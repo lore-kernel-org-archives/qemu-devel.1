@@ -1,29 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59177)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35214)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1ePeQZ-0006xV-7i
-	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 20:04:40 -0500
+	(envelope-from <alistair23@gmail.com>) id 1ePean-0000r4-Ax
+	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 20:15:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1ePeQY-0003NP-30
-	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 20:04:39 -0500
-Received: from mail-wm0-x244.google.com ([2a00:1450:400c:c09::244]:41398)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
-	id 1ePeQX-0003Mc-QP
-	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 20:04:38 -0500
-Received: by mail-wm0-x244.google.com with SMTP id g75so14685428wme.0
-	for <qemu-devel@nongnu.org>; Thu, 14 Dec 2017 17:04:37 -0800 (PST)
+	(envelope-from <alistair23@gmail.com>) id 1ePeam-0001Kh-Dj
+	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 20:15:13 -0500
 MIME-Version: 1.0
 Sender: alistair23@gmail.com
-In-Reply-To: <20171213204436.5379-7-f4bug@amsat.org>
-References: <20171213204436.5379-1-f4bug@amsat.org>
-	<20171213204436.5379-7-f4bug@amsat.org>
+In-Reply-To: <CAAdtpL7ybSzQHHucZTfYtKVR6xwa+r7y0_67b8nJpF_EXMZv6Q@mail.gmail.com>
+References: <20171213195852.30439-1-f4bug@amsat.org>
+	<20171213195852.30439-5-f4bug@amsat.org>
+	<CAKmqyKPvAL3+LAqMBtUOc=0igkSwg4Jmf+Q0ySL7C+oech7AMw@mail.gmail.com>
+	<CAAdtpL6pT0GD+xkV5P+-J=SGr8_kTrNVBxc207g4mRuojrGe3w@mail.gmail.com>
+	<CAKmqyKMU46dmqEDhm9My=4ZM4GQf3n_ZLdm5JnFTi-mf3hz7SQ@mail.gmail.com>
+	<CAAdtpL7ybSzQHHucZTfYtKVR6xwa+r7y0_67b8nJpF_EXMZv6Q@mail.gmail.com>
 From: Alistair Francis <alistair.francis@xilinx.com>
-Date: Thu, 14 Dec 2017 17:04:06 -0800
-Message-ID: <CAKmqyKMTUKfXhU2qDPf+uG=RqMGq1WNW4H-HHeBZLNKjvJRM6Q@mail.gmail.com>
+Date: Thu, 14 Dec 2017 17:14:40 -0800
+Message-ID: <CAKmqyKNZDeF63PrjUAU4MM8C6VbaJj2Ac6Y4zV1rbF2W9QaYtg@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 06/11] sdbus: rename SDCardClass ->
- SDSlaveClass
+Subject: Re: [Qemu-devel] [PATCH 04/14] sdhci: use deposit64()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,160 +29,83 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Cc: Alistair Francis <alistair.francis@xilinx.com>, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, Prasad J Pandit <pjp@fedoraproject.org>, Peter Maydell <peter.maydell@linaro.org>, Andrew Baumann <Andrew.Baumann@microsoft.com>, Andrey Smirnov <andrew.smirnov@gmail.com>, Andrey Yurovsky <yurovsky@gmail.com>, Clement Deschamps <clement.deschamps@antfield.fr>, Sai Pavan Boddu <saipava@xilinx.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
+Cc: Alistair Francis <alistair.francis@xilinx.com>, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, Peter Maydell <peter.maydell@linaro.org>, Prasad J Pandit <pjp@fedoraproject.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Andrey Smirnov <andrew.smirnov@gmail.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Andrew Baumann <Andrew.Baumann@microsoft.com>, Sai Pavan Boddu <saipava@xilinx.com>, QEMU Trivial <qemu-trivial@nongnu.org>, Andrey Yurovsky <yurovsky@gmail.com>
 
-On Wed, Dec 13, 2017 at 12:44 PM, Philippe Mathieu-Daud=C3=A9
-<f4bug@amsat.org> wrote:
-> By default a SD bus connect SD cards, however it may accept other SD devi=
-ces
-> like a SDIO device. The current class is not restricted to a SD "Card" de=
-vice.
-> To better reflect this is a SD bus slave, simply rename it.
+On Thu, Dec 14, 2017 at 4:07 PM, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.o=
+rg> wrote:
+> On Thu, Dec 14, 2017 at 8:41 PM, Alistair Francis
+> <alistair.francis@xilinx.com> wrote:
+>> On Thu, Dec 14, 2017 at 3:25 PM, Philippe Mathieu-Daud=C3=A9 <f4bug@amsa=
+t.org> wrote:
+>>>>> @@ -1123,12 +1123,10 @@ sdhci_write(void *opaque, hwaddr offset, uint=
+64_t val, unsigned size)
+>>>>>          MASKED_WRITE(s->admaerr, mask, value);
+>>>>>          break;
+>>>>>      case SDHC_ADMASYSADDR:
+>>>>> -        s->admasysaddr =3D (s->admasysaddr & (0xFFFFFFFF00000000ULL =
+|
+>>>>> -                (uint64_t)mask)) | (uint64_t)value;
+>>>>> +        s->admasysaddr =3D deposit64(s->admasysaddr, 32, 0, value);
+>>>>
+>>>> This doesn't look right.
+>>>>
+>>>> Originally we were masking admasysaddr with (mask and
+>>>> 0xFFFFFFFF00000000). Then ORing in the value.
+>>>>
+>>>> Now we are depositing value into a bit field that starts at bit 32 and
+>>>> has 0 length. I don't see how value will be deposited at all with a 0
+>>>> length.
+>>>
+>>> good catch :) I'll respin with:
+>>>
+>>>     case SDHC_ADMASYSADDR:
+>>>         s->admasysaddr =3D deposit64(s->admasysaddr, 0, 32, value)
+>>>         break;
+>>>     case SDHC_ADMASYSADDR + 4:
+>>>         s->admasysaddr =3D deposit64(s->admasysaddr, 32, 32, value);
+>>>         break;
+>>
+>> This still doesn't take the mask value into account though.
+>>
+>> Also, doesn't deposit() shift value up in this case? We want to mask
+>> the low bits out. I don't have the code in front of me though, so I
+>> could be wrong here.
 >
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+> We have sdhci_mmio_ops.max_access_size =3D 4, so value will be at most 32=
+bits.
 
-Acked-by: Alistair Francis <alistair.francis@xilinx.com>
+Ah! Good point.
+
+>
+> Now ADMASYSADDR is a 64-bit register, accessible in 2x32-bit.
+>
+> /**
+>  * Deposit @fieldval into the 64 bit @value at the bit field specified
+>  * by the @start and @length parameters, and return the modified
+>  * @value. Bits of @value outside the bit field are not modified.
+>
+> uint64_t deposit64(uint64_t value, int start, int length, uint64_t fieldv=
+al);
+>
+> in both access we use length=3D32
+>
+> at SDHC_ADMASYSADDR we use start=3D0,
+> while at SDHC_ADMASYSADDR + 4 we use start=3D32.
+>
+> both deposit the 32b value (32b masked) into a 64b s->admasysaddr.
+>
+> This is good to clarify this now, because the Spec v3 series (and
+> v4.20 if we want it) add a lot of them.
+
+Ok, this sounds fine to me then.
+
+The mask variable is still being ignored though. value should be anded
+with mask.
 
 Alistair
 
-> ---
->  hw/sd/sd-internal.h | 10 +++++-----
->  hw/sd/core.c        | 16 ++++++++--------
->  hw/sd/sd.c          |  4 ++--
->  3 files changed, 15 insertions(+), 15 deletions(-)
 >
-> diff --git a/hw/sd/sd-internal.h b/hw/sd/sd-internal.h
-> index afd5dbf194..85a747ea64 100644
-> --- a/hw/sd/sd-internal.h
-> +++ b/hw/sd/sd-internal.h
-> @@ -66,10 +66,10 @@ typedef enum {
+> Regards,
 >
->  typedef struct SDState SDState;
->
-> -#define SD_CARD_CLASS(klass) \
-> -    OBJECT_CLASS_CHECK(SDCardClass, (klass), TYPE_SD_CARD)
-> -#define SD_CARD_GET_CLASS(obj) \
-> -    OBJECT_GET_CLASS(SDCardClass, (obj), TYPE_SD_CARD)
-> +#define SDBUS_SLAVE_CLASS(klass) \
-> +    OBJECT_CLASS_CHECK(SDSlaveClass, (klass), TYPE_SD_CARD)
-> +#define SDBUS_SLAVE_GET_CLASS(obj) \
-> +    OBJECT_GET_CLASS(SDSlaveClass, (obj), TYPE_SD_CARD)
->
->  typedef struct {
->      /*< private >*/
-> @@ -83,7 +83,7 @@ typedef struct {
->      void (*enable)(SDState *sd, bool enable);
->      bool (*get_inserted)(SDState *sd);
->      bool (*get_readonly)(SDState *sd);
-> -} SDCardClass;
-> +} SDSlaveClass;
->
->  #define SD_BUS_CLASS(klass) OBJECT_CLASS_CHECK(SDBusClass, (klass), TYPE=
-_SD_BUS)
->  #define SD_BUS_GET_CLASS(obj) OBJECT_GET_CLASS(SDBusClass, (obj), TYPE_S=
-D_BUS)
-> diff --git a/hw/sd/core.c b/hw/sd/core.c
-> index fc9ccfedb2..cd5b531cfa 100644
-> --- a/hw/sd/core.c
-> +++ b/hw/sd/core.c
-> @@ -49,7 +49,7 @@ int sdbus_do_command(SDBus *sdbus, SDRequest *req, uint=
-8_t *response)
->
->      trace_sdbus_command(sdbus_name(sdbus), req->cmd, req->arg, req->crc)=
-;
->      if (card) {
-> -        SDCardClass *sc =3D SD_CARD_GET_CLASS(card);
-> +        SDSlaveClass *sc =3D SDBUS_SLAVE_GET_CLASS(card);
->
->          sz =3D sc->do_command(card, req, response);
->          hexbuf =3D qemu_hexbuf_strdup(response, sz, NULL, "resp: ");
-> @@ -67,7 +67,7 @@ void sdbus_write_data(SDBus *sdbus, uint8_t value)
->
->      trace_sdbus_write(sdbus_name(sdbus), value);
->      if (card) {
-> -        SDCardClass *sc =3D SD_CARD_GET_CLASS(card);
-> +        SDSlaveClass *sc =3D SDBUS_SLAVE_GET_CLASS(card);
->
->          sc->write_data(card, value);
->      }
-> @@ -79,7 +79,7 @@ uint8_t sdbus_read_data(SDBus *sdbus)
->      uint8_t value =3D 0;
->
->      if (card) {
-> -        SDCardClass *sc =3D SD_CARD_GET_CLASS(card);
-> +        SDSlaveClass *sc =3D SDBUS_SLAVE_GET_CLASS(card);
->
->          value =3D sc->read_data(card);
->      }
-> @@ -93,7 +93,7 @@ bool sdbus_data_ready(SDBus *sdbus)
->      SDState *card =3D get_card(sdbus);
->
->      if (card) {
-> -        SDCardClass *sc =3D SD_CARD_GET_CLASS(card);
-> +        SDSlaveClass *sc =3D SDBUS_SLAVE_GET_CLASS(card);
->
->          return sc->data_ready(card);
->      }
-> @@ -106,7 +106,7 @@ bool sdbus_get_inserted(SDBus *sdbus)
->      SDState *card =3D get_card(sdbus);
->
->      if (card) {
-> -        SDCardClass *sc =3D SD_CARD_GET_CLASS(card);
-> +        SDSlaveClass *sc =3D SDBUS_SLAVE_GET_CLASS(card);
->
->          return sc->get_inserted(card);
->      }
-> @@ -119,7 +119,7 @@ bool sdbus_get_readonly(SDBus *sdbus)
->      SDState *card =3D get_card(sdbus);
->
->      if (card) {
-> -        SDCardClass *sc =3D SD_CARD_GET_CLASS(card);
-> +        SDSlaveClass *sc =3D SDBUS_SLAVE_GET_CLASS(card);
->
->          return sc->get_readonly(card);
->      }
-> @@ -150,7 +150,7 @@ void sdbus_set_readonly(SDBus *sdbus, bool readonly)
->  void sdbus_reparent_card(SDBus *from, SDBus *to)
->  {
->      SDState *card =3D get_card(from);
-> -    SDCardClass *sc;
-> +    SDSlaveClass *sc;
->      bool readonly;
->
->      /* We directly reparent the card object rather than implementing thi=
-s
-> @@ -165,7 +165,7 @@ void sdbus_reparent_card(SDBus *from, SDBus *to)
->          return;
->      }
->
-> -    sc =3D SD_CARD_GET_CLASS(card);
-> +    sc =3D SDBUS_SLAVE_GET_CLASS(card);
->      readonly =3D sc->get_readonly(card);
->
->      sdbus_set_inserted(from, false);
-> diff --git a/hw/sd/sd.c b/hw/sd/sd.c
-> index 9b7dee2ec4..97046df5c3 100644
-> --- a/hw/sd/sd.c
-> +++ b/hw/sd/sd.c
-> @@ -1917,7 +1917,7 @@ static Property sd_properties[] =3D {
->  static void sd_class_init(ObjectClass *klass, void *data)
->  {
->      DeviceClass *dc =3D DEVICE_CLASS(klass);
-> -    SDCardClass *sc =3D SD_CARD_CLASS(klass);
-> +    SDSlaveClass *sc =3D SDBUS_SLAVE_CLASS(klass);
->
->      dc->realize =3D sd_realize;
->      dc->props =3D sd_properties;
-> @@ -1938,7 +1938,7 @@ static const TypeInfo sd_info =3D {
->      .name =3D TYPE_SD_CARD,
->      .parent =3D TYPE_DEVICE,
->      .instance_size =3D sizeof(SDState),
-> -    .class_size =3D sizeof(SDCardClass),
-> +    .class_size =3D sizeof(SDSlaveClass),
->      .class_init =3D sd_class_init,
->      .instance_init =3D sd_instance_init,
->      .instance_finalize =3D sd_instance_finalize,
-> --
-> 2.15.1
->
+> Phil.
 >
