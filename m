@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55501)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55515)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1ePpVG-0000Wo-VJ
+	(envelope-from <berto@igalia.com>) id 1ePpVH-0000Wr-9X
 	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 07:54:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1ePpVC-0003GZ-0m
-	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 07:54:14 -0500
+	(envelope-from <berto@igalia.com>) id 1ePpVC-0003HO-6u
+	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 07:54:15 -0500
 From: Alberto Garcia <berto@igalia.com>
-Date: Fri, 15 Dec 2017 13:53:30 +0100
-Message-Id: <97419f591a3aeb5c69c9b24a495f3e603cacb32f.1513342045.git.berto@igalia.com>
+Date: Fri, 15 Dec 2017 13:53:34 +0100
+Message-Id: <3c5596196fac576592433452622c3fb8ce45979c.1513342045.git.berto@igalia.com>
 In-Reply-To: <cover.1513342045.git.berto@igalia.com>
 References: <cover.1513342045.git.berto@igalia.com>
 In-Reply-To: <cover.1513342045.git.berto@igalia.com>
 References: <cover.1513342045.git.berto@igalia.com>
-Subject: [Qemu-devel] [PATCH v2 02/32] qcow2: Add table size field to
- Qcow2Cache
+Subject: [Qemu-devel] [PATCH v2 06/32] qcow2: Remove BDS parameter from
+ qcow2_cache_entry_mark_dirty()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,131 +25,163 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Alberto Garcia <berto@igalia.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, "Denis V . Lunev" <den@openvz.org>
 
-The table size in the qcow2 cache is currently equal to the cluster
-size. This doesn't allow us to use the cache memory efficiently,
-particularly with large cluster sizes, so we need to be able to have
-smaller cache tables that are independent from the cluster size. This
-patch adds a new field to Qcow2Cache that we can use instead of the
-cluster size.
-
-The current table size is still being initialized to the cluster size,
-so there are no semantic changes yet, but this patch will allow us to
-prepare the rest of the code and simplify a few function calls.
+This function was only using the BlockDriverState parameter to pass it
+to qcow2_cache_get_table_idx(). This is no longer necessary so this
+parameter can be removed.
 
 Signed-off-by: Alberto Garcia <berto@igalia.com>
 ---
- block/qcow2-cache.c | 29 ++++++++++++++---------------
- 1 file changed, 14 insertions(+), 15 deletions(-)
+ block/qcow2-cache.c    |  3 +--
+ block/qcow2-cluster.c  | 12 ++++++------
+ block/qcow2-refcount.c | 14 ++++++--------
+ block/qcow2.h          |  3 +--
+ 4 files changed, 14 insertions(+), 18 deletions(-)
 
 diff --git a/block/qcow2-cache.c b/block/qcow2-cache.c
-index c48ffebd8f..d068fed98e 100644
+index 3deded348c..7b4c502908 100644
 --- a/block/qcow2-cache.c
 +++ b/block/qcow2-cache.c
-@@ -39,6 +39,7 @@ struct Qcow2Cache {
-     Qcow2CachedTable       *entries;
-     struct Qcow2Cache      *depends;
-     int                     size;
-+    int                     table_size;
-     bool                    depends_on_flush;
-     void                   *table_array;
-     uint64_t                lru_counter;
-@@ -48,17 +49,15 @@ struct Qcow2Cache {
- static inline void *qcow2_cache_get_table_addr(BlockDriverState *bs,
-                     Qcow2Cache *c, int table)
- {
--    BDRVQcow2State *s = bs->opaque;
--    return (uint8_t *) c->table_array + (size_t) table * s->cluster_size;
-+    return (uint8_t *) c->table_array + (size_t) table * c->table_size;
+@@ -421,8 +421,7 @@ void qcow2_cache_put(BlockDriverState *bs, Qcow2Cache *c, void **table)
+     assert(c->entries[i].ref >= 0);
  }
  
- static inline int qcow2_cache_get_table_idx(BlockDriverState *bs,
-                   Qcow2Cache *c, void *table)
+-void qcow2_cache_entry_mark_dirty(BlockDriverState *bs, Qcow2Cache *c,
+-     void *table)
++void qcow2_cache_entry_mark_dirty(Qcow2Cache *c, void *table)
  {
--    BDRVQcow2State *s = bs->opaque;
-     ptrdiff_t table_offset = (uint8_t *) table - (uint8_t *) c->table_array;
--    int idx = table_offset / s->cluster_size;
--    assert(idx >= 0 && idx < c->size && table_offset % s->cluster_size == 0);
-+    int idx = table_offset / c->table_size;
-+    assert(idx >= 0 && idx < c->size && table_offset % c->table_size == 0);
-     return idx;
- }
+     int i = qcow2_cache_get_table_idx(c, table);
+     assert(c->entries[i].offset != 0);
+diff --git a/block/qcow2-cluster.c b/block/qcow2-cluster.c
+index 8163983d28..1f279a9151 100644
+--- a/block/qcow2-cluster.c
++++ b/block/qcow2-cluster.c
+@@ -325,7 +325,7 @@ static int l2_allocate(BlockDriverState *bs, int l1_index, uint64_t **table)
+     BLKDBG_EVENT(bs->file, BLKDBG_L2_ALLOC_WRITE);
  
-@@ -79,10 +78,9 @@ static void qcow2_cache_table_release(BlockDriverState *bs, Qcow2Cache *c,
- {
- /* Using MADV_DONTNEED to discard memory is a Linux-specific feature */
- #ifdef CONFIG_LINUX
--    BDRVQcow2State *s = bs->opaque;
-     void *t = qcow2_cache_get_table_addr(bs, c, i);
-     int align = getpagesize();
--    size_t mem_size = (size_t) s->cluster_size * num_tables;
-+    size_t mem_size = (size_t) c->table_size * num_tables;
-     size_t offset = QEMU_ALIGN_UP((uintptr_t) t, align) - (uintptr_t) t;
-     size_t length = QEMU_ALIGN_DOWN(mem_size - offset, align);
-     if (mem_size > offset && length > 0) {
-@@ -132,9 +130,10 @@ Qcow2Cache *qcow2_cache_create(BlockDriverState *bs, int num_tables)
- 
-     c = g_new0(Qcow2Cache, 1);
-     c->size = num_tables;
-+    c->table_size = s->cluster_size;
-     c->entries = g_try_new0(Qcow2CachedTable, num_tables);
-     c->table_array = qemu_try_blockalign(bs->file->bs,
--                                         (size_t) num_tables * s->cluster_size);
-+                                         (size_t) num_tables * c->table_size);
- 
-     if (!c->entries || !c->table_array) {
-         qemu_vfree(c->table_array);
-@@ -203,13 +202,13 @@ static int qcow2_cache_entry_flush(BlockDriverState *bs, Qcow2Cache *c, int i)
- 
-     if (c == s->refcount_block_cache) {
-         ret = qcow2_pre_write_overlap_check(bs, QCOW2_OL_REFCOUNT_BLOCK,
--                c->entries[i].offset, s->cluster_size);
-+                c->entries[i].offset, c->table_size);
-     } else if (c == s->l2_table_cache) {
-         ret = qcow2_pre_write_overlap_check(bs, QCOW2_OL_ACTIVE_L2,
--                c->entries[i].offset, s->cluster_size);
-+                c->entries[i].offset, c->table_size);
-     } else {
-         ret = qcow2_pre_write_overlap_check(bs, 0,
--                c->entries[i].offset, s->cluster_size);
-+                c->entries[i].offset, c->table_size);
-     }
- 
+     trace_qcow2_l2_allocate_write_l2(bs, l1_index);
+-    qcow2_cache_entry_mark_dirty(bs, s->l2_table_cache, l2_table);
++    qcow2_cache_entry_mark_dirty(s->l2_table_cache, l2_table);
+     ret = qcow2_cache_flush(bs, s->l2_table_cache);
      if (ret < 0) {
-@@ -223,7 +222,7 @@ static int qcow2_cache_entry_flush(BlockDriverState *bs, Qcow2Cache *c, int i)
-     }
+         goto fail;
+@@ -766,7 +766,7 @@ uint64_t qcow2_alloc_compressed_cluster_offset(BlockDriverState *bs,
+     /* compressed clusters never have the copied flag */
  
-     ret = bdrv_pwrite(bs->file, c->entries[i].offset,
--                      qcow2_cache_get_table_addr(bs, c, i), s->cluster_size);
-+                      qcow2_cache_get_table_addr(bs, c, i), c->table_size);
+     BLKDBG_EVENT(bs->file, BLKDBG_L2_UPDATE_COMPRESSED);
+-    qcow2_cache_entry_mark_dirty(bs, s->l2_table_cache, l2_table);
++    qcow2_cache_entry_mark_dirty(s->l2_table_cache, l2_table);
+     l2_table[l2_index] = cpu_to_be64(cluster_offset);
+     qcow2_cache_put(bs, s->l2_table_cache, (void **) &l2_table);
+ 
+@@ -938,7 +938,7 @@ int qcow2_alloc_cluster_link_l2(BlockDriverState *bs, QCowL2Meta *m)
      if (ret < 0) {
-         return ret;
+         goto err;
      }
-@@ -331,7 +330,7 @@ static int qcow2_cache_do_get(BlockDriverState *bs, Qcow2Cache *c,
-     trace_qcow2_cache_get(qemu_coroutine_self(), c == s->l2_table_cache,
-                           offset, read_from_disk);
+-    qcow2_cache_entry_mark_dirty(bs, s->l2_table_cache, l2_table);
++    qcow2_cache_entry_mark_dirty(s->l2_table_cache, l2_table);
  
--    if (offset_into_cluster(s, offset)) {
-+    if (offset & (c->table_size - 1)) {
-         qcow2_signal_corruption(bs, true, -1, -1, "Cannot get entry from %s "
-                                 "cache: Offset %#" PRIx64 " is unaligned",
-                                 qcow2_cache_get_name(s, c), offset);
-@@ -339,7 +338,7 @@ static int qcow2_cache_do_get(BlockDriverState *bs, Qcow2Cache *c,
-     }
- 
-     /* Check if the table is already cached */
--    i = lookup_index = (offset / s->cluster_size * 4) % c->size;
-+    i = lookup_index = (offset / c->table_size * 4) % c->size;
-     do {
-         const Qcow2CachedTable *t = &c->entries[i];
-         if (t->offset == offset) {
-@@ -380,7 +379,7 @@ static int qcow2_cache_do_get(BlockDriverState *bs, Qcow2Cache *c,
- 
-         ret = bdrv_pread(bs->file, offset,
-                          qcow2_cache_get_table_addr(bs, c, i),
--                         s->cluster_size);
-+                         c->table_size);
-         if (ret < 0) {
-             return ret;
+     assert(l2_index + m->nb_clusters <= s->l2_size);
+     for (i = 0; i < m->nb_clusters; i++) {
+@@ -1679,7 +1679,7 @@ static int discard_single_l2(BlockDriverState *bs, uint64_t offset,
          }
+ 
+         /* First remove L2 entries */
+-        qcow2_cache_entry_mark_dirty(bs, s->l2_table_cache, l2_table);
++        qcow2_cache_entry_mark_dirty(s->l2_table_cache, l2_table);
+         if (!full_discard && s->qcow_version >= 3) {
+             l2_table[l2_index + i] = cpu_to_be64(QCOW_OFLAG_ZERO);
+         } else {
+@@ -1775,7 +1775,7 @@ static int zero_single_l2(BlockDriverState *bs, uint64_t offset,
+             continue;
+         }
+ 
+-        qcow2_cache_entry_mark_dirty(bs, s->l2_table_cache, l2_table);
++        qcow2_cache_entry_mark_dirty(s->l2_table_cache, l2_table);
+         if (cluster_type == QCOW2_CLUSTER_COMPRESSED || unmap) {
+             l2_table[l2_index + i] = cpu_to_be64(QCOW_OFLAG_ZERO);
+             qcow2_free_any_clusters(bs, old_offset, 1, QCOW2_DISCARD_REQUEST);
+@@ -1984,7 +1984,7 @@ static int expand_zero_clusters_in_l1(BlockDriverState *bs, uint64_t *l1_table,
+ 
+         if (is_active_l1) {
+             if (l2_dirty) {
+-                qcow2_cache_entry_mark_dirty(bs, s->l2_table_cache, l2_table);
++                qcow2_cache_entry_mark_dirty(s->l2_table_cache, l2_table);
+                 qcow2_cache_depends_on_flush(s->l2_table_cache);
+             }
+             qcow2_cache_put(bs, s->l2_table_cache, (void **) &l2_table);
+diff --git a/block/qcow2-refcount.c b/block/qcow2-refcount.c
+index 3de1ab51ba..75b1472fc8 100644
+--- a/block/qcow2-refcount.c
++++ b/block/qcow2-refcount.c
+@@ -421,7 +421,7 @@ static int alloc_refcount_block(BlockDriverState *bs,
+ 
+     /* Now the new refcount block needs to be written to disk */
+     BLKDBG_EVENT(bs->file, BLKDBG_REFBLOCK_ALLOC_WRITE);
+-    qcow2_cache_entry_mark_dirty(bs, s->refcount_block_cache, *refcount_block);
++    qcow2_cache_entry_mark_dirty(s->refcount_block_cache, *refcount_block);
+     ret = qcow2_cache_flush(bs, s->refcount_block_cache);
+     if (ret < 0) {
+         goto fail;
+@@ -623,7 +623,7 @@ int64_t qcow2_refcount_area(BlockDriverState *bs, uint64_t start_offset,
+                 goto fail;
+             }
+             memset(refblock_data, 0, s->cluster_size);
+-            qcow2_cache_entry_mark_dirty(bs, s->refcount_block_cache,
++            qcow2_cache_entry_mark_dirty(s->refcount_block_cache,
+                                          refblock_data);
+ 
+             new_table[i] = block_offset;
+@@ -656,7 +656,7 @@ int64_t qcow2_refcount_area(BlockDriverState *bs, uint64_t start_offset,
+                 s->set_refcount(refblock_data, j, 1);
+             }
+ 
+-            qcow2_cache_entry_mark_dirty(bs, s->refcount_block_cache,
++            qcow2_cache_entry_mark_dirty(s->refcount_block_cache,
+                                          refblock_data);
+         }
+ 
+@@ -845,8 +845,7 @@ static int QEMU_WARN_UNUSED_RESULT update_refcount(BlockDriverState *bs,
+         }
+         old_table_index = table_index;
+ 
+-        qcow2_cache_entry_mark_dirty(bs, s->refcount_block_cache,
+-                                     refcount_block);
++        qcow2_cache_entry_mark_dirty(s->refcount_block_cache, refcount_block);
+ 
+         /* we can update the count and save it */
+         block_index = cluster_index & (s->refcount_block_size - 1);
+@@ -1316,8 +1315,7 @@ int qcow2_update_snapshot_refcount(BlockDriverState *bs,
+                             s->refcount_block_cache);
+                     }
+                     l2_table[j] = cpu_to_be64(entry);
+-                    qcow2_cache_entry_mark_dirty(bs, s->l2_table_cache,
+-                                                 l2_table);
++                    qcow2_cache_entry_mark_dirty(s->l2_table_cache, l2_table);
+                 }
+             }
+ 
+@@ -3134,7 +3132,7 @@ static int qcow2_discard_refcount_block(BlockDriverState *bs,
+     }
+     s->set_refcount(refblock, block_index, 0);
+ 
+-    qcow2_cache_entry_mark_dirty(bs, s->refcount_block_cache, refblock);
++    qcow2_cache_entry_mark_dirty(s->refcount_block_cache, refblock);
+ 
+     qcow2_cache_put(bs, s->refcount_block_cache, &refblock);
+ 
+diff --git a/block/qcow2.h b/block/qcow2.h
+index 6f0ff15dd0..caab8630d9 100644
+--- a/block/qcow2.h
++++ b/block/qcow2.h
+@@ -642,8 +642,7 @@ int qcow2_read_snapshots(BlockDriverState *bs);
+ Qcow2Cache *qcow2_cache_create(BlockDriverState *bs, int num_tables);
+ int qcow2_cache_destroy(BlockDriverState* bs, Qcow2Cache *c);
+ 
+-void qcow2_cache_entry_mark_dirty(BlockDriverState *bs, Qcow2Cache *c,
+-     void *table);
++void qcow2_cache_entry_mark_dirty(Qcow2Cache *c, void *table);
+ int qcow2_cache_flush(BlockDriverState *bs, Qcow2Cache *c);
+ int qcow2_cache_write(BlockDriverState *bs, Qcow2Cache *c);
+ int qcow2_cache_set_dependency(BlockDriverState *bs, Qcow2Cache *c,
 -- 
 2.11.0
