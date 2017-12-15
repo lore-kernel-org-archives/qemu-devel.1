@@ -1,29 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37365)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43239)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1ePkF2-0004H6-Tz
-	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 02:17:09 -0500
+	(envelope-from <bounces@canonical.com>) id 1ePkSQ-00008p-P9
+	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 02:30:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1ePkEy-0002El-Ur
-	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 02:17:08 -0500
-Received: from 8.mo5.mail-out.ovh.net ([178.32.116.78]:57997)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1ePkEy-0002Cw-NU
-	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 02:17:04 -0500
-Received: from player773.ha.ovh.net (b9.ovh.net [213.186.33.59])
-	by mo5.mail-out.ovh.net (Postfix) with ESMTP id A5C5415C78B
-	for <qemu-devel@nongnu.org>; Fri, 15 Dec 2017 08:17:02 +0100 (CET)
-References: <20171215061739.9494-1-clg@kaod.org>
-	<df01dd59-d118-0bc4-3c1e-21bdaa3e47b0@ozlabs.ru>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <40d07664-5f54-bd1c-f7f7-d11e7909e5a6@kaod.org>
-Date: Fri, 15 Dec 2017 08:16:57 +0100
+	(envelope-from <bounces@canonical.com>) id 1ePkSN-0000Bt-KI
+	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 02:30:58 -0500
+Received: from indium.canonical.com ([91.189.90.7]:55934)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1ePkSN-000093-E9
+	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 02:30:55 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1ePkSM-00045V-2y
+	for <qemu-devel@nongnu.org>; Fri, 15 Dec 2017 07:30:54 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 09B642E80CB
+	for <qemu-devel@nongnu.org>; Fri, 15 Dec 2017 07:30:54 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <df01dd59-d118-0bc4-3c1e-21bdaa3e47b0@ozlabs.ru>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH] ppc/pnv: change powernv_ prefix
- to pnv_ for overall naming consistency
+Date: Fri, 15 Dec 2017 07:23:32 -0000
+From: Michal Nowak <mnowak@startmail.com>
+Reply-To: Bug 1738283 <1738283@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <151328724563.26325.11755910452939969450.malonedeb@wampee.canonical.com>
+Message-Id: <151332261223.18327.1640658459464258664.malone@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1738283] Re: 'Less than' (<), 'more than' (>),
+ and 'pipe' (|) can't be typed via VNC
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,47 +37,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alexey Kardashevskiy <aik@ozlabs.ru>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
+To: qemu-devel@nongnu.org
 
-On 12/15/2017 07:43 AM, Alexey Kardashevskiy wrote:
-> On 15/12/17 17:17, C=C3=A9dric Le Goater wrote:
->> Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
->> ---
->>  hw/ppc/pnv.c         | 84 ++++++++++++++++++++++++++-----------------=
----------
->>  hw/ppc/pnv_core.c    |  8 ++---
->>  hw/ppc/pnv_lpc.c     |  2 +-
->>  include/hw/ppc/pnv.h |  8 ++---
->>  4 files changed, 51 insertions(+), 51 deletions(-)
->>
->> diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
->> index c35c439d816b..4bc5f61d0da7 100644
->> --- a/hw/ppc/pnv.c
->> +++ b/hw/ppc/pnv.c
->> @@ -77,7 +77,7 @@ static const char *pnv_chip_core_typename(const PnvC=
-hip *o)
->>   * that has a different "affinity". In practice, it means one range
->>   * per chip.
->>   */
->> -static void powernv_populate_memory_node(void *fdt, int chip_id, hwad=
-dr start,
->> +static void pnv_populate_memory_node(void *fdt, int chip_id, hwaddr s=
-tart,
->>                                           hwaddr size)
->=20
-> You may also want to fix indentations like the line above.
+Well, if virt-manager is configured to run the VM with `-k en-us` I
+can't enter <>| even in virt-manager. keycodemapdb?
 
-yes. I missed that. I should run indent after using sed.
+-- =
 
-While I am at it, I can also change the name of the routines=20
-populating the device tree.=20
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1738283
 
-David,=20
+Title:
+  'Less than' (<), 'more than' (>), and 'pipe' (|) can't be typed via
+  VNC
 
-are you following more or less this pattern :
+Status in QEMU:
+  New
 
-	<machine>_dt_<device>
+Bug description:
+  If I start QEMU 2.11 (from
+  https://build.opensuse.org/package/show/Virtualization/qemu) VM with
+  VNC, I am unable to type following three characters: 'less than' (<),
+  'more than' (>), and 'pipe' (|) on en_US QWERTY keyboard. Other
+  characters work fine. QEMu version 2.10.1 worked fine.
 
-Thanks,
+  /usr/bin/qemu-kvm -m 2048 -cpu kvm64 -drive
+  media=3Dcdrom,if=3Dnone,id=3Dcd0,format=3Draw,file=3DOI-hipster-
+  minimal-20171031.iso -device ide-cd,drive=3Dcd0 -boot once=3Dd,menu=3Don
+  ,splash-time=3D5000 -device usb-ehci -device usb-tablet -smp 1 -enable-
+  kvm -vnc :91,share=3Dforce-shared
 
-C.
+  The ISO can be downloaded here: https://www.openindiana.org/download/
+
+  Also tried Fedora-Server-dvd-x86_64-25-1.3.iso and it's the same
+  situation.
+
+  If I run the same command without '-vnc :91,share=3Dforce-shared',
+  everything works just fine.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1738283/+subscriptions
