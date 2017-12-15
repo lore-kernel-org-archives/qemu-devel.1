@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55479)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55469)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1ePpVG-0000Wg-GT
+	(envelope-from <berto@igalia.com>) id 1ePpVG-0000Wf-CS
 	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 07:54:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1ePpVC-0003JJ-TJ
+	(envelope-from <berto@igalia.com>) id 1ePpVC-0003IU-Q6
 	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 07:54:14 -0500
 From: Alberto Garcia <berto@igalia.com>
-Date: Fri, 15 Dec 2017 13:53:56 +0100
-Message-Id: <93ac7be373e194f4dfcc73c0bea96bd1c00209da.1513342045.git.berto@igalia.com>
+Date: Fri, 15 Dec 2017 13:53:33 +0100
+Message-Id: <dd49ca34767c46886ef775739c3a3611b7d5a65b.1513342045.git.berto@igalia.com>
 In-Reply-To: <cover.1513342045.git.berto@igalia.com>
 References: <cover.1513342045.git.berto@igalia.com>
 In-Reply-To: <cover.1513342045.git.berto@igalia.com>
 References: <cover.1513342045.git.berto@igalia.com>
-Subject: [Qemu-devel] [PATCH v2 28/32] qcow2: Rename l2_table in
- count_contiguous_clusters()
+Subject: [Qemu-devel] [PATCH v2 05/32] qcow2: Remove BDS parameter from
+ qcow2_cache_table_release()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,50 +25,53 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Alberto Garcia <berto@igalia.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, "Denis V . Lunev" <den@openvz.org>
 
-This function doesn't need any changes to support L2 slices, but since
-it's now dealing with slices intead of full tables, the l2_table
-variable is renamed for clarity.
+This function was only using the BlockDriverState parameter to get the
+cache table size (since it was equal to the cluster size). This is no
+longer necessary so this parameter can be removed.
 
 Signed-off-by: Alberto Garcia <berto@igalia.com>
 ---
- block/qcow2-cluster.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+ block/qcow2-cache.c | 9 ++++-----
+ 1 file changed, 4 insertions(+), 5 deletions(-)
 
-diff --git a/block/qcow2-cluster.c b/block/qcow2-cluster.c
-index 0afe4eda13..3deb132fa4 100644
---- a/block/qcow2-cluster.c
-+++ b/block/qcow2-cluster.c
-@@ -371,19 +371,19 @@ fail:
+diff --git a/block/qcow2-cache.c b/block/qcow2-cache.c
+index c2a85b80b8..3deded348c 100644
+--- a/block/qcow2-cache.c
++++ b/block/qcow2-cache.c
+@@ -71,8 +71,7 @@ static inline const char *qcow2_cache_get_name(BDRVQcow2State *s, Qcow2Cache *c)
+     }
  }
  
- /*
-- * Checks how many clusters in a given L2 table are contiguous in the image
-+ * Checks how many clusters in a given L2 slice are contiguous in the image
-  * file. As soon as one of the flags in the bitmask stop_flags changes compared
-  * to the first cluster, the search is stopped and the cluster is not counted
-  * as contiguous. (This allows it, for example, to stop at the first compressed
-  * cluster which may require a different handling)
-  */
- static int count_contiguous_clusters(int nb_clusters, int cluster_size,
--        uint64_t *l2_table, uint64_t stop_flags)
-+        uint64_t *l2_slice, uint64_t stop_flags)
+-static void qcow2_cache_table_release(BlockDriverState *bs, Qcow2Cache *c,
+-                                      int i, int num_tables)
++static void qcow2_cache_table_release(Qcow2Cache *c, int i, int num_tables)
  {
-     int i;
-     QCow2ClusterType first_cluster_type;
-     uint64_t mask = stop_flags | L2E_OFFSET_MASK | QCOW_OFLAG_COMPRESSED;
--    uint64_t first_entry = be64_to_cpu(l2_table[0]);
-+    uint64_t first_entry = be64_to_cpu(l2_slice[0]);
-     uint64_t offset = first_entry & mask;
- 
-     if (!offset) {
-@@ -396,7 +396,7 @@ static int count_contiguous_clusters(int nb_clusters, int cluster_size,
-            first_cluster_type == QCOW2_CLUSTER_ZERO_ALLOC);
- 
-     for (i = 0; i < nb_clusters; i++) {
--        uint64_t l2_entry = be64_to_cpu(l2_table[i]) & mask;
-+        uint64_t l2_entry = be64_to_cpu(l2_slice[i]) & mask;
-         if (offset + (uint64_t) i * cluster_size != l2_entry) {
-             break;
+ /* Using MADV_DONTNEED to discard memory is a Linux-specific feature */
+ #ifdef CONFIG_LINUX
+@@ -114,7 +113,7 @@ void qcow2_cache_clean_unused(BlockDriverState *bs, Qcow2Cache *c)
          }
+ 
+         if (to_clean > 0) {
+-            qcow2_cache_table_release(bs, c, i - to_clean, to_clean);
++            qcow2_cache_table_release(c, i - to_clean, to_clean);
+         }
+     }
+ 
+@@ -306,7 +305,7 @@ int qcow2_cache_empty(BlockDriverState *bs, Qcow2Cache *c)
+         c->entries[i].lru_counter = 0;
+     }
+ 
+-    qcow2_cache_table_release(bs, c, 0, c->size);
++    qcow2_cache_table_release(c, 0, c->size);
+ 
+     c->lru_counter = 0;
+ 
+@@ -453,5 +452,5 @@ void qcow2_cache_discard(BlockDriverState *bs, Qcow2Cache *c, void *table)
+     c->entries[i].lru_counter = 0;
+     c->entries[i].dirty = false;
+ 
+-    qcow2_cache_table_release(bs, c, i, 1);
++    qcow2_cache_table_release(c, i, 1);
+ }
 -- 
 2.11.0
