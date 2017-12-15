@@ -1,27 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37443)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38474)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1ePsaX-0005wG-Fs
-	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 11:11:54 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1ePsca-0007uO-35
+	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 11:14:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1ePsaU-0007J0-7J
-	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 11:11:53 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:33454)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1ePsaU-0007Hu-22
-	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 11:11:50 -0500
-Date: Fri, 15 Dec 2017 16:11:40 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20171215161139.GD2358@work-vm>
-References: <20171213180807.7066-1-dgilbert@redhat.com>
-	<20171213180807.7066-5-dgilbert@redhat.com>
-	<20171214162731.50a95633@redhat.com>
-	<20171215133022.GD14126@work-vm>
-	<3b22f588-f7be-d1e2-9b72-072308fe8218@redhat.com>
+	(envelope-from <vsementsov@virtuozzo.com>) id 1ePscW-0000xl-SV
+	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 11:14:00 -0500
+Received: from mail-he1eur01on0097.outbound.protection.outlook.com
+	([104.47.0.97]:45366
+	helo=EUR01-HE1-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+	id 1ePscW-0000td-3D
+	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 11:13:56 -0500
+References: <3c1d9325-56a9-225d-4ff8-230f8ed52fed@virtuozzo.com>
+	<76f5ec24-112f-455a-4ad4-5c97d7182f36@redhat.com>
+	<20171130143306.GC4039@localhost.localdomain>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <328818d5-8d63-8aec-aba2-40404e03503c@virtuozzo.com>
+Date: Fri, 15 Dec 2017 19:13:37 +0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <3b22f588-f7be-d1e2-9b72-072308fe8218@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v4 4/6] vhost: add regions to temporary list
+In-Reply-To: <20171130143306.GC4039@localhost.localdomain>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: quoted-printable
+Content-Language: en-US
+Subject: Re: [Qemu-devel] export root node for write through NBD
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,33 +32,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org, maxime.coquelin@redhat.com, groug@kaod.org, mst@redhat.com
+To: Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, Eric Blake <eblake@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, "Denis V. Lunev" <den@openvz.org>, Nikolay Shirokovskiy <nshirokovskiy@virtuozzo.com>
 
-* Paolo Bonzini (pbonzini@redhat.com) wrote:
-> On 15/12/2017 14:30, Dr. David Alan Gilbert wrote:
-> >> Also it seems that we have a race in current code where
-> >> region_del() unrefs memory region first and then by the
-> >> commit time memory region could be gone since old flatview
-> >> is unreffed before commit callback is called, but guest still
-> >> uses old memory map until vhost_set_mem_table() is complete.
-> >> We probably should unref deleted(old) sections after
-> >> guest gets new memmap.
-> >
-> > Will they really get cleaned up before the commit() returns?
-> > There's no rcu like thing guarding it?
-> 
-> The memory subsystem only keeps them alive until before commmit() is
-> invoked.
+30.11.2017 17:33, Kevin Wolf wrote:
+> Am 30.11.2017 um 15:21 hat Max Reitz geschrieben:
+>> On 2017-11-30 08:47, Vladimir Sementsov-Ogievskiy wrote:
+>>> Hi all.
+>>>
+>>> We need the following option: start vm in stopped mode (-S) and write
+>>> it's disk before start through NBD.
+>>> It should be absolutely safe, but unfortunately it is disallowed by roo=
+t
+>>> role of the disk.
+>>> Is there any workaround or if not, what is a true way to implement this
+>>> possibility?
+>>>
+>>> ----
+>>> error message:
+>>>  =A0=A0=A0 unable to execute QEMU command 'nbd-server-add': Conflicts w=
+ith use
+>>> by drive0 as 'root', which does not allow 'write' on #block100
+>> One thing that comes to mind is adding the guest device only after you
+>> are done with NBD.
+>>
+>> The other of course is to set share-rw=3Don for the device.
+> We already allow this with incoming migration, in that case the
+> BlockBackend for the guest device stays inactive and doesn't request
+> permissions yet.
+>
+> I've been thinking for a while that it would be nice to unify the
+> startup of "normal" VMs and incoming migration, so that images are
+> always opened inactive first and then get activated.
+>
+> The interesting point for you could be that opening the image happens
+> immediately when the process starts, but activation would only happen
+> when the VM actually starts running (i.e. on 'cont').
+>
+> Kevin
 
-Hmm ok; I guess then we do need to keep the temporary list of
-MemoryRegionSections and unref all the old ones after the end of the callback.
+Could it be as simple as:
 
-I'll rework it (again).
+diff --git a/block/block-backend.c b/block/block-backend.c
+index 3064cb888f..b8cbb43f02 100644
+--- a/block/block-backend.c
++++ b/block/block-backend.c
+@@ -709,7 +709,9 @@ static int blk_do_attach_dev(BlockBackend *blk, void=20
+*dev)
+ =A0=A0=A0=A0 /* While migration is still incoming, we don't need to apply =
+the
+ =A0=A0=A0=A0=A0 * permissions of guest device BlockBackends. We might stil=
+l have=20
+a block
+ =A0=A0=A0=A0=A0 * job or NBD server writing to the image for storage migra=
+tion. */
+-=A0=A0=A0 if (runstate_check(RUN_STATE_INMIGRATE)) {
++=A0=A0=A0 if (runstate_check(RUN_STATE_INMIGRATE) ||
++=A0=A0=A0=A0=A0=A0=A0 runstate_check(RUN_STATE_PRELAUNCH))
++=A0=A0=A0 {
+ =A0=A0=A0=A0=A0=A0=A0=A0 blk->disable_perm =3D true;
+ =A0=A0=A0=A0 }
 
-Dave
 
+(at least it fixes my case)
 
-> Paolo
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+--=20
+Best regards,
+Vladimir
