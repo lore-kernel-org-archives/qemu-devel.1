@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47749)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48450)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1ePozy-0005FX-IM
-	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 07:21:55 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1ePp2L-0006iQ-Kr
+	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 07:24:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1ePozr-0006st-I3
-	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 07:21:51 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:35288)
+	(envelope-from <dgilbert@redhat.com>) id 1ePp2H-0001yI-JJ
+	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 07:24:21 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:45854)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1ePozr-0006pe-Bi
-	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 07:21:47 -0500
-Date: Fri, 15 Dec 2017 12:21:39 +0000
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20171215122139.GC11724@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <1511426872-13980-1-git-send-email-jianjay.zhou@huawei.com>
-	<20171205195816.GH2405@work-vm>
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1ePp2H-0001x5-8A
+	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 07:24:17 -0500
+Date: Fri, 15 Dec 2017 12:24:08 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20171215122408.GA14126@work-vm>
+References: <20171213180807.7066-1-dgilbert@redhat.com>
+	<20171213180807.7066-3-dgilbert@redhat.com>
+	<20171214150716.3ffc6b52@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20171205195816.GH2405@work-vm>
-Subject: Re: [Qemu-devel] [PATCH] docs/devel/migration.txt: keep functions
- consistent with the code
+In-Reply-To: <20171214150716.3ffc6b52@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v4 2/6] vhost: Simplify ring verification
+ checks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,32 +29,179 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: Jay Zhou <jianjay.zhou@huawei.com>, qemu-devel@nongnu.org, quintela@redhat.com, weidong.huang@huawei.com, wangxinxin.wang@huawei.com
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: qemu-devel@nongnu.org, pbonzini@redhat.com, maxime.coquelin@redhat.com, mst@redhat.com, groug@kaod.org
 
-On Tue, Dec 05, 2017 at 07:58:16PM +0000, Dr. David Alan Gilbert wrote:
-> * Jay Zhou (jianjay.zhou@huawei.com) wrote:
-> > Since the commit 11808bb0c422134bf09119f4aa22c59b0ce84bf3 removed
-> > the put_buffer callback and using an iovec based write handler instead,
-> > the docs should be sync with the code too.
-> > 
-> > Signed-off-by: Jay Zhou <jianjay.zhou@huawei.com>
+* Igor Mammedov (imammedo@redhat.com) wrote:
+> On Wed, 13 Dec 2017 18:08:03 +0000
+> "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com> wrote:
 > 
-> Lets check with Dan (added to cc) since he wrote 11808bb;
-> it might be best just to rever to migration/qemu-file.h for an
-> explanation of each function.
+> > From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+> > 
+> > vhost_verify_ring_mappings() were used to verify that
+> > rings are still accessible and related memory hasn't
+> > been moved after flatview is updated.
+> > 
+> > It was doing checks by mapping ring's GPA+len and
+> > checking that HVA hadn't changed with new memory map.
+> > To avoid maybe expensive mapping call, we were
+> > identifying address range that changed and were doing
+> > mapping only if ring was in changed range.
+> > 
+> > However it's not neccessary to perform ring's GPA
+> > mapping as we already have its current HVA and all
+> > we need is to verify that ring's GPA translates to
+> > the same HVA in updated flatview.
+> > 
+> > This will allow the following patches to simplify the range
+> > comparison that was previously needed to avoid expensive
+> > verify_ring_mapping calls.
+> > 
+> > Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+> > with modifications by:
+> > Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> > ---
+> >  hw/virtio/vhost.c | 74 ++++++++++++++++++++++++++++++-------------------------
+> >  1 file changed, 41 insertions(+), 33 deletions(-)
+> > 
+> > diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
+> > index e923219e63..c7ce7baf9b 100644
+> > --- a/hw/virtio/vhost.c
+> > +++ b/hw/virtio/vhost.c
+> > @@ -450,35 +450,37 @@ static void vhost_memory_unmap(struct vhost_dev *dev, void *buffer,
+> >      }
+> >  }
+> >  
+> > -static int vhost_verify_ring_part_mapping(struct vhost_dev *dev,
+> > -                                          void *part,
+> > -                                          uint64_t part_addr,
+> > -                                          uint64_t part_size,
+> > -                                          uint64_t start_addr,
+> > -                                          uint64_t size)
+> > +static int vhost_verify_ring_part_mapping(void *ring_hva,
+> > +                                          uint64_t ring_gpa,
+> > +                                          uint64_t ring_size,
+> > +                                          void *reg_hva,
+> > +                                          uint64_t reg_gpa,
+> > +                                          uint64_t reg_size)
+> >  {
+> > -    hwaddr l;
+> > -    void *p;
+> > -    int r = 0;
+> > +    uint64_t hva_ring_offset;
+> > +    uint64_t ring_last = range_get_last(ring_gpa, ring_size);
+> > +    uint64_t reg_last = range_get_last(reg_gpa, reg_size);
+> >  
+> > -    if (!ranges_overlap(start_addr, size, part_addr, part_size)) {
+> > +    if (ring_last < reg_gpa || ring_gpa > reg_last) {
+> >          return 0;
+> >      }
+> > -    l = part_size;
+> > -    p = vhost_memory_map(dev, part_addr, &l, 1);
+> > -    if (!p || l != part_size) {
+> > -        r = -ENOMEM;
+> > +    /* check that whole ring's is mapped */
+> > +    if (ring_last > reg_last) {
+> > +        return -EBUSY;
+> ENOMEM
 
-The updates look ok, but I tend to think this entire section of
-migrate.txt should be deleted, in favour of the inline APIs
-docs in mijgration/qemu-file.h   As a developer the header file
-is where I would look for this kind of API description. The
-migration.txt can just point epople to the header file for API
-docs.
+Done
 
+> >      }
+> > -    if (p != part) {
+> > -        r = -EBUSY;
+> > +    /* check that ring's MemoryRegion wasn't replaced */
+> > +    hva_ring_offset = ring_gpa - reg_gpa;
+> > +    if (ring_hva != reg_hva + hva_ring_offset) {
+> > +        return -ENOMEM;
+> EBUSY
 
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+Done
+
+> 
+> >      }
+> > -    vhost_memory_unmap(dev, p, l, 0, 0);
+> > -    return r;
+> > +
+> > +    return 0;
+> >  }
+> >  
+> >  static int vhost_verify_ring_mappings(struct vhost_dev *dev,
+> > -                                      uint64_t start_addr,
+> > -                                      uint64_t size)
+> > +                                      void *reg_hva,
+> > +                                      uint64_t reg_gpa,
+> > +                                      uint64_t reg_size)
+> >  {
+> >      int i, j;
+> >      int r = 0;
+> > @@ -492,22 +494,25 @@ static int vhost_verify_ring_mappings(struct vhost_dev *dev,
+> >          struct vhost_virtqueue *vq = dev->vqs + i;
+> >  
+> >          j = 0;
+> > -        r = vhost_verify_ring_part_mapping(dev, vq->desc, vq->desc_phys,
+> > -                                           vq->desc_size, start_addr, size);
+> > +        r = vhost_verify_ring_part_mapping(
+> > +                vq->desc, vq->desc_phys, vq->desc_size,
+> > +                reg_hva, reg_gpa, reg_size);
+> >          if (r) {
+> >              break;
+> >          }
+> >  
+> >          j++;
+> > -        r = vhost_verify_ring_part_mapping(dev, vq->avail, vq->avail_phys,
+> > -                                           vq->avail_size, start_addr, size);
+> > +        r = vhost_verify_ring_part_mapping(
+> > +                vq->desc, vq->desc_phys, vq->desc_size,
+> > +                reg_hva, reg_gpa, reg_size);
+> >          if (r) {
+> >              break;
+> >          }
+> >  
+> >          j++;
+> > -        r = vhost_verify_ring_part_mapping(dev, vq->used, vq->used_phys,
+> > -                                           vq->used_size, start_addr, size);
+> > +        r = vhost_verify_ring_part_mapping(
+> > +                vq->desc, vq->desc_phys, vq->desc_size,
+> > +                reg_hva, reg_gpa, reg_size);
+> >          if (r) {
+> >              break;
+> >          }
+> > @@ -633,8 +638,6 @@ static void vhost_commit(MemoryListener *listener)
+> >  {
+> >      struct vhost_dev *dev = container_of(listener, struct vhost_dev,
+> >                                           memory_listener);
+> > -    hwaddr start_addr = 0;
+> > -    ram_addr_t size = 0;
+> >      uint64_t log_size;
+> >      int r;
+> >  
+> > @@ -649,11 +652,16 @@ static void vhost_commit(MemoryListener *listener)
+> >      }
+> >  
+> >      if (dev->started) {
+> ^^^ not needed as we bail out earlier if it's not true
+
+Done
+
+> > -        start_addr = dev->mem_changed_start_addr;
+> > -        size = dev->mem_changed_end_addr - dev->mem_changed_start_addr + 1;
+> > -
+> > -        r = vhost_verify_ring_mappings(dev, start_addr, size);
+> > -        assert(r >= 0);
+> > +        int i;
+> > +        for (i = 0; i < dev->mem->nregions; i++) {
+> > +            if (vhost_verify_ring_mappings(dev,
+> > +                               (void *)dev->mem->regions[i].userspace_addr,
+> > +                               dev->mem->regions[i].guest_phys_addr,
+> > +                               dev->mem->regions[i].memory_size)) {
+> > +                error_report("Verify ring failure on region %d", i);
+> > +                abort();
+> > +            }
+> > +        }
+> >      }
+> >  
+> >      if (!dev->log_enabled) {
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
