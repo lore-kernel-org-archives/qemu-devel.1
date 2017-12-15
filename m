@@ -1,34 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44689)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46619)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1ePsrc-0004b2-7x
-	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 11:29:33 -0500
+	(envelope-from <bounces@canonical.com>) id 1ePswO-0000NP-Tg
+	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 11:34:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1ePsrY-0007UR-RG
-	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 11:29:32 -0500
-Received: from indium.canonical.com ([91.189.90.7]:58682)
+	(envelope-from <bounces@canonical.com>) id 1ePswN-0003vg-U0
+	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 11:34:28 -0500
+Received: from indium.canonical.com ([91.189.90.7]:35088)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1ePsrY-0007Sn-LE
-	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 11:29:28 -0500
+	id 1ePswN-0003uR-Nv
+	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 11:34:27 -0500
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1ePsrW-0006T0-NK
-	for <qemu-devel@nongnu.org>; Fri, 15 Dec 2017 16:29:26 +0000
+	id 1ePswL-0007y6-RI
+	for <qemu-devel@nongnu.org>; Fri, 15 Dec 2017 16:34:26 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id B8D2E2E8197
-	for <qemu-devel@nongnu.org>; Fri, 15 Dec 2017 16:29:24 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 928452E80DC
+	for <qemu-devel@nongnu.org>; Fri, 15 Dec 2017 16:34:25 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Fri, 15 Dec 2017 16:15:54 -0000
-From: Thomas Huth <696094@bugs.launchpad.net>
-Reply-To: Bug 696094 <696094@bugs.launchpad.net>
+Date: Fri, 15 Dec 2017 16:24:17 -0000
+From: Thomas Huth <855630@bugs.launchpad.net>
+Reply-To: Bug 855630 <855630@bugs.launchpad.net>
 Sender: bounces@canonical.com
-References: <20101231203043.711.86363.malonedeb@potassium.ubuntu.com>
-Message-Id: <151335455625.26681.16834897930060175035.launchpad@wampee.canonical.com>
+References: <20110921150616.12335.44343.malonedeb@gac.canonical.com>
+Message-Id: <151335505735.18606.11136160777586532876.malone@chaenomeles.canonical.com>
 Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 696094] Re: TI Stellaris lm3s811evb (ARM
- Cortex-M3) : Systick interrupt not working
+Subject: [Qemu-devel] [Bug 855630] Re: Cant Run Wine (posix not nptl) past
+ 0.14.1
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,77 +39,34 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
+Triaging old bug tickets... The problem with the SDL static linking has lik=
+ely been fixed here:
+https://git.qemu.org/?p=3Dqemu.git;a=3Dcommitdiff;h=3D5f37e6d4a7b22ccf1bb8f=
+a4
+Can you still reproduce the other issue with the latest version of QEMU? Or=
+ could we close this ticket nowadays?
+
 ** Changed in: qemu
-       Status: Fix Committed =3D> Fix Released
+       Status: New =3D> Incomplete
 
 -- =
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/696094
+https://bugs.launchpad.net/bugs/855630
 
 Title:
-  TI Stellaris lm3s811evb (ARM Cortex-M3) : Systick interrupt not
-  working
+  Cant Run Wine (posix not nptl) past 0.14.1
 
 Status in QEMU:
-  Fix Released
+  Incomplete
 
 Bug description:
-  I've tried to create a small project that uses the CMSIS as base library.
-  The problem is that the SysTick_interrupt_handler() doesn't get executed =
-when the systick event is detected in QEMU. Furthermore, it seems asif QEMU=
- gets stuck in an endless loop. QEMU doesn't respond to Ctrl-C on the comma=
-nd line and the GDB session also stalls. 'kill -9' is the only way to stop =
-QEMU.
+  when trying to build qemu I can build with ./configure --static
+  --target-list=3Di386-linux-user just fine with 0.14.1
 
-  It seems asif the initialisation of the NVIC works fine. I've traced the =
-function calls in QEMU as follows:
-  stellaris.c: stellaris_init() - Perform generic armv7 init: armv7m_init()
-     armv7m.c: armv7m_init() - Create and init the nvic:
-                                 nvic =3D qdev_create(NULL, "armv7m_nvic");
-                                 env->nvic =3D nvic;
-                                 qdev_init_nofail(nvic);
-                             - Configure the programmable interrupt control=
-ler:
-                                 Call: arm_pic_init_cpu() =
-
-                                          qemu_allocate_irqs(arm_pic_cpu_ha=
-ndler)
-                             - Initialise 64 interrupt structures.
-
-  The following call sequence is observed when the systick event occur:
-  armv7m_nvic.c: systick_timer_tick(): set pending interrupt
-  armv7m_nvic.c: armv7m_nvic_set_pending() for irq:15
-    arm_gic.c: gic_set_pending_private(): GIC_SET_PENDING(15,)
-      arm_gic.c: gic_update() - Raise IRQ with qemu_set_irq()
-         irq.c: eqmu_set_irq() - Call the irq->handler =
-
-                                 -- I assume the irq handler is 'arm_pic_cp=
-u_handler()',
-                                    since that was passed as the parameter =
-when
-                                    qemu_allocate_irqs() was called in ...
-            arm_pic.c: arm_pic_cpu_handler() - After evaluation, call cpu_i=
-nterrupt()
-               exec.c: cpu_interrupt() is called.     =
-
-
-  The tools that were used during the testing of this project:
-    GCC: Codesourcery ARM eabi 2010q3
-    QEMU: Checked out on 31/12/2010 - Last commit: 0fcec41eec0432c77645b4a4=
-07d3a3e030c4abc4
-  The project files are attached, for reproducing of the errors.
-     Note: The CMSIS wants to perform byte accesses to the NVIC. For the Co=
-rtex-M3, unaligned 8 bit and 16 bit accesses are allowed. The current QEMU =
-implementation doesn't yet cater for it. As a work around, updated versions=
- of
-  arm_gic.c armv7m_nvic.h armv7m_nvic.c is also included.
-
-  Launch project with: go_gdb.sh
-  Attach debugger with: arm-none-eabi-gdbtui --command=3DgdbCommands_tui
-  (s =3D step, n =3D next, c =3D continue, Ctrl-C =3D stop, print <variable=
-> to look at variable contents)
+  But when I try to go on 0.15.0 or higher (tested on 0.15.0). About to
+  test on 0.15.5 from git
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/696094/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/855630/+subscriptions
