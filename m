@@ -1,21 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58036)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60907)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1ePj40-0001nq-NF
-	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 01:01:45 -0500
+	(envelope-from <jianjay.zhou@huawei.com>) id 1ePj8W-0005rB-PP
+	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 01:06:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1ePj3x-00011b-Kq
-	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 01:01:40 -0500
-Date: Fri, 15 Dec 2017 17:01:26 +1100
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20171215060126.GG7753@umbus.fritz.box>
-References: <20171212051619.24456-1-aik@ozlabs.ru>
+	(envelope-from <jianjay.zhou@huawei.com>) id 1ePj8S-00047w-EQ
+	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 01:06:20 -0500
+Received: from szxga03-in.huawei.com ([45.249.212.189]:2246 helo=huawei.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jianjay.zhou@huawei.com>)
+	id 1ePj8S-00041p-47
+	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 01:06:16 -0500
+From: "Zhoujian (jay)" <jianjay.zhou@huawei.com>
+Date: Fri, 15 Dec 2017 06:06:06 +0000
+Message-ID: <B2D15215269B544CADD246097EACE7473AB0452D@DGGEMM505-MBS.china.huawei.com>
+References: <1513269392-23224-1-git-send-email-jianjay.zhou@huawei.com>
+	<20171214202619-mutt-send-email-mst@kernel.org>
+	<20171214194920.GH4380@work-vm>
+	<B2D15215269B544CADD246097EACE7473AB03F26@DGGEMM505-MBS.china.huawei.com>
+	<20171215063550-mutt-send-email-mst@kernel.org>
+Content-Language: zh-CN
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="qoTlaiD+Y2fIM3Ll"
-Content-Disposition: inline
-In-Reply-To: <20171212051619.24456-1-aik@ozlabs.ru>
-Subject: Re: [Qemu-devel] [PATCH qemu v2] vfio/spapr: Allow fallback to
- SPAPR TCE IOMMU v1
+Subject: Re: [Qemu-devel] [PATCH 0/2] vhost: two fixes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,85 +31,104 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alexey Kardashevskiy <aik@ozlabs.ru>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Alex Williamson <alex.williamson@redhat.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "Huangweidong (C)" <weidong.huang@huawei.com>, "Gonglei (Arei)" <arei.gonglei@huawei.com>, "wangxin (U)" <wangxinxin.wang@huawei.com>, "Liuzhe (Cloud Open Labs, NFV)" <gary.liuzhe@huawei.com>, Igor Mammedov <imammedo@redhat.com>
 
+Hi Michael,
 
---qoTlaiD+Y2fIM3Ll
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Tue, Dec 12, 2017 at 04:16:19PM +1100, Alexey Kardashevskiy wrote:
-> The vfio_iommu_spapr_tce driver advertises kernel's support for
-> v1 and v2 IOMMU support, however it is not always possible to use
-> the requested IOMMU type. For example, a pseries host platform does not
-> support dynamic DMA windows so v2 cannot initialize and QEMU fails to
-> start.
+> -----Original Message-----
+> From: Zhoujian (jay)
+> Sent: Friday, December 15, 2017 12:52 PM
+> To: 'Michael S. Tsirkin' <mst@redhat.com>
+> Cc: Dr. David Alan Gilbert <dgilbert@redhat.com>; qemu-devel@nongnu.org;
+> Huangweidong (C) <weidong.huang@huawei.com>; Gonglei (Arei)
+> <arei.gonglei@huawei.com>; wangxin (U) <wangxinxin.wang@huawei.com>;
+> Liuzhe (Cloud Open Labs, NFV) <gary.liuzhe@huawei.com>; Igor Mammedov
+> <imammedo@redhat.com>
+> Subject: RE: [PATCH 0/2] vhost: two fixes
 >=20
-> This adds a fallback to the v1 IOMMU if v2 cannot be used.
+> Hi Michael,
 >=20
-> Fixes: 318f67ce1371 "vfio: spapr: Add DMA memory preregistering (SPAPR IO=
-MMU v2)"
-> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
-
-Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
-
-Alex, will you take this through your tree, or should I take it
-through mine?
-
-> ---
-> Changes:
-> v2:
-> * updated commit log
+> > -----Original Message-----
+> > From: Michael S. Tsirkin [mailto:mst@redhat.com]
+> > Sent: Friday, December 15, 2017 12:36 PM
+> > To: Zhoujian (jay) <jianjay.zhou@huawei.com>
+> > Cc: Dr. David Alan Gilbert <dgilbert@redhat.com>;
+> > qemu-devel@nongnu.org; Huangweidong (C) <weidong.huang@huawei.com>;
+> > Gonglei (Arei) <arei.gonglei@huawei.com>; wangxin (U)
+> > <wangxinxin.wang@huawei.com>; Liuzhe (Cloud Open Labs, NFV)
+> > <gary.liuzhe@huawei.com>; Igor Mammedov <imammedo@redhat.com>
+> > Subject: Re: [PATCH 0/2] vhost: two fixes
+> >
+> > On Fri, Dec 15, 2017 at 02:38:35AM +0000, Zhoujian (jay) wrote:
+> > > Hi Dave,
+> > >
+> > > > -----Original Message-----
+> > > > From: Dr. David Alan Gilbert [mailto:dgilbert@redhat.com]
+> > > > Sent: Friday, December 15, 2017 3:49 AM
+> > > > To: Michael S. Tsirkin <mst@redhat.com>
+> > > > Cc: Zhoujian (jay) <jianjay.zhou@huawei.com>;
+> > > > qemu-devel@nongnu.org; Huangweidong (C)
+> > > > <weidong.huang@huawei.com>; Gonglei (Arei)
+> > > > <arei.gonglei@huawei.com>; wangxin (U)
+> > > > <wangxinxin.wang@huawei.com>; Liuzhe (Cloud Open Labs, NFV)
+> > > > <gary.liuzhe@huawei.com>; Igor Mammedov <imammedo@redhat.com>
+> > > > Subject: Re: [PATCH 0/2] vhost: two fixes
+> > > >
+> > > > * Michael S. Tsirkin (mst@redhat.com) wrote:
+> > > > > On Fri, Dec 15, 2017 at 12:36:30AM +0800, Jay Zhou wrote:
+> > > > > > Jay Zhou (2):
+> > > > > >   vhost: add used memslot number for vhost-user
+> > > > > >   vhost: double check memslot number
+> > > > > >
+> > > > > >  hw/virtio/vhost-user.c            | 31
+> +++++++++++++++++++++++++
+> > > > > >  hw/virtio/vhost.c                 | 49
+> > > > ++++++++++++++++++++++++++++++++++-----
+> > > > > >  include/hw/virtio/vhost-backend.h |  4 ++++
+> > > > > >  3 files changed, 78 insertions(+), 6 deletions(-)
+> > > > >
+> > > > > Cc two developers working on these files right now.
+> > > >
+> > > > I have to admit to not understanding the 'used_memslots' variable.
+> > > >
+> > > > * It's a global in vhost.c
+> > > > * but set by vhost_set_memory that's called from the listener
+> > associated
+> > > >   with each individual vhost
+> > > > * While they're probably always the same, the merging code calls
+> > > >   the vhost_backend_can_merge method for each device, so the number
+> > > >   of regions can be different.
+> > > >
+> > >
+> > > Your mean for some devices the new added MemoryRegionSection can be
+> > > merged, but for others it can not be merged? IIUC the vhost_mem for
+> > > each vhost_dev is the same.
+> > >
+> > > Meanwhile, I think it is more reasonable to add globals in
+> > > vhost-backend.c and vhost-user.c respectively instead of
+> > > 'used_memslots'. The reason is explained in patch 1. What do you thin=
+k?
+> > >
+> > > Regards,
+> > > Jay
+> >
+> > I'd rather avoid globals completely if possible.
+> >
 >=20
-> ---
->  hw/vfio/common.c | 5 +++++
->  1 file changed, 5 insertions(+)
+> It is possible, we could add a 'used_memslots' variable in struct
+> vhost_dev for per device. I will try to do it in v2.
 >=20
-> diff --git a/hw/vfio/common.c b/hw/vfio/common.c
-> index 7b2924c..cd81cc9 100644
-> --- a/hw/vfio/common.c
-> +++ b/hw/vfio/common.c
-> @@ -1040,6 +1040,11 @@ static int vfio_connect_container(VFIOGroup *group=
-, AddressSpace *as,
->              v2 ? VFIO_SPAPR_TCE_v2_IOMMU : VFIO_SPAPR_TCE_IOMMU;
->          ret =3D ioctl(fd, VFIO_SET_IOMMU, container->iommu_type);
->          if (ret) {
-> +            container->iommu_type =3D VFIO_SPAPR_TCE_IOMMU;
-> +            v2 =3D false;
-> +            ret =3D ioctl(fd, VFIO_SET_IOMMU, container->iommu_type);
-> +        }
-> +        if (ret) {
->              error_setg_errno(errp, errno, "failed to set iommu for conta=
-iner");
->              ret =3D -errno;
->              goto free_container_exit;
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
+If the globals don't exist, the disadvantage I found is that the check
+"if memslots number exceeds" will be moved from the beginning to the end
+in vhost_dev_init, does it acceptable? Or are there other ideas to avoid
+globals?
 
---qoTlaiD+Y2fIM3Ll
-Content-Type: application/pgp-signature; name="signature.asc"
+To be honest, I prefer to add globals in vhost-backend.c and vhost-user.c
+respectively, the value of used_memslots for the same type of backend is th=
+e
+same.
 
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlozZTMACgkQbDjKyiDZ
-s5ItZQ/+IY8aGUqrWSZ48HBGK9aFdZAro5xYzgyjKbf1HaE+VRtzypaVKvC71yuk
-PvonwnT91OnmK1xEIIYBNjsK+JpbZXH5mmbrwFHcixYeHZCi/fYH1ZCmjerMiSJ9
-1EbS4Cld+zYo6Zizoiem7v/La8ogPckYXjq/scMIa6Z4oSjALetND7NEgO2p5S2M
-7boBBb5y9BU4/8R134JtXnEZYgVOODfO6/d7MdvBWzhqRO5dr6ZIHD6dKpotHbrb
-/8AINTRg0s6ayY8Iw4fzbkKVbynZX5NPJSFoJMaUQVErY+tRgqm/ypOZGZIBftue
-D+FFJK6hkVoBHl39f1JI3ydR7iLKyOsiknhvUg5DBugtYH3Sc+1NaVZn86Heu1yl
-pTjMdJmoXTDKvXZWVJR1IQcX5bIrXTaSCCNZU23iHm0FdaiNvcWkG3ob0mJrs2+g
-oNR0ryE/Gt5hdWatpRB8jSguvPBqHFh1ZeIqWcYu+fxtRWDeMTAz7LbkDrJGMzv8
-AkVTvC4G+75pUGMEhpR6Aqk/sKBXg3vXtZdI4uNjmUiXdu0EFEXidyEuUauPlDNs
-9S4yUeqWOVJM14pKuuhWATpmOut1Udv6+NR0l1hYrJ25gmu3UBVmEaW5RK+YAv69
-ctjMo+1Kirepe4dzIgExfvvHrUmO8TvyIWczQ9A0EWzdL6Udx5U=
-=0xMk
------END PGP SIGNATURE-----
-
---qoTlaiD+Y2fIM3Ll--
+Regards,
+Jay
