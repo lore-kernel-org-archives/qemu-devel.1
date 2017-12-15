@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42643)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42650)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1ePrap-0004ot-VY
-	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 10:08:09 -0500
+	(envelope-from <marcandre.lureau@redhat.com>) id 1ePrar-0004pz-52
+	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 10:08:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1ePrak-0001n9-65
-	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 10:08:07 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:35232)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1ePran-0001og-2H
+	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 10:08:09 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:45927)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1ePraj-0001mi-TQ
-	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 10:08:02 -0500
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
+	id 1ePram-0001oR-Sh
+	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 10:08:04 -0500
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 26A0C83F3D
-	for <qemu-devel@nongnu.org>; Fri, 15 Dec 2017 15:08:01 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 322CFC04AC45
+	for <qemu-devel@nongnu.org>; Fri, 15 Dec 2017 15:08:04 +0000 (UTC)
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Fri, 15 Dec 2017 16:06:58 +0100
-Message-Id: <20171215150659.1811-13-marcandre.lureau@redhat.com>
+Date: Fri, 15 Dec 2017 16:06:59 +0100
+Message-Id: <20171215150659.1811-14-marcandre.lureau@redhat.com>
 In-Reply-To: <20171215150659.1811-1-marcandre.lureau@redhat.com>
 References: <20171215150659.1811-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v2 12/13] ucontext: annotate coroutine stack
- for ASAN
+Subject: [Qemu-devel] [PATCH v2 13/13] tests: fix coroutine leak in
+ /basic/entered
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,145 +37,44 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Kevin Wolf <kwolf@redhat.com>
 
-It helps ASAN to detect more leaks on coroutine stacks, as found in
-the following patch.
+The coroutine is not finished by the time the test ends, resulting in
+ASAN warning:
 
-A similar work would need to be done for sigaltstack & windows fibers
-to have similar coverage. Since ucontext is prefered, I didn't bother
-checking the other coroutine implementations for now.
+=3D=3D7005=3D=3DERROR: LeakSanitizer: detected memory leaks
+
+Direct leak of 312 byte(s) in 1 object(s) allocated from:
+    #0 0x7fd35290fa38 in __interceptor_calloc (/lib64/libasan.so.4+0xdea3=
+8)
+    #1 0x7fd3506c5f75 in g_malloc0 ../glib/gmem.c:124
+    #2 0x55994af03e47 in qemu_coroutine_new /home/elmarco/src/qemu/util/c=
+oroutine-ucontext.c:144
+    #3 0x55994aefed99 in qemu_coroutine_create /home/elmarco/src/qemu/uti=
+l/qemu-coroutine.c:76
+    #4 0x55994ac1eb50 in verify_entered_step_1 /home/elmarco/src/qemu/tes=
+ts/test-coroutine.c:80
+    #5 0x55994af03c75 in coroutine_trampoline /home/elmarco/src/qemu/util=
+/coroutine-ucontext.c:119
+    #6 0x7fd34ec02bef  (/lib64/libc.so.6+0x50bef)
+
+Do not yield() to let the coroutine terminate.
 
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 ---
- include/qemu/compiler.h   |  4 ++++
- util/coroutine-ucontext.c | 46 +++++++++++++++++++++++++++++++++++++++++=
-+++++
- 2 files changed, 50 insertions(+)
+ tests/test-coroutine.c | 1 -
+ 1 file changed, 1 deletion(-)
 
-diff --git a/include/qemu/compiler.h b/include/qemu/compiler.h
-index 340e5fdc09..5fcc4f7ec7 100644
---- a/include/qemu/compiler.h
-+++ b/include/qemu/compiler.h
-@@ -111,4 +111,8 @@
- #define GCC_FMT_ATTR(n, m)
- #endif
-=20
-+#ifndef __has_feature
-+#define __has_feature(x) 0 /* compatibility with non-clang compilers */
-+#endif
-+
- #endif /* COMPILER_H */
-diff --git a/util/coroutine-ucontext.c b/util/coroutine-ucontext.c
-index 6621f3f692..e78eae8766 100644
---- a/util/coroutine-ucontext.c
-+++ b/util/coroutine-ucontext.c
-@@ -31,6 +31,11 @@
- #include <valgrind/valgrind.h>
- #endif
-=20
-+#if defined(__SANITIZE_ADDRESS__) || __has_feature(address_sanitizer)
-+#define CONFIG_ASAN 1
-+#include <sanitizer/asan_interface.h>
-+#endif
-+
- typedef struct {
-     Coroutine base;
-     void *stack;
-@@ -59,11 +64,37 @@ union cc_arg {
-     int i[2];
- };
-=20
-+static void finish_switch_fiber(void *fake_stack_save)
-+{
-+#ifdef CONFIG_ASAN
-+    const void *bottom_old;
-+    size_t size_old;
-+
-+    __sanitizer_finish_switch_fiber(fake_stack_save, &bottom_old, &size_=
-old);
-+
-+    if (!leader.stack) {
-+        leader.stack =3D (void *)bottom_old;
-+        leader.stack_size =3D size_old;
-+    }
-+#endif
-+}
-+
-+static void start_switch_fiber(void **fake_stack_save,
-+                               const void *bottom, size_t size)
-+{
-+#ifdef CONFIG_ASAN
-+    __sanitizer_start_switch_fiber(fake_stack_save, bottom, size);
-+#endif
-+}
-+
- static void coroutine_trampoline(int i0, int i1)
- {
-     union cc_arg arg;
-     CoroutineUContext *self;
-     Coroutine *co;
-+    void *fake_stack_save =3D NULL;
-+
-+    finish_switch_fiber(NULL);
-=20
-     arg.i[0] =3D i0;
-     arg.i[1] =3D i1;
-@@ -72,9 +103,13 @@ static void coroutine_trampoline(int i0, int i1)
-=20
-     /* Initialize longjmp environment and switch back the caller */
-     if (!sigsetjmp(self->env, 0)) {
-+        start_switch_fiber(&fake_stack_save,
-+                           leader.stack, leader.stack_size);
-         siglongjmp(*(sigjmp_buf *)co->entry_arg, 1);
-     }
-=20
-+    finish_switch_fiber(fake_stack_save);
-+
-     while (true) {
-         co->entry(co->entry_arg);
-         qemu_coroutine_switch(co, co->caller, COROUTINE_TERMINATE);
-@@ -87,6 +122,7 @@ Coroutine *qemu_coroutine_new(void)
-     ucontext_t old_uc, uc;
-     sigjmp_buf old_env;
-     union cc_arg arg =3D {0};
-+    void *fake_stack_save =3D NULL;
-=20
-     /* The ucontext functions preserve signal masks which incurs a
-      * system call overhead.  sigsetjmp(buf, 0)/siglongjmp() does not
-@@ -122,8 +158,12 @@ Coroutine *qemu_coroutine_new(void)
-=20
-     /* swapcontext() in, siglongjmp() back out */
-     if (!sigsetjmp(old_env, 0)) {
-+        start_switch_fiber(&fake_stack_save, co->stack, co->stack_size);
-         swapcontext(&old_uc, &uc);
-     }
-+
-+    finish_switch_fiber(fake_stack_save);
-+
-     return &co->base;
+diff --git a/tests/test-coroutine.c b/tests/test-coroutine.c
+index abd97c23c1..76c646107e 100644
+--- a/tests/test-coroutine.c
++++ b/tests/test-coroutine.c
+@@ -67,7 +67,6 @@ static void coroutine_fn verify_entered_step_2(void *op=
+aque)
+     /* Once more to check it still works after yielding */
+     g_assert(qemu_coroutine_entered(caller));
+     g_assert(qemu_coroutine_entered(qemu_coroutine_self()));
+-    qemu_coroutine_yield();
  }
 =20
-@@ -169,13 +209,19 @@ qemu_coroutine_switch(Coroutine *from_, Coroutine *=
-to_,
-     CoroutineUContext *from =3D DO_UPCAST(CoroutineUContext, base, from_=
-);
-     CoroutineUContext *to =3D DO_UPCAST(CoroutineUContext, base, to_);
-     int ret;
-+    void *fake_stack_save =3D NULL;
-=20
-     current =3D to_;
-=20
-     ret =3D sigsetjmp(from->env, 0);
-     if (ret =3D=3D 0) {
-+        start_switch_fiber(action =3D=3D COROUTINE_TERMINATE ?
-+                           NULL : &fake_stack_save, to->stack, to->stack=
-_size);
-         siglongjmp(to->env, action);
-     }
-+
-+    finish_switch_fiber(fake_stack_save);
-+
-     return ret;
- }
-=20
+ static void coroutine_fn verify_entered_step_1(void *opaque)
 --=20
 2.15.1.355.g36791d7216
