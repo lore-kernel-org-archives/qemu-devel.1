@@ -1,23 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58179)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58178)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1ePpac-0005hw-Nh
-	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 07:59:47 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1ePpac-0005hu-NK
+	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 07:59:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1ePpaZ-0001st-M1
+	(envelope-from <dgibson@ozlabs.org>) id 1ePpaZ-0001sz-MD
 	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 07:59:46 -0500
-Date: Fri, 15 Dec 2017 23:56:40 +1100
+Date: Fri, 15 Dec 2017 23:59:34 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20171215125640.GJ7753@umbus.fritz.box>
+Message-ID: <20171215125934.GK7753@umbus.fritz.box>
 References: <20171215101651.13911-1-david@gibson.dropbear.id.au>
-	<20171215101651.13911-4-david@gibson.dropbear.id.au>
-	<e69f5264-9da3-2bbf-e0f9-3c1e989d7260@redhat.com>
+	<20171215101651.13911-5-david@gibson.dropbear.id.au>
+	<8c3ee849-7c3c-9afd-8906-5c3712323fbd@redhat.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="x0KprKst+ZOYEj2z"
+	protocol="application/pgp-signature"; boundary="huBJOJF9BsF479P6"
 Content-Disposition: inline
-In-Reply-To: <e69f5264-9da3-2bbf-e0f9-3c1e989d7260@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 3/4] tests/pxe-test: Test net booting over
- IPv6 in some cases
+In-Reply-To: <8c3ee849-7c3c-9afd-8906-5c3712323fbd@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 4/4] tests/pxe-test: Add some extra tests
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,67 +29,82 @@ To: Thomas Huth <thuth@redhat.com>
 Cc: mst@redhat.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 
 
---x0KprKst+ZOYEj2z
+--huBJOJF9BsF479P6
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Dec 15, 2017 at 12:10:56PM +0100, Thomas Huth wrote:
+On Fri, Dec 15, 2017 at 11:51:18AM +0100, Thomas Huth wrote:
 > On 15.12.2017 11:16, David Gibson wrote:
-> > This adds IPv6 net boot testing (in addition to IPv4) when in slow test
-> > mode on ppc64 or s390.  IPv6 PXE doesn't seem to work on x86, I'm guess=
-ing
-> > out BIOS image doesn't support it.
-> >=20
-> > Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-> > ---
-> >  tests/pxe-test.c | 26 ++++++++++++++++++++------
-> >  1 file changed, 20 insertions(+), 6 deletions(-)
-> [...]
-> >      } else if (strcmp(arch, "ppc64") =3D=3D 0) {
-> > -        test_batch(ppc64_tests);
-> > +        test_batch(ppc64_tests, g_test_slow());
-> >          if (g_test_slow()) {
-> > -            test_batch(ppc64_tests_slow);
-> > +            test_batch(ppc64_tests_slow, true);
-> >          }
+> > Previously virtio-net was only tested for ppc64 in "slow" mode.  That
+> > doesn't make much sense since virtio-net is used much more often in
+> > practice than the spapr-vlan device which was tested always.  So, move
+> > virtio-net to always be tested on ppc64.
 >=20
-> The NICs from ppc64_tests_slow are now never exercised with IPv4 ...
-> maybe it would be better to do both:
+> Actually, I just moved virtio-net on ppc64 to the slow category a couple
+> of months ago:
+>=20
+> https://git.qemu.org/?p=3Dqemu.git;a=3Dcommitdiff;h=3Dab06ec43577177a442e=
+8e5
+>=20
+> This has been done since some people complained that SLOF is incredibly
+> slow in in TCG mode and thus there is the risk of hitting the timeout on
+> slow systems if they are overloaded.
 
-Yes they are: the ipv6 parameter to test_batch() makes it do IPv6
-tests in addition to IPv4, unlike test_pxe_one() which just does one
-or the other.
+Hm.  If we're really concerned about the speed, I'm more inclined to
+move spapr-vlan to slow than virtio-net.  virtio-net is now a much
+more common case.
 
->             test_batch(ppc64_tests_slow, false);
->             test_batch(ppc64_tests_slow, true);
+> Things will hopefully get a little bit better with the "Use
+> tcg_gen_lookup_and_goto_ptr" patch that you've queued in your
+> ppc-for-2.12 branch,
 
+Just now merged, as it happens.
 
+> but still, the test is very slow on ppc64, so I'd
+> rather keep it in the "slow" category. (virtio-net is already tested in
+> big endian mode on s390x anyway, so we at least got some endianess test
+> coverage for that NIC already).
 
+TBH, I see this as exercising the firmware netboot features more than
+the device model.
+
+>=20
+> > We had no tests at all for the q35 machine, which doesn't seem wise giv=
+en
+> > it's increasing prominence.  Add a couple of tests for it, including
+> > testing the newer e1000e adapter.
+>=20
+> That sounds like a good idea! I wonder whether we should also test some
+> "old" machine versions (in "slow" mode only, of course), like "pc-0.12"
+> for example, to make sure that there are no regressions with old
+> machines?
+
+Maybe.  Not really my department.
 --=20
 David Gibson			| I'll have my music baroque, and my code
 david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---x0KprKst+ZOYEj2z
+--huBJOJF9BsF479P6
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlozxogACgkQbDjKyiDZ
-s5LcQxAAkcM21jBC489zXopE4mRb20kr7rwsv35itb7hbrt1mr7Nu8oHmJyvLUlp
-Qp0L0pk3aRtuyJPdaWjwZxxQW2LLPE1nQOVKIs91D8BN7O4v6V/mImH2P70qbz8o
-bg7t3CmHLfdTbbSaDylidGXuISWFdV8EmrpkyuGrTNp63lbF1S5yjKOf3lXINdjk
-wYqQtaS8iupSeXepsBTgOnukDZUw4Q6saOq3QVjygyCSbr/ODZzAi+bjBgoBv5WN
-xHvD0JOxK4ApJMN1JxCiYWy2Et3XXJ16pSBbonsASlABoxfqfpkK/K9L7ect/U+B
-TYPOoXB1nQz2VJ2GE2mlxSvuac+yH+taR0shwgo1ElNrshznPwEhB6BLu7mjhYzq
-1RCHtKQdBF7iCrzhvUI1A278+cukjCrcLYzf0ymK3iAFTDjizSCVoiQ2aetQCjlA
-fUzkADXhhel+LBydeBrI8l42bUgmE7Co94swCDtqoLLRzObAAEJKga60TZDa4lyf
-l+cKFyK8dxreA+qGAR1DLFmSKy3yQBGF2CdT34QpSkSCaLbEBNARB9/ikNg3Ok08
-daxv6g6LITlInqJGBh9wr4oPlHUtPSXJ9xQy207YzujdkxerXjcsso7m2UIU32F3
-8ERWqEx5KhMyPe/N03A3PtRQNnIjZTFADykhXCfqmKOy+15R/5g=
-=eHFz
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlozxzYACgkQbDjKyiDZ
+s5JvzA/+Iv+ASJpQwMOulL2z9A8MFecUCUQ6GcUeanvNmhzCCmcsd0PSmEWzVtHH
+zJYd91VQ6Jgs5hgx3VAJYTxICpCDhE/+I2lox1/e17XAkfrW4zqwRZN0qNxakNzv
+5HWre9e7u8lZREk4lnTMz+q8dbWb/h+aM3z1XJHZgD+jl/DwyrVcOFNJVf6hhXdv
+cin86ru0VDayw8A6h6O1AQXigKEWQ/j/qF3hlxAN+D15GnSajo+/P8QleuXARj4+
+rZ2lkIfcPELj03xwEtUbF9zX1UvyR97lSBSCxpVrljsTsjlruIlPo+7Sl9H5Rlwq
+bklqyESh9yAUReI+UN6WWiphr6darCQTxJ6Ybb+ScXllmoWaIrTzk/87Z2Wg1gP2
+5z9eJoix9uriV7GoRgM3K91unj/gTEVxARdadZUVej+bKioQdfVSOlIJkO0z7h2b
+UvFSVr1G+QS4x+ACAlieEjQfNk2eelRB4mDyqLt4ngMif71nPoJqcb/whAnoot2A
+WA3QwO+pQ/8wFHqvFVOFqXTtwn0EdLpQcZUrmt/WiNu8ZuYjPtACtjUXtsipJFmR
+iGVDLDjb/6/yubB8X9VrgCd8l902NYECIpZ1yTBCXNRpgDSn5UAL3ylpXOtAV1h1
+62+XVBslmj2HX+mFtox1iuucn9Co5qICzfntKAcInitSHSTMVhg=
+=0BDY
 -----END PGP SIGNATURE-----
 
---x0KprKst+ZOYEj2z--
+--huBJOJF9BsF479P6--
