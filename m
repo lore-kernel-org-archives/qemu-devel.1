@@ -1,34 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50951)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50950)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1ePs1f-0005Yg-MR
-	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 10:35:53 -0500
+	(envelope-from <bounces@canonical.com>) id 1ePs1f-0005Yf-Lx
+	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 10:35:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1ePs1a-00021p-RC
+	(envelope-from <bounces@canonical.com>) id 1ePs1a-00021i-Pz
 	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 10:35:51 -0500
-Received: from indium.canonical.com ([91.189.90.7]:41608)
+Received: from indium.canonical.com ([91.189.90.7]:41606)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1ePs1a-00020S-Ho
+	id 1ePs1a-00020U-JV
 	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 10:35:46 -0500
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1ePs1X-000440-Ir
+	id 1ePs1X-00042N-4F
 	for <qemu-devel@nongnu.org>; Fri, 15 Dec 2017 15:35:43 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 1F2A32E81A2
-	for <qemu-devel@nongnu.org>; Fri, 15 Dec 2017 15:35:40 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 916D72E819E
+	for <qemu-devel@nongnu.org>; Fri, 15 Dec 2017 15:35:39 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Fri, 15 Dec 2017 15:24:46 -0000
+Date: Fri, 15 Dec 2017 15:21:16 -0000
 From: Peter Maydell <peter.maydell@linaro.org>
-Reply-To: Bug 1701798 <1701798@bugs.launchpad.net>
+Reply-To: Bug 1704658 <1704658@bugs.launchpad.net>
 Sender: bounces@canonical.com
-References: <149890819992.24827.8096984642709091835.malonedeb@soybean.canonical.com>
-Message-Id: <151335148685.19112.16305398117501981618.malone@chaenomeles.canonical.com>
+References: <150022185647.5906.17655055691802268187.malonedeb@gac.canonical.com>
+Message-Id: <151335127614.9489.7693821567904645160.malone@gac.canonical.com>
 Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1701798] Re: dynamically linked binaries crash
- for big-endian targets
+Subject: [Qemu-devel] [Bug 1704658] Re: O_CLOEXEC not handled in dup3 system
+ call in user mode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,218 +39,42 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-I still feel we shouldn't be working around guest code bugs in QEMU, so
-I'm not sure there's anything more for QEMU to do here. You should
-report the dynamic linker bug to glibc upstream.
+Should be fixed by http://patchwork.ozlabs.org/patch/849226/
 
 -- =
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1701798
+https://bugs.launchpad.net/bugs/1704658
 
 Title:
-  dynamically linked binaries crash for big-endian targets
+  O_CLOEXEC not handled in dup3 system call in user mode
 
 Status in QEMU:
   New
 
 Bug description:
-  On the targets
-    hppa
-    m68k
-    mips
-    mips64
-    powerpc
-    powerpc64
-    s390x
-    sparc64
-  dynamically linked binaries crash, but statically linked binaries work.
-  On the targets
-    aarch64
-    alpha
-    armhf
-    powerpc64le
-    sh4
-  both dynamically linked and statically linked binaries work.
+  In qemu user mode, for hppa and sparc64 targets, the parameter of the
+  dup3 is not passed correctly when it contains the O_CLOEXEC flag.
 
-  How to reproduce:
+  When the attached program runs, the expected output is:
+  errno=3D9=3DEBADF
 
-  1) On Ubuntu 16.04, install the packages
-  g++-5-aarch64-linux-gnu
-  g++-5-alpha-linux-gnu
-  g++-5-arm-linux-gnueabihf
-  g++-5-hppa-linux-gnu
-  g++-5-m68k-linux-gnu
-  g++-5-mips-linux-gnu
-  g++-5-mips64-linux-gnuabi64
-  g++-5-powerpc-linux-gnu
-  g++-5-powerpc64-linux-gnu
-  g++-5-powerpc64le-linux-gnu
-  g++-5-s390x-linux-gnu
-  g++-5-sh4-linux-gnu
-  g++-5-sparc64-linux-gnu
+  How to reproduce on hppa:
+  - Compile the program: hppa-linux-gnu-gcc-5 -O -Wall -static testdup3.c -=
+o testdup3-hppa
+  - Set environment variables for running qemu-hppa.
+  - ~/inst-qemu/2.9.0/bin/qemu-hppa testdup3-hppa
+  errno=3D22=3DEINVAL
+  testdup3.c:54: assertion 'errno =3D=3D EBADF' failed
 
-  2) Install qemu 2.9.0 from source (for m68k, use the 2.7.0-m68k
-  code from https://github.com/vivier/qemu-m68k.git):
-  $ ../configure --prefix=3D/home/bruno/inst-qemu/2.9.0 --target-list=3Daar=
-ch64-softmmu,alpha-softmmu,arm-softmmu,i386-softmmu,m68k-softmmu,mips-softm=
-mu,mipsel-softmmu,mips64-softmmu,mips64el-softmmu,ppc-softmmu,ppc64-softmmu=
-,s390x-softmmu,sh4-softmmu,sparc-softmmu,sparc64-softmmu,x86_64-softmmu,aar=
-ch64-linux-user,alpha-linux-user,arm-linux-user,hppa-linux-user,m68k-linux-=
-user,mips-linux-user,mipsel-linux-user,mips64-linux-user,mips64el-linux-use=
-r,ppc-linux-user,ppc64-linux-user,ppc64le-linux-user,s390x-linux-user,sh4-l=
-inux-user,sparc-linux-user,sparc64-linux-user --disable-strip --disable-wer=
-ror --enable-gtk --enable-vnc
-  $ make
-  $ make install
-
-  3) Cross-compile the programs:
-
-  $ aarch64-linux-gnu-gcc-5 -O hello.c -o hello.aarch64
-  $ alpha-linux-gnu-gcc-5 -O hello.c -o hello.alpha
-  $ arm-linux-gnueabihf-gcc-5 -O hello.c -o hello.armhf
-  $ hppa-linux-gnu-gcc-5 -O hello.c -o hello.hppa
-  $ m68k-linux-gnu-gcc-5 -O hello.c -o hello.m68k
-  $ mips-linux-gnu-gcc-5 -O hello.c -o hello.mips
-  $ mips64-linux-gnuabi64-gcc-5 -O hello.c -o hello.mips64
-  $ powerpc-linux-gnu-gcc-5 -O hello.c -o hello.powerpc
-  $ powerpc64-linux-gnu-gcc-5 -O hello.c -o hello.powerpc64
-  $ powerpc64le-linux-gnu-gcc-5 -O hello.c -o hello.powerpc64le
-  $ s390x-linux-gnu-gcc-5 -O hello.c -o hello.s390x
-  $ sh4-linux-gnu-gcc-5 -O hello.c -o hello.sh4
-  $ sparc64-linux-gnu-gcc-5 -O hello.c -o hello.sparc64
-
-  4) Run the programs:
-
-  * aarch64 works:
-  $ QEMU_LD_PREFIX=3D/usr/aarch64-linux-gnu ~/inst-qemu/2.9.0/bin/qemu-aarc=
-h64 hello.aarch64
-  Hello world
-
-  * alpha works:
-  $ QEMU_LD_PREFIX=3D/usr/alpha-linux-gnu ~/inst-qemu/2.9.0/bin/qemu-alpha =
-hello.alpha =
-
-  Hello world
-
-  * armhf works:
-  $ QEMU_LD_PREFIX=3D/usr/arm-linux-gnueabihf ~/inst-qemu/2.9.0/bin/qemu-ar=
-m hello.armhf
-  Hello world
-
-  * powerpc64le works:
-  $ QEMU_LD_PREFIX=3D/usr/powerpc64le-linux-gnu ~/inst-qemu/2.9.0/bin/qemu-=
-ppc64le hello.powerpc64le
-  Hello world
-
-  * sh4 works:
-  $ QEMU_LD_PREFIX=3D/usr/sh4-linux-gnu ~/inst-qemu/2.9.0/bin/qemu-sh4 hell=
-o.sh4
-  Hello world
-
-  * =3D=3D=3D=3D=3D sparc64 does not work:
-  $ QEMU_LD_PREFIX=3D/usr/sparc64-linux-gnu ~/inst-qemu/2.9.0/bin/qemu-spar=
-c64 hello.sparc64
-  Segmentation fault (core dumped)
-
-  When I copy the file to a machine with `uname -srm` =3D "Linux 4.5.0-2-sp=
-arc64 sparc64",
-  it works:
-  $ ./hello.sparc64
-  Hello world
-
-  When I copy the file and its execution environment /usr/sparc64-linux-gnu=
- to the
-  same machine and run the binary in a chroot environment:
-  # /bin/hello.sparc64 =
-
-  Hello world
-
-  * =3D=3D=3D=3D=3D mips does not work:
-  $ QEMU_LD_PREFIX=3D/usr/mips-linux-gnu ~/inst-qemu/2.9.0/bin/qemu-mips he=
-llo.mips
-  qemu: uncaught target signal 11 (Segmentation fault) - core dumped
-
-  When I copy the file to a machine with `uname -srm` =3D "Linux 3.16.0-4-4=
-kc-malta mips",
-  it works:
-  $ ./hello.mips
-  Hello world
-
-  When I copy the file and its execution environment /usr/mips-linux-gnu to=
- the
-  same machine and run the binary in a chroot environment:
-  # /bin/hello.mips =
-
-  Hello world
-
-  * =3D=3D=3D=3D=3D mips64 does not work:
-  $ QEMU_LD_PREFIX=3D/usr/mips64-linux-gnuabi64 ~/inst-qemu/2.9.0/bin/qemu-=
-mips64 hello.mips64
-  qemu: uncaught target signal 11 (Segmentation fault) - core dumped
-
-  When I copy the file to a machine with `uname -srm` =3D "Linux 3.16.0-4-5=
-kc-malta mips64",
-  it works:
-  $ ./hello.mips64
-  Hello world
-
-  * =3D=3D=3D=3D=3D powerpc does not work:
-  $ QEMU_LD_PREFIX=3D/usr/powerpc-linux-gnu ~/inst-qemu/2.9.0/bin/qemu-ppc =
-hello.powerpc
-  qemu: uncaught target signal 11 (Segmentation fault) - core dumped
-
-  When I copy the file to a machine with `uname -srm` =3D "Linux 3.17.2-200=
-.fc20.ppc64p7 ppc64",
-  it works:
-  $ ./hello.powerpc
-  Hello world
-
-  * =3D=3D=3D=3D=3D powerpc64 does not work:
-  $ QEMU_LD_PREFIX=3D/usr/powerpc64-linux-gnu ~/inst-qemu/2.9.0/bin/qemu-pp=
-c64 hello.powerpc64
-  qemu: uncaught target signal 11 (Segmentation fault) - core dumped
-
-  When I copy the file to a machine with `uname -srm` =3D "Linux 3.17.2-200=
-.fc20.ppc64p7 ppc64",
-  it works:
-  $ ./hello.powerpc64
-  Hello world
-
-  * =3D=3D=3D=3D=3D s390x does not work:
-  $ QEMU_LD_PREFIX=3D/usr/s390x-linux-gnu ~/inst-qemu/2.9.0/bin/qemu-s390x =
-hello.s390x
-  <hangs>
-  $ QEMU_LD_PREFIX=3D/usr/s390x-linux-gnu ~/inst-qemu/2.8.1/bin/qemu-s390x =
-hello.s390x
-  qemu-s390x: /media/develdata/devel/build/qemu-2.8.1/translate-all.c:175: =
-tb_lock: Assertion `!have_tb_lock' failed.
-  Segmentation fault (core dumped)
-
-  When I copy the file to a machine with `uname -srm` =3D "Linux 3.16.0-4-s=
-390x s390x",
-  it works:
-  $ ./hello.s390x
-  Hello world
-
-  * =3D=3D=3D=3D=3D hppa does not work:
-  $ QEMU_LD_PREFIX=3D/usr/hppa-linux-gnu ~/inst-qemu/2.9.0/bin/qemu-hppa he=
-llo.hppa
-  Segmentation fault (core dumped)
-
-  * =3D=3D=3D=3D=3D m68k does not work:
-  $ QEMU_LD_PREFIX=3D/usr/m68k-linux-gnu QEMU_CPU=3Dm68020 ~/inst-qemu/2.9.=
-0/bin/qemu-m68k hello.m68k
-  qemu: uncaught target signal 4 (Illegal instruction) - core dumped
-  $ QEMU_LD_PREFIX=3D/usr/m68k-linux-gnu QEMU_CPU=3Dm68020 ~/inst-qemu/2.7.=
-0-m68k/bin/qemu-m68k hello.m68k
-  qemu: uncaught target signal 11 (Segmentation fault) - core dumped
-
-  =
-
-  The set of targets where it does not work is exactly the big-endian targe=
-ts.
+  How to reproduce on sparc64:
+  - Compile the program: sparc64-linux-gnu-gcc-5 -O -Wall -static testdup3.=
+c -o testdup3-sparc64
+  - Set environment variables for running qemu-sparc64.
+  - ~/inst-qemu/2.9.0/bin/qemu-sparc64 testdup3-sparc64
+  errno=3D22=3DEINVAL
+  testdup3.c:54: assertion 'errno =3D=3D EBADF' failed
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1701798/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1704658/+subscriptions
