@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47449)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47781)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ePqKu-0006x0-EM
-	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 08:47:37 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1ePqLx-0007W0-6a
+	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 08:48:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ePqKt-00048N-Kr
-	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 08:47:36 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1ePqLw-00066K-Dw
+	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 08:48:41 -0500
+Received: from mail-ot0-x231.google.com ([2607:f8b0:4003:c0f::231]:34093)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1ePqLw-00065q-8T
+	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 08:48:40 -0500
+Received: by mail-ot0-x231.google.com with SMTP id o23so7828028otd.1
+	for <qemu-devel@nongnu.org>; Fri, 15 Dec 2017 05:48:39 -0800 (PST)
 MIME-Version: 1.0
-Sender: philippe.mathieu.daude@gmail.com
-In-Reply-To: <151331201863.120.11022156639051342885@449822a21bf0>
-References: <20171215033015.738-1-f4bug@amsat.org>
-	<151331201863.120.11022156639051342885@449822a21bf0>
-From: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Date: Fri, 15 Dec 2017 10:47:34 -0300
-Message-ID: <CAAdtpL6BmOx-rRJCRO4njm_mWuYgrs1i+uO_zjprj=Rm6m52hw@mail.gmail.com>
+In-Reply-To: <20171215110323.16400-1-cohuck@redhat.com>
+References: <20171215110323.16400-1-cohuck@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 15 Dec 2017 13:48:18 +0000
+Message-ID: <CAFEAcA_2yP1swG0pWLYt+tsObAdTk2G7zitGoMLPAdcy3_kBQA@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v4 00/43] remove i386/pc dependency from
- non-PC world (part 1)
+Subject: Re: [Qemu-devel] [PULL v2 00/46] First batch of s390x patches for
+ 2.12
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,30 +29,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
-Cc: Fam Zheng <famz@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Michael Tokarev <mjt@tls.msk.ru>, Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, QEMU Trivial <qemu-trivial@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-s390x@nongnu.org, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>, Thomas Huth <thuth@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, David Hildenbrand <david@redhat.com>
 
-On Fri, Dec 15, 2017 at 1:27 AM,  <no-reply@patchew.org> wrote:
-> Hi,
+On 15 December 2017 at 11:03, Cornelia Huck <cohuck@redhat.com> wrote:
+> The following changes since commit 0ef0583d5adceb9138bdb47494dabd1549ac5b6d:
 >
-> This series failed build test on ppc host. Please find the details below.
+>   Merge remote-tracking branch 'remotes/dgilbert/tags/pull-hmp-20171214' into staging (2017-12-14 15:32:32 +0000)
 >
-> Subject: [Qemu-devel] [PATCH v4 00/43] remove i386/pc dependency from non=
--PC world (part 1)
-> Type: series
-> Message-id: 20171215033015.738-1-f4bug@amsat.org
-[...]
->   CC      hw/i386/xen/trace.o
->   CC      hw/i386/trace.o
-> In file included from hw/i386/trace.c:4:0:
-> hw/i386/trace.h: In function =E2=80=98_nocheck__trace_vmport_ioport_read_=
-unknown_command=E2=80=99:
-> hw/i386/trace.h:2967:9: error: too many arguments for format [-Werror=3Df=
-ormat-extra-args]
->          qemu_log_mask(LOG_TRACE,
->          ^
-> cc1: all warnings being treated as errors
-> make: *** [hw/i386/trace.o] Error 1
+> are available in the git repository at:
+>
+>   git://github.com/cohuck/qemu tags/s390x-20171215-v2
+>
+> for you to fetch changes up to bb223055b9b327ec66e1f6d2fbaebaee0b8f3dbe:
+>
+>   s390-ccw-virtio: allow for systems larger that 7.999TB (2017-12-15 11:54:52 +0100)
+>
+> ----------------------------------------------------------------
+> s390x changes for 2.12:
+> - Lots of tcg improvements: ccw hotplug is now working and we can run
+>   a Linux kernel built for z12 under tcg
+> - zPCI improvements to get virtio-pci working
+> - get rid of the cssid restrictions for virtual and non-virtual channel
+>   devices
+> - we now support 8TB+ systems
+> - 2.12 compat machine
+> - fixes and cleanups
 
-This has been fixed in the '[PATCH v5 0/2] remove i386/pc dependency
-from non-PC world (part 1) fix' series which Paolo already took.
+Applied, thanks.
+
+-- PMM
