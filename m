@@ -1,27 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33762)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36933)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ePn9T-0006UM-7L
-	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 05:23:40 -0500
+	(envelope-from <wei.w.wang@intel.com>) id 1ePnGs-0000gr-GO
+	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 05:31:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ePn9Q-0005vf-1C
-	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 05:23:35 -0500
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20171215033015.738-1-f4bug@amsat.org>
-	<20171215033015.738-5-f4bug@amsat.org>
-	<800d15c5-fe10-56af-083c-501291d245ad@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <9db63210-0e85-5463-e420-34327f24e1d3@amsat.org>
-Date: Fri, 15 Dec 2017 07:23:17 -0300
+	(envelope-from <wei.w.wang@intel.com>) id 1ePnGp-0003Vu-BY
+	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 05:31:14 -0500
+Received: from mga07.intel.com ([134.134.136.100]:55559)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
+	id 1ePnGp-0003UM-2X
+	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 05:31:11 -0500
+Message-ID: <5A33A4EA.7010204@intel.com>
+Date: Fri, 15 Dec 2017 18:33:14 +0800
+From: Wei Wang <wei.w.wang@intel.com>
 MIME-Version: 1.0
-In-Reply-To: <800d15c5-fe10-56af-083c-501291d245ad@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v4 04/43] MAINTAINERS: add an entry for the
- i82378 (superio)
+References: <CAJSP0QUAqCzFgVtM1cg_KybdyrZa_FRUHhDN7oLfRjZ2ZVkp4g@mail.gmail.com>
+	<286AC319A985734F985F78AFA26841F73937E001@shsmsx102.ccr.corp.intel.com>
+	<20171211111147.GF13593@stefanha-x1.localdomain>
+	<286AC319A985734F985F78AFA26841F73937EEED@shsmsx102.ccr.corp.intel.com>
+	<20171212101440.GB6985@stefanha-x1.localdomain>
+	<5A30E0C1.3070905@intel.com>
+	<20171213123521.GL16782@stefanha-x1.localdomain>
+	<20171213165142-mutt-send-email-mst@kernel.org>
+	<CAJSP0QWHJBL4APkeMt8-P8PFaPF=Vbi0NSnJtU7YX67fJrW=hw@mail.gmail.com>
+	<20171213222102-mutt-send-email-mst@kernel.org>
+	<20171214150609.GQ14433@stefanha-x1.localdomain>
+In-Reply-To: <20171214150609.GQ14433@stefanha-x1.localdomain>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [virtio-dev] [PATCH v3 0/7] Vhost-pci for inter-VM
+ communication
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,38 +38,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Michael Tokarev <mjt@tls.msk.ru>
-Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, qemu-trivial@nongnu.org
+To: Stefan Hajnoczi <stefanha@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Stefan Hajnoczi <stefanha@gmail.com>, "virtio-dev@lists.oasis-open.org" <virtio-dev@lists.oasis-open.org>, "Yang, Zhiyong" <zhiyong.yang@intel.com>, "jan.kiszka@siemens.com" <jan.kiszka@siemens.com>, "jasowang@redhat.com" <jasowang@redhat.com>, "avi.cohen@huawei.com" <avi.cohen@huawei.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "marcandre.lureau@redhat.com" <marcandre.lureau@redhat.com>, Maxime Coquelin <maxime.coquelin@redhat.com>
 
-On 12/15/2017 07:17 AM, Thomas Huth wrote:
-> On 15.12.2017 04:29, Philippe Mathieu-Daudé wrote:
->> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
->> Reviewed-by: Hervé Poussineau <hpoussin@reactos.org>
->> Reviewed-by: Hervé Poussineau <hpoussin@reactos.org>
-> 
-> Remove the doubled Reviewed-by, or replace the second line with:
-> 
-> Reviewed-by: Thomas Huth <thuth@redhat.com>
-
-Haha ok, thanks :)
-
-I applied this series from a patchwork bundle and didn't notice it would
-keep enqueueing R-b from the same reviewer.
-
-> 
->> ---
->>  MAINTAINERS | 1 +
->>  1 file changed, 1 insertion(+)
+On 12/14/2017 11:06 PM, Stefan Hajnoczi wrote:
+> On Wed, Dec 13, 2017 at 10:59:10PM +0200, Michael S. Tsirkin wrote:
+>>>   * VHOST_USER_SET_VRING_KICK
+>>>
+>>>     Set up vring kick doorbell (unless bit 8 is set) before sending
+>>>     VHOST_USER_SET_VRING_KICK to the guest.
+>> But guest can't use it, now can it?
 >>
->> diff --git a/MAINTAINERS b/MAINTAINERS
->> index 31c673d60a..4618f9b4db 100644
->> --- a/MAINTAINERS
->> +++ b/MAINTAINERS
->> @@ -732,6 +732,7 @@ F: hw/ppc/prep.c
->>  F: hw/ppc/prep_systemio.c
->>  F: hw/ppc/rs6000_mc.c
->>  F: hw/pci-host/prep.[hc]
->> +F: hw/isa/i82378.c
->>  F: hw/isa/pc87312.[hc]
->>  F: hw/dma/i82374.c
->>  F: pc-bios/ppc_rom.bin
+>> What guest needs is a mapping to interrupts.
+> ...
+>>>   * VHOST_USER_SET_VRING_CALL
+>>>
+>>>     Set up the vring call doorbell (unless bit 8 is set) before sending
+>>>     VHOST_USER_SET_VRING_CALL to the guest.
+>> Same here. what guest needs is mapping from io to notifications,
+>> right?
+> The PCI device should contain a BAR with doorbell registers.  I don't
+> think a fancy mapping is necessary, instead the device spec should
+> define the BAR layout.
+>
+> When the guest vhost-user slave receives this message it knows it can
+> now begin using the doorbell register.
+
+Not really. A doorbell will cause an interrupt to be injected to the 
+master device driver, which is not ready to work at that time. The slave 
+driver isn't expected to use the doorbell until the master is ready by 
+sending the last message VHOST_USER_SET_VHOST_PCI to link UP the slave 
+device.
+
+So I think passing the fd msg to guest doesn't have a value in terms of 
+functionality.
+
+Best,
+Wei
