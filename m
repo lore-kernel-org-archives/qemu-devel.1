@@ -1,34 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47316)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60694)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1ePyZy-0007L6-6X
-	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 17:35:44 -0500
+	(envelope-from <alistair23@gmail.com>) id 1ePzpV-0000LG-QX
+	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 18:55:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1ePyZu-0006ex-8b
-	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 17:35:42 -0500
-Received: from indium.canonical.com ([91.189.90.7]:38318)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1ePyZu-0006ZW-1h
-	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 17:35:38 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1ePyZp-0002m5-3v
-	for <qemu-devel@nongnu.org>; Fri, 15 Dec 2017 22:35:33 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id D480D2E80D4
-	for <qemu-devel@nongnu.org>; Fri, 15 Dec 2017 22:35:32 +0000 (UTC)
+	(envelope-from <alistair23@gmail.com>) id 1ePzpV-0007dk-1d
+	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 18:55:49 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Sender: alistair23@gmail.com
+In-Reply-To: <20171214020025.4004-2-f4bug@amsat.org>
+References: <20171214020025.4004-1-f4bug@amsat.org>
+	<20171214020025.4004-2-f4bug@amsat.org>
+From: Alistair Francis <alistair.francis@xilinx.com>
+Date: Fri, 15 Dec 2017 15:55:13 -0800
+Message-ID: <CAKmqyKMW-v+29fqk-Bn3cuC40ctr0RTv5kLhLg+XW-UXiJZS9w@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Fri, 15 Dec 2017 22:22:00 -0000
-From: Michal Nowak <mnowak@startmail.com>
-Reply-To: Bug 1738283 <1738283@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <151328724563.26325.11755910452939969450.malonedeb@wampee.canonical.com>
-Message-Id: <151337652089.19770.4901531549771810628.malone@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1738283] Re: 'Less than' (<), 'more than' (>),
- and 'pipe' (|) can't be typed via VNC
+Subject: Re: [Qemu-devel] [PATCH 1/8] sdhci: add a "sd-spec-version" property
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,50 +24,97 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Cc: Alistair Francis <alistair.francis@xilinx.com>, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, Prasad J Pandit <pjp@fedoraproject.org>, Peter Maydell <peter.maydell@linaro.org>, Andrzej Zaborowski <balrogg@gmail.com>, Andrew Baumann <Andrew.Baumann@microsoft.com>, Andrey Smirnov <andrew.smirnov@gmail.com>, Andrey Yurovsky <yurovsky@gmail.com>, Sai Pavan Boddu <saipava@xilinx.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, qemu-arm <qemu-arm@nongnu.org>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
 
-If I start QEMU with `-k en-gb` at least '<' and '>' work, '|' doesn't
-(and obviously 'Shift-2' produces '"' not '@').
+On Wed, Dec 13, 2017 at 6:00 PM, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.o=
+rg> wrote:
+> default to SDHCI v2
+>
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 
-My host `locale` is 'en_US.UTF-8' top to bottom.
+Reviewed-by: Alistair Francis <alistair.francis@xilinx.com>
 
-I tried to update TigerVNC to 1.8 but no change. I run `vncviewer` with
-'-Log *:stderr:100' and QEMU without '-k' option and at least on the VNC
-client side it reports expected key code names.
+Alistair
 
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1738283
-
-Title:
-  'Less than' (<), 'more than' (>), and 'pipe' (|) can't be typed via
-  VNC
-
-Status in QEMU:
-  New
-
-Bug description:
-  If I start QEMU 2.11 (from
-  https://build.opensuse.org/package/show/Virtualization/qemu) VM with
-  VNC, I am unable to type following three characters: 'less than' (<),
-  'more than' (>), and 'pipe' (|) on en_US QWERTY keyboard. Other
-  characters work fine. QEMu version 2.10.1 worked fine.
-
-  /usr/bin/qemu-kvm -m 2048 -cpu kvm64 -drive
-  media=3Dcdrom,if=3Dnone,id=3Dcd0,format=3Draw,file=3DOI-hipster-
-  minimal-20171031.iso -device ide-cd,drive=3Dcd0 -boot once=3Dd,menu=3Don
-  ,splash-time=3D5000 -device usb-ehci -device usb-tablet -smp 1 -enable-
-  kvm -vnc :91,share=3Dforce-shared
-
-  The ISO can be downloaded here: https://www.openindiana.org/download/
-
-  Also tried Fedora-Server-dvd-x86_64-25-1.3.iso and it's the same
-  situation.
-
-  If I run the same command without '-vnc :91,share=3Dforce-shared',
-  everything works just fine.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1738283/+subscriptions
+> ---
+> I am not sure which real VENDOR is HCVER=3D0x24, we probably don't care.
+>
+>  hw/sd/sdhci-internal.h |  4 ++--
+>  include/hw/sd/sdhci.h  | 10 ++++++++++
+>  hw/sd/sdhci.c          |  5 ++++-
+>  3 files changed, 16 insertions(+), 3 deletions(-)
+>
+> diff --git a/hw/sd/sdhci-internal.h b/hw/sd/sdhci-internal.h
+> index e941bc2386..7e4a9d79d1 100644
+> --- a/hw/sd/sdhci-internal.h
+> +++ b/hw/sd/sdhci-internal.h
+> @@ -210,9 +210,9 @@
+>  /* Slot interrupt status */
+>  #define SDHC_SLOT_INT_STATUS            0xFC
+>
+> -/* HWInit Host Controller Version Register 0x0401 */
+> +/* HWInit Host Controller Version Register */
+>  #define SDHC_HCVER                      0xFE
+> -#define SD_HOST_SPECv2_VERS             0x2401
+> +#define SDHC_HCVER_VENDOR               0x24
+>
+>  #define SDHC_REGISTERS_MAP_SIZE         0x100
+>  #define SDHC_INSERTION_DELAY            (NANOSECONDS_PER_SECOND)
+> diff --git a/include/hw/sd/sdhci.h b/include/hw/sd/sdhci.h
+> index 579e0ea644..f8e91ce903 100644
+> --- a/include/hw/sd/sdhci.h
+> +++ b/include/hw/sd/sdhci.h
+> @@ -88,6 +88,9 @@ typedef struct SDHCIState {
+>      /* Force Event Auto CMD12 Error Interrupt Reg - write only */
+>      /* Force Event Error Interrupt Register- write only */
+>      /* RO Host Controller Version Register always reads as 0x2401 */
+> +    struct {
+> +        uint8_t spec_version;
+> +    } capabilities;
+>  } SDHCIState;
+>
+>  #define TYPE_PCI_SDHCI "sdhci-pci"
+> @@ -97,4 +100,11 @@ typedef struct SDHCIState {
+>  #define SYSBUS_SDHCI(obj)                               \
+>       OBJECT_CHECK(SDHCIState, (obj), TYPE_SYSBUS_SDHCI)
+>
+> +/* Host Controller Specification Version */
+> +enum sdhci_spec_version {
+> +    SD_HOST_SPECv1_VERS     =3D 0x00,
+> +    SD_HOST_SPECv2_VERS     =3D 0x01,
+> +    SD_HOST_SPECv3_VERS     =3D 0x02
+> +};
+> +
+>  #endif /* SDHCI_H */
+> diff --git a/hw/sd/sdhci.c b/hw/sd/sdhci.c
+> index d8188fdc2a..d6145342fb 100644
+> --- a/hw/sd/sdhci.c
+> +++ b/hw/sd/sdhci.c
+> @@ -908,7 +908,8 @@ static uint64_t sdhci_read(void *opaque, hwaddr offse=
+t, unsigned size)
+>          ret =3D (uint32_t)(s->admasysaddr >> 32);
+>          break;
+>      case SDHC_SLOT_INT_STATUS:
+> -        ret =3D (SD_HOST_SPECv2_VERS << 16) | sdhci_slotint(s);
+> +        ret =3D (SDHC_HCVER_VENDOR << 24) | (s->capabilities.spec_versio=
+n << 16);
+> +        ret |=3D sdhci_slotint(s);
+>          break;
+>      default:
+>          qemu_log_mask(LOG_UNIMP, "SDHC rd_%ub @0x%02" HWADDR_PRIx " "
+> @@ -1263,6 +1264,8 @@ const VMStateDescription sdhci_vmstate =3D {
+>  /* Capabilities registers provide information on supported features of t=
+his
+>   * specific host controller implementation */
+>  static Property sdhci_properties[] =3D {
+> +    DEFINE_PROP_UINT8("sd-spec-version", SDHCIState,
+> +                      capabilities.spec_version, SD_HOST_SPECv2_VERS),
+>      DEFINE_PROP_UINT32("capareg", SDHCIState, capareg, UINT32_MAX),
+>      DEFINE_PROP_UINT32("maxcurr", SDHCIState, maxcurr, 0),
+>      DEFINE_PROP_BOOL("pending-insert-quirk", SDHCIState, pending_insert_=
+quirk,
+> --
+> 2.15.1
+>
+>
