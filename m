@@ -1,17 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59617)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33874)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1ePkzU-0007L7-Hr
-	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 03:05:12 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1ePl4k-0001LO-21
+	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 03:10:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1ePkzO-0001L8-S9
-	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 03:05:08 -0500
-From: Fam Zheng <famz@redhat.com>
-Date: Fri, 15 Dec 2017 16:04:46 +0800
-Message-Id: <20171215080446.10671-3-famz@redhat.com>
-In-Reply-To: <20171215080446.10671-1-famz@redhat.com>
-References: <20171215080446.10671-1-famz@redhat.com>
-Subject: [Qemu-devel] [PATCH 2/2] iotests: Test creating overlay when guest
- running
+	(envelope-from <pbonzini@redhat.com>) id 1ePl4i-00050v-U8
+	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 03:10:33 -0500
+References: <20171213195852.30439-1-f4bug@amsat.org>
+	<20171213195852.30439-7-f4bug@amsat.org>
+	<CAKmqyKOSn_iVVuqF=By8g2wFYG_PeiisepJhYMrK7imETGeE7A@mail.gmail.com>
+	<CAAdtpL7npoa8Qs5hARn_da39Ctf5eLZ28CMmV=prh63AxCOvYg@mail.gmail.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <2c00f0cf-f91b-69e1-38ec-c44148a7e488@redhat.com>
+Date: Fri, 15 Dec 2017 09:10:17 +0100
+MIME-Version: 1.0
+In-Reply-To: <CAAdtpL7npoa8Qs5hARn_da39Ctf5eLZ28CMmV=prh63AxCOvYg@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 06/14] sdhci: refactor same sysbus/pci
+ properties into a common one
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,50 +27,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Alistair Francis <alistair.francis@xilinx.com>, Kevin O'Connor <kevin@koconnor.net>, Gerd Hoffmann <kraxel@redhat.com>
+Cc: "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, Prasad J Pandit <pjp@fedoraproject.org>, Peter Maydell <peter.maydell@linaro.org>, Andrew Baumann <Andrew.Baumann@microsoft.com>, Andrey Smirnov <andrew.smirnov@gmail.com>, Andrey Yurovsky <yurovsky@gmail.com>, Sai Pavan Boddu <saipava@xilinx.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, "open list:Block layer core" <qemu-block@nongnu.org>
 
-Signed-off-by: Fam Zheng <famz@redhat.com>
----
- tests/qemu-iotests/153     | 4 ++++
- tests/qemu-iotests/153.out | 3 +++
- 2 files changed, 7 insertions(+)
+On 14/12/2017 19:40, Philippe Mathieu-Daud=C3=A9 wrote:
+>>> +    DEFINE_PROP_BOOL("pending-insert-quirk", SDHCIState, pending_ins=
+ert_quirk,
+>>> +                     false),
+>> I like the reduction of code in this patch, but aren't we now going to
+>> have device properties that aren't actually connected to anything?
+> I'm not sure I understand, ar you worried about the PCI_SDHCI will now
+> have this property but not use it?
+>=20
+> I couldn't find any machine using SDHCI via PCI and was tempted to
+> just remove this code,
 
-diff --git a/tests/qemu-iotests/153 b/tests/qemu-iotests/153
-index fa25eb24bd..22cb9c69a7 100755
---- a/tests/qemu-iotests/153
-+++ b/tests/qemu-iotests/153
-@@ -32,6 +32,7 @@ _cleanup()
- {
-     _cleanup_test_img
-     rm -f "${TEST_IMG}.base"
-+    rm -f "${TEST_IMG}.overlay"
-     rm -f "${TEST_IMG}.convert"
-     rm -f "${TEST_IMG}.a"
-     rm -f "${TEST_IMG}.b"
-@@ -218,6 +219,9 @@ _send_qemu_cmd $QEMU_HANDLE \
- 
- _run_cmd $QEMU_IO "${TEST_IMG}" -c 'write 0 512'
- 
-+echo "Creating overlay with qemu-img when the guest is running should be allowed"
-+_run_cmd $QEMU_IMG create -f $IMGFMT -b "${TEST_IMG}" "${TEST_IMG}.overlay"
-+
- echo "Closing the other"
- _send_qemu_cmd $QEMU_HANDLE \
-     "{ 'execute': 'human-monitor-command',
-diff --git a/tests/qemu-iotests/153.out b/tests/qemu-iotests/153.out
-index 5b917b177c..8131180c49 100644
---- a/tests/qemu-iotests/153.out
-+++ b/tests/qemu-iotests/153.out
-@@ -390,6 +390,9 @@ _qemu_img_wrapper info TEST_DIR/t.qcow2
- _qemu_io_wrapper TEST_DIR/t.qcow2 -c write 0 512
- can't open device TEST_DIR/t.qcow2: Failed to get "write" lock
- Is another process using the image?
-+Creating overlay with qemu-img when the guest is running should be allowed
-+
-+_qemu_img_wrapper create -f qcow2 -b TEST_DIR/t.qcow2 TEST_DIR/t.qcow2.overlay
- Closing the other
- 
- _qemu_io_wrapper TEST_DIR/t.qcow2 -c write 0 512
--- 
-2.14.3
+PCI devices can be created with -device, they don't have to be added by
+boards.
+
+Paolo
