@@ -1,34 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37533)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58630)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eQHhc-0000r8-9e
-	for qemu-devel@nongnu.org; Sat, 16 Dec 2017 14:00:53 -0500
+	(envelope-from <no-reply@patchew.org>) id 1eQJG2-0008Qb-QY
+	for qemu-devel@nongnu.org; Sat, 16 Dec 2017 15:40:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eQHhZ-0005X0-0C
-	for qemu-devel@nongnu.org; Sat, 16 Dec 2017 14:00:52 -0500
-Received: from indium.canonical.com ([91.189.90.7]:35842)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1eQHhY-0005WV-Pt
-	for qemu-devel@nongnu.org; Sat, 16 Dec 2017 14:00:48 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1eQHhX-00070K-Jj
-	for <qemu-devel@nongnu.org>; Sat, 16 Dec 2017 19:00:47 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 946142E80C7
-	for <qemu-devel@nongnu.org>; Sat, 16 Dec 2017 19:00:47 +0000 (UTC)
+	(envelope-from <no-reply@patchew.org>) id 1eQJFy-00014r-Hd
+	for qemu-devel@nongnu.org; Sat, 16 Dec 2017 15:40:30 -0500
+Resent-Message-Id: <E1eQJFy-00014r-Hd@eggs.gnu.org>
+Received: from sender-of-o52.zoho.com ([135.84.80.217]:21337)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1eQJFy-0000yu-8h
+	for qemu-devel@nongnu.org; Sat, 16 Dec 2017 15:40:26 -0500
+In-Reply-To: <1513327555-17520-1-git-send-email-jianjay.zhou@huawei.com>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <151332791862.126.5307555752362835378@449822a21bf0>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Sat, 16 Dec 2017 18:53:56 -0000
-From: Peter Maydell <peter.maydell@linaro.org>
-Reply-To: Bug 1696353 <1696353@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <149682692221.8383.2186201709283317126.malonedeb@gac.canonical.com>
-Message-Id: <151345043695.18177.10955724186610948608.malone@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1696353] Re: golang binaries fail to start under
- linux-user
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Fri, 15 Dec 2017 00:52:01 -0800 (PST)
+Subject: Re: [Qemu-devel] [PATCH v2 0/2] vhost: two fixes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,63 +28,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: jianjay.zhou@huawei.com
+Cc: famz@redhat.com, qemu-devel@nongnu.org, mst@redhat.com, weidong.huang@huawei.com, wangxinxin.wang@huawei.com, dgilbert@redhat.com, gary.liuzhe@huawei.com, arei.gonglei@huawei.com, imammedo@redhat.com
 
-Yes, new bug please, that's definitely a different symptom and likely an
-unrelated issue.
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1696353
-
-Title:
-  golang binaries fail to start under linux-user
-
-Status in QEMU:
-  Won't Fix
-
-Bug description:
-  With current master golang binaries fail when run under linux-user,
-  for example:
-
-  [will@localhost qemu]$ ./arm-linux-user/qemu-arm glide =
-
-  runtime: failed to create new OS thread (have 2 already; errno=3D22)
-  fatal error: newosproc
-
-  runtime stack:
-  runtime.throw(0x45f879, 0x9)
-  	/usr/lib/golang/src/runtime/panic.go:566 +0x78
-  runtime.newosproc(0x1092c000, 0x1093bfe0)
-  	/usr/lib/golang/src/runtime/os_linux.go:160 +0x1b0
-  runtime.newm(0x4ae1e8, 0x0)
-  	/usr/lib/golang/src/runtime/proc.go:1572 +0x12c
-  runtime.main.func1()
-  	/usr/lib/golang/src/runtime/proc.go:126 +0x24
-  runtime.systemstack(0x5ef900)
-  	/usr/lib/golang/src/runtime/asm_arm.s:247 +0x80
-  runtime.mstart()
-  	/usr/lib/golang/src/runtime/proc.go:1079
-
-  goroutine 1 [running]:
-  runtime.systemstack_switch()
-  	/usr/lib/golang/src/runtime/asm_arm.s:192 +0x4 fp=3D0x109287ac sp=3D0x10=
-9287a8
-  runtime.main()
-  	/usr/lib/golang/src/runtime/proc.go:127 +0x5c fp=3D0x109287d4 sp=3D0x109=
-287ac
-  runtime.goexit()
-  	/usr/lib/golang/src/runtime/asm_arm.s:998 +0x4 fp=3D0x109287d4 sp=3D0x10=
-9287d4
-
-  The reason for this is that the golang runtime does not pass the
-  CLONE_SYSVMEM flag to clone so the clone flags checks fail:
-
-  https://github.com/golang/go/blob/master/src/runtime/os_linux.go#L155
-
-  The attached patch allows golang binaries to start under linux-user.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1696353/+subscriptions
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKTWVzc2FnZS1pZDogMTUx
+MzMyNzU1NS0xNzUyMC0xLWdpdC1zZW5kLWVtYWlsLWppYW5qYXkuemhvdUBodWF3ZWkuY29tClN1
+YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0ggdjIgMC8yXSB2aG9zdDogdHdvIGZpeGVzClR5cGU6
+IHNlcmllcwoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaAoKQkFTRT1iYXNl
+Cm49MQp0b3RhbD0kKGdpdCBsb2cgLS1vbmVsaW5lICRCQVNFLi4gfCB3YyAtbCkKZmFpbGVkPTAK
+CmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2Fs
+IGRpZmYucmVuYW1lcyBUcnVlCgpjb21taXRzPSIkKGdpdCBsb2cgLS1mb3JtYXQ9JUggLS1yZXZl
+cnNlICRCQVNFLi4pIgpmb3IgYyBpbiAkY29tbWl0czsgZG8KICAgIGVjaG8gIkNoZWNraW5nIFBB
+VENIICRuLyR0b3RhbDogJChnaXQgbG9nIC1uIDEgLS1mb3JtYXQ9JXMgJGMpLi4uIgogICAgaWYg
+ISBnaXQgc2hvdyAkYyAtLWZvcm1hdD1lbWFpbCB8IC4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0t
+bWFpbGJhY2sgLTsgdGhlbgogICAgICAgIGZhaWxlZD0xCiAgICAgICAgZWNobwogICAgZmkKICAg
+IG49JCgobisxKSkKZG9uZQoKZXhpdCAkZmFpbGVkCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpV
+cGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0CmVycm9yOiBS
+UEMgZmFpbGVkOyBjdXJsIDE4IHRyYW5zZmVyIGNsb3NlZCB3aXRoIG91dHN0YW5kaW5nIHJlYWQg
+ZGF0YSByZW1haW5pbmcKZmF0YWw6IFRoZSByZW1vdGUgZW5kIGh1bmcgdXAgdW5leHBlY3RlZGx5
+CmVycm9yOiBDb3VsZCBub3QgZmV0Y2ggM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4
+ODcxMzM4NApUcmFjZWJhY2sgKG1vc3QgcmVjZW50IGNhbGwgbGFzdCk6CiAgRmlsZSAiL3Vzci9i
+aW4vcGF0Y2hldyIsIGxpbmUgNDQyLCBpbiB0ZXN0X29uZQogICAgZ2l0X2Nsb25lX3JlcG8oY2xv
+bmUsIHJbInJlcG8iXSwgclsiaGVhZCJdLCBsb2dmKQogIEZpbGUgIi91c3IvYmluL3BhdGNoZXci
+LCBsaW5lIDQ4LCBpbiBnaXRfY2xvbmVfcmVwbwogICAgc3Rkb3V0PWxvZ2YsIHN0ZGVycj1sb2dm
+KQogIEZpbGUgIi91c3IvbGliNjQvcHl0aG9uMy42L3N1YnByb2Nlc3MucHkiLCBsaW5lIDI5MSwg
+aW4gY2hlY2tfY2FsbAogICAgcmFpc2UgQ2FsbGVkUHJvY2Vzc0Vycm9yKHJldGNvZGUsIGNtZCkK
+c3VicHJvY2Vzcy5DYWxsZWRQcm9jZXNzRXJyb3I6IENvbW1hbmQgJ1snZ2l0JywgJ3JlbW90ZScs
+ICdhZGQnLCAnLWYnLCAnLS1taXJyb3I9ZmV0Y2gnLCAnM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRl
+ZjdmNDRiZDg4ODcxMzM4NCcsICdodHRwczovL2dpdGh1Yi5jb20vcGF0Y2hldy1wcm9qZWN0L3Fl
+bXUnXScgcmV0dXJuZWQgbm9uLXplcm8gZXhpdCBzdGF0dXMgMS4KCgoKLS0tCkVtYWlsIGdlbmVy
+YXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVh
+c2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAZnJlZWxpc3RzLm9yZw==
