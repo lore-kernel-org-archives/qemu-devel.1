@@ -1,28 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53384)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53812)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1ePpMw-00068b-4y
-	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 07:45:39 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1ePpOR-0006mG-Ik
+	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 07:47:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1ePpMs-00023i-TY
-	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 07:45:38 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:43536)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1ePpMs-000221-Kq
-	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 07:45:34 -0500
-Date: Fri, 15 Dec 2017 12:45:24 +0000
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20171215124524.GE26982@stefanha-x1.localdomain>
-References: <20171205055200.16305-1-peterx@redhat.com>
-	<20171205055200.16305-6-peterx@redhat.com>
-	<20171213153702.GF7173@stefanha-x1.localdomain>
-	<20171215075505.GK7780@xz-mi>
+	(envelope-from <dgibson@ozlabs.org>) id 1ePpOQ-0004pk-GD
+	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 07:47:11 -0500
+Date: Fri, 15 Dec 2017 23:46:57 +1100
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20171215124657.GH7753@umbus.fritz.box>
+References: <20171102103559.7382-1-luc.michel@git.antfield.fr>
+	<20171102103559.7382-2-luc.michel@git.antfield.fr>
+	<20171106061639.GA7813@umbus.fritz.box>
+	<2f6bae4a-3489-5cb9-766c-5b8c6c447ac8@antfield.fr>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="GxcwvYAGnODwn7V8"
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="smOfPzt+Qjm5bNGJ"
 Content-Disposition: inline
-In-Reply-To: <20171215075505.GK7780@xz-mi>
-Subject: Re: [Qemu-devel] [RFC v5 05/26] qjson: add "opaque" field to
- JSONMessageParser
+In-Reply-To: <2f6bae4a-3489-5cb9-766c-5b8c6c447ac8@antfield.fr>
+Subject: Re: [Qemu-devel] [PATCH 1/1] target-ppc: Fix booke206 tlbwe TLB
+ instruction
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,87 +27,98 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, Stefan Hajnoczi <shajnocz@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <famz@redhat.com>, Juan Quintela <quintela@redhat.com>, mdroth@linux.vnet.ibm.com, Eric Blake <eblake@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Markus Armbruster <armbru@redhat.com>, marcandre.lureau@redhat.com, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: Luc Michel <luc.michel@antfield.fr>
+Cc: Luc MICHEL <luc.michel@git.antfield.fr>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Alexander Graf <agraf@suse.de>
 
 
---GxcwvYAGnODwn7V8
-Content-Type: text/plain; charset=us-ascii
+--smOfPzt+Qjm5bNGJ
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Dec 15, 2017 at 03:55:06PM +0800, Peter Xu wrote:
-> On Wed, Dec 13, 2017 at 03:37:02PM +0000, Stefan Hajnoczi wrote:
-> > On Tue, Dec 05, 2017 at 01:51:39PM +0800, Peter Xu wrote:
-> > > diff --git a/qga/main.c b/qga/main.c
-> > > index 62a62755bd..3b5ebbc1ee 100644
-> > > --- a/qga/main.c
-> > > +++ b/qga/main.c
-> > > @@ -593,7 +593,8 @@ static void process_command(GAState *s, QDict *re=
-q)
-> > >  }
-> > > =20
-> > >  /* handle requests/control events coming in over the channel */
-> > > -static void process_event(JSONMessageParser *parser, GQueue *tokens)
-> > > +static void process_event(JSONMessageParser *parser, GQueue *tokens,
-> > > +                          void *opaque)
-> > >  {
-> > >      GAState *s =3D container_of(parser, GAState, parser);
-> > >      QDict *qdict;
-> > > @@ -1320,7 +1321,7 @@ static int run_agent(GAState *s, GAConfig *conf=
-ig, int socket_activation)
-> > >      s->command_state =3D ga_command_state_new();
-> > >      ga_command_state_init(s, s->command_state);
-> > >      ga_command_state_init_all(s->command_state);
-> > > -    json_message_parser_init(&s->parser, process_event);
-> > > +    json_message_parser_init(&s->parser, process_event, NULL);
+On Tue, Nov 14, 2017 at 05:28:48PM +0100, Luc Michel wrote:
+> On 11/06/2017 07:16 AM, David Gibson wrote:
+> > On Thu, Nov 02, 2017 at 11:35:59AM +0100, Luc MICHEL wrote:
+> >> When overwritting a valid TLB entry with a new one, the previous page
+> >> were not flushed in QEMU TLB, leading to incoherent mapping. This comm=
+it
+> >> fixes this.
 > >=20
-> > This patch leaves the code with 2 ways of getting at state from the
-> > parser pointer:
-> > 1. Use container_of() like existing users.
-> > 2. Use the new (unused) opaque argument.
+> > I don't think this is right.  As a rule, overwriting a TLB entry
+> > doesn't necessarily invalidate the previous entry, even on real
+> > hardware.  I don't know exactly what the situation is on the various
+> > FSL BookE chips, but I know various other models have other caches
+> > ahead of the main TLB which can cache mappings that have been removed
+> > from it (e.g. the ERAT on server chips and the shadow TLBs on 4xx).
+> Indeed, e500 cores have a two-level TLB. tlbwe writes in L2, and L1 is
+> handled by the hardware and not visible to the user.
+>=20
 > >=20
-> > Given that #1 exists, is this patch really necessary?
+> > To invalidate those other caches requires something other than simply
+> > a tlbwe (tlbie for the ERAT and an isync for the shadow TLBs).
+> Yes you are right. From "EREF 2.0: A Programmer=E2=80=99s Reference Manua=
+l for
+> Freescale Power Architecture Processors, Rev. 0":
 >=20
-> I didn't really notice that.  Thanks for pointing out.
+> "A context synchronizing instruction is required after a tlbwe
+> instruction to ensure any subsequent instructions that will use the
+> updated TLB values execute in the new context."
 >=20
-> However even if so I would still prefer the opaque way to do it if
-> asked.  Existing #1 of course works but IMHO is less flexible and has
-> dependency between structure layouts.
+> Linux executes a msync followed by a isync after a tlbwe for BookE MMU
+> machines.
 >=20
-> How about I append another patch to convert existing users (or, I can
-> post as separate patches after this series)?  It's not really a lot,
-> and the conversion would be obvious:
+> >=20
+> > The current behaviour won't exactly match what hardware does (and it's
+> > probably not practical to do so), but it should be within what's
+> > permitted by the architecture - and therefore good enough for correct
+> > guests.
+> >=20
+> > It's possible that we do need this for the BookE chips, but it'll need
+> > a more detailed rationale.
+> The one sentence from the "PowerPC e500 Core Family Reference Manual,
+> Rev. 1" document that makes my fix kind of correct is this one:
 >=20
-> *** qga/main.c:
-> run_agent[1324]                json_message_parser_init(&s->parser, proce=
-ss_event, NULL);
-> *** qobject/qjson.c:
-> qobject_from_jsonv[45]         json_message_parser_init(&state.parser, pa=
-rse_json, NULL);
-> *** tests/libqtest.c:
-> qmp_fd_receive[438]            json_message_parser_init(&qmp.parser, qmp_=
-response, NULL);
+> In 12.4.2 TLB Write Entry (tlbwe) Instruction:
 >=20
-> Though, if you still insist, I can drop it too.
+> "Note that when an L2 TLB entry is written, it may be displacing an
+> already valid entry in the same L2 TLB location (a victim). If a valid
+> L1 TLB entry corresponds to the L2 MMU victim entry, that L1 TLB entry
+> is automatically invalidated."
 
-I prefer dropping it.  Smaller patch series get reviewed quicker, cause
-fewer merge conflicts, are lower risk, etc.
+That does seem fairly clear.  If you resend the patch with that
+paragraph cited in a comment, I'll apply it.  A link to the reference
+manual would also be appreciated.
 
-Stefan
+> At least, it is as correct as the current tlb_flush in
+> "helper_booke206_tlbwe" function, since it does not wait for isync to
+> effectively invalidate the page.
 
---GxcwvYAGnODwn7V8
+
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--smOfPzt+Qjm5bNGJ
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEcBAEBAgAGBQJaM8PkAAoJEJykq7OBq3PIWqYIAJBleHnD8BC3akwSKugfnDYl
-NzByA7RSu/sNS8eofs3xaEJcIJ5QbBaV/sz1jijZH2iwM9+proQGGXLS1X+JJah5
-vheB7W52ORxdNXL/q7OiSfM5awo9Fqezr/mXx60u5/+QDTnE0zLjXrPF0NWb2nB5
-VaRlG7MLV13kkPQt4Y62QU36oA0LRrUpEHHfbQNb8l2PeHBHIoOuMImImM/uyy3F
-jS/nIiMoHijxtPIbC4Y6upBPdJaQnEouP7SoqBsStX8Lkjus6dt2SJYGmRWmJqqi
-NMBrgd4TzxR+LLcgnKW6tgEOuI4xjT3T8BzJET2R3phAd1QUF2Tgt4T8x7u1kv4=
-=HYiu
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlozxD8ACgkQbDjKyiDZ
+s5KJ2w//R/R+aGDhCH3elktG3K1X0FIFFPGtHNtKgNMyzQH/1Z3G1/2kAp9jS3Z4
+Hc6eyKJ1gY0xGLUPQgHrcIq7iCvWk4G1xGvtI/XkAFE5wF1mrgINL/HS73CevAvh
+N5L+2f+ddn/eXxY29v+S0GcLG5SxNog/Lj7v2VbjDdq2TqE+a9XqOqPMEIX+iv1T
+fSEN8WHnUhEKpo8FYbzhxr5LPadP4CEpkUDDgfLa1HecYSRFqdxtxNdhb8hSO1Ax
+ziGFY9TddcbMqclaWPwPBzfdkiRURG+IiNG7wMbuMqXsnSAc3zKkDunEShrPYI1Z
+liuN1QfoFR/P+HMTHeh5evt72lxhvpRhNvmzRJof+epK9NTCpPhrPE2oC+A38QMA
+dzpmIptdGNELVmpOi44HU9L6W7PPMFQ4NFU5yOGnSfDIgat0LKvLDa4dFgjjsY9u
+yDY8nwP6fOOfDCqW4jXQC4T2qjXUVkjAW6qQE+2KryriObNwexagWUzgXrTerYXF
+MotB0pYMhPATEa/TRUgV+824wL49u4I5UQT8KoHWxrmjOQoVAIi/+lUsmG6COoAm
+nYLSTVUA7E+B2mffPOY9UXhH/gbRfbkBia+trpvkK5cEam1UxV1mSm8AcO4V7iX+
+WYuICWGGzRzBtrDZSz2KaZm9j127UbIbSYqxY0Ut687s8EvzHJU=
+=YGLV
 -----END PGP SIGNATURE-----
 
---GxcwvYAGnODwn7V8--
+--smOfPzt+Qjm5bNGJ--
