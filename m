@@ -1,32 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56846)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57621)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ePo50-0002MJ-Ji
-	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 06:23:06 -0500
+	id 1ePo7U-0003sh-8W
+	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 06:25:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ePo4v-0004Ke-Kl
-	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 06:23:02 -0500
-Received: from mail-qt0-x241.google.com ([2607:f8b0:400d:c0d::241]:42521)
+	id 1ePo7S-0007Pn-VS
+	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 06:25:36 -0500
+Received: from mail-qk0-x243.google.com ([2607:f8b0:400d:c09::243]:37096)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ePo4v-0004KI-FA
-	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 06:22:57 -0500
-Received: by mail-qt0-x241.google.com with SMTP id g9so11626791qth.9
-	for <qemu-devel@nongnu.org>; Fri, 15 Dec 2017 03:22:57 -0800 (PST)
+	id 1ePo7S-0007PD-PL
+	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 06:25:34 -0500
+Received: by mail-qk0-x243.google.com with SMTP id i130so9911435qke.4
+	for <qemu-devel@nongnu.org>; Fri, 15 Dec 2017 03:25:34 -0800 (PST)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 References: <20171210063819.14892-1-peterx@redhat.com>
-	<20171210063819.14892-2-peterx@redhat.com>
+	<20171210063819.14892-3-peterx@redhat.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <16b66d02-30a2-b13e-6cbc-3a50672ce4bf@amsat.org>
-Date: Fri, 15 Dec 2017 08:22:53 -0300
+Message-ID: <eb873259-38f2-4345-7d82-1f844417eb76@amsat.org>
+Date: Fri, 15 Dec 2017 08:25:28 -0300
 MIME-Version: 1.0
-In-Reply-To: <20171210063819.14892-2-peterx@redhat.com>
+In-Reply-To: <20171210063819.14892-3-peterx@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 1/5] i8259: convert DPRINTFs into trace
+Subject: Re: [Qemu-devel] [PATCH 2/5] i8259: use DEBUG_IRQ_COUNT always
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,122 +39,84 @@ To: Peter Xu <peterx@redhat.com>, qemu-devel@nongnu.org
 Cc: Paolo Bonzini <pbonzini@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>
 
 On 12/10/2017 03:38 AM, Peter Xu wrote:
-> One thing to mention is that in pic_set_irq() I need to uncomment a few
-> lines in the macros to make sure IRQ value calculation is correct.
-
-Yep, this is correct.
-
+> It's not really scary to even enable it forever.  After all it's i8259,
+> and it's even not the kernel one.
+> 
+> Then we can remove quite a few of lines to make it cleaner.  And "info
+> irq" will always work for it.
+> 
 > Signed-off-by: Peter Xu <peterx@redhat.com>
+> ---
+>  hw/intc/i8259.c | 18 +-----------------
+>  1 file changed, 1 insertion(+), 17 deletions(-)
+> 
+> diff --git a/hw/intc/i8259.c b/hw/intc/i8259.c
+> index f12e0b27f1..20c9d0a58b 100644
+> --- a/hw/intc/i8259.c
+> +++ b/hw/intc/i8259.c
+> @@ -36,7 +36,6 @@
+>  //#define DEBUG_PIC
+>  
+>  //#define DEBUG_IRQ_LATENCY
+> -//#define DEBUG_IRQ_COUNT
+>  
+>  #define TYPE_I8259 "isa-i8259"
+>  #define PIC_CLASS(class) OBJECT_CLASS_CHECK(PICClass, (class), TYPE_I8259)
+> @@ -52,12 +51,8 @@ typedef struct PICClass {
+>      DeviceRealize parent_realize;
+>  } PICClass;
+>  
+> -#if defined(DEBUG_PIC) || defined(DEBUG_IRQ_COUNT)
+>  static int irq_level[16];
+> -#endif
+> -#ifdef DEBUG_IRQ_COUNT
+>  static uint64_t irq_count[16];
+> -#endif
+
+I'll be so happy once this device get QOMified...
 
 Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-> ---
->  hw/intc/i8259.c      | 26 +++++++++++---------------
->  hw/intc/trace-events |  7 +++++++
->  2 files changed, 18 insertions(+), 15 deletions(-)
-> 
-> diff --git a/hw/intc/i8259.c b/hw/intc/i8259.c
-> index fe9ecd6bd4..f12e0b27f1 100644
-> --- a/hw/intc/i8259.c
-> +++ b/hw/intc/i8259.c
-> @@ -30,17 +30,11 @@
->  #include "qemu/log.h"
->  #include "hw/isa/i8259_internal.h"
->  #include "hw/intc/intc.h"
-> +#include "trace.h"
->  
->  /* debug PIC */
->  //#define DEBUG_PIC
->  
-> -#ifdef DEBUG_PIC
-> -#define DPRINTF(fmt, ...)                                       \
-> -    do { printf("pic: " fmt , ## __VA_ARGS__); } while (0)
-> -#else
-> -#define DPRINTF(fmt, ...)
-> -#endif
-> -
->  //#define DEBUG_IRQ_LATENCY
->  //#define DEBUG_IRQ_COUNT
->  
-> @@ -122,8 +116,7 @@ static void pic_update_irq(PICCommonState *s)
->  
->      irq = pic_get_irq(s);
->      if (irq >= 0) {
-> -        DPRINTF("pic%d: imr=%x irr=%x padd=%d\n",
-> -                s->master ? 0 : 1, s->imr, s->irr, s->priority_add);
-> +        trace_pic_update_irq(s->master, s->imr, s->irr, s->priority_add);
->          qemu_irq_raise(s->int_out[0]);
->      } else {
->          qemu_irq_lower(s->int_out[0]);
-> @@ -140,9 +133,11 @@ static void pic_set_irq(void *opaque, int irq, int level)
->      defined(DEBUG_IRQ_LATENCY)
->      int irq_index = s->master ? irq : irq + 8;
+>  #ifdef DEBUG_IRQ_LATENCY
+>  static int64_t irq_time[16];
 >  #endif
-> +
-> +    trace_pic_set_irq(s->master, irq, level);
-> +
->  #if defined(DEBUG_PIC) || defined(DEBUG_IRQ_COUNT)
->      if (level != irq_level[irq_index]) {
-> -        DPRINTF("pic_set_irq: irq=%d level=%d\n", irq_index, level);
->          irq_level[irq_index] = level;
->  #ifdef DEBUG_IRQ_COUNT
->          if (level == 1) {
-> @@ -223,18 +218,18 @@ int pic_read_irq(DeviceState *d)
->          intno = s->irq_base + irq;
->      }
+> @@ -128,24 +123,17 @@ static void pic_set_irq(void *opaque, int irq, int level)
+>  {
+>      PICCommonState *s = opaque;
+>      int mask = 1 << irq;
+> -
+> -#if defined(DEBUG_PIC) || defined(DEBUG_IRQ_COUNT) || \
+> -    defined(DEBUG_IRQ_LATENCY)
+>      int irq_index = s->master ? irq : irq + 8;
+> -#endif
 >  
-> -#if defined(DEBUG_PIC) || defined(DEBUG_IRQ_LATENCY)
->      if (irq == 2) {
->          irq = irq2 + 8;
+>      trace_pic_set_irq(s->master, irq, level);
+>  
+> -#if defined(DEBUG_PIC) || defined(DEBUG_IRQ_COUNT)
+>      if (level != irq_level[irq_index]) {
+>          irq_level[irq_index] = level;
+> -#ifdef DEBUG_IRQ_COUNT
+>          if (level == 1) {
+>              irq_count[irq_index]++;
+>          }
+> -#endif
 >      }
 > -#endif
 > +
 >  #ifdef DEBUG_IRQ_LATENCY
->      printf("IRQ%d latency=%0.3fus\n",
->             irq,
->             (double)(qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) -
->                      irq_time[irq]) * 1000000.0 / NANOSECONDS_PER_SECOND);
->  #endif
-> -    DPRINTF("pic_interrupt: irq=%d\n", irq);
-> +
-> +    trace_pic_interrupt(irq, intno);
->      return intno;
->  }
+>      if (level) {
+>          irq_time[irq_index] = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
+> @@ -253,12 +241,8 @@ static bool pic_get_statistics(InterruptStatsProvider *obj,
+>      PICCommonState *s = PIC_COMMON(obj);
 >  
-> @@ -289,7 +284,8 @@ static void pic_ioport_write(void *opaque, hwaddr addr64,
->      uint32_t val = val64;
->      int priority, cmd, irq;
->  
-> -    DPRINTF("write: addr=0x%02x val=0x%02x\n", addr, val);
-> +    trace_pic_ioport_write(s->master, addr, val);
-> +
->      if (addr == 0) {
->          if (val & 0x10) {
->              pic_init_reset(s);
-> @@ -402,7 +398,7 @@ static uint64_t pic_ioport_read(void *opaque, hwaddr addr,
->              ret = s->imr;
->          }
->      }
-> -    DPRINTF("read: addr=0x%02" HWADDR_PRIx " val=0x%02x\n", addr, ret);
-> +    trace_pic_ioport_read(s->master, addr, ret);
->      return ret;
->  }
->  
-> diff --git a/hw/intc/trace-events b/hw/intc/trace-events
-> index b298fac7c6..c72b37c5cf 100644
-> --- a/hw/intc/trace-events
-> +++ b/hw/intc/trace-events
-> @@ -1,5 +1,12 @@
->  # See docs/devel/tracing.txt for syntax documentation.
->  
-> +# hw/intc/i8259.c
-> +pic_update_irq(bool master, uint8_t imr, uint8_t irr, uint8_t padd) "master %d imr %"PRIu8" irr %"PRIu8" padd %"PRIu8
-> +pic_set_irq(bool master, int irq, int level) "master %d irq %d level %d"
-> +pic_interrupt(int irq, int intno) "irq %d intno %d"
-> +pic_ioport_write(bool master, uint64_t addr, uint64_t val) "master %d addr 0x%"PRIx64" val 0x%"PRIx64
-> +pic_ioport_read(bool master, uint64_t addr, int val) "master %d addr 0x%"PRIx64" val 0x%x"
-> +
->  # hw/intc/apic_common.c
->  cpu_set_apic_base(uint64_t val) "0x%016"PRIx64
->  cpu_get_apic_base(uint64_t val) "0x%016"PRIx64
+>      if (s->master) {
+> -#ifdef DEBUG_IRQ_COUNT
+>          *irq_counts = irq_count;
+>          *nb_irqs = ARRAY_SIZE(irq_count);
+> -#else
+> -        return false;
+> -#endif
+>      } else {
+>          *irq_counts = NULL;
+>          *nb_irqs = 0;
 > 
