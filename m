@@ -1,17 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58710)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59232)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1ePn34-0000n1-JI
-	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 05:17:08 -0500
+	(envelope-from <thuth@redhat.com>) id 1ePn4A-0001sg-Tn
+	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 05:18:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1ePn33-0007Ay-Kk
-	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 05:16:58 -0500
-From: David Gibson <david@gibson.dropbear.id.au>
-Date: Fri, 15 Dec 2017 21:16:50 +1100
-Message-Id: <20171215101651.13911-4-david@gibson.dropbear.id.au>
-In-Reply-To: <20171215101651.13911-1-david@gibson.dropbear.id.au>
-References: <20171215101651.13911-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PATCH 3/4] tests/pxe-test: Test net booting over IPv6
- in some cases
+	(envelope-from <thuth@redhat.com>) id 1ePn46-0008Cp-Vh
+	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 05:18:06 -0500
+References: <20171215033015.738-1-f4bug@amsat.org>
+	<20171215033015.738-5-f4bug@amsat.org>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <800d15c5-fe10-56af-083c-501291d245ad@redhat.com>
+Date: Fri, 15 Dec 2017 11:17:54 +0100
+MIME-Version: 1.0
+In-Reply-To: <20171215033015.738-5-f4bug@amsat.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v4 04/43] MAINTAINERS: add an entry for the
+ i82378 (superio)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,74 +25,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: mst@redhat.com
-Cc: thuth@redhat.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, "Michael S. Tsirkin" <mst@redhat.com>, Michael Tokarev <mjt@tls.msk.ru>
+Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, qemu-trivial@nongnu.org
 
-This adds IPv6 net boot testing (in addition to IPv4) when in slow test
-mode on ppc64 or s390.  IPv6 PXE doesn't seem to work on x86, I'm guessing
-out BIOS image doesn't support it.
+On 15.12.2017 04:29, Philippe Mathieu-Daud=C3=A9 wrote:
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+> Reviewed-by: Herv=C3=A9 Poussineau <hpoussin@reactos.org>
+> Reviewed-by: Herv=C3=A9 Poussineau <hpoussin@reactos.org>
 
-Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
----
- tests/pxe-test.c | 26 ++++++++++++++++++++------
- 1 file changed, 20 insertions(+), 6 deletions(-)
+Remove the doubled Reviewed-by, or replace the second line with:
 
-diff --git a/tests/pxe-test.c b/tests/pxe-test.c
-index f9bca8976d..e7a0610070 100644
---- a/tests/pxe-test.c
-+++ b/tests/pxe-test.c
-@@ -89,7 +89,14 @@ static void test_pxe_ipv4(gconstpointer data)
-     test_pxe_one(test, false);
- }
- 
--static void test_batch(const testdef_t *tests)
-+static void test_pxe_ipv6(gconstpointer data)
-+{
-+    const testdef_t *test = data;
-+
-+    test_pxe_one(test, true);
-+}
-+
-+static void test_batch(const testdef_t *tests, bool ipv6)
- {
-     int i;
- 
-@@ -101,6 +108,13 @@ static void test_batch(const testdef_t *tests)
-                                    test->machine, test->model);
-         qtest_add_data_func(testname, test, test_pxe_ipv4);
-         g_free(testname);
-+
-+        if (ipv6) {
-+            testname = g_strdup_printf("pxe/ipv6/%s/%s",
-+                                       test->machine, test->model);
-+            qtest_add_data_func(testname, test, test_pxe_ipv6);
-+            g_free(testname);
-+        }
-     }
- }
- 
-@@ -116,17 +130,17 @@ int main(int argc, char *argv[])
-     g_test_init(&argc, &argv, NULL);
- 
-     if (strcmp(arch, "i386") == 0 || strcmp(arch, "x86_64") == 0) {
--        test_batch(x86_tests);
-+        test_batch(x86_tests, false);
-         if (g_test_slow()) {
--            test_batch(x86_tests_slow);
-+            test_batch(x86_tests_slow, false);
-         }
-     } else if (strcmp(arch, "ppc64") == 0) {
--        test_batch(ppc64_tests);
-+        test_batch(ppc64_tests, g_test_slow());
-         if (g_test_slow()) {
--            test_batch(ppc64_tests_slow);
-+            test_batch(ppc64_tests_slow, true);
-         }
-     } else if (g_str_equal(arch, "s390x")) {
--        test_batch(s390x_tests);
-+        test_batch(s390x_tests, g_test_slow());
-     }
-     ret = g_test_run();
-     boot_sector_cleanup(disk);
--- 
-2.14.3
+Reviewed-by: Thomas Huth <thuth@redhat.com>
+
+> ---
+>  MAINTAINERS | 1 +
+>  1 file changed, 1 insertion(+)
+>=20
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index 31c673d60a..4618f9b4db 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -732,6 +732,7 @@ F: hw/ppc/prep.c
+>  F: hw/ppc/prep_systemio.c
+>  F: hw/ppc/rs6000_mc.c
+>  F: hw/pci-host/prep.[hc]
+> +F: hw/isa/i82378.c
+>  F: hw/isa/pc87312.[hc]
+>  F: hw/dma/i82374.c
+>  F: pc-bios/ppc_rom.bin
+>=20
