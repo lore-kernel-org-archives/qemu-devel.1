@@ -1,26 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34865)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42748)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ePdWu-00007H-VE
-	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 19:07:10 -0500
+	(envelope-from <sstabellini@kernel.org>) id 1ePdr2-0002l7-R4
+	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 19:27:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ePdWt-0007ns-Sj
-	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 19:07:08 -0500
+	(envelope-from <sstabellini@kernel.org>) id 1ePdqy-0005ep-Sz
+	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 19:27:56 -0500
+Received: from mail.kernel.org ([198.145.29.99]:60472)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <sstabellini@kernel.org>)
+	id 1ePdqy-0005cv-NO
+	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 19:27:52 -0500
+Date: Thu, 14 Dec 2017 16:27:50 -0800 (PST)
+From: Stefano Stabellini <sstabellini@kernel.org>
+Message-ID: <alpine.DEB.2.10.1712141612170.3857@sstabellini-ThinkPad-X260>
 MIME-Version: 1.0
-Sender: philippe.mathieu.daude@gmail.com
-In-Reply-To: <CAKmqyKMU46dmqEDhm9My=4ZM4GQf3n_ZLdm5JnFTi-mf3hz7SQ@mail.gmail.com>
-References: <20171213195852.30439-1-f4bug@amsat.org>
-	<20171213195852.30439-5-f4bug@amsat.org>
-	<CAKmqyKPvAL3+LAqMBtUOc=0igkSwg4Jmf+Q0ySL7C+oech7AMw@mail.gmail.com>
-	<CAAdtpL6pT0GD+xkV5P+-J=SGr8_kTrNVBxc207g4mRuojrGe3w@mail.gmail.com>
-	<CAKmqyKMU46dmqEDhm9My=4ZM4GQf3n_ZLdm5JnFTi-mf3hz7SQ@mail.gmail.com>
-From: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Date: Thu, 14 Dec 2017 21:07:06 -0300
-Message-ID: <CAAdtpL7ybSzQHHucZTfYtKVR6xwa+r7y0_67b8nJpF_EXMZv6Q@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 04/14] sdhci: use deposit64()
+Content-Type: TEXT/PLAIN; charset=US-ASCII
+Subject: [Qemu-devel] [PULL 0/6] xen-20171214-tag
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,69 +24,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alistair Francis <alistair.francis@xilinx.com>
-Cc: "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, Peter Maydell <peter.maydell@linaro.org>, Prasad J Pandit <pjp@fedoraproject.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Andrey Smirnov <andrew.smirnov@gmail.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Andrew Baumann <Andrew.Baumann@microsoft.com>, Sai Pavan Boddu <saipava@xilinx.com>, QEMU Trivial <qemu-trivial@nongnu.org>, Andrey Yurovsky <yurovsky@gmail.com>
+To: peter.maydell@linaro.org, stefanha@gmail.com
+Cc: sstabellini@kernel.org, stefanha@redhat.com, anthony.perard@citrix.com, xen-devel@lists.xenproject.org, qemu-devel@nongnu.org
 
-On Thu, Dec 14, 2017 at 8:41 PM, Alistair Francis
-<alistair.francis@xilinx.com> wrote:
-> On Thu, Dec 14, 2017 at 3:25 PM, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat=
-.org> wrote:
->>>> @@ -1123,12 +1123,10 @@ sdhci_write(void *opaque, hwaddr offset, uint6=
-4_t val, unsigned size)
->>>>          MASKED_WRITE(s->admaerr, mask, value);
->>>>          break;
->>>>      case SDHC_ADMASYSADDR:
->>>> -        s->admasysaddr =3D (s->admasysaddr & (0xFFFFFFFF00000000ULL |
->>>> -                (uint64_t)mask)) | (uint64_t)value;
->>>> +        s->admasysaddr =3D deposit64(s->admasysaddr, 32, 0, value);
->>>
->>> This doesn't look right.
->>>
->>> Originally we were masking admasysaddr with (mask and
->>> 0xFFFFFFFF00000000). Then ORing in the value.
->>>
->>> Now we are depositing value into a bit field that starts at bit 32 and
->>> has 0 length. I don't see how value will be deposited at all with a 0
->>> length.
->>
->> good catch :) I'll respin with:
->>
->>     case SDHC_ADMASYSADDR:
->>         s->admasysaddr =3D deposit64(s->admasysaddr, 0, 32, value)
->>         break;
->>     case SDHC_ADMASYSADDR + 4:
->>         s->admasysaddr =3D deposit64(s->admasysaddr, 32, 32, value);
->>         break;
->
-> This still doesn't take the mask value into account though.
->
-> Also, doesn't deposit() shift value up in this case? We want to mask
-> the low bits out. I don't have the code in front of me though, so I
-> could be wrong here.
+The following changes since commit 0a0dc59d27527b78a195c2d838d28b7b49e5a639:
 
-We have sdhci_mmio_ops.max_access_size =3D 4, so value will be at most 32bi=
-ts.
+  Update version for v2.11.0 release (2017-12-13 14:31:09 +0000)
 
-Now ADMASYSADDR is a 64-bit register, accessible in 2x32-bit.
+are available in the git repository at:
 
-/**
- * Deposit @fieldval into the 64 bit @value at the bit field specified
- * by the @start and @length parameters, and return the modified
- * @value. Bits of @value outside the bit field are not modified.
+  git://xenbits.xen.org/people/sstabellini/qemu-dm.git tags/xen-20171214-tag
 
-uint64_t deposit64(uint64_t value, int start, int length, uint64_t fieldval=
-);
+for you to fetch changes up to 2e63eb2becc228232f12a1ea30a91b2aa8c5cecd:
 
-in both access we use length=3D32
+  xen/pt: Set is_express to avoid out-of-bounds write (2017-12-14 16:11:53 -0800)
 
-at SDHC_ADMASYSADDR we use start=3D0,
-while at SDHC_ADMASYSADDR + 4 we use start=3D32.
+----------------------------------------------------------------
+Xen 2017/12/14
 
-both deposit the 32b value (32b masked) into a 64b s->admasysaddr.
+----------------------------------------------------------------
+Owen Smith (4):
+      ui: generate qcode to linux mappings
+      xenfb: Use Input Handlers directly
+      xenfb: Add [feature|request]-raw-pointer
+      xenfb: activate input handlers for raw pointer devices
 
-This is good to clarify this now, because the Spec v3 series (and
-v4.20 if we want it) add a lot of them.
+Paul Durrant (1):
+      xen-disk: use an IOThread per instance
 
-Regards,
+Simon Gaiser (1):
+      xen/pt: Set is_express to avoid out-of-bounds write
 
-Phil.
+ Makefile              |   1 +
+ hw/block/trace-events |   7 ++
+ hw/block/xen_disk.c   |  53 +++++++--
+ hw/display/xenfb.c    | 294 ++++++++++++++++++++++++++------------------------
+ hw/xen/xen_pt.c       |   1 +
+ include/ui/input.h    |   3 +
+ ui/input-keymap.c     |   1 +
+ 7 files changed, 215 insertions(+), 145 deletions(-)
