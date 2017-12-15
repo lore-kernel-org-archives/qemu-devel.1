@@ -1,33 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36940)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36941)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1ePsZg-0005CT-Fq
+	(envelope-from <bounces@canonical.com>) id 1ePsZg-0005CU-G1
 	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 11:11:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1ePsZd-00069S-9T
+	(envelope-from <bounces@canonical.com>) id 1ePsZe-0006Au-Ta
 	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 11:11:00 -0500
-Received: from indium.canonical.com ([91.189.90.7]:50648)
+Received: from indium.canonical.com ([91.189.90.7]:50760)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1ePsZd-00066V-33
-	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 11:10:57 -0500
+	id 1ePsZe-00069e-MN
+	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 11:10:58 -0500
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1ePsZZ-00024F-TN
-	for <qemu-devel@nongnu.org>; Fri, 15 Dec 2017 16:10:54 +0000
+	id 1ePsZc-0002Gm-IZ
+	for <qemu-devel@nongnu.org>; Fri, 15 Dec 2017 16:10:56 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 9B5E42E80D8
-	for <qemu-devel@nongnu.org>; Fri, 15 Dec 2017 16:10:53 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 27F662E80D5
+	for <qemu-devel@nongnu.org>; Fri, 15 Dec 2017 16:10:56 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Fri, 15 Dec 2017 15:55:51 -0000
-From: Thomas Huth <1728116@bugs.launchpad.net>
-Reply-To: Bug 1728116 <1728116@bugs.launchpad.net>
+Date: Fri, 15 Dec 2017 15:58:19 -0000
+From: Thomas Huth <1719984@bugs.launchpad.net>
+Reply-To: Bug 1719984 <1719984@bugs.launchpad.net>
 Sender: bounces@canonical.com
-References: <150912776103.20350.959452179379767829.malonedeb@soybean.canonical.com>
-Message-Id: <151335335150.10605.12005520479816619187.malone@gac.canonical.com>
+References: <150654006758.30143.16289666541182400408.malonedeb@wampee.canonical.com>
+Message-Id: <151335349975.11701.17267602458422662326.launchpad@gac.canonical.com>
 Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1728116] Re: Empty /proc/self/auxv (linux-user)
+Subject: [Qemu-devel] [Bug 1719984] Re: wrgsbase misemulated in
+ x86_64-softmmu
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,78 +39,30 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Fix has been released with QEMU 2.11:
-https://git.qemu.org/?p=3Dqemu.git;a=3Dcommitdiff;h=3Df516511ea84d8bb3395d6e
-
 ** Changed in: qemu
-       Status: In Progress =3D> Fix Released
+       Status: Fix Committed =3D> Fix Released
 
 -- =
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1728116
+https://bugs.launchpad.net/bugs/1719984
 
 Title:
-  Empty /proc/self/auxv (linux-user)
+  wrgsbase misemulated in x86_64-softmmu
 
 Status in QEMU:
   Fix Released
 
 Bug description:
-  The userspace Linux API virtualization used to fake access to
-  /proc/self/auxv, to provide meaningful data for the guest process.
+  qemu revision: cfe4cade054c0e0d00d0185cdc433a9e3ce3e2e4
+  command: ./qemu-system-x86_64 -m 2048 -nographic -net none -smp 4,threads=
+=3D2 -machine q35 -kernel zircon.bin -cpu Haswell,+smap,-check -initrd boot=
+data.bin -append 'TERM=3Dscreen kernel.halt-on-panic=3Dtrue '
 
-  For newer qemu versions, this fails: The openat() is intercepted, but
-  there's no content: /proc/self/auxv has length zero (i.e. reading from
-  it returns 0 bytes).
-
-  Good:
-
-  $ x86_64-linux-user/qemu-x86_64 /usr/bin/cat /proc/self/auxv | wc -c
-  256 /proc/self/auxv
-
-  Bad:
-
-  $ x86_64-linux-user/qemu-x86_64 /usr/bin/cat /proc/self/auxv | wc -c
-  0 /proc/self/auxv
-
-  This worked in 2.7.1, and fails in 2.10.1.
-
-  This causes e.g. any procps-ng-based tool to segfault while reading
-  from /proc/self/auxv in an endless loop (probably worth another bug
-  report...)
-
-  Doing a "git bisect" shows that this commit:
-  https://github.com/qemu/qemu/commit/7c4ee5bcc introduced the problem.
-
-  It might be a simple logic (subtraction in the wrong direction?) or
-  sign-ness error: Adding some logging (to v2.10.1)
-
-  diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-  index 9b6364a..49285f9 100644
-  --- a/linux-user/syscall.c
-  +++ b/linux-user/syscall.c
-  @@ -7469,6 +7469,9 @@ static int open_self_auxv(void *cpu_env, int fd)
-       abi_ulong len =3D ts->info->auxv_len;
-       char *ptr;
-   =
-
-  +    gemu_log(TARGET_ABI_FMT_lu"\n", len);
-  +    gemu_log(TARGET_ABI_FMT_ld"\n", len);
-  +
-       /*
-        * Auxiliary vector is stored in target process stack.
-        * read in whole auxv vector and copy it to file
-
-  shows this output:
-
-  $  x86_64-linux-user/qemu-x86_64 /usr/bin/cat /proc/self/auxv | wc -c
-  18446744073709551264
-  -352
-  0
-
-  And 352 could be the expected length.
+  On this revision, the VM reports CPUID.07H.0H.EBX[0] =3D 1.  In this VM,
+  with CR4[16] set to 1, wrgsbase triggers #UD, which mismatches the
+  behavior described in Intel's instruction reference.
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1728116/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1719984/+subscriptions
