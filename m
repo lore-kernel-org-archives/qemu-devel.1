@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53883)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53917)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ePgUV-00061n-5N
-	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 22:16:52 -0500
+	id 1ePgUY-00063O-0C
+	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 22:16:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ePgUS-0001J2-0c
-	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 22:16:51 -0500
+	id 1ePgUW-0001Nj-H2
+	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 22:16:53 -0500
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Fri, 15 Dec 2017 00:15:37 -0300
-Message-Id: <20171215031547.31006-11-f4bug@amsat.org>
+Date: Fri, 15 Dec 2017 00:15:38 -0300
+Message-Id: <20171215031547.31006-12-f4bug@amsat.org>
 In-Reply-To: <20171215031547.31006-1-f4bug@amsat.org>
 References: <20171215031547.31006-1-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v2 10/20] sdhci: add a GPIO for the access
- control LED
+Subject: [Qemu-devel] [PATCH v2 11/20] sdhci: add a "dma-memory" property
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,86 +29,148 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Alistair Francis <alistair.francis@xilinx.com>, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, Peter Maydell <peter.maydell@linaro.org>, Michael Walle <michael@walle.cc>, Andrzej Zaborowski <balrogg@gmail.com>, Andrew Baumann <Andrew.Baumann@microsoft.com>, Andrey Smirnov <andrew.smirnov@gmail.com>, Andrey Yurovsky <yurovsky@gmail.com>
 Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, qemu-arm@nongnu.org, Prasad J Pandit <pjp@fedoraproject.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Sai Pavan Boddu <saipava@xilinx.com>
 
-It blinks to caution the user not to remove the card while the SD card is
-being accessed.
-So far it only emit a trace event.
+Add a dma property allowing machine creation to provide the address-space
+sdhci dma operates on.
 
+[based on a patch from Alistair Francis <alistair.francis@xilinx.com>
+ from qemu/xilinx tag xilinx-v2016.1]
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Reviewed-by: Alistair Francis <alistair.francis@xilinx.com>
 ---
  include/hw/sd/sdhci.h |  2 ++
- hw/sd/sdhci.c         | 13 +++++++++++++
- hw/sd/trace-events    |  1 +
- 3 files changed, 16 insertions(+)
+ hw/sd/sdhci.c         | 36 +++++++++++++++++++++++-------------
+ 2 files changed, 25 insertions(+), 13 deletions(-)
 
 diff --git a/include/hw/sd/sdhci.h b/include/hw/sd/sdhci.h
-index 1b6a98d578..5391430c59 100644
+index 5391430c59..715048d77b 100644
 --- a/include/hw/sd/sdhci.h
 +++ b/include/hw/sd/sdhci.h
-@@ -47,6 +47,8 @@ typedef struct SDHCIState {
-     qemu_irq eject_cb;
-     qemu_irq ro_cb;
-     qemu_irq irq;
-+    qemu_irq access_led;
-+    int access_led_level;
+@@ -41,6 +41,8 @@ typedef struct SDHCIState {
+     /*< public >*/
+     SDBus sdbus;
+     MemoryRegion iomem;
++    MemoryRegion *dma_mr;
++    AddressSpace dma_as;
  
-     uint32_t sdmasysad;    /* SDMA System Address register */
-     uint16_t blksize;      /* Host DMA Buff Boundary and Transfer BlkSize Reg */
+     QEMUTimer *insert_timer;       /* timer for 'changing' sd card. */
+     QEMUTimer *transfer_timer;
 diff --git a/hw/sd/sdhci.c b/hw/sd/sdhci.c
-index ba3afddcf2..866be44db5 100644
+index 866be44db5..0f3ff657cf 100644
 --- a/hw/sd/sdhci.c
 +++ b/hw/sd/sdhci.c
-@@ -202,6 +202,16 @@ static void sdhci_poweron_reset(DeviceState *dev)
-     }
- }
- 
-+static void sdhci_led_handler(void *opaque, int line, int level)
-+{
-+    SDHCIState *s = (SDHCIState *)opaque;
-+
-+    if (s->access_led_level != level) {
-+        trace_sdhci_led(level);
-+        s->access_led_level = level;
-+    }
-+}
-+
- static void sdhci_data_transfer(void *opaque);
- 
- static void sdhci_send_command(SDHCIState *s)
-@@ -1050,6 +1060,7 @@ sdhci_write(void *opaque, hwaddr offset, uint64_t val, unsigned size)
-                 !(s->capareg & (1 << (31 - ((s->pwrcon >> 1) & 0x7))))) {
-             s->pwrcon &= ~SDHC_POWER_ON;
+@@ -505,7 +505,7 @@ static void sdhci_sdma_transfer_multi_blocks(SDHCIState *s)
+                     s->blkcnt--;
+                 }
+             }
+-            dma_memory_write(&address_space_memory, s->sdmasysad,
++            dma_memory_write(&s->dma_as, s->sdmasysad,
+                              &s->fifo_buffer[begin], s->data_count - begin);
+             s->sdmasysad += s->data_count - begin;
+             if (s->data_count == block_size) {
+@@ -527,7 +527,7 @@ static void sdhci_sdma_transfer_multi_blocks(SDHCIState *s)
+                 s->data_count = block_size;
+                 boundary_count -= block_size - begin;
+             }
+-            dma_memory_read(&address_space_memory, s->sdmasysad,
++            dma_memory_read(&s->dma_as, s->sdmasysad,
+                             &s->fifo_buffer[begin], s->data_count - begin);
+             s->sdmasysad += s->data_count - begin;
+             if (s->data_count == block_size) {
+@@ -565,11 +565,9 @@ static void sdhci_sdma_transfer_single_block(SDHCIState *s)
+         for (n = 0; n < datacnt; n++) {
+             s->fifo_buffer[n] = sdbus_read_data(&s->sdbus);
          }
-+        qemu_set_irq(s->access_led, s->hostctl & 1);
+-        dma_memory_write(&address_space_memory, s->sdmasysad, s->fifo_buffer,
+-                         datacnt);
++        dma_memory_write(&s->dma_as, s->sdmasysad, s->fifo_buffer, datacnt);
+     } else {
+-        dma_memory_read(&address_space_memory, s->sdmasysad, s->fifo_buffer,
+-                        datacnt);
++        dma_memory_read(&s->dma_as, s->sdmasysad, s->fifo_buffer, datacnt);
+         for (n = 0; n < datacnt; n++) {
+             sdbus_write_data(&s->sdbus, s->fifo_buffer[n]);
+         }
+@@ -593,7 +591,7 @@ static void get_adma_description(SDHCIState *s, ADMADescr *dscr)
+     hwaddr entry_addr = (hwaddr)s->admasysaddr;
+     switch (SDHC_DMA_TYPE(s->hostctl)) {
+     case SDHC_CTRL_ADMA2_32:
+-        dma_memory_read(&address_space_memory, entry_addr, (uint8_t *)&adma2,
++        dma_memory_read(&s->dma_as, entry_addr, (uint8_t *)&adma2,
+                         sizeof(adma2));
+         adma2 = le64_to_cpu(adma2);
+         /* The spec does not specify endianness of descriptor table.
+@@ -605,7 +603,7 @@ static void get_adma_description(SDHCIState *s, ADMADescr *dscr)
+         dscr->incr = 8;
          break;
-     case SDHC_CLKCON:
-         if (!(mask & 0xFF000000)) {
-@@ -1160,6 +1171,7 @@ static void sdhci_initfn(SDHCIState *s)
-     qbus_create_inplace(&s->sdbus, sizeof(s->sdbus),
-                         TYPE_SDHCI_BUS, DEVICE(s), "sd-bus");
+     case SDHC_CTRL_ADMA1_32:
+-        dma_memory_read(&address_space_memory, entry_addr, (uint8_t *)&adma1,
++        dma_memory_read(&s->dma_as, entry_addr, (uint8_t *)&adma1,
+                         sizeof(adma1));
+         adma1 = le32_to_cpu(adma1);
+         dscr->addr = (hwaddr)(adma1 & 0xFFFFF000);
+@@ -618,12 +616,12 @@ static void get_adma_description(SDHCIState *s, ADMADescr *dscr)
+         }
+         break;
+     case SDHC_CTRL_ADMA2_64:
+-        dma_memory_read(&address_space_memory, entry_addr,
++        dma_memory_read(&s->dma_as, entry_addr,
+                         (uint8_t *)(&dscr->attr), 1);
+-        dma_memory_read(&address_space_memory, entry_addr + 2,
++        dma_memory_read(&s->dma_as, entry_addr + 2,
+                         (uint8_t *)(&dscr->length), 2);
+         dscr->length = le16_to_cpu(dscr->length);
+-        dma_memory_read(&address_space_memory, entry_addr + 4,
++        dma_memory_read(&s->dma_as, entry_addr + 4,
+                         (uint8_t *)(&dscr->addr), 8);
+         dscr->attr = le64_to_cpu(dscr->attr);
+         dscr->attr &= 0xfffffff8;
+@@ -682,7 +680,7 @@ static void sdhci_do_adma(SDHCIState *s)
+                         s->data_count = block_size;
+                         length -= block_size - begin;
+                     }
+-                    dma_memory_write(&address_space_memory, dscr.addr,
++                    dma_memory_write(&s->dma_as, dscr.addr,
+                                      &s->fifo_buffer[begin],
+                                      s->data_count - begin);
+                     dscr.addr += s->data_count - begin;
+@@ -706,7 +704,7 @@ static void sdhci_do_adma(SDHCIState *s)
+                         s->data_count = block_size;
+                         length -= block_size - begin;
+                     }
+-                    dma_memory_read(&address_space_memory, dscr.addr,
++                    dma_memory_read(&s->dma_as, dscr.addr,
+                                     &s->fifo_buffer[begin],
+                                     s->data_count - begin);
+                     dscr.addr += s->data_count - begin;
+@@ -1183,10 +1181,20 @@ static void sdhci_realizefn(SDHCIState *s, Error **errp)
  
-+    s->access_led = qemu_allocate_irq(sdhci_led_handler, s, 0);
-     s->insert_timer = timer_new_ns(QEMU_CLOCK_VIRTUAL, sdhci_raise_insertion_irq, s);
-     s->transfer_timer = timer_new_ns(QEMU_CLOCK_VIRTUAL, sdhci_data_transfer, s);
+     memory_region_init_io(&s->iomem, OBJECT(s), &sdhci_mmio_ops, s, "sdhci",
+                           SDHC_REGISTERS_MAP_SIZE);
++
++    /* use system_memory() if property "dma-memory" not set */
++    address_space_init(&s->dma_as,
++                       s->dma_mr ? s->dma_mr : get_system_memory(),
++                       "sdhci-dma");
  }
-@@ -1185,6 +1197,7 @@ static void sdhci_uninitfn(SDHCIState *s)
-     timer_del(s->transfer_timer);
-     timer_free(s->transfer_timer);
  
-+    qemu_free_irq(s->access_led);
-     qemu_free_irq(s->eject_cb);
-     qemu_free_irq(s->ro_cb);
+ static void sdhci_unrealizefn(SDHCIState *s, Error **errp)
+ {
++    if (s->dma_mr) {
++        address_space_destroy(&s->dma_as);
++        object_unparent(OBJECT(&s->dma_mr));
++    }
++
+     g_free(s->fifo_buffer);
  }
-diff --git a/hw/sd/trace-events b/hw/sd/trace-events
-index e4e26c6d73..f821db2046 100644
---- a/hw/sd/trace-events
-+++ b/hw/sd/trace-events
-@@ -13,6 +13,7 @@ sdhci_adma_transfer_completed(void) "ADMA transfer completed"
- sdhci_access(const char *access, unsigned int size, uint64_t offset, const char *dir, uint64_t val, uint64_t val2) "%s %ub: addr[0x%04" PRIx64 "] %s %" PRIu64 "(0x%" PRIx64 ")"
- sdhci_read_dataport(uint16_t data_count) "all %u bytes of data have been read from input buffer"
- sdhci_write_dataport(uint16_t data_count) "write buffer filled with %u bytes of data"
-+sdhci_led(bool state) "LED: %u"
  
- # hw/sd/milkymist-memcard.c
- milkymist_memcard_memory_read(uint32_t addr, uint32_t value) "addr 0x%08x value 0x%08x"
+@@ -1269,6 +1277,8 @@ static Property sdhci_properties[] = {
+     DEFINE_PROP_UINT32("maxcurr", SDHCIState, maxcurr, 0),
+     DEFINE_PROP_BOOL("pending-insert-quirk", SDHCIState, pending_insert_quirk,
+                      false),
++    DEFINE_PROP_LINK("dma-memory", SDHCIState, dma_mr,
++                     TYPE_MEMORY_REGION, MemoryRegion *),
+     DEFINE_PROP_END_OF_LIST(),
+ };
+ 
 -- 
 2.15.1
