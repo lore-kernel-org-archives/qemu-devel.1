@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42836)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42843)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sstabellini@kernel.org>) id 1ePdrG-0002q7-Fa
+	(envelope-from <sstabellini@kernel.org>) id 1ePdrG-0002qE-HQ
 	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 19:28:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sstabellini@kernel.org>) id 1ePdrD-00065L-UY
+	(envelope-from <sstabellini@kernel.org>) id 1ePdrE-00065p-Ca
 	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 19:28:10 -0500
-Received: from mail.kernel.org ([198.145.29.99]:60590)
+Received: from mail.kernel.org ([198.145.29.99]:60614)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <sstabellini@kernel.org>)
-	id 1ePdrD-00064G-P0
-	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 19:28:07 -0500
+	id 1ePdrE-00064k-6Q
+	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 19:28:08 -0500
 From: Stefano Stabellini <sstabellini@kernel.org>
-Date: Thu, 14 Dec 2017 16:28:02 -0800
-Message-Id: <1513297683-14295-5-git-send-email-sstabellini@kernel.org>
+Date: Thu, 14 Dec 2017 16:28:03 -0800
+Message-Id: <1513297683-14295-6-git-send-email-sstabellini@kernel.org>
 In-Reply-To: <1513297683-14295-1-git-send-email-sstabellini@kernel.org>
 References: <alpine.DEB.2.10.1712141612170.3857@sstabellini-ThinkPad-X260>
 	<1513297683-14295-1-git-send-email-sstabellini@kernel.org>
-Subject: [Qemu-devel] [PULL 5/6] xenfb: activate input handlers for raw
- pointer devices
+Subject: [Qemu-devel] [PULL 6/6] xen/pt: Set is_express to avoid
+ out-of-bounds write
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,41 +27,57 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org, stefanha@gmail.com
-Cc: sstabellini@kernel.org, stefanha@redhat.com, anthony.perard@citrix.com, xen-devel@lists.xenproject.org, qemu-devel@nongnu.org, Owen Smith <owen.smith@citrix.com>
+Cc: sstabellini@kernel.org, stefanha@redhat.com, anthony.perard@citrix.com, xen-devel@lists.xenproject.org, qemu-devel@nongnu.org, Simon Gaiser <hw42@ipsumj.de>
 
-From: Owen Smith <owen.smith@citrix.com>
+From: Simon Gaiser <hw42@ipsumj.de>
 
-If the frontend requests raw pointers, the input handlers must be
-activated to have the input events delivered to the xenfb backend.
-Without activation, the input events are delivered to handlers
-registered earlier, which would be the emulated USB tablet or
-emulated PS/2 mouse.
-HVM xen_kbdfront can incorrectly scale absolute coordinates when
-the display resolution is not 800x600.
+The passed-through device might be an express device. In this case the
+old code allocated a too small emulated config space in
+pci_config_alloc() since pci_config_size() returned the size for a
+non-express device. This leads to an out-of-bound write in
+xen_pt_config_reg_init(), which sometimes results in crashes. So set
+is_express as already done for KVM in vfio-pci.
 
-Signed-off-by: Owen Smith <owen.smith@citrix.com>
-Reviewed-by: Gerd Hoffmann <kraxel@redhat.com>
-Reviewed-by: Stefano Stabellini <sstabellini@kernel.org>
+Shortened ASan report:
+
+==17512==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x611000041648 at pc 0x55e0fdac51ff bp 0x7ffe4af07410 sp 0x7ffe4af07408
+WRITE of size 2 at 0x611000041648 thread T0
+    #0 0x55e0fdac51fe in memcpy /usr/include/x86_64-linux-gnu/bits/string3.h:53
+    #1 0x55e0fdac51fe in stw_he_p include/qemu/bswap.h:330
+    #2 0x55e0fdac51fe in stw_le_p include/qemu/bswap.h:379
+    #3 0x55e0fdac51fe in pci_set_word include/hw/pci/pci.h:490
+    #4 0x55e0fdac51fe in xen_pt_config_reg_init hw/xen/xen_pt_config_init.c:1991
+    #5 0x55e0fdac51fe in xen_pt_config_init hw/xen/xen_pt_config_init.c:2067
+    #6 0x55e0fdabcf4d in xen_pt_realize hw/xen/xen_pt.c:830
+    #7 0x55e0fdf59666 in pci_qdev_realize hw/pci/pci.c:2034
+    #8 0x55e0fdda7d3d in device_set_realized hw/core/qdev.c:914
+[...]
+
+0x611000041648 is located 8 bytes to the right of 256-byte region [0x611000041540,0x611000041640)
+allocated by thread T0 here:
+    #0 0x7ff596a94bb8 in __interceptor_calloc (/usr/lib/x86_64-linux-gnu/libasan.so.4+0xd9bb8)
+    #1 0x7ff57da66580 in g_malloc0 (/lib/x86_64-linux-gnu/libglib-2.0.so.0+0x50580)
+    #2 0x55e0fdda7d3d in device_set_realized hw/core/qdev.c:914
+[...]
+
+Signed-off-by: Simon Gaiser <hw42@ipsumj.de>
+Acked-by: Stefano Stabellini <sstabellini@kernel.org>
 Signed-off-by: Stefano Stabellini <sstabellini@kernel.org>
 ---
- hw/display/xenfb.c | 5 +++++
- 1 file changed, 5 insertions(+)
+ hw/xen/xen_pt.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/hw/display/xenfb.c b/hw/display/xenfb.c
-index 776a2ce..d4fc0fa 100644
---- a/hw/display/xenfb.c
-+++ b/hw/display/xenfb.c
-@@ -387,6 +387,11 @@ static void input_connected(struct XenDevice *xendev)
-     in->qkbd = qemu_input_handler_register((DeviceState *)in, &xenfb_keyboard);
-     in->qmou = qemu_input_handler_register((DeviceState *)in,
-                in->abs_pointer_wanted ? &xenfb_abs_mouse : &xenfb_rel_mouse);
-+
-+    if (in->raw_pointer_wanted) {
-+        qemu_input_handler_activate(in->qkbd);
-+        qemu_input_handler_activate(in->qmou);
-+    }
- }
- 
- static void input_disconnect(struct XenDevice *xendev)
+diff --git a/hw/xen/xen_pt.c b/hw/xen/xen_pt.c
+index 9bba717..d57c6d3 100644
+--- a/hw/xen/xen_pt.c
++++ b/hw/xen/xen_pt.c
+@@ -946,6 +946,7 @@ static void xen_pci_passthrough_class_init(ObjectClass *klass, void *data)
+     k->exit = xen_pt_unregister_device;
+     k->config_read = xen_pt_pci_read_config;
+     k->config_write = xen_pt_pci_write_config;
++    k->is_express = 1; /* We might be */
+     set_bit(DEVICE_CATEGORY_MISC, dc->categories);
+     dc->desc = "Assign an host PCI device with Xen";
+     dc->props = xen_pci_passthrough_properties;
 -- 
 1.9.1
