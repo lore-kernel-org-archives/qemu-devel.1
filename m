@@ -1,33 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33472)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35861)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ePoHZ-0000Hv-Ex
-	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 06:36:02 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1ePoOx-00036Z-J6
+	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 06:43:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ePoHV-00023Q-Hn
-	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 06:36:01 -0500
-Received: from mail-qk0-x241.google.com ([2607:f8b0:400d:c09::241]:42785)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ePoHV-00022O-BM
-	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 06:35:57 -0500
-Received: by mail-qk0-x241.google.com with SMTP id a193so1234309qkc.9
-	for <qemu-devel@nongnu.org>; Fri, 15 Dec 2017 03:35:57 -0800 (PST)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20171211125705.16120-1-alex.bennee@linaro.org>
-	<20171211125705.16120-3-alex.bennee@linaro.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <a6d51948-d82e-f3c5-98cd-372d38aaa7c6@amsat.org>
-Date: Fri, 15 Dec 2017 08:35:52 -0300
+	(envelope-from <dgilbert@redhat.com>) id 1ePoOt-0005bk-Lq
+	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 06:43:39 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:41070)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1ePoOt-0005aA-GH
+	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 06:43:35 -0500
+Date: Fri, 15 Dec 2017 11:43:18 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20171215114317.GB2358@work-vm>
+References: <20171205055200.16305-1-peterx@redhat.com>
+	<20171215104101.GE15187@lemon>
 MIME-Version: 1.0
-In-Reply-To: <20171211125705.16120-3-alex.bennee@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v1 02/19] include/fpu/softfloat: implement
- float16_abs helper
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20171215104101.GE15187@lemon>
+Subject: Re: [Qemu-devel] [RFC v5 00/26] QMP: out-of-band (OOB) execution
+ support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,38 +28,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, richard.henderson@linaro.org, peter.maydell@linaro.org, laurent@vivier.eu, bharata@linux.vnet.ibm.com, andrew@andrewdutcher.com, aleksandar.markovic@imgtec.com
-Cc: qemu-devel@nongnu.org, Aurelien Jarno <aurelien@aurel32.net>
+To: Fam Zheng <famz@redhat.com>
+Cc: Peter Xu <peterx@redhat.com>, armbru@redhat.com, stefanha@redhat.com, qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>, Juan Quintela <quintela@redhat.com>, mdroth@linux.vnet.ibm.com, marcandre.lureau@redhat.com, Paolo Bonzini <pbonzini@redhat.com>
 
-On 12/11/2017 09:56 AM, Alex Bennée wrote:
-> This will be required when expanding the MINMAX() macro for 16
-> bit/half-precision operations.
+* Fam Zheng (famz@redhat.com) wrote:
+> On Tue, 12/05 13:51, Peter Xu wrote:
+> > This version is mostly document update, and dropped the single patch
+> > that is migration related (will be put into postcopy recovery
+> > series).
 > 
-> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+> Sorry if I'm asking an already answered question, if so please remind me with
+> some pointers..
+> 
+> Can we completely hide the "OOB" concept from QMP to avoid the interface
+> complication? In other words, the new "migrate-recover" command can be
+> implemented in a way that it always try to run out of band as if it has
+> "run-oob=true", without user specifying it or even negotiating it.
+> 
+> Because it seems "migrate-recover" is only useful with "run-oob=true".
+> 
+> Of course without introducing the whole OOB concept in QMP, what this command
+> does will sound very hacky, but the bahavior can be documented just well on the
+> single command. I don't see a big advantage in generalizing OOB at the QMP level
+> so far. Do we have a list of other commands to be made OOB?
 
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Many of the status commands can be converted to OOB, and the important
+thing is that the management layer can tell whether OOB can tell which
+commands are OOBable.
 
-> ---
->  include/fpu/softfloat.h | 7 +++++++
->  1 file changed, 7 insertions(+)
-> 
-> diff --git a/include/fpu/softfloat.h b/include/fpu/softfloat.h
-> index d5e99667b6..edf402d422 100644
-> --- a/include/fpu/softfloat.h
-> +++ b/include/fpu/softfloat.h
-> @@ -374,6 +374,13 @@ static inline int float16_is_zero_or_denormal(float16 a)
->      return (float16_val(a) & 0x7c00) == 0;
->  }
->  
-> +static inline float16 float16_abs(float16 a)
-> +{
-> +    /* Note that abs does *not* handle NaN specially, nor does
-> +     * it flush denormal inputs to zero.
-> +     */
-> +    return make_float16(float16_val(a) & 0x7fff);
-> +}
->  /*----------------------------------------------------------------------------
->  | The pattern for a default generated half-precision NaN.
->  *----------------------------------------------------------------------------*/
-> 
+Dave
+
+> Fam
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
