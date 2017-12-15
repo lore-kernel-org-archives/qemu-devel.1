@@ -1,31 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42533)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42498)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1ePraW-0004aO-5P
-	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 10:07:49 -0500
+	(envelope-from <marcandre.lureau@redhat.com>) id 1ePraR-0004WT-HN
+	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 10:07:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1ePraU-0001Z8-N2
-	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 10:07:48 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:34840)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1ePraQ-0001TD-CE
+	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 10:07:43 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:1155)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1ePraU-0001YL-Et
-	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 10:07:46 -0500
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
+	id 1ePraQ-0001SP-3O
+	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 10:07:42 -0500
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id AEA2F6F692
-	for <qemu-devel@nongnu.org>; Fri, 15 Dec 2017 15:07:45 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 5C1B2C0828AB
+	for <qemu-devel@nongnu.org>; Fri, 15 Dec 2017 15:07:41 +0000 (UTC)
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Fri, 15 Dec 2017 16:06:55 +0100
-Message-Id: <20171215150659.1811-10-marcandre.lureau@redhat.com>
+Date: Fri, 15 Dec 2017 16:06:53 +0100
+Message-Id: <20171215150659.1811-8-marcandre.lureau@redhat.com>
 In-Reply-To: <20171215150659.1811-1-marcandre.lureau@redhat.com>
 References: <20171215150659.1811-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v2 09/13] crypto: fix stack-buffer-overflow
- error
+Subject: [Qemu-devel] [PATCH v2 07/13] readline: add a free function
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,108 +34,109 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>
+Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, Markus Armbruster <armbru@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-ASAN complains about:
+Fixes leaks such as:
 
-=3D=3D8856=3D=3DERROR: AddressSanitizer: stack-buffer-overflow on address=
- 0x7ffd8a1fe168 at pc 0x561136cb4451 bp 0x7ffd8a1fe130 sp 0x7ffd8a1fd8e0
-READ of size 16 at 0x7ffd8a1fe168 thread T0
-    #0 0x561136cb4450 in __asan_memcpy (/home/elmarco/src/qq/build/tests/=
-test-crypto-ivgen+0x110450)
-    #1 0x561136d2a6a7 in qcrypto_ivgen_essiv_calculate /home/elmarco/src/=
-qq/crypto/ivgen-essiv.c:83:5
-    #2 0x561136d29af8 in qcrypto_ivgen_calculate /home/elmarco/src/qq/cry=
-pto/ivgen.c:72:12
-    #3 0x561136d07c8e in test_ivgen /home/elmarco/src/qq/tests/test-crypt=
-o-ivgen.c:148:5
-    #4 0x7f77772c3b04 in test_case_run /home/elmarco/src/gnome/glib/build=
-dir/../glib/gtestutils.c:2237
-    #5 0x7f77772c3ec4 in g_test_run_suite_internal /home/elmarco/src/gnom=
-e/glib/builddir/../glib/gtestutils.c:2321
-    #6 0x7f77772c3f6d in g_test_run_suite_internal /home/elmarco/src/gnom=
-e/glib/builddir/../glib/gtestutils.c:2333
-    #7 0x7f77772c3f6d in g_test_run_suite_internal /home/elmarco/src/gnom=
-e/glib/builddir/../glib/gtestutils.c:2333
-    #8 0x7f77772c3f6d in g_test_run_suite_internal /home/elmarco/src/gnom=
-e/glib/builddir/../glib/gtestutils.c:2333
-    #9 0x7f77772c4184 in g_test_run_suite /home/elmarco/src/gnome/glib/bu=
-ilddir/../glib/gtestutils.c:2408
-    #10 0x7f77772c2e0d in g_test_run /home/elmarco/src/gnome/glib/builddi=
-r/../glib/gtestutils.c:1674
-    #11 0x561136d0799b in main /home/elmarco/src/qq/tests/test-crypto-ivg=
-en.c:173:12
-    #12 0x7f77756e6039 in __libc_start_main (/lib64/libc.so.6+0x21039)
-    #13 0x561136c13d89 in _start (/home/elmarco/src/qq/build/tests/test-c=
-rypto-ivgen+0x6fd89)
+Direct leak of 2 byte(s) in 1 object(s) allocated from:
+    #0 0x7eff58beb850 in malloc (/lib64/libasan.so.4+0xde850)
+    #1 0x7eff57942f0c in g_malloc ../glib/gmem.c:94
+    #2 0x7eff579431cf in g_malloc_n ../glib/gmem.c:331
+    #3 0x7eff5795f6eb in g_strdup ../glib/gstrfuncs.c:363
+    #4 0x55db720f1d46 in readline_hist_add /home/elmarco/src/qq/util/read=
+line.c:258
+    #5 0x55db720f2d34 in readline_handle_byte /home/elmarco/src/qq/util/r=
+eadline.c:387
+    #6 0x55db71539d00 in monitor_read /home/elmarco/src/qq/monitor.c:3896
+    #7 0x55db71f9be35 in qemu_chr_be_write_impl /home/elmarco/src/qq/char=
+dev/char.c:167
+    #8 0x55db71f9bed3 in qemu_chr_be_write /home/elmarco/src/qq/chardev/c=
+har.c:179
+    #9 0x55db71fa013c in fd_chr_read /home/elmarco/src/qq/chardev/char-fd=
+.c:66
+    #10 0x55db71fe18a8 in qio_channel_fd_source_dispatch /home/elmarco/sr=
+c/qq/io/channel-watch.c:84
+    #11 0x7eff5793a90b in g_main_dispatch ../glib/gmain.c:3182
+    #12 0x7eff5793b7ac in g_main_context_dispatch ../glib/gmain.c:3847
+    #13 0x55db720af3bd in glib_pollfds_poll /home/elmarco/src/qq/util/mai=
+n-loop.c:214
+    #14 0x55db720af505 in os_host_main_loop_wait /home/elmarco/src/qq/uti=
+l/main-loop.c:261
+    #15 0x55db720af6d6 in main_loop_wait /home/elmarco/src/qq/util/main-l=
+oop.c:515
+    #16 0x55db7184e0de in main_loop /home/elmarco/src/qq/vl.c:1995
+    #17 0x55db7185e956 in main /home/elmarco/src/qq/vl.c:4914
+    #18 0x7eff4ea17039 in __libc_start_main (/lib64/libc.so.6+0x21039)
 
-Address 0x7ffd8a1fe168 is located in stack of thread T0 at offset 40 in f=
-rame
-    #0 0x561136d2a40f in qcrypto_ivgen_essiv_calculate /home/elmarco/src/=
-qq/crypto/ivgen-essiv.c:76
-
-  This frame has 1 object(s):
-    [32, 40) 'sector.addr' <=3D=3D Memory access at offset 40 overflows t=
-his variable
-HINT: this may be a false positive if your program uses some custom stack=
- unwind mechanism or swapcontext
-      (longjmp and C++ exceptions *are* supported)
-SUMMARY: AddressSanitizer: stack-buffer-overflow (/home/elmarco/src/qq/bu=
-ild/tests/test-crypto-ivgen+0x110450) in __asan_memcpy
-Shadow bytes around the buggy address:
-  0x100031437bd0: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-  0x100031437be0: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-  0x100031437bf0: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-  0x100031437c00: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-  0x100031437c10: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-=3D>0x100031437c20: 00 00 00 00 00 00 00 00 f1 f1 f1 f1 00[f3]f3 f3
-  0x100031437c30: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-  0x100031437c40: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-  0x100031437c50: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-  0x100031437c60: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-  0x100031437c70: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-Shadow byte legend (one shadow byte represents 8 application bytes):
-  Addressable:           00
-  Partially addressable: 01 02 03 04 05 06 07
-  Heap left redzone:       fa
-  Freed heap region:       fd
-  Stack left redzone:      f1
-  Stack mid redzone:       f2
-  Stack right redzone:     f3
-  Stack after return:      f5
-  Stack use after scope:   f8
-  Global redzone:          f9
-  Global init order:       f6
-  Poisoned by user:        f7
-  Container overflow:      fc
-  Array cookie:            ac
-  Intra object redzone:    bb
-  ASan internal:           fe
-  Left alloca redzone:     ca
-  Right alloca redzone:    cb
-
-It looks like the rest of the code copes with ndata being larger than
-sizeof(sector), so limit the memcpy() range.
+(while at it, use g_new0(ReadLineState), it's a bit easier to read)
 
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-Reviewed-by: Daniel P. Berrange <berrange@redhat.com>
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 ---
- crypto/ivgen-essiv.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ include/qemu/readline.h |  1 +
+ monitor.c               |  2 +-
+ util/readline.c         | 18 +++++++++++++++++-
+ 3 files changed, 19 insertions(+), 2 deletions(-)
 
-diff --git a/crypto/ivgen-essiv.c b/crypto/ivgen-essiv.c
-index cba20bde6c..ad4d926c19 100644
---- a/crypto/ivgen-essiv.c
-+++ b/crypto/ivgen-essiv.c
-@@ -79,7 +79,7 @@ static int qcrypto_ivgen_essiv_calculate(QCryptoIVGen *=
-ivgen,
-     uint8_t *data =3D g_new(uint8_t, ndata);
+diff --git a/include/qemu/readline.h b/include/qemu/readline.h
+index c08cf7400e..e81258322b 100644
+--- a/include/qemu/readline.h
++++ b/include/qemu/readline.h
+@@ -59,5 +59,6 @@ ReadLineState *readline_init(ReadLinePrintfFunc *printf=
+_func,
+                              ReadLineFlushFunc *flush_func,
+                              void *opaque,
+                              ReadLineCompletionFunc *completion_finder);
++void readline_free(ReadLineState *rs);
 =20
-     sector =3D cpu_to_le64(sector);
--    memcpy(data, (uint8_t *)&sector, ndata);
-+    memcpy(data, (uint8_t *)&sector, MIN(sizeof(sector), ndata));
-     if (sizeof(sector) < ndata) {
-         memset(data + sizeof(sector), 0, ndata - sizeof(sector));
+ #endif /* READLINE_H */
+diff --git a/monitor.c b/monitor.c
+index e36fb5308d..024dd3d515 100644
+--- a/monitor.c
++++ b/monitor.c
+@@ -584,7 +584,7 @@ static void monitor_data_destroy(Monitor *mon)
+     if (monitor_is_qmp(mon)) {
+         json_message_parser_destroy(&mon->qmp.parser);
      }
+-    g_free(mon->rs);
++    readline_free(mon->rs);
+     QDECREF(mon->outbuf);
+     qemu_mutex_destroy(&mon->out_lock);
+ }
+diff --git a/util/readline.c b/util/readline.c
+index bbdee790b0..24ec839854 100644
+--- a/util/readline.c
++++ b/util/readline.c
+@@ -500,12 +500,28 @@ const char *readline_get_history(ReadLineState *rs,=
+ unsigned int index)
+     return rs->history[index];
+ }
+=20
++void readline_free(ReadLineState *rs)
++{
++    int i;
++
++    if (!rs) {
++        return;
++    }
++    for (i =3D 0; i < READLINE_MAX_CMDS; i++) {
++        g_free(rs->history[i]);
++    }
++    for (i =3D 0; i < READLINE_MAX_COMPLETIONS; i++) {
++        g_free(rs->completions[i]);
++    }
++    g_free(rs);
++}
++
+ ReadLineState *readline_init(ReadLinePrintfFunc *printf_func,
+                              ReadLineFlushFunc *flush_func,
+                              void *opaque,
+                              ReadLineCompletionFunc *completion_finder)
+ {
+-    ReadLineState *rs =3D g_malloc0(sizeof(*rs));
++    ReadLineState *rs =3D g_new0(ReadLineState, 1);
+=20
+     rs->hist_entry =3D -1;
+     rs->opaque =3D opaque;
 --=20
 2.15.1.355.g36791d7216
