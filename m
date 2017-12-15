@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37720)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41173)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1ePmEX-0007U3-1j
-	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 04:24:46 -0500
+	(envelope-from <berrange@redhat.com>) id 1ePmN8-0001Pt-OY
+	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 04:33:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1ePmET-0007rJ-Ri
-	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 04:24:45 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:38474)
+	(envelope-from <berrange@redhat.com>) id 1ePmN5-0004Jc-8V
+	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 04:33:38 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:42362)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1ePmET-0007oi-LW
-	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 04:24:41 -0500
-Date: Fri, 15 Dec 2017 09:24:34 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20171215092434.GA2358@work-vm>
-References: <1513269392-23224-1-git-send-email-jianjay.zhou@huawei.com>
-	<20171214202619-mutt-send-email-mst@kernel.org>
-	<20171214194920.GH4380@work-vm>
-	<B2D15215269B544CADD246097EACE7473AB03F26@DGGEMM505-MBS.china.huawei.com>
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1ePmN4-0004DL-TN
+	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 04:33:35 -0500
+Date: Fri, 15 Dec 2017 09:33:24 +0000
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20171215093324.GB11724@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <20171212141044.2582-1-berrange@redhat.com>
+	<20171212141044.2582-5-berrange@redhat.com>
+	<20171213150151.GF2216@perard.uk.xensource.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <B2D15215269B544CADD246097EACE7473AB03F26@DGGEMM505-MBS.china.huawei.com>
-Subject: Re: [Qemu-devel] [PATCH 0/2] vhost: two fixes
+In-Reply-To: <20171213150151.GF2216@perard.uk.xensource.com>
+Subject: Re: [Qemu-devel] [PATCH v6 4/4] hw: convert XenInput keyboard to
+ keycodemapdb
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,64 +30,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Zhoujian (jay)" <jianjay.zhou@huawei.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "Huangweidong (C)" <weidong.huang@huawei.com>, "Gonglei (Arei)" <arei.gonglei@huawei.com>, "wangxin (U)" <wangxinxin.wang@huawei.com>, "Liuzhe (Cloud Open Labs, NFV)" <gary.liuzhe@huawei.com>, Igor Mammedov <imammedo@redhat.com>
+To: Anthony PERARD <anthony.perard@citrix.com>
+Cc: qemu-devel@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Stefano Stabellini <sstabellini@kernel.org>, xen-devel@lists.xenproject.org
 
-* Zhoujian (jay) (jianjay.zhou@huawei.com) wrote:
-> Hi Dave,
+On Wed, Dec 13, 2017 at 03:01:51PM +0000, Anthony PERARD wrote:
+> On Tue, Dec 12, 2017 at 02:10:44PM +0000, Daniel P. Berrange wrote:
+> > Replace the scancode2linux table with an automatically
+> > generated table. In doing so, the XenFB keyboard
+> > handler is also converted to the modern InputEvent
+> > framework.
+> > 
+> > Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
 > 
-> > -----Original Message-----
-> > From: Dr. David Alan Gilbert [mailto:dgilbert@redhat.com]
-> > Sent: Friday, December 15, 2017 3:49 AM
-> > To: Michael S. Tsirkin <mst@redhat.com>
-> > Cc: Zhoujian (jay) <jianjay.zhou@huawei.com>; qemu-devel@nongnu.org;
-> > Huangweidong (C) <weidong.huang@huawei.com>; Gonglei (Arei)
-> > <arei.gonglei@huawei.com>; wangxin (U) <wangxinxin.wang@huawei.com>;
-> > Liuzhe (Cloud Open Labs, NFV) <gary.liuzhe@huawei.com>; Igor Mammedov
-> > <imammedo@redhat.com>
-> > Subject: Re: [PATCH 0/2] vhost: two fixes
-> > 
-> > * Michael S. Tsirkin (mst@redhat.com) wrote:
-> > > On Fri, Dec 15, 2017 at 12:36:30AM +0800, Jay Zhou wrote:
-> > > > Jay Zhou (2):
-> > > >   vhost: add used memslot number for vhost-user
-> > > >   vhost: double check memslot number
-> > > >
-> > > >  hw/virtio/vhost-user.c            | 31 +++++++++++++++++++++++++
-> > > >  hw/virtio/vhost.c                 | 49
-> > ++++++++++++++++++++++++++++++++++-----
-> > > >  include/hw/virtio/vhost-backend.h |  4 ++++
-> > > >  3 files changed, 78 insertions(+), 6 deletions(-)
-> > >
-> > > Cc two developers working on these files right now.
-> > 
-> > I have to admit to not understanding the 'used_memslots' variable.
-> > 
-> > * It's a global in vhost.c
-> > * but set by vhost_set_memory that's called from the listener associated
-> >   with each individual vhost
-> > * While they're probably always the same, the merging code calls
-> >   the vhost_backend_can_merge method for each device, so the number
-> >   of regions can be different.
-> > 
-> 
-> Your mean for some devices the new added MemoryRegionSection can be merged,
-> but for others it can not be merged?
+> FYI, I think that is done by <20171103115631.15175-3-owen.smith@citrix.com>.
+> ([PATCH v5 2/4] xenfb: Use Input Handlers directly)
 
-That's my understanding, because of the call to vhost_backend_can_merge
+Thanks, I see Stefano has posted a PULL for those patches, so I'll drop
+my duplicates.
 
-> IIUC the vhost_mem for each vhost_dev
-> is the same.
-> 
-> Meanwhile, I think it is more reasonable to add globals in vhost-backend.c
-> and vhost-user.c respectively instead of 'used_memslots'. The reason
-> is explained in patch 1. What do you think?
-
-If we need globals I'm not sure it matters that much where they live.
-
-Dave
-
-> Regards,
-> Jay
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
