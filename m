@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41721)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44638)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1ePnQc-0004E0-Gz
-	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 05:41:24 -0500
+	(envelope-from <cohuck@redhat.com>) id 1ePnXl-0005x4-6c
+	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 05:48:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1ePnQX-0002tl-0k
-	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 05:41:18 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:40991)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1ePnQW-0002sh-Qg
-	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 05:41:12 -0500
-Date: Fri, 15 Dec 2017 18:41:01 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20171215104101.GE15187@lemon>
-References: <20171205055200.16305-1-peterx@redhat.com>
+	(envelope-from <cohuck@redhat.com>) id 1ePnXg-0004lp-GJ
+	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 05:48:41 -0500
+Date: Fri, 15 Dec 2017 11:48:28 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20171215114828.1de9a0c3.cohuck@redhat.com>
+In-Reply-To: <CAFEAcA_+XYYGzTgJicvXr47YvnTiT=v-4QKDJUEvgB9Yj4D_uw@mail.gmail.com>
+References: <20171214171004.25058-1-cohuck@redhat.com>
+	<CAFEAcA8tY9=jtsw-MtjWTceLizvpH8oui_+6xf7V6K5o5BLf-A@mail.gmail.com>
+	<cf44ca76-d581-8d96-3e2b-78c698dda446@de.ibm.com>
+	<20171215101135.447d9316.cohuck@redhat.com>
+	<CAFEAcA_VaKua1qjyeX2Ve=JrSUJQbBqMQOJQZ7e3y92+gtxkMA@mail.gmail.com>
+	<20171215112138.6040ee82.cohuck@redhat.com>
+	<CAFEAcA_+XYYGzTgJicvXr47YvnTiT=v-4QKDJUEvgB9Yj4D_uw@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20171205055200.16305-1-peterx@redhat.com>
-Subject: Re: [Qemu-devel] [RFC v5 00/26] QMP: out-of-band (OOB) execution
- support
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [qemu-s390x] [PULL 00/46] First batch of s390x
+ patches for 2.12
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,27 +29,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>, armbru@redhat.com, stefanha@redhat.com
-Cc: qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>, Juan Quintela <quintela@redhat.com>, mdroth@linux.vnet.ibm.com, marcandre.lureau@redhat.com, Paolo Bonzini <pbonzini@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Christian Borntraeger <borntraeger@de.ibm.com>, Thomas Huth <thuth@redhat.com>, David Hildenbrand <david@redhat.com>, Alexander Graf <agraf@suse.de>, QEMU Developers <qemu-devel@nongnu.org>, qemu-s390x@nongnu.org, Richard Henderson <rth@twiddle.net>
 
-On Tue, 12/05 13:51, Peter Xu wrote:
-> This version is mostly document update, and dropped the single patch
-> that is migration related (will be put into postcopy recovery
-> series).
+On Fri, 15 Dec 2017 10:33:28 +0000
+Peter Maydell <peter.maydell@linaro.org> wrote:
 
-Sorry if I'm asking an already answered question, if so please remind me with
-some pointers..
+> On 15 December 2017 at 10:21, Cornelia Huck <cohuck@redhat.com> wrote:
+> > On Fri, 15 Dec 2017 09:51:32 +0000
+> > Peter Maydell <peter.maydell@linaro.org> wrote:
+> >  
+> >> On 15 December 2017 at 09:11, Cornelia Huck <cohuck@redhat.com> wrote:  
+> >> > On Fri, 15 Dec 2017 09:35:10 +0100
+> >> > Christian Borntraeger <borntraeger@de.ibm.com> wrote:
+> >> >  
+> >> >> On 12/14/2017 08:05 PM, Peter Maydell wrote:  
+> >> >> > (ram_addr_t can be a 32-bit type).  
+> >> >
+> >> > This a 32 bit host, isn't it? I don't have regular access to one...  
+> >>
+> >> Yes. Win32 cross compiler also gives this error.  
+> >
+> > Hm, my mingw build on Fedora did not catch this. Setting up a 32bit vm.  
+> 
+> Maybe your mingw build is mingw-w64 rather than -w32 ?
 
-Can we completely hide the "OOB" concept from QMP to avoid the interface
-complication? In other words, the new "migrate-recover" command can be
-implemented in a way that it always try to run out of band as if it has
-"run-oob=true", without user specifying it or even negotiating it.
+It's mingw32-w64 so it seems it's actually w64. Confusing naming.
 
-Because it seems "migrate-recover" is only useful with "run-oob=true".
-
-Of course without introducing the whole OOB concept in QMP, what this command
-does will sound very hacky, but the bahavior can be documented just well on the
-single command. I don't see a big advantage in generalizing OOB at the QMP level
-so far. Do we have a list of other commands to be made OOB?
-
-Fam
+Anyway, I now have a 32 bit build machine, and the uint64_t cast seems
+to work. I'll send an updated pull request (OK if I don't send the
+other 45 patches again?)
