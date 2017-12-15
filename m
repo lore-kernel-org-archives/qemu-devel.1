@@ -1,26 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45341)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47899)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1ePhjZ-0004wo-MB
-	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 23:36:30 -0500
+	(envelope-from <kevin@koconnor.net>) id 1ePhpL-0006CH-TD
+	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 23:42:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1ePhjV-0003C0-Ch
-	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 23:36:29 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:56386)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1ePhjV-00039p-6I
-	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 23:36:25 -0500
-Date: Fri, 15 Dec 2017 06:36:21 +0200
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20171215063550-mutt-send-email-mst@kernel.org>
-References: <1513269392-23224-1-git-send-email-jianjay.zhou@huawei.com>
-	<20171214202619-mutt-send-email-mst@kernel.org>
-	<20171214194920.GH4380@work-vm>
-	<B2D15215269B544CADD246097EACE7473AB03F26@DGGEMM505-MBS.china.huawei.com>
+	(envelope-from <kevin@koconnor.net>) id 1ePhpG-0000SE-W2
+	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 23:42:27 -0500
+Received: from mail-qk0-x22e.google.com ([2607:f8b0:400d:c09::22e]:41394)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <kevin@koconnor.net>) id 1ePhpG-0000RU-Ns
+	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 23:42:22 -0500
+Received: by mail-qk0-x22e.google.com with SMTP id r184so1311788qke.8
+	for <qemu-devel@nongnu.org>; Thu, 14 Dec 2017 20:42:22 -0800 (PST)
+Date: Thu, 14 Dec 2017 23:42:19 -0500
+From: Kevin O'Connor <kevin@koconnor.net>
+Message-ID: <20171215044219.GA16571@morn.lan>
+References: <20171213195852.30439-1-f4bug@amsat.org>
+	<20171213195852.30439-7-f4bug@amsat.org>
+	<CAKmqyKOSn_iVVuqF=By8g2wFYG_PeiisepJhYMrK7imETGeE7A@mail.gmail.com>
+	<CAAdtpL7npoa8Qs5hARn_da39Ctf5eLZ28CMmV=prh63AxCOvYg@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <B2D15215269B544CADD246097EACE7473AB03F26@DGGEMM505-MBS.china.huawei.com>
-Subject: Re: [Qemu-devel] [PATCH 0/2] vhost: two fixes
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAAdtpL7npoa8Qs5hARn_da39Ctf5eLZ28CMmV=prh63AxCOvYg@mail.gmail.com>
+Subject: Re: [Qemu-devel] [PATCH 06/14] sdhci: refactor same sysbus/pci
+ properties into a common one
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,59 +33,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Zhoujian (jay)" <jianjay.zhou@huawei.com>
-Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "Huangweidong (C)" <weidong.huang@huawei.com>, "Gonglei (Arei)" <arei.gonglei@huawei.com>, "wangxin (U)" <wangxinxin.wang@huawei.com>, "Liuzhe (Cloud Open Labs, NFV)" <gary.liuzhe@huawei.com>, Igor Mammedov <imammedo@redhat.com>
+To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
+Cc: Alistair Francis <alistair.francis@xilinx.com>, Paolo Bonzini <pbonzini@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, Prasad J Pandit <pjp@fedoraproject.org>, Peter Maydell <peter.maydell@linaro.org>, Andrew Baumann <Andrew.Baumann@microsoft.com>, Andrey Smirnov <andrew.smirnov@gmail.com>, Andrey Yurovsky <yurovsky@gmail.com>, Sai Pavan Boddu <saipava@xilinx.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, "open list:Block layer core" <qemu-block@nongnu.org>
 
-On Fri, Dec 15, 2017 at 02:38:35AM +0000, Zhoujian (jay) wrote:
-> Hi Dave,
+On Thu, Dec 14, 2017 at 03:40:17PM -0300, Philippe Mathieu-Daudé wrote:
+> >>  /* Capabilities registers provide information on supported features of this
+> >>   * specific host controller implementation */
+> >> -static Property sdhci_pci_properties[] = {
+> >> +static Property sdhci_properties[] = {
+> >>      DEFINE_PROP_UINT32("capareg", SDHCIState, capareg,
+> >>              SDHC_CAPAB_REG_DEFAULT),
+> >>      DEFINE_PROP_UINT32("maxcurr", SDHCIState, maxcurr, 0),
+> >> +    DEFINE_PROP_BOOL("pending-insert-quirk", SDHCIState, pending_insert_quirk,
+> >> +                     false),
+> >
+> > I like the reduction of code in this patch, but aren't we now going to
+> > have device properties that aren't actually connected to anything?
 > 
-> > -----Original Message-----
-> > From: Dr. David Alan Gilbert [mailto:dgilbert@redhat.com]
-> > Sent: Friday, December 15, 2017 3:49 AM
-> > To: Michael S. Tsirkin <mst@redhat.com>
-> > Cc: Zhoujian (jay) <jianjay.zhou@huawei.com>; qemu-devel@nongnu.org;
-> > Huangweidong (C) <weidong.huang@huawei.com>; Gonglei (Arei)
-> > <arei.gonglei@huawei.com>; wangxin (U) <wangxinxin.wang@huawei.com>;
-> > Liuzhe (Cloud Open Labs, NFV) <gary.liuzhe@huawei.com>; Igor Mammedov
-> > <imammedo@redhat.com>
-> > Subject: Re: [PATCH 0/2] vhost: two fixes
-> > 
-> > * Michael S. Tsirkin (mst@redhat.com) wrote:
-> > > On Fri, Dec 15, 2017 at 12:36:30AM +0800, Jay Zhou wrote:
-> > > > Jay Zhou (2):
-> > > >   vhost: add used memslot number for vhost-user
-> > > >   vhost: double check memslot number
-> > > >
-> > > >  hw/virtio/vhost-user.c            | 31 +++++++++++++++++++++++++
-> > > >  hw/virtio/vhost.c                 | 49
-> > ++++++++++++++++++++++++++++++++++-----
-> > > >  include/hw/virtio/vhost-backend.h |  4 ++++
-> > > >  3 files changed, 78 insertions(+), 6 deletions(-)
-> > >
-> > > Cc two developers working on these files right now.
-> > 
-> > I have to admit to not understanding the 'used_memslots' variable.
-> > 
-> > * It's a global in vhost.c
-> > * but set by vhost_set_memory that's called from the listener associated
-> >   with each individual vhost
-> > * While they're probably always the same, the merging code calls
-> >   the vhost_backend_can_merge method for each device, so the number
-> >   of regions can be different.
-> > 
+> I'm not sure I understand, ar you worried about the PCI_SDHCI will now
+> have this property but not use it?
 > 
-> Your mean for some devices the new added MemoryRegionSection can be merged,
-> but for others it can not be merged? IIUC the vhost_mem for each vhost_dev
-> is the same.
-> 
-> Meanwhile, I think it is more reasonable to add globals in vhost-backend.c
-> and vhost-user.c respectively instead of 'used_memslots'. The reason
-> is explained in patch 1. What do you think?
-> 
-> Regards,
-> Jay
+> I couldn't find any machine using SDHCI via PCI and was tempted to
+> just remove this code,
 
-I'd rather avoid globals completely if possible.
+I'm not sure if you are suggesting the removal of PCI SDHCI support or
+removal of some of the properties.
 
--- 
-MST
+I do find qemu's PCI SDHCI support useful for testing.  SeaBIOS can
+launch an OS from PCI SDHCI (qemu-system-x86_64 -device sdhci-pci
+-device sd-card,drive=drive0 -drive id=drive0,if=none,file=dos-drivec)
+and linux has drivers for it as well.  A number of the Chromebooks
+ship with PCI SDHCI devices on them, so it's not an unheard of
+configuration.
+
+I've never manually set any of the PCI properites, however.
+
+-Kevin
