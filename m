@@ -1,14 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44155)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47215)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1ePjUq-00026U-E9
-	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 01:29:26 -0500
+	(envelope-from <bounces@canonical.com>) id 1ePjav-0003e5-Cw
+	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 01:35:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1ePjUm-0006DV-59
-	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 01:29:24 -0500
-From: Alexey Kardashevskiy <aik@ozlabs.ru>
-Date: Fri, 15 Dec 2017 17:29:14 +1100
-Message-Id: <20171215062914.27927-1-aik@ozlabs.ru>
-Subject: [Qemu-devel] [PATCH qemu v2] RFC: vfio-pci: Allow mmap of MSIX BAR
+	(envelope-from <bounces@canonical.com>) id 1ePjas-0000O1-83
+	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 01:35:41 -0500
+Received: from indium.canonical.com ([91.189.90.7]:38724)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1ePjar-0000Ke-V8
+	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 01:35:38 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1ePjap-0001WU-EU
+	for <qemu-devel@nongnu.org>; Fri, 15 Dec 2017 06:35:35 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 6B5C12E80C3
+	for <qemu-devel@nongnu.org>; Fri, 15 Dec 2017 06:35:35 +0000 (UTC)
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 15 Dec 2017 06:24:28 -0000
+From: Bruno Haible <bruno@clisp.org>
+Reply-To: Bug 1704638 <1704638@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <150020341429.6222.13732739204722487038.malonedeb@gac.canonical.com>
+Message-Id: <151331906828.16034.5389301707827133236.malone@soybean.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1704638] Re: weak symbol access makes qemu in
+ user mode hang for mips, mips64
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,254 +38,134 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Alexey Kardashevskiy <aik@ozlabs.ru>, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Alex Williamson <alex.williamson@redhat.com>
 
-This makes use of a new VFIO_REGION_INFO_CAP_MSIX_MAPPABLE capability
-which tells that a region with MSIX data can be mapped entirely, i.e.
-the VFIO PCI driver won't prevent MSIX vectors area from being mapped.
-
-With this change, all BARs are mapped in a single chunk and MSIX vectors
-are emulated on top unless the machine requests not to by defining and
-enabling a new "vfio-no-msix-emulation" property. At the moment only
-sPAPR machine does so - it prohibits MSIX emulation and does not allow
-enabling it as it does not define the "set" callback for the new property;
-the new property also does not appear in "-machine pseries,help".
-
-If the new capability is present, this puts MSIX IO memory region under
-mapped memory region. If the capability is not there, it falls back to
-the old behaviour with the sparse capability.
-
-In MSIX vectors section is not aligned to the page size, the KVM memory
-listener does not register it with the KVM as a memory slot and MSIX is
-emulated by QEMU as before.
-
-This requires the kernel change - "vfio-pci: Allow mapping MSIX BAR" -
-for the new capability: https://www.spinics.net/lists/kvm/msg160282.html
-
-Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
----
-
-This is mtree and flatview BEFORE this patch:
-
-"info mtree":
-memory-region: pci@800000020000000.mmio
-  0000000000000000-ffffffffffffffff (prio 0, i/o): pci@800000020000000.mmio
-    0000210000000000-000021000000ffff (prio 1, i/o): 0001:03:00.0 BAR 1
-      000021000000e000-000021000000e5ff (prio 0, i/o): msix-table
-      000021000000f000-000021000000f00f (prio 0, i/o): msix-pba [disabled]
-    0000210000040000-000021000007ffff (prio 1, i/o): 0001:03:00.0 BAR 3
-      0000210000040000-000021000007ffff (prio 0, ramd): 0001:03:00.0 BAR 3 mmaps[0]
-
-"info mtree -f":
-FlatView #0
- AS "memory", root: system
- AS "cpu-memory", root: system
- Root memory region: system
-  0000000000000000-000000007fffffff (prio 0, ram): ppc_spapr.ram
-  0000210000000000-000021000000dfff (prio 1, i/o): 0001:03:00.0 BAR 1
-  000021000000e000-000021000000e5ff (prio 0, i/o): msix-table
-  000021000000e600-000021000000ffff (prio 1, i/o): 0001:03:00.0 BAR 1 @000000000000e600
-  0000210000040000-000021000007ffff (prio 0, ramd): 0001:03:00.0 BAR 3 mmaps[0]
+This is fixed in qemu-2.11:
+$ ~/inst-qemu/2.11.0/bin/qemu-mips testpthsigmask-mips
+qemu: uncaught target signal 11 (Segmentation fault) - core dumped
+Segmentation fault (core dumped)
+$ ~/inst-qemu/2.11.0/bin/qemu-mips64 testpthsigmask-mips64
+qemu: uncaught target signal 11 (Segmentation fault) - core dumped
+Segmentation fault (core dumped)
 
 
+** Changed in: qemu
+       Status: New =3D> Fix Released
 
-This is AFTER this patch applied:
+-- =
 
-"info mtree":
-memory-region: pci@800000020000000.mmio
-  0000000000000000-ffffffffffffffff (prio 0, i/o): pci@800000020000000.mmio
-    0000210000000000-000021000000ffff (prio 1, i/o): 0001:03:00.0 BAR 1
-      0000210000000000-000021000000ffff (prio 0, ramd): 0001:03:00.0 BAR 1 mmaps[0]
-        000021000000e000-000021000000e5ff (prio 0, i/o): msix-table [disabled]
-        000021000000f000-000021000000f00f (prio 0, i/o): msix-pba [disabled]
-    0000210000040000-000021000007ffff (prio 1, i/o): 0001:03:00.0 BAR 3
-      0000210000040000-000021000007ffff (prio 0, ramd): 0001:03:00.0 BAR 3 mmaps[0]
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1704638
 
+Title:
+  weak symbol access makes qemu in user mode hang for mips, mips64
 
-"info mtree -f":
-FlatView #2
- AS "memory", root: system
- AS "cpu-memory", root: system
- Root memory region: system
-  0000000000000000-000000007fffffff (prio 0, ram): ppc_spapr.ram
-  0000210000000000-000021000000ffff (prio 0, ramd): 0001:03:00.0 BAR 1 mmaps[0]
-  0000210000040000-000021000007ffff (prio 0, ramd): 0001:03:00.0 BAR 3 mmaps[0]
+Status in QEMU:
+  Fix Released
 
+Bug description:
+  A program that is statically linked and invokes a weak pointer should
+  crash (because the weak pointer evaluates to NULL).
 
+  With qemu in user mode, for mips and mips64, it hangs. The process
+  needs to be killed with "kill -9".
 
-This is AFTER this patch applied AND spapr_get_msix_emulation() patched
-to enable emulation:
+  How to reproduce for mips:
+  - Compile the program: mips-linux-gnu-gcc-5 -O -Wall -static -o testpthsi=
+gmask-mips testpthsigmask.c -pthread
+  - Set environment variables for running qemu-mips.
+  - ~/inst-qemu/2.9.0/bin/qemu-mips testpthsigmask-mips
 
-"info mtree":
-memory-region: pci@800000020000000.mmio
-  0000000000000000-ffffffffffffffff (prio 0, i/o): pci@800000020000000.mmio
-    0000210000000000-000021000000ffff (prio 1, i/o): 0001:03:00.0 BAR 1
-      0000210000000000-000021000000ffff (prio 0, ramd): 0001:03:00.0 BAR 1 mmaps[0]
-        000021000000e000-000021000000e5ff (prio 0, i/o): msix-table
-        000021000000f000-000021000000f00f (prio 0, i/o): msix-pba [disabled]
-    0000210000040000-000021000007ffff (prio 1, i/o): 0001:03:00.0 BAR 3
-      0000210000040000-000021000007ffff (prio 0, ramd): 0001:03:00.0 BAR 3 mmaps[0]
+  How to reproduce for mips64:
+  - Compile the program: mips64-linux-gnuabi64-gcc-5 -O -Wall -static -o te=
+stpthsigmask-mips64 testpthsigmask.c -lpthread
+  - Set environment variables for running qemu-mips64.
+  - ~/inst-qemu/2.9.0/bin/qemu-mips64 testpthsigmask-mips64
 
-"info mtree -f":
-FlatView #1
- AS "memory", root: system
- AS "cpu-memory", root: system
- Root memory region: system
-  0000000000000000-000000007fffffff (prio 0, ram): ppc_spapr.ram
-  0000210000000000-000021000000dfff (prio 0, ramd): 0001:03:00.0 BAR 1 mmaps[0]
-  000021000000e000-000021000000e5ff (prio 0, i/o): msix-table
-  000021000000e600-000021000000ffff (prio 0, ramd): 0001:03:00.0 BAR 1 mmaps[0] @000000000000e600
-  0000210000040000-000021000007ffff (prio 0, ramd): 0001:03:00.0 BAR 3 mmaps[0]
----
- include/hw/vfio/vfio-common.h |  1 +
- linux-headers/linux/vfio.h    |  5 +++++
- hw/ppc/spapr.c                |  8 ++++++++
- hw/vfio/common.c              | 15 +++++++++++++++
- hw/vfio/pci.c                 | 23 +++++++++++++++++++++--
- 5 files changed, 50 insertions(+), 2 deletions(-)
+  When I attach gdb to the process, I see that it is hanging inside
+  'gen_intermediate_code':
 
-diff --git a/include/hw/vfio/vfio-common.h b/include/hw/vfio/vfio-common.h
-index f3a2ac9..927d600 100644
---- a/include/hw/vfio/vfio-common.h
-+++ b/include/hw/vfio/vfio-common.h
-@@ -171,6 +171,7 @@ int vfio_get_region_info(VFIODevice *vbasedev, int index,
-                          struct vfio_region_info **info);
- int vfio_get_dev_region_info(VFIODevice *vbasedev, uint32_t type,
-                              uint32_t subtype, struct vfio_region_info **info);
-+bool vfio_is_cap_present(VFIODevice *vbasedev, uint16_t cap_type, int region);
- #endif
- extern const MemoryListener vfio_prereg_listener;
- 
-diff --git a/linux-headers/linux/vfio.h b/linux-headers/linux/vfio.h
-index 4312e96..b45182e 100644
---- a/linux-headers/linux/vfio.h
-+++ b/linux-headers/linux/vfio.h
-@@ -301,6 +301,11 @@ struct vfio_region_info_cap_type {
- #define VFIO_REGION_SUBTYPE_INTEL_IGD_HOST_CFG	(2)
- #define VFIO_REGION_SUBTYPE_INTEL_IGD_LPC_CFG	(3)
- 
-+/*
-+ * The MSIX mappable capability informs that MSIX data of a BAR can be mmapped.
-+ */
-+#define VFIO_REGION_INFO_CAP_MSIX_MAPPABLE	3
-+
- /**
-  * VFIO_DEVICE_GET_IRQ_INFO - _IOWR(VFIO_TYPE, VFIO_BASE + 9,
-  *				    struct vfio_irq_info)
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index 9de63f0..693394a 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -2772,6 +2772,11 @@ static void spapr_set_modern_hotplug_events(Object *obj, bool value,
-     spapr->use_hotplug_event_source = value;
- }
- 
-+static bool spapr_get_msix_emulation(Object *obj, Error **errp)
-+{
-+    return true;
-+}
-+
- static char *spapr_get_resize_hpt(Object *obj, Error **errp)
- {
-     sPAPRMachineState *spapr = SPAPR_MACHINE(obj);
-@@ -2853,6 +2858,8 @@ static void spapr_machine_initfn(Object *obj)
-     object_property_set_description(obj, "vsmt",
-                                     "Virtual SMT: KVM behaves as if this were"
-                                     " the host's SMT mode", &error_abort);
-+    object_property_add_bool(obj, "vfio-no-msix-emulation",
-+                             spapr_get_msix_emulation, NULL, NULL);
- }
- 
- static void spapr_machine_finalizefn(Object *obj)
-@@ -3742,6 +3749,7 @@ static const TypeInfo spapr_machine_info = {
- /*
-  * pseries-2.11
-  */
-+
- static void spapr_machine_2_11_instance_options(MachineState *machine)
- {
- }
-diff --git a/hw/vfio/common.c b/hw/vfio/common.c
-index 1fb8a8e..da5f182 100644
---- a/hw/vfio/common.c
-+++ b/hw/vfio/common.c
-@@ -1411,6 +1411,21 @@ int vfio_get_dev_region_info(VFIODevice *vbasedev, uint32_t type,
-     return -ENODEV;
- }
- 
-+bool vfio_is_cap_present(VFIODevice *vbasedev, uint16_t cap_type, int region)
-+{
-+    struct vfio_region_info *info = NULL;
-+    bool ret = false;
-+
-+    if (!vfio_get_region_info(vbasedev, region, &info)) {
-+        if (vfio_get_region_info_cap(info, cap_type)) {
-+            ret = true;
-+        }
-+        g_free(info);
-+    }
-+
-+    return ret;
-+}
-+
- /*
-  * Interfaces for IBM EEH (Enhanced Error Handling)
-  */
-diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
-index c977ee3..27a3706 100644
---- a/hw/vfio/pci.c
-+++ b/hw/vfio/pci.c
-@@ -1289,6 +1289,11 @@ static void vfio_pci_fixup_msix_region(VFIOPCIDevice *vdev)
-     off_t start, end;
-     VFIORegion *region = &vdev->bars[vdev->msix->table_bar].region;
- 
-+    if (vfio_is_cap_present(&vdev->vbasedev, VFIO_REGION_INFO_CAP_MSIX_MAPPABLE,
-+                            vdev->msix->table_bar)) {
-+        return;
-+    }
-+
-     /*
-      * We expect to find a single mmap covering the whole BAR, anything else
-      * means it's either unsupported or already setup.
-@@ -1432,6 +1437,15 @@ static void vfio_msix_early_setup(VFIOPCIDevice *vdev, Error **errp)
-     vfio_pci_fixup_msix_region(vdev);
- }
- 
-+static MemoryRegion *vfio_msix_parent(VFIORegion *region)
-+{
-+    if (region->nr_mmaps == 1 && region->mmaps[0].size == region->size) {
-+        return &region->mmaps[0].mem;
-+    }
-+
-+    return region->mem;
-+}
-+
- static int vfio_msix_setup(VFIOPCIDevice *vdev, int pos, Error **errp)
- {
-     int ret;
-@@ -1440,9 +1454,9 @@ static int vfio_msix_setup(VFIOPCIDevice *vdev, int pos, Error **errp)
-     vdev->msix->pending = g_malloc0(BITS_TO_LONGS(vdev->msix->entries) *
-                                     sizeof(unsigned long));
-     ret = msix_init(&vdev->pdev, vdev->msix->entries,
--                    vdev->bars[vdev->msix->table_bar].region.mem,
-+                    vfio_msix_parent(&vdev->bars[vdev->msix->table_bar].region),
-                     vdev->msix->table_bar, vdev->msix->table_offset,
--                    vdev->bars[vdev->msix->pba_bar].region.mem,
-+                    vfio_msix_parent(&vdev->bars[vdev->msix->pba_bar].region),
-                     vdev->msix->pba_bar, vdev->msix->pba_offset, pos,
-                     &err);
-     if (ret < 0) {
-@@ -1473,6 +1487,11 @@ static int vfio_msix_setup(VFIOPCIDevice *vdev, int pos, Error **errp)
-      */
-     memory_region_set_enabled(&vdev->pdev.msix_pba_mmio, false);
- 
-+    if (object_property_get_bool(OBJECT(qdev_get_machine()),
-+                                 "vfio-no-msix-emulation", NULL)) {
-+        memory_region_set_enabled(&vdev->pdev.msix_table_mmio, false);
-+    }
-+
-     return 0;
- }
- 
--- 
-2.11.0
+  $ gdb /home/bruno/inst-qemu/2.9.0/bin/qemu-mips 9726
+  ...
+  Reading symbols from /home/bruno/inst-qemu/2.9.0/bin/qemu-mips...done.
+  Attaching to program: /home/bruno/inst-qemu/2.9.0/bin/qemu-mips, process =
+9726
+  ...
+  (gdb) info threads
+    Id   Target Id         Frame =
+
+  * 1    Thread 0x7f1e7e535740 (LWP 9726) "qemu-mips" __lll_lock_wait () at=
+ ../sysdeps/unix/sysv/linux/x86_64/lowlevellock.S:135
+    2    Thread 0x7f1e7d0ad700 (LWP 9727) "qemu-mips" syscall () at ../sysd=
+eps/unix/sysv/linux/x86_64/syscall.S:38
+  (gdb) where
+  #0  __lll_lock_wait () at ../sysdeps/unix/sysv/linux/x86_64/lowlevellock.=
+S:135
+  #1  0x00007f1e7d6f1dbd in __GI___pthread_mutex_lock (mutex=3Dmutex@entry=
+=3D0x55de1c7ff830 <tcg_ctx+272>) at ../nptl/pthread_mutex_lock.c:80
+  #2  0x000055de1c527199 in qemu_mutex_lock (mutex=3Dmutex@entry=3D0x55de1c=
+7ff830 <tcg_ctx+272>)
+      at /media/develdata/devel/build/qemu-2.9.0/util/qemu-thread-posix.c:60
+  #3  0x000055de1c435083 in tb_lock () at /media/develdata/devel/build/qemu=
+-2.9.0/translate-all.c:167
+  #4  cpu_restore_state (cpu=3Dcpu@entry=3D0x55de1e915cb0, retaddr=3Dretadd=
+r@entry=3D94412445741769) at /media/develdata/devel/build/qemu-2.9.0/transl=
+ate-all.c:350
+  #5  0x000055de1c4658d0 in handle_cpu_signal (old_set=3D0x7ffe5ffd8ea8, is=
+_write=3D0, address=3D0, pc=3D94412445741767)
+      at /media/develdata/devel/build/qemu-2.9.0/user-exec.c:124
+  #6  cpu_mips_signal_handler (host_signum=3Dhost_signum@entry=3D11, pinfo=
+=3Dpinfo@entry=3D0x7ffe5ffd8eb0, puc=3Dpuc@entry=3D0x7ffe5ffd8d80)
+      at /media/develdata/devel/build/qemu-2.9.0/user-exec.c:229
+  #7  0x000055de1c4803be in host_signal_handler (host_signum=3D11, info=3D0=
+x7ffe5ffd8eb0, puc=3D0x7ffe5ffd8d80)
+      at /media/develdata/devel/build/qemu-2.9.0/linux-user/signal.c:646
+  #8  <signal handler called>
+  #9  __bswap_32 (__bsx=3D<optimized out>) at /usr/include/x86_64-linux-gnu=
+/bits/byteswap.h:47
+  #10 bswap32 (x=3D<optimized out>) at /media/develdata/devel/build/qemu-2.=
+9.0/include/qemu/bswap.h:21
+  #11 ldl_be_p (ptr=3D<optimized out>) at /media/develdata/devel/build/qemu=
+-2.9.0/include/qemu/bswap.h:434
+  #12 cpu_ldl_code (env=3D0x55de1e91df48, ptr=3D0) at /media/develdata/deve=
+l/build/qemu-2.9.0/include/exec/cpu_ldst_useronly_template.h:68
+  #13 gen_intermediate_code (env=3Denv@entry=3D0x55de1e91df48, tb=3Dtb@entr=
+y=3D0x7f1e7b288e58)
+      at /media/develdata/devel/build/qemu-2.9.0/target/mips/translate.c:19=
+962
+  #14 0x000055de1c4352e6 in tb_gen_code (cpu=3Dcpu@entry=3D0x55de1e915cb0, =
+pc=3Dpc@entry=3D0, cs_base=3Dcs_base@entry=3D0, flags=3Dflags@entry=3D162, =
+cflags=3D<optimized out>, =
+
+      cflags@entry=3D0) at /media/develdata/devel/build/qemu-2.9.0/translat=
+e-all.c:1295
+  #15 0x000055de1c436a7a in tb_find (tb_exit=3D0, last_tb=3D0x0, cpu=3D<opt=
+imized out>) at /media/develdata/devel/build/qemu-2.9.0/cpu-exec.c:365
+  #16 cpu_exec (cpu=3D<optimized out>) at /media/develdata/devel/build/qemu=
+-2.9.0/cpu-exec.c:673
+  #17 0x000055de1c466278 in cpu_loop (env=3D0x55de1e91df48) at /media/devel=
+data/devel/build/qemu-2.9.0/linux-user/main.c:2236
+  #18 0x000055de1c433103 in main (argc=3D<optimized out>, argv=3D0x7ffe5ffd=
+9de8, envp=3D<optimized out>)
+      at /media/develdata/devel/build/qemu-2.9.0/linux-user/main.c:4860
+  (gdb) thread 2
+  [Switching to thread 2 (Thread 0x7f1e7d0ad700 (LWP 9727))]
+  #0  syscall () at ../sysdeps/unix/sysv/linux/x86_64/syscall.S:38
+  38      ../sysdeps/unix/sysv/linux/x86_64/syscall.S: Datei oder Verzeichn=
+is nicht gefunden.
+  (gdb) where
+  #0  syscall () at ../sysdeps/unix/sysv/linux/x86_64/syscall.S:38
+  #1  0x000055de1c527605 in qemu_futex_wait (val=3D<optimized out>, f=3D<op=
+timized out>) at /media/develdata/devel/build/qemu-2.9.0/include/qemu/futex=
+.h:26
+  #2  qemu_event_wait (ev=3Dev@entry=3D0x55de1e82c124 <rcu_call_ready_event=
+>) at /media/develdata/devel/build/qemu-2.9.0/util/qemu-thread-posix.c:399
+  #3  0x000055de1c52d41e in call_rcu_thread (opaque=3D<optimized out>) at /=
+media/develdata/devel/build/qemu-2.9.0/util/rcu.c:249
+  #4  0x00007f1e7d6ef6ba in start_thread (arg=3D0x7f1e7d0ad700) at pthread_=
+create.c:333
+  #5  0x00007f1e7d4253dd in clone () at ../sysdeps/unix/sysv/linux/x86_64/c=
+lone.S:109
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1704638/+subscriptions
