@@ -1,26 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42506)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44742)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1ePq52-0007Rs-Ux
-	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 08:31:20 -0500
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1ePqBN-0003Ab-Ly
+	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 08:37:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1ePq4t-0004pq-8O
-	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 08:31:12 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:54554)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1ePq4t-0004oS-1r
-	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 08:31:03 -0500
-Date: Fri, 15 Dec 2017 13:30:54 +0000
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20171215133054.GI26982@stefanha-x1.localdomain>
-References: <20171205055200.16305-1-peterx@redhat.com>
-	<20171215104101.GE15187@lemon>
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1ePqBK-0002ni-Hq
+	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 08:37:45 -0500
+Received: from mail-qk0-x244.google.com ([2607:f8b0:400d:c09::244]:41415)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1ePqBK-0002me-B0
+	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 08:37:42 -0500
+Received: by mail-qk0-x244.google.com with SMTP id r184so2664640qke.8
+	for <qemu-devel@nongnu.org>; Fri, 15 Dec 2017 05:37:41 -0800 (PST)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20171211125705.16120-1-alex.bennee@linaro.org>
+	<20171211125705.16120-6-alex.bennee@linaro.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <8b36b09f-eb89-46bf-561b-2536cc93c489@amsat.org>
+Date: Fri, 15 Dec 2017 10:37:33 -0300
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="2nTeH+t2PBomgucg"
-Content-Disposition: inline
-In-Reply-To: <20171215104101.GE15187@lemon>
-Subject: Re: [Qemu-devel] [RFC v5 00/26] QMP: out-of-band (OOB) execution
- support
+In-Reply-To: <20171211125705.16120-6-alex.bennee@linaro.org>
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature";
+	boundary="LSmlbITroLX29esaaf2dxNAmu6oCpqNoa"
+Subject: Re: [Qemu-devel] [PATCH v1 05/19] include/fpu/softfloat: add some
+ float16 contants
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,65 +36,113 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: Peter Xu <peterx@redhat.com>, armbru@redhat.com, qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>, Juan Quintela <quintela@redhat.com>, mdroth@linux.vnet.ibm.com, marcandre.lureau@redhat.com, Paolo Bonzini <pbonzini@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, richard.henderson@linaro.org, peter.maydell@linaro.org, laurent@vivier.eu, bharata@linux.vnet.ibm.com, andrew@andrewdutcher.com, aleksandar.markovic@imgtec.com
+Cc: qemu-devel@nongnu.org, Aurelien Jarno <aurelien@aurel32.net>
 
-
---2nTeH+t2PBomgucg
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--LSmlbITroLX29esaaf2dxNAmu6oCpqNoa
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ richard.henderson@linaro.org, peter.maydell@linaro.org, laurent@vivier.eu,
+ bharata@linux.vnet.ibm.com, andrew@andrewdutcher.com,
+ aleksandar.markovic@imgtec.com
+Cc: qemu-devel@nongnu.org, Aurelien Jarno <aurelien@aurel32.net>
+Message-ID: <8b36b09f-eb89-46bf-561b-2536cc93c489@amsat.org>
+Subject: Re: [Qemu-devel] [PATCH v1 05/19] include/fpu/softfloat: add some
+ float16 contants
+References: <20171211125705.16120-1-alex.bennee@linaro.org>
+ <20171211125705.16120-6-alex.bennee@linaro.org>
+In-Reply-To: <20171211125705.16120-6-alex.bennee@linaro.org>
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Dec 15, 2017 at 06:41:01PM +0800, Fam Zheng wrote:
-> On Tue, 12/05 13:51, Peter Xu wrote:
-> > This version is mostly document update, and dropped the single patch
-> > that is migration related (will be put into postcopy recovery
-> > series).
+Hi Alex,
+
+On 12/11/2017 09:56 AM, Alex Benn=C3=A9e wrote:
+> This defines the same set of common constants for float 16 as defined
+> for 32 and 64 bit floats. These are often used by target helper
+> functions.
 >=20
-> Sorry if I'm asking an already answered question, if so please remind me =
-with
-> some pointers..
+> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+> ---
+>  include/fpu/softfloat.h | 7 +++++++
+>  1 file changed, 7 insertions(+)
 >=20
-> Can we completely hide the "OOB" concept from QMP to avoid the interface
-> complication? In other words, the new "migrate-recover" command can be
-> implemented in a way that it always try to run out of band as if it has
-> "run-oob=3Dtrue", without user specifying it or even negotiating it.
+> diff --git a/include/fpu/softfloat.h b/include/fpu/softfloat.h
+> index 17dfe60dbd..5a9258c57c 100644
+> --- a/include/fpu/softfloat.h
+> +++ b/include/fpu/softfloat.h
+> @@ -395,6 +395,13 @@ static inline float16 float16_set_sign(float16 a, =
+int sign)
+>      return make_float16((float16_val(a) & 0x7fff) | (sign << 15));
+>  }
+> =20
+> +#define float16_zero make_float16(0)
+
+ok
+
+> +#define float16_one make_float16(0x3a00)
+
+I'm a bit confused...
+
+>>> [np.fromstring(struct.pack("<H", x), dtype=3Dnp.float16)[0] for x in
+[0, 0x3a00, 0x34d1, 0x4448, 0x3800, 0x7a00]]
+[0.0, 0.75, 0.30103, 4.2812, 0.5, 49152.0]
+
+However:
+
+>>> ['0x' + binascii.hexlify(np.array([x], '>f2').tostring()) for x in
+[0, 1, math.log(2), np.pi, 0.5, np.inf]]
+['0x0000', '0x3c00', '0x398c', '0x4248', '0x3800', '0x7c00']
+
+It seems the MSB bit of the mantissa got shifted as the LSB of the
+biased exponent...
+
+> +#define float16_ln2 make_float16(0x34d1)
+
+incorrect? 0x398c
+
+> +#define float16_pi make_float16(0x4448)
+
+incorrect? 0x4248
+
+> +#define float16_half make_float16(0x3800)
+
+ok
+
+> +#define float16_infinity make_float16(0x7a00)
+
+incorrect? 0x7c00
+
+> +
+>  /*--------------------------------------------------------------------=
+--------
+>  | The pattern for a default generated half-precision NaN.
+>  *---------------------------------------------------------------------=
+-------*/
 >=20
-> Because it seems "migrate-recover" is only useful with "run-oob=3Dtrue".
->=20
-> Of course without introducing the whole OOB concept in QMP, what this com=
-mand
-> does will sound very hacky, but the bahavior can be documented just well =
-on the
-> single command. I don't see a big advantage in generalizing OOB at the QM=
-P level
-> so far. Do we have a list of other commands to be made OOB?
 
-No, that's not possible because the batching behavior changes between
-oob enabled vs disabled:
 
-Clients that don't enable oob can send several commands at once.  They
-expect them to be reliably executed in sequence.
-
-When oob is enabled batched commands can be dropped because the queue is
-full.  This is necessary because otherwise the client can fill the
-monitors socket receive buffer with normal commands and then it's
-impossible to get an oob command through to the monitor.
-
-Stefan
-
---2nTeH+t2PBomgucg
+--LSmlbITroLX29esaaf2dxNAmu6oCpqNoa
 Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEcBAEBAgAGBQJaM86OAAoJEJykq7OBq3PINO0H/1x8N8z7sUIknrUwnctbRkvB
-oncA+/Cp+Xk88qdtiSF0n3OOKt8OArEtmO+Jge9XgxPrkszILnGT7+7Mx7feDAMe
-xLA9EBaQvezs3jP8uk39w1X+M5mk/W6n9aBw+0tv0GjPrNA2m5ESbn9sVcaisvuN
-OjUfnkAQhcdjm314IO4VjcGZiRKIXLWyfCFczj/nwSQfN0jfdznasK7aVkz31DH6
-f5EVrVZxg4qMGVIO1bFBGU1japV46nsmPbQvaeeVSntiI1GPBjQK2zezEoYCpX7N
-UebbVYXF/2dIoZpuNuq3v55B0nfvB6GA9PmBkmp7/vwGnQzHpmRlXgM4XYKPhlQ=
-=wLNc
+iQIzBAEBCgAdFiEE+qvnXhKRciHc/Wuy4+MsLN6twN4FAloz0B0ACgkQ4+MsLN6t
+wN71Xg//ahAZmBx18jbSP8xWXjsgUS9PA/q9hfHwBaPXr/VXdlmWS7EjiTlj8f6y
+C81y+GTcbXXVJZVPRMvhDpnr6lM1Ffw5f3AWxeh7BlvWMnJrpQKaSSlzL+mi9SJV
+ngPvMDkQfWpRDWBB0MwvoOjJfo2m1/5muDzk7kTDTJYgp68lsy8hZ96/crJPUDjI
+ePLaPnOvmVrXRAsatfMeRN+URgh7bNC37MmdlGmFmbWep5NNgy7XkthaCUxDrCCL
+4/SOOuHGwGYMHaN+MKDiHA48j0g+gL4oe8YH0V6nbktk1HmfQ90l5Gx9FCnto5Kh
+eYRPCEEoPwWxdEUYseJJCGJ8C4dH7+oH+2ur9npJ6SMFKOthFWs4Z1TovwznGYtf
+ePd91arI1w/pLe3zahq/JWjUlkLFFKe3gQ46+9plaUTFihShkB1USTYhKlulB2dW
+ewMTgQcgDhLM3LTBrOVN/ySj50WTz+Gx3JUONEsr2bFA0eld9tfQpCdv7G8lRmkB
+FZVkufEH7sG/96DL6A3noNlud5mjxQRSOqddQhKgVqo70uDs4p8NhDFR6fGdnEHI
+g4wP1H1YFOXvknh1QnDF6NAWysxCG+Ank+2swzUAU7tatbWARGso/2toFNP2rNW6
+ZUQ5Gr2scwokjR4K1JITWz+Iy65jUsPg26s03plIBQ8miMbL+gc=
+=660x
 -----END PGP SIGNATURE-----
 
---2nTeH+t2PBomgucg--
+--LSmlbITroLX29esaaf2dxNAmu6oCpqNoa--
