@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40732)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42256)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1ePq11-0003lO-4W
-	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 08:27:04 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1ePq4W-00074B-VW
+	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 08:30:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1ePq0x-00082U-5d
-	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 08:27:03 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:54578)
+	(envelope-from <dgilbert@redhat.com>) id 1ePq4Q-00044c-N5
+	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 08:30:41 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:57822)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1ePq0w-00082A-Uq
-	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 08:26:59 -0500
-Date: Fri, 15 Dec 2017 13:26:42 +0000
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20171215132642.GH26982@stefanha-x1.localdomain>
-References: <20171205055200.16305-1-peterx@redhat.com>
-	<20171205055200.16305-13-peterx@redhat.com>
-	<20171213171934.GC8317@stefanha-x1.localdomain>
-	<20171215094010.GB15187@lemon>
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1ePq4Q-00043B-E0
+	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 08:30:34 -0500
+Date: Fri, 15 Dec 2017 13:30:23 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20171215133022.GD14126@work-vm>
+References: <20171213180807.7066-1-dgilbert@redhat.com>
+	<20171213180807.7066-5-dgilbert@redhat.com>
+	<20171214162731.50a95633@redhat.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="svZFHVx8/dhPCe52"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20171215094010.GB15187@lemon>
-Subject: Re: [Qemu-devel] [RFC v5 12/26] qmp: negociate QMP capabilities
+In-Reply-To: <20171214162731.50a95633@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v4 4/6] vhost: add regions to temporary list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,67 +28,156 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: Peter Xu <peterx@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Juan Quintela <quintela@redhat.com>, Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org, mdroth@linux.vnet.ibm.com, marcandre.lureau@redhat.com, Stefan Hajnoczi <shajnocz@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: qemu-devel@nongnu.org, pbonzini@redhat.com, maxime.coquelin@redhat.com, groug@kaod.org, mst@redhat.com
 
+* Igor Mammedov (imammedo@redhat.com) wrote:
+> On Wed, 13 Dec 2017 18:08:05 +0000
+> "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com> wrote:
+> 
+> > From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+> > 
+> > As regions are reported by the listener to the _nop and _add
+> > methods, add them to our new temporary list.
+> > Regions that abut can be merged if the backend allows.
+> > 
+> > Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> > ---
+> >  hw/virtio/trace-events |  2 ++
+> >  hw/virtio/vhost.c      | 70 ++++++++++++++++++++++++++++++++++++++++++++++++++
+> >  2 files changed, 72 insertions(+)
+> > 
+> > diff --git a/hw/virtio/trace-events b/hw/virtio/trace-events
+> > index 4a493bcd46..7de0663652 100644
+> > --- a/hw/virtio/trace-events
+> > +++ b/hw/virtio/trace-events
+> > @@ -1,6 +1,8 @@
+> >  # See docs/devel/tracing.txt for syntax documentation.
+> >  
+> >  # hw/virtio/vhost.c
+> > +vhost_region_add_tmp(const char *name, uint64_t gpa, uint64_t size, uint64_t host) "%s: 0x%"PRIx64"+0x%"PRIx64" @ 0x%"PRIx64
+> > +vhost_region_add_tmp_abut(const char *name, uint64_t new_size) "%s: 0x%"PRIx64
+> >  vhost_section(const char *name, int r) "%s:%d"
+> >  
+> >  # hw/virtio/virtio.c
+> > diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
+> > index 4523f45587..2084888aa7 100644
+> > --- a/hw/virtio/vhost.c
+> > +++ b/hw/virtio/vhost.c
+> > @@ -694,6 +694,67 @@ static void vhost_commit(MemoryListener *listener)
+> >      dev->memory_changed = false;
+> >  }
+> >  
+> > +/* Adds the section data to the tmp_mem structure.
+> > + * It relies on the listener calling us in memory address order
+> > + * and for each region (via the _add and _nop methods).
+> > + */
+> > +static void vhost_region_add_tmp(struct vhost_dev *dev,
+> > +                                 MemoryRegionSection *section)
+> > +{
+> > +    bool need_add = true;
+> > +    uint64_t mrs_size = int128_get64(section->size);
+> > +    uint64_t mrs_gpa = section->offset_within_address_space;
+> > +    uintptr_t mrs_host = (uintptr_t)memory_region_get_ram_ptr(section->mr) +
+> > +                         section->offset_within_region;
+> > +
+> > +    trace_vhost_region_add_tmp(section->mr->name, mrs_gpa, mrs_size, mrs_host);
+> > +
+> > +    if (dev->tmp_mem->nregions) {
+> > +        /* Since we already have at least one region, lets see if
+> > +         * this extends it; since we're scanning in order, we only
+> > +         * have to look at the last one, and the FlatView that calls
+> > +         * us shouldn't have overlaps.
+> > +         */
+> > +        struct vhost_memory_region *prev_vmr = dev->tmp_mem->regions +
+> > +                                               (dev->tmp_mem->nregions - 1);
+> > +        uint64_t prev_gpa_start = prev_vmr->guest_phys_addr;
+> > +        uint64_t prev_gpa_end   = range_get_last(prev_gpa_start,
+> > +                                                 prev_vmr->memory_size);
+> > +        uint64_t prev_host_start = prev_vmr->userspace_addr;
+> > +        uint64_t prev_host_end   = range_get_last(prev_host_start,
+> > +                                                  prev_vmr->memory_size);
+> > +
+> > +        if (prev_gpa_end + 1 == mrs_gpa &&
+> > +            prev_host_end + 1 == mrs_host &&
+> > +            (!dev->vhost_ops->vhost_backend_can_merge ||
+> > +                dev->vhost_ops->vhost_backend_can_merge(dev,
+> > +                    mrs_host, mrs_size,
+> > +                    prev_host_start, prev_vmr->memory_size))) {
+> > +            /* The two regions abut */
+> > +            need_add = false;
+> > +            mrs_size = mrs_size + prev_vmr->memory_size;
+> > +            prev_vmr->memory_size = mrs_size;
+> > +            trace_vhost_region_add_tmp_abut(section->mr->name, mrs_size);
+> > +        }
+> > +    }
+> > +
+> > +    if (need_add) {
+> > +        uint32_t nregions = dev->tmp_mem->nregions;
+> > +        size_t s = offsetof(struct vhost_memory, regions) +
+> > +                            (nregions + 1) * sizeof dev->tmp_mem->regions[0];
+> > +        dev->tmp_mem = g_realloc(dev->tmp_mem, s);
+> > +        dev->tmp_mem->nregions++;
+> > +        struct vhost_memory_region *cur_vmr = &dev->tmp_mem->regions[nregions];
+> > +
+> > +        cur_vmr->guest_phys_addr = mrs_gpa;
+> > +        cur_vmr->memory_size     = mrs_size;
+> > +        cur_vmr->userspace_addr  = mrs_host;
+> > +        cur_vmr->flags_padding = 0;
+> > +    }
+> > +
+> > +
+> > +}
+> > +
+> >  static void vhost_region_add(MemoryListener *listener,
+> >                               MemoryRegionSection *section)
+> >  {
+> > @@ -703,6 +764,7 @@ static void vhost_region_add(MemoryListener *listener,
+> >      if (!vhost_section(section)) {
+> >          return;
+> >      }
+> > +    vhost_region_add_tmp(dev, section);
+> >  
+> >      ++dev->n_mem_sections;
+> >      dev->mem_sections = g_renew(MemoryRegionSection, dev->mem_sections,
+> > @@ -800,9 +862,17 @@ static void vhost_iommu_region_del(MemoryListener *listener,
+> >      }
+> >  }
+> >  
+> > +/* Called on regions that have not changed */
+> >  static void vhost_region_nop(MemoryListener *listener,
+> >                               MemoryRegionSection *section)
+> >  {
+> move it close to add/del callbacks
+> 
+> > +    struct vhost_dev *dev = container_of(listener, struct vhost_dev,
+> > +                                         memory_listener);
+> > +    if (!vhost_section(section)) {
+> > +        return;
+> > +    }
+> > +
+> > +    vhost_region_add_tmp(dev, section);
+> if you'd operate on temporary mem_sections,
+> I'd add memory_region_ref() and get rid of region_del callback
+> with its section lookup, by unreffing old sections at commit time.
+> 
+> Also it seems that we have a race in current code where
+> region_del() unrefs memory region first and then by the
+> commit time memory region could be gone since old flatview
+> is unreffed before commit callback is called, but guest still
+> uses old memory map until vhost_set_mem_table() is complete.
+> We probably should unref deleted(old) sections after
+> guest gets new memmap.
 
---svZFHVx8/dhPCe52
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Will they really get cleaned up before the commit() returns?
+There's no rcu like thing guarding it?
 
-On Fri, Dec 15, 2017 at 05:40:10PM +0800, Fam Zheng wrote:
-> On Wed, 12/13 17:19, Stefan Hajnoczi wrote:
-> > On Tue, Dec 05, 2017 at 01:51:46PM +0800, Peter Xu wrote:
-> > > @@ -1037,8 +1038,42 @@ static void monitor_init_qmp_commands(void)
-> > >                           qmp_marshal_qmp_capabilities, QCO_NO_OPTION=
-S);
-> > >  }
-> > > =20
-> > > -void qmp_qmp_capabilities(Error **errp)
-> > > +static void qmp_caps_check(Monitor *mon, QMPCapabilityList *list,
-> > > +                           Error **errp)
-> > > +{
-> > > +    for (; list; list =3D list->next) {
-> > > +        assert(list->value < QMP_CAPABILITY__MAX);
-> > > +        switch (list->value) {
-> > > +        case QMP_CAPABILITY_OOB:
-> > > +            if (!mon->use_io_thr) {
-> > > +                /*
-> > > +                 * Out-Of-Band only works with monitors that are
-> > > +                 * running on dedicated IOThread.
-> > > +                 */
-> > > +                error_setg(errp, "This monitor does not support "
-> > > +                           "Out-Of-Band (OOB)");
-> > > +                return;
-> > > +            }
-> > > +            break;
-> >=20
-> > QEMU always offers the 'oob' capability, even if the monitor does not
-> > support it.  Should it send 'oob' only when mon->use_io_thr to make
-> > things easier for clients?
->=20
-> So should we firstly agree on whether the capabilities is on the current =
-monitor
-> connection or QEMU as a whole?
+Dave
 
-It's more flexible to allow per-connection capabilities.  Is there a
-reason against it?
-
-Stefan
-
---svZFHVx8/dhPCe52
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJaM82SAAoJEJykq7OBq3PI6EMIAKOZtbdYmxFkuV/EubJtZJnq
-Tq0NHJKmRJLpgcMLoAmtQtOLmKqdKmW1oQTDnfZSp04d/TL4ojjk45DbuaOxT7Yt
-TMUZ4BQynGvrekK20orGMHeb7YO78ftC2sK+nXYGOfiCNCSrtK4svyVoQOgjJ/IW
-yMHZaZ7CEFK1NOkAK5Y3D4Pkpp5mCL+hxjckKVal64RjCpWXo8ysQsbewJ2y0qPE
-LM5S5l44O0PY88AGj2ieYpUsjVjE5aw9lDaUnXpDw5RBrON0iGeB3dIA25+x68lX
-URydkQQOtzIW1PT4vFgNNUe81rn3WBmQclzs0LDzqd13Gh1VzvS2aQzaiUfBNPQ=
-=c3Ki
------END PGP SIGNATURE-----
-
---svZFHVx8/dhPCe52--
+> 
+> >  }
+> >  
+> >  static int vhost_virtqueue_set_addr(struct vhost_dev *dev,
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
