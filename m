@@ -1,20 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46158)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47534)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1ePrkY-0005RX-Ui
-	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 10:18:11 -0500
+	(envelope-from <marcandre.lureau@gmail.com>) id 1eProP-0008Dh-Ji
+	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 10:22:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1ePrkT-0008Re-B0
-	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 10:18:10 -0500
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:39210)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1ePrkT-0008QM-43
-	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 10:18:05 -0500
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 15 Dec 2017 15:18:00 +0000
-Message-Id: <1513351080-25917-1-git-send-email-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PATCH] linux-user: Translate flags argument to dup3
- syscall
+	(envelope-from <marcandre.lureau@gmail.com>) id 1eProO-0004fk-O4
+	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 10:22:09 -0500
+Received: from mail-wr0-x231.google.com ([2a00:1450:400c:c0c::231]:41252)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+	id 1eProO-0004dY-HE
+	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 10:22:08 -0500
+Received: by mail-wr0-x231.google.com with SMTP id z18so8349656wrb.8
+	for <qemu-devel@nongnu.org>; Fri, 15 Dec 2017 07:22:08 -0800 (PST)
+MIME-Version: 1.0
+In-Reply-To: <20171215150659.1811-1-marcandre.lureau@redhat.com>
+References: <20171215150659.1811-1-marcandre.lureau@redhat.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Fri, 15 Dec 2017 16:22:06 +0100
+Message-ID: <CAJ+F1C+PVtZ+a1+3TFuogUkR5Tf+7Rk-qA2XKJviCEubNMASEg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 00/13] Various build-sys and ASAN
+ related fixes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,46 +30,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>, Bruno Haible <bruno@clisp.org>
+To: QEMU <qemu-devel@nongnu.org>
+Cc: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
 
-The third argument to dup3() is a flags word which may be
-O_CLOEXEC. We weren't translating this flag from target to
-host value, which meant that if the target used a different
-value from the host (eg sparc guest and x86 host) the dup3()
-call would fail EINVAL. Do the correct translation.
+Hi
 
-Fixes: https://bugs.launchpad.net/qemu/+bug/1704658
-Reported-by: Bruno Haible  <bruno@clisp.org>
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
----
- linux-user/syscall.c | 10 +++++++++-
- 1 file changed, 9 insertions(+), 1 deletion(-)
+On Fri, Dec 15, 2017 at 4:06 PM, Marc-Andr=C3=A9 Lureau
+<marcandre.lureau@redhat.com> wrote:
+> work. Finally, the last patch should help ASAN and remove some
+> false-positive, unfortunately it crashes ASAN and may be
+> incorrect. Help welcome!
+>
 
-diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-index 39553c8..41ded90 100644
---- a/linux-user/syscall.c
-+++ b/linux-user/syscall.c
-@@ -8490,11 +8490,19 @@ abi_long do_syscall(void *cpu_env, int num, abi_long arg1,
- #endif
- #if defined(CONFIG_DUP3) && defined(TARGET_NR_dup3)
-     case TARGET_NR_dup3:
--        ret = get_errno(dup3(arg1, arg2, arg3));
-+    {
-+        int host_flags;
-+
-+        if ((arg3 & ~TARGET_O_CLOEXEC) != 0) {
-+            return -EINVAL;
-+        }
-+        host_flags = target_to_host_bitmask(arg3, fcntl_flags_tbl);
-+        ret = get_errno(dup3(arg1, arg2, host_flags));
-         if (ret >= 0) {
-             fd_trans_dup(arg1, arg2);
-         }
-         break;
-+    }
- #endif
- #ifdef TARGET_NR_getppid /* not on alpha */
-     case TARGET_NR_getppid:
--- 
-2.7.4
+I forgot to update the cover letter: this is no longer true!
+
+thanks
+
+> v2:
+> - simplify "build-sys: silence make by default or V=3D0": make it a
+>   oneliner MAKEFLAGS, use --quiet.
+> - document print-VAR rule in docs/devel/build-system.txt
+> - fix ASAN coroutine instrumentation failure
+> - should fix builds on gcc 4.4.7 (centos 6)
+> - new coroutine test leak fix
+> - add some r-b tags
+>
+> Marc-Andr=C3=A9 Lureau (13):
+>   build-sys: fix qemu-ga -pthread linking
+>   build-sys: silence make by default or V=3D0
+>   build-sys: add a rule to print a variable
+>   build-sys: add AddressSanitizer when --enable-debug if possible
+>   tests: fix check-qobject leak:
+>   vl: fix direct firmware directories leak
+>   readline: add a free function
+>   tests: fix migration-test leak
+>   crypto: fix stack-buffer-overflow error
+>   qemu-config: fix leak in query-command-line-options
+>   tests: fix qmp-test leak
+>   ucontext: annotate coroutine stack for ASAN
+>   tests: fix coroutine leak in /basic/entered
+>
+>  include/qemu/compiler.h     |  4 ++++
+>  include/qemu/readline.h     |  1 +
+>  crypto/ivgen-essiv.c        |  2 +-
+>  monitor.c                   |  2 +-
+>  tests/check-qobject.c       |  2 ++
+>  tests/migration-test.c      |  3 ++-
+>  tests/qmp-test.c            |  3 ++-
+>  tests/test-coroutine.c      |  1 -
+>  util/coroutine-ucontext.c   | 46 +++++++++++++++++++++++++++++++++++++++=
+++++++
+>  util/qemu-config.c          |  3 ++-
+>  util/readline.c             | 18 +++++++++++++++++-
+>  vl.c                        |  9 ++++++---
+>  Makefile                    |  7 +++++--
+>  configure                   |  6 ++++++
+>  docs/devel/build-system.txt | 13 +++++++++++++
+>  rules.mak                   |  2 ++
+>  16 files changed, 110 insertions(+), 12 deletions(-)
+>
+> --
+> 2.15.1.355.g36791d7216
+>
+>
+
+
+
+--=20
+Marc-Andr=C3=A9 Lureau
