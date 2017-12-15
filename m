@@ -1,26 +1,40 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41378)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42986)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1ePlP3-00081K-DP
-	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 03:31:34 -0500
+	(envelope-from <borntraeger@de.ibm.com>) id 1ePlSm-0001Dg-EU
+	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 03:35:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1ePlP0-0005EB-7W
-	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 03:31:33 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:53636)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1ePlOz-0005Cp-Kq
-	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 03:31:29 -0500
-Date: Fri, 15 Dec 2017 16:31:08 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20171215083108.GO7780@xz-mi>
-References: <20171205055200.16305-1-peterx@redhat.com>
-	<20171205055200.16305-10-peterx@redhat.com>
-	<20171213162022.GJ7173@stefanha-x1.localdomain>
+	(envelope-from <borntraeger@de.ibm.com>) id 1ePlSi-0002ki-8W
+	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 03:35:24 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:34454)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
+	id 1ePlSh-0002iD-Vf
+	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 03:35:20 -0500
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	vBF8YTCF078926
+	for <qemu-devel@nongnu.org>; Fri, 15 Dec 2017 03:35:17 -0500
+Received: from e06smtp11.uk.ibm.com (e06smtp11.uk.ibm.com [195.75.94.107])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2ev85rxunv-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Fri, 15 Dec 2017 03:35:16 -0500
+Received: from localhost
+	by e06smtp11.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
+	Fri, 15 Dec 2017 08:35:13 -0000
+References: <20171214171004.25058-1-cohuck@redhat.com>
+	<CAFEAcA8tY9=jtsw-MtjWTceLizvpH8oui_+6xf7V6K5o5BLf-A@mail.gmail.com>
+From: Christian Borntraeger <borntraeger@de.ibm.com>
+Date: Fri, 15 Dec 2017 09:35:10 +0100
 MIME-Version: 1.0
+In-Reply-To: <CAFEAcA8tY9=jtsw-MtjWTceLizvpH8oui_+6xf7V6K5o5BLf-A@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20171213162022.GJ7173@stefanha-x1.localdomain>
-Subject: Re: [Qemu-devel] [RFC v5 09/26] monitor: create monitor dedicate
- iothread
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Message-Id: <cf44ca76-d581-8d96-3e2b-78c698dda446@de.ibm.com>
+Subject: Re: [Qemu-devel] [qemu-s390x] [PULL 00/46] First batch of s390x
+ patches for 2.12
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,95 +43,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: qemu-devel@nongnu.org, Stefan Hajnoczi <shajnocz@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <famz@redhat.com>, Juan Quintela <quintela@redhat.com>, mdroth@linux.vnet.ibm.com, Eric Blake <eblake@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Markus Armbruster <armbru@redhat.com>, marcandre.lureau@redhat.com, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>, Cornelia Huck <cohuck@redhat.com>
+Cc: Thomas Huth <thuth@redhat.com>, David Hildenbrand <david@redhat.com>, Alexander Graf <agraf@suse.de>, QEMU Developers <qemu-devel@nongnu.org>, qemu-s390x@nongnu.org, Richard Henderson <rth@twiddle.net>
 
-On Wed, Dec 13, 2017 at 04:20:22PM +0000, Stefan Hajnoczi wrote:
-> On Tue, Dec 05, 2017 at 01:51:43PM +0800, Peter Xu wrote:
-> > @@ -208,6 +209,12 @@ struct Monitor {
-> >      QTAILQ_ENTRY(Monitor) entry;
-> >  };
-> >  
-> > +struct MonitorGlobal {
-> > +    IOThread *mon_iothread;
-> > +};
-> > +
-> > +static struct MonitorGlobal mon_global;
+
+
+On 12/14/2017 08:05 PM, Peter Maydell wrote:
+> On 14 December 2017 at 17:09, Cornelia Huck <cohuck@redhat.com> wrote:
+>> The following changes since commit 0ef0583d5adceb9138bdb47494dabd1549ac5b6d:
+>>
+>>   Merge remote-tracking branch 'remotes/dgilbert/tags/pull-hmp-20171214' into staging (2017-12-14 15:32:32 +0000)
+>>
+>> are available in the git repository at:
+>>
+>>   git://github.com/cohuck/qemu tags/s390x-20171214
+>>
+>> for you to fetch changes up to a9e3065c6579df8652ce38502276ac0a13180d6f:
+>>
+>>   s390-ccw-virtio: allow for systems larger that 7.999TB (2017-12-14 17:56:54 +0100)
+>>
+>> ----------------------------------------------------------------
+>> s390x changes for 2.12:
+>> - Lots of tcg improvements: ccw hotplug is now working and we can run
+>>   a Linux kernel built for z12 under tcg
+>> - zPCI improvements to get virtio-pci working
+>> - get rid of the cssid restrictions for virtual and non-virtual channel
+>>   devices
+>> - we now support 8TB+ systems
+>> - 2.12 compat machine
+>> - fixes and cleanups
+>>
+>> ----------------------------------------------------------------
 > 
-> structs can be anonymous.  That avoids the QEMU coding style violation
-> (structs must be typedefed):
+> Hi; I'm afraid this fails to build on 32-bit:
 > 
->   static struct {
->       IOThread *mon_iothread;
->   } mon_global;
-
-Will fix this up.  Thanks.
-
+> In file included from
+> /usr/lib/arm-linux-gnueabihf/glib-2.0/include/glibconfig.h:9:0,
+>                  from /usr/include/glib-2.0/glib/gtypes.h:32,
+>                  from /usr/include/glib-2.0/glib/galloca.h:32,
+>                  from /usr/include/glib-2.0/glib.h:30,
+>                  from /home/peter.maydell/qemu/include/glib-compat.h:19,
+>                  from /home/peter.maydell/qemu/include/qemu/osdep.h:107,
+>                  from /home/peter.maydell/qemu/hw/s390x/s390-virtio-ccw.c:13:
+> /home/peter.maydell/qemu/hw/s390x/s390-virtio-ccw.c: In function
+> 's390_memory_init':
+> /usr/include/glib-2.0/glib/gmacros.h:291:26: error: comparison is
+> always true due to limited range of data type [-Werror=type-limits]
+>  #define MIN(a, b)  (((a) < (b)) ? (a) : (b))
+>                           ^
+> /home/peter.maydell/qemu/hw/s390x/s390-virtio-ccw.c:177:17: note: in
+> expansion of macro 'MIN'
+>          chunk = MIN(mem_size, KVM_SLOT_MAX_BYTES);
+>                  ^
 > 
-> In general global variables are usually top-level variables in QEMU.
-> I'm not sure why wrapping globals in a struct is useful.
+> (ram_addr_t can be a 32-bit type).
 
-Because I see too many global variables for monitor code, and from
-this patch I wanted to start moving them altogether into this global
-struct.  I didn't really do that in current series because it's more
-like a clean up, but if you see future patches, it at least grows with
-new monitor global variables introduced with current series.
+gcc seems to be extra clever, even a cast does not work.
+Something like this seems to work.
 
-I can add a comment in the commit message, like: "Let's start to
-create a struct to keep monitor global variables together".  Would
-that help?
-
-> 
-> > @@ -4117,6 +4136,16 @@ void monitor_cleanup(void)
-> >  {
-> >      Monitor *mon, *next;
-> >  
-> > +    /*
-> > +     * We need to explicitly stop the iothread (but not destroy it),
-> > +     * cleanup the monitor resources, then destroy the iothread.  See
-> > +     * again on the glib bug mentioned in 2b316774f6 for a reason.
-> > +     *
-> > +     * TODO: the bug is fixed in glib 2.28, so we can remove this hack
-> > +     * as long as we won't support glib versions older than it.
-> > +     */
-> 
-> I find this comment confusing.  There is no GSource .finalize() in
-> monitor.c so why does monitor_cleanup() need to work around the bug?
-> 
-> I see that monitor_data_destroy() is not thread-safe so the IOThread
-> must be stopped first.  That is unrelated to glib.
-
-Yeah actually that's a suggestion by Dave and Dan in previous review
-comments which makes sense to me:
-
-  http://lists.gnu.org/archive/html/qemu-devel/2017-11/msg04344.html
-
-I'm fine with either way: keep it as it is, or instead saying
-"monitor_data_destroy() is not thread-safe" (which finally will still
-root cause to that glib bug).  But how about we just keep it in case
-it may be helpful some day?
-
-Thanks,
-
-> 
-> > +    iothread_stop(mon_global.mon_iothread);
-> > +
-> >      qemu_mutex_lock(&monitor_lock);
-> >      QTAILQ_FOREACH_SAFE(mon, &mon_list, entry, next) {
-> >          QTAILQ_REMOVE(&mon_list, mon, entry);
-> > @@ -4124,6 +4153,9 @@ void monitor_cleanup(void)
-> >          g_free(mon);
-> >      }
-> >      qemu_mutex_unlock(&monitor_lock);
-> > +
-> > +    iothread_destroy(mon_global.mon_iothread);
-> > +    mon_global.mon_iothread = NULL;
-> >  }
-> >  
-> >  QemuOptsList qemu_mon_opts = {
-> > -- 
-> > 2.14.3
-> > 
-
--- 
-Peter Xu
+diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
+index 80e753a5ef..9abb8de9f9 100644
+--- a/hw/s390x/s390-virtio-ccw.c
++++ b/hw/s390x/s390-virtio-ccw.c
+@@ -172,9 +172,10 @@ static void s390_memory_init(ram_addr_t mem_size)
+     name = g_strdup_printf("s390.ram");
+     while (mem_size) {
+         MemoryRegion *ram = g_new(MemoryRegion, 1);
++       unsigned long long size = mem_size;
+ 
+         /* KVM does not allow memslots >= 8 TB */
+-        chunk = MIN(mem_size, KVM_SLOT_MAX_BYTES);
++        chunk = MIN(size, KVM_SLOT_MAX_BYTES);
+         memory_region_allocate_system_memory(ram, NULL, name, chunk);
+         memory_region_add_subregion(sysmem, offset, ram);
+         mem_size -= chunk;
