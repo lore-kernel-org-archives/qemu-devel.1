@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53127)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53171)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1ePixK-0003ay-HD
-	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 00:54:48 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1ePixL-0003c3-IB
+	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 00:54:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1ePixJ-0004cI-Av
-	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 00:54:46 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1ePixK-0004dc-3k
+	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 00:54:47 -0500
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Fri, 15 Dec 2017 16:54:15 +1100
-Message-Id: <20171215055435.24204-5-david@gibson.dropbear.id.au>
+Date: Fri, 15 Dec 2017 16:54:17 +1100
+Message-Id: <20171215055435.24204-7-david@gibson.dropbear.id.au>
 In-Reply-To: <20171215055435.24204-1-david@gibson.dropbear.id.au>
 References: <20171215055435.24204-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PULL 04/24] spapr_cpu_core: instantiate CPUs
- separately
+Subject: [Qemu-devel] [PULL 06/24] nvram: add AT24Cx i2c eeprom
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,155 +20,239 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: agraf@suse.de, groug@kaod.org, mdroth@linux.vnet.ibm.com, lvivier@redhat.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
+Cc: agraf@suse.de, groug@kaod.org, mdroth@linux.vnet.ibm.com, lvivier@redhat.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Michael Davidsaver <mdavidsaver@gmail.com>, David Gibson <david@gibson.dropbear.id.au>
 
-From: Greg Kurz <groug@kaod.org>
+From: Michael Davidsaver <mdavidsaver@gmail.com>
 
-The current code assumes that only the CPU core object holds a
-reference on each individual CPU object, and happily frees their
-allocated memory when the core is unrealized. This is dangerous
-as some other code can legitimely keep a pointer to a CPU if it
-calls object_ref(), but it would end up with a dangling pointer.
-
-Let's allocate all CPUs with object_new() and let QOM free them
-when their reference count reaches zero. This greatly simplify the
-code as we don't have to fiddle with the instance size anymore.
-
-Signed-off-by: Greg Kurz <groug@kaod.org>
-Acked-by: Igor Mammedov <imammedo@redhat.com>
+Signed-off-by: Michael Davidsaver <mdavidsaver@gmail.com>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/ppc/spapr.c                  | 11 +++--------
- hw/ppc/spapr_cpu_core.c         | 19 +++++++------------
- include/hw/ppc/spapr_cpu_core.h |  2 +-
- 3 files changed, 11 insertions(+), 21 deletions(-)
+ hw/nvram/Makefile.objs  |   1 +
+ hw/nvram/eeprom_at24c.c | 205 ++++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 206 insertions(+)
+ create mode 100644 hw/nvram/eeprom_at24c.c
 
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index 8881f2f1e8..f1b96a4e92 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -3180,12 +3180,10 @@ void spapr_core_release(DeviceState *dev)
- 
-     if (smc->pre_2_10_has_unused_icps) {
-         sPAPRCPUCore *sc = SPAPR_CPU_CORE(OBJECT(dev));
--        sPAPRCPUCoreClass *scc = SPAPR_CPU_CORE_GET_CLASS(OBJECT(cc));
--        size_t size = object_type_get_instance_size(scc->cpu_type);
-         int i;
- 
-         for (i = 0; i < cc->nr_threads; i++) {
--            CPUState *cs = CPU(sc->threads + i * size);
-+            CPUState *cs = CPU(sc->threads[i]);
- 
-             pre_2_10_vmstate_register_dummy_icp(cs->cpu_index);
-         }
-@@ -3231,7 +3229,7 @@ static void spapr_core_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
-     sPAPRMachineClass *smc = SPAPR_MACHINE_CLASS(mc);
-     sPAPRCPUCore *core = SPAPR_CPU_CORE(OBJECT(dev));
-     CPUCore *cc = CPU_CORE(dev);
--    CPUState *cs = CPU(core->threads);
-+    CPUState *cs = CPU(core->threads[0]);
-     sPAPRDRConnector *drc;
-     Error *local_err = NULL;
-     int smt = kvmppc_smt_threads();
-@@ -3276,15 +3274,12 @@ static void spapr_core_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
-     core_slot->cpu = OBJECT(dev);
- 
-     if (smc->pre_2_10_has_unused_icps) {
--        sPAPRCPUCoreClass *scc = SPAPR_CPU_CORE_GET_CLASS(OBJECT(cc));
--        size_t size = object_type_get_instance_size(scc->cpu_type);
-         int i;
- 
-         for (i = 0; i < cc->nr_threads; i++) {
-             sPAPRCPUCore *sc = SPAPR_CPU_CORE(dev);
--            void *obj = sc->threads + i * size;
- 
--            cs = CPU(obj);
-+            cs = CPU(sc->threads[i]);
-             pre_2_10_vmstate_unregister_dummy_icp(cs->cpu_index);
-         }
-     }
-diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
-index 3a4c174012..588f9b4571 100644
---- a/hw/ppc/spapr_cpu_core.c
-+++ b/hw/ppc/spapr_cpu_core.c
-@@ -79,13 +79,11 @@ const char *spapr_get_cpu_core_type(const char *cpu_type)
- static void spapr_cpu_core_unrealizefn(DeviceState *dev, Error **errp)
- {
-     sPAPRCPUCore *sc = SPAPR_CPU_CORE(OBJECT(dev));
--    sPAPRCPUCoreClass *scc = SPAPR_CPU_CORE_GET_CLASS(OBJECT(dev));
--    size_t size = object_type_get_instance_size(scc->cpu_type);
-     CPUCore *cc = CPU_CORE(dev);
-     int i;
- 
-     for (i = 0; i < cc->nr_threads; i++) {
--        void *obj = sc->threads + i * size;
-+        Object *obj = OBJECT(sc->threads[i]);
-         DeviceState *dev = DEVICE(obj);
-         CPUState *cs = CPU(dev);
-         PowerPCCPU *cpu = POWERPC_CPU(cs);
-@@ -146,9 +144,8 @@ static void spapr_cpu_core_realize(DeviceState *dev, Error **errp)
-     sPAPRCPUCore *sc = SPAPR_CPU_CORE(OBJECT(dev));
-     sPAPRCPUCoreClass *scc = SPAPR_CPU_CORE_GET_CLASS(OBJECT(dev));
-     CPUCore *cc = CPU_CORE(OBJECT(dev));
--    size_t size;
-     Error *local_err = NULL;
--    void *obj;
-+    Object *obj;
-     int i, j;
- 
-     if (!spapr) {
-@@ -156,18 +153,16 @@ static void spapr_cpu_core_realize(DeviceState *dev, Error **errp)
-         return;
-     }
- 
--    size = object_type_get_instance_size(scc->cpu_type);
--    sc->threads = g_malloc0(size * cc->nr_threads);
-+    sc->threads = g_new(PowerPCCPU *, cc->nr_threads);
-     for (i = 0; i < cc->nr_threads; i++) {
-         char id[32];
-         CPUState *cs;
-         PowerPCCPU *cpu;
- 
--        obj = sc->threads + i * size;
-+        obj = object_new(scc->cpu_type);
- 
--        object_initialize(obj, size, scc->cpu_type);
-         cs = CPU(obj);
--        cpu = POWERPC_CPU(cs);
-+        cpu = sc->threads[i] = POWERPC_CPU(obj);
-         cs->cpu_index = cc->core_id + i;
-         cpu->vcpu_id = (cc->core_id * spapr->vsmt / smp_threads) + i;
-         if (kvm_enabled() && !kvm_vcpu_id_is_valid(cpu->vcpu_id)) {
-@@ -192,7 +187,7 @@ static void spapr_cpu_core_realize(DeviceState *dev, Error **errp)
-     }
- 
-     for (j = 0; j < cc->nr_threads; j++) {
--        obj = sc->threads + j * size;
-+        obj = OBJECT(sc->threads[j]);
- 
-         spapr_cpu_core_realize_child(obj, spapr, &local_err);
-         if (local_err) {
-@@ -203,7 +198,7 @@ static void spapr_cpu_core_realize(DeviceState *dev, Error **errp)
- 
- err:
-     while (--i >= 0) {
--        obj = sc->threads + i * size;
-+        obj = OBJECT(sc->threads[i]);
-         object_unparent(obj);
-     }
-     g_free(sc->threads);
-diff --git a/include/hw/ppc/spapr_cpu_core.h b/include/hw/ppc/spapr_cpu_core.h
-index f2d48d6a67..1129f344aa 100644
---- a/include/hw/ppc/spapr_cpu_core.h
-+++ b/include/hw/ppc/spapr_cpu_core.h
-@@ -28,7 +28,7 @@ typedef struct sPAPRCPUCore {
-     CPUCore parent_obj;
- 
-     /*< public >*/
--    void *threads;
-+    PowerPCCPU **threads;
-     int node_id;
- } sPAPRCPUCore;
- 
+diff --git a/hw/nvram/Makefile.objs b/hw/nvram/Makefile.objs
+index c018f6b2ff..0f4ee71dcb 100644
+--- a/hw/nvram/Makefile.objs
++++ b/hw/nvram/Makefile.objs
+@@ -1,5 +1,6 @@
+ common-obj-$(CONFIG_DS1225Y) += ds1225y.o
+ common-obj-y += eeprom93xx.o
++common-obj-y += eeprom_at24c.o
+ common-obj-y += fw_cfg.o
+ common-obj-y += chrp_nvram.o
+ common-obj-$(CONFIG_MAC_NVRAM) += mac_nvram.o
+diff --git a/hw/nvram/eeprom_at24c.c b/hw/nvram/eeprom_at24c.c
+new file mode 100644
+index 0000000000..efa3621ac6
+--- /dev/null
++++ b/hw/nvram/eeprom_at24c.c
+@@ -0,0 +1,205 @@
++/*
++ * *AT24C* series I2C EEPROM
++ *
++ * Copyright (c) 2015 Michael Davidsaver
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2.  See
++ * the LICENSE file in the top-level directory.
++ */
++
++#include <string.h>
++
++#include "qemu/osdep.h"
++#include "qapi/error.h"
++#include "hw/hw.h"
++#include "hw/i2c/i2c.h"
++#include "sysemu/block-backend.h"
++
++/* #define DEBUG_AT24C */
++
++#ifdef DEBUG_AT24C
++#define DPRINTK(FMT, ...) printf(TYPE_AT24C_EE " : " FMT, ## __VA_ARGS__)
++#else
++#define DPRINTK(FMT, ...) do {} while (0)
++#endif
++
++#define ERR(FMT, ...) fprintf(stderr, TYPE_AT24C_EE " : " FMT, \
++                            ## __VA_ARGS__)
++
++#define TYPE_AT24C_EE "at24c-eeprom"
++#define AT24C_EE(obj) OBJECT_CHECK(EEPROMState, (obj), TYPE_AT24C_EE)
++
++typedef struct EEPROMState {
++    I2CSlave parent_obj;
++
++    /* address counter */
++    uint16_t cur;
++    /* total size in bytes */
++    uint32_t rsize;
++    bool writable;
++    /* cells changed since last START? */
++    bool changed;
++    /* during WRITE, # of address bytes transfered */
++    uint8_t haveaddr;
++
++    uint8_t *mem;
++
++    BlockBackend *blk;
++} EEPROMState;
++
++static
++int at24c_eeprom_event(I2CSlave *s, enum i2c_event event)
++{
++    EEPROMState *ee = container_of(s, EEPROMState, parent_obj);
++
++    switch (event) {
++    case I2C_START_SEND:
++    case I2C_START_RECV:
++    case I2C_FINISH:
++        ee->haveaddr = 0;
++        DPRINTK("clear\n");
++        if (ee->blk && ee->changed) {
++            int len = blk_pwrite(ee->blk, 0, ee->mem, ee->rsize, 0);
++            if (len != ee->rsize) {
++                ERR(TYPE_AT24C_EE
++                        " : failed to write backing file\n");
++            }
++            DPRINTK("Wrote to backing file\n");
++        }
++        ee->changed = false;
++        break;
++    case I2C_NACK:
++        break;
++    }
++    return 0;
++}
++
++static
++int at24c_eeprom_recv(I2CSlave *s)
++{
++    EEPROMState *ee = AT24C_EE(s);
++    int ret;
++
++    ret = ee->mem[ee->cur];
++
++    ee->cur = (ee->cur + 1u) % ee->rsize;
++    DPRINTK("Recv %02x %c\n", ret, ret);
++
++    return ret;
++}
++
++static
++int at24c_eeprom_send(I2CSlave *s, uint8_t data)
++{
++    EEPROMState *ee = AT24C_EE(s);
++
++    if (ee->haveaddr < 2) {
++        ee->cur <<= 8;
++        ee->cur |= data;
++        ee->haveaddr++;
++        if (ee->haveaddr == 2) {
++            ee->cur %= ee->rsize;
++            DPRINTK("Set pointer %04x\n", ee->cur);
++        }
++
++    } else {
++        if (ee->writable) {
++            DPRINTK("Send %02x\n", data);
++            ee->mem[ee->cur] = data;
++            ee->changed = true;
++        } else {
++            DPRINTK("Send error %02x read-only\n", data);
++        }
++        ee->cur = (ee->cur + 1u) % ee->rsize;
++
++    }
++
++    return 0;
++}
++
++static
++int at24c_eeprom_init(I2CSlave *i2c)
++{
++    EEPROMState *ee = AT24C_EE(i2c);
++
++    ee->mem = g_malloc0(ee->rsize);
++
++    if (ee->blk) {
++        int64_t len = blk_getlength(ee->blk);
++
++        if (len != ee->rsize) {
++            ERR(TYPE_AT24C_EE " : Backing file size %lu != %u\n",
++                    (unsigned long)len, (unsigned)ee->rsize);
++            exit(1);
++        }
++
++        if (blk_set_perm(ee->blk, BLK_PERM_CONSISTENT_READ | BLK_PERM_WRITE,
++                         BLK_PERM_ALL, &error_fatal) < 0)
++        {
++            ERR(TYPE_AT24C_EE
++                    " : Backing file incorrect permission\n");
++            exit(1);
++        }
++    }
++    return 0;
++}
++
++static
++void at24c_eeprom_reset(DeviceState *state)
++{
++    EEPROMState *ee = AT24C_EE(state);
++
++    ee->changed = false;
++    ee->cur = 0;
++    ee->haveaddr = 0;
++
++    memset(ee->mem, 0, ee->rsize);
++
++    if (ee->blk) {
++        int len = blk_pread(ee->blk, 0, ee->mem, ee->rsize);
++
++        if (len != ee->rsize) {
++            ERR(TYPE_AT24C_EE
++                    " : Failed initial sync with backing file\n");
++        }
++        DPRINTK("Reset read backing file\n");
++    }
++}
++
++static Property at24c_eeprom_props[] = {
++    DEFINE_PROP_UINT32("rom-size", EEPROMState, rsize, 0),
++    DEFINE_PROP_BOOL("writable", EEPROMState, writable, true),
++    DEFINE_PROP_DRIVE("drive", EEPROMState, blk),
++    DEFINE_PROP_END_OF_LIST()
++};
++
++static
++void at24c_eeprom_class_init(ObjectClass *klass, void *data)
++{
++    DeviceClass *dc = DEVICE_CLASS(klass);
++    I2CSlaveClass *k = I2C_SLAVE_CLASS(klass);
++
++    k->init = &at24c_eeprom_init;
++    k->event = &at24c_eeprom_event;
++    k->recv = &at24c_eeprom_recv;
++    k->send = &at24c_eeprom_send;
++
++    dc->props = at24c_eeprom_props;
++    dc->reset = at24c_eeprom_reset;
++}
++
++static
++const TypeInfo at24c_eeprom_type = {
++    .name = TYPE_AT24C_EE,
++    .parent = TYPE_I2C_SLAVE,
++    .instance_size = sizeof(EEPROMState),
++    .class_size = sizeof(I2CSlaveClass),
++    .class_init = at24c_eeprom_class_init,
++};
++
++static void at24c_eeprom_register(void)
++{
++    type_register_static(&at24c_eeprom_type);
++}
++
++type_init(at24c_eeprom_register)
 -- 
 2.14.3
