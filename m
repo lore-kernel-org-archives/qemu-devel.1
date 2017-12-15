@@ -1,34 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54669)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56246)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1ePsBF-0002FN-Fo
-	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 10:45:47 -0500
+	(envelope-from <bounces@canonical.com>) id 1ePsG4-0005jc-A7
+	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 10:50:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1ePsBA-0006nt-IB
-	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 10:45:45 -0500
-Received: from indium.canonical.com ([91.189.90.7]:44292)
+	(envelope-from <bounces@canonical.com>) id 1ePsG0-0008MO-BI
+	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 10:50:44 -0500
+Received: from indium.canonical.com ([91.189.90.7]:44832)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1ePsBA-0006me-8M
-	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 10:45:40 -0500
+	id 1ePsG0-0008J3-2C
+	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 10:50:40 -0500
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1ePsB8-00078Z-Ji
-	for <qemu-devel@nongnu.org>; Fri, 15 Dec 2017 15:45:38 +0000
+	id 1ePsFy-0007Sp-I0
+	for <qemu-devel@nongnu.org>; Fri, 15 Dec 2017 15:50:38 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 5C37C2E80D5
-	for <qemu-devel@nongnu.org>; Fri, 15 Dec 2017 15:45:38 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 84DF32E80CE
+	for <qemu-devel@nongnu.org>; Fri, 15 Dec 2017 15:50:38 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Fri, 15 Dec 2017 15:38:39 -0000
-From: Thomas Huth <1728661@bugs.launchpad.net>
-Reply-To: Bug 1728661 <1728661@bugs.launchpad.net>
+Date: Fri, 15 Dec 2017 15:41:47 -0000
+From: Thomas Huth <1728657@bugs.launchpad.net>
+Reply-To: Bug 1728657 <1728657@bugs.launchpad.net>
 Sender: bounces@canonical.com
-References: <150938328262.20448.12104835174396986902.malonedeb@soybean.canonical.com>
-Message-Id: <151335231957.11277.5314235245400903495.malone@gac.canonical.com>
+References: <150938258765.4619.4960159407611508533.malonedeb@chaenomeles.canonical.com>
+Message-Id: <151335250775.18849.18148040016277938592.malone@chaenomeles.canonical.com>
 Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1728661] Re: qemu-io segfaults at
- block/qcow2.h:533
+Subject: [Qemu-devel] [Bug 1728657] Re: qemu-io: block/qcow2-cluster.c:1109:
+ handle_copied: Assertion failed
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -40,7 +40,7 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 
 Fix has been released with QEMU 2.11:
-https://git.qemu.org/?p=3Dqemu.git;a=3Dcommitdiff;h=3D23482f8a603a7fc591b770
+https://git.qemu.org/?p=3Dqemu.git;a=3Dcommitdiff;h=3D93bbaf03ff7fd490e82
 
 ** Changed in: qemu
        Status: New =3D> Fix Released
@@ -49,10 +49,10 @@ https://git.qemu.org/?p=3Dqemu.git;a=3Dcommitdiff;h=3D23482f8a603a7fc591b770
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1728661
+https://bugs.launchpad.net/bugs/1728657
 
 Title:
-  qemu-io segfaults at block/qcow2.h:533
+  qemu-io: block/qcow2-cluster.c:1109: handle_copied: Assertion failed
 
 Status in QEMU:
   Fix Released
@@ -63,156 +63,153 @@ Bug description:
 
   Re-production steps:
 
-  1. Copy the attached file named test.img to a directory
+  1. Copy the attached file test.img to a directory
   2. And customize the following command to point to the above directory an=
 d run the same.
   # mv test.img copy.img
-  # qemu-io <path to>/copy.img -c "truncate 66560"
+  # qemu-io <path to>/copy.img -c "write 4105728 2791936"
 
   from gdb:
-  Program terminated with signal 11, Segmentation fault.
-  #0  0x0000000010054cec in get_refblock_offset (s=3D0x32ca3210, offset=3D9=
-223372036854775296) at ./block/qcow2.h:533
-  533	    return s->refcount_table[index] & REFT_OFFSET_MASK;
-  Missing separate debuginfos, use: debuginfo-install cyrus-sasl-lib-2.1.26=
--21.el7.ppc64le glib2-2.50.3-3.el7.ppc64le glibc-2.17-196.el7.ppc64le gmp-6=
-.0.0-15.el7.ppc64le gnutls-3.3.26-9.el7.ppc64le keyutils-libs-1.5.8-3.el7.p=
-pc64le krb5-libs-1.15.1-8.el7.ppc64le libaio-0.3.109-13.el7.ppc64le libcom_=
-err-1.42.9-10.el7.ppc64le libcurl-7.29.0-42.el7.ppc64le libffi-3.0.13-18.el=
-7.ppc64le libgcc-4.8.5-16.el7_4.1.ppc64le libidn-1.28-4.el7.ppc64le libseli=
-nux-2.5-11.el7.ppc64le libssh2-1.4.3-10.el7_2.1.ppc64le libstdc++-4.8.5-16.=
-el7_4.1.ppc64le libtasn1-4.10-1.el7.ppc64le nettle-2.7.1-8.el7.ppc64le nspr=
--4.13.1-1.0.el7_3.ppc64le nss-3.28.4-15.el7_4.ppc64le nss-softokn-freebl-3.=
-28.3-8.el7_4.ppc64le nss-util-3.28.4-3.el7.ppc64le openldap-2.4.44-5.el7.pp=
-c64le openssl-libs-1.0.2k-8.el7.ppc64le p11-kit-0.23.5-3.el7.ppc64le pcre-8=
-.32-17.el7.ppc64le zlib-1.2.7-17.el7.ppc64le
   (gdb) bt
-  #0  0x0000000010054cec in get_refblock_offset (s=3D0x32ca3210, offset=3D9=
-223372036854775296) at ./block/qcow2.h:533
-  #1  0x000000001005df4c in qcow2_discard_refcount_block (bs=3D0x32c96f60, =
-discard_block_offs=3D9223372036854775296) at block/qcow2-refcount.c:3070
-  #2  0x000000001005e5c4 in qcow2_shrink_reftable (bs=3D0x32c96f60) at bloc=
-k/qcow2-refcount.c:3169
-  #3  0x0000000010051184 in qcow2_truncate (bs=3D0x32c96f60, offset=3D66560=
-, prealloc=3DPREALLOC_MODE_OFF, errp=3D0x3fffc051ecd8) at block/qcow2.c:3155
-  #4  0x0000000010016480 in bdrv_truncate (child=3D0x32ca6270, offset=3D665=
-60, prealloc=3DPREALLOC_MODE_OFF, errp=3D0x3fffc051ecd8) at block.c:3585
-  #5  0x0000000010090800 in blk_truncate (blk=3D0x32c89410, offset=3D66560,=
- prealloc=3DPREALLOC_MODE_OFF, errp=3D0x3fffc051ecd8) at block/block-backen=
-d.c:1845
-  #6  0x0000000010023028 in truncate_f (blk=3D0x32c89410, argc=3D2, argv=3D=
-0x32c685a0) at qemu-io-cmds.c:1580
-  #7  0x000000001001e648 in command (blk=3D0x32c89410, ct=3D0x32c96e30, arg=
-c=3D2, argv=3D0x32c685a0) at qemu-io-cmds.c:117
-  #8  0x0000000010024d64 in qemuio_command (blk=3D0x32c89410, cmd=3D0x3fffc=
-052f66e "truncate 66560") at qemu-io-cmds.c:2291
-  #9  0x000000001000b540 in command_loop () at qemu-io.c:374
-  #10 0x000000001000c05c in main (argc=3D4, argv=3D0x3fffc051f618) at qemu-=
-io.c:630
+  #0  0x00003fffb17eeff0 in raise () from /lib64/libc.so.6
+  #1  0x00003fffb17f136c in abort () from /lib64/libc.so.6
+  #2  0x00003fffb17e4c44 in __assert_fail_base () from /lib64/libc.so.6
+  #3  0x00003fffb17e4d34 in __assert_fail () from /lib64/libc.so.6
+  #4  0x00000000100631fc in handle_copied (bs=3D0x42ba9ad0, guest_offset=3D=
+4210688, host_offset=3D0x3fffaf4bfab0, bytes=3D0x3fffaf4bfab8, m=3D0x3fffaf=
+4bfb60)
+      at block/qcow2-cluster.c:1108
+  #5  0x0000000010064118 in qcow2_alloc_cluster_offset (bs=3D0x42ba9ad0, of=
+fset=3D4194304, bytes=3D0x3fffaf4bfb4c, host_offset=3D0x3fffaf4bfb58, m=3D0=
+x3fffaf4bfb60)
+      at block/qcow2-cluster.c:1498
+  #6  0x000000001004d3f4 in qcow2_co_pwritev (bs=3D0x42ba9ad0, offset=3D419=
+4304, bytes=3D2703360, qiov=3D0x3fffc7cc9ee0, flags=3D0) at block/qcow2.c:1=
+919
+  #7  0x00000000100a9648 in bdrv_driver_pwritev (bs=3D0x42ba9ad0, offset=3D=
+4105728, bytes=3D2791936, qiov=3D0x3fffc7cc9ee0, flags=3D16) at block/io.c:=
+898
+  #8  0x00000000100ab630 in bdrv_aligned_pwritev (child=3D0x42bb8250, req=
+=3D0x3fffaf4bfdd8, offset=3D4105728, bytes=3D2791936, align=3D1, qiov=3D0x3=
+fffc7cc9ee0, flags=3D16)
+      at block/io.c:1440
+  #9  0x00000000100ac4ac in bdrv_co_pwritev (child=3D0x42bb8250, offset=3D4=
+105728, bytes=3D2791936, qiov=3D0x3fffc7cc9ee0, flags=3DBDRV_REQ_FUA) at bl=
+ock/io.c:1691
+  #10 0x000000001008da0c in blk_co_pwritev (blk=3D0x42b99410, offset=3D4105=
+728, bytes=3D2791936, qiov=3D0x3fffc7cc9ee0, flags=3DBDRV_REQ_FUA) at block=
+/block-backend.c:1085
+  #11 0x000000001008db68 in blk_write_entry (opaque=3D0x3fffc7cc9ef8) at bl=
+ock/block-backend.c:1110
+  #12 0x00000000101aa444 in coroutine_trampoline (i0=3D1119572144, i1=3D0) =
+at util/coroutine-ucontext.c:79
+  #13 0x00003fffb1802b9c in makecontext () from /lib64/libc.so.6
+  #14 0x0000000000000000 in ?? ()
   (gdb) bt full
-  #0  0x0000000010054cec in get_refblock_offset (s=3D0x32ca3210, offset=3D9=
-223372036854775296) at ./block/qcow2.h:533
-          index =3D 4294967295
-  #1  0x000000001005df4c in qcow2_discard_refcount_block (bs=3D0x32c96f60, =
-discard_block_offs=3D9223372036854775296) at block/qcow2-refcount.c:3070
-          s =3D 0x32ca3210
-          refblock_offs =3D 852111520
-          cluster_index =3D 16384
-          block_index =3D 3226593616
-          refblock =3D 0x32cb9570
-          ret =3D 16384
-          __PRETTY_FUNCTION__ =3D "qcow2_discard_refcount_block"
-  #2  0x000000001005e5c4 in qcow2_shrink_reftable (bs=3D0x32c96f60) at bloc=
-k/qcow2-refcount.c:3169
-          s =3D 0x32ca3210
-          reftable_tmp =3D 0x32cb9570
-          i =3D 0
+  #0  0x00003fffb17eeff0 in raise () from /lib64/libc.so.6
+  No symbol table info available.
+  #1  0x00003fffb17f136c in abort () from /lib64/libc.so.6
+  No symbol table info available.
+  #2  0x00003fffb17e4c44 in __assert_fail_base () from /lib64/libc.so.6
+  No symbol table info available.
+  #3  0x00003fffb17e4d34 in __assert_fail () from /lib64/libc.so.6
+  No symbol table info available.
+  #4  0x00000000100631fc in handle_copied (bs=3D0x42ba9ad0, guest_offset=3D=
+4210688, host_offset=3D0x3fffaf4bfab0, bytes=3D0x3fffaf4bfab8, m=3D0x3fffaf=
+4bfb60)
+      at block/qcow2-cluster.c:1108
+          s =3D 0x42bb5d80
+          l2_index =3D 0
+          cluster_offset =3D 4210688
+          l2_table =3D 0x0
+          nb_clusters =3D 1119575424
+          keep_clusters =3D 0
           ret =3D 0
-  #3  0x0000000010051184 in qcow2_truncate (bs=3D0x32c96f60, offset=3D66560=
-, prealloc=3DPREALLOC_MODE_OFF, errp=3D0x3fffc051ecd8) at block/qcow2.c:3155
-          last_cluster =3D 70367675804416
-          old_file_size =3D 70367675804416
-          s =3D 0x32ca3210
-          old_length =3D 1048576
-          new_l1_size =3D 1
+          __PRETTY_FUNCTION__ =3D "handle_copied"
+  #5  0x0000000010064118 in qcow2_alloc_cluster_offset (bs=3D0x42ba9ad0, of=
+fset=3D4194304, bytes=3D0x3fffaf4bfb4c, host_offset=3D0x3fffaf4bfb58, m=3D0=
+x3fffaf4bfb60)
+      at block/qcow2-cluster.c:1498
+          s =3D 0x42bb5d80
+          start =3D 4210688
+          remaining =3D 2686976
+          cluster_offset =3D 4294983168
+          cur_bytes =3D 2686976
           ret =3D 0
-          __func__ =3D "qcow2_truncate"
-          __PRETTY_FUNCTION__ =3D "qcow2_truncate"
-          __FUNCTION__ =3D "qcow2_truncate"
-  #4  0x0000000010016480 in bdrv_truncate (child=3D0x32ca6270, offset=3D665=
-60, prealloc=3DPREALLOC_MODE_OFF, errp=3D0x3fffc051ecd8) at block.c:3585
-          bs =3D 0x32c96f60
+          __PRETTY_FUNCTION__ =3D "qcow2_alloc_cluster_offset"
+  #6  0x000000001004d3f4 in qcow2_co_pwritev (bs=3D0x42ba9ad0, offset=3D419=
+4304, bytes=3D2703360, qiov=3D0x3fffc7cc9ee0, flags=3D0) at block/qcow2.c:1=
+919
+          s =3D 0x42bb5d80
+          offset_in_cluster =3D 0
+          ret =3D 0
+          cur_bytes =3D 2703360
+          cluster_offset =3D 4294950912
+          hd_qiov =3D {iov =3D 0x42b74fb0, niov =3D 1, nalloc =3D 1, size =
+=3D 16384}
+          bytes_done =3D 88576
+          cluster_data =3D 0x0
+          l2meta =3D 0x42bb5d20
+          __PRETTY_FUNCTION__ =3D "qcow2_co_pwritev"
+  #7  0x00000000100a9648 in bdrv_driver_pwritev (bs=3D0x42ba9ad0, offset=3D=
+4105728, bytes=3D2791936, qiov=3D0x3fffc7cc9ee0, flags=3D16) at block/io.c:=
+898
           drv =3D 0x102036f0 <bdrv_qcow2>
-          ret =3D 16383
-          __PRETTY_FUNCTION__ =3D "bdrv_truncate"
-          __func__ =3D "bdrv_truncate"
-  #5  0x0000000010090800 in blk_truncate (blk=3D0x32c89410, offset=3D66560,=
- prealloc=3DPREALLOC_MODE_OFF, errp=3D0x3fffc051ecd8) at block/block-backen=
-d.c:1845
-          __func__ =3D "blk_truncate"
-  #6  0x0000000010023028 in truncate_f (blk=3D0x32c89410, argc=3D2, argv=3D=
-0x32c685a0) at qemu-io-cmds.c:1580
-          local_err =3D 0x0
-          offset =3D 66560
+          sector_num =3D 1119538320
+          nb_sectors =3D 2841469356
+          ret =3D 2116577536
+          __PRETTY_FUNCTION__ =3D "bdrv_driver_pwritev"
+  #8  0x00000000100ab630 in bdrv_aligned_pwritev (child=3D0x42bb8250, req=
+=3D0x3fffaf4bfdd8, offset=3D4105728, bytes=3D2791936, align=3D1, qiov=3D0x3=
+fffc7cc9ee0, flags=3D16)
+      at block/io.c:1440
+          bs =3D 0x42ba9ad0
+          drv =3D 0x102036f0 <bdrv_qcow2>
+          waited =3D false
           ret =3D 0
-  #7  0x000000001001e648 in command (blk=3D0x32c89410, ct=3D0x32c96e30, arg=
-c=3D2, argv=3D0x32c685a0) at qemu-io-cmds.c:117
-          cmd =3D 0x32c684c0 "truncate"
-  #8  0x0000000010024d64 in qemuio_command (blk=3D0x32c89410, cmd=3D0x3fffc=
-052f66e "truncate 66560") at qemu-io-cmds.c:2291
-          ctx =3D 0x32c924d0
-          input =3D 0x32c684c0 "truncate"
-          ct =3D 0x32c96e30
-          v =3D 0x32c685a0
-          c =3D 2
-          done =3D false
-  #9  0x000000001000b540 in command_loop () at qemu-io.c:374
-          i =3D 0
-          done =3D 0
-          fetchable =3D 0
   ---Type <return> to continue, or q <return> to quit---
-          prompted =3D 0
-          input =3D 0x0
-  #10 0x000000001000c05c in main (argc=3D4, argv=3D0x3fffc051f618) at qemu-=
-io.c:630
-          readonly =3D 0
-          sopt =3D 0x101b2608 "hVc:d:f:rsnCmkt:T:U"
-          lopt =3D {{name =3D 0x101b26d0 "driver", has_arg =3D 0, flag =3D =
-0x0, val =3D 104}, {name =3D 0x101b26d8 "help", has_arg =3D 0, flag =3D 0x0=
-, val =3D 86}, {
-              name =3D 0x101b26e0 "version", has_arg =3D 1, flag =3D 0x0, v=
-al =3D 99}, {name =3D 0x101b26e8 "cmd", has_arg =3D 1, flag =3D 0x0, val =
-=3D 102}, {
-              name =3D 0x101b26f0 "format", has_arg =3D 0, flag =3D 0x0, va=
-l =3D 114}, {name =3D 0x101b2700 "y", has_arg =3D 0, flag =3D 0x0, val =3D =
-115}, {
-              name =3D 0x101b2710 "", has_arg =3D 0, flag =3D 0x0, val =3D =
-110}, {name =3D 0x101b2718 "nocache", has_arg =3D 0, flag =3D 0x0, val =3D =
-67}, {
-              name =3D 0x101b2728 "read", has_arg =3D 0, flag =3D 0x0, val =
-=3D 109}, {name =3D 0x101b2738 "", has_arg =3D 0, flag =3D 0x0, val =3D 107=
-}, {
-              name =3D 0x101b2748 "io", has_arg =3D 1, flag =3D 0x0, val =
-=3D 100}, {name =3D 0x101b2750 "discard", has_arg =3D 1, flag =3D 0x0, val =
-=3D 116}, {
-              name =3D 0x101b2758 "cache", has_arg =3D 1, flag =3D 0x0, val=
- =3D 84}, {name =3D 0x101b25e8 "object", has_arg =3D 1, flag =3D 0x0, val =
-=3D 256}, {
-              name =3D 0x101b2760 "trace", has_arg =3D 0, flag =3D 0x0, val=
- =3D 257}, {name =3D 0x101b1c48 "force-share", has_arg =3D 0, flag =3D 0x0,=
- val =3D 85}, {name =3D 0x0,
-              has_arg =3D 0, flag =3D 0x0, val =3D 0}}
-          c =3D -1
-          opt_index =3D 0
-          flags =3D 16386
-          writethrough =3D true
-          local_error =3D 0x0
-          opts =3D 0x0
-          format =3D 0x0
-          trace_file =3D 0x0
-          force_share =3D false
+          end_sector =3D 13472
+          bytes_remaining =3D 2791936
+          max_transfer =3D 2147483647
+          __PRETTY_FUNCTION__ =3D "bdrv_aligned_pwritev"
+  #9  0x00000000100ac4ac in bdrv_co_pwritev (child=3D0x42bb8250, offset=3D4=
+105728, bytes=3D2791936, qiov=3D0x3fffc7cc9ee0, flags=3DBDRV_REQ_FUA) at bl=
+ock/io.c:1691
+          bs =3D 0x42ba9ad0
+          req =3D {bs =3D 0x42ba9ad0, offset =3D 4105728, bytes =3D 2791936=
+, type =3D BDRV_TRACKED_WRITE, serialising =3D false, overlap_offset =3D 41=
+05728,
+            overlap_bytes =3D 2791936, list =3D {le_next =3D 0x0, le_prev =
+=3D 0x42bacd48}, co =3D 0x42bb50b0, wait_queue =3D {entries =3D {sqh_first =
+=3D 0x0,
+                sqh_last =3D 0x3fffaf4bfe20}}, waiting_for =3D 0x0}
+          align =3D 1
+          head_buf =3D 0x0
+          tail_buf =3D 0x0
+          local_qiov =3D {iov =3D 0x3fffaf4bfdb0, niov =3D -1353974288, nal=
+loc =3D 16383, size =3D 4105728}
+          use_local_qiov =3D false
+          ret =3D 0
+          __PRETTY_FUNCTION__ =3D "bdrv_co_pwritev"
+  #10 0x000000001008da0c in blk_co_pwritev (blk=3D0x42b99410, offset=3D4105=
+728, bytes=3D2791936, qiov=3D0x3fffc7cc9ee0, flags=3DBDRV_REQ_FUA) at block=
+/block-backend.c:1085
+          ret =3D 0
+          bs =3D 0x42ba9ad0
+  #11 0x000000001008db68 in blk_write_entry (opaque=3D0x3fffc7cc9ef8) at bl=
+ock/block-backend.c:1110
+          rwco =3D 0x3fffc7cc9ef8
+  #12 0x00000000101aa444 in coroutine_trampoline (i0=3D1119572144, i1=3D0) =
+at util/coroutine-ucontext.c:79
+          arg =3D {p =3D 0x42bb50b0, i =3D {1119572144, 0}}
+          self =3D 0x42bb50b0
+          co =3D 0x42bb50b0
+  #13 0x00003fffb1802b9c in makecontext () from /lib64/libc.so.6
+  No symbol table info available.
+  #14 0x0000000000000000 in ?? ()
+  No symbol table info available.
 
-  image_fuzzer image will be attached.
+  will attach images_fuzzer image.
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1728661/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1728657/+subscriptions
