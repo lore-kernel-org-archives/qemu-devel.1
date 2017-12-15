@@ -1,22 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48405)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50951)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <miika9764@gmail.com>) id 1ePqOY-0000oh-OO
-	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 08:51:23 -0500
+	(envelope-from <bounces@canonical.com>) id 1ePs1f-0005Yg-MR
+	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 10:35:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <miika9764@gmail.com>) id 1ePqOX-0001Jd-Mq
-	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 08:51:22 -0500
-Received: from mail-qk0-x241.google.com ([2607:f8b0:400d:c09::241]:42930)
+	(envelope-from <bounces@canonical.com>) id 1ePs1a-00021p-RC
+	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 10:35:51 -0500
+Received: from indium.canonical.com ([91.189.90.7]:41608)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <miika9764@gmail.com>) id 1ePqOX-0001J6-HE
-	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 08:51:21 -0500
-Received: by mail-qk0-x241.google.com with SMTP id a193so1692394qkc.9
-	for <qemu-devel@nongnu.org>; Fri, 15 Dec 2017 05:51:20 -0800 (PST)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1ePs1a-00020S-Ho
+	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 10:35:46 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1ePs1X-000440-Ir
+	for <qemu-devel@nongnu.org>; Fri, 15 Dec 2017 15:35:43 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 1F2A32E81A2
+	for <qemu-devel@nongnu.org>; Fri, 15 Dec 2017 15:35:40 +0000 (UTC)
 MIME-Version: 1.0
-From: Miika S <miika9764@gmail.com>
-Date: Fri, 15 Dec 2017 15:51:19 +0200
-Message-ID: <CABMrAhLV6LLwBR70-P4EnekWHKD4AkaatzxQwuxtOnNYQ3MEqQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: [Qemu-devel] Key code conflict in keycodemapdb
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 15 Dec 2017 15:24:46 -0000
+From: Peter Maydell <peter.maydell@linaro.org>
+Reply-To: Bug 1701798 <1701798@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <149890819992.24827.8096984642709091835.malonedeb@soybean.canonical.com>
+Message-Id: <151335148685.19112.16305398117501981618.malone@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1701798] Re: dynamically linked binaries crash
+ for big-endian targets
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,86 +38,219 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: kraxel@redhat.com, berrange@redhat.com
 
-Hi
+I still feel we shouldn't be working around guest code bugs in QEMU, so
+I'm not sure there's anything more for QEMU to do here. You should
+report the dynamic linker bug to glibc upstream.
 
-I tried to add JIS keyboard support to virtio-input-hid but ran
-into a problem with keys that have the "Linux Name" KEY_ISO and
-KEY_KATAKANAHIRAGANA. The problem appears to be that they have
-the same "AT set1 keycode" 0x70. I worked around it by removing
-KEY_ISO from keycodemapdb and got the keys working, but that
-doesn't work for the rest of QEMU. Is it intended that the keys
-have the same "AT set1 keycode"?
+-- =
 
-Patch attached (also includes support for some mouse buttons):
----
-diff --git a/hw/input/virtio-input-hid.c b/hw/input/virtio-input-hid.c
-index e78faec0b1..2cac659469 100644
---- a/hw/input/virtio-input-hid.c
-+++ b/hw/input/virtio-input-hid.c
-@@ -139,6 +139,13 @@ static const unsigned int keymap_qcode[Q_KEY_CODE__MAX] = {
-     [Q_KEY_CODE_META_L]              = KEY_LEFTMETA,
-     [Q_KEY_CODE_META_R]              = KEY_RIGHTMETA,
-     [Q_KEY_CODE_MENU]                = KEY_MENU,
-+
-+    [Q_KEY_CODE_MUHENKAN]            = KEY_MUHENKAN,
-+    [Q_KEY_CODE_HENKAN]              = KEY_HENKAN,
-+    [Q_KEY_CODE_KATAKANAHIRAGANA]    = KEY_KATAKANAHIRAGANA,
-+    [Q_KEY_CODE_COMPOSE]             = KEY_COMPOSE,
-+    [Q_KEY_CODE_RO]                  = KEY_RO,
-+    [Q_KEY_CODE_YEN]                 = KEY_YEN,
- };
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1701798
 
- static const unsigned int keymap_button[INPUT_BUTTON__MAX] = {
-@@ -147,6 +154,8 @@ static const unsigned int
-keymap_button[INPUT_BUTTON__MAX] = {
-     [INPUT_BUTTON_MIDDLE]            = BTN_MIDDLE,
-     [INPUT_BUTTON_WHEEL_UP]          = BTN_GEAR_UP,
-     [INPUT_BUTTON_WHEEL_DOWN]        = BTN_GEAR_DOWN,
-+    [INPUT_BUTTON_SIDE]              = BTN_SIDE,
-+    [INPUT_BUTTON_EXTRA]             = BTN_EXTRA,
- };
+Title:
+  dynamically linked binaries crash for big-endian targets
 
- static const unsigned int axismap_rel[INPUT_AXIS__MAX] = {
-diff --git a/qapi/ui.json b/qapi/ui.json
-index 07b468f625..da4be505ac 100644
---- a/qapi/ui.json
-+++ b/qapi/ui.json
-@@ -775,7 +775,7 @@
-             'left', 'up', 'down', 'right', 'insert', 'delete', 'stop', 'again',
-             'props', 'undo', 'front', 'copy', 'open', 'paste', 'find', 'cut',
-             'lf', 'help', 'meta_l', 'meta_r', 'compose', 'pause',
--            'ro', 'hiragana', 'henkan', 'yen',
-+            'ro', 'hiragana', 'muhenkan', 'henkan', 'katakanahiragana', 'yen',
-             'kp_comma', 'kp_equals', 'power', 'sleep', 'wake',
-             'audionext', 'audioprev', 'audiostop', 'audioplay', 'audiomute',
-             'volumeup', 'volumedown', 'mediaselect',
-Submodule ui/keycodemapdb contains modified content
-diff --git a/ui/keycodemapdb/data/keymaps.csv b/ui/keycodemapdb/data/keymaps.csv
-index 0ef2ec1..825ce47 100644
---- a/ui/keycodemapdb/data/keymaps.csv
-+++ b/ui/keycodemapdb/data/keymaps.csv
-@@ -154,9 +154,9 @@
-KEY_KATAKANA,90,JIS_Kana,0x68,0x78,0x63,,146,VK_KANA,0x15,,,,,Lang3,KATA,,,
- KEY_HIRAGANA,91,,,0x77,0x62,0x87,147,,,,,,,Hiragana,HIRA,hiragana,,
- KEY_HIRAGANA,91,,,0x77,0x62,0x87,147,,,,,,,Lang4,HIRA,hiragana,,
- KEY_HENKAN,92,,,0x79,0x64,0x86,138,,,,,,,Convert,HENK,henkan,,
--KEY_KATAKANAHIRAGANA,93,,,0x70,0x13,0x87,136,,,0xc8,0xc8,,,KanaMode,HKTG,,,
--KEY_MUHENKAN,94,,,0x7b,0x67,0x85,139,,,,,,,NonConvert,NFER,,,
--KEY_MUHENKAN,94,,,0x7b,0x67,0x85,139,,,,,,,NonConvert,MUHE,,,
-+KEY_KATAKANAHIRAGANA,93,,,0x70,0x13,0x87,136,,,0xc8,0xc8,,,KanaMode,HKTG,katakanahiragana,,
-+KEY_MUHENKAN,94,,,0x7b,0x67,0x85,139,,,,,,,NonConvert,NFER,muhenkan,,
-+KEY_MUHENKAN,94,,,0x7b,0x67,0x85,139,,,,,,,NonConvert,MUHE,muhenkan,,
- KEY_KPJPCOMMA,95,JIS_KeypadComma,0x5f,0x5c,0x27,,140,,,,,XK_KP_Separator,0xffac,,KPSP,,,
- KEY_KPJPCOMMA,95,JIS_KeypadComma,0x5f,0x5c,0x27,,140,,,,,XK_KP_Separator,0xffac,,JPCM,,,
- KEY_KPENTER,96,ANSI_KeypadEnter,0x4c,0xe01c,0xe05a,0x79,88,,,0x64,0x64,XK_KP_Enter,0xff8d,NumpadEnter,KPEN,kp_enter,0x5a,0x4c
-@@ -246,7 +246,6 @@
-KEY_STOPCD,166,,,0xe024,0xe03b,0x98,233,VK_MEDIA_STOP,0xb2,,,,,MediaStop,I174,au
- KEY_RECORD,167,,,0xe031,,0x9e,,,,,,,,,I175,,,
- KEY_REWIND,168,,,0xe018,,0x9f,,,,,,,,,I176,,,
- KEY_PHONE,169,,,0x63,,,,,,,,,,,I177,,,
--KEY_ISO,170,ISO_Section,0xa,0x70,,,,,,,,,,,I178,,,
- KEY_CONFIG,171,,,0xe001,,,,,,,,,,,I179,,,
- KEY_HOMEPAGE,172,,,0xe032,0xe03a,0x97,,VK_BROWSER_HOME,0xac,,,,,BrowserHome,I180,ac_home,,
- KEY_REFRESH,173,,,0xe067,0xe020,,250,VK_BROWSER_REFRESH,0xa8,,,,,BrowserRefresh,I181,ac_refresh,,
+Status in QEMU:
+  New
+
+Bug description:
+  On the targets
+    hppa
+    m68k
+    mips
+    mips64
+    powerpc
+    powerpc64
+    s390x
+    sparc64
+  dynamically linked binaries crash, but statically linked binaries work.
+  On the targets
+    aarch64
+    alpha
+    armhf
+    powerpc64le
+    sh4
+  both dynamically linked and statically linked binaries work.
+
+  How to reproduce:
+
+  1) On Ubuntu 16.04, install the packages
+  g++-5-aarch64-linux-gnu
+  g++-5-alpha-linux-gnu
+  g++-5-arm-linux-gnueabihf
+  g++-5-hppa-linux-gnu
+  g++-5-m68k-linux-gnu
+  g++-5-mips-linux-gnu
+  g++-5-mips64-linux-gnuabi64
+  g++-5-powerpc-linux-gnu
+  g++-5-powerpc64-linux-gnu
+  g++-5-powerpc64le-linux-gnu
+  g++-5-s390x-linux-gnu
+  g++-5-sh4-linux-gnu
+  g++-5-sparc64-linux-gnu
+
+  2) Install qemu 2.9.0 from source (for m68k, use the 2.7.0-m68k
+  code from https://github.com/vivier/qemu-m68k.git):
+  $ ../configure --prefix=3D/home/bruno/inst-qemu/2.9.0 --target-list=3Daar=
+ch64-softmmu,alpha-softmmu,arm-softmmu,i386-softmmu,m68k-softmmu,mips-softm=
+mu,mipsel-softmmu,mips64-softmmu,mips64el-softmmu,ppc-softmmu,ppc64-softmmu=
+,s390x-softmmu,sh4-softmmu,sparc-softmmu,sparc64-softmmu,x86_64-softmmu,aar=
+ch64-linux-user,alpha-linux-user,arm-linux-user,hppa-linux-user,m68k-linux-=
+user,mips-linux-user,mipsel-linux-user,mips64-linux-user,mips64el-linux-use=
+r,ppc-linux-user,ppc64-linux-user,ppc64le-linux-user,s390x-linux-user,sh4-l=
+inux-user,sparc-linux-user,sparc64-linux-user --disable-strip --disable-wer=
+ror --enable-gtk --enable-vnc
+  $ make
+  $ make install
+
+  3) Cross-compile the programs:
+
+  $ aarch64-linux-gnu-gcc-5 -O hello.c -o hello.aarch64
+  $ alpha-linux-gnu-gcc-5 -O hello.c -o hello.alpha
+  $ arm-linux-gnueabihf-gcc-5 -O hello.c -o hello.armhf
+  $ hppa-linux-gnu-gcc-5 -O hello.c -o hello.hppa
+  $ m68k-linux-gnu-gcc-5 -O hello.c -o hello.m68k
+  $ mips-linux-gnu-gcc-5 -O hello.c -o hello.mips
+  $ mips64-linux-gnuabi64-gcc-5 -O hello.c -o hello.mips64
+  $ powerpc-linux-gnu-gcc-5 -O hello.c -o hello.powerpc
+  $ powerpc64-linux-gnu-gcc-5 -O hello.c -o hello.powerpc64
+  $ powerpc64le-linux-gnu-gcc-5 -O hello.c -o hello.powerpc64le
+  $ s390x-linux-gnu-gcc-5 -O hello.c -o hello.s390x
+  $ sh4-linux-gnu-gcc-5 -O hello.c -o hello.sh4
+  $ sparc64-linux-gnu-gcc-5 -O hello.c -o hello.sparc64
+
+  4) Run the programs:
+
+  * aarch64 works:
+  $ QEMU_LD_PREFIX=3D/usr/aarch64-linux-gnu ~/inst-qemu/2.9.0/bin/qemu-aarc=
+h64 hello.aarch64
+  Hello world
+
+  * alpha works:
+  $ QEMU_LD_PREFIX=3D/usr/alpha-linux-gnu ~/inst-qemu/2.9.0/bin/qemu-alpha =
+hello.alpha =
+
+  Hello world
+
+  * armhf works:
+  $ QEMU_LD_PREFIX=3D/usr/arm-linux-gnueabihf ~/inst-qemu/2.9.0/bin/qemu-ar=
+m hello.armhf
+  Hello world
+
+  * powerpc64le works:
+  $ QEMU_LD_PREFIX=3D/usr/powerpc64le-linux-gnu ~/inst-qemu/2.9.0/bin/qemu-=
+ppc64le hello.powerpc64le
+  Hello world
+
+  * sh4 works:
+  $ QEMU_LD_PREFIX=3D/usr/sh4-linux-gnu ~/inst-qemu/2.9.0/bin/qemu-sh4 hell=
+o.sh4
+  Hello world
+
+  * =3D=3D=3D=3D=3D sparc64 does not work:
+  $ QEMU_LD_PREFIX=3D/usr/sparc64-linux-gnu ~/inst-qemu/2.9.0/bin/qemu-spar=
+c64 hello.sparc64
+  Segmentation fault (core dumped)
+
+  When I copy the file to a machine with `uname -srm` =3D "Linux 4.5.0-2-sp=
+arc64 sparc64",
+  it works:
+  $ ./hello.sparc64
+  Hello world
+
+  When I copy the file and its execution environment /usr/sparc64-linux-gnu=
+ to the
+  same machine and run the binary in a chroot environment:
+  # /bin/hello.sparc64 =
+
+  Hello world
+
+  * =3D=3D=3D=3D=3D mips does not work:
+  $ QEMU_LD_PREFIX=3D/usr/mips-linux-gnu ~/inst-qemu/2.9.0/bin/qemu-mips he=
+llo.mips
+  qemu: uncaught target signal 11 (Segmentation fault) - core dumped
+
+  When I copy the file to a machine with `uname -srm` =3D "Linux 3.16.0-4-4=
+kc-malta mips",
+  it works:
+  $ ./hello.mips
+  Hello world
+
+  When I copy the file and its execution environment /usr/mips-linux-gnu to=
+ the
+  same machine and run the binary in a chroot environment:
+  # /bin/hello.mips =
+
+  Hello world
+
+  * =3D=3D=3D=3D=3D mips64 does not work:
+  $ QEMU_LD_PREFIX=3D/usr/mips64-linux-gnuabi64 ~/inst-qemu/2.9.0/bin/qemu-=
+mips64 hello.mips64
+  qemu: uncaught target signal 11 (Segmentation fault) - core dumped
+
+  When I copy the file to a machine with `uname -srm` =3D "Linux 3.16.0-4-5=
+kc-malta mips64",
+  it works:
+  $ ./hello.mips64
+  Hello world
+
+  * =3D=3D=3D=3D=3D powerpc does not work:
+  $ QEMU_LD_PREFIX=3D/usr/powerpc-linux-gnu ~/inst-qemu/2.9.0/bin/qemu-ppc =
+hello.powerpc
+  qemu: uncaught target signal 11 (Segmentation fault) - core dumped
+
+  When I copy the file to a machine with `uname -srm` =3D "Linux 3.17.2-200=
+.fc20.ppc64p7 ppc64",
+  it works:
+  $ ./hello.powerpc
+  Hello world
+
+  * =3D=3D=3D=3D=3D powerpc64 does not work:
+  $ QEMU_LD_PREFIX=3D/usr/powerpc64-linux-gnu ~/inst-qemu/2.9.0/bin/qemu-pp=
+c64 hello.powerpc64
+  qemu: uncaught target signal 11 (Segmentation fault) - core dumped
+
+  When I copy the file to a machine with `uname -srm` =3D "Linux 3.17.2-200=
+.fc20.ppc64p7 ppc64",
+  it works:
+  $ ./hello.powerpc64
+  Hello world
+
+  * =3D=3D=3D=3D=3D s390x does not work:
+  $ QEMU_LD_PREFIX=3D/usr/s390x-linux-gnu ~/inst-qemu/2.9.0/bin/qemu-s390x =
+hello.s390x
+  <hangs>
+  $ QEMU_LD_PREFIX=3D/usr/s390x-linux-gnu ~/inst-qemu/2.8.1/bin/qemu-s390x =
+hello.s390x
+  qemu-s390x: /media/develdata/devel/build/qemu-2.8.1/translate-all.c:175: =
+tb_lock: Assertion `!have_tb_lock' failed.
+  Segmentation fault (core dumped)
+
+  When I copy the file to a machine with `uname -srm` =3D "Linux 3.16.0-4-s=
+390x s390x",
+  it works:
+  $ ./hello.s390x
+  Hello world
+
+  * =3D=3D=3D=3D=3D hppa does not work:
+  $ QEMU_LD_PREFIX=3D/usr/hppa-linux-gnu ~/inst-qemu/2.9.0/bin/qemu-hppa he=
+llo.hppa
+  Segmentation fault (core dumped)
+
+  * =3D=3D=3D=3D=3D m68k does not work:
+  $ QEMU_LD_PREFIX=3D/usr/m68k-linux-gnu QEMU_CPU=3Dm68020 ~/inst-qemu/2.9.=
+0/bin/qemu-m68k hello.m68k
+  qemu: uncaught target signal 4 (Illegal instruction) - core dumped
+  $ QEMU_LD_PREFIX=3D/usr/m68k-linux-gnu QEMU_CPU=3Dm68020 ~/inst-qemu/2.7.=
+0-m68k/bin/qemu-m68k hello.m68k
+  qemu: uncaught target signal 11 (Segmentation fault) - core dumped
+
+  =
+
+  The set of targets where it does not work is exactly the big-endian targe=
+ts.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1701798/+subscriptions
