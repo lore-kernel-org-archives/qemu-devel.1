@@ -1,34 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60814)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33582)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1ePsQl-00074Z-8U
-	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 11:01:56 -0500
+	(envelope-from <alex.williamson@redhat.com>) id 1ePsTT-0000wx-0K
+	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 11:04:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1ePsQk-0004CK-7I
-	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 11:01:47 -0500
-Received: from indium.canonical.com ([91.189.90.7]:48616)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1ePsQj-0004AK-Q5
-	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 11:01:46 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1ePsQR-0008IP-J6
-	for <qemu-devel@nongnu.org>; Fri, 15 Dec 2017 16:01:28 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 425682E81FB
-	for <qemu-devel@nongnu.org>; Fri, 15 Dec 2017 16:01:21 +0000 (UTC)
+	(envelope-from <alex.williamson@redhat.com>) id 1ePsTP-0006uB-6r
+	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 11:04:35 -0500
+Date: Fri, 15 Dec 2017 09:04:28 -0700
+From: Alex Williamson <alex.williamson@redhat.com>
+Message-ID: <20171215090428.214cc474@w520.home>
+In-Reply-To: <20171215040731.GD7753@umbus.fritz.box>
+References: <20171212052131.24649-1-aik@ozlabs.ru>
+	<20171215040731.GD7753@umbus.fritz.box>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 15 Dec 2017 15:50:32 -0000
-From: Thomas Huth <1713434@bugs.launchpad.net>
-Reply-To: Bug 1713434 <1713434@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <150391152035.18876.7874968547091336063.malonedeb@chaenomeles.canonical.com>
-Message-Id: <151335303216.18849.10563646409028387204.malone@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1713434] Re: prom-env-test test aborted and core
- dumped
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH qemu] RFC: vfio-pci: Allow mmap of MSIX BAR
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,92 +23,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: Alexey Kardashevskiy <aik@ozlabs.ru>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org
 
-https://git.qemu.org/?p=3Dqemu.git;a=3Dcommitdiff;h=3Ddb221e66d8117f810c804
+On Fri, 15 Dec 2017 15:07:31 +1100
+David Gibson <david@gibson.dropbear.id.au> wrote:
 
-** Changed in: qemu
-       Status: Fix Committed =3D> Fix Released
+> On Tue, Dec 12, 2017 at 04:21:31PM +1100, Alexey Kardashevskiy wrote:
+> > This makes use of a new VFIO_REGION_INFO_CAP_MSIX_MAPPABLE capability
+> > which tells that a region with MSIX data can be mapped entirely, i.e.
+> > the VFIO PCI driver won't prevent MSIX vectors area from being mapped.
+> > 
+> > This adds a "msix-no-mmap" property to the vfio-pci device, it is "true"
+> > by default and "false" for pseries-2.12+ machines.
+> > 
+> > This requites kernel's "vfio-pci: Allow mapping MSIX BAR"
+> > https://www.spinics.net/lists/kvm/msg160282.html
+> > 
+> > Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+> > ---
+> > 
+> > This is an RFC as it requires kernel headers update which is not there yet.
+> > 
+> > I'd like to make it "msix-mmap" (without "no") but could not find a way
+> > of enabling a device property for machine versions newer than some value.
+> > 
+> > I changed 2.11 machine just for the demonstration purpose.  
+> 
+> As Alex says, the mmap()ability of the MSI-X BAR isn't really the
+> point.  The point is whether we need to intercept guest MMIOs to the
+> MSI-X region.  Still, the logic's basically right, just rename your
+> property to, say, "intercept_msix_mmio".  It would be true by default,
+> set to false by the pseries machine type.
+> 
+> I don't think you actually need to make it vary depending on the
+> version of the pseries machine type: whether the BAR is mmap()ed or
+> qemu emulated shouldn't be a guest visible change.  No PAPR guest
+> should have been directly poking the MSI-X region (ever), so we
+> shouldn't need to intercept the region even for old versions.
 
--- =
+I have to ask, is the vfio-pci driver really the right point in the VM
+to be understanding whether the platform requires MSI-X MMIO
+emulation?  vfio-pci is only unique here in that enabling that
+emulation harms performance, but AIUI it's unused on any device and
+there may eventually be other devices affected in the same way as
+vfio-pci.  So should there be some post-realize platform code that
+disables MSI-X MemoryRegions or should the MSI-X code call out to some
+platform hook to determine whether to enable emulation?  Seems like a
+case where the impact might be unique to vfio, but the root of the
+problem is not.  Thanks,
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1713434
-
-Title:
-  prom-env-test test aborted and core dumped
-
-Status in QEMU:
-  Fix Released
-
-Bug description:
-  On ppc64le architecture machine the following test case Aborted and
-  Core dumped.
-
-  # tests/prom-env-test --quiet --keep-going -m=3Dquick --GTestLogFD=3D6
-  **
-  ERROR:tests/libqtest.c:628:qtest_get_arch: assertion failed: (qemu !=3D N=
-ULL)
-  Aborted (core dumped)
-
-  Steps to re-produce:
-  clone from the git
-  configure & compile =
-
-  run the unit tests by 'make check'
-
-  (gdb) bt
-  #0  0x00003fff9d60eff0 in raise () from /lib64/libc.so.6
-  #1  0x00003fff9d61136c in abort () from /lib64/libc.so.6
-  #2  0x00003fff9de1aa04 in g_assertion_message () from /lib64/libglib-2.0.=
-so.0
-  #3  0x00003fff9de1ab0c in g_assertion_message_expr () from /lib64/libglib=
--2.0.so.0
-  #4  0x000000001000cc30 in qtest_get_arch () at tests/libqtest.c:628
-  #5  0x00000000100048f0 in main (argc=3D5, argv=3D0x3ffff2145538) at tests=
-/prom-env-test.c:82
-  (gdb) i r
-  r0             0xfa	250
-  r1             0x3ffff2144d30	70368510627120
-  r2             0x3fff9d7b9900	70367091333376
-  r3             0x0	0
-  r4             0x12a7	4775
-  r5             0x6	6
-  r6             0x8	8
-  r7             0x1	1
-  r8             0x0	0
-  r9             0x0	0
-  r10            0x0	0
-  r11            0x0	0
-  r12            0x0	0
-  r13            0x3fff9dfa1950	70367099623760
-  r14            0x0	0
-  r15            0x0	0
-  r16            0x0	0
-  r17            0x0	0
-  r18            0x0	0
-  r19            0x0	0
-  r20            0x0	0
-  r21            0x0	0
-  r22            0x0	0
-  r23            0x0	0
-  r24            0x0	0
-  r25            0x0	0
-  r26            0x0	0
-  r27            0x100287f8	268601336
-  r28            0x16841b40	377756480
-  r29            0x4c	76
-  r30            0x3ffff2144de8	70368510627304
-  r31            0x6	6
-  pc             0x3fff9d60eff0	0x3fff9d60eff0 <raise+96>
-  msr            0x900000000280f033	10376293541503627315
-  cr             0x42000842	1107298370
-  lr             0x3fff9d61136c	0x3fff9d61136c <abort+396>
-  ctr            0x0	0
-  xer            0x0	0
-  orig_r3        0x12a7	4775
-  trap           0xc00	3072
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1713434/+subscriptions
+Alex
