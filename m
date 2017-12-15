@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33208)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33395)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ePghj-0001QM-6t
-	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 22:30:32 -0500
+	id 1ePght-0001bn-Em
+	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 22:30:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ePghi-0002r1-9L
-	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 22:30:31 -0500
+	id 1ePghs-0003Jh-Ev
+	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 22:30:41 -0500
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Fri, 15 Dec 2017 00:29:34 -0300
-Message-Id: <20171215033015.738-3-f4bug@amsat.org>
+Date: Fri, 15 Dec 2017 00:29:37 -0300
+Message-Id: <20171215033015.738-6-f4bug@amsat.org>
 In-Reply-To: <20171215033015.738-1-f4bug@amsat.org>
 References: <20171215033015.738-1-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v4 02/43] MAINTAINERS: add an entry for the
- i82374 (southbridge)
+Subject: [Qemu-devel] [PATCH v4 05/43] MAINTAINERS: add an entry for
+ watchdog/wdt_ib700
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,22 +32,21 @@ Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nong
 
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 Reviewed-by: Thomas Huth <thuth@redhat.com>
-Reviewed-by: Hervé Poussineau <hpoussin@reactos.org>
 ---
  MAINTAINERS | 1 +
  1 file changed, 1 insertion(+)
 
 diff --git a/MAINTAINERS b/MAINTAINERS
-index 8582c7d6b5..eb1646fbfe 100644
+index 4618f9b4db..00ce2931d9 100644
 --- a/MAINTAINERS
 +++ b/MAINTAINERS
-@@ -733,6 +733,7 @@ F: hw/ppc/prep_systemio.c
- F: hw/ppc/rs6000_mc.c
- F: hw/pci-host/prep.[hc]
- F: hw/isa/pc87312.[hc]
-+F: hw/dma/i82374.c
- F: pc-bios/ppc_rom.bin
- 
- sPAPR
+@@ -877,6 +877,7 @@ F: hw/misc/pc-testdev.c
+ F: hw/timer/hpet*
+ F: hw/timer/i8254*
+ F: hw/timer/mc146818rtc*
++F: hw/watchdog/wdt_ib700.c
+ F: include/hw/i2c/pm_smbus.h
+ F: include/hw/isa/i8257.h
+ F: include/hw/timer/hpet.h
 -- 
 2.15.1
