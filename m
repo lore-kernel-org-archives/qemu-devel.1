@@ -1,20 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33582)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36940)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1ePsTT-0000wx-0K
-	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 11:04:41 -0500
+	(envelope-from <bounces@canonical.com>) id 1ePsZg-0005CT-Fq
+	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 11:11:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1ePsTP-0006uB-6r
-	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 11:04:35 -0500
-Date: Fri, 15 Dec 2017 09:04:28 -0700
-From: Alex Williamson <alex.williamson@redhat.com>
-Message-ID: <20171215090428.214cc474@w520.home>
-In-Reply-To: <20171215040731.GD7753@umbus.fritz.box>
-References: <20171212052131.24649-1-aik@ozlabs.ru>
-	<20171215040731.GD7753@umbus.fritz.box>
+	(envelope-from <bounces@canonical.com>) id 1ePsZd-00069S-9T
+	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 11:11:00 -0500
+Received: from indium.canonical.com ([91.189.90.7]:50648)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1ePsZd-00066V-33
+	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 11:10:57 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1ePsZZ-00024F-TN
+	for <qemu-devel@nongnu.org>; Fri, 15 Dec 2017 16:10:54 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 9B5E42E80D8
+	for <qemu-devel@nongnu.org>; Fri, 15 Dec 2017 16:10:53 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH qemu] RFC: vfio-pci: Allow mmap of MSIX BAR
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 15 Dec 2017 15:55:51 -0000
+From: Thomas Huth <1728116@bugs.launchpad.net>
+Reply-To: Bug 1728116 <1728116@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <150912776103.20350.959452179379767829.malonedeb@soybean.canonical.com>
+Message-Id: <151335335150.10605.12005520479816619187.malone@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1728116] Re: Empty /proc/self/auxv (linux-user)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,54 +36,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: Alexey Kardashevskiy <aik@ozlabs.ru>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org
+To: qemu-devel@nongnu.org
 
-On Fri, 15 Dec 2017 15:07:31 +1100
-David Gibson <david@gibson.dropbear.id.au> wrote:
+Fix has been released with QEMU 2.11:
+https://git.qemu.org/?p=3Dqemu.git;a=3Dcommitdiff;h=3Df516511ea84d8bb3395d6e
 
-> On Tue, Dec 12, 2017 at 04:21:31PM +1100, Alexey Kardashevskiy wrote:
-> > This makes use of a new VFIO_REGION_INFO_CAP_MSIX_MAPPABLE capability
-> > which tells that a region with MSIX data can be mapped entirely, i.e.
-> > the VFIO PCI driver won't prevent MSIX vectors area from being mapped.
-> > 
-> > This adds a "msix-no-mmap" property to the vfio-pci device, it is "true"
-> > by default and "false" for pseries-2.12+ machines.
-> > 
-> > This requites kernel's "vfio-pci: Allow mapping MSIX BAR"
-> > https://www.spinics.net/lists/kvm/msg160282.html
-> > 
-> > Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
-> > ---
-> > 
-> > This is an RFC as it requires kernel headers update which is not there yet.
-> > 
-> > I'd like to make it "msix-mmap" (without "no") but could not find a way
-> > of enabling a device property for machine versions newer than some value.
-> > 
-> > I changed 2.11 machine just for the demonstration purpose.  
-> 
-> As Alex says, the mmap()ability of the MSI-X BAR isn't really the
-> point.  The point is whether we need to intercept guest MMIOs to the
-> MSI-X region.  Still, the logic's basically right, just rename your
-> property to, say, "intercept_msix_mmio".  It would be true by default,
-> set to false by the pseries machine type.
-> 
-> I don't think you actually need to make it vary depending on the
-> version of the pseries machine type: whether the BAR is mmap()ed or
-> qemu emulated shouldn't be a guest visible change.  No PAPR guest
-> should have been directly poking the MSI-X region (ever), so we
-> shouldn't need to intercept the region even for old versions.
+** Changed in: qemu
+       Status: In Progress =3D> Fix Released
 
-I have to ask, is the vfio-pci driver really the right point in the VM
-to be understanding whether the platform requires MSI-X MMIO
-emulation?  vfio-pci is only unique here in that enabling that
-emulation harms performance, but AIUI it's unused on any device and
-there may eventually be other devices affected in the same way as
-vfio-pci.  So should there be some post-realize platform code that
-disables MSI-X MemoryRegions or should the MSI-X code call out to some
-platform hook to determine whether to enable emulation?  Seems like a
-case where the impact might be unique to vfio, but the root of the
-problem is not.  Thanks,
+-- =
 
-Alex
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1728116
+
+Title:
+  Empty /proc/self/auxv (linux-user)
+
+Status in QEMU:
+  Fix Released
+
+Bug description:
+  The userspace Linux API virtualization used to fake access to
+  /proc/self/auxv, to provide meaningful data for the guest process.
+
+  For newer qemu versions, this fails: The openat() is intercepted, but
+  there's no content: /proc/self/auxv has length zero (i.e. reading from
+  it returns 0 bytes).
+
+  Good:
+
+  $ x86_64-linux-user/qemu-x86_64 /usr/bin/cat /proc/self/auxv | wc -c
+  256 /proc/self/auxv
+
+  Bad:
+
+  $ x86_64-linux-user/qemu-x86_64 /usr/bin/cat /proc/self/auxv | wc -c
+  0 /proc/self/auxv
+
+  This worked in 2.7.1, and fails in 2.10.1.
+
+  This causes e.g. any procps-ng-based tool to segfault while reading
+  from /proc/self/auxv in an endless loop (probably worth another bug
+  report...)
+
+  Doing a "git bisect" shows that this commit:
+  https://github.com/qemu/qemu/commit/7c4ee5bcc introduced the problem.
+
+  It might be a simple logic (subtraction in the wrong direction?) or
+  sign-ness error: Adding some logging (to v2.10.1)
+
+  diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+  index 9b6364a..49285f9 100644
+  --- a/linux-user/syscall.c
+  +++ b/linux-user/syscall.c
+  @@ -7469,6 +7469,9 @@ static int open_self_auxv(void *cpu_env, int fd)
+       abi_ulong len =3D ts->info->auxv_len;
+       char *ptr;
+   =
+
+  +    gemu_log(TARGET_ABI_FMT_lu"\n", len);
+  +    gemu_log(TARGET_ABI_FMT_ld"\n", len);
+  +
+       /*
+        * Auxiliary vector is stored in target process stack.
+        * read in whole auxv vector and copy it to file
+
+  shows this output:
+
+  $  x86_64-linux-user/qemu-x86_64 /usr/bin/cat /proc/self/auxv | wc -c
+  18446744073709551264
+  -352
+  0
+
+  And 352 could be the expected length.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1728116/+subscriptions
