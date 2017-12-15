@@ -1,30 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47899)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50437)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kevin@koconnor.net>) id 1ePhpL-0006CH-TD
-	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 23:42:28 -0500
+	(envelope-from <aik@ozlabs.ru>) id 1ePhuY-0007YT-FD
+	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 23:47:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kevin@koconnor.net>) id 1ePhpG-0000SE-W2
-	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 23:42:27 -0500
-Received: from mail-qk0-x22e.google.com ([2607:f8b0:400d:c09::22e]:41394)
+	(envelope-from <aik@ozlabs.ru>) id 1ePhuU-0006oW-8E
+	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 23:47:50 -0500
+Received: from mail-it0-x241.google.com ([2607:f8b0:4001:c0b::241]:37506)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <kevin@koconnor.net>) id 1ePhpG-0000RU-Ns
-	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 23:42:22 -0500
-Received: by mail-qk0-x22e.google.com with SMTP id r184so1311788qke.8
-	for <qemu-devel@nongnu.org>; Thu, 14 Dec 2017 20:42:22 -0800 (PST)
-Date: Thu, 14 Dec 2017 23:42:19 -0500
-From: Kevin O'Connor <kevin@koconnor.net>
-Message-ID: <20171215044219.GA16571@morn.lan>
-References: <20171213195852.30439-1-f4bug@amsat.org>
-	<20171213195852.30439-7-f4bug@amsat.org>
-	<CAKmqyKOSn_iVVuqF=By8g2wFYG_PeiisepJhYMrK7imETGeE7A@mail.gmail.com>
-	<CAAdtpL7npoa8Qs5hARn_da39Ctf5eLZ28CMmV=prh63AxCOvYg@mail.gmail.com>
+	(Exim 4.71) (envelope-from <aik@ozlabs.ru>) id 1ePhuU-0006o1-29
+	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 23:47:46 -0500
+Received: by mail-it0-x241.google.com with SMTP id d137so16164237itc.2
+	for <qemu-devel@nongnu.org>; Thu, 14 Dec 2017 20:47:45 -0800 (PST)
+Received: from [10.61.2.175] ([122.99.82.10])
+	by smtp.googlemail.com with ESMTPSA id
+	l12sm2953543iog.69.2017.12.14.20.47.43 for <qemu-devel@nongnu.org>
+	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+	Thu, 14 Dec 2017 20:47:44 -0800 (PST)
+References: <20171026014139.46221-1-aik@ozlabs.ru>
+From: Alexey Kardashevskiy <aik@ozlabs.ru>
+Message-ID: <82b6cfcf-70ae-2817-8eb8-fe630d3bec95@ozlabs.ru>
+Date: Fri, 15 Dec 2017 15:47:40 +1100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAAdtpL7npoa8Qs5hARn_da39Ctf5eLZ28CMmV=prh63AxCOvYg@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PATCH 06/14] sdhci: refactor same sysbus/pci
- properties into a common one
+In-Reply-To: <20171026014139.46221-1-aik@ozlabs.ru>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-AU
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH qemu v2] machine: Polish -machine xxx,help
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,39 +34,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
-Cc: Alistair Francis <alistair.francis@xilinx.com>, Paolo Bonzini <pbonzini@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, Prasad J Pandit <pjp@fedoraproject.org>, Peter Maydell <peter.maydell@linaro.org>, Andrew Baumann <Andrew.Baumann@microsoft.com>, Andrey Smirnov <andrew.smirnov@gmail.com>, Andrey Yurovsky <yurovsky@gmail.com>, Sai Pavan Boddu <saipava@xilinx.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, "open list:Block layer core" <qemu-block@nongnu.org>
+To: qemu-devel@nongnu.org
 
-On Thu, Dec 14, 2017 at 03:40:17PM -0300, Philippe Mathieu-Daudé wrote:
-> >>  /* Capabilities registers provide information on supported features of this
-> >>   * specific host controller implementation */
-> >> -static Property sdhci_pci_properties[] = {
-> >> +static Property sdhci_properties[] = {
-> >>      DEFINE_PROP_UINT32("capareg", SDHCIState, capareg,
-> >>              SDHC_CAPAB_REG_DEFAULT),
-> >>      DEFINE_PROP_UINT32("maxcurr", SDHCIState, maxcurr, 0),
-> >> +    DEFINE_PROP_BOOL("pending-insert-quirk", SDHCIState, pending_insert_quirk,
-> >> +                     false),
-> >
-> > I like the reduction of code in this patch, but aren't we now going to
-> > have device properties that aren't actually connected to anything?
+On 26/10/17 12:41, Alexey Kardashevskiy wrote:
+> The "-machine xxx,help" prints kernel-irqchip possible values as
+> "OnOffSplit", this adds separators to the printed line.
 > 
-> I'm not sure I understand, ar you worried about the PCI_SDHCI will now
-> have this property but not use it?
+> Also, since only lower case letters are specified in qapi/common.json,
+> this changes the letter cases too.
 > 
-> I couldn't find any machine using SDHCI via PCI and was tempted to
-> just remove this code,
+> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
 
-I'm not sure if you are suggesting the removal of PCI SDHCI support or
-removal of some of the properties.
+ping?
 
-I do find qemu's PCI SDHCI support useful for testing.  SeaBIOS can
-launch an OS from PCI SDHCI (qemu-system-x86_64 -device sdhci-pci
--device sd-card,drive=drive0 -drive id=drive0,if=none,file=dos-drivec)
-and linux has drivers for it as well.  A number of the Chromebooks
-ship with PCI SDHCI devices on them, so it's not an unheard of
-configuration.
 
-I've never manually set any of the PCI properites, however.
+> ---
+> 
+> aik@fstn1-p1:~$ ./qemu-system-ppc64 -machine pseries,help 2>&1 | grep kernel-irqchip
+> 
+> Was:
+> pseries-2.11.kernel-irqchip=OnOffSplit (Configure KVM in-kernel irqchip)
+> 
+> Now:
+> pseries-2.11.kernel-irqchip=on|off|split (Configure KVM in-kernel irqchip)
+> ---
+>  hw/core/machine.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/hw/core/machine.c b/hw/core/machine.c
+> index 36c2fb069c..bd3db14e12 100644
+> --- a/hw/core/machine.c
+> +++ b/hw/core/machine.c
+> @@ -506,7 +506,7 @@ static void machine_class_init(ObjectClass *oc, void *data)
+>      object_class_property_set_description(oc, "accel",
+>          "Accelerator list", &error_abort);
+>  
+> -    object_class_property_add(oc, "kernel-irqchip", "OnOffSplit",
+> +    object_class_property_add(oc, "kernel-irqchip", "on|off|split",
+>          NULL, machine_set_kernel_irqchip,
+>          NULL, NULL, &error_abort);
+>      object_class_property_set_description(oc, "kernel-irqchip",
+> 
 
--Kevin
+
+-- 
+Alexey
