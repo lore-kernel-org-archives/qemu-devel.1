@@ -1,24 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60840)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33762)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1ePn7j-0004lJ-QB
-	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 05:21:48 -0500
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1ePn9T-0006UM-7L
+	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 05:23:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1ePn7h-00048C-NH
-	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 05:21:47 -0500
-Date: Fri, 15 Dec 2017 11:21:38 +0100
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20171215112138.6040ee82.cohuck@redhat.com>
-In-Reply-To: <CAFEAcA_VaKua1qjyeX2Ve=JrSUJQbBqMQOJQZ7e3y92+gtxkMA@mail.gmail.com>
-References: <20171214171004.25058-1-cohuck@redhat.com>
-	<CAFEAcA8tY9=jtsw-MtjWTceLizvpH8oui_+6xf7V6K5o5BLf-A@mail.gmail.com>
-	<cf44ca76-d581-8d96-3e2b-78c698dda446@de.ibm.com>
-	<20171215101135.447d9316.cohuck@redhat.com>
-	<CAFEAcA_VaKua1qjyeX2Ve=JrSUJQbBqMQOJQZ7e3y92+gtxkMA@mail.gmail.com>
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1ePn9Q-0005vf-1C
+	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 05:23:35 -0500
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20171215033015.738-1-f4bug@amsat.org>
+	<20171215033015.738-5-f4bug@amsat.org>
+	<800d15c5-fe10-56af-083c-501291d245ad@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <9db63210-0e85-5463-e420-34327f24e1d3@amsat.org>
+Date: Fri, 15 Dec 2017 07:23:17 -0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [qemu-s390x] [PULL 00/46] First batch of s390x
- patches for 2.12
+In-Reply-To: <800d15c5-fe10-56af-083c-501291d245ad@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v4 04/43] MAINTAINERS: add an entry for the
+ i82378 (superio)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,50 +30,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Christian Borntraeger <borntraeger@de.ibm.com>, Thomas Huth <thuth@redhat.com>, David Hildenbrand <david@redhat.com>, Alexander Graf <agraf@suse.de>, QEMU Developers <qemu-devel@nongnu.org>, qemu-s390x@nongnu.org, Richard Henderson <rth@twiddle.net>
+To: Thomas Huth <thuth@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Michael Tokarev <mjt@tls.msk.ru>
+Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, qemu-trivial@nongnu.org
 
-On Fri, 15 Dec 2017 09:51:32 +0000
-Peter Maydell <peter.maydell@linaro.org> wrote:
-
-> On 15 December 2017 at 09:11, Cornelia Huck <cohuck@redhat.com> wrote:
-> > On Fri, 15 Dec 2017 09:35:10 +0100
-> > Christian Borntraeger <borntraeger@de.ibm.com> wrote:
-> >  
-> >> On 12/14/2017 08:05 PM, Peter Maydell wrote:  
-> >> > (ram_addr_t can be a 32-bit type).  
-> >
-> > This a 32 bit host, isn't it? I don't have regular access to one...  
+On 12/15/2017 07:17 AM, Thomas Huth wrote:
+> On 15.12.2017 04:29, Philippe Mathieu-Daudé wrote:
+>> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+>> Reviewed-by: Hervé Poussineau <hpoussin@reactos.org>
+>> Reviewed-by: Hervé Poussineau <hpoussin@reactos.org>
 > 
-> Yes. Win32 cross compiler also gives this error.
+> Remove the doubled Reviewed-by, or replace the second line with:
+> 
+> Reviewed-by: Thomas Huth <thuth@redhat.com>
 
-Hm, my mingw build on Fedora did not catch this. Setting up a 32bit vm.
+Haha ok, thanks :)
+
+I applied this series from a patchwork bundle and didn't notice it would
+keep enqueueing R-b from the same reviewer.
 
 > 
-> >>
-> >> gcc seems to be extra clever, even a cast does not work.
-> >> Something like this seems to work.
-> >>
-> >> diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
-> >> index 80e753a5ef..9abb8de9f9 100644
-> >> --- a/hw/s390x/s390-virtio-ccw.c
-> >> +++ b/hw/s390x/s390-virtio-ccw.c
-> >> @@ -172,9 +172,10 @@ static void s390_memory_init(ram_addr_t mem_size)
-> >>      name = g_strdup_printf("s390.ram");
-> >>      while (mem_size) {
-> >>          MemoryRegion *ram = g_new(MemoryRegion, 1);
-> >> +       unsigned long long size = mem_size;
-> >>
-> >>          /* KVM does not allow memslots >= 8 TB */
-> >> -        chunk = MIN(mem_size, KVM_SLOT_MAX_BYTES);
-> >> +        chunk = MIN(size, KVM_SLOT_MAX_BYTES);
-> >>          memory_region_allocate_system_memory(ram, NULL, name, chunk);
-> >>          memory_region_add_subregion(sysmem, offset, ram);
-> >>          mem_size -= chunk;
-> >>  
-> >
-> > Will see how I can test this and then merge it.  
-> 
-> I would suggest uint64_t rather than unsigned long long.
-
-Will try how that works.
+>> ---
+>>  MAINTAINERS | 1 +
+>>  1 file changed, 1 insertion(+)
+>>
+>> diff --git a/MAINTAINERS b/MAINTAINERS
+>> index 31c673d60a..4618f9b4db 100644
+>> --- a/MAINTAINERS
+>> +++ b/MAINTAINERS
+>> @@ -732,6 +732,7 @@ F: hw/ppc/prep.c
+>>  F: hw/ppc/prep_systemio.c
+>>  F: hw/ppc/rs6000_mc.c
+>>  F: hw/pci-host/prep.[hc]
+>> +F: hw/isa/i82378.c
+>>  F: hw/isa/pc87312.[hc]
+>>  F: hw/dma/i82374.c
+>>  F: pc-bios/ppc_rom.bin
