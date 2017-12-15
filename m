@@ -1,34 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39037)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40447)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1ePseO-0000t2-KI
-	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 11:15:58 -0500
+	(envelope-from <bounces@canonical.com>) id 1ePsi1-0003ez-2z
+	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 11:19:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1ePseL-00036U-SN
-	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 11:15:52 -0500
-Received: from indium.canonical.com ([91.189.90.7]:53334)
+	(envelope-from <bounces@canonical.com>) id 1ePshz-0008R7-PR
+	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 11:19:37 -0500
+Received: from indium.canonical.com ([91.189.90.7]:53756)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1ePseL-00035j-J6
-	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 11:15:49 -0500
+	id 1ePshz-0008Q3-IL
+	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 11:19:35 -0500
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1ePseI-0003la-Uc
-	for <qemu-devel@nongnu.org>; Fri, 15 Dec 2017 16:15:47 +0000
+	id 1ePshy-0004j8-Kj
+	for <qemu-devel@nongnu.org>; Fri, 15 Dec 2017 16:19:34 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id B1F192E80DC
-	for <qemu-devel@nongnu.org>; Fri, 15 Dec 2017 16:15:46 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 99A902E80D1
+	for <qemu-devel@nongnu.org>; Fri, 15 Dec 2017 16:19:34 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Fri, 15 Dec 2017 16:09:00 -0000
-From: Thomas Huth <1699277@bugs.launchpad.net>
-Reply-To: Bug 1699277 <1699277@bugs.launchpad.net>
+Date: Fri, 15 Dec 2017 16:07:57 -0000
+From: Thomas Huth <1180924@bugs.launchpad.net>
+Reply-To: Bug 1180924 <1180924@bugs.launchpad.net>
 Sender: bounces@canonical.com
-References: <149797819499.4157.2941448503406579843.malonedeb@gac.canonical.com>
-Message-Id: <151335414119.17294.16896840073747438607.launchpad@soybean.canonical.com>
+References: <20130516173517.573.9514.malonedeb@soybean.canonical.com>
+Message-Id: <151335407789.16825.2822385184415176207.launchpad@soybean.canonical.com>
 Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1699277] Re: qemu-system-s390x: asserts while
- booting Debian Stretch installer
+Subject: [Qemu-devel] [Bug 1180924] Re: fails to handle a usb serial port
+ with a specific vendorid
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -46,159 +46,42 @@ To: qemu-devel@nongnu.org
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1699277
+https://bugs.launchpad.net/bugs/1180924
 
 Title:
-  qemu-system-s390x: asserts while booting Debian Stretch installer
+  fails to handle a usb serial port with a specific vendorid
 
 Status in QEMU:
   Fix Released
 
 Bug description:
-  QEMU 2.9.0 (Arch Linux) asserts when I try to install Debian Stretch.
+  If I run qemu-system-i386 with arguments
+  -usb -usbdevice serial:vendorid=3D1221:pty
+  (this is what the documentation says about how I shoud add a usb device w=
+hich has a serial port interface and which has a specific vendor id, I used=
+ the documentation located here:
+  http://qemu.weilnetz.de/qemu-doc.html
+  ), it says =
 
-  Steps to reproduce:
+  char device redirected to /dev/pts/<something> (label usbserial0)
+  qemu-system-i386: -usbdevice serial:vendorid=3D1221:pty: Property '.vendo=
+rid' not found
+  Aborted
+  and exits. Moreover, if I try to add such a device to a running machine b=
+y typing usb_add serial:vendorid=3D1221:pty in the machine's control termin=
+al (to reach it, I press ctrl-alt-2), qemu also writes =
 
-  wget http://ftp.debian.org/debian/dists/stretch/main/installer-s390x/curr=
-ent/images/generic/initrd.debian
-  wget http://ftp.debian.org/debian/dists/stretch/main/installer-s390x/curr=
-ent/images/generic/kernel.debian
-  qemu-img create -f qcow2 hda.qcow2 80G
-  qemu-system-s390x -kernel kernel.debian -initrd initrd.debian -nographic =
--drive file=3Dhda.qcow2
-
-  Output:
-
-  [    0.051915] Linux version 4.9.0-3-s390x (debian-kernel@lists.debian.or=
-g) (gcc version 6.3.0 20170516 (Debian 6.3.0-18) ) #1 SMP Debian 4.9.30-2 (=
-2017-06-12)
-  [    0.053000] setup: Linux is running under KVM in 64-bit mode
-  [    0.053780] setup: Max memory size: 128MB
-  [    0.067239] Write protected kernel read-only data: 8848k
-  [    0.082461] Zone ranges:
-  [    0.083717]   DMA      [mem 0x0000000000000000-0x000000007fffffff]
-  [    0.084163]   Normal   empty
-  [    0.084185] Movable zone start for each node
-  [    0.084223] Early memory node ranges
-  [    0.084306]   node   0: [mem 0x0000000000000000-0x0000000007ffffff]
-  [    0.084468] Initmem setup node 0 [mem 0x0000000000000000-0x0000000007f=
-fffff]
-  [    0.087697] percpu: Embedded 19 pages/cpu @0000000007f87000 s40704 r81=
-92 d28928 u77824
-  [    0.088991] Built 1 zonelists in Zone order, mobility grouping on.  To=
-tal pages: 32256
-  [    0.089108] Kernel command line: =
-
-  [    0.096684] PID hash table entries: 512 (order: 0, 4096 bytes)
-  [    0.096853] Dentry cache hash table entries: 16384 (order: 5, 131072 b=
-ytes)
-  [    0.097041] Inode-cache hash table entries: 8192 (order: 4, 65536 byte=
-s)
-  [    0.102453] Memory: 105164K/131072K available (6060K kernel code, 802K=
- rwdata, 2784K rodata, 508K init, 648K bss, 25908K reserved, 0K cma-reserve=
-d)
-  [    0.109112] Hierarchical RCU implementation.
-  [    0.109134] 	Build-time adjustment of leaf fanout to 64.
-  [    0.109155] 	RCU restricting CPUs from NR_CPUS=3D256 to nr_cpu_ids=3D2.
-  [    0.109194] RCU: Adjusting geometry for rcu_fanout_leaf=3D64, nr_cpu_i=
-ds=3D2
-  [    0.122047] NR_IRQS:3 nr_irqs:3 3
-  [    0.124317] clocksource: tod: mask: 0xffffffffffffffff max_cycles: 0x3=
-b0a9be803b0a9, max_idle_ns: 1805497147909793 ns
-  [    0.138366] console [ttyS1] enabled
-  [    0.139126] pid_max: default: 32768 minimum: 301
-  [    0.143164] Security Framework initialized
-  [    0.143215] Yama: disabled by default; enable with sysctl kernel.yama.*
-  [    0.143955] AppArmor: AppArmor disabled by boot time parameter
-  [    0.144489] Mount-cache hash table entries: 512 (order: 0, 4096 bytes)
-  [    0.144538] Mountpoint-cache hash table entries: 512 (order: 0, 4096 b=
-ytes)
-  [    0.156937] ftrace: allocating 19165 entries in 75 pages
-  [    0.408921] cpu: 1 configured CPUs, 0 standby CPUs
-  [    0.433942] Brought up 1 CPUs
-  [    0.451811] devtmpfs: initialized
-  [    0.467021] clocksource: jiffies: mask: 0xffffffff max_cycles: 0xfffff=
-fff, max_idle_ns: 7645041785100000 ns
-  [    0.467549] futex hash table entries: 512 (order: 5, 131072 bytes)
-  [    0.476626] NET: Registered protocol family 16
-  [    0.482575] The s390-virtio transport is deprecated. Please switch to =
-a modern host providing virtio-ccw.
-  [    0.693017] VFS: Disk quotas dquot_6.6.0
-  [    0.693296] VFS: Dquot-cache hash table entries: 512 (order 0, 4096 by=
-tes)
-  [    0.695029] hugetlbfs: disabling because there are no supported hugepa=
-ge sizes
-  [    0.703040] NET: Registered protocol family 2
-  [    0.709803] TCP established hash table entries: 1024 (order: 1, 8192 b=
-ytes)
-  [    0.710003] TCP bind hash table entries: 1024 (order: 2, 16384 bytes)
-  [    0.710134] TCP: Hash tables configured (established 1024 bind 1024)
-  [    0.710879] UDP hash table entries: 256 (order: 1, 8192 bytes)
-  [    0.711005] UDP-Lite hash table entries: 256 (order: 1, 8192 bytes)
-  [    0.712409] NET: Registered protocol family 1
-  [    0.717432] Unpacking initramfs...
-  [    1.308935] random: fast init done
-  [    1.597369] Freeing initrd memory: 10152K (0000000000f90000 - 00000000=
-0197a000)
-  [    1.600200] hypfs: The hardware system does not support hypfs
-  [    1.601718] hypfs: Initialization of hypfs failed with rc=3D-61
-  [    1.605317] audit: initializing netlink subsys (disabled)
-  [    1.606211] audit: type=3D2000 audit(1497977949.601:1): initialized
-  [    1.611137] workingset: timestamp_bits=3D46 max_order=3D15 bucket_orde=
-r=3D0
-  [    1.612066] zbud: loaded
-  [    1.642108] Block layer SCSI generic (bsg) driver version 0.4 loaded (=
-major 252)
-  [    1.643111] io scheduler noop registered
-  [    1.643160] io scheduler deadline registered
-  [    1.643383] io scheduler cfq registered (default)
-  [    1.644143] pci_hotplug: PCI Hot Plug PCI Core version: 0.5
-  [    1.644221] pciehp: PCI Express Hot Plug Controller Driver version: 0.4
-  [    1.645626] hvc_iucv: The z/VM IUCV HVC device driver cannot be used w=
-ithout z/VM
-  [    1.647547] mousedev: PS/2 mouse device common for all mice
-  [    1.649359] ledtrig-cpu: registered to indicate activity on CPUs
-  [    1.649884] cio: Channel measurement facility initialized using format=
- extended (mode autodetected)
-  [    1.657228] NET: Registered protocol family 10
-  [    1.663924] mip6: Mobile IPv6
-  [    1.664068] NET: Registered protocol family 17
-  [    1.664195] mpls_gso: MPLS GSO support
-  [    1.667936] registered taskstats version 1
-  [    1.669547] zswap: loaded using pool lzo/zbud
-  [    1.674474] ima: No TPM chip found, activating TPM-bypass!
-  [    1.739953] Freeing unused kernel memory: 508K (0000000000a6f000 - 000=
-0000000aee000)
-  [    1.740381] Write protected read-only-after-init data: 4k
-  **
-  ERROR:/build/qemu/src/qemu-2.9.0/translate-common.c:34:tcg_handle_interru=
-pt: assertion failed: (qemu_mutex_iothread_locked())
-  [1]    13880 abort (core dumped)  qemu-system-s390x -kernel kernel.debian=
- -initrd initrd.debian -nographic =
-
-
-  Trace:
-  #0  0x00007ffff10fb670 in raise () at /usr/lib/libc.so.6
-  #1  0x00007ffff10fcd00 in abort () at /usr/lib/libc.so.6
-  #2  0x00007ffff35dfc9d in g_assertion_message () at /usr/lib/libglib-2.0.=
-so.0
-  #3  0x00007ffff35dfd2a in g_assertion_message_expr () at /usr/lib/libglib=
--2.0.so.0
-  #4  0x00005555556abb84 in  ()
-  #5  0x000055555572ab73 in css_adapter_interrupt ()
-  #6  0x000055555571be68 in virtio_notify ()
-  #7  0x00005555556f84ce in  ()
-  #8  0x00005555556f9afd in  ()
-  #9  0x00005555556fa78f in virtio_blk_handle_vq ()
-  #10 0x000055555571b7f1 in virtio_queue_notify ()
-  #11 0x000055555572ceb7 in  ()
-  #12 0x0000555555726f86 in s390_virtio_hypercall ()
-  #13 0x0000555555752c85 in helper_diag ()
-  #14 0x00007fffe46664bf in code_gen_buffer ()
-  #15 0x00005555556ab2f5 in cpu_exec ()
-  #16 0x00005555556ce08d in  ()
-  #17 0x00007ffff1474297 in start_thread () at /usr/lib/libpthread.so.0
-  #18 0x00007ffff11b525f in clone () at /usr/lib/libc.so.6
+  char device redirected to /dev/pts/<something> (label usbserial0)
+  Aborted
+  to the terminal where I run it from and exits. To the quest OS this looks=
+ like a power failure which causes all the programs inside the virtual mach=
+ine to lose their unsaved data.
+  I have tested this with qemu-1.5.0-rc2, actually, the issue occured in a =
+similar way since 1.0.1, but did not occur in 0.11.1.
+  The issue is reproducible always, even if I don't specify any hard disk i=
+n the command line, i. e.
+  $ qemu-system-i386 -usb -usbdevice serial:vendorid=3D1221:pty
+  , so I believe it is guest OS -independent.
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1699277/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1180924/+subscriptions
