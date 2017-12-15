@@ -1,34 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46619)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46658)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1ePswO-0000NP-Tg
-	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 11:34:34 -0500
+	(envelope-from <bounces@canonical.com>) id 1ePswT-0000U9-Oc
+	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 11:34:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1ePswN-0003vg-U0
-	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 11:34:28 -0500
-Received: from indium.canonical.com ([91.189.90.7]:35088)
+	(envelope-from <bounces@canonical.com>) id 1ePswN-0003vQ-Ph
+	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 11:34:33 -0500
+Received: from indium.canonical.com ([91.189.90.7]:35070)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1ePswN-0003uR-Nv
+	id 1ePswN-0003uH-JZ
 	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 11:34:27 -0500
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1ePswL-0007y6-RI
-	for <qemu-devel@nongnu.org>; Fri, 15 Dec 2017 16:34:26 +0000
+	id 1ePswL-0007xf-JQ
+	for <qemu-devel@nongnu.org>; Fri, 15 Dec 2017 16:34:25 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 928452E80DC
+	by loganberry.canonical.com (Postfix) with ESMTP id 56DF82E80D0
 	for <qemu-devel@nongnu.org>; Fri, 15 Dec 2017 16:34:25 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Fri, 15 Dec 2017 16:24:17 -0000
-From: Thomas Huth <855630@bugs.launchpad.net>
-Reply-To: Bug 855630 <855630@bugs.launchpad.net>
+Date: Fri, 15 Dec 2017 16:25:03 -0000
+From: Thomas Huth <1128935@bugs.launchpad.net>
+Reply-To: Bug 1128935 <1128935@bugs.launchpad.net>
 Sender: bounces@canonical.com
-References: <20110921150616.12335.44343.malonedeb@gac.canonical.com>
-Message-Id: <151335505735.18606.11136160777586532876.malone@chaenomeles.canonical.com>
+References: <20130218102749.9311.80891.malonedeb@gac.canonical.com>
+Message-Id: <151335510308.17901.12337069103621900487.malone@chaenomeles.canonical.com>
 Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 855630] Re: Cant Run Wine (posix not nptl) past
- 0.14.1
+Subject: [Qemu-devel] [Bug 1128935] Re: MIPS r4k "TLB modified exception"
+ generated for TLB entries that are not visible to the TLBP instruction
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,12 +39,8 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Triaging old bug tickets... The problem with the SDL static linking has lik=
-ely been fixed here:
-https://git.qemu.org/?p=3Dqemu.git;a=3Dcommitdiff;h=3D5f37e6d4a7b22ccf1bb8f=
-a4
-Can you still reproduce the other issue with the latest version of QEMU? Or=
- could we close this ticket nowadays?
+Triaging old bug tickets... can you still reproduce this issue with the
+latest version of QEMU? Or could we close this ticket nowadays?
 
 ** Changed in: qemu
        Status: New =3D> Incomplete
@@ -53,20 +49,54 @@ Can you still reproduce the other issue with the latest version of QEMU? Or=
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/855630
+https://bugs.launchpad.net/bugs/1128935
 
 Title:
-  Cant Run Wine (posix not nptl) past 0.14.1
+  MIPS r4k "TLB modified exception" generated for TLB entries that are
+  not visible to the TLBP instruction
 
+Status in HelenOS branches:
+  New
 Status in QEMU:
   Incomplete
 
 Bug description:
-  when trying to build qemu I can build with ./configure --static
-  --target-list=3Di386-linux-user just fine with 0.14.1
+  I occasionally see that the TLBP instruction fails to find the
+  corresponding TLB entry in the TLB Modified exception handler.  This
+  behavior is unexpected, because the invocation of the TLB Modified
+  exception suggests there indeed is such an entry in the TLB and only
+  requires its dirty bit to be set.
 
-  But when I try to go on 0.15.0 or higher (tested on 0.15.0). About to
-  test on 0.15.5 from git
+  The operating system which can trigger and is susceptible to this
+  behavior is a HelenOS branch located in lp:~jakub/helenos/mips-malta.
+  The QEMU version on which this is reproducible is QEMU 1.4.0 and also
+  some others.
+
+  When I looked into the QEMU sources, I noticed the following
+  discrepancy, which could potentially explain the behavior:
+
+    65  /* MIPS32/MIPS64 R4000-style MMU emulation */
+    66 int r4k_map_address (CPUMIPSState *env, hwaddr *physical, int *prot,
+    67                      target_ulong address, int rw, int access_type)
+    68 {
+    <snip>
+    72     for (i =3D 0; i < env->tlb->tlb_in_use; i++) {
+
+  1865 void r4k_helper_tlbp(CPUMIPSState *env)
+  1866 {
+   <snip>
+  1875     for (i =3D 0; i < env->tlb->nb_tlb; i++) {
+
+  From the above it appears as if the the code which searches the TLB
+  for a matching entry searched also the QEMU-specific "shadow" TLB
+  entries, which is, however, not in line with how the TLBP instruction
+  searches the TLB. So if a matching entry is found on index >=3D
+  tlb_in_use, the HelenOS exception handler using TLBP to locate the
+  entry would hit an assertion on seeing the Index register bit P set.
+
+  I also suspect there is a similar issue with the TLB Invalid
+  exception, but thanks to the specifics of the MIPS 4Kc CPU, HelenOS is
+  not susceptible in this case.
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/855630/+subscriptions
+https://bugs.launchpad.net/helenos/+bug/1128935/+subscriptions
