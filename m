@@ -1,28 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46363)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46965)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <willy@infradead.org>) id 1ePv3D-0003c1-EJ
-	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 13:49:40 -0500
+	(envelope-from <andrew.smirnov@gmail.com>) id 1ePv50-0004wq-HV
+	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 13:51:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <willy@infradead.org>) id 1ePv3A-0002HB-81
-	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 13:49:39 -0500
-Received: from bombadil.infradead.org ([65.50.211.133]:49796)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <willy@infradead.org>) id 1ePv37-0002DM-P3
-	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 13:49:36 -0500
-Date: Fri, 15 Dec 2017 10:49:15 -0800
-From: Matthew Wilcox <willy@infradead.org>
-Message-ID: <20171215184915.GB27160@bombadil.infradead.org>
-References: <5A311C5E.7000304@intel.com>
-	<201712132316.EJJ57332.MFOSJHOFFVLtQO@I-love.SAKURA.ne.jp>
-	<5A31F445.6070504@intel.com>
-	<201712150129.BFC35949.FFtFOLSOJOQHVM@I-love.SAKURA.ne.jp>
-	<20171214181219.GA26124@bombadil.infradead.org>
-	<201712160121.BEJ26052.HOFFOOQFMLtSVJ@I-love.SAKURA.ne.jp>
+	(envelope-from <andrew.smirnov@gmail.com>) id 1ePv4y-0004Bg-OR
+	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 13:51:30 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <201712160121.BEJ26052.HOFFOOQFMLtSVJ@I-love.SAKURA.ne.jp>
-Subject: Re: [Qemu-devel] [PATCH v19 3/7] xbitmap: add more operations
+In-Reply-To: <c0810d46-60df-2239-fab6-6c1c11f1c274@amsat.org>
+References: <20171214145255.31545-1-andrew.smirnov@gmail.com>
+	<20171214145255.31545-13-andrew.smirnov@gmail.com>
+	<c0810d46-60df-2239-fab6-6c1c11f1c274@amsat.org>
+From: Andrey Smirnov <andrew.smirnov@gmail.com>
+Date: Fri, 15 Dec 2017 10:51:21 -0800
+Message-ID: <CAHQ1cqFAzRSXGsLJOiqiyBHDAwNBuLkFNLocydWii7QEdkdP7Q@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 12/15] sdhci: Add i.MX specific subtype
+ of SDHCI
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,70 +25,381 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
-Cc: wei.w.wang@intel.com, virtio-dev@lists.oasis-open.org, linux-kernel@vger.kernel.org, qemu-devel@nongnu.org, virtualization@lists.linux-foundation.org, kvm@vger.kernel.org, linux-mm@kvack.org, mst@redhat.com, mhocko@kernel.org, akpm@linux-foundation.org, mawilcox@microsoft.com, david@redhat.com, cornelia.huck@de.ibm.com, mgorman@techsingularity.net, aarcange@redhat.com, amit.shah@redhat.com, pbonzini@redhat.com, liliang.opensource@gmail.com, yang.zhang.wz@gmail.com, quan.xu@aliyun.com, nilal@redhat.com, riel@redhat.com
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Cc: "open list:ARM" <qemu-arm@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, Jason Wang <jasowang@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Andrey Yurovsky <yurovsky@gmail.com>
 
-On Sat, Dec 16, 2017 at 01:21:52AM +0900, Tetsuo Handa wrote:
-> My understanding is that virtio-balloon wants to handle sparsely spreaded
-> unsigned long values (which is PATCH 4/7) and wants to find all chunks of
-> consecutive "1" bits efficiently. Therefore, I guess that holding the values
-> in ascending order at store time is faster than sorting the values at read
-> time. I don't know how to use radix tree API, but I think that B+ tree API
-> suits for holding the values in ascending order.
-> 
-> We wait for Wei to post radix tree version combined into one patch and then
-> compare performance between radix tree version and B+ tree version (shown
-> below)?
+On Thu, Dec 14, 2017 at 6:31 PM, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.o=
+rg> wrote:
+> Hi Andrey, Peter.
+>
+> I rather disagree with this patch, however I applied it on top of my
+> current tree and plan to refactor it. But if it is applied before, I can
+> survive :) Not a strong NACK.
+>
 
-Sure.  We all benefit from some friendly competition.  Even if a
-competition between trees might remind one of the Entmoot ;-)
+Umm, Philippe, I didn't really ask you to refactor my code and I'd
+really appreciate if you'd engage into a proper review process with me
+on this patch, instead of just telling me "I don't like the code, but,
+worry not, I'll bulldoze it away later anyway".
 
-But let's not hold back -- let's figure out some good workloads to use
-in our competition.  And we should also decide on the API / locking
-constraints.  And of course we should compete based on not just speed,
-but also memory consumption (both as a runtime overhead for a given set
-of bits and as code size).  If you can replace the IDR, you get to count
-that savings against the cost of your implementation.
 
-Here's the API I'm looking at right now.  The user need take no lock;
-the locking (spinlock) is handled internally to the implementation.
+> See comment inlined.
+>
+> On 12/14/2017 11:52 AM, Andrey Smirnov wrote:
+>> IP block found on several generations of i.MX family does not use
+>> vanilla SDHCI implementation and it comes with a number of quirks.
+>>
+>> Introduce i.MX SDHCI subtype of SDHCI block to add code necessary to
+>> support unmodified Linux guest driver.
+>>
+>> Cc: Peter Maydell <peter.maydell@linaro.org>
+>> Cc: Jason Wang <jasowang@redhat.com>
+>> Cc: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+>> Cc: qemu-devel@nongnu.org
+>> Cc: qemu-arm@nongnu.org
+>> Cc: yurovsky@gmail.com
+>> Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+>> Signed-off-by: Andrey Smirnov <andrew.smirnov@gmail.com>
+>> ---
+>>  hw/sd/sdhci-internal.h |  19 +++++
+>>  hw/sd/sdhci.c          | 228 ++++++++++++++++++++++++++++++++++++++++++=
+++++++-
+>>  include/hw/sd/sdhci.h  |  14 +++
+>>  3 files changed, 259 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/hw/sd/sdhci-internal.h b/hw/sd/sdhci-internal.h
+>> index 161177cf39..b86ac0791b 100644
+>> --- a/hw/sd/sdhci-internal.h
+>> +++ b/hw/sd/sdhci-internal.h
+>> @@ -85,12 +85,18 @@
+>>
+>>  /* R/W Host control Register 0x0 */
+>>  #define SDHC_HOSTCTL                   0x28
+>> +#define SDHC_CTRL_LED                  0x01
+>>  #define SDHC_CTRL_DMA_CHECK_MASK       0x18
+>>  #define SDHC_CTRL_SDMA                 0x00
+>>  #define SDHC_CTRL_ADMA1_32             0x08
+>>  #define SDHC_CTRL_ADMA2_32             0x10
+>>  #define SDHC_CTRL_ADMA2_64             0x18
+>>  #define SDHC_DMA_TYPE(x)               ((x) & SDHC_CTRL_DMA_CHECK_MASK)
+>> +#define SDHC_CTRL_4BITBUS              0x02
+>> +#define SDHC_CTRL_8BITBUS              0x20
+>> +#define SDHC_CTRL_CDTEST_INS           0x40
+>> +#define SDHC_CTRL_CDTEST_EN            0x80
+>> +
+>>
+>>  /* R/W Power Control Register 0x0 */
+>>  #define SDHC_PWRCON                    0x29
+>> @@ -229,4 +235,17 @@ enum {
+>>
+>>  extern const VMStateDescription sdhci_vmstate;
+>>
+>> +
+>> +#define ESDHC_MIX_CTRL                  0x48
+>> +#define ESDHC_VENDOR_SPEC               0xc0
+>> +#define ESDHC_DLL_CTRL                  0x60
+>> +
+>> +#define ESDHC_TUNING_CTRL               0xcc
+>> +#define ESDHC_TUNE_CTRL_STATUS          0x68
+>> +#define ESDHC_WTMK_LVL                  0x44
+>> +
+>> +#define ESDHC_CTRL_4BITBUS              (0x1 << 1)
+>> +#define ESDHC_CTRL_8BITBUS              (0x2 << 1)
+>> +
+>> +
+>>  #endif
+>> diff --git a/hw/sd/sdhci.c b/hw/sd/sdhci.c
+>> index 6d6a791ee9..758af067f9 100644
+>> --- a/hw/sd/sdhci.c
+>> +++ b/hw/sd/sdhci.c
+>> @@ -265,7 +265,8 @@ static void sdhci_send_command(SDHCIState *s)
+>>              }
+>>          }
+>>
+>> -        if ((s->norintstsen & SDHC_NISEN_TRSCMP) &&
+>> +        if (!(s->quirks & SDHCI_QUIRK_NO_BUSY_IRQ) &&
+>> +            (s->norintstsen & SDHC_NISEN_TRSCMP) &&
+>>              (s->cmdreg & SDHC_CMD_RESPONSE) =3D=3D SDHC_CMD_RSP_WITH_BU=
+SY) {
+>>              s->norintsts |=3D SDHC_NIS_TRSCMP;
+>>          }
+>> @@ -1191,6 +1192,8 @@ static void sdhci_initfn(SDHCIState *s)
+>>
+>>      s->insert_timer =3D timer_new_ns(QEMU_CLOCK_VIRTUAL, sdhci_raise_in=
+sertion_irq, s);
+>>      s->transfer_timer =3D timer_new_ns(QEMU_CLOCK_VIRTUAL, sdhci_data_t=
+ransfer, s);
+>> +
+>> +    s->io_ops =3D &sdhci_mmio_ops;
+>>  }
+>>
+>>  static void sdhci_uninitfn(SDHCIState *s)
+>> @@ -1347,7 +1350,7 @@ static void sdhci_sysbus_realize(DeviceState *dev,=
+ Error ** errp)
+>>      s->buf_maxsz =3D sdhci_get_fifolen(s);
+>>      s->fifo_buffer =3D g_malloc0(s->buf_maxsz);
+>>      sysbus_init_irq(sbd, &s->irq);
+>> -    memory_region_init_io(&s->iomem, OBJECT(s), &sdhci_mmio_ops, s, "sd=
+hci",
+>> +    memory_region_init_io(&s->iomem, OBJECT(s), s->io_ops, s, "sdhci",
+>>              SDHC_REGISTERS_MAP_SIZE);
+>>      sysbus_init_mmio(sbd, &s->iomem);
+>>  }
+>> @@ -1386,11 +1389,232 @@ static const TypeInfo sdhci_bus_info =3D {
+>>      .class_init =3D sdhci_bus_class_init,
+>>  };
+>>
+>> +static uint64_t usdhc_read(void *opaque, hwaddr offset, unsigned size)
+>> +{
+>> +    SDHCIState *s =3D SYSBUS_SDHCI(opaque);
+>> +    uint32_t ret;
+>> +    uint16_t hostctl;
+>> +
+>> +    switch (offset) {
+>> +    default:
+>> +        return sdhci_read(opaque, offset, size);
+>> +
+>> +    case SDHC_HOSTCTL:
+>> +        /*
+>> +         * For a detailed explanation on the following bit
+>> +         * manipulation code see comments in a similar part of
+>> +         * usdhc_write()
+>> +         */
+>> +        hostctl =3D SDHC_DMA_TYPE(s->hostctl) << (8 - 3);
+>> +
+>> +        if (s->hostctl & SDHC_CTRL_8BITBUS) {
+>> +            hostctl |=3D ESDHC_CTRL_8BITBUS;
+>> +        }
+>> +
+>> +        if (s->hostctl & SDHC_CTRL_4BITBUS) {
+>> +            hostctl |=3D ESDHC_CTRL_4BITBUS;
+>> +        }
+>> +
+>> +        ret  =3D hostctl;
+>> +        ret |=3D (uint32_t)s->blkgap << 16;
+>> +        ret |=3D (uint32_t)s->wakcon << 24;
+>> +
+>> +        break;
+>> +
+>> +    case ESDHC_DLL_CTRL:
+>> +    case ESDHC_TUNE_CTRL_STATUS:
+>> +    case 0x6c:
+>> +    case ESDHC_TUNING_CTRL:
+>> +    case ESDHC_VENDOR_SPEC:
+>> +    case ESDHC_MIX_CTRL:
+>> +    case ESDHC_WTMK_LVL:
+>> +        ret =3D 0;
+>> +        break;
+>> +    }
+>> +
+>> +    return ret;
+>> +}
+>> +
+>> +static void
+>> +usdhc_write(void *opaque, hwaddr offset, uint64_t val, unsigned size)
+>> +{
+>> +    SDHCIState *s =3D SYSBUS_SDHCI(opaque);
+>> +    uint8_t hostctl;
+>> +    uint32_t value =3D (uint32_t)val;
+>> +
+>> +    switch (offset) {
+>> +    case ESDHC_DLL_CTRL:
+>> +    case ESDHC_TUNE_CTRL_STATUS:
+>> +    case 0x6c:
+>> +    case ESDHC_TUNING_CTRL:
+>> +    case ESDHC_WTMK_LVL:
+>> +    case ESDHC_VENDOR_SPEC:
+>> +        break;
+>> +
+>> +    case SDHC_HOSTCTL:
+>> +        /*
+>> +         * Here's What ESDHCI has at offset 0x28 (SDHC_HOSTCTL)
+>> +         *
+>> +         *       7         6     5      4      3      2        1      0
+>> +         * |-----------+--------+--------+-----------+----------+------=
+---|
+>> +         * | Card      | Card   | Endian | DATA3     | Data     | Led  =
+   |
+>> +         * | Detect    | Detect | Mode   | as Card   | Transfer | Contr=
+ol |
+>> +         * | Signal    | Test   |        | Detection | Width    |      =
+   |
+>> +         * | Selection | Level  |        | Pin       |          |      =
+   |
+>> +         * |-----------+--------+--------+-----------+----------+------=
+---|
+>> +         *
+>> +         * and 0x29
+>> +         *
+>> +         *  15      10 9    8
+>> +         * |----------+------|
+>> +         * | Reserved | DMA  |
+>> +         * |          | Sel. |
+>> +         * |          |      |
+>> +         * |----------+------|
+>> +         *
+>> +         * and here's what SDCHI spec expects those offsets to be:
+>> +         *
+>> +         * 0x28 (Host Control Register)
+>> +         *
+>> +         *     7        6         5       4  3      2         1        =
+0
+>> +         * |--------+--------+----------+------+--------+----------+---=
+------|
+>> +         * | Card   | Card   | Extended | DMA  | High   | Data     | LE=
+D     |
+>> +         * | Detect | Detect | Data     | Sel. | Speed  | Transfer | Co=
+ntrol |
+>> +         * | Signal | Test   | Transfer |      | Enable | Width    |   =
+      |
+>> +         * | Sel.   | Level  | Width    |      |        |          |   =
+      |
+>> +         * |--------+--------+----------+------+--------+----------+---=
+------|
+>> +         *
+>> +         * and 0x29 (Power Control Register)
+>> +         *
+>> +         * |----------------------------------|
+>> +         * | Power Control Register           |
+>> +         * |                                  |
+>> +         * | Description omitted,             |
+>> +         * | since it has no analog in ESDHCI |
+>> +         * |                                  |
+>> +         * |----------------------------------|
+>> +         *
+>> +         * Since offsets 0x2A and 0x2B should be compatible between
+>> +         * both IP specs we only need to reconcile least 16-bit of the
+>> +         * word we've been given.
+>> +         */
+>> +
+>> +        /*
+>> +         * First, save bits 7 6 and 0 since they are identical
+>> +         */
+>> +        hostctl =3D value & (SDHC_CTRL_LED |
+>> +                           SDHC_CTRL_CDTEST_INS |
+>> +                           SDHC_CTRL_CDTEST_EN);
+>> +        /*
+>> +         * Second, split "Data Transfer Width" from bits 2 and 1 in to
+>> +         * bits 5 and 1
+>> +         */
+>> +        if (value & ESDHC_CTRL_8BITBUS) {
+>> +            hostctl |=3D SDHC_CTRL_8BITBUS;
+>> +        }
+>> +
+>> +        if (value & ESDHC_CTRL_4BITBUS) {
+>> +            hostctl |=3D ESDHC_CTRL_4BITBUS;
+>> +        }
+>> +
+>> +        /*
+>> +         * Third, move DMA select from bits 9 and 8 to bits 4 and 3
+>> +         */
+>> +        hostctl |=3D SDHC_DMA_TYPE(value >> (8 - 3));
+>> +
+>> +        /*
+>> +         * Now place the corrected value into low 16-bit of the value
+>> +         * we are going to give standard SDHCI write function
+>> +         *
+>> +         * NOTE: This transformation should be the inverse of what can
+>> +         * be found in drivers/mmc/host/sdhci-esdhc-imx.c in Linux
+>> +         * kernel
+>> +         */
+>> +        value &=3D ~UINT16_MAX;
+>> +        value |=3D hostctl;
+>> +        value |=3D (uint16_t)s->pwrcon << 8;
+>> +
+>> +        sdhci_write(opaque, offset, value, size);
+>> +        break;
+>> +
+>> +    case ESDHC_MIX_CTRL:
+>> +        /*
+>> +         * So, when SD/MMC stack in Linux tries to write to "Transfer
+>> +         * Mode Register", ESDHC i.MX quirk code will translate it
+>> +         * into a write to ESDHC_MIX_CTRL, so we do the opposite in
+>> +         * order to get where we started
+>> +         *
+>> +         * Note that Auto CMD23 Enable bit is located in a wrong place
+>> +         * on i.MX, but since it is not used by QEMU we do not care.
+>> +         *
+>> +         * We don't want to call sdhci_write(.., SDHC_TRNMOD, ...)
+>> +         * here becuase it will result in a call to
+>> +         * sdhci_send_command(s) which we don't want.
+>> +         *
+>> +         */
+>> +        s->trnmod =3D value & UINT16_MAX;
+>> +        break;
+>> +    case SDHC_TRNMOD:
+>> +        /*
+>> +         * Similar to above, but this time a write to "Command
+>> +         * Register" will be translated into a 4-byte write to
+>> +         * "Transfer Mode register" where lower 16-bit of value would
+>> +         * be set to zero. So what we do is fill those bits with
+>> +         * cached value from s->trnmod and let the SDHCI
+>> +         * infrastructure handle the rest
+>> +         */
+>> +        sdhci_write(opaque, offset, val | s->trnmod, size);
+>> +        break;
+>> +    case SDHC_BLKSIZE:
+>> +        /*
+>> +         * ESDHCI does not implement "Host SDMA Buffer Boundary", and
+>> +         * Linux driver will try to zero this field out which will
+>> +         * break the rest of SDHCI emulation.
+>> +         *
+>> +         * Linux defaults to maximum possible setting (512K boundary)
+>> +         * and it seems to be the only option that i.MX IP implements,
+>> +         * so we artificially set it to that value.
+>> +         */
+>> +        val |=3D 0x7 << 12;
+>> +        /* FALLTHROUGH */
+>> +    default:
+>> +        sdhci_write(opaque, offset, val, size);
+>> +        break;
+>> +    }
+>> +}
+>> +
+>> +
+>> +static const MemoryRegionOps usdhc_mmio_ops =3D {
+>> +    .read =3D usdhc_read,
+>> +    .write =3D usdhc_write,
+>> +    .valid =3D {
+>> +        .min_access_size =3D 1,
+>> +        .max_access_size =3D 4,
+>> +        .unaligned =3D false
+>> +    },
+>> +    .endianness =3D DEVICE_LITTLE_ENDIAN,
+>> +};
+>
+> I think the usdhc_mmio_ops can be avoided.
+>
 
-void xbit_init(struct xbitmap *xb);
-int xbit_alloc(struct xbitmap *, unsigned long bit, gfp_t);
-int xbit_alloc_range(struct xbitmap *, unsigned long start,
-                        unsigned long nbits, gfp_t);
-int xbit_set(struct xbitmap *, unsigned long bit, gfp_t);
-bool xbit_test(struct xbitmap *, unsigned long bit);
-int xbit_clear(struct xbitmap *, unsigned long bit);
-int xbit_zero(struct xbitmap *, unsigned long start, unsigned long nbits);
-int xbit_fill(struct xbitmap *, unsigned long start, unsigned long nbits,
-                        gfp_t);
-unsigned long xbit_find_clear(struct xbitmap *, unsigned long start,
-                        unsigned long max);
-unsigned long xbit_find_set(struct xbitmap *, unsigned long start,
-                        unsigned long max);
+OK, care to actually elaborate on this?
 
-> static bool set_ulong(struct ulong_list_head *head, const unsigned long value)
-> {
-> 	if (!ptr) {
-> 		ptr = kzalloc(sizeof(*ptr), GFP_NOWAIT | __GFP_NOWARN);
-> 		if (!ptr)
-> 			goto out1;
-> 		ptr->bitmap = kzalloc(BITMAP_LEN / 8,
-> 				      GFP_NOWAIT | __GFP_NOWARN);
-> 		if (!ptr->bitmap)
-> 			goto out2;
-> 		if (btree_insertl(&head->btree, ~segment, ptr,
-> 				   GFP_NOWAIT | __GFP_NOWARN))
-> 			goto out3;
-> out3:
-> 	kfree(ptr->bitmap);
-> out2:
-> 	kfree(ptr);
-> out1:
-> 	return false;
-> }
+>> +
+>> +static void imx_usdhc_init(Object *obj)
+>> +{
+>> +    SDHCIState *s =3D SYSBUS_SDHCI(obj);
+>> +
+>> +    s->io_ops =3D &usdhc_mmio_ops;
+>> +    s->quirks =3D SDHCI_QUIRK_NO_BUSY_IRQ;
+>> +}
+>> +
+>> +static const TypeInfo imx_usdhc_info =3D {
+>> +    .name =3D TYPE_IMX_USDHC,
+>> +    .parent =3D TYPE_SYSBUS_SDHCI,
+>> +    .instance_init =3D imx_usdhc_init,
+>> +};
+>
+> there is no need to add yet another device. You can achieve the same
+> using a property bit (like the "pending-insert-quirk" one).
+>
+> I think the correct way is to add a DEFINE_PROP_BIT64("quirks*").
+>
 
-And what is the user supposed to do if this returns false?  How do they
-make headway?  The xb_ API is clear -- you call xb_prealloc and that
-ensures forward progress.
+And how's that better? Now, every i.MX user instead of instantiating a
+uSDCH IP block, which matches what i.MX RM say, would have to instead
+create SDHCI (confusing) as well as to set an quirk, which means they
+have to know what SDHCI_QUIRK_NO_BUSY_IRQ means. What's the point of
+spilling those internal implementation guts all of the place just to
+avoid re-defining "yet another device"?
+
+Thanks,
+Andrey Smirnov
