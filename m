@@ -1,14 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58748)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58784)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1ePn37-0000p7-KF
-	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 05:17:03 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1ePn3A-0000pz-39
+	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 05:17:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1ePn33-0007At-KC
-	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 05:17:01 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1ePn34-0007C3-6D
+	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 05:17:04 -0500
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Fri, 15 Dec 2017 21:16:47 +1100
-Message-Id: <20171215101651.13911-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PATCH 0/4] Improvements to pxe-test
+Date: Fri, 15 Dec 2017 21:16:51 +1100
+Message-Id: <20171215101651.13911-5-david@gibson.dropbear.id.au>
+In-Reply-To: <20171215101651.13911-1-david@gibson.dropbear.id.au>
+References: <20171215101651.13911-1-david@gibson.dropbear.id.au>
+Subject: [Qemu-devel] [PATCH 4/4] tests/pxe-test: Add some extra tests
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,17 +22,45 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: mst@redhat.com
 Cc: thuth@redhat.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
 
-This series makes several cleanups and enhancements to tests/pxe-test.
-In particular it improves its handling of different machine types.
+Previously virtio-net was only tested for ppc64 in "slow" mode.  That
+doesn't make much sense since virtio-net is used much more often in
+practice than the spapr-vlan device which was tested always.  So, move
+virtio-net to always be tested on ppc64.
 
-David Gibson (4):
-  tests/pxe-test: Remove unnecessary special case test functions
-  tests/pxe-test: Use table of testcases rather than open-coding
-  tests/pxe-test: Test net booting over IPv6 in some cases
-  tests/pxe-test: Add some extra tests
+We had no tests at all for the q35 machine, which doesn't seem wise given
+it's increasing prominence.  Add a couple of tests for it, including
+testing the newer e1000e adapter.
 
- tests/pxe-test.c | 107 ++++++++++++++++++++++++++++++++++++++++++-------------
- 1 file changed, 82 insertions(+), 25 deletions(-)
+Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+---
+ tests/pxe-test.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
+diff --git a/tests/pxe-test.c b/tests/pxe-test.c
+index e7a0610070..16e2520940 100644
+--- a/tests/pxe-test.c
++++ b/tests/pxe-test.c
+@@ -31,6 +31,8 @@ typedef struct testdef {
+ static testdef_t x86_tests[] = {
+     { "pc", "e1000" },
+     { "pc", "virtio", "-device virtio-net-pci,netdev=" NETNAME },
++    { "q35", "e1000e" },
++    { "q35", "virtio", "-device virtio-net-pci,netdev=" NETNAME },
+     { NULL },
+ };
+ 
+@@ -44,11 +46,11 @@ static testdef_t x86_tests_slow[] = {
+ 
+ static testdef_t ppc64_tests[] = {
+     { "pseries", "spapr-vlan" },
++    { "pseries", "virtio", "-device virtio-net-pci,netdev=" NETNAME },
+     { NULL },
+ };
+ 
+ static testdef_t ppc64_tests_slow[] = {
+-    { "pseries", "virtio", "-device virtio-net-pci,netdev=" NETNAME },
+     { "pseries", "e1000" },
+     { NULL },
+ };
 -- 
 2.14.3
