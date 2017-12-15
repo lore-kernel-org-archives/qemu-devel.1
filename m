@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60019)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34654)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1ePr00-0006Wl-OI
-	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 09:30:10 -0500
+	(envelope-from <cohuck@redhat.com>) id 1ePrAr-0008Sr-C3
+	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 09:41:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1ePqzw-0002TV-P3
-	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 09:30:04 -0500
-Received: from mout.kundenserver.de ([217.72.192.75]:60059)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1ePqzw-0002Os-Ev
-	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 09:30:00 -0500
-References: <1513345976-22958-1-git-send-email-peter.maydell@linaro.org>
-	<1513345976-22958-3-git-send-email-peter.maydell@linaro.org>
-From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <7fe00926-39b9-f0eb-0bc3-29188f767308@vivier.eu>
-Date: Fri, 15 Dec 2017 15:29:40 +0100
+	(envelope-from <cohuck@redhat.com>) id 1ePrAo-0000Q4-6t
+	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 09:41:17 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:58961)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1ePrAn-0000No-Tu
+	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 09:41:14 -0500
+Date: Fri, 15 Dec 2017 15:41:01 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20171215154101.00550c4a.cohuck@redhat.com>
+In-Reply-To: <20171215000606.382a3ce7@virtuozzo.com>
+References: <1508867404-18046-1-git-send-email-jan.dakinevich@virtuozzo.com>
+	<20171212165450.6b6e823f@virtuozzo.com>
+	<20171214120519.48edb873.cohuck@redhat.com>
+	<20171215000606.382a3ce7@virtuozzo.com>
 MIME-Version: 1.0
-In-Reply-To: <1513345976-22958-3-git-send-email-peter.maydell@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 2/2] linux-user: Don't use
- CMSG_ALIGN(sizeof struct cmsghdr)
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC v5 0/2] virtio: introduce `info virtio' hmp
+ command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,23 +30,145 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
-Cc: Riku Voipio <riku.voipio@iki.fi>, Bruno Haible <bruno@clisp.org>, patches@linaro.org
+To: Jan Dakinevich <jan.dakinevich@virtuozzo.com>
+Cc: qemu-devel@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, Kevin Wolf <kwolf@redhat.com>, "Denis V. Lunev" <den@virtuozzo.com>, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-Le 15/12/2017 à 14:52, Peter Maydell a écrit :
-> The Linux struct cmsghdr is already guaranteed to be sufficiently
-> aligned that CMSG_ALIGN(sizeof struct cmsghdr) is always equal
-> to sizeof struct cmsghdr. Stop doing the unnecessary alignment
-> arithmetic for host and target cmsghdr.
-> 
-> This follows kernel commit 1ff8cebf49ed9e9ca2 and brings our
-> TARGET_CMSG_* macros back into line with the kernel ones,
-> as well as making them easier to understand.
-> 
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-> ---
->  linux-user/syscall_defs.h | 6 +++---
->  linux-user/syscall.c      | 4 ++--
->  2 files changed, 5 insertions(+), 5 deletions(-)
+On Fri, 15 Dec 2017 00:06:06 +0300
+Jan Dakinevich <jan.dakinevich@virtuozzo.com> wrote:
 
-Reviewed-by: Laurent Vivier <laurent@vivier.eu>
+> On Thu, 14 Dec 2017 12:05:19 +0100
+> Cornelia Huck <cohuck@redhat.com> wrote:
+> 
+> > On Tue, 12 Dec 2017 16:54:50 +0300
+> > Jan Dakinevich <jan.dakinevich@virtuozzo.com> wrote:
+> >   
+> > > I am going to reanimate works under this QMP/HMP. First of all, it
+> > > could be meaningful to settle what output would provide the QMP. I
+> > > would like to suggest the following description:
+> > > 
+> > > ##
+> > > # @VirtioFeature:
+> > > ##
+> > > {
+> > >     'struct': 'VirtioFeature',
+> > >     'data': {
+> > >         'name': 'str',
+> > >         'acked': 'bool'
+> > >     }
+> > > }
+> > > 
+> > > ##
+> > > # @VirtioInfo:
+> > > ##
+> > > {
+> > >     'struct': 'VirtioInfo',
+> > >     'data': {
+> > >         'qom-path': 'str',
+> > >         
+> > >         'status': 'uint8',
+> > >         'host-features': 'uint64',
+> > >         'guest-features': 'uint64',
+> > > 
+> > >         'status-names': ['str'],
+> > >         'common-features-names': ['VirtioFeature'],
+> > >         'device-features-names': ['VirtioFeature']
+> > >     }
+> > > }
+> > > 
+> > > ##
+> > > # @query-virtio:
+> > > ##
+> > > {
+> > >     'command': 'query-virtio',
+> > >     'data': {'*path': 'str'},
+> > >     'returns': ['VirtioInfo']
+> > > }
+> > > 
+> > > My final goal is to implement HMP which will print all exposed
+> > > virtio features (both common and device-specific) with their
+> > > acknowledgements, and virtio device configuration status. These are
+> > > provided by last 3 fields in @VirtioInfo.
+> > > 
+> > > For these who are going make own decision on features and status
+> > > bitmask, respective fields with raw values are preserved.  
+> > 
+> > Looks sensible. What will you return an for the *-features-names
+> > fields if the status field indicates that negotiation is not yet done?
+> > (This has some fun interaction with the VERSION_1 feature bit...)
+> >   
+> 
+> Hmm... I was going to return current features and theirs
+> acknowledgments regardless if they were negotiated. Thus,
+> *-features-names would contain all exposed host features with `false'
+> in `acked' field.
+
+acked=false is probably the most sensible approach.
+
+> 
+> > > 
+> > > So, I expect following data on the wire in response to
+> > > `query-virtio' command:
+> > > 
+> > > {
+> > >     "return": [
+> > >         {
+> > >             "qom-path":
+> > > "/machine/peripheral-anon/device[0]/virtio-backend", "status": 15,
+> > > "host-features": 6325010438, "guest-features": 5100273670,
+> > >             "status-names": [
+> > >                 "acknowledge", 
+> > >                 "driver", 
+> > >                 "driver-ok", 
+> > >                 "features-ok"
+> > >             ],
+> > >             "common-features-names": [
+> > >                 {"name": "notify-on-empty", "acked": false},
+> > >                 {"name": "any-layout", "acked": false},
+> > >                 {"name": "indirect-desc", "acked": true},
+> > >                 {"name": "event-idx", "acked": true},
+> > >                 {"name": "bad-feature", "acked": false},
+> > >                 {"name": "version-1", "acked": true}
+> > >             ],
+> > >             "device-features-names": [
+> > >                 {"name": "hotplug", "acked": true},
+> > >                 {"name": "change", "acked": true}  
+> > 
+> > I suggest to use the #defines as names, especially as they are also
+> > used in the spec. Makes grepping easier.
+> >   
+> 
+> You mean, for example "VIRTIO_RING_F_EVENT_IDX" instead of "event-idx"
+> should be used. Right?
+
+Right, that's what I meant.
+
+> 
+> > >             ]
+> > >         }
+> > >     ]
+> > > }
+> > > 
+> > > 
+> > > Eric Blake, returning to your question which would probably appear
+> > > again after this mail:
+> > >   
+> > > >> +##
+> > > >> +# @query-virtio:
+> > > >> ...
+> > > >> +##
+> > > >> +{
+> > > >> +    'command': 'query-virtio',
+> > > >> +    'data': { '*path': 'str' },      
+> > > >
+> > > > Do we need filterable queries, or is it better to just have the
+> > > > command return info on all virtio devices at once and let the
+> > > > client filter the results as desired?    
+> > > 
+> > > I think it would be better to do here. I suppose, the client which
+> > > uses HMP will not be happy on filtering monitor output.  
+> > 
+> > I think being able to optionally specify a path is the most flexible
+> > solution.  
+> 
+> 
+> 
