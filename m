@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53733)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53779)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ePgUF-0005pO-EY
-	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 22:16:36 -0500
+	id 1ePgUJ-0005sm-KO
+	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 22:16:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ePgUE-00012p-Iu
-	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 22:16:35 -0500
+	id 1ePgUI-00018I-R8
+	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 22:16:39 -0500
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Fri, 15 Dec 2017 00:15:34 -0300
-Message-Id: <20171215031547.31006-8-f4bug@amsat.org>
+Date: Fri, 15 Dec 2017 00:15:35 -0300
+Message-Id: <20171215031547.31006-9-f4bug@amsat.org>
 In-Reply-To: <20171215031547.31006-1-f4bug@amsat.org>
 References: <20171215031547.31006-1-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v2 07/20] sdhci: refactor common sysbus/pci
- unrealize() into sdhci_unrealizefn()
+Subject: [Qemu-devel] [PATCH v2 08/20] sdhci: use qemu_log_mask(UNIMP)
+ instead of fprintf()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,73 +32,33 @@ Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nong
 
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- hw/sd/sdhci.c | 20 +++++++++++++++++---
- 1 file changed, 17 insertions(+), 3 deletions(-)
+ hw/sd/sdhci.c | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
 
 diff --git a/hw/sd/sdhci.c b/hw/sd/sdhci.c
-index f574495b19..53c1f11855 100644
+index 53c1f11855..ca71a70148 100644
 --- a/hw/sd/sdhci.c
 +++ b/hw/sd/sdhci.c
-@@ -31,6 +31,7 @@
- #include "qemu/bitops.h"
- #include "hw/sd/sdhci.h"
- #include "sdhci-internal.h"
-+#include "qapi/error.h"
- #include "qemu/log.h"
+@@ -945,7 +945,8 @@ static uint64_t sdhci_read(void *opaque, hwaddr offset, unsigned size)
+         ret = (SD_HOST_SPECv2_VERS << 16) | sdhci_slotint(s);
+         break;
+     default:
+-        ERRPRINT("bad %ub read: addr[0x%04x]\n", size, (int)offset);
++        qemu_log_mask(LOG_UNIMP, "SDHC rd_%ub @0x%02" HWADDR_PRIx " "
++                      "not implemented\n", size, offset);
+         break;
+     }
  
- /* host controller debug messages */
-@@ -1200,17 +1201,20 @@ static void sdhci_realizefn(SDHCIState *s, Error **errp)
-                           SDHC_REGISTERS_MAP_SIZE);
- }
- 
-+static void sdhci_unrealizefn(SDHCIState *s, Error **errp)
-+{
-+    g_free(s->fifo_buffer);
-+}
-+
- static void sdhci_uninitfn(SDHCIState *s)
- {
-     timer_del(s->insert_timer);
-     timer_free(s->insert_timer);
-     timer_del(s->transfer_timer);
-     timer_free(s->transfer_timer);
-+
-     qemu_free_irq(s->eject_cb);
-     qemu_free_irq(s->ro_cb);
--
--    g_free(s->fifo_buffer);
--    s->fifo_buffer = NULL;
- }
- 
- static bool sdhci_pending_insert_vmstate_needed(void *opaque)
-@@ -1311,6 +1315,8 @@ static void sdhci_pci_realize(PCIDevice *dev, Error **errp)
- static void sdhci_pci_exit(PCIDevice *dev)
- {
-     SDHCIState *s = PCI_SDHCI(dev);
-+
-+    sdhci_unrealizefn(s, &error_abort);
-     sdhci_uninitfn(s);
- }
- 
-@@ -1364,11 +1370,19 @@ static void sdhci_sysbus_realize(DeviceState *dev, Error ** errp)
-     sysbus_init_mmio(sbd, &s->iomem);
- }
- 
-+static void sdhci_sysbus_unrealize(DeviceState *dev, Error **errp)
-+{
-+    SDHCIState *s = SYSBUS_SDHCI(dev);
-+
-+    sdhci_unrealizefn(s, errp);
-+}
-+
- static void sdhci_sysbus_class_init(ObjectClass *klass, void *data)
- {
-     DeviceClass *dc = DEVICE_CLASS(klass);
- 
-     dc->realize = sdhci_sysbus_realize;
-+    dc->unrealize = sdhci_sysbus_unrealize;
- 
-     sdhci_class_init(klass, data);
- }
+@@ -1149,8 +1150,8 @@ sdhci_write(void *opaque, hwaddr offset, uint64_t val, unsigned size)
+         sdhci_update_irq(s);
+         break;
+     default:
+-        ERRPRINT("bad %ub write offset: addr[0x%04x] <- %u(0x%x)\n",
+-                 size, (int)offset, value >> shift, value >> shift);
++        qemu_log_mask(LOG_UNIMP, "SDHC wr_%ub @0x%02" HWADDR_PRIx " <- 0x%08x "
++                      "not implemented\n", size, offset, value >> shift);
+         break;
+     }
+     DPRINT_L2("write %ub: addr[0x%04x] <- %u(0x%x)\n",
 -- 
 2.15.1
