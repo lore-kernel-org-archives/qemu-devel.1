@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54855)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54886)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ePgWD-0007d0-07
-	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 22:18:37 -0500
+	id 1ePgWF-0007fC-OL
+	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 22:18:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ePgW9-0002ca-QT
-	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 22:18:36 -0500
+	id 1ePgWE-0002hC-U7
+	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 22:18:39 -0500
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Fri, 15 Dec 2017 00:15:43 -0300
-Message-Id: <20171215031547.31006-17-f4bug@amsat.org>
+Date: Fri, 15 Dec 2017 00:15:44 -0300
+Message-Id: <20171215031547.31006-18-f4bug@amsat.org>
 In-Reply-To: <20171215031547.31006-1-f4bug@amsat.org>
 References: <20171215031547.31006-1-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v2 16/20] sdhci: add qtest to check the SD Spec
- version
+Subject: [Qemu-devel] [PATCH v2 17/20] sdhci: add check_capab_readonly()
+ qtest
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,114 +30,72 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Alistair Francis <alistair.francis@xilinx.com>, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, Peter Maydell <peter.maydell@linaro.org>, Michael Walle <michael@walle.cc>, Andrzej Zaborowski <balrogg@gmail.com>, Andrew Baumann <Andrew.Baumann@microsoft.com>, Andrey Smirnov <andrew.smirnov@gmail.com>, Andrey Yurovsky <yurovsky@gmail.com>
 Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, qemu-arm@nongnu.org, Prasad J Pandit <pjp@fedoraproject.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Sai Pavan Boddu <saipava@xilinx.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
-with check_specs_version()
-
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- tests/sdhci-test.c     | 74 ++++++++++++++++++++++++++++++++++++++++++++++++++
- tests/Makefile.include |  2 ++
- 2 files changed, 76 insertions(+)
- create mode 100644 tests/sdhci-test.c
+ tests/sdhci-test.c | 30 ++++++++++++++++++++++++++++++
+ 1 file changed, 30 insertions(+)
 
 diff --git a/tests/sdhci-test.c b/tests/sdhci-test.c
-new file mode 100644
-index 0000000000..4ebe1e349b
---- /dev/null
+index 4ebe1e349b..01373a69df 100644
+--- a/tests/sdhci-test.c
 +++ b/tests/sdhci-test.c
-@@ -0,0 +1,74 @@
-+/*
-+ * QTest testcase for SDHCI controllers
-+ *
-+ * Written by Philippe Mathieu-Daudé <f4bug@amsat.org>
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or later.
-+ * See the COPYING file in the top-level directory.
-+ */
-+#include "qemu/osdep.h"
-+#include "libqtest.h"
-+
-+#define SDHC_HCVER                      0xFE
-+
-+static const struct sdhci_t {
-+    const char *arch;
-+    const char *machine;
-+    struct {
-+        uintptr_t addr;
-+        uint8_t version;
-+    } sdhci;
-+} models[] = {
-+    { "arm",    "smdkc210",
-+        {0x12510000, 2} },
-+    { "arm",    "sabrelite",
-+        {0x02190000, 3} },
-+    { "arm",    "raspi2",           /* bcm2835 */
-+        {0x3f300000, 3} },
-+    { "arm",    "xilinx-zynq-a9",   /* exynos4210 */
-+        {0xe0100000, 3} },
-+};
-+
-+static uint32_t sdhci_readl(uintptr_t base, uint32_t reg_addr)
+@@ -9,6 +9,7 @@
+ #include "qemu/osdep.h"
+ #include "libqtest.h"
+ 
++#define SDHC_CAPAB                      0x40
+ #define SDHC_HCVER                      0xFE
+ 
+ static const struct sdhci_t {
+@@ -36,6 +37,20 @@ static uint32_t sdhci_readl(uintptr_t base, uint32_t reg_addr)
+     return qtest_readl(qtest, base + reg_addr);
+ }
+ 
++static uint64_t sdhci_readq(uintptr_t base, uint32_t reg_addr)
 +{
 +    QTestState *qtest = global_qtest;
 +
-+    return qtest_readl(qtest, base + reg_addr);
++    return qtest_readq(qtest, base + reg_addr);
 +}
 +
-+static void check_specs_version(uintptr_t addr, uint8_t version)
++static void sdhci_writeq(uintptr_t base, uint32_t reg_addr, uint64_t value)
 +{
-+    uint32_t v;
++    QTestState *qtest = global_qtest;
 +
-+    v = sdhci_readl(addr, SDHC_HCVER);
-+    v &= 0xff;
-+    v += 1;
-+    g_assert_cmpuint(v, ==, version);
++    qtest_writeq(qtest, base + reg_addr, value);
 +}
 +
-+static void test_machine(const void *data)
+ static void check_specs_version(uintptr_t addr, uint8_t version)
+ {
+     uint32_t v;
+@@ -46,6 +61,20 @@ static void check_specs_version(uintptr_t addr, uint8_t version)
+     g_assert_cmpuint(v, ==, version);
+ }
+ 
++static void check_capab_readonly(uintptr_t addr)
 +{
-+    const struct sdhci_t *test = data;
++    const uint64_t vrand = 0x123456789abcdef;
++    uint64_t capab0, capab1;
 +
-+    global_qtest = qtest_startf("-machine %s -d unimp", test->machine);
++    capab0 = sdhci_readq(addr, SDHC_CAPAB);
++    g_assert_cmpuint(capab0, !=, vrand);
 +
-+    check_specs_version(test->sdhci.addr, test->sdhci.version);
-+
-+    qtest_quit(global_qtest);
++    sdhci_writeq(addr, SDHC_CAPAB, vrand);
++    capab1 = sdhci_readq(addr, SDHC_CAPAB);
++    g_assert_cmpuint(capab1, !=, vrand);
++    g_assert_cmpuint(capab1, ==, capab0);
 +}
 +
-+int main(int argc, char *argv[])
-+{
-+    char *name;
-+    int i;
-+
-+    g_test_init(&argc, &argv, NULL);
-+
-+    for (i = 0; i < ARRAY_SIZE(models); i++) {
-+        name = g_strdup_printf("sdhci/%s", models[i].machine);
-+        qtest_add_data_func(name, &models[i], test_machine);
-+        g_free(name);
-+    }
-+
-+    return g_test_run();
-+}
-diff --git a/tests/Makefile.include b/tests/Makefile.include
-index c002352134..af7f324e07 100644
---- a/tests/Makefile.include
-+++ b/tests/Makefile.include
-@@ -355,6 +355,7 @@ check-qtest-arm-y += tests/virtio-blk-test$(EXESUF)
- gcov-files-arm-y += arm-softmmu/hw/block/virtio-blk.c
- check-qtest-arm-y += tests/test-arm-mptimer$(EXESUF)
- gcov-files-arm-y += hw/timer/arm_mptimer.c
-+check-qtest-arm-y += tests/sdhci-test$(EXESUF)
+ static void test_machine(const void *data)
+ {
+     const struct sdhci_t *test = data;
+@@ -53,6 +82,7 @@ static void test_machine(const void *data)
+     global_qtest = qtest_startf("-machine %s -d unimp", test->machine);
  
- check-qtest-aarch64-y = tests/numa-test$(EXESUF)
+     check_specs_version(test->sdhci.addr, test->sdhci.version);
++    check_capab_readonly(test->sdhci.addr);
  
-@@ -609,6 +610,7 @@ tests/test-qht-par$(EXESUF): tests/test-qht-par.o tests/qht-bench$(EXESUF) $(tes
- tests/qht-bench$(EXESUF): tests/qht-bench.o $(test-util-obj-y)
- tests/test-bufferiszero$(EXESUF): tests/test-bufferiszero.o $(test-util-obj-y)
- tests/atomic_add-bench$(EXESUF): tests/atomic_add-bench.o $(test-util-obj-y)
-+tests/sdhci-test$(EXESUF): tests/sdhci-test.o
- 
- tests/test-qdev-global-props$(EXESUF): tests/test-qdev-global-props.o \
- 	hw/core/qdev.o hw/core/qdev-properties.o hw/core/hotplug.o\
+     qtest_quit(global_qtest);
+ }
 -- 
 2.15.1
