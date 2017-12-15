@@ -1,35 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37250)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38454)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1ePnHN-0000x4-Mw
-	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 05:31:46 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1ePnJP-0002MT-63
+	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 05:33:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1ePnHK-0003xP-7i
-	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 05:31:45 -0500
-Received: from mga14.intel.com ([192.55.52.115]:29790)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
-	id 1ePnHJ-0003vx-Tc
-	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 05:31:42 -0500
-Message-ID: <5A33A509.1000105@intel.com>
-Date: Fri, 15 Dec 2017 18:33:45 +0800
-From: Wei Wang <wei.w.wang@intel.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1ePnJO-0005mY-D0
+	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 05:33:51 -0500
+Received: from mail-ot0-x244.google.com ([2607:f8b0:4003:c0f::244]:41759)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1ePnJO-0005mG-7v
+	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 05:33:50 -0500
+Received: by mail-ot0-x244.google.com with SMTP id q39so990358otb.8
+	for <qemu-devel@nongnu.org>; Fri, 15 Dec 2017 02:33:50 -0800 (PST)
 MIME-Version: 1.0
-References: <20171207213420-mutt-send-email-mst@kernel.org>
-	<5A2A347B.9070006@intel.com>
-	<CAJSP0QUAqCzFgVtM1cg_KybdyrZa_FRUHhDN7oLfRjZ2ZVkp4g@mail.gmail.com>
-	<286AC319A985734F985F78AFA26841F73937E001@shsmsx102.ccr.corp.intel.com>
-	<20171211111147.GF13593@stefanha-x1.localdomain>
-	<286AC319A985734F985F78AFA26841F73937EEED@shsmsx102.ccr.corp.intel.com>
-	<20171212101440.GB6985@stefanha-x1.localdomain>
-	<5A30E0C1.3070905@intel.com>
-	<20171213123521.GL16782@stefanha-x1.localdomain>
-	<5A3211CC.60607@intel.com>
-	<20171214180449.GU14433@stefanha-x1.localdomain>
-In-Reply-To: <20171214180449.GU14433@stefanha-x1.localdomain>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [virtio-dev] Re: [virtio-dev] [PATCH v3 0/7]
- Vhost-pci for inter-VM communication
+In-Reply-To: <20171215112138.6040ee82.cohuck@redhat.com>
+References: <20171214171004.25058-1-cohuck@redhat.com>
+	<CAFEAcA8tY9=jtsw-MtjWTceLizvpH8oui_+6xf7V6K5o5BLf-A@mail.gmail.com>
+	<cf44ca76-d581-8d96-3e2b-78c698dda446@de.ibm.com>
+	<20171215101135.447d9316.cohuck@redhat.com>
+	<CAFEAcA_VaKua1qjyeX2Ve=JrSUJQbBqMQOJQZ7e3y92+gtxkMA@mail.gmail.com>
+	<20171215112138.6040ee82.cohuck@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 15 Dec 2017 10:33:28 +0000
+Message-ID: <CAFEAcA_+XYYGzTgJicvXr47YvnTiT=v-4QKDJUEvgB9Yj4D_uw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [qemu-s390x] [PULL 00/46] First batch of s390x
+ patches for 2.12
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,32 +34,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: Stefan Hajnoczi <stefanha@gmail.com>, "Michael S. Tsirkin" <mst@redhat.com>, "virtio-dev@lists.oasis-open.org" <virtio-dev@lists.oasis-open.org>, "Yang, Zhiyong" <zhiyong.yang@intel.com>, "jan.kiszka@siemens.com" <jan.kiszka@siemens.com>, "jasowang@redhat.com" <jasowang@redhat.com>, "avi.cohen@huawei.com" <avi.cohen@huawei.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "marcandre.lureau@redhat.com" <marcandre.lureau@redhat.com>
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: Christian Borntraeger <borntraeger@de.ibm.com>, Thomas Huth <thuth@redhat.com>, David Hildenbrand <david@redhat.com>, Alexander Graf <agraf@suse.de>, QEMU Developers <qemu-devel@nongnu.org>, qemu-s390x@nongnu.org, Richard Henderson <rth@twiddle.net>
 
-On 12/15/2017 02:04 AM, Stefan Hajnoczi wrote:
-> On Thu, Dec 14, 2017 at 01:53:16PM +0800, Wei Wang wrote:
->> 3rd one: I'm not able to solve this one, as discussed, there are too many
->> differences and it's too complex. I prefer the direction of simply gating
->> the vhost-user protocol and deliver to the guest what it should see (just
->> what this patch series shows). You would need to solve this issue to show
->> this direction is simpler :)
-> At the moment the main issue deciding what to do seems to be that we
-> have no patches for the approach I've described.  I'll begin working on
-> a patch series.
-
-
-Are you planning to implement the multiple masters and slaves?
-Master-->QemuSlave1-->GuestSlave
-Master<--QemuSlave2<--GuestSlave
-
-
-
-> If there is something else you think I could help with, please let me
-> know.  I'd like to contribute to vhost-pci.
+On 15 December 2017 at 10:21, Cornelia Huck <cohuck@redhat.com> wrote:
+> On Fri, 15 Dec 2017 09:51:32 +0000
+> Peter Maydell <peter.maydell@linaro.org> wrote:
 >
+>> On 15 December 2017 at 09:11, Cornelia Huck <cohuck@redhat.com> wrote:
+>> > On Fri, 15 Dec 2017 09:35:10 +0100
+>> > Christian Borntraeger <borntraeger@de.ibm.com> wrote:
+>> >
+>> >> On 12/14/2017 08:05 PM, Peter Maydell wrote:
+>> >> > (ram_addr_t can be a 32-bit type).
+>> >
+>> > This a 32 bit host, isn't it? I don't have regular access to one...
+>>
+>> Yes. Win32 cross compiler also gives this error.
+>
+> Hm, my mingw build on Fedora did not catch this. Setting up a 32bit vm.
 
-Thanks.
+Maybe your mingw build is mingw-w64 rather than -w32 ?
 
-Best,
-Wei
+thanks
+-- PMM
