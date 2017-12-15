@@ -1,21 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42748)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42839)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sstabellini@kernel.org>) id 1ePdr2-0002l7-R4
-	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 19:27:57 -0500
+	(envelope-from <sstabellini@kernel.org>) id 1ePdrG-0002qA-Ge
+	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 19:28:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sstabellini@kernel.org>) id 1ePdqy-0005ep-Sz
-	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 19:27:56 -0500
-Received: from mail.kernel.org ([198.145.29.99]:60472)
+	(envelope-from <sstabellini@kernel.org>) id 1ePdrC-00063X-Mr
+	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 19:28:10 -0500
+Received: from mail.kernel.org ([198.145.29.99]:60554)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <sstabellini@kernel.org>)
-	id 1ePdqy-0005cv-NO
-	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 19:27:52 -0500
-Date: Thu, 14 Dec 2017 16:27:50 -0800 (PST)
+	id 1ePdrC-00062o-HN
+	for qemu-devel@nongnu.org; Thu, 14 Dec 2017 19:28:06 -0500
 From: Stefano Stabellini <sstabellini@kernel.org>
-Message-ID: <alpine.DEB.2.10.1712141612170.3857@sstabellini-ThinkPad-X260>
-MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
-Subject: [Qemu-devel] [PULL 0/6] xen-20171214-tag
+Date: Thu, 14 Dec 2017 16:27:59 -0800
+Message-Id: <1513297683-14295-2-git-send-email-sstabellini@kernel.org>
+In-Reply-To: <1513297683-14295-1-git-send-email-sstabellini@kernel.org>
+References: <alpine.DEB.2.10.1712141612170.3857@sstabellini-ThinkPad-X260>
+	<1513297683-14295-1-git-send-email-sstabellini@kernel.org>
+Subject: [Qemu-devel] [PULL 2/6] ui: generate qcode to linux mappings
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,41 +26,56 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org, stefanha@gmail.com
-Cc: sstabellini@kernel.org, stefanha@redhat.com, anthony.perard@citrix.com, xen-devel@lists.xenproject.org, qemu-devel@nongnu.org
+Cc: sstabellini@kernel.org, stefanha@redhat.com, anthony.perard@citrix.com, xen-devel@lists.xenproject.org, qemu-devel@nongnu.org, Owen Smith <owen.smith@citrix.com>
 
-The following changes since commit 0a0dc59d27527b78a195c2d838d28b7b49e5a639:
+From: Owen Smith <owen.smith@citrix.com>
 
-  Update version for v2.11.0 release (2017-12-13 14:31:09 +0000)
+Use keycodedb to generate a qcode to linux mapping
 
-are available in the git repository at:
+Signed-off-by: Owen Smith <owen.smith@citrix.com>
+Reviewed-by: Gerd Hoffmann <kraxel@redhat.com>
+Signed-off-by: Stefano Stabellini <sstabellini@kernel.org>
+---
+ Makefile           | 1 +
+ include/ui/input.h | 3 +++
+ ui/input-keymap.c  | 1 +
+ 3 files changed, 5 insertions(+)
 
-  git://xenbits.xen.org/people/sstabellini/qemu-dm.git tags/xen-20171214-tag
-
-for you to fetch changes up to 2e63eb2becc228232f12a1ea30a91b2aa8c5cecd:
-
-  xen/pt: Set is_express to avoid out-of-bounds write (2017-12-14 16:11:53 -0800)
-
-----------------------------------------------------------------
-Xen 2017/12/14
-
-----------------------------------------------------------------
-Owen Smith (4):
-      ui: generate qcode to linux mappings
-      xenfb: Use Input Handlers directly
-      xenfb: Add [feature|request]-raw-pointer
-      xenfb: activate input handlers for raw pointer devices
-
-Paul Durrant (1):
-      xen-disk: use an IOThread per instance
-
-Simon Gaiser (1):
-      xen/pt: Set is_express to avoid out-of-bounds write
-
- Makefile              |   1 +
- hw/block/trace-events |   7 ++
- hw/block/xen_disk.c   |  53 +++++++--
- hw/display/xenfb.c    | 294 ++++++++++++++++++++++++++------------------------
- hw/xen/xen_pt.c       |   1 +
- include/ui/input.h    |   3 +
- ui/input-keymap.c     |   1 +
- 7 files changed, 215 insertions(+), 145 deletions(-)
+diff --git a/Makefile b/Makefile
+index ab0354c..0331c18 100644
+--- a/Makefile
++++ b/Makefile
+@@ -229,6 +229,7 @@ KEYCODEMAP_FILES = \
+ 		 ui/input-keymap-linux-to-qcode.c \
+ 		 ui/input-keymap-qcode-to-qnum.c \
+ 		 ui/input-keymap-qnum-to-qcode.c \
++		 ui/input-keymap-qcode-to-linux.c \
+ 		 $(NULL)
+ 
+ GENERATED_FILES += $(KEYCODEMAP_FILES)
+diff --git a/include/ui/input.h b/include/ui/input.h
+index f8cee43..5cc76d6 100644
+--- a/include/ui/input.h
++++ b/include/ui/input.h
+@@ -77,4 +77,7 @@ extern const guint16 qemu_input_map_qcode_to_qnum[];
+ extern const guint qemu_input_map_qnum_to_qcode_len;
+ extern const guint16 qemu_input_map_qnum_to_qcode[];
+ 
++extern const guint qemu_input_map_qcode_to_linux_len;
++extern const guint16 qemu_input_map_qcode_to_linux[];
++
+ #endif /* INPUT_H */
+diff --git a/ui/input-keymap.c b/ui/input-keymap.c
+index 3a19a16..663986a 100644
+--- a/ui/input-keymap.c
++++ b/ui/input-keymap.c
+@@ -8,6 +8,7 @@
+ #include "ui/input-keymap-linux-to-qcode.c"
+ #include "ui/input-keymap-qcode-to-qnum.c"
+ #include "ui/input-keymap-qnum-to-qcode.c"
++#include "ui/input-keymap-qcode-to-linux.c"
+ 
+ int qemu_input_linux_to_qcode(unsigned int lnx)
+ {
+-- 
+1.9.1
