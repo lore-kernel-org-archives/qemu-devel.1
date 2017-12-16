@@ -1,24 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53086)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53114)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <hpoussin@reactos.org>) id 1eQ8My-0004hQ-Do
-	for qemu-devel@nongnu.org; Sat, 16 Dec 2017 04:02:57 -0500
+	(envelope-from <hpoussin@reactos.org>) id 1eQ8Mz-0004hc-9C
+	for qemu-devel@nongnu.org; Sat, 16 Dec 2017 04:02:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <hpoussin@reactos.org>) id 1eQ8Mx-00021V-6F
-	for qemu-devel@nongnu.org; Sat, 16 Dec 2017 04:02:56 -0500
-Received: from iserv.reactos.org ([2a01:4f8:221:4c5::3]:58795)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <hpoussin@reactos.org>)
-	id 1eQ8Mx-0001we-0O
-	for qemu-devel@nongnu.org; Sat, 16 Dec 2017 04:02:55 -0500
+	(envelope-from <hpoussin@reactos.org>) id 1eQ8Mx-000220-Mo
+	for qemu-devel@nongnu.org; Sat, 16 Dec 2017 04:02:57 -0500
 From: =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>
-Date: Sat, 16 Dec 2017 10:02:16 +0100
-Message-Id: <20171216090228.28505-4-hpoussin@reactos.org>
+Date: Sat, 16 Dec 2017 10:02:14 +0100
+Message-Id: <20171216090228.28505-2-hpoussin@reactos.org>
 In-Reply-To: <20171216090228.28505-1-hpoussin@reactos.org>
 References: <20171216090228.28505-1-hpoussin@reactos.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH 03/15] mc146818rtc: move structure to header
+Subject: [Qemu-devel] [PATCH 01/15] fdc: move object structures to header
  file
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -29,96 +24,270 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Aurelien Jarno <aurelien@aurel32.net>, Yongbok Kim <yongbok.kim@mips.com>, "Michael S . Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
-Cc: =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>
+Cc: =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>, John Snow <jsnow@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, "open list:Floppy" <qemu-block@nongnu.org>
 
-We are now able to embed a timer in another object.
+We are now able to embed floppy controllers in another object.
 
 Signed-off-by: Hervé Poussineau <hpoussin@reactos.org>
 ---
- hw/timer/mc146818rtc.c         | 30 ------------------------------
- include/hw/timer/mc146818rtc.h | 29 +++++++++++++++++++++++++++++
- 2 files changed, 29 insertions(+), 30 deletions(-)
+ hw/block/fdc.c         | 101 ------------------------------------------------
+ include/hw/block/fdc.h | 103 +++++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 103 insertions(+), 101 deletions(-)
 
-diff --git a/hw/timer/mc146818rtc.c b/hw/timer/mc146818rtc.c
-index 7764be25ec..73d1ce21de 100644
---- a/hw/timer/mc146818rtc.c
-+++ b/hw/timer/mc146818rtc.c
-@@ -62,36 +62,6 @@
- #define RTC_CLOCK_RATE            32768
- #define UIP_HOLD_LENGTH           (8 * NANOSECONDS_PER_SECOND / 32768)
+diff --git a/hw/block/fdc.c b/hw/block/fdc.c
+index 67f78ac702..cb0193ab58 100644
+--- a/hw/block/fdc.c
++++ b/hw/block/fdc.c
+@@ -61,14 +61,8 @@
+ #define FLOPPY_BUS(obj) OBJECT_CHECK(FloppyBus, (obj), TYPE_FLOPPY_BUS)
  
--#define MC146818_RTC(obj) OBJECT_CHECK(RTCState, (obj), TYPE_MC146818_RTC)
+ typedef struct FDCtrl FDCtrl;
+-typedef struct FDrive FDrive;
+ static FDrive *get_drv(FDCtrl *fdctrl, int unit);
+ 
+-typedef struct FloppyBus {
+-    BusState bus;
+-    FDCtrl *fdc;
+-} FloppyBus;
 -
--typedef struct RTCState {
+ static const TypeInfo floppy_bus_info = {
+     .name = TYPE_FLOPPY_BUS,
+     .parent = TYPE_BUS,
+@@ -178,36 +172,6 @@ static FDriveSize drive_size(FloppyDriveType drive)
+ #define FD_SECTOR_SC           2   /* Sector size code */
+ #define FD_RESET_SENSEI_COUNT  4   /* Number of sense interrupts on RESET */
+ 
+-/* Floppy disk drive emulation */
+-typedef enum FDiskFlags {
+-    FDISK_DBL_SIDES  = 0x01,
+-} FDiskFlags;
+-
+-struct FDrive {
+-    FDCtrl *fdctrl;
+-    BlockBackend *blk;
+-    BlockConf *conf;
+-    /* Drive status */
+-    FloppyDriveType drive;    /* CMOS drive type        */
+-    uint8_t perpendicular;    /* 2.88 MB access mode    */
+-    /* Position */
+-    uint8_t head;
+-    uint8_t track;
+-    uint8_t sect;
+-    /* Media */
+-    FloppyDriveType disk;     /* Current disk type      */
+-    FDiskFlags flags;
+-    uint8_t last_sect;        /* Nb sector per track    */
+-    uint8_t max_track;        /* Nb of tracks           */
+-    uint16_t bps;             /* Bytes per sector       */
+-    uint8_t ro;               /* Is read-only           */
+-    uint8_t media_changed;    /* Is media changed       */
+-    uint8_t media_rate;       /* Data rate of medium    */
+-
+-    bool media_validated;     /* Have we validated the media? */
+-};
+-
+-
+ static FloppyDriveType get_fallback_drive_type(FDrive *drv);
+ 
+ /* Hack: FD_SEEK is expected to work on empty drives. However, QEMU
+@@ -824,60 +788,6 @@ enum {
+ #define FD_MULTI_TRACK(state) ((state) & FD_STATE_MULTI)
+ #define FD_FORMAT_CMD(state) ((state) & FD_STATE_FORMAT)
+ 
+-struct FDCtrl {
+-    MemoryRegion iomem;
+-    qemu_irq irq;
+-    /* Controller state */
+-    QEMUTimer *result_timer;
+-    int dma_chann;
+-    uint8_t phase;
+-    IsaDma *dma;
+-    /* Controller's identification */
+-    uint8_t version;
+-    /* HW */
+-    uint8_t sra;
+-    uint8_t srb;
+-    uint8_t dor;
+-    uint8_t dor_vmstate; /* only used as temp during vmstate */
+-    uint8_t tdr;
+-    uint8_t dsr;
+-    uint8_t msr;
+-    uint8_t cur_drv;
+-    uint8_t status0;
+-    uint8_t status1;
+-    uint8_t status2;
+-    /* Command FIFO */
+-    uint8_t *fifo;
+-    int32_t fifo_size;
+-    uint32_t data_pos;
+-    uint32_t data_len;
+-    uint8_t data_state;
+-    uint8_t data_dir;
+-    uint8_t eot; /* last wanted sector */
+-    /* States kept only to be returned back */
+-    /* precompensation */
+-    uint8_t precomp_trk;
+-    uint8_t config;
+-    uint8_t lock;
+-    /* Power down config (also with status regB access mode */
+-    uint8_t pwrd;
+-    /* Floppy drives */
+-    FloppyBus bus;
+-    uint8_t num_floppies;
+-    FDrive drives[MAX_FD];
+-    struct {
+-        BlockBackend *blk;
+-        FloppyDriveType type;
+-    } qdev_for_drives[MAX_FD];
+-    int reset_sensei;
+-    uint32_t check_media_rate;
+-    FloppyDriveType fallback; /* type=auto failure fallback */
+-    /* Timers state */
+-    uint8_t timer0;
+-    uint8_t timer1;
+-    PortioList portio_list;
+-};
+-
+ static FloppyDriveType get_fallback_drive_type(FDrive *drv)
+ {
+     return drv->fdctrl->fallback;
+@@ -896,17 +806,6 @@ typedef struct FDCtrlSysBus {
+ 
+ #define ISA_FDC(obj) OBJECT_CHECK(FDCtrlISABus, (obj), TYPE_ISA_FDC)
+ 
+-typedef struct FDCtrlISABus {
 -    ISADevice parent_obj;
 -
--    MemoryRegion io;
--    uint8_t cmos_data[128];
--    uint8_t cmos_index;
--    int32_t base_year;
--    uint64_t base_rtc;
--    uint64_t last_update;
--    int64_t offset;
--    qemu_irq irq;
--    int it_shift;
--    /* periodic timer */
--    QEMUTimer *periodic_timer;
--    int64_t next_periodic_time;
--    /* update-ended timer */
--    QEMUTimer *update_timer;
--    uint64_t next_alarm_time;
--    uint16_t irq_reinject_on_ack_count;
--    uint32_t irq_coalesced;
--    uint32_t period;
--    QEMUTimer *coalesced_timer;
--    Notifier clock_reset_notifier;
--    LostTickPolicy lost_tick_policy;
--    Notifier suspend_notifier;
--    QLIST_ENTRY(RTCState) link;
--} RTCState;
+-    uint32_t iobase;
+-    uint32_t irq;
+-    uint32_t dma;
+-    struct FDCtrl state;
+-    int32_t bootindexA;
+-    int32_t bootindexB;
+-} FDCtrlISABus;
 -
- static void rtc_set_time(RTCState *s);
- static void rtc_update_time(RTCState *s);
- static void rtc_set_cmos(RTCState *s, const struct tm *tm);
-diff --git a/include/hw/timer/mc146818rtc.h b/include/hw/timer/mc146818rtc.h
-index 7c8e64b203..d7b2aa6b13 100644
---- a/include/hw/timer/mc146818rtc.h
-+++ b/include/hw/timer/mc146818rtc.h
-@@ -5,6 +5,35 @@
- #include "hw/timer/mc146818rtc_regs.h"
+ static uint32_t fdctrl_read (void *opaque, uint32_t reg)
+ {
+     FDCtrl *fdctrl = opaque;
+diff --git a/include/hw/block/fdc.h b/include/hw/block/fdc.h
+index 1749dabf25..d076b2fc1a 100644
+--- a/include/hw/block/fdc.h
++++ b/include/hw/block/fdc.h
+@@ -2,12 +2,115 @@
+ #define HW_FDC_H
  
- #define TYPE_MC146818_RTC "mc146818rtc"
-+#define MC146818_RTC(obj) OBJECT_CHECK(RTCState, (obj), TYPE_MC146818_RTC)
+ #include "qemu-common.h"
++#include "hw/block/block.h"
++#include "hw/isa/isa.h"
+ 
+ /* fdc.c */
+ #define MAX_FD 2
+ 
++typedef struct FDCtrl FDCtrl;
 +
-+typedef struct RTCState {
++/* Floppy disk drive emulation */
++typedef enum FDiskFlags {
++    FDISK_DBL_SIDES  = 0x01,
++} FDiskFlags;
++
++typedef struct FDrive {
++    FDCtrl *fdctrl;
++    BlockBackend *blk;
++    BlockConf *conf;
++    /* Drive status */
++    FloppyDriveType drive;    /* CMOS drive type        */
++    uint8_t perpendicular;    /* 2.88 MB access mode    */
++    /* Position */
++    uint8_t head;
++    uint8_t track;
++    uint8_t sect;
++    /* Media */
++    FloppyDriveType disk;     /* Current disk type      */
++    FDiskFlags flags;
++    uint8_t last_sect;        /* Nb sector per track    */
++    uint8_t max_track;        /* Nb of tracks           */
++    uint16_t bps;             /* Bytes per sector       */
++    uint8_t ro;               /* Is read-only           */
++    uint8_t media_changed;    /* Is media changed       */
++    uint8_t media_rate;       /* Data rate of medium    */
++
++    bool media_validated;     /* Have we validated the media? */
++} FDrive;
++
++typedef struct FloppyBus {
++    BusState bus;
++    FDCtrl *fdc;
++} FloppyBus;
++
++struct FDCtrl {
++    MemoryRegion iomem;
++    qemu_irq irq;
++    /* Controller state */
++    QEMUTimer *result_timer;
++    int dma_chann;
++    uint8_t phase;
++    IsaDma *dma;
++    /* Controller's identification */
++    uint8_t version;
++    /* HW */
++    uint8_t sra;
++    uint8_t srb;
++    uint8_t dor;
++    uint8_t dor_vmstate; /* only used as temp during vmstate */
++    uint8_t tdr;
++    uint8_t dsr;
++    uint8_t msr;
++    uint8_t cur_drv;
++    uint8_t status0;
++    uint8_t status1;
++    uint8_t status2;
++    /* Command FIFO */
++    uint8_t *fifo;
++    int32_t fifo_size;
++    uint32_t data_pos;
++    uint32_t data_len;
++    uint8_t data_state;
++    uint8_t data_dir;
++    uint8_t eot; /* last wanted sector */
++    /* States kept only to be returned back */
++    /* precompensation */
++    uint8_t precomp_trk;
++    uint8_t config;
++    uint8_t lock;
++    /* Power down config (also with status regB access mode */
++    uint8_t pwrd;
++    /* Floppy drives */
++    FloppyBus bus;
++    uint8_t num_floppies;
++    FDrive drives[MAX_FD];
++    struct {
++        BlockBackend *blk;
++        FloppyDriveType type;
++    } qdev_for_drives[MAX_FD];
++    int reset_sensei;
++    uint32_t check_media_rate;
++    FloppyDriveType fallback; /* type=auto failure fallback */
++    /* Timers state */
++    uint8_t timer0;
++    uint8_t timer1;
++    PortioList portio_list;
++};
++
+ #define TYPE_ISA_FDC "isa-fdc"
+ 
++typedef struct FDCtrlISABus {
 +    ISADevice parent_obj;
 +
-+    MemoryRegion io;
-+    uint8_t cmos_data[128];
-+    uint8_t cmos_index;
-+    int32_t base_year;
-+    uint64_t base_rtc;
-+    uint64_t last_update;
-+    int64_t offset;
-+    qemu_irq irq;
-+    int it_shift;
-+    /* periodic timer */
-+    QEMUTimer *periodic_timer;
-+    int64_t next_periodic_time;
-+    /* update-ended timer */
-+    QEMUTimer *update_timer;
-+    uint64_t next_alarm_time;
-+    uint16_t irq_reinject_on_ack_count;
-+    uint32_t irq_coalesced;
-+    uint32_t period;
-+    QEMUTimer *coalesced_timer;
-+    Notifier clock_reset_notifier;
-+    LostTickPolicy lost_tick_policy;
-+    Notifier suspend_notifier;
-+    QLIST_ENTRY(RTCState) link;
-+} RTCState;
- 
- ISADevice *rtc_init(ISABus *bus, int base_year, qemu_irq intercept_irq);
- void rtc_set_memory(ISADevice *dev, int addr, int val);
++    uint32_t iobase;
++    uint32_t irq;
++    uint32_t dma;
++    struct FDCtrl state;
++    int32_t bootindexA;
++    int32_t bootindexB;
++} FDCtrlISABus;
++
+ ISADevice *fdctrl_init_isa(ISABus *bus, DriveInfo **fds);
+ void fdctrl_init_sysbus(qemu_irq irq, int dma_chann,
+                         hwaddr mmio_base, DriveInfo **fds);
 -- 
 2.11.0
