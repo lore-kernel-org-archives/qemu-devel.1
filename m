@@ -1,39 +1,37 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45931)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45919)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1eQGTj-000635-Cy
+	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1eQGTi-00062C-E3
 	for qemu-devel@nongnu.org; Sat, 16 Dec 2017 12:42:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1eQGTf-0008UX-C3
-	for qemu-devel@nongnu.org; Sat, 16 Dec 2017 12:42:27 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:45830
-	helo=mx0a-001b2d01.pphosted.com)
+	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1eQGTe-0008TJ-Gt
+	for qemu-devel@nongnu.org; Sat, 16 Dec 2017 12:42:26 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:43024)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <stefanb@linux.vnet.ibm.com>)
-	id 1eQGTf-0008Ty-63
-	for qemu-devel@nongnu.org; Sat, 16 Dec 2017 12:42:23 -0500
-Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	vBGHdUdn134491
-	for <qemu-devel@nongnu.org>; Sat, 16 Dec 2017 12:42:22 -0500
-Received: from e37.co.us.ibm.com (e37.co.us.ibm.com [32.97.110.158])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2ew0h5k70f-1
+	id 1eQGTe-0008S0-7n
+	for qemu-devel@nongnu.org; Sat, 16 Dec 2017 12:42:22 -0500
+Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	vBGHfpHC019071
+	for <qemu-devel@nongnu.org>; Sat, 16 Dec 2017 12:42:21 -0500
+Received: from e36.co.us.ibm.com (e36.co.us.ibm.com [32.97.110.154])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2evypbcgur-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Sat, 16 Dec 2017 12:42:22 -0500
+	for <qemu-devel@nongnu.org>; Sat, 16 Dec 2017 12:42:21 -0500
 Received: from localhost
-	by e37.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	by e36.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
 	Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <stefanb@linux.vnet.ibm.com>;
-	Sat, 16 Dec 2017 10:42:21 -0700
+	Sat, 16 Dec 2017 10:42:20 -0700
 From: Stefan Berger <stefanb@linux.vnet.ibm.com>
-Date: Sat, 16 Dec 2017 12:41:32 -0500
+Date: Sat, 16 Dec 2017 12:41:31 -0500
 In-Reply-To: <1513446109-9013-1-git-send-email-stefanb@linux.vnet.ibm.com>
 References: <1513446109-9013-1-git-send-email-stefanb@linux.vnet.ibm.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-Message-Id: <1513446109-9013-16-git-send-email-stefanb@linux.vnet.ibm.com>
+Message-Id: <1513446109-9013-15-git-send-email-stefanb@linux.vnet.ibm.com>
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL v1 15/32] tpm-passthrough: workaround a possible
- race
+Subject: [Qemu-devel] [PULL v1 14/32] tpm-passthrough: simplify create()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -47,53 +45,81 @@ Cc: peter.maydell@linaro.org, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lu
 
 From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
-The TPM backend processing thread has common shared variable race
-issues. (they should not be so easy to reach since guest interaction
-with the device is slow compared to host emulation)
-
-An obvious one is setting op_cancelled from device thread after
-calling write(cancel_fd). The backend thread may return before the
-device thread has set the variable. Instead set it before
-cancellation. Even if the write() failed, the end result is command
-get possibly cancelled (even if cancellation came from external
-sources it doesn't matter much).
-
-It's worth to consider removing the backend processing thread for now.
+Use a similar code as tpm_emulator_create(), call handle_opts() and
+handle failure cleanup with object_unref() in create().
 
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 Reviewed-by: Stefan Berger <stefanb@linux.vnet.ibm.com>
 Signed-off-by: Stefan Berger <stefanb@linux.vnet.ibm.com>
 ---
- hw/tpm/tpm_passthrough.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ hw/tpm/tpm_passthrough.c | 36 ++++++++++--------------------------
+ 1 file changed, 10 insertions(+), 26 deletions(-)
 
 diff --git a/hw/tpm/tpm_passthrough.c b/hw/tpm/tpm_passthrough.c
-index 788be38..73554aa 100644
+index aa9167e..788be38 100644
 --- a/hw/tpm/tpm_passthrough.c
 +++ b/hw/tpm/tpm_passthrough.c
-@@ -89,6 +89,7 @@ static int tpm_passthrough_unix_tx_bufs(TPMPassthruStat=
-e *tpm_pt,
-     bool is_selftest;
-     const struct tpm_resp_hdr *hdr;
+@@ -261,49 +261,33 @@ tpm_passthrough_handle_device_opts(TPMPassthruState=
+ *tpm_pt, QemuOpts *opts)
+     if (tpm_pt->tpm_fd < 0) {
+         error_report("Cannot access TPM device using '%s': %s",
+                      tpm_pt->tpm_dev, strerror(errno));
+-        goto err_free_parameters;
++        return -1;
+     }
 =20
-+    /* FIXME: protect shared variables or use other sync mechanism */
-     tpm_pt->tpm_op_canceled =3D false;
-     tpm_pt->tpm_executing =3D true;
-     *selftest_done =3D false;
-@@ -178,12 +179,11 @@ static void tpm_passthrough_cancel_cmd(TPMBackend *=
-tb)
-      */
-     if (tpm_pt->tpm_executing) {
-         if (tpm_pt->cancel_fd >=3D 0) {
-+            tpm_pt->tpm_op_canceled =3D true;
-             n =3D write(tpm_pt->cancel_fd, "-", 1);
-             if (n !=3D 1) {
-                 error_report("Canceling TPM command failed: %s",
-                              strerror(errno));
--            } else {
--                tpm_pt->tpm_op_canceled =3D true;
-             }
-         } else {
-             error_report("Cannot cancel TPM command due to missing "
+     if (tpm_util_test_tpmdev(tpm_pt->tpm_fd, &tpm_pt->tpm_version)) {
+         error_report("'%s' is not a TPM device.",
+                      tpm_pt->tpm_dev);
+-        goto err_close_tpmdev;
++        return -1;
+     }
+=20
+-    return 0;
+-
+- err_close_tpmdev:
+-    qemu_close(tpm_pt->tpm_fd);
+-    tpm_pt->tpm_fd =3D -1;
+-
+- err_free_parameters:
+-    qapi_free_TPMPassthroughOptions(tpm_pt->options);
+-    tpm_pt->options =3D NULL;
+-    tpm_pt->tpm_dev =3D NULL;
++    tpm_pt->cancel_fd =3D tpm_passthrough_open_sysfs_cancel(tpm_pt);
++    if (tpm_pt->cancel_fd < 0) {
++        return -1;
++    }
+=20
+-    return 1;
++    return 0;
+ }
+=20
+ static TPMBackend *tpm_passthrough_create(QemuOpts *opts)
+ {
+     Object *obj =3D object_new(TYPE_TPM_PASSTHROUGH);
+-    TPMPassthruState *tpm_pt =3D TPM_PASSTHROUGH(obj);
+=20
+-    if (tpm_passthrough_handle_device_opts(tpm_pt, opts)) {
+-        goto err_exit;
+-    }
+-
+-    tpm_pt->cancel_fd =3D tpm_passthrough_open_sysfs_cancel(tpm_pt);
+-    if (tpm_pt->cancel_fd < 0) {
+-        goto err_exit;
++    if (tpm_passthrough_handle_device_opts(TPM_PASSTHROUGH(obj), opts)) =
+{
++        object_unref(obj);
++        return NULL;
+     }
+=20
+     return TPM_BACKEND(obj);
+-
+-err_exit:
+-    object_unref(obj);
+-
+-    return NULL;
+ }
+=20
+ static TpmTypeOptions *tpm_passthrough_get_tpm_options(TPMBackend *tb)
 --=20
 2.5.5
