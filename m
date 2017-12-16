@@ -1,26 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50067)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49381)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eQCqT-0003BY-UR
-	for qemu-devel@nongnu.org; Sat, 16 Dec 2017 08:49:42 -0500
+	(envelope-from <bounces@canonical.com>) id 1eQ19f-00043B-PJ
+	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 20:20:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eQCqT-0004aV-09
-	for qemu-devel@nongnu.org; Sat, 16 Dec 2017 08:49:41 -0500
-Received: from mail-ot0-x22e.google.com ([2607:f8b0:4003:c0f::22e]:35743)
+	(envelope-from <bounces@canonical.com>) id 1eQ19b-0006wT-KH
+	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 20:20:43 -0500
+Received: from indium.canonical.com ([91.189.90.7]:34702)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1eQCqS-0004Zr-QQ
-	for qemu-devel@nongnu.org; Sat, 16 Dec 2017 08:49:40 -0500
-Received: by mail-ot0-x22e.google.com with SMTP id q3so10037845oth.2
-	for <qemu-devel@nongnu.org>; Sat, 16 Dec 2017 05:49:40 -0800 (PST)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1eQ19b-0006vR-Cp
+	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 20:20:39 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1eQ19a-0006I9-Hq
+	for <qemu-devel@nongnu.org>; Sat, 16 Dec 2017 01:20:38 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 7F33C2E80C7
+	for <qemu-devel@nongnu.org>; Sat, 16 Dec 2017 01:20:38 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <1513370232-25515-1-git-send-email-wei@redhat.com>
-References: <1513370232-25515-1-git-send-email-wei@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Sat, 16 Dec 2017 13:49:19 +0000
-Message-ID: <CAFEAcA8FXhrOzN=9Thiv_aGy8n=kU+E1R5R93DL3XStwQQ2MfQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH RFC 1/1] tests: Add migration test for
- aarch64
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Sat, 16 Dec 2017 01:07:43 -0000
+From: webczat <webczat_200@poczta.onet.pl>
+Reply-To: Bug 1738507 <1738507@bugs.launchpad.net>
+Sender: bounces@canonical.com
+Message-Id: <151338646328.26229.15531211351993382335.malonedeb@wampee.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1738507] [NEW] qemu sometimes stuck when booting
+ windows 10
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,66 +36,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Wei Huang <wei@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Juan Quintela <quintela@redhat.com>
+To: qemu-devel@nongnu.org
 
-On 15 December 2017 at 20:37, Wei Huang <wei@redhat.com> wrote:
-> This patch adds the migration test support for aarch64. The test code,
-> which implements the same functionality as x86, is compiled into a binary
-> and booted as a kernel to qemu. Here are the design ideas:
->
-> * We choose this -kernel design because aarch64 QEMU doesn't provide a
->   built-in fw like x86 does. So instead of relying on a boot loader, we
->   use -kernel approach for aarch64.
-> * The serial output is sent to PL011 directly.
-> * The physical memory base for mach-virt machine is 0x40000000. We have
->   to change the start_address and end_address for aarch64.
-> * The downtime is changed from 0.001 to 0.1. Without this change, we saw
->   migration stalled. This problem is still under analysis and needs to be
->   resolved before removing RFC for this patch.
->
-> The test code is as the following:
->
-> .section .text
+Public bug reported:
 
+I am using qemu-2.10.1, or actually libvirt, to create a virtual machine, r=
+unning microsoft windows 10 pro operating system.
+It installed fine and was actually working, however sometimes when trying t=
+o boot the vm, the whole boot process gets stuck.
+For some reason, it seemed to happen only when enough physical memory is ta=
+ken so that, when booting a windows vm that has 4gb of available ram, host =
+starts swapping some other processes. It is not always happening there, but=
+ often it happens, and I do not remember seeing any case of this happening =
+when not swapping, maybe a kind of a timing issue?
+When this happens, I usually try to hard reset the machine by libvirt reset=
+ command or equivalent system_reset on qemu monitor, however the whole rese=
+t does not happen, and the command is a noop. That makes me think it is a q=
+emu bug, not windows refusing operation. At the time of this event, qemu mo=
+nitor and spice server are working correctly, are not stuck, and even doing=
+ things like system reset does not result in a monitor hang. It is also pos=
+sible to quit qemu normally.
+I tried to workaround the bug by guessing what may cause it. Switched from =
+bios to uefi, changed virtio-scsi to ahci temporarily, and disabled virtio-=
+balloon in case it would be buggy, with no visible change.
+I will attach a libvirt log, because it contains qemu command line. I will =
+also attach an example qemu backtrace.
+>From what i know, both vcpu threads are working normally, at least none of =
+them is stuck in a vcpu, nor deadlocked, etc. So backtrace could be differe=
+nt each time I tried to get it.
 
->  #if defined(__linux__)
-> @@ -125,6 +125,18 @@ unsigned char bootsect[] = {
->    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x55, 0xaa
->  };
->
-> +unsigned char aarch64_kernel[] = {
-> +    0x00, 0x10, 0x38, 0xd5, 0x00, 0xf8, 0x7f, 0x92, 0x00, 0x10, 0x18, 0xd5,
-> +    0xdf, 0x3f, 0x03, 0xd5, 0x24, 0x08, 0x80, 0x52, 0x05, 0x20, 0xa1, 0xd2,
-> +    0xa4, 0x00, 0x00, 0x39, 0x06, 0x00, 0x80, 0x52, 0x03, 0xc8, 0xa8, 0xd2,
-> +    0x02, 0x02, 0xa8, 0xd2, 0x41, 0x00, 0x40, 0x39, 0x21, 0x04, 0x00, 0x11,
-> +    0x41, 0x00, 0x00, 0x39, 0x42, 0x04, 0x40, 0x91, 0x5f, 0x00, 0x03, 0xeb,
-> +    0x6b, 0xff, 0xff, 0x54, 0xc6, 0x04, 0x00, 0x11, 0xc6, 0x1c, 0x00, 0x12,
-> +    0xdf, 0x00, 0x00, 0x71, 0xc1, 0xfe, 0xff, 0x54, 0x44, 0x08, 0x80, 0x52,
-> +    0x05, 0x20, 0xa1, 0xd2, 0xa4, 0x00, 0x00, 0x39, 0xf2, 0xff, 0xff, 0x97
-> +};
-> +unsigned int aarch64_kernel_len = 96;
+** Affects: qemu
+     Importance: Undecided
+         Status: New
 
-I'm not really a fan of this steadily increasing number of hex-encoded
-target binary blobs in the tests directory, but if we must, I
-think this would be easier to read as an array of uint32_t,
-so that each entry is one instruction word.
+** Attachment added: "example qemu backtrace from all threads"
+   https://bugs.launchpad.net/bugs/1738507/+attachment/5023250/+files/backt=
+race.txt
 
-(If your claim is that nobody cares about the hex because
-they'll just rebuild from the source code in the commit
-message, I would suggest that that makes the source code
-the 'preferred form for modification' under the GPL...)
+-- =
 
-But I think at some point we really need to stop doing
-this and instead figure out a mechanism for building
-target code as part of the QEMU build-and-test.
-It is coming up increasingly often:
- * code to run on the guest in tests
- * the bios blobs (at the moment we special case
-   the x86 bios blobs and assume we can compile them
-   with the host C compiler, which is not great)
- * for linux-user on several architectures we would like
-   to properly implement a guest VDSO
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1738507
 
-thanks
--- PMM
+Title:
+  qemu sometimes stuck when booting windows 10
+
+Status in QEMU:
+  New
+
+Bug description:
+  I am using qemu-2.10.1, or actually libvirt, to create a virtual machine,=
+ running microsoft windows 10 pro operating system.
+  It installed fine and was actually working, however sometimes when trying=
+ to boot the vm, the whole boot process gets stuck.
+  For some reason, it seemed to happen only when enough physical memory is =
+taken so that, when booting a windows vm that has 4gb of available ram, hos=
+t starts swapping some other processes. It is not always happening there, b=
+ut often it happens, and I do not remember seeing any case of this happenin=
+g when not swapping, maybe a kind of a timing issue?
+  When this happens, I usually try to hard reset the machine by libvirt res=
+et command or equivalent system_reset on qemu monitor, however the whole re=
+set does not happen, and the command is a noop. That makes me think it is a=
+ qemu bug, not windows refusing operation. At the time of this event, qemu =
+monitor and spice server are working correctly, are not stuck, and even doi=
+ng things like system reset does not result in a monitor hang. It is also p=
+ossible to quit qemu normally.
+  I tried to workaround the bug by guessing what may cause it. Switched fro=
+m bios to uefi, changed virtio-scsi to ahci temporarily, and disabled virti=
+o-balloon in case it would be buggy, with no visible change.
+  I will attach a libvirt log, because it contains qemu command line. I wil=
+l also attach an example qemu backtrace.
+  From what i know, both vcpu threads are working normally, at least none o=
+f them is stuck in a vcpu, nor deadlocked, etc. So backtrace could be diffe=
+rent each time I tried to get it.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1738507/+subscriptions
