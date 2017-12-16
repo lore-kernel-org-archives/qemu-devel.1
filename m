@@ -1,28 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54909)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48301)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <penguin-kernel@I-love.SAKURA.ne.jp>)
-	id 1eQAgF-0003U8-7D
-	for qemu-devel@nongnu.org; Sat, 16 Dec 2017 06:31:00 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1eQCit-0000m7-C8
+	for qemu-devel@nongnu.org; Sat, 16 Dec 2017 08:41:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <penguin-kernel@I-love.SAKURA.ne.jp>)
-	id 1eQAgC-0005CD-KQ
-	for qemu-devel@nongnu.org; Sat, 16 Dec 2017 06:30:59 -0500
-Received: from www262.sakura.ne.jp ([2001:e42:101:1:202:181:97:72]:13847)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <penguin-kernel@I-love.SAKURA.ne.jp>)
-	id 1eQAgC-0002hi-5O
-	for qemu-devel@nongnu.org; Sat, 16 Dec 2017 06:30:56 -0500
-From: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
-References: <1513079759-14169-1-git-send-email-wei.w.wang@intel.com>
-	<1513079759-14169-4-git-send-email-wei.w.wang@intel.com>
-	<20171215184256.GA27160@bombadil.infradead.org>
-	<5A34F193.5040700@intel.com>
-In-Reply-To: <5A34F193.5040700@intel.com>
-Message-Id: <201712162028.FEB87079.FOJFMQHVOSLtFO@I-love.SAKURA.ne.jp>
-Date: Sat, 16 Dec 2017 20:28:04 +0900
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Subject: Re: [Qemu-devel] [PATCH v19 3/7] xbitmap: add more operations
+	(envelope-from <peter.maydell@linaro.org>) id 1eQCis-0007fC-By
+	for qemu-devel@nongnu.org; Sat, 16 Dec 2017 08:41:51 -0500
+Received: from mail-oi0-x22b.google.com ([2607:f8b0:4003:c06::22b]:45787)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1eQCis-0007e2-5f
+	for qemu-devel@nongnu.org; Sat, 16 Dec 2017 08:41:50 -0500
+Received: by mail-oi0-x22b.google.com with SMTP id x20so7948976oix.12
+	for <qemu-devel@nongnu.org>; Sat, 16 Dec 2017 05:41:49 -0800 (PST)
+MIME-Version: 1.0
+In-Reply-To: <CAHQ1cqGPq_PkxbnZHdZwKB8snqavyuWuHFjD9x_OdMSjzS3mRg@mail.gmail.com>
+References: <20171214151906.3250-1-andrew.smirnov@gmail.com>
+	<CAFEAcA-Chirj4y_YhK7Na_gf5504VNKUGZnfNTN6CHXN9gfZPA@mail.gmail.com>
+	<CAHQ1cqGPq_PkxbnZHdZwKB8snqavyuWuHFjD9x_OdMSjzS3mRg@mail.gmail.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Sat, 16 Dec 2017 13:41:28 +0000
+Message-ID: <CAFEAcA_ZU=jNoD-M4J7ux6MuZXvz4tUJQfmVpYn8Q7cYk2HqbQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH] hw/misc: Add code to emulate PFUZE3000 PMIC
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,27 +30,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: wei.w.wang@intel.com, willy@infradead.org
-Cc: virtio-dev@lists.oasis-open.org, linux-kernel@vger.kernel.org, qemu-devel@nongnu.org, virtualization@lists.linux-foundation.org, kvm@vger.kernel.org, linux-mm@kvack.org, mst@redhat.com, mhocko@kernel.org, akpm@linux-foundation.org, mawilcox@microsoft.com, david@redhat.com, cornelia.huck@de.ibm.com, mgorman@techsingularity.net, aarcange@redhat.com, amit.shah@redhat.com, pbonzini@redhat.com, liliang.opensource@gmail.com, yang.zhang.wz@gmail.com, quan.xu@aliyun.com, nilal@redhat.com, riel@redhat.com
+To: Andrey Smirnov <andrew.smirnov@gmail.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm@nongnu.orgn, Andrey Yurovsky <yurovsky@gmail.com>
 
-Wei Wang wrote:
-> On 12/16/2017 02:42 AM, Matthew Wilcox wrote:
-> > On Tue, Dec 12, 2017 at 07:55:55PM +0800, Wei Wang wrote:
-> >> +int xb_preload_and_set_bit(struct xb *xb, unsigned long bit, gfp_t gfp);
-> > I'm struggling to understand when one would use this.  The xb_ API
-> > requires you to handle your own locking.  But specifying GFP flags
-> > here implies you can sleep.  So ... um ... there's no locking?
-> 
-> In the regular use cases, people would do xb_preload() before taking the 
-> lock, and the xb_set/clear within the lock.
-> 
-> In the virtio-balloon usage, we have a large number of bits to set with 
-> the balloon_lock being held (we're not unlocking for each bit), so we 
-> used the above wrapper to do preload and set within the balloon_lock, 
-> and passed in GFP_NOWAIT to avoid sleeping. Probably we can change to 
-> put this wrapper implementation to virtio-balloon, since it would not be 
-> useful for the regular cases.
+On 15 December 2017 at 19:21, Andrey Smirnov <andrew.smirnov@gmail.com> wrote:
+> On Fri, Dec 15, 2017 at 6:56 AM, Peter Maydell <peter.maydell@linaro.org> wrote:
+>> Is there a board which needs this device? We usually
+>> only add devices together with whatever's using them.
 
-GFP_NOWAIT is chosen in order not to try to OOM-kill something, isn't it?
-But passing GFP_NOWAIT means that we can handle allocation failure. There is
-no need to use preload approach when we can handle allocation failure.
+> It's a pretty popular PMIC used on majority on i.MX reference designs,
+> but I am not sure how many of those boards truly need it in QEMU. I
+> ended up having to implement this code for a custom i.MX7 board that
+> used one of PFUZE3000's output as a power supply for USB. I am not
+> sure if I'm ever going to submit patches for that mystery board
+> upstream. Looking at imx6qdl-sabresd.dtsi, in Linux source tree I
+> think this emulation code would also be needed for USB emulation on
+> i.MX6 SabreSD board, but I haven't verified it in practice.
+>
+> Is this enough of a case to justify the patch's inclusion, or should I
+> go back and find a board QEMU supports that actually needs this
+> (either answer is perfectly fine with me)?
+
+I think what I'd like to see is some board model in QEMU
+actually creating this device. (I assume it's not intended
+as a "user creates it with -device" pluggable device.)
+Otherwise it's just dead code from upstream's point of view.
+
+thanks
+-- PMM
