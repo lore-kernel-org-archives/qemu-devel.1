@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38827)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38844)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1eQ9OG-0007ly-R0
-	for qemu-devel@nongnu.org; Sat, 16 Dec 2017 05:08:21 -0500
+	(envelope-from <groug@kaod.org>) id 1eQ9OS-0007ro-Ur
+	for qemu-devel@nongnu.org; Sat, 16 Dec 2017 05:08:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1eQ9OC-0007xr-RL
-	for qemu-devel@nongnu.org; Sat, 16 Dec 2017 05:08:20 -0500
-Received: from mga18.intel.com ([134.134.136.126]:2826)
+	(envelope-from <groug@kaod.org>) id 1eQ9OO-00083p-U3
+	for qemu-devel@nongnu.org; Sat, 16 Dec 2017 05:08:32 -0500
+Received: from 19.mo4.mail-out.ovh.net ([87.98.179.66]:45511)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
-	id 1eQ9OC-0007to-Gj
-	for qemu-devel@nongnu.org; Sat, 16 Dec 2017 05:08:16 -0500
-Message-ID: <5A34F103.7070004@intel.com>
-Date: Sat, 16 Dec 2017 18:10:11 +0800
-From: Wei Wang <wei.w.wang@intel.com>
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1eQ9OO-00082V-N1
+	for qemu-devel@nongnu.org; Sat, 16 Dec 2017 05:08:28 -0500
+Received: from player694.ha.ovh.net (b7.ovh.net [213.186.33.57])
+	by mo4.mail-out.ovh.net (Postfix) with ESMTP id 82F3311871A
+	for <qemu-devel@nongnu.org>; Sat, 16 Dec 2017 11:08:26 +0100 (CET)
+From: Greg Kurz <groug@kaod.org>
+Date: Sat, 16 Dec 2017 11:08:24 +0100
+Message-ID: <151341890412.21880.8358856828225630003.stgit@bahia.lan>
 MIME-Version: 1.0
-References: <1513079759-14169-2-git-send-email-wei.w.wang@intel.com>
-	<201712151837.MQq7hdgk%fengguang.wu@intel.com>
-	<20171215132405.GB10348@bombadil.infradead.org>
-In-Reply-To: <20171215132405.GB10348@bombadil.infradead.org>
-Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v19 1/7] xbitmap: Introduce xbitmap
+Subject: [Qemu-devel] [PATCH] tests: virtio-9p: set DRIVER_OK before using
+ the device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,20 +28,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Matthew Wilcox <willy@infradead.org>, kbuild test robot <lkp@intel.com>
-Cc: kbuild-all@01.org, virtio-dev@lists.oasis-open.org, linux-kernel@vger.kernel.org, qemu-devel@nongnu.org, virtualization@lists.linux-foundation.org, kvm@vger.kernel.org, linux-mm@kvack.org, mst@redhat.com, mhocko@kernel.org, akpm@linux-foundation.org, mawilcox@microsoft.com, david@redhat.com, penguin-kernel@I-love.SAKURA.ne.jp, cornelia.huck@de.ibm.com, mgorman@techsingularity.net, aarcange@redhat.com, amit.shah@redhat.com, pbonzini@redhat.com, liliang.opensource@gmail.com, yang.zhang.wz@gmail.com, quan.xu@aliyun.com, nilal@redhat.com, riel@redhat.com
+To: qemu-devel@nongnu.org
+Cc: Greg Kurz <groug@kaod.org>
 
-On 12/15/2017 09:24 PM, Matthew Wilcox wrote:
-> On Fri, Dec 15, 2017 at 07:05:07PM +0800, kbuild test robot wrote:
->>      21		struct radix_tree_node *node;
->>      22		void **slot;
->                               ^^^
-> missing __rcu annotation here.
->
-> Wei, could you fold that change into your next round?  Thanks!
->
+Signed-off-by: Greg Kurz <groug@kaod.org>
+---
+ tests/virtio-9p-test.c |    3 +++
+ 1 file changed, 3 insertions(+)
 
-Sure, I'll do. Thanks for your time on this patch series.
-
-Best,
-Wei
+diff --git a/tests/virtio-9p-test.c b/tests/virtio-9p-test.c
+index ebd24b20f657..00f00f7246e9 100644
+--- a/tests/virtio-9p-test.c
++++ b/tests/virtio-9p-test.c
+@@ -75,6 +75,9 @@ static QVirtIO9P *qvirtio_9p_pci_start(void)
+     qvirtio_set_driver(v9p->dev);
+ 
+     v9p->vq = qvirtqueue_setup(v9p->dev, v9p->qs->alloc, 0);
++
++    qvirtio_set_driver_ok(v9p->dev);
++
+     return v9p;
+ }
+ 
