@@ -1,38 +1,38 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45751)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45794)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1eQGTU-0005p9-FJ
-	for qemu-devel@nongnu.org; Sat, 16 Dec 2017 12:42:13 -0500
+	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1eQGTW-0005r0-Iq
+	for qemu-devel@nongnu.org; Sat, 16 Dec 2017 12:42:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1eQGTQ-0008C8-GX
-	for qemu-devel@nongnu.org; Sat, 16 Dec 2017 12:42:12 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:51054)
+	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1eQGTS-0008DY-Kt
+	for qemu-devel@nongnu.org; Sat, 16 Dec 2017 12:42:14 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:57128
+	helo=mx0a-001b2d01.pphosted.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <stefanb@linux.vnet.ibm.com>)
-	id 1eQGTQ-0008BU-6r
-	for qemu-devel@nongnu.org; Sat, 16 Dec 2017 12:42:08 -0500
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+	id 1eQGTS-0008DQ-G6
+	for qemu-devel@nongnu.org; Sat, 16 Dec 2017 12:42:10 -0500
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
 	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	vBGHfvKv057146
-	for <qemu-devel@nongnu.org>; Sat, 16 Dec 2017 12:42:03 -0500
-Received: from e33.co.us.ibm.com (e33.co.us.ibm.com [32.97.110.151])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2evxpte586-1
+	vBGHdjqC041747
+	for <qemu-devel@nongnu.org>; Sat, 16 Dec 2017 12:42:10 -0500
+Received: from e31.co.us.ibm.com (e31.co.us.ibm.com [32.97.110.149])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2ew08mumbv-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Sat, 16 Dec 2017 12:42:03 -0500
+	for <qemu-devel@nongnu.org>; Sat, 16 Dec 2017 12:42:09 -0500
 Received: from localhost
-	by e33.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	by e31.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
 	Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <stefanb@linux.vnet.ibm.com>;
-	Sat, 16 Dec 2017 10:42:02 -0700
+	Sat, 16 Dec 2017 10:42:09 -0700
 From: Stefan Berger <stefanb@linux.vnet.ibm.com>
-Date: Sat, 16 Dec 2017 12:41:20 -0500
+Date: Sat, 16 Dec 2017 12:41:24 -0500
 In-Reply-To: <1513446109-9013-1-git-send-email-stefanb@linux.vnet.ibm.com>
 References: <1513446109-9013-1-git-send-email-stefanb@linux.vnet.ibm.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-Message-Id: <1513446109-9013-4-git-send-email-stefanb@linux.vnet.ibm.com>
+Message-Id: <1513446109-9013-8-git-send-email-stefanb@linux.vnet.ibm.com>
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL v1 03/32] tpm-backend: store TPMIf interface,
- improve backend_init()
+Subject: [Qemu-devel] [PULL v1 07/32] tpm-be: ask model to the TPM interface
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -46,160 +46,106 @@ Cc: peter.maydell@linaro.org, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lu
 
 From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
-Store the TPM interface, the actual object may be different from
-TPMState. Keep a reference on the interface, and check the backend
-wasn't already initialized.
+No need to store the mode in the backend, or to let the frontend set
+it itself.
 
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 Reviewed-by: Stefan Berger <stefanb@linux.vnet.ibm.com>
 Signed-off-by: Stefan Berger <stefanb@linux.vnet.ibm.com>
 ---
- backends/tpm.c               | 11 +++++++++--
- hw/tpm/tpm_emulator.c        |  4 ++--
- hw/tpm/tpm_passthrough.c     |  4 ++--
- hw/tpm/tpm_tis.c             |  2 +-
- include/sysemu/tpm.h         |  2 +-
- include/sysemu/tpm_backend.h |  6 +++---
- 6 files changed, 18 insertions(+), 11 deletions(-)
+ backends/tpm.c               | 4 ++--
+ hw/tpm/tpm_tis.c             | 3 +--
+ include/sysemu/tpm.h         | 1 +
+ include/sysemu/tpm_backend.h | 1 -
+ tpm.c                        | 3 ++-
+ 5 files changed, 6 insertions(+), 6 deletions(-)
 
 diff --git a/backends/tpm.c b/backends/tpm.c
-index 1e416d7..86f0e7e 100644
+index 7b108bd..0c48d18 100644
 --- a/backends/tpm.c
 +++ b/backends/tpm.c
-@@ -43,9 +43,15 @@ enum TpmType tpm_backend_get_type(TPMBackend *s)
-     return k->type;
- }
-=20
--int tpm_backend_init(TPMBackend *s, TPMState *state)
-+int tpm_backend_init(TPMBackend *s, TPMIf *tpmif)
+@@ -148,9 +148,10 @@ TPMInfo *tpm_backend_query_tpm(TPMBackend *s)
  {
--    s->tpm_state =3D state;
-+    if (s->tpmif) {
-+        return -1;
-+    }
-+
-+    s->tpmif =3D tpmif;
-+    object_ref(OBJECT(tpmif));
-+
-     s->had_startup_error =3D false;
+     TPMInfo *info =3D g_new0(TPMInfo, 1);
+     TPMBackendClass *k =3D TPM_BACKEND_GET_CLASS(s);
++    TPMIfClass *tic =3D TPM_IF_GET_CLASS(s->tpmif);
 =20
-     return 0;
-@@ -193,6 +199,7 @@ static void tpm_backend_instance_finalize(Object *obj=
-)
- {
-     TPMBackend *s =3D TPM_BACKEND(obj);
-=20
-+    object_unref(OBJECT(s->tpmif));
-     g_free(s->id);
-     tpm_backend_thread_end(s);
- }
-diff --git a/hw/tpm/tpm_emulator.c b/hw/tpm/tpm_emulator.c
-index e1a6810..5f88975 100644
---- a/hw/tpm/tpm_emulator.c
-+++ b/hw/tpm/tpm_emulator.c
-@@ -186,7 +186,7 @@ static int tpm_emulator_set_locality(TPMEmulator *tpm=
-_emu, uint8_t locty_number,
- static void tpm_emulator_handle_request(TPMBackend *tb, TPMBackendCmd *c=
-md)
- {
-     TPMEmulator *tpm_emu =3D TPM_EMULATOR(tb);
--    TPMIfClass *tic =3D TPM_IF_GET_CLASS(tb->tpm_state);
-+    TPMIfClass *tic =3D TPM_IF_GET_CLASS(tb->tpmif);
-     Error *err =3D NULL;
-=20
-     DPRINTF("processing TPM command");
-@@ -201,7 +201,7 @@ static void tpm_emulator_handle_request(TPMBackend *t=
-b, TPMBackendCmd *cmd)
-         goto error;
+     info->id =3D g_strdup(s->id);
+-    info->model =3D s->fe_model;
++    info->model =3D tic->model;
+     if (k->get_tpm_options) {
+         info->options =3D k->get_tpm_options(s);
      }
-=20
--    tic->request_completed(TPM_IF(tb->tpm_state));
-+    tic->request_completed(tb->tpmif);
-     return;
-=20
- error:
-diff --git a/hw/tpm/tpm_passthrough.c b/hw/tpm/tpm_passthrough.c
-index c440aff..2ad74ba 100644
---- a/hw/tpm/tpm_passthrough.c
-+++ b/hw/tpm/tpm_passthrough.c
-@@ -139,14 +139,14 @@ err_exit:
- static void tpm_passthrough_handle_request(TPMBackend *tb, TPMBackendCmd=
- *cmd)
- {
-     TPMPassthruState *tpm_pt =3D TPM_PASSTHROUGH(tb);
--    TPMIfClass *tic =3D TPM_IF_GET_CLASS(tb->tpm_state);
-+    TPMIfClass *tic =3D TPM_IF_GET_CLASS(tb->tpmif);
-=20
-     DPRINTF("tpm_passthrough: processing command %p\n", cmd);
-=20
-     tpm_passthrough_unix_tx_bufs(tpm_pt, cmd->in, cmd->in_len,
-                                  cmd->out, cmd->out_len, &cmd->selftest_=
-done);
-=20
--    tic->request_completed(TPM_IF(tb->tpm_state));
-+    tic->request_completed(tb->tpmif);
+@@ -204,7 +205,6 @@ static void tpm_backend_instance_init(Object *obj)
+                              tpm_backend_prop_get_opened,
+                              tpm_backend_prop_set_opened,
+                              NULL);
+-    s->fe_model =3D -1;
+     s->bh =3D qemu_bh_new(tpm_backend_request_completed_bh, s);
  }
 =20
- static void tpm_passthrough_reset(TPMBackend *tb)
 diff --git a/hw/tpm/tpm_tis.c b/hw/tpm/tpm_tis.c
-index 880ca1a..9a2360e 100644
+index bf291e6..a780167 100644
 --- a/hw/tpm/tpm_tis.c
 +++ b/hw/tpm/tpm_tis.c
-@@ -1082,7 +1082,7 @@ static void tpm_tis_realizefn(DeviceState *dev, Err=
+@@ -1072,8 +1072,6 @@ static void tpm_tis_realizefn(DeviceState *dev, Err=
 or **errp)
-=20
-     s->be_driver->fe_model =3D TPM_MODEL_TPM_TIS;
-=20
--    if (tpm_backend_init(s->be_driver, s)) {
-+    if (tpm_backend_init(s->be_driver, TPM_IF(s))) {
-         error_setg(errp, "tpm_tis: backend driver with id %s could not b=
-e "
-                    "initialized", s->backend);
          return;
+     }
+=20
+-    s->be_driver->fe_model =3D TPM_MODEL_TPM_TIS;
+-
+     if (tpm_backend_init(s->be_driver, TPM_IF(s), errp)) {
+         return;
+     }
+@@ -1108,6 +1106,7 @@ static void tpm_tis_class_init(ObjectClass *klass, =
+void *data)
+     dc->props =3D tpm_tis_properties;
+     dc->reset =3D tpm_tis_reset;
+     dc->vmsd  =3D &vmstate_tpm_tis;
++    tc->model =3D TPM_MODEL_TPM_TIS;
+     tc->request_completed =3D tpm_tis_request_completed;
+ }
+=20
 diff --git a/include/sysemu/tpm.h b/include/sysemu/tpm.h
-index 452cdb9..fb1719e 100644
+index e087962..7b407ca 100644
 --- a/include/sysemu/tpm.h
 +++ b/include/sysemu/tpm.h
-@@ -12,8 +12,8 @@
- #ifndef QEMU_TPM_H
- #define QEMU_TPM_H
+@@ -40,6 +40,7 @@ typedef struct TPMIf {
+ typedef struct TPMIfClass {
+     InterfaceClass parent_class;
 =20
--#include "qemu/option.h"
- #include "qom/object.h"
-+#include "qapi-types.h"
-=20
- typedef struct TPMState TPMState;
++    enum TpmModel model;
+     void (*request_completed)(TPMIf *obj);
+ } TPMIfClass;
 =20
 diff --git a/include/sysemu/tpm_backend.h b/include/sysemu/tpm_backend.h
-index 03ea5a3..b5f21ed 100644
+index df9ebd0..665e807 100644
 --- a/include/sysemu/tpm_backend.h
 +++ b/include/sysemu/tpm_backend.h
-@@ -43,8 +43,8 @@ struct TPMBackend {
-     Object parent;
+@@ -51,7 +51,6 @@ struct TPMBackend {
 =20
-     /*< protected >*/
-+    TPMIf *tpmif;
-     bool opened;
--    TPMState *tpm_state;
-     GThreadPool *thread_pool;
-     bool had_startup_error;
+     /* <public> */
+     char *id;
+-    enum TpmModel fe_model;
 =20
-@@ -96,14 +96,14 @@ enum TpmType tpm_backend_get_type(TPMBackend *s);
- /**
-  * tpm_backend_init:
-  * @s: the backend to initialized
-- * @state: TPMState
-+ * @tpmif: TPM interface
-  * @datacb: callback for sending data to frontend
-  *
-  * Initialize the backend with the given variables.
-  *
-  * Returns 0 on success.
-  */
--int tpm_backend_init(TPMBackend *s, TPMState *state);
-+int tpm_backend_init(TPMBackend *s, TPMIf *tpmif);
+     QLIST_ENTRY(TPMBackend) list;
+ };
+diff --git a/tpm.c b/tpm.c
+index ab5d29e..4320f44 100644
+--- a/tpm.c
++++ b/tpm.c
+@@ -200,9 +200,10 @@ TPMInfoList *qmp_query_tpm(Error **errp)
+     TPMInfoList *info, *head =3D NULL, *cur_item =3D NULL;
 =20
- /**
-  * tpm_backend_startup_tpm:
+     QLIST_FOREACH(drv, &tpm_backends, list) {
+-        if (!tpm_models[drv->fe_model]) {
++        if (!drv->tpmif) {
+             continue;
+         }
++
+         info =3D g_new0(TPMInfoList, 1);
+         info->value =3D tpm_backend_query_tpm(drv);
+=20
 --=20
 2.5.5
