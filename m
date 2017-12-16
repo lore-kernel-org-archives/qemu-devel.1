@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42705)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43245)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <hpoussin@reactos.org>) id 1eQK4l-0008OK-Ui
-	for qemu-devel@nongnu.org; Sat, 16 Dec 2017 16:32:57 -0500
+	(envelope-from <hpoussin@reactos.org>) id 1eQK6C-0000kf-VH
+	for qemu-devel@nongnu.org; Sat, 16 Dec 2017 16:34:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <hpoussin@reactos.org>) id 1eQK4k-00036j-KU
-	for qemu-devel@nongnu.org; Sat, 16 Dec 2017 16:32:55 -0500
+	(envelope-from <hpoussin@reactos.org>) id 1eQK6B-0003nk-TC
+	for qemu-devel@nongnu.org; Sat, 16 Dec 2017 16:34:24 -0500
 From: =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>
-Date: Sat, 16 Dec 2017 22:29:50 +0100
-Message-Id: <20171216213004.30393-2-hpoussin@reactos.org>
+Date: Sat, 16 Dec 2017 22:29:51 +0100
+Message-Id: <20171216213004.30393-3-hpoussin@reactos.org>
 In-Reply-To: <20171216213004.30393-1-hpoussin@reactos.org>
 References: <20171216213004.30393-1-hpoussin@reactos.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v2 01/15] fdc: move object structures to header
- file
+Subject: [Qemu-devel] [PATCH v2 02/15] serial/parallel: move object
+ structures to header file
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,271 +24,173 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Aurelien Jarno <aurelien@aurel32.net>, Yongbok Kim <yongbok.kim@mips.com>, "Michael S . Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
-Cc: =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>, John Snow <jsnow@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, "open list:Floppy" <qemu-block@nongnu.org>
+Cc: =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>, David Gibson <david@gibson.dropbear.id.au>, Alexander Graf <agraf@suse.de>, "open list:PowerPC" <qemu-ppc@nongnu.org>
 
-We are now able to embed floppy controllers in another object.
+We are now able to embed serial/parallel ports in another object.
 
 Signed-off-by: Hervé Poussineau <hpoussin@reactos.org>
 ---
- hw/block/fdc.c         | 102 ------------------------------------------------
- include/hw/block/fdc.h | 103 +++++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 103 insertions(+), 102 deletions(-)
+ hw/char/parallel.c       | 31 +-----------------------------
+ hw/char/serial-isa.c     | 13 +------------
+ hw/ppc/pnv.c             |  2 +-
+ include/hw/char/isa.h    | 50 ++++++++++++++++++++++++++++++++++++++++++++++++
+ include/hw/char/serial.h |  1 -
+ 5 files changed, 53 insertions(+), 44 deletions(-)
+ create mode 100644 include/hw/char/isa.h
 
-diff --git a/hw/block/fdc.c b/hw/block/fdc.c
-index 67f78ac702..502345c4d2 100644
---- a/hw/block/fdc.c
-+++ b/hw/block/fdc.c
-@@ -60,15 +60,8 @@
- #define TYPE_FLOPPY_BUS "floppy-bus"
- #define FLOPPY_BUS(obj) OBJECT_CHECK(FloppyBus, (obj), TYPE_FLOPPY_BUS)
+diff --git a/hw/char/parallel.c b/hw/char/parallel.c
+index f79dc76543..6b36d425ff 100644
+--- a/hw/char/parallel.c
++++ b/hw/char/parallel.c
+@@ -28,6 +28,7 @@
+ #include "chardev/char-parallel.h"
+ #include "chardev/char-fe.h"
+ #include "hw/isa/isa.h"
++#include "hw/char/isa.h"
+ #include "hw/i386/pc.h"
+ #include "sysemu/sysemu.h"
  
--typedef struct FDCtrl FDCtrl;
--typedef struct FDrive FDrive;
- static FDrive *get_drv(FDCtrl *fdctrl, int unit);
+@@ -67,36 +68,6 @@
  
--typedef struct FloppyBus {
--    BusState bus;
--    FDCtrl *fdc;
--} FloppyBus;
--
- static const TypeInfo floppy_bus_info = {
-     .name = TYPE_FLOPPY_BUS,
-     .parent = TYPE_BUS,
-@@ -178,36 +171,6 @@ static FDriveSize drive_size(FloppyDriveType drive)
- #define FD_SECTOR_SC           2   /* Sector size code */
- #define FD_RESET_SENSEI_COUNT  4   /* Number of sense interrupts on RESET */
+ #define PARA_CTR_SIGNAL (PARA_CTR_SELECT|PARA_CTR_INIT|PARA_CTR_AUTOLF|PARA_CTR_STROBE)
  
--/* Floppy disk drive emulation */
--typedef enum FDiskFlags {
--    FDISK_DBL_SIDES  = 0x01,
--} FDiskFlags;
--
--struct FDrive {
--    FDCtrl *fdctrl;
--    BlockBackend *blk;
--    BlockConf *conf;
--    /* Drive status */
--    FloppyDriveType drive;    /* CMOS drive type        */
--    uint8_t perpendicular;    /* 2.88 MB access mode    */
--    /* Position */
--    uint8_t head;
--    uint8_t track;
--    uint8_t sect;
--    /* Media */
--    FloppyDriveType disk;     /* Current disk type      */
--    FDiskFlags flags;
--    uint8_t last_sect;        /* Nb sector per track    */
--    uint8_t max_track;        /* Nb of tracks           */
--    uint16_t bps;             /* Bytes per sector       */
--    uint8_t ro;               /* Is read-only           */
--    uint8_t media_changed;    /* Is media changed       */
--    uint8_t media_rate;       /* Data rate of medium    */
--
--    bool media_validated;     /* Have we validated the media? */
--};
--
--
- static FloppyDriveType get_fallback_drive_type(FDrive *drv);
- 
- /* Hack: FD_SEEK is expected to work on empty drives. However, QEMU
-@@ -824,60 +787,6 @@ enum {
- #define FD_MULTI_TRACK(state) ((state) & FD_STATE_MULTI)
- #define FD_FORMAT_CMD(state) ((state) & FD_STATE_FORMAT)
- 
--struct FDCtrl {
+-typedef struct ParallelState {
 -    MemoryRegion iomem;
+-    uint8_t dataw;
+-    uint8_t datar;
+-    uint8_t status;
+-    uint8_t control;
 -    qemu_irq irq;
--    /* Controller state */
--    QEMUTimer *result_timer;
--    int dma_chann;
--    uint8_t phase;
--    IsaDma *dma;
--    /* Controller's identification */
--    uint8_t version;
--    /* HW */
--    uint8_t sra;
--    uint8_t srb;
--    uint8_t dor;
--    uint8_t dor_vmstate; /* only used as temp during vmstate */
--    uint8_t tdr;
--    uint8_t dsr;
--    uint8_t msr;
--    uint8_t cur_drv;
--    uint8_t status0;
--    uint8_t status1;
--    uint8_t status2;
--    /* Command FIFO */
--    uint8_t *fifo;
--    int32_t fifo_size;
--    uint32_t data_pos;
--    uint32_t data_len;
--    uint8_t data_state;
--    uint8_t data_dir;
--    uint8_t eot; /* last wanted sector */
--    /* States kept only to be returned back */
--    /* precompensation */
--    uint8_t precomp_trk;
--    uint8_t config;
--    uint8_t lock;
--    /* Power down config (also with status regB access mode */
--    uint8_t pwrd;
--    /* Floppy drives */
--    FloppyBus bus;
--    uint8_t num_floppies;
--    FDrive drives[MAX_FD];
--    struct {
--        BlockBackend *blk;
--        FloppyDriveType type;
--    } qdev_for_drives[MAX_FD];
--    int reset_sensei;
--    uint32_t check_media_rate;
--    FloppyDriveType fallback; /* type=auto failure fallback */
--    /* Timers state */
--    uint8_t timer0;
--    uint8_t timer1;
+-    int irq_pending;
+-    CharBackend chr;
+-    int hw_driver;
+-    int epp_timeout;
+-    uint32_t last_read_offset; /* For debugging */
+-    /* Memory-mapped interface */
+-    int it_shift;
 -    PortioList portio_list;
--};
+-} ParallelState;
 -
- static FloppyDriveType get_fallback_drive_type(FDrive *drv)
- {
-     return drv->fdctrl->fallback;
-@@ -896,17 +805,6 @@ typedef struct FDCtrlSysBus {
- 
- #define ISA_FDC(obj) OBJECT_CHECK(FDCtrlISABus, (obj), TYPE_ISA_FDC)
- 
--typedef struct FDCtrlISABus {
+-#define TYPE_ISA_PARALLEL "isa-parallel"
+-#define ISA_PARALLEL(obj) \
+-    OBJECT_CHECK(ISAParallelState, (obj), TYPE_ISA_PARALLEL)
+-
+-typedef struct ISAParallelState {
 -    ISADevice parent_obj;
 -
+-    uint32_t index;
 -    uint32_t iobase;
--    uint32_t irq;
--    uint32_t dma;
--    struct FDCtrl state;
--    int32_t bootindexA;
--    int32_t bootindexB;
--} FDCtrlISABus;
+-    uint32_t isairq;
+-    ParallelState state;
+-} ISAParallelState;
 -
- static uint32_t fdctrl_read (void *opaque, uint32_t reg)
+ static void parallel_update_irq(ParallelState *s)
  {
-     FDCtrl *fdctrl = opaque;
-diff --git a/include/hw/block/fdc.h b/include/hw/block/fdc.h
-index 1749dabf25..d076b2fc1a 100644
---- a/include/hw/block/fdc.h
-+++ b/include/hw/block/fdc.h
-@@ -2,12 +2,115 @@
- #define HW_FDC_H
+     if (s->irq_pending)
+diff --git a/hw/char/serial-isa.c b/hw/char/serial-isa.c
+index d7c5cc11fe..2c6cf81790 100644
+--- a/hw/char/serial-isa.c
++++ b/hw/char/serial-isa.c
+@@ -26,18 +26,7 @@
+ #include "qemu/osdep.h"
+ #include "qapi/error.h"
+ #include "hw/char/serial.h"
+-#include "hw/isa/isa.h"
+-
+-#define ISA_SERIAL(obj) OBJECT_CHECK(ISASerialState, (obj), TYPE_ISA_SERIAL)
+-
+-typedef struct ISASerialState {
+-    ISADevice parent_obj;
+-
+-    uint32_t index;
+-    uint32_t iobase;
+-    uint32_t isairq;
+-    SerialState state;
+-} ISASerialState;
++#include "hw/char/isa.h"
  
- #include "qemu-common.h"
-+#include "hw/block/block.h"
+ static const int isa_serial_io[MAX_SERIAL_PORTS] = {
+     0x3f8, 0x2f8, 0x3e8, 0x2e8
+diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
+index c35c439d81..91d8e36cac 100644
+--- a/hw/ppc/pnv.c
++++ b/hw/ppc/pnv.c
+@@ -41,7 +41,7 @@
+ #include "hw/ppc/pnv_xscom.h"
+ 
+ #include "hw/isa/isa.h"
+-#include "hw/char/serial.h"
++#include "hw/char/isa.h"
+ #include "hw/timer/mc146818rtc.h"
+ 
+ #include <libfdt.h>
+diff --git a/include/hw/char/isa.h b/include/hw/char/isa.h
+new file mode 100644
+index 0000000000..39f7be41c5
+--- /dev/null
++++ b/include/hw/char/isa.h
+@@ -0,0 +1,50 @@
++#ifndef HW_CHAR_ISA_H
++#define HW_CHAR_ISA_H
++
++#include "qemu-common.h"
++#include "hw/char/serial.h"
 +#include "hw/isa/isa.h"
- 
- /* fdc.c */
- #define MAX_FD 2
- 
-+typedef struct FDCtrl FDCtrl;
 +
-+/* Floppy disk drive emulation */
-+typedef enum FDiskFlags {
-+    FDISK_DBL_SIDES  = 0x01,
-+} FDiskFlags;
-+
-+typedef struct FDrive {
-+    FDCtrl *fdctrl;
-+    BlockBackend *blk;
-+    BlockConf *conf;
-+    /* Drive status */
-+    FloppyDriveType drive;    /* CMOS drive type        */
-+    uint8_t perpendicular;    /* 2.88 MB access mode    */
-+    /* Position */
-+    uint8_t head;
-+    uint8_t track;
-+    uint8_t sect;
-+    /* Media */
-+    FloppyDriveType disk;     /* Current disk type      */
-+    FDiskFlags flags;
-+    uint8_t last_sect;        /* Nb sector per track    */
-+    uint8_t max_track;        /* Nb of tracks           */
-+    uint16_t bps;             /* Bytes per sector       */
-+    uint8_t ro;               /* Is read-only           */
-+    uint8_t media_changed;    /* Is media changed       */
-+    uint8_t media_rate;       /* Data rate of medium    */
-+
-+    bool media_validated;     /* Have we validated the media? */
-+} FDrive;
-+
-+typedef struct FloppyBus {
-+    BusState bus;
-+    FDCtrl *fdc;
-+} FloppyBus;
-+
-+struct FDCtrl {
++typedef struct ParallelState {
 +    MemoryRegion iomem;
++    uint8_t dataw;
++    uint8_t datar;
++    uint8_t status;
++    uint8_t control;
 +    qemu_irq irq;
-+    /* Controller state */
-+    QEMUTimer *result_timer;
-+    int dma_chann;
-+    uint8_t phase;
-+    IsaDma *dma;
-+    /* Controller's identification */
-+    uint8_t version;
-+    /* HW */
-+    uint8_t sra;
-+    uint8_t srb;
-+    uint8_t dor;
-+    uint8_t dor_vmstate; /* only used as temp during vmstate */
-+    uint8_t tdr;
-+    uint8_t dsr;
-+    uint8_t msr;
-+    uint8_t cur_drv;
-+    uint8_t status0;
-+    uint8_t status1;
-+    uint8_t status2;
-+    /* Command FIFO */
-+    uint8_t *fifo;
-+    int32_t fifo_size;
-+    uint32_t data_pos;
-+    uint32_t data_len;
-+    uint8_t data_state;
-+    uint8_t data_dir;
-+    uint8_t eot; /* last wanted sector */
-+    /* States kept only to be returned back */
-+    /* precompensation */
-+    uint8_t precomp_trk;
-+    uint8_t config;
-+    uint8_t lock;
-+    /* Power down config (also with status regB access mode */
-+    uint8_t pwrd;
-+    /* Floppy drives */
-+    FloppyBus bus;
-+    uint8_t num_floppies;
-+    FDrive drives[MAX_FD];
-+    struct {
-+        BlockBackend *blk;
-+        FloppyDriveType type;
-+    } qdev_for_drives[MAX_FD];
-+    int reset_sensei;
-+    uint32_t check_media_rate;
-+    FloppyDriveType fallback; /* type=auto failure fallback */
-+    /* Timers state */
-+    uint8_t timer0;
-+    uint8_t timer1;
++    int irq_pending;
++    CharBackend chr;
++    int hw_driver;
++    int epp_timeout;
++    uint32_t last_read_offset; /* For debugging */
++    /* Memory-mapped interface */
++    int it_shift;
 +    PortioList portio_list;
-+};
++} ParallelState;
 +
- #define TYPE_ISA_FDC "isa-fdc"
- 
-+typedef struct FDCtrlISABus {
++typedef struct ISAParallelState {
 +    ISADevice parent_obj;
 +
++    uint32_t index;
 +    uint32_t iobase;
-+    uint32_t irq;
-+    uint32_t dma;
-+    struct FDCtrl state;
-+    int32_t bootindexA;
-+    int32_t bootindexB;
-+} FDCtrlISABus;
++    uint32_t isairq;
++    ParallelState state;
++} ISAParallelState;
 +
- ISADevice *fdctrl_init_isa(ISABus *bus, DriveInfo **fds);
- void fdctrl_init_sysbus(qemu_irq irq, int dma_chann,
-                         hwaddr mmio_base, DriveInfo **fds);
++#define TYPE_ISA_PARALLEL "isa-parallel"
++#define ISA_PARALLEL(obj) \
++    OBJECT_CHECK(ISAParallelState, (obj), TYPE_ISA_PARALLEL)
++
++typedef struct ISASerialState {
++    ISADevice parent_obj;
++
++    uint32_t index;
++    uint32_t iobase;
++    uint32_t isairq;
++    SerialState state;
++} ISASerialState;
++
++#define TYPE_ISA_SERIAL "isa-serial"
++#define ISA_SERIAL(obj) OBJECT_CHECK(ISASerialState, (obj), TYPE_ISA_SERIAL)
++
++#endif
+diff --git a/include/hw/char/serial.h b/include/hw/char/serial.h
+index c4daf11a14..ec7da3d7f6 100644
+--- a/include/hw/char/serial.h
++++ b/include/hw/char/serial.h
+@@ -95,7 +95,6 @@ SerialState *serial_mm_init(MemoryRegion *address_space,
+                             Chardev *chr, enum device_endian end);
+ 
+ /* serial-isa.c */
+-#define TYPE_ISA_SERIAL "isa-serial"
+ void serial_hds_isa_init(ISABus *bus, int from, int to);
+ 
+ #endif
 -- 
 2.11.0
