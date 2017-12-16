@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58443)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59449)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1eQ8gx-0008Na-T7
-	for qemu-devel@nongnu.org; Sat, 16 Dec 2017 04:23:36 -0500
+	(envelope-from <stefanha@redhat.com>) id 1eQ8m0-0001F5-7f
+	for qemu-devel@nongnu.org; Sat, 16 Dec 2017 04:28:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1eQ8gu-0001yW-Oc
-	for qemu-devel@nongnu.org; Sat, 16 Dec 2017 04:23:35 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:47052)
+	(envelope-from <stefanha@redhat.com>) id 1eQ8lx-00022L-3V
+	for qemu-devel@nongnu.org; Sat, 16 Dec 2017 04:28:48 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:40942)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1eQ8gu-0001xO-Ei
-	for qemu-devel@nongnu.org; Sat, 16 Dec 2017 04:23:32 -0500
-Date: Sat, 16 Dec 2017 09:23:22 +0000
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1eQ8lw-00020t-Ph
+	for qemu-devel@nongnu.org; Sat, 16 Dec 2017 04:28:45 -0500
+Date: Sat, 16 Dec 2017 09:28:36 +0000
 From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20171216092322.GC12533@stefanha-x1.localdomain>
+Message-ID: <20171216092836.GD12533@stefanha-x1.localdomain>
 References: <20171205055200.16305-1-peterx@redhat.com>
-	<20171205055200.16305-17-peterx@redhat.com>
-	<20171213200938.GG8317@stefanha-x1.localdomain>
-	<20171216063703.GD22308@xz-mi>
+	<20171205055200.16305-19-peterx@redhat.com>
+	<20171214114136.GG14433@stefanha-x1.localdomain>
+	<20171216071706.GG22308@xz-mi>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="Bu8it7iiRSEf40bY"
+	protocol="application/pgp-signature"; boundary="hxkXGo8AKqTJ+9QI"
 Content-Disposition: inline
-In-Reply-To: <20171216063703.GD22308@xz-mi>
-Subject: Re: [Qemu-devel] [RFC v5 16/26] monitor: separate QMP parser and
- dispatcher
+In-Reply-To: <20171216071706.GG22308@xz-mi>
+Subject: Re: [Qemu-devel] [RFC v5 18/26] monitor: send event when request
+ queue full
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,99 +35,100 @@ To: Peter Xu <peterx@redhat.com>
 Cc: qemu-devel@nongnu.org, Stefan Hajnoczi <shajnocz@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <famz@redhat.com>, Juan Quintela <quintela@redhat.com>, mdroth@linux.vnet.ibm.com, Eric Blake <eblake@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Markus Armbruster <armbru@redhat.com>, marcandre.lureau@redhat.com, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 
 
---Bu8it7iiRSEf40bY
+--hxkXGo8AKqTJ+9QI
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Sat, Dec 16, 2017 at 02:37:03PM +0800, Peter Xu wrote:
-> On Wed, Dec 13, 2017 at 08:09:38PM +0000, Stefan Hajnoczi wrote:
-> > On Tue, Dec 05, 2017 at 01:51:50PM +0800, Peter Xu wrote:
-> > > @@ -3956,12 +3968,122 @@ static void handle_qmp_command(JSONMessagePa=
-rser *parser, GQueue *tokens,
-> > >          }
+On Sat, Dec 16, 2017 at 03:17:06PM +0800, Peter Xu wrote:
+> On Thu, Dec 14, 2017 at 11:41:36AM +0000, Stefan Hajnoczi wrote:
+> > On Tue, Dec 05, 2017 at 01:51:52PM +0800, Peter Xu wrote:
+> > > Set maximum QMP request queue length to 8.  If queue full, instead of
+> > > queue the command, we directly return a "request-dropped" event, tell=
+ing
+> > > client that specific command is dropped.
+> > >=20
+> > > Note that this flow control mechanism is only valid if OOB is enabled.
+> > > If it's not, the effective queue length will always be 1, which stric=
+tly
+> > > follows original behavior of QMP command handling (which never drop
+> > > messages).
+> > >=20
+> > > Signed-off-by: Peter Xu <peterx@redhat.com>
+> > > ---
+> > >  monitor.c | 15 +++++++++++++++
+> > >  1 file changed, 15 insertions(+)
+> > >=20
+> > > diff --git a/monitor.c b/monitor.c
+> > > index c20e659740..f7923c4590 100644
+> > > --- a/monitor.c
+> > > +++ b/monitor.c
+> > > @@ -4029,6 +4029,8 @@ static void monitor_qmp_bh_dispatcher(void *dat=
+a)
 > > >      }
+> > >  }
 > > > =20
-> > > -err_out:
-> > > -    monitor_qmp_respond(mon, rsp, err, id);
-> > > +    /* Respond if necessary */
-> > > +    monitor_qmp_respond(mon, rsp, NULL, id);
+> > > +#define  QMP_REQ_QUEUE_LEN_MAX  (8)
 > > > +
-> > > +    /* This pairs with the monitor_suspend() in handle_qmp_command()=
-=2E */
-> > > +    if (!qmp_oob_enabled(mon)) {
-> > > +        monitor_resume(mon);
+> > >  static void handle_qmp_command(JSONMessageParser *parser, GQueue *to=
+kens,
+> > >                                 void *opaque)
+> > >  {
+> > > @@ -4061,6 +4063,19 @@ static void handle_qmp_command(JSONMessagePars=
+er *parser, GQueue *tokens,
+> > >      req_obj->id =3D id;
+> > >      req_obj->req =3D req;
+> > > =20
+> > > +    if (qmp_oob_enabled(mon)) {
+> > > +        /* Drop the request if queue is full. */
+> > > +        if (mon->qmp.qmp_requests->length >=3D QMP_REQ_QUEUE_LEN_MAX=
+) {
 > >=20
-> > monitor_resume() does not work between threads: if the event loop is
-> > currently blocked in poll() it won't notice that the monitor fd should
-> > be watched again.
+> > qmp_queue_lock must be held.  Perhaps it's simplest to move this check
+> > into the qmp_queue_lock critical section below and unlock before calling
+> > qapi_event_send_request_dropped()...
 > >=20
-> > Please add aio_notify() to monitor_resume() and monitor_suspend().  That
-> > way the event loop is forced to check can_read() again.
+> > > +            qapi_event_send_request_dropped(id,
+> > > +                                            REQUEST_DROP_REASON_QUEU=
+E_FULL,
+> > > +                                            NULL);
+> > > +            qobject_decref(id);
+> > > +            qobject_decref(req);
+> > > +            g_free(req_obj);
+> > > +            return;
+> > > +        }
+> > > +    }
+> > > +
+> > >      /*
+> > >       * Put the request to the end of queue so that requests will be
+> > >       * handled in time order.  Ownership for req_obj, req, id,
+> >=20
+> > ... down here.
 >=20
-> Ah, yes.  I think monitor_suspend() does not need the notify?  Since
-> if it's sleeping it won't miss the next check in can_read() after all?
+> Yeah can do.  I think it's not really a must (IMHO the worst case
+> won't be that worse if current queue length is 8)? but it's obviously
+> nicer.
 
-No, that would be a bug.  Imagine the IOThread is blocked in poll
-monitoring the chardev file descriptor when the main loop calls
-monitor_suspend().  If the file descriptors becomes readable then the
-handler function executes even though the monitor is supposed to be
-suspended!
-
-> Regarding to monitor_resume(), I noticed that I missed the fact that
-> it's only tailored for HMP before, which seems to be a bigger problem.
-> Do you agree with a change like this?
->=20
-> diff --git a/monitor.c b/monitor.c
-> index 9970418d6f..8f96880ad7 100644
-> --- a/monitor.c
-> +++ b/monitor.c
-> @@ -4244,10 +4244,12 @@ int monitor_suspend(Monitor *mon)
-> =20
->  void monitor_resume(Monitor *mon)
->  {
-> -    if (!mon->rs)
-> -        return;
->      if (atomic_dec_fetch(&mon->suspend_cnt) =3D=3D 0) {
-> -        readline_show_prompt(mon->rs);
-> +        if (monitor_is_qmp(mon)) {
-> +            aio_notify(mon_global.mon_iothread->ctx);
-
-Please use iothread_get_aio_context() instead of accessing struct
-members.
-
-> +        } else {
-> +            assert(mon->rs);
-> +            readline_show_prompt(mon->rs);
-
-I haven't studied the HMP and ->rs code.  I'll do that when reviewing
-the next revision of this series.
-
-> +        }
->      }
->  }
->=20
-> Even, I'm thinking about whether I should start to introduce
-> iothread_notify() now to mask out the IOThread.ctx details.
-
-aio_notify() is a low-level AioContext operation that is somewhat
-bug-prone.  I think it's better to leave it directly exposed so callers
-have to think about what they are doing.
+That style of coding is risky.  People reading the code won't know if
+the lack of the lock was a mistake or intentional.  If not taking the
+lock is necessary for performance (it isn't in this case and we're going
+to take the lock anyway), then it should have a comment or nop
+function/macro that documents the intention.
 
 Stefan
 
---Bu8it7iiRSEf40bY
+--hxkXGo8AKqTJ+9QI
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEcBAEBAgAGBQJaNOYKAAoJEJykq7OBq3PIy9gH/R/xirtN8Y9RwqxIXqKlniIm
-+Kd7ZB92Zka+m24U3i6rZd/zuOBDyHObUGOu80NbCE7G16QIV6A9qJHEIrrGVXSf
-03nKAQSfMtqc5JuFzelLDzB2W4MCFzaiSOhj97NsPEYDz/9BxeIDq66LRjYnrYwK
-6osh8JWTjKQxQY6Jsjp6t9N4tGCEYralbZ7skqt70lSjNxVjo5UvxRHdIn6Wd4Ww
-lV+D1/M3znzjvbuovKA/dPAgfqN2FQrbcfSKA6WqOn3JRKo901tvSvuqf+rmpc6D
-vzxMCXUjxkIyDhjoZSr3ml5gr62mfEnxQXsziH/St++v2Ns+9LQyVMMAevuEvi0=
-=Z1j1
+iQEcBAEBAgAGBQJaNOdEAAoJEJykq7OBq3PIJsQH/j4RiJnb45zFkAhnX6g15Ygz
+XfKStJoC7RD+WhC1Oj+A+kxaM5kmoeeronZSJwcwQ7kjrI69iwr14XdxgrZcRTTB
+BPQ2pEoj+IrmvhtLjxcqUYaH3QYpOiXEv42X6/iP0kY/W4FQrdS3Q/ZRmVluK2LP
+mqCppnQuSMhSPK/fk9+RrHeoyTGwm/K02TLAmTdVylWD5gmuT1FUbPtvPBN8KoSw
+ZYS5WgXKgpLCVytnZ0z17h3iz7p9AIQtlJpDAlQDmELZCk+IlTonbvUwZ0Rgh/tc
+MjiTmts567FgwuAMVfTcOvkUtG2VLHJ60bcuAh68QvyS67LCskULuhlyLZCZ/AQ=
+=BYRV
 -----END PGP SIGNATURE-----
 
---Bu8it7iiRSEf40bY--
+--hxkXGo8AKqTJ+9QI--
