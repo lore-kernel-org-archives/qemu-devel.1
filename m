@@ -1,22 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42679)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42705)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <hpoussin@reactos.org>) id 1eQK4c-0008Ju-Qu
-	for qemu-devel@nongnu.org; Sat, 16 Dec 2017 16:32:47 -0500
+	(envelope-from <hpoussin@reactos.org>) id 1eQK4l-0008OK-Ui
+	for qemu-devel@nongnu.org; Sat, 16 Dec 2017 16:32:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <hpoussin@reactos.org>) id 1eQK4b-000332-Qe
-	for qemu-devel@nongnu.org; Sat, 16 Dec 2017 16:32:46 -0500
-Received: from iserv.reactos.org ([2a01:4f8:221:4c5::3]:39978)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <hpoussin@reactos.org>)
-	id 1eQK4X-0002s8-F8
-	for qemu-devel@nongnu.org; Sat, 16 Dec 2017 16:32:45 -0500
+	(envelope-from <hpoussin@reactos.org>) id 1eQK4k-00036j-KU
+	for qemu-devel@nongnu.org; Sat, 16 Dec 2017 16:32:55 -0500
 From: =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>
-Date: Sat, 16 Dec 2017 22:29:49 +0100
-Message-Id: <20171216213004.30393-1-hpoussin@reactos.org>
+Date: Sat, 16 Dec 2017 22:29:50 +0100
+Message-Id: <20171216213004.30393-2-hpoussin@reactos.org>
+In-Reply-To: <20171216213004.30393-1-hpoussin@reactos.org>
+References: <20171216213004.30393-1-hpoussin@reactos.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH 00/15] piix4: cleanup and improvements
+Subject: [Qemu-devel] [PATCH v2 01/15] fdc: move object structures to header
+ file
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,56 +24,271 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Aurelien Jarno <aurelien@aurel32.net>, Yongbok Kim <yongbok.kim@mips.com>, "Michael S . Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
-Cc: =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>
+Cc: =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>, John Snow <jsnow@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, "open list:Floppy" <qemu-block@nongnu.org>
 
-Hi,
+We are now able to embed floppy controllers in another object.
 
-This patchset is a cleanup of the PIIX4 PCI-ISA bridge. Lots of devices
-are moved from MIPS Malta board (which has a PIIX4) to PIIX4, where devices
-belong. This lets us reuse PIIX4 in other machines, while not loosing any
-functionality.
+Signed-off-by: Hervé Poussineau <hpoussin@reactos.org>
+---
+ hw/block/fdc.c         | 102 ------------------------------------------------
+ include/hw/block/fdc.h | 103 +++++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 103 insertions(+), 102 deletions(-)
 
-Last patch allows adding a new PIIX4 device directly from command line.
-Note that this will work only as long no other ISA bus already exist on the
-machine.
-
-Hervé
-
-Changes v1 -> v2:
-- fixed compilation on CentOS 6 (patch 1)
-- automatically create serial/parallel chardevs if not provided (patch 11)
-
-Hervé Poussineau (15):
-  fdc: move object structures to header file
-  serial/parallel: move object structures to header file
-  mc146818rtc: move structure to header file
-  mc146818rtc: always register rtc to rtc list
-  piix4: rename some variables in realize function
-  piix4: add Reset Control Register
-  piix4: add a i8259 interrupt controller as specified in datasheet
-  piix4: add a i8257 dma controller as specified in datasheet
-  piix4: add a i8254 pit controller as specified in datasheet
-  piix4: add a i8042 keyboard/mouse controller as specified in datasheet
-  piix4: add a floppy controller, 1 parallel port and 2 serial ports
-  piix4: add a mc146818rtc controller as specified in datasheet
-  piix4: add a speaker as specified in datasheet
-  piix4: rename PIIX4 object to piix4-isa
-  piix4: we can now instanciate a PIIX4 with -device
-
- hw/block/fdc.c                 | 102 -----------------------
- hw/char/parallel.c             |  31 +------
- hw/char/serial-isa.c           |  13 +--
- hw/isa/piix4.c                 | 178 ++++++++++++++++++++++++++++++++++++-----
- hw/mips/mips_malta.c           |  74 +++++++----------
- hw/ppc/pnv.c                   |   2 +-
- hw/timer/mc146818rtc.c         |  43 ++--------
- include/hw/block/fdc.h         | 103 ++++++++++++++++++++++++
- include/hw/char/isa.h          |  50 ++++++++++++
- include/hw/char/serial.h       |   1 -
- include/hw/i386/pc.h           |   1 -
- include/hw/timer/mc146818rtc.h |  29 +++++++
- 12 files changed, 384 insertions(+), 243 deletions(-)
- create mode 100644 include/hw/char/isa.h
-
+diff --git a/hw/block/fdc.c b/hw/block/fdc.c
+index 67f78ac702..502345c4d2 100644
+--- a/hw/block/fdc.c
++++ b/hw/block/fdc.c
+@@ -60,15 +60,8 @@
+ #define TYPE_FLOPPY_BUS "floppy-bus"
+ #define FLOPPY_BUS(obj) OBJECT_CHECK(FloppyBus, (obj), TYPE_FLOPPY_BUS)
+ 
+-typedef struct FDCtrl FDCtrl;
+-typedef struct FDrive FDrive;
+ static FDrive *get_drv(FDCtrl *fdctrl, int unit);
+ 
+-typedef struct FloppyBus {
+-    BusState bus;
+-    FDCtrl *fdc;
+-} FloppyBus;
+-
+ static const TypeInfo floppy_bus_info = {
+     .name = TYPE_FLOPPY_BUS,
+     .parent = TYPE_BUS,
+@@ -178,36 +171,6 @@ static FDriveSize drive_size(FloppyDriveType drive)
+ #define FD_SECTOR_SC           2   /* Sector size code */
+ #define FD_RESET_SENSEI_COUNT  4   /* Number of sense interrupts on RESET */
+ 
+-/* Floppy disk drive emulation */
+-typedef enum FDiskFlags {
+-    FDISK_DBL_SIDES  = 0x01,
+-} FDiskFlags;
+-
+-struct FDrive {
+-    FDCtrl *fdctrl;
+-    BlockBackend *blk;
+-    BlockConf *conf;
+-    /* Drive status */
+-    FloppyDriveType drive;    /* CMOS drive type        */
+-    uint8_t perpendicular;    /* 2.88 MB access mode    */
+-    /* Position */
+-    uint8_t head;
+-    uint8_t track;
+-    uint8_t sect;
+-    /* Media */
+-    FloppyDriveType disk;     /* Current disk type      */
+-    FDiskFlags flags;
+-    uint8_t last_sect;        /* Nb sector per track    */
+-    uint8_t max_track;        /* Nb of tracks           */
+-    uint16_t bps;             /* Bytes per sector       */
+-    uint8_t ro;               /* Is read-only           */
+-    uint8_t media_changed;    /* Is media changed       */
+-    uint8_t media_rate;       /* Data rate of medium    */
+-
+-    bool media_validated;     /* Have we validated the media? */
+-};
+-
+-
+ static FloppyDriveType get_fallback_drive_type(FDrive *drv);
+ 
+ /* Hack: FD_SEEK is expected to work on empty drives. However, QEMU
+@@ -824,60 +787,6 @@ enum {
+ #define FD_MULTI_TRACK(state) ((state) & FD_STATE_MULTI)
+ #define FD_FORMAT_CMD(state) ((state) & FD_STATE_FORMAT)
+ 
+-struct FDCtrl {
+-    MemoryRegion iomem;
+-    qemu_irq irq;
+-    /* Controller state */
+-    QEMUTimer *result_timer;
+-    int dma_chann;
+-    uint8_t phase;
+-    IsaDma *dma;
+-    /* Controller's identification */
+-    uint8_t version;
+-    /* HW */
+-    uint8_t sra;
+-    uint8_t srb;
+-    uint8_t dor;
+-    uint8_t dor_vmstate; /* only used as temp during vmstate */
+-    uint8_t tdr;
+-    uint8_t dsr;
+-    uint8_t msr;
+-    uint8_t cur_drv;
+-    uint8_t status0;
+-    uint8_t status1;
+-    uint8_t status2;
+-    /* Command FIFO */
+-    uint8_t *fifo;
+-    int32_t fifo_size;
+-    uint32_t data_pos;
+-    uint32_t data_len;
+-    uint8_t data_state;
+-    uint8_t data_dir;
+-    uint8_t eot; /* last wanted sector */
+-    /* States kept only to be returned back */
+-    /* precompensation */
+-    uint8_t precomp_trk;
+-    uint8_t config;
+-    uint8_t lock;
+-    /* Power down config (also with status regB access mode */
+-    uint8_t pwrd;
+-    /* Floppy drives */
+-    FloppyBus bus;
+-    uint8_t num_floppies;
+-    FDrive drives[MAX_FD];
+-    struct {
+-        BlockBackend *blk;
+-        FloppyDriveType type;
+-    } qdev_for_drives[MAX_FD];
+-    int reset_sensei;
+-    uint32_t check_media_rate;
+-    FloppyDriveType fallback; /* type=auto failure fallback */
+-    /* Timers state */
+-    uint8_t timer0;
+-    uint8_t timer1;
+-    PortioList portio_list;
+-};
+-
+ static FloppyDriveType get_fallback_drive_type(FDrive *drv)
+ {
+     return drv->fdctrl->fallback;
+@@ -896,17 +805,6 @@ typedef struct FDCtrlSysBus {
+ 
+ #define ISA_FDC(obj) OBJECT_CHECK(FDCtrlISABus, (obj), TYPE_ISA_FDC)
+ 
+-typedef struct FDCtrlISABus {
+-    ISADevice parent_obj;
+-
+-    uint32_t iobase;
+-    uint32_t irq;
+-    uint32_t dma;
+-    struct FDCtrl state;
+-    int32_t bootindexA;
+-    int32_t bootindexB;
+-} FDCtrlISABus;
+-
+ static uint32_t fdctrl_read (void *opaque, uint32_t reg)
+ {
+     FDCtrl *fdctrl = opaque;
+diff --git a/include/hw/block/fdc.h b/include/hw/block/fdc.h
+index 1749dabf25..d076b2fc1a 100644
+--- a/include/hw/block/fdc.h
++++ b/include/hw/block/fdc.h
+@@ -2,12 +2,115 @@
+ #define HW_FDC_H
+ 
+ #include "qemu-common.h"
++#include "hw/block/block.h"
++#include "hw/isa/isa.h"
+ 
+ /* fdc.c */
+ #define MAX_FD 2
+ 
++typedef struct FDCtrl FDCtrl;
++
++/* Floppy disk drive emulation */
++typedef enum FDiskFlags {
++    FDISK_DBL_SIDES  = 0x01,
++} FDiskFlags;
++
++typedef struct FDrive {
++    FDCtrl *fdctrl;
++    BlockBackend *blk;
++    BlockConf *conf;
++    /* Drive status */
++    FloppyDriveType drive;    /* CMOS drive type        */
++    uint8_t perpendicular;    /* 2.88 MB access mode    */
++    /* Position */
++    uint8_t head;
++    uint8_t track;
++    uint8_t sect;
++    /* Media */
++    FloppyDriveType disk;     /* Current disk type      */
++    FDiskFlags flags;
++    uint8_t last_sect;        /* Nb sector per track    */
++    uint8_t max_track;        /* Nb of tracks           */
++    uint16_t bps;             /* Bytes per sector       */
++    uint8_t ro;               /* Is read-only           */
++    uint8_t media_changed;    /* Is media changed       */
++    uint8_t media_rate;       /* Data rate of medium    */
++
++    bool media_validated;     /* Have we validated the media? */
++} FDrive;
++
++typedef struct FloppyBus {
++    BusState bus;
++    FDCtrl *fdc;
++} FloppyBus;
++
++struct FDCtrl {
++    MemoryRegion iomem;
++    qemu_irq irq;
++    /* Controller state */
++    QEMUTimer *result_timer;
++    int dma_chann;
++    uint8_t phase;
++    IsaDma *dma;
++    /* Controller's identification */
++    uint8_t version;
++    /* HW */
++    uint8_t sra;
++    uint8_t srb;
++    uint8_t dor;
++    uint8_t dor_vmstate; /* only used as temp during vmstate */
++    uint8_t tdr;
++    uint8_t dsr;
++    uint8_t msr;
++    uint8_t cur_drv;
++    uint8_t status0;
++    uint8_t status1;
++    uint8_t status2;
++    /* Command FIFO */
++    uint8_t *fifo;
++    int32_t fifo_size;
++    uint32_t data_pos;
++    uint32_t data_len;
++    uint8_t data_state;
++    uint8_t data_dir;
++    uint8_t eot; /* last wanted sector */
++    /* States kept only to be returned back */
++    /* precompensation */
++    uint8_t precomp_trk;
++    uint8_t config;
++    uint8_t lock;
++    /* Power down config (also with status regB access mode */
++    uint8_t pwrd;
++    /* Floppy drives */
++    FloppyBus bus;
++    uint8_t num_floppies;
++    FDrive drives[MAX_FD];
++    struct {
++        BlockBackend *blk;
++        FloppyDriveType type;
++    } qdev_for_drives[MAX_FD];
++    int reset_sensei;
++    uint32_t check_media_rate;
++    FloppyDriveType fallback; /* type=auto failure fallback */
++    /* Timers state */
++    uint8_t timer0;
++    uint8_t timer1;
++    PortioList portio_list;
++};
++
+ #define TYPE_ISA_FDC "isa-fdc"
+ 
++typedef struct FDCtrlISABus {
++    ISADevice parent_obj;
++
++    uint32_t iobase;
++    uint32_t irq;
++    uint32_t dma;
++    struct FDCtrl state;
++    int32_t bootindexA;
++    int32_t bootindexB;
++} FDCtrlISABus;
++
+ ISADevice *fdctrl_init_isa(ISABus *bus, DriveInfo **fds);
+ void fdctrl_init_sysbus(qemu_irq irq, int dma_chann,
+                         hwaddr mmio_base, DriveInfo **fds);
 -- 
 2.11.0
