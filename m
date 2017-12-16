@@ -1,39 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46169)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37533)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1eQGUE-0006ZT-1a
-	for qemu-devel@nongnu.org; Sat, 16 Dec 2017 12:42:59 -0500
+	(envelope-from <bounces@canonical.com>) id 1eQHhc-0000r8-9e
+	for qemu-devel@nongnu.org; Sat, 16 Dec 2017 14:00:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1eQGUA-0000Wm-4W
-	for qemu-devel@nongnu.org; Sat, 16 Dec 2017 12:42:58 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:55134
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanb@linux.vnet.ibm.com>)
-	id 1eQGU9-0000Vh-VJ
-	for qemu-devel@nongnu.org; Sat, 16 Dec 2017 12:42:54 -0500
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	vBGHdVRl122750
-	for <qemu-devel@nongnu.org>; Sat, 16 Dec 2017 12:42:49 -0500
-Received: from e31.co.us.ibm.com (e31.co.us.ibm.com [32.97.110.149])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2ew0c7bcba-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Sat, 16 Dec 2017 12:42:49 -0500
-Received: from localhost
-	by e31.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <stefanb@linux.vnet.ibm.com>;
-	Sat, 16 Dec 2017 10:42:48 -0700
-From: Stefan Berger <stefanb@linux.vnet.ibm.com>
-Date: Sat, 16 Dec 2017 12:41:49 -0500
-In-Reply-To: <1513446109-9013-1-git-send-email-stefanb@linux.vnet.ibm.com>
-References: <1513446109-9013-1-git-send-email-stefanb@linux.vnet.ibm.com>
+	(envelope-from <bounces@canonical.com>) id 1eQHhZ-0005X0-0C
+	for qemu-devel@nongnu.org; Sat, 16 Dec 2017 14:00:52 -0500
+Received: from indium.canonical.com ([91.189.90.7]:35842)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1eQHhY-0005WV-Pt
+	for qemu-devel@nongnu.org; Sat, 16 Dec 2017 14:00:48 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1eQHhX-00070K-Jj
+	for <qemu-devel@nongnu.org>; Sat, 16 Dec 2017 19:00:47 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 946142E80C7
+	for <qemu-devel@nongnu.org>; Sat, 16 Dec 2017 19:00:47 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Message-Id: <1513446109-9013-33-git-send-email-stefanb@linux.vnet.ibm.com>
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL v1 32/32] tpm: tpm_passthrough: Fail startup if
- FE buffer size < BE buffer size
+Date: Sat, 16 Dec 2017 18:53:56 -0000
+From: Peter Maydell <peter.maydell@linaro.org>
+Reply-To: Bug 1696353 <1696353@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <149682692221.8383.2186201709283317126.malonedeb@gac.canonical.com>
+Message-Id: <151345043695.18177.10955724186610948608.malone@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1696353] Re: golang binaries fail to start under
+ linux-user
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -43,61 +38,62 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, Stefan Berger <stefanb@linux.vnet.ibm.com>
 
-If the requested buffer size of the frontend is smaller than the fixed
-buffer size of the host's TPM, fail the startup_tpm() interface function,
-which will make the device unusable. We fail it because the backend TPM
-could produce larger packets than what the frontend could pass to the OS.
+Yes, new bug please, that's definitely a different symptom and likely an
+unrelated issue.
 
-The current combination of TIS frontend and either passthrough or emulato=
-r
-backend will not lead to this case since the TIS can support any size of
-buffer.
+-- =
 
-Signed-off-by: Stefan Berger <stefanb@linux.vnet.ibm.com>
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
----
- hw/tpm/tpm_passthrough.c | 15 +++++++++++++++
- 1 file changed, 15 insertions(+)
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1696353
 
-diff --git a/hw/tpm/tpm_passthrough.c b/hw/tpm/tpm_passthrough.c
-index 886af9e..487aae2 100644
---- a/hw/tpm/tpm_passthrough.c
-+++ b/hw/tpm/tpm_passthrough.c
-@@ -304,6 +304,20 @@ static TPMBackend *tpm_passthrough_create(QemuOpts *=
-opts)
-     return TPM_BACKEND(obj);
- }
-=20
-+static int tpm_passthrough_startup_tpm(TPMBackend *tb, size_t buffersize=
-)
-+{
-+    TPMPassthruState *tpm_pt =3D TPM_PASSTHROUGH(tb);
-+
-+    if (buffersize && buffersize < tpm_pt->tpm_buffersize) {
-+        error_report("Requested buffer size of %zu is smaller than host =
-TPM's "
-+                     "fixed buffer size of %zu",
-+                     buffersize, tpm_pt->tpm_buffersize);
-+        return -1;
-+    }
-+
-+    return 0;
-+}
-+
- static TpmTypeOptions *tpm_passthrough_get_tpm_options(TPMBackend *tb)
- {
-     TpmTypeOptions *options =3D g_new0(TpmTypeOptions, 1);
-@@ -362,6 +376,7 @@ static void tpm_passthrough_class_init(ObjectClass *k=
-lass, void *data)
-     tbc->opts =3D tpm_passthrough_cmdline_opts;
-     tbc->desc =3D "Passthrough TPM backend driver";
-     tbc->create =3D tpm_passthrough_create;
-+    tbc->startup_tpm =3D tpm_passthrough_startup_tpm;
-     tbc->reset =3D tpm_passthrough_reset;
-     tbc->cancel_cmd =3D tpm_passthrough_cancel_cmd;
-     tbc->get_tpm_established_flag =3D tpm_passthrough_get_tpm_establishe=
-d_flag;
---=20
-2.5.5
+Title:
+  golang binaries fail to start under linux-user
+
+Status in QEMU:
+  Won't Fix
+
+Bug description:
+  With current master golang binaries fail when run under linux-user,
+  for example:
+
+  [will@localhost qemu]$ ./arm-linux-user/qemu-arm glide =
+
+  runtime: failed to create new OS thread (have 2 already; errno=3D22)
+  fatal error: newosproc
+
+  runtime stack:
+  runtime.throw(0x45f879, 0x9)
+  	/usr/lib/golang/src/runtime/panic.go:566 +0x78
+  runtime.newosproc(0x1092c000, 0x1093bfe0)
+  	/usr/lib/golang/src/runtime/os_linux.go:160 +0x1b0
+  runtime.newm(0x4ae1e8, 0x0)
+  	/usr/lib/golang/src/runtime/proc.go:1572 +0x12c
+  runtime.main.func1()
+  	/usr/lib/golang/src/runtime/proc.go:126 +0x24
+  runtime.systemstack(0x5ef900)
+  	/usr/lib/golang/src/runtime/asm_arm.s:247 +0x80
+  runtime.mstart()
+  	/usr/lib/golang/src/runtime/proc.go:1079
+
+  goroutine 1 [running]:
+  runtime.systemstack_switch()
+  	/usr/lib/golang/src/runtime/asm_arm.s:192 +0x4 fp=3D0x109287ac sp=3D0x10=
+9287a8
+  runtime.main()
+  	/usr/lib/golang/src/runtime/proc.go:127 +0x5c fp=3D0x109287d4 sp=3D0x109=
+287ac
+  runtime.goexit()
+  	/usr/lib/golang/src/runtime/asm_arm.s:998 +0x4 fp=3D0x109287d4 sp=3D0x10=
+9287d4
+
+  The reason for this is that the golang runtime does not pass the
+  CLONE_SYSVMEM flag to clone so the clone flags checks fail:
+
+  https://github.com/golang/go/blob/master/src/runtime/os_linux.go#L155
+
+  The attached patch allows golang binaries to start under linux-user.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1696353/+subscriptions
