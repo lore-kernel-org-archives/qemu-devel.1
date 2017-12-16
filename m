@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45362)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46876)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1eQ5Hp-0003KP-Bc
-	for qemu-devel@nongnu.org; Sat, 16 Dec 2017 00:45:26 -0500
+	(envelope-from <peterx@redhat.com>) id 1eQ5PM-0004U7-Ag
+	for qemu-devel@nongnu.org; Sat, 16 Dec 2017 00:53:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1eQ5Hj-0005Dg-IK
-	for qemu-devel@nongnu.org; Sat, 16 Dec 2017 00:45:25 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:59766)
+	(envelope-from <peterx@redhat.com>) id 1eQ5PL-0004zs-EU
+	for qemu-devel@nongnu.org; Sat, 16 Dec 2017 00:53:12 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:32962)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1eQ5Hj-0005Bp-7W
-	for qemu-devel@nongnu.org; Sat, 16 Dec 2017 00:45:19 -0500
-Date: Sat, 16 Dec 2017 13:45:07 +0800
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1eQ5PL-0004zR-7y
+	for qemu-devel@nongnu.org; Sat, 16 Dec 2017 00:53:11 -0500
+Date: Sat, 16 Dec 2017 13:52:54 +0800
 From: Peter Xu <peterx@redhat.com>
-Message-ID: <20171216054507.GA22308@xz-mi>
+Message-ID: <20171216055254.GB22308@xz-mi>
 References: <20171205055200.16305-1-peterx@redhat.com>
-	<20171205055200.16305-14-peterx@redhat.com>
-	<20171215094255.GC15187@lemon>
+	<20171205055200.16305-15-peterx@redhat.com>
+	<20171213173533.GE8317@stefanha-x1.localdomain>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20171215094255.GC15187@lemon>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC v5 13/26] qmp: introduce some capability
- helpers
+In-Reply-To: <20171213173533.GE8317@stefanha-x1.localdomain>
+Subject: Re: [Qemu-devel] [RFC v5 14/26] monitor: introduce
+ monitor_qmp_respond()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,54 +29,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: qemu-devel@nongnu.org, Stefan Hajnoczi <shajnocz@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Juan Quintela <quintela@redhat.com>, mdroth@linux.vnet.ibm.com, Eric Blake <eblake@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Markus Armbruster <armbru@redhat.com>, marcandre.lureau@redhat.com, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Cc: qemu-devel@nongnu.org, Stefan Hajnoczi <shajnocz@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <famz@redhat.com>, Juan Quintela <quintela@redhat.com>, mdroth@linux.vnet.ibm.com, Eric Blake <eblake@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Markus Armbruster <armbru@redhat.com>, marcandre.lureau@redhat.com, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 
-On Fri, Dec 15, 2017 at 05:42:55PM +0800, Fam Zheng wrote:
-> On Tue, 12/05 13:51, Peter Xu wrote:
-> > Introduce qmp_cap_enabled() and qmp_oob_enabled() helpers.
-> >=20
+On Wed, Dec 13, 2017 at 05:35:33PM +0000, Stefan Hajnoczi wrote:
+> On Tue, Dec 05, 2017 at 01:51:48PM +0800, Peter Xu wrote:
+> > A tiny refactoring, preparing to split the QMP dispatcher away.
+> > 
+> > Reviewed-by: Fam Zheng <famz@redhat.com>
 > > Signed-off-by: Peter Xu <peterx@redhat.com>
 > > ---
-> >  monitor.c | 10 ++++++++++
-> >  1 file changed, 10 insertions(+)
-> >=20
+> >  monitor.c | 48 +++++++++++++++++++++++++++++++-----------------
+> >  1 file changed, 31 insertions(+), 17 deletions(-)
+> > 
 > > diff --git a/monitor.c b/monitor.c
-> > index 097312e65f..9666115259 100644
+> > index 9666115259..35d8925636 100644
 > > --- a/monitor.c
 > > +++ b/monitor.c
-> > @@ -1038,6 +1038,16 @@ static void monitor_init_qmp_commands(void)
-> >                           qmp_marshal_qmp_capabilities, QCO_NO_OPTION=
-S);
+> > @@ -3877,6 +3877,36 @@ static int monitor_can_read(void *opaque)
+> >      return (mon->suspend_cnt == 0) ? 1 : 0;
 > >  }
-> > =20
-> > +static bool qmp_cap_enabled(Monitor *mon, QMPCapability cap)
-> > +{
-> > +    return mon->qmp.qmp_caps[cap];
-> > +}
-> > +
-> > +static bool qmp_oob_enabled(Monitor *mon)
-> > +{
-> > +    return qmp_cap_enabled(mon, QMP_CAPABILITY_OOB);
-> > +}
-> > +
-> >  static void qmp_caps_check(Monitor *mon, QMPCapabilityList *list,
-> >                             Error **errp)
-> >  {
-> > --=20
-> > 2.14.3
-> >=20
->=20
-> NACK, this commit doesn't commit for me:
->=20
-> /home/fam/work/qemu/monitor.c:1046:13: error: =E2=80=98qmp_oob_enabled=E2=
-=80=99 defined but not used [-Werror=3Dunused-function]
->  static bool qmp_oob_enabled(Monitor *mon)
->              ^~~~~~~~~~~~~~~
-> cc1: all warnings being treated as errors
->   CC      x86_64-softmmu/accel/stubs/hax-stub.o
+> >  
+> > +/*
+> > + * When rsp/err/id is passed in, the function will be responsible for
+> > + * the cleanup.
+> > + */
+> 
+> Please document this function fully.  I had to look at the
+> implementation to learn how the arguments work:
+> 
+> 1. This function takes ownership of rsp, err, and id.  (Please use this
+> exact wording because the function does not perform the "cleanup" when
+> refcount > 1.)
+> 2. rsp, err, and id may be NULL.
+> 3. If err != NULL then rsp must be NULL.
 
-I'll squash this patch to patch 16, where it started to be used.  Thanks,
+Will steal the lines.  Thanks!
 
---=20
+Also, I'll add an assert() to make sure (3) is true, in case any rsp
+refcount is leaked when accidentally provided with err.
+
+-- 
 Peter Xu
