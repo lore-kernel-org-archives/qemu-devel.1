@@ -1,28 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49062)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53856)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1eQ39n-0002im-27
-	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 22:29:00 -0500
+	(envelope-from <peterx@redhat.com>) id 1eQ3Wn-0005Zq-BU
+	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 22:52:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1eQ39j-0000im-24
-	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 22:28:59 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:57042)
+	(envelope-from <peterx@redhat.com>) id 1eQ3Wk-0000Po-2i
+	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 22:52:45 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:43058)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1eQ39i-0000hi-P2
-	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 22:28:54 -0500
-Date: Sat, 16 Dec 2017 11:28:40 +0800
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1eQ3Wj-0000M2-Sv
+	for qemu-devel@nongnu.org; Fri, 15 Dec 2017 22:52:42 -0500
+Date: Sat, 16 Dec 2017 11:52:28 +0800
 From: Peter Xu <peterx@redhat.com>
-Message-ID: <20171216032840.GS7780@xz-mi>
+Message-ID: <20171216035228.GT7780@xz-mi>
 References: <20171205055200.16305-1-peterx@redhat.com>
-	<20171205055200.16305-6-peterx@redhat.com>
-	<20171213153702.GF7173@stefanha-x1.localdomain>
-	<20171215075505.GK7780@xz-mi>
-	<20171215124524.GE26982@stefanha-x1.localdomain>
+	<20171205055200.16305-8-peterx@redhat.com>
+	<20171213154806.GH7173@stefanha-x1.localdomain>
+	<20171215081141.GN7780@xz-mi>
+	<20171215124711.GF26982@stefanha-x1.localdomain>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20171215124524.GE26982@stefanha-x1.localdomain>
-Subject: Re: [Qemu-devel] [RFC v5 05/26] qjson: add "opaque" field to
- JSONMessageParser
+In-Reply-To: <20171215124711.GF26982@stefanha-x1.localdomain>
+Subject: Re: [Qemu-devel] [RFC v5 07/26] monitor: unify global init
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,61 +33,45 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Stefan Hajnoczi <stefanha@redhat.com>
 Cc: qemu-devel@nongnu.org, Stefan Hajnoczi <shajnocz@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <famz@redhat.com>, Juan Quintela <quintela@redhat.com>, mdroth@linux.vnet.ibm.com, Eric Blake <eblake@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Markus Armbruster <armbru@redhat.com>, marcandre.lureau@redhat.com, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 
-On Fri, Dec 15, 2017 at 12:45:24PM +0000, Stefan Hajnoczi wrote:
-> On Fri, Dec 15, 2017 at 03:55:06PM +0800, Peter Xu wrote:
-> > On Wed, Dec 13, 2017 at 03:37:02PM +0000, Stefan Hajnoczi wrote:
-> > > On Tue, Dec 05, 2017 at 01:51:39PM +0800, Peter Xu wrote:
-> > > > diff --git a/qga/main.c b/qga/main.c
-> > > > index 62a62755bd..3b5ebbc1ee 100644
-> > > > --- a/qga/main.c
-> > > > +++ b/qga/main.c
-> > > > @@ -593,7 +593,8 @@ static void process_command(GAState *s, QDict *req)
-> > > >  }
+On Fri, Dec 15, 2017 at 12:47:11PM +0000, Stefan Hajnoczi wrote:
+> On Fri, Dec 15, 2017 at 04:11:41PM +0800, Peter Xu wrote:
+> > On Wed, Dec 13, 2017 at 03:48:06PM +0000, Stefan Hajnoczi wrote:
+> > > On Tue, Dec 05, 2017 at 01:51:41PM +0800, Peter Xu wrote:
+> > > > diff --git a/vl.c b/vl.c
+> > > > index 1ad1c04637..1ec995a6ae 100644
+> > > > --- a/vl.c
+> > > > +++ b/vl.c
+> > > > @@ -3144,7 +3144,6 @@ int main(int argc, char **argv, char **envp)
+> > > >      qemu_init_exec_dir(argv[0]);
 > > > >  
-> > > >  /* handle requests/control events coming in over the channel */
-> > > > -static void process_event(JSONMessageParser *parser, GQueue *tokens)
-> > > > +static void process_event(JSONMessageParser *parser, GQueue *tokens,
-> > > > +                          void *opaque)
-> > > >  {
-> > > >      GAState *s = container_of(parser, GAState, parser);
-> > > >      QDict *qdict;
-> > > > @@ -1320,7 +1321,7 @@ static int run_agent(GAState *s, GAConfig *config, int socket_activation)
-> > > >      s->command_state = ga_command_state_new();
-> > > >      ga_command_state_init(s, s->command_state);
-> > > >      ga_command_state_init_all(s->command_state);
-> > > > -    json_message_parser_init(&s->parser, process_event);
-> > > > +    json_message_parser_init(&s->parser, process_event, NULL);
+> > > >      module_call_init(MODULE_INIT_QOM);
+> > > > -    monitor_init_qmp_commands();
+> > > >  
+> > > >      qemu_add_opts(&qemu_drive_opts);
+> > > >      qemu_add_drive_opts(&qemu_legacy_drive_opts);
+> > > > @@ -4690,6 +4689,8 @@ int main(int argc, char **argv, char **envp)
+> > > >      default_drive(default_floppy, snapshot, IF_FLOPPY, 0, FD_OPTS);
+> > > >      default_drive(default_sdcard, snapshot, IF_SD, 0, SD_OPTS);
+> > > >  
+> > > > +    monitor_init_globals();
 > > > 
-> > > This patch leaves the code with 2 ways of getting at state from the
-> > > parser pointer:
-> > > 1. Use container_of() like existing users.
-> > > 2. Use the new (unused) opaque argument.
+> > > Why did you move monitor_init_qmp_commands() down here?
 > > > 
-> > > Given that #1 exists, is this patch really necessary?
+> > > There are many function calls between the old position and the new
+> > > position.  Did you check all of them to make sure they don't touch the
+> > > monitor which is now totally uninitialized?
 > > 
-> > I didn't really notice that.  Thanks for pointing out.
-> > 
-> > However even if so I would still prefer the opaque way to do it if
-> > asked.  Existing #1 of course works but IMHO is less flexible and has
-> > dependency between structure layouts.
-> > 
-> > How about I append another patch to convert existing users (or, I can
-> > post as separate patches after this series)?  It's not really a lot,
-> > and the conversion would be obvious:
-> > 
-> > *** qga/main.c:
-> > run_agent[1324]                json_message_parser_init(&s->parser, process_event, NULL);
-> > *** qobject/qjson.c:
-> > qobject_from_jsonv[45]         json_message_parser_init(&state.parser, parse_json, NULL);
-> > *** tests/libqtest.c:
-> > qmp_fd_receive[438]            json_message_parser_init(&qmp.parser, qmp_response, NULL);
-> > 
-> > Though, if you still insist, I can drop it too.
+> > Yeh, this patch is a bit hairy, but I really think we should do it.
+> > Because there are too many places (as you have seen) that we inited
+> > monitor stuff in different places.
 > 
-> I prefer dropping it.  Smaller patch series get reviewed quicker, cause
-> fewer merge conflicts, are lower risk, etc.
+> But why did you move it down here?  Can you replace the
+> monitor_init_qmp_commands() call instead?
 
-Will do.  Thanks,
+I just moved it closer to (actually, right above) initializations of
+monitors to be clear that these globals will never be touched until
+this point.  Or do you want me to move this call exactly back to the
+place where monitor_init_qmp_commands() was called before?  Thanks,
 
 -- 
 Peter Xu
