@@ -1,22 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53064)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53098)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <hpoussin@reactos.org>) id 1eQ8Mx-0004hM-M0
-	for qemu-devel@nongnu.org; Sat, 16 Dec 2017 04:02:56 -0500
+	(envelope-from <hpoussin@reactos.org>) id 1eQ8My-0004hW-NH
+	for qemu-devel@nongnu.org; Sat, 16 Dec 2017 04:02:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <hpoussin@reactos.org>) id 1eQ8Mw-00020t-Nt
-	for qemu-devel@nongnu.org; Sat, 16 Dec 2017 04:02:55 -0500
-Received: from iserv.reactos.org ([2a01:4f8:221:4c5::3]:58762)
+	(envelope-from <hpoussin@reactos.org>) id 1eQ8Mw-000218-R4
+	for qemu-devel@nongnu.org; Sat, 16 Dec 2017 04:02:56 -0500
+Received: from iserv.reactos.org ([2a01:4f8:221:4c5::3]:58836)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <hpoussin@reactos.org>)
-	id 1eQ8Mw-0001t4-8p
+	id 1eQ8Mw-00020R-KN
 	for qemu-devel@nongnu.org; Sat, 16 Dec 2017 04:02:54 -0500
 From: =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>
-Date: Sat, 16 Dec 2017 10:02:13 +0100
-Message-Id: <20171216090228.28505-1-hpoussin@reactos.org>
+Date: Sat, 16 Dec 2017 10:02:23 +0100
+Message-Id: <20171216090228.28505-11-hpoussin@reactos.org>
+In-Reply-To: <20171216090228.28505-1-hpoussin@reactos.org>
+References: <20171216090228.28505-1-hpoussin@reactos.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH 00/15] piix4: cleanup and improvements
+Subject: [Qemu-devel] [PATCH 10/15] piix4: add a i8042 keyboard/mouse
+ controller as specified in datasheet
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,50 +31,41 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Aurelien Jarno <aurelien@aurel32.net>, Yongbok Kim <yongbok.kim@mips.com>, "Michael S . Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
 Cc: =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>
 
-Hi,
+Remove i8042 instanciated in malta board, to not have it twice.
 
-This patchset is a cleanup of the PIIX4 PCI-ISA bridge. Lots of devices
-are moved from MIPS Malta board (which has a PIIX4) to PIIX4, where devices
-belong. This lets us reuse PIIX4 in other machines, while not loosing any
-functionality.
+Signed-off-by: Hervé Poussineau <hpoussin@reactos.org>
+---
+ hw/isa/piix4.c       | 3 +++
+ hw/mips/mips_malta.c | 3 ---
+ 2 files changed, 3 insertions(+), 3 deletions(-)
 
-Last patch allows adding a new PIIX4 device directly from command line.
-Note that this will work only as long no other ISA bus already exist on the
-machine.
-
-Hervé
-
-Hervé Poussineau (15):
-  fdc: move object structures to header file
-  serial/parallel: move object structures to header file
-  mc146818rtc: move structure to header file
-  mc146818rtc: always register rtc to rtc list
-  piix4: rename some variables in realize function
-  piix4: add Reset Control Register
-  piix4: add a i8259 interrupt controller as specified in datasheet
-  piix4: add a i8257 dma controller as specified in datasheet
-  piix4: add a i8254 pit controller as specified in datasheet
-  piix4: add a i8042 keyboard/mouse controller as specified in datasheet
-  piix4: add a floppy controller, 1 parallel port and 2 serial ports
-  piix4: add a mc146818rtc controller as specified in datasheet
-  piix4: add a speaker as specified in datasheet
-  piix4: rename PIIX4 object to piix4-isa
-  piix4: we can now instanciate a PIIX4 with -device
-
- hw/block/fdc.c                 | 101 -------------------------
- hw/char/parallel.c             |  31 +-------
- hw/char/serial-isa.c           |  13 +---
- hw/isa/piix4.c                 | 167 ++++++++++++++++++++++++++++++++++++-----
- hw/mips/mips_malta.c           |  65 ++++++++--------
- hw/ppc/pnv.c                   |   2 +-
- hw/timer/mc146818rtc.c         |  43 ++---------
- include/hw/block/fdc.h         | 103 +++++++++++++++++++++++++
- include/hw/char/isa.h          |  50 ++++++++++++
- include/hw/char/serial.h       |   1 -
- include/hw/i386/pc.h           |   1 -
- include/hw/timer/mc146818rtc.h |  29 +++++++
- 12 files changed, 373 insertions(+), 233 deletions(-)
- create mode 100644 include/hw/char/isa.h
-
+diff --git a/hw/isa/piix4.c b/hw/isa/piix4.c
+index c215bee1ff..cf134b01ee 100644
+--- a/hw/isa/piix4.c
++++ b/hw/isa/piix4.c
+@@ -165,6 +165,9 @@ static void piix4_realize(PCIDevice *pci, Error **errp)
+     /* DMA */
+     DMA_init(isa_bus, 0);
+ 
++    /* Super I/O */
++    isa_create_simple(isa_bus, "i8042");
++
+     piix4_dev = pci;
+     qemu_register_reset(piix4_reset, s);
+ }
+diff --git a/hw/mips/mips_malta.c b/hw/mips/mips_malta.c
+index 5a087fa75d..78049ccf86 100644
+--- a/hw/mips/mips_malta.c
++++ b/hw/mips/mips_malta.c
+@@ -1203,9 +1203,6 @@ void mips_malta_init(MachineState *machine)
+     smbus_eeprom_init(smbus, 8, smbus_eeprom_buf, smbus_eeprom_size);
+     g_free(smbus_eeprom_buf);
+ 
+-    /* Super I/O */
+-    isa_create_simple(isa_bus, "i8042");
+-
+     rtc_init(isa_bus, 2000, NULL);
+     serial_hds_isa_init(isa_bus, 0, 2);
+     parallel_hds_isa_init(isa_bus, 1);
 -- 
 2.11.0
