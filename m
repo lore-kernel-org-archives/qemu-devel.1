@@ -1,25 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41419)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42047)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eQgaf-0005NY-Gr
-	for qemu-devel@nongnu.org; Sun, 17 Dec 2017 16:35:22 -0500
+	(envelope-from <mjt@tls.msk.ru>) id 1eQgcw-0007Ed-Om
+	for qemu-devel@nongnu.org; Sun, 17 Dec 2017 16:37:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eQgae-0007RN-Lj
-	for qemu-devel@nongnu.org; Sun, 17 Dec 2017 16:35:21 -0500
-Received: from mail-oi0-x231.google.com ([2607:f8b0:4003:c06::231]:37394)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1eQgae-0007R7-GL
-	for qemu-devel@nongnu.org; Sun, 17 Dec 2017 16:35:20 -0500
-Received: by mail-oi0-x231.google.com with SMTP id y75so9438818oie.4
-	for <qemu-devel@nongnu.org>; Sun, 17 Dec 2017 13:35:20 -0800 (PST)
+	(envelope-from <mjt@tls.msk.ru>) id 1eQgct-00014m-Hb
+	for qemu-devel@nongnu.org; Sun, 17 Dec 2017 16:37:42 -0500
+From: Michael Tokarev <mjt@tls.msk.ru>
+Date: Mon, 18 Dec 2017 00:27:18 +0300
+Message-Id: <63a083db373daf8bc630b2ad5961a1af5441129b.1513545944.git.mjt@msgid.tls.msk.ru>
+In-Reply-To: <cover.1513545944.git.mjt@msgid.tls.msk.ru>
+References: <cover.1513545944.git.mjt@msgid.tls.msk.ru>
+In-Reply-To: <cover.1513545944.git.mjt@msgid.tls.msk.ru>
+References: <cover.1513545944.git.mjt@msgid.tls.msk.ru>
 MIME-Version: 1.0
-In-Reply-To: <1513446109-9013-1-git-send-email-stefanb@linux.vnet.ibm.com>
-References: <1513446109-9013-1-git-send-email-stefanb@linux.vnet.ibm.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Sun, 17 Dec 2017 21:34:59 +0000
-Message-ID: <CAFEAcA96q6RGAmWJj=jYgYBC_yrP-NcZ6A4_w=S7vgn=-pL3Jw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL v1 00/32] Merge tpm 2017/12/15
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 13/61] accel/tcg/cpu-exec-common.c: Remove
+ unnecessary include of memory-internal.h
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,31 +25,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Berger <stefanb@linux.vnet.ibm.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-trivial@nongnu.org, Michael Tokarev <mjt@tls.msk.ru>
 
-On 16 December 2017 at 17:41, Stefan Berger <stefanb@linux.vnet.ibm.com> wrote:
-> The following patch series refactors the TPM TIS and backend drivers for
-> easier addition of new front-end devices. Further, the TPM buffer sizes
-> are read from the backend and the backend's buffer size can be adjusted
-> by the frontend, if necessary.
->
->
-> The following changes since commit 0ef0583d5adceb9138bdb47494dabd1549ac5b6d:
->
->   Merge remote-tracking branch 'remotes/dgilbert/tags/pull-hmp-20171214' into staging (2017-12-14 15:32:32 +0000)
->
-> are available in the git repository at:
->
->   git://github.com/stefanberger/qemu-tpm.git tags/pull-tpm-2017-12-15-1
->
-> for you to fetch changes up to 683c4b775355cc7acd301e8efe7d4c1c9acdafd8:
->
->   tpm: tpm_passthrough: Fail startup if FE buffer size < BE buffer size (2017-12-14 23:39:15 -0500)
->
-> ----------------------------------------------------------------
-> Merge tpm 2017/12/15 v1
+From: Peter Maydell <peter.maydell@linaro.org>
 
-Applied, thanks.
+The cpu-exec-common.c file includes memory-internal.h, but it doesn't
+actually use anything from that header. Remove the unnecessary include.
 
--- PMM
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+Tested-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Signed-off-by: Michael Tokarev <mjt@tls.msk.ru>
+---
+ accel/tcg/cpu-exec-common.c | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/accel/tcg/cpu-exec-common.c b/accel/tcg/cpu-exec-common.c
+index 5b4ae54a4d..dac5aac477 100644
+--- a/accel/tcg/cpu-exec-common.c
++++ b/accel/tcg/cpu-exec-common.c
+@@ -21,7 +21,6 @@
+ #include "cpu.h"
+ #include "sysemu/cpus.h"
+ #include "exec/exec-all.h"
+-#include "exec/memory-internal.h"
+=20
+ bool tcg_allowed;
+=20
+--=20
+2.11.0
