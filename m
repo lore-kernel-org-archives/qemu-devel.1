@@ -1,31 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50294)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57362)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <willy@infradead.org>) id 1eQhH9-0000XP-4S
-	for qemu-devel@nongnu.org; Sun, 17 Dec 2017 17:19:16 -0500
+	(envelope-from <mjt@tls.msk.ru>) id 1eQhg8-0006GG-6S
+	for qemu-devel@nongnu.org; Sun, 17 Dec 2017 17:45:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <willy@infradead.org>) id 1eQhH5-0004rp-V9
-	for qemu-devel@nongnu.org; Sun, 17 Dec 2017 17:19:15 -0500
-Received: from bombadil.infradead.org ([65.50.211.133]:48758)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <willy@infradead.org>) id 1eQhH5-0004Uu-LD
-	for qemu-devel@nongnu.org; Sun, 17 Dec 2017 17:19:11 -0500
-Date: Sun, 17 Dec 2017 14:18:42 -0800
-From: Matthew Wilcox <willy@infradead.org>
-Message-ID: <20171217221842.GA6683@bombadil.infradead.org>
-References: <5A311C5E.7000304@intel.com>
-	<201712132316.EJJ57332.MFOSJHOFFVLtQO@I-love.SAKURA.ne.jp>
-	<5A31F445.6070504@intel.com>
-	<201712150129.BFC35949.FFtFOLSOJOQHVM@I-love.SAKURA.ne.jp>
-	<20171214181219.GA26124@bombadil.infradead.org>
-	<201712160121.BEJ26052.HOFFOOQFMLtSVJ@I-love.SAKURA.ne.jp>
-	<20171215184915.GB27160@bombadil.infradead.org>
-	<20171215192203.GC27160@bombadil.infradead.org>
-	<286AC319A985734F985F78AFA26841F739387C1D@shsmsx102.ccr.corp.intel.com>
+	(envelope-from <mjt@tls.msk.ru>) id 1eQhg4-0004w4-CM
+	for qemu-devel@nongnu.org; Sun, 17 Dec 2017 17:45:04 -0500
+From: Michael Tokarev <mjt@tls.msk.ru>
+Date: Mon, 18 Dec 2017 00:27:22 +0300
+Message-Id: <cf01b9920e85fc433056d09a7675f1eafb83086e.1513545944.git.mjt@msgid.tls.msk.ru>
+In-Reply-To: <cover.1513545944.git.mjt@msgid.tls.msk.ru>
+References: <cover.1513545944.git.mjt@msgid.tls.msk.ru>
+In-Reply-To: <cover.1513545944.git.mjt@msgid.tls.msk.ru>
+References: <cover.1513545944.git.mjt@msgid.tls.msk.ru>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <286AC319A985734F985F78AFA26841F739387C1D@shsmsx102.ccr.corp.intel.com>
-Subject: Re: [Qemu-devel] [PATCH v19 3/7] xbitmap: add more operations
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 17/61] hw/registerfields: add 64-bit
+ extract/deposit macros
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,51 +25,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Wang, Wei W" <wei.w.wang@intel.com>
-Cc: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>, "virtio-dev@lists.oasis-open.org" <virtio-dev@lists.oasis-open.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "virtualization@lists.linux-foundation.org" <virtualization@lists.linux-foundation.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "linux-mm@kvack.org" <linux-mm@kvack.org>, "mst@redhat.com" <mst@redhat.com>, "mhocko@kernel.org" <mhocko@kernel.org>, "akpm@linux-foundation.org" <akpm@linux-foundation.org>, "mawilcox@microsoft.com" <mawilcox@microsoft.com>, "david@redhat.com" <david@redhat.com>, "cornelia.huck@de.ibm.com" <cornelia.huck@de.ibm.com>, "mgorman@techsingularity.net" <mgorman@techsingularity.net>, "aarcange@redhat.com" <aarcange@redhat.com>, "amit.shah@redhat.com" <amit.shah@redhat.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "liliang.opensource@gmail.com" <liliang.opensource@gmail.com>, "yang.zhang.wz@gmail.com" <yang.zhang.wz@gmail.com>, "quan.xu@aliyun.com" <quan.xu@aliyun.com>, "nilal@redhat.com" <nilal@redhat.com>, "riel@redhat.com" <riel@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-trivial@nongnu.org, Michael Tokarev <mjt@tls.msk.ru>
 
-On Sun, Dec 17, 2017 at 01:47:21PM +0000, Wang, Wei W wrote:
-> On Saturday, December 16, 2017 3:22 AM, Matthew Wilcox wrote:
-> > On Fri, Dec 15, 2017 at 10:49:15AM -0800, Matthew Wilcox wrote:
-> > > Here's the API I'm looking at right now.  The user need take no lock;
-> > > the locking (spinlock) is handled internally to the implementation.
-> 
-> Another place I saw your comment " The xb_ API requires you to handle your own locking" which seems conflict with the above "the user need take no lock".
-> Doesn't the caller need a lock to avoid concurrent accesses to the ida bitmap?
+From: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 
-Yes, the xb_ implementation requires you to handle your own locking.
-The xbit_ API that I'm proposing will take care of the locking for you.
-There's also no preallocation in the API.
+Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+Reviewed-by: Darren Kenny <darren.kenny@oracle.com>
+Reviewed-by: Alistair Francis <alistair.francis@xilinx.com>
+Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
+Signed-off-by: Michael Tokarev <mjt@tls.msk.ru>
+---
+ include/hw/registerfields.h | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
 
-> We'll change it to "bool xb_find_set(.., unsigned long *result)", returning false indicates no "1" bit is found.
-
-I put a replacement proposal in the next paragraph:
-bool xbit_find_set(struct xbitmap *, unsigned long *start, unsigned long max);
-
-Maybe 'start' is the wrong name for that parameter.  Let's call it 'bit'.
-It's both "where to start" and "first bit found".
-
-> >  - xbit_clear() can't return an error.  Neither can xbit_zero().
-> 
-> I found the current xbit_clear implementation only returns 0, and there isn't an error to be returned from this function. In this case, is it better to make the function "void"?
-
-Yes, I think so.
-
-My only qualm is that I've been considering optimising the memory
-consumption when an entire 1024-bit chunk is full; instead of keeping a
-pointer to a 128-byte entry full of ones, store a special value in the
-radix tree which means "every bit is set".
-
-The downside is that we then have to pass GFP flags to xbit_clear() and
-xbit_zero(), and they can fail.  It's not clear to me whether that's a
-good tradeoff.
-
-> Are you suggesting to rename the current xb_ APIs to the above xbit_ names (with parameter changes)? 
-> 
-> Why would we need xbit_alloc, which looks like ida_get_new, I think set/clear should be adequate to the current usages.
-
-I'm intending on replacing the xb_ and ida_ implementations with this one.
-It removes the preload API which makes it easier to use, and it handles
-the locking for you.
-
-But I need to get the XArray (which replaces the radix tree) finished first.
+diff --git a/include/hw/registerfields.h b/include/hw/registerfields.h
+index ad9d7a82a3..f59e7f47bd 100644
+--- a/include/hw/registerfields.h
++++ b/include/hw/registerfields.h
+@@ -35,6 +35,9 @@
+ #define FIELD_EX32(storage, reg, field)                                 =
+  \
+     extract32((storage), R_ ## reg ## _ ## field ## _SHIFT,             =
+  \
+               R_ ## reg ## _ ## field ## _LENGTH)
++#define FIELD_EX64(storage, reg, field)                                 =
+  \
++    extract64((storage), R_ ## reg ## _ ## field ## _SHIFT,             =
+  \
++              R_ ## reg ## _ ## field ## _LENGTH)
+=20
+ /* Extract a field from an array of registers */
+ #define ARRAY_FIELD_EX32(regs, reg, field)                              =
+  \
+@@ -52,6 +55,14 @@
+     d =3D deposit32((storage), R_ ## reg ## _ ## field ## _SHIFT,       =
+    \
+                   R_ ## reg ## _ ## field ## _LENGTH, v.v);             =
+  \
+     d; })
++#define FIELD_DP64(storage, reg, field, val) ({                         =
+  \
++    struct {                                                            =
+  \
++        unsigned int v:R_ ## reg ## _ ## field ## _LENGTH;              =
+  \
++    } v =3D { .v =3D val };                                             =
+      \
++    uint64_t d;                                                         =
+  \
++    d =3D deposit64((storage), R_ ## reg ## _ ## field ## _SHIFT,       =
+    \
++                  R_ ## reg ## _ ## field ## _LENGTH, v.v);             =
+  \
++    d; })
+=20
+ /* Deposit a field to array of registers.  */
+ #define ARRAY_FIELD_DP32(regs, reg, field, val)                         =
+  \
+--=20
+2.11.0
