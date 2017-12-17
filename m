@@ -1,13 +1,13 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57362)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57368)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mjt@tls.msk.ru>) id 1eQhg8-0006GG-6S
+	(envelope-from <mjt@tls.msk.ru>) id 1eQhg8-0006GJ-No
 	for qemu-devel@nongnu.org; Sun, 17 Dec 2017 17:45:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mjt@tls.msk.ru>) id 1eQhg4-0004w4-CM
+	(envelope-from <mjt@tls.msk.ru>) id 1eQhg4-0004vy-Bu
 	for qemu-devel@nongnu.org; Sun, 17 Dec 2017 17:45:04 -0500
 From: Michael Tokarev <mjt@tls.msk.ru>
-Date: Mon, 18 Dec 2017 00:27:22 +0300
-Message-Id: <cf01b9920e85fc433056d09a7675f1eafb83086e.1513545944.git.mjt@msgid.tls.msk.ru>
+Date: Mon, 18 Dec 2017 00:27:19 +0300
+Message-Id: <28a029d32c87b2661f822127906956c1cbe7a86d.1513545944.git.mjt@msgid.tls.msk.ru>
 In-Reply-To: <cover.1513545944.git.mjt@msgid.tls.msk.ru>
 References: <cover.1513545944.git.mjt@msgid.tls.msk.ru>
 In-Reply-To: <cover.1513545944.git.mjt@msgid.tls.msk.ru>
@@ -15,8 +15,8 @@ References: <cover.1513545944.git.mjt@msgid.tls.msk.ru>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 17/61] hw/registerfields: add 64-bit
- extract/deposit macros
+Subject: [Qemu-devel] [PULL 14/61] Makefile: add more targets to the
+ UNCHECKED_GOALS rule
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,58 +30,31 @@ Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-trivial@no
 
 From: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 
+These targets don't need a full build of git submodules.
+(See b8e535ae8af and eaa2ddbb767).
+
 Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-Reviewed-by: Darren Kenny <darren.kenny@oracle.com>
-Reviewed-by: Alistair Francis <alistair.francis@xilinx.com>
-Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
 Signed-off-by: Michael Tokarev <mjt@tls.msk.ru>
 ---
- include/hw/registerfields.h | 11 +++++++++++
- 1 file changed, 11 insertions(+)
+ Makefile | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
-diff --git a/include/hw/registerfields.h b/include/hw/registerfields.h
-index ad9d7a82a3..f59e7f47bd 100644
---- a/include/hw/registerfields.h
-+++ b/include/hw/registerfields.h
-@@ -35,6 +35,9 @@
- #define FIELD_EX32(storage, reg, field)                                 =
-  \
-     extract32((storage), R_ ## reg ## _ ## field ## _SHIFT,             =
-  \
-               R_ ## reg ## _ ## field ## _LENGTH)
-+#define FIELD_EX64(storage, reg, field)                                 =
-  \
-+    extract64((storage), R_ ## reg ## _ ## field ## _SHIFT,             =
-  \
-+              R_ ## reg ## _ ## field ## _LENGTH)
+diff --git a/Makefile b/Makefile
+index 1f93515677..d86ecd2dd4 100644
+--- a/Makefile
++++ b/Makefile
+@@ -6,7 +6,10 @@ BUILD_DIR=3D$(CURDIR)
+ # Before including a proper config-host.mak, assume we are in the source=
+ tree
+ SRC_PATH=3D.
 =20
- /* Extract a field from an array of registers */
- #define ARRAY_FIELD_EX32(regs, reg, field)                              =
-  \
-@@ -52,6 +55,14 @@
-     d =3D deposit32((storage), R_ ## reg ## _ ## field ## _SHIFT,       =
-    \
-                   R_ ## reg ## _ ## field ## _LENGTH, v.v);             =
-  \
-     d; })
-+#define FIELD_DP64(storage, reg, field, val) ({                         =
-  \
-+    struct {                                                            =
-  \
-+        unsigned int v:R_ ## reg ## _ ## field ## _LENGTH;              =
-  \
-+    } v =3D { .v =3D val };                                             =
-      \
-+    uint64_t d;                                                         =
-  \
-+    d =3D deposit64((storage), R_ ## reg ## _ ## field ## _SHIFT,       =
-    \
-+                  R_ ## reg ## _ ## field ## _LENGTH, v.v);             =
-  \
-+    d; })
+-UNCHECKED_GOALS :=3D %clean TAGS cscope ctags docker docker-% help
++UNCHECKED_GOALS :=3D %clean TAGS cscope ctags dist \
++    html info pdf txt \
++    help check-help \
++    docker docker-% vm-test vm-build-%
 =20
- /* Deposit a field to array of registers.  */
- #define ARRAY_FIELD_DP32(regs, reg, field, val)                         =
-  \
+ # All following code might depend on configuration variables
+ ifneq ($(wildcard config-host.mak),)
 --=20
 2.11.0
