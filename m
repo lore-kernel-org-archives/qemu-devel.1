@@ -1,19 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49510)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50294)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mjt@tls.msk.ru>) id 1eQhD1-0007tC-Sw
-	for qemu-devel@nongnu.org; Sun, 17 Dec 2017 17:15:01 -0500
+	(envelope-from <willy@infradead.org>) id 1eQhH9-0000XP-4S
+	for qemu-devel@nongnu.org; Sun, 17 Dec 2017 17:19:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mjt@tls.msk.ru>) id 1eQhCy-0002Am-Hs
-	for qemu-devel@nongnu.org; Sun, 17 Dec 2017 17:14:59 -0500
-From: Michael Tokarev <mjt@tls.msk.ru>
-Date: Mon, 18 Dec 2017 01:07:36 +0300
-Message-Id: <cover.1513548172.git.mjt@msgid.tls.msk.ru>
-References: <cover.1513545944.git.mjt@msgid.tls.msk.ru>
-In-Reply-To: <cover.1513545944.git.mjt@msgid.tls.msk.ru>
+	(envelope-from <willy@infradead.org>) id 1eQhH5-0004rp-V9
+	for qemu-devel@nongnu.org; Sun, 17 Dec 2017 17:19:15 -0500
+Received: from bombadil.infradead.org ([65.50.211.133]:48758)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <willy@infradead.org>) id 1eQhH5-0004Uu-LD
+	for qemu-devel@nongnu.org; Sun, 17 Dec 2017 17:19:11 -0500
+Date: Sun, 17 Dec 2017 14:18:42 -0800
+From: Matthew Wilcox <willy@infradead.org>
+Message-ID: <20171217221842.GA6683@bombadil.infradead.org>
+References: <5A311C5E.7000304@intel.com>
+	<201712132316.EJJ57332.MFOSJHOFFVLtQO@I-love.SAKURA.ne.jp>
+	<5A31F445.6070504@intel.com>
+	<201712150129.BFC35949.FFtFOLSOJOQHVM@I-love.SAKURA.ne.jp>
+	<20171214181219.GA26124@bombadil.infradead.org>
+	<201712160121.BEJ26052.HOFFOOQFMLtSVJ@I-love.SAKURA.ne.jp>
+	<20171215184915.GB27160@bombadil.infradead.org>
+	<20171215192203.GC27160@bombadil.infradead.org>
+	<286AC319A985734F985F78AFA26841F739387C1D@shsmsx102.ccr.corp.intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL v2 00/61] Trivial patches for 2017-12-18
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <286AC319A985734F985F78AFA26841F739387C1D@shsmsx102.ccr.corp.intel.com>
+Subject: Re: [Qemu-devel] [PATCH v19 3/7] xbitmap: add more operations
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,279 +34,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Michael Tokarev <mjt@tls.msk.ru>, qemu-trivial@nongnu.org
+To: "Wang, Wei W" <wei.w.wang@intel.com>
+Cc: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>, "virtio-dev@lists.oasis-open.org" <virtio-dev@lists.oasis-open.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "virtualization@lists.linux-foundation.org" <virtualization@lists.linux-foundation.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "linux-mm@kvack.org" <linux-mm@kvack.org>, "mst@redhat.com" <mst@redhat.com>, "mhocko@kernel.org" <mhocko@kernel.org>, "akpm@linux-foundation.org" <akpm@linux-foundation.org>, "mawilcox@microsoft.com" <mawilcox@microsoft.com>, "david@redhat.com" <david@redhat.com>, "cornelia.huck@de.ibm.com" <cornelia.huck@de.ibm.com>, "mgorman@techsingularity.net" <mgorman@techsingularity.net>, "aarcange@redhat.com" <aarcange@redhat.com>, "amit.shah@redhat.com" <amit.shah@redhat.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "liliang.opensource@gmail.com" <liliang.opensource@gmail.com>, "yang.zhang.wz@gmail.com" <yang.zhang.wz@gmail.com>, "quan.xu@aliyun.com" <quan.xu@aliyun.com>, "nilal@redhat.com" <nilal@redhat.com>, "riel@redhat.com" <riel@redhat.com>
 
-> Here's a large pull request for trivial-patches queue.
-> It's been quite a whie since the last request, and many
-> changes has been accumulated.
->=20
-> Also there's a large patchset by Philippe Mathieu-Daud=C3=A9
-> named "remove i386/pc dependency from non-PC world (part 1)"
-> consisting of 42 patches which makes good portion of this
-> pull request.
+On Sun, Dec 17, 2017 at 01:47:21PM +0000, Wang, Wei W wrote:
+> On Saturday, December 16, 2017 3:22 AM, Matthew Wilcox wrote:
+> > On Fri, Dec 15, 2017 at 10:49:15AM -0800, Matthew Wilcox wrote:
+> > > Here's the API I'm looking at right now.  The user need take no lock;
+> > > the locking (spinlock) is handled internally to the implementation.
+> 
+> Another place I saw your comment " The xb_ API requires you to handle your own locking" which seems conflict with the above "the user need take no lock".
+> Doesn't the caller need a lock to avoid concurrent accesses to the ida bitmap?
 
-I forgot to add my S-o-b lines to the large series by
-Philippe Mathieu-Daud=C3=A9. So here's a re-send of just the
-cover letter (not all the other patches). The only difference
-is the addition of 42 of my "S-o-b" line.
+Yes, the xb_ implementation requires you to handle your own locking.
+The xbit_ API that I'm proposing will take care of the locking for you.
+There's also no preallocation in the API.
 
-Thanks,
+> We'll change it to "bool xb_find_set(.., unsigned long *result)", returning false indicates no "1" bit is found.
 
-/mjt
+I put a replacement proposal in the next paragraph:
+bool xbit_find_set(struct xbitmap *, unsigned long *start, unsigned long max);
 
-The following changes since commit 38d1b31e0501f938db39c5b2e5083285304102=
-46:
+Maybe 'start' is the wrong name for that parameter.  Let's call it 'bit'.
+It's both "where to start" and "first bit found".
 
-  Merge remote-tracking branch 'remotes/berrange/tags/pull-qio-201712151'=
- into staging (2017-12-15 17:05:26 +0000)
+> >  - xbit_clear() can't return an error.  Neither can xbit_zero().
+> 
+> I found the current xbit_clear implementation only returns 0, and there isn't an error to be returned from this function. In this case, is it better to make the function "void"?
 
-are available in the git repository at:
+Yes, I think so.
 
-  git://git.corpit.ru/qemu.git tags/trivial-patches-fetch
+My only qualm is that I've been considering optimising the memory
+consumption when an entire 1024-bit chunk is full; instead of keeping a
+pointer to a 128-byte entry full of ones, store a special value in the
+radix tree which means "every bit is set".
 
-for you to fetch changes up to f4c56de4342e50b9c5a96b579a0cc44a48836536:
+The downside is that we then have to pass GFP flags to xbit_clear() and
+xbit_zero(), and they can fail.  It's not clear to me whether that's a
+good tradeoff.
 
-  misc: drop old i386 dependency (2017-12-18 01:01:55 +0300)
+> Are you suggesting to rename the current xb_ APIs to the above xbit_ names (with parameter changes)? 
+> 
+> Why would we need xbit_alloc, which looks like ida_get_new, I think set/clear should be adequate to the current usages.
 
-----------------------------------------------------------------
-trivial patches for 2017-12-18
+I'm intending on replacing the xb_ and ida_ implementations with this one.
+It removes the preload API which makes it easier to use, and it handles
+the locking for you.
 
-----------------------------------------------------------------
-Daniel Henrique Barboza (1):
-      configure: check $CC available before verifying host CPU
-
-Emilio G. Cota (3):
-      disas/arm: fix 'instuction' typo in comment
-      translate-all: fix 'consisits' typo in comment
-      qht: fix kernel-doc markup in qht.h
-
-Ladi Prosek (1):
-      Remove empty statements
-
-Marc-Andr=C3=A9 Lureau (2):
-      .gitignore: remove vscclient
-      memory: remove unused memory_region_set_global_locking()
-
-Michael McConville (1):
-      mmap(2) returns MAP_FAILED, not NULL, on failure
-
-Mike Frysinger (1):
-      build: fix typo in error message
-
-Peter Maydell (1):
-      accel/tcg/cpu-exec-common.c: Remove unnecessary include of memory-i=
-nternal.h
-
-Philippe Mathieu-Daud=C3=A9 (49):
-      hw/alpha/typhoon: simplify using the "unimplemented" sysbus device
-      Makefile: use $(MAKE) variable
-      Makefile: add more targets to the UNCHECKED_GOALS rule
-      MAINTAINERS: add "hw/registerfields.h" in Register API entry
-      hw/registerfields: fix a typo in the FIELD() documentation
-      hw/registerfields: add 64-bit extract/deposit macros
-      hw/registerfields: add missing include
-      MAINTAINERS: add entries for i2c/ppc4xx
-      MAINTAINERS: add an entry for the i82374 (southbridge)
-      MAINTAINERS: add an entry for the i8257 (DMA controller)
-      MAINTAINERS: add an entry for the i82378 (superio)
-      MAINTAINERS: add an entry for watchdog/wdt_ib700
-      MAINTAINERS: add an entry for input/pckbd.c
-      MAINTAINERS: add entries for timer/m48t59
-      MAINTAINERS: add missing entry for include/hw/net/
-      hw: use "qemu/osdep.h" as first #include in source files
-      hw: remove "qemu/osdep.h" from header files
-      block: remove "qemu/osdep.h" from header file
-      misc: remove headers implicitly included
-      misc: remove duplicated includes
-      ppc: remove duplicated includes
-      i386/hax: remove duplicated includes
-      i386/hax: remove duplicated include
-      nios2: remove duplicated includes (in code commented out)
-      misc: avoid "include/" in include path
-      numa: remove unused #include
-      hw/input/vmmouse: remove unused #include
-      hw/misc/pvpanic: remove unused #include
-      hw/ssi/aspeed_smc: remove unused #include
-      amd_iommu: avoid needless includes in header file
-      misc: remove old i386 dependency
-      hw/ide: remove old i386 dependency
-      hw/ipmi: remove old i386 dependency
-      hw/i2c: remove old i386 dependency
-      hw/tpm: remove old i386 dependency
-      hw/virtio-balloon: remove old i386 dependency
-      hw/unicore32: restrict hw addr defines to source file
-      hw/timer/i8254: rename pit_init() -> i8254_pit_init()
-      hw/timer/mc146818: rename rtc_init() -> mc146818_rtc_init()
-      hw/acpi: ACPI_PM_* defines are not restricted to i386 arch
-      hw/acpi/ich9: extract ACPI_PM_PROP_TCO_ENABLED from i386/pc
-      hw/display/vga: "vga.h" only contains registers defs, rename it "vg=
-a_regs.h"
-      hw/display/vga: "vga_int.h" requires "ui/console.h"
-      hw/display/vga: extract public API from i386/pc to "hw/display/vga.=
-h"
-      hw/net/ne2000: extract ne2k-isa code from i386/pc to ne2000-isa.c
-      hw/misc/pvpanic: extract public API from i386/pc to "hw/misc/pvpani=
-c.h"
-      i386/pc: move vmport.c to hw/i386/
-      i386/pc: move vmmouse.c to hw/i386/
-      misc: drop old i386 dependency
-
-Tao Wu (1):
-      hw/input/hid: Add support for several keys.
-
-Vicente Jimenez Aguilar (1):
-      Document pretty parameter for mon option
-
- .gitignore                          |  1 -
- MAINTAINERS                         | 14 ++++++++++-
- Makefile                            | 11 +++++----
- accel/tcg/cpu-exec-common.c         |  1 -
- accel/tcg/translate-all.c           |  3 +--
- block/dmg.h                         |  1 -
- bsd-user/main.c                     |  1 -
- chardev/wctablet.c                  |  4 ----
- configure                           | 25 ++++++++++---------
- disas/arm.c                         |  2 +-
- disas/nios2.c                       |  3 ---
- exec.c                              |  3 ---
- hw/acpi/core.c                      |  1 -
- hw/acpi/ipmi-stub.c                 |  1 +
- hw/alpha/alpha_sys.h                |  1 -
- hw/alpha/dp264.c                    |  4 ++--
- hw/alpha/pci.c                      | 26 --------------------
- hw/alpha/typhoon.c                  |  6 ++---
- hw/arm/spitz.c                      |  1 -
- hw/audio/fmopl.c                    |  1 -
- hw/audio/fmopl.h                    |  1 -
- hw/audio/pcspk.c                    |  1 -
- hw/char/debugcon.c                  |  1 -
- hw/char/xen_console.c               |  1 -
- hw/core/machine.c                   |  1 -
- hw/cpu/core.c                       |  1 +
- hw/display/cirrus_vga.c             |  1 -
- hw/display/qxl.h                    |  1 -
- hw/display/vga-isa-mm.c             |  4 +---
- hw/display/vga-isa.c                |  3 +--
- hw/display/vga-pci.c                |  1 -
- hw/display/vga.c                    |  5 ++--
- hw/display/vga_int.h                |  3 ++-
- hw/display/{vga.h =3D> vga_regs.h}    |  0
- hw/display/virtio-vga.c             |  1 -
- hw/display/vmware_vga.c             |  1 -
- hw/i2c/pm_smbus.c                   |  1 -
- hw/i2c/smbus_ich9.c                 |  1 -
- hw/i386/Makefile.objs               |  2 ++
- hw/i386/acpi-build.c                |  2 +-
- hw/i386/amd_iommu.c                 |  5 +++-
- hw/i386/amd_iommu.h                 |  5 ----
- hw/i386/pc.c                        |  5 ++--
- hw/{input =3D> i386}/vmmouse.c        |  1 -
- hw/{misc =3D> i386}/vmport.c          | 17 ++++++-------
- hw/i386/xen/xen-mapcache.c          |  2 +-
- hw/i386/xen/xen_platform.c          |  1 -
- hw/ide/ahci.c                       |  1 -
- hw/ide/cmd646.c                     |  1 -
- hw/ide/core.c                       |  3 +--
- hw/ide/ich.c                        |  1 -
- hw/ide/isa.c                        |  1 -
- hw/ide/microdrive.c                 |  1 -
- hw/ide/pci.c                        |  1 -
- hw/ide/piix.c                       |  2 +-
- hw/ide/via.c                        |  1 -
- hw/input/Makefile.objs              |  1 -
- hw/input/adb.c                      |  2 +-
- hw/input/hid.c                      |  8 +++----
- hw/intc/lm32_pic.c                  |  1 -
- hw/ipmi/isa_ipmi_bt.c               |  1 -
- hw/ipmi/isa_ipmi_kcs.c              |  1 -
- hw/isa/i82378.c                     |  5 ++--
- hw/isa/vt82c686.c                   |  1 -
- hw/mips/mips_fulong2e.c             |  4 ++--
- hw/mips/mips_jazz.c                 |  5 ++--
- hw/mips/mips_malta.c                |  4 ++--
- hw/mips/mips_r4k.c                  |  5 ++--
- hw/misc/Makefile.objs               |  2 --
- hw/misc/imx6_ccm.c                  |  2 +-
- hw/misc/ivshmem.c                   |  1 -
- hw/misc/pvpanic.c                   | 12 ++++------
- hw/misc/sga.c                       |  1 -
- hw/moxie/moxiesim.c                 |  1 -
- hw/net/ne2000-isa.c                 |  6 ++---
- hw/net/ne2000.c                     |  2 --
- hw/net/ne2000.h                     |  3 +++
- hw/nios2/boot.c                     |  1 -
- hw/pci-bridge/pci_expander_bridge.c |  1 -
- hw/ppc/pnv.c                        |  2 +-
- hw/ppc/prep.c                       |  1 +
- hw/ppc/spapr_cpu_core.c             |  1 +
- hw/ppc/spapr_hcall.c                |  1 -
- hw/s390x/css.c                      |  1 -
- hw/s390x/virtio-ccw.c               |  2 +-
- hw/scsi/vhost-user-scsi.c           |  1 -
- hw/smbios/smbios_type_38-stub.c     |  1 +
- hw/sparc/sun4m.c                    |  1 -
- hw/ssi/aspeed_smc.c                 |  3 +--
- hw/timer/i8254.c                    |  1 -
- hw/timer/i8254_common.c             |  1 -
- hw/timer/mc146818rtc.c              |  2 +-
- hw/tpm/tpm_passthrough.c            |  1 -
- hw/tpm/tpm_tis.c                    |  1 -
- hw/unicore32/puv3.c                 | 15 ++++++++----
- hw/vfio/ccw.c                       |  2 +-
- hw/virtio/vhost-vsock.c             |  2 +-
- hw/virtio/virtio-balloon.c          |  2 +-
- hw/watchdog/wdt_ib700.c             |  1 -
- include/exec/memory.h               | 12 ----------
- include/hw/acpi/acpi.h              | 11 +++++++++
- include/hw/acpi/ich9.h              |  2 ++
- include/hw/acpi/ipmi.h              |  1 -
- include/hw/cpu/core.h               |  1 -
- include/hw/display/vga.h            | 25 +++++++++++++++++++
- include/hw/i2c/ppc4xx_i2c.h         |  1 -
- include/hw/i386/pc.h                | 48 -------------------------------=
-------
- include/hw/misc/pvpanic.h           | 21 ++++++++++++++++
- include/hw/net/ne2000-isa.h         | 33 +++++++++++++++++++++++++
- include/hw/registerfields.h         | 15 +++++++++++-
- include/hw/timer/i8254.h            |  5 ++--
- include/hw/timer/i8254_internal.h   |  2 +-
- include/hw/timer/mc146818rtc.h      |  3 ++-
- include/hw/unicore32/puv3.h         | 10 --------
- include/qemu/qht.h                  |  6 ++---
- include/sysemu/hax.h                |  1 -
- linux-user/main.c                   |  1 -
- linux-user/signal.c                 |  2 +-
- memory.c                            |  5 ----
- migration/block.c                   |  2 +-
- monitor.c                           |  1 -
- net/colo-compare.c                  |  1 -
- numa.c                              |  1 -
- qemu-options.hx                     |  7 +++---
- scripts/git-submodule.sh            |  2 +-
- target/i386/cpu.c                   |  2 +-
- target/i386/hax-darwin.c            |  6 +----
- target/i386/hax-darwin.h            |  3 ---
- target/i386/hax-windows.h           |  3 ---
- target/i386/kvm.c                   |  2 +-
- target/nios2/cpu.h                  |  1 -
- target/nios2/helper.c               |  5 +---
- target/nios2/op_helper.c            |  1 +
- target/nios2/translate.c            |  1 +
- target/openrisc/exception_helper.c  |  1 -
- target/ppc/kvm.c                    |  3 ---
- target/sh4/translate.c              |  2 +-
- tests/Makefile.include              | 20 ++++++++--------
- tests/test-aio-multithread.c        |  1 -
- tests/test-clone-visitor.c          |  1 -
- tests/vhost-user-test.c             |  1 -
- tests/vmgenid-test.c                |  3 ---
- util/qemu-sockets.c                 |  1 -
- vl.c                                |  3 +--
- 144 files changed, 258 insertions(+), 323 deletions(-)
- rename hw/display/{vga.h =3D> vga_regs.h} (100%)
- rename hw/{input =3D> i386}/vmmouse.c (99%)
- rename hw/{misc =3D> i386}/vmport.c (95%)
- create mode 100644 include/hw/display/vga.h
- create mode 100644 include/hw/misc/pvpanic.h
- create mode 100644 include/hw/net/ne2000-isa.h
+But I need to get the XArray (which replaces the radix tree) finished first.
