@@ -1,26 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56999)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58687)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eQNKX-0001L8-OO
-	for qemu-devel@nongnu.org; Sat, 16 Dec 2017 20:01:26 -0500
+	id 1eQNWx-0003Fs-NO
+	for qemu-devel@nongnu.org; Sat, 16 Dec 2017 20:14:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eQNKX-0007i7-5E
-	for qemu-devel@nongnu.org; Sat, 16 Dec 2017 20:01:25 -0500
+	id 1eQNWu-0006JH-IJ
+	for qemu-devel@nongnu.org; Sat, 16 Dec 2017 20:14:15 -0500
+Received: from mail-qk0-x244.google.com ([2607:f8b0:400d:c09::244]:39017)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1eQNWu-0006J8-DY
+	for qemu-devel@nongnu.org; Sat, 16 Dec 2017 20:14:12 -0500
+Received: by mail-qk0-x244.google.com with SMTP id u184so14609532qkd.6
+	for <qemu-devel@nongnu.org>; Sat, 16 Dec 2017 17:14:12 -0800 (PST)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
-References: <cover.1513465066.git.balaton@eik.bme.hu>
-	<4a19707d5b6554dda851b5da07e0276634b50900.1513465066.git.balaton@eik.bme.hu>
+References: <20171216213004.30393-1-hpoussin@reactos.org>
+	<20171216213004.30393-15-hpoussin@reactos.org>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <aa2dc73d-7475-a886-fc82-016fde4e4417@amsat.org>
-Date: Sat, 16 Dec 2017 22:01:15 -0300
+Message-ID: <f16b03f3-16a8-81aa-ee8c-5ced825ca7a6@amsat.org>
+Date: Sat, 16 Dec 2017 22:14:07 -0300
 MIME-Version: 1.0
-In-Reply-To: <4a19707d5b6554dda851b5da07e0276634b50900.1513465066.git.balaton@eik.bme.hu>
+In-Reply-To: <20171216213004.30393-15-hpoussin@reactos.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [Qemu-trivial] [PATCH 1/2] sm501: Add panel
- hardware cursor registers also to read function
+Subject: Re: [Qemu-devel] [PATCH v2 14/15] piix4: rename PIIX4 object to
+ piix4-isa
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,46 +36,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: BALATON Zoltan <balaton@eik.bme.hu>, qemu-devel@nongnu.org, qemu-trivial@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Magnus Damm <magnus.damm@gmail.com>, David Gibson <david@gibson.dropbear.id.au>
+To: =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>, Aurelien Jarno <aurelien@aurel32.net>, Yongbok Kim <yongbok.kim@mips.com>, "Michael S . Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
 
-On 12/16/2017 07:57 PM, BALATON Zoltan wrote:
-> These were forgotten when adding panel layer support.
+Hi Hervé,
 
- ... in ffd39257018.
-
+On 12/16/2017 06:30 PM, Hervé Poussineau wrote:
+> Other piix4 parts are already named piix4-ide and piix4-usb-uhci.
 > 
-> Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
+> Signed-off-by: Hervé Poussineau <hpoussin@reactos.org>
+> ---
+>  hw/isa/piix4.c       | 2 +-
+>  hw/mips/mips_malta.c | 2 +-
+>  2 files changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/hw/isa/piix4.c b/hw/isa/piix4.c
+> index dc7146ee14..8bf260594f 100644
+> --- a/hw/isa/piix4.c
+> +++ b/hw/isa/piix4.c
+> @@ -52,7 +52,7 @@ typedef struct PIIX4State {
+>      uint8_t rcr;
+>  } PIIX4State;
+>  
+> -#define TYPE_PIIX4_PCI_DEVICE "PIIX4"
+> +#define TYPE_PIIX4_PCI_DEVICE "piix4-isa"
+>  #define PIIX4_PCI_DEVICE(obj) \
+>      OBJECT_CHECK(PIIX4State, (obj), TYPE_PIIX4_PCI_DEVICE)
+>  
+> diff --git a/hw/mips/mips_malta.c b/hw/mips/mips_malta.c
+> index 3d304a6e0a..28d91c9668 100644
+> --- a/hw/mips/mips_malta.c
+> +++ b/hw/mips/mips_malta.c
+> @@ -1178,7 +1178,7 @@ void mips_malta_init(MachineState *machine)
+>      ide_drive_get(hd, ARRAY_SIZE(hd));
+>  
+>      pci = pci_create_multifunction(pci_bus, PCI_DEVFN(10, 0),
+> -                                   true, "PIIX4");
+> +                                   true, "piix4-isa");
 
-with reference to commit:
+Can you use TYPE_PIIX4_PCI_DEVICE instead?
+
+Then:
 Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-> ---
->  hw/display/sm501.c | 13 +++++++++++++
->  1 file changed, 13 insertions(+)
-> 
-> diff --git a/hw/display/sm501.c b/hw/display/sm501.c
-> index 7f18224..b9b6111 100644
-> --- a/hw/display/sm501.c
-> +++ b/hw/display/sm501.c
-> @@ -956,6 +956,19 @@ static uint64_t sm501_disp_ctrl_read(void *opaque, hwaddr addr,
->          ret = s->dc_panel_v_sync;
->          break;
+>      dev = DEVICE(pci);
 >  
-> +    case SM501_DC_PANEL_HWC_ADDR:
-> +        ret = s->dc_panel_hwc_addr;
-> +        break;
-> +    case SM501_DC_PANEL_HWC_LOC:
-> +        ret = s->dc_panel_hwc_location;
-> +        break;
-> +    case SM501_DC_PANEL_HWC_COLOR_1_2:
-> +        ret = s->dc_panel_hwc_color_1_2;
-> +        break;
-> +    case SM501_DC_PANEL_HWC_COLOR_3:
-> +        ret = s->dc_panel_hwc_color_3;
-> +        break;
-> +
->      case SM501_DC_VIDEO_CONTROL:
->          ret = s->dc_video_control;
->          break;
+>      /* Floppy */
 > 
