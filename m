@@ -1,31 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57969)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59602)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eQab8-0008EL-Dy
-	for qemu-devel@nongnu.org; Sun, 17 Dec 2017 10:11:27 -0500
+	(envelope-from <penguin-kernel@I-love.SAKURA.ne.jp>)
+	id 1eQalp-0001g1-Ne
+	for qemu-devel@nongnu.org; Sun, 17 Dec 2017 10:22:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eQab4-00082o-Dv
-	for qemu-devel@nongnu.org; Sun, 17 Dec 2017 10:11:26 -0500
-Received: from mail-qt0-x242.google.com ([2607:f8b0:400d:c0d::242]:45283)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eQab4-00082J-9n
-	for qemu-devel@nongnu.org; Sun, 17 Dec 2017 10:11:22 -0500
-Received: by mail-qt0-x242.google.com with SMTP id g10so17290884qtj.12
-	for <qemu-devel@nongnu.org>; Sun, 17 Dec 2017 07:11:22 -0800 (PST)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20171217052945.12782-2-pbonzini@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <b9491b5d-452c-d26f-a2c7-992ab2852591@amsat.org>
-Date: Sun, 17 Dec 2017 12:11:17 -0300
-MIME-Version: 1.0
-In-Reply-To: <20171217052945.12782-2-pbonzini@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] scsi: replace hex constants with #defines
+	(envelope-from <penguin-kernel@I-love.SAKURA.ne.jp>)
+	id 1eQalm-00026g-H2
+	for qemu-devel@nongnu.org; Sun, 17 Dec 2017 10:22:29 -0500
+Received: from www262.sakura.ne.jp ([2001:e42:101:1:202:181:97:72]:28046)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <penguin-kernel@I-love.SAKURA.ne.jp>)
+	id 1eQall-00022n-2O
+	for qemu-devel@nongnu.org; Sun, 17 Dec 2017 10:22:26 -0500
+From: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+References: <5A34F193.5040700@intel.com>
+	<201712162028.FEB87079.FOJFMQHVOSLtFO@I-love.SAKURA.ne.jp>
+	<5A35FF89.8040500@intel.com>
+	<201712171921.IBB30790.VOOOFMQHFSLFJt@I-love.SAKURA.ne.jp>
+	<286AC319A985734F985F78AFA26841F739387B68@shsmsx102.ccr.corp.intel.com>
+In-Reply-To: <286AC319A985734F985F78AFA26841F739387B68@shsmsx102.ccr.corp.intel.com>
+Message-Id: <201712180016.GHD34301.MQOLOFFJHOVFtS@I-love.SAKURA.ne.jp>
+Date: Mon, 18 Dec 2017 00:16:33 +0900
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Subject: Re: [Qemu-devel] [PATCH v19 3/7] xbitmap: add more operations
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,47 +32,104 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
-Cc: dgilbert@redhat.com
+To: wei.w.wang@intel.com, willy@infradead.org
+Cc: virtio-dev@lists.oasis-open.org, linux-kernel@vger.kernel.org, qemu-devel@nongnu.org, virtualization@lists.linux-foundation.org, kvm@vger.kernel.org, linux-mm@kvack.org, mst@redhat.com, mhocko@kernel.org, akpm@linux-foundation.org, mawilcox@microsoft.com, david@redhat.com, cornelia.huck@de.ibm.com, mgorman@techsingularity.net, aarcange@redhat.com, amit.shah@redhat.com, pbonzini@redhat.com, liliang.opensource@gmail.com, yang.zhang.wz@gmail.com, quan.xu@aliyun.com, nilal@redhat.com, riel@redhat.com
 
-On 12/17/2017 02:29 AM, Paolo Bonzini wrote:
-> Sense keys have nice #defines in scsi/constants.h, use them.
+Wang, Wei W wrote:
+> > Wei Wang wrote:
+> > > > But passing GFP_NOWAIT means that we can handle allocation failure.
+> > > > There is no need to use preload approach when we can handle allocation failure.
+> > >
+> > > I think the reason we need xb_preload is because radix tree insertion
+> > > needs the memory being preallocated already (it couldn't suffer from
+> > > memory failure during the process of inserting, probably because
+> > > handling the failure there isn't easy, Matthew may know the backstory
+> > > of
+> > > this)
+> > 
+> > According to https://lwn.net/Articles/175432/ , I think that preloading is
+> > needed only when failure to insert an item into a radix tree is a significant
+> > problem.
+> > That is, when failure to insert an item into a radix tree is not a problem, I
+> > think that we don't need to use preloading.
 > 
-> Reported-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> It also mentions that the preload attempts to allocate sufficient memory to *guarantee* that the next radix tree insertion cannot fail.
+> 
+> If we check radix_tree_node_alloc(), the comments there says "this assumes that the caller has performed appropriate preallocation".
 
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+If you read what radix_tree_node_alloc() is doing, you will find that
+radix_tree_node_alloc() returns NULL when memory allocation failed.
 
-> ---
->  scsi/utils.c | 14 +++++++-------
->  1 file changed, 7 insertions(+), 7 deletions(-)
+I think that "this assumes that the caller has performed appropriate preallocation"
+means "The caller has to perform appropriate preallocation if the caller does not
+want radix_tree_node_alloc() to return NULL".
+
 > 
-> diff --git a/scsi/utils.c b/scsi/utils.c
-> index 61bc1a8e2b..ddae650a99 100644
-> --- a/scsi/utils.c
-> +++ b/scsi/utils.c
-> @@ -339,16 +339,16 @@ int scsi_convert_sense(uint8_t *in_buf, int in_len,
->  int scsi_sense_to_errno(int key, int asc, int ascq)
->  {
->      switch (key) {
-> -    case 0x00: /* NO SENSE */
-> -    case 0x01: /* RECOVERED ERROR */
-> -    case 0x06: /* UNIT ATTENTION */
-> +    case NO_SENSE:
-> +    case RECOVERED_ERROR:
-> +    case UNIT_ATTENTION:
->          /* These sense keys are not errors */
->          return 0;
-> -    case 0x0b: /* COMMAND ABORTED */
-> +    case ABORTED_COMMAND: /* COMMAND ABORTED */
->          return ECANCELED;
-> -    case 0x02: /* NOT READY */
-> -    case 0x05: /* ILLEGAL REQUEST */
-> -    case 0x07: /* DATA PROTECTION */
-> +    case NOT_READY:
-> +    case ILLEGAL_REQUEST:
-> +    case DATA_PROTECT:
->          /* Parse ASCQ */
->          break;
->      default:
+> So, I think we would get a risk of triggering some issue without preload().
 > 
+> > >
+> > > So, I think we can handle the memory failure with xb_preload, which
+> > > stops going into the radix tree APIs, but shouldn't call radix tree
+> > > APIs without the related memory preallocated.
+> > 
+> > It seems to me that virtio-ballon case has no problem without using
+> > preloading.
+> 
+> Why is that?
+> 
+
+Because you are saying in PATCH 4/7 that it is OK to fail xb_set_page()
+due to -ENOMEM (apart from lack of ability to fallback to !use_sg path
+when all xb_set_page() calls failed (i.e. no page will be handled because
+there is no "1" bit in the xbitmap)).
+
+
++static inline int xb_set_page(struct virtio_balloon *vb,
++			       struct page *page,
++			       unsigned long *pfn_min,
++			       unsigned long *pfn_max)
++{
++	unsigned long pfn = page_to_pfn(page);
++	int ret;
++
++	*pfn_min = min(pfn, *pfn_min);
++	*pfn_max = max(pfn, *pfn_max);
++
++	do {
++		ret = xb_preload_and_set_bit(&vb->page_xb, pfn,
++					     GFP_NOWAIT | __GFP_NOWARN);
++	} while (unlikely(ret == -EAGAIN));
++
++	return ret;
++}
+
+@@ -173,8 +290,15 @@ static unsigned fill_balloon(struct virtio_balloon *vb, size_t num)
+ 
+ 	while ((page = balloon_page_pop(&pages))) {
+ 		balloon_page_enqueue(&vb->vb_dev_info, page);
++		if (use_sg) {
++			if (xb_set_page(vb, page, &pfn_min, &pfn_max) < 0) {
++				__free_page(page);
++				continue;
++			}
++		} else {
++			set_page_pfns(vb, vb->pfns + vb->num_pfns, page);
++		}
+ 
+
+@@ -223,7 +354,14 @@ static unsigned leak_balloon(struct virtio_balloon *vb, size_t num)
+ 		page = balloon_page_dequeue(vb_dev_info);
+ 		if (!page)
+ 			break;
+-		set_page_pfns(vb, vb->pfns + vb->num_pfns, page);
++		if (use_sg) {
++			if (xb_set_page(vb, page, &pfn_min, &pfn_max) < 0) {
++				balloon_page_enqueue(&vb->vb_dev_info, page);
++				break;
++			}
++		} else {
++			set_page_pfns(vb, vb->pfns + vb->num_pfns, page);
++		}
+ 		list_add(&page->lru, &pages);
+ 		vb->num_pages -= VIRTIO_BALLOON_PAGES_PER_PAGE;
+ 	}
