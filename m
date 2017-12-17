@@ -1,25 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35657)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59850)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1eQTwY-0007Ac-N4
-	for qemu-devel@nongnu.org; Sun, 17 Dec 2017 03:05:08 -0500
+	(envelope-from <stefan@weilnetz.de>) id 1eQVvX-0006gj-Pg
+	for qemu-devel@nongnu.org; Sun, 17 Dec 2017 05:12:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1eQTwV-0001ga-H4
-	for qemu-devel@nongnu.org; Sun, 17 Dec 2017 03:05:06 -0500
-Resent-Message-Id: <E1eQTwV-0001ga-H4@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21368)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1eQTwV-0001eU-6o
-	for qemu-devel@nongnu.org; Sun, 17 Dec 2017 03:05:03 -0500
-In-Reply-To: <20171214152246.17503-1-hare@suse.de>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <151326532272.96.4629080124930714784@449822a21bf0>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Thu, 14 Dec 2017 07:28:43 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH 0/2] scsi: Simple ALUA support
+	(envelope-from <stefan@weilnetz.de>) id 1eQVvU-0006d7-Hv
+	for qemu-devel@nongnu.org; Sun, 17 Dec 2017 05:12:11 -0500
+From: Stefan Weil <sw@weilnetz.de>
+Date: Sun, 17 Dec 2017 11:11:36 +0100
+Message-Id: <20171217101136.20206-1-sw@weilnetz.de>
+Subject: [Qemu-devel] [PATCH] s390x: Add missing QEMU_NORETURN attribute
+ (CID 1383842)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,62 +18,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: hare@suse.de
-Cc: famz@redhat.com, pbonzini@redhat.com, qemu-devel@nongnu.org
+To: Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>
+Cc: qemu-s390x@nongnu.org, qemu-devel@nongnu.org, Stefan Weil <sw@weilnetz.de>
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKTWVzc2FnZS1pZDogMjAx
-NzEyMTQxNTIyNDYuMTc1MDMtMS1oYXJlQHN1c2UuZGUKU3ViamVjdDogW1FlbXUtZGV2ZWxdIFtQ
-QVRDSCAwLzJdIHNjc2k6IFNpbXBsZSBBTFVBIHN1cHBvcnQKVHlwZTogc2VyaWVzCgo9PT0gVEVT
-VCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCgpCQVNFPWJhc2UKbj0xCnRvdGFsPSQoZ2l0
-IGxvZyAtLW9uZWxpbmUgJEJBU0UuLiB8IHdjIC1sKQpmYWlsZWQ9MAoKZ2l0IGNvbmZpZyAtLWxv
-Y2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRy
-dWUKCmNvbW1pdHM9IiQoZ2l0IGxvZyAtLWZvcm1hdD0lSCAtLXJldmVyc2UgJEJBU0UuLikiCmZv
-ciBjIGluICRjb21taXRzOyBkbwogICAgZWNobyAiQ2hlY2tpbmcgUEFUQ0ggJG4vJHRvdGFsOiAk
-KGdpdCBsb2cgLW4gMSAtLWZvcm1hdD0lcyAkYykuLi4iCiAgICBpZiAhIGdpdCBzaG93ICRjIC0t
-Zm9ybWF0PWVtYWlsIHwgLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayAtOyB0aGVu
-CiAgICAgICAgZmFpbGVkPTEKICAgICAgICBlY2hvCiAgICBmaQogICAgbj0kKChuKzEpKQpkb25l
-CgpleGl0ICRmYWlsZWQKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5
-YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKRnJvbSBodHRwczovL2dpdGh1Yi5jb20v
-cGF0Y2hldy1wcm9qZWN0L3FlbXUKIHQgW3RhZyB1cGRhdGVdICAgICAgICAgICAgcGF0Y2hldy8y
-MDE3MTIwNTA1NTIwMC4xNjMwNS0xLXBldGVyeEByZWRoYXQuY29tIC0+IHBhdGNoZXcvMjAxNzEy
-MDUwNTUyMDAuMTYzMDUtMS1wZXRlcnhAcmVkaGF0LmNvbQogdCBbdGFnIHVwZGF0ZV0gICAgICAg
-ICAgICBwYXRjaGV3LzIwMTcxMjE0MTQzNzEzLjM3OTUtMS1wcm9ncmFtbWluZ2tpZHhAZ21haWwu
-Y29tIC0+IHBhdGNoZXcvMjAxNzEyMTQxNDM3MTMuMzc5NS0xLXByb2dyYW1taW5na2lkeEBnbWFp
-bC5jb20KICogW25ldyB0YWddICAgICAgICAgICAgICAgcGF0Y2hldy8yMDE3MTIxNDE1MjI0Ni4x
-NzUwMy0xLWhhcmVAc3VzZS5kZSAtPiBwYXRjaGV3LzIwMTcxMjE0MTUyMjQ2LjE3NTAzLTEtaGFy
-ZUBzdXNlLmRlClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKMDFmNjI0YTA4YyBzY3Np
-OiBJbXBsZW1lbnQgbXVsdGlwYXRoIHN1cHBvcnQKYTU3Zjk1MTA1MCBibG9jazogaW1wbGVtZW50
-IHNoYXJlZCBibG9jayBkZXZpY2UgY291bnQKCj09PSBPVVRQVVQgQkVHSU4gPT09CkNoZWNraW5n
-IFBBVENIIDEvMjogYmxvY2s6IGltcGxlbWVudCBzaGFyZWQgYmxvY2sgZGV2aWNlIGNvdW50Li4u
-CkVSUk9SOiBicmFjZXMge30gYXJlIG5lY2Vzc2FyeSBmb3IgYWxsIGFybXMgb2YgdGhpcyBzdGF0
-ZW1lbnQKIzI3OiBGSUxFOiBibG9jay5jOjM4MTA6CisgICAgaWYgKCFicy0+ZmlsZW5hbWUpClsu
-Li5dCgpFUlJPUjogYnJhY2VzIHt9IGFyZSBuZWNlc3NhcnkgZm9yIGFsbCBhcm1zIG9mIHRoaXMg
-c3RhdGVtZW50CiMzMDogRklMRTogYmxvY2suYzozODEzOgorICAgICAgICBpZiAodG1wX2JzID09
-IGJzKQpbLi4uXQoKdG90YWw6IDIgZXJyb3JzLCAwIHdhcm5pbmdzLCA3NiBsaW5lcyBjaGVja2Vk
-CgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBv
-ZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFp
-bnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgpDaGVja2luZyBQQVRDSCAy
-LzI6IHNjc2k6IEltcGxlbWVudCBtdWx0aXBhdGggc3VwcG9ydC4uLgpFUlJPUjogYnJhY2VzIHt9
-IGFyZSBuZWNlc3NhcnkgZm9yIGFsbCBhcm1zIG9mIHRoaXMgc3RhdGVtZW50CiMyNTogRklMRTog
-YmxvY2suYzozODQ0OgorICAgIGlmICghYnMtPmZpbGVuYW1lIHx8ICFzaGFyZWRfbWFzaykKWy4u
-Ll0KCkVSUk9SOiBkbyBub3QgdXNlIEM5OSAvLyBjb21tZW50cwojNDg6IEZJTEU6IGh3L3Njc2kv
-c2NzaS1kaXNrLmM6NjgwOgorICAgICAgICAgICAgICAgIG91dGJ1ZltidWZsZW4rK10gPSAweDYx
-OyAvLyBTQVMgLyBCaW5hcnkKCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiM0OTog
-RklMRTogaHcvc2NzaS9zY3NpLWRpc2suYzo2ODE6CisgICAgICAgICAgICAgICAgb3V0YnVmW2J1
-ZmxlbisrXSA9IDB4OTU7IC8vIFBJViAvIFRhcmdldCBwb3J0IC8gdGFyZ2V0IHBvcnQgZ3JvdXAK
-CkVSUk9SOiBkbyBub3QgdXNlIEM5OSAvLyBjb21tZW50cwojNDk6IEZJTEU6IGh3L3Njc2kvc2Nz
-aS1kaXNrLmM6NjgxOgorICAgICAgICAgICAgICAgIG91dGJ1ZltidWZsZW4rK10gPSAweDk1OyAv
-LyBQSVYgLyBUYXJnZXQgcG9ydCAvIHRhcmdldCBwb3J0IGdyb3VwCgpFUlJPUjogZG8gbm90IHVz
-ZSBDOTkgLy8gY29tbWVudHMKIzUwOiBGSUxFOiBody9zY3NpL3Njc2ktZGlzay5jOjY4MjoKKyAg
-ICAgICAgICAgICAgICBvdXRidWZbYnVmbGVuKytdID0gMDsgLy8gcmVzZXJ2ZWQKCkVSUk9SOiBi
-cmFjZXMge30gYXJlIG5lY2Vzc2FyeSBmb3IgYWxsIGFybXMgb2YgdGhpcyBzdGF0ZW1lbnQKIzk2
-OiBGSUxFOiBody9zY3NpL3Njc2ktZGlzay5jOjE5MDc6CisgICAgICAgIGlmICghdGVzdF9iaXQo
-aSwgJnNoYXJlZF9tYXNrKSkKWy4uLl0KCnRvdGFsOiA1IGVycm9ycywgMSB3YXJuaW5ncywgMTI5
-IGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2
-aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0
-aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCj09
-PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgotLS0K
-RW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcu
-b3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEBmcmVlbGlz
-dHMub3Jn
+This should fix the Coverity warning:
+
+** CID 1383842:  Integer handling issues  (DIVIDE_BY_ZERO)
+/target/s390x/int_helper.c: 84 in helper_divs64()
+
+Signed-off-by: Stefan Weil <sw@weilnetz.de>
+---
+ target/s390x/cpu.h | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/target/s390x/cpu.h b/target/s390x/cpu.h
+index 1a8b6b9ae9..2a6e75d697 100644
+--- a/target/s390x/cpu.h
++++ b/target/s390x/cpu.h
+@@ -746,8 +746,8 @@ void s390_io_interrupt(uint16_t subchannel_id, uint16_t subchannel_nr,
+ /* automatically detect the instruction length */
+ #define ILEN_AUTO                   0xff
+ #define RA_IGNORED                  0
+-void s390_program_interrupt(CPUS390XState *env, uint32_t code, int ilen,
+-                            uintptr_t ra);
++void QEMU_NORETURN s390_program_interrupt(CPUS390XState *env, uint32_t code,
++                                          int ilen, uintptr_t ra);
+ /* service interrupts are floating therefore we must not pass an cpustate */
+ void s390_sclp_extint(uint32_t parm);
+ 
+-- 
+2.11.0
