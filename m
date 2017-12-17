@@ -1,13 +1,13 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41347)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41349)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mjt@tls.msk.ru>) id 1eQm32-0005p1-9F
+	(envelope-from <mjt@tls.msk.ru>) id 1eQm32-0005p3-9w
 	for qemu-devel@nongnu.org; Sun, 17 Dec 2017 22:25:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mjt@tls.msk.ru>) id 1eQm2z-00014J-9j
+	(envelope-from <mjt@tls.msk.ru>) id 1eQm2z-00014R-A6
 	for qemu-devel@nongnu.org; Sun, 17 Dec 2017 22:25:00 -0500
 From: Michael Tokarev <mjt@tls.msk.ru>
-Date: Mon, 18 Dec 2017 00:27:16 +0300
-Message-Id: <b7f6cf3a80a318b218e6b4ae3bfb323d2cc612d3.1513545944.git.mjt@msgid.tls.msk.ru>
+Date: Mon, 18 Dec 2017 00:27:37 +0300
+Message-Id: <7fcd1ffeceac14d56cf6f47f93f0b35114a403e5.1513545944.git.mjt@msgid.tls.msk.ru>
 In-Reply-To: <cover.1513545944.git.mjt@msgid.tls.msk.ru>
 References: <cover.1513545944.git.mjt@msgid.tls.msk.ru>
 In-Reply-To: <cover.1513545944.git.mjt@msgid.tls.msk.ru>
@@ -15,7 +15,7 @@ References: <cover.1513545944.git.mjt@msgid.tls.msk.ru>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 11/61] Makefile: use $(MAKE) variable
+Subject: [Qemu-devel] [PULL 32/61] misc: remove duplicated includes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,126 +25,160 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-trivial@nongnu.org, Michael Tokarev <mjt@tls.msk.ru>
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-trivial@nongnu.org
 
 From: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 
-For some systems (i.e. FreeBSD) the default 'make' is not compatible with=
- the
-GNU extensions used by QEMU makefiles.
+exec: housekeeping (funny since 02d0e095031)
 
-Calling the GNU make (gmake) works, however the help displayed refers to =
-the
-host 'make' and copy/paste leads to lot of unobvious errors:
-
-  $ gmake check-help
-  [...]
-   make check                Run all tests
-
-  $ make check
-  make: "Makefile" line 28: Missing dependency operator
-  make: "Makefile" line 37: Need an operator
-  make: "Makefile" line 41: warning: duplicate script for target "git-sub=
-module-update" ignored
-  make: "rules.mak" line 70: warning: duplicate script for target "%.o" i=
-gnored
-  make: Unknown modifier ' '
-  make: Unclosed substitution for eval modules (=3D missing)
-  make: "tests/Makefile.include" line 24: Variable/Value missing from "ex=
-port"
-  make: "tests/" line 1: warning: Zero byte read from file, skipping rest=
- of line.
-  make: "tests/" line 1: Need an operator
-  make: "Makefile" line 660: warning: duplicate script for target "ifneq"=
- ignored
-  make: "Makefile" line 78: warning: using previous script for "ifneq" de=
-fined here
-  make: Fatal errors encountered -- cannot continue
-
-Using the $(MAKE) variable, the help displayed is consistent with the 'ma=
-ke'
-program used.
+applied using ./scripts/clean-includes
 
 Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-Reviewed-by: Eric Blake <eblake@redhat.com>
-Signed-off-by: Michael Tokarev <mjt@tls.msk.ru>
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Acked-by: Cornelia Huck <cohuck@redhat.com>
+Reviewed-by: Anthony PERARD <anthony.perard@citrix.com>
 ---
- Makefile               |  6 +++---
- tests/Makefile.include | 20 ++++++++++----------
- 2 files changed, 13 insertions(+), 13 deletions(-)
+ accel/tcg/translate-all.c          | 1 -
+ exec.c                             | 3 ---
+ hw/arm/spitz.c                     | 1 -
+ hw/char/xen_console.c              | 1 -
+ hw/core/machine.c                  | 1 -
+ hw/s390x/css.c                     | 1 -
+ target/openrisc/exception_helper.c | 1 -
+ tests/vhost-user-test.c            | 1 -
+ util/qemu-sockets.c                | 1 -
+ vl.c                               | 1 -
+ 10 files changed, 12 deletions(-)
 
-diff --git a/Makefile b/Makefile
-index 0331c182ed..1f93515677 100644
---- a/Makefile
-+++ b/Makefile
-@@ -50,7 +50,7 @@ ifneq ($(realpath $(SRC_PATH)),$(realpath .))
- ifneq ($(wildcard $(SRC_PATH)/config-host.mak),)
- $(error This is an out of tree build but your source tree ($(SRC_PATH)) =
-\
- seems to have been used for an in-tree build. You can fix this by runnin=
-g \
--"make distclean && rm -rf *-linux-user *-softmmu" in your source tree)
-+"$(MAKE) distclean && rm -rf *-linux-user *-softmmu" in your source tree=
-)
- endif
- endif
+diff --git a/accel/tcg/translate-all.c b/accel/tcg/translate-all.c
+index 02dfa361bb..7736257085 100644
+--- a/accel/tcg/translate-all.c
++++ b/accel/tcg/translate-all.c
+@@ -31,7 +31,6 @@
+ #include "tcg.h"
+ #if defined(CONFIG_USER_ONLY)
+ #include "qemu.h"
+-#include "exec/exec-all.h"
+ #if defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
+ #include <sys/param.h>
+ #if __FreeBSD_version >=3D 700104
+diff --git a/exec.c b/exec.c
+index 03238a3449..3e7c57e914 100644
+--- a/exec.c
++++ b/exec.c
+@@ -18,8 +18,6 @@
+  */
+ #include "qemu/osdep.h"
+ #include "qapi/error.h"
+-#ifndef _WIN32
+-#endif
 =20
-@@ -304,7 +304,7 @@ endif
- 	    else \
- 	      echo "WARNING: $@ out of date.";\
- 	    fi; \
--	    echo "Run \"make defconfig\" to regenerate."; \
-+	    echo "Run \"$(MAKE) defconfig\" to regenerate."; \
- 	    rm $@.tmp; \
- 	  fi; \
- 	 else \
-@@ -934,4 +934,4 @@ ifdef QEMU_GA_MSI_ENABLED
- endif
- 	@echo  ''
- endif
--	@echo  '  make V=3D0|1 [targets] 0 =3D> quiet build (default), 1 =3D> v=
-erbose build'
-+	@echo  '  $(MAKE) V=3D0|1 [targets] 0 =3D> quiet build (default), 1 =3D=
-> verbose build'
-diff --git a/tests/Makefile.include b/tests/Makefile.include
-index c002352134..b4bcc872f2 100644
---- a/tests/Makefile.include
-+++ b/tests/Makefile.include
-@@ -3,21 +3,21 @@
- check-help:
- 	@echo "Regression testing targets:"
- 	@echo
--	@echo " make check                Run all tests"
--	@echo " make check-qtest-TARGET   Run qtest tests for given target"
--	@echo " make check-qtest          Run qtest tests"
--	@echo " make check-unit           Run qobject tests"
--	@echo " make check-speed          Run qobject speed tests"
--	@echo " make check-qapi-schema    Run QAPI schema tests"
--	@echo " make check-block          Run block tests"
--	@echo " make check-report.html    Generates an HTML test report"
--	@echo " make check-clean          Clean the tests"
-+	@echo " $(MAKE) check                Run all tests"
-+	@echo " $(MAKE) check-qtest-TARGET   Run qtest tests for given target"
-+	@echo " $(MAKE) check-qtest          Run qtest tests"
-+	@echo " $(MAKE) check-unit           Run qobject tests"
-+	@echo " $(MAKE) check-speed          Run qobject speed tests"
-+	@echo " $(MAKE) check-qapi-schema    Run QAPI schema tests"
-+	@echo " $(MAKE) check-block          Run block tests"
-+	@echo " $(MAKE) check-report.html    Generates an HTML test report"
-+	@echo " $(MAKE) check-clean          Clean the tests"
- 	@echo
- 	@echo "Please note that HTML reports do not regenerate if the unit test=
-s"
- 	@echo "has not changed."
- 	@echo
- 	@echo "The variable SPEED can be set to control the gtester speed setti=
-ng."
--	@echo "Default options are -k and (for make V=3D1) --verbose; they can =
-be"
-+	@echo "Default options are -k and (for $(MAKE) V=3D1) --verbose; they c=
-an be"
- 	@echo "changed with variable GTESTER_OPTIONS."
+ #include "qemu/cutils.h"
+ #include "cpu.h"
+@@ -51,7 +49,6 @@
+ #include "trace-root.h"
 =20
- ifneq ($(wildcard config-host.mak),)
+ #ifdef CONFIG_FALLOCATE_PUNCH_HOLE
+-#include <fcntl.h>
+ #include <linux/falloc.h>
+ #endif
+=20
+diff --git a/hw/arm/spitz.c b/hw/arm/spitz.c
+index feccdb00d3..ac1e15cbbc 100644
+--- a/hw/arm/spitz.c
++++ b/hw/arm/spitz.c
+@@ -29,7 +29,6 @@
+ #include "sysemu/block-backend.h"
+ #include "hw/sysbus.h"
+ #include "exec/address-spaces.h"
+-#include "sysemu/sysemu.h"
+ #include "cpu.h"
+=20
+ #undef REG_FMT
+diff --git a/hw/char/xen_console.c b/hw/char/xen_console.c
+index 3643dfe067..5e68326c19 100644
+--- a/hw/char/xen_console.c
++++ b/hw/char/xen_console.c
+@@ -27,7 +27,6 @@
+ #include "hw/hw.h"
+ #include "chardev/char-fe.h"
+ #include "hw/xen/xen_backend.h"
+-#include "qapi/error.h"
+=20
+ #include <xen/io/console.h>
+=20
+diff --git a/hw/core/machine.c b/hw/core/machine.c
+index 36c2fb069c..c857f3f934 100644
+--- a/hw/core/machine.c
++++ b/hw/core/machine.c
+@@ -20,7 +20,6 @@
+ #include "sysemu/numa.h"
+ #include "qemu/error-report.h"
+ #include "qemu/cutils.h"
+-#include "sysemu/numa.h"
+ #include "sysemu/qtest.h"
+=20
+ static char *machine_get_accel(Object *obj, Error **errp)
+diff --git a/hw/s390x/css.c b/hw/s390x/css.c
+index f071e1394b..1c526fd7e2 100644
+--- a/hw/s390x/css.c
++++ b/hw/s390x/css.c
+@@ -13,7 +13,6 @@
+ #include "qapi/error.h"
+ #include "qapi/visitor.h"
+ #include "hw/qdev.h"
+-#include "qemu/error-report.h"
+ #include "qemu/bitops.h"
+ #include "qemu/error-report.h"
+ #include "exec/address-spaces.h"
+diff --git a/target/openrisc/exception_helper.c b/target/openrisc/excepti=
+on_helper.c
+index a8a5f69b05..6073a5b21c 100644
+--- a/target/openrisc/exception_helper.c
++++ b/target/openrisc/exception_helper.c
+@@ -21,7 +21,6 @@
+ #include "cpu.h"
+ #include "exec/exec-all.h"
+ #include "exec/helper-proto.h"
+-#include "exec/exec-all.h"
+ #include "exception.h"
+=20
+ void HELPER(exception)(CPUOpenRISCState *env, uint32_t excp)
+diff --git a/tests/vhost-user-test.c b/tests/vhost-user-test.c
+index 4b98018478..e2c89ed376 100644
+--- a/tests/vhost-user-test.c
++++ b/tests/vhost-user-test.c
+@@ -21,7 +21,6 @@
+ #include "libqos/libqos.h"
+ #include "libqos/pci-pc.h"
+ #include "libqos/virtio-pci.h"
+-#include "qapi/error.h"
+=20
+ #include "libqos/malloc-pc.h"
+ #include "hw/virtio/virtio-net.h"
+diff --git a/util/qemu-sockets.c b/util/qemu-sockets.c
+index a1cf47e625..af4f01211a 100644
+--- a/util/qemu-sockets.c
++++ b/util/qemu-sockets.c
+@@ -26,7 +26,6 @@
+ #include "qapi/error.h"
+ #include "qemu/sockets.h"
+ #include "qemu/main-loop.h"
+-#include "qapi/clone-visitor.h"
+ #include "qapi/qobject-input-visitor.h"
+ #include "qapi/qobject-output-visitor.h"
+ #include "qapi-visit.h"
+diff --git a/vl.c b/vl.c
+index fc8bd9372f..c1ba52306a 100644
+--- a/vl.c
++++ b/vl.c
+@@ -95,7 +95,6 @@ int main(int argc, char **argv)
+ #include "sysemu/kvm.h"
+ #include "sysemu/hax.h"
+ #include "qapi/qobject-input-visitor.h"
+-#include "qapi/qobject-input-visitor.h"
+ #include "qapi-visit.h"
+ #include "qapi/qmp/qjson.h"
+ #include "qemu/option.h"
 --=20
 2.11.0
