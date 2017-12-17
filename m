@@ -1,26 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47635)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49099)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1eQo7X-0002R7-Kc
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 00:37:48 -0500
+	(envelope-from <mjt@tls.msk.ru>) id 1eQoEY-0003jS-8d
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 00:45:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1eQo7S-0007Fh-OJ
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 00:37:47 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:37962)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1eQo7S-0007DY-Ip
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 00:37:42 -0500
-Date: Mon, 18 Dec 2017 13:37:25 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20171218053725.GM22308@xz-mi>
-References: <20171205055200.16305-1-peterx@redhat.com>
-	<20171205055200.16305-21-peterx@redhat.com>
-	<20171214131632.GI14433@stefanha-x1.localdomain>
+	(envelope-from <mjt@tls.msk.ru>) id 1eQoEU-0003oK-9t
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 00:45:02 -0500
+From: Michael Tokarev <mjt@tls.msk.ru>
+Date: Mon, 18 Dec 2017 00:27:33 +0300
+Message-Id: <87c1fc04a1cf0e983407f24ad0529cf8bf4150a0.1513545944.git.mjt@msgid.tls.msk.ru>
+In-Reply-To: <cover.1513545944.git.mjt@msgid.tls.msk.ru>
+References: <cover.1513545944.git.mjt@msgid.tls.msk.ru>
+In-Reply-To: <cover.1513545944.git.mjt@msgid.tls.msk.ru>
+References: <cover.1513545944.git.mjt@msgid.tls.msk.ru>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20171214131632.GI14433@stefanha-x1.localdomain>
-Subject: Re: [Qemu-devel] [RFC v5 20/26] qmp: support out-of-band (oob)
- execution
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 28/61] hw: use "qemu/osdep.h" as first #include
+ in source files
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,34 +25,120 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: qemu-devel@nongnu.org, Stefan Hajnoczi <shajnocz@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <famz@redhat.com>, Juan Quintela <quintela@redhat.com>, mdroth@linux.vnet.ibm.com, Eric Blake <eblake@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Markus Armbruster <armbru@redhat.com>, marcandre.lureau@redhat.com, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-trivial@nongnu.org
 
-On Thu, Dec 14, 2017 at 01:16:32PM +0000, Stefan Hajnoczi wrote:
-> On Tue, Dec 05, 2017 at 01:51:54PM +0800, Peter Xu wrote:
-> >      if (qdict) {
-> >          id = qdict_get(qdict, "id");
-> > +        /* When OOB is enabled, the "id" field is mandatory. */
-> > +        if (qmp_oob_enabled(mon) && !id) {
-> > +            error_setg(&err, "Out-Of-Band capability requires that "
-> > +                       "every command contains an 'id' field.");
-> 
-> Is this documented in docs/interop/qmp-spec.txt?
+From: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 
-Yes it is:
+applied using ./scripts/clean-includes
 
-@@ -102,10 +125,19 @@ The format for command execution is:
-   required. Each command documents what contents will be considered
-   valid when handling the json-argument
- - The "id" member is a transaction identification associated with the
--  command execution, it is optional and will be part of the response if
-+  command execution.  It is required if OOB is enabled, and optional
-+  if not.  The same "id" field will be part of the response if
-   provided. The "id" member can be any json-value, although most
-   clients merely use a json-number incremented for each successive
-   command
+Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Acked-by: David Gibson <david@gibson.dropbear.id.au>
+Acked-by: Cornelia Huck <cohuck@redhat.com>
+---
+ hw/acpi/ipmi-stub.c             | 1 +
+ hw/audio/fmopl.c                | 1 -
+ hw/cpu/core.c                   | 1 +
+ hw/ppc/spapr_cpu_core.c         | 1 +
+ hw/smbios/smbios_type_38-stub.c | 1 +
+ hw/vfio/ccw.c                   | 2 +-
+ hw/virtio/vhost-vsock.c         | 2 +-
+ 7 files changed, 6 insertions(+), 3 deletions(-)
 
-Thanks,
-
--- 
-Peter Xu
+diff --git a/hw/acpi/ipmi-stub.c b/hw/acpi/ipmi-stub.c
+index 98b6dcee0d..f525f71c2d 100644
+--- a/hw/acpi/ipmi-stub.c
++++ b/hw/acpi/ipmi-stub.c
+@@ -7,6 +7,7 @@
+  * See the COPYING file in the top-level directory.
+  */
+=20
++#include "qemu/osdep.h"
+ #include "hw/acpi/ipmi.h"
+=20
+ void build_acpi_ipmi_devices(Aml *table, BusState *bus)
+diff --git a/hw/audio/fmopl.c b/hw/audio/fmopl.c
+index 5cfb6a96dd..9f50a89b4a 100644
+--- a/hw/audio/fmopl.c
++++ b/hw/audio/fmopl.c
+@@ -34,7 +34,6 @@
+ #include <math.h>
+ //#include "driver.h"		/* use M.A.M.E. */
+ #include "fmopl.h"
+-#include "qemu/osdep.h"
+ #ifndef PI
+ #define PI 3.14159265358979323846
+ #endif
+diff --git a/hw/cpu/core.c b/hw/cpu/core.c
+index bd578ab80c..7e42e2c87a 100644
+--- a/hw/cpu/core.c
++++ b/hw/cpu/core.c
+@@ -6,6 +6,7 @@
+  * This work is licensed under the terms of the GNU GPL, version 2 or la=
+ter.
+  * See the COPYING file in the top-level directory.
+  */
++#include "qemu/osdep.h"
+ #include "hw/cpu/core.h"
+ #include "qapi/visitor.h"
+ #include "qapi/error.h"
+diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
+index 032438b9ce..ac19b2e0b7 100644
+--- a/hw/ppc/spapr_cpu_core.c
++++ b/hw/ppc/spapr_cpu_core.c
+@@ -6,6 +6,7 @@
+  * This work is licensed under the terms of the GNU GPL, version 2 or la=
+ter.
+  * See the COPYING file in the top-level directory.
+  */
++#include "qemu/osdep.h"
+ #include "hw/cpu/core.h"
+ #include "hw/ppc/spapr_cpu_core.h"
+ #include "target/ppc/cpu.h"
+diff --git a/hw/smbios/smbios_type_38-stub.c b/hw/smbios/smbios_type_38-s=
+tub.c
+index 9528c2c28e..5b83c9b1f1 100644
+--- a/hw/smbios/smbios_type_38-stub.c
++++ b/hw/smbios/smbios_type_38-stub.c
+@@ -7,6 +7,7 @@
+  * See the COPYING file in the top-level directory.
+  */
+=20
++#include "qemu/osdep.h"
+ #include "hw/smbios/ipmi.h"
+=20
+ void smbios_build_type_38_table(void)
+diff --git a/hw/vfio/ccw.c b/hw/vfio/ccw.c
+index 636729c03d..16713f2c52 100644
+--- a/hw/vfio/ccw.c
++++ b/hw/vfio/ccw.c
+@@ -11,11 +11,11 @@
+  * directory.
+  */
+=20
++#include "qemu/osdep.h"
+ #include <linux/vfio.h>
+ #include <linux/vfio_ccw.h>
+ #include <sys/ioctl.h>
+=20
+-#include "qemu/osdep.h"
+ #include "qapi/error.h"
+ #include "hw/sysbus.h"
+ #include "hw/vfio/vfio.h"
+diff --git a/hw/virtio/vhost-vsock.c b/hw/virtio/vhost-vsock.c
+index 5ec1c6a2a2..aa5af927e1 100644
+--- a/hw/virtio/vhost-vsock.c
++++ b/hw/virtio/vhost-vsock.c
+@@ -11,8 +11,8 @@
+  * top-level directory.
+  */
+=20
+-#include <sys/ioctl.h>
+ #include "qemu/osdep.h"
++#include <sys/ioctl.h>
+ #include "standard-headers/linux/virtio_vsock.h"
+ #include "qapi/error.h"
+ #include "hw/virtio/virtio-bus.h"
+--=20
+2.11.0
