@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59721)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59767)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eQfsG-0001Ev-2D
-	for qemu-devel@nongnu.org; Sun, 17 Dec 2017 15:49:29 -0500
+	id 1eQfsK-0001HN-HS
+	for qemu-devel@nongnu.org; Sun, 17 Dec 2017 15:49:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eQfsF-0005Zw-4t
-	for qemu-devel@nongnu.org; Sun, 17 Dec 2017 15:49:28 -0500
+	id 1eQfsJ-0005cR-HT
+	for qemu-devel@nongnu.org; Sun, 17 Dec 2017 15:49:32 -0500
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Sun, 17 Dec 2017 17:49:09 -0300
-Message-Id: <20171217204912.12420-2-f4bug@amsat.org>
+Date: Sun, 17 Dec 2017 17:49:10 -0300
+Message-Id: <20171217204912.12420-3-f4bug@amsat.org>
 In-Reply-To: <20171217204912.12420-1-f4bug@amsat.org>
 References: <20171217204912.12420-1-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH 1/4] hw/block/nvme: QOM'ify PCI NVME
+Subject: [Qemu-devel] [PATCH 2/4] hw/pci-host/piix: QOM'ify the IGD
+ Passthrough host bridge
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,104 +27,101 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Keith Busch <keith.busch@intel.com>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, qemu-block@nongnu.org
 
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- hw/block/nvme.c | 32 +++++++++++++++++---------------
- 1 file changed, 17 insertions(+), 15 deletions(-)
+ hw/pci-host/piix.c | 31 +++++++++++++++----------------
+ 1 file changed, 15 insertions(+), 16 deletions(-)
 
-diff --git a/hw/block/nvme.c b/hw/block/nvme.c
-index 441e21ed1f..9c5f898da0 100644
---- a/hw/block/nvme.c
-+++ b/hw/block/nvme.c
-@@ -920,9 +920,9 @@ static const MemoryRegionOps nvme_cmb_ops = {
-     },
+diff --git a/hw/pci-host/piix.c b/hw/pci-host/piix.c
+index a684a7cca9..0153f32a32 100644
+--- a/hw/pci-host/piix.c
++++ b/hw/pci-host/piix.c
+@@ -804,7 +804,7 @@ static const IGDHostInfo igd_host_bridge_infos[] = {
+     {0xa8, 4},  /* SNB: base of GTT stolen memory */
  };
  
--static int nvme_init(PCIDevice *pci_dev)
-+static void nvme_realize(PCIDevice *pci, Error **errp)
+-static int host_pci_config_read(int pos, int len, uint32_t *val)
++static void host_pci_config_read(int pos, int len, uint32_t *val, Error **errp)
  {
--    NvmeCtrl *n = NVME(pci_dev);
-+    NvmeCtrl *n = NVME(pci);
-     NvmeIdCtrl *id = &n->id_ctrl;
+     char path[PATH_MAX];
+     int config_fd;
+@@ -812,19 +812,19 @@ static int host_pci_config_read(int pos, int len, uint32_t *val)
+     /* Access real host bridge. */
+     int rc = snprintf(path, size, "/sys/bus/pci/devices/%04x:%02x:%02x.%d/%s",
+                       0, 0, 0, 0, "config");
+-    int ret = 0;
  
-     int i;
-@@ -931,30 +931,33 @@ static int nvme_init(PCIDevice *pci_dev)
-     Error *local_err = NULL;
+     if (rc >= size || rc < 0) {
+-        return -ENODEV;
++        error_setg(&error_abort, "Invalid PCI device");
+     }
  
-     if (!n->conf.blk) {
--        return -1;
-+        error_setg(errp, "Block device missing");
+     config_fd = open(path, O_RDWR);
+     if (config_fd < 0) {
+-        return -ENODEV;
++        error_setg_errno(errp, errno, "Failed to open: %s", path);
 +        return;
      }
  
-     bs_size = blk_getlength(n->conf.blk);
-     if (bs_size < 0) {
--        return -1;
-+        error_setg_errno(errp, -bs_size, "Could not get length of device");
-+        return;
+     if (lseek(config_fd, pos, SEEK_SET) != pos) {
+-        ret = -errno;
++        error_setg_errno(errp, errno, "Failed to seek: %s", path);
+         goto out;
      }
  
-     blkconf_serial(&n->conf, &n->serial);
-     if (!n->serial) {
--        return -1;
-+        error_setg(errp, "Could not get device serial number");
-+        return;
-     }
-     blkconf_blocksizes(&n->conf);
-     blkconf_apply_backend_options(&n->conf, blk_is_read_only(n->conf.blk),
-                                   false, &local_err);
-     if (local_err) {
--        error_report_err(local_err);
--        return -1;
-+        error_propagate(errp, local_err);
-+        return;
+@@ -832,32 +832,31 @@ static int host_pci_config_read(int pos, int len, uint32_t *val)
+         rc = read(config_fd, (uint8_t *)val, len);
+     } while (rc < 0 && (errno == EINTR || errno == EAGAIN));
+     if (rc != len) {
+-        ret = -errno;
++        error_setg_errno(errp, errno, "Failed to read: %s", path);
      }
  
--    pci_conf = pci_dev->config;
-+    pci_conf = pci->config;
-     pci_conf[PCI_INTERRUPT_PIN] = 1;
--    pci_config_set_prog_interface(pci_dev->config, 0x2);
--    pci_config_set_class(pci_dev->config, PCI_CLASS_STORAGE_EXPRESS);
-+    pci_config_set_prog_interface(pci->config, 0x2);
-+    pci_config_set_class(pci->config, PCI_CLASS_STORAGE_EXPRESS);
-     pcie_endpoint_cap_init(&n->parent_obj, 0x80);
+ out:
+     close(config_fd);
+-    return ret;
+ }
  
-     n->num_namespaces = 1;
-@@ -1046,12 +1049,11 @@ static int nvme_init(PCIDevice *pci_dev)
-             cpu_to_le64(n->ns_size >>
-                 id_ns->lbaf[NVME_ID_NS_FLBAS_INDEX(ns->id_ns.flbas)].ds);
+-static int igd_pt_i440fx_initfn(struct PCIDevice *pci_dev)
++static void igd_pt_i440fx_realize(PCIDevice *pci, Error **errp)
+ {
+     uint32_t val = 0;
+-    int rc, i, num;
++    int i, num;
+     int pos, len;
++    Error *local_err = NULL;
+ 
+     num = ARRAY_SIZE(igd_host_bridge_infos);
+     for (i = 0; i < num; i++) {
+         pos = igd_host_bridge_infos[i].offset;
+         len = igd_host_bridge_infos[i].len;
+-        rc = host_pci_config_read(pos, len, &val);
+-        if (rc) {
+-            return -ENODEV;
++        host_pci_config_read(pos, len, &val, &local_err);
++        if (local_err) {
++            error_propagate(errp, local_err);
++            return;
+         }
+-        pci_default_write_config(pci_dev, pos, val, len);
++        pci_default_write_config(pci, pos, val, len);
      }
+-
 -    return 0;
  }
  
--static void nvme_exit(PCIDevice *pci_dev)
-+static void nvme_exit(PCIDevice *pci)
- {
--    NvmeCtrl *n = NVME(pci_dev);
-+    NvmeCtrl *n = NVME(pci);
+ static void igd_passthrough_i440fx_class_init(ObjectClass *klass, void *data)
+@@ -865,7 +864,7 @@ static void igd_passthrough_i440fx_class_init(ObjectClass *klass, void *data)
+     DeviceClass *dc = DEVICE_CLASS(klass);
+     PCIDeviceClass *k = PCI_DEVICE_CLASS(klass);
  
-     nvme_clear_ctrl(n);
-     g_free(n->namespaces);
-@@ -1061,7 +1063,7 @@ static void nvme_exit(PCIDevice *pci_dev)
-         memory_region_unref(&n->ctrl_mem);
-     }
- 
--    msix_uninit_exclusive_bar(pci_dev);
-+    msix_uninit_exclusive_bar(pci);
+-    k->init = igd_pt_i440fx_initfn;
++    k->realize = igd_pt_i440fx_realize;
+     dc->desc = "IGD Passthrough Host bridge";
  }
  
- static Property nvme_props[] = {
-@@ -1081,7 +1083,7 @@ static void nvme_class_init(ObjectClass *oc, void *data)
-     DeviceClass *dc = DEVICE_CLASS(oc);
-     PCIDeviceClass *pc = PCI_DEVICE_CLASS(oc);
- 
--    pc->init = nvme_init;
-+    pc->realize = nvme_realize;
-     pc->exit = nvme_exit;
-     pc->class_id = PCI_CLASS_STORAGE_EXPRESS;
-     pc->vendor_id = PCI_VENDOR_ID_INTEL;
 -- 
 2.15.1
