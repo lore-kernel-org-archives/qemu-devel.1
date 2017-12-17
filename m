@@ -1,18 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55223)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59698)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jan.dakinevich@virtuozzo.com>) id 1eQfUV-0005CH-9s
-	for qemu-devel@nongnu.org; Sun, 17 Dec 2017 15:25:01 -0500
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1eQfsE-0001EC-Lj
+	for qemu-devel@nongnu.org; Sun, 17 Dec 2017 15:49:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jan.dakinevich@virtuozzo.com>) id 1eQfUQ-00036C-Md
-	for qemu-devel@nongnu.org; Sun, 17 Dec 2017 15:24:55 -0500
-From: Jan Dakinevich <jan.dakinevich@virtuozzo.com>
-Date: Sun, 17 Dec 2017 23:25:55 +0300
-Message-Id: <1513542355-28203-3-git-send-email-jan.dakinevich@virtuozzo.com>
-In-Reply-To: <1513542355-28203-1-git-send-email-jan.dakinevich@virtuozzo.com>
-References: <1513542355-28203-1-git-send-email-jan.dakinevich@virtuozzo.com>
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1eQfsB-0005Wu-He
+	for qemu-devel@nongnu.org; Sun, 17 Dec 2017 15:49:26 -0500
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Date: Sun, 17 Dec 2017 17:49:08 -0300
+Message-Id: <20171217204912.12420-1-f4bug@amsat.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel]  [RFC v6 2/2] virtio: add `info virtio' HMP command
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH 0/4] QOM'ify PCIDevices
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,144 +24,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Jan Dakinevich <jan.dakinevich@virtuozzo.com>, "Denis V. Lunev" <den@virtuozzo.com>, Amit Shah <amit@kernel.org>, Cornelia Huck <cohuck@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Eric Blake <eblake@redhat.com>, Jason Wang <jasowang@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>, Max Reitz <mreitz@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-block@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Paul Burton <paul.burton@mips.com>, Yongbok Kim <yongbok.kim@mips.com>, "Edgar E . Iglesias" <edgar.iglesias@gmail.com>, Alistair Francis <alistair.francis@xilinx.com>, =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>, Keith Busch <keith.busch@intel.com>
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, qemu-block@nongnu.org, James Hogan <jhogan@kernel.org>
 
-The command prints data from `query-virtio' QMP in human-readable
-format.
+Hi,
 
-Cc: Denis V. Lunev <den@virtuozzo.com>
-Signed-off-by: Jan Dakinevich <jan.dakinevich@virtuozzo.com>
----
- hmp-commands-info.hx | 14 ++++++++++
- hmp.c                | 74 ++++++++++++++++++++++++++++++++++++++++++++++++++++
- hmp.h                |  1 +
- 3 files changed, 89 insertions(+)
+In this series we QOM'ify the last few PCI devices still using
+PCIDeviceClass->init() by converting this init() to realize(),
 
-diff --git a/hmp-commands-info.hx b/hmp-commands-info.hx
-index 54c3e5e..292280a 100644
---- a/hmp-commands-info.hx
-+++ b/hmp-commands-info.hx
-@@ -868,6 +868,20 @@ enabled) memory in bytes.
- ETEXI
- 
- STEXI
-+@item info virtio
-+@findex virtio
-+Display guest and host fetures for all virtio devices.
-+ETEXI
-+
-+    {
-+        .name       = "virtio",
-+        .args_type  = "path:s?",
-+        .params     = "[path]",
-+        .help       = "show virtio info",
-+        .cmd        = hmp_info_virtio,
-+    },
-+
-+STEXI
- @end table
- ETEXI
- 
-diff --git a/hmp.c b/hmp.c
-index 35a7041..786782b 100644
---- a/hmp.c
-+++ b/hmp.c
-@@ -43,6 +43,7 @@
- #include "hw/intc/intc.h"
- #include "migration/snapshot.h"
- #include "migration/misc.h"
-+#include "hw/virtio/virtio.h"
- 
- #ifdef CONFIG_SPICE
- #include <spice/enums.h>
-@@ -2918,3 +2919,76 @@ void hmp_info_memory_size_summary(Monitor *mon, const QDict *qdict)
-     }
-     hmp_handle_error(mon, &err);
- }
-+
-+#define HMP_INFO_VIRTIO_INDENT 2
-+#define HMP_INFO_VIRTIO_FEATURE 40
-+
-+static void hmp_info_virtio_print(Monitor *mon, VirtioInfo *info)
-+{
-+    Object *obj = object_resolve_path(info->qom_path, NULL);
-+    char *path = qdev_get_dev_path(DEVICE(obj));
-+    VirtioFeatureList *feat;
-+    strList *status;
-+
-+    monitor_printf(mon, "%s at %s\n", object_get_typename(obj), path);
-+    g_free(path);
-+
-+    monitor_printf(mon, "%*sQOM path: %s\n",
-+                   HMP_INFO_VIRTIO_INDENT, "", info->qom_path);
-+
-+    /* device status */
-+    monitor_printf(mon, "%*sstatus: 0x%02"PRIx8"\n",
-+                   HMP_INFO_VIRTIO_INDENT, "", info->status);
-+    for (status = info->status_names; status; status = status->next) {
-+        monitor_printf(mon, "%*s%s\n",
-+                       HMP_INFO_VIRTIO_INDENT * 2, "", status->value);
-+    }
-+
-+
-+    /* host and guest feature */
-+    monitor_printf(mon, "%*shost features:  0x%016"PRIx64"\n",
-+                   HMP_INFO_VIRTIO_INDENT, "", info->host_features);
-+    monitor_printf(mon, "%*sguest features: 0x%016"PRIx64"\n",
-+                   HMP_INFO_VIRTIO_INDENT, "", info->guest_features);
-+
-+    /* common features */
-+    monitor_printf(mon, "%*scommon features:%s\n",
-+                   HMP_INFO_VIRTIO_INDENT, "",
-+                   info->common_features_names ? "" : " (none)");
-+    for (feat = info->common_features_names; feat; feat = feat->next) {
-+        monitor_printf(mon, "%*s%-*s%s\n",
-+                       HMP_INFO_VIRTIO_INDENT * 2, "",
-+                       HMP_INFO_VIRTIO_FEATURE, feat->value->name,
-+                       feat->value->acked ? " acked" : "");
-+    }
-+
-+    /* device features */
-+    monitor_printf(mon, "%*sdevice features:%s\n",
-+                   HMP_INFO_VIRTIO_INDENT, "",
-+                   info->device_features_names ? "" : " (none)");
-+    for (feat = info->device_features_names; feat; feat = feat->next) {
-+        monitor_printf(mon, "%*s%-*s%s\n",
-+                       HMP_INFO_VIRTIO_INDENT * 2, "",
-+                       HMP_INFO_VIRTIO_FEATURE, feat->value->name,
-+                       feat->value->acked ? " acked" : "");
-+    }
-+}
-+
-+void hmp_info_virtio(Monitor *mon, const QDict *qdict)
-+{
-+    const char *path = qdict_get_try_str(qdict, "path");
-+    Error *err = NULL;
-+    VirtioInfoList *head, *info;
-+
-+
-+    head = qmp_query_virtio(!!path, path, &err);
-+    if (err) {
-+        return;
-+    }
-+
-+    for (info = head; info; info = info->next) {
-+        hmp_info_virtio_print(mon, info->value);
-+    }
-+
-+    qapi_free_VirtioInfoList(head);
-+}
-diff --git a/hmp.h b/hmp.h
-index a6f56b1..156293e 100644
---- a/hmp.h
-+++ b/hmp.h
-@@ -147,5 +147,6 @@ void hmp_info_ramblock(Monitor *mon, const QDict *qdict);
- void hmp_hotpluggable_cpus(Monitor *mon, const QDict *qdict);
- void hmp_info_vm_generation_id(Monitor *mon, const QDict *qdict);
- void hmp_info_memory_size_summary(Monitor *mon, const QDict *qdict);
-+void hmp_info_virtio(Monitor *mon, const QDict *qdict);
- 
- #endif
+Then we finally remove the then PCIDeviceClass->init() method for good.
+
+Regards,
+
+Phil.
+
+Philippe Mathieu-Daudé (4):
+  hw/block/nvme: QOM'ify PCI NVME
+  hw/pci-host/piix: QOM'ify the IGD Passthrough host bridge
+  hw/pci-host/xilinx: QOM'ify the AXI-PCIe host bridge
+  hw/pci: remove obsolete PCIDevice->init()
+
+ include/hw/pci/pci.h      |  1 -
+ hw/block/nvme.c           | 32 +++++++++++++++++---------------
+ hw/pci-host/piix.c        | 31 +++++++++++++++----------------
+ hw/pci-host/xilinx-pcie.c | 19 +++++++++----------
+ hw/pci/pci.c              | 14 --------------
+ 5 files changed, 41 insertions(+), 56 deletions(-)
+
 -- 
-2.1.4
+2.15.1
