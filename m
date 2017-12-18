@@ -1,27 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60132)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60776)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1eQsBk-0000Xv-79
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 04:58:26 -0500
+	(envelope-from <bounces@canonical.com>) id 1eQsDE-0001Ju-8j
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 04:59:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1eQsBf-0002PS-8X
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 04:58:24 -0500
-Received: from 12.mo1.mail-out.ovh.net ([87.98.162.229]:46134)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1eQsBe-0002Ab-UE
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 04:58:19 -0500
-Received: from player691.ha.ovh.net (gw6.ovh.net [213.251.189.206])
-	by mo1.mail-out.ovh.net (Postfix) with ESMTP id 05027AFA4A
-	for <qemu-devel@nongnu.org>; Mon, 18 Dec 2017 10:58:09 +0100 (CET)
-Date: Mon, 18 Dec 2017 10:58:00 +0100
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20171218105800.397859df@bahia.lan>
-In-Reply-To: <20171218092024.21645-2-david@gibson.dropbear.id.au>
-References: <20171218092024.21645-1-david@gibson.dropbear.id.au>
-	<20171218092024.21645-2-david@gibson.dropbear.id.au>
+	(envelope-from <bounces@canonical.com>) id 1eQsD9-0004h2-D8
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 04:59:56 -0500
+Received: from indium.canonical.com ([91.189.90.7]:41376)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1eQsD9-0004fr-6K
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 04:59:51 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1eQsD7-0002q1-Vb
+	for <qemu-devel@nongnu.org>; Mon, 18 Dec 2017 09:59:50 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id E75312E80CB
+	for <qemu-devel@nongnu.org>; Mon, 18 Dec 2017 09:59:49 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 1/6] spapr: Capabilities infrastructure
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 18 Dec 2017 09:46:36 -0000
+From: Thomas Huth <1486768@bugs.launchpad.net>
+Reply-To: Bug 1486768 <1486768@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20150819225907.17083.44407.malonedeb@soybean.canonical.com>
+Message-Id: <151359039657.17836.13653491025344806339.malone@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1486768] Re: BlackMagic USB3 video capture
+ returns only blank frames in Windows (xHCI issue)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,356 +37,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: surajjs@au1.ibm.com, lvivier@redhat.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, mdroth@linux.vnet.ibm.com, abologna@redhat.com
+To: qemu-devel@nongnu.org
 
-On Mon, 18 Dec 2017 20:20:19 +1100
-David Gibson <david@gibson.dropbear.id.au> wrote:
+Triaging old bug tickets... can you still reproduce this issue with the
+latest version of QEMU? Or could we close this ticket nowadays?
 
-> Because PAPR is a paravirtual environment access to certain CPU (or other)
-> facilities can be blocked by the hypervisor.  PAPR provides ways to
-> advertise in the device tree whether or not those features are available to
-> the guest.
-> 
-> In some places we automatically determine whether to make a feature
-> available based on whether our host can support it, in most cases this is
-> based on limitations in the available KVM implementation.
-> 
-> Although we correctly advertise this to the guest, it means that host
-> factors might make changes to the guest visible environment which is bad:
-> as well as generaly reducing reproducibility, it means that a migration
-> between different host environments can easily go bad.
-> 
-> We've mostly gotten away with it because the environments considered mature
-> enough to be well supported (basically, KVM on POWER8) have had consistent
-> feature availability.  But, it's still not right and some limitations on
-> POWER9 is going to make it more of an issue in future.
-> 
-> This introduces an infrastructure for defining "sPAPR capabilities".  These
-> are set by default based on the machine version, masked by the capabilities
-> of the chosen cpu, but can be overriden with machine properties.
-> 
-> The intention is at reset time we verify that the requested capabilities
-> can be supported on the host (considering TCG, KVM and/or host cpu
-> limitations).  If not we simply fail, rather than silently modifying the
-> advertised featureset to the guest.
-> 
-> This does mean that certain configurations that "worked" may now fail, but
-> such configurations were already more subtly broken.
-> 
-> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-> ---
->  hw/ppc/Makefile.objs   |   2 +-
->  hw/ppc/spapr.c         |   7 ++
->  hw/ppc/spapr_caps.c    | 182 +++++++++++++++++++++++++++++++++++++++++++++++++
->  include/hw/ppc/spapr.h |  31 +++++++++
->  4 files changed, 221 insertions(+), 1 deletion(-)
->  create mode 100644 hw/ppc/spapr_caps.c
-> 
-> diff --git a/hw/ppc/Makefile.objs b/hw/ppc/Makefile.objs
-> index 7efc686748..1faff853b7 100644
-> --- a/hw/ppc/Makefile.objs
-> +++ b/hw/ppc/Makefile.objs
-> @@ -1,7 +1,7 @@
->  # shared objects
->  obj-y += ppc.o ppc_booke.o fdt.o
->  # IBM pSeries (sPAPR)
-> -obj-$(CONFIG_PSERIES) += spapr.o spapr_vio.o spapr_events.o
-> +obj-$(CONFIG_PSERIES) += spapr.o spapr_caps.o spapr_vio.o spapr_events.o
->  obj-$(CONFIG_PSERIES) += spapr_hcall.o spapr_iommu.o spapr_rtas.o
->  obj-$(CONFIG_PSERIES) += spapr_pci.o spapr_rtc.o spapr_drc.o spapr_rng.o
->  obj-$(CONFIG_PSERIES) += spapr_cpu_core.o spapr_ovec.o
-> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> index 6785a90c60..d472baef8d 100644
-> --- a/hw/ppc/spapr.c
-> +++ b/hw/ppc/spapr.c
-> @@ -1466,6 +1466,8 @@ static void spapr_machine_reset(void)
->      /* Check for unknown sysbus devices */
->      foreach_dynamic_sysbus_device(find_unknown_sysbus_device, NULL);
->  
-> +    spapr_caps_reset(spapr);
-> +
->      first_ppc_cpu = POWERPC_CPU(first_cpu);
->      if (kvm_enabled() && kvmppc_has_cap_mmu_radix() &&
->          ppc_check_compat(first_ppc_cpu, CPU_POWERPC_LOGICAL_3_00, 0,
-> @@ -2311,6 +2313,8 @@ static void spapr_machine_init(MachineState *machine)
->      char *filename;
->      Error *resize_hpt_err = NULL;
->  
-> +    spapr_caps_validate(spapr, &error_fatal);
-> +
->      msi_nonbroken = true;
->  
->      QLIST_INIT(&spapr->phbs);
-> @@ -3819,6 +3823,9 @@ static void spapr_machine_class_init(ObjectClass *oc, void *data)
->       * in which LMBs are represented and hot-added
->       */
->      mc->numa_mem_align_shift = 28;
-> +
-> +    smc->default_caps = spapr_caps(0);
-> +    spapr_caps_add_properties(smc, &error_abort);
->  }
->  
->  static const TypeInfo spapr_machine_info = {
-> diff --git a/hw/ppc/spapr_caps.c b/hw/ppc/spapr_caps.c
-> new file mode 100644
-> index 0000000000..828ac69b36
-> --- /dev/null
-> +++ b/hw/ppc/spapr_caps.c
-> @@ -0,0 +1,182 @@
-> +/*
-> + * QEMU PowerPC pSeries Logical Partition capabilities handling
-> + *
-> + * Copyright (c) 2017 David Gibson, Red Hat Inc.
-> + *
-> + * Permission is hereby granted, free of charge, to any person obtaining a copy
-> + * of this software and associated documentation files (the "Software"), to deal
-> + * in the Software without restriction, including without limitation the rights
-> + * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-> + * copies of the Software, and to permit persons to whom the Software is
-> + * furnished to do so, subject to the following conditions:
-> + *
-> + * The above copyright notice and this permission notice shall be included in
-> + * all copies or substantial portions of the Software.
-> + *
-> + * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-> + * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-> + * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-> + * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-> + * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-> + * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-> + * THE SOFTWARE.
-> + */
-> +#include "qemu/osdep.h"
-> +#include "qapi/error.h"
-> +#include "qapi/visitor.h"
-> +
-> +#include "hw/ppc/spapr.h"
-> +
-> +typedef struct sPAPRCapabilityInfo {
-> +    const char *name;
-> +    const char *description;
-> +    uint64_t flag;
-> +
-> +    /* Make sure the virtual hardware can support this capability */
-> +    void (*allow)(sPAPRMachineState *spapr, Error **errp);
-> +
-> +    /* If possible, tell the virtual hardware not to allow the cap to
-> +     * be used at all */
-> +    void (*disallow)(sPAPRMachineState *spapr, Error **errp);
-> +} sPAPRCapabilityInfo;
-> +
-> +static sPAPRCapabilityInfo capability_table[] = {
-> +};
-> +
-> +static sPAPRCapabilities default_caps_with_cpu(sPAPRMachineState *spapr,
-> +                                               CPUState *cs)
-> +{
-> +    sPAPRMachineClass *smc = SPAPR_MACHINE_GET_CLASS(spapr);
-> +    sPAPRCapabilities caps;
-> +
-> +    caps = smc->default_caps;
-> +
-> +    /* TODO: clamp according to cpu model */
-> +
-> +    return caps;
-> +}
-> +
-> +void spapr_caps_reset(sPAPRMachineState *spapr)
-> +{
-> +    Error *local_err = NULL;
-> +    sPAPRCapabilities caps;
-> +    int i;
-> +
-> +    /* First compute the actual set of caps we're running with.. */
-> +    caps = default_caps_with_cpu(spapr, first_cpu);
-> +
-> +    caps.mask |= spapr->forced_caps.mask;
-> +    caps.mask &= ~spapr->forbidden_caps.mask;
-> +
-> +    spapr->effective_caps = caps;
-> +
-> +    /* .. then apply those caps to the virtual hardware */
-> +
-> +    for (i = 0; i < ARRAY_SIZE(capability_table); i++) {
-> +        sPAPRCapabilityInfo *info = &capability_table[i];
-> +
-> +        if (spapr->effective_caps.mask & info->flag) {
-> +            /* Failure to allow a cap is fatal - if the guest doesn't
-> +             * have it, we'll be supplying an incorrect environment */
-> +            if (info->allow) {
-> +                info->allow(spapr, &error_fatal);
-> +            }
-> +        } else {
-> +            /* Failure to enforce a cap is only a warning.  The guest
-> +             * shouldn't be using it, since it's not advertised, so it
-> +             * doesn't get to complain about weird behaviour if it
-> +             * goes ahead anyway */
-> +            if (info->disallow) {
-> +                info->disallow(spapr, &local_err);
-> +            }
-> +            if (local_err) {
-> +                warn_report_err(local_err);
-> +                error_free(local_err);
+** Changed in: qemu
+       Status: New =3D> Incomplete
 
-double free.
+-- =
 
-/*
- * Convenience function to warn_report() and free @err.
- */
-void warn_report_err(Error *err);
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1486768
 
+Title:
+  BlackMagic USB3 video capture returns only blank frames in Windows
+  (xHCI issue)
 
-The rest of the patch is fine, so with the above fixed, you can add:
+Status in QEMU:
+  Incomplete
 
-Reviewed-by: Greg Kurz <groug@kaod.org>
+Bug description:
+  Hi,
 
-> +                local_err = NULL;
-> +            }
-> +        }
-> +    }
-> +}
-> +
-> +static void spapr_cap_get(Object *obj, Visitor *v, const char *name,
-> +                          void *opaque, Error **errp)
-> +{
-> +    sPAPRCapabilityInfo *cap = opaque;
-> +    sPAPRMachineState *spapr = SPAPR_MACHINE(obj);
-> +    bool value = spapr_has_cap(spapr, cap->flag);
-> +
-> +    /* TODO: Could this get called before effective_caps is finalized
-> +     * in spapr_caps_reset()? */
-> +
-> +    visit_type_bool(v, name, &value, errp);
-> +}
-> +
-> +static void spapr_cap_set(Object *obj, Visitor *v, const char *name,
-> +                          void *opaque, Error **errp)
-> +{
-> +    sPAPRCapabilityInfo *cap = opaque;
-> +    sPAPRMachineState *spapr = SPAPR_MACHINE(obj);
-> +    bool value;
-> +    Error *local_err = NULL;
-> +
-> +    visit_type_bool(v, name, &value, &local_err);
-> +    if (local_err) {
-> +        error_propagate(errp, local_err);
-> +        return;
-> +    }
-> +
-> +    if (value) {
-> +        spapr->forced_caps.mask |= cap->flag;
-> +    } else {
-> +        spapr->forbidden_caps.mask |= cap->flag;
-> +    }
-> +}
-> +
-> +void spapr_caps_validate(sPAPRMachineState *spapr, Error **errp)
-> +{
-> +    uint64_t allcaps = 0;
-> +    int i;
-> +
-> +    for (i = 0; i < ARRAY_SIZE(capability_table); i++) {
-> +        g_assert((allcaps & capability_table[i].flag) == 0);
-> +        allcaps |= capability_table[i].flag;
-> +    }
-> +
-> +    g_assert((spapr->forced_caps.mask & ~allcaps) == 0);
-> +    g_assert((spapr->forbidden_caps.mask & ~allcaps) == 0);
-> +
-> +    if (spapr->forced_caps.mask & spapr->forbidden_caps.mask) {
-> +        error_setg(errp, "Some sPAPR capabilities set both on and off");
-> +        return;
-> +    }
-> +
-> +    /* Check for any caps incompatible with other caps.  Nothing to do
-> +     * yet */
-> +}
-> +
-> +void spapr_caps_add_properties(sPAPRMachineClass *smc, Error **errp)
-> +{
-> +    Error *local_err = NULL;
-> +    ObjectClass *klass = OBJECT_CLASS(smc);
-> +    int i;
-> +
-> +    for (i = 0; i < ARRAY_SIZE(capability_table); i++) {
-> +        sPAPRCapabilityInfo *cap = &capability_table[i];
-> +        const char *name = g_strdup_printf("cap-%s", cap->name);
-> +
-> +        object_class_property_add(klass, name, "bool",
-> +                                  spapr_cap_get, spapr_cap_set, NULL,
-> +                                  cap, &local_err);
-> +        if (local_err) {
-> +            error_propagate(errp, local_err);
-> +            return;
-> +        }
-> +
-> +        object_class_property_set_description(klass, name, cap->description,
-> +                                              &local_err);
-> +        if (local_err) {
-> +            error_propagate(errp, local_err);
-> +            return;
-> +        }
-> +    }
-> +}
-> diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-> index 14757b805e..5569caf1d4 100644
-> --- a/include/hw/ppc/spapr.h
-> +++ b/include/hw/ppc/spapr.h
-> @@ -50,6 +50,15 @@ typedef enum {
->      SPAPR_RESIZE_HPT_REQUIRED,
->  } sPAPRResizeHPT;
->  
-> +/**
-> + * Capabilities
-> + */
-> +
-> +typedef struct sPAPRCapabilities sPAPRCapabilities;
-> +struct sPAPRCapabilities {
-> +    uint64_t mask;
-> +};
-> +
->  /**
->   * sPAPRMachineClass:
->   */
-> @@ -66,6 +75,7 @@ struct sPAPRMachineClass {
->                            hwaddr *mmio32, hwaddr *mmio64,
->                            unsigned n_dma, uint32_t *liobns, Error **errp);
->      sPAPRResizeHPT resize_hpt_default;
-> +    sPAPRCapabilities default_caps;
->  };
->  
->  /**
-> @@ -127,6 +137,9 @@ struct sPAPRMachineState {
->      MemoryHotplugState hotplug_memory;
->  
->      const char *icp_type;
-> +
-> +    sPAPRCapabilities forced_caps, forbidden_caps;
-> +    sPAPRCapabilities effective_caps;
->  };
->  
->  #define H_SUCCESS         0
-> @@ -724,4 +737,22 @@ int spapr_irq_alloc_block(sPAPRMachineState *spapr, int num, bool lsi,
->  void spapr_irq_free(sPAPRMachineState *spapr, int irq, int num);
->  qemu_irq spapr_qirq(sPAPRMachineState *spapr, int irq);
->  
-> +/*
-> + * Handling of optional capabilities
-> + */
-> +static inline sPAPRCapabilities spapr_caps(uint64_t mask)
-> +{
-> +    sPAPRCapabilities caps = { mask };
-> +    return caps;
-> +}
-> +
-> +static inline bool spapr_has_cap(sPAPRMachineState *spapr, uint64_t cap)
-> +{
-> +    return !!(spapr->effective_caps.mask & cap);
-> +}
-> +
-> +void spapr_caps_reset(sPAPRMachineState *spapr);
-> +void spapr_caps_validate(sPAPRMachineState *spapr, Error **errp);
-> +void spapr_caps_add_properties(sPAPRMachineClass *smc, Error **errp);
-> +
->  #endif /* HW_SPAPR_H */
+  I've got an Intensity Shuttle USB3; it's a HDMI video capture card. It
+  doesn't have any Linux drivers, so I'm trying to get it to work in a
+  Windows 10 guest inside QEMU. I'm running latest git as of today
+  (2015-08-20). I use this command line:
+
+  sudo x86_64-softmmu/qemu-system-x86_64 -enable-kvm -smp 2 -m 4096
+  -acpitable file=3D/sys/firmware/acpi/tables/MSDM -drive
+  file=3D/home/sesse/windows.raw,if=3Dvirtio,format=3Draw -cpu host -netdev
+  tap,id=3Dhostnet0 -device virtio-net-pci,netdev=3Dhostnet0,id=3Dnet0
+  -monitor stdio -device nec-usb-xhci,id=3Dxhci -device usb-
+  host,bus=3Dxhci.0,vendorid=3D0x1edb,productid=3D0xbd3b -usbdevice tablet
+
+  (I will add that the seemingly logical =E2=80=9Chost:1edb:bd3b,bus=3Dxhci=
+.0=E2=80=9D did
+  _not_ add the device at all. I don't know why, probably some parser
+  issue?)
+
+  The card is properly detected, and the driver thinks everything is
+  fine, running on the virtualized USB3 host and all. Looking at usbmon,
+  there's lots of isochronous frames during capture, and they reach the
+  host (looking at USBpcap on the Windows 10 side). However, the driver
+  refuses to capture any video=E2=80=94all frames become black in all
+  applications I try (well, Media Express seems to hardly store any
+  frames at all in the .avi). However, audio is captured without a
+  hitch. Curiously enough, no dropped frames are reported. There's no
+  sign of CPU shortage; both host and guest seem to be happy around 20%
+  of one core.
+
+  I am fairly certain this is an issue with the xHCI driver in QEMU,
+  because if I give it the entire USB controller via VT-d, it works
+  flawlessly, with video and all. For reference, here's the associated
+  command line I use for that (after I've unbound it from the Linux
+  system):
+
+  sudo x86_64-softmmu/qemu-system-x86_64 -enable-kvm -smp 2 -m 4096
+  -acpitable file=3D/sys/firmware/acpi/tables/MSDM -drive
+  file=3D/home/sesse/windows.raw,if=3Dvirtio,format=3Draw -cpu host -netdev
+  tap,id=3Dhostnet0 -device virtio-net-pci,netdev=3Dhostnet0,id=3Dnet0
+  -monitor stdio  -usbdevice tablet -device pci-assign,host=3D00:14.0
+
+  I can get USB pcap logs from both sides if you want, but they are huge
+  (gigabytes) since the data rate is so high.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1486768/+subscriptions
