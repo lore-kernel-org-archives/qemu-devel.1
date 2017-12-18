@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41255)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43163)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eR214-0008Ng-03
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 15:28:02 -0500
+	id 1eR22e-0001AY-AS
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 15:29:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eR212-0008L5-Ta
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 15:28:01 -0500
+	id 1eR22Z-0001Ep-Tv
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 15:29:40 -0500
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 References: <20171218173022.18418-1-richard.henderson@linaro.org>
-	<20171218173022.18418-2-richard.henderson@linaro.org>
+	<20171218173022.18418-7-richard.henderson@linaro.org>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <0f5b89dc-2d8d-7490-c6a7-39aea14e23e7@amsat.org>
-Date: Mon, 18 Dec 2017 17:27:49 -0300
+Message-ID: <7c447107-e135-74bc-dd18-31789fb86a6d@amsat.org>
+Date: Mon, 18 Dec 2017 17:29:25 -0300
 MIME-Version: 1.0
-In-Reply-To: <20171218173022.18418-2-richard.henderson@linaro.org>
+In-Reply-To: <20171218173022.18418-7-richard.henderson@linaro.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH 1/9] target/arm: Mark
- disas_set_insn_syndrome inline
+Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH 6/9] vmstate: Add
+ VMSTATE_UINT64_SUB_ARRAY
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,28 +33,49 @@ To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org, qemu-arm@nongnu.org
 
 On 12/18/2017 02:30 PM, Richard Henderson wrote:
-> If it isn't used when translate.h is included,
-> we'll get a compiler Werror.
+> At the same time, move VMSTATE_UINT32_SUB_ARRAY
+> beside the other UINT32 definitions.
 > 
 > Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 
 Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
 > ---
->  target/arm/translate.h | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+>  include/migration/vmstate.h | 9 ++++++---
+>  1 file changed, 6 insertions(+), 3 deletions(-)
 > 
-> diff --git a/target/arm/translate.h b/target/arm/translate.h
-> index cd7313ace7..3f4df91e5e 100644
-> --- a/target/arm/translate.h
-> +++ b/target/arm/translate.h
-> @@ -108,7 +108,7 @@ static inline int default_exception_el(DisasContext *s)
->              ? 3 : MAX(1, s->current_el);
->  }
+> diff --git a/include/migration/vmstate.h b/include/migration/vmstate.h
+> index 88b55df5ae..8c3889433c 100644
+> --- a/include/migration/vmstate.h
+> +++ b/include/migration/vmstate.h
+> @@ -905,6 +905,9 @@ extern const VMStateInfo vmstate_info_qtailq;
+>  #define VMSTATE_UINT32_ARRAY(_f, _s, _n)                              \
+>      VMSTATE_UINT32_ARRAY_V(_f, _s, _n, 0)
 >  
-> -static void disas_set_insn_syndrome(DisasContext *s, uint32_t syn)
-> +static inline void disas_set_insn_syndrome(DisasContext *s, uint32_t syn)
->  {
->      /* We don't need to save all of the syndrome so we mask and shift
->       * out unneeded bits to help the sleb128 encoder do a better job.
+> +#define VMSTATE_UINT32_SUB_ARRAY(_f, _s, _start, _num)                \
+> +    VMSTATE_SUB_ARRAY(_f, _s, _start, _num, 0, vmstate_info_uint32, uint32_t)
+> +
+>  #define VMSTATE_UINT32_2DARRAY(_f, _s, _n1, _n2)                      \
+>      VMSTATE_UINT32_2DARRAY_V(_f, _s, _n1, _n2, 0)
+>  
+> @@ -914,6 +917,9 @@ extern const VMStateInfo vmstate_info_qtailq;
+>  #define VMSTATE_UINT64_ARRAY(_f, _s, _n)                              \
+>      VMSTATE_UINT64_ARRAY_V(_f, _s, _n, 0)
+>  
+> +#define VMSTATE_UINT64_SUB_ARRAY(_f, _s, _start, _num)                \
+> +    VMSTATE_SUB_ARRAY(_f, _s, _start, _num, 0, vmstate_info_uint64, uint64_t)
+> +
+>  #define VMSTATE_UINT64_2DARRAY(_f, _s, _n1, _n2)                      \
+>      VMSTATE_UINT64_2DARRAY_V(_f, _s, _n1, _n2, 0)
+>  
+> @@ -932,9 +938,6 @@ extern const VMStateInfo vmstate_info_qtailq;
+>  #define VMSTATE_INT32_ARRAY(_f, _s, _n)                               \
+>      VMSTATE_INT32_ARRAY_V(_f, _s, _n, 0)
+>  
+> -#define VMSTATE_UINT32_SUB_ARRAY(_f, _s, _start, _num)                \
+> -    VMSTATE_SUB_ARRAY(_f, _s, _start, _num, 0, vmstate_info_uint32, uint32_t)
+> -
+>  #define VMSTATE_INT64_ARRAY_V(_f, _s, _n, _v)                         \
+>      VMSTATE_ARRAY(_f, _s, _n, _v, vmstate_info_int64, int64_t)
+>  
 > 
