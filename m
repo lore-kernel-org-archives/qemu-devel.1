@@ -1,27 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49183)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50375)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1eQqDx-00033s-4m
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 02:52:34 -0500
+	(envelope-from <bounces@canonical.com>) id 1eQqH6-0004FB-JY
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 02:55:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1eQqDu-0001Oo-21
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 02:52:33 -0500
-Received: from mout.kundenserver.de ([212.227.126.187]:50065)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1eQqDt-0001N1-OP
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 02:52:29 -0500
-References: <20171121064106.13721-1-ybettan@redhat.com>
-	<fe42e8d1-afde-f761-9780-b1a8f7d4030f@vivier.eu>
-	<64af419e-b8b8-0a05-21f7-1029bc809079@redhat.com>
-From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <0843d1d9-e015-f4bd-3a98-92c0e3db5b42@vivier.eu>
-Date: Mon, 18 Dec 2017 08:52:01 +0100
+	(envelope-from <bounces@canonical.com>) id 1eQqH3-0004CL-Gn
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 02:55:48 -0500
+Received: from indium.canonical.com ([91.189.90.7]:42712)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1eQqH3-0004BM-AT
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 02:55:45 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1eQqH0-0002FJ-Pa
+	for <qemu-devel@nongnu.org>; Mon, 18 Dec 2017 07:55:42 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id BD6472E80D6
+	for <qemu-devel@nongnu.org>; Mon, 18 Dec 2017 07:55:42 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <64af419e-b8b8-0a05-21f7-1029bc809079@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] vl.c && linux-user/main.c : removed **envp
- from main() arguments
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 18 Dec 2017 07:50:02 -0000
+From: Thomas Huth <1735653@bugs.launchpad.net>
+Reply-To: Bug 1735653 <1735653@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <151210789540.11140.601756006906517496.malonedeb@soybean.canonical.com>
+Message-Id: <151358340305.11912.1620777192878455121.launchpad@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1735653] Re: qemu aarch64 cannot boot linux
+ kernel v4.6+
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,71 +37,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Yoni Bettan <ybettan@redhat.com>, qemu-devel@nongnu.org
-Cc: Riku Voipio <riku.voipio@iki.fi>, Paolo Bonzini <pbonzini@redhat.com>
+To: qemu-devel@nongnu.org
 
-Le 18/12/2017 à 07:07, Yoni Bettan a écrit :
-> 
-> 
-> On 11/21/2017 09:30 AM, Laurent Vivier wrote:
->> Le 21/11/2017 à 07:41, Yoni Bettan a écrit :
->>>          * it was added on 2008 902b3d5c392bb6f48ef340ad8ecc3311705d2800
->>>            when introduced cache-utils.[ch]
->>>          * since then cache-utils.[ch] were removed but **envp was left
->>>            behind
->>>
->>> Signed-off-by: Yoni Bettan <ybettan@redhat.com>
->>> ---
->>>   linux-user/main.c | 2 +-
->>>   vl.c              | 6 +++---
->>>   2 files changed, 4 insertions(+), 4 deletions(-)
->>>
->>> diff --git a/linux-user/main.c b/linux-user/main.c
->>> index aa02f25b85..ca5628c1ca 100644
->>> --- a/linux-user/main.c
->>> +++ b/linux-user/main.c
->>> @@ -4233,7 +4233,7 @@ static int parse_args(int argc, char **argv)
->>>       return optind;
->>>   }
->>>   -int main(int argc, char **argv, char **envp)
->>> +int main(int argc, char **argv)
->>>   {
->>>       struct target_pt_regs regs1, *regs = &regs1;
->>>       struct image_info info1, *info = &info1;
->>> diff --git a/vl.c b/vl.c
->>> index 1ad1c04637..9667756ccc 100644
->>> --- a/vl.c
->>> +++ b/vl.c
->>> @@ -35,10 +35,10 @@
->>>   #ifdef CONFIG_SDL
->>>   #if defined(__APPLE__) || defined(main)
->>>   #include <SDL.h>
->>> -int qemu_main(int argc, char **argv, char **envp);
->>> +int qemu_main(int argc, char **argv);
->>>   int main(int argc, char **argv)
->>>   {
->>> -    return qemu_main(argc, argv, NULL);
->>> +    return qemu_main(argc, argv);
->>>   }
->>>   #undef main
->>>   #define main qemu_main
->> I think this part can be removed now. As it seems it has been added
->> because of the envp parameter.
-> 
-> Thanks Laurent for your response and sorry for my late response.
-> I think this part was added for another purpose as described here
-> 880fec5d086
-> 
-> As i see it the env param was added in 2008 in order to support cache-utils
-> as shown in 902b3d5c392bb6f48ef340ad8ecc3311705d2800 and in 2009
-> another main function was added in order to unbreak SDL on Mac-OS X and
-> the env param
-> was added only for consistency I suppose...
-> 
-> What do you think?
+** Changed in: qemu
+       Status: New =3D> Fix Released
 
-I think we don't need it anymore as there is no difference betweent
-qemu_main() and main().
+-- =
 
-Thanks,
-Laurent
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1735653
+
+Title:
+  qemu aarch64 cannot boot linux kernel v4.6+
+
+Status in QEMU:
+  Fix Released
+
+Bug description:
+  Hi,
+  I tested the latest qemu-system-aarch64 cannot boot linux mainline kernel=
+ since v4.6 from https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/l=
+inux.git.
+
+  Environment info:
+  # host
+   ubuntu 16.04
+  # qemu
+   Master branch from git://git.qemu.org/qemu.git, and now the HEAD is c11d=
+61271b9e6e7a1f0479ef1ca8fb55fa457a62.
+  # build command
+   ./configure --target-list=3Daarch64-softmmu
+   make
+  # qemu commmand
+   qemu-system-aarch64 -machine virt -cpu cortex-a57 -machine type=3Dvirt -=
+smp 4 -m 1024 -nographic -s -kernel ~/workspace/linux/arch/arm64/boot/Image=
+ -device e1000,netdev=3Dnet0 -netdev user,id=3Dnet0,hostfwd=3Dtcp::2222-:22
+
+  Error info:
+   No error prompted, actually no any log which means I couldn't see the us=
+ually kernel boot message.
+
+  Debug info:
+   I did a git bisect on linux, and found with this kernel commit, qemu fai=
+led to boot. Parent of 406e308770a92bd33995b2e5b681e86358328bb0 can boot.
+   commit 406e308770a92bd33995b2e5b681e86358328bb0
+      Author: James Morse <james.morse@arm.com>
+      Date:   Fri Feb 5 14:58:47 2016 +0000
+
+      arm64: add ARMv8.2 id_aa64mmfr2 boiler plate
+
+      ARMv8.2 adds a new feature register id_aa64mmfr2. This patch adds the
+      cpu feature boiler plate used by the actual features in later patches.
+
+      Signed-off-by: James Morse <james.morse@arm.com>
+      Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+      Signed-off-by: Catalin Marinas <catalin.marinas@arm.com>
+   The main change in the patch is to add reg_id_aa64mmfr2 in to arch/arm64=
+/include/asm/cpu.h, so might it be any struct change not included in qemu?
+
+  Can you please help check how to fix it?
+
+  Thanks
+
+  - Joey
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1735653/+subscriptions
