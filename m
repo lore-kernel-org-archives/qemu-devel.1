@@ -1,27 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54860)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41580)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eQybC-0006Y0-D3
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 11:49:07 -0500
+	(envelope-from <stefanha@redhat.com>) id 1eQymD-0003C5-CG
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 12:00:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eQybA-0004wM-LD
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 11:49:05 -0500
-Received: from mail-ot0-x243.google.com ([2607:f8b0:4003:c0f::243]:35869)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1eQybA-0004v5-Fk
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 11:49:04 -0500
-Received: by mail-ot0-x243.google.com with SMTP id d5so13898113oti.3
-	for <qemu-devel@nongnu.org>; Mon, 18 Dec 2017 08:49:04 -0800 (PST)
+	(envelope-from <stefanha@redhat.com>) id 1eQymC-0007Aq-LG
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 12:00:29 -0500
+Date: Mon, 18 Dec 2017 17:00:18 +0000
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20171218170018.GQ16653@stefanha-x1.localdomain>
+References: <20171215031547.31006-1-f4bug@amsat.org>
+	<20171215031547.31006-18-f4bug@amsat.org>
 MIME-Version: 1.0
-In-Reply-To: <cover.1513606137.git.mjt@msgid.tls.msk.ru>
-References: <cover.1513545944.git.mjt@msgid.tls.msk.ru>
-	<cover.1513606137.git.mjt@msgid.tls.msk.ru>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 18 Dec 2017 16:48:42 +0000
-Message-ID: <CAFEAcA_qw3t5rC0_cj__7ax5FmYdD12e3FQSB3xBccVEH-x2Hw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PULL v3 00/60] Trivial patches for 2017-12-18
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="eBTWNsZZiigckDWV"
+Content-Disposition: inline
+In-Reply-To: <20171215031547.31006-18-f4bug@amsat.org>
+Subject: Re: [Qemu-devel] [PATCH v2 17/20] sdhci: add check_capab_readonly()
+ qtest
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,43 +25,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Michael Tokarev <mjt@tls.msk.ru>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, QEMU Trivial <qemu-trivial@nongnu.org>
+To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
+Cc: Alistair Francis <alistair.francis@xilinx.com>, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, Peter Maydell <peter.maydell@linaro.org>, Michael Walle <michael@walle.cc>, Andrzej Zaborowski <balrogg@gmail.com>, Andrew Baumann <Andrew.Baumann@microsoft.com>, Andrey Smirnov <andrew.smirnov@gmail.com>, Andrey Yurovsky <yurovsky@gmail.com>, qemu-devel@nongnu.org, qemu-arm@nongnu.org, Prasad J Pandit <pjp@fedoraproject.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Sai Pavan Boddu <saipava@xilinx.com>
 
-On 18 December 2017 at 14:13, Michael Tokarev <mjt@tls.msk.ru> wrote:
-> Here's another, 3rd, attempt for a pull request for the trivial-patches
-> tree. Not resending whole thing once again.
->
-> I've removed the patch that caused previous failure, which was
-> =C2=ABhw/alpha/typhoon: simplify using the "unimplemented" sysbus device=
-=C2=BB,
-> and updated another patch, =C2=ABhw/tpm: remove old i386 dependency=C2=BB
-> to resolve slight resolve conflicts, also rebased on top of current maste=
-r.
->
-> Please consider pulling.
->
-> Thanks,
->
-> /mjt
->
-> The following changes since commit 411ad78115ebeb3411cf4b7622784b93dfabe2=
-59:
->
->   Merge remote-tracking branch 'remotes/stefanberger/tags/pull-tpm-2017-1=
-2-15-1' into staging (2017-12-17 15:27:41 +0000)
->
-> are available in the git repository at:
->
->   git://git.corpit.ru/qemu.git tags/trivial-patches-fetch
->
-> for you to fetch changes up to c0578de60fcc3a07a881e9c4b7b8262faf6abbc7:
->
->   misc: drop old i386 dependency (2017-12-18 17:07:03 +0300)
->
-> ----------------------------------------------------------------
-> trivial patches for 2017-12-18
 
-Applied, thanks.
+--eBTWNsZZiigckDWV
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
--- PMM
+On Fri, Dec 15, 2017 at 12:15:44AM -0300, Philippe Mathieu-Daud=E9 wrote:
+> Signed-off-by: Philippe Mathieu-Daud=E9 <f4bug@amsat.org>
+> ---
+>  tests/sdhci-test.c | 30 ++++++++++++++++++++++++++++++
+>  1 file changed, 30 insertions(+)
+
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+
+--eBTWNsZZiigckDWV
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJaN/QhAAoJEJykq7OBq3PIp9UH/3fGuMOEB5akGkizycl8k6dx
+bG+4Wz6cCXvz5QeYagKqGYr7IXbMFrs/8CSSU65lrwkLjRPUcIHU6BbVRO5tP/1A
+DVysv918MyNqckwEnajnxMI5s+Af+hPke41TMEUSv80D72c7HcO8fkIMLt7x+wa6
+6i29YuotSffsd5OMqx91fpVXRTqbsWmtcp+YttI4/3v0VJ7GFaL3+a4N5QOQoLFE
+GulOo5P6gVWSL2CTxqGU9CadGrVRxBNcvpEs2sX6r4/oVricf5FI7ZIbdSg2O1Br
+y3un0aEh7jcOCuvQqozJ2DSRNyu9yUaDbbmJVdnqQ7V4EAdeDYc0PkMv0/EapwM=
+=91+5
+-----END PGP SIGNATURE-----
+
+--eBTWNsZZiigckDWV--
