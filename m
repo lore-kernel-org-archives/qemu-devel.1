@@ -1,40 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48057)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48423)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1eQvso-0007vt-49
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 08:55:06 -0500
+	(envelope-from <aik@ozlabs.ru>) id 1eQvtP-0008Vn-2O
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 08:55:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1eQvsk-0005FE-S5
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 08:55:06 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:36884
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
-	id 1eQvsk-0005Dw-Kf
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 08:55:02 -0500
-Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	vBIDsmt0191077
-	for <qemu-devel@nongnu.org>; Mon, 18 Dec 2017 08:55:00 -0500
-Received: from e06smtp14.uk.ibm.com (e06smtp14.uk.ibm.com [195.75.94.110])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2exehh1ehq-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 18 Dec 2017 08:54:59 -0500
-Received: from localhost
-	by e06smtp14.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
-	Mon, 18 Dec 2017 13:54:57 -0000
-References: <1513350170-20168-1-git-send-email-den@openvz.org>
-	<1513350170-20168-2-git-send-email-den@openvz.org>
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-Date: Mon, 18 Dec 2017 14:54:51 +0100
+	(envelope-from <aik@ozlabs.ru>) id 1eQvtL-0005jb-Px
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 08:55:43 -0500
+Received: from mail-pf0-x232.google.com ([2607:f8b0:400e:c00::232]:34197)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <aik@ozlabs.ru>) id 1eQvtL-0005hC-Et
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 08:55:39 -0500
+Received: by mail-pf0-x232.google.com with SMTP id a90so9713130pfk.1
+	for <qemu-devel@nongnu.org>; Mon, 18 Dec 2017 05:55:39 -0800 (PST)
+References: <20171218040852.13478.19208.stgit@gimli.home>
+	<20171218050253.13478.49457.stgit@gimli.home>
+	<f76b5d78-0107-cca8-5e72-ab9944c8a90b@ozlabs.ru>
+	<20171218062822.625b7469@w520.home>
+From: Alexey Kardashevskiy <aik@ozlabs.ru>
+Message-ID: <c472c115-3cfb-7ce0-62f3-13a026ccf02d@ozlabs.ru>
+Date: Tue, 19 Dec 2017 00:55:32 +1100
 MIME-Version: 1.0
-In-Reply-To: <1513350170-20168-2-git-send-email-den@openvz.org>
+In-Reply-To: <20171218062822.625b7469@w520.home>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Language: en-AU
 Content-Transfer-Encoding: 7bit
-Message-Id: <229a8ddd-2745-b08c-96cf-87135713353f@de.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH 1/2] pc, q35: add 2.12 machine types
+Subject: Re: [Qemu-devel] [RFC/RFT PATCH 5/5] vfio/pci: Allow relocating
+ MSI-X MMIO
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -43,33 +33,149 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Denis V. Lunev" <den@openvz.org>, qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Peter Maydell <peter.maydell@linaro.org>
+To: Alex Williamson <alex.williamson@redhat.com>
+Cc: qemu-devel@nongnu.org, eric.auger@redhat.com
 
-On 12/15/2017 04:02 PM, Denis V. Lunev wrote:
-
->  include/hw/compat.h  |  2 ++
->  include/hw/i386/pc.h |  3 +++
->  hw/i386/pc_piix.c    | 13 ++++++++++++-
->  hw/i386/pc_q35.c     | 12 +++++++++++-
->  4 files changed, 28 insertions(+), 2 deletions(-)
+On 19/12/17 00:28, Alex Williamson wrote:
+> On Mon, 18 Dec 2017 20:04:23 +1100
+> Alexey Kardashevskiy <aik@ozlabs.ru> wrote:
 > 
-> diff --git a/include/hw/compat.h b/include/hw/compat.h
-> index cf389b4..026fee9 100644
-> --- a/include/hw/compat.h
-> +++ b/include/hw/compat.h
-> @@ -1,6 +1,8 @@
->  #ifndef HW_COMPAT_H
->  #define HW_COMPAT_H
+>> On 18/12/17 16:02, Alex Williamson wrote:
+>>> With recently proposed kernel side vfio-pci changes, the MSI-X vector
+>>> table area can be mmap'd from userspace, allowing direct access to
+>>> non-MSI-X registers within the host page size of this area.  However,
+>>> we only get that direct access if QEMU isn't also emulating MSI-X
+>>> within that same page.  For x86/64 host, the system page size is 4K
+>>> and the PCI spec recommends a minimum of 4K to 8K alignment to
+>>> separate MSI-X from non-MSI-X registers, therefore only devices which
+>>> don't honor this recommendation would see any improvement from this
+>>> option.  The real targets for this feature are hosts where the page
+>>> size exceeds the PCI spec recommended alignment, such as ARM64 systems
+>>> with 64K pages.
+>>>
+>>> This new x-msix-relocation option accepts the following options:
+>>>
+>>>   off: Disable MSI-X relocation, use native device config (default)
+>>>   auto: Automaically relocate MSI-X MMIO to another BAR or offset
+>>>        based on minimum additional MMIO requirement
+>>>   bar0..bar5: Specify the target BAR, which will either be extended
+>>>        if the BAR exists or added if the BAR slot is available.  
+>>
+>>
+>> While I am digesting the patchset, here are some test results.
 > 
-> +#define HW_COMPAT_2_11 \
-> +
->  #define HW_COMPAT_2_10 \
->      {\
+> Thanks for testing!
+> 
+>> This is the device:
+>>
+>> 00:00.0 Serial Attached SCSI controller: LSI Logic / Symbios Logic SAS3008
+>> PCI-Express Fusion-MPT SAS-3 (rev 02)
+> 
+> BAR1:
+> 
+>> Memory at 210000000000 (64-bit, non-prefetchable) [size=64K]
+> 
+> BAR3:
+> 
+>> Memory at 210000040000 (64-bit, non-prefetchable) [size=256K]
+>>
+>> Capabilities: [c0] MSI-X: Enable+ Count=96 Masked-
+>>         Vector table: BAR=1 offset=0000e000
+>>         PBA: BAR=1 offset=0000f000
+>>
+>>
+>> Test #1: x-msix-relocation = "off":
+>>
+>> FlatView #1
+>>  AS "memory", root: system
+>>  AS "cpu-memory", root: system
+>>  Root memory region: system
+>>   0000000000000000-000000007fffffff (prio 0, ram): ppc_spapr.ram
+>>   0000210000000000-000021000000dfff (prio 0, i/o): 0001:03:00.0 BAR 1
+>>   000021000000e000-000021000000e5ff (prio 0, i/o): msix-table
+>>   000021000000e600-000021000000ffff (prio 0, i/o): 0001:03:00.0 BAR 1
+>> @000000000000e600
+>>   0000210000040000-000021000007ffff (prio 0, ramd): 0001:03:00.0 BAR 3 mmaps[0]
+>>
+>> Ok, works.
+>>
+>>
+>> Test #2: x-msix-relocation = "auto":
+>>
+>> FlatView #2
+>>  AS "memory", root: system
+>>  AS "cpu-memory", root: system
+>>  Root memory region: system
+>>   0000000000000000-000000007fffffff (prio 0, ram): ppc_spapr.ram
+>>   0000200080000000-00002000800005ff (prio 0, i/o): msix-table
+>>   0000200080000600-000020008000ffff (prio 1, i/o): 0001:03:00.0 base BAR 0
+>> @0000000000000600
+>>   0000210000000000-000021000000ffff (prio 0, i/o): 0001:03:00.0 BAR 1
+>>   0000210000040000-000021000007ffff (prio 0, ramd): 0001:03:00.0 BAR 3 mmaps[0]
+>>
+>>
+>> The guest fails probing because the first 64bit BAR is broken.
+>>
+>> lspci:
+>>
+>> Region 0: Memory at 200080000000 (32-bit, prefetchable) [size=64K]
+>> Region 1: Memory at 210000000000 (64-bit, non-prefetchable) [size=64K]
+>> Region 3: Memory at 210000040000 (64-bit, non-prefetchable) [size=256K]
+>>
+>> Capabilities: [c0] MSI-X: Enable- Count=96 Masked-
+>>         Vector table: BAR=0 offset=00000000
+>>         PBA: BAR=0 offset=00000600
+> 
+> Why do you suppose it's broken?  The added BAR0 is 32bit, it cannot be
+> 64bit since BAR1 is implemented.  I don't see anything fundamentally
+> different between this and the working BAR5 test below.
 
-FWIW, arm, s390, power also include HW_COMPAT_* for their machines.
-As it happens s390 and power already introduced HW_COMPAT_2_11 last
-week so these changes should be fine. 
 
-Peter, maybe ARM should add a 2.11 compat machine (and a switch to 2.12)
-sooner than usual?
+BAR1 (0x14..0x17) uses BAR0 (0x10..0x13) as upper 32bits when it is 64bit
+BAR, no?
+
+
+> 
+>> Test #3: x-msix-relocation = "bar1"
+>>
+>>
+>> FlatView #1
+>>  AS "memory", root: system
+>>  AS "cpu-memory", root: system
+>>  Root memory region: system
+>>   0000000000000000-000000007fffffff (prio 0, ram): ppc_spapr.ram
+>>   0000210000000000-000021000000ffff (prio 0, i/o): 0001:03:00.0 BAR 1
+>>   0000210000010000-00002100000105ff (prio 0, i/o): msix-table
+>>   0000210000010600-000021000001ffff (prio 1, i/o): 0001:03:00.0 base BAR 1
+>> @0000000000010600
+>>   0000210000040000-000021000007ffff (prio 0, ramd): 0001:03:00.0 BAR 3 mmaps[0]
+>>
+>> Ok, works. BAR1 became 128K. However no part of BAR1 was mapped, i.e.
+>> appear as "ramd" in flatview, should it have appeared?
+>>
+>> This is "mtree":
+>>
+>> memory-region: pci@800000020000000.mmio
+>>   0000000000000000-ffffffffffffffff (prio 0, i/o): pci@800000020000000.mmio
+>>     0000210000000000-000021000001ffff (prio 1, i/o): 0001:03:00.0 base BAR 1
+>>       0000210000000000-000021000000ffff (prio 0, i/o): 0001:03:00.0 BAR 1
+>>       0000210000010000-00002100000105ff (prio 0, i/o): msix-table
+>>       0000210000010600-000021000001060f (prio 0, i/o): msix-pba [disabled]
+>>     0000210000040000-000021000007ffff (prio 1, i/o): 0001:03:00.0 base BAR 3
+>>       0000210000040000-000021000007ffff (prio 0, i/o): 0001:03:00.0 BAR 3
+>>         0000210000040000-000021000007ffff (prio 0, ramd): 0001:03:00.0 BAR
+>> 3 mmaps[0]
+> 
+> Did you disable vfio_pci_fixup_msix_region() as noted in 0/5?  This
+> series doesn't do anything about consuming the new MSI-X mappable flag
+> that you introduced in the kernel, so vfio_pci_fixup_msix_region() will
+> continue to exclude mmap'ing the 64K page overlapping the actual BAR.
+
+
+Ah, my bad, I've read this but when I got to testing - forgot. Sorry for
+the noise, tests 3 and 4 mmap as expected with fixup disabled.
+
+
+
+-- 
+Alexey
