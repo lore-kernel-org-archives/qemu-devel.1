@@ -1,24 +1,31 @@
-Received: from eggs.gnu.org ([208.118.235.92]:59626)
+Received: from eggs.gnu.org ([208.118.235.92]:33931)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1eR1HR-0004mZ-Ji
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 14:40:54 -0500
+	(envelope-from <den@virtuozzo.com>) id 1eR1JJ-0006Kw-Qa
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 14:42:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1eR1HJ-0006mD-Ve
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 14:40:49 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:60802)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lvivier@redhat.com>) id 1eR1HJ-0006kH-OD
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 14:40:45 -0500
-References: <20171218183631.32357-1-cohuck@redhat.com>
-From: Laurent Vivier <lvivier@redhat.com>
-Message-ID: <c8748f83-b98e-6dd2-ddf5-6620f6b36f30@redhat.com>
-Date: Mon, 18 Dec 2017 20:40:36 +0100
+	(envelope-from <den@virtuozzo.com>) id 1eR1JE-0008RF-BD
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 14:42:49 -0500
+Received: from mail-eopbgr20124.outbound.protection.outlook.com
+	([40.107.2.124]:45025
+	helo=EUR02-VE1-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <den@virtuozzo.com>) id 1eR1JD-0008M0-By
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 14:42:44 -0500
+References: <1513350170-20168-1-git-send-email-den@openvz.org>
+	<1513350170-20168-3-git-send-email-den@openvz.org>
+	<20171218133812.GD16653@stefanha-x1.localdomain>
+	<2B67BF1C-6489-4A9B-BEE5-08DE9B904C07@intel.com>
+	<5E82066E-45E4-4627-8EB5-F995FFCB1ADF@nutanix.com>
+From: "Denis V. Lunev" <den@openvz.org>
+Message-ID: <674cef25-a411-354e-aaa5-83f382f42189@openvz.org>
+Date: Mon, 18 Dec 2017 22:42:35 +0300
 MIME-Version: 1.0
-In-Reply-To: <20171218183631.32357-1-cohuck@redhat.com>
+In-Reply-To: <5E82066E-45E4-4627-8EB5-F995FFCB1ADF@nutanix.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2] tpm: move qdev_prop_tpm to hw/tpm/
+Content-Language: en-US
+Subject: Re: [Qemu-devel] [PATCH 2/2] virtio: fix IO request length in
+ virtio SCSI/block
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,40 +34,127 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>, stefanb@linux.vnet.ibm.com, pbonzini@redhat.com
-Cc: marcandre.lureau@redhat.com, thuth@redhat.com, qemu-devel@nongnu.org, f4bug@amsat.org
+To: Felipe Franciosi <felipe@nutanix.com>, "Harris, James R" <james.r.harris@intel.com>, Stefan Hajnoczi <stefanha@redhat.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "Michael S. Tsirkin" <mst@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, "Liu, Changpeng" <changpeng.liu@intel.com>
 
-On 18/12/2017 19:36, Cornelia Huck wrote:
-> Building with --disable-tpm yields
->=20
-> ../hw/core/qdev-properties-system.o: In function `set_tpm':
-> /home/cohuck/git/qemu/hw/core/qdev-properties-system.c:274: undefined r=
-eference to `qemu_find_tpm_be'
-> /home/cohuck/git/qemu/hw/core/qdev-properties-system.c:278: undefined r=
-eference to `tpm_backend_init'
-> ../hw/core/qdev-properties-system.o: In function `release_tpm':
-> /home/cohuck/git/qemu/hw/core/qdev-properties-system.c:291: undefined r=
-eference to `tpm_backend_reset'
->=20
-> Move the implementation of DEFINE_PROP_TPMBE to hw/tpm/ so that it is
-> only built when tpm is actually configured, and build tpm_util in every
-> case.
->=20
-> Fixes: 493b78303532 ("qdev: add DEFINE_PROP_TPMBE")
-> Reported-by: Thomas Huth <thuth@redhat.com>
-> Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
-> ---
-> v1->v2: fix x86_64 build with mingw (always build tpm_util)
-> ---
->  hw/core/qdev-properties-system.c | 64 --------------------------------=
-------
->  hw/tpm/Makefile.objs             |  5 +--
->  hw/tpm/tpm_util.c                | 67 ++++++++++++++++++++++++++++++++=
-++++++++
->  hw/tpm/tpm_util.h                |  3 ++
->  include/hw/qdev-properties.h     |  2 --
->  5 files changed, 73 insertions(+), 68 deletions(-)
->=20
+On 12/18/2017 10:35 PM, Felipe Franciosi wrote:
+>> On 18 Dec 2017, at 16:16, Harris, James R <james.r.harris@intel.com> wro=
+te:
+>>
+>>
+>>> On Dec 18, 2017, at 6:38 AM, Stefan Hajnoczi <stefanha@redhat.com> wrot=
+e:
+>>>
+>>> On Fri, Dec 15, 2017 at 06:02:50PM +0300, Denis V. Lunev wrote:
+>>>> Linux guests submit IO requests no longer than PAGE_SIZE * max_seg
+>>>> field reported by SCSI controler. Thus typical sequential read with
+>>>> 1 MB size results in the following pattern of the IO from the guest:
+>>>> 8,16   1    15754     2.766095122  2071  D   R 2095104 + 1008 [dd]
+>>>> 8,16   1    15755     2.766108785  2071  D   R 2096112 + 1008 [dd]
+>>>> 8,16   1    15756     2.766113486  2071  D   R 2097120 + 32 [dd]
+>>>> 8,16   1    15757     2.767668961     0  C   R 2095104 + 1008 [0]
+>>>> 8,16   1    15758     2.768534315     0  C   R 2096112 + 1008 [0]
+>>>> 8,16   1    15759     2.768539782     0  C   R 2097120 + 32 [0]
+>>>> The IO was generated by
+>>>> dd if=3D/dev/sda of=3D/dev/null bs=3D1024 iflag=3Ddirect
+>>>>
+>>>> This effectively means that on rotational disks we will observe 3 IOPS
+>>>> for each 2 MBs processed. This definitely negatively affects both
+>>>> guest and host IO performance.
+>>>>
+>>>> The cure is relatively simple - we should report lengthy scatter-gathe=
+r
+>>>> ability of the SCSI controller. Fortunately the situation here is very
+>>>> good. VirtIO transport layer can accomodate 1024 items in one request
+>>>> while we are using only 128. This situation is present since almost
+>>>> very beginning. 2 items are dedicated for request metadata thus we
+>>>> should publish VIRTQUEUE_MAX_SIZE - 2 as max_seg.
+>>>>
+>>>> The following pattern is observed after the patch:
+>>>> 8,16   1     9921     2.662721340  2063  D   R 2095104 + 1024 [dd]
+>>>> 8,16   1     9922     2.662737585  2063  D   R 2096128 + 1024 [dd]
+>>>> 8,16   1     9923     2.665188167     0  C   R 2095104 + 1024 [0]
+>>>> 8,16   1     9924     2.665198777     0  C   R 2096128 + 1024 [0]
+>>>> which is much better.
+>>>>
+>>>> The dark side of this patch is that we are tweaking guest visible
+>>>> parameter, though this should be relatively safe as above transport
+>>>> layer support is present in QEMU/host Linux for a very long time.
+>>>> The patch adds configurable property for VirtIO SCSI with a new defaul=
+t
+>>>> and hardcode option for VirtBlock which does not provide good
+>>>> configurable framework.
+>>>>
+>>>> Signed-off-by: Denis V. Lunev <den@openvz.org>
+>>>> CC: "Michael S. Tsirkin" <mst@redhat.com>
+>>>> CC: Stefan Hajnoczi <stefanha@redhat.com>
+>>>> CC: Kevin Wolf <kwolf@redhat.com>
+>>>> CC: Max Reitz <mreitz@redhat.com>
+>>>> CC: Paolo Bonzini <pbonzini@redhat.com>
+>>>> CC: Richard Henderson <rth@twiddle.net>
+>>>> CC: Eduardo Habkost <ehabkost@redhat.com>
+>>>> ---
+>>>> include/hw/compat.h             | 17 +++++++++++++++++
+>>>> include/hw/virtio/virtio-blk.h  |  1 +
+>>>> include/hw/virtio/virtio-scsi.h |  1 +
+>>>> hw/block/virtio-blk.c           |  4 +++-
+>>>> hw/scsi/vhost-scsi.c            |  2 ++
+>>>> hw/scsi/vhost-user-scsi.c       |  2 ++
+>>>> hw/scsi/virtio-scsi.c           |  4 +++-
+>>>> 7 files changed, 29 insertions(+), 2 deletions(-)
+>>>>
+>>>> diff --git a/include/hw/compat.h b/include/hw/compat.h
+>>>> index 026fee9..b9be5d7 100644
+>>>> --- a/include/hw/compat.h
+>>>> +++ b/include/hw/compat.h
+>>>> @@ -2,6 +2,23 @@
+>>>> #define HW_COMPAT_H
+>>>>
+>>>> #define HW_COMPAT_2_11 \
+>>>> +    {\
+>>>> +        .driver   =3D "virtio-blk-device",\
+>>>> +        .property =3D "max_segments",\
+>>>> +        .value    =3D "126",\
+>>>> +    },{\
+>>>> +        .driver   =3D "vhost-scsi",\
+>>>> +        .property =3D "max_segments",\
+>>>> +        .value    =3D "126",\
+>>>> +    },{\
+>>>> +        .driver   =3D "vhost-user-scsi",\
+>>>> +        .property =3D "max_segments",\
+>>>> +        .value    =3D "126",\
+>>> Existing vhost-user-scsi slave programs might not expect up to 1022
+>>> segments.  Hopefully we can get away with this change since there are
+>>> relatively few vhost-user-scsi slave programs.
+>>>
+>>> CCed Felipe (Nutanix) and Jim (SPDK) in case they have comments.
+>> SPDK vhost-user targets only expect max 128 segments.  They also pre-all=
+ocate I/O task structures when QEMU connects to the vhost-user device.
+>>
+>> Supporting up to 1022 segments would result in significantly higher memo=
+ry usage, reduction in I/O queue depth processed by the vhost-user target, =
+or having to dynamically allocate I/O task structures - none of which are i=
+deal.
+>>
+>> What if this was just bumped from 126 to 128?  I guess I=E2=80=99m tryin=
+g to understand the level of guest and host I/O performance that is gained =
+with this patch.  One I/O per 512KB vs. one I/O per 4MB - we are still only=
+ talking about a few hundred IO/s difference.
+> SeaBIOS also makes the assumption that the queue size is not bigger than =
+128 elements.
+> https://review.coreboot.org/cgit/seabios.git/tree/src/hw/virtio-ring.h#n2=
+3
+>
+> Perhaps a better approach is to make the value configurable (ie. add the =
+"max_segments" property), but set the default to 128-2. In addition to what=
+ Jim pointed out, I think there may be other legacy front end drivers which=
+ can assume the ring will be at most 128 entries in size.
+>
+> With that, hypervisors can choose to bump the value higher if it's known =
+to be safe for their host+guest configuration.
 
-Reviewed-by: Laurent Vivier <lvivier@redhat.com>
+This should not be a problem at all IMHO. The guest is not obliged
+to use the message of entire possible size. The guest initiates
+request with 128 elements. Fine. QEMU is ready to this.
+
+Den
