@@ -1,23 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45560)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45641)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1eQwWk-0006XU-Tf
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 09:36:28 -0500
+	(envelope-from <stefanha@redhat.com>) id 1eQwWm-0006Zl-R0
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 09:36:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1eQwWd-0006wq-8k
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 09:36:22 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:55934)
+	(envelope-from <stefanha@redhat.com>) id 1eQwWj-00070X-0X
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 09:36:24 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:56020)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1eQwWc-0006vL-Tv
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 09:36:15 -0500
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1eQwWi-0006zk-Ql
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 09:36:20 -0500
 From: Stefan Hajnoczi <stefanha@redhat.com>
-Date: Mon, 18 Dec 2017 14:35:12 +0000
-Message-Id: <20171218143530.12082-6-stefanha@redhat.com>
+Date: Mon, 18 Dec 2017 14:35:14 +0000
+Message-Id: <20171218143530.12082-8-stefanha@redhat.com>
 In-Reply-To: <20171218143530.12082-1-stefanha@redhat.com>
 References: <20171218143530.12082-1-stefanha@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 05/23] dev-storage: Fix the unusual function name
+Subject: [Qemu-devel] [PULL 07/23] blockdev: hold AioContext for
+ bdrv_unref() in external_snapshot_clean()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,104 +25,49 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Mao Zhongyi <maozy.fnst@cn.fujitsu.com>, Gerd Hoffmann <kraxel@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Stefan Hajnoczi <stefanha@redhat.com>
 
-From: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
+bdrv_unref() requires the AioContext lock because bdrv_flush() uses
+BDRV_POLL_WHILE(), which assumes the AioContext is currently held.  If
+BDRV_POLL_WHILE() runs without AioContext held the
+pthread_mutex_unlock() call in aio_context_release() fails.
 
-The function name of usb_msd_{realize,unrealize}_*,
-usb_msd_class_initfn_* are unusual. Rename it to
-usb_msd_*_{realize,unrealize}, usb_msd_class_*_initfn.
+This patch moves bdrv_unref() into the AioContext locked region to solve
+the following pthread_mutex_unlock() failure:
 
-Cc: Gerd Hoffmann <kraxel@redhat.com>
+  #0  0x00007f566181969b in raise () at /lib64/libc.so.6
+  #1  0x00007f566181b3b1 in abort () at /lib64/libc.so.6
+  #2  0x00005592cd590458 in error_exit (err=<optimized out>, msg=msg@entry=0x5592cdaf6d60 <__func__.23977> "qemu_mutex_unlock") at util/qemu-thread-posix.c:36
+  #3  0x00005592cd96e738 in qemu_mutex_unlock (mutex=mutex@entry=0x5592ce9505e0) at util/qemu-thread-posix.c:96
+  #4  0x00005592cd969b69 in aio_context_release (ctx=ctx@entry=0x5592ce950580) at util/async.c:507
+  #5  0x00005592cd8ead78 in bdrv_flush (bs=bs@entry=0x5592cfa87210) at block/io.c:2478
+  #6  0x00005592cd89df30 in bdrv_close (bs=0x5592cfa87210) at block.c:3207
+  #7  0x00005592cd89df30 in bdrv_delete (bs=0x5592cfa87210) at block.c:3395
+  #8  0x00005592cd89df30 in bdrv_unref (bs=0x5592cfa87210) at block.c:4418
+  #9  0x00005592cd6b7f86 in qmp_transaction (dev_list=<optimized out>, has_props=<optimized out>, props=<optimized out>, errp=errp@entry=0x7ffe4a1fc9d8) at blockdev.c:2308
 
-Signed-off-by: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-Message-id: 11e6003433abce35f3f4970e1acc71ee92dbcf51.1511317952.git.maozy=
-.fnst@cn.fujitsu.com
+Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+Reviewed-by: Kevin Wolf <kwolf@redhat.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+Message-id: 20171206144550.22295-2-stefanha@redhat.com
 Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
 ---
- hw/usb/dev-storage.c | 20 ++++++++++----------
- 1 file changed, 10 insertions(+), 10 deletions(-)
+ blockdev.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/hw/usb/dev-storage.c b/hw/usb/dev-storage.c
-index a9bcc67e67..9722ac854c 100644
---- a/hw/usb/dev-storage.c
-+++ b/hw/usb/dev-storage.c
-@@ -596,7 +596,7 @@ static void usb_msd_unrealize_storage(USBDevice *dev,=
- Error **errp)
-     object_unref(OBJECT(&s->bus));
+diff --git a/blockdev.c b/blockdev.c
+index 56a6b24a0b..3c8d994ced 100644
+--- a/blockdev.c
++++ b/blockdev.c
+@@ -1812,8 +1812,8 @@ static void external_snapshot_clean(BlkActionState *common)
+                              DO_UPCAST(ExternalSnapshotState, common, common);
+     if (state->aio_context) {
+         bdrv_drained_end(state->old_bs);
+-        aio_context_release(state->aio_context);
+         bdrv_unref(state->new_bs);
++        aio_context_release(state->aio_context);
+     }
  }
-=20
--static void usb_msd_realize_storage(USBDevice *dev, Error **errp)
-+static void usb_msd_storage_realize(USBDevice *dev, Error **errp)
- {
-     MSDState *s =3D USB_STORAGE_DEV(dev);
-     BlockBackend *blk =3D s->conf.blk;
-@@ -643,14 +643,14 @@ static void usb_msd_realize_storage(USBDevice *dev,=
- Error **errp)
-     s->scsi_dev =3D scsi_dev;
- }
-=20
--static void usb_msd_unrealize_bot(USBDevice *dev, Error **errp)
-+static void usb_msd_bot_unrealize(USBDevice *dev, Error **errp)
- {
-     MSDState *s =3D USB_STORAGE_DEV(dev);
-=20
-     object_unref(OBJECT(&s->bus));
- }
-=20
--static void usb_msd_realize_bot(USBDevice *dev, Error **errp)
-+static void usb_msd_bot_realize(USBDevice *dev, Error **errp)
- {
-     MSDState *s =3D USB_STORAGE_DEV(dev);
-     DeviceState *d =3D DEVICE(dev);
-@@ -764,12 +764,12 @@ static void usb_msd_class_initfn_common(ObjectClass=
- *klass, void *data)
-     dc->vmsd =3D &vmstate_usb_msd;
- }
-=20
--static void usb_msd_class_initfn_storage(ObjectClass *klass, void *data)
-+static void usb_msd_class_storage_initfn(ObjectClass *klass, void *data)
- {
-     DeviceClass *dc =3D DEVICE_CLASS(klass);
-     USBDeviceClass *uc =3D USB_DEVICE_CLASS(klass);
-=20
--    uc->realize =3D usb_msd_realize_storage;
-+    uc->realize =3D usb_msd_storage_realize;
-     uc->unrealize =3D usb_msd_unrealize_storage;
-     dc->props =3D msd_properties;
- }
-@@ -828,26 +828,26 @@ static void usb_msd_instance_init(Object *obj)
-     object_property_set_int(obj, -1, "bootindex", NULL);
- }
-=20
--static void usb_msd_class_initfn_bot(ObjectClass *klass, void *data)
-+static void usb_msd_class_bot_initfn(ObjectClass *klass, void *data)
- {
-     USBDeviceClass *uc =3D USB_DEVICE_CLASS(klass);
-=20
--    uc->realize =3D usb_msd_realize_bot;
--    uc->unrealize =3D usb_msd_unrealize_bot;
-+    uc->realize =3D usb_msd_bot_realize;
-+    uc->unrealize =3D usb_msd_bot_unrealize;
-     uc->attached_settable =3D true;
- }
-=20
- static const TypeInfo msd_info =3D {
-     .name          =3D "usb-storage",
-     .parent        =3D TYPE_USB_STORAGE,
--    .class_init    =3D usb_msd_class_initfn_storage,
-+    .class_init    =3D usb_msd_class_storage_initfn,
-     .instance_init =3D usb_msd_instance_init,
- };
-=20
- static const TypeInfo bot_info =3D {
-     .name          =3D "usb-bot",
-     .parent        =3D TYPE_USB_STORAGE,
--    .class_init    =3D usb_msd_class_initfn_bot,
-+    .class_init    =3D usb_msd_class_bot_initfn,
- };
-=20
- static void usb_msd_register_types(void)
---=20
+ 
+-- 
 2.14.3
