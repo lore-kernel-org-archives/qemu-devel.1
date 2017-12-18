@@ -1,44 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55726)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55758)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1eQuYd-00014j-Fk
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 07:30:12 -0500
+	(envelope-from <balaton@eik.bme.hu>) id 1eQuYj-00019j-A8
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 07:30:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1eQuYa-0001Y9-60
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 07:30:11 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:46132)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pasic@linux.vnet.ibm.com>)
-	id 1eQuYZ-0001XW-Sb
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 07:30:08 -0500
-Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	vBICThG8079328
-	for <qemu-devel@nongnu.org>; Mon, 18 Dec 2017 07:30:05 -0500
-Received: from e06smtp12.uk.ibm.com (e06smtp12.uk.ibm.com [195.75.94.108])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2exc18ma6h-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 18 Dec 2017 07:30:03 -0500
-Received: from localhost
-	by e06smtp12.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <pasic@linux.vnet.ibm.com>;
-	Mon, 18 Dec 2017 12:29:59 -0000
-References: <1512545840-10256-1-git-send-email-longpeng2@huawei.com>
-	<1512545840-10256-2-git-send-email-longpeng2@huawei.com>
-	<0209e49f-3d81-cbc9-eb07-13654a288a22@linux.vnet.ibm.com>
-	<5A2E8067.4050000@huawei.com>
-	<2b7048c1-e2f8-ab40-c4df-afe5efd8f95d@linux.vnet.ibm.com>
-	<5A377F94.5000504@huawei.com>
-From: Halil Pasic <pasic@linux.vnet.ibm.com>
-Date: Mon, 18 Dec 2017 13:29:50 +0100
+	(envelope-from <balaton@eik.bme.hu>) id 1eQuYf-0001e1-VU
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 07:30:17 -0500
+Date: Mon, 18 Dec 2017 13:30:04 +0100 (CET)
+From: BALATON Zoltan <balaton@eik.bme.hu>
+In-Reply-To: <20171218040946.GS7753@umbus.fritz.box>
+Message-ID: <alpine.BSF.2.21.1712181329050.96474@zero.eik.bme.hu>
+References: <20171216224842.EE8C17456B3@zero.eik.bme.hu>
+	<20171218040946.GS7753@umbus.fritz.box>
 MIME-Version: 1.0
-In-Reply-To: <5A377F94.5000504@huawei.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Message-Id: <968106e0-b839-22fc-e3ce-605b4e58fc97@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [virtio-dev] Re: [v22 1/2] virtio-crypto: Add
- virtio crypto device specification
+Content-Type: text/plain; charset=US-ASCII; format=flowed
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH v2] hw/ide: Emulate SiI3112 SATA
+ controller
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -47,101 +23,471 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Longpeng (Mike)" <longpeng2@huawei.com>
-Cc: virtio-dev@lists.oasis-open.org, Ola.Liljedahl@arm.com, brian.a.keating@intel.com, wangxinxin.wang@huawei.com, mst@redhat.com, xin.zeng@intel.com, jasowang@redhat.com, luonengjun@huawei.com, qemu-devel@nongnu.org, john.griffin@intel.com, agraf@suse.de, arei.gonglei@huawei.com, liang.j.ma@intel.com, stefanha@redhat.com, jianjay.zhou@huawei.com, cornelia.huck@de.ibm.com, Varun.Sethi@freescale.com, Jani.Kokkonen@huawei.com, vincent.jardin@6wind.com, denglingli@chinamobile.com, weidong.huang@huawei.com
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: John Snow <jsnow@redhat.com>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 
+On Mon, 18 Dec 2017, David Gibson wrote:
+> On Sat, Dec 16, 2017 at 11:42:39PM +0100, BALATON Zoltan wrote:
+>> This is a common generic PCI SATA controller that is also used in PCs
+>> but more importantly guests running on the Sam460ex board prefer this
+>> card and have a driver for it (unlike for other SATA controllers
+>> already emulated).
+>>
+>> Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
+>
+> I don't know enough about IDE to give this any more than a quick check
+> for anything obviously bogus looking.  So,
+>
+> Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+>
+> John, can you take this through your tree, or should I take it through
+> the ppc tree?
 
+I think he said before it can go via ppc tree:
 
-On 12/18/2017 09:43 AM, Longpeng (Mike) wrote:
-> Hi Halil,
-> 
-> On 2017/12/11 21:54, Halil Pasic wrote:
-> 
->>
->>
->> On 12/11/2017 01:56 PM, Longpeng (Mike) wrote:
->>>
->>>
->>> On 2017/12/6 19:01, Halil Pasic wrote:
->>>
->>>>
->>>>
->>>> On 12/06/2017 08:37 AM, Longpeng(Mike) wrote:
->>>>> +\field{outcome_len} is the size of struct virtio_crypto_session_input or
->>>>> +ZERO for the session-destroy operation.
->>>>
->>>> This ain't correct. It should have been something like virtio_crypto_destroy_session_input.
->>>>
->>>
->>> Hi Halil,
->>>
->>> I already fixed this just now.
->>> Do you have any other comments on v22 ? I'll send v23 tomorrow if no. :)
->>>
->>
->> Did not read the rest of the document. I'm not in the middle of something,
->> but I wanted to read the operation part these days. I guess, you prefer
->> sending out v23 over waiting, so I guess I will wait for v23 then.
->>
-> 
-> Sorry, I prefer to wait for more comments on v22.
-> 
+http://lists.nongnu.org/archive/html/qemu-devel/2017-08/msg04480.html
 
-OK, then I will read the whole thing.
-
->> Some general questions/remarks before you spin v23:
+>> ---
+>> v2: Addressed review comments:
+>> - Replaced debug printf with trace
+>> - Added comments about BAR mappings and reference to data sheet
+>> - Maintained with the sam460ex PPC machine and not with rest of hw/ide
 >>
->> * I'm not convinced about this 'header' and 'extra parameters' terminology.
->> Please see https://en.wikipedia.org/wiki/Header_(computing) for header.
->> I don't think it's fitting for the _flf structs. 
->> Same about the 'extra'. Please see  https://www.merriam-webster.com/dictionary/extra
->> (a : more than is due, usual, or necessary : additional) the things in
->> _vlf aren't extra at all. Do you intend to stick with is terminology?
->> If yes why? Please explain how should I read/understand it so that it makes
->> sense!
+>>  MAINTAINERS                        |   6 +
+>>  default-configs/ppcemb-softmmu.mak |   1 +
+>>  hw/ide/Makefile.objs               |   1 +
+>>  hw/ide/sii3112.c                   | 368 +++++++++++++++++++++++++++++++++++++
+>>  hw/ide/trace-events                |   5 +
+>>  5 files changed, 381 insertions(+)
+>>  create mode 100644 hw/ide/sii3112.c
 >>
-> 
-> I use 'fixed-length paramenters' instead of 'header' and 'variable-length
-> parameters' instead of 'extra parameters' in certain places, but other places
-> are forgotten.
-> 
-> BTW, I think this isn't a big problem and structural defect, I hope native
-> speakers could help us.
-> 
-
-It isn't a big structural thing, but inconsistent wording can make
-difficult to understand stuff even more difficult to understand.
-
-This wording stuff is not a show-stopper for me.
-
->> * Do we want/need to specify any alignment requirement for the
->> stuff in guest storage (for instance the _flf fields) or be explicit
->> about no alignment should be assumed (e.g virtio_crypto_mac_create_session_flf.algo
->> ain't necessarily aligned (in guest memory) as required by uint32_t)?
+>> diff --git a/MAINTAINERS b/MAINTAINERS
+>> index 45e2e20..2ec47db 100644
+>> --- a/MAINTAINERS
+>> +++ b/MAINTAINERS
+>> @@ -761,6 +761,12 @@ L: qemu-ppc@nongnu.org
+>>  S: Odd Fixes
+>>  F: hw/ppc/virtex_ml507.c
 >>
-> 
-> The _flf fields are all 32bit or 64bit.
-> 
-
-What is your point? Please elaborate!
-
->> * I assume one request is supposed to correspond to one descriptor chain.
->> Right? If yes, could you tell me, where is this expressed in the spec.
+>> +sam460ex
+>> +M: BALATON Zoltan <balaton@eik.bme.hu>
+>> +L: qemu-ppc@nongnu.org
+>> +S: Maintained
+>> +F: hw/ide/sii3112.c
+>> +
+>>  SH4 Machines
+>>  ------------
+>>  R2D
+>> diff --git a/default-configs/ppcemb-softmmu.mak b/default-configs/ppcemb-softmmu.mak
+>> index 13917fb..5db4618 100644
+>> --- a/default-configs/ppcemb-softmmu.mak
+>> +++ b/default-configs/ppcemb-softmmu.mak
+>> @@ -16,3 +16,4 @@ CONFIG_I8259=y
+>>  CONFIG_XILINX=y
+>>  CONFIG_XILINX_ETHLITE=y
+>>  CONFIG_SM501=y
+>> +CONFIG_IDE_SII3112=y
+>> diff --git a/hw/ide/Makefile.objs b/hw/ide/Makefile.objs
+>> index f0edca3..fc328ff 100644
+>> --- a/hw/ide/Makefile.objs
+>> +++ b/hw/ide/Makefile.objs
+>> @@ -11,3 +11,4 @@ common-obj-$(CONFIG_MICRODRIVE) += microdrive.o
+>>  common-obj-$(CONFIG_AHCI) += ahci.o
+>>  common-obj-$(CONFIG_AHCI) += ich.o
+>>  common-obj-$(CONFIG_ALLWINNER_A10) += ahci-allwinner.o
+>> +common-obj-$(CONFIG_IDE_SII3112) += sii3112.o
+>> diff --git a/hw/ide/sii3112.c b/hw/ide/sii3112.c
+>> new file mode 100644
+>> index 0000000..e2f5562
+>> --- /dev/null
+>> +++ b/hw/ide/sii3112.c
+>> @@ -0,0 +1,368 @@
+>> +/*
+>> + * QEMU SiI3112A PCI to Serial ATA Controller Emulation
+>> + *
+>> + * Copyright (C) 2017 BALATON Zoltan <balaton@eik.bme.hu>
+>> + *
+>> + * This work is licensed under the terms of the GNU GPL, version 2 or later.
+>> + * See the COPYING file in the top-level directory.
+>> + *
+>> + */
+>> +
+>> +/* For documentation on this and similar cards see:
+>> + * http://wiki.osdev.org/User:Quok/Silicon_Image_Datasheets
+>> + */
+>> +
+>> +#include <qemu/osdep.h>
+>> +#include <hw/ide/pci.h>
+>> +#include "trace.h"
+>> +
+>> +#define TYPE_SII3112_PCI "sii3112"
+>> +#define SII3112_PCI(obj) OBJECT_CHECK(SiI3112PCIState, (obj), \
+>> +                         TYPE_SII3112_PCI)
+>> +
+>> +typedef struct SiI3112Regs {
+>> +    uint32_t confstat;
+>> +    uint32_t scontrol;
+>> +    uint16_t sien;
+>> +    uint8_t swdata;
+>> +} SiI3112Regs;
+>> +
+>> +typedef struct SiI3112PCIState {
+>> +    PCIIDEState i;
+>> +    MemoryRegion mmio;
+>> +    SiI3112Regs regs[2];
+>> +} SiI3112PCIState;
+>> +
+>> +/* The sii3112_reg_read and sii3112_reg_write functions implement the
+>> + * Internal Register Space - BAR5 (section 6.7 of the data sheet).
+>> + */
+>> +
+>> +static uint64_t sii3112_reg_read(void *opaque, hwaddr addr,
+>> +                                unsigned int size)
+>> +{
+>> +    SiI3112PCIState *d = opaque;
+>> +    uint64_t val = 0;
+>> +
+>> +    switch (addr) {
+>> +    case 0x00:
+>> +        val = d->i.bmdma[0].cmd;
+>> +        break;
+>> +    case 0x01:
+>> +        val = d->regs[0].swdata;
+>> +        break;
+>> +    case 0x02:
+>> +        val = d->i.bmdma[0].status;
+>> +        break;
+>> +    case 0x03:
+>> +        val = 0;
+>> +        break;
+>> +    case 0x04 ... 0x07:
+>> +        val = bmdma_addr_ioport_ops.read(&d->i.bmdma[0], addr - 4, size);
+>> +        break;
+>> +    case 0x08:
+>> +        val = d->i.bmdma[1].cmd;
+>> +        break;
+>> +    case 0x09:
+>> +        val = d->regs[1].swdata;
+>> +        break;
+>> +    case 0x0a:
+>> +        val = d->i.bmdma[1].status;
+>> +        break;
+>> +    case 0x0b:
+>> +        val = 0;
+>> +        break;
+>> +    case 0x0c ... 0x0f:
+>> +        val = bmdma_addr_ioport_ops.read(&d->i.bmdma[1], addr - 12, size);
+>> +        break;
+>> +    case 0x10:
+>> +        val = d->i.bmdma[0].cmd;
+>> +        val |= (d->regs[0].confstat & (1UL << 11) ? (1 << 4) : 0); /*SATAINT0*/
+>> +        val |= (d->regs[1].confstat & (1UL << 11) ? (1 << 6) : 0); /*SATAINT1*/
+>> +        val |= (d->i.bmdma[1].status & BM_STATUS_INT ? (1 << 14) : 0);
+>> +        val |= d->i.bmdma[0].status << 16;
+>> +        val |= d->i.bmdma[1].status << 24;
+>> +        break;
+>> +    case 0x18:
+>> +        val = d->i.bmdma[1].cmd;
+>> +        val |= (d->regs[1].confstat & (1UL << 11) ? (1 << 4) : 0);
+>> +        val |= d->i.bmdma[1].status << 16;
+>> +        break;
+>> +    case 0x80 ... 0x87:
+>> +        if (size == 1) {
+>> +            val = ide_ioport_read(&d->i.bus[0], addr - 0x80);
+>> +        } else if (addr == 0x80) {
+>> +            val = (size == 2) ? ide_data_readw(&d->i.bus[0], 0) :
+>> +                                ide_data_readl(&d->i.bus[0], 0);
+>> +        } else {
+>> +            val = (1ULL << (size * 8)) - 1;
+>> +        }
+>> +        break;
+>> +    case 0x8a:
+>> +        val = (size == 1) ? ide_status_read(&d->i.bus[0], 4) :
+>> +                            (1ULL << (size * 8)) - 1;
+>> +        break;
+>> +    case 0xa0:
+>> +        val = d->regs[0].confstat;
+>> +        break;
+>> +    case 0xc0 ... 0xc7:
+>> +        if (size == 1) {
+>> +            val = ide_ioport_read(&d->i.bus[1], addr - 0xc0);
+>> +        } else if (addr == 0xc0) {
+>> +            val = (size == 2) ? ide_data_readw(&d->i.bus[1], 0) :
+>> +                                ide_data_readl(&d->i.bus[1], 0);
+>> +        } else {
+>> +            val = (1ULL << (size * 8)) - 1;
+>> +        }
+>> +        break;
+>> +    case 0xca:
+>> +        val = (size == 1) ? ide_status_read(&d->i.bus[0], 4) :
+>> +                            (1ULL << (size * 8)) - 1;
+>> +        break;
+>> +    case 0xe0:
+>> +        val = d->regs[1].confstat;
+>> +        break;
+>> +    case 0x100:
+>> +        val = d->regs[0].scontrol;
+>> +        break;
+>> +    case 0x104:
+>> +        val = (d->i.bus[0].ifs[0].blk) ? 0x113 : 0;
+>> +        break;
+>> +    case 0x148:
+>> +        val = d->regs[0].sien << 16;
+>> +        break;
+>> +    case 0x180:
+>> +        val = d->regs[1].scontrol;
+>> +        break;
+>> +    case 0x184:
+>> +        val = (d->i.bus[1].ifs[0].blk) ? 0x113 : 0;
+>> +        break;
+>> +    case 0x1c8:
+>> +        val = d->regs[1].sien << 16;
+>> +        break;
+>> +    default:
+>> +        val = 0;
+>> +    }
+>> +    trace_sii3112_read(size, addr, val);
+>> +    return val;
+>> +}
+>> +
+>> +static void sii3112_reg_write(void *opaque, hwaddr addr,
+>> +                              uint64_t val, unsigned int size)
+>> +{
+>> +    SiI3112PCIState *d = opaque;
+>> +
+>> +    trace_sii3112_write(size, addr, val);
+>> +    switch (addr) {
+>> +    case 0x00:
+>> +    case 0x10:
+>> +        bmdma_cmd_writeb(&d->i.bmdma[0], val);
+>> +        break;
+>> +    case 0x01:
+>> +    case 0x11:
+>> +        d->regs[0].swdata = val & 0x3f;
+>> +        break;
+>> +    case 0x02:
+>> +    case 0x12:
+>> +        d->i.bmdma[0].status = (val & 0x60) | (d->i.bmdma[0].status & 1) |
+>> +                               (d->i.bmdma[0].status & ~val & 6);
+>> +        break;
+>> +    case 0x04 ... 0x07:
+>> +        bmdma_addr_ioport_ops.write(&d->i.bmdma[0], addr - 4, val, size);
+>> +        break;
+>> +    case 0x08:
+>> +    case 0x18:
+>> +        bmdma_cmd_writeb(&d->i.bmdma[1], val);
+>> +        break;
+>> +    case 0x09:
+>> +    case 0x19:
+>> +        d->regs[1].swdata = val & 0x3f;
+>> +        break;
+>> +    case 0x0a:
+>> +    case 0x1a:
+>> +        d->i.bmdma[1].status = (val & 0x60) | (d->i.bmdma[1].status & 1) |
+>> +                               (d->i.bmdma[1].status & ~val & 6);
+>> +        break;
+>> +    case 0x0c ... 0x0f:
+>> +        bmdma_addr_ioport_ops.write(&d->i.bmdma[1], addr - 12, val, size);
+>> +        break;
+>> +    case 0x80 ... 0x87:
+>> +        if (size == 1) {
+>> +            ide_ioport_write(&d->i.bus[0], addr - 0x80, val);
+>> +        } else if (addr == 0x80) {
+>> +            if (size == 2) {
+>> +                ide_data_writew(&d->i.bus[0], 0, val);
+>> +            } else {
+>> +                ide_data_writel(&d->i.bus[0], 0, val);
+>> +            }
+>> +        }
+>> +        break;
+>> +    case 0x8a:
+>> +        if (size == 1) {
+>> +            ide_cmd_write(&d->i.bus[0], 4, val);
+>> +        }
+>> +        break;
+>> +    case 0xc0 ... 0xc7:
+>> +        if (size == 1) {
+>> +            ide_ioport_write(&d->i.bus[1], addr - 0xc0, val);
+>> +        } else if (addr == 0xc0) {
+>> +            if (size == 2) {
+>> +                ide_data_writew(&d->i.bus[1], 0, val);
+>> +            } else {
+>> +                ide_data_writel(&d->i.bus[1], 0, val);
+>> +            }
+>> +        }
+>> +        break;
+>> +    case 0xca:
+>> +        if (size == 1) {
+>> +            ide_cmd_write(&d->i.bus[1], 4, val);
+>> +        }
+>> +        break;
+>> +    case 0x100:
+>> +        d->regs[0].scontrol = val & 0xfff;
+>> +        if (val & 1) {
+>> +            ide_bus_reset(&d->i.bus[0]);
+>> +        }
+>> +        break;
+>> +    case 0x148:
+>> +        d->regs[0].sien = (val >> 16) & 0x3eed;
+>> +        break;
+>> +    case 0x180:
+>> +        d->regs[1].scontrol = val & 0xfff;
+>> +        if (val & 1) {
+>> +            ide_bus_reset(&d->i.bus[1]);
+>> +        }
+>> +        break;
+>> +    case 0x1c8:
+>> +        d->regs[1].sien = (val >> 16) & 0x3eed;
+>> +        break;
+>> +    default:
+>> +        val = 0;
+>> +    }
+>> +}
+>> +
+>> +static const MemoryRegionOps sii3112_reg_ops = {
+>> +    .read = sii3112_reg_read,
+>> +    .write = sii3112_reg_write,
+>> +    .endianness = DEVICE_LITTLE_ENDIAN,
+>> +};
+>> +
+>> +/* the PCI irq level is the logical OR of the two channels */
+>> +static void sii3112_update_irq(SiI3112PCIState *s)
+>> +{
+>> +    int i, set = 0;
+>> +
+>> +    for (i = 0; i < 2; i++) {
+>> +        set |= s->regs[i].confstat & (1UL << 11);
+>> +    }
+>> +    pci_set_irq(PCI_DEVICE(s), (set ? 1 : 0));
+>> +}
+>> +
+>> +static void sii3112_set_irq(void *opaque, int channel, int level)
+>> +{
+>> +    SiI3112PCIState *s = opaque;
+>> +
+>> +    trace_sii3112_set_irq(channel, level);
+>> +    if (level) {
+>> +        s->regs[channel].confstat |= (1UL << 11);
+>> +    } else {
+>> +        s->regs[channel].confstat &= ~(1UL << 11);
+>> +    }
+>> +
+>> +    sii3112_update_irq(s);
+>> +}
+>> +
+>> +static void sii3112_reset(void *opaque)
+>> +{
+>> +    SiI3112PCIState *s = opaque;
+>> +    int i;
+>> +
+>> +    for (i = 0; i < 2; i++) {
+>> +        s->regs[i].confstat = 0x6515 << 16;
+>> +        ide_bus_reset(&s->i.bus[i]);
+>> +    }
+>> +}
+>> +
+>> +static void sii3112_pci_realize(PCIDevice *dev, Error **errp)
+>> +{
+>> +    SiI3112PCIState *d = SII3112_PCI(dev);
+>> +    PCIIDEState *s = PCI_IDE(dev);
+>> +    MemoryRegion *mr;
+>> +    qemu_irq *irq;
+>> +    int i;
+>> +
+>> +    pci_config_set_interrupt_pin(dev->config, 1);
+>> +    pci_set_byte(dev->config + PCI_CACHE_LINE_SIZE, 8);
+>> +
+>> +    /* BAR5 is in PCI memory space */
+>> +    memory_region_init_io(&d->mmio, OBJECT(d), &sii3112_reg_ops, d,
+>> +                         "sii3112.bar5", 0x200);
+>> +    pci_register_bar(dev, 5, PCI_BASE_ADDRESS_SPACE_MEMORY, &d->mmio);
+>> +
+>> +    /* BAR0-BAR4 are PCI I/O space aliases into BAR5 */
+>> +    mr = g_new(MemoryRegion, 1);
+>> +    memory_region_init_alias(mr, OBJECT(d), "sii3112.bar0", &d->mmio, 0x80, 8);
+>> +    pci_register_bar(dev, 0, PCI_BASE_ADDRESS_SPACE_IO, mr);
+>> +    mr = g_new(MemoryRegion, 1);
+>> +    memory_region_init_alias(mr, OBJECT(d), "sii3112.bar1", &d->mmio, 0x88, 4);
+>> +    pci_register_bar(dev, 1, PCI_BASE_ADDRESS_SPACE_IO, mr);
+>> +    mr = g_new(MemoryRegion, 1);
+>> +    memory_region_init_alias(mr, OBJECT(d), "sii3112.bar2", &d->mmio, 0xc0, 8);
+>> +    pci_register_bar(dev, 2, PCI_BASE_ADDRESS_SPACE_IO, mr);
+>> +    mr = g_new(MemoryRegion, 1);
+>> +    memory_region_init_alias(mr, OBJECT(d), "sii3112.bar3", &d->mmio, 0xc8, 4);
+>> +    pci_register_bar(dev, 3, PCI_BASE_ADDRESS_SPACE_IO, mr);
+>> +    mr = g_new(MemoryRegion, 1);
+>> +    memory_region_init_alias(mr, OBJECT(d), "sii3112.bar4", &d->mmio, 0, 16);
+>> +    pci_register_bar(dev, 4, PCI_BASE_ADDRESS_SPACE_IO, mr);
+>> +
+>> +    irq = qemu_allocate_irqs(sii3112_set_irq, d, 2);
+>> +    for (i = 0; i < 2; i++) {
+>> +        ide_bus_new(&s->bus[i], sizeof(s->bus[i]), DEVICE(dev), i, 1);
+>> +        ide_init2(&s->bus[i], irq[i]);
+>> +
+>> +        bmdma_init(&s->bus[i], &s->bmdma[i], s);
+>> +        s->bmdma[i].bus = &s->bus[i];
+>> +        ide_register_restart_cb(&s->bus[i]);
+>> +    }
+>> +    qemu_register_reset(sii3112_reset, s);
+>> +}
+>> +
+>> +static void sii3112_pci_exitfn(PCIDevice *dev)
+>> +{
+>> +    PCIIDEState *d = PCI_IDE(dev);
+>> +    int i;
+>> +
+>> +    for (i = 0; i < 2; ++i) {
+>> +        memory_region_del_subregion(&d->bmdma_bar, &d->bmdma[i].extra_io);
+>> +        memory_region_del_subregion(&d->bmdma_bar, &d->bmdma[i].addr_ioport);
+>> +    }
+>> +}
+>> +
+>> +static void sii3112_pci_class_init(ObjectClass *klass, void *data)
+>> +{
+>> +    DeviceClass *dc = DEVICE_CLASS(klass);
+>> +    PCIDeviceClass *pd = PCI_DEVICE_CLASS(klass);
+>> +
+>> +    pd->vendor_id = 0x1095;
+>> +    pd->device_id = 0x3112;
+>> +    pd->class_id = PCI_CLASS_STORAGE_RAID;
+>> +    pd->revision = 1;
+>> +    pd->realize = sii3112_pci_realize;
+>> +    pd->exit = sii3112_pci_exitfn;
+>> +    dc->desc = "SiI3112A SATA controller";
+>> +    set_bit(DEVICE_CATEGORY_STORAGE, dc->categories);
+>> +}
+>> +
+>> +static const TypeInfo sii3112_pci_info = {
+>> +    .name = TYPE_SII3112_PCI,
+>> +    .parent = TYPE_PCI_IDE,
+>> +    .instance_size = sizeof(SiI3112PCIState),
+>> +    .class_init = sii3112_pci_class_init,
+>> +};
+>> +
+>> +static void sii3112_register_types(void)
+>> +{
+>> +    type_register_static(&sii3112_pci_info);
+>> +}
+>> +
+>> +type_init(sii3112_register_types)
+>> diff --git a/hw/ide/trace-events b/hw/ide/trace-events
+>> index 601bd97..0c39cab 100644
+>> --- a/hw/ide/trace-events
+>> +++ b/hw/ide/trace-events
+>> @@ -37,6 +37,11 @@ bmdma_addr_write(uint64_t data) "data: 0x%016"PRIx64
+>>  bmdma_read(uint64_t addr, uint8_t val) "bmdma: readb 0x%"PRIx64" : 0x%02x"
+>>  bmdma_write(uint64_t addr, uint64_t val) "bmdma: writeb 0x%"PRIx64" : 0x%02"PRIx64
 >>
-
-You have ignored this one. Michael said it's the default for the whole
-spec, but I still don't know where is this requirement to be found
-in the spec.
-
->> Halil
+>> +# hw/ide/sii3112.c
+>> +sii3112_read(int size, uint64_t addr, uint64_t val) "bmdma: read (size %d) 0x%"PRIx64" : 0x%02"PRIx64
+>> +sii3112_write(int size, uint64_t addr, uint64_t val) "bmdma: write (size %d) 0x%"PRIx64" : 0x%02"PRIx64
+>> +sii3112_set_irq(int channel, int level) "channel %d level %d"
+>> +
+>>  # hw/ide/via.c
+>>  bmdma_read_via(uint64_t addr, uint32_t val) "bmdma: readb 0x%"PRIx64" : 0x%02x"
+>>  bmdma_write_via(uint64_t addr, uint64_t val) "bmdma: writeb 0x%"PRIx64" : 0x%02"PRIx64
+>> --
+>> 2.7.6
 >>
->>
->> ---------------------------------------------------------------------
->> To unsubscribe, e-mail: virtio-dev-unsubscribe@lists.oasis-open.org
->> For additional commands, e-mail: virtio-dev-help@lists.oasis-open.org
->>
->>
->> .
->>
-> 
-> 
+>
+>
