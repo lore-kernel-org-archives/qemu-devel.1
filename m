@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45910)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45918)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1eQq2q-00086I-01
+	(envelope-from <dgibson@ozlabs.org>) id 1eQq2q-00086Y-Mo
 	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 02:41:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1eQq2l-0007vG-UO
+	(envelope-from <dgibson@ozlabs.org>) id 1eQq2m-0007vc-NW
 	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 02:41:04 -0500
-Received: from ozlabs.org ([103.22.144.67]:50031)
+Received: from ozlabs.org ([103.22.144.67]:36765)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgibson@ozlabs.org>) id 1eQq2l-0007tc-91
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 02:40:59 -0500
-Date: Mon, 18 Dec 2017 17:14:42 +1100
+	(Exim 4.71) (envelope-from <dgibson@ozlabs.org>) id 1eQq2k-0007te-VX
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 02:41:00 -0500
+Date: Mon, 18 Dec 2017 16:41:32 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20171218061442.GW7753@umbus.fritz.box>
+Message-ID: <20171218054132.GV7753@umbus.fritz.box>
 References: <1509710516-21084-1-git-send-email-yi.l.liu@linux.intel.com>
 	<1509710516-21084-3-git-send-email-yi.l.liu@linux.intel.com>
 	<20171113055601.GE1014@umbus.fritz.box>
 	<20171113082845.GA10932@xz-mi>
 	<20171114005934.GD32308@umbus.fritz.box>
-	<20171116085709.GA5072@sky-dev>
+	<20171114033100.GA6821@xz-mi>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="hSsVBZHIO2Q9XETc"
+	protocol="application/pgp-signature"; boundary="xVUAO+xN0VJlKSe3"
 Content-Disposition: inline
-In-Reply-To: <20171116085709.GA5072@sky-dev>
+In-Reply-To: <20171114033100.GA6821@xz-mi>
 Subject: Re: [Qemu-devel] [RESEND PATCH 2/6] memory: introduce
  AddressSpaceOps and IOMMUObject
 List-Id: <qemu-devel.nongnu.org>
@@ -33,18 +33,19 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Liu, Yi L" <yi.l.liu@linux.intel.com>
-Cc: Peter Xu <peterx@redhat.com>, tianyu.lan@intel.com, kevin.tian@intel.com, yi.l.liu@intel.com, mst@redhat.com, jasowang@redhat.com, qemu-devel@nongnu.org, alex.williamson@redhat.com, pbonzini@redhat.com
+To: Peter Xu <peterx@redhat.com>
+Cc: "Liu, Yi L" <yi.l.liu@linux.intel.com>, qemu-devel@nongnu.org, mst@redhat.com, pbonzini@redhat.com, alex.williamson@redhat.com, tianyu.lan@intel.com, yi.l.liu@intel.com, kevin.tian@intel.com, jasowang@redhat.com
 
 
---hSsVBZHIO2Q9XETc
+--xVUAO+xN0VJlKSe3
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Nov 16, 2017 at 04:57:09PM +0800, Liu, Yi L wrote:
-> Hi David,
->=20
+Sorry I've taken so long to reply, I've been super busy with other
+things.
+
+On Tue, Nov 14, 2017 at 11:31:00AM +0800, Peter Xu wrote:
 > On Tue, Nov 14, 2017 at 11:59:34AM +1100, David Gibson wrote:
 > > On Mon, Nov 13, 2017 at 04:28:45PM +0800, Peter Xu wrote:
 > > > On Mon, Nov 13, 2017 at 04:56:01PM +1100, David Gibson wrote:
@@ -107,7 +108,24 @@ see
 > > to be included in the same bundle of silicon.  It only cares what the
 > > behaviour is.  What behavioural characteristics does a single
 > > IOMMUObject have?
-> >=20
+>=20
+> In VT-d (I believe the same to ARM SMMUs), IMHO the special thing is
+> that the translation windows (and device address spaces in QEMU) are
+> only talking about second level translations, but not first level,
+> while virt-svm needs to play with first level translations.  Until
+> now, AFAIU we don't really have a good interface for first level
+> translations at all (aka. the process address space).
+
+Ok, that explains why you need some kind of different model than the
+existing one, but that wasn't really disputed.  It still doesn't say
+why separating the unclearly defined IOMMUObject from the IOMMU MR is
+a good way of modelling this.
+
+If the issue is 1st vs. 2nd level translation, it really seems you
+should be explicitly modelling the different 1st level vs. 2nd level
+address spaces, rather than just splitting functions between the MR
+and AS level with no clear rationale behind what goes where.
+
 > > > IIRC one issue left over during last time's discussion was that there
 > > > could be more complicated IOMMU models. E.g., one device's DMA request
 > > > can be translated nestedly by two or multiple IOMMUs, and current
@@ -128,109 +146,80 @@ see
 > >=20
 > > On POWER - or rather the "pseries" platform, which is paravirtualized.
 > > We can have multiple vIOMMU windows (usually 2) for a single virtual
->=20
-> On POWER, the DMA isolation is done by allocating different DMA window
-> to different isolation domains? And a single isolation domain may include
-> multiple dma windows? So with or withou IOMMU, there is only a single
-> DMA address shared by all the devices in the system? The isolation=20
-> mechanism is as what described above?
-
-No, the multiple windows are completely unrelated to how things are
-isolated.
-
-Just like on x86, each IOMMU domain has independent IOMMU mappings.
-The only difference is that IBM calls the domains "partitionable
-endpoints" (PEs) and they tend to be statically created at boot time,
-rather than runtime generated.
-
-The windows are about what addresses in PCI space are translated by
-the IOMMU.  If the device generates a PCI cycle, only certain
-addresses will be mapped by the IOMMU to DMA - other addresses will
-correspond to other devices MMIOs, MSI vectors, maybe other things.
-
-The set of addresses translated by the IOMMU need not be contiguous.
-Or, there could be two IOMMUs on the bus, each accepting different
-address ranges.  These two situations are not distinguishable from the
-guest's point of view.
-
-So for a typical PAPR setup, the device can access system RAM either
-via DMA in the range 0..1GiB (the "32-bit window") or in the range
-2^59..2^59+<something> (the "64-bit window").  Typically the 32-bit
-window has mappings dynamically created by drivers, and the 64-bit
-window has all of system RAM mapped 1:1, but that's entirely up to the
-OS, it can map each window however it wants.
-
-32-bit devices (or "64 bit" devices which don't actually implement
-enough the address bits) will only be able to use the 32-bit window,
-of course.
-
-MMIOs of other devices, the "magic" MSI-X addresses belonging to the
-host bridge and other things exist outside those ranges.  Those are
-just the ranges which are used to DMA to RAM.
-
-Each PE (domain) can see a different version of what's in each
-window.
-
-In fact, if I understand the "IO hole" correctly, the situation on x86
-isn't very different.  It has a window below the IO hole and a second
-window above the IO hole.  The addresses within the IO hole go to
-(32-bit) devices on the PCI bus, rather than being translated by the
-IOMMU to RAM addresses.  Because the gap is smaller between the two
-windows, I think we get away without really modelling this detail in
-qemu though.
-
 > > PCI host bridge.  Because of the paravirtualization, the mapping to
 > > hardware is fuzzy, but for passthrough devices they will both be
 > > implemented by the IOMMU built into the physical host bridge.  That
 > > isn't importat to the guest, though - all operations happen at the
 > > window level.
 >=20
-> On VT-d, with IOMMU presented, each isolation domain has its own address
-> space. That's why we talked more on address space level. And iommu makes
-> the difference. That's the behavioural characteristics a single iommu
-> translation unit has. And thus an IOMMUObject going to have.
-
-Right, that's the same on POWER.  But the IOMMU only translates *some*
-addresses within the address space, not all of them.  The rest will go
-to other PCI devices or be unmapped, but won't go to RAM.
-
-That's why the IOMMU should really be associated with an MR (or
-several MRs), not an AddressSpace, it only translates some addresses.
-
-> > The other thing that bothers me here is the way it's attached to an
-> > AddressSpace.
+> Now I know that for Power it may not have anything like a "translation
+> unit" but everything is defined as "translation windows" in the
+> guests.  However the problem still exist for some other platforms.
+> Say, for Intel we have emulated VT-d; for ARM, we have vSMMU.  AFAIU
+> these platforms do have their translation units, and even for ARM it
+> should need such an interface (or any better interfaces, which are
+> always welcomed) for virt-svm to work.  Otherwise I don't know a way
+> to configure the first level translation tables.
 >=20
-> My consideration is iommu handles AddressSpaces. dma address space is also
-> an address space managed by iommu.
+> Meanwhile, IMO this abstraction should not really affect pseries - it
+> should be only useful for those platforms who would like to use it.
+> For pseries, we can just ignore that new interface if we don't really
+> even have such a translation unit.
 
-No, it's not.  It's a region (or several) within the overall PCI
-address space.  Other things in the addressspace, such as other
-device's BARs exist independent of the IOMMU.
+But it's _still_ not clear to me what a "translation unit" means.
+What is common across a translation unit that is not common across
+different translation units?
 
-It's not something that could really work with PCI-E, I think, but
-with a more traditional PCI bus there's no reason you couldn't have
-multiple IOMMUs listening on different regions of the PCI address
-space.
-
-> That's why we believe it is fine to
-> associate dma address space with an IOMMUObject.
-
-> >  IIUC how SVM works, the whole point is that the device
+>=20
+> >=20
+> > The other thing that bothers me here is the way it's attached to an
+> > AddressSpace.  IIUC how SVM works, the whole point is that the device
 > > no longer writes into a specific PCI address space.  Instead, it
 > > writes directly into a process address space.  So it seems to me more
 > > that SVM should operate at the PCI level, and disassociate the device
 > > from the normal PCI address space entirely, rather than hooking up
 > > something via that address space.
 >=20
-> As Peter replied, we still need the PCI address space, it would be used
-> to build up the 2nd level page table which would be used in nested
-> translation.
+> IMO the PCI address space is still used.  For virt-svm, host IOMMU
+> will be working in nested translation mode, so we should be having two
+> mappings working in parallel:
 >=20
-> Thanks,
-> Yi L
+>   1. DPDK process (in guest) address space mapping (GVA -> GPA)
+>   2. guest direct memory mappings (GPA -> HPA)
 >=20
-> >=20
->=20
+> And here AFAIU the 2nd mapping is working exactly like general PCI
+> devices, the only difference is that the 2nd level mapping is always
+> static, just like when IOMMU passthrough is enabled for that device.
+
+Ok.  IIUC the 2nd level mapping isn't visible to the guest, is that
+right?
+
+But this doesn't really affect my point - from the guest's point of
+view, the "usual" address space for a PCI device is equal to the GPA
+(i.e. no guest visible translation), but for SVM devices they instead
+use an SVM address space depending on the process id, which is not the
+same as the GPA space.
+
+> So, IMHO virt-SVM is not really in parallel with PCI subsystem.
+
+Well, it's not clear to me if it's in parallel to, or on top of.  But
+the crucial point is that an SVM device does not access the "main" PCI
+address space (whether or not that has a traditional IOMMU).  Instead
+it has access to a bunch of different address spaces, one for each
+process ID.
+
+> For
+> the SVM in guest, it may be different, since it should only be using
+> first level translations.  However to implement virt-SVM, IMHO we not
+> only need existing PCI address space translation logic, we also need
+> an extra way to configure the first level mappings, as discussed.
+
+Right.  I'm not disputing that a way to configure those first level
+mappings is necessary.  The proposed model just doesn't seem a good
+fit.  It still only represents a single "PCI address space", then
+attaches things about the process table mapping to that, when in fact
+they affect the process table and therefore *different* address spaces
+=66rom that which the methods are attached to.
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -238,24 +227,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---hSsVBZHIO2Q9XETc
+--xVUAO+xN0VJlKSe3
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlo3XNAACgkQbDjKyiDZ
-s5IlnhAA1a3rx7loQV9gJ735jJ+HZNGiuCwKKBOKauH/UqiIiIiGXEeCyPGmdrWN
-xyUAzZMw4JrLMG2CloOuSByyBxNRHoYxy+dwbTu3pULtRdFLv0r3hYOmBtW/YdTB
-STURUF50n/h/HLVo4FCyF3ETyQpxJ+7MHJL3q/j5NMivbIF5wt4VlsZSKpDgN3Wd
-RXaTK1gHDlR9cbAPXOst7wrnkD2NTATFArQfzkS4XZ2wmgEC+H9jVlFhbsBZfWnv
-Lf6bdJRAr0P8UU8x6Bt1rcV1hMi7E3DVxrIBU5JJH+YArJLn6rJ/JIjPpHp2CSLG
-jDcQvNshXye5c5iDVK9eghzrEyMk4BCPETNUAp8e8exFlLPuP9Z2CqKgMv020uju
-7r4uH0hvGNC+iZ6ItlFATs/PVvBaT9dqP771aisLrW4HfY04tfl8kFkRZWSuQlz4
-cRWpSfmjVGG8Anh9zQFbW8w6RZTVX2hznR48/q0uwaJ09WVmwwMGkhXY17R1Tyb+
-iCG56dMzfgq0Z394tzDJot7ts0uETiQhqiDgG8gN2J+GK/ZgQs57x1sKPRCORD3A
-DiZArDDGc85coQ0VEGzAij526afkeU4IsJpbipjkPb0vNXzlEsOxoRX4qk5u1jVc
-uibooGMnZ1GpmJB461GnmNtuk/dK9yiyWB6Q/5mAHYm+cWYuPG0=
-=GVdR
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlo3VQoACgkQbDjKyiDZ
+s5IgqhAAn/EgJer90QZq8XG2qGsTlqw9E2YtGDTOh2hfz+1i2apMkS5AUTahlmwP
+rDMnzyX9kYAT4dViYGf59e0ezB6nnFHj1m/01t5Urh1IXbC/fOONMfW0SLtSyK0X
+LQZ9zWBGItC+0DDpTYJhCaJGxDRq5YCRsAtzdBt8hzVaAlMZnAsCfqPYwUOEnb5V
+zpArdTJ6zLP/EmzCdh44uhcWfl+2ovnwa+bhgOUXggCAC5WHWz5dki7NvAwkZU5I
+Yh3vZAIdze6TwpB8ZgDsIepWb4MM6892OnoCbG7z76c6AS2JdoZv0KwwXN7z2shi
+YZgt8CNUXLIHes2saoGuszUgMK29sejCmM86GcHiZ2DDJcKG4vAV4OSjusyu5pPh
+ve67mfUkZ6wd1DQZct5MuS9eVAe3uBNuFtKROBBVcBrkQWyogixZABB7cauYXSJ5
+kukSk2Dpe40yKSbIntcsAwoRQIlzJG+C4EzEoRmjESbR94ZoFFYNMvix56Tb/ZW/
+PXEsSLyEg+pQNIkeKg8EOnRPKv1RLemEA2nkR56608UIAXEGD7dlTp14t8/HnnSF
+pb4sHo6hDQlS+Muieg6y9mM+73m/gHAjw71rZPezEYkPecJJTjRfiZqnn+zCnLYz
+x9bhFJAbdbW7NxBVQhhaKEWSE3xLsyKS0iBpOBs6H1RPmKTXP9Q=
+=CuQX
 -----END PGP SIGNATURE-----
 
---hSsVBZHIO2Q9XETc--
+--xVUAO+xN0VJlKSe3--
