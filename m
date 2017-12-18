@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43163)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43660)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eR22e-0001AY-AS
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 15:29:46 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1eR22x-0001O4-H9
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 15:30:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eR22Z-0001Ep-Tv
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 15:29:40 -0500
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20171218173022.18418-1-richard.henderson@linaro.org>
-	<20171218173022.18418-7-richard.henderson@linaro.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <7c447107-e135-74bc-dd18-31789fb86a6d@amsat.org>
-Date: Mon, 18 Dec 2017 17:29:25 -0300
+	(envelope-from <dgilbert@redhat.com>) id 1eR22u-0001Ym-00
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 15:29:59 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:11268)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1eR22t-0001Y8-PZ
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 15:29:55 -0500
+Date: Mon, 18 Dec 2017 20:29:46 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20171218202946.GE2440@work-vm>
+References: <20171213180807.7066-1-dgilbert@redhat.com>
+	<20171213180807.7066-5-dgilbert@redhat.com>
+	<20171214162731.50a95633@redhat.com>
+	<20171214204310-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20171218173022.18418-7-richard.henderson@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH 6/9] vmstate: Add
- VMSTATE_UINT64_SUB_ARRAY
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20171214204310-mutt-send-email-mst@kernel.org>
+Subject: Re: [Qemu-devel] [PATCH v4 4/6] vhost: add regions to temporary list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,53 +29,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, qemu-arm@nongnu.org
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org, pbonzini@redhat.com, maxime.coquelin@redhat.com, groug@kaod.org
 
-On 12/18/2017 02:30 PM, Richard Henderson wrote:
-> At the same time, move VMSTATE_UINT32_SUB_ARRAY
-> beside the other UINT32 definitions.
+* Michael S. Tsirkin (mst@redhat.com) wrote:
+> On Thu, Dec 14, 2017 at 04:27:31PM +0100, Igor Mammedov wrote:
+> > Also it seems that we have a race in current code where
+> > region_del() unrefs memory region first and then by the
+> > commit time memory region could be gone since old flatview
+> > is unreffed before commit callback is called, but guest still
+> > uses old memory map until vhost_set_mem_table() is complete.
+> > We probably should unref deleted(old) sections after
+> > guest gets new memmap.
 > 
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> Care trying to post a patch for stable? Might be a good idea
+> to merge before this rework, for the sake of downstreams.
 
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+I think the 1st patch of my v5 might be suitable for that; please
+have a look.
 
-> ---
->  include/migration/vmstate.h | 9 ++++++---
->  1 file changed, 6 insertions(+), 3 deletions(-)
-> 
-> diff --git a/include/migration/vmstate.h b/include/migration/vmstate.h
-> index 88b55df5ae..8c3889433c 100644
-> --- a/include/migration/vmstate.h
-> +++ b/include/migration/vmstate.h
-> @@ -905,6 +905,9 @@ extern const VMStateInfo vmstate_info_qtailq;
->  #define VMSTATE_UINT32_ARRAY(_f, _s, _n)                              \
->      VMSTATE_UINT32_ARRAY_V(_f, _s, _n, 0)
->  
-> +#define VMSTATE_UINT32_SUB_ARRAY(_f, _s, _start, _num)                \
-> +    VMSTATE_SUB_ARRAY(_f, _s, _start, _num, 0, vmstate_info_uint32, uint32_t)
-> +
->  #define VMSTATE_UINT32_2DARRAY(_f, _s, _n1, _n2)                      \
->      VMSTATE_UINT32_2DARRAY_V(_f, _s, _n1, _n2, 0)
->  
-> @@ -914,6 +917,9 @@ extern const VMStateInfo vmstate_info_qtailq;
->  #define VMSTATE_UINT64_ARRAY(_f, _s, _n)                              \
->      VMSTATE_UINT64_ARRAY_V(_f, _s, _n, 0)
->  
-> +#define VMSTATE_UINT64_SUB_ARRAY(_f, _s, _start, _num)                \
-> +    VMSTATE_SUB_ARRAY(_f, _s, _start, _num, 0, vmstate_info_uint64, uint64_t)
-> +
->  #define VMSTATE_UINT64_2DARRAY(_f, _s, _n1, _n2)                      \
->      VMSTATE_UINT64_2DARRAY_V(_f, _s, _n1, _n2, 0)
->  
-> @@ -932,9 +938,6 @@ extern const VMStateInfo vmstate_info_qtailq;
->  #define VMSTATE_INT32_ARRAY(_f, _s, _n)                               \
->      VMSTATE_INT32_ARRAY_V(_f, _s, _n, 0)
->  
-> -#define VMSTATE_UINT32_SUB_ARRAY(_f, _s, _start, _num)                \
-> -    VMSTATE_SUB_ARRAY(_f, _s, _start, _num, 0, vmstate_info_uint32, uint32_t)
-> -
->  #define VMSTATE_INT64_ARRAY_V(_f, _s, _n, _v)                         \
->      VMSTATE_ARRAY(_f, _s, _n, _v, vmstate_info_int64, int64_t)
->  
-> 
+Dave
+
+> > 
+> > >  }
+> > >  
+> > >  static int vhost_virtqueue_set_addr(struct vhost_dev *dev,
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
