@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46086)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46111)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1eQwXO-00079w-Nz
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 09:37:03 -0500
+	(envelope-from <stefanha@redhat.com>) id 1eQwXQ-0007BK-61
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 09:37:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1eQwXL-0007VN-Fj
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 09:37:02 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:49440)
+	(envelope-from <stefanha@redhat.com>) id 1eQwXP-0007az-BA
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 09:37:04 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:60566)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1eQwXL-0007Ua-8w
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 09:36:59 -0500
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1eQwXP-0007Zk-4c
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 09:37:03 -0500
 From: Stefan Hajnoczi <stefanha@redhat.com>
-Date: Mon, 18 Dec 2017 14:35:24 +0000
-Message-Id: <20171218143530.12082-18-stefanha@redhat.com>
+Date: Mon, 18 Dec 2017 14:35:25 +0000
+Message-Id: <20171218143530.12082-19-stefanha@redhat.com>
 In-Reply-To: <20171218143530.12082-1-stefanha@redhat.com>
 References: <20171218143530.12082-1-stefanha@redhat.com>
-Subject: [Qemu-devel] [PULL 17/23] virtio-blk: reject configs with logical
- block size > physical block size
+Subject: [Qemu-devel] [PULL 18/23] block: avoid recursive AioContext acquire
+ in bdrv_inactivate_all()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,47 +25,72 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Mark Kanda <mark.kanda@oracle.com>, Stefan Hajnoczi <stefanha@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
-From: Mark Kanda <mark.kanda@oracle.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
 
-virtio-blk logical block size should never be larger than physical block
-size because it doesn't make sense to have such configurations. QEMU doesn't
-have a way to effectively express this condition; the best it can do is
-report the physical block exponent as 0 - indicating the logical block size
-equals the physical block size.
+BDRV_POLL_WHILE() does not support recursive AioContext locking.  It
+only releases the AioContext lock once regardless of how many times the
+caller has acquired it.  This results in a hang since the IOThread does
+not make progress while the AioContext is still locked.
 
-This is identical to commit 3da023b5827543ee4c022986ea2ad9d1274410b2
-but applied to virtio-blk (instead of virtio-scsi).
+The following steps trigger the hang:
 
-Signed-off-by: Mark Kanda <mark.kanda@oracle.com>
-Reviewed-by: Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
-Reviewed-by: Ameya More <ameya.more@oracle.com>
-Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-Message-id: 773169891f9f2deb4cb7c4ef2655580dbe24c1d1.1513005190.git.mark.kanda@oracle.com
+  $ qemu-system-x86_64 -M accel=kvm -m 1G -cpu host \
+                       -object iothread,id=iothread0 \
+                       -device virtio-scsi-pci,iothread=iothread0 \
+                       -drive if=none,id=drive0,file=test.img,format=raw \
+                       -device scsi-hd,drive=drive0 \
+                       -drive if=none,id=drive1,file=test.img,format=raw \
+                       -device scsi-hd,drive=drive1
+  $ qemu-system-x86_64 ...same options... \
+                       -incoming tcp::1234
+  (qemu) migrate tcp:127.0.0.1:1234
+  ...hang...
+
+Tested-by: Stefan Hajnoczi <stefanha@redhat.com>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+Message-id: 20171207201320.19284-2-stefanha@redhat.com
 Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
 ---
- hw/block/virtio-blk.c | 7 +++++++
- 1 file changed, 7 insertions(+)
+ block.c | 14 +++++++++++---
+ 1 file changed, 11 insertions(+), 3 deletions(-)
 
-diff --git a/hw/block/virtio-blk.c b/hw/block/virtio-blk.c
-index d8cfdc81f6..58a5def75d 100644
---- a/hw/block/virtio-blk.c
-+++ b/hw/block/virtio-blk.c
-@@ -948,6 +948,13 @@ static void virtio_blk_device_realize(DeviceState *dev, Error **errp)
+diff --git a/block.c b/block.c
+index 9a1a0d1e73..1c37ce4554 100644
+--- a/block.c
++++ b/block.c
+@@ -4320,9 +4320,15 @@ int bdrv_inactivate_all(void)
+     BdrvNextIterator it;
+     int ret = 0;
+     int pass;
++    GSList *aio_ctxs = NULL, *ctx;
  
-     blkconf_blocksizes(&conf->conf);
- 
-+    if (conf->conf.logical_block_size >
-+        conf->conf.physical_block_size) {
-+        error_setg(errp,
-+                   "logical_block_size > physical_block_size not supported");
-+        return;
-+    }
+     for (bs = bdrv_first(&it); bs; bs = bdrv_next(&it)) {
+-        aio_context_acquire(bdrv_get_aio_context(bs));
++        AioContext *aio_context = bdrv_get_aio_context(bs);
 +
-     virtio_init(vdev, "virtio-blk", VIRTIO_ID_BLOCK,
-                 sizeof(struct virtio_blk_config));
++        if (!g_slist_find(aio_ctxs, aio_context)) {
++            aio_ctxs = g_slist_prepend(aio_ctxs, aio_context);
++            aio_context_acquire(aio_context);
++        }
+     }
  
+     /* We do two passes of inactivation. The first pass calls to drivers'
+@@ -4340,9 +4346,11 @@ int bdrv_inactivate_all(void)
+     }
+ 
+ out:
+-    for (bs = bdrv_first(&it); bs; bs = bdrv_next(&it)) {
+-        aio_context_release(bdrv_get_aio_context(bs));
++    for (ctx = aio_ctxs; ctx != NULL; ctx = ctx->next) {
++        AioContext *aio_context = ctx->data;
++        aio_context_release(aio_context);
+     }
++    g_slist_free(aio_ctxs);
+ 
+     return ret;
+ }
 -- 
 2.14.3
