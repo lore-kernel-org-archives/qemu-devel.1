@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48729)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48796)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1eQsrV-00036n-Gm
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 05:41:34 -0500
+	(envelope-from <groug@kaod.org>) id 1eQsrd-0003Bs-Np
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 05:41:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1eQsrR-0002OH-15
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 05:41:33 -0500
-Received: from 20.mo1.mail-out.ovh.net ([188.165.45.168]:33037)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1eQsrQ-0002Jy-NG
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 05:41:28 -0500
+	(envelope-from <groug@kaod.org>) id 1eQsrY-0002i3-QJ
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 05:41:41 -0500
+Received: from 17.mo1.mail-out.ovh.net ([87.98.179.142]:59409)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <groug@kaod.org>) id 1eQsrY-0002fG-FX
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 05:41:36 -0500
 Received: from player691.ha.ovh.net (gw6.ovh.net [213.251.189.206])
-	by mo1.mail-out.ovh.net (Postfix) with ESMTP id 6430AB2641
-	for <qemu-devel@nongnu.org>; Mon, 18 Dec 2017 11:41:26 +0100 (CET)
+	by mo1.mail-out.ovh.net (Postfix) with ESMTP id B8998B253A
+	for <qemu-devel@nongnu.org>; Mon, 18 Dec 2017 11:41:34 +0100 (CET)
 From: Greg Kurz <groug@kaod.org>
-Date: Mon, 18 Dec 2017 11:41:23 +0100
-Message-ID: <151359368310.6820.9701358868942550883.stgit@bahia.lan>
+Date: Mon, 18 Dec 2017 11:41:31 +0100
+Message-ID: <151359369131.6820.6589067560403425412.stgit@bahia.lan>
 In-Reply-To: <151359366858.6820.6567549632253797169.stgit@bahia.lan>
 References: <151359366858.6820.6567549632253797169.stgit@bahia.lan>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [PATCH v3 1/2] 9pfs: allow PDU to complete without
- sending a reply
+Subject: [Qemu-devel] [PATCH v3 2/2] 9pfs: Correctly handle cancelled
+ requests
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,152 +33,144 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Greg Kurz <groug@kaod.org>, Stefano Stabellini <sstabellini@kernel.org>, keno@juliacomputing.com
 
-The 9p protocol mostly relies on a request/reply dialog between the
-client and the server. A notable exception to this rule is request
-cancellation (ie, flush in 9p wording): the server shouldn't send a
-reply when the request was flushed.
+From: Keno Fischer <keno@juliacomputing.com>
 
-This patch changes the transport API so that the core 9p code may
-choose to discard a reply instead of pushing it back to the client.
-As a consequence, the push_and_notify naming isn't quite appropriate
-anymore. And by the way, this operation also frees ring descriptors
-allocated by the transport, ie, finalizes the completion of the PDU
-in the transport layer. It is hence renamed to pdu_complete.
+# Background
 
-This will be used by a subsequent patch to fix request cancellation.
+I was investigating spurious non-deterministic EINTR returns from
+various 9p file system operations in a Linux guest served from the
+qemu 9p server.
 
+ ## EINTR, ERESTARTSYS and the linux kernel
+
+When a signal arrives that the Linux kernel needs to deliver to user-space
+while a given thread is blocked (in the 9p case waiting for a reply to its
+request in 9p_client_rpc -> wait_event_interruptible), it asks whatever
+driver is currently running to abort its current operation (in the 9p case
+causing the submission of a TFLUSH message) and return to user space.
+In these situations, the error message reported is generally ERESTARTSYS.
+If the userspace processes specified SA_RESTART, this means that the
+system call will get restarted upon completion of the signal handler
+delivery (assuming the signal handler doesn't modify the process state
+in complicated ways not relevant here). If SA_RESTART is not specified,
+ERESTARTSYS gets translated to EINTR and user space is expected to handle
+the restart itself.
+
+ ## The 9p TFLUSH command
+
+The 9p TFLUSH commands requests that the server abort an ongoing operation.
+The man page [1] specifies:
+
+```
+If it recognizes oldtag as the tag of a pending transaction, it should abort any
+pending response and discard that tag.
+[...]
+When the client sends a Tflush, it must wait to receive the corresponding Rflush
+before reusing oldtag for subsequent messages. If a response to the flushed request
+is received before the Rflush, the client must honor the response as if it had not
+been flushed, since the completed request may signify a state change in the server
+```
+
+In particular, this means that the server must not send a reply with the orignal
+tag in response to the cancellation request, because the client is obligated
+to interpret such a reply as a coincidental reply to the original request.
+
+ # The bug
+
+When qemu receives a TFlush request, it sets the `cancelled` flag on the relevant
+pdu. This flag is periodically checked, e.g. in `v9fs_co_name_to_path`, and if
+set, the operation is aborted and the error is set to EINTR. However, the server
+then violates the spec, by returning to the client an Rerror response, rather
+than discarding the message entirely. As a result, the client is required
+to assume that said Rerror response is a result of the original request, not
+a result of the cancellation and thus passes the EINTR error back to user space.
+This is not the worst thing it could do, however as discussed above, the correct
+error code would have been ERESTARTSYS, such that user space programs with
+SA_RESTART set get correctly restarted upon completion of the signal handler.
+Instead, such programs get spurious EINTR results that they were not expecting
+to handle.
+
+It should be noted that there are plenty of user space programs that do not
+set SA_RESTART and do not correctly handle EINTR either. However, that is then
+a userspace bug. It should also be noted that this bug has been mitigated by
+a recent commit to the Linux kernel [2], which essentially prevents the kernel
+from sending Tflush requests unless the process is about to die (in which case
+the process likely doesn't care about the response). Nevertheless, for older
+kernels and to comply with the spec, I believe this change is beneficial.
+
+ # Implementation
+
+The fix is fairly simple, just skipping notification of a reply if
+the pdu was previously cancelled. We do however, also notify the transport
+layer that we're doing this, so it can clean up any resources it may be
+holding. I also added a new trace event to distinguish
+operations that caused an error reply from those that were cancelled.
+
+One complication is that we only omit sending the message on EINTR errors in
+order to avoid confusing the rest of the code (which may assume that a
+client knows about a fid if it sucessfully passed it off to pud_complete
+without checking for cancellation status). This does mean that if the server
+acts upon the cancellation flag, it always needs to set err to EINTR. I believe
+this is true of the current code.
+
+[1] https://9fans.github.io/plan9port/man/man9/flush.html
+[2] https://github.com/torvalds/linux/commit/9523feac272ccad2ad8186ba4fcc89103754de52
+
+Signed-off-by: Keno Fischer <keno@juliacomputing.com>
+Reviewed-by: Greg Kurz <groug@kaod.org>
+[groug, use new pdu_complete transport API]
 Signed-off-by: Greg Kurz <groug@kaod.org>
 ---
- hw/9pfs/9p.c               |   10 +++++-----
- hw/9pfs/9p.h               |    2 +-
- hw/9pfs/virtio-9p-device.c |   11 +++++++----
- hw/9pfs/xen-9p-backend.c   |   14 ++++++++------
- 4 files changed, 21 insertions(+), 16 deletions(-)
+ hw/9pfs/9p.c         |   19 ++++++++++++++++++-
+ hw/9pfs/trace-events |    1 +
+ 2 files changed, 19 insertions(+), 1 deletion(-)
 
 diff --git a/hw/9pfs/9p.c b/hw/9pfs/9p.c
-index 1e4ebbe57687..dd8b7c6d69c6 100644
+index dd8b7c6d69c6..ccbc75265a52 100644
 --- a/hw/9pfs/9p.c
 +++ b/hw/9pfs/9p.c
-@@ -642,7 +642,7 @@ static void coroutine_fn pdu_complete(V9fsPDU *pdu, ssize_t len)
+@@ -630,6 +630,23 @@ static void coroutine_fn pdu_complete(V9fsPDU *pdu, ssize_t len)
+     V9fsState *s = pdu->s;
+     int ret;
  
-             ret = pdu_marshal(pdu, len, "s", &str);
-             if (ret < 0) {
--                goto out_notify;
-+                goto out_complete;
-             }
-             len += ret;
-             id = P9_RERROR;
-@@ -650,7 +650,7 @@ static void coroutine_fn pdu_complete(V9fsPDU *pdu, ssize_t len)
- 
-         ret = pdu_marshal(pdu, len, "d", err);
-         if (ret < 0) {
--            goto out_notify;
-+            goto out_complete;
-         }
-         len += ret;
- 
-@@ -662,15 +662,15 @@ static void coroutine_fn pdu_complete(V9fsPDU *pdu, ssize_t len)
- 
-     /* fill out the header */
-     if (pdu_marshal(pdu, 0, "dbw", (int32_t)len, id, pdu->tag) < 0) {
--        goto out_notify;
++    /*
++     * The 9p spec requires that successfully cancelled pdus receive no reply.
++     * Sending a reply would confuse clients because they would
++     * assume that any EINTR is the actual result of the operation,
++     * rather than a consequence of the cancellation. However, if
++     * the operation completed (succesfully or with an error other
++     * than caused be cancellation), we do send out that reply, both
++     * for efficiency and to avoid confusing the rest of the state machine
++     * that assumes passing a non-error here will mean a successful
++     * transmission of the reply.
++     */
++    bool discard = pdu->cancelled && len == -EINTR;
++    if (discard) {
++        trace_v9fs_rcancel(pdu->tag, pdu->id);
 +        goto out_complete;
-     }
- 
-     /* keep these in sync */
-     pdu->size = len;
++    }
++
+     if (len < 0) {
+         int err = -len;
+         len = 7;
+@@ -670,7 +687,7 @@ static void coroutine_fn pdu_complete(V9fsPDU *pdu, ssize_t len)
      pdu->id = id;
  
--out_notify:
--    pdu->s->transport->push_and_notify(pdu);
-+out_complete:
-+    pdu->s->transport->pdu_complete(pdu, false);
+ out_complete:
+-    pdu->s->transport->pdu_complete(pdu, false);
++    pdu->s->transport->pdu_complete(pdu, discard);
  
      /* Now wakeup anybody waiting in flush for this request */
      if (!qemu_co_queue_next(&pdu->complete)) {
-diff --git a/hw/9pfs/9p.h b/hw/9pfs/9p.h
-index ffe658ab8975..ea7657837784 100644
---- a/hw/9pfs/9p.h
-+++ b/hw/9pfs/9p.h
-@@ -363,7 +363,7 @@ struct V9fsTransport {
-                                         unsigned int *pniov, size_t size);
-     void        (*init_out_iov_from_pdu)(V9fsPDU *pdu, struct iovec **piov,
-                                          unsigned int *pniov, size_t size);
--    void        (*push_and_notify)(V9fsPDU *pdu);
-+    void        (*pdu_complete)(V9fsPDU *pdu, bool discard);
- };
+diff --git a/hw/9pfs/trace-events b/hw/9pfs/trace-events
+index 08a4abf22ea4..1aee350c42f1 100644
+--- a/hw/9pfs/trace-events
++++ b/hw/9pfs/trace-events
+@@ -1,6 +1,7 @@
+ # See docs/devel/tracing.txt for syntax documentation.
  
- static inline int v9fs_register_transport(V9fsState *s, const V9fsTransport *t)
-diff --git a/hw/9pfs/virtio-9p-device.c b/hw/9pfs/virtio-9p-device.c
-index 43f4e53f336f..083df987fd93 100644
---- a/hw/9pfs/virtio-9p-device.c
-+++ b/hw/9pfs/virtio-9p-device.c
-@@ -20,14 +20,17 @@
- #include "hw/virtio/virtio-access.h"
- #include "qemu/iov.h"
- 
--static void virtio_9p_push_and_notify(V9fsPDU *pdu)
-+static void virtio_pdu_complete(V9fsPDU *pdu, bool discard)
- {
-     V9fsState *s = pdu->s;
-     V9fsVirtioState *v = container_of(s, V9fsVirtioState, state);
-     VirtQueueElement *elem = v->elems[pdu->idx];
- 
--    /* push onto queue and notify */
--    virtqueue_push(v->vq, elem, pdu->size);
-+    if (discard) {
-+        virtqueue_detach_element(v->vq, elem, 0);
-+    } else {
-+        virtqueue_push(v->vq, elem, pdu->size);
-+    }
-     g_free(elem);
-     v->elems[pdu->idx] = NULL;
- 
-@@ -189,7 +192,7 @@ static const V9fsTransport virtio_9p_transport = {
-     .pdu_vunmarshal = virtio_pdu_vunmarshal,
-     .init_in_iov_from_pdu = virtio_init_in_iov_from_pdu,
-     .init_out_iov_from_pdu = virtio_init_out_iov_from_pdu,
--    .push_and_notify = virtio_9p_push_and_notify,
-+    .pdu_complete = virtio_pdu_complete,
- };
- 
- static void virtio_9p_device_realize(DeviceState *dev, Error **errp)
-diff --git a/hw/9pfs/xen-9p-backend.c b/hw/9pfs/xen-9p-backend.c
-index df2a4100bf55..dc1e6c88885d 100644
---- a/hw/9pfs/xen-9p-backend.c
-+++ b/hw/9pfs/xen-9p-backend.c
-@@ -210,7 +210,7 @@ static void xen_9pfs_init_in_iov_from_pdu(V9fsPDU *pdu,
-     *pniov = num;
- }
- 
--static void xen_9pfs_push_and_notify(V9fsPDU *pdu)
-+static void xen_9pfs_pdu_complete(V9fsPDU *pdu, bool discard)
- {
-     RING_IDX prod;
-     Xen9pfsDev *priv = container_of(pdu->s, Xen9pfsDev, state);
-@@ -222,10 +222,12 @@ static void xen_9pfs_push_and_notify(V9fsPDU *pdu)
-     ring->intf->out_cons = ring->out_cons;
-     xen_wmb();
- 
--    prod = ring->intf->in_prod;
--    xen_rmb();
--    ring->intf->in_prod = prod + pdu->size;
--    xen_wmb();
-+    if (!discard) {
-+        prod = ring->intf->in_prod;
-+        xen_rmb();
-+        ring->intf->in_prod = prod + pdu->size;
-+        xen_wmb();
-+    }
- 
-     ring->inprogress = false;
-     xenevtchn_notify(ring->evtchndev, ring->local_port);
-@@ -238,7 +240,7 @@ static const V9fsTransport xen_9p_transport = {
-     .pdu_vunmarshal = xen_9pfs_pdu_vunmarshal,
-     .init_in_iov_from_pdu = xen_9pfs_init_in_iov_from_pdu,
-     .init_out_iov_from_pdu = xen_9pfs_init_out_iov_from_pdu,
--    .push_and_notify = xen_9pfs_push_and_notify,
-+    .pdu_complete = xen_9pfs_pdu_complete,
- };
- 
- static int xen_9pfs_init(struct XenDevice *xendev)
+ # hw/9pfs/virtio-9p.c
++v9fs_rcancel(uint16_t tag, uint8_t id) "tag %d id %d"
+ v9fs_rerror(uint16_t tag, uint8_t id, int err) "tag %d id %d err %d"
+ v9fs_version(uint16_t tag, uint8_t id, int32_t msize, char* version) "tag %d id %d msize %d version %s"
+ v9fs_version_return(uint16_t tag, uint8_t id, int32_t msize, char* version) "tag %d id %d msize %d version %s"
