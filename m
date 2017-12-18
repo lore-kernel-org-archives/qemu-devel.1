@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49363)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51019)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jianjay.zhou@huawei.com>) id 1eQkMV-0005WP-MP
-	for qemu-devel@nongnu.org; Sun, 17 Dec 2017 20:37:00 -0500
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1eQkd1-0007zs-Dz
+	for qemu-devel@nongnu.org; Sun, 17 Dec 2017 20:54:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jianjay.zhou@huawei.com>) id 1eQkMS-0000pA-GF
-	for qemu-devel@nongnu.org; Sun, 17 Dec 2017 20:36:59 -0500
-Received: from szxga02-in.huawei.com ([45.249.212.188]:2298 helo=huawei.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jianjay.zhou@huawei.com>)
-	id 1eQkMS-0000dc-58
-	for qemu-devel@nongnu.org; Sun, 17 Dec 2017 20:36:56 -0500
-From: "Zhoujian (jay)" <jianjay.zhou@huawei.com>
-Date: Mon, 18 Dec 2017 01:36:36 +0000
-Message-ID: <B2D15215269B544CADD246097EACE7473AB08FA5@DGGEMM505-MBS.china.huawei.com>
-References: <1511426872-13980-1-git-send-email-jianjay.zhou@huawei.com>
-	<20171205195816.GH2405@work-vm> <20171215122139.GC11724@redhat.com>
-	<20171215151504.GC2358@work-vm>
-In-Reply-To: <20171215151504.GC2358@work-vm>
-Content-Language: zh-CN
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1eQkcw-0004b2-Fl
+	for qemu-devel@nongnu.org; Sun, 17 Dec 2017 20:54:03 -0500
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+References: <cover.1513545944.git.mjt@msgid.tls.msk.ru>
+	<cover.1513548172.git.mjt@msgid.tls.msk.ru>
+	<CAFEAcA9qOtMtct6hND=uOiP_Nv9vaiuR=0NkSvrQQdz0v3FmfA@mail.gmail.com>
+	<26d87055-4c23-6aa1-e55a-fb6a95ece7fd@amsat.org>
+Message-ID: <232ba76b-c42c-ddec-2f90-6eb403a8fee8@amsat.org>
+Date: Sun, 17 Dec 2017 22:53:50 -0300
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH] docs/devel/migration.txt: keep functions
- consistent with the code
+In-Reply-To: <26d87055-4c23-6aa1-e55a-fb6a95ece7fd@amsat.org>
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature";
+	boundary="1gl1SoQBId3d3iLWe6mOMr0Bdje47MrXR"
+Subject: Re: [Qemu-devel] [Qemu-trivial] [PULL v2 00/61] Trivial patches for
+ 2017-12-18
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,45 +31,120 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "quintela@redhat.com" <quintela@redhat.com>, "Huangweidong (C)" <weidong.huang@huawei.com>, "wangxin (U)" <wangxinxin.wang@huawei.com>
+To: Peter Maydell <peter.maydell@linaro.org>, Michael Tokarev <mjt@tls.msk.ru>, Richard Henderson <richard.henderson@linaro.org>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>
+Cc: QEMU Trivial <qemu-trivial@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-> -----Original Message-----
-> From: Dr. David Alan Gilbert [mailto:dgilbert@redhat.com]
-> Sent: Friday, December 15, 2017 11:15 PM
-> To: Daniel P. Berrange <berrange@redhat.com>
-> Cc: Zhoujian (jay) <jianjay.zhou@huawei.com>; qemu-devel@nongnu.org;
-> quintela@redhat.com; Huangweidong (C) <weidong.huang@huawei.com>; wangxin
-> (U) <wangxinxin.wang@huawei.com>
-> Subject: Re: [PATCH] docs/devel/migration.txt: keep functions consistent
-> with the code
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--1gl1SoQBId3d3iLWe6mOMr0Bdje47MrXR
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+To: Peter Maydell <peter.maydell@linaro.org>, Michael Tokarev
+ <mjt@tls.msk.ru>, Richard Henderson <richard.henderson@linaro.org>,
+ =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>
+Cc: QEMU Trivial <qemu-trivial@nongnu.org>,
+ QEMU Developers <qemu-devel@nongnu.org>
+Message-ID: <232ba76b-c42c-ddec-2f90-6eb403a8fee8@amsat.org>
+Subject: Re: [Qemu-trivial] [Qemu-devel] [PULL v2 00/61] Trivial patches for
+ 2017-12-18
+References: <cover.1513545944.git.mjt@msgid.tls.msk.ru>
+ <cover.1513548172.git.mjt@msgid.tls.msk.ru>
+ <CAFEAcA9qOtMtct6hND=uOiP_Nv9vaiuR=0NkSvrQQdz0v3FmfA@mail.gmail.com>
+ <26d87055-4c23-6aa1-e55a-fb6a95ece7fd@amsat.org>
+In-Reply-To: <26d87055-4c23-6aa1-e55a-fb6a95ece7fd@amsat.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+>> I'm afraid this fails 'make check'. (I only tested the
+>> first pullreq but if you only changed signoffs then
+>> it'll still be the same):
+>>
+>> TEST: tests/qom-test... (pid=3D12208)
+>>   /alpha/qom/clipper:
+>> Broken pipe
+>> FAIL
+>> GTester: last random seed: R02S26a31a16d967b2664ad714c1c7f8e7f1
+>> (pid=3D12214)
 >=20
-> * Daniel P. Berrange (berrange@redhat.com) wrote:
-> > On Tue, Dec 05, 2017 at 07:58:16PM +0000, Dr. David Alan Gilbert wrote:
-> > > * Jay Zhou (jianjay.zhou@huawei.com) wrote:
-> > > > Since the commit 11808bb0c422134bf09119f4aa22c59b0ce84bf3 removed
-> > > > the put_buffer callback and using an iovec based write handler
-> > > > instead, the docs should be sync with the code too.
-> > > >
-> > > > Signed-off-by: Jay Zhou <jianjay.zhou@huawei.com>
-> > >
-> > > Lets check with Dan (added to cc) since he wrote 11808bb; it might
-> > > be best just to rever to migration/qemu-file.h for an explanation of
-> > > each function.
-> >
-> > The updates look ok, but I tend to think this entire section of
-> > migrate.txt should be deleted, in favour of the inline APIs
-> > docs in mijgration/qemu-file.h   As a developer the header file
-> > is where I would look for this kind of API description. The
-> > migration.txt can just point epople to the header file for API docs.
-
-Yes, agreed.
-
+> Oops
 >=20
-> OK, I'll do that on top of my rework to rst.
+>>   /alpha/qom/none:                                                    =
+ OK
+>> FAIL: tests/qom-test
+>> TEST: tests/test-hmp... (pid=3D12219)
+>>   /alpha/hmp/clipper:
+>> Broken pipe
+>> FAIL
+>> GTester: last random seed: R02S0c5a0f7de3fc6e9885b740c77c86eef2
+>> (pid=3D12225)
+>>   /alpha/hmp/none:                                                    =
+ OK
+>>   /alpha/hmp/none+2MB:                                                =
+ OK
+>> FAIL: tests/test-hmp
+>>
+>> This is because qemu-system-alpha segfaults on startup:
 >=20
+> My bad...
+>=20
+> eede06dd70f72da489b8f968abbb7cb5445ef834 is the first bad commit
+> Author: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+>=20
+>     hw/alpha/typhoon: simplify using the "unimplemented" sysbus device
+>=20
+> I'm pretty sure I run the qtests, but this was 2 months ago...
+> I'll have a look.
 
-It's OK for me. :)
+This patch is not _trivial_ :| Let's drop it from this tree, I'll have
+to rework it.
+
+> [...]
+>> There was also a minor merge conflict with the tpm pullreq
+>> (both pulls change the #includes in hw/tpm/tpm_tis.c) which
+>> you might fix when you respin.
+>=20
+> Yes, I rebased the 42 patches on /master yesterday but I see you merged=
+
+> the TPM tree in your /staging, so I'll rebase there and resend the
+> offending patches fixed to Michael.
+
+Michael, I removed the "hw/alpha/typhoon" patch, and updated the
+"hw/tpm: remove old i386 dependency" one: no need to modify
+hw/tpm/tpm_tis.c, Marc-Andr=C3=A9 Lureau already cleaned it, I did howeve=
+r
+clean the newly added hw/tpm/tpm_emulator.c file.
+
+The fixed tree is now available signed in the Git repository at:
+
+  github.com:philmd/qemu.git tags/trivial-patches-2017-12-18
+
+If this is OK to you I'll only resend the "hw/tpm: remove old i386
+dependency" on the list, but if you/Peter prefer I can still resend the
+whole enchilada (which is unchanged except this unique patch).
 
 Regards,
-Jay
+
+Phil.
+
+
+--1gl1SoQBId3d3iLWe6mOMr0Bdje47MrXR
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCgAdFiEE+qvnXhKRciHc/Wuy4+MsLN6twN4FAlo3H64ACgkQ4+MsLN6t
+wN6j8Q//S2m3jBqPC/Lu9MyDzuce0MJRmYHeX/PUKC8H4nkYl3KqLFmTpJeKiL8/
+9zNzii/M4tBk0HLUJ+IuINJCOFx5W4lXFsfil9LXpWli44eiesGHWL1QkiMfPS9V
+jraFoJsXMAqim6dtF6HWKinG2sf9E6BKrAXsT9DMaKFp9B6Vxeo98zxu21pwVVSC
+kzZ5JFLp6SHw5uv4jzvD55OEF2k88Fc4h03aa0R3gpUYyw4KkPKpl3DzESOnVpaL
+JMQoIA9lGytEVqxNKVSd8JxM/E73lJbOk6DVrct2pi1ti52t7s7ZzpDgcblynQzD
+Pq/zq7NJZCki9/9KMgr+MM5y33sZdvCeLbsXXiIxqlZnKEjYaGi5F6jeUutzbyzS
+K3tO/RNSmap15EwqMQs0VaeCOIFY0N2k3H47vC/aipTcKUHVquMU+oUqhyNtXKnu
+s/FRD8JGGlCFjPj5UgZzTBs7seUDq22sfVPXd5rmdrQOCLKduuZVwQFGYoFDhPhc
+1/i3B8JGAPonVjBCmCe7qBunrOpXl9dQY0H8rbXFl1+/5XQU1GNs636WtQqexbDB
+liff7f3FOdqeX3dHNVwZAg1iIPmkA9V0ZJ8NN5i61+dBozxa3hG7nYaQYbgUXt7g
+8C/BTr2ZCCBSWOXa+Tw94k+/FzefaPnNLD70CRYAhIQyFVSKwc4=
+=Ewwb
+-----END PGP SIGNATURE-----
+
+--1gl1SoQBId3d3iLWe6mOMr0Bdje47MrXR--
