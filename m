@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57665)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33863)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1eQwKr-0005wX-Fi
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 09:24:08 -0500
+	(envelope-from <stefanha@redhat.com>) id 1eQwO7-0008Ay-Al
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 09:27:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1eQwKo-0001xy-70
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 09:24:05 -0500
-Date: Mon, 18 Dec 2017 14:23:26 +0000
+	(envelope-from <stefanha@redhat.com>) id 1eQwO6-0006ml-Fu
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 09:27:27 -0500
+Date: Mon, 18 Dec 2017 14:27:15 +0000
 From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20171218142326.GJ16653@stefanha-x1.localdomain>
+Message-ID: <20171218142715.GK16653@stefanha-x1.localdomain>
 References: <20171214005953.8898-1-jsnow@redhat.com>
-	<20171214005953.8898-3-jsnow@redhat.com>
+	<20171214005953.8898-4-jsnow@redhat.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="6THr7QwYWIbrk6Kt"
+	protocol="application/pgp-signature"; boundary="Jtds+vpI57xq70EV"
 Content-Disposition: inline
-In-Reply-To: <20171214005953.8898-3-jsnow@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 2/7] blockjob: consolidate SLICE_TIME
- definition
+In-Reply-To: <20171214005953.8898-4-jsnow@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 3/7] blockjob: create block_job_throttle
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,38 +28,39 @@ To: John Snow <jsnow@redhat.com>
 Cc: qemu-block@nongnu.org, kwolf@redhat.com, jcody@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com
 
 
---6THr7QwYWIbrk6Kt
+--Jtds+vpI57xq70EV
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
 
-On Wed, Dec 13, 2017 at 07:59:48PM -0500, John Snow wrote:
-> They're all the same. If it actually becomes important to configure it,
-> it can become a job or driver property.
->=20
-> Signed-off-by: John Snow <jsnow@redhat.com>
-> ---
->  block/backup.c               | 1 -
->  block/commit.c               | 2 --
->  block/mirror.c               | 1 -
->  block/stream.c               | 2 --
->  include/block/blockjob_int.h | 2 ++
->  5 files changed, 2 insertions(+), 6 deletions(-)
+On Wed, Dec 13, 2017 at 07:59:49PM -0500, John Snow wrote:
+> +/**
+> + * block_job_throttle:
+> + * @job: The job that calls the function.
+> + *
+> + * Yield if it has been SLICE_TIME nanoseconds since the last yield.
+> + * Otherwise, check if we need to pause (and update the yield counter).
+> + */
+> +void block_job_throttle(BlockJob *job);
 
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+This name is easily confused with the block-job-set-speed
+ratelimit/throttling feature.
 
---6THr7QwYWIbrk6Kt
+I suggest block_job_cpu_relax() or just block_job_relax() to make it
+clear we're giving up our CPU time voluntarily - but this isn't
+"throttling".
+
+--Jtds+vpI57xq70EV
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEcBAEBAgAGBQJaN89eAAoJEJykq7OBq3PIDiYH/imxONOi5DeA5DNB8vweyZ1a
-b+6fOVSKbqeYTaBbGCZg7jXyFneIcFHSa6L3TBqKGs3YS1EbRLzl+V3Wa7xiS+/Q
-Gzla37DeRIOBNbwwTL5bSPd9f1yqvU5qdSbBO01vSn7AcKiLWftszbxBb6KfWqmi
-eTJXHb+3hgsEw9j0G6XddVl/0A3pBm7I6tn0UpvXiusCpvrj7X0hJWvHk6opjEWR
-oTRIhH1HOAz0zFyn64jystpLPEvX/BJlOOePsOO4+PrcQ8jdQE+jX89D+n0TimWU
-fpzZQX6P1p58YsJ6zECD7qYofGZ7LCKY80Wk9OGmfyI8xSIM5+qZgkcu2kDcWhE=
-=YSL4
+iQEcBAEBAgAGBQJaN9BDAAoJEJykq7OBq3PIgwkH+weZD++NZkg1wXHURpmNL4Hs
+/iD/x6l/0cXJcZzCm4qM2RKKxJFhjCYYMWg1k0VXnk3RrY1QeRNmeGr7gbMxCoC6
+FMOssb436CC/5X9kiwBX5ie2fCj6NCj6/rmgo/w+bWtWOvyfEKcireNcfMtu4F23
+Z6wEk3KmPsTUEa97+NMobpo686jesRU8/Odpyf1Hqf8zJXZTOAEC6x1Tt/soKsIV
+Hr+ddvhFnrO7x3ZDUMk/Lo1aaCm1dXeERdM+POaT+iqOcIU49HCvm4QMisviOl3t
+NHV7f9iwLVRvVVcsUtz1upsVyNrwKihH0ANOm8QBthM9Hj4wr2L4/NQ4pyXWYFY=
+=pHDr
 -----END PGP SIGNATURE-----
 
---6THr7QwYWIbrk6Kt--
+--Jtds+vpI57xq70EV--
