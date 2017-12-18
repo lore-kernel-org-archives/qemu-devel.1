@@ -1,20 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44455)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44321)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1eQzFQ-0002hi-Gg
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 12:30:44 -0500
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1eQzFL-0004jK-6v
+	(envelope-from <richard.henderson@linaro.org>) id 1eQzFK-0002dF-UT
 	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 12:30:40 -0500
-From: Markus Armbruster <armbru@redhat.com>
-Date: Mon, 18 Dec 2017 18:30:16 +0100
-Message-Id: <20171218173023.21417-4-armbru@redhat.com>
-In-Reply-To: <20171218173023.21417-1-armbru@redhat.com>
-References: <20171218173023.21417-1-armbru@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 03/10] qemu-options qemu-doc: Move "Device URL
- Syntax" to qemu-doc
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <richard.henderson@linaro.org>) id 1eQzFG-0004e0-5R
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 12:30:34 -0500
+Received: from mail-pg0-x244.google.com ([2607:f8b0:400e:c05::244]:33264)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1eQzFF-0004cc-DF
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 12:30:29 -0500
+Received: by mail-pg0-x244.google.com with SMTP id g7so9428154pgs.0
+	for <qemu-devel@nongnu.org>; Mon, 18 Dec 2017 09:30:29 -0800 (PST)
+From: Richard Henderson <richard.henderson@linaro.org>
+Date: Mon, 18 Dec 2017 09:30:15 -0800
+Message-Id: <20171218173022.18418-3-richard.henderson@linaro.org>
+In-Reply-To: <20171218173022.18418-1-richard.henderson@linaro.org>
+References: <20171218173022.18418-1-richard.henderson@linaro.org>
+Subject: [Qemu-devel] [PATCH 2/9] target/arm: Use pointers in crypto helpers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,608 +27,629 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Ronnie Sahlberg <ronniesahlberg@gmail.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+Cc: peter.maydell@linaro.org, qemu-arm@nongnu.org
 
-Commit 0f5314a (v1.0) added section "Device URL Syntax" to
-qemu-options.hx.  It's enclosed in STEXI..ETEXI, thus affects only
-qemu-options.texi, not --help.  It appears as a subsection under
-section "Invocation".  Similarly, qemu.1 has it as a subsection under
-"OPTIONS".
+Rather than passing regnos to the helpers, pass pointers to the
+vector registers directly.  This eliminates the need to pass in
+the environment pointer and reduces the number of places that
+directly access env->vfp.regs[].
 
-Commit f9dadc9 (v1.1.0) dropped new option -iscsi into the middle of
-this section.  No effect on qemu-options.texi.  It appears in --help
-run together with the "Bluetooth(R) options:" header.
-
-Commit c70a01e (v1.5.0) gives it is own heading in --help by moving
-commit 0f5314a's DEFHEADING(Device URL Syntax:) outside STEXI..ETEXI.
-Trouble is the heading makes no sense for -iscsi.
-
-Move all of the "Device URL Syntax" Texinfo to qemu-doc.texi.  Mark it
-for inclusion in qemu.1 with '@c man begin NOTES'.  This turns it into
-a separate section outside the list of options both in qemu-doc and in
-qemu.1.
-
-There's substantial overlap with the existing qemu-doc section "Disk
-Images".  Mark with a TODO comment.
-
-Output of --help will be fixed next.
-
-Cc: Ronnie Sahlberg <ronniesahlberg@gmail.com>
-Cc: Kevin Wolf <kwolf@redhat.com>
-Cc: Max Reitz <mreitz@redhat.com>
-Cc: qemu-block@nongnu.org
-Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-Reviewed-by: Ronnie Sahlberg <ronniesahlberg@gmail.com>
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- qemu-doc.texi   | 217 ++++++++++++++++++++++++++++++++++++++++++++++++++=
-++++
- qemu-options.hx | 222 --------------------------------------------------=
-------
- 2 files changed, 217 insertions(+), 222 deletions(-)
+ target/arm/helper.h        |  18 ++---
+ target/arm/crypto_helper.c | 184 +++++++++++++++++----------------------------
+ target/arm/translate-a64.c |  68 +++++++++--------
+ target/arm/translate.c     |  68 +++++++++--------
+ 4 files changed, 154 insertions(+), 184 deletions(-)
 
-diff --git a/qemu-doc.texi b/qemu-doc.texi
-index f7317dfc66..971c0b520e 100644
---- a/qemu-doc.texi
-+++ b/qemu-doc.texi
-@@ -245,6 +245,223 @@ targets do not need a disk image.
-=20
- @c man end
-=20
-+@node device_url
-+@subsection Device URL Syntax
-+@c TODO merge this with section Disk Images
-+
-+@c man begin NOTES
-+
-+In addition to using normal file images for the emulated storage devices=
-,
-+QEMU can also use networked resources such as iSCSI devices. These are
-+specified using a special URL syntax.
-+
-+@table @option
-+@item iSCSI
-+iSCSI support allows QEMU to access iSCSI resources directly and use as
-+images for the guest storage. Both disk and cdrom images are supported.
-+
-+Syntax for specifying iSCSI LUNs is
-+``iscsi://<target-ip>[:<port>]/<target-iqn>/<lun>''
-+
-+By default qemu will use the iSCSI initiator-name
-+'iqn.2008-11.org.linux-kvm[:<name>]' but this can also be set from the c=
-ommand
-+line or a configuration file.
-+
-+Since version Qemu 2.4 it is possible to specify a iSCSI request timeout=
- to detect
-+stalled requests and force a reestablishment of the session. The timeout
-+is specified in seconds. The default is 0 which means no timeout. Libisc=
-si
-+1.15.0 or greater is required for this feature.
-+
-+Example (without authentication):
-+@example
-+qemu-system-i386 -iscsi initiator-name=3Diqn.2001-04.com.example:my-init=
-iator \
-+                 -cdrom iscsi://192.0.2.1/iqn.2001-04.com.example/2 \
-+                 -drive file=3Discsi://192.0.2.1/iqn.2001-04.com.example=
-/1
-+@end example
-+
-+Example (CHAP username/password via URL):
-+@example
-+qemu-system-i386 -drive file=3Discsi://user%password@@192.0.2.1/iqn.2001=
--04.com.example/1
-+@end example
-+
-+Example (CHAP username/password via environment variables):
-+@example
-+LIBISCSI_CHAP_USERNAME=3D"user" \
-+LIBISCSI_CHAP_PASSWORD=3D"password" \
-+qemu-system-i386 -drive file=3Discsi://192.0.2.1/iqn.2001-04.com.example=
-/1
-+@end example
-+
-+@item NBD
-+QEMU supports NBD (Network Block Devices) both using TCP protocol as wel=
-l
-+as Unix Domain Sockets.
-+
-+Syntax for specifying a NBD device using TCP
-+``nbd:<server-ip>:<port>[:exportname=3D<export>]''
-+
-+Syntax for specifying a NBD device using Unix Domain Sockets
-+``nbd:unix:<domain-socket>[:exportname=3D<export>]''
-+
-+Example for TCP
-+@example
-+qemu-system-i386 --drive file=3Dnbd:192.0.2.1:30000
-+@end example
-+
-+Example for Unix Domain Sockets
-+@example
-+qemu-system-i386 --drive file=3Dnbd:unix:/tmp/nbd-socket
-+@end example
-+
-+@item SSH
-+QEMU supports SSH (Secure Shell) access to remote disks.
-+
-+Examples:
-+@example
-+qemu-system-i386 -drive file=3Dssh://user@@host/path/to/disk.img
-+qemu-system-i386 -drive file.driver=3Dssh,file.user=3Duser,file.host=3Dh=
-ost,file.port=3D22,file.path=3D/path/to/disk.img
-+@end example
-+
-+Currently authentication must be done using ssh-agent.  Other
-+authentication methods may be supported in future.
-+
-+@item Sheepdog
-+Sheepdog is a distributed storage system for QEMU.
-+QEMU supports using either local sheepdog devices or remote networked
-+devices.
-+
-+Syntax for specifying a sheepdog device
-+@example
-+sheepdog[+tcp|+unix]://[host:port]/vdiname[?socket=3Dpath][#snapid|#tag]
-+@end example
-+
-+Example
-+@example
-+qemu-system-i386 --drive file=3Dsheepdog://192.0.2.1:30000/MyVirtualMach=
-ine
-+@end example
-+
-+See also @url{https://sheepdog.github.io/sheepdog/}.
-+
-+@item GlusterFS
-+GlusterFS is a user space distributed file system.
-+QEMU supports the use of GlusterFS volumes for hosting VM disk images us=
-ing
-+TCP, Unix Domain Sockets and RDMA transport protocols.
-+
-+Syntax for specifying a VM disk image on GlusterFS volume is
-+@example
-+
-+URI:
-+gluster[+type]://[host[:port]]/volume/path[?socket=3D...][,debug=3DN][,l=
-ogfile=3D...]
-+
-+JSON:
-+'json:@{"driver":"qcow2","file":@{"driver":"gluster","volume":"testvol",=
-"path":"a.img","debug":N,"logfile":"...",
-+@                                 "server":[@{"type":"tcp","host":"...",=
-"port":"..."@},
-+@                                           @{"type":"unix","socket":"..=
-."@}]@}@}'
-+@end example
-+
-+
-+Example
-+@example
-+URI:
-+qemu-system-x86_64 --drive file=3Dgluster://192.0.2.1/testvol/a.img,
-+@                               file.debug=3D9,file.logfile=3D/var/log/q=
-emu-gluster.log
-+
-+JSON:
-+qemu-system-x86_64 'json:@{"driver":"qcow2",
-+@                          "file":@{"driver":"gluster",
-+@                                   "volume":"testvol","path":"a.img",
-+@                                   "debug":9,"logfile":"/var/log/qemu-g=
-luster.log",
-+@                                   "server":[@{"type":"tcp","host":"1.2=
-.3.4","port":24007@},
-+@                                             @{"type":"unix","socket":"=
-/var/run/glusterd.socket"@}]@}@}'
-+qemu-system-x86_64 -drive driver=3Dqcow2,file.driver=3Dgluster,file.volu=
-me=3Dtestvol,file.path=3D/path/a.img,
-+@                                      file.debug=3D9,file.logfile=3D/va=
-r/log/qemu-gluster.log,
-+@                                      file.server.0.type=3Dtcp,file.ser=
-ver.0.host=3D1.2.3.4,file.server.0.port=3D24007,
-+@                                      file.server.1.type=3Dunix,file.se=
-rver.1.socket=3D/var/run/glusterd.socket
-+@end example
-+
-+See also @url{http://www.gluster.org}.
-+
-+@item HTTP/HTTPS/FTP/FTPS
-+QEMU supports read-only access to files accessed over http(s) and ftp(s)=
-.
-+
-+Syntax using a single filename:
-+@example
-+<protocol>://[<username>[:<password>]@@]<host>/<path>
-+@end example
-+
-+where:
-+@table @option
-+@item protocol
-+'http', 'https', 'ftp', or 'ftps'.
-+
-+@item username
-+Optional username for authentication to the remote server.
-+
-+@item password
-+Optional password for authentication to the remote server.
-+
-+@item host
-+Address of the remote server.
-+
-+@item path
-+Path on the remote server, including any query string.
-+@end table
-+
-+The following options are also supported:
-+@table @option
-+@item url
-+The full URL when passing options to the driver explicitly.
-+
-+@item readahead
-+The amount of data to read ahead with each range request to the remote s=
-erver.
-+This value may optionally have the suffix 'T', 'G', 'M', 'K', 'k' or 'b'=
-. If it
-+does not have a suffix, it will be assumed to be in bytes. The value mus=
-t be a
-+multiple of 512 bytes. It defaults to 256k.
-+
-+@item sslverify
-+Whether to verify the remote server's certificate when connecting over S=
-SL. It
-+can have the value 'on' or 'off'. It defaults to 'on'.
-+
-+@item cookie
-+Send this cookie (it can also be a list of cookies separated by ';') wit=
-h
-+each outgoing request.  Only supported when using protocols such as HTTP
-+which support cookies, otherwise ignored.
-+
-+@item timeout
-+Set the timeout in seconds of the CURL connection. This timeout is the t=
-ime
-+that CURL waits for a response from the remote server to get the size of=
- the
-+image to be downloaded. If not set, the default timeout of 5 seconds is =
-used.
-+@end table
-+
-+Note that when passing options to qemu explicitly, @option{driver} is th=
-e value
-+of <protocol>.
-+
-+Example: boot from a remote Fedora 20 live ISO image
-+@example
-+qemu-system-x86_64 --drive media=3Dcdrom,file=3Dhttp://dl.fedoraproject.=
-org/pub/fedora/linux/releases/20/Live/x86_64/Fedora-Live-Desktop-x86_64-2=
-0-1.iso,readonly
-+
-+qemu-system-x86_64 --drive media=3Dcdrom,file.driver=3Dhttp,file.url=3Dh=
-ttp://dl.fedoraproject.org/pub/fedora/linux/releases/20/Live/x86_64/Fedor=
-a-Live-Desktop-x86_64-20-1.iso,readonly
-+@end example
-+
-+Example: boot from a remote Fedora 20 cloud image using a local overlay =
-for
-+writes, copy-on-read, and a readahead of 64k
-+@example
-+qemu-img create -f qcow2 -o backing_file=3D'json:@{"file.driver":"http",=
-, "file.url":"https://dl.fedoraproject.org/pub/fedora/linux/releases/20/I=
-mages/x86_64/Fedora-x86_64-20-20131211.1-sda.qcow2",, "file.readahead":"6=
-4k"@}' /tmp/Fedora-x86_64-20-20131211.1-sda.qcow2
-+
-+qemu-system-x86_64 -drive file=3D/tmp/Fedora-x86_64-20-20131211.1-sda.qc=
-ow2,copy-on-read=3Don
-+@end example
-+
-+Example: boot from an image stored on a VMware vSphere server with a sel=
-f-signed
-+certificate using a local overlay for writes, a readahead of 64k and a t=
-imeout
-+of 10 seconds.
-+@example
-+qemu-img create -f qcow2 -o backing_file=3D'json:@{"file.driver":"https"=
-,, "file.url":"https://user:password@@vsphere.example.com/folder/test/tes=
-t-flat.vmdk?dcPath=3DDatacenter&dsName=3Ddatastore1",, "file.sslverify":"=
-off",, "file.readahead":"64k",, "file.timeout":10@}' /tmp/test.qcow2
-+
-+qemu-system-x86_64 -drive file=3D/tmp/test.qcow2
-+@end example
-+
-+@end table
-+
-+@c man end
-+
- @node pcsys_keys
- @section Keys in the graphical frontends
-=20
-diff --git a/qemu-options.hx b/qemu-options.hx
-index 66ec232879..18b8211a21 100644
---- a/qemu-options.hx
-+++ b/qemu-options.hx
-@@ -2822,234 +2822,12 @@ ETEXI
- DEFHEADING()
-=20
- DEFHEADING(Device URL Syntax:)
--STEXI
+diff --git a/target/arm/helper.h b/target/arm/helper.h
+index 5b6333347d..f9dd7432c1 100644
+--- a/target/arm/helper.h
++++ b/target/arm/helper.h
+@@ -539,17 +539,17 @@ DEF_HELPER_3(neon_qzip8, void, env, i32, i32)
+ DEF_HELPER_3(neon_qzip16, void, env, i32, i32)
+ DEF_HELPER_3(neon_qzip32, void, env, i32, i32)
+ 
+-DEF_HELPER_4(crypto_aese, void, env, i32, i32, i32)
+-DEF_HELPER_4(crypto_aesmc, void, env, i32, i32, i32)
++DEF_HELPER_FLAGS_3(crypto_aese, TCG_CALL_NO_RWG, void, ptr, ptr, i32)
++DEF_HELPER_FLAGS_3(crypto_aesmc, TCG_CALL_NO_RWG, void, ptr, ptr, i32)
+ 
+-DEF_HELPER_5(crypto_sha1_3reg, void, env, i32, i32, i32, i32)
+-DEF_HELPER_3(crypto_sha1h, void, env, i32, i32)
+-DEF_HELPER_3(crypto_sha1su1, void, env, i32, i32)
++DEF_HELPER_FLAGS_4(crypto_sha1_3reg, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
++DEF_HELPER_FLAGS_2(crypto_sha1h, TCG_CALL_NO_RWG, void, ptr, ptr)
++DEF_HELPER_FLAGS_2(crypto_sha1su1, TCG_CALL_NO_RWG, void, ptr, ptr)
+ 
+-DEF_HELPER_4(crypto_sha256h, void, env, i32, i32, i32)
+-DEF_HELPER_4(crypto_sha256h2, void, env, i32, i32, i32)
+-DEF_HELPER_3(crypto_sha256su0, void, env, i32, i32)
+-DEF_HELPER_4(crypto_sha256su1, void, env, i32, i32, i32)
++DEF_HELPER_FLAGS_3(crypto_sha256h, TCG_CALL_NO_RWG, void, ptr, ptr, ptr)
++DEF_HELPER_FLAGS_3(crypto_sha256h2, TCG_CALL_NO_RWG, void, ptr, ptr, ptr)
++DEF_HELPER_FLAGS_2(crypto_sha256su0, TCG_CALL_NO_RWG, void, ptr, ptr)
++DEF_HELPER_FLAGS_3(crypto_sha256su1, TCG_CALL_NO_RWG, void, ptr, ptr, ptr)
+ 
+ DEF_HELPER_FLAGS_3(crc32, TCG_CALL_NO_RWG_SE, i32, i32, i32, i32)
+ DEF_HELPER_FLAGS_3(crc32c, TCG_CALL_NO_RWG_SE, i32, i32, i32, i32)
+diff --git a/target/arm/crypto_helper.c b/target/arm/crypto_helper.c
+index 3b6df3f41a..9ca0bdead7 100644
+--- a/target/arm/crypto_helper.c
++++ b/target/arm/crypto_helper.c
+@@ -30,20 +30,14 @@ union CRYPTO_STATE {
+ #define CR_ST_WORD(state, i)   (state.words[i])
+ #endif
+ 
+-void HELPER(crypto_aese)(CPUARMState *env, uint32_t rd, uint32_t rm,
+-                         uint32_t decrypt)
++void HELPER(crypto_aese)(void *vd, void *vm, uint32_t decrypt)
+ {
+     static uint8_t const * const sbox[2] = { AES_sbox, AES_isbox };
+     static uint8_t const * const shift[2] = { AES_shifts, AES_ishifts };
 -
--In addition to using normal file images for the emulated storage devices=
-,
--QEMU can also use networked resources such as iSCSI devices. These are
--specified using a special URL syntax.
--
--@table @option
--@item iSCSI
--iSCSI support allows QEMU to access iSCSI resources directly and use as
--images for the guest storage. Both disk and cdrom images are supported.
--
--Syntax for specifying iSCSI LUNs is
--``iscsi://<target-ip>[:<port>]/<target-iqn>/<lun>''
--
--By default qemu will use the iSCSI initiator-name
--'iqn.2008-11.org.linux-kvm[:<name>]' but this can also be set from the c=
-ommand
--line or a configuration file.
--
--Since version Qemu 2.4 it is possible to specify a iSCSI request timeout=
- to detect
--stalled requests and force a reestablishment of the session. The timeout
--is specified in seconds. The default is 0 which means no timeout. Libisc=
-si
--1.15.0 or greater is required for this feature.
--
--Example (without authentication):
--@example
--qemu-system-i386 -iscsi initiator-name=3Diqn.2001-04.com.example:my-init=
-iator \
--                 -cdrom iscsi://192.0.2.1/iqn.2001-04.com.example/2 \
--                 -drive file=3Discsi://192.0.2.1/iqn.2001-04.com.example=
-/1
--@end example
--
--Example (CHAP username/password via URL):
--@example
--qemu-system-i386 -drive file=3Discsi://user%password@@192.0.2.1/iqn.2001=
--04.com.example/1
--@end example
--
--Example (CHAP username/password via environment variables):
--@example
--LIBISCSI_CHAP_USERNAME=3D"user" \
--LIBISCSI_CHAP_PASSWORD=3D"password" \
--qemu-system-i386 -drive file=3Discsi://192.0.2.1/iqn.2001-04.com.example=
-/1
--@end example
--
--iSCSI support is an optional feature of QEMU and only available when
--compiled and linked against libiscsi.
--ETEXI
- DEF("iscsi", HAS_ARG, QEMU_OPTION_iscsi,
-     "-iscsi [user=3Duser][,password=3Dpassword]\n"
-     "       [,header-digest=3DCRC32C|CR32C-NONE|NONE-CRC32C|NONE\n"
-     "       [,initiator-name=3Dinitiator-iqn][,id=3Dtarget-iqn]\n"
-     "       [,timeout=3Dtimeout]\n"
-     "                iSCSI session parameters\n", QEMU_ARCH_ALL)
--STEXI
--
--iSCSI parameters such as username and password can also be specified via
--a configuration file. See qemu-doc for more information and examples.
--
--@item NBD
--QEMU supports NBD (Network Block Devices) both using TCP protocol as wel=
-l
--as Unix Domain Sockets.
--
--Syntax for specifying a NBD device using TCP
--``nbd:<server-ip>:<port>[:exportname=3D<export>]''
--
--Syntax for specifying a NBD device using Unix Domain Sockets
--``nbd:unix:<domain-socket>[:exportname=3D<export>]''
--
--
--Example for TCP
--@example
--qemu-system-i386 --drive file=3Dnbd:192.0.2.1:30000
--@end example
--
--Example for Unix Domain Sockets
--@example
--qemu-system-i386 --drive file=3Dnbd:unix:/tmp/nbd-socket
--@end example
--
--@item SSH
--QEMU supports SSH (Secure Shell) access to remote disks.
--
--Examples:
--@example
--qemu-system-i386 -drive file=3Dssh://user@@host/path/to/disk.img
--qemu-system-i386 -drive file.driver=3Dssh,file.user=3Duser,file.host=3Dh=
-ost,file.port=3D22,file.path=3D/path/to/disk.img
--@end example
--
--Currently authentication must be done using ssh-agent.  Other
--authentication methods may be supported in future.
--
--@item Sheepdog
--Sheepdog is a distributed storage system for QEMU.
--QEMU supports using either local sheepdog devices or remote networked
--devices.
--
--Syntax for specifying a sheepdog device
--@example
--sheepdog[+tcp|+unix]://[host:port]/vdiname[?socket=3Dpath][#snapid|#tag]
--@end example
--
--Example
--@example
--qemu-system-i386 --drive file=3Dsheepdog://192.0.2.1:30000/MyVirtualMach=
-ine
--@end example
--
--See also @url{https://sheepdog.github.io/sheepdog/}.
--
--@item GlusterFS
--GlusterFS is a user space distributed file system.
--QEMU supports the use of GlusterFS volumes for hosting VM disk images us=
-ing
--TCP, Unix Domain Sockets and RDMA transport protocols.
--
--Syntax for specifying a VM disk image on GlusterFS volume is
--@example
--
--URI:
--gluster[+type]://[host[:port]]/volume/path[?socket=3D...][,debug=3DN][,l=
-ogfile=3D...]
--
--JSON:
--'json:@{"driver":"qcow2","file":@{"driver":"gluster","volume":"testvol",=
-"path":"a.img","debug":N,"logfile":"...",
--@                                 "server":[@{"type":"tcp","host":"...",=
-"port":"..."@},
--@                                           @{"type":"unix","socket":"..=
-."@}]@}@}'
--@end example
--
--
--Example
--@example
--URI:
--qemu-system-x86_64 --drive file=3Dgluster://192.0.2.1/testvol/a.img,
--@                               file.debug=3D9,file.logfile=3D/var/log/q=
-emu-gluster.log
--
--JSON:
--qemu-system-x86_64 'json:@{"driver":"qcow2",
--@                          "file":@{"driver":"gluster",
--@                                   "volume":"testvol","path":"a.img",
--@                                   "debug":9,"logfile":"/var/log/qemu-g=
-luster.log",
--@                                   "server":[@{"type":"tcp","host":"1.2=
-.3.4","port":24007@},
--@                                             @{"type":"unix","socket":"=
-/var/run/glusterd.socket"@}]@}@}'
--qemu-system-x86_64 -drive driver=3Dqcow2,file.driver=3Dgluster,file.volu=
-me=3Dtestvol,file.path=3D/path/a.img,
--@                                      file.debug=3D9,file.logfile=3D/va=
-r/log/qemu-gluster.log,
--@                                      file.server.0.type=3Dtcp,file.ser=
-ver.0.host=3D1.2.3.4,file.server.0.port=3D24007,
--@                                      file.server.1.type=3Dunix,file.se=
-rver.1.socket=3D/var/run/glusterd.socket
--@end example
--
--See also @url{http://www.gluster.org}.
--
--@item HTTP/HTTPS/FTP/FTPS
--QEMU supports read-only access to files accessed over http(s) and ftp(s)=
-.
--
--Syntax using a single filename:
--@example
--<protocol>://[<username>[:<password>]@@]<host>/<path>
--@end example
--
--where:
--@table @option
--@item protocol
--'http', 'https', 'ftp', or 'ftps'.
--
--@item username
--Optional username for authentication to the remote server.
--
--@item password
--Optional password for authentication to the remote server.
--
--@item host
--Address of the remote server.
--
--@item path
--Path on the remote server, including any query string.
--@end table
--
--The following options are also supported:
--@table @option
--@item url
--The full URL when passing options to the driver explicitly.
--
--@item readahead
--The amount of data to read ahead with each range request to the remote s=
-erver.
--This value may optionally have the suffix 'T', 'G', 'M', 'K', 'k' or 'b'=
-. If it
--does not have a suffix, it will be assumed to be in bytes. The value mus=
-t be a
--multiple of 512 bytes. It defaults to 256k.
--
--@item sslverify
--Whether to verify the remote server's certificate when connecting over S=
-SL. It
--can have the value 'on' or 'off'. It defaults to 'on'.
--
--@item cookie
--Send this cookie (it can also be a list of cookies separated by ';') wit=
-h
--each outgoing request.  Only supported when using protocols such as HTTP
--which support cookies, otherwise ignored.
--
--@item timeout
--Set the timeout in seconds of the CURL connection. This timeout is the t=
-ime
--that CURL waits for a response from the remote server to get the size of=
- the
--image to be downloaded. If not set, the default timeout of 5 seconds is =
-used.
--@end table
--
--Note that when passing options to qemu explicitly, @option{driver} is th=
-e value
--of <protocol>.
--
--Example: boot from a remote Fedora 20 live ISO image
--@example
--qemu-system-x86_64 --drive media=3Dcdrom,file=3Dhttp://dl.fedoraproject.=
-org/pub/fedora/linux/releases/20/Live/x86_64/Fedora-Live-Desktop-x86_64-2=
-0-1.iso,readonly
--
--qemu-system-x86_64 --drive media=3Dcdrom,file.driver=3Dhttp,file.url=3Dh=
-ttp://dl.fedoraproject.org/pub/fedora/linux/releases/20/Live/x86_64/Fedor=
-a-Live-Desktop-x86_64-20-1.iso,readonly
--@end example
--
--Example: boot from a remote Fedora 20 cloud image using a local overlay =
-for
--writes, copy-on-read, and a readahead of 64k
--@example
--qemu-img create -f qcow2 -o backing_file=3D'json:@{"file.driver":"http",=
-, "file.url":"https://dl.fedoraproject.org/pub/fedora/linux/releases/20/I=
-mages/x86_64/Fedora-x86_64-20-20131211.1-sda.qcow2",, "file.readahead":"6=
-4k"@}' /tmp/Fedora-x86_64-20-20131211.1-sda.qcow2
--
--qemu-system-x86_64 -drive file=3D/tmp/Fedora-x86_64-20-20131211.1-sda.qc=
-ow2,copy-on-read=3Don
--@end example
--
--Example: boot from an image stored on a VMware vSphere server with a sel=
-f-signed
--certificate using a local overlay for writes, a readahead of 64k and a t=
-imeout
--of 10 seconds.
--@example
--qemu-img create -f qcow2 -o backing_file=3D'json:@{"file.driver":"https"=
-,, "file.url":"https://user:password@@vsphere.example.com/folder/test/tes=
-t-flat.vmdk?dcPath=3DDatacenter&dsName=3Ddatastore1",, "file.sslverify":"=
-off",, "file.readahead":"64k",, "file.timeout":10@}' /tmp/test.qcow2
--
--qemu-system-x86_64 -drive file=3D/tmp/test.qcow2
--@end example
--ETEXI
--
--STEXI
--@end table
--ETEXI
-=20
- DEFHEADING(Bluetooth(R) options:)
- STEXI
---=20
-2.13.6
+-    union CRYPTO_STATE rk = { .l = {
+-        float64_val(env->vfp.regs[rm]),
+-        float64_val(env->vfp.regs[rm + 1])
+-    } };
+-    union CRYPTO_STATE st = { .l = {
+-        float64_val(env->vfp.regs[rd]),
+-        float64_val(env->vfp.regs[rd + 1])
+-    } };
++    uint64_t *rd = vd;
++    uint64_t *rm = vm;
++    union CRYPTO_STATE rk = { .l = { rm[0], rm[1] } };
++    union CRYPTO_STATE st = { .l = { rd[0], rd[1] } };
+     int i;
+ 
+     assert(decrypt < 2);
+@@ -57,12 +51,11 @@ void HELPER(crypto_aese)(CPUARMState *env, uint32_t rd, uint32_t rm,
+         CR_ST_BYTE(st, i) = sbox[decrypt][CR_ST_BYTE(rk, shift[decrypt][i])];
+     }
+ 
+-    env->vfp.regs[rd] = make_float64(st.l[0]);
+-    env->vfp.regs[rd + 1] = make_float64(st.l[1]);
++    rd[0] = st.l[0];
++    rd[1] = st.l[1];
+ }
+ 
+-void HELPER(crypto_aesmc)(CPUARMState *env, uint32_t rd, uint32_t rm,
+-                          uint32_t decrypt)
++void HELPER(crypto_aesmc)(void *vd, void *vm, uint32_t decrypt)
+ {
+     static uint32_t const mc[][256] = { {
+         /* MixColumns lookup table */
+@@ -197,10 +190,10 @@ void HELPER(crypto_aesmc)(CPUARMState *env, uint32_t rd, uint32_t rm,
+         0x92b479a7, 0x99b970a9, 0x84ae6bbb, 0x8fa362b5,
+         0xbe805d9f, 0xb58d5491, 0xa89a4f83, 0xa397468d,
+     } };
+-    union CRYPTO_STATE st = { .l = {
+-        float64_val(env->vfp.regs[rm]),
+-        float64_val(env->vfp.regs[rm + 1])
+-    } };
++
++    uint64_t *rd = vd;
++    uint64_t *rm = vm;
++    union CRYPTO_STATE st = { .l = { rm[0], rm[1] } };
+     int i;
+ 
+     assert(decrypt < 2);
+@@ -213,8 +206,8 @@ void HELPER(crypto_aesmc)(CPUARMState *env, uint32_t rd, uint32_t rm,
+             rol32(mc[decrypt][CR_ST_BYTE(st, i + 3)], 24);
+     }
+ 
+-    env->vfp.regs[rd] = make_float64(st.l[0]);
+-    env->vfp.regs[rd + 1] = make_float64(st.l[1]);
++    rd[0] = st.l[0];
++    rd[1] = st.l[1];
+ }
+ 
+ /*
+@@ -236,21 +229,14 @@ static uint32_t maj(uint32_t x, uint32_t y, uint32_t z)
+     return (x & y) | ((x | y) & z);
+ }
+ 
+-void HELPER(crypto_sha1_3reg)(CPUARMState *env, uint32_t rd, uint32_t rn,
+-                              uint32_t rm, uint32_t op)
++void HELPER(crypto_sha1_3reg)(void *vd, void *vn, void *vm, uint32_t op)
+ {
+-    union CRYPTO_STATE d = { .l = {
+-        float64_val(env->vfp.regs[rd]),
+-        float64_val(env->vfp.regs[rd + 1])
+-    } };
+-    union CRYPTO_STATE n = { .l = {
+-        float64_val(env->vfp.regs[rn]),
+-        float64_val(env->vfp.regs[rn + 1])
+-    } };
+-    union CRYPTO_STATE m = { .l = {
+-        float64_val(env->vfp.regs[rm]),
+-        float64_val(env->vfp.regs[rm + 1])
+-    } };
++    uint64_t *rd = vd;
++    uint64_t *rn = vn;
++    uint64_t *rm = vm;
++    union CRYPTO_STATE d = { .l = { rd[0], rd[1] } };
++    union CRYPTO_STATE n = { .l = { rn[0], rn[1] } };
++    union CRYPTO_STATE m = { .l = { rm[0], rm[1] } };
+ 
+     if (op == 3) { /* sha1su0 */
+         d.l[0] ^= d.l[1] ^ m.l[0];
+@@ -284,42 +270,37 @@ void HELPER(crypto_sha1_3reg)(CPUARMState *env, uint32_t rd, uint32_t rn,
+             CR_ST_WORD(d, 0) = t;
+         }
+     }
+-    env->vfp.regs[rd] = make_float64(d.l[0]);
+-    env->vfp.regs[rd + 1] = make_float64(d.l[1]);
++    rd[0] = d.l[0];
++    rd[1] = d.l[1];
+ }
+ 
+-void HELPER(crypto_sha1h)(CPUARMState *env, uint32_t rd, uint32_t rm)
++void HELPER(crypto_sha1h)(void *vd, void *vm)
+ {
+-    union CRYPTO_STATE m = { .l = {
+-        float64_val(env->vfp.regs[rm]),
+-        float64_val(env->vfp.regs[rm + 1])
+-    } };
++    uint64_t *rd = vd;
++    uint64_t *rm = vm;
++    union CRYPTO_STATE m = { .l = { rm[0], rm[1] } };
+ 
+     CR_ST_WORD(m, 0) = ror32(CR_ST_WORD(m, 0), 2);
+     CR_ST_WORD(m, 1) = CR_ST_WORD(m, 2) = CR_ST_WORD(m, 3) = 0;
+ 
+-    env->vfp.regs[rd] = make_float64(m.l[0]);
+-    env->vfp.regs[rd + 1] = make_float64(m.l[1]);
++    rd[0] = m.l[0];
++    rd[1] = m.l[1];
+ }
+ 
+-void HELPER(crypto_sha1su1)(CPUARMState *env, uint32_t rd, uint32_t rm)
++void HELPER(crypto_sha1su1)(void *vd, void *vm)
+ {
+-    union CRYPTO_STATE d = { .l = {
+-        float64_val(env->vfp.regs[rd]),
+-        float64_val(env->vfp.regs[rd + 1])
+-    } };
+-    union CRYPTO_STATE m = { .l = {
+-        float64_val(env->vfp.regs[rm]),
+-        float64_val(env->vfp.regs[rm + 1])
+-    } };
++    uint64_t *rd = vd;
++    uint64_t *rm = vm;
++    union CRYPTO_STATE d = { .l = { rd[0], rd[1] } };
++    union CRYPTO_STATE m = { .l = { rm[0], rm[1] } };
+ 
+     CR_ST_WORD(d, 0) = rol32(CR_ST_WORD(d, 0) ^ CR_ST_WORD(m, 1), 1);
+     CR_ST_WORD(d, 1) = rol32(CR_ST_WORD(d, 1) ^ CR_ST_WORD(m, 2), 1);
+     CR_ST_WORD(d, 2) = rol32(CR_ST_WORD(d, 2) ^ CR_ST_WORD(m, 3), 1);
+     CR_ST_WORD(d, 3) = rol32(CR_ST_WORD(d, 3) ^ CR_ST_WORD(d, 0), 1);
+ 
+-    env->vfp.regs[rd] = make_float64(d.l[0]);
+-    env->vfp.regs[rd + 1] = make_float64(d.l[1]);
++    rd[0] = d.l[0];
++    rd[1] = d.l[1];
+ }
+ 
+ /*
+@@ -347,21 +328,14 @@ static uint32_t s1(uint32_t x)
+     return ror32(x, 17) ^ ror32(x, 19) ^ (x >> 10);
+ }
+ 
+-void HELPER(crypto_sha256h)(CPUARMState *env, uint32_t rd, uint32_t rn,
+-                            uint32_t rm)
++void HELPER(crypto_sha256h)(void *vd, void *vn, void *vm)
+ {
+-    union CRYPTO_STATE d = { .l = {
+-        float64_val(env->vfp.regs[rd]),
+-        float64_val(env->vfp.regs[rd + 1])
+-    } };
+-    union CRYPTO_STATE n = { .l = {
+-        float64_val(env->vfp.regs[rn]),
+-        float64_val(env->vfp.regs[rn + 1])
+-    } };
+-    union CRYPTO_STATE m = { .l = {
+-        float64_val(env->vfp.regs[rm]),
+-        float64_val(env->vfp.regs[rm + 1])
+-    } };
++    uint64_t *rd = vd;
++    uint64_t *rn = vn;
++    uint64_t *rm = vm;
++    union CRYPTO_STATE d = { .l = { rd[0], rd[1] } };
++    union CRYPTO_STATE n = { .l = { rn[0], rn[1] } };
++    union CRYPTO_STATE m = { .l = { rm[0], rm[1] } };
+     int i;
+ 
+     for (i = 0; i < 4; i++) {
+@@ -383,25 +357,18 @@ void HELPER(crypto_sha256h)(CPUARMState *env, uint32_t rd, uint32_t rn,
+         CR_ST_WORD(d, 0) = t;
+     }
+ 
+-    env->vfp.regs[rd] = make_float64(d.l[0]);
+-    env->vfp.regs[rd + 1] = make_float64(d.l[1]);
++    rd[0] = d.l[0];
++    rd[1] = d.l[1];
+ }
+ 
+-void HELPER(crypto_sha256h2)(CPUARMState *env, uint32_t rd, uint32_t rn,
+-                             uint32_t rm)
++void HELPER(crypto_sha256h2)(void *vd, void *vn, void *vm)
+ {
+-    union CRYPTO_STATE d = { .l = {
+-        float64_val(env->vfp.regs[rd]),
+-        float64_val(env->vfp.regs[rd + 1])
+-    } };
+-    union CRYPTO_STATE n = { .l = {
+-        float64_val(env->vfp.regs[rn]),
+-        float64_val(env->vfp.regs[rn + 1])
+-    } };
+-    union CRYPTO_STATE m = { .l = {
+-        float64_val(env->vfp.regs[rm]),
+-        float64_val(env->vfp.regs[rm + 1])
+-    } };
++    uint64_t *rd = vd;
++    uint64_t *rn = vn;
++    uint64_t *rm = vm;
++    union CRYPTO_STATE d = { .l = { rd[0], rd[1] } };
++    union CRYPTO_STATE n = { .l = { rn[0], rn[1] } };
++    union CRYPTO_STATE m = { .l = { rm[0], rm[1] } };
+     int i;
+ 
+     for (i = 0; i < 4; i++) {
+@@ -415,51 +382,40 @@ void HELPER(crypto_sha256h2)(CPUARMState *env, uint32_t rd, uint32_t rn,
+         CR_ST_WORD(d, 0) = CR_ST_WORD(n, 3 - i) + t;
+     }
+ 
+-    env->vfp.regs[rd] = make_float64(d.l[0]);
+-    env->vfp.regs[rd + 1] = make_float64(d.l[1]);
++    rd[0] = d.l[0];
++    rd[1] = d.l[1];
+ }
+ 
+-void HELPER(crypto_sha256su0)(CPUARMState *env, uint32_t rd, uint32_t rm)
++void HELPER(crypto_sha256su0)(void *vd, void *vm)
+ {
+-    union CRYPTO_STATE d = { .l = {
+-        float64_val(env->vfp.regs[rd]),
+-        float64_val(env->vfp.regs[rd + 1])
+-    } };
+-    union CRYPTO_STATE m = { .l = {
+-        float64_val(env->vfp.regs[rm]),
+-        float64_val(env->vfp.regs[rm + 1])
+-    } };
++    uint64_t *rd = vd;
++    uint64_t *rm = vm;
++    union CRYPTO_STATE d = { .l = { rd[0], rd[1] } };
++    union CRYPTO_STATE m = { .l = { rm[0], rm[1] } };
+ 
+     CR_ST_WORD(d, 0) += s0(CR_ST_WORD(d, 1));
+     CR_ST_WORD(d, 1) += s0(CR_ST_WORD(d, 2));
+     CR_ST_WORD(d, 2) += s0(CR_ST_WORD(d, 3));
+     CR_ST_WORD(d, 3) += s0(CR_ST_WORD(m, 0));
+ 
+-    env->vfp.regs[rd] = make_float64(d.l[0]);
+-    env->vfp.regs[rd + 1] = make_float64(d.l[1]);
++    rd[0] = d.l[0];
++    rd[1] = d.l[1];
+ }
+ 
+-void HELPER(crypto_sha256su1)(CPUARMState *env, uint32_t rd, uint32_t rn,
+-                              uint32_t rm)
++void HELPER(crypto_sha256su1)(void *vd, void *vn, void *vm)
+ {
+-    union CRYPTO_STATE d = { .l = {
+-        float64_val(env->vfp.regs[rd]),
+-        float64_val(env->vfp.regs[rd + 1])
+-    } };
+-    union CRYPTO_STATE n = { .l = {
+-        float64_val(env->vfp.regs[rn]),
+-        float64_val(env->vfp.regs[rn + 1])
+-    } };
+-    union CRYPTO_STATE m = { .l = {
+-        float64_val(env->vfp.regs[rm]),
+-        float64_val(env->vfp.regs[rm + 1])
+-    } };
++    uint64_t *rd = vd;
++    uint64_t *rn = vn;
++    uint64_t *rm = vm;
++    union CRYPTO_STATE d = { .l = { rd[0], rd[1] } };
++    union CRYPTO_STATE n = { .l = { rn[0], rn[1] } };
++    union CRYPTO_STATE m = { .l = { rm[0], rm[1] } };
+ 
+     CR_ST_WORD(d, 0) += s1(CR_ST_WORD(m, 2)) + CR_ST_WORD(n, 1);
+     CR_ST_WORD(d, 1) += s1(CR_ST_WORD(m, 3)) + CR_ST_WORD(n, 2);
+     CR_ST_WORD(d, 2) += s1(CR_ST_WORD(d, 0)) + CR_ST_WORD(n, 3);
+     CR_ST_WORD(d, 3) += s1(CR_ST_WORD(d, 1)) + CR_ST_WORD(m, 0);
+ 
+-    env->vfp.regs[rd] = make_float64(d.l[0]);
+-    env->vfp.regs[rd + 1] = make_float64(d.l[1]);
++    rd[0] = d.l[0];
++    rd[1] = d.l[1];
+ }
+diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
+index 79fede35c1..d246e8f6b5 100644
+--- a/target/arm/translate-a64.c
++++ b/target/arm/translate-a64.c
+@@ -81,8 +81,9 @@ typedef void NeonGenWidenFn(TCGv_i64, TCGv_i32);
+ typedef void NeonGenTwoSingleOPFn(TCGv_i32, TCGv_i32, TCGv_i32, TCGv_ptr);
+ typedef void NeonGenTwoDoubleOPFn(TCGv_i64, TCGv_i64, TCGv_i64, TCGv_ptr);
+ typedef void NeonGenOneOpFn(TCGv_i64, TCGv_i64);
+-typedef void CryptoTwoOpEnvFn(TCGv_ptr, TCGv_i32, TCGv_i32);
+-typedef void CryptoThreeOpEnvFn(TCGv_ptr, TCGv_i32, TCGv_i32, TCGv_i32);
++typedef void CryptoTwoOpFn(TCGv_ptr, TCGv_ptr);
++typedef void CryptoThreeOpIntFn(TCGv_ptr, TCGv_ptr, TCGv_i32);
++typedef void CryptoThreeOpFn(TCGv_ptr, TCGv_ptr, TCGv_ptr);
+ 
+ /* Note that the gvec expanders operate on offsets + sizes.  */
+ typedef void GVecGen2Fn(unsigned, uint32_t, uint32_t, uint32_t, uint32_t);
+@@ -556,6 +557,14 @@ static inline int vec_full_reg_size(DisasContext *s)
+     return 128 / 8;
+ }
+ 
++/* Return a newly allocated pointer to the vector register.  */
++static TCGv_ptr vec_full_reg_ptr(DisasContext *s, int regno)
++{
++    TCGv_ptr ret = tcg_temp_new_ptr();
++    tcg_gen_addi_ptr(ret, cpu_env, vec_full_reg_offset(s, regno));
++    return ret;
++}
++
+ /* Return the offset into CPUARMState of a slice (from
+  * the least significant end) of FP register Qn (ie
+  * Dn, Sn, Hn or Bn).
+@@ -12455,8 +12464,9 @@ static void disas_crypto_aes(DisasContext *s, uint32_t insn)
+     int rn = extract32(insn, 5, 5);
+     int rd = extract32(insn, 0, 5);
+     int decrypt;
+-    TCGv_i32 tcg_rd_regno, tcg_rn_regno, tcg_decrypt;
+-    CryptoThreeOpEnvFn *genfn;
++    TCGv_ptr tcg_rd_ptr, tcg_rn_ptr;
++    TCGv_i32 tcg_decrypt;
++    CryptoThreeOpIntFn *genfn;
+ 
+     if (!arm_dc_feature(s, ARM_FEATURE_V8_AES)
+         || size != 0) {
+@@ -12490,18 +12500,14 @@ static void disas_crypto_aes(DisasContext *s, uint32_t insn)
+         return;
+     }
+ 
+-    /* Note that we convert the Vx register indexes into the
+-     * index within the vfp.regs[] array, so we can share the
+-     * helper with the AArch32 instructions.
+-     */
+-    tcg_rd_regno = tcg_const_i32(rd << 1);
+-    tcg_rn_regno = tcg_const_i32(rn << 1);
++    tcg_rd_ptr = vec_full_reg_ptr(s, rd);
++    tcg_rn_ptr = vec_full_reg_ptr(s, rn);
+     tcg_decrypt = tcg_const_i32(decrypt);
+ 
+-    genfn(cpu_env, tcg_rd_regno, tcg_rn_regno, tcg_decrypt);
++    genfn(tcg_rd_ptr, tcg_rn_ptr, tcg_decrypt);
+ 
+-    tcg_temp_free_i32(tcg_rd_regno);
+-    tcg_temp_free_i32(tcg_rn_regno);
++    tcg_temp_free_ptr(tcg_rd_ptr);
++    tcg_temp_free_ptr(tcg_rn_ptr);
+     tcg_temp_free_i32(tcg_decrypt);
+ }
+ 
+@@ -12518,8 +12524,8 @@ static void disas_crypto_three_reg_sha(DisasContext *s, uint32_t insn)
+     int rm = extract32(insn, 16, 5);
+     int rn = extract32(insn, 5, 5);
+     int rd = extract32(insn, 0, 5);
+-    CryptoThreeOpEnvFn *genfn;
+-    TCGv_i32 tcg_rd_regno, tcg_rn_regno, tcg_rm_regno;
++    CryptoThreeOpFn *genfn;
++    TCGv_ptr tcg_rd_ptr, tcg_rn_ptr, tcg_rm_ptr;
+     int feature = ARM_FEATURE_V8_SHA256;
+ 
+     if (size != 0) {
+@@ -12558,23 +12564,23 @@ static void disas_crypto_three_reg_sha(DisasContext *s, uint32_t insn)
+         return;
+     }
+ 
+-    tcg_rd_regno = tcg_const_i32(rd << 1);
+-    tcg_rn_regno = tcg_const_i32(rn << 1);
+-    tcg_rm_regno = tcg_const_i32(rm << 1);
++    tcg_rd_ptr = vec_full_reg_ptr(s, rd);
++    tcg_rn_ptr = vec_full_reg_ptr(s, rn);
++    tcg_rm_ptr = vec_full_reg_ptr(s, rm);
+ 
+     if (genfn) {
+-        genfn(cpu_env, tcg_rd_regno, tcg_rn_regno, tcg_rm_regno);
++        genfn(tcg_rd_ptr, tcg_rn_ptr, tcg_rm_ptr);
+     } else {
+         TCGv_i32 tcg_opcode = tcg_const_i32(opcode);
+ 
+-        gen_helper_crypto_sha1_3reg(cpu_env, tcg_rd_regno,
+-                                    tcg_rn_regno, tcg_rm_regno, tcg_opcode);
++        gen_helper_crypto_sha1_3reg(tcg_rd_ptr, tcg_rn_ptr,
++                                    tcg_rm_ptr, tcg_opcode);
+         tcg_temp_free_i32(tcg_opcode);
+     }
+ 
+-    tcg_temp_free_i32(tcg_rd_regno);
+-    tcg_temp_free_i32(tcg_rn_regno);
+-    tcg_temp_free_i32(tcg_rm_regno);
++    tcg_temp_free_ptr(tcg_rd_ptr);
++    tcg_temp_free_ptr(tcg_rn_ptr);
++    tcg_temp_free_ptr(tcg_rm_ptr);
+ }
+ 
+ /* Crypto two-reg SHA
+@@ -12589,9 +12595,9 @@ static void disas_crypto_two_reg_sha(DisasContext *s, uint32_t insn)
+     int opcode = extract32(insn, 12, 5);
+     int rn = extract32(insn, 5, 5);
+     int rd = extract32(insn, 0, 5);
+-    CryptoTwoOpEnvFn *genfn;
++    CryptoTwoOpFn *genfn;
+     int feature;
+-    TCGv_i32 tcg_rd_regno, tcg_rn_regno;
++    TCGv_ptr tcg_rd_ptr, tcg_rn_ptr;
+ 
+     if (size != 0) {
+         unallocated_encoding(s);
+@@ -12625,13 +12631,13 @@ static void disas_crypto_two_reg_sha(DisasContext *s, uint32_t insn)
+         return;
+     }
+ 
+-    tcg_rd_regno = tcg_const_i32(rd << 1);
+-    tcg_rn_regno = tcg_const_i32(rn << 1);
++    tcg_rd_ptr = vec_full_reg_ptr(s, rd);
++    tcg_rn_ptr = vec_full_reg_ptr(s, rn);
+ 
+-    genfn(cpu_env, tcg_rd_regno, tcg_rn_regno);
++    genfn(tcg_rd_ptr, tcg_rn_ptr);
+ 
+-    tcg_temp_free_i32(tcg_rd_regno);
+-    tcg_temp_free_i32(tcg_rn_regno);
++    tcg_temp_free_ptr(tcg_rd_ptr);
++    tcg_temp_free_ptr(tcg_rn_ptr);
+ }
+ 
+ /* C3.6 Data processing - SIMD, inc Crypto
+diff --git a/target/arm/translate.c b/target/arm/translate.c
+index 490e120b0b..0c35c39069 100644
+--- a/target/arm/translate.c
++++ b/target/arm/translate.c
+@@ -1560,6 +1560,13 @@ static inline void neon_store_reg64(TCGv_i64 var, int reg)
+     tcg_gen_st_i64(var, cpu_env, vfp_reg_offset(1, reg));
+ }
+ 
++static TCGv_ptr vfp_reg_ptr(bool dp, int reg)
++{
++    TCGv_ptr ret = tcg_temp_new_ptr();
++    tcg_gen_addi_ptr(ret, cpu_env, vfp_reg_offset(dp, reg));
++    return ret;
++}
++
+ #define tcg_gen_ld_f32 tcg_gen_ld_i32
+ #define tcg_gen_ld_f64 tcg_gen_ld_i64
+ #define tcg_gen_st_f32 tcg_gen_st_i32
+@@ -5614,6 +5621,7 @@ static int disas_neon_data_insn(DisasContext *s, uint32_t insn)
+     int u;
+     uint32_t imm, mask;
+     TCGv_i32 tmp, tmp2, tmp3, tmp4, tmp5;
++    TCGv_ptr ptr1, ptr2, ptr3;
+     TCGv_i64 tmp64;
+ 
+     /* FIXME: this access check should not take precedence over UNDEF
+@@ -5660,34 +5668,34 @@ static int disas_neon_data_insn(DisasContext *s, uint32_t insn)
+                 if (!arm_dc_feature(s, ARM_FEATURE_V8_SHA1)) {
+                     return 1;
+                 }
+-                tmp = tcg_const_i32(rd);
+-                tmp2 = tcg_const_i32(rn);
+-                tmp3 = tcg_const_i32(rm);
++                ptr1 = vfp_reg_ptr(true, rd);
++                ptr2 = vfp_reg_ptr(true, rn);
++                ptr3 = vfp_reg_ptr(true, rm);
+                 tmp4 = tcg_const_i32(size);
+-                gen_helper_crypto_sha1_3reg(cpu_env, tmp, tmp2, tmp3, tmp4);
++                gen_helper_crypto_sha1_3reg(ptr1, ptr2, ptr3, tmp4);
+                 tcg_temp_free_i32(tmp4);
+             } else { /* SHA-256 */
+                 if (!arm_dc_feature(s, ARM_FEATURE_V8_SHA256) || size == 3) {
+                     return 1;
+                 }
+-                tmp = tcg_const_i32(rd);
+-                tmp2 = tcg_const_i32(rn);
+-                tmp3 = tcg_const_i32(rm);
++                ptr1 = vfp_reg_ptr(true, rd);
++                ptr2 = vfp_reg_ptr(true, rn);
++                ptr3 = vfp_reg_ptr(true, rm);
+                 switch (size) {
+                 case 0:
+-                    gen_helper_crypto_sha256h(cpu_env, tmp, tmp2, tmp3);
++                    gen_helper_crypto_sha256h(ptr1, ptr2, ptr3);
+                     break;
+                 case 1:
+-                    gen_helper_crypto_sha256h2(cpu_env, tmp, tmp2, tmp3);
++                    gen_helper_crypto_sha256h2(ptr1, ptr2, ptr3);
+                     break;
+                 case 2:
+-                    gen_helper_crypto_sha256su1(cpu_env, tmp, tmp2, tmp3);
++                    gen_helper_crypto_sha256su1(ptr1, ptr2, ptr3);
+                     break;
+                 }
+             }
+-            tcg_temp_free_i32(tmp);
+-            tcg_temp_free_i32(tmp2);
+-            tcg_temp_free_i32(tmp3);
++            tcg_temp_free_ptr(ptr1);
++            tcg_temp_free_ptr(ptr2);
++            tcg_temp_free_ptr(ptr3);
+             return 0;
+ 
+         case NEON_3R_VPADD_VQRDMLAH:
+@@ -7238,8 +7246,8 @@ static int disas_neon_data_insn(DisasContext *s, uint32_t insn)
+                         || ((rm | rd) & 1)) {
+                         return 1;
+                     }
+-                    tmp = tcg_const_i32(rd);
+-                    tmp2 = tcg_const_i32(rm);
++                    ptr1 = vfp_reg_ptr(true, rd);
++                    ptr2 = vfp_reg_ptr(true, rm);
+ 
+                      /* Bit 6 is the lowest opcode bit; it distinguishes between
+                       * encryption (AESE/AESMC) and decryption (AESD/AESIMC)
+@@ -7247,12 +7255,12 @@ static int disas_neon_data_insn(DisasContext *s, uint32_t insn)
+                     tmp3 = tcg_const_i32(extract32(insn, 6, 1));
+ 
+                     if (op == NEON_2RM_AESE) {
+-                        gen_helper_crypto_aese(cpu_env, tmp, tmp2, tmp3);
++                        gen_helper_crypto_aese(ptr1, ptr2, tmp3);
+                     } else {
+-                        gen_helper_crypto_aesmc(cpu_env, tmp, tmp2, tmp3);
++                        gen_helper_crypto_aesmc(ptr1, ptr2, tmp3);
+                     }
+-                    tcg_temp_free_i32(tmp);
+-                    tcg_temp_free_i32(tmp2);
++                    tcg_temp_free_ptr(ptr1);
++                    tcg_temp_free_ptr(ptr2);
+                     tcg_temp_free_i32(tmp3);
+                     break;
+                 case NEON_2RM_SHA1H:
+@@ -7260,13 +7268,13 @@ static int disas_neon_data_insn(DisasContext *s, uint32_t insn)
+                         || ((rm | rd) & 1)) {
+                         return 1;
+                     }
+-                    tmp = tcg_const_i32(rd);
+-                    tmp2 = tcg_const_i32(rm);
++                    ptr1 = vfp_reg_ptr(true, rd);
++                    ptr2 = vfp_reg_ptr(true, rm);
+ 
+-                    gen_helper_crypto_sha1h(cpu_env, tmp, tmp2);
++                    gen_helper_crypto_sha1h(ptr1, ptr2);
+ 
+-                    tcg_temp_free_i32(tmp);
+-                    tcg_temp_free_i32(tmp2);
++                    tcg_temp_free_ptr(ptr1);
++                    tcg_temp_free_ptr(ptr2);
+                     break;
+                 case NEON_2RM_SHA1SU1:
+                     if ((rm | rd) & 1) {
+@@ -7280,15 +7288,15 @@ static int disas_neon_data_insn(DisasContext *s, uint32_t insn)
+                     } else if (!arm_dc_feature(s, ARM_FEATURE_V8_SHA1)) {
+                         return 1;
+                     }
+-                    tmp = tcg_const_i32(rd);
+-                    tmp2 = tcg_const_i32(rm);
++                    ptr1 = vfp_reg_ptr(true, rd);
++                    ptr2 = vfp_reg_ptr(true, rm);
+                     if (q) {
+-                        gen_helper_crypto_sha256su0(cpu_env, tmp, tmp2);
++                        gen_helper_crypto_sha256su0(ptr1, ptr2);
+                     } else {
+-                        gen_helper_crypto_sha1su1(cpu_env, tmp, tmp2);
++                        gen_helper_crypto_sha1su1(ptr1, ptr2);
+                     }
+-                    tcg_temp_free_i32(tmp);
+-                    tcg_temp_free_i32(tmp2);
++                    tcg_temp_free_ptr(ptr1);
++                    tcg_temp_free_ptr(ptr2);
+                     break;
+                 default:
+                 elementwise:
+-- 
+2.14.3
