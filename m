@@ -1,29 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57934)
+Received: from eggs.gnu.org ([208.118.235.92]:59626)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <felipe@nutanix.com>) id 1eR1D5-0001rS-31
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 14:36:44 -0500
+	(envelope-from <lvivier@redhat.com>) id 1eR1HR-0004mZ-Ji
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 14:40:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <felipe@nutanix.com>) id 1eR1Ch-0002Ir-B2
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 14:36:23 -0500
-Received: from mx0a-002c1b01.pphosted.com ([148.163.151.68]:50742)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <felipe@nutanix.com>) id 1eR1Cg-0002Ea-Q3
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 14:35:59 -0500
-From: Felipe Franciosi <felipe@nutanix.com>
-Date: Mon, 18 Dec 2017 19:35:48 +0000
-Message-ID: <5E82066E-45E4-4627-8EB5-F995FFCB1ADF@nutanix.com>
-References: <1513350170-20168-1-git-send-email-den@openvz.org>
-	<1513350170-20168-3-git-send-email-den@openvz.org>
-	<20171218133812.GD16653@stefanha-x1.localdomain>
-	<2B67BF1C-6489-4A9B-BEE5-08DE9B904C07@intel.com>
-In-Reply-To: <2B67BF1C-6489-4A9B-BEE5-08DE9B904C07@intel.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <F623F9B8FCDDF24993325D05BD6F229E@namprd02.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <lvivier@redhat.com>) id 1eR1HJ-0006mD-Ve
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 14:40:49 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:60802)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <lvivier@redhat.com>) id 1eR1HJ-0006kH-OD
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 14:40:45 -0500
+References: <20171218183631.32357-1-cohuck@redhat.com>
+From: Laurent Vivier <lvivier@redhat.com>
+Message-ID: <c8748f83-b98e-6dd2-ddf5-6620f6b36f30@redhat.com>
+Date: Mon, 18 Dec 2017 20:40:36 +0100
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH 2/2] virtio: fix IO request length in
- virtio SCSI/block
+In-Reply-To: <20171218183631.32357-1-cohuck@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2] tpm: move qdev_prop_tpm to hw/tpm/
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,100 +27,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Harris, James R" <james.r.harris@intel.com>, Stefan Hajnoczi <stefanha@redhat.com>, "Denis V. Lunev" <den@openvz.org>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "Michael S. Tsirkin" <mst@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, "Liu, Changpeng" <changpeng.liu@intel.com>
+To: Cornelia Huck <cohuck@redhat.com>, stefanb@linux.vnet.ibm.com, pbonzini@redhat.com
+Cc: marcandre.lureau@redhat.com, thuth@redhat.com, qemu-devel@nongnu.org, f4bug@amsat.org
 
-DQo+IE9uIDE4IERlYyAyMDE3LCBhdCAxNjoxNiwgSGFycmlzLCBKYW1lcyBSIDxqYW1lcy5yLmhh
-cnJpc0BpbnRlbC5jb20+IHdyb3RlOg0KPiANCj4gDQo+PiBPbiBEZWMgMTgsIDIwMTcsIGF0IDY6
-MzggQU0sIFN0ZWZhbiBIYWpub2N6aSA8c3RlZmFuaGFAcmVkaGF0LmNvbT4gd3JvdGU6DQo+PiAN
-Cj4+IE9uIEZyaSwgRGVjIDE1LCAyMDE3IGF0IDA2OjAyOjUwUE0gKzAzMDAsIERlbmlzIFYuIEx1
-bmV2IHdyb3RlOg0KPj4+IExpbnV4IGd1ZXN0cyBzdWJtaXQgSU8gcmVxdWVzdHMgbm8gbG9uZ2Vy
-IHRoYW4gUEFHRV9TSVpFICogbWF4X3NlZw0KPj4+IGZpZWxkIHJlcG9ydGVkIGJ5IFNDU0kgY29u
-dHJvbGVyLiBUaHVzIHR5cGljYWwgc2VxdWVudGlhbCByZWFkIHdpdGgNCj4+PiAxIE1CIHNpemUg
-cmVzdWx0cyBpbiB0aGUgZm9sbG93aW5nIHBhdHRlcm4gb2YgdGhlIElPIGZyb20gdGhlIGd1ZXN0
-Og0KPj4+IDgsMTYgICAxICAgIDE1NzU0ICAgICAyLjc2NjA5NTEyMiAgMjA3MSAgRCAgIFIgMjA5
-NTEwNCArIDEwMDggW2RkXQ0KPj4+IDgsMTYgICAxICAgIDE1NzU1ICAgICAyLjc2NjEwODc4NSAg
-MjA3MSAgRCAgIFIgMjA5NjExMiArIDEwMDggW2RkXQ0KPj4+IDgsMTYgICAxICAgIDE1NzU2ICAg
-ICAyLjc2NjExMzQ4NiAgMjA3MSAgRCAgIFIgMjA5NzEyMCArIDMyIFtkZF0NCj4+PiA4LDE2ICAg
-MSAgICAxNTc1NyAgICAgMi43Njc2Njg5NjEgICAgIDAgIEMgICBSIDIwOTUxMDQgKyAxMDA4IFsw
-XQ0KPj4+IDgsMTYgICAxICAgIDE1NzU4ICAgICAyLjc2ODUzNDMxNSAgICAgMCAgQyAgIFIgMjA5
-NjExMiArIDEwMDggWzBdDQo+Pj4gOCwxNiAgIDEgICAgMTU3NTkgICAgIDIuNzY4NTM5NzgyICAg
-ICAwICBDICAgUiAyMDk3MTIwICsgMzIgWzBdDQo+Pj4gVGhlIElPIHdhcyBnZW5lcmF0ZWQgYnkN
-Cj4+PiBkZCBpZj0vZGV2L3NkYSBvZj0vZGV2L251bGwgYnM9MTAyNCBpZmxhZz1kaXJlY3QNCj4+
-PiANCj4+PiBUaGlzIGVmZmVjdGl2ZWx5IG1lYW5zIHRoYXQgb24gcm90YXRpb25hbCBkaXNrcyB3
-ZSB3aWxsIG9ic2VydmUgMyBJT1BTDQo+Pj4gZm9yIGVhY2ggMiBNQnMgcHJvY2Vzc2VkLiBUaGlz
-IGRlZmluaXRlbHkgbmVnYXRpdmVseSBhZmZlY3RzIGJvdGgNCj4+PiBndWVzdCBhbmQgaG9zdCBJ
-TyBwZXJmb3JtYW5jZS4NCj4+PiANCj4+PiBUaGUgY3VyZSBpcyByZWxhdGl2ZWx5IHNpbXBsZSAt
-IHdlIHNob3VsZCByZXBvcnQgbGVuZ3RoeSBzY2F0dGVyLWdhdGhlcg0KPj4+IGFiaWxpdHkgb2Yg
-dGhlIFNDU0kgY29udHJvbGxlci4gRm9ydHVuYXRlbHkgdGhlIHNpdHVhdGlvbiBoZXJlIGlzIHZl
-cnkNCj4+PiBnb29kLiBWaXJ0SU8gdHJhbnNwb3J0IGxheWVyIGNhbiBhY2NvbW9kYXRlIDEwMjQg
-aXRlbXMgaW4gb25lIHJlcXVlc3QNCj4+PiB3aGlsZSB3ZSBhcmUgdXNpbmcgb25seSAxMjguIFRo
-aXMgc2l0dWF0aW9uIGlzIHByZXNlbnQgc2luY2UgYWxtb3N0DQo+Pj4gdmVyeSBiZWdpbm5pbmcu
-IDIgaXRlbXMgYXJlIGRlZGljYXRlZCBmb3IgcmVxdWVzdCBtZXRhZGF0YSB0aHVzIHdlDQo+Pj4g
-c2hvdWxkIHB1Ymxpc2ggVklSVFFVRVVFX01BWF9TSVpFIC0gMiBhcyBtYXhfc2VnLg0KPj4+IA0K
-Pj4+IFRoZSBmb2xsb3dpbmcgcGF0dGVybiBpcyBvYnNlcnZlZCBhZnRlciB0aGUgcGF0Y2g6DQo+
-Pj4gOCwxNiAgIDEgICAgIDk5MjEgICAgIDIuNjYyNzIxMzQwICAyMDYzICBEICAgUiAyMDk1MTA0
-ICsgMTAyNCBbZGRdDQo+Pj4gOCwxNiAgIDEgICAgIDk5MjIgICAgIDIuNjYyNzM3NTg1ICAyMDYz
-ICBEICAgUiAyMDk2MTI4ICsgMTAyNCBbZGRdDQo+Pj4gOCwxNiAgIDEgICAgIDk5MjMgICAgIDIu
-NjY1MTg4MTY3ICAgICAwICBDICAgUiAyMDk1MTA0ICsgMTAyNCBbMF0NCj4+PiA4LDE2ICAgMSAg
-ICAgOTkyNCAgICAgMi42NjUxOTg3NzcgICAgIDAgIEMgICBSIDIwOTYxMjggKyAxMDI0IFswXQ0K
-Pj4+IHdoaWNoIGlzIG11Y2ggYmV0dGVyLg0KPj4+IA0KPj4+IFRoZSBkYXJrIHNpZGUgb2YgdGhp
-cyBwYXRjaCBpcyB0aGF0IHdlIGFyZSB0d2Vha2luZyBndWVzdCB2aXNpYmxlDQo+Pj4gcGFyYW1l
-dGVyLCB0aG91Z2ggdGhpcyBzaG91bGQgYmUgcmVsYXRpdmVseSBzYWZlIGFzIGFib3ZlIHRyYW5z
-cG9ydA0KPj4+IGxheWVyIHN1cHBvcnQgaXMgcHJlc2VudCBpbiBRRU1VL2hvc3QgTGludXggZm9y
-IGEgdmVyeSBsb25nIHRpbWUuDQo+Pj4gVGhlIHBhdGNoIGFkZHMgY29uZmlndXJhYmxlIHByb3Bl
-cnR5IGZvciBWaXJ0SU8gU0NTSSB3aXRoIGEgbmV3IGRlZmF1bHQNCj4+PiBhbmQgaGFyZGNvZGUg
-b3B0aW9uIGZvciBWaXJ0QmxvY2sgd2hpY2ggZG9lcyBub3QgcHJvdmlkZSBnb29kDQo+Pj4gY29u
-ZmlndXJhYmxlIGZyYW1ld29yay4NCj4+PiANCj4+PiBTaWduZWQtb2ZmLWJ5OiBEZW5pcyBWLiBM
-dW5ldiA8ZGVuQG9wZW52ei5vcmc+DQo+Pj4gQ0M6ICJNaWNoYWVsIFMuIFRzaXJraW4iIDxtc3RA
-cmVkaGF0LmNvbT4NCj4+PiBDQzogU3RlZmFuIEhham5vY3ppIDxzdGVmYW5oYUByZWRoYXQuY29t
-Pg0KPj4+IENDOiBLZXZpbiBXb2xmIDxrd29sZkByZWRoYXQuY29tPg0KPj4+IENDOiBNYXggUmVp
-dHogPG1yZWl0ekByZWRoYXQuY29tPg0KPj4+IENDOiBQYW9sbyBCb256aW5pIDxwYm9uemluaUBy
-ZWRoYXQuY29tPg0KPj4+IENDOiBSaWNoYXJkIEhlbmRlcnNvbiA8cnRoQHR3aWRkbGUubmV0Pg0K
-Pj4+IENDOiBFZHVhcmRvIEhhYmtvc3QgPGVoYWJrb3N0QHJlZGhhdC5jb20+DQo+Pj4gLS0tDQo+
-Pj4gaW5jbHVkZS9ody9jb21wYXQuaCAgICAgICAgICAgICB8IDE3ICsrKysrKysrKysrKysrKysr
-DQo+Pj4gaW5jbHVkZS9ody92aXJ0aW8vdmlydGlvLWJsay5oICB8ICAxICsNCj4+PiBpbmNsdWRl
-L2h3L3ZpcnRpby92aXJ0aW8tc2NzaS5oIHwgIDEgKw0KPj4+IGh3L2Jsb2NrL3ZpcnRpby1ibGsu
-YyAgICAgICAgICAgfCAgNCArKystDQo+Pj4gaHcvc2NzaS92aG9zdC1zY3NpLmMgICAgICAgICAg
-ICB8ICAyICsrDQo+Pj4gaHcvc2NzaS92aG9zdC11c2VyLXNjc2kuYyAgICAgICB8ICAyICsrDQo+
-Pj4gaHcvc2NzaS92aXJ0aW8tc2NzaS5jICAgICAgICAgICB8ICA0ICsrKy0NCj4+PiA3IGZpbGVz
-IGNoYW5nZWQsIDI5IGluc2VydGlvbnMoKyksIDIgZGVsZXRpb25zKC0pDQo+Pj4gDQo+Pj4gZGlm
-ZiAtLWdpdCBhL2luY2x1ZGUvaHcvY29tcGF0LmggYi9pbmNsdWRlL2h3L2NvbXBhdC5oDQo+Pj4g
-aW5kZXggMDI2ZmVlOS4uYjliZTVkNyAxMDA2NDQNCj4+PiAtLS0gYS9pbmNsdWRlL2h3L2NvbXBh
-dC5oDQo+Pj4gKysrIGIvaW5jbHVkZS9ody9jb21wYXQuaA0KPj4+IEBAIC0yLDYgKzIsMjMgQEAN
-Cj4+PiAjZGVmaW5lIEhXX0NPTVBBVF9IDQo+Pj4gDQo+Pj4gI2RlZmluZSBIV19DT01QQVRfMl8x
-MSBcDQo+Pj4gKyAgICB7XA0KPj4+ICsgICAgICAgIC5kcml2ZXIgICA9ICJ2aXJ0aW8tYmxrLWRl
-dmljZSIsXA0KPj4+ICsgICAgICAgIC5wcm9wZXJ0eSA9ICJtYXhfc2VnbWVudHMiLFwNCj4+PiAr
-ICAgICAgICAudmFsdWUgICAgPSAiMTI2IixcDQo+Pj4gKyAgICB9LHtcDQo+Pj4gKyAgICAgICAg
-LmRyaXZlciAgID0gInZob3N0LXNjc2kiLFwNCj4+PiArICAgICAgICAucHJvcGVydHkgPSAibWF4
-X3NlZ21lbnRzIixcDQo+Pj4gKyAgICAgICAgLnZhbHVlICAgID0gIjEyNiIsXA0KPj4+ICsgICAg
-fSx7XA0KPj4+ICsgICAgICAgIC5kcml2ZXIgICA9ICJ2aG9zdC11c2VyLXNjc2kiLFwNCj4+PiAr
-ICAgICAgICAucHJvcGVydHkgPSAibWF4X3NlZ21lbnRzIixcDQo+Pj4gKyAgICAgICAgLnZhbHVl
-ICAgID0gIjEyNiIsXA0KPj4gDQo+PiBFeGlzdGluZyB2aG9zdC11c2VyLXNjc2kgc2xhdmUgcHJv
-Z3JhbXMgbWlnaHQgbm90IGV4cGVjdCB1cCB0byAxMDIyDQo+PiBzZWdtZW50cy4gIEhvcGVmdWxs
-eSB3ZSBjYW4gZ2V0IGF3YXkgd2l0aCB0aGlzIGNoYW5nZSBzaW5jZSB0aGVyZSBhcmUNCj4+IHJl
-bGF0aXZlbHkgZmV3IHZob3N0LXVzZXItc2NzaSBzbGF2ZSBwcm9ncmFtcy4NCj4+IA0KPj4gQ0Nl
-ZCBGZWxpcGUgKE51dGFuaXgpIGFuZCBKaW0gKFNQREspIGluIGNhc2UgdGhleSBoYXZlIGNvbW1l
-bnRzLg0KPiANCj4gU1BESyB2aG9zdC11c2VyIHRhcmdldHMgb25seSBleHBlY3QgbWF4IDEyOCBz
-ZWdtZW50cy4gIFRoZXkgYWxzbyBwcmUtYWxsb2NhdGUgSS9PIHRhc2sgc3RydWN0dXJlcyB3aGVu
-IFFFTVUgY29ubmVjdHMgdG8gdGhlIHZob3N0LXVzZXIgZGV2aWNlLg0KPiANCj4gU3VwcG9ydGlu
-ZyB1cCB0byAxMDIyIHNlZ21lbnRzIHdvdWxkIHJlc3VsdCBpbiBzaWduaWZpY2FudGx5IGhpZ2hl
-ciBtZW1vcnkgdXNhZ2UsIHJlZHVjdGlvbiBpbiBJL08gcXVldWUgZGVwdGggcHJvY2Vzc2VkIGJ5
-IHRoZSB2aG9zdC11c2VyIHRhcmdldCwgb3IgaGF2aW5nIHRvIGR5bmFtaWNhbGx5IGFsbG9jYXRl
-IEkvTyB0YXNrIHN0cnVjdHVyZXMgLSBub25lIG9mIHdoaWNoIGFyZSBpZGVhbC4NCj4gDQo+IFdo
-YXQgaWYgdGhpcyB3YXMganVzdCBidW1wZWQgZnJvbSAxMjYgdG8gMTI4PyAgSSBndWVzcyBJ4oCZ
-bSB0cnlpbmcgdG8gdW5kZXJzdGFuZCB0aGUgbGV2ZWwgb2YgZ3Vlc3QgYW5kIGhvc3QgSS9PIHBl
-cmZvcm1hbmNlIHRoYXQgaXMgZ2FpbmVkIHdpdGggdGhpcyBwYXRjaC4gIE9uZSBJL08gcGVyIDUx
-MktCIHZzLiBvbmUgSS9PIHBlciA0TUIgLSB3ZSBhcmUgc3RpbGwgb25seSB0YWxraW5nIGFib3V0
-IGEgZmV3IGh1bmRyZWQgSU8vcyBkaWZmZXJlbmNlLg0KDQpTZWFCSU9TIGFsc28gbWFrZXMgdGhl
-IGFzc3VtcHRpb24gdGhhdCB0aGUgcXVldWUgc2l6ZSBpcyBub3QgYmlnZ2VyIHRoYW4gMTI4IGVs
-ZW1lbnRzLg0KaHR0cHM6Ly9yZXZpZXcuY29yZWJvb3Qub3JnL2NnaXQvc2VhYmlvcy5naXQvdHJl
-ZS9zcmMvaHcvdmlydGlvLXJpbmcuaCNuMjMNCg0KUGVyaGFwcyBhIGJldHRlciBhcHByb2FjaCBp
-cyB0byBtYWtlIHRoZSB2YWx1ZSBjb25maWd1cmFibGUgKGllLiBhZGQgdGhlICJtYXhfc2VnbWVu
-dHMiIHByb3BlcnR5KSwgYnV0IHNldCB0aGUgZGVmYXVsdCB0byAxMjgtMi4gSW4gYWRkaXRpb24g
-dG8gd2hhdCBKaW0gcG9pbnRlZCBvdXQsIEkgdGhpbmsgdGhlcmUgbWF5IGJlIG90aGVyIGxlZ2Fj
-eSBmcm9udCBlbmQgZHJpdmVycyB3aGljaCBjYW4gYXNzdW1lIHRoZSByaW5nIHdpbGwgYmUgYXQg
-bW9zdCAxMjggZW50cmllcyBpbiBzaXplLg0KDQpXaXRoIHRoYXQsIGh5cGVydmlzb3JzIGNhbiBj
-aG9vc2UgdG8gYnVtcCB0aGUgdmFsdWUgaGlnaGVyIGlmIGl0J3Mga25vd24gdG8gYmUgc2FmZSBm
-b3IgdGhlaXIgaG9zdCtndWVzdCBjb25maWd1cmF0aW9uLg0KDQpDaGVlcnMsDQpGZWxpcGUNCg0K
-PiANCj4gLUppbQ0KPiANCj4gDQoNCg==
+On 18/12/2017 19:36, Cornelia Huck wrote:
+> Building with --disable-tpm yields
+>=20
+> ../hw/core/qdev-properties-system.o: In function `set_tpm':
+> /home/cohuck/git/qemu/hw/core/qdev-properties-system.c:274: undefined r=
+eference to `qemu_find_tpm_be'
+> /home/cohuck/git/qemu/hw/core/qdev-properties-system.c:278: undefined r=
+eference to `tpm_backend_init'
+> ../hw/core/qdev-properties-system.o: In function `release_tpm':
+> /home/cohuck/git/qemu/hw/core/qdev-properties-system.c:291: undefined r=
+eference to `tpm_backend_reset'
+>=20
+> Move the implementation of DEFINE_PROP_TPMBE to hw/tpm/ so that it is
+> only built when tpm is actually configured, and build tpm_util in every
+> case.
+>=20
+> Fixes: 493b78303532 ("qdev: add DEFINE_PROP_TPMBE")
+> Reported-by: Thomas Huth <thuth@redhat.com>
+> Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+> ---
+> v1->v2: fix x86_64 build with mingw (always build tpm_util)
+> ---
+>  hw/core/qdev-properties-system.c | 64 --------------------------------=
+------
+>  hw/tpm/Makefile.objs             |  5 +--
+>  hw/tpm/tpm_util.c                | 67 ++++++++++++++++++++++++++++++++=
+++++++++
+>  hw/tpm/tpm_util.h                |  3 ++
+>  include/hw/qdev-properties.h     |  2 --
+>  5 files changed, 73 insertions(+), 68 deletions(-)
+>=20
+
+Reviewed-by: Laurent Vivier <lvivier@redhat.com>
