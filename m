@@ -1,27 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39358)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40012)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1eQtl0-0005E1-5R
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 06:38:55 -0500
+	(envelope-from <thuth@redhat.com>) id 1eQtn4-0006k7-Em
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 06:41:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1eQtkz-0008Rp-0f
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 06:38:54 -0500
-Received: from ozlabs.org ([2401:3900:2:1::2]:35147)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgibson@ozlabs.org>) id 1eQtky-0008Pi-HS
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 06:38:52 -0500
-Date: Mon, 18 Dec 2017 22:38:26 +1100
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20171218113826.GD4786@umbus.fritz.box>
-References: <1509710516-21084-1-git-send-email-yi.l.liu@linux.intel.com>
-	<1509710516-21084-3-git-send-email-yi.l.liu@linux.intel.com>
-	<cddc6820-86d8-4db2-126a-94edd86fbffe@redhat.com>
+	(envelope-from <thuth@redhat.com>) id 1eQtn1-0001Ti-Cj
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 06:41:02 -0500
+From: Thomas Huth <thuth@redhat.com>
+Date: Mon, 18 Dec 2017 12:40:47 +0100
+Message-Id: <1513597251-21942-1-git-send-email-thuth@redhat.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="fOHHtNG4YXGJ0yqR"
-Content-Disposition: inline
-In-Reply-To: <cddc6820-86d8-4db2-126a-94edd86fbffe@redhat.com>
-Subject: Re: [Qemu-devel] [RESEND PATCH 2/6] memory: introduce
- AddressSpaceOps and IOMMUObject
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v2 0/4] tests: Rename pc-cpu-test.c to
+ cpu-plug-test.c
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,68 +21,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Auger Eric <eric.auger@redhat.com>
-Cc: "Liu, Yi L" <yi.l.liu@linux.intel.com>, qemu-devel@nongnu.org, mst@redhat.com, pbonzini@redhat.com, alex.williamson@redhat.com, tianyu.lan@intel.com, kevin.tian@intel.com, yi.l.liu@intel.com, jasowang@redhat.com, peterx@redhat.com
+To: qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-ppc@nongnu.org, qemu-s390x@nongnu.org, Bharata B Rao <bharata@linux.vnet.ibm.com>, david@redhat.com, Daniel Barboza <danielhb@linux.vnet.ibm.com>
 
+So far the CPU hot-plug qtest was only checking "cpu-add" on x86. With
+these patches, we now test "device_add" for hot-plugging CPUs on x86,
+and enable the test on ppc64 and s390x, too.
 
---fOHHtNG4YXGJ0yqR
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+v2:
+ - Rebased to current master, fixed contextual conflicts in
+   tests/Makefile.include
+ - Adjusted the data->device_model to the current version of QEMU
+   (e.g. use "qemu-s390x-cpu" instead of "qemu-s390-cpu")
 
-On Tue, Nov 14, 2017 at 11:21:59AM +0100, Auger Eric wrote:
-> Hi Yi L,
->=20
-> On 03/11/2017 13:01, Liu, Yi L wrote:
-> > From: Peter Xu <peterx@redhat.com>
-> >=20
-> > AddressSpaceOps is similar to MemoryRegionOps, it's just for address
-> > spaces to store arch-specific hooks.
-> >=20
-> > The first hook I would like to introduce is iommu_get(). Return an
-> > IOMMUObject behind the AddressSpace.
->=20
-> David had an objection in the past about this method, saying that
-> several IOMMUs could translate a single AS?
->=20
-> https://lists.gnu.org/archive/html/qemu-devel/2017-05/msg01610.html
->=20
-> On ARM I think it works in general:
-> In
-> https://github.com/torvalds/linux/blob/master/Documentation/devicetree/bi=
-ndings/pci/pci-iommu.txt,
-> it is said
-> "a given PCI device can only master through one IOMMU"
+Thomas Huth (4):
+  tests: Rename pc-cpu-test.c to cpu-plug-test.c
+  tests/cpu-plug-test: Check the CPU hot-plugging with device_add, too
+  tests/cpu-plug-test: Check CPU hot-plugging on ppc64, too
+  tests/cpu-plug-test: Test CPU hot-plugging on s390x
 
-That's using a platform specific meaning of what "one IOMMU" means.
-In general what's several IOMMUs and what's one IOMMU which responds
-to several address regions is not distinguishable from the device's
-point of view.
+ tests/Makefile.include |   6 +-
+ tests/cpu-plug-test.c  | 267 +++++++++++++++++++++++++++++++++++++++++++=
+++++++
+ tests/pc-cpu-test.c    | 135 -------------------------
+ 3 files changed, 271 insertions(+), 137 deletions(-)
+ create mode 100644 tests/cpu-plug-test.c
+ delete mode 100644 tests/pc-cpu-test.c
 
 --=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---fOHHtNG4YXGJ0yqR
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlo3qLIACgkQbDjKyiDZ
-s5IlKRAAoRPbXW+JQYFCfup+F4wt+EixuWmLmdX+pZHK14MBM+G6dWh6zPMwEXCG
-AFnewdsPUrLFINACs3Crns1apvcS944D6esv4H6oAPGiF3OjQvh6ZF2ZEGUHJc86
-3lQVk2SPjRs+EDCEXydb7vJrmH++hZ8Spm4aWPX2lG+EHHfSoUYIGnNZE1i7sdY0
-f4uDuiQMD36iZEshxjgrI9oIYFJ9iPfQdcAQPOlv45MwWyNwFPUOQhFlIllCSnoa
-1qX7TYXNHbSnU8gVfHszTuf715Yz4PQFvPZI20Vv8pfA84zdoE++zCN1mJK2vexN
-l6thIQvSYDtx4k5OH7112Jg1EsT1wbAdycHrY5CjdHXbqEvDd0HBgZMbRMD6YK57
-X6i0p5//ttE+NDFC6oNwNyhxMokHh9ZVu0etNe0BKaYyB41zU0jlAVufWA5VQM9h
-hwWl972Cftq8jkeaYMh4OuYoZQ1icjr3PqJy/S+mlEQypmRZnhnZqCFuKl1RHAID
-erieJF0wZ3V5MRiIDvOcpFipc0hb+ZCq2gmcxMKQ/4jrCgCs5SUzm8ZQ1M3HLGyE
-7o3Qco0NmAjaNc9CLco/DV1WkU9fDzQcRWlOH3VEw5iQIkYELj4O9MkB4TlxdtzW
-k1N51bS/Wjxhb1uZN9oKJzFURlbzwJ1cqIAdhnhcMR9kZf/yUjk=
-=FrnT
------END PGP SIGNATURE-----
-
---fOHHtNG4YXGJ0yqR--
+1.8.3.1
