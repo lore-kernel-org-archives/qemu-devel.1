@@ -1,26 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43459)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43972)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1eQtwM-0006Nn-Dk
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 06:50:39 -0500
+	(envelope-from <groug@kaod.org>) id 1eQtxX-00077S-Hd
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 06:51:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1eQtwI-0007n1-3J
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 06:50:38 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:35824)
+	(envelope-from <groug@kaod.org>) id 1eQtxS-0001Ig-MA
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 06:51:51 -0500
+Received: from 20.mo1.mail-out.ovh.net ([188.165.45.168]:39447)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1eQtwH-0007lD-CX
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 06:50:34 -0500
-From: Thomas Huth <thuth@redhat.com>
-References: <1513446109-9013-1-git-send-email-stefanb@linux.vnet.ibm.com>
-	<CAFEAcA96q6RGAmWJj=jYgYBC_yrP-NcZ6A4_w=S7vgn=-pL3Jw@mail.gmail.com>
-	<35bf84c9-271d-5ded-0876-0edb9304b2fc@redhat.com>
-Message-ID: <8520cb93-2dce-7b51-87a1-834652890751@redhat.com>
-Date: Mon, 18 Dec 2017 12:50:29 +0100
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1eQtxS-0001Eu-GI
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 06:51:46 -0500
+Received: from player691.ha.ovh.net (gw6.ovh.net [213.251.189.206])
+	by mo1.mail-out.ovh.net (Postfix) with ESMTP id A027DAF82B
+	for <qemu-devel@nongnu.org>; Mon, 18 Dec 2017 12:51:44 +0100 (CET)
+Date: Mon, 18 Dec 2017 12:51:35 +0100
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20171218125135.2cc3de68@bahia.lan>
+In-Reply-To: <20171218092024.21645-7-david@gibson.dropbear.id.au>
+References: <20171218092024.21645-1-david@gibson.dropbear.id.au>
+	<20171218092024.21645-7-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
-In-Reply-To: <35bf84c9-271d-5ded-0876-0edb9304b2fc@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PULL v1 00/32] Merge tpm 2017/12/15
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 6/6] spapr: Handle Decimal Floating Point
+ (DFP) as an optional capability
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,64 +31,121 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, Stefan Berger <stefanb@linux.vnet.ibm.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: surajjs@au1.ibm.com, lvivier@redhat.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, mdroth@linux.vnet.ibm.com, abologna@redhat.com
 
-On 18.12.2017 12:18, Thomas Huth wrote:
-> On 17.12.2017 22:34, Peter Maydell wrote:
->> On 16 December 2017 at 17:41, Stefan Berger <stefanb@linux.vnet.ibm.co=
-m> wrote:
->>> The following patch series refactors the TPM TIS and backend drivers =
-for
->>> easier addition of new front-end devices. Further, the TPM buffer siz=
-es
->>> are read from the backend and the backend's buffer size can be adjust=
-ed
->>> by the frontend, if necessary.
->>>
->>>
->>> The following changes since commit 0ef0583d5adceb9138bdb47494dabd1549=
-ac5b6d:
->>>
->>>   Merge remote-tracking branch 'remotes/dgilbert/tags/pull-hmp-201712=
-14' into staging (2017-12-14 15:32:32 +0000)
->>>
->>> are available in the git repository at:
->>>
->>>   git://github.com/stefanberger/qemu-tpm.git tags/pull-tpm-2017-12-15=
--1
->>>
->>> for you to fetch changes up to 683c4b775355cc7acd301e8efe7d4c1c9acdaf=
-d8:
->>>
->>>   tpm: tpm_passthrough: Fail startup if FE buffer size < BE buffer si=
-ze (2017-12-14 23:39:15 -0500)
->>>
->>> ----------------------------------------------------------------
->>> Merge tpm 2017/12/15 v1
->>
->> Applied, thanks.
->=20
-> This apparently broke compilation on non-x86 architectures:
->=20
->   LINK    s390x-softmmu/qemu-system-s390x
-> ../hw/core/qdev-properties-system.o: In function `release_tpm':
-> /home/thuth/devel/qemu/hw/core/qdev-properties-system.c:291: undefined =
-reference to `tpm_backend_reset'
-> ../hw/core/qdev-properties-system.o: In function `set_tpm':
-> /home/thuth/devel/qemu/hw/core/qdev-properties-system.c:274: undefined =
-reference to `qemu_find_tpm_be'
-> /home/thuth/devel/qemu/hw/core/qdev-properties-system.c:278: undefined =
-reference to `tpm_backend_init'
-> collect2: error: ld returned 1 exit status
-> make: Leaving directory `/home/thuth/s390x/qemu'
-> make[1]: *** [qemu-system-s390x] Error 1
-> make: *** [subdir-s390x-softmmu] Error 2
->=20
-> Could you please fix this ASAP?
+On Mon, 18 Dec 2017 20:20:24 +1100
+David Gibson <david@gibson.dropbear.id.au> wrote:
 
-FWIW, looks like there was a "--disable-tpm" in my config.status file,
-not sure why. So that's likely causing the issue here, not the non-x86
-system.
+> Decimal Floating Point has been available on POWER7 and later (server)
+> cpus.  However, it can be disabled on the hypervisor, meaning that it's
+> not available to guests.
+> 
+> We currently handle this by conditionally advertising DFP support in the
+> device tree depending on whether the guest CPU model supports it - which
+> can also depend on what's allowed in the host for -cpu host.  That can lead
+> to confusion on migration, since host properties are silently affecting
+> guest visible properties.
+> 
+> This patch handles it by treating it as an optional capability for the
+> pseries machine type.
+> 
+> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+> ---
 
- Thomas
+Reviewed-by: Greg Kurz <groug@kaod.org>
+
+>  hw/ppc/spapr.c         |  7 ++++---
+>  hw/ppc/spapr_caps.c    | 18 ++++++++++++++++++
+>  include/hw/ppc/spapr.h |  3 +++
+>  3 files changed, 25 insertions(+), 3 deletions(-)
+> 
+> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> index 693dd6f7b3..e22888ba06 100644
+> --- a/hw/ppc/spapr.c
+> +++ b/hw/ppc/spapr.c
+> @@ -572,7 +572,7 @@ static void spapr_populate_cpu_dt(CPUState *cs, void *fdt, int offset,
+>      /* Advertise DFP (Decimal Floating Point) if available
+>       *   0 / no property == no DFP
+>       *   1               == DFP available */
+> -    if (env->insns_flags2 & PPC2_DFP) {
+> +    if (spapr_has_cap(spapr, SPAPR_CAP_DFP)) {
+>          _FDT((fdt_setprop_cell(fdt, offset, "ibm,dfp", 1)));
+>      }
+>  
+> @@ -3834,7 +3834,7 @@ static void spapr_machine_class_init(ObjectClass *oc, void *data)
+>       */
+>      mc->numa_mem_align_shift = 28;
+>  
+> -    smc->default_caps = spapr_caps(SPAPR_CAP_VSX);
+> +    smc->default_caps = spapr_caps(SPAPR_CAP_VSX | SPAPR_CAP_DFP);
+>      spapr_caps_add_properties(smc, &error_abort);
+>  }
+>  
+> @@ -3916,7 +3916,8 @@ static void spapr_machine_2_11_class_options(MachineClass *mc)
+>      sPAPRMachineClass *smc = SPAPR_MACHINE_CLASS(mc);
+>  
+>      spapr_machine_2_12_class_options(mc);
+> -    smc->default_caps = spapr_caps(SPAPR_CAP_HTM | SPAPR_CAP_VSX);
+> +    smc->default_caps = spapr_caps(SPAPR_CAP_HTM | SPAPR_CAP_VSX
+> +                                   | SPAPR_CAP_DFP);
+>      SET_MACHINE_COMPAT(mc, SPAPR_COMPAT_2_11);
+>  }
+>  
+> diff --git a/hw/ppc/spapr_caps.c b/hw/ppc/spapr_caps.c
+> index da066aec8f..61745f0b32 100644
+> --- a/hw/ppc/spapr_caps.c
+> +++ b/hw/ppc/spapr_caps.c
+> @@ -70,6 +70,16 @@ static void cap_vsx_allow(sPAPRMachineState *spapr, Error **errp)
+>      }
+>  }
+>  
+> +static void cap_dfp_allow(sPAPRMachineState *spapr, Error **errp)
+> +{
+> +    PowerPCCPU *cpu = POWERPC_CPU(first_cpu);
+> +    CPUPPCState *env = &cpu->env;
+> +
+> +    if (!(env->insns_flags2 & PPC2_DFP)) {
+> +        error_setg(errp, "DFP support not available, try cap-dfp=off");
+> +    }
+> +}
+> +
+>  static sPAPRCapabilityInfo capability_table[] = {
+>      {
+>          .name = "htm",
+> @@ -85,6 +95,13 @@ static sPAPRCapabilityInfo capability_table[] = {
+>          .allow = cap_vsx_allow,
+>          /* TODO: add cap_vsx_disallow */
+>      },
+> +    {
+> +        .name = "dfp",
+> +        .description = "Allow Decimal Floating Point (DFP)",
+> +        .flag = SPAPR_CAP_DFP,
+> +        .allow = cap_dfp_allow,
+> +        /* TODO: add cap_dfp_disallow */
+> +    },
+>  };
+>  
+>  static sPAPRCapabilities default_caps_with_cpu(sPAPRMachineState *spapr,
+> @@ -104,6 +121,7 @@ static sPAPRCapabilities default_caps_with_cpu(sPAPRMachineState *spapr,
+>      if (!ppc_check_compat(cpu, CPU_POWERPC_LOGICAL_2_06,
+>                            0, spapr->max_compat_pvr)) {
+>          caps.mask &= ~SPAPR_CAP_VSX;
+> +        caps.mask &= ~SPAPR_CAP_DFP;
+>      }
+>  
+>      return caps;
+> diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
+> index 148a03d189..26ac17e641 100644
+> --- a/include/hw/ppc/spapr.h
+> +++ b/include/hw/ppc/spapr.h
+> @@ -62,6 +62,9 @@ typedef enum {
+>  /* Vector Scalar Extensions */
+>  #define SPAPR_CAP_VSX               0x0000000000000002ULL
+>  
+> +/* Decimal Floating Point */
+> +#define SPAPR_CAP_DFP               0x0000000000000004ULL
+> +
+>  typedef struct sPAPRCapabilities sPAPRCapabilities;
+>  struct sPAPRCapabilities {
+>      uint64_t mask;
