@@ -1,21 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33863)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34087)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1eQwO7-0008Ay-Al
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 09:27:28 -0500
+	(envelope-from <groug@kaod.org>) id 1eQwOH-0008KK-V0
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 09:27:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1eQwO6-0006ml-Fu
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 09:27:27 -0500
-Date: Mon, 18 Dec 2017 14:27:15 +0000
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20171218142715.GK16653@stefanha-x1.localdomain>
-References: <20171214005953.8898-1-jsnow@redhat.com>
-	<20171214005953.8898-4-jsnow@redhat.com>
+	(envelope-from <groug@kaod.org>) id 1eQwOD-0006sN-O2
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 09:27:37 -0500
+Received: from 16.mo1.mail-out.ovh.net ([178.33.104.224]:58251)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1eQwOD-0006r8-0m
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 09:27:33 -0500
+Received: from player691.ha.ovh.net (gw6.ovh.net [213.251.189.206])
+	by mo1.mail-out.ovh.net (Postfix) with ESMTP id E1DA8B157D
+	for <qemu-devel@nongnu.org>; Mon, 18 Dec 2017 15:27:30 +0100 (CET)
+Date: Mon, 18 Dec 2017 15:27:26 +0100
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20171218152726.391e607f@bahia.lan>
+In-Reply-To: <20171218141946.GB26755@redhat.com>
+References: <151360476094.18806.1179096997853697345.stgit@bahia.lan>
+	<20171218141946.GB26755@redhat.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="Jtds+vpI57xq70EV"
-Content-Disposition: inline
-In-Reply-To: <20171214005953.8898-4-jsnow@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 3/7] blockjob: create block_job_throttle
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] 9pfs: deprecate handle backend
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,43 +30,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>
-Cc: qemu-block@nongnu.org, kwolf@redhat.com, jcody@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: qemu-devel@nongnu.org, "Aneesh Kumar K.V" <aneesh.kumar@linux.vnet.ibm.com>
 
+On Mon, 18 Dec 2017 14:19:46 +0000
+"Daniel P. Berrange" <berrange@redhat.com> wrote:
 
---Jtds+vpI57xq70EV
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+> On Mon, Dec 18, 2017 at 02:46:00PM +0100, Greg Kurz wrote:
+> > This backend raise some concerns:
+> > 
+> > - doesn't support symlinks
+> > - fails +100 tests in the PJD POSIX file system test suite [1]
+> > - requires the QEMU process to run with the CAP_DAC_READ_SEARCH
+> >   capability, which isn't recommended for security reasons
+> > 
+> > For all these reasons, the handle backend is now deprecated.
+> > 
+> > [1] https://www.tuxera.com/community/posix-test-suite/
+> > 
+> > Signed-off-by: Greg Kurz <groug@kaod.org>
+> > ---
+> > 
+> > Aneesh,
+> > 
+> > Even if I see the benefit of using file handles in a userspace file
+> > server, the handle backend still has flaws that make it hardly usable
+> > IMHO. Also I haven't received anything about it in years. All users
+> > and contributors seem to stick to the local backend.
+> > 
+> > My guess is that nobody uses the handle backend, and unless I'm missing
+> > something, it wouldn't hurt to drop it. My motivation is to reduce the
+> > number of lines that I don't really have time/motivation to maintain,
+> > and that could be subject to a CVE in the future.
+> > 
+> > Any thoughts ?
+> > ---
+> >  hw/9pfs/9p-handle.c |    2 ++
+> >  qemu-doc.texi       |    8 ++++++++
+> >  2 files changed, 10 insertions(+)
+> > 
+> > diff --git a/hw/9pfs/9p-handle.c b/hw/9pfs/9p-handle.c
+> > index 9875f1894cc5..1291a2db6782 100644
+> > --- a/hw/9pfs/9p-handle.c
+> > +++ b/hw/9pfs/9p-handle.c
+> > @@ -657,6 +657,8 @@ static int handle_parse_opts(QemuOpts *opts, struct FsDriverEntry *fse)
+> >      const char *sec_model = qemu_opt_get(opts, "security_model");
+> >      const char *path = qemu_opt_get(opts, "path");
+> >  
+> > +    warn_report("handle backend is deprecated");
+> > +
+> >      if (sec_model) {
+> >          error_report("Invalid argument security_model specified with handle fsdriver");
+> >          return -1;
+> > diff --git a/qemu-doc.texi b/qemu-doc.texi
+> > index f7317dfc66cd..bf44e2752cb2 100644
+> > --- a/qemu-doc.texi
+> > +++ b/qemu-doc.texi
+> > @@ -2509,6 +2509,14 @@ default channel subsystem image for guests that do not support multiple
+> >  channel subsystems, all devices can be put into the default channel
+> >  subsystem image.
+> >  
+> > +@subsection -fsdev handle (since 2.12.0)
+> > +
+> > +The ``handle'' fsdev backend does not support symlinks and causes the 9p
+> > +filesystem in the guest to fail a fair amount of tests from the PJD POSIX
+> > +filesystem test suite. Also it requires the CAP_DAC_READ_SEARCH capability,
+> > +which is not the recommended way to run QEMU. This backend should not be
+> > +used and it will be removed with no replacement.
+> > +  
+> 
+> I would suggest a slight teak to the last sentance.
+> 
+>  "This backend should not be used and wil be removed. The 'local' backend
+>   is the recommended alternative"
+> 
 
-On Wed, Dec 13, 2017 at 07:59:49PM -0500, John Snow wrote:
-> +/**
-> + * block_job_throttle:
-> + * @job: The job that calls the function.
-> + *
-> + * Yield if it has been SLICE_TIME nanoseconds since the last yield.
-> + * Otherwise, check if we need to pause (and update the yield counter).
-> + */
-> +void block_job_throttle(BlockJob *job);
+Good idea. I'll just do that.
 
-This name is easily confused with the block-job-set-speed
-ratelimit/throttling feature.
+> Regardless of whether you include this wording change though:
+> 
+>   Reviewed-by: Daniel P. Berrange <berrange@redhat.com>
+> 
 
-I suggest block_job_cpu_relax() or just block_job_relax() to make it
-clear we're giving up our CPU time voluntarily - but this isn't
-"throttling".
+Thanks !
 
---Jtds+vpI57xq70EV
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJaN9BDAAoJEJykq7OBq3PIgwkH+weZD++NZkg1wXHURpmNL4Hs
-/iD/x6l/0cXJcZzCm4qM2RKKxJFhjCYYMWg1k0VXnk3RrY1QeRNmeGr7gbMxCoC6
-FMOssb436CC/5X9kiwBX5ie2fCj6NCj6/rmgo/w+bWtWOvyfEKcireNcfMtu4F23
-Z6wEk3KmPsTUEa97+NMobpo686jesRU8/Odpyf1Hqf8zJXZTOAEC6x1Tt/soKsIV
-Hr+ddvhFnrO7x3ZDUMk/Lo1aaCm1dXeERdM+POaT+iqOcIU49HCvm4QMisviOl3t
-NHV7f9iwLVRvVVcsUtz1upsVyNrwKihH0ANOm8QBthM9Hj4wr2L4/NQ4pyXWYFY=
-=pHDr
------END PGP SIGNATURE-----
-
---Jtds+vpI57xq70EV--
+> 
+> Regards,
+> Daniel
