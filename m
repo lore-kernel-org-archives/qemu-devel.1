@@ -1,15 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48040)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54836)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1eQzK5-0006pY-5D
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 12:35:34 -0500
+	(envelope-from <thuth@redhat.com>) id 1eQzSp-0006mh-Ti
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 12:44:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1eQzJu-0000ph-Mn
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 12:35:29 -0500
+	(envelope-from <thuth@redhat.com>) id 1eQzSn-0000iy-Ay
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 12:44:31 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:54738)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1eQzSn-0000iG-4j
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 12:44:29 -0500
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 321F7C070146
+	for <qemu-devel@nongnu.org>; Mon, 18 Dec 2017 17:44:28 +0000 (UTC)
 From: Thomas Huth <thuth@redhat.com>
-Date: Mon, 18 Dec 2017 18:35:12 +0100
-Message-Id: <1513618512-30070-1-git-send-email-thuth@redhat.com>
-Subject: [Qemu-devel] [PATCH] hw/ppc: Remove the deprecated
- spapr-pci-vfio-host-bridge device
+Date: Mon, 18 Dec 2017 18:44:25 +0100
+Message-Id: <1513619065-31722-1-git-send-email-thuth@redhat.com>
+Subject: [Qemu-devel] [PATCH] Remove legacy -no-kvm-pit option
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,109 +27,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>, qemu-ppc@nongnu.org
-Cc: qemu-devel@nongnu.org, Alexey Kardashevskiy <aik@ozlabs.ru>
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
 
-It's a deprecated dummy device since QEMU v2.6.0. That should have
-been enough time to allow the users to update their scripts in case
-they still use it, so let's remove this legacy code now.
+It's only printing a warning since QEMU v1.3.0, so nobody should use
+this anymore today. Let's get rid of this now.
 
 Signed-off-by: Thomas Huth <thuth@redhat.com>
 ---
- hw/ppc/spapr_pci_vfio.c   | 47 -----------------------------------------------
- qemu-doc.texi             |  5 -----
- scripts/device-crash-test |  1 -
- 3 files changed, 53 deletions(-)
+ qemu-doc.texi   | 5 -----
+ qemu-options.hx | 3 ---
+ vl.c            | 4 ----
+ 3 files changed, 12 deletions(-)
 
-diff --git a/hw/ppc/spapr_pci_vfio.c b/hw/ppc/spapr_pci_vfio.c
-index 8448e0b..053efb0 100644
---- a/hw/ppc/spapr_pci_vfio.c
-+++ b/hw/ppc/spapr_pci_vfio.c
-@@ -29,31 +29,6 @@
- #include "qemu/error-report.h"
- #include "sysemu/qtest.h"
- 
--#define TYPE_SPAPR_PCI_VFIO_HOST_BRIDGE "spapr-pci-vfio-host-bridge"
--
--#define SPAPR_PCI_VFIO_HOST_BRIDGE(obj) \
--    OBJECT_CHECK(sPAPRPHBVFIOState, (obj), TYPE_SPAPR_PCI_VFIO_HOST_BRIDGE)
--
--typedef struct sPAPRPHBVFIOState sPAPRPHBVFIOState;
--
--struct sPAPRPHBVFIOState {
--    sPAPRPHBState phb;
--
--    int32_t iommugroupid;
--};
--
--static Property spapr_phb_vfio_properties[] = {
--    DEFINE_PROP_INT32("iommu", sPAPRPHBVFIOState, iommugroupid, -1),
--    DEFINE_PROP_END_OF_LIST(),
--};
--
--static void spapr_phb_vfio_instance_init(Object *obj)
--{
--    if (!qtest_enabled()) {
--        error_report("spapr-pci-vfio-host-bridge is deprecated");
--    }
--}
--
- bool spapr_phb_eeh_available(sPAPRPHBState *sphb)
- {
-     return vfio_eeh_as_ok(&sphb->iommu_as);
-@@ -218,25 +193,3 @@ int spapr_phb_vfio_eeh_configure(sPAPRPHBState *sphb)
- 
-     return RTAS_OUT_SUCCESS;
- }
--
--static void spapr_phb_vfio_class_init(ObjectClass *klass, void *data)
--{
--    DeviceClass *dc = DEVICE_CLASS(klass);
--
--    dc->props = spapr_phb_vfio_properties;
--}
--
--static const TypeInfo spapr_phb_vfio_info = {
--    .name          = TYPE_SPAPR_PCI_VFIO_HOST_BRIDGE,
--    .parent        = TYPE_SPAPR_PCI_HOST_BRIDGE,
--    .instance_size = sizeof(sPAPRPHBVFIOState),
--    .instance_init = spapr_phb_vfio_instance_init,
--    .class_init    = spapr_phb_vfio_class_init,
--};
--
--static void spapr_pci_vfio_register_types(void)
--{
--    type_register_static(&spapr_phb_vfio_info);
--}
--
--type_init(spapr_pci_vfio_register_types)
 diff --git a/qemu-doc.texi b/qemu-doc.texi
-index f7317df..14d818d 100644
+index 14d818d..d9861b3 100644
 --- a/qemu-doc.texi
 +++ b/qemu-doc.texi
-@@ -2533,11 +2533,6 @@ The ``host_net_remove'' command is replaced by the ``netdev_del'' command.
- The ``ivshmem'' device type is replaced by either the ``ivshmem-plain''
- or ``ivshmem-doorbell`` device types.
+@@ -2396,11 +2396,6 @@ synonym for setting ``-global kvm-pit.lost_tick_policy=discard''.
+ The ``-no-kvm-irqchip'' argument is now a synonym for
+ setting ``-machine kernel_irqchip=off''.
  
--@subsection spapr-pci-vfio-host-bridge (since 2.6.0)
+-@subsection -no-kvm-pit (since 1.3.0)
 -
--The ``spapr-pci-vfio-host-bridge'' device type is replaced by
--the ``spapr-pci-host-bridge'' device type.
+-The ``-no-kvm-pit'' argument is ignored. It is no longer
+-possible to disable the KVM PIT directly.
 -
- @section System emulator machines
+ @subsection -no-kvm (since 1.3.0)
  
- @subsection Xilinx EP108 (since 2.11.0)
-diff --git a/scripts/device-crash-test b/scripts/device-crash-test
-index 1aca55f..7417177 100755
---- a/scripts/device-crash-test
-+++ b/scripts/device-crash-test
-@@ -119,7 +119,6 @@ ERROR_WHITELIST = [
-     {'device':'scsi-generic', 'expected':True},            # drive property not set
-     {'device':'scsi-hd', 'expected':True},                 # drive property not set
-     {'device':'spapr-pci-host-bridge', 'expected':True},   # BUID not specified for PHB
--    {'device':'spapr-pci-vfio-host-bridge', 'expected':True}, # BUID not specified for PHB
-     {'device':'spapr-rng', 'expected':True},               # spapr-rng needs an RNG backend!
-     {'device':'spapr-vty', 'expected':True},               # chardev property not set
-     {'device':'tpm-tis', 'expected':True},                 # tpm_tis: backend driver with id (null) could not be found
+ The ``-no-kvm'' argument is now a synonym for setting
+diff --git a/qemu-options.hx b/qemu-options.hx
+index fe0c292..aa0e849 100644
+--- a/qemu-options.hx
++++ b/qemu-options.hx
+@@ -4139,9 +4139,6 @@ HXCOMM Deprecated by kvm-pit driver properties
+ DEF("no-kvm-pit-reinjection", 0, QEMU_OPTION_no_kvm_pit_reinjection,
+     "", QEMU_ARCH_I386)
+ 
+-HXCOMM Deprecated (ignored)
+-DEF("no-kvm-pit", 0, QEMU_OPTION_no_kvm_pit, "", QEMU_ARCH_I386)
+-
+ HXCOMM Deprecated by -machine kernel_irqchip=on|off property
+ DEF("no-kvm-irqchip", 0, QEMU_OPTION_no_kvm_irqchip, "", QEMU_ARCH_I386)
+ 
+diff --git a/vl.c b/vl.c
+index fc8bd93..2644400 100644
+--- a/vl.c
++++ b/vl.c
+@@ -3818,10 +3818,6 @@ int main(int argc, char **argv, char **envp)
+                 olist = qemu_find_opts("machine");
+                 qemu_opts_parse_noisily(olist, "accel=tcg", false);
+                 break;
+-            case QEMU_OPTION_no_kvm_pit: {
+-                warn_report("ignoring deprecated option");
+-                break;
+-            }
+             case QEMU_OPTION_no_kvm_pit_reinjection: {
+                 static GlobalProperty kvm_pit_lost_tick_policy = {
+                     .driver   = "kvm-pit",
 -- 
 1.8.3.1
