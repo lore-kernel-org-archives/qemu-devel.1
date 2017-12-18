@@ -1,27 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48796)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50313)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1eQsrd-0003Bs-Np
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 05:41:46 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1eQsx9-0005LL-Rg
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 05:47:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1eQsrY-0002i3-QJ
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 05:41:41 -0500
-Received: from 17.mo1.mail-out.ovh.net ([87.98.179.142]:59409)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1eQsrY-0002fG-FX
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 05:41:36 -0500
-Received: from player691.ha.ovh.net (gw6.ovh.net [213.251.189.206])
-	by mo1.mail-out.ovh.net (Postfix) with ESMTP id B8998B253A
-	for <qemu-devel@nongnu.org>; Mon, 18 Dec 2017 11:41:34 +0100 (CET)
-From: Greg Kurz <groug@kaod.org>
-Date: Mon, 18 Dec 2017 11:41:31 +0100
-Message-ID: <151359369131.6820.6589067560403425412.stgit@bahia.lan>
-In-Reply-To: <151359366858.6820.6567549632253797169.stgit@bahia.lan>
-References: <151359366858.6820.6567549632253797169.stgit@bahia.lan>
+	(envelope-from <dgilbert@redhat.com>) id 1eQsx4-0007sk-Qk
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 05:47:23 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:38574)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1eQsx4-0007sW-Gb
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 05:47:18 -0500
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 72EA47F3ED
+	for <qemu-devel@nongnu.org>; Mon, 18 Dec 2017 10:47:17 +0000 (UTC)
+Date: Mon, 18 Dec 2017 10:47:14 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20171218104713.GD2440@work-vm>
+References: <20171217052945.12782-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [PATCH v3 2/2] 9pfs: Correctly handle cancelled
- requests
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20171217052945.12782-1-pbonzini@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] scsi: provide general-purpose functions to
+ manage sense data
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,147 +33,247 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Greg Kurz <groug@kaod.org>, Stefano Stabellini <sstabellini@kernel.org>, keno@juliacomputing.com
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-From: Keno Fischer <keno@juliacomputing.com>
+* Paolo Bonzini (pbonzini@redhat.com) wrote:
+> Extract the common parts of scsi_sense_buf_to_errno, scsi_convert_sense
+> and scsi_target_send_command's REQUEST SENSE handling into two new
+> functions scsi_parse_sense_buf and scsi_build_sense_buf.
+> 
+> Fix a bug in scsi_target_send_command along the way; the length was
+> written in buf[10] rather than buf[7].
+> 
+> Reported-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> Fixes: b07fbce634 ("scsi-bus: correct responses for INQUIRY and REQUEST SENSE")
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 
-# Background
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 
-I was investigating spurious non-deterministic EINTR returns from
-various 9p file system operations in a Linux guest served from the
-qemu 9p server.
-
- ## EINTR, ERESTARTSYS and the linux kernel
-
-When a signal arrives that the Linux kernel needs to deliver to user-space
-while a given thread is blocked (in the 9p case waiting for a reply to its
-request in 9p_client_rpc -> wait_event_interruptible), it asks whatever
-driver is currently running to abort its current operation (in the 9p case
-causing the submission of a TFLUSH message) and return to user space.
-In these situations, the error message reported is generally ERESTARTSYS.
-If the userspace processes specified SA_RESTART, this means that the
-system call will get restarted upon completion of the signal handler
-delivery (assuming the signal handler doesn't modify the process state
-in complicated ways not relevant here). If SA_RESTART is not specified,
-ERESTARTSYS gets translated to EINTR and user space is expected to handle
-the restart itself.
-
- ## The 9p TFLUSH command
-
-The 9p TFLUSH commands requests that the server abort an ongoing operation.
-The man page [1] specifies:
-
-```
-If it recognizes oldtag as the tag of a pending transaction, it should abort any
-pending response and discard that tag.
-[...]
-When the client sends a Tflush, it must wait to receive the corresponding Rflush
-before reusing oldtag for subsequent messages. If a response to the flushed request
-is received before the Rflush, the client must honor the response as if it had not
-been flushed, since the completed request may signify a state change in the server
-```
-
-In particular, this means that the server must not send a reply with the orignal
-tag in response to the cancellation request, because the client is obligated
-to interpret such a reply as a coincidental reply to the original request.
-
- # The bug
-
-When qemu receives a TFlush request, it sets the `cancelled` flag on the relevant
-pdu. This flag is periodically checked, e.g. in `v9fs_co_name_to_path`, and if
-set, the operation is aborted and the error is set to EINTR. However, the server
-then violates the spec, by returning to the client an Rerror response, rather
-than discarding the message entirely. As a result, the client is required
-to assume that said Rerror response is a result of the original request, not
-a result of the cancellation and thus passes the EINTR error back to user space.
-This is not the worst thing it could do, however as discussed above, the correct
-error code would have been ERESTARTSYS, such that user space programs with
-SA_RESTART set get correctly restarted upon completion of the signal handler.
-Instead, such programs get spurious EINTR results that they were not expecting
-to handle.
-
-It should be noted that there are plenty of user space programs that do not
-set SA_RESTART and do not correctly handle EINTR either. However, that is then
-a userspace bug. It should also be noted that this bug has been mitigated by
-a recent commit to the Linux kernel [2], which essentially prevents the kernel
-from sending Tflush requests unless the process is about to die (in which case
-the process likely doesn't care about the response). Nevertheless, for older
-kernels and to comply with the spec, I believe this change is beneficial.
-
- # Implementation
-
-The fix is fairly simple, just skipping notification of a reply if
-the pdu was previously cancelled. We do however, also notify the transport
-layer that we're doing this, so it can clean up any resources it may be
-holding. I also added a new trace event to distinguish
-operations that caused an error reply from those that were cancelled.
-
-One complication is that we only omit sending the message on EINTR errors in
-order to avoid confusing the rest of the code (which may assume that a
-client knows about a fid if it sucessfully passed it off to pud_complete
-without checking for cancellation status). This does mean that if the server
-acts upon the cancellation flag, it always needs to set err to EINTR. I believe
-this is true of the current code.
-
-[1] https://9fans.github.io/plan9port/man/man9/flush.html
-[2] https://github.com/torvalds/linux/commit/9523feac272ccad2ad8186ba4fcc89103754de52
-
-Signed-off-by: Keno Fischer <keno@juliacomputing.com>
-Reviewed-by: Greg Kurz <groug@kaod.org>
-[groug, use new pdu_complete transport API]
-Signed-off-by: Greg Kurz <groug@kaod.org>
----
- hw/9pfs/9p.c         |   19 ++++++++++++++++++-
- hw/9pfs/trace-events |    1 +
- 2 files changed, 19 insertions(+), 1 deletion(-)
-
-diff --git a/hw/9pfs/9p.c b/hw/9pfs/9p.c
-index dd8b7c6d69c6..ccbc75265a52 100644
---- a/hw/9pfs/9p.c
-+++ b/hw/9pfs/9p.c
-@@ -630,6 +630,23 @@ static void coroutine_fn pdu_complete(V9fsPDU *pdu, ssize_t len)
-     V9fsState *s = pdu->s;
-     int ret;
- 
-+    /*
-+     * The 9p spec requires that successfully cancelled pdus receive no reply.
-+     * Sending a reply would confuse clients because they would
-+     * assume that any EINTR is the actual result of the operation,
-+     * rather than a consequence of the cancellation. However, if
-+     * the operation completed (succesfully or with an error other
-+     * than caused be cancellation), we do send out that reply, both
-+     * for efficiency and to avoid confusing the rest of the state machine
-+     * that assumes passing a non-error here will mean a successful
-+     * transmission of the reply.
-+     */
-+    bool discard = pdu->cancelled && len == -EINTR;
-+    if (discard) {
-+        trace_v9fs_rcancel(pdu->tag, pdu->id);
-+        goto out_complete;
-+    }
-+
-     if (len < 0) {
-         int err = -len;
-         len = 7;
-@@ -670,7 +687,7 @@ static void coroutine_fn pdu_complete(V9fsPDU *pdu, ssize_t len)
-     pdu->id = id;
- 
- out_complete:
--    pdu->s->transport->pdu_complete(pdu, false);
-+    pdu->s->transport->pdu_complete(pdu, discard);
- 
-     /* Now wakeup anybody waiting in flush for this request */
-     if (!qemu_co_queue_next(&pdu->complete)) {
-diff --git a/hw/9pfs/trace-events b/hw/9pfs/trace-events
-index 08a4abf22ea4..1aee350c42f1 100644
---- a/hw/9pfs/trace-events
-+++ b/hw/9pfs/trace-events
-@@ -1,6 +1,7 @@
- # See docs/devel/tracing.txt for syntax documentation.
- 
- # hw/9pfs/virtio-9p.c
-+v9fs_rcancel(uint16_t tag, uint8_t id) "tag %d id %d"
- v9fs_rerror(uint16_t tag, uint8_t id, int err) "tag %d id %d err %d"
- v9fs_version(uint16_t tag, uint8_t id, int32_t msize, char* version) "tag %d id %d msize %d version %s"
- v9fs_version_return(uint16_t tag, uint8_t id, int32_t msize, char* version) "tag %d id %d msize %d version %s"
+> ---
+>  hw/scsi/scsi-bus.c   |  16 +-----
+>  include/scsi/utils.h |   3 ++
+>  scsi/utils.c         | 139 +++++++++++++++++++++++++--------------------------
+>  3 files changed, 72 insertions(+), 86 deletions(-)
+> 
+> diff --git a/hw/scsi/scsi-bus.c b/hw/scsi/scsi-bus.c
+> index 977f7bce1f..965becf31f 100644
+> --- a/hw/scsi/scsi-bus.c
+> +++ b/hw/scsi/scsi-bus.c
+> @@ -540,20 +540,8 @@ static int32_t scsi_target_send_command(SCSIRequest *req, uint8_t *buf)
+>          if (req->lun != 0) {
+>              const struct SCSISense sense = SENSE_CODE(LUN_NOT_SUPPORTED);
+>  
+> -            if (fixed_sense) {
+> -                r->buf[0] = 0x70;
+> -                r->buf[2] = sense.key;
+> -                r->buf[10] = 10;
+> -                r->buf[12] = sense.asc;
+> -                r->buf[13] = sense.ascq;
+> -                r->len = MIN(req->cmd.xfer, SCSI_SENSE_LEN);
+> -            } else {
+> -                r->buf[0] = 0x72;
+> -                r->buf[1] = sense.key;
+> -                r->buf[2] = sense.asc;
+> -                r->buf[3] = sense.ascq;
+> -                r->len = 8;
+> -            }
+> +            r->len = scsi_build_sense_buf(r->buf, req->cmd.xfer,
+> +                                          sense, fixed_sense);
+>          } else {
+>              r->len = scsi_device_get_sense(r->req.dev, r->buf,
+>                                             MIN(req->cmd.xfer, r->buf_len),
+> diff --git a/include/scsi/utils.h b/include/scsi/utils.h
+> index eb07e474ee..4b705f5e0f 100644
+> --- a/include/scsi/utils.h
+> +++ b/include/scsi/utils.h
+> @@ -31,6 +31,9 @@ typedef struct SCSISense {
+>  } SCSISense;
+>  
+>  int scsi_build_sense(uint8_t *buf, SCSISense sense);
+> +SCSISense scsi_parse_sense_buf(const uint8_t *in_buf, int in_len);
+> +int scsi_build_sense_buf(uint8_t *buf, size_t max_size, SCSISense sense,
+> +                         bool fixed_sense);
+>  
+>  /*
+>   * Predefined sense codes
+> diff --git a/scsi/utils.c b/scsi/utils.c
+> index e4182a9b09..61bc1a8e2b 100644
+> --- a/scsi/utils.c
+> +++ b/scsi/utils.c
+> @@ -96,15 +96,60 @@ int scsi_cdb_length(uint8_t *buf)
+>      return cdb_len;
+>  }
+>  
+> +SCSISense scsi_parse_sense_buf(const uint8_t *in_buf, int in_len)
+> +{
+> +    bool fixed_in;
+> +    SCSISense sense;
+> +
+> +    assert(in_len > 0);
+> +    fixed_in = (in_buf[0] & 2) == 0;
+> +    if (fixed_in) {
+> +        if (in_len < 14) {
+> +            return SENSE_CODE(IO_ERROR);
+> +        }
+> +        sense.key = in_buf[2];
+> +        sense.asc = in_buf[12];
+> +        sense.ascq = in_buf[13];
+> +    } else {
+> +        if (in_len < 4) {
+> +            return SENSE_CODE(IO_ERROR);
+> +        }
+> +        sense.key = in_buf[1];
+> +        sense.asc = in_buf[2];
+> +        sense.ascq = in_buf[3];
+> +    }
+> +
+> +    return sense;
+> +}
+> +
+> +int scsi_build_sense_buf(uint8_t *out_buf, size_t size, SCSISense sense,
+> +                         bool fixed_sense)
+> +{
+> +    int len;
+> +    uint8_t buf[SCSI_SENSE_LEN] = { 0 };
+> +
+> +    if (fixed_sense) {
+> +        buf[0] = 0x70;
+> +        buf[2] = sense.key;
+> +        buf[7] = 10;
+> +        buf[12] = sense.asc;
+> +        buf[13] = sense.ascq;
+> +        len = 18;
+> +    } else {
+> +        buf[0] = 0x72;
+> +        buf[1] = sense.key;
+> +        buf[2] = sense.asc;
+> +        buf[3] = sense.ascq;
+> +        len = 8;
+> +    }
+> +    len = MIN(len, size);
+> +    memcpy(out_buf, buf, len);
+> +    return len;
+> +}
+> +
+>  int scsi_build_sense(uint8_t *buf, SCSISense sense)
+>  {
+> -    memset(buf, 0, 18);
+> -    buf[0] = 0x70;
+> -    buf[2] = sense.key;
+> -    buf[7] = 10;
+> -    buf[12] = sense.asc;
+> -    buf[13] = sense.ascq;
+> -    return 18;
+> +    return scsi_build_sense_buf(buf, SCSI_SENSE_LEN, sense, true);
+>  }
+>  
+>  /*
+> @@ -274,52 +319,21 @@ const struct SCSISense sense_code_SPACE_ALLOC_FAILED = {
+>  int scsi_convert_sense(uint8_t *in_buf, int in_len,
+>                         uint8_t *buf, int len, bool fixed)
+>  {
+> -    bool fixed_in;
+>      SCSISense sense;
+> -    if (!fixed && len < 8) {
+> -        return 0;
+> -    }
+> -
+> -    if (in_len == 0) {
+> -        sense.key = NO_SENSE;
+> -        sense.asc = 0;
+> -        sense.ascq = 0;
+> -    } else {
+> -        fixed_in = (in_buf[0] & 2) == 0;
+> -
+> -        if (fixed == fixed_in) {
+> -            memcpy(buf, in_buf, MIN(len, in_len));
+> -            return MIN(len, in_len);
+> -        }
+> +    bool fixed_in;
+>  
+> -        if (fixed_in) {
+> -            sense.key = in_buf[2];
+> -            sense.asc = in_buf[12];
+> -            sense.ascq = in_buf[13];
+> -        } else {
+> -            sense.key = in_buf[1];
+> -            sense.asc = in_buf[2];
+> -            sense.ascq = in_buf[3];
+> -        }
+> +    fixed_in = (in_buf[0] & 2) == 0;
+> +    if (in_len && fixed == fixed_in) {
+> +        memcpy(buf, in_buf, MIN(len, in_len));
+> +        return MIN(len, in_len);
+>      }
+>  
+> -    memset(buf, 0, len);
+> -    if (fixed) {
+> -        /* Return fixed format sense buffer */
+> -        buf[0] = 0x70;
+> -        buf[2] = sense.key;
+> -        buf[7] = 10;
+> -        buf[12] = sense.asc;
+> -        buf[13] = sense.ascq;
+> -        return MIN(len, SCSI_SENSE_LEN);
+> +    if (in_len == 0) {
+> +        sense = SENSE_CODE(NO_SENSE);
+>      } else {
+> -        /* Return descriptor format sense buffer */
+> -        buf[0] = 0x72;
+> -        buf[1] = sense.key;
+> -        buf[2] = sense.asc;
+> -        buf[3] = sense.ascq;
+> -        return 8;
+> +        sense = scsi_parse_sense_buf(in_buf, in_len);
+>      }
+> +    return scsi_build_sense_buf(buf, len, sense, fixed);
+>  }
+>  
+>  int scsi_sense_to_errno(int key, int asc, int ascq)
+> @@ -366,34 +380,15 @@ int scsi_sense_to_errno(int key, int asc, int ascq)
+>      }
+>  }
+>  
+> -int scsi_sense_buf_to_errno(const uint8_t *sense, size_t sense_size)
+> +int scsi_sense_buf_to_errno(const uint8_t *in_buf, size_t in_len)
+>  {
+> -    int key, asc, ascq;
+> -    if (sense_size < 1) {
+> -        return EIO;
+> -    }
+> -    switch (sense[0]) {
+> -    case 0x70: /* Fixed format sense data. */
+> -        if (sense_size < 14) {
+> -            return EIO;
+> -        }
+> -        key = sense[2] & 0xF;
+> -        asc = sense[12];
+> -        ascq = sense[13];
+> -        break;
+> -    case 0x72: /* Descriptor format sense data. */
+> -        if (sense_size < 4) {
+> -            return EIO;
+> -        }
+> -        key = sense[1] & 0xF;
+> -        asc = sense[2];
+> -        ascq = sense[3];
+> -        break;
+> -    default:
+> +    SCSISense sense;
+> +    if (in_len < 1) {
+>          return EIO;
+> -        break;
+>      }
+> -    return scsi_sense_to_errno(key, asc, ascq);
+> +
+> +    sense = scsi_parse_sense_buf(in_buf, in_len);
+> +    return scsi_sense_to_errno(sense.key, sense.asc, sense.ascq);
+>  }
+>  
+>  const char *scsi_command_name(uint8_t cmd)
+> -- 
+> 2.14.3
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
