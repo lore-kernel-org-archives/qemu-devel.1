@@ -1,21 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37312)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43618)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mjt@tls.msk.ru>) id 1eQilr-0005Fv-2x
-	for qemu-devel@nongnu.org; Sun, 17 Dec 2017 18:55:04 -0500
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1eQjUz-0008Bo-Mu
+	for qemu-devel@nongnu.org; Sun, 17 Dec 2017 19:41:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mjt@tls.msk.ru>) id 1eQiln-0005tu-W8
-	for qemu-devel@nongnu.org; Sun, 17 Dec 2017 18:55:03 -0500
-From: Michael Tokarev <mjt@tls.msk.ru>
-Date: Mon, 18 Dec 2017 00:27:36 +0300
-Message-Id: <dab29ffa157da6986afd236218f90f60c2ad04ec.1513545944.git.mjt@msgid.tls.msk.ru>
-In-Reply-To: <cover.1513545944.git.mjt@msgid.tls.msk.ru>
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1eQjUu-0002AF-TV
+	for qemu-devel@nongnu.org; Sun, 17 Dec 2017 19:41:41 -0500
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
 References: <cover.1513545944.git.mjt@msgid.tls.msk.ru>
-In-Reply-To: <cover.1513545944.git.mjt@msgid.tls.msk.ru>
-References: <cover.1513545944.git.mjt@msgid.tls.msk.ru>
+	<cover.1513548172.git.mjt@msgid.tls.msk.ru>
+	<CAFEAcA9qOtMtct6hND=uOiP_Nv9vaiuR=0NkSvrQQdz0v3FmfA@mail.gmail.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <26d87055-4c23-6aa1-e55a-fb6a95ece7fd@amsat.org>
+Date: Sun, 17 Dec 2017 21:41:24 -0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 31/61] misc: remove headers implicitly included
+In-Reply-To: <CAFEAcA9qOtMtct6hND=uOiP_Nv9vaiuR=0NkSvrQQdz0v3FmfA@mail.gmail.com>
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature";
+	boundary="cMXAmX5kw5WGtRURVwINp7W7P7lYhBTw9"
+Subject: Re: [Qemu-devel] [Qemu-trivial] [PULL v2 00/61] Trivial patches for
+ 2017-12-18
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,143 +30,118 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-trivial@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>, Michael Tokarev <mjt@tls.msk.ru>, Richard Henderson <richard.henderson@linaro.org>
+Cc: QEMU Trivial <qemu-trivial@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-From: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--cMXAmX5kw5WGtRURVwINp7W7P7lYhBTw9
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+To: Peter Maydell <peter.maydell@linaro.org>, Michael Tokarev
+ <mjt@tls.msk.ru>, Richard Henderson <richard.henderson@linaro.org>
+Cc: QEMU Trivial <qemu-trivial@nongnu.org>,
+ QEMU Developers <qemu-devel@nongnu.org>
+Message-ID: <26d87055-4c23-6aa1-e55a-fb6a95ece7fd@amsat.org>
+Subject: Re: [Qemu-trivial] [Qemu-devel] [PULL v2 00/61] Trivial patches for
+ 2017-12-18
+References: <cover.1513545944.git.mjt@msgid.tls.msk.ru>
+ <cover.1513548172.git.mjt@msgid.tls.msk.ru>
+ <CAFEAcA9qOtMtct6hND=uOiP_Nv9vaiuR=0NkSvrQQdz0v3FmfA@mail.gmail.com>
+In-Reply-To: <CAFEAcA9qOtMtct6hND=uOiP_Nv9vaiuR=0NkSvrQQdz0v3FmfA@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-applied using ./scripts/clean-includes
+Hi Peter,
 
-Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-Reviewed-by: Ben Warren <ben@skyportsystems.com>
----
- bsd-user/main.c              | 1 -
- chardev/wctablet.c           | 4 ----
- hw/audio/fmopl.h             | 1 -
- hw/scsi/vhost-user-scsi.c    | 1 -
- linux-user/main.c            | 1 -
- net/colo-compare.c           | 1 -
- tests/test-aio-multithread.c | 1 -
- tests/test-clone-visitor.c   | 1 -
- tests/vmgenid-test.c         | 3 ---
- 9 files changed, 14 deletions(-)
+On 12/17/2017 08:14 PM, Peter Maydell wrote:
+> On 17 December 2017 at 22:07, Michael Tokarev <mjt@tls.msk.ru> wrote:
+>>> Here's a large pull request for trivial-patches queue.
+>>> It's been quite a whie since the last request, and many
+>>> changes has been accumulated.
+>>>
+>>> Also there's a large patchset by Philippe Mathieu-Daud=C3=A9
+>>> named "remove i386/pc dependency from non-PC world (part 1)"
+>>> consisting of 42 patches which makes good portion of this
+>>> pull request.
+>>
+>> I forgot to add my S-o-b lines to the large series by
+>> Philippe Mathieu-Daud=C3=A9. So here's a re-send of just the
+>> cover letter (not all the other patches). The only difference
+>> is the addition of 42 of my "S-o-b" line.
+>=20
+> I'm afraid this fails 'make check'. (I only tested the
+> first pullreq but if you only changed signoffs then
+> it'll still be the same):
+>=20
+> TEST: tests/qom-test... (pid=3D12208)
+>   /alpha/qom/clipper:
+> Broken pipe
+> FAIL
+> GTester: last random seed: R02S26a31a16d967b2664ad714c1c7f8e7f1
+> (pid=3D12214)
 
-diff --git a/bsd-user/main.c b/bsd-user/main.c
-index f1b244b59b..efef5ff8c5 100644
---- a/bsd-user/main.c
-+++ b/bsd-user/main.c
-@@ -32,7 +32,6 @@
- #include "qemu/envlist.h"
- #include "exec/log.h"
- #include "trace/control.h"
--#include "glib-compat.h"
-=20
- int singlestep;
- unsigned long mmap_min_addr;
-diff --git a/chardev/wctablet.c b/chardev/wctablet.c
-index 6c13c2c58a..969d014574 100644
---- a/chardev/wctablet.c
-+++ b/chardev/wctablet.c
-@@ -25,10 +25,6 @@
-  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALING=
-S IN
-  * THE SOFTWARE.
-  */
--#include <stdlib.h>
--#include <string.h>
--#include <sys/time.h>
--#include <time.h>
-=20
- #include "qemu/osdep.h"
- #include "qemu-common.h"
-diff --git a/hw/audio/fmopl.h b/hw/audio/fmopl.h
-index f4065f425c..e7e578a48e 100644
---- a/hw/audio/fmopl.h
-+++ b/hw/audio/fmopl.h
-@@ -1,7 +1,6 @@
- #ifndef FMOPL_H
- #define FMOPL_H
-=20
--#include <stdint.h>
-=20
- typedef void (*OPL_TIMERHANDLER)(void *param, int channel, double interv=
-al_Sec);
-=20
-diff --git a/hw/scsi/vhost-user-scsi.c b/hw/scsi/vhost-user-scsi.c
-index f7561e23fa..9389ed48e0 100644
---- a/hw/scsi/vhost-user-scsi.c
-+++ b/hw/scsi/vhost-user-scsi.c
-@@ -18,7 +18,6 @@
- #include "qemu/osdep.h"
- #include "qapi/error.h"
- #include "qemu/error-report.h"
--#include "qemu/typedefs.h"
- #include "qom/object.h"
- #include "hw/fw-path-provider.h"
- #include "hw/qdev-core.h"
-diff --git a/linux-user/main.c b/linux-user/main.c
-index 6286661bd3..2fd2a143ed 100644
---- a/linux-user/main.c
-+++ b/linux-user/main.c
-@@ -35,7 +35,6 @@
- #include "elf.h"
- #include "exec/log.h"
- #include "trace/control.h"
--#include "glib-compat.h"
-=20
- char *exec_path;
-=20
-diff --git a/net/colo-compare.c b/net/colo-compare.c
-index 1ce195f877..0ebdec936c 100644
---- a/net/colo-compare.c
-+++ b/net/colo-compare.c
-@@ -23,7 +23,6 @@
- #include "qom/object_interfaces.h"
- #include "qemu/iov.h"
- #include "qom/object.h"
--#include "qemu/typedefs.h"
- #include "net/queue.h"
- #include "chardev/char-fe.h"
- #include "qemu/sockets.h"
-diff --git a/tests/test-aio-multithread.c b/tests/test-aio-multithread.c
-index d396185972..c8bec81520 100644
---- a/tests/test-aio-multithread.c
-+++ b/tests/test-aio-multithread.c
-@@ -11,7 +11,6 @@
-  */
-=20
- #include "qemu/osdep.h"
--#include <glib.h>
- #include "block/aio.h"
- #include "qapi/error.h"
- #include "qemu/coroutine.h"
-diff --git a/tests/test-clone-visitor.c b/tests/test-clone-visitor.c
-index 96982163e4..ac6afc562e 100644
---- a/tests/test-clone-visitor.c
-+++ b/tests/test-clone-visitor.c
-@@ -8,7 +8,6 @@
-  */
-=20
- #include "qemu/osdep.h"
--#include <glib.h>
-=20
- #include "qemu-common.h"
- #include "qapi/clone-visitor.h"
-diff --git a/tests/vmgenid-test.c b/tests/vmgenid-test.c
-index 5a86b40775..68ff954578 100644
---- a/tests/vmgenid-test.c
-+++ b/tests/vmgenid-test.c
-@@ -8,9 +8,6 @@
-  * See the COPYING file in the top-level directory.
-  */
-=20
--#include <glib.h>
--#include <string.h>
--#include <unistd.h>
- #include "qemu/osdep.h"
- #include "qemu/bitmap.h"
- #include "qemu/uuid.h"
---=20
-2.11.0
+Oops
+
+>   /alpha/qom/none:                                                     =
+OK
+> FAIL: tests/qom-test
+> TEST: tests/test-hmp... (pid=3D12219)
+>   /alpha/hmp/clipper:
+> Broken pipe
+> FAIL
+> GTester: last random seed: R02S0c5a0f7de3fc6e9885b740c77c86eef2
+> (pid=3D12225)
+>   /alpha/hmp/none:                                                     =
+OK
+>   /alpha/hmp/none+2MB:                                                 =
+OK
+> FAIL: tests/test-hmp
+>=20
+> This is because qemu-system-alpha segfaults on startup:
+
+My bad...
+
+eede06dd70f72da489b8f968abbb7cb5445ef834 is the first bad commit
+Author: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+
+    hw/alpha/typhoon: simplify using the "unimplemented" sysbus device
+
+I'm pretty sure I run the qtests, but this was 2 months ago...
+I'll have a look.
+
+[...]
+> There was also a minor merge conflict with the tpm pullreq
+> (both pulls change the #includes in hw/tpm/tpm_tis.c) which
+> you might fix when you respin.
+
+Yes, I rebased the 42 patches on /master yesterday but I see you merged
+the TPM tree in your /staging, so I'll rebase there and resend the
+offending patches fixed to Michael.
+
+Regards,
+
+Phil.
+
+
+--cMXAmX5kw5WGtRURVwINp7W7P7lYhBTw9
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCgAdFiEE+qvnXhKRciHc/Wuy4+MsLN6twN4FAlo3DrgACgkQ4+MsLN6t
+wN4srg/7BQ89mrRlBdY0jNO3f377WQARmSo8FUcCfsGDURVMDbjDF1CpHMrBOjxi
+BR/ehKG2fljtKnjcQ5HstUef9XsddH67kQs3K5/PkKvXLdtvXUwy0qRwQRpYxqpB
+yt9NXxFgHp9DCjVZLV6ULnsYkBXEzOlTHNx0B+L/E8PMYnvyAt70gVywROTKQBX0
+UUELG9/o9lKAMtB9MCIm6y52Tm1GqLTMoJ0r874OMNhaEH7xGdzH9YGotErTBuqw
+2lBYOTUN0W9Fd5MD8SKViHibowOWbVEGkFeyCzShN3Ibg6nN+T5OfqSpZYs2xpfh
+PHFyTMyc9AqylznKlp4T/gf2w2RduJhFvfEIQrBFqjS6rB+VLksyfzxVyHXzR/tz
+9xnH1wN0XGM58SO2x7JEBoKp60b8mR03hzoXRG3HUa4xgZzslhMtjnOf09n4Z/Pa
+tJhg1RYZyBQlct+3env3tIwDrtICi68Ebjhp7/EyzsOTeLSLc2IaXEA3w5PskOCb
+PwKOzTrXRX9yJpAfX158fmFwzPMZJcSTXQG2XaetHm/fpba1WsHOlkh2GfXL+CQr
+i1iH+O06PDXJEo7XndnagpVnAMgacZow1pJtjxuMH9d9BujKpUn5sPEtxGOtQrfT
+xSpybjvWTudTanKKt3i22gXijmYEDybGELAOK/zipH1wkFnksPI=
+=trym
+-----END PGP SIGNATURE-----
+
+--cMXAmX5kw5WGtRURVwINp7W7P7lYhBTw9--
