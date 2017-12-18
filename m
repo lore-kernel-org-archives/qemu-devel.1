@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36919)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37034)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1eQz3S-0000NX-Fi
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 12:18:23 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1eQz3V-0000OC-U3
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 12:18:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1eQz3N-0000vw-6N
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 12:18:18 -0500
-Received: from mail-pl0-x244.google.com ([2607:f8b0:400e:c01::244]:35728)
+	(envelope-from <richard.henderson@linaro.org>) id 1eQz3Q-00010q-Es
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 12:18:21 -0500
+Received: from mail-pl0-x244.google.com ([2607:f8b0:400e:c01::244]:44969)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1eQz3M-0000ug-Qh
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 12:18:13 -0500
-Received: by mail-pl0-x244.google.com with SMTP id b96so5198796pli.2
-	for <qemu-devel@nongnu.org>; Mon, 18 Dec 2017 09:18:12 -0800 (PST)
+	id 1eQz3Q-0000zg-6v
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 12:18:16 -0500
+Received: by mail-pl0-x244.google.com with SMTP id n13so5193364plp.11
+	for <qemu-devel@nongnu.org>; Mon, 18 Dec 2017 09:18:16 -0800 (PST)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Mon, 18 Dec 2017 09:17:39 -0800
-Message-Id: <20171218171758.16964-8-richard.henderson@linaro.org>
+Date: Mon, 18 Dec 2017 09:17:41 -0800
+Message-Id: <20171218171758.16964-10-richard.henderson@linaro.org>
 In-Reply-To: <20171218171758.16964-1-richard.henderson@linaro.org>
 References: <20171218171758.16964-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH v7 07/26] target/arm: Use vector infrastructure
- for aa64 dup/movi
+Subject: [Qemu-devel] [PATCH v7 09/26] tcg: Add tcg_expand_vec_op and
+ tcg-target.opc.h
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,151 +30,131 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org
 
+These will be useful in the next few patches adding shifts,
+permutes, and multiplication.
+
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/arm/translate-a64.c | 83 +++++++++++++++++++---------------------------
- 1 file changed, 34 insertions(+), 49 deletions(-)
+ tcg/i386/tcg-target.opc.h |  3 +++
+ tcg/tcg-opc.h             |  6 ++++++
+ tcg/tcg.h                 | 15 +++++++++++++++
+ tcg/i386/tcg-target.inc.c | 21 +++++++++++++++++++++
+ tcg/tcg.c                 | 13 ++++++++++---
+ 5 files changed, 55 insertions(+), 3 deletions(-)
+ create mode 100644 tcg/i386/tcg-target.opc.h
 
-diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
-index bc14c28e71..55a4902fc2 100644
---- a/target/arm/translate-a64.c
-+++ b/target/arm/translate-a64.c
-@@ -5846,38 +5846,24 @@ static void disas_simd_across_lanes(DisasContext *s, uint32_t insn)
-  *
-  * size: encoded in imm5 (see ARM ARM LowestSetBit())
+diff --git a/tcg/i386/tcg-target.opc.h b/tcg/i386/tcg-target.opc.h
+new file mode 100644
+index 0000000000..4816a6c3d4
+--- /dev/null
++++ b/tcg/i386/tcg-target.opc.h
+@@ -0,0 +1,3 @@
++/* Target-specific opcodes for host vector expansion.  These will be
++   emitted by tcg_expand_vec_op.  For those familiar with GCC internals,
++   consider these to be UNSPEC with names.  */
+diff --git a/tcg/tcg-opc.h b/tcg/tcg-opc.h
+index 4e62eda14b..b4e16cfbc3 100644
+--- a/tcg/tcg-opc.h
++++ b/tcg/tcg-opc.h
+@@ -229,6 +229,12 @@ DEF(andc_vec, 1, 2, 0, IMPLVEC | IMPL(TCG_TARGET_HAS_andc_vec))
+ DEF(orc_vec, 1, 2, 0, IMPLVEC | IMPL(TCG_TARGET_HAS_orc_vec))
+ DEF(not_vec, 1, 1, 0, IMPLVEC | IMPL(TCG_TARGET_HAS_not_vec))
+ 
++DEF(last_generic, 0, 0, 0, TCG_OPF_NOT_PRESENT)
++
++#if TCG_TARGET_MAYBE_vec
++#include "tcg-target.opc.h"
++#endif
++
+ #undef TLADDR_ARGS
+ #undef DATA64_ARGS
+ #undef IMPL
+diff --git a/tcg/tcg.h b/tcg/tcg.h
+index dce483b0ee..0e9d79bdd4 100644
+--- a/tcg/tcg.h
++++ b/tcg/tcg.h
+@@ -1207,6 +1207,21 @@ uintptr_t tcg_qemu_tb_exec(CPUArchState *env, uint8_t *tb_ptr);
+ 
+ void tcg_register_jit(void *buf, size_t buf_size);
+ 
++#if TCG_TARGET_MAYBE_vec
++/* Return zero if the tuple (opc, type, vece) is unsupportable;
++   return > 0 if it is directly supportable;
++   return < 0 if we must call tcg_expand_vec_op.  */
++int tcg_can_emit_vec_op(TCGOpcode, TCGType, unsigned);
++#else
++static inline int tcg_can_emit_vec_op(TCGOpcode o, TCGType t, unsigned ve)
++{
++    return 0;
++}
++#endif
++
++/* Expand the tuple (opc, type, vece) on the given arguments.  */
++void tcg_expand_vec_op(TCGOpcode, TCGType, unsigned, TCGArg, ...);
++
+ /*
+  * Memory helpers that will be used by TCG generated code.
   */
-+
- static void handle_simd_dupe(DisasContext *s, int is_q, int rd, int rn,
-                              int imm5)
- {
-     int size = ctz32(imm5);
--    int esize = 8 << size;
--    int elements = (is_q ? 128 : 64) / esize;
--    int index, i;
--    TCGv_i64 tmp;
-+    int index = imm5 >> (size + 1);
- 
-     if (size > 3 || (size == 3 && !is_q)) {
-         unallocated_encoding(s);
-         return;
-     }
--
-     if (!fp_access_check(s)) {
-         return;
-     }
- 
--    index = imm5 >> (size + 1);
--
--    tmp = tcg_temp_new_i64();
--    read_vec_element(s, tmp, rn, index, size);
--
--    for (i = 0; i < elements; i++) {
--        write_vec_element(s, tmp, rd, i, size);
--    }
--
--    if (!is_q) {
--        clear_vec_high(s, rd);
--    }
--
--    tcg_temp_free_i64(tmp);
-+    tcg_gen_gvec_dup_mem(size, vec_full_reg_offset(s, rd),
-+                         vec_reg_offset(s, rn, index, size),
-+                         is_q ? 16 : 8, vec_full_reg_size(s));
+diff --git a/tcg/i386/tcg-target.inc.c b/tcg/i386/tcg-target.inc.c
+index e9a4d92598..062cf16607 100644
+--- a/tcg/i386/tcg-target.inc.c
++++ b/tcg/i386/tcg-target.inc.c
+@@ -2942,6 +2942,27 @@ static const TCGTargetOpDef *tcg_target_op_def(TCGOpcode op)
+     return NULL;
  }
  
- /* DUP (element, scalar)
-@@ -5926,9 +5912,7 @@ static void handle_simd_dupg(DisasContext *s, int is_q, int rd, int rn,
-                              int imm5)
- {
-     int size = ctz32(imm5);
--    int esize = 8 << size;
--    int elements = (is_q ? 128 : 64)/esize;
--    int i = 0;
-+    uint32_t dofs, oprsz, maxsz;
- 
-     if (size > 3 || ((size == 3) && !is_q)) {
-         unallocated_encoding(s);
-@@ -5939,12 +5923,11 @@ static void handle_simd_dupg(DisasContext *s, int is_q, int rd, int rn,
-         return;
-     }
- 
--    for (i = 0; i < elements; i++) {
--        write_vec_element(s, cpu_reg(s, rn), rd, i, size);
--    }
--    if (!is_q) {
--        clear_vec_high(s, rd);
--    }
-+    dofs = vec_full_reg_offset(s, rd);
-+    oprsz = is_q ? 16 : 8;
-+    maxsz = vec_full_reg_size(s);
++int tcg_can_emit_vec_op(TCGOpcode opc, TCGType type, unsigned vece)
++{
++    switch (opc) {
++    case INDEX_op_add_vec:
++    case INDEX_op_sub_vec:
++    case INDEX_op_and_vec:
++    case INDEX_op_or_vec:
++    case INDEX_op_xor_vec:
++    case INDEX_op_andc_vec:
++        return true;
 +
-+    tcg_gen_gvec_dup_i64(size, dofs, oprsz, maxsz, cpu_reg(s, rn));
- }
- 
- /* INS (Element)
-@@ -6135,7 +6118,6 @@ static void disas_simd_mod_imm(DisasContext *s, uint32_t insn)
-     bool is_neg = extract32(insn, 29, 1);
-     bool is_q = extract32(insn, 30, 1);
-     uint64_t imm = 0;
--    TCGv_i64 tcg_rd, tcg_imm;
-     int i;
- 
-     if (o2 != 0 || ((cmode == 0xf) && is_neg && !is_q)) {
-@@ -6217,32 +6199,35 @@ static void disas_simd_mod_imm(DisasContext *s, uint32_t insn)
-         imm = ~imm;
-     }
- 
--    tcg_imm = tcg_const_i64(imm);
--    tcg_rd = new_tmp_a64(s);
-+    if (!((cmode & 0x9) == 0x1 || (cmode & 0xd) == 0x9)) {
-+        /* MOVI or MVNI, with MVNI negation handled above.  */
-+        tcg_gen_gvec_dup64i(vec_full_reg_offset(s, rd), is_q ? 16 : 8,
-+                            vec_full_reg_size(s), imm);
-+    } else {
-+        TCGv_i64 tcg_imm = tcg_const_i64(imm);
-+        TCGv_i64 tcg_rd = new_tmp_a64(s);
- 
--    for (i = 0; i < 2; i++) {
--        int foffs = i ? fp_reg_hi_offset(s, rd) : fp_reg_offset(s, rd, MO_64);
-+        for (i = 0; i < 2; i++) {
-+            int foffs = vec_reg_offset(s, rd, i, MO_64);
- 
--        if (i == 1 && !is_q) {
--            /* non-quad ops clear high half of vector */
--            tcg_gen_movi_i64(tcg_rd, 0);
--        } else if ((cmode & 0x9) == 0x1 || (cmode & 0xd) == 0x9) {
--            tcg_gen_ld_i64(tcg_rd, cpu_env, foffs);
--            if (is_neg) {
--                /* AND (BIC) */
--                tcg_gen_and_i64(tcg_rd, tcg_rd, tcg_imm);
-+            if (i == 1 && !is_q) {
-+                /* non-quad ops clear high half of vector */
-+                tcg_gen_movi_i64(tcg_rd, 0);
-             } else {
--                /* ORR */
--                tcg_gen_or_i64(tcg_rd, tcg_rd, tcg_imm);
-+                tcg_gen_ld_i64(tcg_rd, cpu_env, foffs);
-+                if (is_neg) {
-+                    /* AND (BIC) */
-+                    tcg_gen_and_i64(tcg_rd, tcg_rd, tcg_imm);
-+                } else {
-+                    /* ORR */
-+                    tcg_gen_or_i64(tcg_rd, tcg_rd, tcg_imm);
-+                }
-             }
--        } else {
--            /* MOVI */
--            tcg_gen_mov_i64(tcg_rd, tcg_imm);
-+            tcg_gen_st_i64(tcg_rd, cpu_env, foffs);
-         }
--        tcg_gen_st_i64(tcg_rd, cpu_env, foffs);
--    }
- 
--    tcg_temp_free_i64(tcg_imm);
-+        tcg_temp_free_i64(tcg_imm);
++    default:
++        return false;
 +    }
++}
++
++void tcg_expand_vec_op(TCGOpcode opc, TCGType type, unsigned vece,
++                       TCGArg a0, ...)
++{
++}
++
+ static const int tcg_target_callee_save_regs[] = {
+ #if TCG_TARGET_REG_BITS == 64
+     TCG_REG_RBP,
+diff --git a/tcg/tcg.c b/tcg/tcg.c
+index 16b8faf66f..b4f8938fb0 100644
+--- a/tcg/tcg.c
++++ b/tcg/tcg.c
+@@ -1404,10 +1404,10 @@ bool tcg_op_supported(TCGOpcode op)
+     case INDEX_op_orc_vec:
+         return have_vec && TCG_TARGET_HAS_orc_vec;
+ 
+-    case NB_OPS:
+-        break;
++    default:
++        tcg_debug_assert(op > INDEX_op_last_generic && op < NB_OPS);
++        return true;
+     }
+-    g_assert_not_reached();
  }
  
- /* AdvSIMD scalar copy
+ /* Note: we convert the 64 bit args to 32 bit and do some alignment
+@@ -3737,3 +3737,10 @@ void tcg_register_jit(void *buf, size_t buf_size)
+ {
+ }
+ #endif /* ELF_HOST_MACHINE */
++
++#if !TCG_TARGET_MAYBE_vec
++void tcg_expand_vec_op(TCGOpcode o, TCGType t, unsigned e, TCGArg a0, ...)
++{
++    g_assert_not_reached();
++}
++#endif
 -- 
 2.14.3
