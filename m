@@ -1,29 +1,41 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38109)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38370)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <james.r.harris@intel.com>) id 1eQy5R-0007L0-4V
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 11:16:18 -0500
+	(envelope-from <walling@linux.vnet.ibm.com>) id 1eQy5d-0007VL-RL
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 11:16:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <james.r.harris@intel.com>) id 1eQy5M-0005Pg-IA
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 11:16:17 -0500
-Received: from mga02.intel.com ([134.134.136.20]:34987)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <james.r.harris@intel.com>)
-	id 1eQy5M-0005Ns-5c
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 11:16:12 -0500
-From: "Harris, James R" <james.r.harris@intel.com>
-Date: Mon, 18 Dec 2017 16:16:08 +0000
-Message-ID: <2B67BF1C-6489-4A9B-BEE5-08DE9B904C07@intel.com>
-References: <1513350170-20168-1-git-send-email-den@openvz.org>
-	<1513350170-20168-3-git-send-email-den@openvz.org>
-	<20171218133812.GD16653@stefanha-x1.localdomain>
-In-Reply-To: <20171218133812.GD16653@stefanha-x1.localdomain>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <BDBF4CB6CD6A284B8188CCC7FDD0A8A3@intel.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <walling@linux.vnet.ibm.com>) id 1eQy5Z-0005aj-Be
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 11:16:29 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:36494
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <walling@linux.vnet.ibm.com>)
+	id 1eQy5Z-0005aN-6b
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 11:16:25 -0500
+Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	vBIGEM1K087488
+	for <qemu-devel@nongnu.org>; Mon, 18 Dec 2017 11:16:21 -0500
+Received: from e19.ny.us.ibm.com (e19.ny.us.ibm.com [129.33.205.209])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2exekc7hhd-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Mon, 18 Dec 2017 11:16:20 -0500
+Received: from localhost
+	by e19.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <walling@linux.vnet.ibm.com>;
+	Mon, 18 Dec 2017 11:16:20 -0500
+References: <1513030760-26245-1-git-send-email-walling@linux.vnet.ibm.com>
+	<1513030760-26245-2-git-send-email-walling@linux.vnet.ibm.com>
+	<a6920dc1-f2be-cdd9-ba6e-a341a9e93343@redhat.com>
+From: "Collin L. Walling" <walling@linux.vnet.ibm.com>
+Date: Mon, 18 Dec 2017 11:16:16 -0500
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH 2/2] virtio: fix IO request length in
- virtio SCSI/block
+In-Reply-To: <a6920dc1-f2be-cdd9-ba6e-a341a9e93343@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Message-Id: <231e9fad-a4e0-b957-229e-3f3dcc342e4e@linux.vnet.ibm.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v2 1/5] s390-ccw: update libc
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,87 +44,121 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: "Denis V. Lunev" <den@openvz.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "Michael S. Tsirkin" <mst@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, Felipe Franciosi <felipe@nutanix.com>, "Liu,
-	Changpeng" <changpeng.liu@intel.com>
+To: Thomas Huth <thuth@redhat.com>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org
+Cc: borntraeger@de.ibm.com, cohuck@redhat.com, david@redhat.com, frankja@linux.vnet.ibm.com
 
-DQo+IE9uIERlYyAxOCwgMjAxNywgYXQgNjozOCBBTSwgU3RlZmFuIEhham5vY3ppIDxzdGVmYW5o
-YUByZWRoYXQuY29tPiB3cm90ZToNCj4gDQo+IE9uIEZyaSwgRGVjIDE1LCAyMDE3IGF0IDA2OjAy
-OjUwUE0gKzAzMDAsIERlbmlzIFYuIEx1bmV2IHdyb3RlOg0KPj4gTGludXggZ3Vlc3RzIHN1Ym1p
-dCBJTyByZXF1ZXN0cyBubyBsb25nZXIgdGhhbiBQQUdFX1NJWkUgKiBtYXhfc2VnDQo+PiBmaWVs
-ZCByZXBvcnRlZCBieSBTQ1NJIGNvbnRyb2xlci4gVGh1cyB0eXBpY2FsIHNlcXVlbnRpYWwgcmVh
-ZCB3aXRoDQo+PiAxIE1CIHNpemUgcmVzdWx0cyBpbiB0aGUgZm9sbG93aW5nIHBhdHRlcm4gb2Yg
-dGhlIElPIGZyb20gdGhlIGd1ZXN0Og0KPj4gIDgsMTYgICAxICAgIDE1NzU0ICAgICAyLjc2NjA5
-NTEyMiAgMjA3MSAgRCAgIFIgMjA5NTEwNCArIDEwMDggW2RkXQ0KPj4gIDgsMTYgICAxICAgIDE1
-NzU1ICAgICAyLjc2NjEwODc4NSAgMjA3MSAgRCAgIFIgMjA5NjExMiArIDEwMDggW2RkXQ0KPj4g
-IDgsMTYgICAxICAgIDE1NzU2ICAgICAyLjc2NjExMzQ4NiAgMjA3MSAgRCAgIFIgMjA5NzEyMCAr
-IDMyIFtkZF0NCj4+ICA4LDE2ICAgMSAgICAxNTc1NyAgICAgMi43Njc2Njg5NjEgICAgIDAgIEMg
-ICBSIDIwOTUxMDQgKyAxMDA4IFswXQ0KPj4gIDgsMTYgICAxICAgIDE1NzU4ICAgICAyLjc2ODUz
-NDMxNSAgICAgMCAgQyAgIFIgMjA5NjExMiArIDEwMDggWzBdDQo+PiAgOCwxNiAgIDEgICAgMTU3
-NTkgICAgIDIuNzY4NTM5NzgyICAgICAwICBDICAgUiAyMDk3MTIwICsgMzIgWzBdDQo+PiBUaGUg
-SU8gd2FzIGdlbmVyYXRlZCBieQ0KPj4gIGRkIGlmPS9kZXYvc2RhIG9mPS9kZXYvbnVsbCBicz0x
-MDI0IGlmbGFnPWRpcmVjdA0KPj4gDQo+PiBUaGlzIGVmZmVjdGl2ZWx5IG1lYW5zIHRoYXQgb24g
-cm90YXRpb25hbCBkaXNrcyB3ZSB3aWxsIG9ic2VydmUgMyBJT1BTDQo+PiBmb3IgZWFjaCAyIE1C
-cyBwcm9jZXNzZWQuIFRoaXMgZGVmaW5pdGVseSBuZWdhdGl2ZWx5IGFmZmVjdHMgYm90aA0KPj4g
-Z3Vlc3QgYW5kIGhvc3QgSU8gcGVyZm9ybWFuY2UuDQo+PiANCj4+IFRoZSBjdXJlIGlzIHJlbGF0
-aXZlbHkgc2ltcGxlIC0gd2Ugc2hvdWxkIHJlcG9ydCBsZW5ndGh5IHNjYXR0ZXItZ2F0aGVyDQo+
-PiBhYmlsaXR5IG9mIHRoZSBTQ1NJIGNvbnRyb2xsZXIuIEZvcnR1bmF0ZWx5IHRoZSBzaXR1YXRp
-b24gaGVyZSBpcyB2ZXJ5DQo+PiBnb29kLiBWaXJ0SU8gdHJhbnNwb3J0IGxheWVyIGNhbiBhY2Nv
-bW9kYXRlIDEwMjQgaXRlbXMgaW4gb25lIHJlcXVlc3QNCj4+IHdoaWxlIHdlIGFyZSB1c2luZyBv
-bmx5IDEyOC4gVGhpcyBzaXR1YXRpb24gaXMgcHJlc2VudCBzaW5jZSBhbG1vc3QNCj4+IHZlcnkg
-YmVnaW5uaW5nLiAyIGl0ZW1zIGFyZSBkZWRpY2F0ZWQgZm9yIHJlcXVlc3QgbWV0YWRhdGEgdGh1
-cyB3ZQ0KPj4gc2hvdWxkIHB1Ymxpc2ggVklSVFFVRVVFX01BWF9TSVpFIC0gMiBhcyBtYXhfc2Vn
-Lg0KPj4gDQo+PiBUaGUgZm9sbG93aW5nIHBhdHRlcm4gaXMgb2JzZXJ2ZWQgYWZ0ZXIgdGhlIHBh
-dGNoOg0KPj4gIDgsMTYgICAxICAgICA5OTIxICAgICAyLjY2MjcyMTM0MCAgMjA2MyAgRCAgIFIg
-MjA5NTEwNCArIDEwMjQgW2RkXQ0KPj4gIDgsMTYgICAxICAgICA5OTIyICAgICAyLjY2MjczNzU4
-NSAgMjA2MyAgRCAgIFIgMjA5NjEyOCArIDEwMjQgW2RkXQ0KPj4gIDgsMTYgICAxICAgICA5OTIz
-ICAgICAyLjY2NTE4ODE2NyAgICAgMCAgQyAgIFIgMjA5NTEwNCArIDEwMjQgWzBdDQo+PiAgOCwx
-NiAgIDEgICAgIDk5MjQgICAgIDIuNjY1MTk4Nzc3ICAgICAwICBDICAgUiAyMDk2MTI4ICsgMTAy
-NCBbMF0NCj4+IHdoaWNoIGlzIG11Y2ggYmV0dGVyLg0KPj4gDQo+PiBUaGUgZGFyayBzaWRlIG9m
-IHRoaXMgcGF0Y2ggaXMgdGhhdCB3ZSBhcmUgdHdlYWtpbmcgZ3Vlc3QgdmlzaWJsZQ0KPj4gcGFy
-YW1ldGVyLCB0aG91Z2ggdGhpcyBzaG91bGQgYmUgcmVsYXRpdmVseSBzYWZlIGFzIGFib3ZlIHRy
-YW5zcG9ydA0KPj4gbGF5ZXIgc3VwcG9ydCBpcyBwcmVzZW50IGluIFFFTVUvaG9zdCBMaW51eCBm
-b3IgYSB2ZXJ5IGxvbmcgdGltZS4NCj4+IFRoZSBwYXRjaCBhZGRzIGNvbmZpZ3VyYWJsZSBwcm9w
-ZXJ0eSBmb3IgVmlydElPIFNDU0kgd2l0aCBhIG5ldyBkZWZhdWx0DQo+PiBhbmQgaGFyZGNvZGUg
-b3B0aW9uIGZvciBWaXJ0QmxvY2sgd2hpY2ggZG9lcyBub3QgcHJvdmlkZSBnb29kDQo+PiBjb25m
-aWd1cmFibGUgZnJhbWV3b3JrLg0KPj4gDQo+PiBTaWduZWQtb2ZmLWJ5OiBEZW5pcyBWLiBMdW5l
-diA8ZGVuQG9wZW52ei5vcmc+DQo+PiBDQzogIk1pY2hhZWwgUy4gVHNpcmtpbiIgPG1zdEByZWRo
-YXQuY29tPg0KPj4gQ0M6IFN0ZWZhbiBIYWpub2N6aSA8c3RlZmFuaGFAcmVkaGF0LmNvbT4NCj4+
-IENDOiBLZXZpbiBXb2xmIDxrd29sZkByZWRoYXQuY29tPg0KPj4gQ0M6IE1heCBSZWl0eiA8bXJl
-aXR6QHJlZGhhdC5jb20+DQo+PiBDQzogUGFvbG8gQm9uemluaSA8cGJvbnppbmlAcmVkaGF0LmNv
-bT4NCj4+IENDOiBSaWNoYXJkIEhlbmRlcnNvbiA8cnRoQHR3aWRkbGUubmV0Pg0KPj4gQ0M6IEVk
-dWFyZG8gSGFia29zdCA8ZWhhYmtvc3RAcmVkaGF0LmNvbT4NCj4+IC0tLQ0KPj4gaW5jbHVkZS9o
-dy9jb21wYXQuaCAgICAgICAgICAgICB8IDE3ICsrKysrKysrKysrKysrKysrDQo+PiBpbmNsdWRl
-L2h3L3ZpcnRpby92aXJ0aW8tYmxrLmggIHwgIDEgKw0KPj4gaW5jbHVkZS9ody92aXJ0aW8vdmly
-dGlvLXNjc2kuaCB8ICAxICsNCj4+IGh3L2Jsb2NrL3ZpcnRpby1ibGsuYyAgICAgICAgICAgfCAg
-NCArKystDQo+PiBody9zY3NpL3Zob3N0LXNjc2kuYyAgICAgICAgICAgIHwgIDIgKysNCj4+IGh3
-L3Njc2kvdmhvc3QtdXNlci1zY3NpLmMgICAgICAgfCAgMiArKw0KPj4gaHcvc2NzaS92aXJ0aW8t
-c2NzaS5jICAgICAgICAgICB8ICA0ICsrKy0NCj4+IDcgZmlsZXMgY2hhbmdlZCwgMjkgaW5zZXJ0
-aW9ucygrKSwgMiBkZWxldGlvbnMoLSkNCj4+IA0KPj4gZGlmZiAtLWdpdCBhL2luY2x1ZGUvaHcv
-Y29tcGF0LmggYi9pbmNsdWRlL2h3L2NvbXBhdC5oDQo+PiBpbmRleCAwMjZmZWU5Li5iOWJlNWQ3
-IDEwMDY0NA0KPj4gLS0tIGEvaW5jbHVkZS9ody9jb21wYXQuaA0KPj4gKysrIGIvaW5jbHVkZS9o
-dy9jb21wYXQuaA0KPj4gQEAgLTIsNiArMiwyMyBAQA0KPj4gI2RlZmluZSBIV19DT01QQVRfSA0K
-Pj4gDQo+PiAjZGVmaW5lIEhXX0NPTVBBVF8yXzExIFwNCj4+ICsgICAge1wNCj4+ICsgICAgICAg
-IC5kcml2ZXIgICA9ICJ2aXJ0aW8tYmxrLWRldmljZSIsXA0KPj4gKyAgICAgICAgLnByb3BlcnR5
-ID0gIm1heF9zZWdtZW50cyIsXA0KPj4gKyAgICAgICAgLnZhbHVlICAgID0gIjEyNiIsXA0KPj4g
-KyAgICB9LHtcDQo+PiArICAgICAgICAuZHJpdmVyICAgPSAidmhvc3Qtc2NzaSIsXA0KPj4gKyAg
-ICAgICAgLnByb3BlcnR5ID0gIm1heF9zZWdtZW50cyIsXA0KPj4gKyAgICAgICAgLnZhbHVlICAg
-ID0gIjEyNiIsXA0KPj4gKyAgICB9LHtcDQo+PiArICAgICAgICAuZHJpdmVyICAgPSAidmhvc3Qt
-dXNlci1zY3NpIixcDQo+PiArICAgICAgICAucHJvcGVydHkgPSAibWF4X3NlZ21lbnRzIixcDQo+
-PiArICAgICAgICAudmFsdWUgICAgPSAiMTI2IixcDQo+IA0KPiBFeGlzdGluZyB2aG9zdC11c2Vy
-LXNjc2kgc2xhdmUgcHJvZ3JhbXMgbWlnaHQgbm90IGV4cGVjdCB1cCB0byAxMDIyDQo+IHNlZ21l
-bnRzLiAgSG9wZWZ1bGx5IHdlIGNhbiBnZXQgYXdheSB3aXRoIHRoaXMgY2hhbmdlIHNpbmNlIHRo
-ZXJlIGFyZQ0KPiByZWxhdGl2ZWx5IGZldyB2aG9zdC11c2VyLXNjc2kgc2xhdmUgcHJvZ3JhbXMu
-DQo+IA0KPiBDQ2VkIEZlbGlwZSAoTnV0YW5peCkgYW5kIEppbSAoU1BESykgaW4gY2FzZSB0aGV5
-IGhhdmUgY29tbWVudHMuDQoNClNQREsgdmhvc3QtdXNlciB0YXJnZXRzIG9ubHkgZXhwZWN0IG1h
-eCAxMjggc2VnbWVudHMuICBUaGV5IGFsc28gcHJlLWFsbG9jYXRlIEkvTyB0YXNrIHN0cnVjdHVy
-ZXMgd2hlbiBRRU1VIGNvbm5lY3RzIHRvIHRoZSB2aG9zdC11c2VyIGRldmljZS4NCg0KU3VwcG9y
-dGluZyB1cCB0byAxMDIyIHNlZ21lbnRzIHdvdWxkIHJlc3VsdCBpbiBzaWduaWZpY2FudGx5IGhp
-Z2hlciBtZW1vcnkgdXNhZ2UsIHJlZHVjdGlvbiBpbiBJL08gcXVldWUgZGVwdGggcHJvY2Vzc2Vk
-IGJ5IHRoZSB2aG9zdC11c2VyIHRhcmdldCwgb3IgaGF2aW5nIHRvIGR5bmFtaWNhbGx5IGFsbG9j
-YXRlIEkvTyB0YXNrIHN0cnVjdHVyZXMgLSBub25lIG9mIHdoaWNoIGFyZSBpZGVhbC4NCg0KV2hh
-dCBpZiB0aGlzIHdhcyBqdXN0IGJ1bXBlZCBmcm9tIDEyNiB0byAxMjg/ICBJIGd1ZXNzIEnigJlt
-IHRyeWluZyB0byB1bmRlcnN0YW5kIHRoZSBsZXZlbCBvZiBndWVzdCBhbmQgaG9zdCBJL08gcGVy
-Zm9ybWFuY2UgdGhhdCBpcyBnYWluZWQgd2l0aCB0aGlzIHBhdGNoLiAgT25lIEkvTyBwZXIgNTEy
-S0IgdnMuIG9uZSBJL08gcGVyIDRNQiAtIHdlIGFyZSBzdGlsbCBvbmx5IHRhbGtpbmcgYWJvdXQg
-YSBmZXcgaHVuZHJlZCBJTy9zIGRpZmZlcmVuY2UuDQoNCi1KaW0NCg0KDQo=
+On 12/18/2017 08:06 AM, Thomas Huth wrote:
+> On 11.12.2017 23:19, Collin L. Walling wrote:
+>> Moved:
+>>    memcmp from bootmap.h to libc.h (renamed from _memcmp)
+>>    strlen from sclp.c to libc.h (renamed from _strlen)
+>>
+>> Added C standard functions:
+>>    isdigit
+>>    atoi
+>>
+>> Added non-C standard function:
+>>    itostr
+>>
+>> Signed-off-by: Collin L. Walling <walling@linux.vnet.ibm.com>
+>> Acked-by: Christian Borntraeger <borntraeger@de.ibm.com>
+>> Reviewed-by: Janosch Frank <frankja@linux.vnet.ibm.com>
+>> ---
+>>   pc-bios/s390-ccw/Makefile  |  2 +-
+>>   pc-bios/s390-ccw/bootmap.c |  4 +--
+>>   pc-bios/s390-ccw/bootmap.h | 16 +---------
+>>   pc-bios/s390-ccw/libc.c    | 75 ++++++++++++++++++++++++++++++++++++=
+++++++++++
+>>   pc-bios/s390-ccw/libc.h    | 31 +++++++++++++++++++
+>>   pc-bios/s390-ccw/main.c    | 17 +----------
+>>   pc-bios/s390-ccw/sclp.c    | 10 +------
+>>   7 files changed, 112 insertions(+), 43 deletions(-)
+>>   create mode 100644 pc-bios/s390-ccw/libc.c
+> [...]
+>> +
+>> +/**
+>> + * itostr:
+>> + * @num: the integer to be converted.
+>> + * @str: a pointer to a string to store the conversion.
+>> + * @len: the length of the passed string.
+>> + *
+>> + * Given an integer @num, convert it to a string. The string @str mus=
+t be
+>> + * allocated beforehand. The resulting string will be null terminated=
+ and
+>> + * returned.
+>> + *
+>> + * Returns: the string @str of the converted integer @num.
+>> + */
+>> +char *itostr(int num, char *str, size_t len)
+>> +{
+>> +    long num_len =3D 1;
+>> +    int tmp =3D num;
+>> +    int i;
+>> +
+>> +    /* Count length of num */
+>> +    while ((tmp /=3D 10) > 0) {
+>> +        num_len++;
+>> +    }
+>> +
+>> +    /* Check if we have enough space for num and null */
+>> +    if (len < num_len) {
+>> +        return 0;
+>> +    }
+> I'm afraid, but I think you've got an off-by-one bug in this code.
+>
+> In patch 5, you're using this function like this:
+>
+>      char tmp[4];
+>
+>      sclp_print(itostr(entries, tmp, sizeof(tmp)));
+>
+> That means if entries is >=3D 1000 for example, num_len is 4 ...
+>
+>> +    /* Convert int to string */
+>> +    for (i =3D num_len - 1; i >=3D 0; i--) {
+>> +        str[i] =3D num % 10 + '0';
+>> +        num /=3D 10;
+>> +    }
+>> +
+>> +    str[num_len] =3D '\0';
+> ... and then you run into a buffer overflow here.
+
+
+Doh, you're correct.=C2=A0 I forgot to put a "<=3D" in the len / num_len =
+check.
+That should fix things up.=C2=A0 Thanks for catching that.
+
+
+>
+>> +    return str;
+>> +}
+> Maybe it would also make more sense to panic() instead of "return 0"
+> since you don't check the return value in patch 5 ?
+
+
+I'm a bit conflicted about doing something like that.=C2=A0 I'm not sure =
+if=20
+there's any kind
+of guideline we want to follow for defining functions in libc.
+
+I see one of two possibilities:
+
+a.=C2=A0 define these functions as "libc-like" as possible, and use them =
+as=20
+if they were
+ =C2=A0=C2=A0=C2=A0=C2=A0 regular standard libc functions
+
+ =C2=A0=C2=A0=C2=A0 or
+
+b.=C2=A0 change up these functions to better fit their use cases in=20
+pc-bios/s390-ccw
+
+Does that make sense?=C2=A0 What do you think?
+
+
+>
+>   Thomas
+>
+--=20
+- Collin L Walling
