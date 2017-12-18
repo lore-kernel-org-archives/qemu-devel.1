@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55662)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55704)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1eQzUQ-0008AO-DV
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 12:46:12 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1eQzUS-0008D1-Qq
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 12:46:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1eQzUN-0001ue-F3
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 12:46:10 -0500
-Received: from mail-pg0-x241.google.com ([2607:f8b0:400e:c05::241]:35886)
+	(envelope-from <richard.henderson@linaro.org>) id 1eQzUQ-00020t-HE
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 12:46:12 -0500
+Received: from mail-pl0-x241.google.com ([2607:f8b0:400e:c01::241]:34835)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1eQzUN-0001tp-7C
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 12:46:07 -0500
-Received: by mail-pg0-x241.google.com with SMTP id k134so9433356pga.3
-	for <qemu-devel@nongnu.org>; Mon, 18 Dec 2017 09:46:07 -0800 (PST)
+	id 1eQzUQ-0001zG-9N
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 12:46:10 -0500
+Received: by mail-pl0-x241.google.com with SMTP id b96so5246524pli.2
+	for <qemu-devel@nongnu.org>; Mon, 18 Dec 2017 09:46:10 -0800 (PST)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Mon, 18 Dec 2017 09:45:36 -0800
-Message-Id: <20171218174552.18871-8-richard.henderson@linaro.org>
+Date: Mon, 18 Dec 2017 09:45:38 -0800
+Message-Id: <20171218174552.18871-10-richard.henderson@linaro.org>
 In-Reply-To: <20171218174552.18871-1-richard.henderson@linaro.org>
 References: <20171218174552.18871-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH 07/23] target/arm: Implement SVE Integer Binary
- Arithmetic - Predicated Group
+Subject: [Qemu-devel] [PATCH 09/23] target/arm: Handle SVE registers when
+ using clear_vec_high
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,548 +30,448 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org, qemu-arm@nongnu.org
 
+When storing to an AdvSIMD FP register, all of the high
+bits of the SVE register are zeroed.  Therefore, call it
+more often with is_q as a parameter.
+
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/arm/helper-sve.h    | 145 ++++++++++++++++++++++++++++++++
- target/arm/sve_helper.c    | 203 +++++++++++++++++++++++++++++++++++++++++++--
- target/arm/translate-sve.c |  75 +++++++++++++++++
- target/arm/sve.def         |  39 +++++++++
- 4 files changed, 455 insertions(+), 7 deletions(-)
+ target/arm/translate-a64.c | 157 +++++++++++++++------------------------------
+ 1 file changed, 51 insertions(+), 106 deletions(-)
 
-diff --git a/target/arm/helper-sve.h b/target/arm/helper-sve.h
-index 8b382a962d..964b15b104 100644
---- a/target/arm/helper-sve.h
-+++ b/target/arm/helper-sve.h
-@@ -17,6 +17,151 @@
-  * License along with this library; if not, see <http://www.gnu.org/licenses/>.
-  */
- 
-+DEF_HELPER_FLAGS_5(sve_and_zpzz_b, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_5(sve_and_zpzz_h, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_5(sve_and_zpzz_s, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_5(sve_and_zpzz_d, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, ptr, i32)
-+
-+DEF_HELPER_FLAGS_5(sve_eor_zpzz_b, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_5(sve_eor_zpzz_h, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_5(sve_eor_zpzz_s, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_5(sve_eor_zpzz_d, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, ptr, i32)
-+
-+DEF_HELPER_FLAGS_5(sve_orr_zpzz_b, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_5(sve_orr_zpzz_h, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_5(sve_orr_zpzz_s, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_5(sve_orr_zpzz_d, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, ptr, i32)
-+
-+DEF_HELPER_FLAGS_5(sve_bic_zpzz_b, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_5(sve_bic_zpzz_h, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_5(sve_bic_zpzz_s, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_5(sve_bic_zpzz_d, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, ptr, i32)
-+
-+DEF_HELPER_FLAGS_5(sve_add_zpzz_b, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_5(sve_add_zpzz_h, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_5(sve_add_zpzz_s, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_5(sve_add_zpzz_d, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, ptr, i32)
-+
-+DEF_HELPER_FLAGS_5(sve_sub_zpzz_b, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_5(sve_sub_zpzz_h, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_5(sve_sub_zpzz_s, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_5(sve_sub_zpzz_d, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, ptr, i32)
-+
-+DEF_HELPER_FLAGS_5(sve_smax_zpzz_b, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_5(sve_smax_zpzz_h, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_5(sve_smax_zpzz_s, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_5(sve_smax_zpzz_d, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, ptr, i32)
-+
-+DEF_HELPER_FLAGS_5(sve_umax_zpzz_b, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_5(sve_umax_zpzz_h, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_5(sve_umax_zpzz_s, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_5(sve_umax_zpzz_d, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, ptr, i32)
-+
-+DEF_HELPER_FLAGS_5(sve_smin_zpzz_b, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_5(sve_smin_zpzz_h, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_5(sve_smin_zpzz_s, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_5(sve_smin_zpzz_d, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, ptr, i32)
-+
-+DEF_HELPER_FLAGS_5(sve_umin_zpzz_b, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_5(sve_umin_zpzz_h, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_5(sve_umin_zpzz_s, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_5(sve_umin_zpzz_d, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, ptr, i32)
-+
-+DEF_HELPER_FLAGS_5(sve_sabd_zpzz_b, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_5(sve_sabd_zpzz_h, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_5(sve_sabd_zpzz_s, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_5(sve_sabd_zpzz_d, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, ptr, i32)
-+
-+DEF_HELPER_FLAGS_5(sve_uabd_zpzz_b, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_5(sve_uabd_zpzz_h, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_5(sve_uabd_zpzz_s, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_5(sve_uabd_zpzz_d, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, ptr, i32)
-+
-+DEF_HELPER_FLAGS_5(sve_mul_zpzz_b, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_5(sve_mul_zpzz_h, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_5(sve_mul_zpzz_s, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_5(sve_mul_zpzz_d, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, ptr, i32)
-+
-+DEF_HELPER_FLAGS_5(sve_smulh_zpzz_b, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_5(sve_smulh_zpzz_h, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_5(sve_smulh_zpzz_s, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_5(sve_smulh_zpzz_d, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, ptr, i32)
-+
-+DEF_HELPER_FLAGS_5(sve_umulh_zpzz_b, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_5(sve_umulh_zpzz_h, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_5(sve_umulh_zpzz_s, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_5(sve_umulh_zpzz_d, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, ptr, i32)
-+
-+DEF_HELPER_FLAGS_5(sve_sdiv_zpzz_s, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_5(sve_sdiv_zpzz_d, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, ptr, i32)
-+
-+DEF_HELPER_FLAGS_5(sve_udiv_zpzz_s, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_5(sve_udiv_zpzz_d, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, ptr, i32)
-+
- DEF_HELPER_FLAGS_5(sve_and_pred, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, ptr, i32)
- DEF_HELPER_FLAGS_5(sve_bic_pred, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, ptr, i32)
- DEF_HELPER_FLAGS_5(sve_eor_pred, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, ptr, i32)
-diff --git a/target/arm/sve_helper.c b/target/arm/sve_helper.c
-index a605e623f7..b617ea2c04 100644
---- a/target/arm/sve_helper.c
-+++ b/target/arm/sve_helper.c
-@@ -28,13 +28,17 @@
- /* Note that vector data is stored in host-endian 64-bit chunks,
-    so addressing units smaller than that needs a host-endian fixup.  */
- #ifdef HOST_WORDS_BIGENDIAN
--#define H1(x)  ((x) ^ 7)
--#define H2(x)  ((x) ^ 3)
--#define H4(x)  ((x) ^ 1)
-+#define H1(x)   ((x) ^ 7)
-+#define H1_2(x) ((x) ^ 6)
-+#define H1_4(x) ((x) ^ 4)
-+#define H2(x)   ((x) ^ 3)
-+#define H4(x)   ((x) ^ 1)
- #else
--#define H1(x)  (x)
--#define H2(x)  (x)
--#define H4(x)  (x)
-+#define H1(x)   (x)
-+#define H1_2(x) (x)
-+#define H1_4(x) (x)
-+#define H2(x)   (x)
-+#define H4(x)   (x)
- #endif
- 
- 
-@@ -117,7 +121,7 @@ LOGICAL_PRED_FLAGS(sve_nands_pred, DO_NAND)
- 
- #undef LOGICAL_PRED
- #undef LOGICAL_PRED_FLAGS
--#undef DO_ADD
-+#undef DO_AND
- #undef DO_BIC
- #undef DO_EOR
- #undef DO_ORR
-@@ -126,6 +130,191 @@ LOGICAL_PRED_FLAGS(sve_nands_pred, DO_NAND)
- #undef DO_NAND
- #undef DO_SEL
- 
-+/* Fully general three-operand expander, controlled by a predicate.
-+ * This is complicated by the host-endian storage of the register file.
-+ */
-+/* ??? I don't expect the compiler could ever vectorize this itself.
-+ * With some tables we can convert bit masks to byte masks, and with
-+ * extra care wrt byte/word ordering we could use gcc generic vectors
-+ * and do 16 bytes at a time.
-+ */
-+#define DO_ZPZZ(NAME, TYPE, H, OP)                                       \
-+void HELPER(NAME)(void *vd, void *vn, void *vm, void *vg, uint32_t desc) \
-+{                                                                       \
-+    intptr_t iv = 0, ib = 0, opr_sz = simd_oprsz(desc);                 \
-+    for (iv = ib = 0; iv < opr_sz; iv += 16, ib += 2) {                 \
-+        uint16_t pg = *(uint16_t *)(vg + H2(ib));                       \
-+        intptr_t i = 0;                                                 \
-+        do {                                                            \
-+            if (pg & 1) {                                               \
-+                TYPE nn = *(TYPE *)(vn + iv + H(i));                    \
-+                TYPE mm = *(TYPE *)(vm + iv + H(i));                    \
-+                *(TYPE *)(vd + iv + H(i)) = OP(nn, mm);                 \
-+            }                                                           \
-+            i += sizeof(TYPE), pg >>= sizeof(TYPE);                     \
-+        } while (pg);                                                   \
-+    }                                                                   \
-+}
-+
-+/* Similarly, specialized for 64-bit operands.  */
-+#define DO_ZPZZ_D(NAME, TYPE, OP)                                \
-+void HELPER(NAME)(void *vd, void *vn, void *vm, void *vg, uint32_t desc) \
-+{                                                               \
-+    intptr_t i, opr_sz = simd_oprsz(desc) / 8;                  \
-+    TYPE *d = vd, *n = vn, *m = vm;                             \
-+    uint8_t *pg = vg;                                           \
-+    for (i = 0; i < opr_sz; i += 1) {                           \
-+        if (pg[H1(i)] & 1) {                                    \
-+            TYPE nn = n[i], mm = m[i];                          \
-+            d[i] = OP(nn, mm);                                  \
-+        }                                                       \
-+    }                                                           \
-+}
-+
-+#define DO_AND(N, M)  (N & M)
-+#define DO_EOR(N, M)  (N ^ M)
-+#define DO_ORR(N, M)  (N | M)
-+#define DO_BIC(N, M)  (N &~ M)
-+
-+DO_ZPZZ(sve_and_zpzz_b, uint8_t, H1, DO_AND)
-+DO_ZPZZ(sve_orr_zpzz_b, uint8_t, H1, DO_ORR)
-+DO_ZPZZ(sve_eor_zpzz_b, uint8_t, H1, DO_EOR)
-+DO_ZPZZ(sve_bic_zpzz_b, uint8_t, H1, DO_BIC)
-+
-+DO_ZPZZ(sve_and_zpzz_h, uint16_t, H1_2, DO_AND)
-+DO_ZPZZ(sve_orr_zpzz_h, uint16_t, H1_2, DO_ORR)
-+DO_ZPZZ(sve_eor_zpzz_h, uint16_t, H1_2, DO_EOR)
-+DO_ZPZZ(sve_bic_zpzz_h, uint16_t, H1_2, DO_BIC)
-+
-+DO_ZPZZ(sve_and_zpzz_s, uint32_t, H1_4, DO_AND)
-+DO_ZPZZ(sve_orr_zpzz_s, uint32_t, H1_4, DO_ORR)
-+DO_ZPZZ(sve_eor_zpzz_s, uint32_t, H1_4, DO_EOR)
-+DO_ZPZZ(sve_bic_zpzz_s, uint32_t, H1_4, DO_BIC)
-+
-+DO_ZPZZ_D(sve_and_zpzz_d, uint64_t, DO_AND)
-+DO_ZPZZ_D(sve_orr_zpzz_d, uint64_t, DO_ORR)
-+DO_ZPZZ_D(sve_eor_zpzz_d, uint64_t, DO_EOR)
-+DO_ZPZZ_D(sve_bic_zpzz_d, uint64_t, DO_BIC)
-+
-+#undef DO_AND
-+#undef DO_ORR
-+#undef DO_EOR
-+#undef DO_BIC
-+
-+#define DO_ADD(N, M)  (N + M)
-+#define DO_SUB(N, M)  (N - M)
-+
-+DO_ZPZZ(sve_add_zpzz_b, uint8_t, H1, DO_ADD)
-+DO_ZPZZ(sve_sub_zpzz_b, uint8_t, H1, DO_SUB)
-+
-+DO_ZPZZ(sve_add_zpzz_h, uint16_t, H1_2, DO_ADD)
-+DO_ZPZZ(sve_sub_zpzz_h, uint16_t, H1_2, DO_SUB)
-+
-+DO_ZPZZ(sve_add_zpzz_s, uint32_t, H1_4, DO_ADD)
-+DO_ZPZZ(sve_sub_zpzz_s, uint32_t, H1_4, DO_SUB)
-+
-+DO_ZPZZ_D(sve_add_zpzz_d, uint64_t, DO_ADD)
-+DO_ZPZZ_D(sve_sub_zpzz_d, uint64_t, DO_SUB)
-+
-+#undef DO_ADD
-+#undef DO_SUB
-+
-+#define DO_MAX(N, M)  ((N) >= (M) ? (N) : (M))
-+#define DO_MIN(N, M)  ((N) >= (M) ? (M) : (N))
-+#define DO_ABD(N, M)  ((N) >= (M) ? (N) - (M) : (M) - (N))
-+
-+DO_ZPZZ(sve_smax_zpzz_b, int8_t,  H1, DO_MAX)
-+DO_ZPZZ(sve_umax_zpzz_b, uint8_t, H1, DO_MAX)
-+DO_ZPZZ(sve_smin_zpzz_b, int8_t,  H1, DO_MIN)
-+DO_ZPZZ(sve_umin_zpzz_b, uint8_t, H1, DO_MIN)
-+DO_ZPZZ(sve_sabd_zpzz_b, int8_t,  H1, DO_ABD)
-+DO_ZPZZ(sve_uabd_zpzz_b, uint8_t, H1, DO_ABD)
-+
-+DO_ZPZZ(sve_smax_zpzz_h, int16_t,  H1_2, DO_MAX)
-+DO_ZPZZ(sve_umax_zpzz_h, uint16_t, H1_2, DO_MAX)
-+DO_ZPZZ(sve_smin_zpzz_h, int16_t,  H1_2, DO_MIN)
-+DO_ZPZZ(sve_umin_zpzz_h, uint16_t, H1_2, DO_MIN)
-+DO_ZPZZ(sve_sabd_zpzz_h, int16_t,  H1_2, DO_ABD)
-+DO_ZPZZ(sve_uabd_zpzz_h, uint16_t, H1_2, DO_ABD)
-+
-+DO_ZPZZ(sve_smax_zpzz_s, int32_t,  H1_4, DO_MAX)
-+DO_ZPZZ(sve_umax_zpzz_s, uint32_t, H1_4, DO_MAX)
-+DO_ZPZZ(sve_smin_zpzz_s, int32_t,  H1_4, DO_MIN)
-+DO_ZPZZ(sve_umin_zpzz_s, uint32_t, H1_4, DO_MIN)
-+DO_ZPZZ(sve_sabd_zpzz_s, int32_t,  H1_4, DO_ABD)
-+DO_ZPZZ(sve_uabd_zpzz_s, uint32_t, H1_4, DO_ABD)
-+
-+DO_ZPZZ_D(sve_smax_zpzz_d, int64_t,  DO_MAX)
-+DO_ZPZZ_D(sve_umax_zpzz_d, uint64_t, DO_MAX)
-+DO_ZPZZ_D(sve_smin_zpzz_d, int64_t,  DO_MIN)
-+DO_ZPZZ_D(sve_umin_zpzz_d, uint64_t, DO_MIN)
-+DO_ZPZZ_D(sve_sabd_zpzz_d, int64_t,  DO_ABD)
-+DO_ZPZZ_D(sve_uabd_zpzz_d, uint64_t, DO_ABD)
-+
-+#undef DO_MAX
-+#undef DO_MIN
-+#undef DO_ABD
-+
-+#define DO_MUL(N, M)  (N * M)
-+#define DO_DIV(N, M)  (M ? N / M : 0)
-+
-+/* Because the computation type is at least twice as large as required,
-+   these work for both signed and unsigned source types.  */
-+static inline uint8_t do_mulh_b(int32_t n, int32_t m)
-+{
-+    return (n * m) >> 8;
-+}
-+
-+static inline uint16_t do_mulh_h(int32_t n, int32_t m)
-+{
-+    return (n * m) >> 16;
-+}
-+
-+static inline uint32_t do_mulh_s(int64_t n, int64_t m)
-+{
-+    return (n * m) >> 32;
-+}
-+
-+static inline uint64_t do_smulh_d(uint64_t n, uint64_t m)
-+{
-+    uint64_t lo, hi;
-+    muls64(&lo, &hi, n, m);
-+    return hi;
-+}
-+
-+static inline uint64_t do_umulh_d(uint64_t n, uint64_t m)
-+{
-+    uint64_t lo, hi;
-+    mulu64(&lo, &hi, n, m);
-+    return hi;
-+}
-+
-+DO_ZPZZ(sve_mul_zpzz_b, uint8_t, H1, DO_MUL)
-+DO_ZPZZ(sve_smulh_zpzz_b, int8_t, H1, do_mulh_b)
-+DO_ZPZZ(sve_umulh_zpzz_b, uint8_t, H1, do_mulh_b)
-+
-+DO_ZPZZ(sve_mul_zpzz_h, uint16_t, H1_2, DO_MUL)
-+DO_ZPZZ(sve_smulh_zpzz_h, int16_t, H1_2, do_mulh_h)
-+DO_ZPZZ(sve_umulh_zpzz_h, uint16_t, H1_2, do_mulh_h)
-+
-+DO_ZPZZ(sve_mul_zpzz_s, uint32_t, H1_4, DO_MUL)
-+DO_ZPZZ(sve_smulh_zpzz_s, int32_t, H1_4, do_mulh_s)
-+DO_ZPZZ(sve_umulh_zpzz_s, uint32_t, H1_4, do_mulh_s)
-+DO_ZPZZ(sve_sdiv_zpzz_s, int32_t, H1_4, DO_DIV)
-+DO_ZPZZ(sve_udiv_zpzz_s, uint32_t, H1_4, DO_DIV)
-+
-+DO_ZPZZ_D(sve_mul_zpzz_d, uint64_t, DO_MUL)
-+DO_ZPZZ_D(sve_smulh_zpzz_d, uint64_t, do_smulh_d)
-+DO_ZPZZ_D(sve_umulh_zpzz_d, uint64_t, do_umulh_d)
-+DO_ZPZZ_D(sve_sdiv_zpzz_d, int64_t, DO_DIV)
-+DO_ZPZZ_D(sve_udiv_zpzz_d, uint64_t, DO_DIV)
-+
-+#undef DO_MUL
-+#undef DO_DIV
-+
-+#undef DO_ZPZZ
-+#undef DO_ZPZZ_D
-+
- void HELPER(sve_ldr)(CPUARMState *env, void *d, target_ulong addr, uint32_t len)
- {
-     intptr_t i, len_align = QEMU_ALIGN_DOWN(len, 8);
-diff --git a/target/arm/translate-sve.c b/target/arm/translate-sve.c
-index 0e988c03aa..d8b34020bb 100644
---- a/target/arm/translate-sve.c
-+++ b/target/arm/translate-sve.c
-@@ -126,6 +126,81 @@ void trans_BIC_zzz(DisasContext *s, arg_BIC_zzz *a, uint32_t insn)
-     do_zzz_genfn(s, a, tcg_gen_gvec_andc);
+diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
+index b951045820..9e15a4b1ae 100644
+--- a/target/arm/translate-a64.c
++++ b/target/arm/translate-a64.c
+@@ -533,17 +533,19 @@ static TCGv_i32 read_fp_sreg(DisasContext *s, int reg)
+     return v;
  }
  
-+static void do_zpzz_ool(DisasContext *s, arg_rprr_esz *a, gen_helper_gvec_4 *fn)
-+{
-+    unsigned vsz = size_for_gvec(vec_full_reg_size(s));
-+    tcg_gen_gvec_4_ool(vec_full_reg_offset(s, a->rd),
-+                       vec_full_reg_offset(s, a->rn),
-+                       vec_full_reg_offset(s, a->rm),
-+                       pred_full_reg_offset(s, a->pg),
-+                       vsz, vsz, 0, fn);
-+}
-+
-+#define DO_ZPZZ(NAME, name) \
-+void trans_##NAME##_zpzz(DisasContext *s, arg_rprr_esz *a, uint32_t insn) \
-+{                                                                         \
-+    static gen_helper_gvec_4 * const fns[4] = {                           \
-+        gen_helper_sve_##name##_zpzz_b, gen_helper_sve_##name##_zpzz_h,   \
-+        gen_helper_sve_##name##_zpzz_s, gen_helper_sve_##name##_zpzz_d,   \
-+    };                                                                    \
-+    do_zpzz_ool(s, a, fns[a->esz]);                                       \
-+}
-+
-+DO_ZPZZ(AND, and)
-+DO_ZPZZ(EOR, eor)
-+DO_ZPZZ(ORR, orr)
-+DO_ZPZZ(BIC, bic)
-+
-+DO_ZPZZ(ADD, add)
-+DO_ZPZZ(SUB, sub)
-+
-+DO_ZPZZ(SMAX, smax)
-+DO_ZPZZ(UMAX, umax)
-+DO_ZPZZ(SMIN, smin)
-+DO_ZPZZ(UMIN, umin)
-+DO_ZPZZ(SABD, sabd)
-+DO_ZPZZ(UABD, uabd)
-+
-+DO_ZPZZ(MUL, mul)
-+DO_ZPZZ(SMULH, smulh)
-+DO_ZPZZ(UMULH, umulh)
-+
-+void trans_SDIV_zpzz(DisasContext *s, arg_rprr_esz *a, uint32_t insn)
-+{
-+    gen_helper_gvec_4 *fn;
-+    switch (a->esz) {
-+    default:
-+        unallocated_encoding(s);
-+        return;
-+    case 2:
-+        fn = gen_helper_sve_sdiv_zpzz_s;
-+        break;
-+    case 3:
-+        fn = gen_helper_sve_sdiv_zpzz_d;
-+        break;
-+    };
-+    do_zpzz_ool(s, a, fn);
-+}
-+
-+void trans_UDIV_zpzz(DisasContext *s, arg_rprr_esz *a, uint32_t insn)
-+{
-+    gen_helper_gvec_4 *fn;
-+    switch (a->esz) {
-+    default:
-+        unallocated_encoding(s);
-+        return;
-+    case 2:
-+        fn = gen_helper_sve_udiv_zpzz_s;
-+        break;
-+    case 3:
-+        fn = gen_helper_sve_udiv_zpzz_d;
-+        break;
-+    };
-+    do_zpzz_ool(s, a, fn);
-+}
-+
-+#undef DO_ZPZZ
-+
- static uint64_t pred_esz_mask[4] = {
-     0xffffffffffffffffull, 0x5555555555555555ull,
-     0x1111111111111111ull, 0x0101010101010101ull
-diff --git a/target/arm/sve.def b/target/arm/sve.def
-index d1172296e0..3bb4faaf89 100644
---- a/target/arm/sve.def
-+++ b/target/arm/sve.def
-@@ -24,6 +24,10 @@
+-/* Clear the bits above an 64-bit vector.
++/* Clear the bits above an N-bit vector, for N = (is_q ? 128 : 64).
+  * If SVE is not enabled, then there are only 128 bits in the vector.
+  */
+-static void clear_vec_high(DisasContext *s, int rd)
++static void clear_vec_high(DisasContext *s, bool is_q, int rd)
+ {
+     unsigned ofs = fp_reg_offset(s, rd, MO_64);
+     unsigned vsz = vec_full_reg_size(s);
+-    TCGv_i64 tcg_zero = tcg_const_i64(0);
  
- %imm9_16_10		16:s6 10:3
+-    tcg_gen_st_i64(tcg_zero, cpu_env, ofs + 8);
+-    tcg_temp_free_i64(tcg_zero);
++    if (is_q) {
++        TCGv_i64 tcg_zero = tcg_const_i64(0);
++        tcg_gen_st_i64(tcg_zero, cpu_env, ofs + 8);
++        tcg_temp_free_i64(tcg_zero);
++    }
+     if (vsz > 16) {
+         tcg_gen_gvec_dup8i(ofs + 16, vsz - 16, vsz - 16, 0);
+     }
+@@ -554,7 +556,7 @@ void write_fp_dreg(DisasContext *s, int reg, TCGv_i64 v)
+     unsigned ofs = fp_reg_offset(s, reg, MO_64);
  
-+# Either a copy of rd (at bit 0), or a different source
-+# as propagated via the MOVPRFX instruction.
-+%reg_movprfx		0:5
-+
- ###########################################################################
- # Named attribute sets.  These are used to make nice(er) names
- # when creating helpers common to those for the individual
-@@ -44,6 +48,10 @@
- # Three prediate operand, with governing predicate, unused vector element size
- @pd_pg_pn_pm		........ .... rm:4 .. pg:4 . rn:4 . rd:4	&rprr_esz esz=0
+     tcg_gen_st_i64(v, cpu_env, ofs);
+-    clear_vec_high(s, reg);
++    clear_vec_high(s, false, reg);
+ }
  
-+# Two register operand, with governing predicate, vector element size
-+@rdn_pg_rm_esz		........ esz:2 ... ... ... pg:3 rm:5 rd:5	&rprr_esz rn=%reg_movprfx
-+@rdm_pg_rn_esz		........ esz:2 ... ... ... pg:3 rn:5 rd:5	&rprr_esz rm=%reg_movprfx
-+
- # Basic Load/Store with 9-bit immediate offset
- @pd_rn_i9		........ ........ ...... rn:5 . rd:4		&rri imm=%imm9_16_10
- @rd_rn_i9		........ ........ ...... rn:5 rd:5		&rri imm=%imm9_16_10
-@@ -51,6 +59,37 @@
- ###########################################################################
- # Instruction patterns.  Grouped according to the SVE encodingindex.xhtml.
+ static void write_fp_sreg(DisasContext *s, int reg, TCGv_i32 v)
+@@ -915,6 +917,8 @@ static void do_fp_ld(DisasContext *s, int destidx, TCGv_i64 tcg_addr, int size)
  
-+### SVE Integer Arithmetic - Binary Predicated Group
+     tcg_temp_free_i64(tmplo);
+     tcg_temp_free_i64(tmphi);
 +
-+# SVE bitwise logical vector operations (predicated)
-+ORR_zpzz		00000100 .. 011 000 000 ... ..... .....		@rdn_pg_rm_esz
-+EOR_zpzz		00000100 .. 011 001 000 ... ..... .....		@rdn_pg_rm_esz
-+AND_zpzz		00000100 .. 011 010 000 ... ..... .....		@rdn_pg_rm_esz
-+BIC_zpzz		00000100 .. 011 011 000 ... ..... .....		@rdn_pg_rm_esz
-+
-+# SVE integer add/subtract vectors (predicated)
-+ADD_zpzz		00000100 .. 000 000 000 ... ..... .....		@rdn_pg_rm_esz
-+SUB_zpzz		00000100 .. 000 001 000 ... ..... .....		@rdn_pg_rm_esz
-+SUB_zpzz		00000100 .. 000 011 000 ... ..... .....		@rdm_pg_rn_esz # SUBR
-+
-+# SVE integer min/max/difference (predicated)
-+SMAX_zpzz		00000100 .. 001 000 000 ... ..... .....		@rdn_pg_rm_esz
-+UMAX_zpzz		00000100 .. 001 001 000 ... ..... .....		@rdn_pg_rm_esz
-+SMIN_zpzz		00000100 .. 001 010 000 ... ..... .....		@rdn_pg_rm_esz
-+UMIN_zpzz		00000100 .. 001 011 000 ... ..... .....		@rdn_pg_rm_esz
-+SABD_zpzz		00000100 .. 001 100 000 ... ..... .....		@rdn_pg_rm_esz
-+UABD_zpzz		00000100 .. 001 101 000 ... ..... .....		@rdn_pg_rm_esz
-+
-+# SVE integer multiply/divide (predicated)
-+MUL_zpzz		00000100 .. 010 000 000 ... ..... .....		@rdn_pg_rm_esz
-+SMULH_zpzz		00000100 .. 010 010 000 ... ..... .....		@rdn_pg_rm_esz
-+UMULH_zpzz		00000100 .. 010 011 000 ... ..... .....		@rdn_pg_rm_esz
-+# Note that divide requires size >= 2; below 2 is unallocated.
-+SDIV_zpzz		00000100 .. 010 100 000 ... ..... .....		@rdn_pg_rm_esz
-+UDIV_zpzz		00000100 .. 010 101 000 ... ..... .....		@rdn_pg_rm_esz
-+SDIV_zpzz		00000100 .. 010 110 000 ... ..... .....		@rdm_pg_rn_esz # SDIVR
-+UDIV_zpzz		00000100 .. 010 111 000 ... ..... .....		@rdm_pg_rn_esz # UDIVR
-+
- ### SVE Logical - Unpredicated Group
++    clear_vec_high(s, true, destidx);
+ }
  
- # SVE bitwise logical operations (unpredicated)
+ /*
+@@ -2670,12 +2674,13 @@ static void disas_ldst_multiple_struct(DisasContext *s, uint32_t insn)
+                     /* For non-quad operations, setting a slice of the low
+                      * 64 bits of the register clears the high 64 bits (in
+                      * the ARM ARM pseudocode this is implicit in the fact
+-                     * that 'rval' is a 64 bit wide variable). We optimize
+-                     * by noticing that we only need to do this the first
+-                     * time we touch a register.
++                     * that 'rval' is a 64 bit wide variable).
++                     * For quad operations, we might still need to zero the
++                     * high bits of SVE.  We optimize by noticing that we only
++                     * need to do this the first time we touch a register.
+                      */
+-                    if (!is_q && e == 0 && (r == 0 || xs == selem - 1)) {
+-                        clear_vec_high(s, tt);
++                    if (e == 0 && (r == 0 || xs == selem - 1)) {
++                        clear_vec_high(s, is_q, tt);
+                     }
+                 }
+                 tcg_gen_addi_i64(tcg_addr, tcg_addr, ebytes);
+@@ -2818,10 +2823,9 @@ static void disas_ldst_single_struct(DisasContext *s, uint32_t insn)
+             write_vec_element(s, tcg_tmp, rt, 0, MO_64);
+             if (is_q) {
+                 write_vec_element(s, tcg_tmp, rt, 1, MO_64);
+-            } else {
+-                clear_vec_high(s, rt);
+             }
+             tcg_temp_free_i64(tcg_tmp);
++            clear_vec_high(s, is_q, rt);
+         } else {
+             /* Load/store one element per register */
+             if (is_load) {
+@@ -6659,7 +6663,6 @@ static void handle_vec_simd_sqshrn(DisasContext *s, bool is_scalar, bool is_q,
+     }
+ 
+     if (!is_q) {
+-        clear_vec_high(s, rd);
+         write_vec_element(s, tcg_final, rd, 0, MO_64);
+     } else {
+         write_vec_element(s, tcg_final, rd, 1, MO_64);
+@@ -6672,7 +6675,8 @@ static void handle_vec_simd_sqshrn(DisasContext *s, bool is_scalar, bool is_q,
+     tcg_temp_free_i64(tcg_rd);
+     tcg_temp_free_i32(tcg_rd_narrowed);
+     tcg_temp_free_i64(tcg_final);
+-    return;
++
++    clear_vec_high(s, is_q, rd);
+ }
+ 
+ /* SQSHLU, UQSHL, SQSHL: saturating left shifts */
+@@ -6736,10 +6740,7 @@ static void handle_simd_qshl(DisasContext *s, bool scalar, bool is_q,
+             tcg_temp_free_i64(tcg_op);
+         }
+         tcg_temp_free_i64(tcg_shift);
+-
+-        if (!is_q) {
+-            clear_vec_high(s, rd);
+-        }
++        clear_vec_high(s, is_q, rd);
+     } else {
+         TCGv_i32 tcg_shift = tcg_const_i32(shift);
+         static NeonGenTwoOpEnvFn * const fns[2][2][3] = {
+@@ -6788,8 +6789,8 @@ static void handle_simd_qshl(DisasContext *s, bool scalar, bool is_q,
+         }
+         tcg_temp_free_i32(tcg_shift);
+ 
+-        if (!is_q && !scalar) {
+-            clear_vec_high(s, rd);
++        if (!scalar) {
++            clear_vec_high(s, is_q, rd);
+         }
+     }
+ }
+@@ -6831,10 +6832,8 @@ static void handle_simd_intfp_conv(DisasContext *s, int rd, int rn,
+                 write_vec_element(s, tcg_double, rd, pass, MO_64);
+             }
+         }
+-
+         tcg_temp_free_i64(tcg_int64);
+         tcg_temp_free_i64(tcg_double);
+-
+     } else {
+         TCGv_i32 tcg_int32 = tcg_temp_new_i32();
+         TCGv_i32 tcg_float = tcg_temp_new_i32();
+@@ -6887,20 +6886,17 @@ static void handle_simd_intfp_conv(DisasContext *s, int rd, int rn,
+                 write_vec_element_i32(s, tcg_float, rd, pass, size);
+             }
+         }
+-
+         tcg_temp_free_i32(tcg_int32);
+         tcg_temp_free_i32(tcg_float);
+-
+-        if ((size == MO_32 && elements == 2) ||
+-            (size == MO_16 && elements == 4)) {
+-            clear_vec_high(s, rd);
+-        }
+     }
+ 
+     tcg_temp_free_ptr(tcg_fpst);
+     if (fracbits || size == MO_64) {
+         tcg_temp_free_i32(tcg_shift);
+     }
++    if (elements > 1) {
++        clear_vec_high(s, (elements << size) > 8, rd);
++    }
+ }
+ 
+ /* UCVTF/SCVTF - Integer to FP conversion */
+@@ -6988,9 +6984,7 @@ static void handle_simd_shift_fpint_conv(DisasContext *s, bool is_scalar,
+             write_vec_element(s, tcg_op, rd, pass, MO_64);
+             tcg_temp_free_i64(tcg_op);
+         }
+-        if (!is_q) {
+-            clear_vec_high(s, rd);
+-        }
++        clear_vec_high(s, is_q, rd);
+     } else {
+         int maxpass = is_scalar ? 1 : is_q ? 4 : 2;
+         for (pass = 0; pass < maxpass; pass++) {
+@@ -7009,8 +7003,8 @@ static void handle_simd_shift_fpint_conv(DisasContext *s, bool is_scalar,
+             }
+             tcg_temp_free_i32(tcg_op);
+         }
+-        if (!is_q && !is_scalar) {
+-            clear_vec_high(s, rd);
++        if (!is_scalar) {
++            clear_vec_high(s, is_q, rd);
+         }
+     }
+ 
+@@ -7491,13 +7485,9 @@ static void handle_3same_float(DisasContext *s, int size, int elements,
+             tcg_temp_free_i32(tcg_op2);
+         }
+     }
+-
+     tcg_temp_free_ptr(fpst);
+ 
+-    if ((elements << size) < 4) {
+-        /* scalar, or non-quad vector op */
+-        clear_vec_high(s, rd);
+-    }
++    clear_vec_high(s, elements * (size ? 8 : 4) > 8, rd);
+ }
+ 
+ /* AdvSIMD scalar three same
+@@ -8005,13 +7995,10 @@ static void handle_2misc_fcmp_zero(DisasContext *s, int opcode,
+             }
+             write_vec_element(s, tcg_res, rd, pass, MO_64);
+         }
+-        if (is_scalar) {
+-            clear_vec_high(s, rd);
+-        }
+-
+         tcg_temp_free_i64(tcg_res);
+         tcg_temp_free_i64(tcg_zero);
+         tcg_temp_free_i64(tcg_op);
++        clear_vec_high(s, !is_scalar, rd);
+     } else {
+         TCGv_i32 tcg_op = tcg_temp_new_i32();
+         TCGv_i32 tcg_zero = tcg_const_i32(0);
+@@ -8063,8 +8050,8 @@ static void handle_2misc_fcmp_zero(DisasContext *s, int opcode,
+         tcg_temp_free_i32(tcg_res);
+         tcg_temp_free_i32(tcg_zero);
+         tcg_temp_free_i32(tcg_op);
+-        if (!is_q && !is_scalar) {
+-            clear_vec_high(s, rd);
++        if (!is_scalar) {
++            clear_vec_high(s, is_q, rd);
+         }
+     }
+ 
+@@ -8100,12 +8087,9 @@ static void handle_2misc_reciprocal(DisasContext *s, int opcode,
+             }
+             write_vec_element(s, tcg_res, rd, pass, MO_64);
+         }
+-        if (is_scalar) {
+-            clear_vec_high(s, rd);
+-        }
+-
+         tcg_temp_free_i64(tcg_res);
+         tcg_temp_free_i64(tcg_op);
++        clear_vec_high(s, !is_scalar, rd);
+     } else {
+         TCGv_i32 tcg_op = tcg_temp_new_i32();
+         TCGv_i32 tcg_res = tcg_temp_new_i32();
+@@ -8145,8 +8129,8 @@ static void handle_2misc_reciprocal(DisasContext *s, int opcode,
+         }
+         tcg_temp_free_i32(tcg_res);
+         tcg_temp_free_i32(tcg_op);
+-        if (!is_q && !is_scalar) {
+-            clear_vec_high(s, rd);
++        if (!is_scalar) {
++            clear_vec_high(s, is_q, rd);
+         }
+     }
+     tcg_temp_free_ptr(fpst);
+@@ -8259,9 +8243,7 @@ static void handle_2misc_narrow(DisasContext *s, bool scalar,
+         write_vec_element_i32(s, tcg_res[pass], rd, destelt + pass, MO_32);
+         tcg_temp_free_i32(tcg_res[pass]);
+     }
+-    if (!is_q) {
+-        clear_vec_high(s, rd);
+-    }
++    clear_vec_high(s, is_q, rd);
+ }
+ 
+ /* Remaining saturating accumulating ops */
+@@ -8286,12 +8268,9 @@ static void handle_2misc_satacc(DisasContext *s, bool is_scalar, bool is_u,
+             }
+             write_vec_element(s, tcg_rd, rd, pass, MO_64);
+         }
+-        if (is_scalar) {
+-            clear_vec_high(s, rd);
+-        }
+-
+         tcg_temp_free_i64(tcg_rd);
+         tcg_temp_free_i64(tcg_rn);
++        clear_vec_high(s, !is_scalar, rd);
+     } else {
+         TCGv_i32 tcg_rn = tcg_temp_new_i32();
+         TCGv_i32 tcg_rd = tcg_temp_new_i32();
+@@ -8349,13 +8328,9 @@ static void handle_2misc_satacc(DisasContext *s, bool is_scalar, bool is_u,
+             }
+             write_vec_element_i32(s, tcg_rd, rd, pass, MO_32);
+         }
+-
+-        if (!is_q) {
+-            clear_vec_high(s, rd);
+-        }
+-
+         tcg_temp_free_i32(tcg_rd);
+         tcg_temp_free_i32(tcg_rn);
++        clear_vec_high(s, is_q, rd);
+     }
+ }
+ 
+@@ -8855,9 +8830,7 @@ static void handle_vec_simd_shri(DisasContext *s, bool is_q, bool is_u,
+     tcg_temp_free_i64(tcg_round);
+ 
+  done:
+-    if (!is_q) {
+-        clear_vec_high(s, rd);
+-    }
++    clear_vec_high(s, is_q, rd);
+ }
+ 
+ static void gen_shl8_ins_i64(TCGv_i64 d, TCGv_i64 a, unsigned shift)
+@@ -9045,19 +9018,18 @@ static void handle_vec_simd_shrn(DisasContext *s, bool is_q,
+     }
+ 
+     if (!is_q) {
+-        clear_vec_high(s, rd);
+         write_vec_element(s, tcg_final, rd, 0, MO_64);
+     } else {
+         write_vec_element(s, tcg_final, rd, 1, MO_64);
+     }
+-
+     if (round) {
+         tcg_temp_free_i64(tcg_round);
+     }
+     tcg_temp_free_i64(tcg_rn);
+     tcg_temp_free_i64(tcg_rd);
+     tcg_temp_free_i64(tcg_final);
+-    return;
++
++    clear_vec_high(s, is_q, rd);
+ }
+ 
+ 
+@@ -9451,9 +9423,7 @@ static void handle_3rd_narrowing(DisasContext *s, int is_q, int is_u, int size,
+         write_vec_element_i32(s, tcg_res[pass], rd, pass + part, MO_32);
+         tcg_temp_free_i32(tcg_res[pass]);
+     }
+-    if (!is_q) {
+-        clear_vec_high(s, rd);
+-    }
++    clear_vec_high(s, is_q, rd);
+ }
+ 
+ static void handle_pmull_64(DisasContext *s, int is_q, int rd, int rn, int rm)
+@@ -9877,9 +9847,7 @@ static void handle_simd_3same_pair(DisasContext *s, int is_q, int u, int opcode,
+             write_vec_element_i32(s, tcg_res[pass], rd, pass, MO_32);
+             tcg_temp_free_i32(tcg_res[pass]);
+         }
+-        if (!is_q) {
+-            clear_vec_high(s, rd);
+-        }
++        clear_vec_high(s, is_q, rd);
+     }
+ 
+     if (fpst) {
+@@ -10372,10 +10340,7 @@ static void disas_simd_3same_int(DisasContext *s, uint32_t insn)
+             tcg_temp_free_i32(tcg_op2);
+         }
+     }
+-
+-    if (!is_q) {
+-        clear_vec_high(s, rd);
+-    }
++    clear_vec_high(s, is_q, rd);
+ }
+ 
+ /* AdvSIMD three same
+@@ -10611,10 +10576,7 @@ static void disas_simd_three_reg_same_fp16(DisasContext *s, uint32_t insn)
+ 
+     tcg_temp_free_ptr(fpst);
+ 
+-    if (!is_q) {
+-        /* non-quad vector op */
+-        clear_vec_high(s, rd);
+-    }
++    clear_vec_high(s, is_q, rd);
+ }
+ 
+ /* AdvSIMD three same extra
+@@ -10846,9 +10808,7 @@ static void handle_rev(DisasContext *s, int opcode, bool u,
+             write_vec_element(s, tcg_tmp, rd, i, grp_size);
+             tcg_temp_free_i64(tcg_tmp);
+         }
+-        if (!is_q) {
+-            clear_vec_high(s, rd);
+-        }
++        clear_vec_high(s, is_q, rd);
+     } else {
+         int revmask = (1 << grp_size) - 1;
+         int esize = 8 << size;
+@@ -11499,9 +11459,7 @@ static void disas_simd_two_reg_misc(DisasContext *s, uint32_t insn)
+             tcg_temp_free_i32(tcg_op);
+         }
+     }
+-    if (!is_q) {
+-        clear_vec_high(s, rd);
+-    }
++    clear_vec_high(s, is_q, rd);
+ 
+     if (need_rmode) {
+         gen_helper_set_rmode(tcg_rmode, tcg_rmode, cpu_env);
+@@ -11778,9 +11736,7 @@ static void disas_simd_two_reg_misc_fp16(DisasContext *s, uint32_t insn)
+             tcg_temp_free_i32(tcg_op);
+         }
+ 
+-        if (!is_q) {
+-            clear_vec_high(s, rd);
+-        }
++        clear_vec_high(s, is_q, rd);
+     }
+ 
+     if (need_rmode) {
+@@ -12029,12 +11985,8 @@ static void disas_simd_indexed(DisasContext *s, uint32_t insn)
+             tcg_temp_free_i64(tcg_op);
+             tcg_temp_free_i64(tcg_res);
+         }
+-
+-        if (is_scalar) {
+-            clear_vec_high(s, rd);
+-        }
+-
+         tcg_temp_free_i64(tcg_idx);
++        clear_vec_high(s, !is_scalar, rd);
+     } else if (!is_long) {
+         /* 32 bit floating point, or 16 or 32 bit integer.
+          * For the 16 bit scalar case we use the usual Neon helpers and
+@@ -12198,12 +12150,8 @@ static void disas_simd_indexed(DisasContext *s, uint32_t insn)
+             tcg_temp_free_i32(tcg_op);
+             tcg_temp_free_i32(tcg_res);
+         }
+-
+         tcg_temp_free_i32(tcg_idx);
+-
+-        if (!is_q) {
+-            clear_vec_high(s, rd);
+-        }
++        clear_vec_high(s, is_q, rd);
+     } else {
+         /* long ops: 16x16->32 or 32x32->64 */
+         TCGv_i64 tcg_res[2];
+@@ -12279,10 +12227,7 @@ static void disas_simd_indexed(DisasContext *s, uint32_t insn)
+                 tcg_temp_free_i64(tcg_passres);
+             }
+             tcg_temp_free_i64(tcg_idx);
+-
+-            if (is_scalar) {
+-                clear_vec_high(s, rd);
+-            }
++            clear_vec_high(s, !is_scalar, rd);
+         } else {
+             TCGv_i32 tcg_idx = tcg_temp_new_i32();
+ 
 -- 
 2.14.3
