@@ -1,26 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50130)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50372)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eQuwF-0006VW-NV
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 07:54:36 -0500
+	(envelope-from <marcandre.lureau@gmail.com>) id 1eQuwY-0006jz-2K
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 07:54:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eQuwE-0000Xb-LG
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 07:54:35 -0500
-Received: from mail-ot0-x234.google.com ([2607:f8b0:4003:c0f::234]:42026)
+	(envelope-from <marcandre.lureau@gmail.com>) id 1eQuwX-0000j4-41
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 07:54:54 -0500
+Received: from mail-wr0-x241.google.com ([2a00:1450:400c:c0c::241]:34457)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1eQuwE-0000Wh-D4
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 07:54:34 -0500
-Received: by mail-ot0-x234.google.com with SMTP id i1so13237071oth.9
-	for <qemu-devel@nongnu.org>; Mon, 18 Dec 2017 04:54:34 -0800 (PST)
+	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+	id 1eQuwW-0000iH-TE
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 07:54:53 -0500
+Received: by mail-wr0-x241.google.com with SMTP id y21so13958701wrc.1
+	for <qemu-devel@nongnu.org>; Mon, 18 Dec 2017 04:54:52 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20171218124943.28529-1-ybettan@redhat.com>
-References: <20171218124943.28529-1-ybettan@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 18 Dec 2017 12:54:12 +0000
-Message-ID: <CAFEAcA-vsJ-6MntBB6LuMzHhA+X-YZv=XJwZRuhD5m0wj-o+AA@mail.gmail.com>
+In-Reply-To: <abddfb99-c6ca-70ba-eae9-16f57f60b41d@redhat.com>
+References: <20171215181810.4122-1-marcandre.lureau@redhat.com>
+	<abddfb99-c6ca-70ba-eae9-16f57f60b41d@redhat.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Mon, 18 Dec 2017 13:54:50 +0100
+Message-ID: <CAJ+F1C+3u+yy+LHxkv8DjxMTeCi7oon8s01g2YYMoRB4sNuv1A@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH V2] vl.c && linux-user/main.c : removed
- **envp from main() arguments
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] checkpatch: warn when using volatile with
+ a comment
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,57 +31,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Yoni Bettan <ybettan@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>, Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: QEMU <qemu-devel@nongnu.org>, Laszlo Ersek <lersek@redhat.com>, Fam Zheng <famz@redhat.com>
 
-On 18 December 2017 at 12:49, Yoni Bettan <ybettan@redhat.com> wrote:
->          * it was added on 2008 902b3d5c392bb6f48ef340ad8ecc3311705d2800
->            when introduced cache-utils.[ch]
->
->          * since then cache-utils.[ch] were removed but **envp was left
->            behind
->
->         * by the way "to be portable it is best to write main to take two
->           arguments, and use the value of environ" according to
->           https://www.gnu.org/software/libc/manual/html_node/Program-\
->                 Arguments.html#Program-Arguments
+Hi
 
-> diff --git a/ui/cocoa.m b/ui/cocoa.m
-> index 330ccebf90..851a2dcd06 100644
-> --- a/ui/cocoa.m
-> +++ b/ui/cocoa.m
-> @@ -25,7 +25,6 @@
->  #include "qemu/osdep.h"
+On Mon, Dec 18, 2017 at 1:49 PM, Paolo Bonzini <pbonzini@redhat.com> wrote:
+> On 15/12/2017 19:18, Marc-Andr=C3=A9 Lureau wrote:
+>> Instead of an error, lower to a warning message, assuming the comment
+>> gives some justification.
+>>
+>> Discussed in:
+>> '[Qemu-devel] [PATCH] dump-guest-memory.py: fix "You can't do that witho=
+ut a process to debug"'
+>>
+>> Suggested-by: Fam Zheng <famz@redhat.com>
+>> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 >
->  #import <Cocoa/Cocoa.h>
-> -#include <crt_externs.h>
+> We can drop the error at all if there is a comment.  Also, "volatile sig_=
+atomic_t" is probably self-explanatory and usually correct.  So what about =
+this:
 >
->  #include "qemu-common.h"
->  #include "ui/console.h"
-> @@ -1050,7 +1049,7 @@ QemuCocoaView *cocoaView;
->      COCOA_DEBUG("QemuCocoaAppController: startEmulationWithArgc\n");
+> diff --git a/scripts/checkpatch.pl b/scripts/checkpatch.pl
+> index f5a523af10..3dc27d9656 100755
+> --- a/scripts/checkpatch.pl
+> +++ b/scripts/checkpatch.pl
+> @@ -2475,13 +2475,11 @@ sub process {
 >
->      int status;
-> -    status = qemu_main(argc, argv, *_NSGetEnviron());
-> +    status = main(argc, argv);
->      exit(status);
->  }
+>  # no volatiles please
+>                 my $asm_volatile =3D qr{\b(__asm__|asm)\s+(__volatile__|v=
+olatile)\b};
+> -               if ($line =3D~ /\bvolatile\b/ && $line !~ /$asm_volatile/=
+) {
+> -                       my $msg =3D "Use of volatile is usually wrong: se=
+e Documentation/volatile-considered-harmful.txt\n" . $herecurr;
+> -                       if (ctx_has_comment($first_line, $linenr)) {
+> -                               WARN($msg);
+> -                       } else {
+> -                               ERROR($msg);
+> -                       }
+> +               if ($line =3D~ /\bvolatile\b/ && $line !~ /$asm_volatile/=
+ &&
+> +                    $line !~ /sig_atomic_t/ &&
+> +                    !ctx_has_comment($first_line, $linenr)) {
+> +                       my $msg =3D "Use of volatile is usually wrong, pl=
+ease add a comment\n" . $herecurr;
+> +                        ERROR($msg);
+>                 }
 >
-> @@ -1391,7 +1390,7 @@ int main (int argc, const char * argv[]) {
->                  !strcmp(opt, "-curses") ||
->                  !strcmp(opt, "-display") ||
->                  !strcmp(opt, "-qtest")) {
-> -                return qemu_main(gArgc, gArgv, *_NSGetEnviron());
-> +                return main(gArgc, gArgv);
->              }
->          }
->      }
 
-Did you test this on OSX? I'm pretty sure it will break,
-because now the main() function in ui/cocoa.m will
-recursively call itself, rather than calling the
-function in vl.c. (Either that or it just won't
-link at all because there are two main() functions.)
+Fine for me, can you send a proper patch?
 
-thanks
--- PMM
+Thanks
+
+
+
+--=20
+Marc-Andr=C3=A9 Lureau
