@@ -1,32 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52028)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53235)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <danielhb@linux.vnet.ibm.com>) id 1eQt3H-0006o2-6j
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 05:53:44 -0500
+	(envelope-from <berrange@redhat.com>) id 1eQt6h-00084a-H4
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 05:57:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <danielhb@linux.vnet.ibm.com>) id 1eQt3D-0003TN-8X
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 05:53:43 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:54910)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <danielhb@linux.vnet.ibm.com>)
-	id 1eQt3C-0003RJ-Vl
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 05:53:39 -0500
-Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	vBIAnCWB134517
-	for <qemu-devel@nongnu.org>; Mon, 18 Dec 2017 05:53:36 -0500
-Received: from e12.ny.us.ibm.com (e12.ny.us.ibm.com [129.33.205.202])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2exbagtuws-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 18 Dec 2017 05:53:36 -0500
-Received: from localhost
-	by e12.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <danielhb@linux.vnet.ibm.com>;
-	Mon, 18 Dec 2017 05:53:35 -0500
-From: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
-Date: Mon, 18 Dec 2017 08:53:18 -0200
-Message-Id: <20171218105318.30367-1-danielhb@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH v1 1/1] qmp: marking qmp_cpu as deprecated
+	(envelope-from <berrange@redhat.com>) id 1eQt6d-0005vz-QH
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 05:57:15 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:44272)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1eQt6d-0005vQ-JW
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 05:57:11 -0500
+Date: Mon, 18 Dec 2017 10:57:04 +0000
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20171218105704.GD13493@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <CABMrAhLV6LLwBR70-P4EnekWHKD4AkaatzxQwuxtOnNYQ3MEqQ@mail.gmail.com>
+	<20171215135738.GF11724@redhat.com>
+	<CABMrAhLGAm60AgMjbaKSd3k=oX7J6DVO-DwwW04RE75mEWqhCQ@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <CABMrAhLGAm60AgMjbaKSd3k=oX7J6DVO-DwwW04RE75mEWqhCQ@mail.gmail.com>
+Subject: Re: [Qemu-devel] Key code conflict in keycodemapdb
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,65 +29,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: armbru@redhat.com, eblake@redhat.com, berrange@redhat.com, Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
+To: Miika S <miika9764@gmail.com>
+Cc: qemu-devel@nongnu.org, kraxel@redhat.com
 
-qmp_cpu is a nop that was created a while ago in commit 755f196898
-("qapi: Convert the cpu command") for the sake of compatibility,
-due to the existence of hmp_cpu.
+On Fri, Dec 15, 2017 at 10:03:31PM +0200, Miika S wrote:
+> Ok, I don't know if there is a separate place where to send patches
+> for keycodemapdb but I will put it in this reply. I will send a new
+> set of patches for the QEMU changes that were in the first mail
+> (hopefully in a better format than this one) and also a fix for mouse
+> wheel event being sent twice.
 
-Today, there is no need or requirement to keep it as is. QMP is
-meant to be as stateless as possible, thus any QMP command that
-needs a specific monitor CPU setup should provide it in its
-arguments, instead of relying in the current QMP monitor state.
+keycodemapdb patches can be sent as a pull request to the master upstream
+repo  https://gitlab.com/keycodemap/keycodemapdb/merge_requests
 
-This patch flags qmp_cpu as deprecated in qemu-doc.texi and changes
-qmp_cpu body to show a deprecation message if used.
+That said, I watch for patches sent to gtk-vnc/qemu/libvirt/spice-gtk
+lists that cover keycodemapdb, so I have applied your patch to the
+upstream.
 
-Signed-off-by: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
----
-Although I've changed the behavior of qmp_cpu to return an error
-instead of doing nothing, no errors were found in the Travis
-build of the patch. Code inspection confirms that qmp_cpu isn't
-being used in QEMU.
+When sending your updated qemu patch, don't forget to include the
+keycodemapdb git submodule update to the hash containing your change
+05dad417e9d0b37ee1fba33056d91a6b734b3357
 
-A quick inspection in Libvirt code shows that there is no reference
-to 'qmp_cpu' there either, but to be sure I've CCed Daniel here
-so he can comment/confirm if Libvirt does not care for this change.
+You can do this as follows
 
- qemu-doc.texi | 6 ++++++
- qmp.c         | 2 +-
- 2 files changed, 7 insertions(+), 1 deletion(-)
+  cd $YOUR-QEMU-CHECKOUT
+  cd ui/keycodemapdb
+  git pull
+  cd ../..
+  git add ui/keycodemapdb
 
-diff --git a/qemu-doc.texi b/qemu-doc.texi
-index f7317dfc66..2b63f9a325 100644
---- a/qemu-doc.texi
-+++ b/qemu-doc.texi
-@@ -2516,6 +2516,12 @@ subsystem image.
- The ``convert -s snapshot_id_or_name'' argument is obsoleted
- by the ``convert -l snapshot_param'' argument instead.
- 
-+@section System emulator machine protocol commands
-+
-+@subsection qmp_cpu (since 2.12.0)
-+
-+The ``qmp_cpu'' command is deprecated. Do not use this command.
-+
- @section System emulator human monitor commands
- 
- @subsection host_net_add (since 2.10.0)
-diff --git a/qmp.c b/qmp.c
-index e8c303116a..d8543d713d 100644
---- a/qmp.c
-+++ b/qmp.c
-@@ -115,7 +115,7 @@ void qmp_system_powerdown(Error **erp)
- 
- void qmp_cpu(int64_t index, Error **errp)
- {
--    /* Just do nothing */
-+    error_setg(errp, "qmp_cpu is deprecated, do not use this command");
- }
- 
- void qmp_cpu_add(int64_t id, Error **errp)
+
+Regards,
+Daniel
 -- 
-2.13.6
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
