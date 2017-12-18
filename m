@@ -1,21 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57305)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57766)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <den@openvz.org>) id 1eQtIV-0003Bm-0z
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 06:09:31 -0500
+	(envelope-from <groug@kaod.org>) id 1eQtJy-0004Hp-EI
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 06:10:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <den@openvz.org>) id 1eQtIO-0007Zx-IV
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 06:09:26 -0500
-Received: from mailhub.sw.ru ([195.214.232.25]:7306 helo=relay.sw.ru)
+	(envelope-from <groug@kaod.org>) id 1eQtJu-0000w8-1a
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 06:10:58 -0500
+Received: from 11.mo1.mail-out.ovh.net ([188.165.48.29]:60528)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <den@openvz.org>) id 1eQtIO-0007Z5-1z
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 06:09:20 -0500
-From: "Denis V. Lunev" <den@openvz.org>
-Date: Mon, 18 Dec 2017 14:09:07 +0300
-Message-Id: <1513595351-5899-2-git-send-email-den@openvz.org>
-In-Reply-To: <1513595351-5899-1-git-send-email-den@openvz.org>
-References: <1513595351-5899-1-git-send-email-den@openvz.org>
-Subject: [Qemu-devel] [PATCH 1/5] docs/interop/prl-xml: description of
- Parallels Disk format
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1eQtJt-0000t5-OP
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 06:10:53 -0500
+Received: from player691.ha.ovh.net (gw6.ovh.net [213.251.189.206])
+	by mo1.mail-out.ovh.net (Postfix) with ESMTP id 67687B0882
+	for <qemu-devel@nongnu.org>; Mon, 18 Dec 2017 12:10:51 +0100 (CET)
+Date: Mon, 18 Dec 2017 12:10:41 +0100
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20171218121041.0377a5c9@bahia.lan>
+In-Reply-To: <20171218092024.21645-3-david@gibson.dropbear.id.au>
+References: <20171218092024.21645-1-david@gibson.dropbear.id.au>
+	<20171218092024.21645-3-david@gibson.dropbear.id.au>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 2/6] spapr: Treat Hardware Transactional
+ Memory (HTM) as an optional capability
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,184 +31,177 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: Klim Kireev <klim.kireev@virtuozzo.com>, Edgar Kaziakhmedov <edgar.kaziakhmedov@virtuozzo.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, "Denis V . Lunev" <den@openvz.org>, Stefan Hajnoczi <stefanha@redhat.com>
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: surajjs@au1.ibm.com, lvivier@redhat.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, mdroth@linux.vnet.ibm.com, abologna@redhat.com
 
-From: Klim Kireev <klim.kireev@virtuozzo.com>
+On Mon, 18 Dec 2017 20:20:20 +1100
+David Gibson <david@gibson.dropbear.id.au> wrote:
 
-This patch adds main information about Parallels Disk
-format, which consists of DiskDescriptor.xml and other files.
+> This adds an spapr capability bit for Hardware Transactional Memory.  It is
+> enabled by default for pseries-2.11 and earlier machine types. with POWER8
+> or later CPUs (as it must be, since earlier qemu versions would implicitly
+> allow it).  However it is disabled by default for the latest pseries-2.12
+> machine type.
+> 
+> This means that with the latest machine type, HTM will not be available,
+> regardless of CPU, unless it is explicitly enabled on the command line.
+> That change is made on the basis that:
+> 
+>  * This way running with -M pseries,accel=tcg will start with whatever cpu
+>    and will provide the same guest visible model as with accel=kvm.
+>      - More specifically, this means existing make check tests don't have
+>        to be modified to use cap-htm=off in order to run with TCG
+> 
+>  * We hope to add a new "HTM without suspend" feature in the not too
+>    distant future which could work on both POWER8 and POWER9 cpus, and
+>    could be enabled by default.
+> 
+>  * Best guesses suggest that future POWER cpus may well only support the
+>    HTM-without-suspend model, not the (frankly, horribly overcomplicated)
+>    POWER8 style HTM with suspend.
+> 
+>  * Anecdotal evidence suggests problems with HTM being enabled when it
+>    wasn't wanted are more common than being missing when it was.
+> 
+> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+> ---
+>  hw/ppc/spapr.c         | 15 ++++++++++-----
+>  hw/ppc/spapr_caps.c    | 29 ++++++++++++++++++++++++++++-
+>  include/hw/ppc/spapr.h |  3 +++
+>  3 files changed, 41 insertions(+), 6 deletions(-)
+> 
+> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> index d472baef8d..f8fee8ebcf 100644
+> --- a/hw/ppc/spapr.c
+> +++ b/hw/ppc/spapr.c
+> @@ -253,7 +253,9 @@ static int spapr_fixup_cpu_numa_dt(void *fdt, int offset, PowerPCCPU *cpu)
+>  }
+>  
+>  /* Populate the "ibm,pa-features" property */
+> -static void spapr_populate_pa_features(PowerPCCPU *cpu, void *fdt, int offset,
+> +static void spapr_populate_pa_features(sPAPRMachineState *spapr,
 
-Signed-off-by: Edgar Kaziakhmedov <edgar.kaziakhmedov@virtuozzo.com>
-Signed-off-by: Klim Kireev <klim.kireev@virtuozzo.com>
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Signed-off-by: Denis V. Lunev <den@openvz.org>
-CC: Stefan Hajnoczi <stefanha@redhat.com>
----
- docs/interop/prl-xml.txt | 155 +++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 155 insertions(+)
- create mode 100644 docs/interop/prl-xml.txt
+While here, maybe you could rename spapr_populate_pa_features() to
+spapr_dt_pa_features() ?
 
-diff --git a/docs/interop/prl-xml.txt b/docs/interop/prl-xml.txt
-new file mode 100644
-index 0000000..8ccb91a
---- /dev/null
-+++ b/docs/interop/prl-xml.txt
-@@ -0,0 +1,155 @@
-+= License =
-+
-+Copyright (c) 2015 Denis Lunev
-+Copyright (c) 2015 Vladimir Sementsov-Ogievskiy
-+Copyright (c) 2016-2017 Klim Kireev
-+Copyright (c) 2016-2017 Edgar Kaziakhmedov
-+
-+This work is licensed under the terms of the GNU GPL, version 2 or later.
-+See the COPYING file in the top-level directory.
-+
-+This specification contains minimal information about Parallels Disk Format,
-+which is enough to proper work with QEMU. Nevertheless, Parallels Cloud Server
-+and Parallels Desktop are able to add some unspecified nodes to xml and use
-+them, but they are for internal work and don't affect functionality. Also it
-+uses auxiliary xml "Snapshot.xml", which allows to store optional snapshot
-+information, but it doesn't influence open/read/write functionality. QEMU and
-+other software should not use unspecified here fields and Snapshot.xml file
-+and must leave them as is.
-+
-+= Parallels Disk Format =
-+
-+Parallels disk consists of two parts: the set of snapshots and the disk
-+descriptor file, which stores information about all files and snapshots.
-+
-+== Definitions ==
-+    Snapshot       a record of the contents captured at a particular time,
-+                   capable of storing current state. A snapshot has UUID and
-+                   parent UUID.
-+
-+ Snapshot image    an overlay representing the difference between this
-+                   snapshot and some earlier snapshot
-+
-+    Overlay        an image storing the different sectors between two captured
-+                   states.
-+
-+   Root image      snapshot image without parent, the root of snapshot tree.
-+
-+    Storage        a special conception of data, which consists of disk
-+                   parameters and a list of images. One of this image is root,
-+                   others are overlays. Images must be expandable (parallels
-+                   image file), however root image could be expandable or
-+                   plain. There may be more then one storage in the Parallels
-+                   disk and it is defined as a split image.
-+                   In this case every storage covers specific address
-+                   space area of the disk and has its particular root image.
-+                   Split images are not considered here and isn't supported
-+                   in QEMU.
-+
-+  Description      DiskDescriptor.xml stores information about disk parameters,
-+     file          snapshots, storages.
-+
-+     Top           The overlay between actual state and some previous snapshot.
-+   Snapshot        It is not a snapshot in classical meaning.
-+
-+    Sector         a 512-byte data chunk.
-+
-+== Description file ==
-+All information is placed in single XML section Parallels_disk_image.
-+The section has only one attribute "Version", that must be 1.0.
-+General structure of DiskDescriptor.xml:
-+
-+<Parallels_disk_image Version="1.0">
-+    <Disk_Parameters>
-+        ...
-+    </Disk_Parameters>
-+    <StorageData>
-+        ...
-+    </StorageData>
-+    <Snapshots>
-+        ...
-+    </Snapshots>
-+</Parallels_disk_image>
-+
-+== Disk_Parameters section ==
-+The Disk_Parameters section describes the physical layout of the virtual disk
-+and some general settings.
-+
-+The Disk_Parameters section MUST contain the following subsections:
-+    * Disk_size - number of sectors in the disk,
-+                  desired size of the disk
-+    * Cylinders - number of the disk cylinders
-+    * Heads     - number of the disk heads
-+    * Sectors   - number of the disk sectors per cylinder
-+                  (sector size is 512 bytes)
-+                  Limitation: Product of the Heads, Sectors and Cylinders
-+                  values MUST be equal to the value of the Disk_size parameter.
-+    * Padding   - must be 0. Parallels Cloud Server and Parallels Desktop may
-+                  use padding set to 1, however this case is not covered
-+                  by this spec, QEMU and other software should not open
-+                  such disks and should not create them.
-+                  Attention: this field affects the read/write functionality.
-+
-+== StorageData section ==
-+This section of the file describes root image and all snapshot images.
-+
-+The StorageData section consists of the Storage subsection, as shown below:
-+<StorageData>
-+    <Storage>
-+        ...
-+    </Storage>
-+</StorageData>
-+
-+A Storage descriptor consists of the following subsections:
-+    * Start     - start sector of the storage, equals to 0.
-+    * End       - number of sectors in storage, equals to Disk_size.
-+    * Blocksize - storage cluster size, number of sectors per one cluster.
-+                  Cluster size for each "Compressed" (see below) image in
-+                  parallels disk must be equal to this field. Note: cluster
-+                  size for Parallels Expandable Image is in 'tracks' field of
-+                  its header (see docs/interop/parallels.txt).
-+    * Several Image subsections.
-+
-+Each Image section consists of the following subsections:
-+    * GUID - image identifier, UUID in curly brackets.
-+             For instance, {12345678-9abc-def1-2345-6789abcdef12}.
-+    * Type - image type of the element. It can be:
-+             "Plain" for plain disks.
-+             "Compressed" for expanding disks.
-+    * File - path to image file. Path can be relative to DiskDecriptor.xml or
-+             absolute.
-+
-+== Snapshots section ==
-+The Snapshots section describes the snapshot relations with the snapshot tree.
-+
-+The section contains the set of Shot subsections, as shown below:
-+<Snapshots>
-+    <TopGUID> ... </TopGUID> //Optional subsection
-+    <Shot>
-+        ...
-+    </Shot>
-+    <Shot>
-+        ...
-+    </Shot>
-+    ...
-+</Snapshots>
-+
-+Each Shot section contains the following subsections:
-+    * GUID       - an image GUID.
-+    * ParentGUID - GUID of the image of the parent snapshot.
-+
-+The software may traverse snapshots from child to parent using <ParentGUID>
-+field as reference. ParentGUID of root snapshot is
-+{00000000-0000-0000-0000-000000000000}. There should be only one one root
-+snapshot. Top snapshot could be described via two ways: via TopGUID subsection
-+in the Snapshots section or via predefined GUID
-+{5fbaabe3-6958-40ff-92a7-860e329aab41} If TopGUID is defined, predefined GUID is
-+interpreted as usual GUID. All snapshot images (except Top Snapshot) sould be
-+opened read-only.
-+There is another predefined GIUD,
-+BackupID = {704718e1-2314-44c8-9087-d78ed36b0f4e}, which is used by original and
-+some third-party software for backup, QEMU and other software may operate with
-+images with GUID = BackupID as usual, however, it is not recommended to use this
-+GUID for new disks. Top snapshot cannot have this GUID.
-+
-+NOTE: To address top snapshot QEMU supports only predefined GUID mode.
--- 
-2.7.4
+But anyway, this isn't really the point of this series, so:
+
+Reviewed-by: Greg Kurz <groug@kaod.org>
+
+> +                                       PowerPCCPU *cpu,
+> +                                       void *fdt, int offset,
+>                                         bool legacy_guest)
+>  {
+>      CPUPPCState *env = &cpu->env;
+> @@ -318,7 +320,7 @@ static void spapr_populate_pa_features(PowerPCCPU *cpu, void *fdt, int offset,
+>           */
+>          pa_features[3] |= 0x20;
+>      }
+> -    if (kvmppc_has_cap_htm() && pa_size > 24) {
+> +    if (spapr_has_cap(spapr, SPAPR_CAP_HTM) && pa_size > 24) {
+>          pa_features[24] |= 0x80;    /* Transactional memory support */
+>      }
+>      if (legacy_guest && pa_size > 40) {
+> @@ -384,8 +386,8 @@ static int spapr_fixup_cpu_dt(void *fdt, sPAPRMachineState *spapr)
+>              return ret;
+>          }
+>  
+> -        spapr_populate_pa_features(cpu, fdt, offset,
+> -                                         spapr->cas_legacy_guest_workaround);
+> +        spapr_populate_pa_features(spapr, cpu, fdt, offset,
+> +                                   spapr->cas_legacy_guest_workaround);
+>      }
+>      return ret;
+>  }
+> @@ -579,7 +581,7 @@ static void spapr_populate_cpu_dt(CPUState *cs, void *fdt, int offset,
+>                            page_sizes_prop, page_sizes_prop_size)));
+>      }
+>  
+> -    spapr_populate_pa_features(cpu, fdt, offset, false);
+> +    spapr_populate_pa_features(spapr, cpu, fdt, offset, false);
+>  
+>      _FDT((fdt_setprop_cell(fdt, offset, "ibm,chip-id",
+>                             cs->cpu_index / vcpus_per_socket)));
+> @@ -3903,7 +3905,10 @@ static void spapr_machine_2_11_instance_options(MachineState *machine)
+>  
+>  static void spapr_machine_2_11_class_options(MachineClass *mc)
+>  {
+> +    sPAPRMachineClass *smc = SPAPR_MACHINE_CLASS(mc);
+> +
+>      spapr_machine_2_12_class_options(mc);
+> +    smc->default_caps = spapr_caps(SPAPR_CAP_HTM);
+>      SET_MACHINE_COMPAT(mc, SPAPR_COMPAT_2_11);
+>  }
+>  
+> diff --git a/hw/ppc/spapr_caps.c b/hw/ppc/spapr_caps.c
+> index 828ac69b36..2f0ef98670 100644
+> --- a/hw/ppc/spapr_caps.c
+> +++ b/hw/ppc/spapr_caps.c
+> @@ -24,6 +24,10 @@
+>  #include "qemu/osdep.h"
+>  #include "qapi/error.h"
+>  #include "qapi/visitor.h"
+> +#include "sysemu/hw_accel.h"
+> +#include "target/ppc/cpu.h"
+> +#include "cpu-models.h"
+> +#include "kvm_ppc.h"
+>  
+>  #include "hw/ppc/spapr.h"
+>  
+> @@ -40,18 +44,41 @@ typedef struct sPAPRCapabilityInfo {
+>      void (*disallow)(sPAPRMachineState *spapr, Error **errp);
+>  } sPAPRCapabilityInfo;
+>  
+> +static void cap_htm_allow(sPAPRMachineState *spapr, Error **errp)
+> +{
+> +    if (tcg_enabled()) {
+> +        error_setg(errp,
+> +                   "No Transactional Memory support in TCG, try cap-htm=off");
+> +    } else if (kvm_enabled() && !kvmppc_has_cap_htm()) {
+> +        error_setg(errp,
+> +"KVM implementation does not support Transactional Memory, try cap-htm=off"
+> +            );
+> +    }
+> +}
+> +
+>  static sPAPRCapabilityInfo capability_table[] = {
+> +    {
+> +        .name = "htm",
+> +        .description = "Allow Hardware Transactional Memory (HTM)",
+> +        .flag = SPAPR_CAP_HTM,
+> +        .allow = cap_htm_allow,
+> +        /* TODO: add cap_htm_disallow */
+> +    },
+>  };
+>  
+>  static sPAPRCapabilities default_caps_with_cpu(sPAPRMachineState *spapr,
+>                                                 CPUState *cs)
+>  {
+>      sPAPRMachineClass *smc = SPAPR_MACHINE_GET_CLASS(spapr);
+> +    PowerPCCPU *cpu = POWERPC_CPU(cs);
+>      sPAPRCapabilities caps;
+>  
+>      caps = smc->default_caps;
+>  
+> -    /* TODO: clamp according to cpu model */
+> +    if (!ppc_check_compat(cpu, CPU_POWERPC_LOGICAL_2_07,
+> +                          0, spapr->max_compat_pvr)) {
+> +        caps.mask &= ~SPAPR_CAP_HTM;
+> +    }
+>  
+>      return caps;
+>  }
+> diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
+> index 5569caf1d4..dc64f4ebcb 100644
+> --- a/include/hw/ppc/spapr.h
+> +++ b/include/hw/ppc/spapr.h
+> @@ -54,6 +54,9 @@ typedef enum {
+>   * Capabilities
+>   */
+>  
+> +/* Hardware Transactional Memory */
+> +#define SPAPR_CAP_HTM               0x0000000000000001ULL
+> +
+>  typedef struct sPAPRCapabilities sPAPRCapabilities;
+>  struct sPAPRCapabilities {
+>      uint64_t mask;
