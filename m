@@ -1,29 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41877)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44096)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eQxoO-00030I-Rh
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 10:58:41 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1eQxql-00058T-Dv
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 11:01:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eQxoO-0002fq-91
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 10:58:40 -0500
-Received: from mail-io0-x22e.google.com ([2607:f8b0:4001:c06::22e]:38986)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eQxoO-0002fM-54
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 10:58:40 -0500
-Received: by mail-io0-x22e.google.com with SMTP id h12so10292929iof.6
-	for <qemu-devel@nongnu.org>; Mon, 18 Dec 2017 07:58:39 -0800 (PST)
+	(envelope-from <pbonzini@redhat.com>) id 1eQxqf-0005GU-KN
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 11:01:07 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:55112)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1eQxqf-0005Fi-E6
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 11:01:01 -0500
+Date: Mon, 18 Dec 2017 11:00:59 -0500 (EST)
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <180764363.27732961.1513612859884.JavaMail.zimbra@redhat.com>
+In-Reply-To: <20171218165346.1fe50257.cohuck@redhat.com>
+References: <20171218140002.23677-1-cohuck@redhat.com>
+	<151360760770.51.389844259110219934@5adcb62bf0d6>
+	<20171218165346.1fe50257.cohuck@redhat.com>
 MIME-Version: 1.0
-Sender: philippe.mathieu.daude@gmail.com
-In-Reply-To: <deba612d-e6f0-7181-6328-7eec81f68034@redhat.com>
-References: <20171218121635.25494-1-cohuck@redhat.com>
-	<deba612d-e6f0-7181-6328-7eec81f68034@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Date: Mon, 18 Dec 2017 12:58:38 -0300
-Message-ID: <CAAdtpL4H6E=UDMnAgmnQ0fZyXMrEq0EUu=pO2fwEhOisrr9NAw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH] tpm: add stubs for qdev-prop-tpm
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] tpm: move qdev_prop_tpm to hw/tpm/
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,17 +28,20 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Cornelia Huck <cohuck@redhat.com>, Stefan Berger <stefanb@linux.vnet.ibm.com>, =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>, Thomas Huth <thuth@redhat.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: no-reply@patchew.org, qemu-devel@nongnu.org, famz@redhat.com, stefanb@linux.vnet.ibm.com, marcandre lureau <marcandre.lureau@redhat.com>, thuth@redhat.com
 
->> Add some proper stubs for those functions.
->>
->> Fixes: 493b78303532 ("qdev: add DEFINE_PROP_TPMBE")
->> Reported-by: Thomas Huth <thuth@redhat.com>
->> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
->
-> Maybe all the new code can be moved from qdev-properties-system.c to
-> hw/tpm/qdev.c instead?  (Adding stubs should be the last resort,
-> especially if the stubs are never used outside system emulation).
+> > ../hw/tpm/tpm_tis.o:tpm_tis.c:(.data+0x50): undefined reference to
+> > `qdev_prop_tpm'
+> > collect2: error: ld returned 1 exit status
+> > Makefile:193: recipe for target 'qemu-system-x86_64w.exe' failed
+> > make[1]: *** [qemu-system-x86_64w.exe] Error 1
+> > make: *** [subdir-x86_64-softmmu] Error 2
+> > Makefile:384: recipe for target 'subdir-x86_64-softmmu' failed
+> 
+> Seems we need to build tpm_util also when tpm_tis is built (and none of
+> the others).
 
-This is worth an entry in HACKING :)
+Or place the property in its own file.
+
+Paolo
