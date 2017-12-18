@@ -1,32 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35558)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40498)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1eQvPy-0003IU-3I
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 08:25:23 -0500
+	(envelope-from <alex.williamson@redhat.com>) id 1eQvT7-0006N1-4H
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 08:28:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1eQvPv-0007dx-68
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 08:25:17 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:60824)
+	(envelope-from <alex.williamson@redhat.com>) id 1eQvT2-0002ja-DT
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 08:28:33 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:49178)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1eQvPu-0007dd-W2
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 08:25:15 -0500
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 3FE9B72D9E
-	for <qemu-devel@nongnu.org>; Mon, 18 Dec 2017 13:25:14 +0000 (UTC)
-Date: Mon, 18 Dec 2017 13:25:09 +0000
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20171218132509.GB16653@stefanha-x1.localdomain>
-References: <20171215150659.1811-1-marcandre.lureau@redhat.com>
-	<20171215150659.1811-14-marcandre.lureau@redhat.com>
+	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
+	id 1eQvT2-0002il-2O
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 08:28:28 -0500
+Date: Mon, 18 Dec 2017 06:28:22 -0700
+From: Alex Williamson <alex.williamson@redhat.com>
+Message-ID: <20171218062822.625b7469@w520.home>
+In-Reply-To: <f76b5d78-0107-cca8-5e72-ab9944c8a90b@ozlabs.ru>
+References: <20171218040852.13478.19208.stgit@gimli.home>
+	<20171218050253.13478.49457.stgit@gimli.home>
+	<f76b5d78-0107-cca8-5e72-ab9944c8a90b@ozlabs.ru>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="p4qYPpj5QlsIQJ0K"
-Content-Disposition: inline
-In-Reply-To: <20171215150659.1811-14-marcandre.lureau@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 13/13] tests: fix coroutine leak in
- /basic/entered
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC/RFT PATCH 5/5] vfio/pci: Allow relocating
+ MSI-X MMIO
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,58 +30,203 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>
+To: Alexey Kardashevskiy <aik@ozlabs.ru>
+Cc: qemu-devel@nongnu.org, eric.auger@redhat.com
 
+On Mon, 18 Dec 2017 20:04:23 +1100
+Alexey Kardashevskiy <aik@ozlabs.ru> wrote:
 
---p4qYPpj5QlsIQJ0K
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+> On 18/12/17 16:02, Alex Williamson wrote:
+> > With recently proposed kernel side vfio-pci changes, the MSI-X vector
+> > table area can be mmap'd from userspace, allowing direct access to
+> > non-MSI-X registers within the host page size of this area.  However,
+> > we only get that direct access if QEMU isn't also emulating MSI-X
+> > within that same page.  For x86/64 host, the system page size is 4K
+> > and the PCI spec recommends a minimum of 4K to 8K alignment to
+> > separate MSI-X from non-MSI-X registers, therefore only devices which
+> > don't honor this recommendation would see any improvement from this
+> > option.  The real targets for this feature are hosts where the page
+> > size exceeds the PCI spec recommended alignment, such as ARM64 systems
+> > with 64K pages.
+> > 
+> > This new x-msix-relocation option accepts the following options:
+> > 
+> >   off: Disable MSI-X relocation, use native device config (default)
+> >   auto: Automaically relocate MSI-X MMIO to another BAR or offset
+> >        based on minimum additional MMIO requirement
+> >   bar0..bar5: Specify the target BAR, which will either be extended
+> >        if the BAR exists or added if the BAR slot is available.  
+> 
+> 
+> While I am digesting the patchset, here are some test results.
 
-On Fri, Dec 15, 2017 at 04:06:59PM +0100, Marc-Andr=E9 Lureau wrote:
-> The coroutine is not finished by the time the test ends, resulting in
-> ASAN warning:
->=20
-> =3D=3D7005=3D=3DERROR: LeakSanitizer: detected memory leaks
->=20
-> Direct leak of 312 byte(s) in 1 object(s) allocated from:
->     #0 0x7fd35290fa38 in __interceptor_calloc (/lib64/libasan.so.4+0xdea3=
-8)
->     #1 0x7fd3506c5f75 in g_malloc0 ../glib/gmem.c:124
->     #2 0x55994af03e47 in qemu_coroutine_new /home/elmarco/src/qemu/util/c=
-oroutine-ucontext.c:144
->     #3 0x55994aefed99 in qemu_coroutine_create /home/elmarco/src/qemu/uti=
-l/qemu-coroutine.c:76
->     #4 0x55994ac1eb50 in verify_entered_step_1 /home/elmarco/src/qemu/tes=
-ts/test-coroutine.c:80
->     #5 0x55994af03c75 in coroutine_trampoline /home/elmarco/src/qemu/util=
-/coroutine-ucontext.c:119
->     #6 0x7fd34ec02bef  (/lib64/libc.so.6+0x50bef)
->=20
-> Do not yield() to let the coroutine terminate.
->=20
-> Signed-off-by: Marc-Andr=E9 Lureau <marcandre.lureau@redhat.com>
-> ---
->  tests/test-coroutine.c | 1 -
->  1 file changed, 1 deletion(-)
+Thanks for testing!
 
-Looks like a copy-paste mistake, the second yield shouldn't be there.
+> This is the device:
+> 
+> 00:00.0 Serial Attached SCSI controller: LSI Logic / Symbios Logic SAS3008
+> PCI-Express Fusion-MPT SAS-3 (rev 02)
 
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+BAR1:
 
---p4qYPpj5QlsIQJ0K
-Content-Type: application/pgp-signature; name="signature.asc"
+> Memory at 210000000000 (64-bit, non-prefetchable) [size=64K]
 
------BEGIN PGP SIGNATURE-----
+BAR3:
 
-iQEcBAEBAgAGBQJaN8G1AAoJEJykq7OBq3PIsNMIAKwgZsjLqXfEUqNd36hK2Pbn
-fjH6b4bfQxoZdzjPW341d6dBXP/37VtM7d0lHQaQz1umGidYdLzYZVgHBAkh2azU
-0PxMlWqeSdlDjNZtsryyJavS67bScti9K5/L+u9mImAizAw7hvi2hc1Ags4klOs7
-QQK8O+LXDN7xkErSq7K3hQ+EaF2CDS8PIEOlv7oR6aK/Eyn8l9Ac3M3XEzs5aPRV
-uQCyPkXNDejdKgGvEhwaOn0Ib55aKsEya3lKuajCIiGoUJXKOGbd1De8rlISX9L3
-/MqR5zKBIDy4tMcTR+xbNVd8a9cuFQx16DeA6PT4guu/wX92hWM1Qr0crF5cDYc=
-=KDRJ
------END PGP SIGNATURE-----
+> Memory at 210000040000 (64-bit, non-prefetchable) [size=256K]
+> 
+> Capabilities: [c0] MSI-X: Enable+ Count=96 Masked-
+>         Vector table: BAR=1 offset=0000e000
+>         PBA: BAR=1 offset=0000f000
+> 
+> 
+> Test #1: x-msix-relocation = "off":
+> 
+> FlatView #1
+>  AS "memory", root: system
+>  AS "cpu-memory", root: system
+>  Root memory region: system
+>   0000000000000000-000000007fffffff (prio 0, ram): ppc_spapr.ram
+>   0000210000000000-000021000000dfff (prio 0, i/o): 0001:03:00.0 BAR 1
+>   000021000000e000-000021000000e5ff (prio 0, i/o): msix-table
+>   000021000000e600-000021000000ffff (prio 0, i/o): 0001:03:00.0 BAR 1
+> @000000000000e600
+>   0000210000040000-000021000007ffff (prio 0, ramd): 0001:03:00.0 BAR 3 mmaps[0]
+> 
+> Ok, works.
+> 
+> 
+> Test #2: x-msix-relocation = "auto":
+> 
+> FlatView #2
+>  AS "memory", root: system
+>  AS "cpu-memory", root: system
+>  Root memory region: system
+>   0000000000000000-000000007fffffff (prio 0, ram): ppc_spapr.ram
+>   0000200080000000-00002000800005ff (prio 0, i/o): msix-table
+>   0000200080000600-000020008000ffff (prio 1, i/o): 0001:03:00.0 base BAR 0
+> @0000000000000600
+>   0000210000000000-000021000000ffff (prio 0, i/o): 0001:03:00.0 BAR 1
+>   0000210000040000-000021000007ffff (prio 0, ramd): 0001:03:00.0 BAR 3 mmaps[0]
+> 
+> 
+> The guest fails probing because the first 64bit BAR is broken.
+> 
+> lspci:
+> 
+> Region 0: Memory at 200080000000 (32-bit, prefetchable) [size=64K]
+> Region 1: Memory at 210000000000 (64-bit, non-prefetchable) [size=64K]
+> Region 3: Memory at 210000040000 (64-bit, non-prefetchable) [size=256K]
+> 
+> Capabilities: [c0] MSI-X: Enable- Count=96 Masked-
+>         Vector table: BAR=0 offset=00000000
+>         PBA: BAR=0 offset=00000600
 
---p4qYPpj5QlsIQJ0K--
+Why do you suppose it's broken?  The added BAR0 is 32bit, it cannot be
+64bit since BAR1 is implemented.  I don't see anything fundamentally
+different between this and the working BAR5 test below.
+
+> Test #3: x-msix-relocation = "bar1"
+> 
+> 
+> FlatView #1
+>  AS "memory", root: system
+>  AS "cpu-memory", root: system
+>  Root memory region: system
+>   0000000000000000-000000007fffffff (prio 0, ram): ppc_spapr.ram
+>   0000210000000000-000021000000ffff (prio 0, i/o): 0001:03:00.0 BAR 1
+>   0000210000010000-00002100000105ff (prio 0, i/o): msix-table
+>   0000210000010600-000021000001ffff (prio 1, i/o): 0001:03:00.0 base BAR 1
+> @0000000000010600
+>   0000210000040000-000021000007ffff (prio 0, ramd): 0001:03:00.0 BAR 3 mmaps[0]
+> 
+> Ok, works. BAR1 became 128K. However no part of BAR1 was mapped, i.e.
+> appear as "ramd" in flatview, should it have appeared?
+> 
+> This is "mtree":
+> 
+> memory-region: pci@800000020000000.mmio
+>   0000000000000000-ffffffffffffffff (prio 0, i/o): pci@800000020000000.mmio
+>     0000210000000000-000021000001ffff (prio 1, i/o): 0001:03:00.0 base BAR 1
+>       0000210000000000-000021000000ffff (prio 0, i/o): 0001:03:00.0 BAR 1
+>       0000210000010000-00002100000105ff (prio 0, i/o): msix-table
+>       0000210000010600-000021000001060f (prio 0, i/o): msix-pba [disabled]
+>     0000210000040000-000021000007ffff (prio 1, i/o): 0001:03:00.0 base BAR 3
+>       0000210000040000-000021000007ffff (prio 0, i/o): 0001:03:00.0 BAR 3
+>         0000210000040000-000021000007ffff (prio 0, ramd): 0001:03:00.0 BAR
+> 3 mmaps[0]
+
+Did you disable vfio_pci_fixup_msix_region() as noted in 0/5?  This
+series doesn't do anything about consuming the new MSI-X mappable flag
+that you introduced in the kernel, so vfio_pci_fixup_msix_region() will
+continue to exclude mmap'ing the 64K page overlapping the actual BAR.
+
+> Test #4: x-msix-relocation = "bar5"
+> 
+> The same net result as test #3: it works but BAR1 is not mapped:
+> 
+> 
+> Region 1: Memory at 210000000000 (64-bit, non-prefetchable) [size=64K]
+> Region 3: Memory at 210000040000 (64-bit, non-prefetchable) [size=256K]
+> Region 5: Memory at 200080000000 (32-bit, prefetchable) [size=64K]
+> 
+> Capabilities: [c0] MSI-X: Enable+ Count=96 Masked-
+>         Vector table: BAR=5 offset=00000000
+>         PBA: BAR=5 offset=00000600
+> 
+> FlatView #0
+>  AS "memory", root: system
+>  AS "cpu-memory", root: system
+>  Root memory region: system
+>   0000000000000000-000000007fffffff (prio 0, ram): ppc_spapr.ram
+>   0000200080000000-00002000800005ff (prio 0, i/o): msix-table
+>   0000200080000600-000020008000ffff (prio 1, i/o): 0001:03:00.0 base BAR 5
+> @0000000000000600
+>   0000210000000000-000021000000ffff (prio 0, i/o): 0001:03:00.0 BAR 1
+>   0000210000040000-000021000007ffff (prio 0, ramd): 0001:03:00.0 BAR 3 mmaps[0]
+> 
+> 
+> memory-region: pci@800000020000000.mmio
+>   0000000000000000-ffffffffffffffff (prio 0, i/o): pci@800000020000000.mmio
+>     0000000080000000-000000008000ffff (prio 1, i/o): 0001:03:00.0 base BAR 5
+>       0000000080000000-00000000800005ff (prio 0, i/o): msix-table
+>       0000000080000600-000000008000060f (prio 0, i/o): msix-pba [disabled]
+>     0000210000000000-000021000000ffff (prio 1, i/o): 0001:03:00.0 base BAR 1
+>       0000210000000000-000021000000ffff (prio 0, i/o): 0001:03:00.0 BAR 1
+>     0000210000040000-000021000007ffff (prio 1, i/o): 0001:03:00.0 base BAR 3
+>       0000210000040000-000021000007ffff (prio 0, i/o): 0001:03:00.0 BAR 3
+>         0000210000040000-000021000007ffff (prio 0, ramd): 0001:03:00.0 BAR
+> 3 mmaps[0]
+
+As above, you won't get the mmap without disabling the implicit page
+exclusion.  The real question for this case is why does it work while
+'auto' came up with a nearly identical layout, swapping BAR5 for BAR0
+and it did not work.  The placement of the BARs is even the same.
+
+> and there is also one minor comment below.
+> 
+> 
+> > @@ -2845,13 +2942,14 @@ static void vfio_realize(PCIDevice *pdev, Error **errp)
+> >  
+> >      vfio_pci_size_rom(vdev);
+> >  
+> > +    vfio_bars_prepare(vdev);
+> > +
+> >      vfio_msix_early_setup(vdev, &err);
+> >      if (err) {
+> >          error_propagate(errp, err);
+> >          goto error;
+> >      }
+> >  
+> > -    vfio_bars_prepare(vdev);  
+> 
+> 
+> This could be in 2/5.
+
+It could, but 2/5 was attempting to add the base BAR MemoryRegion and
+split vfio_bars_setup() into vfio_bars_prepare() and
+vfio_bars_register() without otherwise changing the ordering.  It's
+only when we want to modify BARs between prepare and register that we
+need to make this change, thus it's done here.  Thanks,
+
+Alex
