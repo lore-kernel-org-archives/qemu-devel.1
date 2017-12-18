@@ -1,25 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59825)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34211)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1eQx5c-0004F0-Fl
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 10:13:03 -0500
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1eQx70-0005Xk-1N
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 10:14:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1eQx4J-0006kA-CT
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 10:12:24 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:38082)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lvivier@redhat.com>) id 1eQx4H-0006fh-Vc
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 10:11:02 -0500
-References: <1513446109-9013-1-git-send-email-stefanb@linux.vnet.ibm.com>
-	<1513446109-9013-26-git-send-email-stefanb@linux.vnet.ibm.com>
-From: Laurent Vivier <lvivier@redhat.com>
-Message-ID: <8772a2e8-49f8-4674-ff9b-d9df102af52f@redhat.com>
-Date: Mon, 18 Dec 2017 16:10:50 +0100
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1eQx67-0000ih-En
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 10:13:49 -0500
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Date: Mon, 18 Dec 2017 12:12:40 -0300
+Message-Id: <20171218151244.9975-1-f4bug@amsat.org>
 MIME-Version: 1.0
-In-Reply-To: <1513446109-9013-26-git-send-email-stefanb@linux.vnet.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PULL v1 25/32] qdev: add DEFINE_PROP_TPMBE
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH v2 0/4] QOM'ify PCIDevices
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,61 +24,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Berger <stefanb@linux.vnet.ibm.com>, qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Paul Burton <paul.burton@mips.com>, Yongbok Kim <yongbok.kim@mips.com>, "Edgar E . Iglesias" <edgar.iglesias@gmail.com>, Alistair Francis <alistair.francis@xilinx.com>, =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>, Keith Busch <keith.busch@intel.com>
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, qemu-block@nongnu.org, James Hogan <jhogan@kernel.org>
 
-On 16/12/2017 18:41, Stefan Berger wrote:
-> From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
->=20
-> A property to lookup a tpm backend.
->=20
-> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> Reviewed-by: Stefan Berger <stefanb@linux.vnet.ibm.com>
-> Signed-off-by: Stefan Berger <stefanb@linux.vnet.ibm.com>
-> ---
->  hw/core/qdev-properties-system.c | 64 ++++++++++++++++++++++++++++++++=
-++++++++
->  include/hw/qdev-properties.h     |  3 ++
->  2 files changed, 67 insertions(+)
+Hi,
 
-This one breaks my build:
+In this series we QOM'ify the last few PCI devices still using
+PCIDeviceClass->init() by converting this init() to realize(),
 
-...
-  LINK    ppc64-softmmu/qemu-system-ppc64
-../hw/core/qdev-properties-system.o: In function `release_tpm':
-/home/lvivier/qemu/hw/core/qdev-properties-system.c:291: undefined
-reference to `tpm_backend_reset'
-../hw/core/qdev-properties-system.o: In function `set_tpm':
-/home/lvivier/qemu/hw/core/qdev-properties-system.c:274: undefined
-reference to `qemu_find_tpm_be'
-/home/lvivier/qemu/hw/core/qdev-properties-system.c:278: undefined
-reference to `tpm_backend_init'
-collect2: error: ld returned 1 exit status
+Then we finally remove the then PCIDeviceClass->init() method for good.
 
-The following #ifdef fixes the problem for me:
+Regards,
 
-diff --git a/hw/core/qdev-properties-system.c
-b/hw/core/qdev-properties-system.c
-index c173646..b6eca3b 100644
---- a/hw/core/qdev-properties-system.c
-+++ b/hw/core/qdev-properties-system.c
-@@ -239,6 +239,7 @@ const PropertyInfo qdev_prop_chr =3D {
+Phil.
 
- /* --- character device --- */
+v2: addressed review feedbacks from Marcel Apfelbaum
 
-+#if defined(CONFIG_TPM)
- static void get_tpm(Object *obj, Visitor *v, const char *name, void
-*opaque,
-                     Error **errp)
- {
-@@ -299,6 +300,7 @@ const PropertyInfo qdev_prop_tpm =3D {
-     .set   =3D set_tpm,
-     .release =3D release_tpm,
- };
-+#endif
+Philippe Mathieu-Daudé (4):
+  hw/block/nvme: QOM'ify PCI NVME
+  hw/pci-host/piix: QOM'ify the IGD Passthrough host bridge
+  hw/pci-host/xilinx: QOM'ify the AXI-PCIe host bridge
+  hw/pci: remove obsolete PCIDevice->init()
 
- /* --- netdev device --- */
- static void get_netdev(Object *obj, Visitor *v, const char *name,
+ include/hw/pci/pci.h      |  1 -
+ hw/block/nvme.c           | 32 +++++++++++++++++---------------
+ hw/pci-host/piix.c        | 45 ++++++++++++++++++++-------------------------
+ hw/pci-host/xilinx-pcie.c | 20 +++++++++-----------
+ hw/pci/pci.c              | 14 --------------
+ 5 files changed, 46 insertions(+), 66 deletions(-)
 
-Thanks,
-Laurent
+-- 
+2.15.1
