@@ -1,26 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47999)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52172)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1eQu7G-00032L-5P
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 07:02:00 -0500
+	(envelope-from <cohuck@redhat.com>) id 1eQuLf-0006aX-MR
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 07:16:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1eQu7B-0003im-6B
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 07:01:54 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:44109)
+	(envelope-from <cohuck@redhat.com>) id 1eQuLb-0007pe-NO
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 07:16:47 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:34138)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1eQu7A-0003iQ-U9
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 07:01:49 -0500
-Date: Mon, 18 Dec 2017 12:01:44 +0000
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20171218120144.GF13493@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <20171218105318.30367-1-danielhb@linux.vnet.ibm.com>
-	<20171218105954.GE13493@redhat.com>
-	<6932664e-4715-a120-e69b-638a88c9060f@linux.vnet.ibm.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <6932664e-4715-a120-e69b-638a88c9060f@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH v1 1/1] qmp: marking qmp_cpu as deprecated
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1eQuLb-0007mq-H9
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 07:16:43 -0500
+From: Cornelia Huck <cohuck@redhat.com>
+Date: Mon, 18 Dec 2017 13:16:35 +0100
+Message-Id: <20171218121635.25494-1-cohuck@redhat.com>
+Subject: [Qemu-devel] [PATCH] tpm: add stubs for qdev-prop-tpm
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,88 +21,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
-Cc: qemu-devel@nongnu.org, armbru@redhat.com, Eric Blake <eblake@redhat.com>
+To: stefanb@linux.vnet.ibm.com, pbonzini@redhat.com
+Cc: marcandre.lureau@redhat.com, thuth@redhat.com, qemu-devel@nongnu.org, Cornelia Huck <cohuck@redhat.com>
 
-On Mon, Dec 18, 2017 at 09:55:55AM -0200, Daniel Henrique Barboza wrote:
-> 
-> 
-> On 12/18/2017 08:59 AM, Daniel P. Berrange wrote:
-> > On Mon, Dec 18, 2017 at 08:53:18AM -0200, Daniel Henrique Barboza wrote:
-> > > qmp_cpu is a nop that was created a while ago in commit 755f196898
-> > > ("qapi: Convert the cpu command") for the sake of compatibility,
-> > > due to the existence of hmp_cpu.
-> > > 
-> > > Today, there is no need or requirement to keep it as is. QMP is
-> > > meant to be as stateless as possible, thus any QMP command that
-> > > needs a specific monitor CPU setup should provide it in its
-> > > arguments, instead of relying in the current QMP monitor state.
-> > > 
-> > > This patch flags qmp_cpu as deprecated in qemu-doc.texi and changes
-> > > qmp_cpu body to show a deprecation message if used.
-> > > 
-> > > Signed-off-by: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
-> > > ---
-> > > Although I've changed the behavior of qmp_cpu to return an error
-> > > instead of doing nothing, no errors were found in the Travis
-> > > build of the patch. Code inspection confirms that qmp_cpu isn't
-> > > being used in QEMU.
-> > > 
-> > > A quick inspection in Libvirt code shows that there is no reference
-> > > to 'qmp_cpu' there either, but to be sure I've CCed Daniel here
-> > > so he can comment/confirm if Libvirt does not care for this change.
-> > > 
-> > >   qemu-doc.texi | 6 ++++++
-> > >   qmp.c         | 2 +-
-> > >   2 files changed, 7 insertions(+), 1 deletion(-)
-> > > 
-> > > diff --git a/qemu-doc.texi b/qemu-doc.texi
-> > > index f7317dfc66..2b63f9a325 100644
-> > > --- a/qemu-doc.texi
-> > > +++ b/qemu-doc.texi
-> > > @@ -2516,6 +2516,12 @@ subsystem image.
-> > >   The ``convert -s snapshot_id_or_name'' argument is obsoleted
-> > >   by the ``convert -l snapshot_param'' argument instead.
-> > > +@section System emulator machine protocol commands
-> > > +
-> > > +@subsection qmp_cpu (since 2.12.0)
-> > > +
-> > > +The ``qmp_cpu'' command is deprecated. Do not use this command.
-> > Just saying it is deprecated doesn't add any useful info, rather
-> > explain why it is deprecated & what (if anything) to use instead.
-> > e.g.
-> > 
-> >    The ``qmp_cpu'' command is a functional no-op. There is no reason
-> >    to invoke this command and it will be removed with no replacement.
-> 
-> Thanks, I'll add more info in qemu-doc.texi in the next version.
-> 
-> Also, just checked that I didn't touch qapi-schema.json. This is how
-> it reads about qmp_cpu:
-> 
-> 
-> # This command is a nop that is only provided for the purposes of
-> compatibility.
-> #
-> # Since: 0.14.0
-> #
-> # Notes: Do not use this command.
-> 
-> Should we change it to mention that the command is deprecated, something
-> like:
-> 
-> # Notes: Do not use this command - it is deprecated and will disappear in
-> the future.
-> 
-> 
-> Or just adding the deprecation note in qemu-doc.texi is enough?
+Building with --disable-tpm yields
 
-Lets modify the QAPI file too, since you never know what users will read
-first !
+../hw/core/qdev-properties-system.o: In function `set_tpm':
+/home/cohuck/git/qemu/hw/core/qdev-properties-system.c:274: undefined reference to `qemu_find_tpm_be'
+/home/cohuck/git/qemu/hw/core/qdev-properties-system.c:278: undefined reference to `tpm_backend_init'
+../hw/core/qdev-properties-system.o: In function `release_tpm':
+/home/cohuck/git/qemu/hw/core/qdev-properties-system.c:291: undefined reference to `tpm_backend_reset'
 
-Regards,
-Daniel
+Add some proper stubs for those functions.
+
+Fixes: 493b78303532 ("qdev: add DEFINE_PROP_TPMBE")
+Reported-by: Thomas Huth <thuth@redhat.com>
+Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+---
+ stubs/tpm.c | 15 +++++++++++++++
+ 1 file changed, 15 insertions(+)
+
+diff --git a/stubs/tpm.c b/stubs/tpm.c
+index c18aac1c73..97457e0646 100644
+--- a/stubs/tpm.c
++++ b/stubs/tpm.c
+@@ -7,6 +7,7 @@
+ #include "qemu/osdep.h"
+ #include "sysemu/tpm.h"
+ #include "qmp-commands.h"
++#include "sysemu/tpm_backend.h"
+ 
+ int tpm_init(void)
+ {
+@@ -31,3 +32,17 @@ TpmModelList *qmp_query_tpm_models(Error **errp)
+ {
+     return NULL;
+ }
++
++TPMBackend *qemu_find_tpm_be(const char *id)
++{
++    return NULL;
++}
++
++int tpm_backend_init(TPMBackend *s, TPMIf *tpmif, Error **errp)
++{
++    return -1;
++}
++
++void tpm_backend_reset(TPMBackend *s)
++{
++}
 -- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+2.13.6
