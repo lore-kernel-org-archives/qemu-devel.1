@@ -1,28 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49728)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49878)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1eR3yf-0002pX-Ts
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 17:33:42 -0500
+	(envelope-from <crobinso@redhat.com>) id 1eR3z1-00035i-9X
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 17:34:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1eR3yf-0006DX-5x
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 17:33:41 -0500
-Received: from mail-vk0-x243.google.com ([2607:f8b0:400c:c05::243]:43537)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1eR3yf-0006Cx-2e
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 17:33:41 -0500
-Received: by mail-vk0-x243.google.com with SMTP id k132so1393386vke.10
-	for <qemu-devel@nongnu.org>; Mon, 18 Dec 2017 14:33:40 -0800 (PST)
-References: <20171211125705.16120-1-alex.bennee@linaro.org>
-	<20171211125705.16120-13-alex.bennee@linaro.org>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <43e090c9-dd61-f0b2-ca1b-38c9f8617ef2@linaro.org>
-Date: Mon, 18 Dec 2017 14:26:14 -0800
-MIME-Version: 1.0
-In-Reply-To: <20171211125705.16120-13-alex.bennee@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v1 12/19] fpu/softfloat: re-factor div
+	(envelope-from <crobinso@redhat.com>) id 1eR3yy-0006QZ-4T
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 17:34:03 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:40502)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <crobinso@redhat.com>) id 1eR3yx-0006PU-VB
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 17:34:00 -0500
+From: Cole Robinson <crobinso@redhat.com>
+Date: Mon, 18 Dec 2017 17:33:54 -0500
+Message-Id: <458bba0e0865443a3d4e0f8e0dbb5bc712e098b9.1513636434.git.crobinso@redhat.com>
+Subject: [Qemu-devel] [PATCH] scripts/make-release: More .git removal
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,24 +21,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, peter.maydell@linaro.org, laurent@vivier.eu, bharata@linux.vnet.ibm.com, andrew@andrewdutcher.com, aleksandar.markovic@imgtec.com
-Cc: qemu-devel@nongnu.org, Aurelien Jarno <aurelien@aurel32.net>
+To: qemu-devel@nongnu.org
+Cc: mdroth@linux.vnet.ibm.com, peter.maydell@linaro.org, Cole Robinson <crobinso@redhat.com>
 
-On 12/11/2017 04:56 AM, Alex Bennée wrote:
-> We can now add float16_div and use the common decompose and
-> canonicalize functions to have a single implementation for
-> float16/32/64 versions.
-> 
-> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-> ---
->  fpu/softfloat-macros.h  |  44 +++++++++
->  fpu/softfloat.c         | 235 ++++++++++++++++++------------------------------
->  include/fpu/softfloat.h |   1 +
->  3 files changed, 134 insertions(+), 146 deletions(-)
+As was last done in 379e21c25, we want to remove .git files for
+submodules here, which we aren't presently doing for capstone and
+keycodemapdb.
 
-I was involved in writing this, so
+Rather than a whitelist use 'find' to future proof this
 
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+Signed-off-by: Cole Robinson <crobinso@redhat.com>
+---
+ scripts/make-release | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-
-r~
+diff --git a/scripts/make-release b/scripts/make-release
+index 3917df7142..7c7bec577f 100755
+--- a/scripts/make-release
++++ b/scripts/make-release
+@@ -19,7 +19,7 @@ pushd ${destination}
+ git checkout "v${version}"
+ git submodule update --init
+ (cd roms/seabios && git describe --tags --long --dirty > .version)
+-rm -rf .git roms/*/.git dtc/.git pixman/.git
++find . -depth -name .git -exec rm -rf '{}' \;
+ # FIXME: The following line is a workaround for avoiding filename collisions
+ # when unpacking u-boot sources on case-insensitive filesystems. Once we
+ # update to something with u-boot commit 610eec7f0 we can drop this line.
+-- 
+2.14.3
