@@ -1,22 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57306)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57890)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aurelien@aurel32.net>) id 1eR45a-0007Hj-HI
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 17:40:51 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1eR46e-0008Cv-LD
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 17:41:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aurelien@aurel32.net>) id 1eR45Z-00047n-I3
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 17:40:50 -0500
-Received: from hall.aurel32.net ([2001:bc8:30d7:100::1]:43026)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <aurelien@aurel32.net>)
-	id 1eR45Z-0003vY-Bi
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 17:40:49 -0500
-From: Aurelien Jarno <aurelien@aurel32.net>
-Date: Mon, 18 Dec 2017 23:40:29 +0100
-Message-Id: <20171218224030.26726-6-aurelien@aurel32.net>
-In-Reply-To: <20171218224030.26726-1-aurelien@aurel32.net>
-References: <20171218224030.26726-1-aurelien@aurel32.net>
-Subject: [Qemu-devel] [PULL 5/6] target/sh4: Do not singlestep after
- exceptions
+	(envelope-from <richard.henderson@linaro.org>) id 1eR46Z-0005QA-KN
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 17:41:56 -0500
+Received: from mail-pg0-x244.google.com ([2607:f8b0:400e:c05::244]:46496)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1eR46Z-0005Os-E2
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 17:41:51 -0500
+Received: by mail-pg0-x244.google.com with SMTP id b11so9733312pgu.13
+	for <qemu-devel@nongnu.org>; Mon, 18 Dec 2017 14:41:51 -0800 (PST)
+References: <20171211125705.16120-1-alex.bennee@linaro.org>
+	<20171211125705.16120-15-alex.bennee@linaro.org>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <c5ec87ba-79be-c822-19c2-0e40e41aa87d@linaro.org>
+Date: Mon, 18 Dec 2017 14:41:45 -0800
+MIME-Version: 1.0
+In-Reply-To: <20171211125705.16120-15-alex.bennee@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v1 14/19] fpu/softfloat: re-factor
+ round_to_int
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,73 +32,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Richard Henderson <rth@twiddle.net>, Aurelien Jarno <aurelien@aurel32.net>
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, peter.maydell@linaro.org, laurent@vivier.eu, bharata@linux.vnet.ibm.com, andrew@andrewdutcher.com, aleksandar.markovic@imgtec.com
+Cc: qemu-devel@nongnu.org, Aurelien Jarno <aurelien@aurel32.net>
 
-From: Richard Henderson <rth@twiddle.net>
+On 12/11/2017 04:57 AM, Alex Bennée wrote:
+> We can now add float16_round_to_int and use the common round_decomposed and
+> canonicalize functions to have a single implementation for
+> float16/32/64 round_to_int functions.
+> 
+> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+> ---
+>  fpu/softfloat.c         | 304 ++++++++++++++++++++----------------------------
+>  include/fpu/softfloat.h |   1 +
+>  2 files changed, 130 insertions(+), 175 deletions(-)
 
-If we've already raised an exception (and set NORETURN),
-do not emit unreachable code to raise a debug exception.
-Note that gen_goto_tb takes single-stepping into account.
+I was involved in writing this, so
 
-Signed-off-by: Richard Henderson <rth@twiddle.net>
-Message-Id: <20170907185057.23421-4-richard.henderson@linaro.org>
-Signed-off-by: Aurelien Jarno <aurelien@aurel32.net>
----
- target/sh4/translate.c | 32 ++++++++++++++++----------------
- 1 file changed, 16 insertions(+), 16 deletions(-)
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 
-diff --git a/target/sh4/translate.c b/target/sh4/translate.c
-index efd1081c57..dd9aaa4e63 100644
---- a/target/sh4/translate.c
-+++ b/target/sh4/translate.c
-@@ -270,6 +270,7 @@ static void gen_jump(DisasContext * ctx)
-         } else {
-             tcg_gen_lookup_and_goto_ptr();
-         }
-+        ctx->bstate = DISAS_NORETURN;
-     } else {
- 	gen_goto_tb(ctx, 0, ctx->delayed_pc);
-     }
-@@ -2341,24 +2342,23 @@ void gen_intermediate_code(CPUState *cs, struct TranslationBlock *tb)
-         ctx.envflags &= ~GUSA_MASK;
-     }
- 
--    if (cs->singlestep_enabled) {
-+    switch (ctx.bstate) {
-+    case DISAS_STOP:
-         gen_save_cpu_state(&ctx, true);
--        gen_helper_debug(cpu_env);
--    } else {
--	switch (ctx.bstate) {
--        case DISAS_STOP:
--            gen_save_cpu_state(&ctx, true);
-+        if (cs->singlestep_enabled) {
-+            gen_helper_debug(cpu_env);
-+        } else {
-             tcg_gen_exit_tb(0);
--            break;
--        case DISAS_NEXT:
--            gen_save_cpu_state(&ctx, false);
--            gen_goto_tb(&ctx, 0, ctx.pc);
--            break;
--        case DISAS_NORETURN:
--            break;
--        default:
--            g_assert_not_reached();
--	}
-+        }
-+        break;
-+    case DISAS_NEXT:
-+        gen_save_cpu_state(&ctx, false);
-+        gen_goto_tb(&ctx, 0, ctx.pc);
-+        break;
-+    case DISAS_NORETURN:
-+        break;
-+    default:
-+        g_assert_not_reached();
-     }
- 
-     gen_tb_end(tb, num_insns);
--- 
-2.15.1
+
+r~
