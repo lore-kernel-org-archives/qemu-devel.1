@@ -1,29 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42173)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48886)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1eQm5J-0007ze-7M
-	for qemu-devel@nongnu.org; Sun, 17 Dec 2017 22:27:22 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1eQmVy-0006Dl-FP
+	for qemu-devel@nongnu.org; Sun, 17 Dec 2017 22:54:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1eQm5G-00036g-3b
-	for qemu-devel@nongnu.org; Sun, 17 Dec 2017 22:27:21 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:55602)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1eQm5F-00035p-RG
-	for qemu-devel@nongnu.org; Sun, 17 Dec 2017 22:27:18 -0500
-Date: Mon, 18 Dec 2017 11:27:02 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20171218032702.GI22308@xz-mi>
-References: <20171205055200.16305-1-peterx@redhat.com>
-	<20171205055200.16305-8-peterx@redhat.com>
-	<20171213154806.GH7173@stefanha-x1.localdomain>
-	<20171215081141.GN7780@xz-mi>
-	<20171215124711.GF26982@stefanha-x1.localdomain>
-	<20171216035228.GT7780@xz-mi>
-	<20171216090112.GA12533@stefanha-x1.localdomain>
+	(envelope-from <dgibson@ozlabs.org>) id 1eQmVx-0000tx-Gw
+	for qemu-devel@nongnu.org; Sun, 17 Dec 2017 22:54:54 -0500
+Date: Mon, 18 Dec 2017 14:39:51 +1100
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20171218033951.GO7753@umbus.fritz.box>
+References: <20171218022605.43681-1-aik@ozlabs.ru>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="ctUzwJm0i+kwMBIK"
 Content-Disposition: inline
-In-Reply-To: <20171216090112.GA12533@stefanha-x1.localdomain>
-Subject: Re: [Qemu-devel] [RFC v5 07/26] monitor: unify global init
+In-Reply-To: <20171218022605.43681-1-aik@ozlabs.ru>
+Subject: Re: [Qemu-devel] [GIT PULL for qemu-pseries] pseries: Update SLOF
+ firmware image to qemu-slof-20171214
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,99 +24,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: qemu-devel@nongnu.org, Stefan Hajnoczi <shajnocz@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <famz@redhat.com>, Juan Quintela <quintela@redhat.com>, mdroth@linux.vnet.ibm.com, Eric Blake <eblake@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Markus Armbruster <armbru@redhat.com>, marcandre.lureau@redhat.com, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: Alexey Kardashevskiy <aik@ozlabs.ru>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
 
-On Sat, Dec 16, 2017 at 09:01:12AM +0000, Stefan Hajnoczi wrote:
-> On Sat, Dec 16, 2017 at 11:52:28AM +0800, Peter Xu wrote:
-> > On Fri, Dec 15, 2017 at 12:47:11PM +0000, Stefan Hajnoczi wrote:
-> > > On Fri, Dec 15, 2017 at 04:11:41PM +0800, Peter Xu wrote:
-> > > > On Wed, Dec 13, 2017 at 03:48:06PM +0000, Stefan Hajnoczi wrote:
-> > > > > On Tue, Dec 05, 2017 at 01:51:41PM +0800, Peter Xu wrote:
-> > > > > > diff --git a/vl.c b/vl.c
-> > > > > > index 1ad1c04637..1ec995a6ae 100644
-> > > > > > --- a/vl.c
-> > > > > > +++ b/vl.c
-> > > > > > @@ -3144,7 +3144,6 @@ int main(int argc, char **argv, char **envp)
-> > > > > >      qemu_init_exec_dir(argv[0]);
-> > > > > >  
-> > > > > >      module_call_init(MODULE_INIT_QOM);
-> > > > > > -    monitor_init_qmp_commands();
-> > > > > >  
-> > > > > >      qemu_add_opts(&qemu_drive_opts);
-> > > > > >      qemu_add_drive_opts(&qemu_legacy_drive_opts);
-> > > > > > @@ -4690,6 +4689,8 @@ int main(int argc, char **argv, char **envp)
-> > > > > >      default_drive(default_floppy, snapshot, IF_FLOPPY, 0, FD_OPTS);
-> > > > > >      default_drive(default_sdcard, snapshot, IF_SD, 0, SD_OPTS);
-> > > > > >  
-> > > > > > +    monitor_init_globals();
-> > > > > 
-> > > > > Why did you move monitor_init_qmp_commands() down here?
-> > > > > 
-> > > > > There are many function calls between the old position and the new
-> > > > > position.  Did you check all of them to make sure they don't touch the
-> > > > > monitor which is now totally uninitialized?
-> > > > 
-> > > > Yeh, this patch is a bit hairy, but I really think we should do it.
-> > > > Because there are too many places (as you have seen) that we inited
-> > > > monitor stuff in different places.
-> > > 
-> > > But why did you move it down here?  Can you replace the
-> > > monitor_init_qmp_commands() call instead?
-> > 
-> > I just moved it closer to (actually, right above) initializations of
-> > monitors to be clear that these globals will never be touched until
-> > this point.  Or do you want me to move this call exactly back to the
-> > place where monitor_init_qmp_commands() was called before?  Thanks,
-> 
-> Hmm...now that we're discussing this patch in detail I found an ordering
-> dependency:
-> 
-> qtest_enabled() only works after configure_accelerator(current_machine),
-> so the monitor_qapi_event_init() cannot be moved to the
-> monitor_init_qmp_commands() location.
-> 
-> Everything else has no dependencies.  I would be best to remove the
-> self-contained init from vl.c:main() so we don't have to worry about
-> dependencies again.  How about:
-> 
-> -static void __attribute__((constructor)) monitor_lock_init(void)
-> +static void __attribute__((constructor)) monitor_init_ctr(void)
 
-(Curious: why name it "ctr"?)
+--ctUzwJm0i+kwMBIK
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
->  {
->      qemu_mutex_init(&monitor_lock);
-> +    monitor_init_qmp_commands();
-> +    monitor_qapi_event_init();
-> +    sortcmdlist();
+On Mon, Dec 18, 2017 at 01:26:05PM +1100, Alexey Kardashevskiy wrote:
+> The following changes since commit 6b092cf3141ec02fa5f533ecdcd24264febfcd=
+76:
+>=20
+>   pseries: Update SLOF firmware image to qemu-slof-20171214 (2017-12-18 1=
+3:16:40 +1100)
+>=20
+> are available in the git repository at:
+>=20
+>   git@github.com:aik/qemu.git tags/qemu-slof-20171214
+>=20
+> for you to fetch changes up to 6b092cf3141ec02fa5f533ecdcd24264febfcd76:
+>=20
+>   pseries: Update SLOF firmware image to qemu-slof-20171214
+>   (2017-12-18 13:16:40 +1100)
 
-Though I still need to init monitor iothreads, I'm not sure whether it
-can be put into a constructor function since I think IOThead has not
-yet been initialized now (it's done until module_call_init() in
-main()).
+Merged, thanks.
 
->  }
-> 
-> Now vl.c:main() doesn't need to initialize the monitor.
-> 
-> We still need to handle the qtest_enabled() dependency:
-> 
-> -static QEMUClockType event_clock_type = QEMU_CLOCK_REALTIME;
-> +static inline QEMUClockType event_clock_type(void)
-> +{
-> +    return qtest_enabled() ? QEMU_CLOCK_VIRTUAL : QEMU_CLOCK_REALTIME;
-> +}
-> 
-> This way the qtest_enabled() call is deferred until later when the
-> accelerators have been initialized.
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
 
-Or... to be much simpler... How about we just use my patch?  IMHO it
-calls monitor_init_globals() after configure_accelerator() so
-monitor_qapi_event_init() and everything else would just work as
-expected?
+--ctUzwJm0i+kwMBIK
+Content-Type: application/pgp-signature; name="signature.asc"
 
-Thanks,
+-----BEGIN PGP SIGNATURE-----
 
--- 
-Peter Xu
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlo3OIQACgkQbDjKyiDZ
+s5JzmxAAksJaE0JSfdkpZjjKrdimJX28PBfYvtfPEt6ScxUSES/B16ZkGCN+0/zu
+g1dxCyHnVUxWynAQpBiBtcOJlJCJXVrb3uc9jfGfHeKK+tMCLylQhGCRWbFE24ib
+zKdT6BlHdS8fW6LL9S4K+XO17RbIdPgPmF7BYsGd+j3AWUbC9k0Yhcr/7SUahrg9
+vSCjYmLcpnccgQlJmCyHGDJyXBcney7UH2DTzGCHzmtkzz22VqDCWMpIVZTiPyl0
+MdNQAKskBBu5xzk/tBmaFEve2ES5ux+HNg6lfEkfIX7iqodJg4xTFBGEfWMAr9RA
+CevEoLRA1jVWhK6g6hL9NK62iAZx/lhrhPJvnz7C8OERyAql31kP0+7qOKJEmclL
+jfW1YRmQfBtEaQnp6ypTgHVjl1ejgFBtrGl7Tqjy2l8pIHDwD48T4fGzkpI6IHuH
+TUSvNLI78gpUjylZe/lEHtX3X6pv3MNC61DXMeD4kJFEZ2Kv6lcwacTKIsQ6iCAY
+h0cjVU7N7pZ5ihN977lINrYirbxv/93MI/qcWGmvTWWJy3FwsQvmmV789dg6+oqS
+X4JJ4ceBrgV3CIWMh4umaN16NIiOrE/HY4ohyu4S7Kf511but8cY5CiwR2iU4xXn
+9jjFcG5lER4x1g7Vd1m3MOENpPJxsiVQFVzZsmE16QymyHaMpy8=
+=hKpJ
+-----END PGP SIGNATURE-----
+
+--ctUzwJm0i+kwMBIK--
