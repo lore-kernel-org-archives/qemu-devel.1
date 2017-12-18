@@ -1,19 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56686)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56957)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1eQs1l-00041h-3k
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 04:48:06 -0500
+	(envelope-from <peterx@redhat.com>) id 1eQs2d-0004U3-DX
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 04:49:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1eQs1k-0000GN-5k
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 04:48:05 -0500
+	(envelope-from <peterx@redhat.com>) id 1eQs2a-0000m1-BU
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 04:48:59 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:36660)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1eQs2a-0000la-4h
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 04:48:56 -0500
+Date: Mon, 18 Dec 2017 17:48:38 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20171218094838.GR22308@xz-mi>
+References: <20171205055200.16305-1-peterx@redhat.com>
+	<20171205055200.16305-26-peterx@redhat.com>
+	<20171214143934.GN14433@stefanha-x1.localdomain>
 MIME-Version: 1.0
-References: <20171218015947.17293-1-f4bug@amsat.org>
-In-Reply-To: <20171218015947.17293-1-f4bug@amsat.org>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Mon, 18 Dec 2017 09:47:52 +0000
-Message-ID: <CAJ+F1C+42pi5=9KX6811ndi6P_8z_Yr75gRYpzmgZ3ZZRruPZA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] hw/tpm: remove old i386 dependency
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20171214143934.GN14433@stefanha-x1.localdomain>
+Subject: Re: [Qemu-devel] [RFC v5 25/26] tests: qmp-test: verify command
+ batching
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,51 +29,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Cc: Michael Tokarev <mjt@tls.msk.ru>, Stefan Berger <stefanb@linux.vnet.ibm.com>, qemu-devel@nongnu.org, qemu-trivial@nongnu.org
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Cc: qemu-devel@nongnu.org, Stefan Hajnoczi <shajnocz@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <famz@redhat.com>, Juan Quintela <quintela@redhat.com>, mdroth@linux.vnet.ibm.com, Eric Blake <eblake@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Markus Armbruster <armbru@redhat.com>, marcandre.lureau@redhat.com, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@gmail.com>
+On Thu, Dec 14, 2017 at 02:39:34PM +0000, Stefan Hajnoczi wrote:
+> On Tue, Dec 05, 2017 at 01:51:59PM +0800, Peter Xu wrote:
+> > OOB introduced DROP event for flow control.  This should not affect old
+> > QMP clients.  Add a command batching check to make sure of it.
+> > 
+> > Signed-off-by: Peter Xu <peterx@redhat.com>
+> > ---
+> >  tests/qmp-test.c | 19 +++++++++++++++++++
+> >  1 file changed, 19 insertions(+)
+> > 
+> > diff --git a/tests/qmp-test.c b/tests/qmp-test.c
+> > index 292c5f135a..729ec59b0a 100644
+> > --- a/tests/qmp-test.c
+> > +++ b/tests/qmp-test.c
+> > @@ -78,6 +78,7 @@ static void test_qmp_protocol(void)
+> >      QList *capabilities;
+> >      const QListEntry *entry;
+> >      QString *qstr;
+> > +    int i;
+> >  
+> >      global_qtest = qtest_init_without_qmp_handshake(common_args);
+> >  
+> > @@ -135,6 +136,24 @@ static void test_qmp_protocol(void)
+> >      g_assert_cmpint(qdict_get_int(resp, "id"), ==, 2);
+> >      QDECREF(resp);
+> >  
+> > +    /*
+> > +     * Test command batching.  In current test OOB is not enabled, we
+> > +     * should be able to run as many commands in batch as we like.
+> > +     * Using 16 (>8, which is OOB queue length) to make sure OOB
+> > +     * won't break existing clients.
+> > +     */
+> 
+> It's possible that QEMU processes the command and responds before the
+> test case submits the next one.  Please add:
+> 
+>   Note: this test does not control the scheduling of QEMU's QMP command
+>   processing threads so it may not really trigger batching inside QEMU.
+>   This is just a best-effort test.
 
-Le lun. 18 d=C3=A9c. 2017 =C3=A0 03:01, Philippe Mathieu-Daud=C3=A9 <f4bug@=
-amsat.org> a
-=C3=A9crit :
+True.
 
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-> Reviewed-by: Stefan Berger <stefanb@linux.vnet.ibm.com>
-> ---
-> Based-on: 1513446109-9013-33-git-send-email-stefanb@linux.vnet.ibm.com
-> ---
->  hw/tpm/tpm_emulator.c    | 1 -
->  hw/tpm/tpm_passthrough.c | 1 -
->  2 files changed, 2 deletions(-)
->
-> diff --git a/hw/tpm/tpm_emulator.c b/hw/tpm/tpm_emulator.c
-> index 3ae8bf6c5a..38b6f175a1 100644
-> --- a/hw/tpm/tpm_emulator.c
-> +++ b/hw/tpm/tpm_emulator.c
-> @@ -33,7 +33,6 @@
->  #include "sysemu/tpm_backend.h"
->  #include "tpm_int.h"
->  #include "hw/hw.h"
-> -#include "hw/i386/pc.h"
->  #include "tpm_util.h"
->  #include "tpm_ioctl.h"
->  #include "migration/blocker.h"
-> diff --git a/hw/tpm/tpm_passthrough.c b/hw/tpm/tpm_passthrough.c
-> index 487aae2043..149fae63e6 100644
-> --- a/hw/tpm/tpm_passthrough.c
-> +++ b/hw/tpm/tpm_passthrough.c
-> @@ -29,7 +29,6 @@
->  #include "sysemu/tpm_backend.h"
->  #include "tpm_int.h"
->  #include "hw/hw.h"
-> -#include "hw/i386/pc.h"
->  #include "qapi/clone-visitor.h"
->  #include "tpm_util.h"
->
-> --
-> 2.15.1
->
->
-> --
-Marc-Andr=C3=A9 Lureau
+> 
+> Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+
+Thanks,
+
+-- 
+Peter Xu
