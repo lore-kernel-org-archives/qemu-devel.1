@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36380)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44368)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1eQwQe-0001fK-Em
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 09:30:10 -0500
+	(envelope-from <stefanha@redhat.com>) id 1eQwWF-0006AF-1X
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 09:36:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1eQwQd-0000Zz-Mk
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 09:30:04 -0500
-Date: Mon, 18 Dec 2017 14:29:56 +0000
+	(envelope-from <stefanha@redhat.com>) id 1eQwW1-0006Dh-BS
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 09:35:51 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:50352)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1eQwW0-0006Ao-N3
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 09:35:36 -0500
 From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20171218142956.GN16653@stefanha-x1.localdomain>
-References: <20171214005953.8898-1-jsnow@redhat.com>
-	<20171214005953.8898-8-jsnow@redhat.com>
+Date: Mon, 18 Dec 2017 14:35:07 +0000
+Message-Id: <20171218143530.12082-1-stefanha@redhat.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="dZihrQ6eCIduWT38"
-Content-Disposition: inline
-In-Reply-To: <20171214005953.8898-8-jsnow@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 7/7] block/backup: use block_job_throttle
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 00/23] Block patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,34 +24,97 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>
-Cc: qemu-block@nongnu.org, kwolf@redhat.com, jcody@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com
+To: qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, Stefan Hajnoczi <stefanha@redhat.com>
 
+The following changes since commit 411ad78115ebeb3411cf4b7622784b93dfabe2=
+59:
 
---dZihrQ6eCIduWT38
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+  Merge remote-tracking branch 'remotes/stefanberger/tags/pull-tpm-2017-1=
+2-15-1' into staging (2017-12-17 15:27:41 +0000)
 
-On Wed, Dec 13, 2017 at 07:59:53PM -0500, John Snow wrote:
-> Signed-off-by: John Snow <jsnow@redhat.com>
-> ---
->  block/backup.c | 11 ++++++-----
->  1 file changed, 6 insertions(+), 5 deletions(-)
+are available in the Git repository at:
 
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+  git://github.com/stefanha/qemu.git tags/block-pull-request
 
---dZihrQ6eCIduWT38
-Content-Type: application/pgp-signature; name="signature.asc"
+for you to fetch changes up to 585426c518958aa768564596091474be786aae51:
 
------BEGIN PGP SIGNATURE-----
+  qemu-iotests: add 203 savevm with IOThreads test (2017-12-18 13:12:53 +=
+0000)
 
-iQEcBAEBAgAGBQJaN9DkAAoJEJykq7OBq3PIj+kH/jC1y1kQBHCMnnCMIevzm6oa
-7fSvrbesgd1zNhHejWZ7xOL4C7HjEO+dLv0rfHNAp+3ESuQMvmOufEOwZL3MJNu8
-QeKJuakVC7+dNfmim89v4hEeQsVSVJF9dl2FWJx2PIyMHNbH2aIHPYHOlpAfzTFa
-cgTjVuSRMdysRgMJbpJ8OtkIHVbcmwu85MnIfCuSn8f2O+j5iHBJOb47BXooWPLe
-fUnziQ5XvISANkdUQBfMFXR40Bd+AMLqDQwScp35MsY330bIZGgRQDisq4jnY82/
-OAhKhQz5k+cN0zAn8RlQWQEt6y39S8FhVm3CVmQjyB5HO4n+LsC4832ih7bzHcQ=
-=ey/K
------END PGP SIGNATURE-----
+----------------------------------------------------------------
 
---dZihrQ6eCIduWT38--
+----------------------------------------------------------------
+
+Mao Zhongyi (4):
+  hw/block/nvme: Convert to realize
+  hw/block: Fix the return type
+  hw/block: Use errp directly rather than local_err
+  dev-storage: Fix the unusual function name
+
+Mark Kanda (2):
+  virtio-blk: make queue size configurable
+  virtio-blk: reject configs with logical block size > physical block
+    size
+
+Paolo Bonzini (1):
+  block: avoid recursive AioContext acquire in bdrv_inactivate_all()
+
+Stefan Hajnoczi (16):
+  coroutine: simplify co_aio_sleep_ns() prototype
+  qdev: drop unused #include "sysemu/iothread.h"
+  blockdev: hold AioContext for bdrv_unref() in
+    external_snapshot_clean()
+  block: don't keep AioContext acquired after
+    external_snapshot_prepare()
+  block: don't keep AioContext acquired after drive_backup_prepare()
+  block: don't keep AioContext acquired after blockdev_backup_prepare()
+  block: don't keep AioContext acquired after
+    internal_snapshot_prepare()
+  block: drop unused BlockDirtyBitmapState->aio_context field
+  iothread: add iothread_by_id() API
+  blockdev: add x-blockdev-set-iothread testing command
+  qemu-iotests: add 202 external snapshots IOThread test
+  docs: mark nested AioContext locking as a legacy API
+  blockdev: add x-blockdev-set-iothread force boolean
+  iotests: add VM.add_object()
+  iothread: fix iothread_stop() race condition
+  qemu-iotests: add 203 savevm with IOThreads test
+
+ docs/devel/multiple-iothreads.txt |   7 +-
+ qapi/block-core.json              |  40 ++++++
+ hw/block/dataplane/virtio-blk.h   |   2 +-
+ include/hw/block/block.h          |   4 +-
+ include/hw/virtio/virtio-blk.h    |   1 +
+ include/qemu/coroutine.h          |   6 +-
+ include/sysemu/iothread.h         |   4 +-
+ block.c                           |  14 ++-
+ block/null.c                      |   3 +-
+ block/sheepdog.c                  |   3 +-
+ blockdev.c                        | 259 +++++++++++++++++++++++++++-----=
+------
+ hw/block/block.c                  |  15 ++-
+ hw/block/dataplane/virtio-blk.c   |  12 +-
+ hw/block/fdc.c                    |  17 +--
+ hw/block/nvme.c                   |  23 ++--
+ hw/block/virtio-blk.c             |  35 ++++--
+ hw/core/qdev-properties-system.c  |   1 -
+ hw/ide/qdev.c                     |  12 +-
+ hw/scsi/scsi-disk.c               |  13 +-
+ hw/usb/dev-storage.c              |  29 ++---
+ iothread.c                        |  27 +++-
+ util/qemu-coroutine-sleep.c       |   4 +-
+ tests/qemu-iotests/202            |  95 ++++++++++++++
+ tests/qemu-iotests/202.out        |  11 ++
+ tests/qemu-iotests/203            |  59 +++++++++
+ tests/qemu-iotests/203.out        |   6 +
+ tests/qemu-iotests/group          |   2 +
+ tests/qemu-iotests/iotests.py     |   5 +
+ 28 files changed, 532 insertions(+), 177 deletions(-)
+ create mode 100755 tests/qemu-iotests/202
+ create mode 100644 tests/qemu-iotests/202.out
+ create mode 100755 tests/qemu-iotests/203
+ create mode 100644 tests/qemu-iotests/203.out
+
+--=20
+2.14.3
