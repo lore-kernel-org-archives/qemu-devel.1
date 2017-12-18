@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46644)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46693)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1eQrb9-0006Za-KY
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 04:20:37 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1eQrbB-0006b2-KU
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 04:20:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1eQrb7-0001nh-SG
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 04:20:35 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1eQrbA-0001qK-H0
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 04:20:37 -0500
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Mon, 18 Dec 2017 20:20:21 +1100
-Message-Id: <20171218092024.21645-4-david@gibson.dropbear.id.au>
+Date: Mon, 18 Dec 2017 20:20:24 +1100
+Message-Id: <20171218092024.21645-7-david@gibson.dropbear.id.au>
 In-Reply-To: <20171218092024.21645-1-david@gibson.dropbear.id.au>
 References: <20171218092024.21645-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PATCH 3/6] spapr: Validate capabilities on migration
+Subject: [Qemu-devel] [PATCH 6/6] spapr: Handle Decimal Floating Point (DFP)
+ as an optional capability
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,216 +23,114 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: surajjs@au1.ibm.com, groug@kaod.org, lvivier@redhat.com
 Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, mdroth@linux.vnet.ibm.com, abologna@redhat.com, David Gibson <david@gibson.dropbear.id.au>
 
-Now that the "pseries" machine type implements optional capabilities (well,
-one so far) there's the possibility of having different capabilities
-available at either end of a migration.  Although arguably a user error,
-it would be nice to catch this situation and fail as gracefully as we can.
+Decimal Floating Point has been available on POWER7 and later (server)
+cpus.  However, it can be disabled on the hypervisor, meaning that it's
+not available to guests.
 
-This adds code to migrate the capabilities flags.  These aren't pulled
-directly into the destination's configuration since what the user has
-specified on the destination command line should take precedence.  However,
-they are checked against the destination capabilities.
+We currently handle this by conditionally advertising DFP support in the
+device tree depending on whether the guest CPU model supports it - which
+can also depend on what's allowed in the host for -cpu host.  That can lead
+to confusion on migration, since host properties are silently affecting
+guest visible properties.
 
-If the source was using a capability which is absent on the destination,
-we fail the migration, since that could easily cause a guest crash or other
-bad behaviour.  If the source lacked a capability which is present on the
-destination we warn, but allow the migration to proceed.
+This patch handles it by treating it as an optional capability for the
+pseries machine type.
 
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/ppc/spapr.c         |  6 ++++
- hw/ppc/spapr_caps.c    | 96 ++++++++++++++++++++++++++++++++++++++++++++++++--
- include/hw/ppc/spapr.h |  6 ++++
- 3 files changed, 105 insertions(+), 3 deletions(-)
+ hw/ppc/spapr.c         |  7 ++++---
+ hw/ppc/spapr_caps.c    | 18 ++++++++++++++++++
+ include/hw/ppc/spapr.h |  3 +++
+ 3 files changed, 25 insertions(+), 3 deletions(-)
 
 diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index f8fee8ebcf..86fc83f9c2 100644
+index 693dd6f7b3..e22888ba06 100644
 --- a/hw/ppc/spapr.c
 +++ b/hw/ppc/spapr.c
-@@ -1589,6 +1589,11 @@ static int spapr_post_load(void *opaque, int version_id)
-     sPAPRMachineState *spapr = (sPAPRMachineState *)opaque;
-     int err = 0;
- 
-+    err = spapr_caps_post_migration(spapr);
-+    if (err) {
-+        return err;
-+    }
-+
-     if (!object_dynamic_cast(OBJECT(spapr->ics), TYPE_ICS_KVM)) {
-         CPUState *cs;
-         CPU_FOREACH(cs) {
-@@ -1755,6 +1760,7 @@ static const VMStateDescription vmstate_spapr = {
-         &vmstate_spapr_ov5_cas,
-         &vmstate_spapr_patb_entry,
-         &vmstate_spapr_pending_events,
-+        &vmstate_spapr_caps,
-         NULL
+@@ -572,7 +572,7 @@ static void spapr_populate_cpu_dt(CPUState *cs, void *fdt, int offset,
+     /* Advertise DFP (Decimal Floating Point) if available
+      *   0 / no property == no DFP
+      *   1               == DFP available */
+-    if (env->insns_flags2 & PPC2_DFP) {
++    if (spapr_has_cap(spapr, SPAPR_CAP_DFP)) {
+         _FDT((fdt_setprop_cell(fdt, offset, "ibm,dfp", 1)));
      }
- };
+ 
+@@ -3834,7 +3834,7 @@ static void spapr_machine_class_init(ObjectClass *oc, void *data)
+      */
+     mc->numa_mem_align_shift = 28;
+ 
+-    smc->default_caps = spapr_caps(SPAPR_CAP_VSX);
++    smc->default_caps = spapr_caps(SPAPR_CAP_VSX | SPAPR_CAP_DFP);
+     spapr_caps_add_properties(smc, &error_abort);
+ }
+ 
+@@ -3916,7 +3916,8 @@ static void spapr_machine_2_11_class_options(MachineClass *mc)
+     sPAPRMachineClass *smc = SPAPR_MACHINE_CLASS(mc);
+ 
+     spapr_machine_2_12_class_options(mc);
+-    smc->default_caps = spapr_caps(SPAPR_CAP_HTM | SPAPR_CAP_VSX);
++    smc->default_caps = spapr_caps(SPAPR_CAP_HTM | SPAPR_CAP_VSX
++                                   | SPAPR_CAP_DFP);
+     SET_MACHINE_COMPAT(mc, SPAPR_COMPAT_2_11);
+ }
+ 
 diff --git a/hw/ppc/spapr_caps.c b/hw/ppc/spapr_caps.c
-index 2f0ef98670..a8c726a88b 100644
+index da066aec8f..61745f0b32 100644
 --- a/hw/ppc/spapr_caps.c
 +++ b/hw/ppc/spapr_caps.c
-@@ -22,6 +22,7 @@
-  * THE SOFTWARE.
-  */
- #include "qemu/osdep.h"
-+#include "qemu/error-report.h"
- #include "qapi/error.h"
- #include "qapi/visitor.h"
- #include "sysemu/hw_accel.h"
-@@ -83,6 +84,93 @@ static sPAPRCapabilities default_caps_with_cpu(sPAPRMachineState *spapr,
-     return caps;
- }
- 
-+static bool spapr_caps_needed(void *opaque)
-+{
-+    sPAPRMachineState *spapr = opaque;
-+
-+    return (spapr->forced_caps.mask != 0) || (spapr->forbidden_caps.mask != 0);
-+}
-+
-+/* This has to be called from the top-level spapr post_load, not the
-+ * caps specific one.  Otherwise it wouldn't be called when the source
-+ * caps are all defaults, which could still conflict with overridden
-+ * caps on the destination */
-+int spapr_caps_post_migration(sPAPRMachineState *spapr)
-+{
-+    uint64_t allcaps = 0;
-+    int i;
-+    bool ok = true;
-+    sPAPRCapabilities dstcaps = spapr->effective_caps;
-+    sPAPRCapabilities srccaps;
-+
-+    srccaps = default_caps_with_cpu(spapr, first_cpu);
-+    srccaps.mask |= spapr->mig_forced_caps.mask;
-+    srccaps.mask &= ~spapr->mig_forbidden_caps.mask;
-+
-+    for (i = 0; i < ARRAY_SIZE(capability_table); i++) {
-+        sPAPRCapabilityInfo *info = &capability_table[i];
-+
-+        allcaps |= info->flag;
-+
-+        if ((srccaps.mask & info->flag) && !(dstcaps.mask & info->flag)) {
-+            error_report("cap-%s=on in incoming stream, but off in destination",
-+                         info->name);
-+            ok = false;
-+        }
-+
-+        if (!(srccaps.mask & info->flag) && (dstcaps.mask & info->flag)) {
-+            warn_report("cap-%s=off in incoming stream, but on in destination",
-+                         info->name);
-+        }
-+    }
-+
-+    if (spapr->mig_forced_caps.mask & ~allcaps) {
-+        error_report(
-+            "Unknown capabilities 0x%"PRIx64" enabled in incoming stream",
-+            spapr->mig_forced_caps.mask & ~allcaps);
-+        ok = false;
-+    }
-+    if (spapr->mig_forbidden_caps.mask & ~allcaps) {
-+        warn_report(
-+            "Unknown capabilities 0x%"PRIx64" disabled in incoming stream",
-+            spapr->mig_forbidden_caps.mask & ~allcaps);
-+    }
-+
-+    return ok ? 0 : -EINVAL;
-+}
-+
-+static int spapr_caps_pre_save(void *opaque)
-+{
-+    sPAPRMachineState *spapr = opaque;
-+
-+    spapr->mig_forced_caps = spapr->forced_caps;
-+    spapr->mig_forbidden_caps = spapr->forbidden_caps;
-+    return 0;
-+}
-+
-+static int spapr_caps_pre_load(void *opaque)
-+{
-+    sPAPRMachineState *spapr = opaque;
-+
-+    spapr->mig_forced_caps = spapr_caps(0);
-+    spapr->mig_forbidden_caps = spapr_caps(0);
-+    return 0;
-+}
-+
-+const VMStateDescription vmstate_spapr_caps = {
-+    .name = "spapr/caps",
-+    .version_id = 1,
-+    .minimum_version_id = 1,
-+    .needed = spapr_caps_needed,
-+    .pre_save = spapr_caps_pre_save,
-+    .pre_load = spapr_caps_pre_load,
-+    .fields = (VMStateField[]) {
-+        VMSTATE_UINT64(mig_forced_caps.mask, sPAPRMachineState),
-+        VMSTATE_UINT64(mig_forbidden_caps.mask, sPAPRMachineState),
-+        VMSTATE_END_OF_LIST()
-+    },
-+};
-+
- void spapr_caps_reset(sPAPRMachineState *spapr)
- {
-     Error *local_err = NULL;
-@@ -92,6 +180,11 @@ void spapr_caps_reset(sPAPRMachineState *spapr)
-     /* First compute the actual set of caps we're running with.. */
-     caps = default_caps_with_cpu(spapr, first_cpu);
- 
-+    /* Remove unnecessary forced/forbidden bits (this will help us
-+     * with migration) */
-+    spapr->forced_caps.mask &= ~caps.mask;
-+    spapr->forbidden_caps.mask &= caps.mask;
-+
-     caps.mask |= spapr->forced_caps.mask;
-     caps.mask &= ~spapr->forbidden_caps.mask;
- 
-@@ -176,9 +269,6 @@ void spapr_caps_validate(sPAPRMachineState *spapr, Error **errp)
-         error_setg(errp, "Some sPAPR capabilities set both on and off");
-         return;
+@@ -70,6 +70,16 @@ static void cap_vsx_allow(sPAPRMachineState *spapr, Error **errp)
      }
--
--    /* Check for any caps incompatible with other caps.  Nothing to do
--     * yet */
  }
  
- void spapr_caps_add_properties(sPAPRMachineClass *smc, Error **errp)
-diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-index dc64f4ebcb..5c85f39c3b 100644
---- a/include/hw/ppc/spapr.h
-+++ b/include/hw/ppc/spapr.h
-@@ -54,6 +54,8 @@ typedef enum {
-  * Capabilities
-  */
- 
-+/* These bits go in the migration stream, so they can't be reassigned */
++static void cap_dfp_allow(sPAPRMachineState *spapr, Error **errp)
++{
++    PowerPCCPU *cpu = POWERPC_CPU(first_cpu);
++    CPUPPCState *env = &cpu->env;
 +
- /* Hardware Transactional Memory */
- #define SPAPR_CAP_HTM               0x0000000000000001ULL
- 
-@@ -142,6 +144,7 @@ struct sPAPRMachineState {
-     const char *icp_type;
- 
-     sPAPRCapabilities forced_caps, forbidden_caps;
-+    sPAPRCapabilities mig_forced_caps, mig_forbidden_caps;
-     sPAPRCapabilities effective_caps;
++    if (!(env->insns_flags2 & PPC2_DFP)) {
++        error_setg(errp, "DFP support not available, try cap-dfp=off");
++    }
++}
++
+ static sPAPRCapabilityInfo capability_table[] = {
+     {
+         .name = "htm",
+@@ -85,6 +95,13 @@ static sPAPRCapabilityInfo capability_table[] = {
+         .allow = cap_vsx_allow,
+         /* TODO: add cap_vsx_disallow */
+     },
++    {
++        .name = "dfp",
++        .description = "Allow Decimal Floating Point (DFP)",
++        .flag = SPAPR_CAP_DFP,
++        .allow = cap_dfp_allow,
++        /* TODO: add cap_dfp_disallow */
++    },
  };
  
-@@ -743,6 +746,8 @@ qemu_irq spapr_qirq(sPAPRMachineState *spapr, int irq);
- /*
-  * Handling of optional capabilities
-  */
-+extern const VMStateDescription vmstate_spapr_caps;
-+
- static inline sPAPRCapabilities spapr_caps(uint64_t mask)
- {
-     sPAPRCapabilities caps = { mask };
-@@ -757,5 +762,6 @@ static inline bool spapr_has_cap(sPAPRMachineState *spapr, uint64_t cap)
- void spapr_caps_reset(sPAPRMachineState *spapr);
- void spapr_caps_validate(sPAPRMachineState *spapr, Error **errp);
- void spapr_caps_add_properties(sPAPRMachineClass *smc, Error **errp);
-+int spapr_caps_post_migration(sPAPRMachineState *spapr);
+ static sPAPRCapabilities default_caps_with_cpu(sPAPRMachineState *spapr,
+@@ -104,6 +121,7 @@ static sPAPRCapabilities default_caps_with_cpu(sPAPRMachineState *spapr,
+     if (!ppc_check_compat(cpu, CPU_POWERPC_LOGICAL_2_06,
+                           0, spapr->max_compat_pvr)) {
+         caps.mask &= ~SPAPR_CAP_VSX;
++        caps.mask &= ~SPAPR_CAP_DFP;
+     }
  
- #endif /* HW_SPAPR_H */
+     return caps;
+diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
+index 148a03d189..26ac17e641 100644
+--- a/include/hw/ppc/spapr.h
++++ b/include/hw/ppc/spapr.h
+@@ -62,6 +62,9 @@ typedef enum {
+ /* Vector Scalar Extensions */
+ #define SPAPR_CAP_VSX               0x0000000000000002ULL
+ 
++/* Decimal Floating Point */
++#define SPAPR_CAP_DFP               0x0000000000000004ULL
++
+ typedef struct sPAPRCapabilities sPAPRCapabilities;
+ struct sPAPRCapabilities {
+     uint64_t mask;
 -- 
 2.14.3
