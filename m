@@ -1,28 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48412)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58586)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1eR4OZ-0004za-1H
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 18:00:32 -0500
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1eR4YD-0000me-R3
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 18:10:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1eR4OU-0002wd-Su
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 18:00:27 -0500
-Received: from mail-pg0-x244.google.com ([2607:f8b0:400e:c05::244]:36839)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1eR4OU-0002s3-Ll
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 18:00:22 -0500
-Received: by mail-pg0-x244.google.com with SMTP id k134so9763315pga.3
-	for <qemu-devel@nongnu.org>; Mon, 18 Dec 2017 15:00:20 -0800 (PST)
-References: <20171211125705.16120-1-alex.bennee@linaro.org>
-	<20171211125705.16120-18-alex.bennee@linaro.org>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <0060ddd4-aef3-1ff9-a6d8-209720a63530@linaro.org>
-Date: Mon, 18 Dec 2017 15:00:15 -0800
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1eR4YD-0001Vn-10
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 18:10:25 -0500
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20171215031547.31006-1-f4bug@amsat.org>
+	<20171215031547.31006-17-f4bug@amsat.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <ee9ec12e-b559-a059-e0ab-3db30be4b1c6@amsat.org>
+Date: Mon, 18 Dec 2017 20:10:13 -0300
 MIME-Version: 1.0
-In-Reply-To: <20171211125705.16120-18-alex.bennee@linaro.org>
+In-Reply-To: <20171215031547.31006-17-f4bug@amsat.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v1 17/19] fpu/softfloat: re-factor scalbn
+Subject: Re: [Qemu-devel] [PATCH v2 16/20] sdhci: add qtest to check the SD
+ Spec version
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,20 +29,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, peter.maydell@linaro.org, laurent@vivier.eu, bharata@linux.vnet.ibm.com, andrew@andrewdutcher.com, aleksandar.markovic@imgtec.com
-Cc: qemu-devel@nongnu.org, Aurelien Jarno <aurelien@aurel32.net>
+To: Alistair Francis <alistair.francis@xilinx.com>, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Michael Walle <michael@walle.cc>, Andrzej Zaborowski <balrogg@gmail.com>, Andrew Baumann <Andrew.Baumann@microsoft.com>, Andrey Smirnov <andrew.smirnov@gmail.com>, Andrey Yurovsky <yurovsky@gmail.com>, qemu-devel@nongnu.org, qemu-arm@nongnu.org, Prasad J Pandit <pjp@fedoraproject.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Sai Pavan Boddu <saipava@xilinx.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
-On 12/11/2017 04:57 AM, Alex Bennée wrote:
-> This is one of the simpler manipulations you could make to a floating
-> point number.
-> 
-> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-> ---
->  fpu/softfloat.c         | 104 +++++++++++++++---------------------------------
->  include/fpu/softfloat.h |   1 +
->  2 files changed, 32 insertions(+), 73 deletions(-)
+On 12/15/2017 12:15 AM, Philippe Mathieu-Daudé wrote:
+> +static const struct sdhci_t {
+> +    const char *arch;
+> +    const char *machine;
+> +    struct {
+> +        uintptr_t addr;
+> +        uint8_t version;
+> +    } sdhci;
+> +} models[] = {
+> +    { "arm",    "smdkc210",
+> +        {0x12510000, 2} },
+> +    { "arm",    "sabrelite",
+> +        {0x02190000, 3} },
+> +    { "arm",    "raspi2",           /* bcm2835 */
+> +        {0x3f300000, 3} },
+> +    { "arm",    "xilinx-zynq-a9",   /* exynos4210 */
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Just noticed this comment is for the smdkc210 above,
+I'll fix in respin.
 
-
-r~
+> +        {0xe0100000, 3} },
+> +};
