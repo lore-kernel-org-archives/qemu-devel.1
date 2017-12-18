@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57203)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57205)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <den@openvz.org>) id 1eQtIO-000374-8l
+	(envelope-from <den@openvz.org>) id 1eQtIO-000375-9F
 	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 06:09:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <den@openvz.org>) id 1eQtIL-0007Yf-Au
+	(envelope-from <den@openvz.org>) id 1eQtIL-0007Yl-Fc
 	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 06:09:20 -0500
 From: "Denis V. Lunev" <den@openvz.org>
-Date: Mon, 18 Dec 2017 14:09:08 +0300
-Message-Id: <1513595351-5899-3-git-send-email-den@openvz.org>
+Date: Mon, 18 Dec 2017 14:09:11 +0300
+Message-Id: <1513595351-5899-6-git-send-email-den@openvz.org>
 In-Reply-To: <1513595351-5899-1-git-send-email-den@openvz.org>
 References: <1513595351-5899-1-git-send-email-den@openvz.org>
-Subject: [Qemu-devel] [PATCH 2/5] configure: add dependency
+Subject: [Qemu-devel] [PATCH 5/5] block/parallels: add backing support to
+ readv/writev
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,121 +21,112 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: Klim Kireev <klim.kireev@virtuozzo.com>, "Denis V . Lunev" <den@openvz.org>, Edgar Kaziakhmedov <edgar.kaziakhmedov@virtuozzo.com>, Stefan Hajnoczi <stefanha@redhat.com>
+Cc: Edgar Kaziakhmedov <edgar.kaziakhmedov@virtuozzo.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, "Denis V . Lunev" <den@openvz.org>, Stefan Hajnoczi <stefanha@redhat.com>
 
-From: Klim Kireev <klim.kireev@virtuozzo.com>
+From: Edgar Kaziakhmedov <edgar.kaziakhmedov@virtuozzo.com>
 
-This dependency is required for adequate Parallels images support.
-Typically the disk consists of several images which are glued by
-XML disk descriptor. Also XML hides inside several important parameters
-which are not available in the image header.
+Since parallels format supports backing files, refine
+readv/writev (allocate_clusters) to redirect read/write requests
+to a backing file (if cluster is not available in the current bs).
 
-The patch also adds clause to checkpatch.pl to understand libxml2 types.
-
-Signed-off-by: Denis V. Lunev <den@openvz.org>
-Signed-off-by: Klim Kireev <klim.kireev@virtuozzo.com>
 Signed-off-by: Edgar Kaziakhmedov <edgar.kaziakhmedov@virtuozzo.com>
+Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Signed-off-by: Denis V. Lunev <den@openvz.org>
 CC: Stefan Hajnoczi <stefanha@redhat.com>
 ---
- configure             | 27 +++++++++++++++++++++++++++
- block/Makefile.objs   |  2 ++
- scripts/checkpatch.pl |  1 +
- 3 files changed, 30 insertions(+)
+ block/parallels.c | 50 ++++++++++++++++++++++++++++++++++++++++++++------
+ 1 file changed, 44 insertions(+), 6 deletions(-)
 
-diff --git a/configure b/configure
-index 0c6e757..e988fd0 100755
---- a/configure
-+++ b/configure
-@@ -422,6 +422,7 @@ tcmalloc="no"
- jemalloc="no"
- replication="yes"
- vxhs=""
-+libxml2=""
+diff --git a/block/parallels.c b/block/parallels.c
+index 7a8e8b0..d380208 100644
+--- a/block/parallels.c
++++ b/block/parallels.c
+@@ -142,6 +142,7 @@ static int64_t block_status(BDRVParallelsState *s, int64_t sector_num,
+ static int64_t allocate_clusters(BlockDriverState *bs, int64_t sector_num,
+                                  int nb_sectors, int *pnum)
+ {
++    int ret;
+     BDRVParallelsState *s = bs->opaque;
+     int64_t pos, space, idx, to_allocate, i, len;
  
- supported_cpu="no"
- supported_os="no"
-@@ -1275,6 +1276,10 @@ for opt do
-   ;;
-   --enable-numa) numa="yes"
-   ;;
-+  --disable-libxml2) libxml2="no"
-+  ;;
-+  --enable-libxml2) libxml2="yes"
-+  ;;
-   --disable-tcmalloc) tcmalloc="no"
-   ;;
-   --enable-tcmalloc) tcmalloc="yes"
-@@ -1548,6 +1553,7 @@ disabled with --disable-FEATURE, default is enabled if available:
-   tpm             TPM support
-   libssh2         ssh block device support
-   numa            libnuma support
-+  libxml2         for Parallels image format
-   tcmalloc        tcmalloc support
-   jemalloc        jemalloc support
-   replication     replication support
-@@ -1592,6 +1598,20 @@ if test "$ARCH" = "unknown"; then
-     fi
- fi
+@@ -170,7 +171,6 @@ static int64_t allocate_clusters(BlockDriverState *bs, int64_t sector_num,
+         return len;
+     }
+     if (s->data_end + space > (len >> BDRV_SECTOR_BITS)) {
+-        int ret;
+         space += s->prealloc_size;
+         if (s->prealloc_mode == PRL_PREALLOC_MODE_FALLOCATE) {
+             ret = bdrv_pwrite_zeroes(bs->file,
+@@ -186,6 +186,37 @@ static int64_t allocate_clusters(BlockDriverState *bs, int64_t sector_num,
+         }
+     }
  
-+# check for libxml2
-+if test "$libxml2" != "no" ; then
-+    if $pkg_config --exists libxml-2.0; then
-+        libxml2="yes"
-+        libxml2_cflags=$($pkg_config --cflags libxml-2.0)
-+        libxml2_libs=$($pkg_config --libs libxml-2.0)
-+    else
-+        if test "$libxml2" = "yes"; then
-+            feature_not_found "libxml2" "Install libxml2 devel"
-+        fi
-+        libxml2="no"
-+    fi
-+fi
++    /* Try to read from backing to fill empty clusters
++     * FIXME: 1. previous write_zeroes may be redundant
++     *        2. most of data we read from backing will be rewritten by
++     *           parallels_co_writev. On aligned-to-cluster write we do not need
++     *           this read at all.
++     *        3. it would be good to combine write of data from backing and new
++     *           data into one write call */
++    if (bs->backing) {
++        int64_t nb_cow_sectors = to_allocate * s->tracks;
++        int64_t nb_cow_bytes = nb_cow_sectors << BDRV_SECTOR_BITS;
++        QEMUIOVector qiov;
++        struct iovec iov = {
++            .iov_len = nb_cow_bytes,
++            .iov_base = qemu_blockalign(bs, nb_cow_bytes)
++        };
++        qemu_iovec_init_external(&qiov, &iov, 1);
 +
- # Consult white-list to determine whether to enable werror
- # by default.  Only enable by default for git builds
- if test -z "$werror" ; then
-@@ -5549,6 +5569,7 @@ echo "lzo support       $lzo"
- echo "snappy support    $snappy"
- echo "bzip2 support     $bzip2"
- echo "NUMA host support $numa"
-+echo "libxml2           $libxml2"
- echo "tcmalloc support  $tcmalloc"
- echo "jemalloc support  $jemalloc"
- echo "avx2 optimization $avx2_opt"
-@@ -6208,6 +6229,12 @@ if test "$have_rtnetlink" = "yes" ; then
-   echo "CONFIG_RTNETLINK=y" >> $config_host_mak
- fi
- 
-+if test "$libxml2" = "yes" ; then
-+  echo "CONFIG_LIBXML2=y" >> $config_host_mak
-+  echo "LIBXML2_CFLAGS=$libxml2_cflags" >> $config_host_mak
-+  echo "LIBXML2_LIBS=$libxml2_libs" >> $config_host_mak
-+fi
++        ret = bdrv_co_readv(bs->backing, idx * s->tracks, nb_cow_sectors,
++                            &qiov);
++        if (ret < 0) {
++            qemu_vfree(iov.iov_base);
++            return ret;
++        }
 +
- if test "$replication" = "yes" ; then
-   echo "CONFIG_REPLICATION=y" >> $config_host_mak
- fi
-diff --git a/block/Makefile.objs b/block/Makefile.objs
-index 6eaf78a..a73387f 100644
---- a/block/Makefile.objs
-+++ b/block/Makefile.objs
-@@ -47,3 +47,5 @@ block-obj-$(if $(CONFIG_BZIP2),m,n) += dmg-bz2.o
- dmg-bz2.o-libs     := $(BZIP2_LIBS)
- qcow.o-libs        := -lz
- linux-aio.o-libs   := -laio
-+parallels.o-cflags := $(LIBXML2_CFLAGS)
-+parallels.o-libs   := $(LIBXML2_LIBS)
-diff --git a/scripts/checkpatch.pl b/scripts/checkpatch.pl
-index 34df753..e76cc85 100755
---- a/scripts/checkpatch.pl
-+++ b/scripts/checkpatch.pl
-@@ -265,6 +265,7 @@ our @typeList = (
- 	qr{${Ident}_handler_fn},
- 	qr{target_(?:u)?long},
- 	qr{hwaddr},
-+	qr{xml${Ident}},
- );
++        ret = bdrv_co_writev(bs->file, s->data_end, nb_cow_sectors, &qiov);
++        qemu_vfree(iov.iov_base);
++        if (ret < 0) {
++            return ret;
++        }
++    }
++
+     for (i = 0; i < to_allocate; i++) {
+         s->bat_bitmap[idx + i] = cpu_to_le32(s->data_end / s->off_multiplier);
+         s->data_end += s->tracks;
+@@ -309,12 +340,19 @@ static coroutine_fn int parallels_co_readv(BlockDriverState *bs,
  
- # This can be modified by sub possible.  Since it can be empty, be careful
+         nbytes = n << BDRV_SECTOR_BITS;
+ 
++        qemu_iovec_reset(&hd_qiov);
++        qemu_iovec_concat(&hd_qiov, qiov, bytes_done, nbytes);
++
+         if (position < 0) {
+-            qemu_iovec_memset(qiov, bytes_done, 0, nbytes);
++            if (bs->backing) {
++                ret = bdrv_co_readv(bs->backing, sector_num, n, &hd_qiov);
++                if (ret < 0) {
++                    break;
++                }
++            } else {
++                qemu_iovec_memset(&hd_qiov, 0, 0, nbytes);
++            }
+         } else {
+-            qemu_iovec_reset(&hd_qiov);
+-            qemu_iovec_concat(&hd_qiov, qiov, bytes_done, nbytes);
+-
+             ret = bdrv_co_readv(bs->file, position, n, &hd_qiov);
+             if (ret < 0) {
+                 break;
+@@ -748,7 +786,7 @@ static BlockDriver bdrv_parallels = {
+     .bdrv_co_flush_to_os      = parallels_co_flush_to_os,
+     .bdrv_co_readv  = parallels_co_readv,
+     .bdrv_co_writev = parallels_co_writev,
+-
++    .supports_backing = true,
+     .bdrv_create    = parallels_create,
+     .bdrv_check     = parallels_check,
+     .create_opts    = &parallels_create_opts,
 -- 
 2.7.4
