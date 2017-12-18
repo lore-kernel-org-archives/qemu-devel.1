@@ -1,43 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45414)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46840)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <satheesh@MiWiFi-R3L-srv.gho.boulder.ibm.com>)
-	id 1eQzH4-00049H-Ic
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 12:32:23 -0500
+	(envelope-from <bounces@canonical.com>) id 1eR0oz-00055e-7O
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 14:12:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <satheesh@MiWiFi-R3L-srv.gho.boulder.ibm.com>)
-	id 1eQzH1-0006PJ-Ah
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 12:32:22 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:51444)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71)
-	(envelope-from <satheesh@MiWiFi-R3L-srv.gho.boulder.ibm.com>)
-	id 1eQzH1-0006Nq-1y
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 12:32:19 -0500
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	vBIF49Ke065640
-	for <qemu-devel@nongnu.org>; Mon, 18 Dec 2017 10:06:23 -0500
-Received: from e37.co.us.ibm.com (e37.co.us.ibm.com [32.97.110.158])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2exf6qtnjm-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 18 Dec 2017 10:06:22 -0500
-Received: from localhost
-	by e37.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted for <qemu-devel@nongnu.org> from
-	<satheesh@MiWiFi-R3L-srv.gho.boulder.ibm.com>;
-	Mon, 18 Dec 2017 08:06:21 -0700
-Date: Mon, 18 Dec 2017 20:35:12 +0530
-From: satheesh rajendran <satheesh@MiWiFi-R3L-srv.gho.boulder.ibm.com>
-References: <20171218105318.30367-1-danielhb@linux.vnet.ibm.com>
-	<20171218105954.GE13493@redhat.com>
-	<6932664e-4715-a120-e69b-638a88c9060f@linux.vnet.ibm.com>
-	<20171218120144.GF13493@redhat.com>
+	(envelope-from <bounces@canonical.com>) id 1eR0oV-0003KA-L2
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 14:11:29 -0500
+Received: from indium.canonical.com ([91.189.90.7]:60500)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1eR0oV-0003IB-9A
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 14:10:59 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1eR0oT-0001Ji-6n
+	for <qemu-devel@nongnu.org>; Mon, 18 Dec 2017 19:10:57 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 327372E80CC
+	for <qemu-devel@nongnu.org>; Mon, 18 Dec 2017 19:10:57 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20171218120144.GF13493@redhat.com>
-Message-Id: <20171218150512.GA24630@MiWiFi-R3L-srv>
-Subject: Re: [Qemu-devel] [PATCH v1 1/1] qmp: marking qmp_cpu as deprecated
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 18 Dec 2017 18:56:00 -0000
+From: John Snow <1738840@bugs.launchpad.net>
+Reply-To: Bug 1738840 <1738840@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <151361756384.17711.11632335707632949681.malonedeb@soybean.canonical.com>
+Message-Id: <151362336044.11633.3555620077686178754.malone@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1738840] Re: qemu-img convert qcow2 to raw fails
+ on OS X
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -46,94 +37,136 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>
-Cc: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>, qemu-devel@nongnu.org, armbru@redhat.com
+To: qemu-devel@nongnu.org
 
-On Mon, Dec 18, 2017 at 12:01:44PM +0000, Daniel P. Berrange wrote:
-> On Mon, Dec 18, 2017 at 09:55:55AM -0200, Daniel Henrique Barboza wrote:
-> > 
-> > 
-> > On 12/18/2017 08:59 AM, Daniel P. Berrange wrote:
-> > > On Mon, Dec 18, 2017 at 08:53:18AM -0200, Daniel Henrique Barboza wrote:
-> > > > qmp_cpu is a nop that was created a while ago in commit 755f196898
-> > > > ("qapi: Convert the cpu command") for the sake of compatibility,
-> > > > due to the existence of hmp_cpu.
-> > > > 
-> > > > Today, there is no need or requirement to keep it as is. QMP is
-> > > > meant to be as stateless as possible, thus any QMP command that
-> > > > needs a specific monitor CPU setup should provide it in its
-> > > > arguments, instead of relying in the current QMP monitor state.
-> > > > 
-> > > > This patch flags qmp_cpu as deprecated in qemu-doc.texi and changes
-> > > > qmp_cpu body to show a deprecation message if used.
-> > > > 
-> > > > Signed-off-by: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
-> > > > ---
-> > > > Although I've changed the behavior of qmp_cpu to return an error
-> > > > instead of doing nothing, no errors were found in the Travis
-> > > > build of the patch. Code inspection confirms that qmp_cpu isn't
-> > > > being used in QEMU.
-> > > > 
-> > > > A quick inspection in Libvirt code shows that there is no reference
-> > > > to 'qmp_cpu' there either, but to be sure I've CCed Daniel here
-> > > > so he can comment/confirm if Libvirt does not care for this change.
-> > > > 
-> > > >   qemu-doc.texi | 6 ++++++
-> > > >   qmp.c         | 2 +-
-> > > >   2 files changed, 7 insertions(+), 1 deletion(-)
-> > > > 
-> > > > diff --git a/qemu-doc.texi b/qemu-doc.texi
-> > > > index f7317dfc66..2b63f9a325 100644
-> > > > --- a/qemu-doc.texi
-> > > > +++ b/qemu-doc.texi
-> > > > @@ -2516,6 +2516,12 @@ subsystem image.
-> > > >   The ``convert -s snapshot_id_or_name'' argument is obsoleted
-> > > >   by the ``convert -l snapshot_param'' argument instead.
-> > > > +@section System emulator machine protocol commands
-> > > > +
-> > > > +@subsection qmp_cpu (since 2.12.0)
-> > > > +
-> > > > +The ``qmp_cpu'' command is deprecated. Do not use this command.
-> > > Just saying it is deprecated doesn't add any useful info, rather
-> > > explain why it is deprecated & what (if anything) to use instead.
-> > > e.g.
-> > > 
-> > >    The ``qmp_cpu'' command is a functional no-op. There is no reason
-> > >    to invoke this command and it will be removed with no replacement.
-> > 
-> > Thanks, I'll add more info in qemu-doc.texi in the next version.
-> > 
-> > Also, just checked that I didn't touch qapi-schema.json. This is how
-> > it reads about qmp_cpu:
-> > 
-> > 
-> > # This command is a nop that is only provided for the purposes of
-> > compatibility.
-> > #
-> > # Since: 0.14.0
-> > #
-> > # Notes: Do not use this command.
-> > 
-> > Should we change it to mention that the command is deprecated, something
-> > like:
-> > 
-> > # Notes: Do not use this command - it is deprecated and will disappear in
-> > the future.
-> > 
-> > 
-> > Or just adding the deprecation note in qemu-doc.texi is enough?
-> 
-> Lets modify the QAPI file too, since you never know what users will read
-> first !
-+1
+We've had APFS bugs before, if memory serves... perhaps something to do
+with sparse gap handling?
 
-Regards,
--Satheesh.
-> 
-> Regards,
-> Daniel
-> -- 
-> |: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-> |: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-> |: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
-> 
+Do you have the ability to take a "good" conversion of the qcow2 file
+(made on a non-APFS partition) and compare it against the "bad"
+conversion?
+
+Highlighting the differences might inspire some ideas as to where this
+has gone wrong, but at present I don't have an OSX computer to test this
+with, personally.
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1738840
+
+Title:
+  qemu-img convert qcow2 to raw fails on OS X
+
+Status in QEMU:
+  New
+
+Bug description:
+  I try to convert a image from qcow2 to raw and the result is a not bootab=
+le image.
+  I dont know if it is a bug in qemu-img convert or with the image it self.
+
+  See this error report for better readability:
+  https://github.com/coreos/bugs/issues/1121#issuecomment-351968518
+
+  As a reply here they use 2.9.0 version of
+
+  =
+
+  $ qemu-img -V
+  qemu-img version 2.11.0
+  Copyright (c) 2003-2017 Fabrice Bellard and the QEMU Project developers
+
+  $ uname -v
+  Darwin Kernel Version 17.2.0
+
+  $ mount ./
+  /dev/disk1s1 on / (apfs, local, journaled)
+
+  $  wget https://beta.release.core-
+  os.net/amd64-usr/current/coreos_production_openstack_image.img.bz2
+
+  $ date
+  Fri Dec 14 17:15:57 CET 2017
+
+  $ bunzip2 coreos_production_openstack_image.img.bz2
+
+  =
+
+  $ cp -a coreos_production_openstack_image.img.org coreos_production_opens=
+tack_image.img
+
+  $ shasum coreos_production_openstack_image.img.org
+  ae2119c6f0390dc36f247f7016923ea85de5d8e6  coreos_production_openstack_ima=
+ge.img.org
+
+  $ qemu-img convert -f qcow2 -O raw
+  coreos_production_openstack_image.img.org
+  coreos_production_openstack_image.bin
+
+  $ qemu-system-x86_64 -m 256 -nographic -hda coreos_production_openstack_i=
+mage.img -boot c
+  SeaBIOS (version rel-1.11.0-0-g63451fca13-prebuilt.qemu-project.org)
+
+  =
+
+  iPXE (http://ipxe.org) 00:03.0 C980 PCI2.10 PnP PMM+0FF915A0+0FEF15A0 C980
+                                                                           =
+      =
+
+
+  =
+
+  Booting from Hard Disk...
+  GRUB loading....
+  Welcome to GRUB!
+  ....
+
+  $ qemu-system-x86_64 -m 256 -nographic -hda
+  coreos_production_openstack_image.bin -boot c
+
+  SeaBIOS (version rel-1.11.0-0-g63451fca13-prebuilt.qemu-project.org)
+
+  =
+
+  iPXE (http://ipxe.org) 00:03.0 C980 PCI2.10 PnP PMM+0FF915A0+0FEF15A0 C980
+                                                                           =
+      =
+
+
+  =
+
+  Booting from Hard Disk...
+  Boot failed: not a bootable disk
+  ....
+
+  =
+
+  $ head -c 8192 coreos_production_openstack_image.bin | hexdump -C
+  00000000  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  |............=
+....|
+  *
+  00002000
+
+  $ qemu-img info coreos_production_openstack_image.bin
+  image: coreos_production_openstack_image.bin
+  file format: raw
+  virtual size: 8.5G (9116319744 bytes)
+  disk size: 217M
+
+  $ qemu-img info coreos_production_openstack_image.img
+  image: coreos_production_openstack_image.img
+  file format: qcow2
+  virtual size: 8.5G (9116319744 bytes)
+  disk size: 785M
+  cluster_size: 65536
+  Format specific information:
+      compat: 0.10
+      refcount bits: 16
+
+  The same version works on Ubuntu so it looks like its only the Mac
+  version or the new APFS filesystem.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1738840/+subscriptions
