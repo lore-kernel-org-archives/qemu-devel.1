@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34454)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34500)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1eQsHM-0004V3-VW
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 05:04:20 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1eQsHR-0004ZF-PY
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 05:04:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1eQsHM-0001La-98
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 05:04:12 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1eQsHM-0001LB-0I
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 05:04:17 -0500
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Mon, 18 Dec 2017 21:04:04 +1100
-Message-Id: <20171218100404.4427-5-david@gibson.dropbear.id.au>
+Date: Mon, 18 Dec 2017 21:04:03 +1100
+Message-Id: <20171218100404.4427-4-david@gibson.dropbear.id.au>
 In-Reply-To: <20171218100404.4427-1-david@gibson.dropbear.id.au>
 References: <20171218100404.4427-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PATCHv2 4/4] tests/pxe-test: Add some extra tests
+Subject: [Qemu-devel] [PATCHv2 3/4] tests/pxe-test: Test net booting over
+ IPv6 in some cases
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,45 +23,71 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: mst@redhat.com
 Cc: thuth@redhat.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
 
-Previously virtio-net was only tested for ppc64 in "slow" mode.  That
-doesn't make much sense since virtio-net is used much more often in
-practice than the spapr-vlan device which was tested always.  So, move
-virtio-net to always be tested on ppc64.
-
-We had no tests at all for the q35 machine, which doesn't seem wise
-given its increasing prominence.  Add a couple of tests for it,
-including testing the newer e1000e adapter.
+This adds IPv6 net boot testing (in addition to IPv4) when in slow test
+mode on ppc64 or s390.  IPv6 PXE doesn't seem to work on x86, I'm guessing
+our BIOS image doesn't support it.
 
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- tests/pxe-test.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+ tests/pxe-test.c | 26 ++++++++++++++++++++------
+ 1 file changed, 20 insertions(+), 6 deletions(-)
 
 diff --git a/tests/pxe-test.c b/tests/pxe-test.c
-index 18e02c246c..009a82bb97 100644
+index 8c310a8129..18e02c246c 100644
 --- a/tests/pxe-test.c
 +++ b/tests/pxe-test.c
-@@ -31,6 +31,8 @@ typedef struct testdef {
- static testdef_t x86_tests[] = {
-     { "pc", "e1000" },
-     { "pc", "virtio-net-pci" },
-+    { "q35", "e1000e" },
-+    { "q35", "virtio-net-pci", },
-     { NULL },
- };
+@@ -82,7 +82,14 @@ static void test_pxe_ipv4(gconstpointer data)
+     test_pxe_one(test, false);
+ }
  
-@@ -44,11 +46,11 @@ static testdef_t x86_tests_slow[] = {
+-static void test_batch(const testdef_t *tests)
++static void test_pxe_ipv6(gconstpointer data)
++{
++    const testdef_t *test = data;
++
++    test_pxe_one(test, true);
++}
++
++static void test_batch(const testdef_t *tests, bool ipv6)
+ {
+     int i;
  
- static testdef_t ppc64_tests[] = {
-     { "pseries", "spapr-vlan" },
-+    { "pseries", "virtio-net-pci", },
-     { NULL },
- };
+@@ -94,6 +101,13 @@ static void test_batch(const testdef_t *tests)
+                                    test->machine, test->model);
+         qtest_add_data_func(testname, test, test_pxe_ipv4);
+         g_free(testname);
++
++        if (ipv6) {
++            testname = g_strdup_printf("pxe/ipv6/%s/%s",
++                                       test->machine, test->model);
++            qtest_add_data_func(testname, test, test_pxe_ipv6);
++            g_free(testname);
++        }
+     }
+ }
  
- static testdef_t ppc64_tests_slow[] = {
--    { "pseries", "virtio-net-pci", },
-     { "pseries", "e1000" },
-     { NULL },
- };
+@@ -109,17 +123,17 @@ int main(int argc, char *argv[])
+     g_test_init(&argc, &argv, NULL);
+ 
+     if (strcmp(arch, "i386") == 0 || strcmp(arch, "x86_64") == 0) {
+-        test_batch(x86_tests);
++        test_batch(x86_tests, false);
+         if (g_test_slow()) {
+-            test_batch(x86_tests_slow);
++            test_batch(x86_tests_slow, false);
+         }
+     } else if (strcmp(arch, "ppc64") == 0) {
+-        test_batch(ppc64_tests);
++        test_batch(ppc64_tests, g_test_slow());
+         if (g_test_slow()) {
+-            test_batch(ppc64_tests_slow);
++            test_batch(ppc64_tests_slow, true);
+         }
+     } else if (g_str_equal(arch, "s390x")) {
+-        test_batch(s390x_tests);
++        test_batch(s390x_tests, g_test_slow());
+     }
+     ret = g_test_run();
+     boot_sector_cleanup(disk);
 -- 
 2.14.3
