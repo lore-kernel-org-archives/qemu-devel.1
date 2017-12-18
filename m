@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50301)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52722)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcel@redhat.com>) id 1eQxZZ-0002VP-FK
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 10:43:23 -0500
+	(envelope-from <lvivier@redhat.com>) id 1eQxbG-0003cN-AQ
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 10:45:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcel@redhat.com>) id 1eQxZV-0002Ix-D5
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 10:43:21 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:42302)
+	(envelope-from <lvivier@redhat.com>) id 1eQxbA-0003qJ-E8
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 10:45:06 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:41252)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <marcel@redhat.com>) id 1eQxZV-0002HF-04
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 10:43:17 -0500
-References: <20171218151244.9975-1-f4bug@amsat.org>
-	<20171218151244.9975-4-f4bug@amsat.org>
-From: Marcel Apfelbaum <marcel@redhat.com>
-Message-ID: <00f65d06-fcb4-ac56-2247-727891546b9a@redhat.com>
-Date: Mon, 18 Dec 2017 17:43:08 +0200
+	(Exim 4.71) (envelope-from <lvivier@redhat.com>) id 1eQxbA-0003pL-6O
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 10:45:00 -0500
+References: <1513446109-9013-1-git-send-email-stefanb@linux.vnet.ibm.com>
+	<1513446109-9013-26-git-send-email-stefanb@linux.vnet.ibm.com>
+	<8772a2e8-49f8-4674-ff9b-d9df102af52f@redhat.com>
+	<20171218163031.4936361e.cohuck@redhat.com>
+From: Laurent Vivier <lvivier@redhat.com>
+Message-ID: <5b9f0d31-e462-f8dd-1602-7feaa22175d8@redhat.com>
+Date: Mon, 18 Dec 2017 16:44:53 +0100
 MIME-Version: 1.0
-In-Reply-To: <20171218151244.9975-4-f4bug@amsat.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <20171218163031.4936361e.cohuck@redhat.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 3/4] hw/pci-host/xilinx: QOM'ify the
- AXI-PCIe host bridge
+Subject: Re: [Qemu-devel] [PULL v1 25/32] qdev: add DEFINE_PROP_TPMBE
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,70 +30,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, "Michael S. Tsirkin" <mst@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Paul Burton <paul.burton@mips.com>, Yongbok Kim <yongbok.kim@mips.com>, "Edgar E . Iglesias" <edgar.iglesias@gmail.com>, Alistair Francis <alistair.francis@xilinx.com>
-Cc: qemu-devel@nongnu.org, James Hogan <jhogan@kernel.org>
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: Stefan Berger <stefanb@linux.vnet.ibm.com>, qemu-devel@nongnu.org, peter.maydell@linaro.org, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>
 
-On 18/12/2017 17:12, Philippe Mathieu-Daud=C3=A9 wrote:
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-> ---
-> v2: use 'pci_dev' variable, replaced hw_error() -> error_setg()
+On 18/12/2017 16:30, Cornelia Huck wrote:
+> On Mon, 18 Dec 2017 16:10:50 +0100
+> Laurent Vivier <lvivier@redhat.com> wrote:
 >=20
->   hw/pci-host/xilinx-pcie.c | 20 +++++++++-----------
->   1 file changed, 9 insertions(+), 11 deletions(-)
+>> On 16/12/2017 18:41, Stefan Berger wrote:
+>>> From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+>>>
+>>> A property to lookup a tpm backend.
+>>>
+>>> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+>>> Reviewed-by: Stefan Berger <stefanb@linux.vnet.ibm.com>
+>>> Signed-off-by: Stefan Berger <stefanb@linux.vnet.ibm.com>
+>>> ---
+>>>  hw/core/qdev-properties-system.c | 64 ++++++++++++++++++++++++++++++=
+++++++++++
+>>>  include/hw/qdev-properties.h     |  3 ++
+>>>  2 files changed, 67 insertions(+) =20
+>>
+>> This one breaks my build:
+>>
+>> ...
+>>   LINK    ppc64-softmmu/qemu-system-ppc64
+>> ../hw/core/qdev-properties-system.o: In function `release_tpm':
+>> /home/lvivier/qemu/hw/core/qdev-properties-system.c:291: undefined
+>> reference to `tpm_backend_reset'
+>> ../hw/core/qdev-properties-system.o: In function `set_tpm':
+>> /home/lvivier/qemu/hw/core/qdev-properties-system.c:274: undefined
+>> reference to `qemu_find_tpm_be'
+>> /home/lvivier/qemu/hw/core/qdev-properties-system.c:278: undefined
+>> reference to `tpm_backend_init'
+>> collect2: error: ld returned 1 exit status
+>>
+>> The following #ifdef fixes the problem for me:
+>>
+>> diff --git a/hw/core/qdev-properties-system.c
+>> b/hw/core/qdev-properties-system.c
+>> index c173646..b6eca3b 100644
+>> --- a/hw/core/qdev-properties-system.c
+>> +++ b/hw/core/qdev-properties-system.c
+>> @@ -239,6 +239,7 @@ const PropertyInfo qdev_prop_chr =3D {
+>>
+>>  /* --- character device --- */
+>>
+>> +#if defined(CONFIG_TPM)
+>>  static void get_tpm(Object *obj, Visitor *v, const char *name, void
+>> *opaque,
+>>                      Error **errp)
+>>  {
+>> @@ -299,6 +300,7 @@ const PropertyInfo qdev_prop_tpm =3D {
+>>      .set   =3D set_tpm,
+>>      .release =3D release_tpm,
+>>  };
+>> +#endif
+>>
+>>  /* --- netdev device --- */
+>>  static void get_netdev(Object *obj, Visitor *v, const char *name,
+>>
+>> Thanks,
+>> Laurent
+>>
 >=20
-> diff --git a/hw/pci-host/xilinx-pcie.c b/hw/pci-host/xilinx-pcie.c
-> index 7659253090..681fdf486a 100644
-> --- a/hw/pci-host/xilinx-pcie.c
-> +++ b/hw/pci-host/xilinx-pcie.c
-> @@ -267,24 +267,22 @@ static void xilinx_pcie_root_config_write(PCIDevi=
-ce *d, uint32_t address,
->       }
->   }
->  =20
-> -static int xilinx_pcie_root_init(PCIDevice *dev)
-> +static void xilinx_pcie_root_realize(PCIDevice *pci_dev, Error **errp)
->   {
-> -    BusState *bus =3D qdev_get_parent_bus(DEVICE(dev));
-> +    BusState *bus =3D qdev_get_parent_bus(DEVICE(pci_dev));
->       XilinxPCIEHost *s =3D XILINX_PCIE_HOST(bus->parent);
->  =20
-> -    pci_set_word(dev->config + PCI_COMMAND,
-> +    pci_set_word(pci_dev->config + PCI_COMMAND,
->                    PCI_COMMAND_MEMORY | PCI_COMMAND_MASTER);
-> -    pci_set_word(dev->config + PCI_MEMORY_BASE, s->mmio_base >> 16);
-> -    pci_set_word(dev->config + PCI_MEMORY_LIMIT,
-> +    pci_set_word(pci_dev->config + PCI_MEMORY_BASE, s->mmio_base >> 16=
-);
-> +    pci_set_word(pci_dev->config + PCI_MEMORY_LIMIT,
->                    ((s->mmio_base + s->mmio_size - 1) >> 16) & 0xfff0);
->  =20
-> -    pci_bridge_initfn(dev, TYPE_PCI_BUS);
-> +    pci_bridge_initfn(pci_dev, TYPE_PCI_BUS);
->  =20
-> -    if (pcie_endpoint_cap_v1_init(dev, 0x80) < 0) {
-> -        hw_error("Failed to initialize PCIe capability");
-> +    if (pcie_endpoint_cap_v1_init(pci_dev, 0x80) < 0) {
-> +        error_setg(errp, "Failed to initialize PCIe capability");
->       }
-> -
-> -    return 0;
->   }
->  =20
->   static void xilinx_pcie_root_class_init(ObjectClass *klass, void *dat=
-a)
-> @@ -300,7 +298,7 @@ static void xilinx_pcie_root_class_init(ObjectClass=
- *klass, void *data)
->       k->class_id =3D PCI_CLASS_BRIDGE_HOST;
->       k->is_express =3D true;
->       k->is_bridge =3D true;
-> -    k->init =3D xilinx_pcie_root_init;
-> +    k->realize =3D xilinx_pcie_root_realize;
->       k->exit =3D pci_bridge_exitfn;
->       dc->reset =3D pci_bridge_reset;
->       k->config_read =3D xilinx_pcie_root_config_read;
+> This seems to be a popular error today :)
+>=20
+> https://lists.nongnu.org/archive/html/qemu-devel/2017-12/msg03511.html
 >=20
 
-Reviewed-by: Marcel Apfelbaum <marcel@redhat.com>
+Thank you Cornelia, I was hoping someone already posted a patch.
+You win ;)
 
-Thanks,
-Marcel
+Laurent
