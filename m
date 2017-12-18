@@ -1,28 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33769)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34239)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1eQv51-0004Tu-Bs
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 08:03:43 -0500
+	(envelope-from <i.maximets@samsung.com>) id 1eQv5U-0004sE-NK
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 08:04:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1eQv4p-0000yR-UU
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 08:03:39 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:32842)
+	(envelope-from <i.maximets@samsung.com>) id 1eQv5Q-0001R5-Ld
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 08:04:08 -0500
+Received: from mailout2.w1.samsung.com ([210.118.77.12]:43442)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1eQv4p-0000y5-Nk
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 08:03:27 -0500
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id DC617C0AC90E
-	for <qemu-devel@nongnu.org>; Mon, 18 Dec 2017 13:03:26 +0000 (UTC)
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Mon, 18 Dec 2017 14:03:09 +0100
-Message-Id: <20171218130309.2682-1-pbonzini@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v2] checkpatch: volatile with a comment or
- sig_atomic_t is okay
+	(Exim 4.71) (envelope-from <i.maximets@samsung.com>)
+	id 1eQv5Q-0001OB-8A
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 08:04:04 -0500
+From: Ilya Maximets <i.maximets@samsung.com>
+Message-id: <f4c6539b-1266-1602-577d-d4a29efd03d2@samsung.com>
+Date: Mon, 18 Dec 2017 16:03:56 +0300
+MIME-version: 1.0
+In-reply-to: <1513195345-9506-1-git-send-email-mst@redhat.com>
+Content-type: text/plain; charset="utf-8"
+Content-language: en-GB
+Content-transfer-encoding: 7bit
+References: <CGME20171213200345epcas2p16eb8617995e8517ee3ae83e5d72af961@epcas2p1.samsung.com>
+	<1513195345-9506-1-git-send-email-mst@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] virtio_error: don't invoke status callbacks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,46 +29,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: lersek@redhat.com, famz@redhat.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org
+Cc: Maxime Coquelin <maxime.coquelin@redhat.com>
 
-From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+On 13.12.2017 23:03, Michael S. Tsirkin wrote:
+> Backends don't need to know what frontend requested a reset,
+> and notifying then from virtio_error is messy because
+> virtio_error itself might be invoked from backend.
+> 
+> Let's just set the status directly.
+> 
+> Reported-by: Ilya Maximets <i.maximets@samsung.com>
+> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+> ---
+> 
+> Ilya this should fix the crash you are seeing
+I tested it and it really fixes the QEMU crash.
+Thanks. 
 
-This assumes that the comment gives some justification;
-"volatile sig_atomic_t" is also self-explanatory and usually
-correct.
+> but
+> the error itself still shows there's something wrong.
+> So I'd like to defer applying that patch until we
+> figure out what corrupted guest index.
+> 
+> If you know pls let me know!
 
-Discussed in:
-'[Qemu-devel] [PATCH] dump-guest-memory.py: fix "You can't do that withou=
-t a process to debug"'
+It looks like virtio driver crash caused by the same issue that was fixed in recent
+patches from Maxime Coquelin:
 
-Suggested-by: Fam Zheng <famz@redhat.com>
-Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-Message-Id: <20171215181810.4122-1-marcandre.lureau@redhat.com>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- scripts/checkpatch.pl | 7 +++++--
- 1 file changed, 5 insertions(+), 2 deletions(-)
+  2ae39a113af3 ("vhost: restore avail index from vring used index on disconnection")
+  2d4ba6cc741d ("virtio: Add queue interface to restore avail index from vring used index")
 
-diff --git a/scripts/checkpatch.pl b/scripts/checkpatch.pl
-index 34df753571..3dc27d9656 100755
---- a/scripts/checkpatch.pl
-+++ b/scripts/checkpatch.pl
-@@ -2475,8 +2475,11 @@ sub process {
-=20
- # no volatiles please
- 		my $asm_volatile =3D qr{\b(__asm__|asm)\s+(__volatile__|volatile)\b};
--		if ($line =3D~ /\bvolatile\b/ && $line !~ /$asm_volatile/) {
--			ERROR("Use of volatile is usually wrong: see Documentation/volatile-c=
-onsidered-harmful.txt\n" . $herecurr);
-+		if ($line =3D~ /\bvolatile\b/ && $line !~ /$asm_volatile/ &&
-+                    $line !~ /sig_atomic_t/ &&
-+                    !ctx_has_comment($first_line, $linenr)) {
-+			my $msg =3D "Use of volatile is usually wrong, please add a comment\n=
-" . $herecurr;
-+                        ERROR($msg);
- 		}
-=20
- # warn about #if 0
---=20
-2.14.3
+Applying above patches on top of 2.10.1 fixes virtio driver's crash.
+
+> 
+>  hw/virtio/virtio.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
+> index ad564b0..d6002ee 100644
+> --- a/hw/virtio/virtio.c
+> +++ b/hw/virtio/virtio.c
+> @@ -2469,7 +2469,7 @@ void GCC_FMT_ATTR(2, 3) virtio_error(VirtIODevice *vdev, const char *fmt, ...)
+>      va_end(ap);
+>  
+>      if (virtio_vdev_has_feature(vdev, VIRTIO_F_VERSION_1)) {
+> -        virtio_set_status(vdev, vdev->status | VIRTIO_CONFIG_S_NEEDS_RESET);
+> +        vdev->status = vdev->status | VIRTIO_CONFIG_S_NEEDS_RESET;
+>          virtio_notify_config(vdev);
+>      }
+>  
+> 
