@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60200)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60174)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1eR2eg-0002D2-Cw
+	(envelope-from <jcody@redhat.com>) id 1eR2ef-0002CA-Eb
 	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 16:08:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1eR2ef-0003bI-CL
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 16:08:58 -0500
+	(envelope-from <jcody@redhat.com>) id 1eR2ed-0003a1-UB
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 16:08:57 -0500
 From: Jeff Cody <jcody@redhat.com>
-Date: Mon, 18 Dec 2017 16:08:18 -0500
-Message-Id: <20171218210819.31576-10-jcody@redhat.com>
+Date: Mon, 18 Dec 2017 16:08:17 -0500
+Message-Id: <20171218210819.31576-9-jcody@redhat.com>
 In-Reply-To: <20171218210819.31576-1-jcody@redhat.com>
 References: <20171218210819.31576-1-jcody@redhat.com>
-Subject: [Qemu-devel] [PULL 09/10] block/curl: check error return of
- curl_global_init()
+Subject: [Qemu-devel] [PULL 08/10] block/sheepdog: code beautification
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,73 +22,221 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: peter.maydell@linaro.org, jcody@redhat.com, vsementsov@virtuozzo.com, jsnow@redhat.com, qemu-devel@nongnu.org
 
-If curl_global_init() fails, per the documentation no other curl
-functions may be called, so make sure to check the return value.
-
-Also, some minor changes to the initialization latch variable 'inited':
-
-- Make it static in the file, for clarity
-- Change the name for clarity
-- Make it a bool
+No functional changes, just whitespace manipulation.
 
 Signed-off-by: Jeff Cody <jcody@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
-Reviewed-by: Richard W.M. Jones <rjones@redhat.com>
 Reviewed-by: Darren Kenny <darren.kenny@oracle.com>
 Signed-off-by: Jeff Cody <jcody@redhat.com>
 ---
- block/curl.c | 18 ++++++++++++------
- 1 file changed, 12 insertions(+), 6 deletions(-)
+ block/sheepdog.c | 164 +++++++++++++++++++++++++++----------------------------
+ 1 file changed, 82 insertions(+), 82 deletions(-)
 
-diff --git a/block/curl.c b/block/curl.c
-index 2a244e2..00a9879 100644
---- a/block/curl.c
-+++ b/block/curl.c
-@@ -89,6 +89,8 @@ static CURLMcode __curl_multi_socket_action(CURLM *multi_handle,
+diff --git a/block/sheepdog.c b/block/sheepdog.c
+index 459d93a..488bad3 100644
+--- a/block/sheepdog.c
++++ b/block/sheepdog.c
+@@ -400,7 +400,7 @@ typedef struct BDRVSheepdogReopenState {
+     int cache_flags;
+ } BDRVSheepdogReopenState;
  
- struct BDRVCURLState;
+-static const char * sd_strerror(int err)
++static const char *sd_strerror(int err)
+ {
+     int i;
  
-+static bool libcurl_initialized;
-+
- typedef struct CURLAIOCB {
-     Coroutine *co;
-     QEMUIOVector *qiov;
-@@ -686,14 +688,23 @@ static int curl_open(BlockDriverState *bs, QDict *options, int flags,
-     double d;
-     const char *secretid;
-     const char *protocol_delimiter;
-+    int ret;
+@@ -3078,111 +3078,111 @@ static QemuOptsList sd_create_opts = {
+ };
  
--    static int inited = 0;
+ static BlockDriver bdrv_sheepdog = {
+-    .format_name    = "sheepdog",
+-    .protocol_name  = "sheepdog",
+-    .instance_size  = sizeof(BDRVSheepdogState),
+-    .bdrv_parse_filename    = sd_parse_filename,
+-    .bdrv_file_open = sd_open,
+-    .bdrv_reopen_prepare    = sd_reopen_prepare,
+-    .bdrv_reopen_commit     = sd_reopen_commit,
+-    .bdrv_reopen_abort      = sd_reopen_abort,
+-    .bdrv_close     = sd_close,
+-    .bdrv_create    = sd_create,
+-    .bdrv_has_zero_init = bdrv_has_zero_init_1,
+-    .bdrv_getlength = sd_getlength,
++    .format_name                  = "sheepdog",
++    .protocol_name                = "sheepdog",
++    .instance_size                = sizeof(BDRVSheepdogState),
++    .bdrv_parse_filename          = sd_parse_filename,
++    .bdrv_file_open               = sd_open,
++    .bdrv_reopen_prepare          = sd_reopen_prepare,
++    .bdrv_reopen_commit           = sd_reopen_commit,
++    .bdrv_reopen_abort            = sd_reopen_abort,
++    .bdrv_close                   = sd_close,
++    .bdrv_create                  = sd_create,
++    .bdrv_has_zero_init           = bdrv_has_zero_init_1,
++    .bdrv_getlength               = sd_getlength,
+     .bdrv_get_allocated_file_size = sd_get_allocated_file_size,
+-    .bdrv_truncate  = sd_truncate,
++    .bdrv_truncate                = sd_truncate,
  
-     if (flags & BDRV_O_RDWR) {
-         error_setg(errp, "curl block device does not support writes");
-         return -EROFS;
-     }
+-    .bdrv_co_readv  = sd_co_readv,
+-    .bdrv_co_writev = sd_co_writev,
+-    .bdrv_co_flush_to_disk  = sd_co_flush_to_disk,
+-    .bdrv_co_pdiscard = sd_co_pdiscard,
+-    .bdrv_co_get_block_status = sd_co_get_block_status,
++    .bdrv_co_readv                = sd_co_readv,
++    .bdrv_co_writev               = sd_co_writev,
++    .bdrv_co_flush_to_disk        = sd_co_flush_to_disk,
++    .bdrv_co_pdiscard             = sd_co_pdiscard,
++    .bdrv_co_get_block_status     = sd_co_get_block_status,
  
-+    if (!libcurl_initialized) {
-+        ret = curl_global_init(CURL_GLOBAL_ALL);
-+        if (ret) {
-+            error_setg(errp, "libcurl initialization failed with %d", ret);
-+            return -EIO;
-+        }
-+        libcurl_initialized = true;
-+    }
-+
-     qemu_mutex_init(&s->mutex);
-     opts = qemu_opts_create(&runtime_opts, NULL, 0, &error_abort);
-     qemu_opts_absorb_qdict(opts, options, &local_err);
-@@ -772,11 +783,6 @@ static int curl_open(BlockDriverState *bs, QDict *options, int flags,
-         }
-     }
+-    .bdrv_snapshot_create   = sd_snapshot_create,
+-    .bdrv_snapshot_goto     = sd_snapshot_goto,
+-    .bdrv_snapshot_delete   = sd_snapshot_delete,
+-    .bdrv_snapshot_list     = sd_snapshot_list,
++    .bdrv_snapshot_create         = sd_snapshot_create,
++    .bdrv_snapshot_goto           = sd_snapshot_goto,
++    .bdrv_snapshot_delete         = sd_snapshot_delete,
++    .bdrv_snapshot_list           = sd_snapshot_list,
  
--    if (!inited) {
--        curl_global_init(CURL_GLOBAL_ALL);
--        inited = 1;
--    }
--
-     DPRINTF("CURL: Opening %s\n", file);
-     QSIMPLEQ_INIT(&s->free_state_waitq);
-     s->aio_context = bdrv_get_aio_context(bs);
+-    .bdrv_save_vmstate  = sd_save_vmstate,
+-    .bdrv_load_vmstate  = sd_load_vmstate,
++    .bdrv_save_vmstate            = sd_save_vmstate,
++    .bdrv_load_vmstate            = sd_load_vmstate,
+ 
+-    .bdrv_detach_aio_context = sd_detach_aio_context,
+-    .bdrv_attach_aio_context = sd_attach_aio_context,
++    .bdrv_detach_aio_context      = sd_detach_aio_context,
++    .bdrv_attach_aio_context      = sd_attach_aio_context,
+ 
+-    .create_opts    = &sd_create_opts,
++    .create_opts                  = &sd_create_opts,
+ };
+ 
+ static BlockDriver bdrv_sheepdog_tcp = {
+-    .format_name    = "sheepdog",
+-    .protocol_name  = "sheepdog+tcp",
+-    .instance_size  = sizeof(BDRVSheepdogState),
+-    .bdrv_parse_filename    = sd_parse_filename,
+-    .bdrv_file_open = sd_open,
+-    .bdrv_reopen_prepare    = sd_reopen_prepare,
+-    .bdrv_reopen_commit     = sd_reopen_commit,
+-    .bdrv_reopen_abort      = sd_reopen_abort,
+-    .bdrv_close     = sd_close,
+-    .bdrv_create    = sd_create,
+-    .bdrv_has_zero_init = bdrv_has_zero_init_1,
+-    .bdrv_getlength = sd_getlength,
++    .format_name                  = "sheepdog",
++    .protocol_name                = "sheepdog+tcp",
++    .instance_size                = sizeof(BDRVSheepdogState),
++    .bdrv_parse_filename          = sd_parse_filename,
++    .bdrv_file_open               = sd_open,
++    .bdrv_reopen_prepare          = sd_reopen_prepare,
++    .bdrv_reopen_commit           = sd_reopen_commit,
++    .bdrv_reopen_abort            = sd_reopen_abort,
++    .bdrv_close                   = sd_close,
++    .bdrv_create                  = sd_create,
++    .bdrv_has_zero_init           = bdrv_has_zero_init_1,
++    .bdrv_getlength               = sd_getlength,
+     .bdrv_get_allocated_file_size = sd_get_allocated_file_size,
+-    .bdrv_truncate  = sd_truncate,
++    .bdrv_truncate                = sd_truncate,
+ 
+-    .bdrv_co_readv  = sd_co_readv,
+-    .bdrv_co_writev = sd_co_writev,
+-    .bdrv_co_flush_to_disk  = sd_co_flush_to_disk,
+-    .bdrv_co_pdiscard = sd_co_pdiscard,
+-    .bdrv_co_get_block_status = sd_co_get_block_status,
++    .bdrv_co_readv                = sd_co_readv,
++    .bdrv_co_writev               = sd_co_writev,
++    .bdrv_co_flush_to_disk        = sd_co_flush_to_disk,
++    .bdrv_co_pdiscard             = sd_co_pdiscard,
++    .bdrv_co_get_block_status     = sd_co_get_block_status,
+ 
+-    .bdrv_snapshot_create   = sd_snapshot_create,
+-    .bdrv_snapshot_goto     = sd_snapshot_goto,
+-    .bdrv_snapshot_delete   = sd_snapshot_delete,
+-    .bdrv_snapshot_list     = sd_snapshot_list,
++    .bdrv_snapshot_create         = sd_snapshot_create,
++    .bdrv_snapshot_goto           = sd_snapshot_goto,
++    .bdrv_snapshot_delete         = sd_snapshot_delete,
++    .bdrv_snapshot_list           = sd_snapshot_list,
+ 
+-    .bdrv_save_vmstate  = sd_save_vmstate,
+-    .bdrv_load_vmstate  = sd_load_vmstate,
++    .bdrv_save_vmstate            = sd_save_vmstate,
++    .bdrv_load_vmstate            = sd_load_vmstate,
+ 
+-    .bdrv_detach_aio_context = sd_detach_aio_context,
+-    .bdrv_attach_aio_context = sd_attach_aio_context,
++    .bdrv_detach_aio_context      = sd_detach_aio_context,
++    .bdrv_attach_aio_context      = sd_attach_aio_context,
+ 
+-    .create_opts    = &sd_create_opts,
++    .create_opts                  = &sd_create_opts,
+ };
+ 
+ static BlockDriver bdrv_sheepdog_unix = {
+-    .format_name    = "sheepdog",
+-    .protocol_name  = "sheepdog+unix",
+-    .instance_size  = sizeof(BDRVSheepdogState),
+-    .bdrv_parse_filename    = sd_parse_filename,
+-    .bdrv_file_open = sd_open,
+-    .bdrv_reopen_prepare    = sd_reopen_prepare,
+-    .bdrv_reopen_commit     = sd_reopen_commit,
+-    .bdrv_reopen_abort      = sd_reopen_abort,
+-    .bdrv_close     = sd_close,
+-    .bdrv_create    = sd_create,
+-    .bdrv_has_zero_init = bdrv_has_zero_init_1,
+-    .bdrv_getlength = sd_getlength,
++    .format_name                  = "sheepdog",
++    .protocol_name                = "sheepdog+unix",
++    .instance_size                = sizeof(BDRVSheepdogState),
++    .bdrv_parse_filename          = sd_parse_filename,
++    .bdrv_file_open               = sd_open,
++    .bdrv_reopen_prepare          = sd_reopen_prepare,
++    .bdrv_reopen_commit           = sd_reopen_commit,
++    .bdrv_reopen_abort            = sd_reopen_abort,
++    .bdrv_close                   = sd_close,
++    .bdrv_create                  = sd_create,
++    .bdrv_has_zero_init           = bdrv_has_zero_init_1,
++    .bdrv_getlength               = sd_getlength,
+     .bdrv_get_allocated_file_size = sd_get_allocated_file_size,
+-    .bdrv_truncate  = sd_truncate,
++    .bdrv_truncate                = sd_truncate,
+ 
+-    .bdrv_co_readv  = sd_co_readv,
+-    .bdrv_co_writev = sd_co_writev,
+-    .bdrv_co_flush_to_disk  = sd_co_flush_to_disk,
+-    .bdrv_co_pdiscard = sd_co_pdiscard,
+-    .bdrv_co_get_block_status = sd_co_get_block_status,
++    .bdrv_co_readv                = sd_co_readv,
++    .bdrv_co_writev               = sd_co_writev,
++    .bdrv_co_flush_to_disk        = sd_co_flush_to_disk,
++    .bdrv_co_pdiscard             = sd_co_pdiscard,
++    .bdrv_co_get_block_status     = sd_co_get_block_status,
+ 
+-    .bdrv_snapshot_create   = sd_snapshot_create,
+-    .bdrv_snapshot_goto     = sd_snapshot_goto,
+-    .bdrv_snapshot_delete   = sd_snapshot_delete,
+-    .bdrv_snapshot_list     = sd_snapshot_list,
++    .bdrv_snapshot_create         = sd_snapshot_create,
++    .bdrv_snapshot_goto           = sd_snapshot_goto,
++    .bdrv_snapshot_delete         = sd_snapshot_delete,
++    .bdrv_snapshot_list           = sd_snapshot_list,
+ 
+-    .bdrv_save_vmstate  = sd_save_vmstate,
+-    .bdrv_load_vmstate  = sd_load_vmstate,
++    .bdrv_save_vmstate            = sd_save_vmstate,
++    .bdrv_load_vmstate            = sd_load_vmstate,
+ 
+-    .bdrv_detach_aio_context = sd_detach_aio_context,
+-    .bdrv_attach_aio_context = sd_attach_aio_context,
++    .bdrv_detach_aio_context      = sd_detach_aio_context,
++    .bdrv_attach_aio_context      = sd_attach_aio_context,
+ 
+-    .create_opts    = &sd_create_opts,
++    .create_opts                  = &sd_create_opts,
+ };
+ 
+ static void bdrv_sheepdog_init(void)
 -- 
 2.9.5
