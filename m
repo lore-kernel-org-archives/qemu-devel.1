@@ -1,21 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44141)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44182)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1eQzFF-0002XR-Be
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 12:30:31 -0500
+	(envelope-from <armbru@redhat.com>) id 1eQzFG-0002YR-7d
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 12:30:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1eQzFC-0004Xy-1W
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 12:30:29 -0500
-Received: from mail-pg0-x241.google.com ([2607:f8b0:400e:c05::241]:46583)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1eQzFB-0004WI-QV
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 12:30:25 -0500
-Received: by mail-pg0-x241.google.com with SMTP id b11so9404289pgu.13
-	for <qemu-devel@nongnu.org>; Mon, 18 Dec 2017 09:30:25 -0800 (PST)
-From: Richard Henderson <richard.henderson@linaro.org>
-Date: Mon, 18 Dec 2017 09:30:13 -0800
-Message-Id: <20171218173022.18418-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH 0/9] target/arm: Prepatory work for SVE
+	(envelope-from <armbru@redhat.com>) id 1eQzFE-0004bR-2q
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 12:30:30 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:32922)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1eQzFD-0004Zk-SQ
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 12:30:27 -0500
+From: Markus Armbruster <armbru@redhat.com>
+Date: Mon, 18 Dec 2017 18:30:19 +0100
+Message-Id: <20171218173023.21417-7-armbru@redhat.com>
+In-Reply-To: <20171218173023.21417-1-armbru@redhat.com>
+References: <20171218173023.21417-1-armbru@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 06/10] qemu-options: Polish section "TPM device
+ options"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,45 +28,60 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, qemu-arm@nongnu.org
+Cc: Stefan Berger <stefanb@linux.vnet.ibm.com>
 
-This is primarily about changing the representation of env->vfp.regs
-to allow for the larger vector sizes.
+Cc: Stefan Berger <stefanb@linux.vnet.ibm.com>
+Signed-off-by: Markus Armbruster <armbru@redhat.com>
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+---
+ qemu-options.hx | 18 +++++++++---------
+ 1 file changed, 9 insertions(+), 9 deletions(-)
 
-
-r~
-
-
-Richard Henderson (9):
-  target/arm: Mark disas_set_insn_syndrome inline
-  target/arm: Use pointers in crypto helpers
-  target/arm: Use pointers in neon zip/uzp helpers
-  target/arm: Use pointers in neon tbl helper
-  target/arm: Add aa32_vfp_dreg/aa64_vfp_qreg helpers
-  vmstate: Add VMSTATE_UINT64_SUB_ARRAY
-  target/arm: Expand vector registers for SVE
-  target/arm: Add ZCR.LEN to tb->flags
-  target/arm: Add ARM_FEATURE_SVE
-
- include/migration/vmstate.h |   9 ++-
- target/arm/cpu.h            | 127 ++++++++++++++++++++++--------
- target/arm/helper.h         |  46 +++++------
- target/arm/translate.h      |   3 +-
- linux-user/signal.c         |  22 +++---
- target/arm/arch_dump.c      |   8 +-
- target/arm/cpu.c            |   2 +
- target/arm/cpu64.c          |   1 +
- target/arm/crypto_helper.c  | 184 +++++++++++++++++---------------------------
- target/arm/helper-a64.c     |  13 ++--
- target/arm/helper.c         |  32 +++++---
- target/arm/kvm32.c          |   4 +-
- target/arm/kvm64.c          |  31 +++-----
- target/arm/machine.c        |  37 ++++++++-
- target/arm/neon_helper.c    | 162 ++++++++++++++++++++------------------
- target/arm/op_helper.c      |  17 ++--
- target/arm/translate-a64.c  | 106 ++++++++++++-------------
- target/arm/translate.c      | 138 ++++++++++++++++++---------------
- 18 files changed, 510 insertions(+), 432 deletions(-)
-
--- 
-2.14.3
+diff --git a/qemu-options.hx b/qemu-options.hx
+index a173378d98..372cbabb7f 100644
+--- a/qemu-options.hx
++++ b/qemu-options.hx
+@@ -2927,19 +2927,18 @@ The general form of a TPM device option is:
+=20
+ @item -tpmdev @var{backend} ,id=3D@var{id} [,@var{options}]
+ @findex -tpmdev
+-Backend type must be either one of the following:
+-@option{passthrough}, @option{emulator}.
+=20
+ The specific backend type will determine the applicable options.
+ The @code{-tpmdev} option creates the TPM backend and requires a
+ @code{-device} option that specifies the TPM frontend interface model.
+=20
+-Options to each backend are described below.
++Use @code{-tpmdev help} to print all available TPM backend types.
+=20
+-Use 'help' to print all available TPM backend types.
+-@example
+-qemu -tpmdev help
+-@end example
++@end table
++
++The available backends are:
++
++@table @option
+=20
+ @item -tpmdev passthrough, id=3D@var{id}, path=3D@var{path}, cancel-path=
+=3D@var{cancel-path}
+=20
+@@ -2992,10 +2991,11 @@ To create a TPM emulator backend device with char=
+dev socket backend:
+=20
+ @end example
+=20
++ETEXI
++
++STEXI
+ @end table
+-
+ ETEXI
+-
+ DEFHEADING()
+=20
+ #endif
+--=20
+2.13.6
