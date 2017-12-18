@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50615)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50614)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1eR0qd-0006ZT-EG
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 14:13:13 -0500
+	(envelope-from <berrange@redhat.com>) id 1eR0qd-0006ZS-De
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 14:13:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1eR0qa-0005VR-Co
+	(envelope-from <berrange@redhat.com>) id 1eR0qb-0005Wg-HG
 	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 14:13:11 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:50688)
+Received: from mx1.redhat.com ([209.132.183.28]:35920)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1eR0qa-0005UN-1Y
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 14:13:08 -0500
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1eR0qb-0005Vj-9j
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 14:13:09 -0500
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
 	[10.5.11.13])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 30A7734CD
-	for <qemu-devel@nongnu.org>; Mon, 18 Dec 2017 19:13:07 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 7FBEC7EA81
+	for <qemu-devel@nongnu.org>; Mon, 18 Dec 2017 19:13:08 +0000 (UTC)
 From: "Daniel P. Berrange" <berrange@redhat.com>
-Date: Mon, 18 Dec 2017 19:12:27 +0000
-Message-Id: <20171218191228.31018-13-berrange@redhat.com>
+Date: Mon, 18 Dec 2017 19:12:28 +0000
+Message-Id: <20171218191228.31018-14-berrange@redhat.com>
 In-Reply-To: <20171218191228.31018-1-berrange@redhat.com>
 References: <20171218191228.31018-1-berrange@redhat.com>
-Subject: [Qemu-devel] [PATCH v1 12/13] ui: add trace events related to VNC
- client throttling
+Subject: [Qemu-devel] [PATCH v1 13/13] ui: mix misleading comments & return
+ types of VNC I/O helper methods
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,113 +33,169 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Gerd Hoffmann <kraxel@redhat.com>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, P J P <ppandit@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>
 
-The VNC client throttling is quite subtle so will benefit from having trace
-points available for live debugging.
+While the QIOChannel APIs for reading/writing data return ssize_t, with negative
+value indicating an error, the VNC code passes this return value through the
+vnc_client_io_error() method. This detects the error condition, disconnects the
+client and returns 0 to indicate error. Thus all the VNC helper methods should
+return size_t (unsigned), and misleading comments which refer to the possibility
+of negative return values need fixing.
 
 Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
 ---
- ui/trace-events |  7 +++++++
- ui/vnc.c        | 23 +++++++++++++++++++++++
- 2 files changed, 30 insertions(+)
+ ui/vnc-auth-sasl.c |  8 ++++----
+ ui/vnc-auth-sasl.h |  4 ++--
+ ui/vnc.c           | 29 +++++++++++++++--------------
+ ui/vnc.h           |  6 +++---
+ 4 files changed, 24 insertions(+), 23 deletions(-)
 
-diff --git a/ui/trace-events b/ui/trace-events
-index 1a9f126330..85f74f948b 100644
---- a/ui/trace-events
-+++ b/ui/trace-events
-@@ -35,6 +35,13 @@ vnc_client_connect(void *state, void *ioc) "VNC client connect state=%p ioc=%p"
- vnc_client_disconnect_start(void *state, void *ioc) "VNC client disconnect start state=%p ioc=%p"
- vnc_client_disconnect_finish(void *state, void *ioc) "VNC client disconnect finish state=%p ioc=%p"
- vnc_client_io_wrap(void *state, void *ioc, const char *type) "VNC client I/O wrap state=%p ioc=%p type=%s"
-+vnc_client_throttle_threshold(void *state, void *ioc, size_t oldoffset, size_t offset, int client_width, int client_height, int bytes_per_pixel, void *audio_cap) "VNC client throttle threshold state=%p ioc=%p oldoffset=%zu newoffset=%zu width=%d height=%d bpp=%d audio=%p"
-+vnc_client_throttle_incremental(void *state, void *ioc, int job_update, size_t offset) "VNC client throttle incremental state=%p ioc=%p job-update=%d offset=%zu"
-+vnc_client_throttle_forced(void *state, void *ioc, int job_update, size_t offset) "VNC client throttle forced state=%p ioc=%p job-update=%d offset=%zu"
-+vnc_client_throttle_audio(void *state, void *ioc, size_t offset) "VNC client throttle audio state=%p ioc=%p offset=%zu"
-+vnc_client_unthrottle_forced(void *state, void *ioc) "VNC client unthrottle forced offset state=%p ioc=%p"
-+vnc_client_unthrottle_incremental(void *state, void *ioc, size_t offset) "VNC client unthrottle incremental state=%p ioc=%p offset=%zu"
-+vnc_client_output_limit(void *state, void *ioc, size_t offset, size_t threshold) "VNC client output limit state=%p ioc=%p offset=%zu threshold=%zu"
- vnc_auth_init(void *display, int websock, int auth, int subauth) "VNC auth init state=%p websock=%d auth=%d subauth=%d"
- vnc_auth_start(void *state, int method) "VNC client auth start state=%p method=%d"
- vnc_auth_pass(void *state, int method) "VNC client auth passed state=%p method=%d"
-diff --git a/ui/vnc.c b/ui/vnc.c
-index a4f0279cdc..1b5a399dc0 100644
---- a/ui/vnc.c
-+++ b/ui/vnc.c
-@@ -1011,6 +1011,12 @@ static void vnc_update_throttle_offset(VncState *vs)
-      */
-     offset = MAX(offset, 1024 * 1024);
- 
-+    if (vs->throttle_output_offset != offset) {
-+        trace_vnc_client_throttle_threshold(
-+            vs, vs->ioc, vs->throttle_output_offset, offset, vs->client_width,
-+            vs->client_height, vs->client_pf.bytes_per_pixel, vs->audio_cap);
-+    }
-+
-     vs->throttle_output_offset = offset;
+diff --git a/ui/vnc-auth-sasl.c b/ui/vnc-auth-sasl.c
+index 8c1cdde3db..74a5f513f2 100644
+--- a/ui/vnc-auth-sasl.c
++++ b/ui/vnc-auth-sasl.c
+@@ -48,9 +48,9 @@ void vnc_sasl_client_cleanup(VncState *vs)
  }
  
-@@ -1028,6 +1034,8 @@ static bool vnc_should_update(VncState *vs)
-             vs->job_update == VNC_STATE_UPDATE_NONE) {
-             return true;
-         }
-+        trace_vnc_client_throttle_incremental(
-+            vs, vs->ioc, vs->job_update, vs->output.offset);
-         break;
-     case VNC_STATE_UPDATE_FORCE:
-         /* Only allow forced updates if the pending send queue
-@@ -1042,6 +1050,8 @@ static bool vnc_should_update(VncState *vs)
-             vs->job_update == VNC_STATE_UPDATE_NONE) {
-             return true;
-         }
-+        trace_vnc_client_throttle_forced(
-+            vs, vs->ioc, vs->job_update, vs->force_update_offset);
-         break;
-     }
-     return false;
-@@ -1158,6 +1168,8 @@ static void audio_capture(void *opaque, void *buf, int size)
-         vnc_write_u16(vs, VNC_MSG_SERVER_QEMU_AUDIO_DATA);
-         vnc_write_u32(vs, size);
-         vnc_write(vs, buf, size);
-+    } else {
-+        trace_vnc_client_throttle_audio(vs, vs->ioc, vs->output.offset);
-     }
-     vnc_unlock_output(vs);
-     vnc_flush(vs);
-@@ -1328,6 +1340,7 @@ ssize_t vnc_client_write_buf(VncState *vs, const uint8_t *data, size_t datalen)
-  */
- static ssize_t vnc_client_write_plain(VncState *vs)
+ 
+-long vnc_client_write_sasl(VncState *vs)
++size_t vnc_client_write_sasl(VncState *vs)
  {
-+    size_t offset;
+-    long ret;
++    size_t ret;
+ 
+     VNC_DEBUG("Write SASL: Pending output %p size %zd offset %zd "
+               "Encoded: %p size %d offset %d\n",
+@@ -106,9 +106,9 @@ long vnc_client_write_sasl(VncState *vs)
+ }
+ 
+ 
+-long vnc_client_read_sasl(VncState *vs)
++size_t vnc_client_read_sasl(VncState *vs)
+ {
+-    long ret;
++    size_t ret;
+     uint8_t encoded[4096];
+     const char *decoded;
+     unsigned int decodedLen;
+diff --git a/ui/vnc-auth-sasl.h b/ui/vnc-auth-sasl.h
+index b9d8de1c10..2ae224ee3a 100644
+--- a/ui/vnc-auth-sasl.h
++++ b/ui/vnc-auth-sasl.h
+@@ -65,8 +65,8 @@ struct VncDisplaySASL {
+ 
+ void vnc_sasl_client_cleanup(VncState *vs);
+ 
+-long vnc_client_read_sasl(VncState *vs);
+-long vnc_client_write_sasl(VncState *vs);
++size_t vnc_client_read_sasl(VncState *vs);
++size_t vnc_client_write_sasl(VncState *vs);
+ 
+ void start_auth_sasl(VncState *vs);
+ 
+diff --git a/ui/vnc.c b/ui/vnc.c
+index 1b5a399dc0..b0e12ca4dd 100644
+--- a/ui/vnc.c
++++ b/ui/vnc.c
+@@ -1272,7 +1272,7 @@ void vnc_disconnect_finish(VncState *vs)
+     g_free(vs);
+ }
+ 
+-ssize_t vnc_client_io_error(VncState *vs, ssize_t ret, Error **errp)
++size_t vnc_client_io_error(VncState *vs, ssize_t ret, Error **errp)
+ {
+     if (ret <= 0) {
+         if (ret == 0) {
+@@ -1315,9 +1315,9 @@ void vnc_client_error(VncState *vs)
+  *
+  * Returns the number of bytes written, which may be less than
+  * the requested 'datalen' if the socket would block. Returns
+- * -1 on error, and disconnects the client socket.
++ * 0 on I/O error, and disconnects the client socket.
+  */
+-ssize_t vnc_client_write_buf(VncState *vs, const uint8_t *data, size_t datalen)
++size_t vnc_client_write_buf(VncState *vs, const uint8_t *data, size_t datalen)
+ {
+     Error *err = NULL;
      ssize_t ret;
+@@ -1335,13 +1335,13 @@ ssize_t vnc_client_write_buf(VncState *vs, const uint8_t *data, size_t datalen)
+  * will switch the FD poll() handler back to read monitoring.
+  *
+  * Returns the number of bytes written, which may be less than
+- * the buffered output data if the socket would block. Returns
+- * -1 on error, and disconnects the client socket.
++ * the buffered output data if the socket would block.  Returns
++ * 0 on I/O error, and disconnects the client socket.
+  */
+-static ssize_t vnc_client_write_plain(VncState *vs)
++static size_t vnc_client_write_plain(VncState *vs)
+ {
+     size_t offset;
+-    ssize_t ret;
++    size_t ret;
  
  #ifdef CONFIG_VNC_SASL
-@@ -1348,11 +1361,19 @@ static ssize_t vnc_client_write_plain(VncState *vs)
-         return 0;
+     VNC_DEBUG("Write Plain: Pending output %p size %zd offset %zd. Wait SSF %d\n",
+@@ -1442,9 +1442,9 @@ void vnc_read_when(VncState *vs, VncReadEvent *func, size_t expecting)
+  *
+  * Returns the number of bytes read, which may be less than
+  * the requested 'datalen' if the socket would block. Returns
+- * -1 on error, and disconnects the client socket.
++ * 0 on I/O error or EOF, and disconnects the client socket.
+  */
+-ssize_t vnc_client_read_buf(VncState *vs, uint8_t *data, size_t datalen)
++size_t vnc_client_read_buf(VncState *vs, uint8_t *data, size_t datalen)
+ {
+     ssize_t ret;
+     Error *err = NULL;
+@@ -1460,12 +1460,13 @@ ssize_t vnc_client_read_buf(VncState *vs, uint8_t *data, size_t datalen)
+  * when not using any SASL SSF encryption layers. Will read as much
+  * data as possible without blocking.
+  *
+- * Returns the number of bytes read. Returns -1 on error, and
+- * disconnects the client socket.
++ * Returns the number of bytes read, which may be less than
++ * the requested 'datalen' if the socket would block. Returns
++ * 0 on I/O error or EOF, and disconnects the client socket.
+  */
+-static ssize_t vnc_client_read_plain(VncState *vs)
++static size_t vnc_client_read_plain(VncState *vs)
+ {
+-    ssize_t ret;
++    size_t ret;
+     VNC_DEBUG("Read plain %p size %zd offset %zd\n",
+               vs->input.buffer, vs->input.capacity, vs->input.offset);
+     buffer_reserve(&vs->input, 4096);
+@@ -1491,7 +1492,7 @@ static void vnc_jobs_bh(void *opaque)
+  */
+ static int vnc_client_read(VncState *vs)
+ {
+-    ssize_t ret;
++    size_t ret;
  
-     if (ret >= vs->force_update_offset) {
-+        if (vs->force_update_offset != 0) {
-+            trace_vnc_client_unthrottle_forced(vs, vs->ioc);
-+        }
-         vs->force_update_offset = 0;
-     } else {
-         vs->force_update_offset -= ret;
-     }
-+    offset = vs->output.offset;
-     buffer_advance(&vs->output, ret);
-+    if (offset >= vs->throttle_output_offset &&
-+        vs->output.offset < vs->throttle_output_offset) {
-+        trace_vnc_client_unthrottle_incremental(vs, vs->ioc, vs->output.offset);
-+    }
+ #ifdef CONFIG_VNC_SASL
+     if (vs->sasl.conn && vs->sasl.runSSF)
+diff --git a/ui/vnc.h b/ui/vnc.h
+index 3f4cd4d93d..0c33a5f7fe 100644
+--- a/ui/vnc.h
++++ b/ui/vnc.h
+@@ -524,8 +524,8 @@ gboolean vnc_client_io(QIOChannel *ioc,
+                        GIOCondition condition,
+                        void *opaque);
  
-     if (vs->output.offset == 0) {
-         if (vs->ioc_tag) {
-@@ -1549,6 +1570,8 @@ void vnc_write(VncState *vs, const void *data, size_t len)
-     if (vs->throttle_output_offset != 0 &&
-         vs->output.offset > (vs->throttle_output_offset *
-                              VNC_THROTTLE_OUTPUT_LIMIT_SCALE)) {
-+        trace_vnc_client_output_limit(vs, vs->ioc, vs->output.offset,
-+                                      vs->throttle_output_offset);
-         vnc_disconnect_start(vs);
-         return;
-     }
+-ssize_t vnc_client_read_buf(VncState *vs, uint8_t *data, size_t datalen);
+-ssize_t vnc_client_write_buf(VncState *vs, const uint8_t *data, size_t datalen);
++size_t vnc_client_read_buf(VncState *vs, uint8_t *data, size_t datalen);
++size_t vnc_client_write_buf(VncState *vs, const uint8_t *data, size_t datalen);
+ 
+ /* Protocol I/O functions */
+ void vnc_write(VncState *vs, const void *data, size_t len);
+@@ -544,7 +544,7 @@ uint32_t read_u32(uint8_t *data, size_t offset);
+ 
+ /* Protocol stage functions */
+ void vnc_client_error(VncState *vs);
+-ssize_t vnc_client_io_error(VncState *vs, ssize_t ret, Error **errp);
++size_t vnc_client_io_error(VncState *vs, ssize_t ret, Error **errp);
+ 
+ void start_client_init(VncState *vs);
+ void start_auth_vnc(VncState *vs);
 -- 
 2.14.3
