@@ -1,26 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34239)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36513)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <i.maximets@samsung.com>) id 1eQv5U-0004sE-NK
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 08:04:09 -0500
+	(envelope-from <thuth@redhat.com>) id 1eQv8A-0007G4-Fs
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 08:06:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <i.maximets@samsung.com>) id 1eQv5Q-0001R5-Ld
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 08:04:08 -0500
-Received: from mailout2.w1.samsung.com ([210.118.77.12]:43442)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <i.maximets@samsung.com>)
-	id 1eQv5Q-0001OB-8A
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 08:04:04 -0500
-From: Ilya Maximets <i.maximets@samsung.com>
-Message-id: <f4c6539b-1266-1602-577d-d4a29efd03d2@samsung.com>
-Date: Mon, 18 Dec 2017 16:03:56 +0300
-MIME-version: 1.0
-In-reply-to: <1513195345-9506-1-git-send-email-mst@redhat.com>
-Content-type: text/plain; charset="utf-8"
-Content-language: en-GB
-Content-transfer-encoding: 7bit
-References: <CGME20171213200345epcas2p16eb8617995e8517ee3ae83e5d72af961@epcas2p1.samsung.com>
-	<1513195345-9506-1-git-send-email-mst@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] virtio_error: don't invoke status callbacks
+	(envelope-from <thuth@redhat.com>) id 1eQv87-0004A0-87
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 08:06:54 -0500
+References: <1513030760-26245-1-git-send-email-walling@linux.vnet.ibm.com>
+	<1513030760-26245-2-git-send-email-walling@linux.vnet.ibm.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <a6920dc1-f2be-cdd9-ba6e-a341a9e93343@redhat.com>
+Date: Mon, 18 Dec 2017 14:06:39 +0100
+MIME-Version: 1.0
+In-Reply-To: <1513030760-26245-2-git-send-email-walling@linux.vnet.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 1/5] s390-ccw: update libc
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,54 +24,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org
-Cc: Maxime Coquelin <maxime.coquelin@redhat.com>
+To: "Collin L. Walling" <walling@linux.vnet.ibm.com>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org
+Cc: borntraeger@de.ibm.com, frankja@linux.vnet.ibm.com, cohuck@redhat.com, david@redhat.com
 
-On 13.12.2017 23:03, Michael S. Tsirkin wrote:
-> Backends don't need to know what frontend requested a reset,
-> and notifying then from virtio_error is messy because
-> virtio_error itself might be invoked from backend.
-> 
-> Let's just set the status directly.
-> 
-> Reported-by: Ilya Maximets <i.maximets@samsung.com>
-> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+On 11.12.2017 23:19, Collin L. Walling wrote:
+> Moved:
+>   memcmp from bootmap.h to libc.h (renamed from _memcmp)
+>   strlen from sclp.c to libc.h (renamed from _strlen)
+>=20
+> Added C standard functions:
+>   isdigit
+>   atoi
+>=20
+> Added non-C standard function:
+>   itostr
+>=20
+> Signed-off-by: Collin L. Walling <walling@linux.vnet.ibm.com>
+> Acked-by: Christian Borntraeger <borntraeger@de.ibm.com>
+> Reviewed-by: Janosch Frank <frankja@linux.vnet.ibm.com>
 > ---
-> 
-> Ilya this should fix the crash you are seeing
-I tested it and it really fixes the QEMU crash.
-Thanks. 
+>  pc-bios/s390-ccw/Makefile  |  2 +-
+>  pc-bios/s390-ccw/bootmap.c |  4 +--
+>  pc-bios/s390-ccw/bootmap.h | 16 +---------
+>  pc-bios/s390-ccw/libc.c    | 75 ++++++++++++++++++++++++++++++++++++++=
+++++++++
+>  pc-bios/s390-ccw/libc.h    | 31 +++++++++++++++++++
+>  pc-bios/s390-ccw/main.c    | 17 +----------
+>  pc-bios/s390-ccw/sclp.c    | 10 +------
+>  7 files changed, 112 insertions(+), 43 deletions(-)
+>  create mode 100644 pc-bios/s390-ccw/libc.c
+[...]
+> +
+> +/**
+> + * itostr:
+> + * @num: the integer to be converted.
+> + * @str: a pointer to a string to store the conversion.
+> + * @len: the length of the passed string.
+> + *
+> + * Given an integer @num, convert it to a string. The string @str must=
+ be
+> + * allocated beforehand. The resulting string will be null terminated =
+and
+> + * returned.
+> + *
+> + * Returns: the string @str of the converted integer @num.
+> + */
+> +char *itostr(int num, char *str, size_t len)
+> +{
+> +    long num_len =3D 1;
+> +    int tmp =3D num;
+> +    int i;
+> +
+> +    /* Count length of num */
+> +    while ((tmp /=3D 10) > 0) {
+> +        num_len++;
+> +    }
+> +
+> +    /* Check if we have enough space for num and null */
+> +    if (len < num_len) {
+> +        return 0;
+> +    }
 
-> but
-> the error itself still shows there's something wrong.
-> So I'd like to defer applying that patch until we
-> figure out what corrupted guest index.
-> 
-> If you know pls let me know!
+I'm afraid, but I think you've got an off-by-one bug in this code.
 
-It looks like virtio driver crash caused by the same issue that was fixed in recent
-patches from Maxime Coquelin:
+In patch 5, you're using this function like this:
 
-  2ae39a113af3 ("vhost: restore avail index from vring used index on disconnection")
-  2d4ba6cc741d ("virtio: Add queue interface to restore avail index from vring used index")
+    char tmp[4];
 
-Applying above patches on top of 2.10.1 fixes virtio driver's crash.
+    sclp_print(itostr(entries, tmp, sizeof(tmp)));
 
-> 
->  hw/virtio/virtio.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
-> index ad564b0..d6002ee 100644
-> --- a/hw/virtio/virtio.c
-> +++ b/hw/virtio/virtio.c
-> @@ -2469,7 +2469,7 @@ void GCC_FMT_ATTR(2, 3) virtio_error(VirtIODevice *vdev, const char *fmt, ...)
->      va_end(ap);
->  
->      if (virtio_vdev_has_feature(vdev, VIRTIO_F_VERSION_1)) {
-> -        virtio_set_status(vdev, vdev->status | VIRTIO_CONFIG_S_NEEDS_RESET);
-> +        vdev->status = vdev->status | VIRTIO_CONFIG_S_NEEDS_RESET;
->          virtio_notify_config(vdev);
->      }
->  
-> 
+That means if entries is >=3D 1000 for example, num_len is 4 ...
+
+> +    /* Convert int to string */
+> +    for (i =3D num_len - 1; i >=3D 0; i--) {
+> +        str[i] =3D num % 10 + '0';
+> +        num /=3D 10;
+> +    }
+> +
+> +    str[num_len] =3D '\0';
+
+... and then you run into a buffer overflow here.
+
+> +    return str;
+> +}
+
+Maybe it would also make more sense to panic() instead of "return 0"
+since you don't check the return value in patch 5 ?
+
+ Thomas
