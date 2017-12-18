@@ -1,29 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46591)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46644)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1eQrb6-0006Yk-F5
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 04:20:33 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1eQrb9-0006Za-KY
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 04:20:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1eQrb1-0001ii-Hg
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 04:20:32 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:49694)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1eQrb1-0001hs-49
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 04:20:27 -0500
-From: Markus Armbruster <armbru@redhat.com>
-References: <20171213181540.7949-1-danielhb@linux.vnet.ibm.com>
-	<20171213181540.7949-2-danielhb@linux.vnet.ibm.com>
-	<de0c5647-ca81-f5be-db52-9f0d3b173dac@redhat.com>
-	<87ind9xrl6.fsf@dusky.pond.sub.org>
-	<949be39f-d2a9-29b4-d9b7-46378d827161@linux.vnet.ibm.com>
-	<87ind8nlh9.fsf@dusky.pond.sub.org>
-	<bf9ded69-6cf6-f7bf-cfca-a31a6b784211@redhat.com>
-Date: Mon, 18 Dec 2017 10:20:23 +0100
-In-Reply-To: <bf9ded69-6cf6-f7bf-cfca-a31a6b784211@redhat.com> (Paolo
-	Bonzini's message of "Fri, 15 Dec 2017 19:11:14 +0100")
-Message-ID: <87shc8gzoo.fsf@dusky.pond.sub.org>
-MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v1 1/2] qmp.c: (re)implement qmp_cpu
+	(envelope-from <dgibson@ozlabs.org>) id 1eQrb7-0001nh-SG
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 04:20:35 -0500
+From: David Gibson <david@gibson.dropbear.id.au>
+Date: Mon, 18 Dec 2017 20:20:21 +1100
+Message-Id: <20171218092024.21645-4-david@gibson.dropbear.id.au>
+In-Reply-To: <20171218092024.21645-1-david@gibson.dropbear.id.au>
+References: <20171218092024.21645-1-david@gibson.dropbear.id.au>
+Subject: [Qemu-devel] [PATCH 3/6] spapr: Validate capabilities on migration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,32 +19,219 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>, qemu-devel@nongnu.org, dgilbert@redhat.com
+To: surajjs@au1.ibm.com, groug@kaod.org, lvivier@redhat.com
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, mdroth@linux.vnet.ibm.com, abologna@redhat.com, David Gibson <david@gibson.dropbear.id.au>
 
-Paolo Bonzini <pbonzini@redhat.com> writes:
+Now that the "pseries" machine type implements optional capabilities (well,
+one so far) there's the possibility of having different capabilities
+available at either end of a migration.  Although arguably a user error,
+it would be nice to catch this situation and fail as gracefully as we can.
 
-> On 15/12/2017 14:56, Markus Armbruster wrote:
->> 
->> Paolo, we have numerous Features/ pages, and I suspect many of them are
->> too outdated to serve any purpose but confusing readers.  In theory,
->> "somebody" could go through them to identify stale ones.  In practice,
->> "somebody" doesn't exist, I'm afraid.  Should we summarily delete
->> Features/ pages that haven't seen an update in say more than a year?  Or
->> at least mark them as obsolete somehow?
->
-> Plenty of them are marked as complete or obsolete:
->
-> https://wiki.qemu.org/Category:Completed_feature_pages
-> https://wiki.qemu.org/Category:Obsolete_feature_pages
+This adds code to migrate the capabilities flags.  These aren't pulled
+directly into the destination's configuration since what the user has
+specified on the destination command line should take precedence.  However,
+they are checked against the destination capabilities.
 
-I see.
+If the source was using a capability which is absent on the destination,
+we fail the migration, since that could easily cause a guest crash or other
+bad behaviour.  If the source lacked a capability which is present on the
+destination we warn, but allow the migration to proceed.
 
-> Last time I cleaned them up, I couldn't quite decide if some were
-> completed or obsolete, and QAPI is one of them.
+Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+---
+ hw/ppc/spapr.c         |  6 ++++
+ hw/ppc/spapr_caps.c    | 96 ++++++++++++++++++++++++++++++++++++++++++++++++--
+ include/hw/ppc/spapr.h |  6 ++++
+ 3 files changed, 105 insertions(+), 3 deletions(-)
 
-Probably because Features/QAPI is both: it was completed long ago, less
-a number of ideas described in this page.
-
-The page should be updated accordingly.  I'll try to find time for it,
-but don't hold your breath.
+diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+index f8fee8ebcf..86fc83f9c2 100644
+--- a/hw/ppc/spapr.c
++++ b/hw/ppc/spapr.c
+@@ -1589,6 +1589,11 @@ static int spapr_post_load(void *opaque, int version_id)
+     sPAPRMachineState *spapr = (sPAPRMachineState *)opaque;
+     int err = 0;
+ 
++    err = spapr_caps_post_migration(spapr);
++    if (err) {
++        return err;
++    }
++
+     if (!object_dynamic_cast(OBJECT(spapr->ics), TYPE_ICS_KVM)) {
+         CPUState *cs;
+         CPU_FOREACH(cs) {
+@@ -1755,6 +1760,7 @@ static const VMStateDescription vmstate_spapr = {
+         &vmstate_spapr_ov5_cas,
+         &vmstate_spapr_patb_entry,
+         &vmstate_spapr_pending_events,
++        &vmstate_spapr_caps,
+         NULL
+     }
+ };
+diff --git a/hw/ppc/spapr_caps.c b/hw/ppc/spapr_caps.c
+index 2f0ef98670..a8c726a88b 100644
+--- a/hw/ppc/spapr_caps.c
++++ b/hw/ppc/spapr_caps.c
+@@ -22,6 +22,7 @@
+  * THE SOFTWARE.
+  */
+ #include "qemu/osdep.h"
++#include "qemu/error-report.h"
+ #include "qapi/error.h"
+ #include "qapi/visitor.h"
+ #include "sysemu/hw_accel.h"
+@@ -83,6 +84,93 @@ static sPAPRCapabilities default_caps_with_cpu(sPAPRMachineState *spapr,
+     return caps;
+ }
+ 
++static bool spapr_caps_needed(void *opaque)
++{
++    sPAPRMachineState *spapr = opaque;
++
++    return (spapr->forced_caps.mask != 0) || (spapr->forbidden_caps.mask != 0);
++}
++
++/* This has to be called from the top-level spapr post_load, not the
++ * caps specific one.  Otherwise it wouldn't be called when the source
++ * caps are all defaults, which could still conflict with overridden
++ * caps on the destination */
++int spapr_caps_post_migration(sPAPRMachineState *spapr)
++{
++    uint64_t allcaps = 0;
++    int i;
++    bool ok = true;
++    sPAPRCapabilities dstcaps = spapr->effective_caps;
++    sPAPRCapabilities srccaps;
++
++    srccaps = default_caps_with_cpu(spapr, first_cpu);
++    srccaps.mask |= spapr->mig_forced_caps.mask;
++    srccaps.mask &= ~spapr->mig_forbidden_caps.mask;
++
++    for (i = 0; i < ARRAY_SIZE(capability_table); i++) {
++        sPAPRCapabilityInfo *info = &capability_table[i];
++
++        allcaps |= info->flag;
++
++        if ((srccaps.mask & info->flag) && !(dstcaps.mask & info->flag)) {
++            error_report("cap-%s=on in incoming stream, but off in destination",
++                         info->name);
++            ok = false;
++        }
++
++        if (!(srccaps.mask & info->flag) && (dstcaps.mask & info->flag)) {
++            warn_report("cap-%s=off in incoming stream, but on in destination",
++                         info->name);
++        }
++    }
++
++    if (spapr->mig_forced_caps.mask & ~allcaps) {
++        error_report(
++            "Unknown capabilities 0x%"PRIx64" enabled in incoming stream",
++            spapr->mig_forced_caps.mask & ~allcaps);
++        ok = false;
++    }
++    if (spapr->mig_forbidden_caps.mask & ~allcaps) {
++        warn_report(
++            "Unknown capabilities 0x%"PRIx64" disabled in incoming stream",
++            spapr->mig_forbidden_caps.mask & ~allcaps);
++    }
++
++    return ok ? 0 : -EINVAL;
++}
++
++static int spapr_caps_pre_save(void *opaque)
++{
++    sPAPRMachineState *spapr = opaque;
++
++    spapr->mig_forced_caps = spapr->forced_caps;
++    spapr->mig_forbidden_caps = spapr->forbidden_caps;
++    return 0;
++}
++
++static int spapr_caps_pre_load(void *opaque)
++{
++    sPAPRMachineState *spapr = opaque;
++
++    spapr->mig_forced_caps = spapr_caps(0);
++    spapr->mig_forbidden_caps = spapr_caps(0);
++    return 0;
++}
++
++const VMStateDescription vmstate_spapr_caps = {
++    .name = "spapr/caps",
++    .version_id = 1,
++    .minimum_version_id = 1,
++    .needed = spapr_caps_needed,
++    .pre_save = spapr_caps_pre_save,
++    .pre_load = spapr_caps_pre_load,
++    .fields = (VMStateField[]) {
++        VMSTATE_UINT64(mig_forced_caps.mask, sPAPRMachineState),
++        VMSTATE_UINT64(mig_forbidden_caps.mask, sPAPRMachineState),
++        VMSTATE_END_OF_LIST()
++    },
++};
++
+ void spapr_caps_reset(sPAPRMachineState *spapr)
+ {
+     Error *local_err = NULL;
+@@ -92,6 +180,11 @@ void spapr_caps_reset(sPAPRMachineState *spapr)
+     /* First compute the actual set of caps we're running with.. */
+     caps = default_caps_with_cpu(spapr, first_cpu);
+ 
++    /* Remove unnecessary forced/forbidden bits (this will help us
++     * with migration) */
++    spapr->forced_caps.mask &= ~caps.mask;
++    spapr->forbidden_caps.mask &= caps.mask;
++
+     caps.mask |= spapr->forced_caps.mask;
+     caps.mask &= ~spapr->forbidden_caps.mask;
+ 
+@@ -176,9 +269,6 @@ void spapr_caps_validate(sPAPRMachineState *spapr, Error **errp)
+         error_setg(errp, "Some sPAPR capabilities set both on and off");
+         return;
+     }
+-
+-    /* Check for any caps incompatible with other caps.  Nothing to do
+-     * yet */
+ }
+ 
+ void spapr_caps_add_properties(sPAPRMachineClass *smc, Error **errp)
+diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
+index dc64f4ebcb..5c85f39c3b 100644
+--- a/include/hw/ppc/spapr.h
++++ b/include/hw/ppc/spapr.h
+@@ -54,6 +54,8 @@ typedef enum {
+  * Capabilities
+  */
+ 
++/* These bits go in the migration stream, so they can't be reassigned */
++
+ /* Hardware Transactional Memory */
+ #define SPAPR_CAP_HTM               0x0000000000000001ULL
+ 
+@@ -142,6 +144,7 @@ struct sPAPRMachineState {
+     const char *icp_type;
+ 
+     sPAPRCapabilities forced_caps, forbidden_caps;
++    sPAPRCapabilities mig_forced_caps, mig_forbidden_caps;
+     sPAPRCapabilities effective_caps;
+ };
+ 
+@@ -743,6 +746,8 @@ qemu_irq spapr_qirq(sPAPRMachineState *spapr, int irq);
+ /*
+  * Handling of optional capabilities
+  */
++extern const VMStateDescription vmstate_spapr_caps;
++
+ static inline sPAPRCapabilities spapr_caps(uint64_t mask)
+ {
+     sPAPRCapabilities caps = { mask };
+@@ -757,5 +762,6 @@ static inline bool spapr_has_cap(sPAPRMachineState *spapr, uint64_t cap)
+ void spapr_caps_reset(sPAPRMachineState *spapr);
+ void spapr_caps_validate(sPAPRMachineState *spapr, Error **errp);
+ void spapr_caps_add_properties(sPAPRMachineClass *smc, Error **errp);
++int spapr_caps_post_migration(sPAPRMachineState *spapr);
+ 
+ #endif /* HW_SPAPR_H */
+-- 
+2.14.3
