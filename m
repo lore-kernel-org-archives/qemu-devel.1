@@ -1,26 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40407)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43023)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1eQw8t-0004Br-54
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 09:11:50 -0500
+	(envelope-from <mjt@tls.msk.ru>) id 1eQwAf-0005UB-JE
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 09:13:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1eQw8j-0005uG-Ts
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 09:11:43 -0500
-Received: from mail-wm0-x229.google.com ([2a00:1450:400c:c09::229]:38160)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1eQw8j-0005rD-F9
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 09:11:33 -0500
-Received: by mail-wm0-x229.google.com with SMTP id 64so29592371wme.3
-	for <qemu-devel@nongnu.org>; Mon, 18 Dec 2017 06:11:33 -0800 (PST)
+	(envelope-from <mjt@tls.msk.ru>) id 1eQwAd-0007z3-0H
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 09:13:33 -0500
+From: Michael Tokarev <mjt@tls.msk.ru>
+Date: Mon, 18 Dec 2017 17:13:26 +0300
+Message-Id: <cover.1513606137.git.mjt@msgid.tls.msk.ru>
 MIME-Version: 1.0
-In-Reply-To: <20171218140002.23677-1-cohuck@redhat.com>
-References: <20171218140002.23677-1-cohuck@redhat.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Mon, 18 Dec 2017 15:11:31 +0100
-Message-ID: <CAJ+F1CKAzoyg4C1-LDJNv-j8YigxzE8DvGZE2UiEh3iTj8zhhQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=UTF-8
+References: <cover.1513545944.git.mjt@msgid.tls.msk.ru>
+In-Reply-To: <cover.1513545944.git.mjt@msgid.tls.msk.ru>
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] tpm: move qdev_prop_tpm to hw/tpm/
+Subject: [Qemu-devel] [PULL v3 00/60] Trivial patches for 2017-12-18
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,246 +22,273 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: Stefan Berger <stefanb@linux.vnet.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>, Thomas Huth <thuth@redhat.com>, QEMU <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
+Cc: Michael Tokarev <mjt@tls.msk.ru>, qemu-trivial@nongnu.org
 
-On Mon, Dec 18, 2017 at 3:00 PM, Cornelia Huck <cohuck@redhat.com> wrote:
-> Building with --disable-tpm yields
->
-> ../hw/core/qdev-properties-system.o: In function `set_tpm':
-> /home/cohuck/git/qemu/hw/core/qdev-properties-system.c:274: undefined ref=
-erence to `qemu_find_tpm_be'
-> /home/cohuck/git/qemu/hw/core/qdev-properties-system.c:278: undefined ref=
-erence to `tpm_backend_init'
-> ../hw/core/qdev-properties-system.o: In function `release_tpm':
-> /home/cohuck/git/qemu/hw/core/qdev-properties-system.c:291: undefined ref=
-erence to `tpm_backend_reset'
->
-> Move the implementation of DEFINE_PROP_TPMBE to hw/tpm/ so that it is
-> only built when tpm is actually configured.
->
-> Fixes: 493b78303532 ("qdev: add DEFINE_PROP_TPMBE")
-> Reported-by: Thomas Huth <thuth@redhat.com>
-> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+Here's another, 3rd, attempt for a pull request for the trivial-patches
+tree. Not resending whole thing once again.
 
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+I've removed the patch that caused previous failure, which was
+=C2=ABhw/alpha/typhoon: simplify using the "unimplemented" sysbus device=C2=
+=BB,
+and updated another patch, =C2=ABhw/tpm: remove old i386 dependency=C2=BB
+to resolve slight resolve conflicts, also rebased on top of current maste=
+r.
 
+Please consider pulling.
 
-> ---
->  hw/core/qdev-properties-system.c | 64 ----------------------------------=
-----
->  hw/tpm/tpm_util.c                | 67 ++++++++++++++++++++++++++++++++++=
-++++++
->  hw/tpm/tpm_util.h                |  3 ++
->  include/hw/qdev-properties.h     |  2 --
->  4 files changed, 70 insertions(+), 66 deletions(-)
->
-> diff --git a/hw/core/qdev-properties-system.c b/hw/core/qdev-properties-s=
-ystem.c
-> index c17364655c..ec10da7424 100644
-> --- a/hw/core/qdev-properties-system.c
-> +++ b/hw/core/qdev-properties-system.c
-> @@ -21,7 +21,6 @@
->  #include "net/hub.h"
->  #include "qapi/visitor.h"
->  #include "chardev/char-fe.h"
-> -#include "sysemu/tpm_backend.h"
->  #include "sysemu/iothread.h"
->
->  static void get_pointer(Object *obj, Visitor *v, Property *prop,
-> @@ -237,69 +236,6 @@ const PropertyInfo qdev_prop_chr =3D {
->      .release =3D release_chr,
->  };
->
-> -/* --- character device --- */
-> -
-> -static void get_tpm(Object *obj, Visitor *v, const char *name, void *opa=
-que,
-> -                    Error **errp)
-> -{
-> -    DeviceState *dev =3D DEVICE(obj);
-> -    TPMBackend **be =3D qdev_get_prop_ptr(dev, opaque);
-> -    char *p;
-> -
-> -    p =3D g_strdup(*be ? (*be)->id : "");
-> -    visit_type_str(v, name, &p, errp);
-> -    g_free(p);
-> -}
-> -
-> -static void set_tpm(Object *obj, Visitor *v, const char *name, void *opa=
-que,
-> -                    Error **errp)
-> -{
-> -    DeviceState *dev =3D DEVICE(obj);
-> -    Error *local_err =3D NULL;
-> -    Property *prop =3D opaque;
-> -    TPMBackend *s, **be =3D qdev_get_prop_ptr(dev, prop);
-> -    char *str;
-> -
-> -    if (dev->realized) {
-> -        qdev_prop_set_after_realize(dev, name, errp);
-> -        return;
-> -    }
-> -
-> -    visit_type_str(v, name, &str, &local_err);
-> -    if (local_err) {
-> -        error_propagate(errp, local_err);
-> -        return;
-> -    }
-> -
-> -    s =3D qemu_find_tpm_be(str);
-> -    if (s =3D=3D NULL) {
-> -        error_setg(errp, "Property '%s.%s' can't find value '%s'",
-> -                   object_get_typename(obj), prop->name, str);
-> -    } else if (tpm_backend_init(s, TPM_IF(obj), errp) =3D=3D 0) {
-> -        *be =3D s; /* weak reference, avoid cyclic ref */
-> -    }
-> -    g_free(str);
-> -}
-> -
-> -static void release_tpm(Object *obj, const char *name, void *opaque)
-> -{
-> -    DeviceState *dev =3D DEVICE(obj);
-> -    Property *prop =3D opaque;
-> -    TPMBackend **be =3D qdev_get_prop_ptr(dev, prop);
-> -
-> -    if (*be) {
-> -        tpm_backend_reset(*be);
-> -    }
-> -}
-> -
-> -const PropertyInfo qdev_prop_tpm =3D {
-> -    .name  =3D "str",
-> -    .description =3D "ID of a tpm to use as a backend",
-> -    .get   =3D get_tpm,
-> -    .set   =3D set_tpm,
-> -    .release =3D release_tpm,
-> -};
-> -
->  /* --- netdev device --- */
->  static void get_netdev(Object *obj, Visitor *v, const char *name,
->                         void *opaque, Error **errp)
-> diff --git a/hw/tpm/tpm_util.c b/hw/tpm/tpm_util.c
-> index a317243a7e..17cafbe6b3 100644
-> --- a/hw/tpm/tpm_util.c
-> +++ b/hw/tpm/tpm_util.c
-> @@ -21,9 +21,13 @@
->
->  #include "qemu/osdep.h"
->  #include "qemu/error-report.h"
-> +#include "qapi/error.h"
-> +#include "qapi/visitor.h"
->  #include "tpm_util.h"
->  #include "tpm_int.h"
->  #include "exec/memory.h"
-> +#include "sysemu/tpm_backend.h"
-> +#include "hw/qdev.h"
->
->  #define DEBUG_TPM 0
->
-> @@ -33,6 +37,69 @@
->      } \
->  } while (0)
->
-> +/* tpm backend property */
-> +
-> +static void get_tpm(Object *obj, Visitor *v, const char *name, void *opa=
-que,
-> +                    Error **errp)
-> +{
-> +    DeviceState *dev =3D DEVICE(obj);
-> +    TPMBackend **be =3D qdev_get_prop_ptr(dev, opaque);
-> +    char *p;
-> +
-> +    p =3D g_strdup(*be ? (*be)->id : "");
-> +    visit_type_str(v, name, &p, errp);
-> +    g_free(p);
-> +}
-> +
-> +static void set_tpm(Object *obj, Visitor *v, const char *name, void *opa=
-que,
-> +                    Error **errp)
-> +{
-> +    DeviceState *dev =3D DEVICE(obj);
-> +    Error *local_err =3D NULL;
-> +    Property *prop =3D opaque;
-> +    TPMBackend *s, **be =3D qdev_get_prop_ptr(dev, prop);
-> +    char *str;
-> +
-> +    if (dev->realized) {
-> +        qdev_prop_set_after_realize(dev, name, errp);
-> +        return;
-> +    }
-> +
-> +    visit_type_str(v, name, &str, &local_err);
-> +    if (local_err) {
-> +        error_propagate(errp, local_err);
-> +        return;
-> +    }
-> +
-> +    s =3D qemu_find_tpm_be(str);
-> +    if (s =3D=3D NULL) {
-> +        error_setg(errp, "Property '%s.%s' can't find value '%s'",
-> +                   object_get_typename(obj), prop->name, str);
-> +    } else if (tpm_backend_init(s, TPM_IF(obj), errp) =3D=3D 0) {
-> +        *be =3D s; /* weak reference, avoid cyclic ref */
-> +    }
-> +    g_free(str);
-> +}
-> +
-> +static void release_tpm(Object *obj, const char *name, void *opaque)
-> +{
-> +    DeviceState *dev =3D DEVICE(obj);
-> +    Property *prop =3D opaque;
-> +    TPMBackend **be =3D qdev_get_prop_ptr(dev, prop);
-> +
-> +    if (*be) {
-> +        tpm_backend_reset(*be);
-> +    }
-> +}
-> +
-> +const PropertyInfo qdev_prop_tpm =3D {
-> +    .name  =3D "str",
-> +    .description =3D "ID of a tpm to use as a backend",
-> +    .get   =3D get_tpm,
-> +    .set   =3D set_tpm,
-> +    .release =3D release_tpm,
-> +};
-> +
->  /*
->   * Write an error message in the given output buffer.
->   */
-> diff --git a/hw/tpm/tpm_util.h b/hw/tpm/tpm_util.h
-> index 1c17e3913b..2393b6bc0e 100644
-> --- a/hw/tpm/tpm_util.h
-> +++ b/hw/tpm/tpm_util.h
-> @@ -39,4 +39,7 @@ static inline uint32_t tpm_cmd_get_size(const void *b)
->  int tpm_util_get_buffer_size(int tpm_fd, TPMVersion tpm_version,
->                               size_t *buffersize);
->
-> +#define DEFINE_PROP_TPMBE(_n, _s, _f)                     \
-> +    DEFINE_PROP(_n, _s, _f, qdev_prop_tpm, TPMBackend *)
-> +
->  #endif /* TPM_TPM_UTIL_H */
-> diff --git a/include/hw/qdev-properties.h b/include/hw/qdev-properties.h
-> index 4d24cdf8d6..60b42ac561 100644
-> --- a/include/hw/qdev-properties.h
-> +++ b/include/hw/qdev-properties.h
-> @@ -187,8 +187,6 @@ extern const PropertyInfo qdev_prop_link;
->
->  #define DEFINE_PROP_CHR(_n, _s, _f)             \
->      DEFINE_PROP(_n, _s, _f, qdev_prop_chr, CharBackend)
-> -#define DEFINE_PROP_TPMBE(_n, _s, _f)                     \
-> -    DEFINE_PROP(_n, _s, _f, qdev_prop_tpm, TPMBackend *)
->  #define DEFINE_PROP_STRING(_n, _s, _f)             \
->      DEFINE_PROP(_n, _s, _f, qdev_prop_string, char*)
->  #define DEFINE_PROP_NETDEV(_n, _s, _f)             \
-> --
-> 2.13.6
->
->
+Thanks,
 
+/mjt
 
+The following changes since commit 411ad78115ebeb3411cf4b7622784b93dfabe2=
+59:
 
---=20
-Marc-Andr=C3=A9 Lureau
+  Merge remote-tracking branch 'remotes/stefanberger/tags/pull-tpm-2017-1=
+2-15-1' into staging (2017-12-17 15:27:41 +0000)
+
+are available in the git repository at:
+
+  git://git.corpit.ru/qemu.git tags/trivial-patches-fetch
+
+for you to fetch changes up to c0578de60fcc3a07a881e9c4b7b8262faf6abbc7:
+
+  misc: drop old i386 dependency (2017-12-18 17:07:03 +0300)
+
+----------------------------------------------------------------
+trivial patches for 2017-12-18
+
+----------------------------------------------------------------
+Daniel Henrique Barboza (1):
+      configure: check $CC available before verifying host CPU
+
+Emilio G. Cota (3):
+      disas/arm: fix 'instuction' typo in comment
+      translate-all: fix 'consisits' typo in comment
+      qht: fix kernel-doc markup in qht.h
+
+Ladi Prosek (1):
+      Remove empty statements
+
+Marc-Andr=C3=A9 Lureau (2):
+      .gitignore: remove vscclient
+      memory: remove unused memory_region_set_global_locking()
+
+Michael McConville (1):
+      mmap(2) returns MAP_FAILED, not NULL, on failure
+
+Mike Frysinger (1):
+      build: fix typo in error message
+
+Peter Maydell (1):
+      accel/tcg/cpu-exec-common.c: Remove unnecessary include of memory-i=
+nternal.h
+
+Philippe Mathieu-Daud=C3=A9 (48):
+      Makefile: use $(MAKE) variable
+      Makefile: add more targets to the UNCHECKED_GOALS rule
+      MAINTAINERS: add "hw/registerfields.h" in Register API entry
+      hw/registerfields: fix a typo in the FIELD() documentation
+      hw/registerfields: add 64-bit extract/deposit macros
+      hw/registerfields: add missing include
+      MAINTAINERS: add entries for i2c/ppc4xx
+      MAINTAINERS: add an entry for the i82374 (southbridge)
+      MAINTAINERS: add an entry for the i8257 (DMA controller)
+      MAINTAINERS: add an entry for the i82378 (superio)
+      MAINTAINERS: add an entry for watchdog/wdt_ib700
+      MAINTAINERS: add an entry for input/pckbd.c
+      MAINTAINERS: add entries for timer/m48t59
+      MAINTAINERS: add missing entry for include/hw/net/
+      hw: use "qemu/osdep.h" as first #include in source files
+      hw: remove "qemu/osdep.h" from header files
+      block: remove "qemu/osdep.h" from header file
+      misc: remove headers implicitly included
+      misc: remove duplicated includes
+      ppc: remove duplicated includes
+      i386/hax: remove duplicated includes
+      i386/hax: remove duplicated include
+      nios2: remove duplicated includes (in code commented out)
+      misc: avoid "include/" in include path
+      numa: remove unused #include
+      hw/input/vmmouse: remove unused #include
+      hw/misc/pvpanic: remove unused #include
+      hw/ssi/aspeed_smc: remove unused #include
+      amd_iommu: avoid needless includes in header file
+      misc: remove old i386 dependency
+      hw/ide: remove old i386 dependency
+      hw/ipmi: remove old i386 dependency
+      hw/i2c: remove old i386 dependency
+      hw/tpm: remove old i386 dependency
+      hw/virtio-balloon: remove old i386 dependency
+      hw/unicore32: restrict hw addr defines to source file
+      hw/timer/i8254: rename pit_init() -> i8254_pit_init()
+      hw/timer/mc146818: rename rtc_init() -> mc146818_rtc_init()
+      hw/acpi: ACPI_PM_* defines are not restricted to i386 arch
+      hw/acpi/ich9: extract ACPI_PM_PROP_TCO_ENABLED from i386/pc
+      hw/display/vga: "vga.h" only contains registers defs, rename it "vg=
+a_regs.h"
+      hw/display/vga: "vga_int.h" requires "ui/console.h"
+      hw/display/vga: extract public API from i386/pc to "hw/display/vga.=
+h"
+      hw/net/ne2000: extract ne2k-isa code from i386/pc to ne2000-isa.c
+      hw/misc/pvpanic: extract public API from i386/pc to "hw/misc/pvpani=
+c.h"
+      i386/pc: move vmport.c to hw/i386/
+      i386/pc: move vmmouse.c to hw/i386/
+      misc: drop old i386 dependency
+
+Tao Wu (1):
+      hw/input/hid: Add support for several keys.
+
+Vicente Jimenez Aguilar (1):
+      Document pretty parameter for mon option
+
+ .gitignore                          |  1 -
+ MAINTAINERS                         | 14 ++++++++++-
+ Makefile                            | 11 +++++----
+ accel/tcg/cpu-exec-common.c         |  1 -
+ accel/tcg/translate-all.c           |  3 +--
+ block/dmg.h                         |  1 -
+ bsd-user/main.c                     |  1 -
+ chardev/wctablet.c                  |  4 ----
+ configure                           | 25 ++++++++++---------
+ disas/arm.c                         |  2 +-
+ disas/nios2.c                       |  3 ---
+ exec.c                              |  3 ---
+ hw/acpi/core.c                      |  1 -
+ hw/acpi/ipmi-stub.c                 |  1 +
+ hw/alpha/dp264.c                    |  4 ++--
+ hw/arm/spitz.c                      |  1 -
+ hw/audio/fmopl.c                    |  1 -
+ hw/audio/fmopl.h                    |  1 -
+ hw/audio/pcspk.c                    |  1 -
+ hw/char/debugcon.c                  |  1 -
+ hw/char/xen_console.c               |  1 -
+ hw/core/machine.c                   |  1 -
+ hw/cpu/core.c                       |  1 +
+ hw/display/cirrus_vga.c             |  1 -
+ hw/display/qxl.h                    |  1 -
+ hw/display/vga-isa-mm.c             |  4 +---
+ hw/display/vga-isa.c                |  3 +--
+ hw/display/vga-pci.c                |  1 -
+ hw/display/vga.c                    |  5 ++--
+ hw/display/vga_int.h                |  3 ++-
+ hw/display/{vga.h =3D> vga_regs.h}    |  0
+ hw/display/virtio-vga.c             |  1 -
+ hw/display/vmware_vga.c             |  1 -
+ hw/i2c/pm_smbus.c                   |  1 -
+ hw/i2c/smbus_ich9.c                 |  1 -
+ hw/i386/Makefile.objs               |  2 ++
+ hw/i386/acpi-build.c                |  2 +-
+ hw/i386/amd_iommu.c                 |  5 +++-
+ hw/i386/amd_iommu.h                 |  5 ----
+ hw/i386/pc.c                        |  5 ++--
+ hw/{input =3D> i386}/vmmouse.c        |  1 -
+ hw/{misc =3D> i386}/vmport.c          | 17 ++++++-------
+ hw/i386/xen/xen-mapcache.c          |  2 +-
+ hw/i386/xen/xen_platform.c          |  1 -
+ hw/ide/ahci.c                       |  1 -
+ hw/ide/cmd646.c                     |  1 -
+ hw/ide/core.c                       |  3 +--
+ hw/ide/ich.c                        |  1 -
+ hw/ide/isa.c                        |  1 -
+ hw/ide/microdrive.c                 |  1 -
+ hw/ide/pci.c                        |  1 -
+ hw/ide/piix.c                       |  2 +-
+ hw/ide/via.c                        |  1 -
+ hw/input/Makefile.objs              |  1 -
+ hw/input/adb.c                      |  2 +-
+ hw/input/hid.c                      |  8 +++----
+ hw/intc/lm32_pic.c                  |  1 -
+ hw/ipmi/isa_ipmi_bt.c               |  1 -
+ hw/ipmi/isa_ipmi_kcs.c              |  1 -
+ hw/isa/i82378.c                     |  5 ++--
+ hw/isa/vt82c686.c                   |  1 -
+ hw/mips/mips_fulong2e.c             |  4 ++--
+ hw/mips/mips_jazz.c                 |  5 ++--
+ hw/mips/mips_malta.c                |  4 ++--
+ hw/mips/mips_r4k.c                  |  5 ++--
+ hw/misc/Makefile.objs               |  2 --
+ hw/misc/imx6_ccm.c                  |  2 +-
+ hw/misc/ivshmem.c                   |  1 -
+ hw/misc/pvpanic.c                   | 12 ++++------
+ hw/misc/sga.c                       |  1 -
+ hw/moxie/moxiesim.c                 |  1 -
+ hw/net/ne2000-isa.c                 |  6 ++---
+ hw/net/ne2000.c                     |  2 --
+ hw/net/ne2000.h                     |  3 +++
+ hw/nios2/boot.c                     |  1 -
+ hw/pci-bridge/pci_expander_bridge.c |  1 -
+ hw/ppc/pnv.c                        |  2 +-
+ hw/ppc/prep.c                       |  1 +
+ hw/ppc/spapr_cpu_core.c             |  1 +
+ hw/ppc/spapr_hcall.c                |  1 -
+ hw/s390x/css.c                      |  1 -
+ hw/s390x/virtio-ccw.c               |  2 +-
+ hw/scsi/vhost-user-scsi.c           |  1 -
+ hw/smbios/smbios_type_38-stub.c     |  1 +
+ hw/sparc/sun4m.c                    |  1 -
+ hw/ssi/aspeed_smc.c                 |  3 +--
+ hw/timer/i8254.c                    |  1 -
+ hw/timer/i8254_common.c             |  1 -
+ hw/timer/mc146818rtc.c              |  2 +-
+ hw/tpm/tpm_emulator.c               |  1 -
+ hw/tpm/tpm_passthrough.c            |  1 -
+ hw/unicore32/puv3.c                 | 15 ++++++++----
+ hw/vfio/ccw.c                       |  2 +-
+ hw/virtio/vhost-vsock.c             |  2 +-
+ hw/virtio/virtio-balloon.c          |  2 +-
+ hw/watchdog/wdt_ib700.c             |  1 -
+ include/exec/memory.h               | 12 ----------
+ include/hw/acpi/acpi.h              | 11 +++++++++
+ include/hw/acpi/ich9.h              |  2 ++
+ include/hw/acpi/ipmi.h              |  1 -
+ include/hw/cpu/core.h               |  1 -
+ include/hw/display/vga.h            | 25 +++++++++++++++++++
+ include/hw/i2c/ppc4xx_i2c.h         |  1 -
+ include/hw/i386/pc.h                | 48 -------------------------------=
+------
+ include/hw/misc/pvpanic.h           | 21 ++++++++++++++++
+ include/hw/net/ne2000-isa.h         | 33 +++++++++++++++++++++++++
+ include/hw/registerfields.h         | 15 +++++++++++-
+ include/hw/timer/i8254.h            |  5 ++--
+ include/hw/timer/i8254_internal.h   |  2 +-
+ include/hw/timer/mc146818rtc.h      |  3 ++-
+ include/hw/unicore32/puv3.h         | 10 --------
+ include/qemu/qht.h                  |  6 ++---
+ include/sysemu/hax.h                |  1 -
+ linux-user/main.c                   |  1 -
+ linux-user/signal.c                 |  2 +-
+ memory.c                            |  5 ----
+ migration/block.c                   |  2 +-
+ monitor.c                           |  1 -
+ net/colo-compare.c                  |  1 -
+ numa.c                              |  1 -
+ qemu-options.hx                     |  7 +++---
+ scripts/git-submodule.sh            |  2 +-
+ target/i386/cpu.c                   |  2 +-
+ target/i386/hax-darwin.c            |  6 +----
+ target/i386/hax-darwin.h            |  3 ---
+ target/i386/hax-windows.h           |  3 ---
+ target/i386/kvm.c                   |  2 +-
+ target/nios2/cpu.h                  |  1 -
+ target/nios2/helper.c               |  5 +---
+ target/nios2/op_helper.c            |  1 +
+ target/nios2/translate.c            |  1 +
+ target/openrisc/exception_helper.c  |  1 -
+ target/ppc/kvm.c                    |  3 ---
+ target/sh4/translate.c              |  2 +-
+ tests/Makefile.include              | 20 ++++++++--------
+ tests/test-aio-multithread.c        |  1 -
+ tests/test-clone-visitor.c          |  1 -
+ tests/vhost-user-test.c             |  1 -
+ tests/vmgenid-test.c                |  3 ---
+ util/qemu-sockets.c                 |  1 -
+ vl.c                                |  3 +--
+ 141 files changed, 256 insertions(+), 292 deletions(-)
+ rename hw/display/{vga.h =3D> vga_regs.h} (100%)
+ rename hw/{input =3D> i386}/vmmouse.c (99%)
+ rename hw/{misc =3D> i386}/vmport.c (95%)
+ create mode 100644 include/hw/display/vga.h
+ create mode 100644 include/hw/misc/pvpanic.h
+ create mode 100644 include/hw/net/ne2000-isa.h
