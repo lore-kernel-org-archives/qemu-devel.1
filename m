@@ -1,33 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52310)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55972)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eQmlJ-0001m0-Tb
-	for qemu-devel@nongnu.org; Sun, 17 Dec 2017 23:10:49 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1eQmzu-0005cw-FX
+	for qemu-devel@nongnu.org; Sun, 17 Dec 2017 23:25:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eQmlF-0007o5-S1
-	for qemu-devel@nongnu.org; Sun, 17 Dec 2017 23:10:45 -0500
-Received: from indium.canonical.com ([91.189.90.7]:37816)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1eQmlF-0007nY-Fg
-	for qemu-devel@nongnu.org; Sun, 17 Dec 2017 23:10:41 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1eQmlE-0005WD-IT
-	for <qemu-devel@nongnu.org>; Mon, 18 Dec 2017 04:10:40 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 85FD72E804B
-	for <qemu-devel@nongnu.org>; Mon, 18 Dec 2017 04:10:40 +0000 (UTC)
+	(envelope-from <dgibson@ozlabs.org>) id 1eQmzq-0003TG-Vv
+	for qemu-devel@nongnu.org; Sun, 17 Dec 2017 23:25:50 -0500
+Date: Mon, 18 Dec 2017 15:24:02 +1100
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20171218042402.GT7753@umbus.fritz.box>
+References: <20171215135601.13179-1-clg@kaod.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 18 Dec 2017 04:01:14 -0000
-From: Timothy Pearson <kb9vqf@pearsoncomputing.net>
-Reply-To: Bug 1738691 <1738691@bugs.launchpad.net>
-Sender: bounces@canonical.com
-Message-Id: <151356967493.24699.12724051631743338900.malonedeb@wampee.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1738691] [NEW] Guest kernel crashes with kvm_pr
- on POWER8
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="VjP/dwTbBl6I9PQk"
+Content-Disposition: inline
+In-Reply-To: <20171215135601.13179-1-clg@kaod.org>
+Subject: Re: [Qemu-devel] [PATCH v2] ppc/pnv: change powernv_ prefix to pnv_
+ for overall naming consistency
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,533 +24,623 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Alexey Kardashevskiy <aik@ozlabs.ru>
 
-Public bug reported:
 
-When attempting to use the kvm_pr module with QEMU 2.10 on a POWER8
-host, Debian and Ubuntu guests hang and show crashes.
+--VjP/dwTbBl6I9PQk
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Host kernel is 4.14.  Issue is observed with host kernels 4.9 and 4.13
-as well; no other host kernels were tested.
+On Fri, Dec 15, 2017 at 02:56:01PM +0100, C=E9dric Le Goater wrote:
+> The 'pnv' prefix is now used for all and the routines populating the
+> device tree start with 'pnv_dt'. The handler of the PnvXScomInterface
+> is also renamed to 'dt_xscom' which should reflect that it is
+> populating the device tree under the 'xscom@' node of the chip.
+>=20
+> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
 
-Is this the correct place to report a kvm_pr bug?
+Applied to ppc-for-2.12.
 
-Output from Ubuntu 17.10 guest:
+> ---
+>=20
+>  Changes since v2:
+>=20
+>  - fixed code alignment
+>  - renamed device tree routines also.
+>=20
+>  hw/ppc/pnv.c               | 94 ++++++++++++++++++++++------------------=
+------
+>  hw/ppc/pnv_bmc.c           |  2 +-
+>  hw/ppc/pnv_core.c          |  8 ++--
+>  hw/ppc/pnv_lpc.c           |  6 +--
+>  hw/ppc/pnv_psi.c           |  4 +-
+>  hw/ppc/pnv_xscom.c         | 10 ++---
+>  include/hw/ppc/pnv.h       | 10 ++---
+>  include/hw/ppc/pnv_xscom.h |  4 +-
+>  8 files changed, 67 insertions(+), 71 deletions(-)
+>=20
+> diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
+> index c35c439d816b..6ed72ad335d1 100644
+> --- a/hw/ppc/pnv.c
+> +++ b/hw/ppc/pnv.c
+> @@ -77,8 +77,7 @@ static const char *pnv_chip_core_typename(const PnvChip=
+ *o)
+>   * that has a different "affinity". In practice, it means one range
+>   * per chip.
+>   */
+> -static void powernv_populate_memory_node(void *fdt, int chip_id, hwaddr =
+start,
+> -                                         hwaddr size)
+> +static void pnv_dt_memory(void *fdt, int chip_id, hwaddr start, hwaddr s=
+ize)
+>  {
+>      char *mem_name;
+>      uint64_t mem_reg_property[2];
+> @@ -119,7 +118,7 @@ static int get_cpus_node(void *fdt)
+>   * device tree, used in XSCOM to address cores and in interrupt
+>   * servers.
+>   */
+> -static void powernv_create_core_node(PnvChip *chip, PnvCore *pc, void *f=
+dt)
+> +static void pnv_dt_core(PnvChip *chip, PnvCore *pc, void *fdt)
+>  {
+>      CPUState *cs =3D CPU(DEVICE(pc->threads));
+>      DeviceClass *dc =3D DEVICE_GET_CLASS(cs);
+> @@ -228,8 +227,8 @@ static void powernv_create_core_node(PnvChip *chip, P=
+nvCore *pc, void *fdt)
+>                         servers_prop, sizeof(servers_prop))));
+>  }
+> =20
+> -static void powernv_populate_icp(PnvChip *chip, void *fdt, uint32_t pir,
+> -                                 uint32_t nr_threads)
+> +static void pnv_dt_icp(PnvChip *chip, void *fdt, uint32_t pir,
+> +                       uint32_t nr_threads)
+>  {
+>      uint64_t addr =3D PNV_ICP_BASE(chip) | (pir << 12);
+>      char *name;
+> @@ -277,13 +276,13 @@ static int pnv_chip_lpc_offset(PnvChip *chip, void =
+*fdt)
+>      return offset;
+>  }
+> =20
+> -static void powernv_populate_chip(PnvChip *chip, void *fdt)
+> +static void pnv_dt_chip(PnvChip *chip, void *fdt)
+>  {
+>      const char *typename =3D pnv_chip_core_typename(chip);
+>      size_t typesize =3D object_type_get_instance_size(typename);
+>      int i;
+> =20
+> -    pnv_xscom_populate(chip, fdt, 0);
+> +    pnv_dt_xscom(chip, fdt, 0);
+> =20
+>      /* The default LPC bus of a multichip system is on chip 0. It's
+>       * recognized by the firmware (skiboot) using a "primary"
+> @@ -298,20 +297,18 @@ static void powernv_populate_chip(PnvChip *chip, vo=
+id *fdt)
+>      for (i =3D 0; i < chip->nr_cores; i++) {
+>          PnvCore *pnv_core =3D PNV_CORE(chip->cores + i * typesize);
+> =20
+> -        powernv_create_core_node(chip, pnv_core, fdt);
+> +        pnv_dt_core(chip, pnv_core, fdt);
+> =20
+>          /* Interrupt Control Presenters (ICP). One per core. */
+> -        powernv_populate_icp(chip, fdt, pnv_core->pir,
+> -                             CPU_CORE(pnv_core)->nr_threads);
+> +        pnv_dt_icp(chip, fdt, pnv_core->pir, CPU_CORE(pnv_core)->nr_thre=
+ads);
+>      }
+> =20
+>      if (chip->ram_size) {
+> -        powernv_populate_memory_node(fdt, chip->chip_id, chip->ram_start,
+> -                                     chip->ram_size);
+> +        pnv_dt_memory(fdt, chip->chip_id, chip->ram_start, chip->ram_siz=
+e);
+>      }
+>  }
+> =20
+> -static void powernv_populate_rtc(ISADevice *d, void *fdt, int lpc_off)
+> +static void pnv_dt_rtc(ISADevice *d, void *fdt, int lpc_off)
+>  {
+>      uint32_t io_base =3D d->ioport_id;
+>      uint32_t io_regs[] =3D {
+> @@ -331,7 +328,7 @@ static void powernv_populate_rtc(ISADevice *d, void *=
+fdt, int lpc_off)
+>      _FDT((fdt_setprop_string(fdt, node, "compatible", "pnpPNP,b00")));
+>  }
+> =20
+> -static void powernv_populate_serial(ISADevice *d, void *fdt, int lpc_off)
+> +static void pnv_dt_serial(ISADevice *d, void *fdt, int lpc_off)
+>  {
+>      const char compatible[] =3D "ns16550\0pnpPNP,501";
+>      uint32_t io_base =3D d->ioport_id;
+> @@ -362,7 +359,7 @@ static void powernv_populate_serial(ISADevice *d, voi=
+d *fdt, int lpc_off)
+>      _FDT((fdt_setprop_string(fdt, node, "device_type", "serial")));
+>  }
+> =20
+> -static void powernv_populate_ipmi_bt(ISADevice *d, void *fdt, int lpc_of=
+f)
+> +static void pnv_dt_ipmi_bt(ISADevice *d, void *fdt, int lpc_off)
+>  {
+>      const char compatible[] =3D "bt\0ipmi-bt";
+>      uint32_t io_base;
+> @@ -401,17 +398,17 @@ typedef struct ForeachPopulateArgs {
+>      int offset;
+>  } ForeachPopulateArgs;
+> =20
+> -static int powernv_populate_isa_device(DeviceState *dev, void *opaque)
+> +static int pnv_dt_isa_device(DeviceState *dev, void *opaque)
+>  {
+>      ForeachPopulateArgs *args =3D opaque;
+>      ISADevice *d =3D ISA_DEVICE(dev);
+> =20
+>      if (object_dynamic_cast(OBJECT(dev), TYPE_MC146818_RTC)) {
+> -        powernv_populate_rtc(d, args->fdt, args->offset);
+> +        pnv_dt_rtc(d, args->fdt, args->offset);
+>      } else if (object_dynamic_cast(OBJECT(dev), TYPE_ISA_SERIAL)) {
+> -        powernv_populate_serial(d, args->fdt, args->offset);
+> +        pnv_dt_serial(d, args->fdt, args->offset);
+>      } else if (object_dynamic_cast(OBJECT(dev), "isa-ipmi-bt")) {
+> -        powernv_populate_ipmi_bt(d, args->fdt, args->offset);
+> +        pnv_dt_ipmi_bt(d, args->fdt, args->offset);
+>      } else {
+>          error_report("unknown isa device %s@i%x", qdev_fw_name(dev),
+>                       d->ioport_id);
+> @@ -420,7 +417,7 @@ static int powernv_populate_isa_device(DeviceState *d=
+ev, void *opaque)
+>      return 0;
+>  }
+> =20
+> -static void powernv_populate_isa(ISABus *bus, void *fdt, int lpc_offset)
+> +static void pnv_dt_isa(ISABus *bus, void *fdt, int lpc_offset)
+>  {
+>      ForeachPopulateArgs args =3D {
+>          .fdt =3D fdt,
+> @@ -429,14 +426,13 @@ static void powernv_populate_isa(ISABus *bus, void =
+*fdt, int lpc_offset)
+> =20
+>      /* ISA devices are not necessarily parented to the ISA bus so we
+>       * can not use object_child_foreach() */
+> -    qbus_walk_children(BUS(bus), powernv_populate_isa_device,
+> -                       NULL, NULL, NULL, &args);
+> +    qbus_walk_children(BUS(bus), pnv_dt_isa_device, NULL, NULL, NULL, &a=
+rgs);
+>  }
+> =20
+> -static void *powernv_create_fdt(MachineState *machine)
+> +static void *pnv_dt_create(MachineState *machine)
+>  {
+>      const char plat_compat[] =3D "qemu,powernv\0ibm,powernv";
+> -    PnvMachineState *pnv =3D POWERNV_MACHINE(machine);
+> +    PnvMachineState *pnv =3D PNV_MACHINE(machine);
+>      void *fdt;
+>      char *buf;
+>      int off;
+> @@ -479,15 +475,15 @@ static void *powernv_create_fdt(MachineState *machi=
+ne)
+> =20
+>      /* Populate device tree for each chip */
+>      for (i =3D 0; i < pnv->num_chips; i++) {
+> -        powernv_populate_chip(pnv->chips[i], fdt);
+> +        pnv_dt_chip(pnv->chips[i], fdt);
+>      }
+> =20
+>      /* Populate ISA devices on chip 0 */
+>      lpc_offset =3D pnv_chip_lpc_offset(pnv->chips[0], fdt);
+> -    powernv_populate_isa(pnv->isa_bus, fdt, lpc_offset);
+> +    pnv_dt_isa(pnv->isa_bus, fdt, lpc_offset);
+> =20
+>      if (pnv->bmc) {
+> -        pnv_bmc_populate_sensors(pnv->bmc, fdt);
+> +        pnv_dt_bmc_sensors(pnv->bmc, fdt);
+>      }
+> =20
+>      return fdt;
+> @@ -495,17 +491,17 @@ static void *powernv_create_fdt(MachineState *machi=
+ne)
+> =20
+>  static void pnv_powerdown_notify(Notifier *n, void *opaque)
+>  {
+> -    PnvMachineState *pnv =3D POWERNV_MACHINE(qdev_get_machine());
+> +    PnvMachineState *pnv =3D PNV_MACHINE(qdev_get_machine());
+> =20
+>      if (pnv->bmc) {
+>          pnv_bmc_powerdown(pnv->bmc);
+>      }
+>  }
+> =20
+> -static void ppc_powernv_reset(void)
+> +static void pnv_reset(void)
+>  {
+>      MachineState *machine =3D MACHINE(qdev_get_machine());
+> -    PnvMachineState *pnv =3D POWERNV_MACHINE(machine);
+> +    PnvMachineState *pnv =3D PNV_MACHINE(machine);
+>      void *fdt;
+>      Object *obj;
+> =20
+> @@ -524,7 +520,7 @@ static void ppc_powernv_reset(void)
+>          pnv->bmc =3D IPMI_BMC(obj);
+>      }
+> =20
+> -    fdt =3D powernv_create_fdt(machine);
+> +    fdt =3D pnv_dt_create(machine);
+> =20
+>      /* Pack resulting tree */
+>      _FDT((fdt_pack(fdt)));
+> @@ -552,9 +548,9 @@ static ISABus *pnv_isa_create(PnvChip *chip)
+>      return isa_bus;
+>  }
+> =20
+> -static void ppc_powernv_init(MachineState *machine)
+> +static void pnv_init(MachineState *machine)
+>  {
+> -    PnvMachineState *pnv =3D POWERNV_MACHINE(machine);
+> +    PnvMachineState *pnv =3D PNV_MACHINE(machine);
+>      MemoryRegion *ram;
+>      char *fw_filename;
+>      long fw_size;
+> @@ -567,7 +563,7 @@ static void ppc_powernv_init(MachineState *machine)
+>      }
+> =20
+>      ram =3D g_new(MemoryRegion, 1);
+> -    memory_region_allocate_system_memory(ram, NULL, "ppc_powernv.ram",
+> +    memory_region_allocate_system_memory(ram, NULL, "pnv.ram",
+>                                           machine->ram_size);
+>      memory_region_add_subregion(get_system_memory(), 0, ram);
+> =20
+> @@ -974,7 +970,7 @@ static void pnv_chip_class_init(ObjectClass *klass, v=
+oid *data)
+> =20
+>  static ICSState *pnv_ics_get(XICSFabric *xi, int irq)
+>  {
+> -    PnvMachineState *pnv =3D POWERNV_MACHINE(xi);
+> +    PnvMachineState *pnv =3D PNV_MACHINE(xi);
+>      int i;
+> =20
+>      for (i =3D 0; i < pnv->num_chips; i++) {
+> @@ -987,7 +983,7 @@ static ICSState *pnv_ics_get(XICSFabric *xi, int irq)
+> =20
+>  static void pnv_ics_resend(XICSFabric *xi)
+>  {
+> -    PnvMachineState *pnv =3D POWERNV_MACHINE(xi);
+> +    PnvMachineState *pnv =3D PNV_MACHINE(xi);
+>      int i;
+> =20
+>      for (i =3D 0; i < pnv->num_chips; i++) {
+> @@ -1021,7 +1017,7 @@ static ICPState *pnv_icp_get(XICSFabric *xi, int pi=
+r)
+>  static void pnv_pic_print_info(InterruptStatsProvider *obj,
+>                                 Monitor *mon)
+>  {
+> -    PnvMachineState *pnv =3D POWERNV_MACHINE(obj);
+> +    PnvMachineState *pnv =3D PNV_MACHINE(obj);
+>      int i;
+>      CPUState *cs;
+> =20
+> @@ -1039,13 +1035,13 @@ static void pnv_pic_print_info(InterruptStatsProv=
+ider *obj,
+>  static void pnv_get_num_chips(Object *obj, Visitor *v, const char *name,
+>                                void *opaque, Error **errp)
+>  {
+> -    visit_type_uint32(v, name, &POWERNV_MACHINE(obj)->num_chips, errp);
+> +    visit_type_uint32(v, name, &PNV_MACHINE(obj)->num_chips, errp);
+>  }
+> =20
+>  static void pnv_set_num_chips(Object *obj, Visitor *v, const char *name,
+>                                void *opaque, Error **errp)
+>  {
+> -    PnvMachineState *pnv =3D POWERNV_MACHINE(obj);
+> +    PnvMachineState *pnv =3D PNV_MACHINE(obj);
+>      uint32_t num_chips;
+>      Error *local_err =3D NULL;
+> =20
+> @@ -1067,13 +1063,13 @@ static void pnv_set_num_chips(Object *obj, Visito=
+r *v, const char *name,
+>      pnv->num_chips =3D num_chips;
+>  }
+> =20
+> -static void powernv_machine_initfn(Object *obj)
+> +static void pnv_machine_initfn(Object *obj)
+>  {
+> -    PnvMachineState *pnv =3D POWERNV_MACHINE(obj);
+> +    PnvMachineState *pnv =3D PNV_MACHINE(obj);
+>      pnv->num_chips =3D 1;
+>  }
+> =20
+> -static void powernv_machine_class_props_init(ObjectClass *oc)
+> +static void pnv_machine_class_props_init(ObjectClass *oc)
+>  {
+>      object_class_property_add(oc, "num-chips", "uint32",
+>                                pnv_get_num_chips, pnv_set_num_chips,
+> @@ -1083,15 +1079,15 @@ static void powernv_machine_class_props_init(Obje=
+ctClass *oc)
+>                                NULL);
+>  }
+> =20
+> -static void powernv_machine_class_init(ObjectClass *oc, void *data)
+> +static void pnv_machine_class_init(ObjectClass *oc, void *data)
+>  {
+>      MachineClass *mc =3D MACHINE_CLASS(oc);
+>      XICSFabricClass *xic =3D XICS_FABRIC_CLASS(oc);
+>      InterruptStatsProviderClass *ispc =3D INTERRUPT_STATS_PROVIDER_CLASS=
+(oc);
+> =20
+>      mc->desc =3D "IBM PowerNV (Non-Virtualized)";
+> -    mc->init =3D ppc_powernv_init;
+> -    mc->reset =3D ppc_powernv_reset;
+> +    mc->init =3D pnv_init;
+> +    mc->reset =3D pnv_reset;
+>      mc->max_cpus =3D MAX_CPUS;
+>      mc->default_cpu_type =3D POWERPC_CPU_TYPE_NAME("power8_v2.0");
+>      mc->block_default_type =3D IF_IDE; /* Pnv provides a AHCI device for
+> @@ -1104,7 +1100,7 @@ static void powernv_machine_class_init(ObjectClass =
+*oc, void *data)
+>      xic->ics_resend =3D pnv_ics_resend;
+>      ispc->print_info =3D pnv_pic_print_info;
+> =20
+> -    powernv_machine_class_props_init(oc);
+> +    pnv_machine_class_props_init(oc);
+>  }
+> =20
+>  #define DEFINE_PNV_CHIP_TYPE(type, class_initfn) \
+> @@ -1116,11 +1112,11 @@ static void powernv_machine_class_init(ObjectClas=
+s *oc, void *data)
+> =20
+>  static const TypeInfo types[] =3D {
+>      {
+> -        .name          =3D TYPE_POWERNV_MACHINE,
+> +        .name          =3D TYPE_PNV_MACHINE,
+>          .parent        =3D TYPE_MACHINE,
+>          .instance_size =3D sizeof(PnvMachineState),
+> -        .instance_init =3D powernv_machine_initfn,
+> -        .class_init    =3D powernv_machine_class_init,
+> +        .instance_init =3D pnv_machine_initfn,
+> +        .class_init    =3D pnv_machine_class_init,
+>          .interfaces =3D (InterfaceInfo[]) {
+>              { TYPE_XICS_FABRIC },
+>              { TYPE_INTERRUPT_STATS_PROVIDER },
+> diff --git a/hw/ppc/pnv_bmc.c b/hw/ppc/pnv_bmc.c
+> index 7b60b4c36071..b2cf441ee7b2 100644
+> --- a/hw/ppc/pnv_bmc.c
+> +++ b/hw/ppc/pnv_bmc.c
+> @@ -73,7 +73,7 @@ void pnv_bmc_powerdown(IPMIBmc *bmc)
+>      pnv_gen_oem_sel(bmc, SOFT_OFF);
+>  }
+> =20
+> -void pnv_bmc_populate_sensors(IPMIBmc *bmc, void *fdt)
+> +void pnv_dt_bmc_sensors(IPMIBmc *bmc, void *fdt)
+>  {
+>      int offset;
+>      int i;
+> diff --git a/hw/ppc/pnv_core.c b/hw/ppc/pnv_core.c
+> index 82ff440b3334..78eeadbbb6a4 100644
+> --- a/hw/ppc/pnv_core.c
+> +++ b/hw/ppc/pnv_core.c
+> @@ -37,7 +37,7 @@ static const char *pnv_core_cpu_typename(PnvCore *pc)
+>      return cpu_type;
+>  }
+> =20
+> -static void powernv_cpu_reset(void *opaque)
+> +static void pnv_cpu_reset(void *opaque)
+>  {
+>      PowerPCCPU *cpu =3D opaque;
+>      CPUState *cs =3D CPU(cpu);
+> @@ -54,7 +54,7 @@ static void powernv_cpu_reset(void *opaque)
+>      env->msr |=3D MSR_HVB; /* Hypervisor mode */
+>  }
+> =20
+> -static void powernv_cpu_init(PowerPCCPU *cpu, Error **errp)
+> +static void pnv_cpu_init(PowerPCCPU *cpu, Error **errp)
+>  {
+>      CPUPPCState *env =3D &cpu->env;
+>      int core_pir;
+> @@ -73,7 +73,7 @@ static void powernv_cpu_init(PowerPCCPU *cpu, Error **e=
+rrp)
+>      /* Set time-base frequency to 512 MHz */
+>      cpu_ppc_tb_init(env, PNV_TIMEBASE_FREQ);
+> =20
+> -    qemu_register_reset(powernv_cpu_reset, cpu);
+> +    qemu_register_reset(pnv_cpu_reset, cpu);
+>  }
+> =20
+>  /*
+> @@ -146,7 +146,7 @@ static void pnv_core_realize_child(Object *child, XIC=
+SFabric *xi, Error **errp)
+>          return;
+>      }
+> =20
+> -    powernv_cpu_init(cpu, &local_err);
+> +    pnv_cpu_init(cpu, &local_err);
+>      if (local_err) {
+>          object_unparent(obj);
+>          error_propagate(errp, local_err);
+> diff --git a/hw/ppc/pnv_lpc.c b/hw/ppc/pnv_lpc.c
+> index f03a80a29bf6..b777b78e1837 100644
+> --- a/hw/ppc/pnv_lpc.c
+> +++ b/hw/ppc/pnv_lpc.c
+> @@ -92,7 +92,7 @@ enum {
+>  #define LPC_HC_REGS_OPB_SIZE    0x00001000
+> =20
+> =20
+> -static int pnv_lpc_populate(PnvXScomInterface *dev, void *fdt, int xscom=
+_offset)
+> +static int pnv_lpc_dt_xscom(PnvXScomInterface *dev, void *fdt, int xscom=
+_offset)
+>  {
+>      const char compat[] =3D "ibm,power8-lpc\0ibm,lpc";
+>      char *name;
+> @@ -482,7 +482,7 @@ static void pnv_lpc_class_init(ObjectClass *klass, vo=
+id *data)
+>      DeviceClass *dc =3D DEVICE_CLASS(klass);
+>      PnvXScomInterfaceClass *xdc =3D PNV_XSCOM_INTERFACE_CLASS(klass);
+> =20
+> -    xdc->populate =3D pnv_lpc_populate;
+> +    xdc->dt_xscom =3D pnv_lpc_dt_xscom;
+> =20
+>      dc->realize =3D pnv_lpc_realize;
+>  }
+> @@ -515,7 +515,7 @@ type_init(pnv_lpc_register_types)
+>   */
+>  static void pnv_lpc_isa_irq_handler_cpld(void *opaque, int n, int level)
+>  {
+> -    PnvMachineState *pnv =3D POWERNV_MACHINE(qdev_get_machine());
+> +    PnvMachineState *pnv =3D PNV_MACHINE(qdev_get_machine());
+>      uint32_t old_state =3D pnv->cpld_irqstate;
+>      PnvLpcController *lpc =3D PNV_LPC(opaque);
+> =20
+> diff --git a/hw/ppc/pnv_psi.c b/hw/ppc/pnv_psi.c
+> index 9876c266223d..5b969127c303 100644
+> --- a/hw/ppc/pnv_psi.c
+> +++ b/hw/ppc/pnv_psi.c
+> @@ -510,7 +510,7 @@ static void pnv_psi_realize(DeviceState *dev, Error *=
+*errp)
+>      }
+>  }
+> =20
+> -static int pnv_psi_populate(PnvXScomInterface *dev, void *fdt, int xscom=
+_offset)
+> +static int pnv_psi_dt_xscom(PnvXScomInterface *dev, void *fdt, int xscom=
+_offset)
+>  {
+>      const char compat[] =3D "ibm,power8-psihb-x\0ibm,psihb-x";
+>      char *name;
+> @@ -546,7 +546,7 @@ static void pnv_psi_class_init(ObjectClass *klass, vo=
+id *data)
+>      DeviceClass *dc =3D DEVICE_CLASS(klass);
+>      PnvXScomInterfaceClass *xdc =3D PNV_XSCOM_INTERFACE_CLASS(klass);
+> =20
+> -    xdc->populate =3D pnv_psi_populate;
+> +    xdc->dt_xscom =3D pnv_psi_dt_xscom;
+> =20
+>      dc->realize =3D pnv_psi_realize;
+>      dc->props =3D pnv_psi_properties;
+> diff --git a/hw/ppc/pnv_xscom.c b/hw/ppc/pnv_xscom.c
+> index 38bc85f117f6..e51d634f4062 100644
+> --- a/hw/ppc/pnv_xscom.c
+> +++ b/hw/ppc/pnv_xscom.c
+> @@ -207,15 +207,15 @@ typedef struct ForeachPopulateArgs {
+>      int xscom_offset;
+>  } ForeachPopulateArgs;
+> =20
+> -static int xscom_populate_child(Object *child, void *opaque)
+> +static int xscom_dt_child(Object *child, void *opaque)
+>  {
+>      if (object_dynamic_cast(child, TYPE_PNV_XSCOM_INTERFACE)) {
+>          ForeachPopulateArgs *args =3D opaque;
+>          PnvXScomInterface *xd =3D PNV_XSCOM_INTERFACE(child);
+>          PnvXScomInterfaceClass *xc =3D PNV_XSCOM_INTERFACE_GET_CLASS(xd);
+> =20
+> -        if (xc->populate) {
+> -            _FDT((xc->populate(xd, args->fdt, args->xscom_offset)));
+> +        if (xc->dt_xscom) {
+> +            _FDT((xc->dt_xscom(xd, args->fdt, args->xscom_offset)));
+>          }
+>      }
+>      return 0;
+> @@ -224,7 +224,7 @@ static int xscom_populate_child(Object *child, void *=
+opaque)
+>  static const char compat_p8[] =3D "ibm,power8-xscom\0ibm,xscom";
+>  static const char compat_p9[] =3D "ibm,power9-xscom\0ibm,xscom";
+> =20
+> -int pnv_xscom_populate(PnvChip *chip, void *fdt, int root_offset)
+> +int pnv_dt_xscom(PnvChip *chip, void *fdt, int root_offset)
+>  {
+>      uint64_t reg[] =3D { cpu_to_be64(PNV_XSCOM_BASE(chip)),
+>                         cpu_to_be64(PNV_XSCOM_SIZE) };
+> @@ -255,7 +255,7 @@ int pnv_xscom_populate(PnvChip *chip, void *fdt, int =
+root_offset)
+>      args.fdt =3D fdt;
+>      args.xscom_offset =3D xscom_offset;
+> =20
+> -    object_child_foreach(OBJECT(chip), xscom_populate_child, &args);
+> +    object_child_foreach(OBJECT(chip), xscom_dt_child, &args);
+>      return 0;
+>  }
+> =20
+> diff --git a/include/hw/ppc/pnv.h b/include/hw/ppc/pnv.h
+> index 59524cd42b61..61896f9fd767 100644
+> --- a/include/hw/ppc/pnv.h
+> +++ b/include/hw/ppc/pnv.h
+> @@ -26,7 +26,7 @@
+>  #include "hw/ppc/pnv_psi.h"
+>  #include "hw/ppc/pnv_occ.h"
+> =20
+> -#define TYPE_PNV_CHIP "powernv-chip"
+> +#define TYPE_PNV_CHIP "pnv-chip"
+>  #define PNV_CHIP(obj) OBJECT_CHECK(PnvChip, (obj), TYPE_PNV_CHIP)
+>  #define PNV_CHIP_CLASS(klass) \
+>       OBJECT_CLASS_CHECK(PnvChipClass, (klass), TYPE_PNV_CHIP)
+> @@ -117,9 +117,9 @@ typedef struct PnvChipClass {
+>  #define PNV_CHIP_INDEX(chip)                                    \
+>      (((chip)->chip_id >> 2) * 2 + ((chip)->chip_id & 0x3))
+> =20
+> -#define TYPE_POWERNV_MACHINE       MACHINE_TYPE_NAME("powernv")
+> -#define POWERNV_MACHINE(obj) \
+> -    OBJECT_CHECK(PnvMachineState, (obj), TYPE_POWERNV_MACHINE)
+> +#define TYPE_PNV_MACHINE       MACHINE_TYPE_NAME("powernv")
+> +#define PNV_MACHINE(obj) \
+> +    OBJECT_CHECK(PnvMachineState, (obj), TYPE_PNV_MACHINE)
+> =20
+>  typedef struct PnvMachineState {
+>      /*< private >*/
+> @@ -144,7 +144,7 @@ typedef struct PnvMachineState {
+>  /*
+>   * BMC helpers
+>   */
+> -void pnv_bmc_populate_sensors(IPMIBmc *bmc, void *fdt);
+> +void pnv_dt_bmc_sensors(IPMIBmc *bmc, void *fdt);
+>  void pnv_bmc_powerdown(IPMIBmc *bmc);
+> =20
+>  /*
+> diff --git a/include/hw/ppc/pnv_xscom.h b/include/hw/ppc/pnv_xscom.h
+> index 38077b479699..7252e219e249 100644
+> --- a/include/hw/ppc/pnv_xscom.h
+> +++ b/include/hw/ppc/pnv_xscom.h
+> @@ -36,7 +36,7 @@ typedef struct PnvXScomInterface {
+> =20
+>  typedef struct PnvXScomInterfaceClass {
+>      InterfaceClass parent;
+> -    int (*populate)(PnvXScomInterface *dev, void *fdt, int offset);
+> +    int (*dt_xscom)(PnvXScomInterface *dev, void *fdt, int offset);
+>  } PnvXScomInterfaceClass;
+> =20
+>  /*
+> @@ -67,7 +67,7 @@ typedef struct PnvXScomInterfaceClass {
+>  #define PNV_XSCOM_OCC_SIZE        0x6000
+> =20
+>  extern void pnv_xscom_realize(PnvChip *chip, Error **errp);
+> -extern int pnv_xscom_populate(PnvChip *chip, void *fdt, int offset);
+> +extern int pnv_dt_xscom(PnvChip *chip, void *fdt, int offset);
+> =20
+>  extern void pnv_xscom_add_subregion(PnvChip *chip, hwaddr offset,
+>                                      MemoryRegion *mr);
 
-Quiescing Open Firmware ...
-Booting Linux via __start() @ 0x0000000002000000 ...
-[    0.000000] Page sizes from device-tree:
-[    0.000000] base_shift=3D12: shift=3D12, sllp=3D0x0000, avpnm=3D0x000000=
-00, tlbiel=3D1, penc=3D0
-[    0.000000] base_shift=3D16: shift=3D16, sllp=3D0x0110, avpnm=3D0x000000=
-00, tlbiel=3D1, penc=3D1
-[    0.000000] base_shift=3D24: shift=3D24, sllp=3D0x0100, avpnm=3D0x000000=
-01, tlbiel=3D0, penc=3D0
-[    0.000000] Using 1TB segments
-[    0.000000] Initializing hash mmu with SLB
-[    0.000000] Linux version 4.13.0-16-generic (buildd@bos01-ppc64el-029) (=
-gcc version 7.2.0 (Ubuntu 7.2.0-8ubuntu2)) #19-Ubuntu SMP Wed Oct 11 18:37:=
-02 UTC 2017 (Ubuntu 4.13.0-16.19-generic 4.13.4)
-[    0.000000] Found initrd at 0xc000000003b00000:0xc0000000048cf68b
-[    0.000000] Using pSeries machine description
-[    0.000000] bootconsole [udbg0] enabled
-[    0.000000] Partition configured for 2 cpus.
-[    0.000000] CPU maps initialized for 1 thread per core
- -> smp_release_cpus()
-spinning_secondaries =3D 1
- <- smp_release_cpus()
-[    0.000000] -----------------------------------------------------
-[    0.000000] ppc64_pft_size    =3D 0x19
-[    0.000000] phys_mem_size     =3D 0x100000000
-[    0.000000] dcache_bsize      =3D 0x80
-[    0.000000] icache_bsize      =3D 0x80
-[    0.000000] cpu_features      =3D 0x077c7a6c18500249
-[    0.000000]   possible        =3D 0x5fffffff18500649
-[    0.000000]   always          =3D 0x0000000018100040
-[    0.000000] cpu_user_features =3D 0xdc0065c2 0xae000000
-[    0.000000] mmu_features      =3D 0x7c006001
-[    0.000000] firmware_features =3D 0x00000000415a445f
-[    0.000000] htab_hash_mask    =3D 0x3ffff
-[    0.000000] -----------------------------------------------------
-[    0.000000] numa:   NODE_DATA [mem 0xfffd7c80-0xfffe3fff]
-[    0.000000] PCI host bridge /pci@800000020000000  ranges:
-[    0.000000]   IO 0x0000200000000000..0x000020000000ffff -> 0x00000000000=
-00000
-[    0.000000]  MEM 0x0000200080000000..0x00002000ffffffff -> 0x00000000800=
-00000
-[    0.000000]  MEM 0x0000210000000000..0x000021ffffffffff -> 0x00002100000=
-00000
-[    0.000000] PPC64 nvram contains 65536 bytes
-[    0.000000] Zone ranges:
-[    0.000000]   DMA      [mem 0x0000000000000000-0x00000000ffffffff]
-[    0.000000]   DMA32    empty
-[    0.000000]   Normal   empty
-[    0.000000]   Device   empty
-[    0.000000] Movable zone start for each node
-[    0.000000] Early memory node ranges
-[    0.000000]   node   0: [mem 0x0000000000000000-0x00000000ffffffff]
-[    0.000000] Initmem setup node 0 [mem 0x0000000000000000-0x00000000fffff=
-fff]
-[    0.000000] percpu: Embedded 4 pages/cpu @c0000000ffe00000 s162840 r0 d9=
-9304 u524288
-[    0.000000] Built 1 zonelists in Node order, mobility grouping on.  Tota=
-l pages: 65472
-[    0.000000] Policy zone: DMA
-[    0.000000] Kernel command line: BOOT_IMAGE=3D/install/vmlinux file=3D/c=
-drom/preseed/ubuntu-server.seed no_timer_check printk.time=3D1 ---
-[    0.000000] PID hash table entries: 4096 (order: -1, 32768 bytes)
-[    0.000000] Memory: 4070016K/4194304K available (12800K kernel code, 204=
-8K rwdata, 3456K rodata, 4608K init, 3021K bss, 124288K reserved, 0K cma-re=
-served)
-[    0.000000] random: get_random_u64 called from cache_random_seq_create+0=
-x80/0x180 with crng_init=3D0
-[    0.000000] SLUB: HWalign=3D128, Order=3D0-3, MinObjects=3D0, CPUs=3D2, =
-Nodes=3D1
-[    0.000000] ftrace: allocating 33631 entries in 13 pages
-[    0.000000] Hierarchical RCU implementation.
-[    0.000000]  RCU restricting CPUs from NR_CPUS=3D2048 to nr_cpu_ids=3D2.
-[    0.000000]  Tasks RCU enabled.
-[    0.000000] RCU: Adjusting geometry for rcu_fanout_leaf=3D16, nr_cpu_ids=
-=3D2
-[    0.000000] NR_IRQS: 512, nr_irqs: 512, preallocated irqs: 16
-[    0.000006] clocksource: timebase: mask: 0xffffffffffffffff max_cycles: =
-0x761537d007, max_idle_ns: 440795202126 ns
-[    0.000696] clocksource: timebase mult[1f40000] shift[24] registered
-[    0.001189] Console: colour dummy device 80x25
-[    0.001500] console [hvc0] enabled
-[    0.001500] console [hvc0] enabled
-[    0.001751] bootconsole [udbg0] disabled
-[    0.001751] bootconsole [udbg0] disabled
-[    0.002142] pid_max: default: 32768 minimum: 301
-[    0.002358] Security Framework initialized
-[    0.002377] Yama: becoming mindful.
-[    0.002466] AppArmor: AppArmor initialized
-[    0.007008] Dentry cache hash table entries: 524288 (order: 6, 4194304 b=
-ytes)
-[    0.009037] Inode-cache hash table entries: 262144 (order: 5, 2097152 by=
-tes)
-[    0.009144] Mount-cache hash table entries: 8192 (order: 0, 65536 bytes)
-[    0.009282] Mountpoint-cache hash table entries: 8192 (order: 0, 65536 b=
-ytes)
-[    0.011066] EEH: pSeries platform initialized
-[    0.011137] POWER8 performance monitor hardware support registered
-[    0.011231] Hierarchical SRCU implementation.
-[    0.012560] smp: Bringing up secondary CPUs ...
-[    0.014620] smp: Brought up 1 node, 2 CPUs
-[    0.014669] numa: Node 0 CPUs: 0-1
-[    0.017357] devtmpfs: initialized
-[    0.020796] evm: security.selinux
-[    0.020816] evm: security.SMACK64
-[    0.020832] evm: security.SMACK64EXEC
-[    0.020849] evm: security.SMACK64TRANSMUTE
-[    0.020865] evm: security.SMACK64MMAP
-[    0.020882] evm: security.ima
-[    0.020898] evm: security.capability
-[    0.021384] clocksource: jiffies: mask: 0xffffffff max_cycles: 0xfffffff=
-f, max_idle_ns: 7645041785100000 ns
-[    0.021428] futex hash table entries: 512 (order: 0, 65536 bytes)
-[    0.022217] NET: Registered protocol family 16
-[    0.023456] EEH: No capable adapters found
-[    0.068790] KVM: Live patching for a fast VM worked
-[    0.069504] cpuidle: using governor ladder
-[    0.069606] cpuidle: using governor menu
-[    0.070109] pstore: using zlib compression
-[    0.070162] pstore: Registered nvram as persistent store backend
-Linux ppc64le
-#19-Ubuntu SMP W[    0.073385] PCI: Probing PCI hardware
-[    0.073595] PCI host bridge to bus 0000:00
-[    0.073650] pci_bus 0000:00: root bus resource [io  0x10000-0x1ffff] (bu=
-s address [0x0000-0xffff])
-[    0.073722] pci_bus 0000:00: root bus resource [mem 0x200080000000-0x200=
-0ffffffff] (bus address [0x80000000-0xffffffff])
-[    0.073827] pci_bus 0000:00: root bus resource [mem 0x210000000000-0x21f=
-fffffffff]
-[    0.073913] pci_bus 0000:00: root bus resource [bus 00-ff]
-[    0.081145] IOMMU table initialized, virtual merging enabled
-[    0.081231] iommu: Adding device 0000:00:00.0 to group 0
-[    0.083493] HugeTLB registered 16.0 MiB page size, pre-allocated 0 pages
-[    0.085216] SCSI subsystem initialized
-[    0.085722] vgaarb: loaded
-[    0.085885] usbcore: registered new interface driver usbfs
-[    0.085961] usbcore: registered new interface driver hub
-[    0.086096] usbcore: registered new device driver usb
-[    0.086175] pps_core: LinuxPPS API ver. 1 registered
-[    0.086217] pps_core: Software ver. 5.3.6 - Copyright 2005-2007 Rodolfo =
-Giometti <giometti@linux.it>
-[    0.086316] PTP clock support registered
-[    0.086629] EDAC MC: Ver: 3.0.0
-[    0.087455] NetLabel: Initializing
-[    0.087509] NetLabel:  domain hash size =3D 128
-[    0.087550] NetLabel:  protocols =3D UNLABELED CIPSOv4 CALIPSO
-[    0.087676] NetLabel:  unlabeled traffic allowed by default
-[    0.088226] clocksource: Switched to clocksource timebase
-[    0.109127] VFS: Disk quotas dquot_6.6.0
-[    0.109244] VFS: Dquot-cache hash table entries: 8192 (order 0, 65536 by=
-tes)
-[    0.109543] AppArmor: AppArmor Filesystem Enabled
-[    0.121635] NET: Registered protocol family 2
-[    0.122074] TCP established hash table entries: 32768 (order: 2, 262144 =
-bytes)
-[    0.122584] TCP bind hash table entries: 32768 (order: 3, 524288 bytes)
-[    0.123346] TCP: Hash tables configured (established 32768 bind 32768)
-[    0.123472] UDP hash table entries: 2048 (order: 0, 65536 bytes)
-[    0.123692] UDP-Lite hash table entries: 2048 (order: 0, 65536 bytes)
-[    0.123937] NET: Registered protocol family 1
-[    0.124257] Unpacking initramfs...
-[    0.467838] Freeing initrd memory: 14080K
-[    0.472109] audit: initializing netlink subsys (disabled)
-[    0.472949] audit: type=3D2000 audit(1513569522.428:1): state=3Dinitiali=
-zed audit_enabled=3D0 res=3D1
-[    0.473972] Initialise system trusted keyrings
-[    0.474068] Key type blacklist registered
-[    0.474308] workingset: timestamp_bits=3D38 max_order=3D16 bucket_order=
-=3D0
-[    0.476124] zbud: loaded
-[    0.477006] squashfs: version 4.0 (2009/01/31) Phillip Lougher
-[    0.477456] fuse init (API version 7.26)
-[    0.478394] random: fast init done
-[    0.483013] Key type asymmetric registered
-[    0.483040] Asymmetric key parser 'x509' registered
-[    0.483150] Block layer SCSI generic (bsg) driver version 0.4 loaded (ma=
-jor 245)
-[    0.483363] io scheduler noop registered
-[    0.483383] io scheduler deadline registered
-[    0.483450] io scheduler cfq registered (default)
-[    0.484056] virtio-pci 0000:00:00.0: enabling device (0100 -> 0103)
-[    0.485519] virtio-pci 0000:00:00.0: ibm,query-pe-dma-windows(2026) 0 80=
-00000 20000000 returned 0
-[    0.485916] virtio-pci 0000:00:00.0: ibm,create-pe-dma-window(2027) 0 80=
-00000 20000000 10 20 returned 0 (liobn =3D 0x80000001 starting addr =3D 800=
-0000 0)
-[    0.501557] virtio-pci 0000:00:00.0: Using 64-bit direct DMA at offset 8=
-00000000000000
-[    0.503803] Serial: 8250/16550 driver, 32 ports, IRQ sharing enabled
-[    0.507398] Linux agpgart interface v0.103
-[    0.511296] loop: module loaded
-[    0.511671] libphy: Fixed MDIO Bus: probed
-[    0.511698] tun: Universal TUN/TAP device driver, 1.6
-[    0.511860] PPP generic driver version 2.4.2
-[    0.512086] VFIO - User Level meta-driver version: 0.3
-[    0.512309] ehci_hcd: USB 2.0 'Enhanced' Host Controller (EHCI) Driver
-[    0.512367] ehci-pci: EHCI PCI platform driver
-[    0.512420] ohci_hcd: USB 1.1 'Open' Host Controller (OHCI) Driver
-[    0.512457] ohci-pci: OHCI PCI platform driver
-[    0.512501] uhci_hcd: USB Universal Host Controller Interface driver
-[    0.512814] mousedev: PS/2 mouse device common for all mice
-[    0.513152] rtc-generic rtc-generic: rtc core: registered rtc-generic as=
- rtc0
-[    0.513200] i2c /dev entries driver
-[    0.513320] device-mapper: uevent: version 1.0.3
-[    0.513482] device-mapper: ioctl: 4.36.0-ioctl (2017-06-09) initialised:=
- dm-devel@redhat.com
-[    0.513710] ledtrig-cpu: registered to indicate activity on CPUs
-[    0.514095] NET: Registered protocol family 10
-[    0.526547] modprobe[89]: unhandled signal 11 at 0000000000000008 nip 00=
-0073724fd9645c lr 000073724fd855c0 code 30001
-[    0.528919] modprobe[90]: unhandled signal 11 at 00000000001e4250 nip 00=
-0076c0ae90e0f8 lr 000076c0ae90e6a4 code 30001
-[    0.529819] Segment Routing with IPv6
-[    0.529874] NET: Registered protocol family 17
-[    0.529922] Key type dns_resolver registered
-[    0.530832] registered taskstats version 1
-[    0.530902] Loading compiled-in X.509 certificates
-[    0.531719] modprobe[93]: unhandled signal 11 at 0000000000000008 nip 00=
-00741ba74e645c lr 0000741ba74d55c0 code 30001
-[    0.532899] modprobe[94]: unhandled signal 11 at 0000000000000008 nip 00=
-00764dd97f645c lr 0000764dd97e55c0 code 30001
-[    0.534414] Loaded X.509 cert 'Build time autogenerated kernel key: bc29=
-7e5938e0456833a4c0c157e5483b77785cf1'
-[    0.534505] zswap: loaded using pool lzo/zbud
-[    0.535375] modprobe[97]: unhandled signal 11 at 0000000000000008 nip 00=
-007e85a34b645c lr 00007e85a34a55c0 code 30001
-[    0.536618] modprobe[98]: unhandled signal 11 at 0000000000000008 nip 00=
-00713d7724645c lr 0000713d772355c0 code 30001
-[    0.537392] Key type big_key registered
-[    0.537418] Key type trusted registered
-[    0.545589] Key type encrypted registered
-[    0.545642] AppArmor: AppArmor sha1 policy hashing enabled
-[    0.545689] ima: No TPM chip found, activating TPM-bypass! (rc=3D-19)
-[    0.545799] evm: HMAC attrs: 0x1
-[    0.551224] rtc-generic rtc-generic: setting system clock to 2017-12-18 =
-03:58:43 UTC (1513569523)
-[    0.552107] Unable to open file: /etc/keys/x509_ima.der (-2)
-[    0.552109] Unable to open file: /etc/keys/x509_evm.der (-2)
-[    0.591193] Freeing unused kernel memory: 4608K
-[    0.591643] This architecture does not have kernel memory protection.
-<hang>
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
 
-** Affects: qemu
-     Importance: Undecided
-         Status: New
+--VjP/dwTbBl6I9PQk
+Content-Type: application/pgp-signature; name="signature.asc"
 
--- =
+-----BEGIN PGP SIGNATURE-----
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1738691
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlo3QuAACgkQbDjKyiDZ
+s5Lw1RAAyyg+V+YSFMTdvb/p2LNlUin53DSiQApmERmvetR00E1dKHmgHwOTFtim
+tpTTUZcBEpmGYj9764m9OWAXiSqAMfBuIYSq5iW/M9mowT9ZgRcbomMZLjVb0wuy
+N6b4E2vrqI7OUs1EfQU+/F4qVa43vUCJTOs2/3mbjpAmmSl1X1NQ9fi4845Hq/lT
+icqkxaxwH9188b/VQKYw+UZsSAKzmIEH/TBnrUqkjI1Ar3aVbQjLWUlhbereZKmb
+O1gqcf86wkIKN62WMEN/Tz/lMxvKhHKtkXvb0Fi2OyqjPSf2b46RTfiaMmodX1ME
+1NA6zHg67et/4tjwgICC3JjbY7dyE1frIIwDSs9yBuwKqNkXRHdf2/GaS3Uk9W8Y
+6KqPF2WtO56B7uIt2qdDPD413Vt91lm0urrIftL7yCuqzCQg4JIKexsI1Tktb4cF
+AgoXWi3fqc/L7+FPq0fV5YeN+l0UIEAiIv3rLXhlec9+VGSgF7RY7G8DajxeF4O1
+LcpCl7YxwVYhiotuDgRbqMr4iiSMTxJg+xyTctKPendiqc0pRAfIU7XcENZkJUP1
+e4SZvPl1Ng2WZvZwLBIOKGaKSZdWBWJaciju/6wpGR7r+KYWozd8mfx1G37NcywC
+CbVdZeqV875Iw8DI6zsAL4nIoSIdyQo+4Lhm7D/9exavdTXlZFc=
+=sGln
+-----END PGP SIGNATURE-----
 
-Title:
-  Guest kernel crashes with kvm_pr on POWER8
-
-Status in QEMU:
-  New
-
-Bug description:
-  When attempting to use the kvm_pr module with QEMU 2.10 on a POWER8
-  host, Debian and Ubuntu guests hang and show crashes.
-
-  Host kernel is 4.14.  Issue is observed with host kernels 4.9 and 4.13
-  as well; no other host kernels were tested.
-
-  Is this the correct place to report a kvm_pr bug?
-
-  Output from Ubuntu 17.10 guest:
-
-  Quiescing Open Firmware ...
-  Booting Linux via __start() @ 0x0000000002000000 ...
-  [    0.000000] Page sizes from device-tree:
-  [    0.000000] base_shift=3D12: shift=3D12, sllp=3D0x0000, avpnm=3D0x0000=
-0000, tlbiel=3D1, penc=3D0
-  [    0.000000] base_shift=3D16: shift=3D16, sllp=3D0x0110, avpnm=3D0x0000=
-0000, tlbiel=3D1, penc=3D1
-  [    0.000000] base_shift=3D24: shift=3D24, sllp=3D0x0100, avpnm=3D0x0000=
-0001, tlbiel=3D0, penc=3D0
-  [    0.000000] Using 1TB segments
-  [    0.000000] Initializing hash mmu with SLB
-  [    0.000000] Linux version 4.13.0-16-generic (buildd@bos01-ppc64el-029)=
- (gcc version 7.2.0 (Ubuntu 7.2.0-8ubuntu2)) #19-Ubuntu SMP Wed Oct 11 18:3=
-7:02 UTC 2017 (Ubuntu 4.13.0-16.19-generic 4.13.4)
-  [    0.000000] Found initrd at 0xc000000003b00000:0xc0000000048cf68b
-  [    0.000000] Using pSeries machine description
-  [    0.000000] bootconsole [udbg0] enabled
-  [    0.000000] Partition configured for 2 cpus.
-  [    0.000000] CPU maps initialized for 1 thread per core
-   -> smp_release_cpus()
-  spinning_secondaries =3D 1
-   <- smp_release_cpus()
-  [    0.000000] -----------------------------------------------------
-  [    0.000000] ppc64_pft_size    =3D 0x19
-  [    0.000000] phys_mem_size     =3D 0x100000000
-  [    0.000000] dcache_bsize      =3D 0x80
-  [    0.000000] icache_bsize      =3D 0x80
-  [    0.000000] cpu_features      =3D 0x077c7a6c18500249
-  [    0.000000]   possible        =3D 0x5fffffff18500649
-  [    0.000000]   always          =3D 0x0000000018100040
-  [    0.000000] cpu_user_features =3D 0xdc0065c2 0xae000000
-  [    0.000000] mmu_features      =3D 0x7c006001
-  [    0.000000] firmware_features =3D 0x00000000415a445f
-  [    0.000000] htab_hash_mask    =3D 0x3ffff
-  [    0.000000] -----------------------------------------------------
-  [    0.000000] numa:   NODE_DATA [mem 0xfffd7c80-0xfffe3fff]
-  [    0.000000] PCI host bridge /pci@800000020000000  ranges:
-  [    0.000000]   IO 0x0000200000000000..0x000020000000ffff -> 0x000000000=
-0000000
-  [    0.000000]  MEM 0x0000200080000000..0x00002000ffffffff -> 0x000000008=
-0000000
-  [    0.000000]  MEM 0x0000210000000000..0x000021ffffffffff -> 0x000021000=
-0000000
-  [    0.000000] PPC64 nvram contains 65536 bytes
-  [    0.000000] Zone ranges:
-  [    0.000000]   DMA      [mem 0x0000000000000000-0x00000000ffffffff]
-  [    0.000000]   DMA32    empty
-  [    0.000000]   Normal   empty
-  [    0.000000]   Device   empty
-  [    0.000000] Movable zone start for each node
-  [    0.000000] Early memory node ranges
-  [    0.000000]   node   0: [mem 0x0000000000000000-0x00000000ffffffff]
-  [    0.000000] Initmem setup node 0 [mem 0x0000000000000000-0x00000000fff=
-fffff]
-  [    0.000000] percpu: Embedded 4 pages/cpu @c0000000ffe00000 s162840 r0 =
-d99304 u524288
-  [    0.000000] Built 1 zonelists in Node order, mobility grouping on.  To=
-tal pages: 65472
-  [    0.000000] Policy zone: DMA
-  [    0.000000] Kernel command line: BOOT_IMAGE=3D/install/vmlinux file=3D=
-/cdrom/preseed/ubuntu-server.seed no_timer_check printk.time=3D1 ---
-  [    0.000000] PID hash table entries: 4096 (order: -1, 32768 bytes)
-  [    0.000000] Memory: 4070016K/4194304K available (12800K kernel code, 2=
-048K rwdata, 3456K rodata, 4608K init, 3021K bss, 124288K reserved, 0K cma-=
-reserved)
-  [    0.000000] random: get_random_u64 called from cache_random_seq_create=
-+0x80/0x180 with crng_init=3D0
-  [    0.000000] SLUB: HWalign=3D128, Order=3D0-3, MinObjects=3D0, CPUs=3D2=
-, Nodes=3D1
-  [    0.000000] ftrace: allocating 33631 entries in 13 pages
-  [    0.000000] Hierarchical RCU implementation.
-  [    0.000000]  RCU restricting CPUs from NR_CPUS=3D2048 to nr_cpu_ids=3D=
-2.
-  [    0.000000]  Tasks RCU enabled.
-  [    0.000000] RCU: Adjusting geometry for rcu_fanout_leaf=3D16, nr_cpu_i=
-ds=3D2
-  [    0.000000] NR_IRQS: 512, nr_irqs: 512, preallocated irqs: 16
-  [    0.000006] clocksource: timebase: mask: 0xffffffffffffffff max_cycles=
-: 0x761537d007, max_idle_ns: 440795202126 ns
-  [    0.000696] clocksource: timebase mult[1f40000] shift[24] registered
-  [    0.001189] Console: colour dummy device 80x25
-  [    0.001500] console [hvc0] enabled
-  [    0.001500] console [hvc0] enabled
-  [    0.001751] bootconsole [udbg0] disabled
-  [    0.001751] bootconsole [udbg0] disabled
-  [    0.002142] pid_max: default: 32768 minimum: 301
-  [    0.002358] Security Framework initialized
-  [    0.002377] Yama: becoming mindful.
-  [    0.002466] AppArmor: AppArmor initialized
-  [    0.007008] Dentry cache hash table entries: 524288 (order: 6, 4194304=
- bytes)
-  [    0.009037] Inode-cache hash table entries: 262144 (order: 5, 2097152 =
-bytes)
-  [    0.009144] Mount-cache hash table entries: 8192 (order: 0, 65536 byte=
-s)
-  [    0.009282] Mountpoint-cache hash table entries: 8192 (order: 0, 65536=
- bytes)
-  [    0.011066] EEH: pSeries platform initialized
-  [    0.011137] POWER8 performance monitor hardware support registered
-  [    0.011231] Hierarchical SRCU implementation.
-  [    0.012560] smp: Bringing up secondary CPUs ...
-  [    0.014620] smp: Brought up 1 node, 2 CPUs
-  [    0.014669] numa: Node 0 CPUs: 0-1
-  [    0.017357] devtmpfs: initialized
-  [    0.020796] evm: security.selinux
-  [    0.020816] evm: security.SMACK64
-  [    0.020832] evm: security.SMACK64EXEC
-  [    0.020849] evm: security.SMACK64TRANSMUTE
-  [    0.020865] evm: security.SMACK64MMAP
-  [    0.020882] evm: security.ima
-  [    0.020898] evm: security.capability
-  [    0.021384] clocksource: jiffies: mask: 0xffffffff max_cycles: 0xfffff=
-fff, max_idle_ns: 7645041785100000 ns
-  [    0.021428] futex hash table entries: 512 (order: 0, 65536 bytes)
-  [    0.022217] NET: Registered protocol family 16
-  [    0.023456] EEH: No capable adapters found
-  [    0.068790] KVM: Live patching for a fast VM worked
-  [    0.069504] cpuidle: using governor ladder
-  [    0.069606] cpuidle: using governor menu
-  [    0.070109] pstore: using zlib compression
-  [    0.070162] pstore: Registered nvram as persistent store backend
-  Linux ppc64le
-  #19-Ubuntu SMP W[    0.073385] PCI: Probing PCI hardware
-  [    0.073595] PCI host bridge to bus 0000:00
-  [    0.073650] pci_bus 0000:00: root bus resource [io  0x10000-0x1ffff] (=
-bus address [0x0000-0xffff])
-  [    0.073722] pci_bus 0000:00: root bus resource [mem 0x200080000000-0x2=
-000ffffffff] (bus address [0x80000000-0xffffffff])
-  [    0.073827] pci_bus 0000:00: root bus resource [mem 0x210000000000-0x2=
-1ffffffffff]
-  [    0.073913] pci_bus 0000:00: root bus resource [bus 00-ff]
-  [    0.081145] IOMMU table initialized, virtual merging enabled
-  [    0.081231] iommu: Adding device 0000:00:00.0 to group 0
-  [    0.083493] HugeTLB registered 16.0 MiB page size, pre-allocated 0 pag=
-es
-  [    0.085216] SCSI subsystem initialized
-  [    0.085722] vgaarb: loaded
-  [    0.085885] usbcore: registered new interface driver usbfs
-  [    0.085961] usbcore: registered new interface driver hub
-  [    0.086096] usbcore: registered new device driver usb
-  [    0.086175] pps_core: LinuxPPS API ver. 1 registered
-  [    0.086217] pps_core: Software ver. 5.3.6 - Copyright 2005-2007 Rodolf=
-o Giometti <giometti@linux.it>
-  [    0.086316] PTP clock support registered
-  [    0.086629] EDAC MC: Ver: 3.0.0
-  [    0.087455] NetLabel: Initializing
-  [    0.087509] NetLabel:  domain hash size =3D 128
-  [    0.087550] NetLabel:  protocols =3D UNLABELED CIPSOv4 CALIPSO
-  [    0.087676] NetLabel:  unlabeled traffic allowed by default
-  [    0.088226] clocksource: Switched to clocksource timebase
-  [    0.109127] VFS: Disk quotas dquot_6.6.0
-  [    0.109244] VFS: Dquot-cache hash table entries: 8192 (order 0, 65536 =
-bytes)
-  [    0.109543] AppArmor: AppArmor Filesystem Enabled
-  [    0.121635] NET: Registered protocol family 2
-  [    0.122074] TCP established hash table entries: 32768 (order: 2, 26214=
-4 bytes)
-  [    0.122584] TCP bind hash table entries: 32768 (order: 3, 524288 bytes)
-  [    0.123346] TCP: Hash tables configured (established 32768 bind 32768)
-  [    0.123472] UDP hash table entries: 2048 (order: 0, 65536 bytes)
-  [    0.123692] UDP-Lite hash table entries: 2048 (order: 0, 65536 bytes)
-  [    0.123937] NET: Registered protocol family 1
-  [    0.124257] Unpacking initramfs...
-  [    0.467838] Freeing initrd memory: 14080K
-  [    0.472109] audit: initializing netlink subsys (disabled)
-  [    0.472949] audit: type=3D2000 audit(1513569522.428:1): state=3Dinitia=
-lized audit_enabled=3D0 res=3D1
-  [    0.473972] Initialise system trusted keyrings
-  [    0.474068] Key type blacklist registered
-  [    0.474308] workingset: timestamp_bits=3D38 max_order=3D16 bucket_orde=
-r=3D0
-  [    0.476124] zbud: loaded
-  [    0.477006] squashfs: version 4.0 (2009/01/31) Phillip Lougher
-  [    0.477456] fuse init (API version 7.26)
-  [    0.478394] random: fast init done
-  [    0.483013] Key type asymmetric registered
-  [    0.483040] Asymmetric key parser 'x509' registered
-  [    0.483150] Block layer SCSI generic (bsg) driver version 0.4 loaded (=
-major 245)
-  [    0.483363] io scheduler noop registered
-  [    0.483383] io scheduler deadline registered
-  [    0.483450] io scheduler cfq registered (default)
-  [    0.484056] virtio-pci 0000:00:00.0: enabling device (0100 -> 0103)
-  [    0.485519] virtio-pci 0000:00:00.0: ibm,query-pe-dma-windows(2026) 0 =
-8000000 20000000 returned 0
-  [    0.485916] virtio-pci 0000:00:00.0: ibm,create-pe-dma-window(2027) 0 =
-8000000 20000000 10 20 returned 0 (liobn =3D 0x80000001 starting addr =3D 8=
-000000 0)
-  [    0.501557] virtio-pci 0000:00:00.0: Using 64-bit direct DMA at offset=
- 800000000000000
-  [    0.503803] Serial: 8250/16550 driver, 32 ports, IRQ sharing enabled
-  [    0.507398] Linux agpgart interface v0.103
-  [    0.511296] loop: module loaded
-  [    0.511671] libphy: Fixed MDIO Bus: probed
-  [    0.511698] tun: Universal TUN/TAP device driver, 1.6
-  [    0.511860] PPP generic driver version 2.4.2
-  [    0.512086] VFIO - User Level meta-driver version: 0.3
-  [    0.512309] ehci_hcd: USB 2.0 'Enhanced' Host Controller (EHCI) Driver
-  [    0.512367] ehci-pci: EHCI PCI platform driver
-  [    0.512420] ohci_hcd: USB 1.1 'Open' Host Controller (OHCI) Driver
-  [    0.512457] ohci-pci: OHCI PCI platform driver
-  [    0.512501] uhci_hcd: USB Universal Host Controller Interface driver
-  [    0.512814] mousedev: PS/2 mouse device common for all mice
-  [    0.513152] rtc-generic rtc-generic: rtc core: registered rtc-generic =
-as rtc0
-  [    0.513200] i2c /dev entries driver
-  [    0.513320] device-mapper: uevent: version 1.0.3
-  [    0.513482] device-mapper: ioctl: 4.36.0-ioctl (2017-06-09) initialise=
-d: dm-devel@redhat.com
-  [    0.513710] ledtrig-cpu: registered to indicate activity on CPUs
-  [    0.514095] NET: Registered protocol family 10
-  [    0.526547] modprobe[89]: unhandled signal 11 at 0000000000000008 nip =
-000073724fd9645c lr 000073724fd855c0 code 30001
-  [    0.528919] modprobe[90]: unhandled signal 11 at 00000000001e4250 nip =
-000076c0ae90e0f8 lr 000076c0ae90e6a4 code 30001
-  [    0.529819] Segment Routing with IPv6
-  [    0.529874] NET: Registered protocol family 17
-  [    0.529922] Key type dns_resolver registered
-  [    0.530832] registered taskstats version 1
-  [    0.530902] Loading compiled-in X.509 certificates
-  [    0.531719] modprobe[93]: unhandled signal 11 at 0000000000000008 nip =
-0000741ba74e645c lr 0000741ba74d55c0 code 30001
-  [    0.532899] modprobe[94]: unhandled signal 11 at 0000000000000008 nip =
-0000764dd97f645c lr 0000764dd97e55c0 code 30001
-  [    0.534414] Loaded X.509 cert 'Build time autogenerated kernel key: bc=
-297e5938e0456833a4c0c157e5483b77785cf1'
-  [    0.534505] zswap: loaded using pool lzo/zbud
-  [    0.535375] modprobe[97]: unhandled signal 11 at 0000000000000008 nip =
-00007e85a34b645c lr 00007e85a34a55c0 code 30001
-  [    0.536618] modprobe[98]: unhandled signal 11 at 0000000000000008 nip =
-0000713d7724645c lr 0000713d772355c0 code 30001
-  [    0.537392] Key type big_key registered
-  [    0.537418] Key type trusted registered
-  [    0.545589] Key type encrypted registered
-  [    0.545642] AppArmor: AppArmor sha1 policy hashing enabled
-  [    0.545689] ima: No TPM chip found, activating TPM-bypass! (rc=3D-19)
-  [    0.545799] evm: HMAC attrs: 0x1
-  [    0.551224] rtc-generic rtc-generic: setting system clock to 2017-12-1=
-8 03:58:43 UTC (1513569523)
-  [    0.552107] Unable to open file: /etc/keys/x509_ima.der (-2)
-  [    0.552109] Unable to open file: /etc/keys/x509_evm.der (-2)
-  [    0.591193] Freeing unused kernel memory: 4608K
-  [    0.591643] This architecture does not have kernel memory protection.
-  <hang>
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1738691/+subscriptions
+--VjP/dwTbBl6I9PQk--
