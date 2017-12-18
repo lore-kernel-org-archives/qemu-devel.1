@@ -1,34 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33120)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34335)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eQsEB-00027T-Pb
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 05:01:02 -0500
+	(envelope-from <peterx@redhat.com>) id 1eQsH4-0004M3-Oj
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 05:03:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eQsE6-0006Bz-3u
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 05:00:55 -0500
-Received: from indium.canonical.com ([91.189.90.7]:41704)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1eQsE5-0006AY-UH
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 05:00:50 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1eQsE4-0002vh-Lx
-	for <qemu-devel@nongnu.org>; Mon, 18 Dec 2017 10:00:48 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id A53442E80CC
-	for <qemu-devel@nongnu.org>; Mon, 18 Dec 2017 10:00:48 +0000 (UTC)
+	(envelope-from <peterx@redhat.com>) id 1eQsGz-00017U-Ra
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 05:03:54 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:58102)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1eQsGz-00016b-Iv
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 05:03:49 -0500
+Date: Mon, 18 Dec 2017 18:03:34 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20171218100334.GT22308@xz-mi>
+References: <20171205055200.16305-1-peterx@redhat.com>
+	<20171205055200.16305-17-peterx@redhat.com>
+	<20171213200938.GG8317@stefanha-x1.localdomain>
+	<20171216063703.GD22308@xz-mi>
+	<20171216092322.GC12533@stefanha-x1.localdomain>
+	<20171218052649.GK22308@xz-mi>
+	<20171218091053.GD18648@stefanha-x1.localdomain>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 18 Dec 2017 09:53:17 -0000
-From: Thomas Huth <1721187@bugs.launchpad.net>
-Reply-To: Bug 1721187 <1721187@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <150709842178.2640.16899221192910481679.malonedeb@chaenomeles.canonical.com>
-Message-Id: <151359079727.11633.15143686196285021650.malone@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1721187] Re: install Centos7 or fedora27 on qemu
- on windows8.1
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20171218091053.GD18648@stefanha-x1.localdomain>
+Subject: Re: [Qemu-devel] [RFC v5 16/26] monitor: separate QMP parser and
+ dispatcher
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,50 +33,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Cc: qemu-devel@nongnu.org, Stefan Hajnoczi <shajnocz@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <famz@redhat.com>, Juan Quintela <quintela@redhat.com>, mdroth@linux.vnet.ibm.com, Eric Blake <eblake@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Markus Armbruster <armbru@redhat.com>, marcandre.lureau@redhat.com, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 
-So I assume the mouse is working now? I think we then can close this ticket.
-Concerning the speed: QEMU is emulating the CPU by default, so this is of c=
-ourse slower than running everything natively. You've got to use an acceler=
-ator to get more speed - for Windows, you can use HAXM: https://www.qemu.or=
-g/2017/11/22/haxm-usage-windows/
+On Mon, Dec 18, 2017 at 09:10:53AM +0000, Stefan Hajnoczi wrote:
+> On Mon, Dec 18, 2017 at 01:26:49PM +0800, Peter Xu wrote:
+> > On Sat, Dec 16, 2017 at 09:23:22AM +0000, Stefan Hajnoczi wrote:
+> > > On Sat, Dec 16, 2017 at 02:37:03PM +0800, Peter Xu wrote:
+> > > > On Wed, Dec 13, 2017 at 08:09:38PM +0000, Stefan Hajnoczi wrote:
+> > > > > On Tue, Dec 05, 2017 at 01:51:50PM +0800, Peter Xu wrote:
+> > > > > > @@ -3956,12 +3968,122 @@ static void handle_qmp_command(JSONMessageParser *parser, GQueue *tokens,
+> > > > > >          }
+> > > > > >      }
+> > > > > >  
+> > > > > > -err_out:
+> > > > > > -    monitor_qmp_respond(mon, rsp, err, id);
+> > > > > > +    /* Respond if necessary */
+> > > > > > +    monitor_qmp_respond(mon, rsp, NULL, id);
+> > > > > > +
+> > > > > > +    /* This pairs with the monitor_suspend() in handle_qmp_command(). */
+> > > > > > +    if (!qmp_oob_enabled(mon)) {
+> > > > > > +        monitor_resume(mon);
+> > > > > 
+> > > > > monitor_resume() does not work between threads: if the event loop is
+> > > > > currently blocked in poll() it won't notice that the monitor fd should
+> > > > > be watched again.
+> > > > > 
+> > > > > Please add aio_notify() to monitor_resume() and monitor_suspend().  That
+> > > > > way the event loop is forced to check can_read() again.
+> > > > 
+> > > > Ah, yes.  I think monitor_suspend() does not need the notify?  Since
+> > > > if it's sleeping it won't miss the next check in can_read() after all?
+> > > 
+> > > No, that would be a bug.  Imagine the IOThread is blocked in poll
+> > > monitoring the chardev file descriptor when the main loop calls
+> > > monitor_suspend().  If the file descriptors becomes readable then the
+> > > handler function executes even though the monitor is supposed to be
+> > > suspended!
+> > 
+> > When you say "the handler function executes", do you mean the handler
+> > that has already added to the qmp request queue, or the one that
+> > hasn't yet parsed by the parser?
+> 
+> The chardev file descriptor handler function (the QMP parser).
+> 
+> > For the previous case (the handler that has queued already): IMHO
+> > that's what we expect it to behave, say, when we call
+> > monitor_suspend(), we only stop accepting and parsing new inputs from
+> > the user, but the requests on the queue should still be processed.
+> > 
+> > For the latter (the handler of a newly typed command):
+> > monitor_suspend() should suspend the parser already, so
+> > monitor_can_read() check should fail, then that command should never
+> > be queued until we call another monitor_resume().
+> 
+> You are assuming that monitor_can_read() is called *after* poll()
+> returns.  This is what I tried to explain in the previous reply.
+> 
+> The the monitor_can_read() function is called *before* the blocking
+> poll() syscall.  If something changes the monitor_can_read() return
+> value, you must* kick the event loop to ensure that the event loop
+> reflects this change.
+> 
+> If you want to check how this works, see chardev/char-io.c for how
+> fd_can_read() is used.
+> 
+> * Currently monitor.c doesn't need to kick the event loop explicitly
+> because it runs within the main loop thread.  Therefore the event loop
+> always calls monitor_can_read() again before entering poll().
 
-** Changed in: qemu
-       Status: New =3D> Incomplete
+Yeah I got it.  I was assuming the check is done in check() of the
+watcher, but obviously I was wrong. :(
 
--- =
+Thanks for clarifying this.  I'll do proper kicking.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1721187
-
-Title:
-  install Centos7 or fedora27 on qemu on windows8.1
-
-Status in QEMU:
-  Incomplete
-
-Bug description:
-  Hello,
-  I have tried to install CentOs or Fedora27 on my Windows8 using QEMU. I w=
-ork on notepad with 4GB.
-  Unfortunatly, my touchpad nor my usb-mouse are not recognise on the graph=
-ical installation of CentOs and Fedora installation. So, I cannot install t=
-hem.
-  Here are the commands I use for installation :
-
-  qemu-img create -f qcow2 fedora27b2_hd.qcow2 80G
-
-  qemu-system-x86_64 -k fr -hda fedora27b2_hd.qcow2 -cdrom Fedora-
-  Workstation-Live-x86_64-27_Beta-1.5.iso -m 512 -boot d
-
-  I have tried to add the option : -device usb-mouse  but, I got the
-  error message that no 'usb-bus' found for the usb-mouse device.
-
-  What is wrong ?  QEMU or my installation command ?
-
-  Thank, BRgds,
-  Laurent
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1721187/+subscriptions
+-- 
+Peter Xu
