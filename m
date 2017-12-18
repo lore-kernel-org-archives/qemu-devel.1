@@ -1,26 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37950)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38321)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yvugenfi@redhat.com>) id 1eQth1-0003lN-Gv
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 06:34:48 -0500
+	(envelope-from <bounces@canonical.com>) id 1eQthj-0004Ci-GS
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 06:35:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yvugenfi@redhat.com>) id 1eQtgy-0004lh-DO
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 06:34:47 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:56658)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <yvugenfi@redhat.com>) id 1eQtgy-0004jO-3T
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 06:34:44 -0500
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
-From: Yan Vugenfirer <yvugenfi@redhat.com>
-In-Reply-To: <1513280073-27515-1-git-send-email-jbaron@akamai.com>
-Date: Mon, 18 Dec 2017 13:34:33 +0200
+	(envelope-from <bounces@canonical.com>) id 1eQthg-0005Hi-EP
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 06:35:31 -0500
+Received: from indium.canonical.com ([91.189.90.7]:45624)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1eQthg-0005G6-8d
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 06:35:28 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1eQthf-0003Cu-9H
+	for <qemu-devel@nongnu.org>; Mon, 18 Dec 2017 11:35:27 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 407532E80CB
+	for <qemu-devel@nongnu.org>; Mon, 18 Dec 2017 11:35:27 +0000 (UTC)
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Message-Id: <C5089512-91B2-439E-B22D-D7D416BDD558@redhat.com>
-References: <cover.1513278334.git.jbaron@akamai.com>
-	<cover.1513278334.git.jbaron@akamai.com>
-	<1513280073-27515-1-git-send-email-jbaron@akamai.com>
-Subject: Re: [Qemu-devel] [PATCH 2/2] qemu: add linkspeed and duplex setting
- to virtio-net
+Date: Mon, 18 Dec 2017 11:26:25 -0000
+From: Christophe Lyon <christophe.lyon+launchpad@gmail.com>
+Reply-To: Bug 1738767 <1738767@bugs.launchpad.net>
+Sender: bounces@canonical.com
+Message-Id: <151359638511.16639.9243776100393876848.malonedeb@soybean.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1738767] [NEW] Cannot build QEMU on RHEL6 because
+ of MAP_HUGETLB
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,163 +36,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jason Baron <jbaron@akamai.com>
-Cc: qemu-devel@nongnu.org, linux-kernel@vger.kernel.org, jasowang@redhat.com, mst@redhat.com
+To: qemu-devel@nongnu.org
 
+Public bug reported:
 
-> On 14 Dec 2017, at 21:33, Jason Baron via Qemu-devel =
-<qemu-devel@nongnu.org> wrote:
->=20
-> Although they can be currently set in linux via 'ethtool -s', this =
-requires
-> guest changes, and thus it would be nice to extend this functionality =
-such
-> that it can be configured automatically from the host (as other =
-network
-> do).
->=20
-> Linkspeed and duplex settings can be set as:
-> '-device virtio-net,speed=3D10000,duplex=3Dfull'
->=20
-> where speed is [-1...INT_MAX], and duplex is ["half"|"full"].
->=20
-> Signed-off-by: Jason Baron <jbaron@akamai.com>
-> Cc: "Michael S. Tsirkin" <mst@redhat.com>
-> Cc: Jason Wang <jasowang@redhat.com>
-> ---
-> hw/net/virtio-net.c                         | 29 =
-+++++++++++++++++++++++++++++
-> include/hw/virtio/virtio-net.h              |  3 +++
-> include/standard-headers/linux/virtio_net.h |  4 ++++
-> 3 files changed, 36 insertions(+)
->=20
-> diff --git a/hw/net/virtio-net.c b/hw/net/virtio-net.c
-> index 38674b0..d63e790 100644
-> --- a/hw/net/virtio-net.c
-> +++ b/hw/net/virtio-net.c
-> @@ -40,6 +40,12 @@
-> #define VIRTIO_NET_RX_QUEUE_MIN_SIZE VIRTIO_NET_RX_QUEUE_DEFAULT_SIZE
-> #define VIRTIO_NET_TX_QUEUE_MIN_SIZE VIRTIO_NET_TX_QUEUE_DEFAULT_SIZE
->=20
-> +/* duplex and speed defines */
-> +#define DUPLEX_UNKNOWN          0xff
-> +#define DUPLEX_HALF             0x00
-> +#define DUPLEX_FULL             0x01
-> +#define SPEED_UNKNOWN           -1
-> +
-> /*
->  * Calculate the number of bytes up to and including the given 'field' =
-of
->  * 'container'.
-> @@ -61,6 +67,8 @@ static VirtIOFeature feature_sizes[] =3D {
->      .end =3D endof(struct virtio_net_config, max_virtqueue_pairs)},
->     {.flags =3D 1 << VIRTIO_NET_F_MTU,
->      .end =3D endof(struct virtio_net_config, mtu)},
-> +    {.flags =3D 1 << VIRTIO_NET_F_SPEED_DUPLEX,
-> +     .end =3D endof(struct virtio_net_config, duplex)},
->     {}
-> };
->=20
-> @@ -88,6 +96,8 @@ static void virtio_net_get_config(VirtIODevice =
-*vdev, uint8_t *config)
->     virtio_stw_p(vdev, &netcfg.status, n->status);
->     virtio_stw_p(vdev, &netcfg.max_virtqueue_pairs, n->max_queues);
->     virtio_stw_p(vdev, &netcfg.mtu, n->net_conf.mtu);
-> +    virtio_stl_p(vdev, &netcfg.speed, n->net_conf.speed);
-> +    netcfg.duplex =3D n->net_conf.duplex;
->     memcpy(netcfg.mac, n->mac, ETH_ALEN);
->     memcpy(config, &netcfg, n->config_size);
-> }
-> @@ -1941,6 +1951,23 @@ static void =
-virtio_net_device_realize(DeviceState *dev, Error **errp)
->         n->host_features |=3D (0x1 << VIRTIO_NET_F_MTU);
->     }
->=20
-> +    n->host_features |=3D (0x1 << VIRTIO_NET_F_SPEED_DUPLEX);
-> +    if (n->net_conf.duplex_str) {
-> +        if (strncmp(n->net_conf.duplex_str, "half", 5) =3D=3D 0) {
-> +            n->net_conf.duplex =3D DUPLEX_HALF;
-> +        } else if (strncmp(n->net_conf.duplex_str, "full", 5) =3D=3D =
-0) {
-> +            n->net_conf.duplex =3D DUPLEX_FULL;
-> +        } else {
-> +            error_setg(errp, "'duplex' must be 'half' or 'full'");
-> +        }
-> +    } else {
-> +        n->net_conf.duplex =3D DUPLEX_UNKNOWN;
-> +    }
-> +    if (n->net_conf.speed < SPEED_UNKNOWN) {
-> +            error_setg(errp, "'speed' must be between -1 =
-(SPEED_UNKOWN) and "
-> +                       "INT_MAX");
-> +    }
-> +
->     virtio_net_set_config_size(n, n->host_features);
->     virtio_init(vdev, "virtio-net", VIRTIO_ID_NET, n->config_size);
->=20
-> @@ -2160,6 +2187,8 @@ static Property virtio_net_properties[] =3D {
->     DEFINE_PROP_UINT16("host_mtu", VirtIONet, net_conf.mtu, 0),
->     DEFINE_PROP_BOOL("x-mtu-bypass-backend", VirtIONet, =
-mtu_bypass_backend,
->                      true),
-> +    DEFINE_PROP_INT32("speed", VirtIONet, net_conf.speed, =
-SPEED_UNKNOWN),
+Hello,
+I've just downloaded qemu-2.11.0 sources and I wanted to build QEMU on RHEL=
+6 x86_64, for various targets, amonst which arm-linux-user.
 
-=46rom Windows guest perspective I prefer to have some reasonable =
-default (10G for example).=20
+The build fails because /usr/include/bits/mman.h does not define
+MAP_HUGETLB.
 
-Thanks,
-Yan.
+I think it is needed since commit 541e16904.
 
-> +    DEFINE_PROP_STRING("duplex", VirtIONet, net_conf.duplex_str),
->     DEFINE_PROP_END_OF_LIST(),
-> };
->=20
-> diff --git a/include/hw/virtio/virtio-net.h =
-b/include/hw/virtio/virtio-net.h
-> index b81b6a4..af74a94 100644
-> --- a/include/hw/virtio/virtio-net.h
-> +++ b/include/hw/virtio/virtio-net.h
-> @@ -38,6 +38,9 @@ typedef struct virtio_net_conf
->     uint16_t rx_queue_size;
->     uint16_t tx_queue_size;
->     uint16_t mtu;
-> +    int32_t speed;
-> +    char *duplex_str;
-> +    uint8_t duplex;
-> } virtio_net_conf;
->=20
-> /* Maximum packet size we can receive from tap device: header + 64k */
-> diff --git a/include/standard-headers/linux/virtio_net.h =
-b/include/standard-headers/linux/virtio_net.h
-> index 30ff249..0ff1447 100644
-> --- a/include/standard-headers/linux/virtio_net.h
-> +++ b/include/standard-headers/linux/virtio_net.h
-> @@ -36,6 +36,7 @@
-> #define VIRTIO_NET_F_GUEST_CSUM	1	/* Guest handles pkts w/ =
-partial csum */
-> #define VIRTIO_NET_F_CTRL_GUEST_OFFLOADS 2 /* Dynamic offload =
-configuration. */
-> #define VIRTIO_NET_F_MTU	3	/* Initial MTU advice */
-> +#define VIRTIO_NET_F_SPEED_DUPLEX 4	/* Host set linkspeed and duplex =
-*/
-> #define VIRTIO_NET_F_MAC	5	/* Host has given MAC address. =
-*/
-> #define VIRTIO_NET_F_GUEST_TSO4	7	/* Guest can handle =
-TSOv4 in. */
-> #define VIRTIO_NET_F_GUEST_TSO6	8	/* Guest can handle =
-TSOv6 in. */
-> @@ -76,6 +77,9 @@ struct virtio_net_config {
-> 	uint16_t max_virtqueue_pairs;
-> 	/* Default maximum transmit unit advice */
-> 	uint16_t mtu;
-> +	/* Host exported linkspeed and duplex */
-> +	uint32_t speed;
-> +	uint8_t duplex;
-> } QEMU_PACKED;
->=20
-> /*
-> --=20
-> 2.6.1
->=20
->=20
+I'm not sure if RHEL6 is still supported by QEMU? If so, can you fix
+this problem?
+
+Thanks
+
+** Affects: qemu
+     Importance: Undecided
+         Status: New
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1738767
+
+Title:
+  Cannot build QEMU on RHEL6 because of MAP_HUGETLB
+
+Status in QEMU:
+  New
+
+Bug description:
+  Hello,
+  I've just downloaded qemu-2.11.0 sources and I wanted to build QEMU on RH=
+EL6 x86_64, for various targets, amonst which arm-linux-user.
+
+  The build fails because /usr/include/bits/mman.h does not define
+  MAP_HUGETLB.
+
+  I think it is needed since commit 541e16904.
+
+  I'm not sure if RHEL6 is still supported by QEMU? If so, can you fix
+  this problem?
+
+  Thanks
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1738767/+subscriptions
