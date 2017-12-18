@@ -1,26 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50804)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53574)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1eQoLs-0006BR-Qd
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 00:52:37 -0500
+	(envelope-from <ybettan@redhat.com>) id 1eQoaO-0000FC-Gy
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 01:07:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1eQoLo-0008UK-St
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 00:52:36 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:42354)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1eQoLo-0008U7-J2
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 00:52:32 -0500
-Date: Mon, 18 Dec 2017 13:52:17 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20171218055217.GN22308@xz-mi>
-References: <20171205055200.16305-1-peterx@redhat.com>
-	<20171205055200.16305-22-peterx@redhat.com>
-	<20171214134359.GJ14433@stefanha-x1.localdomain>
+	(envelope-from <ybettan@redhat.com>) id 1eQoaL-0003Tm-D6
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 01:07:36 -0500
+Received: from mail-wm0-f67.google.com ([74.125.82.67]:33391)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <ybettan@redhat.com>) id 1eQoaL-0003SX-5b
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 01:07:33 -0500
+Received: by mail-wm0-f67.google.com with SMTP id g130so6050297wme.0
+	for <qemu-devel@nongnu.org>; Sun, 17 Dec 2017 22:07:31 -0800 (PST)
+References: <20171121064106.13721-1-ybettan@redhat.com>
+	<fe42e8d1-afde-f761-9780-b1a8f7d4030f@vivier.eu>
+From: Yoni Bettan <ybettan@redhat.com>
+Message-ID: <64af419e-b8b8-0a05-21f7-1029bc809079@redhat.com>
+Date: Mon, 18 Dec 2017 08:07:28 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20171214134359.GJ14433@stefanha-x1.localdomain>
-Subject: Re: [Qemu-devel] [RFC v5 21/26] qmp: isolate responses into io
- thread
+In-Reply-To: <fe42e8d1-afde-f761-9780-b1a8f7d4030f@vivier.eu>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+Subject: Re: [Qemu-devel] [PATCH] vl.c && linux-user/main.c : removed **envp
+ from main() arguments
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,66 +31,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: qemu-devel@nongnu.org, Stefan Hajnoczi <shajnocz@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <famz@redhat.com>, Juan Quintela <quintela@redhat.com>, mdroth@linux.vnet.ibm.com, Eric Blake <eblake@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Markus Armbruster <armbru@redhat.com>, marcandre.lureau@redhat.com, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: Laurent Vivier <laurent@vivier.eu>, qemu-devel@nongnu.org
+Cc: Riku Voipio <riku.voipio@iki.fi>, Paolo Bonzini <pbonzini@redhat.com>
 
-On Thu, Dec 14, 2017 at 01:43:59PM +0000, Stefan Hajnoczi wrote:
-> On Tue, Dec 05, 2017 at 01:51:55PM +0800, Peter Xu wrote:
-> > @@ -4429,6 +4515,13 @@ void monitor_cleanup(void)
-> >       */
-> >      iothread_stop(mon_global.mon_iothread);
-> >  
-> > +    /*
-> > +     * After we have IOThread to send responses, it's possible that
-> > +     * when we stop the IOThread there are still replies queued in the
-> > +     * responder queue.  Flush all of them.
-> > +     */
-> > +    monitor_qmp_bh_responder(NULL);
-> 
-> This doesn't work because monitor_qmp_bh_responder() does not guarantee
-> that the full response has been written when it returns.
-> 
-> When qemu_chr_fe_write() returns EAGAIN then qemu_chr_fe_add_watch() is
-> used to register an event loop callback when the chardev becomes
-> writable again.  But you stopped the event loop using iothread_stop() so
-> we will never complete the write.
 
-Good catch...
 
-Actually I just noticed that for char frontend I missed a place to use
-the chardev context for polling.  So before the flushing I possibly
-need this:
+On 11/21/2017 09:30 AM, Laurent Vivier wrote:
+> Le 21/11/2017 à 07:41, Yoni Bettan a écrit :
+>>          * it was added on 2008 902b3d5c392bb6f48ef340ad8ecc3311705d2800
+>>            when introduced cache-utils.[ch]
+>>          * since then cache-utils.[ch] were removed but **envp was left
+>>            behind
+>>
+>> Signed-off-by: Yoni Bettan <ybettan@redhat.com>
+>> ---
+>>   linux-user/main.c | 2 +-
+>>   vl.c              | 6 +++---
+>>   2 files changed, 4 insertions(+), 4 deletions(-)
+>>
+>> diff --git a/linux-user/main.c b/linux-user/main.c
+>> index aa02f25b85..ca5628c1ca 100644
+>> --- a/linux-user/main.c
+>> +++ b/linux-user/main.c
+>> @@ -4233,7 +4233,7 @@ static int parse_args(int argc, char **argv)
+>>       return optind;
+>>   }
+>>   
+>> -int main(int argc, char **argv, char **envp)
+>> +int main(int argc, char **argv)
+>>   {
+>>       struct target_pt_regs regs1, *regs = &regs1;
+>>       struct image_info info1, *info = &info1;
+>> diff --git a/vl.c b/vl.c
+>> index 1ad1c04637..9667756ccc 100644
+>> --- a/vl.c
+>> +++ b/vl.c
+>> @@ -35,10 +35,10 @@
+>>   #ifdef CONFIG_SDL
+>>   #if defined(__APPLE__) || defined(main)
+>>   #include <SDL.h>
+>> -int qemu_main(int argc, char **argv, char **envp);
+>> +int qemu_main(int argc, char **argv);
+>>   int main(int argc, char **argv)
+>>   {
+>> -    return qemu_main(argc, argv, NULL);
+>> +    return qemu_main(argc, argv);
+>>   }
+>>   #undef main
+>>   #define main qemu_main
+> I think this part can be removed now. As it seems it has been added
+> because of the envp parameter.
 
-diff --git a/chardev/char-fe.c b/chardev/char-fe.c                             
-index ee6d596100..462c529f19 100644    
---- a/chardev/char-fe.c                
-+++ b/chardev/char-fe.c                
-@@ -356,7 +356,7 @@ guint qemu_chr_fe_add_watch(CharBackend *be, GIOCondition cond,                                                                           
-     }                                 
-                                       
-     g_source_set_callback(src, (GSourceFunc)func, user_data, NULL);           
--    tag = g_source_attach(src, NULL); 
-+    tag = g_source_attach(src, be->chr->gcontext);                            
-     g_source_unref(src);              
-                                       
-     return tag;                       
+Thanks Laurent for your response and sorry for my late response.
+I think this part was added for another purpose as described here 
+880fec5d086
 
-Otherwise it'll be still be run in main thread always.
+As i see it the env param was added in 2008 in order to support cache-utils
+as shown in 902b3d5c392bb6f48ef340ad8ecc3311705d2800 and in 2009
+another main function was added in order to unbreak SDL on Mac-OS X and 
+the env param
+was added only for consistency I suppose...
 
-(I guess I haven't yet encountered an EAGAIN for it so far)
+What do you think?
 
-> 
-> I suggest draining the monitor while the IOThread is still running
-> (that way the AioContext and GMainContext are still operational).  You
-> can:
-> 1. Suspend the monitor so new commands will not be read.
-> 2. Wait until all responses and outbuf are empty.
-> 
-> Another option is moving the chardev back to the main loop but I'm not
-> sure if the chardev subsystem supports that.
-
-Your suggestion is good to me.  I'll do that in IOThread before it
-stops.  Thanks!
-
--- 
-Peter Xu
+Thanks,
+Yoni
+> Thanks,
+> Laurent
