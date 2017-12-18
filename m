@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50029)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56688)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1eQwGo-0002Ex-8J
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 09:19:56 -0500
+	(envelope-from <stefanha@redhat.com>) id 1eQwKS-0005bn-J3
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 09:23:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1eQwGl-0004m0-0L
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 09:19:54 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:39492)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1eQwGk-0004kx-Nh
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 09:19:50 -0500
-Date: Mon, 18 Dec 2017 14:19:46 +0000
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20171218141946.GB26755@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <151360476094.18806.1179096997853697345.stgit@bahia.lan>
+	(envelope-from <stefanha@redhat.com>) id 1eQwK5-00018z-En
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 09:23:40 -0500
+Date: Mon, 18 Dec 2017 14:22:22 +0000
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20171218142222.GI16653@stefanha-x1.localdomain>
+References: <20171214005953.8898-1-jsnow@redhat.com>
+	<20171214005953.8898-2-jsnow@redhat.com>
+	<fad7ac35-e2be-a7b0-078c-4aa4c3dd2905@redhat.com>
+	<cba92745-25c7-0838-8df4-1d8b3881ad93@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="/8E7gjuj425jZz9t"
 Content-Disposition: inline
-In-Reply-To: <151360476094.18806.1179096997853697345.stgit@bahia.lan>
-Subject: Re: [Qemu-devel] [PATCH] 9pfs: deprecate handle backend
+In-Reply-To: <cba92745-25c7-0838-8df4-1d8b3881ad93@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 1/7] blockjob: record time of last yield
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,85 +26,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>
-Cc: qemu-devel@nongnu.org, "Aneesh Kumar K.V" <aneesh.kumar@linux.vnet.ibm.com>
-
-On Mon, Dec 18, 2017 at 02:46:00PM +0100, Greg Kurz wrote:
-> This backend raise some concerns:
-> 
-> - doesn't support symlinks
-> - fails +100 tests in the PJD POSIX file system test suite [1]
-> - requires the QEMU process to run with the CAP_DAC_READ_SEARCH
->   capability, which isn't recommended for security reasons
-> 
-> For all these reasons, the handle backend is now deprecated.
-> 
-> [1] https://www.tuxera.com/community/posix-test-suite/
-> 
-> Signed-off-by: Greg Kurz <groug@kaod.org>
-> ---
-> 
-> Aneesh,
-> 
-> Even if I see the benefit of using file handles in a userspace file
-> server, the handle backend still has flaws that make it hardly usable
-> IMHO. Also I haven't received anything about it in years. All users
-> and contributors seem to stick to the local backend.
-> 
-> My guess is that nobody uses the handle backend, and unless I'm missing
-> something, it wouldn't hurt to drop it. My motivation is to reduce the
-> number of lines that I don't really have time/motivation to maintain,
-> and that could be subject to a CVE in the future.
-> 
-> Any thoughts ?
-> ---
->  hw/9pfs/9p-handle.c |    2 ++
->  qemu-doc.texi       |    8 ++++++++
->  2 files changed, 10 insertions(+)
-> 
-> diff --git a/hw/9pfs/9p-handle.c b/hw/9pfs/9p-handle.c
-> index 9875f1894cc5..1291a2db6782 100644
-> --- a/hw/9pfs/9p-handle.c
-> +++ b/hw/9pfs/9p-handle.c
-> @@ -657,6 +657,8 @@ static int handle_parse_opts(QemuOpts *opts, struct FsDriverEntry *fse)
->      const char *sec_model = qemu_opt_get(opts, "security_model");
->      const char *path = qemu_opt_get(opts, "path");
->  
-> +    warn_report("handle backend is deprecated");
-> +
->      if (sec_model) {
->          error_report("Invalid argument security_model specified with handle fsdriver");
->          return -1;
-> diff --git a/qemu-doc.texi b/qemu-doc.texi
-> index f7317dfc66cd..bf44e2752cb2 100644
-> --- a/qemu-doc.texi
-> +++ b/qemu-doc.texi
-> @@ -2509,6 +2509,14 @@ default channel subsystem image for guests that do not support multiple
->  channel subsystems, all devices can be put into the default channel
->  subsystem image.
->  
-> +@subsection -fsdev handle (since 2.12.0)
-> +
-> +The ``handle'' fsdev backend does not support symlinks and causes the 9p
-> +filesystem in the guest to fail a fair amount of tests from the PJD POSIX
-> +filesystem test suite. Also it requires the CAP_DAC_READ_SEARCH capability,
-> +which is not the recommended way to run QEMU. This backend should not be
-> +used and it will be removed with no replacement.
-> +
-
-I would suggest a slight teak to the last sentance.
-
- "This backend should not be used and wil be removed. The 'local' backend
-  is the recommended alternative"
-
-Regardless of whether you include this wording change though:
-
-  Reviewed-by: Daniel P. Berrange <berrange@redhat.com>
+To: John Snow <jsnow@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-block@nongnu.org, kwolf@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com
 
 
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+--/8E7gjuj425jZz9t
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Thu, Dec 14, 2017 at 10:55:22AM -0500, John Snow wrote:
+>=20
+>=20
+> On 12/14/2017 03:38 AM, Paolo Bonzini wrote:
+> > On 14/12/2017 01:59, John Snow wrote:
+> >>      qemu_coroutine_yield();
+> >> +    job->last_yield_ns =3D qemu_clock_get_ns(QEMU_CLOCK_REALTIME);
+> >=20
+> > This is not the time the job has yielded control, but the time the job
+> > has gotten it back.  Is it intended?
+> >=20
+> > Thanks,
+> >=20
+> > Paolo
+> >=20
+>=20
+> Yes, since that matches how mirror recorded last_sleep_ns, except for
+> where it records the 0ns sleep, then it records it beforehand (close
+> enough.)
+>=20
+> I intended for this valuable to count how long we haven't yielded,
+> basically. Thought being that any time we are yielded, we're being
+> cooperative.
+>=20
+> This is the selfishness counter :)
+
+Maybe last_enter_ns is a clearer name.
+
+--/8E7gjuj425jZz9t
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJaN88eAAoJEJykq7OBq3PIW7AH/2c9ej64XTURpEFsJ+UjH9I/
+erqTRO9c+pVPZcOyOppr2oZeUGl+/Upqo/ZbvET31BoSZePw9URBpm8InRrnGlQ3
+r1ifz0jF506P5PpmxRtk06Bn7Z8nZJS50UdUEOtNS0mFt/7rasNxS5J1QPvtwF1O
+IavKjTAr0EF8ekjFcM5av28vcTCmRsddjuYXr+AZ6uBYjwR1jOtp6et5YAY/u0j6
+b+srU2b9o9GtmrBXxw1vGjt7cWVH8a/x2HdcmKN3obgYglvfbWsv2C6KcBOylKJp
+4O1yeg8QVwAHp0bCgH6dPbqkVPqOQWvVh/JoAMdcWygs7GmgTdBh4iPm7r+sZEA=
+=Yiyo
+-----END PGP SIGNATURE-----
+
+--/8E7gjuj425jZz9t--
