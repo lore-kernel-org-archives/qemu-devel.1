@@ -1,35 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39994)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44228)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhaoshenglong@huawei.com>) id 1eQpgh-0002dx-7P
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 02:18:12 -0500
+	(envelope-from <peterx@redhat.com>) id 1eQpur-0006lx-Gb
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 02:32:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zhaoshenglong@huawei.com>) id 1eQpgd-0006N8-8T
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 02:18:11 -0500
-Received: from szxga05-in.huawei.com ([45.249.212.191]:2054 helo=huawei.com)
+	(envelope-from <peterx@redhat.com>) id 1eQpuo-0001dH-Ai
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 02:32:49 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:57466)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <zhaoshenglong@huawei.com>)
-	id 1eQpgc-0006Hp-Rx
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 02:18:07 -0500
-Message-ID: <5A376B8D.5080008@huawei.com>
-Date: Mon, 18 Dec 2017 15:17:33 +0800
-From: Shannon Zhao <zhaoshenglong@huawei.com>
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1eQpuo-0001cM-1z
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 02:32:46 -0500
+Date: Mon, 18 Dec 2017 15:32:29 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20171218073229.GP22308@xz-mi>
+References: <20171205055200.16305-1-peterx@redhat.com>
+	<20171205055200.16305-22-peterx@redhat.com>
+	<20171214134359.GJ14433@stefanha-x1.localdomain>
+	<20171218055217.GN22308@xz-mi>
 MIME-Version: 1.0
-References: <20171201105622.GB26237@yangzhon-Virtual>
-	<74cccd14-e485-90d4-82d9-03355c05faca@redhat.com>
-	<20171204120322.GA32151@yangzhon-Virtual>
-	<5A253EF5.6040300@huawei.com>
-	<20171205060047.GA4102@yangzhon-Virtual>
-	<024fd897-a16a-f69e-94dc-07affb3ef724@redhat.com>
-	<20171206092625.GA19639@yangzhon-Virtual>
-	<6bfac215-b5ba-fd09-d17b-310a2c843a2b@redhat.com>
-	<20171207150629.GA7387@yangzhon-Virtual>
-	<af4a7e59-ac0a-1d5f-3cc5-458dd5fc6fc9@redhat.com>
-	<20171212065419.GB26607@yangzhon-Virtual>
-In-Reply-To: <20171212065419.GB26607@yangzhon-Virtual>
-Content-Type: text/plain; charset="ISO-8859-1"
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3] rcu: reduce more than 7MB heap memory
- by malloc_trim()
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20171218055217.GN22308@xz-mi>
+Subject: Re: [Qemu-devel] [RFC v5 21/26] qmp: isolate responses into io
+ thread
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,23 +30,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Yang Zhong <yang.zhong@intel.com>, Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-devel@nongnu.org, stefanha@redhat.com, berrange@redhat.com, weidong.huang@huawei.com, arei.gonglei@huawei.com, liujunjie23@huawei.com, wangxinxin.wang@huawei.com, stone.xulei@huawei.com
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Cc: qemu-devel@nongnu.org, Stefan Hajnoczi <shajnocz@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <famz@redhat.com>, Juan Quintela <quintela@redhat.com>, mdroth@linux.vnet.ibm.com, Eric Blake <eblake@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Markus Armbruster <armbru@redhat.com>, marcandre.lureau@redhat.com, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 
-
-
-On 2017/12/12 14:54, Yang Zhong wrote:
->> > 2) what effect it has on boot time in Shannon's case.
->   Hello Shannon,
+On Mon, Dec 18, 2017 at 01:52:17PM +0800, Peter Xu wrote:
+> On Thu, Dec 14, 2017 at 01:43:59PM +0000, Stefan Hajnoczi wrote:
+> > On Tue, Dec 05, 2017 at 01:51:55PM +0800, Peter Xu wrote:
+> > > @@ -4429,6 +4515,13 @@ void monitor_cleanup(void)
+> > >       */
+> > >      iothread_stop(mon_global.mon_iothread);
+> > >  
+> > > +    /*
+> > > +     * After we have IOThread to send responses, it's possible that
+> > > +     * when we stop the IOThread there are still replies queued in the
+> > > +     * responder queue.  Flush all of them.
+> > > +     */
+> > > +    monitor_qmp_bh_responder(NULL);
+> > 
+> > This doesn't work because monitor_qmp_bh_responder() does not guarantee
+> > that the full response has been written when it returns.
+> > 
+> > When qemu_chr_fe_write() returns EAGAIN then qemu_chr_fe_add_watch() is
+> > used to register an event loop callback when the chardev becomes
+> > writable again.  But you stopped the event loop using iothread_stop() so
+> > we will never complete the write.
 > 
->   It's hard for me to reproduce your commands in my x86 enviornment, as a compare test,
->   would you please help me use above two TEMP patches to verify VM bootup time again?
+> Good catch...
 > 
->   Those data can help Paolo to decide which patch will be used or how to adjust delta
->   parameter.  Many thanks!
-We have tested these two patches. Both don't increase the VM bootup time
-in my case.
+> Actually I just noticed that for char frontend I missed a place to use
+> the chardev context for polling.  So before the flushing I possibly
+> need this:
+> 
+> diff --git a/chardev/char-fe.c b/chardev/char-fe.c                             
+> index ee6d596100..462c529f19 100644    
+> --- a/chardev/char-fe.c                
+> +++ b/chardev/char-fe.c                
+> @@ -356,7 +356,7 @@ guint qemu_chr_fe_add_watch(CharBackend *be, GIOCondition cond,                                                                           
+>      }                                 
+>                                        
+>      g_source_set_callback(src, (GSourceFunc)func, user_data, NULL);           
+> -    tag = g_source_attach(src, NULL); 
+> +    tag = g_source_attach(src, be->chr->gcontext);                            
+>      g_source_unref(src);              
+>                                        
+>      return tag;                       
+> 
+> Otherwise it'll be still be run in main thread always.
+> 
+> (I guess I haven't yet encountered an EAGAIN for it so far)
+> 
+> > 
+> > I suggest draining the monitor while the IOThread is still running
+> > (that way the AioContext and GMainContext are still operational).  You
+> > can:
+> > 1. Suspend the monitor so new commands will not be read.
+> > 2. Wait until all responses and outbuf are empty.
+> > 
+> > Another option is moving the chardev back to the main loop but I'm not
+> > sure if the chardev subsystem supports that.
+> 
+> Your suggestion is good to me.  I'll do that in IOThread before it
+> stops.  Thanks!
 
-Thanks,
+Hmm, after a second thought, I think maybe it would be nicer to just
+call monitor_flush() after the monitor iothread is stopped.
+
+Firstly, that is perfectly legal - since AFAICT commit 6cff3e8594
+("monitor: protect outbuf and mux_out with mutex", 2014-06-23) is
+tailored for doing that, though that was for block iothread, not
+monitor.
+
+Then, it's still possible that the write buffer is full and we got
+EAGAIN during flushing.  Then we'll plug another task into the monitor
+gcontext which will never run since the iothread is stopped already.
+IMHO that's totally fine - I think it's already our best effort to
+flush the out buffer once at this point.  If the buffer is still full
+after one attemp of monitor_flush(), we should just give up the 2nd
+flushing instead of waiting here.  After all, we are quitting QEMU.
+
+As a summary, my planned change of this issue would be quite
+straightforward: call monitor_flush() when looping over monitors,
+before destroying them.  And when destroying, if there is dangling
+Monitor.out_watch, detach them.  Hope that works.  Thanks,
+
 -- 
-Shannon
+Peter Xu
