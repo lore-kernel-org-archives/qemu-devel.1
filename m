@@ -1,18 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49878)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52847)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <crobinso@redhat.com>) id 1eR3z1-00035i-9X
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 17:34:06 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1eR421-0005Oc-6S
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 17:37:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <crobinso@redhat.com>) id 1eR3yy-0006QZ-4T
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 17:34:03 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:40502)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <crobinso@redhat.com>) id 1eR3yx-0006PU-VB
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 17:34:00 -0500
-From: Cole Robinson <crobinso@redhat.com>
-Date: Mon, 18 Dec 2017 17:33:54 -0500
-Message-Id: <458bba0e0865443a3d4e0f8e0dbb5bc712e098b9.1513636434.git.crobinso@redhat.com>
-Subject: [Qemu-devel] [PATCH] scripts/make-release: More .git removal
+	(envelope-from <richard.henderson@linaro.org>) id 1eR41w-0000T3-72
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 17:37:09 -0500
+Received: from mail-pl0-x233.google.com ([2607:f8b0:400e:c01::233]:37017)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1eR41v-0000Rw-Vv
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 17:37:04 -0500
+Received: by mail-pl0-x233.google.com with SMTP id s3so5712738plp.4
+	for <qemu-devel@nongnu.org>; Mon, 18 Dec 2017 14:37:03 -0800 (PST)
+References: <20171211125705.16120-1-alex.bennee@linaro.org>
+	<20171211125705.16120-14-alex.bennee@linaro.org>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <48f8d28f-91fd-051d-c24b-63d4c96c46d5@linaro.org>
+Date: Mon, 18 Dec 2017 14:36:58 -0800
+MIME-Version: 1.0
+In-Reply-To: <20171211125705.16120-14-alex.bennee@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v1 13/19] fpu/softfloat: re-factor muladd
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,32 +31,17 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: mdroth@linux.vnet.ibm.com, peter.maydell@linaro.org, Cole Robinson <crobinso@redhat.com>
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, peter.maydell@linaro.org, laurent@vivier.eu, bharata@linux.vnet.ibm.com, andrew@andrewdutcher.com, aleksandar.markovic@imgtec.com
+Cc: qemu-devel@nongnu.org, Aurelien Jarno <aurelien@aurel32.net>
 
-As was last done in 379e21c25, we want to remove .git files for
-submodules here, which we aren't presently doing for capstone and
-keycodemapdb.
+On 12/11/2017 04:56 AM, Alex Bennée wrote:
+> +    if (flags & float_muladd_halve_result) {
+> +            p_exp -= 1;
+> +    }
 
-Rather than a whitelist use 'find' to future proof this
+Indent.  Otherwise, I was involved in writing this, so
 
-Signed-off-by: Cole Robinson <crobinso@redhat.com>
----
- scripts/make-release | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 
-diff --git a/scripts/make-release b/scripts/make-release
-index 3917df7142..7c7bec577f 100755
---- a/scripts/make-release
-+++ b/scripts/make-release
-@@ -19,7 +19,7 @@ pushd ${destination}
- git checkout "v${version}"
- git submodule update --init
- (cd roms/seabios && git describe --tags --long --dirty > .version)
--rm -rf .git roms/*/.git dtc/.git pixman/.git
-+find . -depth -name .git -exec rm -rf '{}' \;
- # FIXME: The following line is a workaround for avoiding filename collisions
- # when unpacking u-boot sources on case-insensitive filesystems. Once we
- # update to something with u-boot commit 610eec7f0 we can drop this line.
--- 
-2.14.3
+
+r~
