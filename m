@@ -1,32 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43193)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52330)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1eQvVY-0008QC-Fp
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 08:31:06 -0500
+	(envelope-from <darren.kenny@oracle.com>) id 1eQvbM-0004a8-NG
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 08:37:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1eQvVV-0004wf-Sv
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 08:31:04 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:35652)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1eQvVV-0004vv-My
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 08:31:01 -0500
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id BE8DB4A6FF
-	for <qemu-devel@nongnu.org>; Mon, 18 Dec 2017 13:31:00 +0000 (UTC)
-Date: Mon, 18 Dec 2017 13:30:56 +0000
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20171218133056.GC16653@stefanha-x1.localdomain>
-References: <20171215150659.1811-1-marcandre.lureau@redhat.com>
-	<20171215150659.1811-13-marcandre.lureau@redhat.com>
+	(envelope-from <darren.kenny@oracle.com>) id 1eQvbI-0002Qv-Ao
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 08:37:04 -0500
+Received: from userp2130.oracle.com ([156.151.31.86]:33275)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <darren.kenny@oracle.com>)
+	id 1eQvbI-0002Nx-25
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 08:37:00 -0500
+Date: Mon, 18 Dec 2017 13:36:52 +0000
+From: Darren Kenny <darren.kenny@oracle.com>
+Message-ID: <20171218133652.wq74ymqhmrxvfoka@starbug-vm.ie.oracle.com>
+References: <20171215181810.4122-1-marcandre.lureau@redhat.com>
+	<abddfb99-c6ca-70ba-eae9-16f57f60b41d@redhat.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="B4IIlcmfBL/1gGOG"
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Disposition: inline
-In-Reply-To: <20171215150659.1811-13-marcandre.lureau@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 12/13] ucontext: annotate coroutine
- stack for ASAN
+In-Reply-To: <abddfb99-c6ca-70ba-eae9-16f57f60b41d@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] checkpatch: warn when using volatile with
+ a comment
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,44 +30,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org, lersek@redhat.com, famz@redhat.com
 
+Hi Paolo,
 
---B4IIlcmfBL/1gGOG
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Slight nit on the subject line, did you mean to s/with/without/ -
+that seems to reflect the change in the patch more correctly.
 
-On Fri, Dec 15, 2017 at 04:06:58PM +0100, Marc-Andr=E9 Lureau wrote:
-> It helps ASAN to detect more leaks on coroutine stacks, as found in
-> the following patch.
->=20
-> A similar work would need to be done for sigaltstack & windows fibers
-> to have similar coverage. Since ucontext is prefered, I didn't bother
-> checking the other coroutine implementations for now.
->=20
-> Signed-off-by: Marc-Andr=E9 Lureau <marcandre.lureau@redhat.com>
-> ---
->  include/qemu/compiler.h   |  4 ++++
->  util/coroutine-ucontext.c | 46 +++++++++++++++++++++++++++++++++++++++++=
-+++++
->  2 files changed, 50 insertions(+)
+Thanks,
 
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+Darren.
 
---B4IIlcmfBL/1gGOG
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJaN8MQAAoJEJykq7OBq3PIivIIAMHCUBVlnWP6QWsPzRvM/yhn
-C4blm8CzJ2XDNM4jnO6Pe5B7qy+oFOZbgpdvgmPqJ99uSljLKGwEtKnxEMPkc078
-oW70wi87G+A7W8wNThsdLmjyy5FkdUFXFP+PZHzyHzUD8AcNOsKVvPLFEXZa4yBf
-o4lDIF2IRMMMuqNyDPRyVqcUS7A1FoFBGR4Vzzk7UOO5sE6sRhLP/YTiok4pMn2M
-aTt16KOnJ79LDbj4uwS4QYY1LmgKramSh24ArRHZ8PcD0QM9teqHgorHW1ogptbc
-6SVi1jEeH4JsxfEhtYH3DT84nsfsBH4gb1IZ6SANvoTkANqvvA4E7Kgkv4oVMNs=
-=/+N3
------END PGP SIGNATURE-----
-
---B4IIlcmfBL/1gGOG--
+On Mon, Dec 18, 2017 at 01:49:52PM +0100, Paolo Bonzini wrote:
+>On 15/12/2017 19:18, Marc-Andr=C3=A9 Lureau wrote:
+>> Instead of an error, lower to a warning message, assuming the comment
+>> gives some justification.
+>>
+>> Discussed in:
+>> '[Qemu-devel] [PATCH] dump-guest-memory.py: fix "You can't do that wit=
+hout a process to debug"'
+>>
+>> Suggested-by: Fam Zheng <famz@redhat.com>
+>> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+>
+>We can drop the error at all if there is a comment.  Also, "volatile sig=
+_atomic_t" is probably self-explanatory and usually correct.  So what abo=
+ut this:
+>
+>diff --git a/scripts/checkpatch.pl b/scripts/checkpatch.pl
+>index f5a523af10..3dc27d9656 100755
+>--- a/scripts/checkpatch.pl
+>+++ b/scripts/checkpatch.pl
+>@@ -2475,13 +2475,11 @@ sub process {
+>
+> # no volatiles please
+> 		my $asm_volatile =3D qr{\b(__asm__|asm)\s+(__volatile__|volatile)\b};
+>-		if ($line =3D~ /\bvolatile\b/ && $line !~ /$asm_volatile/) {
+>-			my $msg =3D "Use of volatile is usually wrong: see Documentation/vol=
+atile-considered-harmful.txt\n" . $herecurr;
+>-			if (ctx_has_comment($first_line, $linenr)) {
+>-				WARN($msg);
+>-			} else {
+>-				ERROR($msg);
+>-			}
+>+		if ($line =3D~ /\bvolatile\b/ && $line !~ /$asm_volatile/ &&
+>+                    $line !~ /sig_atomic_t/ &&
+>+                    !ctx_has_comment($first_line, $linenr)) {
+>+			my $msg =3D "Use of volatile is usually wrong, please add a comment\=
+n" . $herecurr;
+>+                        ERROR($msg);
+> 		}
+>
+> # warn about #if 0
+>
