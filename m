@@ -1,34 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49027)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49183)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yang.zhong@intel.com>) id 1eQqDV-0002fz-DE
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 02:52:06 -0500
+	(envelope-from <laurent@vivier.eu>) id 1eQqDx-00033s-4m
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 02:52:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yang.zhong@intel.com>) id 1eQqDS-0001IE-B5
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 02:52:05 -0500
-Received: from mga05.intel.com ([192.55.52.43]:40798)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <yang.zhong@intel.com>)
-	id 1eQqDS-0001Ha-1Z
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 02:52:02 -0500
-Date: Mon, 18 Dec 2017 15:51:15 +0800
-From: Yang Zhong <yang.zhong@intel.com>
-Message-ID: <20171218075115.GA15707@yangzhon-Virtual>
-References: <20171204120322.GA32151@yangzhon-Virtual>
-	<5A253EF5.6040300@huawei.com>
-	<20171205060047.GA4102@yangzhon-Virtual>
-	<024fd897-a16a-f69e-94dc-07affb3ef724@redhat.com>
-	<20171206092625.GA19639@yangzhon-Virtual>
-	<6bfac215-b5ba-fd09-d17b-310a2c843a2b@redhat.com>
-	<20171207150629.GA7387@yangzhon-Virtual>
-	<af4a7e59-ac0a-1d5f-3cc5-458dd5fc6fc9@redhat.com>
-	<20171212065419.GB26607@yangzhon-Virtual>
-	<5A376B8D.5080008@huawei.com>
+	(envelope-from <laurent@vivier.eu>) id 1eQqDu-0001Oo-21
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 02:52:33 -0500
+Received: from mout.kundenserver.de ([212.227.126.187]:50065)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1eQqDt-0001N1-OP
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 02:52:29 -0500
+References: <20171121064106.13721-1-ybettan@redhat.com>
+	<fe42e8d1-afde-f761-9780-b1a8f7d4030f@vivier.eu>
+	<64af419e-b8b8-0a05-21f7-1029bc809079@redhat.com>
+From: Laurent Vivier <laurent@vivier.eu>
+Message-ID: <0843d1d9-e015-f4bd-3a98-92c0e3db5b42@vivier.eu>
+Date: Mon, 18 Dec 2017 08:52:01 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <5A376B8D.5080008@huawei.com>
-Subject: Re: [Qemu-devel] [PATCH v3] rcu: reduce more than 7MB heap memory
- by malloc_trim()
+In-Reply-To: <64af419e-b8b8-0a05-21f7-1029bc809079@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH] vl.c && linux-user/main.c : removed **envp
+ from main() arguments
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,34 +30,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Shannon Zhao <zhaoshenglong@huawei.com>, pbonzini@redhat.com
-Cc: qemu-devel@nongnu.org, stefanha@redhat.com, berrange@redhat.com, weidong.huang@huawei.com, arei.gonglei@huawei.com, liujunjie23@huawei.com, wangxinxin.wang@huawei.com, stone.xulei@huawei.com, yang.zhong@intel.com
+To: Yoni Bettan <ybettan@redhat.com>, qemu-devel@nongnu.org
+Cc: Riku Voipio <riku.voipio@iki.fi>, Paolo Bonzini <pbonzini@redhat.com>
 
-On Mon, Dec 18, 2017 at 03:17:33PM +0800, Shannon Zhao wrote:
+Le 18/12/2017 à 07:07, Yoni Bettan a écrit :
 > 
 > 
-> On 2017/12/12 14:54, Yang Zhong wrote:
-> >> > 2) what effect it has on boot time in Shannon's case.
-> >   Hello Shannon,
-> > 
-> >   It's hard for me to reproduce your commands in my x86 enviornment, as a compare test,
-> >   would you please help me use above two TEMP patches to verify VM bootup time again?
-> > 
-> >   Those data can help Paolo to decide which patch will be used or how to adjust delta
-> >   parameter.  Many thanks!
-> We have tested these two patches. Both don't increase the VM bootup time
-> in my case.
+> On 11/21/2017 09:30 AM, Laurent Vivier wrote:
+>> Le 21/11/2017 à 07:41, Yoni Bettan a écrit :
+>>>          * it was added on 2008 902b3d5c392bb6f48ef340ad8ecc3311705d2800
+>>>            when introduced cache-utils.[ch]
+>>>          * since then cache-utils.[ch] were removed but **envp was left
+>>>            behind
+>>>
+>>> Signed-off-by: Yoni Bettan <ybettan@redhat.com>
+>>> ---
+>>>   linux-user/main.c | 2 +-
+>>>   vl.c              | 6 +++---
+>>>   2 files changed, 4 insertions(+), 4 deletions(-)
+>>>
+>>> diff --git a/linux-user/main.c b/linux-user/main.c
+>>> index aa02f25b85..ca5628c1ca 100644
+>>> --- a/linux-user/main.c
+>>> +++ b/linux-user/main.c
+>>> @@ -4233,7 +4233,7 @@ static int parse_args(int argc, char **argv)
+>>>       return optind;
+>>>   }
+>>>   -int main(int argc, char **argv, char **envp)
+>>> +int main(int argc, char **argv)
+>>>   {
+>>>       struct target_pt_regs regs1, *regs = &regs1;
+>>>       struct image_info info1, *info = &info1;
+>>> diff --git a/vl.c b/vl.c
+>>> index 1ad1c04637..9667756ccc 100644
+>>> --- a/vl.c
+>>> +++ b/vl.c
+>>> @@ -35,10 +35,10 @@
+>>>   #ifdef CONFIG_SDL
+>>>   #if defined(__APPLE__) || defined(main)
+>>>   #include <SDL.h>
+>>> -int qemu_main(int argc, char **argv, char **envp);
+>>> +int qemu_main(int argc, char **argv);
+>>>   int main(int argc, char **argv)
+>>>   {
+>>> -    return qemu_main(argc, argv, NULL);
+>>> +    return qemu_main(argc, argv);
+>>>   }
+>>>   #undef main
+>>>   #define main qemu_main
+>> I think this part can be removed now. As it seems it has been added
+>> because of the envp parameter.
 > 
-  Thanks for Shannon's great help!
+> Thanks Laurent for your response and sorry for my late response.
+> I think this part was added for another purpose as described here
+> 880fec5d086
+> 
+> As i see it the env param was added in 2008 in order to support cache-utils
+> as shown in 902b3d5c392bb6f48ef340ad8ecc3311705d2800 and in 2009
+> another main function was added in order to unbreak SDL on Mac-OS X and
+> the env param
+> was added only for consistency I suppose...
+> 
+> What do you think?
 
-  Paolo, please make decision which TEMP solution is prefered ? I can send out V4 patch soon.
-  
-  Thanks a lot!
+I think we don't need it anymore as there is no difference betweent
+qemu_main() and main().
 
-  Regards,
-
-  Yang
-
-> Thanks,
-> -- 
-> Shannon
+Thanks,
+Laurent
