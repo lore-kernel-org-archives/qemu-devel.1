@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48886)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49776)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1eQmVy-0006Dl-FP
-	for qemu-devel@nongnu.org; Sun, 17 Dec 2017 22:54:55 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1eQma1-0007JU-Dl
+	for qemu-devel@nongnu.org; Sun, 17 Dec 2017 22:59:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1eQmVx-0000tx-Gw
-	for qemu-devel@nongnu.org; Sun, 17 Dec 2017 22:54:54 -0500
-Date: Mon, 18 Dec 2017 14:39:51 +1100
+	(envelope-from <dgibson@ozlabs.org>) id 1eQma0-0006IH-Kw
+	for qemu-devel@nongnu.org; Sun, 17 Dec 2017 22:59:05 -0500
+Date: Mon, 18 Dec 2017 14:57:04 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20171218033951.GO7753@umbus.fritz.box>
-References: <20171218022605.43681-1-aik@ozlabs.ru>
+Message-ID: <20171218035704.GP7753@umbus.fritz.box>
+References: <cover.1513465066.git.balaton@eik.bme.hu>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="ctUzwJm0i+kwMBIK"
+	protocol="application/pgp-signature"; boundary="b5sSX5qSQrSInIHt"
 Content-Disposition: inline
-In-Reply-To: <20171218022605.43681-1-aik@ozlabs.ru>
-Subject: Re: [Qemu-devel] [GIT PULL for qemu-pseries] pseries: Update SLOF
- firmware image to qemu-slof-20171214
+In-Reply-To: <cover.1513465066.git.balaton@eik.bme.hu>
+Subject: Re: [Qemu-devel] [PATCH 0/2] More SM501 improvements
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,32 +23,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alexey Kardashevskiy <aik@ozlabs.ru>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
+To: BALATON Zoltan <balaton@eik.bme.hu>
+Cc: qemu-devel@nongnu.org, qemu-trivial@nongnu.org, Magnus Damm <magnus.damm@gmail.com>, Aurelien Jarno <aurelien@aurel32.net>, Peter Maydell <peter.maydell@linaro.org>
 
 
---ctUzwJm0i+kwMBIK
+--b5sSX5qSQrSInIHt
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Dec 18, 2017 at 01:26:05PM +1100, Alexey Kardashevskiy wrote:
-> The following changes since commit 6b092cf3141ec02fa5f533ecdcd24264febfcd=
-76:
+On Sat, Dec 16, 2017 at 11:57:46PM +0100, BALATON Zoltan wrote:
+> Two simple patches to add some more registers that were found to be
+> accessed by some guests.
 >=20
->   pseries: Update SLOF firmware image to qemu-slof-20171214 (2017-12-18 1=
-3:16:40 +1100)
+> BALATON Zoltan (3):
+>   sm501: Add panel hardware cursor registers also to read function
+>   sm501: Add some more unimplemented registers
 >=20
-> are available in the git repository at:
->=20
->   git@github.com:aik/qemu.git tags/qemu-slof-20171214
->=20
-> for you to fetch changes up to 6b092cf3141ec02fa5f533ecdcd24264febfcd76:
->=20
->   pseries: Update SLOF firmware image to qemu-slof-20171214
->   (2017-12-18 13:16:40 +1100)
 
-Merged, thanks.
+Applied to ppc-for-2.12, with Philippe's suggested addition to the
+commit message.
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -57,24 +50,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---ctUzwJm0i+kwMBIK
+--b5sSX5qSQrSInIHt
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlo3OIQACgkQbDjKyiDZ
-s5JzmxAAksJaE0JSfdkpZjjKrdimJX28PBfYvtfPEt6ScxUSES/B16ZkGCN+0/zu
-g1dxCyHnVUxWynAQpBiBtcOJlJCJXVrb3uc9jfGfHeKK+tMCLylQhGCRWbFE24ib
-zKdT6BlHdS8fW6LL9S4K+XO17RbIdPgPmF7BYsGd+j3AWUbC9k0Yhcr/7SUahrg9
-vSCjYmLcpnccgQlJmCyHGDJyXBcney7UH2DTzGCHzmtkzz22VqDCWMpIVZTiPyl0
-MdNQAKskBBu5xzk/tBmaFEve2ES5ux+HNg6lfEkfIX7iqodJg4xTFBGEfWMAr9RA
-CevEoLRA1jVWhK6g6hL9NK62iAZx/lhrhPJvnz7C8OERyAql31kP0+7qOKJEmclL
-jfW1YRmQfBtEaQnp6ypTgHVjl1ejgFBtrGl7Tqjy2l8pIHDwD48T4fGzkpI6IHuH
-TUSvNLI78gpUjylZe/lEHtX3X6pv3MNC61DXMeD4kJFEZ2Kv6lcwacTKIsQ6iCAY
-h0cjVU7N7pZ5ihN977lINrYirbxv/93MI/qcWGmvTWWJy3FwsQvmmV789dg6+oqS
-X4JJ4ceBrgV3CIWMh4umaN16NIiOrE/HY4ohyu4S7Kf511but8cY5CiwR2iU4xXn
-9jjFcG5lER4x1g7Vd1m3MOENpPJxsiVQFVzZsmE16QymyHaMpy8=
-=hKpJ
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlo3PI0ACgkQbDjKyiDZ
+s5IkAw//YyQEn4layfxdDsAhPBD1O6jHK5zKmOPMsxg2Uwm4C2k/1eLHmtlfpuHP
+uqY+1d/++WXUapF2N19TrQuCCqXccEQxZrv4mQ8xp2rGbsYHnpWJZDC4EX4W3uCZ
+txcQxpBNDr9Ne/2ubQxVqD9+wvmh6B0ETNNLKve0tVg3n+CM8w5rCEDzzFPToHq0
+A3ARn/+VXyzIOtLJtyDwqvM/1YJdqZzVL7QdSU/U0O7fg1qm5pAivhIuO/j2fxQU
+wjpTJhNRKiRrJ016s+Ep+wa8jwANs7y4OJjs6kWdXUGHeGIx0jaUgmrz+PaCGCr6
+gxiYvfIn5r/G6411hAcIq7Ie9KjwPNNjs+txkg4+xVjp7W++8yon+FEdcngxSgPt
++F8gqfZ1WA9h2Ks1iSIZSoyLCBrwv+iJnABNriqeo/Oy0rdB6pK8cmajjUVp6l0L
+P4PWTzn6HF01IpHdQJkDJvsCWqZCiF5IpnhBA2bNZodLzh1wlr+MPxNEgPcXu7ss
+VO7nmPBhJK/ran4iLXeZXHF3p/QVXJDmA2PoHDIR0x/h7fD4hZVsdEPpBWEHqK1w
+nm84+mAndJspNPBvqFtgL8R7EkHaPzz00yt0/K1zOOQMqtAd8gjSnaUqQAKnDo2J
+rIyKuvb55Yk2kqJ6T5jhG52UlJsNINiUcjPxDeCT2GTp37tjNr8=
+=TEX+
 -----END PGP SIGNATURE-----
 
---ctUzwJm0i+kwMBIK--
+--b5sSX5qSQrSInIHt--
