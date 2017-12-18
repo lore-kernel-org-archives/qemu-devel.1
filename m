@@ -1,21 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36513)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37050)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1eQv8A-0007G4-Fs
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 08:06:55 -0500
+	(envelope-from <mlureau@redhat.com>) id 1eQv8g-0007uI-T0
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 08:07:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1eQv87-0004A0-87
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 08:06:54 -0500
-References: <1513030760-26245-1-git-send-email-walling@linux.vnet.ibm.com>
-	<1513030760-26245-2-git-send-email-walling@linux.vnet.ibm.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <a6920dc1-f2be-cdd9-ba6e-a341a9e93343@redhat.com>
-Date: Mon, 18 Dec 2017 14:06:39 +0100
+	(envelope-from <mlureau@redhat.com>) id 1eQv8d-0004ZV-LD
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 08:07:26 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:55712)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1eQv8d-0004Y4-Fp
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 08:07:23 -0500
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id BFD15356F4
+	for <qemu-devel@nongnu.org>; Mon, 18 Dec 2017 13:07:21 +0000 (UTC)
+Received: from colo-mx.corp.redhat.com
+	(colo-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.20])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id A628584034
+	for <qemu-devel@nongnu.org>; Mon, 18 Dec 2017 13:07:21 +0000 (UTC)
+Date: Mon, 18 Dec 2017 08:07:21 -0500 (EST)
+From: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+Message-ID: <167321084.622468.1513602441314.JavaMail.zimbra@redhat.com>
+In-Reply-To: <20171218130309.2682-1-pbonzini@redhat.com>
+References: <20171218130309.2682-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <1513030760-26245-2-git-send-email-walling@linux.vnet.ibm.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 1/5] s390-ccw: update libc
+Subject: Re: [Qemu-devel] [PATCH v2] checkpatch: volatile with a comment or
+ sig_atomic_t is okay
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,91 +37,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Collin L. Walling" <walling@linux.vnet.ibm.com>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org
-Cc: borntraeger@de.ibm.com, frankja@linux.vnet.ibm.com, cohuck@redhat.com, david@redhat.com
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org, lersek@redhat.com, famz@redhat.com
 
-On 11.12.2017 23:19, Collin L. Walling wrote:
-> Moved:
->   memcmp from bootmap.h to libc.h (renamed from _memcmp)
->   strlen from sclp.c to libc.h (renamed from _strlen)
+Hi
+
+----- Original Message -----
+> From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 >=20
-> Added C standard functions:
->   isdigit
->   atoi
+> This assumes that the comment gives some justification;
+> "volatile sig_atomic_t" is also self-explanatory and usually
+> correct.
 >=20
-> Added non-C standard function:
->   itostr
+> Discussed in:
+> '[Qemu-devel] [PATCH] dump-guest-memory.py: fix "You can't do that withou=
+t a
+> process to debug"'
 >=20
-> Signed-off-by: Collin L. Walling <walling@linux.vnet.ibm.com>
-> Acked-by: Christian Borntraeger <borntraeger@de.ibm.com>
-> Reviewed-by: Janosch Frank <frankja@linux.vnet.ibm.com>
+> Suggested-by: Fam Zheng <famz@redhat.com>
+> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> Message-Id: <20171215181810.4122-1-marcandre.lureau@redhat.com>
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+
+Thanks, I can add it to my 2 patches series for dump (to avoid error on Pet=
+er's end)
+
+Unless you send a pull request with it sonnish
+
+
 > ---
->  pc-bios/s390-ccw/Makefile  |  2 +-
->  pc-bios/s390-ccw/bootmap.c |  4 +--
->  pc-bios/s390-ccw/bootmap.h | 16 +---------
->  pc-bios/s390-ccw/libc.c    | 75 ++++++++++++++++++++++++++++++++++++++=
-++++++++
->  pc-bios/s390-ccw/libc.h    | 31 +++++++++++++++++++
->  pc-bios/s390-ccw/main.c    | 17 +----------
->  pc-bios/s390-ccw/sclp.c    | 10 +------
->  7 files changed, 112 insertions(+), 43 deletions(-)
->  create mode 100644 pc-bios/s390-ccw/libc.c
-[...]
-> +
-> +/**
-> + * itostr:
-> + * @num: the integer to be converted.
-> + * @str: a pointer to a string to store the conversion.
-> + * @len: the length of the passed string.
-> + *
-> + * Given an integer @num, convert it to a string. The string @str must=
- be
-> + * allocated beforehand. The resulting string will be null terminated =
-and
-> + * returned.
-> + *
-> + * Returns: the string @str of the converted integer @num.
-> + */
-> +char *itostr(int num, char *str, size_t len)
-> +{
-> +    long num_len =3D 1;
-> +    int tmp =3D num;
-> +    int i;
-> +
-> +    /* Count length of num */
-> +    while ((tmp /=3D 10) > 0) {
-> +        num_len++;
-> +    }
-> +
-> +    /* Check if we have enough space for num and null */
-> +    if (len < num_len) {
-> +        return 0;
-> +    }
-
-I'm afraid, but I think you've got an off-by-one bug in this code.
-
-In patch 5, you're using this function like this:
-
-    char tmp[4];
-
-    sclp_print(itostr(entries, tmp, sizeof(tmp)));
-
-That means if entries is >=3D 1000 for example, num_len is 4 ...
-
-> +    /* Convert int to string */
-> +    for (i =3D num_len - 1; i >=3D 0; i--) {
-> +        str[i] =3D num % 10 + '0';
-> +        num /=3D 10;
-> +    }
-> +
-> +    str[num_len] =3D '\0';
-
-... and then you run into a buffer overflow here.
-
-> +    return str;
-> +}
-
-Maybe it would also make more sense to panic() instead of "return 0"
-since you don't check the return value in patch 5 ?
-
- Thomas
+>  scripts/checkpatch.pl | 7 +++++--
+>  1 file changed, 5 insertions(+), 2 deletions(-)
+>=20
+> diff --git a/scripts/checkpatch.pl b/scripts/checkpatch.pl
+> index 34df753571..3dc27d9656 100755
+> --- a/scripts/checkpatch.pl
+> +++ b/scripts/checkpatch.pl
+> @@ -2475,8 +2475,11 @@ sub process {
+> =20
+>  # no volatiles please
+>  =09=09my $asm_volatile =3D qr{\b(__asm__|asm)\s+(__volatile__|volatile)\=
+b};
+> -=09=09if ($line =3D~ /\bvolatile\b/ && $line !~ /$asm_volatile/) {
+> -=09=09=09ERROR("Use of volatile is usually wrong: see
+> Documentation/volatile-considered-harmful.txt\n" . $herecurr);
+> +=09=09if ($line =3D~ /\bvolatile\b/ && $line !~ /$asm_volatile/ &&
+> +                    $line !~ /sig_atomic_t/ &&
+> +                    !ctx_has_comment($first_line, $linenr)) {
+> +=09=09=09my $msg =3D "Use of volatile is usually wrong, please add a com=
+ment\n" .
+> $herecurr;
+> +                        ERROR($msg);
+>  =09=09}
+> =20
+>  # warn about #if 0
+> --
+> 2.14.3
+>=20
+>=20
