@@ -1,30 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50313)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52028)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1eQsx9-0005LL-Rg
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 05:47:25 -0500
+	(envelope-from <danielhb@linux.vnet.ibm.com>) id 1eQt3H-0006o2-6j
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 05:53:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1eQsx4-0007sk-Qk
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 05:47:23 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:38574)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1eQsx4-0007sW-Gb
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 05:47:18 -0500
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 72EA47F3ED
-	for <qemu-devel@nongnu.org>; Mon, 18 Dec 2017 10:47:17 +0000 (UTC)
-Date: Mon, 18 Dec 2017 10:47:14 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20171218104713.GD2440@work-vm>
-References: <20171217052945.12782-1-pbonzini@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20171217052945.12782-1-pbonzini@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] scsi: provide general-purpose functions to
- manage sense data
+	(envelope-from <danielhb@linux.vnet.ibm.com>) id 1eQt3D-0003TN-8X
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 05:53:43 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:54910)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <danielhb@linux.vnet.ibm.com>)
+	id 1eQt3C-0003RJ-Vl
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 05:53:39 -0500
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	vBIAnCWB134517
+	for <qemu-devel@nongnu.org>; Mon, 18 Dec 2017 05:53:36 -0500
+Received: from e12.ny.us.ibm.com (e12.ny.us.ibm.com [129.33.205.202])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2exbagtuws-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Mon, 18 Dec 2017 05:53:36 -0500
+Received: from localhost
+	by e12.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <danielhb@linux.vnet.ibm.com>;
+	Mon, 18 Dec 2017 05:53:35 -0500
+From: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
+Date: Mon, 18 Dec 2017 08:53:18 -0200
+Message-Id: <20171218105318.30367-1-danielhb@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH v1 1/1] qmp: marking qmp_cpu as deprecated
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,247 +35,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: armbru@redhat.com, eblake@redhat.com, berrange@redhat.com, Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
 
-* Paolo Bonzini (pbonzini@redhat.com) wrote:
-> Extract the common parts of scsi_sense_buf_to_errno, scsi_convert_sense
-> and scsi_target_send_command's REQUEST SENSE handling into two new
-> functions scsi_parse_sense_buf and scsi_build_sense_buf.
-> 
-> Fix a bug in scsi_target_send_command along the way; the length was
-> written in buf[10] rather than buf[7].
-> 
-> Reported-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> Fixes: b07fbce634 ("scsi-bus: correct responses for INQUIRY and REQUEST SENSE")
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+qmp_cpu is a nop that was created a while ago in commit 755f196898
+("qapi: Convert the cpu command") for the sake of compatibility,
+due to the existence of hmp_cpu.
 
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Today, there is no need or requirement to keep it as is. QMP is
+meant to be as stateless as possible, thus any QMP command that
+needs a specific monitor CPU setup should provide it in its
+arguments, instead of relying in the current QMP monitor state.
 
-> ---
->  hw/scsi/scsi-bus.c   |  16 +-----
->  include/scsi/utils.h |   3 ++
->  scsi/utils.c         | 139 +++++++++++++++++++++++++--------------------------
->  3 files changed, 72 insertions(+), 86 deletions(-)
-> 
-> diff --git a/hw/scsi/scsi-bus.c b/hw/scsi/scsi-bus.c
-> index 977f7bce1f..965becf31f 100644
-> --- a/hw/scsi/scsi-bus.c
-> +++ b/hw/scsi/scsi-bus.c
-> @@ -540,20 +540,8 @@ static int32_t scsi_target_send_command(SCSIRequest *req, uint8_t *buf)
->          if (req->lun != 0) {
->              const struct SCSISense sense = SENSE_CODE(LUN_NOT_SUPPORTED);
->  
-> -            if (fixed_sense) {
-> -                r->buf[0] = 0x70;
-> -                r->buf[2] = sense.key;
-> -                r->buf[10] = 10;
-> -                r->buf[12] = sense.asc;
-> -                r->buf[13] = sense.ascq;
-> -                r->len = MIN(req->cmd.xfer, SCSI_SENSE_LEN);
-> -            } else {
-> -                r->buf[0] = 0x72;
-> -                r->buf[1] = sense.key;
-> -                r->buf[2] = sense.asc;
-> -                r->buf[3] = sense.ascq;
-> -                r->len = 8;
-> -            }
-> +            r->len = scsi_build_sense_buf(r->buf, req->cmd.xfer,
-> +                                          sense, fixed_sense);
->          } else {
->              r->len = scsi_device_get_sense(r->req.dev, r->buf,
->                                             MIN(req->cmd.xfer, r->buf_len),
-> diff --git a/include/scsi/utils.h b/include/scsi/utils.h
-> index eb07e474ee..4b705f5e0f 100644
-> --- a/include/scsi/utils.h
-> +++ b/include/scsi/utils.h
-> @@ -31,6 +31,9 @@ typedef struct SCSISense {
->  } SCSISense;
->  
->  int scsi_build_sense(uint8_t *buf, SCSISense sense);
-> +SCSISense scsi_parse_sense_buf(const uint8_t *in_buf, int in_len);
-> +int scsi_build_sense_buf(uint8_t *buf, size_t max_size, SCSISense sense,
-> +                         bool fixed_sense);
->  
->  /*
->   * Predefined sense codes
-> diff --git a/scsi/utils.c b/scsi/utils.c
-> index e4182a9b09..61bc1a8e2b 100644
-> --- a/scsi/utils.c
-> +++ b/scsi/utils.c
-> @@ -96,15 +96,60 @@ int scsi_cdb_length(uint8_t *buf)
->      return cdb_len;
->  }
->  
-> +SCSISense scsi_parse_sense_buf(const uint8_t *in_buf, int in_len)
-> +{
-> +    bool fixed_in;
-> +    SCSISense sense;
-> +
-> +    assert(in_len > 0);
-> +    fixed_in = (in_buf[0] & 2) == 0;
-> +    if (fixed_in) {
-> +        if (in_len < 14) {
-> +            return SENSE_CODE(IO_ERROR);
-> +        }
-> +        sense.key = in_buf[2];
-> +        sense.asc = in_buf[12];
-> +        sense.ascq = in_buf[13];
-> +    } else {
-> +        if (in_len < 4) {
-> +            return SENSE_CODE(IO_ERROR);
-> +        }
-> +        sense.key = in_buf[1];
-> +        sense.asc = in_buf[2];
-> +        sense.ascq = in_buf[3];
-> +    }
-> +
-> +    return sense;
-> +}
-> +
-> +int scsi_build_sense_buf(uint8_t *out_buf, size_t size, SCSISense sense,
-> +                         bool fixed_sense)
-> +{
-> +    int len;
-> +    uint8_t buf[SCSI_SENSE_LEN] = { 0 };
-> +
-> +    if (fixed_sense) {
-> +        buf[0] = 0x70;
-> +        buf[2] = sense.key;
-> +        buf[7] = 10;
-> +        buf[12] = sense.asc;
-> +        buf[13] = sense.ascq;
-> +        len = 18;
-> +    } else {
-> +        buf[0] = 0x72;
-> +        buf[1] = sense.key;
-> +        buf[2] = sense.asc;
-> +        buf[3] = sense.ascq;
-> +        len = 8;
-> +    }
-> +    len = MIN(len, size);
-> +    memcpy(out_buf, buf, len);
-> +    return len;
-> +}
-> +
->  int scsi_build_sense(uint8_t *buf, SCSISense sense)
->  {
-> -    memset(buf, 0, 18);
-> -    buf[0] = 0x70;
-> -    buf[2] = sense.key;
-> -    buf[7] = 10;
-> -    buf[12] = sense.asc;
-> -    buf[13] = sense.ascq;
-> -    return 18;
-> +    return scsi_build_sense_buf(buf, SCSI_SENSE_LEN, sense, true);
->  }
->  
->  /*
-> @@ -274,52 +319,21 @@ const struct SCSISense sense_code_SPACE_ALLOC_FAILED = {
->  int scsi_convert_sense(uint8_t *in_buf, int in_len,
->                         uint8_t *buf, int len, bool fixed)
->  {
-> -    bool fixed_in;
->      SCSISense sense;
-> -    if (!fixed && len < 8) {
-> -        return 0;
-> -    }
-> -
-> -    if (in_len == 0) {
-> -        sense.key = NO_SENSE;
-> -        sense.asc = 0;
-> -        sense.ascq = 0;
-> -    } else {
-> -        fixed_in = (in_buf[0] & 2) == 0;
-> -
-> -        if (fixed == fixed_in) {
-> -            memcpy(buf, in_buf, MIN(len, in_len));
-> -            return MIN(len, in_len);
-> -        }
-> +    bool fixed_in;
->  
-> -        if (fixed_in) {
-> -            sense.key = in_buf[2];
-> -            sense.asc = in_buf[12];
-> -            sense.ascq = in_buf[13];
-> -        } else {
-> -            sense.key = in_buf[1];
-> -            sense.asc = in_buf[2];
-> -            sense.ascq = in_buf[3];
-> -        }
-> +    fixed_in = (in_buf[0] & 2) == 0;
-> +    if (in_len && fixed == fixed_in) {
-> +        memcpy(buf, in_buf, MIN(len, in_len));
-> +        return MIN(len, in_len);
->      }
->  
-> -    memset(buf, 0, len);
-> -    if (fixed) {
-> -        /* Return fixed format sense buffer */
-> -        buf[0] = 0x70;
-> -        buf[2] = sense.key;
-> -        buf[7] = 10;
-> -        buf[12] = sense.asc;
-> -        buf[13] = sense.ascq;
-> -        return MIN(len, SCSI_SENSE_LEN);
-> +    if (in_len == 0) {
-> +        sense = SENSE_CODE(NO_SENSE);
->      } else {
-> -        /* Return descriptor format sense buffer */
-> -        buf[0] = 0x72;
-> -        buf[1] = sense.key;
-> -        buf[2] = sense.asc;
-> -        buf[3] = sense.ascq;
-> -        return 8;
-> +        sense = scsi_parse_sense_buf(in_buf, in_len);
->      }
-> +    return scsi_build_sense_buf(buf, len, sense, fixed);
->  }
->  
->  int scsi_sense_to_errno(int key, int asc, int ascq)
-> @@ -366,34 +380,15 @@ int scsi_sense_to_errno(int key, int asc, int ascq)
->      }
->  }
->  
-> -int scsi_sense_buf_to_errno(const uint8_t *sense, size_t sense_size)
-> +int scsi_sense_buf_to_errno(const uint8_t *in_buf, size_t in_len)
->  {
-> -    int key, asc, ascq;
-> -    if (sense_size < 1) {
-> -        return EIO;
-> -    }
-> -    switch (sense[0]) {
-> -    case 0x70: /* Fixed format sense data. */
-> -        if (sense_size < 14) {
-> -            return EIO;
-> -        }
-> -        key = sense[2] & 0xF;
-> -        asc = sense[12];
-> -        ascq = sense[13];
-> -        break;
-> -    case 0x72: /* Descriptor format sense data. */
-> -        if (sense_size < 4) {
-> -            return EIO;
-> -        }
-> -        key = sense[1] & 0xF;
-> -        asc = sense[2];
-> -        ascq = sense[3];
-> -        break;
-> -    default:
-> +    SCSISense sense;
-> +    if (in_len < 1) {
->          return EIO;
-> -        break;
->      }
-> -    return scsi_sense_to_errno(key, asc, ascq);
-> +
-> +    sense = scsi_parse_sense_buf(in_buf, in_len);
-> +    return scsi_sense_to_errno(sense.key, sense.asc, sense.ascq);
->  }
->  
->  const char *scsi_command_name(uint8_t cmd)
-> -- 
-> 2.14.3
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+This patch flags qmp_cpu as deprecated in qemu-doc.texi and changes
+qmp_cpu body to show a deprecation message if used.
+
+Signed-off-by: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
+---
+Although I've changed the behavior of qmp_cpu to return an error
+instead of doing nothing, no errors were found in the Travis
+build of the patch. Code inspection confirms that qmp_cpu isn't
+being used in QEMU.
+
+A quick inspection in Libvirt code shows that there is no reference
+to 'qmp_cpu' there either, but to be sure I've CCed Daniel here
+so he can comment/confirm if Libvirt does not care for this change.
+
+ qemu-doc.texi | 6 ++++++
+ qmp.c         | 2 +-
+ 2 files changed, 7 insertions(+), 1 deletion(-)
+
+diff --git a/qemu-doc.texi b/qemu-doc.texi
+index f7317dfc66..2b63f9a325 100644
+--- a/qemu-doc.texi
++++ b/qemu-doc.texi
+@@ -2516,6 +2516,12 @@ subsystem image.
+ The ``convert -s snapshot_id_or_name'' argument is obsoleted
+ by the ``convert -l snapshot_param'' argument instead.
+ 
++@section System emulator machine protocol commands
++
++@subsection qmp_cpu (since 2.12.0)
++
++The ``qmp_cpu'' command is deprecated. Do not use this command.
++
+ @section System emulator human monitor commands
+ 
+ @subsection host_net_add (since 2.10.0)
+diff --git a/qmp.c b/qmp.c
+index e8c303116a..d8543d713d 100644
+--- a/qmp.c
++++ b/qmp.c
+@@ -115,7 +115,7 @@ void qmp_system_powerdown(Error **erp)
+ 
+ void qmp_cpu(int64_t index, Error **errp)
+ {
+-    /* Just do nothing */
++    error_setg(errp, "qmp_cpu is deprecated, do not use this command");
+ }
+ 
+ void qmp_cpu_add(int64_t id, Error **errp)
+-- 
+2.13.6
