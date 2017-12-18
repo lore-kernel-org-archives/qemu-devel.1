@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45993)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46083)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1eQwXF-00071L-AY
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 09:36:54 -0500
+	(envelope-from <stefanha@redhat.com>) id 1eQwXO-00079l-Eu
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 09:37:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1eQwXE-0007M4-2K
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 09:36:53 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:60314)
+	(envelope-from <stefanha@redhat.com>) id 1eQwXJ-0007TF-Qu
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 09:37:02 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:56522)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1eQwXD-0007LN-PJ
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 09:36:51 -0500
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1eQwXJ-0007SM-Km
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 09:36:57 -0500
 From: Stefan Hajnoczi <stefanha@redhat.com>
-Date: Mon, 18 Dec 2017 14:35:22 +0000
-Message-Id: <20171218143530.12082-16-stefanha@redhat.com>
+Date: Mon, 18 Dec 2017 14:35:23 +0000
+Message-Id: <20171218143530.12082-17-stefanha@redhat.com>
 In-Reply-To: <20171218143530.12082-1-stefanha@redhat.com>
 References: <20171218143530.12082-1-stefanha@redhat.com>
-Subject: [Qemu-devel] [PULL 15/23] qemu-iotests: add 202 external snapshots
- IOThread test
+Subject: [Qemu-devel] [PULL 16/23] virtio-blk: make queue size configurable
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,152 +24,71 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Stefan Hajnoczi <stefanha@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Mark Kanda <mark.kanda@oracle.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
-QMP 'transaction' blockdev-snapshot-sync with multiple disks in an
-IOThread is an untested code path.  Several bugs have been found in
-connection with this command.  This patch adds a test case to prevent
-future regressions.
+From: Mark Kanda <mark.kanda@oracle.com>
 
-Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
-Reviewed-by: Kevin Wolf <kwolf@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
-Message-id: 20171206144550.22295-10-stefanha@redhat.com
+Depending on the configuration, it can be beneficial to adjust the virtio-blk
+queue size to something other than the current default of 128. Add a new
+property to make the queue size configurable.
+
+Signed-off-by: Mark Kanda <mark.kanda@oracle.com>
+Reviewed-by: Karl Heubaum <karl.heubaum@oracle.com>
+Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
+Reviewed-by: Ameya More <ameya.more@oracle.com>
+Message-id: 52e6d742811f10dbd16e996e86cf375b9577c187.1513005190.git.mark.kanda@oracle.com
 Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
 ---
- tests/qemu-iotests/202     | 95 ++++++++++++++++++++++++++++++++++++++++++++++
- tests/qemu-iotests/202.out | 11 ++++++
- tests/qemu-iotests/group   |  1 +
- 3 files changed, 107 insertions(+)
- create mode 100755 tests/qemu-iotests/202
- create mode 100644 tests/qemu-iotests/202.out
+ include/hw/virtio/virtio-blk.h |  1 +
+ hw/block/virtio-blk.c          | 10 +++++++++-
+ 2 files changed, 10 insertions(+), 1 deletion(-)
 
-diff --git a/tests/qemu-iotests/202 b/tests/qemu-iotests/202
-new file mode 100755
-index 0000000000..581ca34d79
---- /dev/null
-+++ b/tests/qemu-iotests/202
-@@ -0,0 +1,95 @@
-+#!/usr/bin/env python
-+#
-+# Copyright (C) 2017 Red Hat, Inc.
-+#
-+# This program is free software; you can redistribute it and/or modify
-+# it under the terms of the GNU General Public License as published by
-+# the Free Software Foundation; either version 2 of the License, or
-+# (at your option) any later version.
-+#
-+# This program is distributed in the hope that it will be useful,
-+# but WITHOUT ANY WARRANTY; without even the implied warranty of
-+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+# GNU General Public License for more details.
-+#
-+# You should have received a copy of the GNU General Public License
-+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-+#
-+# Creator/Owner: Stefan Hajnoczi <stefanha@redhat.com>
-+#
-+# Check that QMP 'transaction' blockdev-snapshot-sync with multiple drives on a
-+# single IOThread completes successfully.  This particular command triggered a
-+# hang due to recursive AioContext locking and BDRV_POLL_WHILE().  Protect
-+# against regressions.
-+
-+import iotests
-+
-+iotests.verify_image_format(supported_fmts=['qcow2'])
-+iotests.verify_platform(['linux'])
-+
-+with iotests.FilePath('disk0.img') as disk0_img_path, \
-+     iotests.FilePath('disk1.img') as disk1_img_path, \
-+     iotests.FilePath('disk0-snap.img') as disk0_snap_img_path, \
-+     iotests.FilePath('disk1-snap.img') as disk1_snap_img_path, \
-+     iotests.VM() as vm:
-+
-+    img_size = '10M'
-+    iotests.qemu_img_pipe('create', '-f', iotests.imgfmt, disk0_img_path, img_size)
-+    iotests.qemu_img_pipe('create', '-f', iotests.imgfmt, disk1_img_path, img_size)
-+
-+    iotests.log('Launching VM...')
-+    vm.launch()
-+
-+    iotests.log('Adding IOThread...')
-+    iotests.log(vm.qmp('object-add',
-+                       qom_type='iothread',
-+                       id='iothread0'))
-+
-+    iotests.log('Adding blockdevs...')
-+    iotests.log(vm.qmp('blockdev-add',
-+                       driver=iotests.imgfmt,
-+                       node_name='disk0',
-+                       file={
-+                           'driver': 'file',
-+                           'filename': disk0_img_path,
-+                       }))
-+    iotests.log(vm.qmp('blockdev-add',
-+                       driver=iotests.imgfmt,
-+                       node_name='disk1',
-+                       file={
-+                           'driver': 'file',
-+                           'filename': disk1_img_path,
-+                       }))
-+
-+    iotests.log('Setting iothread...')
-+    iotests.log(vm.qmp('x-blockdev-set-iothread',
-+                       node_name='disk0',
-+                       iothread='iothread0'))
-+    iotests.log(vm.qmp('x-blockdev-set-iothread',
-+                       node_name='disk1',
-+                       iothread='iothread0'))
-+
-+    iotests.log('Creating external snapshots...')
-+    iotests.log(vm.qmp(
-+                  'transaction',
-+                  actions=[
-+                      {
-+                          'data': {
-+                              'node-name': 'disk0',
-+                              'snapshot-file': disk0_snap_img_path,
-+                              'snapshot-node-name': 'disk0-snap',
-+                              'mode': 'absolute-paths',
-+                              'format': iotests.imgfmt,
-+                          },
-+                          'type': 'blockdev-snapshot-sync'
-+                      }, {
-+                          'data': {
-+                              'node-name': 'disk1',
-+                              'snapshot-file': disk1_snap_img_path,
-+                              'snapshot-node-name': 'disk1-snap',
-+                              'mode': 'absolute-paths',
-+                              'format': iotests.imgfmt
-+                          },
-+                          'type': 'blockdev-snapshot-sync'
-+                      }
-+                  ]))
-diff --git a/tests/qemu-iotests/202.out b/tests/qemu-iotests/202.out
-new file mode 100644
-index 0000000000..d5ea374e17
---- /dev/null
-+++ b/tests/qemu-iotests/202.out
-@@ -0,0 +1,11 @@
-+Launching VM...
-+Adding IOThread...
-+{u'return': {}}
-+Adding blockdevs...
-+{u'return': {}}
-+{u'return': {}}
-+Setting iothread...
-+{u'return': {}}
-+{u'return': {}}
-+Creating external snapshots...
-+{u'return': {}}
-diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
-index 3e688678dd..d0ee1e2e55 100644
---- a/tests/qemu-iotests/group
-+++ b/tests/qemu-iotests/group
-@@ -197,3 +197,4 @@
- 197 rw auto quick
- 198 rw auto
- 200 rw auto
-+202 rw auto quick
+diff --git a/include/hw/virtio/virtio-blk.h b/include/hw/virtio/virtio-blk.h
+index d3c8a6fa8c..5117431d96 100644
+--- a/include/hw/virtio/virtio-blk.h
++++ b/include/hw/virtio/virtio-blk.h
+@@ -39,6 +39,7 @@ struct VirtIOBlkConf
+     uint32_t config_wce;
+     uint32_t request_merging;
+     uint16_t num_queues;
++    uint16_t queue_size;
+ };
+ 
+ struct VirtIOBlockDataPlane;
+diff --git a/hw/block/virtio-blk.c b/hw/block/virtio-blk.c
+index ae3356f6a8..d8cfdc81f6 100644
+--- a/hw/block/virtio-blk.c
++++ b/hw/block/virtio-blk.c
+@@ -927,6 +927,13 @@ static void virtio_blk_device_realize(DeviceState *dev, Error **errp)
+         error_setg(errp, "num-queues property must be larger than 0");
+         return;
+     }
++    if (!is_power_of_2(conf->queue_size) ||
++        conf->queue_size > VIRTQUEUE_MAX_SIZE) {
++        error_setg(errp, "invalid queue-size property (%" PRIu16 "), "
++                   "must be a power of 2 (max %d)",
++                   conf->queue_size, VIRTQUEUE_MAX_SIZE);
++        return;
++    }
+ 
+     blkconf_serial(&conf->conf, &conf->serial);
+     if (!blkconf_apply_backend_options(&conf->conf,
+@@ -949,7 +956,7 @@ static void virtio_blk_device_realize(DeviceState *dev, Error **errp)
+     s->sector_mask = (s->conf.conf.logical_block_size / BDRV_SECTOR_SIZE) - 1;
+ 
+     for (i = 0; i < conf->num_queues; i++) {
+-        virtio_add_queue(vdev, 128, virtio_blk_handle_output);
++        virtio_add_queue(vdev, conf->queue_size, virtio_blk_handle_output);
+     }
+     if (!virtio_blk_data_plane_create(vdev, conf, &s->dataplane, errp)) {
+         virtio_cleanup(vdev);
+@@ -1006,6 +1013,7 @@ static Property virtio_blk_properties[] = {
+     DEFINE_PROP_BIT("request-merging", VirtIOBlock, conf.request_merging, 0,
+                     true),
+     DEFINE_PROP_UINT16("num-queues", VirtIOBlock, conf.num_queues, 1),
++    DEFINE_PROP_UINT16("queue-size", VirtIOBlock, conf.queue_size, 128),
+     DEFINE_PROP_LINK("iothread", VirtIOBlock, conf.iothread, TYPE_IOTHREAD,
+                      IOThread *),
+     DEFINE_PROP_END_OF_LIST(),
 -- 
 2.14.3
