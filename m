@@ -1,28 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46897)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50029)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eQwDx-00089o-RY
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 09:16:58 -0500
+	(envelope-from <berrange@redhat.com>) id 1eQwGo-0002Ex-8J
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 09:19:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eQwDw-0002S7-Mk
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 09:16:57 -0500
-Received: from mail-ot0-x244.google.com ([2607:f8b0:4003:c0f::244]:35132)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1eQwDw-0002RT-1g
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 09:16:56 -0500
-Received: by mail-ot0-x244.google.com with SMTP id q3so13437874oth.2
-	for <qemu-devel@nongnu.org>; Mon, 18 Dec 2017 06:16:56 -0800 (PST)
+	(envelope-from <berrange@redhat.com>) id 1eQwGl-0004m0-0L
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 09:19:54 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:39492)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1eQwGk-0004kx-Nh
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 09:19:50 -0500
+Date: Mon, 18 Dec 2017 14:19:46 +0000
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20171218141946.GB26755@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <151360476094.18806.1179096997853697345.stgit@bahia.lan>
 MIME-Version: 1.0
-In-Reply-To: <dd0cf724-3696-0ed3-343a-7ce2645645a9@redhat.com>
-References: <20171218124943.28529-1-ybettan@redhat.com>
-	<CAFEAcA-vsJ-6MntBB6LuMzHhA+X-YZv=XJwZRuhD5m0wj-o+AA@mail.gmail.com>
-	<dd0cf724-3696-0ed3-343a-7ce2645645a9@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 18 Dec 2017 14:16:34 +0000
-Message-ID: <CAFEAcA_OVxUw+rnKuDw5h_KrbxYoGSCJZ-+g_VFr2XuKcw9==g@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH V2] vl.c && linux-user/main.c : removed
- **envp from main() arguments
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <151360476094.18806.1179096997853697345.stgit@bahia.lan>
+Subject: Re: [Qemu-devel] [PATCH] 9pfs: deprecate handle backend
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,30 +27,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Yoni Bettan <ybettan@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>, Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: Greg Kurz <groug@kaod.org>
+Cc: qemu-devel@nongnu.org, "Aneesh Kumar K.V" <aneesh.kumar@linux.vnet.ibm.com>
 
-On 18 December 2017 at 13:13, Yoni Bettan <ybettan@redhat.com> wrote:
-> On 12/18/2017 02:54 PM, Peter Maydell wrote:
->> Did you test this on OSX? I'm pretty sure it will break,
->> because now the main() function in ui/cocoa.m will
->> recursively call itself, rather than calling the
->> function in vl.c. (Either that or it just won't
->> link at all because there are two main() functions.)
->
->
-> I didn't checked it on OSX.
-> I was actually convinced it is Ok but when  I rethink it
-> I understand that on Mac OSX the third argument is required (char **envp)
-> as it seems to use it here:  "return qemu_main(gArgc, gArgv,
-> *_NSGetEnviron());"
-> so the patch *idea* will literally break ui/coca.m.
+On Mon, Dec 18, 2017 at 02:46:00PM +0100, Greg Kurz wrote:
+> This backend raise some concerns:
+> 
+> - doesn't support symlinks
+> - fails +100 tests in the PJD POSIX file system test suite [1]
+> - requires the QEMU process to run with the CAP_DAC_READ_SEARCH
+>   capability, which isn't recommended for security reasons
+> 
+> For all these reasons, the handle backend is now deprecated.
+> 
+> [1] https://www.tuxera.com/community/posix-test-suite/
+> 
+> Signed-off-by: Greg Kurz <groug@kaod.org>
+> ---
+> 
+> Aneesh,
+> 
+> Even if I see the benefit of using file handles in a userspace file
+> server, the handle backend still has flaws that make it hardly usable
+> IMHO. Also I haven't received anything about it in years. All users
+> and contributors seem to stick to the local backend.
+> 
+> My guess is that nobody uses the handle backend, and unless I'm missing
+> something, it wouldn't hurt to drop it. My motivation is to reduce the
+> number of lines that I don't really have time/motivation to maintain,
+> and that could be subject to a CVE in the future.
+> 
+> Any thoughts ?
+> ---
+>  hw/9pfs/9p-handle.c |    2 ++
+>  qemu-doc.texi       |    8 ++++++++
+>  2 files changed, 10 insertions(+)
+> 
+> diff --git a/hw/9pfs/9p-handle.c b/hw/9pfs/9p-handle.c
+> index 9875f1894cc5..1291a2db6782 100644
+> --- a/hw/9pfs/9p-handle.c
+> +++ b/hw/9pfs/9p-handle.c
+> @@ -657,6 +657,8 @@ static int handle_parse_opts(QemuOpts *opts, struct FsDriverEntry *fse)
+>      const char *sec_model = qemu_opt_get(opts, "security_model");
+>      const char *path = qemu_opt_get(opts, "path");
+>  
+> +    warn_report("handle backend is deprecated");
+> +
+>      if (sec_model) {
+>          error_report("Invalid argument security_model specified with handle fsdriver");
+>          return -1;
+> diff --git a/qemu-doc.texi b/qemu-doc.texi
+> index f7317dfc66cd..bf44e2752cb2 100644
+> --- a/qemu-doc.texi
+> +++ b/qemu-doc.texi
+> @@ -2509,6 +2509,14 @@ default channel subsystem image for guests that do not support multiple
+>  channel subsystems, all devices can be put into the default channel
+>  subsystem image.
+>  
+> +@subsection -fsdev handle (since 2.12.0)
+> +
+> +The ``handle'' fsdev backend does not support symlinks and causes the 9p
+> +filesystem in the guest to fail a fair amount of tests from the PJD POSIX
+> +filesystem test suite. Also it requires the CAP_DAC_READ_SEARCH capability,
+> +which is not the recommended way to run QEMU. This backend should not be
+> +used and it will be removed with no replacement.
+> +
 
-No, the general idea of removing the 3rd argument from
-qemu_main() is fine (you can just not pass the environment
-to it from the ui/cocoa.m code). But you can't get rid
-of the ifdef stuff that allows cocoa.m to provide its
-own main() function and rename the vl.c one to qemu_main.
+I would suggest a slight teak to the last sentance.
 
-thanks
--- PMM
+ "This backend should not be used and wil be removed. The 'local' backend
+  is the recommended alternative"
+
+Regardless of whether you include this wording change though:
+
+  Reviewed-by: Daniel P. Berrange <berrange@redhat.com>
+
+
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
