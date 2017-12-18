@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57205)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57240)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <den@openvz.org>) id 1eQtIO-000375-9F
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 06:09:21 -0500
+	(envelope-from <den@openvz.org>) id 1eQtIQ-00037V-M7
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 06:09:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <den@openvz.org>) id 1eQtIL-0007Yl-Fc
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 06:09:20 -0500
+	(envelope-from <den@openvz.org>) id 1eQtIK-0007YR-Uz
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 06:09:22 -0500
 From: "Denis V. Lunev" <den@openvz.org>
-Date: Mon, 18 Dec 2017 14:09:11 +0300
-Message-Id: <1513595351-5899-6-git-send-email-den@openvz.org>
+Date: Mon, 18 Dec 2017 14:09:10 +0300
+Message-Id: <1513595351-5899-5-git-send-email-den@openvz.org>
 In-Reply-To: <1513595351-5899-1-git-send-email-den@openvz.org>
 References: <1513595351-5899-1-git-send-email-den@openvz.org>
-Subject: [Qemu-devel] [PATCH 5/5] block/parallels: add backing support to
- readv/writev
+Subject: [Qemu-devel] [PATCH 4/5] block/parallels: replace some magic numbers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,112 +20,47 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: Edgar Kaziakhmedov <edgar.kaziakhmedov@virtuozzo.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, "Denis V . Lunev" <den@openvz.org>, Stefan Hajnoczi <stefanha@redhat.com>
+Cc: Klim Kireev <klim.kireev@virtuozzo.com>, "Denis V . Lunev" <den@openvz.org>, Stefan Hajnoczi <stefanha@redhat.com>
 
-From: Edgar Kaziakhmedov <edgar.kaziakhmedov@virtuozzo.com>
+From: Klim Kireev <klim.kireev@virtuozzo.com>
 
-Since parallels format supports backing files, refine
-readv/writev (allocate_clusters) to redirect read/write requests
-to a backing file (if cluster is not available in the current bs).
-
-Signed-off-by: Edgar Kaziakhmedov <edgar.kaziakhmedov@virtuozzo.com>
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Signed-off-by: Klim Kireev <klim.kireev@virtuozzo.com>
+Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 Signed-off-by: Denis V. Lunev <den@openvz.org>
 CC: Stefan Hajnoczi <stefanha@redhat.com>
 ---
- block/parallels.c | 50 ++++++++++++++++++++++++++++++++++++++++++++------
- 1 file changed, 44 insertions(+), 6 deletions(-)
+ block/parallels.h | 2 ++
+ block/parallels.c | 5 +++--
+ 2 files changed, 5 insertions(+), 2 deletions(-)
 
+diff --git a/block/parallels.h b/block/parallels.h
+index 7d0fb73..9be29fe 100644
+--- a/block/parallels.h
++++ b/block/parallels.h
+@@ -31,6 +31,8 @@
+ #define BLOCK_PARALLELS_H
+ #include "qemu/module.h"
+ 
++#define HEADS_NUMBER 16
++#define SEC_IN_CYL 32
+ #define DEFAULT_CLUSTER_SIZE 1048576        /* 1 MiB */
+ 
+ /* always little-endian */
 diff --git a/block/parallels.c b/block/parallels.c
-index 7a8e8b0..d380208 100644
+index f9a3b99..7a8e8b0 100644
 --- a/block/parallels.c
 +++ b/block/parallels.c
-@@ -142,6 +142,7 @@ static int64_t block_status(BDRVParallelsState *s, int64_t sector_num,
- static int64_t allocate_clusters(BlockDriverState *bs, int64_t sector_num,
-                                  int nb_sectors, int *pnum)
- {
-+    int ret;
-     BDRVParallelsState *s = bs->opaque;
-     int64_t pos, space, idx, to_allocate, i, len;
- 
-@@ -170,7 +171,6 @@ static int64_t allocate_clusters(BlockDriverState *bs, int64_t sector_num,
-         return len;
-     }
-     if (s->data_end + space > (len >> BDRV_SECTOR_BITS)) {
--        int ret;
-         space += s->prealloc_size;
-         if (s->prealloc_mode == PRL_PREALLOC_MODE_FALLOCATE) {
-             ret = bdrv_pwrite_zeroes(bs->file,
-@@ -186,6 +186,37 @@ static int64_t allocate_clusters(BlockDriverState *bs, int64_t sector_num,
-         }
-     }
- 
-+    /* Try to read from backing to fill empty clusters
-+     * FIXME: 1. previous write_zeroes may be redundant
-+     *        2. most of data we read from backing will be rewritten by
-+     *           parallels_co_writev. On aligned-to-cluster write we do not need
-+     *           this read at all.
-+     *        3. it would be good to combine write of data from backing and new
-+     *           data into one write call */
-+    if (bs->backing) {
-+        int64_t nb_cow_sectors = to_allocate * s->tracks;
-+        int64_t nb_cow_bytes = nb_cow_sectors << BDRV_SECTOR_BITS;
-+        QEMUIOVector qiov;
-+        struct iovec iov = {
-+            .iov_len = nb_cow_bytes,
-+            .iov_base = qemu_blockalign(bs, nb_cow_bytes)
-+        };
-+        qemu_iovec_init_external(&qiov, &iov, 1);
-+
-+        ret = bdrv_co_readv(bs->backing, idx * s->tracks, nb_cow_sectors,
-+                            &qiov);
-+        if (ret < 0) {
-+            qemu_vfree(iov.iov_base);
-+            return ret;
-+        }
-+
-+        ret = bdrv_co_writev(bs->file, s->data_end, nb_cow_sectors, &qiov);
-+        qemu_vfree(iov.iov_base);
-+        if (ret < 0) {
-+            return ret;
-+        }
-+    }
-+
-     for (i = 0; i < to_allocate; i++) {
-         s->bat_bitmap[idx + i] = cpu_to_le32(s->data_end / s->off_multiplier);
-         s->data_end += s->tracks;
-@@ -309,12 +340,19 @@ static coroutine_fn int parallels_co_readv(BlockDriverState *bs,
- 
-         nbytes = n << BDRV_SECTOR_BITS;
- 
-+        qemu_iovec_reset(&hd_qiov);
-+        qemu_iovec_concat(&hd_qiov, qiov, bytes_done, nbytes);
-+
-         if (position < 0) {
--            qemu_iovec_memset(qiov, bytes_done, 0, nbytes);
-+            if (bs->backing) {
-+                ret = bdrv_co_readv(bs->backing, sector_num, n, &hd_qiov);
-+                if (ret < 0) {
-+                    break;
-+                }
-+            } else {
-+                qemu_iovec_memset(&hd_qiov, 0, 0, nbytes);
-+            }
-         } else {
--            qemu_iovec_reset(&hd_qiov);
--            qemu_iovec_concat(&hd_qiov, qiov, bytes_done, nbytes);
--
-             ret = bdrv_co_readv(bs->file, position, n, &hd_qiov);
-             if (ret < 0) {
-                 break;
-@@ -748,7 +786,7 @@ static BlockDriver bdrv_parallels = {
-     .bdrv_co_flush_to_os      = parallels_co_flush_to_os,
-     .bdrv_co_readv  = parallels_co_readv,
-     .bdrv_co_writev = parallels_co_writev,
--
-+    .supports_backing = true,
-     .bdrv_create    = parallels_create,
-     .bdrv_check     = parallels_check,
-     .create_opts    = &parallels_create_opts,
+@@ -476,8 +476,9 @@ static int parallels_create(const char *filename, QemuOpts *opts, Error **errp)
+     memcpy(header.magic, HEADER_MAGIC2, sizeof(header.magic));
+     header.version = cpu_to_le32(HEADER_VERSION);
+     /* don't care much about geometry, it is not used on image level */
+-    header.heads = cpu_to_le32(16);
+-    header.cylinders = cpu_to_le32(total_size / BDRV_SECTOR_SIZE / 16 / 32);
++    header.heads = cpu_to_le32(HEADS_NUMBER);
++    header.cylinders = cpu_to_le32(total_size / BDRV_SECTOR_SIZE
++                                   / HEADS_NUMBER / SEC_IN_CYL);
+     header.tracks = cpu_to_le32(cl_size >> BDRV_SECTOR_BITS);
+     header.bat_entries = cpu_to_le32(bat_entries);
+     header.nb_sectors = cpu_to_le64(DIV_ROUND_UP(total_size, BDRV_SECTOR_SIZE));
 -- 
 2.7.4
