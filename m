@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59681)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59724)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1eR2eH-0001nK-Vl
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 16:08:36 -0500
+	(envelope-from <jcody@redhat.com>) id 1eR2eK-0001pw-QW
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 16:08:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1eR2eG-0003IC-H2
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 16:08:33 -0500
+	(envelope-from <jcody@redhat.com>) id 1eR2eH-0003If-58
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 16:08:36 -0500
 From: Jeff Cody <jcody@redhat.com>
-Date: Mon, 18 Dec 2017 16:08:10 -0500
-Message-Id: <20171218210819.31576-2-jcody@redhat.com>
+Date: Mon, 18 Dec 2017 16:08:11 -0500
+Message-Id: <20171218210819.31576-3-jcody@redhat.com>
 In-Reply-To: <20171218210819.31576-1-jcody@redhat.com>
 References: <20171218210819.31576-1-jcody@redhat.com>
-Subject: [Qemu-devel] [PULL 01/10] hbitmap: add next_zero function
+Subject: [Qemu-devel] [PULL 02/10] backup: move from done_bitmap to
+ copy_bitmap
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,192 +25,115 @@ Cc: peter.maydell@linaro.org, jcody@redhat.com, vsementsov@virtuozzo.com, jsnow@
 
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
-The function searches for next zero bit.
-Also add interface for BdrvDirtyBitmap and unit test.
+Use HBitmap copy_bitmap instead of done_bitmap. This is needed to
+improve incremental backup in following patches and to unify backup
+loop for full/incremental modes in future patches.
 
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Reviewed-by: Jeff Cody <jcody@redhat.com>
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 Reviewed-by: John Snow <jsnow@redhat.com>
-Message-id: 20171012135313.227864-2-vsementsov@virtuozzo.com
+Message-id: 20171012135313.227864-3-vsementsov@virtuozzo.com
 Signed-off-by: Jeff Cody <jcody@redhat.com>
 ---
- block/dirty-bitmap.c         |  5 ++++
- include/block/dirty-bitmap.h |  1 +
- include/qemu/hbitmap.h       |  8 ++++++
- tests/test-hbitmap.c         | 61 ++++++++++++++++++++++++++++++++++++++++++++
- util/hbitmap.c               | 39 ++++++++++++++++++++++++++++
- 5 files changed, 114 insertions(+)
+ block/backup.c | 23 ++++++++++++++---------
+ 1 file changed, 14 insertions(+), 9 deletions(-)
 
-diff --git a/block/dirty-bitmap.c b/block/dirty-bitmap.c
-index bd04e99..7879d13 100644
---- a/block/dirty-bitmap.c
-+++ b/block/dirty-bitmap.c
-@@ -715,3 +715,8 @@ char *bdrv_dirty_bitmap_sha256(const BdrvDirtyBitmap *bitmap, Error **errp)
- {
-     return hbitmap_sha256(bitmap->bitmap, errp);
- }
+diff --git a/block/backup.c b/block/backup.c
+index 99e6bcc..5175808 100644
+--- a/block/backup.c
++++ b/block/backup.c
+@@ -40,11 +40,12 @@ typedef struct BackupBlockJob {
+     BlockdevOnError on_target_error;
+     CoRwlock flush_rwlock;
+     uint64_t bytes_read;
+-    unsigned long *done_bitmap;
+     int64_t cluster_size;
+     bool compress;
+     NotifierWithReturn before_write;
+     QLIST_HEAD(, CowRequest) inflight_reqs;
 +
-+int64_t bdrv_dirty_bitmap_next_zero(BdrvDirtyBitmap *bitmap, uint64_t offset)
-+{
-+    return hbitmap_next_zero(bitmap->bitmap, offset);
-+}
-diff --git a/include/block/dirty-bitmap.h b/include/block/dirty-bitmap.h
-index 3579a75..a591c27 100644
---- a/include/block/dirty-bitmap.h
-+++ b/include/block/dirty-bitmap.h
-@@ -91,5 +91,6 @@ bool bdrv_has_changed_persistent_bitmaps(BlockDriverState *bs);
- BdrvDirtyBitmap *bdrv_dirty_bitmap_next(BlockDriverState *bs,
-                                         BdrvDirtyBitmap *bitmap);
- char *bdrv_dirty_bitmap_sha256(const BdrvDirtyBitmap *bitmap, Error **errp);
-+int64_t bdrv_dirty_bitmap_next_zero(BdrvDirtyBitmap *bitmap, uint64_t start);
++    HBitmap *copy_bitmap;
+ } BackupBlockJob;
  
- #endif
-diff --git a/include/qemu/hbitmap.h b/include/qemu/hbitmap.h
-index 81e7804..6b6490e 100644
---- a/include/qemu/hbitmap.h
-+++ b/include/qemu/hbitmap.h
-@@ -292,6 +292,14 @@ void hbitmap_iter_init(HBitmapIter *hbi, const HBitmap *hb, uint64_t first);
-  */
- unsigned long hbitmap_iter_skip_words(HBitmapIter *hbi);
+ /* See if in-flight requests overlap and wait for them to complete */
+@@ -109,10 +110,11 @@ static int coroutine_fn backup_do_cow(BackupBlockJob *job,
+     cow_request_begin(&cow_request, job, start, end);
  
-+/* hbitmap_next_zero:
-+ * @hb: The HBitmap to operate on
-+ * @start: The bit to start from.
-+ *
-+ * Find next not dirty bit.
-+ */
-+int64_t hbitmap_next_zero(const HBitmap *hb, uint64_t start);
-+
- /* hbitmap_create_meta:
-  * Create a "meta" hbitmap to track dirtiness of the bits in this HBitmap.
-  * The caller owns the created bitmap and must call hbitmap_free_meta(hb) to
-diff --git a/tests/test-hbitmap.c b/tests/test-hbitmap.c
-index af41642..9091c63 100644
---- a/tests/test-hbitmap.c
-+++ b/tests/test-hbitmap.c
-@@ -925,6 +925,61 @@ static void test_hbitmap_iter_and_reset(TestHBitmapData *data,
-     hbitmap_iter_next(&hbi);
- }
+     for (; start < end; start += job->cluster_size) {
+-        if (test_bit(start / job->cluster_size, job->done_bitmap)) {
++        if (!hbitmap_get(job->copy_bitmap, start / job->cluster_size)) {
+             trace_backup_do_cow_skip(job, start);
+             continue; /* already copied */
+         }
++        hbitmap_reset(job->copy_bitmap, start / job->cluster_size, 1);
  
-+static void test_hbitmap_next_zero_check(TestHBitmapData *data, int64_t start)
-+{
-+    int64_t ret1 = hbitmap_next_zero(data->hb, start);
-+    int64_t ret2 = start;
-+    for ( ; ret2 < data->size && hbitmap_get(data->hb, ret2); ret2++) {
-+        ;
-+    }
-+    if (ret2 == data->size) {
-+        ret2 = -1;
-+    }
-+
-+    g_assert_cmpint(ret1, ==, ret2);
-+}
-+
-+static void test_hbitmap_next_zero_do(TestHBitmapData *data, int granularity)
-+{
-+    hbitmap_test_init(data, L3, granularity);
-+    test_hbitmap_next_zero_check(data, 0);
-+    test_hbitmap_next_zero_check(data, L3 - 1);
-+
-+    hbitmap_set(data->hb, L2, 1);
-+    test_hbitmap_next_zero_check(data, 0);
-+    test_hbitmap_next_zero_check(data, L2 - 1);
-+    test_hbitmap_next_zero_check(data, L2);
-+    test_hbitmap_next_zero_check(data, L2 + 1);
-+
-+    hbitmap_set(data->hb, L2 + 5, L1);
-+    test_hbitmap_next_zero_check(data, 0);
-+    test_hbitmap_next_zero_check(data, L2 + 1);
-+    test_hbitmap_next_zero_check(data, L2 + 2);
-+    test_hbitmap_next_zero_check(data, L2 + 5);
-+    test_hbitmap_next_zero_check(data, L2 + L1 - 1);
-+    test_hbitmap_next_zero_check(data, L2 + L1);
-+
-+    hbitmap_set(data->hb, L2 * 2, L3 - L2 * 2);
-+    test_hbitmap_next_zero_check(data, L2 * 2 - L1);
-+    test_hbitmap_next_zero_check(data, L2 * 2 - 2);
-+    test_hbitmap_next_zero_check(data, L2 * 2 - 1);
-+    test_hbitmap_next_zero_check(data, L2 * 2);
-+    test_hbitmap_next_zero_check(data, L3 - 1);
-+
-+    hbitmap_set(data->hb, 0, L3);
-+    test_hbitmap_next_zero_check(data, 0);
-+}
-+
-+static void test_hbitmap_next_zero_0(TestHBitmapData *data, const void *unused)
-+{
-+    test_hbitmap_next_zero_do(data, 0);
-+}
-+
-+static void test_hbitmap_next_zero_4(TestHBitmapData *data, const void *unused)
-+{
-+    test_hbitmap_next_zero_do(data, 4);
-+}
-+
- int main(int argc, char **argv)
- {
-     g_test_init(&argc, &argv, NULL);
-@@ -985,6 +1040,12 @@ int main(int argc, char **argv)
+         trace_backup_do_cow_process(job, start);
  
-     hbitmap_test_add("/hbitmap/iter/iter_and_reset",
-                      test_hbitmap_iter_and_reset);
-+
-+    hbitmap_test_add("/hbitmap/next_zero/next_zero_0",
-+                     test_hbitmap_next_zero_0);
-+    hbitmap_test_add("/hbitmap/next_zero/next_zero_4",
-+                     test_hbitmap_next_zero_4);
-+
-     g_test_run();
+@@ -132,6 +134,7 @@ static int coroutine_fn backup_do_cow(BackupBlockJob *job,
+             if (error_is_read) {
+                 *error_is_read = true;
+             }
++            hbitmap_set(job->copy_bitmap, start / job->cluster_size, 1);
+             goto out;
+         }
  
-     return 0;
-diff --git a/util/hbitmap.c b/util/hbitmap.c
-index 2f9d0fd..289778a 100644
---- a/util/hbitmap.c
-+++ b/util/hbitmap.c
-@@ -188,6 +188,45 @@ void hbitmap_iter_init(HBitmapIter *hbi, const HBitmap *hb, uint64_t first)
+@@ -148,11 +151,10 @@ static int coroutine_fn backup_do_cow(BackupBlockJob *job,
+             if (error_is_read) {
+                 *error_is_read = false;
+             }
++            hbitmap_set(job->copy_bitmap, start / job->cluster_size, 1);
+             goto out;
+         }
+ 
+-        set_bit(start / job->cluster_size, job->done_bitmap);
+-
+         /* Publish progress, guest I/O counts as progress too.  Note that the
+          * offset field is an opaque progress value, it is not a disk offset.
+          */
+@@ -260,7 +262,7 @@ void backup_do_checkpoint(BlockJob *job, Error **errp)
      }
+ 
+     len = DIV_ROUND_UP(backup_job->common.len, backup_job->cluster_size);
+-    bitmap_zero(backup_job->done_bitmap, len);
++    hbitmap_set(backup_job->copy_bitmap, 0, len);
  }
  
-+int64_t hbitmap_next_zero(const HBitmap *hb, uint64_t start)
-+{
-+    size_t pos = (start >> hb->granularity) >> BITS_PER_LEVEL;
-+    unsigned long *last_lev = hb->levels[HBITMAP_LEVELS - 1];
-+    uint64_t sz = hb->sizes[HBITMAP_LEVELS - 1];
-+    unsigned long cur = last_lev[pos];
-+    unsigned start_bit_offset =
-+            (start >> hb->granularity) & (BITS_PER_LONG - 1);
-+    int64_t res;
-+
-+    cur |= (1UL << start_bit_offset) - 1;
-+    assert((start >> hb->granularity) < hb->size);
-+
-+    if (cur == (unsigned long)-1) {
-+        do {
-+            pos++;
-+        } while (pos < sz && last_lev[pos] == (unsigned long)-1);
-+
-+        if (pos >= sz) {
-+            return -1;
-+        }
-+
-+        cur = last_lev[pos];
-+    }
-+
-+    res = (pos << BITS_PER_LEVEL) + ctol(cur);
-+    if (res >= hb->size) {
-+        return -1;
-+    }
-+
-+    res = res << hb->granularity;
-+    if (res < start) {
-+        assert(((start - res) >> hb->granularity) == 0);
-+        return start;
-+    }
-+
-+    return res;
-+}
-+
- bool hbitmap_empty(const HBitmap *hb)
- {
-     return hb->count == 0;
+ void backup_wait_for_overlapping_requests(BlockJob *job, int64_t offset,
+@@ -425,19 +427,22 @@ static void coroutine_fn backup_run(void *opaque)
+     BackupBlockJob *job = opaque;
+     BackupCompleteData *data;
+     BlockDriverState *bs = blk_bs(job->common.blk);
+-    int64_t offset;
++    int64_t offset, nb_clusters;
+     int ret = 0;
+ 
+     QLIST_INIT(&job->inflight_reqs);
+     qemu_co_rwlock_init(&job->flush_rwlock);
+ 
+-    job->done_bitmap = bitmap_new(DIV_ROUND_UP(job->common.len,
+-                                               job->cluster_size));
++    nb_clusters = DIV_ROUND_UP(job->common.len, job->cluster_size);
++    job->copy_bitmap = hbitmap_alloc(nb_clusters, 0);
++    hbitmap_set(job->copy_bitmap, 0, nb_clusters);
+ 
+     job->before_write.notify = backup_before_write_notify;
+     bdrv_add_before_write_notifier(bs, &job->before_write);
+ 
+     if (job->sync_mode == MIRROR_SYNC_MODE_NONE) {
++        /* All bits are set in copy_bitmap to allow any cluster to be copied.
++         * This does not actually require them to be copied. */
+         while (!block_job_is_cancelled(&job->common)) {
+             /* Yield until the job is cancelled.  We just let our before_write
+              * notify callback service CoW requests. */
+@@ -512,7 +517,7 @@ static void coroutine_fn backup_run(void *opaque)
+     /* wait until pending backup_do_cow() calls have completed */
+     qemu_co_rwlock_wrlock(&job->flush_rwlock);
+     qemu_co_rwlock_unlock(&job->flush_rwlock);
+-    g_free(job->done_bitmap);
++    hbitmap_free(job->copy_bitmap);
+ 
+     data = g_malloc(sizeof(*data));
+     data->ret = ret;
 -- 
 2.9.5
