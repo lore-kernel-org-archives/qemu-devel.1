@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38628)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59825)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eQwtO-0003Af-GN
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 09:59:47 -0500
+	(envelope-from <lvivier@redhat.com>) id 1eQx5c-0004F0-Fl
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 10:13:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eQwtN-0003qG-NX
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 09:59:46 -0500
+	(envelope-from <lvivier@redhat.com>) id 1eQx4J-0006kA-CT
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 10:12:24 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:38082)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <lvivier@redhat.com>) id 1eQx4H-0006fh-Vc
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 10:11:02 -0500
+References: <1513446109-9013-1-git-send-email-stefanb@linux.vnet.ibm.com>
+	<1513446109-9013-26-git-send-email-stefanb@linux.vnet.ibm.com>
+From: Laurent Vivier <lvivier@redhat.com>
+Message-ID: <8772a2e8-49f8-4674-ff9b-d9df102af52f@redhat.com>
+Date: Mon, 18 Dec 2017 16:10:50 +0100
 MIME-Version: 1.0
-Sender: philippe.mathieu.daude@gmail.com
-In-Reply-To: <3c50449d-870a-6347-74ba-cde968322891@amsat.org>
-References: <20171217204912.12420-1-f4bug@amsat.org>
-	<20171217204912.12420-3-f4bug@amsat.org>
-	<d0ab7c99-1174-1629-b8ac-87961f17fc4c@redhat.com>
-	<3c50449d-870a-6347-74ba-cde968322891@amsat.org>
-From: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Date: Mon, 18 Dec 2017 11:59:44 -0300
-Message-ID: <CAAdtpL5hGHfH5Qd5qtvK==aTJ5FMjd61OK0BkpY920LBuMqm7Q@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH 2/4] hw/pci-host/piix: QOM'ify the IGD
- Passthrough host bridge
+In-Reply-To: <1513446109-9013-26-git-send-email-stefanb@linux.vnet.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PULL v1 25/32] qdev: add DEFINE_PROP_TPMBE
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,63 +28,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Marcel Apfelbaum <marcel@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, =?UTF-8?Q?Herv=C3=A9_Poussineau?= <hpoussin@reactos.org>
-Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, "open list:Block layer core" <qemu-block@nongnu.org>
+To: Stefan Berger <stefanb@linux.vnet.ibm.com>, qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>
 
-[...]
->>>   -static int host_pci_config_read(int pos, int len, uint32_t *val)
->>> +static void host_pci_config_read(int pos, int len, uint32_t *val,
->>> Error **errp)
->>>   {
->>>       char path[PATH_MAX];
->>>       int config_fd;
->>> @@ -812,19 +812,19 @@ static int host_pci_config_read(int pos, int
->>> len, uint32_t *val)
->>>       /* Access real host bridge. */
->>>       int rc = snprintf(path, size,
->>> "/sys/bus/pci/devices/%04x:%02x:%02x.%d/%s",
->>>                         0, 0, 0, 0, "config");
->>> -    int ret = 0;
->>>         if (rc >= size || rc < 0) {
->>> -        return -ENODEV;
->>> +        error_setg(&error_abort, "Invalid PCI device");
->>
->> I think a return statement is missing here.
->
-> Well, error_setg(&error_abort) will never return, however checking the
-> documentation again I noticed I forgot these recommendations:
->
->  * Please don't error_setg(&error_fatal, ...), use error_report() and
->  * exit(), because that's more obvious.
->  * Likewise, don't error_setg(&error_abort, ...), use assert().
->
-> abort() might be OK but a bit harsh, so I'll use error_report() + exit()
-> here.
+On 16/12/2017 18:41, Stefan Berger wrote:
+> From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+>=20
+> A property to lookup a tpm backend.
+>=20
+> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> Reviewed-by: Stefan Berger <stefanb@linux.vnet.ibm.com>
+> Signed-off-by: Stefan Berger <stefanb@linux.vnet.ibm.com>
+> ---
+>  hw/core/qdev-properties-system.c | 64 ++++++++++++++++++++++++++++++++=
+++++++++
+>  include/hw/qdev-properties.h     |  3 ++
+>  2 files changed, 67 insertions(+)
 
-Actually g_strdup_printf() is cleaner.
+This one breaks my build:
 
->>>       }
->>>         config_fd = open(path, O_RDWR);
->>>       if (config_fd < 0) {
->>> -        return -ENODEV;
->>> +        error_setg_errno(errp, errno, "Failed to open: %s", path);
->>> +        return;
->>>       }
->>>         if (lseek(config_fd, pos, SEEK_SET) != pos) {
->>> -        ret = -errno;
->>> +        error_setg_errno(errp, errno, "Failed to seek: %s", path);
->>>           goto out;
->>>       }
->>>   @@ -832,32 +832,31 @@ static int host_pci_config_read(int pos, int
->>> len, uint32_t *val)
->>>           rc = read(config_fd, (uint8_t *)val, len);
->>>       } while (rc < 0 && (errno == EINTR || errno == EAGAIN));
->>>       if (rc != len) {
->>> -        ret = -errno;
->>> +        error_setg_errno(errp, errno, "Failed to read: %s", path);
->>>       }
->>>     out:
->>>       close(config_fd);
->>> -    return ret;
->>>   }
-[...]
+...
+  LINK    ppc64-softmmu/qemu-system-ppc64
+../hw/core/qdev-properties-system.o: In function `release_tpm':
+/home/lvivier/qemu/hw/core/qdev-properties-system.c:291: undefined
+reference to `tpm_backend_reset'
+../hw/core/qdev-properties-system.o: In function `set_tpm':
+/home/lvivier/qemu/hw/core/qdev-properties-system.c:274: undefined
+reference to `qemu_find_tpm_be'
+/home/lvivier/qemu/hw/core/qdev-properties-system.c:278: undefined
+reference to `tpm_backend_init'
+collect2: error: ld returned 1 exit status
+
+The following #ifdef fixes the problem for me:
+
+diff --git a/hw/core/qdev-properties-system.c
+b/hw/core/qdev-properties-system.c
+index c173646..b6eca3b 100644
+--- a/hw/core/qdev-properties-system.c
++++ b/hw/core/qdev-properties-system.c
+@@ -239,6 +239,7 @@ const PropertyInfo qdev_prop_chr =3D {
+
+ /* --- character device --- */
+
++#if defined(CONFIG_TPM)
+ static void get_tpm(Object *obj, Visitor *v, const char *name, void
+*opaque,
+                     Error **errp)
+ {
+@@ -299,6 +300,7 @@ const PropertyInfo qdev_prop_tpm =3D {
+     .set   =3D set_tpm,
+     .release =3D release_tpm,
+ };
++#endif
+
+ /* --- netdev device --- */
+ static void get_netdev(Object *obj, Visitor *v, const char *name,
+
+Thanks,
+Laurent
