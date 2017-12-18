@@ -1,33 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44533)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44184)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eQzFW-0002p9-Am
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 12:30:47 -0500
+	(envelope-from <armbru@redhat.com>) id 1eQzFG-0002YS-7s
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 12:30:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eQzFT-0004pY-05
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 12:30:46 -0500
-Received: from indium.canonical.com ([91.189.90.7]:57032)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1eQzFS-0004p6-N7
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 12:30:42 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1eQzFR-0007Wc-QV
-	for <qemu-devel@nongnu.org>; Mon, 18 Dec 2017 17:30:41 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id C3ED82E8056
-	for <qemu-devel@nongnu.org>; Mon, 18 Dec 2017 17:30:41 +0000 (UTC)
+	(envelope-from <armbru@redhat.com>) id 1eQzFC-0004Yb-RV
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 12:30:30 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:53386)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1eQzFC-0004X4-Jp
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 12:30:26 -0500
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 91D40C04577E
+	for <qemu-devel@nongnu.org>; Mon, 18 Dec 2017 17:30:25 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-116-74.ams2.redhat.com
+	[10.36.116.74])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 5FF0C80950
+	for <qemu-devel@nongnu.org>; Mon, 18 Dec 2017 17:30:25 +0000 (UTC)
+From: Markus Armbruster <armbru@redhat.com>
+Date: Mon, 18 Dec 2017 18:30:13 +0100
+Message-Id: <20171218173023.21417-1-armbru@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Date: Mon, 18 Dec 2017 17:19:23 -0000
-From: Robert Marklund <1738840@bugs.launchpad.net>
-Reply-To: Bug 1738840 <1738840@bugs.launchpad.net>
-Sender: bounces@canonical.com
-Message-Id: <151361756384.17711.11632335707632949681.malonedeb@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1738840] [NEW] qemu-img convert qcow2 to raw
- fails on OS X
+Subject: [Qemu-devel] [PULL 00/10] Command line patches for 2017-12-18
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,230 +36,47 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Public bug reported:
-
-I try to convert a image from qcow2 to raw and the result is a not bootable=
- image.
-I dont know if it is a bug in qemu-img convert or with the image it self.
-
-See this error report for better readability:
-https://github.com/coreos/bugs/issues/1121#issuecomment-351968518
-
-As a reply here they use 2.9.0 version of
-
-
-$ qemu-img -V
-qemu-img version 2.11.0
-Copyright (c) 2003-2017 Fabrice Bellard and the QEMU Project developers
-
-$ uname -v
-Darwin Kernel Version 17.2.0
-
-$ mount ./
-/dev/disk1s1 on / (apfs, local, journaled)
-
-$  wget https://beta.release.core-
-os.net/amd64-usr/current/coreos_production_openstack_image.img.bz2
-
-$ date
-Fri Dec 14 17:15:57 CET 2017
-
-$ bunzip2 coreos_production_openstack_image.img.bz2
-
-
-$ cp -a coreos_production_openstack_image.img.org coreos_production_opensta=
-ck_image.img
-
-$ shasum coreos_production_openstack_image.img.org
-ae2119c6f0390dc36f247f7016923ea85de5d8e6  coreos_production_openstack_image=
-.img.org
-
-$ qemu-img convert -f qcow2 -O raw
-coreos_production_openstack_image.img.org
-coreos_production_openstack_image.bin
-
-$ qemu-system-x86_64 -m 256 -nographic -hda coreos_production_openstack_ima=
-ge.img -boot c
-SeaBIOS (version rel-1.11.0-0-g63451fca13-prebuilt.qemu-project.org)
-
-
-iPXE (http://ipxe.org) 00:03.0 C980 PCI2.10 PnP PMM+0FF915A0+0FEF15A0 C980
-                                                                           =
-    =
-
-
-
-Booting from Hard Disk...
-GRUB loading....
-Welcome to GRUB!
-....
-
-$ qemu-system-x86_64 -m 256 -nographic -hda
-coreos_production_openstack_image.bin -boot c
-
-SeaBIOS (version rel-1.11.0-0-g63451fca13-prebuilt.qemu-project.org)
-
-
-iPXE (http://ipxe.org) 00:03.0 C980 PCI2.10 PnP PMM+0FF915A0+0FEF15A0 C980
-                                                                           =
-    =
-
-
-
-Booting from Hard Disk...
-Boot failed: not a bootable disk
-....
-
-
-$ head -c 8192 coreos_production_openstack_image.bin | hexdump -C
-00000000  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  |..............=
-..|
-*
-00002000
-
-$ qemu-img info coreos_production_openstack_image.bin
-image: coreos_production_openstack_image.bin
-file format: raw
-virtual size: 8.5G (9116319744 bytes)
-disk size: 217M
-
-$ qemu-img info coreos_production_openstack_image.img
-image: coreos_production_openstack_image.img
-file format: qcow2
-virtual size: 8.5G (9116319744 bytes)
-disk size: 785M
-cluster_size: 65536
-Format specific information:
-    compat: 0.10
-    refcount bits: 16
-
-The same version works on Ubuntu so it looks like its only the Mac
-version or the new APFS filesystem.
-
-** Affects: qemu
-     Importance: Undecided
-         Status: New
-
-
-** Tags: convert mac osx qcow2 qemu-img raw
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1738840
-
-Title:
-  qemu-img convert qcow2 to raw fails on OS X
-
-Status in QEMU:
-  New
-
-Bug description:
-  I try to convert a image from qcow2 to raw and the result is a not bootab=
-le image.
-  I dont know if it is a bug in qemu-img convert or with the image it self.
-
-  See this error report for better readability:
-  https://github.com/coreos/bugs/issues/1121#issuecomment-351968518
-
-  As a reply here they use 2.9.0 version of
-
-  =
-
-  $ qemu-img -V
-  qemu-img version 2.11.0
-  Copyright (c) 2003-2017 Fabrice Bellard and the QEMU Project developers
-
-  $ uname -v
-  Darwin Kernel Version 17.2.0
-
-  $ mount ./
-  /dev/disk1s1 on / (apfs, local, journaled)
-
-  $  wget https://beta.release.core-
-  os.net/amd64-usr/current/coreos_production_openstack_image.img.bz2
-
-  $ date
-  Fri Dec 14 17:15:57 CET 2017
-
-  $ bunzip2 coreos_production_openstack_image.img.bz2
-
-  =
-
-  $ cp -a coreos_production_openstack_image.img.org coreos_production_opens=
-tack_image.img
-
-  $ shasum coreos_production_openstack_image.img.org
-  ae2119c6f0390dc36f247f7016923ea85de5d8e6  coreos_production_openstack_ima=
-ge.img.org
-
-  $ qemu-img convert -f qcow2 -O raw
-  coreos_production_openstack_image.img.org
-  coreos_production_openstack_image.bin
-
-  $ qemu-system-x86_64 -m 256 -nographic -hda coreos_production_openstack_i=
-mage.img -boot c
-  SeaBIOS (version rel-1.11.0-0-g63451fca13-prebuilt.qemu-project.org)
-
-  =
-
-  iPXE (http://ipxe.org) 00:03.0 C980 PCI2.10 PnP PMM+0FF915A0+0FEF15A0 C980
-                                                                           =
-      =
-
-
-  =
-
-  Booting from Hard Disk...
-  GRUB loading....
-  Welcome to GRUB!
-  ....
-
-  $ qemu-system-x86_64 -m 256 -nographic -hda
-  coreos_production_openstack_image.bin -boot c
-
-  SeaBIOS (version rel-1.11.0-0-g63451fca13-prebuilt.qemu-project.org)
-
-  =
-
-  iPXE (http://ipxe.org) 00:03.0 C980 PCI2.10 PnP PMM+0FF915A0+0FEF15A0 C980
-                                                                           =
-      =
-
-
-  =
-
-  Booting from Hard Disk...
-  Boot failed: not a bootable disk
-  ....
-
-  =
-
-  $ head -c 8192 coreos_production_openstack_image.bin | hexdump -C
-  00000000  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  |............=
-....|
-  *
-  00002000
-
-  $ qemu-img info coreos_production_openstack_image.bin
-  image: coreos_production_openstack_image.bin
-  file format: raw
-  virtual size: 8.5G (9116319744 bytes)
-  disk size: 217M
-
-  $ qemu-img info coreos_production_openstack_image.img
-  image: coreos_production_openstack_image.img
-  file format: qcow2
-  virtual size: 8.5G (9116319744 bytes)
-  disk size: 785M
-  cluster_size: 65536
-  Format specific information:
-      compat: 0.10
-      refcount bits: 16
-
-  The same version works on Ubuntu so it looks like its only the Mac
-  version or the new APFS filesystem.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1738840/+subscriptions
+The following changes since commit 411ad78115ebeb3411cf4b7622784b93dfabe2=
+59:
+
+  Merge remote-tracking branch 'remotes/stefanberger/tags/pull-tpm-2017-1=
+2-15-1' into staging (2017-12-17 15:27:41 +0000)
+
+are available in the git repository at:
+
+  git://repo.or.cz/qemu/armbru.git tags/pull-cmdline-2017-12-18
+
+for you to fetch changes up to aa088732820dc26f8881fb7c82bfd75724d18594:
+
+  option: Drop unused get_param_value(), get_next_param_value() (2017-12-=
+18 18:16:28 +0100)
+
+----------------------------------------------------------------
+Command line patches for 2017-12-18
+
+----------------------------------------------------------------
+Dr. David Alan Gilbert (1):
+      option: Remove shadowing opt decl from qemu_opt_print()
+
+Markus Armbruster (9):
+      qemu-options: Remove stray colons from output of --help
+      qemu-options: Fix markup of -netdev l2tpv3
+      qemu-options qemu-doc: Move "Device URL Syntax" to qemu-doc
+      qemu-options: Move -iscsi under "Block device options"
+      qemu-options: Add missing -iscsi Texinfo documentation
+      qemu-options: Polish section "TPM device options"
+      qemu-options: Polish section "Character device options"
+      qemu-options: Belatedly document --watchdog-action inject-nmi
+      option: Drop unused get_param_value(), get_next_param_value()
+
+ include/qemu/option.h  |   5 -
+ qemu-doc.texi          | 217 +++++++++++++++++++++++++++++++++++
+ qemu-options-wrapper.h |   2 +-
+ qemu-options.hx        | 306 ++++++++-----------------------------------=
+------
+ scripts/hxtool         |   3 +-
+ util/qemu-option.c     |  36 +-----
+ 6 files changed, 268 insertions(+), 301 deletions(-)
+
+--=20
+2.13.6
