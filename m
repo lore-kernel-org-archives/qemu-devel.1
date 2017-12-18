@@ -1,21 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52133)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52310)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1eQmko-0001OH-Ey
-	for qemu-devel@nongnu.org; Sun, 17 Dec 2017 23:10:16 -0500
+	(envelope-from <bounces@canonical.com>) id 1eQmlJ-0001m0-Tb
+	for qemu-devel@nongnu.org; Sun, 17 Dec 2017 23:10:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1eQmkk-0007O8-AT
-	for qemu-devel@nongnu.org; Sun, 17 Dec 2017 23:10:14 -0500
-Date: Mon, 18 Dec 2017 15:03:03 +1100
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20171218040303.GR7753@umbus.fritz.box>
-References: <20171216224842.F37CC7456B4@zero.eik.bme.hu>
+	(envelope-from <bounces@canonical.com>) id 1eQmlF-0007o5-S1
+	for qemu-devel@nongnu.org; Sun, 17 Dec 2017 23:10:45 -0500
+Received: from indium.canonical.com ([91.189.90.7]:37816)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1eQmlF-0007nY-Fg
+	for qemu-devel@nongnu.org; Sun, 17 Dec 2017 23:10:41 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1eQmlE-0005WD-IT
+	for <qemu-devel@nongnu.org>; Mon, 18 Dec 2017 04:10:40 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 85FD72E804B
+	for <qemu-devel@nongnu.org>; Mon, 18 Dec 2017 04:10:40 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="0Qexx6XJGNEACt6j"
-Content-Disposition: inline
-In-Reply-To: <20171216224842.F37CC7456B4@zero.eik.bme.hu>
-Subject: Re: [Qemu-devel] [PATCH v2] ppc4xx_i2c: Implement basic I2C
- functions
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 18 Dec 2017 04:01:14 -0000
+From: Timothy Pearson <kb9vqf@pearsoncomputing.net>
+Reply-To: Bug 1738691 <1738691@bugs.launchpad.net>
+Sender: bounces@canonical.com
+Message-Id: <151356967493.24699.12724051631743338900.malonedeb@wampee.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1738691] [NEW] Guest kernel crashes with kvm_pr
+ on POWER8
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,387 +36,533 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: BALATON Zoltan <balaton@eik.bme.hu>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Alexander Graf <agraf@suse.de>, Francois Revol <revol@free.fr>
+To: qemu-devel@nongnu.org
 
+Public bug reported:
 
---0Qexx6XJGNEACt6j
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+When attempting to use the kvm_pr module with QEMU 2.10 on a POWER8
+host, Debian and Ubuntu guests hang and show crashes.
 
-On Sat, Dec 16, 2017 at 11:42:14PM +0100, BALATON Zoltan wrote:
-> Enough to please U-Boot and make it able to detect SDRAM SPD EEPROMs
->=20
-> Signed-off-by: Fran=E7ois Revol <revol@free.fr>
-> Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
-> Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+Host kernel is 4.14.  Issue is observed with host kernels 4.9 and 4.13
+as well; no other host kernels were tested.
 
-Applied to ppc-for-2.12, thanks.
+Is this the correct place to report a kvm_pr bug?
 
-> ---
-> v2:
-> - Removed DPRINTFs, no other change
-> - R-b from: http://lists.nongnu.org/archive/html/qemu-ppc/2017-08/msg0019=
-3.html
->=20
->  hw/i2c/ppc4xx_i2c.c         | 198 +++++++++++++++++++++++++++++++++++++-=
-------
->  include/hw/i2c/ppc4xx_i2c.h |   3 +
->  2 files changed, 171 insertions(+), 30 deletions(-)
->=20
-> diff --git a/hw/i2c/ppc4xx_i2c.c b/hw/i2c/ppc4xx_i2c.c
-> index 5a6bde9..e873a44 100644
-> --- a/hw/i2c/ppc4xx_i2c.c
-> +++ b/hw/i2c/ppc4xx_i2c.c
-> @@ -2,6 +2,8 @@
->   * PPC4xx I2C controller emulation
->   *
->   * Copyright (c) 2007 Jocelyn Mayer
-> + * Copyright (c) 2012 Fran=E7ois Revol
-> + * Copyright (c) 2016 BALATON Zoltan
->   *
->   * Permission is hereby granted, free of charge, to any person obtaining=
- a copy
->   * of this software and associated documentation files (the "Software"),=
- to deal
-> @@ -25,26 +27,118 @@
->  #include "qemu/osdep.h"
->  #include "qapi/error.h"
->  #include "qemu-common.h"
-> +#include "qemu/log.h"
->  #include "cpu.h"
->  #include "hw/hw.h"
->  #include "hw/i2c/ppc4xx_i2c.h"
-> =20
-> -/*#define DEBUG_I2C*/
-> +#define PPC4xx_I2C_MEM_SIZE 0x12
-> =20
-> -#define PPC4xx_I2C_MEM_SIZE 0x11
-> +#define IIC_CNTL_PT         (1 << 0)
-> +#define IIC_CNTL_READ       (1 << 1)
-> +#define IIC_CNTL_CHT        (1 << 2)
-> +#define IIC_CNTL_RPST       (1 << 3)
-> +
-> +#define IIC_STS_PT          (1 << 0)
-> +#define IIC_STS_ERR         (1 << 2)
-> +#define IIC_STS_MDBS        (1 << 5)
-> +
-> +#define IIC_EXTSTS_XFRA     (1 << 0)
-> +
-> +#define IIC_XTCNTLSS_SRST   (1 << 0)
-> +
-> +static void ppc4xx_i2c_reset(DeviceState *s)
-> +{
-> +    PPC4xxI2CState *i2c =3D PPC4xx_I2C(s);
-> +
-> +    /* FIXME: Should also reset bus?
-> +     *if (s->address !=3D ADDR_RESET) {
-> +     *    i2c_end_transfer(s->bus);
-> +     *}
-> +     */
-> +
-> +    i2c->mdata =3D 0;
-> +    i2c->lmadr =3D 0;
-> +    i2c->hmadr =3D 0;
-> +    i2c->cntl =3D 0;
-> +    i2c->mdcntl =3D 0;
-> +    i2c->sts =3D 0;
-> +    i2c->extsts =3D 0x8f;
-> +    i2c->sdata =3D 0;
-> +    i2c->lsadr =3D 0;
-> +    i2c->hsadr =3D 0;
-> +    i2c->clkdiv =3D 0;
-> +    i2c->intrmsk =3D 0;
-> +    i2c->xfrcnt =3D 0;
-> +    i2c->xtcntlss =3D 0;
-> +    i2c->directcntl =3D 0x0f;
-> +    i2c->intr =3D 0;
-> +}
-> +
-> +static inline bool ppc4xx_i2c_is_master(PPC4xxI2CState *i2c)
-> +{
-> +    return true;
-> +}
-> =20
->  static uint64_t ppc4xx_i2c_readb(void *opaque, hwaddr addr, unsigned int=
- size)
->  {
->      PPC4xxI2CState *i2c =3D PPC4xx_I2C(opaque);
->      uint64_t ret;
-> =20
-> -#ifdef DEBUG_I2C
-> -    printf("%s: addr " TARGET_FMT_plx "\n", __func__, addr);
-> -#endif
->      switch (addr) {
->      case 0x00:
-> -        /*i2c_readbyte(&i2c->mdata);*/
->          ret =3D i2c->mdata;
-> +        if (ppc4xx_i2c_is_master(i2c)) {
-> +            ret =3D 0xff;
-> +
-> +            if (!(i2c->sts & IIC_STS_MDBS)) {
-> +                qemu_log_mask(LOG_GUEST_ERROR, "[%s]%s: Trying to read "
-> +                              "without starting transfer\n",
-> +                              TYPE_PPC4xx_I2C, __func__);
-> +            } else {
-> +                int pending =3D (i2c->cntl >> 4) & 3;
-> +
-> +                /* get the next byte */
-> +                int byte =3D i2c_recv(i2c->bus);
-> +
-> +                if (byte < 0) {
-> +                    qemu_log_mask(LOG_GUEST_ERROR, "[%s]%s: read failed "
-> +                                  "for device 0x%02x\n", TYPE_PPC4xx_I2C,
-> +                                  __func__, i2c->lmadr);
-> +                    ret =3D 0xff;
-> +                } else {
-> +                    ret =3D byte;
-> +                    /* Raise interrupt if enabled */
-> +                    /*ppc4xx_i2c_raise_interrupt(i2c)*/;
-> +                }
-> +
-> +                if (!pending) {
-> +                    i2c->sts &=3D ~IIC_STS_MDBS;
-> +                    /*i2c_end_transfer(i2c->bus);*/
-> +                /*} else if (i2c->cntl & (IIC_CNTL_RPST | IIC_CNTL_CHT))=
- {*/
-> +                } else if (pending) {
-> +                    /* current smbus implementation doesn't like
-> +                       multibyte xfer repeated start */
-> +                    i2c_end_transfer(i2c->bus);
-> +                    if (i2c_start_transfer(i2c->bus, i2c->lmadr >> 1, 1)=
-) {
-> +                        /* if non zero is returned, the adress is not va=
-lid */
-> +                        i2c->sts &=3D ~IIC_STS_PT;
-> +                        i2c->sts |=3D IIC_STS_ERR;
-> +                        i2c->extsts |=3D IIC_EXTSTS_XFRA;
-> +                    } else {
-> +                        /*i2c->sts |=3D IIC_STS_PT;*/
-> +                        i2c->sts |=3D IIC_STS_MDBS;
-> +                        i2c->sts &=3D ~IIC_STS_ERR;
-> +                        i2c->extsts =3D 0;
-> +                    }
-> +                }
-> +                pending--;
-> +                i2c->cntl =3D (i2c->cntl & 0xcf) | (pending << 4);
-> +            }
-> +        } else {
-> +            qemu_log_mask(LOG_UNIMP, "[%s]%s: slave mode not implemented=
-\n",
-> +                          TYPE_PPC4xx_I2C, __func__);
-> +        }
->          break;
->      case 0x02:
->          ret =3D i2c->sdata;
-> @@ -88,13 +182,15 @@ static uint64_t ppc4xx_i2c_readb(void *opaque, hwadd=
-r addr, unsigned int size)
->      case 0x10:
->          ret =3D i2c->directcntl;
->          break;
-> +    case 0x11:
-> +        ret =3D i2c->intr;
-> +        break;
->      default:
-> -        ret =3D 0x00;
-> +        qemu_log_mask(LOG_GUEST_ERROR, "[%s]%s: Bad address at offset 0x=
-%"
-> +                      HWADDR_PRIx "\n", TYPE_PPC4xx_I2C, __func__, addr);
-> +        ret =3D 0;
->          break;
->      }
-> -#ifdef DEBUG_I2C
-> -    printf("%s: addr " TARGET_FMT_plx " %02" PRIx64 "\n", __func__, addr=
-, ret);
-> -#endif
-> =20
->      return ret;
->  }
-> @@ -103,26 +199,70 @@ static void ppc4xx_i2c_writeb(void *opaque, hwaddr =
-addr, uint64_t value,
->                                unsigned int size)
->  {
->      PPC4xxI2CState *i2c =3D opaque;
-> -#ifdef DEBUG_I2C
-> -    printf("%s: addr " TARGET_FMT_plx " val %08" PRIx64 "\n",
-> -           __func__, addr, value);
-> -#endif
-> +
->      switch (addr) {
->      case 0x00:
->          i2c->mdata =3D value;
-> -        /*i2c_sendbyte(&i2c->mdata);*/
-> +        if (!i2c_bus_busy(i2c->bus)) {
-> +            /* assume we start a write transfer */
-> +            if (i2c_start_transfer(i2c->bus, i2c->lmadr >> 1, 0)) {
-> +                /* if non zero is returned, the adress is not valid */
-> +                i2c->sts &=3D ~IIC_STS_PT;
-> +                i2c->sts |=3D IIC_STS_ERR;
-> +                i2c->extsts |=3D IIC_EXTSTS_XFRA;
-> +            } else {
-> +                i2c->sts |=3D IIC_STS_PT;
-> +                i2c->sts &=3D ~IIC_STS_ERR;
-> +                i2c->extsts =3D 0;
-> +            }
-> +        }
-> +        if (i2c_bus_busy(i2c->bus)) {
-> +            if (i2c_send(i2c->bus, i2c->mdata)) {
-> +                /* if the target return non zero then end the transfer */
-> +                i2c->sts &=3D ~IIC_STS_PT;
-> +                i2c->sts |=3D IIC_STS_ERR;
-> +                i2c->extsts |=3D IIC_EXTSTS_XFRA;
-> +                i2c_end_transfer(i2c->bus);
-> +            }
-> +        }
->          break;
->      case 0x02:
->          i2c->sdata =3D value;
->          break;
->      case 0x04:
->          i2c->lmadr =3D value;
-> +        if (i2c_bus_busy(i2c->bus)) {
-> +            i2c_end_transfer(i2c->bus);
-> +        }
->          break;
->      case 0x05:
->          i2c->hmadr =3D value;
->          break;
->      case 0x06:
->          i2c->cntl =3D value;
-> +        if (i2c->cntl & IIC_CNTL_PT) {
-> +            if (i2c->cntl & IIC_CNTL_READ) {
-> +                if (i2c_bus_busy(i2c->bus)) {
-> +                    /* end previous transfer */
-> +                    i2c->sts &=3D ~IIC_STS_PT;
-> +                    i2c_end_transfer(i2c->bus);
-> +                }
-> +                if (i2c_start_transfer(i2c->bus, i2c->lmadr >> 1, 1)) {
-> +                    /* if non zero is returned, the adress is not valid =
-*/
-> +                    i2c->sts &=3D ~IIC_STS_PT;
-> +                    i2c->sts |=3D IIC_STS_ERR;
-> +                    i2c->extsts |=3D IIC_EXTSTS_XFRA;
-> +                } else {
-> +                    /*i2c->sts |=3D IIC_STS_PT;*/
-> +                    i2c->sts |=3D IIC_STS_MDBS;
-> +                    i2c->sts &=3D ~IIC_STS_ERR;
-> +                    i2c->extsts =3D 0;
-> +                }
-> +            } else {
-> +                /* we actually already did the write transfer... */
-> +                i2c->sts &=3D ~IIC_STS_PT;
-> +            }
-> +        }
->          break;
->      case 0x07:
->          i2c->mdcntl =3D value & 0xDF;
-> @@ -135,6 +275,7 @@ static void ppc4xx_i2c_writeb(void *opaque, hwaddr ad=
-dr, uint64_t value,
->          break;
->      case 0x0A:
->          i2c->lsadr =3D value;
-> +        /*i2c_set_slave_address(i2c->bus, i2c->lsadr);*/
->          break;
->      case 0x0B:
->          i2c->hsadr =3D value;
-> @@ -149,11 +290,23 @@ static void ppc4xx_i2c_writeb(void *opaque, hwaddr =
-addr, uint64_t value,
->          i2c->xfrcnt =3D value & 0x77;
->          break;
->      case 0x0F:
-> +        if (value & IIC_XTCNTLSS_SRST) {
-> +            /* Is it actually a full reset? U-Boot sets some regs before=
- */
-> +            ppc4xx_i2c_reset(DEVICE(i2c));
-> +            break;
-> +        }
->          i2c->xtcntlss =3D value;
->          break;
->      case 0x10:
->          i2c->directcntl =3D value & 0x7;
->          break;
-> +    case 0x11:
-> +        i2c->intr =3D value;
-> +        break;
-> +    default:
-> +        qemu_log_mask(LOG_GUEST_ERROR, "[%s]%s: Bad address at offset 0x=
-%"
-> +                      HWADDR_PRIx "\n", TYPE_PPC4xx_I2C, __func__, addr);
-> +        break;
->      }
->  }
-> =20
-> @@ -167,21 +320,6 @@ static const MemoryRegionOps ppc4xx_i2c_ops =3D {
->      .endianness =3D DEVICE_NATIVE_ENDIAN,
->  };
-> =20
-> -static void ppc4xx_i2c_reset(DeviceState *s)
-> -{
-> -    PPC4xxI2CState *i2c =3D PPC4xx_I2C(s);
-> -
-> -    i2c->mdata =3D 0x00;
-> -    i2c->sdata =3D 0x00;
-> -    i2c->cntl =3D 0x00;
-> -    i2c->mdcntl =3D 0x00;
-> -    i2c->sts =3D 0x00;
-> -    i2c->extsts =3D 0x00;
-> -    i2c->clkdiv =3D 0x00;
-> -    i2c->xfrcnt =3D 0x00;
-> -    i2c->directcntl =3D 0x0F;
-> -}
-> -
->  static void ppc4xx_i2c_init(Object *o)
->  {
->      PPC4xxI2CState *s =3D PPC4xx_I2C(o);
-> diff --git a/include/hw/i2c/ppc4xx_i2c.h b/include/hw/i2c/ppc4xx_i2c.h
-> index e53042f..71fb392 100644
-> --- a/include/hw/i2c/ppc4xx_i2c.h
-> +++ b/include/hw/i2c/ppc4xx_i2c.h
-> @@ -2,6 +2,8 @@
->   * PPC4xx I2C controller emulation
->   *
->   * Copyright (c) 2007 Jocelyn Mayer
-> + * Copyright (c) 2012 Fran=E7ois Revol
-> + * Copyright (c) 2016 BALATON Zoltan
->   *
->   * Permission is hereby granted, free of charge, to any person obtaining=
- a copy
->   * of this software and associated documentation files (the "Software"),=
- to deal
-> @@ -56,6 +58,7 @@ typedef struct PPC4xxI2CState {
->      uint8_t xfrcnt;
->      uint8_t xtcntlss;
->      uint8_t directcntl;
-> +    uint8_t intr;
->  } PPC4xxI2CState;
-> =20
->  #endif /* PPC4XX_I2C_H */
+Output from Ubuntu 17.10 guest:
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
+Quiescing Open Firmware ...
+Booting Linux via __start() @ 0x0000000002000000 ...
+[    0.000000] Page sizes from device-tree:
+[    0.000000] base_shift=3D12: shift=3D12, sllp=3D0x0000, avpnm=3D0x000000=
+00, tlbiel=3D1, penc=3D0
+[    0.000000] base_shift=3D16: shift=3D16, sllp=3D0x0110, avpnm=3D0x000000=
+00, tlbiel=3D1, penc=3D1
+[    0.000000] base_shift=3D24: shift=3D24, sllp=3D0x0100, avpnm=3D0x000000=
+01, tlbiel=3D0, penc=3D0
+[    0.000000] Using 1TB segments
+[    0.000000] Initializing hash mmu with SLB
+[    0.000000] Linux version 4.13.0-16-generic (buildd@bos01-ppc64el-029) (=
+gcc version 7.2.0 (Ubuntu 7.2.0-8ubuntu2)) #19-Ubuntu SMP Wed Oct 11 18:37:=
+02 UTC 2017 (Ubuntu 4.13.0-16.19-generic 4.13.4)
+[    0.000000] Found initrd at 0xc000000003b00000:0xc0000000048cf68b
+[    0.000000] Using pSeries machine description
+[    0.000000] bootconsole [udbg0] enabled
+[    0.000000] Partition configured for 2 cpus.
+[    0.000000] CPU maps initialized for 1 thread per core
+ -> smp_release_cpus()
+spinning_secondaries =3D 1
+ <- smp_release_cpus()
+[    0.000000] -----------------------------------------------------
+[    0.000000] ppc64_pft_size    =3D 0x19
+[    0.000000] phys_mem_size     =3D 0x100000000
+[    0.000000] dcache_bsize      =3D 0x80
+[    0.000000] icache_bsize      =3D 0x80
+[    0.000000] cpu_features      =3D 0x077c7a6c18500249
+[    0.000000]   possible        =3D 0x5fffffff18500649
+[    0.000000]   always          =3D 0x0000000018100040
+[    0.000000] cpu_user_features =3D 0xdc0065c2 0xae000000
+[    0.000000] mmu_features      =3D 0x7c006001
+[    0.000000] firmware_features =3D 0x00000000415a445f
+[    0.000000] htab_hash_mask    =3D 0x3ffff
+[    0.000000] -----------------------------------------------------
+[    0.000000] numa:   NODE_DATA [mem 0xfffd7c80-0xfffe3fff]
+[    0.000000] PCI host bridge /pci@800000020000000  ranges:
+[    0.000000]   IO 0x0000200000000000..0x000020000000ffff -> 0x00000000000=
+00000
+[    0.000000]  MEM 0x0000200080000000..0x00002000ffffffff -> 0x00000000800=
+00000
+[    0.000000]  MEM 0x0000210000000000..0x000021ffffffffff -> 0x00002100000=
+00000
+[    0.000000] PPC64 nvram contains 65536 bytes
+[    0.000000] Zone ranges:
+[    0.000000]   DMA      [mem 0x0000000000000000-0x00000000ffffffff]
+[    0.000000]   DMA32    empty
+[    0.000000]   Normal   empty
+[    0.000000]   Device   empty
+[    0.000000] Movable zone start for each node
+[    0.000000] Early memory node ranges
+[    0.000000]   node   0: [mem 0x0000000000000000-0x00000000ffffffff]
+[    0.000000] Initmem setup node 0 [mem 0x0000000000000000-0x00000000fffff=
+fff]
+[    0.000000] percpu: Embedded 4 pages/cpu @c0000000ffe00000 s162840 r0 d9=
+9304 u524288
+[    0.000000] Built 1 zonelists in Node order, mobility grouping on.  Tota=
+l pages: 65472
+[    0.000000] Policy zone: DMA
+[    0.000000] Kernel command line: BOOT_IMAGE=3D/install/vmlinux file=3D/c=
+drom/preseed/ubuntu-server.seed no_timer_check printk.time=3D1 ---
+[    0.000000] PID hash table entries: 4096 (order: -1, 32768 bytes)
+[    0.000000] Memory: 4070016K/4194304K available (12800K kernel code, 204=
+8K rwdata, 3456K rodata, 4608K init, 3021K bss, 124288K reserved, 0K cma-re=
+served)
+[    0.000000] random: get_random_u64 called from cache_random_seq_create+0=
+x80/0x180 with crng_init=3D0
+[    0.000000] SLUB: HWalign=3D128, Order=3D0-3, MinObjects=3D0, CPUs=3D2, =
+Nodes=3D1
+[    0.000000] ftrace: allocating 33631 entries in 13 pages
+[    0.000000] Hierarchical RCU implementation.
+[    0.000000]  RCU restricting CPUs from NR_CPUS=3D2048 to nr_cpu_ids=3D2.
+[    0.000000]  Tasks RCU enabled.
+[    0.000000] RCU: Adjusting geometry for rcu_fanout_leaf=3D16, nr_cpu_ids=
+=3D2
+[    0.000000] NR_IRQS: 512, nr_irqs: 512, preallocated irqs: 16
+[    0.000006] clocksource: timebase: mask: 0xffffffffffffffff max_cycles: =
+0x761537d007, max_idle_ns: 440795202126 ns
+[    0.000696] clocksource: timebase mult[1f40000] shift[24] registered
+[    0.001189] Console: colour dummy device 80x25
+[    0.001500] console [hvc0] enabled
+[    0.001500] console [hvc0] enabled
+[    0.001751] bootconsole [udbg0] disabled
+[    0.001751] bootconsole [udbg0] disabled
+[    0.002142] pid_max: default: 32768 minimum: 301
+[    0.002358] Security Framework initialized
+[    0.002377] Yama: becoming mindful.
+[    0.002466] AppArmor: AppArmor initialized
+[    0.007008] Dentry cache hash table entries: 524288 (order: 6, 4194304 b=
+ytes)
+[    0.009037] Inode-cache hash table entries: 262144 (order: 5, 2097152 by=
+tes)
+[    0.009144] Mount-cache hash table entries: 8192 (order: 0, 65536 bytes)
+[    0.009282] Mountpoint-cache hash table entries: 8192 (order: 0, 65536 b=
+ytes)
+[    0.011066] EEH: pSeries platform initialized
+[    0.011137] POWER8 performance monitor hardware support registered
+[    0.011231] Hierarchical SRCU implementation.
+[    0.012560] smp: Bringing up secondary CPUs ...
+[    0.014620] smp: Brought up 1 node, 2 CPUs
+[    0.014669] numa: Node 0 CPUs: 0-1
+[    0.017357] devtmpfs: initialized
+[    0.020796] evm: security.selinux
+[    0.020816] evm: security.SMACK64
+[    0.020832] evm: security.SMACK64EXEC
+[    0.020849] evm: security.SMACK64TRANSMUTE
+[    0.020865] evm: security.SMACK64MMAP
+[    0.020882] evm: security.ima
+[    0.020898] evm: security.capability
+[    0.021384] clocksource: jiffies: mask: 0xffffffff max_cycles: 0xfffffff=
+f, max_idle_ns: 7645041785100000 ns
+[    0.021428] futex hash table entries: 512 (order: 0, 65536 bytes)
+[    0.022217] NET: Registered protocol family 16
+[    0.023456] EEH: No capable adapters found
+[    0.068790] KVM: Live patching for a fast VM worked
+[    0.069504] cpuidle: using governor ladder
+[    0.069606] cpuidle: using governor menu
+[    0.070109] pstore: using zlib compression
+[    0.070162] pstore: Registered nvram as persistent store backend
+Linux ppc64le
+#19-Ubuntu SMP W[    0.073385] PCI: Probing PCI hardware
+[    0.073595] PCI host bridge to bus 0000:00
+[    0.073650] pci_bus 0000:00: root bus resource [io  0x10000-0x1ffff] (bu=
+s address [0x0000-0xffff])
+[    0.073722] pci_bus 0000:00: root bus resource [mem 0x200080000000-0x200=
+0ffffffff] (bus address [0x80000000-0xffffffff])
+[    0.073827] pci_bus 0000:00: root bus resource [mem 0x210000000000-0x21f=
+fffffffff]
+[    0.073913] pci_bus 0000:00: root bus resource [bus 00-ff]
+[    0.081145] IOMMU table initialized, virtual merging enabled
+[    0.081231] iommu: Adding device 0000:00:00.0 to group 0
+[    0.083493] HugeTLB registered 16.0 MiB page size, pre-allocated 0 pages
+[    0.085216] SCSI subsystem initialized
+[    0.085722] vgaarb: loaded
+[    0.085885] usbcore: registered new interface driver usbfs
+[    0.085961] usbcore: registered new interface driver hub
+[    0.086096] usbcore: registered new device driver usb
+[    0.086175] pps_core: LinuxPPS API ver. 1 registered
+[    0.086217] pps_core: Software ver. 5.3.6 - Copyright 2005-2007 Rodolfo =
+Giometti <giometti@linux.it>
+[    0.086316] PTP clock support registered
+[    0.086629] EDAC MC: Ver: 3.0.0
+[    0.087455] NetLabel: Initializing
+[    0.087509] NetLabel:  domain hash size =3D 128
+[    0.087550] NetLabel:  protocols =3D UNLABELED CIPSOv4 CALIPSO
+[    0.087676] NetLabel:  unlabeled traffic allowed by default
+[    0.088226] clocksource: Switched to clocksource timebase
+[    0.109127] VFS: Disk quotas dquot_6.6.0
+[    0.109244] VFS: Dquot-cache hash table entries: 8192 (order 0, 65536 by=
+tes)
+[    0.109543] AppArmor: AppArmor Filesystem Enabled
+[    0.121635] NET: Registered protocol family 2
+[    0.122074] TCP established hash table entries: 32768 (order: 2, 262144 =
+bytes)
+[    0.122584] TCP bind hash table entries: 32768 (order: 3, 524288 bytes)
+[    0.123346] TCP: Hash tables configured (established 32768 bind 32768)
+[    0.123472] UDP hash table entries: 2048 (order: 0, 65536 bytes)
+[    0.123692] UDP-Lite hash table entries: 2048 (order: 0, 65536 bytes)
+[    0.123937] NET: Registered protocol family 1
+[    0.124257] Unpacking initramfs...
+[    0.467838] Freeing initrd memory: 14080K
+[    0.472109] audit: initializing netlink subsys (disabled)
+[    0.472949] audit: type=3D2000 audit(1513569522.428:1): state=3Dinitiali=
+zed audit_enabled=3D0 res=3D1
+[    0.473972] Initialise system trusted keyrings
+[    0.474068] Key type blacklist registered
+[    0.474308] workingset: timestamp_bits=3D38 max_order=3D16 bucket_order=
+=3D0
+[    0.476124] zbud: loaded
+[    0.477006] squashfs: version 4.0 (2009/01/31) Phillip Lougher
+[    0.477456] fuse init (API version 7.26)
+[    0.478394] random: fast init done
+[    0.483013] Key type asymmetric registered
+[    0.483040] Asymmetric key parser 'x509' registered
+[    0.483150] Block layer SCSI generic (bsg) driver version 0.4 loaded (ma=
+jor 245)
+[    0.483363] io scheduler noop registered
+[    0.483383] io scheduler deadline registered
+[    0.483450] io scheduler cfq registered (default)
+[    0.484056] virtio-pci 0000:00:00.0: enabling device (0100 -> 0103)
+[    0.485519] virtio-pci 0000:00:00.0: ibm,query-pe-dma-windows(2026) 0 80=
+00000 20000000 returned 0
+[    0.485916] virtio-pci 0000:00:00.0: ibm,create-pe-dma-window(2027) 0 80=
+00000 20000000 10 20 returned 0 (liobn =3D 0x80000001 starting addr =3D 800=
+0000 0)
+[    0.501557] virtio-pci 0000:00:00.0: Using 64-bit direct DMA at offset 8=
+00000000000000
+[    0.503803] Serial: 8250/16550 driver, 32 ports, IRQ sharing enabled
+[    0.507398] Linux agpgart interface v0.103
+[    0.511296] loop: module loaded
+[    0.511671] libphy: Fixed MDIO Bus: probed
+[    0.511698] tun: Universal TUN/TAP device driver, 1.6
+[    0.511860] PPP generic driver version 2.4.2
+[    0.512086] VFIO - User Level meta-driver version: 0.3
+[    0.512309] ehci_hcd: USB 2.0 'Enhanced' Host Controller (EHCI) Driver
+[    0.512367] ehci-pci: EHCI PCI platform driver
+[    0.512420] ohci_hcd: USB 1.1 'Open' Host Controller (OHCI) Driver
+[    0.512457] ohci-pci: OHCI PCI platform driver
+[    0.512501] uhci_hcd: USB Universal Host Controller Interface driver
+[    0.512814] mousedev: PS/2 mouse device common for all mice
+[    0.513152] rtc-generic rtc-generic: rtc core: registered rtc-generic as=
+ rtc0
+[    0.513200] i2c /dev entries driver
+[    0.513320] device-mapper: uevent: version 1.0.3
+[    0.513482] device-mapper: ioctl: 4.36.0-ioctl (2017-06-09) initialised:=
+ dm-devel@redhat.com
+[    0.513710] ledtrig-cpu: registered to indicate activity on CPUs
+[    0.514095] NET: Registered protocol family 10
+[    0.526547] modprobe[89]: unhandled signal 11 at 0000000000000008 nip 00=
+0073724fd9645c lr 000073724fd855c0 code 30001
+[    0.528919] modprobe[90]: unhandled signal 11 at 00000000001e4250 nip 00=
+0076c0ae90e0f8 lr 000076c0ae90e6a4 code 30001
+[    0.529819] Segment Routing with IPv6
+[    0.529874] NET: Registered protocol family 17
+[    0.529922] Key type dns_resolver registered
+[    0.530832] registered taskstats version 1
+[    0.530902] Loading compiled-in X.509 certificates
+[    0.531719] modprobe[93]: unhandled signal 11 at 0000000000000008 nip 00=
+00741ba74e645c lr 0000741ba74d55c0 code 30001
+[    0.532899] modprobe[94]: unhandled signal 11 at 0000000000000008 nip 00=
+00764dd97f645c lr 0000764dd97e55c0 code 30001
+[    0.534414] Loaded X.509 cert 'Build time autogenerated kernel key: bc29=
+7e5938e0456833a4c0c157e5483b77785cf1'
+[    0.534505] zswap: loaded using pool lzo/zbud
+[    0.535375] modprobe[97]: unhandled signal 11 at 0000000000000008 nip 00=
+007e85a34b645c lr 00007e85a34a55c0 code 30001
+[    0.536618] modprobe[98]: unhandled signal 11 at 0000000000000008 nip 00=
+00713d7724645c lr 0000713d772355c0 code 30001
+[    0.537392] Key type big_key registered
+[    0.537418] Key type trusted registered
+[    0.545589] Key type encrypted registered
+[    0.545642] AppArmor: AppArmor sha1 policy hashing enabled
+[    0.545689] ima: No TPM chip found, activating TPM-bypass! (rc=3D-19)
+[    0.545799] evm: HMAC attrs: 0x1
+[    0.551224] rtc-generic rtc-generic: setting system clock to 2017-12-18 =
+03:58:43 UTC (1513569523)
+[    0.552107] Unable to open file: /etc/keys/x509_ima.der (-2)
+[    0.552109] Unable to open file: /etc/keys/x509_evm.der (-2)
+[    0.591193] Freeing unused kernel memory: 4608K
+[    0.591643] This architecture does not have kernel memory protection.
+<hang>
 
---0Qexx6XJGNEACt6j
-Content-Type: application/pgp-signature; name="signature.asc"
+** Affects: qemu
+     Importance: Undecided
+         Status: New
 
------BEGIN PGP SIGNATURE-----
+-- =
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlo3PfcACgkQbDjKyiDZ
-s5JtFQ/6A2bclCzXkrnCx88MkamvuXYkHhbdBB6oFiIdZOFhIfrlUOVI6ClwFFFR
-zcjA0JvcS5rEGOJeIOAUEdx7X2x0H5iS9/bh32EHhEmMH+/yhFZYa6jqhR86Lz/U
-6+X2W/K5SW64+DQqIg5iBOXCZJ5FkZIxY6gVORouw7OmesDxcFlFXa9842/MHaGp
-FOq0TLZkfkfPMiflF56co9JZm8vXKCWiyK16kQi43ZVg1V0SeZ5BYCDdV9l9hAKB
-u1TrGfLXCpo39DiSi/0gpOU22NkKZCZfR3lX9u+SiM2IqMXKxPVDCa2dUv+OQmIi
-ea+3AwXshZtkT5ZD+hUAW85JM69KjdF1i/K3dQZjdWJOuVGlzYYL+aO7Kh9fgsYz
-vmLN7fxJiWqg3zIwVpb9od1dCS1dho74CMu9ooU9A2o1ie6c3eJ3njqzYnMSv4Zv
-yK5G1H5/yrmumrMiAJvsXA3boClMX7mSw8b5F+vyKvHOqWogKR0eOvKpQrTiyeZs
-Xj7FszmQIKKHeqfptlCAQ2GTeCSQ46ccpP+KxbuGfAzccuNZmQWx/RKq1ny7ZngT
-T+CUYTfb/GsP56HPc2/kizMuuKa4auy53Z1wD2SMTwJtsDU8BKmkDO5deDqRupVX
-6r9NKiF78hdSpO+I3WJS+Vtm5U7YKx6VpxzSuuSjMGwn5FvBXcI=
-=B97H
------END PGP SIGNATURE-----
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1738691
 
---0Qexx6XJGNEACt6j--
+Title:
+  Guest kernel crashes with kvm_pr on POWER8
+
+Status in QEMU:
+  New
+
+Bug description:
+  When attempting to use the kvm_pr module with QEMU 2.10 on a POWER8
+  host, Debian and Ubuntu guests hang and show crashes.
+
+  Host kernel is 4.14.  Issue is observed with host kernels 4.9 and 4.13
+  as well; no other host kernels were tested.
+
+  Is this the correct place to report a kvm_pr bug?
+
+  Output from Ubuntu 17.10 guest:
+
+  Quiescing Open Firmware ...
+  Booting Linux via __start() @ 0x0000000002000000 ...
+  [    0.000000] Page sizes from device-tree:
+  [    0.000000] base_shift=3D12: shift=3D12, sllp=3D0x0000, avpnm=3D0x0000=
+0000, tlbiel=3D1, penc=3D0
+  [    0.000000] base_shift=3D16: shift=3D16, sllp=3D0x0110, avpnm=3D0x0000=
+0000, tlbiel=3D1, penc=3D1
+  [    0.000000] base_shift=3D24: shift=3D24, sllp=3D0x0100, avpnm=3D0x0000=
+0001, tlbiel=3D0, penc=3D0
+  [    0.000000] Using 1TB segments
+  [    0.000000] Initializing hash mmu with SLB
+  [    0.000000] Linux version 4.13.0-16-generic (buildd@bos01-ppc64el-029)=
+ (gcc version 7.2.0 (Ubuntu 7.2.0-8ubuntu2)) #19-Ubuntu SMP Wed Oct 11 18:3=
+7:02 UTC 2017 (Ubuntu 4.13.0-16.19-generic 4.13.4)
+  [    0.000000] Found initrd at 0xc000000003b00000:0xc0000000048cf68b
+  [    0.000000] Using pSeries machine description
+  [    0.000000] bootconsole [udbg0] enabled
+  [    0.000000] Partition configured for 2 cpus.
+  [    0.000000] CPU maps initialized for 1 thread per core
+   -> smp_release_cpus()
+  spinning_secondaries =3D 1
+   <- smp_release_cpus()
+  [    0.000000] -----------------------------------------------------
+  [    0.000000] ppc64_pft_size    =3D 0x19
+  [    0.000000] phys_mem_size     =3D 0x100000000
+  [    0.000000] dcache_bsize      =3D 0x80
+  [    0.000000] icache_bsize      =3D 0x80
+  [    0.000000] cpu_features      =3D 0x077c7a6c18500249
+  [    0.000000]   possible        =3D 0x5fffffff18500649
+  [    0.000000]   always          =3D 0x0000000018100040
+  [    0.000000] cpu_user_features =3D 0xdc0065c2 0xae000000
+  [    0.000000] mmu_features      =3D 0x7c006001
+  [    0.000000] firmware_features =3D 0x00000000415a445f
+  [    0.000000] htab_hash_mask    =3D 0x3ffff
+  [    0.000000] -----------------------------------------------------
+  [    0.000000] numa:   NODE_DATA [mem 0xfffd7c80-0xfffe3fff]
+  [    0.000000] PCI host bridge /pci@800000020000000  ranges:
+  [    0.000000]   IO 0x0000200000000000..0x000020000000ffff -> 0x000000000=
+0000000
+  [    0.000000]  MEM 0x0000200080000000..0x00002000ffffffff -> 0x000000008=
+0000000
+  [    0.000000]  MEM 0x0000210000000000..0x000021ffffffffff -> 0x000021000=
+0000000
+  [    0.000000] PPC64 nvram contains 65536 bytes
+  [    0.000000] Zone ranges:
+  [    0.000000]   DMA      [mem 0x0000000000000000-0x00000000ffffffff]
+  [    0.000000]   DMA32    empty
+  [    0.000000]   Normal   empty
+  [    0.000000]   Device   empty
+  [    0.000000] Movable zone start for each node
+  [    0.000000] Early memory node ranges
+  [    0.000000]   node   0: [mem 0x0000000000000000-0x00000000ffffffff]
+  [    0.000000] Initmem setup node 0 [mem 0x0000000000000000-0x00000000fff=
+fffff]
+  [    0.000000] percpu: Embedded 4 pages/cpu @c0000000ffe00000 s162840 r0 =
+d99304 u524288
+  [    0.000000] Built 1 zonelists in Node order, mobility grouping on.  To=
+tal pages: 65472
+  [    0.000000] Policy zone: DMA
+  [    0.000000] Kernel command line: BOOT_IMAGE=3D/install/vmlinux file=3D=
+/cdrom/preseed/ubuntu-server.seed no_timer_check printk.time=3D1 ---
+  [    0.000000] PID hash table entries: 4096 (order: -1, 32768 bytes)
+  [    0.000000] Memory: 4070016K/4194304K available (12800K kernel code, 2=
+048K rwdata, 3456K rodata, 4608K init, 3021K bss, 124288K reserved, 0K cma-=
+reserved)
+  [    0.000000] random: get_random_u64 called from cache_random_seq_create=
++0x80/0x180 with crng_init=3D0
+  [    0.000000] SLUB: HWalign=3D128, Order=3D0-3, MinObjects=3D0, CPUs=3D2=
+, Nodes=3D1
+  [    0.000000] ftrace: allocating 33631 entries in 13 pages
+  [    0.000000] Hierarchical RCU implementation.
+  [    0.000000]  RCU restricting CPUs from NR_CPUS=3D2048 to nr_cpu_ids=3D=
+2.
+  [    0.000000]  Tasks RCU enabled.
+  [    0.000000] RCU: Adjusting geometry for rcu_fanout_leaf=3D16, nr_cpu_i=
+ds=3D2
+  [    0.000000] NR_IRQS: 512, nr_irqs: 512, preallocated irqs: 16
+  [    0.000006] clocksource: timebase: mask: 0xffffffffffffffff max_cycles=
+: 0x761537d007, max_idle_ns: 440795202126 ns
+  [    0.000696] clocksource: timebase mult[1f40000] shift[24] registered
+  [    0.001189] Console: colour dummy device 80x25
+  [    0.001500] console [hvc0] enabled
+  [    0.001500] console [hvc0] enabled
+  [    0.001751] bootconsole [udbg0] disabled
+  [    0.001751] bootconsole [udbg0] disabled
+  [    0.002142] pid_max: default: 32768 minimum: 301
+  [    0.002358] Security Framework initialized
+  [    0.002377] Yama: becoming mindful.
+  [    0.002466] AppArmor: AppArmor initialized
+  [    0.007008] Dentry cache hash table entries: 524288 (order: 6, 4194304=
+ bytes)
+  [    0.009037] Inode-cache hash table entries: 262144 (order: 5, 2097152 =
+bytes)
+  [    0.009144] Mount-cache hash table entries: 8192 (order: 0, 65536 byte=
+s)
+  [    0.009282] Mountpoint-cache hash table entries: 8192 (order: 0, 65536=
+ bytes)
+  [    0.011066] EEH: pSeries platform initialized
+  [    0.011137] POWER8 performance monitor hardware support registered
+  [    0.011231] Hierarchical SRCU implementation.
+  [    0.012560] smp: Bringing up secondary CPUs ...
+  [    0.014620] smp: Brought up 1 node, 2 CPUs
+  [    0.014669] numa: Node 0 CPUs: 0-1
+  [    0.017357] devtmpfs: initialized
+  [    0.020796] evm: security.selinux
+  [    0.020816] evm: security.SMACK64
+  [    0.020832] evm: security.SMACK64EXEC
+  [    0.020849] evm: security.SMACK64TRANSMUTE
+  [    0.020865] evm: security.SMACK64MMAP
+  [    0.020882] evm: security.ima
+  [    0.020898] evm: security.capability
+  [    0.021384] clocksource: jiffies: mask: 0xffffffff max_cycles: 0xfffff=
+fff, max_idle_ns: 7645041785100000 ns
+  [    0.021428] futex hash table entries: 512 (order: 0, 65536 bytes)
+  [    0.022217] NET: Registered protocol family 16
+  [    0.023456] EEH: No capable adapters found
+  [    0.068790] KVM: Live patching for a fast VM worked
+  [    0.069504] cpuidle: using governor ladder
+  [    0.069606] cpuidle: using governor menu
+  [    0.070109] pstore: using zlib compression
+  [    0.070162] pstore: Registered nvram as persistent store backend
+  Linux ppc64le
+  #19-Ubuntu SMP W[    0.073385] PCI: Probing PCI hardware
+  [    0.073595] PCI host bridge to bus 0000:00
+  [    0.073650] pci_bus 0000:00: root bus resource [io  0x10000-0x1ffff] (=
+bus address [0x0000-0xffff])
+  [    0.073722] pci_bus 0000:00: root bus resource [mem 0x200080000000-0x2=
+000ffffffff] (bus address [0x80000000-0xffffffff])
+  [    0.073827] pci_bus 0000:00: root bus resource [mem 0x210000000000-0x2=
+1ffffffffff]
+  [    0.073913] pci_bus 0000:00: root bus resource [bus 00-ff]
+  [    0.081145] IOMMU table initialized, virtual merging enabled
+  [    0.081231] iommu: Adding device 0000:00:00.0 to group 0
+  [    0.083493] HugeTLB registered 16.0 MiB page size, pre-allocated 0 pag=
+es
+  [    0.085216] SCSI subsystem initialized
+  [    0.085722] vgaarb: loaded
+  [    0.085885] usbcore: registered new interface driver usbfs
+  [    0.085961] usbcore: registered new interface driver hub
+  [    0.086096] usbcore: registered new device driver usb
+  [    0.086175] pps_core: LinuxPPS API ver. 1 registered
+  [    0.086217] pps_core: Software ver. 5.3.6 - Copyright 2005-2007 Rodolf=
+o Giometti <giometti@linux.it>
+  [    0.086316] PTP clock support registered
+  [    0.086629] EDAC MC: Ver: 3.0.0
+  [    0.087455] NetLabel: Initializing
+  [    0.087509] NetLabel:  domain hash size =3D 128
+  [    0.087550] NetLabel:  protocols =3D UNLABELED CIPSOv4 CALIPSO
+  [    0.087676] NetLabel:  unlabeled traffic allowed by default
+  [    0.088226] clocksource: Switched to clocksource timebase
+  [    0.109127] VFS: Disk quotas dquot_6.6.0
+  [    0.109244] VFS: Dquot-cache hash table entries: 8192 (order 0, 65536 =
+bytes)
+  [    0.109543] AppArmor: AppArmor Filesystem Enabled
+  [    0.121635] NET: Registered protocol family 2
+  [    0.122074] TCP established hash table entries: 32768 (order: 2, 26214=
+4 bytes)
+  [    0.122584] TCP bind hash table entries: 32768 (order: 3, 524288 bytes)
+  [    0.123346] TCP: Hash tables configured (established 32768 bind 32768)
+  [    0.123472] UDP hash table entries: 2048 (order: 0, 65536 bytes)
+  [    0.123692] UDP-Lite hash table entries: 2048 (order: 0, 65536 bytes)
+  [    0.123937] NET: Registered protocol family 1
+  [    0.124257] Unpacking initramfs...
+  [    0.467838] Freeing initrd memory: 14080K
+  [    0.472109] audit: initializing netlink subsys (disabled)
+  [    0.472949] audit: type=3D2000 audit(1513569522.428:1): state=3Dinitia=
+lized audit_enabled=3D0 res=3D1
+  [    0.473972] Initialise system trusted keyrings
+  [    0.474068] Key type blacklist registered
+  [    0.474308] workingset: timestamp_bits=3D38 max_order=3D16 bucket_orde=
+r=3D0
+  [    0.476124] zbud: loaded
+  [    0.477006] squashfs: version 4.0 (2009/01/31) Phillip Lougher
+  [    0.477456] fuse init (API version 7.26)
+  [    0.478394] random: fast init done
+  [    0.483013] Key type asymmetric registered
+  [    0.483040] Asymmetric key parser 'x509' registered
+  [    0.483150] Block layer SCSI generic (bsg) driver version 0.4 loaded (=
+major 245)
+  [    0.483363] io scheduler noop registered
+  [    0.483383] io scheduler deadline registered
+  [    0.483450] io scheduler cfq registered (default)
+  [    0.484056] virtio-pci 0000:00:00.0: enabling device (0100 -> 0103)
+  [    0.485519] virtio-pci 0000:00:00.0: ibm,query-pe-dma-windows(2026) 0 =
+8000000 20000000 returned 0
+  [    0.485916] virtio-pci 0000:00:00.0: ibm,create-pe-dma-window(2027) 0 =
+8000000 20000000 10 20 returned 0 (liobn =3D 0x80000001 starting addr =3D 8=
+000000 0)
+  [    0.501557] virtio-pci 0000:00:00.0: Using 64-bit direct DMA at offset=
+ 800000000000000
+  [    0.503803] Serial: 8250/16550 driver, 32 ports, IRQ sharing enabled
+  [    0.507398] Linux agpgart interface v0.103
+  [    0.511296] loop: module loaded
+  [    0.511671] libphy: Fixed MDIO Bus: probed
+  [    0.511698] tun: Universal TUN/TAP device driver, 1.6
+  [    0.511860] PPP generic driver version 2.4.2
+  [    0.512086] VFIO - User Level meta-driver version: 0.3
+  [    0.512309] ehci_hcd: USB 2.0 'Enhanced' Host Controller (EHCI) Driver
+  [    0.512367] ehci-pci: EHCI PCI platform driver
+  [    0.512420] ohci_hcd: USB 1.1 'Open' Host Controller (OHCI) Driver
+  [    0.512457] ohci-pci: OHCI PCI platform driver
+  [    0.512501] uhci_hcd: USB Universal Host Controller Interface driver
+  [    0.512814] mousedev: PS/2 mouse device common for all mice
+  [    0.513152] rtc-generic rtc-generic: rtc core: registered rtc-generic =
+as rtc0
+  [    0.513200] i2c /dev entries driver
+  [    0.513320] device-mapper: uevent: version 1.0.3
+  [    0.513482] device-mapper: ioctl: 4.36.0-ioctl (2017-06-09) initialise=
+d: dm-devel@redhat.com
+  [    0.513710] ledtrig-cpu: registered to indicate activity on CPUs
+  [    0.514095] NET: Registered protocol family 10
+  [    0.526547] modprobe[89]: unhandled signal 11 at 0000000000000008 nip =
+000073724fd9645c lr 000073724fd855c0 code 30001
+  [    0.528919] modprobe[90]: unhandled signal 11 at 00000000001e4250 nip =
+000076c0ae90e0f8 lr 000076c0ae90e6a4 code 30001
+  [    0.529819] Segment Routing with IPv6
+  [    0.529874] NET: Registered protocol family 17
+  [    0.529922] Key type dns_resolver registered
+  [    0.530832] registered taskstats version 1
+  [    0.530902] Loading compiled-in X.509 certificates
+  [    0.531719] modprobe[93]: unhandled signal 11 at 0000000000000008 nip =
+0000741ba74e645c lr 0000741ba74d55c0 code 30001
+  [    0.532899] modprobe[94]: unhandled signal 11 at 0000000000000008 nip =
+0000764dd97f645c lr 0000764dd97e55c0 code 30001
+  [    0.534414] Loaded X.509 cert 'Build time autogenerated kernel key: bc=
+297e5938e0456833a4c0c157e5483b77785cf1'
+  [    0.534505] zswap: loaded using pool lzo/zbud
+  [    0.535375] modprobe[97]: unhandled signal 11 at 0000000000000008 nip =
+00007e85a34b645c lr 00007e85a34a55c0 code 30001
+  [    0.536618] modprobe[98]: unhandled signal 11 at 0000000000000008 nip =
+0000713d7724645c lr 0000713d772355c0 code 30001
+  [    0.537392] Key type big_key registered
+  [    0.537418] Key type trusted registered
+  [    0.545589] Key type encrypted registered
+  [    0.545642] AppArmor: AppArmor sha1 policy hashing enabled
+  [    0.545689] ima: No TPM chip found, activating TPM-bypass! (rc=3D-19)
+  [    0.545799] evm: HMAC attrs: 0x1
+  [    0.551224] rtc-generic rtc-generic: setting system clock to 2017-12-1=
+8 03:58:43 UTC (1513569523)
+  [    0.552107] Unable to open file: /etc/keys/x509_ima.der (-2)
+  [    0.552109] Unable to open file: /etc/keys/x509_evm.der (-2)
+  [    0.591193] Freeing unused kernel memory: 4608K
+  [    0.591643] This architecture does not have kernel memory protection.
+  <hang>
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1738691/+subscriptions
