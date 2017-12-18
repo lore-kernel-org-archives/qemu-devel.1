@@ -1,17 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41260)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41335)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1eQsTu-0006sn-K1
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 05:17:11 -0500
+	(envelope-from <lvivier@redhat.com>) id 1eQsUL-0007GM-2V
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 05:17:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1eQsTq-0007ex-Of
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 05:17:10 -0500
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Date: Mon, 18 Dec 2017 10:16:42 +0000
-Message-Id: <20171218101643.20360-2-berrange@redhat.com>
-In-Reply-To: <20171218101643.20360-1-berrange@redhat.com>
-References: <20171218101643.20360-1-berrange@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 1/2] blockdev: convert internal NBD server
- to QIONetListener
+	(envelope-from <lvivier@redhat.com>) id 1eQsUH-000846-2d
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 05:17:37 -0500
+References: <20170202051445.5735-1-david@gibson.dropbear.id.au>
+	<20170202051445.5735-96-david@gibson.dropbear.id.au>
+	<72cdaa82-8496-1d1d-e7bc-3f962f3853d1@suse.de>
+	<819a1e85-f50e-e1b0-55c0-696225b42606@redhat.com>
+	<e98bc5f2-3bbf-1915-feac-3e88182e28c7@suse.de>
+From: Laurent Vivier <lvivier@redhat.com>
+Message-ID: <4a422e67-838d-6938-cf51-680fec8befa3@redhat.com>
+Date: Mon, 18 Dec 2017 11:17:27 +0100
+MIME-Version: 1.0
+In-Reply-To: <e98bc5f2-3bbf-1915-feac-3e88182e28c7@suse.de>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PULL 095/107] spapr: clock should count only if
+ vm is running
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,115 +28,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Eric Blake <eblake@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-block@nongnu.org, "Daniel P. Berrange" <berrange@redhat.com>
+To: Alexander Graf <agraf@suse.de>, David Gibson <david@gibson.dropbear.id.au>, peter.maydell@linaro.org
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, thuth@redhat.com, mdroth@linux.vnet.ibm.com, aik@ozlabs.ru
 
-Instead of creating a QIOChannelSocket directly for the NBD
-server socket, use a QIONetListener. This provides the ability
-to listen on multiple sockets at the same time, so enables
-full support for IPv4/IPv6 dual stack.
+On 13/12/2017 20:59, Alexander Graf wrote:
+> 
+> 
+> On 13.12.17 20:29, Laurent Vivier wrote:
+>> On 13/12/2017 20:19, Alexander Graf wrote:
+>>>
+>>>
+>>> On 02.02.17 06:14, David Gibson wrote:
+>>>> From: Laurent Vivier <lvivier@redhat.com>
+>>>>
+>>>> This is a port to ppc of the i386 commit:
+>>>>     00f4d64 kvmclock: clock should count only if vm is running
+>>>>
+>>>> We remove timebase_post_load function, and use the VM state
+>>>> change handler to save and restore the guest_timebase (on stop
+>>>> and continue).
+>>>>
+>>>> We keep timebase_pre_save to reduce the clock difference on
+>>>> migration like in:
+>>>>     6053a86 kvmclock: reduce kvmclock difference on migration
+>>>>
+>>>> Time base offset has originally been introduced by commit
+>>>>     98a8b52 spapr: Add support for time base offset migration
+>>>>
+>>>> So while VM is paused, the time is stopped. This allows to have
+>>>> the same result with date (based on Time Base Register) and
+>>>> hwclock (based on "get-time-of-day" RTAS call).
+>>>>
+>>>> Moreover in TCG mode, the Time Base is always paused, so this
+>>>> patch also adjust the behavior between TCG and KVM.
+>>>>
+>>>> VM state field "time_of_the_day_ns" is now useless but we keep
+>>>> it to be able to migrate to older version of the machine.
+>>>>
+>>>> As vmstate_ppc_timebase structure (with timebase_pre_save() and
+>>>> timebase_post_load() functions) was only used by vmstate_spapr,
+>>>> we register the VM state change handler only in ppc_spapr_init().
+>>>>
+>>>> Signed-off-by: Laurent Vivier <lvivier@redhat.com>
+>>>> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+>>>
+>>> Just a small heads-up: I've been debugging an OpenQA regression lately
+>>> where our automated testing regressed with QEMU 2.9. With stock 2.9.1, I
+>>> get a failure rate of "weird" effects (probably TB divergence between
+>>> vcpus) of ~30%. With this patch reverted it's back to 0%.
+>>>
+>>> I *think* something here causes the TB offset of multiple threads (I'm
+>>> running -smp 2,threads=2) to diverge.
+>>>
+>>> I'll keep debugging things tomorrow, but I'll be happy to see anyone
+>>> else beat me to analyze what is going wrong ;).
+>>
+>> Don't know if it can be related, but for migration we need:
+> 
+> 
+> As expected, this did not fix it. I'll keep digging.
+> 
+> My hunch is that we now set VTB on different cores at different times,
+> introducing tiny VTB offsets which can lead to negative TB differences
+> inside the guest.
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
-Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
----
- blockdev-nbd.c | 50 ++++++++++++++++----------------------------------
- 1 file changed, 16 insertions(+), 34 deletions(-)
+Did you find where is the problem?
 
-diff --git a/blockdev-nbd.c b/blockdev-nbd.c
-index 28f551a7b0..9e3c22109c 100644
---- a/blockdev-nbd.c
-+++ b/blockdev-nbd.c
-@@ -18,10 +18,10 @@
- #include "qmp-commands.h"
- #include "block/nbd.h"
- #include "io/channel-socket.h"
-+#include "io/net-listener.h"
- 
- typedef struct NBDServerData {
--    QIOChannelSocket *listen_ioc;
--    int watch;
-+    QIONetListener *listener;
-     QCryptoTLSCreds *tlscreds;
- } NBDServerData;
- 
-@@ -32,27 +32,13 @@ static void nbd_blockdev_client_closed(NBDClient *client, bool ignored)
-     nbd_client_put(client);
- }
- 
--static gboolean nbd_accept(QIOChannel *ioc, GIOCondition condition,
--                           gpointer opaque)
-+static void nbd_accept(QIONetListener *listener, QIOChannelSocket *cioc,
-+                       gpointer opaque)
- {
--    QIOChannelSocket *cioc;
--
--    if (!nbd_server) {
--        return FALSE;
--    }
--
--    cioc = qio_channel_socket_accept(QIO_CHANNEL_SOCKET(ioc),
--                                     NULL);
--    if (!cioc) {
--        return TRUE;
--    }
--
-     qio_channel_set_name(QIO_CHANNEL(cioc), "nbd-server");
-     nbd_client_new(NULL, cioc,
-                    nbd_server->tlscreds, NULL,
-                    nbd_blockdev_client_closed);
--    object_unref(OBJECT(cioc));
--    return TRUE;
- }
- 
- 
-@@ -62,10 +48,8 @@ static void nbd_server_free(NBDServerData *server)
-         return;
-     }
- 
--    if (server->watch != -1) {
--        g_source_remove(server->watch);
--    }
--    object_unref(OBJECT(server->listen_ioc));
-+    qio_net_listener_disconnect(server->listener);
-+    object_unref(OBJECT(server->listener));
-     if (server->tlscreds) {
-         object_unref(OBJECT(server->tlscreds));
-     }
-@@ -112,12 +96,12 @@ void nbd_server_start(SocketAddress *addr, const char *tls_creds,
-     }
- 
-     nbd_server = g_new0(NBDServerData, 1);
--    nbd_server->watch = -1;
--    nbd_server->listen_ioc = qio_channel_socket_new();
--    qio_channel_set_name(QIO_CHANNEL(nbd_server->listen_ioc),
--                         "nbd-listener");
--    if (qio_channel_socket_listen_sync(
--            nbd_server->listen_ioc, addr, errp) < 0) {
-+    nbd_server->listener = qio_net_listener_new();
-+
-+    qio_net_listener_set_name(nbd_server->listener,
-+                              "nbd-listener");
-+
-+    if (qio_net_listener_open_sync(nbd_server->listener, addr, errp) < 0) {
-         goto error;
-     }
- 
-@@ -134,12 +118,10 @@ void nbd_server_start(SocketAddress *addr, const char *tls_creds,
-         }
-     }
- 
--    nbd_server->watch = qio_channel_add_watch(
--        QIO_CHANNEL(nbd_server->listen_ioc),
--        G_IO_IN,
--        nbd_accept,
--        NULL,
--        NULL);
-+    qio_net_listener_set_client_func(nbd_server->listener,
-+                                     nbd_accept,
-+                                     NULL,
-+                                     NULL);
- 
-     return;
- 
--- 
-2.14.3
+Can I help?
+
+Thanks,
+Laurent
