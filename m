@@ -1,27 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44190)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44191)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1eQzFG-0002YY-9e
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 12:30:33 -0500
+	(envelope-from <armbru@redhat.com>) id 1eQzFG-0002YZ-9w
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 12:30:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1eQzFE-0004cD-Hq
+	(envelope-from <armbru@redhat.com>) id 1eQzFD-0004ZR-78
 	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 12:30:30 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:48662)
+Received: from mx1.redhat.com ([209.132.183.28]:46070)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1eQzFE-0004a5-6n
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 12:30:28 -0500
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1eQzFC-0004Y7-P7
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 12:30:27 -0500
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 547BA2D6A30
-	for <qemu-devel@nongnu.org>; Mon, 18 Dec 2017 17:30:27 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id EB99BC0ABF45
+	for <qemu-devel@nongnu.org>; Mon, 18 Dec 2017 17:30:25 +0000 (UTC)
 From: Markus Armbruster <armbru@redhat.com>
-Date: Mon, 18 Dec 2017 18:30:22 +0100
-Message-Id: <20171218173023.21417-10-armbru@redhat.com>
+Date: Mon, 18 Dec 2017 18:30:15 +0100
+Message-Id: <20171218173023.21417-3-armbru@redhat.com>
 In-Reply-To: <20171218173023.21417-1-armbru@redhat.com>
 References: <20171218173023.21417-1-armbru@redhat.com>
-Subject: [Qemu-devel] [PULL 09/10] option: Remove shadowing opt decl from
- qemu_opt_print()
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 02/10] qemu-options: Fix markup of -netdev l2tpv3
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,33 +33,41 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: Jason Wang <jasowang@redhat.com>
 
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+The table of option parameters lacks @table and @end table.  The
+parameters become items in the enclosing table of options.  Screwed up
+when l2tpv3 was added in commit 3fb69aa.  Fix the obvious way.
 
-opt was declared as a separate local inside the last loop,
-shadowing the local at the top of the function.
-
-Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-Message-Id: <20171005190725.18712-1-dgilbert@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
+Cc: Jason Wang <jasowang@redhat.com>
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 ---
- util/qemu-option.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ qemu-options.hx | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/util/qemu-option.c b/util/qemu-option.c
-index 9b1dc8093b..877c5b4d67 100644
---- a/util/qemu-option.c
-+++ b/util/qemu-option.c
-@@ -766,7 +766,7 @@ void qemu_opts_print(QemuOpts *opts, const char *separator)
-     }
-     for (; desc && desc->name; desc++) {
-         const char *value;
--        QemuOpt *opt = qemu_opt_find(opts, desc->name);
-+        opt = qemu_opt_find(opts, desc->name);
- 
-         value = opt ? opt->str : desc->def_value_str;
-         if (!value) {
--- 
+diff --git a/qemu-options.hx b/qemu-options.hx
+index 7ac8ade9f9..66ec232879 100644
+--- a/qemu-options.hx
++++ b/qemu-options.hx
+@@ -2377,6 +2377,7 @@ two systems. It is present in routers, firewalls an=
+d the Linux kernel
+=20
+ This transport allows a VM to communicate to another VM, router or firew=
+all directly.
+=20
++@table @option
+ @item src=3D@var{srcaddr}
+     source address (mandatory)
+ @item dst=3D@var{dstaddr}
+@@ -2404,6 +2405,7 @@ draft-mkonstan-l2tpext-keyed-ipv6-tunnel-00
+ networks which have packet reorder.
+ @item offset=3D@var{offset}
+     Add an extra offset between header and data
++@end table
+=20
+ For example, to attach a VM running on host 4.3.2.1 via L2TPv3 to the br=
+idge br-lan
+ on the remote Linux host 1.2.3.4:
+--=20
 2.13.6
