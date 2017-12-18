@@ -1,17 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40229)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41805)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1eQtnN-00071w-Mx
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 06:41:22 -0500
+	(envelope-from <groug@kaod.org>) id 1eQtrk-0002vf-OW
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 06:45:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1eQtnM-0001jK-Jx
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 06:41:21 -0500
-From: Thomas Huth <thuth@redhat.com>
-Date: Mon, 18 Dec 2017 12:40:51 +0100
-Message-Id: <1513597251-21942-5-git-send-email-thuth@redhat.com>
-In-Reply-To: <1513597251-21942-1-git-send-email-thuth@redhat.com>
-References: <1513597251-21942-1-git-send-email-thuth@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 4/4] tests/cpu-plug-test: Test CPU
- hot-plugging on s390x
+	(envelope-from <groug@kaod.org>) id 1eQtrh-000453-Kx
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 06:45:52 -0500
+Received: from 12.mo1.mail-out.ovh.net ([87.98.162.229]:47065)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1eQtrh-00044U-Ec
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 06:45:49 -0500
+Received: from player691.ha.ovh.net (gw6.ovh.net [213.251.189.206])
+	by mo1.mail-out.ovh.net (Postfix) with ESMTP id B6EA8B26D8
+	for <qemu-devel@nongnu.org>; Mon, 18 Dec 2017 12:45:47 +0100 (CET)
+Date: Mon, 18 Dec 2017 12:45:40 +0100
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20171218124540.7da45454@bahia.lan>
+In-Reply-To: <20171218092024.21645-5-david@gibson.dropbear.id.au>
+References: <20171218092024.21645-1-david@gibson.dropbear.id.au>
+	<20171218092024.21645-5-david@gibson.dropbear.id.au>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 4/6] target/ppc: Clean up probing of VMX,
+ VSX and DFP availability on KVM
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,87 +31,103 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-ppc@nongnu.org, qemu-s390x@nongnu.org, Bharata B Rao <bharata@linux.vnet.ibm.com>, david@redhat.com, Daniel Barboza <danielhb@linux.vnet.ibm.com>
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: surajjs@au1.ibm.com, lvivier@redhat.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, mdroth@linux.vnet.ibm.com, abologna@redhat.com
 
-CPU hot-plugging on s390x is possible with both, "cpu-add"
-and "device_add", so test both.
+On Mon, 18 Dec 2017 20:20:22 +1100
+David Gibson <david@gibson.dropbear.id.au> wrote:
 
-Reviewed-by: David Hildenbrand <david@redhat.com>
-Signed-off-by: Thomas Huth <thuth@redhat.com>
----
- tests/Makefile.include |  1 +
- tests/cpu-plug-test.c  | 39 +++++++++++++++++++++++++++++++++++++++
- 2 files changed, 40 insertions(+)
+> When constructing the "host" cpu class we modify whether the VMX and VSX
+> vector extensions and DFP (Decimal Floating Point) are available
+> based on whether KVM can support those instructions.  This can depend on
+> policy in the host kernel as well as on the actual host cpu capabilities.
+> 
+> However, the way we probe for this is not very nice: we explicitly check
+> the host's device tree.  That works in practice, but it's not really
+> correct, since the device tree is a property of the host kernel's platform
+> which we don't really know about.  We get away with it because the only
+> modern POWER platforms happen to encode VMX, VSX and DFP availability in
+> the device tree in the same way.
+> 
+> Arguably we should have an explicit KVM capability for this, but we haven't
+> needed one so far.  Barring specific KVM policies which don't yet exist,
+> each of these instruction classes will be available in the guest if and
+> only if they're available in the qemu userspace process.  We can determine
+> that from the ELF AUX vector we're supplied with.
+> 
+> Once reworked like this, there are no more callers for kvmppc_get_vmx() and
+> kvmppc_get_dfp() so remove them.
+> 
+> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+> ---
 
-diff --git a/tests/Makefile.include b/tests/Makefile.include
-index 9ec7a38..c0a189d 100644
---- a/tests/Makefile.include
-+++ b/tests/Makefile.include
-@@ -372,6 +372,7 @@ check-qtest-s390x-y += tests/drive_del-test$(EXESUF)
- check-qtest-s390x-y += tests/virtio-balloon-test$(EXESUF)
- check-qtest-s390x-y += tests/virtio-console-test$(EXESUF)
- check-qtest-s390x-y += tests/virtio-serial-test$(EXESUF)
-+check-qtest-s390x-y += tests/cpu-plug-test$(EXESUF)
- 
- check-qtest-generic-y += tests/qom-test$(EXESUF)
- check-qtest-generic-y += tests/test-hmp$(EXESUF)
-diff --git a/tests/cpu-plug-test.c b/tests/cpu-plug-test.c
-index a306340..05d82f7 100644
---- a/tests/cpu-plug-test.c
-+++ b/tests/cpu-plug-test.c
-@@ -212,6 +212,43 @@ static void add_pseries_test_case(const char *mname)
-     g_free(path);
- }
- 
-+static void add_s390x_test_case(const char *mname)
-+{
-+    char *path;
-+    PlugTestData *data, *data2;
-+
-+    if (!g_str_has_prefix(mname, "s390-ccw-virtio-")) {
-+        return;
-+    }
-+
-+    data = g_new(PlugTestData, 1);
-+    data->machine = g_strdup(mname);
-+    data->cpu_model = "qemu";
-+    data->device_model = g_strdup("qemu-s390x-cpu");
-+    data->sockets = 1;
-+    data->cores = 3;
-+    data->threads = 1;
-+    data->maxcpus = data->sockets * data->cores * data->threads * 2;
-+
-+    data2 = g_memdup(data, sizeof(PlugTestData));
-+    data2->machine = g_strdup(data->machine);
-+    data2->device_model = g_strdup(data->device_model);
-+
-+    path = g_strdup_printf("cpu-plug/%s/cpu-add/%ux%ux%u&maxcpus=%u",
-+                           mname, data->sockets, data->cores,
-+                           data->threads, data->maxcpus);
-+    qtest_add_data_func_full(path, data, test_plug_with_cpu_add,
-+                             test_data_free);
-+    g_free(path);
-+
-+    path = g_strdup_printf("cpu-plug/%s/device-add/%ux%ux%u&maxcpus=%u",
-+                           mname, data2->sockets, data2->cores,
-+                           data2->threads, data2->maxcpus);
-+    qtest_add_data_func_full(path, data2, test_plug_with_device_add_coreid,
-+                             test_data_free);
-+    g_free(path);
-+}
-+
- int main(int argc, char **argv)
- {
-     const char *arch = qtest_get_arch();
-@@ -222,6 +259,8 @@ int main(int argc, char **argv)
-         qtest_cb_for_every_machine(add_pc_test_case);
-     } else if (g_str_equal(arch, "ppc64")) {
-         qtest_cb_for_every_machine(add_pseries_test_case);
-+    } else if (g_str_equal(arch, "s390x")) {
-+        qtest_cb_for_every_machine(add_s390x_test_case);
-     }
- 
-     return g_test_run();
--- 
-1.8.3.1
+Reviewed-by: Greg Kurz <groug@kaod.org>
+
+>  target/ppc/kvm.c     | 27 ++++++---------------------
+>  target/ppc/kvm_ppc.h |  2 --
+>  2 files changed, 6 insertions(+), 23 deletions(-)
+> 
+> diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
+> index 9d57debf0e..81d9bd56c7 100644
+> --- a/target/ppc/kvm.c
+> +++ b/target/ppc/kvm.c
+> @@ -2014,16 +2014,6 @@ uint64_t kvmppc_get_clockfreq(void)
+>      return kvmppc_read_int_cpu_dt("clock-frequency");
+>  }
+>  
+> -uint32_t kvmppc_get_vmx(void)
+> -{
+> -    return kvmppc_read_int_cpu_dt("ibm,vmx");
+> -}
+> -
+> -uint32_t kvmppc_get_dfp(void)
+> -{
+> -    return kvmppc_read_int_cpu_dt("ibm,dfp");
+> -}
+> -
+>  static int kvmppc_get_pvinfo(CPUPPCState *env, struct kvm_ppc_pvinfo *pvinfo)
+>   {
+>       PowerPCCPU *cpu = ppc_env_get_cpu(env);
+> @@ -2407,23 +2397,18 @@ static void alter_insns(uint64_t *word, uint64_t flags, bool on)
+>  static void kvmppc_host_cpu_class_init(ObjectClass *oc, void *data)
+>  {
+>      PowerPCCPUClass *pcc = POWERPC_CPU_CLASS(oc);
+> -    uint32_t vmx = kvmppc_get_vmx();
+> -    uint32_t dfp = kvmppc_get_dfp();
+>      uint32_t dcache_size = kvmppc_read_int_cpu_dt("d-cache-size");
+>      uint32_t icache_size = kvmppc_read_int_cpu_dt("i-cache-size");
+>  
+>      /* Now fix up the class with information we can query from the host */
+>      pcc->pvr = mfpvr();
+>  
+> -    if (vmx != -1) {
+> -        /* Only override when we know what the host supports */
+> -        alter_insns(&pcc->insns_flags, PPC_ALTIVEC, vmx > 0);
+> -        alter_insns(&pcc->insns_flags2, PPC2_VSX, vmx > 1);
+> -    }
+> -    if (dfp != -1) {
+> -        /* Only override when we know what the host supports */
+> -        alter_insns(&pcc->insns_flags2, PPC2_DFP, dfp);
+> -    }
+> +    alter_insns(&pcc->insns_flags, PPC_ALTIVEC,
+> +                qemu_getauxval(AT_HWCAP) & PPC_FEATURE_HAS_ALTIVEC);
+> +    alter_insns(&pcc->insns_flags2, PPC2_VSX,
+> +                qemu_getauxval(AT_HWCAP) & PPC_FEATURE_HAS_VSX);
+> +    alter_insns(&pcc->insns_flags2, PPC2_DFP,
+> +                qemu_getauxval(AT_HWCAP) & PPC_FEATURE_HAS_DFP);
+>  
+>      if (dcache_size != -1) {
+>          pcc->l1_dcache_size = dcache_size;
+> diff --git a/target/ppc/kvm_ppc.h b/target/ppc/kvm_ppc.h
+> index d6be38ecaf..ecb55493cc 100644
+> --- a/target/ppc/kvm_ppc.h
+> +++ b/target/ppc/kvm_ppc.h
+> @@ -15,8 +15,6 @@
+>  
+>  uint32_t kvmppc_get_tbfreq(void);
+>  uint64_t kvmppc_get_clockfreq(void);
+> -uint32_t kvmppc_get_vmx(void);
+> -uint32_t kvmppc_get_dfp(void);
+>  bool kvmppc_get_host_model(char **buf);
+>  bool kvmppc_get_host_serial(char **buf);
+>  int kvmppc_get_hasidle(CPUPPCState *env);
