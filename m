@@ -1,21 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43807)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43775)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1eRA6u-0003ed-KP
-	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 00:06:37 -0500
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1eRA6r-0004wz-Qz
+	(envelope-from <dgibson@ozlabs.org>) id 1eRA6t-0003eK-7P
 	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 00:06:36 -0500
-Date: Tue, 19 Dec 2017 16:06:25 +1100
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <dgibson@ozlabs.org>) id 1eRA6r-0004wl-RB
+	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 00:06:35 -0500
+Date: Tue, 19 Dec 2017 16:05:12 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20171219050625.GQ4786@umbus.fritz.box>
+Message-ID: <20171219050512.GO4786@umbus.fritz.box>
 References: <cover.1511731946.git.mdavidsaver@gmail.com>
-	<6417d3123f961850c57474272c717152100b917a.1511731946.git.mdavidsaver@gmail.com>
+	<9eb62eb9ad147fef563d259f24c1891b4b2e8511.1511731946.git.mdavidsaver@gmail.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="90KBcPA0h13nTGdQ"
+	protocol="application/pgp-signature"; boundary="keoAwTxaagou87Dg"
 Content-Disposition: inline
-In-Reply-To: <6417d3123f961850c57474272c717152100b917a.1511731946.git.mdavidsaver@gmail.com>
-Subject: Re: [Qemu-devel] [PATCH 17/17] tests: add mvme3100-test
+In-Reply-To: <9eb62eb9ad147fef563d259f24c1891b4b2e8511.1511731946.git.mdavidsaver@gmail.com>
+Subject: Re: [Qemu-devel] [PATCH 14/17] e500: split mpc8544ds specific
+ initialization
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,135 +29,147 @@ To: Michael Davidsaver <mdavidsaver@gmail.com>
 Cc: Alexander Graf <agraf@suse.de>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org
 
 
---90KBcPA0h13nTGdQ
+--keoAwTxaagou87Dg
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Sun, Nov 26, 2017 at 03:59:15PM -0600, Michael Davidsaver wrote:
-> Exercise some features of the mvme3100 CPLD logic
-> and read from the eeprom w/ VPD.
+On Sun, Nov 26, 2017 at 03:59:12PM -0600, Michael Davidsaver wrote:
+> split off the remaining board specific parts
+> of e500_init() as mpc85xx_init() which
+> will be used by the existing
+> mpc8544ds and generic e500 boards.
 >=20
 > Signed-off-by: Michael Davidsaver <mdavidsaver@gmail.com>
 
 Looks good, but will need a rebase.
 
 > ---
->  tests/Makefile.include |  3 ++
->  tests/mvme3100-test.c  | 79 ++++++++++++++++++++++++++++++++++++++++++++=
-++++++
->  2 files changed, 82 insertions(+)
->  create mode 100644 tests/mvme3100-test.c
+>  hw/ppc/e500.c      | 49 ++++++++++++++++++++++++++++++++-----------------
+>  hw/ppc/e500.h      |  3 ++-
+>  hw/ppc/e500plat.c  |  2 +-
+>  hw/ppc/mpc8544ds.c |  2 +-
+>  4 files changed, 36 insertions(+), 20 deletions(-)
 >=20
-> diff --git a/tests/Makefile.include b/tests/Makefile.include
-> index 062d4e5b7b..97bce77ee4 100644
-> --- a/tests/Makefile.include
-> +++ b/tests/Makefile.include
-> @@ -373,6 +373,8 @@ check-qtest-s390x-y +=3D tests/virtio-balloon-test$(E=
-XESUF)
->  check-qtest-s390x-y +=3D tests/virtio-console-test$(EXESUF)
->  check-qtest-s390x-y +=3D tests/virtio-serial-test$(EXESUF)
+> diff --git a/hw/ppc/e500.c b/hw/ppc/e500.c
+> index b0c8495aef..0ac7cdf6a1 100644
+> --- a/hw/ppc/e500.c
+> +++ b/hw/ppc/e500.c
+> @@ -690,7 +690,32 @@ static void ppce500_power_off(void *opaque, int line=
+, int on)
+>      }
+>  }
 > =20
-> +check-qtest-ppc-$(CONFIG_E500) +=3D tests/mvme3100-test$(EXESUF)
+> -void ppce500_init(MachineState *machine, PPCE500Params *params)
 > +
->  check-qtest-generic-y +=3D tests/qom-test$(EXESUF)
->  check-qtest-generic-y +=3D tests/test-hmp$(EXESUF)
+> +void ppce500_init(MachineState *machine, uint32_t decrementer_freq)
+> +{
+> +    int i;
+> +    for (i =3D 0; i < smp_cpus; i++) {
+> +        PowerPCCPU *cpu;
+> +        CPUState *cs;
+> +        CPUPPCState *env;
+> +
+> +        cpu =3D POWERPC_CPU(cpu_create(machine->cpu_type));
+> +        env =3D &cpu->env;
+> +        cs =3D CPU(cpu);
+> +
+> +        if (env->mmu_model !=3D POWERPC_MMU_BOOKE206) {
+> +            error_report("MMU model %i not supported by this machine.",
+> +                         env->mmu_model);
+> +            exit(1);
+> +        }
+> +
+> +        env->spr_cb[SPR_BOOKE_PIR].default_value =3D cs->cpu_index =3D i;
+> +
+> +        ppc_booke_timers_init(cpu, decrementer_freq, PPC_TIMER_E500);
+> +    }
+> +}
+> +
+> +void mpc85xx_init(MachineState *machine, PPCE500Params *params)
+>  {
+>      MemoryRegion *address_space_mem =3D get_system_memory();
+>      MemoryRegion *ram =3D g_new(MemoryRegion, 1);
+> @@ -716,31 +741,21 @@ void ppce500_init(MachineState *machine, PPCE500Par=
+ams *params)
+>      CPUPPCState *firstenv =3D NULL;
+>      MemoryRegion *ccsr_addr_space;
+>      SysBusDevice *s;
+> +    CPUState *cs;
 > =20
-> @@ -782,6 +784,7 @@ tests/i82801b11-test$(EXESUF): tests/i82801b11-test.o
->  tests/ac97-test$(EXESUF): tests/ac97-test.o
->  tests/es1370-test$(EXESUF): tests/es1370-test.o
->  tests/intel-hda-test$(EXESUF): tests/intel-hda-test.o
-> +tests/mvme3100-test$(EXESUF): tests/mvme3100-test.o $(libqos-e500-obj-y)
->  tests/ioh3420-test$(EXESUF): tests/ioh3420-test.o
->  tests/usb-hcd-ohci-test$(EXESUF): tests/usb-hcd-ohci-test.o $(libqos-usb=
--obj-y)
->  tests/usb-hcd-uhci-test$(EXESUF): tests/usb-hcd-uhci-test.o $(libqos-usb=
--obj-y)
-> diff --git a/tests/mvme3100-test.c b/tests/mvme3100-test.c
-> new file mode 100644
-> index 0000000000..6dde8d1d29
-> --- /dev/null
-> +++ b/tests/mvme3100-test.c
-> @@ -0,0 +1,79 @@
-> +#include <stdio.h>
+> -    for (i =3D 0; i < smp_cpus; i++) {
+> +    ppce500_init(machine, 400000000);
 > +
-> +#include "qemu/osdep.h"
-> +#include "libqtest.h"
-> +#include "libqos/libqos.h"
-> +#include "libqos/i2c.h"
-> +
-> +#define assert_equal(A, B) g_assert_cmphex((A), =3D=3D, (B))
-> +
-> +static
-> +I2CAdapter *i2c;
-> +
-> +static
-> +void test_ccsr(void)
-> +{
-> +    /* CCSRBAR is self referential */
-> +    assert_equal(readl(0xff700000), 0x000ff700);
-> +
-> +    /* introspect memory size */
-> +    assert_equal(readl(0xff702080), 0x80000000);
-> +    /* value is (ram_size-1)>>24 */
-> +    assert_equal(readl(0xff702000), 15);
-> +}
-> +
-> +static
-> +void test_cpld(void)
-> +{
-> +    /* read/write to test register */
-> +    assert_equal(readl(0xe2000010), 0x00000000);
-> +    assert_equal(readl(0xe2000014), 0xffffffff);
-> +
-> +    writel(0xe2000010, 0x12345678);
-> +
-> +    assert_equal(readl(0xe2000010), 0x12345678);
-> +    assert_equal(readl(0xe2000014), 0x12345678 ^ 0xffffffff);
-> +}
-> +
-> +static
-> +void test_eeprom(void)
-> +{
-> +    char buf[] =3D "\x00\x00MOTOROLA";
-> +
-> +    /* 1. zero address pointer
-> +     * 2. write 8 bytes,
-> +     * 3. re-zero address pointer
-> +     */
-> +    i2c_send(i2c, 0xa8, (uint8_t *)buf, 10);
-> +    i2c_send(i2c, 0xa8, (uint8_t *)buf, 2);
-> +
-> +    /* read 8 bytes */
-> +    i2c_recv(i2c, 0xa8, (uint8_t *)buf, 8);
-> +    buf[8] =3D '\0';
-> +
-> +    /* Read header for Motorola VPD info */
-> +    g_assert_cmpstr(buf, =3D=3D, "MOTOROLA");
-> +}
-> +
-> +int main(int argc, char *argv[])
-> +{
-> +    int ret;
-> +    g_test_init(&argc, &argv, NULL);
-> +
-> +    qtest_start("-machine mvme3100-1152");
-> +
-> +    i2c =3D e500_i2c_create(0xff700000);
-> +
-> +    qtest_add_func("/mvme3100/ccsr", test_ccsr);
-> +    qtest_add_func("/mvme3100/cpld", test_cpld);
-> +    qtest_add_func("/mvme3100/eeprom", test_eeprom);
-> +
-> +    ret =3D g_test_run();
-> +
-> +    printf("Tests done\n");
-> +
-> +    qtest_end();
-> +    printf("Tests end\n");
-> +
-> +    return ret;
-> +}
+> +    CPU_FOREACH(cs) {
+>          PowerPCCPU *cpu;
+> -        CPUState *cs;
+> =20
+> -        cpu =3D POWERPC_CPU(cpu_create(machine->cpu_type));
+> +        cpu =3D POWERPC_CPU(cs);
+>          env =3D &cpu->env;
+> -        cs =3D CPU(cpu);
+> =20
+> -        if (env->mmu_model !=3D POWERPC_MMU_BOOKE206) {
+> -            fprintf(stderr, "MMU model %i not supported by this machine.=
+\n",
+> -                env->mmu_model);
+> -            exit(1);
+> -        }
+> =20
+> +        /* Register reset handler */
+>          if (!firstenv) {
+>              firstenv =3D env;
+> -        }
+> =20
+> -        env->spr_cb[SPR_BOOKE_PIR].default_value =3D cs->cpu_index =3D i;
+> -
+> -        ppc_booke_timers_init(cpu, 400000000, PPC_TIMER_E500);
+> -
+> -        /* Register reset handler */
+> -        if (!i) {
+>              /* Primary CPU */
+>              struct boot_info *boot_info;
+>              boot_info =3D g_malloc0(sizeof(struct boot_info));
+> diff --git a/hw/ppc/e500.h b/hw/ppc/e500.h
+> index 70ba1d8f4f..350be17462 100644
+> --- a/hw/ppc/e500.h
+> +++ b/hw/ppc/e500.h
+> @@ -24,7 +24,8 @@ typedef struct PPCE500Params {
+>      hwaddr spin_base;
+>  } PPCE500Params;
+> =20
+> -void ppce500_init(MachineState *machine, PPCE500Params *params);
+> +void ppce500_init(MachineState *machine, uint32_t decrementer_freq);
+> +void mpc85xx_init(MachineState *machine, PPCE500Params *params);
+> =20
+>  hwaddr booke206_page_size_to_tlb(uint64_t size);
+> =20
+> diff --git a/hw/ppc/e500plat.c b/hw/ppc/e500plat.c
+> index e59e80fb9e..103efc68c2 100644
+> --- a/hw/ppc/e500plat.c
+> +++ b/hw/ppc/e500plat.c
+> @@ -55,7 +55,7 @@ static void e500plat_init(MachineState *machine)
+>          params.mpic_version =3D OPENPIC_MODEL_FSL_MPIC_20;
+>      }
+> =20
+> -    ppce500_init(machine, &params);
+> +    mpc85xx_init(machine, &params);
+>  }
+> =20
+>  static void e500plat_machine_init(MachineClass *mc)
+> diff --git a/hw/ppc/mpc8544ds.c b/hw/ppc/mpc8544ds.c
+> index 1717953ec7..7de4ed8ae2 100644
+> --- a/hw/ppc/mpc8544ds.c
+> +++ b/hw/ppc/mpc8544ds.c
+> @@ -47,7 +47,7 @@ static void mpc8544ds_init(MachineState *machine)
+>          exit(1);
+>      }
+> =20
+> -    ppce500_init(machine, &params);
+> +    mpc85xx_init(machine, &params);
+>  }
+> =20
+> =20
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -164,24 +177,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---90KBcPA0h13nTGdQ
+--keoAwTxaagou87Dg
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlo4nlEACgkQbDjKyiDZ
-s5KuPQ/+IFpUGBukdGciobCbP8GvpIuH9ZHgQvfzCDfB/IsN2lISO/Z2XHqZI2Cu
-Yb9AJvrUWDzlSwJRjZ4KEYsJFXDrbBKUo1jxcQC94BE4mOS7NeM1egIg+HLMZfzL
-ymehCM2Fk6HX4yb7Sq8pfEzn1QoaNl6Xe2w31k3qq+nRlic6+4UDor8N4gBfVHPb
-85qOqINMberwnMxZqPNfA2gTL4ZKwdWyplAFp6RDRARNF2CDYg2TiVUVGBac+4ra
-Yl0xP5appT6cZW8l5vsSLoBbo5+0uDzVYfLYnsFji3GmAyR4WHGEVVDR5DdCnTjb
-ehJ9NuvcJw0/zu0HsfOCY640/sQJvOTRrV3aRCK2hyaNjPQ1bT/VVU1npy+Hi5qd
-RBMqyQBdYXc5PZ2SmVU0/LUQBhEJuwIB/m/LJsLi9pH1DU6iCBpU3E8QERIx56+t
-HsgMetcn/9neEqemx/K+gU6OffsGuic28qvx9qHdg6ZXYbMn/X1e67XX4YYPHI8t
-Jg0O1Y6eWpwSxOH3b6ZLuGna7aohssoJ5u8H+s2/dYhbcjE/Ma+yOFsW9h75HlU+
-2SWt2g3yuBKDsL1wqq5ItrJH9CtPEkgKFxAVWyEp8NAbZd4RSNVPAnhGmJj1XM9x
-9SJa7UZby79yKfSNvu0V1YBeBUJTvzhbt1iwy/H0B4Pf5u6Vb34=
-=oGQz
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlo4nggACgkQbDjKyiDZ
+s5KR3BAAkHgn4AH6iEmBisqAhX1+iq0d2STLAd3KupWIjQQJdbdd/XAuNRXzbAvL
+jDFCkvdoE2mLt6kL4QTDpNtF6Rnh3+QeggMMzYpCAHzO6/QcmwcFLOYWVjjlasWT
+X5u6ZWuSv43MGMFgmchDpqaDUgaBx0oDx9BVatbELeNFpRC1SRpTRLDNX0hWk3Lv
+iZrPQKVjia2di7r/zA+N1ns7M15nczc0u10T4DGMU4fovdsJ27rw49zehgpJuHO7
+PQBg3XA0S64CUUvEIx4+VUQmkit20X7k/w9HJ0yzCBeuTydxfunU44Zw+4b6QtXm
+0TVBdbORo95WtlVRfTgBy/tT2QAw7Arl4H8CDwKy5XxdfOUQrevM/ys2Rw+vRDp4
+iZRD5mBXf2GhZBBslMiFkUO1YGuDlkUOS11CiqXTn7GhnkJizi1y6M+Xyw/o6PvQ
+CS8nNLZszLtjIisY4JSOX569gQjnOL6EtWtA9OOogmKEv3MEajqvPWsXdUNc/RRo
+kDjMht/Z1hwXI0uoY21Bs05mU4g5THnx3nukV3xMTodkyS1ztoFlOLuwpBvlkd7B
+XWH1Xh5mho7452JlaL6ljW/CbpmarVpTbYitDo7og0yYwhggzm9SgZbjT2CGC77q
+lXBJgXX2CORIcdl4GHgQRpbwuDCpUbp//uE4+8fu6KPQQcnykNc=
+=z6KP
 -----END PGP SIGNATURE-----
 
---90KBcPA0h13nTGdQ--
+--keoAwTxaagou87Dg--
