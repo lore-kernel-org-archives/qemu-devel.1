@@ -1,22 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43775)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53923)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1eRA6t-0003eK-7P
-	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 00:06:36 -0500
+	(envelope-from <peterx@redhat.com>) id 1eRAGq-0001jM-AC
+	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 00:16:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1eRA6r-0004wl-RB
-	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 00:06:35 -0500
-Date: Tue, 19 Dec 2017 16:05:12 +1100
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20171219050512.GO4786@umbus.fritz.box>
-References: <cover.1511731946.git.mdavidsaver@gmail.com>
-	<9eb62eb9ad147fef563d259f24c1891b4b2e8511.1511731946.git.mdavidsaver@gmail.com>
+	(envelope-from <peterx@redhat.com>) id 1eRAGn-0005JK-HF
+	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 00:16:52 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:58048)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1eRAGn-0005Hf-AL
+	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 00:16:49 -0500
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 97C13C04AC40
+	for <qemu-devel@nongnu.org>; Tue, 19 Dec 2017 05:16:47 +0000 (UTC)
+Date: Tue, 19 Dec 2017 13:16:42 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20171219051642.GZ22308@xz-mi>
+References: <20171215171655.7818-1-dgilbert@redhat.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="keoAwTxaagou87Dg"
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <9eb62eb9ad147fef563d259f24c1891b4b2e8511.1511731946.git.mdavidsaver@gmail.com>
-Subject: Re: [Qemu-devel] [PATCH 14/17] e500: split mpc8544ds specific
- initialization
+In-Reply-To: <20171215171655.7818-1-dgilbert@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 0/2] migration/channel errors and cancelling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,176 +32,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Michael Davidsaver <mdavidsaver@gmail.com>
-Cc: Alexander Graf <agraf@suse.de>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org
+To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
+Cc: qemu-devel@nongnu.org, berrange@redhat.com, quintela@redhat.com
 
+On Fri, Dec 15, 2017 at 05:16:53PM +0000, Dr. David Alan Gilbert (git) wrote:
+> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+> 
+> Hi,
+>   Where a channel fails asynchronously during connect, call
+> back through the migration code so it can clean up.
+>   In particular this causes the transition of a 'cancelling' state
+> to 'cancelled' in the case of:
+> 
+>     migrate -d tcp:deadhost:port
+>      <host tries to connect>
+>     migrate_cancel
+> 
+> previously the status would get stuck in cancelling because
+> the final cleanup didn't happen.
+> 
+>   This is the second part of the fix for:
+> https://bugzilla.redhat.com/show_bug.cgi?id=1525899
 
---keoAwTxaagou87Dg
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+IIUC this series tries to deliver the connection error a long way
+until migrate_fd_connect() to handle it. But, haven't we already have
+a function migrate_fd_error() to do that (which is faster, and
+simpler)?
 
-On Sun, Nov 26, 2017 at 03:59:12PM -0600, Michael Davidsaver wrote:
-> split off the remaining board specific parts
-> of e500_init() as mpc85xx_init() which
-> will be used by the existing
-> mpc8544ds and generic e500 boards.
->=20
-> Signed-off-by: Michael Davidsaver <mdavidsaver@gmail.com>
+void migrate_fd_error(MigrationState *s, const Error *error)
+{
+    trace_migrate_fd_error(error_get_pretty(error));
+    assert(s->to_dst_file == NULL);
+    migrate_set_state(&s->state, MIGRATION_STATUS_SETUP,
+                      MIGRATION_STATUS_FAILED);
+    migrate_set_error(s, error);
+    notifier_list_notify(&migration_state_notifiers, s);
+    block_cleanup_parameters(s);
+}
 
-Looks good, but will need a rebase.
+I think it's not handling the case when cancelling.  If we let it to
+handle the cancelling case well, would it be a simpler fix?
 
-> ---
->  hw/ppc/e500.c      | 49 ++++++++++++++++++++++++++++++++-----------------
->  hw/ppc/e500.h      |  3 ++-
->  hw/ppc/e500plat.c  |  2 +-
->  hw/ppc/mpc8544ds.c |  2 +-
->  4 files changed, 36 insertions(+), 20 deletions(-)
->=20
-> diff --git a/hw/ppc/e500.c b/hw/ppc/e500.c
-> index b0c8495aef..0ac7cdf6a1 100644
-> --- a/hw/ppc/e500.c
-> +++ b/hw/ppc/e500.c
-> @@ -690,7 +690,32 @@ static void ppce500_power_off(void *opaque, int line=
-, int on)
->      }
->  }
-> =20
-> -void ppce500_init(MachineState *machine, PPCE500Params *params)
-> +
-> +void ppce500_init(MachineState *machine, uint32_t decrementer_freq)
-> +{
-> +    int i;
-> +    for (i =3D 0; i < smp_cpus; i++) {
-> +        PowerPCCPU *cpu;
-> +        CPUState *cs;
-> +        CPUPPCState *env;
-> +
-> +        cpu =3D POWERPC_CPU(cpu_create(machine->cpu_type));
-> +        env =3D &cpu->env;
-> +        cs =3D CPU(cpu);
-> +
-> +        if (env->mmu_model !=3D POWERPC_MMU_BOOKE206) {
-> +            error_report("MMU model %i not supported by this machine.",
-> +                         env->mmu_model);
-> +            exit(1);
-> +        }
-> +
-> +        env->spr_cb[SPR_BOOKE_PIR].default_value =3D cs->cpu_index =3D i;
-> +
-> +        ppc_booke_timers_init(cpu, decrementer_freq, PPC_TIMER_E500);
-> +    }
-> +}
-> +
-> +void mpc85xx_init(MachineState *machine, PPCE500Params *params)
->  {
->      MemoryRegion *address_space_mem =3D get_system_memory();
->      MemoryRegion *ram =3D g_new(MemoryRegion, 1);
-> @@ -716,31 +741,21 @@ void ppce500_init(MachineState *machine, PPCE500Par=
-ams *params)
->      CPUPPCState *firstenv =3D NULL;
->      MemoryRegion *ccsr_addr_space;
->      SysBusDevice *s;
-> +    CPUState *cs;
-> =20
-> -    for (i =3D 0; i < smp_cpus; i++) {
-> +    ppce500_init(machine, 400000000);
-> +
-> +    CPU_FOREACH(cs) {
->          PowerPCCPU *cpu;
-> -        CPUState *cs;
-> =20
-> -        cpu =3D POWERPC_CPU(cpu_create(machine->cpu_type));
-> +        cpu =3D POWERPC_CPU(cs);
->          env =3D &cpu->env;
-> -        cs =3D CPU(cpu);
-> =20
-> -        if (env->mmu_model !=3D POWERPC_MMU_BOOKE206) {
-> -            fprintf(stderr, "MMU model %i not supported by this machine.=
-\n",
-> -                env->mmu_model);
-> -            exit(1);
-> -        }
-> =20
-> +        /* Register reset handler */
->          if (!firstenv) {
->              firstenv =3D env;
-> -        }
-> =20
-> -        env->spr_cb[SPR_BOOKE_PIR].default_value =3D cs->cpu_index =3D i;
-> -
-> -        ppc_booke_timers_init(cpu, 400000000, PPC_TIMER_E500);
-> -
-> -        /* Register reset handler */
-> -        if (!i) {
->              /* Primary CPU */
->              struct boot_info *boot_info;
->              boot_info =3D g_malloc0(sizeof(struct boot_info));
-> diff --git a/hw/ppc/e500.h b/hw/ppc/e500.h
-> index 70ba1d8f4f..350be17462 100644
-> --- a/hw/ppc/e500.h
-> +++ b/hw/ppc/e500.h
-> @@ -24,7 +24,8 @@ typedef struct PPCE500Params {
->      hwaddr spin_base;
->  } PPCE500Params;
-> =20
-> -void ppce500_init(MachineState *machine, PPCE500Params *params);
-> +void ppce500_init(MachineState *machine, uint32_t decrementer_freq);
-> +void mpc85xx_init(MachineState *machine, PPCE500Params *params);
-> =20
->  hwaddr booke206_page_size_to_tlb(uint64_t size);
-> =20
-> diff --git a/hw/ppc/e500plat.c b/hw/ppc/e500plat.c
-> index e59e80fb9e..103efc68c2 100644
-> --- a/hw/ppc/e500plat.c
-> +++ b/hw/ppc/e500plat.c
-> @@ -55,7 +55,7 @@ static void e500plat_init(MachineState *machine)
->          params.mpic_version =3D OPENPIC_MODEL_FSL_MPIC_20;
->      }
-> =20
-> -    ppce500_init(machine, &params);
-> +    mpc85xx_init(machine, &params);
->  }
-> =20
->  static void e500plat_machine_init(MachineClass *mc)
-> diff --git a/hw/ppc/mpc8544ds.c b/hw/ppc/mpc8544ds.c
-> index 1717953ec7..7de4ed8ae2 100644
-> --- a/hw/ppc/mpc8544ds.c
-> +++ b/hw/ppc/mpc8544ds.c
-> @@ -47,7 +47,7 @@ static void mpc8544ds_init(MachineState *machine)
->          exit(1);
->      }
-> =20
-> -    ppce500_init(machine, &params);
-> +    mpc85xx_init(machine, &params);
->  }
-> =20
-> =20
+Moreover, I think this is another good example that migration is not
+handling the cleanup "cleanly" in general... I really hope we can do
+this better in 2.12.  I'll see whether I can give it a shot, but in
+all cases it'll be after the merging of existing patches since there
+are already quite a lot of dangling patches.
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
+Thanks,
 
---keoAwTxaagou87Dg
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlo4nggACgkQbDjKyiDZ
-s5KR3BAAkHgn4AH6iEmBisqAhX1+iq0d2STLAd3KupWIjQQJdbdd/XAuNRXzbAvL
-jDFCkvdoE2mLt6kL4QTDpNtF6Rnh3+QeggMMzYpCAHzO6/QcmwcFLOYWVjjlasWT
-X5u6ZWuSv43MGMFgmchDpqaDUgaBx0oDx9BVatbELeNFpRC1SRpTRLDNX0hWk3Lv
-iZrPQKVjia2di7r/zA+N1ns7M15nczc0u10T4DGMU4fovdsJ27rw49zehgpJuHO7
-PQBg3XA0S64CUUvEIx4+VUQmkit20X7k/w9HJ0yzCBeuTydxfunU44Zw+4b6QtXm
-0TVBdbORo95WtlVRfTgBy/tT2QAw7Arl4H8CDwKy5XxdfOUQrevM/ys2Rw+vRDp4
-iZRD5mBXf2GhZBBslMiFkUO1YGuDlkUOS11CiqXTn7GhnkJizi1y6M+Xyw/o6PvQ
-CS8nNLZszLtjIisY4JSOX569gQjnOL6EtWtA9OOogmKEv3MEajqvPWsXdUNc/RRo
-kDjMht/Z1hwXI0uoY21Bs05mU4g5THnx3nukV3xMTodkyS1ztoFlOLuwpBvlkd7B
-XWH1Xh5mho7452JlaL6ljW/CbpmarVpTbYitDo7og0yYwhggzm9SgZbjT2CGC77q
-lXBJgXX2CORIcdl4GHgQRpbwuDCpUbp//uE4+8fu6KPQQcnykNc=
-=z6KP
------END PGP SIGNATURE-----
-
---keoAwTxaagou87Dg--
+-- 
+Peter Xu
