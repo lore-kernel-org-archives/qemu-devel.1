@@ -1,23 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49594)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49613)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcmvbkbc@gmail.com>) id 1eRAdG-00016j-L5
-	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 00:40:03 -0500
+	(envelope-from <jcmvbkbc@gmail.com>) id 1eRAdI-00018K-BQ
+	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 00:40:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcmvbkbc@gmail.com>) id 1eRAdF-00021o-EV
-	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 00:40:02 -0500
-Received: from mail-wr0-x241.google.com ([2a00:1450:400c:c0c::241]:33490)
+	(envelope-from <jcmvbkbc@gmail.com>) id 1eRAdH-00023C-M8
+	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 00:40:04 -0500
+Received: from mail-wr0-x242.google.com ([2a00:1450:400c:c0c::242]:40356)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <jcmvbkbc@gmail.com>) id 1eRAdF-00021Q-5o
-	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 00:40:01 -0500
-Received: by mail-wr0-x241.google.com with SMTP id v21so6296925wrc.0
-	for <qemu-devel@nongnu.org>; Mon, 18 Dec 2017 21:40:01 -0800 (PST)
+	(Exim 4.71) (envelope-from <jcmvbkbc@gmail.com>) id 1eRAdH-00022o-G3
+	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 00:40:03 -0500
+Received: by mail-wr0-x242.google.com with SMTP id q9so16996508wre.7
+	for <qemu-devel@nongnu.org>; Mon, 18 Dec 2017 21:40:03 -0800 (PST)
 From: Max Filippov <jcmvbkbc@gmail.com>
-Date: Mon, 18 Dec 2017 21:38:48 -0800
-Message-Id: <1513661932-6849-13-git-send-email-jcmvbkbc@gmail.com>
+Date: Mon, 18 Dec 2017 21:38:49 -0800
+Message-Id: <1513661932-6849-14-git-send-email-jcmvbkbc@gmail.com>
 In-Reply-To: <1513661932-6849-1-git-send-email-jcmvbkbc@gmail.com>
 References: <1513661932-6849-1-git-send-email-jcmvbkbc@gmail.com>
-Subject: [Qemu-devel] [PATCH v2 12/16] target/xtensa: add internal/noop SRs
- and opcodes
+Subject: [Qemu-devel] [PATCH v2 13/16] target/xtensa: implement salt/saltu
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,149 +28,49 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Richard Henderson <rth@twiddle.net>, Max Filippov <jcmvbkbc@gmail.com>
 
-Add two special registers: MMID and DDR:
-- MMID is write-only and the only side effect of writing to it is output
-  to the trace port, which is not emulated;
-- DDR is only accessible in debug mode, which is not emulated.
-
-Add two debug-mode-only opcodes:
-- rfdd and rfdo do return from the debug mode, which is not emulated.
-
-Add three internal opcodes for full MMU:
-- hwwdtlba and hwwitlba are the internal opcodes that write a value into
-  autoupdate DTLB or ITLB entry.
-- ldpte is internal opcode that loads PTE entry that covers the most
-  recent page fault address.
-None of these three opcodes may appear in a valid instruction.
+SALT/SALTU are recent additions to the core Xtensa ISA that do
+signed/unsigned setcond.
 
 Signed-off-by: Max Filippov <jcmvbkbc@gmail.com>
 ---
- target/xtensa/cpu.h       |  2 ++
- target/xtensa/translate.c | 33 +++++++++++++++++++++++++++++++++
- 2 files changed, 35 insertions(+)
+ target/xtensa/translate.c | 18 ++++++++++++++++++
+ 1 file changed, 18 insertions(+)
 
-diff --git a/target/xtensa/cpu.h b/target/xtensa/cpu.h
-index e93bbb3c6d1e..80e9b47e84e9 100644
---- a/target/xtensa/cpu.h
-+++ b/target/xtensa/cpu.h
-@@ -127,6 +127,7 @@ enum {
-     WINDOW_BASE = 72,
-     WINDOW_START = 73,
-     PTEVADDR = 83,
-+    MMID = 89,
-     RASID = 90,
-     ITLBCFG = 91,
-     DTLBCFG = 92,
-@@ -134,6 +135,7 @@ enum {
-     MEMCTL = 97,
-     CACHEATTR = 98,
-     ATOMCTL = 99,
-+    DDR = 104,
-     IBREAKA = 128,
-     DBREAKA = 144,
-     DBREAKC = 160,
 diff --git a/target/xtensa/translate.c b/target/xtensa/translate.c
-index fb6a4c979590..f644d9fed22a 100644
+index f644d9fed22a..da1f712badc7 100644
 --- a/target/xtensa/translate.c
 +++ b/target/xtensa/translate.c
-@@ -135,6 +135,7 @@ static const XtensaReg sregnames[256] = {
-     [WINDOW_START] = XTENSA_REG("WINDOW_START",
-             XTENSA_OPTION_WINDOWED_REGISTER),
-     [PTEVADDR] = XTENSA_REG("PTEVADDR", XTENSA_OPTION_MMU),
-+    [MMID] = XTENSA_REG_BITS("MMID", XTENSA_OPTION_ALL),
-     [RASID] = XTENSA_REG("RASID", XTENSA_OPTION_MMU),
-     [ITLBCFG] = XTENSA_REG("ITLBCFG", XTENSA_OPTION_MMU),
-     [DTLBCFG] = XTENSA_REG("DTLBCFG", XTENSA_OPTION_MMU),
-@@ -142,6 +143,7 @@ static const XtensaReg sregnames[256] = {
-     [MEMCTL] = XTENSA_REG_BITS("MEMCTL", XTENSA_OPTION_ALL),
-     [CACHEATTR] = XTENSA_REG("CACHEATTR", XTENSA_OPTION_CACHEATTR),
-     [ATOMCTL] = XTENSA_REG("ATOMCTL", XTENSA_OPTION_ATOMCTL),
-+    [DDR] = XTENSA_REG("DDR", XTENSA_OPTION_DEBUG),
-     [IBREAKA] = XTENSA_REG("IBREAKA0", XTENSA_OPTION_DEBUG),
-     [IBREAKA + 1] = XTENSA_REG("IBREAKA1", XTENSA_OPTION_DEBUG),
-     [DBREAKA] = XTENSA_REG("DBREAKA0", XTENSA_OPTION_DEBUG),
-@@ -2767,6 +2769,12 @@ static const XtensaOpcodeOps core_ops[] = {
-         .name = "extw",
-         .translate = translate_nop,
+@@ -2199,6 +2199,16 @@ static void translate_s32e(DisasContext *dc, const uint32_t arg[],
+     }
+ }
+ 
++static void translate_salt(DisasContext *dc, const uint32_t arg[],
++                           const uint32_t par[])
++{
++    if (gen_window_check3(dc, arg[0], arg[1], arg[2])) {
++        tcg_gen_setcond_i32(par[0],
++                            cpu_R[arg[0]],
++                            cpu_R[arg[1]], cpu_R[arg[2]]);
++    }
++}
++
+ static void translate_sext(DisasContext *dc, const uint32_t arg[],
+                            const uint32_t par[])
+ {
+@@ -3667,6 +3677,14 @@ static const XtensaOpcodeOps core_ops[] = {
+         .translate = translate_ldst,
+         .par = (const uint32_t[]){MO_UB, false, true},
      }, {
-+        .name = "hwwdtlba",
-+        .translate = translate_ill,
++        .name = "salt",
++        .translate = translate_salt,
++        .par = (const uint32_t[]){TCG_COND_LT},
 +    }, {
-+        .name = "hwwitlba",
-+        .translate = translate_ill,
++        .name = "saltu",
++        .translate = translate_salt,
++        .par = (const uint32_t[]){TCG_COND_LTU},
 +    }, {
-         .name = "idtlb",
-         .translate = translate_itlb,
-         .par = (const uint32_t[]){true},
-@@ -2852,6 +2860,9 @@ static const XtensaOpcodeOps core_ops[] = {
-         .translate = translate_mac16,
-         .par = (const uint32_t[]){MAC16_NONE, 0, 0, 4},
+         .name = "sext",
+         .translate = translate_sext,
      }, {
-+        .name = "ldpte",
-+        .translate = translate_ill,
-+    }, {
-         .name = "loop",
-         .translate = translate_loop,
-         .par = (const uint32_t[]){TCG_COND_NEVER},
-@@ -3270,9 +3281,15 @@ static const XtensaOpcodeOps core_ops[] = {
-         .name = "retw.n",
-         .translate = translate_retw,
-     }, {
-+        .name = "rfdd",
-+        .translate = translate_ill,
-+    }, {
-         .name = "rfde",
-         .translate = translate_rfde,
-     }, {
-+        .name = "rfdo",
-+        .translate = translate_ill,
-+    }, {
-         .name = "rfe",
-         .translate = translate_rfe,
-     }, {
-@@ -3373,6 +3390,10 @@ static const XtensaOpcodeOps core_ops[] = {
-         .translate = translate_rsr,
-         .par = (const uint32_t[]){DBREAKC + 1},
-     }, {
-+        .name = "rsr.ddr",
-+        .translate = translate_rsr,
-+        .par = (const uint32_t[]){DDR},
-+    }, {
-         .name = "rsr.debugcause",
-         .translate = translate_rsr,
-         .par = (const uint32_t[]){DEBUGCAUSE},
-@@ -3808,6 +3829,10 @@ static const XtensaOpcodeOps core_ops[] = {
-         .translate = translate_wsr,
-         .par = (const uint32_t[]){DBREAKC + 1},
-     }, {
-+        .name = "wsr.ddr",
-+        .translate = translate_wsr,
-+        .par = (const uint32_t[]){DDR},
-+    }, {
-         .name = "wsr.debugcause",
-         .translate = translate_wsr,
-         .par = (const uint32_t[]){DEBUGCAUSE},
-@@ -4000,6 +4025,10 @@ static const XtensaOpcodeOps core_ops[] = {
-         .translate = translate_wsr,
-         .par = (const uint32_t[]){MISC + 3},
-     }, {
-+        .name = "wsr.mmid",
-+        .translate = translate_wsr,
-+        .par = (const uint32_t[]){MMID},
-+    }, {
-         .name = "wsr.prid",
-         .translate = translate_wsr,
-         .par = (const uint32_t[]){PRID},
-@@ -4127,6 +4156,10 @@ static const XtensaOpcodeOps core_ops[] = {
-         .translate = translate_xsr,
-         .par = (const uint32_t[]){DBREAKC + 1},
-     }, {
-+        .name = "xsr.ddr",
-+        .translate = translate_xsr,
-+        .par = (const uint32_t[]){DDR},
-+    }, {
-         .name = "xsr.debugcause",
-         .translate = translate_xsr,
-         .par = (const uint32_t[]){DEBUGCAUSE},
 -- 
 2.1.4
