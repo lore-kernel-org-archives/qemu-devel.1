@@ -1,29 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53923)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49041)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1eRAGq-0001jM-AC
-	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 00:16:53 -0500
+	(envelope-from <jcmvbkbc@gmail.com>) id 1eRAci-0000Z9-Mp
+	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 00:39:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1eRAGn-0005JK-HF
-	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 00:16:52 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:58048)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1eRAGn-0005Hf-AL
-	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 00:16:49 -0500
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 97C13C04AC40
-	for <qemu-devel@nongnu.org>; Tue, 19 Dec 2017 05:16:47 +0000 (UTC)
-Date: Tue, 19 Dec 2017 13:16:42 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20171219051642.GZ22308@xz-mi>
-References: <20171215171655.7818-1-dgilbert@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20171215171655.7818-1-dgilbert@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 0/2] migration/channel errors and cancelling
+	(envelope-from <jcmvbkbc@gmail.com>) id 1eRAch-0001bk-DK
+	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 00:39:28 -0500
+Received: from mail-wr0-x22b.google.com ([2a00:1450:400c:c0c::22b]:34374)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <jcmvbkbc@gmail.com>) id 1eRAch-0001aZ-5j
+	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 00:39:27 -0500
+Received: by mail-wr0-x22b.google.com with SMTP id y21so17008223wrc.1
+	for <qemu-devel@nongnu.org>; Mon, 18 Dec 2017 21:39:26 -0800 (PST)
+From: Max Filippov <jcmvbkbc@gmail.com>
+Date: Mon, 18 Dec 2017 21:38:36 -0800
+Message-Id: <1513661932-6849-1-git-send-email-jcmvbkbc@gmail.com>
+Subject: [Qemu-devel] [PATCH v2 00/16] target/xtensa: switch to libisa
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,54 +23,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Cc: qemu-devel@nongnu.org, berrange@redhat.com, quintela@redhat.com
+To: qemu-devel@nongnu.org
+Cc: Richard Henderson <rth@twiddle.net>, Max Filippov <jcmvbkbc@gmail.com>
 
-On Fri, Dec 15, 2017 at 05:16:53PM +0000, Dr. David Alan Gilbert (git) wrote:
-> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-> 
-> Hi,
->   Where a channel fails asynchronously during connect, call
-> back through the migration code so it can clean up.
->   In particular this causes the transition of a 'cancelling' state
-> to 'cancelled' in the case of:
-> 
->     migrate -d tcp:deadhost:port
->      <host tries to connect>
->     migrate_cancel
-> 
-> previously the status would get stuck in cancelling because
-> the final cleanup didn't happen.
-> 
->   This is the second part of the fix for:
-> https://bugzilla.redhat.com/show_bug.cgi?id=1525899
+Hello,
 
-IIUC this series tries to deliver the connection error a long way
-until migrate_fd_connect() to handle it. But, haven't we already have
-a function migrate_fd_error() to do that (which is faster, and
-simpler)?
+this series adds libisa to the Xtensa target, changes decoder and
+instruction translators to use it, switches existing xtensa cores
+to use it, adds support for a number of new instructions and adds
+disassembler for Xtensa.
 
-void migrate_fd_error(MigrationState *s, const Error *error)
-{
-    trace_migrate_fd_error(error_get_pretty(error));
-    assert(s->to_dst_file == NULL);
-    migrate_set_state(&s->state, MIGRATION_STATUS_SETUP,
-                      MIGRATION_STATUS_FAILED);
-    migrate_set_error(s, error);
-    notifier_list_notify(&migration_state_notifiers, s);
-    block_cleanup_parameters(s);
-}
+Libisa is the canonical way of dealing with Xtensa instructions
+decoding and encoding. Libisa is a configuration-independent library
+with a stable interface plus generated configuration-specific
+xtensa-modules.c file with implementations of decoding and encoding
+functions. Libisa is MIT-licensed and originally distributed
+xtensa-modules.c files are also MIT-licensed and are available as a
+part of the xtensa configuration overlay.
 
-I think it's not handling the case when cancelling.  If we let it to
-handle the cancelling case well, would it be a simpler fix?
+This transition makes it possible to support variable-encoding
+instructions of the core ISA, like const16, and will allow to support
+advanced Xtensa features, like FLIX and TIE.
 
-Moreover, I think this is another good example that migration is not
-handling the cleanup "cleanly" in general... I really hope we can do
-this better in 2.12.  I'll see whether I can give it a shot, but in
-all cases it'll be after the merging of existing patches since there
-are already quite a lot of dangling patches.
+Development branch is available at:
 
-Thanks,
+   git://github.com/OSLL/qemu-xtensa.git xtensa-libisa
+
+Changes v1->v2:
+- add sed transformation to target/xtensa/import-core.sh that drops
+  #include "ansidecl.h" from imported xtensa-modules.c;
+- drop #include "ansidecl.h" from xtensa-modules.c for converted cores;
+- reimplement translate_const16 using tcg_gen_deposit_i32.
+
+Max Filippov (16):
+  target/xtensa: pass actual frame size to the entry helper
+  target/xtensa: import libisa source
+  target/xtensa: extract core opcode translators
+  target/xtensa: extract FPU2000 opcode translators
+  target/xtensa: update import_core.sh script for libisa
+  target/xtensa: switch dc232b to libisa
+  target/xtensa: switch dc233c to libisa
+  target/xtensa: switch fsf to libisa
+  target/xtensa: use libisa for instruction decoding
+  target/xtensa: tests: fix memctl SR test
+  target/xtensa: drop DisasContext::litbase
+  target/xtensa: add internal/noop SRs and opcodes
+  target/xtensa: implement salt/saltu
+  target/xtensa: implement GPIO32
+  target/xtensa: implement const16
+  target/xtensa: implement disassembler
+
+ MAINTAINERS                                |     1 +
+ disas/Makefile.objs                        |     1 +
+ disas/xtensa.c                             |   133 +
+ include/disas/bfd.h                        |     1 +
+ include/hw/xtensa/xtensa-isa.h             |   838 ++
+ target/xtensa/Makefile.objs                |     1 +
+ target/xtensa/core-dc232b.c                |     4 +
+ target/xtensa/core-dc232b/xtensa-modules.c | 14105 +++++++++++++++++++++++++
+ target/xtensa/core-dc233c.c                |     4 +
+ target/xtensa/core-dc233c/xtensa-modules.c | 15232 +++++++++++++++++++++++++++
+ target/xtensa/core-fsf.c                   |     5 +
+ target/xtensa/core-fsf/xtensa-modules.c    |  9841 +++++++++++++++++
+ target/xtensa/cpu.c                        |     9 +
+ target/xtensa/cpu.h                        |    31 +
+ target/xtensa/helper.c                     |    37 +
+ target/xtensa/import_core.sh               |    15 +
+ target/xtensa/op_helper.c                  |     2 +-
+ target/xtensa/translate.c                  |  5883 +++++++----
+ target/xtensa/xtensa-isa-internal.h        |   231 +
+ target/xtensa/xtensa-isa.c                 |  1745 +++
+ target/xtensa/xtensa-isa.h                 |     1 +
+ tests/tcg/xtensa/test_sr.S                 |     2 +-
+ 22 files changed, 45949 insertions(+), 2173 deletions(-)
+ create mode 100644 disas/xtensa.c
+ create mode 100644 include/hw/xtensa/xtensa-isa.h
+ create mode 100644 target/xtensa/core-dc232b/xtensa-modules.c
+ create mode 100644 target/xtensa/core-dc233c/xtensa-modules.c
+ create mode 100644 target/xtensa/core-fsf/xtensa-modules.c
+ create mode 100644 target/xtensa/xtensa-isa-internal.h
+ create mode 100644 target/xtensa/xtensa-isa.c
+ create mode 100644 target/xtensa/xtensa-isa.h
 
 -- 
-Peter Xu
+2.1.4
