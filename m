@@ -1,27 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50758)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43924)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1eRFCy-00057W-Li
-	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 05:33:13 -0500
+	(envelope-from <cohuck@redhat.com>) id 1eRFXy-0003Ug-B6
+	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 05:54:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1eRFCo-0001a7-Uu
-	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 05:33:08 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:35786)
+	(envelope-from <cohuck@redhat.com>) id 1eRFXv-0004ZI-AB
+	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 05:54:54 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:50840)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1eRFCo-0001Y5-PC
-	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 05:33:02 -0500
-Date: Tue, 19 Dec 2017 10:32:57 +0000
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20171219103257.GC32479@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <20171218191228.31018-1-berrange@redhat.com>
-	<20171218191228.31018-2-berrange@redhat.com>
-	<20171219072629.4c23icd27ggxayc5@starbug-vm.ie.oracle.com>
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1eRFXv-0004XA-3r
+	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 05:54:51 -0500
+Date: Tue, 19 Dec 2017 11:54:44 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20171219115444.5e033bc6.cohuck@redhat.com>
+In-Reply-To: <20171218153552.18140-1-f4bug@amsat.org>
+References: <20171218153552.18140-1-f4bug@amsat.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20171219072629.4c23icd27ggxayc5@starbug-vm.ie.oracle.com>
-Subject: Re: [Qemu-devel] [PATCH v1 01/13] ui: remove 'sync' parametr from
- vnc_update_client
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] travis: add no-TPM build
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,88 +26,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Darren Kenny <darren.kenny@oracle.com>, qemu-devel@nongnu.org
+To: Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <f4bug@amsat.org>
+Cc: Alex =?UTF-8?B?QmVubsOpZQ==?= <alex.bennee@linaro.org>, Fam Zheng <famz@redhat.com>, Stefan Berger <stefanb@linux.vnet.ibm.com>, qemu-devel@nongnu.org
 
-Just cc'ing  qemu-devel back on the mail since it was accidentally dropped.
+On Mon, 18 Dec 2017 12:35:52 -0300
+Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> wrote:
 
-On Tue, Dec 19, 2017 at 07:26:29AM +0000, Darren Kenny wrote:
-> Small nit on the subject s/parametr/parameter/
-> 
-> Otherwise, looks good.
-> 
-> Reviewed-by: Darren Kenny <darren.kenny@oracle.com>
-> 
-> Thanks,
-> 
-> Darren.
-> 
-> On Mon, Dec 18, 2017 at 07:12:16PM +0000, Daniel P. Berrange wrote:
-> > There is only one caller of vnc_update_client and that always passes false
-> > for the 'sync' parameter.
-> > 
-> > Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
-> > ---
-> > ui/vnc.c | 11 +++--------
-> > 1 file changed, 3 insertions(+), 8 deletions(-)
-> > 
-> > diff --git a/ui/vnc.c b/ui/vnc.c
-> > index 9f8d5a1b1f..7ba3297dfa 100644
-> > --- a/ui/vnc.c
-> > +++ b/ui/vnc.c
-> > @@ -596,7 +596,7 @@ VncInfo2List *qmp_query_vnc_servers(Error **errp)
-> >    3) resolutions > 1024
-> > */
-> > 
-> > -static int vnc_update_client(VncState *vs, int has_dirty, bool sync);
-> > +static int vnc_update_client(VncState *vs, int has_dirty);
-> > static void vnc_disconnect_start(VncState *vs);
-> > 
-> > static void vnc_colordepth(VncState *vs);
-> > @@ -961,7 +961,7 @@ static int find_and_clear_dirty_height(VncState *vs,
-> >     return h;
-> > }
-> > 
-> > -static int vnc_update_client(VncState *vs, int has_dirty, bool sync)
-> > +static int vnc_update_client(VncState *vs, int has_dirty)
-> > {
-> >     if (vs->disconnecting) {
-> >         vnc_disconnect_finish(vs);
-> > @@ -1025,9 +1025,6 @@ static int vnc_update_client(VncState *vs, int has_dirty, bool sync)
-> >         }
-> > 
-> >         vnc_job_push(job);
-> > -        if (sync) {
-> > -            vnc_jobs_join(vs);
-> > -        }
-> >         vs->force_update = 0;
-> >         vs->has_dirty = 0;
-> >         return n;
-> > @@ -1035,8 +1032,6 @@ static int vnc_update_client(VncState *vs, int has_dirty, bool sync)
-> > 
-> >     if (vs->disconnecting) {
-> >         vnc_disconnect_finish(vs);
-> > -    } else if (sync) {
-> > -        vnc_jobs_join(vs);
-> >     }
-> > 
-> >     return 0;
-> > @@ -2863,7 +2858,7 @@ static void vnc_refresh(DisplayChangeListener *dcl)
-> >     vnc_unlock_display(vd);
-> > 
-> >     QTAILQ_FOREACH_SAFE(vs, &vd->clients, next, vn) {
-> > -        rects += vnc_update_client(vs, has_dirty, false);
-> > +        rects += vnc_update_client(vs, has_dirty);
-> >         /* vs might be free()ed here */
-> >     }
-> > 
-> > -- 
-> > 2.14.3
-> > 
-> > 
+> Use CI to avoid TPM bitrot:
+>   hw/core/qdev-properties-system.o: In function `release_tpm':
+>   hw/core/qdev-properties-system.c:291: undefined reference to `tpm_backe=
+nd_reset'
+>=20
+> Reported-by: Cornelia Huck <cohuck@redhat.com>
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+> ---
+> Based-on: 20171218140002.23677-1-cohuck@redhat.com
+>=20
+>  .travis.yml | 3 +++
+>  1 file changed, 3 insertions(+)
+>=20
+> diff --git a/.travis.yml b/.travis.yml
+> index f583839755..b4232ff2f9 100644
+> --- a/.travis.yml
+> +++ b/.travis.yml
+> @@ -90,6 +90,9 @@ matrix:
+>      - env: CONFIG=3D"--disable-tcg"
+>             TEST_CMD=3D""
+>        compiler: gcc
+> +    - env: CONFIG=3D"--disable-tpm"
+> +           TEST_CMD=3D""
+> +      compiler: gcc
+>      - env: CONFIG=3D""
+>        os: osx
+>        compiler: clang
 
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+Acked-by: Cornelia Huck <cohuck@redhat.com>
