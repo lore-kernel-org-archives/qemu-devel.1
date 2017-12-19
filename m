@@ -1,23 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41581)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51128)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1eRPim-0005w1-PJ
-	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 16:47:20 -0500
+	(envelope-from <paolo.bonzini@gmail.com>) id 1eRPrH-0001fX-Ce
+	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 16:55:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1eRPiH-0007UZ-AR
-	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 16:46:44 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:47962)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1eRPiF-0007S4-SE
-	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 16:46:12 -0500
-Date: Tue, 19 Dec 2017 23:46:02 +0200
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20171219234550-mutt-send-email-mst@kernel.org>
-References: <1513327555-17520-1-git-send-email-jianjay.zhou@huawei.com>
+	(envelope-from <paolo.bonzini@gmail.com>) id 1eRPrC-0007q8-Ik
+	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 16:55:30 -0500
+Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
+References: <20171219173425.8113-1-f4bug@amsat.org>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <d83a2802-c5a6-531b-321a-599ed16973d9@redhat.com>
+Date: Tue, 19 Dec 2017 22:54:49 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1513327555-17520-1-git-send-email-jianjay.zhou@huawei.com>
-Subject: Re: [Qemu-devel] [PATCH v2 0/2] vhost: two fixes
+In-Reply-To: <20171219173425.8113-1-f4bug@amsat.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 0/9] iotests: python3 compatibility
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,27 +24,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jay Zhou <jianjay.zhou@huawei.com>
-Cc: qemu-devel@nongnu.org, weidong.huang@huawei.com, arei.gonglei@huawei.com, wangxinxin.wang@huawei.com, gary.liuzhe@huawei.com, dgilbert@redhat.com, imammedo@redhat.com
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Cleber Rosa <crosa@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, =?UTF-8?B?THVrw6HFoSBEb2t0b3I=?= <ldoktor@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Eric Blake <eblake@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Fam Zheng <famz@redhat.com>, Markus Armbruster <armbru@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, John Snow <jsnow@redhat.com>, Nir Soffer <nirsof@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, Janosch Frank <frankja@linux.vnet.ibm.com>, Ishani Chugh <chugh.ishani@research.iiit.ac.in>
 
-On Fri, Dec 15, 2017 at 04:45:53PM +0800, Jay Zhou wrote:
-> v1 -> v2:
->   * delete the "used_memslots" global variable, and add it
->     for vhost-user and vhost-kernel separately
+On 19/12/2017 18:34, Philippe Mathieu-Daudé wrote:
+> Hi,
+> 
+> This is a very boring series.
+> 
+> I a later series I refactor the iotests.py class, however when the first version
+> of series [1] was posted I received comments that this class should no support
+> Python 3.
+> 
+> I didn't tested with very old CentOS release, but this should work with Python
+> versions >= 2.6.0a2.
 
-imammedo, any feedback on this?
+Thanks, this is useful.  However, it'd be much easier if the commit
+messages showed the actual error message that is fixed, or an example.
 
-> Jay Zhou (2):
->   vhost: add used memslot number for vhost-user and vhost-kernel    
->     separately
->   vhost: double check used memslots number
-> 
->  hw/virtio/vhost-backend.c         | 14 ++++++++++++++
->  hw/virtio/vhost-user.c            | 31 +++++++++++++++++++++++++++++++
->  hw/virtio/vhost.c                 | 39 ++++++++++++++++++++++++++++++---------
->  include/hw/virtio/vhost-backend.h |  4 ++++
->  4 files changed, 79 insertions(+), 9 deletions(-)
-> 
-> -- 
-> 1.8.3.1
-> 
+Paolo
