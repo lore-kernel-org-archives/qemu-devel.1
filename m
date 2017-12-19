@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56044)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38657)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1eR4wi-0002qq-6B
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 18:35:47 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1eR5ZM-0007Gt-Ra
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 19:15:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1eR4wf-0002jX-44
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 18:35:44 -0500
-Resent-Message-Id: <E1eR4wf-0002jX-44@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21441)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1eR4we-0002iV-QI
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 18:35:41 -0500
-In-Reply-To: <1513606078-728-1-git-send-email-stefanb@linux.vnet.ibm.com>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <151361214442.51.2461913259732164138@5adcb62bf0d6>
+	(envelope-from <peter.maydell@linaro.org>) id 1eR5ZM-00051I-0g
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 19:15:40 -0500
+Received: from mail-oi0-x22f.google.com ([2607:f8b0:4003:c06::22f]:45505)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1eR5ZL-00050I-Rp
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 19:15:39 -0500
+Received: by mail-oi0-x22f.google.com with SMTP id x20so11787099oix.12
+	for <qemu-devel@nongnu.org>; Mon, 18 Dec 2017 16:15:39 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Mon, 18 Dec 2017 07:49:05 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH] tpm: Fix linker error when using
- --disable-tpm
+In-Reply-To: <20171218143530.12082-1-stefanha@redhat.com>
+References: <20171218143530.12082-1-stefanha@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 19 Dec 2017 00:15:18 +0000
+Message-ID: <CAFEAcA8fBMYV_uvphxadgXbfzAb+BoOhWVdvX5q4=fXsGBoj3A@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL 00/23] Block patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,32 +28,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: stefanb@linux.vnet.ibm.com
-Cc: famz@redhat.com, qemu-devel@nongnu.org, thuth@redhat.com, peter.maydell@linaro.org, marcandre.lureau@redhat.com
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
-c3NhZ2UtaWQ6IDE1MTM2MDYwNzgtNzI4LTEtZ2l0LXNlbmQtZW1haWwtc3RlZmFuYkBsaW51eC52
-bmV0LmlibS5jb20KU3ViamVjdDogW1FlbXUtZGV2ZWxdIFtQQVRDSF0gdHBtOiBGaXggbGlua2Vy
-IGVycm9yIHdoZW4gdXNpbmcgLS1kaXNhYmxlLXRwbQoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09
-PQojIS9iaW4vYmFzaAoKQkFTRT1iYXNlCm49MQp0b3RhbD0kKGdpdCBsb2cgLS1vbmVsaW5lICRC
-QVNFLi4gfCB3YyAtbCkKZmFpbGVkPTAKCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxp
-bWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCgpjb21taXRzPSIkKGdp
-dCBsb2cgLS1mb3JtYXQ9JUggLS1yZXZlcnNlICRCQVNFLi4pIgpmb3IgYyBpbiAkY29tbWl0czsg
-ZG8KICAgIGVjaG8gIkNoZWNraW5nIFBBVENIICRuLyR0b3RhbDogJChnaXQgbG9nIC1uIDEgLS1m
-b3JtYXQ9JXMgJGMpLi4uIgogICAgaWYgISBnaXQgc2hvdyAkYyAtLWZvcm1hdD1lbWFpbCB8IC4v
-c2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgLTsgdGhlbgogICAgICAgIGZhaWxlZD0x
-CiAgICAgICAgZWNobwogICAgZmkKICAgIG49JCgobisxKSkKZG9uZQoKZXhpdCAkZmFpbGVkCj09
-PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVm
-N2Y0NGJkODg4NzEzMzg0ClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKZmJjZjA0MjZj
-ZCB0cG06IEZpeCBsaW5rZXIgZXJyb3Igd2hlbiB1c2luZyAtLWRpc2FibGUtdHBtCgo9PT0gT1VU
-UFVUIEJFR0lOID09PQpDaGVja2luZyBQQVRDSCAxLzE6IHRwbTogRml4IGxpbmtlciBlcnJvciB3
-aGVuIHVzaW5nIC0tZGlzYWJsZS10cG0uLi4KRVJST1I6IGFkZGluZyBhIGxpbmUgd2l0aG91dCBu
-ZXdsaW5lIGF0IGVuZCBvZiBmaWxlCiM0NDogRklMRTogc3R1YnMvdHBtLmM6NDk6Cit9Cgp0b3Rh
-bDogMSBlcnJvcnMsIDAgd2FybmluZ3MsIDI1IGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFz
-IHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwph
-cmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hF
-Q0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5k
-IGV4aXRlZCB3aXRoIGNvZGU6IDEKCgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkg
-YnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJh
-Y2sgdG8gcGF0Y2hldy1kZXZlbEBmcmVlbGlzdHMub3Jn
+On 18 December 2017 at 14:35, Stefan Hajnoczi <stefanha@redhat.com> wrote:
+> The following changes since commit 411ad78115ebeb3411cf4b7622784b93dfabe259:
+>
+>   Merge remote-tracking branch 'remotes/stefanberger/tags/pull-tpm-2017-12-15-1' into staging (2017-12-17 15:27:41 +0000)
+>
+> are available in the Git repository at:
+>
+>   git://github.com/stefanha/qemu.git tags/block-pull-request
+>
+> for you to fetch changes up to 585426c518958aa768564596091474be786aae51:
+>
+>   qemu-iotests: add 203 savevm with IOThreads test (2017-12-18 13:12:53 +0000)
+>
+> ----------------------------------------------------------------
+>
+
+This failed 'make check' on all hosts:
+
+TEST: tests/virtio-blk-test... (pid=49005)
+  /arm/virtio/blk/mmio/basic:                                          **
+ERROR:/home/pm215/qemu/tests/libqos/virtio.c:94:qvirtio_wait_queue_isr:
+assertion failed: (g_get_monotonic_time() - start_time <= timeout_us)
+FAIL
+GTester: last random seed: R02S8877aa3278e71261919aae7707897a80
+(pid=49024)
+FAIL: tests/virtio-blk-test
+
+
+thanks
+-- PMM
