@@ -1,20 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35574)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46674)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1eRKyU-0001Ee-E6
-	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 11:42:39 -0500
+	(envelope-from <jbaron@akamai.com>) id 1eRL8I-0005aT-Fl
+	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 11:52:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1eRKyT-0006UM-LS
-	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 11:42:38 -0500
-Date: Tue, 19 Dec 2017 14:42:18 -0200
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20171219164218.GB4836@localhost.localdomain>
-References: <20171218152140.17985-1-ybettan@redhat.com>
+	(envelope-from <jbaron@akamai.com>) id 1eRL8E-0008DQ-Sk
+	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 11:52:46 -0500
+Received: from mx0b-00190b01.pphosted.com ([2620:100:9005:57f::1]:55122)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jbaron@akamai.com>) id 1eRL8E-0008CN-Lb
+	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 11:52:42 -0500
+References: <cover.1513278334.git.jbaron@akamai.com>
+	<cover.1513278334.git.jbaron@akamai.com>
+	<1513280073-27515-1-git-send-email-jbaron@akamai.com>
+	<C5089512-91B2-439E-B22D-D7D416BDD558@redhat.com>
+	<9d600f3d-7e8d-153f-fd34-704c9975099b@akamai.com>
+	<21A64922-D22E-4AE1-8B4C-B0D85357240C@redhat.com>
+From: Jason Baron <jbaron@akamai.com>
+Message-ID: <73e8811d-70fd-4920-1cb4-ad1809ebff82@akamai.com>
+Date: Tue, 19 Dec 2017 11:52:39 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20171218152140.17985-1-ybettan@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH V5] pci: removed the is_express field since
- a uniform interface was inserted
+In-Reply-To: <21A64922-D22E-4AE1-8B4C-B0D85357240C@redhat.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 2/2] qemu: add linkspeed and duplex setting
+ to virtio-net
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,29 +33,211 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Yoni Bettan <ybettan@redhat.com>
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Hannes Reinecke <hare@suse.com>, Stefano Stabellini <sstabellini@kernel.org>, "open list:X86" <xen-devel@lists.xenproject.org>, "open list:nvme" <qemu-block@nongnu.org>, "Michael S. Tsirkin" <mst@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, Max Reitz <mreitz@redhat.com>, Keith Busch <keith.busch@intel.com>, Dmitry Fleytman <dmitry@daynix.com>, Paul Burton <paul.burton@mips.com>, Gerd Hoffmann <kraxel@redhat.com>, Anthony Perard <anthony.perard@citrix.com>, Marcel Apfelbaum <marcel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Jason Wang <jasowang@redhat.com>
+To: Yan Vugenfirer <yvugenfi@redhat.com>
+Cc: jasowang@redhat.com, mst@redhat.com, qemu-devel@nongnu.org, linux-kernel@vger.kernel.org
 
-On Mon, Dec 18, 2017 at 05:21:40PM +0200, Yoni Bettan wrote:
-> according to Eduardo Habkost's commit fd3b02c889 all PCIEs now implement
-> INTERFACE_PCIE_DEVICE so we don't need is_express field anymore.
-> 
-> Devices that implements only INTERFACE_PCIE_DEVICE (is_express == 1)
-> or
-> devices that implements only INTERFACE_CONVENTIONAL_PCI_DEVICE (is_express == 0)
-> where not affected by the change.
-> 
-> The only devices that were affected are those that are hybrid and also
-> had (is_express == 1) - therefor only:
->   - hw/vfio/pci.c
->   - hw/usb/hcd-xhci.c
->   - hw/xen/xen_pt.c
-> 
-> For those 3 I made sure that QEMU_PCI_CAP_EXPRESS is on in instance_init()
-> 
-> Signed-off-by: Yoni Bettan <ybettan@redhat.com>
 
-Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
 
--- 
-Eduardo
+On 12/19/2017 04:19 AM, Yan Vugenfirer wrote:
+>=20
+>> On 18 Dec 2017, at 18:04, Jason Baron via Qemu-devel
+>> <qemu-devel@nongnu.org <mailto:qemu-devel@nongnu.org>> wrote:
+>>
+>>
+>>
+>> On 12/18/2017 06:34 AM, Yan Vugenfirer wrote:
+>>>
+>>>> On 14 Dec 2017, at 21:33, Jason Baron via Qemu-devel
+>>>> <qemu-devel@nongnu.org <mailto:qemu-devel@nongnu.org>> wrote:
+>>>>
+>>>> Although they can be currently set in linux via 'ethtool -s', this
+>>>> requires
+>>>> guest changes, and thus it would be nice to extend this
+>>>> functionality such
+>>>> that it can be configured automatically from the host (as other netw=
+ork
+>>>> do).
+>>>>
+>>>> Linkspeed and duplex settings can be set as:
+>>>> '-device virtio-net,speed=3D10000,duplex=3Dfull'
+>>>>
+>>>> where speed is [-1...INT_MAX], and duplex is ["half"|"full"].
+>>>>
+>>>> Signed-off-by: Jason Baron <jbaron@akamai.com
+>>>> <mailto:jbaron@akamai.com>>
+>>>> Cc: "Michael S. Tsirkin" <mst@redhat.com <mailto:mst@redhat.com>>
+>>>> Cc: Jason Wang <jasowang@redhat.com <mailto:jasowang@redhat.com>>
+>>>> ---
+>>>> hw/net/virtio-net.c =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
+=A0=A0=A0=A0=A0=A0=A0=A0| 29
+>>>> +++++++++++++++++++++++++++++
+>>>> include/hw/virtio/virtio-net.h =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
+| =A03 +++
+>>>> include/standard-headers/linux/virtio_net.h | =A04 ++++
+>>>> 3 files changed, 36 insertions(+)
+>>>>
+>>>> diff --git a/hw/net/virtio-net.c b/hw/net/virtio-net.c
+>>>> index 38674b0..d63e790 100644
+>>>> --- a/hw/net/virtio-net.c
+>>>> +++ b/hw/net/virtio-net.c
+>>>> @@ -40,6 +40,12 @@
+>>>> #define VIRTIO_NET_RX_QUEUE_MIN_SIZE VIRTIO_NET_RX_QUEUE_DEFAULT_SIZ=
+E
+>>>> #define VIRTIO_NET_TX_QUEUE_MIN_SIZE VIRTIO_NET_TX_QUEUE_DEFAULT_SIZ=
+E
+>>>>
+>>>> +/* duplex and speed defines */
+>>>> +#define DUPLEX_UNKNOWN =A0=A0=A0=A0=A0=A0=A0=A0=A00xff
+>>>> +#define DUPLEX_HALF =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A00x00
+>>>> +#define DUPLEX_FULL =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A00x01
+>>>> +#define SPEED_UNKNOWN =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0-1
+>>>> +
+>>>> /*
+>>>> * Calculate the number of bytes up to and including the given 'field=
+' of
+>>>> * 'container'.
+>>>> @@ -61,6 +67,8 @@ static VirtIOFeature feature_sizes[] =3D {
+>>>> =A0=A0=A0=A0.end =3D endof(struct virtio_net_config, max_virtqueue_p=
+airs)},
+>>>> =A0=A0=A0{.flags =3D 1 << VIRTIO_NET_F_MTU,
+>>>> =A0=A0=A0=A0.end =3D endof(struct virtio_net_config, mtu)},
+>>>> + =A0=A0=A0{.flags =3D 1 << VIRTIO_NET_F_SPEED_DUPLEX,
+>>>> + =A0=A0=A0=A0.end =3D endof(struct virtio_net_config, duplex)},
+>>>> =A0=A0=A0{}
+>>>> };
+>>>>
+>>>> @@ -88,6 +96,8 @@ static void virtio_net_get_config(VirtIODevice
+>>>> *vdev, uint8_t *config)
+>>>> =A0=A0=A0virtio_stw_p(vdev, &netcfg.status, n->status);
+>>>> =A0=A0=A0virtio_stw_p(vdev, &netcfg.max_virtqueue_pairs, n->max_queu=
+es);
+>>>> =A0=A0=A0virtio_stw_p(vdev, &netcfg.mtu, n->net_conf.mtu);
+>>>> + =A0=A0=A0virtio_stl_p(vdev, &netcfg.speed, n->net_conf.speed);
+>>>> + =A0=A0=A0netcfg.duplex =3D n->net_conf.duplex;
+>>>> =A0=A0=A0memcpy(netcfg.mac, n->mac, ETH_ALEN);
+>>>> =A0=A0=A0memcpy(config, &netcfg, n->config_size);
+>>>> }
+>>>> @@ -1941,6 +1951,23 @@ static void
+>>>> virtio_net_device_realize(DeviceState *dev, Error **errp)
+>>>> =A0=A0=A0=A0=A0=A0=A0n->host_features |=3D (0x1 << VIRTIO_NET_F_MTU)=
+;
+>>>> =A0=A0=A0}
+>>>>
+>>>> + =A0=A0=A0n->host_features |=3D (0x1 << VIRTIO_NET_F_SPEED_DUPLEX);
+>>>> + =A0=A0=A0if (n->net_conf.duplex_str) {
+>>>> + =A0=A0=A0=A0=A0=A0=A0if (strncmp(n->net_conf.duplex_str, "half", 5=
+) =3D=3D 0) {
+>>>> + =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0n->net_conf.duplex =3D DUPLEX_HAL=
+F;
+>>>> + =A0=A0=A0=A0=A0=A0=A0} else if (strncmp(n->net_conf.duplex_str, "f=
+ull", 5) =3D=3D 0) {
+>>>> + =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0n->net_conf.duplex =3D DUPLEX_FUL=
+L;
+>>>> + =A0=A0=A0=A0=A0=A0=A0} else {
+>>>> + =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0error_setg(errp, "'duplex' must b=
+e 'half' or 'full'");
+>>>> + =A0=A0=A0=A0=A0=A0=A0}
+>>>> + =A0=A0=A0} else {
+>>>> + =A0=A0=A0=A0=A0=A0=A0n->net_conf.duplex =3D DUPLEX_UNKNOWN;
+>>>> + =A0=A0=A0}
+>>>> + =A0=A0=A0if (n->net_conf.speed < SPEED_UNKNOWN) {
+>>>> + =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0error_setg(errp, "'speed' must be=
+ between -1
+>>>> (SPEED_UNKOWN) and "
+>>>> + =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
+"INT_MAX");
+>>>> + =A0=A0=A0}
+>>>> +
+>>>> =A0=A0=A0virtio_net_set_config_size(n, n->host_features);
+>>>> =A0=A0=A0virtio_init(vdev, "virtio-net", VIRTIO_ID_NET, n->config_si=
+ze);
+>>>>
+>>>> @@ -2160,6 +2187,8 @@ static Property virtio_net_properties[] =3D {
+>>>> =A0=A0=A0DEFINE_PROP_UINT16("host_mtu", VirtIONet, net_conf.mtu, 0),
+>>>> =A0=A0=A0DEFINE_PROP_BOOL("x-mtu-bypass-backend", VirtIONet,
+>>>> mtu_bypass_backend,
+>>>> =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0true),
+>>>> + =A0=A0=A0DEFINE_PROP_INT32("speed", VirtIONet, net_conf.speed,
+>>>> SPEED_UNKNOWN),
+>>>
+>>> From Windows guest perspective I prefer to have some reasonable
+>>> default (10G for example).=A0
+>>
+>>
+>> hmmm, I didn't want to change/set the default here in case it broke
+>> something, but I'm ok setting it to some 'reasonable' value - (10G and
+>> duplex?), if the consensus is that that would be safe.
+>=20
+> OK from my side.
+> Thanks.
+
+I presume your speaking for windows - i'm wondering if under linux the
+virtio device suddenly start showing up as duplex, 10Gbps, will that
+break anything? I can speak for the use-cases we have here and that
+would certainly be fine for us, but i'm really not sure if that is ok
+more generally.
+
+Thanks,
+
+-Jason
+
+>=20
+>>
+>> Thanks,
+>>
+>> -Jason
+>>
+>>>
+>>> Thanks,
+>>> Yan.
+>>>
+>>>> + =A0=A0=A0DEFINE_PROP_STRING("duplex", VirtIONet, net_conf.duplex_s=
+tr),
+>>>> =A0=A0=A0DEFINE_PROP_END_OF_LIST(),
+>>>> };
+>>>>
+>>>> diff --git a/include/hw/virtio/virtio-net.h
+>>>> b/include/hw/virtio/virtio-net.h
+>>>> index b81b6a4..af74a94 100644
+>>>> --- a/include/hw/virtio/virtio-net.h
+>>>> +++ b/include/hw/virtio/virtio-net.h
+>>>> @@ -38,6 +38,9 @@ typedef struct virtio_net_conf
+>>>> =A0=A0=A0uint16_t rx_queue_size;
+>>>> =A0=A0=A0uint16_t tx_queue_size;
+>>>> =A0=A0=A0uint16_t mtu;
+>>>> + =A0=A0=A0int32_t speed;
+>>>> + =A0=A0=A0char *duplex_str;
+>>>> + =A0=A0=A0uint8_t duplex;
+>>>> } virtio_net_conf;
+>>>>
+>>>> /* Maximum packet size we can receive from tap device: header + 64k =
+*/
+>>>> diff --git a/include/standard-headers/linux/virtio_net.h
+>>>> b/include/standard-headers/linux/virtio_net.h
+>>>> index 30ff249..0ff1447 100644
+>>>> --- a/include/standard-headers/linux/virtio_net.h
+>>>> +++ b/include/standard-headers/linux/virtio_net.h
+>>>> @@ -36,6 +36,7 @@
+>>>> #define VIRTIO_NET_F_GUEST_CSUM1/* Guest handles pkts w/ partial csu=
+m */
+>>>> #define VIRTIO_NET_F_CTRL_GUEST_OFFLOADS 2 /* Dynamic offload
+>>>> configuration. */
+>>>> #define VIRTIO_NET_F_MTU3/* Initial MTU advice */
+>>>> +#define VIRTIO_NET_F_SPEED_DUPLEX 4/* Host set linkspeed and duplex=
+ */
+>>>> #define VIRTIO_NET_F_MAC5/* Host has given MAC address. */
+>>>> #define VIRTIO_NET_F_GUEST_TSO47/* Guest can handle TSOv4 in. */
+>>>> #define VIRTIO_NET_F_GUEST_TSO68/* Guest can handle TSOv6 in. */
+>>>> @@ -76,6 +77,9 @@ struct virtio_net_config {
+>>>> uint16_t max_virtqueue_pairs;
+>>>> /* Default maximum transmit unit advice */
+>>>> uint16_t mtu;
+>>>> +/* Host exported linkspeed and duplex */
+>>>> +uint32_t speed;
+>>>> +uint8_t duplex;
+>>>> } QEMU_PACKED;
+>>>>
+>>>> /*
+>>>> --=A0
+>>>> 2.6.1
+>=20
