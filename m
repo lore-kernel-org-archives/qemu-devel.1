@@ -1,21 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43499)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44163)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1eRJKl-0006Qy-F2
-	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 09:57:32 -0500
+	(envelope-from <mlureau@redhat.com>) id 1eRJLI-0006vo-KB
+	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 09:58:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1eRJKk-000328-Fx
-	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 09:57:31 -0500
-From: Markus Armbruster <armbru@redhat.com>
-References: <1513542355-28203-1-git-send-email-jan.dakinevich@virtuozzo.com>
-	<1513542355-28203-2-git-send-email-jan.dakinevich@virtuozzo.com>
-Date: Tue, 19 Dec 2017 15:57:18 +0100
-In-Reply-To: <1513542355-28203-2-git-send-email-jan.dakinevich@virtuozzo.com>
-	(Jan Dakinevich's message of "Sun, 17 Dec 2017 23:25:54 +0300")
-Message-ID: <87k1xig3zl.fsf@dusky.pond.sub.org>
+	(envelope-from <mlureau@redhat.com>) id 1eRJLF-0003PU-T5
+	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 09:58:04 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:35750)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1eRJLF-0003OT-KF
+	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 09:58:01 -0500
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 2A3B5356DE
+	for <qemu-devel@nongnu.org>; Tue, 19 Dec 2017 14:58:00 +0000 (UTC)
+Received: from colo-mx.corp.redhat.com
+	(colo-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.20])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 20B57183C6
+	for <qemu-devel@nongnu.org>; Tue, 19 Dec 2017 14:58:00 +0000 (UTC)
+Date: Tue, 19 Dec 2017 09:57:59 -0500 (EST)
+From: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+Message-ID: <32374673.1188228.1513695479889.JavaMail.zimbra@redhat.com>
+In-Reply-To: <20171218191228.31018-1-berrange@redhat.com>
+References: <20171218191228.31018-1-berrange@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [RFC v6 1/2] virtio: introduce `query-virtio' QMP
- command
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v1 00/13] Fix VNC server unbounded memory
+ usage
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,124 +37,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jan Dakinevich <jan.dakinevich@virtuozzo.com>
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, "Denis V. Lunev" <den@virtuozzo.com>, qemu-block@nongnu.org, Amit Shah <amit@kernel.org>, Jason Wang <jasowang@redhat.com>, Cornelia Huck <cohuck@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Max Reitz <mreitz@redhat.com>, Eric Blake <eblake@redhat.com>
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: qemu-devel@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>, P J P <ppandit@redhat.com>
 
-QAPI/QMP interface review only.
+Hi
 
-You neglected to cc: the maintainers of qapi-schema.json, so I'm doing
-that for you.
+----- Original Message -----
+> In the 2.11 release we fixed CVE-2017-15268, which allowed the VNC websoc=
+kets
+> server to consume arbitrary memory when a slow client was connected. I ha=
+ve
+> since discovered that this same type of problem can be triggered in sever=
+al
+> other ways in the regular (non-websockets) VNC server. This patch series
+> attempts to fix this problem by limiting framebuffer updates and other da=
+ta
+> sent from server to client. The mitigating factor is that you need to hav=
+e
+> successfully authenticated with the VNC server to trigger these new flaws=
+.
+> This new more general flaw is assigned CVE-2017-15124 by the Red Hat secu=
+rity
+> team.
+>=20
+> The key patches containing the security fix are 9, 10, 11.
+>=20
+> Since this code is incredibly subtle & hard to understand though, the fir=
+st
+> 8 patches do a bunch of independant cleanups/refactoring to make the secu=
+rity
+> fixes clearer.  The last two patches are just some extra cleanup / help f=
+or
+> future maint.
 
-Jan Dakinevich <jan.dakinevich@virtuozzo.com> writes:
+I already reviewed the series privately, and in general, I'd ack it.
 
-> The command is intended for gathering virtio information such as status,
-> feature bits, negotiation status. It is convenient and useful for debug
-> purpose.
->
-> The commands returns generic virtio information for virtio such as
-> common feature names and status bits names and information for all
-> attached to current machine devices.
->
-> To retrieve names of device-specific features `tell_feature_name'
-> callback in VirtioDeviceClass also was introduced.
->
-> Cc: Denis V. Lunev <den@virtuozzo.com>
-> Signed-off-by: Jan Dakinevich <jan.dakinevich@virtuozzo.com>
-[...]
-> diff --git a/qapi-schema.json b/qapi-schema.json
-> index 1845795..51cd0f3 100644
-> --- a/qapi-schema.json
-> +++ b/qapi-schema.json
-> @@ -3200,3 +3200,73 @@
->  # Since: 2.11
->  ##
->  { 'command': 'watchdog-set-action', 'data' : {'action': 'WatchdogAction'} }
-> +
-> +##
-> +# @VirtioFeature:
-> +#
-> +# Virtio feature bit with negotiation status
-> +#
-> +# @name: name of feature bit
-> +#
-> +# @acked: negotiation status, `true' if guest acknowledged the feature
-> +#
-> +# Since: 2.12
-> +##
-> +{
-> +    'struct': 'VirtioFeature',
-> +    'data': {
-> +        'name': 'str',
-> +        'acked': 'bool'
-> +    }
-> +}
-> +
-> +##
-> +# @VirtioInfo:
-> +#
-> +# Information about virtio device
-> +#
-> +# @qom-path: QOM path of the device
-> +#
-> +# @status: status bitmask
-> +#
-> +# @host-features: bitmask of features, exposed by device
-> +#
-> +# @guest-features: bitmask of features, acknowledged by guest
+Did you manage to run some throttle tests? (I tried to trigger them manuall=
+y by slowing artificially network or calling framebuffer_update_request() i=
+n gdb, I didn't manage yet :-/)
 
-Quoting my review of v4: "Unsigned integer interpreted as combination of
-well-known bit-valued symbols" is a fine C interface, but a pretty
-horrid QMP interface.  What's wrong with doing a set the straightforward
-way as "array of enum"?  As far as I can see, I didn't get a reply back
-then.  You'll have to give one to get the patch accepted.
+>=20
+> Daniel P. Berrange (13):
+>   ui: remove 'sync' parametr from vnc_update_client
+>   ui: remove unreachable code in vnc_update_client
+>   ui: remove redundant indentation in vnc_client_update
+>   ui: avoid pointless VNC updates if framebuffer isn't dirty
+>   ui: track how much decoded data we consumed when doing SASL encoding
+>   ui: introduce enum to track VNC client framebuffer update request
+>     state
+>   ui: correctly reset framebuffer update state after processing dirty
+>     regions
+>   ui: refactor code for determining if an update should be sent to the
+>     client
+>   ui: fix VNC client throttling when audio capture is active
+>   ui: fix VNC client throttling when forced update is requested
+>   ui: place a hard cap on VNC server output buffer size
+>   ui: add trace events related to VNC client throttling
+>   ui: mix misleading comments & return types of VNC I/O helper methods
+>=20
+>  ui/trace-events    |   7 ++
+>  ui/vnc-auth-sasl.c |  16 ++-
+>  ui/vnc-auth-sasl.h |   5 +-
+>  ui/vnc-jobs.c      |   5 +
+>  ui/vnc.c           | 320
+>  ++++++++++++++++++++++++++++++++++++++---------------
+>  ui/vnc.h           |  28 ++++-
+>  6 files changed, 277 insertions(+), 104 deletions(-)
+>=20
 
-In case symbolic names may not be known at QEMU compile time (me having
-to wonder at v6 is a sign of rather ineffective patch review, sorry
-about that): you have to explain this in the doc comment, with a
-reference to where the bits are specified.
+Series:
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
-> +#
-> +# @status-names: names of checked bits in status bitmask
-
-How are the strings in @status-names connected to the bits in @status?
-Spell it out in this doc string, please.
-
-> +#
-> +# @common-features-names: names exposed features and negotiation status,
-> +# that are common to all devices
-> +#
-> +# @device-features-names: names exposed features and negotiation status,
-> +# that are specific to this device
-
-Likewise.
-
-> +#
-> +# Since: 2.12
-> +##
-> +{
-> +    'struct': 'VirtioInfo',
-> +    'data': {
-> +        'qom-path': 'str',
-> +
-> +        'status': 'uint8',
-> +        'host-features': 'uint64',
-> +        'guest-features': 'uint64',
-> +
-> +        'status-names': ['str'],
-> +        'common-features-names': ['VirtioFeature'],
-> +        'device-features-names': ['VirtioFeature']
-> +    }
-> +}
-> +
-> +##
-> +# @query-virtio:
-> +#
-> +# Returns virtio information such as device status and features
-> +#
-> +# Since: 2.12
-> +##
-> +{
-> +    'command': 'query-virtio',
-> +    'data': {'*path': 'str'},
-> +    'returns': ['VirtioInfo']
-> +}
+> --
+> 2.14.3
+>=20
+>=20
