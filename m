@@ -1,18 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57078)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39639)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <nutarojj@ornl.gov>) id 1eRQyg-0000q7-5e
-	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 18:07:17 -0500
+	(envelope-from <no-reply@patchew.org>) id 1eRRF5-0006gW-VM
+	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 18:24:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <nutarojj@ornl.gov>) id 1eRQyc-0007kL-1N
-	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 18:07:14 -0500
-Received: from mta01.ornl.gov ([128.219.177.137]:27469)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <nutarojj@ornl.gov>) id 1eRQyb-0007hi-O4
-	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 18:07:09 -0500
-From: "James J. Nutaro" <nutarojj@ornl.gov>
-Date: Tue, 19 Dec 2017 18:07:02 -0500
-Message-Id: <1513724822-25232-1-git-send-email-nutarojj@ornl.gov>
-Subject: [Qemu-devel] [PATCH V10] qqq: module for synchronizing with a
+	(envelope-from <no-reply@patchew.org>) id 1eRRF2-00032I-Q2
+	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 18:24:11 -0500
+Resent-Message-Id: <E1eRRF2-00032I-Q2@eggs.gnu.org>
+Received: from sender-of-o52.zoho.com ([135.84.80.217]:21478)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1eRRF2-000316-Gl
+	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 18:24:08 -0500
+In-Reply-To: <1513724822-25232-1-git-send-email-nutarojj@ornl.gov>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <151372583496.81.4087757779829737900@5adcb62bf0d6>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Tue, 19 Dec 2017 15:23:56 -0800 (PST)
+Subject: Re: [Qemu-devel] [PATCH V10] qqq: module for synchronizing with a
  simulation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -22,484 +29,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: cota@braap.org, pbonzini@redhat.com, nutarojj@ornl.gov
+To: nutarojj@ornl.gov
+Cc: famz@redhat.com, qemu-devel@nongnu.org, pbonzini@redhat.com, cota@braap.org
 
-This patch adds an interface for pacing the execution of QEMU to match an external
-simulation clock. Its aim is to permit QEMU to be used as a module within a
-larger simulation system. This version renames the feature "external-sim"
-and cleans up the code for the most recent code in the git repo.
-
-Signed-off-by: James J. Nutaro <nutarojj@ornl.gov>
----
- Makefile.target       |   1 +
- accel/kvm/kvm-all.c   |  10 ++++
- cpus.c                |   8 +++
- docs/external-sim.txt |  59 +++++++++++++++++++
- external_sim.c        | 157 ++++++++++++++++++++++++++++++++++++++++++++++++++
- external_sim.h        |  36 ++++++++++++
- include/sysemu/cpus.h |   1 +
- qemu-options.hx       |  15 +++++
- vl.c                  |  38 +++++++++++-
- 9 files changed, 324 insertions(+), 1 deletion(-)
- create mode 100644 docs/external-sim.txt
- create mode 100644 external_sim.c
- create mode 100644 external_sim.h
-
-diff --git a/Makefile.target b/Makefile.target
-index f9a9da7..61bd0cb 100644
---- a/Makefile.target
-+++ b/Makefile.target
-@@ -91,6 +91,7 @@ all: $(PROGS) stap
- 
- #########################################################
- # cpu emulator library
-+obj-y += external_sim.o
- obj-y += exec.o
- obj-y += accel/
- obj-$(CONFIG_TCG) += tcg/tcg.o tcg/tcg-op.o tcg/optimize.o
-diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
-index f290f48..f42546a 100644
---- a/accel/kvm/kvm-all.c
-+++ b/accel/kvm/kvm-all.c
-@@ -40,6 +40,7 @@
- #include "hw/irq.h"
- 
- #include "hw/boards.h"
-+#include "external_sim.h"
- 
- /* This check must be after config-host.h is included */
- #ifdef CONFIG_EVENTFD
-@@ -1863,6 +1864,15 @@ int kvm_cpu_exec(CPUState *cpu)
-     do {
-         MemTxAttrs attrs;
- 
-+        if (external_sim_enabled()) {
-+            /* Pause here while synchronizing with a simulation clock.
-+             * We do not want to execute instructions past the synchronization
-+             * deadline, but it is ok to update the states of other equipment
-+             * like timers, i/o devices, etc.
-+             */
-+            external_sim_sync();
-+        }
-+
-         if (cpu->vcpu_dirty) {
-             kvm_arch_put_registers(cpu, KVM_PUT_RUNTIME_STATE);
-             cpu->vcpu_dirty = false;
-diff --git a/cpus.c b/cpus.c
-index 114c29b..877e65c 100644
---- a/cpus.c
-+++ b/cpus.c
-@@ -2060,3 +2060,11 @@ void dump_drift_info(FILE *f, fprintf_function cpu_fprintf)
-         cpu_fprintf(f, "Max guest advance   NA\n");
-     }
- }
-+
-+void kick_all_vcpus(void)
-+{
-+    CPUState *cpu;
-+    CPU_FOREACH(cpu) {
-+        qemu_cpu_kick(cpu);
-+    }
-+}
-diff --git a/docs/external-sim.txt b/docs/external-sim.txt
-new file mode 100644
-index 0000000..c5953fe
---- /dev/null
-+++ b/docs/external-sim.txt
-@@ -0,0 +1,59 @@
-+= Synchronizing the virtual clock with an external source =
-+
-+QEMU has a protocol for synchronizing its virtual clock
-+with the clock of a simulator in which QEMU is embedded
-+as a component. This options is enabled with the -external_sim
-+argument, and it should generally be accompanied by the
-+following additional command line arguments:
-+
-+-icount 1,sleep=off -rtc clock=vm
-+  or
-+-enable-kvm -cpu kvm=off,-tsc,-kvmclock -rtc clock=vm
-+
-+The -external_sim argument is used to supply a file descriptor
-+for a Unix socket, which is used for synchronization.
-+The procedure for launching QEMU in is synchronization
-+mode has three steps:
-+
-+(1) Create a socket pair with the Linux socketpair function.
-+    The code segment that does this might look like
-+
-+       int socks[2];
-+       socketpair(AF_UNIX,SOCK_STREAM,0,socks);
-+
-+(2) Fork QEMU with the appropriate command line arguments.
-+    The -external_sim part of the argument will look something like
-+
-+       -external_sim sock=socks[1]
-+
-+(3) After forking QEMU, close sock[1] and retain the
-+    sock[0] for communicating with QEMU.
-+
-+The synchronization protocol is very simple. To start, the
-+external simulator writes an integer to its socket with
-+the amount of time in microseconds that QEMU is allowed to
-+advance. The code segment that does this might look like:
-+
-+    uint32_t ta = htonl(1000); // Advance by 1 millisecond
-+    write(sock[0],&ta,sizeof(uint32_t));
-+
-+The external simulator can then advance its clock by this
-+same amount. During this time, QEMU and the external simulator
-+will be executing in parallel. When the external simulator
-+completes its time advance, it waits for QEMU by reading from
-+its socket. The value read will be the actual number of
-+virtual microseconds by which QEMU has advanced its virtual clock.
-+This will be greater than or equal to the requested advance.
-+The code that does this might look like:
-+
-+   uint32_t ta;
-+   read(fd,&ta,sizeof(uint32_t));
-+   ta = ntohl(ta);
-+
-+These steps are repeated until either (1) the external simulator
-+closes its socket thereby causing QEMU to terminate or (2) QEMU
-+stops executing (e.g., if the emulated computer is shutdown) and
-+causes a read or write error on the simulator's socket.
-+
-+You can find an example of a simulator using this protocol in
-+the adevs simulation package at http://sourceforge.net/projects/adevs/
-diff --git a/external_sim.c b/external_sim.c
-new file mode 100644
-index 0000000..e6ab3d5
---- /dev/null
-+++ b/external_sim.c
-@@ -0,0 +1,157 @@
-+#include "qemu/osdep.h"
-+#include "qemu/timer.h"
-+#include "sysemu/cpus.h"
-+#include "sysemu/kvm.h"
-+#include "external_sim.h"
-+
-+/* This is a Linux only feature */
-+
-+#ifndef _WIN32
-+
-+static bool enabled = false, syncing = true;
-+static unsigned elapsed; /* initialized to zero */
-+static int time_advance = -1;
-+static int fd = -1;
-+static int64_t t;
-+static QEMUTimer *sync_timer;
-+static QemuMutex external_sim_mutex;
-+static QemuCond external_sim_cond;
-+
-+bool external_sim_enabled(void)
-+{
-+    return enabled;
-+}
-+
-+void external_sim_sync(void)
-+{
-+    /* kvm-all.c will call this function before running
-+     * instructions with kvm. Because syncing will be
-+     * true while external_sim is waiting for a new time advance
-+     * from the simulation, no instructions will execute
-+     * while the machine is supposed to be suspended in
-+     * simulation time.
-+     */
-+    qemu_mutex_lock(&external_sim_mutex);
-+    while (syncing) {
-+        qemu_cond_wait(&external_sim_cond, &external_sim_mutex);
-+    }
-+    qemu_mutex_unlock(&external_sim_mutex);
-+}
-+
-+static void cleanup_and_exit(void)
-+{
-+    /* Close the socket and quit */
-+    close(fd);
-+    exit(0);
-+}
-+
-+static void start_emulator(void)
-+{
-+    if (kvm_enabled()) {
-+        /* Setting syncing to false tells kvm-all that
-+         * it can execute guest instructions.
-+         */
-+        qemu_mutex_lock(&external_sim_mutex);
-+        syncing = false;
-+        qemu_mutex_unlock(&external_sim_mutex);
-+        qemu_cond_signal(&external_sim_cond);
-+        /* Restart the emulator clock */
-+        cpu_enable_ticks();
-+    }
-+}
-+
-+static void stop_emulator(void)
-+{
-+    if (kvm_enabled()) {
-+        /* Tell the emulator that it is not allowed to
-+         * execute guest instructions.
-+         */
-+        qemu_mutex_lock(&external_sim_mutex);
-+        syncing = true;
-+        qemu_mutex_unlock(&external_sim_mutex);
-+        /* Kick KVM off of the CPU and stop the emulator clock. */
-+        cpu_disable_ticks();
-+        kick_all_vcpus();
-+    }
-+}
-+
-+static void write_mem_value(unsigned val)
-+{
-+    uint32_t msg = htonl(val);
-+    if (write(fd, &msg, sizeof(uint32_t)) != sizeof(uint32_t)) {
-+        /* If the socket is no good, then assume this is an
-+         * indication that we should exit.
-+         */
-+        cleanup_and_exit();
-+    }
-+}
-+
-+static unsigned read_mem_value(void)
-+{
-+    uint32_t msg;
-+    if (read(fd, &msg, sizeof(uint32_t)) != sizeof(uint32_t)) {
-+        /* If the socket is no good, then assume this is an
-+         * indication that we should exit.
-+         */
-+        cleanup_and_exit();
-+    }
-+    return ntohl(msg);
-+}
-+
-+static void schedule_next_event(void)
-+{
-+    /* Read time advance from the socket */
-+    time_advance = read_mem_value();
-+    assert(t == 0 ||
-+        abs(t - qemu_clock_get_us(QEMU_CLOCK_VIRTUAL)) <= time_advance);
-+    /* Schedule the next synchronization point */
-+    timer_mod(sync_timer, t + time_advance);
-+    /* Note that we need to read the time advance again on the next pass */
-+    time_advance = -1;
-+    /* Start advancing cpu ticks and the wall clock */
-+    start_emulator();
-+}
-+
-+static void sync_func(void *data)
-+{
-+    /* Stop advancing cpu ticks and the wall clock */
-+    stop_emulator();
-+    /* Report the actual elapsed time to the external simulator. */
-+    int64_t tnow = qemu_clock_get_us(QEMU_CLOCK_VIRTUAL);
-+    elapsed = tnow - t;
-+    write_mem_value(elapsed);
-+    /* Update our time of last event */
-+    t = tnow;
-+    /* Schedule the next event */
-+    schedule_next_event();
-+}
-+
-+void setup_external_sim(QemuOpts *opts)
-+{
-+    /* The module has been enabled */
-+    enabled = true;
-+    if (kvm_enabled()) {
-+        qemu_mutex_init(&external_sim_mutex);
-+        qemu_cond_init(&external_sim_cond);
-+    }
-+    /* Stop the clock while the simulation is initialized */
-+    stop_emulator();
-+    /* Initialize the simulation clock */
-+    t = 0;
-+    /* Get the communication socket */
-+    fd = qemu_opt_get_number(opts, "sock", 0);
-+    /* Start the timer to ensure time warps advance the clock */
-+    sync_timer = timer_new_us(QEMU_CLOCK_VIRTUAL, sync_func, NULL);
-+    /* Get the time advance that is requested by the simulation */
-+    schedule_next_event();
-+}
-+
-+#else
-+
-+void setup_external_sim(QemuOpts *opts)
-+{
-+    fprintf(stderr, "-external_sim is not supported on Windows, exiting\n");
-+    exit(0);
-+}
-+
-+#endif
-diff --git a/external_sim.h b/external_sim.h
-new file mode 100644
-index 0000000..38ee348
---- /dev/null
-+++ b/external_sim.h
-@@ -0,0 +1,36 @@
-+/*
-+ * This work is licensed under the terms of the GNU GPL
-+ * version 2. Seethe COPYING file in the top-level directory.
-+ *
-+ * A module for pacing the rate of advance of the computer
-+ * clock in reference to an external simulation clock. The
-+ * basic approach used here is adapted from QBox from Green
-+ * Socs. The mode of operation is as follows:
-+ *
-+ * The simulator uses pipes to exchange time advance data.
-+ * The external simulator starts the exchange by forking a
-+ * QEMU process and passing is descriptors for a read and
-+ * write pipe. Then the external simulator writes an integer
-+ * (native endian) to the pipe to indicate the number of
-+ * microseconds that QEMU should advance. QEMU advances its
-+ * virtual clock by this amount and writes to its write pipe
-+ * the actual number of microseconds that have advanced.
-+ * This process continues until a pipe on either side is
-+ * closed, which will either cause QEMU to exit (if the
-+ * external simulator closes a pipe) or raise SIGPIPE in the
-+ * external simulator (if QEMU closes a pipe).
-+ *
-+ * Authors:
-+ *   James Nutaro <nutaro@gmail.com>
-+ *
-+ */
-+#ifndef EXTERNAL_SIM_H
-+#define EXTERNAL_SIM_H
-+
-+#include "qemu-options.h"
-+
-+void external_sim_sync(void);
-+bool external_sim_enabled(void);
-+void setup_external_sim(QemuOpts *opts);
-+
-+#endif
-diff --git a/include/sysemu/cpus.h b/include/sysemu/cpus.h
-index 731756d..7fde006 100644
---- a/include/sysemu/cpus.h
-+++ b/include/sysemu/cpus.h
-@@ -10,6 +10,7 @@ void resume_all_vcpus(void);
- void pause_all_vcpus(void);
- void cpu_stop_current(void);
- void cpu_ticks_init(void);
-+void kick_all_vcpus(void);
- 
- void configure_icount(QemuOpts *opts, Error **errp);
- extern int use_icount;
-diff --git a/qemu-options.hx b/qemu-options.hx
-index 32d9378..6321115 100644
---- a/qemu-options.hx
-+++ b/qemu-options.hx
-@@ -4479,6 +4479,21 @@ contents of @code{iv.b64} to the second secret
- 
- ETEXI
- 
-+DEF("external_sim", HAS_ARG, QEMU_OPTION_external_sim, \
-+    "-external_sim sock=fd\n" \
-+    "                enable synchronization of the virtual clock \n" \
-+    "                with an external simulation clock\n", QEMU_ARCH_ALL)
-+STEXI
-+@item -external_sim sock=@var{fd0}
-+@findex -external_sim
-+Qemu will use the supplied socket to synchronize its virtual clock with
-+an external simulation clock. Qemu will wait until a time slice size in
-+microseconds is supplied on the socket. Then it will execute for at
-+least that number of virtual microseconds before writing the actual
-+virtual time that has elapsed in microseconds to the socket. This
-+cycle will repeat until a zero time advance is requested, which
-+will cause qemu to exit.
-+ETEXI
- 
- HXCOMM This is the last statement. Insert new options before this line!
- STEXI
-diff --git a/vl.c b/vl.c
-index e9012bb..4746c17 100644
---- a/vl.c
-+++ b/vl.c
-@@ -128,6 +128,8 @@ int main(int argc, char **argv)
- #include "qapi/qmp/qerror.h"
- #include "sysemu/iothread.h"
- 
-+#include "external_sim.h"
-+
- #define MAX_VIRTIO_CONSOLES 1
- #define MAX_SCLP_CONSOLES 1
- 
-@@ -240,6 +242,20 @@ static struct {
-     { .driver = "virtio-vga",           .flag = &default_vga       },
- };
- 
-+static QemuOptsList qemu_external_sim_opts = {
-+    .name = "external_sim",
-+    .implied_opt_name = "",
-+    .merge_lists = true,
-+    .head = QTAILQ_HEAD_INITIALIZER(qemu_external_sim_opts.head),
-+    .desc = {
-+        {
-+            .name = "sock",
-+            .type = QEMU_OPT_NUMBER,
-+        },
-+        { /* end of list */ }
-+    },
-+};
-+
- static QemuOptsList qemu_rtc_opts = {
-     .name = "rtc",
-     .head = QTAILQ_HEAD_INITIALIZER(qemu_rtc_opts.head),
-@@ -823,7 +839,7 @@ int qemu_timedate_diff(struct tm *tm)
-             struct tm tmp = *tm;
-             tmp.tm_isdst = -1; /* use timezone to figure it out */
-             seconds = mktime(&tmp);
--	}
-+    }
-     else
-         seconds = mktimegm(tm) + rtc_date_offset;
- 
-@@ -3055,6 +3071,7 @@ int main(int argc, char **argv, char **envp)
-     int cyls, heads, secs, translation;
-     QemuOpts *opts, *machine_opts;
-     QemuOpts *hda_opts = NULL, *icount_opts = NULL, *accel_opts = NULL;
-+    QemuOpts *external_sim_opts = NULL;
-     QemuOptsList *olist;
-     int optind;
-     const char *optarg;
-@@ -3101,6 +3118,7 @@ int main(int argc, char **argv, char **envp)
-     module_call_init(MODULE_INIT_QOM);
-     monitor_init_qmp_commands();
- 
-+    qemu_add_opts(&qemu_external_sim_opts);
-     qemu_add_opts(&qemu_drive_opts);
-     qemu_add_drive_opts(&qemu_legacy_drive_opts);
-     qemu_add_drive_opts(&qemu_common_drive_opts);
-@@ -4007,6 +4025,14 @@ int main(int argc, char **argv, char **envp)
-                     exit(1);
-                 }
-                 break;
-+            case QEMU_OPTION_external_sim:
-+                external_sim_opts =
-+                    qemu_opts_parse_noisily(
-+                        qemu_find_opts("external_sim"),optarg,true);
-+                if (!external_sim_opts) {
-+                    exit(1);
-+                }
-+                break;
-             case QEMU_OPTION_incoming:
-                 if (!incoming) {
-                     runstate_set(RUN_STATE_INMIGRATE);
-@@ -4560,6 +4586,16 @@ int main(int argc, char **argv, char **envp)
-     /* spice needs the timers to be initialized by this point */
-     qemu_spice_init();
- 
-+    if (external_sim_opts) {
-+        if (!(rtc_clock == QEMU_CLOCK_VIRTUAL && (
-+              (icount_opts && !qemu_opt_get_bool(icount_opts, "sleep", true)) ||
-+              kvm_enabled()))) {
-+            error_report("-external_sim requires -rtc clock=vm and either "
-+                "icount -1,sleep=off or -enable-kvm");
-+            exit(1);
-+        }
-+        setup_external_sim(external_sim_opts);
-+    }
-     cpu_ticks_init();
-     if (icount_opts) {
-         if (!tcg_enabled()) {
--- 
-2.7.4
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IDE1MTM3MjQ4MjItMjUyMzItMS1naXQtc2VuZC1lbWFpbC1udXRhcm9qakBvcm5s
+LmdvdgpTdWJqZWN0OiBbUWVtdS1kZXZlbF0gW1BBVENIIFYxMF0gcXFxOiBtb2R1bGUgZm9yIHN5
+bmNocm9uaXppbmcgd2l0aCBhIHNpbXVsYXRpb24KCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0K
+IyEvYmluL2Jhc2gKCkJBU0U9YmFzZQpuPTEKdG90YWw9JChnaXQgbG9nIC0tb25lbGluZSAkQkFT
+RS4uIHwgd2MgLWwpCmZhaWxlZD0wCgpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1p
+dCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQoKY29tbWl0cz0iJChnaXQg
+bG9nIC0tZm9ybWF0PSVIIC0tcmV2ZXJzZSAkQkFTRS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7IGRv
+CiAgICBlY2hvICJDaGVja2luZyBQQVRDSCAkbi8kdG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0tZm9y
+bWF0PSVzICRjKS4uLiIKICAgIGlmICEgZ2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAuL3Nj
+cmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIC07IHRoZW4KICAgICAgICBmYWlsZWQ9MQog
+ICAgICAgIGVjaG8KICAgIGZpCiAgICBuPSQoKG4rMSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9PT0g
+VEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdm
+NDRiZDg4ODcxMzM4NApTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCjkxYjA2NGYwYWEg
+cXFxOiBtb2R1bGUgZm9yIHN5bmNocm9uaXppbmcgd2l0aCBhIHNpbXVsYXRpb24KCj09PSBPVVRQ
+VVQgQkVHSU4gPT09CkNoZWNraW5nIFBBVENIIDEvMTogcXFxOiBtb2R1bGUgZm9yIHN5bmNocm9u
+aXppbmcgd2l0aCBhIHNpbXVsYXRpb24uLi4KRVJST1I6IHNwYWNlIHJlcXVpcmVkIGFmdGVyIHRo
+YXQgJywnIChjdHg6VnhWKQojNDQ0OiBGSUxFOiB2bC5jOjQwMzE6CisgICAgICAgICAgICAgICAg
+ICAgICAgICBxZW11X2ZpbmRfb3B0cygiZXh0ZXJuYWxfc2ltIiksb3B0YXJnLHRydWUpOwogICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXgoKRVJS
+T1I6IHNwYWNlIHJlcXVpcmVkIGFmdGVyIHRoYXQgJywnIChjdHg6VnhWKQojNDQ0OiBGSUxFOiB2
+bC5jOjQwMzE6CisgICAgICAgICAgICAgICAgICAgICAgICBxZW11X2ZpbmRfb3B0cygiZXh0ZXJu
+YWxfc2ltIiksb3B0YXJnLHRydWUpOwogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgIF4KCnRvdGFsOiAyIGVycm9ycywgMCB3YXJuaW5n
+cywgNDAwIGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVh
+c2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJl
+cG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVS
+Uy4KCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEK
+CgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3Bh
+dGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEBm
+cmVlbGlzdHMub3Jn
