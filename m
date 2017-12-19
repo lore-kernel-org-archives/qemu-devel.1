@@ -1,34 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40799)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43791)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eRJrn-0004Q9-8l
-	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 10:32:56 -0500
+	(envelope-from <wzssyqa@gmail.com>) id 1eRG11-0006El-5i
+	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 06:24:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eRJqy-00012J-Kz
-	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 10:31:39 -0500
-Received: from indium.canonical.com ([91.189.90.7]:42656)
+	(envelope-from <wzssyqa@gmail.com>) id 1eRG0x-0000F3-7J
+	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 06:24:55 -0500
+Received: from mail-pg0-x241.google.com ([2607:f8b0:400e:c05::241]:41990)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1eRJqx-000106-Nr
-	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 10:30:48 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1eRJqr-000191-UR
-	for <qemu-devel@nongnu.org>; Tue, 19 Dec 2017 15:30:41 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id E54FC2E80C3
-	for <qemu-devel@nongnu.org>; Tue, 19 Dec 2017 15:30:41 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 19 Dec 2017 15:23:13 -0000
-From: Robert Marklund <1738840@bugs.launchpad.net>
-Reply-To: Bug 1738840 <1738840@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <151361756384.17711.11632335707632949681.malonedeb@soybean.canonical.com>
-Message-Id: <151369699326.19363.2015043319915216572.malone@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1738840] Re: qemu-img convert qcow2 to raw fails
- on OS X
+	(Exim 4.71) (envelope-from <wzssyqa@gmail.com>) id 1eRG0w-0000Ea-UI
+	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 06:24:51 -0500
+Received: by mail-pg0-x241.google.com with SMTP id q67so1187032pga.9
+	for <qemu-devel@nongnu.org>; Tue, 19 Dec 2017 03:24:50 -0800 (PST)
+Sender: YunQiang Su <wzssyqa@gmail.com>
+From: YunQiang Su <syq@debian.org>
+Date: Tue, 19 Dec 2017 19:24:38 +0800
+Message-Id: <20171219112438.6065-1-syq@debian.org>
+Subject: [Qemu-devel] [PATCH] linux-user: Fix support MIPS o32 FP64 mode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,162 +25,156 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: YunQiang Su <syq@debian.org>
 
-The image apfs2 here is created with "-S 0"and the .bin is a working one ge=
-nerated on a ubuntu machine.
+MIPS o32 has a mode called FP64, who has 32 64Bit FPU registers.
+To use it:
+  add PR_GET_FP_MODE and PR_SET_FP_MODE options for prctl
+  set CP0St_FR when binary as EF_MIPS_FP64
 
-Strange thing is that this say they are identical:
-$ time qemu-img compare -f qcow2 -F raw coreos_production_openstack_image.i=
-mg.org coreos_production_openstack_image.bin.apfs
-Images are identical.
+https://dmz-portal.mips.com/wiki/MIPS_O32_ABI_-_FR0_and_FR1_Interlinking
+Signed-off-by: YunQiang Su <syq@debian.org>
+---
+ linux-user/main.c    |  3 +++
+ linux-user/syscall.c | 24 +++++++++++++++++++++
+ target/mips/cpu.c    | 59 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+ target/mips/cpu.h    |  9 ++++++++
+ 4 files changed, 95 insertions(+)
 
-real    0m0.078s
-user    0m0.016s
-sys     0m0.054s
-
-But these are not:
-$ time qemu-img compare -f qcow2 -F raw coreos_production_openstack_image.i=
-mg.org coreos_production_openstack_image.bin.apfs2
-Content mismatch at offset 0!
-
-real    0m0.026s
-user    0m0.009s
-sys     0m0.010s
-
-But hese are identical :)
-$ diff coreos_production_openstack_image.bin.apfs coreos_production_opensta=
-ck_image.bin.apfs2
-$ echo $?
-0
-
-And of cause these are not identical:
-$ diff coreos_production_openstack_image.bin coreos_production_openstack_im=
-age.bin.apfs2
-Binary files coreos_production_openstack_image.bin and coreos_production_op=
-enstack_image.bin.apfs2 differ
-
-$ diff coreos_production_openstack_image.bin coreos_production_openstack_im=
-age.bin.apfs
-Binary files coreos_production_openstack_image.bin and coreos_production_op=
-enstack_image.bin.apfs differ
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1738840
-
-Title:
-  qemu-img convert qcow2 to raw fails on OS X
-
-Status in QEMU:
-  New
-
-Bug description:
-  I try to convert a image from qcow2 to raw and the result is a not bootab=
-le image.
-  I dont know if it is a bug in qemu-img convert or with the image it self.
-
-  See this error report for better readability:
-  https://github.com/coreos/bugs/issues/1121#issuecomment-351968518
-
-  As a reply here they use 2.9.0 version of
-
-  =
-
-  $ qemu-img -V
-  qemu-img version 2.11.0
-  Copyright (c) 2003-2017 Fabrice Bellard and the QEMU Project developers
-
-  $ uname -v
-  Darwin Kernel Version 17.2.0
-
-  $ mount ./
-  /dev/disk1s1 on / (apfs, local, journaled)
-
-  $  wget https://beta.release.core-
-  os.net/amd64-usr/current/coreos_production_openstack_image.img.bz2
-
-  $ date
-  Fri Dec 14 17:15:57 CET 2017
-
-  $ bunzip2 coreos_production_openstack_image.img.bz2
-
-  =
-
-  $ cp -a coreos_production_openstack_image.img.org coreos_production_opens=
-tack_image.img
-
-  $ shasum coreos_production_openstack_image.img.org
-  ae2119c6f0390dc36f247f7016923ea85de5d8e6  coreos_production_openstack_ima=
-ge.img.org
-
-  $ qemu-img convert -f qcow2 -O raw
-  coreos_production_openstack_image.img.org
-  coreos_production_openstack_image.bin
-
-  $ qemu-system-x86_64 -m 256 -nographic -hda coreos_production_openstack_i=
-mage.img -boot c
-  SeaBIOS (version rel-1.11.0-0-g63451fca13-prebuilt.qemu-project.org)
-
-  =
-
-  iPXE (http://ipxe.org) 00:03.0 C980 PCI2.10 PnP PMM+0FF915A0+0FEF15A0 C980
-                                                                           =
-      =
-
-
-  =
-
-  Booting from Hard Disk...
-  GRUB loading....
-  Welcome to GRUB!
-  ....
-
-  $ qemu-system-x86_64 -m 256 -nographic -hda
-  coreos_production_openstack_image.bin -boot c
-
-  SeaBIOS (version rel-1.11.0-0-g63451fca13-prebuilt.qemu-project.org)
-
-  =
-
-  iPXE (http://ipxe.org) 00:03.0 C980 PCI2.10 PnP PMM+0FF915A0+0FEF15A0 C980
-                                                                           =
-      =
-
-
-  =
-
-  Booting from Hard Disk...
-  Boot failed: not a bootable disk
-  ....
-
-  =
-
-  $ head -c 8192 coreos_production_openstack_image.bin | hexdump -C
-  00000000  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  |............=
-....|
-  *
-  00002000
-
-  $ qemu-img info coreos_production_openstack_image.bin
-  image: coreos_production_openstack_image.bin
-  file format: raw
-  virtual size: 8.5G (9116319744 bytes)
-  disk size: 217M
-
-  $ qemu-img info coreos_production_openstack_image.img
-  image: coreos_production_openstack_image.img
-  file format: qcow2
-  virtual size: 8.5G (9116319744 bytes)
-  disk size: 785M
-  cluster_size: 65536
-  Format specific information:
-      compat: 0.10
-      refcount bits: 16
-
-  The same version works on Ubuntu so it looks like its only the Mac
-  version or the new APFS filesystem.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1738840/+subscriptions
+diff --git a/linux-user/main.c b/linux-user/main.c
+index 2fd2a143ed..f2b02a99a2 100644
+--- a/linux-user/main.c
++++ b/linux-user/main.c
+@@ -4750,6 +4750,9 @@ int main(int argc, char **argv, char **envp)
+             }
+             restore_snan_bit_mode(env);
+         }
++        if ((info->elf_flags & EF_MIPS_FP64) != 0) {
++            env->CP0_Status |= (1 << CP0St_FR);
++        }
+     }
+ #elif defined(TARGET_NIOS2)
+     {
+diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+index 11c9116c4a..664dacda33 100644
+--- a/linux-user/syscall.c
++++ b/linux-user/syscall.c
+@@ -10530,6 +10530,30 @@ abi_long do_syscall(void *cpu_env, int num, abi_long arg1,
+              * need. */
+             ret = -TARGET_EINVAL;
+             break;
++#ifdef TARGET_MIPS
++        case PR_GET_FP_MODE:
++        {
++            CPUMIPSState *env = ((CPUMIPSState *)cpu_env);
++            ret = 0;
++            if (env->CP0_Status & (1 << CP0St_FR)) {
++                ret |= PR_FP_MODE_FR;
++            }
++            if (env->CP0_Config5 & (1 << CP0C5_FRE)) {
++                ret |= PR_FP_MODE_FRE;
++            }
++            break;
++        }
++        case PR_SET_FP_MODE:
++        {
++            CPUMIPSState *env = ((CPUMIPSState *)cpu_env);
++            ret = mips_prctl_set_fp_mode(env, arg2);
++            if (ret < 0) {
++                ret = -TARGET_EOPNOTSUPP;
++                goto fail;
++            }
++            break;
++        }
++#endif
+         default:
+             /* Most prctl options have no pointer arguments */
+             ret = get_errno(prctl(arg1, arg2, arg3, arg4, arg5));
+diff --git a/target/mips/cpu.c b/target/mips/cpu.c
+index 069f93560e..6cf1907f9c 100644
+--- a/target/mips/cpu.c
++++ b/target/mips/cpu.c
+@@ -246,4 +246,63 @@ static void mips_cpu_register_types(void)
+     }
+ }
+ 
++#ifdef CONFIG_USER_ONLY
++abi_long mips_prctl_set_fp_mode(CPUMIPSState *env, abi_long arg2)
++{
++    abi_long ret;
++    CPUState *other_cpu;
++    bool old_fr = env->CP0_Status & (1 << CP0St_FR);
++    bool new_fr = arg2 & PR_FP_MODE_FR;
++    bool new_fre = arg2 & PR_FP_MODE_FRE;
++
++    if (new_fr && !(env->active_fpu.fcr0 & (1 << FCR0_F64))) {
++        /* FR1 is not supported */
++        ret = -1;
++        return ret;
++    }
++
++    if (!new_fr && (env->active_fpu.fcr0 & (1 << FCR0_F64))
++        && !(env->CP0_Status_rw_bitmask & (1 << CP0St_FR))) {
++        /* cannot set FR=0 */
++        ret = -1;
++        return ret;
++    }
++
++    if (new_fre && !(env->active_fpu.fcr0 & (1 << FCR0_FREP))) {
++        /* Cannot set FRE=1 */
++        ret = -1;
++        return ret;
++    }
++
++    start_exclusive();
++    CPU_FOREACH(other_cpu) {
++        int i;
++        MIPSCPU *cpu = MIPS_CPU(other_cpu);
++        env = &cpu->env;
++        for (i = 0; i < 32 ; i += 2) {
++            fpr_t *fpr = env->active_fpu.fpr;
++            if (!old_fr && new_fr) {
++                fpr[i].w[!FP_ENDIAN_IDX] = fpr[i + 1].w[FP_ENDIAN_IDX];
++            } else if (old_fr && !new_fr) {
++                fpr[i + 1].w[FP_ENDIAN_IDX] = fpr[i].w[!FP_ENDIAN_IDX];
++            }
++        }
++        if (new_fr) {
++            env->CP0_Status |= (1 << CP0St_FR);
++        } else {
++            env->CP0_Status &= ~(1 << CP0St_FR);
++        }
++        if (new_fre) {
++            env->CP0_Config5 |= (1 << CP0C5_FRE);
++        } else {
++            env->CP0_Config5 &= ~(1 << CP0C5_FRE);
++        }
++        compute_hflags(env);
++    }
++    end_exclusive();
++    ret = 0;
++    return ret;
++}
++#endif
++
+ type_init(mips_cpu_register_types)
+diff --git a/target/mips/cpu.h b/target/mips/cpu.h
+index 7f8ba5ff3e..b5d9aac6d0 100644
+--- a/target/mips/cpu.h
++++ b/target/mips/cpu.h
+@@ -769,4 +769,13 @@ static inline void cpu_get_tb_cpu_state(CPUMIPSState *env, target_ulong *pc,
+                             MIPS_HFLAG_HWRENA_ULR);
+ }
+ 
++/* prctl interface.  */
++#if defined(CONFIG_USER_ONLY)
++#define PR_SET_FP_MODE 45
++#define PR_GET_FP_MODE 46
++#define PR_FP_MODE_FR  (1 << 0)
++#define PR_FP_MODE_FRE (1 << 1)
++abi_long mips_prctl_set_fp_mode(CPUMIPSState *env, abi_long arg2);
++#endif
++
+ #endif /* MIPS_CPU_H */
+-- 
+2.15.1
