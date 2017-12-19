@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32952)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38272)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1eR91F-0007pl-Q4
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 22:56:42 -0500
+	(envelope-from <douly.fnst@cn.fujitsu.com>) id 1eR96e-0001Zn-P5
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 23:02:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1eR91B-00024G-NK
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 22:56:41 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:45586)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
-	id 1eR91B-00023J-HB
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 22:56:37 -0500
-Date: Mon, 18 Dec 2017 20:56:33 -0700
-From: Alex Williamson <alex.williamson@redhat.com>
-Message-ID: <20171218205633.27ed0ee0@w520.home>
-In-Reply-To: <d6bf4252-7138-b0cd-cc84-ad05a7ecc5f3@ozlabs.ru>
-References: <20171218040852.13478.19208.stgit@gimli.home>
-	<20171218050229.13478.65667.stgit@gimli.home>
-	<d6bf4252-7138-b0cd-cc84-ad05a7ecc5f3@ozlabs.ru>
+	(envelope-from <douly.fnst@cn.fujitsu.com>) id 1eR96a-0003oH-Mq
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 23:02:16 -0500
+Received: from mail.cn.fujitsu.com ([183.91.158.132]:15320
+	helo=heian.cn.fujitsu.com) by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <douly.fnst@cn.fujitsu.com>) id 1eR96a-0003io-83
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 23:02:12 -0500
+References: <20171214040855.22231-1-douly.fnst@cn.fujitsu.com>
+	<20171218220901.GE5209@localhost.localdomain>
+From: Dou Liyang <douly.fnst@cn.fujitsu.com>
+Message-ID: <f5057cbf-c699-847a-d219-78a0ba6bff63@cn.fujitsu.com>
+Date: Tue, 19 Dec 2017 12:01:59 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <20171218220901.GE5209@localhost.localdomain>
+Content-Type: text/plain; charset="gbk"; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC/RFT PATCH 2/5] vfio/pci: Add base BAR
- MemoryRegion
+Subject: Re: [Qemu-devel] [RESEND PATCH for-2.12 0/2] ACPI/unit-test: Add a
+ testcase
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,62 +29,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alexey Kardashevskiy <aik@ozlabs.ru>
-Cc: qemu-devel@nongnu.org, eric.auger@redhat.com
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: imammedo@redhat.com, mst@redhat.com, peter.maydell@linaro.org, qemu-devel@nongnu.org, indou.takao@jp.fujitsu.com
 
-On Tue, 19 Dec 2017 14:44:51 +1100
-Alexey Kardashevskiy <aik@ozlabs.ru> wrote:
+Hi Eduardo,
 
-> On 18/12/17 16:02, Alex Williamson wrote:
-> > Add one more layer to our stack of MemoryRegions, this base region
-> > allows us to register BARs independently of the vfio region or to
-> > extend the size of BARs which do map to a region.  This will be
-> > useful when we want hypervisor defined BARs or sections of BARs,
-> > for purposes such as relocating MSI-X emulation.  We therefore call
-> > msix_init() based on this new base MemoryRegion, while the quirks,
-> > which only modify regions still operate on those sub-MemoryRegions.  
+At 12/19/2017 06:09 AM, Eduardo Habkost wrote:
+> On Thu, Dec 14, 2017 at 12:08:53PM +0800, Dou Liyang wrote:
+>> These are the patches left over from the pull request:
+>>
+>>    [Qemu-devel] [PULL 0/9] x86 and machine queue, 2017-10-05
+>>
+>> because of some errors when tested by "make check" command[1].
+>>
+>> Now, the QEMU 2.11.0 has been released, rebase/retest/respin them
+>> for v2.12 dev.
+>>
+>> Changelog:
+>>    --Rebase and retest this patch in v2.11.0
+>>    --Update the DSDT.numamem:
+>>
+>> [1]: http://lists.gnu.org/archive/html/qemu-devel/2017-10/msg01334.html
 > 
-> 
-> Looks ok, one worry though - the default config produces this:
-> 
-> 
-> memory-region: pci@800000020000000.mmio
->   0000000000000000-ffffffffffffffff (prio 0, i/o): pci@800000020000000.mmio
->     0000210000000000-000021000000ffff (prio 1, i/o): 0001:03:00.0 base BAR 1
->       0000210000000000-000021000000ffff (prio 0, i/o): 0001:03:00.0 BAR 1
->       000021000000e000-000021000000e5ff (prio 0, i/o): msix-table
->       000021000000f000-000021000000f00f (prio 0, i/o): msix-pba [disabled]
->     0000210000040000-000021000007ffff (prio 1, i/o): 0001:03:00.0 base BAR 3
->       0000210000040000-000021000007ffff (prio 0, i/o): 0001:03:00.0 BAR 3
->         0000210000040000-000021000007ffff (prio 0, ramd): 0001:03:00.0 BAR
-> 3 mmaps[0]
-> 
-> 
-> Where "BAR 1" and "msix-table" overlap. It resolves correctly:
-> 
-> 
-> FlatView #1
->  AS "memory", root: system
->  AS "cpu-memory", root: system
->  Root memory region: system
->   0000000000000000-000000007fffffff (prio 0, ram): ppc_spapr.ram
->   0000210000000000-000021000000dfff (prio 0, i/o): 0001:03:00.0 BAR 1
->   000021000000e000-000021000000e5ff (prio 0, i/o): msix-table
->   000021000000e600-000021000000ffff (prio 0, i/o): 0001:03:00.0 BAR 1
-> @000000000000e600
->   0000210000040000-000021000007ffff (prio 0, ramd): 0001:03:00.0 BAR 3 mmaps[0]
-> 
-> 
-> but this looks like an accident - should not we raise the msix-table
-> priority or lower the BAR1 priority (to -1)?
+> Do we know what caused the failures Peter saw, and if we can now
+> be sure it won't happen again?
 
-I was worried about this too, but the way I read the code is that the
-last registered subregion with the same priority wins.  Therefore so
-long as msix_init() is called after we layer anything else onto the base
-BAR MemoryRegion that might interfere with it, everything should work
-correctly.  It certainly might make sense for msix_init() to add
-subregions with a higher priority, but then you immediately get into
-the road block of what priority should it use, which is a bit of a rat
-hole since we can make it work as-is with proper ordering.  Thanks,
+Sorry, I can't. I tested it many times with my colleagues, it won't
+happen like Peter saw. This issue is very subtle and funny. Could you
+give me some suggestions?
 
-Alex
+BTW, I used "make TEST_ACPI_REBUILD_AML=1 check" to create the DSDT
+file. Is it correct?
+
+Thanks,
+	dou.
+>
