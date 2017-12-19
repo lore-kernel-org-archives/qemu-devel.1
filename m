@@ -1,30 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33572)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36315)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1eREug-00045t-Sd
-	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 05:14:24 -0500
+	(envelope-from <ybettan@redhat.com>) id 1eRExO-0005PT-Ft
+	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 05:17:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1eREue-0001FG-98
-	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 05:14:18 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:44640)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1eREue-0001DO-2Q
-	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 05:14:16 -0500
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id D5C36820F4
-	for <qemu-devel@nongnu.org>; Tue, 19 Dec 2017 10:14:13 +0000 (UTC)
-Date: Tue, 19 Dec 2017 10:14:08 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20171219101407.GB2730@work-vm>
-References: <20171215171655.7818-1-dgilbert@redhat.com>
-	<20171219051642.GZ22308@xz-mi>
+	(envelope-from <ybettan@redhat.com>) id 1eRExL-0003lQ-7n
+	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 05:17:06 -0500
+Received: from mail-wm0-f68.google.com ([74.125.82.68]:42582)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <ybettan@redhat.com>) id 1eRExL-0003lC-17
+	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 05:17:03 -0500
+Received: by mail-wm0-f68.google.com with SMTP id b199so2505642wme.1
+	for <qemu-devel@nongnu.org>; Tue, 19 Dec 2017 02:17:02 -0800 (PST)
+References: <20171219101122.31711-1-ybettan@redhat.com>
+From: Yoni Bettan <ybettan@redhat.com>
+Message-ID: <917c1192-2171-5b3f-f2e8-2b4ef5cfd130@redhat.com>
+Date: Tue, 19 Dec 2017 12:16:59 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20171219051642.GZ22308@xz-mi>
-Subject: Re: [Qemu-devel] [PATCH 0/2] migration/channel errors and cancelling
+In-Reply-To: <20171219101122.31711-1-ybettan@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+Subject: Re: [Qemu-devel] [PATCH V3] vl.c && linux-user/main.c : removed
+ **envp from main() arguments
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,68 +30,135 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, berrange@redhat.com, quintela@redhat.com
+To: qemu-devel@nongnu.org
+Cc: Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>, Peter Maydell <peter.maydell@linaro.org>, Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-* Peter Xu (peterx@redhat.com) wrote:
-> On Fri, Dec 15, 2017 at 05:16:53PM +0000, Dr. David Alan Gilbert (git) wrote:
-> > From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-> > 
-> > Hi,
-> >   Where a channel fails asynchronously during connect, call
-> > back through the migration code so it can clean up.
-> >   In particular this causes the transition of a 'cancelling' state
-> > to 'cancelled' in the case of:
-> > 
-> >     migrate -d tcp:deadhost:port
-> >      <host tries to connect>
-> >     migrate_cancel
-> > 
-> > previously the status would get stuck in cancelling because
-> > the final cleanup didn't happen.
-> > 
-> >   This is the second part of the fix for:
-> > https://bugzilla.redhat.com/show_bug.cgi?id=1525899
-> 
-> IIUC this series tries to deliver the connection error a long way
-> until migrate_fd_connect() to handle it. But, haven't we already have
-> a function migrate_fd_error() to do that (which is faster, and
-> simpler)?
-> 
-> void migrate_fd_error(MigrationState *s, const Error *error)
-> {
->     trace_migrate_fd_error(error_get_pretty(error));
->     assert(s->to_dst_file == NULL);
->     migrate_set_state(&s->state, MIGRATION_STATUS_SETUP,
->                       MIGRATION_STATUS_FAILED);
->     migrate_set_error(s, error);
->     notifier_list_notify(&migration_state_notifiers, s);
->     block_cleanup_parameters(s);
-> }
-> 
-> I think it's not handling the case when cancelling.  If we let it to
-> handle the cancelling case well, would it be a simpler fix?
+
+
+On 12/19/2017 12:11 PM, Yoni Bettan wrote:
+> it was added on 2008 902b3d5c39 when introduced cache-utils.[ch]
 >
-> Moreover, I think this is another good example that migration is not
-> handling the cleanup "cleanly" in general... I really hope we can do
-> this better in 2.12.  I'll see whether I can give it a shot, but in
-> all cases it'll be after the merging of existing patches since there
-> are already quite a lot of dangling patches.
+> since then cache-utils.[ch] were removed but **envp was left
+> behind.
+>
+> By the way "to be portable it is best to write main to take two
+> arguments, and use the value of environ" according to
+> https://www.gnu.org/software/libc/manual/html_node/Program-\
+>        Arguments.html#Program-Arguments
+>
+> Signed-off-by: Yoni Bettan <ybettan@redhat.com>
+> ---
+>
+> V2 -> V3:
+>      
+>      since ui/cocoa.c rename main() is using qemu_main() ,because it uses it
+>      inside its main() function, the function qemu_main() can't be removed
+>    
+>
+> V1 -> V2:
+>
+>      removed the ui/cocoa.c renaming of main() function since i thought that we
+>      no longer need qemu_main()
+>
+>
+>   include/qemu-common.h | 2 +-
+>   linux-user/main.c     | 2 +-
+>   ui/cocoa.m            | 5 ++---
+>   vl.c                  | 7 +++----
+>   4 files changed, 7 insertions(+), 9 deletions(-)
 
-No, I think migrate_fd_error is the cause of the problem here, not the
-answer.
-
-If we stick to the simple rule that a migration must always call
-migrate_fd_cleanup then the cancellation problems are fixed - I think
-that's how we make migration 'clean' - a single cleanup routine
-that always gets called.
-
-Dave
-
-
-> Thanks,
-> 
-> -- 
-> Peter Xu
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Notes:
+1. I didn't checked the patch on Mac OS due to some difficulties to run
+     Mac OS gust as host (make check passed successfully)
+2. checkpatch.pl seems to not work well when touching extern variables
+>
+> diff --git a/include/qemu-common.h b/include/qemu-common.h
+> index 05319b9ddc..8a5b7ec5ec 100644
+> --- a/include/qemu-common.h
+> +++ b/include/qemu-common.h
+> @@ -29,7 +29,7 @@
+>   
+>   /* main function, renamed */
+>   #if defined(CONFIG_COCOA)
+> -int qemu_main(int argc, char **argv, char **envp);
+> +int qemu_main(int argc, char **argv);
+>   #endif
+>   
+>   void qemu_get_timedate(struct tm *tm, int offset);
+> diff --git a/linux-user/main.c b/linux-user/main.c
+> index 6286661bd3..fe81d410da 100644
+> --- a/linux-user/main.c
+> +++ b/linux-user/main.c
+> @@ -4237,7 +4237,7 @@ static int parse_args(int argc, char **argv)
+>       return optind;
+>   }
+>   
+> -int main(int argc, char **argv, char **envp)
+> +int main(int argc, char **argv)
+>   {
+>       struct target_pt_regs regs1, *regs = &regs1;
+>       struct image_info info1, *info = &info1;
+> diff --git a/ui/cocoa.m b/ui/cocoa.m
+> index 330ccebf90..4d18153659 100644
+> --- a/ui/cocoa.m
+> +++ b/ui/cocoa.m
+> @@ -25,7 +25,6 @@
+>   #include "qemu/osdep.h"
+>   
+>   #import <Cocoa/Cocoa.h>
+> -#include <crt_externs.h>
+>   
+>   #include "qemu-common.h"
+>   #include "ui/console.h"
+> @@ -1050,7 +1049,7 @@ QemuCocoaView *cocoaView;
+>       COCOA_DEBUG("QemuCocoaAppController: startEmulationWithArgc\n");
+>   
+>       int status;
+> -    status = qemu_main(argc, argv, *_NSGetEnviron());
+> +    status = qemu_main(argc, argv);
+>       exit(status);
+>   }
+>   
+> @@ -1391,7 +1390,7 @@ int main (int argc, const char * argv[]) {
+>                   !strcmp(opt, "-curses") ||
+>                   !strcmp(opt, "-display") ||
+>                   !strcmp(opt, "-qtest")) {
+> -                return qemu_main(gArgc, gArgv, *_NSGetEnviron());
+> +                return qemu_main(gArgc, gArgv);
+>               }
+>           }
+>       }
+> diff --git a/vl.c b/vl.c
+> index fc8bd9372f..ea17cc34f6 100644
+> --- a/vl.c
+> +++ b/vl.c
+> @@ -35,10 +35,10 @@
+>   #ifdef CONFIG_SDL
+>   #if defined(__APPLE__) || defined(main)
+>   #include <SDL.h>
+> -int qemu_main(int argc, char **argv, char **envp);
+> +int qemu_main(int argc, char **argv);
+>   int main(int argc, char **argv)
+>   {
+> -    return qemu_main(argc, argv, NULL);
+> +    return qemu_main(argc, argv);
+>   }
+>   #undef main
+>   #define main qemu_main
+> @@ -50,7 +50,6 @@ int main(int argc, char **argv)
+>   #define main qemu_main
+>   #endif /* CONFIG_COCOA */
+>   
+> -
+>   #include "qemu/error-report.h"
+>   #include "qemu/sockets.h"
+>   #include "hw/hw.h"
+> @@ -3044,7 +3043,7 @@ static void register_global_properties(MachineState *ms)
+>       user_register_global_props();
+>   }
+>   
+> -int main(int argc, char **argv, char **envp)
+> +int main(int argc, char **argv)
+>   {
+>       int i;
+>       int snapshot, linux_boot;
