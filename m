@@ -1,29 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41173)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43333)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <atar4qemu@gmail.com>) id 1eRClI-0004vY-2b
-	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 02:56:29 -0500
+	(envelope-from <wei.w.wang@intel.com>) id 1eRCmy-0006HD-1X
+	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 02:58:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <atar4qemu@gmail.com>) id 1eRClG-0006gl-Va
-	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 02:56:28 -0500
-Received: from mail-io0-x22d.google.com ([2607:f8b0:4001:c06::22d]:34181)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <atar4qemu@gmail.com>) id 1eRClG-0006gH-P9
-	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 02:56:26 -0500
-Received: by mail-io0-x22d.google.com with SMTP id f18so7572998ioh.1
-	for <qemu-devel@nongnu.org>; Mon, 18 Dec 2017 23:56:26 -0800 (PST)
+	(envelope-from <wei.w.wang@intel.com>) id 1eRCmt-0007nX-Ko
+	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 02:58:12 -0500
+Received: from mga03.intel.com ([134.134.136.65]:57833)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
+	id 1eRCmt-0007lL-9Q
+	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 02:58:07 -0500
+Message-ID: <5A38C70D.30207@intel.com>
+Date: Tue, 19 Dec 2017 16:00:13 +0800
+From: Wei Wang <wei.w.wang@intel.com>
 MIME-Version: 1.0
-In-Reply-To: <bc0ce243-e8aa-9f63-7c7c-68197b201209@ilande.co.uk>
-References: <1510926167-23326-1-git-send-email-mark.cave-ayland@ilande.co.uk>
-	<1510926167-23326-12-git-send-email-mark.cave-ayland@ilande.co.uk>
-	<CACXAS8D7kJ7sk3Z+72-PaUnWwLUK7Xwb1_zHUjQe0BXBaYoKyA@mail.gmail.com>
-	<d1e0a801-f8ce-b726-4ea8-fbb4f11417ea@ilande.co.uk>
-	<bc0ce243-e8aa-9f63-7c7c-68197b201209@ilande.co.uk>
-From: Artyom Tarasenko <atar4qemu@gmail.com>
-Date: Tue, 19 Dec 2017 08:56:05 +0100
-Message-ID: <CACXAS8A1-aEWqw9xoYKY6ebxU3GztBUG2UDVyCrwsVy_kcKWrw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH 11/15] apb: split pci_pbm_map_irq() into
- separate functions for bus A and bus B
+References: <20171215170519.31392-1-stefanha@redhat.com>
+In-Reply-To: <20171215170519.31392-1-stefanha@redhat.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC virtio-dev] vhost-user-slave: add vhost-user
+ slave device type
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,133 +28,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Cc: qemu-devel <qemu-devel@nongnu.org>
+To: Stefan Hajnoczi <stefanha@redhat.com>, virtio-dev@lists.oasis-open.org
+Cc: qemu-devel@nongnu.org, "Michael S . Tsirkin" <mst@redhat.com>, Maxime Coquelin <maxime.coquelin@redhat.com>
 
-On Sun, Dec 17, 2017 at 12:09 PM, Mark Cave-Ayland
-<mark.cave-ayland@ilande.co.uk> wrote:
-> On 19/11/17 11:06, Mark Cave-Ayland wrote:
+On 12/16/2017 01:05 AM, Stefan Hajnoczi wrote:
+> The vhost-user slave device facilitates vhost-user device emulation
+> through vhost-user protocol exchanges and access to shared memory.
+> Software-defined networking, storage, and other I/O appliances can
+> provide services through this device.
 >
->> On 17/11/17 14:33, Artyom Tarasenko wrote:
->>
->>> On Fri, Nov 17, 2017 at 2:42 PM, Mark Cave-Ayland
->>> <mark.cave-ayland@ilande.co.uk> wrote:
->>>>
->>>> After the previous refactoring it is now possible to use separate
->>>> functions
->>>> to improve clarity of the interrupt paths. Similarly by checking the PCI
->>>> devnfn to identify busA during apb_pci_bridge_realize() it becomes
->>>> possible
->>>> to completely remove the busA property from the PBMPCIBridge state.
->>>>
->>>> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
->>>> ---
->>>>   hw/pci-host/apb.c         |   54
->>>> ++++++++++++++++++---------------------------
->>>>   include/hw/pci-host/apb.h |    3 ---
->>>>   2 files changed, 21 insertions(+), 36 deletions(-)
->>>>
->>>> diff --git a/hw/pci-host/apb.c b/hw/pci-host/apb.c
->>>> index 6c20285..268100e 100644
->>>> --- a/hw/pci-host/apb.c
->>>> +++ b/hw/pci-host/apb.c
->>>> @@ -517,32 +517,27 @@ static int pci_apb_map_irq(PCIDevice *pci_dev, int
->>>> irq_num)
->>>>       return irq_num;
->>>>   }
->>>>
->>>> -static int pci_pbm_map_irq(PCIDevice *pci_dev, int irq_num)
->>>> +static int pci_pbmA_map_irq(PCIDevice *pci_dev, int irq_num)
->>>>   {
->>>> -    PBMPCIBridge *br = PBM_PCI_BRIDGE(pci_bridge_get_device(
->>>> -
->>>> PCI_BUS(qdev_get_parent_bus(DEVICE(pci_dev)))));
->>>> -
->>>> -    int bus_offset;
->>>> -    if (br->busA) {
->>>> -        bus_offset = 0x0;
->>>> +    /* The on-board devices have fixed (legacy) OBIO intnos */
->>>> +    switch (PCI_SLOT(pci_dev->devfn)) {
->>>> +    case 1:
->>>> +        /* Onboard NIC */
->>>> +        return 0x21;
->>>> +    case 3:
->>>> +        /* Onboard IDE */
->>>> +        return 0x20;
->>>> +    default:
->>>> +        /* Normal intno, fall through */
->>>> +        break;
->>>> +    }
->>>>
->>>> -        /* The on-board devices have fixed (legacy) OBIO intnos */
->>>> -        switch (PCI_SLOT(pci_dev->devfn)) {
->>>> -        case 1:
->>>> -            /* Onboard NIC */
->>>> -            return 0x21;
->>>> -        case 3:
->>>> -            /* Onboard IDE */
->>>> -            return 0x20;
->>>> +    return ((PCI_SLOT(pci_dev->devfn) << 2) + irq_num) & 0x1f;
->>>> +}
->>>>
->>>> -        default:
->>>> -            /* Normal intno, fall through */
->>>> -            break;
->>>> -        }
->>>> -    } else {
->>>> -        bus_offset = 0x10;
->>>> -    }
->>>> -    return (bus_offset + (PCI_SLOT(pci_dev->devfn) << 2) + irq_num) &
->>>> 0x1f;
->>>> +static int pci_pbmB_map_irq(PCIDevice *pci_dev, int irq_num)
->>>> +{
->>>> +    return (0x10 + (PCI_SLOT(pci_dev->devfn) << 2) + irq_num) & 0x1f;
->>>>   }
->>>>
->>>>   static void pci_apb_set_irq(void *opaque, int irq_num, int level)
->>>> @@ -593,7 +588,7 @@ static void apb_pci_bridge_realize(PCIDevice *dev,
->>>> Error **errp)
->>>>
->>>>       /* If initialising busA, ensure that we allow IO transactions so
->>>> that
->>>>          we get the early serial console until OpenBIOS configures the
->>>> bridge */
->>>> -    if (br->busA) {
->>>> +    if (dev->devfn == PCI_DEVFN(1, 1)) {
->>>
->>>
->>> I think the previous syntax was more explicit here. A comment would be
->>> nice.
->>
->>
->> Yes it's definitely something that isn't immediately obvious, which is
->> why I left the above comment in place explaining what the if() branch is
->> doing. Is there something in the comment that isn't particularly clear?
->>
->> Note one of the reasons for wanting to remove the busA property is that
->> where possible I'd like to reduce the code in the IRQ path, and while
->> the existing code works I am still unsure of the additional overhead of
->> the 2 levels of QOM type checking that the current approach requires for
->> each IRQ.
+> This device is based on Wei Wang's vhost-pci work.  The vhost-user slave
+> device differs from vhost-pci because it is a single virtio device type
+> that exposes the vhost-user protocol instead of a family of new virtio
+> device types, one for each vhost-user device type.
 >
+> This device supports vhost-user slave and vhost-user master
+> reconnection.  It also contains a UUID so that vhost-user slave programs
+> can identify a specific device among many without using bus addresses.
 >
-> Hi Artyom,
->
-> Thinking about this a bit more during freeze, this is actually doing the
-> opposite of what we want, as it requires the device realise function to
-> behave differently depending upon how it is related to the PCI bus.
->
-> How about swapping this out for a qdev bool property for APB named
-> "enable-early-pci-io-access", setting it just for the PCI_DEVFN(1, 1) device
-> containing the ebus and then alter the if() statement above to enable PCI IO
-> access if the qdev property is set?
+> It is somewhat unconventional for a virtio device because it makes use
+> of additional resources called doorbells, notifications, and shared
+> memory.  A mapping of these resources to the virtio PCI transport is
+> provided.  Other transports, such as CCW may not be able to support
+> this device.
 
-This does sound reasonable. I wonder if this has to be a qdev property though.
-Doesn't the physical bridge have a software visible bit/register for it?
+Hi Stefan,
 
+Sorry for being late. I need to shift my focus to some other things for 
+a week or two.
 
--- 
-Regards,
-Artyom Tarasenko
+I still couldn't see how those problems can be solved with this slave 
+device proposal (which vhost-pci doesn't have):
 
-SPARC and PPC PReP under qemu blog: http://tyom.blogspot.com/search/label/qemu
+- The complexity of the "relaying" mechanism for two directions 
+(GuestSlave<->QemuSlave<->Master). I couldn't think of a simple way to 
+do this. If you know a *simple* way, could you please describe the 
+detailed steps or show a picture of the details? (I think most of us 
+couldn't see the true advantage over the vhost-pci's method)
+
+- Reusability. We seem to have no chance to reuse one slave 
+implementation for GuestSlave and QemuSlave, which also wasn't your 
+intention as you mentioned. If this couldn't be solved, shall we give up 
+this option?
+
+Best,
+Wei
