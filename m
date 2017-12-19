@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33585)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37028)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1eRKVP-0007tQ-13
-	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 11:12:35 -0500
+	(envelope-from <rjones@redhat.com>) id 1eRKYY-000186-UW
+	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 11:15:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1eRKVL-0007Tf-CP
-	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 11:12:35 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:42186)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1eRKVL-0007Sm-6g
-	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 11:12:31 -0500
-Date: Tue, 19 Dec 2017 18:12:26 +0200
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20171219181158-mutt-send-email-mst@kernel.org>
-References: <20171217125457.3429-1-marcel@redhat.com>
-	<20171217125457.3429-5-marcel@redhat.com>
+	(envelope-from <rjones@redhat.com>) id 1eRKYX-0002SG-SD
+	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 11:15:50 -0500
+Date: Tue, 19 Dec 2017 16:15:35 +0000
+From: "Richard W.M. Jones" <rjones@redhat.com>
+Message-ID: <20171219161535.GW2787@redhat.com>
+References: <20171115162648.30135-1-ptoscano@redhat.com>
+	<16ae9efe-78df-2e59-39db-1570deba2847@redhat.com>
+	<20171218213140.GT2787@redhat.com>
+	<20171219152418.GB20944@localhost.localdomain>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20171217125457.3429-5-marcel@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH V2 4/5] pvrdma: initial implementation
+In-Reply-To: <20171219152418.GB20944@localhost.localdomain>
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v3] ssh: switch from libssh2
+ to libssh
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,29 +26,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Marcel Apfelbaum <marcel@redhat.com>
-Cc: qemu-devel@nongnu.org, ehabkost@redhat.com, imammedo@redhat.com, yuval.shaia@oracle.com, pbonzini@redhat.com
+To: Jeff Cody <jcody@redhat.com>
+Cc: John Snow <jsnow@redhat.com>, kwolf@redhat.com, qemu-block@nongnu.org, qemu-devel@nongnu.org, mreitz@redhat.com, Pino Toscano <ptoscano@redhat.com>, asn@redhat.com
 
-On Sun, Dec 17, 2017 at 02:54:56PM +0200, Marcel Apfelbaum wrote:
-> @@ -2847,15 +2847,16 @@ if test "$rdma" != "no" ; then
->  #include <rdma/rdma_cma.h>
->  int main(void) { return 0; }
->  EOF
-> -  rdma_libs="-lrdmacm -libverbs"
-> +  rdma_libs="-lrdmacm -libverbs -libumad"
->    if compile_prog "" "$rdma_libs" ; then
->      rdma="yes"
->    else
-> +    libs_softmmu="$libs_softmmu $rdma_libs"
->      if test "$rdma" = "yes" ; then
->          error_exit \
-> -            " OpenFabrics librdmacm/libibverbs not present." \
-> +            " OpenFabrics librdmacm/libibverbs/libibumad not present." \
->              " Your options:" \
-> -            "  (1) Fast: Install infiniband packages from your distro." \
-> +	    "  (1) Fast: Install infiniband packages (devel) from your distro." \
->              "  (2) Cleanest: Install libraries from www.openfabrics.org" \
->              "  (3) Also: Install softiwarp if you don't have RDMA hardware"
->      fi
+On Tue, Dec 19, 2017 at 10:24:18AM -0500, Jeff Cody wrote:
+> On Mon, Dec 18, 2017 at 09:31:40PM +0000, Richard W.M. Jones wrote:
+> > On Mon, Dec 18, 2017 at 01:43:39PM -0500, John Snow wrote:
+> > > Hi, friendly ping:
+> > > 
+> > > It's been over a month with no replies, so it's safe to say this has
+> > > gotten lost in the 2.11 release shuffle.
+> > > 
+> > > Recommend you re-send it for the 2.12 window.
+> > 
+> > Actually there is an interop problem with the ssh daemon on ESXi which
+> > I've not resolved yet.  Unfortunately there was no response to my
+> > upstream message about collecting debugging info:
+> > 
+> > https://www.libssh.org/archive/libssh/2017-12/0000000.html
+> > 
+> > Since liberating guests from VMware is a prime reason to have an ssh
+> > driver in qemu, I'd really like this to be fixed first ...
+> > 
+> > Rich.
+> 
+> I also sent a review, and found an issue with at least libssh 0.7-4 (not
+> getting EOF on short reads).
 
-Some whitespace damage here.
+Thanks, yes, I read that after I sent the email, so I'd like to
+test again once that bug has been fixed.
+
+Rich.
+
+-- 
+Richard Jones, Virtualization Group, Red Hat http://people.redhat.com/~rjones
+Read my programming and virtualization blog: http://rwmj.wordpress.com
+Fedora Windows cross-compiler. Compile Windows programs, test, and
+build Windows installers. Over 100 libraries supported.
+http://fedoraproject.org/wiki/MinGW
