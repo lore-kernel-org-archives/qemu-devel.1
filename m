@@ -1,25 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47123)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47189)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <michael@rivendell.weiser.dinsnail.net>)
-	id 1eROMc-0002FI-Hh
-	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 15:19:47 -0500
+	id 1eROMj-0002Ih-Vj
+	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 15:19:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <michael@rivendell.weiser.dinsnail.net>)
-	id 1eROMb-00005Q-OG
-	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 15:19:46 -0500
+	id 1eROMj-0000DF-29
+	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 15:19:53 -0500
 Received: from heinz.dinsnail.net
-	([2a01:238:43b4:3200:9392:5dcc:2f0e:a960]:47118)
+	([2a01:238:43b4:3200:9392:5dcc:2f0e:a960]:47126)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <michael@rivendell.weiser.dinsnail.net>)
-	id 1eROMb-0008W9-De
-	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 15:19:45 -0500
+	id 1eROMi-0000Bm-MX
+	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 15:19:52 -0500
 From: Michael Weiser <michael.weiser@gmx.de>
-Date: Tue, 19 Dec 2017 21:16:10 +0100
-Message-Id: <20171219201613.7399-3-michael.weiser@gmx.de>
-In-Reply-To: <20171219201613.7399-1-michael.weiser@gmx.de>
-References: <20171219201613.7399-1-michael.weiser@gmx.de>
-Subject: [Qemu-devel] [PATCH v2 2/5] linux-user: Add separate aarch64_be
- uname
+Date: Tue, 19 Dec 2017 21:16:08 +0100
+Message-Id: <20171219201613.7399-1-michael.weiser@gmx.de>
+Subject: [Qemu-devel] [PATCH v2 0/5] Add aarch64_be-linux-user target
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,29 +28,42 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Michael Weiser <michael.weiser@gmx.de>, Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>
 
-Make big-endian aarch64 systems identify as aarch64_be as expected by
-big-endian userland and toolchains.
+Hello,
 
-Signed-off-by: Michael Weiser <michael.weiser@gmx.de>
----
- linux-user/aarch64/target_syscall.h | 4 ++++
- 1 file changed, 4 insertions(+)
+below patches add support for big-endian aarch64 to linux-user. Almost
+everything is already in place. The patches just set up the CPU flags as
+required for big-endianess, add a distinction in uname and make sure the
+instructions for the signal trampoline end up in memory little-endian.
+Finally, configure is extended to allow building of a
+aarch64_be-linux-user target and scripts/qemu-binfmt-conf.sh to include
+the binfmt magic for aarch64_be ELF files.
 
-diff --git a/linux-user/aarch64/target_syscall.h b/linux-user/aarch64/target_syscall.h
-index 1b62953eeb..604ab99b14 100644
---- a/linux-user/aarch64/target_syscall.h
-+++ b/linux-user/aarch64/target_syscall.h
-@@ -8,7 +8,11 @@ struct target_pt_regs {
-     uint64_t        pstate;
- };
- 
-+#if defined(TARGET_WORDS_BIGENDIAN)
-+#define UNAME_MACHINE "aarch64_be"
-+#else
- #define UNAME_MACHINE "aarch64"
-+#endif
- #define UNAME_MINIMUM_RELEASE "3.8.0"
- #define TARGET_CLONE_BACKWARDS
- #define TARGET_MINSIGSTKSZ       2048
+With this I am able to run individual aarch64_be binaries as well as
+chroot into a full-blown aarch64_be userland using binfmt_misc, running
+and compiling things (Gentoo crossdev/native).
+
+v2:
+- add binfmt magic to qemu-binfmt-conf.sh
+- fix style problems (tab indenting)
+
+Thanks,
+Michael
+
+Michael Weiser (5):
+  linux-user: Add support for big-endian aarch64
+  linux-user: Add separate aarch64_be uname
+  linux-user: Fix endianess of aarch64 signal trampoline
+  configure: Add aarch64_be-linux-user target
+  linux-user: Add aarch64_be magic numbers to qemu-binfmt-conf.sh
+
+ configure                                 |  9 +++++----
+ default-configs/aarch64_be-linux-user.mak |  1 +
+ linux-user/aarch64/target_syscall.h       |  4 ++++
+ linux-user/main.c                         |  6 ++++++
+ linux-user/signal.c                       | 10 +++++++---
+ scripts/qemu-binfmt-conf.sh               |  6 +++++-
+ 6 files changed, 28 insertions(+), 8 deletions(-)
+ create mode 100644 default-configs/aarch64_be-linux-user.mak
+
 -- 
 2.15.1
