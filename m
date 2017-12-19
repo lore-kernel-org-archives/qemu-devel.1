@@ -1,22 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47189)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47259)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <michael@rivendell.weiser.dinsnail.net>)
-	id 1eROMj-0002Ih-Vj
-	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 15:19:54 -0500
+	id 1eROMo-0002Mn-NE
+	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 15:19:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <michael@rivendell.weiser.dinsnail.net>)
-	id 1eROMj-0000DF-29
-	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 15:19:53 -0500
+	id 1eROMn-0000Ic-Pn
+	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 15:19:58 -0500
 Received: from heinz.dinsnail.net
-	([2a01:238:43b4:3200:9392:5dcc:2f0e:a960]:47126)
+	([2a01:238:43b4:3200:9392:5dcc:2f0e:a960]:47136)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <michael@rivendell.weiser.dinsnail.net>)
-	id 1eROMi-0000Bm-MX
-	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 15:19:52 -0500
+	id 1eROMn-0000Gy-I5
+	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 15:19:57 -0500
 From: Michael Weiser <michael.weiser@gmx.de>
-Date: Tue, 19 Dec 2017 21:16:08 +0100
-Message-Id: <20171219201613.7399-1-michael.weiser@gmx.de>
-Subject: [Qemu-devel] [PATCH v2 0/5] Add aarch64_be-linux-user target
+Date: Tue, 19 Dec 2017 21:16:13 +0100
+Message-Id: <20171219201613.7399-6-michael.weiser@gmx.de>
+In-Reply-To: <20171219201613.7399-1-michael.weiser@gmx.de>
+References: <20171219201613.7399-1-michael.weiser@gmx.de>
+Subject: [Qemu-devel] [PATCH v2 5/5] linux-user: Add aarch64_be magic
+ numbers to qemu-binfmt-conf.sh
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,42 +31,37 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Michael Weiser <michael.weiser@gmx.de>, Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>
 
-Hello,
+As we now have a linux-user aarch64_be target, we can add it to the list
+of supported targets in qemu-binfmt-conf.sh
 
-below patches add support for big-endian aarch64 to linux-user. Almost
-everything is already in place. The patches just set up the CPU flags as
-required for big-endianess, add a distinction in uname and make sure the
-instructions for the signal trampoline end up in memory little-endian.
-Finally, configure is extended to allow building of a
-aarch64_be-linux-user target and scripts/qemu-binfmt-conf.sh to include
-the binfmt magic for aarch64_be ELF files.
+Signed-off-by: Michael Weiser <michael.weiser@gmx.de>
+---
+ scripts/qemu-binfmt-conf.sh | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
 
-With this I am able to run individual aarch64_be binaries as well as
-chroot into a full-blown aarch64_be userland using binfmt_misc, running
-and compiling things (Gentoo crossdev/native).
-
-v2:
-- add binfmt magic to qemu-binfmt-conf.sh
-- fix style problems (tab indenting)
-
-Thanks,
-Michael
-
-Michael Weiser (5):
-  linux-user: Add support for big-endian aarch64
-  linux-user: Add separate aarch64_be uname
-  linux-user: Fix endianess of aarch64 signal trampoline
-  configure: Add aarch64_be-linux-user target
-  linux-user: Add aarch64_be magic numbers to qemu-binfmt-conf.sh
-
- configure                                 |  9 +++++----
- default-configs/aarch64_be-linux-user.mak |  1 +
- linux-user/aarch64/target_syscall.h       |  4 ++++
- linux-user/main.c                         |  6 ++++++
- linux-user/signal.c                       | 10 +++++++---
- scripts/qemu-binfmt-conf.sh               |  6 +++++-
- 6 files changed, 28 insertions(+), 8 deletions(-)
- create mode 100644 default-configs/aarch64_be-linux-user.mak
-
+diff --git a/scripts/qemu-binfmt-conf.sh b/scripts/qemu-binfmt-conf.sh
+index 8afc3eb5bb..d69953525c 100755
+--- a/scripts/qemu-binfmt-conf.sh
++++ b/scripts/qemu-binfmt-conf.sh
+@@ -4,7 +4,7 @@
+ 
+ qemu_target_list="i386 i486 alpha arm sparc32plus ppc ppc64 ppc64le m68k \
+ mips mipsel mipsn32 mipsn32el mips64 mips64el \
+-sh4 sh4eb s390x aarch64 hppa"
++sh4 sh4eb s390x aarch64 aarch64_be hppa"
+ 
+ i386_magic='\x7fELF\x01\x01\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02\x00\x03\x00'
+ i386_mask='\xff\xff\xff\xff\xff\xfe\xfe\xff\xff\xff\xff\xff\xff\xff\xff\xff\xfe\xff\xff\xff'
+@@ -92,6 +92,10 @@ aarch64_magic='\x7fELF\x02\x01\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02\x00\x
+ aarch64_mask='\xff\xff\xff\xff\xff\xff\xff\x00\xff\xff\xff\xff\xff\xff\xff\xff\xfe\xff\xff\xff'
+ aarch64_family=arm
+ 
++aarch64_be_magic='\x7fELF\x02\x02\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02\x00\xb7'
++aarch64_be_mask='\xff\xff\xff\xff\xff\xff\xff\x00\xff\xff\xff\xff\xff\xff\xff\xff\xff\xfe\xff\xff'
++aarch64_be_family=arm
++
+ hppa_magic='\x7f\x45\x4c\x46\x01\x02\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02\x00\x0f'
+ hppa_mask='\xff\xff\xff\xff\xff\xff\xff\x00\xff\xff\xff\xff\xff\xff\xff\xff\xff\xfe\xff\xff'
+ hppa_family=hppa
 -- 
 2.15.1
