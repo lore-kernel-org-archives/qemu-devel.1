@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56992)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57047)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1eRJYi-0003zB-GN
-	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 10:11:57 -0500
+	(envelope-from <stefanha@redhat.com>) id 1eRJYk-00040S-R6
+	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 10:12:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1eRJYc-0006Ml-KO
-	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 10:11:56 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:33688)
+	(envelope-from <stefanha@redhat.com>) id 1eRJYj-0006Qj-Il
+	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 10:11:58 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:35542)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1eRJYc-0006MT-BH
-	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 10:11:50 -0500
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1eRJYj-0006Pn-2b
+	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 10:11:57 -0500
 From: Stefan Hajnoczi <stefanha@redhat.com>
-Date: Tue, 19 Dec 2017 15:11:21 +0000
-Message-Id: <20171219151144.11120-1-stefanha@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL v2 00/23] Block patches
+Date: Tue, 19 Dec 2017 15:11:22 +0000
+Message-Id: <20171219151144.11120-2-stefanha@redhat.com>
+In-Reply-To: <20171219151144.11120-1-stefanha@redhat.com>
+References: <20171219151144.11120-1-stefanha@redhat.com>
+Subject: [Qemu-devel] [PULL v2 01/23] coroutine: simplify co_aio_sleep_ns()
+ prototype
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,102 +27,91 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Peter Maydell <peter.maydell@linaro.org>, Stefan Hajnoczi <stefanha@redhat.com>
 
-The following changes since commit eaefea537b476cb853e2edbdc68e969ec777e4=
-bb:
+The AioContext pointer argument to co_aio_sleep_ns() is only used for
+the sleep timer.  It does not affect where the caller coroutine is
+resumed.
 
-  Merge remote-tracking branch 'remotes/mjt/tags/trivial-patches-fetch' i=
-nto staging (2017-12-18 14:17:42 +0000)
+Due to changes to coroutine and AIO APIs it is now possible to drop the
+AioContext pointer argument.  This is safe to do since no caller has
+specific requirements for which AioContext the timer must run in.
 
-are available in the Git repository at:
+This patch drops the AioContext pointer argument and renames the
+function to simplify the API.
 
-  git://github.com/stefanha/qemu.git tags/block-pull-request
+Reported-by: Paolo Bonzini <pbonzini@redhat.com>
+Reported-by: Eric Blake <eblake@redhat.com>
+Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+Message-id: 20171109102652.6360-1-stefanha@redhat.com
+Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+---
+ include/qemu/coroutine.h    | 6 +-----
+ block/null.c                | 3 +--
+ block/sheepdog.c            | 3 +--
+ util/qemu-coroutine-sleep.c | 4 ++--
+ 4 files changed, 5 insertions(+), 11 deletions(-)
 
-for you to fetch changes up to 7a9dda0d7f9831c2432620dcfefdadbb7ae888dc:
-
-  qemu-iotests: add 203 savevm with IOThreads test (2017-12-19 10:25:09 +=
-0000)
-
-----------------------------------------------------------------
-Pull request
-
-v2:
- * Fixed incorrect virtio_blk_data_plane_create() local_err refactoring i=
-n
-   "hw/block: Use errp directly rather than local_err" that broke virtio-=
-blk
-   over virtio-mmio [Peter]
-
-----------------------------------------------------------------
-
-Mao Zhongyi (4):
-  hw/block/nvme: Convert to realize
-  hw/block: Fix the return type
-  hw/block: Use errp directly rather than local_err
-  dev-storage: Fix the unusual function name
-
-Mark Kanda (2):
-  virtio-blk: make queue size configurable
-  virtio-blk: reject configs with logical block size > physical block
-    size
-
-Paolo Bonzini (1):
-  block: avoid recursive AioContext acquire in bdrv_inactivate_all()
-
-Stefan Hajnoczi (16):
-  coroutine: simplify co_aio_sleep_ns() prototype
-  qdev: drop unused #include "sysemu/iothread.h"
-  blockdev: hold AioContext for bdrv_unref() in
-    external_snapshot_clean()
-  block: don't keep AioContext acquired after
-    external_snapshot_prepare()
-  block: don't keep AioContext acquired after drive_backup_prepare()
-  block: don't keep AioContext acquired after blockdev_backup_prepare()
-  block: don't keep AioContext acquired after
-    internal_snapshot_prepare()
-  block: drop unused BlockDirtyBitmapState->aio_context field
-  iothread: add iothread_by_id() API
-  blockdev: add x-blockdev-set-iothread testing command
-  qemu-iotests: add 202 external snapshots IOThread test
-  docs: mark nested AioContext locking as a legacy API
-  blockdev: add x-blockdev-set-iothread force boolean
-  iotests: add VM.add_object()
-  iothread: fix iothread_stop() race condition
-  qemu-iotests: add 203 savevm with IOThreads test
-
- docs/devel/multiple-iothreads.txt |   7 +-
- qapi/block-core.json              |  40 ++++++
- hw/block/dataplane/virtio-blk.h   |   2 +-
- include/hw/block/block.h          |   4 +-
- include/hw/virtio/virtio-blk.h    |   1 +
- include/qemu/coroutine.h          |   6 +-
- include/sysemu/iothread.h         |   4 +-
- block.c                           |  14 ++-
- block/null.c                      |   3 +-
- block/sheepdog.c                  |   3 +-
- blockdev.c                        | 259 +++++++++++++++++++++++++++-----=
-------
- hw/block/block.c                  |  15 ++-
- hw/block/dataplane/virtio-blk.c   |  12 +-
- hw/block/fdc.c                    |  17 +--
- hw/block/nvme.c                   |  23 ++--
- hw/block/virtio-blk.c             |  30 +++--
- hw/core/qdev-properties-system.c  |   1 -
- hw/ide/qdev.c                     |  12 +-
- hw/scsi/scsi-disk.c               |  13 +-
- hw/usb/dev-storage.c              |  29 ++---
- iothread.c                        |  27 +++-
- util/qemu-coroutine-sleep.c       |   4 +-
- tests/qemu-iotests/202            |  95 ++++++++++++++
- tests/qemu-iotests/202.out        |  11 ++
- tests/qemu-iotests/203            |  59 +++++++++
- tests/qemu-iotests/203.out        |   6 +
- tests/qemu-iotests/group          |   2 +
- tests/qemu-iotests/iotests.py     |   5 +
- 28 files changed, 531 insertions(+), 173 deletions(-)
- create mode 100755 tests/qemu-iotests/202
- create mode 100644 tests/qemu-iotests/202.out
- create mode 100755 tests/qemu-iotests/203
- create mode 100644 tests/qemu-iotests/203.out
-
---=20
+diff --git a/include/qemu/coroutine.h b/include/qemu/coroutine.h
+index 9aff9a735e..ce2eb73670 100644
+--- a/include/qemu/coroutine.h
++++ b/include/qemu/coroutine.h
+@@ -261,12 +261,8 @@ void qemu_co_rwlock_unlock(CoRwlock *lock);
+ 
+ /**
+  * Yield the coroutine for a given duration
+- *
+- * Behaves similarly to co_sleep_ns(), but the sleeping coroutine will be
+- * resumed when using aio_poll().
+  */
+-void coroutine_fn co_aio_sleep_ns(AioContext *ctx, QEMUClockType type,
+-                                  int64_t ns);
++void coroutine_fn qemu_co_sleep_ns(QEMUClockType type, int64_t ns);
+ 
+ /**
+  * Yield until a file descriptor becomes readable
+diff --git a/block/null.c b/block/null.c
+index dd9c13f9ba..0cdabaa440 100644
+--- a/block/null.c
++++ b/block/null.c
+@@ -110,8 +110,7 @@ static coroutine_fn int null_co_common(BlockDriverState *bs)
+     BDRVNullState *s = bs->opaque;
+ 
+     if (s->latency_ns) {
+-        co_aio_sleep_ns(bdrv_get_aio_context(bs), QEMU_CLOCK_REALTIME,
+-                        s->latency_ns);
++        qemu_co_sleep_ns(QEMU_CLOCK_REALTIME, s->latency_ns);
+     }
+     return 0;
+ }
+diff --git a/block/sheepdog.c b/block/sheepdog.c
+index 696a71442a..a1edb992ff 100644
+--- a/block/sheepdog.c
++++ b/block/sheepdog.c
+@@ -776,8 +776,7 @@ static coroutine_fn void reconnect_to_sdog(void *opaque)
+         if (s->fd < 0) {
+             DPRINTF("Wait for connection to be established\n");
+             error_report_err(local_err);
+-            co_aio_sleep_ns(bdrv_get_aio_context(s->bs), QEMU_CLOCK_REALTIME,
+-                            1000000000ULL);
++            qemu_co_sleep_ns(QEMU_CLOCK_REALTIME, 1000000000ULL);
+         }
+     };
+ 
+diff --git a/util/qemu-coroutine-sleep.c b/util/qemu-coroutine-sleep.c
+index 254349cdbb..afb678fbe5 100644
+--- a/util/qemu-coroutine-sleep.c
++++ b/util/qemu-coroutine-sleep.c
+@@ -31,9 +31,9 @@ static void co_sleep_cb(void *opaque)
+     aio_co_wake(sleep_cb->co);
+ }
+ 
+-void coroutine_fn co_aio_sleep_ns(AioContext *ctx, QEMUClockType type,
+-                                  int64_t ns)
++void coroutine_fn qemu_co_sleep_ns(QEMUClockType type, int64_t ns)
+ {
++    AioContext *ctx = qemu_get_current_aio_context();
+     CoSleepCB sleep_cb = {
+         .co = qemu_coroutine_self(),
+     };
+-- 
 2.14.3
