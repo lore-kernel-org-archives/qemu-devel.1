@@ -1,25 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48464)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48576)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1eRFAI-00033h-Nt
-	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 05:30:28 -0500
+	(envelope-from <david@redhat.com>) id 1eRFAO-00038E-Fq
+	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 05:30:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1eRFAD-0005XT-HP
-	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 05:30:26 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:32862)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1eRFAD-0005VA-7I
-	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 05:30:21 -0500
-Date: Tue, 19 Dec 2017 10:30:11 +0000
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20171219103011.GB32479@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <20171219002105.Horde.McUB5OjQ4CcwjyzfFEIWM2V@www.quantumachine.net>
+	(envelope-from <david@redhat.com>) id 1eRFAN-0005ns-Ko
+	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 05:30:32 -0500
+References: <20171219082807.84494-1-borntraeger@de.ibm.com>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <a320cbd7-1791-088d-7236-adce69b6089d@redhat.com>
+Date: Tue, 19 Dec 2017 11:30:25 +0100
 MIME-Version: 1.0
+In-Reply-To: <20171219082807.84494-1-borntraeger@de.ibm.com>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20171219002105.Horde.McUB5OjQ4CcwjyzfFEIWM2V@www.quantumachine.net>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] sockets: Fix test for DragonFly BSD
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] s390x/sclp: fixup highest CPU address
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,105 +23,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Antonio Huete =?utf-8?Q?Jim=C3=A9nez?= <tuxillo@quantumachine.net>
-Cc: qemu-devel@nongnu.org, kraxel@redhat.com, pbonzini@redhat.com
+To: Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cohuck@redhat.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, qemu-s390x <qemu-s390x@nongnu.org>, Halil Pasic <pasic@linux.vnet.ibm.com>, Alexander Graf <agraf@suse.de>, Thomas Huth <thuth@redhat.com>, Richard Henderson <rth@twiddle.net>, "Jason J . Herne" <jjherne@linux.vnet.ibm.com>
 
-On Tue, Dec 19, 2017 at 12:21:05AM +0000, Antonio Huete Jim=C3=A9nez wrot=
-e:
-> From f57cdc7ec2d5a5e906fa8b795eeede2d7b66aa56 Mon Sep 17 00:00:00 2001
-> From: Antonio Huete Jimenez <tuxillo@quantumachine.net>
-> Date: Fri, 15 Dec 2017 01:08:10 +0100
-> Subject: [PATCH] sockets: Fix test for DragonFly BSD
->=20
-> DragonFly BSD does not implement AI_V4MAPPED for its getaddrinfo() so
-> probe and discard that flag instead of aborting the test.
->=20
-> Test that fails:
->     ERROR:tests/test-char.c:448:char_udp_test_internal: 'chr' should no=
-t be
-> NULL
->=20
-> Signed-off-by: Antonio Huete Jimenez <tuxillo@quantumachine.net>
+On 19.12.2017 09:28, Christian Borntraeger wrote:
+> the highest cpu address is not the same as max_cpus. max_cpus
+> counts from 1 while the cpu address starts at 0.
+> 
+> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
+> Reviewed-by: Jason J. Herne <jjherne@linux.vnet.ibm.com>
 > ---
->  util/qemu-sockets.c | 25 ++++++++++++++++++++++---
->  1 file changed, 22 insertions(+), 3 deletions(-)
->=20
-> diff --git a/util/qemu-sockets.c b/util/qemu-sockets.c
-> index af4f01211a..5a9c55c303 100644
-> --- a/util/qemu-sockets.c
-> +++ b/util/qemu-sockets.c
-> @@ -43,6 +43,8 @@
->  # define AI_NUMERICSERV 0
->  #endif
->=20
-> +int useV4Mapped =3D 1;
-> +
->=20
->  static int inet_getport(struct addrinfo *e)
->  {
-> @@ -383,7 +385,6 @@ static struct addrinfo
-> *inet_parse_connect_saddr(InetSocketAddress *saddr,
->      struct addrinfo ai, *res;
->      int rc;
->      Error *err =3D NULL;
-> -    static int useV4Mapped =3D 1;
->=20
->      memset(&ai, 0, sizeof(ai));
->=20
-> @@ -474,7 +475,11 @@ static int inet_dgram_saddr(InetSocketAddress *sra=
-ddr,
->=20
->      /* lookup peer addr */
->      memset(&ai,0, sizeof(ai));
-> -    ai.ai_flags =3D AI_CANONNAME | AI_V4MAPPED | AI_ADDRCONFIG;
-> +    ai.ai_flags =3D AI_CANONNAME | AI_ADDRCONFIG;
-> +    if (atomic_read(&useV4Mapped)) {
-> +        ai.ai_flags |=3D AI_V4MAPPED;
-> +    }
-> +
->      ai.ai_family =3D inet_ai_family_from_address(sraddr, &err);
->      ai.ai_socktype =3D SOCK_DGRAM;
->=20
-> @@ -493,7 +498,21 @@ static int inet_dgram_saddr(InetSocketAddress *sra=
-ddr,
->          goto err;
->      }
->=20
-> -    if ((rc =3D getaddrinfo(addr, port, &ai, &peer)) !=3D 0) {
-> +    /* lookup */
-> +    rc =3D getaddrinfo(addr, port, &ai, &peer);
-> +
-> +    /* At least FreeBSD and OS-X 10.6 declare AI_V4MAPPED but
-> +     * then don't implement it in their getaddrinfo(). Detect
-> +     * this and retry without the flag since that's preferrable
-> +     * to a fatal error
-> +     */
-> +    if (rc =3D=3D EAI_BADFLAGS &&
-> +        (ai.ai_flags & AI_V4MAPPED)) {
-> +        atomic_set(&useV4Mapped, 0);
-> +        ai.ai_flags &=3D ~AI_V4MAPPED;
-> +        rc =3D getaddrinfo(addr, port, &ai, &peer);
-> +    }
+>  hw/s390x/sclp.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/hw/s390x/sclp.c b/hw/s390x/sclp.c
+> index 9be0cb80ad..21351ffffc 100644
+> --- a/hw/s390x/sclp.c
+> +++ b/hw/s390x/sclp.c
+> @@ -67,7 +67,7 @@ static void read_SCP_info(SCLPDevice *sclp, SCCB *sccb)
+>      prepare_cpu_entries(sclp, read_info->entries, &cpu_count);
+>      read_info->entries_cpu = cpu_to_be16(cpu_count);
+>      read_info->offset_cpu = cpu_to_be16(offsetof(ReadInfo, entries));
+> -    read_info->highest_cpu = cpu_to_be16(max_cpus);
+> +    read_info->highest_cpu = cpu_to_be16(max_cpus - 1);
+>  
+>      read_info->ibc_val = cpu_to_be32(s390_get_ibc_val());
+>  
+> 
 
-Rather than duplicating this repeated calls to getaddrinfo in multiple
-methods, I think it would be better to define a wrapper method. ie
-create a  'qemu_getaddrinfo()' method in this file that does the magic
-re-try without AI_V4MAPPED. Export it in include/qemu/sockets.h too.
+Reviewed-by: David Hildenbrand <david@redhat.com>
 
-Then call that from all places in QEMU that currently use getaddrinfo()
-directly - there are 5 in this file, another in io/dns-resolver.c,
-and some more in net/ & test/. That way we are't going to mistakely
-reintroduce the bug in other places later.
+-- 
 
-We should probably also move the #ifdef AI_*   code into qemu/sockets.h
-too, so we can remove the duplication in test suites.=20
+Thanks,
 
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+David / dhildenb
