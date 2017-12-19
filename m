@@ -1,26 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48496)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51322)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pombredanne@nexb.com>) id 1eRKIA-0000h1-F7
-	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 10:58:55 -0500
+	(envelope-from <cohuck@redhat.com>) id 1eRKKx-00029J-Vh
+	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 11:01:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pombredanne@nexb.com>) id 1eRKI9-000483-Ib
-	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 10:58:54 -0500
-Received: from mail-wm0-x241.google.com ([2a00:1450:400c:c09::241]:35313)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <pombredanne@nexb.com>)
-	id 1eRKI9-00047e-A7
-	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 10:58:53 -0500
-Received: by mail-wm0-x241.google.com with SMTP id f9so4666772wmh.0
-	for <qemu-devel@nongnu.org>; Tue, 19 Dec 2017 07:58:52 -0800 (PST)
+	(envelope-from <cohuck@redhat.com>) id 1eRKKt-0007V9-JY
+	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 11:01:48 -0500
+Date: Tue, 19 Dec 2017 17:01:36 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20171219170136.239cd55b.cohuck@redhat.com>
+In-Reply-To: <20171219082807.84494-1-borntraeger@de.ibm.com>
+References: <20171219082807.84494-1-borntraeger@de.ibm.com>
 MIME-Version: 1.0
-In-Reply-To: <1513685879-21823-2-git-send-email-wei.w.wang@intel.com>
-References: <1513685879-21823-1-git-send-email-wei.w.wang@intel.com>
-	<1513685879-21823-2-git-send-email-wei.w.wang@intel.com>
-From: Philippe Ombredanne <pombredanne@nexb.com>
-Date: Tue, 19 Dec 2017 16:58:10 +0100
-Message-ID: <CAOFm3uHJF1X93iALES6njXrkpsk5bSsuXqcKQMWP4HGT0S8qeg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v20 1/7] xbitmap: Introduce xbitmap
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] s390x/sclp: fixup highest CPU address
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,51 +22,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: mawilcox@microsoft.com
-Cc: virtio-dev@lists.oasis-open.org, LKML <linux-kernel@vger.kernel.org>, qemu-devel@nongnu.org, virtualization@lists.linux-foundation.org, kvm@vger.kernel.org, linux-mm@kvack.org, mst@redhat.com, mhocko@kernel.org, Andrew Morton <akpm@linux-foundation.org>, david@redhat.com, penguin-kernel@i-love.sakura.ne.jp, cornelia.huck@de.ibm.com, mgorman@techsingularity.net, aarcange@redhat.com, amit.shah@redhat.com, Paolo Bonzini <pbonzini@redhat.com>, willy@infradead.org, liliang.opensource@gmail.com, yang.zhang.wz@gmail.com, quan.xu0@gmail.com, nilal@redhat.com, riel@redhat.com
+To: Christian Borntraeger <borntraeger@de.ibm.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, qemu-s390x <qemu-s390x@nongnu.org>, Halil Pasic <pasic@linux.vnet.ibm.com>, Alexander Graf <agraf@suse.de>, Thomas Huth <thuth@redhat.com>, David Hildenbrand <david@redhat.com>, Richard Henderson <rth@twiddle.net>, "Jason J . Herne" <jjherne@linux.vnet.ibm.com>
 
-Matthew,
+On Tue, 19 Dec 2017 09:28:07 +0100
+Christian Borntraeger <borntraeger@de.ibm.com> wrote:
 
-On Tue, Dec 19, 2017 at 1:17 PM, Wei Wang <wei.w.wang@intel.com> wrote:
-> From: Matthew Wilcox <mawilcox@microsoft.com>
->
-> The eXtensible Bitmap is a sparse bitmap representation which is
-> efficient for set bits which tend to cluster.  It supports up to
-> 'unsigned long' worth of bits, and this commit adds the bare bones --
-> xb_set_bit(), xb_clear_bit() and xb_test_bit().
+> the highest cpu address is not the same as max_cpus. max_cpus
 
-<snip>
+s/the/The/
 
-> --- /dev/null
-> +++ b/include/linux/xbitmap.h
-> @@ -0,0 +1,49 @@
-> +/*
-> + * eXtensible Bitmaps
-> + * Copyright (c) 2017 Microsoft Corporation <mawilcox@microsoft.com>
-> + *
-> + * This program is free software; you can redistribute it and/or
-> + * modify it under the terms of the GNU General Public License as
-> + * published by the Free Software Foundation; either version 2 of the
-> + * License, or (at your option) any later version.
-> + *
-> + * This program is distributed in the hope that it will be useful,
-> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
-> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-> + * GNU General Public License for more details.
-> + *
-> + * eXtensible Bitmaps provide an unlimited-size sparse bitmap facility.
-> + * All bits are initially zero.
-> + */
+> counts from 1 while the cpu address starts at 0.
+> 
+> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
+> Reviewed-by: Jason J. Herne <jjherne@linux.vnet.ibm.com>
+> ---
+>  hw/s390x/sclp.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/hw/s390x/sclp.c b/hw/s390x/sclp.c
+> index 9be0cb80ad..21351ffffc 100644
+> --- a/hw/s390x/sclp.c
+> +++ b/hw/s390x/sclp.c
+> @@ -67,7 +67,7 @@ static void read_SCP_info(SCLPDevice *sclp, SCCB *sccb)
+>      prepare_cpu_entries(sclp, read_info->entries, &cpu_count);
+>      read_info->entries_cpu = cpu_to_be16(cpu_count);
+>      read_info->offset_cpu = cpu_to_be16(offsetof(ReadInfo, entries));
+> -    read_info->highest_cpu = cpu_to_be16(max_cpus);
+> +    read_info->highest_cpu = cpu_to_be16(max_cpus - 1);
+>  
+>      read_info->ibc_val = cpu_to_be32(s390_get_ibc_val());
+>  
 
-Would you mind using the new SPDX tags documented in Thomas patch set
-[1] rather than this fine but longer legalese?
-
-And if you could spread the word to others in your team this would be very nice.
-
-Thank you!
-
-[1] https://lkml.org/lkml/2017/12/4/934
-
--- 
-Cordially
-Philippe Ombredanne
+Thanks, applied.
