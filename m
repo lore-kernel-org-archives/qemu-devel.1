@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34549)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34589)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1eR9XP-00018D-Nt
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 23:29:57 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1eR9XR-00018Z-2w
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 23:29:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1eR9XN-0007n6-1g
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 23:29:55 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1eR9XP-0007pV-Mw
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 23:29:57 -0500
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Tue, 19 Dec 2017 15:29:29 +1100
-Message-Id: <20171219042942.29297-2-david@gibson.dropbear.id.au>
+Date: Tue, 19 Dec 2017 15:29:38 +1100
+Message-Id: <20171219042942.29297-11-david@gibson.dropbear.id.au>
 In-Reply-To: <20171219042942.29297-1-david@gibson.dropbear.id.au>
 References: <20171219042942.29297-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PULL 01/14] target-ppc: optimize cmp translation
+Subject: [Qemu-devel] [PULL 10/14] target/ppc: Clean up probing of VMX,
+ VSX and DFP availability on KVM
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,67 +21,99 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: groug@kaod.org, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, mdroth@linux.vnet.ibm.com, "pbonzini@redhat.com" <pbonzini@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
+Cc: groug@kaod.org, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, mdroth@linux.vnet.ibm.com, David Gibson <david@gibson.dropbear.id.au>
 
-From: "pbonzini@redhat.com" <pbonzini@redhat.com>
+When constructing the "host" cpu class we modify whether the VMX and VSX
+vector extensions and DFP (Decimal Floating Point) are available
+based on whether KVM can support those instructions.  This can depend on
+policy in the host kernel as well as on the actual host cpu capabilities.
 
-We know that only one bit (in addition to SO) is going to be set in
-the condition register, so do two movconds instead of three setconds,
-three shifts and two ORs.
+However, the way we probe for this is not very nice: we explicitly check
+the host's device tree.  That works in practice, but it's not really
+correct, since the device tree is a property of the host kernel's platform
+which we don't really know about.  We get away with it because the only
+modern POWER platforms happen to encode VMX, VSX and DFP availability in
+the device tree in the same way.
 
-For ppc64-linux-user, the code size reduction is around 5% and the
-performance improvement slightly less than 10%.  For softmmu, the
-improvement is around 5%.
+Arguably we should have an explicit KVM capability for this, but we haven't
+needed one so far.  Barring specific KVM policies which don't yet exist,
+each of these instruction classes will be available in the guest if and
+only if they're available in the qemu userspace process.  We can determine
+that from the ELF AUX vector we're supplied with.
 
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+Once reworked like this, there are no more callers for kvmppc_get_vmx() and
+kvmppc_get_dfp() so remove them.
+
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+Reviewed-by: Greg Kurz <groug@kaod.org>
 ---
- target/ppc/translate.c | 29 ++++++++++++-----------------
- 1 file changed, 12 insertions(+), 17 deletions(-)
+ target/ppc/kvm.c     | 27 ++++++---------------------
+ target/ppc/kvm_ppc.h |  2 --
+ 2 files changed, 6 insertions(+), 23 deletions(-)
 
-diff --git a/target/ppc/translate.c b/target/ppc/translate.c
-index 4075fc8589..8a6bd329d0 100644
---- a/target/ppc/translate.c
-+++ b/target/ppc/translate.c
-@@ -605,27 +605,22 @@ static opc_handler_t invalid_handler = {
- static inline void gen_op_cmp(TCGv arg0, TCGv arg1, int s, int crf)
- {
-     TCGv t0 = tcg_temp_new();
--    TCGv_i32 t1 = tcg_temp_new_i32();
--
--    tcg_gen_trunc_tl_i32(cpu_crf[crf], cpu_so);
--
--    tcg_gen_setcond_tl((s ? TCG_COND_LT: TCG_COND_LTU), t0, arg0, arg1);
--    tcg_gen_trunc_tl_i32(t1, t0);
--    tcg_gen_shli_i32(t1, t1, CRF_LT_BIT);
--    tcg_gen_or_i32(cpu_crf[crf], cpu_crf[crf], t1);
-+    TCGv t1 = tcg_temp_new();
-+    TCGv_i32 t = tcg_temp_new_i32();
- 
--    tcg_gen_setcond_tl((s ? TCG_COND_GT: TCG_COND_GTU), t0, arg0, arg1);
--    tcg_gen_trunc_tl_i32(t1, t0);
--    tcg_gen_shli_i32(t1, t1, CRF_GT_BIT);
--    tcg_gen_or_i32(cpu_crf[crf], cpu_crf[crf], t1);
-+    tcg_gen_movi_tl(t0, CRF_EQ);
-+    tcg_gen_movi_tl(t1, CRF_LT);
-+    tcg_gen_movcond_tl((s ? TCG_COND_LT : TCG_COND_LTU), t0, arg0, arg1, t1, t0);
-+    tcg_gen_movi_tl(t1, CRF_GT);
-+    tcg_gen_movcond_tl((s ? TCG_COND_GT : TCG_COND_GTU), t0, arg0, arg1, t1, t0);
- 
--    tcg_gen_setcond_tl(TCG_COND_EQ, t0, arg0, arg1);
--    tcg_gen_trunc_tl_i32(t1, t0);
--    tcg_gen_shli_i32(t1, t1, CRF_EQ_BIT);
--    tcg_gen_or_i32(cpu_crf[crf], cpu_crf[crf], t1);
-+    tcg_gen_trunc_tl_i32(t, t0);
-+    tcg_gen_trunc_tl_i32(cpu_crf[crf], cpu_so);
-+    tcg_gen_or_i32(cpu_crf[crf], cpu_crf[crf], t);
- 
-     tcg_temp_free(t0);
--    tcg_temp_free_i32(t1);
-+    tcg_temp_free(t1);
-+    tcg_temp_free_i32(t);
+diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
+index 4664a3ce9d..518dd06e98 100644
+--- a/target/ppc/kvm.c
++++ b/target/ppc/kvm.c
+@@ -2011,16 +2011,6 @@ uint64_t kvmppc_get_clockfreq(void)
+     return kvmppc_read_int_cpu_dt("clock-frequency");
  }
  
- static inline void gen_op_cmpi(TCGv arg0, target_ulong arg1, int s, int crf)
+-uint32_t kvmppc_get_vmx(void)
+-{
+-    return kvmppc_read_int_cpu_dt("ibm,vmx");
+-}
+-
+-uint32_t kvmppc_get_dfp(void)
+-{
+-    return kvmppc_read_int_cpu_dt("ibm,dfp");
+-}
+-
+ static int kvmppc_get_pvinfo(CPUPPCState *env, struct kvm_ppc_pvinfo *pvinfo)
+  {
+      PowerPCCPU *cpu = ppc_env_get_cpu(env);
+@@ -2404,23 +2394,18 @@ static void alter_insns(uint64_t *word, uint64_t flags, bool on)
+ static void kvmppc_host_cpu_class_init(ObjectClass *oc, void *data)
+ {
+     PowerPCCPUClass *pcc = POWERPC_CPU_CLASS(oc);
+-    uint32_t vmx = kvmppc_get_vmx();
+-    uint32_t dfp = kvmppc_get_dfp();
+     uint32_t dcache_size = kvmppc_read_int_cpu_dt("d-cache-size");
+     uint32_t icache_size = kvmppc_read_int_cpu_dt("i-cache-size");
+ 
+     /* Now fix up the class with information we can query from the host */
+     pcc->pvr = mfpvr();
+ 
+-    if (vmx != -1) {
+-        /* Only override when we know what the host supports */
+-        alter_insns(&pcc->insns_flags, PPC_ALTIVEC, vmx > 0);
+-        alter_insns(&pcc->insns_flags2, PPC2_VSX, vmx > 1);
+-    }
+-    if (dfp != -1) {
+-        /* Only override when we know what the host supports */
+-        alter_insns(&pcc->insns_flags2, PPC2_DFP, dfp);
+-    }
++    alter_insns(&pcc->insns_flags, PPC_ALTIVEC,
++                qemu_getauxval(AT_HWCAP) & PPC_FEATURE_HAS_ALTIVEC);
++    alter_insns(&pcc->insns_flags2, PPC2_VSX,
++                qemu_getauxval(AT_HWCAP) & PPC_FEATURE_HAS_VSX);
++    alter_insns(&pcc->insns_flags2, PPC2_DFP,
++                qemu_getauxval(AT_HWCAP) & PPC_FEATURE_HAS_DFP);
+ 
+     if (dcache_size != -1) {
+         pcc->l1_dcache_size = dcache_size;
+diff --git a/target/ppc/kvm_ppc.h b/target/ppc/kvm_ppc.h
+index d6be38ecaf..ecb55493cc 100644
+--- a/target/ppc/kvm_ppc.h
++++ b/target/ppc/kvm_ppc.h
+@@ -15,8 +15,6 @@
+ 
+ uint32_t kvmppc_get_tbfreq(void);
+ uint64_t kvmppc_get_clockfreq(void);
+-uint32_t kvmppc_get_vmx(void);
+-uint32_t kvmppc_get_dfp(void);
+ bool kvmppc_get_host_model(char **buf);
+ bool kvmppc_get_host_serial(char **buf);
+ int kvmppc_get_hasidle(CPUPPCState *env);
 -- 
 2.14.3
