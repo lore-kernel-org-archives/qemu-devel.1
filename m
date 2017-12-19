@@ -1,27 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40381)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41936)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jianjay.zhou@huawei.com>) id 1eRF29-0006zK-Ug
-	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 05:22:03 -0500
+	(envelope-from <marcandre.lureau@gmail.com>) id 1eRF3w-00083T-8B
+	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 05:23:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jianjay.zhou@huawei.com>) id 1eRF25-0007CF-Du
-	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 05:22:01 -0500
-Received: from szxga02-in.huawei.com ([45.249.212.188]:2299 helo=huawei.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jianjay.zhou@huawei.com>)
-	id 1eRF24-00077f-Pt
-	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 05:21:57 -0500
-From: "Zhoujian (jay)" <jianjay.zhou@huawei.com>
-Date: Tue, 19 Dec 2017 10:21:30 +0000
-Message-ID: <B2D15215269B544CADD246097EACE7473AB0D08F@DGGEMM505-MBS.china.huawei.com>
-References: <1513148690-23440-1-git-send-email-jianjay.zhou@huawei.com>
-	<217eb906-023e-b3ff-8f65-1af84655ca25@redhat.com>
-In-Reply-To: <217eb906-023e-b3ff-8f65-1af84655ca25@redhat.com>
-Content-Language: zh-CN
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	(envelope-from <marcandre.lureau@gmail.com>) id 1eRF3q-0008SF-Dv
+	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 05:23:52 -0500
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [RFC PATCH] vhost-user: quit infinite loop while
- used memslots is more than the backend limit
+In-Reply-To: <20171219082518.19724-1-lma@suse.com>
+References: <20171219082518.19724-1-lma@suse.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Tue, 19 Dec 2017 11:23:43 +0100
+Message-ID: <CAJ+F1CL-ohuLUdDvLC5GPZOX81tUMSXo_LkwNWFw47UEJ9ivWA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] build: Fix typo in scripts/git-submodule.sh
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,110 +22,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jason Wang <jasowang@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "mst@redhat.com" <mst@redhat.com>, "Gonglei (Arei)" <arei.gonglei@huawei.com>, "marcandre.lureau@redhat.com" <marcandre.lureau@redhat.com>, "Huangweidong (C)" <weidong.huang@huawei.com>, "wangxin (U)" <wangxinxin.wang@huawei.com>
+To: Lin Ma <lma@suse.com>
+Cc: QEMU <qemu-devel@nongnu.org>, qemu trival <qemu-trivial@nongnu.org>
 
-DQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogSmFzb24gV2FuZyBbbWFp
-bHRvOmphc293YW5nQHJlZGhhdC5jb21dDQo+IFNlbnQ6IFR1ZXNkYXksIERlY2VtYmVyIDE5LCAy
-MDE3IDU6MjQgUE0NCj4gVG86IFpob3VqaWFuIChqYXkpIDxqaWFuamF5Lnpob3VAaHVhd2VpLmNv
-bT47IHFlbXUtZGV2ZWxAbm9uZ251Lm9yZw0KPiBDYzogbXN0QHJlZGhhdC5jb207IEdvbmdsZWkg
-KEFyZWkpIDxhcmVpLmdvbmdsZWlAaHVhd2VpLmNvbT47DQo+IG1hcmNhbmRyZS5sdXJlYXVAcmVk
-aGF0LmNvbTsgSHVhbmd3ZWlkb25nIChDKSA8d2VpZG9uZy5odWFuZ0BodWF3ZWkuY29tPjsNCj4g
-d2FuZ3hpbiAoVSkgPHdhbmd4aW54aW4ud2FuZ0BodWF3ZWkuY29tPg0KPiBTdWJqZWN0OiBSZTog
-W1JGQyBQQVRDSF0gdmhvc3QtdXNlcjogcXVpdCBpbmZpbml0ZSBsb29wIHdoaWxlIHVzZWQNCj4g
-bWVtc2xvdHMgaXMgbW9yZSB0aGFuIHRoZSBiYWNrZW5kIGxpbWl0DQo+IA0KPiANCj4gDQo+IE9u
-IDIwMTflubQxMuaciDEz5pelIDE1OjA0LCBKYXkgWmhvdSB3cm90ZToNCj4gPiBTdGVwcyB0byAx
-MDAlIHJlcHJvZHVjZToNCj4gPiAoMSkgc3RhcnQgYSBWTSB3aXRoIHR3byBWRklPIDgyNTk5IFBD
-SSBOSUNzIHN1Y2Nlc3NmdWxseQ0KPiA+ICgyKSBob3QgcGx1ZyBhIFJBTSwgd2hpY2ggaXMgYXR0
-YWNoZWQgc3VjY2Vzc2Z1bGx5DQo+ID4gKDMpIGhvdCBwbHVnIGFub3RoZXIgUkFNLCB3aGljaCBp
-cyBhdHRhY2hlZCBzdWNjZXNzZnVsbHkNCj4gPiAoNCkgaG90IHBsdWcgYSB2aG9zdC11c2VyIE5J
-Qywgd2hpY2ggaXMgYXR0YWNoZWQgc3VjY2Vzc2Z1bGx5DQo+ID4gKDUpIGhvdCBwbHVnIGFub3Ro
-ZXIgdmhvc3QtdXNlciBOSUMsIHdoaWNoIGlzIGhhbmdlZA0KPiA+DQo+ID4gdGhlbiB0aGUgcWVt
-dSBwcm9jZXNzIGluZmluaXRlbHkgYW5kIHF1aWNrbHkgcHJpbnQgdGhlIGxvZ3MgYmVsb3c6DQo+
-ID4gICAgICBbLi4uXQ0KPiA+ICAgICAgdmhvc3QgYmFja2VuZCBtZW1vcnkgc2xvdHMgbGltaXQg
-aXMgbGVzcyB0aGFuIGN1cnJlbnQgbnVtYmVyIG9mDQo+IHByZXNlbnQgbWVtb3J5IHNsb3RzDQo+
-ID4gICAgICBmYWlsZWQgdG8gaW5pdCB2aG9zdF9uZXQgZm9yIHF1ZXVlIDANCj4gPiAgICAgIHZo
-b3N0IGJhY2tlbmQgbWVtb3J5IHNsb3RzIGxpbWl0IGlzIGxlc3MgdGhhbiBjdXJyZW50IG51bWJl
-ciBvZg0KPiBwcmVzZW50IG1lbW9yeSBzbG90cw0KPiA+ICAgICAgZmFpbGVkIHRvIGluaXQgdmhv
-c3RfbmV0IGZvciBxdWV1ZSAwDQo+ID4gICAgICB2aG9zdCBiYWNrZW5kIG1lbW9yeSBzbG90cyBs
-aW1pdCBpcyBsZXNzIHRoYW4gY3VycmVudCBudW1iZXIgb2YNCj4gcHJlc2VudCBtZW1vcnkgc2xv
-dHMNCj4gPiAgICAgIGZhaWxlZCB0byBpbml0IHZob3N0X25ldCBmb3IgcXVldWUgMA0KPiA+ICAg
-ICAgWy4uLl0NCj4gPg0KPiA+IGFuZCB0aGUgY3B1IHV0aWxpemF0aW9uIG9mIHRoZSBzeXN0ZW1k
-LWpvdXJuYWwgcHJvY2VzcyBvbiBob3N0IGlzDQo+ID4gMTAwJSwgdGhlIHJlYXNvbiBpcyBjbGVh
-cjoNCj4gPiAgICAgICJ1c2VkX21lbXNsb3RzID4gaGRldi0+dmhvc3Rfb3BzLQ0KPiA+dmhvc3Rf
-YmFja2VuZF9tZW1zbG90c19saW1pdChoZGV2KSINCj4gPiBpcyB0cnVlIGluIHZob3N0X2Rldl9p
-bml0LCBhbmQgdGhlIG1haW4gdGhyZWFkIGluIHRoZSBpbmZpbml0ZSBkbyBhbmQNCj4gPiB3aGls
-ZSBsb29wIGluIG5ldF92aG9zdF91c2VyX2luaXQuDQo+ID4NCj4gPiBPbmUgd2F5IGlzIHRvIGlu
-Y3JlYXNlIHRoZSB2aG9zdCBiYWNrZW5kIG1lbW9yeSBzbG90cyBsaW1pdCwgc29tZQ0KPiA+IGRp
-c2N1c3Npb25zIGFyZSBoZXJlOg0KPiA+DQo+ID4gaHR0cHM6Ly9saXN0cy5nbnUub3JnL2FyY2hp
-dmUvaHRtbC9xZW11LWRldmVsLzIwMTctMTEvbXNnMDQ1NzIuaHRtbA0KPiA+DQo+ID4gSSB0aGlu
-ayBpZg0KPiA+ICAgICAgInVzZWRfbWVtc2xvdHMgPiBoZGV2LT52aG9zdF9vcHMtDQo+ID52aG9z
-dF9iYWNrZW5kX21lbXNsb3RzX2xpbWl0KGhkZXYpIg0KPiA+IGlzIHRydWUsIGl0IGRvZXMgbm90
-IG1ha2Ugc2Vuc2UgdG8gdHJ5IHRvIGluaXRpYWxpemUgdGhlIHZob3N0LXVzZXINCj4gPiBhZ2Fp
-biBhbmQgYWdhaW4sIGJlY2F1c2UgdGhlIG1haW4gdGhyZWFkIGNhbiBub3QgaGFuZGxlIG90aGVy
-IHFtcHMgYXQNCj4gPiBhbGwsIHdoaWNoIG1lYW5zIGl0IGNhbiBub3QgcmVkdWNlIHRoZSBudW1i
-ZXIgb2YgbWVtc2xvdHMsIGl0IG11c3QgYmUNCj4gPiBmYWlsZWQgYXQgbGFzdC4NCj4gDQo+IFlv
-dSBzaG91bGQgaW5jbHVkZSB0aGUgcmVhc29uIHdoeSB3ZSBoaXQgaW5maW5pdGUgbG9vcCBpbiB0
-aGUgY29tbWl0IGxvZywNCj4gYW5kIHdoYXQncyBtb3JlIGltcG9ydGFudCwgaXMgdGhpcyBpc3N1
-ZSBzcGVjaWZpYyB0byBtZW1zbG90cyBvbmx5Pw0KPiBXaGF0IGlmIHlvdSBoaXQgZXJyb3JzIG90
-aGVyIHRoYW4gdGhpcyBpbiB2aG9zdF9kZXZfaW5pdCgpIGZvciB2aG9zdC11c2VyPw0KDQpJZiB0
-aGUgbmV3IGhvdCBwbHVnZ2VkIHZob3N0LXVzZXIgTklDIGZhaWxlZCB0byBpbml0aWFsaXplIGlu
-IHZob3N0X2Rldl9pbml0LA0KdGhlIHMtPnN0YXJ0ZWQgaW4gbmV0X3Zob3N0X3VzZXJfaW5pdCBp
-cyBhbHdheXMgZmFsc2UsIHNvIHdlIGhpdCBpbmZpbml0ZSBsb29wDQppbiBuZXRfdmhvc3RfdXNl
-cl9pbml0KCkuDQpJdCBpcyBub3Qgc3BlY2lmaWMgdG8gbWVtc2xvdHMgb25seSwgZS5nLiBpZiB0
-aGUgYmFja2VuZCBsYWNrcyBzb21lIGZlYXR1cmUNCm1hc2tzLCBpdCB3aWxsIGhpdCBpbmZpbml0
-ZSBsb29wIHRvby4NCg0KSXMgaXQgYXZhaWxhYmxlIHRvIGlkZW50aWZ5IHRoZSBjYXNlcyB0aGF0
-IE1BWSBiZSBmYWlsZWQgYW5kIE1VU1QgYmUgZmFpbGVkDQphdCBpbml0aWFsaXphdGlvbj8NCiAg
-ICAtIElmIGl0IG11c3QgYmUgZmFpbGVkLCBxdWl0IHRoZSBsb29wIGF0IG9uY2UuDQogICAgLSBJ
-ZiBpdCBtYXkgYmUgZmFpbGVkLCB0aGVuIHdlIHNob3VsZCBkbyB0aGUgbG9vcCB0byB3YWl0IHRo
-ZSBjb25uZWN0aW9uDQogICAgICBlc3RhYmxpc2hlZCwgaS5lLiB3YWl0IHRoZSBzLT5zdGFydGVk
-IGJlY29tZXMgdHJ1ZS4gQW5kIHNvbWUgc2xlZXAgdGltZQ0KICAgICAgbWF5IGJlIGFkZGVkIHRv
-IHJlZHVjZSB0aGUgQ1BVIHV0aWxpemF0aW9uLg0KDQo+IElzIHRoaXMgYmV0dGVyIHRvIGRpc2Fi
-bGUgZXZlbnQgc291cmNlIGluIHRoaXMgY2FzZT8NCg0KVGhlICJldmVudCBzb3VyY2UiIHlvdSBt
-ZWFuIGlzIHRoZSBsb2dzIHByaW50ZWQ/DQpJZiBpdCBpcyBkaXNhYmxlZCwgdGhlIHJlYXNvbiB3
-aHkgaW5pdGlhbGl6YXRpb24gZmFpbGVkIGlzIG5vdCBleHBsaWNpdCwNCnRoaXMgaXMgdGhlIGRy
-YXdiYWNrLg0KDQoNClJlZ2FyZHMsDQpKYXkNCg0KPiANCj4gVGhhbmtzDQo+IA0KPiA+DQo+ID4g
-U2lnbmVkLW9mZi1ieTogSmF5IFpob3UgPGppYW5qYXkuemhvdUBodWF3ZWkuY29tPg0KPiA+IC0t
-LQ0KPiA+ICAgaHcvdmlydGlvL3Zob3N0LmMgICAgICAgICB8IDMgKysrDQo+ID4gICBpbmNsdWRl
-L2h3L3ZpcnRpby92aG9zdC5oIHwgMiArKw0KPiA+ICAgbmV0L3Zob3N0LXVzZXIuYyAgICAgICAg
-ICB8IDUgKysrKysNCj4gPiAgIDMgZmlsZXMgY2hhbmdlZCwgMTAgaW5zZXJ0aW9ucygrKQ0KPiA+
-DQo+ID4gZGlmZiAtLWdpdCBhL2h3L3ZpcnRpby92aG9zdC5jIGIvaHcvdmlydGlvL3Zob3N0LmMg
-aW5kZXgNCj4gPiBlNDI5MGNlLi4xY2M0YTE4IDEwMDY0NA0KPiA+IC0tLSBhL2h3L3ZpcnRpby92
-aG9zdC5jDQo+ID4gKysrIGIvaHcvdmlydGlvL3Zob3N0LmMNCj4gPiBAQCAtNDcsNiArNDcsOCBA
-QCBzdGF0aWMgdW5zaWduZWQgaW50IHVzZWRfbWVtc2xvdHM7DQo+ID4gICBzdGF0aWMgUUxJU1Rf
-SEVBRCgsIHZob3N0X2Rldikgdmhvc3RfZGV2aWNlcyA9DQo+ID4gICAgICAgUUxJU1RfSEVBRF9J
-TklUSUFMSVpFUih2aG9zdF9kZXZpY2VzKTsNCj4gPg0KPiA+ICtib29sIHVzZWRfbWVtc2xvdHNf
-ZXhjZWVkZWQ7DQo+ID4gKw0KPiA+ICAgYm9vbCB2aG9zdF9oYXNfZnJlZV9zbG90KHZvaWQpDQo+
-ID4gICB7DQo+ID4gICAgICAgdW5zaWduZWQgaW50IHNsb3RzX2xpbWl0ID0gfjBVOw0KPiA+IEBA
-IC0xMjU0LDYgKzEyNTYsNyBAQCBpbnQgdmhvc3RfZGV2X2luaXQoc3RydWN0IHZob3N0X2RldiAq
-aGRldiwgdm9pZA0KPiAqb3BhcXVlLA0KPiA+ICAgICAgIGlmICh1c2VkX21lbXNsb3RzID4gaGRl
-di0+dmhvc3Rfb3BzLQ0KPiA+dmhvc3RfYmFja2VuZF9tZW1zbG90c19saW1pdChoZGV2KSkgew0K
-PiA+ICAgICAgICAgICBlcnJvcl9yZXBvcnQoInZob3N0IGJhY2tlbmQgbWVtb3J5IHNsb3RzIGxp
-bWl0IGlzIGxlc3MiDQo+ID4gICAgICAgICAgICAgICAgICAgIiB0aGFuIGN1cnJlbnQgbnVtYmVy
-IG9mIHByZXNlbnQgbWVtb3J5IHNsb3RzIik7DQo+ID4gKyAgICAgICAgdXNlZF9tZW1zbG90c19l
-eGNlZWRlZCA9IHRydWU7DQo+ID4gICAgICAgICAgIHIgPSAtMTsNCj4gPiAgICAgICAgICAgZ290
-byBmYWlsOw0KPiA+ICAgICAgIH0NCj4gPiBkaWZmIC0tZ2l0IGEvaW5jbHVkZS9ody92aXJ0aW8v
-dmhvc3QuaCBiL2luY2x1ZGUvaHcvdmlydGlvL3Zob3N0LmgNCj4gPiBpbmRleCA0NjdkYzc3Li5i
-Y2M2NmQ5IDEwMDY0NA0KPiA+IC0tLSBhL2luY2x1ZGUvaHcvdmlydGlvL3Zob3N0LmgNCj4gPiAr
-KysgYi9pbmNsdWRlL2h3L3ZpcnRpby92aG9zdC5oDQo+ID4gQEAgLTYsNiArNiw4IEBADQo+ID4g
-ICAjaW5jbHVkZSAiaHcvdmlydGlvL3ZpcnRpby5oIg0KPiA+ICAgI2luY2x1ZGUgImV4ZWMvbWVt
-b3J5LmgiDQo+ID4NCj4gPiArZXh0ZXJuIGJvb2wgdXNlZF9tZW1zbG90c19leGNlZWRlZDsNCj4g
-PiArDQo+ID4gICAvKiBHZW5lcmljIHN0cnVjdHVyZXMgY29tbW9uIGZvciBhbnkgdmhvc3QgYmFz
-ZWQgZGV2aWNlLiAqLw0KPiA+ICAgc3RydWN0IHZob3N0X3ZpcnRxdWV1ZSB7DQo+ID4gICAgICAg
-aW50IGtpY2s7DQo+ID4gZGlmZiAtLWdpdCBhL25ldC92aG9zdC11c2VyLmMgYi9uZXQvdmhvc3Qt
-dXNlci5jIGluZGV4DQo+ID4gYzIzOTI3Yy4uOGI3YmZmZiAxMDA2NDQNCj4gPiAtLS0gYS9uZXQv
-dmhvc3QtdXNlci5jDQo+ID4gKysrIGIvbmV0L3Zob3N0LXVzZXIuYw0KPiA+IEBAIC0xNyw2ICsx
-Nyw3IEBADQo+ID4gICAjaW5jbHVkZSAicWVtdS9lcnJvci1yZXBvcnQuaCINCj4gPiAgICNpbmNs
-dWRlICJxbXAtY29tbWFuZHMuaCINCj4gPiAgICNpbmNsdWRlICJ0cmFjZS5oIg0KPiA+ICsjaW5j
-bHVkZSAiaW5jbHVkZS9ody92aXJ0aW8vdmhvc3QuaCINCj4gPg0KPiA+ICAgdHlwZWRlZiBzdHJ1
-Y3QgVmhvc3RVc2VyU3RhdGUgew0KPiA+ICAgICAgIE5ldENsaWVudFN0YXRlIG5jOw0KPiA+IEBA
-IC0zMTEsNiArMzEyLDEwIEBAIHN0YXRpYyBpbnQgbmV0X3Zob3N0X3VzZXJfaW5pdChOZXRDbGll
-bnRTdGF0ZSAqcGVlciwNCj4gY29uc3QgY2hhciAqZGV2aWNlLA0KPiA+ICAgICAgICAgICBxZW11
-X2Nocl9mZV9zZXRfaGFuZGxlcnMoJnMtPmNociwgTlVMTCwgTlVMTCwNCj4gPiAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgIG5ldF92aG9zdF91c2VyX2V2ZW50LCBOVUxMLCBuYzAt
-Pm5hbWUsDQo+IE5VTEwsDQo+ID4gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICB0
-cnVlKTsNCj4gPiArICAgICAgICBpZiAodXNlZF9tZW1zbG90c19leGNlZWRlZCkgew0KPiA+ICsg
-ICAgICAgICAgICBlcnJvcl9yZXBvcnQoInVzZWQgbWVtc2xvdHMgZXhjZWVkZWQgdGhlIGJhY2tl
-bmQgbGltaXQsDQo+IHF1aXQgbG9vcCIpOw0KPiA+ICsgICAgICAgICAgICByZXR1cm4gLTE7DQo+
-ID4gKyAgICAgICAgfQ0KPiA+ICAgICAgIH0gd2hpbGUgKCFzLT5zdGFydGVkKTsNCj4gPg0KPiA+
-ICAgICAgIGFzc2VydChzLT52aG9zdF9uZXQpOw0KDQo=
+On Tue, Dec 19, 2017 at 9:25 AM, Lin Ma <lma@suse.com> wrote:
+> Signed-off-by: Lin Ma <lma@suse.com>
+> ---
+>  scripts/git-submodule.sh | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/scripts/git-submodule.sh b/scripts/git-submodule.sh
+> index bc7224a..807ca0b 100755
+> --- a/scripts/git-submodule.sh
+> +++ b/scripts/git-submodule.sh
+> @@ -28,7 +28,7 @@ error() {
+>      echo
+>      echo "and then manually update submodules prior to running make, wit=
+h:"
+>      echo
+> -    echo " $ scripts/git-sbumodule.sh update $modules"
+> +    echo " $ scripts/git-submodule.sh update $modules"
+>      echo
+>      exit 1
+>  }
+> --
+> 2.9.2
+
+
+CC: trivial
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+
+
+>
+>
+
+
+
+--=20
+Marc-Andr=C3=A9 Lureau
