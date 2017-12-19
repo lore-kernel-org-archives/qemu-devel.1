@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48219)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55776)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1eS7Rl-0001GJ-RG
-	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 15:28:07 -0500
+	(envelope-from <no-reply@patchew.org>) id 1eS7Yx-0004IQ-8C
+	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 15:35:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1eS7Rh-0001Ux-28
-	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 15:28:05 -0500
-Received: from mout.kundenserver.de ([212.227.17.24]:65084)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1eS7Rg-0001UB-PR
-	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 15:28:01 -0500
-References: <151388621863.99.14752373861605263949@5adcb62bf0d6>
-From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <f6153d1a-d163-a4e1-8e6c-30d3735ac5a7@vivier.eu>
-Date: Thu, 21 Dec 2017 21:27:54 +0100
+	(envelope-from <no-reply@patchew.org>) id 1eS7Ys-0007Ws-I8
+	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 15:35:31 -0500
+Resent-Message-Id: <E1eS7Ys-0007Ws-I8@eggs.gnu.org>
+Received: from sender-of-o52.zoho.com ([135.84.80.217]:21390)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1eS7Ys-0007Qx-8O
+	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 15:35:26 -0500
+In-Reply-To: <20171219201613.7399-1-michael.weiser@gmx.de>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <151371630382.81.15113721097565651933@5adcb62bf0d6>
 MIME-Version: 1.0
-In-Reply-To: <151388621863.99.14752373861605263949@5adcb62bf0d6>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PULL 0/5] M68k for 2.12 patches
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Tue, 19 Dec 2017 12:45:04 -0800 (PST)
+Subject: Re: [Qemu-devel] [PATCH v2 0/5] Add aarch64_be-linux-user target
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,50 +28,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: famz@redhat.com
+To: michael.weiser@gmx.de
+Cc: famz@redhat.com, qemu-devel@nongnu.org, riku.voipio@iki.fi, laurent@vivier.eu
 
-Le 21/12/2017 à 20:57, no-reply@patchew.org a écrit :
-> Hi,
-> 
-> This series failed automatic build test. Please find the testing commands and
-> their output below. If you have docker installed, you can probably reproduce it
-> locally.
-> 
-> Type: series
-> Message-id: 20171221193640.27418-1-laurent@vivier.eu
-> Subject: [Qemu-devel] [PULL 0/5] M68k for 2.12 patches
-> 
-...
-> Configure options:
-> --enable-werror --target-list=x86_64-softmmu,aarch64-softmmu --prefix=/tmp/qemu-test/install --cross-prefix=x86_64-w64-mingw32- --enable-trace-backends=simple --enable-debug --enable-gnutls --enable-nettle --enable-curl --enable-vnc --enable-bzip2 --enable-guest-agent --with-sdlabi=1.2 --with-gtkabi=2.0
-...
-> /tmp/qemu-test/src/hw/i386/vmport.c: In function 'vmport_ioport_read':
-> /tmp/qemu-test/src/hw/i386/vmport.c:81:9: error: implicit declaration of function 'qemu_log_mask' [-Werror=implicit-function-declaration]
->          qemu_log_mask(LOG_UNIMP, "vmport: unknown command %x\n", command);
->          ^~~~~~~~~~~~~
-> /tmp/qemu-test/src/hw/i386/vmport.c:81:9: error: nested extern declaration of 'qemu_log_mask' [-Werror=nested-externs]
-> /tmp/qemu-test/src/hw/i386/vmport.c:81:23: error: 'LOG_UNIMP' undeclared (first use in this function)
->          qemu_log_mask(LOG_UNIMP, "vmport: unknown command %x\n", command);
->                        ^~~~~~~~~
-> /tmp/qemu-test/src/hw/i386/vmport.c:81:23: note: each undeclared identifier is reported only once for each function it appears in
-> cc1: all warnings being treated as errors
-> make[1]: *** [hw/i386/vmport.o] Error 1
-> make[1]: *** Waiting for unfinished jobs....
-
-Looks like a patch from Paolo's pull is breaking the build:
-
-commit 7299e1a411de99761a4260e44b4f1cf2e4e126ef
-Author: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Date:   Fri Dec 15 00:43:55 2017 -0300
-
-    hw/i386/vmport: replace fprintf() by trace events or LOG_UNIMP
-
-    Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-    Message-Id: <20171215034356.4449-2-f4bug@amsat.org>
-    [Replace unknown command tracepoint with LOG_UNIMP, add
-     generic tracepoint for vmport commands. - Paolo]
-    Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-
-Thanks,
-Laurent
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IDIwMTcxMjE5MjAxNjEzLjczOTktMS1taWNoYWVsLndlaXNlckBnbXguZGUKU3Vi
+amVjdDogW1FlbXUtZGV2ZWxdIFtQQVRDSCB2MiAwLzVdIEFkZCBhYXJjaDY0X2JlLWxpbnV4LXVz
+ZXIgdGFyZ2V0Cgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCgpCQVNFPWJh
+c2UKbj0xCnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJBU0UuLiB8IHdjIC1sKQpmYWlsZWQ9
+MAoKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9j
+YWwgZGlmZi5yZW5hbWVzIFRydWUKCmNvbW1pdHM9IiQoZ2l0IGxvZyAtLWZvcm1hdD0lSCAtLXJl
+dmVyc2UgJEJBU0UuLikiCmZvciBjIGluICRjb21taXRzOyBkbwogICAgZWNobyAiQ2hlY2tpbmcg
+UEFUQ0ggJG4vJHRvdGFsOiAkKGdpdCBsb2cgLW4gMSAtLWZvcm1hdD0lcyAkYykuLi4iCiAgICBp
+ZiAhIGdpdCBzaG93ICRjIC0tZm9ybWF0PWVtYWlsIHwgLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwg
+LS1tYWlsYmFjayAtOyB0aGVuCiAgICAgICAgZmFpbGVkPTEKICAgICAgICBlY2hvCiAgICBmaQog
+ICAgbj0kKChuKzEpKQpkb25lCgpleGl0ICRmYWlsZWQKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0K
+ClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKU3dpdGNo
+ZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0JwoxNDA4YmU1OTlmIGxpbnV4LXVzZXI6IEFkZCBhYXJj
+aDY0X2JlIG1hZ2ljIG51bWJlcnMgdG8gcWVtdS1iaW5mbXQtY29uZi5zaAoyNDZjMDkxM2JlIGNv
+bmZpZ3VyZTogQWRkIGFhcmNoNjRfYmUtbGludXgtdXNlciB0YXJnZXQKZTg0NWQzNWM5NyBsaW51
+eC11c2VyOiBGaXggZW5kaWFuZXNzIG9mIGFhcmNoNjQgc2lnbmFsIHRyYW1wb2xpbmUKYzlkYzM0
+ODM0MyBsaW51eC11c2VyOiBBZGQgc2VwYXJhdGUgYWFyY2g2NF9iZSB1bmFtZQoxMzhmNDhhYzYx
+IGxpbnV4LXVzZXI6IEFkZCBzdXBwb3J0IGZvciBiaWctZW5kaWFuIGFhcmNoNjQKCj09PSBPVVRQ
+VVQgQkVHSU4gPT09CkNoZWNraW5nIFBBVENIIDEvNTogbGludXgtdXNlcjogQWRkIHN1cHBvcnQg
+Zm9yIGJpZy1lbmRpYW4gYWFyY2g2NC4uLgpDaGVja2luZyBQQVRDSCAyLzU6IGxpbnV4LXVzZXI6
+IEFkZCBzZXBhcmF0ZSBhYXJjaDY0X2JlIHVuYW1lLi4uCkNoZWNraW5nIFBBVENIIDMvNTogbGlu
+dXgtdXNlcjogRml4IGVuZGlhbmVzcyBvZiBhYXJjaDY0IHNpZ25hbCB0cmFtcG9saW5lLi4uCkNo
+ZWNraW5nIFBBVENIIDQvNTogY29uZmlndXJlOiBBZGQgYWFyY2g2NF9iZS1saW51eC11c2VyIHRh
+cmdldC4uLgpDaGVja2luZyBQQVRDSCA1LzU6IGxpbnV4LXVzZXI6IEFkZCBhYXJjaDY0X2JlIG1h
+Z2ljIG51bWJlcnMgdG8gcWVtdS1iaW5mbXQtY29uZi5zaC4uLgpXQVJOSU5HOiBsaW5lIG92ZXIg
+ODAgY2hhcmFjdGVycwojMzA6IEZJTEU6IHNjcmlwdHMvcWVtdS1iaW5mbXQtY29uZi5zaDo5NToK
+K2FhcmNoNjRfYmVfbWFnaWM9J1x4N2ZFTEZceDAyXHgwMlx4MDFceDAwXHgwMFx4MDBceDAwXHgw
+MFx4MDBceDAwXHgwMFx4MDBceDAwXHgwMlx4MDBceGI3JwoKRVJST1I6IGxpbmUgb3ZlciA5MCBj
+aGFyYWN0ZXJzCiMzMTogRklMRTogc2NyaXB0cy9xZW11LWJpbmZtdC1jb25mLnNoOjk2OgorYWFy
+Y2g2NF9iZV9tYXNrPSdceGZmXHhmZlx4ZmZceGZmXHhmZlx4ZmZceGZmXHgwMFx4ZmZceGZmXHhm
+Zlx4ZmZceGZmXHhmZlx4ZmZceGZmXHhmZlx4ZmVceGZmXHhmZicKCnRvdGFsOiAxIGVycm9ycywg
+MSB3YXJuaW5ncywgMTggbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxl
+bXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3Np
+dGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1B
+SU5UQUlORVJTLgoKPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGgg
+Y29kZTogMQoKCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFto
+dHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3
+LWRldmVsQGZyZWVsaXN0cy5vcmc=
