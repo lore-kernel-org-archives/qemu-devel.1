@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43334)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43458)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1eRKeZ-0005Pz-2u
-	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 11:22:06 -0500
+	(envelope-from <berrange@redhat.com>) id 1eRKej-0005Uy-06
+	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 11:22:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1eRKeW-0007ON-5L
-	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 11:22:03 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:6572)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1eRKeV-0007Ny-T3
-	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 11:22:00 -0500
-Date: Tue, 19 Dec 2017 16:21:51 +0000
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20171219162151.GA10889@stefanha-x1.localdomain>
+	(envelope-from <berrange@redhat.com>) id 1eRKed-0007Qx-7V
+	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 11:22:12 -0500
+Date: Tue, 19 Dec 2017 16:21:57 +0000
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20171219162157.GD3567@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <1513700253-10045-1-git-send-email-thuth@redhat.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="IS0zKkzwUGydFO0o"
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-Subject: [Qemu-devel] vhost-user graceful connect/disconnect
+In-Reply-To: <1513700253-10045-1-git-send-email-thuth@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] monitor: Remove legacy "-mon default=on"
+ parameter
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,83 +24,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: mukawa@igel.co.jp, marcandre.lureau@redhat.com, "Michael S. Tsirkin" <mst@redhat.com>, Wei Wang <wei.w.wang@intel.com>, Maxime Coquelin <maxime.coquelin@redhat.com>, n.nikolaev@virtualopensystems.com
+To: Thomas Huth <thuth@redhat.com>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Markus Armbruster <armbru@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, qemu-trivial@nongnu.org
+
+On Tue, Dec 19, 2017 at 05:17:33PM +0100, Thomas Huth wrote:
+> The "default" parameter of the "-mon" option is useless since
+> QEMU v2.4.0, and marked as deprecated since QEMU v2.8.0. That
+> should have been long enough to let people update their scripts,
+> so time to remove it now.
+> 
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> ---
+>  monitor.c     | 3 ---
+>  qemu-doc.texi | 9 ---------
+>  vl.c          | 4 ----
+>  3 files changed, 16 deletions(-)
+> 
+> diff --git a/monitor.c b/monitor.c
+> index e36fb53..e53c6e1 100644
+> --- a/monitor.c
+> +++ b/monitor.c
+> @@ -4141,9 +4141,6 @@ QemuOptsList qemu_mon_opts = {
+>              .name = "chardev",
+>              .type = QEMU_OPT_STRING,
+>          },{
+> -            .name = "default",  /* deprecated */
+> -            .type = QEMU_OPT_BOOL,
+> -        },{
+>              .name = "pretty",
+>              .type = QEMU_OPT_BOOL,
+>          },
+> diff --git a/qemu-doc.texi b/qemu-doc.texi
+> index d9861b3..6913b32 100644
+> --- a/qemu-doc.texi
+> +++ b/qemu-doc.texi
+> @@ -2401,15 +2401,6 @@ setting ``-machine kernel_irqchip=off''.
+>  The ``-no-kvm'' argument is now a synonym for setting
+>  ``-machine accel=tcg''.
+>  
+> -@subsection -mon default=on (since 2.4.0)
+> -
+> -The ``default'' option to the ``-mon'' argument is
+> -now ignored. When multiple monitors were enabled, it
+> -indicated which monitor would receive log messages
+> -from the various subsystems. This feature is no longer
+> -required as messages are now only sent to the monitor
+> -in response to explicitly monitor commands.
+> -
+>  @subsection -vnc tls (since 2.5.0)
+
+It occurs to me that qemu.org only ever displays the very latest version
+of the qemu-tech doc.
+
+So if someone has deployed QEMU 2.11, and reads the doc online, once your
+patches are commited, all the info about deprecated features that affect
+their 2.11 version will have gone, despite 2.12 not yet existing. They'll
+only find deprecation info in their locally installed doc. I think this
+is pretty undesirable.
+
+So rather than deleting entries from the deprecation appendix, should
+we move them to a separate appendix, or "Formerly deprecated, now
+deleted" features. Or just change the annotation
+
+  (since 2.4.0)
+
+to
+
+  (deprecated since 2.4.0, deleted in 2.12.0)
 
 
---IS0zKkzwUGydFO0o
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+same comment for all your patches deleting deprecated features.
 
-Hi,
-Vhost-user implementations assume the slave is already running before
-the master starts.  The slave is required during virtio device
-initialization (e.g. feature bit negotiation) and so it is simplest to
-assume that the master is already available and will respond immediately
-to the VHOST_USER_GET_FEATURES message.
-
-I have thought about how to let master and slave start in any order.
-Some approaches involve changes to the VIRTIO specification so that
-guest drivers can wait until the vhost-user connection is established.
-
-We can avoid spec changes using PCI hotplug:
-
-1. Introduce a new vhost-user object that manages a connection:
-
-   -chardev ...
-   -object vhost-user,id=vhost-user0,chardev=chr0
-
-   Note this object is *not* a NetClient.  It's a resource for managing
-   a vhost-user connection and can be used with any device type (net,
-   scsi, blk, etc).
-
-   This object tries to establish a connection.  When a connection is
-   established it sends vhost-user protocol messages to fetch
-   information needed for virtio device initialization (like the number
-   of virtqueues supported, features bits, etc).  This information is
-   stashed so that vhost_*() calls later on do not require synchronous
-   communication with the vhost-user slave.
-
-2. When the vhost-user connection is established the object emits a QMP
-   event so management software can hotplug the virtio device:
-
-   VHOST_USER_CONNECTED source=vhost-user0
-
-3. The management software hotplugs the virtio device:
-
-   (qmp) netdev_add vhost-user,id=netdev0,vhost-user=vhost-user0
-   (qmp) device_add virtio-net-pci,netdev=netdev0
-
-Advantages of this approach:
-
- * Does not require spec changes.
- * Can be implemented without vhost-user.c qemu_chr_fe_read/write_all()
-   calls that hang QEMU until the slave sends data.
- * Allows slave to set the number of queues, feature bits, etc via the
-   vhost-user socket.  It is not necessary to manually specify feature
-   bitmasks and other slave-specific information on the QEMU
-   command-line.
-
-I haven't thought through disconnection but I imagine the vhost-user
-object would emit a VHOST_USER_DISCONNECTED event so the management
-software can hot unplug the device.
-
-Thoughts?
-
-Stefan
-
---IS0zKkzwUGydFO0o
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJaOTyfAAoJEJykq7OBq3PIZlEIALYu+C66xQLXYoPzLExEMV/U
-eRWCkJ2IwGZp/IJYNeCx1bEam213KklRVT4Mu5cL1XBOsq1+pNczo2U4dExQZ7Aw
-tnIo1G2cnibW6EViCpF90Pm8Edts626meyZ05bjbs7zkM25rIZhoC7NJiLO07dnk
-iIRMJtvEQgqDfayOIWPSdzuXcptqbZZWcfryKfftQeX0HJj002cu2umvSnCRaPnx
-X5FRTxyceUsvvCxXddWRjeMz34LaGUH7JGxwSTOuzcEY9ZOfenkl3xIUsPmFsBWc
-SpZXNtsPut1GjnZnUdVqQX+q+7pEbqzTP41mcaLyyLMkgs9+oa309j+uTWyC+g8=
-=+852
------END PGP SIGNATURE-----
-
---IS0zKkzwUGydFO0o--
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
