@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60607)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60730)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eRLnl-0001iE-8L
-	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 12:35:42 -0500
+	id 1eRLnu-0001o9-OL
+	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 12:35:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eRLnk-00013i-6O
-	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 12:35:37 -0500
+	id 1eRLnt-0001FR-Ko
+	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 12:35:46 -0500
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Tue, 19 Dec 2017 14:34:21 -0300
-Message-Id: <20171219173425.8113-6-f4bug@amsat.org>
+Date: Tue, 19 Dec 2017 14:34:22 -0300
+Message-Id: <20171219173425.8113-7-f4bug@amsat.org>
 In-Reply-To: <20171219173425.8113-1-f4bug@amsat.org>
 References: <20171219173425.8113-1-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH 5/9] iotests: replace xrange() by range() for
- python3 compatibility
+Subject: [Qemu-devel] [PATCH 6/9] iotests: replace dict.has_key() by 'in'
+ operator for python3 compatibility
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,72 +32,52 @@ Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nong
 
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- tests/qemu-iotests/044 | 14 +++++++-------
- tests/qemu-iotests/163 |  2 +-
- 2 files changed, 8 insertions(+), 8 deletions(-)
+ tests/qemu-iotests/093 | 2 +-
+ tests/qemu-iotests/096 | 4 ++--
+ tests/qemu-iotests/136 | 2 +-
+ 3 files changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/tests/qemu-iotests/044 b/tests/qemu-iotests/044
-index 11ea0f4d35..1e96800176 100755
---- a/tests/qemu-iotests/044
-+++ b/tests/qemu-iotests/044
-@@ -52,23 +52,23 @@ class TestRefcountTableGrowth(iotests.QMPTestCase):
-             # Write a refcount table
-             fd.seek(off_reftable)
+diff --git a/tests/qemu-iotests/093 b/tests/qemu-iotests/093
+index 5c36a5fb4d..28b1d021ca 100755
+--- a/tests/qemu-iotests/093
++++ b/tests/qemu-iotests/093
+@@ -237,7 +237,7 @@ class ThrottleTestGroupNames(iotests.QMPTestCase):
+                 if name:
+                     self.assertEqual(info["group"], name)
+                 else:
+-                    self.assertFalse(info.has_key('group'))
++                    self.assertFalse('group' in info)
+                 return
  
--            for i in xrange(0, h.refcount_table_clusters):
-+            for i in range(0, h.refcount_table_clusters):
-                 sector = ''.join(struct.pack('>Q',
-                     off_refblock + i * 64 * 512 + j * 512)
--                    for j in xrange(0, 64))
-+                    for j in range(0, 64))
-                 fd.write(sector)
+         raise Exception("No group information found for '%s'" % device)
+diff --git a/tests/qemu-iotests/096 b/tests/qemu-iotests/096
+index aeeb3753cf..a69439602d 100644
+--- a/tests/qemu-iotests/096
++++ b/tests/qemu-iotests/096
+@@ -53,9 +53,9 @@ class TestLiveSnapshot(iotests.QMPTestCase):
+                 self.assertEqual(r['iops'], self.iops)
+                 self.assertEqual(r['iops_size'], self.iops_size)
+             else:
+-                self.assertFalse(r.has_key('group'))
++                self.assertFalse('group' in r)
+                 self.assertEqual(r['iops'], 0)
+-                self.assertFalse(r.has_key('iops_size'))
++                self.assertFalse('iops_size' in r)
  
-             # Write the refcount blocks
-             assert(fd.tell() == off_refblock)
--            sector = ''.join(struct.pack('>H', 1) for j in xrange(0, 64 * 256))
--            for block in xrange(0, h.refcount_table_clusters):
-+            sector = ''.join(struct.pack('>H', 1) for j in range(0, 64 * 256))
-+            for block in range(0, h.refcount_table_clusters):
-                 fd.write(sector)
+     def testSnapshot(self):
+         self.checkConfig('base')
+diff --git a/tests/qemu-iotests/136 b/tests/qemu-iotests/136
+index 88b97ea7c6..a154d8ef9d 100644
+--- a/tests/qemu-iotests/136
++++ b/tests/qemu-iotests/136
+@@ -203,7 +203,7 @@ sector = "%d"
+         if (self.accounted_ops(read = True, write = True, flush = True) != 0):
+             self.assertLess(0, stats['idle_time_ns'])
+         else:
+-            self.assertFalse(stats.has_key('idle_time_ns'))
++            self.assertFalse('idle_time_ns' in stats)
  
-             # Write the L1 table
-             assert(fd.tell() == off_l1)
-             assert(off_l2 + 512 * h.l1_size == off_data)
-             table = ''.join(struct.pack('>Q', (1 << 63) | off_l2 + 512 * j)
--                for j in xrange(0, h.l1_size))
-+                for j in range(0, h.l1_size))
-             fd.write(table)
- 
-             # Write the L2 tables
-@@ -79,14 +79,14 @@ class TestRefcountTableGrowth(iotests.QMPTestCase):
-             off = off_data
-             while remaining > 1024 * 512:
-                 pytable = list((1 << 63) | off + 512 * j
--                    for j in xrange(0, 1024))
-+                    for j in range(0, 1024))
-                 table = struct.pack('>1024Q', *pytable)
-                 fd.write(table)
-                 remaining = remaining - 1024 * 512
-                 off = off + 1024 * 512
- 
-             table = ''.join(struct.pack('>Q', (1 << 63) | off + 512 * j)
--                for j in xrange(0, remaining / 512))
-+                for j in range(0, remaining / 512))
-             fd.write(table)
- 
- 
-diff --git a/tests/qemu-iotests/163 b/tests/qemu-iotests/163
-index 403842354e..fb0d0257ec 100644
---- a/tests/qemu-iotests/163
-+++ b/tests/qemu-iotests/163
-@@ -41,7 +41,7 @@ class ShrinkBaseClass(iotests.QMPTestCase):
-         div_roundup = lambda n, d: (n + d - 1) / d
- 
-         def split_by_n(data, n):
--            for x in xrange(0, len(data), n):
-+            for x in range(0, len(data), n):
-                 yield struct.unpack('>Q', data[x:x + n])[0] & l1_mask
- 
-         def check_l1_table(h, l1_data):
+         # This test does not alter these, so they must be all 0
+         self.assertEqual(0, stats['rd_merged'])
 -- 
 2.15.1
