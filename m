@@ -1,22 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46632)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49088)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1eR9o0-0007rD-BW
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 23:47:05 -0500
+	(envelope-from <peterx@redhat.com>) id 1eR9pz-0001TV-PV
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 23:49:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1eR9nz-0002Jn-FK
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 23:47:04 -0500
-Date: Tue, 19 Dec 2017 15:46:55 +1100
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20171219044655.GJ4786@umbus.fritz.box>
-References: <20171209084338.29395-1-clg@kaod.org>
-	<20171209084338.29395-2-clg@kaod.org>
+	(envelope-from <peterx@redhat.com>) id 1eR9pi-0003w6-8V
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 23:49:07 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:36760)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1eR9ph-0003rs-JL
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 23:48:49 -0500
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id BC71785363
+	for <qemu-devel@nongnu.org>; Tue, 19 Dec 2017 04:48:46 +0000 (UTC)
+Date: Tue, 19 Dec 2017 12:48:42 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20171219044842.GY22308@xz-mi>
+References: <20171215115123.12959-1-dgilbert@redhat.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="ZG+WKzXzVby2T9Ro"
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20171209084338.29395-2-clg@kaod.org>
-Subject: Re: [Qemu-devel] [PATCH v2 01/19] dma-helpers: add a return value
- to store helpers
+In-Reply-To: <20171215115123.12959-1-dgilbert@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] migration: Guard ram_bytes_remaining
+ against early call
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,75 +33,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Benjamin Herrenschmidt <benh@kernel.crashing.org>, Greg Kurz <groug@kaod.org>
+To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
+Cc: qemu-devel@nongnu.org, quintela@redhat.com
 
+On Fri, Dec 15, 2017 at 11:51:23AM +0000, Dr. David Alan Gilbert (git) wrote:
+> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+> 
+> Calling ram_bytes_remaining during the early part of setup is unsafe
+> because the ram_state isn't yet initialised.
+> 
+> This can happen in the sequence:
+>    migrate
+>    migrate_cancel
+>    info migrate
+> 
+> if the migrate sticks trying to connect (e.g. to an unresponsive
+> destination due to the connect timeout).  Here 'info migrate' sees
+> a state of CANCELLING and so assumes the migrate has partially happened.
+> 
+> partial fix for:
+> RH bz: https://bugzilla.redhat.com/show_bug.cgi?id=1525899
+> Reported-by: Xianxian Wang <xianwang@redhat.com>
+> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 
---ZG+WKzXzVby2T9Ro
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Reviewed-by: Peter Xu <peterx@redhat.com>
 
-On Sat, Dec 09, 2017 at 09:43:20AM +0100, C=E9dric Le Goater wrote:
-> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
+Now we fetch this as long as !COMPLETE:
 
-Hrm.  I know I (indirectly) suggested this, but now that I see it, I'm
-thinking adding return values here but not on the read side (which
-would be awkward since they return the read values) seems like not a
-great idea.
+    if (s->state != MIGRATION_STATUS_COMPLETED) {
+        info->ram->remaining = ram_bytes_remaining();
+        info->ram->dirty_pages_rate = ram_counters.dirty_pages_rate;
+    }
 
-So I'm ok with just open coding the dma_memory_write()s after all.
+Maybe we should also narrow this down some day.  Thanks,
 
-> ---
->  include/sysemu/dma.h | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
->=20
-> diff --git a/include/sysemu/dma.h b/include/sysemu/dma.h
-> index c228c6651360..74a9558af39c 100644
-> --- a/include/sysemu/dma.h
-> +++ b/include/sysemu/dma.h
-> @@ -153,12 +153,12 @@ static inline void dma_memory_unmap(AddressSpace *a=
-s,
->          dma_memory_read(as, addr, &val, (_bits) / 8);                   \
->          return _end##_bits##_to_cpu(val);                               \
->      }                                                                   \
-> -    static inline void st##_sname##_##_end##_dma(AddressSpace *as,      \
-> +    static inline int st##_sname##_##_end##_dma(AddressSpace *as,      \
->                                                   dma_addr_t addr,       \
->                                                   uint##_bits##_t val)   \
->      {                                                                   \
->          val =3D cpu_to_##_end##_bits(val);                              =
-  \
-> -        dma_memory_write(as, addr, &val, (_bits) / 8);                  \
-> +        return dma_memory_write(as, addr, &val, (_bits) / 8);           \
->      }
-> =20
->  static inline uint8_t ldub_dma(AddressSpace *as, dma_addr_t addr)
-
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---ZG+WKzXzVby2T9Ro
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlo4mb8ACgkQbDjKyiDZ
-s5LvmxAAvkIhyEa9Ue8UNTwyQlRQBNAq8WefMNgiqz1npKxpNBUtOdWt/BEiAPGV
-7OJcaEYHk2aORPLteHwZpRwJGMkDOIR5PjNxu5met8uNFcYFFadlE0Y2eVqbdSdV
-KImWxEEpzhBn/+f050+kn9Juy/v6L5ah1Sd8Bd722tawhEPPcXynNTT7pLRvyff6
-rguryFnScu/WjbsJi9P2bmLNji8OHsNi0n6YJtCv8ZYCdbqx280LdeR7mreKtbeq
-IV+SI5fk5zy/tH/8UbTA8W65x8IBhG/r0lEESIec3pT9dMr9MMSVlOaUnh2isBEW
-SO7qScmXPt9WFNDtuRY9xnnEl46FoaMb8iuHF8bOAltxyCOBHF+owpp0nKKcVv2g
-CALbopsqNahVZsSUJU+Ii9S8tSX90d9z4hqWPO6AFTXXVhgBRQz9TehwmJwH0iR/
-k+yyysd6xwydE+TPKyZegBIWltaZMUhJc3atnRida7cGSCLk3LCMlgbO0agWgLcs
-V3yfZqz3kPPBUTHaukWWQZgonL/5/H8ruXu1fYXnIWblzBndat//qhUirLHrUd9W
-16QirM9vlGUzpFzVwWfph41RyRG3JwEtZOGcutpbN71h05JpoArPNXXH6OobSzaO
-a1THTcgY7D1qbI+ZIsqSw5bXe0xkz4dOP7FthPeVU6WrUlmsy/c=
-=lM08
------END PGP SIGNATURE-----
-
---ZG+WKzXzVby2T9Ro--
+-- 
+Peter Xu
