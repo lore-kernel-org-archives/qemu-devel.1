@@ -1,24 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43517)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56298)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <tuxillo@quantumachine.net>) id 1eR5ek-0002F1-SG
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 19:21:15 -0500
+	(envelope-from <balaton@eik.bme.hu>) id 1eR5rC-0007jX-6h
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 19:34:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <tuxillo@quantumachine.net>) id 1eR5eh-00035w-LJ
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 19:21:14 -0500
-Received: from mailrelay.quantumachine.net ([37.59.103.225]:34526)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <tuxillo@quantumachine.net>) id 1eR5eh-00034m-DW
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 19:21:11 -0500
-Received: from mail.quantumachine.net (unknown [89.128.97.235])
-	by mailrelay.quantumachine.net (Postfix) with ESMTP id 7955045
-	for <qemu-devel@nongnu.org>; Tue, 19 Dec 2017 01:21:07 +0100 (CET)
-Date: Tue, 19 Dec 2017 00:21:05 +0000
-Message-ID: <20171219002105.Horde.McUB5OjQ4CcwjyzfFEIWM2V@www.quantumachine.net>
-From: Antonio Huete =?utf-8?b?Smltw6luZXo=?= <tuxillo@quantumachine.net>
-Content-Type: text/plain; charset=utf-8; format=flowed; DelSp=Yes
+	(envelope-from <balaton@eik.bme.hu>) id 1eR5r9-0008Vp-0p
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 19:34:06 -0500
+Date: Tue, 19 Dec 2017 01:34:00 +0100 (CET)
+From: BALATON Zoltan <balaton@eik.bme.hu>
+In-Reply-To: <730aec0f-3f10-55ea-eb26-e5740c2fbfe2@redhat.com>
+Message-ID: <alpine.BSF.2.21.1712190109110.9867@zero.eik.bme.hu>
+References: <20171216224842.EE8C17456B3@zero.eik.bme.hu>
+	<20171218040946.GS7753@umbus.fritz.box>
+	<alpine.BSF.2.21.1712181329050.96474@zero.eik.bme.hu>
+	<730aec0f-3f10-55ea-eb26-e5740c2fbfe2@redhat.com>
 MIME-Version: 1.0
-Content-Disposition: inline
-Subject: [Qemu-devel] [PATCH] sockets: Fix test for DragonFly BSD
+Content-Type: text/plain; charset=US-ASCII; format=flowed
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH v2] hw/ide: Emulate SiI3112 SATA
+ controller
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,84 +25,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: berrange@redhat.com, kraxel@redhat.com, pbonzini@redhat.com
+To: John Snow <jsnow@redhat.com>
+Cc: David Gibson <david@gibson.dropbear.id.au>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 
- From f57cdc7ec2d5a5e906fa8b795eeede2d7b66aa56 Mon Sep 17 00:00:00 2001
-From: Antonio Huete Jimenez <tuxillo@quantumachine.net>
-Date: Fri, 15 Dec 2017 01:08:10 +0100
-Subject: [PATCH] sockets: Fix test for DragonFly BSD
+On Mon, 18 Dec 2017, John Snow wrote:
+> On 12/18/2017 07:30 AM, BALATON Zoltan wrote:
+>> On Mon, 18 Dec 2017, David Gibson wrote:
+>>> On Sat, Dec 16, 2017 at 11:42:39PM +0100, BALATON Zoltan wrote:
+>>>> This is a common generic PCI SATA controller that is also used in PCs
+>>>> but more importantly guests running on the Sam460ex board prefer this
+>>>> card and have a driver for it (unlike for other SATA controllers
+>>>> already emulated).
+>>>>
+>>>> Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
+>>>
+>>> I don't know enough about IDE to give this any more than a quick check
+>>> for anything obviously bogus looking.? So,
+>>>
+>>> Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+>>>
+>>> John, can you take this through your tree, or should I take it through
+>>> the ppc tree?
+>>
+>> I think he said before it can go via ppc tree:
+>>
+>> http://lists.nongnu.org/archive/html/qemu-devel/2017-08/msg04480.html
+>>
+>
+> Yep, I tend to use Acked-by to indicate that it's okay for you to stage.
+> I'll give it another look-over in a minute, but I'm fine with adding the
+> model in general, even if it's not quite complete just yet.
 
-DragonFly BSD does not implement AI_V4MAPPED for its getaddrinfo() so
-probe and discard that flag instead of aborting the test.
+Maybe it's not complete yet but it should work to some degree. I've tested 
+it with Linux on i386-softmmu and on PPC Sam460ex with u-boot and some 
+guests (both on x86_64 host) and these could boot from an ide-cd model 
+connected to this controller so at least basic PIO and UDMA modes should 
+work. Maybe some more advanced features are missing but don't know if 
+there are any drivers using those.
 
-Test that fails:
-     ERROR:tests/test-char.c:448:char_udp_test_internal: 'chr' should  
-not be NULL
+On i386 the bios does not have a driver so one cannot boot from this 
+controller only, so I've tested it with -kernel and -initrd options but 
+root filesystem was then read from CD connected to this controller and it 
+could read it and start. I haven't tested it more than that though. Maybe 
+the card's original option ROM that would allow booting from BIOS might 
+not work with this device model but I think we could not distribute that 
+anyway for legal reasons so I did not try that. On the Sam460ex which is 
+my target for this the u-boot firmware has a driver and can boot from this 
+controller as well as clients can use it.
 
-Signed-off-by: Antonio Huete Jimenez <tuxillo@quantumachine.net>
----
-  util/qemu-sockets.c | 25 ++++++++++++++++++++++---
-  1 file changed, 22 insertions(+), 3 deletions(-)
+As of now this patch only adds it to ppcemb and will only be created by 
+default on the sam460ex machine so not very likely someone would try to 
+use it on something else without recompiling QEMU.
 
-diff --git a/util/qemu-sockets.c b/util/qemu-sockets.c
-index af4f01211a..5a9c55c303 100644
---- a/util/qemu-sockets.c
-+++ b/util/qemu-sockets.c
-@@ -43,6 +43,8 @@
-  # define AI_NUMERICSERV 0
-  #endif
-
-+int useV4Mapped = 1;
-+
-
-  static int inet_getport(struct addrinfo *e)
-  {
-@@ -383,7 +385,6 @@ static struct addrinfo  
-*inet_parse_connect_saddr(InetSocketAddress *saddr,
-      struct addrinfo ai, *res;
-      int rc;
-      Error *err = NULL;
--    static int useV4Mapped = 1;
-
-      memset(&ai, 0, sizeof(ai));
-
-@@ -474,7 +475,11 @@ static int inet_dgram_saddr(InetSocketAddress *sraddr,
-
-      /* lookup peer addr */
-      memset(&ai,0, sizeof(ai));
--    ai.ai_flags = AI_CANONNAME | AI_V4MAPPED | AI_ADDRCONFIG;
-+    ai.ai_flags = AI_CANONNAME | AI_ADDRCONFIG;
-+    if (atomic_read(&useV4Mapped)) {
-+        ai.ai_flags |= AI_V4MAPPED;
-+    }
-+
-      ai.ai_family = inet_ai_family_from_address(sraddr, &err);
-      ai.ai_socktype = SOCK_DGRAM;
-
-@@ -493,7 +498,21 @@ static int inet_dgram_saddr(InetSocketAddress *sraddr,
-          goto err;
-      }
-
--    if ((rc = getaddrinfo(addr, port, &ai, &peer)) != 0) {
-+    /* lookup */
-+    rc = getaddrinfo(addr, port, &ai, &peer);
-+
-+    /* At least FreeBSD and OS-X 10.6 declare AI_V4MAPPED but
-+     * then don't implement it in their getaddrinfo(). Detect
-+     * this and retry without the flag since that's preferrable
-+     * to a fatal error
-+     */
-+    if (rc == EAI_BADFLAGS &&
-+        (ai.ai_flags & AI_V4MAPPED)) {
-+        atomic_set(&useV4Mapped, 0);
-+        ai.ai_flags &= ~AI_V4MAPPED;
-+        rc = getaddrinfo(addr, port, &ai, &peer);
-+    }
-+    if (rc != 0) {
-          error_setg(errp, "address resolution failed for %s:%s: %s",  
-addr, port,
-                     gai_strerror(rc));
-          goto err;
--- 
-2.15.0
+Regards,
+BALATON Zoltan
