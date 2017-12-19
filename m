@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60265)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60407)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eRLnQ-0001Oi-4Z
-	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 12:35:21 -0500
+	id 1eRLnb-0001Y2-0M
+	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 12:35:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eRLnO-0000b4-Oi
-	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 12:35:16 -0500
+	id 1eRLnZ-0000pA-Js
+	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 12:35:26 -0500
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Tue, 19 Dec 2017 14:34:19 -0300
-Message-Id: <20171219173425.8113-4-f4bug@amsat.org>
+Date: Tue, 19 Dec 2017 14:34:20 -0300
+Message-Id: <20171219173425.8113-5-f4bug@amsat.org>
 In-Reply-To: <20171219173425.8113-1-f4bug@amsat.org>
 References: <20171219173425.8113-1-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH 3/9] iotests: replace print statement by
- print() function for python3 compatibility
+Subject: [Qemu-devel] [PATCH 4/9] iotests: use octal numbers for python3
+ compatibility
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,82 +32,103 @@ Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nong
 
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- tests/qemu-iotests/149        | 3 ++-
- tests/qemu-iotests/165        | 3 ++-
- tests/qemu-iotests/iotests.py | 5 +++--
- 3 files changed, 7 insertions(+), 4 deletions(-)
+ tests/qemu-iotests/118 | 24 ++++++++++++------------
+ 1 file changed, 12 insertions(+), 12 deletions(-)
 
-diff --git a/tests/qemu-iotests/149 b/tests/qemu-iotests/149
-index 223cd68ad5..d3ffa259db 100755
---- a/tests/qemu-iotests/149
-+++ b/tests/qemu-iotests/149
-@@ -20,6 +20,7 @@
- # Exercise the QEMU 'luks' block driver to validate interoperability
- # with the Linux dm-crypt + cryptsetup implementation
+diff --git a/tests/qemu-iotests/118 b/tests/qemu-iotests/118
+index 8a9e838c90..3cf21218f0 100755
+--- a/tests/qemu-iotests/118
++++ b/tests/qemu-iotests/118
+@@ -417,14 +417,14 @@ class TestChangeReadOnly(ChangeBaseClass):
  
-+from __future__ import print_function
- import subprocess
- import os
- import os.path
-@@ -376,7 +377,7 @@ def test_once(config, qemu_img=False):
-     finally:
-         iotests.log("# Delete image")
-         delete_image(config)
--        print
-+        print()
+     def tearDown(self):
+         self.vm.shutdown()
+-        os.chmod(old_img, 0666)
+-        os.chmod(new_img, 0666)
++        os.chmod(old_img, 0o666)
++        os.chmod(new_img, 0o666)
+         os.remove(old_img)
+         os.remove(new_img)
  
- 
- # Obviously we only work with the luks image format
-diff --git a/tests/qemu-iotests/165 b/tests/qemu-iotests/165
-index a3932db3de..ab29066076 100755
---- a/tests/qemu-iotests/165
-+++ b/tests/qemu-iotests/165
-@@ -18,6 +18,7 @@
- # along with this program.  If not, see <http://www.gnu.org/licenses/>.
- #
- 
-+from __future__ import print_function
- import os
- import re
- import iotests
-@@ -85,7 +86,7 @@ class TestPersistentDirtyBitmap(iotests.QMPTestCase):
-         log = re.sub(r'^\[I \d+\.\d+\] OPENED\n', '', log)
-         log = re.sub(r'\[I \+\d+\.\d+\] CLOSED\n?$', '', log)
-         if log:
--            print log
-+            print(log)
- 
-         self.vm = self.mkVm()
+     def test_ro_ro_retain(self):
+-        os.chmod(old_img, 0444)
+-        os.chmod(new_img, 0444)
++        os.chmod(old_img, 0o444)
++        os.chmod(new_img, 0o444)
+         self.vm.add_drive(old_img, 'media=disk,read-only=on', 'floppy')
          self.vm.launch()
-diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotests.py
-index 6f057904a9..85c9d2c211 100644
---- a/tests/qemu-iotests/iotests.py
-+++ b/tests/qemu-iotests/iotests.py
-@@ -16,6 +16,7 @@
- # along with this program.  If not, see <http://www.gnu.org/licenses/>.
- #
  
-+from __future__ import print_function
- import errno
- import os
- import re
-@@ -145,7 +146,7 @@ def filter_qmp_event(event):
- def log(msg, filters=[]):
-     for flt in filters:
-         msg = flt(msg)
--    print msg
-+    print(msg)
+@@ -443,7 +443,7 @@ class TestChangeReadOnly(ChangeBaseClass):
+         self.assert_qmp(result, 'return[0]/inserted/image/filename', new_img)
  
- class Timeout:
-     def __init__(self, seconds, errmsg = "Timeout"):
-@@ -417,7 +418,7 @@ def notrun(reason):
-     seq = os.path.basename(sys.argv[0])
+     def test_ro_rw_retain(self):
+-        os.chmod(old_img, 0444)
++        os.chmod(old_img, 0o444)
+         self.vm.add_drive(old_img, 'media=disk,read-only=on', 'floppy')
+         self.vm.launch()
  
-     open('%s/%s.notrun' % (output_dir, seq), 'wb').write(reason + '\n')
--    print '%s not run: %s' % (seq, reason)
-+    print("{} not run: {}".format(seq, reason))
-     sys.exit(0)
+@@ -462,7 +462,7 @@ class TestChangeReadOnly(ChangeBaseClass):
+         self.assert_qmp(result, 'return[0]/inserted/image/filename', new_img)
  
- def verify_image_format(supported_fmts=[], unsupported_fmts=[]):
+     def test_rw_ro_retain(self):
+-        os.chmod(new_img, 0444)
++        os.chmod(new_img, 0o444)
+         self.vm.add_drive(old_img, 'media=disk', 'floppy')
+         self.vm.launch()
+ 
+@@ -483,7 +483,7 @@ class TestChangeReadOnly(ChangeBaseClass):
+         self.assert_qmp(result, 'return[0]/inserted/image/filename', old_img)
+ 
+     def test_ro_rw(self):
+-        os.chmod(old_img, 0444)
++        os.chmod(old_img, 0o444)
+         self.vm.add_drive(old_img, 'media=disk,read-only=on', 'floppy')
+         self.vm.launch()
+ 
+@@ -503,7 +503,7 @@ class TestChangeReadOnly(ChangeBaseClass):
+         self.assert_qmp(result, 'return[0]/inserted/image/filename', new_img)
+ 
+     def test_rw_ro(self):
+-        os.chmod(new_img, 0444)
++        os.chmod(new_img, 0o444)
+         self.vm.add_drive(old_img, 'media=disk', 'floppy')
+         self.vm.launch()
+ 
+@@ -542,7 +542,7 @@ class TestChangeReadOnly(ChangeBaseClass):
+         self.assert_qmp(result, 'return[0]/inserted/image/filename', new_img)
+ 
+     def test_make_ro_rw(self):
+-        os.chmod(new_img, 0444)
++        os.chmod(new_img, 0o444)
+         self.vm.add_drive(old_img, 'media=disk', 'floppy')
+         self.vm.launch()
+ 
+@@ -562,7 +562,7 @@ class TestChangeReadOnly(ChangeBaseClass):
+         self.assert_qmp(result, 'return[0]/inserted/image/filename', old_img)
+ 
+     def test_make_rw_ro_by_retain(self):
+-        os.chmod(old_img, 0444)
++        os.chmod(old_img, 0o444)
+         self.vm.add_drive(old_img, 'media=disk,read-only=on', 'floppy')
+         self.vm.launch()
+ 
+@@ -581,7 +581,7 @@ class TestChangeReadOnly(ChangeBaseClass):
+         self.assert_qmp(result, 'return[0]/inserted/image/filename', new_img)
+ 
+     def test_make_ro_rw_by_retain(self):
+-        os.chmod(new_img, 0444)
++        os.chmod(new_img, 0o444)
+         self.vm.add_drive(old_img, 'media=disk', 'floppy')
+         self.vm.launch()
+ 
+@@ -600,7 +600,7 @@ class TestChangeReadOnly(ChangeBaseClass):
+         self.assert_qmp(result, 'return[0]/inserted/image/filename', old_img)
+ 
+     def test_rw_ro_cycle(self):
+-        os.chmod(new_img, 0444)
++        os.chmod(new_img, 0o444)
+         self.vm.add_drive(old_img, 'media=disk', 'floppy')
+         self.vm.launch()
+ 
 -- 
 2.15.1
