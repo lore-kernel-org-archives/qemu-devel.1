@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47259)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47303)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <michael@rivendell.weiser.dinsnail.net>)
-	id 1eROMo-0002Mn-NE
-	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 15:19:59 -0500
+	id 1eROMs-0002Q9-79
+	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 15:20:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <michael@rivendell.weiser.dinsnail.net>)
-	id 1eROMn-0000Ic-Pn
-	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 15:19:58 -0500
+	id 1eROMr-0000Mb-CK
+	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 15:20:02 -0500
 Received: from heinz.dinsnail.net
-	([2a01:238:43b4:3200:9392:5dcc:2f0e:a960]:47136)
+	([2a01:238:43b4:3200:9392:5dcc:2f0e:a960]:47144)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <michael@rivendell.weiser.dinsnail.net>)
-	id 1eROMn-0000Gy-I5
-	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 15:19:57 -0500
+	id 1eROMr-0000LR-6Z
+	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 15:20:01 -0500
 From: Michael Weiser <michael.weiser@gmx.de>
-Date: Tue, 19 Dec 2017 21:16:13 +0100
-Message-Id: <20171219201613.7399-6-michael.weiser@gmx.de>
+Date: Tue, 19 Dec 2017 21:16:12 +0100
+Message-Id: <20171219201613.7399-5-michael.weiser@gmx.de>
 In-Reply-To: <20171219201613.7399-1-michael.weiser@gmx.de>
 References: <20171219201613.7399-1-michael.weiser@gmx.de>
-Subject: [Qemu-devel] [PATCH v2 5/5] linux-user: Add aarch64_be magic
- numbers to qemu-binfmt-conf.sh
+Subject: [Qemu-devel] [PATCH v2 4/5] configure: Add aarch64_be-linux-user
+ target
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,37 +31,63 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Michael Weiser <michael.weiser@gmx.de>, Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>
 
-As we now have a linux-user aarch64_be target, we can add it to the list
-of supported targets in qemu-binfmt-conf.sh
+Add target aarch64_be-linux-user. This allows a qemu-aarch64_be binary
+to be built that will run big-endian aarch64 binaries.
 
 Signed-off-by: Michael Weiser <michael.weiser@gmx.de>
 ---
- scripts/qemu-binfmt-conf.sh | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
+ configure                                 | 9 +++++----
+ default-configs/aarch64_be-linux-user.mak | 1 +
+ 2 files changed, 6 insertions(+), 4 deletions(-)
+ create mode 100644 default-configs/aarch64_be-linux-user.mak
 
-diff --git a/scripts/qemu-binfmt-conf.sh b/scripts/qemu-binfmt-conf.sh
-index 8afc3eb5bb..d69953525c 100755
---- a/scripts/qemu-binfmt-conf.sh
-+++ b/scripts/qemu-binfmt-conf.sh
-@@ -4,7 +4,7 @@
+diff --git a/configure b/configure
+index 9c8aa5a98b..03d95340d8 100755
+--- a/configure
++++ b/configure
+@@ -657,7 +657,7 @@ case "$cpu" in
+     cpu="arm"
+     supported_cpu="yes"
+   ;;
+-  aarch64)
++  aarch64|aarch64_be)
+     cpu="aarch64"
+     supported_cpu="yes"
+   ;;
+@@ -6345,7 +6345,7 @@ if test "$linux" = "yes" ; then
+   s390x)
+     linux_arch=s390
+     ;;
+-  aarch64)
++  aarch64|aarch64_be)
+     linux_arch=arm64
+     ;;
+   mips64)
+@@ -6369,7 +6369,7 @@ target_name=$(echo $target | cut -d '-' -f 1)
+ target_bigendian="no"
  
- qemu_target_list="i386 i486 alpha arm sparc32plus ppc ppc64 ppc64le m68k \
- mips mipsel mipsn32 mipsn32el mips64 mips64el \
--sh4 sh4eb s390x aarch64 hppa"
-+sh4 sh4eb s390x aarch64 aarch64_be hppa"
- 
- i386_magic='\x7fELF\x01\x01\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02\x00\x03\x00'
- i386_mask='\xff\xff\xff\xff\xff\xfe\xfe\xff\xff\xff\xff\xff\xff\xff\xff\xff\xfe\xff\xff\xff'
-@@ -92,6 +92,10 @@ aarch64_magic='\x7fELF\x02\x01\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02\x00\x
- aarch64_mask='\xff\xff\xff\xff\xff\xff\xff\x00\xff\xff\xff\xff\xff\xff\xff\xff\xfe\xff\xff\xff'
- aarch64_family=arm
- 
-+aarch64_be_magic='\x7fELF\x02\x02\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02\x00\xb7'
-+aarch64_be_mask='\xff\xff\xff\xff\xff\xff\xff\x00\xff\xff\xff\xff\xff\xff\xff\xff\xff\xfe\xff\xff'
-+aarch64_be_family=arm
-+
- hppa_magic='\x7f\x45\x4c\x46\x01\x02\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02\x00\x0f'
- hppa_mask='\xff\xff\xff\xff\xff\xff\xff\x00\xff\xff\xff\xff\xff\xff\xff\xff\xff\xfe\xff\xff'
- hppa_family=hppa
+ case "$target_name" in
+-  armeb|hppa|lm32|m68k|microblaze|mips|mipsn32|mips64|moxie|or1k|ppc|ppcemb|ppc64|ppc64abi32|s390x|sh4eb|sparc|sparc64|sparc32plus|xtensaeb)
++  armeb|aarch64_be|hppa|lm32|m68k|microblaze|mips|mipsn32|mips64|moxie|or1k|ppc|ppcemb|ppc64|ppc64abi32|s390x|sh4eb|sparc|sparc64|sparc32plus|xtensaeb)
+   target_bigendian=yes
+   ;;
+ esac
+@@ -6424,7 +6424,8 @@ case "$target_name" in
+     mttcg="yes"
+     gdb_xml_files="arm-core.xml arm-vfp.xml arm-vfp3.xml arm-neon.xml"
+   ;;
+-  aarch64)
++  aarch64|aarch64_be)
++    TARGET_ARCH=aarch64
+     TARGET_BASE_ARCH=arm
+     bflt="yes"
+     mttcg="yes"
+diff --git a/default-configs/aarch64_be-linux-user.mak b/default-configs/aarch64_be-linux-user.mak
+new file mode 100644
+index 0000000000..a69d9d2e41
+--- /dev/null
++++ b/default-configs/aarch64_be-linux-user.mak
+@@ -0,0 +1 @@
++# Default configuration for aarch64_be-linux-user
 -- 
 2.15.1
