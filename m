@@ -1,23 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40888)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47671)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1eR6OB-0002Zf-1d
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 20:08:12 -0500
+	(envelope-from <alistair23@gmail.com>) id 1eR6Ti-0005x1-9S
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 20:13:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1eR6O7-00081V-OT
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 20:08:11 -0500
-Date: Tue, 19 Dec 2017 11:35:08 +1100
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20171219003508.GE4786@umbus.fritz.box>
-References: <20171218092024.21645-1-david@gibson.dropbear.id.au>
-	<20171218092024.21645-3-david@gibson.dropbear.id.au>
-	<20171218121041.0377a5c9@bahia.lan>
+	(envelope-from <alistair23@gmail.com>) id 1eR6Th-0005m3-Af
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 20:13:54 -0500
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="u5E4XgoOPWr4PD9E"
-Content-Disposition: inline
-In-Reply-To: <20171218121041.0377a5c9@bahia.lan>
-Subject: Re: [Qemu-devel] [PATCH 2/6] spapr: Treat Hardware Transactional
- Memory (HTM) as an optional capability
+Sender: alistair23@gmail.com
+In-Reply-To: <20171215031547.31006-5-f4bug@amsat.org>
+References: <20171215031547.31006-1-f4bug@amsat.org>
+	<20171215031547.31006-5-f4bug@amsat.org>
+From: Alistair Francis <alistair.francis@xilinx.com>
+Date: Mon, 18 Dec 2017 17:13:21 -0800
+Message-ID: <CAKmqyKM-Ar=Ld=6KBvJ1D1T0z2wPhvFR52tvKXKp=SEWoFJ=XQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 04/20] sdhci: refactor same sysbus/pci
+ properties into a common one
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,107 +25,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>
-Cc: surajjs@au1.ibm.com, lvivier@redhat.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, mdroth@linux.vnet.ibm.com, abologna@redhat.com
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Cc: Alistair Francis <alistair.francis@xilinx.com>, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, Peter Maydell <peter.maydell@linaro.org>, Michael Walle <michael@walle.cc>, Andrzej Zaborowski <balrogg@gmail.com>, Andrew Baumann <Andrew.Baumann@microsoft.com>, Andrey Smirnov <andrew.smirnov@gmail.com>, Andrey Yurovsky <yurovsky@gmail.com>, Eduardo Habkost <ehabkost@redhat.com>, Prasad J Pandit <pjp@fedoraproject.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Sai Pavan Boddu <saipava@xilinx.com>, qemu-arm <qemu-arm@nongnu.org>
 
+On Thu, Dec 14, 2017 at 7:15 PM, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.o=
+rg> wrote:
+> add sysbus/pci/sdbus separator comments to keep it clearer
+>
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 
---u5E4XgoOPWr4PD9E
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+I'm still unsure about this. Won't this leave us with properties that
+have no impact on the device? That seems very confusing to me.
 
-On Mon, Dec 18, 2017 at 12:10:41PM +0100, Greg Kurz wrote:
-> On Mon, 18 Dec 2017 20:20:20 +1100
-> David Gibson <david@gibson.dropbear.id.au> wrote:
->=20
-> > This adds an spapr capability bit for Hardware Transactional Memory.  I=
-t is
-> > enabled by default for pseries-2.11 and earlier machine types. with POW=
-ER8
-> > or later CPUs (as it must be, since earlier qemu versions would implici=
-tly
-> > allow it).  However it is disabled by default for the latest pseries-2.=
-12
-> > machine type.
-> >=20
-> > This means that with the latest machine type, HTM will not be available,
-> > regardless of CPU, unless it is explicitly enabled on the command line.
-> > That change is made on the basis that:
-> >=20
-> >  * This way running with -M pseries,accel=3Dtcg will start with whateve=
-r cpu
-> >    and will provide the same guest visible model as with accel=3Dkvm.
-> >      - More specifically, this means existing make check tests don't ha=
-ve
-> >        to be modified to use cap-htm=3Doff in order to run with TCG
-> >=20
-> >  * We hope to add a new "HTM without suspend" feature in the not too
-> >    distant future which could work on both POWER8 and POWER9 cpus, and
-> >    could be enabled by default.
-> >=20
-> >  * Best guesses suggest that future POWER cpus may well only support the
-> >    HTM-without-suspend model, not the (frankly, horribly overcomplicate=
-d)
-> >    POWER8 style HTM with suspend.
-> >=20
-> >  * Anecdotal evidence suggests problems with HTM being enabled when it
-> >    wasn't wanted are more common than being missing when it was.
-> >=20
-> > Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-> > ---
-> >  hw/ppc/spapr.c         | 15 ++++++++++-----
-> >  hw/ppc/spapr_caps.c    | 29 ++++++++++++++++++++++++++++-
-> >  include/hw/ppc/spapr.h |  3 +++
-> >  3 files changed, 41 insertions(+), 6 deletions(-)
-> >=20
-> > diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> > index d472baef8d..f8fee8ebcf 100644
-> > --- a/hw/ppc/spapr.c
-> > +++ b/hw/ppc/spapr.c
-> > @@ -253,7 +253,9 @@ static int spapr_fixup_cpu_numa_dt(void *fdt, int o=
-ffset, PowerPCCPU *cpu)
-> >  }
-> > =20
-> >  /* Populate the "ibm,pa-features" property */
-> > -static void spapr_populate_pa_features(PowerPCCPU *cpu, void *fdt, int=
- offset,
-> > +static void spapr_populate_pa_features(sPAPRMachineState *spapr,
->=20
-> While here, maybe you could rename spapr_populate_pa_features() to
-> spapr_dt_pa_features() ?
->=20
-> But anyway, this isn't really the point of this series, so:
+Alistair
 
-Yeah, I don't think that's really in scope for this series.
-
-> Reviewed-by: Greg Kurz <groug@kaod.org>
-
-Thanks.
-
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---u5E4XgoOPWr4PD9E
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlo4XrcACgkQbDjKyiDZ
-s5KU1hAAqsetPfflzXAi0kGUbwY8bHFejhdMwe7zMXzxXQl5lVd5UmFXSSHex0+y
-PKmHzpuFaUxh+4+HW4go/UXrshgS4GdgI+jDWB9NSIcFMZp+jm87eqWSukrxwvUF
-ZAZltCpYVpDjleWRNBL4LWcGq5REfUEEMGe+uUXK9NPA1Yuw+FJoWa7IklN2gMVk
-xAVdp/yY+G2/8Hbf45oBlhIoucFpdRqzVs8V010P4nH8gf51RlTQVIlRR4nVbUTI
-gscZQ8iiStmOBozyp4ZbCRtFKIExWUVQ2kXrLyDDtbh1wzGWxZzdAHCAuXTLzXde
-c1u3A8jRVLndA18comBayUnnxxxkuZWkljPgTPPCYF8dz14hgxSzweKZWqwryyGv
-qtwv9PhnPGg4GB4+RY0aD7k5xDqCe2J/ciBDJz2xtEt+b2A4QBd6MIJoH7bt+Rqu
-MGzwUavV47koBBtQKwWFaUCOK9p+YtOgMXl6TLPCDYqRZqUhyNxsROU6e0WUPc+R
-HldevIbEnfCnkzKzSXpjCGSmSjvF9tKeAeNq8me9IjRAFo6i1SMHpqWX74wHpX5o
-Rc+hXAEi0pU29JGMlzNvQdeoGHJjjdA+OoBWwGLg3cUCVd+KaBqHnrc9l+b+vYz0
-ZJwY2EU5zKHQmcSbDm5i+rnM5AcKkTkZK3jKaX4q+/kniG57VyY=
-=4WNH
------END PGP SIGNATURE-----
-
---u5E4XgoOPWr4PD9E--
+> ---
+>  hw/sd/sdhci.c | 21 ++++++++++-----------
+>  1 file changed, 10 insertions(+), 11 deletions(-)
+>
+> diff --git a/hw/sd/sdhci.c b/hw/sd/sdhci.c
+> index 2823da00da..dbdfd54350 100644
+> --- a/hw/sd/sdhci.c
+> +++ b/hw/sd/sdhci.c
+> @@ -1265,13 +1265,17 @@ const VMStateDescription sdhci_vmstate =3D {
+>
+>  /* Capabilities registers provide information on supported features of t=
+his
+>   * specific host controller implementation */
+> -static Property sdhci_pci_properties[] =3D {
+> +static Property sdhci_properties[] =3D {
+>      DEFINE_PROP_UINT32("capareg", SDHCIState, capareg,
+>              SDHC_CAPAB_REG_DEFAULT),
+>      DEFINE_PROP_UINT32("maxcurr", SDHCIState, maxcurr, 0),
+> +    DEFINE_PROP_BOOL("pending-insert-quirk", SDHCIState, pending_insert_=
+quirk,
+> +                     false),
+>      DEFINE_PROP_END_OF_LIST(),
+>  };
+>
+> +/* --- qdev PCI --- */
+> +
+>  static void sdhci_pci_realize(PCIDevice *dev, Error **errp)
+>  {
+>      SDHCIState *s =3D PCI_SDHCI(dev);
+> @@ -1304,7 +1308,7 @@ static void sdhci_pci_class_init(ObjectClass *klass=
+, void *data)
+>      k->class_id =3D PCI_CLASS_SYSTEM_SDHCI;
+>      set_bit(DEVICE_CATEGORY_STORAGE, dc->categories);
+>      dc->vmsd =3D &sdhci_vmstate;
+> -    dc->props =3D sdhci_pci_properties;
+> +    dc->props =3D sdhci_properties;
+>      dc->reset =3D sdhci_poweron_reset;
+>  }
+>
+> @@ -1319,14 +1323,7 @@ static const TypeInfo sdhci_pci_info =3D {
+>      },
+>  };
+>
+> -static Property sdhci_sysbus_properties[] =3D {
+> -    DEFINE_PROP_UINT32("capareg", SDHCIState, capareg,
+> -            SDHC_CAPAB_REG_DEFAULT),
+> -    DEFINE_PROP_UINT32("maxcurr", SDHCIState, maxcurr, 0),
+> -    DEFINE_PROP_BOOL("pending-insert-quirk", SDHCIState, pending_insert_=
+quirk,
+> -                     false),
+> -    DEFINE_PROP_END_OF_LIST(),
+> -};
+> +/* --- qdev SysBus --- */
+>
+>  static void sdhci_sysbus_init(Object *obj)
+>  {
+> @@ -1359,7 +1356,7 @@ static void sdhci_sysbus_class_init(ObjectClass *kl=
+ass, void *data)
+>      DeviceClass *dc =3D DEVICE_CLASS(klass);
+>
+>      dc->vmsd =3D &sdhci_vmstate;
+> -    dc->props =3D sdhci_sysbus_properties;
+> +    dc->props =3D sdhci_properties;
+>      dc->realize =3D sdhci_sysbus_realize;
+>      dc->reset =3D sdhci_poweron_reset;
+>  }
+> @@ -1373,6 +1370,8 @@ static const TypeInfo sdhci_sysbus_info =3D {
+>      .class_init =3D sdhci_sysbus_class_init,
+>  };
+>
+> +/* --- qdev bus master --- */
+> +
+>  static void sdhci_bus_class_init(ObjectClass *klass, void *data)
+>  {
+>      SDBusClass *sbc =3D SD_BUS_CLASS(klass);
+> --
+> 2.15.1
+>
+>
