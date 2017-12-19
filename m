@@ -1,25 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52907)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53769)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <penguin-kernel@I-love.SAKURA.ne.jp>)
-	id 1eRIZ2-00072D-Ac
-	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 09:08:13 -0500
+	(envelope-from <alex.williamson@redhat.com>) id 1eRIaD-0007mh-HR
+	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 09:09:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <penguin-kernel@I-love.SAKURA.ne.jp>)
-	id 1eRIYz-0000wI-Hs
-	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 09:08:12 -0500
-Received: from www262.sakura.ne.jp ([2001:e42:101:1:202:181:97:72]:25356)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <penguin-kernel@I-love.SAKURA.ne.jp>)
-	id 1eRIYz-0007m7-2f
-	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 09:08:09 -0500
-From: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
-References: <1513685879-21823-1-git-send-email-wei.w.wang@intel.com>
-In-Reply-To: <1513685879-21823-1-git-send-email-wei.w.wang@intel.com>
-Message-Id: <201712192305.AAE21882.MtQHJOFFSFVOLO@I-love.SAKURA.ne.jp>
-Date: Tue, 19 Dec 2017 23:05:11 +0900
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Subject: Re: [Qemu-devel] [PATCH v20 0/7] Virtio-balloon Enhancement
+	(envelope-from <alex.williamson@redhat.com>) id 1eRIaA-0001Xo-OH
+	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 09:09:25 -0500
+Date: Tue, 19 Dec 2017 07:09:19 -0700
+From: Alex Williamson <alex.williamson@redhat.com>
+Message-ID: <20171219070919.42d90b94@w520.home>
+In-Reply-To: <ca9cd686-ea2f-716e-b909-f6e22d1c704c@redhat.com>
+References: <20171212051853.24583-1-aik@ozlabs.ru>
+	<20171211224650.71237179@w520.home>
+	<ca9cd686-ea2f-716e-b909-f6e22d1c704c@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH qemu] RFC: spapr/iommu: Enable in-kernel
+ TCE acceleration via VFIO KVM device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,41 +25,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: wei.w.wang@intel.com
-Cc: virtio-dev@lists.oasis-open.org, linux-kernel@vger.kernel.org, qemu-devel@nongnu.org, virtualization@lists.linux-foundation.org, kvm@vger.kernel.org, linux-mm@kvack.org, mst@redhat.com, mhocko@kernel.org, akpm@linux-foundation.org, mawilcox@microsoft.com, david@redhat.com, cornelia.huck@de.ibm.com, mgorman@techsingularity.net, aarcange@redhat.com, amit.shah@redhat.com, pbonzini@redhat.com, willy@infradead.org, liliang.opensource@gmail.com, yang.zhang.wz@gmail.com, quan.xu0@gmail.com, nilal@redhat.com, riel@redhat.com
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Alexey Kardashevskiy <aik@ozlabs.ru>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
 
-Wei Wang wrote:
-> ChangeLog:
-> v19->v20:
-> 1) patch 1: xbitmap
-> 	- add __rcu to "void **slot";
-> 	- remove the exceptional path.
-> 2) patch 3: xbitmap
-> 	- DeveloperNotes: add an item to comment that the current bit range
-> 	  related APIs operating on extremely large ranges (e.g.
->           [0, ULONG_MAX)) will take too long time. This can be optimized in
-> 	  the future.
-> 	- remove the exceptional path;
-> 	- remove xb_preload_and_set();
-> 	- reimplement xb_clear_bit_range to make its usage close to
-> 	  bitmap_clear;
-> 	- rename xb_find_next_set_bit to xb_find_set, and re-implement it
-> 	  in a style close to find_next_bit;
-> 	- rename xb_find_next_zero_bit to xb_find_clear, and re-implement
-> 	  it in a stytle close to find_next_zero_bit;
-> 	- separate the implementation of xb_find_set and xb_find_clear for
-> 	  the convenience of future updates.
+On Tue, 19 Dec 2017 12:12:35 +0100
+Paolo Bonzini <pbonzini@redhat.com> wrote:
 
-Removing exceptional path made this patch easier to read.
-But what I meant is
+> On 12/12/2017 06:46, Alex Williamson wrote:
+> >> +enum IOMMUMemoryRegionAttr {
+> >> +    IOMMU_ATTR_KVM_FD  
+> > 
+> > You're generalizing the wrong thing here, this is specifically a
+> > SPAPR_TCE_FD, call it that.  
+> 
+> ... and you're not even implementing set_attr, so let's drop it.
+> 
+> My suggestion is to add a function in hw/vfio:
+> 
+>     int vfio_container_attach_kvm_spapr_tce(VFIOContainer *cont,
+>                                             int tablefd);
+> 
+> and an IOMMUMemoryRegionClass member:
+> 
+>     int (*set_vfio_container_attrs)(IOMMUMemoryRegion *iommu,
+>                                     VFIOContainer *cont)
+> 
+> Then your implementation for the latter is as simple as this:
+> 
+>     if (!kvm_enabled() || !kvmppc_has_cap_spapr_vfio()) {
+>         sPAPRTCETable *tcet = container_of(iommu, sPAPRTCETable, iommu);
+>         return vfio_container_attach_kvm_spapr_tce(cont, tcet->fd);
+>     }
 
-  Can you eliminate exception path and fold all xbitmap patches into one, and
-  post only one xbitmap patch without virtio-balloon changes? 
+Ugh, exactly the sort of interface I've been trying to avoid, vfio
+specific callbacks on common data structures handing out vfio private
+data pointers, requiring additional exported functions from vfio for
+each new user of it.  Why is this better?  Thanks,
 
-.
-
-I still think we don't need xb_preload()/xb_preload_end().
-I think xb_find_set() has a bug in !node path.
-
-Also, please avoid unconditionally adding to builtin modules.
-There are users who want to save even few KB.
+Alex
