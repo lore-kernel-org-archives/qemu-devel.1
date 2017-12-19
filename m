@@ -1,28 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55132)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33463)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1eRM8t-0001A0-Ix
-	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 12:57:28 -0500
+	(envelope-from <mst@redhat.com>) id 1eRMGh-0003c8-Tk
+	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 13:05:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1eRM8s-00059o-8B
-	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 12:57:27 -0500
-Received: from mail-wm0-x22e.google.com ([2a00:1450:400c:c09::22e]:43605)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1eRM8r-00058n-Vb
-	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 12:57:26 -0500
-Received: by mail-wm0-x22e.google.com with SMTP id n138so5354998wmg.2
-	for <qemu-devel@nongnu.org>; Tue, 19 Dec 2017 09:57:25 -0800 (PST)
+	(envelope-from <mst@redhat.com>) id 1eRMGe-0005hX-Pz
+	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 13:05:31 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:33518)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1eRMGe-0005gq-Gw
+	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 13:05:28 -0500
+Date: Tue, 19 Dec 2017 20:05:18 +0200
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20171219194951-mutt-send-email-mst@kernel.org>
+References: <20171217125457.3429-1-marcel@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20171218191228.31018-11-berrange@redhat.com>
-References: <20171218191228.31018-1-berrange@redhat.com>
-	<20171218191228.31018-11-berrange@redhat.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Tue, 19 Dec 2017 18:57:23 +0100
-Message-ID: <CAJ+F1CK+cpUO7J1_WrbQeLZSDApMOamm=j0S4mUGWJM7qRuoVQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v1 10/13] ui: fix VNC client throttling
- when forced update is requested
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20171217125457.3429-1-marcel@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH V2 0/5] hw/pvrdma: PVRDMA device
+ implementation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,225 +27,170 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>
-Cc: QEMU <qemu-devel@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>, P J P <ppandit@redhat.com>
+To: Marcel Apfelbaum <marcel@redhat.com>
+Cc: qemu-devel@nongnu.org, ehabkost@redhat.com, imammedo@redhat.com, yuval.shaia@oracle.com, pbonzini@redhat.com
 
-Hi
+On Sun, Dec 17, 2017 at 02:54:52PM +0200, Marcel Apfelbaum wrote:
+> RFC -> V2:
+>  - Full implementation of the pvrdma device
+>  - Backend is an ibdevice interface, no need for the KDBR module
+> 
+> General description
+> ===================
+> PVRDMA is the QEMU implementation of VMware's paravirtualized RDMA device.
+> It works with its Linux Kernel driver AS IS, no need for any special guest
+> modifications.
+> 
+> While it complies with the VMware device, it can also communicate with bare
+> metal RDMA-enabled machines and does not require an RDMA HCA in the host, it
+> can work with Soft-RoCE (rxe).
+> 
+> It does not require the whole guest RAM to be pinned
 
-On Mon, Dec 18, 2017 at 8:12 PM, Daniel P. Berrange <berrange@redhat.com> w=
-rote:
-> The VNC server must throttle data sent to the client to prevent the 'outp=
-ut'
-> buffer size growing without bound, if the client stops reading data off t=
-he
-> socket (either maliciously or due to stalled/slow network connection).
->
-> The current throttling is very crude because it simply checks whether the
-> output buffer offset is zero. This check is disabled if the client has re=
-quested
-> a forced update, because we want to send these as soon as possible.
->
-> As a result, the VNC client can cause QEMU to allocate arbitrary amounts =
-of RAM.
-> They can first start something in the guest that triggers lots of framebu=
-ffer
-> updates eg play a youtube video. Then repeatedly send full framebuffer up=
-date
-> requests, but never read data back from the server. This can easily make =
-QEMU's
-> VNC server send buffer consume 100MB of RAM per second, until the OOM kil=
-ler
-> starts reaping processes (hopefully the rogue QEMU process, but it might =
-pick
-> others...).
->
-> To address this we make the throttling more intelligent, so we can thrott=
-le
-> full updates. When we get a forced update request, we keep track of exact=
-ly how
-> much data we put on the output buffer. We will not process a subsequent f=
-orced
-> update request until this data has been fully sent on the wire. We always=
- allow
-> one forced update request to be in flight, regardless of what data is que=
-ued
-> for incremental updates or audio data. The slight complication is that we=
- do
-> not initially know how much data an update will send, as this is done in =
-the
-> background by the VNC job thread. So we must track the fact that the job =
-thread
-> has an update pending, and not process any further updates until this job=
- is
-> has been completed & put data on the output buffer.
->
-> This unbounded memory growth affects all VNC server configurations suppor=
-ted by
-> QEMU, with no workaround possible. The mitigating factor is that it can o=
-nly be
-> triggered by a client that has authenticated with the VNC server, and who=
- is
-> able to trigger a large quantity of framebuffer updates or audio samples =
-from
-> the guest OS. Mostly they'll just succeed in getting the OOM killer to ki=
-ll
-> their own QEMU process, but its possible other processes can get taken ou=
-t as
-> collateral damage.
->
-> This is a more general variant of the similar unbounded memory usage flaw=
- in
-> the websockets server, that was previously assigned CVE-2017-15268, and f=
-ixed
-> in 2.11 by:
->
->   commit a7b20a8efa28e5f22c26c06cd06c2f12bc863493
->   Author: Daniel P. Berrange <berrange@redhat.com>
->   Date:   Mon Oct 9 14:43:42 2017 +0100
->
->     io: monitor encoutput buffer size from websocket GSource
->
-> This new general memory usage flaw has been assigned CVE-2017-15124, and =
-is
-> partially fixed by this patch.
->
-> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
-> ---
->  ui/vnc-auth-sasl.c |  5 +++++
->  ui/vnc-jobs.c      |  5 +++++
->  ui/vnc.c           | 28 ++++++++++++++++++++++++----
->  ui/vnc.h           |  7 +++++++
->  4 files changed, 41 insertions(+), 4 deletions(-)
->
-> diff --git a/ui/vnc-auth-sasl.c b/ui/vnc-auth-sasl.c
-> index 761493b9b2..8c1cdde3db 100644
-> --- a/ui/vnc-auth-sasl.c
-> +++ b/ui/vnc-auth-sasl.c
-> @@ -79,6 +79,11 @@ long vnc_client_write_sasl(VncState *vs)
->
->      vs->sasl.encodedOffset +=3D ret;
->      if (vs->sasl.encodedOffset =3D=3D vs->sasl.encodedLength) {
-> +        if (vs->sasl.encodedRawLength >=3D vs->force_update_offset) {
-> +            vs->force_update_offset =3D 0;
-> +        } else {
-> +            vs->force_update_offset -=3D vs->sasl.encodedRawLength;
-> +        }
->          vs->output.offset -=3D vs->sasl.encodedRawLength;
->          vs->sasl.encoded =3D NULL;
->          vs->sasl.encodedOffset =3D vs->sasl.encodedLength =3D 0;
-> diff --git a/ui/vnc-jobs.c b/ui/vnc-jobs.c
-> index f7867771ae..e326679dd0 100644
-> --- a/ui/vnc-jobs.c
-> +++ b/ui/vnc-jobs.c
-> @@ -152,6 +152,11 @@ void vnc_jobs_consume_buffer(VncState *vs)
->                  vs->ioc, G_IO_IN | G_IO_OUT, vnc_client_io, vs, NULL);
->          }
->          buffer_move(&vs->output, &vs->jobs_buffer);
-> +
-> +        if (vs->job_update =3D=3D VNC_STATE_UPDATE_FORCE) {
-> +            vs->force_update_offset =3D vs->output.offset;
-> +        }
-> +        vs->job_update =3D VNC_STATE_UPDATE_NONE;
->      }
->      flush =3D vs->ioc !=3D NULL && vs->abort !=3D true;
->      vnc_unlock_output(vs);
-> diff --git a/ui/vnc.c b/ui/vnc.c
-> index a2699f534d..4021c0118c 100644
-> --- a/ui/vnc.c
-> +++ b/ui/vnc.c
-> @@ -1021,14 +1021,28 @@ static bool vnc_should_update(VncState *vs)
->          break;
->      case VNC_STATE_UPDATE_INCREMENTAL:
->          /* Only allow incremental updates if the pending send queue
-> -         * is less than the permitted threshold
-> +         * is less than the permitted threshold, and the job worker
-> +         * is completely idle.
->           */
-> -        if (vs->output.offset < vs->throttle_output_offset) {
-> +        if (vs->output.offset < vs->throttle_output_offset &&
-> +            vs->job_update =3D=3D VNC_STATE_UPDATE_NONE) {
->              return true;
->          }
->          break;
->      case VNC_STATE_UPDATE_FORCE:
-> -        return true;
-> +        /* Only allow forced updates if the pending send queue
-> +         * does not contain a previous forced update, and the
-> +         * job worker is completely idle.
-> +         *
-> +         * Note this means we'll queue a forced update, even if
-> +         * the output buffer size is otherwise over the throttle
-> +         * output limit.
-> +         */
-> +        if (vs->force_update_offset =3D=3D 0 &&
-> +            vs->job_update =3D=3D VNC_STATE_UPDATE_NONE) {
-> +            return true;
-> +        }
-> +        break;
->      }
->      return false;
->  }
-> @@ -1096,8 +1110,9 @@ static int vnc_update_client(VncState *vs, int has_=
-dirty)
->          }
->      }
->
-> -    vnc_job_push(job);
-> +    vs->job_update =3D vs->update;
+What happens if guest attempts to register all its memory?
 
-How is this going to match the buffer job in vnc_jobs_consume_buffer() ?
+> allowing memory
+> over-commit
+> and, even if not implemented yet, migration support will be
+> possible with some HW assistance.
 
-(isn't this potentially taking the next job to finish as a force-update?)
+What does "HW assistance" mean here?
+Can it work with any existing hardware?
 
->      vs->update =3D VNC_STATE_UPDATE_NONE;
-> +    vnc_job_push(job);
->      vs->has_dirty =3D 0;
->      return n;
->  }
-> @@ -1332,6 +1347,11 @@ static ssize_t vnc_client_write_plain(VncState *vs=
-)
->      if (!ret)
->          return 0;
->
-> +    if (ret >=3D vs->force_update_offset) {
-> +        vs->force_update_offset =3D 0;
-> +    } else {
-> +        vs->force_update_offset -=3D ret;
-> +    }
->      buffer_advance(&vs->output, ret);
->
->      if (vs->output.offset =3D=3D 0) {
-> diff --git a/ui/vnc.h b/ui/vnc.h
-> index 8fe69595c6..3f4cd4d93d 100644
-> --- a/ui/vnc.h
-> +++ b/ui/vnc.h
-> @@ -271,6 +271,7 @@ struct VncState
->
->      VncDisplay *vd;
->      VncStateUpdate update; /* Most recent pending request from client */
-> +    VncStateUpdate job_update; /* Currently processed by job thread */
->      int has_dirty;
->      uint32_t features;
->      int absolute;
-> @@ -298,6 +299,12 @@ struct VncState
->
->      VncClientInfo *info;
->
-> +    /* Job thread bottom half has put data for a forced update
-> +     * into the output buffer. This offset points to the end of
-> +     * the update data in the output buffer. This lets us determine
-> +     * when a force update is fully sent to the client, allowing
-> +     * us to process further forced updates. */
-> +    size_t force_update_offset;
->      /* We allow multiple incremental updates or audio capture
->       * samples to be queued in output buffer, provided the
->       * buffer size doesn't exceed this threshold. The value
-> --
-> 2.14.3
->
->
+> 
+>  Design
+>  ======
+>  - Follows the behavior of VMware's pvrdma device, however is not tightly
+>    coupled with it
+
+Everything seems to be in pvrdma. Since it's not coupled, could you
+split code to pvrdma specific and generic parts?
+
+> and most of the code can be reused if we decide to
+>    continue to a Virtio based RDMA device.
+
+I suspect that without virtio we won't be able to do any future
+extensions.
+
+>  - It exposes 3 BARs:
+>     BAR 0 - MSIX, utilize 3 vectors for command ring, async events and
+>             completions
+>     BAR 1 - Configuration of registers
+
+What does this mean?
+
+>     BAR 2 - UAR, used to pass HW commands from driver.
+
+A detailed description of above belongs in documentation.
+
+>  - The device performs internal management of the RDMA
+>    resources (PDs, CQs, QPs, ...), meaning the objects
+>    are not directly coupled to a physical RDMA device resources.
+
+I am wondering how do you make connections? QP#s are exposed on
+the wire during connection management.
+
+> The pvrdma backend is an ibdevice interface that can be exposed
+> either by a Soft-RoCE(rxe) device on machines with no RDMA device,
+> or an HCA SRIOV function(VF/PF).
+> Note that ibdevice interfaces can't be shared between pvrdma devices,
+> each one requiring a separate instance (rxe or SRIOV VF).
+
+So what's the advantage of this over pass-through then?
 
 
-
---=20
-Marc-Andr=C3=A9 Lureau
+> 
+> Tests and performance
+> =====================
+> Tested with SoftRoCE backend (rxe)/Mellanox ConnectX3,
+> and Mellanox ConnectX4 HCAs with:
+>   - VMs in the same host
+>   - VMs in different hosts 
+>   - VMs to bare metal.
+> 
+> The best performance achieved with ConnectX HCAs and buffer size
+> bigger than 1MB which was the line rate ~ 50Gb/s.
+> The conclusion is that using the PVRDMA device there are no
+> actual performance penalties compared to bare metal for big enough
+> buffers (which is quite common when using RDMA), while allowing
+> memory overcommit.
+> 
+> Marcel Apfelbaum (3):
+>   mem: add share parameter to memory-backend-ram
+>   docs: add pvrdma device documentation.
+>   MAINTAINERS: add entry for hw/net/pvrdma
+> 
+> Yuval Shaia (2):
+>   pci/shpc: Move function to generic header file
+>   pvrdma: initial implementation
+> 
+>  MAINTAINERS                         |   7 +
+>  Makefile.objs                       |   1 +
+>  backends/hostmem-file.c             |  25 +-
+>  backends/hostmem-ram.c              |   4 +-
+>  backends/hostmem.c                  |  21 +
+>  configure                           |   9 +-
+>  default-configs/arm-softmmu.mak     |   2 +
+>  default-configs/i386-softmmu.mak    |   1 +
+>  default-configs/x86_64-softmmu.mak  |   1 +
+>  docs/pvrdma.txt                     | 145 ++++++
+>  exec.c                              |  26 +-
+>  hw/net/Makefile.objs                |   7 +
+>  hw/net/pvrdma/pvrdma.h              | 179 +++++++
+>  hw/net/pvrdma/pvrdma_backend.c      | 986 ++++++++++++++++++++++++++++++++++++
+>  hw/net/pvrdma/pvrdma_backend.h      |  74 +++
+>  hw/net/pvrdma/pvrdma_backend_defs.h |  68 +++
+>  hw/net/pvrdma/pvrdma_cmd.c          | 338 ++++++++++++
+>  hw/net/pvrdma/pvrdma_defs.h         | 121 +++++
+>  hw/net/pvrdma/pvrdma_dev_api.h      | 580 +++++++++++++++++++++
+>  hw/net/pvrdma/pvrdma_dev_ring.c     | 138 +++++
+>  hw/net/pvrdma/pvrdma_dev_ring.h     |  42 ++
+>  hw/net/pvrdma/pvrdma_ib_verbs.h     | 399 +++++++++++++++
+>  hw/net/pvrdma/pvrdma_main.c         | 664 ++++++++++++++++++++++++
+>  hw/net/pvrdma/pvrdma_qp_ops.c       | 187 +++++++
+>  hw/net/pvrdma/pvrdma_qp_ops.h       |  26 +
+>  hw/net/pvrdma/pvrdma_ring.h         | 134 +++++
+>  hw/net/pvrdma/pvrdma_rm.c           | 791 +++++++++++++++++++++++++++++
+>  hw/net/pvrdma/pvrdma_rm.h           |  54 ++
+>  hw/net/pvrdma/pvrdma_rm_defs.h      | 111 ++++
+>  hw/net/pvrdma/pvrdma_types.h        |  37 ++
+>  hw/net/pvrdma/pvrdma_utils.c        | 133 +++++
+>  hw/net/pvrdma/pvrdma_utils.h        |  41 ++
+>  hw/net/pvrdma/trace-events          |   9 +
+>  hw/pci/shpc.c                       |  11 +-
+>  include/exec/memory.h               |  23 +
+>  include/exec/ram_addr.h             |   3 +-
+>  include/hw/pci/pci_ids.h            |   3 +
+>  include/qemu/cutils.h               |  10 +
+>  include/qemu/osdep.h                |   2 +-
+>  include/sysemu/hostmem.h            |   2 +-
+>  include/sysemu/kvm.h                |   2 +-
+>  memory.c                            |  16 +-
+>  util/oslib-posix.c                  |   4 +-
+>  util/oslib-win32.c                  |   2 +-
+>  44 files changed, 5378 insertions(+), 61 deletions(-)
+>  create mode 100644 docs/pvrdma.txt
+>  create mode 100644 hw/net/pvrdma/pvrdma.h
+>  create mode 100644 hw/net/pvrdma/pvrdma_backend.c
+>  create mode 100644 hw/net/pvrdma/pvrdma_backend.h
+>  create mode 100644 hw/net/pvrdma/pvrdma_backend_defs.h
+>  create mode 100644 hw/net/pvrdma/pvrdma_cmd.c
+>  create mode 100644 hw/net/pvrdma/pvrdma_defs.h
+>  create mode 100644 hw/net/pvrdma/pvrdma_dev_api.h
+>  create mode 100644 hw/net/pvrdma/pvrdma_dev_ring.c
+>  create mode 100644 hw/net/pvrdma/pvrdma_dev_ring.h
+>  create mode 100644 hw/net/pvrdma/pvrdma_ib_verbs.h
+>  create mode 100644 hw/net/pvrdma/pvrdma_main.c
+>  create mode 100644 hw/net/pvrdma/pvrdma_qp_ops.c
+>  create mode 100644 hw/net/pvrdma/pvrdma_qp_ops.h
+>  create mode 100644 hw/net/pvrdma/pvrdma_ring.h
+>  create mode 100644 hw/net/pvrdma/pvrdma_rm.c
+>  create mode 100644 hw/net/pvrdma/pvrdma_rm.h
+>  create mode 100644 hw/net/pvrdma/pvrdma_rm_defs.h
+>  create mode 100644 hw/net/pvrdma/pvrdma_types.h
+>  create mode 100644 hw/net/pvrdma/pvrdma_utils.c
+>  create mode 100644 hw/net/pvrdma/pvrdma_utils.h
+>  create mode 100644 hw/net/pvrdma/trace-events
+> 
+> -- 
+> 2.13.5
