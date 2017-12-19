@@ -1,26 +1,42 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50566)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51174)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1eRKkv-0000Fm-BY
-	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 11:28:38 -0500
+	(envelope-from <walling@linux.vnet.ibm.com>) id 1eRKlh-0000hp-EN
+	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 11:29:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1eRKks-0004P0-Dv
-	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 11:28:37 -0500
-Received: from mout.kundenserver.de ([212.227.126.134]:56104)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1eRKks-0004OC-42
-	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 11:28:34 -0500
-References: <20171219115447.17948-1-laurent@vivier.eu>
-	<CAAdtpL5LUMb33mBvEFcfbj=_HrhzsuadkokrxosftJ1hiLS3fA@mail.gmail.com>
-From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <fb5c727f-884e-c8f2-591f-9142954383dd@vivier.eu>
-Date: Tue, 19 Dec 2017 17:28:26 +0100
+	(envelope-from <walling@linux.vnet.ibm.com>) id 1eRKle-0004sd-Hd
+	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 11:29:25 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:54338)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <walling@linux.vnet.ibm.com>)
+	id 1eRKle-0004ro-8i
+	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 11:29:22 -0500
+Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	vBJGSxqr109761
+	for <qemu-devel@nongnu.org>; Tue, 19 Dec 2017 11:29:17 -0500
+Received: from e12.ny.us.ibm.com (e12.ny.us.ibm.com [129.33.205.202])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2ey4y7d0ff-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Tue, 19 Dec 2017 11:29:16 -0500
+Received: from localhost
+	by e12.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <walling@linux.vnet.ibm.com>;
+	Tue, 19 Dec 2017 11:29:15 -0500
+References: <1513030760-26245-1-git-send-email-walling@linux.vnet.ibm.com>
+	<1513030760-26245-2-git-send-email-walling@linux.vnet.ibm.com>
+	<a6920dc1-f2be-cdd9-ba6e-a341a9e93343@redhat.com>
+	<231e9fad-a4e0-b957-229e-3f3dcc342e4e@linux.vnet.ibm.com>
+	<31f9a2b4-b8c2-c823-1dfc-b251d00d7fc2@redhat.com>
+From: "Collin L. Walling" <walling@linux.vnet.ibm.com>
+Date: Tue, 19 Dec 2017 11:29:10 -0500
 MIME-Version: 1.0
-In-Reply-To: <CAAdtpL5LUMb33mBvEFcfbj=_HrhzsuadkokrxosftJ1hiLS3fA@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <31f9a2b4-b8c2-c823-1dfc-b251d00d7fc2@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] Split adb.c into adb.c,
- adb-mouse.c and adb-kbd.c
+Message-Id: <889623b1-f186-33af-e1be-8222a429518d@linux.vnet.ibm.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v2 1/5] s390-ccw: update libc
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,85 +45,131 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>, =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+To: Thomas Huth <thuth@redhat.com>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org
+Cc: frankja@linux.vnet.ibm.com, borntraeger@de.ibm.com, cohuck@redhat.com, david@redhat.com
 
-Le 19/12/2017 à 16:26, Philippe Mathieu-Daudé a écrit :
-> Hi Laurent,
-> 
-> On Tue, Dec 19, 2017 at 8:54 AM, Laurent Vivier <laurent@vivier.eu> wrote:
->> It makes the code clearer to separate the bus implementation
->> from the devices one.
+On 12/19/2017 02:31 AM, Thomas Huth wrote:
+> On 18.12.2017 17:16, Collin L. Walling wrote:
+>> On 12/18/2017 08:06 AM, Thomas Huth wrote:
+>>> On 11.12.2017 23:19, Collin L. Walling wrote:
+>>>> Moved:
+>>>>  =C2=A0=C2=A0 memcmp from bootmap.h to libc.h (renamed from _memcmp)
+>>>>  =C2=A0=C2=A0 strlen from sclp.c to libc.h (renamed from _strlen)
+>>>>
+>>>> Added C standard functions:
+>>>>  =C2=A0=C2=A0 isdigit
+>>>>  =C2=A0=C2=A0 atoi
+>>>>
+>>>> Added non-C standard function:
+>>>>  =C2=A0=C2=A0 itostr
+>>>>
+>>>> Signed-off-by: Collin L. Walling <walling@linux.vnet.ibm.com>
+>>>> Acked-by: Christian Borntraeger <borntraeger@de.ibm.com>
+>>>> Reviewed-by: Janosch Frank <frankja@linux.vnet.ibm.com>
+>>>> ---
+>>>>  =C2=A0 pc-bios/s390-ccw/Makefile=C2=A0 |=C2=A0 2 +-
+>>>>  =C2=A0 pc-bios/s390-ccw/bootmap.c |=C2=A0 4 +--
+>>>>  =C2=A0 pc-bios/s390-ccw/bootmap.h | 16 +---------
+>>>>  =C2=A0 pc-bios/s390-ccw/libc.c=C2=A0=C2=A0=C2=A0 | 75
+>>>> ++++++++++++++++++++++++++++++++++++++++++++++
+>>>>  =C2=A0 pc-bios/s390-ccw/libc.h=C2=A0=C2=A0=C2=A0 | 31 +++++++++++++=
+++++++
+>>>>  =C2=A0 pc-bios/s390-ccw/main.c=C2=A0=C2=A0=C2=A0 | 17 +----------
+>>>>  =C2=A0 pc-bios/s390-ccw/sclp.c=C2=A0=C2=A0=C2=A0 | 10 +------
+>>>>  =C2=A0 7 files changed, 112 insertions(+), 43 deletions(-)
+>>>>  =C2=A0 create mode 100644 pc-bios/s390-ccw/libc.c
+>>> [...]
+>>>> +
+>>>> +/**
+>>>> + * itostr:
+>>>> + * @num: the integer to be converted.
+>>>> + * @str: a pointer to a string to store the conversion.
+>>>> + * @len: the length of the passed string.
+>>>> + *
+>>>> + * Given an integer @num, convert it to a string. The string @str
+>>>> must be
+>>>> + * allocated beforehand. The resulting string will be null
+>>>> terminated and
+>>>> + * returned.
+>>>> + *
+>>>> + * Returns: the string @str of the converted integer @num.
+>>>> + */
+>>>> +char *itostr(int num, char *str, size_t len)
+>>>> +{
+>>>> +=C2=A0=C2=A0=C2=A0 long num_len =3D 1;
+>>>> +=C2=A0=C2=A0=C2=A0 int tmp =3D num;
+>>>> +=C2=A0=C2=A0=C2=A0 int i;
+>>>> +
+>>>> +=C2=A0=C2=A0=C2=A0 /* Count length of num */
+>>>> +=C2=A0=C2=A0=C2=A0 while ((tmp /=3D 10) > 0) {
+>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 num_len++;
+>>>> +=C2=A0=C2=A0=C2=A0 }
+>>>> +
+>>>> +=C2=A0=C2=A0=C2=A0 /* Check if we have enough space for num and nul=
+l */
+>>>> +=C2=A0=C2=A0=C2=A0 if (len < num_len) {
+>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return 0;
+>>>> +=C2=A0=C2=A0=C2=A0 }
+>>> I'm afraid, but I think you've got an off-by-one bug in this code.
+>>>
+>>> In patch 5, you're using this function like this:
+>>>
+>>>  =C2=A0=C2=A0=C2=A0=C2=A0 char tmp[4];
+>>>
+>>>  =C2=A0=C2=A0=C2=A0=C2=A0 sclp_print(itostr(entries, tmp, sizeof(tmp)=
+));
+>>>
+>>> That means if entries is >=3D 1000 for example, num_len is 4 ...
+>>>
+>>>> +=C2=A0=C2=A0=C2=A0 /* Convert int to string */
+>>>> +=C2=A0=C2=A0=C2=A0 for (i =3D num_len - 1; i >=3D 0; i--) {
+>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 str[i] =3D num % 10 + '0=
+';
+>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 num /=3D 10;
+>>>> +=C2=A0=C2=A0=C2=A0 }
+>>>> +
+>>>> +=C2=A0=C2=A0=C2=A0 str[num_len] =3D '\0';
+>>> ... and then you run into a buffer overflow here.
 >>
->> Remove ADB_DPRINTF() from adb.c instead of adding it to new files.
->> Some minor changes to make checkpatch.pl happy.
+>> Doh, you're correct.=C2=A0 I forgot to put a "<=3D" in the len / num_l=
+en check.
+>> That should fix things up.=C2=A0 Thanks for catching that.
 >>
->> Signed-off-by: Laurent Vivier <laurent@vivier.eu>
->> ---
->>  hw/input/Makefile.objs |   2 +-
->>  hw/input/adb-kbd.c     | 395 +++++++++++++++++++++++++++++++
->>  hw/input/adb-mouse.c   | 250 ++++++++++++++++++++
->>  hw/input/adb.c         | 621 +------------------------------------------------
->>  include/hw/input/adb.h |  26 +++
->>  5 files changed, 673 insertions(+), 621 deletions(-)
->>  create mode 100644 hw/input/adb-kbd.c
->>  create mode 100644 hw/input/adb-mouse.c
 >>
-...
->> +
->> +/* ADB commands */
->> +
->> +#define ADB_BUSRESET            0x00
->> +#define ADB_FLUSH               0x01
->> +#define ADB_WRITEREG            0x08
->> +#define ADB_READREG             0x0c
->> +
->> +/* ADB device commands */
->> +
->> +#define ADB_CMD_SELF_TEST               0xff
->> +#define ADB_CMD_CHANGE_ID               0xfe
->> +#define ADB_CMD_CHANGE_ID_AND_ACT       0xfd
->> +#define ADB_CMD_CHANGE_ID_AND_ENABLE    0x00
->> +
->> +/* ADB default device IDs (upper 4 bits of ADB command byte) */
->> +
->> +#define ADB_DEVID_DONGLE      1
->> +#define ADB_DEVID_KEYBOARD    2
->> +#define ADB_DEVID_MOUSE       3
->> +#define ADB_DEVID_TABLET      4
->> +#define ADB_DEVID_MODEM       5
->> +#define ADB_DEVID_MISC        7
-> 
-> Is ADB the protocol used out of adb*.c?
-> Personally I prefer not expose those protocol defines if not needed,
-> so I'd add them to hw/input/adb-protocol.h (or to match the other
-> includes, hw/input/adb-internal.h).
-> 
-> regardless this comment:
-> Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-> 
->> +
->>  typedef struct ADBDevice ADBDevice;
+>>>> +=C2=A0=C2=A0=C2=A0 return str;
+>>>> +}
+>>> Maybe it would also make more sense to panic() instead of "return 0"
+>>> since you don't check the return value in patch 5 ?
 >>
->>  /* buf = NULL means polling */
->> @@ -77,6 +101,8 @@ struct ADBBusState {
->>      int poll_index;
->>  };
+>> I'm a bit conflicted about doing something like that.=C2=A0 I'm not su=
+re if
+>> there's any kind
+>> of guideline we want to follow for defining functions in libc.
 >>
->> +extern const VMStateDescription vmstate_adb_device;
-> 
-> If you choose to add hw/input/adb-internal.h, this extern can go there.
-> 
->> +
->>  int adb_request(ADBBusState *s, uint8_t *buf_out,
->>                  const uint8_t *buf, int len);
->>  int adb_poll(ADBBusState *s, uint8_t *buf_out, uint16_t poll_mask);
->> --
->> 2.14.3
+>> I see one of two possibilities:
 >>
+>> a.=C2=A0 define these functions as "libc-like" as possible, and use th=
+em as
+>> if they were
+>>  =C2=A0=C2=A0=C2=A0=C2=A0 regular standard libc functions
+>>
+>>  =C2=A0=C2=A0=C2=A0 or
+>>
+>> b.=C2=A0 change up these functions to better fit their use cases in
+>> pc-bios/s390-ccw
+>>
+>> Does that make sense?=C2=A0 What do you think?
+> Keeping them libc-like likely makes sense ... but could we somehow also
+> make sure that we're not running into unexpected errors when using them=
+?
+> Something like "IPL_assert(entries < 1000, ...)" before calling the
+> functions in patch 5?
+>
+>   Thomas
+>
+>
 
+Sounds good to me.
 
-I agree with you, I'm going to add an new include, hw/input/adb-internal.h
-
-Thanks,
-Laurent
+--=20
+- Collin L Walling
