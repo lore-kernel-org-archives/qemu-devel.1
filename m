@@ -1,23 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60981)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42808)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sw@weilnetz.de>) id 1eRP5N-0002SN-I3
-	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 16:06:02 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1eRPFZ-0005kN-Ao
+	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 16:16:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sw@weilnetz.de>) id 1eRP5K-0007w2-Ud
-	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 16:06:01 -0500
-References: <1513700253-10045-1-git-send-email-thuth@redhat.com>
-	<20171219162157.GD3567@redhat.com>
-	<7d919cca-4dc1-6591-1a01-4143d3fe2b3b@redhat.com>
-From: Stefan Weil <sw@weilnetz.de>
-Message-ID: <2114e43c-e755-523c-9035-6bd1bafbaae9@weilnetz.de>
-Date: Tue, 19 Dec 2017 22:05:55 +0100
+	(envelope-from <peter.maydell@linaro.org>) id 1eRPFY-00006B-FQ
+	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 16:16:33 -0500
+Received: from mail-ot0-x241.google.com ([2607:f8b0:4003:c0f::241]:34331)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1eRPFY-00005U-Ao
+	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 16:16:32 -0500
+Received: by mail-ot0-x241.google.com with SMTP id n18so8641629otd.1
+	for <qemu-devel@nongnu.org>; Tue, 19 Dec 2017 13:16:32 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <7d919cca-4dc1-6591-1a01-4143d3fe2b3b@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-GB
+In-Reply-To: <20171218224030.26726-1-aurelien@aurel32.net>
+References: <20171218224030.26726-1-aurelien@aurel32.net>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 19 Dec 2017 21:16:11 +0000
+Message-ID: <CAFEAcA_nvtqkS8WV56q2qE1Rh8B5sNf1fuYbR5-Ajoxh=UH5fQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] monitor: Remove legacy "-mon default=on"
- parameter
+Subject: Re: [Qemu-devel] [PULL 0/6] Queued target/sh4 patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,17 +29,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Markus Armbruster <armbru@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu-trivial@nongnu.org
+To: Aurelien Jarno <aurelien@aurel32.net>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-Am 19.12.2017 um 17:34 schrieb Thomas Huth:
-> No, as far as I know, the online qemu-doc is only updated for release
-> candidates and releases, so the current information will stay there a
-> little bit longer.
+On 18 December 2017 at 22:40, Aurelien Jarno <aurelien@aurel32.net> wrote:
+> The following changes since commit eaefea537b476cb853e2edbdc68e969ec777e4=
+bb:
+>
+>   Merge remote-tracking branch 'remotes/mjt/tags/trivial-patches-fetch' i=
+nto staging (2017-12-18 14:17:42 +0000)
+>
+> are available in the Git repository at:
+>
+>   git://git.aurel32.net/qemu.git tags/pull-target-sh4-20171218
+>
+> for you to fetch changes up to 6f1c2af641d6e7aceb2e5671a45b3d6e5966dfb8:
+>
+>   target/sh4: Convert to DisasContextBase (2017-12-18 23:35:33 +0100)
+>
+> ----------------------------------------------------------------
+> Queued target/sh4 patches
+>
+> ----------------------------------------------------------------
+> Alex Benn=C3=A9e (1):
+>       target/sh4: fix TCG leak during gusa sequence
+>
+> Philippe Mathieu-Daud=C3=A9 (1):
+>       target/sh4: add missing tcg_temp_free() in _decode_opc()
+>
+> Richard Henderson (4):
+>       target/sh4: Use cmpxchg for movco when parallel_cpus
+>       target/sh4: Convert to DisasJumpType
+>       target/sh4: Do not singlestep after exceptions
+>       target/sh4: Convert to DisasContextBase
+>
+>  linux-user/main.c      |  19 +++-
+>  target/sh4/cpu.h       |   4 +-
+>  target/sh4/helper.c    |   1 +
+>  target/sh4/translate.c | 273 ++++++++++++++++++++++++++++---------------=
+------
+>  4 files changed, 174 insertions(+), 123 deletions(-)
 
-It's normally updated when I create new QEMU installers for Windows.
-I can update it when needed, and it is also possible to provide
-additional qemu-doc for releases (https://qemu.weilnetz.de/doc/).
+Applied, thanks.
 
-Regards,
-Stefan
+-- PMM
