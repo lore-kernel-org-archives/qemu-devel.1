@@ -1,24 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46358)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56992)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1eRJNU-00009A-1z
-	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 10:00:22 -0500
+	(envelope-from <stefanha@redhat.com>) id 1eRJYi-0003zB-GN
+	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 10:11:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1eRJNK-0004hs-F3
-	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 10:00:20 -0500
-References: <20171212051853.24583-1-aik@ozlabs.ru>
-	<20171211224650.71237179@w520.home>
-	<ca9cd686-ea2f-716e-b909-f6e22d1c704c@redhat.com>
-	<20171219070919.42d90b94@w520.home>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <87e241ad-4d65-1b51-aa22-a84f18de1cb6@redhat.com>
-Date: Tue, 19 Dec 2017 15:59:59 +0100
+	(envelope-from <stefanha@redhat.com>) id 1eRJYc-0006Ml-KO
+	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 10:11:56 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:33688)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1eRJYc-0006MT-BH
+	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 10:11:50 -0500
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Date: Tue, 19 Dec 2017 15:11:21 +0000
+Message-Id: <20171219151144.11120-1-stefanha@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20171219070919.42d90b94@w520.home>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH qemu] RFC: spapr/iommu: Enable in-kernel
- TCE acceleration via VFIO KVM device
+Subject: [Qemu-devel] [PULL v2 00/23] Block patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,84 +24,105 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alex Williamson <alex.williamson@redhat.com>
-Cc: Alexey Kardashevskiy <aik@ozlabs.ru>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
+To: qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, Stefan Hajnoczi <stefanha@redhat.com>
 
-On 19/12/2017 15:09, Alex Williamson wrote:
-> On Tue, 19 Dec 2017 12:12:35 +0100
-> Paolo Bonzini <pbonzini@redhat.com> wrote:
->=20
->> On 12/12/2017 06:46, Alex Williamson wrote:
->>>> +enum IOMMUMemoryRegionAttr {
->>>> +    IOMMU_ATTR_KVM_FD =20
->>>
->>> You're generalizing the wrong thing here, this is specifically a
->>> SPAPR_TCE_FD, call it that. =20
->>
->> ... and you're not even implementing set_attr, so let's drop it.
->>
->> My suggestion is to add a function in hw/vfio:
->>
->>     int vfio_container_attach_kvm_spapr_tce(VFIOContainer *cont,
->>                                             int tablefd);
->>
->> and an IOMMUMemoryRegionClass member:
->>
->>     int (*set_vfio_container_attrs)(IOMMUMemoryRegion *iommu,
->>                                     VFIOContainer *cont)
->>
->> Then your implementation for the latter is as simple as this:
->>
->>     if (!kvm_enabled() || !kvmppc_has_cap_spapr_vfio()) {
->>         sPAPRTCETable *tcet =3D container_of(iommu, sPAPRTCETable, iom=
-mu);
->>         return vfio_container_attach_kvm_spapr_tce(cont, tcet->fd);
->>     }
->=20
-> Ugh, exactly the sort of interface I've been trying to avoid, vfio
-> specific callbacks on common data structures handing out vfio private
-> data pointers,
+The following changes since commit eaefea537b476cb853e2edbdc68e969ec777e4=
+bb:
 
-True, VFIOContainer* is private, but in those declarations it's also opaq=
-ue.
+  Merge remote-tracking branch 'remotes/mjt/tags/trivial-patches-fetch' i=
+nto staging (2017-12-18 14:17:42 +0000)
 
-The VFIO container is the representation of the IOMMU, so it makes sense
-to me to have a function to set it up according to QEMU's IOMMU object.
-I don't think we will be introducing another object soon that is similar
-to the VFIO container.
+are available in the Git repository at:
 
-> requiring additional exported functions from vfio for
-> each new user of it.  Why is this better?
+  git://github.com/stefanha/qemu.git tags/block-pull-request
 
-I understand that you don't like having many exported functions, but you
-are just pushing the problem on the memory.h side where you'd get many
-attribute enums.
+for you to fetch changes up to 7a9dda0d7f9831c2432620dcfefdadbb7ae888dc:
 
-I suppose it would pay if you have many attributes and many clients,
-and/or if the attributes need to be public similar to sysfs.  I mention
-public vs. private because, before inventing a new mechanism for
-attributes, it would make sense to look at QOM properties.  However,
-here we have one client (VFIO) and one attribute (the KVM IOMMU fd) that
-is pretty much internal to QEMU.
+  qemu-iotests: add 203 savevm with IOThreads test (2017-12-19 10:25:09 +=
+0000)
 
-So, depending on the direction you want to pull/push the information to,
-I would do either:
+----------------------------------------------------------------
+Pull request
 
-- as above, a generic IOMMU callback
+v2:
+ * Fixed incorrect virtio_blk_data_plane_create() local_err refactoring i=
+n
+   "hw/block: Use errp directly rather than local_err" that broke virtio-=
+blk
+   over virtio-mmio [Peter]
 
-     int (*set_vfio_container_attrs)(IOMMUMemoryRegion *iommu,
-                                     VFIOContainer *cont);
+----------------------------------------------------------------
 
-- an object-type check in VFIO, followed by calling a new function
+Mao Zhongyi (4):
+  hw/block/nvme: Convert to realize
+  hw/block: Fix the return type
+  hw/block: Use errp directly rather than local_err
+  dev-storage: Fix the unusual function name
 
-     int spapr_tce_iommu_get_kvm_fd(IOMMUMemoryRegion *iommu);
+Mark Kanda (2):
+  virtio-blk: make queue size configurable
+  virtio-blk: reject configs with logical block size > physical block
+    size
 
-- if we foresee having more IOMMU devices in KVM, let's rename
-KVM_DEV_VFIO_GROUP_SET_SPAPR_TCE to KVM_DEV_VFIO_GROUP_ATTACH_IOMMU and
-add a new function
+Paolo Bonzini (1):
+  block: avoid recursive AioContext acquire in bdrv_inactivate_all()
 
-     int iommu_memory_region_get_kvm_fd(IOMMUMemoryRegion *iommu);
+Stefan Hajnoczi (16):
+  coroutine: simplify co_aio_sleep_ns() prototype
+  qdev: drop unused #include "sysemu/iothread.h"
+  blockdev: hold AioContext for bdrv_unref() in
+    external_snapshot_clean()
+  block: don't keep AioContext acquired after
+    external_snapshot_prepare()
+  block: don't keep AioContext acquired after drive_backup_prepare()
+  block: don't keep AioContext acquired after blockdev_backup_prepare()
+  block: don't keep AioContext acquired after
+    internal_snapshot_prepare()
+  block: drop unused BlockDirtyBitmapState->aio_context field
+  iothread: add iothread_by_id() API
+  blockdev: add x-blockdev-set-iothread testing command
+  qemu-iotests: add 202 external snapshots IOThread test
+  docs: mark nested AioContext locking as a legacy API
+  blockdev: add x-blockdev-set-iothread force boolean
+  iotests: add VM.add_object()
+  iothread: fix iothread_stop() race condition
+  qemu-iotests: add 203 savevm with IOThreads test
 
-that requires no object-type check in VFIO.
+ docs/devel/multiple-iothreads.txt |   7 +-
+ qapi/block-core.json              |  40 ++++++
+ hw/block/dataplane/virtio-blk.h   |   2 +-
+ include/hw/block/block.h          |   4 +-
+ include/hw/virtio/virtio-blk.h    |   1 +
+ include/qemu/coroutine.h          |   6 +-
+ include/sysemu/iothread.h         |   4 +-
+ block.c                           |  14 ++-
+ block/null.c                      |   3 +-
+ block/sheepdog.c                  |   3 +-
+ blockdev.c                        | 259 +++++++++++++++++++++++++++-----=
+------
+ hw/block/block.c                  |  15 ++-
+ hw/block/dataplane/virtio-blk.c   |  12 +-
+ hw/block/fdc.c                    |  17 +--
+ hw/block/nvme.c                   |  23 ++--
+ hw/block/virtio-blk.c             |  30 +++--
+ hw/core/qdev-properties-system.c  |   1 -
+ hw/ide/qdev.c                     |  12 +-
+ hw/scsi/scsi-disk.c               |  13 +-
+ hw/usb/dev-storage.c              |  29 ++---
+ iothread.c                        |  27 +++-
+ util/qemu-coroutine-sleep.c       |   4 +-
+ tests/qemu-iotests/202            |  95 ++++++++++++++
+ tests/qemu-iotests/202.out        |  11 ++
+ tests/qemu-iotests/203            |  59 +++++++++
+ tests/qemu-iotests/203.out        |   6 +
+ tests/qemu-iotests/group          |   2 +
+ tests/qemu-iotests/iotests.py     |   5 +
+ 28 files changed, 531 insertions(+), 173 deletions(-)
+ create mode 100755 tests/qemu-iotests/202
+ create mode 100644 tests/qemu-iotests/202.out
+ create mode 100755 tests/qemu-iotests/203
+ create mode 100644 tests/qemu-iotests/203.out
 
-Paolo
+--=20
+2.14.3
