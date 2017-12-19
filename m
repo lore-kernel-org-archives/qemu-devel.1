@@ -1,18 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50143)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57579)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1eRl5W-0007Tl-MT
-	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 15:35:39 -0500
+	(envelope-from <no-reply@patchew.org>) id 1eRlI1-0002h4-6l
+	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 15:48:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1eRl5S-0000Zt-Mh
-	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 15:35:38 -0500
-Received: from mout.kundenserver.de ([217.72.192.74]:58306)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1eRl5S-0000Yo-5e
-	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 15:35:34 -0500
-From: Laurent Vivier <laurent@vivier.eu>
-Date: Wed, 20 Dec 2017 21:35:28 +0100
-Message-Id: <20171220203528.21334-1-laurent@vivier.eu>
-Subject: [Qemu-devel] [PATCH] target/m68k: add monitor.c
+	(envelope-from <no-reply@patchew.org>) id 1eRlHy-0000sG-1G
+	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 15:48:33 -0500
+Resent-Message-Id: <E1eRlHy-0000sG-1G@eggs.gnu.org>
+Received: from sender-of-o52.zoho.com ([135.84.80.217]:21307)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1eRlHx-0000rr-Ox
+	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 15:48:29 -0500
+In-Reply-To: <20171219151636.5162-1-michael.weiser@gmx.de>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <151370280732.78.8158957873762610473@5adcb62bf0d6>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Tue, 19 Dec 2017 09:00:08 -0800 (PST)
+Subject: Re: [Qemu-devel] [PATCH 0/4] Add aarch64_be-linux-user target
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,110 +28,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Thomas Huth <huth@tuxfamily.org>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Laurent Vivier <laurent@vivier.eu>
+To: michael.weiser@gmx.de
+Cc: famz@redhat.com, qemu-devel@nongnu.org, riku.voipio@iki.fi, laurent@vivier.eu
 
-This allows to use registers content in the monitor.
-
-Example:
-
- BEFORE:
-  (qemu) print $d0
-  unknown register
-
- AFTER:
-  (qemu) print $d0
-  0
-  (qemu) print $sr
-  0x2000
-  (qemu) x/10i $pc
-  0x40010a2a:  movew %sr,%d0
-  0x40010a2c:  oril #1792,%d0
-  0x40010a32:  movew %d0,%sr
-  0x40010a34:  movel %a0@,%d0
-  0x40010a36:  btst #3,%d0
-  0x40010a3a:  beqs 0x40010a26
-  0x40010a3c:  movew %sr,%d0
-  0x40010a3e:  andil #63743,%d0
-  0x40010a44:  movew %d0,%sr
-  0x40010a46:  rts
-
-Signed-off-by: Laurent Vivier <laurent@vivier.eu>
----
- target/m68k/Makefile.objs |  1 +
- target/m68k/monitor.c     | 55 +++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 56 insertions(+)
- create mode 100644 target/m68k/monitor.c
-
-diff --git a/target/m68k/Makefile.objs b/target/m68k/Makefile.objs
-index 39141ab93d..d143f20270 100644
---- a/target/m68k/Makefile.objs
-+++ b/target/m68k/Makefile.objs
-@@ -1,3 +1,4 @@
- obj-y += m68k-semi.o
- obj-y += translate.o op_helper.o helper.o cpu.o fpu_helper.o
- obj-y += gdbstub.o
-+obj-$(CONFIG_SOFTMMU) += monitor.o
-diff --git a/target/m68k/monitor.c b/target/m68k/monitor.c
-new file mode 100644
-index 0000000000..03d037ccab
---- /dev/null
-+++ b/target/m68k/monitor.c
-@@ -0,0 +1,55 @@
-+/*
-+ * QEMU monitor
-+ *
-+ * Copyright (c) 2003-2004 Fabrice Bellard
-+ *
-+ * Permission is hereby granted, free of charge, to any person obtaining a copy
-+ * of this software and associated documentation files (the "Software"), to deal
-+ * in the Software without restriction, including without limitation the rights
-+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-+ * copies of the Software, and to permit persons to whom the Software is
-+ * furnished to do so, subject to the following conditions:
-+ *
-+ * The above copyright notice and this permission notice shall be included in
-+ * all copies or substantial portions of the Software.
-+ *
-+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-+ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-+ * THE SOFTWARE.
-+ */
-+#include "qemu/osdep.h"
-+#include "cpu.h"
-+#include "monitor/hmp-target.h"
-+
-+const MonitorDef monitor_defs[] = {
-+    { "d0", offsetof(CPUM68KState, dregs[0]) },
-+    { "d1", offsetof(CPUM68KState, dregs[1]) },
-+    { "d2", offsetof(CPUM68KState, dregs[2]) },
-+    { "d3", offsetof(CPUM68KState, dregs[3]) },
-+    { "d4", offsetof(CPUM68KState, dregs[4]) },
-+    { "d5", offsetof(CPUM68KState, dregs[5]) },
-+    { "d6", offsetof(CPUM68KState, dregs[6]) },
-+    { "d7", offsetof(CPUM68KState, dregs[7]) },
-+    { "a0", offsetof(CPUM68KState, aregs[0]) },
-+    { "a1", offsetof(CPUM68KState, aregs[1]) },
-+    { "a2", offsetof(CPUM68KState, aregs[2]) },
-+    { "a3", offsetof(CPUM68KState, aregs[3]) },
-+    { "a4", offsetof(CPUM68KState, aregs[4]) },
-+    { "a5", offsetof(CPUM68KState, aregs[5]) },
-+    { "a6", offsetof(CPUM68KState, aregs[6]) },
-+    { "a7", offsetof(CPUM68KState, aregs[7]) },
-+    { "pc", offsetof(CPUM68KState, pc) },
-+    { "sr", offsetof(CPUM68KState, sr) },
-+    { "ssp", offsetof(CPUM68KState, sp[0]) },
-+    { "usp", offsetof(CPUM68KState, sp[1]) },
-+    { NULL },
-+};
-+
-+const MonitorDef *target_monitor_defs(void)
-+{
-+    return monitor_defs;
-+}
--- 
-2.14.3
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IDIwMTcxMjE5MTUxNjM2LjUxNjItMS1taWNoYWVsLndlaXNlckBnbXguZGUKU3Vi
+amVjdDogW1FlbXUtZGV2ZWxdIFtQQVRDSCAwLzRdIEFkZCBhYXJjaDY0X2JlLWxpbnV4LXVzZXIg
+dGFyZ2V0Cgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCgpCQVNFPWJhc2UK
+bj0xCnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJBU0UuLiB8IHdjIC1sKQpmYWlsZWQ9MAoK
+Z2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwg
+ZGlmZi5yZW5hbWVzIFRydWUKCmNvbW1pdHM9IiQoZ2l0IGxvZyAtLWZvcm1hdD0lSCAtLXJldmVy
+c2UgJEJBU0UuLikiCmZvciBjIGluICRjb21taXRzOyBkbwogICAgZWNobyAiQ2hlY2tpbmcgUEFU
+Q0ggJG4vJHRvdGFsOiAkKGdpdCBsb2cgLW4gMSAtLWZvcm1hdD0lcyAkYykuLi4iCiAgICBpZiAh
+IGdpdCBzaG93ICRjIC0tZm9ybWF0PWVtYWlsIHwgLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1t
+YWlsYmFjayAtOyB0aGVuCiAgICAgICAgZmFpbGVkPTEKICAgICAgICBlY2hvCiAgICBmaQogICAg
+bj0kKChuKzEpKQpkb25lCgpleGl0ICRmYWlsZWQKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVw
+ZGF0aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKU3dpdGNoZWQg
+dG8gYSBuZXcgYnJhbmNoICd0ZXN0Jwo1YWM1N2ZmMjEwIGNvbmZpZ3VyZTogQWRkIGFhcmNoNjRf
+YmUtbGludXgtdXNlciB0YXJnZXQKMDczMzU2NTJjNiBsaW51eC11c2VyOiBGaXggZW5kaWFuZXNz
+IG9mIGFhcmNoNjQgc2lnbmFsIHRyYW1wb2xpbmUKZWU0YzZlMmU3MiBsaW51eC11c2VyOiBBZGQg
+c2VwYXJhdGUgYWFyY2g2NF9iZSB1bmFtZQoxYjIxNGNkOTZhIGxpbnV4LXVzZXI6IEFkZCBzdXBw
+b3J0IGZvciBiaWctZW5kaWFuIGFhcmNoNjQKCj09PSBPVVRQVVQgQkVHSU4gPT09CkNoZWNraW5n
+IFBBVENIIDEvNDogbGludXgtdXNlcjogQWRkIHN1cHBvcnQgZm9yIGJpZy1lbmRpYW4gYWFyY2g2
+NC4uLgpDaGVja2luZyBQQVRDSCAyLzQ6IGxpbnV4LXVzZXI6IEFkZCBzZXBhcmF0ZSBhYXJjaDY0
+X2JlIHVuYW1lLi4uCkNoZWNraW5nIFBBVENIIDMvNDogbGludXgtdXNlcjogRml4IGVuZGlhbmVz
+cyBvZiBhYXJjaDY0IHNpZ25hbCB0cmFtcG9saW5lLi4uCkVSUk9SOiBjb2RlIGluZGVudCBzaG91
+bGQgbmV2ZXIgdXNlIHRhYnMKIzI2OiBGSUxFOiBsaW51eC11c2VyL3NpZ25hbC5jOjE2MDM6Cite
+SSAqIG1vdiB4OCwjX19OUl9ydF9zaWdyZXR1cm47IHN2YyAjMCQKCkVSUk9SOiBjb2RlIGluZGVu
+dCBzaG91bGQgbmV2ZXIgdXNlIHRhYnMKIzI3OiBGSUxFOiBsaW51eC11c2VyL3NpZ25hbC5jOjE2
+MDQ6CiteSSAqIFNpbmNlIHRoZXNlIGFyZSBpbnN0cnVjdGlvbnMgdGhleSBuZWVkIHRvIGJlIHB1
+dCBhcyBsaXR0bGUtZW5kaWFuJAoKRVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2Ug
+dGFicwojMjg6IEZJTEU6IGxpbnV4LXVzZXIvc2lnbmFsLmM6MTYwNToKK15JICogcmVnYXJkbGVz
+cyBvZiB0YXJnZXQgZGVmYXVsdCBvciBjdXJyZW50IENQVSBlbmRpYW5uZXNzLiQKCkVSUk9SOiBj
+b2RlIGluZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRhYnMKIzI5OiBGSUxFOiBsaW51eC11c2VyL3Np
+Z25hbC5jOjE2MDY6CiteSSAqLyQKCnRvdGFsOiA0IGVycm9ycywgMCB3YXJuaW5ncywgMTYgbGlu
+ZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcu
+ICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0g
+dG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKQ2hlY2tp
+bmcgUEFUQ0ggNC80OiBjb25maWd1cmU6IEFkZCBhYXJjaDY0X2JlLWxpbnV4LXVzZXIgdGFyZ2V0
+Li4uCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEK
+CgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3Bh
+dGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEBm
+cmVlbGlzdHMub3Jn
