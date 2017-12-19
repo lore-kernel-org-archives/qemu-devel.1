@@ -1,25 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36315)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40262)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ybettan@redhat.com>) id 1eRExO-0005PT-Ft
-	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 05:17:07 -0500
+	(envelope-from <laurent@vivier.eu>) id 1eRF21-0006ut-On
+	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 05:21:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ybettan@redhat.com>) id 1eRExL-0003lQ-7n
-	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 05:17:06 -0500
-Received: from mail-wm0-f68.google.com ([74.125.82.68]:42582)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <ybettan@redhat.com>) id 1eRExL-0003lC-17
-	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 05:17:03 -0500
-Received: by mail-wm0-f68.google.com with SMTP id b199so2505642wme.1
-	for <qemu-devel@nongnu.org>; Tue, 19 Dec 2017 02:17:02 -0800 (PST)
+	(envelope-from <laurent@vivier.eu>) id 1eRF1w-00076J-Ne
+	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 05:21:53 -0500
+Received: from mout.kundenserver.de ([212.227.126.135]:58588)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1eRF1w-00075g-AO
+	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 05:21:48 -0500
 References: <20171219101122.31711-1-ybettan@redhat.com>
-From: Yoni Bettan <ybettan@redhat.com>
-Message-ID: <917c1192-2171-5b3f-f2e8-2b4ef5cfd130@redhat.com>
-Date: Tue, 19 Dec 2017 12:16:59 +0200
+From: Laurent Vivier <laurent@vivier.eu>
+Message-ID: <639add7d-ba36-8058-cc11-b8577ef38b04@vivier.eu>
+Date: Tue, 19 Dec 2017 11:21:33 +0100
 MIME-Version: 1.0
 In-Reply-To: <20171219101122.31711-1-ybettan@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Subject: Re: [Qemu-devel] [PATCH V3] vl.c && linux-user/main.c : removed
  **envp from main() arguments
 List-Id: <qemu-devel.nongnu.org>
@@ -30,135 +28,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>, Peter Maydell <peter.maydell@linaro.org>, Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: Yoni Bettan <ybettan@redhat.com>, qemu-devel@nongnu.org
+Cc: Riku Voipio <riku.voipio@iki.fi>, Peter Maydell <peter.maydell@linaro.org>, Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-
-
-On 12/19/2017 12:11 PM, Yoni Bettan wrote:
+Le 19/12/2017 à 11:11, Yoni Bettan a écrit :
 > it was added on 2008 902b3d5c39 when introduced cache-utils.[ch]
->
+> 
 > since then cache-utils.[ch] were removed but **envp was left
 > behind.
->
+> 
 > By the way "to be portable it is best to write main to take two
 > arguments, and use the value of environ" according to
 > https://www.gnu.org/software/libc/manual/html_node/Program-\
->        Arguments.html#Program-Arguments
->
+>       Arguments.html#Program-Arguments
+> 
 > Signed-off-by: Yoni Bettan <ybettan@redhat.com>
 > ---
->
+> 
 > V2 -> V3:
->      
->      since ui/cocoa.c rename main() is using qemu_main() ,because it uses it
->      inside its main() function, the function qemu_main() can't be removed
->    
->
+>     
+>     since ui/cocoa.c rename main() is using qemu_main() ,because it uses it 
+>     inside its main() function, the function qemu_main() can't be removed
+>   
+> 
 > V1 -> V2:
->
->      removed the ui/cocoa.c renaming of main() function since i thought that we
->      no longer need qemu_main()
->
->
->   include/qemu-common.h | 2 +-
->   linux-user/main.c     | 2 +-
->   ui/cocoa.m            | 5 ++---
->   vl.c                  | 7 +++----
->   4 files changed, 7 insertions(+), 9 deletions(-)
-
-Notes:
-1. I didn't checked the patch on Mac OS due to some difficulties to run
-     Mac OS gust as host (make check passed successfully)
-2. checkpatch.pl seems to not work well when touching extern variables
->
-> diff --git a/include/qemu-common.h b/include/qemu-common.h
-> index 05319b9ddc..8a5b7ec5ec 100644
-> --- a/include/qemu-common.h
-> +++ b/include/qemu-common.h
-> @@ -29,7 +29,7 @@
->   
->   /* main function, renamed */
->   #if defined(CONFIG_COCOA)
-> -int qemu_main(int argc, char **argv, char **envp);
-> +int qemu_main(int argc, char **argv);
->   #endif
->   
->   void qemu_get_timedate(struct tm *tm, int offset);
-> diff --git a/linux-user/main.c b/linux-user/main.c
-> index 6286661bd3..fe81d410da 100644
-> --- a/linux-user/main.c
-> +++ b/linux-user/main.c
-> @@ -4237,7 +4237,7 @@ static int parse_args(int argc, char **argv)
->       return optind;
->   }
->   
-> -int main(int argc, char **argv, char **envp)
-> +int main(int argc, char **argv)
->   {
->       struct target_pt_regs regs1, *regs = &regs1;
->       struct image_info info1, *info = &info1;
-> diff --git a/ui/cocoa.m b/ui/cocoa.m
-> index 330ccebf90..4d18153659 100644
-> --- a/ui/cocoa.m
-> +++ b/ui/cocoa.m
-> @@ -25,7 +25,6 @@
->   #include "qemu/osdep.h"
->   
->   #import <Cocoa/Cocoa.h>
-> -#include <crt_externs.h>
->   
->   #include "qemu-common.h"
->   #include "ui/console.h"
-> @@ -1050,7 +1049,7 @@ QemuCocoaView *cocoaView;
->       COCOA_DEBUG("QemuCocoaAppController: startEmulationWithArgc\n");
->   
->       int status;
-> -    status = qemu_main(argc, argv, *_NSGetEnviron());
-> +    status = qemu_main(argc, argv);
->       exit(status);
->   }
->   
-> @@ -1391,7 +1390,7 @@ int main (int argc, const char * argv[]) {
->                   !strcmp(opt, "-curses") ||
->                   !strcmp(opt, "-display") ||
->                   !strcmp(opt, "-qtest")) {
-> -                return qemu_main(gArgc, gArgv, *_NSGetEnviron());
-> +                return qemu_main(gArgc, gArgv);
->               }
->           }
->       }
+> 
+>     removed the ui/cocoa.c renaming of main() function since i thought that we 
+>     no longer need qemu_main()
+> 
+> 
+>  include/qemu-common.h | 2 +-
+>  linux-user/main.c     | 2 +-
+>  ui/cocoa.m            | 5 ++---
+>  vl.c                  | 7 +++----
+>  4 files changed, 7 insertions(+), 9 deletions(-)
+> 
+...
 > diff --git a/vl.c b/vl.c
 > index fc8bd9372f..ea17cc34f6 100644
 > --- a/vl.c
 > +++ b/vl.c
 > @@ -35,10 +35,10 @@
->   #ifdef CONFIG_SDL
->   #if defined(__APPLE__) || defined(main)
->   #include <SDL.h>
+>  #ifdef CONFIG_SDL
+>  #if defined(__APPLE__) || defined(main)
+>  #include <SDL.h>
 > -int qemu_main(int argc, char **argv, char **envp);
 > +int qemu_main(int argc, char **argv);
->   int main(int argc, char **argv)
->   {
+>  int main(int argc, char **argv)
+>  {
 > -    return qemu_main(argc, argv, NULL);
 > +    return qemu_main(argc, argv);
->   }
->   #undef main
->   #define main qemu_main
-> @@ -50,7 +50,6 @@ int main(int argc, char **argv)
->   #define main qemu_main
->   #endif /* CONFIG_COCOA */
->   
-> -
->   #include "qemu/error-report.h"
->   #include "qemu/sockets.h"
->   #include "hw/hw.h"
-> @@ -3044,7 +3043,7 @@ static void register_global_properties(MachineState *ms)
->       user_register_global_props();
->   }
->   
-> -int main(int argc, char **argv, char **envp)
-> +int main(int argc, char **argv)
->   {
->       int i;
->       int snapshot, linux_boot;
+>  }
+>  #undef main
+>  #define main qemu_main
+
+
+I'm really sorry, but I really think we can remove this part.
+
+This does not break the call of qemu_main from COCOA because we keep:
+
+     48 #ifdef CONFIG_COCOA
+     49 #undef main
+     50 #define main qemu_main
+     51 #endif /* CONFIG_COCOA */
+
+Thanks,
+Laurent
