@@ -1,25 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42748)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43499)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1eRJJj-0005mK-IJ
-	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 09:56:28 -0500
+	(envelope-from <armbru@redhat.com>) id 1eRJKl-0006Qy-F2
+	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 09:57:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1eRJJg-0002VA-Qm
-	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 09:56:27 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:60417)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1eRJJg-0002UH-K9
-	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 09:56:24 -0500
-Date: Tue, 19 Dec 2017 16:56:15 +0200
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20171219161754-mutt-send-email-mst@kernel.org>
-References: <1512444796-30615-1-git-send-email-wei.w.wang@intel.com>
-	<20171219113505.GA8499@stefanha-x1.localdomain>
+	(envelope-from <armbru@redhat.com>) id 1eRJKk-000328-Fx
+	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 09:57:31 -0500
+From: Markus Armbruster <armbru@redhat.com>
+References: <1513542355-28203-1-git-send-email-jan.dakinevich@virtuozzo.com>
+	<1513542355-28203-2-git-send-email-jan.dakinevich@virtuozzo.com>
+Date: Tue, 19 Dec 2017 15:57:18 +0100
+In-Reply-To: <1513542355-28203-2-git-send-email-jan.dakinevich@virtuozzo.com>
+	(Jan Dakinevich's message of "Sun, 17 Dec 2017 23:25:54 +0300")
+Message-ID: <87k1xig3zl.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20171219113505.GA8499@stefanha-x1.localdomain>
-Subject: Re: [Qemu-devel] [virtio-dev] [PATCH v3 0/7] Vhost-pci for inter-VM
- communication
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [RFC v6 1/2] virtio: introduce `query-virtio' QMP
+ command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,57 +24,124 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: Wei Wang <wei.w.wang@intel.com>, virtio-dev@lists.oasis-open.org, qemu-devel@nongnu.org, marcandre.lureau@redhat.com, jasowang@redhat.com, pbonzini@redhat.com, jan.kiszka@siemens.com, avi.cohen@huawei.com, zhiyong.yang@intel.com
+To: Jan Dakinevich <jan.dakinevich@virtuozzo.com>
+Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, "Denis V. Lunev" <den@virtuozzo.com>, qemu-block@nongnu.org, Amit Shah <amit@kernel.org>, Jason Wang <jasowang@redhat.com>, Cornelia Huck <cohuck@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Max Reitz <mreitz@redhat.com>, Eric Blake <eblake@redhat.com>
 
->  * Please handle short reads/writes and EAGAIN with the UNIX domain socket.  Do
->    not use read/write_all() functions because they hang QEMU until I/O
->    completes.
+QAPI/QMP interface review only.
 
-I'm not sure I agree with this one. vhost-user uses this extensively
-right now. It might be a worth-while goal to drop this limitation
-but I don't see why we should start with vhost-pci.
+You neglected to cc: the maintainers of qapi-schema.json, so I'm doing
+that for you.
 
-And in particular, VCPU can't make progress unless a slave is present.
+Jan Dakinevich <jan.dakinevich@virtuozzo.com> writes:
 
->  * What happens when the vhost-user master disconnects while we're running?
-> 
->  * How does the guest know when the QEMU vhost-user slave has finished
->    initializing everything?  It seems like a guest driver could access the
->    device before things are initialized.
-> 
->  * How can the vhost-user slave inside the guest participate in feature
->    negotiation?  It must be able to participate, otherwise slaves cannot
->    disable features that QEMU supports but they don't want to support.
-> 
->    It's not feasible to pass in host_features as a QEMU parameter because
->    that would require libvirt, OpenStack, cloud providers, etc to add
->    support so users can manually set the bits for their slave
->    implementation.
+> The command is intended for gathering virtio information such as status,
+> feature bits, negotiation status. It is convenient and useful for debug
+> purpose.
 >
->  * How can the the guest limit the number of virtqueues?
+> The commands returns generic virtio information for virtio such as
+> common feature names and status bits names and information for all
+> attached to current machine devices.
+>
+> To retrieve names of device-specific features `tell_feature_name'
+> callback in VirtioDeviceClass also was introduced.
+>
+> Cc: Denis V. Lunev <den@virtuozzo.com>
+> Signed-off-by: Jan Dakinevich <jan.dakinevich@virtuozzo.com>
+[...]
+> diff --git a/qapi-schema.json b/qapi-schema.json
+> index 1845795..51cd0f3 100644
+> --- a/qapi-schema.json
+> +++ b/qapi-schema.json
+> @@ -3200,3 +3200,73 @@
+>  # Since: 2.11
+>  ##
+>  { 'command': 'watchdog-set-action', 'data' : {'action': 'WatchdogAction'} }
+> +
+> +##
+> +# @VirtioFeature:
+> +#
+> +# Virtio feature bit with negotiation status
+> +#
+> +# @name: name of feature bit
+> +#
+> +# @acked: negotiation status, `true' if guest acknowledged the feature
+> +#
+> +# Since: 2.12
+> +##
+> +{
+> +    'struct': 'VirtioFeature',
+> +    'data': {
+> +        'name': 'str',
+> +        'acked': 'bool'
+> +    }
+> +}
+> +
+> +##
+> +# @VirtioInfo:
+> +#
+> +# Information about virtio device
+> +#
+> +# @qom-path: QOM path of the device
+> +#
+> +# @status: status bitmask
+> +#
+> +# @host-features: bitmask of features, exposed by device
+> +#
+> +# @guest-features: bitmask of features, acknowledged by guest
 
-I think it is feasible to pass in host features, # of vqs etc.  Assuming
-compatibility with existing guests, I don't think you can do anything
-else really if you assume that vhost guest might boot after the
-virtio guest.
+Quoting my review of v4: "Unsigned integer interpreted as combination of
+well-known bit-valued symbols" is a fine C interface, but a pretty
+horrid QMP interface.  What's wrong with doing a set the straightforward
+way as "array of enum"?  As far as I can see, I didn't get a reply back
+then.  You'll have to give one to get the patch accepted.
 
-So either you give up on compatibility, or you allow the vhost
-guest to block the virtio guest.
+In case symbolic names may not be known at QEMU compile time (me having
+to wonder at v6 is a sign of rather ineffective patch review, sorry
+about that): you have to explain this in the doc comment, with a
+reference to where the bits are specified.
 
-I think compatibility is more important.
+> +#
+> +# @status-names: names of checked bits in status bitmask
 
-We can later think about ways to add non-blocking behaviour
-as a feature.
+How are the strings in @status-names connected to the bits in @status?
+Spell it out in this doc string, please.
 
-> 
->  * Please include tests.  See tests/virtio-net-test.c and
->    tests/vhost-user-test.c for examples.
+> +#
+> +# @common-features-names: names exposed features and negotiation status,
+> +# that are common to all devices
+> +#
+> +# @device-features-names: names exposed features and negotiation status,
+> +# that are specific to this device
 
-Unit tests are nice but an actual way to test without
-running a full blown dpdk stack would be nicer.
-Something along the lines of a port of vhost user bridge
-to the guest.
+Likewise.
 
--- 
-MST
+> +#
+> +# Since: 2.12
+> +##
+> +{
+> +    'struct': 'VirtioInfo',
+> +    'data': {
+> +        'qom-path': 'str',
+> +
+> +        'status': 'uint8',
+> +        'host-features': 'uint64',
+> +        'guest-features': 'uint64',
+> +
+> +        'status-names': ['str'],
+> +        'common-features-names': ['VirtioFeature'],
+> +        'device-features-names': ['VirtioFeature']
+> +    }
+> +}
+> +
+> +##
+> +# @query-virtio:
+> +#
+> +# Returns virtio information such as device status and features
+> +#
+> +# Since: 2.12
+> +##
+> +{
+> +    'command': 'query-virtio',
+> +    'data': {'*path': 'str'},
+> +    'returns': ['VirtioInfo']
+> +}
