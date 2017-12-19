@@ -1,22 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51452)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53452)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1eR6YH-0000tV-G2
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 20:18:40 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1eR6a5-0002Gv-Mu
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 20:20:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1eR6YG-0001TC-I8
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 20:18:37 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1eR6a4-0002xz-IX
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 20:20:29 -0500
+Date: Tue, 19 Dec 2017 12:18:47 +1100
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20171219011847.GH4786@umbus.fritz.box>
+References: <20171216224842.EE8C17456B3@zero.eik.bme.hu>
+	<20171218040946.GS7753@umbus.fritz.box>
+	<alpine.BSF.2.21.1712181329050.96474@zero.eik.bme.hu>
+	<730aec0f-3f10-55ea-eb26-e5740c2fbfe2@redhat.com>
 MIME-Version: 1.0
-Sender: alistair23@gmail.com
-In-Reply-To: <20171215031547.31006-14-f4bug@amsat.org>
-References: <20171215031547.31006-1-f4bug@amsat.org>
-	<20171215031547.31006-14-f4bug@amsat.org>
-From: Alistair Francis <alistair.francis@xilinx.com>
-Date: Mon, 18 Dec 2017 17:18:04 -0800
-Message-ID: <CAKmqyKOSHhEsgA_a5SE2Q2NwJO2UCxYJ=HRT=FMKBNhiH5AN8w@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 13/20] sdhci: Implement write method of
- ACMD12ERRSTS register
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="U3BNvdZEnlJXqmh+"
+Content-Disposition: inline
+In-Reply-To: <730aec0f-3f10-55ea-eb26-e5740c2fbfe2@redhat.com>
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH v2] hw/ide: Emulate SiI3112 SATA
+ controller
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,48 +27,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Cc: Alistair Francis <alistair.francis@xilinx.com>, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, Peter Maydell <peter.maydell@linaro.org>, Michael Walle <michael@walle.cc>, Andrzej Zaborowski <balrogg@gmail.com>, Andrew Baumann <Andrew.Baumann@microsoft.com>, Andrey Smirnov <andrew.smirnov@gmail.com>, Andrey Yurovsky <yurovsky@gmail.com>, Jason Wang <jasowang@redhat.com>, Prasad J Pandit <pjp@fedoraproject.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Sai Pavan Boddu <saipava@xilinx.com>, qemu-arm <qemu-arm@nongnu.org>
+To: John Snow <jsnow@redhat.com>
+Cc: BALATON Zoltan <balaton@eik.bme.hu>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 
-On Thu, Dec 14, 2017 at 7:15 PM, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.o=
-rg> wrote:
-> From: Andrey Smirnov <andrew.smirnov@gmail.com>
->
-> Cc: Peter Maydell <peter.maydell@linaro.org>
-> Cc: Jason Wang <jasowang@redhat.com>
-> Cc: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-> Cc: qemu-devel@nongnu.org
-> Cc: qemu-arm@nongnu.org
-> Cc: yurovsky@gmail.com
-> Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-> Signed-off-by: Andrey Smirnov <andrew.smirnov@gmail.com>
-> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 
-Reviewed-by: Alistair Francis <alistair.francis@xilinx.com>
+--U3BNvdZEnlJXqmh+
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Alistair
+On Mon, Dec 18, 2017 at 01:33:07PM -0500, John Snow wrote:
+>=20
+>=20
+> On 12/18/2017 07:30 AM, BALATON Zoltan wrote:
+> > On Mon, 18 Dec 2017, David Gibson wrote:
+> >> On Sat, Dec 16, 2017 at 11:42:39PM +0100, BALATON Zoltan wrote:
+> >>> This is a common generic PCI SATA controller that is also used in PCs
+> >>> but more importantly guests running on the Sam460ex board prefer this
+> >>> card and have a driver for it (unlike for other SATA controllers
+> >>> already emulated).
+> >>>
+> >>> Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
+> >>
+> >> I don't know enough about IDE to give this any more than a quick check
+> >> for anything obviously bogus looking.=A0 So,
+> >>
+> >> Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+> >>
+> >> John, can you take this through your tree, or should I take it through
+> >> the ppc tree?
+> >=20
+> > I think he said before it can go via ppc tree:
+> >=20
+> > http://lists.nongnu.org/archive/html/qemu-devel/2017-08/msg04480.html
+> >=20
+>=20
+> Yep, I tend to use Acked-by to indicate that it's okay for you to stage.
+> I'll give it another look-over in a minute, but I'm fine with adding the
+> model in general, even if it's not quite complete just yet.
+>=20
+> (More musings: we really ought to have a way to indicate to QEMU
+> programmatically which devices we think are supported, which are
+> experimental, and which are rudimentary.)
 
-> ---
->  hw/sd/sdhci.c | 3 +++
->  1 file changed, 3 insertions(+)
->
-> diff --git a/hw/sd/sdhci.c b/hw/sd/sdhci.c
-> index 9c1b28d9dd..64a9b26e0d 100644
-> --- a/hw/sd/sdhci.c
-> +++ b/hw/sd/sdhci.c
-> @@ -1124,6 +1124,9 @@ sdhci_write(void *opaque, hwaddr offset, uint64_t v=
-al, unsigned size)
->      case SDHC_ADMASYSADDR + 4:
->          s->admasysaddr =3D deposit64(s->admasysaddr, 32, 32, value);
->          break;
-> +    case SDHC_ACMD12ERRSTS:
-> +        MASKED_WRITE(s->acmd12errsts, mask, value);
-> +        break;
->      case SDHC_FEAER:
->          s->acmd12errsts |=3D value;
->          s->errintsts |=3D (value >> 16) & s->errintstsen;
-> --
-> 2.15.1
->
->
+Ok, I've taken it into my tree.
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--U3BNvdZEnlJXqmh+
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlo4aPQACgkQbDjKyiDZ
+s5KMNA/8CV4D28PL36jvECN/Z0zT6YAW1bPbQORJ/Zq4w0FTKeao78nxMDUztNLp
+Ahl1ArA/nT+7n0cMhQIU5HlHmJL3mz2zJq22c8mAhuh0QlF1aJ5lbxl0cMAqnifL
+VvYVF1KdpsS5UHjMt9uTihYwjbXe47Q9yHS305qYf4gfM7bNXXMgYUKc2EI41Z4v
+90225soEAScNJY2q8P8Np2BEyvVZdpsQOjGpKxLugp7L/nENI5b3nzqI4BcCdkqD
+feEbmR3ZG0py+YFkxytvoLIu97+WdIvwN+C0zHMG+xFPOLLgzol3fKaxMQ5e9D+T
+rRd0RXqnrJsXq1yjz2QOFRGITKD+bBrKRaSwTrS+mbL2LeOteZcrighL9zCs233e
+n4DqYnHbxMx1zG7hFsLKjMS7BnULGfcCzy+gilqbmTSpvJb60qJ2FoxdyNuuygqg
+lGfWBUMENQPcjYlg66ZL5zovnP8a+S3gZOKc8yuYfAOY2kYJUx5FqECFkaoFghB3
+NvYM6shvPtDj0d1Umjcwt0Sd2yWAe+r7zcF/ZrRo8YXnpIi9HT08R6iFXN3w7W/F
+vN2xPNdsHz6YnHzzYDpEHlrWuzJx9cRiIx/uFuu1glNgcPanb9oT0gAJ2kTB5bQ5
+dr30lrCiDEF/Hlt8T7D/4/0jIceMdybHTUpYYJZfR6vFEOEIB7Y=
+=ZtIk
+-----END PGP SIGNATURE-----
+
+--U3BNvdZEnlJXqmh+--
