@@ -1,20 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34725)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34689)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1eR9XV-0001CQ-6E
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 23:30:04 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1eR9XU-0001B2-1t
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 23:30:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1eR9XQ-0007qV-6k
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 23:30:01 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1eR9XQ-0007qt-Ee
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 23:29:59 -0500
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Tue, 19 Dec 2017 15:29:34 +1100
-Message-Id: <20171219042942.29297-7-david@gibson.dropbear.id.au>
+Date: Tue, 19 Dec 2017 15:29:35 +1100
+Message-Id: <20171219042942.29297-8-david@gibson.dropbear.id.au>
 In-Reply-To: <20171219042942.29297-1-david@gibson.dropbear.id.au>
 References: <20171219042942.29297-1-david@gibson.dropbear.id.au>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 06/14] ppc/pnv: change powernv_ prefix to pnv_
- for overall naming consistency
+Subject: [Qemu-devel] [PULL 07/14] spapr: Capabilities infrastructure
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,586 +20,341 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: groug@kaod.org, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, mdroth@linux.vnet.ibm.com, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>, David Gibson <david@gibson.dropbear.id.au>
+Cc: groug@kaod.org, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, mdroth@linux.vnet.ibm.com, David Gibson <david@gibson.dropbear.id.au>
 
-From: C=C3=A9dric Le Goater <clg@kaod.org>
+Because PAPR is a paravirtual environment access to certain CPU (or other)
+facilities can be blocked by the hypervisor.  PAPR provides ways to
+advertise in the device tree whether or not those features are available to
+the guest.
 
-The 'pnv' prefix is now used for all and the routines populating the
-device tree start with 'pnv_dt'. The handler of the PnvXScomInterface
-is also renamed to 'dt_xscom' which should reflect that it is
-populating the device tree under the 'xscom@' node of the chip.
+In some places we automatically determine whether to make a feature
+available based on whether our host can support it, in most cases this is
+based on limitations in the available KVM implementation.
 
-Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+Although we correctly advertise this to the guest, it means that host
+factors might make changes to the guest visible environment which is bad:
+as well as generaly reducing reproducibility, it means that a migration
+between different host environments can easily go bad.
+
+We've mostly gotten away with it because the environments considered mature
+enough to be well supported (basically, KVM on POWER8) have had consistent
+feature availability.  But, it's still not right and some limitations on
+POWER9 is going to make it more of an issue in future.
+
+This introduces an infrastructure for defining "sPAPR capabilities".  These
+are set by default based on the machine version, masked by the capabilities
+of the chosen cpu, but can be overriden with machine properties.
+
+The intention is at reset time we verify that the requested capabilities
+can be supported on the host (considering TCG, KVM and/or host cpu
+limitations).  If not we simply fail, rather than silently modifying the
+advertised featureset to the guest.
+
+This does mean that certain configurations that "worked" may now fail, but
+such configurations were already more subtly broken.
+
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+Reviewed-by: Greg Kurz <groug@kaod.org>
 ---
- hw/ppc/pnv.c               | 94 ++++++++++++++++++++++------------------=
-------
- hw/ppc/pnv_bmc.c           |  2 +-
- hw/ppc/pnv_core.c          |  8 ++--
- hw/ppc/pnv_lpc.c           |  6 +--
- hw/ppc/pnv_psi.c           |  4 +-
- hw/ppc/pnv_xscom.c         | 10 ++---
- include/hw/ppc/pnv.h       | 10 ++---
- include/hw/ppc/pnv_xscom.h |  4 +-
- 8 files changed, 67 insertions(+), 71 deletions(-)
+ hw/ppc/Makefile.objs   |   2 +-
+ hw/ppc/spapr.c         |   7 ++
+ hw/ppc/spapr_caps.c    | 181 +++++++++++++++++++++++++++++++++++++++++++++++++
+ include/hw/ppc/spapr.h |  31 +++++++++
+ 4 files changed, 220 insertions(+), 1 deletion(-)
+ create mode 100644 hw/ppc/spapr_caps.c
 
-diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
-index 94ffc8e137..9475e8479c 100644
---- a/hw/ppc/pnv.c
-+++ b/hw/ppc/pnv.c
-@@ -77,8 +77,7 @@ static const char *pnv_chip_core_typename(const PnvChip=
- *o)
-  * that has a different "affinity". In practice, it means one range
-  * per chip.
+diff --git a/hw/ppc/Makefile.objs b/hw/ppc/Makefile.objs
+index 7efc686748..1faff853b7 100644
+--- a/hw/ppc/Makefile.objs
++++ b/hw/ppc/Makefile.objs
+@@ -1,7 +1,7 @@
+ # shared objects
+ obj-y += ppc.o ppc_booke.o fdt.o
+ # IBM pSeries (sPAPR)
+-obj-$(CONFIG_PSERIES) += spapr.o spapr_vio.o spapr_events.o
++obj-$(CONFIG_PSERIES) += spapr.o spapr_caps.o spapr_vio.o spapr_events.o
+ obj-$(CONFIG_PSERIES) += spapr_hcall.o spapr_iommu.o spapr_rtas.o
+ obj-$(CONFIG_PSERIES) += spapr_pci.o spapr_rtc.o spapr_drc.o spapr_rng.o
+ obj-$(CONFIG_PSERIES) += spapr_cpu_core.o spapr_ovec.o
+diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+index 6785a90c60..d472baef8d 100644
+--- a/hw/ppc/spapr.c
++++ b/hw/ppc/spapr.c
+@@ -1466,6 +1466,8 @@ static void spapr_machine_reset(void)
+     /* Check for unknown sysbus devices */
+     foreach_dynamic_sysbus_device(find_unknown_sysbus_device, NULL);
+ 
++    spapr_caps_reset(spapr);
++
+     first_ppc_cpu = POWERPC_CPU(first_cpu);
+     if (kvm_enabled() && kvmppc_has_cap_mmu_radix() &&
+         ppc_check_compat(first_ppc_cpu, CPU_POWERPC_LOGICAL_3_00, 0,
+@@ -2311,6 +2313,8 @@ static void spapr_machine_init(MachineState *machine)
+     char *filename;
+     Error *resize_hpt_err = NULL;
+ 
++    spapr_caps_validate(spapr, &error_fatal);
++
+     msi_nonbroken = true;
+ 
+     QLIST_INIT(&spapr->phbs);
+@@ -3819,6 +3823,9 @@ static void spapr_machine_class_init(ObjectClass *oc, void *data)
+      * in which LMBs are represented and hot-added
+      */
+     mc->numa_mem_align_shift = 28;
++
++    smc->default_caps = spapr_caps(0);
++    spapr_caps_add_properties(smc, &error_abort);
+ }
+ 
+ static const TypeInfo spapr_machine_info = {
+diff --git a/hw/ppc/spapr_caps.c b/hw/ppc/spapr_caps.c
+new file mode 100644
+index 0000000000..968ba7b857
+--- /dev/null
++++ b/hw/ppc/spapr_caps.c
+@@ -0,0 +1,181 @@
++/*
++ * QEMU PowerPC pSeries Logical Partition capabilities handling
++ *
++ * Copyright (c) 2017 David Gibson, Red Hat Inc.
++ *
++ * Permission is hereby granted, free of charge, to any person obtaining a copy
++ * of this software and associated documentation files (the "Software"), to deal
++ * in the Software without restriction, including without limitation the rights
++ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
++ * copies of the Software, and to permit persons to whom the Software is
++ * furnished to do so, subject to the following conditions:
++ *
++ * The above copyright notice and this permission notice shall be included in
++ * all copies or substantial portions of the Software.
++ *
++ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
++ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
++ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
++ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
++ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
++ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
++ * THE SOFTWARE.
++ */
++#include "qemu/osdep.h"
++#include "qapi/error.h"
++#include "qapi/visitor.h"
++
++#include "hw/ppc/spapr.h"
++
++typedef struct sPAPRCapabilityInfo {
++    const char *name;
++    const char *description;
++    uint64_t flag;
++
++    /* Make sure the virtual hardware can support this capability */
++    void (*allow)(sPAPRMachineState *spapr, Error **errp);
++
++    /* If possible, tell the virtual hardware not to allow the cap to
++     * be used at all */
++    void (*disallow)(sPAPRMachineState *spapr, Error **errp);
++} sPAPRCapabilityInfo;
++
++static sPAPRCapabilityInfo capability_table[] = {
++};
++
++static sPAPRCapabilities default_caps_with_cpu(sPAPRMachineState *spapr,
++                                               CPUState *cs)
++{
++    sPAPRMachineClass *smc = SPAPR_MACHINE_GET_CLASS(spapr);
++    sPAPRCapabilities caps;
++
++    caps = smc->default_caps;
++
++    /* TODO: clamp according to cpu model */
++
++    return caps;
++}
++
++void spapr_caps_reset(sPAPRMachineState *spapr)
++{
++    Error *local_err = NULL;
++    sPAPRCapabilities caps;
++    int i;
++
++    /* First compute the actual set of caps we're running with.. */
++    caps = default_caps_with_cpu(spapr, first_cpu);
++
++    caps.mask |= spapr->forced_caps.mask;
++    caps.mask &= ~spapr->forbidden_caps.mask;
++
++    spapr->effective_caps = caps;
++
++    /* .. then apply those caps to the virtual hardware */
++
++    for (i = 0; i < ARRAY_SIZE(capability_table); i++) {
++        sPAPRCapabilityInfo *info = &capability_table[i];
++
++        if (spapr->effective_caps.mask & info->flag) {
++            /* Failure to allow a cap is fatal - if the guest doesn't
++             * have it, we'll be supplying an incorrect environment */
++            if (info->allow) {
++                info->allow(spapr, &error_fatal);
++            }
++        } else {
++            /* Failure to enforce a cap is only a warning.  The guest
++             * shouldn't be using it, since it's not advertised, so it
++             * doesn't get to complain about weird behaviour if it
++             * goes ahead anyway */
++            if (info->disallow) {
++                info->disallow(spapr, &local_err);
++            }
++            if (local_err) {
++                warn_report_err(local_err);
++                local_err = NULL;
++            }
++        }
++    }
++}
++
++static void spapr_cap_get(Object *obj, Visitor *v, const char *name,
++                          void *opaque, Error **errp)
++{
++    sPAPRCapabilityInfo *cap = opaque;
++    sPAPRMachineState *spapr = SPAPR_MACHINE(obj);
++    bool value = spapr_has_cap(spapr, cap->flag);
++
++    /* TODO: Could this get called before effective_caps is finalized
++     * in spapr_caps_reset()? */
++
++    visit_type_bool(v, name, &value, errp);
++}
++
++static void spapr_cap_set(Object *obj, Visitor *v, const char *name,
++                          void *opaque, Error **errp)
++{
++    sPAPRCapabilityInfo *cap = opaque;
++    sPAPRMachineState *spapr = SPAPR_MACHINE(obj);
++    bool value;
++    Error *local_err = NULL;
++
++    visit_type_bool(v, name, &value, &local_err);
++    if (local_err) {
++        error_propagate(errp, local_err);
++        return;
++    }
++
++    if (value) {
++        spapr->forced_caps.mask |= cap->flag;
++    } else {
++        spapr->forbidden_caps.mask |= cap->flag;
++    }
++}
++
++void spapr_caps_validate(sPAPRMachineState *spapr, Error **errp)
++{
++    uint64_t allcaps = 0;
++    int i;
++
++    for (i = 0; i < ARRAY_SIZE(capability_table); i++) {
++        g_assert((allcaps & capability_table[i].flag) == 0);
++        allcaps |= capability_table[i].flag;
++    }
++
++    g_assert((spapr->forced_caps.mask & ~allcaps) == 0);
++    g_assert((spapr->forbidden_caps.mask & ~allcaps) == 0);
++
++    if (spapr->forced_caps.mask & spapr->forbidden_caps.mask) {
++        error_setg(errp, "Some sPAPR capabilities set both on and off");
++        return;
++    }
++
++    /* Check for any caps incompatible with other caps.  Nothing to do
++     * yet */
++}
++
++void spapr_caps_add_properties(sPAPRMachineClass *smc, Error **errp)
++{
++    Error *local_err = NULL;
++    ObjectClass *klass = OBJECT_CLASS(smc);
++    int i;
++
++    for (i = 0; i < ARRAY_SIZE(capability_table); i++) {
++        sPAPRCapabilityInfo *cap = &capability_table[i];
++        const char *name = g_strdup_printf("cap-%s", cap->name);
++
++        object_class_property_add(klass, name, "bool",
++                                  spapr_cap_get, spapr_cap_set, NULL,
++                                  cap, &local_err);
++        if (local_err) {
++            error_propagate(errp, local_err);
++            return;
++        }
++
++        object_class_property_set_description(klass, name, cap->description,
++                                              &local_err);
++        if (local_err) {
++            error_propagate(errp, local_err);
++            return;
++        }
++    }
++}
+diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
+index 14757b805e..5569caf1d4 100644
+--- a/include/hw/ppc/spapr.h
++++ b/include/hw/ppc/spapr.h
+@@ -50,6 +50,15 @@ typedef enum {
+     SPAPR_RESIZE_HPT_REQUIRED,
+ } sPAPRResizeHPT;
+ 
++/**
++ * Capabilities
++ */
++
++typedef struct sPAPRCapabilities sPAPRCapabilities;
++struct sPAPRCapabilities {
++    uint64_t mask;
++};
++
+ /**
+  * sPAPRMachineClass:
   */
--static void powernv_populate_memory_node(void *fdt, int chip_id, hwaddr =
-start,
--                                         hwaddr size)
-+static void pnv_dt_memory(void *fdt, int chip_id, hwaddr start, hwaddr s=
-ize)
- {
-     char *mem_name;
-     uint64_t mem_reg_property[2];
-@@ -119,7 +118,7 @@ static int get_cpus_node(void *fdt)
-  * device tree, used in XSCOM to address cores and in interrupt
-  * servers.
-  */
--static void powernv_create_core_node(PnvChip *chip, PnvCore *pc, void *f=
-dt)
-+static void pnv_dt_core(PnvChip *chip, PnvCore *pc, void *fdt)
- {
-     CPUState *cs =3D CPU(DEVICE(pc->threads));
-     DeviceClass *dc =3D DEVICE_GET_CLASS(cs);
-@@ -228,8 +227,8 @@ static void powernv_create_core_node(PnvChip *chip, P=
-nvCore *pc, void *fdt)
-                        servers_prop, sizeof(servers_prop))));
- }
-=20
--static void powernv_populate_icp(PnvChip *chip, void *fdt, uint32_t pir,
--                                 uint32_t nr_threads)
-+static void pnv_dt_icp(PnvChip *chip, void *fdt, uint32_t pir,
-+                       uint32_t nr_threads)
- {
-     uint64_t addr =3D PNV_ICP_BASE(chip) | (pir << 12);
-     char *name;
-@@ -277,13 +276,13 @@ static int pnv_chip_lpc_offset(PnvChip *chip, void =
-*fdt)
-     return offset;
- }
-=20
--static void powernv_populate_chip(PnvChip *chip, void *fdt)
-+static void pnv_dt_chip(PnvChip *chip, void *fdt)
- {
-     const char *typename =3D pnv_chip_core_typename(chip);
-     size_t typesize =3D object_type_get_instance_size(typename);
-     int i;
-=20
--    pnv_xscom_populate(chip, fdt, 0);
-+    pnv_dt_xscom(chip, fdt, 0);
-=20
-     /* The default LPC bus of a multichip system is on chip 0. It's
-      * recognized by the firmware (skiboot) using a "primary"
-@@ -298,20 +297,18 @@ static void powernv_populate_chip(PnvChip *chip, vo=
-id *fdt)
-     for (i =3D 0; i < chip->nr_cores; i++) {
-         PnvCore *pnv_core =3D PNV_CORE(chip->cores + i * typesize);
-=20
--        powernv_create_core_node(chip, pnv_core, fdt);
-+        pnv_dt_core(chip, pnv_core, fdt);
-=20
-         /* Interrupt Control Presenters (ICP). One per core. */
--        powernv_populate_icp(chip, fdt, pnv_core->pir,
--                             CPU_CORE(pnv_core)->nr_threads);
-+        pnv_dt_icp(chip, fdt, pnv_core->pir, CPU_CORE(pnv_core)->nr_thre=
-ads);
-     }
-=20
-     if (chip->ram_size) {
--        powernv_populate_memory_node(fdt, chip->chip_id, chip->ram_start=
-,
--                                     chip->ram_size);
-+        pnv_dt_memory(fdt, chip->chip_id, chip->ram_start, chip->ram_siz=
-e);
-     }
- }
-=20
--static void powernv_populate_rtc(ISADevice *d, void *fdt, int lpc_off)
-+static void pnv_dt_rtc(ISADevice *d, void *fdt, int lpc_off)
- {
-     uint32_t io_base =3D d->ioport_id;
-     uint32_t io_regs[] =3D {
-@@ -331,7 +328,7 @@ static void powernv_populate_rtc(ISADevice *d, void *=
-fdt, int lpc_off)
-     _FDT((fdt_setprop_string(fdt, node, "compatible", "pnpPNP,b00")));
- }
-=20
--static void powernv_populate_serial(ISADevice *d, void *fdt, int lpc_off=
-)
-+static void pnv_dt_serial(ISADevice *d, void *fdt, int lpc_off)
- {
-     const char compatible[] =3D "ns16550\0pnpPNP,501";
-     uint32_t io_base =3D d->ioport_id;
-@@ -362,7 +359,7 @@ static void powernv_populate_serial(ISADevice *d, voi=
-d *fdt, int lpc_off)
-     _FDT((fdt_setprop_string(fdt, node, "device_type", "serial")));
- }
-=20
--static void powernv_populate_ipmi_bt(ISADevice *d, void *fdt, int lpc_of=
-f)
-+static void pnv_dt_ipmi_bt(ISADevice *d, void *fdt, int lpc_off)
- {
-     const char compatible[] =3D "bt\0ipmi-bt";
-     uint32_t io_base;
-@@ -401,17 +398,17 @@ typedef struct ForeachPopulateArgs {
-     int offset;
- } ForeachPopulateArgs;
-=20
--static int powernv_populate_isa_device(DeviceState *dev, void *opaque)
-+static int pnv_dt_isa_device(DeviceState *dev, void *opaque)
- {
-     ForeachPopulateArgs *args =3D opaque;
-     ISADevice *d =3D ISA_DEVICE(dev);
-=20
-     if (object_dynamic_cast(OBJECT(dev), TYPE_MC146818_RTC)) {
--        powernv_populate_rtc(d, args->fdt, args->offset);
-+        pnv_dt_rtc(d, args->fdt, args->offset);
-     } else if (object_dynamic_cast(OBJECT(dev), TYPE_ISA_SERIAL)) {
--        powernv_populate_serial(d, args->fdt, args->offset);
-+        pnv_dt_serial(d, args->fdt, args->offset);
-     } else if (object_dynamic_cast(OBJECT(dev), "isa-ipmi-bt")) {
--        powernv_populate_ipmi_bt(d, args->fdt, args->offset);
-+        pnv_dt_ipmi_bt(d, args->fdt, args->offset);
-     } else {
-         error_report("unknown isa device %s@i%x", qdev_fw_name(dev),
-                      d->ioport_id);
-@@ -420,7 +417,7 @@ static int powernv_populate_isa_device(DeviceState *d=
-ev, void *opaque)
-     return 0;
- }
-=20
--static void powernv_populate_isa(ISABus *bus, void *fdt, int lpc_offset)
-+static void pnv_dt_isa(ISABus *bus, void *fdt, int lpc_offset)
- {
-     ForeachPopulateArgs args =3D {
-         .fdt =3D fdt,
-@@ -429,14 +426,13 @@ static void powernv_populate_isa(ISABus *bus, void =
-*fdt, int lpc_offset)
-=20
-     /* ISA devices are not necessarily parented to the ISA bus so we
-      * can not use object_child_foreach() */
--    qbus_walk_children(BUS(bus), powernv_populate_isa_device,
--                       NULL, NULL, NULL, &args);
-+    qbus_walk_children(BUS(bus), pnv_dt_isa_device, NULL, NULL, NULL, &a=
-rgs);
- }
-=20
--static void *powernv_create_fdt(MachineState *machine)
-+static void *pnv_dt_create(MachineState *machine)
- {
-     const char plat_compat[] =3D "qemu,powernv\0ibm,powernv";
--    PnvMachineState *pnv =3D POWERNV_MACHINE(machine);
-+    PnvMachineState *pnv =3D PNV_MACHINE(machine);
-     void *fdt;
-     char *buf;
-     int off;
-@@ -479,15 +475,15 @@ static void *powernv_create_fdt(MachineState *machi=
-ne)
-=20
-     /* Populate device tree for each chip */
-     for (i =3D 0; i < pnv->num_chips; i++) {
--        powernv_populate_chip(pnv->chips[i], fdt);
-+        pnv_dt_chip(pnv->chips[i], fdt);
-     }
-=20
-     /* Populate ISA devices on chip 0 */
-     lpc_offset =3D pnv_chip_lpc_offset(pnv->chips[0], fdt);
--    powernv_populate_isa(pnv->isa_bus, fdt, lpc_offset);
-+    pnv_dt_isa(pnv->isa_bus, fdt, lpc_offset);
-=20
-     if (pnv->bmc) {
--        pnv_bmc_populate_sensors(pnv->bmc, fdt);
-+        pnv_dt_bmc_sensors(pnv->bmc, fdt);
-     }
-=20
-     return fdt;
-@@ -495,17 +491,17 @@ static void *powernv_create_fdt(MachineState *machi=
-ne)
-=20
- static void pnv_powerdown_notify(Notifier *n, void *opaque)
- {
--    PnvMachineState *pnv =3D POWERNV_MACHINE(qdev_get_machine());
-+    PnvMachineState *pnv =3D PNV_MACHINE(qdev_get_machine());
-=20
-     if (pnv->bmc) {
-         pnv_bmc_powerdown(pnv->bmc);
-     }
- }
-=20
--static void ppc_powernv_reset(void)
-+static void pnv_reset(void)
- {
-     MachineState *machine =3D MACHINE(qdev_get_machine());
--    PnvMachineState *pnv =3D POWERNV_MACHINE(machine);
-+    PnvMachineState *pnv =3D PNV_MACHINE(machine);
-     void *fdt;
-     Object *obj;
-=20
-@@ -524,7 +520,7 @@ static void ppc_powernv_reset(void)
-         pnv->bmc =3D IPMI_BMC(obj);
-     }
-=20
--    fdt =3D powernv_create_fdt(machine);
-+    fdt =3D pnv_dt_create(machine);
-=20
-     /* Pack resulting tree */
-     _FDT((fdt_pack(fdt)));
-@@ -552,9 +548,9 @@ static ISABus *pnv_isa_create(PnvChip *chip)
-     return isa_bus;
- }
-=20
--static void ppc_powernv_init(MachineState *machine)
-+static void pnv_init(MachineState *machine)
- {
--    PnvMachineState *pnv =3D POWERNV_MACHINE(machine);
-+    PnvMachineState *pnv =3D PNV_MACHINE(machine);
-     MemoryRegion *ram;
-     char *fw_filename;
-     long fw_size;
-@@ -567,7 +563,7 @@ static void ppc_powernv_init(MachineState *machine)
-     }
-=20
-     ram =3D g_new(MemoryRegion, 1);
--    memory_region_allocate_system_memory(ram, NULL, "ppc_powernv.ram",
-+    memory_region_allocate_system_memory(ram, NULL, "pnv.ram",
-                                          machine->ram_size);
-     memory_region_add_subregion(get_system_memory(), 0, ram);
-=20
-@@ -974,7 +970,7 @@ static void pnv_chip_class_init(ObjectClass *klass, v=
-oid *data)
-=20
- static ICSState *pnv_ics_get(XICSFabric *xi, int irq)
- {
--    PnvMachineState *pnv =3D POWERNV_MACHINE(xi);
-+    PnvMachineState *pnv =3D PNV_MACHINE(xi);
-     int i;
-=20
-     for (i =3D 0; i < pnv->num_chips; i++) {
-@@ -987,7 +983,7 @@ static ICSState *pnv_ics_get(XICSFabric *xi, int irq)
-=20
- static void pnv_ics_resend(XICSFabric *xi)
- {
--    PnvMachineState *pnv =3D POWERNV_MACHINE(xi);
-+    PnvMachineState *pnv =3D PNV_MACHINE(xi);
-     int i;
-=20
-     for (i =3D 0; i < pnv->num_chips; i++) {
-@@ -1021,7 +1017,7 @@ static ICPState *pnv_icp_get(XICSFabric *xi, int pi=
-r)
- static void pnv_pic_print_info(InterruptStatsProvider *obj,
-                                Monitor *mon)
- {
--    PnvMachineState *pnv =3D POWERNV_MACHINE(obj);
-+    PnvMachineState *pnv =3D PNV_MACHINE(obj);
-     int i;
-     CPUState *cs;
-=20
-@@ -1039,13 +1035,13 @@ static void pnv_pic_print_info(InterruptStatsProv=
-ider *obj,
- static void pnv_get_num_chips(Object *obj, Visitor *v, const char *name,
-                               void *opaque, Error **errp)
- {
--    visit_type_uint32(v, name, &POWERNV_MACHINE(obj)->num_chips, errp);
-+    visit_type_uint32(v, name, &PNV_MACHINE(obj)->num_chips, errp);
- }
-=20
- static void pnv_set_num_chips(Object *obj, Visitor *v, const char *name,
-                               void *opaque, Error **errp)
- {
--    PnvMachineState *pnv =3D POWERNV_MACHINE(obj);
-+    PnvMachineState *pnv =3D PNV_MACHINE(obj);
-     uint32_t num_chips;
-     Error *local_err =3D NULL;
-=20
-@@ -1067,13 +1063,13 @@ static void pnv_set_num_chips(Object *obj, Visito=
-r *v, const char *name,
-     pnv->num_chips =3D num_chips;
- }
-=20
--static void powernv_machine_initfn(Object *obj)
-+static void pnv_machine_initfn(Object *obj)
- {
--    PnvMachineState *pnv =3D POWERNV_MACHINE(obj);
-+    PnvMachineState *pnv =3D PNV_MACHINE(obj);
-     pnv->num_chips =3D 1;
- }
-=20
--static void powernv_machine_class_props_init(ObjectClass *oc)
-+static void pnv_machine_class_props_init(ObjectClass *oc)
- {
-     object_class_property_add(oc, "num-chips", "uint32",
-                               pnv_get_num_chips, pnv_set_num_chips,
-@@ -1083,15 +1079,15 @@ static void powernv_machine_class_props_init(Obje=
-ctClass *oc)
-                               NULL);
- }
-=20
--static void powernv_machine_class_init(ObjectClass *oc, void *data)
-+static void pnv_machine_class_init(ObjectClass *oc, void *data)
- {
-     MachineClass *mc =3D MACHINE_CLASS(oc);
-     XICSFabricClass *xic =3D XICS_FABRIC_CLASS(oc);
-     InterruptStatsProviderClass *ispc =3D INTERRUPT_STATS_PROVIDER_CLASS=
-(oc);
-=20
-     mc->desc =3D "IBM PowerNV (Non-Virtualized)";
--    mc->init =3D ppc_powernv_init;
--    mc->reset =3D ppc_powernv_reset;
-+    mc->init =3D pnv_init;
-+    mc->reset =3D pnv_reset;
-     mc->max_cpus =3D MAX_CPUS;
-     mc->default_cpu_type =3D POWERPC_CPU_TYPE_NAME("power8_v2.0");
-     mc->block_default_type =3D IF_IDE; /* Pnv provides a AHCI device for
-@@ -1104,7 +1100,7 @@ static void powernv_machine_class_init(ObjectClass =
-*oc, void *data)
-     xic->ics_resend =3D pnv_ics_resend;
-     ispc->print_info =3D pnv_pic_print_info;
-=20
--    powernv_machine_class_props_init(oc);
-+    pnv_machine_class_props_init(oc);
- }
-=20
- #define DEFINE_PNV_CHIP_TYPE(type, class_initfn) \
-@@ -1116,11 +1112,11 @@ static void powernv_machine_class_init(ObjectClas=
-s *oc, void *data)
-=20
- static const TypeInfo types[] =3D {
-     {
--        .name          =3D TYPE_POWERNV_MACHINE,
-+        .name          =3D TYPE_PNV_MACHINE,
-         .parent        =3D TYPE_MACHINE,
-         .instance_size =3D sizeof(PnvMachineState),
--        .instance_init =3D powernv_machine_initfn,
--        .class_init    =3D powernv_machine_class_init,
-+        .instance_init =3D pnv_machine_initfn,
-+        .class_init    =3D pnv_machine_class_init,
-         .interfaces =3D (InterfaceInfo[]) {
-             { TYPE_XICS_FABRIC },
-             { TYPE_INTERRUPT_STATS_PROVIDER },
-diff --git a/hw/ppc/pnv_bmc.c b/hw/ppc/pnv_bmc.c
-index 7b60b4c360..b2cf441ee7 100644
---- a/hw/ppc/pnv_bmc.c
-+++ b/hw/ppc/pnv_bmc.c
-@@ -73,7 +73,7 @@ void pnv_bmc_powerdown(IPMIBmc *bmc)
-     pnv_gen_oem_sel(bmc, SOFT_OFF);
- }
-=20
--void pnv_bmc_populate_sensors(IPMIBmc *bmc, void *fdt)
-+void pnv_dt_bmc_sensors(IPMIBmc *bmc, void *fdt)
- {
-     int offset;
-     int i;
-diff --git a/hw/ppc/pnv_core.c b/hw/ppc/pnv_core.c
-index 03317db853..7e8a76df44 100644
---- a/hw/ppc/pnv_core.c
-+++ b/hw/ppc/pnv_core.c
-@@ -37,7 +37,7 @@ static const char *pnv_core_cpu_typename(PnvCore *pc)
-     return cpu_type;
- }
-=20
--static void powernv_cpu_reset(void *opaque)
-+static void pnv_cpu_reset(void *opaque)
- {
-     PowerPCCPU *cpu =3D opaque;
-     CPUState *cs =3D CPU(cpu);
-@@ -54,7 +54,7 @@ static void powernv_cpu_reset(void *opaque)
-     env->msr |=3D MSR_HVB; /* Hypervisor mode */
- }
-=20
--static void powernv_cpu_init(PowerPCCPU *cpu, Error **errp)
-+static void pnv_cpu_init(PowerPCCPU *cpu, Error **errp)
- {
-     CPUPPCState *env =3D &cpu->env;
-     int core_pir;
-@@ -73,7 +73,7 @@ static void powernv_cpu_init(PowerPCCPU *cpu, Error **e=
-rrp)
-     /* Set time-base frequency to 512 MHz */
-     cpu_ppc_tb_init(env, PNV_TIMEBASE_FREQ);
-=20
--    qemu_register_reset(powernv_cpu_reset, cpu);
-+    qemu_register_reset(pnv_cpu_reset, cpu);
- }
-=20
- /*
-@@ -139,7 +139,7 @@ static void pnv_core_realize_child(Object *child, XIC=
-SFabric *xi, Error **errp)
-         return;
-     }
-=20
--    powernv_cpu_init(cpu, &local_err);
-+    pnv_cpu_init(cpu, &local_err);
-     if (local_err) {
-         error_propagate(errp, local_err);
-         return;
-diff --git a/hw/ppc/pnv_lpc.c b/hw/ppc/pnv_lpc.c
-index f03a80a29b..b777b78e18 100644
---- a/hw/ppc/pnv_lpc.c
-+++ b/hw/ppc/pnv_lpc.c
-@@ -92,7 +92,7 @@ enum {
- #define LPC_HC_REGS_OPB_SIZE    0x00001000
-=20
-=20
--static int pnv_lpc_populate(PnvXScomInterface *dev, void *fdt, int xscom=
-_offset)
-+static int pnv_lpc_dt_xscom(PnvXScomInterface *dev, void *fdt, int xscom=
-_offset)
- {
-     const char compat[] =3D "ibm,power8-lpc\0ibm,lpc";
-     char *name;
-@@ -482,7 +482,7 @@ static void pnv_lpc_class_init(ObjectClass *klass, vo=
-id *data)
-     DeviceClass *dc =3D DEVICE_CLASS(klass);
-     PnvXScomInterfaceClass *xdc =3D PNV_XSCOM_INTERFACE_CLASS(klass);
-=20
--    xdc->populate =3D pnv_lpc_populate;
-+    xdc->dt_xscom =3D pnv_lpc_dt_xscom;
-=20
-     dc->realize =3D pnv_lpc_realize;
- }
-@@ -515,7 +515,7 @@ type_init(pnv_lpc_register_types)
-  */
- static void pnv_lpc_isa_irq_handler_cpld(void *opaque, int n, int level)
- {
--    PnvMachineState *pnv =3D POWERNV_MACHINE(qdev_get_machine());
-+    PnvMachineState *pnv =3D PNV_MACHINE(qdev_get_machine());
-     uint32_t old_state =3D pnv->cpld_irqstate;
-     PnvLpcController *lpc =3D PNV_LPC(opaque);
-=20
-diff --git a/hw/ppc/pnv_psi.c b/hw/ppc/pnv_psi.c
-index 9876c26622..5b969127c3 100644
---- a/hw/ppc/pnv_psi.c
-+++ b/hw/ppc/pnv_psi.c
-@@ -510,7 +510,7 @@ static void pnv_psi_realize(DeviceState *dev, Error *=
-*errp)
-     }
- }
-=20
--static int pnv_psi_populate(PnvXScomInterface *dev, void *fdt, int xscom=
-_offset)
-+static int pnv_psi_dt_xscom(PnvXScomInterface *dev, void *fdt, int xscom=
-_offset)
- {
-     const char compat[] =3D "ibm,power8-psihb-x\0ibm,psihb-x";
-     char *name;
-@@ -546,7 +546,7 @@ static void pnv_psi_class_init(ObjectClass *klass, vo=
-id *data)
-     DeviceClass *dc =3D DEVICE_CLASS(klass);
-     PnvXScomInterfaceClass *xdc =3D PNV_XSCOM_INTERFACE_CLASS(klass);
-=20
--    xdc->populate =3D pnv_psi_populate;
-+    xdc->dt_xscom =3D pnv_psi_dt_xscom;
-=20
-     dc->realize =3D pnv_psi_realize;
-     dc->props =3D pnv_psi_properties;
-diff --git a/hw/ppc/pnv_xscom.c b/hw/ppc/pnv_xscom.c
-index 38bc85f117..e51d634f40 100644
---- a/hw/ppc/pnv_xscom.c
-+++ b/hw/ppc/pnv_xscom.c
-@@ -207,15 +207,15 @@ typedef struct ForeachPopulateArgs {
-     int xscom_offset;
- } ForeachPopulateArgs;
-=20
--static int xscom_populate_child(Object *child, void *opaque)
-+static int xscom_dt_child(Object *child, void *opaque)
- {
-     if (object_dynamic_cast(child, TYPE_PNV_XSCOM_INTERFACE)) {
-         ForeachPopulateArgs *args =3D opaque;
-         PnvXScomInterface *xd =3D PNV_XSCOM_INTERFACE(child);
-         PnvXScomInterfaceClass *xc =3D PNV_XSCOM_INTERFACE_GET_CLASS(xd)=
-;
-=20
--        if (xc->populate) {
--            _FDT((xc->populate(xd, args->fdt, args->xscom_offset)));
-+        if (xc->dt_xscom) {
-+            _FDT((xc->dt_xscom(xd, args->fdt, args->xscom_offset)));
-         }
-     }
-     return 0;
-@@ -224,7 +224,7 @@ static int xscom_populate_child(Object *child, void *=
-opaque)
- static const char compat_p8[] =3D "ibm,power8-xscom\0ibm,xscom";
- static const char compat_p9[] =3D "ibm,power9-xscom\0ibm,xscom";
-=20
--int pnv_xscom_populate(PnvChip *chip, void *fdt, int root_offset)
-+int pnv_dt_xscom(PnvChip *chip, void *fdt, int root_offset)
- {
-     uint64_t reg[] =3D { cpu_to_be64(PNV_XSCOM_BASE(chip)),
-                        cpu_to_be64(PNV_XSCOM_SIZE) };
-@@ -255,7 +255,7 @@ int pnv_xscom_populate(PnvChip *chip, void *fdt, int =
-root_offset)
-     args.fdt =3D fdt;
-     args.xscom_offset =3D xscom_offset;
-=20
--    object_child_foreach(OBJECT(chip), xscom_populate_child, &args);
-+    object_child_foreach(OBJECT(chip), xscom_dt_child, &args);
-     return 0;
- }
-=20
-diff --git a/include/hw/ppc/pnv.h b/include/hw/ppc/pnv.h
-index 59524cd42b..61896f9fd7 100644
---- a/include/hw/ppc/pnv.h
-+++ b/include/hw/ppc/pnv.h
-@@ -26,7 +26,7 @@
- #include "hw/ppc/pnv_psi.h"
- #include "hw/ppc/pnv_occ.h"
-=20
--#define TYPE_PNV_CHIP "powernv-chip"
-+#define TYPE_PNV_CHIP "pnv-chip"
- #define PNV_CHIP(obj) OBJECT_CHECK(PnvChip, (obj), TYPE_PNV_CHIP)
- #define PNV_CHIP_CLASS(klass) \
-      OBJECT_CLASS_CHECK(PnvChipClass, (klass), TYPE_PNV_CHIP)
-@@ -117,9 +117,9 @@ typedef struct PnvChipClass {
- #define PNV_CHIP_INDEX(chip)                                    \
-     (((chip)->chip_id >> 2) * 2 + ((chip)->chip_id & 0x3))
-=20
--#define TYPE_POWERNV_MACHINE       MACHINE_TYPE_NAME("powernv")
--#define POWERNV_MACHINE(obj) \
--    OBJECT_CHECK(PnvMachineState, (obj), TYPE_POWERNV_MACHINE)
-+#define TYPE_PNV_MACHINE       MACHINE_TYPE_NAME("powernv")
-+#define PNV_MACHINE(obj) \
-+    OBJECT_CHECK(PnvMachineState, (obj), TYPE_PNV_MACHINE)
-=20
- typedef struct PnvMachineState {
-     /*< private >*/
-@@ -144,7 +144,7 @@ typedef struct PnvMachineState {
- /*
-  * BMC helpers
-  */
--void pnv_bmc_populate_sensors(IPMIBmc *bmc, void *fdt);
-+void pnv_dt_bmc_sensors(IPMIBmc *bmc, void *fdt);
- void pnv_bmc_powerdown(IPMIBmc *bmc);
-=20
- /*
-diff --git a/include/hw/ppc/pnv_xscom.h b/include/hw/ppc/pnv_xscom.h
-index 38077b4796..7252e219e2 100644
---- a/include/hw/ppc/pnv_xscom.h
-+++ b/include/hw/ppc/pnv_xscom.h
-@@ -36,7 +36,7 @@ typedef struct PnvXScomInterface {
-=20
- typedef struct PnvXScomInterfaceClass {
-     InterfaceClass parent;
--    int (*populate)(PnvXScomInterface *dev, void *fdt, int offset);
-+    int (*dt_xscom)(PnvXScomInterface *dev, void *fdt, int offset);
- } PnvXScomInterfaceClass;
-=20
- /*
-@@ -67,7 +67,7 @@ typedef struct PnvXScomInterfaceClass {
- #define PNV_XSCOM_OCC_SIZE        0x6000
-=20
- extern void pnv_xscom_realize(PnvChip *chip, Error **errp);
--extern int pnv_xscom_populate(PnvChip *chip, void *fdt, int offset);
-+extern int pnv_dt_xscom(PnvChip *chip, void *fdt, int offset);
-=20
- extern void pnv_xscom_add_subregion(PnvChip *chip, hwaddr offset,
-                                     MemoryRegion *mr);
---=20
+@@ -66,6 +75,7 @@ struct sPAPRMachineClass {
+                           hwaddr *mmio32, hwaddr *mmio64,
+                           unsigned n_dma, uint32_t *liobns, Error **errp);
+     sPAPRResizeHPT resize_hpt_default;
++    sPAPRCapabilities default_caps;
+ };
+ 
+ /**
+@@ -127,6 +137,9 @@ struct sPAPRMachineState {
+     MemoryHotplugState hotplug_memory;
+ 
+     const char *icp_type;
++
++    sPAPRCapabilities forced_caps, forbidden_caps;
++    sPAPRCapabilities effective_caps;
+ };
+ 
+ #define H_SUCCESS         0
+@@ -724,4 +737,22 @@ int spapr_irq_alloc_block(sPAPRMachineState *spapr, int num, bool lsi,
+ void spapr_irq_free(sPAPRMachineState *spapr, int irq, int num);
+ qemu_irq spapr_qirq(sPAPRMachineState *spapr, int irq);
+ 
++/*
++ * Handling of optional capabilities
++ */
++static inline sPAPRCapabilities spapr_caps(uint64_t mask)
++{
++    sPAPRCapabilities caps = { mask };
++    return caps;
++}
++
++static inline bool spapr_has_cap(sPAPRMachineState *spapr, uint64_t cap)
++{
++    return !!(spapr->effective_caps.mask & cap);
++}
++
++void spapr_caps_reset(sPAPRMachineState *spapr);
++void spapr_caps_validate(sPAPRMachineState *spapr, Error **errp);
++void spapr_caps_add_properties(sPAPRMachineClass *smc, Error **errp);
++
+ #endif /* HW_SPAPR_H */
+-- 
 2.14.3
