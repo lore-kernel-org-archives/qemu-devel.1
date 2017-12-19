@@ -1,22 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56298)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40857)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1eR5rC-0007jX-6h
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 19:34:07 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1eR6O9-0002ZI-1g
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 20:08:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1eR5r9-0008Vp-0p
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 19:34:06 -0500
-Date: Tue, 19 Dec 2017 01:34:00 +0100 (CET)
-From: BALATON Zoltan <balaton@eik.bme.hu>
-In-Reply-To: <730aec0f-3f10-55ea-eb26-e5740c2fbfe2@redhat.com>
-Message-ID: <alpine.BSF.2.21.1712190109110.9867@zero.eik.bme.hu>
-References: <20171216224842.EE8C17456B3@zero.eik.bme.hu>
-	<20171218040946.GS7753@umbus.fritz.box>
-	<alpine.BSF.2.21.1712181329050.96474@zero.eik.bme.hu>
-	<730aec0f-3f10-55ea-eb26-e5740c2fbfe2@redhat.com>
+	(envelope-from <dgibson@ozlabs.org>) id 1eR6O7-00081d-Ot
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 20:08:09 -0500
+Date: Tue, 19 Dec 2017 11:38:05 +1100
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20171219003805.GG4786@umbus.fritz.box>
+References: <151361268274.29357.7778552806095274865.stgit@bahia.lan>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII; format=flowed
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH v2] hw/ide: Emulate SiI3112 SATA
- controller
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="yZnyZsPjQYjG7xG7"
+Content-Disposition: inline
+In-Reply-To: <151361268274.29357.7778552806095274865.stgit@bahia.lan>
+Subject: Re: [Qemu-devel] [PATCH] spapr_pci: use warn_report()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,57 +23,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>
-Cc: David Gibson <david@gibson.dropbear.id.au>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+To: Greg Kurz <groug@kaod.org>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org
 
-On Mon, 18 Dec 2017, John Snow wrote:
-> On 12/18/2017 07:30 AM, BALATON Zoltan wrote:
->> On Mon, 18 Dec 2017, David Gibson wrote:
->>> On Sat, Dec 16, 2017 at 11:42:39PM +0100, BALATON Zoltan wrote:
->>>> This is a common generic PCI SATA controller that is also used in PCs
->>>> but more importantly guests running on the Sam460ex board prefer this
->>>> card and have a driver for it (unlike for other SATA controllers
->>>> already emulated).
->>>>
->>>> Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
->>>
->>> I don't know enough about IDE to give this any more than a quick check
->>> for anything obviously bogus looking.? So,
->>>
->>> Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
->>>
->>> John, can you take this through your tree, or should I take it through
->>> the ppc tree?
->>
->> I think he said before it can go via ppc tree:
->>
->> http://lists.nongnu.org/archive/html/qemu-devel/2017-08/msg04480.html
->>
->
-> Yep, I tend to use Acked-by to indicate that it's okay for you to stage.
-> I'll give it another look-over in a minute, but I'm fine with adding the
-> model in general, even if it's not quite complete just yet.
 
-Maybe it's not complete yet but it should work to some degree. I've tested 
-it with Linux on i386-softmmu and on PPC Sam460ex with u-boot and some 
-guests (both on x86_64 host) and these could boot from an ide-cd model 
-connected to this controller so at least basic PIO and UDMA modes should 
-work. Maybe some more advanced features are missing but don't know if 
-there are any drivers using those.
+--yZnyZsPjQYjG7xG7
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-On i386 the bios does not have a driver so one cannot boot from this 
-controller only, so I've tested it with -kernel and -initrd options but 
-root filesystem was then read from CD connected to this controller and it 
-could read it and start. I haven't tested it more than that though. Maybe 
-the card's original option ROM that would allow booting from BIOS might 
-not work with this device model but I think we could not distribute that 
-anyway for legal reasons so I did not try that. On the Sam460ex which is 
-my target for this the u-boot firmware has a driver and can boot from this 
-controller as well as clients can use it.
+On Mon, Dec 18, 2017 at 04:58:02PM +0100, Greg Kurz wrote:
+> These two are definitely warnings. Let's use the appropriate API.
+>=20
+> Signed-off-by: Greg Kurz <groug@kaod.org>
 
-As of now this patch only adds it to ppcemb and will only be created by 
-default on the sam460ex machine so not very likely someone would try to 
-use it on something else without recompiling QEMU.
+Applied to ppc-for-2.12, thanks.
 
-Regards,
-BALATON Zoltan
+> ---
+>  hw/ppc/spapr_pci.c      |    6 +++---
+>  hw/ppc/spapr_pci_vfio.c |    2 +-
+>  2 files changed, 4 insertions(+), 4 deletions(-)
+>=20
+> diff --git a/hw/ppc/spapr_pci.c b/hw/ppc/spapr_pci.c
+> index 88797b3d3622..695c82091140 100644
+> --- a/hw/ppc/spapr_pci.c
+> +++ b/hw/ppc/spapr_pci.c
+> @@ -1696,9 +1696,9 @@ static void spapr_phb_realize(DeviceState *dev, Err=
+or **errp)
+>      /* DMA setup */
+>      if (((sphb->page_size_mask & qemu_getrampagesize()) =3D=3D 0)
+>          && kvm_enabled()) {
+> -        error_report("System page size 0x%lx is not enabled in page_size=
+_mask "
+> -                     "(0x%"PRIx64"). Performance may be slow",
+> -                     qemu_getrampagesize(), sphb->page_size_mask);
+> +        warn_report("System page size 0x%lx is not enabled in page_size_=
+mask "
+> +                    "(0x%"PRIx64"). Performance may be slow",
+> +                    qemu_getrampagesize(), sphb->page_size_mask);
+>      }
+> =20
+>      for (i =3D 0; i < windows_supported; ++i) {
+> diff --git a/hw/ppc/spapr_pci_vfio.c b/hw/ppc/spapr_pci_vfio.c
+> index 8448e0b0247d..1f775ea93dc6 100644
+> --- a/hw/ppc/spapr_pci_vfio.c
+> +++ b/hw/ppc/spapr_pci_vfio.c
+> @@ -50,7 +50,7 @@ static Property spapr_phb_vfio_properties[] =3D {
+>  static void spapr_phb_vfio_instance_init(Object *obj)
+>  {
+>      if (!qtest_enabled()) {
+> -        error_report("spapr-pci-vfio-host-bridge is deprecated");
+> +        warn_report("spapr-pci-vfio-host-bridge is deprecated");
+>      }
+>  }
+> =20
+>=20
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--yZnyZsPjQYjG7xG7
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlo4X20ACgkQbDjKyiDZ
+s5I6Xw/+JK1VU1CA9uIuAXmTGPWIFAZT7V/kLkL8eE2gktYDUmcdNanvUSDCEfhh
+E4SMZMLoSJsOOF1tg8ZOS62QWeq6A1mxQNBmfEEusfveanAZ/f6LBuElxQlL/CpP
+Eak8FpbkCtPBVI6u6jYkmLdqBuAD8/ZPNSaDZ5AqV4JyOuC9ozKmGb7w0v0v9kZO
+jL1omVs3EBqZNHZy4jQu0Q8zhIpaA3yQpToWROs47ZRe+uY62O4TSC8mknpN8Ozb
+rmnUGCqFqhXIaC6JsuKAksV9kobkH8ys28C0usBXU9E29gQANX88SSvtU7AeTj+n
+1EKsMa+5BiqAgFIZds9ChQ+WfRPb9rKd+MZNmSabZFNjhVdyE701XDN9CR6oEqPV
+lnUuRs01/bxgovFuMcqP/pENL2rRYCidN0trPD0+EH9cpEfzr0J1xWK7rnFQD8+d
+8Y3mCKh5ezAmGxPSn+jilO27OTH/d6/jBdj29GR4OCx7Twwqpulemeyolggh5YN5
+x2EGx2/9hY2yYVE3/DbyyBOtl9/RgY6evEtS9b9SkkKa+pRndvx3CtoMCH0yH97c
+AgfB2l7q6EeMWn99tCnlj4/3a6bWYlRixx3anH9Q5vKvsjtHw2GFj7ufBOEoeIe+
+ynREbf8iLqREcr/6CdHx4/jgeIV8QSaaFNd7zpP2eTLDrQ3hj+c=
+=AtzZ
+-----END PGP SIGNATURE-----
+
+--yZnyZsPjQYjG7xG7--
