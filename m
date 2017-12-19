@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58092)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58135)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1eRJaD-0005EB-M0
-	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 10:13:34 -0500
+	(envelope-from <stefanha@redhat.com>) id 1eRJaI-0005Ht-55
+	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 10:13:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1eRJa7-0007NV-P2
-	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 10:13:29 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:50754)
+	(envelope-from <stefanha@redhat.com>) id 1eRJaG-0007YR-3u
+	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 10:13:34 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:50934)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1eRJa7-0007MZ-IK
-	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 10:13:23 -0500
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1eRJaF-0007XX-UE
+	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 10:13:32 -0500
 From: Stefan Hajnoczi <stefanha@redhat.com>
-Date: Tue, 19 Dec 2017 15:11:40 +0000
-Message-Id: <20171219151144.11120-20-stefanha@redhat.com>
+Date: Tue, 19 Dec 2017 15:11:42 +0000
+Message-Id: <20171219151144.11120-22-stefanha@redhat.com>
 In-Reply-To: <20171219151144.11120-1-stefanha@redhat.com>
 References: <20171219151144.11120-1-stefanha@redhat.com>
-Subject: [Qemu-devel] [PULL v2 19/23] docs: mark nested AioContext locking
- as a legacy API
+Subject: [Qemu-devel] [PULL v2 21/23] iotests: add VM.add_object()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,37 +26,32 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Peter Maydell <peter.maydell@linaro.org>, Stefan Hajnoczi <stefanha@redhat.com>
 
-See the patch for why nested AioContext locking is no longer allowed.
+The VM.add_object() method can be used to add IOThreads or memory
+backend objects.
 
 Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
-Message-id: 20171207201320.19284-3-stefanha@redhat.com
+Message-id: 20171207201320.19284-5-stefanha@redhat.com
 Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
 ---
- docs/devel/multiple-iothreads.txt | 7 ++++---
- 1 file changed, 4 insertions(+), 3 deletions(-)
+ tests/qemu-iotests/iotests.py | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-diff --git a/docs/devel/multiple-iothreads.txt b/docs/devel/multiple-iothreads.txt
-index e4d340bbb7..4f9012d154 100644
---- a/docs/devel/multiple-iothreads.txt
-+++ b/docs/devel/multiple-iothreads.txt
-@@ -1,4 +1,4 @@
--Copyright (c) 2014 Red Hat Inc.
-+Copyright (c) 2014-2017 Red Hat Inc.
+diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotests.py
+index 6f057904a9..44477e9295 100644
+--- a/tests/qemu-iotests/iotests.py
++++ b/tests/qemu-iotests/iotests.py
+@@ -197,6 +197,11 @@ class VM(qtest.QEMUQtestMachine):
+                                  socket_scm_helper=socket_scm_helper)
+         self._num_drives = 0
  
- This work is licensed under the terms of the GNU GPL, version 2 or later.  See
- the COPYING file in the top-level directory.
-@@ -92,8 +92,9 @@ aio_context_acquire()/aio_context_release() for mutual exclusion.  Once the
- context is acquired no other thread can access it or run event loop iterations
- in this AioContext.
- 
--aio_context_acquire()/aio_context_release() calls may be nested.  This
--means you can call them if you're not sure whether #2 applies.
-+Legacy code sometimes nests aio_context_acquire()/aio_context_release() calls.
-+Do not use nesting anymore, it is incompatible with the BDRV_POLL_WHILE() macro
-+used in the block layer and can lead to hangs.
- 
- There is currently no lock ordering rule if a thread needs to acquire multiple
- AioContexts simultaneously.  Therefore, it is only safe for code holding the
++    def add_object(self, opts):
++        self._args.append('-object')
++        self._args.append(opts)
++        return self
++
+     def add_device(self, opts):
+         self._args.append('-device')
+         self._args.append(opts)
 -- 
 2.14.3
