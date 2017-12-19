@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34689)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34800)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1eR9XU-0001B2-1t
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 23:30:03 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1eR9XX-0001FF-6o
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 23:30:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1eR9XQ-0007qt-Ee
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 23:29:59 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1eR9XS-0007tj-Ua
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 23:30:03 -0500
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Tue, 19 Dec 2017 15:29:35 +1100
-Message-Id: <20171219042942.29297-8-david@gibson.dropbear.id.au>
+Date: Tue, 19 Dec 2017 15:29:42 +1100
+Message-Id: <20171219042942.29297-15-david@gibson.dropbear.id.au>
 In-Reply-To: <20171219042942.29297-1-david@gibson.dropbear.id.au>
 References: <20171219042942.29297-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PULL 07/14] spapr: Capabilities infrastructure
+Subject: [Qemu-devel] [PULL 14/14] hw/ide: Emulate SiI3112 SATA controller
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,341 +20,450 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: groug@kaod.org, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, mdroth@linux.vnet.ibm.com, David Gibson <david@gibson.dropbear.id.au>
+Cc: groug@kaod.org, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, mdroth@linux.vnet.ibm.com, BALATON Zoltan <balaton@eik.bme.hu>, David Gibson <david@gibson.dropbear.id.au>
 
-Because PAPR is a paravirtual environment access to certain CPU (or other)
-facilities can be blocked by the hypervisor.  PAPR provides ways to
-advertise in the device tree whether or not those features are available to
-the guest.
+From: BALATON Zoltan <balaton@eik.bme.hu>
 
-In some places we automatically determine whether to make a feature
-available based on whether our host can support it, in most cases this is
-based on limitations in the available KVM implementation.
+This is a common generic PCI SATA controller that is also used in PCs
+but more importantly guests running on the Sam460ex board prefer this
+card and have a driver for it (unlike for other SATA controllers
+already emulated).
 
-Although we correctly advertise this to the guest, it means that host
-factors might make changes to the guest visible environment which is bad:
-as well as generaly reducing reproducibility, it means that a migration
-between different host environments can easily go bad.
-
-We've mostly gotten away with it because the environments considered mature
-enough to be well supported (basically, KVM on POWER8) have had consistent
-feature availability.  But, it's still not right and some limitations on
-POWER9 is going to make it more of an issue in future.
-
-This introduces an infrastructure for defining "sPAPR capabilities".  These
-are set by default based on the machine version, masked by the capabilities
-of the chosen cpu, but can be overriden with machine properties.
-
-The intention is at reset time we verify that the requested capabilities
-can be supported on the host (considering TCG, KVM and/or host cpu
-limitations).  If not we simply fail, rather than silently modifying the
-advertised featureset to the guest.
-
-This does mean that certain configurations that "worked" may now fail, but
-such configurations were already more subtly broken.
-
+Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-Reviewed-by: Greg Kurz <groug@kaod.org>
 ---
- hw/ppc/Makefile.objs   |   2 +-
- hw/ppc/spapr.c         |   7 ++
- hw/ppc/spapr_caps.c    | 181 +++++++++++++++++++++++++++++++++++++++++++++++++
- include/hw/ppc/spapr.h |  31 +++++++++
- 4 files changed, 220 insertions(+), 1 deletion(-)
- create mode 100644 hw/ppc/spapr_caps.c
+ MAINTAINERS                        |   6 +
+ default-configs/ppcemb-softmmu.mak |   1 +
+ hw/ide/Makefile.objs               |   1 +
+ hw/ide/sii3112.c                   | 368 +++++++++++++++++++++++++++++++++++++
+ hw/ide/trace-events                |   5 +
+ 5 files changed, 381 insertions(+)
+ create mode 100644 hw/ide/sii3112.c
 
-diff --git a/hw/ppc/Makefile.objs b/hw/ppc/Makefile.objs
-index 7efc686748..1faff853b7 100644
---- a/hw/ppc/Makefile.objs
-+++ b/hw/ppc/Makefile.objs
-@@ -1,7 +1,7 @@
- # shared objects
- obj-y += ppc.o ppc_booke.o fdt.o
- # IBM pSeries (sPAPR)
--obj-$(CONFIG_PSERIES) += spapr.o spapr_vio.o spapr_events.o
-+obj-$(CONFIG_PSERIES) += spapr.o spapr_caps.o spapr_vio.o spapr_events.o
- obj-$(CONFIG_PSERIES) += spapr_hcall.o spapr_iommu.o spapr_rtas.o
- obj-$(CONFIG_PSERIES) += spapr_pci.o spapr_rtc.o spapr_drc.o spapr_rng.o
- obj-$(CONFIG_PSERIES) += spapr_cpu_core.o spapr_ovec.o
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index 6785a90c60..d472baef8d 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -1466,6 +1466,8 @@ static void spapr_machine_reset(void)
-     /* Check for unknown sysbus devices */
-     foreach_dynamic_sysbus_device(find_unknown_sysbus_device, NULL);
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 8859a50c36..399ba2c94b 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -765,6 +765,12 @@ L: qemu-ppc@nongnu.org
+ S: Odd Fixes
+ F: hw/ppc/virtex_ml507.c
  
-+    spapr_caps_reset(spapr);
++sam460ex
++M: BALATON Zoltan <balaton@eik.bme.hu>
++L: qemu-ppc@nongnu.org
++S: Maintained
++F: hw/ide/sii3112.c
 +
-     first_ppc_cpu = POWERPC_CPU(first_cpu);
-     if (kvm_enabled() && kvmppc_has_cap_mmu_radix() &&
-         ppc_check_compat(first_ppc_cpu, CPU_POWERPC_LOGICAL_3_00, 0,
-@@ -2311,6 +2313,8 @@ static void spapr_machine_init(MachineState *machine)
-     char *filename;
-     Error *resize_hpt_err = NULL;
- 
-+    spapr_caps_validate(spapr, &error_fatal);
-+
-     msi_nonbroken = true;
- 
-     QLIST_INIT(&spapr->phbs);
-@@ -3819,6 +3823,9 @@ static void spapr_machine_class_init(ObjectClass *oc, void *data)
-      * in which LMBs are represented and hot-added
-      */
-     mc->numa_mem_align_shift = 28;
-+
-+    smc->default_caps = spapr_caps(0);
-+    spapr_caps_add_properties(smc, &error_abort);
- }
- 
- static const TypeInfo spapr_machine_info = {
-diff --git a/hw/ppc/spapr_caps.c b/hw/ppc/spapr_caps.c
+ SH4 Machines
+ ------------
+ R2D
+diff --git a/default-configs/ppcemb-softmmu.mak b/default-configs/ppcemb-softmmu.mak
+index 13917fb7a3..5db4618a5a 100644
+--- a/default-configs/ppcemb-softmmu.mak
++++ b/default-configs/ppcemb-softmmu.mak
+@@ -16,3 +16,4 @@ CONFIG_I8259=y
+ CONFIG_XILINX=y
+ CONFIG_XILINX_ETHLITE=y
+ CONFIG_SM501=y
++CONFIG_IDE_SII3112=y
+diff --git a/hw/ide/Makefile.objs b/hw/ide/Makefile.objs
+index f0edca3300..fc328ffbe8 100644
+--- a/hw/ide/Makefile.objs
++++ b/hw/ide/Makefile.objs
+@@ -11,3 +11,4 @@ common-obj-$(CONFIG_MICRODRIVE) += microdrive.o
+ common-obj-$(CONFIG_AHCI) += ahci.o
+ common-obj-$(CONFIG_AHCI) += ich.o
+ common-obj-$(CONFIG_ALLWINNER_A10) += ahci-allwinner.o
++common-obj-$(CONFIG_IDE_SII3112) += sii3112.o
+diff --git a/hw/ide/sii3112.c b/hw/ide/sii3112.c
 new file mode 100644
-index 0000000000..968ba7b857
+index 0000000000..e2f5562bb7
 --- /dev/null
-+++ b/hw/ppc/spapr_caps.c
-@@ -0,0 +1,181 @@
++++ b/hw/ide/sii3112.c
+@@ -0,0 +1,368 @@
 +/*
-+ * QEMU PowerPC pSeries Logical Partition capabilities handling
++ * QEMU SiI3112A PCI to Serial ATA Controller Emulation
 + *
-+ * Copyright (c) 2017 David Gibson, Red Hat Inc.
++ * Copyright (C) 2017 BALATON Zoltan <balaton@eik.bme.hu>
 + *
-+ * Permission is hereby granted, free of charge, to any person obtaining a copy
-+ * of this software and associated documentation files (the "Software"), to deal
-+ * in the Software without restriction, including without limitation the rights
-+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-+ * copies of the Software, and to permit persons to whom the Software is
-+ * furnished to do so, subject to the following conditions:
++ * This work is licensed under the terms of the GNU GPL, version 2 or later.
++ * See the COPYING file in the top-level directory.
 + *
-+ * The above copyright notice and this permission notice shall be included in
-+ * all copies or substantial portions of the Software.
-+ *
-+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-+ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-+ * THE SOFTWARE.
 + */
-+#include "qemu/osdep.h"
-+#include "qapi/error.h"
-+#include "qapi/visitor.h"
 +
-+#include "hw/ppc/spapr.h"
++/* For documentation on this and similar cards see:
++ * http://wiki.osdev.org/User:Quok/Silicon_Image_Datasheets
++ */
 +
-+typedef struct sPAPRCapabilityInfo {
-+    const char *name;
-+    const char *description;
-+    uint64_t flag;
++#include <qemu/osdep.h>
++#include <hw/ide/pci.h>
++#include "trace.h"
 +
-+    /* Make sure the virtual hardware can support this capability */
-+    void (*allow)(sPAPRMachineState *spapr, Error **errp);
++#define TYPE_SII3112_PCI "sii3112"
++#define SII3112_PCI(obj) OBJECT_CHECK(SiI3112PCIState, (obj), \
++                         TYPE_SII3112_PCI)
 +
-+    /* If possible, tell the virtual hardware not to allow the cap to
-+     * be used at all */
-+    void (*disallow)(sPAPRMachineState *spapr, Error **errp);
-+} sPAPRCapabilityInfo;
++typedef struct SiI3112Regs {
++    uint32_t confstat;
++    uint32_t scontrol;
++    uint16_t sien;
++    uint8_t swdata;
++} SiI3112Regs;
 +
-+static sPAPRCapabilityInfo capability_table[] = {
-+};
++typedef struct SiI3112PCIState {
++    PCIIDEState i;
++    MemoryRegion mmio;
++    SiI3112Regs regs[2];
++} SiI3112PCIState;
 +
-+static sPAPRCapabilities default_caps_with_cpu(sPAPRMachineState *spapr,
-+                                               CPUState *cs)
++/* The sii3112_reg_read and sii3112_reg_write functions implement the
++ * Internal Register Space - BAR5 (section 6.7 of the data sheet).
++ */
++
++static uint64_t sii3112_reg_read(void *opaque, hwaddr addr,
++                                unsigned int size)
 +{
-+    sPAPRMachineClass *smc = SPAPR_MACHINE_GET_CLASS(spapr);
-+    sPAPRCapabilities caps;
++    SiI3112PCIState *d = opaque;
++    uint64_t val = 0;
 +
-+    caps = smc->default_caps;
-+
-+    /* TODO: clamp according to cpu model */
-+
-+    return caps;
-+}
-+
-+void spapr_caps_reset(sPAPRMachineState *spapr)
-+{
-+    Error *local_err = NULL;
-+    sPAPRCapabilities caps;
-+    int i;
-+
-+    /* First compute the actual set of caps we're running with.. */
-+    caps = default_caps_with_cpu(spapr, first_cpu);
-+
-+    caps.mask |= spapr->forced_caps.mask;
-+    caps.mask &= ~spapr->forbidden_caps.mask;
-+
-+    spapr->effective_caps = caps;
-+
-+    /* .. then apply those caps to the virtual hardware */
-+
-+    for (i = 0; i < ARRAY_SIZE(capability_table); i++) {
-+        sPAPRCapabilityInfo *info = &capability_table[i];
-+
-+        if (spapr->effective_caps.mask & info->flag) {
-+            /* Failure to allow a cap is fatal - if the guest doesn't
-+             * have it, we'll be supplying an incorrect environment */
-+            if (info->allow) {
-+                info->allow(spapr, &error_fatal);
-+            }
++    switch (addr) {
++    case 0x00:
++        val = d->i.bmdma[0].cmd;
++        break;
++    case 0x01:
++        val = d->regs[0].swdata;
++        break;
++    case 0x02:
++        val = d->i.bmdma[0].status;
++        break;
++    case 0x03:
++        val = 0;
++        break;
++    case 0x04 ... 0x07:
++        val = bmdma_addr_ioport_ops.read(&d->i.bmdma[0], addr - 4, size);
++        break;
++    case 0x08:
++        val = d->i.bmdma[1].cmd;
++        break;
++    case 0x09:
++        val = d->regs[1].swdata;
++        break;
++    case 0x0a:
++        val = d->i.bmdma[1].status;
++        break;
++    case 0x0b:
++        val = 0;
++        break;
++    case 0x0c ... 0x0f:
++        val = bmdma_addr_ioport_ops.read(&d->i.bmdma[1], addr - 12, size);
++        break;
++    case 0x10:
++        val = d->i.bmdma[0].cmd;
++        val |= (d->regs[0].confstat & (1UL << 11) ? (1 << 4) : 0); /*SATAINT0*/
++        val |= (d->regs[1].confstat & (1UL << 11) ? (1 << 6) : 0); /*SATAINT1*/
++        val |= (d->i.bmdma[1].status & BM_STATUS_INT ? (1 << 14) : 0);
++        val |= d->i.bmdma[0].status << 16;
++        val |= d->i.bmdma[1].status << 24;
++        break;
++    case 0x18:
++        val = d->i.bmdma[1].cmd;
++        val |= (d->regs[1].confstat & (1UL << 11) ? (1 << 4) : 0);
++        val |= d->i.bmdma[1].status << 16;
++        break;
++    case 0x80 ... 0x87:
++        if (size == 1) {
++            val = ide_ioport_read(&d->i.bus[0], addr - 0x80);
++        } else if (addr == 0x80) {
++            val = (size == 2) ? ide_data_readw(&d->i.bus[0], 0) :
++                                ide_data_readl(&d->i.bus[0], 0);
 +        } else {
-+            /* Failure to enforce a cap is only a warning.  The guest
-+             * shouldn't be using it, since it's not advertised, so it
-+             * doesn't get to complain about weird behaviour if it
-+             * goes ahead anyway */
-+            if (info->disallow) {
-+                info->disallow(spapr, &local_err);
++            val = (1ULL << (size * 8)) - 1;
++        }
++        break;
++    case 0x8a:
++        val = (size == 1) ? ide_status_read(&d->i.bus[0], 4) :
++                            (1ULL << (size * 8)) - 1;
++        break;
++    case 0xa0:
++        val = d->regs[0].confstat;
++        break;
++    case 0xc0 ... 0xc7:
++        if (size == 1) {
++            val = ide_ioport_read(&d->i.bus[1], addr - 0xc0);
++        } else if (addr == 0xc0) {
++            val = (size == 2) ? ide_data_readw(&d->i.bus[1], 0) :
++                                ide_data_readl(&d->i.bus[1], 0);
++        } else {
++            val = (1ULL << (size * 8)) - 1;
++        }
++        break;
++    case 0xca:
++        val = (size == 1) ? ide_status_read(&d->i.bus[0], 4) :
++                            (1ULL << (size * 8)) - 1;
++        break;
++    case 0xe0:
++        val = d->regs[1].confstat;
++        break;
++    case 0x100:
++        val = d->regs[0].scontrol;
++        break;
++    case 0x104:
++        val = (d->i.bus[0].ifs[0].blk) ? 0x113 : 0;
++        break;
++    case 0x148:
++        val = d->regs[0].sien << 16;
++        break;
++    case 0x180:
++        val = d->regs[1].scontrol;
++        break;
++    case 0x184:
++        val = (d->i.bus[1].ifs[0].blk) ? 0x113 : 0;
++        break;
++    case 0x1c8:
++        val = d->regs[1].sien << 16;
++        break;
++    default:
++        val = 0;
++    }
++    trace_sii3112_read(size, addr, val);
++    return val;
++}
++
++static void sii3112_reg_write(void *opaque, hwaddr addr,
++                              uint64_t val, unsigned int size)
++{
++    SiI3112PCIState *d = opaque;
++
++    trace_sii3112_write(size, addr, val);
++    switch (addr) {
++    case 0x00:
++    case 0x10:
++        bmdma_cmd_writeb(&d->i.bmdma[0], val);
++        break;
++    case 0x01:
++    case 0x11:
++        d->regs[0].swdata = val & 0x3f;
++        break;
++    case 0x02:
++    case 0x12:
++        d->i.bmdma[0].status = (val & 0x60) | (d->i.bmdma[0].status & 1) |
++                               (d->i.bmdma[0].status & ~val & 6);
++        break;
++    case 0x04 ... 0x07:
++        bmdma_addr_ioport_ops.write(&d->i.bmdma[0], addr - 4, val, size);
++        break;
++    case 0x08:
++    case 0x18:
++        bmdma_cmd_writeb(&d->i.bmdma[1], val);
++        break;
++    case 0x09:
++    case 0x19:
++        d->regs[1].swdata = val & 0x3f;
++        break;
++    case 0x0a:
++    case 0x1a:
++        d->i.bmdma[1].status = (val & 0x60) | (d->i.bmdma[1].status & 1) |
++                               (d->i.bmdma[1].status & ~val & 6);
++        break;
++    case 0x0c ... 0x0f:
++        bmdma_addr_ioport_ops.write(&d->i.bmdma[1], addr - 12, val, size);
++        break;
++    case 0x80 ... 0x87:
++        if (size == 1) {
++            ide_ioport_write(&d->i.bus[0], addr - 0x80, val);
++        } else if (addr == 0x80) {
++            if (size == 2) {
++                ide_data_writew(&d->i.bus[0], 0, val);
++            } else {
++                ide_data_writel(&d->i.bus[0], 0, val);
 +            }
-+            if (local_err) {
-+                warn_report_err(local_err);
-+                local_err = NULL;
++        }
++        break;
++    case 0x8a:
++        if (size == 1) {
++            ide_cmd_write(&d->i.bus[0], 4, val);
++        }
++        break;
++    case 0xc0 ... 0xc7:
++        if (size == 1) {
++            ide_ioport_write(&d->i.bus[1], addr - 0xc0, val);
++        } else if (addr == 0xc0) {
++            if (size == 2) {
++                ide_data_writew(&d->i.bus[1], 0, val);
++            } else {
++                ide_data_writel(&d->i.bus[1], 0, val);
 +            }
 +        }
-+    }
-+}
-+
-+static void spapr_cap_get(Object *obj, Visitor *v, const char *name,
-+                          void *opaque, Error **errp)
-+{
-+    sPAPRCapabilityInfo *cap = opaque;
-+    sPAPRMachineState *spapr = SPAPR_MACHINE(obj);
-+    bool value = spapr_has_cap(spapr, cap->flag);
-+
-+    /* TODO: Could this get called before effective_caps is finalized
-+     * in spapr_caps_reset()? */
-+
-+    visit_type_bool(v, name, &value, errp);
-+}
-+
-+static void spapr_cap_set(Object *obj, Visitor *v, const char *name,
-+                          void *opaque, Error **errp)
-+{
-+    sPAPRCapabilityInfo *cap = opaque;
-+    sPAPRMachineState *spapr = SPAPR_MACHINE(obj);
-+    bool value;
-+    Error *local_err = NULL;
-+
-+    visit_type_bool(v, name, &value, &local_err);
-+    if (local_err) {
-+        error_propagate(errp, local_err);
-+        return;
-+    }
-+
-+    if (value) {
-+        spapr->forced_caps.mask |= cap->flag;
-+    } else {
-+        spapr->forbidden_caps.mask |= cap->flag;
-+    }
-+}
-+
-+void spapr_caps_validate(sPAPRMachineState *spapr, Error **errp)
-+{
-+    uint64_t allcaps = 0;
-+    int i;
-+
-+    for (i = 0; i < ARRAY_SIZE(capability_table); i++) {
-+        g_assert((allcaps & capability_table[i].flag) == 0);
-+        allcaps |= capability_table[i].flag;
-+    }
-+
-+    g_assert((spapr->forced_caps.mask & ~allcaps) == 0);
-+    g_assert((spapr->forbidden_caps.mask & ~allcaps) == 0);
-+
-+    if (spapr->forced_caps.mask & spapr->forbidden_caps.mask) {
-+        error_setg(errp, "Some sPAPR capabilities set both on and off");
-+        return;
-+    }
-+
-+    /* Check for any caps incompatible with other caps.  Nothing to do
-+     * yet */
-+}
-+
-+void spapr_caps_add_properties(sPAPRMachineClass *smc, Error **errp)
-+{
-+    Error *local_err = NULL;
-+    ObjectClass *klass = OBJECT_CLASS(smc);
-+    int i;
-+
-+    for (i = 0; i < ARRAY_SIZE(capability_table); i++) {
-+        sPAPRCapabilityInfo *cap = &capability_table[i];
-+        const char *name = g_strdup_printf("cap-%s", cap->name);
-+
-+        object_class_property_add(klass, name, "bool",
-+                                  spapr_cap_get, spapr_cap_set, NULL,
-+                                  cap, &local_err);
-+        if (local_err) {
-+            error_propagate(errp, local_err);
-+            return;
++        break;
++    case 0xca:
++        if (size == 1) {
++            ide_cmd_write(&d->i.bus[1], 4, val);
 +        }
-+
-+        object_class_property_set_description(klass, name, cap->description,
-+                                              &local_err);
-+        if (local_err) {
-+            error_propagate(errp, local_err);
-+            return;
++        break;
++    case 0x100:
++        d->regs[0].scontrol = val & 0xfff;
++        if (val & 1) {
++            ide_bus_reset(&d->i.bus[0]);
 +        }
++        break;
++    case 0x148:
++        d->regs[0].sien = (val >> 16) & 0x3eed;
++        break;
++    case 0x180:
++        d->regs[1].scontrol = val & 0xfff;
++        if (val & 1) {
++            ide_bus_reset(&d->i.bus[1]);
++        }
++        break;
++    case 0x1c8:
++        d->regs[1].sien = (val >> 16) & 0x3eed;
++        break;
++    default:
++        val = 0;
 +    }
 +}
-diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-index 14757b805e..5569caf1d4 100644
---- a/include/hw/ppc/spapr.h
-+++ b/include/hw/ppc/spapr.h
-@@ -50,6 +50,15 @@ typedef enum {
-     SPAPR_RESIZE_HPT_REQUIRED,
- } sPAPRResizeHPT;
- 
-+/**
-+ * Capabilities
-+ */
 +
-+typedef struct sPAPRCapabilities sPAPRCapabilities;
-+struct sPAPRCapabilities {
-+    uint64_t mask;
++static const MemoryRegionOps sii3112_reg_ops = {
++    .read = sii3112_reg_read,
++    .write = sii3112_reg_write,
++    .endianness = DEVICE_LITTLE_ENDIAN,
 +};
 +
- /**
-  * sPAPRMachineClass:
-  */
-@@ -66,6 +75,7 @@ struct sPAPRMachineClass {
-                           hwaddr *mmio32, hwaddr *mmio64,
-                           unsigned n_dma, uint32_t *liobns, Error **errp);
-     sPAPRResizeHPT resize_hpt_default;
-+    sPAPRCapabilities default_caps;
- };
- 
- /**
-@@ -127,6 +137,9 @@ struct sPAPRMachineState {
-     MemoryHotplugState hotplug_memory;
- 
-     const char *icp_type;
-+
-+    sPAPRCapabilities forced_caps, forbidden_caps;
-+    sPAPRCapabilities effective_caps;
- };
- 
- #define H_SUCCESS         0
-@@ -724,4 +737,22 @@ int spapr_irq_alloc_block(sPAPRMachineState *spapr, int num, bool lsi,
- void spapr_irq_free(sPAPRMachineState *spapr, int irq, int num);
- qemu_irq spapr_qirq(sPAPRMachineState *spapr, int irq);
- 
-+/*
-+ * Handling of optional capabilities
-+ */
-+static inline sPAPRCapabilities spapr_caps(uint64_t mask)
++/* the PCI irq level is the logical OR of the two channels */
++static void sii3112_update_irq(SiI3112PCIState *s)
 +{
-+    sPAPRCapabilities caps = { mask };
-+    return caps;
++    int i, set = 0;
++
++    for (i = 0; i < 2; i++) {
++        set |= s->regs[i].confstat & (1UL << 11);
++    }
++    pci_set_irq(PCI_DEVICE(s), (set ? 1 : 0));
 +}
 +
-+static inline bool spapr_has_cap(sPAPRMachineState *spapr, uint64_t cap)
++static void sii3112_set_irq(void *opaque, int channel, int level)
 +{
-+    return !!(spapr->effective_caps.mask & cap);
++    SiI3112PCIState *s = opaque;
++
++    trace_sii3112_set_irq(channel, level);
++    if (level) {
++        s->regs[channel].confstat |= (1UL << 11);
++    } else {
++        s->regs[channel].confstat &= ~(1UL << 11);
++    }
++
++    sii3112_update_irq(s);
 +}
 +
-+void spapr_caps_reset(sPAPRMachineState *spapr);
-+void spapr_caps_validate(sPAPRMachineState *spapr, Error **errp);
-+void spapr_caps_add_properties(sPAPRMachineClass *smc, Error **errp);
++static void sii3112_reset(void *opaque)
++{
++    SiI3112PCIState *s = opaque;
++    int i;
 +
- #endif /* HW_SPAPR_H */
++    for (i = 0; i < 2; i++) {
++        s->regs[i].confstat = 0x6515 << 16;
++        ide_bus_reset(&s->i.bus[i]);
++    }
++}
++
++static void sii3112_pci_realize(PCIDevice *dev, Error **errp)
++{
++    SiI3112PCIState *d = SII3112_PCI(dev);
++    PCIIDEState *s = PCI_IDE(dev);
++    MemoryRegion *mr;
++    qemu_irq *irq;
++    int i;
++
++    pci_config_set_interrupt_pin(dev->config, 1);
++    pci_set_byte(dev->config + PCI_CACHE_LINE_SIZE, 8);
++
++    /* BAR5 is in PCI memory space */
++    memory_region_init_io(&d->mmio, OBJECT(d), &sii3112_reg_ops, d,
++                         "sii3112.bar5", 0x200);
++    pci_register_bar(dev, 5, PCI_BASE_ADDRESS_SPACE_MEMORY, &d->mmio);
++
++    /* BAR0-BAR4 are PCI I/O space aliases into BAR5 */
++    mr = g_new(MemoryRegion, 1);
++    memory_region_init_alias(mr, OBJECT(d), "sii3112.bar0", &d->mmio, 0x80, 8);
++    pci_register_bar(dev, 0, PCI_BASE_ADDRESS_SPACE_IO, mr);
++    mr = g_new(MemoryRegion, 1);
++    memory_region_init_alias(mr, OBJECT(d), "sii3112.bar1", &d->mmio, 0x88, 4);
++    pci_register_bar(dev, 1, PCI_BASE_ADDRESS_SPACE_IO, mr);
++    mr = g_new(MemoryRegion, 1);
++    memory_region_init_alias(mr, OBJECT(d), "sii3112.bar2", &d->mmio, 0xc0, 8);
++    pci_register_bar(dev, 2, PCI_BASE_ADDRESS_SPACE_IO, mr);
++    mr = g_new(MemoryRegion, 1);
++    memory_region_init_alias(mr, OBJECT(d), "sii3112.bar3", &d->mmio, 0xc8, 4);
++    pci_register_bar(dev, 3, PCI_BASE_ADDRESS_SPACE_IO, mr);
++    mr = g_new(MemoryRegion, 1);
++    memory_region_init_alias(mr, OBJECT(d), "sii3112.bar4", &d->mmio, 0, 16);
++    pci_register_bar(dev, 4, PCI_BASE_ADDRESS_SPACE_IO, mr);
++
++    irq = qemu_allocate_irqs(sii3112_set_irq, d, 2);
++    for (i = 0; i < 2; i++) {
++        ide_bus_new(&s->bus[i], sizeof(s->bus[i]), DEVICE(dev), i, 1);
++        ide_init2(&s->bus[i], irq[i]);
++
++        bmdma_init(&s->bus[i], &s->bmdma[i], s);
++        s->bmdma[i].bus = &s->bus[i];
++        ide_register_restart_cb(&s->bus[i]);
++    }
++    qemu_register_reset(sii3112_reset, s);
++}
++
++static void sii3112_pci_exitfn(PCIDevice *dev)
++{
++    PCIIDEState *d = PCI_IDE(dev);
++    int i;
++
++    for (i = 0; i < 2; ++i) {
++        memory_region_del_subregion(&d->bmdma_bar, &d->bmdma[i].extra_io);
++        memory_region_del_subregion(&d->bmdma_bar, &d->bmdma[i].addr_ioport);
++    }
++}
++
++static void sii3112_pci_class_init(ObjectClass *klass, void *data)
++{
++    DeviceClass *dc = DEVICE_CLASS(klass);
++    PCIDeviceClass *pd = PCI_DEVICE_CLASS(klass);
++
++    pd->vendor_id = 0x1095;
++    pd->device_id = 0x3112;
++    pd->class_id = PCI_CLASS_STORAGE_RAID;
++    pd->revision = 1;
++    pd->realize = sii3112_pci_realize;
++    pd->exit = sii3112_pci_exitfn;
++    dc->desc = "SiI3112A SATA controller";
++    set_bit(DEVICE_CATEGORY_STORAGE, dc->categories);
++}
++
++static const TypeInfo sii3112_pci_info = {
++    .name = TYPE_SII3112_PCI,
++    .parent = TYPE_PCI_IDE,
++    .instance_size = sizeof(SiI3112PCIState),
++    .class_init = sii3112_pci_class_init,
++};
++
++static void sii3112_register_types(void)
++{
++    type_register_static(&sii3112_pci_info);
++}
++
++type_init(sii3112_register_types)
+diff --git a/hw/ide/trace-events b/hw/ide/trace-events
+index 601bd97d81..0c39cabe72 100644
+--- a/hw/ide/trace-events
++++ b/hw/ide/trace-events
+@@ -37,6 +37,11 @@ bmdma_addr_write(uint64_t data) "data: 0x%016"PRIx64
+ bmdma_read(uint64_t addr, uint8_t val) "bmdma: readb 0x%"PRIx64" : 0x%02x"
+ bmdma_write(uint64_t addr, uint64_t val) "bmdma: writeb 0x%"PRIx64" : 0x%02"PRIx64
+ 
++# hw/ide/sii3112.c
++sii3112_read(int size, uint64_t addr, uint64_t val) "bmdma: read (size %d) 0x%"PRIx64" : 0x%02"PRIx64
++sii3112_write(int size, uint64_t addr, uint64_t val) "bmdma: write (size %d) 0x%"PRIx64" : 0x%02"PRIx64
++sii3112_set_irq(int channel, int level) "channel %d level %d"
++
+ # hw/ide/via.c
+ bmdma_read_via(uint64_t addr, uint32_t val) "bmdma: readb 0x%"PRIx64" : 0x%02x"
+ bmdma_write_via(uint64_t addr, uint64_t val) "bmdma: writeb 0x%"PRIx64" : 0x%02"PRIx64
 -- 
 2.14.3
