@@ -1,31 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35996)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38473)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1eRHKt-0004iN-8z
-	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 07:49:32 -0500
+	(envelope-from <eblake@redhat.com>) id 1eRHNK-0006Dt-I5
+	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 07:52:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1eRHKq-0001a6-N6
-	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 07:49:31 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:44674)
+	(envelope-from <eblake@redhat.com>) id 1eRHNG-0003cA-15
+	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 07:52:02 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:34068)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1eRHKq-0001ZR-D8
-	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 07:49:28 -0500
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 6D2AE7E436
-	for <qemu-devel@nongnu.org>; Tue, 19 Dec 2017 12:49:27 +0000 (UTC)
-References: <1513619065-31722-1-git-send-email-thuth@redhat.com>
-	<a2451ec3-0234-f4db-039c-a37ba1d5a571@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <4c62b984-62ac-88fe-638d-6ff6a2ae42eb@redhat.com>
-Date: Tue, 19 Dec 2017 13:49:25 +0100
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1eRHNF-0003bT-OX
+	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 07:51:57 -0500
+References: <20171218184428.15074-1-danielhb@linux.vnet.ibm.com>
+	<20171218184428.15074-2-danielhb@linux.vnet.ibm.com>
+	<87efnr81qs.fsf@dusky.pond.sub.org>
+	<a4277edc-37f6-8673-1883-b30f793d9d43@linux.vnet.ibm.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <caa98406-154a-a599-6556-5b6ef13d4d25@redhat.com>
+Date: Tue, 19 Dec 2017 06:51:54 -0600
 MIME-Version: 1.0
-In-Reply-To: <a2451ec3-0234-f4db-039c-a37ba1d5a571@redhat.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <a4277edc-37f6-8673-1883-b30f793d9d43@linux.vnet.ibm.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] Remove legacy -no-kvm-pit option
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 1/1] qmp: marking qmp_cpu as deprecated
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,70 +30,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+To: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>, Markus Armbruster <armbru@redhat.com>
+Cc: qemu-devel@nongnu.org, "Daniel P. Berrange" <berrange@redhat.com>
 
-On 19.12.2017 11:56, Paolo Bonzini wrote:
-> On 18/12/2017 18:44, Thomas Huth wrote:
->> It's only printing a warning since QEMU v1.3.0, so nobody should use
->> this anymore today. Let's get rid of this now.
->>
->> Signed-off-by: Thomas Huth <thuth@redhat.com>
->> ---
->>  qemu-doc.texi   | 5 -----
->>  qemu-options.hx | 3 ---
->>  vl.c            | 4 ----
->>  3 files changed, 12 deletions(-)
->>
->> diff --git a/qemu-doc.texi b/qemu-doc.texi
->> index 14d818d..d9861b3 100644
->> --- a/qemu-doc.texi
->> +++ b/qemu-doc.texi
->> @@ -2396,11 +2396,6 @@ synonym for setting ``-global kvm-pit.lost_tick_policy=discard''.
->>  The ``-no-kvm-irqchip'' argument is now a synonym for
->>  setting ``-machine kernel_irqchip=off''.
->>  
->> -@subsection -no-kvm-pit (since 1.3.0)
->> -
->> -The ``-no-kvm-pit'' argument is ignored. It is no longer
->> -possible to disable the KVM PIT directly.
->> -
->>  @subsection -no-kvm (since 1.3.0)
->>  
->>  The ``-no-kvm'' argument is now a synonym for setting
->> diff --git a/qemu-options.hx b/qemu-options.hx
->> index fe0c292..aa0e849 100644
->> --- a/qemu-options.hx
->> +++ b/qemu-options.hx
->> @@ -4139,9 +4139,6 @@ HXCOMM Deprecated by kvm-pit driver properties
->>  DEF("no-kvm-pit-reinjection", 0, QEMU_OPTION_no_kvm_pit_reinjection,
->>      "", QEMU_ARCH_I386)
->>  
->> -HXCOMM Deprecated (ignored)
->> -DEF("no-kvm-pit", 0, QEMU_OPTION_no_kvm_pit, "", QEMU_ARCH_I386)
->> -
->>  HXCOMM Deprecated by -machine kernel_irqchip=on|off property
->>  DEF("no-kvm-irqchip", 0, QEMU_OPTION_no_kvm_irqchip, "", QEMU_ARCH_I386)
->>  
->> diff --git a/vl.c b/vl.c
->> index fc8bd93..2644400 100644
->> --- a/vl.c
->> +++ b/vl.c
->> @@ -3818,10 +3818,6 @@ int main(int argc, char **argv, char **envp)
->>                  olist = qemu_find_opts("machine");
->>                  qemu_opts_parse_noisily(olist, "accel=tcg", false);
->>                  break;
->> -            case QEMU_OPTION_no_kvm_pit: {
->> -                warn_report("ignoring deprecated option");
->> -                break;
->> -            }
->>              case QEMU_OPTION_no_kvm_pit_reinjection: {
->>                  static GlobalProperty kvm_pit_lost_tick_policy = {
->>                      .driver   = "kvm-pit",
->>
-> 
-> Queued, thanks.  Please create the 2.12 changelog page and add it to the
-> incompatible changes section.
+On 12/19/2017 06:19 AM, Daniel Henrique Barboza wrote:
 
-Ok, I'll do that as soon as this patch hits the master branch.
+>> Let's compare behavior:
+>>
+>> 0. Status quo=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+ do nothing and succeed
+>> 1. Your patch=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+ fail with GenericError
+>> 2. Your patch less error_setg()=C2=A0=C2=A0=C2=A0=C2=A0 do nothing and=
+ succeed
+>> 3. Immediate removal=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 fail with CommandNotFound
+>>
+>> Does the difference between 1. and 3. matter at all?=C2=A0 Or is it ju=
+st
+>> deprecation cargo cult?
+>=20
+> Good point. If both the deprecation message and the removal will
+> result in error for the user ....
+>=20
+>>
+>> Here's my take on it.=C2=A0 I'd prefer 3. Immediate removal.=C2=A0 I'd=
+ also be
+>> fine with 2. Your patch less error_setg(), followed by removal after t=
+he
+>> customary deprecation period.=C2=A0 1. plus later removal just doesn't=
+ make
+>> sense to me, but it's really no big deal, so if you guys want it...
+>=20
+> It all goes down to whether we consider qmp_cpu, a QMP command that doe=
+s
+> nothing since its creation and apparently no one ever used it, a=20
+> feature. If it's a
+> feature, then I vote for (2) and removal after 2 releases following the=
+=20
+> regular
+> deprecation policy.
+>=20
+> If we consider that applying the policy to qmp_cpu is more trouble than=
+=20
+> it's worth,
+> I'll gladly resend this patch removing it entirely and rewording the=20
+> qemu-doc.texi
+> entry to mention that it was removed because it did nothing and it was =
+of
+> no use for anyone.
+>=20
 
- Thomas
+My vote: (3).  No one was using qmp_cpu for anything, while deprecation=20
+exists to allow a user a chance to fix their workflow to adjust from one=20
+thing that works (but badly) to its replacement that also works (and=20
+will be supported long term).  Since our replacement is nothing, we are=20
+admitting that no one was relying on the command, and I don't see the=20
+point in a deprecation delay. Just nuke it!
+
+qemu-doc.texi doesn't even need to mention the command; the commit=20
+message is enough to document our reasons for complete removal.
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
