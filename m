@@ -1,32 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49091)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60119)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <changpeng.liu@intel.com>) id 1eREgP-0006in-Ht
-	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 04:59:37 -0500
+	(envelope-from <ybettan@redhat.com>) id 1eREsm-0002m3-4m
+	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 05:12:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <changpeng.liu@intel.com>) id 1eREgL-0008Ei-Kr
-	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 04:59:33 -0500
-Received: from mga04.intel.com ([192.55.52.120]:19108)
+	(envelope-from <ybettan@redhat.com>) id 1eREsg-0008Fd-2J
+	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 05:12:20 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:28905)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <changpeng.liu@intel.com>)
-	id 1eREgK-0008E2-UW
-	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 04:59:29 -0500
-From: "Liu, Changpeng" <changpeng.liu@intel.com>
-Date: Tue, 19 Dec 2017 09:59:21 +0000
-Message-ID: <FF7FC980937D6342B9D289F5F3C7C2625B5E7A19@SHSMSX103.ccr.corp.intel.com>
-References: <1513350170-20168-1-git-send-email-den@openvz.org>
-	<1513350170-20168-3-git-send-email-den@openvz.org>
-	<20171218133812.GD16653@stefanha-x1.localdomain>
-	<2B67BF1C-6489-4A9B-BEE5-08DE9B904C07@intel.com>
-	<5E82066E-45E4-4627-8EB5-F995FFCB1ADF@nutanix.com>
-	<674cef25-a411-354e-aaa5-83f382f42189@openvz.org>
-	<20171219085746.GA18391@rkaganb.sw.ru>
-In-Reply-To: <20171219085746.GA18391@rkaganb.sw.ru>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH 2/2] virtio: fix IO request length in
- virtio SCSI/block
+	(Exim 4.71) (envelope-from <ybettan@redhat.com>) id 1eREsf-0008En-QI
+	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 05:12:13 -0500
+From: Yoni Bettan <ybettan@redhat.com>
+Date: Tue, 19 Dec 2017 12:11:22 +0200
+Message-Id: <20171219101122.31711-1-ybettan@redhat.com>
+Subject: [Qemu-devel] [PATCH V3] vl.c && linux-user/main.c : removed **envp
+ from main() arguments
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,84 +22,129 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Roman Kagan <rkagan@virtuozzo.com>, "Denis V. Lunev" <den@openvz.org>
-Cc: Felipe Franciosi <felipe@nutanix.com>, "Harris, James R" <james.r.harris@intel.com>, Stefan Hajnoczi <stefanha@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S.
-	Tsirkin" <mst@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: qemu-devel@nongnu.org
+Cc: Yoni Bettan <ybettan@redhat.com>, Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>, Peter Maydell <peter.maydell@linaro.org>, Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-DQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogUm9tYW4gS2FnYW4gW21h
-aWx0bzpya2FnYW5AdmlydHVvenpvLmNvbV0NCj4gU2VudDogVHVlc2RheSwgRGVjZW1iZXIgMTks
-IDIwMTcgNDo1OCBQTQ0KPiBUbzogRGVuaXMgVi4gTHVuZXYgPGRlbkBvcGVudnoub3JnPg0KPiBD
-YzogRmVsaXBlIEZyYW5jaW9zaSA8ZmVsaXBlQG51dGFuaXguY29tPjsgSGFycmlzLCBKYW1lcyBS
-DQo+IDxqYW1lcy5yLmhhcnJpc0BpbnRlbC5jb20+OyBTdGVmYW4gSGFqbm9jemkgPHN0ZWZhbmhh
-QHJlZGhhdC5jb20+OyBLZXZpbiBXb2xmDQo+IDxrd29sZkByZWRoYXQuY29tPjsgRWR1YXJkbyBI
-YWJrb3N0IDxlaGFia29zdEByZWRoYXQuY29tPjsgTWljaGFlbCBTLg0KPiBUc2lya2luIDxtc3RA
-cmVkaGF0LmNvbT47IHFlbXUtZGV2ZWxAbm9uZ251Lm9yZzsgTWF4IFJlaXR6DQo+IDxtcmVpdHpA
-cmVkaGF0LmNvbT47IFBhb2xvIEJvbnppbmkgPHBib256aW5pQHJlZGhhdC5jb20+OyBMaXUsIENo
-YW5ncGVuZw0KPiA8Y2hhbmdwZW5nLmxpdUBpbnRlbC5jb20+OyBSaWNoYXJkIEhlbmRlcnNvbiA8
-cnRoQHR3aWRkbGUubmV0Pg0KPiBTdWJqZWN0OiBSZTogW1FlbXUtZGV2ZWxdIFtQQVRDSCAyLzJd
-IHZpcnRpbzogZml4IElPIHJlcXVlc3QgbGVuZ3RoIGluIHZpcnRpbw0KPiBTQ1NJL2Jsb2NrDQo+
-IA0KPiBPbiBNb24sIERlYyAxOCwgMjAxNyBhdCAxMDo0MjozNVBNICswMzAwLCBEZW5pcyBWLiBM
-dW5ldiB3cm90ZToNCj4gPiBPbiAxMi8xOC8yMDE3IDEwOjM1IFBNLCBGZWxpcGUgRnJhbmNpb3Np
-IHdyb3RlOg0KPiA+ID4+IE9uIDE4IERlYyAyMDE3LCBhdCAxNjoxNiwgSGFycmlzLCBKYW1lcyBS
-IDxqYW1lcy5yLmhhcnJpc0BpbnRlbC5jb20+IHdyb3RlOg0KPiA+ID4+PiBPbiBEZWMgMTgsIDIw
-MTcsIGF0IDY6MzggQU0sIFN0ZWZhbiBIYWpub2N6aSA8c3RlZmFuaGFAcmVkaGF0LmNvbT4gd3Jv
-dGU6DQo+ID4gPj4+IE9uIEZyaSwgRGVjIDE1LCAyMDE3IGF0IDA2OjAyOjUwUE0gKzAzMDAsIERl
-bmlzIFYuIEx1bmV2IHdyb3RlOg0KPiA+ID4+Pj4gZGlmZiAtLWdpdCBhL2luY2x1ZGUvaHcvY29t
-cGF0LmggYi9pbmNsdWRlL2h3L2NvbXBhdC5oDQo+ID4gPj4+PiBpbmRleCAwMjZmZWU5Li5iOWJl
-NWQ3IDEwMDY0NA0KPiA+ID4+Pj4gLS0tIGEvaW5jbHVkZS9ody9jb21wYXQuaA0KPiA+ID4+Pj4g
-KysrIGIvaW5jbHVkZS9ody9jb21wYXQuaA0KPiA+ID4+Pj4gQEAgLTIsNiArMiwyMyBAQA0KPiA+
-ID4+Pj4gI2RlZmluZSBIV19DT01QQVRfSA0KPiA+ID4+Pj4NCj4gPiA+Pj4+ICNkZWZpbmUgSFdf
-Q09NUEFUXzJfMTEgXA0KPiA+ID4+Pj4gKyAgICB7XA0KPiA+ID4+Pj4gKyAgICAgICAgLmRyaXZl
-ciAgID0gInZpcnRpby1ibGstZGV2aWNlIixcDQo+ID4gPj4+PiArICAgICAgICAucHJvcGVydHkg
-PSAibWF4X3NlZ21lbnRzIixcDQo+ID4gPj4+PiArICAgICAgICAudmFsdWUgICAgPSAiMTI2Iixc
-DQo+ID4gPj4+PiArICAgIH0se1wNCj4gPiA+Pj4+ICsgICAgICAgIC5kcml2ZXIgICA9ICJ2aG9z
-dC1zY3NpIixcDQo+ID4gPj4+PiArICAgICAgICAucHJvcGVydHkgPSAibWF4X3NlZ21lbnRzIixc
-DQo+ID4gPj4+PiArICAgICAgICAudmFsdWUgICAgPSAiMTI2IixcDQo+ID4gPj4+PiArICAgIH0s
-e1wNCj4gPiA+Pj4+ICsgICAgICAgIC5kcml2ZXIgICA9ICJ2aG9zdC11c2VyLXNjc2kiLFwNCj4g
-PiA+Pj4+ICsgICAgICAgIC5wcm9wZXJ0eSA9ICJtYXhfc2VnbWVudHMiLFwNCj4gPiA+Pj4+ICsg
-ICAgICAgIC52YWx1ZSAgICA9ICIxMjYiLFwNCj4gPiA+Pj4gRXhpc3Rpbmcgdmhvc3QtdXNlci1z
-Y3NpIHNsYXZlIHByb2dyYW1zIG1pZ2h0IG5vdCBleHBlY3QgdXAgdG8gMTAyMg0KPiA+ID4+PiBz
-ZWdtZW50cy4gIEhvcGVmdWxseSB3ZSBjYW4gZ2V0IGF3YXkgd2l0aCB0aGlzIGNoYW5nZSBzaW5j
-ZSB0aGVyZSBhcmUNCj4gPiA+Pj4gcmVsYXRpdmVseSBmZXcgdmhvc3QtdXNlci1zY3NpIHNsYXZl
-IHByb2dyYW1zLg0KPiA+ID4+Pg0KPiA+ID4+PiBDQ2VkIEZlbGlwZSAoTnV0YW5peCkgYW5kIEpp
-bSAoU1BESykgaW4gY2FzZSB0aGV5IGhhdmUgY29tbWVudHMuDQo+ID4gPj4gU1BESyB2aG9zdC11
-c2VyIHRhcmdldHMgb25seSBleHBlY3QgbWF4IDEyOCBzZWdtZW50cy4gIFRoZXkgYWxzbyBwcmUt
-YWxsb2NhdGUNCj4gSS9PIHRhc2sgc3RydWN0dXJlcyB3aGVuIFFFTVUgY29ubmVjdHMgdG8gdGhl
-IHZob3N0LXVzZXIgZGV2aWNlLg0KPiA+ID4+DQo+ID4gPj4gU3VwcG9ydGluZyB1cCB0byAxMDIy
-IHNlZ21lbnRzIHdvdWxkIHJlc3VsdCBpbiBzaWduaWZpY2FudGx5IGhpZ2hlciBtZW1vcnkNCj4g
-dXNhZ2UsIHJlZHVjdGlvbiBpbiBJL08gcXVldWUgZGVwdGggcHJvY2Vzc2VkIGJ5IHRoZSB2aG9z
-dC11c2VyIHRhcmdldCwgb3IgaGF2aW5nDQo+IHRvIGR5bmFtaWNhbGx5IGFsbG9jYXRlIEkvTyB0
-YXNrIHN0cnVjdHVyZXMgLSBub25lIG9mIHdoaWNoIGFyZSBpZGVhbC4NCj4gPiA+Pg0KPiA+ID4+
-IFdoYXQgaWYgdGhpcyB3YXMganVzdCBidW1wZWQgZnJvbSAxMjYgdG8gMTI4PyAgSSBndWVzcyBJ
-4oCZbSB0cnlpbmcgdG8NCj4gdW5kZXJzdGFuZCB0aGUgbGV2ZWwgb2YgZ3Vlc3QgYW5kIGhvc3Qg
-SS9PIHBlcmZvcm1hbmNlIHRoYXQgaXMgZ2FpbmVkIHdpdGggdGhpcw0KPiBwYXRjaC4gIE9uZSBJ
-L08gcGVyIDUxMktCIHZzLiBvbmUgSS9PIHBlciA0TUIgLSB3ZSBhcmUgc3RpbGwgb25seSB0YWxr
-aW5nIGFib3V0IGENCj4gZmV3IGh1bmRyZWQgSU8vcyBkaWZmZXJlbmNlLg0KPiA+ID4gU2VhQklP
-UyBhbHNvIG1ha2VzIHRoZSBhc3N1bXB0aW9uIHRoYXQgdGhlIHF1ZXVlIHNpemUgaXMgbm90IGJp
-Z2dlciB0aGFuIDEyOA0KPiBlbGVtZW50cy4NCj4gPiA+IGh0dHBzOi8vcmV2aWV3LmNvcmVib290
-Lm9yZy9jZ2l0L3NlYWJpb3MuZ2l0L3RyZWUvc3JjL2h3L3ZpcnRpby1yaW5nLmgjbjIzDQo+ID4g
-Pg0KPiA+ID4gUGVyaGFwcyBhIGJldHRlciBhcHByb2FjaCBpcyB0byBtYWtlIHRoZSB2YWx1ZSBj
-b25maWd1cmFibGUgKGllLiBhZGQgdGhlDQo+ICJtYXhfc2VnbWVudHMiIHByb3BlcnR5KSwgYnV0
-IHNldCB0aGUgZGVmYXVsdCB0byAxMjgtMi4gSW4gYWRkaXRpb24gdG8gd2hhdCBKaW0NCj4gcG9p
-bnRlZCBvdXQsIEkgdGhpbmsgdGhlcmUgbWF5IGJlIG90aGVyIGxlZ2FjeSBmcm9udCBlbmQgZHJp
-dmVycyB3aGljaCBjYW4gYXNzdW1lDQo+IHRoZSByaW5nIHdpbGwgYmUgYXQgbW9zdCAxMjggZW50
-cmllcyBpbiBzaXplLg0KPiA+ID4NCj4gPiA+IFdpdGggdGhhdCwgaHlwZXJ2aXNvcnMgY2FuIGNo
-b29zZSB0byBidW1wIHRoZSB2YWx1ZSBoaWdoZXIgaWYgaXQncyBrbm93biB0byBiZQ0KPiBzYWZl
-IGZvciB0aGVpciBob3N0K2d1ZXN0IGNvbmZpZ3VyYXRpb24uDQo+ID4NCj4gPiBUaGlzIHNob3Vs
-ZCBub3QgYmUgYSBwcm9ibGVtIGF0IGFsbCBJTUhPLiBUaGUgZ3Vlc3QgaXMgbm90IG9ibGlnZWQN
-Cj4gPiB0byB1c2UgdGhlIG1lc3NhZ2Ugb2YgZW50aXJlIHBvc3NpYmxlIHNpemUuIFRoZSBndWVz
-dCBpbml0aWF0ZXMNCj4gPiByZXF1ZXN0IHdpdGggMTI4IGVsZW1lbnRzLiBGaW5lLiBRRU1VIGlz
-IHJlYWR5IHRvIHRoaXMuDQo+IA0KPiBRRU1VIGlzLCBidXQgdmhvc3QtdXNlciBzbGF2ZXMgbWF5
-IG5vdCBiZS4gIEFuZCB0aGVyZSBzZWVtcyB0byBiZSBubw0KPiB2aG9zdC11c2VyIHByb3RvY29s
-IG1lc3NhZ2UgdHlwZSB0aGF0IHdvdWxkIGFsbG93IHRvIG5lZ290aWF0ZSB0aGlzDQo+IHZhbHVl
-IGJldHdlZW4gdGhlIG1hc3RlciBhbmQgdGhlIHNsYXZlLg0KPiANCj4gU28gYXBwYXJlbnRseSB0
-aGUgZGVmYXVsdCBmb3Igdmhvc3QtdXNlci1zY3NpIGhhcyB0byBzdGF5IHRoZSBzYW1lIGluDQo+
-IG9yZGVyIG5vdCB0byBicmVhayBleGlzdGluZyBzbGF2ZXMuICBJIGd1ZXNzIGhhdmluZyBpdCB0
-dW5hYmxlIHZpYSBhDQo+IHByb3BlcnR5IG1heSBzdGlsbCB0dXJuIG91dCB1c2VmdWwuDQpBY3R1
-YWxseSBJIHdyb3RlIGEgbmV3IHBhdGNoIHNldCByZWNlbnRseSBmb3Igc3VwcG9ydCB2aG9zdC11
-c2VyLWJsayBob3N0IGRldmljZSwgDQphbmQgYWRkZWQgMiBleHRyYSB2aG9zdC11c2VyIG1lc3Nh
-Z2VzLCAgR0VUX0NPTkZJRy9TRVRfQ09ORklHIHdoaWNoIGNhbiBsZXQgaG9zdCBkZXZpY2UgZ2V0
-IHRob3NlIHBhcmFtZXRlcnMgDQpmcm9tIHZob3N0LXVzZXIgc2xhdmUgdGFyZ2V0LCB0aGUgbmV3
-IGFkZGVkIG1lc3NhZ2VzIGNhbiBnZXQgdmlydGlvIGRldmljZSdzIGNvbmZpZ3VyYXRpb24gc3Bh
-Y2UgZnJvbSBzbGF2ZSB0YXJnZXQsDQpzbyB2aG9zdC11c2VyLXNjc2kgbWF5IHVzZSB0aGF0IGFz
-IHdlbGwuIA0KDQo+IA0KPiBSb21hbi4NCg==
+it was added on 2008 902b3d5c39 when introduced cache-utils.[ch]
+
+since then cache-utils.[ch] were removed but **envp was left
+behind.
+
+By the way "to be portable it is best to write main to take two
+arguments, and use the value of environ" according to
+https://www.gnu.org/software/libc/manual/html_node/Program-\
+      Arguments.html#Program-Arguments
+
+Signed-off-by: Yoni Bettan <ybettan@redhat.com>
+---
+
+V2 -> V3:
+    
+    since ui/cocoa.c rename main() is using qemu_main() ,because it uses it 
+    inside its main() function, the function qemu_main() can't be removed
+  
+
+V1 -> V2:
+
+    removed the ui/cocoa.c renaming of main() function since i thought that we 
+    no longer need qemu_main()
+
+
+ include/qemu-common.h | 2 +-
+ linux-user/main.c     | 2 +-
+ ui/cocoa.m            | 5 ++---
+ vl.c                  | 7 +++----
+ 4 files changed, 7 insertions(+), 9 deletions(-)
+
+diff --git a/include/qemu-common.h b/include/qemu-common.h
+index 05319b9ddc..8a5b7ec5ec 100644
+--- a/include/qemu-common.h
++++ b/include/qemu-common.h
+@@ -29,7 +29,7 @@
+ 
+ /* main function, renamed */
+ #if defined(CONFIG_COCOA)
+-int qemu_main(int argc, char **argv, char **envp);
++int qemu_main(int argc, char **argv);
+ #endif
+ 
+ void qemu_get_timedate(struct tm *tm, int offset);
+diff --git a/linux-user/main.c b/linux-user/main.c
+index 6286661bd3..fe81d410da 100644
+--- a/linux-user/main.c
++++ b/linux-user/main.c
+@@ -4237,7 +4237,7 @@ static int parse_args(int argc, char **argv)
+     return optind;
+ }
+ 
+-int main(int argc, char **argv, char **envp)
++int main(int argc, char **argv)
+ {
+     struct target_pt_regs regs1, *regs = &regs1;
+     struct image_info info1, *info = &info1;
+diff --git a/ui/cocoa.m b/ui/cocoa.m
+index 330ccebf90..4d18153659 100644
+--- a/ui/cocoa.m
++++ b/ui/cocoa.m
+@@ -25,7 +25,6 @@
+ #include "qemu/osdep.h"
+ 
+ #import <Cocoa/Cocoa.h>
+-#include <crt_externs.h>
+ 
+ #include "qemu-common.h"
+ #include "ui/console.h"
+@@ -1050,7 +1049,7 @@ QemuCocoaView *cocoaView;
+     COCOA_DEBUG("QemuCocoaAppController: startEmulationWithArgc\n");
+ 
+     int status;
+-    status = qemu_main(argc, argv, *_NSGetEnviron());
++    status = qemu_main(argc, argv);
+     exit(status);
+ }
+ 
+@@ -1391,7 +1390,7 @@ int main (int argc, const char * argv[]) {
+                 !strcmp(opt, "-curses") ||
+                 !strcmp(opt, "-display") ||
+                 !strcmp(opt, "-qtest")) {
+-                return qemu_main(gArgc, gArgv, *_NSGetEnviron());
++                return qemu_main(gArgc, gArgv);
+             }
+         }
+     }
+diff --git a/vl.c b/vl.c
+index fc8bd9372f..ea17cc34f6 100644
+--- a/vl.c
++++ b/vl.c
+@@ -35,10 +35,10 @@
+ #ifdef CONFIG_SDL
+ #if defined(__APPLE__) || defined(main)
+ #include <SDL.h>
+-int qemu_main(int argc, char **argv, char **envp);
++int qemu_main(int argc, char **argv);
+ int main(int argc, char **argv)
+ {
+-    return qemu_main(argc, argv, NULL);
++    return qemu_main(argc, argv);
+ }
+ #undef main
+ #define main qemu_main
+@@ -50,7 +50,6 @@ int main(int argc, char **argv)
+ #define main qemu_main
+ #endif /* CONFIG_COCOA */
+ 
+-
+ #include "qemu/error-report.h"
+ #include "qemu/sockets.h"
+ #include "hw/hw.h"
+@@ -3044,7 +3043,7 @@ static void register_global_properties(MachineState *ms)
+     user_register_global_props();
+ }
+ 
+-int main(int argc, char **argv, char **envp)
++int main(int argc, char **argv)
+ {
+     int i;
+     int snapshot, linux_boot;
+-- 
+2.14.3
