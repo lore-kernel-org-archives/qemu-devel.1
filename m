@@ -1,23 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43924)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45542)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1eRFXy-0003Ug-B6
-	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 05:54:55 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1eRFZL-0004TN-WA
+	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 05:56:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1eRFXv-0004ZI-AB
-	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 05:54:54 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:50840)
+	(envelope-from <pbonzini@redhat.com>) id 1eRFZI-0006Y8-HS
+	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 05:56:20 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:37432)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1eRFXv-0004XA-3r
-	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 05:54:51 -0500
-Date: Tue, 19 Dec 2017 11:54:44 +0100
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20171219115444.5e033bc6.cohuck@redhat.com>
-In-Reply-To: <20171218153552.18140-1-f4bug@amsat.org>
-References: <20171218153552.18140-1-f4bug@amsat.org>
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1eRFZI-0006Wc-63
+	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 05:56:16 -0500
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 4B2C45F739
+	for <qemu-devel@nongnu.org>; Tue, 19 Dec 2017 10:56:15 +0000 (UTC)
+References: <1513619065-31722-1-git-send-email-thuth@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <a2451ec3-0234-f4db-039c-a37ba1d5a571@redhat.com>
+Date: Tue, 19 Dec 2017 11:56:10 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] travis: add no-TPM build
+In-Reply-To: <1513619065-31722-1-git-send-email-thuth@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] Remove legacy -no-kvm-pit option
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,38 +33,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <f4bug@amsat.org>
-Cc: Alex =?UTF-8?B?QmVubsOpZQ==?= <alex.bennee@linaro.org>, Fam Zheng <famz@redhat.com>, Stefan Berger <stefanb@linux.vnet.ibm.com>, qemu-devel@nongnu.org
+To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
 
-On Mon, 18 Dec 2017 12:35:52 -0300
-Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> wrote:
-
-> Use CI to avoid TPM bitrot:
->   hw/core/qdev-properties-system.o: In function `release_tpm':
->   hw/core/qdev-properties-system.c:291: undefined reference to `tpm_backe=
-nd_reset'
->=20
-> Reported-by: Cornelia Huck <cohuck@redhat.com>
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+On 18/12/2017 18:44, Thomas Huth wrote:
+> It's only printing a warning since QEMU v1.3.0, so nobody should use
+> this anymore today. Let's get rid of this now.
+> 
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
 > ---
-> Based-on: 20171218140002.23677-1-cohuck@redhat.com
->=20
->  .travis.yml | 3 +++
->  1 file changed, 3 insertions(+)
->=20
-> diff --git a/.travis.yml b/.travis.yml
-> index f583839755..b4232ff2f9 100644
-> --- a/.travis.yml
-> +++ b/.travis.yml
-> @@ -90,6 +90,9 @@ matrix:
->      - env: CONFIG=3D"--disable-tcg"
->             TEST_CMD=3D""
->        compiler: gcc
-> +    - env: CONFIG=3D"--disable-tpm"
-> +           TEST_CMD=3D""
-> +      compiler: gcc
->      - env: CONFIG=3D""
->        os: osx
->        compiler: clang
+>  qemu-doc.texi   | 5 -----
+>  qemu-options.hx | 3 ---
+>  vl.c            | 4 ----
+>  3 files changed, 12 deletions(-)
+> 
+> diff --git a/qemu-doc.texi b/qemu-doc.texi
+> index 14d818d..d9861b3 100644
+> --- a/qemu-doc.texi
+> +++ b/qemu-doc.texi
+> @@ -2396,11 +2396,6 @@ synonym for setting ``-global kvm-pit.lost_tick_policy=discard''.
+>  The ``-no-kvm-irqchip'' argument is now a synonym for
+>  setting ``-machine kernel_irqchip=off''.
+>  
+> -@subsection -no-kvm-pit (since 1.3.0)
+> -
+> -The ``-no-kvm-pit'' argument is ignored. It is no longer
+> -possible to disable the KVM PIT directly.
+> -
+>  @subsection -no-kvm (since 1.3.0)
+>  
+>  The ``-no-kvm'' argument is now a synonym for setting
+> diff --git a/qemu-options.hx b/qemu-options.hx
+> index fe0c292..aa0e849 100644
+> --- a/qemu-options.hx
+> +++ b/qemu-options.hx
+> @@ -4139,9 +4139,6 @@ HXCOMM Deprecated by kvm-pit driver properties
+>  DEF("no-kvm-pit-reinjection", 0, QEMU_OPTION_no_kvm_pit_reinjection,
+>      "", QEMU_ARCH_I386)
+>  
+> -HXCOMM Deprecated (ignored)
+> -DEF("no-kvm-pit", 0, QEMU_OPTION_no_kvm_pit, "", QEMU_ARCH_I386)
+> -
+>  HXCOMM Deprecated by -machine kernel_irqchip=on|off property
+>  DEF("no-kvm-irqchip", 0, QEMU_OPTION_no_kvm_irqchip, "", QEMU_ARCH_I386)
+>  
+> diff --git a/vl.c b/vl.c
+> index fc8bd93..2644400 100644
+> --- a/vl.c
+> +++ b/vl.c
+> @@ -3818,10 +3818,6 @@ int main(int argc, char **argv, char **envp)
+>                  olist = qemu_find_opts("machine");
+>                  qemu_opts_parse_noisily(olist, "accel=tcg", false);
+>                  break;
+> -            case QEMU_OPTION_no_kvm_pit: {
+> -                warn_report("ignoring deprecated option");
+> -                break;
+> -            }
+>              case QEMU_OPTION_no_kvm_pit_reinjection: {
+>                  static GlobalProperty kvm_pit_lost_tick_policy = {
+>                      .driver   = "kvm-pit",
+> 
 
-Acked-by: Cornelia Huck <cohuck@redhat.com>
+Queued, thanks.  Please create the 2.12 changelog page and add it to the
+incompatible changes section.
+
+Paolo
