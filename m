@@ -1,34 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56935)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58216)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eRLK6-0003Jh-C6
-	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 12:05:19 -0500
+	(envelope-from <stefanha@gmail.com>) id 1eRLLG-0004M1-3a
+	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 12:06:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eRLJx-0001qp-Il
-	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 12:04:58 -0500
-Received: from indium.canonical.com ([91.189.90.7]:46720)
+	(envelope-from <stefanha@gmail.com>) id 1eRLLA-0003aW-6Q
+	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 12:06:10 -0500
+Received: from mail-wm0-x22e.google.com ([2a00:1450:400c:c09::22e]:44428)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1eRLJx-0001ns-5Y
-	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 12:04:49 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1eRLJw-0001x7-2S
-	for <qemu-devel@nongnu.org>; Tue, 19 Dec 2017 17:04:48 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 0FA162E80C3
-	for <qemu-devel@nongnu.org>; Tue, 19 Dec 2017 17:04:48 +0000 (UTC)
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1eRLL9-0003Zk-UC
+	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 12:06:04 -0500
+Received: by mail-wm0-x22e.google.com with SMTP id t8so5047452wmc.3
+	for <qemu-devel@nongnu.org>; Tue, 19 Dec 2017 09:06:03 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 19 Dec 2017 16:51:24 -0000
-From: Thomas Huth <1211910@bugs.launchpad.net>
-Reply-To: Bug 1211910 <1211910@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20130813175222.16219.80463.malonedeb@gac.canonical.com>
-Message-Id: <151370228492.17365.5946540764926870257.malone@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1211910] Re: Logical to linear address
- translation is wrong for 32-bit guests on a 64-bit hypervisor
+In-Reply-To: <20171219161754-mutt-send-email-mst@kernel.org>
+References: <1512444796-30615-1-git-send-email-wei.w.wang@intel.com>
+	<20171219113505.GA8499@stefanha-x1.localdomain>
+	<20171219161754-mutt-send-email-mst@kernel.org>
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Date: Tue, 19 Dec 2017 17:05:59 +0000
+Message-ID: <CAJSP0QV80YLwDfKJaXkjepwttsrX1wuH0c_69KTq_mGimYMf1g@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [virtio-dev] [PATCH v3 0/7] Vhost-pci for inter-VM
+ communication
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,47 +30,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>, virtio-dev@lists.oasis-open.org, "Avi Cohen (A)" <avi.cohen@huawei.com>, "Yang,
+	Zhiyong" <zhiyong.yang@intel.com>, Jan Kiszka <jan.kiszka@siemens.com>, Jason Wang <jasowang@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, Wei Wang <wei.w.wang@intel.com>, =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-Triaging old bug tickets... can you still reproduce this issue with the
-latest version of QEMU? Or could we close this ticket nowadays?
+On Tue, Dec 19, 2017 at 2:56 PM, Michael S. Tsirkin <mst@redhat.com> wrote:
+>>  * Please handle short reads/writes and EAGAIN with the UNIX domain socket.  Do
+>>    not use read/write_all() functions because they hang QEMU until I/O
+>>    completes.
+>
+> I'm not sure I agree with this one. vhost-user uses this extensively
+> right now. It might be a worth-while goal to drop this limitation
+> but I don't see why we should start with vhost-pci.
+>
+> And in particular, VCPU can't make progress unless a slave is present.
 
-** Changed in: qemu
-       Status: New =3D> Incomplete
+Hang on, we're talking about different things:
 
--- =
+The QEMU vhost-user master blocks because vhost_*() functions are
+synchronous (they don't use callbacks or yield).  Fixing that is
+beyond the scope of this patch series and I'm not asking for it.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1211910
+This patch series adds a from-scratch vhost-user slave implementation
+which has no good reason to be blocking.  A single malicious or broken
+guest must not be able to hang a vhost-pci network switch.
 
-Title:
-  Logical to linear address translation is wrong for 32-bit guests on a
-  64-bit hypervisor
+>>  * How can the the guest limit the number of virtqueues?
+>
+> I think it is feasible to pass in host features, # of vqs etc.  Assuming
+> compatibility with existing guests, I don't think you can do anything
+> else really if you assume that vhost guest might boot after the
+> virtio guest.
+>
+> So either you give up on compatibility, or you allow the vhost
+> guest to block the virtio guest.
+>
+> I think compatibility is more important.
+>
+> We can later think about ways to add non-blocking behaviour
+> as a feature.
 
-Status in QEMU:
-  Incomplete
+I agree it's a separate feature because it will require non-vhost-pci
+related changes.
 
-Bug description:
-  I run a 64-bit hypervisor in qemu-system-x86_64 (without KVM) and on top =
-of that I have a 32-bit guest. The guest configures the code-segment to hav=
-e a base of 0x4000_0000 and a limit of 0xFFFF_FFFF with paging disabled. Th=
-us, if a logical address of e.g. 0xC000_0000 is used, it should be translat=
-ed to 0x0000_0000 (linear and physical), because of the overflow that happe=
-ns.
-  But this does not happen with the described setup. Instead, qemu seems to=
- calculate the logical to linear translation with 64-bit addresses so that =
-no overflow happens. Consequently, the resulting address is 0x1_0000_0000 a=
-nd this gets written to exitinfo2 in the VMCB structure. This causes troubl=
-e for hypervisors that expect the upper 32 bits of exitinfo2 to be 0 for 32=
--bit guests.
+I have posted a separate email thread to discuss a solution.
 
-  Note also that the exact same setup runs fine on real AMD machines
-  with SVM. That is, the upper 32 bits in exitinfo2 are always 0 because
-  of the overflow.
+>>
+>>  * Please include tests.  See tests/virtio-net-test.c and
+>>    tests/vhost-user-test.c for examples.
+>
+> Unit tests are nice but an actual way to test without
+> running a full blown dpdk stack would be nicer.
+> Something along the lines of a port of vhost user bridge
+> to the guest.
 
-  I've tested that with the latest development version of QEMU (commit
-  328465fd9f3a628ab320b5959d68d3d49df58fa6).
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1211910/+subscriptions
+Yes!
