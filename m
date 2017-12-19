@@ -1,23 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49881)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50758)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1eRFCB-0004Q9-JO
-	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 05:32:24 -0500
+	(envelope-from <berrange@redhat.com>) id 1eRFCy-00057W-Li
+	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 05:33:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1eRFCA-0000Da-Mc
-	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 05:32:23 -0500
-References: <20171218224616.21030-1-david@redhat.com>
-	<20171218224616.21030-2-david@redhat.com>
-	<4ea93c11-adf5-ca1c-b49b-e80d82bf3945@redhat.com>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <588a1a23-843c-c7e0-b174-8deb84b41b80@redhat.com>
-Date: Tue, 19 Dec 2017 11:32:16 +0100
+	(envelope-from <berrange@redhat.com>) id 1eRFCo-0001a7-Uu
+	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 05:33:08 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:35786)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1eRFCo-0001Y5-PC
+	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 05:33:02 -0500
+Date: Tue, 19 Dec 2017 10:32:57 +0000
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20171219103257.GC32479@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <20171218191228.31018-1-berrange@redhat.com>
+	<20171218191228.31018-2-berrange@redhat.com>
+	<20171219072629.4c23icd27ggxayc5@starbug-vm.ie.oracle.com>
 MIME-Version: 1.0
-In-Reply-To: <4ea93c11-adf5-ca1c-b49b-e80d82bf3945@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v1 1/2] s390x/tcg: implement
- TEST PROTECTION
+Content-Disposition: inline
+In-Reply-To: <20171219072629.4c23icd27ggxayc5@starbug-vm.ie.oracle.com>
+Subject: Re: [Qemu-devel] [PATCH v1 01/13] ui: remove 'sync' parametr from
+ vnc_update_client
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,70 +30,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org
-Cc: Cornelia Huck <cohuck@redhat.com>, Alexander Graf <agraf@suse.de>, Richard Henderson <rth@twiddle.net>
+To: Darren Kenny <darren.kenny@oracle.com>, qemu-devel@nongnu.org
 
-On 19.12.2017 09:20, Thomas Huth wrote:
-> On 18.12.2017 23:46, David Hildenbrand wrote:
->> Linux uses TEST PROTECTION to sense for available memory locations.
->>
->> Let's implement what we can for now (just as for the other instructions,
->> excluding AR mode and special protection mechanisms).
->>
->> Signed-off-by: David Hildenbrand <david@redhat.com>
->> ---
->>  target/s390x/helper.h     |  2 +-
->>  target/s390x/mem_helper.c | 41 +++++++++++++++++++++++++++++++++++++++--
->>  target/s390x/translate.c  |  2 +-
->>  3 files changed, 41 insertions(+), 4 deletions(-)
->>
->> diff --git a/target/s390x/helper.h b/target/s390x/helper.h
->> index 2f17b62d3d..26c1b07b44 100644
->> --- a/target/s390x/helper.h
->> +++ b/target/s390x/helper.h
->> @@ -137,7 +137,7 @@ DEF_HELPER_FLAGS_4(lctlg, TCG_CALL_NO_WG, void, env, i32, i64, i32)
->>  DEF_HELPER_FLAGS_4(stctl, TCG_CALL_NO_WG, void, env, i32, i64, i32)
->>  DEF_HELPER_FLAGS_4(stctg, TCG_CALL_NO_WG, void, env, i32, i64, i32)
->>  DEF_HELPER_FLAGS_2(testblock, TCG_CALL_NO_WG, i32, env, i64)
->> -DEF_HELPER_FLAGS_2(tprot, TCG_CALL_NO_RWG, i32, i64, i64)
->> +DEF_HELPER_FLAGS_3(tprot, TCG_CALL_NO_RWG, i32, env, i64, i64)
->>  DEF_HELPER_FLAGS_2(iske, TCG_CALL_NO_RWG_SE, i64, env, i64)
->>  DEF_HELPER_FLAGS_3(sske, TCG_CALL_NO_RWG, void, env, i64, i64)
->>  DEF_HELPER_FLAGS_2(rrbe, TCG_CALL_NO_RWG, i32, env, i64)
->> diff --git a/target/s390x/mem_helper.c b/target/s390x/mem_helper.c
->> index 2625d843b3..359e446c6f 100644
->> --- a/target/s390x/mem_helper.c
->> +++ b/target/s390x/mem_helper.c
->> @@ -1717,9 +1717,46 @@ uint32_t HELPER(testblock)(CPUS390XState *env, uint64_t real_addr)
->>      return 0;
->>  }
->>  
->> -uint32_t HELPER(tprot)(uint64_t a1, uint64_t a2)
->> +uint32_t HELPER(tprot)(CPUS390XState *env, uint64_t a1, uint64_t a2)
->>  {
->> -    /* XXX implement */
->> +    S390CPU *cpu = s390_env_get_cpu(env);
->> +    CPUState *cs = CPU(cpu);
->> +
->> +    /*
->> +     * TODO: we currently don't handle all access protection types
->> +     * (including access-list and key-controlled) as well as AR mode.
->> +     */
+Just cc'ing  qemu-devel back on the mail since it was accidentally dropped.
+
+On Tue, Dec 19, 2017 at 07:26:29AM +0000, Darren Kenny wrote:
+> Small nit on the subject s/parametr/parameter/
 > 
-> Maybe add some "if (a2 & 0xf0) qemu_log_mask(LOG_UNIMPL, ...)" so that
-> we've got a chance to detect such conditions later?
+> Otherwise, looks good.
 > 
+> Reviewed-by: Darren Kenny <darren.kenny@oracle.com>
+> 
+> Thanks,
+> 
+> Darren.
+> 
+> On Mon, Dec 18, 2017 at 07:12:16PM +0000, Daniel P. Berrange wrote:
+> > There is only one caller of vnc_update_client and that always passes false
+> > for the 'sync' parameter.
+> > 
+> > Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+> > ---
+> > ui/vnc.c | 11 +++--------
+> > 1 file changed, 3 insertions(+), 8 deletions(-)
+> > 
+> > diff --git a/ui/vnc.c b/ui/vnc.c
+> > index 9f8d5a1b1f..7ba3297dfa 100644
+> > --- a/ui/vnc.c
+> > +++ b/ui/vnc.c
+> > @@ -596,7 +596,7 @@ VncInfo2List *qmp_query_vnc_servers(Error **errp)
+> >    3) resolutions > 1024
+> > */
+> > 
+> > -static int vnc_update_client(VncState *vs, int has_dirty, bool sync);
+> > +static int vnc_update_client(VncState *vs, int has_dirty);
+> > static void vnc_disconnect_start(VncState *vs);
+> > 
+> > static void vnc_colordepth(VncState *vs);
+> > @@ -961,7 +961,7 @@ static int find_and_clear_dirty_height(VncState *vs,
+> >     return h;
+> > }
+> > 
+> > -static int vnc_update_client(VncState *vs, int has_dirty, bool sync)
+> > +static int vnc_update_client(VncState *vs, int has_dirty)
+> > {
+> >     if (vs->disconnecting) {
+> >         vnc_disconnect_finish(vs);
+> > @@ -1025,9 +1025,6 @@ static int vnc_update_client(VncState *vs, int has_dirty, bool sync)
+> >         }
+> > 
+> >         vnc_job_push(job);
+> > -        if (sync) {
+> > -            vnc_jobs_join(vs);
+> > -        }
+> >         vs->force_update = 0;
+> >         vs->has_dirty = 0;
+> >         return n;
+> > @@ -1035,8 +1032,6 @@ static int vnc_update_client(VncState *vs, int has_dirty, bool sync)
+> > 
+> >     if (vs->disconnecting) {
+> >         vnc_disconnect_finish(vs);
+> > -    } else if (sync) {
+> > -        vnc_jobs_join(vs);
+> >     }
+> > 
+> >     return 0;
+> > @@ -2863,7 +2858,7 @@ static void vnc_refresh(DisplayChangeListener *dcl)
+> >     vnc_unlock_display(vd);
+> > 
+> >     QTAILQ_FOREACH_SAFE(vs, &vd->clients, next, vn) {
+> > -        rects += vnc_update_client(vs, has_dirty, false);
+> > +        rects += vnc_update_client(vs, has_dirty);
+> >         /* vs might be free()ed here */
+> >     }
+> > 
+> > -- 
+> > 2.14.3
+> > 
+> > 
 
-In general I would agree, however as such acess-list + storage key stuff
-is missing literally all over the place, I don't think it is very helpful.
-
-Once (if ever) we implement it, we will have to go through the whole PoP
-either way and fixup all functions.
-
-Thanks!
-
+Regards,
+Daniel
 -- 
-
-Thanks,
-
-David / dhildenb
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
