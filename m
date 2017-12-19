@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41621)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42670)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <michael@rivendell.weiser.dinsnail.net>)
-	id 1eRJsG-0004vE-NI
-	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 10:32:37 -0500
+	id 1eRJso-0005Z0-74
+	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 10:33:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <michael@rivendell.weiser.dinsnail.net>)
-	id 1eRJrg-0001mq-EG
-	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 10:32:08 -0500
+	id 1eRJrZ-0001fi-2D
+	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 10:32:42 -0500
 Received: from heinz.dinsnail.net
-	([2a01:238:43b4:3200:9392:5dcc:2f0e:a960]:46430)
+	([2a01:238:43b4:3200:9392:5dcc:2f0e:a960]:46422)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <michael@rivendell.weiser.dinsnail.net>)
-	id 1eRJrd-0001jR-SF
-	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 10:31:30 -0500
+	id 1eRJrX-0001d9-NR
+	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 10:31:24 -0500
 From: Michael Weiser <michael.weiser@gmx.de>
-Date: Tue, 19 Dec 2017 16:16:36 +0100
-Message-Id: <20171219151636.5162-5-michael.weiser@gmx.de>
+Date: Tue, 19 Dec 2017 16:16:35 +0100
+Message-Id: <20171219151636.5162-4-michael.weiser@gmx.de>
 In-Reply-To: <20171219151636.5162-1-michael.weiser@gmx.de>
 References: <20171219151636.5162-1-michael.weiser@gmx.de>
-Subject: [Qemu-devel] [PATCH 4/4] configure: Add aarch64_be-linux-user target
+Subject: [Qemu-devel] [PATCH 3/4] linux-user: Fix endianess of aarch64
+ signal trampoline
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,63 +31,36 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Michael Weiser <michael.weiser@gmx.de>, Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>
 
-Add target aarch64_be-linux-user. This allows a qemu-aarch64_be binary
-to be built that will run big-endian aarch64 binaries.
+Since for aarch64 the signal trampoline is synthesized directly into the
+signal frame we need to make sure the instructions end up little-endian.
+Otherwise the wrong endianness will cause a SIGILL upon return from the
+signal handler on big-endian targets.
 
 Signed-off-by: Michael Weiser <michael.weiser@gmx.de>
 ---
- configure                                 | 9 +++++----
- default-configs/aarch64_be-linux-user.mak | 1 +
- 2 files changed, 6 insertions(+), 4 deletions(-)
- create mode 100644 default-configs/aarch64_be-linux-user.mak
+ linux-user/signal.c | 10 +++++++---
+ 1 file changed, 7 insertions(+), 3 deletions(-)
 
-diff --git a/configure b/configure
-index 9c8aa5a98b..03d95340d8 100755
---- a/configure
-+++ b/configure
-@@ -657,7 +657,7 @@ case "$cpu" in
-     cpu="arm"
-     supported_cpu="yes"
-   ;;
--  aarch64)
-+  aarch64|aarch64_be)
-     cpu="aarch64"
-     supported_cpu="yes"
-   ;;
-@@ -6345,7 +6345,7 @@ if test "$linux" = "yes" ; then
-   s390x)
-     linux_arch=s390
-     ;;
--  aarch64)
-+  aarch64|aarch64_be)
-     linux_arch=arm64
-     ;;
-   mips64)
-@@ -6369,7 +6369,7 @@ target_name=$(echo $target | cut -d '-' -f 1)
- target_bigendian="no"
- 
- case "$target_name" in
--  armeb|hppa|lm32|m68k|microblaze|mips|mipsn32|mips64|moxie|or1k|ppc|ppcemb|ppc64|ppc64abi32|s390x|sh4eb|sparc|sparc64|sparc32plus|xtensaeb)
-+  armeb|aarch64_be|hppa|lm32|m68k|microblaze|mips|mipsn32|mips64|moxie|or1k|ppc|ppcemb|ppc64|ppc64abi32|s390x|sh4eb|sparc|sparc64|sparc32plus|xtensaeb)
-   target_bigendian=yes
-   ;;
- esac
-@@ -6424,7 +6424,8 @@ case "$target_name" in
-     mttcg="yes"
-     gdb_xml_files="arm-core.xml arm-vfp.xml arm-vfp3.xml arm-neon.xml"
-   ;;
--  aarch64)
-+  aarch64|aarch64_be)
-+    TARGET_ARCH=aarch64
-     TARGET_BASE_ARCH=arm
-     bflt="yes"
-     mttcg="yes"
-diff --git a/default-configs/aarch64_be-linux-user.mak b/default-configs/aarch64_be-linux-user.mak
-new file mode 100644
-index 0000000000..a69d9d2e41
---- /dev/null
-+++ b/default-configs/aarch64_be-linux-user.mak
-@@ -0,0 +1 @@
-+# Default configuration for aarch64_be-linux-user
+diff --git a/linux-user/signal.c b/linux-user/signal.c
+index dae14d4a89..eb3638f61b 100644
+--- a/linux-user/signal.c
++++ b/linux-user/signal.c
+@@ -1599,9 +1599,13 @@ static void target_setup_frame(int usig, struct target_sigaction *ka,
+     if (ka->sa_flags & TARGET_SA_RESTORER) {
+         return_addr = ka->sa_restorer;
+     } else {
+-        /* mov x8,#__NR_rt_sigreturn; svc #0 */
+-        __put_user(0xd2801168, &frame->tramp[0]);
+-        __put_user(0xd4000001, &frame->tramp[1]);
++        /*
++	 * mov x8,#__NR_rt_sigreturn; svc #0
++	 * Since these are instructions they need to be put as little-endian
++	 * regardless of target default or current CPU endianness.
++	 */
++        __put_user_e(0xd2801168, &frame->tramp[0], le);
++        __put_user_e(0xd4000001, &frame->tramp[1], le);
+         return_addr = frame_addr + offsetof(struct target_rt_sigframe, tramp);
+     }
+     env->xregs[0] = usig;
 -- 
 2.15.1
