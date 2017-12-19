@@ -1,41 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36858)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49362)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <danielhb@linux.vnet.ibm.com>) id 1eRGs7-0008JE-TN
-	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 07:19:49 -0500
+	(envelope-from <wei.w.wang@intel.com>) id 1eRH6b-0003Vt-F3
+	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 07:34:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <danielhb@linux.vnet.ibm.com>) id 1eRGs3-00065H-Pb
-	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 07:19:47 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:47724
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <danielhb@linux.vnet.ibm.com>)
-	id 1eRGs3-00064j-Js
-	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 07:19:43 -0500
-Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	vBJCJ2j1106535
-	for <qemu-devel@nongnu.org>; Tue, 19 Dec 2017 07:19:40 -0500
-Received: from e34.co.us.ibm.com (e34.co.us.ibm.com [32.97.110.152])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2ey1xxa231-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 19 Dec 2017 07:19:39 -0500
-Received: from localhost
-	by e34.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <danielhb@linux.vnet.ibm.com>;
-	Tue, 19 Dec 2017 05:19:38 -0700
-References: <20171218184428.15074-1-danielhb@linux.vnet.ibm.com>
-	<20171218184428.15074-2-danielhb@linux.vnet.ibm.com>
-	<87efnr81qs.fsf@dusky.pond.sub.org>
-From: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
-Date: Tue, 19 Dec 2017 10:19:32 -0200
-MIME-Version: 1.0
-In-Reply-To: <87efnr81qs.fsf@dusky.pond.sub.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-Message-Id: <a4277edc-37f6-8673-1883-b30f793d9d43@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH v2 1/1] qmp: marking qmp_cpu as deprecated
+	(envelope-from <wei.w.wang@intel.com>) id 1eRH6Y-0000Cq-5D
+	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 07:34:45 -0500
+Received: from mga02.intel.com ([134.134.136.20]:51438)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
+	id 1eRH6X-0000Bf-P3
+	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 07:34:42 -0500
+From: Wei Wang <wei.w.wang@intel.com>
+Date: Tue, 19 Dec 2017 20:17:52 +0800
+Message-Id: <1513685879-21823-1-git-send-email-wei.w.wang@intel.com>
+Subject: [Qemu-devel] [PATCH v20 0/7] Virtio-balloon Enhancement
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -44,131 +22,222 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: qemu-devel@nongnu.org, "Daniel P. Berrange" <berrange@redhat.com>, Eric Blake <eblake@redhat.com>
+To: virtio-dev@lists.oasis-open.org, linux-kernel@vger.kernel.org, qemu-devel@nongnu.org, virtualization@lists.linux-foundation.org, kvm@vger.kernel.org, linux-mm@kvack.org, mst@redhat.com, mhocko@kernel.org, akpm@linux-foundation.org, mawilcox@microsoft.com
+Cc: david@redhat.com, penguin-kernel@I-love.SAKURA.ne.jp, cornelia.huck@de.ibm.com, mgorman@techsingularity.net, aarcange@redhat.com, amit.shah@redhat.com, pbonzini@redhat.com, willy@infradead.org, wei.w.wang@intel.com, liliang.opensource@gmail.com, yang.zhang.wz@gmail.com, quan.xu0@gmail.com, nilal@redhat.com, riel@redhat.com
 
+This patch series enhances the existing virtio-balloon with the following
+new features:
+1) fast ballooning: transfer ballooned pages between the guest and host in
+chunks using sgs, instead of one array each time; and
+2) free page block reporting: a new virtqueue to report guest free pages
+to the host.
 
+The second feature can be used to accelerate live migration of VMs. Here
+are some details:
 
-On 12/19/2017 08:12 AM, Markus Armbruster wrote:
-> Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com> writes:
->
->> qmp_cpu is a nop that was created a while ago in commit 755f196898
->> ("qapi: Convert the cpu command") for the sake of compatibility,
->> due to the existence of hmp_cpu.
-> The compatibility argument makes no sense to me, but it's the reason the
-> commit documented.
-Reading the thread that added it back in 2011*, I am guessing that the
-compatibility argument is based on the premise that every HMP command
-should have a QMP counterpart. This also makes sense considering the
-QAPI FAQ page I've mentioned a few days ago.
->
->> Today, there is no need or requirement to keep it as is. QMP is
->> meant to be as stateless as possible, thus any QMP command that
->> needs a specific monitor CPU setup should provide it in its
-> s/should/must/
->
->> arguments, instead of relying in the current QMP monitor state.
->>
->> This patch flags qmp_cpu as deprecated in qemu-doc.texi,
->> qapi-schema.json and changes qmp_cpu body to show a deprecation
->> message if used.
->>
->> Signed-off-by: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
-> The "deprecation message" is actually a hard error.  This is unusual.
-> When we deprecate an interface, we don't normally make its use fail, we
-> just warn.  QMP doesn't provide a good way to warn, though.
->
-> Let's compare behavior:
->
-> 0. Status quo                       do nothing and succeed
-> 1. Your patch                       fail with GenericError
-> 2. Your patch less error_setg()     do nothing and succeed
-> 3. Immediate removal                fail with CommandNotFound
->
-> Does the difference between 1. and 3. matter at all?  Or is it just
-> deprecation cargo cult?
+Live migration needs to transfer the VM's memory from the source machine
+to the destination round by round. For the 1st round, all the VM's memory
+is transferred. From the 2nd round, only the pieces of memory that were
+written by the guest (after the 1st round) are transferred. One method
+that is popularly used by the hypervisor to track which part of memory is
+written is to write-protect all the guest memory.
 
-Good point. If both the deprecation message and the removal will
-result in error for the user ....
+The second feature enables the optimization of the 1st round memory
+transfer - the hypervisor can skip the transfer of guest free pages in the
+1st round. It is not concerned that the memory pages are used after they
+are given to the hypervisor as a hint of the free pages, because they will
+be tracked by the hypervisor and transferred in the next round if they are
+used and written.
 
->
-> Here's my take on it.  I'd prefer 3. Immediate removal.  I'd also be
-> fine with 2. Your patch less error_setg(), followed by removal after the
-> customary deprecation period.  1. plus later removal just doesn't make
-> sense to me, but it's really no big deal, so if you guys want it...
+ChangeLog:
+v19->v20:
+1) patch 1: xbitmap
+	- add __rcu to "void **slot";
+	- remove the exceptional path.
+2) patch 3: xbitmap
+	- DeveloperNotes: add an item to comment that the current bit range
+	  related APIs operating on extremely large ranges (e.g.
+          [0, ULONG_MAX)) will take too long time. This can be optimized in
+	  the future.
+	- remove the exceptional path;
+	- remove xb_preload_and_set();
+	- reimplement xb_clear_bit_range to make its usage close to
+	  bitmap_clear;
+	- rename xb_find_next_set_bit to xb_find_set, and re-implement it
+	  in a style close to find_next_bit;
+	- rename xb_find_next_zero_bit to xb_find_clear, and re-implement
+	  it in a stytle close to find_next_zero_bit;
+	- separate the implementation of xb_find_set and xb_find_clear for
+	  the convenience of future updates.
+3) patch 4: virtio-balloon
+	- xb_set_page: change the way to call xb_ related APIs
 
-It all goes down to whether we consider qmp_cpu, a QMP command that does
-nothing since its creation and apparently no one ever used it, a 
-feature. If it's a
-feature, then I vote for (2) and removal after 2 releases following the 
-regular
-deprecation policy.
+v18->v19:
+1) patch 3:
+	- xb_clear_bit_range and xb_find_next_bit will deal with range [start,
+	  end), where end is changed to be exclusive of the range.
+	- add overflow checks at the end of xb_clear_bit_range and
+	  xb_find_next_bit 
+	- add overflow related test cases
+2) patch 4:
+	- change back to the previous add_one_sg methond, which is based on the
+	  scatterlist struct
+        - tell_host_sgs: use "uint64_t len" to avoid overflow
+	- batch_balloon_page_sg: a simpler function to implement the batching of
+	  sgs
+3) patch 6: batch_free_page_sg: batch sgs using the previous scatterlist struct
+4) patch 7: add a config field, poison_val, to tell the host about the poison
+	    value
+v17->v18:
+1) patch 1-2: new to solve some tools related compilation issues
+2) patch 3: revert to the original xbitmap implementation from Matthew
+Wilcox with some minor changes (e.g. comments added to the exported
+functions)
+3) patch 4: summarize the changes we want to make to patch 3
+4) patch 5: add the developer notes as a reminder for users to avoid
+concurrent accesses to the ida bitmap
+5) patch 6: a new vring API to allow users to directly pass in a physical
+address to a vring desc
+6) patch 7: ballooning time is reduced from ~490ms to ~440ms with the new
+implementation
+	- use the new API from patch 6 to send balloon pages
+	- xb_preload with "GFP_NOWAIT | __GFP_NOWARN" flag;
+	- handle the case when xb_set_page() fails to avoid memory leak;
+	- put xb_set_page() under the balloon lock
+7) patch 9: simper implementation
+	- start free page reporting by sending a new cmd id from the host
+	- guest acks the start or stop via adding a cmd id to the free page vq
+	- use vb->report_free_page, instead of vb->report_free_page_stop
+	- use WRITE_ONCE/READ_ONCE to access vb->report_free_page
+	- use the new API from patch 6 to send free pages to avoid the
+	  unnecessary use of kaddr.
+8) patch 10: new patch to solve the page posioning issue reported by
+Michael S. Tsirkin 
 
-If we consider that applying the policy to qmp_cpu is more trouble than 
-it's worth,
-I'll gladly resend this patch removing it entirely and rewording the 
-qemu-doc.texi
-entry to mention that it was removed because it did nothing and it was of
-no use for anyone.
+v16->v17:
+1) patch 1: please check the commit log there;
+2) patch 3: included Michael S. Tsirkin patch to fix the potential
+deadlock issue;
+3) patch 4: use BUG_ON if virtqueue_add_ returns error, which is
+expected never to happen;
+4) patch 4: add leak_balloon_sg_oom, which is used in the oom case when
+VIRTIO_BALLOON_F_SG is in use;
+5) patch 6: use config registers, instead of a vq, as the command channel
+between the host and guest;
+6) patch 6: add the command sequence id support.
 
+v15->v16:
+1) mm: stop reporting the free pfn range if the callback returns false;
+2) mm: move some implementaion of walk_free_mem_block into a function to
+make the code layout looks better;
+3) xbitmap: added some optimizations suggested by Matthew, please refer to
+the ChangLog in the xbitmap patch for details.
+4) xbitmap: added a test suite
+5) virtio-balloon: bail out with a warning when virtqueue_add_inbuf returns
+an error
+6) virtio-balloon: some small code re-arrangement, e.g. detachinf used buf
+from the vq before adding a new buf
 
+v14->v15:
+1) mm: make the report callback return a bool value - returning 1 to stop
+walking through the free page list.
+2) virtio-balloon: batching sgs of balloon pages till the vq is full
+3) virtio-balloon: create a new workqueue, rather than using the default
+system_wq, to queue the free page reporting work item.
+4) virtio-balloon: add a ctrl_vq to be a central control plane which will
+handle all the future control related commands between the host and guest.
+Add free page report as the first feature controlled under ctrl_vq, and
+the free_page_vq is a data plane vq dedicated to the transmission of free
+page blocks.
 
-danielhb
+v13->v14:
+1) xbitmap: move the code from lib/radix-tree.c to lib/xbitmap.c.
+2) xbitmap: consolidate the implementation of xb_bit_set/clear/test into
+one xb_bit_ops.
+3) xbitmap: add documents for the exported APIs.
+4) mm: rewrite the function to walk through free page blocks.
+5) virtio-balloon: when reporting a free page blcok to the device, if the
+vq is full (less likey to happen in practice), just skip reporting this
+block, instead of busywaiting till an entry gets released.
+6) virtio-balloon: fail the probe function if adding the signal buf in
+init_vqs fails.
 
->
->> ---
->>   qapi-schema.json |  5 ++++-
->>   qemu-doc.texi    | 10 ++++++++++
->>   qmp.c            |  2 +-
->>   3 files changed, 15 insertions(+), 2 deletions(-)
->>
->> diff --git a/qapi-schema.json b/qapi-schema.json
->> index 18457954a8..b51b89e19b 100644
->> --- a/qapi-schema.json
->> +++ b/qapi-schema.json
->> @@ -1052,7 +1052,10 @@
->>   #
->>   # Since: 0.14.0
->>   #
->> -# Notes: Do not use this command.
->> +# Notes: Do not use this command. It was deprecated in release 2.12.0 and will
->> +#        be removed, with no replacement, at any time in the future. QMP
->> +#        commands that rely on the current CPU monitor should specify it as a
->> +#        parameter.
->>   ##
->>   { 'command': 'cpu', 'data': {'index': 'int'} }
->>   
->> diff --git a/qemu-doc.texi b/qemu-doc.texi
->> index f7317dfc66..09e6c5046a 100644
->> --- a/qemu-doc.texi
->> +++ b/qemu-doc.texi
->> @@ -2516,6 +2516,16 @@ subsystem image.
->>   The ``convert -s snapshot_id_or_name'' argument is obsoleted
->>   by the ``convert -l snapshot_param'' argument instead.
->>   
->> +@section System emulator machine protocol commands
->> +
->> +@subsection qmp_cpu (since 2.12.0)
->> +
->> +The ``qmp_cpu'' command was implemented in release 0.14.0 as a functional
->> +no-op, remaining as such up to release 2.12.0 when it was deprecated and
->> +flagged for future removal. No replacement will be provided: any QMP command
->> +that uses the current CPU monitor should, instead, specify the CPU in its
->> +parameters.
->> +
->>   @section System emulator human monitor commands
->>   
->>   @subsection host_net_add (since 2.10.0)
->> diff --git a/qmp.c b/qmp.c
->> index e8c303116a..d8543d713d 100644
->> --- a/qmp.c
->> +++ b/qmp.c
->> @@ -115,7 +115,7 @@ void qmp_system_powerdown(Error **erp)
->>   
->>   void qmp_cpu(int64_t index, Error **errp)
->>   {
->> -    /* Just do nothing */
->> +    error_setg(errp, "qmp_cpu is deprecated, do not use this command");
->>   }
->>   
->>   void qmp_cpu_add(int64_t id, Error **errp)
+v12->v13:
+1) mm: use a callback function to handle the the free page blocks from the
+report function. This avoids exposing the zone internal to a kernel
+module.
+2) virtio-balloon: send balloon pages or a free page block using a single
+sg each time. This has the benefits of simpler implementation with no new
+APIs.
+3) virtio-balloon: the free_page_vq is used to report free pages only (no
+multiple usages interleaving)
+4) virtio-balloon: Balloon pages and free page blocks are sent via input
+sgs, and the completion signal to the host is sent via an output sg.
+
+v11->v12:
+1) xbitmap: use the xbitmap from Matthew Wilcox to record ballooned pages.
+2) virtio-ring: enable the driver to build up a desc chain using vring
+desc.
+3) virtio-ring: Add locking to the existing START_USE() and END_USE()
+macro to lock/unlock the vq when a vq operation starts/ends.
+4) virtio-ring: add virtqueue_kick_sync() and virtqueue_kick_async()
+5) virtio-balloon: describe chunks of ballooned pages and free pages
+blocks directly using one or more chains of desc from the vq.
+
+v10->v11:
+1) virtio_balloon: use vring_desc to describe a chunk;
+2) virtio_ring: support to add an indirect desc table to virtqueue;
+3)  virtio_balloon: use cmdq to report guest memory statistics.
+
+v9->v10:
+1) mm: put report_unused_page_block() under CONFIG_VIRTIO_BALLOON;
+2) virtio-balloon: add virtballoon_validate();
+3) virtio-balloon: msg format change;
+4) virtio-balloon: move miscq handling to a task on system_freezable_wq;
+5) virtio-balloon: code cleanup.
+
+v8->v9:
+1) Split the two new features, VIRTIO_BALLOON_F_BALLOON_CHUNKS and
+VIRTIO_BALLOON_F_MISC_VQ, which were mixed together in the previous
+implementation;
+2) Simpler function to get the free page block.
+
+v7->v8:
+1) Use only one chunk format, instead of two.
+2) re-write the virtio-balloon implementation patch.
+3) commit changes
+4) patch re-org
+
+Matthew Wilcox (1):
+  xbitmap: Introduce xbitmap
+
+Wei Wang (6):
+  xbitmap: potential improvement
+  xbitmap: add more operations
+  virtio-balloon: VIRTIO_BALLOON_F_SG
+  mm: support reporting free page blocks
+  virtio-balloon: VIRTIO_BALLOON_F_FREE_PAGE_VQ
+  virtio-balloon: don't report free pages when page poisoning is enabled
+
+ drivers/virtio/virtio_balloon.c          | 444 +++++++++++++++++++++++++++----
+ include/linux/mm.h                       |   6 +
+ include/linux/radix-tree.h               |   2 +
+ include/linux/xbitmap.h                  |  55 ++++
+ include/uapi/linux/virtio_balloon.h      |   7 +
+ lib/Makefile                             |   2 +-
+ lib/radix-tree.c                         |  40 ++-
+ lib/xbitmap.c                            | 330 +++++++++++++++++++++++
+ mm/page_alloc.c                          |  91 +++++++
+ tools/include/linux/bitmap.h             |  34 +++
+ tools/include/linux/kernel.h             |   2 +
+ tools/testing/radix-tree/Makefile        |  12 +-
+ tools/testing/radix-tree/linux/xbitmap.h |   1 +
+ tools/testing/radix-tree/main.c          |   4 +
+ tools/testing/radix-tree/test.h          |   1 +
+ 15 files changed, 976 insertions(+), 55 deletions(-)
+ create mode 100644 include/linux/xbitmap.h
+ create mode 100644 lib/xbitmap.c
+ create mode 100644 tools/testing/radix-tree/linux/xbitmap.h
+
+-- 
+2.7.4
