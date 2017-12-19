@@ -1,16 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49094)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52907)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sochin.jiang@huawei.com>) id 1eRI1l-0005gs-Fj
-	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 08:33:50 -0500
+	(envelope-from <penguin-kernel@I-love.SAKURA.ne.jp>)
+	id 1eRIZ2-00072D-Ac
+	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 09:08:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sochin.jiang@huawei.com>) id 1eRI1k-0003EK-HV
-	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 08:33:49 -0500
-From: sochin.jiang <sochin.jiang@huawei.com>
-Date: Tue, 19 Dec 2017 21:33:03 +0800
-Message-ID: <1513690383-27269-1-git-send-email-sochin.jiang@huawei.com>
-MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH]  virtio-blk: notify guest directly
+	(envelope-from <penguin-kernel@I-love.SAKURA.ne.jp>)
+	id 1eRIYz-0000wI-Hs
+	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 09:08:12 -0500
+Received: from www262.sakura.ne.jp ([2001:e42:101:1:202:181:97:72]:25356)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <penguin-kernel@I-love.SAKURA.ne.jp>)
+	id 1eRIYz-0007m7-2f
+	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 09:08:09 -0500
+From: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+References: <1513685879-21823-1-git-send-email-wei.w.wang@intel.com>
+In-Reply-To: <1513685879-21823-1-git-send-email-wei.w.wang@intel.com>
+Message-Id: <201712192305.AAE21882.MtQHJOFFSFVOLO@I-love.SAKURA.ne.jp>
+Date: Tue, 19 Dec 2017 23:05:11 +0900
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Subject: Re: [Qemu-devel] [PATCH v20 0/7] Virtio-balloon Enhancement
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -19,78 +28,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: stefanha@redhat.com, kwolf@redhat.com, mreitz@redhat.com
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, sochin.jiang@huawei.com, eric.fangyi@huawei.com
+To: wei.w.wang@intel.com
+Cc: virtio-dev@lists.oasis-open.org, linux-kernel@vger.kernel.org, qemu-devel@nongnu.org, virtualization@lists.linux-foundation.org, kvm@vger.kernel.org, linux-mm@kvack.org, mst@redhat.com, mhocko@kernel.org, akpm@linux-foundation.org, mawilcox@microsoft.com, david@redhat.com, cornelia.huck@de.ibm.com, mgorman@techsingularity.net, aarcange@redhat.com, amit.shah@redhat.com, pbonzini@redhat.com, willy@infradead.org, liliang.opensource@gmail.com, yang.zhang.wz@gmail.com, quan.xu0@gmail.com, nilal@redhat.com, riel@redhat.com
 
-From: "sochin.jiang" <sochin.jiang@huawei.com>
+Wei Wang wrote:
+> ChangeLog:
+> v19->v20:
+> 1) patch 1: xbitmap
+> 	- add __rcu to "void **slot";
+> 	- remove the exceptional path.
+> 2) patch 3: xbitmap
+> 	- DeveloperNotes: add an item to comment that the current bit range
+> 	  related APIs operating on extremely large ranges (e.g.
+>           [0, ULONG_MAX)) will take too long time. This can be optimized in
+> 	  the future.
+> 	- remove the exceptional path;
+> 	- remove xb_preload_and_set();
+> 	- reimplement xb_clear_bit_range to make its usage close to
+> 	  bitmap_clear;
+> 	- rename xb_find_next_set_bit to xb_find_set, and re-implement it
+> 	  in a style close to find_next_bit;
+> 	- rename xb_find_next_zero_bit to xb_find_clear, and re-implement
+> 	  it in a stytle close to find_next_zero_bit;
+> 	- separate the implementation of xb_find_set and xb_find_clear for
+> 	  the convenience of future updates.
 
- Till now, we've already notify guest as a batch mostly, an
- extra BH won't decrease guest interrupts much, but cause a
- significant notification loss. Generally, we could have 15%
- or so performance lost in single queue IO models, as I tested.
+Removing exceptional path made this patch easier to read.
+But what I meant is
 
-Signed-off-by: sochin.jiang <sochin.jiang@huawei.com>
----
- hw/block/dataplane/virtio-blk.c | 19 +++++++------------
- 1 file changed, 7 insertions(+), 12 deletions(-)
+  Can you eliminate exception path and fold all xbitmap patches into one, and
+  post only one xbitmap patch without virtio-balloon changes? 
 
-diff --git a/hw/block/dataplane/virtio-blk.c b/hw/block/dataplane/virtio-blk.c
-index 5556f0e..a261a1d 100644
---- a/hw/block/dataplane/virtio-blk.c
-+++ b/hw/block/dataplane/virtio-blk.c
-@@ -32,7 +32,6 @@ struct VirtIOBlockDataPlane {
- 
-     VirtIOBlkConf *conf;
-     VirtIODevice *vdev;
--    QEMUBH *bh;                     /* bh for guest notification */
-     unsigned long *batch_notify_vqs;
- 
-     /* Note that these EventNotifiers are assigned by value.  This is
-@@ -44,14 +43,7 @@ struct VirtIOBlockDataPlane {
-     AioContext *ctx;
- };
- 
--/* Raise an interrupt to signal guest, if necessary */
--void virtio_blk_data_plane_notify(VirtIOBlockDataPlane *s, VirtQueue *vq)
--{
--    set_bit(virtio_get_queue_index(vq), s->batch_notify_vqs);
--    qemu_bh_schedule(s->bh);
--}
--
--static void notify_guest_bh(void *opaque)
-+static void notify_guest(void *opaque)
- {
-     VirtIOBlockDataPlane *s = opaque;
-     unsigned nvqs = s->conf->num_queues;
-@@ -75,7 +67,12 @@ static void notify_guest_bh(void *opaque)
-     }
- }
- 
--/* Context: QEMU global mutex held */
-+/* Raise an interrupt to signal guest, if necessary */
-+void virtio_blk_data_plane_notify(VirtIOBlockDataPlane *s, VirtQueue *vq)
-+{
-+    set_bit(virtio_get_queue_index(vq), s->batch_notify_vqs);
-+    notify_guest(s);
-+}
- void virtio_blk_data_plane_create(VirtIODevice *vdev, VirtIOBlkConf *conf,
-                                   VirtIOBlockDataPlane **dataplane,
-                                   Error **errp)
-@@ -122,7 +119,6 @@ void virtio_blk_data_plane_create(VirtIODevice *vdev, VirtIOBlkConf *conf,
-     } else {
-         s->ctx = qemu_get_aio_context();
-     }
--    s->bh = aio_bh_new(s->ctx, notify_guest_bh, s);
-     s->batch_notify_vqs = bitmap_new(conf->num_queues);
- 
-     *dataplane = s;
-@@ -140,7 +136,6 @@ void virtio_blk_data_plane_destroy(VirtIOBlockDataPlane *s)
-     vblk = VIRTIO_BLK(s->vdev);
-     assert(!vblk->dataplane_started);
-     g_free(s->batch_notify_vqs);
--    qemu_bh_delete(s->bh);
-     if (s->iothread) {
-         object_unref(OBJECT(s->iothread));
-     }
--- 
-1.8.3.1
+.
+
+I still think we don't need xb_preload()/xb_preload_end().
+I think xb_find_set() has a bug in !node path.
+
+Also, please avoid unconditionally adding to builtin modules.
+There are users who want to save even few KB.
