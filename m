@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46624)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53248)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <atar4qemu@gmail.com>) id 1eRCpT-0007ic-Mu
-	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 03:00:55 -0500
+	(envelope-from <darren.kenny@oracle.com>) id 1eRCvP-0001mn-Pb
+	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 03:06:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <atar4qemu@gmail.com>) id 1eRCpO-0001K8-AF
-	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 03:00:47 -0500
-Received: from mail-it0-x241.google.com ([2607:f8b0:4001:c0b::241]:44371)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <atar4qemu@gmail.com>) id 1eRCpO-0001JI-2A
-	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 03:00:42 -0500
-Received: by mail-it0-x241.google.com with SMTP id b5so1745050itc.3
-	for <qemu-devel@nongnu.org>; Tue, 19 Dec 2017 00:00:41 -0800 (PST)
+	(envelope-from <darren.kenny@oracle.com>) id 1eRCvJ-0006aS-KG
+	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 03:06:55 -0500
+Received: from userp2130.oracle.com ([156.151.31.86]:52024)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <darren.kenny@oracle.com>)
+	id 1eRCvJ-0006Zd-BM
+	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 03:06:49 -0500
+Date: Tue, 19 Dec 2017 08:01:40 +0000
+From: Darren Kenny <darren.kenny@oracle.com>
+Message-ID: <20171219080140.ziafa2x3jyuqv2wu@starbug-vm.ie.oracle.com>
+References: <20171218191228.31018-1-berrange@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <1511703326-25325-1-git-send-email-mark.cave-ayland@ilande.co.uk>
-References: <1511703326-25325-1-git-send-email-mark.cave-ayland@ilande.co.uk>
-From: Artyom Tarasenko <atar4qemu@gmail.com>
-Date: Tue, 19 Dec 2017 09:00:20 +0100
-Message-ID: <CACXAS8DRKEGkC8YFN4PFf1d7kGeerN6cNPcS94zk2YvNoVLgSA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH 0/8] sparc: IOMMU tidy-up and reorganisation
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Disposition: inline
+In-Reply-To: <20171218191228.31018-1-berrange@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v1 00/13] Fix VNC server unbounded memory
+ usage
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,78 +28,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Cc: qemu-devel <qemu-devel@nongnu.org>
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: qemu-devel@nongnu.org, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, P J P <ppandit@redhat.com>
 
-On Sun, Nov 26, 2017 at 2:35 PM, Mark Cave-Ayland
-<mark.cave-ayland@ilande.co.uk> wrote:
-> Following on from the previous sun4u patchset, here is the next step of
-> IOMMU-related updates for 2.12.
->
-> This patchset does 2 main things: firstly it moves the sun4m IOMMU
-> device out of hw/dma and into hw/sparc to match existing architectures.
-> With this (and the previous sun4m DMA rework) the old sun4m.h header can
-> now be completely removed.
->
-> Secondly in a similar manner, we split the sun4u IOMMU functionality out
-> from the APB device into a new sun4u-iommu device in hw/sparc64, adding in
-> a conversion from DPRINTF macros to trace-events for good measure while
-> we are here.
->
-> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Hi Daniel,
 
-Acked-by: Artyom Tarasenko <atar4qemu@gmail.com>
+For the series:
 
-> Based-on: 1511699686-12605-1-git-send-email-mark.cave-ayland@ilande.co.uk ([PATCHv2 00/15] sun4u: tidy-up CPU, APB and ebus)
+Reviewed-by: Darren Kenny <darren.kenny@oracle.com>
+
+With one small nit on patch 1.
+
+Thanks,
+
+Darren.
+
+On Mon, Dec 18, 2017 at 07:12:15PM +0000, Daniel P. Berrange wrote:
+>In the 2.11 release we fixed CVE-2017-15268, which allowed the VNC websockets
+>server to consume arbitrary memory when a slow client was connected. I have
+>since discovered that this same type of problem can be triggered in several
+>other ways in the regular (non-websockets) VNC server. This patch series
+>attempts to fix this problem by limiting framebuffer updates and other data
+>sent from server to client. The mitigating factor is that you need to have
+>successfully authenticated with the VNC server to trigger these new flaws.
+>This new more general flaw is assigned CVE-2017-15124 by the Red Hat security
+>team.
+>
+>The key patches containing the security fix are 9, 10, 11.
+>
+>Since this code is incredibly subtle & hard to understand though, the first
+>8 patches do a bunch of independant cleanups/refactoring to make the security
+>fixes clearer.  The last two patches are just some extra cleanup / help for
+>future maint.
+>
+>Daniel P. Berrange (13):
+>  ui: remove 'sync' parametr from vnc_update_client
+>  ui: remove unreachable code in vnc_update_client
+>  ui: remove redundant indentation in vnc_client_update
+>  ui: avoid pointless VNC updates if framebuffer isn't dirty
+>  ui: track how much decoded data we consumed when doing SASL encoding
+>  ui: introduce enum to track VNC client framebuffer update request
+>    state
+>  ui: correctly reset framebuffer update state after processing dirty
+>    regions
+>  ui: refactor code for determining if an update should be sent to the
+>    client
+>  ui: fix VNC client throttling when audio capture is active
+>  ui: fix VNC client throttling when forced update is requested
+>  ui: place a hard cap on VNC server output buffer size
+>  ui: add trace events related to VNC client throttling
+>  ui: mix misleading comments & return types of VNC I/O helper methods
+>
+> ui/trace-events    |   7 ++
+> ui/vnc-auth-sasl.c |  16 ++-
+> ui/vnc-auth-sasl.h |   5 +-
+> ui/vnc-jobs.c      |   5 +
+> ui/vnc.c           | 320 ++++++++++++++++++++++++++++++++++++++---------------
+> ui/vnc.h           |  28 ++++-
+> 6 files changed, 277 insertions(+), 104 deletions(-)
+>
+>-- 
+>2.14.3
 >
 >
-> Mark Cave-Ayland (8):
->   sun4m: move sun4m_iommu.c from hw/dma to hw/sparc
->   sun4m: move IOMMU declarations from sun4m.h to sun4m_iommu.h
->   sun4m: remove include/hw/sparc/sun4m.h and all references to it
->   apb: QOMify IOMMU
->   sun4u: split IOMMU device out from apb.c to sun4u_iommu.c
->   sun4u_iommu: update to reflect IOMMU is no longer part of the APB
->     device
->   sun4u_iommu: convert from IOMMU_DPRINTF to trace-events
->   sun4u_iommu: add trace event for IOMMU translations
->
->  hw/dma/Makefile.objs           |    1 -
->  hw/dma/sparc32_dma.c           |    2 +-
->  hw/dma/sun4m_iommu.c           |  406 ---------------------------------------
->  hw/dma/trace-events            |   10 -
->  hw/intc/slavio_intctl.c        |    1 -
->  hw/net/lance.c                 |    2 +-
->  hw/pci-host/apb.c              |  256 +------------------------
->  hw/sparc/Makefile.objs         |    2 +-
->  hw/sparc/sun4m.c               |    2 +-
->  hw/sparc/sun4m_iommu.c         |  407 ++++++++++++++++++++++++++++++++++++++++
->  hw/sparc/trace-events          |   10 +
->  hw/sparc64/Makefile.objs       |    1 +
->  hw/sparc64/sun4u.c             |    8 +-
->  hw/sparc64/sun4u_iommu.c       |  342 +++++++++++++++++++++++++++++++++
->  hw/sparc64/trace-events        |    5 +
->  hw/timer/slavio_timer.c        |    1 -
->  include/hw/pci-host/apb.h      |   53 +-----
->  include/hw/sparc/sun4m.h       |   35 ----
->  include/hw/sparc/sun4m_iommu.h |   51 +++++
->  include/hw/sparc/sun4u_iommu.h |   50 +++++
->  20 files changed, 889 insertions(+), 756 deletions(-)
->  delete mode 100644 hw/dma/sun4m_iommu.c
->  create mode 100644 hw/sparc/sun4m_iommu.c
->  create mode 100644 hw/sparc64/sun4u_iommu.c
->  delete mode 100644 include/hw/sparc/sun4m.h
->  create mode 100644 include/hw/sparc/sun4m_iommu.h
->  create mode 100644 include/hw/sparc/sun4u_iommu.h
->
-> --
-> 1.7.10.4
->
-
-
-
--- 
-Regards,
-Artyom Tarasenko
-
-SPARC and PPC PReP under qemu blog: http://tyom.blogspot.com/search/label/qemu
