@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58022)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57987)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1eRJa7-000592-C7
+	(envelope-from <stefanha@redhat.com>) id 1eRJa3-00056d-BJ
 	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 10:13:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1eRJa1-0007Iq-HS
-	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 10:13:23 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:60912)
+	(envelope-from <stefanha@redhat.com>) id 1eRJZv-0007Ez-FQ
+	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 10:13:19 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:55046)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1eRJa1-0007IC-Ai
-	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 10:13:17 -0500
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1eRJZv-0007EK-9C
+	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 10:13:11 -0500
 From: Stefan Hajnoczi <stefanha@redhat.com>
-Date: Tue, 19 Dec 2017 15:11:39 +0000
-Message-Id: <20171219151144.11120-19-stefanha@redhat.com>
+Date: Tue, 19 Dec 2017 15:11:37 +0000
+Message-Id: <20171219151144.11120-17-stefanha@redhat.com>
 In-Reply-To: <20171219151144.11120-1-stefanha@redhat.com>
 References: <20171219151144.11120-1-stefanha@redhat.com>
-Subject: [Qemu-devel] [PULL v2 18/23] block: avoid recursive AioContext
- acquire in bdrv_inactivate_all()
+Subject: [Qemu-devel] [PULL v2 16/23] virtio-blk: make queue size
+ configurable
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,72 +25,71 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Mark Kanda <mark.kanda@oracle.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
-From: Paolo Bonzini <pbonzini@redhat.com>
+From: Mark Kanda <mark.kanda@oracle.com>
 
-BDRV_POLL_WHILE() does not support recursive AioContext locking.  It
-only releases the AioContext lock once regardless of how many times the
-caller has acquired it.  This results in a hang since the IOThread does
-not make progress while the AioContext is still locked.
+Depending on the configuration, it can be beneficial to adjust the virtio-blk
+queue size to something other than the current default of 128. Add a new
+property to make the queue size configurable.
 
-The following steps trigger the hang:
-
-  $ qemu-system-x86_64 -M accel=kvm -m 1G -cpu host \
-                       -object iothread,id=iothread0 \
-                       -device virtio-scsi-pci,iothread=iothread0 \
-                       -drive if=none,id=drive0,file=test.img,format=raw \
-                       -device scsi-hd,drive=drive0 \
-                       -drive if=none,id=drive1,file=test.img,format=raw \
-                       -device scsi-hd,drive=drive1
-  $ qemu-system-x86_64 ...same options... \
-                       -incoming tcp::1234
-  (qemu) migrate tcp:127.0.0.1:1234
-  ...hang...
-
-Tested-by: Stefan Hajnoczi <stefanha@redhat.com>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
-Message-id: 20171207201320.19284-2-stefanha@redhat.com
+Signed-off-by: Mark Kanda <mark.kanda@oracle.com>
+Reviewed-by: Karl Heubaum <karl.heubaum@oracle.com>
+Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
+Reviewed-by: Ameya More <ameya.more@oracle.com>
+Message-id: 52e6d742811f10dbd16e996e86cf375b9577c187.1513005190.git.mark.kanda@oracle.com
 Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
 ---
- block.c | 14 +++++++++++---
- 1 file changed, 11 insertions(+), 3 deletions(-)
+ include/hw/virtio/virtio-blk.h |  1 +
+ hw/block/virtio-blk.c          | 10 +++++++++-
+ 2 files changed, 10 insertions(+), 1 deletion(-)
 
-diff --git a/block.c b/block.c
-index 9a1a0d1e73..1c37ce4554 100644
---- a/block.c
-+++ b/block.c
-@@ -4320,9 +4320,15 @@ int bdrv_inactivate_all(void)
-     BdrvNextIterator it;
-     int ret = 0;
-     int pass;
-+    GSList *aio_ctxs = NULL, *ctx;
+diff --git a/include/hw/virtio/virtio-blk.h b/include/hw/virtio/virtio-blk.h
+index d3c8a6fa8c..5117431d96 100644
+--- a/include/hw/virtio/virtio-blk.h
++++ b/include/hw/virtio/virtio-blk.h
+@@ -39,6 +39,7 @@ struct VirtIOBlkConf
+     uint32_t config_wce;
+     uint32_t request_merging;
+     uint16_t num_queues;
++    uint16_t queue_size;
+ };
  
-     for (bs = bdrv_first(&it); bs; bs = bdrv_next(&it)) {
--        aio_context_acquire(bdrv_get_aio_context(bs));
-+        AioContext *aio_context = bdrv_get_aio_context(bs);
-+
-+        if (!g_slist_find(aio_ctxs, aio_context)) {
-+            aio_ctxs = g_slist_prepend(aio_ctxs, aio_context);
-+            aio_context_acquire(aio_context);
-+        }
+ struct VirtIOBlockDataPlane;
+diff --git a/hw/block/virtio-blk.c b/hw/block/virtio-blk.c
+index 41a4ccdede..66ab0b19c8 100644
+--- a/hw/block/virtio-blk.c
++++ b/hw/block/virtio-blk.c
+@@ -928,6 +928,13 @@ static void virtio_blk_device_realize(DeviceState *dev, Error **errp)
+         error_setg(errp, "num-queues property must be larger than 0");
+         return;
      }
++    if (!is_power_of_2(conf->queue_size) ||
++        conf->queue_size > VIRTQUEUE_MAX_SIZE) {
++        error_setg(errp, "invalid queue-size property (%" PRIu16 "), "
++                   "must be a power of 2 (max %d)",
++                   conf->queue_size, VIRTQUEUE_MAX_SIZE);
++        return;
++    }
  
-     /* We do two passes of inactivation. The first pass calls to drivers'
-@@ -4340,9 +4346,11 @@ int bdrv_inactivate_all(void)
+     blkconf_serial(&conf->conf, &conf->serial);
+     if (!blkconf_apply_backend_options(&conf->conf,
+@@ -950,7 +957,7 @@ static void virtio_blk_device_realize(DeviceState *dev, Error **errp)
+     s->sector_mask = (s->conf.conf.logical_block_size / BDRV_SECTOR_SIZE) - 1;
+ 
+     for (i = 0; i < conf->num_queues; i++) {
+-        virtio_add_queue(vdev, 128, virtio_blk_handle_output);
++        virtio_add_queue(vdev, conf->queue_size, virtio_blk_handle_output);
      }
- 
- out:
--    for (bs = bdrv_first(&it); bs; bs = bdrv_next(&it)) {
--        aio_context_release(bdrv_get_aio_context(bs));
-+    for (ctx = aio_ctxs; ctx != NULL; ctx = ctx->next) {
-+        AioContext *aio_context = ctx->data;
-+        aio_context_release(aio_context);
-     }
-+    g_slist_free(aio_ctxs);
- 
-     return ret;
- }
+     virtio_blk_data_plane_create(vdev, conf, &s->dataplane, &err);
+     if (err != NULL) {
+@@ -1009,6 +1016,7 @@ static Property virtio_blk_properties[] = {
+     DEFINE_PROP_BIT("request-merging", VirtIOBlock, conf.request_merging, 0,
+                     true),
+     DEFINE_PROP_UINT16("num-queues", VirtIOBlock, conf.num_queues, 1),
++    DEFINE_PROP_UINT16("queue-size", VirtIOBlock, conf.queue_size, 128),
+     DEFINE_PROP_LINK("iothread", VirtIOBlock, conf.iothread, TYPE_IOTHREAD,
+                      IOThread *),
+     DEFINE_PROP_END_OF_LIST(),
 -- 
 2.14.3
