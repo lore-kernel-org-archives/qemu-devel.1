@@ -1,19 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51322)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56747)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1eRKKx-00029J-Vh
-	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 11:01:57 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1eRKQh-0004ud-0u
+	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 11:07:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1eRKKt-0007V9-JY
-	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 11:01:48 -0500
-Date: Tue, 19 Dec 2017 17:01:36 +0100
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20171219170136.239cd55b.cohuck@redhat.com>
-In-Reply-To: <20171219082807.84494-1-borntraeger@de.ibm.com>
-References: <20171219082807.84494-1-borntraeger@de.ibm.com>
+	(envelope-from <vsementsov@virtuozzo.com>) id 1eRKQf-0003KM-Ts
+	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 11:07:43 -0500
+References: <20171113162053.58795-1-vsementsov@virtuozzo.com>
+	<20171213041248.GB31040@lemon>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <af98ffe7-71fb-0493-c4da-4b77a4c453f5@virtuozzo.com>
+Date: Tue, 19 Dec 2017 19:07:29 +0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] s390x/sclp: fixup highest CPU address
+In-Reply-To: <20171213041248.GB31040@lemon>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
+Content-Language: en-US
+Subject: Re: [Qemu-devel] [PATCH for-2.12 0/4] qmp dirty bitmap API
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,36 +24,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Christian Borntraeger <borntraeger@de.ibm.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, qemu-s390x <qemu-s390x@nongnu.org>, Halil Pasic <pasic@linux.vnet.ibm.com>, Alexander Graf <agraf@suse.de>, Thomas Huth <thuth@redhat.com>, David Hildenbrand <david@redhat.com>, Richard Henderson <rth@twiddle.net>, "Jason J . Herne" <jjherne@linux.vnet.ibm.com>
+To: Fam Zheng <famz@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, kwolf@redhat.com, armbru@redhat.com, mnestratov@virtuozzo.com, mreitz@redhat.com, nshirokovskiy@virtuozzo.com, stefanha@redhat.com, den@openvz.org, pbonzini@redhat.com, jsnow@redhat.com, dev@acronis.com
 
-On Tue, 19 Dec 2017 09:28:07 +0100
-Christian Borntraeger <borntraeger@de.ibm.com> wrote:
+13.12.2017 07:12, Fam Zheng wrote:
+> On Mon, 11/13 19:20, Vladimir Sementsov-Ogievskiy wrote:
+>> Hi all.
+>>
+>> There are three qmp commands, needed to implement external backup API.
+>>
+>> Using these three commands, client may do all needed bitmap management b=
+y
+>> hand:
+>>
+>> on backup start we need to do a transaction:
+>>   {disable old bitmap, create new bitmap}
+>>
+>> on backup success:
+>>   drop old bitmap
+>>
+>> on backup fail:
+>>   enable old bitmap
+>>   merge new bitmap to old bitmap
+>>   drop new bitmap
+>>
+>> Question: it may be better to make one command instead of two:
+>> block-dirty-bitmap-set-enabled(bool enabled)
+>>
+>> Vladimir Sementsov-Ogievskiy (4):
+>>    block/dirty-bitmap: add lock to bdrv_enable/disable_dirty_bitmap
+>>    qapi: add block-dirty-bitmap-enable/disable
+>>    qmp: transaction support for block-dirty-bitmap-enable/disable
+>>    qapi: add block-dirty-bitmap-merge
+>>
+>>   qapi/block-core.json         |  80 +++++++++++++++++++++++
+>>   qapi/transaction.json        |   4 ++
+>>   include/block/dirty-bitmap.h |   2 +
+>>   block/dirty-bitmap.c         |  21 ++++++
+>>   blockdev.c                   | 151 +++++++++++++++++++++++++++++++++++=
+++++++++
+>>   5 files changed, 258 insertions(+)
+>>
+> I think tests are required to merge new features/commands.  Can we includ=
+e tests
+> on these new code please?  We should cover error handling, and also write=
+ tests
+> that demonstrate the intended real world use cases.
+>
+> Also should we add new sections to docs/interop/bitmaps.rst?
+>
+> Meta: John started a long discussion about the API design but I think aft=
+er all
+> it turns out exposing dirty bitmap objects and the primitives is a reason=
+able
+> approach to implement incremental backup functionalities. The comment I h=
+ave is
+> that we should ensure we have also reviewed it from a higher level (e.g. =
+all the
+> potential user requirements) to make sure this low level API is both soun=
+d and
+> flexible. We shouldn't introduce a minimal set of low level commands just=
+ to
+> support one particular use case, but look a bit further and broader and c=
+ome up
+> with a more complete design? Writing docs and tests might force us to thi=
+nk in
+> this direction, which I think is a good thing to have for this series, to=
+o.
+>
+> Fam
 
-> the highest cpu address is not the same as max_cpus. max_cpus
+Nikolay, please describe what do you plan in libvirt over qmp bitmap API.
 
-s/the/The/
+Kirill, what do you think about this all?
 
-> counts from 1 while the cpu address starts at 0.
-> 
-> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
-> Reviewed-by: Jason J. Herne <jjherne@linux.vnet.ibm.com>
-> ---
->  hw/s390x/sclp.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/hw/s390x/sclp.c b/hw/s390x/sclp.c
-> index 9be0cb80ad..21351ffffc 100644
-> --- a/hw/s390x/sclp.c
-> +++ b/hw/s390x/sclp.c
-> @@ -67,7 +67,7 @@ static void read_SCP_info(SCLPDevice *sclp, SCCB *sccb)
->      prepare_cpu_entries(sclp, read_info->entries, &cpu_count);
->      read_info->entries_cpu = cpu_to_be16(cpu_count);
->      read_info->offset_cpu = cpu_to_be16(offsetof(ReadInfo, entries));
-> -    read_info->highest_cpu = cpu_to_be16(max_cpus);
-> +    read_info->highest_cpu = cpu_to_be16(max_cpus - 1);
->  
->      read_info->ibc_val = cpu_to_be32(s390_get_ibc_val());
->  
+(brief history:
+we are considering 3 new qmp commands for bitmap management, needed for
+external incremental backup support
+ =C2=A0- enable (bitmap will track disk changes)
+ =C2=A0- disable (bitmap will stop tracking changes)
+ =C2=A0- merge (merge bitmap A to bitmap B)
+)
 
-Thanks, applied.
+--=20
+Best regards,
+Vladimir
