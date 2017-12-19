@@ -1,24 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53452)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56222)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1eR6a5-0002Gv-Mu
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 20:20:31 -0500
+	(envelope-from <aik@ozlabs.ru>) id 1eR6cb-0003uQ-Q9
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 20:23:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1eR6a4-0002xz-IX
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 20:20:29 -0500
-Date: Tue, 19 Dec 2017 12:18:47 +1100
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20171219011847.GH4786@umbus.fritz.box>
-References: <20171216224842.EE8C17456B3@zero.eik.bme.hu>
-	<20171218040946.GS7753@umbus.fritz.box>
-	<alpine.BSF.2.21.1712181329050.96474@zero.eik.bme.hu>
-	<730aec0f-3f10-55ea-eb26-e5740c2fbfe2@redhat.com>
+	(envelope-from <aik@ozlabs.ru>) id 1eR6cZ-0004dh-53
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 20:23:05 -0500
+Received: from mail-pf0-x229.google.com ([2607:f8b0:400e:c00::229]:35641)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <aik@ozlabs.ru>) id 1eR6cY-0004dB-Pa
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 20:23:03 -0500
+Received: by mail-pf0-x229.google.com with SMTP id j124so10480116pfc.2
+	for <qemu-devel@nongnu.org>; Mon, 18 Dec 2017 17:23:02 -0800 (PST)
+References: <20171218040852.13478.19208.stgit@gimli.home>
+	<20171218050253.13478.49457.stgit@gimli.home>
+	<f76b5d78-0107-cca8-5e72-ab9944c8a90b@ozlabs.ru>
+	<20171218062822.625b7469@w520.home>
+	<c472c115-3cfb-7ce0-62f3-13a026ccf02d@ozlabs.ru>
+	<20171218072800.58456558@w520.home>
+From: Alexey Kardashevskiy <aik@ozlabs.ru>
+Message-ID: <e087ecee-b42f-afcd-bfa5-7b9ee54301df@ozlabs.ru>
+Date: Tue, 19 Dec 2017 12:22:56 +1100
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="U3BNvdZEnlJXqmh+"
-Content-Disposition: inline
-In-Reply-To: <730aec0f-3f10-55ea-eb26-e5740c2fbfe2@redhat.com>
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH v2] hw/ide: Emulate SiI3112 SATA
- controller
+In-Reply-To: <20171218072800.58456558@w520.home>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-AU
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC/RFT PATCH 5/5] vfio/pci: Allow relocating
+ MSI-X MMIO
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,75 +35,183 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>
-Cc: BALATON Zoltan <balaton@eik.bme.hu>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+To: Alex Williamson <alex.williamson@redhat.com>
+Cc: qemu-devel@nongnu.org, eric.auger@redhat.com
+
+On 19/12/17 01:28, Alex Williamson wrote:
+> On Tue, 19 Dec 2017 00:55:32 +1100
+> Alexey Kardashevskiy <aik@ozlabs.ru> wrote:
+> 
+>> On 19/12/17 00:28, Alex Williamson wrote:
+>>> On Mon, 18 Dec 2017 20:04:23 +1100
+>>> Alexey Kardashevskiy <aik@ozlabs.ru> wrote:
+>>>   
+>>>> On 18/12/17 16:02, Alex Williamson wrote:  
+>>>>> With recently proposed kernel side vfio-pci changes, the MSI-X vector
+>>>>> table area can be mmap'd from userspace, allowing direct access to
+>>>>> non-MSI-X registers within the host page size of this area.  However,
+>>>>> we only get that direct access if QEMU isn't also emulating MSI-X
+>>>>> within that same page.  For x86/64 host, the system page size is 4K
+>>>>> and the PCI spec recommends a minimum of 4K to 8K alignment to
+>>>>> separate MSI-X from non-MSI-X registers, therefore only devices which
+>>>>> don't honor this recommendation would see any improvement from this
+>>>>> option.  The real targets for this feature are hosts where the page
+>>>>> size exceeds the PCI spec recommended alignment, such as ARM64 systems
+>>>>> with 64K pages.
+>>>>>
+>>>>> This new x-msix-relocation option accepts the following options:
+>>>>>
+>>>>>   off: Disable MSI-X relocation, use native device config (default)
+>>>>>   auto: Automaically relocate MSI-X MMIO to another BAR or offset
+>>>>>        based on minimum additional MMIO requirement
+>>>>>   bar0..bar5: Specify the target BAR, which will either be extended
+>>>>>        if the BAR exists or added if the BAR slot is available.    
+>>>>
+>>>>
+>>>> While I am digesting the patchset, here are some test results.  
+>>>
+>>> Thanks for testing!
+>>>   
+>>>> This is the device:
+>>>>
+>>>> 00:00.0 Serial Attached SCSI controller: LSI Logic / Symbios Logic SAS3008
+>>>> PCI-Express Fusion-MPT SAS-3 (rev 02)  
+>>>
+>>> BAR1:
+>>>   
+>>>> Memory at 210000000000 (64-bit, non-prefetchable) [size=64K]  
+>>>
+>>> BAR3:
+>>>   
+>>>> Memory at 210000040000 (64-bit, non-prefetchable) [size=256K]
+>>>>
+>>>> Capabilities: [c0] MSI-X: Enable+ Count=96 Masked-
+>>>>         Vector table: BAR=1 offset=0000e000
+>>>>         PBA: BAR=1 offset=0000f000
+>>>>
+>>>>
+>>>> Test #1: x-msix-relocation = "off":
+>>>>
+>>>> FlatView #1
+>>>>  AS "memory", root: system
+>>>>  AS "cpu-memory", root: system
+>>>>  Root memory region: system
+>>>>   0000000000000000-000000007fffffff (prio 0, ram): ppc_spapr.ram
+>>>>   0000210000000000-000021000000dfff (prio 0, i/o): 0001:03:00.0 BAR 1
+>>>>   000021000000e000-000021000000e5ff (prio 0, i/o): msix-table
+>>>>   000021000000e600-000021000000ffff (prio 0, i/o): 0001:03:00.0 BAR 1
+>>>> @000000000000e600
+>>>>   0000210000040000-000021000007ffff (prio 0, ramd): 0001:03:00.0 BAR 3 mmaps[0]
+>>>>
+>>>> Ok, works.
+>>>>
+>>>>
+>>>> Test #2: x-msix-relocation = "auto":
+>>>>
+>>>> FlatView #2
+>>>>  AS "memory", root: system
+>>>>  AS "cpu-memory", root: system
+>>>>  Root memory region: system
+>>>>   0000000000000000-000000007fffffff (prio 0, ram): ppc_spapr.ram
+>>>>   0000200080000000-00002000800005ff (prio 0, i/o): msix-table
+>>>>   0000200080000600-000020008000ffff (prio 1, i/o): 0001:03:00.0 base BAR 0
+>>>> @0000000000000600
+>>>>   0000210000000000-000021000000ffff (prio 0, i/o): 0001:03:00.0 BAR 1
+>>>>   0000210000040000-000021000007ffff (prio 0, ramd): 0001:03:00.0 BAR 3 mmaps[0]
+>>>>
+>>>>
+>>>> The guest fails probing because the first 64bit BAR is broken.
+>>>>
+>>>> lspci:
+>>>>
+>>>> Region 0: Memory at 200080000000 (32-bit, prefetchable) [size=64K]
+>>>> Region 1: Memory at 210000000000 (64-bit, non-prefetchable) [size=64K]
+>>>> Region 3: Memory at 210000040000 (64-bit, non-prefetchable) [size=256K]
+>>>>
+>>>> Capabilities: [c0] MSI-X: Enable- Count=96 Masked-
+>>>>         Vector table: BAR=0 offset=00000000
+>>>>         PBA: BAR=0 offset=00000600  
+>>>
+>>> Why do you suppose it's broken?  The added BAR0 is 32bit, it cannot be
+>>> 64bit since BAR1 is implemented.  I don't see anything fundamentally
+>>> different between this and the working BAR5 test below.  
+>>
+>>
+>> BAR1 (0x14..0x17) uses BAR0 (0x10..0x13) as upper 32bits when it is 64bit
+>> BAR, no?
+> 
+> AIUI, if BAR1 is 64bit, it consumes 0x14-0x17 for the lower 32bis and
+> 0x18-1b for the upper 32bits, ie. it consumes BAR1 + BAR2.  Likewise
+> the 64bit BAR3 also consumes BAR4.  See for instance the 82576
+> datasheet:
+> 
+> https://www.intel.com/content/dam/www/public/us/en/documents/datasheets/82576eb-gigabit-ethernet-controller-datasheet.pdf
+> 
+> 9.4.11.2 shows the BAR configuration in 64bit mode, 64bit BAR0 consumes
+> BAR0 (lower) + BAR1 (upper), 64bit BAR2 consumes BAR2 (lower) + BAR3
+> (upper), and the MSI-X BAR becomes 64bit at BAR4, consuming BAR4
+> (lower) + BAR5 (upper).  lspci would show this as Region 0, 2, 4.  The
+> layout of your SAS card does seem poorly thought out that they've
+> essentially precluded a 3rd 64bit BAR by starting with BAR1, but
+> perhaps it's for compatibility with an equally poorly designed 32bit
+> version of the device.  Thanks,
 
 
---U3BNvdZEnlJXqmh+
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Ah, makes sense, I just never saw 64bit BARs starting from an odd offset.
+My card is weird^Wunusual then:
 
-On Mon, Dec 18, 2017 at 01:33:07PM -0500, John Snow wrote:
->=20
->=20
-> On 12/18/2017 07:30 AM, BALATON Zoltan wrote:
-> > On Mon, 18 Dec 2017, David Gibson wrote:
-> >> On Sat, Dec 16, 2017 at 11:42:39PM +0100, BALATON Zoltan wrote:
-> >>> This is a common generic PCI SATA controller that is also used in PCs
-> >>> but more importantly guests running on the Sam460ex board prefer this
-> >>> card and have a driver for it (unlike for other SATA controllers
-> >>> already emulated).
-> >>>
-> >>> Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
-> >>
-> >> I don't know enough about IDE to give this any more than a quick check
-> >> for anything obviously bogus looking.=A0 So,
-> >>
-> >> Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
-> >>
-> >> John, can you take this through your tree, or should I take it through
-> >> the ppc tree?
-> >=20
-> > I think he said before it can go via ppc tree:
-> >=20
-> > http://lists.nongnu.org/archive/html/qemu-devel/2017-08/msg04480.html
-> >=20
->=20
-> Yep, I tend to use Acked-by to indicate that it's okay for you to stage.
-> I'll give it another look-over in a minute, but I'm fine with adding the
-> model in general, even if it's not quite complete just yet.
->=20
-> (More musings: we really ought to have a way to indicate to QEMU
-> programmatically which devices we think are supported, which are
-> experimental, and which are rudimentary.)
 
-Ok, I've taken it into my tree.
+aik@stratton2:~$ lspci -vbxs 0001:03:00.0
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
+0001:03:00.0 Serial Attached SCSI controller: LSI Logic / Symbios Logic
+SAS3008 PCI-Express Fusion-MPT SAS-3 (rev
+02)
+        Subsystem: Super Micro Computer Inc SAS3008 PCI-Express Fusion-MPT
+SAS-3
+        Flags: bus master, fast devsel, latency 0
+        I/O ports at <unassigned> [disabled]
+        Memory at 80140000 (64-bit, non-prefetchable)
+        Memory at 80100000 (64-bit, non-prefetchable)
+        Capabilities: <access denied>
+        Kernel driver in use: vfio-pci
+        Kernel modules: mpt3sas
+00: 00 10 97 00 46 05 10 00 02 00 07 01 00 00 00 00
+10: 01 00 00 00 04 00 14 80 00 00 00 00 04 00 10 80
+20: 00 00 00 00 00 00 00 00 00 00 00 00 d9 15 08 08
+30: 00 00 00 00 50 00 00 00 00 00 00 00 00 01 00 00
 
---U3BNvdZEnlJXqmh+
-Content-Type: application/pgp-signature; name="signature.asc"
 
------BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlo4aPQACgkQbDjKyiDZ
-s5KMNA/8CV4D28PL36jvECN/Z0zT6YAW1bPbQORJ/Zq4w0FTKeao78nxMDUztNLp
-Ahl1ArA/nT+7n0cMhQIU5HlHmJL3mz2zJq22c8mAhuh0QlF1aJ5lbxl0cMAqnifL
-VvYVF1KdpsS5UHjMt9uTihYwjbXe47Q9yHS305qYf4gfM7bNXXMgYUKc2EI41Z4v
-90225soEAScNJY2q8P8Np2BEyvVZdpsQOjGpKxLugp7L/nENI5b3nzqI4BcCdkqD
-feEbmR3ZG0py+YFkxytvoLIu97+WdIvwN+C0zHMG+xFPOLLgzol3fKaxMQ5e9D+T
-rRd0RXqnrJsXq1yjz2QOFRGITKD+bBrKRaSwTrS+mbL2LeOteZcrighL9zCs233e
-n4DqYnHbxMx1zG7hFsLKjMS7BnULGfcCzy+gilqbmTSpvJb60qJ2FoxdyNuuygqg
-lGfWBUMENQPcjYlg66ZL5zovnP8a+S3gZOKc8yuYfAOY2kYJUx5FqECFkaoFghB3
-NvYM6shvPtDj0d1Umjcwt0Sd2yWAe+r7zcF/ZrRo8YXnpIi9HT08R6iFXN3w7W/F
-vN2xPNdsHz6YnHzzYDpEHlrWuzJx9cRiIx/uFuu1glNgcPanb9oT0gAJ2kTB5bQ5
-dr30lrCiDEF/Hlt8T7D/4/0jIceMdybHTUpYYJZfR6vFEOEIB7Y=
-=ZtIk
------END PGP SIGNATURE-----
+The mpt3sas driver is funny too - it fails probing with MSIX in bar0 but
+succeeds with bar5.
 
---U3BNvdZEnlJXqmh+--
+Region 1: Memory at 210000000000 (64-bit, non-prefetchable)
+Region 3: Memory at 210000040000 (64-bit, non-prefetchable)
+Region 5: Memory at 80000000 (32-bit, prefetchable)
+Capabilities: [c0] MSI-X: Enable+ Count=96 Masked-
+        Vector table: BAR=5 offset=00000000
+        PBA: BAR=5 offset=00000600
+
+
+vs.
+
+Region 0: Memory at 80000000 (32-bit, prefetchable)
+Region 1: Memory at 210000000000 (64-bit, non-prefetchable)
+Region 3: Memory at 210000040000 (64-bit, non-prefetchable)
+Capabilities: [c0] MSI-X: Enable- Count=96 Masked-
+        Vector table: BAR=0 offset=00000000
+        PBA: BAR=0 offset=00000600
+
+
+Here is why:
+
+https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/drivers/scsi/mpt3sas/mpt3sas_base.c?h=v4.15-rc4#n2608
+
+It is looking for a first MMIO BAR and assumes it is the one which
+implements the basic registers including doorbell. I am not so sure this is
+that unusual.
+
+
+
+-- 
+Alexey
