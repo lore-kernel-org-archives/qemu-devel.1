@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34800)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34686)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1eR9XX-0001FF-6o
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 23:30:06 -0500
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1eR9XS-0007tj-Ua
+	(envelope-from <dgibson@ozlabs.org>) id 1eR9XU-0001Ay-0k
 	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 23:30:03 -0500
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <dgibson@ozlabs.org>) id 1eR9XQ-0007qi-Ax
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 23:29:59 -0500
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Tue, 19 Dec 2017 15:29:42 +1100
-Message-Id: <20171219042942.29297-15-david@gibson.dropbear.id.au>
+Date: Tue, 19 Dec 2017 15:29:37 +1100
+Message-Id: <20171219042942.29297-10-david@gibson.dropbear.id.au>
 In-Reply-To: <20171219042942.29297-1-david@gibson.dropbear.id.au>
 References: <20171219042942.29297-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PULL 14/14] hw/ide: Emulate SiI3112 SATA controller
+Subject: [Qemu-devel] [PULL 09/14] spapr: Validate capabilities on migration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,450 +20,219 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: groug@kaod.org, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, mdroth@linux.vnet.ibm.com, BALATON Zoltan <balaton@eik.bme.hu>, David Gibson <david@gibson.dropbear.id.au>
+Cc: groug@kaod.org, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, mdroth@linux.vnet.ibm.com, David Gibson <david@gibson.dropbear.id.au>
 
-From: BALATON Zoltan <balaton@eik.bme.hu>
+Now that the "pseries" machine type implements optional capabilities (well,
+one so far) there's the possibility of having different capabilities
+available at either end of a migration.  Although arguably a user error,
+it would be nice to catch this situation and fail as gracefully as we can.
 
-This is a common generic PCI SATA controller that is also used in PCs
-but more importantly guests running on the Sam460ex board prefer this
-card and have a driver for it (unlike for other SATA controllers
-already emulated).
+This adds code to migrate the capabilities flags.  These aren't pulled
+directly into the destination's configuration since what the user has
+specified on the destination command line should take precedence.  However,
+they are checked against the destination capabilities.
 
-Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
+If the source was using a capability which is absent on the destination,
+we fail the migration, since that could easily cause a guest crash or other
+bad behaviour.  If the source lacked a capability which is present on the
+destination we warn, but allow the migration to proceed.
+
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+Reviewed-by: Greg Kurz <groug@kaod.org>
 ---
- MAINTAINERS                        |   6 +
- default-configs/ppcemb-softmmu.mak |   1 +
- hw/ide/Makefile.objs               |   1 +
- hw/ide/sii3112.c                   | 368 +++++++++++++++++++++++++++++++++++++
- hw/ide/trace-events                |   5 +
- 5 files changed, 381 insertions(+)
- create mode 100644 hw/ide/sii3112.c
+ hw/ppc/spapr.c         |  6 ++++
+ hw/ppc/spapr_caps.c    | 96 ++++++++++++++++++++++++++++++++++++++++++++++++--
+ include/hw/ppc/spapr.h |  6 ++++
+ 3 files changed, 105 insertions(+), 3 deletions(-)
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 8859a50c36..399ba2c94b 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -765,6 +765,12 @@ L: qemu-ppc@nongnu.org
- S: Odd Fixes
- F: hw/ppc/virtex_ml507.c
+diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+index f8fee8ebcf..86fc83f9c2 100644
+--- a/hw/ppc/spapr.c
++++ b/hw/ppc/spapr.c
+@@ -1589,6 +1589,11 @@ static int spapr_post_load(void *opaque, int version_id)
+     sPAPRMachineState *spapr = (sPAPRMachineState *)opaque;
+     int err = 0;
  
-+sam460ex
-+M: BALATON Zoltan <balaton@eik.bme.hu>
-+L: qemu-ppc@nongnu.org
-+S: Maintained
-+F: hw/ide/sii3112.c
-+
- SH4 Machines
- ------------
- R2D
-diff --git a/default-configs/ppcemb-softmmu.mak b/default-configs/ppcemb-softmmu.mak
-index 13917fb7a3..5db4618a5a 100644
---- a/default-configs/ppcemb-softmmu.mak
-+++ b/default-configs/ppcemb-softmmu.mak
-@@ -16,3 +16,4 @@ CONFIG_I8259=y
- CONFIG_XILINX=y
- CONFIG_XILINX_ETHLITE=y
- CONFIG_SM501=y
-+CONFIG_IDE_SII3112=y
-diff --git a/hw/ide/Makefile.objs b/hw/ide/Makefile.objs
-index f0edca3300..fc328ffbe8 100644
---- a/hw/ide/Makefile.objs
-+++ b/hw/ide/Makefile.objs
-@@ -11,3 +11,4 @@ common-obj-$(CONFIG_MICRODRIVE) += microdrive.o
- common-obj-$(CONFIG_AHCI) += ahci.o
- common-obj-$(CONFIG_AHCI) += ich.o
- common-obj-$(CONFIG_ALLWINNER_A10) += ahci-allwinner.o
-+common-obj-$(CONFIG_IDE_SII3112) += sii3112.o
-diff --git a/hw/ide/sii3112.c b/hw/ide/sii3112.c
-new file mode 100644
-index 0000000000..e2f5562bb7
---- /dev/null
-+++ b/hw/ide/sii3112.c
-@@ -0,0 +1,368 @@
-+/*
-+ * QEMU SiI3112A PCI to Serial ATA Controller Emulation
-+ *
-+ * Copyright (C) 2017 BALATON Zoltan <balaton@eik.bme.hu>
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or later.
-+ * See the COPYING file in the top-level directory.
-+ *
-+ */
-+
-+/* For documentation on this and similar cards see:
-+ * http://wiki.osdev.org/User:Quok/Silicon_Image_Datasheets
-+ */
-+
-+#include <qemu/osdep.h>
-+#include <hw/ide/pci.h>
-+#include "trace.h"
-+
-+#define TYPE_SII3112_PCI "sii3112"
-+#define SII3112_PCI(obj) OBJECT_CHECK(SiI3112PCIState, (obj), \
-+                         TYPE_SII3112_PCI)
-+
-+typedef struct SiI3112Regs {
-+    uint32_t confstat;
-+    uint32_t scontrol;
-+    uint16_t sien;
-+    uint8_t swdata;
-+} SiI3112Regs;
-+
-+typedef struct SiI3112PCIState {
-+    PCIIDEState i;
-+    MemoryRegion mmio;
-+    SiI3112Regs regs[2];
-+} SiI3112PCIState;
-+
-+/* The sii3112_reg_read and sii3112_reg_write functions implement the
-+ * Internal Register Space - BAR5 (section 6.7 of the data sheet).
-+ */
-+
-+static uint64_t sii3112_reg_read(void *opaque, hwaddr addr,
-+                                unsigned int size)
-+{
-+    SiI3112PCIState *d = opaque;
-+    uint64_t val = 0;
-+
-+    switch (addr) {
-+    case 0x00:
-+        val = d->i.bmdma[0].cmd;
-+        break;
-+    case 0x01:
-+        val = d->regs[0].swdata;
-+        break;
-+    case 0x02:
-+        val = d->i.bmdma[0].status;
-+        break;
-+    case 0x03:
-+        val = 0;
-+        break;
-+    case 0x04 ... 0x07:
-+        val = bmdma_addr_ioport_ops.read(&d->i.bmdma[0], addr - 4, size);
-+        break;
-+    case 0x08:
-+        val = d->i.bmdma[1].cmd;
-+        break;
-+    case 0x09:
-+        val = d->regs[1].swdata;
-+        break;
-+    case 0x0a:
-+        val = d->i.bmdma[1].status;
-+        break;
-+    case 0x0b:
-+        val = 0;
-+        break;
-+    case 0x0c ... 0x0f:
-+        val = bmdma_addr_ioport_ops.read(&d->i.bmdma[1], addr - 12, size);
-+        break;
-+    case 0x10:
-+        val = d->i.bmdma[0].cmd;
-+        val |= (d->regs[0].confstat & (1UL << 11) ? (1 << 4) : 0); /*SATAINT0*/
-+        val |= (d->regs[1].confstat & (1UL << 11) ? (1 << 6) : 0); /*SATAINT1*/
-+        val |= (d->i.bmdma[1].status & BM_STATUS_INT ? (1 << 14) : 0);
-+        val |= d->i.bmdma[0].status << 16;
-+        val |= d->i.bmdma[1].status << 24;
-+        break;
-+    case 0x18:
-+        val = d->i.bmdma[1].cmd;
-+        val |= (d->regs[1].confstat & (1UL << 11) ? (1 << 4) : 0);
-+        val |= d->i.bmdma[1].status << 16;
-+        break;
-+    case 0x80 ... 0x87:
-+        if (size == 1) {
-+            val = ide_ioport_read(&d->i.bus[0], addr - 0x80);
-+        } else if (addr == 0x80) {
-+            val = (size == 2) ? ide_data_readw(&d->i.bus[0], 0) :
-+                                ide_data_readl(&d->i.bus[0], 0);
-+        } else {
-+            val = (1ULL << (size * 8)) - 1;
-+        }
-+        break;
-+    case 0x8a:
-+        val = (size == 1) ? ide_status_read(&d->i.bus[0], 4) :
-+                            (1ULL << (size * 8)) - 1;
-+        break;
-+    case 0xa0:
-+        val = d->regs[0].confstat;
-+        break;
-+    case 0xc0 ... 0xc7:
-+        if (size == 1) {
-+            val = ide_ioport_read(&d->i.bus[1], addr - 0xc0);
-+        } else if (addr == 0xc0) {
-+            val = (size == 2) ? ide_data_readw(&d->i.bus[1], 0) :
-+                                ide_data_readl(&d->i.bus[1], 0);
-+        } else {
-+            val = (1ULL << (size * 8)) - 1;
-+        }
-+        break;
-+    case 0xca:
-+        val = (size == 1) ? ide_status_read(&d->i.bus[0], 4) :
-+                            (1ULL << (size * 8)) - 1;
-+        break;
-+    case 0xe0:
-+        val = d->regs[1].confstat;
-+        break;
-+    case 0x100:
-+        val = d->regs[0].scontrol;
-+        break;
-+    case 0x104:
-+        val = (d->i.bus[0].ifs[0].blk) ? 0x113 : 0;
-+        break;
-+    case 0x148:
-+        val = d->regs[0].sien << 16;
-+        break;
-+    case 0x180:
-+        val = d->regs[1].scontrol;
-+        break;
-+    case 0x184:
-+        val = (d->i.bus[1].ifs[0].blk) ? 0x113 : 0;
-+        break;
-+    case 0x1c8:
-+        val = d->regs[1].sien << 16;
-+        break;
-+    default:
-+        val = 0;
++    err = spapr_caps_post_migration(spapr);
++    if (err) {
++        return err;
 +    }
-+    trace_sii3112_read(size, addr, val);
-+    return val;
++
+     if (!object_dynamic_cast(OBJECT(spapr->ics), TYPE_ICS_KVM)) {
+         CPUState *cs;
+         CPU_FOREACH(cs) {
+@@ -1755,6 +1760,7 @@ static const VMStateDescription vmstate_spapr = {
+         &vmstate_spapr_ov5_cas,
+         &vmstate_spapr_patb_entry,
+         &vmstate_spapr_pending_events,
++        &vmstate_spapr_caps,
+         NULL
+     }
+ };
+diff --git a/hw/ppc/spapr_caps.c b/hw/ppc/spapr_caps.c
+index 3b35b91a5b..cad40fe49a 100644
+--- a/hw/ppc/spapr_caps.c
++++ b/hw/ppc/spapr_caps.c
+@@ -22,6 +22,7 @@
+  * THE SOFTWARE.
+  */
+ #include "qemu/osdep.h"
++#include "qemu/error-report.h"
+ #include "qapi/error.h"
+ #include "qapi/visitor.h"
+ #include "sysemu/hw_accel.h"
+@@ -83,6 +84,93 @@ static sPAPRCapabilities default_caps_with_cpu(sPAPRMachineState *spapr,
+     return caps;
+ }
+ 
++static bool spapr_caps_needed(void *opaque)
++{
++    sPAPRMachineState *spapr = opaque;
++
++    return (spapr->forced_caps.mask != 0) || (spapr->forbidden_caps.mask != 0);
 +}
 +
-+static void sii3112_reg_write(void *opaque, hwaddr addr,
-+                              uint64_t val, unsigned int size)
++/* This has to be called from the top-level spapr post_load, not the
++ * caps specific one.  Otherwise it wouldn't be called when the source
++ * caps are all defaults, which could still conflict with overridden
++ * caps on the destination */
++int spapr_caps_post_migration(sPAPRMachineState *spapr)
 +{
-+    SiI3112PCIState *d = opaque;
++    uint64_t allcaps = 0;
++    int i;
++    bool ok = true;
++    sPAPRCapabilities dstcaps = spapr->effective_caps;
++    sPAPRCapabilities srccaps;
 +
-+    trace_sii3112_write(size, addr, val);
-+    switch (addr) {
-+    case 0x00:
-+    case 0x10:
-+        bmdma_cmd_writeb(&d->i.bmdma[0], val);
-+        break;
-+    case 0x01:
-+    case 0x11:
-+        d->regs[0].swdata = val & 0x3f;
-+        break;
-+    case 0x02:
-+    case 0x12:
-+        d->i.bmdma[0].status = (val & 0x60) | (d->i.bmdma[0].status & 1) |
-+                               (d->i.bmdma[0].status & ~val & 6);
-+        break;
-+    case 0x04 ... 0x07:
-+        bmdma_addr_ioport_ops.write(&d->i.bmdma[0], addr - 4, val, size);
-+        break;
-+    case 0x08:
-+    case 0x18:
-+        bmdma_cmd_writeb(&d->i.bmdma[1], val);
-+        break;
-+    case 0x09:
-+    case 0x19:
-+        d->regs[1].swdata = val & 0x3f;
-+        break;
-+    case 0x0a:
-+    case 0x1a:
-+        d->i.bmdma[1].status = (val & 0x60) | (d->i.bmdma[1].status & 1) |
-+                               (d->i.bmdma[1].status & ~val & 6);
-+        break;
-+    case 0x0c ... 0x0f:
-+        bmdma_addr_ioport_ops.write(&d->i.bmdma[1], addr - 12, val, size);
-+        break;
-+    case 0x80 ... 0x87:
-+        if (size == 1) {
-+            ide_ioport_write(&d->i.bus[0], addr - 0x80, val);
-+        } else if (addr == 0x80) {
-+            if (size == 2) {
-+                ide_data_writew(&d->i.bus[0], 0, val);
-+            } else {
-+                ide_data_writel(&d->i.bus[0], 0, val);
-+            }
++    srccaps = default_caps_with_cpu(spapr, first_cpu);
++    srccaps.mask |= spapr->mig_forced_caps.mask;
++    srccaps.mask &= ~spapr->mig_forbidden_caps.mask;
++
++    for (i = 0; i < ARRAY_SIZE(capability_table); i++) {
++        sPAPRCapabilityInfo *info = &capability_table[i];
++
++        allcaps |= info->flag;
++
++        if ((srccaps.mask & info->flag) && !(dstcaps.mask & info->flag)) {
++            error_report("cap-%s=on in incoming stream, but off in destination",
++                         info->name);
++            ok = false;
 +        }
-+        break;
-+    case 0x8a:
-+        if (size == 1) {
-+            ide_cmd_write(&d->i.bus[0], 4, val);
++
++        if (!(srccaps.mask & info->flag) && (dstcaps.mask & info->flag)) {
++            warn_report("cap-%s=off in incoming stream, but on in destination",
++                         info->name);
 +        }
-+        break;
-+    case 0xc0 ... 0xc7:
-+        if (size == 1) {
-+            ide_ioport_write(&d->i.bus[1], addr - 0xc0, val);
-+        } else if (addr == 0xc0) {
-+            if (size == 2) {
-+                ide_data_writew(&d->i.bus[1], 0, val);
-+            } else {
-+                ide_data_writel(&d->i.bus[1], 0, val);
-+            }
-+        }
-+        break;
-+    case 0xca:
-+        if (size == 1) {
-+            ide_cmd_write(&d->i.bus[1], 4, val);
-+        }
-+        break;
-+    case 0x100:
-+        d->regs[0].scontrol = val & 0xfff;
-+        if (val & 1) {
-+            ide_bus_reset(&d->i.bus[0]);
-+        }
-+        break;
-+    case 0x148:
-+        d->regs[0].sien = (val >> 16) & 0x3eed;
-+        break;
-+    case 0x180:
-+        d->regs[1].scontrol = val & 0xfff;
-+        if (val & 1) {
-+            ide_bus_reset(&d->i.bus[1]);
-+        }
-+        break;
-+    case 0x1c8:
-+        d->regs[1].sien = (val >> 16) & 0x3eed;
-+        break;
-+    default:
-+        val = 0;
 +    }
++
++    if (spapr->mig_forced_caps.mask & ~allcaps) {
++        error_report(
++            "Unknown capabilities 0x%"PRIx64" enabled in incoming stream",
++            spapr->mig_forced_caps.mask & ~allcaps);
++        ok = false;
++    }
++    if (spapr->mig_forbidden_caps.mask & ~allcaps) {
++        warn_report(
++            "Unknown capabilities 0x%"PRIx64" disabled in incoming stream",
++            spapr->mig_forbidden_caps.mask & ~allcaps);
++    }
++
++    return ok ? 0 : -EINVAL;
 +}
 +
-+static const MemoryRegionOps sii3112_reg_ops = {
-+    .read = sii3112_reg_read,
-+    .write = sii3112_reg_write,
-+    .endianness = DEVICE_LITTLE_ENDIAN,
++static int spapr_caps_pre_save(void *opaque)
++{
++    sPAPRMachineState *spapr = opaque;
++
++    spapr->mig_forced_caps = spapr->forced_caps;
++    spapr->mig_forbidden_caps = spapr->forbidden_caps;
++    return 0;
++}
++
++static int spapr_caps_pre_load(void *opaque)
++{
++    sPAPRMachineState *spapr = opaque;
++
++    spapr->mig_forced_caps = spapr_caps(0);
++    spapr->mig_forbidden_caps = spapr_caps(0);
++    return 0;
++}
++
++const VMStateDescription vmstate_spapr_caps = {
++    .name = "spapr/caps",
++    .version_id = 1,
++    .minimum_version_id = 1,
++    .needed = spapr_caps_needed,
++    .pre_save = spapr_caps_pre_save,
++    .pre_load = spapr_caps_pre_load,
++    .fields = (VMStateField[]) {
++        VMSTATE_UINT64(mig_forced_caps.mask, sPAPRMachineState),
++        VMSTATE_UINT64(mig_forbidden_caps.mask, sPAPRMachineState),
++        VMSTATE_END_OF_LIST()
++    },
 +};
 +
-+/* the PCI irq level is the logical OR of the two channels */
-+static void sii3112_update_irq(SiI3112PCIState *s)
-+{
-+    int i, set = 0;
-+
-+    for (i = 0; i < 2; i++) {
-+        set |= s->regs[i].confstat & (1UL << 11);
-+    }
-+    pci_set_irq(PCI_DEVICE(s), (set ? 1 : 0));
-+}
-+
-+static void sii3112_set_irq(void *opaque, int channel, int level)
-+{
-+    SiI3112PCIState *s = opaque;
-+
-+    trace_sii3112_set_irq(channel, level);
-+    if (level) {
-+        s->regs[channel].confstat |= (1UL << 11);
-+    } else {
-+        s->regs[channel].confstat &= ~(1UL << 11);
-+    }
-+
-+    sii3112_update_irq(s);
-+}
-+
-+static void sii3112_reset(void *opaque)
-+{
-+    SiI3112PCIState *s = opaque;
-+    int i;
-+
-+    for (i = 0; i < 2; i++) {
-+        s->regs[i].confstat = 0x6515 << 16;
-+        ide_bus_reset(&s->i.bus[i]);
-+    }
-+}
-+
-+static void sii3112_pci_realize(PCIDevice *dev, Error **errp)
-+{
-+    SiI3112PCIState *d = SII3112_PCI(dev);
-+    PCIIDEState *s = PCI_IDE(dev);
-+    MemoryRegion *mr;
-+    qemu_irq *irq;
-+    int i;
-+
-+    pci_config_set_interrupt_pin(dev->config, 1);
-+    pci_set_byte(dev->config + PCI_CACHE_LINE_SIZE, 8);
-+
-+    /* BAR5 is in PCI memory space */
-+    memory_region_init_io(&d->mmio, OBJECT(d), &sii3112_reg_ops, d,
-+                         "sii3112.bar5", 0x200);
-+    pci_register_bar(dev, 5, PCI_BASE_ADDRESS_SPACE_MEMORY, &d->mmio);
-+
-+    /* BAR0-BAR4 are PCI I/O space aliases into BAR5 */
-+    mr = g_new(MemoryRegion, 1);
-+    memory_region_init_alias(mr, OBJECT(d), "sii3112.bar0", &d->mmio, 0x80, 8);
-+    pci_register_bar(dev, 0, PCI_BASE_ADDRESS_SPACE_IO, mr);
-+    mr = g_new(MemoryRegion, 1);
-+    memory_region_init_alias(mr, OBJECT(d), "sii3112.bar1", &d->mmio, 0x88, 4);
-+    pci_register_bar(dev, 1, PCI_BASE_ADDRESS_SPACE_IO, mr);
-+    mr = g_new(MemoryRegion, 1);
-+    memory_region_init_alias(mr, OBJECT(d), "sii3112.bar2", &d->mmio, 0xc0, 8);
-+    pci_register_bar(dev, 2, PCI_BASE_ADDRESS_SPACE_IO, mr);
-+    mr = g_new(MemoryRegion, 1);
-+    memory_region_init_alias(mr, OBJECT(d), "sii3112.bar3", &d->mmio, 0xc8, 4);
-+    pci_register_bar(dev, 3, PCI_BASE_ADDRESS_SPACE_IO, mr);
-+    mr = g_new(MemoryRegion, 1);
-+    memory_region_init_alias(mr, OBJECT(d), "sii3112.bar4", &d->mmio, 0, 16);
-+    pci_register_bar(dev, 4, PCI_BASE_ADDRESS_SPACE_IO, mr);
-+
-+    irq = qemu_allocate_irqs(sii3112_set_irq, d, 2);
-+    for (i = 0; i < 2; i++) {
-+        ide_bus_new(&s->bus[i], sizeof(s->bus[i]), DEVICE(dev), i, 1);
-+        ide_init2(&s->bus[i], irq[i]);
-+
-+        bmdma_init(&s->bus[i], &s->bmdma[i], s);
-+        s->bmdma[i].bus = &s->bus[i];
-+        ide_register_restart_cb(&s->bus[i]);
-+    }
-+    qemu_register_reset(sii3112_reset, s);
-+}
-+
-+static void sii3112_pci_exitfn(PCIDevice *dev)
-+{
-+    PCIIDEState *d = PCI_IDE(dev);
-+    int i;
-+
-+    for (i = 0; i < 2; ++i) {
-+        memory_region_del_subregion(&d->bmdma_bar, &d->bmdma[i].extra_io);
-+        memory_region_del_subregion(&d->bmdma_bar, &d->bmdma[i].addr_ioport);
-+    }
-+}
-+
-+static void sii3112_pci_class_init(ObjectClass *klass, void *data)
-+{
-+    DeviceClass *dc = DEVICE_CLASS(klass);
-+    PCIDeviceClass *pd = PCI_DEVICE_CLASS(klass);
-+
-+    pd->vendor_id = 0x1095;
-+    pd->device_id = 0x3112;
-+    pd->class_id = PCI_CLASS_STORAGE_RAID;
-+    pd->revision = 1;
-+    pd->realize = sii3112_pci_realize;
-+    pd->exit = sii3112_pci_exitfn;
-+    dc->desc = "SiI3112A SATA controller";
-+    set_bit(DEVICE_CATEGORY_STORAGE, dc->categories);
-+}
-+
-+static const TypeInfo sii3112_pci_info = {
-+    .name = TYPE_SII3112_PCI,
-+    .parent = TYPE_PCI_IDE,
-+    .instance_size = sizeof(SiI3112PCIState),
-+    .class_init = sii3112_pci_class_init,
-+};
-+
-+static void sii3112_register_types(void)
-+{
-+    type_register_static(&sii3112_pci_info);
-+}
-+
-+type_init(sii3112_register_types)
-diff --git a/hw/ide/trace-events b/hw/ide/trace-events
-index 601bd97d81..0c39cabe72 100644
---- a/hw/ide/trace-events
-+++ b/hw/ide/trace-events
-@@ -37,6 +37,11 @@ bmdma_addr_write(uint64_t data) "data: 0x%016"PRIx64
- bmdma_read(uint64_t addr, uint8_t val) "bmdma: readb 0x%"PRIx64" : 0x%02x"
- bmdma_write(uint64_t addr, uint64_t val) "bmdma: writeb 0x%"PRIx64" : 0x%02"PRIx64
+ void spapr_caps_reset(sPAPRMachineState *spapr)
+ {
+     Error *local_err = NULL;
+@@ -92,6 +180,11 @@ void spapr_caps_reset(sPAPRMachineState *spapr)
+     /* First compute the actual set of caps we're running with.. */
+     caps = default_caps_with_cpu(spapr, first_cpu);
  
-+# hw/ide/sii3112.c
-+sii3112_read(int size, uint64_t addr, uint64_t val) "bmdma: read (size %d) 0x%"PRIx64" : 0x%02"PRIx64
-+sii3112_write(int size, uint64_t addr, uint64_t val) "bmdma: write (size %d) 0x%"PRIx64" : 0x%02"PRIx64
-+sii3112_set_irq(int channel, int level) "channel %d level %d"
++    /* Remove unnecessary forced/forbidden bits (this will help us
++     * with migration) */
++    spapr->forced_caps.mask &= ~caps.mask;
++    spapr->forbidden_caps.mask &= caps.mask;
 +
- # hw/ide/via.c
- bmdma_read_via(uint64_t addr, uint32_t val) "bmdma: readb 0x%"PRIx64" : 0x%02x"
- bmdma_write_via(uint64_t addr, uint64_t val) "bmdma: writeb 0x%"PRIx64" : 0x%02"PRIx64
+     caps.mask |= spapr->forced_caps.mask;
+     caps.mask &= ~spapr->forbidden_caps.mask;
+ 
+@@ -175,9 +268,6 @@ void spapr_caps_validate(sPAPRMachineState *spapr, Error **errp)
+         error_setg(errp, "Some sPAPR capabilities set both on and off");
+         return;
+     }
+-
+-    /* Check for any caps incompatible with other caps.  Nothing to do
+-     * yet */
+ }
+ 
+ void spapr_caps_add_properties(sPAPRMachineClass *smc, Error **errp)
+diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
+index dc64f4ebcb..5c85f39c3b 100644
+--- a/include/hw/ppc/spapr.h
++++ b/include/hw/ppc/spapr.h
+@@ -54,6 +54,8 @@ typedef enum {
+  * Capabilities
+  */
+ 
++/* These bits go in the migration stream, so they can't be reassigned */
++
+ /* Hardware Transactional Memory */
+ #define SPAPR_CAP_HTM               0x0000000000000001ULL
+ 
+@@ -142,6 +144,7 @@ struct sPAPRMachineState {
+     const char *icp_type;
+ 
+     sPAPRCapabilities forced_caps, forbidden_caps;
++    sPAPRCapabilities mig_forced_caps, mig_forbidden_caps;
+     sPAPRCapabilities effective_caps;
+ };
+ 
+@@ -743,6 +746,8 @@ qemu_irq spapr_qirq(sPAPRMachineState *spapr, int irq);
+ /*
+  * Handling of optional capabilities
+  */
++extern const VMStateDescription vmstate_spapr_caps;
++
+ static inline sPAPRCapabilities spapr_caps(uint64_t mask)
+ {
+     sPAPRCapabilities caps = { mask };
+@@ -757,5 +762,6 @@ static inline bool spapr_has_cap(sPAPRMachineState *spapr, uint64_t cap)
+ void spapr_caps_reset(sPAPRMachineState *spapr);
+ void spapr_caps_validate(sPAPRMachineState *spapr, Error **errp);
+ void spapr_caps_add_properties(sPAPRMachineClass *smc, Error **errp);
++int spapr_caps_post_migration(sPAPRMachineState *spapr);
+ 
+ #endif /* HW_SPAPR_H */
 -- 
 2.14.3
