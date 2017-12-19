@@ -1,34 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44035)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48464)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eRF5g-00010r-Q3
-	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 05:25:42 -0500
+	(envelope-from <berrange@redhat.com>) id 1eRFAI-00033h-Nt
+	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 05:30:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eRF5b-0001lf-67
-	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 05:25:40 -0500
-Received: from indium.canonical.com ([91.189.90.7]:49814)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1eRF5a-0001kH-Td
-	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 05:25:35 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1eRF5Z-00057r-1B
-	for <qemu-devel@nongnu.org>; Tue, 19 Dec 2017 10:25:33 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 06F982E80C9
-	for <qemu-devel@nongnu.org>; Tue, 19 Dec 2017 10:25:33 +0000 (UTC)
+	(envelope-from <berrange@redhat.com>) id 1eRFAD-0005XT-HP
+	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 05:30:26 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:32862)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1eRFAD-0005VA-7I
+	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 05:30:21 -0500
+Date: Tue, 19 Dec 2017 10:30:11 +0000
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20171219103011.GB32479@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <20171219002105.Horde.McUB5OjQ4CcwjyzfFEIWM2V@www.quantumachine.net>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20171219002105.Horde.McUB5OjQ4CcwjyzfFEIWM2V@www.quantumachine.net>
 Content-Transfer-Encoding: quoted-printable
-Date: Tue, 19 Dec 2017 10:18:54 -0000
-From: Robert Marklund <1738840@bugs.launchpad.net>
-Reply-To: Bug 1738840 <1738840@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <151361756384.17711.11632335707632949681.malonedeb@soybean.canonical.com>
-Message-Id: <151367873433.16825.18186035050062906028.malone@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1738840] Re: qemu-img convert qcow2 to raw fails
- on OS X
+Subject: Re: [Qemu-devel] [PATCH] sockets: Fix test for DragonFly BSD
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,130 +28,105 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Antonio Huete =?utf-8?Q?Jim=C3=A9nez?= <tuxillo@quantumachine.net>
+Cc: qemu-devel@nongnu.org, kraxel@redhat.com, pbonzini@redhat.com
 
-I gave it a try here:
-http://termbin.com/ufv4
+On Tue, Dec 19, 2017 at 12:21:05AM +0000, Antonio Huete Jim=C3=A9nez wrot=
+e:
+> From f57cdc7ec2d5a5e906fa8b795eeede2d7b66aa56 Mon Sep 17 00:00:00 2001
+> From: Antonio Huete Jimenez <tuxillo@quantumachine.net>
+> Date: Fri, 15 Dec 2017 01:08:10 +0100
+> Subject: [PATCH] sockets: Fix test for DragonFly BSD
+>=20
+> DragonFly BSD does not implement AI_V4MAPPED for its getaddrinfo() so
+> probe and discard that flag instead of aborting the test.
+>=20
+> Test that fails:
+>     ERROR:tests/test-char.c:448:char_udp_test_internal: 'chr' should no=
+t be
+> NULL
+>=20
+> Signed-off-by: Antonio Huete Jimenez <tuxillo@quantumachine.net>
+> ---
+>  util/qemu-sockets.c | 25 ++++++++++++++++++++++---
+>  1 file changed, 22 insertions(+), 3 deletions(-)
+>=20
+> diff --git a/util/qemu-sockets.c b/util/qemu-sockets.c
+> index af4f01211a..5a9c55c303 100644
+> --- a/util/qemu-sockets.c
+> +++ b/util/qemu-sockets.c
+> @@ -43,6 +43,8 @@
+>  # define AI_NUMERICSERV 0
+>  #endif
+>=20
+> +int useV4Mapped =3D 1;
+> +
+>=20
+>  static int inet_getport(struct addrinfo *e)
+>  {
+> @@ -383,7 +385,6 @@ static struct addrinfo
+> *inet_parse_connect_saddr(InetSocketAddress *saddr,
+>      struct addrinfo ai, *res;
+>      int rc;
+>      Error *err =3D NULL;
+> -    static int useV4Mapped =3D 1;
+>=20
+>      memset(&ai, 0, sizeof(ai));
+>=20
+> @@ -474,7 +475,11 @@ static int inet_dgram_saddr(InetSocketAddress *sra=
+ddr,
+>=20
+>      /* lookup peer addr */
+>      memset(&ai,0, sizeof(ai));
+> -    ai.ai_flags =3D AI_CANONNAME | AI_V4MAPPED | AI_ADDRCONFIG;
+> +    ai.ai_flags =3D AI_CANONNAME | AI_ADDRCONFIG;
+> +    if (atomic_read(&useV4Mapped)) {
+> +        ai.ai_flags |=3D AI_V4MAPPED;
+> +    }
+> +
+>      ai.ai_family =3D inet_ai_family_from_address(sraddr, &err);
+>      ai.ai_socktype =3D SOCK_DGRAM;
+>=20
+> @@ -493,7 +498,21 @@ static int inet_dgram_saddr(InetSocketAddress *sra=
+ddr,
+>          goto err;
+>      }
+>=20
+> -    if ((rc =3D getaddrinfo(addr, port, &ai, &peer)) !=3D 0) {
+> +    /* lookup */
+> +    rc =3D getaddrinfo(addr, port, &ai, &peer);
+> +
+> +    /* At least FreeBSD and OS-X 10.6 declare AI_V4MAPPED but
+> +     * then don't implement it in their getaddrinfo(). Detect
+> +     * this and retry without the flag since that's preferrable
+> +     * to a fatal error
+> +     */
+> +    if (rc =3D=3D EAI_BADFLAGS &&
+> +        (ai.ai_flags & AI_V4MAPPED)) {
+> +        atomic_set(&useV4Mapped, 0);
+> +        ai.ai_flags &=3D ~AI_V4MAPPED;
+> +        rc =3D getaddrinfo(addr, port, &ai, &peer);
+> +    }
 
-Its only the first 4096 bytes.
+Rather than duplicating this repeated calls to getaddrinfo in multiple
+methods, I think it would be better to define a wrapper method. ie
+create a  'qemu_getaddrinfo()' method in this file that does the magic
+re-try without AI_V4MAPPED. Export it in include/qemu/sockets.h too.
 
--- =
+Then call that from all places in QEMU that currently use getaddrinfo()
+directly - there are 5 in this file, another in io/dns-resolver.c,
+and some more in net/ & test/. That way we are't going to mistakely
+reintroduce the bug in other places later.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1738840
+We should probably also move the #ifdef AI_*   code into qemu/sockets.h
+too, so we can remove the duplication in test suites.=20
 
-Title:
-  qemu-img convert qcow2 to raw fails on OS X
-
-Status in QEMU:
-  New
-
-Bug description:
-  I try to convert a image from qcow2 to raw and the result is a not bootab=
-le image.
-  I dont know if it is a bug in qemu-img convert or with the image it self.
-
-  See this error report for better readability:
-  https://github.com/coreos/bugs/issues/1121#issuecomment-351968518
-
-  As a reply here they use 2.9.0 version of
-
-  =
-
-  $ qemu-img -V
-  qemu-img version 2.11.0
-  Copyright (c) 2003-2017 Fabrice Bellard and the QEMU Project developers
-
-  $ uname -v
-  Darwin Kernel Version 17.2.0
-
-  $ mount ./
-  /dev/disk1s1 on / (apfs, local, journaled)
-
-  $  wget https://beta.release.core-
-  os.net/amd64-usr/current/coreos_production_openstack_image.img.bz2
-
-  $ date
-  Fri Dec 14 17:15:57 CET 2017
-
-  $ bunzip2 coreos_production_openstack_image.img.bz2
-
-  =
-
-  $ cp -a coreos_production_openstack_image.img.org coreos_production_opens=
-tack_image.img
-
-  $ shasum coreos_production_openstack_image.img.org
-  ae2119c6f0390dc36f247f7016923ea85de5d8e6  coreos_production_openstack_ima=
-ge.img.org
-
-  $ qemu-img convert -f qcow2 -O raw
-  coreos_production_openstack_image.img.org
-  coreos_production_openstack_image.bin
-
-  $ qemu-system-x86_64 -m 256 -nographic -hda coreos_production_openstack_i=
-mage.img -boot c
-  SeaBIOS (version rel-1.11.0-0-g63451fca13-prebuilt.qemu-project.org)
-
-  =
-
-  iPXE (http://ipxe.org) 00:03.0 C980 PCI2.10 PnP PMM+0FF915A0+0FEF15A0 C980
-                                                                           =
-      =
-
-
-  =
-
-  Booting from Hard Disk...
-  GRUB loading....
-  Welcome to GRUB!
-  ....
-
-  $ qemu-system-x86_64 -m 256 -nographic -hda
-  coreos_production_openstack_image.bin -boot c
-
-  SeaBIOS (version rel-1.11.0-0-g63451fca13-prebuilt.qemu-project.org)
-
-  =
-
-  iPXE (http://ipxe.org) 00:03.0 C980 PCI2.10 PnP PMM+0FF915A0+0FEF15A0 C980
-                                                                           =
-      =
-
-
-  =
-
-  Booting from Hard Disk...
-  Boot failed: not a bootable disk
-  ....
-
-  =
-
-  $ head -c 8192 coreos_production_openstack_image.bin | hexdump -C
-  00000000  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  |............=
-....|
-  *
-  00002000
-
-  $ qemu-img info coreos_production_openstack_image.bin
-  image: coreos_production_openstack_image.bin
-  file format: raw
-  virtual size: 8.5G (9116319744 bytes)
-  disk size: 217M
-
-  $ qemu-img info coreos_production_openstack_image.img
-  image: coreos_production_openstack_image.img
-  file format: qcow2
-  virtual size: 8.5G (9116319744 bytes)
-  disk size: 785M
-  cluster_size: 65536
-  Format specific information:
-      compat: 0.10
-      refcount bits: 16
-
-  The same version works on Ubuntu so it looks like its only the Mac
-  version or the new APFS filesystem.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1738840/+subscriptions
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
