@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60881)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33585)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eRKUP-0007FC-5D
-	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 11:11:34 -0500
+	(envelope-from <mst@redhat.com>) id 1eRKVP-0007tQ-13
+	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 11:12:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eRKUO-0006XM-9G
-	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 11:11:33 -0500
-Received: from mail-oi0-x22f.google.com ([2607:f8b0:4003:c06::22f]:39926)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1eRKUO-0006Ws-2l
-	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 11:11:32 -0500
-Received: by mail-oi0-x22f.google.com with SMTP id r63so12713251oia.6
-	for <qemu-devel@nongnu.org>; Tue, 19 Dec 2017 08:11:32 -0800 (PST)
+	(envelope-from <mst@redhat.com>) id 1eRKVL-0007Tf-CP
+	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 11:12:35 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:42186)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1eRKVL-0007Sm-6g
+	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 11:12:31 -0500
+Date: Tue, 19 Dec 2017 18:12:26 +0200
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20171219181158-mutt-send-email-mst@kernel.org>
+References: <20171217125457.3429-1-marcel@redhat.com>
+	<20171217125457.3429-5-marcel@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <1513684540-13949-1-git-send-email-stefanb@linux.vnet.ibm.com>
-References: <1513684540-13949-1-git-send-email-stefanb@linux.vnet.ibm.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 19 Dec 2017 16:11:10 +0000
-Message-ID: <CAFEAcA-_CeZ08vyaV5ihi9QsC=cByAK-W1LmvygCPktJxKJHgw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL v1] Merge tpm 2017/12/19
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20171217125457.3429-5-marcel@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH V2 4/5] pvrdma: initial implementation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,41 +27,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Berger <stefanb@linux.vnet.ibm.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Marcel Apfelbaum <marcel@redhat.com>
+Cc: qemu-devel@nongnu.org, ehabkost@redhat.com, imammedo@redhat.com, yuval.shaia@oracle.com, pbonzini@redhat.com
 
-On 19 December 2017 at 11:55, Stefan Berger <stefanb@linux.vnet.ibm.com> wrote:
-> The patch in this pull request fixes a linker error when --disable-tpm is used.
->
->    Stefan
->
-> The following changes since commit eaefea537b476cb853e2edbdc68e969ec777e4bb:
->
->   Merge remote-tracking branch 'remotes/mjt/tags/trivial-patches-fetch' into staging (2017-12-18 14:17:42 +0000)
->
-> are available in the git repository at:
->
->   git://github.com/stefanberger/qemu-tpm.git tags/pull-tpm-2017-12-19-1
->
-> for you to fetch changes up to 89be9e99c83095af25ce16907143c31f2959188b:
->
->   tpm: move qdev_prop_tpm to hw/tpm/ (2017-12-19 06:40:04 -0500)
->
-> ----------------------------------------------------------------
-> Merge tpm 2017/12/19 v1
->
-> ----------------------------------------------------------------
-> Cornelia Huck (1):
->       tpm: move qdev_prop_tpm to hw/tpm/
->
->  hw/core/qdev-properties-system.c | 64 --------------------------------------------------------------
->  hw/tpm/Makefile.objs             |  5 +++--
->  hw/tpm/tpm_util.c                | 67 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
->  hw/tpm/tpm_util.h                |  3 +++
->  include/hw/qdev-properties.h     |  2 --
->  5 files changed, 73 insertions(+), 68 deletions(-)
->
+On Sun, Dec 17, 2017 at 02:54:56PM +0200, Marcel Apfelbaum wrote:
+> @@ -2847,15 +2847,16 @@ if test "$rdma" != "no" ; then
+>  #include <rdma/rdma_cma.h>
+>  int main(void) { return 0; }
+>  EOF
+> -  rdma_libs="-lrdmacm -libverbs"
+> +  rdma_libs="-lrdmacm -libverbs -libumad"
+>    if compile_prog "" "$rdma_libs" ; then
+>      rdma="yes"
+>    else
+> +    libs_softmmu="$libs_softmmu $rdma_libs"
+>      if test "$rdma" = "yes" ; then
+>          error_exit \
+> -            " OpenFabrics librdmacm/libibverbs not present." \
+> +            " OpenFabrics librdmacm/libibverbs/libibumad not present." \
+>              " Your options:" \
+> -            "  (1) Fast: Install infiniband packages from your distro." \
+> +	    "  (1) Fast: Install infiniband packages (devel) from your distro." \
+>              "  (2) Cleanest: Install libraries from www.openfabrics.org" \
+>              "  (3) Also: Install softiwarp if you don't have RDMA hardware"
+>      fi
 
-Applied, thanks.
-
--- PMM
+Some whitespace damage here.
