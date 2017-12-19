@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38657)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43517)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eR5ZM-0007Gt-Ra
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 19:15:42 -0500
+	(envelope-from <tuxillo@quantumachine.net>) id 1eR5ek-0002F1-SG
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 19:21:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eR5ZM-00051I-0g
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 19:15:40 -0500
-Received: from mail-oi0-x22f.google.com ([2607:f8b0:4003:c06::22f]:45505)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1eR5ZL-00050I-Rp
-	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 19:15:39 -0500
-Received: by mail-oi0-x22f.google.com with SMTP id x20so11787099oix.12
-	for <qemu-devel@nongnu.org>; Mon, 18 Dec 2017 16:15:39 -0800 (PST)
+	(envelope-from <tuxillo@quantumachine.net>) id 1eR5eh-00035w-LJ
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 19:21:14 -0500
+Received: from mailrelay.quantumachine.net ([37.59.103.225]:34526)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <tuxillo@quantumachine.net>) id 1eR5eh-00034m-DW
+	for qemu-devel@nongnu.org; Mon, 18 Dec 2017 19:21:11 -0500
+Received: from mail.quantumachine.net (unknown [89.128.97.235])
+	by mailrelay.quantumachine.net (Postfix) with ESMTP id 7955045
+	for <qemu-devel@nongnu.org>; Tue, 19 Dec 2017 01:21:07 +0100 (CET)
+Date: Tue, 19 Dec 2017 00:21:05 +0000
+Message-ID: <20171219002105.Horde.McUB5OjQ4CcwjyzfFEIWM2V@www.quantumachine.net>
+From: Antonio Huete =?utf-8?b?Smltw6luZXo=?= <tuxillo@quantumachine.net>
+Content-Type: text/plain; charset=utf-8; format=flowed; DelSp=Yes
 MIME-Version: 1.0
-In-Reply-To: <20171218143530.12082-1-stefanha@redhat.com>
-References: <20171218143530.12082-1-stefanha@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 19 Dec 2017 00:15:18 +0000
-Message-ID: <CAFEAcA8fBMYV_uvphxadgXbfzAb+BoOhWVdvX5q4=fXsGBoj3A@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 00/23] Block patches
+Content-Disposition: inline
+Subject: [Qemu-devel] [PATCH] sockets: Fix test for DragonFly BSD
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,36 +27,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
+Cc: berrange@redhat.com, kraxel@redhat.com, pbonzini@redhat.com
 
-On 18 December 2017 at 14:35, Stefan Hajnoczi <stefanha@redhat.com> wrote:
-> The following changes since commit 411ad78115ebeb3411cf4b7622784b93dfabe259:
->
->   Merge remote-tracking branch 'remotes/stefanberger/tags/pull-tpm-2017-12-15-1' into staging (2017-12-17 15:27:41 +0000)
->
-> are available in the Git repository at:
->
->   git://github.com/stefanha/qemu.git tags/block-pull-request
->
-> for you to fetch changes up to 585426c518958aa768564596091474be786aae51:
->
->   qemu-iotests: add 203 savevm with IOThreads test (2017-12-18 13:12:53 +0000)
->
-> ----------------------------------------------------------------
->
+ From f57cdc7ec2d5a5e906fa8b795eeede2d7b66aa56 Mon Sep 17 00:00:00 2001
+From: Antonio Huete Jimenez <tuxillo@quantumachine.net>
+Date: Fri, 15 Dec 2017 01:08:10 +0100
+Subject: [PATCH] sockets: Fix test for DragonFly BSD
 
-This failed 'make check' on all hosts:
+DragonFly BSD does not implement AI_V4MAPPED for its getaddrinfo() so
+probe and discard that flag instead of aborting the test.
 
-TEST: tests/virtio-blk-test... (pid=49005)
-  /arm/virtio/blk/mmio/basic:                                          **
-ERROR:/home/pm215/qemu/tests/libqos/virtio.c:94:qvirtio_wait_queue_isr:
-assertion failed: (g_get_monotonic_time() - start_time <= timeout_us)
-FAIL
-GTester: last random seed: R02S8877aa3278e71261919aae7707897a80
-(pid=49024)
-FAIL: tests/virtio-blk-test
+Test that fails:
+     ERROR:tests/test-char.c:448:char_udp_test_internal: 'chr' should  
+not be NULL
 
+Signed-off-by: Antonio Huete Jimenez <tuxillo@quantumachine.net>
+---
+  util/qemu-sockets.c | 25 ++++++++++++++++++++++---
+  1 file changed, 22 insertions(+), 3 deletions(-)
 
-thanks
--- PMM
+diff --git a/util/qemu-sockets.c b/util/qemu-sockets.c
+index af4f01211a..5a9c55c303 100644
+--- a/util/qemu-sockets.c
++++ b/util/qemu-sockets.c
+@@ -43,6 +43,8 @@
+  # define AI_NUMERICSERV 0
+  #endif
+
++int useV4Mapped = 1;
++
+
+  static int inet_getport(struct addrinfo *e)
+  {
+@@ -383,7 +385,6 @@ static struct addrinfo  
+*inet_parse_connect_saddr(InetSocketAddress *saddr,
+      struct addrinfo ai, *res;
+      int rc;
+      Error *err = NULL;
+-    static int useV4Mapped = 1;
+
+      memset(&ai, 0, sizeof(ai));
+
+@@ -474,7 +475,11 @@ static int inet_dgram_saddr(InetSocketAddress *sraddr,
+
+      /* lookup peer addr */
+      memset(&ai,0, sizeof(ai));
+-    ai.ai_flags = AI_CANONNAME | AI_V4MAPPED | AI_ADDRCONFIG;
++    ai.ai_flags = AI_CANONNAME | AI_ADDRCONFIG;
++    if (atomic_read(&useV4Mapped)) {
++        ai.ai_flags |= AI_V4MAPPED;
++    }
++
+      ai.ai_family = inet_ai_family_from_address(sraddr, &err);
+      ai.ai_socktype = SOCK_DGRAM;
+
+@@ -493,7 +498,21 @@ static int inet_dgram_saddr(InetSocketAddress *sraddr,
+          goto err;
+      }
+
+-    if ((rc = getaddrinfo(addr, port, &ai, &peer)) != 0) {
++    /* lookup */
++    rc = getaddrinfo(addr, port, &ai, &peer);
++
++    /* At least FreeBSD and OS-X 10.6 declare AI_V4MAPPED but
++     * then don't implement it in their getaddrinfo(). Detect
++     * this and retry without the flag since that's preferrable
++     * to a fatal error
++     */
++    if (rc == EAI_BADFLAGS &&
++        (ai.ai_flags & AI_V4MAPPED)) {
++        atomic_set(&useV4Mapped, 0);
++        ai.ai_flags &= ~AI_V4MAPPED;
++        rc = getaddrinfo(addr, port, &ai, &peer);
++    }
++    if (rc != 0) {
+          error_setg(errp, "address resolution failed for %s:%s: %s",  
+addr, port,
+                     gai_strerror(rc));
+          goto err;
+-- 
+2.15.0
