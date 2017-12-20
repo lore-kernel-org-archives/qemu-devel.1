@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33188)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33241)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistai@xilinx.com>) id 1eRiBU-0008IG-AK
-	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 12:29:39 -0500
+	(envelope-from <alistai@xilinx.com>) id 1eRiBe-0008Rj-1v
+	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 12:29:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistai@xilinx.com>) id 1eRiBS-0007ZJ-Ln
-	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 12:29:36 -0500
+	(envelope-from <alistai@xilinx.com>) id 1eRiBc-0007fV-Pf
+	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 12:29:46 -0500
 From: Alistair Francis <alistair.francis@xilinx.com>
-Date: Wed, 20 Dec 2017 09:25:01 -0800
-Message-ID: <59c2dce96ca7e14c38fd889afea1d1f0ed3fc371.1513790495.git.alistair.francis@xilinx.com>
+Date: Wed, 20 Dec 2017 09:25:07 -0800
+Message-ID: <6203a3d4e7a51f1508819c4f8916aa5fa97fbc01.1513790495.git.alistair.francis@xilinx.com>
 In-Reply-To: <cover.1513790494.git.alistair.francis@xilinx.com>
 References: <cover.1513790494.git.alistair.francis@xilinx.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v6 27/29] hw/xen*: Replace fprintf(stderr,
- "*\n" with error_report()
+Subject: [Qemu-devel] [PATCH v6 29/29] target: Use qemu_log() instead of
+ fprintf(stderr, ...)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,244 +23,141 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org, qemu-trivial@nongnu.org
-Cc: alistair.francis@xilinx.com, alistair23@gmail.com, armbru@redhat.com, Stefano Stabellini <sstabellini@kernel.org>, Anthony Perard <anthony.perard@citrix.com>
+Cc: alistair.francis@xilinx.com, alistair23@gmail.com, armbru@redhat.com
 
-Replace a large number of the fprintf(stderr, "*\n" calls with
-error_report(). The functions were renamed with these commands and then
-compiler issues where manually fixed.
-
-find ./* -type f -exec sed -i \
-    'N;N;N;N;N;N;N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
-    {} +
-find ./* -type f -exec sed -i \
-    'N;N;N;N;N;N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
-    {} +
-find ./* -type f -exec sed -i \
-    'N;N;N;N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
-    {} +
-find ./* -type f -exec sed -i \
-    'N;N;N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
-    {} +
-find ./* -type f -exec sed -i \
-    'N;N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
-    {} +
-find ./* -type f -exec sed -i \
-    'N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
-    {} +
-find ./* -type f -exec sed -i \
-    'N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
-    {} +
-find ./* -type f -exec sed -i \
-    'N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
-    {} +
-find ./* -type f -exec sed -i \
-    'N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
-    {} +
-find ./* -type f -exec sed -i \
-    'N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
-    {} +
-find ./* -type f -exec sed -i \
-    'N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
-    {} +
-
-Some lines where then manually tweaked to pass checkpatch.
-
-xen_pt_log() was left with an fprintf(stderr,
+Convert fprintf(stderr, ...) to use qemu_log(). Double prints in
+target/ppc/translate.c were manually remove. A fprintf() in
+target/sh4/translate.c was kept as it's inside a #if 0. The #if 0 and
+fflush() was removed around the unimplemented log in
+target/sh4/translate.c as well.
 
 Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
-Cc: Stefano Stabellini <sstabellini@kernel.org>
-Cc: Anthony Perard <anthony.perard@citrix.com>
-Acked-by: Anthony PERARD <anthony.perard@citrix.com>
-Reviewed-by: Thomas Huth <thuth@redhat.com>
 ---
-V3:
- - Don't change xen_pt_log()
-V2:
- - Split hw patch into individual directories
 
- hw/xen/xen-common.c        | 11 ++++++-----
- hw/xenpv/xen_domainbuild.c | 24 ++++++++++++------------
- hw/xenpv/xen_machine_pv.c  |  9 +++++----
- 3 files changed, 23 insertions(+), 21 deletions(-)
+ target/cris/translate.c      |  2 +-
+ target/ppc/translate.c       | 36 ++++++++++--------------------------
+ target/sh4/translate.c       |  7 ++-----
+ target/unicore32/translate.c |  2 +-
+ 4 files changed, 14 insertions(+), 33 deletions(-)
 
-diff --git a/hw/xen/xen-common.c b/hw/xen/xen-common.c
-index 632a938dcc..42ada2ac05 100644
---- a/hw/xen/xen-common.c
-+++ b/hw/xen/xen-common.c
-@@ -9,6 +9,7 @@
-  */
+diff --git a/target/cris/translate.c b/target/cris/translate.c
+index 2831419845..d2dba748cd 100644
+--- a/target/cris/translate.c
++++ b/target/cris/translate.c
+@@ -137,7 +137,7 @@ typedef struct DisasContext {
  
- #include "qemu/osdep.h"
-+#include "qemu/error-report.h"
- #include "hw/xen/xen_backend.h"
- #include "qmp-commands.h"
- #include "chardev/char.h"
-@@ -47,19 +48,19 @@ static int store_dev_info(int domid, Chardev *cs, const char *string)
-     /* We now have everything we need to set the xenstore entry. */
-     xs = xs_open(0);
-     if (xs == NULL) {
--        fprintf(stderr, "Could not contact XenStore\n");
-+        error_report("Could not contact XenStore");
-         goto out;
+ static void gen_BUG(DisasContext *dc, const char *file, int line)
+ {
+-    fprintf(stderr, "BUG: pc=%x %s %d\n", dc->pc, file, line);
++    qemu_log("BUG: pc=%x %s %d\n", dc->pc, file, line);
+     if (qemu_log_separate()) {
+         qemu_log("BUG: pc=%x %s %d\n", dc->pc, file, line);
      }
- 
-     path = xs_get_domain_path(xs, domid);
-     if (path == NULL) {
--        fprintf(stderr, "xs_get_domain_path() error\n");
-+        error_report("xs_get_domain_path() error");
-         goto out;
-     }
-     newpath = realloc(path, (strlen(path) + strlen(string) +
-                 strlen("/tty") + 1));
-     if (newpath == NULL) {
--        fprintf(stderr, "realloc error\n");
-+        error_report("realloc error");
-         goto out;
-     }
-     path = newpath;
-@@ -96,13 +97,13 @@ static void xenstore_record_dm_state(struct xs_handle *xs, const char *state)
-     char path[50];
- 
-     if (xs == NULL) {
--        fprintf(stderr, "xenstore connection not initialized\n");
-+        error_report("xenstore connection not initialized");
-         exit(1);
-     }
- 
-     snprintf(path, sizeof (path), "device-model/%u/state", xen_domid);
-     if (!xs_write(xs, XBT_NULL, path, state, strlen(state))) {
--        fprintf(stderr, "error recording dm state\n");
-+        error_report("error recording dm state");
-         exit(1);
-     }
- }
-diff --git a/hw/xenpv/xen_domainbuild.c b/hw/xenpv/xen_domainbuild.c
-index 027f76fad1..f5514ffec2 100644
---- a/hw/xenpv/xen_domainbuild.c
-+++ b/hw/xenpv/xen_domainbuild.c
-@@ -25,22 +25,22 @@ static int xenstore_domain_mkdir(char *path)
-     int i;
- 
-     if (!xs_mkdir(xenstore, 0, path)) {
--        fprintf(stderr, "%s: xs_mkdir %s: failed\n", __func__, path);
--	return -1;
-+        error_report("%s: xs_mkdir %s: failed", __func__, path);
-+        return -1;
-     }
-     if (!xs_set_permissions(xenstore, 0, path, perms_ro, 2)) {
--        fprintf(stderr, "%s: xs_set_permissions failed\n", __func__);
--	return -1;
-+        error_report("%s: xs_set_permissions failed", __func__);
-+        return -1;
-     }
- 
-     for (i = 0; writable[i]; i++) {
-         snprintf(subpath, sizeof(subpath), "%s/%s", path, writable[i]);
-         if (!xs_mkdir(xenstore, 0, subpath)) {
--            fprintf(stderr, "%s: xs_mkdir %s: failed\n", __func__, subpath);
-+            error_report("%s: xs_mkdir %s: failed", __func__, subpath);
-             return -1;
+diff --git a/target/ppc/translate.c b/target/ppc/translate.c
+index 4075fc8589..eb1fa9a0cf 100644
+--- a/target/ppc/translate.c
++++ b/target/ppc/translate.c
+@@ -3938,12 +3938,8 @@ static inline void gen_op_mfspr(DisasContext *ctx)
+              * allowing userland application to read the PVR
+              */
+             if (sprn != SPR_PVR) {
+-                fprintf(stderr, "Trying to read privileged spr %d (0x%03x) at "
+-                        TARGET_FMT_lx "\n", sprn, sprn, ctx->nip - 4);
+-                if (qemu_log_separate()) {
+-                    qemu_log("Trying to read privileged spr %d (0x%03x) at "
+-                             TARGET_FMT_lx "\n", sprn, sprn, ctx->nip - 4);
+-                }
++                qemu_log("Trying to read privileged spr %d (0x%03x) at "
++                         TARGET_FMT_lx "\n", sprn, sprn, ctx->nip - 4);
+             }
+             gen_priv_exception(ctx, POWERPC_EXCP_PRIV_REG);
          }
-         if (!xs_set_permissions(xenstore, 0, subpath, perms_rw, 2)) {
--            fprintf(stderr, "%s: xs_set_permissions failed\n", __func__);
-+            error_report("%s: xs_set_permissions failed", __func__);
-             return -1;
+@@ -3955,12 +3951,8 @@ static inline void gen_op_mfspr(DisasContext *ctx)
+             return;
          }
-     }
-@@ -235,7 +235,7 @@ int xen_domain_build_pv(const char *kernel, const char *ramdisk,
-     memcpy(uuid, &qemu_uuid, sizeof(uuid));
-     rc = xen_domain_create(xen_xc, ssidref, uuid, flags, &xen_domid);
-     if (rc < 0) {
--        fprintf(stderr, "xen: xc_domain_create() failed\n");
-+        error_report("xen: xc_domain_create() failed");
-         goto err;
-     }
-     qemu_log("xen: created domain %d\n", xen_domid);
-@@ -248,21 +248,21 @@ int xen_domain_build_pv(const char *kernel, const char *ramdisk,
+         /* Not defined */
+-        fprintf(stderr, "Trying to read invalid spr %d (0x%03x) at "
+-                TARGET_FMT_lx "\n", sprn, sprn, ctx->nip - 4);
+-        if (qemu_log_separate()) {
+-            qemu_log("Trying to read invalid spr %d (0x%03x) at "
+-                     TARGET_FMT_lx "\n", sprn, sprn, ctx->nip - 4);
+-        }
++        qemu_log("Trying to read invalid spr %d (0x%03x) at "
++                 TARGET_FMT_lx "\n", sprn, sprn, ctx->nip - 4);
  
-     rc = xc_domain_max_vcpus(xen_xc, xen_domid, smp_cpus);
-     if (rc < 0) {
--        fprintf(stderr, "xen: xc_domain_max_vcpus() failed\n");
-+        error_report("xen: xc_domain_max_vcpus() failed");
-         goto err;
-     }
+         /* The behaviour depends on MSR:PR and SPR# bit 0x10,
+          * it can generate a priv, a hv emu or a no-op
+@@ -4101,12 +4093,8 @@ static void gen_mtspr(DisasContext *ctx)
+             (*write_cb)(ctx, sprn, rS(ctx->opcode));
+         } else {
+             /* Privilege exception */
+-            fprintf(stderr, "Trying to write privileged spr %d (0x%03x) at "
+-                    TARGET_FMT_lx "\n", sprn, sprn, ctx->nip - 4);
+-            if (qemu_log_separate()) {
+-                qemu_log("Trying to write privileged spr %d (0x%03x) at "
+-                         TARGET_FMT_lx "\n", sprn, sprn, ctx->nip - 4);
+-            }
++            qemu_log("Trying to write privileged spr %d (0x%03x) at "
++                     TARGET_FMT_lx "\n", sprn, sprn, ctx->nip - 4);
+             gen_priv_exception(ctx, POWERPC_EXCP_PRIV_REG);
+         }
+     } else {
+@@ -4118,12 +4106,8 @@ static void gen_mtspr(DisasContext *ctx)
+         }
  
- #if 0
-     rc = xc_domain_setcpuweight(xen_xc, xen_domid, 256);
-     if (rc < 0) {
--        fprintf(stderr, "xen: xc_domain_setcpuweight() failed\n");
-+        error_report("xen: xc_domain_setcpuweight() failed");
-         goto err;
-     }
- #endif
+         /* Not defined */
+-        if (qemu_log_separate()) {
+-            qemu_log("Trying to write invalid spr %d (0x%03x) at "
+-                     TARGET_FMT_lx "\n", sprn, sprn, ctx->nip - 4);
+-        }
+-        fprintf(stderr, "Trying to write invalid spr %d (0x%03x) at "
+-                TARGET_FMT_lx "\n", sprn, sprn, ctx->nip - 4);
++        qemu_log("Trying to write invalid spr %d (0x%03x) at "
++                 TARGET_FMT_lx "\n", sprn, sprn, ctx->nip - 4);
  
-     rc = xc_domain_setmaxmem(xen_xc, xen_domid, ram_size >> 10);
-     if (rc < 0) {
--        fprintf(stderr, "xen: xc_domain_setmaxmem() failed\n");
-+        error_report("xen: xc_domain_setmaxmem() failed");
-         goto err;
-     }
  
-@@ -275,7 +275,7 @@ int xen_domain_build_pv(const char *kernel, const char *ramdisk,
-                         xenstore_port, &xenstore_mfn,
-                         console_port, &console_mfn);
-     if (rc < 0) {
--        fprintf(stderr, "xen: xc_linux_build() failed\n");
-+        error_report("xen: xc_linux_build() failed");
-         goto err;
-     }
- 
-@@ -285,7 +285,7 @@ int xen_domain_build_pv(const char *kernel, const char *ramdisk,
-     qemu_log("xen: unpausing domain %d\n", xen_domid);
-     rc = xc_domain_unpause(xen_xc, xen_domid);
-     if (rc < 0) {
--        fprintf(stderr, "xen: xc_domain_unpause() failed\n");
-+        error_report("xen: xc_domain_unpause() failed");
-         goto err;
-     }
- 
-diff --git a/hw/xenpv/xen_machine_pv.c b/hw/xenpv/xen_machine_pv.c
-index 69a52a9f93..44d67b87c4 100644
---- a/hw/xenpv/xen_machine_pv.c
-+++ b/hw/xenpv/xen_machine_pv.c
-@@ -23,6 +23,7 @@
-  */
- 
- #include "qemu/osdep.h"
-+#include "qemu/error-report.h"
- #include "hw/hw.h"
- #include "hw/boards.h"
- #include "hw/xen/xen_backend.h"
-@@ -36,7 +37,7 @@ static void xen_init_pv(MachineState *machine)
- 
-     /* Initialize backend core & drivers */
-     if (xen_be_init() != 0) {
--        fprintf(stderr, "%s: xen backend core setup failed\n", __func__);
-+        error_report("%s: xen backend core setup failed", __func__);
-         exit(1);
-     }
- 
-@@ -51,18 +52,18 @@ static void xen_init_pv(MachineState *machine)
-         const char *initrd_filename = machine->initrd_filename;
-         if (xen_domain_build_pv(kernel_filename, initrd_filename,
-                                 kernel_cmdline) < 0) {
--            fprintf(stderr, "xen pv domain creation failed\n");
-+            error_report("xen pv domain creation failed");
+         /* The behaviour depends on MSR:PR and SPR# bit 0x10,
+@@ -7365,8 +7349,8 @@ void gen_intermediate_code(CPUState *cs, struct TranslationBlock *tb)
+             break;
+         }
+         if (tcg_check_temp_count()) {
+-            fprintf(stderr, "Opcode %02x %02x %02x %02x (%08x) leaked "
+-                    "temporaries\n", opc1(ctx.opcode), opc2(ctx.opcode),
++            qemu_log("Opcode %02x %02x %02x %02x (%08x) leaked "
++                     "temporaries\n", opc1(ctx.opcode), opc2(ctx.opcode),
+                     opc3(ctx.opcode), opc4(ctx.opcode), ctx.opcode);
              exit(1);
          }
+diff --git a/target/sh4/translate.c b/target/sh4/translate.c
+index 8569179883..5de92b19e9 100644
+--- a/target/sh4/translate.c
++++ b/target/sh4/translate.c
+@@ -1787,11 +1787,8 @@ static void _decode_opc(DisasContext * ctx)
+         }
          break;
      }
- #endif
-     case XEN_EMULATE:
--        fprintf(stderr, "xen emulation not implemented (yet)\n");
-+        error_report("xen emulation not implemented (yet)");
-         exit(1);
-         break;
-     default:
--        fprintf(stderr, "unhandled xen_mode %d\n", xen_mode);
-+        error_report("unhandled xen_mode %d", xen_mode);
-         exit(1);
-         break;
-     }
+-#if 0
+-    fprintf(stderr, "unknown instruction 0x%04x at pc 0x%08x\n",
+-	    ctx->opcode, ctx->pc);
+-    fflush(stderr);
+-#endif
++    qemu_log_mask(LOG_UNIMP, "unknown instruction 0x%04x at pc 0x%08x\n",
++                  ctx->opcode, ctx->pc);
+  do_illegal:
+     if (ctx->envflags & DELAY_SLOT_MASK) {
+  do_illegal_slot:
+diff --git a/target/unicore32/translate.c b/target/unicore32/translate.c
+index 384aa86027..1d4f3dd2ac 100644
+--- a/target/unicore32/translate.c
++++ b/target/unicore32/translate.c
+@@ -1936,7 +1936,7 @@ void gen_intermediate_code(CPUState *cs, TranslationBlock *tb)
+         disas_uc32_insn(env, dc);
+ 
+         if (num_temps) {
+-            fprintf(stderr, "Internal resource leak before %08x\n", dc->pc);
++            qemu_log("Internal resource leak before %08x\n", dc->pc);
+             num_temps = 0;
+         }
+ 
 -- 
 2.14.1
