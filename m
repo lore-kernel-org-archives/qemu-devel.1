@@ -1,33 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60029)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46632)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eRdb1-0004Ko-0t
-	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 07:35:40 -0500
+	(envelope-from <cohuck@redhat.com>) id 1eRdn9-0007iB-PZ
+	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 07:48:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eRdaw-0002B3-Uu
-	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 07:35:39 -0500
-Received: from indium.canonical.com ([91.189.90.7]:43298)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1eRdaw-00029J-PN
-	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 07:35:34 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1eRdau-0003Go-LQ
-	for <qemu-devel@nongnu.org>; Wed, 20 Dec 2017 12:35:32 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 04D5D2E8007
-	for <qemu-devel@nongnu.org>; Wed, 20 Dec 2017 12:35:32 +0000 (UTC)
+	(envelope-from <cohuck@redhat.com>) id 1eRdn8-0007mk-Ib
+	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 07:48:11 -0500
+Date: Wed, 20 Dec 2017 13:47:54 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20171220134754.77999bcf.cohuck@redhat.com>
+In-Reply-To: <873745d7qp.fsf@dusky.pond.sub.org>
+References: <1513542355-28203-1-git-send-email-jan.dakinevich@virtuozzo.com>
+	<1513542355-28203-2-git-send-email-jan.dakinevich@virtuozzo.com>
+	<87k1xig3zl.fsf@dusky.pond.sub.org>
+	<20171220034730.696c3ceb@virtuozzo.com>
+	<873745d7qp.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
-Date: Wed, 20 Dec 2017 12:24:50 -0000
-From: Satheesh Rajendran <sathnaga@linux.vnet.ibm.com>
-Reply-To: Bug 1739413 <1739413@bugs.launchpad.net>
-Sender: bounces@canonical.com
-Message-Id: <151377269069.19770.3703612061677458311.malonedeb@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1739413] [NEW] Hotplugged vcpu does not guarantee
- cpu compat mode(power8) on power9 host
+Subject: Re: [Qemu-devel] [RFC v6 1/2] virtio: introduce `query-virtio' QMP
+ command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,160 +27,94 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Markus Armbruster <armbru@redhat.com>
+Cc: Jan Dakinevich <jan.dakinevich@virtuozzo.com>, Kevin Wolf <kwolf@redhat.com>, "Denis V. Lunev" <den@virtuozzo.com>, qemu-block@nongnu.org, Amit Shah <amit@kernel.org>, Jason Wang <jasowang@redhat.com>, qemu-devel@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-Public bug reported:
+On Wed, 20 Dec 2017 11:16:46 +0100
+Markus Armbruster <armbru@redhat.com> wrote:
 
-./ppc64-softmmu/qemu-system-ppc64 -version
-QEMU emulator version 2.11.50 (v2.11.0-254-gaf35267)
+> Jan Dakinevich <jan.dakinevich@virtuozzo.com> writes:
+>=20
+> > On Tue, 19 Dec 2017 15:57:18 +0100
+> > Markus Armbruster <armbru@redhat.com> wrote:
 
-1. Boot a power8 compat mode guest power9 HW.
-./ppc64-softmmu/qemu-system-ppc64 -machine pseries,accel=3Dkvm,max-cpu-comp=
-at=3Dpower8 -m 4096 /home/sath/images/guest.qcow2 -smp 1,maxcpus=3D2 -seria=
-l /dev/pts/8  -monitor stdio -vga none -nographic
-QEMU 2.11.50 monitor - type 'help' for more information
-(qemu) =
+> >> Jan Dakinevich <jan.dakinevich@virtuozzo.com> writes:
 
+> Taking a step back: what's the intended purpose of query-virtio?  The
+> cover letter doesn't really say:
+>=20
+>     After some discussion, I am going to suggest reworked QMP/HMP for
+>     gathering virtio info. It would provide the following monitor output.
+>=20
+>     (qemu) info virtio
+>     virtio-blk-device at 0000:00:02.0
+>       QOM path: /machine/peripheral-anon/device[0]/virtio-backend
+>       status: 0x0f
+>         VIRTIO_CONFIG_S_ACKNOWLEDGE
+>         VIRTIO_CONFIG_S_DRIVER
+>         VIRTIO_CONFIG_S_DRIVER_OK
+>         VIRTIO_CONFIG_S_FEATURES_OK
+>       host features:  0x0000000179000e54
+>       guest features: 0x0000000130000e54
+>       common features:
+>         VIRTIO_F_NOTIFY_ON_EMPTY
+>         VIRTIO_F_ANY_LAYOUT
+>         VIRTIO_RING_F_INDIRECT_DESC              acked
+>         VIRTIO_RING_F_EVENT_IDX                  acked
+>         VIRTIO_F_BAD_FEATURE
+>         VIRTIO_F_VERSION_1                       acked
+>       device features:
+>         VIRTIO_BLK_F_SEG_MAX                     acked
+>         VIRTIO_BLK_F_BLK_SIZE                    acked
+>         VIRTIO_BLK_F_FLUSH                       acked
+>         VIRTIO_BLK_F_TOPOLOGY                    acked
+>=20
+> The first sentence carries no useful information; suggest to scratch it.
+> The rest is an HMP example.  Examples are great, but we really need to
+> understand *why* you need this command.
 
-2. Check for cpuinfo
+=46rom my side, I see at least two use cases:
 
-# cat /proc/cpuinfo =
+- Monitoring the state of virtio devices. If I can see from outside
+  that VIRTIO_CONFIG_S_FAILED or VIRTIO_CONFIG_S_NEEDS_RESET has been
+  set for a device, I know that something went wrong for that device.
+- Debugging. This command gives me a nice way to find out why something
+  is not working as it is supposed to, or to verify that something
+  indeed does work as intended (I would have found such a command quite
+  useful when implementing virtio-1).
 
-processor	: 0
-cpu		: POWER8 (architected), altivec supported
-clock		: 2200.000000MHz
-revision	: 2.1 (pvr 004e 1201)
+>=20
+> >> In case symbolic names may not be known at QEMU compile time (me
+> >> having to wonder at v6 is a sign of rather ineffective patch review,
+> >> sorry about that): you have to explain this in the doc comment, with a
+> >> reference to where the bits are specified.
+> >>  =20
+> >
+> > ok =20
+>=20
+> Can you think of a scenario where status or feature bits occur that are
+> not known to QEMU at compile time?
 
-timebase	: 512000000
-platform	: pSeries
-model		: IBM pSeries (emulated by qemu)
-machine		: CHRP IBM pSeries (emulated by qemu)
-MMU		: Hash
+Could happen for status bits (although very unlikely). For feature
+bits, the guest is supposed to ack a subset of the offered bits, so
+this would mean a fundamentally broken guest (also unlikely, but not
+impossible).
 
-
-3. Run a small program invoking isa v3.0 instruction, it should complain 'I=
-llegal instruction' as it is a power8 compat guest
-# cat 1.c =
-
-#include <stdio.h>
-void main()
-    {
-    asm volatile (".long 0x7c0005e6");
-    }
-# ./a.out =
-
-[   59.352795] a.out[1741]: unhandled signal 4 at 0000000010000600 nip 0000=
-000010000600 lr 00007fffb4da5080 code 1
-Illegal instruction =
-
-
-4. Hotplug a vcpu
-(qemu) device_add host-spapr-cpu-core,id=3Dcore1,core-id=3D1
-(qemu) info cpus
-* CPU #0: nip=3D0xc0000000000de42c thread_id=3D113110
-  CPU #1: nip=3D0xc0000000000de42c thread_id=3D113348
-
-5. Try running the same program in the hotplugged vcpu and it does not
-complain as 'Illegal instruction'
-
-#taskset -c 1 ./a.out ----------------------NOK
-#  =
-
-
-# taskset -c 0 ./a.out =
-
-[  356.618031] a.out[1755]: unhandled signal 4 at 0000000010000600 nip 0000=
-000010000600 lr 00007fffae7f5080 code 1
-Illegal instruction
-
-** Affects: qemu
-     Importance: Undecided
-         Status: New
-
-
-** Tags: ppc64le
-
-** Summary changed:
-
-- Hotplugged vcpu does not guarantee cpu compat mode
-+ Hotplugged vcpu does not guarantee cpu compat mode(power8) on power9 host
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1739413
-
-Title:
-  Hotplugged vcpu does not guarantee cpu compat mode(power8) on power9
-  host
-
-Status in QEMU:
-  New
-
-Bug description:
-  ./ppc64-softmmu/qemu-system-ppc64 -version
-  QEMU emulator version 2.11.50 (v2.11.0-254-gaf35267)
-
-  1. Boot a power8 compat mode guest power9 HW.
-  ./ppc64-softmmu/qemu-system-ppc64 -machine pseries,accel=3Dkvm,max-cpu-co=
-mpat=3Dpower8 -m 4096 /home/sath/images/guest.qcow2 -smp 1,maxcpus=3D2 -ser=
-ial /dev/pts/8  -monitor stdio -vga none -nographic
-  QEMU 2.11.50 monitor - type 'help' for more information
-  (qemu) =
-
-
-  2. Check for cpuinfo
-
-  # cat /proc/cpuinfo =
-
-  processor	: 0
-  cpu		: POWER8 (architected), altivec supported
-  clock		: 2200.000000MHz
-  revision	: 2.1 (pvr 004e 1201)
-
-  timebase	: 512000000
-  platform	: pSeries
-  model		: IBM pSeries (emulated by qemu)
-  machine		: CHRP IBM pSeries (emulated by qemu)
-  MMU		: Hash
-
-  =
-
-  3. Run a small program invoking isa v3.0 instruction, it should complain =
-'Illegal instruction' as it is a power8 compat guest
-  # cat 1.c =
-
-  #include <stdio.h>
-  void main()
-      {
-      asm volatile (".long 0x7c0005e6");
-      }
-  # ./a.out =
-
-  [   59.352795] a.out[1741]: unhandled signal 4 at 0000000010000600 nip 00=
-00000010000600 lr 00007fffb4da5080 code 1
-  Illegal instruction =
-
-
-  4. Hotplug a vcpu
-  (qemu) device_add host-spapr-cpu-core,id=3Dcore1,core-id=3D1
-  (qemu) info cpus
-  * CPU #0: nip=3D0xc0000000000de42c thread_id=3D113110
-    CPU #1: nip=3D0xc0000000000de42c thread_id=3D113348
-
-  5. Try running the same program in the hotplugged vcpu and it does not
-  complain as 'Illegal instruction'
-
-  #taskset -c 1 ./a.out ----------------------NOK
-  #  =
-
-
-  # taskset -c 0 ./a.out =
-
-  [  356.618031] a.out[1755]: unhandled signal 4 at 0000000010000600 nip 00=
-00000010000600 lr 00007fffae7f5080 code 1
-  Illegal instruction
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1739413/+subscriptions
+>=20
+> >> > +#
+> >> > +# @status-names: names of checked bits in status bitmask =20
+> >>=20
+> >> How are the strings in @status-names connected to the bits in @status?
+> >> Spell it out in this doc string, please.
+> >>  =20
+> >
+> > ok
+> >
+> > ...but, strictly saying, I was not going to show in QAPI how these names
+> > are mapped into bits, QMP answer would not contain how these names are
+> > connected to bits. Otherwise, It would be reinvention of v4. =20
+>=20
+> To avoid going in circles some more, let's take a step back and examine
+> what exactly you're trying to accomplish.  Give us use cases: this is my
+> need, and this is how you use the proposed command to satisfy my need.
+> Also give us design limitations: what the command is *not* trying to do.
