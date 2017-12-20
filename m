@@ -1,32 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46661)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47826)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <michael@weiser.dinsnail.net>) id 1eRl0k-0004ne-2r
-	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 15:30:43 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1eRl2I-0005h0-F8
+	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 15:32:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <michael@weiser.dinsnail.net>) id 1eRl0j-0006AM-8m
-	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 15:30:42 -0500
-Received: from heinz.dinsnail.net
-	([2a01:238:43b4:3200:9392:5dcc:2f0e:a960]:49702)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <michael@weiser.dinsnail.net>)
-	id 1eRl0j-00069j-2T
-	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 15:30:41 -0500
-Date: Wed, 20 Dec 2017 21:29:18 +0100
-From: Michael Weiser <michael.weiser@gmx.de>
-Message-ID: <20171220202918.GA18146@weiser.dinsnail.net>
-References: <20171219201613.7399-1-michael.weiser@gmx.de>
-	<20171219201613.7399-6-michael.weiser@gmx.de>
-	<6f0ce872-849b-dc5a-25e7-3242a6e5c624@vivier.eu>
-	<20171220153715.GC15475@weiser.dinsnail.net>
-	<1d8aa1e1-2160-015a-28f5-58baaa51f728@vivier.eu>
-	<20171220161556.GF15475@weiser.dinsnail.net>
-	<bcf948cb-fe73-bc72-5e93-b776740fa80d@vivier.eu>
+	(envelope-from <peter.maydell@linaro.org>) id 1eRl2H-00075c-DL
+	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 15:32:18 -0500
+Received: from mail-ot0-x244.google.com ([2607:f8b0:4003:c0f::244]:39230)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1eRl2H-000758-9D
+	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 15:32:17 -0500
+Received: by mail-ot0-x244.google.com with SMTP id v21so20702182oth.6
+	for <qemu-devel@nongnu.org>; Wed, 20 Dec 2017 12:32:17 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <bcf948cb-fe73-bc72-5e93-b776740fa80d@vivier.eu>
-Subject: Re: [Qemu-devel] [PATCH v2 5/5] linux-user: Add aarch64_be magic
- numbers to qemu-binfmt-conf.sh
+In-Reply-To: <20171220180358.29316-1-pbonzini@redhat.com>
+References: <20171220180358.29316-1-pbonzini@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Wed, 20 Dec 2017 20:31:56 +0000
+Message-ID: <CAFEAcA-VXabxkEeLcvtf7OZTpM1WUD9O+XwUX1D9rBFFGf5JCw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL 00/19] Initial support for
+ Hypervisor.framework
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,44 +29,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Vivier <laurent@vivier.eu>
-Cc: qemu-devel@nongnu.org, Riku Voipio <riku.voipio@iki.fi>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-Hi Laurent,
+On 20 December 2017 at 18:03, Paolo Bonzini <pbonzini@redhat.com> wrote:
+> The following changes since commit f1faf2d59c91a8f1f59a0fc6339154efb749b55d:
+>
+>   Merge remote-tracking branch 'remotes/stefanha/tags/block-pull-request' into staging (2017-12-20 11:30:55 +0000)
+>
+> are available in the Git repository at:
+>
+>   git://github.com/bonzini/qemu.git tags/for-upstream-hvf
+>
+> for you to fetch changes up to 5fd1a70fb75d53b43dfff636a9c641dbf03f949f:
+>
+>   i386: hvf: cleanup x86_gen.h (2017-12-20 18:39:06 +0100)
+>
+> ----------------------------------------------------------------
+> Initial support for the HVF accelerator
 
-On Wed, Dec 20, 2017 at 05:43:34PM +0100, Laurent Vivier wrote:
+Build failure, Windows:
 
-> >> So it's not like on intel/AMD where we can execute a 32bit binary on a
-> >> 64bit kernel?
-> > 
-> > An aarch64 CPU is capable of running arm (i.e. aarch32) code. And I
-> > think this is supported as a multilib setup on Linux. But not in mixed
-> > endianess as far as I know.
-> > 
-> > Looking at the code again, I'm confused now: Wouldn't the current logic
-> > treat an actual i386 machine as capable of running x86_64 binaries
-> > natively and omit registering the handler for x86_64?
-> - on 32bit machine, we don't register the interpreter because the
-> interpreter cannot work,
+  LINK    arm-softmmu/qemu-system-arm.exe
+cpus.o: In function `qemu_hvf_cpu_thread_fn':
+/home/petmay01/linaro/qemu-for-merges/cpus.c:1478: undefined reference
+to `hvf_init_vcpu'
+/home/petmay01/linaro/qemu-for-merges/cpus.c:1486: undefined reference
+to `hvf_vcpu_exec'
+/home/petmay01/linaro/qemu-for-merges/cpus.c:1494: undefined reference
+to `hvf_vcpu_destroy'
+collect2: error: ld returned 1 exit status
 
-Okay, makes sense.
+(ditto for all the other exes)
 
-Meanwhile I verified that a little-endian arm kernel indeed refuses to
-run a statically linked big-endian arm binary and vice-versa with
-ENOEXEC ("Exec format error").
+Build failure, OSX:
 
-Looking at fs/binfmt_elf.c of the kernel, I understand that the kernel
-makes no attempt to adjust for binary images of differing endianness.
-Because the e_type ELF header field is byte-swapped in the big-endian
-arm ELF binary, the kernel will see an invalid executable type and
-return ENOEXEC.
+In file included from
+/Users/pm215/src/qemu-for-merges/target/i386/hvf/x86_cpuid.c:25:
+/Users/pm215/src/qemu-for-merges/target/i386/hvf/x86.h:290:5: error:
+unknown type name 'target_ulong'
+    target_ulong result;
+    ^
+/Users/pm215/src/qemu-for-merges/target/i386/hvf/x86.h:291:5: error:
+unknown type name 'target_ulong'
+    target_ulong auxbits;
+    ^
+/Users/pm215/src/qemu-for-merges/target/i386/hvf/x86.h:382:1: error:
+unknown type name 'target_ulong'
+target_ulong linear_addr(struct CPUState *cpu, target_ulong addr, enum
+X86Seg seg);
+^
+/Users/pm215/src/qemu-for-merges/target/i386/hvf/x86.h:382:48: error:
+unknown type name 'target_ulong'
+target_ulong linear_addr(struct CPUState *cpu, target_ulong addr, enum
+X86Seg seg);
+                                               ^
+/Users/pm215/src/qemu-for-merges/target/i386/hvf/x86.h:383:1: error:
+unknown type name 'target_ulong'
+target_ulong linear_addr_size(struct CPUState *cpu, target_ulong addr, int size,
+^
+/Users/pm215/src/qemu-for-merges/target/i386/hvf/x86.h:383:53: error:
+unknown type name 'target_ulong'
+target_ulong linear_addr_size(struct CPUState *cpu, target_ulong addr, int size,
+                                                    ^
+/Users/pm215/src/qemu-for-merges/target/i386/hvf/x86.h:385:1: error:
+unknown type name 'target_ulong'
+target_ulong linear_rip(struct CPUState *cpu, target_ulong rip);
+^
+/Users/pm215/src/qemu-for-merges/target/i386/hvf/x86.h:385:47: error:
+unknown type name 'target_ulong'
+target_ulong linear_rip(struct CPUState *cpu, target_ulong rip);
+                                              ^
 
-Based on this I'm reasonably sure that a mixed little-/big-endian
-userland is not currently possible on Linux. So I've gone with the
-arm/armeb family split.
-
-I'll push out a new version of the patch series with all the discussed
-changes in a minute.
--- 
-Bye,
-Michael
+thanks
+-- PMM
