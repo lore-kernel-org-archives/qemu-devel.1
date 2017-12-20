@@ -1,34 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55713)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55766)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1eRjaX-0002AP-TE
+	(envelope-from <armbru@redhat.com>) id 1eRjaY-0002BT-VL
 	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 13:59:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1eRjaT-000634-1B
-	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 13:59:33 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:53882)
+	(envelope-from <armbru@redhat.com>) id 1eRjaU-00064t-99
+	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 13:59:35 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:57104)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1eRjaS-00061X-Lz
-	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 13:59:28 -0500
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id AB159356D1
-	for <qemu-devel@nongnu.org>; Wed, 20 Dec 2017 18:59:27 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-116-74.ams2.redhat.com
-	[10.36.116.74])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 51A8A196AE
-	for <qemu-devel@nongnu.org>; Wed, 20 Dec 2017 18:59:27 +0000 (UTC)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1eRjaU-00063Z-2F
+	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 13:59:30 -0500
 From: Markus Armbruster <armbru@redhat.com>
-Date: Wed, 20 Dec 2017 19:59:16 +0100
-Message-Id: <20171220185924.32756-6-armbru@redhat.com>
+Date: Wed, 20 Dec 2017 19:59:24 +0100
+Message-Id: <20171220185924.32756-14-armbru@redhat.com>
 In-Reply-To: <20171220185924.32756-1-armbru@redhat.com>
 References: <20171220185924.32756-1-armbru@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 05/13] tests/qapi-schema/doc-bad-section: New,
- factored out of doc-good
+Subject: [Qemu-devel] [PULL 13/13] qmp: remove qmp_cpu
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,144 +24,86 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>, Eric Blake <eblake@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>
 
-A negative test case crept into doc-good.json: invalid use of section
-markup we currently fail to reject.  Move this into its own
-doc-bad-section.json.
+From: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
 
+'qmp_cpu' was implemented in commit 755f196898 ("qapi: Convert the cpu
+command") as a functional no-op, a QMP call that does nothing and
+return success. The idea, apparently, was to provide a counterpart
+for the HMP 'hmp_cpu' command, introduced in the same commit.
+
+After 6 years of its creation, qmp_cpu remains a functional no-op
+that does nothing, having no value for any caller/user. A proposal
+was sent to implement qmp_cpu like hmp_cpu works, but it was denied
+[1]. The reason is that QMP must be as stateless as possible and a
+function that changes its state (the current CPU monitor in the case
+of qmp_cpu) goes against it. Any QMP command that needs a specific
+monitor CPU setup must provide it in its arguments, instead of relying
+in the current QMP monitor state.
+
+After discussions that happened in [2] it was decided that a command
+that does nothing since its birth, no one uses for anything and will
+not be implemented, should be deprecated and erased. Given that we will
+*not* provide any replacement for qmp_cpu and we believe that there
+is no user relying on it, there is no point in adding a deprecation
+delay for it.
+
+So, this patch nukes qmp_cpu from QEMU code, removing both its blank
+implementation in qmp.c and its doc in qapi-schema.json.
+
+[1] https://lists.gnu.org/archive/html/qemu-devel/2017-12/msg02283.html
+[2] https://lists.gnu.org/archive/html/qemu-devel/2017-12/msg03696.html
+
+Signed-off-by: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
+CC: Markus Armbruster <armbru@redhat.com>
+CC: Eric Blake <eblake@redhat.com>
+CC: Daniel P. Berrange <berrange@redhat.com>
+Message-Id: <20171220102304.8288-1-danielhb@linux.vnet.ibm.com>
+Reviewed-by: Daniel P. Berrange <berrange@redhat.com>
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Message-Id: <20171002141341.24616-6-armbru@redhat.com>
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 ---
- tests/Makefile.include                 |  3 ++-
- tests/qapi-schema/doc-bad-section.err  |  0
- tests/qapi-schema/doc-bad-section.exit |  1 +
- tests/qapi-schema/doc-bad-section.json | 11 +++++++++++
- tests/qapi-schema/doc-bad-section.out  | 13 +++++++++++++
- tests/qapi-schema/doc-good.json        |  1 -
- tests/qapi-schema/doc-good.out         |  2 +-
- tests/qapi-schema/doc-good.texi        |  2 +-
- 8 files changed, 29 insertions(+), 4 deletions(-)
- create mode 100644 tests/qapi-schema/doc-bad-section.err
- create mode 100644 tests/qapi-schema/doc-bad-section.exit
- create mode 100644 tests/qapi-schema/doc-bad-section.json
- create mode 100644 tests/qapi-schema/doc-bad-section.out
+ qapi-schema.json | 11 -----------
+ qmp.c            |  5 -----
+ 2 files changed, 16 deletions(-)
 
-diff --git a/tests/Makefile.include b/tests/Makefile.include
-index b4bcc872f2..f8e20d9f5d 100644
---- a/tests/Makefile.include
-+++ b/tests/Makefile.include
-@@ -416,6 +416,7 @@ qapi-schema +=3D command-int.json
- qapi-schema +=3D comments.json
- qapi-schema +=3D doc-bad-alternate-member.json
- qapi-schema +=3D doc-bad-command-arg.json
-+qapi-schema +=3D doc-bad-section.json
- qapi-schema +=3D doc-bad-symbol.json
- qapi-schema +=3D doc-bad-union-member.json
- qapi-schema +=3D doc-before-include.json
-@@ -433,10 +434,10 @@ qapi-schema +=3D doc-invalid-end2.json
- qapi-schema +=3D doc-invalid-return.json
- qapi-schema +=3D doc-invalid-section.json
- qapi-schema +=3D doc-invalid-start.json
--qapi-schema +=3D doc-missing.json
- qapi-schema +=3D doc-missing-colon.json
- qapi-schema +=3D doc-missing-expr.json
- qapi-schema +=3D doc-missing-space.json
-+qapi-schema +=3D doc-missing.json
- qapi-schema +=3D doc-no-symbol.json
- qapi-schema +=3D double-data.json
- qapi-schema +=3D double-type.json
-diff --git a/tests/qapi-schema/doc-bad-section.err b/tests/qapi-schema/do=
-c-bad-section.err
-new file mode 100644
-index 0000000000..e69de29bb2
-diff --git a/tests/qapi-schema/doc-bad-section.exit b/tests/qapi-schema/d=
-oc-bad-section.exit
-new file mode 100644
-index 0000000000..573541ac97
---- /dev/null
-+++ b/tests/qapi-schema/doc-bad-section.exit
-@@ -0,0 +1 @@
-+0
-diff --git a/tests/qapi-schema/doc-bad-section.json b/tests/qapi-schema/d=
-oc-bad-section.json
-new file mode 100644
-index 0000000000..560df4b087
---- /dev/null
-+++ b/tests/qapi-schema/doc-bad-section.json
-@@ -0,0 +1,11 @@
-+# =3D section within an expression comment
-+# BUG: not rejected
-+
-+##
-+# @Enum:
-+# =3D=3D Produces *invalid* texinfo
-+# @one: The _one_ {and only}
-+#
-+# @two is undocumented
-+##
-+{ 'enum': 'Enum', 'data': [ 'one', 'two' ] }
-diff --git a/tests/qapi-schema/doc-bad-section.out b/tests/qapi-schema/do=
-c-bad-section.out
-new file mode 100644
-index 0000000000..6fce84dd34
---- /dev/null
-+++ b/tests/qapi-schema/doc-bad-section.out
-@@ -0,0 +1,13 @@
-+enum Enum ['one', 'two']
-+enum QType ['none', 'qnull', 'qnum', 'qstring', 'qdict', 'qlist', 'qbool=
-']
-+    prefix QTYPE
-+object q_empty
-+doc symbol=3DEnum
-+    body=3D
-+=3D=3D Produces *invalid* texinfo
-+    arg=3Done
-+The _one_ {and only}
-+    arg=3Dtwo
-+
-+    section=3D
-+@two is undocumented
-diff --git a/tests/qapi-schema/doc-good.json b/tests/qapi-schema/doc-good=
-.json
-index cfdc0a8a81..97ab4625ff 100644
---- a/tests/qapi-schema/doc-good.json
-+++ b/tests/qapi-schema/doc-good.json
-@@ -51,7 +51,6 @@
-=20
+diff --git a/qapi-schema.json b/qapi-schema.json
+index ea3723f903..5c06745c79 100644
+--- a/qapi-schema.json
++++ b/qapi-schema.json
+@@ -1046,17 +1046,6 @@
+ { 'command': 'system_powerdown' }
+ 
  ##
- # @Enum:
--# =3D=3D Produces *invalid* texinfo
- # @one: The _one_ {and only}
+-# @cpu:
+-#
+-# This command is a nop that is only provided for the purposes of compatibility.
+-#
+-# Since: 0.14.0
+-#
+-# Notes: Do not use this command.
+-##
+-{ 'command': 'cpu', 'data': {'index': 'int'} }
+-
+-##
+ # @cpu-add:
  #
- # @two is undocumented
-diff --git a/tests/qapi-schema/doc-good.out b/tests/qapi-schema/doc-good.=
-out
-index 63ca25a8b9..c55e394e8a 100644
---- a/tests/qapi-schema/doc-good.out
-+++ b/tests/qapi-schema/doc-good.out
-@@ -77,7 +77,7 @@ Examples:
- - {braces}
- doc symbol=3DEnum
-     body=3D
--=3D=3D Produces *invalid* texinfo
-+
-     arg=3Done
- The _one_ {and only}
-     arg=3Dtwo
-diff --git a/tests/qapi-schema/doc-good.texi b/tests/qapi-schema/doc-good=
-.texi
-index c410626e4a..a331349756 100644
---- a/tests/qapi-schema/doc-good.texi
-+++ b/tests/qapi-schema/doc-good.texi
-@@ -76,7 +76,7 @@ Examples:
-=20
- @deftp {Enum} Enum
-=20
--@subsection Produces @strong{invalid} texinfo
-+
-=20
- @b{Values:}
- @table @asis
---=20
+ # Adds CPU with specified ID
+diff --git a/qmp.c b/qmp.c
+index e8c303116a..52cfd2d81c 100644
+--- a/qmp.c
++++ b/qmp.c
+@@ -113,11 +113,6 @@ void qmp_system_powerdown(Error **erp)
+     qemu_system_powerdown_request();
+ }
+ 
+-void qmp_cpu(int64_t index, Error **errp)
+-{
+-    /* Just do nothing */
+-}
+-
+ void qmp_cpu_add(int64_t id, Error **errp)
+ {
+     MachineClass *mc;
+-- 
 2.13.6
