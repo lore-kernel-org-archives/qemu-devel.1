@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41534)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49221)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1eRbKa-0001Lh-32
-	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 05:10:36 -0500
+	(envelope-from <armbru@redhat.com>) id 1eRbQt-00051o-Oc
+	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 05:17:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1eRbKW-0005o5-1p
-	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 05:10:32 -0500
-Date: Wed, 20 Dec 2017 10:10:01 +0000
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20171220101001.GK21216@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <20171219173425.8113-1-f4bug@amsat.org>
-	<20171219173425.8113-10-f4bug@amsat.org>
+	(envelope-from <armbru@redhat.com>) id 1eRbQr-0003rI-WC
+	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 05:17:03 -0500
+From: Markus Armbruster <armbru@redhat.com>
+References: <1513542355-28203-1-git-send-email-jan.dakinevich@virtuozzo.com>
+	<1513542355-28203-2-git-send-email-jan.dakinevich@virtuozzo.com>
+	<87k1xig3zl.fsf@dusky.pond.sub.org>
+	<20171220034730.696c3ceb@virtuozzo.com>
+Date: Wed, 20 Dec 2017 11:16:46 +0100
+In-Reply-To: <20171220034730.696c3ceb@virtuozzo.com> (Jan Dakinevich's message
+	of "Wed, 20 Dec 2017 03:47:30 +0300")
+Message-ID: <873745d7qp.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20171219173425.8113-10-f4bug@amsat.org>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 9/9] iotests.py: use io.StringIO with
- python3
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [RFC v6 1/2] virtio: introduce `query-virtio' QMP
+ command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,61 +26,286 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Cc: Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Cleber Rosa <crosa@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, =?utf-8?B?THVrw6HFoQ==?= Doktor <ldoktor@redhat.com>, Eric Blake <eblake@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Fam Zheng <famz@redhat.com>, Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org, John Snow <jsnow@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Nir Soffer <nirsof@gmail.com>, Janosch Frank <frankja@linux.vnet.ibm.com>, Ishani Chugh <chugh.ishani@research.iiit.ac.in>
+To: Jan Dakinevich <jan.dakinevich@virtuozzo.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, "Denis V. Lunev" <den@virtuozzo.com>, qemu-block@nongnu.org, Amit Shah <amit@kernel.org>, Jason Wang <jasowang@redhat.com>, Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-On Tue, Dec 19, 2017 at 02:34:25PM -0300, Philippe Mathieu-Daud=C3=A9 wro=
-te:
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-> ---
->  tests/qemu-iotests/iotests.py | 7 +++++--
->  1 file changed, 5 insertions(+), 2 deletions(-)
+Jan Dakinevich <jan.dakinevich@virtuozzo.com> writes:
 
-Reviewed-by: Daniel P. Berrange <berrange@redhat.com>
+> On Tue, 19 Dec 2017 15:57:18 +0100
+> Markus Armbruster <armbru@redhat.com> wrote:
+>
+>> QAPI/QMP interface review only.
+>> 
+>> You neglected to cc: the maintainers of qapi-schema.json, so I'm doing
+>> that for you.
+>> 
+>
+> Thank you so much. I screwed up with this patchset at least twice: with
+> list of maintainers and with my own e-mail.
+>
+>> Jan Dakinevich <jan.dakinevich@virtuozzo.com> writes:
+>> 
+>> > The command is intended for gathering virtio information such as
+>> > status, feature bits, negotiation status. It is convenient and
+>> > useful for debug purpose.
+>> >
+>> > The commands returns generic virtio information for virtio such as
+>> > common feature names and status bits names and information for all
+>> > attached to current machine devices.
+>> >
+>> > To retrieve names of device-specific features `tell_feature_name'
+>> > callback in VirtioDeviceClass also was introduced.
+>> >
+>> > Cc: Denis V. Lunev <den@virtuozzo.com>
+>> > Signed-off-by: Jan Dakinevich <jan.dakinevich@virtuozzo.com>
+>> [...]
+>> > diff --git a/qapi-schema.json b/qapi-schema.json
+>> > index 1845795..51cd0f3 100644
+>> > --- a/qapi-schema.json
+>> > +++ b/qapi-schema.json
+>> > @@ -3200,3 +3200,73 @@
+>> >  # Since: 2.11
+>> >  ##
+>> >  { 'command': 'watchdog-set-action', 'data' : {'action':
+>> > 'WatchdogAction'} } +
+>> > +##
+>> > +# @VirtioFeature:
+>> > +#
+>> > +# Virtio feature bit with negotiation status
+>> > +#
+>> > +# @name: name of feature bit
+>> > +#
+>> > +# @acked: negotiation status, `true' if guest acknowledged the
+>> > feature +#
+>> > +# Since: 2.12
+>> > +##
+>> > +{
+>> > +    'struct': 'VirtioFeature',
+>> > +    'data': {
+>> > +        'name': 'str',
+>> > +        'acked': 'bool'
+>> > +    }
+>> > +}
+>> > +
+>> > +##
+>> > +# @VirtioInfo:
+>> > +#
+>> > +# Information about virtio device
+>> > +#
+>> > +# @qom-path: QOM path of the device
+>> > +#
+>> > +# @status: status bitmask
+>> > +#
+>> > +# @host-features: bitmask of features, exposed by device
+>> > +#
+>> > +# @guest-features: bitmask of features, acknowledged by guest
+>> 
+>> Quoting my review of v4: "Unsigned integer interpreted as combination
+>> of well-known bit-valued symbols" is a fine C interface, but a pretty
+>> horrid QMP interface.  What's wrong with doing a set the
+>> straightforward way as "array of enum"?  As far as I can see, I
+>> didn't get a reply back then.  You'll have to give one to get the
+>> patch accepted.
+>> 
+>
+> Most probably, I didn't understand you last time. Although, I'm still
+> far from correct understanding.
+>
+> About 'array of enum', I could make the following description:
+>
+> {
+>   'enum': 'VirtioFeatureScsiBit',
+>   'data': ['inout', 'hotplug', 'change', 'ta10_pi']
+> }
+>
+> {
+>   'struct': 'VirtioFeatureScsi',
+>   'data' : {
+>       'bit': 'VirtioFeatureScsiBit',
+>       'acked': 'bool'
+>   }
+> }
+>
+> {
+>   'enum': 'VirtioFeatureSerialBit',
+>   'data': ['size', 'multiport', 'emerg-write']
+> }
+>
+> {
+>   'struct': 'VirtioFeatureSerial',
+>   'data' : {
+>       'bit': 'VirtioFeatureSerialBit',
+>       'acked': 'bool'
+>   }
+> }
+>
+> { 
+>   'enum': 'VirtioFeatureCategory',
+>   'data': ['scsi', 'serial'] 
+> }
+>
+> {
+>   'union': 'VirtioFeature',
+>   'base': {
+>     'category': 'VirtioFeatureCategory'
+>   },
+>   'discriminator': 'categoty',
+>   'data': {
+>     'scsi': 'VirtioFeatureScsi',
+>     'serial': 'VirtioFeatureSerial'
+>   }
+> }
+>
+> {
+>   'union': 'VirtioInfo',
+>   'data': {
+>     'qom-path': 'str',
+>     'device-features': ['VirtioFeature']
+>     ...
+>   }
+> }
+>
+> But IMO, it only increases complexity without any benefit. To use this
+> description, at first it should be listed all features names in enums.
+> Then, these enums should be mapped into bit numbers and differently for
+> each virtio device. I expect something like this:
+>
+> VirtioFeatureScsiBit bit = ...
+>
+> switch (bit) {
+> case VIRTIO_FEATURE_SCSI_BIT_INOUT:
+>     return VIRTIO_SCSI_F_INOUT;
+> case VIRTIO_FEATURE_SERIAL_BIT_HOTPLUG:
+>     return VIRTIO_SCSI_F_HOTPLUG;
+> case VIRTIO_FEATURE_SERIAL_BIT_CHANGE:
+>     return VIRTIO_SCSI_F_CHANGE;
+> case VIRTIO_FEATURE_SERIAL_BIT_T10_PI:
+>     return VIRTIO_SCSI_F_T10_PI;
+> }
+>
+> So, boilerplate for mapping between bit numbers and and theirs names
+> will not go away.
 
+No argument.  It's not about simplifying the implementation, it's about
+finding the appropriate QMP interface.
 
->=20
-> diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotests=
-.py
-> index 4c515d2e6c..0e1b8ab6e6 100644
-> --- a/tests/qemu-iotests/iotests.py
-> +++ b/tests/qemu-iotests/iotests.py
-> @@ -459,13 +459,16 @@ def main(supported_fmts=3D[], supported_oses=3D['=
-linux']):
-> =20
->      # We need to filter out the time taken from the output so that qem=
-u-iotest
->      # can reliably diff the results against master output.
-> -    import StringIO
->      if debug:
->          output =3D sys.stdout
->          verbosity =3D 2
->          sys.argv.remove('-d')
->      else:
-> -        output =3D StringIO.StringIO()
-> +        try:
-> +            from StringIO import StringIO
-> +        except ImportError:
-> +            from io import StringIO
-> +        output =3D StringIO()
+> Furthermore, HMP command should produce readable output from QMP data,
+> features's enum values should be converted to strings from json
+> description. For that, for each possible VirtioFeatureCategary should
+> be called respective VirtioFeature*_str macro to resolve enum value.
+>
+> So, all my attempts to declare bit names within QAPI brings me to
+> familiar solutions.
 
-If it was nit-picking I'd put the py3 'io' import first and the py2
-'StringIO' as the fallback, but doesn't honestly matter
+QMP prefers symbols (strings on the wire, preferably enums in the
+schema) over magic numbers.
 
-> =20
->      logging.basicConfig(level=3D(logging.DEBUG if debug else logging.W=
-ARN))
-> =20
-> --=20
-> 2.15.1
->=20
+That said, numbers may be okay in certain cases, say when they're
+sufficiently well-known and QEMU only passes them along.  Drawback:
+defeats introspection; you can't see what bits this QEMU supports.  Why
+is that not interesting?
 
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+Taking a step back: what's the intended purpose of query-virtio?  The
+cover letter doesn't really say:
+
+    After some discussion, I am going to suggest reworked QMP/HMP for
+    gathering virtio info. It would provide the following monitor output.
+
+    (qemu) info virtio
+    virtio-blk-device at 0000:00:02.0
+      QOM path: /machine/peripheral-anon/device[0]/virtio-backend
+      status: 0x0f
+        VIRTIO_CONFIG_S_ACKNOWLEDGE
+        VIRTIO_CONFIG_S_DRIVER
+        VIRTIO_CONFIG_S_DRIVER_OK
+        VIRTIO_CONFIG_S_FEATURES_OK
+      host features:  0x0000000179000e54
+      guest features: 0x0000000130000e54
+      common features:
+        VIRTIO_F_NOTIFY_ON_EMPTY
+        VIRTIO_F_ANY_LAYOUT
+        VIRTIO_RING_F_INDIRECT_DESC              acked
+        VIRTIO_RING_F_EVENT_IDX                  acked
+        VIRTIO_F_BAD_FEATURE
+        VIRTIO_F_VERSION_1                       acked
+      device features:
+        VIRTIO_BLK_F_SEG_MAX                     acked
+        VIRTIO_BLK_F_BLK_SIZE                    acked
+        VIRTIO_BLK_F_FLUSH                       acked
+        VIRTIO_BLK_F_TOPOLOGY                    acked
+
+The first sentence carries no useful information; suggest to scratch it.
+The rest is an HMP example.  Examples are great, but we really need to
+understand *why* you need this command.
+
+>> In case symbolic names may not be known at QEMU compile time (me
+>> having to wonder at v6 is a sign of rather ineffective patch review,
+>> sorry about that): you have to explain this in the doc comment, with a
+>> reference to where the bits are specified.
+>> 
+>
+> ok
+
+Can you think of a scenario where status or feature bits occur that are
+not known to QEMU at compile time?
+
+>> > +#
+>> > +# @status-names: names of checked bits in status bitmask
+>> 
+>> How are the strings in @status-names connected to the bits in @status?
+>> Spell it out in this doc string, please.
+>> 
+>
+> ok
+>
+> ...but, strictly saying, I was not going to show in QAPI how these names
+> are mapped into bits, QMP answer would not contain how these names are
+> connected to bits. Otherwise, It would be reinvention of v4.
+
+To avoid going in circles some more, let's take a step back and examine
+what exactly you're trying to accomplish.  Give us use cases: this is my
+need, and this is how you use the proposed command to satisfy my need.
+Also give us design limitations: what the command is *not* trying to do.
+
+>> > +#
+>> > +# @common-features-names: names exposed features and negotiation
+>> > status, +# that are common to all devices
+>> > +#
+>> > +# @device-features-names: names exposed features and negotiation
+>> > status, +# that are specific to this device
+>> 
+>> Likewise.
+>> 
+>
+> ok
+>
+>> > +#
+>> > +# Since: 2.12
+>> > +##
+>> > +{
+>> > +    'struct': 'VirtioInfo',
+>> > +    'data': {
+>> > +        'qom-path': 'str',
+>> > +
+>> > +        'status': 'uint8',
+>> > +        'host-features': 'uint64',
+>> > +        'guest-features': 'uint64',
+>> > +
+>> > +        'status-names': ['str'],
+>> > +        'common-features-names': ['VirtioFeature'],
+>> > +        'device-features-names': ['VirtioFeature']
+>> > +    }
+>> > +}
+>> > +
+>> > +##
+>> > +# @query-virtio:
+>> > +#
+>> > +# Returns virtio information such as device status and features
+>> > +#
+>> > +# Since: 2.12
+>> > +##
+>> > +{
+>> > +    'command': 'query-virtio',
+>> > +    'data': {'*path': 'str'},
+>> > +    'returns': ['VirtioInfo']
+>> > +}
