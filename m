@@ -1,25 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56807)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58031)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1eRhym-00054X-Lg
-	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 12:16:29 -0500
+	(envelope-from <bounces@canonical.com>) id 1eRi2k-0008LA-As
+	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 12:20:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1eRhyl-0007Sg-GD
-	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 12:16:28 -0500
-Received: from mail-wr0-x242.google.com ([2a00:1450:400c:c0c::242]:42665)
+	(envelope-from <bounces@canonical.com>) id 1eRi2g-0001E0-Jh
+	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 12:20:34 -0500
+Received: from indium.canonical.com ([91.189.90.7]:39306)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1eRhyl-0007SF-6x
-	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 12:16:27 -0500
-Received: by mail-wr0-x242.google.com with SMTP id s66so22904335wrc.9
-	for <qemu-devel@nongnu.org>; Wed, 20 Dec 2017 09:16:27 -0800 (PST)
-Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Wed, 20 Dec 2017 18:14:58 +0100
-Message-Id: <1513790098-9815-47-git-send-email-pbonzini@redhat.com>
-In-Reply-To: <1513790098-9815-1-git-send-email-pbonzini@redhat.com>
-References: <1513790098-9815-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 46/46] chardev: convert the socket server to
- QIONetListener
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1eRi2g-0001DV-C6
+	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 12:20:30 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1eRi2f-0006oI-E6
+	for <qemu-devel@nongnu.org>; Wed, 20 Dec 2017 17:20:29 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 420A82E8075
+	for <qemu-devel@nongnu.org>; Wed, 20 Dec 2017 17:20:29 +0000 (UTC)
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 20 Dec 2017 17:02:51 -0000
+From: VinceLe <vincent.legoll@gmail.com>
+Reply-To: Bug 1594394 <1594394@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20160620140124.12349.60184.malonedeb@wampee.canonical.com>
+Message-Id: <151378937125.9696.4445587360110812646.malone@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1594394] Re: Using setreuid / setegid crashes
+ x86_64 user-mode target
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,177 +39,89 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-From: "Daniel P. Berrange" <berrange@redhat.com>
+I guess this is happening to my attempts to use pbuilder for cross-
+building armel / mipsel packages
 
-Instead of creating a QIOChannelSocket directly for the chardev
-server socket, use a QIONetListener. This provides the ability
-to listen on multiple sockets at the same time, so enables
-full support for IPv4/IPv6 dual stack.
+-- =
 
-Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
-Message-Id: <20171218135417.28301-2-berrange@redhat.com>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- chardev/char-socket.c | 73 +++++++++++++++++++++------------------------------
- 1 file changed, 30 insertions(+), 43 deletions(-)
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1594394
 
-diff --git a/chardev/char-socket.c b/chardev/char-socket.c
-index 53eda8e..630a7f2 100644
---- a/chardev/char-socket.c
-+++ b/chardev/char-socket.c
-@@ -25,6 +25,7 @@
- #include "chardev/char.h"
- #include "io/channel-socket.h"
- #include "io/channel-tls.h"
-+#include "io/net-listener.h"
- #include "qemu/error-report.h"
- #include "qapi/error.h"
- #include "qapi/clone-visitor.h"
-@@ -40,8 +41,7 @@ typedef struct {
-     Chardev parent;
-     QIOChannel *ioc; /* Client I/O channel */
-     QIOChannelSocket *sioc; /* Client master channel */
--    QIOChannelSocket *listen_ioc;
--    guint listen_tag;
-+    QIONetListener *listener;
-     QCryptoTLSCreds *tls_creds;
-     int connected;
-     int max_size;
-@@ -93,9 +93,9 @@ static void check_report_connect_error(Chardev *chr,
-     qemu_chr_socket_restart_timer(chr);
- }
- 
--static gboolean tcp_chr_accept(QIOChannel *chan,
--                               GIOCondition cond,
--                               void *opaque);
-+static void tcp_chr_accept(QIONetListener *listener,
-+                           QIOChannelSocket *cioc,
-+                           void *opaque);
- 
- static int tcp_chr_read_poll(void *opaque);
- static void tcp_chr_disconnect(Chardev *chr);
-@@ -401,9 +401,9 @@ static void tcp_chr_disconnect(Chardev *chr)
- 
-     tcp_chr_free_connection(chr);
- 
--    if (s->listen_ioc && s->listen_tag == 0) {
--        s->listen_tag = qio_channel_add_watch(
--            QIO_CHANNEL(s->listen_ioc), G_IO_IN, tcp_chr_accept, chr, NULL);
-+    if (s->listener) {
-+        qio_net_listener_set_client_func(s->listener, tcp_chr_accept,
-+                                         chr, NULL);
-     }
-     update_disconnected_filename(s);
-     if (emit_close) {
-@@ -702,9 +702,8 @@ static int tcp_chr_new_client(Chardev *chr, QIOChannelSocket *sioc)
-     if (s->do_nodelay) {
-         qio_channel_set_delay(s->ioc, false);
-     }
--    if (s->listen_tag) {
--        g_source_remove(s->listen_tag);
--        s->listen_tag = 0;
-+    if (s->listener) {
-+        qio_net_listener_set_client_func(s->listener, NULL, NULL, NULL);
-     }
- 
-     if (s->tls_creds) {
-@@ -736,24 +735,14 @@ static int tcp_chr_add_client(Chardev *chr, int fd)
-     return ret;
- }
- 
--static gboolean tcp_chr_accept(QIOChannel *channel,
--                               GIOCondition cond,
--                               void *opaque)
-+static void tcp_chr_accept(QIONetListener *listener,
-+                           QIOChannelSocket *cioc,
-+                           void *opaque)
- {
-     Chardev *chr = CHARDEV(opaque);
--    QIOChannelSocket *sioc;
--
--    sioc = qio_channel_socket_accept(QIO_CHANNEL_SOCKET(channel),
--                                     NULL);
--    if (!sioc) {
--        return TRUE;
--    }
--
--    tcp_chr_new_client(chr, sioc);
- 
--    object_unref(OBJECT(sioc));
--
--    return TRUE;
-+    tcp_chr_set_client_ioc_name(chr, cioc);
-+    tcp_chr_new_client(chr, cioc);
- }
- 
- static int tcp_chr_wait_connected(Chardev *chr, Error **errp)
-@@ -767,9 +756,10 @@ static int tcp_chr_wait_connected(Chardev *chr, Error **errp)
-         if (s->is_listen) {
-             info_report("QEMU waiting for connection on: %s",
-                         chr->filename);
--            qio_channel_set_blocking(QIO_CHANNEL(s->listen_ioc), true, NULL);
--            tcp_chr_accept(QIO_CHANNEL(s->listen_ioc), G_IO_IN, chr);
--            qio_channel_set_blocking(QIO_CHANNEL(s->listen_ioc), false, NULL);
-+            sioc = qio_net_listener_wait_client(s->listener);
-+            tcp_chr_set_client_ioc_name(chr, sioc);
-+            tcp_chr_new_client(chr, sioc);
-+            object_unref(OBJECT(sioc));
-         } else {
-             sioc = qio_channel_socket_new();
-             tcp_chr_set_client_ioc_name(chr, sioc);
-@@ -797,12 +787,9 @@ static void char_socket_finalize(Object *obj)
-         s->reconnect_timer = 0;
-     }
-     qapi_free_SocketAddress(s->addr);
--    if (s->listen_tag) {
--        g_source_remove(s->listen_tag);
--        s->listen_tag = 0;
--    }
--    if (s->listen_ioc) {
--        object_unref(OBJECT(s->listen_ioc));
-+    if (s->listener) {
-+        qio_net_listener_set_client_func(s->listener, NULL, NULL, NULL);
-+        object_unref(OBJECT(s->listener));
-     }
-     if (s->tls_creds) {
-         object_unref(OBJECT(s->tls_creds));
-@@ -935,29 +922,29 @@ static void qmp_chardev_open_socket(Chardev *chr,
-     } else {
-         if (s->is_listen) {
-             char *name;
--            sioc = qio_channel_socket_new();
-+            s->listener = qio_net_listener_new();
- 
-             name = g_strdup_printf("chardev-tcp-listener-%s", chr->label);
--            qio_channel_set_name(QIO_CHANNEL(sioc), name);
-+            qio_net_listener_set_name(s->listener, name);
-             g_free(name);
- 
--            if (qio_channel_socket_listen_sync(sioc, s->addr, errp) < 0) {
-+            if (qio_net_listener_open_sync(s->listener, s->addr, errp) < 0) {
-+                object_unref(OBJECT(s->listener));
-+                s->listener = NULL;
-                 goto error;
-             }
- 
-             qapi_free_SocketAddress(s->addr);
--            s->addr = socket_local_address(sioc->fd, errp);
-+            s->addr = socket_local_address(s->listener->sioc[0]->fd, errp);
-             update_disconnected_filename(s);
- 
--            s->listen_ioc = sioc;
-             if (is_waitconnect &&
-                 qemu_chr_wait_connected(chr, errp) < 0) {
-                 return;
-             }
-             if (!s->ioc) {
--                s->listen_tag = qio_channel_add_watch(
--                    QIO_CHANNEL(s->listen_ioc), G_IO_IN,
--                    tcp_chr_accept, chr, NULL);
-+                qio_net_listener_set_client_func(s->listener, tcp_chr_accept,
-+                                                 chr, NULL);
-             }
-         } else if (qemu_chr_wait_connected(chr, errp) < 0) {
-             goto error;
--- 
-1.8.3.1
+Title:
+  Using setreuid / setegid crashes x86_64 user-mode target
+
+Status in QEMU:
+  New
+
+Bug description:
+  When setreuid() or setegid() are called from x86_64 target code in
+  user mode, qemu crashes inside the NPTL signal handlers.  x86 targets
+  do not directly use a syscall to handle setreuid() / setegid();
+  instead the x86 NPTL implementation sets up a temporary data region in
+  memory (__xidcmd) and issues a signal (SIGRT1) to all threads,
+  allowing the handler for that signal to issue the syscall.  Under
+  qemu, __xidcmd remains null (see variable display below backtrace).
+
+  Backtrace:
+  Program received signal SIGSEGV, Segmentation fault.
+  [Switching to Thread 0x3fff85c74fc0 (LWP 74517)]
+  0x000000006017491c in sighandler_setxid (sig=3D33, si=3D0x3fff85c72d08, c=
+tx=3D0x3fff85c71f90) at nptl-init.c:263
+  263     nptl-init.c: No such file or directory.
+  (gdb) thread apply all bt
+
+  Thread 3 (Thread 0x3fff87e8efc0 (LWP 74515)):
+  #0  0x00000000601cc430 in syscall ()
+  #1  0x0000000060109080 in futex_wait (val=3D<optimized out>, ev=3D<optimi=
+zed out>) at /build/qemu/util/qemu-thread-posix.c:292
+  #2  qemu_event_wait (ev=3D0x62367bb0 <rcu_call_ready_event>) at /build/qe=
+mu/util/qemu-thread-posix.c:399
+  #3  0x000000006010f73c in call_rcu_thread (opaque=3D<optimized out>) at /=
+build/qemu/util/rcu.c:250
+  #4  0x0000000060176f8c in start_thread (arg=3D0x3fff87e8efc0) at pthread_=
+create.c:336
+  #5  0x00000000601cebf4 in clone ()
+
+  Thread 2 (Thread 0x3fff85c74fc0 (LWP 74517)):
+  #0  0x000000006017491c in sighandler_setxid (sig=3D33, si=3D0x3fff85c72d0=
+8, ctx=3D0x3fff85c71f90) at nptl-init.c:263
+  #1  <signal handler called>
+  #2  0x00000000601cc42c in syscall ()
+  #3  0x0000000060044b08 in safe_futex (val3=3D<optimized out>, uaddr2=3D0x=
+0, timeout=3D<optimized out>, val=3D<optimized out>, op=3D128, uaddr=3D<opt=
+imized out>) at /build/qemu/linux-user/syscall.c:748
+  #4  do_futex (val3=3D<optimized out>, uaddr2=3D275186650880, timeout=3D0,=
+ val=3D1129, op=3D128, uaddr=3D275186651116) at /build/qemu/linux-user/sysc=
+all.c:6201
+  #5  do_syscall (cpu_env=3D0x1000abfd350, num=3D<optimized out>, arg1=3D27=
+5186651116, arg2=3D<optimized out>, arg3=3D1129, arg4=3D0, arg5=3D275186650=
+880, arg6=3D<optimized out>, arg7=3D0, arg8=3D0)
+      at /build/qemu/linux-user/syscall.c:10651
+  #6  0x00000000600347b8 in cpu_loop (env=3D0x1000abfd350) at /build/qemu/l=
+inux-user/main.c:317
+  #7  0x0000000060036ae0 in clone_func (arg=3D0x3fffc4c2ca38) at /build/qem=
+u/linux-user/syscall.c:5445
+  #8  0x0000000060176f8c in start_thread (arg=3D0x3fff85c74fc0) at pthread_=
+create.c:336
+  #9  0x00000000601cebf4 in clone ()
+
+  Thread 1 (Thread 0x1000aa05000 (LWP 74511)):
+  #0  0x00000000601cc430 in syscall ()
+  #1  0x0000000060044b08 in safe_futex (val3=3D<optimized out>, uaddr2=3D0x=
+0, timeout=3D<optimized out>, val=3D<optimized out>, op=3D128, uaddr=3D<opt=
+imized out>) at /build/qemu/linux-user/syscall.c:748
+  #2  do_futex (val3=3D<optimized out>, uaddr2=3D1, timeout=3D0, val=3D1, o=
+p=3D128, uaddr=3D275078324992) at /build/qemu/linux-user/syscall.c:6201
+  #3  do_syscall (cpu_env=3D0x1000aa23890, num=3D<optimized out>, arg1=3D27=
+5078324992, arg2=3D<optimized out>, arg3=3D1, arg4=3D0, arg5=3D1, arg6=3D<o=
+ptimized out>, arg7=3D0, arg8=3D0) at /build/qemu/linux-user/syscall.c:10651
+  #4  0x00000000600347b8 in cpu_loop (env=3D0x1000aa23890) at /build/qemu/l=
+inux-user/main.c:317
+  #5  0x00000000600020e4 in main (argc=3D<optimized out>, argv=3D<optimized=
+ out>, envp=3D<optimized out>) at /build/qemu/linux-user/main.c:4779
+  (gdb) p __xidcmd
+  $1 =3D (struct xid_command *) 0x0
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1594394/+subscriptions
