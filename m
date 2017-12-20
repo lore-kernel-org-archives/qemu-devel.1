@@ -1,14 +1,17 @@
-Received: from eggs.gnu.org ([208.118.235.92]:35083)
+Received: from eggs.gnu.org ([208.118.235.92]:35141)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1eRgd6-0003uv-Pt
-	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 10:50:09 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1eRgdB-0003vb-Id
+	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 10:50:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1eRgd1-0005eK-JZ
-	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 10:50:00 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1eRgd1-0005eR-Mr
+	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 10:50:03 -0500
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Wed, 20 Dec 2017 18:49:32 +0300
-Message-Id: <20171220154945.88410-1-vsementsov@virtuozzo.com>
-Subject: [Qemu-devel] [PATCH v9 00/13] Dirty bitmaps postcopy migration
+Date: Wed, 20 Dec 2017 18:49:42 +0300
+Message-Id: <20171220154945.88410-11-vsementsov@virtuozzo.com>
+In-Reply-To: <20171220154945.88410-1-vsementsov@virtuozzo.com>
+References: <20171220154945.88410-1-vsementsov@virtuozzo.com>
+Subject: [Qemu-devel] [PATCH v9 10/13] migration: add postcopy migration of
+ dirty bitmaps
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,350 +23,862 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org, qemu-devel@nongnu.org
 Cc: pbonzini@redhat.com, armbru@redhat.com, eblake@redhat.com, famz@redhat.com, stefanha@redhat.com, amit.shah@redhat.com, quintela@redhat.com, mreitz@redhat.com, kwolf@redhat.com, peter.maydell@linaro.org, dgilbert@redhat.com, den@openvz.org, jsnow@redhat.com, vsementsov@virtuozzo.com, lirans@il.ibm.com
 
-Hi all!
+Postcopy migration of dirty bitmaps. Only named dirty bitmaps,
+associated with root nodes and non-root named nodes are migrated.
 
-There is a new version of dirty bitmap postcopy migration series.
+If destination qemu is already containing a dirty bitmap with the same name
+as a migrated bitmap (for the same node), then, if their granularities are
+the same the migration will be done, otherwise the error will be generated.
 
-v9
+If destination qemu doesn't contain such bitmap it will be created.
 
-clone: tag postcopy-v9 from https://src.openvz.org/scm/~vsementsov/qemu.git
-online: https://src.openvz.org/users/vsementsov/repos/qemu/browse?at=postcopy-v9
-
-01: r-b John
-02: was incomplete, now add here bdrv_reclaim_dirty_bitmap fix
-03: new
-04: new
-05: r-b John
-07: fix type in commit message, r-b John
-09: add comment about is_active_iterate, r-b Snow and keep Juan's r-b, hope comment is ok
-10: change copyright to Virtuozzo
-    reword comment at the top of the file
-    rewrite init_dirty_bitmap_migration, to not do same things twice (John)
-      and skip _only_ unnamed bitmaps, error out for unnamed nodes (John)
-    use new "locked" state of bitmaps instead of frozen on source vm
-    do not support migrating bitmap to existent one with the same name,
-      keep only create-new-bitmap way
-    break loop in dirty_bitmap_load_complete when bitmap is found
-    use bitmap locking instead of context acquire
-12: rewrite, to add more cases. (note, that 169 iotest is also in my
-    "[PATCH v2 0/3] fix bitmaps migration through shared storage", which probably should
-    go to qemu-stable. So this patch should rewrite it, but here I make it like new patch,
-    to simplify review. When "[PATCH v2..." merged I'll rebase this on it), drop r-b
-13: move to separate test, drop r-b
-
-
-v8.1
-
-clone: tag postcopy-v8.1 from https://src.openvz.org/scm/~vsementsov/qemu.git
-online: https://src.openvz.org/users/vsementsov/repos/qemu/browse?at=postcopy-v8.1
-
-05: fix compilation, add new version for cmma_save_pending too.
-
-
-v8
-
-clone: tag postcopy-v8 from https://src.openvz.org/scm/~vsementsov/qemu.git
-online: https://src.openvz.org/users/vsementsov/repos/qemu/browse?at=postcopy-v8
-
-- rebased on master
-- patches 01-03 from v7 are already merged to master
-- patch order is changed to make it possible to merge block/dirty-bitmap patches
-  in separate if is needed
-01: new patch
-03: fixed to use _locked version of bdrv_release_dirty_bitmap
-06: qapi-schema.json -> qapi/migration.json
-    2.9 -> 2.11
-10: protocol changed a bit:
-  instead of 1 byte "bitmap enabled flag" this byte becomes just "flags"
-  and have "enabled", "persistent" and "autoloading" flags inside.
-  also, make all migrated bitmaps to be not persistent (to prevent their
-  storing on source vm)
-14: new patch
-
-
-patches status:
-01-04 - are only about block/dirty-bitmap and have no r-b. Fam, John, Paolo (about bitmap lock),
-    please look at. These patches are ok to be merged in separate (but before 05-14)
-other patches are about migration
-05-09 has Juan's r-b (and some of them has John's and Eric's r-bs)
-10 - the main patch (dirty bitmaps migration), has no r-b.
-11 - preparation for tests, not related to migration directly, has Max's r-b, ok to be merged
-    separately (but before 12-14)
-12-14 - tests, 12 and 13 have Max's r-b, 14 is new
-
-
-v7
-
-clone: tag postcopy-v7 from https://src.openvz.org/scm/~vsementsov/qemu.git
-online: https://src.openvz.org/users/vsementsov/repos/qemu/browse?at=postcopy-v7
-
-- rebased on dirty-bitmap byte-based interfaces
-    (based on git://repo.or.cz/qemu/ericb.git branch nbd-byte-dirty-v4)
-- migration of persistent bitmaps should fail for shared storage migration for now,
-  as persistent dirty bitmaps are stored/load on inactivate/invalidate-cache.
-  also, even for non-shared storage migration there would be useless saving of dirty
-  bitmaps on source. This all will be optimized later.
-
-01: staff from include/migration/vmstate.h moved to include/migration/register.h (rebase)
-03: some structural changes due to rebase - drop r-b
-04: staff from include/migration/vmstate.h moved to include/migration/register.h (rebase)
-    staff from include/sysemu/sysemu.h moved to migration/savevm.h (rebase)
-05: fix patch header: block -> block/dirty-bitmap
-    add locking, drop r-b
-06: staff from include/migration/migration.h moved to migration/migration.h (rebase)
-07: add locking, drop r-b
-09: staff from include/migration/qemu-file.h moved to migration/qemu-file.h (rebase)
-10: staff from include/migration/vmstate.h moved to include/migration/register.h (rebase)
-11: new patch
-12: a lot of changes/fixes (mostly by Fam's comments) + rebase
-    header-definition movement
-    remove include <assert.h>
-    add some includes
-    fix/refactor bitmap flags send
-    byte-based interface for dirty bitmaps (rebase)
-    froze bitmaps on source
-    init_dirty_bitmap_migration can return error, if some of bitmaps are already
-      frozen
-    bdrv_ref drives with bitmaps
-    fprintf -> error_report
-    check version_id in _load function
-
-v6:
-
-clone: tag postcopy-v6 from https://src.openvz.org/scm/~vsementsov/qemu.git
-online: https://src.openvz.org/users/vsementsov/repos/qemu/browse?at=postcopy-v6
-
-rebase on master.
-
-03 - tiny contextual change
-
-12 - little change, but it should be reviewed. Call of init_dirty_bitmap_incoming_migration()
-    (which only initialize mutex) moved from start of process_incoming_migration_co (it was
-    immediately after "mis = migration_incoming_state_new(f)") to migration_incoming_get_current()
-    to stay with initialization code.
-    I remove r-b's, but hope that this will not be a problem. The only change in this patch - is moved
-    call of init_dirty_bitmap_incoming_migration.
-    I do so because of recent
-
-commit b4b076daf324894dd288cbdb67ff1e3c7434df7b
-Author: Juan Quintela <quintela@redhat.com>
-Date:   Mon Jan 23 22:32:06 2017 +0100
-
-    migration: create Migration Incoming State at init time
-
-15 - add Max's r-b
-
-v5:
-
-clone: tag postcopy-v5 from https://src.openvz.org/scm/~vsementsov/qemu.git
-online: https://src.openvz.org/users/vsementsov/repos/qemu/browse?at=postcopy-v5
-
-- move 'signed-off' over 'reviewed-by' in patches.
-
-03,04 - add comments. Hope they will be ok for you, so add Juan's r-b.
-    If not ok - let me know and I'll resend.
-
-06,08,12 - add Max's r-b
-07,09,10,11,12 - add Juan's r-b
-
-14 - used last version of this patch from qcow2-bitmap series with 
-     Max's r-b. It has contextual changes due to different base.
-
-15 - fix 041 iotest, add default node-name only if path is specified and
-     node-name is not specified
-16 - handle whitespaces
-       s/"exec: cat " + fifo/"exec: cat '" + fifo + "'"/
-     fix indentation
-     add Max's r-b
-17 - fix typos, wrong size in comment, s/md5/sha256/
-     add Max's r-b
-
-v4:
-
-clone: tag postcopy-v4 from https://src.openvz.org/scm/~vsementsov/qemu.git
-online: https://src.openvz.org/users/vsementsov/repos/qemu/browse?at=postcopy-v4
-
-reroll, to fix "failed automatic build test"
-
-rebase on master!
-
-07: since 2.8 -> since 2.9
-14: fix build of test-hbitmap
-    since 2.8 -> since 2.9 and small rewording of comment (this change was not done for
-    same patch in may parallels series about qcow2 bitmap extension)
-
-v3:
-
-rebased on Max's block branch: https://github.com/XanClic/qemu/commits/block
-clone: tag postcopy-v3 from https://src.openvz.org/scm/~vsementsov/qemu.git
-online: https://src.openvz.org/users/vsementsov/repos/qemu/browse?at=postcopy-v3
-
-01  - r-b by Juan
-02  - r-b by Juan and David
-04  - fix indent
-07  - s/since 2.6/since 2.8/
-10  - change variable name s/buf/str/
-12  - improve copyright message and move it up
-      fix memory loss (thanks to Juan)
-      switch from DPRINTF to trace events
-14* - switch to sha256 and qcrypto_hash_*
-      separate qmp command x-debug-block-dirty-bitmap-sha256
-16  - use path_suffix for multi-vm test
-      fix indent
-      fix copyright
-      use x-debug-block-dirty-bitmap-sha256 instead of md5
-17  - use x-debug-block-dirty-bitmap-sha256 instead of md5
-      remove not existing 170 test from qemu-iotests/group
-
-*Note: patch 14 is also used in my second series 'qcow2 persistent dirty bitmaps'
-
-
-v2:
-some bugs fixed, iotests a bit changed and merged into one test.
-based on block-next (https://github.com/XanClic/qemu/commits/block-next)
-clone: tag postcopy-v2 from https://src.openvz.org/scm/~vsementsov/qemu.git
-online: https://src.openvz.org/users/vsementsov/repos/qemu/browse?at=refs%2Ftags%2Fpostcopy-v2
-
-v1:
-
-These series are derived from my 'Dirty bitmaps migration' series. The
-core idea is switch to postcopy migration and drop usage of meta
-bitmaps.
-
-These patches provide dirty bitmap postcopy migration feature. Only
-named dirty bitmaps are to be migrated. Migration may be enabled using
-migration capabilities.
-
-The overall method (thanks to John Snow):
-
-1. migrate bitmaps meta data in .save_live_setup
-   - create/find related bitmaps on target
-   - disable them
-   - create successors (anonimous children) only for enabled migrated
-     bitmaps
-2. do nothing in precopy stage
-3. just before target vm start: enable successors, created in (1)
-4. migrate bitmap data
-5. reclaime bitmaps (merge successors to their parents)
-6. enable bitmaps (only bitmaps, which was enabled in source)
-
-
-Some patches are unchnaged from (v7) of 'Dirty bitmaps migration'
-(DBMv7). I've left Reviewed-by's for them, if you don't like it, say me
-and I'll drop them in the following version.
-
-So, relatively to last DBMv7: 
-
-01-04: new patches, splitting common postcopy migration out of ram
-       postcopy migration
-   05: equal to DBMv7.05
-   06: new
-   07: equal to DBMv7.06
-   08: new
-   09: equal to DBMv7.07
-   10: new
-   11: derived from DBMv7.08, see below
-12-15: equal to DBMv7.09-12
-   16: derived from DBMv7.13
-       - switch from fifo to socket, as postcopy don't work with fifo
-         for now
-       - change parameters: size, granularity, regions
-       - add time.sleep, to wait for postcopy migration phase (bad
-         temporary solution.
-       - drop Reviewed-by
-   17: new
-
-   11: the core patch of the series, it is derived from
-       [DBMv7.08: migration: add migration_block-dirty-bitmap.c]
-       There are a lot of changes related to switching from precopy to
-       postcopy, but functions related to migration stream itself
-       (structs, send/load sequences) are mostly unchnaged.
-
-       So, changes, to switch from precopy to postcopy:
-       - removed all staff related to meta bitmaps and dirty phase!!!
-       - add dirty_bitmap_mig_enable_successors, and call it before
-         target vm start in loadvm_postcopy_handle_run
-       - add enabled_bitmaps list of bitmaps for
-         dirty_bitmap_mig_enable_successors
-
-       - enabled flag is send with start bitmap chunk instead of
-         completion chunk
-       - sectors_per_chunk is calculated directly from CHUNK_SIZE, not
-         using meta bitmap granularity
-
-       - dirty_bitmap_save_iterate: remove dirty_phase, move bulk_phase
-         to postcopy stage
-       - dirty_bitmap_save_pending: remove dirty phase related pending,
-         switch pending to non-postcopyable
-       - dirty_bitmap_load_start: get enabled flag and prepare
-         successors for enabled bitmaps, also add them to
-         enabled_bitmaps list
-       - dirty_bitmap_load_complete: for enabled bitmaps: merge them
-         with successors and enable
-
-       - savevm handlers:
-         * remove separate savevm_dirty_bitmap_live_iterate_handlers state
-           (it was bad idea, any way), and move its save_live_iterate to
-           savevm_dirty_bitmap_handlers
-         * add is_active_iterate savevm handler, which allows iterations
-           only in postcopy stage (after stopping source vm)
-         * add has_postcopy savevm handler. (ofcourse, just returning true)
-         * use save_live_complete_postcopy instead of
-           save_live_complete_precopy
-
-       Other changes:
-       - some debug output changed
-       - remove MIN_LIVE_SIZE, is_live_iterative and related staff (it
-         was needed to omit iterations if bitmap data is small, possibly
-         this should be reimplemented)
-
-Vladimir Sementsov-Ogievskiy (13):
-  block/dirty-bitmap: add bdrv_dirty_bitmap_enable_successor()
-  block/dirty-bitmap: fix locking in bdrv_reclaim_dirty_bitmap
-  block/dirty-bitmap: add _locked version of bdrv_reclaim_dirty_bitmap
-  dirty-bitmap: add locked state
-  migration: introduce postcopy-only pending
-  qapi: add dirty-bitmaps migration capability
-  migration: include migrate_dirty_bitmaps in migrate_postcopy
-  migration/qemu-file: add qemu_put_counted_string()
-  migration: add is_active_iterate handler
-  migration: add postcopy migration of dirty bitmaps
-  iotests: add default node-name
-  iotests: add dirty bitmap migration test
-  iotests: add dirty bitmap postcopy test
-
- qapi/block-core.json           |   5 +-
- qapi/migration.json            |   6 +-
- include/block/dirty-bitmap.h   |   7 +
+Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+---
  include/migration/misc.h       |   3 +
- include/migration/register.h   |  26 +-
- migration/migration.h          |   4 +
- migration/qemu-file.h          |   2 +
- migration/savevm.h             |   5 +-
- block/dirty-bitmap.c           | 120 +++++--
- blockdev.c                     |  19 ++
- hw/s390x/s390-stattrib.c       |   7 +-
+ migration/migration.h          |   3 +
  migration/block-dirty-bitmap.c | 732 +++++++++++++++++++++++++++++++++++++++++
- migration/block.c              |   7 +-
- migration/migration.c          |  29 +-
- migration/qemu-file.c          |  13 +
- migration/ram.c                |   9 +-
- migration/savevm.c             |  20 +-
+ migration/migration.c          |   3 +
+ migration/savevm.c             |   2 +
  vl.c                           |   1 +
  migration/Makefile.objs        |   1 +
- migration/trace-events         |  16 +-
- tests/qemu-iotests/169         | 139 ++++++++
- tests/qemu-iotests/169.out     |   5 +
- tests/qemu-iotests/199         | 105 ++++++
- tests/qemu-iotests/199.out     |   5 +
- tests/qemu-iotests/group       |   2 +
- tests/qemu-iotests/iotests.py  |   9 +-
- 26 files changed, 1232 insertions(+), 65 deletions(-)
+ migration/trace-events         |  14 +
+ 8 files changed, 759 insertions(+)
  create mode 100644 migration/block-dirty-bitmap.c
- create mode 100755 tests/qemu-iotests/169
- create mode 100644 tests/qemu-iotests/169.out
- create mode 100755 tests/qemu-iotests/199
- create mode 100644 tests/qemu-iotests/199.out
 
+diff --git a/include/migration/misc.h b/include/migration/misc.h
+index c079b7771b..9cc539e232 100644
+--- a/include/migration/misc.h
++++ b/include/migration/misc.h
+@@ -55,4 +55,7 @@ bool migration_has_failed(MigrationState *);
+ bool migration_in_postcopy_after_devices(MigrationState *);
+ void migration_global_dump(Monitor *mon);
+ 
++/* migration/block-dirty-bitmap.c */
++void dirty_bitmap_mig_init(void);
++
+ #endif
+diff --git a/migration/migration.h b/migration/migration.h
+index 50d1f01346..4e3ad04664 100644
+--- a/migration/migration.h
++++ b/migration/migration.h
+@@ -211,4 +211,7 @@ void migrate_send_rp_pong(MigrationIncomingState *mis,
+ void migrate_send_rp_req_pages(MigrationIncomingState *mis, const char* rbname,
+                               ram_addr_t start, size_t len);
+ 
++void dirty_bitmap_mig_before_vm_start(void);
++void init_dirty_bitmap_incoming_migration(void);
++
+ #endif
+diff --git a/migration/block-dirty-bitmap.c b/migration/block-dirty-bitmap.c
+new file mode 100644
+index 0000000000..782e0fc1d4
+--- /dev/null
++++ b/migration/block-dirty-bitmap.c
+@@ -0,0 +1,732 @@
++/*
++ * Block dirty bitmap postcopy migration
++ *
++ * Copyright IBM, Corp. 2009
++ * Copyright (c) 2016-2017 Virtuozzo International GmbH. All rights reserved.
++ *
++ * Authors:
++ *  Liran Schour   <lirans@il.ibm.com>
++ *  Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2.  See
++ * the COPYING file in the top-level directory.
++ * This file is derived from migration/block.c, so it's author and IBM copyright
++ * are here, although content is quite different.
++ *
++ * Contributions after 2012-01-13 are licensed under the terms of the
++ * GNU GPL, version 2 or (at your option) any later version.
++ *
++ *                                ***
++ *
++ * Here postcopy migration of dirty bitmaps is realized. Only QMP-addressable
++ * bitmaps, associated with root nodes and non-root named nodes are migrated.
++ *
++ * Bitmap migration implies creating bitmap with the same name and granularity
++ * in destination QEMU. If the bitmap with the same name (for the same node)
++ * already exists on destination an error will be generated.
++ *
++ * format of migration:
++ *
++ * # Header (shared for different chunk types)
++ * 1, 2 or 4 bytes: flags (see qemu_{put,put}_flags)
++ * [ 1 byte: node name size ] \  flags & DEVICE_NAME
++ * [ n bytes: node name     ] /
++ * [ 1 byte: bitmap name size ] \  flags & BITMAP_NAME
++ * [ n bytes: bitmap name     ] /
++ *
++ * # Start of bitmap migration (flags & START)
++ * header
++ * be64: granularity
++ * 1 byte: bitmap flags (corresponds to BdrvDirtyBitmap)
++ *   bit 0    -  bitmap is enabled
++ *   bit 1    -  bitmap is persistent
++ *   bit 2    -  bitmap is autoloading
++ *   bits 3-7 - reserved, must be zero
++ *
++ * # Complete of bitmap migration (flags & COMPLETE)
++ * header
++ *
++ * # Data chunk of bitmap migration
++ * header
++ * be64: start sector
++ * be32: number of sectors
++ * [ be64: buffer size  ] \ ! (flags & ZEROES)
++ * [ n bytes: buffer    ] /
++ *
++ * The last chunk in stream should contain flags & EOS. The chunk may skip
++ * device and/or bitmap names, assuming them to be the same with the previous
++ * chunk.
++ */
++
++#include "qemu/osdep.h"
++#include "block/block.h"
++#include "block/block_int.h"
++#include "sysemu/block-backend.h"
++#include "qemu/main-loop.h"
++#include "qemu/error-report.h"
++#include "migration/misc.h"
++#include "migration/migration.h"
++#include "migration/qemu-file.h"
++#include "migration/vmstate.h"
++#include "migration/register.h"
++#include "qemu/hbitmap.h"
++#include "sysemu/sysemu.h"
++#include "qemu/cutils.h"
++#include "qapi/error.h"
++#include "trace.h"
++
++#define CHUNK_SIZE     (1 << 10)
++
++/* Flags occupy one, two or four bytes (Big Endian). The size is determined as
++ * follows:
++ * in first (most significant) byte bit 8 is clear  -->  one byte
++ * in first byte bit 8 is set    -->  two or four bytes, depending on second
++ *                                    byte:
++ *    | in second byte bit 8 is clear  -->  two bytes
++ *    | in second byte bit 8 is set    -->  four bytes
++ */
++#define DIRTY_BITMAP_MIG_FLAG_EOS           0x01
++#define DIRTY_BITMAP_MIG_FLAG_ZEROES        0x02
++#define DIRTY_BITMAP_MIG_FLAG_BITMAP_NAME   0x04
++#define DIRTY_BITMAP_MIG_FLAG_DEVICE_NAME   0x08
++#define DIRTY_BITMAP_MIG_FLAG_START         0x10
++#define DIRTY_BITMAP_MIG_FLAG_COMPLETE      0x20
++#define DIRTY_BITMAP_MIG_FLAG_BITS          0x40
++
++#define DIRTY_BITMAP_MIG_EXTRA_FLAGS        0x80
++
++#define DIRTY_BITMAP_MIG_START_FLAG_ENABLED          0x01
++#define DIRTY_BITMAP_MIG_START_FLAG_PERSISTENT       0x02
++#define DIRTY_BITMAP_MIG_START_FLAG_AUTOLOAD         0x04
++#define DIRTY_BITMAP_MIG_START_FLAG_RESERVED_MASK    0xf8
++
++typedef struct DirtyBitmapMigBitmapState {
++    /* Written during setup phase. */
++    BlockDriverState *bs;
++    const char *node_name;
++    BdrvDirtyBitmap *bitmap;
++    uint64_t total_sectors;
++    uint64_t sectors_per_chunk;
++    QSIMPLEQ_ENTRY(DirtyBitmapMigBitmapState) entry;
++    uint8_t flags;
++
++    /* For bulk phase. */
++    bool bulk_completed;
++    uint64_t cur_sector;
++} DirtyBitmapMigBitmapState;
++
++typedef struct DirtyBitmapMigState {
++    QSIMPLEQ_HEAD(dbms_list, DirtyBitmapMigBitmapState) dbms_list;
++
++    bool bulk_completed;
++
++    /* for send_bitmap_bits() */
++    BlockDriverState *prev_bs;
++    BdrvDirtyBitmap *prev_bitmap;
++} DirtyBitmapMigState;
++
++typedef struct DirtyBitmapLoadState {
++    uint32_t flags;
++    char node_name[256];
++    char bitmap_name[256];
++    BlockDriverState *bs;
++    BdrvDirtyBitmap *bitmap;
++} DirtyBitmapLoadState;
++
++static DirtyBitmapMigState dirty_bitmap_mig_state;
++
++typedef struct DirtyBitmapLoadBitmapState {
++    BlockDriverState *bs;
++    BdrvDirtyBitmap *bitmap;
++    bool migrated;
++} DirtyBitmapLoadBitmapState;
++static GSList *enabled_bitmaps;
++QemuMutex finish_lock;
++
++void init_dirty_bitmap_incoming_migration(void)
++{
++    qemu_mutex_init(&finish_lock);
++}
++
++static uint32_t qemu_get_bitmap_flags(QEMUFile *f)
++{
++    uint8_t flags = qemu_get_byte(f);
++    if (flags & DIRTY_BITMAP_MIG_EXTRA_FLAGS) {
++        flags = flags << 8 | qemu_get_byte(f);
++        if (flags & DIRTY_BITMAP_MIG_EXTRA_FLAGS) {
++            flags = flags << 16 | qemu_get_be16(f);
++        }
++    }
++
++    return flags;
++}
++
++static void qemu_put_bitmap_flags(QEMUFile *f, uint32_t flags)
++{
++    /* The code currently do not send flags more than one byte */
++    assert(!(flags & (0xffffff00 | DIRTY_BITMAP_MIG_EXTRA_FLAGS)));
++
++    qemu_put_byte(f, flags);
++}
++
++static void send_bitmap_header(QEMUFile *f, DirtyBitmapMigBitmapState *dbms,
++                               uint32_t additional_flags)
++{
++    BlockDriverState *bs = dbms->bs;
++    BdrvDirtyBitmap *bitmap = dbms->bitmap;
++    uint32_t flags = additional_flags;
++    trace_send_bitmap_header_enter();
++
++    if (bs != dirty_bitmap_mig_state.prev_bs) {
++        dirty_bitmap_mig_state.prev_bs = bs;
++        flags |= DIRTY_BITMAP_MIG_FLAG_DEVICE_NAME;
++    }
++
++    if (bitmap != dirty_bitmap_mig_state.prev_bitmap) {
++        dirty_bitmap_mig_state.prev_bitmap = bitmap;
++        flags |= DIRTY_BITMAP_MIG_FLAG_BITMAP_NAME;
++    }
++
++    qemu_put_bitmap_flags(f, flags);
++
++    if (flags & DIRTY_BITMAP_MIG_FLAG_DEVICE_NAME) {
++        qemu_put_counted_string(f, dbms->node_name);
++    }
++
++    if (flags & DIRTY_BITMAP_MIG_FLAG_BITMAP_NAME) {
++        qemu_put_counted_string(f, bdrv_dirty_bitmap_name(bitmap));
++    }
++}
++
++static void send_bitmap_start(QEMUFile *f, DirtyBitmapMigBitmapState *dbms)
++{
++    send_bitmap_header(f, dbms, DIRTY_BITMAP_MIG_FLAG_START);
++    qemu_put_be32(f, bdrv_dirty_bitmap_granularity(dbms->bitmap));
++    qemu_put_byte(f, dbms->flags);
++}
++
++static void send_bitmap_complete(QEMUFile *f, DirtyBitmapMigBitmapState *dbms)
++{
++    send_bitmap_header(f, dbms, DIRTY_BITMAP_MIG_FLAG_COMPLETE);
++}
++
++static void send_bitmap_bits(QEMUFile *f, DirtyBitmapMigBitmapState *dbms,
++                             uint64_t start_sector, uint32_t nr_sectors)
++{
++    /* align for buffer_is_zero() */
++    uint64_t align = 4 * sizeof(long);
++    uint64_t unaligned_size =
++        bdrv_dirty_bitmap_serialization_size(
++            dbms->bitmap, start_sector << BDRV_SECTOR_BITS,
++            (uint64_t)nr_sectors << BDRV_SECTOR_BITS);
++    uint64_t buf_size = (unaligned_size + align - 1) & ~(align - 1);
++    uint8_t *buf = g_malloc0(buf_size);
++    uint32_t flags = DIRTY_BITMAP_MIG_FLAG_BITS;
++
++    bdrv_dirty_bitmap_serialize_part(
++        dbms->bitmap, buf, start_sector << BDRV_SECTOR_BITS,
++        (uint64_t)nr_sectors << BDRV_SECTOR_BITS);
++
++    if (buffer_is_zero(buf, buf_size)) {
++        g_free(buf);
++        buf = NULL;
++        flags |= DIRTY_BITMAP_MIG_FLAG_ZEROES;
++    }
++
++    trace_send_bitmap_bits(flags, start_sector, nr_sectors, buf_size);
++
++    send_bitmap_header(f, dbms, flags);
++
++    qemu_put_be64(f, start_sector);
++    qemu_put_be32(f, nr_sectors);
++
++    /* if a block is zero we need to flush here since the network
++     * bandwidth is now a lot higher than the storage device bandwidth.
++     * thus if we queue zero blocks we slow down the migration. */
++    if (flags & DIRTY_BITMAP_MIG_FLAG_ZEROES) {
++        qemu_fflush(f);
++    } else {
++        qemu_put_be64(f, buf_size);
++        qemu_put_buffer(f, buf, buf_size);
++    }
++
++    g_free(buf);
++}
++
++/* Called with iothread lock taken.  */
++static void dirty_bitmap_mig_cleanup(void)
++{
++    DirtyBitmapMigBitmapState *dbms;
++
++    while ((dbms = QSIMPLEQ_FIRST(&dirty_bitmap_mig_state.dbms_list)) != NULL) {
++        QSIMPLEQ_REMOVE_HEAD(&dirty_bitmap_mig_state.dbms_list, entry);
++        bdrv_dirty_bitmap_set_qmp_locked(dbms->bitmap, false);
++        bdrv_unref(dbms->bs);
++        g_free(dbms);
++    }
++}
++
++/* Called with iothread lock taken. */
++static int init_dirty_bitmap_migration(void)
++{
++    BlockDriverState *bs;
++    BdrvDirtyBitmap *bitmap;
++    DirtyBitmapMigBitmapState *dbms;
++    BdrvNextIterator it;
++
++    dirty_bitmap_mig_state.bulk_completed = false;
++    dirty_bitmap_mig_state.prev_bs = NULL;
++    dirty_bitmap_mig_state.prev_bitmap = NULL;
++
++    for (bs = bdrv_first(&it); bs; bs = bdrv_next(&it)) {
++        bool not_named_node = !bdrv_get_device_or_node_name(bs);
++
++        for (bitmap = bdrv_dirty_bitmap_next(bs, NULL); bitmap;
++             bitmap = bdrv_dirty_bitmap_next(bs, bitmap))
++        {
++            if (!bdrv_dirty_bitmap_name(bitmap)) {
++                continue;
++            }
++
++            if (not_named_node) {
++                error_report("Found bitmap '%s' in unnamed node %p. It can't "
++                             "be migrated", bdrv_dirty_bitmap_name(bitmap), bs);
++                goto fail;
++            }
++
++            if (bdrv_dirty_bitmap_frozen(bitmap)) {
++                error_report("Can't migrate frozen dirty bitmap: '%s",
++                             bdrv_dirty_bitmap_name(bitmap));
++                goto fail;
++            }
++
++            if (bdrv_dirty_bitmap_qmp_locked(bitmap)) {
++                error_report("Can't migrate locked dirty bitmap: '%s",
++                             bdrv_dirty_bitmap_name(bitmap));
++                goto fail;
++            }
++
++            bdrv_ref(bs);
++            bdrv_dirty_bitmap_set_qmp_locked(bitmap, true);
++
++            dbms = g_new0(DirtyBitmapMigBitmapState, 1);
++            dbms->bs = bs;
++            dbms->node_name = bdrv_get_node_name(bs);
++            if (!dbms->node_name || dbms->node_name[0] == '\0') {
++                dbms->node_name = bdrv_get_device_name(bs);
++            }
++            dbms->bitmap = bitmap;
++            dbms->total_sectors = bdrv_nb_sectors(bs);
++            dbms->sectors_per_chunk = CHUNK_SIZE * 8 *
++                bdrv_dirty_bitmap_granularity(bitmap) >> BDRV_SECTOR_BITS;
++            if (bdrv_dirty_bitmap_enabled(bitmap)) {
++                dbms->flags |= DIRTY_BITMAP_MIG_START_FLAG_ENABLED;
++            }
++            if (bdrv_dirty_bitmap_get_persistance(bitmap)) {
++                dbms->flags |= DIRTY_BITMAP_MIG_START_FLAG_PERSISTENT;
++            }
++            if (bdrv_dirty_bitmap_get_autoload(bitmap)) {
++                dbms->flags |= DIRTY_BITMAP_MIG_START_FLAG_AUTOLOAD;
++            }
++
++            QSIMPLEQ_INSERT_TAIL(&dirty_bitmap_mig_state.dbms_list,
++                                 dbms, entry);
++        }
++    }
++
++    /* unset persistance here, to not roll back it */
++    QSIMPLEQ_FOREACH(dbms, &dirty_bitmap_mig_state.dbms_list, entry) {
++        bdrv_dirty_bitmap_set_persistance(dbms->bitmap, false);
++    }
++
++    return 0;
++
++fail:
++    dirty_bitmap_mig_cleanup();
++
++    return -1;
++}
++
++/* Called with no lock taken.  */
++static void bulk_phase_send_chunk(QEMUFile *f, DirtyBitmapMigBitmapState *dbms)
++{
++    uint32_t nr_sectors = MIN(dbms->total_sectors - dbms->cur_sector,
++                             dbms->sectors_per_chunk);
++
++    send_bitmap_bits(f, dbms, dbms->cur_sector, nr_sectors);
++
++    dbms->cur_sector += nr_sectors;
++    if (dbms->cur_sector >= dbms->total_sectors) {
++        dbms->bulk_completed = true;
++    }
++}
++
++/* Called with no lock taken.  */
++static void bulk_phase(QEMUFile *f, bool limit)
++{
++    DirtyBitmapMigBitmapState *dbms;
++
++    QSIMPLEQ_FOREACH(dbms, &dirty_bitmap_mig_state.dbms_list, entry) {
++        while (!dbms->bulk_completed) {
++            bulk_phase_send_chunk(f, dbms);
++            if (limit && qemu_file_rate_limit(f)) {
++                return;
++            }
++        }
++    }
++
++    dirty_bitmap_mig_state.bulk_completed = true;
++}
++
++/* for SaveVMHandlers */
++static void dirty_bitmap_save_cleanup(void *opaque)
++{
++    dirty_bitmap_mig_cleanup();
++}
++
++static int dirty_bitmap_save_iterate(QEMUFile *f, void *opaque)
++{
++    trace_dirty_bitmap_save_iterate(migration_in_postcopy());
++
++    if (migration_in_postcopy() && !dirty_bitmap_mig_state.bulk_completed) {
++        bulk_phase(f, true);
++    }
++
++    qemu_put_bitmap_flags(f, DIRTY_BITMAP_MIG_FLAG_EOS);
++
++    return dirty_bitmap_mig_state.bulk_completed;
++}
++
++/* Called with iothread lock taken.  */
++
++static int dirty_bitmap_save_complete(QEMUFile *f, void *opaque)
++{
++    DirtyBitmapMigBitmapState *dbms;
++    trace_dirty_bitmap_save_complete_enter();
++
++    if (!dirty_bitmap_mig_state.bulk_completed) {
++        bulk_phase(f, false);
++    }
++
++    QSIMPLEQ_FOREACH(dbms, &dirty_bitmap_mig_state.dbms_list, entry) {
++        send_bitmap_complete(f, dbms);
++    }
++
++    qemu_put_bitmap_flags(f, DIRTY_BITMAP_MIG_FLAG_EOS);
++
++    trace_dirty_bitmap_save_complete_finish();
++
++    dirty_bitmap_mig_cleanup();
++    return 0;
++}
++
++static void dirty_bitmap_save_pending(QEMUFile *f, void *opaque,
++                                      uint64_t max_size,
++                                      uint64_t *res_precopy_only,
++                                      uint64_t *res_compatible,
++                                      uint64_t *res_postcopy_only)
++{
++    DirtyBitmapMigBitmapState *dbms;
++    uint64_t pending = 0;
++
++    qemu_mutex_lock_iothread();
++
++    QSIMPLEQ_FOREACH(dbms, &dirty_bitmap_mig_state.dbms_list, entry) {
++        uint64_t gran = bdrv_dirty_bitmap_granularity(dbms->bitmap);
++        uint64_t sectors = dbms->bulk_completed ? 0 :
++                           dbms->total_sectors - dbms->cur_sector;
++
++        pending += (sectors * BDRV_SECTOR_SIZE + gran - 1) / gran;
++    }
++
++    qemu_mutex_unlock_iothread();
++
++    trace_dirty_bitmap_save_pending(pending, max_size);
++
++    *res_postcopy_only += pending;
++}
++
++/* First occurrence of this bitmap. It should be created if doesn't exist */
++static int dirty_bitmap_load_start(QEMUFile *f, DirtyBitmapLoadState *s)
++{
++    Error *local_err = NULL;
++    uint32_t granularity = qemu_get_be32(f);
++    uint8_t flags = qemu_get_byte(f);
++
++    if (s->bitmap) {
++        error_report("Bitmap with the same name ('%s') already exists on "
++                     "destination", bdrv_dirty_bitmap_name(s->bitmap));
++        return -EINVAL;
++    } else {
++        s->bitmap = bdrv_create_dirty_bitmap(s->bs, granularity,
++                                             s->bitmap_name, &local_err);
++        if (!s->bitmap) {
++            error_report_err(local_err);
++            return -EINVAL;
++        }
++    }
++
++    if (flags & DIRTY_BITMAP_MIG_START_FLAG_RESERVED_MASK) {
++        error_report("Unknown flags in migrated dirty bitmap header: %x",
++                     flags);
++        return -EINVAL;
++    }
++
++    if (flags & DIRTY_BITMAP_MIG_START_FLAG_PERSISTENT) {
++        bdrv_dirty_bitmap_set_persistance(s->bitmap, true);
++    }
++    if (flags & DIRTY_BITMAP_MIG_START_FLAG_AUTOLOAD) {
++        bdrv_dirty_bitmap_set_autoload(s->bitmap, true);
++    }
++
++    bdrv_disable_dirty_bitmap(s->bitmap);
++    if (flags & DIRTY_BITMAP_MIG_START_FLAG_ENABLED) {
++        DirtyBitmapLoadBitmapState *b;
++
++        bdrv_dirty_bitmap_create_successor(s->bs, s->bitmap, &local_err);
++        if (local_err) {
++            error_report_err(local_err);
++            return -EINVAL;
++        }
++
++        b = g_new(DirtyBitmapLoadBitmapState, 1);
++        b->bs = s->bs;
++        b->bitmap = s->bitmap;
++        b->migrated = false;
++        enabled_bitmaps = g_slist_prepend(enabled_bitmaps, b);
++    }
++
++    return 0;
++}
++
++void dirty_bitmap_mig_before_vm_start(void)
++{
++    GSList *item;
++
++    qemu_mutex_lock(&finish_lock);
++
++    for (item = enabled_bitmaps; item; item = g_slist_next(item)) {
++        DirtyBitmapLoadBitmapState *b = item->data;
++
++        if (b->migrated) {
++            bdrv_enable_dirty_bitmap(b->bitmap);
++        } else {
++            bdrv_dirty_bitmap_enable_successor(b->bitmap);
++        }
++
++        g_free(b);
++    }
++
++    g_slist_free(enabled_bitmaps);
++    enabled_bitmaps = NULL;
++
++    qemu_mutex_unlock(&finish_lock);
++}
++
++static void dirty_bitmap_load_complete(QEMUFile *f, DirtyBitmapLoadState *s)
++{
++    GSList *item;
++    trace_dirty_bitmap_load_complete();
++    bdrv_dirty_bitmap_deserialize_finish(s->bitmap);
++
++    qemu_mutex_lock(&finish_lock);
++
++    for (item = enabled_bitmaps; item; item = g_slist_next(item)) {
++        DirtyBitmapLoadBitmapState *b = item->data;
++
++        if (b->bitmap == s->bitmap) {
++            b->migrated = true;
++            break;
++        }
++    }
++
++    if (bdrv_dirty_bitmap_frozen(s->bitmap)) {
++        bdrv_dirty_bitmap_lock(s->bitmap);
++        if (enabled_bitmaps == NULL) {
++            /* in postcopy */
++            bdrv_reclaim_dirty_bitmap_locked(s->bs, s->bitmap, &error_abort);
++            bdrv_enable_dirty_bitmap(s->bitmap);
++        } else {
++            /* target not started, successor must be empty */
++            int64_t count = bdrv_get_dirty_count(s->bitmap);
++            BdrvDirtyBitmap *ret = bdrv_reclaim_dirty_bitmap_locked(s->bs,
++                                                                    s->bitmap,
++                                                                    NULL);
++            /* bdrv_reclaim_dirty_bitmap can fail only on no successor (it
++             * must be) or on merge fail, but merge can't fail when second
++             * bitmap is empty
++             */
++            assert(ret == s->bitmap &&
++                   count == bdrv_get_dirty_count(s->bitmap));
++        }
++        bdrv_dirty_bitmap_unlock(s->bitmap);
++    }
++
++    qemu_mutex_unlock(&finish_lock);
++}
++
++static int dirty_bitmap_load_bits(QEMUFile *f, DirtyBitmapLoadState *s)
++{
++    uint64_t first_byte = qemu_get_be64(f) << BDRV_SECTOR_BITS;
++    uint64_t nr_bytes = (uint64_t)qemu_get_be32(f) << BDRV_SECTOR_BITS;
++    trace_dirty_bitmap_load_bits_enter(first_byte >> BDRV_SECTOR_BITS,
++                                       nr_bytes >> BDRV_SECTOR_BITS);
++
++    if (s->flags & DIRTY_BITMAP_MIG_FLAG_ZEROES) {
++        trace_dirty_bitmap_load_bits_zeroes();
++        bdrv_dirty_bitmap_deserialize_zeroes(s->bitmap, first_byte, nr_bytes,
++                                             false);
++    } else {
++        uint8_t *buf;
++        uint64_t buf_size = qemu_get_be64(f);
++        uint64_t needed_size =
++            bdrv_dirty_bitmap_serialization_size(s->bitmap,
++                                                 first_byte, nr_bytes);
++
++        if (needed_size > buf_size) {
++            error_report("Error: Migrated bitmap granularity doesn't "
++                         "match the destination bitmap '%s' granularity",
++                         bdrv_dirty_bitmap_name(s->bitmap));
++            return -EINVAL;
++        }
++
++        buf = g_malloc(buf_size);
++        qemu_get_buffer(f, buf, buf_size);
++        bdrv_dirty_bitmap_deserialize_part(s->bitmap, buf, first_byte, nr_bytes,
++                                           false);
++        g_free(buf);
++    }
++
++    return 0;
++}
++
++static int dirty_bitmap_load_header(QEMUFile *f, DirtyBitmapLoadState *s)
++{
++    Error *local_err = NULL;
++    s->flags = qemu_get_bitmap_flags(f);
++    trace_dirty_bitmap_load_header(s->flags);
++
++    if (s->flags & DIRTY_BITMAP_MIG_FLAG_DEVICE_NAME) {
++        if (!qemu_get_counted_string(f, s->node_name)) {
++            error_report("Unable to read node name string");
++            return -EINVAL;
++        }
++        s->bs = bdrv_lookup_bs(s->node_name, s->node_name, &local_err);
++        if (!s->bs) {
++            error_report_err(local_err);
++            return -EINVAL;
++        }
++    } else if (!s->bs) {
++        error_report("Error: block device name is not set");
++        return -EINVAL;
++    }
++
++    if (s->flags & DIRTY_BITMAP_MIG_FLAG_BITMAP_NAME) {
++        if (!qemu_get_counted_string(f, s->bitmap_name)) {
++            error_report("Unable to read node name string");
++            return -EINVAL;
++        }
++        s->bitmap = bdrv_find_dirty_bitmap(s->bs, s->bitmap_name);
++
++        /* bitmap may be NULL here, it wouldn't be an error if it is the
++         * first occurrence of the bitmap */
++        if (!s->bitmap && !(s->flags & DIRTY_BITMAP_MIG_FLAG_START)) {
++            error_report("Error: unknown dirty bitmap "
++                         "'%s' for block device '%s'",
++                         s->bitmap_name, s->node_name);
++            return -EINVAL;
++        }
++    } else if (!s->bitmap) {
++        error_report("Error: block device name is not set");
++        return -EINVAL;
++    }
++
++    return 0;
++}
++
++static int dirty_bitmap_load(QEMUFile *f, void *opaque, int version_id)
++{
++    static DirtyBitmapLoadState s;
++    int ret = 0;
++
++    trace_dirty_bitmap_load_enter();
++
++    if (version_id != 1) {
++        return -EINVAL;
++    }
++
++    do {
++        dirty_bitmap_load_header(f, &s);
++
++        if (s.flags & DIRTY_BITMAP_MIG_FLAG_START) {
++            ret = dirty_bitmap_load_start(f, &s);
++        } else if (s.flags & DIRTY_BITMAP_MIG_FLAG_COMPLETE) {
++            dirty_bitmap_load_complete(f, &s);
++        } else if (s.flags & DIRTY_BITMAP_MIG_FLAG_BITS) {
++            ret = dirty_bitmap_load_bits(f, &s);
++        }
++
++        if (!ret) {
++            ret = qemu_file_get_error(f);
++        }
++
++        if (ret) {
++            return ret;
++        }
++    } while (!(s.flags & DIRTY_BITMAP_MIG_FLAG_EOS));
++
++    trace_dirty_bitmap_load_success();
++    return 0;
++}
++
++static int dirty_bitmap_save_setup(QEMUFile *f, void *opaque)
++{
++    DirtyBitmapMigBitmapState *dbms = NULL;
++    if (init_dirty_bitmap_migration() < 0) {
++        return -1;
++    }
++
++    QSIMPLEQ_FOREACH(dbms, &dirty_bitmap_mig_state.dbms_list, entry) {
++        send_bitmap_start(f, dbms);
++    }
++    qemu_put_bitmap_flags(f, DIRTY_BITMAP_MIG_FLAG_EOS);
++
++    return 0;
++}
++
++static bool dirty_bitmap_is_active(void *opaque)
++{
++    return migrate_dirty_bitmaps();
++}
++
++static bool dirty_bitmap_is_active_iterate(void *opaque)
++{
++    return dirty_bitmap_is_active(opaque) && !runstate_is_running();
++}
++
++static bool dirty_bitmap_has_postcopy(void *opaque)
++{
++    return true;
++}
++
++static SaveVMHandlers savevm_dirty_bitmap_handlers = {
++    .save_setup = dirty_bitmap_save_setup,
++    .save_live_complete_postcopy = dirty_bitmap_save_complete,
++    .save_live_complete_precopy = dirty_bitmap_save_complete,
++    .has_postcopy = dirty_bitmap_has_postcopy,
++    .save_live_pending = dirty_bitmap_save_pending,
++    .save_live_iterate = dirty_bitmap_save_iterate,
++    .is_active_iterate = dirty_bitmap_is_active_iterate,
++    .load_state = dirty_bitmap_load,
++    .save_cleanup = dirty_bitmap_save_cleanup,
++    .is_active = dirty_bitmap_is_active,
++};
++
++void dirty_bitmap_mig_init(void)
++{
++    QSIMPLEQ_INIT(&dirty_bitmap_mig_state.dbms_list);
++
++    register_savevm_live(NULL, "dirty-bitmap", 0, 1,
++                         &savevm_dirty_bitmap_handlers,
++                         &dirty_bitmap_mig_state);
++}
+diff --git a/migration/migration.c b/migration/migration.c
+index e973837bfd..66e9cf03cd 100644
+--- a/migration/migration.c
++++ b/migration/migration.c
+@@ -150,6 +150,9 @@ MigrationIncomingState *migration_incoming_get_current(void)
+         memset(&mis_current, 0, sizeof(MigrationIncomingState));
+         qemu_mutex_init(&mis_current.rp_mutex);
+         qemu_event_init(&mis_current.main_thread_load_event, false);
++
++        init_dirty_bitmap_incoming_migration();
++
+         once = true;
+     }
+     return &mis_current;
+diff --git a/migration/savevm.c b/migration/savevm.c
+index e5d557458e..93b339646b 100644
+--- a/migration/savevm.c
++++ b/migration/savevm.c
+@@ -1673,6 +1673,8 @@ static void loadvm_postcopy_handle_run_bh(void *opaque)
+ 
+     trace_loadvm_postcopy_handle_run_vmstart();
+ 
++    dirty_bitmap_mig_before_vm_start();
++
+     if (autostart) {
+         /* Hold onto your hats, starting the CPU */
+         vm_start();
+diff --git a/vl.c b/vl.c
+index fc8bd9372f..753a298881 100644
+--- a/vl.c
++++ b/vl.c
+@@ -4613,6 +4613,7 @@ int main(int argc, char **argv, char **envp)
+ 
+     blk_mig_init();
+     ram_mig_init();
++    dirty_bitmap_mig_init();
+ 
+     /* If the currently selected machine wishes to override the units-per-bus
+      * property of its default HBA interface type, do so now. */
+diff --git a/migration/Makefile.objs b/migration/Makefile.objs
+index 99e038024d..c83ec47ba8 100644
+--- a/migration/Makefile.objs
++++ b/migration/Makefile.objs
+@@ -6,6 +6,7 @@ common-obj-y += qemu-file.o global_state.o
+ common-obj-y += qemu-file-channel.o
+ common-obj-y += xbzrle.o postcopy-ram.o
+ common-obj-y += qjson.o
++common-obj-y += block-dirty-bitmap.o
+ 
+ common-obj-$(CONFIG_RDMA) += rdma.o
+ 
+diff --git a/migration/trace-events b/migration/trace-events
+index a04fffb877..e9eb8078d4 100644
+--- a/migration/trace-events
++++ b/migration/trace-events
+@@ -227,3 +227,17 @@ colo_vm_state_change(const char *old, const char *new) "Change '%s' => '%s'"
+ colo_send_message(const char *msg) "Send '%s' message"
+ colo_receive_message(const char *msg) "Receive '%s' message"
+ colo_failover_set_state(const char *new_state) "new state %s"
++
++# migration/block-dirty-bitmap.c
++send_bitmap_header_enter(void) ""
++send_bitmap_bits(uint32_t flags, uint64_t start_sector, uint32_t nr_sectors, uint64_t data_size) "\n   flags:        0x%x\n   start_sector: %" PRIu64 "\n   nr_sectors:   %" PRIu32 "\n   data_size:    %" PRIu64 "\n"
++dirty_bitmap_save_iterate(int in_postcopy) "in postcopy: %d"
++dirty_bitmap_save_complete_enter(void) ""
++dirty_bitmap_save_complete_finish(void) ""
++dirty_bitmap_save_pending(uint64_t pending, uint64_t max_size) "pending %" PRIu64 " max: %" PRIu64
++dirty_bitmap_load_complete(void) ""
++dirty_bitmap_load_bits_enter(uint64_t first_sector, uint32_t nr_sectors) "chunk: %" PRIu64 " %" PRIu32
++dirty_bitmap_load_bits_zeroes(void) ""
++dirty_bitmap_load_header(uint32_t flags) "flags 0x%x"
++dirty_bitmap_load_enter(void) ""
++dirty_bitmap_load_success(void) ""
 -- 
 2.11.1
