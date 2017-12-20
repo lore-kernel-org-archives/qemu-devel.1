@@ -1,23 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51969)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55658)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1eRjWP-00074a-Dq
-	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 13:55:20 -0500
+	(envelope-from <armbru@redhat.com>) id 1eRjaX-00029P-0S
+	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 13:59:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1eRjWH-0002zM-Pl
-	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 13:55:17 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:60772)
+	(envelope-from <armbru@redhat.com>) id 1eRjaR-00060X-DH
+	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 13:59:33 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:57042)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1eRjWH-0002xf-Hy
-	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 13:55:09 -0500
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1eRjaR-0005zO-4T
+	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 13:59:27 -0500
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 170EB13AB3
+	for <qemu-devel@nongnu.org>; Wed, 20 Dec 2017 18:59:26 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-116-74.ams2.redhat.com
+	[10.36.116.74])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id D1B8419219
+	for <qemu-devel@nongnu.org>; Wed, 20 Dec 2017 18:59:25 +0000 (UTC)
 From: Markus Armbruster <armbru@redhat.com>
-References: <20171220102304.8288-1-danielhb@linux.vnet.ibm.com>
-Date: Wed, 20 Dec 2017 19:55:06 +0100
-In-Reply-To: <20171220102304.8288-1-danielhb@linux.vnet.ibm.com> (Daniel
-	Henrique Barboza's message of "Wed, 20 Dec 2017 08:23:04 -0200")
-Message-ID: <87bmit6xh1.fsf@dusky.pond.sub.org>
+Date: Wed, 20 Dec 2017 19:59:14 +0100
+Message-Id: <20171220185924.32756-4-armbru@redhat.com>
+In-Reply-To: <20171220185924.32756-1-armbru@redhat.com>
+References: <20171220185924.32756-1-armbru@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v1 1/1] qmp: remove qmp_cpu
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 03/13] qapi: Eliminate
+ QAPISchemaParser.__init__()'s local fname
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,43 +37,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
-Cc: qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
 
-Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com> writes:
+Signed-off-by: Markus Armbruster <armbru@redhat.com>
+Message-Id: <20171002141341.24616-4-armbru@redhat.com>
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+---
+ scripts/qapi.py | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
 
-> 'qmp_cpu' was implemented in commit 755f196898 ("qapi: Convert the cpu
-> command") as a functional no-op, a QMP call that does nothing and
-> return success. The idea, apparently, was to provide a counterpart
-> for the HMP 'hmp_cpu' command, introduced in the same commit.
->
-> After 6 years of its creation, qmp_cpu remains a functional no-op
-> that does nothing, having no value for any caller/user. A proposal
-> was sent to implement qmp_cpu like hmp_cpu works, but it was denied
-> [1]. The reason is that QMP must be as stateless as possible and a
-> function that changes its state (the current CPU monitor in the case
-> of qmp_cpu) goes against it. Any QMP command that needs a specific
-> monitor CPU setup must provide it in its arguments, instead of relying
-> in the current QMP monitor state.
->
-> After discussions that happened in [2] it was decided that a command
-> that does nothing since its birth, no one uses for anything and will
-> not be implemented, should be deprecated and erased. Given that we will
-> *not* provide any replacement for qmp_cpu and we believe that there
-> is no user relying on it, there is no point in adding a deprecation
-> delay for it.
->
-> So, this patch nukes qmp_cpu from QEMU code, removing both its blank
-> implementation in qmp.c and its doc in qapi-schema.json.
->
-> [1] https://lists.gnu.org/archive/html/qemu-devel/2017-12/msg02283.html
-> [2] https://lists.gnu.org/archive/html/qemu-devel/2017-12/msg03696.html
->
-> Signed-off-by: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
-> CC: Markus Armbruster <armbru@redhat.com>
-> CC: Eric Blake <eblake@redhat.com>
-> CC: Daniel P. Berrange <berrange@redhat.com>
-
-Lovely commit message.
-
-I'll take this through my tree.  Thanks!
+diff --git a/scripts/qapi.py b/scripts/qapi.py
+index dc92bca620..6c8001e96d 100644
+--- a/scripts/qapi.py
++++ b/scripts/qapi.py
+@@ -261,8 +261,7 @@ class QAPISchemaParser(object):
+=20
+     def __init__(self, fp, previously_included=3D[], incl_info=3DNone):
+         abs_fname =3D os.path.abspath(fp.name)
+-        fname =3D fp.name
+-        self.fname =3D fname
++        self.fname =3D fp.name
+         previously_included.append(abs_fname)
+         self.incl_info =3D incl_info
+         self.src =3D fp.read()
+@@ -277,7 +276,7 @@ class QAPISchemaParser(object):
+         self.accept()
+=20
+         while self.tok is not None:
+-            info =3D {'file': fname, 'line': self.line,
++            info =3D {'file': self.fname, 'line': self.line,
+                     'parent': self.incl_info}
+             if self.tok =3D=3D '#':
+                 self.reject_expr_doc()
+--=20
+2.13.6
