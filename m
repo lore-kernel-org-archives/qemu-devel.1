@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47458)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47365)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1eRij4-0004LK-Om
-	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 13:04:20 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1eRij1-0004L1-PF
+	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 13:04:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1eRij2-0002UP-H1
-	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 13:04:18 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:42466)
+	(envelope-from <pbonzini@redhat.com>) id 1eRiiz-0002Ry-QF
+	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 13:04:15 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:39838)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1eRij2-0002TK-3b
-	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 13:04:16 -0500
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1eRiiz-0002RA-F8
+	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 13:04:13 -0500
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Wed, 20 Dec 2017 19:03:46 +0100
-Message-Id: <20171220180358.29316-8-pbonzini@redhat.com>
+Date: Wed, 20 Dec 2017 19:03:44 +0100
+Message-Id: <20171220180358.29316-6-pbonzini@redhat.com>
 In-Reply-To: <20171220180358.29316-1-pbonzini@redhat.com>
 References: <20171220180358.29316-1-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 07/19] i386: hvf: implement vga dirty page
- tracking
+Subject: [Qemu-devel] [PULL 05/19] i386: hvf: implement
+ hvf_get_supported_cpuid
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,164 +29,186 @@ Cc: Sergio Andres Gomez Del Real <sergio.g.delreal@gmail.com>, Sergio Andres Gom
 
 From: Sergio Andres Gomez Del Real <sergio.g.delreal@gmail.com>
 
-This patch implements setting the tracking of dirty vga pages, using hvf's
-interface to protect guest memory. It uses the MemoryListener callback
-mechanism through .log_start/stop/sync
+This patch implements hvf_get_supported_cpuid, which returns the set of
+features supported by both the host processor and the hypervisor.
 
 Signed-off-by: Sergio Andres Gomez Del Real <Sergio.G.DelReal@gmail.com>
-Message-Id: <20170913090522.4022-13-Sergio.G.DelReal@gmail.com>
+Message-Id: <20170913090522.4022-11-Sergio.G.DelReal@gmail.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- include/sysemu/hvf.h  |  5 ++++
- target/i386/hvf-all.c | 73 ++++++++++++++++++++++++++++++++++++++++++++++-----
- 2 files changed, 71 insertions(+), 7 deletions(-)
+ target/i386/hvf-utils/x86_cpuid.c | 164 ++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 164 insertions(+)
+ create mode 100644 target/i386/hvf-utils/x86_cpuid.c
 
-diff --git a/include/sysemu/hvf.h b/include/sysemu/hvf.h
-index 614a2d203b..e4e43f6468 100644
---- a/include/sysemu/hvf.h
-+++ b/include/sysemu/hvf.h
-@@ -34,11 +34,16 @@ uint32_t hvf_get_supported_cpuid(uint32_t func, uint32_t idx,
- #define hvf_get_supported_cpuid(func, idx, reg) 0
- #endif
- 
-+/* hvf_slot flags */
-+#define HVF_SLOT_LOG (1 << 0)
+diff --git a/target/i386/hvf-utils/x86_cpuid.c b/target/i386/hvf-utils/x86_cpuid.c
+new file mode 100644
+index 0000000000..103223a85d
+--- /dev/null
++++ b/target/i386/hvf-utils/x86_cpuid.c
+@@ -0,0 +1,164 @@
++/*
++ *  i386 CPUID helper functions
++ *
++ *  Copyright (c) 2003 Fabrice Bellard
++ *  Copyright (c) 2017 Google Inc.
++ *
++ * This program is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU Lesser General Public
++ * License as published by the Free Software Foundation; either
++ * version 2 of the License, or (at your option) any later version.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * Lesser General Public License for more details.
++ *
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with this program; if not, see <http://www.gnu.org/licenses/>.
++ *
++ * cpuid
++ */
 +
- typedef struct hvf_slot {
-     uint64_t start;
-     uint64_t size;
-     uint8_t *mem;
-     int slot_id;
-+    uint32_t flags;
-+    MemoryRegion *region;
- } hvf_slot;
- 
- typedef struct hvf_vcpu_caps {
-diff --git a/target/i386/hvf-all.c b/target/i386/hvf-all.c
-index cfd7de4f6a..d8c7981120 100644
---- a/target/i386/hvf-all.c
-+++ b/target/i386/hvf-all.c
-@@ -193,6 +193,7 @@ void hvf_set_phys_mem(MemoryRegionSection *section, bool add)
-     mem->size = int128_get64(section->size);
-     mem->mem = memory_region_get_ram_ptr(area) + section->offset_within_region;
-     mem->start = section->offset_within_address_space;
-+    mem->region = area;
- 
-     if (do_hvf_set_memory(mem)) {
-         error_report("Error registering new memory slot\n");
-@@ -289,8 +290,7 @@ void hvf_cpu_synchronize_post_init(CPUState *cpu_state)
-     run_on_cpu(cpu_state, _hvf_cpu_synchronize_post_init, RUN_ON_CPU_NULL);
- }
- 
--/* TODO: ept fault handlig */
--static bool ept_emulation_fault(uint64_t ept_qual)
-+static bool ept_emulation_fault(hvf_slot *slot, addr_t gpa, uint64_t ept_qual)
- {
-     int read, write;
- 
-@@ -306,6 +306,14 @@ static bool ept_emulation_fault(uint64_t ept_qual)
-         return false;
-     }
- 
-+    if (write && slot) {
-+        if (slot->flags & HVF_SLOT_LOG) {
-+            memory_region_set_dirty(slot->region, gpa - slot->start, 1);
-+            hv_vm_protect((hv_gpaddr_t)slot->start, (size_t)slot->size,
-+                          HV_MEMORY_READ | HV_MEMORY_WRITE);
++#include "qemu/osdep.h"
++#include "x86.h"
++#include "vmx.h"
++#include "sysemu/hvf.h"
++
++static uint64_t xgetbv(uint32_t xcr)
++{
++    uint32_t eax, edx;
++
++    __asm__ volatile ("xgetbv"
++                      : "=a" (eax), "=d" (edx)
++                      : "c" (xcr));
++
++    return (((uint64_t)edx) << 32) | eax;
++}
++
++static bool vmx_mpx_supported()
++{
++    uint64_t cap_exit, cap_entry;
++
++    hv_vmx_read_capability(HV_VMX_CAP_ENTRY, &cap_entry);
++    hv_vmx_read_capability(HV_VMX_CAP_EXIT, &cap_exit);
++
++    return ((cap_exit & (1 << 23)) && (cap_entry & (1 << 16)));
++}
++
++uint32_t hvf_get_supported_cpuid(uint32_t func, uint32_t idx,
++                                 int reg)
++{
++    uint64_t cap;
++    uint32_t eax, ebx, ecx, edx;
++
++    host_cpuid(func, idx, &eax, &ebx, &ecx, &edx);
++
++    switch (func) {
++    case 0:
++        eax = eax < (uint32_t)0xd ? eax : (uint32_t)0xd;
++        break;
++    case 1:
++        edx &= CPUID_FP87 | CPUID_VME | CPUID_DE | CPUID_PSE | CPUID_TSC |
++             CPUID_MSR | CPUID_PAE | CPUID_MCE | CPUID_CX8 | CPUID_APIC |
++             CPUID_SEP | CPUID_MTRR | CPUID_PGE | CPUID_MCA | CPUID_CMOV |
++             CPUID_PAT | CPUID_PSE36 | CPUID_CLFLUSH | CPUID_MMX |
++             CPUID_FXSR | CPUID_SSE | CPUID_SSE2 | CPUID_SS;
++        ecx &= CPUID_EXT_SSE3 | CPUID_EXT_PCLMULQDQ | CPUID_EXT_SSSE3 |
++             CPUID_EXT_FMA | CPUID_EXT_CX16 | CPUID_EXT_PCID |
++             CPUID_EXT_SSE41 | CPUID_EXT_SSE42 | CPUID_EXT_MOVBE |
++             CPUID_EXT_POPCNT | CPUID_EXT_AES | CPUID_EXT_XSAVE |
++             CPUID_EXT_AVX | CPUID_EXT_F16C | CPUID_EXT_RDRAND;
++        ecx |= CPUID_EXT_HYPERVISOR;
++        break;
++    case 6:
++        eax = CPUID_6_EAX_ARAT;
++        ebx = 0;
++        ecx = 0;
++        edx = 0;
++        break;
++    case 7:
++        if (idx == 0) {
++            ebx &= CPUID_7_0_EBX_FSGSBASE | CPUID_7_0_EBX_BMI1 |
++                    CPUID_7_0_EBX_HLE | CPUID_7_0_EBX_AVX2 |
++                    CPUID_7_0_EBX_SMEP | CPUID_7_0_EBX_BMI2 |
++                    CPUID_7_0_EBX_ERMS | CPUID_7_0_EBX_RTM |
++                    CPUID_7_0_EBX_RDSEED | CPUID_7_0_EBX_ADX |
++                    CPUID_7_0_EBX_SMAP | CPUID_7_0_EBX_AVX512IFMA |
++                    CPUID_7_0_EBX_AVX512F | CPUID_7_0_EBX_AVX512PF |
++                    CPUID_7_0_EBX_AVX512ER | CPUID_7_0_EBX_AVX512CD |
++                    CPUID_7_0_EBX_CLFLUSHOPT | CPUID_7_0_EBX_CLWB |
++                    CPUID_7_0_EBX_AVX512DQ | CPUID_7_0_EBX_SHA_NI |
++                    CPUID_7_0_EBX_AVX512BW | CPUID_7_0_EBX_AVX512VL |
++                    CPUID_7_0_EBX_INVPCID | CPUID_7_0_EBX_MPX;
++
++            if (!vmx_mpx_supported()) {
++                ebx &= ~CPUID_7_0_EBX_MPX;
++            }
++            hv_vmx_read_capability(HV_VMX_CAP_PROCBASED2, &cap);
++            if (!(cap & CPU_BASED2_INVPCID)) {
++                ebx &= ~CPUID_7_0_EBX_INVPCID;
++            }
++
++            ecx &= CPUID_7_0_ECX_AVX512BMI | CPUID_7_0_ECX_AVX512_VPOPCNTDQ;
++            edx &= CPUID_7_0_EDX_AVX512_4VNNIW | CPUID_7_0_EDX_AVX512_4FMAPS;
++        } else {
++            ebx = 0;
++            ecx = 0;
++            edx = 0;
 +        }
++        eax = 0;
++        break;
++    case 0xD:
++        if (idx == 0) {
++            uint64_t host_xcr0 = xgetbv(0);
++            uint64_t supp_xcr0 = host_xcr0 & (XSTATE_FP_MASK | XSTATE_SSE_MASK |
++                                  XSTATE_YMM_MASK | XSTATE_BNDREGS_MASK |
++                                  XSTATE_BNDCSR_MASK | XSTATE_OPMASK_MASK |
++                                  XSTATE_ZMM_Hi256_MASK | XSTATE_Hi16_ZMM_MASK);
++            eax &= supp_xcr0;
++            if (!vmx_mpx_supported()) {
++                eax &= ~(XSTATE_BNDREGS_MASK | XSTATE_BNDCSR_MASK);
++            }
++        } else if (idx == 1) {
++            hv_vmx_read_capability(HV_VMX_CAP_PROCBASED2, &cap);
++            eax &= CPUID_XSAVE_XSAVEOPT | CPUID_XSAVE_XGETBV1;
++            if (!(cap & CPU_BASED2_XSAVES_XRSTORS)) {
++                eax &= ~CPUID_XSAVE_XSAVES;
++            }
++        }
++        break;
++    case 0x80000001:
++        /* LM only if HVF in 64-bit mode */
++        edx &= CPUID_FP87 | CPUID_VME | CPUID_DE | CPUID_PSE | CPUID_TSC |
++                CPUID_MSR | CPUID_PAE | CPUID_MCE | CPUID_CX8 | CPUID_APIC |
++                CPUID_EXT2_SYSCALL | CPUID_MTRR | CPUID_PGE | CPUID_MCA | CPUID_CMOV |
++                CPUID_PAT | CPUID_PSE36 | CPUID_EXT2_MMXEXT | CPUID_MMX |
++                CPUID_FXSR | CPUID_EXT2_FXSR | CPUID_EXT2_PDPE1GB | CPUID_EXT2_3DNOWEXT |
++                CPUID_EXT2_3DNOW | CPUID_EXT2_LM | CPUID_EXT2_RDTSCP | CPUID_EXT2_NX;
++        hv_vmx_read_capability(HV_VMX_CAP_PROCBASED, &cap);
++        if (!(cap & CPU_BASED_TSC_OFFSET)) {
++            edx &= ~CPUID_EXT2_RDTSCP;
++        }
++        ecx &= CPUID_EXT3_LAHF_LM | CPUID_EXT3_CMP_LEG | CPUID_EXT3_CR8LEG |
++                CPUID_EXT3_ABM | CPUID_EXT3_SSE4A | CPUID_EXT3_MISALIGNSSE |
++                CPUID_EXT3_3DNOWPREFETCH | CPUID_EXT3_OSVW | CPUID_EXT3_XOP |
++                CPUID_EXT3_FMA4 | CPUID_EXT3_TBM;
++        break;
++    default:
++        return 0;
 +    }
 +
-     /*
-      * The EPT violation must have been caused by accessing a
-      * guest-physical address that is a translation of a guest-linear
-@@ -316,7 +324,58 @@ static bool ept_emulation_fault(uint64_t ept_qual)
-         return false;
-     }
- 
--    return true;
-+    return !slot;
-+}
-+
-+static void hvf_set_dirty_tracking(MemoryRegionSection *section, bool on)
-+{
-+    hvf_slot *slot;
-+
-+    slot = hvf_find_overlap_slot(
-+            section->offset_within_address_space,
-+            section->offset_within_address_space + int128_get64(section->size));
-+
-+    /* protect region against writes; begin tracking it */
-+    if (on) {
-+        slot->flags |= HVF_SLOT_LOG;
-+        hv_vm_protect((hv_gpaddr_t)slot->start, (size_t)slot->size,
-+                      HV_MEMORY_READ);
-+    /* stop tracking region*/
-+    } else {
-+        slot->flags &= ~HVF_SLOT_LOG;
-+        hv_vm_protect((hv_gpaddr_t)slot->start, (size_t)slot->size,
-+                      HV_MEMORY_READ | HV_MEMORY_WRITE);
++    switch (reg) {
++    case R_EAX:
++        return eax;
++    case R_EBX:
++        return ebx;
++    case R_ECX:
++        return ecx;
++    case R_EDX:
++        return edx;
++    default:
++        return 0;
 +    }
 +}
-+
-+static void hvf_log_start(MemoryListener *listener,
-+                          MemoryRegionSection *section, int old, int new)
-+{
-+    if (old != 0) {
-+        return;
-+    }
-+
-+    hvf_set_dirty_tracking(section, 1);
-+}
-+
-+static void hvf_log_stop(MemoryListener *listener,
-+                         MemoryRegionSection *section, int old, int new)
-+{
-+    if (new != 0) {
-+        return;
-+    }
-+
-+    hvf_set_dirty_tracking(section, 0);
-+}
-+
-+static void hvf_log_sync(MemoryListener *listener,
-+                         MemoryRegionSection *section)
-+{
-+    /*
-+     * sync of dirty pages is handled elsewhere; just make sure we keep
-+     * tracking the region.
-+     */
-+    hvf_set_dirty_tracking(section, 1);
- }
- 
- static void hvf_region_add(MemoryListener *listener,
-@@ -335,6 +394,9 @@ static MemoryListener hvf_memory_listener = {
-     .priority = 10,
-     .region_add = hvf_region_add,
-     .region_del = hvf_region_del,
-+    .log_start = hvf_log_start,
-+    .log_stop = hvf_log_stop,
-+    .log_sync = hvf_log_sync,
- };
- 
- void hvf_reset_vcpu(CPUState *cpu) {
-@@ -605,7 +667,7 @@ int hvf_vcpu_exec(CPUState *cpu)
- 
-             slot = hvf_find_overlap_slot(gpa, gpa);
-             /* mmio */
--            if (ept_emulation_fault(exit_qual) && !slot) {
-+            if (ept_emulation_fault(slot, gpa, exit_qual)) {
-                 struct x86_decode decode;
- 
-                 load_regs(cpu);
-@@ -616,9 +678,6 @@ int hvf_vcpu_exec(CPUState *cpu)
-                 store_regs(cpu);
-                 break;
-             }
--#ifdef DIRTY_VGA_TRACKING
--            /* TODO: handle dirty page tracking */
--#endif
-             break;
-         }
-         case EXIT_REASON_INOUT:
 -- 
 2.14.3
