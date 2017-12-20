@@ -1,30 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56024)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56031)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1eRhxx-0004EY-Cx
-	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 12:15:38 -0500
+	(envelope-from <paolo.bonzini@gmail.com>) id 1eRhxx-0004Eq-Sh
+	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 12:15:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1eRhxt-0006vL-Jr
+	(envelope-from <paolo.bonzini@gmail.com>) id 1eRhxw-0006xR-Bz
 	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 12:15:37 -0500
-Received: from mail-wr0-x242.google.com ([2a00:1450:400c:c0c::242]:36870)
+Received: from mail-wr0-x241.google.com ([2a00:1450:400c:c0c::241]:34984)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1eRhxt-0006uP-2G
-	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 12:15:33 -0500
-Received: by mail-wr0-x242.google.com with SMTP id f8so12140968wre.4
-	for <qemu-devel@nongnu.org>; Wed, 20 Dec 2017 09:15:32 -0800 (PST)
-Received: from 640k.lan (dynamic-adsl-78-12-251-125.clienti.tiscali.it.
-	[78.12.251.125]) by smtp.gmail.com with ESMTPSA id
-	f125sm2751101wme.45.2017.12.20.09.15.30 for <qemu-devel@nongnu.org>
-	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Wed, 20 Dec 2017 09:15:30 -0800 (PST)
+	id 1eRhxw-0006wd-1W
+	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 12:15:36 -0500
+Received: by mail-wr0-x241.google.com with SMTP id l19so10549020wrc.2
+	for <qemu-devel@nongnu.org>; Wed, 20 Dec 2017 09:15:35 -0800 (PST)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Wed, 20 Dec 2017 18:14:12 +0100
-Message-Id: <1513790098-9815-1-git-send-email-pbonzini@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 00/46] First batch of misc patches for QEMU 2.12
+Date: Wed, 20 Dec 2017 18:14:14 +0100
+Message-Id: <1513790098-9815-3-git-send-email-pbonzini@redhat.com>
+In-Reply-To: <1513790098-9815-1-git-send-email-pbonzini@redhat.com>
+References: <1513790098-9815-1-git-send-email-pbonzini@redhat.com>
+Subject: [Qemu-devel] [PULL 02/46] qemu-thread: fix races on threads that
+ exit very quickly
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,171 +29,142 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: linzhecheng <linzhecheng@huawei.com>
 
-The following changes since commit 200780a3a3ed067dfb2e0d2210b0ed09e748ba26:
+From: linzhecheng <linzhecheng@huawei.com>
 
-  Merge remote-tracking branch 'remotes/armbru/tags/pull-cmdline-2017-12-18-v2' into staging (2017-12-20 13:20:48 +0000)
+If we create a thread with QEMU_THREAD_DETACHED mode, QEMU may get a segfault with low probability.
 
-are available in the git repository at:
+The backtrace is:
+   #0  0x00007f46c60291d7 in __GI_raise (sig=sig@entry=6) at ../nptl/sysdeps/unix/sysv/linux/raise.c:56
+   #1  0x00007f46c602a8c8 in __GI_abort () at abort.c:90
+   #2  0x00000000008543c9 in PAT_abort ()
+   #3  0x000000000085140d in patchIllInsHandler ()
+   #4  <signal handler called>
+   #5  pthread_detach (th=139933037614848) at pthread_detach.c:50
+   #6  0x0000000000829759 in qemu_thread_create (thread=thread@entry=0x7ffdaa8205e0, name=name@entry=0x94d94a "io-task-worker", start_routine=start_routine@entry=0x7eb9a0 <qio_task_thread_worker>,
+       arg=arg@entry=0x3f5cf70, mode=mode@entry=1) at util/qemu_thread_posix.c:512
+   #7  0x00000000007ebc96 in qio_task_run_in_thread (task=0x31db2c0, worker=worker@entry=0x7e7e40 <qio_channel_socket_connect_worker>, opaque=0xcd23380, destroy=0x7f1180 <qapi_free_SocketAddress>)
+       at io/task.c:141
+   #8  0x00000000007e7f33 in qio_channel_socket_connect_async (ioc=ioc@entry=0x626c0b0, addr=<optimized out>, callback=callback@entry=0x55e080 <qemu_chr_socket_connected>, opaque=opaque@entry=0x42862c0,
+       destroy=destroy@entry=0x0) at io/channel_socket.c:194
+   #9  0x000000000055bdd1 in socket_reconnect_timeout (opaque=0x42862c0) at qemu_char.c:4744
+   #10 0x00007f46c72483b3 in g_timeout_dispatch () from /usr/lib64/libglib-2.0.so.0
+   #11 0x00007f46c724799a in g_main_context_dispatch () from /usr/lib64/libglib-2.0.so.0
+   #12 0x000000000076c646 in glib_pollfds_poll () at main_loop.c:228
+   #13 0x000000000076c6eb in os_host_main_loop_wait (timeout=348000000) at main_loop.c:273
+   #14 0x000000000076c815 in main_loop_wait (nonblocking=nonblocking@entry=0) at main_loop.c:521
+   #15 0x000000000056a511 in main_loop () at vl.c:2076
+   #16 0x0000000000420705 in main (argc=<optimized out>, argv=<optimized out>, envp=<optimized out>) at vl.c:4940
 
+The cause of this problem is a glibc bug; for more information, see
+https://sourceware.org/bugzilla/show_bug.cgi?id=19951.
+The solution for this bug is to use pthread_attr_setdetachstate.
 
-  git://github.com/bonzini/qemu.git tags/for-upstream
+There is a similar issue with pthread_setname_np, which is moved
+from creating thread to created thread.
 
-for you to fetch changes up to d01ce16cd827831145cf6a5b4a81ce3a47b537cd:
+Signed-off-by: linzhecheng <linzhecheng@huawei.com>
+Message-Id: <20171128044656.10592-1-linzhecheng@huawei.com>
+Reviewed-by: Fam Zheng <famz@redhat.com>
+[Simplify the code by removing qemu_thread_set_name, and free the arguments
+ before invoking the start routine. - Paolo]
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ util/qemu-thread-posix.c | 59 ++++++++++++++++++++++++++++++++++--------------
+ 1 file changed, 42 insertions(+), 17 deletions(-)
 
-  chardev: convert the socket server to QIONetListener (2017-12-20 17:18:19 +0100)
-
-----------------------------------------------------------------
-* NBD and chardev conversion to QIONetListener (Daniel)
-* MTTCG fixes (David)
-* Hyper-V fixes (Roman, Evgeny)
-* share-rw option (Fam)
-* Mux chardev event bugfix (Marc-André)
-* Add systemd unit files in contrib/ (me)
-* SCSI and block/iscsi.c bugfixes (me, Peter L.)
-* unassigned_mem_ops fixes (Peter M.)
-* VEX decoding fix (Peter M.)
-* "info pic" and "info irq" improvements (Peter Xu)
-* vmport trace events (Philippe)
-* Braille chardev bugfix (Samuel)
-* Compiler warnings fix (Stefan)
-* boot-serial-test aka TCG smoke test (Thomas)
-* New CPU features (Yang)
-* Reduce startup memory usage (Yang)
-* QemuThread race fix (linhecheng)
-
-----------------------------------------------------------------
-Daniel P. Berrange (4):
-      sockets: remove obsolete code that updated listen address
-      blockdev: convert internal NBD server to QIONetListener
-      blockdev: convert qemu-nbd server to QIONetListener
-      chardev: convert the socket server to QIONetListener
-
-David Hildenbrand (2):
-      cpus: make pause_all_cpus() play with SMP on single threaded TCG
-      cpu-exec: fix missed CPU kick during interrupt injection
-
-Evgeny Yakovlev (1):
-      hyperv: set partition-wide MSRs only on first vcpu
-
-Fam Zheng (3):
-      Revert "docker: Enable features explicitly in test-full"
-      scsi-block: Add share-rw option
-      MAITAINERS: List Fam Zheng as reviewer for SCSI patches
-
-Marc-André Lureau (3):
-      checkpatch: volatile with a comment or sig_atomic_t is okay
-      chardev: fix backend events regression with mux chardev
-      test: add some chardev mux event tests
-
-Paolo Bonzini (5):
-      memfd: fix configure test
-      qemu-pr-helper: miscellaneous fixes
-      contrib: add systemd unit files
-      scsi: provide general-purpose functions to manage sense data
-      scsi: replace hex constants with #defines
-
-Peter Lieven (2):
-      block/iscsi: dont leave allocmap in an invalid state on UNMAP failure
-      block/iscsi: only report an iSCSI Failure if we don't handle it gracefully
-
-Peter Maydell (3):
-      target/i386: Fix handling of VEX prefixes
-      exec: Don't reuse unassigned_mem_ops for io_mem_rom
-      hw/mips/boston: Remove workaround for writes to ROM aborting
-
-Peter Xu (7):
-      cpu: refactor cpu_address_space_init()
-      cpu: suffix cpu address spaces with cpu index
-      i8259: convert DPRINTFs into trace
-      i8259: use DEBUG_IRQ_COUNT always
-      i8259: generalize statistics into common code
-      kvm-i8259: support "info pic" and "info irq"
-      i8259: move TYPE_INTERRUPT_STATS_PROVIDER upper
-
-Philippe Mathieu-Daudé (1):
-      hw/i386/vmport: replace fprintf() by trace events or LOG_UNIMP
-
-Roman Kagan (2):
-      hyperv: ensure SINTx msrs are reset properly
-      hyperv: make SynIC version msr constant
-
-Samuel Thibault (1):
-      baum: Truncate braille device size to 84x1
-
-Stefan Weil (1):
-      target/i386: Fix compiler warnings
-
-Thomas Huth (8):
-      tests/boot-serial-test: Make sure that we check the timeout regularly
-      tests/boot-serial-test: Add code to allow to specify our own kernel or bios
-      tests/boot-serial-test: Add support for the mcf5208evb board
-      tests/boot-serial-test: Add tests for microblaze boards
-      hw/moxie/moxiesim: Add support for loading a BIOS on moxiesim
-      tests/boot-serial-test: Add a test for the moxiesim machine
-      tests/boot-serial-test: Add support for the raspi2 machine
-      Remove legacy -no-kvm-pit option
-
-Yang Zhong (2):
-      x86/cpu: Enable new SSE/AVX/AVX512 cpu features
-      rcu: reduce more than 7MB heap memory by malloc_trim()
-
-linzhecheng (1):
-      qemu-thread: fix races on threads that exit very quickly
-
- MAINTAINERS                              |   2 +
- accel/tcg/cpu-exec.c                     |  12 +--
- block/iscsi.c                            |  51 +++++++---
- blockdev-nbd.c                           |  50 +++-------
- chardev/baum.c                           |   8 +-
- chardev/char-mux.c                       |   8 ++
- chardev/char-socket.c                    |  72 ++++++--------
- chardev/char.c                           |  18 ++--
- configure                                |  37 ++++++-
- contrib/systemd/qemu-guest-agent.service |  11 +++
- contrib/systemd/qemu-pr-helper.service   |  15 +++
- contrib/systemd/qemu-pr-helper.socket    |   9 ++
- cpus.c                                   |  37 +++----
- exec.c                                   |  44 ++++++++-
- hw/i386/kvm/i8259.c                      |   1 +
- hw/i386/trace-events                     |   4 +
- hw/i386/vmport.c                         |  14 +--
- hw/intc/i8259.c                          |  86 +++-------------
- hw/intc/i8259_common.c                   |  49 ++++++++++
- hw/intc/trace-events                     |   7 ++
- hw/mips/boston.c                         |  14 +--
- hw/moxie/moxiesim.c                      |  12 ++-
- hw/scsi/scsi-bus.c                       |  16 +--
- hw/scsi/scsi-disk.c                      |   1 +
- include/chardev/char.h                   |   1 +
- include/exec/exec-all.h                  |   6 +-
- include/hw/isa/i8259_internal.h          |   7 +-
- include/qemu/sockets.h                   |   2 +-
- include/scsi/utils.h                     |   9 +-
- qemu-doc.texi                            |   5 -
- qemu-nbd.c                               |  61 +++++-------
- qemu-options.hx                          |   3 -
- qga/channel-posix.c                      |   2 +-
- scripts/checkpatch.pl                    |   7 +-
- scsi/qemu-pr-helper.c                    |  30 +++++-
- scsi/utils.c                             | 163 ++++++++++++++++---------------
- target/arm/cpu.c                         |  13 +--
- target/i386/cpu.c                        |  16 +--
- target/i386/cpu.h                        |  12 ++-
- target/i386/kvm.c                        |  44 +++++----
- target/i386/translate.c                  |   9 +-
- tests/Makefile.include                   |   7 ++
- tests/boot-serial-test.c                 | 106 +++++++++++++++++---
- tests/docker/test-full                   |  79 +--------------
- tests/test-char.c                        |  17 ++++
- util/memfd.c                             |   4 +-
- util/qemu-sockets.c                      |  31 +-----
- util/qemu-thread-posix.c                 |  59 +++++++----
- util/rcu.c                               |   6 ++
- vl.c                                     |   4 -
- 50 files changed, 719 insertions(+), 562 deletions(-)
- create mode 100644 contrib/systemd/qemu-guest-agent.service
- create mode 100644 contrib/systemd/qemu-pr-helper.service
- create mode 100644 contrib/systemd/qemu-pr-helper.socket
+diff --git a/util/qemu-thread-posix.c b/util/qemu-thread-posix.c
+index 7306475..fcd369b 100644
+--- a/util/qemu-thread-posix.c
++++ b/util/qemu-thread-posix.c
+@@ -479,15 +479,29 @@ static void __attribute__((constructor)) qemu_thread_atexit_init(void)
+ }
+ 
+ 
+-/* Attempt to set the threads name; note that this is for debug, so
+- * we're not going to fail if we can't set it.
+- */
+-static void qemu_thread_set_name(QemuThread *thread, const char *name)
+-{
+ #ifdef CONFIG_PTHREAD_SETNAME_NP
+-    pthread_setname_np(thread->thread, name);
+-#endif
++typedef struct {
++    void *(*start_routine)(void *);
++    void *arg;
++    char *name;
++} QemuThreadArgs;
++
++static void *qemu_thread_start(void *args)
++{
++    QemuThreadArgs *qemu_thread_args = args;
++    void *(*start_routine)(void *) = qemu_thread_args->start_routine;
++    void *arg = qemu_thread_args->arg;
++
++    /* Attempt to set the threads name; note that this is for debug, so
++     * we're not going to fail if we can't set it.
++     */
++    pthread_setname_np(pthread_self(), qemu_thread_args->name);
++    g_free(qemu_thread_args->name);
++    g_free(qemu_thread_args);
++    return start_routine(arg);
+ }
++#endif
++
+ 
+ void qemu_thread_create(QemuThread *thread, const char *name,
+                        void *(*start_routine)(void*),
+@@ -496,29 +510,40 @@ void qemu_thread_create(QemuThread *thread, const char *name,
+     sigset_t set, oldset;
+     int err;
+     pthread_attr_t attr;
++    QemuThreadArgs *qemu_thread_args;
+ 
+     err = pthread_attr_init(&attr);
+     if (err) {
+         error_exit(err, __func__);
+     }
+ 
++    if (mode == QEMU_THREAD_DETACHED) {
++        pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
++    }
++
+     /* Leave signal handling to the iothread.  */
+     sigfillset(&set);
+     pthread_sigmask(SIG_SETMASK, &set, &oldset);
+-    err = pthread_create(&thread->thread, &attr, start_routine, arg);
+-    if (err)
+-        error_exit(err, __func__);
+ 
++#ifdef CONFIG_PTHREAD_SETNAME_NP
+     if (name_threads) {
+-        qemu_thread_set_name(thread, name);
++        qemu_thread_args = g_new0(QemuThreadArgs, 1);
++        qemu_thread_args->name = g_strdup(name);
++        qemu_thread_args->start_routine = start_routine;
++        qemu_thread_args->arg = arg;
++
++        err = pthread_create(&thread->thread, &attr,
++                             qemu_thread_start, qemu_thread_args);
++    } else
++#endif
++    {
++        err = pthread_create(&thread->thread, &attr,
++                             start_routine, arg);
+     }
+ 
+-    if (mode == QEMU_THREAD_DETACHED) {
+-        err = pthread_detach(thread->thread);
+-        if (err) {
+-            error_exit(err, __func__);
+-        }
+-    }
++    if (err)
++        error_exit(err, __func__);
++
+     pthread_sigmask(SIG_SETMASK, &oldset, NULL);
+ 
+     pthread_attr_destroy(&attr);
 -- 
 1.8.3.1
