@@ -1,24 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37122)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38628)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1eRbgi-0002gL-Fx
-	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 05:33:25 -0500
+	(envelope-from <kwolf@redhat.com>) id 1eRbiN-00042V-1r
+	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 05:35:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1eRbgf-0002Vt-LU
-	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 05:33:24 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:35726)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1eRbgf-0002V2-CK
-	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 05:33:21 -0500
-Date: Wed, 20 Dec 2017 10:33:17 +0000
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20171220103317.GO21216@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <20171220102304.8288-1-danielhb@linux.vnet.ibm.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20171220102304.8288-1-danielhb@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH v1 1/1] qmp: remove qmp_cpu
+	(envelope-from <kwolf@redhat.com>) id 1eRbiL-0004CQ-Qk
+	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 05:35:07 -0500
+From: Kevin Wolf <kwolf@redhat.com>
+Date: Wed, 20 Dec 2017 11:33:53 +0100
+Message-Id: <20171220103412.13048-1-kwolf@redhat.com>
+Subject: [Qemu-devel] [PATCH 00/19] Drain fixes and cleanups, part 2
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,95 +17,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
-Cc: qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>, Eric Blake <eblake@redhat.com>
+To: qemu-block@nongnu.org
+Cc: kwolf@redhat.com, famz@redhat.com, pbonzini@redhat.com, qemu-devel@nongnu.org
 
-On Wed, Dec 20, 2017 at 08:23:04AM -0200, Daniel Henrique Barboza wrote:
-> 'qmp_cpu' was implemented in commit 755f196898 ("qapi: Convert the cpu
-> command") as a functional no-op, a QMP call that does nothing and
-> return success. The idea, apparently, was to provide a counterpart
-> for the HMP 'hmp_cpu' command, introduced in the same commit.
-> 
-> After 6 years of its creation, qmp_cpu remains a functional no-op
-> that does nothing, having no value for any caller/user. A proposal
-> was sent to implement qmp_cpu like hmp_cpu works, but it was denied
-> [1]. The reason is that QMP must be as stateless as possible and a
-> function that changes its state (the current CPU monitor in the case
-> of qmp_cpu) goes against it. Any QMP command that needs a specific
-> monitor CPU setup must provide it in its arguments, instead of relying
-> in the current QMP monitor state.
-> 
-> After discussions that happened in [2] it was decided that a command
-> that does nothing since its birth, no one uses for anything and will
-> not be implemented, should be deprecated and erased. Given that we will
-> *not* provide any replacement for qmp_cpu and we believe that there
-> is no user relying on it, there is no point in adding a deprecation
-> delay for it.
-> 
-> So, this patch nukes qmp_cpu from QEMU code, removing both its blank
-> implementation in qmp.c and its doc in qapi-schema.json.
-> 
-> [1] https://lists.gnu.org/archive/html/qemu-devel/2017-12/msg02283.html
-> [2] https://lists.gnu.org/archive/html/qemu-devel/2017-12/msg03696.html
-> 
-> Signed-off-by: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
-> CC: Markus Armbruster <armbru@redhat.com>
-> CC: Eric Blake <eblake@redhat.com>
-> CC: Daniel P. Berrange <berrange@redhat.com>
-> ---
->  qapi-schema.json | 11 -----------
->  qmp.c            |  5 -----
->  2 files changed, 16 deletions(-)
+This is the second part of my work to fix drain and hopefully to prevent
+it from attracting bugs as much as it did in the past. There is
+definitely at least a third part coming after this, see below.
 
-Reviewed-by: Daniel P. Berrange <berrange@redhat.com>
+In this series, the following improvments are made:
+* Fix several bugs and inconsistencies
+* Create lots of unit tests for the drain functions
+* Introduce bdrv_subtree_drained_begin/end() to drain a whole subtree
+  rather than only a single node
+* Use this to make bdrv_reopen() safe (graph changes in callbacks
+  called during its internal bdrv_drain_all() frequently broke it)
 
+Planned for part three: Make graph modifications in callbacks safe by
+avoiding BDRV_POLL_WHILE() calls while we're recursing through the
+graph. We can recurse before BDRV_POLL_WHILE(), after it or while
+evaluating its condition, but never call any callbacks while we're
+iterating child or parent lists.
 
-> 
-> diff --git a/qapi-schema.json b/qapi-schema.json
-> index 18457954a8..5c29bcd27f 100644
-> --- a/qapi-schema.json
-> +++ b/qapi-schema.json
-> @@ -1046,17 +1046,6 @@
->  { 'command': 'system_powerdown' }
->  
->  ##
-> -# @cpu:
-> -#
-> -# This command is a nop that is only provided for the purposes of compatibility.
-> -#
-> -# Since: 0.14.0
-> -#
-> -# Notes: Do not use this command.
-> -##
-> -{ 'command': 'cpu', 'data': {'index': 'int'} }
-> -
-> -##
->  # @cpu-add:
->  #
->  # Adds CPU with specified ID
-> diff --git a/qmp.c b/qmp.c
-> index e8c303116a..52cfd2d81c 100644
-> --- a/qmp.c
-> +++ b/qmp.c
-> @@ -113,11 +113,6 @@ void qmp_system_powerdown(Error **erp)
->      qemu_system_powerdown_request();
->  }
->  
-> -void qmp_cpu(int64_t index, Error **errp)
-> -{
-> -    /* Just do nothing */
-> -}
-> -
->  void qmp_cpu_add(int64_t id, Error **errp)
->  {
->      MachineClass *mc;
-> -- 
-> 2.13.6
-> 
+Fam Zheng (1):
+  block: Remove unused bdrv_requests_pending
 
-Regards,
-Daniel
+Kevin Wolf (18):
+  block: Assert drain_all is only called from main AioContext
+  block: Make bdrv_drain() driver callbacks non-recursive
+  test-bdrv-drain: Test callback for bdrv_drain
+  test-bdrv-drain: Test bs->quiesce_counter
+  blockjob: Pause job on draining any job BDS
+  test-bdrv-drain: Test drain vs. block jobs
+  block: Don't block_job_pause_all() in bdrv_drain_all()
+  block: Nested drain_end must still call callbacks
+  test-bdrv-drain: Test nested drain sections
+  block: Don't notify parents in drain call chain
+  block: Add bdrv_subtree_drained_begin/end()
+  test-bdrv-drain: Tests for bdrv_subtree_drain
+  test-bdrv-drain: Test behaviour in coroutine context
+  test-bdrv-drain: Recursive draining with multiple parents
+  block: Allow graph changes in subtree drained section
+  test-bdrv-drain: Test graph changes in drained section
+  commit: Simplify reopen of base
+  block: Keep nodes drained between reopen_queue/multiple
+
+ include/block/block.h     |  20 +-
+ include/block/block_int.h |   3 +-
+ block.c                   |  74 +++++--
+ block/commit.c            |   8 +-
+ block/io.c                | 128 ++++++++----
+ block/replication.c       |   6 +
+ blockjob.c                |  22 +-
+ qemu-io-cmds.c            |   3 +
+ tests/test-bdrv-drain.c   | 520 +++++++++++++++++++++++++++++++++++++++++++++-
+ 9 files changed, 696 insertions(+), 88 deletions(-)
+
 -- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+2.13.6
