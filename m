@@ -1,20 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60726)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60818)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistai@xilinx.com>) id 1eRiAT-0007GG-D9
-	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 12:28:34 -0500
+	(envelope-from <mst@redhat.com>) id 1eRiAe-0007Q6-0y
+	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 12:28:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistai@xilinx.com>) id 1eRiAQ-0006Ci-Bd
-	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 12:28:33 -0500
-From: Alistair Francis <alistair.francis@xilinx.com>
-Date: Wed, 20 Dec 2017 09:24:02 -0800
-Message-ID: <48d2cc59ffc16788bc78c8a508c670d6cd03ea53.1513790495.git.alistair.francis@xilinx.com>
-In-Reply-To: <cover.1513790494.git.alistair.francis@xilinx.com>
-References: <cover.1513790494.git.alistair.francis@xilinx.com>
+	(envelope-from <mst@redhat.com>) id 1eRiAb-0006Ys-1C
+	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 12:28:44 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:49422)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1eRiAa-0006XL-Rd
+	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 12:28:40 -0500
+Date: Wed, 20 Dec 2017 19:28:37 +0200
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20171220192749-mutt-send-email-mst@kernel.org>
+References: <20171211072806.2812-1-haozhong.zhang@intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v6 13/29] hw/lm32: Replace fprintf(stderr,
- "*\n" with error_report()
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20171211072806.2812-1-haozhong.zhang@intel.com>
+Subject: Re: [Qemu-devel] [PATCH for-2.12 v4 0/3] nvdimm: fixes for
+ (non-)dax backends
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,135 +27,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, qemu-trivial@nongnu.org
-Cc: alistair.francis@xilinx.com, alistair23@gmail.com, armbru@redhat.com, Michael Walle <michael@walle.cc>
+To: Haozhong Zhang <haozhong.zhang@intel.com>
+Cc: qemu-devel@nongnu.org, ehabkost@redhat.com, Xiao Guangrong <guangrong.xiao@gmail.com>, Stefan Hajnoczi <stefanha@gmail.com>, Dan Williams <dan.j.williams@intel.com>, Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <rth@twiddle.net>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>
 
-Replace a large number of the fprintf(stderr, "*\n" calls with
-error_report(). The functions were renamed with these commands and then
-compiler issues where manually fixed.
+On Mon, Dec 11, 2017 at 03:28:03PM +0800, Haozhong Zhang wrote:
+> Previous versions can be found at
+>   v3: https://lists.gnu.org/archive/html/qemu-devel/2017-11/msg04785.html
+>   v2: https://lists.gnu.org/archive/html/qemu-devel/2017-06/msg01203.html
+>   v1: https://lists.gnu.org/archive/html/qemu-devel/2017-05/msg05919.html
+> 
+> Changes in v4:
+>  * Document new memory-backend-file option 'align' in qemu-options.hx. (Eduardo Habkost)
+>  * Add endian conversion when setting the unarmed flag in NFIT. (Stefan Hajnoczi)
+> 
+> Changes in v3:
+>  * Add an option 'align' to 'memory-backend-file' to address the
+>    failure when mmap device dax (patch 1).
+>  * Remove device dax check, which needs to access sysfs and may not
+>    work with SELinux.
+>  * Add a boolean option 'unarmed' to '-device nvdimm', which allows
+>    users to control the unarmed flag in guest ACPI NFIT. I don't make
+>    it as OnOffAuto, because of the remove of device dax check.
+>  * Document new options added by this patch series.
 
-find ./* -type f -exec sed -i \
-    'N;N;N;N;N;N;N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_=
-report("\1"\2);|Ig}' \
-    {} +
-find ./* -type f -exec sed -i \
-    'N;N;N;N;N;N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_re=
-port("\1"\2);|Ig}' \
-    {} +
-find ./* -type f -exec sed -i \
-    'N;N;N;N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report=
-("\1"\2);|Ig}' \
-    {} +
-find ./* -type f -exec sed -i \
-    'N;N;N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("=
-\1"\2);|Ig}' \
-    {} +
-find ./* -type f -exec sed -i \
-    'N;N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1=
-"\2);|Ig}' \
-    {} +
-find ./* -type f -exec sed -i \
-    'N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\=
-2);|Ig}' \
-    {} +
-find ./* -type f -exec sed -i \
-    'N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2)=
-;|Ig}' \
-    {} +
-find ./* -type f -exec sed -i \
-    'N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|=
-Ig}' \
-    {} +
-find ./* -type f -exec sed -i \
-    'N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig=
-}' \
-    {} +
-find ./* -type f -exec sed -i \
-    'N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}'=
- \
-    {} +
-find ./* -type f -exec sed -i \
-    'N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
-    {} +
+Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 
-Some lines where then manually tweaked to pass checkpatch.
+Pls merge through the memory tree.
 
-Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
-Cc: Michael Walle <michael@walle.cc>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-Acked-by: Michael Walle <michael@walle.cc>
----
-V2:
- - Split hw patch into individual directories
-
- hw/lm32/lm32_boards.c | 7 +++----
- hw/lm32/milkymist.c   | 7 +++----
- 2 files changed, 6 insertions(+), 8 deletions(-)
-
-diff --git a/hw/lm32/lm32_boards.c b/hw/lm32/lm32_boards.c
-index 002d638edd..527bcc229c 100644
---- a/hw/lm32/lm32_boards.c
-+++ b/hw/lm32/lm32_boards.c
-@@ -18,6 +18,7 @@
-  */
-=20
- #include "qemu/osdep.h"
-+#include "qemu/error-report.h"
- #include "qemu-common.h"
- #include "cpu.h"
- #include "hw/sysbus.h"
-@@ -148,8 +149,7 @@ static void lm32_evr_init(MachineState *machine)
-         }
-=20
-         if (kernel_size < 0) {
--            fprintf(stderr, "qemu: could not load kernel '%s'\n",
--                    kernel_filename);
-+            error_report("could not load kernel '%s'", kernel_filename);
-             exit(1);
-         }
-     }
-@@ -242,8 +242,7 @@ static void lm32_uclinux_init(MachineState *machine)
-         }
-=20
-         if (kernel_size < 0) {
--            fprintf(stderr, "qemu: could not load kernel '%s'\n",
--                    kernel_filename);
-+            error_report("could not load kernel '%s'", kernel_filename);
-             exit(1);
-         }
-     }
-diff --git a/hw/lm32/milkymist.c b/hw/lm32/milkymist.c
-index d4e765f2eb..85d64fe58d 100644
---- a/hw/lm32/milkymist.c
-+++ b/hw/lm32/milkymist.c
-@@ -18,6 +18,7 @@
-  */
-=20
- #include "qemu/osdep.h"
-+#include "qemu/error-report.h"
- #include "qemu-common.h"
- #include "cpu.h"
- #include "hw/sysbus.h"
-@@ -145,8 +146,7 @@ milkymist_init(MachineState *machine)
-=20
-     /* if no kernel is given no valid bios rom is a fatal error */
-     if (!kernel_filename && !dinfo && !bios_filename && !qtest_enabled()) =
-{
--        fprintf(stderr, "qemu: could not load Milkymist One bios '%s'\n",
--                bios_name);
-+        error_report("could not load Milkymist One bios '%s'", bios_name);
-         exit(1);
-     }
-     g_free(bios_filename);
-@@ -184,8 +184,7 @@ milkymist_init(MachineState *machine)
-         }
-=20
-         if (kernel_size < 0) {
--            fprintf(stderr, "qemu: could not load kernel '%s'\n",
--                    kernel_filename);
-+            error_report("could not load kernel '%s'", kernel_filename);
-             exit(1);
-         }
-     }
---=20
-2.14.1
+> Haozhong Zhang (3):
+>   hostmem-file: add "align" option
+>   nvdimm: add a macro for property "label-size"
+>   nvdimm: add 'unarmed' option
+> 
+>  backends/hostmem-file.c | 41 ++++++++++++++++++++++++++++++++++++++++-
+>  docs/nvdimm.txt         | 31 +++++++++++++++++++++++++++++++
+>  exec.c                  |  8 +++++++-
+>  hw/acpi/nvdimm.c        |  7 +++++++
+>  hw/mem/nvdimm.c         | 28 +++++++++++++++++++++++++++-
+>  include/exec/memory.h   |  3 +++
+>  include/hw/mem/nvdimm.h | 12 ++++++++++++
+>  memory.c                |  2 ++
+>  numa.c                  |  2 +-
+>  qemu-options.hx         |  9 ++++++++-
+>  10 files changed, 138 insertions(+), 5 deletions(-)
+> 
+> -- 
+> 2.14.1
