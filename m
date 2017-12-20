@@ -1,35 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56075)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56170)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eRlwv-0006Du-DO
-	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 16:30:51 -0500
+	(envelope-from <michael@rivendell.weiser.dinsnail.net>)
+	id 1eRlx2-0006Gz-J0
+	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 16:30:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eRlwq-0006PM-DR
-	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 16:30:49 -0500
-Received: from indium.canonical.com ([91.189.90.7]:43540)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1eRlwq-0006Nb-5O
-	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 16:30:44 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1eRlwn-0003os-Mb
-	for <qemu-devel@nongnu.org>; Wed, 20 Dec 2017 21:30:41 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 703F62E8074
-	for <qemu-devel@nongnu.org>; Wed, 20 Dec 2017 21:30:41 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 20 Dec 2017 21:17:40 -0000
-From: Gustavo Moreira <gmoreira@gmail.com>
-Reply-To: Bug 1739371 <1739371@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <151375574544.16920.12315859630279795224.malonedeb@soybean.canonical.com>
-	<151378463512.18928.6831633995468403926.malone@chaenomeles.canonical.com>
-Message-Id: <CAF7ODbXP3TNmhohJA4GzeNeOWZhMT_FYOH-_=weZeHVfdQq-bw@mail.gmail.com>
-Errors-To: bounces@canonical.com
-Subject: Re: [Qemu-devel] [Bug 1739371] Re: qemu-system-arm snapshot loadvm
- core dumped
+	(envelope-from <michael@rivendell.weiser.dinsnail.net>)
+	id 1eRlx1-0006k2-KB
+	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 16:30:56 -0500
+Received: from heinz.dinsnail.net
+	([2a01:238:43b4:3200:9392:5dcc:2f0e:a960]:49796)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <michael@rivendell.weiser.dinsnail.net>)
+	id 1eRlx1-0006eJ-Cl
+	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 16:30:55 -0500
+From: Michael Weiser <michael.weiser@gmx.de>
+Date: Wed, 20 Dec 2017 22:23:02 +0100
+Message-Id: <20171220212308.12614-2-michael.weiser@gmx.de>
+In-Reply-To: <20171220212308.12614-1-michael.weiser@gmx.de>
+References: <20171220212308.12614-1-michael.weiser@gmx.de>
+Subject: [Qemu-devel] [PATCH v3 1/7] linux-user: Add support for big-endian
+ aarch64
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,219 +29,35 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: Michael Weiser <michael.weiser@gmx.de>, Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>
 
-Thanks Peter for your prompt response.
+Enable big-endian mode for data accesses on aarch64 for big-endian linux
+user mode. Activate it for all exception levels as documented by ARM:
+Set the SCTLR EE bit for ELs 1 through 3. Additionally set bit E0E in
+EL1 to enable it in EL0 as well.
 
-I wonder if you have any plan of fixing it. Also if there is any
-workaround.
+Signed-off-by: Michael Weiser <michael.weiser@gmx.de>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+---
+ linux-user/main.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-Is the bug limited to arm? Is there any main ticket where I can follow the
-progress of this issue?
-
-On Thu., 21 Dec. 2017, 2:50 am Peter Maydell, <peter.maydell@linaro.org>
-wrote:
-
-> I suspect this is the same underlying state save/restore bug as your
-> other LP:1739378 -- it's just that since 2.5.0 we've improved the error
-> reporting for cases where the incoming migration state doesn't match
-> what we're expecting, so we report an error message rather than just
-> mangling the simulation state and causing the guest to crash on restart.
->
-> --
-> You received this bug notification because you are subscribed to the bug
-> report.
-> https://bugs.launchpad.net/bugs/1739371
->
-> Title:
->   qemu-system-arm snapshot loadvm core dumped
->
-> Status in QEMU:
->   New
->
-> Bug description:
->   Ubuntu Qemu is crashing trying to restore saved snapshot in
-> qemu-system-arm.
->   I've tried different guests kernels, but I wasn't lucky with any of the=
-m.
->
->   The guest vm boots and I can use it normally. The issue is when I save
->   the snapshot using "savevm Base0", "quit" and then I restore that
->   snapshot using "-loadvm Base0" from the cmd line.
->
->   The only difference I've noticed is tweaking the guest memory:
->   * With -m 512 or 1024 it crashes as you can see below.
->   * With -m 2048 it doesn't crash, it restores the vm and I can see the
-> screen as it was, but the OS is halted. And it's not just the keyboard.
-> I've tried saving the snapshot while it's booting with lot of lines being
-> printed on screen and after restoring it, the OS is frozen.
->
->   I also tried limiting the guest kernel memory using the mem parameter
->   (mem=3D2048M) and disabling the kernel address space randomization
->   (nokaslr) with the same results.
->
->   OS: Ubuntu 16.04.3 LTS (xenial)
->
->   $ qemu-system-arm --version
->   QEMU emulator version 2.5.0 (Debian 1:2.5+dfsg-5ubuntu10.16), Copyright
-> (c) 2003-2008 Fabrice Bellard
->
->   $ qemu-system-arm -kernel kernel/vmlinuz-4.10.0-42-generic -initrd
-> kernel/initrd.img-4.10.0-42-generic -M vexpress-a15 -m 512 -append
-> 'root=3D/dev/mmcblk0 rootwait console=3Dtty0' -sd vexpress-4G.qcow2 -dtb
-> device-tree/vexpress-v2p-ca15-tc1.dtb  -loadvm Base0
->   pulseaudio: set_sink_input_volume() failed
->   pulseaudio: Reason: Invalid argument
->   pulseaudio: set_sink_input_mute() failed
->   pulseaudio: Reason: Invalid argument
->   qemu: fatal: Trying to execute code outside RAM or ROM at 0xc0321568
->
->   R00=3D00000001 R01=3D00000000 R02=3D00000000 R03=3Dc0321560
->   R04=3Dc1500000 R05=3Dc150529c R06=3Dc1505234 R07=3Dc14384d0
->   R08=3D00000000 R09=3D00000000 R10=3Dc1501f50 R11=3Dc1501f3c
->   R12=3Dc1501f40 R13=3Dc1501f30 R14=3Dc030a184 R15=3Dc0321568
->   PSR=3D60070093 -ZC- A S svc32
->   s00=3D6374652f s01=3D636f6c2f d00=3D636f6c2f6374652f
->   s02=3D7273752f s03=3D6962732f d01=3D6962732f7273752f
->   s04=3D6e612f6e s05=3D6f726361 d02=3D6f7263616e612f6e
->   s06=3D7c7c206e s07=3D63202820 d03=3D632028207c7c206e
->   s08=3D202f2064 s09=3D72202626 d04=3D72202626202f2064
->   s10=3D702d6e75 s11=3D73747261 d05=3D73747261702d6e75
->   s12=3D722d2d20 s13=3D726f7065 d06=3D726f7065722d2d20
->   s14=3D652f2074 s15=3D632f6374 d07=3D632f6374652f2074
->   s16=3D00000000 s17=3D00000000 d08=3D0000000000000000
->   s18=3D00000000 s19=3D00000000 d09=3D0000000000000000
->   s20=3D00000000 s21=3D00000000 d10=3D0000000000000000
->   s22=3D00000000 s23=3D00000000 d11=3D0000000000000000
->   s24=3D00000000 s25=3D00000000 d12=3D0000000000000000
->   s26=3D00000000 s27=3D00000000 d13=3D0000000000000000
->   s28=3D00000000 s29=3D00000000 d14=3D0000000000000000
->   s30=3D00000000 s31=3D00000000 d15=3D0000000000000000
->   s32=3D00000000 s33=3D00000000 d16=3D0000000000000000
->   s34=3D00000000 s35=3D00000000 d17=3D0000000000000000
->   s36=3D00000000 s37=3D00000000 d18=3D0000000000000000
->   s38=3D00000000 s39=3D00000000 d19=3D0000000000000000
->   s40=3D00000000 s41=3D00000000 d20=3D0000000000000000
->   s42=3D00000000 s43=3D00000000 d21=3D0000000000000000
->   s44=3D00000000 s45=3D00000000 d22=3D0000000000000000
->   s46=3D00000000 s47=3D00000000 d23=3D0000000000000000
->   s48=3D00000000 s49=3D00000000 d24=3D0000000000000000
->   s50=3D00000000 s51=3D00000000 d25=3D0000000000000000
->   s52=3D00000000 s53=3D00000000 d26=3D0000000000000000
->   s54=3D00000000 s55=3D00000000 d27=3D0000000000000000
->   s56=3D00000000 s57=3D00000000 d28=3D0000000000000000
->   s58=3D00000000 s59=3D00000000 d29=3D0000000000000000
->   s60=3D00000000 s61=3D00000000 d30=3D0000000000000000
->   s62=3D00000000 s63=3D00000000 d31=3D0000000000000000
->   FPSCR: 00000000
->   Aborted (core dumped)
->
->   As I said above, the same happens when -m 1024 is used.
->
->   I have a different issue when I use the qemu git master version, but
->   I'm submiting a different ticket for that.
->
->   Cheers,
->   Gus
->
-> To manage notifications about this bug go to:
-> https://bugs.launchpad.net/qemu/+bug/1739371/+subscriptions
->
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1739371
-
-Title:
-  qemu-system-arm snapshot loadvm core dumped
-
-Status in QEMU:
-  New
-
-Bug description:
-  Ubuntu Qemu is crashing trying to restore saved snapshot in qemu-system-a=
-rm.
-  I've tried different guests kernels, but I wasn't lucky with any of them.
-
-  The guest vm boots and I can use it normally. The issue is when I save
-  the snapshot using "savevm Base0", "quit" and then I restore that
-  snapshot using "-loadvm Base0" from the cmd line.
-
-  The only difference I've noticed is tweaking the guest memory:
-  * With -m 512 or 1024 it crashes as you can see below.
-  * With -m 2048 it doesn't crash, it restores the vm and I can see the scr=
-een as it was, but the OS is halted. And it's not just the keyboard. I've t=
-ried saving the snapshot while it's booting with lot of lines being printed=
- on screen and after restoring it, the OS is frozen.
-
-  I also tried limiting the guest kernel memory using the mem parameter
-  (mem=3D2048M) and disabling the kernel address space randomization
-  (nokaslr) with the same results.
-
-  OS: Ubuntu 16.04.3 LTS (xenial)
-
-  $ qemu-system-arm --version
-  QEMU emulator version 2.5.0 (Debian 1:2.5+dfsg-5ubuntu10.16), Copyright (=
-c) 2003-2008 Fabrice Bellard
-
-  $ qemu-system-arm -kernel kernel/vmlinuz-4.10.0-42-generic -initrd kernel=
-/initrd.img-4.10.0-42-generic -M vexpress-a15 -m 512 -append 'root=3D/dev/m=
-mcblk0 rootwait console=3Dtty0' -sd vexpress-4G.qcow2 -dtb device-tree/vexp=
-ress-v2p-ca15-tc1.dtb  -loadvm Base0
-  pulseaudio: set_sink_input_volume() failed
-  pulseaudio: Reason: Invalid argument
-  pulseaudio: set_sink_input_mute() failed
-  pulseaudio: Reason: Invalid argument
-  qemu: fatal: Trying to execute code outside RAM or ROM at 0xc0321568
-
-  R00=3D00000001 R01=3D00000000 R02=3D00000000 R03=3Dc0321560
-  R04=3Dc1500000 R05=3Dc150529c R06=3Dc1505234 R07=3Dc14384d0
-  R08=3D00000000 R09=3D00000000 R10=3Dc1501f50 R11=3Dc1501f3c
-  R12=3Dc1501f40 R13=3Dc1501f30 R14=3Dc030a184 R15=3Dc0321568
-  PSR=3D60070093 -ZC- A S svc32
-  s00=3D6374652f s01=3D636f6c2f d00=3D636f6c2f6374652f
-  s02=3D7273752f s03=3D6962732f d01=3D6962732f7273752f
-  s04=3D6e612f6e s05=3D6f726361 d02=3D6f7263616e612f6e
-  s06=3D7c7c206e s07=3D63202820 d03=3D632028207c7c206e
-  s08=3D202f2064 s09=3D72202626 d04=3D72202626202f2064
-  s10=3D702d6e75 s11=3D73747261 d05=3D73747261702d6e75
-  s12=3D722d2d20 s13=3D726f7065 d06=3D726f7065722d2d20
-  s14=3D652f2074 s15=3D632f6374 d07=3D632f6374652f2074
-  s16=3D00000000 s17=3D00000000 d08=3D0000000000000000
-  s18=3D00000000 s19=3D00000000 d09=3D0000000000000000
-  s20=3D00000000 s21=3D00000000 d10=3D0000000000000000
-  s22=3D00000000 s23=3D00000000 d11=3D0000000000000000
-  s24=3D00000000 s25=3D00000000 d12=3D0000000000000000
-  s26=3D00000000 s27=3D00000000 d13=3D0000000000000000
-  s28=3D00000000 s29=3D00000000 d14=3D0000000000000000
-  s30=3D00000000 s31=3D00000000 d15=3D0000000000000000
-  s32=3D00000000 s33=3D00000000 d16=3D0000000000000000
-  s34=3D00000000 s35=3D00000000 d17=3D0000000000000000
-  s36=3D00000000 s37=3D00000000 d18=3D0000000000000000
-  s38=3D00000000 s39=3D00000000 d19=3D0000000000000000
-  s40=3D00000000 s41=3D00000000 d20=3D0000000000000000
-  s42=3D00000000 s43=3D00000000 d21=3D0000000000000000
-  s44=3D00000000 s45=3D00000000 d22=3D0000000000000000
-  s46=3D00000000 s47=3D00000000 d23=3D0000000000000000
-  s48=3D00000000 s49=3D00000000 d24=3D0000000000000000
-  s50=3D00000000 s51=3D00000000 d25=3D0000000000000000
-  s52=3D00000000 s53=3D00000000 d26=3D0000000000000000
-  s54=3D00000000 s55=3D00000000 d27=3D0000000000000000
-  s56=3D00000000 s57=3D00000000 d28=3D0000000000000000
-  s58=3D00000000 s59=3D00000000 d29=3D0000000000000000
-  s60=3D00000000 s61=3D00000000 d30=3D0000000000000000
-  s62=3D00000000 s63=3D00000000 d31=3D0000000000000000
-  FPSCR: 00000000
-  Aborted (core dumped)
-
-  As I said above, the same happens when -m 1024 is used.
-
-  I have a different issue when I use the qemu git master version, but
-  I'm submiting a different ticket for that.
-
-  Cheers,
-  Gus
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1739371/+subscriptions
+diff --git a/linux-user/main.c b/linux-user/main.c
+index 71696ed33d..7a4dd0c9c3 100644
+--- a/linux-user/main.c
++++ b/linux-user/main.c
+@@ -4622,6 +4622,12 @@ int main(int argc, char **argv, char **envp)
+         }
+         env->pc = regs->pc;
+         env->xregs[31] = regs->sp;
++#ifdef TARGET_WORDS_BIGENDIAN
++        env->cp15.sctlr_el[1] |= SCTLR_E0E;
++        for (i = 1; i < 4; ++i) {
++            env->cp15.sctlr_el[i] |= SCTLR_EE;
++        }
++#endif
+     }
+ #elif defined(TARGET_ARM)
+     {
+-- 
+2.15.1
