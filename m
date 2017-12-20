@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43960)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52473)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eRjvd-0001zq-EA
-	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 14:21:22 -0500
+	(envelope-from <groug@kaod.org>) id 1eRkGc-0000TQ-VU
+	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 14:43:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eRjvc-0003eE-6B
-	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 14:21:21 -0500
-Received: from mail-ot0-x242.google.com ([2607:f8b0:4003:c0f::242]:42413)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1eRjvb-0003dh-WA
-	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 14:21:20 -0500
-Received: by mail-ot0-x242.google.com with SMTP id i1so20532974oth.9
-	for <qemu-devel@nongnu.org>; Wed, 20 Dec 2017 11:21:19 -0800 (PST)
+	(envelope-from <groug@kaod.org>) id 1eRkGY-00077h-WD
+	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 14:43:03 -0500
+Received: from 5.mo1.mail-out.ovh.net ([178.33.45.107]:43748)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1eRkGY-00076s-Pq
+	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 14:42:58 -0500
+Received: from player795.ha.ovh.net (gw6.ovh.net [213.251.189.206])
+	by mo1.mail-out.ovh.net (Postfix) with ESMTP id A893FB595B
+	for <qemu-devel@nongnu.org>; Wed, 20 Dec 2017 20:42:56 +0100 (CET)
+From: Greg Kurz <groug@kaod.org>
+Date: Wed, 20 Dec 2017 20:42:54 +0100
+Message-ID: <151379897394.31252.4783267371691256574.stgit@bahia>
 MIME-Version: 1.0
-In-Reply-To: <1513790098-9815-1-git-send-email-pbonzini@redhat.com>
-References: <1513790098-9815-1-git-send-email-pbonzini@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Wed, 20 Dec 2017 19:20:58 +0000
-Message-ID: <CAFEAcA8J53A93+SQz01W13gRCX-ecw0v+8JTaRqwmrUeFjqaJA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PULL 00/46] First batch of misc patches for QEMU
- 2.12
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Subject: [Qemu-devel] [PATCH] 9pfs: drop v9fs_register_transport()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,100 +27,111 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
+Cc: Greg Kurz <groug@kaod.org>, Stefano Stabellini <sstabellini@kernel.org>
 
-On 20 December 2017 at 17:14, Paolo Bonzini <pbonzini@redhat.com> wrote:
-> The following changes since commit 200780a3a3ed067dfb2e0d2210b0ed09e748ba=
-26:
->
->   Merge remote-tracking branch 'remotes/armbru/tags/pull-cmdline-2017-12-=
-18-v2' into staging (2017-12-20 13:20:48 +0000)
->
-> are available in the git repository at:
->
->
->   git://github.com/bonzini/qemu.git tags/for-upstream
->
-> for you to fetch changes up to d01ce16cd827831145cf6a5b4a81ce3a47b537cd:
->
->   chardev: convert the socket server to QIONetListener (2017-12-20 17:18:=
-19 +0100)
->
-> ----------------------------------------------------------------
-> * NBD and chardev conversion to QIONetListener (Daniel)
-> * MTTCG fixes (David)
-> * Hyper-V fixes (Roman, Evgeny)
-> * share-rw option (Fam)
-> * Mux chardev event bugfix (Marc-Andr=C3=A9)
-> * Add systemd unit files in contrib/ (me)
-> * SCSI and block/iscsi.c bugfixes (me, Peter L.)
-> * unassigned_mem_ops fixes (Peter M.)
-> * VEX decoding fix (Peter M.)
-> * "info pic" and "info irq" improvements (Peter Xu)
-> * vmport trace events (Philippe)
-> * Braille chardev bugfix (Samuel)
-> * Compiler warnings fix (Stefan)
-> * boot-serial-test aka TCG smoke test (Thomas)
-> * New CPU features (Yang)
-> * Reduce startup memory usage (Yang)
-> * QemuThread race fix (linhecheng)
+No good reasons to do this outside of v9fs_device_realize_common().
 
-Build failures, I'm afraid:
+Signed-off-by: Greg Kurz <groug@kaod.org>
+---
+ hw/9pfs/9p.c               |    6 +++++-
+ hw/9pfs/9p.h               |   10 ++--------
+ hw/9pfs/virtio-9p-device.c |    8 ++------
+ hw/9pfs/xen-9p-backend.c   |    3 +--
+ 4 files changed, 10 insertions(+), 17 deletions(-)
 
-NetBSD, FreeBSD, OpenBSD, OSX:
-
-  CC      util/qemu-thread-posix.o
-/root/qemu/util/qemu-thread-posix.c: In function 'qemu_thread_create':
-/root/qemu/util/qemu-thread-posix.c:513:5: error: unknown type name
-'QemuThreadArgs'
-     QemuThreadArgs *qemu_thread_args;
-     ^
-/root/qemu/util/qemu-thread-posix.c:513:21: warning: unused variable
-'qemu_thread_args' [-Wunused-variable]
-     QemuThreadArgs *qemu_thread_args;
-                     ^
-
-On the x86/sanitizer build, new runtime errors:
-  GTESTER tests/test-char
-/home/petmay01/linaro/qemu-for-merges/chardev/char-mux.c:119:23:
-runtime error: index -1 out of bounds for type 'CharBackend *[4]'
-
-  GTESTER check-qtest-m68k
-/home/petmay01/linaro/qemu-for-merges/target/m68k/translate.c:230:12:
-runtime error: index -1 out of bounds for type 'const uint8_t [11]'
-
-and a bunch of test-hmp failures on SPARC host:
-
-TEST: tests/test-hmp... (pid=3D112458)
-  /or1k/hmp/none:                                                      OK
-  /or1k/hmp/or1k-sim:
-Broken pipe
-FAIL
-GTester: last random seed: R02S910131160952686f50f8817feb7ffa43
-(pid=3D112640)
-  /or1k/hmp/none+2MB:                                                  OK
-FAIL: tests/test-hmp
-
-
-TEST: tests/test-hmp... (pid=3D112535)
-  /lm32/hmp/lm32-evr:                                                  OK
-  /lm32/hmp/none:                                                      OK
-  /lm32/hmp/milkymist:                                                 OK
-  /lm32/hmp/lm32-uclinux:
-Broken pipe
-FAIL
-GTester: last random seed: R02S8117b2f6f2c32eedeb45726a96bd3248
-(pid=3D112826)
-  /lm32/hmp/none+2MB:                                                  OK
-FAIL: tests/test-hmp
-
-...and similar fails on one or two boards on most of the other
-guest architectures.
-
-I think sparc is the only test box I run 'make check' with -j32,
-so that might be the cause there. Running the test case by
-hand passes, but -j32 reliably fails.
-
-thanks
--- PMM
+diff --git a/hw/9pfs/9p.c b/hw/9pfs/9p.c
+index ccbc75265a52..2f836a59deac 100644
+--- a/hw/9pfs/9p.c
++++ b/hw/9pfs/9p.c
+@@ -3502,7 +3502,8 @@ void pdu_submit(V9fsPDU *pdu, P9MsgHeader *hdr)
+ }
+ 
+ /* Returns 0 on success, 1 on failure. */
+-int v9fs_device_realize_common(V9fsState *s, Error **errp)
++int v9fs_device_realize_common(V9fsState *s, const V9fsTransport *t,
++                               Error **errp)
+ {
+     int i, len;
+     struct stat stat;
+@@ -3510,6 +3511,9 @@ int v9fs_device_realize_common(V9fsState *s, Error **errp)
+     V9fsPath path;
+     int rc = 1;
+ 
++    assert(!s->transport);
++    s->transport = t;
++
+     /* initialize pdu allocator */
+     QLIST_INIT(&s->free_list);
+     QLIST_INIT(&s->active_list);
+diff --git a/hw/9pfs/9p.h b/hw/9pfs/9p.h
+index ea7657837784..e2aa64577fe1 100644
+--- a/hw/9pfs/9p.h
++++ b/hw/9pfs/9p.h
+@@ -346,7 +346,8 @@ void v9fs_path_sprintf(V9fsPath *path, const char *fmt, ...);
+ void v9fs_path_copy(V9fsPath *lhs, V9fsPath *rhs);
+ int v9fs_name_to_path(V9fsState *s, V9fsPath *dirpath,
+                       const char *name, V9fsPath *path);
+-int v9fs_device_realize_common(V9fsState *s, Error **errp);
++int v9fs_device_realize_common(V9fsState *s, const V9fsTransport *t,
++                               Error **errp);
+ void v9fs_device_unrealize_common(V9fsState *s, Error **errp);
+ 
+ V9fsPDU *pdu_alloc(V9fsState *s);
+@@ -366,11 +367,4 @@ struct V9fsTransport {
+     void        (*pdu_complete)(V9fsPDU *pdu, bool discard);
+ };
+ 
+-static inline int v9fs_register_transport(V9fsState *s, const V9fsTransport *t)
+-{
+-    assert(!s->transport);
+-    s->transport = t;
+-    return 0;
+-}
+-
+ #endif
+diff --git a/hw/9pfs/virtio-9p-device.c b/hw/9pfs/virtio-9p-device.c
+index d874f48467ba..806e7573276c 100644
+--- a/hw/9pfs/virtio-9p-device.c
++++ b/hw/9pfs/virtio-9p-device.c
+@@ -201,17 +201,13 @@ static void virtio_9p_device_realize(DeviceState *dev, Error **errp)
+     V9fsVirtioState *v = VIRTIO_9P(dev);
+     V9fsState *s = &v->state;
+ 
+-    if (v9fs_device_realize_common(s, errp)) {
+-        goto out;
++    if (v9fs_device_realize_common(s, &virtio_9p_transport, errp)) {
++        return;
+     }
+ 
+     v->config_size = sizeof(struct virtio_9p_config) + strlen(s->fsconf.tag);
+     virtio_init(vdev, "virtio-9p", VIRTIO_ID_9P, v->config_size);
+     v->vq = virtio_add_queue(vdev, MAX_REQ, handle_9p_output);
+-    v9fs_register_transport(s, &virtio_9p_transport);
+-
+-out:
+-    return;
+ }
+ 
+ static void virtio_9p_device_unrealize(DeviceState *dev, Error **errp)
+diff --git a/hw/9pfs/xen-9p-backend.c b/hw/9pfs/xen-9p-backend.c
+index dc1e6c88885d..e2ae1ac148eb 100644
+--- a/hw/9pfs/xen-9p-backend.c
++++ b/hw/9pfs/xen-9p-backend.c
+@@ -448,7 +448,6 @@ static int xen_9pfs_connect(struct XenDevice *xendev)
+     xen_9pdev->id = s->fsconf.fsdev_id =
+         g_strdup_printf("xen9p%d", xendev->dev);
+     xen_9pdev->tag = s->fsconf.tag = xenstore_read_fe_str(xendev, "tag");
+-    v9fs_register_transport(s, &xen_9p_transport);
+     fsdev = qemu_opts_create(qemu_find_opts("fsdev"),
+             s->fsconf.tag,
+             1, NULL);
+@@ -457,7 +456,7 @@ static int xen_9pfs_connect(struct XenDevice *xendev)
+     qemu_opt_set(fsdev, "security_model", xen_9pdev->security_model, NULL);
+     qemu_opts_set_id(fsdev, s->fsconf.fsdev_id);
+     qemu_fsdev_add(fsdev);
+-    v9fs_device_realize_common(s, NULL);
++    v9fs_device_realize_common(s, &xen_9p_transport, NULL);
+ 
+     return 0;
+ 
