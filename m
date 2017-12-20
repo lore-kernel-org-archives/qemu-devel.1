@@ -1,34 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44700)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47023)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eRbob-0001dC-BU
-	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 05:41:34 -0500
+	(envelope-from <kchamart@redhat.com>) id 1eRbrk-0004ii-Ux
+	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 05:44:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eRboW-0003kf-SN
-	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 05:41:33 -0500
-Received: from indium.canonical.com ([91.189.90.7]:47092)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1eRboW-0003iV-N7
-	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 05:41:28 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1eRboS-000317-JP
-	for <qemu-devel@nongnu.org>; Wed, 20 Dec 2017 10:41:24 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id C67DE2E80E8
-	for <qemu-devel@nongnu.org>; Wed, 20 Dec 2017 10:41:19 +0000 (UTC)
+	(envelope-from <kchamart@redhat.com>) id 1eRbrk-0007KM-5i
+	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 05:44:49 -0500
+Date: Wed, 20 Dec 2017 11:44:36 +0100
+From: Kashyap Chamarthy <kchamart@redhat.com>
+Message-ID: <20171220104436.fzucmsombnpyxoke@eukaryote>
+References: <2cd24073-b6d9-6479-59b1-869db6c25103@redhat.com>
+	<87ind4gxcb.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 20 Dec 2017 10:31:55 -0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Reply-To: Bug 1739304 <1739304@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <151372207410.18061.3050483309114042068.malonedeb@chaenomeles.canonical.com>
-Message-Id: <151376591662.17755.1284403896485862270.malone@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1739304] Re: Passing a directory to (eg.) -cdrom
- results in misleading error message
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <87ind4gxcb.fsf@dusky.pond.sub.org>
+Subject: Re: [Qemu-devel] [Qemu-block] Raw notes from a small block
+ layer/QAPI/something pre-christmas meeting
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,44 +24,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Markus Armbruster <armbru@redhat.com>
+Cc: Max Reitz <mreitz@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Qemu-block <qemu-block@nongnu.org>
 
-Yep, can repeat it here, it seems pretty random which error it gives:
+On Mon, Dec 18, 2017 at 11:11:00AM +0100, Markus Armbruster wrote:
+> Max Reitz <mreitz@redhat.com> writes:
 
-[dgilbert@dgilbert-t530 try]$ ./x86_64-softmmu/qemu-system-x86_64 -cdrom /t=
-mp
-qemu-system-x86_64: -cdrom /tmp: Could not refresh total sector count: Inva=
-lid argument
-[dgilbert@dgilbert-t530 try]$ ./x86_64-softmmu/qemu-system-x86_64 -cdrom /v=
-ar
-qemu-system-x86_64: -cdrom /var: Could not read image for determining its f=
-ormat: File too large
+[...]
 
+Thanks, Max, for the detailed notes.
 
-** Changed in: qemu
-       Status: New =3D> Confirmed
+> > Image creation in qemu-system-* vs. qemu-img:
+> >   In order to get proper introspection for qemu-img create, we need a
+> >   QAPI schema.  If we have a QAPI schema, we might as well add
+> >   blockdev-create to QMP.
+> >   As long as we do not have a really-none (null, void, ...) machine type
+> >   for qemu-system-*, launching such a process just for creating an image
+> >   will bring quite a bit of overhead (e.g. with -M none -accel qtest).
+> >   However, as for libvirt, this is not exactly a regression since
+> >   libvirt currently cannot create images at all (apart from implicitly
+> >   through drive-mirror etc.).  Further work on voidifying qemu-system-*
+> >   will improve performance.
+> 
+> Another thought: do we want to give qemu-system-* the necessary
+> privileges for creating images?  Two cases: running with and without a
+> guest.
 
--- =
+Related: Just curious -- was it an explicit design decision to not give
+`qemu-system-*` permissions to create disk images?
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1739304
+[...]
 
-Title:
-  Passing a directory to (eg.) -cdrom results in misleading error
-  message
-
-Status in QEMU:
-  Confirmed
-
-Bug description:
-  For example:
-
-      qemu-system-x86_64 -cdrom /path/to/directory
-
-  Results in:
-
-      Could not read image for determining its format: File too large
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1739304/+subscriptions
+-- 
+/kashyap
