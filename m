@@ -1,23 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40460)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41801)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1eReTE-0006SB-He
-	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 08:31:41 -0500
+	(envelope-from <famz@redhat.com>) id 1eReUe-0007gb-2a
+	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 08:33:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1eReTD-00036J-Ng
-	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 08:31:40 -0500
-Date: Wed, 20 Dec 2017 21:31:33 +0800
+	(envelope-from <famz@redhat.com>) id 1eReUa-0004Zo-If
+	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 08:33:08 -0500
+Date: Wed, 20 Dec 2017 21:32:54 +0800
 From: Fam Zheng <famz@redhat.com>
-Message-ID: <20171220133133.GE10812@lemon>
+Message-ID: <20171220133254.GF10812@lemon>
 References: <20171220103412.13048-1-kwolf@redhat.com>
-	<20171220103412.13048-4-kwolf@redhat.com>
-	<20171220131618.GD10812@lemon>
-	<20171220132425.GC6374@localhost.localdomain>
+	<20171220103412.13048-19-kwolf@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20171220132425.GC6374@localhost.localdomain>
-Subject: Re: [Qemu-devel] [PATCH 03/19] block: Make bdrv_drain() driver
- callbacks non-recursive
+In-Reply-To: <20171220103412.13048-19-kwolf@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 18/19] commit: Simplify reopen of base
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,77 +26,44 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Kevin Wolf <kwolf@redhat.com>
 Cc: qemu-block@nongnu.org, pbonzini@redhat.com, qemu-devel@nongnu.org
 
-On Wed, 12/20 14:24, Kevin Wolf wrote:
-> Am 20.12.2017 um 14:16 hat Fam Zheng geschrieben:
-> > On Wed, 12/20 11:33, Kevin Wolf wrote:
-> > > bdrv_drain_begin() doesn't increase bs->quiesce_counter recursively,
-> > 
-> > Pretty trivial but:
-> > 
-> > s/bdrv_drain_begin/bdrv_drained_begin/
+On Wed, 12/20 11:34, Kevin Wolf wrote:
+> Since commit bde70715, base is the only node that is reopened in
+> commit_start(). This means that the code, which still involves an
+> explicit BlockReopenQueue, can now be simplified by using bdrv_reopen().
 > 
-> Yes, thanks.
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> ---
+>  block/commit.c | 8 +-------
+>  1 file changed, 1 insertion(+), 7 deletions(-)
 > 
-> > > which means that the child nodes are not actually drained. To keep this
-> > > consistent, we also shouldn't call the block driver callbacks.
-> > > 
-> > > Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-> > > ---
-> > >  block/io.c | 16 +++++++++-------
-> > >  1 file changed, 9 insertions(+), 7 deletions(-)
-> > > 
-> > > diff --git a/block/io.c b/block/io.c
-> > > index b94740b8ff..91a52e2d82 100644
-> > > --- a/block/io.c
-> > > +++ b/block/io.c
-> > > @@ -158,7 +158,7 @@ static void coroutine_fn bdrv_drain_invoke_entry(void *opaque)
-> > >  }
-> > >  
-> > >  /* Recursively call BlockDriver.bdrv_co_drain_begin/end callbacks */
-> > > -static void bdrv_drain_invoke(BlockDriverState *bs, bool begin)
-> > > +static void bdrv_drain_invoke(BlockDriverState *bs, bool begin, bool recursive)
-> > >  {
-> > >      BdrvChild *child, *tmp;
-> > >      BdrvCoDrainData data = { .bs = bs, .done = false, .begin = begin};
-> > > @@ -172,8 +172,10 @@ static void bdrv_drain_invoke(BlockDriverState *bs, bool begin)
-> > >      bdrv_coroutine_enter(bs, data.co);
-> > >      BDRV_POLL_WHILE(bs, !data.done);
-> > >  
-> > > -    QLIST_FOREACH_SAFE(child, &bs->children, next, tmp) {
-> > > -        bdrv_drain_invoke(child->bs, begin);
-> > > +    if (recursive) {
-> > > +        QLIST_FOREACH_SAFE(child, &bs->children, next, tmp) {
-> > > +            bdrv_drain_invoke(child->bs, begin, true);
-> > > +        }
-> > >      }
-> > >  }
-> > >  
-> > > @@ -265,7 +267,7 @@ void bdrv_drained_begin(BlockDriverState *bs)
-> > >          bdrv_parent_drained_begin(bs);
-> > >      }
-> > >  
-> > > -    bdrv_drain_invoke(bs, true);
-> > > +    bdrv_drain_invoke(bs, true, false);
-> > 
-> > I'm not sure I understand this patch. If we call bdrv_drained_begin on a quorum
-> > BDS that has a QED child, we do want to call bdrv_qed_co_drain_begin() on the
-> > child, don't we? I think after this patch, we don't do that any more?
-> > 
-> > The same question arises when I look at throttle_co_drain_begin()..
+> diff --git a/block/commit.c b/block/commit.c
+> index c5327551ce..bb6c904704 100644
+> --- a/block/commit.c
+> +++ b/block/commit.c
+> @@ -277,7 +277,6 @@ void commit_start(const char *job_id, BlockDriverState *bs,
+>                    const char *filter_node_name, Error **errp)
+>  {
+>      CommitBlockJob *s;
+> -    BlockReopenQueue *reopen_queue = NULL;
+>      int orig_base_flags;
+>      BlockDriverState *iter;
+>      BlockDriverState *commit_top_bs = NULL;
+> @@ -299,12 +298,7 @@ void commit_start(const char *job_id, BlockDriverState *bs,
+>      /* convert base to r/w, if necessary */
+>      orig_base_flags = bdrv_get_flags(base);
+>      if (!(orig_base_flags & BDRV_O_RDWR)) {
+> -        reopen_queue = bdrv_reopen_queue(reopen_queue, base, NULL,
+> -                                         orig_base_flags | BDRV_O_RDWR);
+> -    }
+> -
+> -    if (reopen_queue) {
+> -        bdrv_reopen_multiple(bdrv_get_aio_context(bs), reopen_queue, &local_err);
+> +        bdrv_reopen(base, orig_base_flags | BDRV_O_RDWR, &local_err);
+>          if (local_err != NULL) {
+>              error_propagate(errp, local_err);
+>              goto fail;
+> -- 
+> 2.13.6
 > 
-> We don't increase bs->quiesce_counter for child nodes and don't notify
-> their parents, so they aren't really drained. Calling the BlcokDriver
-> callbacks is the only thing we did recursively. We should do one thing
-> consistently, and for bdrv_drained_begin/end() that is draining a single
-> node without the children.
-> 
-> Later in the series, I introduce a bdrv_subtree_drained_begin/end()
-> which doesn't only call the callbacks recursively, but also increases
-> bs->quiesce_counter etc. so that the child nodes are actually drained.
-> 
-> There are use cases for both functions.
-> 
-
-OK, thanks.
 
 Reviewed-by: Fam Zheng <famz@redhat.com>
