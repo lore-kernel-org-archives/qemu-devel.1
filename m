@@ -1,19 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55510)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55602)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1eReHr-0004Ow-Ah
-	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 08:19:56 -0500
+	(envelope-from <kwolf@redhat.com>) id 1eReHw-0004US-4f
+	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 08:20:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1eReHq-0006Ao-EK
-	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 08:19:55 -0500
+	(envelope-from <kwolf@redhat.com>) id 1eReHs-0006DO-B6
+	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 08:20:00 -0500
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Wed, 20 Dec 2017 14:19:28 +0100
-Message-Id: <20171220131939.27543-4-kwolf@redhat.com>
+Date: Wed, 20 Dec 2017 14:19:29 +0100
+Message-Id: <20171220131939.27543-5-kwolf@redhat.com>
 In-Reply-To: <20171220131939.27543-1-kwolf@redhat.com>
 References: <20171220131939.27543-1-kwolf@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 03/14] iotests: fix 197 for vpc
+Subject: [Qemu-devel] [PULL 04/14] block: Make bdrv_drain_invoke() recursive
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,52 +22,96 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, qemu-devel@nongnu.org
 
-From: John Snow <jsnow@redhat.com>
+This change separates bdrv_drain_invoke(), which calls the BlockDriver
+drain callbacks, from bdrv_drain_recurse(). Instead, the function
+performs its own recursion now.
 
-VPC has some difficulty creating geometries of particular size.
-However, we can indeed force it to use a literal one, so let's
-do that for the sake of test 197, which is testing some specific
-offsets.
+One reason for this is that bdrv_drain_recurse() can be called multiple
+times by bdrv_drain_all_begin(), but the callbacks may only be called
+once. The separation is necessary to fix this bug.
 
-Signed-off-by: John Snow <jsnow@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+The other reason is that we intend to go to a model where we call all
+driver callbacks first, and only then start polling. This is not fully
+achieved yet with this patch, as bdrv_drain_invoke() contains a
+BDRV_POLL_WHILE() loop for the block driver callbacks, which can still
+call callbacks for any unrelated event. It's a step in this direction
+anyway.
+
+Cc: qemu-stable@nongnu.org
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-Reviewed-by: Luk=C3=A1=C5=A1 Doktor <ldoktor@redhat.com>
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 ---
- tests/qemu-iotests/197           | 4 ++++
- tests/qemu-iotests/common.filter | 3 ++-
- 2 files changed, 6 insertions(+), 1 deletion(-)
+ block/io.c | 14 +++++++++++---
+ 1 file changed, 11 insertions(+), 3 deletions(-)
 
-diff --git a/tests/qemu-iotests/197 b/tests/qemu-iotests/197
-index 887eb4f496..5e869fe2b7 100755
---- a/tests/qemu-iotests/197
-+++ b/tests/qemu-iotests/197
-@@ -60,6 +60,10 @@ echo '=3D=3D=3D Copy-on-read =3D=3D=3D'
- echo
-=20
- # Prep the images
-+# VPC rounds image sizes to a specific geometry, force a specific size.
-+if [ "$IMGFMT" =3D "vpc" ]; then
-+    IMGOPTS=3D$(_optstr_add "$IMGOPTS" "force_size")
-+fi
- _make_test_img 4G
- $QEMU_IO -c "write -P 55 3G 1k" "$TEST_IMG" | _filter_qemu_io
- IMGPROTO=3Dfile IMGFMT=3Dqcow2 IMGOPTS=3D TEST_IMG_FILE=3D"$TEST_WRAP" \
-diff --git a/tests/qemu-iotests/common.filter b/tests/qemu-iotests/common=
-.filter
-index d9237799e9..f08248bfd9 100644
---- a/tests/qemu-iotests/common.filter
-+++ b/tests/qemu-iotests/common.filter
-@@ -134,7 +134,8 @@ _filter_img_create()
-         -e "s# log_size=3D[0-9]\\+##g" \
-         -e "s# refcount_bits=3D[0-9]\\+##g" \
-         -e "s# key-secret=3D[a-zA-Z0-9]\\+##g" \
--        -e "s# iter-time=3D[0-9]\\+##g"
-+        -e "s# iter-time=3D[0-9]\\+##g" \
-+        -e "s# force_size=3D\\(on\\|off\\)##g"
+diff --git a/block/io.c b/block/io.c
+index 6773926fc1..096468b761 100644
+--- a/block/io.c
++++ b/block/io.c
+@@ -175,8 +175,10 @@ static void coroutine_fn bdrv_drain_invoke_entry(void *opaque)
+     bdrv_wakeup(bs);
  }
-=20
- _filter_img_info()
---=20
+ 
++/* Recursively call BlockDriver.bdrv_co_drain_begin/end callbacks */
+ static void bdrv_drain_invoke(BlockDriverState *bs, bool begin)
+ {
++    BdrvChild *child, *tmp;
+     BdrvCoDrainData data = { .bs = bs, .done = false, .begin = begin};
+ 
+     if (!bs->drv || (begin && !bs->drv->bdrv_co_drain_begin) ||
+@@ -187,6 +189,10 @@ static void bdrv_drain_invoke(BlockDriverState *bs, bool begin)
+     data.co = qemu_coroutine_create(bdrv_drain_invoke_entry, &data);
+     bdrv_coroutine_enter(bs, data.co);
+     BDRV_POLL_WHILE(bs, !data.done);
++
++    QLIST_FOREACH_SAFE(child, &bs->children, next, tmp) {
++        bdrv_drain_invoke(child->bs, begin);
++    }
+ }
+ 
+ static bool bdrv_drain_recurse(BlockDriverState *bs, bool begin)
+@@ -194,9 +200,6 @@ static bool bdrv_drain_recurse(BlockDriverState *bs, bool begin)
+     BdrvChild *child, *tmp;
+     bool waited;
+ 
+-    /* Ensure any pending metadata writes are submitted to bs->file.  */
+-    bdrv_drain_invoke(bs, begin);
+-
+     /* Wait for drained requests to finish */
+     waited = BDRV_POLL_WHILE(bs, atomic_read(&bs->in_flight) > 0);
+ 
+@@ -279,6 +282,7 @@ void bdrv_drained_begin(BlockDriverState *bs)
+         bdrv_parent_drained_begin(bs);
+     }
+ 
++    bdrv_drain_invoke(bs, true);
+     bdrv_drain_recurse(bs, true);
+ }
+ 
+@@ -294,6 +298,7 @@ void bdrv_drained_end(BlockDriverState *bs)
+     }
+ 
+     bdrv_parent_drained_end(bs);
++    bdrv_drain_invoke(bs, false);
+     bdrv_drain_recurse(bs, false);
+     aio_enable_external(bdrv_get_aio_context(bs));
+ }
+@@ -372,6 +377,8 @@ void bdrv_drain_all_begin(void)
+             aio_context_acquire(aio_context);
+             for (bs = bdrv_first(&it); bs; bs = bdrv_next(&it)) {
+                 if (aio_context == bdrv_get_aio_context(bs)) {
++                    /* FIXME Calling this multiple times is wrong */
++                    bdrv_drain_invoke(bs, true);
+                     waited |= bdrv_drain_recurse(bs, true);
+                 }
+             }
+@@ -393,6 +400,7 @@ void bdrv_drain_all_end(void)
+         aio_context_acquire(aio_context);
+         aio_enable_external(aio_context);
+         bdrv_parent_drained_end(bs);
++        bdrv_drain_invoke(bs, false);
+         bdrv_drain_recurse(bs, false);
+         aio_context_release(aio_context);
+     }
+-- 
 2.13.6
