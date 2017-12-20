@@ -1,21 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53384)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57306)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1eRiuR-00069n-Fs
-	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 13:16:04 -0500
+	(envelope-from <laurent@vivier.eu>) id 1eRj3n-0005ag-SL
+	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 13:25:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1eRiuQ-0000jK-G5
-	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 13:16:03 -0500
-From: Markus Armbruster <armbru@redhat.com>
-References: <2cd24073-b6d9-6479-59b1-869db6c25103@redhat.com>
-	<20171220111133.GR21216@redhat.com>
-Date: Wed, 20 Dec 2017 19:15:55 +0100
-In-Reply-To: <20171220111133.GR21216@redhat.com> (Daniel P. Berrange's message
-	of "Wed, 20 Dec 2017 11:11:33 +0000")
-Message-ID: <87ind16zac.fsf@dusky.pond.sub.org>
+	(envelope-from <laurent@vivier.eu>) id 1eRj3k-000600-Oa
+	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 13:25:43 -0500
+Received: from mout.kundenserver.de ([212.227.126.131]:64215)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1eRj3k-0005zh-FP
+	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 13:25:40 -0500
+References: <20171123163538.31411-1-laurent@vivier.eu>
+From: Laurent Vivier <laurent@vivier.eu>
+Message-ID: <6339ce2a-3152-4227-20cb-7f5a3222829a@vivier.eu>
+Date: Wed, 20 Dec 2017 19:25:15 +0100
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] Raw notes from a small block layer/QAPI/something
- pre-christmas meeting
+In-Reply-To: <20171123163538.31411-1-laurent@vivier.eu>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v2 0/5] target/m68k: implement 680x0 FPU
+ (part 3)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,54 +28,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>
-Cc: Max Reitz <mreitz@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Qemu-block <qemu-block@nongnu.org>
+To: qemu-devel@nongnu.org
+Cc: Thomas Huth <huth@tuxfamily.org>, Aurelien Jarno <aurelien@aurel32.net>, Richard Henderson <rth@twiddle.net>, Andreas Grabher <andreas.grabher@cable.vol.at>, william lin <wlsaidhi@gmail.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
 
-"Daniel P. Berrange" <berrange@redhat.com> writes:
+Le 23/11/2017 à 17:35, Laurent Vivier a écrit :
+> Implement fmod, frem, fscale, fgetman and fgetexp.
+> 
+> Instead of using functions of libm (v1 of this series)
+> and converting between host long double and floatx80 type
+> the new version (v2) adds new floatx80 functions in softfloat.
+> 
+> All the floatx80 functions are copied from "Previous",
+> the NeXT Computer Emulator, and written by Andreas Grabher.
+> 
+> Laurent Vivier (5):
+>   softfloat: add floatx80_mod()
+>   target/m68k: add fmod/frem
+>   softfloat: use floatx80_infinity in softfloat
+>   softfloat: add floatx80_getman(), floatx80_getexp(), floatx80_scale()
+>   target-m68k: add fscale, fgetman and fgetexp
+> 
+>  fpu/softfloat-specialize.h |  29 +++++
+>  fpu/softfloat.c            | 258 ++++++++++++++++++++++++++++++++++++++++++---
+>  include/fpu/softfloat.h    |  13 ++-
+>  target/m68k/cpu.h          |   1 +
+>  target/m68k/fpu_helper.c   |  48 +++++++++
+>  target/m68k/helper.h       |   5 +
+>  target/m68k/translate.c    |  15 +++
+>  7 files changed, 355 insertions(+), 14 deletions(-)
+> 
 
-> On Fri, Dec 15, 2017 at 05:38:00PM +0100, Max Reitz wrote:
->
->> Image creation in qemu-system-* vs. qemu-img:
->>   In order to get proper introspection for qemu-img create, we need a
->>   QAPI schema.  If we have a QAPI schema, we might as well add
->>   blockdev-create to QMP.
->>   As long as we do not have a really-none (null, void, ...) machine type
->>   for qemu-system-*, launching such a process just for creating an image
->>   will bring quite a bit of overhead (e.g. with -M none -accel qtest).
->>   However, as for libvirt, this is not exactly a regression since
->>   libvirt currently cannot create images at all (apart from implicitly
->>   through drive-mirror etc.).  Further work on voidifying qemu-system-*
->>   will improve performance.
->
-> In terms of the I/O operations involved, image creation is a already a
-> pretty slow process, particularly if pre-allocation is used which is
-> common.  So even QEMU's current slow (circa 300ms) startup time is a
-> complete non-issue for image creation IMHO - it'll be dwarfed by the
-> time to actually create the image. 
->
->>   On the other side, we can also add QAPI introspection to qemu-img.
->>   (qemu-img already links to QAPI, so this should not be too hard.)
->>   qemu-img will also need command-line introspection, though.
->
-> I figure the qapi-ificiation is the hard & time consuming bit of
-> work. Once that's done exporting it via both qemu-img & qemu-system*
-> is quite straighforward.
+I have 37 more patches coming to implement FPU for m68k. I'd really like
+to go forward with that. Can I have a 'yes' or a 'no' for these 5 simple
+patches? and perhaps a merge?
 
-qemu-system-*: trivial.
-qemu-img, via command line: straightforward
-qemu-img, via QMP: more difficult, since QMP is entangled with HMP,
-    character devices, ...
+The license issue has been clearly solved as the code comes from
+previous (GPL) and Andreas explained his work is derived from code from
+the NetBSD code (Motorola (c) but compatible with the GPL), with
+softfloat 2a.
 
-If libvirt really wants to use QMP for the job, *and* doesn't want to
-use the qemu-system-* that's running a guest, the easy solution is
-running another qemu-system-* without a guest.
-
->>   Plan B:
->>     libvirt can use qemu-img now with the currently supported options,
->>     and as soon as libvirt needs anything better, we will have something
->>     better done.
->>     (Also, there is "qemu-img create -f $format -o help"!  Because
->>      parsing help texts has worked so well in the past.)
->
-> Regards,
-> Daniel
+Thanks,
+Laurent
