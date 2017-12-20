@@ -1,33 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47233)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51969)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eRjS2-00030A-Dx
-	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 13:50:47 -0500
+	(envelope-from <armbru@redhat.com>) id 1eRjWP-00074a-Dq
+	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 13:55:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eRjRx-0007yr-IV
-	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 13:50:46 -0500
-Received: from indium.canonical.com ([91.189.90.7]:36352)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1eRjRx-0007yU-CV
-	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 13:50:41 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1eRjRv-0004RY-Kf
-	for <qemu-devel@nongnu.org>; Wed, 20 Dec 2017 18:50:39 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 9A3F92E807E
-	for <qemu-devel@nongnu.org>; Wed, 20 Dec 2017 18:50:39 +0000 (UTC)
+	(envelope-from <armbru@redhat.com>) id 1eRjWH-0002zM-Pl
+	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 13:55:17 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:60772)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1eRjWH-0002xf-Hy
+	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 13:55:09 -0500
+From: Markus Armbruster <armbru@redhat.com>
+References: <20171220102304.8288-1-danielhb@linux.vnet.ibm.com>
+Date: Wed, 20 Dec 2017 19:55:06 +0100
+In-Reply-To: <20171220102304.8288-1-danielhb@linux.vnet.ibm.com> (Daniel
+	Henrique Barboza's message of "Wed, 20 Dec 2017 08:23:04 -0200")
+Message-ID: <87bmit6xh1.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 20 Dec 2017 18:44:47 -0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Reply-To: Bug 1739378 <1739378@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <151375741208.25451.9053884797959645588.malonedeb@wampee.canonical.com>
-Message-Id: <151379548718.11069.3987410517769405650.malone@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1739378] Re: qemu git master snapshot doesn't work
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v1 1/1] qmp: remove qmp_cpu
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,87 +26,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
+Cc: qemu-devel@nongnu.org
 
->From a quick look my guess would be the wpgrps_size in sd_vmstate is differ=
-ent on the source and destination for some reason - it's the only thing tha=
-t seems to be variable.
-(It could also be whether the subsection is transmitted or not, but that's =
-supposed to sort itself out automatically).
+Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com> writes:
 
--- =
+> 'qmp_cpu' was implemented in commit 755f196898 ("qapi: Convert the cpu
+> command") as a functional no-op, a QMP call that does nothing and
+> return success. The idea, apparently, was to provide a counterpart
+> for the HMP 'hmp_cpu' command, introduced in the same commit.
+>
+> After 6 years of its creation, qmp_cpu remains a functional no-op
+> that does nothing, having no value for any caller/user. A proposal
+> was sent to implement qmp_cpu like hmp_cpu works, but it was denied
+> [1]. The reason is that QMP must be as stateless as possible and a
+> function that changes its state (the current CPU monitor in the case
+> of qmp_cpu) goes against it. Any QMP command that needs a specific
+> monitor CPU setup must provide it in its arguments, instead of relying
+> in the current QMP monitor state.
+>
+> After discussions that happened in [2] it was decided that a command
+> that does nothing since its birth, no one uses for anything and will
+> not be implemented, should be deprecated and erased. Given that we will
+> *not* provide any replacement for qmp_cpu and we believe that there
+> is no user relying on it, there is no point in adding a deprecation
+> delay for it.
+>
+> So, this patch nukes qmp_cpu from QEMU code, removing both its blank
+> implementation in qmp.c and its doc in qapi-schema.json.
+>
+> [1] https://lists.gnu.org/archive/html/qemu-devel/2017-12/msg02283.html
+> [2] https://lists.gnu.org/archive/html/qemu-devel/2017-12/msg03696.html
+>
+> Signed-off-by: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
+> CC: Markus Armbruster <armbru@redhat.com>
+> CC: Eric Blake <eblake@redhat.com>
+> CC: Daniel P. Berrange <berrange@redhat.com>
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1739378
+Lovely commit message.
 
-Title:
-  qemu git master snapshot doesn't work
-
-Status in QEMU:
-  New
-
-Bug description:
-  I'm having different issues trying to have QEMU snapshots working
-  using qemu-system-arm with vexpress-a15 board.
-
-  In this opportunity, I'm trying the git master head version:
-  # git rev-parse HEAD
-  af352675efb7e92a1f5f6461a042a12015ab3d12
-
-  $ /usr/local/bin/qemu-system-arm -kernel kernel/vmlinuz-4.10.0-42-generic=
- -initrd kernel/initrd.img-4.10.0-42-generic -M vexpress-a15 -m 2048 -appen=
-d 'root=3D/dev/mmcblk0 rootwait console=3Dtty0' -sd vexpress-4G.qcow2 -dtb =
-device-tree/vexpress-v2p-ca15-tc1.dtb  =
-
-  audio: Could not init `oss' audio driver
-
-  Later on, when the machine finishes booting I savevm ss and quit.
-  However, when I try to restore it, I have that Missing section footer
-  error:
-
-  $ /usr/local/bin/qemu-system-arm -kernel kernel/vmlinuz-4.10.0-42-generic=
- -initrd kernel/initrd.img-4.10.0-42-generic -M vexpress-a15 -m 2048 -appen=
-d 'root=3D/dev/mmcblk0 rootwait console=3Dtty0' -sd vexpress-4G.qcow2 -dtb =
-device-tree/vexpress-v2p-ca15-tc1.dtb  -loadvm ss
-  audio: Could not init `oss' audio driver
-  qemu-system-arm: Missing section footer for sd-card
-  qemu-system-arm: Error -22 while loading VM state
-
-  =
-
-  OS: Ubuntu 16.04.3 LTS (xenial)
-
-  $ gcc --version
-  gcc (Ubuntu 5.4.0-6ubuntu1~16.04.5) 5.4.0 20160609
-
-  I've also tried a different ./configure line, explicitly enabling some
-  of the features, i.e. smartcard, with the same results:
-
-  ./configure '--disable-user' '--enable-system' '--enable-linux-user'
-  '--enable-modules' '--enable-linux-aio' '--audio-drv-list=3Dpa'
-  '--enable-attr' '--enable-brlapi' '--enable-virtfs' '--enable-cap-ng'
-  '--enable-curl' '--enable-fdt' '--enable-gnutls' '--disable-gtk'
-  '--disable-vte' '--enable-libiscsi' '--enable-curses' '--enable-
-  smartcard' '--enable-rbd' '--enable-vnc-sasl' '--enable-seccomp'
-  '--enable-spice' '--enable-libusb' '--enable-usb-redir' '--enable-
-  xfsctl' '--enable-vnc' '--enable-vnc-jpeg' '--enable-vnc-png'
-  '--enable-kvm' '--enable-vhost-net'
-
-  How have I built it?
-  # git clone git://git.qemu.org/qemu.git
-  # cd qemu
-  # git submodule update --init --checkout
-  # make clean && ./configure --target-list=3Darm-softmmu && make -j8
-  # sudo make install
-
-  As a reference, and just in case these may be in some way related,
-  I've just submitted another ticket for a different issue with
-  snapshots using Ubuntu Qemu version
-  (https://bugs.launchpad.net/qemu/+bug/1739371)
-
-  Cheers,
-  Gus
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1739378/+subscriptions
+I'll take this through my tree.  Thanks!
