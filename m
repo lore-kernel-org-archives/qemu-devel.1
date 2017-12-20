@@ -1,29 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57576)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33129)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jbaron@akamai.com>) id 1eRlz4-0007s0-Is
-	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 16:33:06 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1eRm4O-0004DL-5p
+	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 16:38:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jbaron@akamai.com>) id 1eRlz0-0001O6-6J
-	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 16:33:02 -0500
-Received: from mx0b-00190b01.pphosted.com ([2620:100:9005:57f::1]:38154)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jbaron@akamai.com>) id 1eRlyz-0001MM-WF
-	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 16:32:58 -0500
-References: <cover.1513278334.git.jbaron@akamai.com>
-	<12f0830fe220dc43671f6dbc1a5d81e0276c3a9e.1513278334.git.jbaron@akamai.com>
-	<20171220164809-mutt-send-email-mst@kernel.org>
-	<0f613ff4-8cc1-67ac-63bf-5a8c05d9cd79@akamai.com>
-	<20171220194848-mutt-send-email-mst@kernel.org>
-From: Jason Baron <jbaron@akamai.com>
-Message-ID: <adddd3e4-4e1a-d455-02cf-c58aef504abd@akamai.com>
-Date: Wed, 20 Dec 2017 16:32:52 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1eRm4J-0002IN-Dw
+	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 16:38:32 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:33824)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1eRm4J-0002Db-7R
+	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 16:38:27 -0500
+Date: Wed, 20 Dec 2017 19:38:20 -0200
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20171220213820.GF24025@localhost.localdomain>
+References: <20171214040855.22231-1-douly.fnst@cn.fujitsu.com>
+	<20171218220901.GE5209@localhost.localdomain>
+	<f5057cbf-c699-847a-d219-78a0ba6bff63@cn.fujitsu.com>
 MIME-Version: 1.0
-In-Reply-To: <20171220194848-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH net-next 1/2] virtio_net: allow hypervisor
- to indicate linkspeed and duplex setting
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <f5057cbf-c699-847a-d219-78a0ba6bff63@cn.fujitsu.com>
+Subject: Re: [Qemu-devel] [RESEND PATCH for-2.12 0/2] ACPI/unit-test: Add a
+ testcase
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,147 +29,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: qemu-devel@nongnu.org, linux-kernel@vger.kernel.org, jasowang@redhat.com
+To: Dou Liyang <douly.fnst@cn.fujitsu.com>
+Cc: imammedo@redhat.com, mst@redhat.com, peter.maydell@linaro.org, qemu-devel@nongnu.org, indou.takao@jp.fujitsu.com
 
-
-
-On 12/20/2017 12:52 PM, Michael S. Tsirkin wrote:
-> On Wed, Dec 20, 2017 at 12:07:55PM -0500, Jason Baron wrote:
->>
->>
->> On 12/20/2017 09:57 AM, Michael S. Tsirkin wrote:
->>> On Thu, Dec 14, 2017 at 02:33:53PM -0500, Jason Baron wrote:
->>>> If the hypervisor exports the link and duplex speed, let's use that instead
->>>> of the default unknown speed. The user can still overwrite it later if
->>>> desired via: 'ethtool -s'. This allows the hypervisor to set the default
->>>> link speed and duplex setting without requiring guest changes and is
->>>> consistent with how other network drivers operate. We ran into some cases
->>>> where the guest software was failing due to a lack of linkspeed and had to
->>>> fall back to a fully emulated network device that does export a linkspeed
->>>> and duplex setting.
->>>>
->>>> Implement by adding a new VIRTIO_NET_F_SPEED_DUPLEX feature flag, to
->>>> indicate that a linkspeed and duplex setting are present.
->>>>
->>>> Signed-off-by: Jason Baron <jbaron@akamai.com>
->>>> Cc: "Michael S. Tsirkin" <mst@redhat.com>
->>>> Cc: Jason Wang <jasowang@redhat.com>
->>>> ---
->>>>  drivers/net/virtio_net.c        | 11 ++++++++++-
->>>>  include/uapi/linux/virtio_net.h |  4 ++++
->>>>  2 files changed, 14 insertions(+), 1 deletion(-)
->>>>
->>>> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
->>>> index 6fb7b65..e7a2ad6 100644
->>>> --- a/drivers/net/virtio_net.c
->>>> +++ b/drivers/net/virtio_net.c
->>>> @@ -2671,6 +2671,14 @@ static int virtnet_probe(struct virtio_device *vdev)
->>>>  	netif_set_real_num_rx_queues(dev, vi->curr_queue_pairs);
->>>>  
->>>>  	virtnet_init_settings(dev);
->>>> +	if (virtio_has_feature(vdev, VIRTIO_NET_F_SPEED_DUPLEX)) {
->>>> +		vi->speed = virtio_cread32(vdev,
->>>> +					offsetof(struct virtio_net_config,
->>>> +					speed));
->>>> +		vi->duplex = virtio_cread8(vdev,
->>>> +					offsetof(struct virtio_net_config,
->>>> +					duplex));
->>>> +	}
->>>>  
->>>>  	err = register_netdev(dev);
->>>>  	if (err) {
->>>
->>> How are we going to validate speed values? Imagine host
->>> using a new 1000Gbit device and exposing that to guest.
->>>
->>> Need to think what do we want guest to do.
->>> I think that ideally we'd say it's a 100Gbit device.
->>>
->>> For duplex, force to one of 3 valid values?
->>
->> So I didn't provide validation here b/c as you point out its not clear
->> how we would validate it. I don't believe h/w drivers do any validation
->> here either.
+On Tue, Dec 19, 2017 at 12:01:59PM +0800, Dou Liyang wrote:
+> Hi Eduardo,
 > 
-> Right but hardware tends not to change as quickly as the hypervisors :)
-> For virtual device drivers, we need some way to handle forward
-> compatibility since hypervisors do change quite quickly.
+> At 12/19/2017 06:09 AM, Eduardo Habkost wrote:
+> > On Thu, Dec 14, 2017 at 12:08:53PM +0800, Dou Liyang wrote:
+> > > These are the patches left over from the pull request:
+> > > 
+> > >    [Qemu-devel] [PULL 0/9] x86 and machine queue, 2017-10-05
+> > > 
+> > > because of some errors when tested by "make check" command[1].
+> > > 
+> > > Now, the QEMU 2.11.0 has been released, rebase/retest/respin them
+> > > for v2.12 dev.
+> > > 
+> > > Changelog:
+> > >    --Rebase and retest this patch in v2.11.0
+> > >    --Update the DSDT.numamem:
+> > > 
+> > > [1]: http://lists.gnu.org/archive/html/qemu-devel/2017-10/msg01334.html
+> > 
+> > Do we know what caused the failures Peter saw, and if we can now
+> > be sure it won't happen again?
 > 
->> They simply propagate the value from the the underlying
->> device. So that seemed reasonable to me.
->>
->> Why do you divide by 10 in the above example? Would you propose always
->> dividing what the device reports by 10?
-> 
-> No, that was just an example. I was just suggesting rounding down to
-> next valid known speed.
+> Sorry, I can't. I tested it many times with my colleagues, it won't
+> happen like Peter saw. This issue is very subtle and funny. Could you
+> give me some suggestions?
 
-I see, but virtio currently uses ethtool_validate_speed() which allows
-arbitrary values up to INT_MAX in units of Mbps. That seems to leave
-plenty of headroom. So I could use that function for validation as well
-as well as ethtool_validate_duplex() and if they fail fall back to
-SPEED_UNKNOWN and DUPLEX_UNKNOWN?
+I guess all we can do is to ask Peter to test if the issue is
+still reproducible.
+
+Peter, do you prefer that I just send a regular pull request
+asking for testing, or do you prefer to apply this series and
+test it manually before I send a pull request?
 
 > 
->>>
->>>
->>>> @@ -2796,7 +2804,8 @@ static struct virtio_device_id id_table[] = {
->>>>  	VIRTIO_NET_F_CTRL_RX, VIRTIO_NET_F_CTRL_VLAN, \
->>>>  	VIRTIO_NET_F_GUEST_ANNOUNCE, VIRTIO_NET_F_MQ, \
->>>>  	VIRTIO_NET_F_CTRL_MAC_ADDR, \
->>>> -	VIRTIO_NET_F_MTU, VIRTIO_NET_F_CTRL_GUEST_OFFLOADS
->>>> +	VIRTIO_NET_F_MTU, VIRTIO_NET_F_CTRL_GUEST_OFFLOADS, \
->>>> +	VIRTIO_NET_F_SPEED_DUPLEX
->>>>  
->>>>  static unsigned int features[] = {
->>>>  	VIRTNET_FEATURES,
->>>> diff --git a/include/uapi/linux/virtio_net.h b/include/uapi/linux/virtio_net.h
->>>> index fc353b5..acfcf68 100644
->>>> --- a/include/uapi/linux/virtio_net.h
->>>> +++ b/include/uapi/linux/virtio_net.h
->>>> @@ -36,6 +36,7 @@
->>>>  #define VIRTIO_NET_F_GUEST_CSUM	1	/* Guest handles pkts w/ partial csum */
->>>>  #define VIRTIO_NET_F_CTRL_GUEST_OFFLOADS 2 /* Dynamic offload configuration. */
->>>>  #define VIRTIO_NET_F_MTU	3	/* Initial MTU advice */
->>>> +#define VIRTIO_NET_F_SPEED_DUPLEX 4	/* Host set linkspeed and duplex */
->>>>  #define VIRTIO_NET_F_MAC	5	/* Host has given MAC address. */
->>>>  #define VIRTIO_NET_F_GUEST_TSO4	7	/* Guest can handle TSOv4 in. */
->>>>  #define VIRTIO_NET_F_GUEST_TSO6	8	/* Guest can handle TSOv6 in. */
->>>
->>> I think I'd prefer a high feature bit - low bits are ones that can
->>> be backported to legacy interfaces, so I think we should hang on to
->>> these for fixing issues that break communication completely (like the
->>> mtu).
->>>
->>
->> So I went with a low bit here b/c in the virtio spec 'section 2.2
->> Feature Bits':
->>
->>
->>  0 to 23
->>     Feature bits for the specific device type
->> 24 to 32
->>     Feature bits reserved for extensions to the queue and feature
->> negotiation mechanisms
->> 33 and above
->>     Feature bits reserved for future extensions.
->>
->> So virtio_net already goes up to 23 (but omits 4 and 6), and I wasn't
->> sure if it was reasonable to use the higher bits. It looks like the code
->> would handle the higher bits ok, so I can try that - bit 33 perhaps ?
->>
->> Thanks,
->>
->> -Jason
-> 
-> 
-> Transports started from bit 24 and are growing up.
-> So I would say devices should start from bit 63 and grow down.
->
+> BTW, I used "make TEST_ACPI_REBUILD_AML=1 check" to create the DSDT
+> file. Is it correct?
 
-Ok, I will use 63.
+This sounds correct to me.  Igor, can you confirm?
 
-Thanks,
-
--Jason
+-- 
+Eduardo
