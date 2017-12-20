@@ -1,34 +1,28 @@
-Received: from eggs.gnu.org ([208.118.235.92]:35890)
+Received: from eggs.gnu.org ([208.118.235.92]:36483)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eRgdk-0004X1-AI
-	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 10:50:41 -0500
+	(envelope-from <laurent@vivier.eu>) id 1eRgeh-0005LY-JQ
+	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 10:51:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eRgdg-0006MY-PX
-	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 10:50:40 -0500
-Received: from indium.canonical.com ([91.189.90.7]:60742)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1eRgdg-0006Lb-Bo
-	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 10:50:36 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1eRgdf-0002yx-Bi
-	for <qemu-devel@nongnu.org>; Wed, 20 Dec 2017 15:50:35 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 402052E806B
-	for <qemu-devel@nongnu.org>; Wed, 20 Dec 2017 15:50:35 +0000 (UTC)
+	(envelope-from <laurent@vivier.eu>) id 1eRgee-0006tb-3F
+	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 10:51:39 -0500
+Received: from mout.kundenserver.de ([212.227.126.134]:62326)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1eRged-0006tE-Pa
+	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 10:51:36 -0500
+References: <20171219201613.7399-1-michael.weiser@gmx.de>
+	<20171219201613.7399-3-michael.weiser@gmx.de>
+	<bd78a6f5-f023-af5a-0d35-f3b29ae4e7a6@vivier.eu>
+	<CAFEAcA8D0n_PNJ-fqMq8KtZSBRdf2i=3cxcbwT1HSnFi9_MhpA@mail.gmail.com>
+From: Laurent Vivier <laurent@vivier.eu>
+Message-ID: <12f2eb2c-cc6b-102e-dc6b-2526c03ea42c@vivier.eu>
+Date: Wed, 20 Dec 2017 16:51:23 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 20 Dec 2017 15:43:55 -0000
-From: Peter Maydell <peter.maydell@linaro.org>
-Reply-To: Bug 1739371 <1739371@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <151375574544.16920.12315859630279795224.malonedeb@soybean.canonical.com>
-Message-Id: <151378463512.18928.6831633995468403926.malone@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1739371] Re: qemu-system-arm snapshot loadvm core
- dumped
+In-Reply-To: <CAFEAcA8D0n_PNJ-fqMq8KtZSBRdf2i=3cxcbwT1HSnFi9_MhpA@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v2 2/5] linux-user: Add separate aarch64_be
+ uname
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,109 +31,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Michael Weiser <michael.weiser@gmx.de>, QEMU Developers <qemu-devel@nongnu.org>, Riku Voipio <riku.voipio@iki.fi>
 
-I suspect this is the same underlying state save/restore bug as your
-other LP:1739378 -- it's just that since 2.5.0 we've improved the error
-reporting for cases where the incoming migration state doesn't match
-what we're expecting, so we report an error message rather than just
-mangling the simulation state and causing the guest to crash on restart.
+Le 20/12/2017 à 16:36, Peter Maydell a écrit :
+> On 20 December 2017 at 15:20, Laurent Vivier <laurent@vivier.eu> wrote:
+>> Le 19/12/2017 à 21:16, Michael Weiser a écrit :
+>>> Make big-endian aarch64 systems identify as aarch64_be as expected by
+>>> big-endian userland and toolchains.
+>>>
+>>> Signed-off-by: Michael Weiser <michael.weiser@gmx.de>
+>>> ---
+>>>  linux-user/aarch64/target_syscall.h | 4 ++++
+>>>  1 file changed, 4 insertions(+)
+>>>
+>>> diff --git a/linux-user/aarch64/target_syscall.h b/linux-user/aarch64/target_syscall.h
+>>> index 1b62953eeb..604ab99b14 100644
+>>> --- a/linux-user/aarch64/target_syscall.h
+>>> +++ b/linux-user/aarch64/target_syscall.h
+>>> @@ -8,7 +8,11 @@ struct target_pt_regs {
+>>>      uint64_t        pstate;
+>>>  };
+>>>
+>>> +#if defined(TARGET_WORDS_BIGENDIAN)
+>>> +#define UNAME_MACHINE "aarch64_be"
+>>> +#else
+>>>  #define UNAME_MACHINE "aarch64"
+>>> +#endif
+>>>  #define UNAME_MINIMUM_RELEASE "3.8.0"
+>>
+>> For aarch64_be, I think the minimum release should be 4.9.0
+>> (see kernel commit cfa88c79462d "arm64: Set UTS_MACHINE in the Makefile")
+> 
+> Isn't the thing that defines what we set the minimum-release
+> to glibc, not the kernel? That is, the reason we lie to the
+> guest about the kernel version for some architectures is because
+> the glibc for those archs insists on a minimum kernel version
+> which the host may not have. Unless aarch64_be glibc insists
+> on kernel 4.9.0 there's no need to tell the guest that.
 
--- =
+As you are the author of the original commit (4a24a75810 "linux-user:
+Allow targets to specify a minimum uname release"), I guess you're
+right. So ignore my comment...
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1739371
-
-Title:
-  qemu-system-arm snapshot loadvm core dumped
-
-Status in QEMU:
-  New
-
-Bug description:
-  Ubuntu Qemu is crashing trying to restore saved snapshot in qemu-system-a=
-rm.
-  I've tried different guests kernels, but I wasn't lucky with any of them.
-
-  The guest vm boots and I can use it normally. The issue is when I save
-  the snapshot using "savevm Base0", "quit" and then I restore that
-  snapshot using "-loadvm Base0" from the cmd line.
-
-  The only difference I've noticed is tweaking the guest memory:
-  * With -m 512 or 1024 it crashes as you can see below.
-  * With -m 2048 it doesn't crash, it restores the vm and I can see the scr=
-een as it was, but the OS is halted. And it's not just the keyboard. I've t=
-ried saving the snapshot while it's booting with lot of lines being printed=
- on screen and after restoring it, the OS is frozen.
-
-  I also tried limiting the guest kernel memory using the mem parameter
-  (mem=3D2048M) and disabling the kernel address space randomization
-  (nokaslr) with the same results.
-
-  OS: Ubuntu 16.04.3 LTS (xenial)
-
-  $ qemu-system-arm --version
-  QEMU emulator version 2.5.0 (Debian 1:2.5+dfsg-5ubuntu10.16), Copyright (=
-c) 2003-2008 Fabrice Bellard
-
-  $ qemu-system-arm -kernel kernel/vmlinuz-4.10.0-42-generic -initrd kernel=
-/initrd.img-4.10.0-42-generic -M vexpress-a15 -m 512 -append 'root=3D/dev/m=
-mcblk0 rootwait console=3Dtty0' -sd vexpress-4G.qcow2 -dtb device-tree/vexp=
-ress-v2p-ca15-tc1.dtb  -loadvm Base0
-  pulseaudio: set_sink_input_volume() failed
-  pulseaudio: Reason: Invalid argument
-  pulseaudio: set_sink_input_mute() failed
-  pulseaudio: Reason: Invalid argument
-  qemu: fatal: Trying to execute code outside RAM or ROM at 0xc0321568
-
-  R00=3D00000001 R01=3D00000000 R02=3D00000000 R03=3Dc0321560
-  R04=3Dc1500000 R05=3Dc150529c R06=3Dc1505234 R07=3Dc14384d0
-  R08=3D00000000 R09=3D00000000 R10=3Dc1501f50 R11=3Dc1501f3c
-  R12=3Dc1501f40 R13=3Dc1501f30 R14=3Dc030a184 R15=3Dc0321568
-  PSR=3D60070093 -ZC- A S svc32
-  s00=3D6374652f s01=3D636f6c2f d00=3D636f6c2f6374652f
-  s02=3D7273752f s03=3D6962732f d01=3D6962732f7273752f
-  s04=3D6e612f6e s05=3D6f726361 d02=3D6f7263616e612f6e
-  s06=3D7c7c206e s07=3D63202820 d03=3D632028207c7c206e
-  s08=3D202f2064 s09=3D72202626 d04=3D72202626202f2064
-  s10=3D702d6e75 s11=3D73747261 d05=3D73747261702d6e75
-  s12=3D722d2d20 s13=3D726f7065 d06=3D726f7065722d2d20
-  s14=3D652f2074 s15=3D632f6374 d07=3D632f6374652f2074
-  s16=3D00000000 s17=3D00000000 d08=3D0000000000000000
-  s18=3D00000000 s19=3D00000000 d09=3D0000000000000000
-  s20=3D00000000 s21=3D00000000 d10=3D0000000000000000
-  s22=3D00000000 s23=3D00000000 d11=3D0000000000000000
-  s24=3D00000000 s25=3D00000000 d12=3D0000000000000000
-  s26=3D00000000 s27=3D00000000 d13=3D0000000000000000
-  s28=3D00000000 s29=3D00000000 d14=3D0000000000000000
-  s30=3D00000000 s31=3D00000000 d15=3D0000000000000000
-  s32=3D00000000 s33=3D00000000 d16=3D0000000000000000
-  s34=3D00000000 s35=3D00000000 d17=3D0000000000000000
-  s36=3D00000000 s37=3D00000000 d18=3D0000000000000000
-  s38=3D00000000 s39=3D00000000 d19=3D0000000000000000
-  s40=3D00000000 s41=3D00000000 d20=3D0000000000000000
-  s42=3D00000000 s43=3D00000000 d21=3D0000000000000000
-  s44=3D00000000 s45=3D00000000 d22=3D0000000000000000
-  s46=3D00000000 s47=3D00000000 d23=3D0000000000000000
-  s48=3D00000000 s49=3D00000000 d24=3D0000000000000000
-  s50=3D00000000 s51=3D00000000 d25=3D0000000000000000
-  s52=3D00000000 s53=3D00000000 d26=3D0000000000000000
-  s54=3D00000000 s55=3D00000000 d27=3D0000000000000000
-  s56=3D00000000 s57=3D00000000 d28=3D0000000000000000
-  s58=3D00000000 s59=3D00000000 d29=3D0000000000000000
-  s60=3D00000000 s61=3D00000000 d30=3D0000000000000000
-  s62=3D00000000 s63=3D00000000 d31=3D0000000000000000
-  FPSCR: 00000000
-  Aborted (core dumped)
-
-  As I said above, the same happens when -m 1024 is used.
-
-  I have a different issue when I use the qemu git master version, but
-  I'm submiting a different ticket for that.
-
-  Cheers,
-  Gus
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1739371/+subscriptions
+Thanks,
+Laurent
