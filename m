@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56075)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56121)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1eReIG-0004sR-Te
-	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 08:20:22 -0500
+	(envelope-from <kwolf@redhat.com>) id 1eReIJ-0004uz-AX
+	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 08:20:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1eReIA-0006bV-HL
-	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 08:20:20 -0500
+	(envelope-from <kwolf@redhat.com>) id 1eReII-0006ok-53
+	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 08:20:23 -0500
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Wed, 20 Dec 2017 14:19:35 +0100
-Message-Id: <20171220131939.27543-11-kwolf@redhat.com>
+Date: Wed, 20 Dec 2017 14:19:38 +0100
+Message-Id: <20171220131939.27543-14-kwolf@redhat.com>
 In-Reply-To: <20171220131939.27543-1-kwolf@redhat.com>
 References: <20171220131939.27543-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL 10/14] qemu-img: Document --force-share / -U
+Subject: [Qemu-devel] [PULL 13/14] block: Document that x-blockdev-change
+ breaks quorum children list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,35 +23,34 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, qemu-devel@nongnu.org
 
-From: Fam Zheng <famz@redhat.com>
+Removing a quorum child node with x-blockdev-change results in a quorum
+driver state that cannot be recreated with create options because it
+would require a list with gaps. This causes trouble in at least
+.bdrv_refresh_filename().
 
-Signed-off-by: Fam Zheng <famz@redhat.com>
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-Reviewed-by: Kashyap Chamarthy <kchamart@redhat.com>
+Document this problem so that we won't accidentally mark the command
+stable without having addressed it.
+
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+Reviewed-by: Alberto Garcia <berto@igalia.com>
 ---
- qemu-img.texi | 9 +++++++++
- 1 file changed, 9 insertions(+)
+ qapi/block-core.json | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/qemu-img.texi b/qemu-img.texi
-index fdcf120f36..bc24565ae9 100644
---- a/qemu-img.texi
-+++ b/qemu-img.texi
-@@ -57,6 +57,15 @@ exclusive with the @var{-O} parameters. It is currently required to also use
- the @var{-n} parameter to skip image creation. This restriction may be relaxed
- in a future release.
- 
-+@item --force-share (-U)
-+
-+If specified, @code{qemu-img} will open the image with shared permissions,
-+which makes it less likely to conflict with a running guest's permissions due
-+to image locking. For example, this can be used to get the image information
-+(with 'info' subcommand) when the image is used by a running guest. Note that
-+this could produce inconsistent results because of concurrent metadata changes,
-+etc. This option is only allowed when opening images in read-only mode.
-+
- @item fmt
- is the disk image format. It is guessed automatically in most cases. See below
- for a description of the supported disk formats.
+diff --git a/qapi/block-core.json b/qapi/block-core.json
+index dd763dcf87..4cc1389834 100644
+--- a/qapi/block-core.json
++++ b/qapi/block-core.json
+@@ -3918,6 +3918,10 @@
+ # does not support all kinds of operations, all kinds of children, nor
+ # all block drivers.
+ #
++# FIXME Removing children from a quorum node means introducing gaps in the
++# child indices. This cannot be represented in the 'children' list of
++# BlockdevOptionsQuorum, as returned by .bdrv_refresh_filename().
++#
+ # Warning: The data in a new quorum child MUST be consistent with that of
+ # the rest of the array.
+ #
 -- 
 2.13.6
