@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56023)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56388)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1eRhxx-0004EW-Cs
-	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 12:15:38 -0500
+	(envelope-from <paolo.bonzini@gmail.com>) id 1eRhyJ-0004bu-Au
+	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 12:16:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1eRhxv-0006wP-6d
-	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 12:15:37 -0500
-Received: from mail-wr0-x244.google.com ([2a00:1450:400c:c0c::244]:45820)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1eRhyI-0007E5-Gy
+	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 12:15:59 -0500
+Received: from mail-wm0-x244.google.com ([2a00:1450:400c:c09::244]:36801)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1eRhxu-0006vk-Sd
-	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 12:15:35 -0500
-Received: by mail-wr0-x244.google.com with SMTP id h1so22876631wre.12
-	for <qemu-devel@nongnu.org>; Wed, 20 Dec 2017 09:15:34 -0800 (PST)
+	id 1eRhyI-0007DV-AS
+	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 12:15:58 -0500
+Received: by mail-wm0-x244.google.com with SMTP id b76so11198531wmg.1
+	for <qemu-devel@nongnu.org>; Wed, 20 Dec 2017 09:15:58 -0800 (PST)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Wed, 20 Dec 2017 18:14:13 +0100
-Message-Id: <1513790098-9815-2-git-send-email-pbonzini@redhat.com>
+Date: Wed, 20 Dec 2017 18:14:33 +0100
+Message-Id: <1513790098-9815-22-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1513790098-9815-1-git-send-email-pbonzini@redhat.com>
 References: <1513790098-9815-1-git-send-email-pbonzini@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 01/46] memfd: fix configure test
+Subject: [Qemu-devel] [PULL 21/46] tests/boot-serial-test: Add tests for
+ microblaze boards
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,51 +29,71 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+Cc: Thomas Huth <thuth@redhat.com>
 
-Recent glibc added memfd_create in sys/mman.h.  This conflicts with
-the definition in util/memfd.c:
+From: Thomas Huth <thuth@redhat.com>
 
-    /builddir/build/BUILD/qemu-2.11.0-rc1/util/memfd.c:40:12: error: static declaration of memfd_create follows non-static declaration
+This adds two simple TCG + UART tests for the microblaze boards,
+one in big endian mode, and one in little endian mode.
 
-Fix the configure test, and remove the sys/memfd.h inclusion since the
-file actually does not exist---it is a typo in the memfd_create(2) man
-page.
-
-Cc: Marc-André Lureau <marcandre.lureau@redhat.com>
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+Message-Id: <1512031988-32490-5-git-send-email-thuth@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- configure    | 2 +-
- util/memfd.c | 4 +---
- 2 files changed, 2 insertions(+), 4 deletions(-)
+ tests/Makefile.include   |  2 ++
+ tests/boot-serial-test.c | 20 ++++++++++++++++++++
+ 2 files changed, 22 insertions(+)
 
-diff --git a/configure b/configure
-index 9c8aa5a..99ccc17 100755
---- a/configure
-+++ b/configure
-@@ -3923,7 +3923,7 @@ fi
- # check if memfd is supported
- memfd=no
- cat > $TMPC << EOF
--#include <sys/memfd.h>
-+#include <sys/mman.h>
+diff --git a/tests/Makefile.include b/tests/Makefile.include
+index bbb9d89..5789911 100644
+--- a/tests/Makefile.include
++++ b/tests/Makefile.include
+@@ -299,6 +299,8 @@ check-qtest-alpha-y = tests/boot-serial-test$(EXESUF)
  
- int main(void)
- {
-diff --git a/util/memfd.c b/util/memfd.c
-index 4571d1a..412e94a 100644
---- a/util/memfd.c
-+++ b/util/memfd.c
-@@ -31,9 +31,7 @@
+ check-qtest-m68k-y = tests/boot-serial-test$(EXESUF)
  
- #include "qemu/memfd.h"
++check-qtest-microblaze-y = tests/boot-serial-test$(EXESUF)
++
+ check-qtest-mips-y = tests/endianness-test$(EXESUF)
  
--#ifdef CONFIG_MEMFD
--#include <sys/memfd.h>
--#elif defined CONFIG_LINUX
-+#if defined CONFIG_LINUX && !defined CONFIG_MEMFD
- #include <sys/syscall.h>
- #include <asm/unistd.h>
+ check-qtest-mips64-y = tests/endianness-test$(EXESUF)
+diff --git a/tests/boot-serial-test.c b/tests/boot-serial-test.c
+index dd3828c..a39273a 100644
+--- a/tests/boot-serial-test.c
++++ b/tests/boot-serial-test.c
+@@ -24,6 +24,22 @@ static const uint8_t kernel_mcf5208[] = {
+     0x60, 0xfa                              /* bra.s  loop */
+ };
  
++static const uint8_t kernel_pls3adsp1800[] = {
++    0xb0, 0x00, 0x84, 0x00,                 /* imm   0x8400 */
++    0x30, 0x60, 0x00, 0x04,                 /* addik r3,r0,4 */
++    0x30, 0x80, 0x00, 0x54,                 /* addik r4,r0,'T' */
++    0xf0, 0x83, 0x00, 0x00,                 /* sbi   r4,r3,0 */
++    0xb8, 0x00, 0xff, 0xfc                  /* bri   -4  loop */
++};
++
++static const uint8_t kernel_plml605[] = {
++    0xe0, 0x83, 0x00, 0xb0,                 /* imm   0x83e0 */
++    0x00, 0x10, 0x60, 0x30,                 /* addik r3,r0,0x1000 */
++    0x54, 0x00, 0x80, 0x30,                 /* addik r4,r0,'T' */
++    0x00, 0x00, 0x83, 0xf0,                 /* sbi   r4,r3,0 */
++    0xfc, 0xff, 0x00, 0xb8                  /* bri   -4  loop */
++};
++
+ typedef struct testdef {
+     const char *arch;       /* Target architecture */
+     const char *machine;    /* Name of the machine */
+@@ -50,6 +66,10 @@ static testdef_t tests[] = {
+     { "s390x", "s390-ccw-virtio",
+       "-nodefaults -device sclpconsole,chardev=serial0", "virtio device" },
+     { "m68k", "mcf5208evb", "", "TT", sizeof(kernel_mcf5208), kernel_mcf5208 },
++    { "microblaze", "petalogix-s3adsp1800", "", "TT",
++      sizeof(kernel_pls3adsp1800), kernel_pls3adsp1800 },
++    { "microblazeel", "petalogix-ml605", "", "TT",
++      sizeof(kernel_plml605), kernel_plml605 },
+ 
+     { NULL }
+ };
 -- 
 1.8.3.1
