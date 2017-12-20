@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47365)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47516)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1eRij1-0004L1-PF
-	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 13:04:22 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1eRij6-0004NK-Jm
+	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 13:04:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1eRiiz-0002Ry-QF
-	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 13:04:15 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:39838)
+	(envelope-from <pbonzini@redhat.com>) id 1eRij3-0002VY-M0
+	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 13:04:20 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:58998)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1eRiiz-0002RA-F8
-	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 13:04:13 -0500
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1eRij3-0002Ug-AP
+	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 13:04:17 -0500
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Wed, 20 Dec 2017 19:03:44 +0100
-Message-Id: <20171220180358.29316-6-pbonzini@redhat.com>
+Date: Wed, 20 Dec 2017 19:03:47 +0100
+Message-Id: <20171220180358.29316-9-pbonzini@redhat.com>
 In-Reply-To: <20171220180358.29316-1-pbonzini@redhat.com>
 References: <20171220180358.29316-1-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 05/19] i386: hvf: implement
- hvf_get_supported_cpuid
+Subject: [Qemu-devel] [PULL 08/19] i386: hvf: refactor event injection code
+ for hvf
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,186 +29,281 @@ Cc: Sergio Andres Gomez Del Real <sergio.g.delreal@gmail.com>, Sergio Andres Gom
 
 From: Sergio Andres Gomez Del Real <sergio.g.delreal@gmail.com>
 
-This patch implements hvf_get_supported_cpuid, which returns the set of
-features supported by both the host processor and the hypervisor.
+This patch refactors the event-injection code for hvf by using the
+appropriate fields already provided by CPUX86State. At vmexit, it fills
+these fields so that hvf_inject_interrupts can just retrieve them without
+calling into hvf.
 
 Signed-off-by: Sergio Andres Gomez Del Real <Sergio.G.DelReal@gmail.com>
-Message-Id: <20170913090522.4022-11-Sergio.G.DelReal@gmail.com>
+Message-Id: <20170913090522.4022-14-Sergio.G.DelReal@gmail.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- target/i386/hvf-utils/x86_cpuid.c | 164 ++++++++++++++++++++++++++++++++++++++
- 1 file changed, 164 insertions(+)
- create mode 100644 target/i386/hvf-utils/x86_cpuid.c
+ target/i386/cpu.c              |  3 ++
+ target/i386/hvf-all.c          | 57 ++++++++++++++++++++++++++++++++----
+ target/i386/hvf-utils/vmcs.h   |  3 ++
+ target/i386/hvf-utils/vmx.h    |  8 ++++++
+ target/i386/hvf-utils/x86hvf.c | 65 ++++++++++++++++++++----------------------
+ target/i386/kvm.c              |  2 --
+ 6 files changed, 97 insertions(+), 41 deletions(-)
 
-diff --git a/target/i386/hvf-utils/x86_cpuid.c b/target/i386/hvf-utils/x86_cpuid.c
-new file mode 100644
-index 0000000000..103223a85d
---- /dev/null
-+++ b/target/i386/hvf-utils/x86_cpuid.c
-@@ -0,0 +1,164 @@
-+/*
-+ *  i386 CPUID helper functions
-+ *
-+ *  Copyright (c) 2003 Fabrice Bellard
-+ *  Copyright (c) 2017 Google Inc.
-+ *
-+ * This program is free software; you can redistribute it and/or
-+ * modify it under the terms of the GNU Lesser General Public
-+ * License as published by the Free Software Foundation; either
-+ * version 2 of the License, or (at your option) any later version.
-+ *
-+ * This program is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ * Lesser General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU Lesser General Public
-+ * License along with this program; if not, see <http://www.gnu.org/licenses/>.
-+ *
-+ * cpuid
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "x86.h"
-+#include "vmx.h"
-+#include "sysemu/hvf.h"
-+
-+static uint64_t xgetbv(uint32_t xcr)
+diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+index 7b472962fc..b685df06ba 100644
+--- a/target/i386/cpu.c
++++ b/target/i386/cpu.c
+@@ -3285,6 +3285,9 @@ static void x86_cpu_reset(CPUState *s)
+     memset(env->mtrr_var, 0, sizeof(env->mtrr_var));
+     memset(env->mtrr_fixed, 0, sizeof(env->mtrr_fixed));
+ 
++    env->interrupt_injected = -1;
++    env->exception_injected = -1;
++    env->nmi_injected = false;
+ #if !defined(CONFIG_USER_ONLY)
+     /* We hard-wire the BSP to the first CPU. */
+     apic_designate_bsp(cpu->apic_state, s->cpu_index == 0);
+diff --git a/target/i386/hvf-all.c b/target/i386/hvf-all.c
+index d8c7981120..8a5b165e62 100644
+--- a/target/i386/hvf-all.c
++++ b/target/i386/hvf-all.c
+@@ -584,6 +584,55 @@ void hvf_disable(int shouldDisable)
+     hvf_disabled = shouldDisable;
+ }
+ 
++static void hvf_store_events(CPUState *cpu, uint32_t ins_len, uint64_t idtvec_info)
 +{
-+    uint32_t eax, edx;
++    X86CPU *x86_cpu = X86_CPU(cpu);
++    CPUX86State *env = &x86_cpu->env;
 +
-+    __asm__ volatile ("xgetbv"
-+                      : "=a" (eax), "=d" (edx)
-+                      : "c" (xcr));
-+
-+    return (((uint64_t)edx) << 32) | eax;
++    env->exception_injected = -1;
++    env->interrupt_injected = -1;
++    env->nmi_injected = false;
++    if (idtvec_info & VMCS_IDT_VEC_VALID) {
++        switch (idtvec_info & VMCS_IDT_VEC_TYPE) {
++        case VMCS_IDT_VEC_HWINTR:
++        case VMCS_IDT_VEC_SWINTR:
++            env->interrupt_injected = idtvec_info & VMCS_IDT_VEC_VECNUM;
++            break;
++        case VMCS_IDT_VEC_NMI:
++            env->nmi_injected = true;
++            break;
++        case VMCS_IDT_VEC_HWEXCEPTION:
++        case VMCS_IDT_VEC_SWEXCEPTION:
++            env->exception_injected = idtvec_info & VMCS_IDT_VEC_VECNUM;
++            break;
++        case VMCS_IDT_VEC_PRIV_SWEXCEPTION:
++        default:
++            abort();
++        }
++        if ((idtvec_info & VMCS_IDT_VEC_TYPE) == VMCS_IDT_VEC_SWEXCEPTION ||
++            (idtvec_info & VMCS_IDT_VEC_TYPE) == VMCS_IDT_VEC_SWINTR) {
++            env->ins_len = ins_len;
++        }
++        if (idtvec_info & VMCS_INTR_DEL_ERRCODE) {
++            env->has_error_code = true;
++            env->error_code = rvmcs(cpu->hvf_fd, VMCS_IDT_VECTORING_ERROR);
++        }
++    }
++    if ((rvmcs(cpu->hvf_fd, VMCS_GUEST_INTERRUPTIBILITY) &
++        VMCS_INTERRUPTIBILITY_NMI_BLOCKING)) {
++        env->hflags2 |= HF2_NMI_MASK;
++    } else {
++        env->hflags2 &= ~HF2_NMI_MASK;
++    }
++    if (rvmcs(cpu->hvf_fd, VMCS_GUEST_INTERRUPTIBILITY) &
++         (VMCS_INTERRUPTIBILITY_STI_BLOCKING |
++         VMCS_INTERRUPTIBILITY_MOVSS_BLOCKING)) {
++        env->hflags |= HF_INHIBIT_IRQ_MASK;
++    } else {
++        env->hflags &= ~HF_INHIBIT_IRQ_MASK;
++    }
 +}
 +
-+static bool vmx_mpx_supported()
-+{
-+    uint64_t cap_exit, cap_entry;
+ int hvf_vcpu_exec(CPUState *cpu)
+ {
+     X86CPU *x86_cpu = X86_CPU(cpu);
+@@ -603,11 +652,6 @@ int hvf_vcpu_exec(CPUState *cpu)
+             cpu->vcpu_dirty = false;
+         }
+ 
+-        env->hvf_emul->interruptable =
+-            !(rvmcs(cpu->hvf_fd, VMCS_GUEST_INTERRUPTIBILITY) &
+-             (VMCS_INTERRUPTIBILITY_STI_BLOCKING |
+-             VMCS_INTERRUPTIBILITY_MOVSS_BLOCKING));
+-
+         hvf_inject_interrupts(cpu);
+         vmx_update_tpr(cpu);
+ 
+@@ -626,7 +670,10 @@ int hvf_vcpu_exec(CPUState *cpu)
+         uint64_t exit_qual = rvmcs(cpu->hvf_fd, VMCS_EXIT_QUALIFICATION);
+         uint32_t ins_len = (uint32_t)rvmcs(cpu->hvf_fd,
+                                            VMCS_EXIT_INSTRUCTION_LENGTH);
 +
-+    hv_vmx_read_capability(HV_VMX_CAP_ENTRY, &cap_entry);
-+    hv_vmx_read_capability(HV_VMX_CAP_EXIT, &cap_exit);
+         uint64_t idtvec_info = rvmcs(cpu->hvf_fd, VMCS_IDT_VECTORING_INFO);
 +
-+    return ((cap_exit & (1 << 23)) && (cap_entry & (1 << 16)));
-+}
++        hvf_store_events(cpu, ins_len, idtvec_info);
+         rip = rreg(cpu->hvf_fd, HV_X86_RIP);
+         RFLAGS(env) = rreg(cpu->hvf_fd, HV_X86_RFLAGS);
+         env->eflags = RFLAGS(env);
+diff --git a/target/i386/hvf-utils/vmcs.h b/target/i386/hvf-utils/vmcs.h
+index c410dcfaaa..0fae73dce5 100644
+--- a/target/i386/hvf-utils/vmcs.h
++++ b/target/i386/hvf-utils/vmcs.h
+@@ -299,6 +299,7 @@
+ /*
+  * VMCS IDT-Vectoring information fields
+  */
++#define VMCS_IDT_VEC_VECNUM 0xFF
+ #define VMCS_IDT_VEC_VALID (1U << 31)
+ #define VMCS_IDT_VEC_TYPE 0x700
+ #define VMCS_IDT_VEC_ERRCODE_VALID (1U << 11)
+@@ -306,6 +307,8 @@
+ #define VMCS_IDT_VEC_NMI (2 << 8)
+ #define VMCS_IDT_VEC_HWEXCEPTION (3 << 8)
+ #define VMCS_IDT_VEC_SWINTR (4 << 8)
++#define VMCS_IDT_VEC_PRIV_SWEXCEPTION (5 << 8)
++#define VMCS_IDT_VEC_SWEXCEPTION (6 << 8)
+ 
+ /*
+  * VMCS Guest interruptibility field
+diff --git a/target/i386/hvf-utils/vmx.h b/target/i386/hvf-utils/vmx.h
+index 44a5c6d554..102075d0d4 100644
+--- a/target/i386/hvf-utils/vmx.h
++++ b/target/i386/hvf-utils/vmx.h
+@@ -181,6 +181,10 @@ static inline void macvm_set_rip(CPUState *cpu, uint64_t rip)
+ 
+ static inline void vmx_clear_nmi_blocking(CPUState *cpu)
+ {
++    X86CPU *x86_cpu = X86_CPU(cpu);
++    CPUX86State *env = &x86_cpu->env;
 +
-+uint32_t hvf_get_supported_cpuid(uint32_t func, uint32_t idx,
-+                                 int reg)
-+{
-+    uint64_t cap;
-+    uint32_t eax, ebx, ecx, edx;
++    env->hflags2 &= ~HF2_NMI_MASK;
+     uint32_t gi = (uint32_t) rvmcs(cpu->hvf_fd, VMCS_GUEST_INTERRUPTIBILITY);
+     gi &= ~VMCS_INTERRUPTIBILITY_NMI_BLOCKING;
+     wvmcs(cpu->hvf_fd, VMCS_GUEST_INTERRUPTIBILITY, gi);
+@@ -188,6 +192,10 @@ static inline void vmx_clear_nmi_blocking(CPUState *cpu)
+ 
+ static inline void vmx_set_nmi_blocking(CPUState *cpu)
+ {
++    X86CPU *x86_cpu = X86_CPU(cpu);
++    CPUX86State *env = &x86_cpu->env;
 +
-+    host_cpuid(func, idx, &eax, &ebx, &ecx, &edx);
-+
-+    switch (func) {
-+    case 0:
-+        eax = eax < (uint32_t)0xd ? eax : (uint32_t)0xd;
-+        break;
-+    case 1:
-+        edx &= CPUID_FP87 | CPUID_VME | CPUID_DE | CPUID_PSE | CPUID_TSC |
-+             CPUID_MSR | CPUID_PAE | CPUID_MCE | CPUID_CX8 | CPUID_APIC |
-+             CPUID_SEP | CPUID_MTRR | CPUID_PGE | CPUID_MCA | CPUID_CMOV |
-+             CPUID_PAT | CPUID_PSE36 | CPUID_CLFLUSH | CPUID_MMX |
-+             CPUID_FXSR | CPUID_SSE | CPUID_SSE2 | CPUID_SS;
-+        ecx &= CPUID_EXT_SSE3 | CPUID_EXT_PCLMULQDQ | CPUID_EXT_SSSE3 |
-+             CPUID_EXT_FMA | CPUID_EXT_CX16 | CPUID_EXT_PCID |
-+             CPUID_EXT_SSE41 | CPUID_EXT_SSE42 | CPUID_EXT_MOVBE |
-+             CPUID_EXT_POPCNT | CPUID_EXT_AES | CPUID_EXT_XSAVE |
-+             CPUID_EXT_AVX | CPUID_EXT_F16C | CPUID_EXT_RDRAND;
-+        ecx |= CPUID_EXT_HYPERVISOR;
-+        break;
-+    case 6:
-+        eax = CPUID_6_EAX_ARAT;
-+        ebx = 0;
-+        ecx = 0;
-+        edx = 0;
-+        break;
-+    case 7:
-+        if (idx == 0) {
-+            ebx &= CPUID_7_0_EBX_FSGSBASE | CPUID_7_0_EBX_BMI1 |
-+                    CPUID_7_0_EBX_HLE | CPUID_7_0_EBX_AVX2 |
-+                    CPUID_7_0_EBX_SMEP | CPUID_7_0_EBX_BMI2 |
-+                    CPUID_7_0_EBX_ERMS | CPUID_7_0_EBX_RTM |
-+                    CPUID_7_0_EBX_RDSEED | CPUID_7_0_EBX_ADX |
-+                    CPUID_7_0_EBX_SMAP | CPUID_7_0_EBX_AVX512IFMA |
-+                    CPUID_7_0_EBX_AVX512F | CPUID_7_0_EBX_AVX512PF |
-+                    CPUID_7_0_EBX_AVX512ER | CPUID_7_0_EBX_AVX512CD |
-+                    CPUID_7_0_EBX_CLFLUSHOPT | CPUID_7_0_EBX_CLWB |
-+                    CPUID_7_0_EBX_AVX512DQ | CPUID_7_0_EBX_SHA_NI |
-+                    CPUID_7_0_EBX_AVX512BW | CPUID_7_0_EBX_AVX512VL |
-+                    CPUID_7_0_EBX_INVPCID | CPUID_7_0_EBX_MPX;
-+
-+            if (!vmx_mpx_supported()) {
-+                ebx &= ~CPUID_7_0_EBX_MPX;
-+            }
-+            hv_vmx_read_capability(HV_VMX_CAP_PROCBASED2, &cap);
-+            if (!(cap & CPU_BASED2_INVPCID)) {
-+                ebx &= ~CPUID_7_0_EBX_INVPCID;
-+            }
-+
-+            ecx &= CPUID_7_0_ECX_AVX512BMI | CPUID_7_0_ECX_AVX512_VPOPCNTDQ;
-+            edx &= CPUID_7_0_EDX_AVX512_4VNNIW | CPUID_7_0_EDX_AVX512_4FMAPS;
++    env->hflags2 |= HF2_NMI_MASK;
+     uint32_t gi = (uint32_t)rvmcs(cpu->hvf_fd, VMCS_GUEST_INTERRUPTIBILITY);
+     gi |= VMCS_INTERRUPTIBILITY_NMI_BLOCKING;
+     wvmcs(cpu->hvf_fd, VMCS_GUEST_INTERRUPTIBILITY, gi);
+diff --git a/target/i386/hvf-utils/x86hvf.c b/target/i386/hvf-utils/x86hvf.c
+index 15d65b2105..cb1edb6186 100644
+--- a/target/i386/hvf-utils/x86hvf.c
++++ b/target/i386/hvf-utils/x86hvf.c
+@@ -356,50 +356,47 @@ void vmx_clear_int_window_exiting(CPUState *cpu)
+ 
+ void hvf_inject_interrupts(CPUState *cpu_state)
+ {
+-    int allow_nmi = !(rvmcs(cpu_state->hvf_fd, VMCS_GUEST_INTERRUPTIBILITY) &
+-                VMCS_INTERRUPTIBILITY_NMI_BLOCKING);
+     X86CPU *x86cpu = X86_CPU(cpu_state);
+     CPUX86State *env = &x86cpu->env;
+ 
+-    uint64_t idt_info = rvmcs(cpu_state->hvf_fd, VMCS_IDT_VECTORING_INFO);
++    uint8_t vector;
++    uint64_t intr_type;
++    bool have_event = true;
++    if (env->interrupt_injected != -1) {
++        vector = env->interrupt_injected;
++        intr_type = VMCS_INTR_T_SWINTR;
++    } else if (env->exception_injected != -1) {
++        vector = env->exception_injected;
++        if (vector == EXCP03_INT3 || vector == EXCP04_INTO) {
++            intr_type = VMCS_INTR_T_SWEXCEPTION;
 +        } else {
-+            ebx = 0;
-+            ecx = 0;
-+            edx = 0;
++            intr_type = VMCS_INTR_T_HWEXCEPTION;
 +        }
-+        eax = 0;
-+        break;
-+    case 0xD:
-+        if (idx == 0) {
-+            uint64_t host_xcr0 = xgetbv(0);
-+            uint64_t supp_xcr0 = host_xcr0 & (XSTATE_FP_MASK | XSTATE_SSE_MASK |
-+                                  XSTATE_YMM_MASK | XSTATE_BNDREGS_MASK |
-+                                  XSTATE_BNDCSR_MASK | XSTATE_OPMASK_MASK |
-+                                  XSTATE_ZMM_Hi256_MASK | XSTATE_Hi16_ZMM_MASK);
-+            eax &= supp_xcr0;
-+            if (!vmx_mpx_supported()) {
-+                eax &= ~(XSTATE_BNDREGS_MASK | XSTATE_BNDCSR_MASK);
-+            }
-+        } else if (idx == 1) {
-+            hv_vmx_read_capability(HV_VMX_CAP_PROCBASED2, &cap);
-+            eax &= CPUID_XSAVE_XSAVEOPT | CPUID_XSAVE_XGETBV1;
-+            if (!(cap & CPU_BASED2_XSAVES_XRSTORS)) {
-+                eax &= ~CPUID_XSAVE_XSAVES;
-+            }
-+        }
-+        break;
-+    case 0x80000001:
-+        /* LM only if HVF in 64-bit mode */
-+        edx &= CPUID_FP87 | CPUID_VME | CPUID_DE | CPUID_PSE | CPUID_TSC |
-+                CPUID_MSR | CPUID_PAE | CPUID_MCE | CPUID_CX8 | CPUID_APIC |
-+                CPUID_EXT2_SYSCALL | CPUID_MTRR | CPUID_PGE | CPUID_MCA | CPUID_CMOV |
-+                CPUID_PAT | CPUID_PSE36 | CPUID_EXT2_MMXEXT | CPUID_MMX |
-+                CPUID_FXSR | CPUID_EXT2_FXSR | CPUID_EXT2_PDPE1GB | CPUID_EXT2_3DNOWEXT |
-+                CPUID_EXT2_3DNOW | CPUID_EXT2_LM | CPUID_EXT2_RDTSCP | CPUID_EXT2_NX;
-+        hv_vmx_read_capability(HV_VMX_CAP_PROCBASED, &cap);
-+        if (!(cap & CPU_BASED_TSC_OFFSET)) {
-+            edx &= ~CPUID_EXT2_RDTSCP;
-+        }
-+        ecx &= CPUID_EXT3_LAHF_LM | CPUID_EXT3_CMP_LEG | CPUID_EXT3_CR8LEG |
-+                CPUID_EXT3_ABM | CPUID_EXT3_SSE4A | CPUID_EXT3_MISALIGNSSE |
-+                CPUID_EXT3_3DNOWPREFETCH | CPUID_EXT3_OSVW | CPUID_EXT3_XOP |
-+                CPUID_EXT3_FMA4 | CPUID_EXT3_TBM;
-+        break;
-+    default:
-+        return 0;
++    } else if (env->nmi_injected) {
++        vector = NMI_VEC;
++        intr_type = VMCS_INTR_T_NMI;
++    } else {
++        have_event = false;
 +    }
 +
-+    switch (reg) {
-+    case R_EAX:
-+        return eax;
-+    case R_EBX:
-+        return ebx;
-+    case R_ECX:
-+        return ecx;
-+    case R_EDX:
-+        return edx;
-+    default:
-+        return 0;
-+    }
-+}
+     uint64_t info = 0;
+-    
+-    if (idt_info & VMCS_IDT_VEC_VALID) {
+-        uint8_t vector = idt_info & 0xff;
+-        uint64_t intr_type = idt_info & VMCS_INTR_T_MASK;
+-        info = idt_info;
+-        
++    if (have_event) {
++        info = vector | intr_type | VMCS_INTR_VALID;
+         uint64_t reason = rvmcs(cpu_state->hvf_fd, VMCS_EXIT_REASON);
+-        if (intr_type == VMCS_INTR_T_NMI && reason != EXIT_REASON_TASK_SWITCH) {
+-            allow_nmi = 1;
++        if (env->nmi_injected && reason != EXIT_REASON_TASK_SWITCH) {
+             vmx_clear_nmi_blocking(cpu_state);
+         }
+-        
+-        if ((allow_nmi || intr_type != VMCS_INTR_T_NMI)) {
++
++        if (!(env->hflags2 & HF2_NMI_MASK) || intr_type != VMCS_INTR_T_NMI) {
+             info &= ~(1 << 12); /* clear undefined bit */
+             if (intr_type == VMCS_INTR_T_SWINTR ||
+-                intr_type == VMCS_INTR_T_PRIV_SWEXCEPTION ||
+                 intr_type == VMCS_INTR_T_SWEXCEPTION) {
+-                uint64_t ins_len = rvmcs(cpu_state->hvf_fd,
+-                                         VMCS_EXIT_INSTRUCTION_LENGTH);
+-                wvmcs(cpu_state->hvf_fd, VMCS_ENTRY_INST_LENGTH, ins_len);
+-            }
+-            if (vector == EXCEPTION_BP || vector == EXCEPTION_OF) {
+-                /*
+-                 * VT-x requires #BP and #OF to be injected as software
+-                 * exceptions.
+-                 */
+-                info &= ~VMCS_INTR_T_MASK;
+-                info |= VMCS_INTR_T_SWEXCEPTION;
+-                uint64_t ins_len = rvmcs(cpu_state->hvf_fd,
+-                                         VMCS_EXIT_INSTRUCTION_LENGTH);
+-                wvmcs(cpu_state->hvf_fd, VMCS_ENTRY_INST_LENGTH, ins_len);
++                wvmcs(cpu_state->hvf_fd, VMCS_ENTRY_INST_LENGTH, env->ins_len);
+             }
+             
+-            uint64_t err = 0;
+-            if (idt_info & VMCS_INTR_DEL_ERRCODE) {
+-                err = rvmcs(cpu_state->hvf_fd, VMCS_IDT_VECTORING_ERROR);
+-                wvmcs(cpu_state->hvf_fd, VMCS_ENTRY_EXCEPTION_ERROR, err);
++            if (env->has_error_code) {
++                wvmcs(cpu_state->hvf_fd, VMCS_ENTRY_EXCEPTION_ERROR,
++                      env->error_code);
+             }
+             /*printf("reinject  %lx err %d\n", info, err);*/
+             wvmcs(cpu_state->hvf_fd, VMCS_ENTRY_INTR_INFO, info);
+@@ -407,7 +404,7 @@ void hvf_inject_interrupts(CPUState *cpu_state)
+     }
+ 
+     if (cpu_state->interrupt_request & CPU_INTERRUPT_NMI) {
+-        if (allow_nmi && !(info & VMCS_INTR_VALID)) {
++        if (!(env->hflags2 & HF2_NMI_MASK) && !(info & VMCS_INTR_VALID)) {
+             cpu_state->interrupt_request &= ~CPU_INTERRUPT_NMI;
+             info = VMCS_INTR_VALID | VMCS_INTR_T_NMI | NMI_VEC;
+             wvmcs(cpu_state->hvf_fd, VMCS_ENTRY_INTR_INFO, info);
+@@ -416,7 +413,7 @@ void hvf_inject_interrupts(CPUState *cpu_state)
+         }
+     }
+ 
+-    if (env->hvf_emul->interruptable &&
++    if (!(env->hflags & HF_INHIBIT_IRQ_MASK) &&
+         (cpu_state->interrupt_request & CPU_INTERRUPT_HARD) &&
+         (EFLAGS(env) & IF_MASK) && !(info & VMCS_INTR_VALID)) {
+         int line = cpu_get_pic_interrupt(&x86cpu->env);
+diff --git a/target/i386/kvm.c b/target/i386/kvm.c
+index d4b2ce2e94..dac6a39ef8 100644
+--- a/target/i386/kvm.c
++++ b/target/i386/kvm.c
+@@ -1044,8 +1044,6 @@ void kvm_arch_reset_vcpu(X86CPU *cpu)
+ {
+     CPUX86State *env = &cpu->env;
+ 
+-    env->exception_injected = -1;
+-    env->interrupt_injected = -1;
+     env->xcr0 = 1;
+     if (kvm_irqchip_in_kernel()) {
+         env->mp_state = cpu_is_bsp(cpu) ? KVM_MP_STATE_RUNNABLE :
 -- 
 2.14.3
