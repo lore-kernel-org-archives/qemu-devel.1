@@ -1,24 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36256)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40934)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1eRiKK-0007ez-JF
-	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 12:38:45 -0500
+	(envelope-from <mst@redhat.com>) id 1eRiY7-0002l5-Iq
+	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 12:53:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1eRiKG-0004Sr-Gh
-	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 12:38:44 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:40558)
+	(envelope-from <mst@redhat.com>) id 1eRiY3-0003lb-Fm
+	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 12:52:59 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:44518)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1eRiKG-0004Rd-8Z
-	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 12:38:40 -0500
-Date: Wed, 20 Dec 2017 19:38:35 +0200
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1eRiY3-0003jT-75
+	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 12:52:55 -0500
+Date: Wed, 20 Dec 2017 19:52:53 +0200
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20171220193658-mutt-send-email-mst@kernel.org>
-References: <1511859789-43680-1-git-send-email-arei.gonglei@huawei.com>
-	<33183CC9F5247A488A2544077AF19020DA4ED5D3@DGGEMA505-MBX.china.huawei.com>
+Message-ID: <20171220194848-mutt-send-email-mst@kernel.org>
+References: <cover.1513278334.git.jbaron@akamai.com>
+	<12f0830fe220dc43671f6dbc1a5d81e0276c3a9e.1513278334.git.jbaron@akamai.com>
+	<20171220164809-mutt-send-email-mst@kernel.org>
+	<0f613ff4-8cc1-67ac-63bf-5a8c05d9cd79@akamai.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <33183CC9F5247A488A2544077AF19020DA4ED5D3@DGGEMA505-MBX.china.huawei.com>
-Subject: Re: [Qemu-devel] [PATCH 0/4] cryptodev: add vhost support
+In-Reply-To: <0f613ff4-8cc1-67ac-63bf-5a8c05d9cd79@akamai.com>
+Subject: Re: [Qemu-devel] [PATCH net-next 1/2] virtio_net: allow hypervisor
+ to indicate linkspeed and duplex setting
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,77 +30,145 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Gonglei (Arei)" <arei.gonglei@huawei.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "Huangweidong (C)" <weidong.huang@huawei.com>, "stefanha@redhat.com" <stefanha@redhat.com>, "Zhoujian (jay)" <jianjay.zhou@huawei.com>, "pasic@linux.vnet.ibm.com" <pasic@linux.vnet.ibm.com>, longpeng <longpeng2@huawei.com>, "xin.zeng@intel.com" <xin.zeng@intel.com>, "roy.fan.zhang@intel.com" <roy.fan.zhang@intel.com>
+To: Jason Baron <jbaron@akamai.com>
+Cc: qemu-devel@nongnu.org, linux-kernel@vger.kernel.org, jasowang@redhat.com
 
-On Mon, Dec 18, 2017 at 09:03:16AM +0000, Gonglei (Arei) wrote:
-> Ping...
+On Wed, Dec 20, 2017 at 12:07:55PM -0500, Jason Baron wrote:
 > 
-> Fan (working for DPDK parts) is waiting for those patches upstreamed. :)
+> 
+> On 12/20/2017 09:57 AM, Michael S. Tsirkin wrote:
+> > On Thu, Dec 14, 2017 at 02:33:53PM -0500, Jason Baron wrote:
+> >> If the hypervisor exports the link and duplex speed, let's use that instead
+> >> of the default unknown speed. The user can still overwrite it later if
+> >> desired via: 'ethtool -s'. This allows the hypervisor to set the default
+> >> link speed and duplex setting without requiring guest changes and is
+> >> consistent with how other network drivers operate. We ran into some cases
+> >> where the guest software was failing due to a lack of linkspeed and had to
+> >> fall back to a fully emulated network device that does export a linkspeed
+> >> and duplex setting.
+> >>
+> >> Implement by adding a new VIRTIO_NET_F_SPEED_DUPLEX feature flag, to
+> >> indicate that a linkspeed and duplex setting are present.
+> >>
+> >> Signed-off-by: Jason Baron <jbaron@akamai.com>
+> >> Cc: "Michael S. Tsirkin" <mst@redhat.com>
+> >> Cc: Jason Wang <jasowang@redhat.com>
+> >> ---
+> >>  drivers/net/virtio_net.c        | 11 ++++++++++-
+> >>  include/uapi/linux/virtio_net.h |  4 ++++
+> >>  2 files changed, 14 insertions(+), 1 deletion(-)
+> >>
+> >> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
+> >> index 6fb7b65..e7a2ad6 100644
+> >> --- a/drivers/net/virtio_net.c
+> >> +++ b/drivers/net/virtio_net.c
+> >> @@ -2671,6 +2671,14 @@ static int virtnet_probe(struct virtio_device *vdev)
+> >>  	netif_set_real_num_rx_queues(dev, vi->curr_queue_pairs);
+> >>  
+> >>  	virtnet_init_settings(dev);
+> >> +	if (virtio_has_feature(vdev, VIRTIO_NET_F_SPEED_DUPLEX)) {
+> >> +		vi->speed = virtio_cread32(vdev,
+> >> +					offsetof(struct virtio_net_config,
+> >> +					speed));
+> >> +		vi->duplex = virtio_cread8(vdev,
+> >> +					offsetof(struct virtio_net_config,
+> >> +					duplex));
+> >> +	}
+> >>  
+> >>  	err = register_netdev(dev);
+> >>  	if (err) {
+> > 
+> > How are we going to validate speed values? Imagine host
+> > using a new 1000Gbit device and exposing that to guest.
+> > 
+> > Need to think what do we want guest to do.
+> > I think that ideally we'd say it's a 100Gbit device.
+> > 
+> > For duplex, force to one of 3 valid values?
+> 
+> So I didn't provide validation here b/c as you point out its not clear
+> how we would validate it. I don't believe h/w drivers do any validation
+> here either.
+
+Right but hardware tends not to change as quickly as the hypervisors :)
+For virtual device drivers, we need some way to handle forward
+compatibility since hypervisors do change quite quickly.
+
+> They simply propagate the value from the the underlying
+> device. So that seemed reasonable to me.
+> 
+> Why do you divide by 10 in the above example? Would you propose always
+> dividing what the device reports by 10?
+
+No, that was just an example. I was just suggesting rounding down to
+next valid known speed.
+
+> > 
+> > 
+> >> @@ -2796,7 +2804,8 @@ static struct virtio_device_id id_table[] = {
+> >>  	VIRTIO_NET_F_CTRL_RX, VIRTIO_NET_F_CTRL_VLAN, \
+> >>  	VIRTIO_NET_F_GUEST_ANNOUNCE, VIRTIO_NET_F_MQ, \
+> >>  	VIRTIO_NET_F_CTRL_MAC_ADDR, \
+> >> -	VIRTIO_NET_F_MTU, VIRTIO_NET_F_CTRL_GUEST_OFFLOADS
+> >> +	VIRTIO_NET_F_MTU, VIRTIO_NET_F_CTRL_GUEST_OFFLOADS, \
+> >> +	VIRTIO_NET_F_SPEED_DUPLEX
+> >>  
+> >>  static unsigned int features[] = {
+> >>  	VIRTNET_FEATURES,
+> >> diff --git a/include/uapi/linux/virtio_net.h b/include/uapi/linux/virtio_net.h
+> >> index fc353b5..acfcf68 100644
+> >> --- a/include/uapi/linux/virtio_net.h
+> >> +++ b/include/uapi/linux/virtio_net.h
+> >> @@ -36,6 +36,7 @@
+> >>  #define VIRTIO_NET_F_GUEST_CSUM	1	/* Guest handles pkts w/ partial csum */
+> >>  #define VIRTIO_NET_F_CTRL_GUEST_OFFLOADS 2 /* Dynamic offload configuration. */
+> >>  #define VIRTIO_NET_F_MTU	3	/* Initial MTU advice */
+> >> +#define VIRTIO_NET_F_SPEED_DUPLEX 4	/* Host set linkspeed and duplex */
+> >>  #define VIRTIO_NET_F_MAC	5	/* Host has given MAC address. */
+> >>  #define VIRTIO_NET_F_GUEST_TSO4	7	/* Guest can handle TSOv4 in. */
+> >>  #define VIRTIO_NET_F_GUEST_TSO6	8	/* Guest can handle TSOv6 in. */
+> > 
+> > I think I'd prefer a high feature bit - low bits are ones that can
+> > be backported to legacy interfaces, so I think we should hang on to
+> > these for fixing issues that break communication completely (like the
+> > mtu).
+> > 
+> 
+> So I went with a low bit here b/c in the virtio spec 'section 2.2
+> Feature Bits':
+> 
+> 
+>  0 to 23
+>     Feature bits for the specific device type
+> 24 to 32
+>     Feature bits reserved for extensions to the queue and feature
+> negotiation mechanisms
+> 33 and above
+>     Feature bits reserved for future extensions.
+> 
+> So virtio_net already goes up to 23 (but omits 4 and 6), and I wasn't
+> sure if it was reasonable to use the higher bits. It looks like the code
+> would handle the higher bits ok, so I can try that - bit 33 perhaps ?
 > 
 > Thanks,
-> -Gonglei
+> 
+> -Jason
 
-As far as I am concerned, the main issue is that it says it assumes
-polling.  virtio does not work like this right now.  As long as spec
-does not support interrupt mode, I don't think we can merge this.
+
+Transports started from bit 24 and are growing up.
+So I would say devices should start from bit 63 and grow down.
 
 > 
-> > -----Original Message-----
-> > From: Gonglei (Arei)
-> > Sent: Tuesday, November 28, 2017 5:03 PM
-> > To: qemu-devel@nongnu.org
-> > Cc: mst@redhat.com; pbonzini@redhat.com; Huangweidong (C);
-> > stefanha@redhat.com; Zhoujian (jay); pasic@linux.vnet.ibm.com; longpeng;
-> > xin.zeng@intel.com; roy.fan.zhang@intel.com; Gonglei (Arei)
-> > Subject: [PATCH 0/4] cryptodev: add vhost support
 > > 
-> > I posted the RFC verion five months ago for DPDK
-> > vhost-crypto implmention, and now it's time to send
-> > the formal version. Because we need an user space scheme
-> > for better performance.
-> > 
-> > The vhost user crypto server side patches had been
-> > sent to DPDK community, pls see
-> > 
-> > [RFC PATCH 0/6] lib/librte_vhost: introduce new	vhost_user crypto backend
-> > support
-> > http://dpdk.org/ml/archives/dev/2017-November/081048.html
-> > 
-> > You also can get virtio-crypto polling mode driver from:
-> > 
-> > [PATCH] virtio: add new driver for crypto devices
-> > http://dpdk.org/ml/archives/dev/2017-November/081985.html
-> > 
-> > 
-> > Gonglei (4):
-> >   cryptodev: add vhost-user as a new cryptodev backend
-> >   cryptodev: add vhost support
-> >   cryptodev-vhost-user: add crypto session handler
-> >   cryptodev-vhost-user: set the key length
-> > 
-> >  backends/Makefile.objs                |   4 +
-> >  backends/cryptodev-builtin.c          |   1 +
-> >  backends/cryptodev-vhost-user.c       | 381
-> > ++++++++++++++++++++++++++++++++++
-> >  backends/cryptodev-vhost.c            | 297
-> > ++++++++++++++++++++++++++
-> >  docs/interop/vhost-user.txt           |  19 ++
-> >  hw/virtio/vhost-user.c                |  89 ++++++++
-> >  hw/virtio/virtio-crypto.c             |  70 +++++++
-> >  include/hw/virtio/vhost-backend.h     |   8 +
-> >  include/hw/virtio/virtio-crypto.h     |   1 +
-> >  include/sysemu/cryptodev-vhost-user.h |  47 +++++
-> >  include/sysemu/cryptodev-vhost.h      | 154 ++++++++++++++
-> >  include/sysemu/cryptodev.h            |   8 +
-> >  qemu-options.hx                       |  21 ++
-> >  vl.c                                  |   4 +
-> >  14 files changed, 1104 insertions(+)
-> >  create mode 100644 backends/cryptodev-vhost-user.c
-> >  create mode 100644 backends/cryptodev-vhost.c
-> >  create mode 100644 include/sysemu/cryptodev-vhost-user.h
-> >  create mode 100644 include/sysemu/cryptodev-vhost.h
-> > 
-> > --
-> > 1.8.3.1
-> > 
+> >> @@ -76,6 +77,9 @@ struct virtio_net_config {
+> >>  	__u16 max_virtqueue_pairs;
+> >>  	/* Default maximum transmit unit advice */
+> >>  	__u16 mtu;
+> >> +	/* Host exported linkspeed and duplex */
+> >> +	__u32 speed;
+> >> +	__u8 duplex;
+> >>  } __attribute__((packed));
+> >>  
+> >>  /*
+> >> -- 
+> >> 2.6.1
