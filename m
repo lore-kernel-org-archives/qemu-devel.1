@@ -1,28 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46617)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48203)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1eRSoC-0000oe-9r
-	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 20:04:33 -0500
+	(envelope-from <jsnow@redhat.com>) id 1eRSqG-0002Jm-CR
+	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 20:06:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1eRSoB-0006Ij-8v
-	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 20:04:32 -0500
-Received: from mail-wr0-x236.google.com ([2a00:1450:400c:c0c::236]:35620)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
-	id 1eRSoA-0006HU-U4
-	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 20:04:31 -0500
-Received: by mail-wr0-x236.google.com with SMTP id l19so8536566wrc.2
-	for <qemu-devel@nongnu.org>; Tue, 19 Dec 2017 17:04:30 -0800 (PST)
+	(envelope-from <jsnow@redhat.com>) id 1eRSqF-0000JX-7N
+	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 20:06:40 -0500
+References: <20171113162053.58795-1-vsementsov@virtuozzo.com>
+	<20171213041248.GB31040@lemon>
+	<af98ffe7-71fb-0493-c4da-4b77a4c453f5@virtuozzo.com>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <696c198b-e3d8-fab6-0128-de9ed34e4cff@redhat.com>
+Date: Tue, 19 Dec 2017 20:06:24 -0500
 MIME-Version: 1.0
-Sender: alistair23@gmail.com
-In-Reply-To: <CAKmqyKPHHQcQ3HYs4r7f4uUDfdMqSq=-mUJn6becXw8WXNAwNQ@mail.gmail.com>
-References: <cover.1513729519.git.alistair.francis@xilinx.com>
-	<CAFEAcA-dvs-E83ZCEk6VAyyQkpghX9oF-d-D62vOKs7kfjPzaw@mail.gmail.com>
-	<CAKmqyKPHHQcQ3HYs4r7f4uUDfdMqSq=-mUJn6becXw8WXNAwNQ@mail.gmail.com>
-From: Alistair Francis <alistair.francis@xilinx.com>
-Date: Tue, 19 Dec 2017 17:03:59 -0800
-Message-ID: <CAKmqyKMKL_BGSbaetubaPv8gkmF9XFFdDwkXAPsUZdV1qkOyqA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v4 0/5] Add a valid_cpu_types property
+In-Reply-To: <af98ffe7-71fb-0493-c4da-4b77a4c453f5@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH for-2.12 0/4] qmp dirty bitmap API
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,119 +25,111 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alistair Francis <alistair.francis@xilinx.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, Eduardo Habkost <ehabkost@redhat.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, Igor Mammedov <imammedo@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, Fam Zheng <famz@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, kwolf@redhat.com, armbru@redhat.com, mnestratov@virtuozzo.com, mreitz@redhat.com, nshirokovskiy@virtuozzo.com, stefanha@redhat.com, den@openvz.org, pbonzini@redhat.com, dev@acronis.com
 
-On Tue, Dec 19, 2017 at 4:55 PM, Alistair Francis
-<alistair.francis@xilinx.com> wrote:
-> On Tue, Dec 19, 2017 at 4:43 PM, Peter Maydell <peter.maydell@linaro.org> wrote:
->> On 20 December 2017 at 00:27, Alistair Francis
->> <alistair.francis@xilinx.com> wrote:
->>> There are numorous QEMU machines that only have a single or a handful of
->>> valid CPU options. To simplyfy the management of specificying which CPU
->>> is/isn't valid let's create a property that can be set in the machine
->>> init. We can then check to see if the user supplied CPU is in that list
->>> or not.
+
+
+On 12/19/2017 11:07 AM, Vladimir Sementsov-Ogievskiy wrote:
+> 13.12.2017 07:12, Fam Zheng wrote:
+>> On Mon, 11/13 19:20, Vladimir Sementsov-Ogievskiy wrote:
+>>> Hi all.
 >>>
->>> I have added the valid_cpu_types for some ARM machines only at the
->>> moment.
+>>> There are three qmp commands, needed to implement external backup API=
+.
 >>>
->>> Here is what specifying the CPUs looks like now:
+>>> Using these three commands, client may do all needed bitmap
+>>> management by
+>>> hand:
 >>>
->>> $ aarch64-softmmu/qemu-system-aarch64 -M netduino2 -kernel ./u-boot.elf -nographic -cpu "cortex-m3" -S
->>> QEMU 2.10.50 monitor - type 'help' for more information
->>> (qemu) info cpus
->>> * CPU #0: thread_id=24175
->>> (qemu) q
+>>> on backup start we need to do a transaction:
+>>> =C2=A0 {disable old bitmap, create new bitmap}
 >>>
->>> $ aarch64-softmmu/qemu-system-aarch64 -M netduino2 -kernel ./u-boot.elf -nographic -cpu "cortex-m4" -S
->>> QEMU 2.10.50 monitor - type 'help' for more information
->>> (qemu) q
+>>> on backup success:
+>>> =C2=A0 drop old bitmap
 >>>
->>> $ aarch64-softmmu/qemu-system-aarch64 -M netduino2 -kernel ./u-boot.elf -nographic -cpu "cortex-m5" -S
->>> qemu-system-aarch64: unable to find CPU model 'cortex-m5'
+>>> on backup fail:
+>>> =C2=A0 enable old bitmap
+>>> =C2=A0 merge new bitmap to old bitmap
+>>> =C2=A0 drop new bitmap
 >>>
->>> $ aarch64-softmmu/qemu-system-aarch64 -M netduino2 -kernel ./u-boot.elf -nographic -cpu "cortex-a9" -S
->>> qemu-system-aarch64: Invalid CPU type: cortex-a9-arm-cpu
->>> The valid types are: cortex-m3-arm-cpu, cortex-m4-arm-cpu
+>>> Question: it may be better to make one command instead of two:
+>>> block-dirty-bitmap-set-enabled(bool enabled)
+>>>
+>>> Vladimir Sementsov-Ogievskiy (4):
+>>> =C2=A0=C2=A0 block/dirty-bitmap: add lock to bdrv_enable/disable_dirt=
+y_bitmap
+>>> =C2=A0=C2=A0 qapi: add block-dirty-bitmap-enable/disable
+>>> =C2=A0=C2=A0 qmp: transaction support for block-dirty-bitmap-enable/d=
+isable
+>>> =C2=A0=C2=A0 qapi: add block-dirty-bitmap-merge
+>>>
+>>> =C2=A0 qapi/block-core.json=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0 |=C2=A0 80 +++++++++++++++++++++++
+>>> =C2=A0 qapi/transaction.json=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+ |=C2=A0=C2=A0 4 ++
+>>> =C2=A0 include/block/dirty-bitmap.h |=C2=A0=C2=A0 2 +
+>>> =C2=A0 block/dirty-bitmap.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0 |=C2=A0 21 ++++++
+>>> =C2=A0 blockdev.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 | 151
+>>> +++++++++++++++++++++++++++++++++++++++++++
+>>> =C2=A0 5 files changed, 258 insertions(+)
+>>>
+>> I think tests are required to merge new features/commands.=C2=A0 Can w=
+e
+>> include tests
+>> on these new code please?=C2=A0 We should cover error handling, and al=
+so
+>> write tests
+>> that demonstrate the intended real world use cases.
 >>
->> Thanks for this; we really should be more strict about
->> forbidding "won't work" combinations than we have
->> been in the past.
+>> Also should we add new sections to docs/interop/bitmaps.rst?
 >>
->> In the last of these cases, I think that when we
->> list the invalid CPU type and the valid types
->> we should use the same names we want the user to
->> use on the command line, without the "-arm-cpu"
->> suffixes.
->
-> Hmm... That is a good point, it is confusing that they don't line up.
->
-> The problem is that we are just doing a simple
-> object_class_dynamic_cast() in hw/core/machine.c which I think
-> (untested) requires us to have the full name in the valid cpu array.
-
-Yeah, so I tested this diff on top of this series:
-
-diff --git a/hw/arm/netduino2.c b/hw/arm/netduino2.c
-index 111a1d0aba..702e5e8fcf 100644
---- a/hw/arm/netduino2.c
-+++ b/hw/arm/netduino2.c
-@@ -42,8 +42,8 @@ static void netduino2_init(MachineState *machine)
- }
-
- static const char *netduino_valid_cpus[] = {
--                                            ARM_CPU_TYPE_NAME("cortex-m3"),
--                                            ARM_CPU_TYPE_NAME("cortex-m4"),
-+                                            "cortex-m3",
-+                                            "cortex-m4",
-                                             NULL
-                                            };
-
-diff --git a/hw/core/machine.c b/hw/core/machine.c
-index c857f3f934..4b817ccc58 100644
---- a/hw/core/machine.c
-+++ b/hw/core/machine.c
-@@ -761,8 +761,8 @@ void machine_run_board_init(MachineState *machine)
-     /* If the machine supports the valid_cpu_types check and the user
-      * specified a CPU with -cpu check here that the user CPU is supported.
-      */
--    if (machine_class->valid_cpu_types && machine->cpu_type) {
--        ObjectClass *class = object_class_by_name(machine->cpu_type);
-+    if (machine_class->valid_cpu_types && machine->cpu_model) {
-+        ObjectClass *class = object_class_by_name(machine->cpu_model);
-         int i;
-
-         for (i = 0; machine_class->valid_cpu_types[i]; i++) {
-@@ -777,7 +777,7 @@ void machine_run_board_init(MachineState *machine)
-
-         if (!machine_class->valid_cpu_types[i]) {
-             /* The user specified CPU is not valid */
--            error_report("Invalid CPU type: %s", machine->cpu_type);
-+            error_report("Invalid CPU type: %s", machine->cpu_model);
-             error_printf("The valid types are: %s",
-                          machine_class->valid_cpu_types[0]);
-             for (i = 1; machine_class->valid_cpu_types[i]; i++) {
-
-and I get this:
-
-$ aarch64-softmmu/qemu-system-aarch64 -M netduino2 -kernel
-./u-boot.elf -nographic -cpu "cortex-m4" -S
-qemu-system-aarch64: Invalid CPU type: cortex-m4
-The valid types are: cortex-m3, cortex-m4
-
-So we loose the object_class_dynamic_cast() ability.
-
-I think an earlier version of my previous series adding the support to
-machine.c did string comparison, but it was decided to utilise objects
-instead. One option is to make the array 2 wide and have the second
-string be user friendly?
-
-Alistair
-
->
-> Alistair
->
+>> Meta: John started a long discussion about the API design but I think
+>> after all
+>> it turns out exposing dirty bitmap objects and the primitives is a
+>> reasonable
+>> approach to implement incremental backup functionalities. The comment
+>> I have is
+>> that we should ensure we have also reviewed it from a higher level
+>> (e.g. all the
+>> potential user requirements) to make sure this low level API is both
+>> sound and
+>> flexible. We shouldn't introduce a minimal set of low level commands
+>> just to
+>> support one particular use case, but look a bit further and broader
+>> and come up
+>> with a more complete design? Writing docs and tests might force us to
+>> think in
+>> this direction, which I think is a good thing to have for this series,
+>> too.
 >>
->> thanks
->> -- PMM
+>> Fam
+>=20
+> Nikolay, please describe what do you plan in libvirt over qmp bitmap AP=
+I.
+>=20
+> Kirill, what do you think about this all?
+>=20
+> (brief history:
+> we are considering 3 new qmp commands for bitmap management, needed for
+> external incremental backup support
+> =C2=A0- enable (bitmap will track disk changes)
+> =C2=A0- disable (bitmap will stop tracking changes)
+> =C2=A0- merge (merge bitmap A to bitmap B)
+> )
+>=20
+
+Yeah, it would be helpful to know what the full workflow for the API
+will be ... before I get ahead of myself again (sorry) ...
+
+but I'd like to see a quick writeup of your vision for the pull-mode
+backups (which I assume this is for, right?) from start-to-finish, like
+a mockup of annotated QMP output or something.
+
+Nothing fancy, just something that lets me orient where we're headed,
+since you're doing most of the work and I just want to get out of your
+way, but having a roadmap helps me do that.
+
+--js
