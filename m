@@ -1,19 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57618)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58768)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yvugenfi@redhat.com>) id 1eRfQL-0007bJ-6w
-	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 09:32:47 -0500
+	(envelope-from <yvugenfi@redhat.com>) id 1eRfRE-00088W-6J
+	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 09:33:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yvugenfi@redhat.com>) id 1eRfQI-0006Yr-Ct
-	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 09:32:45 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:14807)
+	(envelope-from <yvugenfi@redhat.com>) id 1eRfRB-0007ml-2L
+	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 09:33:40 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:37508)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <yvugenfi@redhat.com>) id 1eRfQI-0006X5-3K
-	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 09:32:42 -0500
-From: Yan Vugenfirer <yvugenfi@redhat.com>
-Message-Id: <842777DF-299D-47D5-A3E7-C08D9F5D289C@redhat.com>
+	(Exim 4.71) (envelope-from <yvugenfi@redhat.com>) id 1eRfRA-0007ls-Ps
+	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 09:33:36 -0500
+Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
-Date: Wed, 20 Dec 2017 16:32:28 +0200
+From: Yan Vugenfirer <yvugenfi@redhat.com>
 In-Reply-To: <20171220162927-mutt-send-email-mst@kernel.org>
+Date: Wed, 20 Dec 2017 16:33:28 +0200
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <F096C867-C75B-4756-B4F6-9774DDF2FC8B@redhat.com>
 References: <cover.1513278334.git.jbaron@akamai.com>
 	<cover.1513278334.git.jbaron@akamai.com>
 	<1513280073-27515-1-git-send-email-jbaron@akamai.com>
@@ -22,9 +24,6 @@ References: <cover.1513278334.git.jbaron@akamai.com>
 	<21A64922-D22E-4AE1-8B4C-B0D85357240C@redhat.com>
 	<73e8811d-70fd-4920-1cb4-ad1809ebff82@akamai.com>
 	<20171220162927-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain;
-	charset=us-ascii
-Content-Transfer-Encoding: quoted-printable
 Subject: Re: [Qemu-devel] [PATCH 2/2] qemu: add linkspeed and duplex setting
  to virtio-net
 List-Id: <qemu-devel.nongnu.org>
@@ -36,7 +35,7 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Jason Baron <jbaron@akamai.com>, Jason Wang <jasowang@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, linux-kernel@vger.kernel.org
+Cc: Jason Baron <jbaron@akamai.com>, jasowang@redhat.com, qemu-devel@nongnu.org, linux-kernel@vger.kernel.org
 
 
 > On 20 Dec 2017, at 16:31, Michael S. Tsirkin <mst@redhat.com> wrote:
