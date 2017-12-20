@@ -1,28 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44180)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47537)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1eRgzo-0006M9-5m
-	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 11:13:29 -0500
+	(envelope-from <michael@weiser.dinsnail.net>) id 1eRh1z-00088U-EU
+	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 11:15:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1eRgzi-0001Eu-Jh
-	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 11:13:28 -0500
-Received: from mga11.intel.com ([192.55.52.93]:39156)
+	(envelope-from <michael@weiser.dinsnail.net>) id 1eRh1y-0003FW-GO
+	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 11:15:43 -0500
+Received: from heinz.dinsnail.net
+	([2a01:238:43b4:3200:9392:5dcc:2f0e:a960]:49234)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
-	id 1eRgzi-0001DF-9n
-	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 11:13:22 -0500
-From: "Wang, Wei W" <wei.w.wang@intel.com>
-Date: Wed, 20 Dec 2017 16:13:16 +0000
-Message-ID: <286AC319A985734F985F78AFA26841F73938CC3E@shsmsx102.ccr.corp.intel.com>
-References: <1513685879-21823-1-git-send-email-wei.w.wang@intel.com>
-	<201712192305.AAE21882.MtQHJOFFSFVOLO@I-love.SAKURA.ne.jp>
-	<5A3A3CBC.4030202@intel.com>
-	<20171220122547.GA1654@bombadil.infradead.org>
-In-Reply-To: <20171220122547.GA1654@bombadil.infradead.org>
-Content-Language: en-US
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	(Exim 4.71) (envelope-from <michael@weiser.dinsnail.net>)
+	id 1eRh1y-0003D7-8G
+	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 11:15:42 -0500
+Date: Wed, 20 Dec 2017 17:01:06 +0100
+From: Michael Weiser <michael.weiser@gmx.de>
+Message-ID: <20171220160106.GE15475@weiser.dinsnail.net>
+References: <20171219201613.7399-1-michael.weiser@gmx.de>
+	<20171219201613.7399-3-michael.weiser@gmx.de>
+	<bd78a6f5-f023-af5a-0d35-f3b29ae4e7a6@vivier.eu>
+	<CAFEAcA8D0n_PNJ-fqMq8KtZSBRdf2i=3cxcbwT1HSnFi9_MhpA@mail.gmail.com>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v20 0/7] Virtio-balloon Enhancement
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAFEAcA8D0n_PNJ-fqMq8KtZSBRdf2i=3cxcbwT1HSnFi9_MhpA@mail.gmail.com>
+Subject: Re: [Qemu-devel] [PATCH v2 2/5] linux-user: Add separate aarch64_be
+ uname
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,47 +32,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Matthew Wilcox <willy@infradead.org>
-Cc: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>, "virtio-dev@lists.oasis-open.org" <virtio-dev@lists.oasis-open.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "virtualization@lists.linux-foundation.org" <virtualization@lists.linux-foundation.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "linux-mm@kvack.org" <linux-mm@kvack.org>, "mst@redhat.com" <mst@redhat.com>, "mhocko@kernel.org" <mhocko@kernel.org>, "akpm@linux-foundation.org" <akpm@linux-foundation.org>, "mawilcox@microsoft.com" <mawilcox@microsoft.com>, "david@redhat.com" <david@redhat.com>, "cornelia.huck@de.ibm.com" <cornelia.huck@de.ibm.com>, "mgorman@techsingularity.net" <mgorman@techsingularity.net>, "aarcange@redhat.com" <aarcange@redhat.com>, "amit.shah@redhat.com" <amit.shah@redhat.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "liliang.opensource@gmail.com" <liliang.opensource@gmail.com>, "yang.zhang.wz@gmail.com" <yang.zhang.wz@gmail.com>, "quan.xu0@gmail.com" <quan.xu0@gmail.com>, "nilal@redhat.com" <nilal@redhat.com>, "riel@redhat.com" <riel@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Laurent Vivier <laurent@vivier.eu>, QEMU Developers <qemu-devel@nongnu.org>, Riku Voipio <riku.voipio@iki.fi>
 
-On Wednesday, December 20, 2017 8:26 PM, Matthew Wilcox wrote:
-> On Wed, Dec 20, 2017 at 06:34:36PM +0800, Wei Wang wrote:
-> > On 12/19/2017 10:05 PM, Tetsuo Handa wrote:
-> > > I think xb_find_set() has a bug in !node path.
-> >
-> > I think we can probably remove the "!node" path for now. It would be
-> > good to get the fundamental part in first, and leave optimization to
-> > come as separate patches with corresponding test cases in the future.
->=20
-> You can't remove the !node path.  You'll see !node when the highest set b=
-it
-> is less than 1024.  So do something like this:
->=20
-> 	unsigned long bit;
-> 	xb_preload(GFP_KERNEL);
-> 	xb_set_bit(xb, 700);
-> 	xb_preload_end();
-> 	bit =3D xb_find_set(xb, ULONG_MAX, 0);
-> 	assert(bit =3D=3D 700);
+Hi Peter,
 
-This above test will result in "!node with bitmap !=3DNULL", and it goes to=
- the regular "if (bitmap)" path, which finds 700.
+On Wed, Dec 20, 2017 at 03:36:29PM +0000, Peter Maydell wrote:
 
-A better test would be
-...
-xb_set_bit(xb, 700);
-assert(xb_find_set(xb, ULONG_MAX, 800) =3D=3D ULONG_MAX);
-...
+> >>  #define UNAME_MINIMUM_RELEASE "3.8.0"
 
-The first try with the "if (bitmap)" path doesn't find a set bit, and the r=
-emaining tries will always result in "!node && !bitmap", which implies no s=
-et bit anymore and no need to try in this case.
+> > For aarch64_be, I think the minimum release should be 4.9.0
+> > (see kernel commit cfa88c79462d "arm64: Set UTS_MACHINE in the Makefile")
 
-So, I think we can change it to
+> Isn't the thing that defines what we set the minimum-release
+> to glibc, not the kernel? That is, the reason we lie to the
+> guest about the kernel version for some architectures is because
+> the glibc for those archs insists on a minimum kernel version
+> which the host may not have. Unless aarch64_be glibc insists
+> on kernel 4.9.0 there's no need to tell the guest that.
 
-If (!node && !bitmap)
-	return size;
+I can confirm that cross-compiled glibc runs fine with the current
+value. Also, a native compile of glibc inside an qemu-aarch64_be binfmt
+chroot configured without problem and currently churns along compiling.
 
+My Gentoo setup calls configure with --enable-kernel=3.2.0 and that says
+about this:
 
-Best,
-Wei
+checking installed Linux kernel header files... 3.2.0 or later
+configure: WARNING: minimum kernel version reset to 3.7.0
+checking for kernel header at least 3.7.0... ok
+
+So it seems your memory is right.
+-- 
+Bye,
+Michael
