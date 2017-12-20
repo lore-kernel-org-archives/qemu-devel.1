@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39415)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39346)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1eRbj2-0004k0-8V
-	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 05:35:50 -0500
+	(envelope-from <kwolf@redhat.com>) id 1eRbiz-0004fU-H7
+	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 05:35:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1eRbj0-0005BO-JU
-	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 05:35:48 -0500
+	(envelope-from <kwolf@redhat.com>) id 1eRbiu-00053E-9U
+	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 05:35:45 -0500
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Wed, 20 Dec 2017 11:34:02 +0100
-Message-Id: <20171220103412.13048-10-kwolf@redhat.com>
+Date: Wed, 20 Dec 2017 11:34:00 +0100
+Message-Id: <20171220103412.13048-8-kwolf@redhat.com>
 In-Reply-To: <20171220103412.13048-1-kwolf@redhat.com>
 References: <20171220103412.13048-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PATCH 09/19] block: Nested drain_end must still call
- callbacks
+Subject: [Qemu-devel] [PATCH 07/19] test-bdrv-drain: Test drain vs. block
+ jobs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,47 +23,157 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, famz@redhat.com, pbonzini@redhat.com, qemu-devel@nongnu.org
 
-bdrv_do_drained_begin() restricts the call of parent callbacks and
-aio_disable_external() to the outermost drain section, but the block
-driver callbacks are always called. bdrv_do_drained_end() must match
-this behaviour, otherwise nodes stay drained even if begin/end calls
-were balanced.
+Block jobs must be paused if any of the involved nodes are drained.
 
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- block/io.c | 12 +++++++-----
- 1 file changed, 7 insertions(+), 5 deletions(-)
+ tests/test-bdrv-drain.c | 121 ++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 121 insertions(+)
 
-diff --git a/block/io.c b/block/io.c
-index 74d2e5278e..6038a16c58 100644
---- a/block/io.c
-+++ b/block/io.c
-@@ -273,19 +273,21 @@ void bdrv_drained_begin(BlockDriverState *bs)
+diff --git a/tests/test-bdrv-drain.c b/tests/test-bdrv-drain.c
+index 2aa2b9aa43..019fe9074d 100644
+--- a/tests/test-bdrv-drain.c
++++ b/tests/test-bdrv-drain.c
+@@ -24,6 +24,7 @@
  
- void bdrv_drained_end(BlockDriverState *bs)
- {
-+    int old_quiesce_counter;
-+
-     if (qemu_in_coroutine()) {
-         bdrv_co_yield_to_drain(bs, false);
-         return;
-     }
-     assert(bs->quiesce_counter > 0);
--    if (atomic_fetch_dec(&bs->quiesce_counter) > 1) {
--        return;
--    }
-+    old_quiesce_counter = atomic_fetch_dec(&bs->quiesce_counter);
+ #include "qemu/osdep.h"
+ #include "block/block.h"
++#include "block/blockjob_int.h"
+ #include "sysemu/block-backend.h"
+ #include "qapi/error.h"
  
-     /* Re-enable things in child-to-parent order */
-     bdrv_drain_invoke(bs, false, false);
--    bdrv_parent_drained_end(bs);
--    aio_enable_external(bdrv_get_aio_context(bs));
-+    if (old_quiesce_counter == 1) {
-+        bdrv_parent_drained_end(bs);
-+        aio_enable_external(bdrv_get_aio_context(bs));
-+    }
+@@ -220,6 +221,123 @@ static void test_quiesce_drain(void)
+     test_quiesce_common(BDRV_DRAIN, false);
  }
  
- /*
++
++typedef struct TestBlockJob {
++    BlockJob common;
++    bool should_complete;
++} TestBlockJob;
++
++static void test_job_completed(BlockJob *job, void *opaque)
++{
++    block_job_completed(job, 0);
++}
++
++static void coroutine_fn test_job_start(void *opaque)
++{
++    TestBlockJob *s = opaque;
++
++    while (!s->should_complete) {
++        block_job_sleep_ns(&s->common, 100000);
++    }
++
++    block_job_defer_to_main_loop(&s->common, test_job_completed, NULL);
++}
++
++static void test_job_complete(BlockJob *job, Error **errp)
++{
++    TestBlockJob *s = container_of(job, TestBlockJob, common);
++    s->should_complete = true;
++}
++
++BlockJobDriver test_job_driver = {
++    .instance_size  = sizeof(TestBlockJob),
++    .start          = test_job_start,
++    .complete       = test_job_complete,
++};
++
++static void test_blockjob_common(enum drain_type drain_type)
++{
++    BlockBackend *blk_src, *blk_target;
++    BlockDriverState *src, *target;
++    BlockJob *job;
++    int ret;
++
++    src = bdrv_new_open_driver(&bdrv_test, "source", BDRV_O_RDWR,
++                               &error_abort);
++    blk_src = blk_new(BLK_PERM_ALL, BLK_PERM_ALL);
++    blk_insert_bs(blk_src, src, &error_abort);
++
++    target = bdrv_new_open_driver(&bdrv_test, "target", BDRV_O_RDWR,
++                                  &error_abort);
++    blk_target = blk_new(BLK_PERM_ALL, BLK_PERM_ALL);
++    blk_insert_bs(blk_target, target, &error_abort);
++
++    job = block_job_create("job0", &test_job_driver, src, 0, BLK_PERM_ALL, 0,
++                           0, NULL, NULL, &error_abort);
++    block_job_add_bdrv(job, "target", target, 0, BLK_PERM_ALL, &error_abort);
++    block_job_start(job);
++
++    g_assert_cmpint(job->pause_count, ==, 0);
++    g_assert_false(job->paused);
++    g_assert_false(job->busy); /* We're in block_job_sleep_ns() */
++
++    do_drain_begin(drain_type, src);
++
++    if (drain_type == BDRV_DRAIN_ALL) {
++        /* bdrv_drain_all() drains both src and target, and involves an
++         * additional block_job_pause_all() */
++        g_assert_cmpint(job->pause_count, ==, 3);
++    } else {
++        g_assert_cmpint(job->pause_count, ==, 1);
++    }
++    /* XXX We don't wait until the job is actually paused. Is this okay? */
++    /* g_assert_true(job->paused); */
++    g_assert_false(job->busy); /* The job is paused */
++
++    do_drain_end(drain_type, src);
++
++    g_assert_cmpint(job->pause_count, ==, 0);
++    g_assert_false(job->paused);
++    g_assert_false(job->busy); /* We're in block_job_sleep_ns() */
++
++    do_drain_begin(drain_type, target);
++
++    if (drain_type == BDRV_DRAIN_ALL) {
++        /* bdrv_drain_all() drains both src and target, and involves an
++         * additional block_job_pause_all() */
++        g_assert_cmpint(job->pause_count, ==, 3);
++    } else {
++        g_assert_cmpint(job->pause_count, ==, 1);
++    }
++    /* XXX We don't wait until the job is actually paused. Is this okay? */
++    /* g_assert_true(job->paused); */
++    g_assert_false(job->busy); /* The job is paused */
++
++    do_drain_end(drain_type, target);
++
++    g_assert_cmpint(job->pause_count, ==, 0);
++    g_assert_false(job->paused);
++    g_assert_false(job->busy); /* We're in block_job_sleep_ns() */
++
++    ret = block_job_complete_sync(job, &error_abort);
++    g_assert_cmpint(ret, ==, 0);
++
++    blk_unref(blk_src);
++    blk_unref(blk_target);
++    bdrv_unref(src);
++    bdrv_unref(target);
++}
++
++static void test_blockjob_drain_all(void)
++{
++    test_blockjob_common(BDRV_DRAIN_ALL);
++}
++
++static void test_blockjob_drain(void)
++{
++    test_blockjob_common(BDRV_DRAIN);
++}
++
+ int main(int argc, char **argv)
+ {
+     bdrv_init();
+@@ -233,5 +351,8 @@ int main(int argc, char **argv)
+     g_test_add_func("/bdrv-drain/quiesce/drain_all", test_quiesce_drain_all);
+     g_test_add_func("/bdrv-drain/quiesce/drain", test_quiesce_drain);
+ 
++    g_test_add_func("/bdrv-drain/blockjob/drain_all", test_blockjob_drain_all);
++    g_test_add_func("/bdrv-drain/blockjob/drain", test_blockjob_drain);
++
+     return g_test_run();
+ }
 -- 
 2.13.6
