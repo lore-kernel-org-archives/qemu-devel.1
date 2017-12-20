@@ -1,25 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56753)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57576)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <michael@rivendell.weiser.dinsnail.net>)
-	id 1eRlxm-0006nQ-Ij
-	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 16:31:43 -0500
+	(envelope-from <jbaron@akamai.com>) id 1eRlz4-0007s0-Is
+	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 16:33:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <michael@rivendell.weiser.dinsnail.net>)
-	id 1eRlxk-00082K-Vn
-	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 16:31:41 -0500
-Received: from heinz.dinsnail.net
-	([2a01:238:43b4:3200:9392:5dcc:2f0e:a960]:49868)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <michael@rivendell.weiser.dinsnail.net>)
-	id 1eRlxk-0007zT-Mm
-	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 16:31:40 -0500
-From: Michael Weiser <michael.weiser@gmx.de>
-Date: Wed, 20 Dec 2017 22:23:07 +0100
-Message-Id: <20171220212308.12614-7-michael.weiser@gmx.de>
-In-Reply-To: <20171220212308.12614-1-michael.weiser@gmx.de>
-References: <20171220212308.12614-1-michael.weiser@gmx.de>
-Subject: [Qemu-devel] [PATCH v3 6/7] linux-user: Separate binfmt arm CPU
- families
+	(envelope-from <jbaron@akamai.com>) id 1eRlz0-0001O6-6J
+	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 16:33:02 -0500
+Received: from mx0b-00190b01.pphosted.com ([2620:100:9005:57f::1]:38154)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jbaron@akamai.com>) id 1eRlyz-0001MM-WF
+	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 16:32:58 -0500
+References: <cover.1513278334.git.jbaron@akamai.com>
+	<12f0830fe220dc43671f6dbc1a5d81e0276c3a9e.1513278334.git.jbaron@akamai.com>
+	<20171220164809-mutt-send-email-mst@kernel.org>
+	<0f613ff4-8cc1-67ac-63bf-5a8c05d9cd79@akamai.com>
+	<20171220194848-mutt-send-email-mst@kernel.org>
+From: Jason Baron <jbaron@akamai.com>
+Message-ID: <adddd3e4-4e1a-d455-02cf-c58aef504abd@akamai.com>
+Date: Wed, 20 Dec 2017 16:32:52 -0500
+MIME-Version: 1.0
+In-Reply-To: <20171220194848-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH net-next 1/2] virtio_net: allow hypervisor
+ to indicate linkspeed and duplex setting
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,55 +32,147 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Michael Weiser <michael.weiser@gmx.de>, Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: qemu-devel@nongnu.org, linux-kernel@vger.kernel.org, jasowang@redhat.com
 
-Give big-endian arm and aarch64 CPUs their own family in
-qemu-binfmt-conf.sh to make sure we register qemu-user for binaries of
-the opposite endianness on arm and aarch64. Apart from the family
-assignments of the magic vales, qemu_get_family() needs to be able to
-distinguish the two and recognise aarch64{,_be} as well.
 
-Signed-off-by: Michael Weiser <michael.weiser@gmx.de>
----
- scripts/qemu-binfmt-conf.sh | 9 ++++++---
- 1 file changed, 6 insertions(+), 3 deletions(-)
 
-diff --git a/scripts/qemu-binfmt-conf.sh b/scripts/qemu-binfmt-conf.sh
-index d69953525c..597efdbe50 100755
---- a/scripts/qemu-binfmt-conf.sh
-+++ b/scripts/qemu-binfmt-conf.sh
-@@ -24,7 +24,7 @@ arm_family=arm
- 
- armeb_magic='\x7fELF\x01\x02\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02\x00\x28'
- armeb_mask='\xff\xff\xff\xff\xff\xff\xff\x00\xff\xff\xff\xff\xff\xff\xff\xff\xff\xfe\xff\xff'
--armeb_family=arm
-+armeb_family=armeb
- 
- sparc_magic='\x7fELF\x01\x02\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02\x00\x02'
- sparc_mask='\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xfe\xff\xff'
-@@ -94,7 +94,7 @@ aarch64_family=arm
- 
- aarch64_be_magic='\x7fELF\x02\x02\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02\x00\xb7'
- aarch64_be_mask='\xff\xff\xff\xff\xff\xff\xff\x00\xff\xff\xff\xff\xff\xff\xff\xff\xff\xfe\xff\xff'
--aarch64_be_family=arm
-+aarch64_be_family=armeb
- 
- hppa_magic='\x7f\x45\x4c\x46\x01\x02\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02\x00\x0f'
- hppa_mask='\xff\xff\xff\xff\xff\xff\xff\x00\xff\xff\xff\xff\xff\xff\xff\xff\xff\xfe\xff\xff'
-@@ -115,9 +115,12 @@ qemu_get_family() {
-     ppc64el|ppc64le)
-         echo "ppcle"
-         ;;
--    arm|armel|armhf|arm64|armv[4-9]*)
-+    arm|armel|armhf|arm64|armv[4-9]*l|aarch64)
-         echo "arm"
-         ;;
-+    armeb|armv[4-9]*b|aarch64_be)
-+        echo "armeb"
-+        ;;
-     sparc*)
-         echo "sparc"
-         ;;
--- 
-2.15.1
+On 12/20/2017 12:52 PM, Michael S. Tsirkin wrote:
+> On Wed, Dec 20, 2017 at 12:07:55PM -0500, Jason Baron wrote:
+>>
+>>
+>> On 12/20/2017 09:57 AM, Michael S. Tsirkin wrote:
+>>> On Thu, Dec 14, 2017 at 02:33:53PM -0500, Jason Baron wrote:
+>>>> If the hypervisor exports the link and duplex speed, let's use that instead
+>>>> of the default unknown speed. The user can still overwrite it later if
+>>>> desired via: 'ethtool -s'. This allows the hypervisor to set the default
+>>>> link speed and duplex setting without requiring guest changes and is
+>>>> consistent with how other network drivers operate. We ran into some cases
+>>>> where the guest software was failing due to a lack of linkspeed and had to
+>>>> fall back to a fully emulated network device that does export a linkspeed
+>>>> and duplex setting.
+>>>>
+>>>> Implement by adding a new VIRTIO_NET_F_SPEED_DUPLEX feature flag, to
+>>>> indicate that a linkspeed and duplex setting are present.
+>>>>
+>>>> Signed-off-by: Jason Baron <jbaron@akamai.com>
+>>>> Cc: "Michael S. Tsirkin" <mst@redhat.com>
+>>>> Cc: Jason Wang <jasowang@redhat.com>
+>>>> ---
+>>>>  drivers/net/virtio_net.c        | 11 ++++++++++-
+>>>>  include/uapi/linux/virtio_net.h |  4 ++++
+>>>>  2 files changed, 14 insertions(+), 1 deletion(-)
+>>>>
+>>>> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
+>>>> index 6fb7b65..e7a2ad6 100644
+>>>> --- a/drivers/net/virtio_net.c
+>>>> +++ b/drivers/net/virtio_net.c
+>>>> @@ -2671,6 +2671,14 @@ static int virtnet_probe(struct virtio_device *vdev)
+>>>>  	netif_set_real_num_rx_queues(dev, vi->curr_queue_pairs);
+>>>>  
+>>>>  	virtnet_init_settings(dev);
+>>>> +	if (virtio_has_feature(vdev, VIRTIO_NET_F_SPEED_DUPLEX)) {
+>>>> +		vi->speed = virtio_cread32(vdev,
+>>>> +					offsetof(struct virtio_net_config,
+>>>> +					speed));
+>>>> +		vi->duplex = virtio_cread8(vdev,
+>>>> +					offsetof(struct virtio_net_config,
+>>>> +					duplex));
+>>>> +	}
+>>>>  
+>>>>  	err = register_netdev(dev);
+>>>>  	if (err) {
+>>>
+>>> How are we going to validate speed values? Imagine host
+>>> using a new 1000Gbit device and exposing that to guest.
+>>>
+>>> Need to think what do we want guest to do.
+>>> I think that ideally we'd say it's a 100Gbit device.
+>>>
+>>> For duplex, force to one of 3 valid values?
+>>
+>> So I didn't provide validation here b/c as you point out its not clear
+>> how we would validate it. I don't believe h/w drivers do any validation
+>> here either.
+> 
+> Right but hardware tends not to change as quickly as the hypervisors :)
+> For virtual device drivers, we need some way to handle forward
+> compatibility since hypervisors do change quite quickly.
+> 
+>> They simply propagate the value from the the underlying
+>> device. So that seemed reasonable to me.
+>>
+>> Why do you divide by 10 in the above example? Would you propose always
+>> dividing what the device reports by 10?
+> 
+> No, that was just an example. I was just suggesting rounding down to
+> next valid known speed.
+
+I see, but virtio currently uses ethtool_validate_speed() which allows
+arbitrary values up to INT_MAX in units of Mbps. That seems to leave
+plenty of headroom. So I could use that function for validation as well
+as well as ethtool_validate_duplex() and if they fail fall back to
+SPEED_UNKNOWN and DUPLEX_UNKNOWN?
+
+> 
+>>>
+>>>
+>>>> @@ -2796,7 +2804,8 @@ static struct virtio_device_id id_table[] = {
+>>>>  	VIRTIO_NET_F_CTRL_RX, VIRTIO_NET_F_CTRL_VLAN, \
+>>>>  	VIRTIO_NET_F_GUEST_ANNOUNCE, VIRTIO_NET_F_MQ, \
+>>>>  	VIRTIO_NET_F_CTRL_MAC_ADDR, \
+>>>> -	VIRTIO_NET_F_MTU, VIRTIO_NET_F_CTRL_GUEST_OFFLOADS
+>>>> +	VIRTIO_NET_F_MTU, VIRTIO_NET_F_CTRL_GUEST_OFFLOADS, \
+>>>> +	VIRTIO_NET_F_SPEED_DUPLEX
+>>>>  
+>>>>  static unsigned int features[] = {
+>>>>  	VIRTNET_FEATURES,
+>>>> diff --git a/include/uapi/linux/virtio_net.h b/include/uapi/linux/virtio_net.h
+>>>> index fc353b5..acfcf68 100644
+>>>> --- a/include/uapi/linux/virtio_net.h
+>>>> +++ b/include/uapi/linux/virtio_net.h
+>>>> @@ -36,6 +36,7 @@
+>>>>  #define VIRTIO_NET_F_GUEST_CSUM	1	/* Guest handles pkts w/ partial csum */
+>>>>  #define VIRTIO_NET_F_CTRL_GUEST_OFFLOADS 2 /* Dynamic offload configuration. */
+>>>>  #define VIRTIO_NET_F_MTU	3	/* Initial MTU advice */
+>>>> +#define VIRTIO_NET_F_SPEED_DUPLEX 4	/* Host set linkspeed and duplex */
+>>>>  #define VIRTIO_NET_F_MAC	5	/* Host has given MAC address. */
+>>>>  #define VIRTIO_NET_F_GUEST_TSO4	7	/* Guest can handle TSOv4 in. */
+>>>>  #define VIRTIO_NET_F_GUEST_TSO6	8	/* Guest can handle TSOv6 in. */
+>>>
+>>> I think I'd prefer a high feature bit - low bits are ones that can
+>>> be backported to legacy interfaces, so I think we should hang on to
+>>> these for fixing issues that break communication completely (like the
+>>> mtu).
+>>>
+>>
+>> So I went with a low bit here b/c in the virtio spec 'section 2.2
+>> Feature Bits':
+>>
+>>
+>>  0 to 23
+>>     Feature bits for the specific device type
+>> 24 to 32
+>>     Feature bits reserved for extensions to the queue and feature
+>> negotiation mechanisms
+>> 33 and above
+>>     Feature bits reserved for future extensions.
+>>
+>> So virtio_net already goes up to 23 (but omits 4 and 6), and I wasn't
+>> sure if it was reasonable to use the higher bits. It looks like the code
+>> would handle the higher bits ok, so I can try that - bit 33 perhaps ?
+>>
+>> Thanks,
+>>
+>> -Jason
+> 
+> 
+> Transports started from bit 24 and are growing up.
+> So I would say devices should start from bit 63 and grow down.
+>
+
+Ok, I will use 63.
+
+Thanks,
+
+-Jason
