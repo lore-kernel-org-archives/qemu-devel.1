@@ -1,38 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48665)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50514)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <benh@au1.ibm.com>) id 1eRmvN-0000tZ-Ge
-	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 17:33:18 -0500
+	(envelope-from <eblake@redhat.com>) id 1eRmxq-00023d-3z
+	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 17:35:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <benh@au1.ibm.com>) id 1eRmvJ-0001mQ-G0
-	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 17:33:17 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:39584
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <benh@au1.ibm.com>) id 1eRmvJ-0001lb-AI
-	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 17:33:13 -0500
-Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	vBKMTLHs006064
-	for <qemu-devel@nongnu.org>; Wed, 20 Dec 2017 17:33:09 -0500
-Received: from e06smtp12.uk.ibm.com (e06smtp12.uk.ibm.com [195.75.94.108])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2eyw1xhu5m-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 20 Dec 2017 17:33:09 -0500
-Received: from localhost
-	by e06smtp12.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <benh@au1.ibm.com>;
-	Wed, 20 Dec 2017 22:33:07 -0000
-From: Benjamin Herrenschmidt <benh@au1.ibm.com>
-Reply-To: benh@au1.ibm.com
-Date: Thu, 21 Dec 2017 09:32:59 +1100
-In-Reply-To: <20171218092024.21645-1-david@gibson.dropbear.id.au>
-References: <20171218092024.21645-1-david@gibson.dropbear.id.au>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+	(envelope-from <eblake@redhat.com>) id 1eRmxm-0003sg-0M
+	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 17:35:50 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:34390)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1eRmxl-0003rE-QV
+	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 17:35:45 -0500
+References: <20171218132439.2772-1-miika9764@gmail.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <7579578e-2e0f-a6bb-f5be-ae7dfbafd6c4@redhat.com>
+Date: Wed, 20 Dec 2017 16:35:43 -0600
+MIME-Version: 1.0
+In-Reply-To: <20171218132439.2772-1-miika9764@gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Message-Id: <1513809179.2743.20.camel@au1.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH 0/6] spapr: Add optional capabilities
+Subject: Re: [Qemu-devel] [PATCH 1/3] input: add missing JIS keys to virtio
+ input
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -41,55 +28,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>, surajjs@au1.ibm.com, groug@kaod.org, lvivier@redhat.com
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, abologna@redhat.com, mdroth@linux.vnet.ibm.com
+To: Miika S <miika9764@gmail.com>, qemu-devel@nongnu.org
 
-On Mon, 2017-12-18 at 20:20 +1100, David Gibson wrote:
-> This series is a first draft to add the notion of optional
-> capabilities to the "pseries" machine type.  A default set of
-> capabilities is selected based on the machine type version and
-> selected cpu model, but this can be overridden with machine
-> parameters.
-> 
-> The purpose of this is to get rid of a number of places where we
-> implicitly decide what features to advertise to the guest based on
-> capabilities of the host.  This is bad, because it means it's
-> difficult to be certain if machines started at different ends of a
-> migration really match from the guest's point of view.
-> 
-> By giving the user explicit control of these optional features, then
-> validating that the chosen ones can be supplied on the host we make
-> behaviour more predictable.
-> 
-> The more specific motivation for this is that POWER9 has bugs in its
-> hardware transactional memory (HTM) implementation making it unsafe to
-> migrate POWER8 guests to POWER9 if they use HTM
+On 12/18/2017 07:24 AM, Miika S wrote:
+> Signed-off-by: Miika S <miika9764@gmail.com>
+> ---
+>   hw/input/virtio-input-hid.c | 7 +++++++
+>   qapi/ui.json                | 2 +-
+>   ui/keycodemapdb             | 2 +-
+>   3 files changed, 9 insertions(+), 2 deletions(-)
 
-It might be worthwhile mentioning that we do plan to support TM and
-migration from P8 for KVM guests at some point. Working on it ... there
-are some SW workarounds involved in KVM to make it possible.
+When sending a multi-patch series, please remember to include the 0/3 
+cover letter.  'git config format.coverletter auto' can make this task 
+easier to remember.
 
-> Changes since RFC:
->  - Two preliminary patches not really related split off and already
->    merged.
->  - Assorted minor fixes based on review notes
->  - Change defaults to disable HTM on pseries-2.12 machine type
-> 
-> David Gibson (6):
->   spapr: Capabilities infrastructure
->   spapr: Treat Hardware Transactional Memory (HTM) as an optional
->     capability
->   spapr: Validate capabilities on migration
->   target/ppc: Clean up probing of VMX, VSX and DFP availability on KVM
->   spapr: Handle VMX/VSX presence as an spapr capability flag
->   spapr: Handle Decimal Floating Point (DFP) as an optional capability
-> 
->  hw/ppc/Makefile.objs   |   2 +-
->  hw/ppc/spapr.c         |  47 +++++--
->  hw/ppc/spapr_caps.c    | 342 +++++++++++++++++++++++++++++++++++++++++++++++++
->  include/hw/ppc/spapr.h |  46 +++++++
->  target/ppc/kvm.c       |  27 +---
->  target/ppc/kvm_ppc.h   |   2 -
->  6 files changed, 429 insertions(+), 37 deletions(-)
->  create mode 100644 hw/ppc/spapr_caps.c
-> 
+
+>   
+>   static const unsigned int keymap_button[INPUT_BUTTON__MAX] = {
+> diff --git a/qapi/ui.json b/qapi/ui.json
+> index 07b468f625..da4be505ac 100644
+> --- a/qapi/ui.json
+> +++ b/qapi/ui.json
+> @@ -775,7 +775,7 @@
+>               'left', 'up', 'down', 'right', 'insert', 'delete', 'stop', 'again',
+>               'props', 'undo', 'front', 'copy', 'open', 'paste', 'find', 'cut',
+>               'lf', 'help', 'meta_l', 'meta_r', 'compose', 'pause',
+> -            'ro', 'hiragana', 'henkan', 'yen',
+> +            'ro', 'hiragana', 'muhenkan', 'henkan', 'katakanahiragana', 'yen',
+>               'kp_comma', 'kp_equals', 'power', 'sleep', 'wake',
+>               'audionext', 'audioprev', 'audiostop', 'audioplay', 'audiomute',
+>               'volumeup', 'volumedown', 'mediaselect',
+
+Missing documentation that calls out which enum values were added in 2.12.
+
+> diff --git a/ui/keycodemapdb b/ui/keycodemapdb
+> index 10739aa260..05dad417e9 160000
+> --- a/ui/keycodemapdb
+> +++ b/ui/keycodemapdb
+> @@ -1 +1 @@
+> -Subproject commit 10739aa26051a5d49d88132604539d3ed085e72e
+> +Subproject commit 05dad417e9d0b37ee1fba33056d91a6b734b3357
+
+Generally, the commit message body should call out that a submodule 
+change alongside other changes is intentional.
+
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
