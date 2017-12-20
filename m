@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52757)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54102)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jbaron@akamai.com>) id 1eRhqf-0001QF-6A
-	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 12:08:06 -0500
+	(envelope-from <willy@infradead.org>) id 1eRhtC-0002PB-Lp
+	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 12:10:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jbaron@akamai.com>) id 1eRhqa-0001Va-Mp
-	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 12:08:05 -0500
-Received: from mx0b-00190b01.pphosted.com ([2620:100:9005:57f::1]:52922)
+	(envelope-from <willy@infradead.org>) id 1eRht8-00031w-T8
+	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 12:10:42 -0500
+Received: from bombadil.infradead.org ([65.50.211.133]:45339)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jbaron@akamai.com>) id 1eRhqa-0001Ux-EZ
-	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 12:08:00 -0500
-References: <cover.1513278334.git.jbaron@akamai.com>
-	<12f0830fe220dc43671f6dbc1a5d81e0276c3a9e.1513278334.git.jbaron@akamai.com>
-	<20171220164809-mutt-send-email-mst@kernel.org>
-From: Jason Baron <jbaron@akamai.com>
-Message-ID: <0f613ff4-8cc1-67ac-63bf-5a8c05d9cd79@akamai.com>
-Date: Wed, 20 Dec 2017 12:07:55 -0500
+	(Exim 4.71) (envelope-from <willy@infradead.org>) id 1eRht8-0002tM-8W
+	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 12:10:38 -0500
+Date: Wed, 20 Dec 2017 09:10:19 -0800
+From: Matthew Wilcox <willy@infradead.org>
+Message-ID: <20171220171019.GA12236@bombadil.infradead.org>
+References: <1513685879-21823-1-git-send-email-wei.w.wang@intel.com>
+	<201712192305.AAE21882.MtQHJOFFSFVOLO@I-love.SAKURA.ne.jp>
+	<5A3A3CBC.4030202@intel.com>
+	<20171220122547.GA1654@bombadil.infradead.org>
+	<286AC319A985734F985F78AFA26841F73938CC3E@shsmsx102.ccr.corp.intel.com>
 MIME-Version: 1.0
-In-Reply-To: <20171220164809-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH net-next 1/2] virtio_net: allow hypervisor
- to indicate linkspeed and duplex setting
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <286AC319A985734F985F78AFA26841F73938CC3E@shsmsx102.ccr.corp.intel.com>
+Subject: Re: [Qemu-devel] [PATCH v20 0/7] Virtio-balloon Enhancement
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,131 +30,251 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: qemu-devel@nongnu.org, linux-kernel@vger.kernel.org, jasowang@redhat.com
+To: "Wang, Wei W" <wei.w.wang@intel.com>
+Cc: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>, "virtio-dev@lists.oasis-open.org" <virtio-dev@lists.oasis-open.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "virtualization@lists.linux-foundation.org" <virtualization@lists.linux-foundation.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "linux-mm@kvack.org" <linux-mm@kvack.org>, "mst@redhat.com" <mst@redhat.com>, "mhocko@kernel.org" <mhocko@kernel.org>, "akpm@linux-foundation.org" <akpm@linux-foundation.org>, "mawilcox@microsoft.com" <mawilcox@microsoft.com>, "david@redhat.com" <david@redhat.com>, "cornelia.huck@de.ibm.com" <cornelia.huck@de.ibm.com>, "mgorman@techsingularity.net" <mgorman@techsingularity.net>, "aarcange@redhat.com" <aarcange@redhat.com>, "amit.shah@redhat.com" <amit.shah@redhat.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "liliang.opensource@gmail.com" <liliang.opensource@gmail.com>, "yang.zhang.wz@gmail.com" <yang.zhang.wz@gmail.com>, "quan.xu0@gmail.com" <quan.xu0@gmail.com>, "nilal@redhat.com" <nilal@redhat.com>, "riel@redhat.com" <riel@redhat.com>
 
-
-
-On 12/20/2017 09:57 AM, Michael S. Tsirkin wrote:
-> On Thu, Dec 14, 2017 at 02:33:53PM -0500, Jason Baron wrote:
->> If the hypervisor exports the link and duplex speed, let's use that instead
->> of the default unknown speed. The user can still overwrite it later if
->> desired via: 'ethtool -s'. This allows the hypervisor to set the default
->> link speed and duplex setting without requiring guest changes and is
->> consistent with how other network drivers operate. We ran into some cases
->> where the guest software was failing due to a lack of linkspeed and had to
->> fall back to a fully emulated network device that does export a linkspeed
->> and duplex setting.
->>
->> Implement by adding a new VIRTIO_NET_F_SPEED_DUPLEX feature flag, to
->> indicate that a linkspeed and duplex setting are present.
->>
->> Signed-off-by: Jason Baron <jbaron@akamai.com>
->> Cc: "Michael S. Tsirkin" <mst@redhat.com>
->> Cc: Jason Wang <jasowang@redhat.com>
->> ---
->>  drivers/net/virtio_net.c        | 11 ++++++++++-
->>  include/uapi/linux/virtio_net.h |  4 ++++
->>  2 files changed, 14 insertions(+), 1 deletion(-)
->>
->> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
->> index 6fb7b65..e7a2ad6 100644
->> --- a/drivers/net/virtio_net.c
->> +++ b/drivers/net/virtio_net.c
->> @@ -2671,6 +2671,14 @@ static int virtnet_probe(struct virtio_device *vdev)
->>  	netif_set_real_num_rx_queues(dev, vi->curr_queue_pairs);
->>  
->>  	virtnet_init_settings(dev);
->> +	if (virtio_has_feature(vdev, VIRTIO_NET_F_SPEED_DUPLEX)) {
->> +		vi->speed = virtio_cread32(vdev,
->> +					offsetof(struct virtio_net_config,
->> +					speed));
->> +		vi->duplex = virtio_cread8(vdev,
->> +					offsetof(struct virtio_net_config,
->> +					duplex));
->> +	}
->>  
->>  	err = register_netdev(dev);
->>  	if (err) {
+On Wed, Dec 20, 2017 at 04:13:16PM +0000, Wang, Wei W wrote:
+> On Wednesday, December 20, 2017 8:26 PM, Matthew Wilcox wrote:
+> > 	unsigned long bit;
+> > 	xb_preload(GFP_KERNEL);
+> > 	xb_set_bit(xb, 700);
+> > 	xb_preload_end();
+> > 	bit = xb_find_set(xb, ULONG_MAX, 0);
+> > 	assert(bit == 700);
 > 
-> How are we going to validate speed values? Imagine host
-> using a new 1000Gbit device and exposing that to guest.
+> This above test will result in "!node with bitmap !=NULL", and it goes to the regular "if (bitmap)" path, which finds 700.
 > 
-> Need to think what do we want guest to do.
-> I think that ideally we'd say it's a 100Gbit device.
-> 
-> For duplex, force to one of 3 valid values?
+> A better test would be
+> ...
+> xb_set_bit(xb, 700);
+> assert(xb_find_set(xb, ULONG_MAX, 800) == ULONG_MAX);
+> ...
 
-So I didn't provide validation here b/c as you point out its not clear
-how we would validate it. I don't believe h/w drivers do any validation
-here either. They simply propagate the value from the the underlying
-device. So that seemed reasonable to me.
+I decided to write a test case to show you what I meant, then I discovered
+the test suite didn't build, then the test I wrote took forever to run, so
+I rewrote xb_find_set() using the radix tree iterators.  So I have no idea
+what bugs may be in your implementation, but at least this function passes
+the current test suite.  Of course, there may be gaps in the test suite.
+And since I changed the API to not have the ambiguous return value, I
+also changed the test suite, and maybe I introduced a bug.
 
-Why do you divide by 10 in the above example? Would you propose always
-dividing what the device reports by 10?
-
-> 
-> 
->> @@ -2796,7 +2804,8 @@ static struct virtio_device_id id_table[] = {
->>  	VIRTIO_NET_F_CTRL_RX, VIRTIO_NET_F_CTRL_VLAN, \
->>  	VIRTIO_NET_F_GUEST_ANNOUNCE, VIRTIO_NET_F_MQ, \
->>  	VIRTIO_NET_F_CTRL_MAC_ADDR, \
->> -	VIRTIO_NET_F_MTU, VIRTIO_NET_F_CTRL_GUEST_OFFLOADS
->> +	VIRTIO_NET_F_MTU, VIRTIO_NET_F_CTRL_GUEST_OFFLOADS, \
->> +	VIRTIO_NET_F_SPEED_DUPLEX
->>  
->>  static unsigned int features[] = {
->>  	VIRTNET_FEATURES,
->> diff --git a/include/uapi/linux/virtio_net.h b/include/uapi/linux/virtio_net.h
->> index fc353b5..acfcf68 100644
->> --- a/include/uapi/linux/virtio_net.h
->> +++ b/include/uapi/linux/virtio_net.h
->> @@ -36,6 +36,7 @@
->>  #define VIRTIO_NET_F_GUEST_CSUM	1	/* Guest handles pkts w/ partial csum */
->>  #define VIRTIO_NET_F_CTRL_GUEST_OFFLOADS 2 /* Dynamic offload configuration. */
->>  #define VIRTIO_NET_F_MTU	3	/* Initial MTU advice */
->> +#define VIRTIO_NET_F_SPEED_DUPLEX 4	/* Host set linkspeed and duplex */
->>  #define VIRTIO_NET_F_MAC	5	/* Host has given MAC address. */
->>  #define VIRTIO_NET_F_GUEST_TSO4	7	/* Guest can handle TSOv4 in. */
->>  #define VIRTIO_NET_F_GUEST_TSO6	8	/* Guest can handle TSOv6 in. */
-> 
-> I think I'd prefer a high feature bit - low bits are ones that can
-> be backported to legacy interfaces, so I think we should hang on to
-> these for fixing issues that break communication completely (like the
-> mtu).
-> 
-
-So I went with a low bit here b/c in the virtio spec 'section 2.2
-Feature Bits':
-
-
- 0 to 23
-    Feature bits for the specific device type
-24 to 32
-    Feature bits reserved for extensions to the queue and feature
-negotiation mechanisms
-33 and above
-    Feature bits reserved for future extensions.
-
-So virtio_net already goes up to 23 (but omits 4 and 6), and I wasn't
-sure if it was reasonable to use the higher bits. It looks like the code
-would handle the higher bits ok, so I can try that - bit 33 perhaps ?
-
-Thanks,
-
--Jason
-
-
-> 
->> @@ -76,6 +77,9 @@ struct virtio_net_config {
->>  	__u16 max_virtqueue_pairs;
->>  	/* Default maximum transmit unit advice */
->>  	__u16 mtu;
->> +	/* Host exported linkspeed and duplex */
->> +	__u32 speed;
->> +	__u8 duplex;
->>  } __attribute__((packed));
->>  
->>  /*
->> -- 
->> 2.6.1
+diff --git a/include/linux/xbitmap.h b/include/linux/xbitmap.h
+index ede1029b8a27..96e7e3560a0e 100644
+--- a/include/linux/xbitmap.h
++++ b/include/linux/xbitmap.h
+@@ -37,8 +37,7 @@ bool xb_test_bit(const struct xb *xb, unsigned long bit);
+ void xb_clear_bit(struct xb *xb, unsigned long bit);
+ void xb_clear_bit_range(struct xb *xb, unsigned long start,
+ 			unsigned long nbits);
+-unsigned long xb_find_set(struct xb *xb, unsigned long size,
+-			  unsigned long offset);
++bool xb_find_set(struct xb *xb, unsigned long max, unsigned long *bit);
+ unsigned long xb_find_zero(struct xb *xb, unsigned long size,
+ 			   unsigned long offset);
+ 
+diff --git a/lib/xbitmap.c b/lib/xbitmap.c
+index 0bd3027b082d..58c26c8dd595 100644
+--- a/lib/xbitmap.c
++++ b/lib/xbitmap.c
+@@ -150,48 +150,39 @@ EXPORT_SYMBOL(xb_test_bit);
+ /**
+  * xb_find_set - find the next set bit in a range of bits
+  * @xb: the xbitmap to search from
+- * @offset: the offset in the range to start searching
+- * @size: the size of the range
++ * @max: the maximum position to search to
++ * @bit: the first bit to examine, and on exit, the found bit
+  *
+- * Returns: the found bit or, @size if no set bit is found.
++ * Returns: %true if a set bit was found.  @bit will be updated.
+  */
+-unsigned long xb_find_set(struct xb *xb, unsigned long size,
+-			  unsigned long offset)
++bool xb_find_set(struct xb *xb, unsigned long max, unsigned long *bit)
+ {
+-	struct radix_tree_root *root = &xb->xbrt;
+-	struct radix_tree_node *node;
++	struct radix_tree_iter iter;
+ 	void __rcu **slot;
+ 	struct ida_bitmap *bitmap;
+-	unsigned long index = offset / IDA_BITMAP_BITS;
+-	unsigned long index_end = size / IDA_BITMAP_BITS;
+-	unsigned long bit = offset % IDA_BITMAP_BITS;
+-
+-	if (unlikely(offset >= size))
+-		return size;
+-
+-	while (index <= index_end) {
+-		unsigned long ret;
+-		unsigned int nbits = size - index * IDA_BITMAP_BITS;
+-
+-		bitmap = __radix_tree_lookup(root, index, &node, &slot);
+-		if (!node) {
+-			index = (index | RADIX_TREE_MAP_MASK) + 1;
+-			continue;
+-		}
+-
++	unsigned long index = *bit / IDA_BITMAP_BITS;
++	unsigned int first = *bit % IDA_BITMAP_BITS;
++	unsigned long index_end = max / IDA_BITMAP_BITS;
++
++	radix_tree_for_each_slot(slot, &xb->xbrt, &iter, index) {
++		if (iter.index > index_end)
++			break;
++		bitmap = radix_tree_deref_slot(slot);
+ 		if (bitmap) {
+-			if (nbits > IDA_BITMAP_BITS)
+-				nbits = IDA_BITMAP_BITS;
+-
+-			ret = find_next_bit(bitmap->bitmap, nbits, bit);
+-			if (ret != nbits)
+-				return ret + index * IDA_BITMAP_BITS;
++			unsigned int nbits = IDA_BITMAP_BITS;
++			if (iter.index == index_end)
++				nbits = max % IDA_BITMAP_BITS + 1;
++
++			first = find_next_bit(bitmap->bitmap, nbits, first);
++			if (first != nbits) {
++				*bit = first + iter.index * IDA_BITMAP_BITS;
++				return true;
++			}
+ 		}
+-		bit = 0;
+-		index++;
++		first = 0;
+ 	}
+ 
+-	return size;
++	return false;
+ }
+ EXPORT_SYMBOL(xb_find_set);
+ 
+@@ -246,19 +237,30 @@ static DEFINE_XB(xb1);
+ 
+ void xbitmap_check_bit(unsigned long bit)
+ {
++	unsigned long nbit = 0;
++
+ 	xb_preload(GFP_KERNEL);
+ 	assert(!xb_test_bit(&xb1, bit));
+ 	assert(xb_set_bit(&xb1, bit) == 0);
+ 	assert(xb_test_bit(&xb1, bit));
+-	assert(xb_clear_bit(&xb1, bit) == 0);
++	assert(xb_find_set(&xb1, ULONG_MAX, &nbit) == true);
++	assert(nbit == bit);
++	assert(xb_find_set(&xb1, ULONG_MAX, &nbit) == true);
++	assert(nbit == bit);
++	nbit++;
++	assert(xb_find_set(&xb1, ULONG_MAX, &nbit) == false);
++	assert(nbit == bit + 1);
++	xb_clear_bit(&xb1, bit);
+ 	assert(xb_empty(&xb1));
+-	assert(xb_clear_bit(&xb1, bit) == 0);
++	xb_clear_bit(&xb1, bit);
+ 	assert(xb_empty(&xb1));
+ 	xb_preload_end();
+ }
+ 
+ static void xbitmap_check_bit_range(void)
+ {
++	unsigned long nbit;
++
+ 	/*
+ 	 * Regular tests
+ 	 * set bit 2000, 2001, 2040
+@@ -273,14 +275,23 @@ static void xbitmap_check_bit_range(void)
+ 	assert(!xb_set_bit(&xb1, 2000));
+ 	assert(!xb_set_bit(&xb1, 2001));
+ 	assert(!xb_set_bit(&xb1, 2040));
+-	assert(xb_find_set(&xb1, 2048, 0) == 2000);
+-	assert(xb_find_set(&xb1, 2002, 2000) == 2000);
+-	assert(xb_find_set(&xb1, 2041, 2002) == 2040);
+-	assert(xb_find_set(&xb1, 2040, 2002) == 2040);
++	nbit = 0;
++	assert(xb_find_set(&xb1, 2048, &nbit) == true);
++	assert(nbit == 2000);
++	assert(xb_find_set(&xb1, 2002, &nbit) == true);
++	assert(nbit == 2000);
++	nbit = 2002;
++	assert(xb_find_set(&xb1, 2041, &nbit) == true);
++	assert(nbit == 2040);
++	nbit = 2002;
++	assert(xb_find_set(&xb1, 2040, &nbit) == true);
++	assert(nbit == 2040);
+ 	assert(xb_find_zero(&xb1, 2048, 2000) == 2002);
+ 	assert(xb_find_zero(&xb1, 2060, 2048) == 2048);
+ 	xb_clear_bit_range(&xb1, 0, 2048);
+-	assert(xb_find_set(&xb1, 2048, 0) == 2048);
++	nbit = 0;
++	assert(xb_find_set(&xb1, 2048, &nbit) == false);
++	assert(nbit == 0);
+ 	xb_preload_end();
+ 
+ 	/*
+@@ -295,15 +306,22 @@ static void xbitmap_check_bit_range(void)
+ 	xb_preload_end();
+ 	xb_preload(GFP_KERNEL);
+ 	assert(!xb_set_bit(&xb1, ULONG_MAX - 4));
+-	assert(xb_find_set(&xb1, ULONG_MAX, ULONG_MAX - 4) == ULONG_MAX - 4);
+-	assert(xb_find_set(&xb1, ULONG_MAX + 4, ULONG_MAX - 3) ==
+-	       ULONG_MAX + 4);
++	nbit = ULONG_MAX - 4;
++	assert(xb_find_set(&xb1, ULONG_MAX, &nbit) == true);
++	assert(nbit == ULONG_MAX - 4);
++	nbit++;
++	assert(xb_find_set(&xb1, ULONG_MAX + 4, &nbit) == false);
++	assert(nbit == ULONG_MAX - 3);
+ 	assert(xb_find_zero(&xb1, ULONG_MAX + 4, ULONG_MAX - 4) ==
+ 	       ULONG_MAX + 4);
+ 	xb_clear_bit_range(&xb1, ULONG_MAX - 4, 4);
+-	assert(xb_find_set(&xb1, ULONG_MAX, ULONG_MAX - 10) == ULONG_MAX);
++	nbit = ULONG_MAX - 10;
++	assert(xb_find_set(&xb1, ULONG_MAX, &nbit) == false);
++	assert(nbit == ULONG_MAX - 10);
+ 	xb_clear_bit_range(&xb1, 0, 2);
+-	assert(xb_find_set(&xb1, 2, 0) == 2);
++	nbit = 0;
++	assert(xb_find_set(&xb1, 2, &nbit) == false);
++	assert(nbit == 0);
+ 	xb_preload_end();
+ }
+ 
+@@ -313,6 +331,10 @@ void xbitmap_checks(void)
+ 	xbitmap_check_bit(0);
+ 	xbitmap_check_bit(30);
+ 	xbitmap_check_bit(31);
++	xbitmap_check_bit(62);
++	xbitmap_check_bit(63);
++	xbitmap_check_bit(64);
++	xbitmap_check_bit(700);
+ 	xbitmap_check_bit(1023);
+ 	xbitmap_check_bit(1024);
+ 	xbitmap_check_bit(1025);
+diff --git a/tools/testing/radix-tree/Makefile b/tools/testing/radix-tree/Makefile
+index 34ece7883629..adf36e34dd77 100644
+--- a/tools/testing/radix-tree/Makefile
++++ b/tools/testing/radix-tree/Makefile
+@@ -1,9 +1,9 @@
+ # SPDX-License-Identifier: GPL-2.0
+ 
+ CFLAGS += -I. -I../../include -g -O2 -Wall -D_LGPL_SOURCE -fsanitize=address
+-LDFLAGS += -fsanitize=address
+-LDLIBS+= -lpthread -lurcu
+-TARGETS = main idr-test multiorder
++LDFLAGS += -fsanitize=address $(LDLIBS)
++LDLIBS := -lpthread -lurcu
++TARGETS = main idr-test multiorder xbitmap
+ CORE_OFILES := radix-tree.o idr.o linux.o test.o find_bit.o
+ OFILES = main.o $(CORE_OFILES) regression1.o regression2.o regression3.o \
+ 	 tag_check.o multiorder.o idr-test.o iteration_check.o benchmark.o \
+diff --git a/tools/testing/radix-tree/linux/kernel.h b/tools/testing/radix-tree/linux/kernel.h
+index c3bc3f364f68..426f32f28547 100644
+--- a/tools/testing/radix-tree/linux/kernel.h
++++ b/tools/testing/radix-tree/linux/kernel.h
+@@ -17,6 +17,4 @@
+ #define pr_debug printk
+ #define pr_cont printk
+ 
+-#define ARRAY_SIZE(arr) (sizeof(arr) / sizeof((arr)[0]))
+-
+ #endif /* _KERNEL_H */
