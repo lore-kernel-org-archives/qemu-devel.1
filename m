@@ -1,25 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43175)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45484)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1eRmIC-0001zO-3o
-	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 16:52:49 -0500
+	(envelope-from <paolo.bonzini@gmail.com>) id 1eRmMD-0003Ig-9w
+	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 16:56:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1eRmI8-0000ja-6A
-	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 16:52:48 -0500
-Resent-Message-Id: <E1eRmI8-0000ja-6A@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21483)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1eRmI7-0000if-SW
-	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 16:52:44 -0500
-In-Reply-To: <20171220212308.12614-1-michael.weiser@gmx.de>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <151380673117.93.8901897283036873944@5adcb62bf0d6>
+	(envelope-from <paolo.bonzini@gmail.com>) id 1eRmMA-00046E-89
+	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 16:56:57 -0500
+Received: from mail-wm0-x241.google.com ([2a00:1450:400c:c09::241]:33148)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
+	id 1eRmMA-00045e-1U
+	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 16:56:54 -0500
+Received: by mail-wm0-x241.google.com with SMTP id g130so17583869wme.0
+	for <qemu-devel@nongnu.org>; Wed, 20 Dec 2017 13:56:53 -0800 (PST)
+Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
+References: <1513790098-9815-1-git-send-email-pbonzini@redhat.com>
+	<CAFEAcA8J53A93+SQz01W13gRCX-ecw0v+8JTaRqwmrUeFjqaJA@mail.gmail.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <51174e3a-12d3-f3e0-2d76-b776e0fe62b6@redhat.com>
+Date: Wed, 20 Dec 2017 22:56:49 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Wed, 20 Dec 2017 13:52:12 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH v3 0/7]  Add aarch64_be-linux-user target
+In-Reply-To: <CAFEAcA8J53A93+SQz01W13gRCX-ecw0v+8JTaRqwmrUeFjqaJA@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PULL 00/46] First batch of misc patches for QEMU
+ 2.12
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,54 +33,21 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: michael.weiser@gmx.de
-Cc: famz@redhat.com, qemu-devel@nongnu.org, riku.voipio@iki.fi, laurent@vivier.eu
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Thomas Huth <thuth@redhat.com>
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
-c3NhZ2UtaWQ6IDIwMTcxMjIwMjEyMzA4LjEyNjE0LTEtbWljaGFlbC53ZWlzZXJAZ214LmRlClN1
-YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0ggdjMgMC83XSAgQWRkIGFhcmNoNjRfYmUtbGludXgt
-dXNlciB0YXJnZXQKCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKCkJBU0U9
-YmFzZQpuPTEKdG90YWw9JChnaXQgbG9nIC0tb25lbGluZSAkQkFTRS4uIHwgd2MgLWwpCmZhaWxl
-ZD0wCgpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1s
-b2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQoKY29tbWl0cz0iJChnaXQgbG9nIC0tZm9ybWF0PSVIIC0t
-cmV2ZXJzZSAkQkFTRS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7IGRvCiAgICBlY2hvICJDaGVja2lu
-ZyBQQVRDSCAkbi8kdG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVzICRjKS4uLiIKICAg
-IGlmICEgZ2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMvY2hlY2twYXRjaC5w
-bCAtLW1haWxiYWNrIC07IHRoZW4KICAgICAgICBmYWlsZWQ9MQogICAgICAgIGVjaG8KICAgIGZp
-CiAgICBuPSQoKG4rMSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBTQ1JJUFQgRU5EID09
-PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApGcm9t
-IGh0dHBzOi8vZ2l0aHViLmNvbS9wYXRjaGV3LXByb2plY3QvcWVtdQogdCBbdGFnIHVwZGF0ZV0g
-ICAgICAgICAgICBwYXRjaGV3LzE1MTM2MTcyNzMtNzk4OC0xLWdpdC1zZW5kLWVtYWlsLXRodXRo
-QHJlZGhhdC5jb20gLT4gcGF0Y2hldy8xNTEzNjE3MjczLTc5ODgtMS1naXQtc2VuZC1lbWFpbC10
-aHV0aEByZWRoYXQuY29tClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKNjZmMDkwN2Y2
-NCBsaW51eC11c2VyOiBBY3RpdmF0ZSBhcm1lYiBoYW5kbGVyIHJlZ2lzdHJhdGlvbgpkYTg4ZGM4
-ZDY3IGxpbnV4LXVzZXI6IFNlcGFyYXRlIGJpbmZtdCBhcm0gQ1BVIGZhbWlsaWVzCjE0YmEwYzQ2
-ODkgbGludXgtdXNlcjogQWRkIGFhcmNoNjRfYmUgbWFnaWMgbnVtYmVycyB0byBxZW11LWJpbmZt
-dC1jb25mLnNoCmJmY2IyNzg2YzYgY29uZmlndXJlOiBBZGQgYWFyY2g2NF9iZS1saW51eC11c2Vy
-IHRhcmdldAo2OWJmNmM2MjYyIGxpbnV4LXVzZXI6IEZpeCBlbmRpYW5lc3Mgb2YgYWFyY2g2NCBz
-aWduYWwgdHJhbXBvbGluZQoxN2Q5NWJlMGI1IGxpbnV4LXVzZXI6IEFkZCBzZXBhcmF0ZSBhYXJj
-aDY0X2JlIHVuYW1lCjdlMjQwMzJkOTggbGludXgtdXNlcjogQWRkIHN1cHBvcnQgZm9yIGJpZy1l
-bmRpYW4gYWFyY2g2NAoKPT09IE9VVFBVVCBCRUdJTiA9PT0KQ2hlY2tpbmcgUEFUQ0ggMS83OiBs
-aW51eC11c2VyOiBBZGQgc3VwcG9ydCBmb3IgYmlnLWVuZGlhbiBhYXJjaDY0Li4uCkNoZWNraW5n
-IFBBVENIIDIvNzogbGludXgtdXNlcjogQWRkIHNlcGFyYXRlIGFhcmNoNjRfYmUgdW5hbWUuLi4K
-Q2hlY2tpbmcgUEFUQ0ggMy83OiBsaW51eC11c2VyOiBGaXggZW5kaWFuZXNzIG9mIGFhcmNoNjQg
-c2lnbmFsIHRyYW1wb2xpbmUuLi4KQ2hlY2tpbmcgUEFUQ0ggNC83OiBjb25maWd1cmU6IEFkZCBh
-YXJjaDY0X2JlLWxpbnV4LXVzZXIgdGFyZ2V0Li4uCkNoZWNraW5nIFBBVENIIDUvNzogbGludXgt
-dXNlcjogQWRkIGFhcmNoNjRfYmUgbWFnaWMgbnVtYmVycyB0byBxZW11LWJpbmZtdC1jb25mLnNo
-Li4uCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiMzMDogRklMRTogc2NyaXB0cy9x
-ZW11LWJpbmZtdC1jb25mLnNoOjk1OgorYWFyY2g2NF9iZV9tYWdpYz0nXHg3ZkVMRlx4MDJceDAy
-XHgwMVx4MDBceDAwXHgwMFx4MDBceDAwXHgwMFx4MDBceDAwXHgwMFx4MDBceDAyXHgwMFx4Yjcn
-CgpFUlJPUjogbGluZSBvdmVyIDkwIGNoYXJhY3RlcnMKIzMxOiBGSUxFOiBzY3JpcHRzL3FlbXUt
-YmluZm10LWNvbmYuc2g6OTY6CithYXJjaDY0X2JlX21hc2s9J1x4ZmZceGZmXHhmZlx4ZmZceGZm
-XHhmZlx4ZmZceDAwXHhmZlx4ZmZceGZmXHhmZlx4ZmZceGZmXHhmZlx4ZmZceGZmXHhmZVx4ZmZc
-eGZmJwoKdG90YWw6IDEgZXJyb3JzLCAxIHdhcm5pbmdzLCAxOCBsaW5lcyBjaGVja2VkCgpZb3Vy
-IHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVz
-ZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5l
-ciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgpDaGVja2luZyBQQVRDSCA2Lzc6IGxp
-bnV4LXVzZXI6IFNlcGFyYXRlIGJpbmZtdCBhcm0gQ1BVIGZhbWlsaWVzLi4uCkNoZWNraW5nIFBB
-VENIIDcvNzogbGludXgtdXNlcjogQWN0aXZhdGUgYXJtZWIgaGFuZGxlciByZWdpc3RyYXRpb24u
-Li4KPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoK
-Ci0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0
-Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQGZy
-ZWVsaXN0cy5vcmc=
+On 20/12/2017 20:20, Peter Maydell wrote:
+> On the x86/sanitizer build, new runtime errors:
+>   GTESTER check-qtest-m68k
+> /home/petmay01/linaro/qemu-for-merges/target/m68k/translate.c:230:12:
+> runtime error: index -1 out of bounds for type 'const uint8_t [11]'
+>
+> ...and similar fails on one or two boards on most of the other
+> guest architectures.
+
+These are preexisting bugs, now exposed by the boot-serial-test.
+Thomas, can you identify the architectures that have a problem and
+notify the maintainers?  In the meanwhile I'll keep the boot-serial-test
+enhancements queued locally, and remove them from the pull request.
+
+Paolo
