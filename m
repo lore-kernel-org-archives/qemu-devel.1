@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36457)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37376)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1eRZbs-00020Z-8d
-	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 03:20:19 -0500
+	(envelope-from <armbru@redhat.com>) id 1eRZcW-0002dF-RQ
+	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 03:20:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1eRZbn-0002zS-Uc
-	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 03:20:16 -0500
-References: <20171113162053.58795-1-vsementsov@virtuozzo.com>
-	<20171213041248.GB31040@lemon>
-	<af98ffe7-71fb-0493-c4da-4b77a4c453f5@virtuozzo.com>
-	<696c198b-e3d8-fab6-0128-de9ed34e4cff@redhat.com>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <d5df7e51-fe6b-da89-9bf1-9b03c1afdd67@virtuozzo.com>
-Date: Wed, 20 Dec 2017 11:20:00 +0300
+	(envelope-from <armbru@redhat.com>) id 1eRZcV-0003Y0-PX
+	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 03:20:56 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:50026)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1eRZcV-0003X9-HL
+	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 03:20:55 -0500
+From: Markus Armbruster <armbru@redhat.com>
+References: <20171218173023.21417-1-armbru@redhat.com>
+	<CAFEAcA8TDYqe5hXL7jRn64cBCauSDiTDxDWAGrykE7_j9nqVnQ@mail.gmail.com>
+Date: Wed, 20 Dec 2017 09:20:53 +0100
+In-Reply-To: <CAFEAcA8TDYqe5hXL7jRn64cBCauSDiTDxDWAGrykE7_j9nqVnQ@mail.gmail.com>
+	(Peter Maydell's message of "Tue, 19 Dec 2017 17:44:18 +0000")
+Message-ID: <87vah1dd3u.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <696c198b-e3d8-fab6-0128-de9ed34e4cff@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH for-2.12 0/4] qmp dirty bitmap API
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PULL 00/10] Command line patches for 2017-12-18
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,157 +27,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>, Fam Zheng <famz@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, kwolf@redhat.com, armbru@redhat.com, mnestratov@virtuozzo.com, mreitz@redhat.com, nshirokovskiy@virtuozzo.com, stefanha@redhat.com, den@openvz.org, pbonzini@redhat.com, dev@acronis.com
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-20.12.2017 04:06, John Snow wrote:
->
-> On 12/19/2017 11:07 AM, Vladimir Sementsov-Ogievskiy wrote:
->> 13.12.2017 07:12, Fam Zheng wrote:
->>> On Mon, 11/13 19:20, Vladimir Sementsov-Ogievskiy wrote:
->>>> Hi all.
->>>>
->>>> There are three qmp commands, needed to implement external backup API.
->>>>
->>>> Using these three commands, client may do all needed bitmap
->>>> management by
->>>> hand:
->>>>
->>>> on backup start we need to do a transaction:
->>>>  =C2=A0 {disable old bitmap, create new bitmap}
->>>>
->>>> on backup success:
->>>>  =C2=A0 drop old bitmap
->>>>
->>>> on backup fail:
->>>>  =C2=A0 enable old bitmap
->>>>  =C2=A0 merge new bitmap to old bitmap
->>>>  =C2=A0 drop new bitmap
->>>>
->>>> Question: it may be better to make one command instead of two:
->>>> block-dirty-bitmap-set-enabled(bool enabled)
->>>>
->>>> Vladimir Sementsov-Ogievskiy (4):
->>>>  =C2=A0=C2=A0 block/dirty-bitmap: add lock to bdrv_enable/disable_dirt=
-y_bitmap
->>>>  =C2=A0=C2=A0 qapi: add block-dirty-bitmap-enable/disable
->>>>  =C2=A0=C2=A0 qmp: transaction support for block-dirty-bitmap-enable/d=
-isable
->>>>  =C2=A0=C2=A0 qapi: add block-dirty-bitmap-merge
->>>>
->>>>  =C2=A0 qapi/block-core.json=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0 |=C2=A0 80 +++++++++++++++++++++++
->>>>  =C2=A0 qapi/transaction.json=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0 |=C2=A0=C2=A0 4 ++
->>>>  =C2=A0 include/block/dirty-bitmap.h |=C2=A0=C2=A0 2 +
->>>>  =C2=A0 block/dirty-bitmap.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0 |=C2=A0 21 ++++++
->>>>  =C2=A0 blockdev.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 | 151
->>>> +++++++++++++++++++++++++++++++++++++++++++
->>>>  =C2=A0 5 files changed, 258 insertions(+)
->>>>
->>> I think tests are required to merge new features/commands.=C2=A0 Can we
->>> include tests
->>> on these new code please?=C2=A0 We should cover error handling, and als=
-o
->>> write tests
->>> that demonstrate the intended real world use cases.
->>>
->>> Also should we add new sections to docs/interop/bitmaps.rst?
->>>
->>> Meta: John started a long discussion about the API design but I think
->>> after all
->>> it turns out exposing dirty bitmap objects and the primitives is a
->>> reasonable
->>> approach to implement incremental backup functionalities. The comment
->>> I have is
->>> that we should ensure we have also reviewed it from a higher level
->>> (e.g. all the
->>> potential user requirements) to make sure this low level API is both
->>> sound and
->>> flexible. We shouldn't introduce a minimal set of low level commands
->>> just to
->>> support one particular use case, but look a bit further and broader
->>> and come up
->>> with a more complete design? Writing docs and tests might force us to
->>> think in
->>> this direction, which I think is a good thing to have for this series,
->>> too.
->>>
->>> Fam
->> Nikolay, please describe what do you plan in libvirt over qmp bitmap API=
-.
+Peter Maydell <peter.maydell@linaro.org> writes:
+
+> On 18 December 2017 at 17:30, Markus Armbruster <armbru@redhat.com> wrote:
+>> The following changes since commit 411ad78115ebeb3411cf4b7622784b93dfabe259:
 >>
->> Kirill, what do you think about this all?
+>>   Merge remote-tracking branch 'remotes/stefanberger/tags/pull-tpm-2017-12-15-1' into staging (2017-12-17 15:27:41 +0000)
 >>
->> (brief history:
->> we are considering 3 new qmp commands for bitmap management, needed for
->> external incremental backup support
->>  =C2=A0- enable (bitmap will track disk changes)
->>  =C2=A0- disable (bitmap will stop tracking changes)
->>  =C2=A0- merge (merge bitmap A to bitmap B)
->> )
+>> are available in the git repository at:
 >>
-> Yeah, it would be helpful to know what the full workflow for the API
-> will be ... before I get ahead of myself again (sorry) ...
+>>   git://repo.or.cz/qemu/armbru.git tags/pull-cmdline-2017-12-18
+>>
+>> for you to fetch changes up to aa088732820dc26f8881fb7c82bfd75724d18594:
+>>
+>>   option: Drop unused get_param_value(), get_next_param_value() (2017-12-18 18:16:28 +0100)
+>>
+>> ----------------------------------------------------------------
+>> Command line patches for 2017-12-18
+>>
+>> ----------------------------------------------------------------
+>> Dr. David Alan Gilbert (1):
+>>       option: Remove shadowing opt decl from qemu_opt_print()
+>>
+>> Markus Armbruster (9):
+>>       qemu-options: Remove stray colons from output of --help
+>>       qemu-options: Fix markup of -netdev l2tpv3
+>>       qemu-options qemu-doc: Move "Device URL Syntax" to qemu-doc
+>>       qemu-options: Move -iscsi under "Block device options"
+>>       qemu-options: Add missing -iscsi Texinfo documentation
+>>       qemu-options: Polish section "TPM device options"
+>>       qemu-options: Polish section "Character device options"
+>>       qemu-options: Belatedly document --watchdog-action inject-nmi
+>>       option: Drop unused get_param_value(), get_next_param_value()
+>>
+>>  include/qemu/option.h  |   5 -
+>>  qemu-doc.texi          | 217 +++++++++++++++++++++++++++++++++++
+>>  qemu-options-wrapper.h |   2 +-
+>>  qemu-options.hx        | 306 ++++++++-----------------------------------------
+>>  scripts/hxtool         |   3 +-
+>>  util/qemu-option.c     |  36 +-----
+>>  6 files changed, 268 insertions(+), 301 deletions(-)
 >
-> but I'd like to see a quick writeup of your vision for the pull-mode
-> backups (which I assume this is for, right?) from start-to-finish, like
-> a mockup of annotated QMP output or something.
+> This failed to build on PPC and aarch64 linux:
 >
-> Nothing fancy, just something that lets me orient where we're headed,
-> since you're doing most of the work and I just want to get out of your
-> way, but having a roadmap helps me do that.
+> /home/pm215/qemu/qemu-doc.texi:231: node `sec_invocation' lacks menu
+> item for `device_url' despite being its Up target
+> make: *** [qemu-doc.txt] Error 1
+> make: *** Waiting for unfinished jobs....
+> /home/pm215/qemu/qemu-doc.texi:231: node `sec_invocation' lacks menu
+> item for `device_url' despite being its Up target
+> make: *** [qemu-doc.html] Error 1
 >
-> --js
+> and with slightly different errors on openbsd/netbsd/osx:
+>   GEN     qemu-doc.txt
+> /root/qemu/qemu-doc.texi:8: warning: unrecognized encoding name `UTF-8'.
+> /root/qemu/qemu-doc.texi:248: `device_url' has no Up field (perhaps
+> incorrect sectioning?).
+> /root/qemu/qemu-doc.texi:248: warning: unreferenced node `device_url'.
+> makeinfo: Removing output file `qemu-doc.txt' due to errors; use
+> --force to preserve.
+> Makefile:774: recipe for target 'qemu-doc.txt' failed
 
-external backup:
-
-0. we have active_disk and attached to it dirty bitmap bitmap0
-1. qmp blockdev-add tmp_disk (backing=3Dactive_disk)
-2. guest fsfreeze
-3. qmp transaction:
- =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 - block-dirty-bitmap-add node=
-=3Dactive_disk name=3Dbitmap1
- =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 - block-dirty-bitmap-disable no=
-de=3Dactive_disk name=3Dbitmap0
- =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 - blockdev-backup drive=3Dactiv=
-e_disk target=3Dtmp_disk sync=3Dnone
-4. guest fsthaw
-5. (? not designed yet) qmp blockdev-add filter_node - special filter=20
-node over tmp_disk for synchronization of nbd-reads and=20
-backup(sync=3Dnone) cow requests (like it is done in block/replication)
-6. qmp nbd-server-start
-7. qmp nbd-server-add filter_node (there should be possibility of=20
-exporting bitmap of child node filter_node->tmp_disk->active_disk->bitmap0)
-
-then, external tool can connect to nbd server and get exported bitmap=20
-and read data (including bitmap0) accordingly to nbd specification.
-(also, external tool may get a merge of several bitmaps, if we already=20
-have a sequence of them)
-then, after backup finish, what can be done:
-
-1. qmp block-job-cancel device=3Dactive_disk (stop our backup(sync=3Dnone))
-2. qmp nbd-server-stop (or qmp nbd-server-remove filter_node)
-3. qmp blockdev-remove filter_node
-4. qmp blockdev-remove tmp_disk
-
-on successful backup, you can drop old bitmap if you want (or do not=20
-drop it, if you need to keep sequence of disabled bitmaps):
-1. block-dirty-bitmap-remove node=3Dactive_disk name=3Dbitmap0
-
-on failed backup, you can merge bitmaps, to make it look like nothing=20
-happened:
-1. qmp transaction:
- =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 - block-dirty-bitmap-merge node=3Dact=
-ive_disk name-source=3Dbitmap1=20
-name-target=3Dbitmap0
- =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 - block-dirty-bitmap-remove node=3Dac=
-tive_disk name=3Dbitmap1
- =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 - block-dirty-bitmap-enable node=3Dac=
-tive_disk name=3Dbitmap0
-
---=20
-Best regards,
-Vladimir
+Hmm.  Looks like the culprit is a @node we don't actually want.  v2
+sent.  Thanks!
