@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55447)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55452)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1eReHp-0004N1-RO
+	(envelope-from <kwolf@redhat.com>) id 1eReHp-0004NH-Vl
 	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 08:19:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1eReHo-00068f-Ve
+	(envelope-from <kwolf@redhat.com>) id 1eReHo-00068V-UE
 	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 08:19:53 -0500
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Wed, 20 Dec 2017 14:19:25 +0100
-Message-Id: <20171220131939.27543-1-kwolf@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 00/14] Block layer patches
+Date: Wed, 20 Dec 2017 14:19:26 +0100
+Message-Id: <20171220131939.27543-2-kwolf@redhat.com>
+In-Reply-To: <20171220131939.27543-1-kwolf@redhat.com>
+References: <20171220131939.27543-1-kwolf@redhat.com>
+Subject: [Qemu-devel] [PULL 01/14] hw/block/nvme: Convert to realize
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,63 +22,84 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, qemu-devel@nongnu.org
 
-The following changes since commit af352675efb7e92a1f5f6461a042a12015ab3d=
-12:
+From: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
 
-  Merge remote-tracking branch 'remotes/aurel/tags/pull-target-sh4-201712=
-18' into staging (2017-12-19 19:11:11 +0000)
+Convert nvme_init() to realize and rename it to nvme_realize().
 
-are available in the git repository at:
+Cc: John Snow <jsnow@redhat.com>
+Cc: Keith Busch <keith.busch@intel.com>
+Cc: Kevin Wolf <kwolf@redhat.com>
+Cc: Max Reitz <mreitz@redhat.com>
+Cc: Markus Armbruster <armbru@redhat.com>
 
-  git://repo.or.cz/qemu/kevin.git tags/for-upstream
+Signed-off-by: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
+Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+---
+ hw/block/nvme.c | 18 ++++++++++--------
+ 1 file changed, 10 insertions(+), 8 deletions(-)
 
-for you to fetch changes up to b4d526c87b26aff6d8b353951aa175a1236ad887:
-
-  nvme: Add tracing (2017-12-20 11:05:49 +0100)
-
-----------------------------------------------------------------
-Block layer patches
-
-----------------------------------------------------------------
-Doug Gale (1):
-      nvme: Add tracing
-
-Edgar Kaziakhmedov (1):
-      qcow2: get rid of qcow2_backing_read1 routine
-
-Fam Zheng (1):
-      qemu-img: Document --force-share / -U
-
-John Snow (1):
-      iotests: fix 197 for vpc
-
-Kevin Wolf (9):
-      block: Formats don't need CONSISTENT_READ with NO_IO
-      block: Make bdrv_drain_invoke() recursive
-      block: Call .drain_begin only once in bdrv_drain_all_begin()
-      test-bdrv-drain: Test BlockDriver callbacks for drain
-      block: bdrv_drain_recurse(): Remove unused begin parameter
-      block: Don't wait for requests in bdrv_drain*_end()
-      block: Unify order in drain functions
-      block: Don't acquire AioContext in hmp_qemu_io()
-      block: Document that x-blockdev-change breaks quorum children list
-
-Mao Zhongyi (1):
-      hw/block/nvme: Convert to realize
-
- qapi/block-core.json             |   4 +
- block/qcow2.h                    |   3 -
- block.c                          |   6 +-
- block/io.c                       |  31 ++--
- block/qcow2.c                    |  51 +-----
- hmp.c                            |   6 -
- hw/block/nvme.c                  | 367 ++++++++++++++++++++++++++++++++-=
-------
- tests/test-bdrv-drain.c          | 137 +++++++++++++++
- hw/block/trace-events            |  93 ++++++++++
- qemu-img.texi                    |   9 +
- tests/Makefile.include           |   2 +
- tests/qemu-iotests/197           |   4 +
- tests/qemu-iotests/common.filter |   3 +-
- 13 files changed, 591 insertions(+), 125 deletions(-)
- create mode 100644 tests/test-bdrv-drain.c
+diff --git a/hw/block/nvme.c b/hw/block/nvme.c
+index 441e21ed1f..e530ba7a30 100644
+--- a/hw/block/nvme.c
++++ b/hw/block/nvme.c
+@@ -920,7 +920,7 @@ static const MemoryRegionOps nvme_cmb_ops = {
+     },
+ };
+ 
+-static int nvme_init(PCIDevice *pci_dev)
++static void nvme_realize(PCIDevice *pci_dev, Error **errp)
+ {
+     NvmeCtrl *n = NVME(pci_dev);
+     NvmeIdCtrl *id = &n->id_ctrl;
+@@ -931,24 +931,27 @@ static int nvme_init(PCIDevice *pci_dev)
+     Error *local_err = NULL;
+ 
+     if (!n->conf.blk) {
+-        return -1;
++        error_setg(errp, "drive property not set");
++        return;
+     }
+ 
+     bs_size = blk_getlength(n->conf.blk);
+     if (bs_size < 0) {
+-        return -1;
++        error_setg(errp, "could not get backing file size");
++        return;
+     }
+ 
+     blkconf_serial(&n->conf, &n->serial);
+     if (!n->serial) {
+-        return -1;
++        error_setg(errp, "serial property not set");
++        return;
+     }
+     blkconf_blocksizes(&n->conf);
+     blkconf_apply_backend_options(&n->conf, blk_is_read_only(n->conf.blk),
+                                   false, &local_err);
+     if (local_err) {
+-        error_report_err(local_err);
+-        return -1;
++        error_propagate(errp, local_err);
++        return;
+     }
+ 
+     pci_conf = pci_dev->config;
+@@ -1046,7 +1049,6 @@ static int nvme_init(PCIDevice *pci_dev)
+             cpu_to_le64(n->ns_size >>
+                 id_ns->lbaf[NVME_ID_NS_FLBAS_INDEX(ns->id_ns.flbas)].ds);
+     }
+-    return 0;
+ }
+ 
+ static void nvme_exit(PCIDevice *pci_dev)
+@@ -1081,7 +1083,7 @@ static void nvme_class_init(ObjectClass *oc, void *data)
+     DeviceClass *dc = DEVICE_CLASS(oc);
+     PCIDeviceClass *pc = PCI_DEVICE_CLASS(oc);
+ 
+-    pc->init = nvme_init;
++    pc->realize = nvme_realize;
+     pc->exit = nvme_exit;
+     pc->class_id = PCI_CLASS_STORAGE_EXPRESS;
+     pc->vendor_id = PCI_VENDOR_ID_INTEL;
+-- 
+2.13.6
