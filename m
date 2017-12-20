@@ -1,31 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35812)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35807)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1eRZbB-0001NE-Kz
-	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 03:19:34 -0500
+	(envelope-from <armbru@redhat.com>) id 1eRZbB-0001NA-Jc
+	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 03:19:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1eRZb8-0002Z0-RG
+	(envelope-from <armbru@redhat.com>) id 1eRZb8-0002ZI-Vv
 	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 03:19:33 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:58560)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1eRZb8-0002Xz-L7
-	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 03:19:30 -0500
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id C343E806A4
-	for <qemu-devel@nongnu.org>; Wed, 20 Dec 2017 08:19:29 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-116-74.ams2.redhat.com
-	[10.36.116.74])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 902DB190C4
-	for <qemu-devel@nongnu.org>; Wed, 20 Dec 2017 08:19:29 +0000 (UTC)
 From: Markus Armbruster <armbru@redhat.com>
-Date: Wed, 20 Dec 2017 09:19:17 +0100
-Message-Id: <20171220081927.8761-1-armbru@redhat.com>
+Date: Wed, 20 Dec 2017 09:19:18 +0100
+Message-Id: <20171220081927.8761-2-armbru@redhat.com>
+In-Reply-To: <20171220081927.8761-1-armbru@redhat.com>
+References: <20171220081927.8761-1-armbru@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL v2 00/10] Command line patches for 2017-12-18
+Subject: [Qemu-devel] [PULL v2 01/10] qemu-options: Remove stray colons from
+ output of --help
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,48 +24,177 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-stable@nongnu.org
 
-The following changes since commit af352675efb7e92a1f5f6461a042a12015ab3d=
-12:
+Commit 43f187a broke --help: it put colons into blank lines.  It
+removed the colon from DEFHEADING(TITLE:) and added it back in the
+macro expansion of DEFHEADING(TITLE), so hxtool can emit "@subsection
+TITLE" more easily.  Trouble is it's added back even for the blank
+lines made with DEFHEADING().
 
-  Merge remote-tracking branch 'remotes/aurel/tags/pull-target-sh4-201712=
-18' into staging (2017-12-19 19:11:11 +0000)
+Put the colons back where they were before commit 43f187a, and strip
+them in hxtool instead.
 
-are available in the git repository at:
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+CC: qemu-stable@nongnu.org
+Signed-off-by: Markus Armbruster <armbru@redhat.com>
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+---
+ qemu-options-wrapper.h |  2 +-
+ qemu-options.hx        | 27 ++++++++++++++-------------
+ scripts/hxtool         |  3 ++-
+ 3 files changed, 17 insertions(+), 15 deletions(-)
 
-  git://repo.or.cz/qemu/armbru.git tags/pull-cmdline-2017-12-18-v2
-
-for you to fetch changes up to 3e05349de8bd6744d23a26beac9ed6fb2e286f80:
-
-  option: Drop unused get_param_value(), get_next_param_value() (2017-12-=
-20 09:11:50 +0100)
-
-----------------------------------------------------------------
-Command line patches for 2017-12-18
-
-----------------------------------------------------------------
-Dr. David Alan Gilbert (1):
-      option: Remove shadowing opt decl from qemu_opt_print()
-
-Markus Armbruster (9):
-      qemu-options: Remove stray colons from output of --help
-      qemu-options: Fix markup of -netdev l2tpv3
-      qemu-options qemu-doc: Move "Device URL Syntax" to qemu-doc
-      qemu-options: Move -iscsi under "Block device options"
-      qemu-options: Add missing -iscsi Texinfo documentation
-      qemu-options: Polish section "TPM device options"
-      qemu-options: Polish section "Character device options"
-      qemu-options: Belatedly document --watchdog-action inject-nmi
-      option: Drop unused get_param_value(), get_next_param_value()
-
- include/qemu/option.h  |   5 -
- qemu-doc.texi          | 216 ++++++++++++++++++++++++++++++++++
- qemu-options-wrapper.h |   2 +-
- qemu-options.hx        | 306 ++++++++-----------------------------------=
-------
- scripts/hxtool         |   3 +-
- util/qemu-option.c     |  36 +-----
- 6 files changed, 267 insertions(+), 301 deletions(-)
-
+diff --git a/qemu-options-wrapper.h b/qemu-options-wrapper.h
+index 4d7aeb1352..13bfea0294 100644
+--- a/qemu-options-wrapper.h
++++ b/qemu-options-wrapper.h
+@@ -14,7 +14,7 @@
+=20
+ #define ARCHHEADING(text, arch_mask) \
+     if ((arch_mask) & arch_type)    \
+-        puts(stringify(text) ":");
++        puts(stringify(text));
+=20
+ #define DEFHEADING(text) ARCHHEADING(text, QEMU_ARCH_ALL)
+=20
+diff --git a/qemu-options.hx b/qemu-options.hx
+index fe0c29271f..7ac8ade9f9 100644
+--- a/qemu-options.hx
++++ b/qemu-options.hx
+@@ -6,7 +6,7 @@ HXCOMM construct option structures, enums and help messag=
+e for specified
+ HXCOMM architectures.
+ HXCOMM HXCOMM can be used for comments, discarded from both texi and C
+=20
+-DEFHEADING(Standard options)
++DEFHEADING(Standard options:)
+ STEXI
+ @table @option
+ ETEXI
+@@ -584,7 +584,7 @@ STEXI
+ ETEXI
+ DEFHEADING()
+=20
+-DEFHEADING(Block device options)
++DEFHEADING(Block device options:)
+ STEXI
+ @table @option
+ ETEXI
+@@ -1187,7 +1187,7 @@ STEXI
+ ETEXI
+ DEFHEADING()
+=20
+-DEFHEADING(USB options)
++DEFHEADING(USB options:)
+ STEXI
+ @table @option
+ ETEXI
+@@ -1252,7 +1252,7 @@ STEXI
+ ETEXI
+ DEFHEADING()
+=20
+-DEFHEADING(Display options)
++DEFHEADING(Display options:)
+ STEXI
+ @table @option
+ ETEXI
+@@ -1789,7 +1789,7 @@ STEXI
+ ETEXI
+ ARCHHEADING(, QEMU_ARCH_I386)
+=20
+-ARCHHEADING(i386 target only, QEMU_ARCH_I386)
++ARCHHEADING(i386 target only:, QEMU_ARCH_I386)
+ STEXI
+ @table @option
+ ETEXI
+@@ -1905,7 +1905,7 @@ STEXI
+ ETEXI
+ DEFHEADING()
+=20
+-DEFHEADING(Network options)
++DEFHEADING(Network options:)
+ STEXI
+ @table @option
+ ETEXI
+@@ -2486,7 +2486,7 @@ STEXI
+ ETEXI
+ DEFHEADING()
+=20
+-DEFHEADING(Character device options)
++DEFHEADING(Character device options:)
+ STEXI
+=20
+ The general form of a character device option is:
+@@ -2819,7 +2819,7 @@ STEXI
+ ETEXI
+ DEFHEADING()
+=20
+-DEFHEADING(Device URL Syntax)
++DEFHEADING(Device URL Syntax:)
+ STEXI
+=20
+ In addition to using normal file images for the emulated storage devices=
+,
+@@ -3049,7 +3049,7 @@ STEXI
+ @end table
+ ETEXI
+=20
+-DEFHEADING(Bluetooth(R) options)
++DEFHEADING(Bluetooth(R) options:)
+ STEXI
+ @table @option
+ ETEXI
+@@ -3125,7 +3125,7 @@ ETEXI
+ DEFHEADING()
+=20
+ #ifdef CONFIG_TPM
+-DEFHEADING(TPM device options)
++DEFHEADING(TPM device options:)
+=20
+ DEF("tpmdev", HAS_ARG, QEMU_OPTION_tpmdev, \
+     "-tpmdev passthrough,id=3Did[,path=3Dpath][,cancel-path=3Dpath]\n"
+@@ -3215,7 +3215,7 @@ DEFHEADING()
+=20
+ #endif
+=20
+-DEFHEADING(Linux/Multiboot boot specific)
++DEFHEADING(Linux/Multiboot boot specific:)
+ STEXI
+=20
+ When using these options, you can use a given Linux or Multiboot
+@@ -3271,7 +3271,7 @@ STEXI
+ ETEXI
+ DEFHEADING()
+=20
+-DEFHEADING(Debug/Expert options)
++DEFHEADING(Debug/Expert options:)
+ STEXI
+ @table @option
+ ETEXI
+@@ -4177,7 +4177,8 @@ STEXI
+ @end table
+ ETEXI
+ DEFHEADING()
+-DEFHEADING(Generic object creation)
++
++DEFHEADING(Generic object creation:)
+ STEXI
+ @table @option
+ ETEXI
+diff --git a/scripts/hxtool b/scripts/hxtool
+index 1e2c97c5e6..7d7c4289e3 100644
+--- a/scripts/hxtool
++++ b/scripts/hxtool
+@@ -19,7 +19,8 @@ hxtoh()
+ print_texi_heading()
+ {
+     if test "$*" !=3D ""; then
+-        printf "@subsection %s\n" "$*"
++        title=3D"$*"
++        printf "@subsection %s\n" "${title%:}"
+     fi
+ }
+=20
 --=20
 2.13.6
