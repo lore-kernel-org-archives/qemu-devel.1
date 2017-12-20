@@ -1,23 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49221)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55668)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1eRbQt-00051o-Oc
-	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 05:17:05 -0500
+	(envelope-from <danielhb@linux.vnet.ibm.com>) id 1eRbX5-0007J7-4j
+	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 05:23:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1eRbQr-0003rI-WC
-	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 05:17:03 -0500
-From: Markus Armbruster <armbru@redhat.com>
-References: <1513542355-28203-1-git-send-email-jan.dakinevich@virtuozzo.com>
-	<1513542355-28203-2-git-send-email-jan.dakinevich@virtuozzo.com>
-	<87k1xig3zl.fsf@dusky.pond.sub.org>
-	<20171220034730.696c3ceb@virtuozzo.com>
-Date: Wed, 20 Dec 2017 11:16:46 +0100
-In-Reply-To: <20171220034730.696c3ceb@virtuozzo.com> (Jan Dakinevich's message
-	of "Wed, 20 Dec 2017 03:47:30 +0300")
-Message-ID: <873745d7qp.fsf@dusky.pond.sub.org>
-MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [RFC v6 1/2] virtio: introduce `query-virtio' QMP
- command
+	(envelope-from <danielhb@linux.vnet.ibm.com>) id 1eRbX2-0001TF-Bf
+	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 05:23:27 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:58156
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <danielhb@linux.vnet.ibm.com>)
+	id 1eRbX2-0001Sb-4p
+	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 05:23:24 -0500
+Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	vBKAJo0X001711
+	for <qemu-devel@nongnu.org>; Wed, 20 Dec 2017 05:23:22 -0500
+Received: from e18.ny.us.ibm.com (e18.ny.us.ibm.com [129.33.205.208])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2eyjcc185k-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Wed, 20 Dec 2017 05:23:21 -0500
+Received: from localhost
+	by e18.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <danielhb@linux.vnet.ibm.com>;
+	Wed, 20 Dec 2017 05:23:21 -0500
+From: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
+Date: Wed, 20 Dec 2017 08:23:04 -0200
+Message-Id: <20171220102304.8288-1-danielhb@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH v1 1/1] qmp: remove qmp_cpu
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,286 +36,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jan Dakinevich <jan.dakinevich@virtuozzo.com>
-Cc: Kevin Wolf <kwolf@redhat.com>, "Denis V. Lunev" <den@virtuozzo.com>, qemu-block@nongnu.org, Amit Shah <amit@kernel.org>, Jason Wang <jasowang@redhat.com>, Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Max Reitz <mreitz@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>, Markus Armbruster <armbru@redhat.com>, Eric Blake <eblake@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>
 
-Jan Dakinevich <jan.dakinevich@virtuozzo.com> writes:
+'qmp_cpu' was implemented in commit 755f196898 ("qapi: Convert the cpu
+command") as a functional no-op, a QMP call that does nothing and
+return success. The idea, apparently, was to provide a counterpart
+for the HMP 'hmp_cpu' command, introduced in the same commit.
 
-> On Tue, 19 Dec 2017 15:57:18 +0100
-> Markus Armbruster <armbru@redhat.com> wrote:
->
->> QAPI/QMP interface review only.
->> 
->> You neglected to cc: the maintainers of qapi-schema.json, so I'm doing
->> that for you.
->> 
->
-> Thank you so much. I screwed up with this patchset at least twice: with
-> list of maintainers and with my own e-mail.
->
->> Jan Dakinevich <jan.dakinevich@virtuozzo.com> writes:
->> 
->> > The command is intended for gathering virtio information such as
->> > status, feature bits, negotiation status. It is convenient and
->> > useful for debug purpose.
->> >
->> > The commands returns generic virtio information for virtio such as
->> > common feature names and status bits names and information for all
->> > attached to current machine devices.
->> >
->> > To retrieve names of device-specific features `tell_feature_name'
->> > callback in VirtioDeviceClass also was introduced.
->> >
->> > Cc: Denis V. Lunev <den@virtuozzo.com>
->> > Signed-off-by: Jan Dakinevich <jan.dakinevich@virtuozzo.com>
->> [...]
->> > diff --git a/qapi-schema.json b/qapi-schema.json
->> > index 1845795..51cd0f3 100644
->> > --- a/qapi-schema.json
->> > +++ b/qapi-schema.json
->> > @@ -3200,3 +3200,73 @@
->> >  # Since: 2.11
->> >  ##
->> >  { 'command': 'watchdog-set-action', 'data' : {'action':
->> > 'WatchdogAction'} } +
->> > +##
->> > +# @VirtioFeature:
->> > +#
->> > +# Virtio feature bit with negotiation status
->> > +#
->> > +# @name: name of feature bit
->> > +#
->> > +# @acked: negotiation status, `true' if guest acknowledged the
->> > feature +#
->> > +# Since: 2.12
->> > +##
->> > +{
->> > +    'struct': 'VirtioFeature',
->> > +    'data': {
->> > +        'name': 'str',
->> > +        'acked': 'bool'
->> > +    }
->> > +}
->> > +
->> > +##
->> > +# @VirtioInfo:
->> > +#
->> > +# Information about virtio device
->> > +#
->> > +# @qom-path: QOM path of the device
->> > +#
->> > +# @status: status bitmask
->> > +#
->> > +# @host-features: bitmask of features, exposed by device
->> > +#
->> > +# @guest-features: bitmask of features, acknowledged by guest
->> 
->> Quoting my review of v4: "Unsigned integer interpreted as combination
->> of well-known bit-valued symbols" is a fine C interface, but a pretty
->> horrid QMP interface.  What's wrong with doing a set the
->> straightforward way as "array of enum"?  As far as I can see, I
->> didn't get a reply back then.  You'll have to give one to get the
->> patch accepted.
->> 
->
-> Most probably, I didn't understand you last time. Although, I'm still
-> far from correct understanding.
->
-> About 'array of enum', I could make the following description:
->
-> {
->   'enum': 'VirtioFeatureScsiBit',
->   'data': ['inout', 'hotplug', 'change', 'ta10_pi']
-> }
->
-> {
->   'struct': 'VirtioFeatureScsi',
->   'data' : {
->       'bit': 'VirtioFeatureScsiBit',
->       'acked': 'bool'
->   }
-> }
->
-> {
->   'enum': 'VirtioFeatureSerialBit',
->   'data': ['size', 'multiport', 'emerg-write']
-> }
->
-> {
->   'struct': 'VirtioFeatureSerial',
->   'data' : {
->       'bit': 'VirtioFeatureSerialBit',
->       'acked': 'bool'
->   }
-> }
->
-> { 
->   'enum': 'VirtioFeatureCategory',
->   'data': ['scsi', 'serial'] 
-> }
->
-> {
->   'union': 'VirtioFeature',
->   'base': {
->     'category': 'VirtioFeatureCategory'
->   },
->   'discriminator': 'categoty',
->   'data': {
->     'scsi': 'VirtioFeatureScsi',
->     'serial': 'VirtioFeatureSerial'
->   }
-> }
->
-> {
->   'union': 'VirtioInfo',
->   'data': {
->     'qom-path': 'str',
->     'device-features': ['VirtioFeature']
->     ...
->   }
-> }
->
-> But IMO, it only increases complexity without any benefit. To use this
-> description, at first it should be listed all features names in enums.
-> Then, these enums should be mapped into bit numbers and differently for
-> each virtio device. I expect something like this:
->
-> VirtioFeatureScsiBit bit = ...
->
-> switch (bit) {
-> case VIRTIO_FEATURE_SCSI_BIT_INOUT:
->     return VIRTIO_SCSI_F_INOUT;
-> case VIRTIO_FEATURE_SERIAL_BIT_HOTPLUG:
->     return VIRTIO_SCSI_F_HOTPLUG;
-> case VIRTIO_FEATURE_SERIAL_BIT_CHANGE:
->     return VIRTIO_SCSI_F_CHANGE;
-> case VIRTIO_FEATURE_SERIAL_BIT_T10_PI:
->     return VIRTIO_SCSI_F_T10_PI;
-> }
->
-> So, boilerplate for mapping between bit numbers and and theirs names
-> will not go away.
+After 6 years of its creation, qmp_cpu remains a functional no-op
+that does nothing, having no value for any caller/user. A proposal
+was sent to implement qmp_cpu like hmp_cpu works, but it was denied
+[1]. The reason is that QMP must be as stateless as possible and a
+function that changes its state (the current CPU monitor in the case
+of qmp_cpu) goes against it. Any QMP command that needs a specific
+monitor CPU setup must provide it in its arguments, instead of relying
+in the current QMP monitor state.
 
-No argument.  It's not about simplifying the implementation, it's about
-finding the appropriate QMP interface.
+After discussions that happened in [2] it was decided that a command
+that does nothing since its birth, no one uses for anything and will
+not be implemented, should be deprecated and erased. Given that we will
+*not* provide any replacement for qmp_cpu and we believe that there
+is no user relying on it, there is no point in adding a deprecation
+delay for it.
 
-> Furthermore, HMP command should produce readable output from QMP data,
-> features's enum values should be converted to strings from json
-> description. For that, for each possible VirtioFeatureCategary should
-> be called respective VirtioFeature*_str macro to resolve enum value.
->
-> So, all my attempts to declare bit names within QAPI brings me to
-> familiar solutions.
+So, this patch nukes qmp_cpu from QEMU code, removing both its blank
+implementation in qmp.c and its doc in qapi-schema.json.
 
-QMP prefers symbols (strings on the wire, preferably enums in the
-schema) over magic numbers.
+[1] https://lists.gnu.org/archive/html/qemu-devel/2017-12/msg02283.html
+[2] https://lists.gnu.org/archive/html/qemu-devel/2017-12/msg03696.html
 
-That said, numbers may be okay in certain cases, say when they're
-sufficiently well-known and QEMU only passes them along.  Drawback:
-defeats introspection; you can't see what bits this QEMU supports.  Why
-is that not interesting?
+Signed-off-by: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
+CC: Markus Armbruster <armbru@redhat.com>
+CC: Eric Blake <eblake@redhat.com>
+CC: Daniel P. Berrange <berrange@redhat.com>
+---
+ qapi-schema.json | 11 -----------
+ qmp.c            |  5 -----
+ 2 files changed, 16 deletions(-)
 
-Taking a step back: what's the intended purpose of query-virtio?  The
-cover letter doesn't really say:
-
-    After some discussion, I am going to suggest reworked QMP/HMP for
-    gathering virtio info. It would provide the following monitor output.
-
-    (qemu) info virtio
-    virtio-blk-device at 0000:00:02.0
-      QOM path: /machine/peripheral-anon/device[0]/virtio-backend
-      status: 0x0f
-        VIRTIO_CONFIG_S_ACKNOWLEDGE
-        VIRTIO_CONFIG_S_DRIVER
-        VIRTIO_CONFIG_S_DRIVER_OK
-        VIRTIO_CONFIG_S_FEATURES_OK
-      host features:  0x0000000179000e54
-      guest features: 0x0000000130000e54
-      common features:
-        VIRTIO_F_NOTIFY_ON_EMPTY
-        VIRTIO_F_ANY_LAYOUT
-        VIRTIO_RING_F_INDIRECT_DESC              acked
-        VIRTIO_RING_F_EVENT_IDX                  acked
-        VIRTIO_F_BAD_FEATURE
-        VIRTIO_F_VERSION_1                       acked
-      device features:
-        VIRTIO_BLK_F_SEG_MAX                     acked
-        VIRTIO_BLK_F_BLK_SIZE                    acked
-        VIRTIO_BLK_F_FLUSH                       acked
-        VIRTIO_BLK_F_TOPOLOGY                    acked
-
-The first sentence carries no useful information; suggest to scratch it.
-The rest is an HMP example.  Examples are great, but we really need to
-understand *why* you need this command.
-
->> In case symbolic names may not be known at QEMU compile time (me
->> having to wonder at v6 is a sign of rather ineffective patch review,
->> sorry about that): you have to explain this in the doc comment, with a
->> reference to where the bits are specified.
->> 
->
-> ok
-
-Can you think of a scenario where status or feature bits occur that are
-not known to QEMU at compile time?
-
->> > +#
->> > +# @status-names: names of checked bits in status bitmask
->> 
->> How are the strings in @status-names connected to the bits in @status?
->> Spell it out in this doc string, please.
->> 
->
-> ok
->
-> ...but, strictly saying, I was not going to show in QAPI how these names
-> are mapped into bits, QMP answer would not contain how these names are
-> connected to bits. Otherwise, It would be reinvention of v4.
-
-To avoid going in circles some more, let's take a step back and examine
-what exactly you're trying to accomplish.  Give us use cases: this is my
-need, and this is how you use the proposed command to satisfy my need.
-Also give us design limitations: what the command is *not* trying to do.
-
->> > +#
->> > +# @common-features-names: names exposed features and negotiation
->> > status, +# that are common to all devices
->> > +#
->> > +# @device-features-names: names exposed features and negotiation
->> > status, +# that are specific to this device
->> 
->> Likewise.
->> 
->
-> ok
->
->> > +#
->> > +# Since: 2.12
->> > +##
->> > +{
->> > +    'struct': 'VirtioInfo',
->> > +    'data': {
->> > +        'qom-path': 'str',
->> > +
->> > +        'status': 'uint8',
->> > +        'host-features': 'uint64',
->> > +        'guest-features': 'uint64',
->> > +
->> > +        'status-names': ['str'],
->> > +        'common-features-names': ['VirtioFeature'],
->> > +        'device-features-names': ['VirtioFeature']
->> > +    }
->> > +}
->> > +
->> > +##
->> > +# @query-virtio:
->> > +#
->> > +# Returns virtio information such as device status and features
->> > +#
->> > +# Since: 2.12
->> > +##
->> > +{
->> > +    'command': 'query-virtio',
->> > +    'data': {'*path': 'str'},
->> > +    'returns': ['VirtioInfo']
->> > +}
+diff --git a/qapi-schema.json b/qapi-schema.json
+index 18457954a8..5c29bcd27f 100644
+--- a/qapi-schema.json
++++ b/qapi-schema.json
+@@ -1046,17 +1046,6 @@
+ { 'command': 'system_powerdown' }
+ 
+ ##
+-# @cpu:
+-#
+-# This command is a nop that is only provided for the purposes of compatibility.
+-#
+-# Since: 0.14.0
+-#
+-# Notes: Do not use this command.
+-##
+-{ 'command': 'cpu', 'data': {'index': 'int'} }
+-
+-##
+ # @cpu-add:
+ #
+ # Adds CPU with specified ID
+diff --git a/qmp.c b/qmp.c
+index e8c303116a..52cfd2d81c 100644
+--- a/qmp.c
++++ b/qmp.c
+@@ -113,11 +113,6 @@ void qmp_system_powerdown(Error **erp)
+     qemu_system_powerdown_request();
+ }
+ 
+-void qmp_cpu(int64_t index, Error **errp)
+-{
+-    /* Just do nothing */
+-}
+-
+ void qmp_cpu_add(int64_t id, Error **errp)
+ {
+     MachineClass *mc;
+-- 
+2.13.6
