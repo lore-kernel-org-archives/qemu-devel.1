@@ -1,21 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55372)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60794)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1eRmZe-0008M7-Kp
-	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 17:10:51 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1eRmgH-0002Rm-6Z
+	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 17:17:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1eRmZa-0006Xh-Fc
-	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 17:10:50 -0500
-Date: Wed, 20 Dec 2017 20:10:40 -0200
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20171220221040.GI24025@localhost.localdomain>
-References: <cover.1513790494.git.alistair.francis@xilinx.com>
-	<97bff6488fbc4c6b2c10879798aa149a43426fd9.1513790495.git.alistair.francis@xilinx.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1eRmgG-0005jt-3S
+	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 17:17:41 -0500
+Received: from mail-oi0-x236.google.com ([2607:f8b0:4003:c06::236]:44901)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1eRmgF-0005iJ-V9
+	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 17:17:40 -0500
+Received: by mail-oi0-x236.google.com with SMTP id l6so15631335oih.11
+	for <qemu-devel@nongnu.org>; Wed, 20 Dec 2017 14:17:39 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <97bff6488fbc4c6b2c10879798aa149a43426fd9.1513790495.git.alistair.francis@xilinx.com>
-Subject: Re: [Qemu-devel] [PATCH v6 08/29] hw/i386: Replace fprintf(stderr,
- "*\n" with error_report()
+In-Reply-To: <20171220185924.32756-1-armbru@redhat.com>
+References: <20171220185924.32756-1-armbru@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Wed, 20 Dec 2017 22:17:18 +0000
+Message-ID: <CAFEAcA8JZLC0jFBEtY3N+gPwH6AhSqWWhDf-Pt5BZ3yLaAT6=w@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL 00/13] QAPI patches for 2017-12-20
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,60 +28,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alistair Francis <alistair.francis@xilinx.com>
-Cc: qemu-devel@nongnu.org, qemu-trivial@nongnu.org, alistair23@gmail.com, armbru@redhat.com, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, "Michael S. Tsirkin" <mst@redhat.com>, Stefano Stabellini <sstabellini@kernel.org>, Anthony Perard <anthony.perard@citrix.com>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-On Wed, Dec 20, 2017 at 09:23:16AM -0800, Alistair Francis wrote:
-> Replace a large number of the fprintf(stderr, "*\n" calls with
-> error_report(). The functions were renamed with these commands and then
-> compiler issues where manually fixed.
-> 
-> find ./* -type f -exec sed -i \
->     'N;N;N;N;N;N;N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
->     {} +
-> find ./* -type f -exec sed -i \
->     'N;N;N;N;N;N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
->     {} +
-> find ./* -type f -exec sed -i \
->     'N;N;N;N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
->     {} +
-> find ./* -type f -exec sed -i \
->     'N;N;N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
->     {} +
-> find ./* -type f -exec sed -i \
->     'N;N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
->     {} +
-> find ./* -type f -exec sed -i \
->     'N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
->     {} +
-> find ./* -type f -exec sed -i \
->     'N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
->     {} +
-> find ./* -type f -exec sed -i \
->     'N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
->     {} +
-> find ./* -type f -exec sed -i \
->     'N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
->     {} +
-> find ./* -type f -exec sed -i \
->     'N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
->     {} +
-> find ./* -type f -exec sed -i \
->     'N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
->     {} +
-> 
-> Some lines where then manually tweaked to pass checkpatch.
-> 
-> Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
-> Cc: Paolo Bonzini <pbonzini@redhat.com>
-> Cc: Richard Henderson <rth@twiddle.net>
-> Cc: Eduardo Habkost <ehabkost@redhat.com>
-> Cc: "Michael S. Tsirkin" <mst@redhat.com>
-> Cc: Stefano Stabellini <sstabellini@kernel.org>
-> Cc: Anthony Perard <anthony.perard@citrix.com>
-> Acked-by: Anthony PERARD <anthony.perard@citrix.com> (Xen part)
+On 20 December 2017 at 18:59, Markus Armbruster <armbru@redhat.com> wrote:
+> The following changes since commit 200780a3a3ed067dfb2e0d2210b0ed09e748ba26:
+>
+>   Merge remote-tracking branch 'remotes/armbru/tags/pull-cmdline-2017-12-18-v2' into staging (2017-12-20 13:20:48 +0000)
+>
+> are available in the git repository at:
+>
+>   git://repo.or.cz/qemu/armbru.git tags/pull-qapi-2017-12-20
+>
+> for you to fetch changes up to 49ccefde303c84d291c70842922c37b6de6ef15a:
+>
+>   qmp: remove qmp_cpu (2017-12-20 19:18:33 +0100)
+>
+> ----------------------------------------------------------------
+> QAPI patches for 2017-12-20
+>
 
-Acked-by: Eduardo Habkost <ehabkost@redhat.com>
+Applied, thanks.
 
--- 
-Eduardo
+-- PMM
