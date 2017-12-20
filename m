@@ -1,25 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58371)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53668)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1eRfoX-0007iI-G1
-	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 09:57:46 -0500
+	(envelope-from <palmer@dabbelt.com>) id 1eRSHz-0001ce-TM
+	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 19:31:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1eRfoU-0005Ui-1i
-	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 09:57:45 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:35866)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1eRfoT-0005TE-O1
-	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 09:57:41 -0500
-Date: Wed, 20 Dec 2017 16:57:37 +0200
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20171220164809-mutt-send-email-mst@kernel.org>
-References: <cover.1513278334.git.jbaron@akamai.com>
-	<12f0830fe220dc43671f6dbc1a5d81e0276c3a9e.1513278334.git.jbaron@akamai.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <12f0830fe220dc43671f6dbc1a5d81e0276c3a9e.1513278334.git.jbaron@akamai.com>
-Subject: Re: [Qemu-devel] [PATCH net-next 1/2] virtio_net: allow hypervisor
- to indicate linkspeed and duplex setting
+	(envelope-from <palmer@dabbelt.com>) id 1eRSHw-0006Ir-2P
+	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 19:31:15 -0500
+Received: from mail-pl0-x244.google.com ([2607:f8b0:400e:c01::244]:42158)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <palmer@dabbelt.com>) id 1eRSHv-0006Hl-Ql
+	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 19:31:11 -0500
+Received: by mail-pl0-x244.google.com with SMTP id bd8so7999766plb.9
+	for <qemu-devel@nongnu.org>; Tue, 19 Dec 2017 16:31:11 -0800 (PST)
+Date: Tue, 19 Dec 2017 16:29:41 -0800
+Message-Id: <20171220002941.14560-1-palmer@dabbelt.com>
+From: Palmer Dabbelt <palmer@dabbelt.com>
+Subject: [Qemu-devel] [PATCH] linux-user: Implement renameat2 when defined
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,97 +23,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jason Baron <jbaron@akamai.com>
-Cc: qemu-devel@nongnu.org, linux-kernel@vger.kernel.org, jasowang@redhat.com
+To: qemu-devel@nongnu.org
+Cc: Palmer Dabbelt <palmer@sifive.com>, Michael Clark <mjc@sifive.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
 
-On Thu, Dec 14, 2017 at 02:33:53PM -0500, Jason Baron wrote:
-> If the hypervisor exports the link and duplex speed, let's use that instead
-> of the default unknown speed. The user can still overwrite it later if
-> desired via: 'ethtool -s'. This allows the hypervisor to set the default
-> link speed and duplex setting without requiring guest changes and is
-> consistent with how other network drivers operate. We ran into some cases
-> where the guest software was failing due to a lack of linkspeed and had to
-> fall back to a fully emulated network device that does export a linkspeed
-> and duplex setting.
-> 
-> Implement by adding a new VIRTIO_NET_F_SPEED_DUPLEX feature flag, to
-> indicate that a linkspeed and duplex setting are present.
-> 
-> Signed-off-by: Jason Baron <jbaron@akamai.com>
-> Cc: "Michael S. Tsirkin" <mst@redhat.com>
-> Cc: Jason Wang <jasowang@redhat.com>
-> ---
->  drivers/net/virtio_net.c        | 11 ++++++++++-
->  include/uapi/linux/virtio_net.h |  4 ++++
->  2 files changed, 14 insertions(+), 1 deletion(-)
-> 
-> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-> index 6fb7b65..e7a2ad6 100644
-> --- a/drivers/net/virtio_net.c
-> +++ b/drivers/net/virtio_net.c
-> @@ -2671,6 +2671,14 @@ static int virtnet_probe(struct virtio_device *vdev)
->  	netif_set_real_num_rx_queues(dev, vi->curr_queue_pairs);
->  
->  	virtnet_init_settings(dev);
-> +	if (virtio_has_feature(vdev, VIRTIO_NET_F_SPEED_DUPLEX)) {
-> +		vi->speed = virtio_cread32(vdev,
-> +					offsetof(struct virtio_net_config,
-> +					speed));
-> +		vi->duplex = virtio_cread8(vdev,
-> +					offsetof(struct virtio_net_config,
-> +					duplex));
-> +	}
->  
->  	err = register_netdev(dev);
->  	if (err) {
+From: Palmer Dabbelt <palmer@sifive.com>
 
-How are we going to validate speed values? Imagine host
-using a new 1000Gbit device and exposing that to guest.
+The RISC-V Linux port was recently accept upstream and will be released
+as part of 4.15.  While working on our glibc port I discovered that
+qemu's user-mode emulation doesn't support renameat2, which has replaced
+rename as part of the default system call list for new architectures.
+Since a bunch of commonly used functionality boils down to rename (and
+now renameat2), we ended up with many failures.
 
-Need to think what do we want guest to do.
-I think that ideally we'd say it's a 100Gbit device.
+This patch adds support for renameat2.  As I'm not familiar with QEMU
+development, I haven't really testing anything more than a simple
+"./configure; make" on the upstream codebase, but I did test this
+against our (not yet upstream) QEMU port where it appears to work for
+me.  I've just cobbled it together by copying the existing renameat
+implementation, but as there appears to be no glibc wrapper for
+renameat2 on either of the systems I've tried this on I just emited the
+system call directly.
 
-For duplex, force to one of 3 valid values?
+    commit b0da6d44157aa6e652de7634343708251ba64146
+    Author: James Hogan <james.hogan@imgtec.com>
+    Date:   Fri Apr 29 22:29:26 2016 +0100
 
+        asm-generic: Drop renameat syscall from default list
 
-> @@ -2796,7 +2804,8 @@ static struct virtio_device_id id_table[] = {
->  	VIRTIO_NET_F_CTRL_RX, VIRTIO_NET_F_CTRL_VLAN, \
->  	VIRTIO_NET_F_GUEST_ANNOUNCE, VIRTIO_NET_F_MQ, \
->  	VIRTIO_NET_F_CTRL_MAC_ADDR, \
-> -	VIRTIO_NET_F_MTU, VIRTIO_NET_F_CTRL_GUEST_OFFLOADS
-> +	VIRTIO_NET_F_MTU, VIRTIO_NET_F_CTRL_GUEST_OFFLOADS, \
-> +	VIRTIO_NET_F_SPEED_DUPLEX
->  
->  static unsigned int features[] = {
->  	VIRTNET_FEATURES,
-> diff --git a/include/uapi/linux/virtio_net.h b/include/uapi/linux/virtio_net.h
-> index fc353b5..acfcf68 100644
-> --- a/include/uapi/linux/virtio_net.h
-> +++ b/include/uapi/linux/virtio_net.h
-> @@ -36,6 +36,7 @@
->  #define VIRTIO_NET_F_GUEST_CSUM	1	/* Guest handles pkts w/ partial csum */
->  #define VIRTIO_NET_F_CTRL_GUEST_OFFLOADS 2 /* Dynamic offload configuration. */
->  #define VIRTIO_NET_F_MTU	3	/* Initial MTU advice */
-> +#define VIRTIO_NET_F_SPEED_DUPLEX 4	/* Host set linkspeed and duplex */
->  #define VIRTIO_NET_F_MAC	5	/* Host has given MAC address. */
->  #define VIRTIO_NET_F_GUEST_TSO4	7	/* Guest can handle TSOv4 in. */
->  #define VIRTIO_NET_F_GUEST_TSO6	8	/* Guest can handle TSOv6 in. */
+        The newer renameat2 syscall provides all the functionality provided by
+        the renameat syscall and adds flags, so future architectures won't need
+        to include renameat.
 
-I think I'd prefer a high feature bit - low bits are ones that can
-be backported to legacy interfaces, so I think we should hang on to
-these for fixing issues that break communication completely (like the
-mtu).
+        Therefore drop the renameat syscall from the generic syscall list unless
+        __ARCH_WANT_RENAMEAT is defined by the architecture's unistd.h prior to
+        including asm-generic/unistd.h, and adjust all architectures using the
+        generic syscall list to define it so that no in-tree architectures are
+        affected.
 
+Michael, Sagar, and Bastian are the RISC-V QEMU guys, I just use it.
+I've CC'd them all here to serve as sort of a surprise introduction for
+everyone -- they haven't seen the patch before, so blame me for the
+stupid parts :).
 
-> @@ -76,6 +77,9 @@ struct virtio_net_config {
->  	__u16 max_virtqueue_pairs;
->  	/* Default maximum transmit unit advice */
->  	__u16 mtu;
-> +	/* Host exported linkspeed and duplex */
-> +	__u32 speed;
-> +	__u8 duplex;
->  } __attribute__((packed));
->  
->  /*
-> -- 
-> 2.6.1
+CC: Michael Clark <mjc@sifive.com>
+CC: Sagar Karandikar <sagark@eecs.berkeley.edu>
+CC: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
+Signed-off-by: Palmer Dabbelt <palmer@sifive.com>
+---
+ linux-user/syscall.c | 15 +++++++++++++++
+ 1 file changed, 15 insertions(+)
+
+diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+index 11c9116c4a1e..ece574f47aca 100644
+--- a/linux-user/syscall.c
++++ b/linux-user/syscall.c
+@@ -8342,6 +8342,21 @@ abi_long do_syscall(void *cpu_env, int num, abi_long arg1,
+         }
+         break;
+ #endif
++#if defined(TARGET_NR_renameat2) && defined(__NR_renameat2)
++    case TARGET_NR_renameat2:
++        {
++            void *p2;
++            p  = lock_user_string(arg2);
++            p2 = lock_user_string(arg4);
++            if (!p || !p2)
++                ret = -TARGET_EFAULT;
++            else
++                ret = get_errno(syscall(__NR_renameat2, arg1, p, arg3, p2, arg5));
++            unlock_user(p2, arg4, 0);
++            unlock_user(p, arg2, 0);
++        }
++        break;
++#endif
+ #ifdef TARGET_NR_mkdir
+     case TARGET_NR_mkdir:
+         if (!(p = lock_user_string(arg1)))
+-- 
+2.13.6
