@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50800)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36951)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <miika9764@gmail.com>) id 1eSgZI-0008Fi-RG
-	for qemu-devel@nongnu.org; Sat, 23 Dec 2017 04:58:13 -0500
+	(envelope-from <no-reply@patchew.org>) id 1eShcd-0006K7-DO
+	for qemu-devel@nongnu.org; Sat, 23 Dec 2017 06:05:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <miika9764@gmail.com>) id 1eSgZH-0003yM-SJ
-	for qemu-devel@nongnu.org; Sat, 23 Dec 2017 04:58:12 -0500
-Received: from mail-qk0-x243.google.com ([2607:f8b0:400d:c09::243]:34899)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <miika9764@gmail.com>) id 1eSgZH-0003yE-Mq
-	for qemu-devel@nongnu.org; Sat, 23 Dec 2017 04:58:11 -0500
-Received: by mail-qk0-x243.google.com with SMTP id 143so22687189qki.2
-	for <qemu-devel@nongnu.org>; Sat, 23 Dec 2017 01:58:11 -0800 (PST)
+	(envelope-from <no-reply@patchew.org>) id 1eShcY-0005g4-QZ
+	for qemu-devel@nongnu.org; Sat, 23 Dec 2017 06:05:43 -0500
+Resent-Message-Id: <E1eShcY-0005g4-QZ@eggs.gnu.org>
+Received: from sender-of-o52.zoho.com ([135.84.80.217]:21366)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1eShcY-0005fc-H0
+	for qemu-devel@nongnu.org; Sat, 23 Dec 2017 06:05:38 -0500
+In-Reply-To: <20171220002941.14560-1-palmer@dabbelt.com>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <151378287585.90.8638590888365142538@5adcb62bf0d6>
 MIME-Version: 1.0
-In-Reply-To: <7579578e-2e0f-a6bb-f5be-ae7dfbafd6c4@redhat.com>
-References: <20171218132439.2772-1-miika9764@gmail.com>
-	<7579578e-2e0f-a6bb-f5be-ae7dfbafd6c4@redhat.com>
-From: Miika S <miika9764@gmail.com>
-Date: Sat, 23 Dec 2017 11:58:10 +0200
-Message-ID: <CABMrAh+327uiN0HBf_U-FquDxZRGAng_1bstadoO8pda-Xa5SA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH 1/3] input: add missing JIS keys to virtio
- input
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Wed, 20 Dec 2017 07:14:37 -0800 (PST)
+Subject: Re: [Qemu-devel] [PATCH] linux-user: Implement renameat2 when
+ defined
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,66 +29,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: palmer@dabbelt.com
+Cc: famz@redhat.com, qemu-devel@nongnu.org, kbastian@mail.uni-paderborn.de, palmer@sifive.com, mjc@sifive.com, sagark@eecs.berkeley.edu
 
-Thank you for pointing out these errors. I've sent a new set
-of patches with the errors addressed, but later noticed that
-the new revision should have been titled [PATCH v2]. So to
-anybody reading this thread, it has been replaced with a new
-one.
-
-On Thu, Dec 21, 2017 at 12:35 AM, Eric Blake <eblake@redhat.com> wrote:
-> On 12/18/2017 07:24 AM, Miika S wrote:
->>
->> Signed-off-by: Miika S <miika9764@gmail.com>
->> ---
->>   hw/input/virtio-input-hid.c | 7 +++++++
->>   qapi/ui.json                | 2 +-
->>   ui/keycodemapdb             | 2 +-
->>   3 files changed, 9 insertions(+), 2 deletions(-)
->
->
-> When sending a multi-patch series, please remember to include the 0/3 cover
-> letter.  'git config format.coverletter auto' can make this task easier to
-> remember.
->
->
->>     static const unsigned int keymap_button[INPUT_BUTTON__MAX] = {
->> diff --git a/qapi/ui.json b/qapi/ui.json
->> index 07b468f625..da4be505ac 100644
->> --- a/qapi/ui.json
->> +++ b/qapi/ui.json
->> @@ -775,7 +775,7 @@
->>               'left', 'up', 'down', 'right', 'insert', 'delete', 'stop',
->> 'again',
->>               'props', 'undo', 'front', 'copy', 'open', 'paste', 'find',
->> 'cut',
->>               'lf', 'help', 'meta_l', 'meta_r', 'compose', 'pause',
->> -            'ro', 'hiragana', 'henkan', 'yen',
->> +            'ro', 'hiragana', 'muhenkan', 'henkan', 'katakanahiragana',
->> 'yen',
->>               'kp_comma', 'kp_equals', 'power', 'sleep', 'wake',
->>               'audionext', 'audioprev', 'audiostop', 'audioplay',
->> 'audiomute',
->>               'volumeup', 'volumedown', 'mediaselect',
->
->
-> Missing documentation that calls out which enum values were added in 2.12.
->
->> diff --git a/ui/keycodemapdb b/ui/keycodemapdb
->> index 10739aa260..05dad417e9 160000
->> --- a/ui/keycodemapdb
->> +++ b/ui/keycodemapdb
->> @@ -1 +1 @@
->> -Subproject commit 10739aa26051a5d49d88132604539d3ed085e72e
->> +Subproject commit 05dad417e9d0b37ee1fba33056d91a6b734b3357
->
->
-> Generally, the commit message body should call out that a submodule change
-> alongside other changes is intentional.
->
-> --
-> Eric Blake, Principal Software Engineer
-> Red Hat, Inc.           +1-919-301-3266
-> Virtualization:  qemu.org | libvirt.org
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IDIwMTcxMjIwMDAyOTQxLjE0NTYwLTEtcGFsbWVyQGRhYmJlbHQuY29tClN1Ympl
+Y3Q6IFtRZW11LWRldmVsXSBbUEFUQ0hdIGxpbnV4LXVzZXI6IEltcGxlbWVudCByZW5hbWVhdDIg
+d2hlbiBkZWZpbmVkCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCgpCQVNF
+PWJhc2UKbj0xCnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJBU0UuLiB8IHdjIC1sKQpmYWls
+ZWQ9MAoKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0t
+bG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKCmNvbW1pdHM9IiQoZ2l0IGxvZyAtLWZvcm1hdD0lSCAt
+LXJldmVyc2UgJEJBU0UuLikiCmZvciBjIGluICRjb21taXRzOyBkbwogICAgZWNobyAiQ2hlY2tp
+bmcgUEFUQ0ggJG4vJHRvdGFsOiAkKGdpdCBsb2cgLW4gMSAtLWZvcm1hdD0lcyAkYykuLi4iCiAg
+ICBpZiAhIGdpdCBzaG93ICRjIC0tZm9ybWF0PWVtYWlsIHwgLi9zY3JpcHRzL2NoZWNrcGF0Y2gu
+cGwgLS1tYWlsYmFjayAtOyB0aGVuCiAgICAgICAgZmFpbGVkPTEKICAgICAgICBlY2hvCiAgICBm
+aQogICAgbj0kKChuKzEpKQpkb25lCgpleGl0ICRmYWlsZWQKPT09IFRFU1QgU0NSSVBUIEVORCA9
+PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKU3dp
+dGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0JwpiY2ZmNWE0ODI5IGxpbnV4LXVzZXI6IEltcGxl
+bWVudCByZW5hbWVhdDIgd2hlbiBkZWZpbmVkCgo9PT0gT1VUUFVUIEJFR0lOID09PQpDaGVja2lu
+ZyBQQVRDSCAxLzE6IGxpbnV4LXVzZXI6IEltcGxlbWVudCByZW5hbWVhdDIgd2hlbiBkZWZpbmVk
+Li4uCldBUk5JTkc6IGFyY2hpdGVjdHVyZSBzcGVjaWZpYyBkZWZpbmVzIHNob3VsZCBiZSBhdm9p
+ZGVkCiM1NzogRklMRTogbGludXgtdXNlci9zeXNjYWxsLmM6ODM0NToKKyNpZiBkZWZpbmVkKFRB
+UkdFVF9OUl9yZW5hbWVhdDIpICYmIGRlZmluZWQoX19OUl9yZW5hbWVhdDIpCgpFUlJPUjogYnJh
+Y2VzIHt9IGFyZSBuZWNlc3NhcnkgZm9yIGFsbCBhcm1zIG9mIHRoaXMgc3RhdGVtZW50CiM2Mzog
+RklMRTogbGludXgtdXNlci9zeXNjYWxsLmM6ODM1MToKKyAgICAgICAgICAgIGlmICghcCB8fCAh
+cDIpClsuLi5dCisgICAgICAgICAgICBlbHNlClsuLi5dCgpXQVJOSU5HOiBsaW5lIG92ZXIgODAg
+Y2hhcmFjdGVycwojNjY6IEZJTEU6IGxpbnV4LXVzZXIvc3lzY2FsbC5jOjgzNTQ6CisgICAgICAg
+ICAgICAgICAgcmV0ID0gZ2V0X2Vycm5vKHN5c2NhbGwoX19OUl9yZW5hbWVhdDIsIGFyZzEsIHAs
+IGFyZzMsIHAyLCBhcmc1KSk7Cgp0b3RhbDogMSBlcnJvcnMsIDIgd2FybmluZ3MsIDIxIGxpbmVz
+IGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAg
+SWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRv
+IHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCj09PSBPVVRQ
+VVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgotLS0KRW1haWwg
+Z2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10u
+ClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEBmcmVlbGlzdHMub3Jn
