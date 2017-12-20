@@ -1,34 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42872)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42578)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eRZhF-0006lC-Bt
-	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 03:25:55 -0500
+	(envelope-from <marcel@redhat.com>) id 1eRfyD-000660-By
+	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 10:07:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eRZhB-0008KK-5a
-	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 03:25:49 -0500
-Received: from indium.canonical.com ([91.189.90.7]:39142)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1eRZhA-0008JC-Td
-	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 03:25:45 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1eRZhA-0004WT-0E
-	for <qemu-devel@nongnu.org>; Wed, 20 Dec 2017 08:25:44 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 001DE2E80C0
-	for <qemu-devel@nongnu.org>; Wed, 20 Dec 2017 08:25:44 +0000 (UTC)
+	(envelope-from <marcel@redhat.com>) id 1eRfy7-0000Wm-3N
+	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 10:07:45 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:49728)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <marcel@redhat.com>) id 1eRfy6-0000Vl-Rt
+	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 10:07:39 -0500
+References: <20171217125457.3429-1-marcel@redhat.com>
+	<20171219194951-mutt-send-email-mst@kernel.org>
+From: Marcel Apfelbaum <marcel@redhat.com>
+Message-ID: <77710384-30d0-cb76-9dbc-6195b831f050@redhat.com>
+Date: Wed, 20 Dec 2017 17:07:38 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 20 Dec 2017 08:11:01 -0000
-From: Gustavo Moreira <gmoreira@gmail.com>
-Reply-To: Bug 1739371 <1739371@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <151375574544.16920.12315859630279795224.malonedeb@soybean.canonical.com>
-Message-Id: <151375746133.17869.13771931784340205211.launchpad@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1739371] Re: qemu-system-arm snapshot loadvm core
- dumped
+In-Reply-To: <20171219194951-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH V2 0/5] hw/pvrdma: PVRDMA device
+ implementation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,107 +29,146 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: qemu-devel@nongnu.org, ehabkost@redhat.com, imammedo@redhat.com, yuval.shaia@oracle.com, pbonzini@redhat.com
 
-** Tags added: qemu-system-arm snapshot snapshots vexpress-a15
+On 19/12/2017 20:05, Michael S. Tsirkin wrote:
+> On Sun, Dec 17, 2017 at 02:54:52PM +0200, Marcel Apfelbaum wrote:
+>> RFC -> V2:
+>>   - Full implementation of the pvrdma device
+>>   - Backend is an ibdevice interface, no need for the KDBR module
+>>
+>> General description
+>> ===================
+>> PVRDMA is the QEMU implementation of VMware's paravirtualized RDMA device.
+>> It works with its Linux Kernel driver AS IS, no need for any special guest
+>> modifications.
+>>
+>> While it complies with the VMware device, it can also communicate with bare
+>> metal RDMA-enabled machines and does not require an RDMA HCA in the host, it
+>> can work with Soft-RoCE (rxe).
+>>
+>> It does not require the whole guest RAM to be pinned
+> 
 
-** Tags added: arm
+Hi Michael,
 
--- =
+> What happens if guest attempts to register all its memory?
+> 
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1739371
+Then we loose, is not different from bare metal, reg_mr will pin all the RAM.
+However this is only one scenario, and hopefully not much used
+for RoCE. (I know IPoIB does that, but it doesn't make sense to use it with RoCE).
 
-Title:
-  qemu-system-arm snapshot loadvm core dumped
+>> allowing memory
+>> over-commit
+>> and, even if not implemented yet, migration support will be
+>> possible with some HW assistance.
+> 
+> What does "HW assistance" mean here?
 
-Status in QEMU:
-  New
+Several things:
+1. We need to be able to pass resource numbers when we create
+them on the destination machine.
+2. We also need a way to stall prev connections while starting the new ones.
+3. Last, we need the HW to pass resources states.
 
-Bug description:
-  Ubuntu Qemu is crashing trying to restore saved snapshot in qemu-system-a=
-rm.
-  I've tried different guests kernels, but I wasn't lucky with any of them.
+> Can it work with any existing hardware?
+> 
 
-  The guest vm boots and I can use it normally. The issue is when I save
-  the snapshot using "savevm Base0", "quit" and then I restore that
-  snapshot using "-loadvm Base0" from the cmd line.
+Sadly no, however we talked with Mellanox at the last year
+Plumbers Conference and all the above are on their plans.
+We hope this submission will help, since now we will have
+a fast way to test and use it.
 
-  The only difference I've noticed is tweaking the guest memory:
-  * With -m 512 or 1024 it crashes as you can see below.
-  * With -m 2048 it doesn't crash, it restores the vm and I can see the scr=
-een as it was, but the OS is halted. And it's not just the keyboard. I've t=
-ried saving the snapshot while it's booting with lot of lines being printed=
- on screen and after restoring it, the OS is frozen.
+For Soft-RoCE backend is doable, but is best to wait first to
+see how HCAs are going to expose the changes.
 
-  I also tried limiting the guest kernel memory using the mem parameter
-  (mem=3D2048M) and disabling the kernel address space randomization
-  (nokaslr) with the same results.
+>>
+>>   Design
+>>   ======
+>>   - Follows the behavior of VMware's pvrdma device, however is not tightly
+>>     coupled with it
+> 
+> Everything seems to be in pvrdma. Since it's not coupled, could you
+> split code to pvrdma specific and generic parts?
+> 
+>> and most of the code can be reused if we decide to
+>>     continue to a Virtio based RDMA device.
+> 
+> I suspect that without virtio we won't be able to do any future
+> extensions.
+> 
 
-  OS: Ubuntu 16.04.3 LTS (xenial)
+While I do agree is harder to work with a 3rd party spec, their
+Linux driver is open source and we may be able to do sane
+modifications.
 
-  $ qemu-system-arm --version
-  QEMU emulator version 2.5.0 (Debian 1:2.5+dfsg-5ubuntu10.16), Copyright (=
-c) 2003-2008 Fabrice Bellard
+>>   - It exposes 3 BARs:
+>>      BAR 0 - MSIX, utilize 3 vectors for command ring, async events and
+>>              completions
+>>      BAR 1 - Configuration of registers
 
-  $ qemu-system-arm -kernel kernel/vmlinuz-4.10.0-42-generic -initrd kernel=
-/initrd.img-4.10.0-42-generic -M vexpress-a15 -m 512 -append 'root=3D/dev/m=
-mcblk0 rootwait console=3Dtty0' -sd vexpress-4G.qcow2 -dtb device-tree/vexp=
-ress-v2p-ca15-tc1.dtb  -loadvm Base0
-  pulseaudio: set_sink_input_volume() failed
-  pulseaudio: Reason: Invalid argument
-  pulseaudio: set_sink_input_mute() failed
-  pulseaudio: Reason: Invalid argument
-  qemu: fatal: Trying to execute code outside RAM or ROM at 0xc0321568
+[...]
 
-  R00=3D00000001 R01=3D00000000 R02=3D00000000 R03=3Dc0321560
-  R04=3Dc1500000 R05=3Dc150529c R06=3Dc1505234 R07=3Dc14384d0
-  R08=3D00000000 R09=3D00000000 R10=3Dc1501f50 R11=3Dc1501f3c
-  R12=3Dc1501f40 R13=3Dc1501f30 R14=3Dc030a184 R15=3Dc0321568
-  PSR=3D60070093 -ZC- A S svc32
-  s00=3D6374652f s01=3D636f6c2f d00=3D636f6c2f6374652f
-  s02=3D7273752f s03=3D6962732f d01=3D6962732f7273752f
-  s04=3D6e612f6e s05=3D6f726361 d02=3D6f7263616e612f6e
-  s06=3D7c7c206e s07=3D63202820 d03=3D632028207c7c206e
-  s08=3D202f2064 s09=3D72202626 d04=3D72202626202f2064
-  s10=3D702d6e75 s11=3D73747261 d05=3D73747261702d6e75
-  s12=3D722d2d20 s13=3D726f7065 d06=3D726f7065722d2d20
-  s14=3D652f2074 s15=3D632f6374 d07=3D632f6374652f2074
-  s16=3D00000000 s17=3D00000000 d08=3D0000000000000000
-  s18=3D00000000 s19=3D00000000 d09=3D0000000000000000
-  s20=3D00000000 s21=3D00000000 d10=3D0000000000000000
-  s22=3D00000000 s23=3D00000000 d11=3D0000000000000000
-  s24=3D00000000 s25=3D00000000 d12=3D0000000000000000
-  s26=3D00000000 s27=3D00000000 d13=3D0000000000000000
-  s28=3D00000000 s29=3D00000000 d14=3D0000000000000000
-  s30=3D00000000 s31=3D00000000 d15=3D0000000000000000
-  s32=3D00000000 s33=3D00000000 d16=3D0000000000000000
-  s34=3D00000000 s35=3D00000000 d17=3D0000000000000000
-  s36=3D00000000 s37=3D00000000 d18=3D0000000000000000
-  s38=3D00000000 s39=3D00000000 d19=3D0000000000000000
-  s40=3D00000000 s41=3D00000000 d20=3D0000000000000000
-  s42=3D00000000 s43=3D00000000 d21=3D0000000000000000
-  s44=3D00000000 s45=3D00000000 d22=3D0000000000000000
-  s46=3D00000000 s47=3D00000000 d23=3D0000000000000000
-  s48=3D00000000 s49=3D00000000 d24=3D0000000000000000
-  s50=3D00000000 s51=3D00000000 d25=3D0000000000000000
-  s52=3D00000000 s53=3D00000000 d26=3D0000000000000000
-  s54=3D00000000 s55=3D00000000 d27=3D0000000000000000
-  s56=3D00000000 s57=3D00000000 d28=3D0000000000000000
-  s58=3D00000000 s59=3D00000000 d29=3D0000000000000000
-  s60=3D00000000 s61=3D00000000 d30=3D0000000000000000
-  s62=3D00000000 s63=3D00000000 d31=3D0000000000000000
-  FPSCR: 00000000
-  Aborted (core dumped)
+>> The pvrdma backend is an ibdevice interface that can be exposed
+>> either by a Soft-RoCE(rxe) device on machines with no RDMA device,
+>> or an HCA SRIOV function(VF/PF).
+>> Note that ibdevice interfaces can't be shared between pvrdma devices,
+>> each one requiring a separate instance (rxe or SRIOV VF).
+> 
+> So what's the advantage of this over pass-through then?
+> 
 
-  As I said above, the same happens when -m 1024 is used.
+1. We can work also with the same ibdevice for multiple pvrdma
+devices using multiple GIDs; it works (tested).
+The problem begins when we think about migration, the way
+HCAs work today is one resource namespace per ibdevice,
+not per GID. I emphasize that this can be changed,  however
+we don't have a timeline for it.
 
-  I have a different issue when I use the qemu git master version, but
-  I'm submiting a different ticket for that.
+2. We do have advantages:
+- Guest agnostic device (we can change host HCA)
+- Memory over commit (unless the guest registers all the memory)
+- Future migration support
+- A friendly migration of RDMA VMWare guests to QEMU.
 
-  Cheers,
-  Gus
+3. In case when live migration is not a must we can
+    use multiple GIDs of the same port, so we do not
+    depend on SRIOV.
 
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1739371/+subscriptions
+4. We support Soft RoCE backend, people can test their
+    software on guest without RDMA hw.
+
+
+Thanks,
+Marcel
+
+> 
+>>
+>> Tests and performance
+>> =====================
+>> Tested with SoftRoCE backend (rxe)/Mellanox ConnectX3,
+>> and Mellanox ConnectX4 HCAs with:
+>>    - VMs in the same host
+>>    - VMs in different hosts
+>>    - VMs to bare metal.
+>>
+>> The best performance achieved with ConnectX HCAs and buffer size
+>> bigger than 1MB which was the line rate ~ 50Gb/s.
+>> The conclusion is that using the PVRDMA device there are no
+>> actual performance penalties compared to bare metal for big enough
+>> buffers (which is quite common when using RDMA), while allowing
+>> memory overcommit.
+>>
+>> Marcel Apfelbaum (3):
+>>    mem: add share parameter to memory-backend-ram
+>>    docs: add pvrdma device documentation.
+>>    MAINTAINERS: add entry for hw/net/pvrdma
+>>
+>> Yuval Shaia (2):
+>>    pci/shpc: Move function to generic header file
+>>    pvrdma: initial implementation
+>>
+
+[...]
