@@ -1,20 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59526)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35914)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1eRc1M-0004zS-A3
-	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 05:54:45 -0500
+	(envelope-from <berrange@redhat.com>) id 1eRc4P-0007G6-LC
+	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 05:57:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1eRc1L-00050W-Ci
-	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 05:54:44 -0500
-References: <20171220103412.13048-1-kwolf@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <b6e0eb49-de02-f109-8cd9-3d3768281eb7@redhat.com>
-Date: Wed, 20 Dec 2017 11:54:30 +0100
+	(envelope-from <berrange@redhat.com>) id 1eRc4K-0008R5-3D
+	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 05:57:53 -0500
+Date: Wed, 20 Dec 2017 10:57:40 +0000
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20171220105740.GQ21216@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <2cd24073-b6d9-6479-59b1-869db6c25103@redhat.com>
+	<87ind4gxcb.fsf@dusky.pond.sub.org>
+	<20171220104436.fzucmsombnpyxoke@eukaryote>
 MIME-Version: 1.0
-In-Reply-To: <20171220103412.13048-1-kwolf@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 00/19] Drain fixes and cleanups, part 2
+Content-Disposition: inline
+In-Reply-To: <20171220104436.fzucmsombnpyxoke@eukaryote>
+Subject: Re: [Qemu-devel] [Qemu-block] Raw notes from a small block
+ layer/QAPI/something pre-christmas meeting
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,64 +26,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-Cc: famz@redhat.com, qemu-devel@nongnu.org
+To: Kashyap Chamarthy <kchamart@redhat.com>
+Cc: Markus Armbruster <armbru@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Qemu-block <qemu-block@nongnu.org>, Max Reitz <mreitz@redhat.com>
 
-On 20/12/2017 11:33, Kevin Wolf wrote:
-> This is the second part of my work to fix drain and hopefully to prevent
-> it from attracting bugs as much as it did in the past. There is
-> definitely at least a third part coming after this, see below.
+On Wed, Dec 20, 2017 at 11:44:36AM +0100, Kashyap Chamarthy wrote:
+> On Mon, Dec 18, 2017 at 11:11:00AM +0100, Markus Armbruster wrote:
+> > Max Reitz <mreitz@redhat.com> writes:
 > 
-> In this series, the following improvments are made:
-> * Fix several bugs and inconsistencies
-> * Create lots of unit tests for the drain functions
-> * Introduce bdrv_subtree_drained_begin/end() to drain a whole subtree
->   rather than only a single node
-> * Use this to make bdrv_reopen() safe (graph changes in callbacks
->   called during its internal bdrv_drain_all() frequently broke it)
+> [...]
 > 
-> Planned for part three: Make graph modifications in callbacks safe by
-> avoiding BDRV_POLL_WHILE() calls while we're recursing through the
-> graph. We can recurse before BDRV_POLL_WHILE(), after it or while
-> evaluating its condition, but never call any callbacks while we're
-> iterating child or parent lists.
+> Thanks, Max, for the detailed notes.
+> 
+> > > Image creation in qemu-system-* vs. qemu-img:
+> > >   In order to get proper introspection for qemu-img create, we need a
+> > >   QAPI schema.  If we have a QAPI schema, we might as well add
+> > >   blockdev-create to QMP.
+> > >   As long as we do not have a really-none (null, void, ...) machine type
+> > >   for qemu-system-*, launching such a process just for creating an image
+> > >   will bring quite a bit of overhead (e.g. with -M none -accel qtest).
+> > >   However, as for libvirt, this is not exactly a regression since
+> > >   libvirt currently cannot create images at all (apart from implicitly
+> > >   through drive-mirror etc.).  Further work on voidifying qemu-system-*
+> > >   will improve performance.
+> > 
+> > Another thought: do we want to give qemu-system-* the necessary
+> > privileges for creating images?  Two cases: running with and without a
+> > guest.
+> 
+> Related: Just curious -- was it an explicit design decision to not give
+> `qemu-system-*` permissions to create disk images?
 
-This is very nice, thanks for it!  I only had two comments, one of them
-pretty minor.
+Our security model considers QEMU broadly untrustworthy, and so any resources
+it needs to use must either be passed in by libvirt, or have permissions
+explicitly assigned to permit usage by QEMU. QEMU is allowed to create tmp
+files, and create RAM files for memory backing, but in general we don't want
+to have QEMU able to create arbitrary files, only open things that are
+already created.
 
-Paolo
-
-> Fam Zheng (1):
->   block: Remove unused bdrv_requests_pending
-> 
-> Kevin Wolf (18):
->   block: Assert drain_all is only called from main AioContext
->   block: Make bdrv_drain() driver callbacks non-recursive
->   test-bdrv-drain: Test callback for bdrv_drain
->   test-bdrv-drain: Test bs->quiesce_counter
->   blockjob: Pause job on draining any job BDS
->   test-bdrv-drain: Test drain vs. block jobs
->   block: Don't block_job_pause_all() in bdrv_drain_all()
->   block: Nested drain_end must still call callbacks
->   test-bdrv-drain: Test nested drain sections
->   block: Don't notify parents in drain call chain
->   block: Add bdrv_subtree_drained_begin/end()
->   test-bdrv-drain: Tests for bdrv_subtree_drain
->   test-bdrv-drain: Test behaviour in coroutine context
->   test-bdrv-drain: Recursive draining with multiple parents
->   block: Allow graph changes in subtree drained section
->   test-bdrv-drain: Test graph changes in drained section
->   commit: Simplify reopen of base
->   block: Keep nodes drained between reopen_queue/multiple
-> 
->  include/block/block.h     |  20 +-
->  include/block/block_int.h |   3 +-
->  block.c                   |  74 +++++--
->  block/commit.c            |   8 +-
->  block/io.c                | 128 ++++++++----
->  block/replication.c       |   6 +
->  blockjob.c                |  22 +-
->  qemu-io-cmds.c            |   3 +
->  tests/test-bdrv-drain.c   | 520 +++++++++++++++++++++++++++++++++++++++++++++-
->  9 files changed, 696 insertions(+), 88 deletions(-)
-> 
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
