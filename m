@@ -1,22 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38522)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41331)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Michael.Wu@ngc.com>) id 1eRen3-0001po-EC
-	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 08:52:11 -0500
+	(envelope-from <laurent@vivier.eu>) id 1eReoq-0003Dj-Lv
+	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 08:54:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Michael.Wu@ngc.com>) id 1eRemy-0005aX-72
-	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 08:52:09 -0500
-Received: from xspc0103.northgrum.com ([157.127.149.150]:58630)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <Michael.Wu@ngc.com>) id 1eRemx-0005UZ-QP
-	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 08:52:04 -0500
-From: "Wu, Michael Y [US] (MS)" <Michael.Wu@ngc.com>
-Date: Wed, 20 Dec 2017 13:51:49 +0000
-Message-ID: <11b2dc716bf343cc9e93cc46693ab93f@XCGC3021.northgrum.com>
-Content-Language: en-US
+	(envelope-from <laurent@vivier.eu>) id 1eReom-00080j-FA
+	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 08:54:00 -0500
+Received: from mout.kundenserver.de ([212.227.126.130]:58993)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1eReom-0007yF-4B
+	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 08:53:56 -0500
+References: <20171220121406.24056-1-laurent@vivier.eu>
+	<CAAdtpL5QmaXbGN_q5nMiUuoJRtNf4QF2yz1xWUK0-b6ZRo+dng@mail.gmail.com>
+From: Laurent Vivier <laurent@vivier.eu>
+Message-ID: <e4d9b437-159c-556d-f529-1429f6f14f33@vivier.eu>
+Date: Wed, 20 Dec 2017 14:53:47 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] Generating external interrupt on PPC bare metal code
+In-Reply-To: <CAAdtpL5QmaXbGN_q5nMiUuoJRtNf4QF2yz1xWUK0-b6ZRo+dng@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v2] Split adb.c into adb.c,
+ adb-mouse.c and adb-kbd.c
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,28 +29,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Gerd Hoffmann <kraxel@redhat.com>
 
-Hi,
+Le 20/12/2017 à 14:16, Philippe Mathieu-Daudé a écrit :
+> On Wed, Dec 20, 2017 at 9:14 AM, Laurent Vivier <laurent@vivier.eu> wrote:
+>> It makes the code clearer to separate the bus implementation
+>> from the devices one.
+>>
+>> Replace ADB_DPRINTF() with trace events (and adding new ones in adb-kbd.c).
+>> Some minor changes to make checkpatch.pl happy.
+>>
+>> Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+>> ---
+>> v2: move internal declarations to adb-internal.h
+>>     replace ADB_DPRINTF() with trace event.
+>>
+>>  hw/input/Makefile.objs  |   2 +-
+>>  hw/input/adb-internal.h |  49 ++++
+>>  hw/input/adb-kbd.c      | 400 +++++++++++++++++++++++++++++++
+>>  hw/input/adb-mouse.c    | 254 ++++++++++++++++++++
+>>  hw/input/adb.c          | 622 +-----------------------------------------------
+>>  hw/input/trace-events   |   8 +
+>>  6 files changed, 714 insertions(+), 621 deletions(-)
+>>  create mode 100644 hw/input/adb-internal.h
+>>  create mode 100644 hw/input/adb-kbd.c
+>>  create mode 100644 hw/input/adb-mouse.c
+>>
+...
+>> diff --git a/hw/input/trace-events b/hw/input/trace-events
+>> index 88150ef7a6..a8d46cb766 100644
+>> --- a/hw/input/trace-events
+>> +++ b/hw/input/trace-events
+>> @@ -1,5 +1,13 @@
+>>  # See docs/devel/tracing.txt for syntax documentation.
+>>
+>> +# hw/input/adb-kbd.c
+>> +adb_kbd_no_key(void) "Ignoring NO_KEY"
+>> +adb_kbd_writereg(int reg, uint8_t val) "reg %d val 0x%2.2x"
+>> +adb_kbd_readreg(int reg, uint8_t val0, uint8_t val1) "reg %d obuf[0] 0x%2.2x obuf[1] 0x%2.2x"
+> 
+> Minor aesthetical change:
+> adb_kbd_readreg(int reg, uint8_t val0, uint8_t val1) "reg %d obuf
+> [0x%2.2x, 0x%2.2x]"
+> 
+> Anyway, regardless this:
+> Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+> 
+>> +# hw/input/adb-mouse.c
+>> +adb_mouse_writereg(int reg, uint8_t val) "reg %d val 0x%2.2x"
+>> +adb_mouse_readreg(int reg, uint8_t val0, uint8_t val1) "reg %d obuf[0] 0x%2.2x obuf[1] 0x%2.2x"
+> 
+> Ditto:
+> adb_mouse_readreg(int reg, uint8_t val0, uint8_t val1) "reg %d obuf
+> [0x%2.2x, 0x%2.2x]"
+> 
 
-I am attempting to generate an external interrupt from bare metal code I've=
- written. The system I am emulating is something I've developed on my own f=
-or experimentation. The system has a very simple interrupt controller that =
-I've written which would call qemu_set_irq() when a certain memory address =
-is written into. The program running on the system simply writes into that =
-memory address to set off the interrupt.
+I will in case of a v3: I don't think it is worth another round only for
+that.
 
-The program running performs as expected and qemu_set_irq() is called. I tu=
-rned on the interrupt log messages to see what I was getting:
-ppc6xx_set_irq: env 0x7f93319cc290 pin 5 level 1
-ppc6xx_set_irq: set the external IRQ state to 1
-ppc_set_irq: 0x7f93319cc290 n_IRQ 3 level 1 =3D> pending 00000008req 000000=
-02
-
-It seems like the internal QEMU interrupt handler is being called but the i=
-nterrupt is not jumping to the desired external interrupt address. I am cur=
-rently using GDB to determine if the interrupt is set off or not. I've also=
- made sure that my bare metal program enables external interrupt bit in the=
- machine state register. Any suggestions or advice would be great.
-
-Thanks!
+Thanks,
+Laurent
