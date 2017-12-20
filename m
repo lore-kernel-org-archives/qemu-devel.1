@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55954)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55992)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1eReIB-0004kA-MN
-	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 08:20:16 -0500
+	(envelope-from <kwolf@redhat.com>) id 1eReIC-0004mq-OH
+	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 08:20:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1eReIA-0006bx-Ql
-	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 08:20:15 -0500
+	(envelope-from <kwolf@redhat.com>) id 1eReIB-0006cu-ND
+	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 08:20:16 -0500
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Wed, 20 Dec 2017 14:19:34 +0100
-Message-Id: <20171220131939.27543-10-kwolf@redhat.com>
+Date: Wed, 20 Dec 2017 14:19:37 +0100
+Message-Id: <20171220131939.27543-13-kwolf@redhat.com>
 In-Reply-To: <20171220131939.27543-1-kwolf@redhat.com>
 References: <20171220131939.27543-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL 09/14] block: Unify order in drain functions
+Subject: [Qemu-devel] [PULL 12/14] qcow2: get rid of qcow2_backing_read1
+ routine
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,73 +23,108 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, qemu-devel@nongnu.org
 
-Drain requests are propagated to child nodes, parent nodes and directly
-to the AioContext. The order in which this happened was different
-between all combinations of drain/drain_all and begin/end.
+From: Edgar Kaziakhmedov <edgar.kaziakhmedov@virtuozzo.com>
 
-The correct order is to keep children only drained when their parents
-are also drained. This means that at the start of a drained section, the
-AioContext needs to be drained first, the parents second and only then
-the children. The correct order for the end of a drained section is the
-opposite.
+Since bdrv_co_preadv does all neccessary checks including
+reading after the end of the backing file, avoid duplication
+of verification before bdrv_co_preadv call.
 
-This patch changes the three other functions to follow the example of
-bdrv_drained_begin(), which is the only one that got it right.
-
+Signed-off-by: Edgar Kaziakhmedov <edgar.kaziakhmedov@virtuozzo.com>
+Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 ---
- block/io.c | 12 ++++++++----
- 1 file changed, 8 insertions(+), 4 deletions(-)
+ block/qcow2.h |  3 ---
+ block/qcow2.c | 51 ++++++++-------------------------------------------
+ 2 files changed, 8 insertions(+), 46 deletions(-)
 
-diff --git a/block/io.c b/block/io.c
-index 5fdb92a15e..1e92d2e5b2 100644
---- a/block/io.c
-+++ b/block/io.c
-@@ -277,6 +277,7 @@ void bdrv_drained_begin(BlockDriverState *bs)
-         return;
-     }
- 
-+    /* Stop things in parent-to-child order */
-     if (atomic_fetch_inc(&bs->quiesce_counter) == 0) {
-         aio_disable_external(bdrv_get_aio_context(bs));
-         bdrv_parent_drained_begin(bs);
-@@ -297,8 +298,9 @@ void bdrv_drained_end(BlockDriverState *bs)
-         return;
-     }
- 
--    bdrv_parent_drained_end(bs);
-+    /* Re-enable things in child-to-parent order */
-     bdrv_drain_invoke(bs, false);
-+    bdrv_parent_drained_end(bs);
-     aio_enable_external(bdrv_get_aio_context(bs));
+diff --git a/block/qcow2.h b/block/qcow2.h
+index 6f0ff15dd0..46c8cf44ec 100644
+--- a/block/qcow2.h
++++ b/block/qcow2.h
+@@ -528,9 +528,6 @@ uint32_t offset_to_reftable_index(BDRVQcow2State *s, uint64_t offset)
  }
  
-@@ -351,9 +353,10 @@ void bdrv_drain_all_begin(void)
-     for (bs = bdrv_first(&it); bs; bs = bdrv_next(&it)) {
-         AioContext *aio_context = bdrv_get_aio_context(bs);
+ /* qcow2.c functions */
+-int qcow2_backing_read1(BlockDriverState *bs, QEMUIOVector *qiov,
+-                  int64_t sector_num, int nb_sectors);
+-
+ int64_t qcow2_refcount_metadata_size(int64_t clusters, size_t cluster_size,
+                                      int refcount_order, bool generous_increase,
+                                      uint64_t *refblock_count);
+diff --git a/block/qcow2.c b/block/qcow2.c
+index 1914a940e5..4348b2c0c5 100644
+--- a/block/qcow2.c
++++ b/block/qcow2.c
+@@ -1672,34 +1672,12 @@ static int64_t coroutine_fn qcow2_co_get_block_status(BlockDriverState *bs,
+     return status;
+ }
  
-+        /* Stop things in parent-to-child order */
-         aio_context_acquire(aio_context);
--        bdrv_parent_drained_begin(bs);
-         aio_disable_external(aio_context);
-+        bdrv_parent_drained_begin(bs);
-         bdrv_drain_invoke(bs, true);
-         aio_context_release(aio_context);
+-/* handle reading after the end of the backing file */
+-int qcow2_backing_read1(BlockDriverState *bs, QEMUIOVector *qiov,
+-                        int64_t offset, int bytes)
+-{
+-    uint64_t bs_size = bs->total_sectors * BDRV_SECTOR_SIZE;
+-    int n1;
+-
+-    if ((offset + bytes) <= bs_size) {
+-        return bytes;
+-    }
+-
+-    if (offset >= bs_size) {
+-        n1 = 0;
+-    } else {
+-        n1 = bs_size - offset;
+-    }
+-
+-    qemu_iovec_memset(qiov, n1, 0, bytes - n1);
+-
+-    return n1;
+-}
+-
+ static coroutine_fn int qcow2_co_preadv(BlockDriverState *bs, uint64_t offset,
+                                         uint64_t bytes, QEMUIOVector *qiov,
+                                         int flags)
+ {
+     BDRVQcow2State *s = bs->opaque;
+-    int offset_in_cluster, n1;
++    int offset_in_cluster;
+     int ret;
+     unsigned int cur_bytes; /* number of bytes in current iteration */
+     uint64_t cluster_offset = 0;
+@@ -1734,26 +1712,13 @@ static coroutine_fn int qcow2_co_preadv(BlockDriverState *bs, uint64_t offset,
+         case QCOW2_CLUSTER_UNALLOCATED:
  
-@@ -395,10 +398,11 @@ void bdrv_drain_all_end(void)
-     for (bs = bdrv_first(&it); bs; bs = bdrv_next(&it)) {
-         AioContext *aio_context = bdrv_get_aio_context(bs);
- 
-+        /* Re-enable things in child-to-parent order */
-         aio_context_acquire(aio_context);
--        aio_enable_external(aio_context);
--        bdrv_parent_drained_end(bs);
-         bdrv_drain_invoke(bs, false);
-+        bdrv_parent_drained_end(bs);
-+        aio_enable_external(aio_context);
-         aio_context_release(aio_context);
-     }
- 
+             if (bs->backing) {
+-                /* read from the base image */
+-                n1 = qcow2_backing_read1(bs->backing->bs, &hd_qiov,
+-                                         offset, cur_bytes);
+-                if (n1 > 0) {
+-                    QEMUIOVector local_qiov;
+-
+-                    qemu_iovec_init(&local_qiov, hd_qiov.niov);
+-                    qemu_iovec_concat(&local_qiov, &hd_qiov, 0, n1);
+-
+-                    BLKDBG_EVENT(bs->file, BLKDBG_READ_BACKING_AIO);
+-                    qemu_co_mutex_unlock(&s->lock);
+-                    ret = bdrv_co_preadv(bs->backing, offset, n1,
+-                                         &local_qiov, 0);
+-                    qemu_co_mutex_lock(&s->lock);
+-
+-                    qemu_iovec_destroy(&local_qiov);
+-
+-                    if (ret < 0) {
+-                        goto fail;
+-                    }
++                BLKDBG_EVENT(bs->file, BLKDBG_READ_BACKING_AIO);
++                qemu_co_mutex_unlock(&s->lock);
++                ret = bdrv_co_preadv(bs->backing, offset, cur_bytes,
++                                     &hd_qiov, 0);
++                qemu_co_mutex_lock(&s->lock);
++                if (ret < 0) {
++                    goto fail;
+                 }
+             } else {
+                 /* Note: in this case, no need to wait */
 -- 
 2.13.6
