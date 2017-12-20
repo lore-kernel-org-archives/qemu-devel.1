@@ -1,34 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52992)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35037)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1eRnjR-0007To-Ic
-	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 18:25:02 -0500
+	(envelope-from <bounces@canonical.com>) id 1eRnHC-00008A-LL
+	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 17:55:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1eRnjO-0000At-9L
-	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 18:25:01 -0500
-Received: from mail-wr0-f194.google.com ([209.85.128.194]:40606)
+	(envelope-from <bounces@canonical.com>) id 1eRnHA-0002bG-Bv
+	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 17:55:50 -0500
+Received: from indium.canonical.com ([91.189.90.7]:34494)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1eRnjO-0000AC-3J
-	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 18:24:58 -0500
-Received: by mail-wr0-f194.google.com with SMTP id q9so23701817wre.7
-	for <qemu-devel@nongnu.org>; Wed, 20 Dec 2017 15:24:58 -0800 (PST)
-References: <20171212051853.24583-1-aik@ozlabs.ru>
-	<20171211224650.71237179@w520.home>
-	<ca9cd686-ea2f-716e-b909-f6e22d1c704c@redhat.com>
-	<20171219070919.42d90b94@w520.home>
-	<87e241ad-4d65-1b51-aa22-a84f18de1cb6@redhat.com>
-	<344fb27b-1765-92e0-312f-6d5610925c5a@ozlabs.ru>
-	<ada748a5-f174-89ab-9741-165b424c5485@redhat.com>
-	<fb78f948-0b49-1cbc-d9a6-7b29d63e605f@ozlabs.ru>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <2cded4b6-8756-43df-ad5e-e38f6a1ab028@redhat.com>
-Date: Thu, 21 Dec 2017 00:24:54 +0100
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1eRnHA-0002ZK-2g
+	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 17:55:48 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1eRnH7-0003a7-KG
+	for <qemu-devel@nongnu.org>; Wed, 20 Dec 2017 22:55:45 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 6A53D2E8089
+	for <qemu-devel@nongnu.org>; Wed, 20 Dec 2017 22:55:45 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <fb78f948-0b49-1cbc-d9a6-7b29d63e605f@ozlabs.ru>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH qemu] RFC: spapr/iommu: Enable in-kernel
- TCE acceleration via VFIO KVM device
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 20 Dec 2017 22:43:36 -0000
+From: Adam Williamson <awilliam@redhat.com>
+Reply-To: Bug 1738283 <1738283@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <151328724563.26325.11755910452939969450.malonedeb@wampee.canonical.com>
+Message-Id: <151380981610.10452.9775754250848631559.malone@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1738283] Re: 'Less than' (<), 'more than' (>),
+ and 'pipe' (|) can't be typed via VNC
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,30 +37,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alexey Kardashevskiy <aik@ozlabs.ru>, Alex Williamson <alex.williamson@redhat.com>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
+To: qemu-devel@nongnu.org
 
-On 20/12/2017 15:13, Alexey Kardashevskiy wrote:
-> On 20/12/17 20:04, Paolo Bonzini wrote:
->> On 20/12/2017 02:47, Alexey Kardashevskiy wrote:
->>>> - if we foresee having more IOMMU devices in KVM, let's rename
->>>> KVM_DEV_VFIO_GROUP_SET_SPAPR_TCE to KVM_DEV_VFIO_GROUP_ATTACH_IOMMU and
->>>> add a new function
->>>>
->>>>      int iommu_memory_region_get_kvm_fd(IOMMUMemoryRegion *iommu);
->>>>
->>>> that requires no object-type check in VFIO.
->>>
->>> This is how it started and the comment was that this KVM fd needs to have a
->>> well defined semantic which I struggle to provide.
->>
->> I don't think the definition should be anything more than "it can be
->> passed to KVM_DEV_VFIO_GROUP_ATTACH_IOMMU".  I'll discuss it with Alex
->> later today.
-> 
-> That was more David's concern :)
+Note, os-autoinst is its own VNC client. Most of the implementation can
+be found in https://github.com/os-autoinst/os-
+autoinst/blob/master/consoles/VNC.pm . The functions relevant to sending
+key events are `shift_keys`, `init_x11_keymap`, `map_and_send_key`, and
+`_send_key_event`.
 
-The get_attr API is okay, just remove the unused set_attr and follow the
-other review comments from Alex.
+-- =
 
-Paolo
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1738283
+
+Title:
+  'Less than' (<), 'more than' (>), and 'pipe' (|) can't be typed via
+  VNC
+
+Status in QEMU:
+  New
+
+Bug description:
+  If I start QEMU 2.11 (from
+  https://build.opensuse.org/package/show/Virtualization/qemu) VM with
+  VNC, I am unable to type following three characters: 'less than' (<),
+  'more than' (>), and 'pipe' (|) on en_US QWERTY keyboard. Other
+  characters work fine. QEMu version 2.10.1 worked fine.
+
+  /usr/bin/qemu-kvm -m 2048 -cpu kvm64 -drive
+  media=3Dcdrom,if=3Dnone,id=3Dcd0,format=3Draw,file=3DOI-hipster-
+  minimal-20171031.iso -device ide-cd,drive=3Dcd0 -boot once=3Dd,menu=3Don
+  ,splash-time=3D5000 -device usb-ehci -device usb-tablet -smp 1 -enable-
+  kvm -vnc :91,share=3Dforce-shared
+
+  The ISO can be downloaded here: https://www.openindiana.org/download/
+
+  Also tried Fedora-Server-dvd-x86_64-25-1.3.iso and it's the same
+  situation.
+
+  If I run the same command without '-vnc :91,share=3Dforce-shared',
+  everything works just fine.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1738283/+subscriptions
