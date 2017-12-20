@@ -1,21 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55772)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56269)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1eRf0e-0006e1-U0
-	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 09:06:17 -0500
+	(envelope-from <marcandre.lureau@redhat.com>) id 1eRf19-0006tk-Ay
+	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 09:06:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1eRf0d-0006e6-TO
-	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 09:06:12 -0500
-References: <20171212160450.17510-1-vsementsov@virtuozzo.com>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <7d53138b-6ae5-c157-f98c-07026eea432b@virtuozzo.com>
-Date: Wed, 20 Dec 2017 17:05:58 +0300
+	(envelope-from <marcandre.lureau@redhat.com>) id 1eRf15-0007NA-2J
+	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 09:06:43 -0500
+From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+Date: Wed, 20 Dec 2017 15:06:18 +0100
+Message-Id: <20171220140618.12701-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20171212160450.17510-1-vsementsov@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH v2 0/3] fix bitmaps migration through
- shared storage
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH] vnc: fix debug spelling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,44 +20,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: mreitz@redhat.com, kwolf@redhat.com, crosa@redhat.com, ehabkost@redhat.com, den@openvz.org, jsnow@redhat.com
+To: qemu-devel@nongnu.org
+Cc: qemu-trivial@nongnu.org, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
 
-Should qemu-stable be here?
+Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+---
+ ui/vnc.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-
-12.12.2017 19:04, Vladimir Sementsov-Ogievskiy wrote:
-> Hi all.
->
-> This fixes bitmaps migration through shared storage. Look at 02 for
-> details.
->
-> The bug introduced in 2.10 with the whole qcow2 bitmaps feature, so
-> qemu-stable in CC. However I doubt that someone really suffered from this.
->
-> v2:
->     John, thank you for reviewing v1.
->     changes:
->      add John's r-bs, change s/timeout=10/timeout=10.0/ in last patch
->      and drop old 03 patch, related to this timeout fix.
->
-> Vladimir Sementsov-Ogievskiy (3):
->    qcow2-bitmap: add qcow2_reopen_bitmaps_rw_hint()
->    qcow2: handle reopening bitmaps on bdrv_invalidate_cache
->    iotests: add dirty bitmap migration test
->
->   block/qcow2.h              |  2 ++
->   block/qcow2-bitmap.c       | 15 ++++++++-
->   block/qcow2.c              |  8 ++++-
->   tests/qemu-iotests/169     | 82 ++++++++++++++++++++++++++++++++++++++++++++++
->   tests/qemu-iotests/169.out |  5 +++
->   tests/qemu-iotests/group   |  1 +
->   6 files changed, 111 insertions(+), 2 deletions(-)
->   create mode 100755 tests/qemu-iotests/169
->   create mode 100644 tests/qemu-iotests/169.out
->
-
-
--- 
-Best regards,
-Vladimir
+diff --git a/ui/vnc.c b/ui/vnc.c
+index 9f8d5a1b1f..7d537b5c6b 100644
+--- a/ui/vnc.c
++++ b/ui/vnc.c
+@@ -2255,7 +2255,7 @@ static int protocol_client_msg(VncState *vs, uint8_=
+t *data, size_t len)
+                 }
+                 vs->as.nchannels =3D read_u8(data, 5);
+                 if (vs->as.nchannels !=3D 1 && vs->as.nchannels !=3D 2) =
+{
+-                    VNC_DEBUG("Invalid audio channel coount %d\n",
++                    VNC_DEBUG("Invalid audio channel count %d\n",
+                               read_u8(data, 5));
+                     vnc_client_error(vs);
+                     break;
+--=20
+2.15.1.355.g36791d7216
