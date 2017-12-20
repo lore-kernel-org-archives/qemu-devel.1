@@ -1,31 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34284)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44180)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1eRguL-0002BP-7J
-	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 11:07:51 -0500
+	(envelope-from <wei.w.wang@intel.com>) id 1eRgzo-0006M9-5m
+	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 11:13:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1eRguH-0004pG-Vi
-	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 11:07:49 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:44338)
+	(envelope-from <wei.w.wang@intel.com>) id 1eRgzi-0001Eu-Jh
+	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 11:13:28 -0500
+Received: from mga11.intel.com ([192.55.52.93]:39156)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1eRguH-0004oQ-PS
-	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 11:07:45 -0500
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id E060D3B73A
-	for <qemu-devel@nongnu.org>; Wed, 20 Dec 2017 16:07:44 +0000 (UTC)
-Date: Wed, 20 Dec 2017 16:07:41 +0000
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20171220160741.GE12566@stefanha-x1.localdomain>
-References: <20171219181129.24189-1-maxime.coquelin@redhat.com>
+	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
+	id 1eRgzi-0001DF-9n
+	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 11:13:22 -0500
+From: "Wang, Wei W" <wei.w.wang@intel.com>
+Date: Wed, 20 Dec 2017 16:13:16 +0000
+Message-ID: <286AC319A985734F985F78AFA26841F73938CC3E@shsmsx102.ccr.corp.intel.com>
+References: <1513685879-21823-1-git-send-email-wei.w.wang@intel.com>
+	<201712192305.AAE21882.MtQHJOFFSFVOLO@I-love.SAKURA.ne.jp>
+	<5A3A3CBC.4030202@intel.com>
+	<20171220122547.GA1654@bombadil.infradead.org>
+In-Reply-To: <20171220122547.GA1654@bombadil.infradead.org>
+Content-Language: en-US
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="AsxXAMtlQ5JHofzM"
-Content-Disposition: inline
-In-Reply-To: <20171219181129.24189-1-maxime.coquelin@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 0/3] Vhost: no more leak QEMU virtual
- addresses to user backend
+Subject: Re: [Qemu-devel] [PATCH v20 0/7] Virtio-balloon Enhancement
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,59 +31,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Maxime Coquelin <maxime.coquelin@redhat.com>
-Cc: qemu-devel@nongnu.org, mst@redhat.com, mlureau@redhat.com
+To: Matthew Wilcox <willy@infradead.org>
+Cc: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>, "virtio-dev@lists.oasis-open.org" <virtio-dev@lists.oasis-open.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "virtualization@lists.linux-foundation.org" <virtualization@lists.linux-foundation.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "linux-mm@kvack.org" <linux-mm@kvack.org>, "mst@redhat.com" <mst@redhat.com>, "mhocko@kernel.org" <mhocko@kernel.org>, "akpm@linux-foundation.org" <akpm@linux-foundation.org>, "mawilcox@microsoft.com" <mawilcox@microsoft.com>, "david@redhat.com" <david@redhat.com>, "cornelia.huck@de.ibm.com" <cornelia.huck@de.ibm.com>, "mgorman@techsingularity.net" <mgorman@techsingularity.net>, "aarcange@redhat.com" <aarcange@redhat.com>, "amit.shah@redhat.com" <amit.shah@redhat.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "liliang.opensource@gmail.com" <liliang.opensource@gmail.com>, "yang.zhang.wz@gmail.com" <yang.zhang.wz@gmail.com>, "quan.xu0@gmail.com" <quan.xu0@gmail.com>, "nilal@redhat.com" <nilal@redhat.com>, "riel@redhat.com" <riel@redhat.com>
 
-
---AsxXAMtlQ5JHofzM
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Tue, Dec 19, 2017 at 07:11:26PM +0100, Maxime Coquelin wrote:
-> Before this series, QEMU process virtual addresses are sent to the
-> user backend as user addresses.
+On Wednesday, December 20, 2017 8:26 PM, Matthew Wilcox wrote:
+> On Wed, Dec 20, 2017 at 06:34:36PM +0800, Wei Wang wrote:
+> > On 12/19/2017 10:05 PM, Tetsuo Handa wrote:
+> > > I think xb_find_set() has a bug in !node path.
+> >
+> > I think we can probably remove the "!node" path for now. It would be
+> > good to get the fundamental part in first, and leave optimization to
+> > come as separate patches with corresponding test cases in the future.
 >=20
-> Passing these virtual addresses aren't useful, as the backend doesn't
-> direct access to QEMU address space.
+> You can't remove the !node path.  You'll see !node when the highest set b=
+it
+> is less than 1024.  So do something like this:
 >=20
-> It does make sense however for kernel backend, which can access QEMU
-> address space.
->=20
-> This series introduce a new enum set by the backend stating whether it
-> prefers using QEMU Virtual addresses or Guest physical addresses as
-> User address, and make vhost-user backend to use Guest physical
-> addresses.
->=20
-> Maxime Coquelin (3):
->   vhost-user: rename VhostUserMemory userspace_addr field to user_addr
->   vhost: introduce backend's user address type
->   vhost-user: no more leak QEMU virtual addresses to user backend
->=20
->  hw/virtio/vhost-backend.c         |  1 +
->  hw/virtio/vhost-user.c            |  6 ++++--
->  hw/virtio/vhost.c                 | 16 ++++++++++++----
->  include/hw/virtio/vhost-backend.h |  6 ++++++
->  4 files changed, 23 insertions(+), 6 deletions(-)
->=20
-> --=20
-> 2.14.3
->=20
+> 	unsigned long bit;
+> 	xb_preload(GFP_KERNEL);
+> 	xb_set_bit(xb, 700);
+> 	xb_preload_end();
+> 	bit =3D xb_find_set(xb, ULONG_MAX, 0);
+> 	assert(bit =3D=3D 700);
 
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+This above test will result in "!node with bitmap !=3DNULL", and it goes to=
+ the regular "if (bitmap)" path, which finds 700.
 
---AsxXAMtlQ5JHofzM
-Content-Type: application/pgp-signature; name="signature.asc"
+A better test would be
+...
+xb_set_bit(xb, 700);
+assert(xb_find_set(xb, ULONG_MAX, 800) =3D=3D ULONG_MAX);
+...
 
------BEGIN PGP SIGNATURE-----
+The first try with the "if (bitmap)" path doesn't find a set bit, and the r=
+emaining tries will always result in "!node && !bitmap", which implies no s=
+et bit anymore and no need to try in this case.
 
-iQEcBAEBAgAGBQJaOorNAAoJEJykq7OBq3PIgPwIAJ9Og5J+O7mtiOwcUtP2DKKv
-hElxi5FuxljFkyLbUC7xoPNUFmewBrrcYycWIdCzZFLCcTOKeZVVaGhEJL7vwXgv
-GboIj5yhnpI/zP1M7xUwKZWHradeyJODJIyGifS/7vZqW/GkIOTWApB8MZCaatKP
-cPVTlk97qXixODHNnvXu/G/mRjHr5PEifCvEDo0ut3Q3X5f6X0vCynKLqX997cdE
-Ti/ZqCyqZPwEm+uFMOd+DrOoMFmgljpSLamOWnxnaOMuW8QHUgoX1sm94cMrWUn/
-xGJ3FR9fUyirgib3+mvI4ZDmNqETo/Zug3OS5Kopu5EDjvNqkbqQnnYDaOXvjm4=
-=nK9x
------END PGP SIGNATURE-----
+So, I think we can change it to
 
---AsxXAMtlQ5JHofzM--
+If (!node && !bitmap)
+	return size;
+
+
+Best,
+Wei
