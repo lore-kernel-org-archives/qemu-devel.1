@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56001)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56075)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1eReID-0004nE-33
-	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 08:20:21 -0500
+	(envelope-from <kwolf@redhat.com>) id 1eReIG-0004sR-Te
+	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 08:20:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1eReIC-0006dV-8v
-	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 08:20:17 -0500
+	(envelope-from <kwolf@redhat.com>) id 1eReIA-0006bV-HL
+	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 08:20:20 -0500
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Wed, 20 Dec 2017 14:19:36 +0100
-Message-Id: <20171220131939.27543-12-kwolf@redhat.com>
+Date: Wed, 20 Dec 2017 14:19:35 +0100
+Message-Id: <20171220131939.27543-11-kwolf@redhat.com>
 In-Reply-To: <20171220131939.27543-1-kwolf@redhat.com>
 References: <20171220131939.27543-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL 11/14] block: Don't acquire AioContext in
- hmp_qemu_io()
+Subject: [Qemu-devel] [PULL 10/14] qemu-img: Document --force-share / -U
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,49 +22,35 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, qemu-devel@nongnu.org
 
-Commit 15afd94a047 added code to acquire and release the AioContext in
-qemuio_command(). This means that the lock is taken twice now in the
-call path from hmp_qemu_io(). This causes BDRV_POLL_WHILE() to hang for
-any requests issued to nodes in a non-mainloop AioContext.
+From: Fam Zheng <famz@redhat.com>
 
-Dropping the first locking from hmp_qemu_io() fixes the problem.
-
-Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+Signed-off-by: Fam Zheng <famz@redhat.com>
 Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+Reviewed-by: Kashyap Chamarthy <kchamart@redhat.com>
+Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- hmp.c | 6 ------
- 1 file changed, 6 deletions(-)
+ qemu-img.texi | 9 +++++++++
+ 1 file changed, 9 insertions(+)
 
-diff --git a/hmp.c b/hmp.c
-index 35a7041824..2d72f94193 100644
---- a/hmp.c
-+++ b/hmp.c
-@@ -2318,7 +2318,6 @@ void hmp_qemu_io(Monitor *mon, const QDict *qdict)
- {
-     BlockBackend *blk;
-     BlockBackend *local_blk = NULL;
--    AioContext *aio_context;
-     const char* device = qdict_get_str(qdict, "device");
-     const char* command = qdict_get_str(qdict, "command");
-     Error *err = NULL;
-@@ -2338,9 +2337,6 @@ void hmp_qemu_io(Monitor *mon, const QDict *qdict)
-         }
-     }
+diff --git a/qemu-img.texi b/qemu-img.texi
+index fdcf120f36..bc24565ae9 100644
+--- a/qemu-img.texi
++++ b/qemu-img.texi
+@@ -57,6 +57,15 @@ exclusive with the @var{-O} parameters. It is currently required to also use
+ the @var{-n} parameter to skip image creation. This restriction may be relaxed
+ in a future release.
  
--    aio_context = blk_get_aio_context(blk);
--    aio_context_acquire(aio_context);
--
-     /*
-      * Notably absent: Proper permission management. This is sad, but it seems
-      * almost impossible to achieve without changing the semantics and thereby
-@@ -2368,8 +2364,6 @@ void hmp_qemu_io(Monitor *mon, const QDict *qdict)
-      */
-     qemuio_command(blk, command);
- 
--    aio_context_release(aio_context);
--
- fail:
-     blk_unref(local_blk);
-     hmp_handle_error(mon, &err);
++@item --force-share (-U)
++
++If specified, @code{qemu-img} will open the image with shared permissions,
++which makes it less likely to conflict with a running guest's permissions due
++to image locking. For example, this can be used to get the image information
++(with 'info' subcommand) when the image is used by a running guest. Note that
++this could produce inconsistent results because of concurrent metadata changes,
++etc. This option is only allowed when opening images in read-only mode.
++
+ @item fmt
+ is the disk image format. It is guessed automatically in most cases. See below
+ for a description of the supported disk formats.
 -- 
 2.13.6
