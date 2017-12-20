@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60209)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60222)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistai@xilinx.com>) id 1eRi9b-0006Pj-1z
-	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 12:27:40 -0500
+	(envelope-from <alistai@xilinx.com>) id 1eRi9b-0006QU-Pu
+	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 12:27:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistai@xilinx.com>) id 1eRi9Z-0005DL-TG
+	(envelope-from <alistai@xilinx.com>) id 1eRi9Z-0005DF-T8
 	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 12:27:39 -0500
 From: Alistair Francis <alistair.francis@xilinx.com>
-Date: Wed, 20 Dec 2017 09:23:10 -0800
-Message-ID: <1bf2b45441c9104a838d35c58971c0270c480e59.1513790495.git.alistair.francis@xilinx.com>
+Date: Wed, 20 Dec 2017 09:23:04 -0800
+Message-ID: <75171003322239e9f9c16cc723c2d4cac569fde4.1513790495.git.alistair.francis@xilinx.com>
 In-Reply-To: <cover.1513790494.git.alistair.francis@xilinx.com>
 References: <cover.1513790494.git.alistair.francis@xilinx.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v6 06/29] hw/gpio: Replace fprintf(stderr,
+Subject: [Qemu-devel] [PATCH v6 05/29] hw/dma: Replace fprintf(stderr,
  "*\n" with error_report()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -79,25 +79,184 @@ Some lines where then manually tweaked to pass checkpatch.
 Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
 Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 ---
+V3:
+ - Remove ""s
 V2:
  - Split hw patch into individual directories
 
- hw/gpio/omap_gpio.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ hw/dma/omap_dma.c | 26 ++++++++++++++------------
+ hw/dma/soc_dma.c  | 36 ++++++++++++++++++------------------
+ 2 files changed, 32 insertions(+), 30 deletions(-)
 
-diff --git a/hw/gpio/omap_gpio.c b/hw/gpio/omap_gpio.c
-index 08472193b5..57aa2e54f5 100644
---- a/hw/gpio/omap_gpio.c
-+++ b/hw/gpio/omap_gpio.c
-@@ -399,7 +399,7 @@ static void omap2_gpio_module_write(void *opaque, hwadd=
-r addr,
+diff --git a/hw/dma/omap_dma.c b/hw/dma/omap_dma.c
+index abd18c67ea..5d7fe06d98 100644
+--- a/hw/dma/omap_dma.c
++++ b/hw/dma/omap_dma.c
+@@ -18,6 +18,7 @@
+  * with this program; if not, see <http://www.gnu.org/licenses/>.
+  */
+ #include "qemu/osdep.h"
++#include "qemu/error-report.h"
+ #include "qemu-common.h"
+ #include "qemu/timer.h"
+ #include "hw/arm/omap.h"
+@@ -1898,13 +1899,13 @@ static void omap_dma4_write(void *opaque, hwaddr ad=
+dr,
+             omap_dma_reset(s->dma);
+         s->ocp =3D value & 0x3321;
+         if (((s->ocp >> 12) & 3) =3D=3D 3)				/* MIDLEMODE */
+-            fprintf(stderr, "%s: invalid DMA power mode\n", __func__);
++            error_report("%s: invalid DMA power mode", __func__);
+         return;
 =20
-     case 0x10:	/* GPIO_SYSCONFIG */
-         if (((value >> 3) & 3) =3D=3D 3)
--            fprintf(stderr, "%s: bad IDLEMODE value\n", __func__);
-+            error_report("%s: bad IDLEMODE value", __func__);
-         if (value & 2)
-             omap2_gpio_module_reset(s);
-         s->config[0] =3D value & 0x1d;
+     case 0x78:	/* DMA4_GCR */
+         s->gcr =3D value & 0x00ff00ff;
+ 	if ((value & 0xff) =3D=3D 0x00)		/* MAX_CHANNEL_FIFO_DEPTH */
+-            fprintf(stderr, "%s: wrong FIFO depth in GCR\n", __func__);
++            error_report("%s: wrong FIFO depth in GCR", __func__);
+         return;
+=20
+     case 0x80 ... 0xfff:
+@@ -1934,8 +1935,8 @@ static void omap_dma4_write(void *opaque, hwaddr addr=
+,
+         ch->buf_disable =3D (value >> 25) & 1;
+         ch->src_sync =3D (value >> 24) & 1;	/* XXX For CamDMA must be 1 */
+         if (ch->buf_disable && !ch->src_sync)
+-            fprintf(stderr, "%s: Buffering disable is not allowed in "
+-                            "destination synchronised mode\n", __func__);
++            error_report("%s: Buffering disable is not allowed in "
++                         "destination synchronised mode", __func__);
+         ch->prefetch =3D (value >> 23) & 1;
+         ch->bs =3D (value >> 18) & 1;
+         ch->transparent_copy =3D (value >> 17) & 1;
+@@ -1946,8 +1947,8 @@ static void omap_dma4_write(void *opaque, hwaddr addr=
+,
+         ch->priority =3D (value & 0x0040) >> 6;
+         ch->fs =3D (value & 0x0020) >> 5;
+         if (ch->fs && ch->bs && ch->mode[0] && ch->mode[1])
+-            fprintf(stderr, "%s: For a packet transfer at least one port "
+-                            "must be constant-addressed\n", __func__);
++            error_report("%s: For a packet transfer at least one port "
++                         "must be constant-addressed", __func__);
+         ch->sync =3D (value & 0x001f) | ((value >> 14) & 0x0060);
+         /* XXX must be 0x01 for CamDMA */
+=20
+@@ -1977,8 +1978,8 @@ static void omap_dma4_write(void *opaque, hwaddr addr=
+,
+         ch->endian[1] =3D(value >> 19) & 1;
+         ch->endian_lock[1] =3D(value >> 18) & 1;
+         if (ch->endian[0] !=3D ch->endian[1])
+-            fprintf(stderr, "%s: DMA endianness conversion enable attempt\=
+n",
+-                            __func__);
++            error_report("%s: DMA endianness conversion enable attempt",
++                          __func__);
+         ch->write_mode =3D (value >> 16) & 3;
+         ch->burst[1] =3D (value & 0xc000) >> 14;
+         ch->pack[1] =3D (value & 0x2000) >> 13;
+@@ -1986,12 +1987,13 @@ static void omap_dma4_write(void *opaque, hwaddr ad=
+dr,
+         ch->burst[0] =3D (value & 0x0180) >> 7;
+         ch->pack[0] =3D (value & 0x0040) >> 6;
+         ch->translate[0] =3D (value & 0x003c) >> 2;
+-        if (ch->translate[0] | ch->translate[1])
+-            fprintf(stderr, "%s: bad MReqAddressTranslate sideband signal\=
+n",
+-                            __func__);
++        if (ch->translate[0] | ch->translate[1]) {
++            error_report("%s: bad MReqAddressTranslate sideband signal",
++                         __func__);
++        }
+         ch->data_type =3D 1 << (value & 3);
+         if ((value & 3) =3D=3D 3) {
+-            printf("%s: bad data_type for DMA channel\n", __func__);
++            error_report("%s: bad data_type for DMA channel", __func__);
+             ch->data_type >>=3D 1;
+         }
+         break;
+diff --git a/hw/dma/soc_dma.c b/hw/dma/soc_dma.c
+index 9bb499bf9c..45516241c6 100644
+--- a/hw/dma/soc_dma.c
++++ b/hw/dma/soc_dma.c
+@@ -18,6 +18,7 @@
+  * with this program; if not, see <http://www.gnu.org/licenses/>.
+  */
+ #include "qemu/osdep.h"
++#include "qemu/error-report.h"
+ #include "qemu-common.h"
+ #include "qemu/timer.h"
+ #include "hw/arm/soc_dma.h"
+@@ -270,11 +271,11 @@ void soc_dma_port_add_fifo(struct soc_dma_s *soc, hwa=
+ddr virt_base,
+         if (entry->type =3D=3D soc_dma_port_mem) {
+             if (entry->addr <=3D virt_base &&
+                             entry->addr + entry->u.mem.size > virt_base) {
+-                fprintf(stderr, "%s: FIFO at %"PRIx64
+-                                " collides with RAM region at %"PRIx64
+-                                "-%"PRIx64 "\n", __func__,
+-                                virt_base, entry->addr,
+-                                (entry->addr + entry->u.mem.size));
++                error_report("%s: FIFO at %"PRIx64
++                             " collides with RAM region at %"PRIx64
++                             "-%"PRIx64, __func__,
++                             virt_base, entry->addr,
++                             (entry->addr + entry->u.mem.size));
+                 exit(-1);
+             }
+=20
+@@ -284,9 +285,9 @@ void soc_dma_port_add_fifo(struct soc_dma_s *soc, hwadd=
+r virt_base,
+             while (entry < dma->memmap + dma->memmap_size &&
+                             entry->addr <=3D virt_base) {
+                 if (entry->addr =3D=3D virt_base && entry->u.fifo.out =3D=
+=3D out) {
+-                    fprintf(stderr, "%s: FIFO at %"PRIx64
+-                                    " collides FIFO at %"PRIx64 "\n",
+-                                    __func__, virt_base, entry->addr);
++                    error_report("%s: FIFO at %"PRIx64
++                                 " collides FIFO at %"PRIx64,
++                                 __func__, virt_base, entry->addr);
+                     exit(-1);
+                 }
+=20
+@@ -321,11 +322,11 @@ void soc_dma_port_add_mem(struct soc_dma_s *soc, uint=
+8_t *phys_base,
+             if ((entry->addr >=3D virt_base && entry->addr < virt_base + s=
+ize) ||
+                             (entry->addr <=3D virt_base &&
+                              entry->addr + entry->u.mem.size > virt_base))=
+ {
+-                fprintf(stderr, "%s: RAM at %"PRIx64 "-%"PRIx64
+-                                " collides with RAM region at %"PRIx64
+-                                "-%"PRIx64 "\n", __func__,
+-                                virt_base, virt_base + size,
+-                                entry->addr, entry->addr + entry->u.mem.si=
+ze);
++                error_report("%s: RAM at %"PRIx64 "-%"PRIx64
++                             " collides with RAM region at %"PRIx64
++                             "-%"PRIx64, __func__,
++                             virt_base, virt_base + size,
++                             entry->addr, entry->addr + entry->u.mem.size)=
+;
+                 exit(-1);
+             }
+=20
+@@ -334,11 +335,10 @@ void soc_dma_port_add_mem(struct soc_dma_s *soc, uint=
+8_t *phys_base,
+         } else {
+             if (entry->addr >=3D virt_base &&
+                             entry->addr < virt_base + size) {
+-                fprintf(stderr, "%s: RAM at %"PRIx64 "-%"PRIx64
+-                                " collides with FIFO at %"PRIx64
+-                                "\n", __func__,
+-                                virt_base, virt_base + size,
+-                                entry->addr);
++                error_report("%s: RAM at %"PRIx64 "-%"PRIx64
++                             " collides with FIFO at %"PRIx64,
++                             __func__, virt_base, virt_base + size,
++                             entry->addr);
+                 exit(-1);
+             }
+=20
 --=20
 2.14.1
