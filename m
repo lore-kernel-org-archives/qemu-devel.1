@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40989)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56798)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eRnQx-00029b-A5
-	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 18:05:56 -0500
+	(envelope-from <bounces@canonical.com>) id 1eRnov-00017l-33
+	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 18:30:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eRnQu-00014h-H5
-	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 18:05:55 -0500
-Received: from indium.canonical.com ([91.189.90.7]:35586)
+	(envelope-from <bounces@canonical.com>) id 1eRnor-0004Mm-Go
+	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 18:30:41 -0500
+Received: from indium.canonical.com ([91.189.90.7]:38936)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1eRnQu-00013a-B0
-	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 18:05:52 -0500
+	id 1eRnor-0004MA-Am
+	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 18:30:37 -0500
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1eRnQs-0004hX-DA
-	for <qemu-devel@nongnu.org>; Wed, 20 Dec 2017 23:05:50 +0000
+	id 1eRnop-00018z-D3
+	for <qemu-devel@nongnu.org>; Wed, 20 Dec 2017 23:30:35 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id F12882E8089
-	for <qemu-devel@nongnu.org>; Wed, 20 Dec 2017 23:05:49 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 46D162E806B
+	for <qemu-devel@nongnu.org>; Wed, 20 Dec 2017 23:30:35 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Wed, 20 Dec 2017 22:54:30 -0000
+Date: Wed, 20 Dec 2017 23:22:42 -0000
 From: Adam Williamson <awilliam@redhat.com>
 Reply-To: Bug 1738283 <1738283@bugs.launchpad.net>
 Sender: bounces@canonical.com
 References: <151328724563.26325.11755910452939969450.malonedeb@wampee.canonical.com>
-Message-Id: <151381047007.17365.6606992042188125315.malone@soybean.canonical.com>
+Message-Id: <151381216217.11206.14039217629588873109.malone@gac.canonical.com>
 Errors-To: bounces@canonical.com
 Subject: [Qemu-devel] [Bug 1738283] Re: 'Less than' (<), 'more than' (>),
  and 'pipe' (|) can't be typed via VNC
@@ -39,16 +39,25 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-I also confirm Michal's observation of virt-manager and tigervnc
-behaving differently with the same VM: I ran a VM set up with VNC
-display server in virt-manager and can type < from the virt-manager UI
-fine, but if I connect to the same VM with tigervnc and try to type < ,
-I get > . This is with current Fedora Rawhide qemu, virt-manager and
-tigervnc:
+I found something interesting using showkey in the VM. This is all
+assuming en-US everywhere, note. On a US keyboard, "<" is a shifted
+comma (shift-,), ">" is a shifted period (shift-.), and "|" is a shifted
+backslash (shift-\).
 
-qemu-common-2.11.0-1.fc28.x86_64
-virt-manager-1.4.3-2.fc28.noarch
-tigervnc-1.8.0-5.fc28.x86_64
+If I run showkey and try the affected characters in virt-manager, the
+results are kinda what I'd expect. It reports keycode 42 for the shift
+key, keycode 51 for comma key, keycode 52 for period key, and keycode 43
+for backslash key. If I do shift-, (to get a <), it shows keycode 42
+down, keycode 51 down, keycode 51 up, keycode 42 up - just what you'd
+expect. Ditto for > and |: it shows 42d/52d/52u/42u and 42d/43d/43u/42u
+in those cases.
+
+But if I do this while typing in tigervnc, it reports something quite
+different. Just pressing the keys alone gives the right codes - 51, 52,
+43. But when I try the shifted combinations, it reports keycode *86* for
+all three keys. That is, so long as shift is held down, pressing the
+comma, period or backslash key reports keycode 86 - not 51, 52 or 43.
+Somehow this results in the generation of a > character, not sure how.
 
 -- =
 
