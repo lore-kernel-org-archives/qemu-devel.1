@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56468)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56578)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <michael@rivendell.weiser.dinsnail.net>)
-	id 1eRlxL-0006S9-7x
-	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 16:31:16 -0500
+	id 1eRlxS-0006ZH-Q4
+	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 16:31:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <michael@rivendell.weiser.dinsnail.net>)
-	id 1eRlxK-0007DJ-F2
-	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 16:31:15 -0500
+	id 1eRlxS-0007Sv-1D
+	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 16:31:22 -0500
 Received: from heinz.dinsnail.net
-	([2a01:238:43b4:3200:9392:5dcc:2f0e:a960]:49824)
+	([2a01:238:43b4:3200:9392:5dcc:2f0e:a960]:49832)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <michael@rivendell.weiser.dinsnail.net>)
-	id 1eRlxK-0007BE-67
-	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 16:31:14 -0500
+	id 1eRlxR-0007Qd-O1
+	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 16:31:21 -0500
 From: Michael Weiser <michael.weiser@gmx.de>
-Date: Wed, 20 Dec 2017 22:23:08 +0100
-Message-Id: <20171220212308.12614-8-michael.weiser@gmx.de>
+Date: Wed, 20 Dec 2017 22:23:03 +0100
+Message-Id: <20171220212308.12614-3-michael.weiser@gmx.de>
 In-Reply-To: <20171220212308.12614-1-michael.weiser@gmx.de>
 References: <20171220212308.12614-1-michael.weiser@gmx.de>
-Subject: [Qemu-devel] [PATCH v3 7/7] linux-user: Activate armeb handler
- registration
+Subject: [Qemu-devel] [PATCH v3 2/7] linux-user: Add separate aarch64_be
+ uname
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,26 +31,30 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Michael Weiser <michael.weiser@gmx.de>, Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>
 
-armeb is missing from the target list in qemu-binfmt-conf.sh. Add it so
-the handler for those binaries gets registered by the script.
+Make big-endian aarch64 systems identify as aarch64_be as expected by
+big-endian userland and toolchains.
 
 Signed-off-by: Michael Weiser <michael.weiser@gmx.de>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- scripts/qemu-binfmt-conf.sh | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ linux-user/aarch64/target_syscall.h | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/scripts/qemu-binfmt-conf.sh b/scripts/qemu-binfmt-conf.sh
-index 597efdbe50..ea5a748745 100755
---- a/scripts/qemu-binfmt-conf.sh
-+++ b/scripts/qemu-binfmt-conf.sh
-@@ -2,7 +2,7 @@
- # enable automatic i386/ARM/M68K/MIPS/SPARC/PPC/s390/HPPA
- # program execution by the kernel
+diff --git a/linux-user/aarch64/target_syscall.h b/linux-user/aarch64/target_syscall.h
+index 1b62953eeb..604ab99b14 100644
+--- a/linux-user/aarch64/target_syscall.h
++++ b/linux-user/aarch64/target_syscall.h
+@@ -8,7 +8,11 @@ struct target_pt_regs {
+     uint64_t        pstate;
+ };
  
--qemu_target_list="i386 i486 alpha arm sparc32plus ppc ppc64 ppc64le m68k \
-+qemu_target_list="i386 i486 alpha arm armeb sparc32plus ppc ppc64 ppc64le m68k \
- mips mipsel mipsn32 mipsn32el mips64 mips64el \
- sh4 sh4eb s390x aarch64 aarch64_be hppa"
- 
++#if defined(TARGET_WORDS_BIGENDIAN)
++#define UNAME_MACHINE "aarch64_be"
++#else
+ #define UNAME_MACHINE "aarch64"
++#endif
+ #define UNAME_MINIMUM_RELEASE "3.8.0"
+ #define TARGET_CLONE_BACKWARDS
+ #define TARGET_MINSIGSTKSZ       2048
 -- 
 2.15.1
