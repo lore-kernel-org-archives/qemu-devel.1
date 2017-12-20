@@ -1,18 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33034)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33035)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistai@xilinx.com>) id 1eRiBJ-00086f-5X
-	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 12:29:26 -0500
+	(envelope-from <alistai@xilinx.com>) id 1eRiBJ-00086h-69
+	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 12:29:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistai@xilinx.com>) id 1eRiBG-0007Qm-4o
+	(envelope-from <alistai@xilinx.com>) id 1eRiBG-0007Qq-5h
 	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 12:29:25 -0500
 From: Alistair Francis <alistair.francis@xilinx.com>
-Date: Wed, 20 Dec 2017 09:24:47 -0800
-Message-ID: <488ba8d4c562ea44119de8ea0f385a898bd8fa1e.1513790495.git.alistair.francis@xilinx.com>
+Date: Wed, 20 Dec 2017 09:24:51 -0800
+Message-ID: <20db575739761ca7dea1f0670d2c019e3678f035.1513790495.git.alistair.francis@xilinx.com>
 In-Reply-To: <cover.1513790494.git.alistair.francis@xilinx.com>
 References: <cover.1513790494.git.alistair.francis@xilinx.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v6 23/29] hw/sd: Replace fprintf(stderr,
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v6 24/29] hw/sparc*: Replace fprintf(stderr,
  "*\n" with error_report()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -23,41 +24,51 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org, qemu-trivial@nongnu.org
-Cc: alistair.francis@xilinx.com, alistair23@gmail.com, armbru@redhat.com
+Cc: alistair.francis@xilinx.com, alistair23@gmail.com, armbru@redhat.com, Fabien Chouteau <chouteau@adacore.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Artyom Tarasenko <atar4qemu@gmail.com>
 
 Replace a large number of the fprintf(stderr, "*\n" calls with
 error_report(). The functions were renamed with these commands and then
 compiler issues where manually fixed.
 
 find ./* -type f -exec sed -i \
-    'N;N;N;N;N;N;N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
+    'N;N;N;N;N;N;N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_=
+report("\1"\2);|Ig}' \
     {} +
 find ./* -type f -exec sed -i \
-    'N;N;N;N;N;N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
+    'N;N;N;N;N;N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_re=
+port("\1"\2);|Ig}' \
     {} +
 find ./* -type f -exec sed -i \
-    'N;N;N;N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
+    'N;N;N;N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report=
+("\1"\2);|Ig}' \
     {} +
 find ./* -type f -exec sed -i \
-    'N;N;N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
+    'N;N;N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("=
+\1"\2);|Ig}' \
     {} +
 find ./* -type f -exec sed -i \
-    'N;N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
+    'N;N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1=
+"\2);|Ig}' \
     {} +
 find ./* -type f -exec sed -i \
-    'N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
+    'N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\=
+2);|Ig}' \
     {} +
 find ./* -type f -exec sed -i \
-    'N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
+    'N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2)=
+;|Ig}' \
     {} +
 find ./* -type f -exec sed -i \
-    'N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
+    'N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|=
+Ig}' \
     {} +
 find ./* -type f -exec sed -i \
-    'N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
+    'N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig=
+}' \
     {} +
 find ./* -type f -exec sed -i \
-    'N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
+    'N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}'=
+ \
     {} +
 find ./* -type f -exec sed -i \
     'N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
@@ -65,103 +76,201 @@ find ./* -type f -exec sed -i \
 
 Some lines where then manually tweaked to pass checkpatch.
 
-Some of the prints in hw/sd/sd.c were manually converted to using
-DPRINTF() instead.
-
 Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
-Reviewed-by: Philippe Mathieu-Daud <f4bug@amsat.org>
+Cc: Fabien Chouteau <chouteau@adacore.com>
+Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Cc: Artyom Tarasenko <atar4qemu@gmail.com>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+Acked-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 ---
-V3:
- - Fixup some DPRINTF() prints being wrong
 V2:
  - Split hw patch into individual directories
 
- hw/sd/pl181.c |  5 +++--
- hw/sd/sd.c    | 15 ++++++++-------
- 2 files changed, 11 insertions(+), 9 deletions(-)
+ hw/sparc/leon3.c     | 16 +++++++---------
+ hw/sparc/sun4m.c     | 16 +++++++---------
+ hw/sparc64/niagara.c |  4 ++--
+ hw/sparc64/sun4u.c   | 10 +++++-----
+ 4 files changed, 21 insertions(+), 25 deletions(-)
 
-diff --git a/hw/sd/pl181.c b/hw/sd/pl181.c
-index 55c8098ecd..2b878a0c5e 100644
---- a/hw/sd/pl181.c
-+++ b/hw/sd/pl181.c
-@@ -8,6 +8,7 @@
+diff --git a/hw/sparc/leon3.c b/hw/sparc/leon3.c
+index 8c66d5af24..bba3aa3dee 100644
+--- a/hw/sparc/leon3.c
++++ b/hw/sparc/leon3.c
+@@ -22,6 +22,7 @@
+  * THE SOFTWARE.
   */
- 
  #include "qemu/osdep.h"
 +#include "qemu/error-report.h"
- #include "sysemu/block-backend.h"
- #include "sysemu/blockdev.h"
- #include "hw/sysbus.h"
-@@ -146,7 +147,7 @@ static void pl181_fifo_push(PL181State *s, uint32_t value)
-     int n;
- 
-     if (s->fifo_len == PL181_FIFO_LEN) {
--        fprintf(stderr, "pl181: FIFO overflow\n");
-+        error_report("pl181: FIFO overflow");
-         return;
+ #include "qapi/error.h"
+ #include "qemu-common.h"
+ #include "cpu.h"
+@@ -139,9 +140,8 @@ static void leon3_generic_hw_init(MachineState *machine=
+)
+=20
+     /* Allocate RAM */
+     if ((uint64_t)ram_size > (1UL << 30)) {
+-        fprintf(stderr,
+-                "qemu: Too much memory for this machine: %d, maximum 1G\n"=
+,
+-                (unsigned int)(ram_size / (1024 * 1024)));
++        error_report("Too much memory for this machine: %d, maximum 1G",
++                     (unsigned int)(ram_size / (1024 * 1024)));
+         exit(1);
      }
-     n = (s->fifo_pos + s->fifo_len) & (PL181_FIFO_LEN - 1);
-@@ -160,7 +161,7 @@ static uint32_t pl181_fifo_pop(PL181State *s)
-     uint32_t value;
- 
-     if (s->fifo_len == 0) {
--        fprintf(stderr, "pl181: FIFO underflow\n");
-+        error_report("pl181: FIFO underflow");
-         return 0;
+=20
+@@ -167,19 +167,18 @@ static void leon3_generic_hw_init(MachineState *machi=
+ne)
      }
-     value = s->fifo[s->fifo_pos];
-diff --git a/hw/sd/sd.c b/hw/sd/sd.c
-index 35347a5bbc..5d7fa3e418 100644
---- a/hw/sd/sd.c
-+++ b/hw/sd/sd.c
-@@ -700,7 +700,7 @@ static void sd_lock_command(SDState *sd)
-         sd->card_status &= ~CARD_IS_LOCKED;
-         sd->pwd_len = 0;
-         /* Erasing the entire card here! */
--        fprintf(stderr, "SD: Card force-erased by CMD42\n");
-+        error_report("SD: Card force-erased by CMD42");
-         return;
+=20
+     if (bios_size > prom_size) {
+-        fprintf(stderr, "qemu: could not load prom '%s': file too big\n",
+-                filename);
++        error_report("could not load prom '%s': file too big", filename);
+         exit(1);
      }
- 
-@@ -1282,7 +1282,7 @@ static sd_rsp_type_t sd_normal_command(SDState *sd,
-         return sd_r1;
- 
-     case 56:	/* CMD56:  GEN_CMD */
--        fprintf(stderr, "SD: GEN_CMD 0x%08x\n", req.arg);
-+        error_report("SD: GEN_CMD 0x%08x", req.arg);
- 
-         switch (sd->state) {
-         case sd_transfer_state:
-@@ -1564,9 +1564,10 @@ send_response:
-     if (rsplen) {
-         int i;
-         DPRINTF("Response:");
--        for (i = 0; i < rsplen; i++)
--            fprintf(stderr, " %02x", response[i]);
--        fprintf(stderr, " state %d\n", sd->state);
-+        for (i = 0; i < rsplen; i++) {
-+            DPRINTF(" %02x", response[i]);
-+        }
-+        DPRINTF(" state %d\n", sd->state);
-     } else {
-         DPRINTF("No response %d\n", sd->state);
+=20
+     if (bios_size > 0) {
+         ret =3D load_image_targphys(filename, 0x00000000, bios_size);
+         if (ret < 0 || ret > prom_size) {
+-            fprintf(stderr, "qemu: could not load prom '%s'\n", filename);
++            error_report("could not load prom '%s'", filename);
+             exit(1);
+         }
+     } else if (kernel_filename =3D=3D NULL && !qtest_enabled()) {
+-        fprintf(stderr, "Can't read bios image %s\n", filename);
++        error_report("Can't read bios image %s", filename);
+         exit(1);
      }
-@@ -1580,14 +1581,14 @@ static void sd_blk_read(SDState *sd, uint64_t addr, uint32_t len)
-     DPRINTF("sd_blk_read: addr = 0x%08llx, len = %d\n",
-             (unsigned long long) addr, len);
-     if (!sd->blk || blk_pread(sd->blk, addr, sd->data, len) < 0) {
--        fprintf(stderr, "sd_blk_read: read error on host side\n");
-+        error_report("sd_blk_read: read error on host side");
+     g_free(filename);
+@@ -192,8 +191,7 @@ static void leon3_generic_hw_init(MachineState *machine=
+)
+         kernel_size =3D load_elf(kernel_filename, NULL, NULL, &entry, NULL=
+, NULL,
+                                1 /* big endian */, EM_SPARC, 0, 0);
+         if (kernel_size < 0) {
+-            fprintf(stderr, "qemu: could not load kernel '%s'\n",
+-                    kernel_filename);
++            error_report("could not load kernel '%s'", kernel_filename);
+             exit(1);
+         }
+         if (bios_size <=3D 0) {
+diff --git a/hw/sparc/sun4m.c b/hw/sparc/sun4m.c
+index e71648404c..e38b5d84be 100644
+--- a/hw/sparc/sun4m.c
++++ b/hw/sparc/sun4m.c
+@@ -259,8 +259,7 @@ static unsigned long sun4m_load_kernel(const char *kern=
+el_filename,
+                                               KERNEL_LOAD_ADDR,
+                                               RAM_size - KERNEL_LOAD_ADDR)=
+;
+         if (kernel_size < 0) {
+-            fprintf(stderr, "qemu: could not load kernel '%s'\n",
+-                    kernel_filename);
++            error_report("could not load kernel '%s'", kernel_filename);
+             exit(1);
+         }
+=20
+@@ -271,8 +270,8 @@ static unsigned long sun4m_load_kernel(const char *kern=
+el_filename,
+                                               INITRD_LOAD_ADDR,
+                                               RAM_size - INITRD_LOAD_ADDR)=
+;
+             if (initrd_size < 0) {
+-                fprintf(stderr, "qemu: could not load initial ram disk '%s=
+'\n",
+-                        initrd_filename);
++                error_report("could not load initial ram disk '%s'",
++                             initrd_filename);
+                 exit(1);
+             }
+         }
+@@ -680,7 +679,7 @@ static void prom_init(hwaddr addr, const char *bios_nam=
+e)
+         ret =3D -1;
+     }
+     if (ret < 0 || ret > PROM_SIZE_MAX) {
+-        fprintf(stderr, "qemu: could not load prom '%s'\n", bios_name);
++        error_report("could not load prom '%s'", bios_name);
+         exit(1);
      }
  }
- 
- static void sd_blk_write(SDState *sd, uint64_t addr, uint32_t len)
- {
-     if (!sd->blk || blk_pwrite(sd->blk, addr, sd->data, len, 0) < 0) {
--        fprintf(stderr, "sd_blk_write: write error on host side\n");
-+        error_report("sd_blk_write: write error on host side");
+@@ -746,10 +745,9 @@ static void ram_init(hwaddr addr, ram_addr_t RAM_size,
+=20
+     /* allocate RAM */
+     if ((uint64_t)RAM_size > max_mem) {
+-        fprintf(stderr,
+-                "qemu: Too much memory for this machine: %d, maximum %d\n"=
+,
+-                (unsigned int)(RAM_size / (1024 * 1024)),
+-                (unsigned int)(max_mem / (1024 * 1024)));
++        error_report("Too much memory for this machine: %d, maximum %d",
++                     (unsigned int)(RAM_size / (1024 * 1024)),
++                     (unsigned int)(max_mem / (1024 * 1024)));
+         exit(1);
+     }
+     dev =3D qdev_create(NULL, "memory");
+diff --git a/hw/sparc64/niagara.c b/hw/sparc64/niagara.c
+index 7a723326c5..996ce2ada0 100644
+--- a/hw/sparc64/niagara.c
++++ b/hw/sparc64/niagara.c
+@@ -152,8 +152,8 @@ static void niagara_init(MachineState *machine)
+             dinfo->is_default =3D 1;
+             rom_add_file_fixed(blk_bs(blk)->filename, NIAGARA_VDISK_BASE, =
+-1);
+         } else {
+-            fprintf(stderr, "qemu: could not load ram disk '%s'\n",
+-                    blk_bs(blk)->filename);
++            error_report("could not load ram disk '%s'",
++                         blk_bs(blk)->filename);
+             exit(1);
+         }
+     }
+diff --git a/hw/sparc64/sun4u.c b/hw/sparc64/sun4u.c
+index 1672f256e7..1fd1c3c861 100644
+--- a/hw/sparc64/sun4u.c
++++ b/hw/sparc64/sun4u.c
+@@ -22,6 +22,7 @@
+  * THE SOFTWARE.
+  */
+ #include "qemu/osdep.h"
++#include "qemu/error-report.h"
+ #include "qapi/error.h"
+ #include "qemu-common.h"
+ #include "cpu.h"
+@@ -166,8 +167,7 @@ static uint64_t sun4u_load_kernel(const char *kernel_fi=
+lename,
+                                               RAM_size - KERNEL_LOAD_ADDR)=
+;
+         }
+         if (kernel_size < 0) {
+-            fprintf(stderr, "qemu: could not load kernel '%s'\n",
+-                    kernel_filename);
++            error_report("could not load kernel '%s'", kernel_filename);
+             exit(1);
+         }
+         /* load initrd above kernel */
+@@ -179,8 +179,8 @@ static uint64_t sun4u_load_kernel(const char *kernel_fi=
+lename,
+                                                *initrd_addr,
+                                                RAM_size - *initrd_addr);
+             if ((int)*initrd_size < 0) {
+-                fprintf(stderr, "qemu: could not load initial ram disk '%s=
+'\n",
+-                        initrd_filename);
++                error_report("could not load initial ram disk '%s'",
++                             initrd_filename);
+                 exit(1);
+             }
+         }
+@@ -327,7 +327,7 @@ static void prom_init(hwaddr addr, const char *bios_nam=
+e)
+         ret =3D -1;
+     }
+     if (ret < 0 || ret > PROM_SIZE_MAX) {
+-        fprintf(stderr, "qemu: could not load prom '%s'\n", bios_name);
++        error_report("could not load prom '%s'", bios_name);
+         exit(1);
      }
  }
- 
--- 
+--=20
 2.14.1
