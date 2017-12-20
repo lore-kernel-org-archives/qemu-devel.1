@@ -1,29 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47537)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54644)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <michael@weiser.dinsnail.net>) id 1eRh1z-00088U-EU
-	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 11:15:44 -0500
+	(envelope-from <stefanha@redhat.com>) id 1eRh6f-0002Yc-VG
+	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 11:20:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <michael@weiser.dinsnail.net>) id 1eRh1y-0003FW-GO
-	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 11:15:43 -0500
-Received: from heinz.dinsnail.net
-	([2a01:238:43b4:3200:9392:5dcc:2f0e:a960]:49234)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <michael@weiser.dinsnail.net>)
-	id 1eRh1y-0003D7-8G
-	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 11:15:42 -0500
-Date: Wed, 20 Dec 2017 17:01:06 +0100
-From: Michael Weiser <michael.weiser@gmx.de>
-Message-ID: <20171220160106.GE15475@weiser.dinsnail.net>
-References: <20171219201613.7399-1-michael.weiser@gmx.de>
-	<20171219201613.7399-3-michael.weiser@gmx.de>
-	<bd78a6f5-f023-af5a-0d35-f3b29ae4e7a6@vivier.eu>
-	<CAFEAcA8D0n_PNJ-fqMq8KtZSBRdf2i=3cxcbwT1HSnFi9_MhpA@mail.gmail.com>
+	(envelope-from <stefanha@redhat.com>) id 1eRh6d-0007Fu-A9
+	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 11:20:33 -0500
+Date: Wed, 20 Dec 2017 16:20:21 +0000
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20171220162021.GF12566@stefanha-x1.localdomain>
+References: <1513690383-27269-1-git-send-email-sochin.jiang@huawei.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="DEueqSqTbz/jWVG1"
 Content-Disposition: inline
-In-Reply-To: <CAFEAcA8D0n_PNJ-fqMq8KtZSBRdf2i=3cxcbwT1HSnFi9_MhpA@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PATCH v2 2/5] linux-user: Add separate aarch64_be
- uname
+In-Reply-To: <1513690383-27269-1-git-send-email-sochin.jiang@huawei.com>
+Subject: Re: [Qemu-devel] [PATCH]  virtio-blk: notify guest directly
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,37 +23,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Laurent Vivier <laurent@vivier.eu>, QEMU Developers <qemu-devel@nongnu.org>, Riku Voipio <riku.voipio@iki.fi>
+To: "sochin.jiang" <sochin.jiang@huawei.com>
+Cc: kwolf@redhat.com, mreitz@redhat.com, qemu-block@nongnu.org, qemu-devel@nongnu.org, eric.fangyi@huawei.com, Ming Lei <tom.leiming@gmail.com>
 
-Hi Peter,
 
-On Wed, Dec 20, 2017 at 03:36:29PM +0000, Peter Maydell wrote:
+--DEueqSqTbz/jWVG1
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-> >>  #define UNAME_MINIMUM_RELEASE "3.8.0"
+On Tue, Dec 19, 2017 at 09:33:03PM +0800, sochin.jiang wrote:
+> From: "sochin.jiang" <sochin.jiang@huawei.com>
+>=20
+>  Till now, we've already notify guest as a batch mostly, an
+>  extra BH won't decrease guest interrupts much, but cause a
+>  significant notification loss. Generally, we could have 15%
+>  or so performance lost in single queue IO models, as I tested.
 
-> > For aarch64_be, I think the minimum release should be 4.9.0
-> > (see kernel commit cfa88c79462d "arm64: Set UTS_MACHINE in the Makefile")
+I have CCed Ming Lei, who originally implemented batched notifications
+in commit 5b2ffbe4d99843fd8305c573a100047a8c962327 ("virtio-blk:
+dataplane: notify guest as a batch").  The original commit mentions a 13K
+interrupt/sec reduction, which is significant.
 
-> Isn't the thing that defines what we set the minimum-release
-> to glibc, not the kernel? That is, the reason we lie to the
-> guest about the kernel version for some architectures is because
-> the glibc for those archs insists on a minimum kernel version
-> which the host may not have. Unless aarch64_be glibc insists
-> on kernel 4.9.0 there's no need to tell the guest that.
+Which host storage device are you benchmarking and what is the benchmark
+configuration?
 
-I can confirm that cross-compiled glibc runs fine with the current
-value. Also, a native compile of glibc inside an qemu-aarch64_be binfmt
-chroot configured without problem and currently churns along compiling.
+How many interrupts/sec does the guest report (cat /proc/interrupts)
+before and after this patch?
 
-My Gentoo setup calls configure with --enable-kernel=3.2.0 and that says
-about this:
+In the past I've noticed performance can vary significantly depending on
+QEMUBH ordering in the AioContext->first_bh list.  Can you measure the
+latency from virtio_blk_data_plane_notify() to aio_bh_poll() and compare
+against the latency from virtio_blk_data_plane_notify() to
+notify_guest_bh()?
 
-checking installed Linux kernel header files... 3.2.0 or later
-configure: WARNING: minimum kernel version reset to 3.7.0
-checking for kernel header at least 3.7.0... ok
+> @@ -75,7 +67,12 @@ static void notify_guest_bh(void *opaque)
+>      }
+>  }
+> =20
+> -/* Context: QEMU global mutex held */
 
-So it seems your memory is right.
--- 
-Bye,
-Michael
+Please keep this doc comment for virtio_blk_data_plane_create().
+
+--DEueqSqTbz/jWVG1
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJaOo3FAAoJEJykq7OBq3PInNkH/RxHOFmBOKcBzJZY445rk3rx
+esoRlq7mqzQF2FuWA8/uknyg1MvtdGIr4u9TVWOlO218734QKFIjbGnSAejPiFLr
+BTDmwjpuh1BHnn+eUX2AAk2+Ga/gAbA9YQGhLKv7pL6aRSUVFsq7pIGdgyJ8k9iA
+SQf5u9D4DNwnckjt+EmojSs8G6ebBiXywNga7B6f1huoCTeudCBJSlP/4hEFuR/r
+HGDMtmV0W1xeUQWg+OLNlKCsQmFuNzGqFALdgL+zCO/UcAPBbMx9cEroo+2FN4Tz
+EQWW8Wpjb4NKzLtgATppKXxP8s19QlNgZen+xt4U4qqcuz8lvQ8Q8VfxmWDBMeY=
+=a1SN
+-----END PGP SIGNATURE-----
+
+--DEueqSqTbz/jWVG1--
