@@ -1,26 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60853)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33470)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1eRbBf-00025B-Fw
-	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 05:01:24 -0500
+	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1eRbCU-0002Z7-B2
+	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 05:02:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1eRbBV-0006ie-SX
-	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 05:01:19 -0500
-References: <1513030760-26245-1-git-send-email-walling@linux.vnet.ibm.com>
-	<1513030760-26245-2-git-send-email-walling@linux.vnet.ibm.com>
-	<a6920dc1-f2be-cdd9-ba6e-a341a9e93343@redhat.com>
-	<231e9fad-a4e0-b957-229e-3f3dcc342e4e@linux.vnet.ibm.com>
-	<31f9a2b4-b8c2-c823-1dfc-b251d00d7fc2@redhat.com>
-	<889623b1-f186-33af-e1be-8222a429518d@linux.vnet.ibm.com>
-	<27778497-8f7b-5d3d-b86c-9cb48d1592ad@linux.vnet.ibm.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <678867dd-d32c-ba5a-b2ac-348f574d36e0@redhat.com>
-Date: Wed, 20 Dec 2017 11:00:59 +0100
+	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1eRbCQ-0007Nm-11
+	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 05:02:10 -0500
+Received: from mail.ispras.ru ([83.149.199.45]:57688)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1eRbCP-0007N6-P9
+	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 05:02:05 -0500
+From: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
+Date: Wed, 20 Dec 2017 13:02:05 +0300
+Message-ID: <20171220100205.16625.84632.stgit@pasha-VirtualBox>
 MIME-Version: 1.0
-In-Reply-To: <27778497-8f7b-5d3d-b86c-9cb48d1592ad@linux.vnet.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v2 1/5] s390-ccw: update libc
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Subject: [Qemu-devel] [PATCH v2] hpet: recover timer offset correctly
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,167 +24,104 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Collin L. Walling" <walling@linux.vnet.ibm.com>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org
-Cc: frankja@linux.vnet.ibm.com, cohuck@redhat.com, borntraeger@de.ibm.com, david@redhat.com
+To: qemu-devel@nongnu.org
+Cc: quintela@redhat.com, mst@redhat.com, dgilbert@redhat.com, maria.klimushenkova@ispras.ru, dovgaluk@ispras.ru, pavel.dovgaluk@ispras.ru, pbonzini@redhat.com
 
-On 19.12.2017 21:23, Collin L. Walling wrote:
-> On 12/19/2017 11:29 AM, Collin L. Walling wrote:
->> On 12/19/2017 02:31 AM, Thomas Huth wrote:
->>> On 18.12.2017 17:16, Collin L. Walling wrote:
->>>> On 12/18/2017 08:06 AM, Thomas Huth wrote:
->>>>> On 11.12.2017 23:19, Collin L. Walling wrote:
->>>>>> Moved:
->>>>>> =C2=A0=C2=A0=C2=A0 memcmp from bootmap.h to libc.h (renamed from _=
-memcmp)
->>>>>> =C2=A0=C2=A0=C2=A0 strlen from sclp.c to libc.h (renamed from _str=
-len)
->>>>>>
->>>>>> Added C standard functions:
->>>>>> =C2=A0=C2=A0=C2=A0 isdigit
->>>>>> =C2=A0=C2=A0=C2=A0 atoi
->>>>>>
->>>>>> Added non-C standard function:
->>>>>> =C2=A0=C2=A0=C2=A0 itostr
->>>>>>
->>>>>> Signed-off-by: Collin L. Walling <walling@linux.vnet.ibm.com>
->>>>>> Acked-by: Christian Borntraeger <borntraeger@de.ibm.com>
->>>>>> Reviewed-by: Janosch Frank <frankja@linux.vnet.ibm.com>
->>>>>> ---
->>>>>> =C2=A0=C2=A0 pc-bios/s390-ccw/Makefile=C2=A0 |=C2=A0 2 +-
->>>>>> =C2=A0=C2=A0 pc-bios/s390-ccw/bootmap.c |=C2=A0 4 +--
->>>>>> =C2=A0=C2=A0 pc-bios/s390-ccw/bootmap.h | 16 +---------
->>>>>> =C2=A0=C2=A0 pc-bios/s390-ccw/libc.c=C2=A0=C2=A0=C2=A0 | 75
->>>>>> ++++++++++++++++++++++++++++++++++++++++++++++
->>>>>> =C2=A0=C2=A0 pc-bios/s390-ccw/libc.h=C2=A0=C2=A0=C2=A0 | 31 ++++++=
-+++++++++++++
->>>>>> =C2=A0=C2=A0 pc-bios/s390-ccw/main.c=C2=A0=C2=A0=C2=A0 | 17 +-----=
------
->>>>>> =C2=A0=C2=A0 pc-bios/s390-ccw/sclp.c=C2=A0=C2=A0=C2=A0 | 10 +-----=
--
->>>>>> =C2=A0=C2=A0 7 files changed, 112 insertions(+), 43 deletions(-)
->>>>>> =C2=A0=C2=A0 create mode 100644 pc-bios/s390-ccw/libc.c
->>>>> [...]
->>>>>> +
->>>>>> +/**
->>>>>> + * itostr:
->>>>>> + * @num: the integer to be converted.
->>>>>> + * @str: a pointer to a string to store the conversion.
->>>>>> + * @len: the length of the passed string.
->>>>>> + *
->>>>>> + * Given an integer @num, convert it to a string. The string @str
->>>>>> must be
->>>>>> + * allocated beforehand. The resulting string will be null
->>>>>> terminated and
->>>>>> + * returned.
->>>>>> + *
->>>>>> + * Returns: the string @str of the converted integer @num.
->>>>>> + */
->>>>>> +char *itostr(int num, char *str, size_t len)
->>>>>> +{
->>>>>> +=C2=A0=C2=A0=C2=A0 long num_len =3D 1;
->>>>>> +=C2=A0=C2=A0=C2=A0 int tmp =3D num;
->>>>>> +=C2=A0=C2=A0=C2=A0 int i;
->>>>>> +
->>>>>> +=C2=A0=C2=A0=C2=A0 /* Count length of num */
->>>>>> +=C2=A0=C2=A0=C2=A0 while ((tmp /=3D 10) > 0) {
->>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 num_len++;
->>>>>> +=C2=A0=C2=A0=C2=A0 }
->>>>>> +
->>>>>> +=C2=A0=C2=A0=C2=A0 /* Check if we have enough space for num and n=
-ull */
->>>>>> +=C2=A0=C2=A0=C2=A0 if (len < num_len) {
->>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return 0;
->>>>>> +=C2=A0=C2=A0=C2=A0 }
->>>>> I'm afraid, but I think you've got an off-by-one bug in this code.
->>>>>
->>>>> In patch 5, you're using this function like this:
->>>>>
->>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 char tmp[4];
->>>>>
->>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 sclp_print(itostr(entries, tmp, size=
-of(tmp)));
->>>>>
->>>>> That means if entries is >=3D 1000 for example, num_len is 4 ...
->>>>>
->>>>>> +=C2=A0=C2=A0=C2=A0 /* Convert int to string */
->>>>>> +=C2=A0=C2=A0=C2=A0 for (i =3D num_len - 1; i >=3D 0; i--) {
->>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 str[i] =3D num % 10 + =
-'0';
->>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 num /=3D 10;
->>>>>> +=C2=A0=C2=A0=C2=A0 }
->>>>>> +
->>>>>> +=C2=A0=C2=A0=C2=A0 str[num_len] =3D '\0';
->>>>> ... and then you run into a buffer overflow here.
->>>>
->>>> Doh, you're correct.=C2=A0 I forgot to put a "<=3D" in the len / num=
-_len
->>>> check.
->>>> That should fix things up.=C2=A0 Thanks for catching that.
->>>>
->>>>
->>>>>> +=C2=A0=C2=A0=C2=A0 return str;
->>>>>> +}
->>>>> Maybe it would also make more sense to panic() instead of "return 0=
-"
->>>>> since you don't check the return value in patch 5 ?
->>>>
->>>> I'm a bit conflicted about doing something like that.=C2=A0 I'm not =
-sure if
->>>> there's any kind
->>>> of guideline we want to follow for defining functions in libc.
->>>>
->>>> I see one of two possibilities:
->>>>
->>>> a.=C2=A0 define these functions as "libc-like" as possible, and use =
-them as
->>>> if they were
->>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 regular standard libc functions
->>>>
->>>> =C2=A0=C2=A0=C2=A0=C2=A0 or
->>>>
->>>> b.=C2=A0 change up these functions to better fit their use cases in
->>>> pc-bios/s390-ccw
->>>>
->>>> Does that make sense?=C2=A0 What do you think?
->>> Keeping them libc-like likely makes sense ... but could we somehow al=
-so
->>> make sure that we're not running into unexpected errors when using th=
-em?
->>> Something like "IPL_assert(entries < 1000, ...)" before calling the
->>> functions in patch 5?
->>>
->>> =C2=A0 Thomas
->>>
->>>
->>
->> Sounds good to me.
->>
->=20
->=20
-> What if we made a wrapper function for itostr. This func will have a tm=
-p
-> variable
-> that stores the return of itostr. We then do an assertion to make sure
-> we did not
-> return 0 (which indicates that the size of the array was not large
-> enough). If we
-> pass, then just return tmp.
->=20
-> e.g.
->=20
-> static char *_itostr(int num, char *str, size_t len)
-> {
-> =C2=A0=C2=A0=C2=A0 ...
-> }
->=20
-> char *itostr(int num, char *str, size_t len)
-> {
-> =C2=A0=C2=A0=C2=A0 char *tmp =3D _itostr(num, str, len);
-> =C2=A0=C2=A0=C2=A0 IPL_assert(tmp !=3D 0, "array too small for itostr c=
-onversion");
-> =C2=A0=C2=A0=C2=A0 return tmp;
-> }
+HPET saves its state by calculating the current time and recovers timer
+offset using this calculated value. But these calculations include
+divisions and multiplications. Therefore the timer state cannot be recovered
+precise enough.
+This patch introduces saving of the original value of the offset to
+preserve the determinism of the timer.
 
-That's fine for me, too.
+Signed-off-by: Maria Klimushenkova <maria.klimushenkova@ispras.ru>
+Signed-off-by: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
+---
+ hw/timer/hpet.c |   32 ++++++++++++++++++++++++++++++--
+ 1 file changed, 30 insertions(+), 2 deletions(-)
 
- Thomas
+diff --git a/hw/timer/hpet.c b/hw/timer/hpet.c
+index 577371b..4904a60 100644
+--- a/hw/timer/hpet.c
++++ b/hw/timer/hpet.c
+@@ -70,6 +70,7 @@ typedef struct HPETState {
+ 
+     MemoryRegion iomem;
+     uint64_t hpet_offset;
++    bool hpet_offset_loaded;
+     qemu_irq irqs[HPET_NUM_IRQ_ROUTES];
+     uint32_t flags;
+     uint8_t rtc_irq_level;
+@@ -221,7 +222,9 @@ static int hpet_pre_save(void *opaque)
+     HPETState *s = opaque;
+ 
+     /* save current counter value */
+-    s->hpet_counter = hpet_get_ticks(s);
++    if (hpet_enabled(s)) {
++        s->hpet_counter = hpet_get_ticks(s);
++    }
+ 
+     return 0;
+ }
+@@ -232,6 +235,8 @@ static int hpet_pre_load(void *opaque)
+ 
+     /* version 1 only supports 3, later versions will load the actual value */
+     s->num_timers = HPET_MIN_TIMERS;
++    /* for checking whether the hpet_offset section is loaded */
++    s->hpet_offset_loaded = false;
+     return 0;
+ }
+ 
+@@ -252,7 +257,10 @@ static int hpet_post_load(void *opaque, int version_id)
+     HPETState *s = opaque;
+ 
+     /* Recalculate the offset between the main counter and guest time */
+-    s->hpet_offset = ticks_to_ns(s->hpet_counter) - qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
++    if (!s->hpet_offset_loaded) {
++        s->hpet_offset = ticks_to_ns(s->hpet_counter)
++                        - qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
++    }
+ 
+     /* Push number of timers into capability returned via HPET_ID */
+     s->capability &= ~HPET_ID_NUM_TIM_MASK;
+@@ -267,6 +275,14 @@ static int hpet_post_load(void *opaque, int version_id)
+     return 0;
+ }
+ 
++static int hpet_offset_post_load(void *opaque, int version_id)
++{
++    HPETState *s = opaque;
++
++    s->hpet_offset_loaded = true;
++    return 0;
++}
++
+ static bool hpet_rtc_irq_level_needed(void *opaque)
+ {
+     HPETState *s = opaque;
+@@ -285,6 +301,17 @@ static const VMStateDescription vmstate_hpet_rtc_irq_level = {
+     }
+ };
+ 
++static const VMStateDescription vmstate_hpet_offset = {
++    .name = "hpet/offset",
++    .version_id = 1,
++    .minimum_version_id = 1,
++    .post_load = hpet_offset_post_load,
++    .fields = (VMStateField[]) {
++        VMSTATE_UINT64(hpet_offset, HPETState),
++        VMSTATE_END_OF_LIST()
++    }
++};
++
+ static const VMStateDescription vmstate_hpet_timer = {
+     .name = "hpet_timer",
+     .version_id = 1,
+@@ -320,6 +347,7 @@ static const VMStateDescription vmstate_hpet = {
+     },
+     .subsections = (const VMStateDescription*[]) {
+         &vmstate_hpet_rtc_irq_level,
++        &vmstate_hpet_offset,
+         NULL
+     }
+ };
