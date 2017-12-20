@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([208.118.235.92]:35036)
+Received: from eggs.gnu.org ([208.118.235.92]:35034)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1eRgd5-0003ui-P0
+	(envelope-from <vsementsov@virtuozzo.com>) id 1eRgd5-0003ug-Oq
 	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 10:50:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1eRgd1-0005e2-Hq
+	(envelope-from <vsementsov@virtuozzo.com>) id 1eRgd1-0005e9-HV
 	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 10:49:58 -0500
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Wed, 20 Dec 2017 18:49:37 +0300
-Message-Id: <20171220154945.88410-6-vsementsov@virtuozzo.com>
+Date: Wed, 20 Dec 2017 18:49:44 +0300
+Message-Id: <20171220154945.88410-13-vsementsov@virtuozzo.com>
 In-Reply-To: <20171220154945.88410-1-vsementsov@virtuozzo.com>
 References: <20171220154945.88410-1-vsementsov@virtuozzo.com>
-Subject: [Qemu-devel] [PATCH v9 05/13] migration: introduce postcopy-only
- pending
+Subject: [Qemu-devel] [PATCH v9 12/13] iotests: add dirty bitmap migration
+ test
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,223 +23,186 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org, qemu-devel@nongnu.org
 Cc: pbonzini@redhat.com, armbru@redhat.com, eblake@redhat.com, famz@redhat.com, stefanha@redhat.com, amit.shah@redhat.com, quintela@redhat.com, mreitz@redhat.com, kwolf@redhat.com, peter.maydell@linaro.org, dgilbert@redhat.com, den@openvz.org, jsnow@redhat.com, vsementsov@virtuozzo.com, lirans@il.ibm.com
 
-There would be savevm states (dirty-bitmap) which can migrate only in
-postcopy stage. The corresponding pending is introduced here.
+The test starts two vms (vm_a, vm_b), create dirty bitmap in
+the first one, do several writes to corresponding device and
+then migrate vm_a to vm_b.
 
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Reviewed-by: Juan Quintela <quintela@redhat.com>
-Reviewed-by: John Snow <jsnow@redhat.com>
 ---
- include/migration/register.h | 17 +++++++++++++++--
- migration/savevm.h           |  5 +++--
- hw/s390x/s390-stattrib.c     |  7 ++++---
- migration/block.c            |  7 ++++---
- migration/migration.c        | 15 ++++++++-------
- migration/ram.c              |  9 +++++----
- migration/savevm.c           | 13 ++++++++-----
- migration/trace-events       |  2 +-
- 8 files changed, 48 insertions(+), 27 deletions(-)
+ tests/qemu-iotests/169     | 139 +++++++++++++++++++++++++++++++++++++++++++++
+ tests/qemu-iotests/169.out |   5 ++
+ tests/qemu-iotests/group   |   1 +
+ 3 files changed, 145 insertions(+)
+ create mode 100755 tests/qemu-iotests/169
+ create mode 100644 tests/qemu-iotests/169.out
 
-diff --git a/include/migration/register.h b/include/migration/register.h
-index f4f7bdc177..9436a87678 100644
---- a/include/migration/register.h
-+++ b/include/migration/register.h
-@@ -37,8 +37,21 @@ typedef struct SaveVMHandlers {
-     int (*save_setup)(QEMUFile *f, void *opaque);
-     void (*save_live_pending)(QEMUFile *f, void *opaque,
-                               uint64_t threshold_size,
--                              uint64_t *non_postcopiable_pending,
--                              uint64_t *postcopiable_pending);
-+                              uint64_t *res_precopy_only,
-+                              uint64_t *res_compatible,
-+                              uint64_t *res_postcopy_only);
-+    /* Note for save_live_pending:
-+     * - res_precopy_only is for data which must be migrated in precopy phase
-+     *     or in stopped state, in other words - before target vm start
-+     * - res_compatible is for data which may be migrated in any phase
-+     * - res_postcopy_only is for data which must be migrated in postcopy phase
-+     *     or in stopped state, in other words - after source vm stop
-+     *
-+     * Sum of res_postcopy_only, res_compatible and res_postcopy_only is the
-+     * whole amount of pending data.
-+     */
+diff --git a/tests/qemu-iotests/169 b/tests/qemu-iotests/169
+new file mode 100755
+index 0000000000..4b82399591
+--- /dev/null
++++ b/tests/qemu-iotests/169
+@@ -0,0 +1,139 @@
++#!/usr/bin/env python
++#
++# Tests for dirty bitmaps migration.
++#
++# Copyright (c) 2016-2017 Virtuozzo International GmbH. All rights reserved.
++#
++# This program is free software; you can redistribute it and/or modify
++# it under the terms of the GNU General Public License as published by
++# the Free Software Foundation; either version 2 of the License, or
++# (at your option) any later version.
++#
++# This program is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU General Public License for more details.
++#
++# You should have received a copy of the GNU General Public License
++# along with this program.  If not, see <http://www.gnu.org/licenses/>.
++#
++
++import os
++import iotests
++import time
++import itertools
++import operator
++import new
++from iotests import qemu_img
 +
 +
-     LoadStateHandler *load_state;
-     int (*load_setup)(QEMUFile *f, void *opaque);
-     int (*load_cleanup)(void *opaque);
-diff --git a/migration/savevm.h b/migration/savevm.h
-index 295c4a1f2c..cf4f0d37ca 100644
---- a/migration/savevm.h
-+++ b/migration/savevm.h
-@@ -38,8 +38,9 @@ void qemu_savevm_state_complete_postcopy(QEMUFile *f);
- int qemu_savevm_state_complete_precopy(QEMUFile *f, bool iterable_only,
-                                        bool inactivate_disks);
- void qemu_savevm_state_pending(QEMUFile *f, uint64_t max_size,
--                               uint64_t *res_non_postcopiable,
--                               uint64_t *res_postcopiable);
-+                               uint64_t *res_precopy_only,
-+                               uint64_t *res_compatible,
-+                               uint64_t *res_postcopy_only);
- void qemu_savevm_send_ping(QEMUFile *f, uint32_t value);
- void qemu_savevm_send_open_return_path(QEMUFile *f);
- int qemu_savevm_send_packaged(QEMUFile *f, const uint8_t *buf, size_t len);
-diff --git a/hw/s390x/s390-stattrib.c b/hw/s390x/s390-stattrib.c
-index 2902f54f11..dd3fbfd1eb 100644
---- a/hw/s390x/s390-stattrib.c
-+++ b/hw/s390x/s390-stattrib.c
-@@ -183,15 +183,16 @@ static int cmma_save_setup(QEMUFile *f, void *opaque)
- }
- 
- static void cmma_save_pending(QEMUFile *f, void *opaque, uint64_t max_size,
--                             uint64_t *non_postcopiable_pending,
--                             uint64_t *postcopiable_pending)
-+                              uint64_t *res_precopy_only,
-+                              uint64_t *res_compatible,
-+                              uint64_t *res_postcopy_only)
- {
-     S390StAttribState *sas = S390_STATTRIB(opaque);
-     S390StAttribClass *sac = S390_STATTRIB_GET_CLASS(sas);
-     long long res = sac->get_dirtycount(sas);
- 
-     if (res >= 0) {
--        *non_postcopiable_pending += res;
-+        *res_precopy_only += res;
-     }
- }
- 
-diff --git a/migration/block.c b/migration/block.c
-index 7147171bb7..e5bf30f5de 100644
---- a/migration/block.c
-+++ b/migration/block.c
-@@ -866,8 +866,9 @@ static int block_save_complete(QEMUFile *f, void *opaque)
- }
- 
- static void block_save_pending(QEMUFile *f, void *opaque, uint64_t max_size,
--                               uint64_t *non_postcopiable_pending,
--                               uint64_t *postcopiable_pending)
-+                               uint64_t *res_precopy_only,
-+                               uint64_t *res_compatible,
-+                               uint64_t *res_postcopy_only)
- {
-     /* Estimate pending number of bytes to send */
-     uint64_t pending;
-@@ -888,7 +889,7 @@ static void block_save_pending(QEMUFile *f, void *opaque, uint64_t max_size,
- 
-     DPRINTF("Enter save live pending  %" PRIu64 "\n", pending);
-     /* We don't do postcopy */
--    *non_postcopiable_pending += pending;
-+    *res_precopy_only += pending;
- }
- 
- static int block_load(QEMUFile *f, void *opaque, int version_id)
-diff --git a/migration/migration.c b/migration/migration.c
-index 4de3b551fe..e6c9be3cca 100644
---- a/migration/migration.c
-+++ b/migration/migration.c
-@@ -2216,20 +2216,21 @@ static void *migration_thread(void *opaque)
-         uint64_t pending_size;
- 
-         if (!qemu_file_rate_limit(s->to_dst_file)) {
--            uint64_t pend_post, pend_nonpost;
-+            uint64_t pend_pre, pend_compat, pend_post;
- 
--            qemu_savevm_state_pending(s->to_dst_file, threshold_size,
--                                      &pend_nonpost, &pend_post);
--            pending_size = pend_nonpost + pend_post;
-+            qemu_savevm_state_pending(s->to_dst_file, threshold_size, &pend_pre,
-+                                      &pend_compat, &pend_post);
-+            pending_size = pend_pre + pend_compat + pend_post;
-             trace_migrate_pending(pending_size, threshold_size,
--                                  pend_post, pend_nonpost);
-+                                  pend_pre, pend_compat, pend_post);
-             if (pending_size && pending_size >= threshold_size) {
-                 /* Still a significant amount to transfer */
- 
-                 if (migrate_postcopy() &&
-                     s->state != MIGRATION_STATUS_POSTCOPY_ACTIVE &&
--                    pend_nonpost <= threshold_size &&
--                    atomic_read(&s->start_postcopy)) {
-+                    pend_pre <= threshold_size &&
-+                    (atomic_read(&s->start_postcopy) ||
-+                     (pend_pre + pend_compat <= threshold_size))) {
- 
-                     if (!postcopy_start(s, &old_vm_running)) {
-                         current_active_state = MIGRATION_STATUS_POSTCOPY_ACTIVE;
-diff --git a/migration/ram.c b/migration/ram.c
-index 021d583b9b..f316e2b4dc 100644
---- a/migration/ram.c
-+++ b/migration/ram.c
-@@ -2358,8 +2358,9 @@ static int ram_save_complete(QEMUFile *f, void *opaque)
- }
- 
- static void ram_save_pending(QEMUFile *f, void *opaque, uint64_t max_size,
--                             uint64_t *non_postcopiable_pending,
--                             uint64_t *postcopiable_pending)
-+                             uint64_t *res_precopy_only,
-+                             uint64_t *res_compatible,
-+                             uint64_t *res_postcopy_only)
- {
-     RAMState **temp = opaque;
-     RAMState *rs = *temp;
-@@ -2379,9 +2380,9 @@ static void ram_save_pending(QEMUFile *f, void *opaque, uint64_t max_size,
- 
-     if (migrate_postcopy_ram()) {
-         /* We can do postcopy, and all the data is postcopiable */
--        *postcopiable_pending += remaining_size;
-+        *res_compatible += remaining_size;
-     } else {
--        *non_postcopiable_pending += remaining_size;
-+        *res_precopy_only += remaining_size;
-     }
- }
- 
-diff --git a/migration/savevm.c b/migration/savevm.c
-index b7908f62be..c3c60a15e3 100644
---- a/migration/savevm.c
-+++ b/migration/savevm.c
-@@ -1218,13 +1218,15 @@ int qemu_savevm_state_complete_precopy(QEMUFile *f, bool iterable_only,
-  * for units that can't do postcopy.
-  */
- void qemu_savevm_state_pending(QEMUFile *f, uint64_t threshold_size,
--                               uint64_t *res_non_postcopiable,
--                               uint64_t *res_postcopiable)
-+                               uint64_t *res_precopy_only,
-+                               uint64_t *res_compatible,
-+                               uint64_t *res_postcopy_only)
- {
-     SaveStateEntry *se;
- 
--    *res_non_postcopiable = 0;
--    *res_postcopiable = 0;
-+    *res_precopy_only = 0;
-+    *res_compatible = 0;
-+    *res_postcopy_only = 0;
- 
- 
-     QTAILQ_FOREACH(se, &savevm_state.handlers, entry) {
-@@ -1237,7 +1239,8 @@ void qemu_savevm_state_pending(QEMUFile *f, uint64_t threshold_size,
-             }
-         }
-         se->ops->save_live_pending(f, se->opaque, threshold_size,
--                                   res_non_postcopiable, res_postcopiable);
-+                                   res_precopy_only, res_compatible,
-+                                   res_postcopy_only);
-     }
- }
- 
-diff --git a/migration/trace-events b/migration/trace-events
-index 6f29fcc686..a04fffb877 100644
---- a/migration/trace-events
-+++ b/migration/trace-events
-@@ -86,7 +86,7 @@ migrate_fd_cleanup(void) ""
- migrate_fd_error(const char *error_desc) "error=%s"
- migrate_fd_cancel(void) ""
- migrate_handle_rp_req_pages(const char *rbname, size_t start, size_t len) "in %s at 0x%zx len 0x%zx"
--migrate_pending(uint64_t size, uint64_t max, uint64_t post, uint64_t nonpost) "pending size %" PRIu64 " max %" PRIu64 " (post=%" PRIu64 " nonpost=%" PRIu64 ")"
-+migrate_pending(uint64_t size, uint64_t max, uint64_t pre, uint64_t compat, uint64_t post) "pending size %" PRIu64 " max %" PRIu64 " (pre = %" PRIu64 " compat=%" PRIu64 " post=%" PRIu64 ")"
- migrate_send_rp_message(int msg_type, uint16_t len) "%d: len %d"
- migration_completion_file_err(void) ""
- migration_completion_postcopy_end(void) ""
++disk_a = os.path.join(iotests.test_dir, 'disk_a')
++disk_b = os.path.join(iotests.test_dir, 'disk_b')
++size = '1M'
++mig_file = os.path.join(iotests.test_dir, 'mig_file')
++
++
++class TestDirtyBitmapMigration(iotests.QMPTestCase):
++    def tearDown(self):
++        self.vm_a.shutdown()
++        self.vm_b.shutdown()
++        os.remove(disk_a)
++        os.remove(disk_b)
++        os.remove(mig_file)
++
++    def setUp(self):
++        qemu_img('create', '-f', iotests.imgfmt, disk_a, size)
++        qemu_img('create', '-f', iotests.imgfmt, disk_b, size)
++
++        self.vm_a = iotests.VM(path_suffix='a').add_drive(disk_a)
++        self.vm_a.launch()
++
++        self.vm_b = iotests.VM(path_suffix='b')
++        self.vm_b.add_incoming("exec: cat '" + mig_file + "'")
++
++    def add_bitmap(self, vm, granularity, persistent):
++        params = {'node': 'drive0',
++                  'name': 'bitmap0',
++                  'granularity': granularity}
++        if persistent:
++            params['persistent'] = True
++            params['autoload'] = True
++
++        result = vm.qmp('block-dirty-bitmap-add', **params)
++        self.assert_qmp(result, 'return', {});
++
++    def get_bitmap_hash(self, vm):
++        result = vm.qmp('x-debug-block-dirty-bitmap-sha256',
++                        node='drive0', name='bitmap0')
++        return result['return']['sha256']
++
++    def check_bitmap(self, vm, sha256):
++        result = vm.qmp('x-debug-block-dirty-bitmap-sha256',
++                        node='drive0', name='bitmap0')
++        if sha256:
++            self.assert_qmp(result, 'return/sha256', sha256);
++        else:
++            self.assert_qmp(result, 'error/desc',
++                            "Dirty bitmap 'bitmap0' not found");
++
++    def do_test_migration(self, persistent=False, shared_storage=False,
++                          migrate_bitmaps=True, online=True):
++        granularity = 512
++
++        # regions = ((start, count), ...)
++        regions = ((0, 0x10000),
++                   (0xf0000, 0x10000),
++                   (0xa0201, 0x1000))
++
++        should_migrate = migrate_bitmaps or persistent and shared_storage
++
++        self.vm_b.add_drive(disk_a if shared_storage else disk_b)
++
++        if online:
++            os.mkfifo(mig_file)
++            self.vm_b.launch()
++
++        self.add_bitmap(self.vm_a, granularity, persistent)
++        for r in regions:
++            self.vm_a.hmp_qemu_io('drive0', 'write %d %d' % r)
++        sha256 = self.get_bitmap_hash(self.vm_a)
++
++        if migrate_bitmaps:
++            result = self.vm_a.qmp('migrate-set-capabilities',
++                                   capabilities=[{'capability': 'dirty-bitmaps',
++                                                  'state': True}])
++            self.assert_qmp(result, 'return', {})
++
++        result = self.vm_a.qmp('migrate', uri='exec:cat>' + mig_file)
++        self.vm_a.event_wait("STOP")
++
++        if not online:
++            self.vm_a.shutdown()
++            self.vm_b.launch()
++
++        self.vm_b.event_wait("RESUME", timeout=10.0)
++
++        self.check_bitmap(self.vm_b, sha256 if should_migrate else False)
++
++        if should_migrate:
++            self.vm_b.shutdown()
++            self.vm_b.launch()
++            self.check_bitmap(self.vm_b, sha256 if persistent else False)
++
++
++def inject_test_case(klass, name, method, *args, **kwargs):
++    mc = operator.methodcaller(method, *args, **kwargs)
++    setattr(klass, 'test_' + name, new.instancemethod(mc, None, klass))
++
++
++for cmb in list(itertools.product((True, False), repeat=4)):
++    name = ('_' if cmb[0] else '_not_') + 'persistent_'
++    name += ('_' if cmb[1] else '_not_') + 'shared_'
++    name += ('_' if cmb[2] else '_not_') + 'migbitmap_'
++    name += '_online' if cmb[3] else '_offline'
++
++    inject_test_case(TestDirtyBitmapMigration, name, 'do_test_migration', *cmb)
++
++
++if __name__ == '__main__':
++    iotests.main(supported_fmts=['qcow2'])
+diff --git a/tests/qemu-iotests/169.out b/tests/qemu-iotests/169.out
+new file mode 100644
+index 0000000000..b6f257674e
+--- /dev/null
++++ b/tests/qemu-iotests/169.out
+@@ -0,0 +1,5 @@
++................
++----------------------------------------------------------------------
++Ran 16 tests
++
++OK
+diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
+index 3e688678dd..e879c7ebc7 100644
+--- a/tests/qemu-iotests/group
++++ b/tests/qemu-iotests/group
+@@ -169,6 +169,7 @@
+ 162 auto quick
+ 163 rw auto quick
+ 165 rw auto quick
++169 rw auto quick
+ 170 rw auto quick
+ 171 rw auto quick
+ 172 auto
 -- 
 2.11.1
