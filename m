@@ -1,24 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56294)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56024)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1eRhyC-0004V9-IM
-	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 12:15:56 -0500
+	(envelope-from <paolo.bonzini@gmail.com>) id 1eRhxx-0004EY-Cx
+	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 12:15:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1eRhyB-0007A6-Is
-	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 12:15:52 -0500
-Received: from mail-wr0-x244.google.com ([2a00:1450:400c:c0c::244]:46960)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1eRhxt-0006vL-Jr
+	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 12:15:37 -0500
+Received: from mail-wr0-x242.google.com ([2a00:1450:400c:c0c::242]:36870)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1eRhyB-00079b-Bq
-	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 12:15:51 -0500
-Received: by mail-wr0-x244.google.com with SMTP id g17so13685671wrd.13
-	for <qemu-devel@nongnu.org>; Wed, 20 Dec 2017 09:15:51 -0800 (PST)
+	id 1eRhxt-0006uP-2G
+	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 12:15:33 -0500
+Received: by mail-wr0-x242.google.com with SMTP id f8so12140968wre.4
+	for <qemu-devel@nongnu.org>; Wed, 20 Dec 2017 09:15:32 -0800 (PST)
+Received: from 640k.lan (dynamic-adsl-78-12-251-125.clienti.tiscali.it.
+	[78.12.251.125]) by smtp.gmail.com with ESMTPSA id
+	f125sm2751101wme.45.2017.12.20.09.15.30 for <qemu-devel@nongnu.org>
+	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+	Wed, 20 Dec 2017 09:15:30 -0800 (PST)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Wed, 20 Dec 2017 18:14:27 +0100
-Message-Id: <1513790098-9815-16-git-send-email-pbonzini@redhat.com>
-In-Reply-To: <1513790098-9815-1-git-send-email-pbonzini@redhat.com>
-References: <1513790098-9815-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 15/46] baum: Truncate braille device size to 84x1
+Date: Wed, 20 Dec 2017 18:14:12 +0100
+Message-Id: <1513790098-9815-1-git-send-email-pbonzini@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PULL 00/46] First batch of misc patches for QEMU 2.12
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,46 +34,171 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Samuel Thibault <samuel.thibault@ens-lyon.org>
 
-From: Samuel Thibault <samuel.thibault@ens-lyon.org>
+The following changes since commit 200780a3a3ed067dfb2e0d2210b0ed09e748ba26:
 
-Baum device bigger than 84 do not actually exist, but the user's own
-Braille device might be wider than 84 columns.  Some guest drivers
-would be upset by such sizes, so clamp the device size.
+  Merge remote-tracking branch 'remotes/armbru/tags/pull-cmdline-2017-12-18-v2' into staging (2017-12-20 13:20:48 +0000)
 
-Signed-off-by: Samuel Thibault <samuel.thibault@ens-lyon.org>
-Message-Id: <20171211001950.27843-1-samuel.thibault@ens-lyon.org>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- chardev/baum.c | 8 +++++++-
- 1 file changed, 7 insertions(+), 1 deletion(-)
+are available in the git repository at:
 
-diff --git a/chardev/baum.c b/chardev/baum.c
-index 67fd783..78b0c87 100644
---- a/chardev/baum.c
-+++ b/chardev/baum.c
-@@ -1,7 +1,7 @@
- /*
-  * QEMU Baum Braille Device
-  *
-- * Copyright (c) 2008, 2010-2011, 2016 Samuel Thibault
-+ * Copyright (c) 2008, 2010-2011, 2016-2017 Samuel Thibault
-  *
-  * Permission is hereby granted, free of charge, to any person obtaining a copy
-  * of this software and associated documentation files (the "Software"), to deal
-@@ -239,6 +239,12 @@ static int baum_deferred_init(BaumChardev *baum)
-         brlapi_perror("baum: brlapi__getDisplaySize");
-         return 0;
-     }
-+    if (baum->y > 1) {
-+        baum->y = 1;
-+    }
-+    if (baum->x > 84) {
-+        baum->x = 84;
-+    }
- 
-     con = qemu_console_lookup_by_index(0);
-     if (con && qemu_console_is_graphic(con)) {
+
+  git://github.com/bonzini/qemu.git tags/for-upstream
+
+for you to fetch changes up to d01ce16cd827831145cf6a5b4a81ce3a47b537cd:
+
+  chardev: convert the socket server to QIONetListener (2017-12-20 17:18:19 +0100)
+
+----------------------------------------------------------------
+* NBD and chardev conversion to QIONetListener (Daniel)
+* MTTCG fixes (David)
+* Hyper-V fixes (Roman, Evgeny)
+* share-rw option (Fam)
+* Mux chardev event bugfix (Marc-André)
+* Add systemd unit files in contrib/ (me)
+* SCSI and block/iscsi.c bugfixes (me, Peter L.)
+* unassigned_mem_ops fixes (Peter M.)
+* VEX decoding fix (Peter M.)
+* "info pic" and "info irq" improvements (Peter Xu)
+* vmport trace events (Philippe)
+* Braille chardev bugfix (Samuel)
+* Compiler warnings fix (Stefan)
+* boot-serial-test aka TCG smoke test (Thomas)
+* New CPU features (Yang)
+* Reduce startup memory usage (Yang)
+* QemuThread race fix (linhecheng)
+
+----------------------------------------------------------------
+Daniel P. Berrange (4):
+      sockets: remove obsolete code that updated listen address
+      blockdev: convert internal NBD server to QIONetListener
+      blockdev: convert qemu-nbd server to QIONetListener
+      chardev: convert the socket server to QIONetListener
+
+David Hildenbrand (2):
+      cpus: make pause_all_cpus() play with SMP on single threaded TCG
+      cpu-exec: fix missed CPU kick during interrupt injection
+
+Evgeny Yakovlev (1):
+      hyperv: set partition-wide MSRs only on first vcpu
+
+Fam Zheng (3):
+      Revert "docker: Enable features explicitly in test-full"
+      scsi-block: Add share-rw option
+      MAITAINERS: List Fam Zheng as reviewer for SCSI patches
+
+Marc-André Lureau (3):
+      checkpatch: volatile with a comment or sig_atomic_t is okay
+      chardev: fix backend events regression with mux chardev
+      test: add some chardev mux event tests
+
+Paolo Bonzini (5):
+      memfd: fix configure test
+      qemu-pr-helper: miscellaneous fixes
+      contrib: add systemd unit files
+      scsi: provide general-purpose functions to manage sense data
+      scsi: replace hex constants with #defines
+
+Peter Lieven (2):
+      block/iscsi: dont leave allocmap in an invalid state on UNMAP failure
+      block/iscsi: only report an iSCSI Failure if we don't handle it gracefully
+
+Peter Maydell (3):
+      target/i386: Fix handling of VEX prefixes
+      exec: Don't reuse unassigned_mem_ops for io_mem_rom
+      hw/mips/boston: Remove workaround for writes to ROM aborting
+
+Peter Xu (7):
+      cpu: refactor cpu_address_space_init()
+      cpu: suffix cpu address spaces with cpu index
+      i8259: convert DPRINTFs into trace
+      i8259: use DEBUG_IRQ_COUNT always
+      i8259: generalize statistics into common code
+      kvm-i8259: support "info pic" and "info irq"
+      i8259: move TYPE_INTERRUPT_STATS_PROVIDER upper
+
+Philippe Mathieu-Daudé (1):
+      hw/i386/vmport: replace fprintf() by trace events or LOG_UNIMP
+
+Roman Kagan (2):
+      hyperv: ensure SINTx msrs are reset properly
+      hyperv: make SynIC version msr constant
+
+Samuel Thibault (1):
+      baum: Truncate braille device size to 84x1
+
+Stefan Weil (1):
+      target/i386: Fix compiler warnings
+
+Thomas Huth (8):
+      tests/boot-serial-test: Make sure that we check the timeout regularly
+      tests/boot-serial-test: Add code to allow to specify our own kernel or bios
+      tests/boot-serial-test: Add support for the mcf5208evb board
+      tests/boot-serial-test: Add tests for microblaze boards
+      hw/moxie/moxiesim: Add support for loading a BIOS on moxiesim
+      tests/boot-serial-test: Add a test for the moxiesim machine
+      tests/boot-serial-test: Add support for the raspi2 machine
+      Remove legacy -no-kvm-pit option
+
+Yang Zhong (2):
+      x86/cpu: Enable new SSE/AVX/AVX512 cpu features
+      rcu: reduce more than 7MB heap memory by malloc_trim()
+
+linzhecheng (1):
+      qemu-thread: fix races on threads that exit very quickly
+
+ MAINTAINERS                              |   2 +
+ accel/tcg/cpu-exec.c                     |  12 +--
+ block/iscsi.c                            |  51 +++++++---
+ blockdev-nbd.c                           |  50 +++-------
+ chardev/baum.c                           |   8 +-
+ chardev/char-mux.c                       |   8 ++
+ chardev/char-socket.c                    |  72 ++++++--------
+ chardev/char.c                           |  18 ++--
+ configure                                |  37 ++++++-
+ contrib/systemd/qemu-guest-agent.service |  11 +++
+ contrib/systemd/qemu-pr-helper.service   |  15 +++
+ contrib/systemd/qemu-pr-helper.socket    |   9 ++
+ cpus.c                                   |  37 +++----
+ exec.c                                   |  44 ++++++++-
+ hw/i386/kvm/i8259.c                      |   1 +
+ hw/i386/trace-events                     |   4 +
+ hw/i386/vmport.c                         |  14 +--
+ hw/intc/i8259.c                          |  86 +++-------------
+ hw/intc/i8259_common.c                   |  49 ++++++++++
+ hw/intc/trace-events                     |   7 ++
+ hw/mips/boston.c                         |  14 +--
+ hw/moxie/moxiesim.c                      |  12 ++-
+ hw/scsi/scsi-bus.c                       |  16 +--
+ hw/scsi/scsi-disk.c                      |   1 +
+ include/chardev/char.h                   |   1 +
+ include/exec/exec-all.h                  |   6 +-
+ include/hw/isa/i8259_internal.h          |   7 +-
+ include/qemu/sockets.h                   |   2 +-
+ include/scsi/utils.h                     |   9 +-
+ qemu-doc.texi                            |   5 -
+ qemu-nbd.c                               |  61 +++++-------
+ qemu-options.hx                          |   3 -
+ qga/channel-posix.c                      |   2 +-
+ scripts/checkpatch.pl                    |   7 +-
+ scsi/qemu-pr-helper.c                    |  30 +++++-
+ scsi/utils.c                             | 163 ++++++++++++++++---------------
+ target/arm/cpu.c                         |  13 +--
+ target/i386/cpu.c                        |  16 +--
+ target/i386/cpu.h                        |  12 ++-
+ target/i386/kvm.c                        |  44 +++++----
+ target/i386/translate.c                  |   9 +-
+ tests/Makefile.include                   |   7 ++
+ tests/boot-serial-test.c                 | 106 +++++++++++++++++---
+ tests/docker/test-full                   |  79 +--------------
+ tests/test-char.c                        |  17 ++++
+ util/memfd.c                             |   4 +-
+ util/qemu-sockets.c                      |  31 +-----
+ util/qemu-thread-posix.c                 |  59 +++++++----
+ util/rcu.c                               |   6 ++
+ vl.c                                     |   4 -
+ 50 files changed, 719 insertions(+), 562 deletions(-)
+ create mode 100644 contrib/systemd/qemu-guest-agent.service
+ create mode 100644 contrib/systemd/qemu-pr-helper.service
+ create mode 100644 contrib/systemd/qemu-pr-helper.socket
 -- 
 1.8.3.1
