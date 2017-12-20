@@ -1,29 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56841)
+Received: from eggs.gnu.org ([208.118.235.92]:35032)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eRgRU-0000jN-1J
-	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 10:39:27 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1eRgd5-0003ue-Or
+	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 10:50:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eRgQT-0004Kb-Nc
-	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 10:37:59 -0500
-Received: from mail-ot0-x241.google.com ([2607:f8b0:4003:c0f::241]:36389)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1eRgQT-0004Jk-8x
-	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 10:36:57 -0500
-Received: by mail-ot0-x241.google.com with SMTP id d5so19955761oti.3
-	for <qemu-devel@nongnu.org>; Wed, 20 Dec 2017 07:36:57 -0800 (PST)
-MIME-Version: 1.0
-In-Reply-To: <bd78a6f5-f023-af5a-0d35-f3b29ae4e7a6@vivier.eu>
-References: <20171219201613.7399-1-michael.weiser@gmx.de>
-	<20171219201613.7399-3-michael.weiser@gmx.de>
-	<bd78a6f5-f023-af5a-0d35-f3b29ae4e7a6@vivier.eu>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Wed, 20 Dec 2017 15:36:29 +0000
-Message-ID: <CAFEAcA8D0n_PNJ-fqMq8KtZSBRdf2i=3cxcbwT1HSnFi9_MhpA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 2/5] linux-user: Add separate aarch64_be
- uname
+	(envelope-from <vsementsov@virtuozzo.com>) id 1eRgd1-0005d6-7b
+	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 10:49:58 -0500
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Wed, 20 Dec 2017 18:49:38 +0300
+Message-Id: <20171220154945.88410-7-vsementsov@virtuozzo.com>
+In-Reply-To: <20171220154945.88410-1-vsementsov@virtuozzo.com>
+References: <20171220154945.88410-1-vsementsov@virtuozzo.com>
+Subject: [Qemu-devel] [PATCH v9 06/13] qapi: add dirty-bitmaps migration
+ capability
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,44 +20,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Vivier <laurent@vivier.eu>
-Cc: Michael Weiser <michael.weiser@gmx.de>, QEMU Developers <qemu-devel@nongnu.org>, Riku Voipio <riku.voipio@iki.fi>
+To: qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: pbonzini@redhat.com, armbru@redhat.com, eblake@redhat.com, famz@redhat.com, stefanha@redhat.com, amit.shah@redhat.com, quintela@redhat.com, mreitz@redhat.com, kwolf@redhat.com, peter.maydell@linaro.org, dgilbert@redhat.com, den@openvz.org, jsnow@redhat.com, vsementsov@virtuozzo.com, lirans@il.ibm.com
 
-On 20 December 2017 at 15:20, Laurent Vivier <laurent@vivier.eu> wrote:
-> Le 19/12/2017 =C3=A0 21:16, Michael Weiser a =C3=A9crit :
->> Make big-endian aarch64 systems identify as aarch64_be as expected by
->> big-endian userland and toolchains.
->>
->> Signed-off-by: Michael Weiser <michael.weiser@gmx.de>
->> ---
->>  linux-user/aarch64/target_syscall.h | 4 ++++
->>  1 file changed, 4 insertions(+)
->>
->> diff --git a/linux-user/aarch64/target_syscall.h b/linux-user/aarch64/ta=
-rget_syscall.h
->> index 1b62953eeb..604ab99b14 100644
->> --- a/linux-user/aarch64/target_syscall.h
->> +++ b/linux-user/aarch64/target_syscall.h
->> @@ -8,7 +8,11 @@ struct target_pt_regs {
->>      uint64_t        pstate;
->>  };
->>
->> +#if defined(TARGET_WORDS_BIGENDIAN)
->> +#define UNAME_MACHINE "aarch64_be"
->> +#else
->>  #define UNAME_MACHINE "aarch64"
->> +#endif
->>  #define UNAME_MINIMUM_RELEASE "3.8.0"
->
-> For aarch64_be, I think the minimum release should be 4.9.0
-> (see kernel commit cfa88c79462d "arm64: Set UTS_MACHINE in the Makefile")
+Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Reviewed-by: John Snow <jsnow@redhat.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: Juan Quintela <quintela@redhat.com>
+---
+ qapi/migration.json   | 6 +++++-
+ migration/migration.h | 1 +
+ migration/migration.c | 9 +++++++++
+ 3 files changed, 15 insertions(+), 1 deletion(-)
 
-Isn't the thing that defines what we set the minimum-release
-to glibc, not the kernel? That is, the reason we lie to the
-guest about the kernel version for some architectures is because
-the glibc for those archs insists on a minimum kernel version
-which the host may not have. Unless aarch64_be glibc insists
-on kernel 4.9.0 there's no need to tell the guest that.
-
-thanks
--- PMM
+diff --git a/qapi/migration.json b/qapi/migration.json
+index 03f57c9616..9f20b645a7 100644
+--- a/qapi/migration.json
++++ b/qapi/migration.json
+@@ -352,12 +352,16 @@
+ #
+ # @x-multifd: Use more than one fd for migration (since 2.11)
+ #
++# @dirty-bitmaps: If enabled, QEMU will migrate named dirty bitmaps.
++#                 (since 2.11)
++#
+ # Since: 1.2
+ ##
+ { 'enum': 'MigrationCapability',
+   'data': ['xbzrle', 'rdma-pin-all', 'auto-converge', 'zero-blocks',
+            'compress', 'events', 'postcopy-ram', 'x-colo', 'release-ram',
+-           'block', 'return-path', 'pause-before-switchover', 'x-multifd' ] }
++           'block', 'return-path', 'pause-before-switchover', 'x-multifd',
++           'dirty-bitmaps' ] }
+ 
+ ##
+ # @MigrationCapabilityStatus:
+diff --git a/migration/migration.h b/migration/migration.h
+index 663415fe48..50d1f01346 100644
+--- a/migration/migration.h
++++ b/migration/migration.h
+@@ -181,6 +181,7 @@ bool migrate_postcopy(void);
+ bool migrate_release_ram(void);
+ bool migrate_postcopy_ram(void);
+ bool migrate_zero_blocks(void);
++bool migrate_dirty_bitmaps(void);
+ 
+ bool migrate_auto_converge(void);
+ bool migrate_use_multifd(void);
+diff --git a/migration/migration.c b/migration/migration.c
+index e6c9be3cca..1526cd4bff 100644
+--- a/migration/migration.c
++++ b/migration/migration.c
+@@ -1544,6 +1544,15 @@ int migrate_decompress_threads(void)
+     return s->parameters.decompress_threads;
+ }
+ 
++bool migrate_dirty_bitmaps(void)
++{
++    MigrationState *s;
++
++    s = migrate_get_current();
++
++    return s->enabled_capabilities[MIGRATION_CAPABILITY_DIRTY_BITMAPS];
++}
++
+ bool migrate_use_events(void)
+ {
+     MigrationState *s;
+-- 
+2.11.1
