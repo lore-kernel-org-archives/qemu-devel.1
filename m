@@ -1,25 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56031)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56047)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1eRhxx-0004Eq-Sh
+	(envelope-from <paolo.bonzini@gmail.com>) id 1eRhxy-0004FU-P8
 	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 12:15:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1eRhxw-0006xR-Bz
-	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 12:15:37 -0500
-Received: from mail-wr0-x241.google.com ([2a00:1450:400c:c0c::241]:34984)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1eRhxw-0006wd-1W
-	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 12:15:36 -0500
-Received: by mail-wr0-x241.google.com with SMTP id l19so10549020wrc.2
-	for <qemu-devel@nongnu.org>; Wed, 20 Dec 2017 09:15:35 -0800 (PST)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1eRhxx-0006yQ-OF
+	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 12:15:38 -0500
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Wed, 20 Dec 2017 18:14:14 +0100
-Message-Id: <1513790098-9815-3-git-send-email-pbonzini@redhat.com>
+Date: Wed, 20 Dec 2017 18:14:15 +0100
+Message-Id: <1513790098-9815-4-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1513790098-9815-1-git-send-email-pbonzini@redhat.com>
 References: <1513790098-9815-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 02/46] qemu-thread: fix races on threads that
- exit very quickly
+Subject: [Qemu-devel] [PULL 03/46] qemu-pr-helper: miscellaneous fixes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,142 +21,120 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: linzhecheng <linzhecheng@huawei.com>
+Cc: qemu-stable@nongnu.org
 
-From: linzhecheng <linzhecheng@huawei.com>
+1) Return a generic sense if TEST UNIT READY does not provide one;
 
-If we create a thread with QEMU_THREAD_DETACHED mode, QEMU may get a segfault with low probability.
+2) Fix two mistakes in copying from the spec.
 
-The backtrace is:
-   #0  0x00007f46c60291d7 in __GI_raise (sig=sig@entry=6) at ../nptl/sysdeps/unix/sysv/linux/raise.c:56
-   #1  0x00007f46c602a8c8 in __GI_abort () at abort.c:90
-   #2  0x00000000008543c9 in PAT_abort ()
-   #3  0x000000000085140d in patchIllInsHandler ()
-   #4  <signal handler called>
-   #5  pthread_detach (th=139933037614848) at pthread_detach.c:50
-   #6  0x0000000000829759 in qemu_thread_create (thread=thread@entry=0x7ffdaa8205e0, name=name@entry=0x94d94a "io-task-worker", start_routine=start_routine@entry=0x7eb9a0 <qio_task_thread_worker>,
-       arg=arg@entry=0x3f5cf70, mode=mode@entry=1) at util/qemu_thread_posix.c:512
-   #7  0x00000000007ebc96 in qio_task_run_in_thread (task=0x31db2c0, worker=worker@entry=0x7e7e40 <qio_channel_socket_connect_worker>, opaque=0xcd23380, destroy=0x7f1180 <qapi_free_SocketAddress>)
-       at io/task.c:141
-   #8  0x00000000007e7f33 in qio_channel_socket_connect_async (ioc=ioc@entry=0x626c0b0, addr=<optimized out>, callback=callback@entry=0x55e080 <qemu_chr_socket_connected>, opaque=opaque@entry=0x42862c0,
-       destroy=destroy@entry=0x0) at io/channel_socket.c:194
-   #9  0x000000000055bdd1 in socket_reconnect_timeout (opaque=0x42862c0) at qemu_char.c:4744
-   #10 0x00007f46c72483b3 in g_timeout_dispatch () from /usr/lib64/libglib-2.0.so.0
-   #11 0x00007f46c724799a in g_main_context_dispatch () from /usr/lib64/libglib-2.0.so.0
-   #12 0x000000000076c646 in glib_pollfds_poll () at main_loop.c:228
-   #13 0x000000000076c6eb in os_host_main_loop_wait (timeout=348000000) at main_loop.c:273
-   #14 0x000000000076c815 in main_loop_wait (nonblocking=nonblocking@entry=0) at main_loop.c:521
-   #15 0x000000000056a511 in main_loop () at vl.c:2076
-   #16 0x0000000000420705 in main (argc=<optimized out>, argv=<optimized out>, envp=<optimized out>) at vl.c:4940
-
-The cause of this problem is a glibc bug; for more information, see
-https://sourceware.org/bugzilla/show_bug.cgi?id=19951.
-The solution for this bug is to use pthread_attr_setdetachstate.
-
-There is a similar issue with pthread_setname_np, which is moved
-from creating thread to created thread.
-
-Signed-off-by: linzhecheng <linzhecheng@huawei.com>
-Message-Id: <20171128044656.10592-1-linzhecheng@huawei.com>
-Reviewed-by: Fam Zheng <famz@redhat.com>
-[Simplify the code by removing qemu_thread_set_name, and free the arguments
- before invoking the start routine. - Paolo]
+Cc: qemu-stable@nongnu.org
+Reported-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- util/qemu-thread-posix.c | 59 ++++++++++++++++++++++++++++++++++--------------
- 1 file changed, 42 insertions(+), 17 deletions(-)
+ include/scsi/utils.h  |  6 +++++-
+ scsi/qemu-pr-helper.c | 30 ++++++++++++++++++++++++++----
+ scsi/utils.c          | 10 ++++++++++
+ 3 files changed, 41 insertions(+), 5 deletions(-)
 
-diff --git a/util/qemu-thread-posix.c b/util/qemu-thread-posix.c
-index 7306475..fcd369b 100644
---- a/util/qemu-thread-posix.c
-+++ b/util/qemu-thread-posix.c
-@@ -479,15 +479,29 @@ static void __attribute__((constructor)) qemu_thread_atexit_init(void)
+diff --git a/include/scsi/utils.h b/include/scsi/utils.h
+index 00a4bdb..eb07e47 100644
+--- a/include/scsi/utils.h
++++ b/include/scsi/utils.h
+@@ -76,7 +76,11 @@ extern const struct SCSISense sense_code_LUN_FAILURE;
+ extern const struct SCSISense sense_code_LUN_COMM_FAILURE;
+ /* Command aborted, Overlapped Commands Attempted */
+ extern const struct SCSISense sense_code_OVERLAPPED_COMMANDS;
+-/* LUN not ready, Capacity data has changed */
++/* Medium error, Unrecovered read error */
++extern const struct SCSISense sense_code_READ_ERROR;
++/* LUN not ready, Cause not reportable */
++extern const struct SCSISense sense_code_NOT_READY;
++/* Unit attention, Capacity data has changed */
+ extern const struct SCSISense sense_code_CAPACITY_CHANGED;
+ /* Unit attention, SCSI bus reset */
+ extern const struct SCSISense sense_code_SCSI_BUS_RESET;
+diff --git a/scsi/qemu-pr-helper.c b/scsi/qemu-pr-helper.c
+index dd97851..9fe615c 100644
+--- a/scsi/qemu-pr-helper.c
++++ b/scsi/qemu-pr-helper.c
+@@ -314,6 +314,22 @@ static int is_mpath(int fd)
+     return !strncmp(tgt->target_type, "multipath", DM_MAX_TYPE_NAME);
  }
  
- 
--/* Attempt to set the threads name; note that this is for debug, so
-- * we're not going to fail if we can't set it.
-- */
--static void qemu_thread_set_name(QemuThread *thread, const char *name)
--{
- #ifdef CONFIG_PTHREAD_SETNAME_NP
--    pthread_setname_np(thread->thread, name);
--#endif
-+typedef struct {
-+    void *(*start_routine)(void *);
-+    void *arg;
-+    char *name;
-+} QemuThreadArgs;
-+
-+static void *qemu_thread_start(void *args)
++static SCSISense mpath_generic_sense(int r)
 +{
-+    QemuThreadArgs *qemu_thread_args = args;
-+    void *(*start_routine)(void *) = qemu_thread_args->start_routine;
-+    void *arg = qemu_thread_args->arg;
-+
-+    /* Attempt to set the threads name; note that this is for debug, so
-+     * we're not going to fail if we can't set it.
-+     */
-+    pthread_setname_np(pthread_self(), qemu_thread_args->name);
-+    g_free(qemu_thread_args->name);
-+    g_free(qemu_thread_args);
-+    return start_routine(arg);
- }
-+#endif
-+
- 
- void qemu_thread_create(QemuThread *thread, const char *name,
-                        void *(*start_routine)(void*),
-@@ -496,29 +510,40 @@ void qemu_thread_create(QemuThread *thread, const char *name,
-     sigset_t set, oldset;
-     int err;
-     pthread_attr_t attr;
-+    QemuThreadArgs *qemu_thread_args;
- 
-     err = pthread_attr_init(&attr);
-     if (err) {
-         error_exit(err, __func__);
-     }
- 
-+    if (mode == QEMU_THREAD_DETACHED) {
-+        pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
++    switch (r) {
++    case MPATH_PR_SENSE_NOT_READY:
++         return SENSE_CODE(NOT_READY);
++    case MPATH_PR_SENSE_MEDIUM_ERROR:
++         return SENSE_CODE(READ_ERROR);
++    case MPATH_PR_SENSE_HARDWARE_ERROR:
++         return SENSE_CODE(TARGET_FAILURE);
++    case MPATH_PR_SENSE_ABORTED_COMMAND:
++         return SENSE_CODE(IO_ERROR);
++    default:
++         abort();
 +    }
++}
 +
-     /* Leave signal handling to the iothread.  */
-     sigfillset(&set);
-     pthread_sigmask(SIG_SETMASK, &set, &oldset);
--    err = pthread_create(&thread->thread, &attr, start_routine, arg);
--    if (err)
--        error_exit(err, __func__);
- 
-+#ifdef CONFIG_PTHREAD_SETNAME_NP
-     if (name_threads) {
--        qemu_thread_set_name(thread, name);
-+        qemu_thread_args = g_new0(QemuThreadArgs, 1);
-+        qemu_thread_args->name = g_strdup(name);
-+        qemu_thread_args->start_routine = start_routine;
-+        qemu_thread_args->arg = arg;
+ static int mpath_reconstruct_sense(int fd, int r, uint8_t *sense)
+ {
+     switch (r) {
+@@ -329,7 +345,13 @@ static int mpath_reconstruct_sense(int fd, int r, uint8_t *sense)
+              */
+             uint8_t cdb[6] = { TEST_UNIT_READY };
+             int sz = 0;
+-            return do_sgio(fd, cdb, sense, NULL, &sz, SG_DXFER_NONE);
++            int r = do_sgio(fd, cdb, sense, NULL, &sz, SG_DXFER_NONE);
 +
-+        err = pthread_create(&thread->thread, &attr,
-+                             qemu_thread_start, qemu_thread_args);
-+    } else
-+#endif
-+    {
-+        err = pthread_create(&thread->thread, &attr,
-+                             start_routine, arg);
-     }
++            if (r != GOOD) {
++                return r;
++            }
++            scsi_build_sense(sense, mpath_generic_sense(r));
++            return CHECK_CONDITION;
+         }
  
--    if (mode == QEMU_THREAD_DETACHED) {
--        err = pthread_detach(thread->thread);
--        if (err) {
--            error_exit(err, __func__);
--        }
--    }
-+    if (err)
-+        error_exit(err, __func__);
+     case MPATH_PR_SENSE_UNIT_ATTENTION:
+@@ -449,7 +471,7 @@ static int multipath_pr_out(int fd, const uint8_t *cdb, uint8_t *sense,
+     memset(&paramp, 0, sizeof(paramp));
+     memcpy(&paramp.key, &param[0], 8);
+     memcpy(&paramp.sa_key, &param[8], 8);
+-    paramp.sa_flags = param[10];
++    paramp.sa_flags = param[20];
+     if (sz > PR_OUT_FIXED_PARAM_SIZE) {
+         size_t transportid_len;
+         int i, j;
+@@ -478,8 +500,8 @@ static int multipath_pr_out(int fd, const uint8_t *cdb, uint8_t *sense,
+                 j += offsetof(struct transportid, n_port_name[8]);
+                 i += 24;
+                 break;
+-            case 3:
+-            case 0x43:
++            case 5:
++            case 0x45:
+                 /* iSCSI transport.  */
+                 len = lduw_be_p(&param[i + 2]);
+                 if (len > 252 || (len & 3) || i + len + 4 > transportid_len) {
+diff --git a/scsi/utils.c b/scsi/utils.c
+index 5684951..e4182a9 100644
+--- a/scsi/utils.c
++++ b/scsi/utils.c
+@@ -211,6 +211,16 @@ const struct SCSISense sense_code_LUN_COMM_FAILURE = {
+     .key = ABORTED_COMMAND, .asc = 0x08, .ascq = 0x00
+ };
+ 
++/* Medium Error, Unrecovered read error */
++const struct SCSISense sense_code_READ_ERROR = {
++    .key = MEDIUM_ERROR, .asc = 0x11, .ascq = 0x00
++};
 +
-     pthread_sigmask(SIG_SETMASK, &oldset, NULL);
- 
-     pthread_attr_destroy(&attr);
++/* Not ready, Cause not reportable */
++const struct SCSISense sense_code_NOT_READY = {
++    .key = NOT_READY, .asc = 0x04, .ascq = 0x00
++};
++
+ /* Unit attention, Capacity data has changed */
+ const struct SCSISense sense_code_CAPACITY_CHANGED = {
+     .key = UNIT_ATTENTION, .asc = 0x2a, .ascq = 0x09
 -- 
 1.8.3.1
