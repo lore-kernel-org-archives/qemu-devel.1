@@ -1,25 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48253)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60029)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <willy@infradead.org>) id 1eRdRj-0001oM-Ug
-	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 07:26:07 -0500
+	(envelope-from <bounces@canonical.com>) id 1eRdb1-0004Ko-0t
+	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 07:35:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <willy@infradead.org>) id 1eRdRe-0000nt-R9
-	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 07:26:02 -0500
-Received: from bombadil.infradead.org ([65.50.211.133]:51415)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <willy@infradead.org>) id 1eRdRe-0000iM-Hz
-	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 07:25:58 -0500
-Date: Wed, 20 Dec 2017 04:25:47 -0800
-From: Matthew Wilcox <willy@infradead.org>
-Message-ID: <20171220122547.GA1654@bombadil.infradead.org>
-References: <1513685879-21823-1-git-send-email-wei.w.wang@intel.com>
-	<201712192305.AAE21882.MtQHJOFFSFVOLO@I-love.SAKURA.ne.jp>
-	<5A3A3CBC.4030202@intel.com>
+	(envelope-from <bounces@canonical.com>) id 1eRdaw-0002B3-Uu
+	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 07:35:39 -0500
+Received: from indium.canonical.com ([91.189.90.7]:43298)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1eRdaw-00029J-PN
+	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 07:35:34 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1eRdau-0003Go-LQ
+	for <qemu-devel@nongnu.org>; Wed, 20 Dec 2017 12:35:32 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 04D5D2E8007
+	for <qemu-devel@nongnu.org>; Wed, 20 Dec 2017 12:35:32 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <5A3A3CBC.4030202@intel.com>
-Subject: Re: [Qemu-devel] [PATCH v20 0/7] Virtio-balloon Enhancement
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 20 Dec 2017 12:24:50 -0000
+From: Satheesh Rajendran <sathnaga@linux.vnet.ibm.com>
+Reply-To: Bug 1739413 <1739413@bugs.launchpad.net>
+Sender: bounces@canonical.com
+Message-Id: <151377269069.19770.3703612061677458311.malonedeb@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1739413] [NEW] Hotplugged vcpu does not guarantee
+ cpu compat mode(power8) on power9 host
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,23 +36,160 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Wei Wang <wei.w.wang@intel.com>
-Cc: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>, virtio-dev@lists.oasis-open.org, linux-kernel@vger.kernel.org, qemu-devel@nongnu.org, virtualization@lists.linux-foundation.org, kvm@vger.kernel.org, linux-mm@kvack.org, mst@redhat.com, mhocko@kernel.org, akpm@linux-foundation.org, mawilcox@microsoft.com, david@redhat.com, cornelia.huck@de.ibm.com, mgorman@techsingularity.net, aarcange@redhat.com, amit.shah@redhat.com, pbonzini@redhat.com, liliang.opensource@gmail.com, yang.zhang.wz@gmail.com, quan.xu0@gmail.com, nilal@redhat.com, riel@redhat.com
+To: qemu-devel@nongnu.org
 
-On Wed, Dec 20, 2017 at 06:34:36PM +0800, Wei Wang wrote:
-> On 12/19/2017 10:05 PM, Tetsuo Handa wrote:
-> > I think xb_find_set() has a bug in !node path.
-> 
-> I think we can probably remove the "!node" path for now. It would be good to
-> get the fundamental part in first, and leave optimization to come as
-> separate patches with corresponding test cases in the future.
+Public bug reported:
 
-You can't remove the !node path.  You'll see !node when the highest set
-bit is less than 1024.  So do something like this:
+./ppc64-softmmu/qemu-system-ppc64 -version
+QEMU emulator version 2.11.50 (v2.11.0-254-gaf35267)
 
-	unsigned long bit;
-	xb_preload(GFP_KERNEL);
-	xb_set_bit(xb, 700);
-	xb_preload_end();
-	bit = xb_find_set(xb, ULONG_MAX, 0);
-	assert(bit == 700);
+1. Boot a power8 compat mode guest power9 HW.
+./ppc64-softmmu/qemu-system-ppc64 -machine pseries,accel=3Dkvm,max-cpu-comp=
+at=3Dpower8 -m 4096 /home/sath/images/guest.qcow2 -smp 1,maxcpus=3D2 -seria=
+l /dev/pts/8  -monitor stdio -vga none -nographic
+QEMU 2.11.50 monitor - type 'help' for more information
+(qemu) =
+
+
+2. Check for cpuinfo
+
+# cat /proc/cpuinfo =
+
+processor	: 0
+cpu		: POWER8 (architected), altivec supported
+clock		: 2200.000000MHz
+revision	: 2.1 (pvr 004e 1201)
+
+timebase	: 512000000
+platform	: pSeries
+model		: IBM pSeries (emulated by qemu)
+machine		: CHRP IBM pSeries (emulated by qemu)
+MMU		: Hash
+
+
+3. Run a small program invoking isa v3.0 instruction, it should complain 'I=
+llegal instruction' as it is a power8 compat guest
+# cat 1.c =
+
+#include <stdio.h>
+void main()
+    {
+    asm volatile (".long 0x7c0005e6");
+    }
+# ./a.out =
+
+[   59.352795] a.out[1741]: unhandled signal 4 at 0000000010000600 nip 0000=
+000010000600 lr 00007fffb4da5080 code 1
+Illegal instruction =
+
+
+4. Hotplug a vcpu
+(qemu) device_add host-spapr-cpu-core,id=3Dcore1,core-id=3D1
+(qemu) info cpus
+* CPU #0: nip=3D0xc0000000000de42c thread_id=3D113110
+  CPU #1: nip=3D0xc0000000000de42c thread_id=3D113348
+
+5. Try running the same program in the hotplugged vcpu and it does not
+complain as 'Illegal instruction'
+
+#taskset -c 1 ./a.out ----------------------NOK
+#  =
+
+
+# taskset -c 0 ./a.out =
+
+[  356.618031] a.out[1755]: unhandled signal 4 at 0000000010000600 nip 0000=
+000010000600 lr 00007fffae7f5080 code 1
+Illegal instruction
+
+** Affects: qemu
+     Importance: Undecided
+         Status: New
+
+
+** Tags: ppc64le
+
+** Summary changed:
+
+- Hotplugged vcpu does not guarantee cpu compat mode
++ Hotplugged vcpu does not guarantee cpu compat mode(power8) on power9 host
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1739413
+
+Title:
+  Hotplugged vcpu does not guarantee cpu compat mode(power8) on power9
+  host
+
+Status in QEMU:
+  New
+
+Bug description:
+  ./ppc64-softmmu/qemu-system-ppc64 -version
+  QEMU emulator version 2.11.50 (v2.11.0-254-gaf35267)
+
+  1. Boot a power8 compat mode guest power9 HW.
+  ./ppc64-softmmu/qemu-system-ppc64 -machine pseries,accel=3Dkvm,max-cpu-co=
+mpat=3Dpower8 -m 4096 /home/sath/images/guest.qcow2 -smp 1,maxcpus=3D2 -ser=
+ial /dev/pts/8  -monitor stdio -vga none -nographic
+  QEMU 2.11.50 monitor - type 'help' for more information
+  (qemu) =
+
+
+  2. Check for cpuinfo
+
+  # cat /proc/cpuinfo =
+
+  processor	: 0
+  cpu		: POWER8 (architected), altivec supported
+  clock		: 2200.000000MHz
+  revision	: 2.1 (pvr 004e 1201)
+
+  timebase	: 512000000
+  platform	: pSeries
+  model		: IBM pSeries (emulated by qemu)
+  machine		: CHRP IBM pSeries (emulated by qemu)
+  MMU		: Hash
+
+  =
+
+  3. Run a small program invoking isa v3.0 instruction, it should complain =
+'Illegal instruction' as it is a power8 compat guest
+  # cat 1.c =
+
+  #include <stdio.h>
+  void main()
+      {
+      asm volatile (".long 0x7c0005e6");
+      }
+  # ./a.out =
+
+  [   59.352795] a.out[1741]: unhandled signal 4 at 0000000010000600 nip 00=
+00000010000600 lr 00007fffb4da5080 code 1
+  Illegal instruction =
+
+
+  4. Hotplug a vcpu
+  (qemu) device_add host-spapr-cpu-core,id=3Dcore1,core-id=3D1
+  (qemu) info cpus
+  * CPU #0: nip=3D0xc0000000000de42c thread_id=3D113110
+    CPU #1: nip=3D0xc0000000000de42c thread_id=3D113348
+
+  5. Try running the same program in the hotplugged vcpu and it does not
+  complain as 'Illegal instruction'
+
+  #taskset -c 1 ./a.out ----------------------NOK
+  #  =
+
+
+  # taskset -c 0 ./a.out =
+
+  [  356.618031] a.out[1755]: unhandled signal 4 at 0000000010000600 nip 00=
+00000010000600 lr 00007fffae7f5080 code 1
+  Illegal instruction
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1739413/+subscriptions
