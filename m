@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54370)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54407)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistai@xilinx.com>) id 1eRSJ7-0001vA-4q
-	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 19:32:26 -0500
+	(envelope-from <alistai@xilinx.com>) id 1eRSJD-000204-03
+	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 19:32:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistai@xilinx.com>) id 1eRSJ3-00072e-7g
-	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 19:32:25 -0500
-Received: from mail-co1nam03on0077.outbound.protection.outlook.com
-	([104.47.40.77]:14131
-	helo=NAM03-CO1-obe.outbound.protection.outlook.com)
+	(envelope-from <alistai@xilinx.com>) id 1eRSJ8-00075H-7h
+	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 19:32:31 -0500
+Received: from mail-sn1nam02on0082.outbound.protection.outlook.com
+	([104.47.36.82]:48984
+	helo=NAM02-SN1-obe.outbound.protection.outlook.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <alistai@xilinx.com>) id 1eRSJ2-000724-VI
-	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 19:32:21 -0500
+	(Exim 4.71) (envelope-from <alistai@xilinx.com>) id 1eRSJ7-00074t-Vj
+	for qemu-devel@nongnu.org; Tue, 19 Dec 2017 19:32:26 -0500
 From: Alistair Francis <alistair.francis@xilinx.com>
-Date: Tue, 19 Dec 2017 16:27:56 -0800
-Message-ID: <4a3fcaca266b4d766c968b18c7c15d820404594a.1513729519.git.alistair.francis@xilinx.com>
+Date: Tue, 19 Dec 2017 16:27:59 -0800
+Message-ID: <2ac3cbb3f44c35bf061c0c14a2955a4f8884b30b.1513729519.git.alistair.francis@xilinx.com>
 In-Reply-To: <cover.1513729519.git.alistair.francis@xilinx.com>
 References: <cover.1513729519.git.alistair.francis@xilinx.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v4 3/5] raspi: Specify the valid CPUs
+Subject: [Qemu-devel] [PATCH v4 4/5] xlnx-zcu102: Specify the valid CPUs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,42 +34,85 @@ Cc: alistair.francis@xilinx.com, alistair23@gmail.com, ehabkost@redhat.com, marc
 List all possible valid CPU options.
 
 Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
+Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
 Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 ---
 
+An implementation for single CPU machines is still being discussed. A
+solution proposed by Eduardo is this:
+
+1) Change the default on TYPE_MACHINE to:
+     mc->valid_cpu_types =3D { TYPE_CPU, NULL };
+
+   This will keep the existing behavior for all boards.
+
+2) mc->valid_cpu_types=3DNULL be interpreted as "no CPU model
+   except the default is accepted" or "-cpu is not accepted" in
+   machine_run_board_init() (I prefer the former, but both
+   options would be correct)
+
+3) Boards like xlnx_zynqmp could then just do this:
+
+   static void xxx_class_init(...) {
+       mc->default_cpu_type =3D MY_CPU_TYPE;
+       /* Reason: XXX_init() is hardcoded to MY_CPU_TYPE */
+       mc->valid_cpu_types =3D NULL;
+   }
 V4:
  - Remove spaces
 V3:
- - Add static property
+ - Make variable static
 V2:
- - Fix the indentation
+ - Don't use the users -cpu
+ - Fixup allignment
 
- hw/arm/raspi.c | 7 +++++++
- 1 file changed, 7 insertions(+)
+ hw/arm/xlnx-zcu102.c | 17 +++++++++++++++++
+ 1 file changed, 17 insertions(+)
 
-diff --git a/hw/arm/raspi.c b/hw/arm/raspi.c
-index cd5fa8c3dc..bd175e8c16 100644
---- a/hw/arm/raspi.c
-+++ b/hw/arm/raspi.c
-@@ -158,6 +158,11 @@ static void raspi2_init(MachineState *machine)
-     setup_boot(machine, 2, machine->ram_size - vcram_size);
+diff --git a/hw/arm/xlnx-zcu102.c b/hw/arm/xlnx-zcu102.c
+index b126cf148b..08b5c28a3a 100644
+--- a/hw/arm/xlnx-zcu102.c
++++ b/hw/arm/xlnx-zcu102.c
+@@ -184,6 +184,11 @@ static void xlnx_zynqmp_init(XlnxZCU102 *s, MachineSta=
+te *machine)
+     arm_load_kernel(s->soc.boot_cpu_ptr, &xlnx_zcu102_binfo);
  }
 =20
-+static const char *raspi2_valid_cpus[] =3D {
-+    ARM_CPU_TYPE_NAME("cortex-a7"),
++static const char *xlnx_zynqmp_valid_cpus[] =3D {
++    ARM_CPU_TYPE_NAME("cortex-a53"),
 +    NULL
 +};
 +
- static void raspi2_machine_init(MachineClass *mc)
+ static void xlnx_ep108_init(MachineState *machine)
  {
-     mc->desc =3D "Raspberry Pi 2";
-@@ -171,5 +176,7 @@ static void raspi2_machine_init(MachineClass *mc)
-     mc->default_cpus =3D BCM2836_NCPUS;
-     mc->default_ram_size =3D 1024 * 1024 * 1024;
+     XlnxZCU102 *s =3D EP108_MACHINE(machine);
+@@ -216,6 +221,12 @@ static void xlnx_ep108_machine_class_init(ObjectClass =
+*oc, void *data)
      mc->ignore_memory_transaction_failures =3D true;
-+    mc->default_cpu_type =3D ARM_CPU_TYPE_NAME("cortex-a7");
-+    mc->valid_cpu_types =3D raspi2_valid_cpus;
- };
- DEFINE_MACHINE("raspi2", raspi2_machine_init)
+     mc->max_cpus =3D XLNX_ZYNQMP_NUM_APU_CPUS + XLNX_ZYNQMP_NUM_RPU_CPUS;
+     mc->default_cpus =3D XLNX_ZYNQMP_NUM_APU_CPUS;
++    mc->default_cpu_type =3D ARM_CPU_TYPE_NAME("cortex-a53");
++    /* The ZynqMP SoC is always a Cortex-A53. We add this here to give
++     * users a sane error if they specify a different CPU, but we never
++     * use their CPU choice.
++     */
++    mc->valid_cpu_types =3D xlnx_zynqmp_valid_cpus;
+ }
+=20
+ static const TypeInfo xlnx_ep108_machine_init_typeinfo =3D {
+@@ -274,6 +285,12 @@ static void xlnx_zcu102_machine_class_init(ObjectClass=
+ *oc, void *data)
+     mc->ignore_memory_transaction_failures =3D true;
+     mc->max_cpus =3D XLNX_ZYNQMP_NUM_APU_CPUS + XLNX_ZYNQMP_NUM_RPU_CPUS;
+     mc->default_cpus =3D XLNX_ZYNQMP_NUM_APU_CPUS;
++    mc->default_cpu_type =3D ARM_CPU_TYPE_NAME("cortex-a53");
++    /* The ZynqMP SoC is always a Cortex-A53. We add this here to give
++     * users a sane error if they specify a different CPU, but we never
++     * use their CPU choice.
++     */
++    mc->valid_cpu_types =3D xlnx_zynqmp_valid_cpus;
+ }
+=20
+ static const TypeInfo xlnx_zcu102_machine_init_typeinfo =3D {
 --=20
 2.14.1
