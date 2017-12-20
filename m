@@ -1,25 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56199)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56064)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1eRhy6-0004N8-VZ
-	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 12:15:48 -0500
+	(envelope-from <paolo.bonzini@gmail.com>) id 1eRhxz-0004G6-Oy
+	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 12:15:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1eRhy3-00073B-EQ
-	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 12:15:46 -0500
-Received: from mail-wm0-x244.google.com ([2a00:1450:400c:c09::244]:45257)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1eRhxy-0006zA-PL
+	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 12:15:39 -0500
+Received: from mail-wr0-x232.google.com ([2a00:1450:400c:c0c::232]:41923)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1eRhy3-00072b-7g
-	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 12:15:43 -0500
-Received: by mail-wm0-x244.google.com with SMTP id 9so11255301wme.4
-	for <qemu-devel@nongnu.org>; Wed, 20 Dec 2017 09:15:43 -0800 (PST)
+	id 1eRhxy-0006yW-I9
+	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 12:15:38 -0500
+Received: by mail-wr0-x232.google.com with SMTP id p69so14070847wrb.8
+	for <qemu-devel@nongnu.org>; Wed, 20 Dec 2017 09:15:38 -0800 (PST)
+Received: from 640k.lan (dynamic-adsl-78-12-251-125.clienti.tiscali.it.
+	[78.12.251.125]) by smtp.gmail.com with ESMTPSA id
+	f125sm2751101wme.45.2017.12.20.09.15.36 for <qemu-devel@nongnu.org>
+	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+	Wed, 20 Dec 2017 09:15:36 -0800 (PST)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Wed, 20 Dec 2017 18:14:20 +0100
-Message-Id: <1513790098-9815-9-git-send-email-pbonzini@redhat.com>
+Date: Wed, 20 Dec 2017 18:14:16 +0100
+Message-Id: <1513790098-9815-5-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1513790098-9815-1-git-send-email-pbonzini@redhat.com>
 References: <1513790098-9815-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 08/46] x86/cpu: Enable new SSE/AVX/AVX512 cpu
- features
+Subject: [Qemu-devel] [PULL 04/46] contrib: add systemd unit files
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,67 +33,84 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Yang Zhong <yang.zhong@intel.com>
 
-From: Yang Zhong <yang.zhong@intel.com>
+This lets distros standardize on how QEMU should install systemd
+services for qemu-ga and qemu-pr-helper.
 
-Intel IceLake cpu has added new cpu features,AVX512_VBMI2/GFNI/
-VAES/VPCLMULQDQ/AVX512_VNNI/AVX512_BITALG. Those new cpu features
-need expose to guest VM.
+The qemu-ga unit file comes from Fedora, but I checked that
+Debian is using the same path for the virtio-serisal port.
 
-The bit definition:
-CPUID.(EAX=7,ECX=0):ECX[bit 06] AVX512_VBMI2
-CPUID.(EAX=7,ECX=0):ECX[bit 08] GFNI
-CPUID.(EAX=7,ECX=0):ECX[bit 09] VAES
-CPUID.(EAX=7,ECX=0):ECX[bit 10] VPCLMULQDQ
-CPUID.(EAX=7,ECX=0):ECX[bit 11] AVX512_VNNI
-CPUID.(EAX=7,ECX=0):ECX[bit 12] AVX512_BITALG
+I would like to include this in 2.11, so that the qemu-pr-helper
+socket can be standardized across distros.  Note however that
+the files are not installed.  We can add a configure option
+in 2.12 perhaps, but it's too late now; documenting the files
+in the release notes should do.
 
-The release document ref below link:
-https://software.intel.com/sites/default/files/managed/c5/15/\
-architecture-instruction-set-extensions-programming-reference.pdf
-
-Signed-off-by: Yang Zhong <yang.zhong@intel.com>
-Message-Id: <1511335676-20797-1-git-send-email-yang.zhong@intel.com>
+Suggested-by: Daniel P. Berrange <berrange@redhat.com>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+Message-Id: <20171124164422.3960-1-pbonzini@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- target/i386/cpu.c | 6 +++---
- target/i386/cpu.h | 6 ++++++
- 2 files changed, 9 insertions(+), 3 deletions(-)
+ contrib/systemd/qemu-guest-agent.service | 11 +++++++++++
+ contrib/systemd/qemu-pr-helper.service   | 15 +++++++++++++++
+ contrib/systemd/qemu-pr-helper.socket    |  9 +++++++++
+ 3 files changed, 35 insertions(+)
+ create mode 100644 contrib/systemd/qemu-guest-agent.service
+ create mode 100644 contrib/systemd/qemu-pr-helper.service
+ create mode 100644 contrib/systemd/qemu-pr-helper.socket
 
-diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index 82603e3..325b52e 100644
---- a/target/i386/cpu.c
-+++ b/target/i386/cpu.c
-@@ -437,9 +437,9 @@ static FeatureWordInfo feature_word_info[FEATURE_WORDS] = {
-     [FEAT_7_0_ECX] = {
-         .feat_names = {
-             NULL, "avx512vbmi", "umip", "pku",
--            "ospke", NULL, NULL, NULL,
--            NULL, NULL, NULL, NULL,
--            NULL, NULL, "avx512-vpopcntdq", NULL,
-+            "ospke", NULL, "avx512vbmi2", NULL,
-+            "gfni", "vaes", "vpclmulqdq", "avx512vnni",
-+            "avx512bitalg", NULL, "avx512-vpopcntdq", NULL,
-             "la57", NULL, NULL, NULL,
-             NULL, NULL, "rdpid", NULL,
-             NULL, NULL, NULL, NULL,
-diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-index b086b15..cdbf8b0 100644
---- a/target/i386/cpu.h
-+++ b/target/i386/cpu.h
-@@ -635,6 +635,12 @@ typedef uint32_t FeatureWordArray[FEATURE_WORDS];
- #define CPUID_7_0_ECX_UMIP     (1U << 2)
- #define CPUID_7_0_ECX_PKU      (1U << 3)
- #define CPUID_7_0_ECX_OSPKE    (1U << 4)
-+#define CPUID_7_0_ECX_VBMI2    (1U << 6) /* Additional VBMI Instrs */
-+#define CPUID_7_0_ECX_GFNI     (1U << 8)
-+#define CPUID_7_0_ECX_VAES     (1U << 9)
-+#define CPUID_7_0_ECX_VPCLMULQDQ (1U << 10)
-+#define CPUID_7_0_ECX_AVX512VNNI (1U << 11)
-+#define CPUID_7_0_ECX_AVX512BITALG (1U << 12)
- #define CPUID_7_0_ECX_AVX512_VPOPCNTDQ (1U << 14) /* POPCNT for vectors of DW/QW */
- #define CPUID_7_0_ECX_LA57     (1U << 16)
- #define CPUID_7_0_ECX_RDPID    (1U << 22)
+diff --git a/contrib/systemd/qemu-guest-agent.service b/contrib/systemd/qemu-guest-agent.service
+new file mode 100644
+index 0000000..51cd7b3
+--- /dev/null
++++ b/contrib/systemd/qemu-guest-agent.service
+@@ -0,0 +1,11 @@
++[Unit]
++Description=QEMU Guest Agent
++BindTo=dev-virtio\x2dports-org.qemu.guest_agent.0.device
++After=dev-virtio\x2dports-org.qemu.guest_agent.0.device
++
++[Service]
++ExecStart=-/usr/bin/qemu-ga
++Restart=always
++RestartSec=0
++
++[Install]
+diff --git a/contrib/systemd/qemu-pr-helper.service b/contrib/systemd/qemu-pr-helper.service
+new file mode 100644
+index 0000000..a1d27b0
+--- /dev/null
++++ b/contrib/systemd/qemu-pr-helper.service
+@@ -0,0 +1,15 @@
++[Unit]
++Description=Persistent Reservation Daemon for QEMU
++
++[Service]
++WorkingDirectory=/tmp
++Type=simple
++ExecStart=/usr/bin/qemu-pr-helper
++PrivateTmp=yes
++ProtectSystem=strict
++ReadWritePaths=/var/run
++RestrictAddressFamilies=AF_UNIX
++Restart=always
++RestartSec=0
++
++[Install]
+diff --git a/contrib/systemd/qemu-pr-helper.socket b/contrib/systemd/qemu-pr-helper.socket
+new file mode 100644
+index 0000000..9d7c3e5
+--- /dev/null
++++ b/contrib/systemd/qemu-pr-helper.socket
+@@ -0,0 +1,9 @@
++[Unit]
++Description=Persistent Reservation Daemon for QEMU
++
++[Socket]
++ListenStream=/run/qemu-pr-helper.sock
++SocketMode=0600
++
++[Install]
++WantedBy=multi-user.target
 -- 
 1.8.3.1
