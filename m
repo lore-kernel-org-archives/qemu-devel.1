@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([208.118.235.92]:44234)
+Received: from eggs.gnu.org ([208.118.235.92]:47339)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1eRgjt-0001cY-SC
-	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 10:57:03 -0500
+	(envelope-from <michael@weiser.dinsnail.net>) id 1eRgn5-0004rC-2l
+	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 11:00:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1eRgjp-0003gj-55
-	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 10:57:01 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:42346)
+	(envelope-from <michael@weiser.dinsnail.net>) id 1eRgn3-0006d9-P5
+	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 11:00:18 -0500
+Received: from heinz.dinsnail.net
+	([2a01:238:43b4:3200:9392:5dcc:2f0e:a960]:49180)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1eRgjo-0003fU-P2
-	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 10:56:56 -0500
-Date: Wed, 20 Dec 2017 15:56:45 +0000
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20171220155645.GB12566@stefanha-x1.localdomain>
-References: <20171219162151.GA10889@stefanha-x1.localdomain>
-	<20171220064548.GB3735@lemon>
+	(Exim 4.71) (envelope-from <michael@weiser.dinsnail.net>)
+	id 1eRgn3-0006YC-6R
+	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 11:00:17 -0500
+Date: Wed, 20 Dec 2017 16:37:15 +0100
+From: Michael Weiser <michael.weiser@gmx.de>
+Message-ID: <20171220153715.GC15475@weiser.dinsnail.net>
+References: <20171219201613.7399-1-michael.weiser@gmx.de>
+	<20171219201613.7399-6-michael.weiser@gmx.de>
+	<6f0ce872-849b-dc5a-25e7-3242a6e5c624@vivier.eu>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="5/uDoXvLw7AC5HRs"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20171220064548.GB3735@lemon>
-Subject: Re: [Qemu-devel] vhost-user graceful connect/disconnect
+In-Reply-To: <6f0ce872-849b-dc5a-25e7-3242a6e5c624@vivier.eu>
+Subject: Re: [Qemu-devel] [PATCH v2 5/5] linux-user: Add aarch64_be magic
+ numbers to qemu-binfmt-conf.sh
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,86 +31,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, Maxime Coquelin <maxime.coquelin@redhat.com>, n.nikolaev@virtualopensystems.com, Wei Wang <wei.w.wang@intel.com>, mukawa@igel.co.jp, marcandre.lureau@redhat.com
+To: Laurent Vivier <laurent@vivier.eu>
+Cc: qemu-devel@nongnu.org, Riku Voipio <riku.voipio@iki.fi>
 
+Hi Laurent,
 
---5/uDoXvLw7AC5HRs
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+On Wed, Dec 20, 2017 at 03:18:34PM +0100, Laurent Vivier wrote:
 
-On Wed, Dec 20, 2017 at 02:45:48PM +0800, Fam Zheng wrote:
-> On Tue, 12/19 16:21, Stefan Hajnoczi wrote:
-> > Hi,
-> > Vhost-user implementations assume the slave is already running before
-> > the master starts.  The slave is required during virtio device
-> > initialization (e.g. feature bit negotiation) and so it is simplest to
-> > assume that the master is already available and will respond immediately
-> > to the VHOST_USER_GET_FEATURES message.
-> >=20
-> > I have thought about how to let master and slave start in any order.
-> > Some approaches involve changes to the VIRTIO specification so that
-> > guest drivers can wait until the vhost-user connection is established.
-> >=20
-> > We can avoid spec changes using PCI hotplug:
-> >=20
-> > 1. Introduce a new vhost-user object that manages a connection:
-> >=20
-> >    -chardev ...
-> >    -object vhost-user,id=3Dvhost-user0,chardev=3Dchr0
-> >=20
-> >    Note this object is *not* a NetClient.  It's a resource for managing
-> >    a vhost-user connection and can be used with any device type (net,
-> >    scsi, blk, etc).
-> >=20
-> >    This object tries to establish a connection.  When a connection is
-> >    established it sends vhost-user protocol messages to fetch
-> >    information needed for virtio device initialization (like the number
-> >    of virtqueues supported, features bits, etc).  This information is
-> >    stashed so that vhost_*() calls later on do not require synchronous
-> >    communication with the vhost-user slave.
-> >=20
-> > 2. When the vhost-user connection is established the object emits a QMP
-> >    event so management software can hotplug the virtio device:
-> >=20
-> >    VHOST_USER_CONNECTED source=3Dvhost-user0
-> >=20
-> > 3. The management software hotplugs the virtio device:
-> >=20
-> >    (qmp) netdev_add vhost-user,id=3Dnetdev0,vhost-user=3Dvhost-user0
-> >    (qmp) device_add virtio-net-pci,netdev=3Dnetdev0
->=20
-> Why cannot the management software start the slave then hot plug chardev +
-> netdev + virtio-net-pci? That way we don't need the vhost-user connected =
-event.
+> > +aarch64_be_magic='\x7fELF\x02\x02\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02\x00\xb7'
+> > +aarch64_be_mask='\xff\xff\xff\xff\xff\xff\xff\x00\xff\xff\xff\xff\xff\xff\xff\xff\xff\xfe\xff\xff'
+> > +aarch64_be_family=arm
 
-There's an advantage to keeping the vhost-user object in QEMU:
+> You need a different family, something like "armbe", to let
+> qemu_set_binfmts() registers aarch64_be on aarch64 and vice-versa.
 
-In Step 1 the vhost-user object pre-initializes the vhost-user slave to
-avoid synchronous vhost_*() calls during hotplug (e.g.
-vhost_set_owner(), vhost_get_features()).  When vhost_dev_init() and
-other code gets called it won't be necessary to block anymore.  This
-makes the vhost-user master robust against slaves that respond slowly or
-are malicious.
+> The principle is binaries of a given family can be executed natively on
+> the host of the same family, so we don't want to register a binfmt
+> handler. Is that the case between aarch64 and arch64_be?
 
-It's messy to do pre-init outside QEMU and then pass the necessary state
-in.
+Right, while the CPU certainly is capable of switching endianess on the
+fly I'm not sure if there is any multilib/multiarch userland setup and
+kernel interface that would support mixed little/big-endianess of
+arm or aarch64 binaries. Even if, it would likely need further detection
+in the script to make sure it's there.
 
-Stefan
+Based on that I suspect that qemu-binfmt-conf.sh's current assignment of
+armeb and aarch64 into the arm CPU family is over-optimistic as well.
+So I'd suggest treating all of arm, armeb, aarch64 and aarch64_be as
+separate families.
 
---5/uDoXvLw7AC5HRs
-Content-Type: application/pgp-signature; name="signature.asc"
+Incidentally: I noticed that armeb is missing from qemu_target_list. Is
+that intentional?
 
------BEGIN PGP SIGNATURE-----
+How about the following changes, maybe split into two patches "add
+armeb" and "separate ARM CPU families"?
 
-iQEcBAEBAgAGBQJaOog9AAoJEJykq7OBq3PIvcIIALrItS8uzTv3wc//b/jkR+Rv
-fHzR+tYpBmla0ZqYVn+5yY61z7H3gm0sTAlbkwT9SzQiq3/p4yXkx/mhv+cbxfO8
-L9oNymT8gy3jNfbsE2GaToEEYPG3TlbzkaZze7jDZLwIjWK1URLDypeoKr7rBwgk
-hyXQdAehNWq1wB9+m0+dWXrdcHLZBZOvG88knmguW1zSdpdli0il+vJooKgjn4hD
-CORIN44qdrTBKrvjS/DaijqHe5VxdbMAd3NYx3zvKLTvj12oE5DluiylQe512sXF
-QmpKnjzE7n7HgvBTS0S7OApwoSHMyC6BXc2ZxyWkZOUjI1yy6iweALRhwUYlroc=
-=FiH3
------END PGP SIGNATURE-----
+diff --git a/scripts/qemu-binfmt-conf.sh b/scripts/qemu-binfmt-conf.sh
+index d69953525c..69ebfe7a6e 100755
+--- a/scripts/qemu-binfmt-conf.sh
++++ b/scripts/qemu-binfmt-conf.sh
+@@ -2,7 +2,7 @@
+ # enable automatic i386/ARM/M68K/MIPS/SPARC/PPC/s390/HPPA
+ # program execution by the kernel
+ 
+-qemu_target_list="i386 i486 alpha arm sparc32plus ppc ppc64 ppc64le m68k \
++qemu_target_list="i386 i486 alpha arm armeb sparc32plus ppc ppc64 ppc64le m68k \
+ mips mipsel mipsn32 mipsn32el mips64 mips64el \
+ sh4 sh4eb s390x aarch64 aarch64_be hppa"
+ 
+@@ -24,7 +24,7 @@ arm_family=arm
+ 
+ armeb_magic='\x7fELF\x01\x02\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02\x00\x28'
+ armeb_mask='\xff\xff\xff\xff\xff\xff\xff\x00\xff\xff\xff\xff\xff\xff\xff\xff\xff\xfe\xff\xff'
+-armeb_family=arm
++armeb_family=armeb
+ 
+ sparc_magic='\x7fELF\x01\x02\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02\x00\x02'
+ sparc_mask='\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xfe\xff\xff'
+@@ -90,11 +90,11 @@ s390x_family=s390x
+ 
+ aarch64_magic='\x7fELF\x02\x01\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02\x00\xb7\x00'
+ aarch64_mask='\xff\xff\xff\xff\xff\xff\xff\x00\xff\xff\xff\xff\xff\xff\xff\xff\xfe\xff\xff\xff'
+-aarch64_family=arm
++aarch64_family=aarch64
+ 
+ aarch64_be_magic='\x7fELF\x02\x02\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02\x00\xb7'
+ aarch64_be_mask='\xff\xff\xff\xff\xff\xff\xff\x00\xff\xff\xff\xff\xff\xff\xff\xff\xff\xfe\xff\xff'
+-aarch64_be_family=arm
++aarch64_be_family=aarch64_be
+ 
+ hppa_magic='\x7f\x45\x4c\x46\x01\x02\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02\x00\x0f'
+ hppa_mask='\xff\xff\xff\xff\xff\xff\xff\x00\xff\xff\xff\xff\xff\xff\xff\xff\xff\xfe\xff\xff'
 
---5/uDoXvLw7AC5HRs--
+Okay?
+-- 
+bye, Michael
