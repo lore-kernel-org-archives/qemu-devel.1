@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39777)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39849)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1eRbjG-0004y0-C1
-	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 05:36:03 -0500
+	(envelope-from <kwolf@redhat.com>) id 1eRbjJ-000523-P6
+	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 05:36:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1eRbjE-0005QZ-10
-	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 05:36:02 -0500
+	(envelope-from <kwolf@redhat.com>) id 1eRbjH-0005Uv-VR
+	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 05:36:05 -0500
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Wed, 20 Dec 2017 11:34:06 +0100
-Message-Id: <20171220103412.13048-14-kwolf@redhat.com>
+Date: Wed, 20 Dec 2017 11:34:10 +0100
+Message-Id: <20171220103412.13048-18-kwolf@redhat.com>
 In-Reply-To: <20171220103412.13048-1-kwolf@redhat.com>
 References: <20171220103412.13048-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PATCH 13/19] test-bdrv-drain: Tests for
- bdrv_subtree_drain
+Subject: [Qemu-devel] [PATCH 17/19] test-bdrv-drain: Test graph changes in
+ drained section
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,107 +23,108 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, famz@redhat.com, pbonzini@redhat.com, qemu-devel@nongnu.org
 
-Add a subtree drain version to the existing test cases.
-
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- tests/test-bdrv-drain.c | 27 ++++++++++++++++++++++++++-
- 1 file changed, 26 insertions(+), 1 deletion(-)
+ tests/test-bdrv-drain.c | 80 +++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 80 insertions(+)
 
 diff --git a/tests/test-bdrv-drain.c b/tests/test-bdrv-drain.c
-index ede5cf6e64..c00d96bb2f 100644
+index b7322c5826..6803e64950 100644
 --- a/tests/test-bdrv-drain.c
 +++ b/tests/test-bdrv-drain.c
-@@ -85,6 +85,7 @@ static void aio_ret_cb(void *opaque, int ret)
- enum drain_type {
-     BDRV_DRAIN_ALL,
-     BDRV_DRAIN,
-+    BDRV_SUBTREE_DRAIN,
-     DRAIN_TYPE_MAX,
- };
- 
-@@ -93,6 +94,7 @@ static void do_drain_begin(enum drain_type drain_type, BlockDriverState *bs)
-     switch (drain_type) {
-     case BDRV_DRAIN_ALL:        bdrv_drain_all_begin(); break;
-     case BDRV_DRAIN:            bdrv_drained_begin(bs); break;
-+    case BDRV_SUBTREE_DRAIN:    bdrv_subtree_drained_begin(bs); break;
-     default:                    g_assert_not_reached();
-     }
- }
-@@ -102,6 +104,7 @@ static void do_drain_end(enum drain_type drain_type, BlockDriverState *bs)
-     switch (drain_type) {
-     case BDRV_DRAIN_ALL:        bdrv_drain_all_end(); break;
-     case BDRV_DRAIN:            bdrv_drained_end(bs); break;
-+    case BDRV_SUBTREE_DRAIN:    bdrv_subtree_drained_end(bs); break;
-     default:                    g_assert_not_reached();
-     }
- }
-@@ -180,6 +183,11 @@ static void test_drv_cb_drain(void)
-     test_drv_cb_common(BDRV_DRAIN, false);
+@@ -411,6 +411,85 @@ static void test_multiparent(void)
+     blk_unref(blk_b);
  }
  
-+static void test_drv_cb_drain_subtree(void)
++static void test_graph_change(void)
 +{
-+    test_drv_cb_common(BDRV_SUBTREE_DRAIN, true);
++    BlockBackend *blk_a, *blk_b;
++    BlockDriverState *bs_a, *bs_b, *backing;
++    BDRVTestState *a_s, *b_s, *backing_s;
++
++    blk_a = blk_new(BLK_PERM_ALL, BLK_PERM_ALL);
++    bs_a = bdrv_new_open_driver(&bdrv_test, "test-node-a", BDRV_O_RDWR,
++                                &error_abort);
++    a_s = bs_a->opaque;
++    blk_insert_bs(blk_a, bs_a, &error_abort);
++
++    blk_b = blk_new(BLK_PERM_ALL, BLK_PERM_ALL);
++    bs_b = bdrv_new_open_driver(&bdrv_test, "test-node-b", BDRV_O_RDWR,
++                                &error_abort);
++    b_s = bs_b->opaque;
++    blk_insert_bs(blk_b, bs_b, &error_abort);
++
++    backing = bdrv_new_open_driver(&bdrv_test, "backing", 0, &error_abort);
++    backing_s = backing->opaque;
++    bdrv_set_backing_hd(bs_a, backing, &error_abort);
++
++    g_assert_cmpint(bs_a->quiesce_counter, ==, 0);
++    g_assert_cmpint(bs_b->quiesce_counter, ==, 0);
++    g_assert_cmpint(backing->quiesce_counter, ==, 0);
++    g_assert_cmpint(a_s->drain_count, ==, 0);
++    g_assert_cmpint(b_s->drain_count, ==, 0);
++    g_assert_cmpint(backing_s->drain_count, ==, 0);
++
++    do_drain_begin(BDRV_SUBTREE_DRAIN, bs_a);
++    do_drain_begin(BDRV_SUBTREE_DRAIN, bs_a);
++    do_drain_begin(BDRV_SUBTREE_DRAIN, bs_a);
++    do_drain_begin(BDRV_SUBTREE_DRAIN, bs_b);
++    do_drain_begin(BDRV_SUBTREE_DRAIN, bs_b);
++
++    bdrv_set_backing_hd(bs_b, backing, &error_abort);
++    g_assert_cmpint(bs_a->quiesce_counter, ==, 5);
++    g_assert_cmpint(bs_b->quiesce_counter, ==, 5);
++    g_assert_cmpint(backing->quiesce_counter, ==, 5);
++    g_assert_cmpint(a_s->drain_count, ==, 5);
++    g_assert_cmpint(b_s->drain_count, ==, 5);
++    g_assert_cmpint(backing_s->drain_count, ==, 5);
++
++    bdrv_set_backing_hd(bs_b, NULL, &error_abort);
++    g_assert_cmpint(bs_a->quiesce_counter, ==, 3);
++    g_assert_cmpint(bs_b->quiesce_counter, ==, 2);
++    g_assert_cmpint(backing->quiesce_counter, ==, 3);
++    g_assert_cmpint(a_s->drain_count, ==, 3);
++    g_assert_cmpint(b_s->drain_count, ==, 2);
++    g_assert_cmpint(backing_s->drain_count, ==, 3);
++
++    bdrv_set_backing_hd(bs_b, backing, &error_abort);
++    g_assert_cmpint(bs_a->quiesce_counter, ==, 5);
++    g_assert_cmpint(bs_b->quiesce_counter, ==, 5);
++    g_assert_cmpint(backing->quiesce_counter, ==, 5);
++    g_assert_cmpint(a_s->drain_count, ==, 5);
++    g_assert_cmpint(b_s->drain_count, ==, 5);
++    g_assert_cmpint(backing_s->drain_count, ==, 5);
++
++    do_drain_end(BDRV_SUBTREE_DRAIN, bs_b);
++    do_drain_end(BDRV_SUBTREE_DRAIN, bs_b);
++    do_drain_end(BDRV_SUBTREE_DRAIN, bs_a);
++    do_drain_end(BDRV_SUBTREE_DRAIN, bs_a);
++    do_drain_end(BDRV_SUBTREE_DRAIN, bs_a);
++
++    g_assert_cmpint(bs_a->quiesce_counter, ==, 0);
++    g_assert_cmpint(bs_b->quiesce_counter, ==, 0);
++    g_assert_cmpint(backing->quiesce_counter, ==, 0);
++    g_assert_cmpint(a_s->drain_count, ==, 0);
++    g_assert_cmpint(b_s->drain_count, ==, 0);
++    g_assert_cmpint(backing_s->drain_count, ==, 0);
++
++    bdrv_unref(backing);
++    bdrv_unref(bs_a);
++    bdrv_unref(bs_b);
++    blk_unref(blk_a);
++    blk_unref(blk_b);
 +}
 +
- static void test_quiesce_common(enum drain_type drain_type, bool recursive)
- {
-     BlockBackend *blk;
-@@ -222,6 +230,11 @@ static void test_quiesce_drain(void)
-     test_quiesce_common(BDRV_DRAIN, false);
- }
  
-+static void test_quiesce_drain_subtree(void)
-+{
-+    test_quiesce_common(BDRV_SUBTREE_DRAIN, true);
-+}
-+
- static void test_nested(void)
- {
-     BlockBackend *blk;
-@@ -244,7 +257,8 @@ static void test_nested(void)
-             /* XXX bdrv_drain_all() doesn't increase the quiesce_counter */
-             int bs_quiesce      = (outer != BDRV_DRAIN_ALL) +
-                                   (inner != BDRV_DRAIN_ALL);
--            int backing_quiesce = 0;
-+            int backing_quiesce = (outer == BDRV_SUBTREE_DRAIN) +
-+                                  (inner == BDRV_SUBTREE_DRAIN);
-             int backing_cb_cnt  = (outer != BDRV_DRAIN) +
-                                   (inner != BDRV_DRAIN);
- 
-@@ -391,6 +405,11 @@ static void test_blockjob_drain(void)
-     test_blockjob_common(BDRV_DRAIN);
- }
- 
-+static void test_blockjob_drain_subtree(void)
-+{
-+    test_blockjob_common(BDRV_SUBTREE_DRAIN);
-+}
-+
- int main(int argc, char **argv)
- {
-     bdrv_init();
-@@ -400,14 +419,20 @@ int main(int argc, char **argv)
- 
-     g_test_add_func("/bdrv-drain/driver-cb/drain_all", test_drv_cb_drain_all);
-     g_test_add_func("/bdrv-drain/driver-cb/drain", test_drv_cb_drain);
-+    g_test_add_func("/bdrv-drain/driver-cb/drain_subtree",
-+                    test_drv_cb_drain_subtree);
- 
-     g_test_add_func("/bdrv-drain/quiesce/drain_all", test_quiesce_drain_all);
-     g_test_add_func("/bdrv-drain/quiesce/drain", test_quiesce_drain);
-+    g_test_add_func("/bdrv-drain/quiesce/drain_subtree",
-+                    test_quiesce_drain_subtree);
+ typedef struct TestBlockJob {
+     BlockJob common;
+@@ -553,6 +632,7 @@ int main(int argc, char **argv)
  
      g_test_add_func("/bdrv-drain/nested", test_nested);
+     g_test_add_func("/bdrv-drain/multiparent", test_multiparent);
++    g_test_add_func("/bdrv-drain/graph-change", test_graph_change);
  
      g_test_add_func("/bdrv-drain/blockjob/drain_all", test_blockjob_drain_all);
      g_test_add_func("/bdrv-drain/blockjob/drain", test_blockjob_drain);
-+    g_test_add_func("/bdrv-drain/blockjob/drain_subtree",
-+                    test_blockjob_drain_subtree);
- 
-     return g_test_run();
- }
 -- 
 2.13.6
