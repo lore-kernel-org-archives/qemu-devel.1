@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56388)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56294)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1eRhyJ-0004bu-Au
-	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 12:16:00 -0500
+	(envelope-from <paolo.bonzini@gmail.com>) id 1eRhyC-0004V9-IM
+	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 12:15:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1eRhyI-0007E5-Gy
-	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 12:15:59 -0500
-Received: from mail-wm0-x244.google.com ([2a00:1450:400c:c09::244]:36801)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1eRhyB-0007A6-Is
+	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 12:15:52 -0500
+Received: from mail-wr0-x244.google.com ([2a00:1450:400c:c0c::244]:46960)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1eRhyI-0007DV-AS
-	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 12:15:58 -0500
-Received: by mail-wm0-x244.google.com with SMTP id b76so11198531wmg.1
-	for <qemu-devel@nongnu.org>; Wed, 20 Dec 2017 09:15:58 -0800 (PST)
+	id 1eRhyB-00079b-Bq
+	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 12:15:51 -0500
+Received: by mail-wr0-x244.google.com with SMTP id g17so13685671wrd.13
+	for <qemu-devel@nongnu.org>; Wed, 20 Dec 2017 09:15:51 -0800 (PST)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Wed, 20 Dec 2017 18:14:33 +0100
-Message-Id: <1513790098-9815-22-git-send-email-pbonzini@redhat.com>
+Date: Wed, 20 Dec 2017 18:14:27 +0100
+Message-Id: <1513790098-9815-16-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1513790098-9815-1-git-send-email-pbonzini@redhat.com>
 References: <1513790098-9815-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 21/46] tests/boot-serial-test: Add tests for
- microblaze boards
+Subject: [Qemu-devel] [PULL 15/46] baum: Truncate braille device size to 84x1
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,71 +28,46 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Thomas Huth <thuth@redhat.com>
+Cc: Samuel Thibault <samuel.thibault@ens-lyon.org>
 
-From: Thomas Huth <thuth@redhat.com>
+From: Samuel Thibault <samuel.thibault@ens-lyon.org>
 
-This adds two simple TCG + UART tests for the microblaze boards,
-one in big endian mode, and one in little endian mode.
+Baum device bigger than 84 do not actually exist, but the user's own
+Braille device might be wider than 84 columns.  Some guest drivers
+would be upset by such sizes, so clamp the device size.
 
-Signed-off-by: Thomas Huth <thuth@redhat.com>
-Message-Id: <1512031988-32490-5-git-send-email-thuth@redhat.com>
+Signed-off-by: Samuel Thibault <samuel.thibault@ens-lyon.org>
+Message-Id: <20171211001950.27843-1-samuel.thibault@ens-lyon.org>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- tests/Makefile.include   |  2 ++
- tests/boot-serial-test.c | 20 ++++++++++++++++++++
- 2 files changed, 22 insertions(+)
+ chardev/baum.c | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
 
-diff --git a/tests/Makefile.include b/tests/Makefile.include
-index bbb9d89..5789911 100644
---- a/tests/Makefile.include
-+++ b/tests/Makefile.include
-@@ -299,6 +299,8 @@ check-qtest-alpha-y = tests/boot-serial-test$(EXESUF)
+diff --git a/chardev/baum.c b/chardev/baum.c
+index 67fd783..78b0c87 100644
+--- a/chardev/baum.c
++++ b/chardev/baum.c
+@@ -1,7 +1,7 @@
+ /*
+  * QEMU Baum Braille Device
+  *
+- * Copyright (c) 2008, 2010-2011, 2016 Samuel Thibault
++ * Copyright (c) 2008, 2010-2011, 2016-2017 Samuel Thibault
+  *
+  * Permission is hereby granted, free of charge, to any person obtaining a copy
+  * of this software and associated documentation files (the "Software"), to deal
+@@ -239,6 +239,12 @@ static int baum_deferred_init(BaumChardev *baum)
+         brlapi_perror("baum: brlapi__getDisplaySize");
+         return 0;
+     }
++    if (baum->y > 1) {
++        baum->y = 1;
++    }
++    if (baum->x > 84) {
++        baum->x = 84;
++    }
  
- check-qtest-m68k-y = tests/boot-serial-test$(EXESUF)
- 
-+check-qtest-microblaze-y = tests/boot-serial-test$(EXESUF)
-+
- check-qtest-mips-y = tests/endianness-test$(EXESUF)
- 
- check-qtest-mips64-y = tests/endianness-test$(EXESUF)
-diff --git a/tests/boot-serial-test.c b/tests/boot-serial-test.c
-index dd3828c..a39273a 100644
---- a/tests/boot-serial-test.c
-+++ b/tests/boot-serial-test.c
-@@ -24,6 +24,22 @@ static const uint8_t kernel_mcf5208[] = {
-     0x60, 0xfa                              /* bra.s  loop */
- };
- 
-+static const uint8_t kernel_pls3adsp1800[] = {
-+    0xb0, 0x00, 0x84, 0x00,                 /* imm   0x8400 */
-+    0x30, 0x60, 0x00, 0x04,                 /* addik r3,r0,4 */
-+    0x30, 0x80, 0x00, 0x54,                 /* addik r4,r0,'T' */
-+    0xf0, 0x83, 0x00, 0x00,                 /* sbi   r4,r3,0 */
-+    0xb8, 0x00, 0xff, 0xfc                  /* bri   -4  loop */
-+};
-+
-+static const uint8_t kernel_plml605[] = {
-+    0xe0, 0x83, 0x00, 0xb0,                 /* imm   0x83e0 */
-+    0x00, 0x10, 0x60, 0x30,                 /* addik r3,r0,0x1000 */
-+    0x54, 0x00, 0x80, 0x30,                 /* addik r4,r0,'T' */
-+    0x00, 0x00, 0x83, 0xf0,                 /* sbi   r4,r3,0 */
-+    0xfc, 0xff, 0x00, 0xb8                  /* bri   -4  loop */
-+};
-+
- typedef struct testdef {
-     const char *arch;       /* Target architecture */
-     const char *machine;    /* Name of the machine */
-@@ -50,6 +66,10 @@ static testdef_t tests[] = {
-     { "s390x", "s390-ccw-virtio",
-       "-nodefaults -device sclpconsole,chardev=serial0", "virtio device" },
-     { "m68k", "mcf5208evb", "", "TT", sizeof(kernel_mcf5208), kernel_mcf5208 },
-+    { "microblaze", "petalogix-s3adsp1800", "", "TT",
-+      sizeof(kernel_pls3adsp1800), kernel_pls3adsp1800 },
-+    { "microblazeel", "petalogix-ml605", "", "TT",
-+      sizeof(kernel_plml605), kernel_plml605 },
- 
-     { NULL }
- };
+     con = qemu_console_lookup_by_index(0);
+     if (con && qemu_console_is_graphic(con)) {
 -- 
 1.8.3.1
