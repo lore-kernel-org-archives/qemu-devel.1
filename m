@@ -1,25 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38702)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40404)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eRcZT-0001Zj-1Z
-	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 06:30:00 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1eRcay-0002iE-Ll
+	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 06:31:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eRcZR-0004qX-TN
-	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 06:29:59 -0500
-Received: from mail-oi0-x22c.google.com ([2607:f8b0:4003:c06::22c]:41237)
+	(envelope-from <pbonzini@redhat.com>) id 1eRcat-0006ha-1X
+	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 06:31:32 -0500
+Received: from mail-wr0-f193.google.com ([209.85.128.193]:35572)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1eRcZR-0004pm-OO
-	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 06:29:57 -0500
-Received: by mail-oi0-x22c.google.com with SMTP id t78so14398216oie.8
-	for <qemu-devel@nongnu.org>; Wed, 20 Dec 2017 03:29:57 -0800 (PST)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1eRcas-0006gw-QR
+	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 06:31:26 -0500
+Received: by mail-wr0-f193.google.com with SMTP id l19so9640506wrc.2
+	for <qemu-devel@nongnu.org>; Wed, 20 Dec 2017 03:31:26 -0800 (PST)
+References: <20171220103412.13048-1-kwolf@redhat.com>
+	<20171220103412.13048-17-kwolf@redhat.com>
+	<974e7f62-412a-21e8-d502-a0e7a99015cc@redhat.com>
+	<20171220111822.GA6374@localhost.localdomain>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <09b75421-21f1-5e9e-8f2e-c9189ab207eb@redhat.com>
+Date: Wed, 20 Dec 2017 12:31:22 +0100
 MIME-Version: 1.0
-In-Reply-To: <20171219042942.29297-1-david@gibson.dropbear.id.au>
-References: <20171219042942.29297-1-david@gibson.dropbear.id.au>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Wed, 20 Dec 2017 11:29:36 +0000
-Message-ID: <CAFEAcA_CrLPQDBxYs6bzYX1Venpau1McP5o7-6PKuL1H-NJR4Q@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 00/14] ppc-for-2.12 queue 20171219
+In-Reply-To: <20171220111822.GA6374@localhost.localdomain>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 16/19] block: Allow graph
+ changes in subtree drained section
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,99 +33,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: Greg Kurz <groug@kaod.org>, qemu-ppc@nongnu.org, QEMU Developers <qemu-devel@nongnu.org>, Michael Roth <mdroth@linux.vnet.ibm.com>
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: famz@redhat.com, qemu-devel@nongnu.org, qemu-block@nongnu.org
 
-On 19 December 2017 at 04:29, David Gibson <david@gibson.dropbear.id.au> wrote:
-> The following changes since commit eaefea537b476cb853e2edbdc68e969ec777e4bb:
->
->   Merge remote-tracking branch 'remotes/mjt/tags/trivial-patches-fetch' into staging (2017-12-18 14:17:42 +0000)
->
-> are available in the Git repository at:
->
->   git://github.com/dgibson/qemu.git tags/ppc-for-2.12-20171219
->
-> for you to fetch changes up to eec745d4366076dee068750ea80245e1a46e9c13:
->
->   hw/ide: Emulate SiI3112 SATA controller (2017-12-19 15:24:28 +1100)
->
-> ----------------------------------------------------------------
-> ppc patch queue 2017-12-19
->
-> Here's a second batch of patches for qemu-2.12.  Highlights are:
->
->   * Optional capabilities for the "pseries" machine.  This removes
->     some places where we were changing guest visible properties based
->     on host capabilities, which makes life very bad for migration.
->   * SLOF update
->   * Significant TCG speedup from Paolo
->   * Several new devices for embedded platforms
->   * Some minor cleanups
->
+On 20/12/2017 12:18, Kevin Wolf wrote:
+> Am 20.12.2017 um 11:51 hat Paolo Bonzini geschrieben:
+>> On 20/12/2017 11:34, Kevin Wolf wrote:
+>>>      .inherit_options = bdrv_inherited_options,
+>>>      .drained_begin   = bdrv_child_cb_drained_begin,
+>>>      .drained_end     = bdrv_child_cb_drained_end,
+>>> +    .attach          = bdrv_child_cb_attach,
+>>> +    .detach          = bdrv_child_cb_detach,
+>>>      .inactivate      = bdrv_child_cb_inactivate,
+>>>  };
+>>>  
+>>> @@ -911,6 +933,8 @@ const BdrvChildRole child_format = {
+>>>      .inherit_options = bdrv_inherited_fmt_options,
+>>>      .drained_begin   = bdrv_child_cb_drained_begin,
+>>>      .drained_end     = bdrv_child_cb_drained_end,
+>>> +    .attach          = bdrv_child_cb_attach,
+>>> +    .detach          = bdrv_child_cb_detach,
+>>>      .inactivate      = bdrv_child_cb_inactivate,
+>>
+>> Is there any case of a BdrvChildRole that doesn't want these callbacks?
+>> Maybe the functions should be called after ->attach and before ->detach
+>> (e.g. bdrv_{,un}apply_subtree_drain), rather than modifying the
+>> BdrvChildRole implementations.
+> 
+> At first I intended to implement it directly in
+> bdrv_replace_child_noperm(), but the thing is that you need the
+> bs->recursive_quiesce_counter of the parent BDS - but not all parents of
+> a BdrvChild are even a BDS. It could also be a BB root child or a block
+> job child. This is why we only have a void *opaque rather than a BDS
+> pointer for the parent.
+> 
+> The other option would be an additional BdrvChildRole callback like
+> .get_recursive_quiesce_counter, but compared to that, I like some code
+> in .attach/.detach better.
 
-Migration test hangs on aarch32 host/ppc guest:
+I see.  What about keeping the callbacks, but exporting
 
-peter.m+  3942  0.0  0.0   1452   412 pts/0    S+   Dec19   0:00  |
-                   \_ /bin/sh -c
-QTEST_QEMU_BINARY=ppc64-softmmu/qemu-system-ppc64
-QTEST_QEMU_IMG=qemu-img MALLOC_PERTURB_=${MALLOC_PERTURB_:-$((
-${RANDOM:-0} % 255 + 1))} gtester -k --verbose -m=quick
-tests/spapr-phb-test tests/endianness-test tests/boot-order-test
-tests/prom-env-test tests/pnv-xscom-test tests/drive_del-test
-tests/migration-test tests/boot-serial-test tests/rtas-test
-tests/pxe-test tests/usb-hcd-ohci-test tests/usb-hcd-uhci-test
-tests/usb-hcd-xhci-test tests/virtio-net-test
-tests/virtio-balloon-test tests/virtio-blk-test tests/virtio-rng-test
-tests/virtio-scsi-test tests/virtio-9p-test tests/virtio-serial-test
-tests/virtio-console-test tests/test-netfilter
-tests/test-filter-mirror tests/test-filter-redirector
-tests/display-vga-test tests/numa-test tests/ivshmem-test
-tests/qmp-test tests/device-introspect-test tests/qom-test
-tests/test-hmp
-peter.m+  3943  0.0  0.0  11984  1828 pts/0    Sl+  Dec19   0:00  |
-                       \_ gtester -k --verbose -m=quick
-tests/spapr-phb-test tests/endianness-test tests/boot-order-test
-tests/prom-env-test tests/pnv-xscom-test tests/drive_del-test
-tests/migration-test tests/boot-serial-test tests/rtas-test
-tests/pxe-test tests/usb-hcd-ohci-test tests/usb-hcd-uhci-test
-tests/usb-hcd-xhci-test tests/virtio-net-test
-tests/virtio-balloon-test tests/virtio-blk-test tests/virtio-rng-test
-tests/virtio-scsi-test tests/virtio-9p-test tests/virtio-serial-test
-tests/virtio-console-test tests/test-netfilter
-tests/test-filter-mirror tests/test-filter-redirector
-tests/display-vga-test tests/numa-test tests/ivshmem-test
-tests/qmp-test tests/device-introspect-test tests/qom-test
-tests/test-hmp
-peter.m+  4041 99.9  0.0   3460   824 pts/0    R+   Dec19 809:16  |
-                           \_ tests/migration-test --quiet
---keep-going -m=quick --GTestLogFD=6
-peter.m+  4042 99.9  0.4 607804 72924 pts/0    Sl+  Dec19 809:50  |
-                               \_ ppc64-softmmu/qemu-system-ppc64
--qtest unix:/tmp/qtest-4041.sock,nowait -qtest-log /dev/null -qmp
-unix:/tmp/qtest-4041.qmp,nowait -machine accel=qtest -display none
--machine accel=tcg -m 256M -name pcsource,debug-threads=on -serial
-file:/tmp/migration-test-vxvkIZ/src_serial -drive
-file=/tmp/migration-test-vxvkIZ/bootsect,if=pflash,format=raw
-peter.m+  4046  0.0  0.3 596596 49696 pts/0    Sl+  Dec19   0:01  |
-                               \_ ppc64-softmmu/qemu-system-ppc64
--qtest unix:/tmp/qtest-4041.sock,nowait -qtest-log /dev/null -qmp
-unix:/tmp/qtest-4041.qmp,nowait -machine accel=qtest -display none
--machine accel=tcg -m 256M -name pcdest,debug-threads=on -serial
-file:/tmp/migration-test-vxvkIZ/dest_serial -incoming
-unix:/tmp/migration-test-vxvkIZ/migsocket
+void bdrv_apply_subtree_drain(BlockDriverState *child,
+			      BlockDriverState *new_parent);
+void bdrv_unapply_subtree_drain(BlockDriverState *child,
+			        BlockDriverState *old_parent);
 
+instead of bdrv_do_drained_{begin,end}?
 
-Process 4041/4042 are using 100% CPU.
+Thanks,
 
-$ QTEST_QEMU_BINARY=ppc64-softmmu/qemu-system-ppc64 gtester -k
---verbose -m=quick tests/migration-test
-TEST: tests/migration-test... (pid=5441)
-  /ppc64/migration/postcopy/unix:
-[hangs]
+Paolo
 
-My first guess is that this is a general 32-bit host issue
-rather than an arm-host specific one; arm just happens to
-be the only 32-bit system in my test set.
-
-thanks
--- PMM
+>> Then they can be put in block/io.c, and bdrv_do_drained_* can remain
+>> static.  (I would also consider extracting block/drain.c, but it is
+>> painful to do it now that you have this nice series---so let's do it after).
+> 
+> I can keep that in mind for part 3 (or 4, whatever it may become).
+> 
+> Kevin
+> 
