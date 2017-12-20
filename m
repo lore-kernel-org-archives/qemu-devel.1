@@ -1,25 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56557)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60575)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eReIe-0005EW-Sg
-	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 08:20:45 -0500
+	(envelope-from <kwolf@redhat.com>) id 1eReMN-00009q-9U
+	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 08:24:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eReIZ-0007Tv-50
-	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 08:20:44 -0500
-Received: from mail-oi0-x22d.google.com ([2607:f8b0:4003:c06::22d]:33829)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1eReIZ-0007ST-0E
-	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 08:20:39 -0500
-Received: by mail-oi0-x22d.google.com with SMTP id u193so14593672oie.1
-	for <qemu-devel@nongnu.org>; Wed, 20 Dec 2017 05:20:38 -0800 (PST)
+	(envelope-from <kwolf@redhat.com>) id 1eReMM-00036E-E7
+	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 08:24:35 -0500
+Date: Wed, 20 Dec 2017 14:24:25 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20171220132425.GC6374@localhost.localdomain>
+References: <20171220103412.13048-1-kwolf@redhat.com>
+	<20171220103412.13048-4-kwolf@redhat.com>
+	<20171220131618.GD10812@lemon>
 MIME-Version: 1.0
-In-Reply-To: <20171219151144.11120-1-stefanha@redhat.com>
-References: <20171219151144.11120-1-stefanha@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Wed, 20 Dec 2017 13:20:17 +0000
-Message-ID: <CAFEAcA8N-YmoCsQbC_Pi442HX4v-XLnJwibEuZm_auqDyrkikw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL v2 00/23] Block patches
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20171220131618.GD10812@lemon>
+Subject: Re: [Qemu-devel] [PATCH 03/19] block: Make bdrv_drain() driver
+ callbacks non-recursive
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,31 +25,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Fam Zheng <famz@redhat.com>
+Cc: qemu-block@nongnu.org, pbonzini@redhat.com, qemu-devel@nongnu.org
 
-On 19 December 2017 at 15:11, Stefan Hajnoczi <stefanha@redhat.com> wrote:
-> The following changes since commit eaefea537b476cb853e2edbdc68e969ec777e4bb:
->
->   Merge remote-tracking branch 'remotes/mjt/tags/trivial-patches-fetch' into staging (2017-12-18 14:17:42 +0000)
->
-> are available in the Git repository at:
->
->   git://github.com/stefanha/qemu.git tags/block-pull-request
->
-> for you to fetch changes up to 7a9dda0d7f9831c2432620dcfefdadbb7ae888dc:
->
->   qemu-iotests: add 203 savevm with IOThreads test (2017-12-19 10:25:09 +0000)
->
-> ----------------------------------------------------------------
-> Pull request
->
-> v2:
->  * Fixed incorrect virtio_blk_data_plane_create() local_err refactoring in
->    "hw/block: Use errp directly rather than local_err" that broke virtio-blk
->    over virtio-mmio [Peter]
->
+Am 20.12.2017 um 14:16 hat Fam Zheng geschrieben:
+> On Wed, 12/20 11:33, Kevin Wolf wrote:
+> > bdrv_drain_begin() doesn't increase bs->quiesce_counter recursively,
+> 
+> Pretty trivial but:
+> 
+> s/bdrv_drain_begin/bdrv_drained_begin/
 
-Applied, thanks.
+Yes, thanks.
 
--- PMM
+> > which means that the child nodes are not actually drained. To keep this
+> > consistent, we also shouldn't call the block driver callbacks.
+> > 
+> > Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> > ---
+> >  block/io.c | 16 +++++++++-------
+> >  1 file changed, 9 insertions(+), 7 deletions(-)
+> > 
+> > diff --git a/block/io.c b/block/io.c
+> > index b94740b8ff..91a52e2d82 100644
+> > --- a/block/io.c
+> > +++ b/block/io.c
+> > @@ -158,7 +158,7 @@ static void coroutine_fn bdrv_drain_invoke_entry(void *opaque)
+> >  }
+> >  
+> >  /* Recursively call BlockDriver.bdrv_co_drain_begin/end callbacks */
+> > -static void bdrv_drain_invoke(BlockDriverState *bs, bool begin)
+> > +static void bdrv_drain_invoke(BlockDriverState *bs, bool begin, bool recursive)
+> >  {
+> >      BdrvChild *child, *tmp;
+> >      BdrvCoDrainData data = { .bs = bs, .done = false, .begin = begin};
+> > @@ -172,8 +172,10 @@ static void bdrv_drain_invoke(BlockDriverState *bs, bool begin)
+> >      bdrv_coroutine_enter(bs, data.co);
+> >      BDRV_POLL_WHILE(bs, !data.done);
+> >  
+> > -    QLIST_FOREACH_SAFE(child, &bs->children, next, tmp) {
+> > -        bdrv_drain_invoke(child->bs, begin);
+> > +    if (recursive) {
+> > +        QLIST_FOREACH_SAFE(child, &bs->children, next, tmp) {
+> > +            bdrv_drain_invoke(child->bs, begin, true);
+> > +        }
+> >      }
+> >  }
+> >  
+> > @@ -265,7 +267,7 @@ void bdrv_drained_begin(BlockDriverState *bs)
+> >          bdrv_parent_drained_begin(bs);
+> >      }
+> >  
+> > -    bdrv_drain_invoke(bs, true);
+> > +    bdrv_drain_invoke(bs, true, false);
+> 
+> I'm not sure I understand this patch. If we call bdrv_drained_begin on a quorum
+> BDS that has a QED child, we do want to call bdrv_qed_co_drain_begin() on the
+> child, don't we? I think after this patch, we don't do that any more?
+> 
+> The same question arises when I look at throttle_co_drain_begin()..
+
+We don't increase bs->quiesce_counter for child nodes and don't notify
+their parents, so they aren't really drained. Calling the BlcokDriver
+callbacks is the only thing we did recursively. We should do one thing
+consistently, and for bdrv_drained_begin/end() that is draining a single
+node without the children.
+
+Later in the series, I introduce a bdrv_subtree_drained_begin/end()
+which doesn't only call the callbacks recursively, but also increases
+bs->quiesce_counter etc. so that the child nodes are actually drained.
+
+There are use cases for both functions.
+
+Kevin
