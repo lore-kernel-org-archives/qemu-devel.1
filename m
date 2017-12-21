@@ -1,28 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42967)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45336)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1eS1EL-0000RW-5v
-	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 08:49:50 -0500
+	(envelope-from <kbastian@mail.uni-paderborn.de>) id 1eS1Gp-0001pi-Tq
+	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 08:52:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1eS1EK-0006qe-Bb
-	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 08:49:49 -0500
-Received: from mail-wm0-x243.google.com ([2a00:1450:400c:c09::243]:39529)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1eS1EK-0006pX-5e
-	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 08:49:48 -0500
-Received: by mail-wm0-x243.google.com with SMTP id i11so15888543wmf.4
-	for <qemu-devel@nongnu.org>; Thu, 21 Dec 2017 05:49:48 -0800 (PST)
+	(envelope-from <kbastian@mail.uni-paderborn.de>) id 1eS1Gm-0000iL-Jb
+	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 08:52:23 -0500
+Received: from mail.uni-paderborn.de ([131.234.142.9]:33542)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kbastian@mail.uni-paderborn.de>)
+	id 1eS1Gm-0000ga-8i
+	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 08:52:20 -0500
+References: <20171220002941.14560-1-palmer@dabbelt.com>
+From: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
+Message-ID: <345662bb-caee-3d5f-3494-900d9becfbcc@mail.uni-paderborn.de>
+Date: Thu, 21 Dec 2017 14:49:56 +0100
 MIME-Version: 1.0
-In-Reply-To: <20171221132717.30284-2-berrange@redhat.com>
-References: <20171221132717.30284-1-berrange@redhat.com>
-	<20171221132717.30284-2-berrange@redhat.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Thu, 21 Dec 2017 14:49:46 +0100
-Message-ID: <CAJ+F1CLcAPRTG3iEoe_j5R_XkLNz8_R+_cX6Az+qFLHG-h4Uog@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v1 1/2] io: move fd_is_socket() into common
- sockets code
+In-Reply-To: <20171220002941.14560-1-palmer@dabbelt.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] linux-user: Implement renameat2 when
+ defined
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,93 +29,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>
-Cc: QEMU <qemu-devel@nongnu.org>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: Palmer Dabbelt <palmer@dabbelt.com>, qemu-devel@nongnu.org
+Cc: Palmer Dabbelt <palmer@sifive.com>, Michael Clark <mjc@sifive.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>, Riku Voipio <riku.voipio@iki.fi>
 
-Hi
+On 12/20/2017 01:29 AM, Palmer Dabbelt wrote:
+> From: Palmer Dabbelt <palmer@sifive.com>
+> 
+> The RISC-V Linux port was recently accept upstream and will be released
+> as part of 4.15.  While working on our glibc port I discovered that
+> qemu's user-mode emulation doesn't support renameat2, which has replaced
+> rename as part of the default system call list for new architectures.
+> Since a bunch of commonly used functionality boils down to rename (and
+> now renameat2), we ended up with many failures.
+> 
+> This patch adds support for renameat2.  As I'm not familiar with QEMU
+> development, I haven't really testing anything more than a simple
+> "./configure; make" on the upstream codebase, but I did test this
+> against our (not yet upstream) QEMU port where it appears to work for
+> me.  I've just cobbled it together by copying the existing renameat
+> implementation, but as there appears to be no glibc wrapper for
+> renameat2 on either of the systems I've tried this on I just emited the
+> system call directly.
+> 
 
-On Thu, Dec 21, 2017 at 2:27 PM, Daniel P. Berrange <berrange@redhat.com> w=
-rote:
-> The fd_is_socket() helper method is useful in a few places, so put it in
-> the common sockets code.
->
-> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+CC'ed linux-user maintainer Riku Voipio.
 
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-
-
-> ---
->  include/qemu/sockets.h |  1 +
->  io/channel-util.c      | 13 -------------
->  util/qemu-sockets.c    | 13 +++++++++++++
->  3 files changed, 14 insertions(+), 13 deletions(-)
->
-> diff --git a/include/qemu/sockets.h b/include/qemu/sockets.h
-> index 4f7311b52a..5680880f5a 100644
-> --- a/include/qemu/sockets.h
-> +++ b/include/qemu/sockets.h
-> @@ -12,6 +12,7 @@ int inet_aton(const char *cp, struct in_addr *ia);
->  #include "qapi-types.h"
->
->  /* misc helpers */
-> +bool fd_is_socket(int fd);
->  int qemu_socket(int domain, int type, int protocol);
->  int qemu_accept(int s, struct sockaddr *addr, socklen_t *addrlen);
->  int socket_set_cork(int fd, int v);
-> diff --git a/io/channel-util.c b/io/channel-util.c
-> index 0fb4bd0837..423d79845a 100644
-> --- a/io/channel-util.c
-> +++ b/io/channel-util.c
-> @@ -24,19 +24,6 @@
->  #include "io/channel-socket.h"
->
->
-> -static bool fd_is_socket(int fd)
-> -{
-> -    int optval;
-> -    socklen_t optlen;
-> -    optlen =3D sizeof(optval);
-> -    return qemu_getsockopt(fd,
-> -                           SOL_SOCKET,
-> -                           SO_TYPE,
-> -                           (char *)&optval,
-> -                           &optlen) =3D=3D 0;
-> -}
-> -
-> -
->  QIOChannel *qio_channel_new_fd(int fd,
->                                 Error **errp)
->  {
-> diff --git a/util/qemu-sockets.c b/util/qemu-sockets.c
-> index af4f01211a..1d23f0b742 100644
-> --- a/util/qemu-sockets.c
-> +++ b/util/qemu-sockets.c
-> @@ -91,6 +91,19 @@ NetworkAddressFamily inet_netfamily(int family)
->      return NETWORK_ADDRESS_FAMILY_UNKNOWN;
->  }
->
-> +bool fd_is_socket(int fd)
-> +{
-> +    int optval;
-> +    socklen_t optlen;
-> +    optlen =3D sizeof(optval);
-> +    return qemu_getsockopt(fd,
-> +                           SOL_SOCKET,
-> +                           SO_TYPE,
-> +                           (char *)&optval,
-> +                           &optlen) =3D=3D 0;
-> +}
-> +
-> +
->  /*
->   * Matrix we're trying to apply
->   *
-> --
-> 2.14.3
->
->
-
-
-
---=20
-Marc-Andr=C3=A9 Lureau
+Cheers,
+Bastian
