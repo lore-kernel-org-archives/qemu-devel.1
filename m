@@ -1,33 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37852)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59687)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jbaron@akamai.com>) id 1eS6k4-0002O4-Pr
-	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 14:42:58 -0500
+	(envelope-from <eblake@redhat.com>) id 1eS7AL-0003s3-Sm
+	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 15:10:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jbaron@akamai.com>) id 1eS6k1-0002ad-CK
-	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 14:42:56 -0500
-Received: from mx0a-00190b01.pphosted.com ([2620:100:9001:583::1]:51890)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jbaron@akamai.com>) id 1eS6k1-0002ZR-2D
-	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 14:42:53 -0500
-References: <cover.1513278334.git.jbaron@akamai.com>
-	<cover.1513278334.git.jbaron@akamai.com>
-	<1513280073-27515-1-git-send-email-jbaron@akamai.com>
-	<C5089512-91B2-439E-B22D-D7D416BDD558@redhat.com>
-	<9d600f3d-7e8d-153f-fd34-704c9975099b@akamai.com>
-	<21A64922-D22E-4AE1-8B4C-B0D85357240C@redhat.com>
-	<73e8811d-70fd-4920-1cb4-ad1809ebff82@akamai.com>
-	<20171220162927-mutt-send-email-mst@kernel.org>
-	<F096C867-C75B-4756-B4F6-9774DDF2FC8B@redhat.com>
-From: Jason Baron <jbaron@akamai.com>
-Message-ID: <c12c5c83-cc73-844f-2c37-3a4c364d4dd6@akamai.com>
-Date: Thu, 21 Dec 2017 14:42:48 -0500
+	(envelope-from <eblake@redhat.com>) id 1eS7AI-0007ww-Ng
+	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 15:10:05 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:59912)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1eS7AI-0007wa-Gq
+	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 15:10:02 -0500
+References: <0B44C3E6-545D-43B1-B124-97BB9D84BA0C@gmail.com>
+	<8bf902fe-1ec9-4845-a072-af2e7da32ed2@redhat.com>
+	<29E7CA81-A379-4B37-B174-20EACDEA5E79@gmail.com>
+	<0e51a7c4-34b1-7b14-c2be-e21e81e6e7fc@redhat.com>
+	<9F278FF6-8D20-45FC-88B9-64E6F47A2C98@gmail.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <5ecea600-77b2-ecd7-faca-fc4c29994a83@redhat.com>
+Date: Thu, 21 Dec 2017 14:09:59 -0600
 MIME-Version: 1.0
-In-Reply-To: <F096C867-C75B-4756-B4F6-9774DDF2FC8B@redhat.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <9F278FF6-8D20-45FC-88B9-64E6F47A2C98@gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 2/2] qemu: add linkspeed and duplex setting
- to virtio-net
+Subject: Re: [Qemu-devel] About my strnlen patch
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,216 +31,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Yan Vugenfirer <yvugenfi@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
-Cc: jasowang@redhat.com, qemu-devel@nongnu.org, linux-kernel@vger.kernel.org
+To: Programmingkid <programmingkidx@gmail.com>
+Cc: David Gibson <david@gibson.dropbear.id.au>, QEMU Developers <qemu-devel@nongnu.org>
 
-
-
-On 12/20/2017 09:33 AM, Yan Vugenfirer wrote:
+On 12/21/2017 01:07 PM, Programmingkid wrote:
 > 
->> On 20 Dec 2017, at 16:31, Michael S. Tsirkin <mst@redhat.com> wrote:
+>> On Dec 21, 2017, at 1:40 PM, Eric Blake <eblake@redhat.com> wrote:
 >>
->> On Tue, Dec 19, 2017 at 11:52:39AM -0500, Jason Baron wrote:
->>>
->>>
->>> On 12/19/2017 04:19 AM, Yan Vugenfirer wrote:
+>> On 12/21/2017 12:36 PM, Programmingkid wrote:
+>>>> On Dec 21, 2017, at 1:30 PM, Eric Blake <eblake@redhat.com> wrote:
 >>>>
->>>>> On 18 Dec 2017, at 18:04, Jason Baron via Qemu-devel
->>>>> <qemu-devel@nongnu.org <mailto:qemu-devel@nongnu.org>> wrote:
->>>>>
->>>>>
->>>>>
->>>>> On 12/18/2017 06:34 AM, Yan Vugenfirer wrote:
->>>>>>
->>>>>>> On 14 Dec 2017, at 21:33, Jason Baron via Qemu-devel
->>>>>>> <qemu-devel@nongnu.org <mailto:qemu-devel@nongnu.org>> wrote:
->>>>>>>
->>>>>>> Although they can be currently set in linux via 'ethtool -s', this
->>>>>>> requires
->>>>>>> guest changes, and thus it would be nice to extend this
->>>>>>> functionality such
->>>>>>> that it can be configured automatically from the host (as other network
->>>>>>> do).
->>>>>>>
->>>>>>> Linkspeed and duplex settings can be set as:
->>>>>>> '-device virtio-net,speed=10000,duplex=full'
->>>>>>>
->>>>>>> where speed is [-1...INT_MAX], and duplex is ["half"|"full"].
->>>>>>>
->>>>>>> Signed-off-by: Jason Baron <jbaron@akamai.com
->>>>>>> <mailto:jbaron@akamai.com>>
->>>>>>> Cc: "Michael S. Tsirkin" <mst@redhat.com <mailto:mst@redhat.com>>
->>>>>>> Cc: Jason Wang <jasowang@redhat.com <mailto:jasowang@redhat.com>>
->>>>>>> ---
->>>>>>> hw/net/virtio-net.c                         | 29
->>>>>>> +++++++++++++++++++++++++++++
->>>>>>> include/hw/virtio/virtio-net.h              |  3 +++
->>>>>>> include/standard-headers/linux/virtio_net.h |  4 ++++
->>>>>>> 3 files changed, 36 insertions(+)
->>>>>>>
->>>>>>> diff --git a/hw/net/virtio-net.c b/hw/net/virtio-net.c
->>>>>>> index 38674b0..d63e790 100644
->>>>>>> --- a/hw/net/virtio-net.c
->>>>>>> +++ b/hw/net/virtio-net.c
->>>>>>> @@ -40,6 +40,12 @@
->>>>>>> #define VIRTIO_NET_RX_QUEUE_MIN_SIZE VIRTIO_NET_RX_QUEUE_DEFAULT_SIZE
->>>>>>> #define VIRTIO_NET_TX_QUEUE_MIN_SIZE VIRTIO_NET_TX_QUEUE_DEFAULT_SIZE
->>>>>>>
->>>>>>> +/* duplex and speed defines */
->>>>>>> +#define DUPLEX_UNKNOWN          0xff
->>>>>>> +#define DUPLEX_HALF             0x00
->>>>>>> +#define DUPLEX_FULL             0x01
->>>>>>> +#define SPEED_UNKNOWN           -1
->>>>>>> +
->>>>>>> /*
->>>>>>> * Calculate the number of bytes up to and including the given 'field' of
->>>>>>> * 'container'.
->>>>>>> @@ -61,6 +67,8 @@ static VirtIOFeature feature_sizes[] = {
->>>>>>>     .end = endof(struct virtio_net_config, max_virtqueue_pairs)},
->>>>>>>    {.flags = 1 << VIRTIO_NET_F_MTU,
->>>>>>>     .end = endof(struct virtio_net_config, mtu)},
->>>>>>> +    {.flags = 1 << VIRTIO_NET_F_SPEED_DUPLEX,
->>>>>>> +     .end = endof(struct virtio_net_config, duplex)},
->>>>>>>    {}
->>>>>>> };
->>>>>>>
->>>>>>> @@ -88,6 +96,8 @@ static void virtio_net_get_config(VirtIODevice
->>>>>>> *vdev, uint8_t *config)
->>>>>>>    virtio_stw_p(vdev, &netcfg.status, n->status);
->>>>>>>    virtio_stw_p(vdev, &netcfg.max_virtqueue_pairs, n->max_queues);
->>>>>>>    virtio_stw_p(vdev, &netcfg.mtu, n->net_conf.mtu);
->>>>>>> +    virtio_stl_p(vdev, &netcfg.speed, n->net_conf.speed);
->>>>>>> +    netcfg.duplex = n->net_conf.duplex;
->>>>>>>    memcpy(netcfg.mac, n->mac, ETH_ALEN);
->>>>>>>    memcpy(config, &netcfg, n->config_size);
->>>>>>> }
->>>>>>> @@ -1941,6 +1951,23 @@ static void
->>>>>>> virtio_net_device_realize(DeviceState *dev, Error **errp)
->>>>>>>        n->host_features |= (0x1 << VIRTIO_NET_F_MTU);
->>>>>>>    }
->>>>>>>
->>>>>>> +    n->host_features |= (0x1 << VIRTIO_NET_F_SPEED_DUPLEX);
->>>>>>> +    if (n->net_conf.duplex_str) {
->>>>>>> +        if (strncmp(n->net_conf.duplex_str, "half", 5) == 0) {
->>>>>>> +            n->net_conf.duplex = DUPLEX_HALF;
->>>>>>> +        } else if (strncmp(n->net_conf.duplex_str, "full", 5) == 0) {
->>>>>>> +            n->net_conf.duplex = DUPLEX_FULL;
->>>>>>> +        } else {
->>>>>>> +            error_setg(errp, "'duplex' must be 'half' or 'full'");
->>>>>>> +        }
->>>>>>> +    } else {
->>>>>>> +        n->net_conf.duplex = DUPLEX_UNKNOWN;
->>>>>>> +    }
->>>>>>> +    if (n->net_conf.speed < SPEED_UNKNOWN) {
->>>>>>> +            error_setg(errp, "'speed' must be between -1
->>>>>>> (SPEED_UNKOWN) and "
->>>>>>> +                       "INT_MAX");
->>>>>>> +    }
->>>>>>> +
->>>>>>>    virtio_net_set_config_size(n, n->host_features);
->>>>>>>    virtio_init(vdev, "virtio-net", VIRTIO_ID_NET, n->config_size);
->>>>>>>
->>>>>>> @@ -2160,6 +2187,8 @@ static Property virtio_net_properties[] = {
->>>>>>>    DEFINE_PROP_UINT16("host_mtu", VirtIONet, net_conf.mtu, 0),
->>>>>>>    DEFINE_PROP_BOOL("x-mtu-bypass-backend", VirtIONet,
->>>>>>> mtu_bypass_backend,
->>>>>>>                     true),
->>>>>>> +    DEFINE_PROP_INT32("speed", VirtIONet, net_conf.speed,
->>>>>>> SPEED_UNKNOWN),
->>>>>>
->>>>>> From Windows guest perspective I prefer to have some reasonable
->>>>>> default (10G for example). 
->>>>>
->>>>>
->>>>> hmmm, I didn't want to change/set the default here in case it broke
->>>>> something, but I'm ok setting it to some 'reasonable' value - (10G and
->>>>> duplex?), if the consensus is that that would be safe.
+>>>> On 12/21/2017 08:31 AM, Programmingkid wrote:
+>>>>> Now would be a good time to push the strnlen patch.
 >>>>
->>>> OK from my side.
->>>> Thanks.
->>>
->>> I presume your speaking for windows - i'm wondering if under linux the
->>> virtio device suddenly start showing up as duplex, 10Gbps, will that
->>> break anything? I can speak for the use-cases we have here and that
->>> would certainly be fine for us, but i'm really not sure if that is ok
->>> more generally.
->>>
->>> Thanks,
->>>
->>> -Jason
+>>>> No links to the patch? Generally, when pinging a patch, it's best to reply to the existing thread, or at least provide a URL to the thread, where the patch was proposed.
+>>>>
+>>> Yes here is the patch: https://patchwork.kernel.org/patch/10027375/
 >>
->> How about not enabling the flag unless the user specified the speed?
->> This way we also do not need an "unknown" value.
+>> And that link says it was applied to libfdt on Oct 25.  What still needs to happen that caused you to send this ping?
 > 
-> This is even better.
+> It isn't available in QEMU yet. Without the patch building QEMU on Mac OS 10.6 fails.
 > 
-We may still want "unknown" here as a setting, because otherwise we
-can't support dynamically changing the speed later (if we added say a
-qmp monitor command), because the flag would not have been set.
-
-So I am ok with the 10Gps and full duplex defaults, if at least one of
-'speed=' or 'duplex=' is supplied, but I would prefer to leave the
-"unknown" values as a setting (to still potentially allow dynamic
-updates in this case).
-
-Thanks,
-
--Jason
-
->>
->>>>
->>>>>
->>>>> Thanks,
->>>>>
->>>>> -Jason
->>>>>
->>>>>>
->>>>>> Thanks,
->>>>>> Yan.
->>>>>>
->>>>>>> +    DEFINE_PROP_STRING("duplex", VirtIONet, net_conf.duplex_str),
->>>>>>>    DEFINE_PROP_END_OF_LIST(),
->>>>>>> };
->>>>>>>
->>>>>>> diff --git a/include/hw/virtio/virtio-net.h
->>>>>>> b/include/hw/virtio/virtio-net.h
->>>>>>> index b81b6a4..af74a94 100644
->>>>>>> --- a/include/hw/virtio/virtio-net.h
->>>>>>> +++ b/include/hw/virtio/virtio-net.h
->>>>>>> @@ -38,6 +38,9 @@ typedef struct virtio_net_conf
->>>>>>>    uint16_t rx_queue_size;
->>>>>>>    uint16_t tx_queue_size;
->>>>>>>    uint16_t mtu;
->>>>>>> +    int32_t speed;
->>>>>>> +    char *duplex_str;
->>>>>>> +    uint8_t duplex;
->>>>>>> } virtio_net_conf;
->>>>>>>
->>>>>>> /* Maximum packet size we can receive from tap device: header + 64k */
->>>>>>> diff --git a/include/standard-headers/linux/virtio_net.h
->>>>>>> b/include/standard-headers/linux/virtio_net.h
->>>>>>> index 30ff249..0ff1447 100644
->>>>>>> --- a/include/standard-headers/linux/virtio_net.h
->>>>>>> +++ b/include/standard-headers/linux/virtio_net.h
->>>>>>> @@ -36,6 +36,7 @@
->>>>>>> #define VIRTIO_NET_F_GUEST_CSUM1/* Guest handles pkts w/ partial csum */
->>>>>>> #define VIRTIO_NET_F_CTRL_GUEST_OFFLOADS 2 /* Dynamic offload
->>>>>>> configuration. */
->>>>>>> #define VIRTIO_NET_F_MTU3/* Initial MTU advice */
->>>>>>> +#define VIRTIO_NET_F_SPEED_DUPLEX 4/* Host set linkspeed and duplex */
->>>>>>> #define VIRTIO_NET_F_MAC5/* Host has given MAC address. */
->>>>>>> #define VIRTIO_NET_F_GUEST_TSO47/* Guest can handle TSOv4 in. */
->>>>>>> #define VIRTIO_NET_F_GUEST_TSO68/* Guest can handle TSOv6 in. */
->>>>>>> @@ -76,6 +77,9 @@ struct virtio_net_config {
->>>>>>> uint16_t max_virtqueue_pairs;
->>>>>>> /* Default maximum transmit unit advice */
->>>>>>> uint16_t mtu;
->>>>>>> +/* Host exported linkspeed and duplex */
->>>>>>> +uint32_t speed;
->>>>>>> +uint8_t duplex;
->>>>>>> } QEMU_PACKED;
->>>>>>>
->>>>>>> /*
->>>>>>> -- 
->>>>>>> 2.6.1
+> The patch'ed code would be found here: <qemu folder>/dtc/libfdt/libfdt_env.h.
 > 
+> I can check on the patch's status by deleting the dtc folder and retrieve it again using this command:
+> $ scripts/git-submodule.sh dtc
+
+In other words, for qemu, you are proposing a patch to update the dtc 
+submodule to a newer commit id.  Instead of describing that in words, 
+it's better to post an actual patch, such as this, which updates to the 
+latest dtc commit available as of my email:
+
+diff --git i/dtc w/dtc
+index 558cd81bdd..e671852042 160000
+--- i/dtc
++++ w/dtc
+@@ -1 +1 @@
+-Subproject commit 558cd81bdd432769b59bff01240c44f82cfb1a9d
++Subproject commit e671852042a77b15ec72ca908291c7d647e4fb01
+
+Create such a patch by: 'cd dtc; git pull; git merge origin; cd ..; git 
+add dtc'.  However, pointing the dtc submodule to a commit in-between 
+releases may not be desirable; your commit landed in dtc as commit 
+c8f8194d, missing v1.4.5 (qemu.git is currently pointing to v1.4.4).  As 
+I'm not the maintainer of the dtc submodule, I don't know the preferred 
+submodule update procedure; it may mean that you have to wait for 
+upstream dtc to release v1.4.6 before qemu.git can be updated to point 
+to a dtc version that includes your commit.
+
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
