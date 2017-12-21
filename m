@@ -1,30 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39437)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40761)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1eS7jn-00020V-Kg
-	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 15:46:44 -0500
+	(envelope-from <laurent@vivier.eu>) id 1eS7le-00039R-Mm
+	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 15:48:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1eS7jj-0001WC-O9
-	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 15:46:43 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:45262)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1eS7jj-0001VM-Id
-	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 15:46:39 -0500
-Date: Thu, 21 Dec 2017 22:46:35 +0200
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20171221224323-mutt-send-email-mst@kernel.org>
-References: <20171217125457.3429-1-marcel@redhat.com>
-	<20171219194951-mutt-send-email-mst@kernel.org>
-	<77710384-30d0-cb76-9dbc-6195b831f050@redhat.com>
-	<20171220200550-mutt-send-email-mst@kernel.org>
-	<20171221072750.GC2931@yuvallap>
-	<20171221162200-mutt-send-email-mst@kernel.org>
-	<69d67108-448d-51af-c6d7-46d2054b00a5@redhat.com>
+	(envelope-from <laurent@vivier.eu>) id 1eS7la-0003N3-Py
+	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 15:48:38 -0500
+Received: from mout.kundenserver.de ([212.227.126.131]:56925)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1eS7la-0003MV-Dj
+	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 15:48:34 -0500
+From: Laurent Vivier <laurent@vivier.eu>
+References: <151388621863.99.14752373861605263949@5adcb62bf0d6>
+	<f6153d1a-d163-a4e1-8e6c-30d3735ac5a7@vivier.eu>
+Message-ID: <d6786114-0636-cf4f-f30f-cb03d2aae00f@vivier.eu>
+Date: Thu, 21 Dec 2017 21:48:24 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <69d67108-448d-51af-c6d7-46d2054b00a5@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH V2 0/5] hw/pvrdma: PVRDMA device
- implementation
+In-Reply-To: <f6153d1a-d163-a4e1-8e6c-30d3735ac5a7@vivier.eu>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PULL 0/5] M68k for 2.12 patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,51 +28,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Marcel Apfelbaum <marcel@redhat.com>
-Cc: Yuval Shaia <yuval.shaia@oracle.com>, qemu-devel@nongnu.org, ehabkost@redhat.com, imammedo@redhat.com, pbonzini@redhat.com
+To: qemu-devel@nongnu.org
+Cc: famz@redhat.com, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
 
-On Thu, Dec 21, 2017 at 05:59:38PM +0200, Marcel Apfelbaum wrote:
-> On 21/12/2017 16:22, Michael S. Tsirkin wrote:
-> > On Thu, Dec 21, 2017 at 09:27:51AM +0200, Yuval Shaia wrote:
-> > > > > 
-> > > > > > What happens if guest attempts to register all its memory?
-> > > > > > 
-> > > > > 
-> > > > > Then we loose, is not different from bare metal, reg_mr will pin all the RAM.
-> > > > 
-> > > > We need to find a way to communicate to guests about amount
-> > > > of memory they can pin.
-> > > 
-> > > dev_caps.max_mr_size is the way device limits guest driver.
-> > > This value is controlled by the command line argument dev-caps-max-mr-size
-> > > so we should be fine (btw, default value is 1<<32).
-> > 
-> > Isn't that still leaving the option for guest to register all memory,
-> > just in chunks?
-> > 
+Le 21/12/2017 à 21:27, Laurent Vivier a écrit :
+> Le 21/12/2017 à 20:57, no-reply@patchew.org a écrit :
+>> Hi,
+>>
+>> This series failed automatic build test. Please find the testing commands and
+>> their output below. If you have docker installed, you can probably reproduce it
+>> locally.
+>>
+>> Type: series
+>> Message-id: 20171221193640.27418-1-laurent@vivier.eu
+>> Subject: [Qemu-devel] [PULL 0/5] M68k for 2.12 patches
+>>
+> ...
+>> Configure options:
+>> --enable-werror --target-list=x86_64-softmmu,aarch64-softmmu --prefix=/tmp/qemu-test/install --cross-prefix=x86_64-w64-mingw32- --enable-trace-backends=simple --enable-debug --enable-gnutls --enable-nettle --enable-curl --enable-vnc --enable-bzip2 --enable-guest-agent --with-sdlabi=1.2 --with-gtkabi=2.0
+> ...
+>> /tmp/qemu-test/src/hw/i386/vmport.c: In function 'vmport_ioport_read':
+>> /tmp/qemu-test/src/hw/i386/vmport.c:81:9: error: implicit declaration of function 'qemu_log_mask' [-Werror=implicit-function-declaration]
+>>          qemu_log_mask(LOG_UNIMP, "vmport: unknown command %x\n", command);
+>>          ^~~~~~~~~~~~~
+>> /tmp/qemu-test/src/hw/i386/vmport.c:81:9: error: nested extern declaration of 'qemu_log_mask' [-Werror=nested-externs]
+>> /tmp/qemu-test/src/hw/i386/vmport.c:81:23: error: 'LOG_UNIMP' undeclared (first use in this function)
+>>          qemu_log_mask(LOG_UNIMP, "vmport: unknown command %x\n", command);
+>>                        ^~~~~~~~~
+>> /tmp/qemu-test/src/hw/i386/vmport.c:81:23: note: each undeclared identifier is reported only once for each function it appears in
+>> cc1: all warnings being treated as errors
+>> make[1]: *** [hw/i386/vmport.o] Error 1
+>> make[1]: *** Waiting for unfinished jobs....
 > 
-> We also have a parameter limiting the number of mrs (dev-caps-max-mr),
-> together with dev-caps-max-mr-size we can limit the memory the guests can pin.
+> Looks like a patch from Paolo's pull is breaking the build:
 > 
-> Thanks,
-> Marcel
+> commit 7299e1a411de99761a4260e44b4f1cf2e4e126ef
+> Author: Philippe Mathieu-Daudé <f4bug@amsat.org>
+> Date:   Fri Dec 15 00:43:55 2017 -0300
+> 
+>     hw/i386/vmport: replace fprintf() by trace events or LOG_UNIMP
+> 
+>     Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+>     Message-Id: <20171215034356.4449-2-f4bug@amsat.org>
+>     [Replace unknown command tracepoint with LOG_UNIMP, add
+>      generic tracepoint for vmport commands. - Paolo]
+>     Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 
-You might want to limit the default values then.
+This is fixed by:
 
-Right now:
+diff --git a/hw/i386/vmport.c b/hw/i386/vmport.c
+index 9b8c68806e..116aa09819 100644
+--- a/hw/i386/vmport.c
++++ b/hw/i386/vmport.c
+@@ -27,6 +27,7 @@
+ #include "hw/i386/pc.h"
+ #include "sysemu/hw_accel.h"
+ #include "hw/qdev.h"
++#include "qemu/log.h"
+ #include "trace.h"
 
-+#define MAX_MR_SIZE           (1UL << 32)
-+#define MAX_MR                2048
-
-Which is IIUC 8TB.
-
-That's pretty close to unlimited, and so far overcommit seems to be the
-main feature for users.
+ #define VMPORT_CMD_GETVERSION 0x0a
 
 
-> > > > 
-> > > > > However this is only one scenario, and hopefully not much used
-> > > > > for RoCE. (I know IPoIB does that, but it doesn't make sense to use it with RoCE).
-> > > > 
-> > > > SRP does it too AFAIK.
-> > > > 
+Laurent
