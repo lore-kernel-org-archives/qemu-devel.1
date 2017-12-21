@@ -1,22 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60852)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38778)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <linzhecheng@huawei.com>) id 1eRrYg-00047T-Bo
-	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 22:30:11 -0500
+	(envelope-from <eblake@redhat.com>) id 1eRreM-00066Y-Fz
+	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 22:36:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <linzhecheng@huawei.com>) id 1eRrYd-0007YV-2G
-	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 22:30:10 -0500
-Received: from szxga01-in.huawei.com ([45.249.212.187]:2361 helo=huawei.com)
+	(envelope-from <eblake@redhat.com>) id 1eRreJ-0003uz-7X
+	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 22:36:02 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:46910)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <linzhecheng@huawei.com>)
-	id 1eRrYc-0007RE-7T
-	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 22:30:06 -0500
-From: linzhecheng <linzhecheng@huawei.com>
-Date: Thu, 21 Dec 2017 03:29:47 +0000
-Message-ID: <D9DE8DBB19F2A24080482022C1DE758302C51EF0@dggemm509-mbx.china.huawei.com>
-Content-Language: zh-CN
-Content-Type: text/plain; charset="gb2312"
-Content-Transfer-Encoding: base64
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1eRreJ-0003uB-2A
+	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 22:35:59 -0500
+References: <D9DE8DBB19F2A24080482022C1DE758302C51EF0@dggemm509-mbx.china.huawei.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <0da086fe-8ba2-7e31-f9d4-f9e4422eedb8@redhat.com>
+Date: Wed, 20 Dec 2017 21:35:52 -0600
 MIME-Version: 1.0
+In-Reply-To: <D9DE8DBB19F2A24080482022C1DE758302C51EF0@dggemm509-mbx.china.huawei.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Subject: Re: [Qemu-devel] [PULL 02/46] qemu-thread: fix races on threads
  that exit very quickly
 List-Id: <qemu-devel.nongnu.org>
@@ -27,119 +28,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "famz@redhat.com" <famz@redhat.com>
+To: linzhecheng <linzhecheng@huawei.com>, Paolo Bonzini <pbonzini@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "famz@redhat.com" <famz@redhat.com>
 Cc: "wangxin (U)" <wangxinxin.wang@huawei.com>
 
-DQoNCj4gLS0tLS3Tyrz+1K28/i0tLS0tDQo+ILeivP7IyzogUGFvbG8gQm9uemluaSBbbWFpbHRv
-OnBhb2xvLmJvbnppbmlAZ21haWwuY29tXSC0+rHtIFBhb2xvIEJvbnppbmkNCj4gt6LLzcqxvOQ6
-IDIwMTfE6jEy1MIyMcjVIDE6MTQNCj4gytW8/sjLOiBxZW11LWRldmVsQG5vbmdudS5vcmcNCj4g
-s63LzTogbGluemhlY2hlbmcgPGxpbnpoZWNoZW5nQGh1YXdlaS5jb20+DQo+INb3zOI6IFtQVUxM
-IDAyLzQ2XSBxZW11LXRocmVhZDogZml4IHJhY2VzIG9uIHRocmVhZHMgdGhhdCBleGl0IHZlcnkg
-cXVpY2tseQ0KPiANCj4gRnJvbTogbGluemhlY2hlbmcgPGxpbnpoZWNoZW5nQGh1YXdlaS5jb20+
-DQo+IA0KPiBJZiB3ZSBjcmVhdGUgYSB0aHJlYWQgd2l0aCBRRU1VX1RIUkVBRF9ERVRBQ0hFRCBt
-b2RlLCBRRU1VIG1heSBnZXQgYQ0KPiBzZWdmYXVsdCB3aXRoIGxvdyBwcm9iYWJpbGl0eS4NCj4g
-DQo+IFRoZSBiYWNrdHJhY2UgaXM6DQo+ICAgICMwICAweDAwMDA3ZjQ2YzYwMjkxZDcgaW4gX19H
-SV9yYWlzZSAoc2lnPXNpZ0BlbnRyeT02KQ0KPiBhdCAuLi9ucHRsL3N5c2RlcHMvdW5peC9zeXN2
-L2xpbnV4L3JhaXNlLmM6NTYNCj4gICAgIzEgIDB4MDAwMDdmNDZjNjAyYThjOCBpbiBfX0dJX2Fi
-b3J0ICgpIGF0IGFib3J0LmM6OTANCj4gICAgIzIgIDB4MDAwMDAwMDAwMDg1NDNjOSBpbiBQQVRf
-YWJvcnQgKCkNCj4gICAgIzMgIDB4MDAwMDAwMDAwMDg1MTQwZCBpbiBwYXRjaElsbEluc0hhbmRs
-ZXIgKCkNCj4gICAgIzQgIDxzaWduYWwgaGFuZGxlciBjYWxsZWQ+DQo+ICAgICM1ICBwdGhyZWFk
-X2RldGFjaCAodGg9MTM5OTMzMDM3NjE0ODQ4KSBhdCBwdGhyZWFkX2RldGFjaC5jOjUwDQo+ICAg
-ICM2ICAweDAwMDAwMDAwMDA4Mjk3NTkgaW4gcWVtdV90aHJlYWRfY3JlYXRlDQo+ICh0aHJlYWQ9
-dGhyZWFkQGVudHJ5PTB4N2ZmZGFhODIwNWUwLCBuYW1lPW5hbWVAZW50cnk9MHg5NGQ5NGEgImlv
-LQ0KPiB0YXNrLXdvcmtlciIsIHN0YXJ0X3JvdXRpbmU9c3RhcnRfcm91dGluZUBlbnRyeT0weDdl
-YjlhMA0KPiA8cWlvX3Rhc2tfdGhyZWFkX3dvcmtlcj4sDQo+ICAgICAgICBhcmc9YXJnQGVudHJ5
-PTB4M2Y1Y2Y3MCwgbW9kZT1tb2RlQGVudHJ5PTEpIGF0DQo+IHV0aWwvcWVtdV90aHJlYWRfcG9z
-aXguYzo1MTINCj4gICAgIzcgIDB4MDAwMDAwMDAwMDdlYmM5NiBpbiBxaW9fdGFza19ydW5faW5f
-dGhyZWFkICh0YXNrPTB4MzFkYjJjMCwNCj4gd29ya2VyPXdvcmtlckBlbnRyeT0weDdlN2U0MCA8
-cWlvX2NoYW5uZWxfc29ja2V0X2Nvbm5lY3Rfd29ya2VyPiwNCj4gb3BhcXVlPTB4Y2QyMzM4MCwg
-ZGVzdHJveT0weDdmMTE4MCA8cWFwaV9mcmVlX1NvY2tldEFkZHJlc3M+KQ0KPiAgICAgICAgYXQg
-aW8vdGFzay5jOjE0MQ0KPiAgICAjOCAgMHgwMDAwMDAwMDAwN2U3ZjMzIGluIHFpb19jaGFubmVs
-X3NvY2tldF9jb25uZWN0X2FzeW5jDQo+IChpb2M9aW9jQGVudHJ5PTB4NjI2YzBiMCwgYWRkcj08
-b3B0aW1pemVkIG91dD4sDQo+IGNhbGxiYWNrPWNhbGxiYWNrQGVudHJ5PTB4NTVlMDgwIDxxZW11
-X2Nocl9zb2NrZXRfY29ubmVjdGVkPiwNCj4gb3BhcXVlPW9wYXF1ZUBlbnRyeT0weDQyODYyYzAs
-DQo+ICAgICAgICBkZXN0cm95PWRlc3Ryb3lAZW50cnk9MHgwKSBhdCBpby9jaGFubmVsX3NvY2tl
-dC5jOjE5NA0KPiAgICAjOSAgMHgwMDAwMDAwMDAwNTViZGQxIGluIHNvY2tldF9yZWNvbm5lY3Rf
-dGltZW91dCAob3BhcXVlPTB4NDI4NjJjMCkNCj4gYXQgcWVtdV9jaGFyLmM6NDc0NA0KPiAgICAj
-MTAgMHgwMDAwN2Y0NmM3MjQ4M2IzIGluIGdfdGltZW91dF9kaXNwYXRjaCAoKSBmcm9tIC91c3Iv
-bGliNjQvbGliZ2xpYi0NCj4gMi4wLnNvLjANCj4gICAgIzExIDB4MDAwMDdmNDZjNzI0Nzk5YSBp
-biBnX21haW5fY29udGV4dF9kaXNwYXRjaCAoKSBmcm9tDQo+IC91c3IvbGliNjQvbGliZ2xpYi0y
-LjAuc28uMA0KPiAgICAjMTIgMHgwMDAwMDAwMDAwNzZjNjQ2IGluIGdsaWJfcG9sbGZkc19wb2xs
-ICgpIGF0IG1haW5fbG9vcC5jOjIyOA0KPiAgICAjMTMgMHgwMDAwMDAwMDAwNzZjNmViIGluIG9z
-X2hvc3RfbWFpbl9sb29wX3dhaXQgKHRpbWVvdXQ9MzQ4MDAwMDAwKQ0KPiBhdCBtYWluX2xvb3Au
-YzoyNzMNCj4gICAgIzE0IDB4MDAwMDAwMDAwMDc2YzgxNSBpbiBtYWluX2xvb3Bfd2FpdA0KPiAo
-bm9uYmxvY2tpbmc9bm9uYmxvY2tpbmdAZW50cnk9MCkgYXQgbWFpbl9sb29wLmM6NTIxDQo+ICAg
-ICMxNSAweDAwMDAwMDAwMDA1NmE1MTEgaW4gbWFpbl9sb29wICgpIGF0IHZsLmM6MjA3Ng0KPiAg
-ICAjMTYgMHgwMDAwMDAwMDAwNDIwNzA1IGluIG1haW4gKGFyZ2M9PG9wdGltaXplZCBvdXQ+LCBh
-cmd2PTxvcHRpbWl6ZWQNCj4gb3V0PiwgZW52cD08b3B0aW1pemVkIG91dD4pIGF0IHZsLmM6NDk0
-MA0KPiANCj4gVGhlIGNhdXNlIG9mIHRoaXMgcHJvYmxlbSBpcyBhIGdsaWJjIGJ1ZzsgZm9yIG1v
-cmUgaW5mb3JtYXRpb24sIHNlZQ0KPiBodHRwczovL3NvdXJjZXdhcmUub3JnL2J1Z3ppbGxhL3No
-b3dfYnVnLmNnaT9pZD0xOTk1MS4NCj4gVGhlIHNvbHV0aW9uIGZvciB0aGlzIGJ1ZyBpcyB0byB1
-c2UgcHRocmVhZF9hdHRyX3NldGRldGFjaHN0YXRlLg0KPiANCj4gVGhlcmUgaXMgYSBzaW1pbGFy
-IGlzc3VlIHdpdGggcHRocmVhZF9zZXRuYW1lX25wLCB3aGljaCBpcyBtb3ZlZCBmcm9tDQo+IGNy
-ZWF0aW5nIHRocmVhZCB0byBjcmVhdGVkIHRocmVhZC4NCj4gDQo+IFNpZ25lZC1vZmYtYnk6IGxp
-bnpoZWNoZW5nIDxsaW56aGVjaGVuZ0BodWF3ZWkuY29tPg0KPiBNZXNzYWdlLUlkOiA8MjAxNzEx
-MjgwNDQ2NTYuMTA1OTItMS1saW56aGVjaGVuZ0BodWF3ZWkuY29tPg0KPiBSZXZpZXdlZC1ieTog
-RmFtIFpoZW5nIDxmYW16QHJlZGhhdC5jb20+IFtTaW1wbGlmeSB0aGUgY29kZSBieSByZW1vdmlu
-Zw0KPiBxZW11X3RocmVhZF9zZXRfbmFtZSwgYW5kIGZyZWUgdGhlIGFyZ3VtZW50cyAgYmVmb3Jl
-IGludm9raW5nIHRoZSBzdGFydA0KPiByb3V0aW5lLiAtIFBhb2xvXQ0KPiBTaWduZWQtb2ZmLWJ5
-OiBQYW9sbyBCb256aW5pIDxwYm9uemluaUByZWRoYXQuY29tPg0KPiAtLS0NCj4gIHV0aWwvcWVt
-dS10aHJlYWQtcG9zaXguYyB8IDU5ICsrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKyst
-LS0tLS0tLS0NCj4gLS0tLS0NCj4gIDEgZmlsZSBjaGFuZ2VkLCA0MiBpbnNlcnRpb25zKCspLCAx
-NyBkZWxldGlvbnMoLSkNCj4gDQo+IGRpZmYgLS1naXQgYS91dGlsL3FlbXUtdGhyZWFkLXBvc2l4
-LmMgYi91dGlsL3FlbXUtdGhyZWFkLXBvc2l4LmMgaW5kZXgNCj4gNzMwNjQ3NS4uZmNkMzY5YiAx
-MDA2NDQNCj4gLS0tIGEvdXRpbC9xZW11LXRocmVhZC1wb3NpeC5jDQo+ICsrKyBiL3V0aWwvcWVt
-dS10aHJlYWQtcG9zaXguYw0KPiBAQCAtNDc5LDE1ICs0NzksMjkgQEAgc3RhdGljIHZvaWQgX19h
-dHRyaWJ1dGVfXygoY29uc3RydWN0b3IpKQ0KPiBxZW11X3RocmVhZF9hdGV4aXRfaW5pdCh2b2lk
-KSAgfQ0KPiANCj4gDQo+IC0vKiBBdHRlbXB0IHRvIHNldCB0aGUgdGhyZWFkcyBuYW1lOyBub3Rl
-IHRoYXQgdGhpcyBpcyBmb3IgZGVidWcsIHNvDQo+IC0gKiB3ZSdyZSBub3QgZ29pbmcgdG8gZmFp
-bCBpZiB3ZSBjYW4ndCBzZXQgaXQuDQo+IC0gKi8NCj4gLXN0YXRpYyB2b2lkIHFlbXVfdGhyZWFk
-X3NldF9uYW1lKFFlbXVUaHJlYWQgKnRocmVhZCwgY29uc3QgY2hhciAqbmFtZSkgLQ0KPiB7ICAj
-aWZkZWYgQ09ORklHX1BUSFJFQURfU0VUTkFNRV9OUA0KPiAtICAgIHB0aHJlYWRfc2V0bmFtZV9u
-cCh0aHJlYWQtPnRocmVhZCwgbmFtZSk7DQo+IC0jZW5kaWYNCj4gK3R5cGVkZWYgc3RydWN0IHsN
-Cj4gKyAgICB2b2lkICooKnN0YXJ0X3JvdXRpbmUpKHZvaWQgKik7DQo+ICsgICAgdm9pZCAqYXJn
-Ow0KPiArICAgIGNoYXIgKm5hbWU7DQo+ICt9IFFlbXVUaHJlYWRBcmdzOw0KPiArDQo+ICtzdGF0
-aWMgdm9pZCAqcWVtdV90aHJlYWRfc3RhcnQodm9pZCAqYXJncykgew0KPiArICAgIFFlbXVUaHJl
-YWRBcmdzICpxZW11X3RocmVhZF9hcmdzID0gYXJnczsNCj4gKyAgICB2b2lkICooKnN0YXJ0X3Jv
-dXRpbmUpKHZvaWQgKikgPSBxZW11X3RocmVhZF9hcmdzLT5zdGFydF9yb3V0aW5lOw0KPiArICAg
-IHZvaWQgKmFyZyA9IHFlbXVfdGhyZWFkX2FyZ3MtPmFyZzsNCj4gKw0KPiArICAgIC8qIEF0dGVt
-cHQgdG8gc2V0IHRoZSB0aHJlYWRzIG5hbWU7IG5vdGUgdGhhdCB0aGlzIGlzIGZvciBkZWJ1Zywg
-c28NCj4gKyAgICAgKiB3ZSdyZSBub3QgZ29pbmcgdG8gZmFpbCBpZiB3ZSBjYW4ndCBzZXQgaXQu
-DQo+ICsgICAgICovDQo+ICsgICAgcHRocmVhZF9zZXRuYW1lX25wKHB0aHJlYWRfc2VsZigpLCBx
-ZW11X3RocmVhZF9hcmdzLT5uYW1lKTsNCj4gKyAgICBnX2ZyZWUocWVtdV90aHJlYWRfYXJncy0+
-bmFtZSk7DQo+ICsgICAgZ19mcmVlKHFlbXVfdGhyZWFkX2FyZ3MpOw0KSWYgcWVtdV90aHJlYWRf
-YXJncyBpcyBmcmVlZCBoZXJlLCBzdGFydF9yb3V0aW5lKGFyZykgd2lsbCBsZWFkIHRvIHVzZSBh
-ZnRlciBmcmVlIGJlY2F1c2UgYXJnIGVxdWFscyB0byBxZW11X3RocmVhZF9hcmdzDQo+ICsgICAg
-cmV0dXJuIHN0YXJ0X3JvdXRpbmUoYXJnKTsNCj4gIH0NCj4gKyNlbmRpZg0KPiArDQo+IA0KPiAg
-dm9pZCBxZW11X3RocmVhZF9jcmVhdGUoUWVtdVRocmVhZCAqdGhyZWFkLCBjb25zdCBjaGFyICpu
-YW1lLA0KPiAgICAgICAgICAgICAgICAgICAgICAgICB2b2lkICooKnN0YXJ0X3JvdXRpbmUpKHZv
-aWQqKSwgQEAgLTQ5NiwyOSArNTEwLDQwIEBAIHZvaWQNCj4gcWVtdV90aHJlYWRfY3JlYXRlKFFl
-bXVUaHJlYWQgKnRocmVhZCwgY29uc3QgY2hhciAqbmFtZSwNCj4gICAgICBzaWdzZXRfdCBzZXQs
-IG9sZHNldDsNCj4gICAgICBpbnQgZXJyOw0KPiAgICAgIHB0aHJlYWRfYXR0cl90IGF0dHI7DQo+
-ICsgICAgUWVtdVRocmVhZEFyZ3MgKnFlbXVfdGhyZWFkX2FyZ3M7DQo+IA0KPiAgICAgIGVyciA9
-IHB0aHJlYWRfYXR0cl9pbml0KCZhdHRyKTsNCj4gICAgICBpZiAoZXJyKSB7DQo+ICAgICAgICAg
-IGVycm9yX2V4aXQoZXJyLCBfX2Z1bmNfXyk7DQo+ICAgICAgfQ0KPiANCj4gKyAgICBpZiAobW9k
-ZSA9PSBRRU1VX1RIUkVBRF9ERVRBQ0hFRCkgew0KPiArICAgICAgICBwdGhyZWFkX2F0dHJfc2V0
-ZGV0YWNoc3RhdGUoJmF0dHIsIFBUSFJFQURfQ1JFQVRFX0RFVEFDSEVEKTsNCj4gKyAgICB9DQo+
-ICsNCj4gICAgICAvKiBMZWF2ZSBzaWduYWwgaGFuZGxpbmcgdG8gdGhlIGlvdGhyZWFkLiAgKi8N
-Cj4gICAgICBzaWdmaWxsc2V0KCZzZXQpOw0KPiAgICAgIHB0aHJlYWRfc2lnbWFzayhTSUdfU0VU
-TUFTSywgJnNldCwgJm9sZHNldCk7DQo+IC0gICAgZXJyID0gcHRocmVhZF9jcmVhdGUoJnRocmVh
-ZC0+dGhyZWFkLCAmYXR0ciwgc3RhcnRfcm91dGluZSwgYXJnKTsNCj4gLSAgICBpZiAoZXJyKQ0K
-PiAtICAgICAgICBlcnJvcl9leGl0KGVyciwgX19mdW5jX18pOw0KPiANCj4gKyNpZmRlZiBDT05G
-SUdfUFRIUkVBRF9TRVROQU1FX05QDQo+ICAgICAgaWYgKG5hbWVfdGhyZWFkcykgew0KPiAtICAg
-ICAgICBxZW11X3RocmVhZF9zZXRfbmFtZSh0aHJlYWQsIG5hbWUpOw0KPiArICAgICAgICBxZW11
-X3RocmVhZF9hcmdzID0gZ19uZXcwKFFlbXVUaHJlYWRBcmdzLCAxKTsNCj4gKyAgICAgICAgcWVt
-dV90aHJlYWRfYXJncy0+bmFtZSA9IGdfc3RyZHVwKG5hbWUpOw0KPiArICAgICAgICBxZW11X3Ro
-cmVhZF9hcmdzLT5zdGFydF9yb3V0aW5lID0gc3RhcnRfcm91dGluZTsNCj4gKyAgICAgICAgcWVt
-dV90aHJlYWRfYXJncy0+YXJnID0gYXJnOw0KPiArDQo+ICsgICAgICAgIGVyciA9IHB0aHJlYWRf
-Y3JlYXRlKCZ0aHJlYWQtPnRocmVhZCwgJmF0dHIsDQo+ICsgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgIHFlbXVfdGhyZWFkX3N0YXJ0LCBxZW11X3RocmVhZF9hcmdzKTsNCj4gKyAgICB9IGVs
-c2UNCj4gKyNlbmRpZg0KPiArICAgIHsNCj4gKyAgICAgICAgZXJyID0gcHRocmVhZF9jcmVhdGUo
-JnRocmVhZC0+dGhyZWFkLCAmYXR0ciwNCj4gKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-c3RhcnRfcm91dGluZSwgYXJnKTsNCj4gICAgICB9DQo+IA0KPiAtICAgIGlmIChtb2RlID09IFFF
-TVVfVEhSRUFEX0RFVEFDSEVEKSB7DQo+IC0gICAgICAgIGVyciA9IHB0aHJlYWRfZGV0YWNoKHRo
-cmVhZC0+dGhyZWFkKTsNCj4gLSAgICAgICAgaWYgKGVycikgew0KPiAtICAgICAgICAgICAgZXJy
-b3JfZXhpdChlcnIsIF9fZnVuY19fKTsNCj4gLSAgICAgICAgfQ0KPiAtICAgIH0NCj4gKyAgICBp
-ZiAoZXJyKQ0KPiArICAgICAgICBlcnJvcl9leGl0KGVyciwgX19mdW5jX18pOw0KPiArDQo+ICAg
-ICAgcHRocmVhZF9zaWdtYXNrKFNJR19TRVRNQVNLLCAmb2xkc2V0LCBOVUxMKTsNCj4gDQo+ICAg
-ICAgcHRocmVhZF9hdHRyX2Rlc3Ryb3koJmF0dHIpOw0KPiAtLQ0KPiAxLjguMy4xDQo+IA0KDQo=
+On 12/20/2017 09:29 PM, linzhecheng wrote:
+
+>> +} QemuThreadArgs;
+>> +
+>> +static void *qemu_thread_start(void *args) {
+>> +    QemuThreadArgs *qemu_thread_args = args;
+>> +    void *(*start_routine)(void *) = qemu_thread_args->start_routine;
+>> +    void *arg = qemu_thread_args->arg;
+>> +
+>> +    /* Attempt to set the threads name; note that this is for debug, so
+>> +     * we're not going to fail if we can't set it.
+>> +     */
+>> +    pthread_setname_np(pthread_self(), qemu_thread_args->name);
+>> +    g_free(qemu_thread_args->name);
+>> +    g_free(qemu_thread_args);
+> If qemu_thread_args is freed here, start_routine(arg) will lead to use after free because arg equals to qemu_thread_args
+
+No, we explicitly copied qemu_thread_args->arg into a local variable 
+prior to freeing qemu_thread_args, so that we do not have to dereference 
+the freed variable.
+
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
