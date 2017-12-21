@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44954)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53270)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1eS47l-0001fb-LL
-	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 11:55:24 -0500
+	(envelope-from <no-reply@patchew.org>) id 1eS4G6-0000oh-I3
+	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 12:03:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1eS47i-00056Q-97
-	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 11:55:13 -0500
-Received: from 4.mo177.mail-out.ovh.net ([46.105.37.72]:36588)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1eS47h-00054V-Um
-	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 11:55:10 -0500
-Received: from player779.ha.ovh.net (b9.ovh.net [213.186.33.59])
-	by mo177.mail-out.ovh.net (Postfix) with ESMTP id 4F8D9920B9
-	for <qemu-devel@nongnu.org>; Thu, 21 Dec 2017 17:55:06 +0100 (CET)
-From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
-Date: Thu, 21 Dec 2017 17:54:56 +0100
-Message-Id: <20171221165456.8609-1-clg@kaod.org>
+	(envelope-from <no-reply@patchew.org>) id 1eS4G2-0005qF-7k
+	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 12:03:50 -0500
+Resent-Message-Id: <E1eS4G2-0005qF-7k@eggs.gnu.org>
+Received: from sender-of-o52.zoho.com ([135.84.80.217]:21482)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1eS4G1-0005m6-TB
+	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 12:03:46 -0500
+In-Reply-To: <20171221155905.3793-1-berrange@redhat.com>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <151387305838.99.508098824580499746@5adcb62bf0d6>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH] target/ppc: more use of the PPC_*() macros
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Thu, 21 Dec 2017 08:17:39 -0800 (PST)
+Subject: Re: [Qemu-devel] [PATCH v2 0/2] Enable passing pre-opened chardev
+ socket FDs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,137 +29,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
-Cc: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
+To: berrange@redhat.com
+Cc: famz@redhat.com, qemu-devel@nongnu.org, dgilbert@redhat.com, armbru@redhat.com, marcandre.lureau@redhat.com, pbonzini@redhat.com
 
-Also introduce utilities to manipulate bitmasks (originaly from OPAL)
-which be will be used in the model of the XIVE interrupt controller.
-
-Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
----
- hw/ppc/pnv_lpc.c        | 10 +++++-----
- target/ppc/cpu.h        | 49 +++++++++++++++++++++++++++----------------=
-------
- target/ppc/int_helper.c |  2 +-
- 3 files changed, 33 insertions(+), 28 deletions(-)
-
-diff --git a/hw/ppc/pnv_lpc.c b/hw/ppc/pnv_lpc.c
-index b777b78e1837..c42b4a8f6c0f 100644
---- a/hw/ppc/pnv_lpc.c
-+++ b/hw/ppc/pnv_lpc.c
-@@ -146,13 +146,13 @@ static bool opb_write(PnvLpcController *lpc, uint32=
-_t addr, uint8_t *data,
-     return success;
- }
-=20
--#define ECCB_CTL_READ           (1ull << (63 - 15))
-+#define ECCB_CTL_READ           PPC_BIT(15)
- #define ECCB_CTL_SZ_LSH         (63 - 7)
--#define ECCB_CTL_SZ_MASK        (0xfull << ECCB_CTL_SZ_LSH)
--#define ECCB_CTL_ADDR_MASK      0xffffffffu;
-+#define ECCB_CTL_SZ_MASK        PPC_BITMASK(4, 7)
-+#define ECCB_CTL_ADDR_MASK      PPC_BITMASK(32, 63)
-=20
--#define ECCB_STAT_OP_DONE       (1ull << (63 - 52))
--#define ECCB_STAT_OP_ERR        (1ull << (63 - 52))
-+#define ECCB_STAT_OP_DONE       PPC_BIT(52)
-+#define ECCB_STAT_OP_ERR        PPC_BIT(52)
- #define ECCB_STAT_RD_DATA_LSH   (63 - 37)
- #define ECCB_STAT_RD_DATA_MASK  (0xffffffff << ECCB_STAT_RD_DATA_LSH)
-=20
-diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
-index 370b05e76ede..894fb76fabe1 100644
---- a/target/ppc/cpu.h
-+++ b/target/ppc/cpu.h
-@@ -93,6 +93,12 @@
- #define PPC_BITMASK(bs, be)     ((PPC_BIT(bs) - PPC_BIT(be)) | PPC_BIT(b=
-s))
- #define PPC_BITMASK32(bs, be)   ((PPC_BIT32(bs) - PPC_BIT32(be)) | \
-                                  PPC_BIT32(bs))
-+#define PPC_BITMASK8(bs, be)    ((PPC_BIT8(bs) - PPC_BIT8(be)) | PPC_BIT=
-8(bs))
-+
-+#define MASK_TO_LSH(m)          (__builtin_ffsl(m) - 1)
-+#define GETFIELD(m, v)          (((v) & (m)) >> MASK_TO_LSH(m))
-+#define SETFIELD(m, v, val)                             \
-+        (((v) & ~(m)) | ((((typeof(v))(val)) << MASK_TO_LSH(m)) & (m)))
-=20
- /***********************************************************************=
-******/
- /* Exception vectors definitions                                        =
-     */
-@@ -2349,32 +2355,31 @@ enum {
-=20
- /* Processor Compatibility mask (PCR) */
- enum {
--    PCR_COMPAT_2_05     =3D 1ull << (63-62),
--    PCR_COMPAT_2_06     =3D 1ull << (63-61),
--    PCR_COMPAT_2_07     =3D 1ull << (63-60),
--    PCR_COMPAT_3_00     =3D 1ull << (63-59),
--    PCR_VEC_DIS         =3D 1ull << (63-0), /* Vec. disable (bit NA sinc=
-e POWER8) */
--    PCR_VSX_DIS         =3D 1ull << (63-1), /* VSX disable (bit NA since=
- POWER8) */
--    PCR_TM_DIS          =3D 1ull << (63-2), /* Trans. memory disable (PO=
-WER8) */
-+    PCR_COMPAT_2_05     =3D PPC_BIT(62),
-+    PCR_COMPAT_2_06     =3D PPC_BIT(61),
-+    PCR_COMPAT_2_07     =3D PPC_BIT(60),
-+    PCR_COMPAT_3_00     =3D PPC_BIT(59),
-+    PCR_VEC_DIS         =3D PPC_BIT(0), /* Vec. disable (bit NA since PO=
-WER8) */
-+    PCR_VSX_DIS         =3D PPC_BIT(1), /* VSX disable (bit NA since POW=
-ER8) */
-+    PCR_TM_DIS          =3D PPC_BIT(2), /* Trans. memory disable (POWER8=
-) */
- };
-=20
- /* HMER/HMEER */
- enum {
--    HMER_MALFUNCTION_ALERT      =3D 1ull << (63 - 0),
--    HMER_PROC_RECV_DONE         =3D 1ull << (63 - 2),
--    HMER_PROC_RECV_ERROR_MASKED =3D 1ull << (63 - 3),
--    HMER_TFAC_ERROR             =3D 1ull << (63 - 4),
--    HMER_TFMR_PARITY_ERROR      =3D 1ull << (63 - 5),
--    HMER_XSCOM_FAIL             =3D 1ull << (63 - 8),
--    HMER_XSCOM_DONE             =3D 1ull << (63 - 9),
--    HMER_PROC_RECV_AGAIN        =3D 1ull << (63 - 11),
--    HMER_WARN_RISE              =3D 1ull << (63 - 14),
--    HMER_WARN_FALL              =3D 1ull << (63 - 15),
--    HMER_SCOM_FIR_HMI           =3D 1ull << (63 - 16),
--    HMER_TRIG_FIR_HMI           =3D 1ull << (63 - 17),
--    HMER_HYP_RESOURCE_ERR       =3D 1ull << (63 - 20),
--    HMER_XSCOM_STATUS_MASK      =3D 7ull << (63 - 23),
--    HMER_XSCOM_STATUS_LSH       =3D (63 - 23),
-+    HMER_MALFUNCTION_ALERT      =3D PPC_BIT(0),
-+    HMER_PROC_RECV_DONE         =3D PPC_BIT(2),
-+    HMER_PROC_RECV_ERROR_MASKED =3D PPC_BIT(3),
-+    HMER_TFAC_ERROR             =3D PPC_BIT(4),
-+    HMER_TFMR_PARITY_ERROR      =3D PPC_BIT(5),
-+    HMER_XSCOM_FAIL             =3D PPC_BIT(8),
-+    HMER_XSCOM_DONE             =3D PPC_BIT(9),
-+    HMER_PROC_RECV_AGAIN        =3D PPC_BIT(11),
-+    HMER_WARN_RISE              =3D PPC_BIT(14),
-+    HMER_WARN_FALL              =3D PPC_BIT(15),
-+    HMER_SCOM_FIR_HMI           =3D PPC_BIT(16),
-+    HMER_TRIG_FIR_HMI           =3D PPC_BIT(17),
-+    HMER_HYP_RESOURCE_ERR       =3D PPC_BIT(20),
-+    HMER_XSCOM_STATUS_MASK      =3D PPC_BITMASK(21, 23),
- };
-=20
- /* Alternate Interrupt Location (AIL) */
-diff --git a/target/ppc/int_helper.c b/target/ppc/int_helper.c
-index 1c013a0ee3f1..3a50f1e1b72c 100644
---- a/target/ppc/int_helper.c
-+++ b/target/ppc/int_helper.c
-@@ -183,7 +183,7 @@ uint64_t helper_bpermd(uint64_t rs, uint64_t rb)
-     for (i =3D 0; i < 8; i++) {
-         int index =3D (rs >> (i*8)) & 0xFF;
-         if (index < 64) {
--            if (rb & (1ull << (63-index))) {
-+            if (rb & PPC_BIT(index)) {
-                 ra |=3D 1 << i;
-             }
-         }
---=20
-2.13.6
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IDIwMTcxMjIxMTU1OTA1LjM3OTMtMS1iZXJyYW5nZUByZWRoYXQuY29tClN1Ympl
+Y3Q6IFtRZW11LWRldmVsXSBbUEFUQ0ggdjIgMC8yXSBFbmFibGUgcGFzc2luZyBwcmUtb3BlbmVk
+IGNoYXJkZXYgc29ja2V0IEZEcwoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFz
+aAoKQkFTRT1iYXNlCm49MQp0b3RhbD0kKGdpdCBsb2cgLS1vbmVsaW5lICRCQVNFLi4gfCB3YyAt
+bCkKZmFpbGVkPTAKCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNv
+bmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCgpjb21taXRzPSIkKGdpdCBsb2cgLS1mb3Jt
+YXQ9JUggLS1yZXZlcnNlICRCQVNFLi4pIgpmb3IgYyBpbiAkY29tbWl0czsgZG8KICAgIGVjaG8g
+IkNoZWNraW5nIFBBVENIICRuLyR0b3RhbDogJChnaXQgbG9nIC1uIDEgLS1mb3JtYXQ9JXMgJGMp
+Li4uIgogICAgaWYgISBnaXQgc2hvdyAkYyAtLWZvcm1hdD1lbWFpbCB8IC4vc2NyaXB0cy9jaGVj
+a3BhdGNoLnBsIC0tbWFpbGJhY2sgLTsgdGhlbgogICAgICAgIGZhaWxlZD0xCiAgICAgICAgZWNo
+bwogICAgZmkKICAgIG49JCgobisxKSkKZG9uZQoKZXhpdCAkZmFpbGVkCj09PSBURVNUIFNDUklQ
+VCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEz
+Mzg0CkZyb20gaHR0cHM6Ly9naXRodWIuY29tL3BhdGNoZXctcHJvamVjdC9xZW11CiAqIFtuZXcg
+dGFnXSAgICAgICAgICAgICAgIHBhdGNoZXcvMjAxNzEyMjExNjA1NTguMTQxNTEtMS1sYXVyZW50
+QHZpdmllci5ldSAtPiBwYXRjaGV3LzIwMTcxMjIxMTYwNTU4LjE0MTUxLTEtbGF1cmVudEB2aXZp
+ZXIuZXUKU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0Jwo2MTE2ZGUyMjIyIGNoYXI6IGFs
+bG93IHBhc3NpbmcgcHJlLW9wZW5lZCBzb2NrZXQgZmlsZSBkZXNjcmlwdG9yIGF0IHN0YXJ0dXAK
+ODlkODliNzQ5YyBpbzogbW92ZSBmZF9pc19zb2NrZXQoKSBpbnRvIGNvbW1vbiBzb2NrZXRzIGNv
+ZGUKCj09PSBPVVRQVVQgQkVHSU4gPT09CkNoZWNraW5nIFBBVENIIDEvMjogaW86IG1vdmUgZmRf
+aXNfc29ja2V0KCkgaW50byBjb21tb24gc29ja2V0cyBjb2RlLi4uCkNoZWNraW5nIFBBVENIIDIv
+MjogY2hhcjogYWxsb3cgcGFzc2luZyBwcmUtb3BlbmVkIHNvY2tldCBmaWxlIGRlc2NyaXB0b3Ig
+YXQgc3RhcnR1cC4uLgpFUlJPUjogZG8gbm90IGluaXRpYWxpc2UgZ2xvYmFscyB0byAwIG9yIE5V
+TEwKIzI1NTogRklMRTogdGVzdHMvdGVzdC1jaGFyLmM6NDE0OgorTW9uaXRvciAqY3VyX21vbiA9
+IE5VTEw7Cgp0b3RhbDogMSBlcnJvcnMsIDAgd2FybmluZ3MsIDMzMCBsaW5lcyBjaGVja2VkCgpZ
+b3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0
+aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRh
+aW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgo9PT0gT1VUUFVUIEVORCA9PT0K
+ClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKLS0tCkVtYWlsIGdlbmVyYXRlZCBh
+dXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2Vu
+ZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAZnJlZWxpc3RzLm9yZw==
