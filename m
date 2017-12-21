@@ -1,33 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37384)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50957)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <th.huth@gmail.com>) id 1eRvqf-0007ku-Ry
-	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 03:05:02 -0500
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1eRw6C-0003ay-5k
+	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 03:21:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <th.huth@gmail.com>) id 1eRvqc-0000PK-ID
-	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 03:05:01 -0500
-Received: from mail-wm0-f48.google.com ([74.125.82.48]:36184)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <th.huth@gmail.com>) id 1eRvqc-0000P1-Bn
-	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 03:04:58 -0500
-Received: by mail-wm0-f48.google.com with SMTP id b76so14137772wmg.1
-	for <qemu-devel@nongnu.org>; Thu, 21 Dec 2017 00:04:58 -0800 (PST)
-Received: from [192.168.8.100] (x2f7f4db.dyn.telefonica.de. [2.247.244.219])
-	by smtp.gmail.com with ESMTPSA id
-	c33sm15876512edd.36.2017.12.21.00.04.54 for <qemu-devel@nongnu.org>
-	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Thu, 21 Dec 2017 00:04:55 -0800 (PST)
-References: <20171220203528.21334-1-laurent@vivier.eu>
-	<20171220222219.7cdf2a57@thl530>
-	<15fae875-6eb3-252f-7c98-0e6755afea54@vivier.eu>
-From: Thomas Huth <huth@tuxfamily.org>
-Message-ID: <2cc84400-93be-4dbb-0103-ffef42917bd2@tuxfamily.org>
-Date: Thu, 21 Dec 2017 09:04:53 +0100
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1eRw69-0004Lu-Fb
+	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 03:21:04 -0500
+Received: from chuckie.co.uk ([82.165.15.123]:43098
+	helo=s16892447.onlinehome-server.info)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
+	id 1eRw69-0004En-7z
+	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 03:21:01 -0500
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Date: Thu, 21 Dec 2017 08:20:29 +0000
+Message-Id: <20171221082045.14022-1-mark.cave-ayland@ilande.co.uk>
 MIME-Version: 1.0
-In-Reply-To: <15fae875-6eb3-252f-7c98-0e6755afea54@vivier.eu>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] target/m68k: add monitor.c
+Subject: [Qemu-devel] [PATCHv3 00/16] sun4u: tidy-up CPU, APB and ebus
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,75 +26,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org, atar4qemu@gmail.com
 
-On 21.12.2017 08:56, Laurent Vivier wrote:
-> Le 20/12/2017 à 22:22, Thomas Huth a écrit :
->> Am Wed, 20 Dec 2017 21:35:28 +0100
->> schrieb Laurent Vivier <laurent@vivier.eu>:
->>
->>> This allows to use registers content in the monitor.
->>>
->>> Example:
->>>
->>>  BEFORE:
->>>   (qemu) print $d0
->>>   unknown register
->>>
->>>  AFTER:
->>>   (qemu) print $d0
->>>   0
->>>   (qemu) print $sr
->>>   0x2000
->>>   (qemu) x/10i $pc
->>>   0x40010a2a:  movew %sr,%d0
->>>   0x40010a2c:  oril #1792,%d0
->>>   0x40010a32:  movew %d0,%sr
->>>   0x40010a34:  movel %a0@,%d0
->>>   0x40010a36:  btst #3,%d0
->>>   0x40010a3a:  beqs 0x40010a26
->>>   0x40010a3c:  movew %sr,%d0
->>>   0x40010a3e:  andil #63743,%d0
->>>   0x40010a44:  movew %d0,%sr
->>>   0x40010a46:  rts
->>>
->>> Signed-off-by: Laurent Vivier <laurent@vivier.eu>
->>> ---
->>>  target/m68k/Makefile.objs |  1 +
->>>  target/m68k/monitor.c     | 55
->>> +++++++++++++++++++++++++++++++++++++++++++++++ 2 files changed, 56
->>> insertions(+) create mode 100644 target/m68k/monitor.c
->>>
->>> diff --git a/target/m68k/Makefile.objs b/target/m68k/Makefile.objs
->>> index 39141ab93d..d143f20270 100644
->>> --- a/target/m68k/Makefile.objs
->>> +++ b/target/m68k/Makefile.objs
->>> @@ -1,3 +1,4 @@
->>>  obj-y += m68k-semi.o
->>>  obj-y += translate.o op_helper.o helper.o cpu.o fpu_helper.o
->>>  obj-y += gdbstub.o
->>> +obj-$(CONFIG_SOFTMMU) += monitor.o
->>> diff --git a/target/m68k/monitor.c b/target/m68k/monitor.c
->>> new file mode 100644
->>> index 0000000000..03d037ccab
->>> --- /dev/null
->>> +++ b/target/m68k/monitor.c
->>> @@ -0,0 +1,55 @@
->>> +/*
->>> + * QEMU monitor
->>> + *
->>> + * Copyright (c) 2003-2004 Fabrice Bellard
->>
->> Why this copyright line (and the non-GPL license code)?
-> 
-> I don't know. I've checked all the others monitor.c and they have the
-> same header. An y suggestions?
+This patchset for 2.12 continues with tidying up the sun4u CPU, APB and
+ebus devices by encapsulating the ebus ISA bus within the ebus QOM device,
+allowing APB and ebus devices to be instantiated directly via QOM, and
+formally wiring up the device IRQs using qdev GPIOs rather than passing
+around arrays of qemu_irq via various _init() functions.
 
-Put at least your name in there - Fabrice did not write the new
-monitor.c, but it was you instead!
+Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 
-Concerning the license text, this seems to be the MIT license. I guess
-that's OK, just wanted to make you aware of it to consider whether you
-rather want to use GPL instead or not.
+v3:
+- Rebase onto master
+- Split patch 11 into 2 patches, move busA configuration to pci_pbm_reset()
+  (based upon further discussions with Artyom off-list)
 
- Thomas
+v2:
+- Rebase onto master
+- Add R-Bs from Artyom/Phillipe
+- Use ISA_NUM_IRQS for sizing ISA bus IRQ arrays
+- Add more detail to busA comment in patch 11 as suggested by Artyom
+
+
+Mark Cave-Ayland (16):
+  apb: move QOM macros and typedefs from apb.c to apb.h
+  sun4u: ebus QOMify tidy-up
+  sun4u: move ISABus inside of EBusState
+  sun4u: remove pci_ebus_init() function
+  sun4u: move initialisation of all ISABus devices into ebus_realize()
+  apb: APB QOMify tidy-up
+  apb: return APBState from pci_apb_init() rather than PCIBus
+  apb: use gpios to wire up the apb device to the SPARC CPU IRQs
+  apb: move the two secondary PCI bridges objects into APBState
+  apb: remove pci_apb_init() and instantiate APB device using qdev
+  apb: split pci_pbm_map_irq() into separate functions for bus A and bus
+    B
+  apb: remove busA property from PBMPCIBridge state
+  ebus: wire up OBIO interrupts to APB pbm via qdev GPIOs
+  apb: replace OBIO interrupt numbers in pci_pbmA_map_irq() with
+    constants
+  sparc64: introduce trace-events for hw/sparc64
+  sun4u: switch from EBUS_DPRINTF() macro to trace-events
+
+ Makefile.objs              |   1 +
+ hw/pci-host/apb.c          | 297 +++++++++++++++------------------------------
+ hw/sparc64/sparc64.c       |   2 +
+ hw/sparc64/sun4u.c         | 185 ++++++++++++++++------------
+ hw/sparc64/trace-events    |   4 +
+ include/hw/pci-host/apb.h  | 101 ++++++++++++++-
+ include/hw/sparc/sparc64.h |   2 +
+ 7 files changed, 309 insertions(+), 283 deletions(-)
+ create mode 100644 hw/sparc64/trace-events
+
+-- 
+2.11.0
