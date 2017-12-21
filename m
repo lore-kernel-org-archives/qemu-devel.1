@@ -1,33 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43622)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44954)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1eS46S-0000g9-EB
-	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 11:53:58 -0500
+	(envelope-from <clg@kaod.org>) id 1eS47l-0001fb-LL
+	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 11:55:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1eS46P-00040Q-Bp
-	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 11:53:52 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:47274)
+	(envelope-from <clg@kaod.org>) id 1eS47i-00056Q-97
+	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 11:55:13 -0500
+Received: from 4.mo177.mail-out.ovh.net ([46.105.37.72]:36588)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1eS46P-0003zc-2D
-	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 11:53:49 -0500
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 110526A7D0
-	for <qemu-devel@nongnu.org>; Thu, 21 Dec 2017 16:53:48 +0000 (UTC)
-Date: Thu, 21 Dec 2017 16:53:32 +0000
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20171221165332.GK30327@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <20171221132717.30284-1-berrange@redhat.com>
-	<20171221132717.30284-3-berrange@redhat.com>
-	<87mv2cuiut.fsf@dusky.pond.sub.org>
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1eS47h-00054V-Um
+	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 11:55:10 -0500
+Received: from player779.ha.ovh.net (b9.ovh.net [213.186.33.59])
+	by mo177.mail-out.ovh.net (Postfix) with ESMTP id 4F8D9920B9
+	for <qemu-devel@nongnu.org>; Thu, 21 Dec 2017 17:55:06 +0100 (CET)
+From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
+Date: Thu, 21 Dec 2017 17:54:56 +0100
+Message-Id: <20171221165456.8609-1-clg@kaod.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <87mv2cuiut.fsf@dusky.pond.sub.org>
-Subject: Re: [Qemu-devel] [PATCH v1 2/2] char: allow passing pre-opened
- socket file descriptor at startup
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH] target/ppc: more use of the PPC_*() macros
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,179 +27,137 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: qemu-devel@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
+Cc: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
 
-On Thu, Dec 21, 2017 at 05:49:14PM +0100, Markus Armbruster wrote:
-> QAPI schema review only.
-> 
-> "Daniel P. Berrange" <berrange@redhat.com> writes:
-> 
-> > When starting QEMU management apps will usually setup a monitor socket, and
-> > then open it immediately after startup. If not using QEMU's own -daemonize
-> > arg, this process can be troublesome to handle correctly. The mgmt app will
-> > need to repeatedly call connect() until it succeeds, because it does not
-> > know when QEMU has created the listener socket. If can't retry connect()
-> > forever though, because an error might have caused QEMU to exit before it
-> > even creates the monitor.
-> >
-> > The obvious way to fix this kind of problem is to just pass in a pre-opened
-> > socket file descriptor for the QEMU monitor to listen on. The management app
-> > can now immediately call connect() just once. If connect() fails it knows
-> > that QEMU has exited with an error.
-> >
-> > The SocketAddress(Legacy) structs allow for FD passing via the monitor, using
-> > the 'getfd' command, but only when using QMP JSON syntax. The HMP syntax has
-> > no way to initialize the SocketAddress(Legacy) 'fd' variant. So this patch
-> > first wires up the 'fd' parameter to refer to a monitor file descriptor,
-> > allowing HMP to use
-> >
-> >    getfd myfd
-> >    chardev-add socket,fd=myfd
-> >
-> > The SocketAddress 'fd' variant is currently tied to the use of the monitor
-> > 'getfd' command, so we have a chicken & egg problem with reusing that at
-> > startup wher no monitor connection is available. We could define that the
-> 
-> s/wher/where/
-> 
-> > special fd name prefix '/dev/fdset' refers to a FD passed via the CLI, but
-> > magic strings feel unpleasant.
-> >
-> > Instead we define a SocketAddress 'fdset' variant that takes an fd set number
-> > that works in combination with the 'add-fd' command line argument. e.g.
-> >
-> >   -add-fd fd=3,set=1
-> >   -chardev socket,fdset=1,id=mon
-> >   -mon chardev=mon,mode=control
-> >
-> > Note that we do not wire this up in the legacy chardev syntax, so you cannot
-> > use FD passing with '-qmp', you must use the modern '-mon' + '-chardev' pair
-> >
-> > An illustrative example of usage is:
-> >
-> >   #!/usr/bin/perl
-> >
-> >   use IO::Socket::UNIX;
-> >   use Fcntl;
-> >
-> >   unlink "/tmp/qmp";
-> >   my $srv = IO::Socket::UNIX->new(
-> >     Type => SOCK_STREAM(),
-> >     Local => "/tmp/qmp",
-> >     Listen => 1,
-> >   );
-> >
-> >   my $flags = fcntl $srv, F_GETFD, 0;
-> >   fcntl $srv, F_SETFD, $flags & ~FD_CLOEXEC;
-> >
-> >   my $fd = $srv->fileno();
-> >
-> >   exec "qemu-system-x86_64", \
-> >       "-add-fd", "fd=$fd,set=1", \
-> >       "-chardev", "socket,fdset=1,server,nowait,id=mon", \
-> >       "-mon", "chardev=mon,mode=control";
-> >
-> > Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
-> [...]
-> > diff --git a/qapi/common.json b/qapi/common.json
-> > index 6eb01821ef..a15cdc36e9 100644
-> > --- a/qapi/common.json
-> > +++ b/qapi/common.json
-> > @@ -74,6 +74,17 @@
-> >  { 'enum': 'OnOffSplit',
-> >    'data': [ 'on', 'off', 'split' ] }
-> >  
-> > +##
-> > +# @Int:
-> > +#
-> > +# A fat type wrapping 'int', to be embedded in lists.
-> 
-> I figure you got the "to be embedded in lists" part from @String.  That
-> one's occasionally used as list element type, but there are other uses.
-> @Int has only such other uses so far.  Let's drop this line from both types.
-> 
-> > +#
-> > +# Since: 2.12
-> > +##
-> > +{ 'struct': 'Int',
-> > +  'data': {
-> > +    'i': 'int' } }
-> > +
-> >  ##
-> >  # @String:
-> >  #
-> > diff --git a/qapi/sockets.json b/qapi/sockets.json
-> > index ac022c6ad0..f3cac02166 100644
-> > --- a/qapi/sockets.json
-> > +++ b/qapi/sockets.json
-> > @@ -112,7 +112,8 @@
-> >      'inet': 'InetSocketAddress',
-> >      'unix': 'UnixSocketAddress',
-> >      'vsock': 'VsockSocketAddress',
-> > -    'fd': 'String' } }
-> > +    'fd': 'String',
-> > +    'fdset': 'Int' } }
-> >  
-> >  ##
-> >  # @SocketAddressType:
-> > @@ -123,10 +124,16 @@
-> >  #
-> >  # @unix:  Unix domain socket
-> >  #
-> > +# @vsock: VSOCK socket
-> > +#
-> > +# @fd: socket file descriptor passed over monitor
-> > +#
-> 
-> Indepedent doc fix.  I'd put it in a separate patch.
-> 
-> One inaccuracy: @fd is *not* a file descriptor, it's the *name* of a
-> file descriptor.  Please fix.
-> 
-> > +# @fdset: socket file descriptor passed via CLI (since 2.12)
-> > +#
-> 
-> I gather we have to ways to pass file descriptors.  One way identifies
-> them by name (member @fd), the other by numeric ID (member @fdset).
-> 
-> 0. This is disgusting.  Is there any way to unify the two, and deprecate
-> the loser (hopefully the numeric one)?
+Also introduce utilities to manipulate bitmasks (originaly from OPAL)
+which be will be used in the model of the XIVE interrupt controller.
 
-Checkout my v2 which takes a different, less disgusting approach.
+Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+---
+ hw/ppc/pnv_lpc.c        | 10 +++++-----
+ target/ppc/cpu.h        | 49 +++++++++++++++++++++++++++----------------=
+------
+ target/ppc/int_helper.c |  2 +-
+ 3 files changed, 33 insertions(+), 28 deletions(-)
 
-> 1. What makes the second one a *set*?
-
-Just that the API i used was called fdset.
-
-> 2. What ties the second one to the CLI?  Accidents of implementation or
-> something deeper?
-
-Nothing strict - just convention of usage. You could technically (ab)use
-it from the monitor too.  My v2 approach enforces the distinct usage
-more strictly.
-
-> 
-> >  # Since: 2.9
-> >  ##
-> >  { 'enum': 'SocketAddressType',
-> > -  'data': [ 'inet', 'unix', 'vsock', 'fd' ] }
-> > +  'data': [ 'inet', 'unix', 'vsock', 'fd', 'fdset' ] }
-> >  
-> >  ##
-> >  # @SocketAddress:
-> > @@ -144,4 +151,5 @@
-> >    'data': { 'inet': 'InetSocketAddress',
-> >              'unix': 'UnixSocketAddress',
-> >              'vsock': 'VsockSocketAddress',
-> > -            'fd': 'String' } }
-> > +            'fd': 'String',
-> > +            'fdset': 'Int' } }
-> [...]
-
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+diff --git a/hw/ppc/pnv_lpc.c b/hw/ppc/pnv_lpc.c
+index b777b78e1837..c42b4a8f6c0f 100644
+--- a/hw/ppc/pnv_lpc.c
++++ b/hw/ppc/pnv_lpc.c
+@@ -146,13 +146,13 @@ static bool opb_write(PnvLpcController *lpc, uint32=
+_t addr, uint8_t *data,
+     return success;
+ }
+=20
+-#define ECCB_CTL_READ           (1ull << (63 - 15))
++#define ECCB_CTL_READ           PPC_BIT(15)
+ #define ECCB_CTL_SZ_LSH         (63 - 7)
+-#define ECCB_CTL_SZ_MASK        (0xfull << ECCB_CTL_SZ_LSH)
+-#define ECCB_CTL_ADDR_MASK      0xffffffffu;
++#define ECCB_CTL_SZ_MASK        PPC_BITMASK(4, 7)
++#define ECCB_CTL_ADDR_MASK      PPC_BITMASK(32, 63)
+=20
+-#define ECCB_STAT_OP_DONE       (1ull << (63 - 52))
+-#define ECCB_STAT_OP_ERR        (1ull << (63 - 52))
++#define ECCB_STAT_OP_DONE       PPC_BIT(52)
++#define ECCB_STAT_OP_ERR        PPC_BIT(52)
+ #define ECCB_STAT_RD_DATA_LSH   (63 - 37)
+ #define ECCB_STAT_RD_DATA_MASK  (0xffffffff << ECCB_STAT_RD_DATA_LSH)
+=20
+diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
+index 370b05e76ede..894fb76fabe1 100644
+--- a/target/ppc/cpu.h
++++ b/target/ppc/cpu.h
+@@ -93,6 +93,12 @@
+ #define PPC_BITMASK(bs, be)     ((PPC_BIT(bs) - PPC_BIT(be)) | PPC_BIT(b=
+s))
+ #define PPC_BITMASK32(bs, be)   ((PPC_BIT32(bs) - PPC_BIT32(be)) | \
+                                  PPC_BIT32(bs))
++#define PPC_BITMASK8(bs, be)    ((PPC_BIT8(bs) - PPC_BIT8(be)) | PPC_BIT=
+8(bs))
++
++#define MASK_TO_LSH(m)          (__builtin_ffsl(m) - 1)
++#define GETFIELD(m, v)          (((v) & (m)) >> MASK_TO_LSH(m))
++#define SETFIELD(m, v, val)                             \
++        (((v) & ~(m)) | ((((typeof(v))(val)) << MASK_TO_LSH(m)) & (m)))
+=20
+ /***********************************************************************=
+******/
+ /* Exception vectors definitions                                        =
+     */
+@@ -2349,32 +2355,31 @@ enum {
+=20
+ /* Processor Compatibility mask (PCR) */
+ enum {
+-    PCR_COMPAT_2_05     =3D 1ull << (63-62),
+-    PCR_COMPAT_2_06     =3D 1ull << (63-61),
+-    PCR_COMPAT_2_07     =3D 1ull << (63-60),
+-    PCR_COMPAT_3_00     =3D 1ull << (63-59),
+-    PCR_VEC_DIS         =3D 1ull << (63-0), /* Vec. disable (bit NA sinc=
+e POWER8) */
+-    PCR_VSX_DIS         =3D 1ull << (63-1), /* VSX disable (bit NA since=
+ POWER8) */
+-    PCR_TM_DIS          =3D 1ull << (63-2), /* Trans. memory disable (PO=
+WER8) */
++    PCR_COMPAT_2_05     =3D PPC_BIT(62),
++    PCR_COMPAT_2_06     =3D PPC_BIT(61),
++    PCR_COMPAT_2_07     =3D PPC_BIT(60),
++    PCR_COMPAT_3_00     =3D PPC_BIT(59),
++    PCR_VEC_DIS         =3D PPC_BIT(0), /* Vec. disable (bit NA since PO=
+WER8) */
++    PCR_VSX_DIS         =3D PPC_BIT(1), /* VSX disable (bit NA since POW=
+ER8) */
++    PCR_TM_DIS          =3D PPC_BIT(2), /* Trans. memory disable (POWER8=
+) */
+ };
+=20
+ /* HMER/HMEER */
+ enum {
+-    HMER_MALFUNCTION_ALERT      =3D 1ull << (63 - 0),
+-    HMER_PROC_RECV_DONE         =3D 1ull << (63 - 2),
+-    HMER_PROC_RECV_ERROR_MASKED =3D 1ull << (63 - 3),
+-    HMER_TFAC_ERROR             =3D 1ull << (63 - 4),
+-    HMER_TFMR_PARITY_ERROR      =3D 1ull << (63 - 5),
+-    HMER_XSCOM_FAIL             =3D 1ull << (63 - 8),
+-    HMER_XSCOM_DONE             =3D 1ull << (63 - 9),
+-    HMER_PROC_RECV_AGAIN        =3D 1ull << (63 - 11),
+-    HMER_WARN_RISE              =3D 1ull << (63 - 14),
+-    HMER_WARN_FALL              =3D 1ull << (63 - 15),
+-    HMER_SCOM_FIR_HMI           =3D 1ull << (63 - 16),
+-    HMER_TRIG_FIR_HMI           =3D 1ull << (63 - 17),
+-    HMER_HYP_RESOURCE_ERR       =3D 1ull << (63 - 20),
+-    HMER_XSCOM_STATUS_MASK      =3D 7ull << (63 - 23),
+-    HMER_XSCOM_STATUS_LSH       =3D (63 - 23),
++    HMER_MALFUNCTION_ALERT      =3D PPC_BIT(0),
++    HMER_PROC_RECV_DONE         =3D PPC_BIT(2),
++    HMER_PROC_RECV_ERROR_MASKED =3D PPC_BIT(3),
++    HMER_TFAC_ERROR             =3D PPC_BIT(4),
++    HMER_TFMR_PARITY_ERROR      =3D PPC_BIT(5),
++    HMER_XSCOM_FAIL             =3D PPC_BIT(8),
++    HMER_XSCOM_DONE             =3D PPC_BIT(9),
++    HMER_PROC_RECV_AGAIN        =3D PPC_BIT(11),
++    HMER_WARN_RISE              =3D PPC_BIT(14),
++    HMER_WARN_FALL              =3D PPC_BIT(15),
++    HMER_SCOM_FIR_HMI           =3D PPC_BIT(16),
++    HMER_TRIG_FIR_HMI           =3D PPC_BIT(17),
++    HMER_HYP_RESOURCE_ERR       =3D PPC_BIT(20),
++    HMER_XSCOM_STATUS_MASK      =3D PPC_BITMASK(21, 23),
+ };
+=20
+ /* Alternate Interrupt Location (AIL) */
+diff --git a/target/ppc/int_helper.c b/target/ppc/int_helper.c
+index 1c013a0ee3f1..3a50f1e1b72c 100644
+--- a/target/ppc/int_helper.c
++++ b/target/ppc/int_helper.c
+@@ -183,7 +183,7 @@ uint64_t helper_bpermd(uint64_t rs, uint64_t rb)
+     for (i =3D 0; i < 8; i++) {
+         int index =3D (rs >> (i*8)) & 0xFF;
+         if (index < 64) {
+-            if (rb & (1ull << (63-index))) {
++            if (rb & PPC_BIT(index)) {
+                 ra |=3D 1 << i;
+             }
+         }
+--=20
+2.13.6
