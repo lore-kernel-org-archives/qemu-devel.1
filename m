@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42335)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42385)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1eS1ky-0002rD-MW
-	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 09:23:34 -0500
+	(envelope-from <kwolf@redhat.com>) id 1eS1l1-0002v2-F7
+	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 09:23:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1eS1ku-0001uL-IT
-	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 09:23:32 -0500
+	(envelope-from <kwolf@redhat.com>) id 1eS1l0-0001z3-FJ
+	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 09:23:35 -0500
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Thu, 21 Dec 2017 15:22:39 +0100
-Message-Id: <20171221142251.18366-8-kwolf@redhat.com>
+Date: Thu, 21 Dec 2017 15:22:40 +0100
+Message-Id: <20171221142251.18366-9-kwolf@redhat.com>
 In-Reply-To: <20171221142251.18366-1-kwolf@redhat.com>
 References: <20171221142251.18366-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 07/19] test-bdrv-drain: Test drain vs. block
- jobs
+Subject: [Qemu-devel] [PATCH v2 08/19] block: Don't block_job_pause_all() in
+ bdrv_drain_all()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,157 +23,64 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, famz@redhat.com, pbonzini@redhat.com, qemu-devel@nongnu.org
 
-Block jobs must be paused if any of the involved nodes are drained.
+Block jobs are already paused using the BdrvChildRole drain callbacks,
+so we don't need an additionall block_job_pause_all() call.
 
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- tests/test-bdrv-drain.c | 121 ++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 121 insertions(+)
+ block/io.c              |  4 ----
+ tests/test-bdrv-drain.c | 10 ++++------
+ 2 files changed, 4 insertions(+), 10 deletions(-)
 
+diff --git a/block/io.c b/block/io.c
+index 91a52e2d82..74d2e5278e 100644
+--- a/block/io.c
++++ b/block/io.c
+@@ -338,8 +338,6 @@ void bdrv_drain_all_begin(void)
+      * context. */
+     assert(qemu_get_current_aio_context() == qemu_get_aio_context());
+ 
+-    block_job_pause_all();
+-
+     for (bs = bdrv_first(&it); bs; bs = bdrv_next(&it)) {
+         AioContext *aio_context = bdrv_get_aio_context(bs);
+ 
+@@ -395,8 +393,6 @@ void bdrv_drain_all_end(void)
+         aio_enable_external(aio_context);
+         aio_context_release(aio_context);
+     }
+-
+-    block_job_resume_all();
+ }
+ 
+ void bdrv_drain_all(void)
 diff --git a/tests/test-bdrv-drain.c b/tests/test-bdrv-drain.c
-index 2aa2b9aa43..019fe9074d 100644
+index 019fe9074d..4571137928 100644
 --- a/tests/test-bdrv-drain.c
 +++ b/tests/test-bdrv-drain.c
-@@ -24,6 +24,7 @@
+@@ -284,9 +284,8 @@ static void test_blockjob_common(enum drain_type drain_type)
+     do_drain_begin(drain_type, src);
  
- #include "qemu/osdep.h"
- #include "block/block.h"
-+#include "block/blockjob_int.h"
- #include "sysemu/block-backend.h"
- #include "qapi/error.h"
+     if (drain_type == BDRV_DRAIN_ALL) {
+-        /* bdrv_drain_all() drains both src and target, and involves an
+-         * additional block_job_pause_all() */
+-        g_assert_cmpint(job->pause_count, ==, 3);
++        /* bdrv_drain_all() drains both src and target */
++        g_assert_cmpint(job->pause_count, ==, 2);
+     } else {
+         g_assert_cmpint(job->pause_count, ==, 1);
+     }
+@@ -303,9 +302,8 @@ static void test_blockjob_common(enum drain_type drain_type)
+     do_drain_begin(drain_type, target);
  
-@@ -220,6 +221,123 @@ static void test_quiesce_drain(void)
-     test_quiesce_common(BDRV_DRAIN, false);
- }
- 
-+
-+typedef struct TestBlockJob {
-+    BlockJob common;
-+    bool should_complete;
-+} TestBlockJob;
-+
-+static void test_job_completed(BlockJob *job, void *opaque)
-+{
-+    block_job_completed(job, 0);
-+}
-+
-+static void coroutine_fn test_job_start(void *opaque)
-+{
-+    TestBlockJob *s = opaque;
-+
-+    while (!s->should_complete) {
-+        block_job_sleep_ns(&s->common, 100000);
-+    }
-+
-+    block_job_defer_to_main_loop(&s->common, test_job_completed, NULL);
-+}
-+
-+static void test_job_complete(BlockJob *job, Error **errp)
-+{
-+    TestBlockJob *s = container_of(job, TestBlockJob, common);
-+    s->should_complete = true;
-+}
-+
-+BlockJobDriver test_job_driver = {
-+    .instance_size  = sizeof(TestBlockJob),
-+    .start          = test_job_start,
-+    .complete       = test_job_complete,
-+};
-+
-+static void test_blockjob_common(enum drain_type drain_type)
-+{
-+    BlockBackend *blk_src, *blk_target;
-+    BlockDriverState *src, *target;
-+    BlockJob *job;
-+    int ret;
-+
-+    src = bdrv_new_open_driver(&bdrv_test, "source", BDRV_O_RDWR,
-+                               &error_abort);
-+    blk_src = blk_new(BLK_PERM_ALL, BLK_PERM_ALL);
-+    blk_insert_bs(blk_src, src, &error_abort);
-+
-+    target = bdrv_new_open_driver(&bdrv_test, "target", BDRV_O_RDWR,
-+                                  &error_abort);
-+    blk_target = blk_new(BLK_PERM_ALL, BLK_PERM_ALL);
-+    blk_insert_bs(blk_target, target, &error_abort);
-+
-+    job = block_job_create("job0", &test_job_driver, src, 0, BLK_PERM_ALL, 0,
-+                           0, NULL, NULL, &error_abort);
-+    block_job_add_bdrv(job, "target", target, 0, BLK_PERM_ALL, &error_abort);
-+    block_job_start(job);
-+
-+    g_assert_cmpint(job->pause_count, ==, 0);
-+    g_assert_false(job->paused);
-+    g_assert_false(job->busy); /* We're in block_job_sleep_ns() */
-+
-+    do_drain_begin(drain_type, src);
-+
-+    if (drain_type == BDRV_DRAIN_ALL) {
-+        /* bdrv_drain_all() drains both src and target, and involves an
-+         * additional block_job_pause_all() */
-+        g_assert_cmpint(job->pause_count, ==, 3);
-+    } else {
-+        g_assert_cmpint(job->pause_count, ==, 1);
-+    }
-+    /* XXX We don't wait until the job is actually paused. Is this okay? */
-+    /* g_assert_true(job->paused); */
-+    g_assert_false(job->busy); /* The job is paused */
-+
-+    do_drain_end(drain_type, src);
-+
-+    g_assert_cmpint(job->pause_count, ==, 0);
-+    g_assert_false(job->paused);
-+    g_assert_false(job->busy); /* We're in block_job_sleep_ns() */
-+
-+    do_drain_begin(drain_type, target);
-+
-+    if (drain_type == BDRV_DRAIN_ALL) {
-+        /* bdrv_drain_all() drains both src and target, and involves an
-+         * additional block_job_pause_all() */
-+        g_assert_cmpint(job->pause_count, ==, 3);
-+    } else {
-+        g_assert_cmpint(job->pause_count, ==, 1);
-+    }
-+    /* XXX We don't wait until the job is actually paused. Is this okay? */
-+    /* g_assert_true(job->paused); */
-+    g_assert_false(job->busy); /* The job is paused */
-+
-+    do_drain_end(drain_type, target);
-+
-+    g_assert_cmpint(job->pause_count, ==, 0);
-+    g_assert_false(job->paused);
-+    g_assert_false(job->busy); /* We're in block_job_sleep_ns() */
-+
-+    ret = block_job_complete_sync(job, &error_abort);
-+    g_assert_cmpint(ret, ==, 0);
-+
-+    blk_unref(blk_src);
-+    blk_unref(blk_target);
-+    bdrv_unref(src);
-+    bdrv_unref(target);
-+}
-+
-+static void test_blockjob_drain_all(void)
-+{
-+    test_blockjob_common(BDRV_DRAIN_ALL);
-+}
-+
-+static void test_blockjob_drain(void)
-+{
-+    test_blockjob_common(BDRV_DRAIN);
-+}
-+
- int main(int argc, char **argv)
- {
-     bdrv_init();
-@@ -233,5 +351,8 @@ int main(int argc, char **argv)
-     g_test_add_func("/bdrv-drain/quiesce/drain_all", test_quiesce_drain_all);
-     g_test_add_func("/bdrv-drain/quiesce/drain", test_quiesce_drain);
- 
-+    g_test_add_func("/bdrv-drain/blockjob/drain_all", test_blockjob_drain_all);
-+    g_test_add_func("/bdrv-drain/blockjob/drain", test_blockjob_drain);
-+
-     return g_test_run();
- }
+     if (drain_type == BDRV_DRAIN_ALL) {
+-        /* bdrv_drain_all() drains both src and target, and involves an
+-         * additional block_job_pause_all() */
+-        g_assert_cmpint(job->pause_count, ==, 3);
++        /* bdrv_drain_all() drains both src and target */
++        g_assert_cmpint(job->pause_count, ==, 2);
+     } else {
+         g_assert_cmpint(job->pause_count, ==, 1);
+     }
 -- 
 2.13.6
