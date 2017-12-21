@@ -1,21 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52881)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55781)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eS5eL-0001dg-BL
-	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 13:32:58 -0500
+	(envelope-from <programmingkidx@gmail.com>) id 1eS5hY-0003QP-2e
+	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 13:36:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eS5eK-0000if-NU
-	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 13:32:57 -0500
-References: <20171207155102.66622-1-vsementsov@virtuozzo.com>
-	<87shc4umku.fsf@dusky.pond.sub.org>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <d4c1aa6a-9583-ade6-4ef6-fc060fa5ffcd@redhat.com>
-Date: Thu, 21 Dec 2017 12:32:49 -0600
-MIME-Version: 1.0
-In-Reply-To: <87shc4umku.fsf@dusky.pond.sub.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 0/6] nbd export qmp interface
+	(envelope-from <programmingkidx@gmail.com>) id 1eS5hV-0002TG-HX
+	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 13:36:16 -0500
+Received: from mail-io0-x244.google.com ([2607:f8b0:4001:c06::244]:42828)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <programmingkidx@gmail.com>)
+	id 1eS5hV-0002T6-Ce
+	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 13:36:13 -0500
+Received: by mail-io0-x244.google.com with SMTP id x67so15903182ioi.9
+	for <qemu-devel@nongnu.org>; Thu, 21 Dec 2017 10:36:13 -0800 (PST)
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
+From: Programmingkid <programmingkidx@gmail.com>
+In-Reply-To: <8bf902fe-1ec9-4845-a072-af2e7da32ed2@redhat.com>
+Date: Thu, 21 Dec 2017 13:36:10 -0500
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <29E7CA81-A379-4B37-B174-20EACDEA5E79@gmail.com>
+References: <0B44C3E6-545D-43B1-B124-97BB9D84BA0C@gmail.com>
+	<8bf902fe-1ec9-4845-a072-af2e7da32ed2@redhat.com>
+Subject: Re: [Qemu-devel] About my strnlen patch
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,17 +30,17 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, kwolf@redhat.com, mreitz@redhat.com, den@openvz.org, pbonzini@redhat.com, dgilbert@redhat.com
+To: Eric Blake <eblake@redhat.com>
+Cc: David Gibson <david@gibson.dropbear.id.au>, QEMU Developers <qemu-devel@nongnu.org>
 
-On 12/21/2017 09:28 AM, Markus Armbruster wrote:
-> Looks like you forgot to cc: Eric.  Fixing...
 
-Or that he did cc me, and the mailman bug ate the cc line because of my 
-list subscription settings.  (Have I mentioned that I hate that mailman 
-2 bug, but don't know whether mailman 3 will make it any better?)
-
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+> On Dec 21, 2017, at 1:30 PM, Eric Blake <eblake@redhat.com> wrote:
+>=20
+> On 12/21/2017 08:31 AM, Programmingkid wrote:
+>> Now would be a good time to push the strnlen patch.
+>=20
+> No links to the patch? Generally, when pinging a patch, it's best to =
+reply to the existing thread, or at least provide a URL to the thread, =
+where the patch was proposed.
+>=20
+Yes here is the patch: https://patchwork.kernel.org/patch/10027375/
