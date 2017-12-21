@@ -1,32 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36274)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41815)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1eRxnc-000789-Ru
-	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 05:10:06 -0500
+	(envelope-from <atar4qemu@gmail.com>) id 1eRxuE-0001uz-Rp
+	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 05:16:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1eRxnY-0006Ah-Jz
-	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 05:10:00 -0500
-Received: from 1.mo177.mail-out.ovh.net ([178.33.107.143]:52068)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1eRxnY-00069k-Cu
-	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 05:09:56 -0500
-Received: from player779.ha.ovh.net (b9.ovh.net [213.186.33.59])
-	by mo177.mail-out.ovh.net (Postfix) with ESMTP id A864391EE3
-	for <qemu-devel@nongnu.org>; Thu, 21 Dec 2017 11:09:54 +0100 (CET)
-References: <20171209084338.29395-1-clg@kaod.org>
-	<20171209084338.29395-3-clg@kaod.org>
-	<20171220050947.GC5981@umbus.fritz.box>
-	<1513815126.2743.34.camel@kernel.crashing.org>
-	<6768575f-27e0-1277-3e7e-56ec44298e6a@kaod.org>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <106596f7-44eb-0cda-42fc-b552f6eb8dc6@kaod.org>
-Date: Thu, 21 Dec 2017 11:09:48 +0100
+	(envelope-from <atar4qemu@gmail.com>) id 1eRxuA-0002KV-Dw
+	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 05:16:50 -0500
+Received: from mail-io0-x241.google.com ([2607:f8b0:4001:c06::241]:41454)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <atar4qemu@gmail.com>) id 1eRxuA-0002Jx-7G
+	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 05:16:46 -0500
+Received: by mail-io0-x241.google.com with SMTP id o2so20478592ioe.8
+	for <qemu-devel@nongnu.org>; Thu, 21 Dec 2017 02:16:45 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <6768575f-27e0-1277-3e7e-56ec44298e6a@kaod.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 02/19] spapr: introduce a skeleton for
- the XIVE interrupt controller
+In-Reply-To: <20171221082045.14022-13-mark.cave-ayland@ilande.co.uk>
+References: <20171221082045.14022-1-mark.cave-ayland@ilande.co.uk>
+	<20171221082045.14022-13-mark.cave-ayland@ilande.co.uk>
+From: Artyom Tarasenko <atar4qemu@gmail.com>
+Date: Thu, 21 Dec 2017 11:16:25 +0100
+Message-ID: <CACXAS8CZyx7eEph4iCddbuNqO2xz-33OX9fFbuktsygQ3tQpzA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCHv3 12/16] apb: remove busA property from
+ PBMPCIBridge state
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,77 +29,130 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Benjamin Herrenschmidt <benh@kernel.crashing.org>, David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Greg Kurz <groug@kaod.org>
+To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Cc: qemu-devel <qemu-devel@nongnu.org>
 
-On 12/21/2017 10:16 AM, C=C3=A9dric Le Goater wrote:
-> On 12/21/2017 01:12 AM, Benjamin Herrenschmidt wrote:
->> On Wed, 2017-12-20 at 16:09 +1100, David Gibson wrote:
->>>
->>> As you've suggested in yourself, I think we might need to more
->>> explicitly model the different components of the XIVE system.  As par=
-t
->>> of that, I think you need to be clearer in this base skeleton about
->>> exactly what component your XIVE object represents.
->>>
->>> If the answer is "the overall thing" I suspect that's not what you
->>> want - I had one of those for XICs which proved to be a mistake
->>> (eventually replaced by the XICSFabric interface).
->>>
->>> Changing the model later isn't impossible, but doing so without
->>> breaking migration can be a real pain, so I think it's worth a
->>> reasonable effort to try and get it right initially.
->>
->> Note: we do need to speed things up a bit, as having exploitation mode
->> in KVM will significantly help with IPI performance among other things=
-.
->>
->> I'm about ready to do the KVM bits. The one thing we need to discuss
->> and figure a good design for is how we map all those interrupt control
->> pages into qemu.
->>
->> Each interrupt (either PCIe pass-through or the "generic XIVE IPIs"
->> which are used for guest IPIs and for vio/virtio/emulated interrupts)
->> comes with a "control page" (ESB page) which needs to be mapped into
->> the guest, and the generic IPIs also come with a trigger page which
->> needs to be mapped into the guest for guest IPIs or OpenCAPI
->> interrupts, or just qemu for emulated devices.
->=20
-> what about the OS TIMA page ? Do we trap the accesses in QEMU and
-> forward them to KVM ? or do we use a similar mechanism.=20
->=20
->> Now that can be thousands of these critters. I certainly don't want to
->> create thousands of VMAs in qemu and even less thousands of memory
->> regions in KVM.
->=20
-> we can provision one mapping per kvmppc_xive_src_block  maybe ? =20
->=20
->> So we need some kind of mechanism by wich a single large VMA gets
->> mmap'ed into qemu (or maybe a couple of these, but not too many) and
->> the interrupt pages can be assigned to slots in there and demand
->> faulted.
->=20
-> Frederic has started to put in place a similar mecanism for OpenCAPI.
->=20
->> For the generic interrupts, this can probably be covered by KVM, addin=
-g
->> some arch ioctls for allocating IPIs and mmap'ing that region etc...
->=20
-> The KVM device has a ioctl handler :
->   =20
-> 	struct kvm_device_ops {
->=20
-> 		long (*ioctl)(struct kvm_device *dev, unsigned int ioctl,
-> 			      unsigned long arg);
-> 	};
->=20
-> So a KVM device for the XIVE interrupt controller can implement a coupl=
-e=20
-> of extra calls for its need, like getting the VMA addresses, etc
+On Thu, Dec 21, 2017 at 9:20 AM, Mark Cave-Ayland
+<mark.cave-ayland@ilande.co.uk> wrote:
+> Since the previous commit the only remaining use of the qdev busA property is
+> to configure the PCI bridge in front of the onboard ebus devices differently
+> to allow early OpenBIOS serial console access.
+>
+> Instead we can now manually update the PCI configuration for bridge A in
+> pci_pbm_reset() and thus completely remove the busA property from the
+> PBMPCIBridge state.
+>
+> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 
-or use set/get_attr.=20
+Reviewed-by: Artyom Tarasenko <atar4qemu@gmail.com>
 
-I wonder if it would be possible to add a 'mmap' ops to kvm_device_fops=20
-for the KVM_DEV_TYPE_XIVE device.=20
+> ---
+>  hw/pci-host/apb.c         | 29 +++++++++++++----------------
+>  include/hw/pci-host/apb.h |  3 ---
+>  2 files changed, 13 insertions(+), 19 deletions(-)
+>
+> diff --git a/hw/pci-host/apb.c b/hw/pci-host/apb.c
+> index 3ebb9dc304..53de1c93c1 100644
+> --- a/hw/pci-host/apb.c
+> +++ b/hw/pci-host/apb.c
+> @@ -581,18 +581,11 @@ static void apb_pci_bridge_realize(PCIDevice *dev, Error **errp)
+>       *   the reset value should be zero unless the boot pin is tied high
+>       *   (which is true) and thus it should be PCI_COMMAND_MEMORY.
+>       */
+> -    uint16_t cmd = PCI_COMMAND_MEMORY;
+>      PBMPCIBridge *br = PBM_PCI_BRIDGE(dev);
+>
+>      pci_bridge_initfn(dev, TYPE_PCI_BUS);
+>
+> -    /* If initialising busA, ensure that we allow IO transactions so that
+> -       we get the early serial console until OpenBIOS configures the bridge */
+> -    if (br->busA) {
+> -        cmd |= PCI_COMMAND_IO;
+> -    }
+> -
+> -    pci_set_word(dev->config + PCI_COMMAND, cmd);
+> +    pci_set_word(dev->config + PCI_COMMAND, PCI_COMMAND_MEMORY);
+>      pci_set_word(dev->config + PCI_STATUS,
+>                   PCI_STATUS_FAST_BACK | PCI_STATUS_66MHZ |
+>                   PCI_STATUS_DEVSEL_MEDIUM);
+> @@ -608,8 +601,10 @@ static void apb_pci_bridge_realize(PCIDevice *dev, Error **errp)
+>
+>  static void pci_pbm_reset(DeviceState *d)
+>  {
+> -    unsigned int i;
+>      APBState *s = APB_DEVICE(d);
+> +    PCIDevice *pci_dev;
+> +    unsigned int i;
+> +    uint16_t cmd;
+>
+>      for (i = 0; i < 8; i++) {
+>          s->pci_irq_map[i] &= PBM_PCI_IMR_MASK;
+> @@ -625,6 +620,15 @@ static void pci_pbm_reset(DeviceState *d)
+>          /* Power on reset */
+>          s->reset_control = POR;
+>      }
+> +
+> +    /* As this is the busA PCI bridge which contains the on-board devices
+> +     * attached to the ebus, ensure that we initially allow IO transactions
+> +     * so that we get the early serial console until OpenBIOS can properly
+> +     * configure the PCI bridge itself */
+> +    pci_dev = PCI_DEVICE(s->bridgeA);
+> +    cmd = pci_get_word(pci_dev->config + PCI_COMMAND);
+> +    pci_set_word(pci_dev->config + PCI_COMMAND, cmd | PCI_COMMAND_IO);
+> +    pci_bridge_update_mappings(PCI_BRIDGE(pci_dev));
+>  }
+>
+>  static const MemoryRegionOps pci_config_ops = {
+> @@ -675,7 +679,6 @@ static void pci_pbm_realize(DeviceState *dev, Error **errp)
+>                                     TYPE_PBM_PCI_BRIDGE);
+>      s->bridgeA = PCI_BRIDGE(pci_dev);
+>      pci_bridge_map_irq(s->bridgeA, "pciA", pci_pbmA_map_irq);
+> -    qdev_prop_set_bit(DEVICE(pci_dev), "busA", true);
+>      qdev_init_nofail(&pci_dev->qdev);
+>  }
+>
+> @@ -784,11 +787,6 @@ static const TypeInfo pbm_host_info = {
+>      .class_init    = pbm_host_class_init,
+>  };
+>
+> -static Property pbm_pci_properties[] = {
+> -    DEFINE_PROP_BOOL("busA", PBMPCIBridge, busA, false),
+> -    DEFINE_PROP_END_OF_LIST(),
+> -};
+> -
+>  static void pbm_pci_bridge_class_init(ObjectClass *klass, void *data)
+>  {
+>      DeviceClass *dc = DEVICE_CLASS(klass);
+> @@ -804,7 +802,6 @@ static void pbm_pci_bridge_class_init(ObjectClass *klass, void *data)
+>      set_bit(DEVICE_CATEGORY_BRIDGE, dc->categories);
+>      dc->reset = pci_bridge_reset;
+>      dc->vmsd = &vmstate_pci_device;
+> -    dc->props = pbm_pci_properties;
+>  }
+>
+>  static const TypeInfo pbm_pci_bridge_info = {
+> diff --git a/include/hw/pci-host/apb.h b/include/hw/pci-host/apb.h
+> index f0074f7a51..dd49437ff1 100644
+> --- a/include/hw/pci-host/apb.h
+> +++ b/include/hw/pci-host/apb.h
+> @@ -86,9 +86,6 @@ typedef struct APBState {
+>  typedef struct PBMPCIBridge {
+>      /*< private >*/
+>      PCIBridge parent_obj;
+> -
+> -    /* Is this busA with in-built devices (ebus)? */
+> -    bool busA;
+>  } PBMPCIBridge;
+>
+>  #define TYPE_PBM_PCI_BRIDGE "pbm-bridge"
+> --
+> 2.11.0
+>
 
-C.
+
+
+-- 
+Regards,
+Artyom Tarasenko
+
+SPARC and PPC PReP under qemu blog: http://tyom.blogspot.com/search/label/qemu
