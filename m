@@ -1,17 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33721)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35121)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eRpmL-0007Io-Oh
-	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 20:36:10 -0500
+	(envelope-from <eblake@redhat.com>) id 1eRpoL-0000bz-OV
+	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 20:38:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eRpmK-0001VH-RM
-	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 20:36:09 -0500
+	(envelope-from <eblake@redhat.com>) id 1eRpoK-00039A-N9
+	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 20:38:13 -0500
+References: <20171122101958.17065-1-vsementsov@virtuozzo.com>
+	<20171122101958.17065-3-vsementsov@virtuozzo.com>
+	<a07578ae-f57b-cb82-e87e-23b6c39cbd10@redhat.com>
 From: Eric Blake <eblake@redhat.com>
-Date: Wed, 20 Dec 2017 19:35:58 -0600
-Message-Id: <20171221013600.17648-3-eblake@redhat.com>
-In-Reply-To: <20171221013600.17648-1-eblake@redhat.com>
-References: <20171221013600.17648-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PULL 2/4] nbd/server: Optimize final chunk of sparse
- read
+Message-ID: <d4ed06f2-161d-7d42-0889-953bb33465dd@redhat.com>
+Date: Wed, 20 Dec 2017 19:38:05 -0600
+MIME-Version: 1.0
+In-Reply-To: <a07578ae-f57b-cb82-e87e-23b6c39cbd10@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 2/5] nbd/server: add nbd_opt_{read,
+ drop} to track client->optlen
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,78 +26,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, "open list:Network Block Dev..." <qemu-block@nongnu.org>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, pbonzini@redhat.com, den@openvz.org, mreitz@redhat.com
 
-If we are careful to handle 0-length read requests correctly,
-we can optimize our sparse read to send the NBD_REPLY_FLAG_DONE
-bit on our last OFFSET_DATA or OFFSET_HOLE chunk rather than
-needing a separate chunk.
+On 11/22/2017 02:03 PM, Eric Blake wrote:
+> On 11/22/2017 04:19 AM, Vladimir Sementsov-Ogievskiy wrote:
+>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+>> ---
+>>   nbd/server.c | 34 ++++++++++++++++++++++------------
+>>   1 file changed, 22 insertions(+), 12 deletions(-)
+>>
+> 
 
-Signed-off-by: Eric Blake <eblake@redhat.com>
-Message-Id: <20171107030912.23930-3-eblake@redhat.com>
-Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
----
- nbd/server.c | 13 +++++++------
- 1 file changed, 7 insertions(+), 6 deletions(-)
+> I think that means we need a tri-state return from nbd_opt_read(): < 0
+> on I/O failure, 0 if the EINVAL message has been sent, and 1 if the read
+> was successful; I also think it means that the handler for
+> NBD_OPT_EXPORT_NAME does not really fit the bill for using the same
+> handler.  Hopefully this explanation will give you more insight into the
+> counter-proposal patch I'm about to post.
 
-diff --git a/nbd/server.c b/nbd/server.c
-index be7310cb41..e443b3cf5c 100644
---- a/nbd/server.c
-+++ b/nbd/server.c
-@@ -1339,12 +1339,14 @@ static int coroutine_fn nbd_co_send_sparse_read(NBDClient *client,
-                                              offset + progress,
-                                              size - progress, &pnum, NULL,
-                                              NULL);
-+        bool final;
+Hmm, I never posted the counter-proposal, because I got caught up in 
+handling the CVEs that I spotted in the same area, then the 2.11 
+release.  I'll get back to this series shortly.
 
-         if (status < 0) {
-             error_setg_errno(errp, -status, "unable to check for holes");
-             return status;
-         }
-         assert(pnum && pnum <= size - progress);
-+        final = progress + pnum == size;
-         if (status & BDRV_BLOCK_ZERO) {
-             NBDStructuredReadHole chunk;
-             struct iovec iov[] = {
-@@ -1353,7 +1355,8 @@ static int coroutine_fn nbd_co_send_sparse_read(NBDClient *client,
-
-             trace_nbd_co_send_structured_read_hole(handle, offset + progress,
-                                                    pnum);
--            set_be_chunk(&chunk.h, 0, NBD_REPLY_TYPE_OFFSET_HOLE,
-+            set_be_chunk(&chunk.h, final ? NBD_REPLY_FLAG_DONE : 0,
-+                         NBD_REPLY_TYPE_OFFSET_HOLE,
-                          handle, sizeof(chunk) - sizeof(chunk.h));
-             stq_be_p(&chunk.offset, offset + progress);
-             stl_be_p(&chunk.length, pnum);
-@@ -1366,7 +1369,7 @@ static int coroutine_fn nbd_co_send_sparse_read(NBDClient *client,
-                 break;
-             }
-             ret = nbd_co_send_structured_read(client, handle, offset + progress,
--                                              data + progress, pnum, false,
-+                                              data + progress, pnum, final,
-                                               errp);
-         }
-
-@@ -1375,9 +1378,6 @@ static int coroutine_fn nbd_co_send_sparse_read(NBDClient *client,
-         }
-         progress += pnum;
-     }
--    if (!ret) {
--        ret = nbd_co_send_structured_done(client, handle, errp);
--    }
-     return ret;
- }
-
-@@ -1542,7 +1542,8 @@ static coroutine_fn void nbd_trip(void *opaque)
-             }
-         }
-
--        if (client->structured_reply && !(request.flags & NBD_CMD_FLAG_DF)) {
-+        if (client->structured_reply && !(request.flags & NBD_CMD_FLAG_DF) &&
-+            request.len) {
-             ret = nbd_co_send_sparse_read(req->client, request.handle,
-                                           request.from, req->data, request.len,
-                                           &local_err);
 -- 
-2.14.3
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
