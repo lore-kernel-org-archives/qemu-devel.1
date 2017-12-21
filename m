@@ -1,28 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44498)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47272)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcel@redhat.com>) id 1eS6LQ-0006WU-Mq
-	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 14:17:29 -0500
+	(envelope-from <laurent@vivier.eu>) id 1eS6Oo-000069-92
+	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 14:20:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcel@redhat.com>) id 1eS6LN-0007jF-5m
-	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 14:17:27 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:40088)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <marcel@redhat.com>) id 1eS6LM-0007iz-Sa
-	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 14:17:25 -0500
-From: Marcel Apfelbaum <marcel@redhat.com>
-References: <20171208063113.20383-1-lprosek@redhat.com>
-	<545999678.39861203.1512742146072.JavaMail.zimbra@redhat.com>
-	<20171221155923-mutt-send-email-mst@kernel.org>
-	<200a2a4e-e238-e427-d683-2e028ddeb167@redhat.com>
-Message-ID: <88bff321-03c7-7320-0cd5-2b3c95473237@redhat.com>
-Date: Thu, 21 Dec 2017 21:17:11 +0200
+	(envelope-from <laurent@vivier.eu>) id 1eS6Ol-0001dj-Io
+	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 14:20:58 -0500
+Received: from mout.kundenserver.de ([212.227.126.135]:63959)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1eS6Ol-0001bP-95
+	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 14:20:55 -0500
+From: Laurent Vivier <laurent@vivier.eu>
+References: <1513790098-9815-1-git-send-email-pbonzini@redhat.com>
+	<CAFEAcA8J53A93+SQz01W13gRCX-ecw0v+8JTaRqwmrUeFjqaJA@mail.gmail.com>
+	<51174e3a-12d3-f3e0-2d76-b776e0fe62b6@redhat.com>
+	<e7994a8d-3a02-99c7-d919-c940aa4bc066@redhat.com>
+	<40dbaff2-918c-bba6-2a70-7c5f9b19cb66@vivier.eu>
+	<0d3d6598-608c-0079-426f-7455a92de7d8@vivier.eu>
+	<64440fda-1799-f50d-21ed-dc898e08d82f@redhat.com>
+	<8033acdb-f88a-2df3-83f3-e3e304c8eb51@vivier.eu>
+	<183d1158-2aa3-7ecb-3372-4a206f4c5292@redhat.com>
+	<3aee5f72-55ee-3653-d409-0f77e40cf90f@vivier.eu>
+Message-ID: <172eed1f-4769-b3d5-e9f8-48dd834049d8@vivier.eu>
+Date: Thu, 21 Dec 2017 20:20:40 +0100
 MIME-Version: 1.0
-In-Reply-To: <200a2a4e-e238-e427-d683-2e028ddeb167@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <3aee5f72-55ee-3653-d409-0f77e40cf90f@vivier.eu>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2] msix: don't mask already masked vectors
- on reset
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] out of bounds in set_cc_op()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,125 +36,130 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Ladi Prosek <lprosek@redhat.com>, qemu-devel@nongnu.org, geoff@hostfission.com, alex williamson <alex.williamson@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>, Thomas Huth <thuth@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Richard Henderson <rth@twiddle.net>
+Cc: Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-On 21/12/2017 17:08, Marcel Apfelbaum wrote:
-> On 21/12/2017 16:01, Michael S. Tsirkin wrote:
->> On Fri, Dec 08, 2017 at 09:09:06AM -0500, Marcel Apfelbaum wrote:
+Le 21/12/2017 à 15:36, Laurent Vivier a écrit :
+> Le 21/12/2017 à 15:14, Paolo Bonzini a écrit :
+>> On 21/12/2017 15:13, Laurent Vivier wrote:
+>>> Le 21/12/2017 à 15:10, Paolo Bonzini a écrit :
+>>>> On 21/12/2017 14:32, Laurent Vivier wrote:
+>>>>> Le 21/12/2017 à 14:07, Laurent Vivier a écrit :
+>>>>>> Le 21/12/2017 à 13:49, Thomas Huth a écrit :
+>>>>>>> On 20.12.2017 22:56, Paolo Bonzini wrote:
+>>>>>>>> On 20/12/2017 20:20, Peter Maydell wrote:
+>>>>>>>>> On the x86/sanitizer build, new runtime errors:
+>>>>>>>>>   GTESTER check-qtest-m68k
+>>>>>>>>> /home/petmay01/linaro/qemu-for-merges/target/m68k/translate.c:230:12:
+>>>>>>>>> runtime error: index -1 out of bounds for type 'const uint8_t [11]'
+>>>>>>>>>
+>>>>>>>>> ...and similar fails on one or two boards on most of the other
+>>>>>>>>> guest architectures.
+>>>>>>>>
+>>>>>>>> These are preexisting bugs, now exposed by the boot-serial-test.
+>>>>>>>> Thomas, can you identify the architectures that have a problem and
+>>>>>>>> notify the maintainers?  In the meanwhile I'll keep the boot-serial-test
+>>>>>>>> enhancements queued locally, and remove them from the pull request.
+>>>>>>>
+>>>>>>>  Laurent, Richard,
+>>>>>>>
+>>>>>>> looks like old_op is -1 when set_cc_op() is called here for the first
+>>>>>>> time. The problem can be reproduced by running the mini-kernel directly.
+>>>>>>> Just get http://people.redhat.com/~thuth/m68k-uart.bin and run QEMU like
+>>>>>>> this:
+>>>>>>>
+>>>>>>>  qemu-system-m68k -nographic -kernel  ~/tmp/m68k-uart.bin -serial none
+>>>>>>>
+>>>>>>> That kernel only contains these few instructions:
+>>>>>>>
+>>>>>>>   0x41, 0xf9, 0xfc, 0x06, 0x00, 0x00,     /* lea 0xfc060000,%a0 */
+>>>>>>>   0x10, 0x3c, 0x00, 0x54,                 /* move.b #'T',%d0 */
+>>>>>>>   0x11, 0x7c, 0x00, 0x04, 0x00, 0x08,     /* move.b #4,8(%a0) */
+>>>>>>>   0x11, 0x40, 0x00, 0x0c,                 /* move.b %d0,12(%a0) */
+>>>>>>>   0x60, 0xfa                              /* bra.s  loop */
+>>>>>>>
+>>>>>>> The problem occurs during the second instruction (i.e. the first move.b).
+>>>>>>>
+>>>>>>> Do you have any ideas where this -1 in s->cc_op could come from?
+>>>>>>
+>>>>>> I think it comes from CCOp: it's the value of CC_OP_DYNAMIC.
+>>>>>>
+>>>>>> We should not use it to access cc_op_live[].
+>>>>>>
+>>>>>> I try to find a fix, but I think Richard knows this better than me.
+>>>>>
+>>>>> This should fix the problem, but I'd like Richard checks it...
+>>>>>
+>>>>> diff --git a/target/m68k/translate.c b/target/m68k/translate.c
+>>>>> index b60909222c..721b5801da 100644
+>>>>> --- a/target/m68k/translate.c
+>>>>> +++ b/target/m68k/translate.c
+>>>>> @@ -225,6 +225,11 @@ static void set_cc_op(DisasContext *s, CCOp op)
+>>>>>      s->cc_op = op;
+>>>>>      s->cc_op_synced = 0;
+>>>>>
+>>>>> +    if (old_op == CC_OP_DYNAMIC) {
+>>>>> +        tcg_gen_discard_i32(QREG_CC_OP);
+>>>>> +        return;
+>>>>> +    }
+>>>>
+>>>> This tcg_gen_discard_i32 is correct, but all flags were potentially live
+>>>> and can be discarded if the new op uses it(*).  So I'd replace "return"
+>>>> with "old_op = CC_OP_FLAGS".
+>>>
+>>> Yes, I agree, we can also have:
+>>>
+>>> iff --git a/target/m68k/cpu.h b/target/m68k/cpu.h
+>>> index afae5f68ac..5d03764eab 100644
+>>> --- a/target/m68k/cpu.h
+>>> +++ b/target/m68k/cpu.h
+>>> @@ -182,7 +182,7 @@ void cpu_m68k_set_fpcr(CPUM68KState *env, uint32_t val);
+>>>   */
+>>>  typedef enum {
+>>>      /* Translator only -- use env->cc_op.  */
+>>> -    CC_OP_DYNAMIC = -1,
+>>> +    CC_OP_DYNAMIC,
+>>>
+>>>      /* Each flag bit computed into cc_[xcnvz].  */
+>>>      CC_OP_FLAGS,
+>>> diff --git a/target/m68k/translate.c b/target/m68k/translate.c
+>>> index b60909222c..61ac1a8e83 100644
+>>> --- a/target/m68k/translate.c
+>>> +++ b/target/m68k/translate.c
+>>> @@ -207,6 +207,7 @@ typedef void (*disas_proc)(CPUM68KState *env,
+>>> DisasContext *s, uint16_t insn);
+>>>  #endif
+>>>
+>>>  static const uint8_t cc_op_live[CC_OP_NB] = {
+>>> +    [CC_OP_DYNAMIC] = CCF_C | CCF_V | CCF_Z | CCF_N | CCF_X,
+>>>      [CC_OP_FLAGS] = CCF_C | CCF_V | CCF_Z | CCF_N | CCF_X,
+>>>      [CC_OP_ADDB ... CC_OP_ADDL] = CCF_X | CCF_N | CCF_V,
+>>>      [CC_OP_SUBB ... CC_OP_SUBL] = CCF_X | CCF_N | CCF_V,
+>>> @@ -237,6 +238,11 @@ static void set_cc_op(DisasContext *s, CCOp op)
+>>>      if (dead & CCF_V) {
+>>>          tcg_gen_discard_i32(QREG_CC_V);
+>>>      }
+>>> +
+>>> +    /* Discard any computed CC_OP value */
+>>> +    if (old_op == CC_OP_DYNAMIC) {
+>>> +        tcg_gen_discard_i32(QREG_CC_OP);
+>>> +    }
+>>>  }
+>>>
+>>>  /* Update the CPU env CC_OP state.  */
 >>>
 >>>
->>> ----- Original Message -----
->>>> From: "Ladi Prosek" <lprosek@redhat.com>
->>>> To: qemu-devel@nongnu.org
->>>> Cc: marcel@redhat.com, geoff@hostfission.com, mst@redhat.com, "alex =
-williamson" <alex.williamson@redhat.com>
->>>> Sent: Friday, December 8, 2017 8:31:13 AM
->>>> Subject: [PATCH v2] msix: don't mask already masked vectors on reset
->>>>
->>>> msix_mask_all() is supposed to invoke the release vector notifier if=
- the
->>>> state of the
->>>> respective vector changed from unmasked to masked. The way it's curr=
-ently
->>>> called from
->>>> msix_reset(), though, may result in calling the release notifier eve=
-n if the
->>>> vector
->>>> is already masked.
->>>>
->>>> 1) msix_reset() clears out the msix_cap field and the msix_table.
->>>> 2) msix_mask_all() runs with was_masked=3Dfalse for all vectors beca=
-use of 1),
->>>> which
->>>> =C2=A0=C2=A0=C2=A0 results in calling the release notifier on all ve=
-ctors.
->>>> 3) if msix_reset() is subsequently called again, it goes through the=
- same
->>>> steps and
->>>> =C2=A0=C2=A0=C2=A0 calls the release notifier on all vectors again.
->>>>
->>>> This commit moves msix_mask_all() up so it runs before the device st=
-ate is
->>>> lost. And
->>>> it adds an assignment to msix_function_masked so that the device rem=
-embers
->>>> that
->>>> MSI-X is masked.
->>>>
->>>> This is likely a low impact issue, found while debugging an already =
-broken
->>>> device. It
->>>> is however easy to fix and the expectation that the use and release =
-notifier
->>>> invocations
->>>> are always balanced is very natural.
->>>>
->>>> Signed-off-by: Ladi Prosek <lprosek@redhat.com>
->>>> ---
->>>>
->>>> v1->v2:
->>>> * fixed typo in commit message "or" -> "to" (Marcel)
->>>> * directly set msix_function_masked to true instead of calling
->>>> =C2=A0=C2=A0 msix_update_function_masked() (Marcel)
->>>>
->>>>
->>>> =C2=A0 hw/pci/msix.c | 3 ++-
->>>> =C2=A0 1 file changed, 2 insertions(+), 1 deletion(-)
->>>>
->>>> diff --git a/hw/pci/msix.c b/hw/pci/msix.c
->>>> index c944c02135..d6a4dbdb6b 100644
->>>> --- a/hw/pci/msix.c
->>>> +++ b/hw/pci/msix.c
->>>> @@ -500,11 +500,12 @@ void msix_reset(PCIDevice *dev)
->>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return;
->>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
->>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 msix_clear_all_vectors(dev);
->>>> +=C2=A0=C2=A0=C2=A0 msix_mask_all(dev, dev->msix_entries_nr);
->>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 dev->config[dev->msix_cap + MSIX_CONT=
-ROL_OFFSET] &=3D
->>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ~dev->wmask[d=
-ev->msix_cap + MSIX_CONTROL_OFFSET];
->>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 memset(dev->msix_table, 0, dev->msix_=
-entries_nr * PCI_MSIX_ENTRY_SIZE);
->>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 memset(dev->msix_pba, 0, QEMU_ALIGN_U=
-P(dev->msix_entries_nr, 64) / 8);
->>>> -=C2=A0=C2=A0=C2=A0 msix_mask_all(dev, dev->msix_entries_nr);
->>>> +=C2=A0=C2=A0=C2=A0 dev->msix_function_masked =3D true;
->>>> =C2=A0 }
->>>> =C2=A0 /* PCI spec suggests that devices make it possible for softwa=
-re to configure
->>>> --=20
->>>> 2.13.6
->>>>
->>>>
->>>
->>> Thanks Ladi!
->>>
->>> Reviewed-by: Marcel Apfelbaum <marcel@redhat.com>
 >>
->> This breaks make check though.
->>
->> Marcel - could you take a look please?
->>
->=20
-> Sure
+>> Yes, this is good too.  After my pull request is in, feel free to take
+>> Thomas's m68k boot-serial-test patch in your tree.
 
-We have a problem with the patch.
+And what about:
 
-Moving msix_mask_all before resetting the msix_table to 0
-modifies behavior since we don't set the PCI_MSIX_ENTRY_CTRL_MASKBIT
-for each vector anymore (the information is lost).
+      tests/boot-serial-test: Add tests for microblaze boards
+      tests/boot-serial-test: Add a test for the moxiesim machine
+      tests/boot-serial-test: Add support for the raspi2 machine
 
-What we need (I think) is to run msix_mask_all again,
-this time without calling msix_handle_mask_update (only setting the bit).
-(I tested it and the make check passes after it)
+?
 
-I think is risky to use the patch for now.
 Thanks,
-Marcel
-
-
->=20
-> Thanks,
-> Marcel
+Laurent
