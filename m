@@ -1,20 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35140)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36141)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1eS9pX-0005jW-CS
-	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 18:00:52 -0500
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1eS9qn-0006jx-5o
+	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 18:02:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1eS9pW-0008Jh-5r
-	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 18:00:47 -0500
-References: <151389701772.99.13078696286436717322@5adcb62bf0d6>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <ff58eb94-fc46-0571-6d36-83a2bd7a4689@redhat.com>
-Date: Thu, 21 Dec 2017 18:00:30 -0500
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1eS9qm-0000lV-I1
+	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 18:02:05 -0500
 MIME-Version: 1.0
-In-Reply-To: <151389701772.99.13078696286436717322@5adcb62bf0d6>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] file-posix: refuse to open directories
+Sender: philippe.mathieu.daude@gmail.com
+In-Reply-To: <20171221223727-mutt-send-email-mst@kernel.org>
+References: <1513866427-27125-1-git-send-email-mst@redhat.com>
+	<1513866427-27125-16-git-send-email-mst@redhat.com>
+	<20171221223727-mutt-send-email-mst@kernel.org>
+From: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Date: Thu, 21 Dec 2017 20:02:03 -0300
+Message-ID: <CAAdtpL4dudnESw9rN_5JHowS_gAxakb8GVikRgTrB1iOSupq3A@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PULL 15/25] hw/block/nvme: QOM'ify PCI NVME
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,19 +27,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: famz@redhat.com, qemu-block@nongnu.org, kwolf@redhat.com, mreitz@redhat.com, dgilbert@redhat.com
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, Keith Busch <keith.busch@intel.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, "open list:Block layer core" <qemu-block@nongnu.org>
 
+Hi Michael,
 
+On Thu, Dec 21, 2017 at 5:38 PM, Michael S. Tsirkin <mst@redhat.com> wrote:
+> On Thu, Dec 21, 2017 at 04:29:21PM +0200, Michael S. Tsirkin wrote:
+>> From: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+>>
+>> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+>> Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+>> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+>
+> Dropped due to merge conflicts. Pls rebase and ask
+> storage maintainers to apply as appropriate.
 
-On 12/21/2017 05:56 PM, no-reply@patchew.org wrote:
-> /tmp/qemu-test/src/hw/i386/vmport.c: In function 'vmport_ioport_read':
-> /tmp/qemu-test/src/hw/i386/vmport.c:81:9: error: implicit declaration of function 'qemu_log_mask' [-Werror=implicit-function-declaration]
->          qemu_log_mask(LOG_UNIMP, "vmport: unknown command %x\n", command);
->          ^~~~~~~~~~~~~
-> /tmp/qemu-test/src/hw/i386/vmport.c:81:9: error: nested extern declaration of 'qemu_log_mask' [-Werror=nested-externs]
-> /tmp/qemu-test/src/hw/i386/vmport.c:81:23: error: 'LOG_UNIMP' undeclared (first use in this function)
->          qemu_log_mask(LOG_UNIMP, "vmport: unknown command %x\n", command);
->                        ^~~~~~~~~
+Ok, sorry about this.
+Many patch queue during freezing in different trees lead to this.
 
-fake news
+However you must also drop the patch "hw/pci: remove obsolete
+PCIDevice->init()" else the NVME device won't work.
+
+Regards,
+
+Phil.
