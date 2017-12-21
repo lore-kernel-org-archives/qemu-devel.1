@@ -1,29 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47015)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47908)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eSA2e-0004W7-E4
-	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 18:14:21 -0500
+	(envelope-from <bounces@canonical.com>) id 1eSA3w-0005Ks-Lu
+	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 18:15:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eSA2a-0003Nk-C5
-	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 18:14:20 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:49728)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1eSA2a-0003NH-77
-	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 18:14:16 -0500
-References: <1511273358-21789-1-git-send-email-s1seetee@linux.vnet.ibm.com>
-	<20171212164114.GF2409@work-vm>
-	<e37d8871-544f-3c4f-3a59-bb66dc5c8b67@linux.vnet.ibm.com>
-	<b5c7e566-34f0-adb0-0fcb-bf272cbb0a81@redhat.com>
-	<225a4478-dc5e-a067-f207-e8a183afa0d9@linux.vnet.ibm.com>
-	<9b719ebe-8b38-708c-45a7-d377a583f899@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <5e07b5ea-e8b0-521a-b1af-31017fc52578@redhat.com>
-Date: Thu, 21 Dec 2017 17:14:14 -0600
+	(envelope-from <bounces@canonical.com>) id 1eSA3s-0004Zv-Ga
+	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 18:15:40 -0500
+Received: from indium.canonical.com ([91.189.90.7]:41378)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1eSA3s-0004Yt-BJ
+	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 18:15:36 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1eSA3q-0006iH-DA
+	for <qemu-devel@nongnu.org>; Thu, 21 Dec 2017 23:15:34 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 5FE4D2E80C3
+	for <qemu-devel@nongnu.org>; Thu, 21 Dec 2017 23:15:34 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <9b719ebe-8b38-708c-45a7-d377a583f899@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v1] hmp: 'info snapshots' not showing the id
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 21 Dec 2017 23:08:34 -0000
+From: Gustavo Moreira <gmoreira@gmail.com>
+Reply-To: Bug 1739378 <1739378@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <151375741208.25451.9053884797959645588.malonedeb@wampee.canonical.com>
+Message-Id: <151389771426.17795.4591366412435193989.malone@soybean.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1739378] Re: qemu git master snapshot doesn't work
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,47 +36,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>, seeteena <s1seetee@linux.vnet.ibm.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, lma@suse.com
-Cc: qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
 
-On 12/19/2017 08:20 AM, Max Reitz wrote:
+So, it should be only related to SD? Which virtual device/storage
+backend do you recommend for snapshots?
 
-> So there are three things:
-> 
-> (1) We probably should not allow snapshot names that could be IDs.
-> Easiest way to solve this: Names have to start with a non-digit.
+-- =
 
-Yes, that would be a nice change.  It is not strictly backwards 
-compatible (so we'd still have to cope with images that didn't follow 
-the rule, whether created by older qemu or by non-qemu implementations 
-of qcow2), but would alleviate a lot of confusion.
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1739378
 
-> 
-> (2) If we want to print a global snapshot's common ID, we need to affirm
-> that this ID is indeed the same on all disks before we can print it.
-> Same for names, but currently the name is always the same on all disks
-> because that is how we identify global snapshots.
-> 
-> (3) You can give an ID to loadvm and then it will load the snapshot with
-> that ID from all disks.  So if you have snapshots with a common ID on
-> all disks, these are kind of global snapshots, too, even though they
-> don't share a name.  Thus, they should probably be included in the
-> listing (this is what you have just proposed).
-> I don't like this at all, though.  A snapshot's ID is not really
-> user-controlled, it's just some auto-generated number.  Therefore, just
-> because the ID of a snapshot matches across multiple disks, this doesn't
-> mean that they are related whatsoever.
-> So, first, I don't think loadvm should work with IDs (at least not
-> across multiple disks).  But I don't think this really needs to be fixed.
-> On the other hand, I really don't think info snapshots should list
-> snapshots that match by ID, because a matching ID does not mean that
-> snapshots are actually related.  A matching name usually does, though,
-> so I think what we currently do is sufficient and the right way to do it.
-> 
-> Max
-> 
+Title:
+  qemu git master snapshot doesn't work
 
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+Status in QEMU:
+  New
+
+Bug description:
+  I'm having different issues trying to have QEMU snapshots working
+  using qemu-system-arm with vexpress-a15 board.
+
+  In this opportunity, I'm trying the git master head version:
+  # git rev-parse HEAD
+  af352675efb7e92a1f5f6461a042a12015ab3d12
+
+  $ /usr/local/bin/qemu-system-arm -kernel kernel/vmlinuz-4.10.0-42-generic=
+ -initrd kernel/initrd.img-4.10.0-42-generic -M vexpress-a15 -m 2048 -appen=
+d 'root=3D/dev/mmcblk0 rootwait console=3Dtty0' -sd vexpress-4G.qcow2 -dtb =
+device-tree/vexpress-v2p-ca15-tc1.dtb
+  audio: Could not init `oss' audio driver
+
+  Later on, when the machine finishes booting I savevm ss and quit.
+  However, when I try to restore it, I have that Missing section footer
+  error:
+
+  $ /usr/local/bin/qemu-system-arm -kernel kernel/vmlinuz-4.10.0-42-generic=
+ -initrd kernel/initrd.img-4.10.0-42-generic -M vexpress-a15 -m 2048 -appen=
+d 'root=3D/dev/mmcblk0 rootwait console=3Dtty0' -sd vexpress-4G.qcow2 -dtb =
+device-tree/vexpress-v2p-ca15-tc1.dtb  -loadvm ss
+  audio: Could not init `oss' audio driver
+  qemu-system-arm: Missing section footer for sd-card
+  qemu-system-arm: Error -22 while loading VM state
+
+  OS: Ubuntu 16.04.3 LTS (xenial)
+
+  $ gcc --version
+  gcc (Ubuntu 5.4.0-6ubuntu1~16.04.5) 5.4.0 20160609
+
+  How have I built it?
+  # git clone git://git.qemu.org/qemu.git
+  # cd qemu
+  # git submodule update --init --checkout
+  # make clean && ./configure --target-list=3Darm-softmmu && make -j8
+  # sudo make install
+
+  I've also tried a different ./configure line, explicitly enabling some
+  of the features, i.e. smartcard, with the same results:
+
+  ./configure '--disable-user' '--enable-system' '--enable-linux-user'
+  '--enable-modules' '--enable-linux-aio' '--audio-drv-list=3Dpa'
+  '--enable-attr' '--enable-brlapi' '--enable-virtfs' '--enable-cap-ng'
+  '--enable-curl' '--enable-fdt' '--enable-gnutls' '--disable-gtk'
+  '--disable-vte' '--enable-libiscsi' '--enable-curses' '--enable-
+  smartcard' '--enable-rbd' '--enable-vnc-sasl' '--enable-seccomp'
+  '--enable-spice' '--enable-libusb' '--enable-usb-redir' '--enable-
+  xfsctl' '--enable-vnc' '--enable-vnc-jpeg' '--enable-vnc-png'
+  '--enable-kvm' '--enable-vhost-net'
+
+  As a reference, and just in case these may be in some way related,
+  I've just submitted another ticket for a different issue with
+  snapshots using Ubuntu Qemu version
+  (https://bugs.launchpad.net/qemu/+bug/1739371)
+
+  Cheers,
+  Gus
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1739378/+subscriptions
