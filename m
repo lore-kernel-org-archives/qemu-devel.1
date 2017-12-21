@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52994)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53026)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eS1Q4-0005yV-8L
-	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 09:01:57 -0500
+	(envelope-from <mst@redhat.com>) id 1eS1Q8-00062j-Qc
+	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 09:02:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eS1Pu-0000Ig-L4
-	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 09:01:56 -0500
-Received: from mail-ot0-x241.google.com ([2607:f8b0:4003:c0f::241]:35810)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1eS1Pu-0000Hm-Em
-	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 09:01:46 -0500
-Received: by mail-ot0-x241.google.com with SMTP id q5so188277oth.2
-	for <qemu-devel@nongnu.org>; Thu, 21 Dec 2017 06:01:46 -0800 (PST)
+	(envelope-from <mst@redhat.com>) id 1eS1Q3-0000NV-6F
+	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 09:02:00 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:54318)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1eS1Q2-0000N5-Tk
+	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 09:01:55 -0500
+Date: Thu, 21 Dec 2017 16:01:46 +0200
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20171221155923-mutt-send-email-mst@kernel.org>
+References: <20171208063113.20383-1-lprosek@redhat.com>
+	<545999678.39861203.1512742146072.JavaMail.zimbra@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20171220002941.14560-1-palmer@dabbelt.com>
-References: <20171220002941.14560-1-palmer@dabbelt.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 21 Dec 2017 14:01:25 +0000
-Message-ID: <CAFEAcA-+9wWhyVwt7=-tdGe22U1XKAq1PfQ4tNRQx0yMjPx3yg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH] linux-user: Implement renameat2 when
- defined
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <545999678.39861203.1512742146072.JavaMail.zimbra@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2] msix: don't mask already masked vectors
+ on reset
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,29 +28,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Palmer Dabbelt <palmer@dabbelt.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Palmer Dabbelt <palmer@sifive.com>, Michael Clark <mjc@sifive.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>
+To: Marcel Apfelbaum <marcel@redhat.com>
+Cc: Ladi Prosek <lprosek@redhat.com>, qemu-devel@nongnu.org, geoff@hostfission.com, alex williamson <alex.williamson@redhat.com>
 
-On 20 December 2017 at 00:29, Palmer Dabbelt <palmer@dabbelt.com> wrote:
-> +#if defined(TARGET_NR_renameat2) && defined(__NR_renameat2)
-> +    case TARGET_NR_renameat2:
-> +        {
-> +            void *p2;
-> +            p  = lock_user_string(arg2);
-> +            p2 = lock_user_string(arg4);
-> +            if (!p || !p2)
-> +                ret = -TARGET_EFAULT;
-> +            else
-> +                ret = get_errno(syscall(__NR_renameat2, arg1, p, arg3, p2, arg5));
-> +            unlock_user(p2, arg4, 0);
-> +            unlock_user(p, arg2, 0);
-> +        }
-> +        break;
-> +#endif
+On Fri, Dec 08, 2017 at 09:09:06AM -0500, Marcel Apfelbaum wrote:
+> 
+> 
+> ----- Original Message -----
+> > From: "Ladi Prosek" <lprosek@redhat.com>
+> > To: qemu-devel@nongnu.org
+> > Cc: marcel@redhat.com, geoff@hostfission.com, mst@redhat.com, "alex williamson" <alex.williamson@redhat.com>
+> > Sent: Friday, December 8, 2017 8:31:13 AM
+> > Subject: [PATCH v2] msix: don't mask already masked vectors on reset
+> > 
+> > msix_mask_all() is supposed to invoke the release vector notifier if the
+> > state of the
+> > respective vector changed from unmasked to masked. The way it's currently
+> > called from
+> > msix_reset(), though, may result in calling the release notifier even if the
+> > vector
+> > is already masked.
+> > 
+> > 1) msix_reset() clears out the msix_cap field and the msix_table.
+> > 2) msix_mask_all() runs with was_masked=false for all vectors because of 1),
+> > which
+> >    results in calling the release notifier on all vectors.
+> > 3) if msix_reset() is subsequently called again, it goes through the same
+> > steps and
+> >    calls the release notifier on all vectors again.
+> > 
+> > This commit moves msix_mask_all() up so it runs before the device state is
+> > lost. And
+> > it adds an assignment to msix_function_masked so that the device remembers
+> > that
+> > MSI-X is masked.
+> > 
+> > This is likely a low impact issue, found while debugging an already broken
+> > device. It
+> > is however easy to fix and the expectation that the use and release notifier
+> > invocations
+> > are always balanced is very natural.
+> > 
+> > Signed-off-by: Ladi Prosek <lprosek@redhat.com>
+> > ---
+> > 
+> > v1->v2:
+> > * fixed typo in commit message "or" -> "to" (Marcel)
+> > * directly set msix_function_masked to true instead of calling
+> >   msix_update_function_masked() (Marcel)
+> > 
+> > 
+> >  hw/pci/msix.c | 3 ++-
+> >  1 file changed, 2 insertions(+), 1 deletion(-)
+> > 
+> > diff --git a/hw/pci/msix.c b/hw/pci/msix.c
+> > index c944c02135..d6a4dbdb6b 100644
+> > --- a/hw/pci/msix.c
+> > +++ b/hw/pci/msix.c
+> > @@ -500,11 +500,12 @@ void msix_reset(PCIDevice *dev)
+> >          return;
+> >      }
+> >      msix_clear_all_vectors(dev);
+> > +    msix_mask_all(dev, dev->msix_entries_nr);
+> >      dev->config[dev->msix_cap + MSIX_CONTROL_OFFSET] &=
+> >  	    ~dev->wmask[dev->msix_cap + MSIX_CONTROL_OFFSET];
+> >      memset(dev->msix_table, 0, dev->msix_entries_nr * PCI_MSIX_ENTRY_SIZE);
+> >      memset(dev->msix_pba, 0, QEMU_ALIGN_UP(dev->msix_entries_nr, 64) / 8);
+> > -    msix_mask_all(dev, dev->msix_entries_nr);
+> > +    dev->msix_function_masked = true;
+> >  }
+> >  
+> >  /* PCI spec suggests that devices make it possible for software to configure
+> > --
+> > 2.13.6
+> > 
+> > 
+> 
+> Thanks Ladi!
+> 
+> Reviewed-by: Marcel Apfelbaum <marcel@redhat.com>
 
-Should we have code to handle using plain renameat for flags==0
-calls? renameat2() only arrived in 3.15 kernels, so as it stands
-this patch will work on a smaller set of hosts than it might.
+This breaks make check though.
 
-thanks
--- PMM
+Marcel - could you take a look please?
+
+-- 
+MST
