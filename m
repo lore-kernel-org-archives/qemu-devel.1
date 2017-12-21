@@ -1,26 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53270)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55066)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1eS4G6-0000oh-I3
-	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 12:03:51 -0500
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1eS4HA-0001ZG-TC
+	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 12:05:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1eS4G2-0005qF-7k
-	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 12:03:50 -0500
-Resent-Message-Id: <E1eS4G2-0005qF-7k@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21482)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1eS4G1-0005m6-TB
-	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 12:03:46 -0500
-In-Reply-To: <20171221155905.3793-1-berrange@redhat.com>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <151387305838.99.508098824580499746@5adcb62bf0d6>
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1eS4H4-0007VG-DD
+	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 12:04:56 -0500
+Received: from mail-io0-x243.google.com ([2607:f8b0:4001:c06::243]:42227)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1eS4H4-0007Ut-88
+	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 12:04:50 -0500
+Received: by mail-io0-x243.google.com with SMTP id x67so15626170ioi.9
+	for <qemu-devel@nongnu.org>; Thu, 21 Dec 2017 09:04:50 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Thu, 21 Dec 2017 08:17:39 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH v2 0/2] Enable passing pre-opened chardev
- socket FDs
+Sender: philippe.mathieu.daude@gmail.com
+In-Reply-To: <20171221161949-mutt-send-email-mst@kernel.org>
+References: <20171218151244.9975-1-f4bug@amsat.org>
+	<20171218151244.9975-4-f4bug@amsat.org>
+	<20171221161949-mutt-send-email-mst@kernel.org>
+From: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Date: Thu, 21 Dec 2017 14:04:48 -0300
+Message-ID: <CAAdtpL78hATJrxYbCsw9dooa1S09WENiMb=LP+Y5AFAu_NF2KA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 3/4] hw/pci-host/xilinx: QOM'ify the
+ AXI-PCIe host bridge
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,38 +35,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: berrange@redhat.com
-Cc: famz@redhat.com, qemu-devel@nongnu.org, dgilbert@redhat.com, armbru@redhat.com, marcandre.lureau@redhat.com, pbonzini@redhat.com
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Marcel Apfelbaum <marcel@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Paul Burton <paul.burton@mips.com>, Yongbok Kim <yongbok.kim@mips.com>, "Edgar E . Iglesias" <edgar.iglesias@gmail.com>, Alistair Francis <alistair.francis@xilinx.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, James Hogan <jhogan@kernel.org>
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
-c3NhZ2UtaWQ6IDIwMTcxMjIxMTU1OTA1LjM3OTMtMS1iZXJyYW5nZUByZWRoYXQuY29tClN1Ympl
-Y3Q6IFtRZW11LWRldmVsXSBbUEFUQ0ggdjIgMC8yXSBFbmFibGUgcGFzc2luZyBwcmUtb3BlbmVk
-IGNoYXJkZXYgc29ja2V0IEZEcwoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFz
-aAoKQkFTRT1iYXNlCm49MQp0b3RhbD0kKGdpdCBsb2cgLS1vbmVsaW5lICRCQVNFLi4gfCB3YyAt
-bCkKZmFpbGVkPTAKCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNv
-bmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCgpjb21taXRzPSIkKGdpdCBsb2cgLS1mb3Jt
-YXQ9JUggLS1yZXZlcnNlICRCQVNFLi4pIgpmb3IgYyBpbiAkY29tbWl0czsgZG8KICAgIGVjaG8g
-IkNoZWNraW5nIFBBVENIICRuLyR0b3RhbDogJChnaXQgbG9nIC1uIDEgLS1mb3JtYXQ9JXMgJGMp
-Li4uIgogICAgaWYgISBnaXQgc2hvdyAkYyAtLWZvcm1hdD1lbWFpbCB8IC4vc2NyaXB0cy9jaGVj
-a3BhdGNoLnBsIC0tbWFpbGJhY2sgLTsgdGhlbgogICAgICAgIGZhaWxlZD0xCiAgICAgICAgZWNo
-bwogICAgZmkKICAgIG49JCgobisxKSkKZG9uZQoKZXhpdCAkZmFpbGVkCj09PSBURVNUIFNDUklQ
-VCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEz
-Mzg0CkZyb20gaHR0cHM6Ly9naXRodWIuY29tL3BhdGNoZXctcHJvamVjdC9xZW11CiAqIFtuZXcg
-dGFnXSAgICAgICAgICAgICAgIHBhdGNoZXcvMjAxNzEyMjExNjA1NTguMTQxNTEtMS1sYXVyZW50
-QHZpdmllci5ldSAtPiBwYXRjaGV3LzIwMTcxMjIxMTYwNTU4LjE0MTUxLTEtbGF1cmVudEB2aXZp
-ZXIuZXUKU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0Jwo2MTE2ZGUyMjIyIGNoYXI6IGFs
-bG93IHBhc3NpbmcgcHJlLW9wZW5lZCBzb2NrZXQgZmlsZSBkZXNjcmlwdG9yIGF0IHN0YXJ0dXAK
-ODlkODliNzQ5YyBpbzogbW92ZSBmZF9pc19zb2NrZXQoKSBpbnRvIGNvbW1vbiBzb2NrZXRzIGNv
-ZGUKCj09PSBPVVRQVVQgQkVHSU4gPT09CkNoZWNraW5nIFBBVENIIDEvMjogaW86IG1vdmUgZmRf
-aXNfc29ja2V0KCkgaW50byBjb21tb24gc29ja2V0cyBjb2RlLi4uCkNoZWNraW5nIFBBVENIIDIv
-MjogY2hhcjogYWxsb3cgcGFzc2luZyBwcmUtb3BlbmVkIHNvY2tldCBmaWxlIGRlc2NyaXB0b3Ig
-YXQgc3RhcnR1cC4uLgpFUlJPUjogZG8gbm90IGluaXRpYWxpc2UgZ2xvYmFscyB0byAwIG9yIE5V
-TEwKIzI1NTogRklMRTogdGVzdHMvdGVzdC1jaGFyLmM6NDE0OgorTW9uaXRvciAqY3VyX21vbiA9
-IE5VTEw7Cgp0b3RhbDogMSBlcnJvcnMsIDAgd2FybmluZ3MsIDMzMCBsaW5lcyBjaGVja2VkCgpZ
-b3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0
-aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRh
-aW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgo9PT0gT1VUUFVUIEVORCA9PT0K
-ClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKLS0tCkVtYWlsIGdlbmVyYXRlZCBh
-dXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2Vu
-ZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAZnJlZWxpc3RzLm9yZw==
+On Thu, Dec 21, 2017 at 11:20 AM, Michael S. Tsirkin <mst@redhat.com> wrote=
+:
+> On Mon, Dec 18, 2017 at 12:12:43PM -0300, Philippe Mathieu-Daud=C3=A9 wro=
+te:
+>> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+>> ---
+>> v2: use 'pci_dev' variable, replaced hw_error() -> error_setg()
+>>
+>>  hw/pci-host/xilinx-pcie.c | 20 +++++++++-----------
+>>  1 file changed, 9 insertions(+), 11 deletions(-)
+>>
+>> diff --git a/hw/pci-host/xilinx-pcie.c b/hw/pci-host/xilinx-pcie.c
+>> index 7659253090..681fdf486a 100644
+>> --- a/hw/pci-host/xilinx-pcie.c
+>> +++ b/hw/pci-host/xilinx-pcie.c
+>> @@ -267,24 +267,22 @@ static void xilinx_pcie_root_config_write(PCIDevic=
+e *d, uint32_t address,
+>>      }
+>>  }
+>>
+>> -static int xilinx_pcie_root_init(PCIDevice *dev)
+>> +static void xilinx_pcie_root_realize(PCIDevice *pci_dev, Error **errp)
+>>  {
+>> -    BusState *bus =3D qdev_get_parent_bus(DEVICE(dev));
+>> +    BusState *bus =3D qdev_get_parent_bus(DEVICE(pci_dev));
+>>      XilinxPCIEHost *s =3D XILINX_PCIE_HOST(bus->parent);
+>>
+>> -    pci_set_word(dev->config + PCI_COMMAND,
+>> +    pci_set_word(pci_dev->config + PCI_COMMAND,
+>>                   PCI_COMMAND_MEMORY | PCI_COMMAND_MASTER);
+>> -    pci_set_word(dev->config + PCI_MEMORY_BASE, s->mmio_base >> 16);
+>> -    pci_set_word(dev->config + PCI_MEMORY_LIMIT,
+>> +    pci_set_word(pci_dev->config + PCI_MEMORY_BASE, s->mmio_base >> 16)=
+;
+>> +    pci_set_word(pci_dev->config + PCI_MEMORY_LIMIT,
+>>                   ((s->mmio_base + s->mmio_size - 1) >> 16) & 0xfff0);
+>>
+>> -    pci_bridge_initfn(dev, TYPE_PCI_BUS);
+>> +    pci_bridge_initfn(pci_dev, TYPE_PCI_BUS);
+>>
+>> -    if (pcie_endpoint_cap_v1_init(dev, 0x80) < 0) {
+>> -        hw_error("Failed to initialize PCIe capability");
+>> +    if (pcie_endpoint_cap_v1_init(pci_dev, 0x80) < 0) {
+>> +        error_setg(errp, "Failed to initialize PCIe capability");
+>>      }
+>
+> This file doesn't include qapi/error.h so this makes build fail on
+> mingw. Fixed it up, pls take care in the future.
+
+Oops :| Thanks for fixing it.
+I will.
+
+>> -
+>> -    return 0;
+>>  }
+>>
+>>  static void xilinx_pcie_root_class_init(ObjectClass *klass, void *data)
+>> @@ -300,7 +298,7 @@ static void xilinx_pcie_root_class_init(ObjectClass =
+*klass, void *data)
+>>      k->class_id =3D PCI_CLASS_BRIDGE_HOST;
+>>      k->is_express =3D true;
+>>      k->is_bridge =3D true;
+>> -    k->init =3D xilinx_pcie_root_init;
+>> +    k->realize =3D xilinx_pcie_root_realize;
+>>      k->exit =3D pci_bridge_exitfn;
+>>      dc->reset =3D pci_bridge_reset;
+>>      k->config_read =3D xilinx_pcie_root_config_read;
+>> --
+>> 2.15.1
