@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45980)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46061)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1eS1qp-00086T-D4
-	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 09:29:36 -0500
+	(envelope-from <mst@redhat.com>) id 1eS1qv-0008Bs-0s
+	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 09:29:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1eS1qo-0005sa-Em
-	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 09:29:35 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:39314)
+	(envelope-from <mst@redhat.com>) id 1eS1qu-0005wA-3X
+	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 09:29:41 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:39408)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1eS1qo-0005rb-4P
-	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 09:29:34 -0500
-Date: Thu, 21 Dec 2017 16:29:25 +0200
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1eS1qt-0005vQ-TI
+	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 09:29:40 -0500
+Date: Thu, 21 Dec 2017 16:29:33 +0200
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <1513866427-27125-17-git-send-email-mst@redhat.com>
+Message-ID: <1513866427-27125-18-git-send-email-mst@redhat.com>
 References: <1513866427-27125-1-git-send-email-mst@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 In-Reply-To: <1513866427-27125-1-git-send-email-mst@redhat.com>
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 16/25] hw/pci-host/piix: QOM'ify the IGD
- Passthrough host bridge
+Subject: [Qemu-devel] [PULL 17/25] hw/pci-host/xilinx: QOM'ify the AXI-PCIe
+ host bridge
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,7 +29,7 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Marcel Apfelbaum <marcel@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Marcel Apfelbaum <marcel@redhat.com>, Paul Burton <paul.burton@mips.com>
 
 From: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 
@@ -38,107 +38,64 @@ Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 Reviewed-by: Marcel Apfelbaum <marcel@redhat.com>
 ---
- hw/pci-host/piix.c | 45 ++++++++++++++++++++-------------------------
- 1 file changed, 20 insertions(+), 25 deletions(-)
+ hw/pci-host/xilinx-pcie.c | 21 ++++++++++-----------
+ 1 file changed, 10 insertions(+), 11 deletions(-)
 
-diff --git a/hw/pci-host/piix.c b/hw/pci-host/piix.c
-index effe3db..0e60834 100644
---- a/hw/pci-host/piix.c
-+++ b/hw/pci-host/piix.c
-@@ -804,60 +804,55 @@ static const IGDHostInfo igd_host_bridge_infos[] =3D=
- {
-     {0xa8, 4},  /* SNB: base of GTT stolen memory */
- };
+diff --git a/hw/pci-host/xilinx-pcie.c b/hw/pci-host/xilinx-pcie.c
+index d2f88d1..53b561f 100644
+--- a/hw/pci-host/xilinx-pcie.c
++++ b/hw/pci-host/xilinx-pcie.c
+@@ -18,6 +18,7 @@
+  */
 =20
--static int host_pci_config_read(int pos, int len, uint32_t *val)
-+static void host_pci_config_read(int pos, int len, uint32_t *val, Error =
-**errp)
- {
--    char path[PATH_MAX];
--    int config_fd;
--    ssize_t size =3D sizeof(path);
-+    int rc, config_fd;
-     /* Access real host bridge. */
--    int rc =3D snprintf(path, size, "/sys/bus/pci/devices/%04x:%02x:%02x=
-.%d/%s",
--                      0, 0, 0, 0, "config");
--    int ret =3D 0;
--
--    if (rc >=3D size || rc < 0) {
--        return -ENODEV;
--    }
-+    char *path =3D g_strdup_printf("/sys/bus/pci/devices/%04x:%02x:%02x.=
-%d/%s",
-+                                 0, 0, 0, 0, "config");
+ #include "qemu/osdep.h"
++#include "qapi/error.h"
+ #include "hw/pci/pci_bridge.h"
+ #include "hw/pci-host/xilinx-pcie.h"
 =20
-     config_fd =3D open(path, O_RDWR);
-     if (config_fd < 0) {
--        return -ENODEV;
-+        error_setg_errno(errp, errno, "Failed to open: %s", path);
-+        goto out;
+@@ -267,24 +268,22 @@ static void xilinx_pcie_root_config_write(PCIDevice=
+ *d, uint32_t address,
      }
-=20
-     if (lseek(config_fd, pos, SEEK_SET) !=3D pos) {
--        ret =3D -errno;
--        goto out;
-+        error_setg_errno(errp, errno, "Failed to seek: %s", path);
-+        goto out_close_fd;
-     }
-=20
-     do {
-         rc =3D read(config_fd, (uint8_t *)val, len);
-     } while (rc < 0 && (errno =3D=3D EINTR || errno =3D=3D EAGAIN));
-     if (rc !=3D len) {
--        ret =3D -errno;
-+        error_setg_errno(errp, errno, "Failed to read: %s", path);
-     }
-=20
--out:
-+out_close_fd:
-     close(config_fd);
--    return ret;
-+out:
-+    g_free(path);
  }
 =20
--static int igd_pt_i440fx_initfn(struct PCIDevice *pci_dev)
-+static void igd_pt_i440fx_realize(PCIDevice *pci_dev, Error **errp)
+-static int xilinx_pcie_root_init(PCIDevice *dev)
++static void xilinx_pcie_root_realize(PCIDevice *pci_dev, Error **errp)
  {
-     uint32_t val =3D 0;
--    int rc, i, num;
-+    int i, num;
-     int pos, len;
-+    Error *local_err =3D NULL;
+-    BusState *bus =3D qdev_get_parent_bus(DEVICE(dev));
++    BusState *bus =3D qdev_get_parent_bus(DEVICE(pci_dev));
+     XilinxPCIEHost *s =3D XILINX_PCIE_HOST(bus->parent);
 =20
-     num =3D ARRAY_SIZE(igd_host_bridge_infos);
-     for (i =3D 0; i < num; i++) {
-         pos =3D igd_host_bridge_infos[i].offset;
-         len =3D igd_host_bridge_infos[i].len;
--        rc =3D host_pci_config_read(pos, len, &val);
--        if (rc) {
--            return -ENODEV;
-+        host_pci_config_read(pos, len, &val, &local_err);
-+        if (local_err) {
-+            error_propagate(errp, local_err);
-+            return;
-         }
-         pci_default_write_config(pci_dev, pos, val, len);
+-    pci_set_word(dev->config + PCI_COMMAND,
++    pci_set_word(pci_dev->config + PCI_COMMAND,
+                  PCI_COMMAND_MEMORY | PCI_COMMAND_MASTER);
+-    pci_set_word(dev->config + PCI_MEMORY_BASE, s->mmio_base >> 16);
+-    pci_set_word(dev->config + PCI_MEMORY_LIMIT,
++    pci_set_word(pci_dev->config + PCI_MEMORY_BASE, s->mmio_base >> 16);
++    pci_set_word(pci_dev->config + PCI_MEMORY_LIMIT,
+                  ((s->mmio_base + s->mmio_size - 1) >> 16) & 0xfff0);
+=20
+-    pci_bridge_initfn(dev, TYPE_PCI_BUS);
++    pci_bridge_initfn(pci_dev, TYPE_PCI_BUS);
+=20
+-    if (pcie_endpoint_cap_v1_init(dev, 0x80) < 0) {
+-        hw_error("Failed to initialize PCIe capability");
++    if (pcie_endpoint_cap_v1_init(pci_dev, 0x80) < 0) {
++        error_setg(errp, "Failed to initialize PCIe capability");
      }
 -
 -    return 0;
  }
 =20
- static void igd_passthrough_i440fx_class_init(ObjectClass *klass, void *=
-data)
-@@ -865,7 +860,7 @@ static void igd_passthrough_i440fx_class_init(ObjectC=
-lass *klass, void *data)
-     DeviceClass *dc =3D DEVICE_CLASS(klass);
-     PCIDeviceClass *k =3D PCI_DEVICE_CLASS(klass);
-=20
--    k->init =3D igd_pt_i440fx_initfn;
-+    k->realize =3D igd_pt_i440fx_realize;
-     dc->desc =3D "IGD Passthrough Host bridge";
- }
-=20
+ static void xilinx_pcie_root_class_init(ObjectClass *klass, void *data)
+@@ -300,7 +299,7 @@ static void xilinx_pcie_root_class_init(ObjectClass *=
+klass, void *data)
+     k->class_id =3D PCI_CLASS_BRIDGE_HOST;
+     k->is_express =3D true;
+     k->is_bridge =3D true;
+-    k->init =3D xilinx_pcie_root_init;
++    k->realize =3D xilinx_pcie_root_realize;
+     k->exit =3D pci_bridge_exitfn;
+     dc->reset =3D pci_bridge_reset;
+     k->config_read =3D xilinx_pcie_root_config_read;
 --=20
 MST
