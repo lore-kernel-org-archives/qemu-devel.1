@@ -1,26 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53993)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54323)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eS9ee-0007lD-Th
-	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 17:49:33 -0500
+	(envelope-from <mst@redhat.com>) id 1eS9f9-00084x-1S
+	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 17:50:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eS9ee-0000S5-54
-	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 17:49:32 -0500
-Received: from mail-ot0-x242.google.com ([2607:f8b0:4003:c0f::242]:35572)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1eS9ee-0000Rx-0M
-	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 17:49:32 -0500
-Received: by mail-ot0-x242.google.com with SMTP id q5so1432686oth.2
-	for <qemu-devel@nongnu.org>; Thu, 21 Dec 2017 14:49:31 -0800 (PST)
+	(envelope-from <mst@redhat.com>) id 1eS9f5-0000ez-VF
+	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 17:50:03 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:39744)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1eS9f5-0000eK-OK
+	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 17:49:59 -0500
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id BC6F480F90
+	for <qemu-devel@nongnu.org>; Thu, 21 Dec 2017 22:49:58 +0000 (UTC)
+Date: Fri, 22 Dec 2017 00:49:55 +0200
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20171222004937-mutt-send-email-mst@kernel.org>
+References: <20171221212125.19075-1-maxime.coquelin@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20171221211103.30311-1-laurent@vivier.eu>
-References: <20171221211103.30311-1-laurent@vivier.eu>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 21 Dec 2017 22:49:10 +0000
-Message-ID: <CAFEAcA8MvShVAZf1+OOf2ZZnhD3sQ_jgED4NPWBOOySwJitD2Q@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH] hw/i386/vmport: fix missing definitions
- with x86_64-w64-mingw32
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <20171221212125.19075-1-maxime.coquelin@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v3 0/5] vhost-user-test: Fixes & code
+ clean-up
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,25 +34,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Vivier <laurent@vivier.eu>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+To: Maxime Coquelin <maxime.coquelin@redhat.com>
+Cc: qemu-devel@nongnu.org, stefanha@redhat.com, mlureau@redhat.com
 
-On 21 December 2017 at 21:11, Laurent Vivier <laurent@vivier.eu> wrote:
-> When compiled with x86_64-w64-mingw32, we have:
->
->    error: implicit declaration of function 'qemu_log_mask'
->    error: 'LOG_UNIMP' undeclared (first use in this function)
->
-> This patch adds the missing include.
->
-> Fixes: 7299e1a411
->        ("hw/i386/vmport: replace fprintf() by trace events or LOG_UNIMP")
-> Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+On Thu, Dec 21, 2017 at 10:21:20PM +0100, Maxime Coquelin wrote:
+> Sorry, I missed to fixup the feature mask in patch 4,
+> this is the only change in this v3.
+>=20
+> The two changes in v2 are fixing the features mask
+> before the function rework, and reword of commit message
+> of patch "vhost-user-test: extract read-guest-mem test
+> from main loop" (Thanks Marc-Andr=E9).
+>=20
+> This series fixes two issues in vhost-user-test:
+> 1. Setup virtqueues in all tests
+> 2. Fix features mask for all but test_multiqueue()
+>=20
+> The clean-ups comprises making read-guest-mem test consistent
+> with other tests by initializing the device in the qtest thread.
+> Also, some code factorization is done with regard to device
+> initialization so that all tests share the same init.
 
-Looks to me like it'll be a bug for anything not configured
-using the 'log' trace backend, rather than win32 specific.
+Looks like mingw tests fail with this.
 
-I'll apply (and fix up the commit message).
-
-thanks
--- PMM
+> Maxime Coquelin (5):
+>   vhost-user-test: fix features mask
+>   vhost-user-test: extract read-guest-mem test from main loop
+>   vhost-user-test: setup virtqueues in all tests
+>   vhost-user-test: make features mask an init_virtio_dev() argument
+>   vhost-user-test: use init_virtio_dev in multiqueue test
+>=20
+>  tests/vhost-user-test.c | 171 ++++++++++++++++++++++------------------=
+--------
+>  1 file changed, 79 insertions(+), 92 deletions(-)
+>=20
+> --=20
+> 2.14.3
