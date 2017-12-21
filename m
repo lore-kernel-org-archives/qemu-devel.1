@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55776)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57707)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1eS7Yx-0004IQ-8C
-	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 15:35:33 -0500
+	(envelope-from <mst@redhat.com>) id 1eS7ao-0005f7-8K
+	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 15:37:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1eS7Ys-0007Ws-I8
-	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 15:35:31 -0500
-Resent-Message-Id: <E1eS7Ys-0007Ws-I8@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21390)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1eS7Ys-0007Qx-8O
-	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 15:35:26 -0500
-In-Reply-To: <20171219201613.7399-1-michael.weiser@gmx.de>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <151371630382.81.15113721097565651933@5adcb62bf0d6>
+	(envelope-from <mst@redhat.com>) id 1eS7aj-0000gO-Az
+	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 15:37:26 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:47866)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1eS7aj-0000fS-5F
+	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 15:37:21 -0500
+Date: Thu, 21 Dec 2017 22:37:18 +0200
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20171221223704-mutt-send-email-mst@kernel.org>
+References: <1513866427-27125-1-git-send-email-mst@redhat.com>
+	<CAFEAcA_pt7XhXOhL2jSxwH9ooL7xjShmp6eBAYpRLc=dY-=TXQ@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Tue, 19 Dec 2017 12:45:04 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH v2 0/5] Add aarch64_be-linux-user target
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAFEAcA_pt7XhXOhL2jSxwH9ooL7xjShmp6eBAYpRLc=dY-=TXQ@mail.gmail.com>
+Subject: Re: [Qemu-devel] [PULL 00/25] pc, pci, virtio: features, fixes,
+ cleanups
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,46 +28,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: michael.weiser@gmx.de
-Cc: famz@redhat.com, qemu-devel@nongnu.org, riku.voipio@iki.fi, laurent@vivier.eu
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
-c3NhZ2UtaWQ6IDIwMTcxMjE5MjAxNjEzLjczOTktMS1taWNoYWVsLndlaXNlckBnbXguZGUKU3Vi
-amVjdDogW1FlbXUtZGV2ZWxdIFtQQVRDSCB2MiAwLzVdIEFkZCBhYXJjaDY0X2JlLWxpbnV4LXVz
-ZXIgdGFyZ2V0Cgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCgpCQVNFPWJh
-c2UKbj0xCnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJBU0UuLiB8IHdjIC1sKQpmYWlsZWQ9
-MAoKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9j
-YWwgZGlmZi5yZW5hbWVzIFRydWUKCmNvbW1pdHM9IiQoZ2l0IGxvZyAtLWZvcm1hdD0lSCAtLXJl
-dmVyc2UgJEJBU0UuLikiCmZvciBjIGluICRjb21taXRzOyBkbwogICAgZWNobyAiQ2hlY2tpbmcg
-UEFUQ0ggJG4vJHRvdGFsOiAkKGdpdCBsb2cgLW4gMSAtLWZvcm1hdD0lcyAkYykuLi4iCiAgICBp
-ZiAhIGdpdCBzaG93ICRjIC0tZm9ybWF0PWVtYWlsIHwgLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwg
-LS1tYWlsYmFjayAtOyB0aGVuCiAgICAgICAgZmFpbGVkPTEKICAgICAgICBlY2hvCiAgICBmaQog
-ICAgbj0kKChuKzEpKQpkb25lCgpleGl0ICRmYWlsZWQKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0K
-ClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKU3dpdGNo
-ZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0JwoxNDA4YmU1OTlmIGxpbnV4LXVzZXI6IEFkZCBhYXJj
-aDY0X2JlIG1hZ2ljIG51bWJlcnMgdG8gcWVtdS1iaW5mbXQtY29uZi5zaAoyNDZjMDkxM2JlIGNv
-bmZpZ3VyZTogQWRkIGFhcmNoNjRfYmUtbGludXgtdXNlciB0YXJnZXQKZTg0NWQzNWM5NyBsaW51
-eC11c2VyOiBGaXggZW5kaWFuZXNzIG9mIGFhcmNoNjQgc2lnbmFsIHRyYW1wb2xpbmUKYzlkYzM0
-ODM0MyBsaW51eC11c2VyOiBBZGQgc2VwYXJhdGUgYWFyY2g2NF9iZSB1bmFtZQoxMzhmNDhhYzYx
-IGxpbnV4LXVzZXI6IEFkZCBzdXBwb3J0IGZvciBiaWctZW5kaWFuIGFhcmNoNjQKCj09PSBPVVRQ
-VVQgQkVHSU4gPT09CkNoZWNraW5nIFBBVENIIDEvNTogbGludXgtdXNlcjogQWRkIHN1cHBvcnQg
-Zm9yIGJpZy1lbmRpYW4gYWFyY2g2NC4uLgpDaGVja2luZyBQQVRDSCAyLzU6IGxpbnV4LXVzZXI6
-IEFkZCBzZXBhcmF0ZSBhYXJjaDY0X2JlIHVuYW1lLi4uCkNoZWNraW5nIFBBVENIIDMvNTogbGlu
-dXgtdXNlcjogRml4IGVuZGlhbmVzcyBvZiBhYXJjaDY0IHNpZ25hbCB0cmFtcG9saW5lLi4uCkNo
-ZWNraW5nIFBBVENIIDQvNTogY29uZmlndXJlOiBBZGQgYWFyY2g2NF9iZS1saW51eC11c2VyIHRh
-cmdldC4uLgpDaGVja2luZyBQQVRDSCA1LzU6IGxpbnV4LXVzZXI6IEFkZCBhYXJjaDY0X2JlIG1h
-Z2ljIG51bWJlcnMgdG8gcWVtdS1iaW5mbXQtY29uZi5zaC4uLgpXQVJOSU5HOiBsaW5lIG92ZXIg
-ODAgY2hhcmFjdGVycwojMzA6IEZJTEU6IHNjcmlwdHMvcWVtdS1iaW5mbXQtY29uZi5zaDo5NToK
-K2FhcmNoNjRfYmVfbWFnaWM9J1x4N2ZFTEZceDAyXHgwMlx4MDFceDAwXHgwMFx4MDBceDAwXHgw
-MFx4MDBceDAwXHgwMFx4MDBceDAwXHgwMlx4MDBceGI3JwoKRVJST1I6IGxpbmUgb3ZlciA5MCBj
-aGFyYWN0ZXJzCiMzMTogRklMRTogc2NyaXB0cy9xZW11LWJpbmZtdC1jb25mLnNoOjk2OgorYWFy
-Y2g2NF9iZV9tYXNrPSdceGZmXHhmZlx4ZmZceGZmXHhmZlx4ZmZceGZmXHgwMFx4ZmZceGZmXHhm
-Zlx4ZmZceGZmXHhmZlx4ZmZceGZmXHhmZlx4ZmVceGZmXHhmZicKCnRvdGFsOiAxIGVycm9ycywg
-MSB3YXJuaW5ncywgMTggbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxl
-bXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3Np
-dGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1B
-SU5UQUlORVJTLgoKPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGgg
-Y29kZTogMQoKCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFto
-dHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3
-LWRldmVsQGZyZWVsaXN0cy5vcmc=
+On Thu, Dec 21, 2017 at 08:26:47PM +0000, Peter Maydell wrote:
+> On 21 December 2017 at 14:27, Michael S. Tsirkin <mst@redhat.com> wrote:
+> > The following changes since commit 2babfe0c9241c239272a03fec785165a50e8288c:
+> >
+> >   Update version for v2.11.0-rc4 release (2017-12-05 16:36:46 +0000)
+> >
+> > are available in the git repository at:
+> >
+> >   git://git.kernel.org/pub/scm/virt/kvm/mst/qemu.git tags/for_upstream
+> >
+> > for you to fetch changes up to 664ed92706ff6e66fa278c3163b5387f11d6daca:
+> >
+> >   smbus: do not immediately complete commands (2017-12-21 16:24:44 +0200)
+> >
+> > ----------------------------------------------------------------
+> > pc, pci, virtio: features, fixes, cleanups
+> >
+> > A bunch of fixes, cleanus and new features all over the place.
+> >
+> > Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+> >
+> 
+> Conflicts in hw/block/nvme.c -- can you fix and resend, please?
+> 
+> thanks
+> -- PMM
+
+Done and pushed - I dropped the conflicting patch.
