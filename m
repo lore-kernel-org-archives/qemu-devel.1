@@ -1,22 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45087)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45112)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1eS1pI-0006jQ-66
-	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 09:28:01 -0500
+	(envelope-from <mst@redhat.com>) id 1eS1pM-0006n0-1z
+	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 09:28:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1eS1pH-0004nQ-4Y
-	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 09:28:00 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:40953)
+	(envelope-from <mst@redhat.com>) id 1eS1pK-0004oo-HA
+	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 09:28:04 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:51158)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1eS1pG-0004n3-Rg
-	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 09:27:59 -0500
-Date: Thu, 21 Dec 2017 16:27:56 +0200
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1eS1pK-0004oM-7E
+	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 09:28:02 -0500
+Date: Thu, 21 Dec 2017 16:27:58 +0200
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <1513866427-27125-1-git-send-email-mst@redhat.com>
+Message-ID: <1513866427-27125-2-git-send-email-mst@redhat.com>
+References: <1513866427-27125-1-git-send-email-mst@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 00/25] pc, pci, virtio: features, fixes, cleanups
+In-Reply-To: <1513866427-27125-1-git-send-email-mst@redhat.com>
+Subject: [Qemu-devel] [PULL 01/25] smbios: support setting OEM strings table
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,132 +27,216 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>, "Daniel P. Berrange" <berrange@redhat.com>, Igor Mammedov <imammedo@redhat.com>
 
-The following changes since commit 2babfe0c9241c239272a03fec785165a50e828=
-8c:
+From: "Daniel P. Berrange" <berrange@redhat.com>
 
-  Update version for v2.11.0-rc4 release (2017-12-05 16:36:46 +0000)
+The cloud-init program currently allows fetching of its data by repurposing of
+the 'system' type 'serial' field. This is a clear abuse of the serial field that
+would clash with other valid usage a virt management app might have for that
+field.
 
-are available in the git repository at:
+Fortunately the SMBIOS defines an "OEM Strings" table whose puporse is to allow
+exposing of arbitrary vendor specific strings to the operating system. This is
+perfect for use with cloud-init, or as a way to pass arguments to OS installers
+such as anaconda.
 
-  git://git.kernel.org/pub/scm/virt/kvm/mst/qemu.git tags/for_upstream
+This patch makes it easier to support this with QEMU. e.g.
 
-for you to fetch changes up to 664ed92706ff6e66fa278c3163b5387f11d6daca:
+  $QEMU -smbios type=11,value=Hello,value=World,value=Tricky,,value=test
 
-  smbus: do not immediately complete commands (2017-12-21 16:24:44 +0200)
+Which results in the guest seeing dmidecode data
 
-----------------------------------------------------------------
-pc, pci, virtio: features, fixes, cleanups
+  Handle 0x0E00, DMI type 11, 5 bytes
+  OEM Strings
+          String 1: Hello
+          String 2: World
+          String 3: Tricky,value=test
 
-A bunch of fixes, cleanus and new features all over the place.
+It is suggested that any app wanting to make use of this OEM strings capability
+for accepting data from the host mgmt layer should use its name as a string
+prefix. e.g. to expose OEM strings targetting both cloud init and anaconda in
+parallel the mgmt app could set
 
+  $QEMU -smbios type=11,value=cloud-init:ds=nocloud-net;s=http://10.10.0.1:8000/,\
+        value=anaconda:method=http://dl.fedoraproject.org/pub/fedora/linux/releases/25/x86_64/os
+
+which would appear as
+
+  Handle 0x0E00, DMI type 11, 5 bytes
+  OEM Strings
+          String 1: cloud-init:ds=nocloud-net;s=http://10.10.0.1:8000/
+          String 2: anaconda:method=http://dl.fedoraproject.org/pub/fedora/linux/releases/25/x86_64/os
+
+Use of such string prefixes means the app won't have to care which string slot
+its data appears in.
+
+Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+---
+ hw/smbios/smbios_build.h   | 12 ++++++++
+ include/hw/smbios/smbios.h |  6 ++++
+ hw/smbios/smbios.c         | 72 ++++++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 90 insertions(+)
 
-----------------------------------------------------------------
-Daniel P. Berrange (1):
-      smbios: support setting OEM strings table
-
-David Gibson (9):
-      pci: Rename root bus initialization functions for clarity
-      pci: Move bridge data structures from pci_bus.h to pci_bridge.h
-      pci: Add pci_dev_bus_num() helper
-      pci: Eliminate redundant PCIDevice::bus pointer
-      pci: Eliminate pci_find_primary_bus()
-      tests/pxe-test: Remove unnecessary special case test functions
-      tests/pxe-test: Use table of testcases rather than open-coding
-      tests/pxe-test: Test net booting over IPv6 in some cases
-      tests/pxe-test: Add some extra tests
-
-Herv=C3=A9 Poussineau (1):
-      smbus: do not immediately complete commands
-
-Ladi Prosek (1):
-      virtio-pci: Don't force Subsystem Vendor ID =3D Vendor ID
-
-Marc-Andr=C3=A9 Lureau (1):
-      dump-guest-memory.py: fix "You can't do that without a process to d=
-ebug"
-
-Michael S. Tsirkin (1):
-      virtio_error: don't invoke status callbacks
-
-Peter Xu (2):
-      intel_iommu: remove X86_IOMMU_PCI_DEVFN_MAX
-      intel_iommu: fix error param in string
-
-Philippe Mathieu-Daud=C3=A9 (4):
-      hw/block/nvme: QOM'ify PCI NVME
-      hw/pci-host/piix: QOM'ify the IGD Passthrough host bridge
-      hw/pci-host/xilinx: QOM'ify the AXI-PCIe host bridge
-      hw/pci: remove obsolete PCIDevice->init()
-
-Prasad J Pandit (1):
-      tests: add test to check VirtQueue object
-
-Roman Kagan (2):
-      qdev-properties: add UUID property type
-      vmgenid: use UUID property type
-
-Stefan Hajnoczi (2):
-      vhost-user: fix indentation in protocol specification
-      vhost-user: document memory accesses
-
- docs/interop/vhost-user.txt         |  37 +++++++--
- hw/smbios/smbios_build.h            |  12 +++
- include/hw/i386/x86-iommu.h         |   1 -
- include/hw/pci-host/xilinx-pcie.h   |   2 +-
- include/hw/pci/pci.h                |  39 +++++----
- include/hw/pci/pci_bridge.h         |  48 +++++++++++
- include/hw/pci/pci_bus.h            |  51 +-----------
- include/hw/qdev-properties.h        |   9 +++
- include/hw/smbios/smbios.h          |   6 ++
- include/hw/xen/xen_common.h         |   8 +-
- hw/acpi/pcihp.c                     |   4 +-
- hw/acpi/piix4.c                     |   7 +-
- hw/acpi/vmgenid.c                   |  30 ++-----
- hw/alpha/typhoon.c                  |   8 +-
- hw/block/nvme.c                     |  32 ++++----
- hw/core/qdev-properties.c           |  61 ++++++++++++++
- hw/i2c/pm_smbus.c                   |  16 +++-
- hw/i386/intel_iommu.c               |  12 +--
- hw/i386/pc_piix.c                   |   8 +-
- hw/i386/xen/xen_platform.c          |  12 +--
- hw/isa/lpc_ich9.c                   |  10 +--
- hw/mips/gt64xxx_pci.c               |  12 +--
- hw/misc/vmcoreinfo.c                |   3 +
- hw/net/vmxnet3.c                    |   2 +-
- hw/pci-bridge/pci_expander_bridge.c |  21 ++---
- hw/pci-host/apb.c                   |  10 +--
- hw/pci-host/bonito.c                |   8 +-
- hw/pci-host/gpex.c                  |   6 +-
- hw/pci-host/grackle.c               |  14 ++--
- hw/pci-host/piix.c                  |  59 +++++++-------
- hw/pci-host/ppce500.c               |   6 +-
- hw/pci-host/prep.c                  |   4 +-
- hw/pci-host/q35.c                   |   7 +-
- hw/pci-host/uninorth.c              |  24 +++---
- hw/pci-host/versatile.c             |   8 +-
- hw/pci-host/xilinx-pcie.c           |  27 +++----
- hw/pci/pci.c                        | 155 +++++++++++++++---------------=
-------
- hw/pci/pci_bridge.c                 |   6 +-
- hw/pci/pcie.c                       |   5 +-
- hw/pci/pcie_aer.c                   |   4 +-
- hw/ppc/ppc4xx_pci.c                 |   6 +-
- hw/ppc/spapr_pci.c                  |  10 +--
- hw/s390x/s390-pci-bus.c             |  18 ++---
- hw/scsi/megasas.c                   |   2 +-
- hw/scsi/mptsas.c                    |   2 +-
- hw/scsi/vmw_pvscsi.c                |   2 +-
- hw/sh4/sh_pci.c                     |  12 +--
- hw/smbios/smbios.c                  |  72 +++++++++++++++++
- hw/usb/hcd-xhci.c                   |   2 +-
- hw/vfio/pci.c                       |  10 +--
- hw/virtio/virtio-pci.c              |  12 +--
- hw/virtio/virtio.c                  |   2 +-
- hw/xen/xen_pt.c                     |  10 +--
- tests/pxe-test.c                    |  99 +++++++++++++++++------
- tests/virtio-blk-test.c             |  25 ++++++
- scripts/dump-guest-memory.py        |   3 +-
- 56 files changed, 663 insertions(+), 418 deletions(-)
+diff --git a/hw/smbios/smbios_build.h b/hw/smbios/smbios_build.h
+index 68b8b72..93b360d 100644
+--- a/hw/smbios/smbios_build.h
++++ b/hw/smbios/smbios_build.h
+@@ -63,6 +63,18 @@ extern unsigned smbios_table_cnt;
+         }                                                                 \
+     } while (0)
+ 
++#define SMBIOS_TABLE_SET_STR_LIST(tbl_type, value)                        \
++    do {                                                                  \
++        int len = (value != NULL) ? strlen(value) + 1 : 0;                \
++        if (len > 1) {                                                    \
++            smbios_tables = g_realloc(smbios_tables,                      \
++                                      smbios_tables_len + len);           \
++            memcpy(smbios_tables + smbios_tables_len, value, len);        \
++            smbios_tables_len += len;                                     \
++            ++str_index;                                                  \
++        }                                                                 \
++    } while (0)
++
+ #define SMBIOS_BUILD_TABLE_POST                                           \
+     do {                                                                  \
+         size_t term_cnt, t_size;                                          \
+diff --git a/include/hw/smbios/smbios.h b/include/hw/smbios/smbios.h
+index 31e8d5f..a83adb9 100644
+--- a/include/hw/smbios/smbios.h
++++ b/include/hw/smbios/smbios.h
+@@ -195,6 +195,12 @@ struct smbios_type_4 {
+     uint16_t processor_family2;
+ } QEMU_PACKED;
+ 
++/* SMBIOS type 11 - OEM strings */
++struct smbios_type_11 {
++    struct smbios_structure_header header;
++    uint8_t count;
++} QEMU_PACKED;
++
+ /* SMBIOS type 16 - Physical Memory Array (v2.7) */
+ struct smbios_type_16 {
+     struct smbios_structure_header header;
+diff --git a/hw/smbios/smbios.c b/hw/smbios/smbios.c
+index 1a5437a..5d11f01 100644
+--- a/hw/smbios/smbios.c
++++ b/hw/smbios/smbios.c
+@@ -96,6 +96,11 @@ static struct {
+ } type4;
+ 
+ static struct {
++    size_t nvalues;
++    const char **values;
++} type11;
++
++static struct {
+     const char *loc_pfx, *bank, *manufacturer, *serial, *asset, *part;
+     uint16_t speed;
+ } type17;
+@@ -282,6 +287,14 @@ static const QemuOptDesc qemu_smbios_type4_opts[] = {
+     { /* end of list */ }
+ };
+ 
++static const QemuOptDesc qemu_smbios_type11_opts[] = {
++    {
++        .name = "value",
++        .type = QEMU_OPT_STRING,
++        .help = "OEM string data",
++    },
++};
++
+ static const QemuOptDesc qemu_smbios_type17_opts[] = {
+     {
+         .name = "type",
+@@ -590,6 +603,27 @@ static void smbios_build_type_4_table(unsigned instance)
+     smbios_type4_count++;
+ }
+ 
++static void smbios_build_type_11_table(void)
++{
++    char count_str[128];
++    size_t i;
++
++    if (type11.nvalues == 0) {
++        return;
++    }
++
++    SMBIOS_BUILD_TABLE_PRE(11, 0xe00, true); /* required */
++
++    snprintf(count_str, sizeof(count_str), "%zu", type11.nvalues);
++    t->count = type11.nvalues;
++
++    for (i = 0; i < type11.nvalues; i++) {
++        SMBIOS_TABLE_SET_STR_LIST(11, type11.values[i]);
++    }
++
++    SMBIOS_BUILD_TABLE_POST;
++}
++
+ #define ONE_KB ((ram_addr_t)1 << 10)
+ #define ONE_MB ((ram_addr_t)1 << 20)
+ #define ONE_GB ((ram_addr_t)1 << 30)
+@@ -832,6 +866,8 @@ void smbios_get_tables(const struct smbios_phys_mem_area *mem_array,
+             smbios_build_type_4_table(i);
+         }
+ 
++        smbios_build_type_11_table();
++
+ #define MAX_DIMM_SZ (16ll * ONE_GB)
+ #define GET_DIMM_SZ ((i < dimm_cnt - 1) ? MAX_DIMM_SZ \
+                                         : ((ram_size - 1) % MAX_DIMM_SZ) + 1)
+@@ -882,6 +918,38 @@ static void save_opt(const char **dest, QemuOpts *opts, const char *name)
+     }
+ }
+ 
++
++struct opt_list {
++    const char *name;
++    size_t *ndest;
++    const char ***dest;
++};
++
++static int save_opt_one(void *opaque,
++                        const char *name, const char *value,
++                        Error **errp)
++{
++    struct opt_list *opt = opaque;
++
++    if (!g_str_equal(name, opt->name)) {
++        return 0;
++    }
++
++    *opt->dest = g_renew(const char *, *opt->dest, (*opt->ndest) + 1);
++    (*opt->dest)[*opt->ndest] = value;
++    (*opt->ndest)++;
++    return 0;
++}
++
++static void save_opt_list(size_t *ndest, const char ***dest,
++                          QemuOpts *opts, const char *name)
++{
++    struct opt_list opt = {
++        name, ndest, dest,
++    };
++    qemu_opt_foreach(opts, save_opt_one, &opt, NULL);
++}
++
+ void smbios_entry_add(QemuOpts *opts, Error **errp)
+ {
+     const char *val;
+@@ -1035,6 +1103,10 @@ void smbios_entry_add(QemuOpts *opts, Error **errp)
+             save_opt(&type4.asset, opts, "asset");
+             save_opt(&type4.part, opts, "part");
+             return;
++        case 11:
++            qemu_opts_validate(opts, qemu_smbios_type11_opts, &error_fatal);
++            save_opt_list(&type11.nvalues, &type11.values, opts, "value");
++            return;
+         case 17:
+             qemu_opts_validate(opts, qemu_smbios_type17_opts, &error_fatal);
+             save_opt(&type17.loc_pfx, opts, "loc_pfx");
+-- 
+MST
