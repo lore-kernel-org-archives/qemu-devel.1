@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33749)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33768)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eRpmN-0007KQ-3f
-	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 20:36:12 -0500
+	(envelope-from <eblake@redhat.com>) id 1eRpmO-0007Lk-34
+	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 20:36:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eRpmL-0001Vq-E4
-	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 20:36:11 -0500
+	(envelope-from <eblake@redhat.com>) id 1eRpmN-0001XJ-5i
+	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 20:36:12 -0500
 From: Eric Blake <eblake@redhat.com>
-Date: Wed, 20 Dec 2017 19:35:57 -0600
-Message-Id: <20171221013600.17648-2-eblake@redhat.com>
+Date: Wed, 20 Dec 2017 19:36:00 -0600
+Message-Id: <20171221013600.17648-5-eblake@redhat.com>
 In-Reply-To: <20171221013600.17648-1-eblake@redhat.com>
 References: <20171221013600.17648-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PULL 1/4] nbd/server: Implement sparse reads atop
- structured reply
+Subject: [Qemu-devel] [PULL 4/4] qmp: add nbd-server-remove
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,164 +20,92 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, "open list:Network Block Dev..." <qemu-block@nongnu.org>
+Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Markus Armbruster <armbru@redhat.com>, "open list:Block layer core" <qemu-block@nongnu.org>
 
-The reason that NBD added structured reply in the first place was
-to allow for efficient reads of sparse files, by allowing the
-reply to include chunks to quickly communicate holes to the client
-without sending lots of zeroes over the wire.  Time to implement
-this in the server; our client can already read such data.
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
-We can only skip holes insofar as the block layer can query them;
-and only if the client is okay with a fragmented request (if a
-client requests NBD_CMD_FLAG_DF and the entire read is a hole, we
-could technically return a single NBD_REPLY_TYPE_OFFSET_HOLE, but
-that's a fringe case not worth catering to here).  Sadly, the
-control flow is a bit wonkier than I would have preferred, but
-it was minimally invasive to have a split in the action between
-a fragmented read (handled directly where we recognize
-NBD_CMD_READ with the right conditions, and sending multiple
-chunks) vs. a single read (handled at the end of nbd_trip, for
-both simple and structured replies, when we know there is only
-one thing being read).  Likewise, I didn't make any effort to
-optimize the final chunk of a fragmented read to set the
-NBD_REPLY_FLAG_DONE, but unconditionally send that as a separate
-NBD_REPLY_TYPE_NONE.
+Add command for export removing. It is needed for cases when we
+don't want to keep export after the operation on it was completed.
+The other example is temporary node, created with blockdev-add.
+If we want to delete it we should firstly remove corresponding
+NBD export.
 
+Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-Id: <20171109154049.42386-3-vsementsov@virtuozzo.com>
 Signed-off-by: Eric Blake <eblake@redhat.com>
-Message-Id: <20171107030912.23930-2-eblake@redhat.com>
-Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 ---
- nbd/server.c     | 78 +++++++++++++++++++++++++++++++++++++++++++++++++++++---
- nbd/trace-events |  1 +
- 2 files changed, 76 insertions(+), 3 deletions(-)
+ qapi/block.json | 20 ++++++++++++++++++++
+ blockdev-nbd.c  | 27 +++++++++++++++++++++++++++
+ 2 files changed, 47 insertions(+)
 
-diff --git a/nbd/server.c b/nbd/server.c
-index 92c0fdd03b..be7310cb41 100644
---- a/nbd/server.c
-+++ b/nbd/server.c
-@@ -1303,6 +1303,7 @@ static int coroutine_fn nbd_co_send_structured_read(NBDClient *client,
-                                                     uint64_t offset,
-                                                     void *data,
-                                                     size_t size,
-+                                                    bool final,
-                                                     Error **errp)
- {
-     NBDStructuredReadData chunk;
-@@ -1313,13 +1314,73 @@ static int coroutine_fn nbd_co_send_structured_read(NBDClient *client,
+diff --git a/qapi/block.json b/qapi/block.json
+index f093fa3f27..1827940717 100644
+--- a/qapi/block.json
++++ b/qapi/block.json
+@@ -222,6 +222,26 @@
+ ##
+ { 'command': 'nbd-server-add', 'data': {'device': 'str', '*writable': 'bool'} }
 
-     assert(size);
-     trace_nbd_co_send_structured_read(handle, offset, data, size);
--    set_be_chunk(&chunk.h, NBD_REPLY_FLAG_DONE, NBD_REPLY_TYPE_OFFSET_DATA,
--                 handle, sizeof(chunk) - sizeof(chunk.h) + size);
-+    set_be_chunk(&chunk.h, final ? NBD_REPLY_FLAG_DONE : 0,
-+                 NBD_REPLY_TYPE_OFFSET_DATA, handle,
-+                 sizeof(chunk) - sizeof(chunk.h) + size);
-     stq_be_p(&chunk.offset, offset);
-
-     return nbd_co_send_iov(client, iov, 2, errp);
++##
++# @nbd-server-remove:
++#
++# Stop exporting block node through QEMU's embedded NBD server.
++#
++# @device: The device name or node name of the exported node. Should be equal
++#          to @device parameter for corresponding nbd-server-add command call.
++#
++# @force: Whether active connections to the export should be closed. If this
++#         parameter is false the export is only removed from named exports list,
++#         so new connetions are impossible and it would be freed after all
++#         clients are disconnected (default false).
++#
++# Returns: error if the server is not running or the device is not marked for
++#          export.
++#
++# Since: 2.12
++##
++{ 'command': 'nbd-server-remove', 'data': {'device': 'str', '*force': 'bool'} }
++
+ ##
+ # @nbd-server-stop:
+ #
+diff --git a/blockdev-nbd.c b/blockdev-nbd.c
+index 28f551a7b0..5f66951c33 100644
+--- a/blockdev-nbd.c
++++ b/blockdev-nbd.c
+@@ -203,6 +203,33 @@ void qmp_nbd_server_add(const char *device, bool has_writable, bool writable,
+     nbd_export_put(exp);
  }
 
-+static int coroutine_fn nbd_co_send_sparse_read(NBDClient *client,
-+                                                uint64_t handle,
-+                                                uint64_t offset,
-+                                                uint8_t *data,
-+                                                size_t size,
-+                                                Error **errp)
++void qmp_nbd_server_remove(const char *device, bool has_force, bool force,
++                           Error **errp)
 +{
-+    int ret = 0;
-+    NBDExport *exp = client->exp;
-+    size_t progress = 0;
++    NBDExport *exp;
 +
-+    while (progress < size) {
-+        int64_t pnum;
-+        int status = bdrv_block_status_above(blk_bs(exp->blk), NULL,
-+                                             offset + progress,
-+                                             size - progress, &pnum, NULL,
-+                                             NULL);
-+
-+        if (status < 0) {
-+            error_setg_errno(errp, -status, "unable to check for holes");
-+            return status;
-+        }
-+        assert(pnum && pnum <= size - progress);
-+        if (status & BDRV_BLOCK_ZERO) {
-+            NBDStructuredReadHole chunk;
-+            struct iovec iov[] = {
-+                {.iov_base = &chunk, .iov_len = sizeof(chunk)},
-+            };
-+
-+            trace_nbd_co_send_structured_read_hole(handle, offset + progress,
-+                                                   pnum);
-+            set_be_chunk(&chunk.h, 0, NBD_REPLY_TYPE_OFFSET_HOLE,
-+                         handle, sizeof(chunk) - sizeof(chunk.h));
-+            stq_be_p(&chunk.offset, offset + progress);
-+            stl_be_p(&chunk.length, pnum);
-+            ret = nbd_co_send_iov(client, iov, 1, errp);
-+        } else {
-+            ret = blk_pread(exp->blk, offset + progress + exp->dev_offset,
-+                            data + progress, pnum);
-+            if (ret < 0) {
-+                error_setg_errno(errp, -ret, "reading from file failed");
-+                break;
-+            }
-+            ret = nbd_co_send_structured_read(client, handle, offset + progress,
-+                                              data + progress, pnum, false,
-+                                              errp);
-+        }
-+
-+        if (ret < 0) {
-+            break;
-+        }
-+        progress += pnum;
++    if (!nbd_server) {
++        error_setg(errp, "NBD server not running");
++        return;
 +    }
-+    if (!ret) {
-+        ret = nbd_co_send_structured_done(client, handle, errp);
++
++    exp = nbd_export_find(device);
++    if (exp == NULL) {
++        error_setg(errp, "'%s' is not exported", device);
++        return;
 +    }
-+    return ret;
++
++    if (!has_force) {
++        force = false;
++    }
++
++    if (force) {
++        nbd_export_close(exp);
++    } else {
++        nbd_export_set_name(exp, NULL);
++    }
 +}
 +
- static int coroutine_fn nbd_co_send_structured_error(NBDClient *client,
-                                                      uint64_t handle,
-                                                      uint32_t error,
-@@ -1481,6 +1542,16 @@ static coroutine_fn void nbd_trip(void *opaque)
-             }
-         }
-
-+        if (client->structured_reply && !(request.flags & NBD_CMD_FLAG_DF)) {
-+            ret = nbd_co_send_sparse_read(req->client, request.handle,
-+                                          request.from, req->data, request.len,
-+                                          &local_err);
-+            if (ret < 0) {
-+                goto reply;
-+            }
-+            goto done;
-+        }
-+
-         ret = blk_pread(exp->blk, request.from + exp->dev_offset,
-                         req->data, request.len);
-         if (ret < 0) {
-@@ -1561,7 +1632,8 @@ reply:
-         } else if (reply_data_len) {
-             ret = nbd_co_send_structured_read(req->client, request.handle,
-                                               request.from, req->data,
--                                              reply_data_len, &local_err);
-+                                              reply_data_len, true,
-+                                              &local_err);
-         } else {
-             ret = nbd_co_send_structured_done(req->client, request.handle,
-                                               &local_err);
-diff --git a/nbd/trace-events b/nbd/trace-events
-index 92568edce5..2b8268ce8c 100644
---- a/nbd/trace-events
-+++ b/nbd/trace-events
-@@ -57,6 +57,7 @@ nbd_blk_aio_detach(const char *name, void *ctx) "Export %s: Detaching clients fr
- nbd_co_send_simple_reply(uint64_t handle, uint32_t error, const char *errname, int len) "Send simple reply: handle = %" PRIu64 ", error = %" PRIu32 " (%s), len = %d"
- nbd_co_send_structured_done(uint64_t handle) "Send structured reply done: handle = %" PRIu64
- nbd_co_send_structured_read(uint64_t handle, uint64_t offset, void *data, size_t size) "Send structured read data reply: handle = %" PRIu64 ", offset = %" PRIu64 ", data = %p, len = %zu"
-+nbd_co_send_structured_read_hole(uint64_t handle, uint64_t offset, size_t size) "Send structured read hole reply: handle = %" PRIu64 ", offset = %" PRIu64 ", len = %zu"
- nbd_co_send_structured_error(uint64_t handle, int err, const char *errname, const char *msg) "Send structured error reply: handle = %" PRIu64 ", error = %d (%s), msg = '%s'"
- nbd_co_receive_request_decode_type(uint64_t handle, uint16_t type, const char *name) "Decoding type: handle = %" PRIu64 ", type = %" PRIu16 " (%s)"
- nbd_co_receive_request_payload_received(uint64_t handle, uint32_t len) "Payload received: handle = %" PRIu64 ", len = %" PRIu32
+ void qmp_nbd_server_stop(Error **errp)
+ {
+     nbd_export_close_all();
 -- 
 2.14.3
