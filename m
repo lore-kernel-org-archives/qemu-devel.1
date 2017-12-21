@@ -1,25 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53026)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60561)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1eS1Q8-00062j-Qc
-	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 09:02:08 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1eS1Ym-0001vg-29
+	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 09:10:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1eS1Q3-0000NV-6F
-	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 09:02:00 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:54318)
+	(envelope-from <pbonzini@redhat.com>) id 1eS1Yh-0000sf-LC
+	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 09:10:56 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:42068)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1eS1Q2-0000N5-Tk
-	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 09:01:55 -0500
-Date: Thu, 21 Dec 2017 16:01:46 +0200
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20171221155923-mutt-send-email-mst@kernel.org>
-References: <20171208063113.20383-1-lprosek@redhat.com>
-	<545999678.39861203.1512742146072.JavaMail.zimbra@redhat.com>
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1eS1Yh-0000rj-DZ
+	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 09:10:51 -0500
+References: <1513790098-9815-1-git-send-email-pbonzini@redhat.com>
+	<CAFEAcA8J53A93+SQz01W13gRCX-ecw0v+8JTaRqwmrUeFjqaJA@mail.gmail.com>
+	<51174e3a-12d3-f3e0-2d76-b776e0fe62b6@redhat.com>
+	<e7994a8d-3a02-99c7-d919-c940aa4bc066@redhat.com>
+	<40dbaff2-918c-bba6-2a70-7c5f9b19cb66@vivier.eu>
+	<0d3d6598-608c-0079-426f-7455a92de7d8@vivier.eu>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <64440fda-1799-f50d-21ed-dc898e08d82f@redhat.com>
+Date: Thu, 21 Dec 2017 15:10:46 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <545999678.39861203.1512742146072.JavaMail.zimbra@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2] msix: don't mask already masked vectors
- on reset
+In-Reply-To: <0d3d6598-608c-0079-426f-7455a92de7d8@vivier.eu>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] out of bounds in set_cc_op()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,89 +32,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Marcel Apfelbaum <marcel@redhat.com>
-Cc: Ladi Prosek <lprosek@redhat.com>, qemu-devel@nongnu.org, geoff@hostfission.com, alex williamson <alex.williamson@redhat.com>
+To: Laurent Vivier <laurent@vivier.eu>, Thomas Huth <thuth@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Richard Henderson <rth@twiddle.net>
+Cc: Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-On Fri, Dec 08, 2017 at 09:09:06AM -0500, Marcel Apfelbaum wrote:
-> 
-> 
-> ----- Original Message -----
-> > From: "Ladi Prosek" <lprosek@redhat.com>
-> > To: qemu-devel@nongnu.org
-> > Cc: marcel@redhat.com, geoff@hostfission.com, mst@redhat.com, "alex williamson" <alex.williamson@redhat.com>
-> > Sent: Friday, December 8, 2017 8:31:13 AM
-> > Subject: [PATCH v2] msix: don't mask already masked vectors on reset
-> > 
-> > msix_mask_all() is supposed to invoke the release vector notifier if the
-> > state of the
-> > respective vector changed from unmasked to masked. The way it's currently
-> > called from
-> > msix_reset(), though, may result in calling the release notifier even if the
-> > vector
-> > is already masked.
-> > 
-> > 1) msix_reset() clears out the msix_cap field and the msix_table.
-> > 2) msix_mask_all() runs with was_masked=false for all vectors because of 1),
-> > which
-> >    results in calling the release notifier on all vectors.
-> > 3) if msix_reset() is subsequently called again, it goes through the same
-> > steps and
-> >    calls the release notifier on all vectors again.
-> > 
-> > This commit moves msix_mask_all() up so it runs before the device state is
-> > lost. And
-> > it adds an assignment to msix_function_masked so that the device remembers
-> > that
-> > MSI-X is masked.
-> > 
-> > This is likely a low impact issue, found while debugging an already broken
-> > device. It
-> > is however easy to fix and the expectation that the use and release notifier
-> > invocations
-> > are always balanced is very natural.
-> > 
-> > Signed-off-by: Ladi Prosek <lprosek@redhat.com>
-> > ---
-> > 
-> > v1->v2:
-> > * fixed typo in commit message "or" -> "to" (Marcel)
-> > * directly set msix_function_masked to true instead of calling
-> >   msix_update_function_masked() (Marcel)
-> > 
-> > 
-> >  hw/pci/msix.c | 3 ++-
-> >  1 file changed, 2 insertions(+), 1 deletion(-)
-> > 
-> > diff --git a/hw/pci/msix.c b/hw/pci/msix.c
-> > index c944c02135..d6a4dbdb6b 100644
-> > --- a/hw/pci/msix.c
-> > +++ b/hw/pci/msix.c
-> > @@ -500,11 +500,12 @@ void msix_reset(PCIDevice *dev)
-> >          return;
-> >      }
-> >      msix_clear_all_vectors(dev);
-> > +    msix_mask_all(dev, dev->msix_entries_nr);
-> >      dev->config[dev->msix_cap + MSIX_CONTROL_OFFSET] &=
-> >  	    ~dev->wmask[dev->msix_cap + MSIX_CONTROL_OFFSET];
-> >      memset(dev->msix_table, 0, dev->msix_entries_nr * PCI_MSIX_ENTRY_SIZE);
-> >      memset(dev->msix_pba, 0, QEMU_ALIGN_UP(dev->msix_entries_nr, 64) / 8);
-> > -    msix_mask_all(dev, dev->msix_entries_nr);
-> > +    dev->msix_function_masked = true;
-> >  }
-> >  
-> >  /* PCI spec suggests that devices make it possible for software to configure
-> > --
-> > 2.13.6
-> > 
-> > 
-> 
-> Thanks Ladi!
-> 
-> Reviewed-by: Marcel Apfelbaum <marcel@redhat.com>
+On 21/12/2017 14:32, Laurent Vivier wrote:
+> Le 21/12/2017 =C3=A0 14:07, Laurent Vivier a =C3=A9crit=C2=A0:
+>> Le 21/12/2017 =C3=A0 13:49, Thomas Huth a =C3=A9crit=C2=A0:
+>>> On 20.12.2017 22:56, Paolo Bonzini wrote:
+>>>> On 20/12/2017 20:20, Peter Maydell wrote:
+>>>>> On the x86/sanitizer build, new runtime errors:
+>>>>>   GTESTER check-qtest-m68k
+>>>>> /home/petmay01/linaro/qemu-for-merges/target/m68k/translate.c:230:1=
+2:
+>>>>> runtime error: index -1 out of bounds for type 'const uint8_t [11]'
+>>>>>
+>>>>> ...and similar fails on one or two boards on most of the other
+>>>>> guest architectures.
+>>>>
+>>>> These are preexisting bugs, now exposed by the boot-serial-test.
+>>>> Thomas, can you identify the architectures that have a problem and
+>>>> notify the maintainers?  In the meanwhile I'll keep the boot-serial-=
+test
+>>>> enhancements queued locally, and remove them from the pull request.
+>>>
+>>>  Laurent, Richard,
+>>>
+>>> looks like old_op is -1 when set_cc_op() is called here for the first
+>>> time. The problem can be reproduced by running the mini-kernel direct=
+ly.
+>>> Just get http://people.redhat.com/~thuth/m68k-uart.bin and run QEMU l=
+ike
+>>> this:
+>>>
+>>>  qemu-system-m68k -nographic -kernel  ~/tmp/m68k-uart.bin -serial non=
+e
+>>>
+>>> That kernel only contains these few instructions:
+>>>
+>>>   0x41, 0xf9, 0xfc, 0x06, 0x00, 0x00,     /* lea 0xfc060000,%a0 */
+>>>   0x10, 0x3c, 0x00, 0x54,                 /* move.b #'T',%d0 */
+>>>   0x11, 0x7c, 0x00, 0x04, 0x00, 0x08,     /* move.b #4,8(%a0) */
+>>>   0x11, 0x40, 0x00, 0x0c,                 /* move.b %d0,12(%a0) */
+>>>   0x60, 0xfa                              /* bra.s  loop */
+>>>
+>>> The problem occurs during the second instruction (i.e. the first move=
+.b).
+>>>
+>>> Do you have any ideas where this -1 in s->cc_op could come from?
+>>
+>> I think it comes from CCOp: it's the value of CC_OP_DYNAMIC.
+>>
+>> We should not use it to access cc_op_live[].
+>>
+>> I try to find a fix, but I think Richard knows this better than me.
+>=20
+> This should fix the problem, but I'd like Richard checks it...
+>=20
+> diff --git a/target/m68k/translate.c b/target/m68k/translate.c
+> index b60909222c..721b5801da 100644
+> --- a/target/m68k/translate.c
+> +++ b/target/m68k/translate.c
+> @@ -225,6 +225,11 @@ static void set_cc_op(DisasContext *s, CCOp op)
+>      s->cc_op =3D op;
+>      s->cc_op_synced =3D 0;
+>=20
+> +    if (old_op =3D=3D CC_OP_DYNAMIC) {
+> +        tcg_gen_discard_i32(QREG_CC_OP);
+> +        return;
+> +    }
 
-This breaks make check though.
+This tcg_gen_discard_i32 is correct, but all flags were potentially live
+and can be discarded if the new op uses it(*).  So I'd replace "return"
+with "old_op =3D CC_OP_FLAGS".
 
-Marcel - could you take a look please?
+Paolo
 
--- 
-MST
+	(*) in fact it's always true that all flags can be discarded.
+	    Only discarding some is an optimization to limit the number
+	    of generated ops.
+
+>      /* Discard CC computation that will no longer be used.
+>         Note that X and N are never dead.  */
+>      dead =3D cc_op_live[old_op] & ~cc_op_live[op];
+>=20
+>=20
+> Thanks,
+> Laurent
+>=20
