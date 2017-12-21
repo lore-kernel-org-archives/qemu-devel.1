@@ -1,29 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53110)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50251)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <willy@infradead.org>) id 1eRzkN-0008Vw-IY
-	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 07:14:48 -0500
+	(envelope-from <thuth@redhat.com>) id 1eS0IM-0008TR-OG
+	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 07:49:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <willy@infradead.org>) id 1eRzkK-0005H4-8z
-	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 07:14:47 -0500
-Received: from bombadil.infradead.org ([65.50.211.133]:59494)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <willy@infradead.org>) id 1eRzkJ-0005Fn-W1
-	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 07:14:44 -0500
-Date: Thu, 21 Dec 2017 04:14:37 -0800
-From: Matthew Wilcox <willy@infradead.org>
-Message-ID: <20171221121437.GA22405@bombadil.infradead.org>
-References: <1513685879-21823-1-git-send-email-wei.w.wang@intel.com>
-	<201712192305.AAE21882.MtQHJOFFSFVOLO@I-love.SAKURA.ne.jp>
-	<5A3A3CBC.4030202@intel.com>
-	<20171220122547.GA1654@bombadil.infradead.org>
-	<286AC319A985734F985F78AFA26841F73938CC3E@shsmsx102.ccr.corp.intel.com>
-	<20171220171019.GA12236@bombadil.infradead.org>
-	<5A3B2148.8050306@intel.com>
+	(envelope-from <thuth@redhat.com>) id 1eS0II-00038d-KS
+	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 07:49:54 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:35554)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1eS0II-000372-ET
+	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 07:49:50 -0500
+References: <1513790098-9815-1-git-send-email-pbonzini@redhat.com>
+	<CAFEAcA8J53A93+SQz01W13gRCX-ecw0v+8JTaRqwmrUeFjqaJA@mail.gmail.com>
+	<51174e3a-12d3-f3e0-2d76-b776e0fe62b6@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <e7994a8d-3a02-99c7-d919-c940aa4bc066@redhat.com>
+Date: Thu, 21 Dec 2017 13:49:44 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <5A3B2148.8050306@intel.com>
-Subject: Re: [Qemu-devel] [PATCH v20 0/7] Virtio-balloon Enhancement
+In-Reply-To: <51174e3a-12d3-f3e0-2d76-b776e0fe62b6@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] out of bounds in set_cc_op() (was: [PULL 00/46]
+ First batch of misc patches for QEMU 2.12)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,17 +30,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Wei Wang <wei.w.wang@intel.com>
-Cc: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>, "virtio-dev@lists.oasis-open.org" <virtio-dev@lists.oasis-open.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "virtualization@lists.linux-foundation.org" <virtualization@lists.linux-foundation.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "linux-mm@kvack.org" <linux-mm@kvack.org>, "mst@redhat.com" <mst@redhat.com>, "mhocko@kernel.org" <mhocko@kernel.org>, "akpm@linux-foundation.org" <akpm@linux-foundation.org>, "mawilcox@microsoft.com" <mawilcox@microsoft.com>, "david@redhat.com" <david@redhat.com>, "cornelia.huck@de.ibm.com" <cornelia.huck@de.ibm.com>, "mgorman@techsingularity.net" <mgorman@techsingularity.net>, "aarcange@redhat.com" <aarcange@redhat.com>, "amit.shah@redhat.com" <amit.shah@redhat.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "liliang.opensource@gmail.com" <liliang.opensource@gmail.com>, "yang.zhang.wz@gmail.com" <yang.zhang.wz@gmail.com>, "quan.xu0@gmail.com" <quan.xu0@gmail.com>, "nilal@redhat.com" <nilal@redhat.com>, "riel@redhat.com" <riel@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Richard Henderson <rth@twiddle.net>
+Cc: Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-On Thu, Dec 21, 2017 at 10:49:44AM +0800, Wei Wang wrote:
-> On 12/21/2017 01:10 AM, Matthew Wilcox wrote:
-> One more question is about the return value, why would it be ambiguous? I
-> think it is the same as find_next_bit() which returns the found bit or size
-> if not found.
+On 20.12.2017 22:56, Paolo Bonzini wrote:
+> On 20/12/2017 20:20, Peter Maydell wrote:
+>> On the x86/sanitizer build, new runtime errors:
+>>   GTESTER check-qtest-m68k
+>> /home/petmay01/linaro/qemu-for-merges/target/m68k/translate.c:230:12:
+>> runtime error: index -1 out of bounds for type 'const uint8_t [11]'
+>>
+>> ...and similar fails on one or two boards on most of the other
+>> guest architectures.
+>=20
+> These are preexisting bugs, now exposed by the boot-serial-test.
+> Thomas, can you identify the architectures that have a problem and
+> notify the maintainers?  In the meanwhile I'll keep the boot-serial-tes=
+t
+> enhancements queued locally, and remove them from the pull request.
 
-Because find_next_bit doesn't reasonably support a bitmap which is
-ULONG_MAX in size.  The point of XBitmap is to support a bitmap which
-is ULONG_MAX in size, so every possible return value is a legitimate
-"we found a bit here".  There's no value which can possibly be used for
-"no bit was found".
+ Laurent, Richard,
+
+looks like old_op is -1 when set_cc_op() is called here for the first
+time. The problem can be reproduced by running the mini-kernel directly.
+Just get http://people.redhat.com/~thuth/m68k-uart.bin and run QEMU like
+this:
+
+ qemu-system-m68k -nographic -kernel  ~/tmp/m68k-uart.bin -serial none
+
+That kernel only contains these few instructions:
+
+  0x41, 0xf9, 0xfc, 0x06, 0x00, 0x00,     /* lea 0xfc060000,%a0 */
+  0x10, 0x3c, 0x00, 0x54,                 /* move.b #'T',%d0 */
+  0x11, 0x7c, 0x00, 0x04, 0x00, 0x08,     /* move.b #4,8(%a0) */
+  0x11, 0x40, 0x00, 0x0c,                 /* move.b %d0,12(%a0) */
+  0x60, 0xfa                              /* bra.s  loop */
+
+The problem occurs during the second instruction (i.e. the first move.b).
+
+Do you have any ideas where this -1 in s->cc_op could come from?
+
+ Thomas
