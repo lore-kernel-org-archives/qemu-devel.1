@@ -1,24 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57441)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58196)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1eS0R8-0003Gf-Lm
-	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 07:59:00 -0500
+	(envelope-from <penguin-kernel@I-love.SAKURA.ne.jp>)
+	id 1eS0S0-0003ul-Pm
+	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 07:59:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1eS0R5-0002qi-D2
-	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 07:58:58 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:49468)
+	(envelope-from <penguin-kernel@I-love.SAKURA.ne.jp>)
+	id 1eS0Rx-0003ZF-Jd
+	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 07:59:52 -0500
+Received: from www262.sakura.ne.jp ([2001:e42:101:1:202:181:97:72]:50354)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1eS0R5-0002pd-6m
-	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 07:58:55 -0500
-Date: Thu, 21 Dec 2017 20:58:46 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20171221125846.GU10812@lemon>
-References: <20171219084557.9801-1-peterx@redhat.com>
-	<20171219084557.9801-25-peterx@redhat.com>
-MIME-Version: 1.0
+	(Exim 4.71) (envelope-from <penguin-kernel@I-love.SAKURA.ne.jp>)
+	id 1eS0Rx-00021S-42
+	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 07:59:49 -0500
+From: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+References: <5A3A3CBC.4030202@intel.com>
+	<20171220122547.GA1654@bombadil.infradead.org>
+	<286AC319A985734F985F78AFA26841F73938CC3E@shsmsx102.ccr.corp.intel.com>
+	<20171220171019.GA12236@bombadil.infradead.org>
+	<5A3B2148.8050306@intel.com>
+In-Reply-To: <5A3B2148.8050306@intel.com>
+Message-Id: <201712212156.AGC09823.OVFtFMJHOSFOLQ@I-love.SAKURA.ne.jp>
+Date: Thu, 21 Dec 2017 21:56:55 +0900
+Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20171219084557.9801-25-peterx@redhat.com>
-Subject: Re: [Qemu-devel] [RFC v6 24/27] qmp: add command "x-oob-test"
+Subject: Re: [Qemu-devel] [PATCH v20 0/7] Virtio-balloon Enhancement
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,72 +32,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, Stefan Hajnoczi <shajnocz@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Juan Quintela <quintela@redhat.com>, mdroth@linux.vnet.ibm.com, Eric Blake <eblake@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Markus Armbruster <armbru@redhat.com>, marcandre.lureau@redhat.com, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: wei.w.wang@intel.com, willy@infradead.org
+Cc: virtio-dev@lists.oasis-open.org, linux-kernel@vger.kernel.org, qemu-devel@nongnu.org, virtualization@lists.linux-foundation.org, kvm@vger.kernel.org, linux-mm@kvack.org, mst@redhat.com, mhocko@kernel.org, akpm@linux-foundation.org, mawilcox@microsoft.com, david@redhat.com, cornelia.huck@de.ibm.com, mgorman@techsingularity.net, aarcange@redhat.com, amit.shah@redhat.com, pbonzini@redhat.com, liliang.opensource@gmail.com, yang.zhang.wz@gmail.com, quan.xu0@gmail.com, nilal@redhat.com, riel@redhat.com
 
-On Tue, 12/19 16:45, Peter Xu wrote:
-> This command is only used to test OOB functionality.  It should not be
-> used for any other purposes.
+Wei Wang wrote:
+> Thanks for the effort. That's actually caused by the previous "!node" 
+> path, which incorrectly changed "index = (index | RADIX_TREE_MAP_MASK) + 
+> 1". With the change below, it will run pretty well with the test cases.
 > 
-> Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-> Signed-off-by: Peter Xu <peterx@redhat.com>
-> ---
->  qapi-schema.json | 18 ++++++++++++++++++
->  qmp.c            | 16 ++++++++++++++++
->  2 files changed, 34 insertions(+)
+> if (!node && !bitmap)
+>      return size;
 > 
-> diff --git a/qapi-schema.json b/qapi-schema.json
-> index 447ab25572..a63cd42cdd 100644
-> --- a/qapi-schema.json
-> +++ b/qapi-schema.json
-> @@ -3259,3 +3259,21 @@
->  ##
->  { 'event': 'COMMAND_DROPPED' ,
->    'data': { 'id': 'any', 'reason': 'CommandDropReason' } }
-> +
-> +##
-> +# @x-oob-test:
-> +#
-> +# Test OOB functionality.  When send this command with lock=true,
-> +# it'll try to hang the dispatcher.  When send it with lock=false,
-> +# it'll try to notify the locked thread to continue.  Note: it should
-> +# only be used by QMP test program rather than anything else.
-> +#
-> +# Since: 2.12
-> +#
-> +# Example:
-> +#
-> +# { "execute": "x-oob-test",
-> +#   "arguments": { "lock": true } }
-> +##
-> +{ 'command': 'x-oob-test', 'data' : { 'lock': 'bool' },
-> +  'allow-oob': true }
-> diff --git a/qmp.c b/qmp.c
-> index e8c303116a..ca2968aad2 100644
-> --- a/qmp.c
-> +++ b/qmp.c
-> @@ -722,3 +722,19 @@ MemoryInfo *qmp_query_memory_size_summary(Error **errp)
->  
->      return mem_info;
->  }
-> +
-> +static QemuSemaphore x_oob_test_sem;
-> +
-> +static void __attribute__((constructor)) x_oob_test_init(void)
-> +{
-> +    qemu_sem_init(&x_oob_test_sem, 0);
-> +}
-> +
-> +void qmp_x_oob_test(bool lock, Error **errp)
-> +{
-> +    if (lock) {
-> +        qemu_sem_wait(&x_oob_test_sem);
-> +    } else {
-> +        qemu_sem_post(&x_oob_test_sem);
-> +    }
-> +}
-> -- 
-> 2.14.3
-> 
+> Would you mind to have a try with the v20 RESEND patch that was just 
+> shared?
 
-Reviewed-by: Fam Zheng <famz@redhat.com>
+No. Please explain what "!node" situation indicates. Why did you try
+"index = (index | RADIX_TREE_MAP_MASK) + 1; continue;" in the previous patch?
+
++unsigned long xb_find_set(struct xb *xb, unsigned long size,
++			  unsigned long offset)
++{
++	struct radix_tree_root *root = &xb->xbrt;
++	struct radix_tree_node *node;
++	void __rcu **slot;
++	struct ida_bitmap *bitmap;
++	unsigned long index = offset / IDA_BITMAP_BITS;
++	unsigned long index_end = size / IDA_BITMAP_BITS;
++	unsigned long bit = offset % IDA_BITMAP_BITS;
++
++	if (unlikely(offset >= size))
++		return size;
++
++	while (index <= index_end) {
++		unsigned long ret;
++		unsigned int nbits = size - index * IDA_BITMAP_BITS;
++
++		bitmap = __radix_tree_lookup(root, index, &node, &slot);
++
++		if (!node && !bitmap)
++			return size;
++
++		if (bitmap) {
++			if (nbits > IDA_BITMAP_BITS)
++				nbits = IDA_BITMAP_BITS;
++
++			ret = find_next_bit(bitmap->bitmap, nbits, bit);
++			if (ret != nbits)
++				return ret + index * IDA_BITMAP_BITS;
++		}
++		bit = 0;
++		index++;
++	}
++
++	return size;
++}
