@@ -1,29 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60561)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60992)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1eS1Ym-0001vg-29
-	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 09:10:57 -0500
+	(envelope-from <marcandre.lureau@gmail.com>) id 1eS1Z7-00027t-69
+	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 09:11:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1eS1Yh-0000sf-LC
-	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 09:10:56 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:42068)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1eS1Yh-0000rj-DZ
-	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 09:10:51 -0500
-References: <1513790098-9815-1-git-send-email-pbonzini@redhat.com>
-	<CAFEAcA8J53A93+SQz01W13gRCX-ecw0v+8JTaRqwmrUeFjqaJA@mail.gmail.com>
-	<51174e3a-12d3-f3e0-2d76-b776e0fe62b6@redhat.com>
-	<e7994a8d-3a02-99c7-d919-c940aa4bc066@redhat.com>
-	<40dbaff2-918c-bba6-2a70-7c5f9b19cb66@vivier.eu>
-	<0d3d6598-608c-0079-426f-7455a92de7d8@vivier.eu>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <64440fda-1799-f50d-21ed-dc898e08d82f@redhat.com>
-Date: Thu, 21 Dec 2017 15:10:46 +0100
+	(envelope-from <marcandre.lureau@gmail.com>) id 1eS1Z6-0001BG-0P
+	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 09:11:17 -0500
+Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:43261)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+	id 1eS1Z5-0001Ad-M0
+	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 09:11:15 -0500
+Received: by mail-wm0-x242.google.com with SMTP id n138so16166249wmg.2
+	for <qemu-devel@nongnu.org>; Thu, 21 Dec 2017 06:11:15 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <0d3d6598-608c-0079-426f-7455a92de7d8@vivier.eu>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+In-Reply-To: <1510323112-2207-5-git-send-email-stefanb@linux.vnet.ibm.com>
+References: <1510323112-2207-1-git-send-email-stefanb@linux.vnet.ibm.com>
+	<1510323112-2207-5-git-send-email-stefanb@linux.vnet.ibm.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Thu, 21 Dec 2017 15:11:13 +0100
+Message-ID: <CAJ+F1CKWgshVZMbeAmJ2gGLNauF0AGcd-NQVYaoWHA03N=OGTQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] out of bounds in set_cc_op()
+Subject: Re: [Qemu-devel] [PATCH v3 04/13] tpm_tis: move buffers from
+ localities into common location
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,90 +31,172 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Vivier <laurent@vivier.eu>, Thomas Huth <thuth@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Richard Henderson <rth@twiddle.net>
-Cc: Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>
+To: Stefan Berger <stefanb@linux.vnet.ibm.com>
+Cc: QEMU <qemu-devel@nongnu.org>, Amarnath Valluri <amarnath.valluri@intel.com>
 
-On 21/12/2017 14:32, Laurent Vivier wrote:
-> Le 21/12/2017 =C3=A0 14:07, Laurent Vivier a =C3=A9crit=C2=A0:
->> Le 21/12/2017 =C3=A0 13:49, Thomas Huth a =C3=A9crit=C2=A0:
->>> On 20.12.2017 22:56, Paolo Bonzini wrote:
->>>> On 20/12/2017 20:20, Peter Maydell wrote:
->>>>> On the x86/sanitizer build, new runtime errors:
->>>>>   GTESTER check-qtest-m68k
->>>>> /home/petmay01/linaro/qemu-for-merges/target/m68k/translate.c:230:1=
-2:
->>>>> runtime error: index -1 out of bounds for type 'const uint8_t [11]'
->>>>>
->>>>> ...and similar fails on one or two boards on most of the other
->>>>> guest architectures.
->>>>
->>>> These are preexisting bugs, now exposed by the boot-serial-test.
->>>> Thomas, can you identify the architectures that have a problem and
->>>> notify the maintainers?  In the meanwhile I'll keep the boot-serial-=
-test
->>>> enhancements queued locally, and remove them from the pull request.
->>>
->>>  Laurent, Richard,
->>>
->>> looks like old_op is -1 when set_cc_op() is called here for the first
->>> time. The problem can be reproduced by running the mini-kernel direct=
-ly.
->>> Just get http://people.redhat.com/~thuth/m68k-uart.bin and run QEMU l=
-ike
->>> this:
->>>
->>>  qemu-system-m68k -nographic -kernel  ~/tmp/m68k-uart.bin -serial non=
-e
->>>
->>> That kernel only contains these few instructions:
->>>
->>>   0x41, 0xf9, 0xfc, 0x06, 0x00, 0x00,     /* lea 0xfc060000,%a0 */
->>>   0x10, 0x3c, 0x00, 0x54,                 /* move.b #'T',%d0 */
->>>   0x11, 0x7c, 0x00, 0x04, 0x00, 0x08,     /* move.b #4,8(%a0) */
->>>   0x11, 0x40, 0x00, 0x0c,                 /* move.b %d0,12(%a0) */
->>>   0x60, 0xfa                              /* bra.s  loop */
->>>
->>> The problem occurs during the second instruction (i.e. the first move=
-.b).
->>>
->>> Do you have any ideas where this -1 in s->cc_op could come from?
->>
->> I think it comes from CCOp: it's the value of CC_OP_DYNAMIC.
->>
->> We should not use it to access cc_op_live[].
->>
->> I try to find a fix, but I think Richard knows this better than me.
->=20
-> This should fix the problem, but I'd like Richard checks it...
->=20
-> diff --git a/target/m68k/translate.c b/target/m68k/translate.c
-> index b60909222c..721b5801da 100644
-> --- a/target/m68k/translate.c
-> +++ b/target/m68k/translate.c
-> @@ -225,6 +225,11 @@ static void set_cc_op(DisasContext *s, CCOp op)
->      s->cc_op =3D op;
->      s->cc_op_synced =3D 0;
->=20
-> +    if (old_op =3D=3D CC_OP_DYNAMIC) {
-> +        tcg_gen_discard_i32(QREG_CC_OP);
-> +        return;
-> +    }
+Hi
 
-This tcg_gen_discard_i32 is correct, but all flags were potentially live
-and can be discarded if the new op uses it(*).  So I'd replace "return"
-with "old_op =3D CC_OP_FLAGS".
+On Fri, Nov 10, 2017 at 3:11 PM, Stefan Berger
+<stefanb@linux.vnet.ibm.com> wrote:
+> One read buffer and one write buffer is sufficient for all localities.
+> The localities cannot all be active at the same time, and only the active
+> locality can use the r/w buffers. Inactive localities will require the
+> COMMAND_READY flag to be set on the STS register to move to the READY
+> state, which then enables access to using the buffer for writing of a
+> command, while all other localities are inactive.
+>
+> Signed-off-by: Stefan Berger <stefanb@linux.vnet.ibm.com>
+> ---
+>  hw/tpm/tpm_tis.c | 34 +++++++++++++++-------------------
+>  1 file changed, 15 insertions(+), 19 deletions(-)
+>
+> diff --git a/hw/tpm/tpm_tis.c b/hw/tpm/tpm_tis.c
+> index ddfcfc9..f6f5f17 100644
+> --- a/hw/tpm/tpm_tis.c
+> +++ b/hw/tpm/tpm_tis.c
+> @@ -64,16 +64,14 @@ typedef struct TPMLocality {
+>
+>      uint16_t w_offset;
+>      uint16_t r_offset;
+> -    unsigned char w_buffer[TPM_TIS_BUFFER_MAX];
+> -    unsigned char r_buffer[TPM_TIS_BUFFER_MAX];
+>  } TPMLocality;
+>
+>  typedef struct TPMState {
+>      ISADevice busdev;
+>      MemoryRegion mmio;
+>
+> -    uint32_t offset;
+> -    uint8_t buf[TPM_TIS_BUFFER_MAX];
 
-Paolo
+Looks like those were never used. Make it a seperate cleanup?
 
-	(*) in fact it's always true that all flags can be discarded.
-	    Only discarding some is an optimization to limit the number
-	    of generated ops.
+> +    unsigned char w_buffer[TPM_TIS_BUFFER_MAX];
+> +    unsigned char r_buffer[TPM_TIS_BUFFER_MAX];
+>
+>      uint8_t active_locty;
+>      uint8_t aborting_locty;
+> @@ -259,7 +257,7 @@ static void tpm_tis_tpm_send(TPMState *s, uint8_t loc=
+ty)
+>  {
+>      TPMLocality *locty_data =3D &s->loc[locty];
+>
+> -    tpm_tis_show_buffer(s->loc[locty].w_buffer, s->be_buffer_size,
+> +    tpm_tis_show_buffer(s->w_buffer, s->be_buffer_size,
+>                          "tpm_tis: To TPM");
+>
+>      /*
+> @@ -270,9 +268,9 @@ static void tpm_tis_tpm_send(TPMState *s, uint8_t loc=
+ty)
+>
+>      s->cmd =3D (TPMBackendCmd) {
+>          .locty =3D locty,
+> -        .in =3D locty_data->w_buffer,
+> +        .in =3D s->w_buffer,
+>          .in_len =3D locty_data->w_offset,
+> -        .out =3D locty_data->r_buffer,
+> +        .out =3D s->r_buffer,
+>          .out_len =3D s->be_buffer_size,
+>      };
+>
+> @@ -424,7 +422,7 @@ static void tpm_tis_request_completed(TPMIf *ti)
+>      s->loc[locty].r_offset =3D 0;
+>      s->loc[locty].w_offset =3D 0;
+>
+> -    tpm_tis_show_buffer(s->loc[locty].r_buffer, s->be_buffer_size,
+> +    tpm_tis_show_buffer(s->r_buffer, s->be_buffer_size,
+>                          "tpm_tis: From TPM");
+>
+>      if (TPM_TIS_IS_VALID_LOCTY(s->next_locty)) {
+> @@ -444,10 +442,10 @@ static uint32_t tpm_tis_data_read(TPMState *s, uint=
+8_t locty)
+>      uint16_t len;
+>
+>      if ((s->loc[locty].sts & TPM_TIS_STS_DATA_AVAILABLE)) {
+> -        len =3D MIN(tpm_cmd_get_size(&s->loc[locty].r_buffer),
+> +        len =3D MIN(tpm_cmd_get_size(&s->r_buffer),
+>                    s->be_buffer_size);
+>
+> -        ret =3D s->loc[locty].r_buffer[s->loc[locty].r_offset++];
+> +        ret =3D s->r_buffer[s->loc[locty].r_offset++];
+>          if (s->loc[locty].r_offset >=3D len) {
+>              /* got last byte */
+>              tpm_tis_sts_set(&s->loc[locty], TPM_TIS_STS_VALID);
+> @@ -493,12 +491,11 @@ static void tpm_tis_dump_state(void *opaque, hwaddr=
+ addr)
+>              "tpm_tis: result buffer : ",
+>              s->loc[locty].r_offset);
+>      for (idx =3D 0;
+> -         idx < MIN(tpm_cmd_get_size(&s->loc[locty].r_buffer),
+> -                   s->be_buffer_size);
+> +         idx < MIN(tpm_cmd_get_size(&s->r_buffer), s->be_buffer_size);
+>           idx++) {
+>          DPRINTF("%c%02x%s",
+>                  s->loc[locty].r_offset =3D=3D idx ? '>' : ' ',
+> -                s->loc[locty].r_buffer[idx],
+> +                s->r_buffer[idx],
+>                  ((idx & 0xf) =3D=3D 0xf) ? "\ntpm_tis:                 "=
+ : "");
+>      }
+>      DPRINTF("\n"
+> @@ -506,12 +503,11 @@ static void tpm_tis_dump_state(void *opaque, hwaddr=
+ addr)
+>              "tpm_tis: request buffer: ",
+>              s->loc[locty].w_offset);
+>      for (idx =3D 0;
+> -         idx < MIN(tpm_cmd_get_size(s->loc[locty].w_buffer),
+> -                   s->be_buffer_size);
+> +         idx < MIN(tpm_cmd_get_size(s->w_buffer), s->be_buffer_size);
+>           idx++) {
+>          DPRINTF("%c%02x%s",
+>                  s->loc[locty].w_offset =3D=3D idx ? '>' : ' ',
+> -                s->loc[locty].w_buffer[idx],
+> +                s->w_buffer[idx],
+>                  ((idx & 0xf) =3D=3D 0xf) ? "\ntpm_tis:                 "=
+ : "");
+>      }
+>      DPRINTF("\n");
+> @@ -573,7 +569,7 @@ static uint64_t tpm_tis_mmio_read(void *opaque, hwadd=
+r addr,
+>          if (s->active_locty =3D=3D locty) {
+>              if ((s->loc[locty].sts & TPM_TIS_STS_DATA_AVAILABLE)) {
+>                  val =3D TPM_TIS_BURST_COUNT(
+> -                       MIN(tpm_cmd_get_size(&s->loc[locty].r_buffer),
+> +                       MIN(tpm_cmd_get_size(&s->r_buffer),
+>                             s->be_buffer_size)
+>                         - s->loc[locty].r_offset) | s->loc[locty].sts;
+>              } else {
+> @@ -926,7 +922,7 @@ static void tpm_tis_mmio_write(void *opaque, hwaddr a=
+ddr,
+>
+>              while ((s->loc[locty].sts & TPM_TIS_STS_EXPECT) && size > 0)=
+ {
+>                  if (s->loc[locty].w_offset < s->be_buffer_size) {
+> -                    s->loc[locty].w_buffer[s->loc[locty].w_offset++] =3D
+> +                    s->w_buffer[s->loc[locty].w_offset++] =3D
+>                          (uint8_t)val;
+>                      val >>=3D 8;
+>                      size--;
+> @@ -941,7 +937,7 @@ static void tpm_tis_mmio_write(void *opaque, hwaddr a=
+ddr,
+>                  /* we have a packet length - see if we have all of it */
+>                  bool need_irq =3D !(s->loc[locty].sts & TPM_TIS_STS_VALI=
+D);
+>
+> -                len =3D tpm_cmd_get_size(&s->loc[locty].w_buffer);
+> +                len =3D tpm_cmd_get_size(&s->w_buffer);
+>                  if (len > s->loc[locty].w_offset) {
+>                      tpm_tis_sts_set(&s->loc[locty],
+>                                      TPM_TIS_STS_EXPECT | TPM_TIS_STS_VAL=
+ID);
+> --
+> 2.5.5
+>
+>
 
->      /* Discard CC computation that will no longer be used.
->         Note that X and N are never dead.  */
->      dead =3D cc_op_live[old_op] & ~cc_op_live[op];
->=20
->=20
-> Thanks,
-> Laurent
->=20
+
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+
+
+--=20
+Marc-Andr=C3=A9 Lureau
