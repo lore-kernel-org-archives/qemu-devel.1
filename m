@@ -1,24 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45850)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45950)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1eS1qb-0007t6-Al
-	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 09:29:27 -0500
+	(envelope-from <mst@redhat.com>) id 1eS1qm-00083o-MM
+	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 09:29:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1eS1qa-0005hY-Dq
-	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 09:29:21 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:55152)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1eS1qa-0005h2-6W
-	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 09:29:20 -0500
-Date: Thu, 21 Dec 2017 16:29:18 +0200
+	(envelope-from <mst@redhat.com>) id 1eS1ql-0005q4-LW
+	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 09:29:32 -0500
+Date: Thu, 21 Dec 2017 16:29:21 +0200
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <1513866427-27125-14-git-send-email-mst@redhat.com>
+Message-ID: <1513866427-27125-16-git-send-email-mst@redhat.com>
 References: <1513866427-27125-1-git-send-email-mst@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 In-Reply-To: <1513866427-27125-1-git-send-email-mst@redhat.com>
-Subject: [Qemu-devel] [PULL 13/25] tests/pxe-test: Test net booting over
- IPv6 in some cases
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 15/25] hw/block/nvme: QOM'ify PCI NVME
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,78 +24,111 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, David Gibson <david@gibson.dropbear.id.au>, Thomas Huth <thuth@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Keith Busch <keith.busch@intel.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
 
-From: David Gibson <david@gibson.dropbear.id.au>
+From: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 
-This adds IPv6 net boot testing (in addition to IPv4) when in slow test
-mode on ppc64 or s390.  IPv6 PXE doesn't seem to work on x86, I'm guessing
-our BIOS image doesn't support it.
-
-Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 ---
- tests/pxe-test.c | 26 ++++++++++++++++++++------
- 1 file changed, 20 insertions(+), 6 deletions(-)
+ hw/block/nvme.c | 32 +++++++++++++++++---------------
+ 1 file changed, 17 insertions(+), 15 deletions(-)
 
-diff --git a/tests/pxe-test.c b/tests/pxe-test.c
-index 4758ce7..5689c7d 100644
---- a/tests/pxe-test.c
-+++ b/tests/pxe-test.c
-@@ -81,7 +81,14 @@ static void test_pxe_ipv4(gconstpointer data)
-     test_pxe_one(test, false);
- }
- 
--static void test_batch(const testdef_t *tests)
-+static void test_pxe_ipv6(gconstpointer data)
-+{
-+    const testdef_t *test = data;
-+
-+    test_pxe_one(test, true);
-+}
-+
-+static void test_batch(const testdef_t *tests, bool ipv6)
+diff --git a/hw/block/nvme.c b/hw/block/nvme.c
+index 441e21e..9c5f898 100644
+--- a/hw/block/nvme.c
++++ b/hw/block/nvme.c
+@@ -920,9 +920,9 @@ static const MemoryRegionOps nvme_cmb_ops =3D {
+     },
+ };
+=20
+-static int nvme_init(PCIDevice *pci_dev)
++static void nvme_realize(PCIDevice *pci, Error **errp)
  {
+-    NvmeCtrl *n =3D NVME(pci_dev);
++    NvmeCtrl *n =3D NVME(pci);
+     NvmeIdCtrl *id =3D &n->id_ctrl;
+=20
      int i;
- 
-@@ -93,6 +100,13 @@ static void test_batch(const testdef_t *tests)
-                                    test->machine, test->model);
-         qtest_add_data_func(testname, test, test_pxe_ipv4);
-         g_free(testname);
-+
-+        if (ipv6) {
-+            testname = g_strdup_printf("pxe/ipv6/%s/%s",
-+                                       test->machine, test->model);
-+            qtest_add_data_func(testname, test, test_pxe_ipv6);
-+            g_free(testname);
-+        }
+@@ -931,30 +931,33 @@ static int nvme_init(PCIDevice *pci_dev)
+     Error *local_err =3D NULL;
+=20
+     if (!n->conf.blk) {
+-        return -1;
++        error_setg(errp, "Block device missing");
++        return;
      }
+=20
+     bs_size =3D blk_getlength(n->conf.blk);
+     if (bs_size < 0) {
+-        return -1;
++        error_setg_errno(errp, -bs_size, "Could not get length of device=
+");
++        return;
+     }
+=20
+     blkconf_serial(&n->conf, &n->serial);
+     if (!n->serial) {
+-        return -1;
++        error_setg(errp, "Could not get device serial number");
++        return;
+     }
+     blkconf_blocksizes(&n->conf);
+     blkconf_apply_backend_options(&n->conf, blk_is_read_only(n->conf.blk=
+),
+                                   false, &local_err);
+     if (local_err) {
+-        error_report_err(local_err);
+-        return -1;
++        error_propagate(errp, local_err);
++        return;
+     }
+=20
+-    pci_conf =3D pci_dev->config;
++    pci_conf =3D pci->config;
+     pci_conf[PCI_INTERRUPT_PIN] =3D 1;
+-    pci_config_set_prog_interface(pci_dev->config, 0x2);
+-    pci_config_set_class(pci_dev->config, PCI_CLASS_STORAGE_EXPRESS);
++    pci_config_set_prog_interface(pci->config, 0x2);
++    pci_config_set_class(pci->config, PCI_CLASS_STORAGE_EXPRESS);
+     pcie_endpoint_cap_init(&n->parent_obj, 0x80);
+=20
+     n->num_namespaces =3D 1;
+@@ -1046,12 +1049,11 @@ static int nvme_init(PCIDevice *pci_dev)
+             cpu_to_le64(n->ns_size >>
+                 id_ns->lbaf[NVME_ID_NS_FLBAS_INDEX(ns->id_ns.flbas)].ds)=
+;
+     }
+-    return 0;
  }
- 
-@@ -108,17 +122,17 @@ int main(int argc, char *argv[])
-     g_test_init(&argc, &argv, NULL);
- 
-     if (strcmp(arch, "i386") == 0 || strcmp(arch, "x86_64") == 0) {
--        test_batch(x86_tests);
-+        test_batch(x86_tests, false);
-         if (g_test_slow()) {
--            test_batch(x86_tests_slow);
-+            test_batch(x86_tests_slow, false);
-         }
-     } else if (strcmp(arch, "ppc64") == 0) {
--        test_batch(ppc64_tests);
-+        test_batch(ppc64_tests, g_test_slow());
-         if (g_test_slow()) {
--            test_batch(ppc64_tests_slow);
-+            test_batch(ppc64_tests_slow, true);
-         }
-     } else if (g_str_equal(arch, "s390x")) {
--        test_batch(s390x_tests);
-+        test_batch(s390x_tests, g_test_slow());
+=20
+-static void nvme_exit(PCIDevice *pci_dev)
++static void nvme_exit(PCIDevice *pci)
+ {
+-    NvmeCtrl *n =3D NVME(pci_dev);
++    NvmeCtrl *n =3D NVME(pci);
+=20
+     nvme_clear_ctrl(n);
+     g_free(n->namespaces);
+@@ -1061,7 +1063,7 @@ static void nvme_exit(PCIDevice *pci_dev)
+         memory_region_unref(&n->ctrl_mem);
      }
-     ret = g_test_run();
-     boot_sector_cleanup(disk);
--- 
+=20
+-    msix_uninit_exclusive_bar(pci_dev);
++    msix_uninit_exclusive_bar(pci);
+ }
+=20
+ static Property nvme_props[] =3D {
+@@ -1081,7 +1083,7 @@ static void nvme_class_init(ObjectClass *oc, void *=
+data)
+     DeviceClass *dc =3D DEVICE_CLASS(oc);
+     PCIDeviceClass *pc =3D PCI_DEVICE_CLASS(oc);
+=20
+-    pc->init =3D nvme_init;
++    pc->realize =3D nvme_realize;
+     pc->exit =3D nvme_exit;
+     pc->class_id =3D PCI_CLASS_STORAGE_EXPRESS;
+     pc->vendor_id =3D PCI_VENDOR_ID_INTEL;
+--=20
 MST
