@@ -1,20 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59834)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39208)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eSAIs-0002WG-U8
-	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 18:31:07 -0500
+	(envelope-from <mst@redhat.com>) id 1eSAUB-0005ct-Go
+	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 18:42:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eSAIr-0007wu-Uh
-	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 18:31:06 -0500
-References: <20171221224411.8901-1-jsnow@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <fe4de8eb-814a-7a41-4fc5-4ff69018689d@redhat.com>
-Date: Thu, 21 Dec 2017 17:30:56 -0600
+	(envelope-from <mst@redhat.com>) id 1eSAU8-0001cf-V4
+	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 18:42:47 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:38600)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1eSAU8-0001aa-PX
+	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 18:42:44 -0500
+Date: Fri, 22 Dec 2017 01:42:42 +0200
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20171222014229-mutt-send-email-mst@kernel.org>
+References: <1513866427-27125-1-git-send-email-mst@redhat.com>
+	<CAFEAcA_pt7XhXOhL2jSxwH9ooL7xjShmp6eBAYpRLc=dY-=TXQ@mail.gmail.com>
+	<20171221223704-mutt-send-email-mst@kernel.org>
+	<CAFEAcA8-Pe4gVJcKnGXAwia8Y4FD=3r=E-EZuqcX68UZeLoXLg@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20171221224411.8901-1-jsnow@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] file-posix: refuse to open directories
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAFEAcA8-Pe4gVJcKnGXAwia8Y4FD=3r=E-EZuqcX68UZeLoXLg@mail.gmail.com>
+Subject: Re: [Qemu-devel] [PULL 00/25] pc, pci, virtio: features, fixes,
+ cleanups
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,40 +30,16 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org
-Cc: kwolf@redhat.com, mreitz@redhat.com, qemu-devel@nongnu.org, dgilbert@redhat.com
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-On 12/21/2017 04:44 PM, John Snow wrote:
-> I don't think there's a legitimate reason to open directories as if
-> they were files. This prevents QEMU from opening and attempting to probe
-> a directory inode, which can break in exciting ways. One of those ways
-> is lseek on ext4/xfs, which will return 0x7fffffffffffffff as the file
-> size instead of EISDIR. This can coax QEMU into responding with a
-> confusing "file too big" instead of "Hey, that's not a file".
+On Thu, Dec 21, 2017 at 11:05:01PM +0000, Peter Maydell wrote:
+> On 21 December 2017 at 20:37, Michael S. Tsirkin <mst@redhat.com> wrote:
+> > Done and pushed - I dropped the conflicting patch.
 > 
-> See: https://bugs.launchpad.net/qemu/+bug/1739304/
-> Signed-off-by: John Snow <jsnow@redhat.com>
-> ---
->   block/file-posix.c | 5 +++++
->   1 file changed, 5 insertions(+)
+> Have you also dropped the other one Philippe says depends on it?
 > 
-> diff --git a/block/file-posix.c b/block/file-posix.c
-> index 36ee89e940..bd29bdada6 100644
-> --- a/block/file-posix.c
-> +++ b/block/file-posix.c
-> @@ -589,6 +589,11 @@ static int raw_open_common(BlockDriverState *bs, QDict *options,
->           s->needs_alignment = true;
->       }
->   #endif
-> +    if (S_ISDIR(st.st_mode)) {
-> +        ret = -EISDIR;
-> +        error_setg_errno(errp, errno, "Cannot open directory as file");
-> +        goto fail;
-> +    }
+> thanks
+> -- PMM
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
-
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+I did now
