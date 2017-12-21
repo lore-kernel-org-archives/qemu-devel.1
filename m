@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42098)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42986)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <atar4qemu@gmail.com>) id 1eRxur-0002Pq-KS
-	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 05:17:30 -0500
+	(envelope-from <atar4qemu@gmail.com>) id 1eRxvw-0003H1-IM
+	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 05:18:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <atar4qemu@gmail.com>) id 1eRxuq-0002vy-Hx
-	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 05:17:29 -0500
-Received: from mail-io0-x242.google.com ([2607:f8b0:4001:c06::242]:43981)
+	(envelope-from <atar4qemu@gmail.com>) id 1eRxvv-0003gO-Fs
+	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 05:18:36 -0500
+Received: from mail-io0-x243.google.com ([2607:f8b0:4001:c06::243]:44658)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <atar4qemu@gmail.com>) id 1eRxuq-0002vZ-Cm
-	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 05:17:28 -0500
-Received: by mail-io0-x242.google.com with SMTP id k202so12254563ioe.10
-	for <qemu-devel@nongnu.org>; Thu, 21 Dec 2017 02:17:28 -0800 (PST)
+	(Exim 4.71) (envelope-from <atar4qemu@gmail.com>) id 1eRxvv-0003g1-Ay
+	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 05:18:35 -0500
+Received: by mail-io0-x243.google.com with SMTP id w127so20514108iow.11
+	for <qemu-devel@nongnu.org>; Thu, 21 Dec 2017 02:18:35 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20171221082045.14022-12-mark.cave-ayland@ilande.co.uk>
+In-Reply-To: <20171221082045.14022-17-mark.cave-ayland@ilande.co.uk>
 References: <20171221082045.14022-1-mark.cave-ayland@ilande.co.uk>
-	<20171221082045.14022-12-mark.cave-ayland@ilande.co.uk>
+	<20171221082045.14022-17-mark.cave-ayland@ilande.co.uk>
 From: Artyom Tarasenko <atar4qemu@gmail.com>
-Date: Thu, 21 Dec 2017 11:17:07 +0100
-Message-ID: <CACXAS8DLXDkC2ssjQcEXU7nrE_P2_S62MJkA3dpHwDC6DEKvpQ@mail.gmail.com>
+Date: Thu, 21 Dec 2017 11:18:13 +0100
+Message-ID: <CACXAS8AEpHQy=61J=3AREcbXbBksm40y4A0qHpiWDvA57oj20w@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCHv3 11/16] apb: split pci_pbm_map_irq() into
- separate functions for bus A and bus B
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCHv3 16/16] sun4u: switch from EBUS_DPRINTF()
+ macro to trace-events
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,96 +35,67 @@ Cc: qemu-devel <qemu-devel@nongnu.org>
 
 On Thu, Dec 21, 2017 at 9:20 AM, Mark Cave-Ayland
 <mark.cave-ayland@ilande.co.uk> wrote:
-> After the previous refactoring it is now possible to use separate functions
-> to improve the clarity of the interrupt paths.
->
 > Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 
 Reviewed-by: Artyom Tarasenko <atar4qemu@gmail.com>
 
 > ---
->  hw/pci-host/apb.c | 45 ++++++++++++++++++++-------------------------
->  1 file changed, 20 insertions(+), 25 deletions(-)
+>  hw/sparc64/sun4u.c      | 12 ++----------
+>  hw/sparc64/trace-events |  3 +++
+>  2 files changed, 5 insertions(+), 10 deletions(-)
 >
-> diff --git a/hw/pci-host/apb.c b/hw/pci-host/apb.c
-> index 6c20285b04..3ebb9dc304 100644
-> --- a/hw/pci-host/apb.c
-> +++ b/hw/pci-host/apb.c
-> @@ -517,32 +517,27 @@ static int pci_apb_map_irq(PCIDevice *pci_dev, int irq_num)
->      return irq_num;
->  }
+> diff --git a/hw/sparc64/sun4u.c b/hw/sparc64/sun4u.c
+> index 1456c3370d..5d802bdfde 100644
+> --- a/hw/sparc64/sun4u.c
+> +++ b/hw/sparc64/sun4u.c
+> @@ -47,17 +47,9 @@
+>  #include "hw/ide/pci.h"
+>  #include "hw/loader.h"
+>  #include "elf.h"
+> +#include "trace.h"
+>  #include "qemu/cutils.h"
 >
-> -static int pci_pbm_map_irq(PCIDevice *pci_dev, int irq_num)
-> +static int pci_pbmA_map_irq(PCIDevice *pci_dev, int irq_num)
->  {
-> -    PBMPCIBridge *br = PBM_PCI_BRIDGE(pci_bridge_get_device(
-> -                           PCI_BUS(qdev_get_parent_bus(DEVICE(pci_dev)))));
+> -//#define DEBUG_EBUS
 > -
-> -    int bus_offset;
-> -    if (br->busA) {
-> -        bus_offset = 0x0;
-> +    /* The on-board devices have fixed (legacy) OBIO intnos */
-> +    switch (PCI_SLOT(pci_dev->devfn)) {
-> +    case 1:
-> +        /* Onboard NIC */
-> +        return 0x21;
-> +    case 3:
-> +        /* Onboard IDE */
-> +        return 0x20;
-> +    default:
-> +        /* Normal intno, fall through */
-> +        break;
-> +    }
+> -#ifdef DEBUG_EBUS
+> -#define EBUS_DPRINTF(fmt, ...)                                  \
+> -    do { printf("EBUS: " fmt , ## __VA_ARGS__); } while (0)
+> -#else
+> -#define EBUS_DPRINTF(fmt, ...)
+> -#endif
+> -
+>  #define KERNEL_LOAD_ADDR     0x00404000
+>  #define CMDLINE_ADDR         0x003ff000
+>  #define PROM_SIZE_MAX        (4 * 1024 * 1024)
+> @@ -218,7 +210,7 @@ static void ebus_isa_irq_handler(void *opaque, int n,=
+ int level)
+>      qemu_irq irq =3D s->isa_bus_irqs[n];
 >
-> -        /* The on-board devices have fixed (legacy) OBIO intnos */
-> -        switch (PCI_SLOT(pci_dev->devfn)) {
-> -        case 1:
-> -            /* Onboard NIC */
-> -            return 0x21;
-> -        case 3:
-> -            /* Onboard IDE */
-> -            return 0x20;
-> +    return ((PCI_SLOT(pci_dev->devfn) << 2) + irq_num) & 0x1f;
-> +}
->
-> -        default:
-> -            /* Normal intno, fall through */
-> -            break;
-> -        }
-> -    } else {
-> -        bus_offset = 0x10;
-> -    }
-> -    return (bus_offset + (PCI_SLOT(pci_dev->devfn) << 2) + irq_num) & 0x1f;
-> +static int pci_pbmB_map_irq(PCIDevice *pci_dev, int irq_num)
-> +{
-> +    return (0x10 + (PCI_SLOT(pci_dev->devfn) << 2) + irq_num) & 0x1f;
->  }
->
->  static void pci_apb_set_irq(void *opaque, int irq_num, int level)
-> @@ -673,13 +668,13 @@ static void pci_pbm_realize(DeviceState *dev, Error **errp)
->      pci_dev = pci_create_multifunction(phb->bus, PCI_DEVFN(1, 0), true,
->                                     TYPE_PBM_PCI_BRIDGE);
->      s->bridgeB = PCI_BRIDGE(pci_dev);
-> -    pci_bridge_map_irq(s->bridgeB, "pciB", pci_pbm_map_irq);
-> +    pci_bridge_map_irq(s->bridgeB, "pciB", pci_pbmB_map_irq);
->      qdev_init_nofail(&pci_dev->qdev);
->
->      pci_dev = pci_create_multifunction(phb->bus, PCI_DEVFN(1, 1), true,
->                                     TYPE_PBM_PCI_BRIDGE);
->      s->bridgeA = PCI_BRIDGE(pci_dev);
-> -    pci_bridge_map_irq(s->bridgeA, "pciA", pci_pbm_map_irq);
-> +    pci_bridge_map_irq(s->bridgeA, "pciA", pci_pbmA_map_irq);
->      qdev_prop_set_bit(DEVICE(pci_dev), "busA", true);
->      qdev_init_nofail(&pci_dev->qdev);
->  }
+>      /* Pass ISA bus IRQs onto their gpio equivalent */
+> -    EBUS_DPRINTF("Set ISA IRQ %d level %d\n", n, level);
+> +    trace_ebus_isa_irq_handler(n, level);
+>      if (irq) {
+>          qemu_set_irq(irq, level);
+>      }
+> diff --git a/hw/sparc64/trace-events b/hw/sparc64/trace-events
+> index 9284b1fbad..04d80b7f70 100644
+> --- a/hw/sparc64/trace-events
+> +++ b/hw/sparc64/trace-events
+> @@ -1 +1,4 @@
+>  # See docs/devel/tracing.txt for syntax documentation.
+> +
+> +# hw/sparc64/sun4u.c
+> +ebus_isa_irq_handler(int n, int level) "Set ISA IRQ %d level %d"
 > --
 > 2.11.0
 >
 
 
 
--- 
+--=20
 Regards,
 Artyom Tarasenko
 
-SPARC and PPC PReP under qemu blog: http://tyom.blogspot.com/search/label/qemu
+SPARC and PPC PReP under qemu blog: http://tyom.blogspot.com/search/label/q=
+emu
