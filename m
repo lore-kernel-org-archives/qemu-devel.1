@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58776)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59437)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1eRvit-00040p-CZ
-	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 02:57:00 -0500
+	(envelope-from <laurent@vivier.eu>) id 1eRvjc-0004b4-Gm
+	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 02:57:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1eRviq-0003N5-76
-	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 02:56:59 -0500
-Received: from mout.kundenserver.de ([212.227.126.187]:65398)
+	(envelope-from <laurent@vivier.eu>) id 1eRvjZ-0003vd-BT
+	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 02:57:44 -0500
+Received: from mout.kundenserver.de ([212.227.126.131]:52876)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1eRvip-0003Lv-TI
-	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 02:56:56 -0500
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1eRvjZ-0003v9-13
+	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 02:57:41 -0500
 References: <20171220203528.21334-1-laurent@vivier.eu>
-	<20171220222219.7cdf2a57@thl530>
+	<CAAdtpL73-1-vSqe+A59Tu_-tT-CSnVy0b1VbsAVSmGYVxBcALQ@mail.gmail.com>
 From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <15fae875-6eb3-252f-7c98-0e6755afea54@vivier.eu>
-Date: Thu, 21 Dec 2017 08:56:49 +0100
+Message-ID: <37c5db22-72cf-c409-4257-8d44f4d24416@vivier.eu>
+Date: Thu, 21 Dec 2017 08:57:34 +0100
 MIME-Version: 1.0
-In-Reply-To: <20171220222219.7cdf2a57@thl530>
+In-Reply-To: <CAAdtpL73-1-vSqe+A59Tu_-tT-CSnVy0b1VbsAVSmGYVxBcALQ@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
@@ -28,13 +28,11 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <huth@tuxfamily.org>
-Cc: qemu-devel@nongnu.org, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Thomas Huth <huth@tuxfamily.org>
 
-Le 20/12/2017 à 22:22, Thomas Huth a écrit :
-> Am Wed, 20 Dec 2017 21:35:28 +0100
-> schrieb Laurent Vivier <laurent@vivier.eu>:
-> 
+Le 20/12/2017 à 21:54, Philippe Mathieu-Daudé a écrit :
+> On Wed, Dec 20, 2017 at 5:35 PM, Laurent Vivier <laurent@vivier.eu> wrote:
 >> This allows to use registers content in the monitor.
 >>
 >> Example:
@@ -63,9 +61,9 @@ Le 20/12/2017 à 22:22, Thomas Huth a écrit :
 >> Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 >> ---
 >>  target/m68k/Makefile.objs |  1 +
->>  target/m68k/monitor.c     | 55
->> +++++++++++++++++++++++++++++++++++++++++++++++ 2 files changed, 56
->> insertions(+) create mode 100644 target/m68k/monitor.c
+>>  target/m68k/monitor.c     | 55 +++++++++++++++++++++++++++++++++++++++++++++++
+>>  2 files changed, 56 insertions(+)
+>>  create mode 100644 target/m68k/monitor.c
 >>
 >> diff --git a/target/m68k/Makefile.objs b/target/m68k/Makefile.objs
 >> index 39141ab93d..d143f20270 100644
@@ -86,11 +84,36 @@ Le 20/12/2017 à 22:22, Thomas Huth a écrit :
 >> + * QEMU monitor
 >> + *
 >> + * Copyright (c) 2003-2004 Fabrice Bellard
+>> + *
+>> + * Permission is hereby granted, free of charge, to any person obtaining a copy
+>> + * of this software and associated documentation files (the "Software"), to deal
+>> + * in the Software without restriction, including without limitation the rights
+>> + * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+>> + * copies of the Software, and to permit persons to whom the Software is
+>> + * furnished to do so, subject to the following conditions:
+>> + *
+>> + * The above copyright notice and this permission notice shall be included in
+>> + * all copies or substantial portions of the Software.
+>> + *
+>> + * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+>> + * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+>> + * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+>> + * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+>> + * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+>> + * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+>> + * THE SOFTWARE.
+>> + */
+>> +#include "qemu/osdep.h"
+>> +#include "cpu.h"
+>> +#include "monitor/hmp-target.h"
+>> +
+>> +const MonitorDef monitor_defs[] = {
 > 
-> Why this copyright line (and the non-GPL license code)?
+> adding 'static':
 
-I don't know. I've checked all the others monitor.c and they have the
-same header. An y suggestions?
+ok
+
+> Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
 Thanks,
 Laurent
