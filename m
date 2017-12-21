@@ -1,34 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55431)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60704)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1eS6Xv-0003XA-4M
-	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 14:30:23 -0500
+	(envelope-from <laurent@vivier.eu>) id 1eS6e8-00067E-H2
+	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 14:36:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1eS6Xq-0000vR-UE
-	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 14:30:23 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:53284)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1eS6Xq-0000uP-Ol
-	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 14:30:18 -0500
-References: <1513790098-9815-1-git-send-email-pbonzini@redhat.com>
-	<CAFEAcA8J53A93+SQz01W13gRCX-ecw0v+8JTaRqwmrUeFjqaJA@mail.gmail.com>
-	<51174e3a-12d3-f3e0-2d76-b776e0fe62b6@redhat.com>
-	<e7994a8d-3a02-99c7-d919-c940aa4bc066@redhat.com>
-	<40dbaff2-918c-bba6-2a70-7c5f9b19cb66@vivier.eu>
-	<0d3d6598-608c-0079-426f-7455a92de7d8@vivier.eu>
-	<64440fda-1799-f50d-21ed-dc898e08d82f@redhat.com>
-	<8033acdb-f88a-2df3-83f3-e3e304c8eb51@vivier.eu>
-	<183d1158-2aa3-7ecb-3372-4a206f4c5292@redhat.com>
-	<3aee5f72-55ee-3653-d409-0f77e40cf90f@vivier.eu>
-	<172eed1f-4769-b3d5-e9f8-48dd834049d8@vivier.eu>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <de9c2db1-8d00-f66c-0d4d-f3d06b560090@redhat.com>
-Date: Thu, 21 Dec 2017 20:30:07 +0100
+	(envelope-from <laurent@vivier.eu>) id 1eS6e4-0005Zr-BQ
+	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 14:36:48 -0500
+Received: from mout.kundenserver.de ([212.227.126.187]:51217)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1eS6e4-0005Yt-1i
+	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 14:36:44 -0500
+From: Laurent Vivier <laurent@vivier.eu>
+Date: Thu, 21 Dec 2017 20:36:35 +0100
+Message-Id: <20171221193640.27418-1-laurent@vivier.eu>
 MIME-Version: 1.0
-In-Reply-To: <172eed1f-4769-b3d5-e9f8-48dd834049d8@vivier.eu>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] out of bounds in set_cc_op()
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PULL 0/5] M68k for 2.12 patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,20 +24,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Vivier <laurent@vivier.eu>, Thomas Huth <thuth@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Richard Henderson <rth@twiddle.net>
-Cc: Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
+Cc: Laurent Vivier <laurent@vivier.eu>
 
-On 21/12/2017 20:20, Laurent Vivier wrote:
->>> Yes, this is good too.  After my pull request is in, feel free to take
->>> Thomas's m68k boot-serial-test patch in your tree.
-> And what about:
-> 
->       tests/boot-serial-test: Add tests for microblaze boards
->       tests/boot-serial-test: Add a test for the moxiesim machine
->       tests/boot-serial-test: Add support for the raspi2 machine
+The following changes since commit 23bafd75cd979ad3a21af10273c5a0c5d67d068b:
 
-I didn't want to hold the whole pull request close to the Christmas
-holidays; once either Thomas or I will test them with the sanitizers,
-they will go in.
+  Merge remote-tracking branch 'remotes/bonzini/tags/for-upstream' into staging (2017-12-21 16:34:23 +0000)
 
-Paolo
+are available in the Git repository at:
+
+  git://github.com/vivier/qemu-m68k.git tags/m68k-for-2.12-pull-request
+
+for you to fetch changes up to 598a29f3606c4c7042a1ca3f1116663d0a60867c:
+
+  tests/boot-serial-test: Add support for the mcf5208evb board (2017-12-21 20:13:18 +0100)
+
+----------------------------------------------------------------
+
+----------------------------------------------------------------
+
+Laurent Vivier (4):
+  Split adb.c into adb.c, adb-mouse.c and adb-kbd.c
+  target/m68k: remove unused variable gen_throws_exception
+  target/m68k: add monitor.c
+  target/m68k: fix set_cc_op()
+
+Thomas Huth (1):
+  tests/boot-serial-test: Add support for the mcf5208evb board
+
+ hw/input/Makefile.objs    |   2 +-
+ hw/input/adb-internal.h   |  49 ++++
+ hw/input/adb-kbd.c        | 400 +++++++++++++++++++++++++++++
+ hw/input/adb-mouse.c      | 254 +++++++++++++++++++
+ hw/input/adb.c            | 622 +---------------------------------------------
+ hw/input/trace-events     |   8 +
+ target/m68k/Makefile.objs |   1 +
+ target/m68k/cpu.h         |   2 +-
+ target/m68k/monitor.c     |  39 +++
+ target/m68k/translate.c   |  11 +-
+ tests/Makefile.include    |   2 +
+ tests/boot-serial-test.c  |  10 +
+ 12 files changed, 768 insertions(+), 632 deletions(-)
+ create mode 100644 hw/input/adb-internal.h
+ create mode 100644 hw/input/adb-kbd.c
+ create mode 100644 hw/input/adb-mouse.c
+ create mode 100644 target/m68k/monitor.c
+
+-- 
+2.14.3
