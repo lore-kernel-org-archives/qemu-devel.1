@@ -1,21 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60913)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37852)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1eS6eF-0006EO-QS
-	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 14:37:00 -0500
+	(envelope-from <jbaron@akamai.com>) id 1eS6k4-0002O4-Pr
+	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 14:42:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1eS6eB-0005g7-9a
-	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 14:36:55 -0500
-Received: from mout.kundenserver.de ([212.227.126.135]:52983)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1eS6eA-0005ei-Tu
-	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 14:36:51 -0500
-From: Laurent Vivier <laurent@vivier.eu>
-Date: Thu, 21 Dec 2017 20:36:40 +0100
-Message-Id: <20171221193640.27418-6-laurent@vivier.eu>
-In-Reply-To: <20171221193640.27418-1-laurent@vivier.eu>
-References: <20171221193640.27418-1-laurent@vivier.eu>
-Subject: [Qemu-devel] [PULL 5/5] tests/boot-serial-test: Add support for the
- mcf5208evb board
+	(envelope-from <jbaron@akamai.com>) id 1eS6k1-0002ad-CK
+	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 14:42:56 -0500
+Received: from mx0a-00190b01.pphosted.com ([2620:100:9001:583::1]:51890)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jbaron@akamai.com>) id 1eS6k1-0002ZR-2D
+	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 14:42:53 -0500
+References: <cover.1513278334.git.jbaron@akamai.com>
+	<cover.1513278334.git.jbaron@akamai.com>
+	<1513280073-27515-1-git-send-email-jbaron@akamai.com>
+	<C5089512-91B2-439E-B22D-D7D416BDD558@redhat.com>
+	<9d600f3d-7e8d-153f-fd34-704c9975099b@akamai.com>
+	<21A64922-D22E-4AE1-8B4C-B0D85357240C@redhat.com>
+	<73e8811d-70fd-4920-1cb4-ad1809ebff82@akamai.com>
+	<20171220162927-mutt-send-email-mst@kernel.org>
+	<F096C867-C75B-4756-B4F6-9774DDF2FC8B@redhat.com>
+From: Jason Baron <jbaron@akamai.com>
+Message-ID: <c12c5c83-cc73-844f-2c37-3a4c364d4dd6@akamai.com>
+Date: Thu, 21 Dec 2017 14:42:48 -0500
+MIME-Version: 1.0
+In-Reply-To: <F096C867-C75B-4756-B4F6-9774DDF2FC8B@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 2/2] qemu: add linkspeed and duplex setting
+ to virtio-net
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,63 +36,216 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Thomas Huth <thuth@redhat.com>, Laurent Vivier <laurent@vivier.eu>
+To: Yan Vugenfirer <yvugenfi@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
+Cc: jasowang@redhat.com, qemu-devel@nongnu.org, linux-kernel@vger.kernel.org
 
-From: Thomas Huth <thuth@redhat.com>
 
-We can output a character quite easily here with some few lines of
-assembly that we provide as a mini-kernel for this board.
 
-Signed-off-by: Thomas Huth <thuth@redhat.com>
-Message-Id: <1512031988-32490-4-git-send-email-thuth@redhat.com>
-[lv: add boot-serial-test in check-qtest-m68k]
-Signed-off-by: Laurent Vivier <laurent@vivier.eu>
----
- tests/Makefile.include   |  2 ++
- tests/boot-serial-test.c | 10 ++++++++++
- 2 files changed, 12 insertions(+)
+On 12/20/2017 09:33 AM, Yan Vugenfirer wrote:
+> 
+>> On 20 Dec 2017, at 16:31, Michael S. Tsirkin <mst@redhat.com> wrote:
+>>
+>> On Tue, Dec 19, 2017 at 11:52:39AM -0500, Jason Baron wrote:
+>>>
+>>>
+>>> On 12/19/2017 04:19 AM, Yan Vugenfirer wrote:
+>>>>
+>>>>> On 18 Dec 2017, at 18:04, Jason Baron via Qemu-devel
+>>>>> <qemu-devel@nongnu.org <mailto:qemu-devel@nongnu.org>> wrote:
+>>>>>
+>>>>>
+>>>>>
+>>>>> On 12/18/2017 06:34 AM, Yan Vugenfirer wrote:
+>>>>>>
+>>>>>>> On 14 Dec 2017, at 21:33, Jason Baron via Qemu-devel
+>>>>>>> <qemu-devel@nongnu.org <mailto:qemu-devel@nongnu.org>> wrote:
+>>>>>>>
+>>>>>>> Although they can be currently set in linux via 'ethtool -s', this
+>>>>>>> requires
+>>>>>>> guest changes, and thus it would be nice to extend this
+>>>>>>> functionality such
+>>>>>>> that it can be configured automatically from the host (as other network
+>>>>>>> do).
+>>>>>>>
+>>>>>>> Linkspeed and duplex settings can be set as:
+>>>>>>> '-device virtio-net,speed=10000,duplex=full'
+>>>>>>>
+>>>>>>> where speed is [-1...INT_MAX], and duplex is ["half"|"full"].
+>>>>>>>
+>>>>>>> Signed-off-by: Jason Baron <jbaron@akamai.com
+>>>>>>> <mailto:jbaron@akamai.com>>
+>>>>>>> Cc: "Michael S. Tsirkin" <mst@redhat.com <mailto:mst@redhat.com>>
+>>>>>>> Cc: Jason Wang <jasowang@redhat.com <mailto:jasowang@redhat.com>>
+>>>>>>> ---
+>>>>>>> hw/net/virtio-net.c                         | 29
+>>>>>>> +++++++++++++++++++++++++++++
+>>>>>>> include/hw/virtio/virtio-net.h              |  3 +++
+>>>>>>> include/standard-headers/linux/virtio_net.h |  4 ++++
+>>>>>>> 3 files changed, 36 insertions(+)
+>>>>>>>
+>>>>>>> diff --git a/hw/net/virtio-net.c b/hw/net/virtio-net.c
+>>>>>>> index 38674b0..d63e790 100644
+>>>>>>> --- a/hw/net/virtio-net.c
+>>>>>>> +++ b/hw/net/virtio-net.c
+>>>>>>> @@ -40,6 +40,12 @@
+>>>>>>> #define VIRTIO_NET_RX_QUEUE_MIN_SIZE VIRTIO_NET_RX_QUEUE_DEFAULT_SIZE
+>>>>>>> #define VIRTIO_NET_TX_QUEUE_MIN_SIZE VIRTIO_NET_TX_QUEUE_DEFAULT_SIZE
+>>>>>>>
+>>>>>>> +/* duplex and speed defines */
+>>>>>>> +#define DUPLEX_UNKNOWN          0xff
+>>>>>>> +#define DUPLEX_HALF             0x00
+>>>>>>> +#define DUPLEX_FULL             0x01
+>>>>>>> +#define SPEED_UNKNOWN           -1
+>>>>>>> +
+>>>>>>> /*
+>>>>>>> * Calculate the number of bytes up to and including the given 'field' of
+>>>>>>> * 'container'.
+>>>>>>> @@ -61,6 +67,8 @@ static VirtIOFeature feature_sizes[] = {
+>>>>>>>     .end = endof(struct virtio_net_config, max_virtqueue_pairs)},
+>>>>>>>    {.flags = 1 << VIRTIO_NET_F_MTU,
+>>>>>>>     .end = endof(struct virtio_net_config, mtu)},
+>>>>>>> +    {.flags = 1 << VIRTIO_NET_F_SPEED_DUPLEX,
+>>>>>>> +     .end = endof(struct virtio_net_config, duplex)},
+>>>>>>>    {}
+>>>>>>> };
+>>>>>>>
+>>>>>>> @@ -88,6 +96,8 @@ static void virtio_net_get_config(VirtIODevice
+>>>>>>> *vdev, uint8_t *config)
+>>>>>>>    virtio_stw_p(vdev, &netcfg.status, n->status);
+>>>>>>>    virtio_stw_p(vdev, &netcfg.max_virtqueue_pairs, n->max_queues);
+>>>>>>>    virtio_stw_p(vdev, &netcfg.mtu, n->net_conf.mtu);
+>>>>>>> +    virtio_stl_p(vdev, &netcfg.speed, n->net_conf.speed);
+>>>>>>> +    netcfg.duplex = n->net_conf.duplex;
+>>>>>>>    memcpy(netcfg.mac, n->mac, ETH_ALEN);
+>>>>>>>    memcpy(config, &netcfg, n->config_size);
+>>>>>>> }
+>>>>>>> @@ -1941,6 +1951,23 @@ static void
+>>>>>>> virtio_net_device_realize(DeviceState *dev, Error **errp)
+>>>>>>>        n->host_features |= (0x1 << VIRTIO_NET_F_MTU);
+>>>>>>>    }
+>>>>>>>
+>>>>>>> +    n->host_features |= (0x1 << VIRTIO_NET_F_SPEED_DUPLEX);
+>>>>>>> +    if (n->net_conf.duplex_str) {
+>>>>>>> +        if (strncmp(n->net_conf.duplex_str, "half", 5) == 0) {
+>>>>>>> +            n->net_conf.duplex = DUPLEX_HALF;
+>>>>>>> +        } else if (strncmp(n->net_conf.duplex_str, "full", 5) == 0) {
+>>>>>>> +            n->net_conf.duplex = DUPLEX_FULL;
+>>>>>>> +        } else {
+>>>>>>> +            error_setg(errp, "'duplex' must be 'half' or 'full'");
+>>>>>>> +        }
+>>>>>>> +    } else {
+>>>>>>> +        n->net_conf.duplex = DUPLEX_UNKNOWN;
+>>>>>>> +    }
+>>>>>>> +    if (n->net_conf.speed < SPEED_UNKNOWN) {
+>>>>>>> +            error_setg(errp, "'speed' must be between -1
+>>>>>>> (SPEED_UNKOWN) and "
+>>>>>>> +                       "INT_MAX");
+>>>>>>> +    }
+>>>>>>> +
+>>>>>>>    virtio_net_set_config_size(n, n->host_features);
+>>>>>>>    virtio_init(vdev, "virtio-net", VIRTIO_ID_NET, n->config_size);
+>>>>>>>
+>>>>>>> @@ -2160,6 +2187,8 @@ static Property virtio_net_properties[] = {
+>>>>>>>    DEFINE_PROP_UINT16("host_mtu", VirtIONet, net_conf.mtu, 0),
+>>>>>>>    DEFINE_PROP_BOOL("x-mtu-bypass-backend", VirtIONet,
+>>>>>>> mtu_bypass_backend,
+>>>>>>>                     true),
+>>>>>>> +    DEFINE_PROP_INT32("speed", VirtIONet, net_conf.speed,
+>>>>>>> SPEED_UNKNOWN),
+>>>>>>
+>>>>>> From Windows guest perspective I prefer to have some reasonable
+>>>>>> default (10G for example). 
+>>>>>
+>>>>>
+>>>>> hmmm, I didn't want to change/set the default here in case it broke
+>>>>> something, but I'm ok setting it to some 'reasonable' value - (10G and
+>>>>> duplex?), if the consensus is that that would be safe.
+>>>>
+>>>> OK from my side.
+>>>> Thanks.
+>>>
+>>> I presume your speaking for windows - i'm wondering if under linux the
+>>> virtio device suddenly start showing up as duplex, 10Gbps, will that
+>>> break anything? I can speak for the use-cases we have here and that
+>>> would certainly be fine for us, but i'm really not sure if that is ok
+>>> more generally.
+>>>
+>>> Thanks,
+>>>
+>>> -Jason
+>>
+>> How about not enabling the flag unless the user specified the speed?
+>> This way we also do not need an "unknown" value.
+> 
+> This is even better.
+> 
+We may still want "unknown" here as a setting, because otherwise we
+can't support dynamically changing the speed later (if we added say a
+qmp monitor command), because the flag would not have been set.
 
-diff --git a/tests/Makefile.include b/tests/Makefile.include
-index f8e20d9f5d..77f8183117 100644
---- a/tests/Makefile.include
-+++ b/tests/Makefile.include
-@@ -297,6 +297,8 @@ gcov-files-x86_64-y = $(subst i386-softmmu/,x86_64-softmmu/,$(gcov-files-i386-y)
- 
- check-qtest-alpha-y = tests/boot-serial-test$(EXESUF)
- 
-+check-qtest-m68k-y = tests/boot-serial-test$(EXESUF)
-+
- check-qtest-mips-y = tests/endianness-test$(EXESUF)
- 
- check-qtest-mips64-y = tests/endianness-test$(EXESUF)
-diff --git a/tests/boot-serial-test.c b/tests/boot-serial-test.c
-index d99726919e..dd3828c49b 100644
---- a/tests/boot-serial-test.c
-+++ b/tests/boot-serial-test.c
-@@ -16,6 +16,14 @@
- #include "qemu/osdep.h"
- #include "libqtest.h"
- 
-+static const uint8_t kernel_mcf5208[] = {
-+    0x41, 0xf9, 0xfc, 0x06, 0x00, 0x00,     /* lea 0xfc060000,%a0 */
-+    0x10, 0x3c, 0x00, 0x54,                 /* move.b #'T',%d0 */
-+    0x11, 0x7c, 0x00, 0x04, 0x00, 0x08,     /* move.b #4,8(%a0)     Enable TX */
-+    0x11, 0x40, 0x00, 0x0c,                 /* move.b %d0,12(%a0)   Print 'T' */
-+    0x60, 0xfa                              /* bra.s  loop */
-+};
-+
- typedef struct testdef {
-     const char *arch;       /* Target architecture */
-     const char *machine;    /* Name of the machine */
-@@ -41,6 +49,8 @@ static testdef_t tests[] = {
-     { "x86_64", "q35", "-device sga", "SGABIOS" },
-     { "s390x", "s390-ccw-virtio",
-       "-nodefaults -device sclpconsole,chardev=serial0", "virtio device" },
-+    { "m68k", "mcf5208evb", "", "TT", sizeof(kernel_mcf5208), kernel_mcf5208 },
-+
-     { NULL }
- };
- 
--- 
-2.14.3
+So I am ok with the 10Gps and full duplex defaults, if at least one of
+'speed=' or 'duplex=' is supplied, but I would prefer to leave the
+"unknown" values as a setting (to still potentially allow dynamic
+updates in this case).
+
+Thanks,
+
+-Jason
+
+>>
+>>>>
+>>>>>
+>>>>> Thanks,
+>>>>>
+>>>>> -Jason
+>>>>>
+>>>>>>
+>>>>>> Thanks,
+>>>>>> Yan.
+>>>>>>
+>>>>>>> +    DEFINE_PROP_STRING("duplex", VirtIONet, net_conf.duplex_str),
+>>>>>>>    DEFINE_PROP_END_OF_LIST(),
+>>>>>>> };
+>>>>>>>
+>>>>>>> diff --git a/include/hw/virtio/virtio-net.h
+>>>>>>> b/include/hw/virtio/virtio-net.h
+>>>>>>> index b81b6a4..af74a94 100644
+>>>>>>> --- a/include/hw/virtio/virtio-net.h
+>>>>>>> +++ b/include/hw/virtio/virtio-net.h
+>>>>>>> @@ -38,6 +38,9 @@ typedef struct virtio_net_conf
+>>>>>>>    uint16_t rx_queue_size;
+>>>>>>>    uint16_t tx_queue_size;
+>>>>>>>    uint16_t mtu;
+>>>>>>> +    int32_t speed;
+>>>>>>> +    char *duplex_str;
+>>>>>>> +    uint8_t duplex;
+>>>>>>> } virtio_net_conf;
+>>>>>>>
+>>>>>>> /* Maximum packet size we can receive from tap device: header + 64k */
+>>>>>>> diff --git a/include/standard-headers/linux/virtio_net.h
+>>>>>>> b/include/standard-headers/linux/virtio_net.h
+>>>>>>> index 30ff249..0ff1447 100644
+>>>>>>> --- a/include/standard-headers/linux/virtio_net.h
+>>>>>>> +++ b/include/standard-headers/linux/virtio_net.h
+>>>>>>> @@ -36,6 +36,7 @@
+>>>>>>> #define VIRTIO_NET_F_GUEST_CSUM1/* Guest handles pkts w/ partial csum */
+>>>>>>> #define VIRTIO_NET_F_CTRL_GUEST_OFFLOADS 2 /* Dynamic offload
+>>>>>>> configuration. */
+>>>>>>> #define VIRTIO_NET_F_MTU3/* Initial MTU advice */
+>>>>>>> +#define VIRTIO_NET_F_SPEED_DUPLEX 4/* Host set linkspeed and duplex */
+>>>>>>> #define VIRTIO_NET_F_MAC5/* Host has given MAC address. */
+>>>>>>> #define VIRTIO_NET_F_GUEST_TSO47/* Guest can handle TSOv4 in. */
+>>>>>>> #define VIRTIO_NET_F_GUEST_TSO68/* Guest can handle TSOv6 in. */
+>>>>>>> @@ -76,6 +77,9 @@ struct virtio_net_config {
+>>>>>>> uint16_t max_virtqueue_pairs;
+>>>>>>> /* Default maximum transmit unit advice */
+>>>>>>> uint16_t mtu;
+>>>>>>> +/* Host exported linkspeed and duplex */
+>>>>>>> +uint32_t speed;
+>>>>>>> +uint8_t duplex;
+>>>>>>> } QEMU_PACKED;
+>>>>>>>
+>>>>>>> /*
+>>>>>>> -- 
+>>>>>>> 2.6.1
+> 
