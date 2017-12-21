@@ -1,25 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60279)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36774)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1eRzJ8-0007Rg-1o
-	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 06:46:38 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1eRzPK-00014L-ST
+	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 06:53:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1eRzJ7-0004zV-Df
-	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 06:46:38 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:39324)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1eRzJ7-0004yz-6t
-	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 06:46:37 -0500
-Date: Thu, 21 Dec 2017 19:46:30 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20171221114630.GQ10812@lemon>
-References: <20171219084557.9801-1-peterx@redhat.com>
-	<20171219084557.9801-21-peterx@redhat.com>
+	(envelope-from <vsementsov@virtuozzo.com>) id 1eRzPF-0003eL-6L
+	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 06:53:02 -0500
+References: <20171207155102.66622-1-vsementsov@virtuozzo.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <021a0b90-d9c6-ced4-65a5-0d9585221c03@virtuozzo.com>
+Date: Thu, 21 Dec 2017 14:52:42 +0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20171219084557.9801-21-peterx@redhat.com>
-Subject: Re: [Qemu-devel] [RFC v6 20/27] qmp: export qmp_dispatch_check_obj
- and allow "id"
+In-Reply-To: <20171207155102.66622-1-vsementsov@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+Subject: [Qemu-devel] ping Re: [PATCH v2 0/6] nbd export qmp interface
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,14 +23,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, Stefan Hajnoczi <shajnocz@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Juan Quintela <quintela@redhat.com>, mdroth@linux.vnet.ibm.com, Eric Blake <eblake@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Markus Armbruster <armbru@redhat.com>, marcandre.lureau@redhat.com, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: armbru@redhat.com, dgilbert@redhat.com, pbonzini@redhat.com, eblake@redhat.com, mreitz@redhat.com, kwolf@redhat.com, den@openvz.org
 
-On Tue, 12/19 16:45, Peter Xu wrote:
-> We need this for earlier check for OOB, before reaching
-> do_qmp_dispatch().  Meanwhile, a small touch-up to allow "id" field,
-> after all we allow that for sure in the spec (in any form).
-> 
-> Signed-off-by: Peter Xu <peterx@redhat.com>
+Hi, what about this?
 
-Reviewed-by: Fam Zheng <famz@redhat.com>
+07.12.2017 18:50, Vladimir Sementsov-Ogievskiy wrote:
+> Here:
+>      1. separate export name from device name
+>      1.1 several exports per device possible
+>      2. add nbd-server-remove
+>
+> v2:
+> 01: add r-bs by Max and Eric, add comment to code (hope you don't mind)
+> 03: address export by its name, not by device name
+>      make it possible to force-remove export, which is already
+>      non-force-removed (thourh new "hidden" field)
+> other patches are new
+>
+> v1:
+> Add command to remove nbd export, pair to nbd-server-add.
+> The whole thing and description are in patch 02.
+>
+>
+> Vladimir Sementsov-Ogievskiy (6):
+>    nbd/server: add additional assert to nbd_export_put
+>    qapi: add name parameter to nbd-server-add
+>    qapi: add nbd-server-remove
+>    iotest 147: add cases to test new @name parameter of nbd-server-add
+>    iotests: implement QemuIoInteractive class
+>    iotest 201: new test for qmp nbd-server-remove
+>
+>   qapi/block.json               |  27 ++++++++-
+>   include/block/nbd.h           |   3 +-
+>   blockdev-nbd.c                |  41 +++++++++++--
+>   hmp.c                         |   5 +-
+>   nbd/server.c                  |  31 +++++++++-
+>   tests/qemu-iotests/147        |  68 +++++++++++++++++-----
+>   tests/qemu-iotests/147.out    |   4 +-
+>   tests/qemu-iotests/201        | 130 ++++++++++++++++++++++++++++++++++++++++++
+>   tests/qemu-iotests/201.out    |   5 ++
+>   tests/qemu-iotests/group      |   1 +
+>   tests/qemu-iotests/iotests.py |  38 ++++++++++++
+>   11 files changed, 325 insertions(+), 28 deletions(-)
+>   create mode 100644 tests/qemu-iotests/201
+>   create mode 100644 tests/qemu-iotests/201.out
+>
+
+
+-- 
+Best regards,
+Vladimir
