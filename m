@@ -1,20 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45950)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45980)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1eS1qm-00083o-MM
-	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 09:29:33 -0500
+	(envelope-from <mst@redhat.com>) id 1eS1qp-00086T-D4
+	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 09:29:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1eS1ql-0005q4-LW
-	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 09:29:32 -0500
-Date: Thu, 21 Dec 2017 16:29:21 +0200
+	(envelope-from <mst@redhat.com>) id 1eS1qo-0005sa-Em
+	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 09:29:35 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:39314)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1eS1qo-0005rb-4P
+	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 09:29:34 -0500
+Date: Thu, 21 Dec 2017 16:29:25 +0200
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <1513866427-27125-16-git-send-email-mst@redhat.com>
+Message-ID: <1513866427-27125-17-git-send-email-mst@redhat.com>
 References: <1513866427-27125-1-git-send-email-mst@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 In-Reply-To: <1513866427-27125-1-git-send-email-mst@redhat.com>
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 15/25] hw/block/nvme: QOM'ify PCI NVME
+Subject: [Qemu-devel] [PULL 16/25] hw/pci-host/piix: QOM'ify the IGD
+ Passthrough host bridge
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,111 +29,116 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Keith Busch <keith.busch@intel.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Marcel Apfelbaum <marcel@redhat.com>
 
 From: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 
 Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+Reviewed-by: Marcel Apfelbaum <marcel@redhat.com>
 ---
- hw/block/nvme.c | 32 +++++++++++++++++---------------
- 1 file changed, 17 insertions(+), 15 deletions(-)
+ hw/pci-host/piix.c | 45 ++++++++++++++++++++-------------------------
+ 1 file changed, 20 insertions(+), 25 deletions(-)
 
-diff --git a/hw/block/nvme.c b/hw/block/nvme.c
-index 441e21e..9c5f898 100644
---- a/hw/block/nvme.c
-+++ b/hw/block/nvme.c
-@@ -920,9 +920,9 @@ static const MemoryRegionOps nvme_cmb_ops =3D {
-     },
+diff --git a/hw/pci-host/piix.c b/hw/pci-host/piix.c
+index effe3db..0e60834 100644
+--- a/hw/pci-host/piix.c
++++ b/hw/pci-host/piix.c
+@@ -804,60 +804,55 @@ static const IGDHostInfo igd_host_bridge_infos[] =3D=
+ {
+     {0xa8, 4},  /* SNB: base of GTT stolen memory */
  };
 =20
--static int nvme_init(PCIDevice *pci_dev)
-+static void nvme_realize(PCIDevice *pci, Error **errp)
+-static int host_pci_config_read(int pos, int len, uint32_t *val)
++static void host_pci_config_read(int pos, int len, uint32_t *val, Error =
+**errp)
  {
--    NvmeCtrl *n =3D NVME(pci_dev);
-+    NvmeCtrl *n =3D NVME(pci);
-     NvmeIdCtrl *id =3D &n->id_ctrl;
+-    char path[PATH_MAX];
+-    int config_fd;
+-    ssize_t size =3D sizeof(path);
++    int rc, config_fd;
+     /* Access real host bridge. */
+-    int rc =3D snprintf(path, size, "/sys/bus/pci/devices/%04x:%02x:%02x=
+.%d/%s",
+-                      0, 0, 0, 0, "config");
+-    int ret =3D 0;
+-
+-    if (rc >=3D size || rc < 0) {
+-        return -ENODEV;
+-    }
++    char *path =3D g_strdup_printf("/sys/bus/pci/devices/%04x:%02x:%02x.=
+%d/%s",
++                                 0, 0, 0, 0, "config");
 =20
-     int i;
-@@ -931,30 +931,33 @@ static int nvme_init(PCIDevice *pci_dev)
-     Error *local_err =3D NULL;
-=20
-     if (!n->conf.blk) {
--        return -1;
-+        error_setg(errp, "Block device missing");
-+        return;
+     config_fd =3D open(path, O_RDWR);
+     if (config_fd < 0) {
+-        return -ENODEV;
++        error_setg_errno(errp, errno, "Failed to open: %s", path);
++        goto out;
      }
 =20
-     bs_size =3D blk_getlength(n->conf.blk);
-     if (bs_size < 0) {
--        return -1;
-+        error_setg_errno(errp, -bs_size, "Could not get length of device=
-");
-+        return;
+     if (lseek(config_fd, pos, SEEK_SET) !=3D pos) {
+-        ret =3D -errno;
+-        goto out;
++        error_setg_errno(errp, errno, "Failed to seek: %s", path);
++        goto out_close_fd;
      }
 =20
-     blkconf_serial(&n->conf, &n->serial);
-     if (!n->serial) {
--        return -1;
-+        error_setg(errp, "Could not get device serial number");
-+        return;
-     }
-     blkconf_blocksizes(&n->conf);
-     blkconf_apply_backend_options(&n->conf, blk_is_read_only(n->conf.blk=
-),
-                                   false, &local_err);
-     if (local_err) {
--        error_report_err(local_err);
--        return -1;
-+        error_propagate(errp, local_err);
-+        return;
+     do {
+         rc =3D read(config_fd, (uint8_t *)val, len);
+     } while (rc < 0 && (errno =3D=3D EINTR || errno =3D=3D EAGAIN));
+     if (rc !=3D len) {
+-        ret =3D -errno;
++        error_setg_errno(errp, errno, "Failed to read: %s", path);
      }
 =20
--    pci_conf =3D pci_dev->config;
-+    pci_conf =3D pci->config;
-     pci_conf[PCI_INTERRUPT_PIN] =3D 1;
--    pci_config_set_prog_interface(pci_dev->config, 0x2);
--    pci_config_set_class(pci_dev->config, PCI_CLASS_STORAGE_EXPRESS);
-+    pci_config_set_prog_interface(pci->config, 0x2);
-+    pci_config_set_class(pci->config, PCI_CLASS_STORAGE_EXPRESS);
-     pcie_endpoint_cap_init(&n->parent_obj, 0x80);
+-out:
++out_close_fd:
+     close(config_fd);
+-    return ret;
++out:
++    g_free(path);
+ }
 =20
-     n->num_namespaces =3D 1;
-@@ -1046,12 +1049,11 @@ static int nvme_init(PCIDevice *pci_dev)
-             cpu_to_le64(n->ns_size >>
-                 id_ns->lbaf[NVME_ID_NS_FLBAS_INDEX(ns->id_ns.flbas)].ds)=
-;
+-static int igd_pt_i440fx_initfn(struct PCIDevice *pci_dev)
++static void igd_pt_i440fx_realize(PCIDevice *pci_dev, Error **errp)
+ {
+     uint32_t val =3D 0;
+-    int rc, i, num;
++    int i, num;
+     int pos, len;
++    Error *local_err =3D NULL;
+=20
+     num =3D ARRAY_SIZE(igd_host_bridge_infos);
+     for (i =3D 0; i < num; i++) {
+         pos =3D igd_host_bridge_infos[i].offset;
+         len =3D igd_host_bridge_infos[i].len;
+-        rc =3D host_pci_config_read(pos, len, &val);
+-        if (rc) {
+-            return -ENODEV;
++        host_pci_config_read(pos, len, &val, &local_err);
++        if (local_err) {
++            error_propagate(errp, local_err);
++            return;
+         }
+         pci_default_write_config(pci_dev, pos, val, len);
      }
+-
 -    return 0;
  }
 =20
--static void nvme_exit(PCIDevice *pci_dev)
-+static void nvme_exit(PCIDevice *pci)
- {
--    NvmeCtrl *n =3D NVME(pci_dev);
-+    NvmeCtrl *n =3D NVME(pci);
+ static void igd_passthrough_i440fx_class_init(ObjectClass *klass, void *=
+data)
+@@ -865,7 +860,7 @@ static void igd_passthrough_i440fx_class_init(ObjectC=
+lass *klass, void *data)
+     DeviceClass *dc =3D DEVICE_CLASS(klass);
+     PCIDeviceClass *k =3D PCI_DEVICE_CLASS(klass);
 =20
-     nvme_clear_ctrl(n);
-     g_free(n->namespaces);
-@@ -1061,7 +1063,7 @@ static void nvme_exit(PCIDevice *pci_dev)
-         memory_region_unref(&n->ctrl_mem);
-     }
-=20
--    msix_uninit_exclusive_bar(pci_dev);
-+    msix_uninit_exclusive_bar(pci);
+-    k->init =3D igd_pt_i440fx_initfn;
++    k->realize =3D igd_pt_i440fx_realize;
+     dc->desc =3D "IGD Passthrough Host bridge";
  }
 =20
- static Property nvme_props[] =3D {
-@@ -1081,7 +1083,7 @@ static void nvme_class_init(ObjectClass *oc, void *=
-data)
-     DeviceClass *dc =3D DEVICE_CLASS(oc);
-     PCIDeviceClass *pc =3D PCI_DEVICE_CLASS(oc);
-=20
--    pc->init =3D nvme_init;
-+    pc->realize =3D nvme_realize;
-     pc->exit =3D nvme_exit;
-     pc->class_id =3D PCI_CLASS_STORAGE_EXPRESS;
-     pc->vendor_id =3D PCI_VENDOR_ID_INTEL;
 --=20
 MST
