@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42986)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44426)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <atar4qemu@gmail.com>) id 1eRxvw-0003H1-IM
-	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 05:18:37 -0500
+	(envelope-from <atar4qemu@gmail.com>) id 1eRxxe-0004W3-Nq
+	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 05:20:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <atar4qemu@gmail.com>) id 1eRxvv-0003gO-Fs
-	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 05:18:36 -0500
-Received: from mail-io0-x243.google.com ([2607:f8b0:4001:c06::243]:44658)
+	(envelope-from <atar4qemu@gmail.com>) id 1eRxxd-0004vo-Ch
+	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 05:20:22 -0500
+Received: from mail-io0-x242.google.com ([2607:f8b0:4001:c06::242]:38249)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <atar4qemu@gmail.com>) id 1eRxvv-0003g1-Ay
-	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 05:18:35 -0500
-Received: by mail-io0-x243.google.com with SMTP id w127so20514108iow.11
-	for <qemu-devel@nongnu.org>; Thu, 21 Dec 2017 02:18:35 -0800 (PST)
+	(Exim 4.71) (envelope-from <atar4qemu@gmail.com>) id 1eRxxd-0004vL-5C
+	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 05:20:21 -0500
+Received: by mail-io0-x242.google.com with SMTP id 87so16343916ior.5
+	for <qemu-devel@nongnu.org>; Thu, 21 Dec 2017 02:20:21 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20171221082045.14022-17-mark.cave-ayland@ilande.co.uk>
+In-Reply-To: <20171221082045.14022-9-mark.cave-ayland@ilande.co.uk>
 References: <20171221082045.14022-1-mark.cave-ayland@ilande.co.uk>
-	<20171221082045.14022-17-mark.cave-ayland@ilande.co.uk>
+	<20171221082045.14022-9-mark.cave-ayland@ilande.co.uk>
 From: Artyom Tarasenko <atar4qemu@gmail.com>
-Date: Thu, 21 Dec 2017 11:18:13 +0100
-Message-ID: <CACXAS8AEpHQy=61J=3AREcbXbBksm40y4A0qHpiWDvA57oj20w@mail.gmail.com>
+Date: Thu, 21 Dec 2017 11:20:00 +0100
+Message-ID: <CACXAS8ANJt5zNrVXy4FpCy2c6q0J6ON2U7FuwmTfnLLhCeXH9Q@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCHv3 16/16] sun4u: switch from EBUS_DPRINTF()
- macro to trace-events
+Subject: Re: [Qemu-devel] [PATCHv3 08/16] apb: use gpios to wire up the apb
+ device to the SPARC CPU IRQs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -41,52 +41,148 @@ On Thu, Dec 21, 2017 at 9:20 AM, Mark Cave-Ayland
 Reviewed-by: Artyom Tarasenko <atar4qemu@gmail.com>
 
 > ---
->  hw/sparc64/sun4u.c      | 12 ++----------
->  hw/sparc64/trace-events |  3 +++
->  2 files changed, 5 insertions(+), 10 deletions(-)
+>  hw/pci-host/apb.c          |  6 ++----
+>  hw/sparc64/sparc64.c       |  2 ++
+>  hw/sparc64/sun4u.c         | 12 ++++++++----
+>  include/hw/pci-host/apb.h  |  6 ++++--
+>  include/hw/sparc/sparc64.h |  2 ++
+>  5 files changed, 18 insertions(+), 10 deletions(-)
 >
+> diff --git a/hw/pci-host/apb.c b/hw/pci-host/apb.c
+> index 0c709992ec..c0b97e41bf 100644
+> --- a/hw/pci-host/apb.c
+> +++ b/hw/pci-host/apb.c
+> @@ -79,7 +79,6 @@ do { printf("IOMMU: " fmt , ## __VA_ARGS__); } while (0=
+)
+>  #define RESET_WCMASK 0x98000000
+>  #define RESET_WMASK  0x60000000
+>
+> -#define MAX_IVEC 0x40
+>  #define NO_IRQ_REQUEST (MAX_IVEC + 1)
+>
+>  static inline void pbm_set_request(APBState *s, unsigned int irq_num)
+> @@ -614,7 +613,7 @@ static void apb_pci_bridge_realize(PCIDevice *dev, Er=
+ror **errp)
+>
+>  APBState *pci_apb_init(hwaddr special_base,
+>                         hwaddr mem_base,
+> -                       qemu_irq *ivec_irqs, PCIBus **busA, PCIBus **busB=
+)
+> +                       PCIBus **busA, PCIBus **busB)
+>  {
+>      DeviceState *dev;
+>      SysBusDevice *s;
+> @@ -645,8 +644,6 @@ APBState *pci_apb_init(hwaddr special_base,
+>      memory_region_init(&d->pci_mmio, OBJECT(s), "pci-mmio", 0x100000000U=
+LL);
+>      memory_region_add_subregion(get_system_memory(), mem_base, &d->pci_m=
+mio);
+>
+> -    d->ivec_irqs =3D ivec_irqs;
+> -
+>      pci_create_simple(phb->bus, 0, "pbm-pci");
+>
+>      /* APB IOMMU */
+> @@ -721,6 +718,7 @@ static int pci_pbm_init_device(DeviceState *dev)
+>          s->obio_irq_map[i] =3D ((0x1f << 6) | 0x20) + i;
+>      }
+>      s->pbm_irqs =3D qemu_allocate_irqs(pci_apb_set_irq, s, MAX_IVEC);
+> +    qdev_init_gpio_out_named(DEVICE(s), s->ivec_irqs, "ivec-irq", MAX_IV=
+EC);
+>      s->irq_request =3D NO_IRQ_REQUEST;
+>      s->pci_irq_in =3D 0ULL;
+>
+> diff --git a/hw/sparc64/sparc64.c b/hw/sparc64/sparc64.c
+> index 9453e2c390..95a06f00b2 100644
+> --- a/hw/sparc64/sparc64.c
+> +++ b/hw/sparc64/sparc64.c
+> @@ -350,6 +350,8 @@ SPARCCPU *sparc64_cpu_devinit(const char *cpu_type, u=
+int64_t prom_addr)
+>      uint32_t hstick_frequency =3D 100 * 1000000;
+>
+>      cpu =3D SPARC_CPU(cpu_create(cpu_type));
+> +    qdev_init_gpio_in_named(DEVICE(cpu), sparc64_cpu_set_ivec_irq,
+> +                            "ivec-irq", IVEC_MAX);
+>      env =3D &cpu->env;
+>
+>      env->tick =3D cpu_timer_create("tick", cpu, tick_irq,
 > diff --git a/hw/sparc64/sun4u.c b/hw/sparc64/sun4u.c
-> index 1456c3370d..5d802bdfde 100644
+> index a64ddc569d..2afd3f28dd 100644
 > --- a/hw/sparc64/sun4u.c
 > +++ b/hw/sparc64/sun4u.c
-> @@ -47,17 +47,9 @@
->  #include "hw/ide/pci.h"
->  #include "hw/loader.h"
->  #include "elf.h"
-> +#include "trace.h"
->  #include "qemu/cutils.h"
+> @@ -486,7 +486,6 @@ static void sun4uv_init(MemoryRegion *address_space_m=
+em,
+>      PCIBus *pci_bus, *pci_busA, *pci_busB;
+>      PCIDevice *ebus, *pci_dev;
+>      SysBusDevice *s;
+> -    qemu_irq *ivec_irqs;
+>      DriveInfo *hd[MAX_IDE_BUS * MAX_IDE_DEVS];
+>      DeviceState *dev;
+>      FWCfgState *fw_cfg;
+> @@ -502,9 +501,14 @@ static void sun4uv_init(MemoryRegion *address_space_=
+mem,
 >
-> -//#define DEBUG_EBUS
-> -
-> -#ifdef DEBUG_EBUS
-> -#define EBUS_DPRINTF(fmt, ...)                                  \
-> -    do { printf("EBUS: " fmt , ## __VA_ARGS__); } while (0)
-> -#else
-> -#define EBUS_DPRINTF(fmt, ...)
-> -#endif
-> -
->  #define KERNEL_LOAD_ADDR     0x00404000
->  #define CMDLINE_ADDR         0x003ff000
->  #define PROM_SIZE_MAX        (4 * 1024 * 1024)
-> @@ -218,7 +210,7 @@ static void ebus_isa_irq_handler(void *opaque, int n,=
- int level)
->      qemu_irq irq =3D s->isa_bus_irqs[n];
+>      prom_init(hwdef->prom_addr, bios_name);
 >
->      /* Pass ISA bus IRQs onto their gpio equivalent */
-> -    EBUS_DPRINTF("Set ISA IRQ %d level %d\n", n, level);
-> +    trace_ebus_isa_irq_handler(n, level);
->      if (irq) {
->          qemu_set_irq(irq, level);
->      }
-> diff --git a/hw/sparc64/trace-events b/hw/sparc64/trace-events
-> index 9284b1fbad..04d80b7f70 100644
-> --- a/hw/sparc64/trace-events
-> +++ b/hw/sparc64/trace-events
-> @@ -1 +1,4 @@
->  # See docs/devel/tracing.txt for syntax documentation.
+> -    ivec_irqs =3D qemu_allocate_irqs(sparc64_cpu_set_ivec_irq, cpu, IVEC=
+_MAX);
+> -    apb =3D pci_apb_init(APB_SPECIAL_BASE, APB_MEM_BASE, ivec_irqs, &pci=
+_busA,
+> -                       &pci_busB);
+> +    apb =3D pci_apb_init(APB_SPECIAL_BASE, APB_MEM_BASE, &pci_busA, &pci=
+_busB);
 > +
-> +# hw/sparc64/sun4u.c
-> +ebus_isa_irq_handler(int n, int level) "Set ISA IRQ %d level %d"
+> +    /* Wire up PCI interrupts to CPU */
+> +    for (i =3D 0; i < IVEC_MAX; i++) {
+> +        qdev_connect_gpio_out_named(DEVICE(apb), "ivec-irq", i,
+> +            qdev_get_gpio_in_named(DEVICE(cpu), "ivec-irq", i));
+> +    }
+> +
+>      pci_bus =3D PCI_HOST_BRIDGE(apb)->bus;
+>
+>      /* Only in-built Simba PBMs can exist on the root bus, slot 0 on bus=
+A is
+> diff --git a/include/hw/pci-host/apb.h b/include/hw/pci-host/apb.h
+> index a4ef51adc8..f7ead680f3 100644
+> --- a/include/hw/pci-host/apb.h
+> +++ b/include/hw/pci-host/apb.h
+> @@ -50,6 +50,8 @@ typedef struct IOMMUState {
+>      uint64_t regs[IOMMU_NREGS];
+>  } IOMMUState;
+>
+> +#define MAX_IVEC 0x40
+> +
+>  #define TYPE_APB "pbm"
+>
+>  #define APB_DEVICE(obj) \
+> @@ -71,7 +73,7 @@ typedef struct APBState {
+>      uint32_t pci_err_irq_map[4];
+>      uint32_t obio_irq_map[32];
+>      qemu_irq *pbm_irqs;
+> -    qemu_irq *ivec_irqs;
+> +    qemu_irq ivec_irqs[MAX_IVEC];
+>      unsigned int irq_request;
+>      uint32_t reset_control;
+>      unsigned int nr_resets;
+> @@ -91,5 +93,5 @@ typedef struct PBMPCIBridge {
+>
+>  APBState *pci_apb_init(hwaddr special_base,
+>                         hwaddr mem_base,
+> -                       qemu_irq *ivec_irqs, PCIBus **bus2, PCIBus **bus3=
+);
+> +                       PCIBus **bus2, PCIBus **bus3);
+>  #endif
+> diff --git a/include/hw/sparc/sparc64.h b/include/hw/sparc/sparc64.h
+> index ca3bb4be71..5af4344459 100644
+> --- a/include/hw/sparc/sparc64.h
+> +++ b/include/hw/sparc/sparc64.h
+> @@ -1,4 +1,6 @@
+>
+> +#define IVEC_MAX             0x40
+> +
+>  SPARCCPU *sparc64_cpu_devinit(const char *cpu_type, uint64_t prom_addr);
+>
+>  void sparc64_cpu_set_ivec_irq(void *opaque, int irq, int level);
 > --
 > 2.11.0
 >
