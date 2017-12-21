@@ -1,31 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47368)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35525)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1eRwyC-0004hp-3N
-	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 04:16:53 -0500
+	(envelope-from <famz@redhat.com>) id 1eRxFG-0001fN-14
+	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 04:34:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1eRwy7-0005LJ-1b
-	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 04:16:52 -0500
-Received: from 3.mo177.mail-out.ovh.net ([46.105.36.172]:54551)
+	(envelope-from <famz@redhat.com>) id 1eRxFC-0003dT-2t
+	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 04:34:30 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:60374)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1eRwy6-0005EO-P4
-	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 04:16:46 -0500
-Received: from player779.ha.ovh.net (b9.ovh.net [213.186.33.59])
-	by mo177.mail-out.ovh.net (Postfix) with ESMTP id 895B78F7B3
-	for <qemu-devel@nongnu.org>; Thu, 21 Dec 2017 10:16:37 +0100 (CET)
-References: <20171209084338.29395-1-clg@kaod.org>
-	<20171209084338.29395-3-clg@kaod.org>
-	<20171220050947.GC5981@umbus.fritz.box>
-	<1513815126.2743.34.camel@kernel.crashing.org>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <6768575f-27e0-1277-3e7e-56ec44298e6a@kaod.org>
-Date: Thu, 21 Dec 2017 10:16:32 +0100
+	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1eRxFB-0003cG-QV
+	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 04:34:26 -0500
+Date: Thu, 21 Dec 2017 17:34:16 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20171221093416.GI10812@lemon>
+References: <20171219084557.9801-1-peterx@redhat.com>
+	<20171219084557.9801-11-peterx@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <1513815126.2743.34.camel@kernel.crashing.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 02/19] spapr: introduce a skeleton for
- the XIVE interrupt controller
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20171219084557.9801-11-peterx@redhat.com>
+Subject: Re: [Qemu-devel] [RFC v6 10/27] monitor: allow to use IO thread for
+ parsing
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,103 +28,129 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Benjamin Herrenschmidt <benh@kernel.crashing.org>, David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Greg Kurz <groug@kaod.org>
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, Stefan Hajnoczi <shajnocz@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Juan Quintela <quintela@redhat.com>, mdroth@linux.vnet.ibm.com, Eric Blake <eblake@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Markus Armbruster <armbru@redhat.com>, marcandre.lureau@redhat.com, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 
-On 12/21/2017 01:12 AM, Benjamin Herrenschmidt wrote:
-> On Wed, 2017-12-20 at 16:09 +1100, David Gibson wrote:
->>
->> As you've suggested in yourself, I think we might need to more
->> explicitly model the different components of the XIVE system.  As part
->> of that, I think you need to be clearer in this base skeleton about
->> exactly what component your XIVE object represents.
->>
->> If the answer is "the overall thing" I suspect that's not what you
->> want - I had one of those for XICs which proved to be a mistake
->> (eventually replaced by the XICSFabric interface).
->>
->> Changing the model later isn't impossible, but doing so without
->> breaking migration can be a real pain, so I think it's worth a
->> reasonable effort to try and get it right initially.
+On Tue, 12/19 16:45, Peter Xu wrote:
+> For each Monitor, add one field "use_io_thr" to show whether it will be
+> using the dedicated monitor IO thread to handle input/output.  When set,
+> monitor IO parsing work will be offloaded to dedicated monitor IO
+> thread, rather than the original main loop thread.
 > 
-> Note: we do need to speed things up a bit, as having exploitation mode
-> in KVM will significantly help with IPI performance among other things.
+> This only works for QMP.  HMP will always be run on main loop thread.
 > 
-> I'm about ready to do the KVM bits. The one thing we need to discuss
-> and figure a good design for is how we map all those interrupt control
-> pages into qemu.
+> Currently we're still keeping use_io_thr to off always.  Will turn it on
+> later at some point.
 > 
-> Each interrupt (either PCIe pass-through or the "generic XIVE IPIs"
-> which are used for guest IPIs and for vio/virtio/emulated interrupts)
-> comes with a "control page" (ESB page) which needs to be mapped into
-> the guest, and the generic IPIs also come with a trigger page which
-> needs to be mapped into the guest for guest IPIs or OpenCAPI
-> interrupts, or just qemu for emulated devices.
-
-what about the OS TIMA page ? Do we trap the accesses in QEMU and
-forward them to KVM ? or do we use a similar mechanism. 
-
-> Now that can be thousands of these critters. I certainly don't want to
-> create thousands of VMAs in qemu and even less thousands of memory
-> regions in KVM.
-
-we can provision one mapping per kvmppc_xive_src_block  maybe ?  
-
-> So we need some kind of mechanism by wich a single large VMA gets
-> mmap'ed into qemu (or maybe a couple of these, but not too many) and
-> the interrupt pages can be assigned to slots in there and demand
-> faulted.
-
-Frederic has started to put in place a similar mecanism for OpenCAPI.
-
-> For the generic interrupts, this can probably be covered by KVM, adding
-> some arch ioctls for allocating IPIs and mmap'ing that region etc...
-
-The KVM device has a ioctl handler :
-   
-	struct kvm_device_ops {
-
-		long (*ioctl)(struct kvm_device *dev, unsigned int ioctl,
-			      unsigned long arg);
-	};
-
-So a KVM device for the XIVE interrupt controller can implement a couple 
-of extra calls for its need, like getting the VMA addresses, etc
-
-> For pass-through, it's trickier, we don't want to mmap each irqfd
-> individually for the above reason, so we want to "link" them to KVM. We
-> don't want to allow qemu to take control of any arbitrary interrupt in
-> the system though, so it has to related to the ownership of the irqfd
-> coming from vfio.
+> One thing to mention is that we cannot set use_io_thr for every QMP
+> monitors.  The problem is that MUXed typed chardevs may not work well
+> with it now. When MUX is used, frontend of chardev can be the monitor
+> plus something else.  The only thing we know would be safe to be run
+> outside main thread so far is the monitor frontend. All the rest of the
+> frontends should still be run in main thread only.
 > 
-> OpenCAPI I suspect will be its own can of worms...
+> Signed-off-by: Peter Xu <peterx@redhat.com>
+> ---
+>  monitor.c | 41 ++++++++++++++++++++++++++++++++---------
+>  1 file changed, 32 insertions(+), 9 deletions(-)
 > 
-> Also, have we decided how the process of switching between XICS and
-> XIVE will work vs. CAS ? 
+> diff --git a/monitor.c b/monitor.c
+> index 4ebd83fd94..4b2bee773f 100644
+> --- a/monitor.c
+> +++ b/monitor.c
+> @@ -190,6 +190,7 @@ struct Monitor {
+>      int flags;
+>      int suspend_cnt;
+>      bool skip_flush;
+> +    bool use_io_thr;
+>  
+>      QemuMutex out_lock;
+>      QString *outbuf;
+> @@ -573,7 +574,8 @@ static void monitor_qapi_event_init(void)
+>  
+>  static void handle_hmp_command(Monitor *mon, const char *cmdline);
+>  
+> -static void monitor_data_init(Monitor *mon, bool skip_flush)
+> +static void monitor_data_init(Monitor *mon, bool skip_flush,
+> +                              bool use_io_thr)
+>  {
+>      memset(mon, 0, sizeof(Monitor));
+>      qemu_mutex_init(&mon->out_lock);
+> @@ -581,6 +583,7 @@ static void monitor_data_init(Monitor *mon, bool skip_flush)
+>      /* Use *mon_cmds by default. */
+>      mon->cmd_table = mon_cmds;
+>      mon->skip_flush = skip_flush;
+> +    mon->use_io_thr = use_io_thr;
+>  }
+>  
+>  static void monitor_data_destroy(Monitor *mon)
+> @@ -601,7 +604,7 @@ char *qmp_human_monitor_command(const char *command_line, bool has_cpu_index,
+>      char *output = NULL;
+>      Monitor *old_mon, hmp;
+>  
+> -    monitor_data_init(&hmp, true);
+> +    monitor_data_init(&hmp, true, false);
+>  
+>      old_mon = cur_mon;
+>      cur_mon = &hmp;
+> @@ -4103,8 +4106,9 @@ void error_vprintf_unless_qmp(const char *fmt, va_list ap)
+>  void monitor_init(Chardev *chr, int flags)
+>  {
+>      Monitor *mon = g_malloc(sizeof(*mon));
+> +    GMainContext *context;
+>  
+> -    monitor_data_init(mon, false);
+> +    monitor_data_init(mon, false, false);
+>  
+>      qemu_chr_fe_init(&mon->chr, chr, &error_abort);
+>      mon->flags = flags;
+> @@ -4116,19 +4120,38 @@ void monitor_init(Chardev *chr, int flags)
+>          monitor_read_command(mon, 0);
+>      }
+>  
+> +    if (mon->use_io_thr) {
+> +        /*
+> +         * When use_io_thr is set, we use the global shared dedicated
+> +         * IO thread for this monitor to handle input/output.
+> +         */
+> +        context = monitor_io_context_get();
+> +        /* We should have inited globals before reaching here. */
+> +        assert(context);
+> +    } else {
+> +        /* The default main loop, which is the main thread */
+> +        context = NULL;
+> +    }
+> +
+> +    /*
+> +     * Add the monitor before running it (which is triggered by
+> +     * qemu_chr_fe_set_handlers), otherwise one monitor may find
+> +     * itself not on the mon_list when running.
+> +     */
+> +    qemu_mutex_lock(&monitor_lock);
+> +    QTAILQ_INSERT_HEAD(&mon_list, mon, entry);
+> +    qemu_mutex_unlock(&monitor_lock);
+> +
+>      if (monitor_is_qmp(mon)) {
+> -        qemu_chr_fe_set_handlers(&mon->chr, monitor_can_read, monitor_qmp_read,
+> -                                 monitor_qmp_event, NULL, mon, NULL, true);
+>          qemu_chr_fe_set_echo(&mon->chr, true);
+>          json_message_parser_init(&mon->qmp.parser, handle_qmp_command);
+> +        qemu_chr_fe_set_handlers(&mon->chr, monitor_can_read, monitor_qmp_read,
+> +                                 monitor_qmp_event, NULL, mon, context, true);
+>      } else {
+> +        assert(!context);       /* HMP does not support IOThreads */
+>          qemu_chr_fe_set_handlers(&mon->chr, monitor_can_read, monitor_read,
+>                                   monitor_event, NULL, mon, NULL, true);
+>      }
+> -
+> -    qemu_mutex_lock(&monitor_lock);
+> -    QLIST_INSERT_HEAD(&mon_list, mon, entry);
+> -    qemu_mutex_unlock(&monitor_lock);
+>  }
+>  
+>  void monitor_cleanup(void)
+> -- 
+> 2.14.3
+> 
 
-That's how it is described in the architecture. The current choice is
-to create both XICS and XIVE objects and choose at CAS which one to
-use. It relies today on the capability of the pseries machine to 
-allocate IRQ numbers for both interrupt controller backends. These
-patches have been merged in QEMU.
-
-A change of interrupt mode results in a reset. The device tree is 
-populated accordingly and the ICPs are switched for the model in 
-use. 
-
-> And how that will interact with KVM ? 
-
-I expect we will do the same, which is to create two KVM devices to 
-be able to handle both interrupt controller backends depending on the 
-mode negotiated by the guest.  
-
-
-> I was
-> thinking the kernel would implement a different KVM device type, ie
-> the "emulated XICS" would remain KVM_DEV_TYPE_XICS and XIVE would be
-> KVM_DEV_TYPE_XIVE.
-
-yes. it makes sense. The new device will have a lot in common with the 
-KVM_DEV_TYPE_XICS using kvm_xive_ops.
-
-C.
+Reviewed-by: Fam Zheng <famz@redhat.com>
