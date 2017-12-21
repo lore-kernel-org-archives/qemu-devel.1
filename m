@@ -1,19 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46345)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59067)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1eS2mL-0007fG-Gi
-	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 10:29:07 -0500
+	(envelope-from <groug@kaod.org>) id 1eS31f-0003WA-N1
+	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 10:44:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1eS2mK-00008f-J7
-	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 10:29:01 -0500
-From: Markus Armbruster <armbru@redhat.com>
-References: <20171207155102.66622-1-vsementsov@virtuozzo.com>
-Date: Thu, 21 Dec 2017 16:28:49 +0100
-In-Reply-To: <20171207155102.66622-1-vsementsov@virtuozzo.com> (Vladimir
-	Sementsov-Ogievskiy's message of "Thu, 7 Dec 2017 18:50:56 +0300")
-Message-ID: <87shc4umku.fsf@dusky.pond.sub.org>
+	(envelope-from <groug@kaod.org>) id 1eS31a-0004nO-MN
+	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 10:44:51 -0500
+Received: from 8.mo1.mail-out.ovh.net ([178.33.110.239]:41660)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1eS31a-0004jC-FO
+	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 10:44:46 -0500
+Received: from player795.ha.ovh.net (gw6.ovh.net [213.251.189.206])
+	by mo1.mail-out.ovh.net (Postfix) with ESMTP id 7357FAF557
+	for <qemu-devel@nongnu.org>; Thu, 21 Dec 2017 16:43:47 +0100 (CET)
+From: Greg Kurz <groug@kaod.org>
+Date: Thu, 21 Dec 2017 16:43:45 +0100
+Message-ID: <151387102500.6441.11333264832773390059.stgit@bahia.lan>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v2 0/6] nbd export qmp interface
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Subject: [Qemu-devel] [PATCH] 9pfs: fix type in *_parse_opts declarations
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,49 +27,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, kwolf@redhat.com, mreitz@redhat.com, den@openvz.org, pbonzini@redhat.com, dgilbert@redhat.com, Eric Blake <eblake@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: Greg Kurz <groug@kaod.org>
 
-Looks like you forgot to cc: Eric.  Fixing...
+To comply with the QEMU coding style.
 
-Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com> writes:
+Signed-off-by: Greg Kurz <groug@kaod.org>
+---
+ hw/9pfs/9p-handle.c |    2 +-
+ hw/9pfs/9p-local.c  |    2 +-
+ hw/9pfs/9p-proxy.c  |    2 +-
+ 3 files changed, 3 insertions(+), 3 deletions(-)
 
-> Here:
->     1. separate export name from device name
->     1.1 several exports per device possible
->     2. add nbd-server-remove
->
-> v2:
-> 01: add r-bs by Max and Eric, add comment to code (hope you don't mind)
-> 03: address export by its name, not by device name
->     make it possible to force-remove export, which is already
->     non-force-removed (thourh new "hidden" field)
-> other patches are new
->
-> v1:
-> Add command to remove nbd export, pair to nbd-server-add.
-> The whole thing and description are in patch 02.
->
->
-> Vladimir Sementsov-Ogievskiy (6):
->   nbd/server: add additional assert to nbd_export_put
->   qapi: add name parameter to nbd-server-add
->   qapi: add nbd-server-remove
->   iotest 147: add cases to test new @name parameter of nbd-server-add
->   iotests: implement QemuIoInteractive class
->   iotest 201: new test for qmp nbd-server-remove
->
->  qapi/block.json               |  27 ++++++++-
->  include/block/nbd.h           |   3 +-
->  blockdev-nbd.c                |  41 +++++++++++--
->  hmp.c                         |   5 +-
->  nbd/server.c                  |  31 +++++++++-
->  tests/qemu-iotests/147        |  68 +++++++++++++++++-----
->  tests/qemu-iotests/147.out    |   4 +-
->  tests/qemu-iotests/201        | 130 ++++++++++++++++++++++++++++++++++++++++++
->  tests/qemu-iotests/201.out    |   5 ++
->  tests/qemu-iotests/group      |   1 +
->  tests/qemu-iotests/iotests.py |  38 ++++++++++++
->  11 files changed, 325 insertions(+), 28 deletions(-)
->  create mode 100644 tests/qemu-iotests/201
->  create mode 100644 tests/qemu-iotests/201.out
+diff --git a/hw/9pfs/9p-handle.c b/hw/9pfs/9p-handle.c
+index 65b12de230c1..26ac90fc5ce3 100644
+--- a/hw/9pfs/9p-handle.c
++++ b/hw/9pfs/9p-handle.c
+@@ -652,7 +652,7 @@ static void handle_cleanup(FsContext *ctx)
+     g_free(data);
+ }
+ 
+-static int handle_parse_opts(QemuOpts *opts, struct FsDriverEntry *fse)
++static int handle_parse_opts(QemuOpts *opts, FsDriverEntry *fse)
+ {
+     const char *sec_model = qemu_opt_get(opts, "security_model");
+     const char *path = qemu_opt_get(opts, "path");
+diff --git a/hw/9pfs/9p-local.c b/hw/9pfs/9p-local.c
+index e51af87309c6..155834db28e1 100644
+--- a/hw/9pfs/9p-local.c
++++ b/hw/9pfs/9p-local.c
+@@ -1459,7 +1459,7 @@ static void local_cleanup(FsContext *ctx)
+     g_free(data);
+ }
+ 
+-static int local_parse_opts(QemuOpts *opts, struct FsDriverEntry *fse)
++static int local_parse_opts(QemuOpts *opts, FsDriverEntry *fse)
+ {
+     const char *sec_model = qemu_opt_get(opts, "security_model");
+     const char *path = qemu_opt_get(opts, "path");
+diff --git a/hw/9pfs/9p-proxy.c b/hw/9pfs/9p-proxy.c
+index 28b20a7c3dfa..652940726e72 100644
+--- a/hw/9pfs/9p-proxy.c
++++ b/hw/9pfs/9p-proxy.c
+@@ -1111,7 +1111,7 @@ static int connect_namedsocket(const char *path)
+     return sockfd;
+ }
+ 
+-static int proxy_parse_opts(QemuOpts *opts, struct FsDriverEntry *fs)
++static int proxy_parse_opts(QemuOpts *opts, FsDriverEntry *fs)
+ {
+     const char *socket = qemu_opt_get(opts, "socket");
+     const char *sock_fd = qemu_opt_get(opts, "sock_fd");
