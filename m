@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43166)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43167)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1eS3Fo-0008N2-3i
-	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 10:59:28 -0500
+	(envelope-from <berrange@redhat.com>) id 1eS3Fo-0008N3-3n
+	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 10:59:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1eS3Fk-0000Cx-5r
+	(envelope-from <berrange@redhat.com>) id 1eS3Fm-0000EK-9g
 	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 10:59:28 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:44746)
+Received: from mx1.redhat.com ([209.132.183.28]:39874)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1eS3Fj-0000Co-Vt
-	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 10:59:24 -0500
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1eS3Fm-0000Du-3a
+	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 10:59:26 -0500
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
 	[10.5.11.13])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id EF4CD5D9E3
-	for <qemu-devel@nongnu.org>; Thu, 21 Dec 2017 15:59:22 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 1DEBA72D10
+	for <qemu-devel@nongnu.org>; Thu, 21 Dec 2017 15:59:25 +0000 (UTC)
 From: "Daniel P. Berrange" <berrange@redhat.com>
-Date: Thu, 21 Dec 2017 15:59:03 +0000
-Message-Id: <20171221155905.3793-1-berrange@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 0/2] Enable passing pre-opened chardev
- socket FDs
+Date: Thu, 21 Dec 2017 15:59:04 +0000
+Message-Id: <20171221155905.3793-2-berrange@redhat.com>
+In-Reply-To: <20171221155905.3793-1-berrange@redhat.com>
+References: <20171221155905.3793-1-berrange@redhat.com>
+Subject: [Qemu-devel] [PATCH v2 1/2] io: move fd_is_socket() into common
+ sockets code
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,31 +33,75 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Markus Armbruster <armbru@redhat.com>, Eric Blake <eblake@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>
 
-This fixes a long standing problem that libvirt has with starting up QEMU.
+The fd_is_socket() helper method is useful in a few places, so put it in
+the common sockets code.
 
-We have to busy-wait retrying connect() on the QMP monitor socket until QEMU
-finally creates & listens on it, but at same time must be careful to not wait
-forever if QEMU exits.
+Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+---
+ include/qemu/sockets.h |  1 +
+ io/channel-util.c      | 13 -------------
+ util/qemu-sockets.c    | 13 +++++++++++++
+ 3 files changed, 14 insertions(+), 13 deletions(-)
 
-This this patch series, libvirt can simply pass in a pre-opened UNIX domain
-socket file descriptor, which it can immediately connect to with no busy-wait.
-
-Changed in v2:
-
-  - Drop 'fdset' property / address kind, and use 'fd' for both CLI and HMP
-  - Add unit tests
-
-Daniel P. Berrange (2):
-  io: move fd_is_socket() into common sockets code
-  char: allow passing pre-opened socket file descriptor at startup
-
- chardev/char-socket.c  |  32 +++++++--
- chardev/char.c         |   3 +
- include/qemu/sockets.h |   1 +
- io/channel-util.c      |  13 ----
- tests/test-char.c      | 173 ++++++++++++++++++++++++++++++++++++++++++++++++-
- util/qemu-sockets.c    |  55 +++++++++++++++-
- 6 files changed, 252 insertions(+), 25 deletions(-)
-
+diff --git a/include/qemu/sockets.h b/include/qemu/sockets.h
+index 4f7311b52a..5680880f5a 100644
+--- a/include/qemu/sockets.h
++++ b/include/qemu/sockets.h
+@@ -12,6 +12,7 @@ int inet_aton(const char *cp, struct in_addr *ia);
+ #include "qapi-types.h"
+ 
+ /* misc helpers */
++bool fd_is_socket(int fd);
+ int qemu_socket(int domain, int type, int protocol);
+ int qemu_accept(int s, struct sockaddr *addr, socklen_t *addrlen);
+ int socket_set_cork(int fd, int v);
+diff --git a/io/channel-util.c b/io/channel-util.c
+index 0fb4bd0837..423d79845a 100644
+--- a/io/channel-util.c
++++ b/io/channel-util.c
+@@ -24,19 +24,6 @@
+ #include "io/channel-socket.h"
+ 
+ 
+-static bool fd_is_socket(int fd)
+-{
+-    int optval;
+-    socklen_t optlen;
+-    optlen = sizeof(optval);
+-    return qemu_getsockopt(fd,
+-                           SOL_SOCKET,
+-                           SO_TYPE,
+-                           (char *)&optval,
+-                           &optlen) == 0;
+-}
+-
+-
+ QIOChannel *qio_channel_new_fd(int fd,
+                                Error **errp)
+ {
+diff --git a/util/qemu-sockets.c b/util/qemu-sockets.c
+index af4f01211a..1d23f0b742 100644
+--- a/util/qemu-sockets.c
++++ b/util/qemu-sockets.c
+@@ -91,6 +91,19 @@ NetworkAddressFamily inet_netfamily(int family)
+     return NETWORK_ADDRESS_FAMILY_UNKNOWN;
+ }
+ 
++bool fd_is_socket(int fd)
++{
++    int optval;
++    socklen_t optlen;
++    optlen = sizeof(optval);
++    return qemu_getsockopt(fd,
++                           SOL_SOCKET,
++                           SO_TYPE,
++                           (char *)&optval,
++                           &optlen) == 0;
++}
++
++
+ /*
+  * Matrix we're trying to apply
+  *
 -- 
 2.14.3
