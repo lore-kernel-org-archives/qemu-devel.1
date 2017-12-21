@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50251)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55945)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1eS0IM-0008TR-OG
-	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 07:49:55 -0500
+	(envelope-from <famz@redhat.com>) id 1eS0PT-00024i-Dy
+	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 07:57:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1eS0II-00038d-KS
-	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 07:49:54 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:35554)
+	(envelope-from <famz@redhat.com>) id 1eS0PQ-0001Sw-6E
+	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 07:57:15 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:58746)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1eS0II-000372-ET
-	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 07:49:50 -0500
-References: <1513790098-9815-1-git-send-email-pbonzini@redhat.com>
-	<CAFEAcA8J53A93+SQz01W13gRCX-ecw0v+8JTaRqwmrUeFjqaJA@mail.gmail.com>
-	<51174e3a-12d3-f3e0-2d76-b776e0fe62b6@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <e7994a8d-3a02-99c7-d919-c940aa4bc066@redhat.com>
-Date: Thu, 21 Dec 2017 13:49:44 +0100
+	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1eS0PP-0001R4-W4
+	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 07:57:12 -0500
+Date: Thu, 21 Dec 2017 20:57:02 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20171221125702.GS10812@lemon>
+References: <20171219084557.9801-1-peterx@redhat.com>
+	<20171219084557.9801-23-peterx@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <51174e3a-12d3-f3e0-2d76-b776e0fe62b6@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] out of bounds in set_cc_op() (was: [PULL 00/46]
- First batch of misc patches for QEMU 2.12)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20171219084557.9801-23-peterx@redhat.com>
+Subject: Re: [Qemu-devel] [RFC v6 22/27] qmp: isolate responses into io
+ thread
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,44 +28,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Richard Henderson <rth@twiddle.net>
-Cc: Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, Stefan Hajnoczi <shajnocz@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Juan Quintela <quintela@redhat.com>, mdroth@linux.vnet.ibm.com, Eric Blake <eblake@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Markus Armbruster <armbru@redhat.com>, marcandre.lureau@redhat.com, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 
-On 20.12.2017 22:56, Paolo Bonzini wrote:
-> On 20/12/2017 20:20, Peter Maydell wrote:
->> On the x86/sanitizer build, new runtime errors:
->>   GTESTER check-qtest-m68k
->> /home/petmay01/linaro/qemu-for-merges/target/m68k/translate.c:230:12:
->> runtime error: index -1 out of bounds for type 'const uint8_t [11]'
->>
->> ...and similar fails on one or two boards on most of the other
->> guest architectures.
->=20
-> These are preexisting bugs, now exposed by the boot-serial-test.
-> Thomas, can you identify the architectures that have a problem and
-> notify the maintainers?  In the meanwhile I'll keep the boot-serial-tes=
-t
-> enhancements queued locally, and remove them from the pull request.
+On Tue, 12/19 16:45, Peter Xu wrote:
+> For those monitors who has enabled IO thread, we'll offload the
 
- Laurent, Richard,
+s/has/have/
 
-looks like old_op is -1 when set_cc_op() is called here for the first
-time. The problem can be reproduced by running the mini-kernel directly.
-Just get http://people.redhat.com/~thuth/m68k-uart.bin and run QEMU like
-this:
+> responding procedure into IO thread.  The main reason is that chardev is
+> not thread safe, and we need to do all the read/write IOs in the same
+> thread.  For use_io_thr=true monitors, that thread is the IO thread.
+> 
+> We do this isolation in similar pattern as what we have done to the
+> request queue: we first create one response queue for each monitor, then
+> instead of reply directly in main thread, we queue the responses and
 
- qemu-system-m68k -nographic -kernel  ~/tmp/m68k-uart.bin -serial none
+s/reply/replying/
 
-That kernel only contains these few instructions:
+s/main thread/the main thread/
 
-  0x41, 0xf9, 0xfc, 0x06, 0x00, 0x00,     /* lea 0xfc060000,%a0 */
-  0x10, 0x3c, 0x00, 0x54,                 /* move.b #'T',%d0 */
-  0x11, 0x7c, 0x00, 0x04, 0x00, 0x08,     /* move.b #4,8(%a0) */
-  0x11, 0x40, 0x00, 0x0c,                 /* move.b %d0,12(%a0) */
-  0x60, 0xfa                              /* bra.s  loop */
+> kick the IO thread to do the rest of the job for us.
+> 
+> A funny thing after doing this is that, when the QMP clients send "quit"
+> to QEMU, it's possible that we close the IOThread even earlier than
+> replying to that "quit".  So another thing we need to do before cleaning
+> up the monitors is that we need to flush the response queue (we don't
+> need to do that for command queue; after all we are quitting) to make
+> sure replies for handled commands are always flushed back to clients.
+> 
+> Signed-off-by: Peter Xu <peterx@redhat.com>
 
-The problem occurs during the second instruction (i.e. the first move.b).
-
-Do you have any ideas where this -1 in s->cc_op could come from?
-
- Thomas
+Reviewed-by: Fam Zheng <famz@redhat.com>
