@@ -1,24 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36141)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38598)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eS9qn-0006jx-5o
-	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 18:02:05 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1eS9t6-0008Ng-46
+	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 18:04:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eS9qm-0000lV-I1
-	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 18:02:05 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1eS9t5-0002uS-5w
+	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 18:04:28 -0500
+Received: from mail-ot0-x231.google.com ([2607:f8b0:4003:c0f::231]:44836)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1eS9t4-0002u0-VY
+	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 18:04:27 -0500
+Received: by mail-ot0-x231.google.com with SMTP id d27so23799150ote.11
+	for <qemu-devel@nongnu.org>; Thu, 21 Dec 2017 15:04:26 -0800 (PST)
 MIME-Version: 1.0
-Sender: philippe.mathieu.daude@gmail.com
-In-Reply-To: <20171221223727-mutt-send-email-mst@kernel.org>
-References: <1513866427-27125-1-git-send-email-mst@redhat.com>
-	<1513866427-27125-16-git-send-email-mst@redhat.com>
-	<20171221223727-mutt-send-email-mst@kernel.org>
-From: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Date: Thu, 21 Dec 2017 20:02:03 -0300
-Message-ID: <CAAdtpL4dudnESw9rN_5JHowS_gAxakb8GVikRgTrB1iOSupq3A@mail.gmail.com>
+In-Reply-To: <CAAdtpL46YjfBuH5XDAKYecGh0Va2bup7EVAGqT6jEO=Dwj_n5Q@mail.gmail.com>
+References: <20171221211103.30311-1-laurent@vivier.eu>
+	<CAFEAcA8MvShVAZf1+OOf2ZZnhD3sQ_jgED4NPWBOOySwJitD2Q@mail.gmail.com>
+	<CAAdtpL46YjfBuH5XDAKYecGh0Va2bup7EVAGqT6jEO=Dwj_n5Q@mail.gmail.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 21 Dec 2017 23:04:05 +0000
+Message-ID: <CAFEAcA8yLUgu3jx-ymRU2HRdN9Wwr6RB-Q1WVFAeB9DFrbU_Wg@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PULL 15/25] hw/block/nvme: QOM'ify PCI NVME
+Subject: Re: [Qemu-devel] [PATCH] hw/i386/vmport: fix missing definitions
+ with x86_64-w64-mingw32
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,28 +32,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, Keith Busch <keith.busch@intel.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, "open list:Block layer core" <qemu-block@nongnu.org>
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Cc: Laurent Vivier <laurent@vivier.eu>, QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>
 
-Hi Michael,
-
-On Thu, Dec 21, 2017 at 5:38 PM, Michael S. Tsirkin <mst@redhat.com> wrote:
-> On Thu, Dec 21, 2017 at 04:29:21PM +0200, Michael S. Tsirkin wrote:
->> From: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+On 21 December 2017 at 22:55, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>=
+ wrote:
+>>> Fixes: 7299e1a411
+>>>        ("hw/i386/vmport: replace fprintf() by trace events or LOG_UNIMP=
+")
+>>> Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 >>
->> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
->> Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
->> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+>> Looks to me like it'll be a bug for anything not configured
+>> using the 'log' trace backend, rather than win32 specific.
 >
-> Dropped due to merge conflicts. Pls rebase and ask
-> storage maintainers to apply as appropriate.
+> Sorry my bad, it seems I don't test enough lately, I'll try to do more
+> testing, and somehow to reduce CI build time, more they last, less we
+> rely on it, even with personal repositories.
 
-Ok, sorry about this.
-Many patch queue during freezing in different trees lead to this.
+It's unfortunate that trace.h pulls in qemu/log.h if you're
+using the log backend, because it makes this particular
+mistake easy; we've had quite a few instances of it...
+(I could probably configure one of my test setups with a
+different trace backend which would at least catch these
+before they hit master.)
 
-However you must also drop the patch "hw/pci: remove obsolete
-PCIDevice->init()" else the NVME device won't work.
-
-Regards,
-
-Phil.
+thanks
+-- PMM
