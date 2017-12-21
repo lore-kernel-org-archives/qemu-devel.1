@@ -1,26 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40049)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47487)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1eRuEY-0007Ao-Be
-	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 01:21:35 -0500
+	(envelope-from <yi.l.liu@linux.intel.com>) id 1eRuOX-0001Vp-Ko
+	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 01:31:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1eRuEV-0003sF-7m
-	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 01:21:34 -0500
-Resent-Message-Id: <E1eRuEV-0003sF-7m@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21367)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1eRuEU-0003rh-Ul
-	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 01:21:31 -0500
-In-Reply-To: <20171219101122.31711-1-ybettan@redhat.com>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <151367948848.78.420383713099037505@5adcb62bf0d6>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Tue, 19 Dec 2017 02:31:29 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH V3] vl.c && linux-user/main.c : removed
- **envp from main() arguments
+	(envelope-from <yi.l.liu@linux.intel.com>) id 1eRuOU-0001mN-Hc
+	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 01:31:53 -0500
+Received: from mga11.intel.com ([192.55.52.93]:32422)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <yi.l.liu@linux.intel.com>)
+	id 1eRuOU-0001lx-85
+	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 01:31:50 -0500
+From: "Liu, Yi L" <yi.l.liu@linux.intel.com>
+Date: Thu, 21 Dec 2017 14:15:19 +0800
+Message-Id: <1513836919-13458-1-git-send-email-yi.l.liu@linux.intel.com>
+Subject: [Qemu-devel] [PATCH] intel_iommu: a fix to vtd_dev_get_trans_type()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,36 +22,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: ybettan@redhat.com
-Cc: famz@redhat.com, qemu-devel@nongnu.org, peter.maydell@linaro.org, riku.voipio@iki.fi, laurent@vivier.eu, kraxel@redhat.com, pbonzini@redhat.com
+To: qemu-devel@nongnu.org, peterx@redhat.com, jasowang@redhat.com
+Cc: yi.l.liu@intel.com, "Liu, Yi L" <yi.l.liu@linux.intel.com>
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
-c3NhZ2UtaWQ6IDIwMTcxMjE5MTAxMTIyLjMxNzExLTEteWJldHRhbkByZWRoYXQuY29tClN1Ympl
-Y3Q6IFtRZW11LWRldmVsXSBbUEFUQ0ggVjNdIHZsLmMgJiYgbGludXgtdXNlci9tYWluLmMgOiBy
-ZW1vdmVkICoqZW52cCBmcm9tIG1haW4oKSBhcmd1bWVudHMKCj09PSBURVNUIFNDUklQVCBCRUdJ
-TiA9PT0KIyEvYmluL2Jhc2gKCkJBU0U9YmFzZQpuPTEKdG90YWw9JChnaXQgbG9nIC0tb25lbGlu
-ZSAkQkFTRS4uIHwgd2MgLWwpCmZhaWxlZD0wCgpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5h
-bWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQoKY29tbWl0cz0i
-JChnaXQgbG9nIC0tZm9ybWF0PSVIIC0tcmV2ZXJzZSAkQkFTRS4uKSIKZm9yIGMgaW4gJGNvbW1p
-dHM7IGRvCiAgICBlY2hvICJDaGVja2luZyBQQVRDSCAkbi8kdG90YWw6ICQoZ2l0IGxvZyAtbiAx
-IC0tZm9ybWF0PSVzICRjKS4uLiIKICAgIGlmICEgZ2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1haWwg
-fCAuL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIC07IHRoZW4KICAgICAgICBmYWls
-ZWQ9MQogICAgICAgIGVjaG8KICAgIGZpCiAgICBuPSQoKG4rMSkpCmRvbmUKCmV4aXQgJGZhaWxl
-ZAo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRk
-MWRlZjdmNDRiZDg4ODcxMzM4NApGcm9tIGh0dHBzOi8vZ2l0aHViLmNvbS9wYXRjaGV3LXByb2pl
-Y3QvcWVtdQogdCBbdGFnIHVwZGF0ZV0gICAgICAgICAgICBwYXRjaGV3LzIwMTcxMjE5MDgyNTE4
-LjE5NzI0LTEtbG1hQHN1c2UuY29tIC0+IHBhdGNoZXcvMjAxNzEyMTkwODI1MTguMTk3MjQtMS1s
-bWFAc3VzZS5jb20KU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0JwozNTQ1MDJlODRmIHZs
-LmMgJiYgbGludXgtdXNlci9tYWluLmMgOiByZW1vdmVkICoqZW52cCBmcm9tIG1haW4oKSBhcmd1
-bWVudHMKCj09PSBPVVRQVVQgQkVHSU4gPT09CkNoZWNraW5nIFBBVENIIDEvMTogdmwuYyAmJiBs
-aW51eC11c2VyL21haW4uYyA6IHJlbW92ZWQgKiplbnZwIGZyb20gbWFpbigpIGFyZ3VtZW50cy4u
-LgpFUlJPUjogZXh0ZXJucyBzaG91bGQgYmUgYXZvaWRlZCBpbiAuYyBmaWxlcwojODU6IEZJTEU6
-IHZsLmM6Mzg6CitpbnQgcWVtdV9tYWluKGludCBhcmdjLCBjaGFyICoqYXJndik7Cgp0b3RhbDog
-MSBlcnJvcnMsIDAgd2FybmluZ3MsIDY2IGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0
-eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUg
-ZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQ
-QVRDSCBpbiBNQUlOVEFJTkVSUy4KCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4
-aXRlZCB3aXRoIGNvZGU6IDEKCgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkg
-UGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sg
-dG8gcGF0Y2hldy1kZXZlbEBmcmVlbGlzdHMub3Jn
+vtd_ce_get_type() returns uin32_t and vtd_dev_get_trans_type() returns
+the value from vtd_ce_get_type(). However, vtd_dev_get_trans_type()
+returns int. This patch switchs to return the translation type by
+parameter. It avoids unsigned to int transfer and also avoid potential
+reading confusion.
+
+Signed-off-by: Liu, Yi L <yi.l.liu@linux.intel.com>
+---
+ hw/i386/intel_iommu.c | 10 ++++++----
+ 1 file changed, 6 insertions(+), 4 deletions(-)
+
+diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
+index 3a5bb0b..609f087 100644
+--- a/hw/i386/intel_iommu.c
++++ b/hw/i386/intel_iommu.c
+@@ -916,7 +916,7 @@ static int vtd_dev_to_context_entry(IntelIOMMUState *s, uint8_t bus_num,
+  * happens, otherwise return the shifted type to check against
+  * VTD_CONTEXT_TT_*.
+  */
+-static int vtd_dev_get_trans_type(VTDAddressSpace *as)
++static int vtd_dev_get_trans_type(VTDAddressSpace *as, uint32_t *tt)
+ {
+     IntelIOMMUState *s;
+     VTDContextEntry ce;
+@@ -930,16 +930,18 @@ static int vtd_dev_get_trans_type(VTDAddressSpace *as)
+         return ret;
+     }
+ 
+-    return vtd_ce_get_type(&ce);
++    *tt = vtd_ce_get_type(&ce);
++    return 0;
+ }
+ 
+ static bool vtd_dev_pt_enabled(VTDAddressSpace *as)
+ {
+     int ret;
++    uint32_t tt;
+ 
+     assert(as);
+ 
+-    ret = vtd_dev_get_trans_type(as);
++    ret = vtd_dev_get_trans_type(as, &tt);
+     if (ret < 0) {
+         /*
+          * Possibly failed to parse the context entry for some reason
+@@ -950,7 +952,7 @@ static bool vtd_dev_pt_enabled(VTDAddressSpace *as)
+         return false;
+     }
+ 
+-    return ret == VTD_CONTEXT_TT_PASS_THROUGH;
++    return tt == VTD_CONTEXT_TT_PASS_THROUGH;
+ }
+ 
+ /* Return whether the device is using IOMMU translation. */
+-- 
+1.9.1
