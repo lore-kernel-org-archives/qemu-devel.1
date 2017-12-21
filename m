@@ -1,34 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59971)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59125)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eRntg-00024g-9W
-	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 18:35:37 -0500
+	(envelope-from <mst@redhat.com>) id 1eRoMq-0004I6-20
+	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 19:05:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eRntc-0007w9-TH
-	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 18:35:36 -0500
-Received: from indium.canonical.com ([91.189.90.7]:39564)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1eRntc-0007vQ-MV
-	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 18:35:32 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1eRntb-0001cA-NY
-	for <qemu-devel@nongnu.org>; Wed, 20 Dec 2017 23:35:31 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id AC1732E8075
-	for <qemu-devel@nongnu.org>; Wed, 20 Dec 2017 23:35:31 +0000 (UTC)
+	(envelope-from <mst@redhat.com>) id 1eRoMk-0000Si-RA
+	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 19:05:44 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:49390)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1eRoMk-0000Ry-Gq
+	for qemu-devel@nongnu.org; Wed, 20 Dec 2017 19:05:38 -0500
+Date: Thu, 21 Dec 2017 02:05:34 +0200
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20171220200550-mutt-send-email-mst@kernel.org>
+References: <20171217125457.3429-1-marcel@redhat.com>
+	<20171219194951-mutt-send-email-mst@kernel.org>
+	<77710384-30d0-cb76-9dbc-6195b831f050@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 20 Dec 2017 23:28:13 -0000
-From: Adam Williamson <awilliam@redhat.com>
-Reply-To: Bug 1738283 <1738283@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <151328724563.26325.11755910452939969450.malonedeb@wampee.canonical.com>
-Message-Id: <151381249335.16639.10774037523486530023.malone@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1738283] Re: 'Less than' (<), 'more than' (>),
- and 'pipe' (|) can't be typed via VNC
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <77710384-30d0-cb76-9dbc-6195b831f050@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH V2 0/5] hw/pvrdma: PVRDMA device
+ implementation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,53 +29,186 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Marcel Apfelbaum <marcel@redhat.com>
+Cc: qemu-devel@nongnu.org, ehabkost@redhat.com, imammedo@redhat.com, yuval.shaia@oracle.com, pbonzini@redhat.com
 
-I note this block in pc-bios/keymaps/en-us with interest:
+On Wed, Dec 20, 2017 at 05:07:38PM +0200, Marcel Apfelbaum wrote:
+> On 19/12/2017 20:05, Michael S. Tsirkin wrote:
+> > On Sun, Dec 17, 2017 at 02:54:52PM +0200, Marcel Apfelbaum wrote:
+> > > RFC -> V2:
+> > >   - Full implementation of the pvrdma device
+> > >   - Backend is an ibdevice interface, no need for the KDBR module
+> > > 
+> > > General description
+> > > ===================
+> > > PVRDMA is the QEMU implementation of VMware's paravirtualized RDMA device.
+> > > It works with its Linux Kernel driver AS IS, no need for any special guest
+> > > modifications.
+> > > 
+> > > While it complies with the VMware device, it can also communicate with bare
+> > > metal RDMA-enabled machines and does not require an RDMA HCA in the host, it
+> > > can work with Soft-RoCE (rxe).
+> > > 
+> > > It does not require the whole guest RAM to be pinned
+> > 
+> 
+> Hi Michael,
+> 
+> > What happens if guest attempts to register all its memory?
+> > 
+> 
+> Then we loose, is not different from bare metal, reg_mr will pin all the RAM.
 
-# evdev 86 (0x56), QKeyCode "less", number 0x56
-less 0x56
-greater 0x56 shift
-bar 0x56 altgr
-brokenbar 0x56 shift altgr
+We need to find a way to communicate to guests about amount
+of memory they can pin.
 
-That block was added in commit a7815faffb2bd594b92aa3542d7b799cc89c5414
-, which I am very suspicious was the cause of this problem. I strongly
-suspect that removing it will fix the problem. Will test now.
+> However this is only one scenario, and hopefully not much used
+> for RoCE. (I know IPoIB does that, but it doesn't make sense to use it with RoCE).
 
--- =
+SRP does it too AFAIK.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1738283
+> > > allowing memory
+> > > over-commit
+> > > and, even if not implemented yet, migration support will be
+> > > possible with some HW assistance.
+> > 
+> > What does "HW assistance" mean here?
+> 
+> Several things:
+> 1. We need to be able to pass resource numbers when we create
+> them on the destination machine.
 
-Title:
-  'Less than' (<), 'more than' (>), and 'pipe' (|) can't be typed via
-  VNC
+These resources are mostly managed by software.
 
-Status in QEMU:
-  New
+> 2. We also need a way to stall prev connections while starting the new ones.
 
-Bug description:
-  If I start QEMU 2.11 (from
-  https://build.opensuse.org/package/show/Virtualization/qemu) VM with
-  VNC, I am unable to type following three characters: 'less than' (<),
-  'more than' (>), and 'pipe' (|) on en_US QWERTY keyboard. Other
-  characters work fine. QEMu version 2.10.1 worked fine.
+Look at what hardware can do.
 
-  /usr/bin/qemu-kvm -m 2048 -cpu kvm64 -drive
-  media=3Dcdrom,if=3Dnone,id=3Dcd0,format=3Draw,file=3DOI-hipster-
-  minimal-20171031.iso -device ide-cd,drive=3Dcd0 -boot once=3Dd,menu=3Don
-  ,splash-time=3D5000 -device usb-ehci -device usb-tablet -smp 1 -enable-
-  kvm -vnc :91,share=3Dforce-shared
+> 3. Last, we need the HW to pass resources states.
 
-  The ISO can be downloaded here: https://www.openindiana.org/download/
+Look at the spec, some of this can be done.
 
-  Also tried Fedora-Server-dvd-x86_64-25-1.3.iso and it's the same
-  situation.
+> > Can it work with any existing hardware?
+> > 
+> 
+> Sadly no,
 
-  If I run the same command without '-vnc :91,share=3Dforce-shared',
-  everything works just fine.
+Above can be done. What's needed is host kernel work to support it.
 
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1738283/+subscriptions
+> however we talked with Mellanox at the last year
+> Plumbers Conference and all the above are on their plans.
+> We hope this submission will help, since now we will have
+> a fast way to test and use it.
+
+I'm doubtful it'll help.
+
+> For Soft-RoCE backend is doable, but is best to wait first to
+> see how HCAs are going to expose the changes.
+> 
+> > > 
+> > >   Design
+> > >   ======
+> > >   - Follows the behavior of VMware's pvrdma device, however is not tightly
+> > >     coupled with it
+> > 
+> > Everything seems to be in pvrdma. Since it's not coupled, could you
+> > split code to pvrdma specific and generic parts?
+> > 
+> > > and most of the code can be reused if we decide to
+> > >     continue to a Virtio based RDMA device.
+> > 
+> > I suspect that without virtio we won't be able to do any future
+> > extensions.
+> > 
+> 
+> While I do agree is harder to work with a 3rd party spec, their
+> Linux driver is open source and we may be able to do sane
+> modifications.
+
+I am sceptical. ARM guys did not want to add a single bit in their IOMMU
+spec. You want an open spec that everyone can contribute to.
+
+> > >   - It exposes 3 BARs:
+> > >      BAR 0 - MSIX, utilize 3 vectors for command ring, async events and
+> > >              completions
+> > >      BAR 1 - Configuration of registers
+> 
+> [...]
+> 
+> > > The pvrdma backend is an ibdevice interface that can be exposed
+> > > either by a Soft-RoCE(rxe) device on machines with no RDMA device,
+> > > or an HCA SRIOV function(VF/PF).
+> > > Note that ibdevice interfaces can't be shared between pvrdma devices,
+> > > each one requiring a separate instance (rxe or SRIOV VF).
+> > 
+> > So what's the advantage of this over pass-through then?
+> > 
+> 
+> 1. We can work also with the same ibdevice for multiple pvrdma
+> devices using multiple GIDs; it works (tested).
+> The problem begins when we think about migration, the way
+> HCAs work today is one resource namespace per ibdevice,
+> not per GID. I emphasize that this can be changed,  however
+> we don't have a timeline for it.
+> 
+> 2. We do have advantages:
+> - Guest agnostic device (we can change host HCA)
+> - Memory over commit (unless the guest registers all the memory)
+
+Not just all. You trust guest and this is a problem.  If you do try to
+overcommit, at any point guest can try to register too much and host
+will stall.
+
+> - Future migration support
+
+So there are lots of difficult problems to solve for this.  E.g. any MR
+that is hardware writeable can be changed and hypervisor won't know. All
+this can be solvable but it might also be solveable with passthrough
+too.
+
+> - A friendly migration of RDMA VMWare guests to QEMU.
+
+Why do we need to emulate their device for this?  Reboot is required
+anyway, you can switch to a passthrough easily.
+
+> 3. In case when live migration is not a must we can
+>    use multiple GIDs of the same port, so we do not
+>    depend on SRIOV.
+> 
+> 4. We support Soft RoCE backend, people can test their
+>    software on guest without RDMA hw.
+> 
+> 
+> Thanks,
+> Marcel
+
+These two are nice, if very niche, features.
+
+> > 
+> > > 
+> > > Tests and performance
+> > > =====================
+> > > Tested with SoftRoCE backend (rxe)/Mellanox ConnectX3,
+> > > and Mellanox ConnectX4 HCAs with:
+> > >    - VMs in the same host
+> > >    - VMs in different hosts
+> > >    - VMs to bare metal.
+> > > 
+> > > The best performance achieved with ConnectX HCAs and buffer size
+> > > bigger than 1MB which was the line rate ~ 50Gb/s.
+> > > The conclusion is that using the PVRDMA device there are no
+> > > actual performance penalties compared to bare metal for big enough
+> > > buffers (which is quite common when using RDMA), while allowing
+> > > memory overcommit.
+> > > 
+> > > Marcel Apfelbaum (3):
+> > >    mem: add share parameter to memory-backend-ram
+> > >    docs: add pvrdma device documentation.
+> > >    MAINTAINERS: add entry for hw/net/pvrdma
+> > > 
+> > > Yuval Shaia (2):
+> > >    pci/shpc: Move function to generic header file
+> > >    pvrdma: initial implementation
+> > > 
+> 
+> [...]
