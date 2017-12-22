@@ -1,19 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53780)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58547)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <hikarupsp@gmail.com>) id 1eSHnm-0004AI-Ch
-	for qemu-devel@nongnu.org; Fri, 22 Dec 2017 02:31:31 -0500
+	(envelope-from <armbru@redhat.com>) id 1eSHu0-0006jQ-Vz
+	for qemu-devel@nongnu.org; Fri, 22 Dec 2017 02:37:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <hikarupsp@gmail.com>) id 1eSHnl-00046g-9D
-	for qemu-devel@nongnu.org; Fri, 22 Dec 2017 02:31:30 -0500
+	(envelope-from <armbru@redhat.com>) id 1eSHtx-0000vT-2w
+	for qemu-devel@nongnu.org; Fri, 22 Dec 2017 02:37:57 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:44768)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1eSHtw-0000uq-TG
+	for qemu-devel@nongnu.org; Fri, 22 Dec 2017 02:37:53 -0500
+From: Markus Armbruster <armbru@redhat.com>
+References: <1511273358-21789-1-git-send-email-s1seetee@linux.vnet.ibm.com>
+	<20171212164114.GF2409@work-vm>
+	<e37d8871-544f-3c4f-3a59-bb66dc5c8b67@linux.vnet.ibm.com>
+	<b5c7e566-34f0-adb0-0fcb-bf272cbb0a81@redhat.com>
+	<225a4478-dc5e-a067-f207-e8a183afa0d9@linux.vnet.ibm.com>
+	<9b719ebe-8b38-708c-45a7-d377a583f899@redhat.com>
+	<5e07b5ea-e8b0-521a-b1af-31017fc52578@redhat.com>
+Date: Fri, 22 Dec 2017 08:37:50 +0100
+In-Reply-To: <5e07b5ea-e8b0-521a-b1af-31017fc52578@redhat.com> (Eric Blake's
+	message of "Thu, 21 Dec 2017 17:14:14 -0600")
+Message-ID: <87shc3rz5d.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <1513573243-29022-1-git-send-email-hikarupsp@gmail.com>
-References: <1513573243-29022-1-git-send-email-hikarupsp@gmail.com>
-From: Hikaru Nishida <hikarupsp@gmail.com>
-Date: Fri, 22 Dec 2017 16:31:11 +0900
-Message-ID: <CAD-w0GB+KZK_=7HZhXfarfNEFF_Y992=wc8XZ=CX6FTC107zfw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH] hw/block: Fix pin-based interrupt
- behaviour of NVMe
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v1] hmp: 'info snapshots' not showing the id
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,116 +32,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Hikaru Nishida <hikarupsp@gmail.com>, Keith Busch <keith.busch@intel.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, "open list:nvme" <qemu-block@nongnu.org>
+To: Eric Blake <eblake@redhat.com>
+Cc: Max Reitz <mreitz@redhat.com>, seeteena <s1seetee@linux.vnet.ibm.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, lma@suse.com, qemu-devel@nongnu.org
 
-ping
-http://patchwork.ozlabs.org/patch/849786/
+Eric Blake <eblake@redhat.com> writes:
 
-2017-12-18 14:00 GMT+09:00 Hikaru Nishida <hikarupsp@gmail.com>:
-> Pin-based interrupt of NVMe controller did not work properly
-> because using an obsolated function pci_irq_pulse().
-> To fix this, change to use pci_irq_assert() / pci_irq_deassert()
-> instead of pci_irq_pulse().
+> On 12/19/2017 08:20 AM, Max Reitz wrote:
 >
-> Signed-off-by: Hikaru Nishida <hikarupsp@gmail.com>
-> ---
->  hw/block/nvme.c | 39 ++++++++++++++++++++++++++++++++++-----
->  hw/block/nvme.h |  1 +
->  2 files changed, 35 insertions(+), 5 deletions(-)
+>> So there are three things:
+>>
+>> (1) We probably should not allow snapshot names that could be IDs.
+>> Easiest way to solve this: Names have to start with a non-digit.
 >
-> diff --git a/hw/block/nvme.c b/hw/block/nvme.c
-> index 441e21e..2d164fc 100644
-> --- a/hw/block/nvme.c
-> +++ b/hw/block/nvme.c
-> @@ -82,13 +82,40 @@ static uint8_t nvme_sq_empty(NvmeSQueue *sq)
->      return sq->head == sq->tail;
->  }
->
-> -static void nvme_isr_notify(NvmeCtrl *n, NvmeCQueue *cq)
-> +static void nvme_irq_check(NvmeCtrl *n)
-> +{
-> +    if (msix_enabled(&(n->parent_obj))) {
-> +        return;
-> +    }
-> +    if (~n->bar.intms & n->irq_status) {
-> +        pci_irq_assert(&n->parent_obj);
-> +    } else {
-> +        pci_irq_deassert(&n->parent_obj);
-> +    }
-> +}
-> +
-> +static void nvme_irq_assert(NvmeCtrl *n, NvmeCQueue *cq)
->  {
->      if (cq->irq_enabled) {
->          if (msix_enabled(&(n->parent_obj))) {
->              msix_notify(&(n->parent_obj), cq->vector);
->          } else {
-> -            pci_irq_pulse(&n->parent_obj);
-> +            assert(cq->cqid < 64);
-> +            n->irq_status |= 1 << cq->cqid;
-> +            nvme_irq_check(n);
-> +        }
-> +    }
-> +}
-> +
-> +static void nvme_irq_deassert(NvmeCtrl *n, NvmeCQueue *cq)
-> +{
-> +    if (cq->irq_enabled) {
-> +        if (msix_enabled(&(n->parent_obj))) {
-> +            return;
-> +        } else {
-> +            assert(cq->cqid < 64);
-> +            n->irq_status &= ~(1 << cq->cqid);
-> +            nvme_irq_check(n);
->          }
->      }
->  }
-> @@ -220,7 +247,7 @@ static void nvme_post_cqes(void *opaque)
->              sizeof(req->cqe));
->          QTAILQ_INSERT_TAIL(&sq->req_list, req, entry);
->      }
-> -    nvme_isr_notify(n, cq);
-> +    nvme_irq_assert(n, cq);
->  }
->
->  static void nvme_enqueue_req_completion(NvmeCQueue *cq, NvmeRequest *req)
-> @@ -753,10 +780,12 @@ static void nvme_write_bar(NvmeCtrl *n, hwaddr offset, uint64_t data,
->      case 0xc:
->          n->bar.intms |= data & 0xffffffff;
->          n->bar.intmc = n->bar.intms;
-> +        nvme_irq_check(n);
->          break;
->      case 0x10:
->          n->bar.intms &= ~(data & 0xffffffff);
->          n->bar.intmc = n->bar.intms;
-> +        nvme_irq_check(n);
->          break;
->      case 0x14:
->          /* Windows first sends data, then sends enable bit */
-> @@ -851,8 +880,8 @@ static void nvme_process_db(NvmeCtrl *n, hwaddr addr, int val)
->              timer_mod(cq->timer, qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) + 500);
->          }
->
-> -        if (cq->tail != cq->head) {
-> -            nvme_isr_notify(n, cq);
-> +        if (cq->tail == cq->head) {
-> +            nvme_irq_deassert(n, cq);
->          }
->      } else {
->          uint16_t new_tail = val & 0xffff;
-> diff --git a/hw/block/nvme.h b/hw/block/nvme.h
-> index 6aab338..7b62dad 100644
-> --- a/hw/block/nvme.h
-> +++ b/hw/block/nvme.h
-> @@ -775,6 +775,7 @@ typedef struct NvmeCtrl {
->      uint32_t    cmbsz;
->      uint32_t    cmbloc;
->      uint8_t     *cmbuf;
-> +    uint64_t    irq_status;
->
->      char            *serial;
->      NvmeNamespace   *namespaces;
-> --
-> 2.7.4
->
+> Yes, that would be a nice change.  It is not strictly backwards
+> compatible (so we'd still have to cope with images that didn't follow
+> the rule, whether created by older qemu or by non-qemu implementations
+> of qcow2), but would alleviate a lot of confusion.
+
+I recommend to restrict ID strings to letters, digits, '-', '.', '_',
+starting with a letter.  Use id_wellformed() to check.
+
+If backward compatibility is an issue, deprecate offending IDs (with a
+suitable warning), and kill them off after the customary grace period.
+
+IDs embedded in image files and such you may have to keep working
+somehow indefinitely.
