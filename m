@@ -1,26 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59438)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38607)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <arei.gonglei@huawei.com>) id 1eSHvS-0007Sw-6E
-	for qemu-devel@nongnu.org; Fri, 22 Dec 2017 02:39:27 -0500
+	(envelope-from <maxime.coquelin@redhat.com>) id 1eSIk2-0002Iy-De
+	for qemu-devel@nongnu.org; Fri, 22 Dec 2017 03:31:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <arei.gonglei@huawei.com>) id 1eSHvO-00020v-8c
-	for qemu-devel@nongnu.org; Fri, 22 Dec 2017 02:39:26 -0500
-Received: from szxga01-in.huawei.com ([45.249.212.187]:2362 helo=huawei.com)
+	(envelope-from <maxime.coquelin@redhat.com>) id 1eSIjy-0005jY-7G
+	for qemu-devel@nongnu.org; Fri, 22 Dec 2017 03:31:41 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:33698)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <arei.gonglei@huawei.com>)
-	id 1eSHvN-0001pa-RL
-	for qemu-devel@nongnu.org; Fri, 22 Dec 2017 02:39:22 -0500
-From: "Gonglei (Arei)" <arei.gonglei@huawei.com>
-Date: Fri, 22 Dec 2017 07:39:04 +0000
-Message-ID: <33183CC9F5247A488A2544077AF19020DA4F41A9@DGGEMA505-MBX.china.huawei.com>
-References: <1511859789-43680-1-git-send-email-arei.gonglei@huawei.com>
-	<20171221162459-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20171221162459-mutt-send-email-mst@kernel.org>
-Content-Language: zh-CN
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	(Exim 4.71) (envelope-from <maxime.coquelin@redhat.com>)
+	id 1eSIjy-0005iz-2B
+	for qemu-devel@nongnu.org; Fri, 22 Dec 2017 03:31:38 -0500
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id E7D915F7AC
+	for <qemu-devel@nongnu.org>; Fri, 22 Dec 2017 08:31:36 +0000 (UTC)
+References: <20171221212125.19075-1-maxime.coquelin@redhat.com>
+	<20171222004937-mutt-send-email-mst@kernel.org>
+From: Maxime Coquelin <maxime.coquelin@redhat.com>
+Message-ID: <1d5fc27d-5ff9-8637-dcc1-8fccca9038b0@redhat.com>
+Date: Fri, 22 Dec 2017 09:31:29 +0100
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH 0/4] cryptodev: add vhost support
+In-Reply-To: <20171222004937-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v3 0/5] vhost-user-test: Fixes & code
+ clean-up
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,61 +37,48 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "Huangweidong (C)" <weidong.huang@huawei.com>, "stefanha@redhat.com" <stefanha@redhat.com>, "Zhoujian (jay)" <jianjay.zhou@huawei.com>, "pasic@linux.vnet.ibm.com" <pasic@linux.vnet.ibm.com>, longpeng <longpeng2@huawei.com>, "xin.zeng@intel.com" <xin.zeng@intel.com>, "roy.fan.zhang@intel.com" <roy.fan.zhang@intel.com>
+Cc: qemu-devel@nongnu.org, stefanha@redhat.com, mlureau@redhat.com
 
 
-> -----Original Message-----
-> From: Michael S. Tsirkin [mailto:mst@redhat.com]
-> Sent: Thursday, December 21, 2017 10:25 PM
-> To: Gonglei (Arei)
-> Cc: qemu-devel@nongnu.org; pbonzini@redhat.com; Huangweidong (C);
-> stefanha@redhat.com; Zhoujian (jay); pasic@linux.vnet.ibm.com; longpeng;
-> xin.zeng@intel.com; roy.fan.zhang@intel.com
-> Subject: Re: [PATCH 0/4] cryptodev: add vhost support
->=20
-> On Tue, Nov 28, 2017 at 05:03:05PM +0800, Gonglei wrote:
-> > I posted the RFC verion five months ago for DPDK
-> > vhost-crypto implmention, and now it's time to send
-> > the formal version. Because we need an user space scheme
-> > for better performance.
-> >
-> > The vhost user crypto server side patches had been
-> > sent to DPDK community, pls see
-> >
-> > [RFC PATCH 0/6] lib/librte_vhost: introduce new	vhost_user crypto
-> backend support
-> > http://dpdk.org/ml/archives/dev/2017-November/081048.html
-> >
-> > You also can get virtio-crypto polling mode driver from:
-> >
-> > [PATCH] virtio: add new driver for crypto devices
-> > http://dpdk.org/ml/archives/dev/2017-November/081985.html
-> >
->=20
-> This makes build on mingw break:
->=20
->   CC      sparc64-softmmu/hw/scsi/virtio-scsi-dataplane.o
-> hw/virtio/virtio-crypto.o: In function `virtio_crypto_vhost_status':
-> /scm/qemu/hw/virtio/virtio-crypto.c:898: undefined reference to
-> `cryptodev_get_vhost'
-> /scm/qemu/hw/virtio/virtio-crypto.c:910: undefined reference to
-> `cryptodev_vhost_start'
-> /scm/qemu/hw/virtio/virtio-crypto.c:917: undefined reference to
-> `cryptodev_vhost_stop'
-> hw/virtio/virtio-crypto.o: In function `virtio_crypto_guest_notifier_pend=
-ing':
-> /scm/qemu/hw/virtio/virtio-crypto.c:947: undefined reference to
-> `cryptodev_vhost_virtqueue_pending'
-> hw/virtio/virtio-crypto.o: In function `virtio_crypto_guest_notifier_mask=
-':
-> /scm/qemu/hw/virtio/virtio-crypto.c:937: undefined reference to
-> `cryptodev_vhost_virtqueue_mask'
-> collect2: error: ld returned 1 exit status
-> make[1]: *** [Makefile:193: qemu-system-i386.exe] Error 1
-> make: *** [Makefile:383: subdir-i386-softmmu] Error 2
->=20
->=20
-Sorry about that. We'll build it on a cross-compiler environment.
 
-Thanks,
--Gonglei
+On 12/21/2017 11:49 PM, Michael S. Tsirkin wrote:
+> On Thu, Dec 21, 2017 at 10:21:20PM +0100, Maxime Coquelin wrote:
+>> Sorry, I missed to fixup the feature mask in patch 4,
+>> this is the only change in this v3.
+>>
+>> The two changes in v2 are fixing the features mask
+>> before the function rework, and reword of commit message
+>> of patch "vhost-user-test: extract read-guest-mem test
+>> from main loop" (Thanks Marc-Andr=C3=A9).
+>>
+>> This series fixes two issues in vhost-user-test:
+>> 1. Setup virtqueues in all tests
+>> 2. Fix features mask for all but test_multiqueue()
+>>
+>> The clean-ups comprises making read-guest-mem test consistent
+>> with other tests by initializing the device in the qtest thread.
+>> Also, some code factorization is done with regard to device
+>> initialization so that all tests share the same init.
+>=20
+> Looks like mingw tests fail with this.
+
+No, the build issue with mingw is due to a regression in master.
+
+Laurent posted a patch to fix it:
+[PATCH] hw/i386/vmport: fix missing definitions with x86_64-w64-mingw32
+Message-Id: <20171221211103.30311-1-laurent@vivier.eu>
+
+Maxime
+>> Maxime Coquelin (5):
+>>    vhost-user-test: fix features mask
+>>    vhost-user-test: extract read-guest-mem test from main loop
+>>    vhost-user-test: setup virtqueues in all tests
+>>    vhost-user-test: make features mask an init_virtio_dev() argument
+>>    vhost-user-test: use init_virtio_dev in multiqueue test
+>>
+>>   tests/vhost-user-test.c | 171 ++++++++++++++++++++++----------------=
+----------
+>>   1 file changed, 79 insertions(+), 92 deletions(-)
+>>
+>> --=20
+>> 2.14.3
