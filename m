@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38411)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38470)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1eSCtE-0007vY-NG
-	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 21:16:49 -0500
+	(envelope-from <jasowang@redhat.com>) id 1eSCtJ-000824-Oc
+	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 21:16:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1eSCtD-00015z-KD
-	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 21:16:48 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:43510)
+	(envelope-from <jasowang@redhat.com>) id 1eSCtH-000181-2k
+	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 21:16:53 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:43518)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1eSCtD-00015V-BA
-	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 21:16:47 -0500
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1eSCtG-00017Y-SF
+	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 21:16:50 -0500
 From: Jason Wang <jasowang@redhat.com>
-Date: Fri, 22 Dec 2017 10:15:35 +0800
-Message-Id: <1513908937-16034-17-git-send-email-jasowang@redhat.com>
+Date: Fri, 22 Dec 2017 10:15:36 +0800
+Message-Id: <1513908937-16034-18-git-send-email-jasowang@redhat.com>
 In-Reply-To: <1513908937-16034-1-git-send-email-jasowang@redhat.com>
 References: <1513908937-16034-1-git-send-email-jasowang@redhat.com>
-Subject: [Qemu-devel] [PULL 16/18] net: Remove the legacy "-net channel"
- parameter
+Subject: [Qemu-devel] [PULL 17/18] qemu-doc: The "-net nic" option can be
+ used with "netdev=...", too
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,108 +29,49 @@ Cc: Thomas Huth <thuth@redhat.com>, Jason Wang <jasowang@redhat.com>
 
 From: Thomas Huth <thuth@redhat.com>
 
-It has never been documented, so hardly anybody knows about this
-parameter, and it is marked as deprecated since QEMU v2.6.
-Time to let it go now.
+Looks like we missed to document that it is also possible to specify
+a netdev with "-net nic" - which is very useful if you want to
+configure your on-board NIC to use a backend that has been specified
+with "-netdev".
 
-Reviewed-by: Samuel Thibault <samuel.thibault@ens-lyon.org>
 Signed-off-by: Thomas Huth <thuth@redhat.com>
 Signed-off-by: Jason Wang <jasowang@redhat.com>
 ---
- include/net/slirp.h |  2 --
- net/net.c           |  7 -------
- net/slirp.c         | 34 ----------------------------------
- qemu-doc.texi       |  5 -----
- 4 files changed, 48 deletions(-)
+ qemu-options.hx | 14 ++++++++------
+ 1 file changed, 8 insertions(+), 6 deletions(-)
 
-diff --git a/include/net/slirp.h b/include/net/slirp.h
-index 64b795c..0c98e46 100644
---- a/include/net/slirp.h
-+++ b/include/net/slirp.h
-@@ -36,8 +36,6 @@ void hmp_hostfwd_remove(Monitor *mon, const QDict *qdict);
- 
- int net_slirp_redir(const char *redir_str);
- 
--int net_slirp_parse_legacy(QemuOptsList *opts_list, const char *optarg, int *ret);
--
- int net_slirp_smb(const char *exported_dir);
- 
- void hmp_info_usernet(Monitor *mon, const QDict *qdict);
-diff --git a/net/net.c b/net/net.c
-index 5bc0a34..2b81c93 100644
---- a/net/net.c
-+++ b/net/net.c
-@@ -1565,13 +1565,6 @@ int net_init_clients(void)
- 
- int net_client_parse(QemuOptsList *opts_list, const char *optarg)
- {
--#if defined(CONFIG_SLIRP)
--    int ret;
--    if (net_slirp_parse_legacy(opts_list, optarg, &ret)) {
--        return ret;
--    }
--#endif
--
-     if (!qemu_opts_parse_noisily(opts_list, optarg, true)) {
-         return -1;
-     }
-diff --git a/net/slirp.c b/net/slirp.c
-index 318a26e..cb8ca23 100644
---- a/net/slirp.c
-+++ b/net/slirp.c
-@@ -956,37 +956,3 @@ int net_init_slirp(const Netdev *netdev, const char *name,
- 
-     return ret;
- }
--
--int net_slirp_parse_legacy(QemuOptsList *opts_list, const char *optarg, int *ret)
--{
--    if (strcmp(opts_list->name, "net") != 0 ||
--        strncmp(optarg, "channel,", strlen("channel,")) != 0) {
--        return 0;
--    }
--
--    error_report("The '-net channel' option is deprecated. "
--                 "Please use '-netdev user,guestfwd=...' instead.");
--
--    /* handle legacy -net channel,port:chr */
--    optarg += strlen("channel,");
--
--    if (QTAILQ_EMPTY(&slirp_stacks)) {
--        struct slirp_config_str *config;
--
--        config = g_malloc(sizeof(*config));
--        pstrcpy(config->str, sizeof(config->str), optarg);
--        config->flags = SLIRP_CFG_LEGACY;
--        config->next = slirp_configs;
--        slirp_configs = config;
--        *ret = 0;
--    } else {
--        Error *err = NULL;
--        *ret = slirp_guestfwd(QTAILQ_FIRST(&slirp_stacks), optarg, 1, &err);
--        if (*ret < 0) {
--            error_report_err(err);
--        }
--    }
--
--    return 1;
--}
--
-diff --git a/qemu-doc.texi b/qemu-doc.texi
-index 90bea73..140659a 100644
---- a/qemu-doc.texi
-+++ b/qemu-doc.texi
-@@ -2670,11 +2670,6 @@ The ``-smb /some/dir'' argument is now a synonym for setting
- the ``-netdev user,smb=/some/dir'' argument instead. The new
- syntax allows different settings to be provided per NIC.
- 
--@subsection -net channel (since 2.6.0)
--
--The ``--net channel,ARGS'' argument is now a synonym for setting
--the ``-netdev user,guestfwd=ARGS'' argument instead.
--
- @subsection -net vlan (since 2.9.0)
- 
- The ``-net vlan=NN'' argument is partially replaced with the
+diff --git a/qemu-options.hx b/qemu-options.hx
+index 94647e2..9f4dd3a 100644
+--- a/qemu-options.hx
++++ b/qemu-options.hx
+@@ -2035,9 +2035,10 @@ DEF("netdev", HAS_ARG, QEMU_OPTION_netdev,
+     "-netdev hubport,id=str,hubid=n\n"
+     "                configure a hub port on QEMU VLAN 'n'\n", QEMU_ARCH_ALL)
+ DEF("net", HAS_ARG, QEMU_OPTION_net,
+-    "-net nic[,vlan=n][,macaddr=mac][,model=type][,name=str][,addr=str][,vectors=v]\n"
+-    "                old way to create a new NIC and connect it to VLAN 'n'\n"
+-    "                (use the '-device devtype,netdev=str' option if possible instead)\n"
++    "-net nic[,vlan=n][,netdev=nd][,macaddr=mac][,model=type][,name=str][,addr=str][,vectors=v]\n"
++    "                configure or create an on-board (or machine default) NIC and\n"
++    "                connect it either to VLAN 'n' or the netdev 'nd' (for pluggable\n"
++    "                NICs please use '-device devtype,netdev=nd' instead)\n"
+     "-net dump[,vlan=n][,file=f][,len=n]\n"
+     "                dump traffic on vlan 'n' to file 'f' (max n bytes per packet)\n"
+     "-net none       use it alone to have zero network devices. If no -net option\n"
+@@ -2058,10 +2059,11 @@ DEF("net", HAS_ARG, QEMU_OPTION_net,
+     "                old way to initialize a host network interface\n"
+     "                (use the -netdev option if possible instead)\n", QEMU_ARCH_ALL)
+ STEXI
+-@item -net nic[,vlan=@var{n}][,macaddr=@var{mac}][,model=@var{type}] [,name=@var{name}][,addr=@var{addr}][,vectors=@var{v}]
++@item -net nic[,vlan=@var{n}][,netdev=@var{nd}][,macaddr=@var{mac}][,model=@var{type}] [,name=@var{name}][,addr=@var{addr}][,vectors=@var{v}]
+ @findex -net
+-Create a new Network Interface Card and connect it to VLAN @var{n} (@var{n}
+-= 0 is the default). The NIC is an e1000 by default on the PC
++Configure or create an on-board (or machine default) Network Interface Card
++(NIC) and connect it either to VLAN @var{n} (@var{n} = 0 is the default), or
++to the netdev @var{nd}. The NIC is an e1000 by default on the PC
+ target. Optionally, the MAC address can be changed to @var{mac}, the
+ device address set to @var{addr} (PCI cards only),
+ and a @var{name} can be assigned for use in monitor commands.
 -- 
 2.7.4
