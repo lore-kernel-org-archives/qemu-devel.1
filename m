@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57325)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57322)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1eSP6l-0005o1-3g
+	(envelope-from <kwolf@redhat.com>) id 1eSP6k-0005ne-Nj
 	for qemu-devel@nongnu.org; Fri, 22 Dec 2017 10:19:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1eSP6g-0002Uk-1h
+	(envelope-from <kwolf@redhat.com>) id 1eSP6f-0002UI-MW
 	for qemu-devel@nongnu.org; Fri, 22 Dec 2017 10:19:30 -0500
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Fri, 22 Dec 2017 16:18:30 +0100
-Message-Id: <20171222151846.28110-20-kwolf@redhat.com>
+Date: Fri, 22 Dec 2017 16:18:27 +0100
+Message-Id: <20171222151846.28110-17-kwolf@redhat.com>
 In-Reply-To: <20171222151846.28110-1-kwolf@redhat.com>
 References: <20171222151846.28110-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL v3 19/35] block: Make bdrv_drain() driver
- callbacks non-recursive
+Subject: [Qemu-devel] [PULL v3 16/35] block: Mention -drive
+ cyls/heads/secs/trans/serial/addr in deprecation chapter
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,84 +23,44 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, peter.maydell@linaro.org, qemu-devel@nongnu.org
 
-bdrv_drained_begin() doesn't increase bs->quiesce_counter recursively
-and also doesn't notify other parent nodes of children, which both means
-that the child nodes are not actually drained, and bdrv_drained_begin()
-is providing useful functionality only on a single node.
+From: Thomas Huth <thuth@redhat.com>
 
-To keep things consistent, we also shouldn't call the block driver
-callbacks recursively.
+Looks like we forgot to announce the deprecation of these options in
+the corresponding chapter of the qemu-doc text, so let's do that now.
 
-A proper recursive drain version that provides an actually working
-drained section for child nodes will be introduced later.
-
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+Reviewed-by: John Snow <jsnow@redhat.com>
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-Reviewed-by: Fam Zheng <famz@redhat.com>
 ---
- block/io.c | 16 +++++++++-------
- 1 file changed, 9 insertions(+), 7 deletions(-)
+ qemu-doc.texi | 15 +++++++++++++++
+ 1 file changed, 15 insertions(+)
 
-diff --git a/block/io.c b/block/io.c
-index b94740b8ff..91a52e2d82 100644
---- a/block/io.c
-+++ b/block/io.c
-@@ -158,7 +158,7 @@ static void coroutine_fn bdrv_drain_invoke_entry(void *opaque)
- }
+diff --git a/qemu-doc.texi b/qemu-doc.texi
+index 96fda9c56e..2cc741e77e 100644
+--- a/qemu-doc.texi
++++ b/qemu-doc.texi
+@@ -2680,6 +2680,21 @@ longer be directly supported in QEMU.
+ The ``-drive if=scsi'' argument is replaced by the the
+ ``-device BUS-TYPE'' argument combined with ``-drive if=none''.
  
- /* Recursively call BlockDriver.bdrv_co_drain_begin/end callbacks */
--static void bdrv_drain_invoke(BlockDriverState *bs, bool begin)
-+static void bdrv_drain_invoke(BlockDriverState *bs, bool begin, bool recursive)
- {
-     BdrvChild *child, *tmp;
-     BdrvCoDrainData data = { .bs = bs, .done = false, .begin = begin};
-@@ -172,8 +172,10 @@ static void bdrv_drain_invoke(BlockDriverState *bs, bool begin)
-     bdrv_coroutine_enter(bs, data.co);
-     BDRV_POLL_WHILE(bs, !data.done);
++@subsection -drive cyls=...,heads=...,secs=...,trans=... (since 2.10.0)
++
++The drive geometry arguments are replaced by the the geometry arguments
++that can be specified with the ``-device'' parameter.
++
++@subsection -drive serial=... (since 2.10.0)
++
++The drive serial argument is replaced by the the serial argument
++that can be specified with the ``-device'' parameter.
++
++@subsection -drive addr=... (since 2.10.0)
++
++The drive addr argument is replaced by the the addr argument
++that can be specified with the ``-device'' parameter.
++
+ @subsection -net dump (since 2.10.0)
  
--    QLIST_FOREACH_SAFE(child, &bs->children, next, tmp) {
--        bdrv_drain_invoke(child->bs, begin);
-+    if (recursive) {
-+        QLIST_FOREACH_SAFE(child, &bs->children, next, tmp) {
-+            bdrv_drain_invoke(child->bs, begin, true);
-+        }
-     }
- }
- 
-@@ -265,7 +267,7 @@ void bdrv_drained_begin(BlockDriverState *bs)
-         bdrv_parent_drained_begin(bs);
-     }
- 
--    bdrv_drain_invoke(bs, true);
-+    bdrv_drain_invoke(bs, true, false);
-     bdrv_drain_recurse(bs);
- }
- 
-@@ -281,7 +283,7 @@ void bdrv_drained_end(BlockDriverState *bs)
-     }
- 
-     /* Re-enable things in child-to-parent order */
--    bdrv_drain_invoke(bs, false);
-+    bdrv_drain_invoke(bs, false, false);
-     bdrv_parent_drained_end(bs);
-     aio_enable_external(bdrv_get_aio_context(bs));
- }
-@@ -345,7 +347,7 @@ void bdrv_drain_all_begin(void)
-         aio_context_acquire(aio_context);
-         aio_disable_external(aio_context);
-         bdrv_parent_drained_begin(bs);
--        bdrv_drain_invoke(bs, true);
-+        bdrv_drain_invoke(bs, true, true);
-         aio_context_release(aio_context);
- 
-         if (!g_slist_find(aio_ctxs, aio_context)) {
-@@ -388,7 +390,7 @@ void bdrv_drain_all_end(void)
- 
-         /* Re-enable things in child-to-parent order */
-         aio_context_acquire(aio_context);
--        bdrv_drain_invoke(bs, false);
-+        bdrv_drain_invoke(bs, false, true);
-         bdrv_parent_drained_end(bs);
-         aio_enable_external(aio_context);
-         aio_context_release(aio_context);
+ The ``--net dump'' argument is now replaced with the
 -- 
 2.13.6
