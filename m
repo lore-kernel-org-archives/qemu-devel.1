@@ -1,22 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37153)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41926)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1eSPOU-00050b-C1
-	for qemu-devel@nongnu.org; Fri, 22 Dec 2017 10:37:55 -0500
+	(envelope-from <kwolf@redhat.com>) id 1eSPUX-0002Q4-Sy
+	for qemu-devel@nongnu.org; Fri, 22 Dec 2017 10:44:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1eSPOT-0002f1-9R
-	for qemu-devel@nongnu.org; Fri, 22 Dec 2017 10:37:54 -0500
-From: Markus Armbruster <armbru@redhat.com>
-References: <cover.1513790494.git.alistair.francis@xilinx.com>
-	<6bad4084f4cbc290e2e9f1a72fcfcda7223383ec.1513790495.git.alistair.francis@xilinx.com>
-Date: Fri, 22 Dec 2017 16:37:47 +0100
-In-Reply-To: <6bad4084f4cbc290e2e9f1a72fcfcda7223383ec.1513790495.git.alistair.francis@xilinx.com>
-	(Alistair Francis's message of "Wed, 20 Dec 2017 09:23:01 -0800")
-Message-ID: <87lghulqno.fsf@dusky.pond.sub.org>
+	(envelope-from <kwolf@redhat.com>) id 1eSPUM-0007dx-Ly
+	for qemu-devel@nongnu.org; Fri, 22 Dec 2017 10:44:09 -0500
+Date: Fri, 22 Dec 2017 16:43:18 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20171222154318.GK3763@localhost.localdomain>
+References: <20171212160450.17510-1-vsementsov@virtuozzo.com>
+	<20171212160450.17510-3-vsementsov@virtuozzo.com>
+	<20171222133911.GG3763@localhost.localdomain>
+	<25bbf12b-e6e8-29be-c28e-1bd10a9dd473@virtuozzo.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <25bbf12b-e6e8-29be-c28e-1bd10a9dd473@virtuozzo.com>
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v6 04/29] hw/arm: Replace fprintf(stderr,
- "*\n" with error_report()
+Subject: Re: [Qemu-devel] [PATCH v2 2/3] qcow2: handle reopening bitmaps on
+ bdrv_invalidate_cache
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,170 +27,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alistair Francis <alistair.francis@xilinx.com>
-Cc: qemu-devel@nongnu.org, qemu-trivial@nongnu.org, alistair23@gmail.com, qemu-arm@nongnu.org, Peter Maydell <peter.maydell@linaro.org>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, mreitz@redhat.com, crosa@redhat.com, ehabkost@redhat.com, den@openvz.org, jsnow@redhat.com
 
-Second thoughts...
+Am 22.12.2017 um 15:25 hat Vladimir Sementsov-Ogievskiy geschrieben:
+> 22.12.2017 16:39, Kevin Wolf wrote:
+> > Am 12.12.2017 um 17:04 hat Vladimir Sementsov-Ogievskiy geschrieben:
+> > > Consider migration with shared storage. Persistent bitmaps are stor=
+ed
+> > > on bdrv_inactivate. Then, on destination
+> > > process_incoming_migration_bh() calls bdrv_invalidate_cache_all() w=
+hich
+> > > leads to qcow2_load_autoloading_dirty_bitmaps() which fails if bitm=
+aps
+> > > are already loaded on destination start. In this case we should cal=
+l
+> > > qcow2_reopen_bitmaps_rw instead.
+> > >=20
+> > > Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.c=
+om>
+> > > Reviewed-by: John Snow <jsnow@redhat.com>
+> > qcow2_invalidate_cache() calls qcow2_close() first, so why are there
+> > still any bitmaps loaded? Isn't this a bug? Do we leak bitmaps when a
+> > qcow2 image is closed?
+> >=20
+> > Kevin
+>=20
+> Interesting point.
+>=20
+> Now persistent dirty bitmaps are released at the end of
+> bdrv_inactivate_recurse,
+> which is not called here. It was a separate patch
+>=20
+> commit 615b5dcf2decbc5f0abb512d13d7e5db2385fa23
+> Author: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> Date:=A0=A0 Wed Jun 28 15:05:30 2017 +0300
+>=20
+> =A0=A0=A0 block: release persistent bitmaps on inactivate
+>=20
+> May be it is more correct to release them immediately after storing, in
+> qcow2_inactivete.
 
-Alistair Francis <alistair.francis@xilinx.com> writes:
+I chose the question form because I'm really not deep enough into the
+bitmap code to have a solid opinion, but I have a feeling that releasing
+the bitmaps from the block driver that provided them would be cleaner
+indeed. I suppose the same is true for .bdrv_close.
 
-> Replace a large number of the fprintf(stderr, "*\n" calls with
-> error_report(). The functions were renamed with these commands and then
-> compiler issues where manually fixed.
->
-> find ./* -type f -exec sed -i \
->     'N;N;N;N;N;N;N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|erro=
-r_report("\1"\2);|Ig}' \
->     {} +
-> find ./* -type f -exec sed -i \
->     'N;N;N;N;N;N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_=
-report("\1"\2);|Ig}' \
->     {} +
-> find ./* -type f -exec sed -i \
->     'N;N;N;N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_repo=
-rt("\1"\2);|Ig}' \
->     {} +
-> find ./* -type f -exec sed -i \
->     'N;N;N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report=
-("\1"\2);|Ig}' \
->     {} +
-> find ./* -type f -exec sed -i \
->     'N;N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("=
-\1"\2);|Ig}' \
->     {} +
-> find ./* -type f -exec sed -i \
->     'N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1=
-"\2);|Ig}' \
->     {} +
-> find ./* -type f -exec sed -i \
->     'N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\=
-2);|Ig}' \
->     {} +
-> find ./* -type f -exec sed -i \
->     'N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2)=
-;|Ig}' \
->     {} +
-> find ./* -type f -exec sed -i \
->     'N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|=
-Ig}' \
->     {} +
-> find ./* -type f -exec sed -i \
->     'N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig=
-}' \
->     {} +
-> find ./* -type f -exec sed -i \
->     'N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}'=
- \
->     {} +
->
-> Some lines where then manually tweaked to pass checkpatch.
->
-> The 'qemu: ' prefix was manually removed from the hw/arm/boot.c file.
->
-> Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
-> Cc: qemu-arm@nongnu.org
-> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-> ---
-> V6:
->  - Fix indendation
-> V3:
->  - Remoave 'qemu: ' prefix
-> V2:
->  - Split hw patch into individual directories
->
->  hw/arm/armv7m.c      |  2 +-
->  hw/arm/boot.c        | 37 ++++++++++++++++++-------------------
->  hw/arm/gumstix.c     | 13 +++++++------
->  hw/arm/mainstone.c   |  7 ++++---
->  hw/arm/musicpal.c    |  2 +-
->  hw/arm/omap1.c       |  5 +++--
->  hw/arm/omap2.c       | 23 ++++++++++++-----------
->  hw/arm/omap_sx1.c    |  8 +++-----
->  hw/arm/palm.c        | 10 +++++-----
->  hw/arm/pxa2xx.c      |  7 ++++---
->  hw/arm/stellaris.c   |  3 ++-
->  hw/arm/tosa.c        | 18 +++++++++---------
->  hw/arm/versatilepb.c |  2 +-
->  hw/arm/vexpress.c    |  8 ++++----
->  hw/arm/z2.c          |  6 +++---
->  15 files changed, 77 insertions(+), 74 deletions(-)
->
-> diff --git a/hw/arm/armv7m.c b/hw/arm/armv7m.c
-> index bb2dfc942b..56770a7048 100644
-> --- a/hw/arm/armv7m.c
-> +++ b/hw/arm/armv7m.c
-> @@ -278,7 +278,7 @@ void armv7m_load_kernel(ARMCPU *cpu, const char *kern=
-el_filename, int mem_size)
->  #endif
->=20=20
->      if (!kernel_filename && !qtest_enabled()) {
-> -        fprintf(stderr, "Guest image must be specified (using -kernel)\n=
-");
-> +        error_report("Guest image must be specified (using -kernel)");
->          exit(1);
->      }
->=20=20
+> But it will not fix the issue, because qcow2_close will
+> call qcow2_inactivate only if (!(s->flags & BDRV_O_INACTIVE)), but it i=
+s
+> not the case.
 
-This is obviously a genuine (fatal) error.
+Yes, good point.
 
-> diff --git a/hw/arm/boot.c b/hw/arm/boot.c
-> index c2720c8046..6e6b8c0c6a 100644
-> --- a/hw/arm/boot.c
-> +++ b/hw/arm/boot.c
-> @@ -8,6 +8,7 @@
->   */
->=20=20
->  #include "qemu/osdep.h"
-> +#include "qemu/error-report.h"
->  #include "qapi/error.h"
->  #include <libfdt.h>
->  #include "hw/hw.h"
-> @@ -418,13 +419,13 @@ static int load_dtb(hwaddr addr, const struct arm_b=
-oot_info *binfo,
->          char *filename;
->          filename =3D qemu_find_file(QEMU_FILE_TYPE_BIOS, binfo->dtb_file=
-name);
->          if (!filename) {
-> -            fprintf(stderr, "Couldn't open dtb file %s\n", binfo->dtb_fi=
-lename);
-> +            error_report("Couldn't open dtb file %s", binfo->dtb_filenam=
-e);
->              goto fail;
->          }
+Is there a reason why bitmaps are already loaded in qcow2_do_open() even
+if the image is inactive? Can bitmaps be meaningfully used on inactive
+images?
 
-These is obviously a genuine (recoverable) error..
+Otherwise, we could just make qcow2_load_autoloading_dirty_bitmaps()
+conditional on cleared BDRV_O_INACTIVE.
 
-[More of the same...]
-> diff --git a/hw/arm/omap2.c b/hw/arm/omap2.c
-> index b53878b8b9..3a1d995d6a 100644
-> --- a/hw/arm/omap2.c
-> +++ b/hw/arm/omap2.c
-> @@ -19,6 +19,7 @@
->   */
->=20=20
->  #include "qemu/osdep.h"
-> +#include "qemu/error-report.h"
->  #include "qapi/error.h"
->  #include "qemu-common.h"
->  #include "cpu.h"
-> @@ -1311,8 +1312,8 @@ static void omap_prcm_apll_update(struct omap_prcm_=
-s *s)
->      /* TODO: update clocks */
->=20=20
->      if (mode[0] =3D=3D 1 || mode[0] =3D=3D 2 || mode[1] =3D=3D 1 || mode=
-[1] =3D=3D 2)
-> -        fprintf(stderr, "%s: bad EN_54M_PLL or bad EN_96M_PLL\n",
-> -                        __func__);
-> +        error_report("%s: bad EN_54M_PLL or bad EN_96M_PLL",
-> +                     __func__);
->  }
+> or we can do like this, it fixes the new test:
+> =A0 static void qcow2_close(BlockDriverState *bs)
+> {
+> =A0=A0=A0=A0=A0 BDRVQcow2State *s =3D bs->opaque;
+> qemu_vfree(s->l1_table);
+> =A0=A0=A0=A0=A0 /* else pre-write overlap checks in cache_destroy may c=
+rash */
+> =A0=A0=A0=A0=A0 s->l1_table =3D NULL;
+>=20
+> =A0=A0=A0=A0=A0 if (!(s->flags & BDRV_O_INACTIVE)) {
+> qcow2_inactivate(bs);
+> }
+> +=A0=A0=A0=A0 bdrv_release_persistent_dirty_bitmaps(bs);
+>=20
+> What do you think?
 
-This one's different: we neither exit() nor return a "failed" status to
-the caller.
+Hm, I think I don't like this much.
 
-We get here when the guest writes something funny to a certain
-memory-mapped I/O register.  In other words, it's guest misbehavior, not
-a user error.  I doubt it should be reported with error_report().
-Peter, do we have a canonical way to report or log  guest misbehavior?
+We just need to decide what the status of inactive images is supposed to
+be. If they should have bitmaps, then your patch is probably right. But
+if inactive images shouldn't have any, we need to change qcow2_do_open()
+and qcow2_inactivate().
 
-[...]
+Kevin
