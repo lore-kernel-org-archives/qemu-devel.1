@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57919)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58374)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1eSSNC-0004eK-Bj
-	for qemu-devel@nongnu.org; Fri, 22 Dec 2017 13:48:47 -0500
+	(envelope-from <imammedo@redhat.com>) id 1eSSNg-0004zI-Mb
+	for qemu-devel@nongnu.org; Fri, 22 Dec 2017 13:49:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1eSSNB-0007gc-Et
-	for qemu-devel@nongnu.org; Fri, 22 Dec 2017 13:48:46 -0500
-Received: from mail-wm0-x244.google.com ([2a00:1450:400c:c09::244]:43741)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1eSSNB-0007fv-7h
-	for qemu-devel@nongnu.org; Fri, 22 Dec 2017 13:48:45 -0500
-Received: by mail-wm0-x244.google.com with SMTP id n138so23388827wmg.2
-	for <qemu-devel@nongnu.org>; Fri, 22 Dec 2017 10:48:45 -0800 (PST)
+	(envelope-from <imammedo@redhat.com>) id 1eSSNd-00081n-JG
+	for qemu-devel@nongnu.org; Fri, 22 Dec 2017 13:49:16 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:50268)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1eSSNd-00080i-8t
+	for qemu-devel@nongnu.org; Fri, 22 Dec 2017 13:49:13 -0500
+Date: Fri, 22 Dec 2017 19:48:55 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20171222194855.6d1139f1@igors-macbook-pro.local>
+In-Reply-To: <1513327555-17520-3-git-send-email-jianjay.zhou@huawei.com>
+References: <1513327555-17520-1-git-send-email-jianjay.zhou@huawei.com>
+	<1513327555-17520-3-git-send-email-jianjay.zhou@huawei.com>
 MIME-Version: 1.0
-In-Reply-To: <20171023141815.17709-1-marcandre.lureau@redhat.com>
-References: <20171023141815.17709-1-marcandre.lureau@redhat.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Fri, 22 Dec 2017 19:48:43 +0100
-Message-ID: <CAJ+F1CJOkEJMizL3EAVVyW16L5ucW2gU+4U2BKHw7OFzfOpWag@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v6 0/9] Add memfd memory backend
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 2/2] vhost: double check used memslots
+ number
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,79 +28,118 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: QEMU <qemu-devel@nongnu.org>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
+To: Jay Zhou <jianjay.zhou@huawei.com>
+Cc: qemu-devel@nongnu.org, mst@redhat.com, weidong.huang@huawei.com, arei.gonglei@huawei.com, wangxinxin.wang@huawei.com, gary.liuzhe@huawei.com, dgilbert@redhat.com
 
-Hi
+On Fri, 15 Dec 2017 16:45:55 +0800
+Jay Zhou <jianjay.zhou@huawei.com> wrote:
 
-On Mon, Oct 23, 2017 at 4:18 PM, Marc-Andr=C3=A9 Lureau
-<marcandre.lureau@redhat.com> wrote:
-> Add a new Linux-specific memory backend, similar to hostmem-file,
-> except that it doesn't need file path. It also try to enforce memory
-> sealing if available. It is thus slightly easier and secure, and is
-> compatible with transparent huge-pages since Linux 4.8.
->
-> Since Linux 4.14, memfd supports explicit hugetlb, however without
-> sealing.
+> If the VM already has N(N>8) available memory slots for vhost user,
+> the VM will be crashed in vhost_user_set_mem_table if we try to
+> hotplug the first vhost user NIC.
+> This patch checks if memslots number exceeded or not after updating
+> vhost_user_used_memslots.
+Can't understand commit message, pls rephrase (what is being fixed, and how it's fixed)
+also include reproducing steps for crash and maybe describe call flow/backtrace
+that triggers crash.
 
-A little update here, 4.16 is likely to support sealing with hugetlb
-too (patches are in -mm tree). This should make memfd the prefered
-backend for sharing memory with a vhost-user backend.
+PS:
+I wasn't able to reproduce crash
 
-please review.
-thanks
-
->
-> v6:
-> - add hugetlbsize option
-> - run vhost-user read-guest-mem test with memfile & memfd backend
->
-> v5:
-> - add memfd hugetlb support
-> - add seal and hugeltb options to memfd memory backend
-> - update qemu-option to explain sharing works with vhost-user for now
-> - rebased, misc code changes
->
-> v4:
-> - rebased, now that preliminary patches are merged
->
-> v3:
-> - make vhost-user-test use memfd only if possible
-> - rebased
->
-> v1->v2:
-> - make it linux-specific
-> - minor changes and commit message tweaks
->
-> Marc-Andr=C3=A9 Lureau (9):
->   memfd: split qemu_memfd_alloc()
->   memfd: remove needless include
->   memfd: add error argument, instead of perror()
->   memfd: add hugetlb support
->   memfd: add hugetlbsize argument
->   Add memfd based hostmem
->   tests: keep compiling failing vhost-user tests
->   vhost-user-test: make read-guest-mem setup its own qemu
->   tests: use memfd in vhost-user-test
->
->  include/qemu/memfd.h     |   4 +-
->  backends/hostmem-memfd.c | 168 +++++++++++++++++++++++++++++++++++++++++=
-++++++
->  hw/virtio/vhost.c        |   8 ++-
->  tests/vhost-user-test.c  | 160 +++++++++++++++++++++++++++--------------=
----
->  util/memfd.c             | 115 ++++++++++++++++++++------------
->  backends/Makefile.objs   |   2 +
->  qemu-options.hx          |  23 +++++++
->  7 files changed, 378 insertions(+), 102 deletions(-)
->  create mode 100644 backends/hostmem-memfd.c
->
-> --
-> 2.15.0.rc0.40.gaefcc5f6f
->
->
+> 
+> Signed-off-by: Jay Zhou <jianjay.zhou@huawei.com>
+> ---
+>  hw/virtio/vhost.c | 27 +++++++++++++++++++++++----
+>  1 file changed, 23 insertions(+), 4 deletions(-)
+> 
+> diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
+> index 59a32e9..e45f5e2 100644
+> --- a/hw/virtio/vhost.c
+> +++ b/hw/virtio/vhost.c
+> @@ -1234,6 +1234,18 @@ static void vhost_virtqueue_cleanup(struct vhost_virtqueue *vq)
+>      event_notifier_cleanup(&vq->masked_notifier);
+>  }
+>  
+> +static bool vhost_dev_used_memslots_is_exceeded(struct vhost_dev *hdev)
+> +{
+> +    if (hdev->vhost_ops->vhost_get_used_memslots() >
+> +        hdev->vhost_ops->vhost_backend_memslots_limit(hdev)) {
+> +        error_report("vhost backend memory slots limit is less"
+> +                " than current number of present memory slots");
+> +        return true;
+> +    }
+> +
+> +    return false;
+> +}
+> +
+>  int vhost_dev_init(struct vhost_dev *hdev, void *opaque,
+>                     VhostBackendType backend_type, uint32_t busyloop_timeout)
+>  {
+> @@ -1252,10 +1264,7 @@ int vhost_dev_init(struct vhost_dev *hdev, void *opaque,
+>          goto fail;
+>      }
+>  
+> -    if (hdev->vhost_ops->vhost_get_used_memslots() >
+> -        hdev->vhost_ops->vhost_backend_memslots_limit(hdev)) {
+> -        error_report("vhost backend memory slots limit is less"
+> -                " than current number of present memory slots");
+> +    if (vhost_dev_used_memslots_is_exceeded(hdev)) {
+why do you keep this check?
+it seems always be false
 
 
 
---=20
-Marc-Andr=C3=A9 Lureau
+>          r = -1;
+>          goto fail;
+>      }
+> @@ -1341,6 +1350,16 @@ int vhost_dev_init(struct vhost_dev *hdev, void *opaque,
+>      hdev->memory_changed = false;
+>      memory_listener_register(&hdev->memory_listener, &address_space_memory);
+>      QLIST_INSERT_HEAD(&vhost_devices, hdev, entry);
+> +
+> +    if (vhost_dev_used_memslots_is_exceeded(hdev)) {
+> +        r = -1;
+> +        if (busyloop_timeout) {
+> +            goto fail_busyloop;
+> +        } else {
+> +            goto fail;
+> +        }
+> +    }
+seem to be right thing to do, since after registering listener for the first time
+used_memslots will be updated to actual value.
+
+
+I did some testing and without this hunk/patch
+
+on 'device_add  virtio-net-pci,netdev=net0' qemu prints:
+
+qemu-system-x86_64: vhost_set_mem_table failed: Argument list too long (7)
+qemu-system-x86_64: unable to start vhost net: 7: falling back on userspace virtio
+
+and network is operational in guest, but with this patch
+
+"netdev_add ...,vhost-on" prints:
+
+vhost backend memory slots limit is less than current number of present memory slots
+vhost-net requested but could not be initialized
+
+and following "device_add  virtio-net-pci,netdev=net0" prints:
+
+TUNSETOFFLOAD ioctl() failed: Bad file descriptor
+TUNSETOFFLOAD ioctl() failed: Bad file descriptor
+
+adapter is still hot-plugged but guest networking is broken (can't get IP address via DHCP)
+
+so patch seems introduces a regression or something broken elsewhere and this exposes issue,
+not sure what qemu reaction should be in this case
+ i.e. when netdev_add fails 
+    1: should we fail followed up device_add or 
+    2: make it fall back to userspace virtio
+
+I'd go for #2,
+Michael what's your take on it?
+
+> +
+>      return 0;
+>  
+>  fail_busyloop:
