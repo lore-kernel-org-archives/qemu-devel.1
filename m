@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37747)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37999)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1eSCsN-0007KX-BC
-	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 21:15:56 -0500
+	(envelope-from <jasowang@redhat.com>) id 1eSCsY-0007St-NI
+	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 21:16:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1eSCsL-0000EB-Rk
-	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 21:15:55 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:43290)
+	(envelope-from <jasowang@redhat.com>) id 1eSCsW-0000Nn-0B
+	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 21:16:06 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:58236)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1eSCsL-0000DR-IY
-	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 21:15:53 -0500
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1eSCsV-0000M7-Qd
+	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 21:16:03 -0500
 From: Jason Wang <jasowang@redhat.com>
-Date: Fri, 22 Dec 2017 10:15:22 +0800
-Message-Id: <1513908937-16034-4-git-send-email-jasowang@redhat.com>
+Date: Fri, 22 Dec 2017 10:15:24 +0800
+Message-Id: <1513908937-16034-6-git-send-email-jasowang@redhat.com>
 In-Reply-To: <1513908937-16034-1-git-send-email-jasowang@redhat.com>
 References: <1513908937-16034-1-git-send-email-jasowang@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 03/18] net: move CRC32 calculation from
- compute_mcast_idx() into its own net_crc32() function
+Subject: [Qemu-devel] [PULL 05/18] pcnet: switch pcnet over to use
+ net_crc32_le()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,106 +32,67 @@ Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Jason Wang <jasowang@redha
 
 From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 
-Separate out the standard ethernet CRC32 calculation into a new net_crc32=
-()
-function, renaming the constant POLYNOMIAL to POLYNOMIAL_BE to make it cl=
-ear
-that this is a big-endian CRC32 calculation.
-
-As part of the constant rename, remove the duplicate definition of POLYNO=
-MIAL
-from eepro100.c and use the new POLYNOMIAL_BE constant instead.
-
-Once this is complete remove the existing CRC32 implementation from
-compute_mcast_idx() and call the new net_crc32() function in its place.
+Instead of lnc_mchash() using its own implementation, we can simply call
+net_crc32_le() directly and apply the bit shift inline.
 
 Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Reviewed-by: Eric Blake <eblake@redhat.com>
 Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 Signed-off-by: Jason Wang <jasowang@redhat.com>
 ---
- hw/net/eepro100.c |  4 +---
- include/net/net.h |  3 ++-
- net/net.c         | 16 +++++++++++-----
- 3 files changed, 14 insertions(+), 9 deletions(-)
+ hw/net/pcnet.c | 22 ++--------------------
+ 1 file changed, 2 insertions(+), 20 deletions(-)
 
-diff --git a/hw/net/eepro100.c b/hw/net/eepro100.c
-index 1c0def5..71cddfe 100644
---- a/hw/net/eepro100.c
-+++ b/hw/net/eepro100.c
-@@ -323,8 +323,6 @@ static const uint16_t eepro100_mdi_mask[] =3D {
-     0xffff, 0xffff, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000,
- };
+diff --git a/hw/net/pcnet.c b/hw/net/pcnet.c
+index 6544553..39d5d93 100644
+--- a/hw/net/pcnet.c
++++ b/hw/net/pcnet.c
+@@ -38,6 +38,7 @@
+ #include "qemu/osdep.h"
+ #include "hw/qdev.h"
+ #include "net/net.h"
++#include "net/eth.h"
+ #include "qemu/timer.h"
+ #include "qemu/sockets.h"
+ #include "sysemu/sysemu.h"
+@@ -522,25 +523,6 @@ static inline void pcnet_rmd_store(PCNetState *s, st=
+ruct pcnet_RMD *rmd,
+            be16_to_cpu(hdr->ether_type));       \
+ } while (0)
 =20
--#define POLYNOMIAL 0x04c11db6
+-#define MULTICAST_FILTER_LEN 8
 -
- static E100PCIDeviceInfo *eepro100_get_class(EEPRO100State *s);
+-static inline uint32_t lnc_mchash(const uint8_t *ether_addr)
+-{
+-#define LNC_POLYNOMIAL          0xEDB88320UL
+-    uint32_t crc =3D 0xFFFFFFFF;
+-    int idx, bit;
+-    uint8_t data;
+-
+-    for (idx =3D 0; idx < 6; idx++) {
+-        for (data =3D *ether_addr++, bit =3D 0; bit < MULTICAST_FILTER_L=
+EN; bit++) {
+-            crc =3D (crc >> 1) ^ (((crc ^ data) & 1) ? LNC_POLYNOMIAL : =
+0);
+-            data >>=3D 1;
+-        }
+-    }
+-    return crc;
+-#undef LNC_POLYNOMIAL
+-}
+-
+ #define CRC(crc, ch)	 (crc =3D (crc >> 8) ^ crctab[(crc ^ (ch)) & 0xff])
 =20
- /* From FreeBSD (locally modified). */
-@@ -342,7 +340,7 @@ static unsigned e100_compute_mcast_idx(const uint8_t =
-*ep)
-             crc <<=3D 1;
-             b >>=3D 1;
-             if (carry) {
--                crc =3D ((crc ^ POLYNOMIAL) | carry);
-+                crc =3D ((crc ^ POLYNOMIAL_BE) | carry);
-             }
-         }
+ /* generated using the AUTODIN II polynomial
+@@ -656,7 +638,7 @@ static inline int ladr_match(PCNetState *s, const uin=
+t8_t *buf, int size)
+             s->csr[10] & 0xff, s->csr[10] >> 8,
+             s->csr[11] & 0xff, s->csr[11] >> 8
+         };
+-        int index =3D lnc_mchash(hdr->ether_dhost) >> 26;
++        int index =3D net_crc32_le(hdr->ether_dhost, ETH_ALEN) >> 26;
+         return !!(ladr[index >> 3] & (1 << (index & 7)));
      }
-diff --git a/include/net/net.h b/include/net/net.h
-index 1c55a93..586098c 100644
---- a/include/net/net.h
-+++ b/include/net/net.h
-@@ -227,7 +227,8 @@ NetClientState *net_hub_port_find(int hub_id);
-=20
- void qdev_set_nic_properties(DeviceState *dev, NICInfo *nd);
-=20
--#define POLYNOMIAL 0x04c11db6
-+#define POLYNOMIAL_BE 0x04c11db6
-+uint32_t net_crc32(const uint8_t *p, int len);
- unsigned compute_mcast_idx(const uint8_t *ep);
-=20
- #define vmstate_offset_macaddr(_state, _field)                       \
-diff --git a/net/net.c b/net/net.c
-index 39ef546..a14dc99 100644
---- a/net/net.c
-+++ b/net/net.c
-@@ -1581,25 +1581,31 @@ int net_client_parse(QemuOptsList *opts_list, con=
-st char *optarg)
-=20
- /* From FreeBSD */
- /* XXX: optimize */
--unsigned compute_mcast_idx(const uint8_t *ep)
-+uint32_t net_crc32(const uint8_t *p, int len)
- {
-     uint32_t crc;
-     int carry, i, j;
-     uint8_t b;
-=20
-     crc =3D 0xffffffff;
--    for (i =3D 0; i < 6; i++) {
--        b =3D *ep++;
-+    for (i =3D 0; i < len; i++) {
-+        b =3D *p++;
-         for (j =3D 0; j < 8; j++) {
-             carry =3D ((crc & 0x80000000L) ? 1 : 0) ^ (b & 0x01);
-             crc <<=3D 1;
-             b >>=3D 1;
-             if (carry) {
--                crc =3D ((crc ^ POLYNOMIAL) | carry);
-+                crc =3D ((crc ^ POLYNOMIAL_BE) | carry);
-             }
-         }
-     }
--    return crc >> 26;
-+
-+    return crc;
-+}
-+
-+unsigned compute_mcast_idx(const uint8_t *ep)
-+{
-+    return net_crc32(ep, ETH_ALEN) >> 26;
- }
-=20
- QemuOptsList qemu_netdev_opts =3D {
+     return 0;
 --=20
 2.7.4
