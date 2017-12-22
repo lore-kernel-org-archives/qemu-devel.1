@@ -1,30 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53497)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45262)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1eSLV8-0004WG-Dl
-	for qemu-devel@nongnu.org; Fri, 22 Dec 2017 06:28:31 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1eSMPb-0002iR-2e
+	for qemu-devel@nongnu.org; Fri, 22 Dec 2017 07:26:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1eSLV4-0006LG-FC
-	for qemu-devel@nongnu.org; Fri, 22 Dec 2017 06:28:30 -0500
-Received: from 10.mo177.mail-out.ovh.net ([46.105.73.133]:60453)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1eSLV4-0006Jl-7V
-	for qemu-devel@nongnu.org; Fri, 22 Dec 2017 06:28:26 -0500
-Received: from player779.ha.ovh.net (b9.ovh.net [213.186.33.59])
-	by mo177.mail-out.ovh.net (Postfix) with ESMTP id 9DA1592295
-	for <qemu-devel@nongnu.org>; Fri, 22 Dec 2017 12:28:23 +0100 (CET)
-References: <20171221165456.8609-1-clg@kaod.org>
-	<20171222003906.GA26042@umbus.fritz.box>
-	<edb67b7f-7592-d21c-901a-1d4671903d65@kaod.org>
-	<20171222100911.GC26042@umbus.fritz.box>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <0833b855-99e3-0a19-58ae-2c6dec4be374@kaod.org>
-Date: Fri, 22 Dec 2017 12:28:16 +0100
+	(envelope-from <peter.maydell@linaro.org>) id 1eSMPa-0002lZ-3e
+	for qemu-devel@nongnu.org; Fri, 22 Dec 2017 07:26:51 -0500
+Received: from mail-oi0-x22b.google.com ([2607:f8b0:4003:c06::22b]:38177)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1eSMPZ-0002ju-Va
+	for qemu-devel@nongnu.org; Fri, 22 Dec 2017 07:26:50 -0500
+Received: by mail-oi0-x22b.google.com with SMTP id s9so18837021oie.5
+	for <qemu-devel@nongnu.org>; Fri, 22 Dec 2017 04:26:49 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20171222100911.GC26042@umbus.fritz.box>
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] target/ppc: more use of the PPC_*() macros
+In-Reply-To: <20171221193640.27418-1-laurent@vivier.eu>
+References: <20171221193640.27418-1-laurent@vivier.eu>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 22 Dec 2017 12:26:28 +0000
+Message-ID: <CAFEAcA8HMHPfMaeWdOCb4A3bx2cXke00YC41-sAjYcinqPZvEA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL 0/5] M68k for 2.12 patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,33 +28,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+To: Laurent Vivier <laurent@vivier.eu>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-On 12/22/2017 11:09 AM, David Gibson wrote:
-> On Fri, Dec 22, 2017 at 08:01:41AM +0100, C=E9dric Le Goater wrote:
->> On 12/22/2017 01:39 AM, David Gibson wrote:
->>> On Thu, Dec 21, 2017 at 05:54:56PM +0100, C=E9dric Le Goater wrote:
->>>> Also introduce utilities to manipulate bitmasks (originaly from OPAL=
-)
->>>> which be will be used in the model of the XIVE interrupt controller.
->>>>
->>>> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
->>>
->>> Applied to ppc-for-2.12, thanks.  Unfortunately getting my tree pulle=
-d
->>> is held up because something is breaking on arm.
->>
->> yes. I saw. I gave it a try on ppc64,pp64el,x86-64 hosts and didn't=20
->> see anything wrong. I also have a raspberrypi3. Would that be a good=20
->> candidate ?
->=20
-> No idea.  I tried on a RasPi 1 and a couple of other arms I borrowed.
-> Haven't managed to reproduce.  I'm now suspecting it's something to do
-> with the distro/library versions on Peter Maydell's system rather than
-> anything particularly to do with ARM.
->=20
+On 21 December 2017 at 19:36, Laurent Vivier <laurent@vivier.eu> wrote:
+> The following changes since commit 23bafd75cd979ad3a21af10273c5a0c5d67d068b:
+>
+>   Merge remote-tracking branch 'remotes/bonzini/tags/for-upstream' into staging (2017-12-21 16:34:23 +0000)
+>
+> are available in the Git repository at:
+>
+>   git://github.com/vivier/qemu-m68k.git tags/m68k-for-2.12-pull-request
+>
+> for you to fetch changes up to 598a29f3606c4c7042a1ca3f1116663d0a60867c:
+>
+>   tests/boot-serial-test: Add support for the mcf5208evb board (2017-12-21 20:13:18 +0100)
+>
+> ----------------------------------------------------------------
+>
 
-I cannot reproduce either on a rpi3 running raspian 8.=20
+Applied, thanks.
 
-C.
+-- PMM
