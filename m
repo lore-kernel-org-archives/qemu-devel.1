@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57323)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57510)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1eSP6l-0005ny-2x
-	for qemu-devel@nongnu.org; Fri, 22 Dec 2017 10:19:38 -0500
+	(envelope-from <kwolf@redhat.com>) id 1eSP6s-00060D-57
+	for qemu-devel@nongnu.org; Fri, 22 Dec 2017 10:19:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1eSP6g-0002V3-5n
-	for qemu-devel@nongnu.org; Fri, 22 Dec 2017 10:19:30 -0500
+	(envelope-from <kwolf@redhat.com>) id 1eSP6r-0002e4-3x
+	for qemu-devel@nongnu.org; Fri, 22 Dec 2017 10:19:42 -0500
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Fri, 22 Dec 2017 16:18:29 +0100
-Message-Id: <20171222151846.28110-19-kwolf@redhat.com>
+Date: Fri, 22 Dec 2017 16:18:37 +0100
+Message-Id: <20171222151846.28110-27-kwolf@redhat.com>
 In-Reply-To: <20171222151846.28110-1-kwolf@redhat.com>
 References: <20171222151846.28110-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL v3 18/35] block: Assert drain_all is only called
- from main AioContext
+Subject: [Qemu-devel] [PULL v3 26/35] test-bdrv-drain: Test nested drain
+ sections
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,27 +24,91 @@ To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, peter.maydell@linaro.org, qemu-devel@nongnu.org
 
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-Reviewed-by: Fam Zheng <famz@redhat.com>
 ---
- block/io.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+ tests/test-bdrv-drain.c | 57 +++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 57 insertions(+)
 
-diff --git a/block/io.c b/block/io.c
-index cf780c3cb0..b94740b8ff 100644
---- a/block/io.c
-+++ b/block/io.c
-@@ -330,6 +330,12 @@ void bdrv_drain_all_begin(void)
-     BdrvNextIterator it;
-     GSList *aio_ctxs = NULL, *ctx;
+diff --git a/tests/test-bdrv-drain.c b/tests/test-bdrv-drain.c
+index 6da66ae841..9098b77ab4 100644
+--- a/tests/test-bdrv-drain.c
++++ b/tests/test-bdrv-drain.c
+@@ -85,6 +85,7 @@ static void aio_ret_cb(void *opaque, int ret)
+ enum drain_type {
+     BDRV_DRAIN_ALL,
+     BDRV_DRAIN,
++    DRAIN_TYPE_MAX,
+ };
  
-+    /* BDRV_POLL_WHILE() for a node can only be called from its own I/O thread
-+     * or the main loop AioContext. We potentially use BDRV_POLL_WHILE() on
-+     * nodes in several different AioContexts, so make sure we're in the main
-+     * context. */
-+    assert(qemu_get_current_aio_context() == qemu_get_aio_context());
+ static void do_drain_begin(enum drain_type drain_type, BlockDriverState *bs)
+@@ -221,6 +222,60 @@ static void test_quiesce_drain(void)
+     test_quiesce_common(BDRV_DRAIN, false);
+ }
+ 
++static void test_nested(void)
++{
++    BlockBackend *blk;
++    BlockDriverState *bs, *backing;
++    BDRVTestState *s, *backing_s;
++    enum drain_type outer, inner;
 +
-     block_job_pause_all();
++    blk = blk_new(BLK_PERM_ALL, BLK_PERM_ALL);
++    bs = bdrv_new_open_driver(&bdrv_test, "test-node", BDRV_O_RDWR,
++                              &error_abort);
++    s = bs->opaque;
++    blk_insert_bs(blk, bs, &error_abort);
++
++    backing = bdrv_new_open_driver(&bdrv_test, "backing", 0, &error_abort);
++    backing_s = backing->opaque;
++    bdrv_set_backing_hd(bs, backing, &error_abort);
++
++    for (outer = 0; outer < DRAIN_TYPE_MAX; outer++) {
++        for (inner = 0; inner < DRAIN_TYPE_MAX; inner++) {
++            /* XXX bdrv_drain_all() doesn't increase the quiesce_counter */
++            int bs_quiesce      = (outer != BDRV_DRAIN_ALL) +
++                                  (inner != BDRV_DRAIN_ALL);
++            int backing_quiesce = 0;
++            int backing_cb_cnt  = (outer != BDRV_DRAIN) +
++                                  (inner != BDRV_DRAIN);
++
++            g_assert_cmpint(bs->quiesce_counter, ==, 0);
++            g_assert_cmpint(backing->quiesce_counter, ==, 0);
++            g_assert_cmpint(s->drain_count, ==, 0);
++            g_assert_cmpint(backing_s->drain_count, ==, 0);
++
++            do_drain_begin(outer, bs);
++            do_drain_begin(inner, bs);
++
++            g_assert_cmpint(bs->quiesce_counter, ==, bs_quiesce);
++            g_assert_cmpint(backing->quiesce_counter, ==, backing_quiesce);
++            g_assert_cmpint(s->drain_count, ==, 2);
++            g_assert_cmpint(backing_s->drain_count, ==, backing_cb_cnt);
++
++            do_drain_end(inner, bs);
++            do_drain_end(outer, bs);
++
++            g_assert_cmpint(bs->quiesce_counter, ==, 0);
++            g_assert_cmpint(backing->quiesce_counter, ==, 0);
++            g_assert_cmpint(s->drain_count, ==, 0);
++            g_assert_cmpint(backing_s->drain_count, ==, 0);
++        }
++    }
++
++    bdrv_unref(backing);
++    bdrv_unref(bs);
++    blk_unref(blk);
++}
++
  
-     for (bs = bdrv_first(&it); bs; bs = bdrv_next(&it)) {
+ typedef struct TestBlockJob {
+     BlockJob common;
+@@ -349,6 +404,8 @@ int main(int argc, char **argv)
+     g_test_add_func("/bdrv-drain/quiesce/drain_all", test_quiesce_drain_all);
+     g_test_add_func("/bdrv-drain/quiesce/drain", test_quiesce_drain);
+ 
++    g_test_add_func("/bdrv-drain/nested", test_nested);
++
+     g_test_add_func("/bdrv-drain/blockjob/drain_all", test_blockjob_drain_all);
+     g_test_add_func("/bdrv-drain/blockjob/drain", test_blockjob_drain);
+ 
 -- 
 2.13.6
