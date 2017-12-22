@@ -1,24 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38129)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38179)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1eSCsj-0007Zv-7Y
-	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 21:16:18 -0500
+	(envelope-from <jasowang@redhat.com>) id 1eSCsl-0007bn-6v
+	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 21:16:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1eSCsg-0000Vb-D8
-	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 21:16:17 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:35704)
+	(envelope-from <jasowang@redhat.com>) id 1eSCsk-0000Yn-Gm
+	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 21:16:19 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:35998)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1eSCsg-0000VD-61
-	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 21:16:14 -0500
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1eSCsk-0000Y2-C9
+	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 21:16:18 -0500
 From: Jason Wang <jasowang@redhat.com>
-Date: Fri, 22 Dec 2017 10:15:27 +0800
-Message-Id: <1513908937-16034-9-git-send-email-jasowang@redhat.com>
+Date: Fri, 22 Dec 2017 10:15:28 +0800
+Message-Id: <1513908937-16034-10-git-send-email-jasowang@redhat.com>
 In-Reply-To: <1513908937-16034-1-git-send-email-jasowang@redhat.com>
 References: <1513908937-16034-1-git-send-email-jasowang@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 08/18] sungem: fix multicast filter CRC
- calculation
+Subject: [Qemu-devel] [PULL 09/18] eepro100: use inline net_crc32() and
+ bitshift instead of compute_mcast_idx()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,48 +29,27 @@ Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Jason Wang <jasowang@redha
 
 From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 
->From the Linux sungem driver, we know that the multicast filter CRC is
-implemented using ether_crc_le() which isn't the same as calling zlib's
-crc32() function (the zlib implementation requires a complemented initial=
- value
-and also returns the complemented result).
-
-Fix the multicast filter by simply using the new net_crc32_le() function.
+This makes it much easier to compare the multicast CRC calculation endian and
+bitshift against the Linux driver implementation.
 
 Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 Signed-off-by: Jason Wang <jasowang@redhat.com>
 ---
- hw/net/sungem.c | 5 ++---
- 1 file changed, 2 insertions(+), 3 deletions(-)
+ hw/net/eepro100.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/hw/net/sungem.c b/hw/net/sungem.c
-index 6aa8d11..60f1e47 100644
---- a/hw/net/sungem.c
-+++ b/hw/net/sungem.c
-@@ -11,12 +11,11 @@
- #include "hw/pci/pci.h"
- #include "qemu/log.h"
- #include "net/net.h"
-+#include "net/eth.h"
- #include "net/checksum.h"
- #include "hw/net/mii.h"
- #include "sysemu/sysemu.h"
- #include "trace.h"
--/* For crc32 */
--#include <zlib.h>
-=20
- #define TYPE_SUNGEM "sungem"
-=20
-@@ -595,7 +594,7 @@ static ssize_t sungem_receive(NetClientState *nc, con=
-st uint8_t *buf,
-     }
-=20
-     /* Get MAC crc */
--    mac_crc =3D crc32(~0, buf, 6);
-+    mac_crc =3D net_crc32_le(buf, ETH_ALEN);
-=20
-     /* Packet isn't for me ? */
-     rx_cond =3D sungem_check_rx_mac(s, buf, mac_crc);
---=20
+diff --git a/hw/net/eepro100.c b/hw/net/eepro100.c
+index e30fed8..a07a632 100644
+--- a/hw/net/eepro100.c
++++ b/hw/net/eepro100.c
+@@ -1679,7 +1679,7 @@ static ssize_t nic_receive(NetClientState *nc, const uint8_t * buf, size_t size)
+         rfd_status |= 0x0004;
+     } else if (s->configuration[20] & BIT(6)) {
+         /* Multiple IA bit set. */
+-        unsigned mcast_idx = compute_mcast_idx(buf);
++        unsigned mcast_idx = net_crc32(buf, ETH_ALEN) >> 26;
+         assert(mcast_idx < 64);
+         if (s->mult[mcast_idx >> 3] & (1 << (mcast_idx & 7))) {
+             TRACE(RXTX, logout("%p accepted, multiple IA bit set\n", s));
+-- 
 2.7.4
