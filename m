@@ -1,31 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38318)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54361)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1eSRV9-0000gQ-Le
-	for qemu-devel@nongnu.org; Fri, 22 Dec 2017 12:52:57 -0500
+	(envelope-from <alistair23@gmail.com>) id 1eSSKo-000329-KH
+	for qemu-devel@nongnu.org; Fri, 22 Dec 2017 13:46:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1eSRV8-0000vT-FZ
-	for qemu-devel@nongnu.org; Fri, 22 Dec 2017 12:52:55 -0500
-Received: from mail-wm0-x22c.google.com ([2a00:1450:400c:c09::22c]:34422)
+	(envelope-from <alistair23@gmail.com>) id 1eSSKk-0004vy-Sc
+	for qemu-devel@nongnu.org; Fri, 22 Dec 2017 13:46:18 -0500
+Received: from mail-wr0-x22a.google.com ([2a00:1450:400c:c0c::22a]:47067)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1eSRV8-0000uu-79
-	for qemu-devel@nongnu.org; Fri, 22 Dec 2017 12:52:54 -0500
-Received: by mail-wm0-x22c.google.com with SMTP id y82so25394130wmg.1
-	for <qemu-devel@nongnu.org>; Fri, 22 Dec 2017 09:52:54 -0800 (PST)
+	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
+	id 1eSSKk-0004tz-FL
+	for qemu-devel@nongnu.org; Fri, 22 Dec 2017 13:46:14 -0500
+Received: by mail-wr0-x22a.google.com with SMTP id g17so19425292wrd.13
+	for <qemu-devel@nongnu.org>; Fri, 22 Dec 2017 10:46:14 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <2d4ed601-262f-2fd7-fe50-7c517f7fe172@linux.vnet.ibm.com>
-References: <1510323112-2207-1-git-send-email-stefanb@linux.vnet.ibm.com>
-	<CAJ+F1CKbAETPvHXVEB36UZFeyDum71_oVQbWFcWwG9Q6h0+aWw@mail.gmail.com>
-	<27beee7c-e263-aa6d-69a2-a5eb0f82a5b5@linux.vnet.ibm.com>
-	<CAJ+F1CLVpNg8dezRA6wDTAC1dt0pzqEApAhHp+r0B1Rxdoj7yQ@mail.gmail.com>
-	<2d4ed601-262f-2fd7-fe50-7c517f7fe172@linux.vnet.ibm.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Fri, 22 Dec 2017 18:52:52 +0100
-Message-ID: <CAJ+F1CLuv-QQHLqZYPMJJHNhvobgrDF76j+a7smqux98tN4Tqg@mail.gmail.com>
+Sender: alistair23@gmail.com
+In-Reply-To: <20171220220608.GH24025@localhost.localdomain>
+References: <cover.1513729519.git.alistair.francis@xilinx.com>
+	<CAFEAcA-dvs-E83ZCEk6VAyyQkpghX9oF-d-D62vOKs7kfjPzaw@mail.gmail.com>
+	<CAKmqyKPHHQcQ3HYs4r7f4uUDfdMqSq=-mUJn6becXw8WXNAwNQ@mail.gmail.com>
+	<CAKmqyKMKL_BGSbaetubaPv8gkmF9XFFdDwkXAPsUZdV1qkOyqA@mail.gmail.com>
+	<20171220220608.GH24025@localhost.localdomain>
+From: Alistair Francis <alistair.francis@xilinx.com>
+Date: Fri, 22 Dec 2017 10:45:42 -0800
+Message-ID: <CAKmqyKO+UvsEuK3fuEP7jmK3i5hb=rzp8DWye6-P7-BZ2CVXuQ@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3 00/13] tpm: Extend TPM with state
- migration support (not 2.11)
+Subject: Re: [Qemu-devel] [PATCH v4 0/5] Add a valid_cpu_types property
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,149 +33,97 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Berger <stefanb@linux.vnet.ibm.com>
-Cc: Amarnath Valluri <amarnath.valluri@intel.com>, QEMU <qemu-devel@nongnu.org>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: Alistair Francis <alistair.francis@xilinx.com>, Marcel Apfelbaum <marcel@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Igor Mammedov <imammedo@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
 
-Hi
-
-On Fri, Dec 22, 2017 at 6:47 PM, Stefan Berger
-<stefanb@linux.vnet.ibm.com> wrote:
-> On 12/22/2017 11:13 AM, Marc-Andr=C3=A9 Lureau wrote:
->>
->> Hi
->>
->> On Fri, Dec 22, 2017 at 4:59 PM, Stefan Berger
->> <stefanb@linux.vnet.ibm.com> wrote:
->>>
->>> On 12/22/2017 07:49 AM, Marc-Andr=C3=A9 Lureau wrote:
->>>>
->>>> Hi
->>>>
->>>> On Fri, Nov 10, 2017 at 3:11 PM, Stefan Berger
->>>> <stefanb@linux.vnet.ibm.com> wrote:
->>>>>
->>>>> This set of patches implements support for migrating the state of the
->>>>> external 'swtpm' TPM emulator as well as that of the emulated device
->>>>> interfaces. I have primarily tested this with the TIS and TPM 1.2 so
->>>>> far, but it also seems to work with TPM 2.
->>>>>
->>>>> The TIS is simplified first by reducing the number of buffers and rea=
-d
->>>>> and write offsets into these buffers. Following the state machine of
->>>>> the
->>>>> TIS, a single buffer and r/w offset is enough for all localities sinc=
-e
->>>>> only one locality can ever be active.
->>>>>
->>>>> This series applies on top of my tpm-next branch.
->>>>>
->>>>> One of the challenges that is addressed by this set of patches is the
->>>>> fact
->>>>> that the TPM emulator may be processing a command while the state
->>>>> serialization of the devices is supposed to happen. A necessary first
->>>>> step
->>>>> has been implemented here that ensures that a response has been
->>>>> received
->>>>> from the exernal emulator and the bottom half function, which deliver=
-s
->>>>> the
->>>>> response and adjusts device registers (TIS or CRB), has been executed=
-,
->>>>> before the device's state is serialized.
->>>>>
->>>>> A subsequent extension may need to address the live migration loop an=
-d
->>>>> delay
->>>>> the serialization of devices until the response from the external TPM
->>>>> has
->>>>> been received. Though the likelihood that someone executes a
->>>>> long-lasting
->>>>> TPM command while this is occurring is certainly rare.
->>>>>
->>>>>      Stefan
->>>>>
->>>>> Stefan Berger (13):
->>>>>     tpm_tis: convert uint32_t to size_t
->>>>>     tpm_tis: limit size of buffer from backend
->>>>>     tpm_tis: remove TPMSizeBuffer usage
->>>>>     tpm_tis: move buffers from localities into common location
->>>>>     tpm_tis: merge read and write buffer into single buffer
->>>>>     tpm_tis: move r/w_offsets to TPMState
->>>>>     tpm_tis: merge r/w_offset into rw_offset
->>>>>     tpm: Implement tpm_sized_buffer_reset
->>>>
->>>> ok for the above (you could queue/pull-req this now)
->>>>
->>>>>     tpm: Introduce condition to notify waiters of completed command
->>>>>     tpm: Introduce condition in TPM backend for notification
->>>>>     tpm: implement tpm_backend_wait_cmd_completed
->>>>>     tpm: extend TPM emulator with state migration support
->>>>>     tpm_tis: extend TPM TIS with state migration support
->>>>
->>>> Much of the complexity from this migration series comes with the
->>>> handling & synchronization of the IO thread.
->>>>
->>>> I think having a seperate thread doesn't bring much today TPM thread.
->>>> it is a workaround for the chardev API being mostly synchronous. Am I
->>>> wrong? (yes, passthrough doesn't use chardev, but it should probably
->>>> use qio or chardev internally)
->>>>
->>>> Other kind of devices using a seperate process suffer the same
->>>> problem. Just grep for qemu_chr_fe_write and look for the preceding
->>>> comment, it's a common flaw in qemu code base. Code use the
->>>> synchronous API, and sometime use non-blocking write
->>>> (hw/usb/redirect.c seems quite better!)
->>>>
->>>> I would like to get rid of the seperate thread in TPM before we add
->>>> migration support. We should try to improve the chardev API to make it
->>>> easier to do non-blocking IO. This should considerably simplify the
->>>> above patches and benefit the rest of qemu (instead of having everyone
->>>> doing its own thing with seperate thread or other kind of continuation
->>>> state).
->>>>
->>>> What do you think?
->>>
->>>
->>> I am wondering whether it will help us to get rid of the
->>> conditions/notifications, like patches 9-11 of this series. I doubt 12
->>> and
->>> 13 will change. At some point device state is supposed to be written ou=
-t
->>> and
->>> in case of the TPM we have to wait for the response to have come back
->>> into
->>> the backend. We won't start listening on the file descriptor for an
->>> outstanding response, so I guess we will still wait for a notification =
-in
->>> that case as well. So I am not sure which parts are going to be
->>> simpler...
->>
->> Why would qemu need to wait for completion of emulator? Couldn't qemu
->> & emulator save the current state, including in-flights commands?
->> That's apparently what usbredir does.
+On Wed, Dec 20, 2017 at 2:06 PM, Eduardo Habkost <ehabkost@redhat.com> wrote:
+> On Tue, Dec 19, 2017 at 05:03:59PM -0800, Alistair Francis wrote:
+>> On Tue, Dec 19, 2017 at 4:55 PM, Alistair Francis
+>> <alistair.francis@xilinx.com> wrote:
+>> > On Tue, Dec 19, 2017 at 4:43 PM, Peter Maydell <peter.maydell@linaro.org> wrote:
+>> >> On 20 December 2017 at 00:27, Alistair Francis
+>> >> <alistair.francis@xilinx.com> wrote:
+>> >>> There are numorous QEMU machines that only have a single or a handful of
+>> >>> valid CPU options. To simplyfy the management of specificying which CPU
+>> >>> is/isn't valid let's create a property that can be set in the machine
+>> >>> init. We can then check to see if the user supplied CPU is in that list
+>> >>> or not.
+>> >>>
+>> >>> I have added the valid_cpu_types for some ARM machines only at the
+>> >>> moment.
+>> >>>
+>> >>> Here is what specifying the CPUs looks like now:
+>> >>>
+>> >>> $ aarch64-softmmu/qemu-system-aarch64 -M netduino2 -kernel ./u-boot.elf -nographic -cpu "cortex-m3" -S
+>> >>> QEMU 2.10.50 monitor - type 'help' for more information
+>> >>> (qemu) info cpus
+>> >>> * CPU #0: thread_id=24175
+>> >>> (qemu) q
+>> >>>
+>> >>> $ aarch64-softmmu/qemu-system-aarch64 -M netduino2 -kernel ./u-boot.elf -nographic -cpu "cortex-m4" -S
+>> >>> QEMU 2.10.50 monitor - type 'help' for more information
+>> >>> (qemu) q
+>> >>>
+>> >>> $ aarch64-softmmu/qemu-system-aarch64 -M netduino2 -kernel ./u-boot.elf -nographic -cpu "cortex-m5" -S
+>> >>> qemu-system-aarch64: unable to find CPU model 'cortex-m5'
+>> >>>
+>> >>> $ aarch64-softmmu/qemu-system-aarch64 -M netduino2 -kernel ./u-boot.elf -nographic -cpu "cortex-a9" -S
+>> >>> qemu-system-aarch64: Invalid CPU type: cortex-a9-arm-cpu
+>> >>> The valid types are: cortex-m3-arm-cpu, cortex-m4-arm-cpu
+>> >>
+>> >> Thanks for this; we really should be more strict about
+>> >> forbidding "won't work" combinations than we have
+>> >> been in the past.
+>> >>
+>> >> In the last of these cases, I think that when we
+>> >> list the invalid CPU type and the valid types
+>> >> we should use the same names we want the user to
+>> >> use on the command line, without the "-arm-cpu"
+>> >> suffixes.
+>> >
+>> > Hmm... That is a good point, it is confusing that they don't line up.
 >
+> Agreed.
 >
-> How could we make sure whether the PCRExtend has internally completed the
-> extensions of the PCR but we haven't received the response yet and would
-> just send the same command again? In general, the TPM cannot be sent the
-> same commands twice due to (sevaral) commands (cryptographically) alterin=
-g
-> the internal state of the TPM.
+>> >
+>> > The problem is that we are just doing a simple
+>> > object_class_dynamic_cast() in hw/core/machine.c which I think
+>> > (untested) requires us to have the full name in the valid cpu array.
+> [...]
+>>
+>> I think an earlier version of my previous series adding the support to
+>> machine.c did string comparison, but it was decided to utilise objects
+>> instead. One option is to make the array 2 wide and have the second
+>> string be user friendly?
 >
+> Making the array 2-column will duplicate information that we can
+> already find out using other methods, and it won't solve the
+> problem if an entry has a parent class with multiple subclasses
+> (the original reason I suggested object_class_dynamic_cast()).
+>
+> The main obstacle to fix this easily is that we do have a common
+>   ObjectClass *cpu_class_by_name(const char *cpu_model)
+> function, but not a common method to get the model name from a
+> CPUClass.  Implementing this is possible, but probably better to
+> do it after moving the existing arch-specific CPU model
+> enumeration hooks to common code (currently we duplicate lots of
+> CPU enumeration/lookup boilerplate code that we shouldn't have
+> to).
+>
+> Listing only the human-friendly names in the array like in the
+> original patch could be a reasonable temporary solution.  It
+> won't allow us to use a single entry for all subclasses of a
+> given type by now (e.g. listing only TYPE_X86_CPU on PC), but at
+> least we can address this issue without waiting for a refactor of
+> the CPU model enumeration code.
 
-Why would it send the same command again? If the commands is still
-in-flight on emulator side, ex:
+Ok, so it sounds like I'll respin this series with an extra column in
+the array for human readable names. Then in the future we can work on
+removing that.
 
-- send PCRExtend cmd
-- send SaveState cmd
-- receive SaveState reply
+Alistair
 
-Then the received state should be able to restore the emulator so that
-PCRExtend reply is received after migration.
-
-Wouldn't that work?
-
-
-
---=20
-Marc-Andr=C3=A9 Lureau
+>
+> --
+> Eduardo
+>
