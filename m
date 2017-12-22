@@ -1,31 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37058)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39756)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <programmingkidx@gmail.com>) id 1eSQtU-000679-NG
-	for qemu-devel@nongnu.org; Fri, 22 Dec 2017 12:14:01 -0500
+	(envelope-from <thuth@redhat.com>) id 1eSQx8-0007MQ-GY
+	for qemu-devel@nongnu.org; Fri, 22 Dec 2017 12:17:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <programmingkidx@gmail.com>) id 1eSQtQ-0001vq-P6
-	for qemu-devel@nongnu.org; Fri, 22 Dec 2017 12:14:00 -0500
-Received: from mail-it0-x22d.google.com ([2607:f8b0:4001:c0b::22d]:36475)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <programmingkidx@gmail.com>)
-	id 1eSQtQ-0001uY-Js
-	for qemu-devel@nongnu.org; Fri, 22 Dec 2017 12:13:56 -0500
-Received: by mail-it0-x22d.google.com with SMTP id d16so15340421itj.1
-	for <qemu-devel@nongnu.org>; Fri, 22 Dec 2017 09:13:56 -0800 (PST)
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
-From: Programmingkid <programmingkidx@gmail.com>
-In-Reply-To: <8eb78791-4951-e5ee-bcba-b13038c2bc39@redhat.com>
-Date: Fri, 22 Dec 2017 12:13:54 -0500
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <034292AA-D4E9-49EE-8622-E3C3860C2BBB@gmail.com>
-References: <mailman.13900.1513951820.27992.qemu-devel@nongnu.org>
-	<79998796-2975-46CC-9629-8ADCDC2032FF@gmail.com>
-	<6cb05b76-0dcc-0baa-3ca1-9e5deb5baafe@redhat.com>
-	<D67FF13F-57E4-47C9-BCD3-48CDC8E17D65@gmail.com>
-	<8eb78791-4951-e5ee-bcba-b13038c2bc39@redhat.com>
-Subject: Re: [Qemu-devel] [PULL v3 00/19] Initial support for
- Hypervisor.framework
+	(envelope-from <thuth@redhat.com>) id 1eSQx7-0007ei-HJ
+	for qemu-devel@nongnu.org; Fri, 22 Dec 2017 12:17:46 -0500
+References: <cover.1513790494.git.alistair.francis@xilinx.com>
+	<6bad4084f4cbc290e2e9f1a72fcfcda7223383ec.1513790495.git.alistair.francis@xilinx.com>
+	<87lghulqno.fsf@dusky.pond.sub.org>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <1cfb1217-e32d-8e91-da46-07f1c72be77f@redhat.com>
+Date: Fri, 22 Dec 2017 18:17:32 +0100
+MIME-Version: 1.0
+In-Reply-To: <87lghulqno.fsf@dusky.pond.sub.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v6 04/29] hw/arm: Replace fprintf(stderr,
+ "*\n" with error_report()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,45 +26,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>
+To: Markus Armbruster <armbru@redhat.com>, Alistair Francis <alistair.francis@xilinx.com>
+Cc: qemu-trivial@nongnu.org, alistair23@gmail.com, qemu-arm@nongnu.org, qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>
 
+On 22.12.2017 16:37, Markus Armbruster wrote:
+> Second thoughts...
+> 
+> Alistair Francis <alistair.francis@xilinx.com> writes:
+[...]
+>>  #include "qemu/osdep.h"
+>> +#include "qemu/error-report.h"
+>>  #include "qapi/error.h"
+>>  #include "qemu-common.h"
+>>  #include "cpu.h"
+>> @@ -1311,8 +1312,8 @@ static void omap_prcm_apll_update(struct omap_prcm_s *s)
+>>      /* TODO: update clocks */
+>>  
+>>      if (mode[0] == 1 || mode[0] == 2 || mode[1] == 1 || mode[1] == 2)
+>> -        fprintf(stderr, "%s: bad EN_54M_PLL or bad EN_96M_PLL\n",
+>> -                        __func__);
+>> +        error_report("%s: bad EN_54M_PLL or bad EN_96M_PLL",
+>> +                     __func__);
+>>  }
+> 
+> This one's different: we neither exit() nor return a "failed" status to
+> the caller.
+> 
+> We get here when the guest writes something funny to a certain
+> memory-mapped I/O register.  In other words, it's guest misbehavior, not
+> a user error.  I doubt it should be reported with error_report().
+> Peter, do we have a canonical way to report or log  guest misbehavior?
 
-> On Dec 22, 2017, at 11:52 AM, Paolo Bonzini <pbonzini@redhat.com> =
-wrote:
->=20
-> On 22/12/2017 17:51, Programmingkid wrote:
->> Thanks. When I tried using qemu-system-i386 with the -accel hvf =
-feature I saw this error: accel=3Dhvf: No accelerator found.
->>=20
->> I tried to build the qemu-system-x86_64 target but I also saw this =
-error:
->>=20
->> /Users/misbah/desktop/qemu/target/i386/hvf/x86_task.c:23:10: fatal =
-error:=20
->>      'x86_cpuid.h' file not found
->> #include "x86_cpuid.h"
->>         ^~~~~~~~~~~~~
->> 1 error generated.
->=20
-> Just remove the line, that's what Peter was complaining about. :)  =
-Also,
-> the top two commits in the branch are not included in the pull =
-request.
->=20
-> Paolo
+qemu_log_mask(LOG_GUEST_ERROR, ...) ?
 
-Excellent job! With this accelerator I was able to watch a youtube video =
-in my Windows XP guest. Without the accelerator youtube isn't even =
-usable.
-
-When I add "-smp 2", Windows XP does not boot. This error message is =
-displayed:
-
-Warning: host doesn't support requested feature: CPUID.80000001H:ECX.svm =
-[bit 2]
-
-In the BSOD, I see this error message: DRIVER_IRQL_NOT_LESS_OR_EQUAL.
-
-I tried experimenting with -cpu pentium3, -cpu pentium, -cpu qemu64, and =
--cpu core2duo, but none of them changed the error message.=
+ Thomas
