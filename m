@@ -1,16 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57812)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58533)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1eSP7B-0006MN-PP
-	for qemu-devel@nongnu.org; Fri, 22 Dec 2017 10:20:02 -0500
+	(envelope-from <armbru@redhat.com>) id 1eSP8K-0007Tb-9B
+	for qemu-devel@nongnu.org; Fri, 22 Dec 2017 10:21:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1eSP7A-0002xR-U6
-	for qemu-devel@nongnu.org; Fri, 22 Dec 2017 10:20:01 -0500
-From: Kevin Wolf <kwolf@redhat.com>
-Date: Fri, 22 Dec 2017 16:18:45 +0100
-Message-Id: <20171222151846.28110-35-kwolf@redhat.com>
-In-Reply-To: <20171222151846.28110-1-kwolf@redhat.com>
-References: <20171222151846.28110-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL v3 34/35] commit: Simplify reopen of base
+	(envelope-from <armbru@redhat.com>) id 1eSP8J-0003wz-Cf
+	for qemu-devel@nongnu.org; Fri, 22 Dec 2017 10:21:12 -0500
+From: Markus Armbruster <armbru@redhat.com>
+References: <cover.1513790494.git.alistair.francis@xilinx.com>
+	<6bad4084f4cbc290e2e9f1a72fcfcda7223383ec.1513790495.git.alistair.francis@xilinx.com>
+Date: Fri, 22 Dec 2017 16:21:04 +0100
+In-Reply-To: <6bad4084f4cbc290e2e9f1a72fcfcda7223383ec.1513790495.git.alistair.francis@xilinx.com>
+	(Alistair Francis's message of "Wed, 20 Dec 2017 09:23:01 -0800")
+Message-ID: <87y3lun5zz.fsf@dusky.pond.sub.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v6 04/29] hw/arm: Replace fprintf(stderr,
+ "*\n" with error_report()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -19,44 +25,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-block@nongnu.org
-Cc: kwolf@redhat.com, peter.maydell@linaro.org, qemu-devel@nongnu.org
+To: Alistair Francis <alistair.francis@xilinx.com>
+Cc: qemu-devel@nongnu.org, qemu-trivial@nongnu.org, alistair23@gmail.com, qemu-arm@nongnu.org
 
-Since commit bde70715, base is the only node that is reopened in
-commit_start(). This means that the code, which still involves an
-explicit BlockReopenQueue, can now be simplified by using bdrv_reopen().
+Alistair Francis <alistair.francis@xilinx.com> writes:
 
-Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-Reviewed-by: Fam Zheng <famz@redhat.com>
----
- block/commit.c | 8 +-------
- 1 file changed, 1 insertion(+), 7 deletions(-)
+> Replace a large number of the fprintf(stderr, "*\n" calls with
+> error_report(). The functions were renamed with these commands and then
+> compiler issues where manually fixed.
+>
+> find ./* -type f -exec sed -i \
+>     'N;N;N;N;N;N;N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|erro=
+r_report("\1"\2);|Ig}' \
+>     {} +
+> find ./* -type f -exec sed -i \
+>     'N;N;N;N;N;N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_=
+report("\1"\2);|Ig}' \
+>     {} +
+> find ./* -type f -exec sed -i \
+>     'N;N;N;N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_repo=
+rt("\1"\2);|Ig}' \
+>     {} +
+> find ./* -type f -exec sed -i \
+>     'N;N;N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report=
+("\1"\2);|Ig}' \
+>     {} +
+> find ./* -type f -exec sed -i \
+>     'N;N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("=
+\1"\2);|Ig}' \
+>     {} +
+> find ./* -type f -exec sed -i \
+>     'N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1=
+"\2);|Ig}' \
+>     {} +
+> find ./* -type f -exec sed -i \
+>     'N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\=
+2);|Ig}' \
+>     {} +
+> find ./* -type f -exec sed -i \
+>     'N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2)=
+;|Ig}' \
+>     {} +
+> find ./* -type f -exec sed -i \
+>     'N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|=
+Ig}' \
+>     {} +
+> find ./* -type f -exec sed -i \
+>     'N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig=
+}' \
+>     {} +
+> find ./* -type f -exec sed -i \
+>     'N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}'=
+ \
+>     {} +
+>
+> Some lines where then manually tweaked to pass checkpatch.
+>
+> The 'qemu: ' prefix was manually removed from the hw/arm/boot.c file.
 
-diff --git a/block/commit.c b/block/commit.c
-index c5327551ce..bb6c904704 100644
---- a/block/commit.c
-+++ b/block/commit.c
-@@ -277,7 +277,6 @@ void commit_start(const char *job_id, BlockDriverState *bs,
-                   const char *filter_node_name, Error **errp)
- {
-     CommitBlockJob *s;
--    BlockReopenQueue *reopen_queue = NULL;
-     int orig_base_flags;
-     BlockDriverState *iter;
-     BlockDriverState *commit_top_bs = NULL;
-@@ -299,12 +298,7 @@ void commit_start(const char *job_id, BlockDriverState *bs,
-     /* convert base to r/w, if necessary */
-     orig_base_flags = bdrv_get_flags(base);
-     if (!(orig_base_flags & BDRV_O_RDWR)) {
--        reopen_queue = bdrv_reopen_queue(reopen_queue, base, NULL,
--                                         orig_base_flags | BDRV_O_RDWR);
--    }
--
--    if (reopen_queue) {
--        bdrv_reopen_multiple(bdrv_get_aio_context(bs), reopen_queue, &local_err);
-+        bdrv_reopen(base, orig_base_flags | BDRV_O_RDWR, &local_err);
-         if (local_err != NULL) {
-             error_propagate(errp, local_err);
-             goto fail;
--- 
-2.13.6
+Elsewhere, too.  Suggest "The 'qemu: ' prefix was manually removed from
+several error messages."  Perhaps this could be done on commit.
+
+>
+> Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
+> Cc: qemu-arm@nongnu.org
+> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+
+With the commit message touched up:
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
