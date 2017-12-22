@@ -1,26 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55233)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59230)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1eSUez-0006Sb-K9
-	for qemu-devel@nongnu.org; Fri, 22 Dec 2017 16:15:19 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1eSUpY-0008UA-11
+	for qemu-devel@nongnu.org; Fri, 22 Dec 2017 16:26:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1eSUev-0008D1-G7
-	for qemu-devel@nongnu.org; Fri, 22 Dec 2017 16:15:17 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:59330)
+	(envelope-from <ehabkost@redhat.com>) id 1eSUpT-0006ki-Ve
+	for qemu-devel@nongnu.org; Fri, 22 Dec 2017 16:26:12 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:39976)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1eSUev-0008BH-4s
-	for qemu-devel@nongnu.org; Fri, 22 Dec 2017 16:15:13 -0500
-Date: Fri, 22 Dec 2017 23:15:09 +0200
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20171222231342-mutt-send-email-mst@kernel.org>
-References: <1513327555-17520-1-git-send-email-jianjay.zhou@huawei.com>
-	<1513327555-17520-3-git-send-email-jianjay.zhou@huawei.com>
-	<20171222194855.6d1139f1@igors-macbook-pro.local>
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1eSUpT-0006kD-MW
+	for qemu-devel@nongnu.org; Fri, 22 Dec 2017 16:26:07 -0500
+Date: Fri, 22 Dec 2017 19:26:00 -0200
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20171222212600.GU24025@localhost.localdomain>
+References: <cover.1513729519.git.alistair.francis@xilinx.com>
+	<CAFEAcA-dvs-E83ZCEk6VAyyQkpghX9oF-d-D62vOKs7kfjPzaw@mail.gmail.com>
+	<CAKmqyKPHHQcQ3HYs4r7f4uUDfdMqSq=-mUJn6becXw8WXNAwNQ@mail.gmail.com>
+	<CAKmqyKMKL_BGSbaetubaPv8gkmF9XFFdDwkXAPsUZdV1qkOyqA@mail.gmail.com>
+	<20171220220608.GH24025@localhost.localdomain>
+	<CAKmqyKO+UvsEuK3fuEP7jmK3i5hb=rzp8DWye6-P7-BZ2CVXuQ@mail.gmail.com>
+	<CAKmqyKP4ewwxLgQ0+fBbMzpSOA1rh23XaER-yoJQuBQOiXFPzg@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20171222194855.6d1139f1@igors-macbook-pro.local>
-Subject: Re: [Qemu-devel] [PATCH v2 2/2] vhost: double check used memslots
- number
+In-Reply-To: <CAKmqyKP4ewwxLgQ0+fBbMzpSOA1rh23XaER-yoJQuBQOiXFPzg@mail.gmail.com>
+Subject: Re: [Qemu-devel] [PATCH v4 0/5] Add a valid_cpu_types property
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,124 +32,103 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: Jay Zhou <jianjay.zhou@huawei.com>, qemu-devel@nongnu.org, weidong.huang@huawei.com, arei.gonglei@huawei.com, wangxinxin.wang@huawei.com, gary.liuzhe@huawei.com, dgilbert@redhat.com
+To: Alistair Francis <alistair.francis@xilinx.com>
+Cc: Marcel Apfelbaum <marcel@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Igor Mammedov <imammedo@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
 
-On Fri, Dec 22, 2017 at 07:48:55PM +0100, Igor Mammedov wrote:
-> On Fri, 15 Dec 2017 16:45:55 +0800
-> Jay Zhou <jianjay.zhou@huawei.com> wrote:
+On Fri, Dec 22, 2017 at 11:47:00AM -0800, Alistair Francis wrote:
+> On Fri, Dec 22, 2017 at 10:45 AM, Alistair Francis
+> <alistair.francis@xilinx.com> wrote:
+> > On Wed, Dec 20, 2017 at 2:06 PM, Eduardo Habkost <ehabkost@redhat.com> wrote:
+> >> On Tue, Dec 19, 2017 at 05:03:59PM -0800, Alistair Francis wrote:
+> >>> On Tue, Dec 19, 2017 at 4:55 PM, Alistair Francis
+> >>> <alistair.francis@xilinx.com> wrote:
+> >>> > On Tue, Dec 19, 2017 at 4:43 PM, Peter Maydell <peter.maydell@linaro.org> wrote:
+> >>> >> On 20 December 2017 at 00:27, Alistair Francis
+> >>> >> <alistair.francis@xilinx.com> wrote:
+> >>> >>> There are numorous QEMU machines that only have a single or a handful of
+> >>> >>> valid CPU options. To simplyfy the management of specificying which CPU
+> >>> >>> is/isn't valid let's create a property that can be set in the machine
+> >>> >>> init. We can then check to see if the user supplied CPU is in that list
+> >>> >>> or not.
+> >>> >>>
+> >>> >>> I have added the valid_cpu_types for some ARM machines only at the
+> >>> >>> moment.
+> >>> >>>
+> >>> >>> Here is what specifying the CPUs looks like now:
+> >>> >>>
+> >>> >>> $ aarch64-softmmu/qemu-system-aarch64 -M netduino2 -kernel ./u-boot.elf -nographic -cpu "cortex-m3" -S
+> >>> >>> QEMU 2.10.50 monitor - type 'help' for more information
+> >>> >>> (qemu) info cpus
+> >>> >>> * CPU #0: thread_id=24175
+> >>> >>> (qemu) q
+> >>> >>>
+> >>> >>> $ aarch64-softmmu/qemu-system-aarch64 -M netduino2 -kernel ./u-boot.elf -nographic -cpu "cortex-m4" -S
+> >>> >>> QEMU 2.10.50 monitor - type 'help' for more information
+> >>> >>> (qemu) q
+> >>> >>>
+> >>> >>> $ aarch64-softmmu/qemu-system-aarch64 -M netduino2 -kernel ./u-boot.elf -nographic -cpu "cortex-m5" -S
+> >>> >>> qemu-system-aarch64: unable to find CPU model 'cortex-m5'
+> >>> >>>
+> >>> >>> $ aarch64-softmmu/qemu-system-aarch64 -M netduino2 -kernel ./u-boot.elf -nographic -cpu "cortex-a9" -S
+> >>> >>> qemu-system-aarch64: Invalid CPU type: cortex-a9-arm-cpu
+> >>> >>> The valid types are: cortex-m3-arm-cpu, cortex-m4-arm-cpu
+> >>> >>
+> >>> >> Thanks for this; we really should be more strict about
+> >>> >> forbidding "won't work" combinations than we have
+> >>> >> been in the past.
+> >>> >>
+> >>> >> In the last of these cases, I think that when we
+> >>> >> list the invalid CPU type and the valid types
+> >>> >> we should use the same names we want the user to
+> >>> >> use on the command line, without the "-arm-cpu"
+> >>> >> suffixes.
+> >>> >
+> >>> > Hmm... That is a good point, it is confusing that they don't line up.
+> >>
+> >> Agreed.
+> >>
+> >>> >
+> >>> > The problem is that we are just doing a simple
+> >>> > object_class_dynamic_cast() in hw/core/machine.c which I think
+> >>> > (untested) requires us to have the full name in the valid cpu array.
+> >> [...]
+> >>>
+> >>> I think an earlier version of my previous series adding the support to
+> >>> machine.c did string comparison, but it was decided to utilise objects
+> >>> instead. One option is to make the array 2 wide and have the second
+> >>> string be user friendly?
+> >>
+> >> Making the array 2-column will duplicate information that we can
+> >> already find out using other methods, and it won't solve the
+> >> problem if an entry has a parent class with multiple subclasses
+> >> (the original reason I suggested object_class_dynamic_cast()).
+> >>
+> >> The main obstacle to fix this easily is that we do have a common
+> >>   ObjectClass *cpu_class_by_name(const char *cpu_model)
+> >> function, but not a common method to get the model name from a
+> >> CPUClass.  Implementing this is possible, but probably better to
+> >> do it after moving the existing arch-specific CPU model
+> >> enumeration hooks to common code (currently we duplicate lots of
+> >> CPU enumeration/lookup boilerplate code that we shouldn't have
+> >> to).
+> >>
+> >> Listing only the human-friendly names in the array like in the
+> >> original patch could be a reasonable temporary solution.  It
+> >> won't allow us to use a single entry for all subclasses of a
+> >> given type by now (e.g. listing only TYPE_X86_CPU on PC), but at
+> >> least we can address this issue without waiting for a refactor of
+> >> the CPU model enumeration code.
 > 
-> > If the VM already has N(N>8) available memory slots for vhost user,
-> > the VM will be crashed in vhost_user_set_mem_table if we try to
-> > hotplug the first vhost user NIC.
-> > This patch checks if memslots number exceeded or not after updating
-> > vhost_user_used_memslots.
-> Can't understand commit message, pls rephrase (what is being fixed, and how it's fixed)
-> also include reproducing steps for crash and maybe describe call flow/backtrace
-> that triggers crash.
-> 
-> PS:
-> I wasn't able to reproduce crash
-> 
-> > 
-> > Signed-off-by: Jay Zhou <jianjay.zhou@huawei.com>
-> > ---
-> >  hw/virtio/vhost.c | 27 +++++++++++++++++++++++----
-> >  1 file changed, 23 insertions(+), 4 deletions(-)
-> > 
-> > diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
-> > index 59a32e9..e45f5e2 100644
-> > --- a/hw/virtio/vhost.c
-> > +++ b/hw/virtio/vhost.c
-> > @@ -1234,6 +1234,18 @@ static void vhost_virtqueue_cleanup(struct vhost_virtqueue *vq)
-> >      event_notifier_cleanup(&vq->masked_notifier);
-> >  }
-> >  
-> > +static bool vhost_dev_used_memslots_is_exceeded(struct vhost_dev *hdev)
-> > +{
-> > +    if (hdev->vhost_ops->vhost_get_used_memslots() >
-> > +        hdev->vhost_ops->vhost_backend_memslots_limit(hdev)) {
-> > +        error_report("vhost backend memory slots limit is less"
-> > +                " than current number of present memory slots");
-> > +        return true;
-> > +    }
-> > +
-> > +    return false;
-> > +}
-> > +
-> >  int vhost_dev_init(struct vhost_dev *hdev, void *opaque,
-> >                     VhostBackendType backend_type, uint32_t busyloop_timeout)
-> >  {
-> > @@ -1252,10 +1264,7 @@ int vhost_dev_init(struct vhost_dev *hdev, void *opaque,
-> >          goto fail;
-> >      }
-> >  
-> > -    if (hdev->vhost_ops->vhost_get_used_memslots() >
-> > -        hdev->vhost_ops->vhost_backend_memslots_limit(hdev)) {
-> > -        error_report("vhost backend memory slots limit is less"
-> > -                " than current number of present memory slots");
-> > +    if (vhost_dev_used_memslots_is_exceeded(hdev)) {
-> why do you keep this check?
-> it seems always be false
-> 
-> 
-> 
-> >          r = -1;
-> >          goto fail;
-> >      }
-> > @@ -1341,6 +1350,16 @@ int vhost_dev_init(struct vhost_dev *hdev, void *opaque,
-> >      hdev->memory_changed = false;
-> >      memory_listener_register(&hdev->memory_listener, &address_space_memory);
-> >      QLIST_INSERT_HEAD(&vhost_devices, hdev, entry);
-> > +
-> > +    if (vhost_dev_used_memslots_is_exceeded(hdev)) {
-> > +        r = -1;
-> > +        if (busyloop_timeout) {
-> > +            goto fail_busyloop;
-> > +        } else {
-> > +            goto fail;
-> > +        }
-> > +    }
-> seem to be right thing to do, since after registering listener for the first time
-> used_memslots will be updated to actual value.
-> 
-> 
-> I did some testing and without this hunk/patch
-> 
-> on 'device_add  virtio-net-pci,netdev=net0' qemu prints:
-> 
-> qemu-system-x86_64: vhost_set_mem_table failed: Argument list too long (7)
-> qemu-system-x86_64: unable to start vhost net: 7: falling back on userspace virtio
-> 
-> and network is operational in guest, but with this patch
-> 
-> "netdev_add ...,vhost-on" prints:
-> 
-> vhost backend memory slots limit is less than current number of present memory slots
-> vhost-net requested but could not be initialized
-> 
-> and following "device_add  virtio-net-pci,netdev=net0" prints:
-> 
-> TUNSETOFFLOAD ioctl() failed: Bad file descriptor
-> TUNSETOFFLOAD ioctl() failed: Bad file descriptor
-> 
-> adapter is still hot-plugged but guest networking is broken (can't get IP address via DHCP)
-> 
-> so patch seems introduces a regression or something broken elsewhere and this exposes issue,
-> not sure what qemu reaction should be in this case
->  i.e. when netdev_add fails 
->     1: should we fail followed up device_add or 
->     2: make it fall back to userspace virtio
-> 
-> I'd go for #2,
-> Michael what's your take on it?
+> Ah, I just re-read this. Do you mean go back to the original RFC and
+> just use strcmp() to compare the human readable cpu_model?
 
-OK but there's a vhost force flag, if that is set we definitely should
-fail device_add.
+Yes, I think this would be simpler, considering that the current
+users don't need the object_class_dynamic_cast() stuff.
 
-Also, hotplug can follow device_add, should be handled similarly.
+Then whoever decide to make PC simply list TYPE_X86_CPU later
+(possibly me) will need to clean up the CPU model
+enumeration/lookup code and implement a
+cpu_model_from_type_name() helper.
 
-> > +
-> >      return 0;
-> >  
-> >  fail_busyloop:
+-- 
+Eduardo
