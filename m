@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58743)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60624)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1eSP8u-0007vB-AS
-	for qemu-devel@nongnu.org; Fri, 22 Dec 2017 10:21:54 -0500
+	(envelope-from <miika9764@gmail.com>) id 1eSPCy-00035a-T5
+	for qemu-devel@nongnu.org; Fri, 22 Dec 2017 10:26:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1eSP8r-0004hq-SN
-	for qemu-devel@nongnu.org; Fri, 22 Dec 2017 10:21:48 -0500
-From: Markus Armbruster <armbru@redhat.com>
-References: <cover.1513790494.git.alistair.francis@xilinx.com>
-	<75171003322239e9f9c16cc723c2d4cac569fde4.1513790495.git.alistair.francis@xilinx.com>
-Date: Fri, 22 Dec 2017 16:21:43 +0100
-In-Reply-To: <75171003322239e9f9c16cc723c2d4cac569fde4.1513790495.git.alistair.francis@xilinx.com>
-	(Alistair Francis's message of "Wed, 20 Dec 2017 09:23:04 -0800")
-Message-ID: <87tvwin5yw.fsf@dusky.pond.sub.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v6 05/29] hw/dma: Replace fprintf(stderr,
- "*\n" with error_report()
+	(envelope-from <miika9764@gmail.com>) id 1eSPCu-00014j-SG
+	for qemu-devel@nongnu.org; Fri, 22 Dec 2017 10:26:00 -0500
+Received: from mail-lf0-x241.google.com ([2a00:1450:4010:c07::241]:34075)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <miika9764@gmail.com>) id 1eSPCu-00013d-Kl
+	for qemu-devel@nongnu.org; Fri, 22 Dec 2017 10:25:56 -0500
+Received: by mail-lf0-x241.google.com with SMTP id y78so26251562lfd.1
+	for <qemu-devel@nongnu.org>; Fri, 22 Dec 2017 07:25:56 -0800 (PST)
+From: Miika S <miika9764@gmail.com>
+Date: Fri, 22 Dec 2017 17:25:28 +0200
+Message-Id: <20171222152531.1849-1-miika9764@gmail.com>
+Subject: [Qemu-devel] [PATCH 0/3] input: add keys and mouse buttons to
+ virtio input
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,63 +24,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alistair Francis <alistair.francis@xilinx.com>
-Cc: qemu-devel@nongnu.org, qemu-trivial@nongnu.org, alistair23@gmail.com
+To: qemu-devel@nongnu.org
+Cc: kraxel@redhat.com, berrange@redhat.com, Miika S <miika9764@gmail.com>
 
-Alistair Francis <alistair.francis@xilinx.com> writes:
+This patchset adds some missing keys and mouse buttons to
+hw/input/virtio-input-hid.c.
 
-> Replace a large number of the fprintf(stderr, "*\n" calls with
-> error_report(). The functions were renamed with these commands and then
-> compiler issues where manually fixed.
->
-> find ./* -type f -exec sed -i \
->     'N;N;N;N;N;N;N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|erro=
-r_report("\1"\2);|Ig}' \
->     {} +
-> find ./* -type f -exec sed -i \
->     'N;N;N;N;N;N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_=
-report("\1"\2);|Ig}' \
->     {} +
-> find ./* -type f -exec sed -i \
->     'N;N;N;N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_repo=
-rt("\1"\2);|Ig}' \
->     {} +
-> find ./* -type f -exec sed -i \
->     'N;N;N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report=
-("\1"\2);|Ig}' \
->     {} +
-> find ./* -type f -exec sed -i \
->     'N;N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("=
-\1"\2);|Ig}' \
->     {} +
-> find ./* -type f -exec sed -i \
->     'N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1=
-"\2);|Ig}' \
->     {} +
-> find ./* -type f -exec sed -i \
->     'N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\=
-2);|Ig}' \
->     {} +
-> find ./* -type f -exec sed -i \
->     'N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2)=
-;|Ig}' \
->     {} +
-> find ./* -type f -exec sed -i \
->     'N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|=
-Ig}' \
->     {} +
-> find ./* -type f -exec sed -i \
->     'N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig=
-}' \
->     {} +
-> find ./* -type f -exec sed -i \
->     'N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}'=
- \
->     {} +
->
-> Some lines where then manually tweaked to pass checkpatch.
->
-> Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
-> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+On a JIS keyboard such as this one (106/109 - JIS)
+https://upload.wikimedia.org/wikipedia/commons/b/b2/Physical_keyboard_layouts_comparison_ANSI_ISO_KS_ABNT_JIS.png
+the keys are located as follows:
+muhenkan: left of spacebar
+henkan: right of spacebar
+katakanahiragana: right of henkan
+compose: the same as menu but the existing one didn't work
+ro: left of right shift
+    (this produces the same key code as the key right of left shift on
+    102/105 ISO keyboard in the linked picture and consequently this
+    patch also adds support for those keyboards)
+yen: left of backspace
 
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
+The mouse buttons "side" and "extra" are the ones you use to go to the
+previous and next page in modern web browsers such as Firefox and
+Chrome.
+
+The last patch fixes mouse wheel event sent for both button up and down
+by only forwarding the event when the button state is down.
+
+
+Miika S (3):
+  input: add missing JIS keys to virtio input
+  input: add mouse side buttons to virtio input
+  input: virtio: don't send mouse wheel event twice
+
+ hw/input/virtio-input-hid.c | 15 +++++++++++++--
+ qapi/ui.json                |  5 ++++-
+ ui/keycodemapdb             |  2 +-
+ 3 files changed, 18 insertions(+), 4 deletions(-)
+
+-- 
+2.15.1
