@@ -1,21 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38494)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43636)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1eSCtM-00084c-7f
-	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 21:16:57 -0500
+	(envelope-from <bounces@canonical.com>) id 1eSD1n-0007Xr-Hz
+	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 21:25:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1eSCtL-0001AV-4B
-	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 21:16:56 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:43558)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1eSCtK-00019x-Tz
-	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 21:16:55 -0500
-From: Jason Wang <jasowang@redhat.com>
-Date: Fri, 22 Dec 2017 10:15:37 +0800
-Message-Id: <1513908937-16034-19-git-send-email-jasowang@redhat.com>
-In-Reply-To: <1513908937-16034-1-git-send-email-jasowang@redhat.com>
-References: <1513908937-16034-1-git-send-email-jasowang@redhat.com>
-Subject: [Qemu-devel] [PULL 18/18] qemu-doc: Update the deprecation
- information of -tftp, -bootp, -redir and -smb
+	(envelope-from <bounces@canonical.com>) id 1eSD1k-0005ka-S4
+	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 21:25:39 -0500
+Received: from indium.canonical.com ([91.189.90.7]:34852)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1eSD1k-0005k2-Ay
+	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 21:25:36 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1eSD1i-0000wV-I4
+	for <qemu-devel@nongnu.org>; Fri, 22 Dec 2017 02:25:34 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 717732E80C9
+	for <qemu-devel@nongnu.org>; Fri, 22 Dec 2017 02:25:34 +0000 (UTC)
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 22 Dec 2017 02:17:27 -0000
+From: John Snow <1738840@bugs.launchpad.net>
+Reply-To: Bug 1738840 <1738840@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <151361756384.17711.11632335707632949681.malonedeb@soybean.canonical.com>
+Message-Id: <151390904770.19497.9483710051107935106.malone@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1738840] Re: qemu-img convert qcow2 to raw fails
+ on OS X
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,74 +37,138 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: peter.maydell@linaro.org, qemu-devel@nongnu.org
-Cc: Thomas Huth <thuth@redhat.com>, Jason Wang <jasowang@redhat.com>
+To: qemu-devel@nongnu.org
 
-From: Thomas Huth <thuth@redhat.com>
+In the termbin:
 
-The information how to update the deprecated parameters was too scarce,
-so that some people did not update to the new syntax yet. Provide some
-more information to make sure that it is clear how to update from the
-old syntax to the new one.
+So the "good" one is on the left, and the "bad" one is on the right. The
+bad one is ... completely blank for the first 200+ MB? That's not great.
 
-Signed-off-by: Thomas Huth <thuth@redhat.com>
-Signed-off-by: Jason Wang <jasowang@redhat.com>
----
- qemu-doc.texi | 33 +++++++++++++++++++++------------
- 1 file changed, 21 insertions(+), 12 deletions(-)
+so:
+.bin.apfs: broken raw file, made on apfs, no arguments(?)
+.bin.apfs2: broken raw file, made on apfs, `-S 0` ?
+.img.org: qcow2 file (original/working?)
+.bin: working raw file, made on Ubuntu?
 
-diff --git a/qemu-doc.texi b/qemu-doc.texi
-index 140659a..ae90f71 100644
---- a/qemu-doc.texi
-+++ b/qemu-doc.texi
-@@ -2648,27 +2648,36 @@ combined with ``-vnc tls-creds=tls0'
- 
- @subsection -tftp (since 2.6.0)
- 
--The ``-tftp /some/dir'' argument is now a synonym for setting
--the ``-netdev user,tftp=/some/dir' argument. The new syntax
--allows different settings to be provided per NIC.
-+The ``-tftp /some/dir'' argument is replaced by
-+``-netdev user,id=x,tftp=/some/dir'', either accompanied with
-+``-device ...,netdev=x'' (for pluggable NICs) or ``-net nic,netdev=x''
-+(for embedded NICs). The new syntax allows different settings to be
-+provided per NIC.
- 
- @subsection -bootp (since 2.6.0)
- 
--The ``-bootp /some/file'' argument is now a synonym for setting
--the ``-netdev user,bootp=/some/file' argument. The new syntax
--allows different settings to be provided per NIC.
-+The ``-bootp /some/file'' argument is replaced by
-+``-netdev user,id=x,bootp=/some/file'', either accompanied with
-+``-device ...,netdev=x'' (for pluggable NICs) or ``-net nic,netdev=x''
-+(for embedded NICs). The new syntax allows different settings to be
-+provided per NIC.
- 
- @subsection -redir (since 2.6.0)
- 
--The ``-redir ARGS'' argument is now a synonym for setting
--the ``-netdev user,hostfwd=ARGS'' argument instead. The new
--syntax allows different settings to be provided per NIC.
-+The ``-redir [tcp|udp]:hostport:[guestaddr]:guestport'' argument is
-+replaced by ``-netdev
-+user,id=x,hostfwd=[tcp|udp]:[hostaddr]:hostport-[guestaddr]:guestport'',
-+either accompanied with ``-device ...,netdev=x'' (for pluggable NICs) or
-+``-net nic,netdev=x'' (for embedded NICs). The new syntax allows different
-+settings to be provided per NIC.
- 
- @subsection -smb (since 2.6.0)
- 
--The ``-smb /some/dir'' argument is now a synonym for setting
--the ``-netdev user,smb=/some/dir'' argument instead. The new
--syntax allows different settings to be provided per NIC.
-+The ``-smb /some/dir'' argument is replaced by
-+``-netdev user,id=x,smb=/some/dir'', either accompanied with
-+``-device ...,netdev=x'' (for pluggable NICs) or ``-net nic,netdev=x''
-+(for embedded NICs). The new syntax allows different settings to be
-+provided per NIC.
- 
- @subsection -net vlan (since 2.9.0)
- 
--- 
-2.7.4
+Do I have that right?
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1738840
+
+Title:
+  qemu-img convert qcow2 to raw fails on OS X
+
+Status in QEMU:
+  New
+
+Bug description:
+  I try to convert a image from qcow2 to raw and the result is a not bootab=
+le image.
+  I dont know if it is a bug in qemu-img convert or with the image it self.
+
+  See this error report for better readability:
+  https://github.com/coreos/bugs/issues/1121#issuecomment-351968518
+
+  As a reply here they use 2.9.0 version of
+
+  =
+
+  $ qemu-img -V
+  qemu-img version 2.11.0
+  Copyright (c) 2003-2017 Fabrice Bellard and the QEMU Project developers
+
+  $ uname -v
+  Darwin Kernel Version 17.2.0
+
+  $ mount ./
+  /dev/disk1s1 on / (apfs, local, journaled)
+
+  $  wget https://beta.release.core-
+  os.net/amd64-usr/current/coreos_production_openstack_image.img.bz2
+
+  $ date
+  Fri Dec 14 17:15:57 CET 2017
+
+  $ bunzip2 coreos_production_openstack_image.img.bz2
+
+  =
+
+  $ cp -a coreos_production_openstack_image.img.org coreos_production_opens=
+tack_image.img
+
+  $ shasum coreos_production_openstack_image.img.org
+  ae2119c6f0390dc36f247f7016923ea85de5d8e6  coreos_production_openstack_ima=
+ge.img.org
+
+  $ qemu-img convert -f qcow2 -O raw
+  coreos_production_openstack_image.img.org
+  coreos_production_openstack_image.bin
+
+  $ qemu-system-x86_64 -m 256 -nographic -hda coreos_production_openstack_i=
+mage.img -boot c
+  SeaBIOS (version rel-1.11.0-0-g63451fca13-prebuilt.qemu-project.org)
+
+  =
+
+  iPXE (http://ipxe.org) 00:03.0 C980 PCI2.10 PnP PMM+0FF915A0+0FEF15A0 C980
+                                                                           =
+      =
+
+
+  =
+
+  Booting from Hard Disk...
+  GRUB loading....
+  Welcome to GRUB!
+  ....
+
+  $ qemu-system-x86_64 -m 256 -nographic -hda
+  coreos_production_openstack_image.bin -boot c
+
+  SeaBIOS (version rel-1.11.0-0-g63451fca13-prebuilt.qemu-project.org)
+
+  =
+
+  iPXE (http://ipxe.org) 00:03.0 C980 PCI2.10 PnP PMM+0FF915A0+0FEF15A0 C980
+                                                                           =
+      =
+
+
+  =
+
+  Booting from Hard Disk...
+  Boot failed: not a bootable disk
+  ....
+
+  =
+
+  $ head -c 8192 coreos_production_openstack_image.bin | hexdump -C
+  00000000  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  |............=
+....|
+  *
+  00002000
+
+  $ qemu-img info coreos_production_openstack_image.bin
+  image: coreos_production_openstack_image.bin
+  file format: raw
+  virtual size: 8.5G (9116319744 bytes)
+  disk size: 217M
+
+  $ qemu-img info coreos_production_openstack_image.img
+  image: coreos_production_openstack_image.img
+  file format: qcow2
+  virtual size: 8.5G (9116319744 bytes)
+  disk size: 785M
+  cluster_size: 65536
+  Format specific information:
+      compat: 0.10
+      refcount bits: 16
+
+  The same version works on Ubuntu so it looks like its only the Mac
+  version or the new APFS filesystem.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1738840/+subscriptions
