@@ -1,22 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48822)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50982)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1eSJY5-0003pX-70
-	for qemu-devel@nongnu.org; Fri, 22 Dec 2017 04:23:26 -0500
+	(envelope-from <berrange@redhat.com>) id 1eSJbB-0005U4-Fb
+	for qemu-devel@nongnu.org; Fri, 22 Dec 2017 04:26:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1eSJY4-00072w-53
-	for qemu-devel@nongnu.org; Fri, 22 Dec 2017 04:23:25 -0500
-Date: Fri, 22 Dec 2017 09:23:08 +0000
+	(envelope-from <berrange@redhat.com>) id 1eSJbA-0000Ro-Gp
+	for qemu-devel@nongnu.org; Fri, 22 Dec 2017 04:26:37 -0500
+Date: Fri, 22 Dec 2017 09:26:25 +0000
 From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20171222092308.GF30605@redhat.com>
+Message-ID: <20171222092625.GG30605@redhat.com>
 Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <CACaajQsL3e+XWR0hBDLThmG_fd=ih-n+HJVz++XcnwLhhVstgg@mail.gmail.com>
-	<56c5bcbb-02c0-a3f7-4363-e3141476b2f8@redhat.com>
+References: <20171221224411.8901-1-jsnow@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <56c5bcbb-02c0-a3f7-4363-e3141476b2f8@redhat.com>
-Subject: Re: [Qemu-devel] qemu 2.9.0 qcow2 file failed to open after hard
- server reset
+In-Reply-To: <20171221224411.8901-1-jsnow@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] file-posix: refuse to open directories
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,33 +24,43 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: John Snow <jsnow@redhat.com>
-Cc: Vasiliy Tolstov <v.tolstov@selfip.ru>, qemu-devel <qemu-devel@nongnu.org>, Qemu-block <qemu-block@nongnu.org>
+Cc: qemu-block@nongnu.org, kwolf@redhat.com, mreitz@redhat.com, qemu-devel@nongnu.org, dgilbert@redhat.com
 
-On Thu, Dec 21, 2017 at 05:58:47PM -0500, John Snow wrote:
+On Thu, Dec 21, 2017 at 05:44:11PM -0500, John Snow wrote:
+> I don't think there's a legitimate reason to open directories as if
+> they were files. This prevents QEMU from opening and attempting to probe
+> a directory inode, which can break in exciting ways. One of those ways
+> is lseek on ext4/xfs, which will return 0x7fffffffffffffff as the file
+> size instead of EISDIR. This can coax QEMU into responding with a
+> confusing "file too big" instead of "Hey, that's not a file".
 > 
+> See: https://bugs.launchpad.net/qemu/+bug/1739304/
+> Signed-off-by: John Snow <jsnow@redhat.com>
+> ---
+>  block/file-posix.c | 5 +++++
+>  1 file changed, 5 insertions(+)
 > 
-> On 12/21/2017 05:13 PM, Vasiliy Tolstov wrote:
-> > Hi! Today my server have forced reboot and one of my vm can't start
-> > with message:
-> > qcow2: Marking image as corrupt: L2 table offset 0x3f786d6c207600
-> > unaligned (L1 index: 0); further corruption events will be suppressed
-> > 
-> > i'm use debian jessie with hand builded qemu 2.9.0, i'm try to
-> > qemu-img check but it not helps. How can i recover data inside qcow2
-> > file? (i'm not use compression or encryption inside it).
-> > 
-> 
-> Not looking good if you're missing the very first L2 table in its entirety.
-> 
-> You might be able to go through this thing by hand and learn for
-> yourself where the L2 table is (it will be a 64KiB region, aligned to a
-> 64KiB boundary, that all contain 64bit, 64KiB aligned pointers that will
-> be less than the size of the file. the offset of this missing region is
-> not likely to be referenced elsewhere in your file.)
+> diff --git a/block/file-posix.c b/block/file-posix.c
+> index 36ee89e940..bd29bdada6 100644
+> --- a/block/file-posix.c
+> +++ b/block/file-posix.c
+> @@ -589,6 +589,11 @@ static int raw_open_common(BlockDriverState *bs, QDict *options,
+>          s->needs_alignment = true;
+>      }
+>  #endif
+> +    if (S_ISDIR(st.st_mode)) {
+> +        ret = -EISDIR;
+> +        error_setg_errno(errp, errno, "Cannot open directory as file");
+> +        goto fail;
+> +    }
 
-Fun. That rather makes you wish that every single distinct type of table
-in QCow2 files had a unique UUID value stored in it, to make forensics
-like this easier :-)
+Should we also do the same for S_ISCHR & S_ISFIFO, because neither of
+them allow seeking, which IIUC would prevent usage in the file driver
+for random I/O.  It would be fine todo that in a followup patch though,
+so from this patch pov
+
+Reviewed-by: Daniel P. Berrange <berrange@redhat.com>
+
 
 Regards,
 Daniel
