@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38376)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38411)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1eSCtB-0007uY-6g
-	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 21:16:47 -0500
+	(envelope-from <jasowang@redhat.com>) id 1eSCtE-0007vY-NG
+	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 21:16:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1eSCtA-00013l-9s
-	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 21:16:45 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:39448)
+	(envelope-from <jasowang@redhat.com>) id 1eSCtD-00015z-KD
+	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 21:16:48 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:43510)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1eSCtA-00013D-3d
-	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 21:16:44 -0500
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1eSCtD-00015V-BA
+	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 21:16:47 -0500
 From: Jason Wang <jasowang@redhat.com>
-Date: Fri, 22 Dec 2017 10:15:34 +0800
-Message-Id: <1513908937-16034-16-git-send-email-jasowang@redhat.com>
+Date: Fri, 22 Dec 2017 10:15:35 +0800
+Message-Id: <1513908937-16034-17-git-send-email-jasowang@redhat.com>
 In-Reply-To: <1513908937-16034-1-git-send-email-jasowang@redhat.com>
 References: <1513908937-16034-1-git-send-email-jasowang@redhat.com>
-Subject: [Qemu-devel] [PULL 15/18] net: remove unused compute_mcast_idx()
- function
+Subject: [Qemu-devel] [PULL 16/18] net: Remove the legacy "-net channel"
+ parameter
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,34 +25,112 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org, qemu-devel@nongnu.org
-Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Jason Wang <jasowang@redhat.com>
+Cc: Thomas Huth <thuth@redhat.com>, Jason Wang <jasowang@redhat.com>
 
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+From: Thomas Huth <thuth@redhat.com>
 
-Now that all of the callers have been converted to compute the multicast index
-inline using new net CRC functions, this function can now be dropped.
+It has never been documented, so hardly anybody knows about this
+parameter, and it is marked as deprecated since QEMU v2.6.
+Time to let it go now.
 
-Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Reviewed-by: Samuel Thibault <samuel.thibault@ens-lyon.org>
+Signed-off-by: Thomas Huth <thuth@redhat.com>
 Signed-off-by: Jason Wang <jasowang@redhat.com>
 ---
- net/net.c | 5 -----
- 1 file changed, 5 deletions(-)
+ include/net/slirp.h |  2 --
+ net/net.c           |  7 -------
+ net/slirp.c         | 34 ----------------------------------
+ qemu-doc.texi       |  5 -----
+ 4 files changed, 48 deletions(-)
 
+diff --git a/include/net/slirp.h b/include/net/slirp.h
+index 64b795c..0c98e46 100644
+--- a/include/net/slirp.h
++++ b/include/net/slirp.h
+@@ -36,8 +36,6 @@ void hmp_hostfwd_remove(Monitor *mon, const QDict *qdict);
+ 
+ int net_slirp_redir(const char *redir_str);
+ 
+-int net_slirp_parse_legacy(QemuOptsList *opts_list, const char *optarg, int *ret);
+-
+ int net_slirp_smb(const char *exported_dir);
+ 
+ void hmp_info_usernet(Monitor *mon, const QDict *qdict);
 diff --git a/net/net.c b/net/net.c
-index 4ecaf80..5bc0a34 100644
+index 5bc0a34..2b81c93 100644
 --- a/net/net.c
 +++ b/net/net.c
-@@ -1625,11 +1625,6 @@ uint32_t net_crc32_le(const uint8_t *p, int len)
-     return crc;
- }
+@@ -1565,13 +1565,6 @@ int net_init_clients(void)
  
--unsigned compute_mcast_idx(const uint8_t *ep)
+ int net_client_parse(QemuOptsList *opts_list, const char *optarg)
+ {
+-#if defined(CONFIG_SLIRP)
+-    int ret;
+-    if (net_slirp_parse_legacy(opts_list, optarg, &ret)) {
+-        return ret;
+-    }
+-#endif
+-
+     if (!qemu_opts_parse_noisily(opts_list, optarg, true)) {
+         return -1;
+     }
+diff --git a/net/slirp.c b/net/slirp.c
+index 318a26e..cb8ca23 100644
+--- a/net/slirp.c
++++ b/net/slirp.c
+@@ -956,37 +956,3 @@ int net_init_slirp(const Netdev *netdev, const char *name,
+ 
+     return ret;
+ }
+-
+-int net_slirp_parse_legacy(QemuOptsList *opts_list, const char *optarg, int *ret)
 -{
--    return net_crc32(ep, ETH_ALEN) >> 26;
+-    if (strcmp(opts_list->name, "net") != 0 ||
+-        strncmp(optarg, "channel,", strlen("channel,")) != 0) {
+-        return 0;
+-    }
+-
+-    error_report("The '-net channel' option is deprecated. "
+-                 "Please use '-netdev user,guestfwd=...' instead.");
+-
+-    /* handle legacy -net channel,port:chr */
+-    optarg += strlen("channel,");
+-
+-    if (QTAILQ_EMPTY(&slirp_stacks)) {
+-        struct slirp_config_str *config;
+-
+-        config = g_malloc(sizeof(*config));
+-        pstrcpy(config->str, sizeof(config->str), optarg);
+-        config->flags = SLIRP_CFG_LEGACY;
+-        config->next = slirp_configs;
+-        slirp_configs = config;
+-        *ret = 0;
+-    } else {
+-        Error *err = NULL;
+-        *ret = slirp_guestfwd(QTAILQ_FIRST(&slirp_stacks), optarg, 1, &err);
+-        if (*ret < 0) {
+-            error_report_err(err);
+-        }
+-    }
+-
+-    return 1;
 -}
 -
- QemuOptsList qemu_netdev_opts = {
-     .name = "netdev",
-     .implied_opt_name = "type",
+diff --git a/qemu-doc.texi b/qemu-doc.texi
+index 90bea73..140659a 100644
+--- a/qemu-doc.texi
++++ b/qemu-doc.texi
+@@ -2670,11 +2670,6 @@ The ``-smb /some/dir'' argument is now a synonym for setting
+ the ``-netdev user,smb=/some/dir'' argument instead. The new
+ syntax allows different settings to be provided per NIC.
+ 
+-@subsection -net channel (since 2.6.0)
+-
+-The ``--net channel,ARGS'' argument is now a synonym for setting
+-the ``-netdev user,guestfwd=ARGS'' argument instead.
+-
+ @subsection -net vlan (since 2.9.0)
+ 
+ The ``-net vlan=NN'' argument is partially replaced with the
 -- 
 2.7.4
