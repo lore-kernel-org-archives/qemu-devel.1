@@ -1,32 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56470)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48822)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1eSJ7E-0003Yj-2w
-	for qemu-devel@nongnu.org; Fri, 22 Dec 2017 03:55:41 -0500
+	(envelope-from <berrange@redhat.com>) id 1eSJY5-0003pX-70
+	for qemu-devel@nongnu.org; Fri, 22 Dec 2017 04:23:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1eSJ7B-0000Ag-4s
-	for qemu-devel@nongnu.org; Fri, 22 Dec 2017 03:55:40 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:39838)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1eSJ7A-00009Y-OK
-	for qemu-devel@nongnu.org; Fri, 22 Dec 2017 03:55:37 -0500
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 91878821C7
-	for <qemu-devel@nongnu.org>; Fri, 22 Dec 2017 08:55:35 +0000 (UTC)
-From: Markus Armbruster <armbru@redhat.com>
-References: <20171221155905.3793-1-berrange@redhat.com>
-	<20171221155905.3793-2-berrange@redhat.com>
-	<cf30232b-8674-134a-38fa-0c6cb9f9af3e@redhat.com>
-Date: Fri, 22 Dec 2017 09:55:29 +0100
-In-Reply-To: <cf30232b-8674-134a-38fa-0c6cb9f9af3e@redhat.com> (Eric Blake's
-	message of "Thu, 21 Dec 2017 12:47:17 -0600")
-Message-ID: <87o9mrrvjy.fsf@dusky.pond.sub.org>
+	(envelope-from <berrange@redhat.com>) id 1eSJY4-00072w-53
+	for qemu-devel@nongnu.org; Fri, 22 Dec 2017 04:23:25 -0500
+Date: Fri, 22 Dec 2017 09:23:08 +0000
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20171222092308.GF30605@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <CACaajQsL3e+XWR0hBDLThmG_fd=ih-n+HJVz++XcnwLhhVstgg@mail.gmail.com>
+	<56c5bcbb-02c0-a3f7-4363-e3141476b2f8@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v2 1/2] io: move fd_is_socket() into common
- sockets code
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <56c5bcbb-02c0-a3f7-4363-e3141476b2f8@redhat.com>
+Subject: Re: [Qemu-devel] qemu 2.9.0 qcow2 file failed to open after hard
+ server reset
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,56 +25,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+To: John Snow <jsnow@redhat.com>
+Cc: Vasiliy Tolstov <v.tolstov@selfip.ru>, qemu-devel <qemu-devel@nongnu.org>, Qemu-block <qemu-block@nongnu.org>
 
-Eric Blake <eblake@redhat.com> writes:
+On Thu, Dec 21, 2017 at 05:58:47PM -0500, John Snow wrote:
+> 
+> 
+> On 12/21/2017 05:13 PM, Vasiliy Tolstov wrote:
+> > Hi! Today my server have forced reboot and one of my vm can't start
+> > with message:
+> > qcow2: Marking image as corrupt: L2 table offset 0x3f786d6c207600
+> > unaligned (L1 index: 0); further corruption events will be suppressed
+> > 
+> > i'm use debian jessie with hand builded qemu 2.9.0, i'm try to
+> > qemu-img check but it not helps. How can i recover data inside qcow2
+> > file? (i'm not use compression or encryption inside it).
+> > 
+> 
+> Not looking good if you're missing the very first L2 table in its entirety.
+> 
+> You might be able to go through this thing by hand and learn for
+> yourself where the L2 table is (it will be a 64KiB region, aligned to a
+> 64KiB boundary, that all contain 64bit, 64KiB aligned pointers that will
+> be less than the size of the file. the offset of this missing region is
+> not likely to be referenced elsewhere in your file.)
 
-> On 12/21/2017 09:59 AM, Daniel P. Berrange wrote:
->> The fd_is_socket() helper method is useful in a few places, so put it in
->> the common sockets code.
->>
->> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
->> ---
->>   include/qemu/sockets.h |  1 +
->>   io/channel-util.c      | 13 -------------
->>   util/qemu-sockets.c    | 13 +++++++++++++
->>   3 files changed, 14 insertions(+), 13 deletions(-)
->
-> Reviewed-by: Eric Blake <eblake@redhat.com>
->
-> But while you are touching this...
->
->> +++ b/util/qemu-sockets.c
->> @@ -91,6 +91,19 @@ NetworkAddressFamily inet_netfamily(int family)
->>       return NETWORK_ADDRESS_FAMILY_UNKNOWN;
->>   }
->>   +bool fd_is_socket(int fd)
->> +{
->> +    int optval;
->> +    socklen_t optlen;
->> +    optlen = sizeof(optval);
->> +    return qemu_getsockopt(fd,
->> +                           SOL_SOCKET,
->> +                           SO_TYPE,
->> +                           (char *)&optval,
->
-> This cast is pointless (although you are just moving it from the old
-> code).  qemu_getsockopt() already takes care of casting for mingw
-> (where the signature is not POSIX-compliant), and on all other
-> platforms, the argument is already prototyped as void*; and since
-> void* accepts anything, you don't have to go through an intermediate
-> char*.
+Fun. That rather makes you wish that every single distinct type of table
+in QCow2 files had a unique UUID value stored in it, to make forensics
+like this easier :-)
 
-If we're tweaking, then I'd like it tweaked so:
-
-    bool fd_is_socket(int fd)
-    {
-        int optval;
-        socklen_t optlen = sizeof(optval);
-
-        return !qemu_getsockopt(fd, SOL_SOCKET, SO_TYPE, &optval, &optlen);
-    }
-
-With or without such tweaks:
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
