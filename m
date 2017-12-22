@@ -1,24 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57142)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49460)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <me@nagexiucai.com>) id 1eSDEh-0006jr-Kk
-	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 21:39:00 -0500
+	(envelope-from <marcel@redhat.com>) id 1eSFPp-0004vq-AH
+	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 23:58:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <me@nagexiucai.com>) id 1eSDEd-0000sK-VY
-	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 21:38:59 -0500
-Received: from mail139-37.mail.alibaba.com ([198.11.139.37]:37088)
+	(envelope-from <marcel@redhat.com>) id 1eSFPm-0001fr-5U
+	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 23:58:37 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:43948)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <me@nagexiucai.com>) id 1eSDEd-0000cv-Hx
-	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 21:38:55 -0500
-Date: Fri, 22 Dec 2017 10:32:44 +0800
-From: "=?UTF-8?B?6YKj5Liq56eA5omN?=" <me@nagexiucai.com>
-Reply-To: "=?UTF-8?B?6YKj5Liq56eA5omN?=" <me@nagexiucai.com>
-Message-ID: <b18a7a95-7ca6-4bd5-a6e3-8bcb18a2c0d0.me@nagexiucai.com>
+	(Exim 4.71) (envelope-from <marcel@redhat.com>) id 1eSFPl-0001fD-Vo
+	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 23:58:34 -0500
+References: <20171217125457.3429-1-marcel@redhat.com>
+	<20171219194951-mutt-send-email-mst@kernel.org>
+	<77710384-30d0-cb76-9dbc-6195b831f050@redhat.com>
+	<20171220200550-mutt-send-email-mst@kernel.org>
+	<20171221072750.GC2931@yuvallap>
+	<20171221162200-mutt-send-email-mst@kernel.org>
+	<69d67108-448d-51af-c6d7-46d2054b00a5@redhat.com>
+	<20171221224323-mutt-send-email-mst@kernel.org>
+	<20171221223025.GA31872@yuvallap>
+From: Marcel Apfelbaum <marcel@redhat.com>
+Message-ID: <03faab36-4bab-7d87-2e50-5693e441d51d@redhat.com>
+Date: Fri, 22 Dec 2017 06:58:25 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: base64
-Subject: Re: [Qemu-devel]
- =?utf-8?q?Hi=2C_where_can_i_get_a_latest_full_versi?=
- =?utf-8?q?on_of_QAPI_=3F?=
+In-Reply-To: <20171221223025.GA31872@yuvallap>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH V2 0/5] hw/pvrdma: PVRDMA device
+ implementation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,37 +36,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Luiz Capitulino <lcapitulino@redhat.com>, Markus Armbruster <armbru@redhat.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>
+To: Yuval Shaia <yuval.shaia@oracle.com>, "Michael S. Tsirkin" <mst@redhat.com>
+Cc: qemu-devel@nongnu.org, ehabkost@redhat.com, imammedo@redhat.com, pbonzini@redhat.com
 
-VGhhbmtzIGEgbG90ICFUaGVzZSBhcmUgdXNlZnVsIHRvIG1lIDopCi0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLeWPkeS7tuS6
-uu+8mk1hcmt1cyBBcm1icnVzdGVyIDxhcm1icnVAcmVkaGF0LmNvbT7lj5HpgIHml7bpl7TvvJoy
-MDE35bm0MTLmnIgyMeaXpSjmmJ/mnJ/lm5spIDIxOjE15pS25Lu25Lq677yaTHVpeiBDYXBpdHVs
-aW5vIDxsY2FwaXR1bGlub0ByZWRoYXQuY29tPuaKhOOAgOmAge+8mmJvYiA8bWVAbmFnZXhpdWNh
-aS5jb20+OyBxZW11LWRldmVsIDxxZW11LWRldmVsQG5vbmdudS5vcmc+5Li744CA6aKY77yaUmU6
-IFtRZW11LWRldmVsXSBIaSwgd2hlcmUgY2FuIGkgZ2V0IGEgbGF0ZXN0IGZ1bGwgdmVyc2lvbiBv
-ZiBRQVBJID/CoEx1aXrCoENhcGl0dWxpbm/CoDxsY2FwaXR1bGlub0ByZWRoYXQuY29tPsKgd3Jp
-dGVzOgoKPsKgT27CoFdlZCzCoDIwwqBEZWPCoDIwMTfCoDE4OjM3OjM3wqArMDgwMAo+wqAi6YKj
-5Liq56eA5omNIsKgPG1lQG5hZ2V4aXVjYWkuY29tPsKgd3JvdGU6Cj4KPj7CoEhpLAo+PsKgwqDC
-oMKgwqBEZWFywqBtYXN0ZXIuwqDCoMKgwqBXaGVyZcKgY2FuwqBpwqBnZXTCoGHCoGxhdGVzdMKg
-ZnVsbMKgdmVyc29uwqBvZsKgUUFQScKgP8KgwqDCoMKgScKgd2FubmHCoHJlYWTCoHNvbWXCoGZp
-bGXCoGluwqBWTXPCoGJ5wqBxZW11LXF1ZXN0LWFnZW50LMKgc2luY2XCoHRoZW4swqBpwqBmb3Vu
-ZMKgdGhpbmdzwqBiZWxvdzoKPj7CoMKgwqDCoMKgaHR0cHM6Ly93aWtpLnFlbXUub3JnL1FNUMKg
-wqDCoMKgaHR0cHM6Ly93aWtpLnFlbXUub3JnL0ZlYXR1cmVzL0d1ZXN0QWdlbnTCoMKgwqDCoGh0
-dHBzOi8vd2lraS5xZW11Lm9yZy9GZWF0dXJlcy9RQVBJwqDCoMKgwqBodHRwczovL3dpa2kucWVt
-dS5vcmcvRmVhdHVyZXMvUUFQSS9TaWduYWxzCj4+wqDCoMKgwqDCoGFuZMKgZXZlbjoKPj7CoMKg
-wqDCoMKgaHR0cDovL3NoZXZlay5naXRodWIuaW8vcWVtdS1qYXZhL2RvY3MvamF2YWRvYy/CoMKg
-wqDCoEhvd2V2ZXIswqB0aG9zZcKgYXJlwqBhbGzCoG5vdMKgYcKgQVBJwqBtYW51YWzCoGxpa2XC
-oGh0dHBzOi8vZGV2ZWxvcGVyLm9wZW5zdGFjay5vcmcvYXBpLXJlZi9hcHBsaWNhdGlvbi1jb250
-YWluZXIvwqBvcsKgaHR0cHM6Ly9kZXYub2ZmaWNlLmNvbS9yZWZlcmVuY2UvYWRkLWlucy9zaGFy
-ZWQvYXN5bmNyZXN1bHQKPj7CoMKgwqDCoMKgTmVlZMKgaGVscMKgIcKgwqDCoMKgVGhhbmtzwqBm
-b3LCoGFuecKgcmVzcG9uc2XCoCEKPj7CoFJlZ2FyZHMhCj4+wqBCb2JhwqBsaXR0bGXCoGNvZGXC
-oGxhYm91csKgaW7CoHRoZcKgd29ybGTCoGZ1bGzCoG9mwqBkdXN0Lgo+Cj7CoE1hcmt1c8KgaXPC
-oGHCoGJldHRlcsKgcGVyc29uwqB0b8KgYXNrLgoKVGhlwqBnZW5lcmFswqBndWVzdMKgYWdlbnTC
-oHByb3RvY29swqBpc8KgZG9jdW1lbnRlZMKgaW4KZG9jcy9pbnRlcm9wL3FtcC1zcGVjLnR4dC4K
-Ckd1ZXN0wqBhZ2VudMKgY29tbWFuZHPCoGFyZcKgc3BlY2lmaWVkwqBpbsKgcWdhL3FhcGktc2No
-ZW1hLmpzb24uwqDCoFRoZcKgYnVpbGQKcHJvY2Vzc8KgZXh0cmFjdHPCoGRvY3VtZW50YXRpb27C
-oGZyb23CoGl0wqB0b8KgZG9jcy9pbnRlcm9wL3FlbXUtZ2EtcmVmLiouCllvdcKgY2FuwqBicm93
-c2XCoDIuMTEnc8KgYXTCoDxodHRwOi8vcWVtdS53ZWlsbmV0ei5kZS9kb2MvcWVtdS1nYS1yZWYu
-aHRtbD4uCgpIb3BlwqB0aGlzwqBoZWxwcyE=
+On 22/12/2017 0:30, Yuval Shaia wrote:
+> On Thu, Dec 21, 2017 at 10:46:35PM +0200, Michael S. Tsirkin wrote:
+>> On Thu, Dec 21, 2017 at 05:59:38PM +0200, Marcel Apfelbaum wrote:
+>>> On 21/12/2017 16:22, Michael S. Tsirkin wrote:
+>>>> On Thu, Dec 21, 2017 at 09:27:51AM +0200, Yuval Shaia wrote:
+>>>>>>>
+>>>>>>>> What happens if guest attempts to register all its memory?
+>>>>>>>>
+>>>>>>>
+>>>>>>> Then we loose, is not different from bare metal, reg_mr will pin all the RAM.
+>>>>>>
+>>>>>> We need to find a way to communicate to guests about amount
+>>>>>> of memory they can pin.
+>>>>>
+>>>>> dev_caps.max_mr_size is the way device limits guest driver.
+>>>>> This value is controlled by the command line argument dev-caps-max-mr-size
+>>>>> so we should be fine (btw, default value is 1<<32).
+>>>>
+>>>> Isn't that still leaving the option for guest to register all memory,
+>>>> just in chunks?
+>>>>
+>>>
+>>> We also have a parameter limiting the number of mrs (dev-caps-max-mr),
+>>> together with dev-caps-max-mr-size we can limit the memory the guests can pin.
+>>>
+>>> Thanks,
+>>> Marcel
+>>
+>> You might want to limit the default values then.
+>>
+
+Hi Yuval,
+
+>> Right now:
+>>
+>> +#define MAX_MR_SIZE           (1UL << 32)
+>> +#define MAX_MR                2048
+> 
+> Maybe limiting by constant number is not a good approach, it looks odd if
+> one guest with 16G ram and second with 32G ram will have the same settings,
+> right?
+> So how about limiting by a specific percentage of total memory?
+> In that case, what would be this percentage? 100%? 80%?
+> 
+
+I think is too complicated. Maybe we can limit the max pined memory
+to 2G assuming the RDMA guests have a lot of RAM and let the
+users fine-tune the parameters.
+
+Thanks,
+Marcel
+
+>>
+>> Which is IIUC 8TB.
+>>
+>> That's pretty close to unlimited, and so far overcommit seems to be the
+>> main feature for users.
+>>
+>>
+>>>>>>
+>>>>>>> However this is only one scenario, and hopefully not much used
+>>>>>>> for RoCE. (I know IPoIB does that, but it doesn't make sense to use it with RoCE).
+>>>>>>
+>>>>>> SRP does it too AFAIK.
+>>>>>>
