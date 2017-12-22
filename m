@@ -1,28 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38100)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40005)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1eSO1j-0007lw-1q
-	for qemu-devel@nongnu.org; Fri, 22 Dec 2017 09:10:20 -0500
+	(envelope-from <no-reply@patchew.org>) id 1eSO43-0000qf-Br
+	for qemu-devel@nongnu.org; Fri, 22 Dec 2017 09:12:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1eSO1h-0000M2-4j
-	for qemu-devel@nongnu.org; Fri, 22 Dec 2017 09:10:18 -0500
-Received: from mail-wr0-x232.google.com ([2a00:1450:400c:c0c::232]:45862)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1eSO1g-0000Jw-A9
-	for qemu-devel@nongnu.org; Fri, 22 Dec 2017 09:10:17 -0500
-Received: by mail-wr0-x232.google.com with SMTP id h1so27991754wre.12
-	for <qemu-devel@nongnu.org>; Fri, 22 Dec 2017 06:10:16 -0800 (PST)
+	(envelope-from <no-reply@patchew.org>) id 1eSO3y-0002Pc-Vs
+	for qemu-devel@nongnu.org; Fri, 22 Dec 2017 09:12:43 -0500
+Resent-Message-Id: <E1eSO3y-0002Pc-Vs@eggs.gnu.org>
+Received: from sender-of-o52.zoho.com ([135.84.80.217]:21474)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1eSO3y-0002O8-Mw
+	for qemu-devel@nongnu.org; Fri, 22 Dec 2017 09:12:38 -0500
+In-Reply-To: <20171222134527.14467-1-berrange@redhat.com>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <151395193977.99.12572842361193307429@5adcb62bf0d6>
 MIME-Version: 1.0
-In-Reply-To: <20171222134527.14467-4-berrange@redhat.com>
-References: <20171222134527.14467-1-berrange@redhat.com>
-	<20171222134527.14467-4-berrange@redhat.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Fri, 22 Dec 2017 15:10:14 +0100
-Message-ID: <CAJ+F1CLbLpz9HRyvEvXaZ0or0kupZ2Eg71V3spZKnzZmkd0Kmw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3 3/8] sockets: pull code for testing IP
- availability out of specific test
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Fri, 22 Dec 2017 06:12:21 -0800 (PST)
+Subject: Re: [Qemu-devel] [PATCH v3 0/8] Enable passing pre-opened chardev
+ socket FDs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,306 +29,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>
-Cc: QEMU <qemu-devel@nongnu.org>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: berrange@redhat.com
+Cc: famz@redhat.com, qemu-devel@nongnu.org, dgilbert@redhat.com, armbru@redhat.com, marcandre.lureau@redhat.com, pbonzini@redhat.com
 
-On Fri, Dec 22, 2017 at 2:45 PM, Daniel P. Berrange <berrange@redhat.com> w=
-rote:
-> The test-io-channel-socket.c file has some useful helper functions for
-> checking if a specific IP protocol is available. Other tests need to
-> perform similar kinds of checks to avoid running tests that will fail
-> due to missing IP protocols.
->
-> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
-
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-
-
-> ---
->  tests/Makefile.include         |   2 +-
->  tests/socket-helpers.c         | 104 +++++++++++++++++++++++++++++++++++=
-++++++
->  tests/socket-helpers.h         |  42 +++++++++++++++++
->  tests/test-io-channel-socket.c |  72 +---------------------------
->  4 files changed, 149 insertions(+), 71 deletions(-)
->  create mode 100644 tests/socket-helpers.c
->  create mode 100644 tests/socket-helpers.h
->
-> diff --git a/tests/Makefile.include b/tests/Makefile.include
-> index f8e20d9f5d..bede832dc1 100644
-> --- a/tests/Makefile.include
-> +++ b/tests/Makefile.include
-> @@ -696,7 +696,7 @@ tests/test-crypto-tlssession$(EXESUF): tests/test-cry=
-pto-tlssession.o \
->         tests/crypto-tls-x509-helpers.o tests/pkix_asn1_tab.o $(test-cryp=
-to-obj-y)
->  tests/test-io-task$(EXESUF): tests/test-io-task.o $(test-io-obj-y)
->  tests/test-io-channel-socket$(EXESUF): tests/test-io-channel-socket.o \
-> -        tests/io-channel-helpers.o $(test-io-obj-y)
-> +        tests/io-channel-helpers.o tests/socket-helpers.o $(test-io-obj-=
-y)
->  tests/test-io-channel-file$(EXESUF): tests/test-io-channel-file.o \
->          tests/io-channel-helpers.o $(test-io-obj-y)
->  tests/test-io-channel-tls$(EXESUF): tests/test-io-channel-tls.o \
-> diff --git a/tests/socket-helpers.c b/tests/socket-helpers.c
-> new file mode 100644
-> index 0000000000..13b6bb38eb
-> --- /dev/null
-> +++ b/tests/socket-helpers.c
-> @@ -0,0 +1,104 @@
-> +/*
-> + * Helper functions for tests using sockets
-> + *
-> + * Copyright 2015-2018 Red Hat, Inc.
-> + *
-> + * This program is free software; you can redistribute it and/or
-> + * modify it under the terms of the GNU General Public License as
-> + * published by the Free Software Foundation; either version 2 or
-> + * (at your option) version 3 of the License.
-> + *
-> + * This program is distributed in the hope that it will be useful,
-> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
-> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-> + * GNU General Public License for more details.
-> + *
-> + * You should have received a copy of the GNU General Public License
-> + * along with this program; if not, see <http://www.gnu.org/licenses/>.
-> + *
-> + */
-> +
-> +#include "qemu/osdep.h"
-> +#include "qemu-common.h"
-> +#include "qemu/sockets.h"
-> +#include "socket-helpers.h"
-> +
-> +#ifndef AI_ADDRCONFIG
-> +# define AI_ADDRCONFIG 0
-> +#endif
-> +#ifndef EAI_ADDRFAMILY
-> +# define EAI_ADDRFAMILY 0
-> +#endif
-> +
-> +int socket_can_bind(const char *hostname)
-> +{
-> +    int fd =3D -1;
-> +    struct addrinfo ai, *res =3D NULL;
-> +    int rc;
-> +    int ret =3D -1;
-> +
-> +    memset(&ai, 0, sizeof(ai));
-> +    ai.ai_flags =3D AI_CANONNAME | AI_ADDRCONFIG;
-> +    ai.ai_family =3D AF_UNSPEC;
-> +    ai.ai_socktype =3D SOCK_STREAM;
-> +
-> +    /* lookup */
-> +    rc =3D getaddrinfo(hostname, NULL, &ai, &res);
-> +    if (rc !=3D 0) {
-> +        if (rc =3D=3D EAI_ADDRFAMILY ||
-> +            rc =3D=3D EAI_FAMILY) {
-> +            errno =3D EADDRNOTAVAIL;
-> +            goto done;
-> +        }
-> +        errno =3D EINVAL;
-> +        goto cleanup;
-> +    }
-> +
-> +    fd =3D qemu_socket(res->ai_family, res->ai_socktype, res->ai_protoco=
-l);
-> +    if (fd < 0) {
-> +        goto cleanup;
-> +    }
-> +
-> +    if (bind(fd, res->ai_addr, res->ai_addrlen) < 0) {
-> +        if (errno =3D=3D EADDRNOTAVAIL) {
-> +            goto done;
-> +        }
-> +        goto cleanup;
-> +    }
-> +
-> + done:
-> +    ret =3D 0;
-> +
-> + cleanup:
-> +    if (fd !=3D -1) {
-> +        close(fd);
-> +    }
-> +    if (res) {
-> +        freeaddrinfo(res);
-> +    }
-> +    return ret;
-> +}
-> +
-> +
-> +int socket_check_protocol_support(bool *has_ipv4, bool *has_ipv6)
-> +{
-> +    *has_ipv4 =3D *has_ipv6 =3D false;
-> +
-> +    if (socket_can_bind("127.0.0.1") < 0) {
-> +        if (errno !=3D EADDRNOTAVAIL) {
-> +            return -1;
-> +        }
-> +    } else {
-> +        *has_ipv4 =3D true;
-> +    }
-> +
-> +    if (socket_can_bind("::1") < 0) {
-> +        if (errno !=3D EADDRNOTAVAIL) {
-> +            return -1;
-> +        }
-> +    } else {
-> +        *has_ipv6 =3D true;
-> +    }
-> +
-> +    return 0;
-> +}
-> diff --git a/tests/socket-helpers.h b/tests/socket-helpers.h
-> new file mode 100644
-> index 0000000000..efa96eddc2
-> --- /dev/null
-> +++ b/tests/socket-helpers.h
-> @@ -0,0 +1,42 @@
-> +/*
-> + * Helper functions for tests using sockets
-> + *
-> + * Copyright 2015-2018 Red Hat, Inc.
-> + *
-> + * This program is free software; you can redistribute it and/or
-> + * modify it under the terms of the GNU General Public License as
-> + * published by the Free Software Foundation; either version 2 or
-> + * (at your option) version 3 of the License.
-> + *
-> + * This program is distributed in the hope that it will be useful,
-> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
-> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-> + * GNU General Public License for more details.
-> + *
-> + * You should have received a copy of the GNU General Public License
-> + * along with this program; if not, see <http://www.gnu.org/licenses/>.
-> + *
-> + */
-> +
-> +/*
-> + * @hostname: a DNS name or numeric IP address
-> + *
-> + * Check whether it is possible to bind to ports
-> + * on the DNS name or IP address @hostname. If an IP address
-> + * is used, it must not be a wildcard address.
-> + *
-> + * Returns 0 on success, -1 on error with errno set
-> + */
-> +int socket_can_bind(const char *hostname);
-> +
-> +/*
-> + * @has_ipv4: set to true on return if IPv4 is available
-> + * @has_ipv6: set to true on return if IPv6 is available
-> + *
-> + * Check whether IPv4 and/or IPv6 are available for use.
-> + * On success, @has_ipv4 and @has_ipv6 will be set to
-> + * indicate whether the respective protocols are available.
-> + *
-> + * Returns 0 on success, -1 on fatal error
-> + */
-> +int socket_check_protocol_support(bool *has_ipv4, bool *has_ipv6);
-> diff --git a/tests/test-io-channel-socket.c b/tests/test-io-channel-socke=
-t.c
-> index d357cd2a8e..b0b69e8ad0 100644
-> --- a/tests/test-io-channel-socket.c
-> +++ b/tests/test-io-channel-socket.c
-> @@ -22,77 +22,9 @@
->  #include "io/channel-socket.h"
->  #include "io/channel-util.h"
->  #include "io-channel-helpers.h"
-> +#include "socket-helpers.h"
->  #include "qapi/error.h"
->
-> -#ifndef AI_ADDRCONFIG
-> -# define AI_ADDRCONFIG 0
-> -#endif
-> -#ifndef EAI_ADDRFAMILY
-> -# define EAI_ADDRFAMILY 0
-> -#endif
-> -
-> -static int check_bind(const char *hostname, bool *has_proto)
-> -{
-> -    int fd =3D -1;
-> -    struct addrinfo ai, *res =3D NULL;
-> -    int rc;
-> -    int ret =3D -1;
-> -
-> -    memset(&ai, 0, sizeof(ai));
-> -    ai.ai_flags =3D AI_CANONNAME | AI_ADDRCONFIG;
-> -    ai.ai_family =3D AF_UNSPEC;
-> -    ai.ai_socktype =3D SOCK_STREAM;
-> -
-> -    /* lookup */
-> -    rc =3D getaddrinfo(hostname, NULL, &ai, &res);
-> -    if (rc !=3D 0) {
-> -        if (rc =3D=3D EAI_ADDRFAMILY ||
-> -            rc =3D=3D EAI_FAMILY) {
-> -            *has_proto =3D false;
-> -            goto done;
-> -        }
-> -        goto cleanup;
-> -    }
-> -
-> -    fd =3D qemu_socket(res->ai_family, res->ai_socktype, res->ai_protoco=
-l);
-> -    if (fd < 0) {
-> -        goto cleanup;
-> -    }
-> -
-> -    if (bind(fd, res->ai_addr, res->ai_addrlen) < 0) {
-> -        if (errno =3D=3D EADDRNOTAVAIL) {
-> -            *has_proto =3D false;
-> -            goto done;
-> -        }
-> -        goto cleanup;
-> -    }
-> -
-> -    *has_proto =3D true;
-> - done:
-> -    ret =3D 0;
-> -
-> - cleanup:
-> -    if (fd !=3D -1) {
-> -        close(fd);
-> -    }
-> -    if (res) {
-> -        freeaddrinfo(res);
-> -    }
-> -    return ret;
-> -}
-> -
-> -static int check_protocol_support(bool *has_ipv4, bool *has_ipv6)
-> -{
-> -    if (check_bind("127.0.0.1", has_ipv4) < 0) {
-> -        return -1;
-> -    }
-> -    if (check_bind("::1", has_ipv6) < 0) {
-> -        return -1;
-> -    }
-> -
-> -    return 0;
-> -}
-> -
->
->  static void test_io_channel_set_socket_bufs(QIOChannel *src,
->                                              QIOChannel *dst)
-> @@ -566,7 +498,7 @@ int main(int argc, char **argv)
->       * each protocol to avoid breaking tests on machines
->       * with either IPv4 or IPv6 disabled.
->       */
-> -    if (check_protocol_support(&has_ipv4, &has_ipv6) < 0) {
-> +    if (socket_check_protocol_support(&has_ipv4, &has_ipv6) < 0) {
->          return 1;
->      }
->
-> --
-> 2.14.3
->
->
-
-
-
---=20
-Marc-Andr=C3=A9 Lureau
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IDIwMTcxMjIyMTM0NTI3LjE0NDY3LTEtYmVycmFuZ2VAcmVkaGF0LmNvbQpTdWJq
+ZWN0OiBbUWVtdS1kZXZlbF0gW1BBVENIIHYzIDAvOF0gRW5hYmxlIHBhc3NpbmcgcHJlLW9wZW5l
+ZCBjaGFyZGV2IHNvY2tldCBGRHMKCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jh
+c2gKCkJBU0U9YmFzZQpuPTEKdG90YWw9JChnaXQgbG9nIC0tb25lbGluZSAkQkFTRS4uIHwgd2Mg
+LWwpCmZhaWxlZD0wCgpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBj
+b25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQoKY29tbWl0cz0iJChnaXQgbG9nIC0tZm9y
+bWF0PSVIIC0tcmV2ZXJzZSAkQkFTRS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7IGRvCiAgICBlY2hv
+ICJDaGVja2luZyBQQVRDSCAkbi8kdG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVzICRj
+KS4uLiIKICAgIGlmICEgZ2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMvY2hl
+Y2twYXRjaC5wbCAtLW1haWxiYWNrIC07IHRoZW4KICAgICAgICBmYWlsZWQ9MQogICAgICAgIGVj
+aG8KICAgIGZpCiAgICBuPSQoKG4rMSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBTQ1JJ
+UFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcx
+MzM4NApGcm9tIGh0dHBzOi8vZ2l0aHViLmNvbS9wYXRjaGV3LXByb2plY3QvcWVtdQogdCBbdGFn
+IHVwZGF0ZV0gICAgICAgICAgICBwYXRjaGV3LzIwMTcxMjIxMjEyMTI1LjE5MDc1LTEtbWF4aW1l
+LmNvcXVlbGluQHJlZGhhdC5jb20gLT4gcGF0Y2hldy8yMDE3MTIyMTIxMjEyNS4xOTA3NS0xLW1h
+eGltZS5jb3F1ZWxpbkByZWRoYXQuY29tCiB0IFt0YWcgdXBkYXRlXSAgICAgICAgICAgIHBhdGNo
+ZXcvMjAxNzEyMjIxMzQ1MjcuMTQ0NjctMS1iZXJyYW5nZUByZWRoYXQuY29tIC0+IHBhdGNoZXcv
+MjAxNzEyMjIxMzQ1MjcuMTQ0NjctMS1iZXJyYW5nZUByZWRoYXQuY29tClN3aXRjaGVkIHRvIGEg
+bmV3IGJyYW5jaCAndGVzdCcKNjdjODIwNWVlNiBjaGFyOiBhbGxvdyBwYXNzaW5nIHByZS1vcGVu
+ZWQgc29ja2V0IGZpbGUgZGVzY3JpcHRvciBhdCBzdGFydHVwCjRkNzZkODIzNmQgY2hhcjogcmVm
+YWN0b3IgcGFyc2luZyBvZiBzb2NrZXQgYWRkcmVzcyBpbmZvcm1hdGlvbgpjOTk0YThiZTY1IHNv
+Y2tldHM6IGFsbG93IFNvY2tldEFkZHJlc3MgJ2ZkJyB0byByZWZlcmVuY2UgbnVtZXJpYyBmaWxl
+IGRlc2NyaXB0b3JzCjBiMTE5YWVkMDQgc29ja2V0czogY2hlY2sgdGhhdCB0aGUgbmFtZWQgZmls
+ZSBkZXNjcmlwdG9yIGlzIGEgc29ja2V0CjQ2NDkyYWYzM2Ygc29ja2V0czogc3RyZW5ndGhlbiB0
+ZXN0IHN1aXRlIElQIHByb3RvY29sIGF2YWlsYWJpbGl0eSBjaGVja3MKNmI4YmZlYmM3MyBzb2Nr
+ZXRzOiBwdWxsIGNvZGUgZm9yIHRlc3RpbmcgSVAgYXZhaWxhYmlsaXR5IG91dCBvZiBzcGVjaWZp
+YyB0ZXN0CmU4NzQwZWYzYWEgc29ja2V0czogbW92ZSBmZF9pc19zb2NrZXQoKSBpbnRvIGNvbW1v
+biBzb2NrZXRzIGNvZGUKYmU1MGMxNTRhZiBjdXRpbHM6IGFkZCBxZW11X3N0cnRvaSAmIHFlbXVf
+c3RydG91aSBwYXJzZXJzIGZvciBpbnQvdW5zaWduZWQgaW50IHR5cGVzCgo9PT0gT1VUUFVUIEJF
+R0lOID09PQpDaGVja2luZyBQQVRDSCAxLzg6IGN1dGlsczogYWRkIHFlbXVfc3RydG9pICYgcWVt
+dV9zdHJ0b3VpIHBhcnNlcnMgZm9yIGludC91bnNpZ25lZCBpbnQgdHlwZXMuLi4KRVJST1I6IGNv
+bnNpZGVyIHVzaW5nIHFlbXVfc3RydG9sIGluIHByZWZlcmVuY2UgdG8gc3RydG9sCiM3Mjk6IEZJ
+TEU6IHV0aWwvY3V0aWxzLmM6MzM4OgorICAgIGxyZXN1bHQgPSBzdHJ0b2wobnB0ciwgJmVwLCBi
+YXNlKTsKCkVSUk9SOiBjb25zaWRlciB1c2luZyBxZW11X3N0cnRvbCBpbiBwcmVmZXJlbmNlIHRv
+IHN0cnRvbAojNzc5OiBGSUxFOiB1dGlsL2N1dGlscy5jOjM4ODoKKyAgICBscmVzdWx0ID0gc3Ry
+dG9sKG5wdHIsICZlcCwgYmFzZSk7Cgp0b3RhbDogMiBlcnJvcnMsIDAgd2FybmluZ3MsIDc4NSBs
+aW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmll
+dy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhl
+bSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgpDaGVj
+a2luZyBQQVRDSCAyLzg6IHNvY2tldHM6IG1vdmUgZmRfaXNfc29ja2V0KCkgaW50byBjb21tb24g
+c29ja2V0cyBjb2RlLi4uCkNoZWNraW5nIFBBVENIIDMvODogc29ja2V0czogcHVsbCBjb2RlIGZv
+ciB0ZXN0aW5nIElQIGF2YWlsYWJpbGl0eSBvdXQgb2Ygc3BlY2lmaWMgdGVzdC4uLgpDaGVja2lu
+ZyBQQVRDSCA0Lzg6IHNvY2tldHM6IHN0cmVuZ3RoZW4gdGVzdCBzdWl0ZSBJUCBwcm90b2NvbCBh
+dmFpbGFiaWxpdHkgY2hlY2tzLi4uCkNoZWNraW5nIFBBVENIIDUvODogc29ja2V0czogY2hlY2sg
+dGhhdCB0aGUgbmFtZWQgZmlsZSBkZXNjcmlwdG9yIGlzIGEgc29ja2V0Li4uCkNoZWNraW5nIFBB
+VENIIDYvODogc29ja2V0czogYWxsb3cgU29ja2V0QWRkcmVzcyAnZmQnIHRvIHJlZmVyZW5jZSBu
+dW1lcmljIGZpbGUgZGVzY3JpcHRvcnMuLi4KQ2hlY2tpbmcgUEFUQ0ggNy84OiBjaGFyOiByZWZh
+Y3RvciBwYXJzaW5nIG9mIHNvY2tldCBhZGRyZXNzIGluZm9ybWF0aW9uLi4uCkNoZWNraW5nIFBB
+VENIIDgvODogY2hhcjogYWxsb3cgcGFzc2luZyBwcmUtb3BlbmVkIHNvY2tldCBmaWxlIGRlc2Ny
+aXB0b3IgYXQgc3RhcnR1cC4uLgo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0
+ZWQgd2l0aCBjb2RlOiAxCgoKLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBh
+dGNoZXcgW2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRv
+IHBhdGNoZXctZGV2ZWxAZnJlZWxpc3RzLm9yZw==
