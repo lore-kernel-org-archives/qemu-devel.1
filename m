@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57651)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57681)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1eSP71-0006AH-Jw
-	for qemu-devel@nongnu.org; Fri, 22 Dec 2017 10:19:52 -0500
+	(envelope-from <kwolf@redhat.com>) id 1eSP72-0006CL-Mx
+	for qemu-devel@nongnu.org; Fri, 22 Dec 2017 10:19:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1eSP70-0002ot-CD
-	for qemu-devel@nongnu.org; Fri, 22 Dec 2017 10:19:51 -0500
+	(envelope-from <kwolf@redhat.com>) id 1eSP71-0002ps-Ku
+	for qemu-devel@nongnu.org; Fri, 22 Dec 2017 10:19:52 -0500
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Fri, 22 Dec 2017 16:18:41 +0100
-Message-Id: <20171222151846.28110-31-kwolf@redhat.com>
+Date: Fri, 22 Dec 2017 16:18:40 +0100
+Message-Id: <20171222151846.28110-30-kwolf@redhat.com>
 In-Reply-To: <20171222151846.28110-1-kwolf@redhat.com>
 References: <20171222151846.28110-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL v3 30/35] test-bdrv-drain: Test behaviour in
- coroutine context
+Subject: [Qemu-devel] [PULL v3 29/35] test-bdrv-drain: Tests for
+ bdrv_subtree_drain
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,110 +23,107 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, peter.maydell@linaro.org, qemu-devel@nongnu.org
 
-If bdrv_do_drained_begin/end() are called in coroutine context, they
-first use a BH to get out of the coroutine context. Call some existing
-tests again from a coroutine to cover this code path.
+Add a subtree drain version to the existing test cases.
 
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- tests/test-bdrv-drain.c | 59 +++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 59 insertions(+)
+ tests/test-bdrv-drain.c | 27 ++++++++++++++++++++++++++-
+ 1 file changed, 26 insertions(+), 1 deletion(-)
 
 diff --git a/tests/test-bdrv-drain.c b/tests/test-bdrv-drain.c
-index f363d51b34..354c6151a0 100644
+index 9098b77ab4..f363d51b34 100644
 --- a/tests/test-bdrv-drain.c
 +++ b/tests/test-bdrv-drain.c
-@@ -82,6 +82,34 @@ static void aio_ret_cb(void *opaque, int ret)
-     *aio_ret = ret;
- }
- 
-+typedef struct CallInCoroutineData {
-+    void (*entry)(void);
-+    bool done;
-+} CallInCoroutineData;
-+
-+static coroutine_fn void call_in_coroutine_entry(void *opaque)
-+{
-+    CallInCoroutineData *data = opaque;
-+
-+    data->entry();
-+    data->done = true;
-+}
-+
-+static void call_in_coroutine(void (*entry)(void))
-+{
-+    Coroutine *co;
-+    CallInCoroutineData data = {
-+        .entry  = entry,
-+        .done   = false,
-+    };
-+
-+    co = qemu_coroutine_create(call_in_coroutine_entry, &data);
-+    qemu_coroutine_enter(co);
-+    while (!data.done) {
-+        aio_poll(qemu_get_aio_context(), true);
-+    }
-+}
-+
+@@ -85,6 +85,7 @@ static void aio_ret_cb(void *opaque, int ret)
  enum drain_type {
      BDRV_DRAIN_ALL,
      BDRV_DRAIN,
-@@ -188,6 +216,16 @@ static void test_drv_cb_drain_subtree(void)
-     test_drv_cb_common(BDRV_SUBTREE_DRAIN, true);
++    BDRV_SUBTREE_DRAIN,
+     DRAIN_TYPE_MAX,
+ };
+ 
+@@ -93,6 +94,7 @@ static void do_drain_begin(enum drain_type drain_type, BlockDriverState *bs)
+     switch (drain_type) {
+     case BDRV_DRAIN_ALL:        bdrv_drain_all_begin(); break;
+     case BDRV_DRAIN:            bdrv_drained_begin(bs); break;
++    case BDRV_SUBTREE_DRAIN:    bdrv_subtree_drained_begin(bs); break;
+     default:                    g_assert_not_reached();
+     }
+ }
+@@ -102,6 +104,7 @@ static void do_drain_end(enum drain_type drain_type, BlockDriverState *bs)
+     switch (drain_type) {
+     case BDRV_DRAIN_ALL:        bdrv_drain_all_end(); break;
+     case BDRV_DRAIN:            bdrv_drained_end(bs); break;
++    case BDRV_SUBTREE_DRAIN:    bdrv_subtree_drained_end(bs); break;
+     default:                    g_assert_not_reached();
+     }
+ }
+@@ -180,6 +183,11 @@ static void test_drv_cb_drain(void)
+     test_drv_cb_common(BDRV_DRAIN, false);
  }
  
-+static void test_drv_cb_co_drain(void)
++static void test_drv_cb_drain_subtree(void)
 +{
-+    call_in_coroutine(test_drv_cb_drain);
-+}
-+
-+static void test_drv_cb_co_drain_subtree(void)
-+{
-+    call_in_coroutine(test_drv_cb_drain_subtree);
++    test_drv_cb_common(BDRV_SUBTREE_DRAIN, true);
 +}
 +
  static void test_quiesce_common(enum drain_type drain_type, bool recursive)
  {
      BlockBackend *blk;
-@@ -235,6 +273,16 @@ static void test_quiesce_drain_subtree(void)
-     test_quiesce_common(BDRV_SUBTREE_DRAIN, true);
+@@ -222,6 +230,11 @@ static void test_quiesce_drain(void)
+     test_quiesce_common(BDRV_DRAIN, false);
  }
  
-+static void test_quiesce_co_drain(void)
++static void test_quiesce_drain_subtree(void)
 +{
-+    call_in_coroutine(test_quiesce_drain);
-+}
-+
-+static void test_quiesce_co_drain_subtree(void)
-+{
-+    call_in_coroutine(test_quiesce_drain_subtree);
++    test_quiesce_common(BDRV_SUBTREE_DRAIN, true);
 +}
 +
  static void test_nested(void)
  {
      BlockBackend *blk;
-@@ -422,11 +470,22 @@ int main(int argc, char **argv)
-     g_test_add_func("/bdrv-drain/driver-cb/drain_subtree",
-                     test_drv_cb_drain_subtree);
+@@ -244,7 +257,8 @@ static void test_nested(void)
+             /* XXX bdrv_drain_all() doesn't increase the quiesce_counter */
+             int bs_quiesce      = (outer != BDRV_DRAIN_ALL) +
+                                   (inner != BDRV_DRAIN_ALL);
+-            int backing_quiesce = 0;
++            int backing_quiesce = (outer == BDRV_SUBTREE_DRAIN) +
++                                  (inner == BDRV_SUBTREE_DRAIN);
+             int backing_cb_cnt  = (outer != BDRV_DRAIN) +
+                                   (inner != BDRV_DRAIN);
  
-+    // XXX bdrv_drain_all() doesn't work in coroutine context
-+    g_test_add_func("/bdrv-drain/driver-cb/co/drain", test_drv_cb_co_drain);
-+    g_test_add_func("/bdrv-drain/driver-cb/co/drain_subtree",
-+                    test_drv_cb_co_drain_subtree);
+@@ -391,6 +405,11 @@ static void test_blockjob_drain(void)
+     test_blockjob_common(BDRV_DRAIN);
+ }
+ 
++static void test_blockjob_drain_subtree(void)
++{
++    test_blockjob_common(BDRV_SUBTREE_DRAIN);
++}
 +
-+
+ int main(int argc, char **argv)
+ {
+     bdrv_init();
+@@ -400,14 +419,20 @@ int main(int argc, char **argv)
+ 
+     g_test_add_func("/bdrv-drain/driver-cb/drain_all", test_drv_cb_drain_all);
+     g_test_add_func("/bdrv-drain/driver-cb/drain", test_drv_cb_drain);
++    g_test_add_func("/bdrv-drain/driver-cb/drain_subtree",
++                    test_drv_cb_drain_subtree);
+ 
      g_test_add_func("/bdrv-drain/quiesce/drain_all", test_quiesce_drain_all);
      g_test_add_func("/bdrv-drain/quiesce/drain", test_quiesce_drain);
-     g_test_add_func("/bdrv-drain/quiesce/drain_subtree",
-                     test_quiesce_drain_subtree);
++    g_test_add_func("/bdrv-drain/quiesce/drain_subtree",
++                    test_quiesce_drain_subtree);
  
-+    // XXX bdrv_drain_all() doesn't work in coroutine context
-+    g_test_add_func("/bdrv-drain/quiesce/co/drain", test_quiesce_co_drain);
-+    g_test_add_func("/bdrv-drain/quiesce/co/drain_subtree",
-+                    test_quiesce_co_drain_subtree);
-+
      g_test_add_func("/bdrv-drain/nested", test_nested);
  
      g_test_add_func("/bdrv-drain/blockjob/drain_all", test_blockjob_drain_all);
+     g_test_add_func("/bdrv-drain/blockjob/drain", test_blockjob_drain);
++    g_test_add_func("/bdrv-drain/blockjob/drain_subtree",
++                    test_blockjob_drain_subtree);
+ 
+     return g_test_run();
+ }
 -- 
 2.13.6
