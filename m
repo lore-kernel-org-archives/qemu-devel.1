@@ -1,21 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37686)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37747)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1eSCsK-0007Iy-Hg
-	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 21:15:55 -0500
+	(envelope-from <jasowang@redhat.com>) id 1eSCsN-0007KX-BC
+	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 21:15:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1eSCsI-0000Ag-IQ
-	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 21:15:52 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:58168)
+	(envelope-from <jasowang@redhat.com>) id 1eSCsL-0000EB-Rk
+	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 21:15:55 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:43290)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1eSCsI-00009v-8j
-	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 21:15:50 -0500
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1eSCsL-0000DR-IY
+	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 21:15:53 -0500
 From: Jason Wang <jasowang@redhat.com>
-Date: Fri, 22 Dec 2017 10:15:21 +0800
-Message-Id: <1513908937-16034-3-git-send-email-jasowang@redhat.com>
+Date: Fri, 22 Dec 2017 10:15:22 +0800
+Message-Id: <1513908937-16034-4-git-send-email-jasowang@redhat.com>
 In-Reply-To: <1513908937-16034-1-git-send-email-jasowang@redhat.com>
 References: <1513908937-16034-1-git-send-email-jasowang@redhat.com>
-Subject: [Qemu-devel] [PULL 02/18] e1000: Separate TSO and non-TSO contexts,
- fixing UDP TX corruption
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 03/18] net: move CRC32 calculation from
+ compute_mcast_idx() into its own net_crc32() function
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,212 +28,110 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org, qemu-devel@nongnu.org
-Cc: Ed Swierk <eswierk@skyportsystems.com>, Jason Wang <jasowang@redhat.com>
+Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Jason Wang <jasowang@redhat.com>
 
-From: Ed Swierk via Qemu-devel <qemu-devel@nongnu.org>
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 
-The device is supposed to maintain two distinct contexts for transmit
-offloads: one has parameters for both segmentation and checksum
-offload, the other only for checksum offload. The guest driver can
-send two context descriptors, one for each context (the TSE flag
-specifies which). Then the guest can refer to one or the other context
-in subsequent transmit data descriptors, depending on what offloads it
-wants applied to each packet.
+Separate out the standard ethernet CRC32 calculation into a new net_crc32=
+()
+function, renaming the constant POLYNOMIAL to POLYNOMIAL_BE to make it cl=
+ear
+that this is a big-endian CRC32 calculation.
 
-Currently the e1000 device stores just one context, and misinterprets
-the TSE flags in the context and data descriptors. This is often okay:
-Linux happens to send a fresh context descriptor before every data
-descriptor, so forgetting the other context doesn't matter. Windows
-does rely on separate contexts for TSO vs. non-TSO packets, but for
-mostly-TCP traffic the two contexts have identical TCP-specific
-offload parameters so confusing them doesn't matter.
+As part of the constant rename, remove the duplicate definition of POLYNO=
+MIAL
+from eepro100.c and use the new POLYNOMIAL_BE constant instead.
 
-One case where this confusion matters is when a Windows guest sets up
-a TSO context for TCP and a non-TSO context for UDP, and then
-transmits both TCP and UDP traffic in parallel. The e1000 device
-sometimes ends up using TCP-specific parameters while doing checksum
-offload on a UDP datagram: it writes the checksum to offset 16 (the
-correct location for a TCP checksum), stomping on two bytes of UDP
-data, and leaving the wrong value in the actual UDP checksum field at
-offset 6. (Even worse, the host network stack may then recompute the
-UDP checksum, "correcting" it to match the corrupt data before sending
-it out a physical interface.)
+Once this is complete remove the existing CRC32 implementation from
+compute_mcast_idx() and call the new net_crc32() function in its place.
 
-Correct this by tracking the TSO context independently of the non-TSO
-context, and selecting the appropriate context based on the TSE flag
-in each transmit data descriptor.
-
-Signed-off-by: Ed Swierk <eswierk@skyportsystems.com>
+Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 Signed-off-by: Jason Wang <jasowang@redhat.com>
 ---
- hw/net/e1000.c | 70 +++++++++++++++++++++++++++++++++-------------------------
- 1 file changed, 40 insertions(+), 30 deletions(-)
+ hw/net/eepro100.c |  4 +---
+ include/net/net.h |  3 ++-
+ net/net.c         | 16 +++++++++++-----
+ 3 files changed, 14 insertions(+), 9 deletions(-)
 
-diff --git a/hw/net/e1000.c b/hw/net/e1000.c
-index 30aef93..804ec08 100644
---- a/hw/net/e1000.c
-+++ b/hw/net/e1000.c
-@@ -101,6 +101,7 @@ typedef struct E1000State_st {
-         unsigned char sum_needed;
-         bool cptse;
-         e1000x_txd_props props;
-+        e1000x_txd_props tso_props;
-         uint16_t tso_frames;
-     } tx;
- 
-@@ -541,35 +542,37 @@ xmit_seg(E1000State *s)
-     uint16_t len;
-     unsigned int frames = s->tx.tso_frames, css, sofar;
-     struct e1000_tx *tp = &s->tx;
-+    struct e1000x_txd_props *props = tp->cptse ? &tp->tso_props : &tp->props;
- 
--    if (tp->props.tse && tp->cptse) {
--        css = tp->props.ipcss;
-+    if (tp->cptse) {
-+        css = props->ipcss;
-         DBGOUT(TXSUM, "frames %d size %d ipcss %d\n",
-                frames, tp->size, css);
--        if (tp->props.ip) {    /* IPv4 */
-+        if (props->ip) {    /* IPv4 */
-             stw_be_p(tp->data+css+2, tp->size - css);
-             stw_be_p(tp->data+css+4,
-                      lduw_be_p(tp->data + css + 4) + frames);
-         } else {         /* IPv6 */
-             stw_be_p(tp->data+css+4, tp->size - css);
+diff --git a/hw/net/eepro100.c b/hw/net/eepro100.c
+index 1c0def5..71cddfe 100644
+--- a/hw/net/eepro100.c
++++ b/hw/net/eepro100.c
+@@ -323,8 +323,6 @@ static const uint16_t eepro100_mdi_mask[] =3D {
+     0xffff, 0xffff, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000,
+ };
+=20
+-#define POLYNOMIAL 0x04c11db6
+-
+ static E100PCIDeviceInfo *eepro100_get_class(EEPRO100State *s);
+=20
+ /* From FreeBSD (locally modified). */
+@@ -342,7 +340,7 @@ static unsigned e100_compute_mcast_idx(const uint8_t =
+*ep)
+             crc <<=3D 1;
+             b >>=3D 1;
+             if (carry) {
+-                crc =3D ((crc ^ POLYNOMIAL) | carry);
++                crc =3D ((crc ^ POLYNOMIAL_BE) | carry);
+             }
          }
--        css = tp->props.tucss;
-+        css = props->tucss;
-         len = tp->size - css;
--        DBGOUT(TXSUM, "tcp %d tucss %d len %d\n", tp->props.tcp, css, len);
--        if (tp->props.tcp) {
--            sofar = frames * tp->props.mss;
-+        DBGOUT(TXSUM, "tcp %d tucss %d len %d\n", props->tcp, css, len);
-+        if (props->tcp) {
-+            sofar = frames * props->mss;
-             stl_be_p(tp->data+css+4, ldl_be_p(tp->data+css+4)+sofar); /* seq */
--            if (tp->props.paylen - sofar > tp->props.mss) {
-+            if (props->paylen - sofar > props->mss) {
-                 tp->data[css + 13] &= ~9;    /* PSH, FIN */
-             } else if (frames) {
-                 e1000x_inc_reg_if_not_full(s->mac_reg, TSCTC);
+     }
+diff --git a/include/net/net.h b/include/net/net.h
+index 1c55a93..586098c 100644
+--- a/include/net/net.h
++++ b/include/net/net.h
+@@ -227,7 +227,8 @@ NetClientState *net_hub_port_find(int hub_id);
+=20
+ void qdev_set_nic_properties(DeviceState *dev, NICInfo *nd);
+=20
+-#define POLYNOMIAL 0x04c11db6
++#define POLYNOMIAL_BE 0x04c11db6
++uint32_t net_crc32(const uint8_t *p, int len);
+ unsigned compute_mcast_idx(const uint8_t *ep);
+=20
+ #define vmstate_offset_macaddr(_state, _field)                       \
+diff --git a/net/net.c b/net/net.c
+index 39ef546..a14dc99 100644
+--- a/net/net.c
++++ b/net/net.c
+@@ -1581,25 +1581,31 @@ int net_client_parse(QemuOptsList *opts_list, con=
+st char *optarg)
+=20
+ /* From FreeBSD */
+ /* XXX: optimize */
+-unsigned compute_mcast_idx(const uint8_t *ep)
++uint32_t net_crc32(const uint8_t *p, int len)
+ {
+     uint32_t crc;
+     int carry, i, j;
+     uint8_t b;
+=20
+     crc =3D 0xffffffff;
+-    for (i =3D 0; i < 6; i++) {
+-        b =3D *ep++;
++    for (i =3D 0; i < len; i++) {
++        b =3D *p++;
+         for (j =3D 0; j < 8; j++) {
+             carry =3D ((crc & 0x80000000L) ? 1 : 0) ^ (b & 0x01);
+             crc <<=3D 1;
+             b >>=3D 1;
+             if (carry) {
+-                crc =3D ((crc ^ POLYNOMIAL) | carry);
++                crc =3D ((crc ^ POLYNOMIAL_BE) | carry);
              }
--        } else    /* UDP */
-+        } else {    /* UDP */
-             stw_be_p(tp->data+css+4, len);
-+        }
-         if (tp->sum_needed & E1000_TXD_POPTS_TXSM) {
-             unsigned int phsum;
-             // add pseudo-header length before checksum calculation
--            void *sp = tp->data + tp->props.tucso;
-+            void *sp = tp->data + props->tucso;
- 
-             phsum = lduw_be_p(sp) + len;
-             phsum = (phsum >> 16) + (phsum & 0xffff);
-@@ -579,12 +582,10 @@ xmit_seg(E1000State *s)
-     }
- 
-     if (tp->sum_needed & E1000_TXD_POPTS_TXSM) {
--        putsum(tp->data, tp->size, tp->props.tucso,
--               tp->props.tucss, tp->props.tucse);
-+        putsum(tp->data, tp->size, props->tucso, props->tucss, props->tucse);
-     }
-     if (tp->sum_needed & E1000_TXD_POPTS_IXSM) {
--        putsum(tp->data, tp->size, tp->props.ipcso,
--               tp->props.ipcss, tp->props.ipcse);
-+        putsum(tp->data, tp->size, props->ipcso, props->ipcss, props->ipcse);
-     }
-     if (tp->vlan_needed) {
-         memmove(tp->vlan, tp->data, 4);
-@@ -616,11 +617,11 @@ process_tx_desc(E1000State *s, struct e1000_tx_desc *dp)
- 
-     s->mit_ide |= (txd_lower & E1000_TXD_CMD_IDE);
-     if (dtype == E1000_TXD_CMD_DEXT) {    /* context descriptor */
--        e1000x_read_tx_ctx_descr(xp, &tp->props);
--        tp->tso_frames = 0;
--        if (tp->props.tucso == 0) {    /* this is probably wrong */
--            DBGOUT(TXSUM, "TCP/UDP: cso 0!\n");
--            tp->props.tucso = tp->props.tucss + (tp->props.tcp ? 16 : 6);
-+        if (le32_to_cpu(xp->cmd_and_length) & E1000_TXD_CMD_TSE) {
-+            e1000x_read_tx_ctx_descr(xp, &tp->tso_props);
-+            tp->tso_frames = 0;
-+        } else {
-+            e1000x_read_tx_ctx_descr(xp, &tp->props);
          }
-         return;
-     } else if (dtype == (E1000_TXD_CMD_DEXT | E1000_TXD_DTYP_D)) {
-@@ -645,8 +646,8 @@ process_tx_desc(E1000State *s, struct e1000_tx_desc *dp)
      }
- 
-     addr = le64_to_cpu(dp->buffer_addr);
--    if (tp->props.tse && tp->cptse) {
--        msh = tp->props.hdr_len + tp->props.mss;
-+    if (tp->cptse) {
-+        msh = tp->tso_props.hdr_len + tp->tso_props.mss;
-         do {
-             bytes = split_size;
-             if (tp->size + bytes > msh)
-@@ -655,21 +656,19 @@ process_tx_desc(E1000State *s, struct e1000_tx_desc *dp)
-             bytes = MIN(sizeof(tp->data) - tp->size, bytes);
-             pci_dma_read(d, addr, tp->data + tp->size, bytes);
-             sz = tp->size + bytes;
--            if (sz >= tp->props.hdr_len && tp->size < tp->props.hdr_len) {
--                memmove(tp->header, tp->data, tp->props.hdr_len);
-+            if (sz >= tp->tso_props.hdr_len
-+                && tp->size < tp->tso_props.hdr_len) {
-+                memmove(tp->header, tp->data, tp->tso_props.hdr_len);
-             }
-             tp->size = sz;
-             addr += bytes;
-             if (sz == msh) {
-                 xmit_seg(s);
--                memmove(tp->data, tp->header, tp->props.hdr_len);
--                tp->size = tp->props.hdr_len;
-+                memmove(tp->data, tp->header, tp->tso_props.hdr_len);
-+                tp->size = tp->tso_props.hdr_len;
-             }
-             split_size -= bytes;
-         } while (bytes && split_size);
--    } else if (!tp->props.tse && tp->cptse) {
--        // context descriptor TSE is not set, while data descriptor TSE is set
--        DBGOUT(TXERR, "TCP segmentation error\n");
-     } else {
-         split_size = MIN(sizeof(tp->data) - tp->size, split_size);
-         pci_dma_read(d, addr, tp->data + tp->size, split_size);
-@@ -678,7 +677,7 @@ process_tx_desc(E1000State *s, struct e1000_tx_desc *dp)
- 
-     if (!(txd_lower & E1000_TXD_CMD_EOP))
-         return;
--    if (!(tp->props.tse && tp->cptse && tp->size < tp->props.hdr_len)) {
-+    if (!(tp->cptse && tp->size < tp->tso_props.hdr_len)) {
-         xmit_seg(s);
-     }
-     tp->tso_frames = 0;
-@@ -1437,7 +1436,7 @@ static const VMStateDescription vmstate_e1000_full_mac_state = {
- 
- static const VMStateDescription vmstate_e1000 = {
-     .name = "e1000",
--    .version_id = 2,
-+    .version_id = 3,
-     .minimum_version_id = 1,
-     .pre_save = e1000_pre_save,
-     .post_load = e1000_post_load,
-@@ -1510,6 +1509,17 @@ static const VMStateDescription vmstate_e1000 = {
-         VMSTATE_UINT32_SUB_ARRAY(mac_reg, E1000State, RA, 32),
-         VMSTATE_UINT32_SUB_ARRAY(mac_reg, E1000State, MTA, 128),
-         VMSTATE_UINT32_SUB_ARRAY(mac_reg, E1000State, VFTA, 128),
-+        VMSTATE_UINT8_V(tx.tso_props.ipcss, E1000State, 3),
-+        VMSTATE_UINT8_V(tx.tso_props.ipcso, E1000State, 3),
-+        VMSTATE_UINT16_V(tx.tso_props.ipcse, E1000State, 3),
-+        VMSTATE_UINT8_V(tx.tso_props.tucss, E1000State, 3),
-+        VMSTATE_UINT8_V(tx.tso_props.tucso, E1000State, 3),
-+        VMSTATE_UINT16_V(tx.tso_props.tucse, E1000State, 3),
-+        VMSTATE_UINT32_V(tx.tso_props.paylen, E1000State, 3),
-+        VMSTATE_UINT8_V(tx.tso_props.hdr_len, E1000State, 3),
-+        VMSTATE_UINT16_V(tx.tso_props.mss, E1000State, 3),
-+        VMSTATE_INT8_V(tx.tso_props.ip, E1000State, 3),
-+        VMSTATE_INT8_V(tx.tso_props.tcp, E1000State, 3),
-         VMSTATE_END_OF_LIST()
-     },
-     .subsections = (const VMStateDescription*[]) {
--- 
+-    return crc >> 26;
++
++    return crc;
++}
++
++unsigned compute_mcast_idx(const uint8_t *ep)
++{
++    return net_crc32(ep, ETH_ALEN) >> 26;
+ }
+=20
+ QemuOptsList qemu_netdev_opts =3D {
+--=20
 2.7.4
