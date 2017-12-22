@@ -1,28 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37954)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38718)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1eST1l-0002aa-0X
-	for qemu-devel@nongnu.org; Fri, 22 Dec 2017 14:30:41 -0500
+	(envelope-from <mst@redhat.com>) id 1eST2U-00034s-2u
+	for qemu-devel@nongnu.org; Fri, 22 Dec 2017 14:31:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1eST1h-0004Ev-Rl
-	for qemu-devel@nongnu.org; Fri, 22 Dec 2017 14:30:41 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:55240)
+	(envelope-from <mst@redhat.com>) id 1eST2Q-0004pr-Ui
+	for qemu-devel@nongnu.org; Fri, 22 Dec 2017 14:31:26 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:35576)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1eST1h-0004Dc-KW
-	for qemu-devel@nongnu.org; Fri, 22 Dec 2017 14:30:37 -0500
-Date: Fri, 22 Dec 2017 21:30:34 +0200
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1eST2Q-0004pP-Ou
+	for qemu-devel@nongnu.org; Fri, 22 Dec 2017 14:31:22 -0500
+Date: Fri, 22 Dec 2017 21:31:20 +0200
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20171222213027-mutt-send-email-mst@kernel.org>
+Message-ID: <20171222213109-mutt-send-email-mst@kernel.org>
 References: <20171214040855.22231-1-douly.fnst@cn.fujitsu.com>
-	<20171218220901.GE5209@localhost.localdomain>
-	<f5057cbf-c699-847a-d219-78a0ba6bff63@cn.fujitsu.com>
-	<20171220213820.GF24025@localhost.localdomain>
-	<20171222202434.2e749e99@igors-macbook-pro.local>
+	<20171214040855.22231-3-douly.fnst@cn.fujitsu.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20171222202434.2e749e99@igors-macbook-pro.local>
-Subject: Re: [Qemu-devel] [RESEND PATCH for-2.12 0/2] ACPI/unit-test: Add a
- testcase
+In-Reply-To: <20171214040855.22231-3-douly.fnst@cn.fujitsu.com>
+Subject: Re: [Qemu-devel] [RESEND PATCH for-2.12 2/2] hw/acpi-build: Make
+ next_base easy to follow
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,56 +28,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, Dou Liyang <douly.fnst@cn.fujitsu.com>, peter.maydell@linaro.org, qemu-devel@nongnu.org, indou.takao@jp.fujitsu.com
+To: Dou Liyang <douly.fnst@cn.fujitsu.com>
+Cc: ehabkost@redhat.com, imammedo@redhat.com, peter.maydell@linaro.org, qemu-devel@nongnu.org, indou.takao@jp.fujitsu.com
 
-On Fri, Dec 22, 2017 at 08:24:34PM +0100, Igor Mammedov wrote:
-> On Wed, 20 Dec 2017 19:38:20 -0200
-> Eduardo Habkost <ehabkost@redhat.com> wrote:
+On Thu, Dec 14, 2017 at 12:08:55PM +0800, Dou Liyang wrote:
+> It may be hard to read the assignment statement of "next_base", so
 > 
-> > On Tue, Dec 19, 2017 at 12:01:59PM +0800, Dou Liyang wrote:
-> > > Hi Eduardo,
-> > > 
-> > > At 12/19/2017 06:09 AM, Eduardo Habkost wrote:
-> > > > On Thu, Dec 14, 2017 at 12:08:53PM +0800, Dou Liyang wrote:
-> > > > > These are the patches left over from the pull request:
-> > > > > 
-> > > > >    [Qemu-devel] [PULL 0/9] x86 and machine queue, 2017-10-05
-> > > > > 
-> > > > > because of some errors when tested by "make check" command[1].
-> > > > > 
-> > > > > Now, the QEMU 2.11.0 has been released, rebase/retest/respin them
-> > > > > for v2.12 dev.
-> > > > > 
-> > > > > Changelog:
-> > > > >    --Rebase and retest this patch in v2.11.0
-> > > > >    --Update the DSDT.numamem:
-> > > > > 
-> > > > > [1]: http://lists.gnu.org/archive/html/qemu-devel/2017-10/msg01334.html
-> > > > 
-> > > > Do we know what caused the failures Peter saw, and if we can now
-> > > > be sure it won't happen again?
-> > > 
-> > > Sorry, I can't. I tested it many times with my colleagues, it won't
-> > > happen like Peter saw. This issue is very subtle and funny. Could you
-> > > give me some suggestions?
-> > 
-> > I guess all we can do is to ask Peter to test if the issue is
-> > still reproducible.
-> > 
-> > Peter, do you prefer that I just send a regular pull request
-> > asking for testing, or do you prefer to apply this series and
-> > test it manually before I send a pull request?
-> > 
-> > > 
-> > > BTW, I used "make TEST_ACPI_REBUILD_AML=1 check" to create the DSDT
-> > > file. Is it correct?
-> > 
-> > This sounds correct to me.  Igor, can you confirm?
-> It's will rebuild/update reference tables.
+> S/next_base += (1ULL << 32) - pcms->below_4g_mem_size;
+>  /next_base = mem_base + mem_len;
 > 
-> I'm for merging it early and tracking/fixing issue Peter saw during this dev cycle.
+> ... for readability.
 > 
+> No functionality change.
 > 
+> Signed-off-by: Dou Liyang <douly.fnst@cn.fujitsu.com>
 
-Send an ack then?
+Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+
+> ---
+>  hw/i386/acpi-build.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+> index 73519ab3ac..2010108ae0 100644
+> --- a/hw/i386/acpi-build.c
+> +++ b/hw/i386/acpi-build.c
+> @@ -2381,7 +2381,7 @@ build_srat(GArray *table_data, BIOSLinker *linker, MachineState *machine)
+>              }
+>              mem_base = 1ULL << 32;
+>              mem_len = next_base - pcms->below_4g_mem_size;
+> -            next_base += (1ULL << 32) - pcms->below_4g_mem_size;
+> +            next_base = mem_base + mem_len;
+>          }
+>          numamem = acpi_data_push(table_data, sizeof *numamem);
+>          build_srat_memory(numamem, mem_base, mem_len, i - 1,
+> -- 
+> 2.14.3
+> 
+> 
