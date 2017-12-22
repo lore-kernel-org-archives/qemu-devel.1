@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44022)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55233)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1eSUPi-0001iS-EA
-	for qemu-devel@nongnu.org; Fri, 22 Dec 2017 15:59:31 -0500
+	(envelope-from <mst@redhat.com>) id 1eSUez-0006Sb-K9
+	for qemu-devel@nongnu.org; Fri, 22 Dec 2017 16:15:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1eSUPh-0004mC-Nd
-	for qemu-devel@nongnu.org; Fri, 22 Dec 2017 15:59:30 -0500
+	(envelope-from <mst@redhat.com>) id 1eSUev-0008D1-G7
+	for qemu-devel@nongnu.org; Fri, 22 Dec 2017 16:15:17 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:59330)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1eSUev-0008BH-4s
+	for qemu-devel@nongnu.org; Fri, 22 Dec 2017 16:15:13 -0500
+Date: Fri, 22 Dec 2017 23:15:09 +0200
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20171222231342-mutt-send-email-mst@kernel.org>
+References: <1513327555-17520-1-git-send-email-jianjay.zhou@huawei.com>
+	<1513327555-17520-3-git-send-email-jianjay.zhou@huawei.com>
+	<20171222194855.6d1139f1@igors-macbook-pro.local>
 MIME-Version: 1.0
-Sender: alistair23@gmail.com
-In-Reply-To: <87a7yah5ea.fsf@dusky.pond.sub.org>
-References: <cover.1513790494.git.alistair.francis@xilinx.com>
-	<6bad4084f4cbc290e2e9f1a72fcfcda7223383ec.1513790495.git.alistair.francis@xilinx.com>
-	<87lghulqno.fsf@dusky.pond.sub.org>
-	<1cfb1217-e32d-8e91-da46-07f1c72be77f@redhat.com>
-	<CAKmqyKPyL8B5ZjEUePkqVbzP8kVmM48vWML41PRXVVO7LVmMpg@mail.gmail.com>
-	<87a7yah5ea.fsf@dusky.pond.sub.org>
-From: Alistair Francis <alistair.francis@xilinx.com>
-Date: Fri, 22 Dec 2017 12:58:53 -0800
-Message-ID: <CAKmqyKO5sKdiZJ65teDxa16PCE71WCLay7cOAQJQdyS-EVNOJg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v6 04/29] hw/arm: Replace fprintf(stderr,
- "*\n" with error_report()
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20171222194855.6d1139f1@igors-macbook-pro.local>
+Subject: Re: [Qemu-devel] [PATCH v2 2/2] vhost: double check used memslots
+ number
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,62 +29,124 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: Alistair Francis <alistair.francis@xilinx.com>, QEMU Trivial <qemu-trivial@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, qemu-arm <qemu-arm@nongnu.org>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: Jay Zhou <jianjay.zhou@huawei.com>, qemu-devel@nongnu.org, weidong.huang@huawei.com, arei.gonglei@huawei.com, wangxinxin.wang@huawei.com, gary.liuzhe@huawei.com, dgilbert@redhat.com
 
-On Fri, Dec 22, 2017 at 12:30 PM, Markus Armbruster <armbru@redhat.com> wrote:
-> Alistair Francis <alistair.francis@xilinx.com> writes:
->
->> On Fri, Dec 22, 2017 at 9:17 AM, Thomas Huth <thuth@redhat.com> wrote:
->>> On 22.12.2017 16:37, Markus Armbruster wrote:
->>>> Second thoughts...
->>>>
->>>> Alistair Francis <alistair.francis@xilinx.com> writes:
->>> [...]
->>>>>  #include "qemu/osdep.h"
->>>>> +#include "qemu/error-report.h"
->>>>>  #include "qapi/error.h"
->>>>>  #include "qemu-common.h"
->>>>>  #include "cpu.h"
->>>>> @@ -1311,8 +1312,8 @@ static void omap_prcm_apll_update(struct omap_prcm_s *s)
->>>>>      /* TODO: update clocks */
->>>>>
->>>>>      if (mode[0] == 1 || mode[0] == 2 || mode[1] == 1 || mode[1] == 2)
->>>>> -        fprintf(stderr, "%s: bad EN_54M_PLL or bad EN_96M_PLL\n",
->>>>> -                        __func__);
->>>>> +        error_report("%s: bad EN_54M_PLL or bad EN_96M_PLL",
->>>>> +                     __func__);
->>>>>  }
->>>>
->>>> This one's different: we neither exit() nor return a "failed" status to
->>>> the caller.
->>>>
->>>> We get here when the guest writes something funny to a certain
->>>> memory-mapped I/O register.  In other words, it's guest misbehavior, not
->>>> a user error.  I doubt it should be reported with error_report().
->>>> Peter, do we have a canonical way to report or log  guest misbehavior?
->>>
->>> qemu_log_mask(LOG_GUEST_ERROR, ...) ?
->>
->> That seems like the best option to me.
->
-> Suggest:
->
-> 1. Keep converting fatal errors (the ones that exit())
->
-> 2. Keep converting recoverable errors (the ones that return failure)
->
-> 3. You can leave the prints that are neither alone.  You can also
->    convert to logging or tracing, as appropriate, but that requires
->    understanding the code.
->
-> Makes sense?
+On Fri, Dec 22, 2017 at 07:48:55PM +0100, Igor Mammedov wrote:
+> On Fri, 15 Dec 2017 16:45:55 +0800
+> Jay Zhou <jianjay.zhou@huawei.com> wrote:
+> 
+> > If the VM already has N(N>8) available memory slots for vhost user,
+> > the VM will be crashed in vhost_user_set_mem_table if we try to
+> > hotplug the first vhost user NIC.
+> > This patch checks if memslots number exceeded or not after updating
+> > vhost_user_used_memslots.
+> Can't understand commit message, pls rephrase (what is being fixed, and how it's fixed)
+> also include reproducing steps for crash and maybe describe call flow/backtrace
+> that triggers crash.
+> 
+> PS:
+> I wasn't able to reproduce crash
+> 
+> > 
+> > Signed-off-by: Jay Zhou <jianjay.zhou@huawei.com>
+> > ---
+> >  hw/virtio/vhost.c | 27 +++++++++++++++++++++++----
+> >  1 file changed, 23 insertions(+), 4 deletions(-)
+> > 
+> > diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
+> > index 59a32e9..e45f5e2 100644
+> > --- a/hw/virtio/vhost.c
+> > +++ b/hw/virtio/vhost.c
+> > @@ -1234,6 +1234,18 @@ static void vhost_virtqueue_cleanup(struct vhost_virtqueue *vq)
+> >      event_notifier_cleanup(&vq->masked_notifier);
+> >  }
+> >  
+> > +static bool vhost_dev_used_memslots_is_exceeded(struct vhost_dev *hdev)
+> > +{
+> > +    if (hdev->vhost_ops->vhost_get_used_memslots() >
+> > +        hdev->vhost_ops->vhost_backend_memslots_limit(hdev)) {
+> > +        error_report("vhost backend memory slots limit is less"
+> > +                " than current number of present memory slots");
+> > +        return true;
+> > +    }
+> > +
+> > +    return false;
+> > +}
+> > +
+> >  int vhost_dev_init(struct vhost_dev *hdev, void *opaque,
+> >                     VhostBackendType backend_type, uint32_t busyloop_timeout)
+> >  {
+> > @@ -1252,10 +1264,7 @@ int vhost_dev_init(struct vhost_dev *hdev, void *opaque,
+> >          goto fail;
+> >      }
+> >  
+> > -    if (hdev->vhost_ops->vhost_get_used_memslots() >
+> > -        hdev->vhost_ops->vhost_backend_memslots_limit(hdev)) {
+> > -        error_report("vhost backend memory slots limit is less"
+> > -                " than current number of present memory slots");
+> > +    if (vhost_dev_used_memslots_is_exceeded(hdev)) {
+> why do you keep this check?
+> it seems always be false
+> 
+> 
+> 
+> >          r = -1;
+> >          goto fail;
+> >      }
+> > @@ -1341,6 +1350,16 @@ int vhost_dev_init(struct vhost_dev *hdev, void *opaque,
+> >      hdev->memory_changed = false;
+> >      memory_listener_register(&hdev->memory_listener, &address_space_memory);
+> >      QLIST_INSERT_HEAD(&vhost_devices, hdev, entry);
+> > +
+> > +    if (vhost_dev_used_memslots_is_exceeded(hdev)) {
+> > +        r = -1;
+> > +        if (busyloop_timeout) {
+> > +            goto fail_busyloop;
+> > +        } else {
+> > +            goto fail;
+> > +        }
+> > +    }
+> seem to be right thing to do, since after registering listener for the first time
+> used_memslots will be updated to actual value.
+> 
+> 
+> I did some testing and without this hunk/patch
+> 
+> on 'device_add  virtio-net-pci,netdev=net0' qemu prints:
+> 
+> qemu-system-x86_64: vhost_set_mem_table failed: Argument list too long (7)
+> qemu-system-x86_64: unable to start vhost net: 7: falling back on userspace virtio
+> 
+> and network is operational in guest, but with this patch
+> 
+> "netdev_add ...,vhost-on" prints:
+> 
+> vhost backend memory slots limit is less than current number of present memory slots
+> vhost-net requested but could not be initialized
+> 
+> and following "device_add  virtio-net-pci,netdev=net0" prints:
+> 
+> TUNSETOFFLOAD ioctl() failed: Bad file descriptor
+> TUNSETOFFLOAD ioctl() failed: Bad file descriptor
+> 
+> adapter is still hot-plugged but guest networking is broken (can't get IP address via DHCP)
+> 
+> so patch seems introduces a regression or something broken elsewhere and this exposes issue,
+> not sure what qemu reaction should be in this case
+>  i.e. when netdev_add fails 
+>     1: should we fail followed up device_add or 
+>     2: make it fall back to userspace virtio
+> 
+> I'd go for #2,
+> Michael what's your take on it?
 
-Does this apply to new patches after this series or to this series as
-well? The series is mostly just mechanical find/replace. I really
-don't want to have to dig through every patch to figure out what to
-change/not change.
+OK but there's a vhost force flag, if that is set we definitely should
+fail device_add.
 
-Alistair
+Also, hotplug can follow device_add, should be handled similarly.
 
->
+> > +
+> >      return 0;
+> >  
+> >  fail_busyloop:
