@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56947)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56926)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1eSP6K-0005Q2-Gl
+	(envelope-from <kwolf@redhat.com>) id 1eSP6J-0005PF-Ue
 	for qemu-devel@nongnu.org; Fri, 22 Dec 2017 10:19:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1eSP6J-00025Q-HT
-	for qemu-devel@nongnu.org; Fri, 22 Dec 2017 10:19:08 -0500
+	(envelope-from <kwolf@redhat.com>) id 1eSP6I-000235-Cr
+	for qemu-devel@nongnu.org; Fri, 22 Dec 2017 10:19:07 -0500
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Fri, 22 Dec 2017 16:18:19 +0100
-Message-Id: <20171222151846.28110-9-kwolf@redhat.com>
+Date: Fri, 22 Dec 2017 16:18:16 +0100
+Message-Id: <20171222151846.28110-6-kwolf@redhat.com>
 In-Reply-To: <20171222151846.28110-1-kwolf@redhat.com>
 References: <20171222151846.28110-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL v3 08/35] block: Unify order in drain functions
+Subject: [Qemu-devel] [PULL v3 05/35] test-bdrv-drain: Test BlockDriver
+ callbacks for drain
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,73 +23,181 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, peter.maydell@linaro.org, qemu-devel@nongnu.org
 
-Drain requests are propagated to child nodes, parent nodes and directly
-to the AioContext. The order in which this happened was different
-between all combinations of drain/drain_all and begin/end.
-
-The correct order is to keep children only drained when their parents
-are also drained. This means that at the start of a drained section, the
-AioContext needs to be drained first, the parents second and only then
-the children. The correct order for the end of a drained section is the
-opposite.
-
-This patch changes the three other functions to follow the example of
-bdrv_drained_begin(), which is the only one that got it right.
+This adds a test case that the BlockDriver callbacks for drain are
+called in bdrv_drained_all_begin/end(), and that both of them are called
+exactly once.
 
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
 ---
- block/io.c | 12 ++++++++----
- 1 file changed, 8 insertions(+), 4 deletions(-)
+ tests/test-bdrv-drain.c | 137 ++++++++++++++++++++++++++++++++++++++++++++++++
+ tests/Makefile.include  |   2 +
+ 2 files changed, 139 insertions(+)
+ create mode 100644 tests/test-bdrv-drain.c
 
-diff --git a/block/io.c b/block/io.c
-index 5fdb92a15e..1e92d2e5b2 100644
---- a/block/io.c
-+++ b/block/io.c
-@@ -277,6 +277,7 @@ void bdrv_drained_begin(BlockDriverState *bs)
-         return;
-     }
- 
-+    /* Stop things in parent-to-child order */
-     if (atomic_fetch_inc(&bs->quiesce_counter) == 0) {
-         aio_disable_external(bdrv_get_aio_context(bs));
-         bdrv_parent_drained_begin(bs);
-@@ -297,8 +298,9 @@ void bdrv_drained_end(BlockDriverState *bs)
-         return;
-     }
- 
--    bdrv_parent_drained_end(bs);
-+    /* Re-enable things in child-to-parent order */
-     bdrv_drain_invoke(bs, false);
-+    bdrv_parent_drained_end(bs);
-     aio_enable_external(bdrv_get_aio_context(bs));
- }
- 
-@@ -351,9 +353,10 @@ void bdrv_drain_all_begin(void)
-     for (bs = bdrv_first(&it); bs; bs = bdrv_next(&it)) {
-         AioContext *aio_context = bdrv_get_aio_context(bs);
- 
-+        /* Stop things in parent-to-child order */
-         aio_context_acquire(aio_context);
--        bdrv_parent_drained_begin(bs);
-         aio_disable_external(aio_context);
-+        bdrv_parent_drained_begin(bs);
-         bdrv_drain_invoke(bs, true);
-         aio_context_release(aio_context);
- 
-@@ -395,10 +398,11 @@ void bdrv_drain_all_end(void)
-     for (bs = bdrv_first(&it); bs; bs = bdrv_next(&it)) {
-         AioContext *aio_context = bdrv_get_aio_context(bs);
- 
-+        /* Re-enable things in child-to-parent order */
-         aio_context_acquire(aio_context);
--        aio_enable_external(aio_context);
--        bdrv_parent_drained_end(bs);
-         bdrv_drain_invoke(bs, false);
-+        bdrv_parent_drained_end(bs);
-+        aio_enable_external(aio_context);
-         aio_context_release(aio_context);
-     }
- 
+diff --git a/tests/test-bdrv-drain.c b/tests/test-bdrv-drain.c
+new file mode 100644
+index 0000000000..0e567e34ba
+--- /dev/null
++++ b/tests/test-bdrv-drain.c
+@@ -0,0 +1,137 @@
++/*
++ * Block node draining tests
++ *
++ * Copyright (c) 2017 Kevin Wolf <kwolf@redhat.com>
++ *
++ * Permission is hereby granted, free of charge, to any person obtaining a copy
++ * of this software and associated documentation files (the "Software"), to deal
++ * in the Software without restriction, including without limitation the rights
++ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
++ * copies of the Software, and to permit persons to whom the Software is
++ * furnished to do so, subject to the following conditions:
++ *
++ * The above copyright notice and this permission notice shall be included in
++ * all copies or substantial portions of the Software.
++ *
++ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
++ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
++ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
++ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
++ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
++ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
++ * THE SOFTWARE.
++ */
++
++#include "qemu/osdep.h"
++#include "block/block.h"
++#include "sysemu/block-backend.h"
++#include "qapi/error.h"
++
++typedef struct BDRVTestState {
++    int drain_count;
++} BDRVTestState;
++
++static void coroutine_fn bdrv_test_co_drain_begin(BlockDriverState *bs)
++{
++    BDRVTestState *s = bs->opaque;
++    s->drain_count++;
++}
++
++static void coroutine_fn bdrv_test_co_drain_end(BlockDriverState *bs)
++{
++    BDRVTestState *s = bs->opaque;
++    s->drain_count--;
++}
++
++static void bdrv_test_close(BlockDriverState *bs)
++{
++    BDRVTestState *s = bs->opaque;
++    g_assert_cmpint(s->drain_count, >, 0);
++}
++
++static int coroutine_fn bdrv_test_co_preadv(BlockDriverState *bs,
++                                            uint64_t offset, uint64_t bytes,
++                                            QEMUIOVector *qiov, int flags)
++{
++    /* We want this request to stay until the polling loop in drain waits for
++     * it to complete. We need to sleep a while as bdrv_drain_invoke() comes
++     * first and polls its result, too, but it shouldn't accidentally complete
++     * this request yet. */
++    qemu_co_sleep_ns(QEMU_CLOCK_REALTIME, 100000);
++
++    return 0;
++}
++
++static BlockDriver bdrv_test = {
++    .format_name            = "test",
++    .instance_size          = sizeof(BDRVTestState),
++
++    .bdrv_close             = bdrv_test_close,
++    .bdrv_co_preadv         = bdrv_test_co_preadv,
++
++    .bdrv_co_drain_begin    = bdrv_test_co_drain_begin,
++    .bdrv_co_drain_end      = bdrv_test_co_drain_end,
++};
++
++static void aio_ret_cb(void *opaque, int ret)
++{
++    int *aio_ret = opaque;
++    *aio_ret = ret;
++}
++
++static void test_drv_cb_drain_all(void)
++{
++    BlockBackend *blk;
++    BlockDriverState *bs;
++    BDRVTestState *s;
++    BlockAIOCB *acb;
++    int aio_ret;
++
++    QEMUIOVector qiov;
++    struct iovec iov = {
++        .iov_base = NULL,
++        .iov_len = 0,
++    };
++    qemu_iovec_init_external(&qiov, &iov, 1);
++
++    blk = blk_new(BLK_PERM_ALL, BLK_PERM_ALL);
++    bs = bdrv_new_open_driver(&bdrv_test, "test-node", BDRV_O_RDWR,
++                              &error_abort);
++    s = bs->opaque;
++    blk_insert_bs(blk, bs, &error_abort);
++
++    /* Simple bdrv_drain_all_begin/end pair, check that CBs are called */
++    g_assert_cmpint(s->drain_count, ==, 0);
++    bdrv_drain_all_begin();
++    g_assert_cmpint(s->drain_count, ==, 1);
++    bdrv_drain_all_end();
++    g_assert_cmpint(s->drain_count, ==, 0);
++
++    /* Now do the same while a request is pending */
++    aio_ret = -EINPROGRESS;
++    acb = blk_aio_preadv(blk, 0, &qiov, 0, aio_ret_cb, &aio_ret);
++    g_assert(acb != NULL);
++    g_assert_cmpint(aio_ret, ==, -EINPROGRESS);
++
++    g_assert_cmpint(s->drain_count, ==, 0);
++    bdrv_drain_all_begin();
++    g_assert_cmpint(aio_ret, ==, 0);
++    g_assert_cmpint(s->drain_count, ==, 1);
++    bdrv_drain_all_end();
++    g_assert_cmpint(s->drain_count, ==, 0);
++
++    bdrv_unref(bs);
++    blk_unref(blk);
++}
++
++int main(int argc, char **argv)
++{
++    bdrv_init();
++    qemu_init_main_loop(&error_abort);
++
++    g_test_init(&argc, &argv, NULL);
++
++    g_test_add_func("/bdrv-drain/driver-cb/drain_all", test_drv_cb_drain_all);
++
++    return g_test_run();
++}
+diff --git a/tests/Makefile.include b/tests/Makefile.include
+index 77f8183117..39a4b5359d 100644
+--- a/tests/Makefile.include
++++ b/tests/Makefile.include
+@@ -80,6 +80,7 @@ gcov-files-test-thread-pool-y = thread-pool.c
+ gcov-files-test-hbitmap-y = util/hbitmap.c
+ check-unit-y += tests/test-hbitmap$(EXESUF)
+ gcov-files-test-hbitmap-y = blockjob.c
++check-unit-y += tests/test-bdrv-drain$(EXESUF)
+ check-unit-y += tests/test-blockjob$(EXESUF)
+ check-unit-y += tests/test-blockjob-txn$(EXESUF)
+ check-unit-y += tests/test-x86-cpuid$(EXESUF)
+@@ -595,6 +596,7 @@ tests/test-coroutine$(EXESUF): tests/test-coroutine.o $(test-block-obj-y)
+ tests/test-aio$(EXESUF): tests/test-aio.o $(test-block-obj-y)
+ tests/test-aio-multithread$(EXESUF): tests/test-aio-multithread.o $(test-block-obj-y)
+ tests/test-throttle$(EXESUF): tests/test-throttle.o $(test-block-obj-y)
++tests/test-bdrv-drain$(EXESUF): tests/test-bdrv-drain.o $(test-block-obj-y) $(test-util-obj-y)
+ tests/test-blockjob$(EXESUF): tests/test-blockjob.o $(test-block-obj-y) $(test-util-obj-y)
+ tests/test-blockjob-txn$(EXESUF): tests/test-blockjob-txn.o $(test-block-obj-y) $(test-util-obj-y)
+ tests/test-thread-pool$(EXESUF): tests/test-thread-pool.o $(test-block-obj-y)
 -- 
 2.13.6
