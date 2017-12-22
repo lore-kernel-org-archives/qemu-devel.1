@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60158)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60126)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1eSKQ9-0006yN-SL
+	(envelope-from <dgibson@ozlabs.org>) id 1eSKQ8-0006yC-NS
 	for qemu-devel@nongnu.org; Fri, 22 Dec 2017 05:19:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1eSKQ7-0005Rx-29
-	for qemu-devel@nongnu.org; Fri, 22 Dec 2017 05:19:17 -0500
-Date: Fri, 22 Dec 2017 21:09:11 +1100
+	(envelope-from <dgibson@ozlabs.org>) id 1eSKQ7-0005S4-2r
+	for qemu-devel@nongnu.org; Fri, 22 Dec 2017 05:19:16 -0500
+Date: Fri, 22 Dec 2017 21:09:41 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20171222100911.GC26042@umbus.fritz.box>
-References: <20171221165456.8609-1-clg@kaod.org>
-	<20171222003906.GA26042@umbus.fritz.box>
-	<edb67b7f-7592-d21c-901a-1d4671903d65@kaod.org>
+Message-ID: <20171222100941.GD26042@umbus.fritz.box>
+References: <20171222095551.5581-1-clg@kaod.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="aT9PWwzfKXlsBJM1"
+	protocol="application/pgp-signature"; boundary="6WlEvdN9Dv0WHSBl"
 Content-Disposition: inline
-In-Reply-To: <edb67b7f-7592-d21c-901a-1d4671903d65@kaod.org>
-Subject: Re: [Qemu-devel] [PATCH] target/ppc: more use of the PPC_*() macros
+In-Reply-To: <20171222095551.5581-1-clg@kaod.org>
+Subject: Re: [Qemu-devel] [PATCH v2] target/ppc: more use of the PPC_*()
+ macros
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,30 +28,156 @@ To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
 Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 
 
---aT9PWwzfKXlsBJM1
+--6WlEvdN9Dv0WHSBl
 Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Dec 22, 2017 at 08:01:41AM +0100, C=E9dric Le Goater wrote:
-> On 12/22/2017 01:39 AM, David Gibson wrote:
-> > On Thu, Dec 21, 2017 at 05:54:56PM +0100, C=E9dric Le Goater wrote:
-> >> Also introduce utilities to manipulate bitmasks (originaly from OPAL)
-> >> which be will be used in the model of the XIVE interrupt controller.
-> >>
-> >> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
-> >=20
-> > Applied to ppc-for-2.12, thanks.  Unfortunately getting my tree pulled
-> > is held up because something is breaking on arm.
+On Fri, Dec 22, 2017 at 10:55:51AM +0100, C=E9dric Le Goater wrote:
+> Also introduce utilities to manipulate bitmasks (originaly from OPAL)
+> which be will be used in the model of the XIVE interrupt controller.
 >=20
-> yes. I saw. I gave it a try on ppc64,pp64el,x86-64 hosts and didn't=20
-> see anything wrong. I also have a raspberrypi3. Would that be a good=20
-> candidate ?
+> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
+> ---
+>=20
+>  Changes since v2:
+>=20
+>  - use __builtin_ffsll() on 32bits hosts
 
-No idea.  I tried on a RasPi 1 and a couple of other arms I borrowed.
-Haven't managed to reproduce.  I'm now suspecting it's something to do
-with the distro/library versions on Peter Maydell's system rather than
-anything particularly to do with ARM.
+I've updated my tree.
+
+>=20
+>  hw/ppc/pnv_lpc.c        | 10 ++++-----
+>  target/ppc/cpu.h        | 56 ++++++++++++++++++++++++++++++-------------=
+------
+>  target/ppc/int_helper.c |  2 +-
+>  3 files changed, 40 insertions(+), 28 deletions(-)
+>=20
+> diff --git a/hw/ppc/pnv_lpc.c b/hw/ppc/pnv_lpc.c
+> index b777b78e1837..c42b4a8f6c0f 100644
+> --- a/hw/ppc/pnv_lpc.c
+> +++ b/hw/ppc/pnv_lpc.c
+> @@ -146,13 +146,13 @@ static bool opb_write(PnvLpcController *lpc, uint32=
+_t addr, uint8_t *data,
+>      return success;
+>  }
+> =20
+> -#define ECCB_CTL_READ           (1ull << (63 - 15))
+> +#define ECCB_CTL_READ           PPC_BIT(15)
+>  #define ECCB_CTL_SZ_LSH         (63 - 7)
+> -#define ECCB_CTL_SZ_MASK        (0xfull << ECCB_CTL_SZ_LSH)
+> -#define ECCB_CTL_ADDR_MASK      0xffffffffu;
+> +#define ECCB_CTL_SZ_MASK        PPC_BITMASK(4, 7)
+> +#define ECCB_CTL_ADDR_MASK      PPC_BITMASK(32, 63)
+> =20
+> -#define ECCB_STAT_OP_DONE       (1ull << (63 - 52))
+> -#define ECCB_STAT_OP_ERR        (1ull << (63 - 52))
+> +#define ECCB_STAT_OP_DONE       PPC_BIT(52)
+> +#define ECCB_STAT_OP_ERR        PPC_BIT(52)
+>  #define ECCB_STAT_RD_DATA_LSH   (63 - 37)
+>  #define ECCB_STAT_RD_DATA_MASK  (0xffffffff << ECCB_STAT_RD_DATA_LSH)
+> =20
+> diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
+> index 370b05e76ede..a5e49f23e9cf 100644
+> --- a/target/ppc/cpu.h
+> +++ b/target/ppc/cpu.h
+> @@ -93,6 +93,19 @@
+>  #define PPC_BITMASK(bs, be)     ((PPC_BIT(bs) - PPC_BIT(be)) | PPC_BIT(b=
+s))
+>  #define PPC_BITMASK32(bs, be)   ((PPC_BIT32(bs) - PPC_BIT32(be)) | \
+>                                   PPC_BIT32(bs))
+> +#define PPC_BITMASK8(bs, be)    ((PPC_BIT8(bs) - PPC_BIT8(be)) | PPC_BIT=
+8(bs))
+> +
+> +#if HOST_LONG_BITS =3D=3D 32
+> +# define MASK_TO_LSH(m)          (__builtin_ffsll(m) - 1)
+> +#elif HOST_LONG_BITS =3D=3D 64
+> +# define MASK_TO_LSH(m)          (__builtin_ffsl(m) - 1)
+> +#else
+> +# error Unknown sizeof long
+> +#endif
+> +
+> +#define GETFIELD(m, v)          (((v) & (m)) >> MASK_TO_LSH(m))
+> +#define SETFIELD(m, v, val)                             \
+> +        (((v) & ~(m)) | ((((typeof(v))(val)) << MASK_TO_LSH(m)) & (m)))
+> =20
+>  /***********************************************************************=
+******/
+>  /* Exception vectors definitions                                        =
+     */
+> @@ -2349,32 +2362,31 @@ enum {
+> =20
+>  /* Processor Compatibility mask (PCR) */
+>  enum {
+> -    PCR_COMPAT_2_05     =3D 1ull << (63-62),
+> -    PCR_COMPAT_2_06     =3D 1ull << (63-61),
+> -    PCR_COMPAT_2_07     =3D 1ull << (63-60),
+> -    PCR_COMPAT_3_00     =3D 1ull << (63-59),
+> -    PCR_VEC_DIS         =3D 1ull << (63-0), /* Vec. disable (bit NA sinc=
+e POWER8) */
+> -    PCR_VSX_DIS         =3D 1ull << (63-1), /* VSX disable (bit NA since=
+ POWER8) */
+> -    PCR_TM_DIS          =3D 1ull << (63-2), /* Trans. memory disable (PO=
+WER8) */
+> +    PCR_COMPAT_2_05     =3D PPC_BIT(62),
+> +    PCR_COMPAT_2_06     =3D PPC_BIT(61),
+> +    PCR_COMPAT_2_07     =3D PPC_BIT(60),
+> +    PCR_COMPAT_3_00     =3D PPC_BIT(59),
+> +    PCR_VEC_DIS         =3D PPC_BIT(0), /* Vec. disable (bit NA since PO=
+WER8) */
+> +    PCR_VSX_DIS         =3D PPC_BIT(1), /* VSX disable (bit NA since POW=
+ER8) */
+> +    PCR_TM_DIS          =3D PPC_BIT(2), /* Trans. memory disable (POWER8=
+) */
+>  };
+> =20
+>  /* HMER/HMEER */
+>  enum {
+> -    HMER_MALFUNCTION_ALERT      =3D 1ull << (63 - 0),
+> -    HMER_PROC_RECV_DONE         =3D 1ull << (63 - 2),
+> -    HMER_PROC_RECV_ERROR_MASKED =3D 1ull << (63 - 3),
+> -    HMER_TFAC_ERROR             =3D 1ull << (63 - 4),
+> -    HMER_TFMR_PARITY_ERROR      =3D 1ull << (63 - 5),
+> -    HMER_XSCOM_FAIL             =3D 1ull << (63 - 8),
+> -    HMER_XSCOM_DONE             =3D 1ull << (63 - 9),
+> -    HMER_PROC_RECV_AGAIN        =3D 1ull << (63 - 11),
+> -    HMER_WARN_RISE              =3D 1ull << (63 - 14),
+> -    HMER_WARN_FALL              =3D 1ull << (63 - 15),
+> -    HMER_SCOM_FIR_HMI           =3D 1ull << (63 - 16),
+> -    HMER_TRIG_FIR_HMI           =3D 1ull << (63 - 17),
+> -    HMER_HYP_RESOURCE_ERR       =3D 1ull << (63 - 20),
+> -    HMER_XSCOM_STATUS_MASK      =3D 7ull << (63 - 23),
+> -    HMER_XSCOM_STATUS_LSH       =3D (63 - 23),
+> +    HMER_MALFUNCTION_ALERT      =3D PPC_BIT(0),
+> +    HMER_PROC_RECV_DONE         =3D PPC_BIT(2),
+> +    HMER_PROC_RECV_ERROR_MASKED =3D PPC_BIT(3),
+> +    HMER_TFAC_ERROR             =3D PPC_BIT(4),
+> +    HMER_TFMR_PARITY_ERROR      =3D PPC_BIT(5),
+> +    HMER_XSCOM_FAIL             =3D PPC_BIT(8),
+> +    HMER_XSCOM_DONE             =3D PPC_BIT(9),
+> +    HMER_PROC_RECV_AGAIN        =3D PPC_BIT(11),
+> +    HMER_WARN_RISE              =3D PPC_BIT(14),
+> +    HMER_WARN_FALL              =3D PPC_BIT(15),
+> +    HMER_SCOM_FIR_HMI           =3D PPC_BIT(16),
+> +    HMER_TRIG_FIR_HMI           =3D PPC_BIT(17),
+> +    HMER_HYP_RESOURCE_ERR       =3D PPC_BIT(20),
+> +    HMER_XSCOM_STATUS_MASK      =3D PPC_BITMASK(21, 23),
+>  };
+> =20
+>  /* Alternate Interrupt Location (AIL) */
+> diff --git a/target/ppc/int_helper.c b/target/ppc/int_helper.c
+> index 1c013a0ee3f1..3a50f1e1b72c 100644
+> --- a/target/ppc/int_helper.c
+> +++ b/target/ppc/int_helper.c
+> @@ -183,7 +183,7 @@ uint64_t helper_bpermd(uint64_t rs, uint64_t rb)
+>      for (i =3D 0; i < 8; i++) {
+>          int index =3D (rs >> (i*8)) & 0xFF;
+>          if (index < 64) {
+> -            if (rb & (1ull << (63-index))) {
+> +            if (rb & PPC_BIT(index)) {
+>                  ra |=3D 1 << i;
+>              }
+>          }
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -60,24 +185,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---aT9PWwzfKXlsBJM1
+--6WlEvdN9Dv0WHSBl
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlo82cQACgkQbDjKyiDZ
-s5K4lg/+OY9QXiKtFp4TqXmIbcgEio9KtUnJd7KAb4IV4nKvS55rEkqzG5ARRPW/
-GKg+QEVlAejKPjCai2KChwspWOGMjxVOipZr9a8ToantTzFlbXOWcwEOgB7bS0Rn
-Mck+8AsMFPFC+JOo8mtzsmL4uxm8cBiEezCqqslVbwPZjvcALwV4Ra+X3v4bOgRt
-gAOF1XRYlCVDAvdKemG8YR4h2uxCwpHdDeR/+NZixYFlZ1zyPhKTMbuiDEyyjFqm
-wL13eMVWXeHDusH33vRFqVZP5Cc9SIFaebgi7cbMatJsH/aZ5DWCLXM4EpE0fSgg
-jCvLOqmCQU6aDKiCk8R+g+mV3Sy8JdV9qtjFzdCQ3+JjaPFNVDfPSE06KixeVkUx
-qeXSR3A5m+tPdef5pd4F0GckfSvSX6gTJ5JaPAG9cSacwOmNyBqWEpJoL23J7roY
-f+qTaiYM+2R77g2jzIvViPAvr+sjLupdpevISU4TDUpukLBBcKoppnEuUcBOYan6
-nwAIqLaa5n9+LqwkPQz5lSnIU2VEwfuWNX7+8l7E6dKW1oszmHFGqeRKJDjzxwcb
-apLI2lwFtIn3Sos0FSbjtWU8nJ/qww45YoE08ZCCsHhgMlSFDLuhsT7cA09VvfbS
-EvpbjUS12QCSatJEWc5eYzOMu4zuP0iAlln8XfJitl/92zlOQGE=
-=uWP5
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlo82eUACgkQbDjKyiDZ
+s5KiXw//ReGzZt6EH1K/C5RCqECIZiHinm1fU7SCB11CrBs0uwiKFav3AoAnpxQf
+jHquc+/fmtC+7lWUpe/P5LlE+OKNIq5cGn+MILWn4TurUFpaIJV8YV+nARtcFhiS
+r/4b/XO/eIrGcGiF3qDUOkw/sRhO1x/MFOTOTW3ZP3VstiIKNtrjMCvdgOLpBYkR
+lSt7w77P0UiWvMPvMIseerfmjPGfUWFhXlXXsGlYR1Jo74DIfuJ8dclD9GO2IDvY
+C0I1eqwEo/H3pVV/Rei81lmsSbSD6CgexHeLvUZ1PCqMM2fnGSvEUwPfvRB3qojs
+ylWkW+upkXY4H1dE++ef0HjhD/q/c7BKnRNghkRbVCOUJcDPlIK3VEtaUKbIxlvk
+l0UI6kesiSmbaErlsK54vuV3ofiGY8A4+Mc+8GCfmWgf3PLnZdh9EDxjoroKQlMB
+xOOJuAutWzpRihw2ixr4oVO5pyRpBiMyvAcZw8voLk6SZzmGwagIr6g4RxNUw54n
+XrWd/8v4Yzk8BRgwzbs1H9gwRerJQFEZqhGDZCwSUblsiH/tJ3987wmwFANNfTm0
+Wmlc6xbhPDzJJAdMFQFZGtbpn2+dKojBHusM2IF0w7G21bX8+STSPXyXVSbbMZn6
+tEhVmfKkRyDI360EdLib0JsWc6qu+Gf9RIL7TEazwyR2EK6d7BA=
+=07No
 -----END PGP SIGNATURE-----
 
---aT9PWwzfKXlsBJM1--
+--6WlEvdN9Dv0WHSBl--
