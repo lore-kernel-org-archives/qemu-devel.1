@@ -1,34 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33451)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53780)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yi.l.liu@linux.intel.com>) id 1eSHNG-00060o-Cz
-	for qemu-devel@nongnu.org; Fri, 22 Dec 2017 02:04:07 -0500
+	(envelope-from <hikarupsp@gmail.com>) id 1eSHnm-0004AI-Ch
+	for qemu-devel@nongnu.org; Fri, 22 Dec 2017 02:31:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yi.l.liu@linux.intel.com>) id 1eSHNA-0006BO-HB
-	for qemu-devel@nongnu.org; Fri, 22 Dec 2017 02:04:06 -0500
-Received: from mga06.intel.com ([134.134.136.31]:32713)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <yi.l.liu@linux.intel.com>)
-	id 1eSHNA-0006Ar-4q
-	for qemu-devel@nongnu.org; Fri, 22 Dec 2017 02:04:00 -0500
-Date: Fri, 22 Dec 2017 14:47:28 +0800
-From: "Liu, Yi L" <yi.l.liu@linux.intel.com>
-Message-ID: <20171222064728.GA20627@sky-dev>
-References: <1509710516-21084-3-git-send-email-yi.l.liu@linux.intel.com>
-	<20171113055601.GE1014@umbus.fritz.box>
-	<20171113082845.GA10932@xz-mi>
-	<20171114005934.GD32308@umbus.fritz.box>
-	<20171116085709.GA5072@sky-dev>
-	<20171218061442.GW7753@umbus.fritz.box>
-	<20171218091735.GA6002@sky-dev>
-	<20171218112218.GB4786@umbus.fritz.box>
-	<20171220063242.GA7070@sky-dev>
-	<20171220110110.GF5981@umbus.fritz.box>
+	(envelope-from <hikarupsp@gmail.com>) id 1eSHnl-00046g-9D
+	for qemu-devel@nongnu.org; Fri, 22 Dec 2017 02:31:30 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20171220110110.GF5981@umbus.fritz.box>
-Subject: Re: [Qemu-devel] [RESEND PATCH 2/6] memory: introduce
- AddressSpaceOps and IOMMUObject
+In-Reply-To: <1513573243-29022-1-git-send-email-hikarupsp@gmail.com>
+References: <1513573243-29022-1-git-send-email-hikarupsp@gmail.com>
+From: Hikaru Nishida <hikarupsp@gmail.com>
+Date: Fri, 22 Dec 2017 16:31:11 +0900
+Message-ID: <CAD-w0GB+KZK_=7HZhXfarfNEFF_Y992=wc8XZ=CX6FTC107zfw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH] hw/block: Fix pin-based interrupt
+ behaviour of NVMe
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,38 +22,116 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: tianyu.lan@intel.com, kevin.tian@intel.com, yi.l.liu@intel.com, mst@redhat.com, jasowang@redhat.com, qemu-devel@nongnu.org, Peter Xu <peterx@redhat.com>, alex.williamson@redhat.com, pbonzini@redhat.com
+To: qemu-devel@nongnu.org
+Cc: Hikaru Nishida <hikarupsp@gmail.com>, Keith Busch <keith.busch@intel.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, "open list:nvme" <qemu-block@nongnu.org>
 
-On Wed, Dec 20, 2017 at 10:01:10PM +1100, David Gibson wrote:
-> On Wed, Dec 20, 2017 at 02:32:42PM +0800, Liu, Yi L wrote:
-> > On Mon, Dec 18, 2017 at 10:22:18PM +1100, David Gibson wrote:
-> > > On Mon, Dec 18, 2017 at 05:17:35PM +0800, Liu, Yi L wrote:
-> > > > On Mon, Dec 18, 2017 at 05:14:42PM +1100, David Gibson wrote:
-> > > > > On Thu, Nov 16, 2017 at 04:57:09PM +0800, Liu, Yi L wrote:
-[snip]
-> > > Partly.  Each PE has an address space which all devices in the PE see.
-> > > Only some of that address space is mapped to system memory though,
-> > > other parts are occupied by devices, others are unmapped.
-> > > 
-> > > Only the parts mapped by the IOMMU vary between PEs - the other parts
-> > > of the address space will be identical for all PEs on the host
-> > 
-> > Thx, this comment addressed me well. This is different from what we have
-> > on VT-d.
-> 
-> Really?  That's hard to believe.  I'm pretty sure the VT-d IOMMU must
-> have a range < 2^64, and anything on the bus outside that range I
-> expect would be common between all domains.  In particular I'd expect
-> the BARs for other devices not to be remapped by the IOMMU (though
-> they may be inaccessible on PCI-E due peer to peer transactions being
-> blocked).  As well as things above the IOMMU's range, I'd expect the
-> region for 32-bit BARs to be common between all domains.
+ping
+http://patchwork.ozlabs.org/patch/849786/
 
-Sorry I misunderstood you. In each IOVA space, there is reserved range
-, it is the BARs MMIO range. Such reservation is to avoid un-expected
-Peer-To-Peer transaction. So regards to the IOVA space, all vendors should
-be similar. So you are right~
-
-Thanks,
-Yi L 
+2017-12-18 14:00 GMT+09:00 Hikaru Nishida <hikarupsp@gmail.com>:
+> Pin-based interrupt of NVMe controller did not work properly
+> because using an obsolated function pci_irq_pulse().
+> To fix this, change to use pci_irq_assert() / pci_irq_deassert()
+> instead of pci_irq_pulse().
+>
+> Signed-off-by: Hikaru Nishida <hikarupsp@gmail.com>
+> ---
+>  hw/block/nvme.c | 39 ++++++++++++++++++++++++++++++++++-----
+>  hw/block/nvme.h |  1 +
+>  2 files changed, 35 insertions(+), 5 deletions(-)
+>
+> diff --git a/hw/block/nvme.c b/hw/block/nvme.c
+> index 441e21e..2d164fc 100644
+> --- a/hw/block/nvme.c
+> +++ b/hw/block/nvme.c
+> @@ -82,13 +82,40 @@ static uint8_t nvme_sq_empty(NvmeSQueue *sq)
+>      return sq->head == sq->tail;
+>  }
+>
+> -static void nvme_isr_notify(NvmeCtrl *n, NvmeCQueue *cq)
+> +static void nvme_irq_check(NvmeCtrl *n)
+> +{
+> +    if (msix_enabled(&(n->parent_obj))) {
+> +        return;
+> +    }
+> +    if (~n->bar.intms & n->irq_status) {
+> +        pci_irq_assert(&n->parent_obj);
+> +    } else {
+> +        pci_irq_deassert(&n->parent_obj);
+> +    }
+> +}
+> +
+> +static void nvme_irq_assert(NvmeCtrl *n, NvmeCQueue *cq)
+>  {
+>      if (cq->irq_enabled) {
+>          if (msix_enabled(&(n->parent_obj))) {
+>              msix_notify(&(n->parent_obj), cq->vector);
+>          } else {
+> -            pci_irq_pulse(&n->parent_obj);
+> +            assert(cq->cqid < 64);
+> +            n->irq_status |= 1 << cq->cqid;
+> +            nvme_irq_check(n);
+> +        }
+> +    }
+> +}
+> +
+> +static void nvme_irq_deassert(NvmeCtrl *n, NvmeCQueue *cq)
+> +{
+> +    if (cq->irq_enabled) {
+> +        if (msix_enabled(&(n->parent_obj))) {
+> +            return;
+> +        } else {
+> +            assert(cq->cqid < 64);
+> +            n->irq_status &= ~(1 << cq->cqid);
+> +            nvme_irq_check(n);
+>          }
+>      }
+>  }
+> @@ -220,7 +247,7 @@ static void nvme_post_cqes(void *opaque)
+>              sizeof(req->cqe));
+>          QTAILQ_INSERT_TAIL(&sq->req_list, req, entry);
+>      }
+> -    nvme_isr_notify(n, cq);
+> +    nvme_irq_assert(n, cq);
+>  }
+>
+>  static void nvme_enqueue_req_completion(NvmeCQueue *cq, NvmeRequest *req)
+> @@ -753,10 +780,12 @@ static void nvme_write_bar(NvmeCtrl *n, hwaddr offset, uint64_t data,
+>      case 0xc:
+>          n->bar.intms |= data & 0xffffffff;
+>          n->bar.intmc = n->bar.intms;
+> +        nvme_irq_check(n);
+>          break;
+>      case 0x10:
+>          n->bar.intms &= ~(data & 0xffffffff);
+>          n->bar.intmc = n->bar.intms;
+> +        nvme_irq_check(n);
+>          break;
+>      case 0x14:
+>          /* Windows first sends data, then sends enable bit */
+> @@ -851,8 +880,8 @@ static void nvme_process_db(NvmeCtrl *n, hwaddr addr, int val)
+>              timer_mod(cq->timer, qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) + 500);
+>          }
+>
+> -        if (cq->tail != cq->head) {
+> -            nvme_isr_notify(n, cq);
+> +        if (cq->tail == cq->head) {
+> +            nvme_irq_deassert(n, cq);
+>          }
+>      } else {
+>          uint16_t new_tail = val & 0xffff;
+> diff --git a/hw/block/nvme.h b/hw/block/nvme.h
+> index 6aab338..7b62dad 100644
+> --- a/hw/block/nvme.h
+> +++ b/hw/block/nvme.h
+> @@ -775,6 +775,7 @@ typedef struct NvmeCtrl {
+>      uint32_t    cmbsz;
+>      uint32_t    cmbloc;
+>      uint8_t     *cmbuf;
+> +    uint64_t    irq_status;
+>
+>      char            *serial;
+>      NvmeNamespace   *namespaces;
+> --
+> 2.7.4
+>
