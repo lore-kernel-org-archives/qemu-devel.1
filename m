@@ -1,20 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36298)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40006)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1eSNQL-0007BS-Us
-	for qemu-devel@nongnu.org; Fri, 22 Dec 2017 08:31:42 -0500
+	(envelope-from <marcandre.lureau@gmail.com>) id 1eSNVD-0000zj-6B
+	for qemu-devel@nongnu.org; Fri, 22 Dec 2017 08:36:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1eSNQL-0008AA-3E
-	for qemu-devel@nongnu.org; Fri, 22 Dec 2017 08:31:41 -0500
-Date: Fri, 22 Dec 2017 14:31:28 +0100
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20171222133128.GF3763@localhost.localdomain>
-References: <20171221152628.12942-1-kwolf@redhat.com>
-	<CAFEAcA8=SBwRDbfNyuHk3gYCYJCF89---EAeV-Peov458afWJQ@mail.gmail.com>
+	(envelope-from <marcandre.lureau@gmail.com>) id 1eSNVC-0004ID-3o
+	for qemu-devel@nongnu.org; Fri, 22 Dec 2017 08:36:43 -0500
+Received: from mail-wm0-x243.google.com ([2a00:1450:400c:c09::243]:46309)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+	id 1eSNVB-0004HU-Sz
+	for qemu-devel@nongnu.org; Fri, 22 Dec 2017 08:36:42 -0500
+Received: by mail-wm0-x243.google.com with SMTP id r78so21998170wme.5
+	for <qemu-devel@nongnu.org>; Fri, 22 Dec 2017 05:36:41 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAFEAcA8=SBwRDbfNyuHk3gYCYJCF89---EAeV-Peov458afWJQ@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PULL v2 00/13] Block layer patches
+In-Reply-To: <20171125151610.20547-6-ehabkost@redhat.com>
+References: <20171125151610.20547-1-ehabkost@redhat.com>
+	<20171125151610.20547-6-ehabkost@redhat.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Fri, 22 Dec 2017 14:36:40 +0100
+Message-ID: <CAJ+F1CLrWG-h8ciO0rvLYnTidff7Ba0ixr1cmBYV82gYUfctXQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 5/6] xen: Add only xen-sysdev to dynamic
+ sysbus device list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,45 +31,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Qemu-block <qemu-block@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, famz@redhat.com
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: QEMU <qemu-devel@nongnu.org>, jgross@suse.com, Thomas Huth <thuth@redhat.com>, Stefano Stabellini <sstabellini@kernel.org>, Anthony Perard <anthony.perard@citrix.com>, Marcel Apfelbaum <marcel@redhat.com>, xen-devel@lists.xenproject.org, Laszlo Ersek <lersek@redhat.com>
 
-Am 21.12.2017 um 23:47 hat Peter Maydell geschrieben:
-> On 21 December 2017 at 15:26, Kevin Wolf <kwolf@redhat.com> wrote:
-> > The following changes since commit 4da5c51cac8363f86ec92dc99c38f9382d617647:
-> >
-> >   Merge remote-tracking branch 'remotes/armbru/tags/pull-qapi-2017-12-20' into staging (2017-12-20 20:38:36 +0000)
-> >
-> > are available in the git repository at:
-> >
-> >   git://repo.or.cz/qemu/kevin.git tags/for-upstream
-> >
-> > for you to fetch changes up to af65cdae56861d5e163559a53f7ec34142a249f1:
-> >
-> >   nvme: Add tracing (2017-12-21 16:02:14 +0100)
-> >
-> > ----------------------------------------------------------------
-> > Block layer patches
-> >
-> > ----------------------------------------------------------------
-> 
-> Now I get these warnings on NetBSD/OpenBSD/OSX:
-> 
->   GEN     qemu-doc.txt
-> /root/qemu/qemu-doc.texi:8: warning: unrecognized encoding name `UTF-8'.
-> /root/qemu//qemu-img.texi:61: warning: unlikely character ( in @var.
-> /root/qemu//qemu-img.texi:61: warning: unlikely character ) in @var.
+Hi,
 
-Fam, I'm dropping "qemu-img: Document --force-share / -U" from my pull
-request again.
+On Sat, Nov 25, 2017 at 4:16 PM, Eduardo Habkost <ehabkost@redhat.com> wrot=
+e:
+> There's no need to make the machine allow every possible sysbus
+> device.  We can now just add xen-sysdev to the allowed list.
+>
+> Cc: Stefano Stabellini <sstabellini@kernel.org>
+> Cc: Anthony Perard <anthony.perard@citrix.com>
+> Cc: xen-devel@lists.xenproject.org
+> Cc: Juergen Gross <jgross@suse.com>
+> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+> ---
+> Changes series v1 -> v2:
+> * New patch added to series
+> ---
+>  hw/xen/xen_backend.c | 7 +------
+>  1 file changed, 1 insertion(+), 6 deletions(-)
+>
+> diff --git a/hw/xen/xen_backend.c b/hw/xen/xen_backend.c
+> index 82380ea9ee..7445b506ac 100644
+> --- a/hw/xen/xen_backend.c
+> +++ b/hw/xen/xen_backend.c
+> @@ -564,12 +564,7 @@ static void xen_set_dynamic_sysbus(void)
+>      ObjectClass *oc =3D object_get_class(machine);
+>      MachineClass *mc =3D MACHINE_CLASS(oc);
+>
+> -    /*
+> -     * Emulate old mc->has_dynamic_sysbus=3Dtrue assignment
+> -     *
+> -     *TODO: add only Xen devices to the list
+> -     */
+> -    machine_class_allow_dynamic_sysbus_dev(mc, TYPE_SYS_BUS_DEVICE);
+> +    machine_class_allow_dynamic_sysbus_dev(mc, TYPE_XENSYSDEV);
 
-The problem there seems to be that we're inside of a '@table @var' here.
-People have been careless enough to add options in there, which results
-in less than optimal formatting in the manpage.
+It looks like it's the last patch in the series without review. It
+would be nice if a Xen maintainer could look at it, or test it, as I
+dont know how to test it tbh.
 
-I'd suggest that we split the table in two, first a '@table @var' that
-explains only variables, and after that a proper '@table @option' for
-the options. I suppose (and hope) that in '@table @option', parentheses
-are allowed.
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
-Kevin
+
+>  }
+>
+>  int xen_be_register(const char *type, struct XenDevOps *ops)
+> --
+> 2.13.6
+>
+>
+
+
+
+--=20
+Marc-Andr=C3=A9 Lureau
