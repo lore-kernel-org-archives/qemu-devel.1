@@ -1,15 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60240)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53976)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jack.schwartz@oracle.com>) id 1eSAw4-00068j-LP
-	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 19:11:37 -0500
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1eSBRS-0006Ff-N3
+	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 19:44:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jack.schwartz@oracle.com>) id 1eSAw3-00081F-KP
-	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 19:11:36 -0500
-From: Jack Schwartz <jack.schwartz@oracle.com>
-Date: Thu, 21 Dec 2017 16:11:35 -0800
-Message-Id: <1513901496-13538-1-git-send-email-jack.schwartz@oracle.com>
-Subject: [Qemu-devel] [PATCH v1 0/1] block: Add numeric errno field to
- BLOCK_IO_ERROR events
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1eSBRR-0005JI-Ux
+	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 19:44:02 -0500
+MIME-Version: 1.0
+Sender: philippe.mathieu.daude@gmail.com
+In-Reply-To: <20171222014229-mutt-send-email-mst@kernel.org>
+References: <1513866427-27125-1-git-send-email-mst@redhat.com>
+	<CAFEAcA_pt7XhXOhL2jSxwH9ooL7xjShmp6eBAYpRLc=dY-=TXQ@mail.gmail.com>
+	<20171221223704-mutt-send-email-mst@kernel.org>
+	<CAFEAcA8-Pe4gVJcKnGXAwia8Y4FD=3r=E-EZuqcX68UZeLoXLg@mail.gmail.com>
+	<20171222014229-mutt-send-email-mst@kernel.org>
+From: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philippe@mathieu-daude.net>
+Date: Thu, 21 Dec 2017 21:44:00 -0300
+Message-ID: <CAAdtpL6Kg_Hx5bgbRNTXcD_+ymzM9X6ziC5XM-Oi27O1rxvKjA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL 00/25] pc, pci, virtio: features, fixes,
+ cleanups
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,56 +29,21 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: kwolf@redhat.com, mreitz@redhat.com, armbru@redhat.com, eblake@redhat.com, karl.heubaum@oracle.com, konrad.wilk@oracle.com
+To: "Michael S. Tsirkin" <mst@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Mao Zhongyi <maozy.fnst@cn.fujitsu.com>, "open list:Block layer core" <qemu-block@nongnu.org>
 
-Currently, BLOCK_IO_ERROR events have a string error "reason" field
-which is derived from errno.  The proposed change adds errno itself
-as a field to these events.  Figuring out the error by comparing the
-(int) errno itself is easier than comparing a string.  There is also
-a comment in the code that the reason field should not be parsed by
-applications.
+>> > Done and pushed - I dropped the conflicting patch.
+>>
+>> Have you also dropped the other one Philippe says depends on it?
 
-Sample QMP output of modified events adds the errno field as follows (see
-last line):
+Now than I could take time to check, dropping this single patch was
+correct and inoffensive, since conflicting patch from Mao Zhongyi is
+doing exactly the same change (e01d6a415be).
 
-{"timestamp": {"seconds": 1509071709, "microseconds": 563303}, "event":
-"BLOCK_IO_ERROR", "data": {"device": "ide0-hd0", "node-name": "#block128",
-"reason": "Input/output error", "operation": "write", "action": "ignore",
-"errno": 5}}
+But better safe than sorry :) I'll resend the "remove obsolete
+PCIDevice->init()" patch later to you Michael since it makes more sens
+it enters thru the PCI tree than the Block tree.
 
-Testing:
-- Artificially created error conditions that emit BLOCK_IO_ERROR events.
-Verified those events could be viewed by the QMP monitor and by the
-qmp-shell; and that event behavior with those two utilities was identical.
-- Ran tests via "make check" from the build root.  There were no changes
-from vanilla build when building or running.
+Sorry again for any trouble caused,
 
-Homework:
-- Looked through source and build trees for tests and scripts which
-reference BLOCK_IO_ERROR events.  No direct references to such events were
-found.  No direct references to BLOCK_IO_ERROR events implies there won't be
-references to specific fields within those events.
-
-- What about Windows?
-  - The file block/block-backend.c is the only C file with a code change.
-The file block/Makefile brings block-backend.o into both Windows and Linux
-compilations.  The change introduces an additional reference to errno, which
-strerror already calls, even with Windows.  That file's prior reference to
-errno confirms that Windows will work with the code change.
-  - If there would be a Linux vs Windows difference in mapping of errno to
-error string values, that difference would have been in place before my
-changes.
-
-  Thanks,
-  Jack
-
-Jack Schwartz (1):
-  block: Add numeric errno field to BLOCK_IO_ERROR events
-
- block/block-backend.c |  2 +-
- qapi/block-core.json  | 12 ++++++++++--
- 2 files changed, 11 insertions(+), 3 deletions(-)
-
--- 
-1.8.3.1
+Phil.
