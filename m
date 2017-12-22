@@ -1,16 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60204)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60240)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jack.schwartz@oracle.com>) id 1eSAw2-000684-CI
-	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 19:11:35 -0500
+	(envelope-from <jack.schwartz@oracle.com>) id 1eSAw4-00068j-LP
+	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 19:11:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jack.schwartz@oracle.com>) id 1eSAw1-0007zs-AW
-	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 19:11:34 -0500
+	(envelope-from <jack.schwartz@oracle.com>) id 1eSAw3-00081F-KP
+	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 19:11:36 -0500
 From: Jack Schwartz <jack.schwartz@oracle.com>
-Date: Thu, 21 Dec 2017 16:11:36 -0800
-Message-Id: <1513901496-13538-2-git-send-email-jack.schwartz@oracle.com>
-In-Reply-To: <1513901496-13538-1-git-send-email-jack.schwartz@oracle.com>
-References: <1513901496-13538-1-git-send-email-jack.schwartz@oracle.com>
-Subject: [Qemu-devel] [PATCH v1 1/1] block: Add numeric errno field to
+Date: Thu, 21 Dec 2017 16:11:35 -0800
+Message-Id: <1513901496-13538-1-git-send-email-jack.schwartz@oracle.com>
+Subject: [Qemu-devel] [PATCH v1 0/1] block: Add numeric errno field to
  BLOCK_IO_ERROR events
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -23,67 +21,53 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, qemu-block@nongnu.org
 Cc: kwolf@redhat.com, mreitz@redhat.com, armbru@redhat.com, eblake@redhat.com, karl.heubaum@oracle.com, konrad.wilk@oracle.com
 
-BLOCK_IO_ERROR events currently contain a "reason" string which is
-strerror(errno) of the error.  This enhancement provides those events with
-the numeric errno value as well, since it is easier to parse for error type
-than a string.
+Currently, BLOCK_IO_ERROR events have a string error "reason" field
+which is derived from errno.  The proposed change adds errno itself
+as a field to these events.  Figuring out the error by comparing the
+(int) errno itself is easier than comparing a string.  There is also
+a comment in the code that the reason field should not be parsed by
+applications.
 
-Signed-off-by: Jack Schwartz <jack.schwartz@oracle.com>
-Reviewed-by: Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
-Reviewed-by: Karl Heubaum <karl.heubaum@oracle.com>
----
+Sample QMP output of modified events adds the errno field as follows (see
+last line):
+
+{"timestamp": {"seconds": 1509071709, "microseconds": 563303}, "event":
+"BLOCK_IO_ERROR", "data": {"device": "ide0-hd0", "node-name": "#block128",
+"reason": "Input/output error", "operation": "write", "action": "ignore",
+"errno": 5}}
+
+Testing:
+- Artificially created error conditions that emit BLOCK_IO_ERROR events.
+Verified those events could be viewed by the QMP monitor and by the
+qmp-shell; and that event behavior with those two utilities was identical.
+- Ran tests via "make check" from the build root.  There were no changes
+from vanilla build when building or running.
+
+Homework:
+- Looked through source and build trees for tests and scripts which
+reference BLOCK_IO_ERROR events.  No direct references to such events were
+found.  No direct references to BLOCK_IO_ERROR events implies there won't be
+references to specific fields within those events.
+
+- What about Windows?
+  - The file block/block-backend.c is the only C file with a code change.
+The file block/Makefile brings block-backend.o into both Windows and Linux
+compilations.  The change introduces an additional reference to errno, which
+strerror already calls, even with Windows.  That file's prior reference to
+errno confirms that Windows will work with the code change.
+  - If there would be a Linux vs Windows difference in mapping of errno to
+error string values, that difference would have been in place before my
+changes.
+
+  Thanks,
+  Jack
+
+Jack Schwartz (1):
+  block: Add numeric errno field to BLOCK_IO_ERROR events
+
  block/block-backend.c |  2 +-
  qapi/block-core.json  | 12 ++++++++++--
  2 files changed, 11 insertions(+), 3 deletions(-)
 
-diff --git a/block/block-backend.c b/block/block-backend.c
-index baef8e7..f628668 100644
---- a/block/block-backend.c
-+++ b/block/block-backend.c
-@@ -1572,7 +1572,7 @@ static void send_qmp_error_event(BlockBackend *blk,
-     qapi_event_send_block_io_error(blk_name(blk),
-                                    bdrv_get_node_name(blk_bs(blk)), optype,
-                                    action, blk_iostatus_is_enabled(blk),
--                                   error == ENOSPC, strerror(error),
-+                                   error == ENOSPC, error, strerror(error),
-                                    &error_abort);
- }
- 
-diff --git a/qapi/block-core.json b/qapi/block-core.json
-index a8cdbc3..b7beca7 100644
---- a/qapi/block-core.json
-+++ b/qapi/block-core.json
-@@ -3660,6 +3660,11 @@
- #           io-status is present, please see query-block documentation
- #           for more information (since: 2.2)
- #
-+# @errno: int describing the error cause, provided for applications.
-+#         (Note: while most errnos are posix compliant between OSs, it
-+#         is possible some errno values can vary among different OSs.)
-+#         (since 2.12)
-+#
- # @reason: human readable string describing the error cause.
- #          (This field is a debugging aid for humans, it should not
- #           be parsed by applications) (since: 2.2)
-@@ -3675,14 +3680,17 @@
- #      "data": { "device": "ide0-hd1",
- #                "node-name": "#block212",
- #                "operation": "write",
--#                "action": "stop" },
-+#                "action": "stop",
-+#                "nospace": false,
-+#                "errno": 5,
-+#                "reason": "Input/output error" },
- #      "timestamp": { "seconds": 1265044230, "microseconds": 450486 } }
- #
- ##
- { 'event': 'BLOCK_IO_ERROR',
-   'data': { 'device': 'str', 'node-name': 'str', 'operation': 'IoOperationType',
-             'action': 'BlockErrorAction', '*nospace': 'bool',
--            'reason': 'str' } }
-+            'errno': 'int', 'reason': 'str' } }
- 
- ##
- # @BLOCK_JOB_COMPLETED:
 -- 
 1.8.3.1
