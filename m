@@ -1,20 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47863)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49390)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <haozhong.zhang@intel.com>) id 1eSCVB-0006iz-1e
-	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 20:51:57 -0500
+	(envelope-from <famz@redhat.com>) id 1eSCXT-0007lt-QE
+	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 20:54:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <haozhong.zhang@intel.com>) id 1eSCV7-0006Co-3r
-	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 20:51:57 -0500
-Received: from mga07.intel.com ([134.134.136.100]:5655)
+	(envelope-from <famz@redhat.com>) id 1eSCXP-0007eQ-R4
+	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 20:54:19 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:34548)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <haozhong.zhang@intel.com>)
-	id 1eSCV6-0006A6-Pz
-	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 20:51:53 -0500
-From: Haozhong Zhang <haozhong.zhang@intel.com>
-Date: Fri, 22 Dec 2017 09:51:20 +0800
-Message-Id: <20171222015120.31730-1-haozhong.zhang@intel.com>
-Subject: [Qemu-devel] [PATCH] pc: fail memory hot-plug/unplug with -no-acpi
- and Q35 machine type
+	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1eSCXP-0007e2-KU
+	for qemu-devel@nongnu.org; Thu, 21 Dec 2017 20:54:15 -0500
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 85787821C7
+	for <qemu-devel@nongnu.org>; Fri, 22 Dec 2017 01:54:14 +0000 (UTC)
+Date: Fri, 22 Dec 2017 09:54:12 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20171222015412.GC7652@lemon>
+References: <20171205151553.7834-1-famz@redhat.com>
+	<20171220095104.GB10812@lemon>
+	<af9ceced-6a51-1fef-916b-69602403c2a4@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <af9ceced-6a51-1fef-916b-69602403c2a4@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] scsi-generic: Add share-rw option
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,57 +34,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, mst@redhat.com, Haozhong Zhang <haozhong.zhang@intel.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-When -no-acpi option is used with Q35 machine type, no guest ACPI is
-built, but the ACPI device is still created, so only checking the
-presence of ACPI device before memory plug/unplug is not enough in
-such cases. Check whether ACPI is disabled globally in addition and
-fail memory plug/unplug if it's disabled.
+On Wed, 12/20 11:06, Paolo Bonzini wrote:
+> On 20/12/2017 10:51, Fam Zheng wrote:
+> > On Tue, 12/05 23:15, Fam Zheng wrote:
+> >> Add the property to the device model, then parse it by calling
+> >> blkconf_apply_backend_options().
+> >>
+> >> In addition to blk_set_perm(), the called function also handles error
+> >> options and wce. For error options we've already checked that the
+> >> default values are used, for wce we don't have the option either so it
+> >> is always the default (true). In other words there is no change of
+> >> behavior in these regards.
+> >>
+> >> Signed-off-by: Fam Zheng <famz@redhat.com>
+> > 
+> > Ping? :)
+> 
+> Already queued.
+> 
 
-Signed-off-by: Haozhong Zhang <haozhong.zhang@intel.com>
----
- hw/i386/pc.c | 18 ++++++++++++++----
- 1 file changed, 14 insertions(+), 4 deletions(-)
+But I think it was not in yesterday's PULL?
 
-diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-index 3fcf318a95..55686bf5d8 100644
---- a/hw/i386/pc.c
-+++ b/hw/i386/pc.c
-@@ -1695,9 +1695,14 @@ static void pc_dimm_plug(HotplugHandler *hotplug_dev,
-         align = memory_region_get_alignment(mr);
-     }
- 
--    if (!pcms->acpi_dev) {
-+    /*
-+     * When -no-acpi is used with Q35 machine type, no ACPI is built,
-+     * but pcms->acpi_dev is still created. Check !acpi_enabled in
-+     * addition to cover this case.
-+     */
-+    if (!pcms->acpi_dev || !acpi_enabled) {
-         error_setg(&local_err,
--                   "memory hotplug is not enabled: missing acpi device");
-+                   "memory hotplug is not enabled: missing acpi device or acpi disabled");
-         goto out;
-     }
- 
-@@ -1729,9 +1734,14 @@ static void pc_dimm_unplug_request(HotplugHandler *hotplug_dev,
-     Error *local_err = NULL;
-     PCMachineState *pcms = PC_MACHINE(hotplug_dev);
- 
--    if (!pcms->acpi_dev) {
-+    /*
-+     * When -no-acpi is used with Q35 machine type, no ACPI is built,
-+     * but pcms->acpi_dev is still created. Check !acpi_enabled in
-+     * addition to cover this case.
-+     */
-+    if (!pcms->acpi_dev || !acpi_enabled) {
-         error_setg(&local_err,
--                   "memory hotplug is not enabled: missing acpi device");
-+                   "memory hotplug is not enabled: missing acpi device or acpi disabled");
-         goto out;
-     }
- 
--- 
-2.14.1
+Fam
