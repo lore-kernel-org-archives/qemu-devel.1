@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57088)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57101)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1eSP6V-0005cx-6V
-	for qemu-devel@nongnu.org; Fri, 22 Dec 2017 10:19:20 -0500
+	(envelope-from <kwolf@redhat.com>) id 1eSP6W-0005eD-2E
+	for qemu-devel@nongnu.org; Fri, 22 Dec 2017 10:19:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1eSP6U-0002Io-B6
-	for qemu-devel@nongnu.org; Fri, 22 Dec 2017 10:19:19 -0500
+	(envelope-from <kwolf@redhat.com>) id 1eSP6S-0002GP-7V
+	for qemu-devel@nongnu.org; Fri, 22 Dec 2017 10:19:20 -0500
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Fri, 22 Dec 2017 16:18:24 +0100
-Message-Id: <20171222151846.28110-14-kwolf@redhat.com>
+Date: Fri, 22 Dec 2017 16:18:22 +0100
+Message-Id: <20171222151846.28110-12-kwolf@redhat.com>
 In-Reply-To: <20171222151846.28110-1-kwolf@redhat.com>
 References: <20171222151846.28110-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL v3 13/35] block: Open backing image in force
- share mode for size probe
+Subject: [Qemu-devel] [PULL v3 11/35] block: Document that x-blockdev-change
+ breaks quorum children list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,43 +23,34 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, peter.maydell@linaro.org, qemu-devel@nongnu.org
 
-From: Fam Zheng <famz@redhat.com>
+Removing a quorum child node with x-blockdev-change results in a quorum
+driver state that cannot be recreated with create options because it
+would require a list with gaps. This causes trouble in at least
+.bdrv_refresh_filename().
 
-Management tools create overlays of running guests with qemu-img:
+Document this problem so that we won't accidentally mark the command
+stable without having addressed it.
 
-  $ qemu-img create -b /image/in/use.qcow2 -f qcow2 /overlay/image.qcow2
-
-but this doesn't work anymore due to image locking:
-
-    qemu-img: /overlay/image.qcow2: Failed to get shared "write" lock
-    Is another process using the image?
-    Could not open backing image to determine size.
-Use the force share option to allow this use case again.
-
-Cc: qemu-stable@nongnu.org
-Signed-off-by: Fam Zheng <famz@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+Reviewed-by: Alberto Garcia <berto@igalia.com>
 ---
- block.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ qapi/block-core.json | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/block.c b/block.c
-index db0be7ef36..dd90dca896 100644
---- a/block.c
-+++ b/block.c
-@@ -4605,10 +4605,11 @@ void bdrv_img_create(const char *filename, const char *fmt,
-         back_flags = flags;
-         back_flags &= ~(BDRV_O_RDWR | BDRV_O_SNAPSHOT | BDRV_O_NO_BACKING);
- 
-+        backing_options = qdict_new();
-         if (backing_fmt) {
--            backing_options = qdict_new();
-             qdict_put_str(backing_options, "driver", backing_fmt);
-         }
-+        qdict_put_bool(backing_options, BDRV_OPT_FORCE_SHARE, true);
- 
-         bs = bdrv_open(full_backing, NULL, backing_options, back_flags,
-                        &local_err);
+diff --git a/qapi/block-core.json b/qapi/block-core.json
+index a8cdbc300b..e94a6881b2 100644
+--- a/qapi/block-core.json
++++ b/qapi/block-core.json
+@@ -3918,6 +3918,10 @@
+ # does not support all kinds of operations, all kinds of children, nor
+ # all block drivers.
+ #
++# FIXME Removing children from a quorum node means introducing gaps in the
++# child indices. This cannot be represented in the 'children' list of
++# BlockdevOptionsQuorum, as returned by .bdrv_refresh_filename().
++#
+ # Warning: The data in a new quorum child MUST be consistent with that of
+ # the rest of the array.
+ #
 -- 
 2.13.6
