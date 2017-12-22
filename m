@@ -1,29 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59230)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36970)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1eSUpY-0008UA-11
-	for qemu-devel@nongnu.org; Fri, 22 Dec 2017 16:26:13 -0500
+	(envelope-from <jbaron@akamai.com>) id 1eSVI1-0006S0-By
+	for qemu-devel@nongnu.org; Fri, 22 Dec 2017 16:55:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1eSUpT-0006ki-Ve
-	for qemu-devel@nongnu.org; Fri, 22 Dec 2017 16:26:12 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:39976)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1eSUpT-0006kD-MW
-	for qemu-devel@nongnu.org; Fri, 22 Dec 2017 16:26:07 -0500
-Date: Fri, 22 Dec 2017 19:26:00 -0200
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20171222212600.GU24025@localhost.localdomain>
-References: <cover.1513729519.git.alistair.francis@xilinx.com>
-	<CAFEAcA-dvs-E83ZCEk6VAyyQkpghX9oF-d-D62vOKs7kfjPzaw@mail.gmail.com>
-	<CAKmqyKPHHQcQ3HYs4r7f4uUDfdMqSq=-mUJn6becXw8WXNAwNQ@mail.gmail.com>
-	<CAKmqyKMKL_BGSbaetubaPv8gkmF9XFFdDwkXAPsUZdV1qkOyqA@mail.gmail.com>
-	<20171220220608.GH24025@localhost.localdomain>
-	<CAKmqyKO+UvsEuK3fuEP7jmK3i5hb=rzp8DWye6-P7-BZ2CVXuQ@mail.gmail.com>
-	<CAKmqyKP4ewwxLgQ0+fBbMzpSOA1rh23XaER-yoJQuBQOiXFPzg@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAKmqyKP4ewwxLgQ0+fBbMzpSOA1rh23XaER-yoJQuBQOiXFPzg@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PATCH v4 0/5] Add a valid_cpu_types property
+	(envelope-from <jbaron@akamai.com>) id 1eSVHy-0007CE-9j
+	for qemu-devel@nongnu.org; Fri, 22 Dec 2017 16:55:37 -0500
+Received: from mx0b-00190b01.pphosted.com ([2620:100:9005:57f::1]:59726)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jbaron@akamai.com>) id 1eSVHy-0007BJ-0v
+	for qemu-devel@nongnu.org; Fri, 22 Dec 2017 16:55:34 -0500
+From: Jason Baron <jbaron@akamai.com>
+Date: Fri, 22 Dec 2017 16:53:58 -0500
+Message-Id: <1513979641-7999-1-git-send-email-jbaron@akamai.com>
+In-Reply-To: <cover.1513974243.git.jbaron@akamai.com>
+References: <cover.1513974243.git.jbaron@akamai.com>
+Subject: [Qemu-devel] [PATCH 2/3] qemu: use 64-bit values for feature flags
+ in virtio-net
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,103 +24,136 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alistair Francis <alistair.francis@xilinx.com>
-Cc: Marcel Apfelbaum <marcel@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Igor Mammedov <imammedo@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
+To: netdev@vger.kernel.org, virtualization@lists.linux-foundation.org, qemu-devel@nongnu.org
+Cc: mst@redhat.com, jasowang@redhat.com
 
-On Fri, Dec 22, 2017 at 11:47:00AM -0800, Alistair Francis wrote:
-> On Fri, Dec 22, 2017 at 10:45 AM, Alistair Francis
-> <alistair.francis@xilinx.com> wrote:
-> > On Wed, Dec 20, 2017 at 2:06 PM, Eduardo Habkost <ehabkost@redhat.com> wrote:
-> >> On Tue, Dec 19, 2017 at 05:03:59PM -0800, Alistair Francis wrote:
-> >>> On Tue, Dec 19, 2017 at 4:55 PM, Alistair Francis
-> >>> <alistair.francis@xilinx.com> wrote:
-> >>> > On Tue, Dec 19, 2017 at 4:43 PM, Peter Maydell <peter.maydell@linaro.org> wrote:
-> >>> >> On 20 December 2017 at 00:27, Alistair Francis
-> >>> >> <alistair.francis@xilinx.com> wrote:
-> >>> >>> There are numorous QEMU machines that only have a single or a handful of
-> >>> >>> valid CPU options. To simplyfy the management of specificying which CPU
-> >>> >>> is/isn't valid let's create a property that can be set in the machine
-> >>> >>> init. We can then check to see if the user supplied CPU is in that list
-> >>> >>> or not.
-> >>> >>>
-> >>> >>> I have added the valid_cpu_types for some ARM machines only at the
-> >>> >>> moment.
-> >>> >>>
-> >>> >>> Here is what specifying the CPUs looks like now:
-> >>> >>>
-> >>> >>> $ aarch64-softmmu/qemu-system-aarch64 -M netduino2 -kernel ./u-boot.elf -nographic -cpu "cortex-m3" -S
-> >>> >>> QEMU 2.10.50 monitor - type 'help' for more information
-> >>> >>> (qemu) info cpus
-> >>> >>> * CPU #0: thread_id=24175
-> >>> >>> (qemu) q
-> >>> >>>
-> >>> >>> $ aarch64-softmmu/qemu-system-aarch64 -M netduino2 -kernel ./u-boot.elf -nographic -cpu "cortex-m4" -S
-> >>> >>> QEMU 2.10.50 monitor - type 'help' for more information
-> >>> >>> (qemu) q
-> >>> >>>
-> >>> >>> $ aarch64-softmmu/qemu-system-aarch64 -M netduino2 -kernel ./u-boot.elf -nographic -cpu "cortex-m5" -S
-> >>> >>> qemu-system-aarch64: unable to find CPU model 'cortex-m5'
-> >>> >>>
-> >>> >>> $ aarch64-softmmu/qemu-system-aarch64 -M netduino2 -kernel ./u-boot.elf -nographic -cpu "cortex-a9" -S
-> >>> >>> qemu-system-aarch64: Invalid CPU type: cortex-a9-arm-cpu
-> >>> >>> The valid types are: cortex-m3-arm-cpu, cortex-m4-arm-cpu
-> >>> >>
-> >>> >> Thanks for this; we really should be more strict about
-> >>> >> forbidding "won't work" combinations than we have
-> >>> >> been in the past.
-> >>> >>
-> >>> >> In the last of these cases, I think that when we
-> >>> >> list the invalid CPU type and the valid types
-> >>> >> we should use the same names we want the user to
-> >>> >> use on the command line, without the "-arm-cpu"
-> >>> >> suffixes.
-> >>> >
-> >>> > Hmm... That is a good point, it is confusing that they don't line up.
-> >>
-> >> Agreed.
-> >>
-> >>> >
-> >>> > The problem is that we are just doing a simple
-> >>> > object_class_dynamic_cast() in hw/core/machine.c which I think
-> >>> > (untested) requires us to have the full name in the valid cpu array.
-> >> [...]
-> >>>
-> >>> I think an earlier version of my previous series adding the support to
-> >>> machine.c did string comparison, but it was decided to utilise objects
-> >>> instead. One option is to make the array 2 wide and have the second
-> >>> string be user friendly?
-> >>
-> >> Making the array 2-column will duplicate information that we can
-> >> already find out using other methods, and it won't solve the
-> >> problem if an entry has a parent class with multiple subclasses
-> >> (the original reason I suggested object_class_dynamic_cast()).
-> >>
-> >> The main obstacle to fix this easily is that we do have a common
-> >>   ObjectClass *cpu_class_by_name(const char *cpu_model)
-> >> function, but not a common method to get the model name from a
-> >> CPUClass.  Implementing this is possible, but probably better to
-> >> do it after moving the existing arch-specific CPU model
-> >> enumeration hooks to common code (currently we duplicate lots of
-> >> CPU enumeration/lookup boilerplate code that we shouldn't have
-> >> to).
-> >>
-> >> Listing only the human-friendly names in the array like in the
-> >> original patch could be a reasonable temporary solution.  It
-> >> won't allow us to use a single entry for all subclasses of a
-> >> given type by now (e.g. listing only TYPE_X86_CPU on PC), but at
-> >> least we can address this issue without waiting for a refactor of
-> >> the CPU model enumeration code.
-> 
-> Ah, I just re-read this. Do you mean go back to the original RFC and
-> just use strcmp() to compare the human readable cpu_model?
+In prepartion for using some of the high order feature bits, make sure that
+virtio-net uses 64-bit values everywhere.
 
-Yes, I think this would be simpler, considering that the current
-users don't need the object_class_dynamic_cast() stuff.
+Signed-off-by: Jason Baron <jbaron@akamai.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Jason Wang <jasowang@redhat.com>
+---
+ hw/net/virtio-net.c            | 54 +++++++++++++++++++++---------------------
+ include/hw/virtio/virtio-net.h |  2 +-
+ 2 files changed, 28 insertions(+), 28 deletions(-)
 
-Then whoever decide to make PC simply list TYPE_X86_CPU later
-(possibly me) will need to clean up the CPU model
-enumeration/lookup code and implement a
-cpu_model_from_type_name() helper.
-
+diff --git a/hw/net/virtio-net.c b/hw/net/virtio-net.c
+index 38674b0..adc20df 100644
+--- a/hw/net/virtio-net.c
++++ b/hw/net/virtio-net.c
+@@ -48,18 +48,18 @@
+     (offsetof(container, field) + sizeof(((container *)0)->field))
+ 
+ typedef struct VirtIOFeature {
+-    uint32_t flags;
++    uint64_t flags;
+     size_t end;
+ } VirtIOFeature;
+ 
+ static VirtIOFeature feature_sizes[] = {
+-    {.flags = 1 << VIRTIO_NET_F_MAC,
++    {.flags = 1ULL << VIRTIO_NET_F_MAC,
+      .end = endof(struct virtio_net_config, mac)},
+-    {.flags = 1 << VIRTIO_NET_F_STATUS,
++    {.flags = 1ULL << VIRTIO_NET_F_STATUS,
+      .end = endof(struct virtio_net_config, status)},
+-    {.flags = 1 << VIRTIO_NET_F_MQ,
++    {.flags = 1ULL << VIRTIO_NET_F_MQ,
+      .end = endof(struct virtio_net_config, max_virtqueue_pairs)},
+-    {.flags = 1 << VIRTIO_NET_F_MTU,
++    {.flags = 1ULL << VIRTIO_NET_F_MTU,
+      .end = endof(struct virtio_net_config, mtu)},
+     {}
+ };
+@@ -1938,7 +1938,7 @@ static void virtio_net_device_realize(DeviceState *dev, Error **errp)
+     int i;
+ 
+     if (n->net_conf.mtu) {
+-        n->host_features |= (0x1 << VIRTIO_NET_F_MTU);
++        n->host_features |= (1ULL << VIRTIO_NET_F_MTU);
+     }
+ 
+     virtio_net_set_config_size(n, n->host_features);
+@@ -2109,45 +2109,45 @@ static const VMStateDescription vmstate_virtio_net = {
+ };
+ 
+ static Property virtio_net_properties[] = {
+-    DEFINE_PROP_BIT("csum", VirtIONet, host_features, VIRTIO_NET_F_CSUM, true),
+-    DEFINE_PROP_BIT("guest_csum", VirtIONet, host_features,
++    DEFINE_PROP_BIT64("csum", VirtIONet, host_features, VIRTIO_NET_F_CSUM, true),
++    DEFINE_PROP_BIT64("guest_csum", VirtIONet, host_features,
+                     VIRTIO_NET_F_GUEST_CSUM, true),
+-    DEFINE_PROP_BIT("gso", VirtIONet, host_features, VIRTIO_NET_F_GSO, true),
+-    DEFINE_PROP_BIT("guest_tso4", VirtIONet, host_features,
++    DEFINE_PROP_BIT64("gso", VirtIONet, host_features, VIRTIO_NET_F_GSO, true),
++    DEFINE_PROP_BIT64("guest_tso4", VirtIONet, host_features,
+                     VIRTIO_NET_F_GUEST_TSO4, true),
+-    DEFINE_PROP_BIT("guest_tso6", VirtIONet, host_features,
++    DEFINE_PROP_BIT64("guest_tso6", VirtIONet, host_features,
+                     VIRTIO_NET_F_GUEST_TSO6, true),
+-    DEFINE_PROP_BIT("guest_ecn", VirtIONet, host_features,
++    DEFINE_PROP_BIT64("guest_ecn", VirtIONet, host_features,
+                     VIRTIO_NET_F_GUEST_ECN, true),
+-    DEFINE_PROP_BIT("guest_ufo", VirtIONet, host_features,
++    DEFINE_PROP_BIT64("guest_ufo", VirtIONet, host_features,
+                     VIRTIO_NET_F_GUEST_UFO, true),
+-    DEFINE_PROP_BIT("guest_announce", VirtIONet, host_features,
++    DEFINE_PROP_BIT64("guest_announce", VirtIONet, host_features,
+                     VIRTIO_NET_F_GUEST_ANNOUNCE, true),
+-    DEFINE_PROP_BIT("host_tso4", VirtIONet, host_features,
++    DEFINE_PROP_BIT64("host_tso4", VirtIONet, host_features,
+                     VIRTIO_NET_F_HOST_TSO4, true),
+-    DEFINE_PROP_BIT("host_tso6", VirtIONet, host_features,
++    DEFINE_PROP_BIT64("host_tso6", VirtIONet, host_features,
+                     VIRTIO_NET_F_HOST_TSO6, true),
+-    DEFINE_PROP_BIT("host_ecn", VirtIONet, host_features,
++    DEFINE_PROP_BIT64("host_ecn", VirtIONet, host_features,
+                     VIRTIO_NET_F_HOST_ECN, true),
+-    DEFINE_PROP_BIT("host_ufo", VirtIONet, host_features,
++    DEFINE_PROP_BIT64("host_ufo", VirtIONet, host_features,
+                     VIRTIO_NET_F_HOST_UFO, true),
+-    DEFINE_PROP_BIT("mrg_rxbuf", VirtIONet, host_features,
++    DEFINE_PROP_BIT64("mrg_rxbuf", VirtIONet, host_features,
+                     VIRTIO_NET_F_MRG_RXBUF, true),
+-    DEFINE_PROP_BIT("status", VirtIONet, host_features,
++    DEFINE_PROP_BIT64("status", VirtIONet, host_features,
+                     VIRTIO_NET_F_STATUS, true),
+-    DEFINE_PROP_BIT("ctrl_vq", VirtIONet, host_features,
++    DEFINE_PROP_BIT64("ctrl_vq", VirtIONet, host_features,
+                     VIRTIO_NET_F_CTRL_VQ, true),
+-    DEFINE_PROP_BIT("ctrl_rx", VirtIONet, host_features,
++    DEFINE_PROP_BIT64("ctrl_rx", VirtIONet, host_features,
+                     VIRTIO_NET_F_CTRL_RX, true),
+-    DEFINE_PROP_BIT("ctrl_vlan", VirtIONet, host_features,
++    DEFINE_PROP_BIT64("ctrl_vlan", VirtIONet, host_features,
+                     VIRTIO_NET_F_CTRL_VLAN, true),
+-    DEFINE_PROP_BIT("ctrl_rx_extra", VirtIONet, host_features,
++    DEFINE_PROP_BIT64("ctrl_rx_extra", VirtIONet, host_features,
+                     VIRTIO_NET_F_CTRL_RX_EXTRA, true),
+-    DEFINE_PROP_BIT("ctrl_mac_addr", VirtIONet, host_features,
++    DEFINE_PROP_BIT64("ctrl_mac_addr", VirtIONet, host_features,
+                     VIRTIO_NET_F_CTRL_MAC_ADDR, true),
+-    DEFINE_PROP_BIT("ctrl_guest_offloads", VirtIONet, host_features,
++    DEFINE_PROP_BIT64("ctrl_guest_offloads", VirtIONet, host_features,
+                     VIRTIO_NET_F_CTRL_GUEST_OFFLOADS, true),
+-    DEFINE_PROP_BIT("mq", VirtIONet, host_features, VIRTIO_NET_F_MQ, false),
++    DEFINE_PROP_BIT64("mq", VirtIONet, host_features, VIRTIO_NET_F_MQ, false),
+     DEFINE_NIC_PROPERTIES(VirtIONet, nic_conf),
+     DEFINE_PROP_UINT32("x-txtimer", VirtIONet, net_conf.txtimer,
+                        TX_TIMER_INTERVAL),
+diff --git a/include/hw/virtio/virtio-net.h b/include/hw/virtio/virtio-net.h
+index b81b6a4..e7634c9 100644
+--- a/include/hw/virtio/virtio-net.h
++++ b/include/hw/virtio/virtio-net.h
+@@ -67,7 +67,7 @@ typedef struct VirtIONet {
+     uint32_t has_vnet_hdr;
+     size_t host_hdr_len;
+     size_t guest_hdr_len;
+-    uint32_t host_features;
++    uint64_t host_features;
+     uint8_t has_ufo;
+     uint32_t mergeable_rx_bufs;
+     uint8_t promisc;
 -- 
-Eduardo
+2.6.1
