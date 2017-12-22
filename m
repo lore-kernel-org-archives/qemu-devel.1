@@ -1,34 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59333)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34521)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1eSL1Q-0003HR-Ml
-	for qemu-devel@nongnu.org; Fri, 22 Dec 2017 05:57:49 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1eSL5T-0005Nm-1L
+	for qemu-devel@nongnu.org; Fri, 22 Dec 2017 06:02:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1eSL1P-0000b1-Fv
-	for qemu-devel@nongnu.org; Fri, 22 Dec 2017 05:57:48 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:49586)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1eSL1P-0000YM-8l
-	for qemu-devel@nongnu.org; Fri, 22 Dec 2017 05:57:47 -0500
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id DC4CA82100
-	for <qemu-devel@nongnu.org>; Fri, 22 Dec 2017 10:57:43 +0000 (UTC)
-Date: Fri, 22 Dec 2017 10:57:36 +0000
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20171222105736.GL30605@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <20171221155905.3793-1-berrange@redhat.com>
-	<20171221155905.3793-2-berrange@redhat.com>
-	<cf30232b-8674-134a-38fa-0c6cb9f9af3e@redhat.com>
-	<87o9mrrvjy.fsf@dusky.pond.sub.org>
+	(envelope-from <vsementsov@virtuozzo.com>) id 1eSL5M-0004J4-Il
+	for qemu-devel@nongnu.org; Fri, 22 Dec 2017 06:01:59 -0500
+References: <2cd24073-b6d9-6479-59b1-869db6c25103@redhat.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <9df51df9-f5bb-dc19-c58a-b06c0b656a40@virtuozzo.com>
+Date: Fri, 22 Dec 2017 14:01:39 +0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <87o9mrrvjy.fsf@dusky.pond.sub.org>
-Subject: Re: [Qemu-devel] [PATCH v2 1/2] io: move fd_is_socket() into common
- sockets code
+In-Reply-To: <2cd24073-b6d9-6479-59b1-869db6c25103@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
+Content-Language: en-US
+Subject: Re: [Qemu-devel] Raw notes from a small block layer/QAPI/something
+ pre-christmas meeting
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,67 +24,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+To: Max Reitz <mreitz@redhat.com>, Qemu-block <qemu-block@nongnu.org>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
-On Fri, Dec 22, 2017 at 09:55:29AM +0100, Markus Armbruster wrote:
-> Eric Blake <eblake@redhat.com> writes:
-> 
-> > On 12/21/2017 09:59 AM, Daniel P. Berrange wrote:
-> >> The fd_is_socket() helper method is useful in a few places, so put it in
-> >> the common sockets code.
-> >>
-> >> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
-> >> ---
-> >>   include/qemu/sockets.h |  1 +
-> >>   io/channel-util.c      | 13 -------------
-> >>   util/qemu-sockets.c    | 13 +++++++++++++
-> >>   3 files changed, 14 insertions(+), 13 deletions(-)
-> >
-> > Reviewed-by: Eric Blake <eblake@redhat.com>
-> >
-> > But while you are touching this...
-> >
-> >> +++ b/util/qemu-sockets.c
-> >> @@ -91,6 +91,19 @@ NetworkAddressFamily inet_netfamily(int family)
-> >>       return NETWORK_ADDRESS_FAMILY_UNKNOWN;
-> >>   }
-> >>   +bool fd_is_socket(int fd)
-> >> +{
-> >> +    int optval;
-> >> +    socklen_t optlen;
-> >> +    optlen = sizeof(optval);
-> >> +    return qemu_getsockopt(fd,
-> >> +                           SOL_SOCKET,
-> >> +                           SO_TYPE,
-> >> +                           (char *)&optval,
-> >
-> > This cast is pointless (although you are just moving it from the old
-> > code).  qemu_getsockopt() already takes care of casting for mingw
-> > (where the signature is not POSIX-compliant), and on all other
-> > platforms, the argument is already prototyped as void*; and since
-> > void* accepts anything, you don't have to go through an intermediate
-> > char*.
-> 
-> If we're tweaking, then I'd like it tweaked so:
-> 
->     bool fd_is_socket(int fd)
->     {
->         int optval;
->         socklen_t optlen = sizeof(optval);
-> 
->         return !qemu_getsockopt(fd, SOL_SOCKET, SO_TYPE, &optval, &optlen);
->     }
+15.12.2017 19:38, Max Reitz wrote:
+> Hi everyone,
+>
+> Kevin, Markus, and me had a small personal meeting over the last 1.5
+> days and discussed a couple of things about the block layer and its QAPI
+> entanglements.
+>
+> Here's a rather rough sketch on what we talked about:
+>
+>
 
-Yes I'll do exactly that.
+[...]
 
-> 
-> With or without such tweaks:
-> Reviewed-by: Markus Armbruster <armbru@redhat.com>
+> =3D=3D Single block job for backup/commit/mirror (blockdev-copy) =3D=3D
+>
+> - Special things:
+>    - mirror: Ready state and block-job-complete
+>    - mirror: Always replaces some node by the target
+>    - backup: copy before write and synchronous
+>      (mirror/commit are copy after write and asynchronous (except
+>       active-mirror))
+>    - backup: Has @compressed, that may not work with mirror right now
+>      (because block drivers assume you only write once)
+>    - commit: Resizes target if smaller than source
+>    - commit: Does not share write permissions, maybe because it doesn't
+>      want to use a dirty bitmap (a unified job would just use a dirty
+>      bitmap so then it could just generally share write permissions)
+>    - active commit: Can read from source even if the backing chain is
+>      garbage because of the ongoing commit (mirror) job
+>      - block_job_add_bdrv() on nearly whole backing chain so that
+>        READ_CONSISTENT is not being shared
+>    - non-active commit: Write target's (base's) filename into all of
+>      source's (top's) overlays as their backing filename
+>
+> At least some of these differences would require blockdev-copy runtime
+> options.
+>
+> blockdev-copy runtime parameters:
+> - everything blockdev-mirror has, plus
+> - @compressed? -- could be done as a block filter that converts normal
+>    writes to compressed writes
+> - Some option to suppress node replacement
+>    (in theory you could put block-job-finalize and bdrv_reopen into a
+>     transaction to do that replacement yourself)
+> - Some option to suppress READY event and complete automatically
+>    (compatibility to backup and non-active commit)
+> - Options to control the exact copying behavior (before/after write,
+>    active/passive)
 
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+also, I think, for backup we need options to control the following:
+- it there is a write notifier, which waits for copy, if copy fails,=20
+what to do:
+ =C2=A0 fail guest write or fail the backup?
+- should we handle guest writes when block-job is paused (now they are=20
+handled)
+
+>    (passive before-write is impossible)
+> - Option to resize target if smaller than source
+>    (maybe just internal and not visible in the interface)
+>    (compatibility to block-commit)
+> - Several other commit thingies (like permissions) which can be
+>    automatically deduced and set if the target is in source's backing
+>    chain
+> - Option to specify the target's filename (this is written into all
+>    overlays of @to_replace as their backing filename; if omitted, the
+>    filename QEMU knows will be used)
+>
+>
+
+
+
+--=20
+Best regards,
+Vladimir
