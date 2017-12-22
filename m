@@ -1,29 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46979)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56103)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1eSPx9-0007rm-1y
-	for qemu-devel@nongnu.org; Fri, 22 Dec 2017 11:13:44 -0500
+	(envelope-from <imammedo@redhat.com>) id 1eSQ8X-00049e-WE
+	for qemu-devel@nongnu.org; Fri, 22 Dec 2017 11:25:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1eSPx7-0005Wd-Ty
-	for qemu-devel@nongnu.org; Fri, 22 Dec 2017 11:13:43 -0500
-Received: from mail-wr0-x230.google.com ([2a00:1450:400c:c0c::230]:41942)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1eSPx7-0005Vb-Ju
-	for qemu-devel@nongnu.org; Fri, 22 Dec 2017 11:13:41 -0500
-Received: by mail-wr0-x230.google.com with SMTP id p69so19481320wrb.8
-	for <qemu-devel@nongnu.org>; Fri, 22 Dec 2017 08:13:41 -0800 (PST)
+	(envelope-from <imammedo@redhat.com>) id 1eSQ8U-0005Nq-L7
+	for qemu-devel@nongnu.org; Fri, 22 Dec 2017 11:25:30 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:36226)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1eSQ8U-0005Ms-CP
+	for qemu-devel@nongnu.org; Fri, 22 Dec 2017 11:25:26 -0500
+Date: Fri, 22 Dec 2017 17:25:13 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20171222172513.4157adcc@igors-macbook-pro.local>
+In-Reply-To: <1513327555-17520-2-git-send-email-jianjay.zhou@huawei.com>
+References: <1513327555-17520-1-git-send-email-jianjay.zhou@huawei.com>
+	<1513327555-17520-2-git-send-email-jianjay.zhou@huawei.com>
 MIME-Version: 1.0
-In-Reply-To: <27beee7c-e263-aa6d-69a2-a5eb0f82a5b5@linux.vnet.ibm.com>
-References: <1510323112-2207-1-git-send-email-stefanb@linux.vnet.ibm.com>
-	<CAJ+F1CKbAETPvHXVEB36UZFeyDum71_oVQbWFcWwG9Q6h0+aWw@mail.gmail.com>
-	<27beee7c-e263-aa6d-69a2-a5eb0f82a5b5@linux.vnet.ibm.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Fri, 22 Dec 2017 17:13:39 +0100
-Message-ID: <CAJ+F1CLVpNg8dezRA6wDTAC1dt0pzqEApAhHp+r0B1Rxdoj7yQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3 00/13] tpm: Extend TPM with state
- migration support (not 2.11)
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 1/2] vhost: add used memslot number for
+ vhost-user and vhost-kernel separately
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,136 +28,213 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Berger <stefanb@linux.vnet.ibm.com>
-Cc: QEMU <qemu-devel@nongnu.org>, Amarnath Valluri <amarnath.valluri@intel.com>
+To: Jay Zhou <jianjay.zhou@huawei.com>
+Cc: qemu-devel@nongnu.org, mst@redhat.com, weidong.huang@huawei.com, arei.gonglei@huawei.com, wangxinxin.wang@huawei.com, gary.liuzhe@huawei.com, dgilbert@redhat.com
 
-Hi
+On Fri, 15 Dec 2017 16:45:54 +0800
+Jay Zhou <jianjay.zhou@huawei.com> wrote:
 
-On Fri, Dec 22, 2017 at 4:59 PM, Stefan Berger
-<stefanb@linux.vnet.ibm.com> wrote:
-> On 12/22/2017 07:49 AM, Marc-Andr=C3=A9 Lureau wrote:
->>
->> Hi
->>
->> On Fri, Nov 10, 2017 at 3:11 PM, Stefan Berger
->> <stefanb@linux.vnet.ibm.com> wrote:
->>>
->>> This set of patches implements support for migrating the state of the
->>> external 'swtpm' TPM emulator as well as that of the emulated device
->>> interfaces. I have primarily tested this with the TIS and TPM 1.2 so
->>> far, but it also seems to work with TPM 2.
->>>
->>> The TIS is simplified first by reducing the number of buffers and read
->>> and write offsets into these buffers. Following the state machine of th=
-e
->>> TIS, a single buffer and r/w offset is enough for all localities since
->>> only one locality can ever be active.
->>>
->>> This series applies on top of my tpm-next branch.
->>>
->>> One of the challenges that is addressed by this set of patches is the
->>> fact
->>> that the TPM emulator may be processing a command while the state
->>> serialization of the devices is supposed to happen. A necessary first
->>> step
->>> has been implemented here that ensures that a response has been receive=
-d
->>> from the exernal emulator and the bottom half function, which delivers
->>> the
->>> response and adjusts device registers (TIS or CRB), has been executed,
->>> before the device's state is serialized.
->>>
->>> A subsequent extension may need to address the live migration loop and
->>> delay
->>> the serialization of devices until the response from the external TPM h=
-as
->>> been received. Though the likelihood that someone executes a long-lasti=
-ng
->>> TPM command while this is occurring is certainly rare.
->>>
->>>     Stefan
->>>
->>> Stefan Berger (13):
->>>    tpm_tis: convert uint32_t to size_t
->>>    tpm_tis: limit size of buffer from backend
->>>    tpm_tis: remove TPMSizeBuffer usage
->>>    tpm_tis: move buffers from localities into common location
->>>    tpm_tis: merge read and write buffer into single buffer
->>>    tpm_tis: move r/w_offsets to TPMState
->>>    tpm_tis: merge r/w_offset into rw_offset
->>>    tpm: Implement tpm_sized_buffer_reset
->>
->> ok for the above (you could queue/pull-req this now)
->>
->>>    tpm: Introduce condition to notify waiters of completed command
->>>    tpm: Introduce condition in TPM backend for notification
->>>    tpm: implement tpm_backend_wait_cmd_completed
->>>    tpm: extend TPM emulator with state migration support
->>>    tpm_tis: extend TPM TIS with state migration support
->>
->> Much of the complexity from this migration series comes with the
->> handling & synchronization of the IO thread.
->>
->> I think having a seperate thread doesn't bring much today TPM thread.
->> it is a workaround for the chardev API being mostly synchronous. Am I
->> wrong? (yes, passthrough doesn't use chardev, but it should probably
->> use qio or chardev internally)
->>
->> Other kind of devices using a seperate process suffer the same
->> problem. Just grep for qemu_chr_fe_write and look for the preceding
->> comment, it's a common flaw in qemu code base. Code use the
->> synchronous API, and sometime use non-blocking write
->> (hw/usb/redirect.c seems quite better!)
->>
->> I would like to get rid of the seperate thread in TPM before we add
->> migration support. We should try to improve the chardev API to make it
->> easier to do non-blocking IO. This should considerably simplify the
->> above patches and benefit the rest of qemu (instead of having everyone
->> doing its own thing with seperate thread or other kind of continuation
->> state).
->>
->> What do you think?
->
->
-> I am wondering whether it will help us to get rid of the
-> conditions/notifications, like patches 9-11 of this series. I doubt 12 an=
-d
-> 13 will change. At some point device state is supposed to be written out =
-and
-> in case of the TPM we have to wait for the response to have come back int=
-o
-> the backend. We won't start listening on the file descriptor for an
-> outstanding response, so I guess we will still wait for a notification in
-> that case as well. So I am not sure which parts are going to be simpler..=
-.
+> Used_memslots is equal to dev->mem->nregions now, it is true for
+> vhost kernel, but not for vhost user, which uses the memory regions
+> that have file descriptor. In fact, not all of the memory regions
+> have file descriptor.
+> It is usefully in some scenarios, e.g. used_memslots is 8, and only
+> 5 memory slots can be used by vhost user, it is failed to hot plug
+> a new memory RAM because vhost_has_free_slot just returned false,
+> but we can hot plug it safely in fact.
 
-Why would qemu need to wait for completion of emulator? Couldn't qemu
-& emulator save the current state, including in-flights commands?
-That's apparently what usbredir does.
-
->
->    Stefan
->
->
->>
->>>   backends/tpm.c               |  29 +++++
->>>   hw/tpm/tpm_emulator.c        | 303
->>> +++++++++++++++++++++++++++++++++++++++++--
->>>   hw/tpm/tpm_tis.c             | 216 +++++++++++++++++-------------
->>>   hw/tpm/tpm_util.c            |   7 +
->>>   hw/tpm/tpm_util.h            |   7 +
->>>   include/sysemu/tpm_backend.h |  22 ++++
->>>   6 files changed, 483 insertions(+), 101 deletions(-)
->>>
->>> --
->>> 2.5.5
->>>
->>>
->>
->>
->
+a bit of rant:
+it seems vhost is chasing after a tail (1-2 regions that are not
+actually RAM), while approach will allow to hotplug 1-2 extra dimms
+vhost-user still will be limited to 8 regions max.
 
 
+vhost-user protocol should be extended to allow qemu query
+limit value from backend (which in turn should be tunable),
+so that backend could be configured to meet user needs.
 
---=20
-Marc-Andr=C3=A9 Lureau
+Jay,
+would you like to look into it?
+
+Otherwise it looks like patch will do its job,
+see for a minor suggestion below.
+ 
+> Signed-off-by: Jay Zhou <jianjay.zhou@huawei.com>
+> Signed-off-by: Zhe Liu <gary.liuzhe@huawei.com>
+> ---
+>  hw/virtio/vhost-backend.c         | 14 ++++++++++++++
+>  hw/virtio/vhost-user.c            | 31 +++++++++++++++++++++++++++++++
+>  hw/virtio/vhost.c                 | 16 +++++++++-------
+>  include/hw/virtio/vhost-backend.h |  4 ++++
+>  4 files changed, 58 insertions(+), 7 deletions(-)
+> 
+> diff --git a/hw/virtio/vhost-backend.c b/hw/virtio/vhost-backend.c
+> index 7f09efa..866718c 100644
+> --- a/hw/virtio/vhost-backend.c
+> +++ b/hw/virtio/vhost-backend.c
+> @@ -15,6 +15,8 @@
+>  #include "hw/virtio/vhost-backend.h"
+>  #include "qemu/error-report.h"
+>  
+> +static unsigned int vhost_kernel_used_memslots;
+> +
+>  static int vhost_kernel_call(struct vhost_dev *dev, unsigned long int request,
+>                               void *arg)
+>  {
+> @@ -233,6 +235,16 @@ static void vhost_kernel_set_iotlb_callback(struct vhost_dev *dev,
+>          qemu_set_fd_handler((uintptr_t)dev->opaque, NULL, NULL, NULL);
+>  }
+>  
+> +static void vhost_kernel_set_used_memslots(struct vhost_dev *dev)
+> +{
+> +    vhost_kernel_used_memslots = dev->mem->nregions;
+> +}
+> +
+> +static unsigned int vhost_kernel_get_used_memslots(void)
+> +{
+> +    return vhost_kernel_used_memslots;
+> +}
+> +
+>  static const VhostOps kernel_ops = {
+>          .backend_type = VHOST_BACKEND_TYPE_KERNEL,
+>          .vhost_backend_init = vhost_kernel_init,
+> @@ -264,6 +276,8 @@ static const VhostOps kernel_ops = {
+>  #endif /* CONFIG_VHOST_VSOCK */
+>          .vhost_set_iotlb_callback = vhost_kernel_set_iotlb_callback,
+>          .vhost_send_device_iotlb_msg = vhost_kernel_send_device_iotlb_msg,
+> +        .vhost_set_used_memslots = vhost_kernel_set_used_memslots,
+> +        .vhost_get_used_memslots = vhost_kernel_get_used_memslots,
+>  };
+>  
+>  int vhost_set_backend_type(struct vhost_dev *dev, VhostBackendType backend_type)
+> diff --git a/hw/virtio/vhost-user.c b/hw/virtio/vhost-user.c
+> index 093675e..58a4cec 100644
+> --- a/hw/virtio/vhost-user.c
+> +++ b/hw/virtio/vhost-user.c
+> @@ -122,6 +122,8 @@ static VhostUserMsg m __attribute__ ((unused));
+>  /* The version of the protocol we support */
+>  #define VHOST_USER_VERSION    (0x1)
+>  
+> +static unsigned int vhost_user_used_memslots;
+> +
+>  struct vhost_user {
+>      CharBackend *chr;
+>      int slave_fd;
+> @@ -922,6 +924,33 @@ static void vhost_user_set_iotlb_callback(struct vhost_dev *dev, int enabled)
+>      /* No-op as the receive channel is not dedicated to IOTLB messages. */
+>  }
+>  
+> +static void vhost_user_set_used_memslots(struct vhost_dev *dev)
+> +{
+> +    int counter = 0;
+> +    int i;
+> +
+> +    for (i = 0; i < dev->mem->nregions; ++i) {
+> +        struct vhost_memory_region *reg = dev->mem->regions + i;
+> +        ram_addr_t offset;
+> +        MemoryRegion *mr;
+> +        int fd;
+> +
+> +        assert((uintptr_t)reg->userspace_addr == reg->userspace_addr);
+> +        mr = memory_region_from_host((void *)(uintptr_t)reg->userspace_addr,
+> +                                    &offset);
+> +        fd = memory_region_get_fd(mr);
+> +        if (fd > 0) {
+> +            counter++;
+> +        }
+> +    }
+vhost_user_set_mem_table() already does the same counting,
+there is no point in duplicating it, just drop vhost_set_used_memslots callback
+
+> +    vhost_user_used_memslots = counter;
+and update this value from vhost_user_set_mem_table()
+
+> +}
+> +
+> +static unsigned int vhost_user_get_used_memslots(void)
+> +{
+> +    return vhost_user_used_memslots;
+> +}
+> +
+>  const VhostOps user_ops = {
+>          .backend_type = VHOST_BACKEND_TYPE_USER,
+>          .vhost_backend_init = vhost_user_init,
+> @@ -948,4 +977,6 @@ const VhostOps user_ops = {
+>          .vhost_net_set_mtu = vhost_user_net_set_mtu,
+>          .vhost_set_iotlb_callback = vhost_user_set_iotlb_callback,
+>          .vhost_send_device_iotlb_msg = vhost_user_send_device_iotlb_msg,
+> +        .vhost_set_used_memslots = vhost_user_set_used_memslots,
+> +        .vhost_get_used_memslots = vhost_user_get_used_memslots,
+>  };
+> diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
+> index e4290ce..59a32e9 100644
+> --- a/hw/virtio/vhost.c
+> +++ b/hw/virtio/vhost.c
+> @@ -43,20 +43,21 @@
+>  static struct vhost_log *vhost_log;
+>  static struct vhost_log *vhost_log_shm;
+>  
+> -static unsigned int used_memslots;
+>  static QLIST_HEAD(, vhost_dev) vhost_devices =
+>      QLIST_HEAD_INITIALIZER(vhost_devices);
+>  
+>  bool vhost_has_free_slot(void)
+>  {
+> -    unsigned int slots_limit = ~0U;
+>      struct vhost_dev *hdev;
+>  
+>      QLIST_FOREACH(hdev, &vhost_devices, entry) {
+> -        unsigned int r = hdev->vhost_ops->vhost_backend_memslots_limit(hdev);
+> -        slots_limit = MIN(slots_limit, r);
+> +        if (hdev->vhost_ops->vhost_get_used_memslots() >=
+> +            hdev->vhost_ops->vhost_backend_memslots_limit(hdev)) {
+> +            return false;
+> +        }
+>      }
+> -    return slots_limit > used_memslots;
+> +
+> +    return true;
+>  }
+>  
+>  static void vhost_dev_sync_region(struct vhost_dev *dev,
+> @@ -606,7 +607,7 @@ static void vhost_set_memory(MemoryListener *listener,
+>      dev->mem_changed_start_addr = MIN(dev->mem_changed_start_addr, start_addr);
+>      dev->mem_changed_end_addr = MAX(dev->mem_changed_end_addr, start_addr + size - 1);
+>      dev->memory_changed = true;
+> -    used_memslots = dev->mem->nregions;
+> +    dev->vhost_ops->vhost_set_used_memslots(dev);
+>  }
+>  
+>  static bool vhost_section(MemoryRegionSection *section)
+> @@ -1251,7 +1252,8 @@ int vhost_dev_init(struct vhost_dev *hdev, void *opaque,
+>          goto fail;
+>      }
+>  
+> -    if (used_memslots > hdev->vhost_ops->vhost_backend_memslots_limit(hdev)) {
+> +    if (hdev->vhost_ops->vhost_get_used_memslots() >
+> +        hdev->vhost_ops->vhost_backend_memslots_limit(hdev)) {
+>          error_report("vhost backend memory slots limit is less"
+>                  " than current number of present memory slots");
+>          r = -1;
+> diff --git a/include/hw/virtio/vhost-backend.h b/include/hw/virtio/vhost-backend.h
+> index a7a5f22..19961b5 100644
+> --- a/include/hw/virtio/vhost-backend.h
+> +++ b/include/hw/virtio/vhost-backend.h
+> @@ -84,6 +84,8 @@ typedef void (*vhost_set_iotlb_callback_op)(struct vhost_dev *dev,
+>                                             int enabled);
+>  typedef int (*vhost_send_device_iotlb_msg_op)(struct vhost_dev *dev,
+>                                                struct vhost_iotlb_msg *imsg);
+> +typedef void (*vhost_set_used_memslots_op)(struct vhost_dev *dev);
+> +typedef unsigned int (*vhost_get_used_memslots_op)(void);
+>  
+>  typedef struct VhostOps {
+>      VhostBackendType backend_type;
+> @@ -118,6 +120,8 @@ typedef struct VhostOps {
+>      vhost_vsock_set_running_op vhost_vsock_set_running;
+>      vhost_set_iotlb_callback_op vhost_set_iotlb_callback;
+>      vhost_send_device_iotlb_msg_op vhost_send_device_iotlb_msg;
+> +    vhost_set_used_memslots_op vhost_set_used_memslots;
+> +    vhost_get_used_memslots_op vhost_get_used_memslots;
+>  } VhostOps;
+>  
+>  extern const VhostOps user_ops;
