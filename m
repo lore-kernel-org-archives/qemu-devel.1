@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47325)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48274)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <programmingkidx@gmail.com>) id 1eSQXa-00052m-VL
-	for qemu-devel@nongnu.org; Fri, 22 Dec 2017 11:51:23 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1eSQZ0-00063H-Hf
+	for qemu-devel@nongnu.org; Fri, 22 Dec 2017 11:52:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <programmingkidx@gmail.com>) id 1eSQXX-0001yw-CD
-	for qemu-devel@nongnu.org; Fri, 22 Dec 2017 11:51:22 -0500
-Received: from mail-io0-x244.google.com ([2607:f8b0:4001:c06::244]:37508)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <programmingkidx@gmail.com>)
-	id 1eSQXX-0001yM-6V
-	for qemu-devel@nongnu.org; Fri, 22 Dec 2017 11:51:19 -0500
-Received: by mail-io0-x244.google.com with SMTP id n14so1944482iob.4
-	for <qemu-devel@nongnu.org>; Fri, 22 Dec 2017 08:51:19 -0800 (PST)
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
-From: Programmingkid <programmingkidx@gmail.com>
-In-Reply-To: <6cb05b76-0dcc-0baa-3ca1-9e5deb5baafe@redhat.com>
-Date: Fri, 22 Dec 2017 11:51:16 -0500
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <D67FF13F-57E4-47C9-BCD3-48CDC8E17D65@gmail.com>
+	(envelope-from <pbonzini@redhat.com>) id 1eSQYz-0003CL-TS
+	for qemu-devel@nongnu.org; Fri, 22 Dec 2017 11:52:50 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:51412)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1eSQYz-0003BW-MX
+	for qemu-devel@nongnu.org; Fri, 22 Dec 2017 11:52:49 -0500
 References: <mailman.13900.1513951820.27992.qemu-devel@nongnu.org>
 	<79998796-2975-46CC-9629-8ADCDC2032FF@gmail.com>
 	<6cb05b76-0dcc-0baa-3ca1-9e5deb5baafe@redhat.com>
+	<D67FF13F-57E4-47C9-BCD3-48CDC8E17D65@gmail.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <8eb78791-4951-e5ee-bcba-b13038c2bc39@redhat.com>
+Date: Fri, 22 Dec 2017 17:52:46 +0100
+MIME-Version: 1.0
+In-Reply-To: <D67FF13F-57E4-47C9-BCD3-48CDC8E17D65@gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Subject: Re: [Qemu-devel] [PULL v3 00/19] Initial support for
  Hypervisor.framework
 List-Id: <qemu-devel.nongnu.org>
@@ -32,39 +31,21 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
+To: Programmingkid <programmingkidx@gmail.com>
 Cc: QEMU Developers <qemu-devel@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>
 
+On 22/12/2017 17:51, Programmingkid wrote:
+> Thanks. When I tried using qemu-system-i386 with the -accel hvf feature I saw this error: accel=hvf: No accelerator found.
+> 
+> I tried to build the qemu-system-x86_64 target but I also saw this error:
+> 
+> /Users/misbah/desktop/qemu/target/i386/hvf/x86_task.c:23:10: fatal error: 
+>       'x86_cpuid.h' file not found
+> #include "x86_cpuid.h"
+>          ^~~~~~~~~~~~~
+> 1 error generated.
 
-> On Dec 22, 2017, at 11:42 AM, Paolo Bonzini <pbonzini@redhat.com> =
-wrote:
->=20
-> On 22/12/2017 17:26, Programmingkid wrote:
->> I was able to clone your git repository and successfully build the =
-hvf branch. The latest commit is this:
->>=20
->> commit aabe2a1a77b70efe96c9345f737068a0dcef0281 (HEAD -> hvf, =
-origin/hvf)
->> Author: Paolo Bonzini <pbonzini@redhat.com>
->> Date:   Thu Dec 21 00:10:03 2017 +0100
->>=20
->>    i386: hvf: avoid useless exit to the main loop
->>=20
->> How do I make QEMU use the hvf feature?
->=20
-> "-accel hvf".
->=20
-> Paolo
+Just remove the line, that's what Peter was complaining about. :)  Also,
+the top two commits in the branch are not included in the pull request.
 
-Thanks. When I tried using qemu-system-i386 with the -accel hvf feature =
-I saw this error: accel=3Dhvf: No accelerator found.
-
-I tried to build the qemu-system-x86_64 target but I also saw this =
-error:
-
-/Users/misbah/desktop/qemu/target/i386/hvf/x86_task.c:23:10: fatal =
-error:=20
-      'x86_cpuid.h' file not found
-#include "x86_cpuid.h"
-         ^~~~~~~~~~~~~
-1 error generated.=
+Paolo
