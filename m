@@ -1,26 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40005)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48120)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1eSO43-0000qf-Br
-	for qemu-devel@nongnu.org; Fri, 22 Dec 2017 09:12:44 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1eSOGO-0006JF-2c
+	for qemu-devel@nongnu.org; Fri, 22 Dec 2017 09:25:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1eSO3y-0002Pc-Vs
-	for qemu-devel@nongnu.org; Fri, 22 Dec 2017 09:12:43 -0500
-Resent-Message-Id: <E1eSO3y-0002Pc-Vs@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21474)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1eSO3y-0002O8-Mw
-	for qemu-devel@nongnu.org; Fri, 22 Dec 2017 09:12:38 -0500
-In-Reply-To: <20171222134527.14467-1-berrange@redhat.com>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <151395193977.99.12572842361193307429@5adcb62bf0d6>
+	(envelope-from <vsementsov@virtuozzo.com>) id 1eSOGM-0007tu-SD
+	for qemu-devel@nongnu.org; Fri, 22 Dec 2017 09:25:27 -0500
+References: <20171212160450.17510-1-vsementsov@virtuozzo.com>
+	<20171212160450.17510-3-vsementsov@virtuozzo.com>
+	<20171222133911.GG3763@localhost.localdomain>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <25bbf12b-e6e8-29be-c28e-1bd10a9dd473@virtuozzo.com>
+Date: Fri, 22 Dec 2017 17:25:11 +0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Fri, 22 Dec 2017 06:12:21 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH v3 0/8] Enable passing pre-opened chardev
- socket FDs
+In-Reply-To: <20171222133911.GG3763@localhost.localdomain>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
+Content-Language: en-US
+Subject: Re: [Qemu-devel] [PATCH v2 2/3] qcow2: handle reopening bitmaps on
+ bdrv_invalidate_cache
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,61 +26,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: berrange@redhat.com
-Cc: famz@redhat.com, qemu-devel@nongnu.org, dgilbert@redhat.com, armbru@redhat.com, marcandre.lureau@redhat.com, pbonzini@redhat.com
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, mreitz@redhat.com, crosa@redhat.com, ehabkost@redhat.com, den@openvz.org, jsnow@redhat.com
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
-c3NhZ2UtaWQ6IDIwMTcxMjIyMTM0NTI3LjE0NDY3LTEtYmVycmFuZ2VAcmVkaGF0LmNvbQpTdWJq
-ZWN0OiBbUWVtdS1kZXZlbF0gW1BBVENIIHYzIDAvOF0gRW5hYmxlIHBhc3NpbmcgcHJlLW9wZW5l
-ZCBjaGFyZGV2IHNvY2tldCBGRHMKCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jh
-c2gKCkJBU0U9YmFzZQpuPTEKdG90YWw9JChnaXQgbG9nIC0tb25lbGluZSAkQkFTRS4uIHwgd2Mg
-LWwpCmZhaWxlZD0wCgpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBj
-b25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQoKY29tbWl0cz0iJChnaXQgbG9nIC0tZm9y
-bWF0PSVIIC0tcmV2ZXJzZSAkQkFTRS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7IGRvCiAgICBlY2hv
-ICJDaGVja2luZyBQQVRDSCAkbi8kdG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVzICRj
-KS4uLiIKICAgIGlmICEgZ2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMvY2hl
-Y2twYXRjaC5wbCAtLW1haWxiYWNrIC07IHRoZW4KICAgICAgICBmYWlsZWQ9MQogICAgICAgIGVj
-aG8KICAgIGZpCiAgICBuPSQoKG4rMSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBTQ1JJ
-UFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcx
-MzM4NApGcm9tIGh0dHBzOi8vZ2l0aHViLmNvbS9wYXRjaGV3LXByb2plY3QvcWVtdQogdCBbdGFn
-IHVwZGF0ZV0gICAgICAgICAgICBwYXRjaGV3LzIwMTcxMjIxMjEyMTI1LjE5MDc1LTEtbWF4aW1l
-LmNvcXVlbGluQHJlZGhhdC5jb20gLT4gcGF0Y2hldy8yMDE3MTIyMTIxMjEyNS4xOTA3NS0xLW1h
-eGltZS5jb3F1ZWxpbkByZWRoYXQuY29tCiB0IFt0YWcgdXBkYXRlXSAgICAgICAgICAgIHBhdGNo
-ZXcvMjAxNzEyMjIxMzQ1MjcuMTQ0NjctMS1iZXJyYW5nZUByZWRoYXQuY29tIC0+IHBhdGNoZXcv
-MjAxNzEyMjIxMzQ1MjcuMTQ0NjctMS1iZXJyYW5nZUByZWRoYXQuY29tClN3aXRjaGVkIHRvIGEg
-bmV3IGJyYW5jaCAndGVzdCcKNjdjODIwNWVlNiBjaGFyOiBhbGxvdyBwYXNzaW5nIHByZS1vcGVu
-ZWQgc29ja2V0IGZpbGUgZGVzY3JpcHRvciBhdCBzdGFydHVwCjRkNzZkODIzNmQgY2hhcjogcmVm
-YWN0b3IgcGFyc2luZyBvZiBzb2NrZXQgYWRkcmVzcyBpbmZvcm1hdGlvbgpjOTk0YThiZTY1IHNv
-Y2tldHM6IGFsbG93IFNvY2tldEFkZHJlc3MgJ2ZkJyB0byByZWZlcmVuY2UgbnVtZXJpYyBmaWxl
-IGRlc2NyaXB0b3JzCjBiMTE5YWVkMDQgc29ja2V0czogY2hlY2sgdGhhdCB0aGUgbmFtZWQgZmls
-ZSBkZXNjcmlwdG9yIGlzIGEgc29ja2V0CjQ2NDkyYWYzM2Ygc29ja2V0czogc3RyZW5ndGhlbiB0
-ZXN0IHN1aXRlIElQIHByb3RvY29sIGF2YWlsYWJpbGl0eSBjaGVja3MKNmI4YmZlYmM3MyBzb2Nr
-ZXRzOiBwdWxsIGNvZGUgZm9yIHRlc3RpbmcgSVAgYXZhaWxhYmlsaXR5IG91dCBvZiBzcGVjaWZp
-YyB0ZXN0CmU4NzQwZWYzYWEgc29ja2V0czogbW92ZSBmZF9pc19zb2NrZXQoKSBpbnRvIGNvbW1v
-biBzb2NrZXRzIGNvZGUKYmU1MGMxNTRhZiBjdXRpbHM6IGFkZCBxZW11X3N0cnRvaSAmIHFlbXVf
-c3RydG91aSBwYXJzZXJzIGZvciBpbnQvdW5zaWduZWQgaW50IHR5cGVzCgo9PT0gT1VUUFVUIEJF
-R0lOID09PQpDaGVja2luZyBQQVRDSCAxLzg6IGN1dGlsczogYWRkIHFlbXVfc3RydG9pICYgcWVt
-dV9zdHJ0b3VpIHBhcnNlcnMgZm9yIGludC91bnNpZ25lZCBpbnQgdHlwZXMuLi4KRVJST1I6IGNv
-bnNpZGVyIHVzaW5nIHFlbXVfc3RydG9sIGluIHByZWZlcmVuY2UgdG8gc3RydG9sCiM3Mjk6IEZJ
-TEU6IHV0aWwvY3V0aWxzLmM6MzM4OgorICAgIGxyZXN1bHQgPSBzdHJ0b2wobnB0ciwgJmVwLCBi
-YXNlKTsKCkVSUk9SOiBjb25zaWRlciB1c2luZyBxZW11X3N0cnRvbCBpbiBwcmVmZXJlbmNlIHRv
-IHN0cnRvbAojNzc5OiBGSUxFOiB1dGlsL2N1dGlscy5jOjM4ODoKKyAgICBscmVzdWx0ID0gc3Ry
-dG9sKG5wdHIsICZlcCwgYmFzZSk7Cgp0b3RhbDogMiBlcnJvcnMsIDAgd2FybmluZ3MsIDc4NSBs
-aW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmll
-dy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhl
-bSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgpDaGVj
-a2luZyBQQVRDSCAyLzg6IHNvY2tldHM6IG1vdmUgZmRfaXNfc29ja2V0KCkgaW50byBjb21tb24g
-c29ja2V0cyBjb2RlLi4uCkNoZWNraW5nIFBBVENIIDMvODogc29ja2V0czogcHVsbCBjb2RlIGZv
-ciB0ZXN0aW5nIElQIGF2YWlsYWJpbGl0eSBvdXQgb2Ygc3BlY2lmaWMgdGVzdC4uLgpDaGVja2lu
-ZyBQQVRDSCA0Lzg6IHNvY2tldHM6IHN0cmVuZ3RoZW4gdGVzdCBzdWl0ZSBJUCBwcm90b2NvbCBh
-dmFpbGFiaWxpdHkgY2hlY2tzLi4uCkNoZWNraW5nIFBBVENIIDUvODogc29ja2V0czogY2hlY2sg
-dGhhdCB0aGUgbmFtZWQgZmlsZSBkZXNjcmlwdG9yIGlzIGEgc29ja2V0Li4uCkNoZWNraW5nIFBB
-VENIIDYvODogc29ja2V0czogYWxsb3cgU29ja2V0QWRkcmVzcyAnZmQnIHRvIHJlZmVyZW5jZSBu
-dW1lcmljIGZpbGUgZGVzY3JpcHRvcnMuLi4KQ2hlY2tpbmcgUEFUQ0ggNy84OiBjaGFyOiByZWZh
-Y3RvciBwYXJzaW5nIG9mIHNvY2tldCBhZGRyZXNzIGluZm9ybWF0aW9uLi4uCkNoZWNraW5nIFBB
-VENIIDgvODogY2hhcjogYWxsb3cgcGFzc2luZyBwcmUtb3BlbmVkIHNvY2tldCBmaWxlIGRlc2Ny
-aXB0b3IgYXQgc3RhcnR1cC4uLgo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0
-ZWQgd2l0aCBjb2RlOiAxCgoKLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBh
-dGNoZXcgW2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRv
-IHBhdGNoZXctZGV2ZWxAZnJlZWxpc3RzLm9yZw==
+22.12.2017 16:39, Kevin Wolf wrote:
+> Am 12.12.2017 um 17:04 hat Vladimir Sementsov-Ogievskiy geschrieben:
+>> Consider migration with shared storage. Persistent bitmaps are stored
+>> on bdrv_inactivate. Then, on destination
+>> process_incoming_migration_bh() calls bdrv_invalidate_cache_all() which
+>> leads to qcow2_load_autoloading_dirty_bitmaps() which fails if bitmaps
+>> are already loaded on destination start. In this case we should call
+>> qcow2_reopen_bitmaps_rw instead.
+>>
+>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+>> Reviewed-by: John Snow <jsnow@redhat.com>
+> qcow2_invalidate_cache() calls qcow2_close() first, so why are there
+> still any bitmaps loaded? Isn't this a bug? Do we leak bitmaps when a
+> qcow2 image is closed?
+>
+> Kevin
+
+Interesting point.
+
+Now persistent dirty bitmaps are released at the end of=20
+bdrv_inactivate_recurse,
+which is not called here. It was a separate patch
+
+commit 615b5dcf2decbc5f0abb512d13d7e5db2385fa23
+Author: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date:=C2=A0=C2=A0 Wed Jun 28 15:05:30 2017 +0300
+
+ =C2=A0=C2=A0=C2=A0 block: release persistent bitmaps on inactivate
+
+
+May be it is more correct to release them immediately after storing, in
+qcow2_inactivete. But it will not fix the issue, because qcow2_close will
+call qcow2_inactivate only if (!(s->flags & BDRV_O_INACTIVE)), but it is
+not the case.
+
+or we can do like this, it fixes the new test:
+ =C2=A0 static void qcow2_close(BlockDriverState *bs)
+{
+ =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 BDRVQcow2State *s =3D bs->opaque;
+qemu_vfree(s->l1_table);
+ =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 /* else pre-write overlap checks in cache_d=
+estroy may crash */
+ =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 s->l1_table =3D NULL;
+
+ =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (!(s->flags & BDRV_O_INACTIVE)) {
+qcow2_inactivate(bs);
+}
++=C2=A0=C2=A0=C2=A0=C2=A0 bdrv_release_persistent_dirty_bitmaps(bs);
+
+
+What do you think?
+
+--=20
+Best regards,
+Vladimir
