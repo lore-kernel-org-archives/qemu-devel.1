@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52778)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60373)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1eSech-0006p0-0E
-	for qemu-devel@nongnu.org; Sat, 23 Dec 2017 02:53:36 -0500
+	(envelope-from <jianjay.zhou@huawei.com>) id 1eSf9n-00030Z-Ju
+	for qemu-devel@nongnu.org; Sat, 23 Dec 2017 03:27:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1eSecd-000744-V1
-	for qemu-devel@nongnu.org; Sat, 23 Dec 2017 02:53:35 -0500
-Received: from mail-wr0-x234.google.com ([2a00:1450:400c:c0c::234]:39390)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1eSecd-00073g-LK
-	for qemu-devel@nongnu.org; Sat, 23 Dec 2017 02:53:31 -0500
-Received: by mail-wr0-x234.google.com with SMTP id o101so979594wrb.6
-	for <qemu-devel@nongnu.org>; Fri, 22 Dec 2017 23:53:31 -0800 (PST)
-Received: from donizetti.lan (94-39-147-114.adsl-ull.clienti.tiscali.it.
-	[94.39.147.114]) by smtp.gmail.com with ESMTPSA id
-	j77sm33166618wmf.36.2017.12.22.23.53.27 for <qemu-devel@nongnu.org>
-	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-	Fri, 22 Dec 2017 23:53:28 -0800 (PST)
-Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Sat, 23 Dec 2017 08:53:26 +0100
-Message-Id: <20171223075326.9265-1-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL v4 00/19] Initial support for
- Hypervisor.framework
+	(envelope-from <jianjay.zhou@huawei.com>) id 1eSf9j-0001Ao-5c
+	for qemu-devel@nongnu.org; Sat, 23 Dec 2017 03:27:47 -0500
+Received: from [45.249.212.255] (port=45827 helo=huawei.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jianjay.zhou@huawei.com>)
+	id 1eSf9i-00019S-Fr
+	for qemu-devel@nongnu.org; Sat, 23 Dec 2017 03:27:43 -0500
+From: "Zhoujian (jay)" <jianjay.zhou@huawei.com>
+Date: Sat, 23 Dec 2017 08:27:25 +0000
+Message-ID: <B2D15215269B544CADD246097EACE7473AB19758@DGGEMM505-MBS.china.huawei.com>
+References: <1513327555-17520-1-git-send-email-jianjay.zhou@huawei.com>
+	<1513327555-17520-3-git-send-email-jianjay.zhou@huawei.com>
+	<20171222194855.6d1139f1@igors-macbook-pro.local>
+In-Reply-To: <20171222194855.6d1139f1@igors-macbook-pro.local>
+Content-Language: zh-CN
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH v2 2/2] vhost: double check used memslots
+ number
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,112 +31,151 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "mst@redhat.com" <mst@redhat.com>, "Huangweidong (C)" <weidong.huang@huawei.com>, "Gonglei
+	(Arei)" <arei.gonglei@huawei.com>, "wangxin (U)" <wangxinxin.wang@huawei.com>, "Liuzhe (Cloud Open Labs, NFV)" <gary.liuzhe@huawei.com>, "dgilbert@redhat.com" <dgilbert@redhat.com>
 
-The following changes since commit 43ab9a5376c95c61ae898a222c4d04bdf60e239b:
 
-  hw/i386/vmport: fix missing definitions with non-log trace backends (2017-12-21 22:52:28 +0000)
 
-are available in the Git repository at:
+> -----Original Message-----
+> From: Igor Mammedov [mailto:imammedo@redhat.com]
+> Sent: Saturday, December 23, 2017 2:49 AM
+> To: Zhoujian (jay) <jianjay.zhou@huawei.com>
+> Cc: qemu-devel@nongnu.org; mst@redhat.com; Huangweidong (C)
+> <weidong.huang@huawei.com>; Gonglei (Arei) <arei.gonglei@huawei.com>;
+> wangxin (U) <wangxinxin.wang@huawei.com>; Liuzhe (Cloud Open Labs, NFV)
+> <gary.liuzhe@huawei.com>; dgilbert@redhat.com
+> Subject: Re: [PATCH v2 2/2] vhost: double check used memslots number
+>=20
+> On Fri, 15 Dec 2017 16:45:55 +0800
+> Jay Zhou <jianjay.zhou@huawei.com> wrote:
+>=20
+> > If the VM already has N(N>8) available memory slots for vhost user,
+> > the VM will be crashed in vhost_user_set_mem_table if we try to
+> > hotplug the first vhost user NIC.
+> > This patch checks if memslots number exceeded or not after updating
+> > vhost_user_used_memslots.
+> Can't understand commit message, pls rephrase (what is being fixed, and
+> how it's fixed) also include reproducing steps for crash and maybe
+> describe call flow/backtrace that triggers crash.
 
-  git://github.com/bonzini/qemu.git tags/for-upstream-hvf
+Sorry about my pool english
 
-for you to fetch changes up to 895f9fdf3ac5481ca5ad5763bf667cbf82aa52c4:
+>=20
+> PS:
+> I wasn't able to reproduce crash
 
-  i386: hvf: cleanup x86_gen.h (2017-12-22 15:02:07 +0100)
+Steps to reproduce:
+(1) start up a VM successfully without any vhost device
+(2) hotplug 8 DIMM memory successfully
+(3) hotplug a vhost-user NIC, the VM crashed, it asserted
+    at the line
+        assert(fd_num < VHOST_MEMORY_MAX_NREGIONS);
+    in vhost_user_set_mem_table()
 
-----------------------------------------------------------------
-Initial support for the HVF accelerator
+Regards,
+Jay
 
-----------------------------------------------------------------
-Paolo Bonzini (10):
-      i386: hvf: move all hvf files in the same directory
-      i386: hvf: header cleanup
-      i386: hvf: unify register enums between HVF and the rest
-      i386: hvf: remove more dead emulator code
-      i386: hvf: remove ZERO_INIT macro
-      i386: hvf: abort on decoding error
-      i386: hvf: simplify flag handling
-      i386: hvf: remove addr_t
-      i386: hvf: remove VM_PANIC from "in"
-      i386: hvf: cleanup x86_gen.h
-
-Sergio Andres Gomez Del Real (9):
-      apic: add function to apic that will be used by hvf
-      i386: hvf: add code base from Google's QEMU repository
-      i386: hvf: fix licensing issues; isolate task handling code (GPL v2-only)
-      i386: hvf: use new helper functions for put/get xsave
-      i386: hvf: implement hvf_get_supported_cpuid
-      i386: refactor KVM cpuid code so that it applies to hvf as well
-      i386: hvf: implement vga dirty page tracking
-      i386: hvf: refactor event injection code for hvf
-      i386: hvf: inject General Protection Fault when vmexit through vmcall
-
- accel/stubs/Makefile.objs     |    1 +
- accel/stubs/hvf-stub.c        |   31 +
- configure                     |   38 +
- cpus.c                        |   86 ++
- hw/intc/apic.c                |   12 +
- include/hw/i386/apic.h        |    1 +
- include/qemu/typedefs.h       |    1 +
- include/qom/cpu.h             |    2 +
- include/sysemu/hvf.h          |  107 ++
- qemu-options.hx               |   10 +-
- target/i386/Makefile.objs     |    1 +
- target/i386/cpu-qom.h         |    4 +-
- target/i386/cpu.c             |   80 +-
- target/i386/cpu.h             |  101 +-
- target/i386/hvf/Makefile.objs |    2 +
- target/i386/hvf/README.md     |    7 +
- target/i386/hvf/hvf-i386.h    |   48 +
- target/i386/hvf/hvf.c         |  959 ++++++++++++++++++
- target/i386/hvf/panic.h       |   45 +
- target/i386/hvf/vmcs.h        |  374 +++++++
- target/i386/hvf/vmx.h         |  222 +++++
- target/i386/hvf/x86.c         |  186 ++++
- target/i386/hvf/x86.h         |  400 ++++++++
- target/i386/hvf/x86_cpuid.c   |  166 ++++
- target/i386/hvf/x86_decode.c  | 2186 +++++++++++++++++++++++++++++++++++++++++
- target/i386/hvf/x86_decode.h  |  323 ++++++
- target/i386/hvf/x86_descr.c   |  125 +++
- target/i386/hvf/x86_descr.h   |   58 ++
- target/i386/hvf/x86_emu.c     | 1483 ++++++++++++++++++++++++++++
- target/i386/hvf/x86_emu.h     |   49 +
- target/i386/hvf/x86_flags.c   |  315 ++++++
- target/i386/hvf/x86_flags.h   |   80 ++
- target/i386/hvf/x86_mmu.c     |  272 +++++
- target/i386/hvf/x86_mmu.h     |   43 +
- target/i386/hvf/x86_task.c    |  191 ++++
- target/i386/hvf/x86_task.h    |   18 +
- target/i386/hvf/x86hvf.c      |  465 +++++++++
- target/i386/hvf/x86hvf.h      |   39 +
- target/i386/kvm.c             |    2 -
- 39 files changed, 8474 insertions(+), 59 deletions(-)
- create mode 100644 accel/stubs/hvf-stub.c
- create mode 100644 include/sysemu/hvf.h
- create mode 100644 target/i386/hvf/Makefile.objs
- create mode 100644 target/i386/hvf/README.md
- create mode 100644 target/i386/hvf/hvf-i386.h
- create mode 100644 target/i386/hvf/hvf.c
- create mode 100644 target/i386/hvf/panic.h
- create mode 100644 target/i386/hvf/vmcs.h
- create mode 100644 target/i386/hvf/vmx.h
- create mode 100644 target/i386/hvf/x86.c
- create mode 100644 target/i386/hvf/x86.h
- create mode 100644 target/i386/hvf/x86_cpuid.c
- create mode 100644 target/i386/hvf/x86_decode.c
- create mode 100644 target/i386/hvf/x86_decode.h
- create mode 100644 target/i386/hvf/x86_descr.c
- create mode 100644 target/i386/hvf/x86_descr.h
- create mode 100644 target/i386/hvf/x86_emu.c
- create mode 100644 target/i386/hvf/x86_emu.h
- create mode 100644 target/i386/hvf/x86_flags.c
- create mode 100644 target/i386/hvf/x86_flags.h
- create mode 100644 target/i386/hvf/x86_mmu.c
- create mode 100644 target/i386/hvf/x86_mmu.h
- create mode 100644 target/i386/hvf/x86_task.c
- create mode 100644 target/i386/hvf/x86_task.h
- create mode 100644 target/i386/hvf/x86hvf.c
- create mode 100644 target/i386/hvf/x86hvf.h
--- 
-2.14.3
+> >
+> > Signed-off-by: Jay Zhou <jianjay.zhou@huawei.com>
+> > ---
+> >  hw/virtio/vhost.c | 27 +++++++++++++++++++++++----
+> >  1 file changed, 23 insertions(+), 4 deletions(-)
+> >
+> > diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c index
+> > 59a32e9..e45f5e2 100644
+> > --- a/hw/virtio/vhost.c
+> > +++ b/hw/virtio/vhost.c
+> > @@ -1234,6 +1234,18 @@ static void vhost_virtqueue_cleanup(struct
+> vhost_virtqueue *vq)
+> >      event_notifier_cleanup(&vq->masked_notifier);
+> >  }
+> >
+> > +static bool vhost_dev_used_memslots_is_exceeded(struct vhost_dev
+> > +*hdev) {
+> > +    if (hdev->vhost_ops->vhost_get_used_memslots() >
+> > +        hdev->vhost_ops->vhost_backend_memslots_limit(hdev)) {
+> > +        error_report("vhost backend memory slots limit is less"
+> > +                " than current number of present memory slots");
+> > +        return true;
+> > +    }
+> > +
+> > +    return false;
+> > +}
+> > +
+> >  int vhost_dev_init(struct vhost_dev *hdev, void *opaque,
+> >                     VhostBackendType backend_type, uint32_t
+> > busyloop_timeout)  { @@ -1252,10 +1264,7 @@ int vhost_dev_init(struct
+> > vhost_dev *hdev, void *opaque,
+> >          goto fail;
+> >      }
+> >
+> > -    if (hdev->vhost_ops->vhost_get_used_memslots() >
+> > -        hdev->vhost_ops->vhost_backend_memslots_limit(hdev)) {
+> > -        error_report("vhost backend memory slots limit is less"
+> > -                " than current number of present memory slots");
+> > +    if (vhost_dev_used_memslots_is_exceeded(hdev)) {
+> why do you keep this check?
+> it seems always be false
+>=20
+>=20
+>=20
+> >          r =3D -1;
+> >          goto fail;
+> >      }
+> > @@ -1341,6 +1350,16 @@ int vhost_dev_init(struct vhost_dev *hdev, void
+> *opaque,
+> >      hdev->memory_changed =3D false;
+> >      memory_listener_register(&hdev->memory_listener,
+> &address_space_memory);
+> >      QLIST_INSERT_HEAD(&vhost_devices, hdev, entry);
+> > +
+> > +    if (vhost_dev_used_memslots_is_exceeded(hdev)) {
+> > +        r =3D -1;
+> > +        if (busyloop_timeout) {
+> > +            goto fail_busyloop;
+> > +        } else {
+> > +            goto fail;
+> > +        }
+> > +    }
+> seem to be right thing to do, since after registering listener for the
+> first time used_memslots will be updated to actual value.
+>=20
+>=20
+> I did some testing and without this hunk/patch
+>=20
+> on 'device_add  virtio-net-pci,netdev=3Dnet0' qemu prints:
+>=20
+> qemu-system-x86_64: vhost_set_mem_table failed: Argument list too long (7=
+)
+> qemu-system-x86_64: unable to start vhost net: 7: falling back on
+> userspace virtio
+>=20
+> and network is operational in guest, but with this patch
+>=20
+> "netdev_add ...,vhost-on" prints:
+>=20
+> vhost backend memory slots limit is less than current number of present
+> memory slots vhost-net requested but could not be initialized
+>=20
+> and following "device_add  virtio-net-pci,netdev=3Dnet0" prints:
+>=20
+> TUNSETOFFLOAD ioctl() failed: Bad file descriptor TUNSETOFFLOAD ioctl()
+> failed: Bad file descriptor
+>=20
+> adapter is still hot-plugged but guest networking is broken (can't get IP
+> address via DHCP)
+>=20
+> so patch seems introduces a regression or something broken elsewhere and
+> this exposes issue, not sure what qemu reaction should be in this case
+> i.e. when netdev_add fails
+>     1: should we fail followed up device_add or
+>     2: make it fall back to userspace virtio
+>=20
+> I'd go for #2,
+> Michael what's your take on it?
+>=20
+> > +
+> >      return 0;
+> >
+> >  fail_busyloop:
