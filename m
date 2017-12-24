@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45373)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60832)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <penguin-kernel@I-love.SAKURA.ne.jp>)
-	id 1eSyCb-0004J0-4C
-	for qemu-devel@nongnu.org; Sat, 23 Dec 2017 23:47:58 -0500
+	(envelope-from <wei.w.wang@intel.com>) id 1eT0iw-0000qz-Gc
+	for qemu-devel@nongnu.org; Sun, 24 Dec 2017 02:29:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <penguin-kernel@I-love.SAKURA.ne.jp>)
-	id 1eSyCY-0006yd-87
-	for qemu-devel@nongnu.org; Sat, 23 Dec 2017 23:47:57 -0500
-Received: from www262.sakura.ne.jp ([2001:e42:101:1:202:181:97:72]:61170)
+	(envelope-from <wei.w.wang@intel.com>) id 1eT0it-00060z-DM
+	for qemu-devel@nongnu.org; Sun, 24 Dec 2017 02:29:30 -0500
+Received: from mga07.intel.com ([134.134.136.100]:51569)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <penguin-kernel@I-love.SAKURA.ne.jp>)
-	id 1eSyCX-00051s-K0
-	for qemu-devel@nongnu.org; Sat, 23 Dec 2017 23:47:54 -0500
-From: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
-References: <1513685879-21823-1-git-send-email-wei.w.wang@intel.com>
-	<1513685879-21823-5-git-send-email-wei.w.wang@intel.com>
-	<20171224032121.GA5273@bombadil.infradead.org>
-In-Reply-To: <20171224032121.GA5273@bombadil.infradead.org>
-Message-Id: <201712241345.DIG21823.SLFOOJtQFOMVFH@I-love.SAKURA.ne.jp>
-Date: Sun, 24 Dec 2017 13:45:10 +0900
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Subject: Re: [Qemu-devel] [PATCH v20 4/7] virtio-balloon: VIRTIO_BALLOON_F_SG
+	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
+	id 1eT0it-0005qt-2C
+	for qemu-devel@nongnu.org; Sun, 24 Dec 2017 02:29:27 -0500
+Message-ID: <5A3F57D0.9050007@intel.com>
+Date: Sun, 24 Dec 2017 15:31:28 +0800
+From: Wei Wang <wei.w.wang@intel.com>
+MIME-Version: 1.0
+References: <1513823406-43632-1-git-send-email-wei.w.wang@intel.com>	<20171221210327.GB25009@bombadil.infradead.org>	<201712231159.ECI73411.tFFFJOHOVMOLQS@I-love.SAKURA.ne.jp>	<20171223032959.GA11578@bombadil.infradead.org>
+	<201712232333.BAH82874.FFFtOMHSLVQOOJ@I-love.SAKURA.ne.jp>
+In-Reply-To: <201712232333.BAH82874.FFFtOMHSLVQOOJ@I-love.SAKURA.ne.jp>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v20 3/7 RESEND] xbitmap: add more operations
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,68 +28,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: willy@infradead.org, wei.w.wang@intel.com
-Cc: virtio-dev@lists.oasis-open.org, linux-kernel@vger.kernel.org, qemu-devel@nongnu.org, virtualization@lists.linux-foundation.org, kvm@vger.kernel.org, linux-mm@kvack.org, mst@redhat.com, mhocko@kernel.org, akpm@linux-foundation.org, mawilcox@microsoft.com, david@redhat.com, cornelia.huck@de.ibm.com, mgorman@techsingularity.net, aarcange@redhat.com, amit.shah@redhat.com, pbonzini@redhat.com, liliang.opensource@gmail.com, yang.zhang.wz@gmail.com, quan.xu0@gmail.com, nilal@redhat.com, riel@redhat.com
+To: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>, willy@infradead.org
+Cc: virtio-dev@lists.oasis-open.org, linux-kernel@vger.kernel.org, qemu-devel@nongnu.org, virtualization@lists.linux-foundation.org, kvm@vger.kernel.org, linux-mm@kvack.org, mst@redhat.com, mhocko@kernel.org, akpm@linux-foundation.org, mawilcox@microsoft.com
 
-Matthew Wilcox wrote:
-> > +	unsigned long pfn = page_to_pfn(page);
-> > +	int ret;
-> > +
-> > +	*pfn_min = min(pfn, *pfn_min);
-> > +	*pfn_max = max(pfn, *pfn_max);
-> > +
-> > +	do {
-> > +		if (xb_preload(GFP_NOWAIT | __GFP_NOWARN) < 0)
-> > +			return -ENOMEM;
-> > +
-> > +		ret = xb_set_bit(&vb->page_xb, pfn);
-> > +		xb_preload_end();
-> > +	} while (unlikely(ret == -EAGAIN));
-> 
-> OK, so you don't need a spinlock because you're under a mutex?  But you
-> can't allocate memory because you're in the balloon driver, and so a
-> GFP_KERNEL allocation might recurse into your driver?
+On 12/23/2017 10:33 PM, Tetsuo Handa wrote:
+>>>> +	bitmap = rcu_dereference_raw(*slot);
+>>>> +	if (!bitmap) {
+>>>> +		bitmap = this_cpu_xchg(ida_bitmap, NULL);
+>>>> +		if (!bitmap)
+>>>> +			return -ENOMEM;
+>>> I can't understand this. I can understand if it were
+>>>
+>>>    BUG_ON(!bitmap);
+>>>
+>>> because you called xb_preload().
+>>>
+>>> But
+>>>
+>>> 	/*
+>>> 	 * Regular test 2
+>>> 	 * set bit 2000, 2001, 2040
+>>> 	 * Next 1 in [0, 2048)		--> 2000
+>>> 	 * Next 1 in [2000, 2002)	--> 2000
+>>> 	 * Next 1 in [2002, 2041)	--> 2040
+>>> 	 * Next 1 in [2002, 2040)	--> none
+>>> 	 * Next 0 in [2000, 2048)	--> 2002
+>>> 	 * Next 0 in [2048, 2060)	--> 2048
+>>> 	 */
+>>> 	xb_preload(GFP_KERNEL);
+>>> 	assert(!xb_set_bit(&xb1, 2000));
+>>> 	assert(!xb_set_bit(&xb1, 2001));
+>>> 	assert(!xb_set_bit(&xb1, 2040));
+>> [...]
+>>> 	xb_preload_end();
+>>>
+>>> you are not calling xb_preload() prior to each xb_set_bit() call.
+>>> This means that, if each xb_set_bit() is not surrounded with
+>>> xb_preload()/xb_preload_end(), there is possibility of hitting
+>>> this_cpu_xchg(ida_bitmap, NULL) == NULL.
+>> This is just a lazy test.  We "know" that the bits in the range 1024-2047
+>> will all land in the same bitmap, so there's no need to preload for each
+>> of them.
+> Testcases also serves as how to use that API.
+> Assuming such thing leads to incorrect usage.
 
-Right. We can't (directly or indirectly) depend on __GFP_DIRECT_RECLAIM && !__GFP_NORETRY
-allocations because the balloon driver needs to handle OOM notifier callback.
+If callers are aware that the bits that they going to record locate in 
+the same bitmap, I think they should also perform the xb_ APIs with only 
+one preload. So the test cases here have shown them a correct example. 
+We can probably add some comments above to explain this.
 
->                                                        Would GFP_NOIO
-> do the job?  I'm a little hazy on exactly how the balloon driver works.
 
-GFP_NOIO implies __GFP_DIRECT_RECLAIM. In the worst case, it can lockup due to
-the too small to fail memory allocation rule. GFP_NOIO | __GFP_NORETRY would work
-if there is really a guarantee that GFP_NOIO | __GFP_NORETRY never depend on
-__GFP_DIRECT_RECLAIM && !__GFP_NORETRY allocations, which is too subtle for me to
-validate. The direct reclaim dependency is too complicated to validate.
-I consider that !__GFP_DIRECT_RECLAIM is the future-safe choice.
-
-> 
-> If you can't preload with anything better than that, I think that
-> xb_set_bit() should attempt an allocation with GFP_NOWAIT | __GFP_NOWARN,
-> and then you can skip the preload; it has no value for you.
-
-Yes, that's why I suggest directly using kzalloc() at xb_set_bit().
-
-> 
-> > @@ -173,8 +292,15 @@ static unsigned fill_balloon(struct virtio_balloon *vb, size_t num)
-> >  
-> >  	while ((page = balloon_page_pop(&pages))) {
-> >  		balloon_page_enqueue(&vb->vb_dev_info, page);
-> > +		if (use_sg) {
-> > +			if (xb_set_page(vb, page, &pfn_min, &pfn_max) < 0) {
-> > +				__free_page(page);
-> > +				continue;
-> > +			}
-> > +		} else {
-> > +			set_page_pfns(vb, vb->pfns + vb->num_pfns, page);
-> > +		}
-> 
-> Is this the right behaviour?
-
-I don't think so. In the worst case, we can set no bit using xb_set_page().
-
->                               If we can't record the page in the xb,
-> wouldn't we rather send it across as a single page?
-> 
-
-I think that we need to be able to fallback to !use_sg path when OOM.
+Best,
+Wei
