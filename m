@@ -1,26 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49747)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59167)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1eTLBX-0004nQ-Tm
-	for qemu-devel@nongnu.org; Mon, 25 Dec 2017 00:20:24 -0500
+	(envelope-from <peterx@redhat.com>) id 1eTLOq-0008Tk-QF
+	for qemu-devel@nongnu.org; Mon, 25 Dec 2017 00:34:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1eTLBW-0001Ey-Vc
-	for qemu-devel@nongnu.org; Mon, 25 Dec 2017 00:20:23 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:58600)
+	(envelope-from <peterx@redhat.com>) id 1eTLOm-0002iC-4F
+	for qemu-devel@nongnu.org; Mon, 25 Dec 2017 00:34:08 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:37000)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1eTLBW-0001Ee-NX
-	for qemu-devel@nongnu.org; Mon, 25 Dec 2017 00:20:22 -0500
-Date: Mon, 25 Dec 2017 13:20:11 +0800
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1eTLOl-0002h5-VK
+	for qemu-devel@nongnu.org; Mon, 25 Dec 2017 00:34:04 -0500
+Date: Mon, 25 Dec 2017 13:33:55 +0800
 From: Peter Xu <peterx@redhat.com>
-Message-ID: <20171225052011.GG2443@xz-mi>
-References: <20171219084557.9801-1-peterx@redhat.com>
-	<20171219084557.9801-23-peterx@redhat.com>
-	<20171221125702.GS10812@lemon>
+Message-ID: <20171225053355.GH2443@xz-mi>
+References: <20171225024704.19540-1-linzhecheng@huawei.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20171221125702.GS10812@lemon>
-Subject: Re: [Qemu-devel] [RFC v6 22/27] qmp: isolate responses into io
- thread
+In-Reply-To: <20171225024704.19540-1-linzhecheng@huawei.com>
+Subject: Re: [Qemu-devel] [PATCH] irq: fix memory leak
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,44 +26,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: qemu-devel@nongnu.org, Stefan Hajnoczi <shajnocz@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Juan Quintela <quintela@redhat.com>, mdroth@linux.vnet.ibm.com, Eric Blake <eblake@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Markus Armbruster <armbru@redhat.com>, marcandre.lureau@redhat.com, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: linzhecheng <linzhecheng@huawei.com>
+Cc: qemu-devel@nongnu.org, pbonzini@redhat.com, arei.gonglei@huawei.com, mst@redhat.com
 
-On Thu, Dec 21, 2017 at 08:57:02PM +0800, Fam Zheng wrote:
-> On Tue, 12/19 16:45, Peter Xu wrote:
-> > For those monitors who has enabled IO thread, we'll offload the
+On Mon, Dec 25, 2017 at 10:47:04AM +0800, linzhecheng wrote:
+> entry is moved from list but is not freed.
 > 
-> s/has/have/
+> Signed-off-by: linzhecheng <linzhecheng@huawei.com>
 > 
-> > responding procedure into IO thread.  The main reason is that chardev is
-> > not thread safe, and we need to do all the read/write IOs in the same
-> > thread.  For use_io_thr=true monitors, that thread is the IO thread.
-> > 
-> > We do this isolation in similar pattern as what we have done to the
-> > request queue: we first create one response queue for each monitor, then
-> > instead of reply directly in main thread, we queue the responses and
+> diff --git a/target/i386/kvm.c b/target/i386/kvm.c
+> index 351b64f77c..3c920db79a 100644
+> --- a/target/i386/kvm.c
+> +++ b/target/i386/kvm.c
+> @@ -3494,6 +3494,7 @@ int kvm_arch_release_virq_post(int virq)
+>          if (entry->virq == virq) {
+>              trace_kvm_x86_remove_msi_route(virq);
+>              QLIST_REMOVE(entry, list);
+> +            g_free(entry);
+>              break;
+>          }
+>      }
+> -- 
+> 2.12.2.windows.2
 > 
-> s/reply/replying/
 > 
-> s/main thread/the main thread/
+> 
 
-Fixed all.
+My INBOX didn't really catch this email, don't know why.  Anyway,
+thanks for fixing that.
 
-> 
-> > kick the IO thread to do the rest of the job for us.
-> > 
-> > A funny thing after doing this is that, when the QMP clients send "quit"
-> > to QEMU, it's possible that we close the IOThread even earlier than
-> > replying to that "quit".  So another thing we need to do before cleaning
-> > up the monitors is that we need to flush the response queue (we don't
-> > need to do that for command queue; after all we are quitting) to make
-> > sure replies for handled commands are always flushed back to clients.
-> > 
-> > Signed-off-by: Peter Xu <peterx@redhat.com>
-> 
-> Reviewed-by: Fam Zheng <famz@redhat.com>
-
-Thanks!
+Reviewed-by: Peter Xu <peterx@redhat.com>
 
 -- 
 Peter Xu
