@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38082)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40856)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1eTIKF-0005zP-B2
-	for qemu-devel@nongnu.org; Sun, 24 Dec 2017 21:17:13 -0500
+	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1eTINt-0007PQ-O9
+	for qemu-devel@nongnu.org; Sun, 24 Dec 2017 21:21:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1eTIKC-0008HP-0E
-	for qemu-devel@nongnu.org; Sun, 24 Dec 2017 21:17:11 -0500
-Received: from mail.cn.fujitsu.com ([183.91.158.132]:22234
+	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1eTINq-00029u-Ee
+	for qemu-devel@nongnu.org; Sun, 24 Dec 2017 21:20:57 -0500
+Received: from mail.cn.fujitsu.com ([183.91.158.132]:25587
 	helo=heian.cn.fujitsu.com) by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1eTIKA-00089P-OD
-	for qemu-devel@nongnu.org; Sun, 24 Dec 2017 21:17:07 -0500
+	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1eTINp-00027q-82
+	for qemu-devel@nongnu.org; Sun, 24 Dec 2017 21:20:54 -0500
 References: <CAK3tnvJ5YZ0hGi-6QVdeg-zzP4SNc7Tvs221zBktC=LLktZqfQ@mail.gmail.com>
 	<09987cd3-07d5-ff3a-5298-1a1fcac846a3@cn.fujitsu.com>
 From: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
-Message-ID: <951df91e-4f49-a07a-69ed-e8dbcdf687f9@cn.fujitsu.com>
-Date: Mon, 25 Dec 2017 10:12:10 +0800
+Message-ID: <9e07f14a-6cff-4aa8-5e32-cb1fe7ff2f68@cn.fujitsu.com>
+Date: Mon, 25 Dec 2017 10:16:02 +0800
 MIME-Version: 1.0
 In-Reply-To: <09987cd3-07d5-ff3a-5298-1a1fcac846a3@cn.fujitsu.com>
 Content-Type: text/plain; charset="utf-8"; format=flowed
@@ -28,8 +28,8 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Zhang Chen <zhangckid@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>
-Cc: Jason Wang <jasowang@redhat.com>, =?UTF-8?B?TGksIFpoaWppYW4v5p2OIOaZuuWdmg==?= <lizhijian@cn.fujitsu.com>
+To: QEMU Developers <qemu-devel@nongnu.org>, Zhang Chen <zhangckid@gmail.com>
+Cc: Jason Wang <jasowang@redhat.com>, =?UTF-8?B?TGksIFpoaWppYW4v5p2OIOaZuuWdmg==?= <lizhijian@cn.fujitsu.com>, Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
 
 
 
@@ -347,13 +347,13 @@ On 12/25/2017 09:51 AM, Dou Liyang wrote:
 >
 > Reviewed-by: Zhang Chen <zhangckid@gmail.com>
 > Tested-by: Zhang Chen <zhangckid@gmail.com>
+>
 
 Noted and thanks for the review.
 
 Thanks,
 Mao
 
->
 >
 > Thanks
 > Zhang Chen
