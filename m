@@ -1,34 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45184)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45876)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eTKPb-0008R2-OL
-	for qemu-devel@nongnu.org; Sun, 24 Dec 2017 23:30:52 -0500
+	(envelope-from <peterx@redhat.com>) id 1eTL6A-0002YL-MK
+	for qemu-devel@nongnu.org; Mon, 25 Dec 2017 00:14:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eTKPY-0003V5-Fu
-	for qemu-devel@nongnu.org; Sun, 24 Dec 2017 23:30:51 -0500
-Received: from indium.canonical.com ([91.189.90.7]:55556)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1eTKPY-0003UE-9h
-	for qemu-devel@nongnu.org; Sun, 24 Dec 2017 23:30:48 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1eTKPW-0007NY-DY
-	for <qemu-devel@nongnu.org>; Mon, 25 Dec 2017 04:30:46 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id E97712E80D5
-	for <qemu-devel@nongnu.org>; Mon, 25 Dec 2017 04:30:45 +0000 (UTC)
+	(envelope-from <peterx@redhat.com>) id 1eTL67-000479-HL
+	for qemu-devel@nongnu.org; Mon, 25 Dec 2017 00:14:50 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:50266)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1eTL67-00046Z-BB
+	for qemu-devel@nongnu.org; Mon, 25 Dec 2017 00:14:47 -0500
+Date: Mon, 25 Dec 2017 13:14:35 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20171225051435.GE2443@xz-mi>
+References: <20171219084557.9801-1-peterx@redhat.com>
+	<20171219084557.9801-17-peterx@redhat.com>
+	<20171221114013.GN10812@lemon>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 25 Dec 2017 04:17:37 -0000
-From: Launchpad Bug Tracker <1290370@bugs.launchpad.net>
-Reply-To: Bug 1290370 <1290370@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20140310134632.8138.95419.malonedeb@soybean.canonical.com>
-Message-Id: <151417545798.5133.10240357873176860986.malone@loganberry.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1290370] Re: FreeBSD 9.2 shell crashes when run
- with -smp 4 option
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20171221114013.GN10812@lemon>
+Subject: Re: [Qemu-devel] [RFC v6 16/27] monitor: separate QMP parser and
+ dispatcher
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,69 +29,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Fam Zheng <famz@redhat.com>
+Cc: qemu-devel@nongnu.org, Stefan Hajnoczi <shajnocz@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Juan Quintela <quintela@redhat.com>, mdroth@linux.vnet.ibm.com, Eric Blake <eblake@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Markus Armbruster <armbru@redhat.com>, marcandre.lureau@redhat.com, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 
-[Expired for QEMU because there has been no activity for 60 days.]
+On Thu, Dec 21, 2017 at 07:40:13PM +0800, Fam Zheng wrote:
 
-** Changed in: qemu
-       Status: Incomplete =3D> Expired
+[...]
 
--- =
+> > +/*
+> > + * Pop one QMP request from monitor queues, return NULL if not found.
+> > + * We are using round-robin fasion to pop the request, to avoid
+> 
+> s/fasion/fashion/
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1290370
+Fixed.
 
-Title:
-  FreeBSD 9.2 shell crashes when run with -smp 4 option
+[...]
 
-Status in QEMU:
-  Expired
+> >  static void monitor_qmp_read(void *opaque, const uint8_t *buf, int size)
+> >  {
+> >      Monitor *mon = opaque;
+> > @@ -4150,6 +4292,15 @@ static void monitor_iothread_init(void)
+> >  {
+> >      mon_global.mon_iothread = iothread_create("mon_iothread",
+> >                                                &error_abort);
+> > +
+> > +    /*
+> > +     * This MUST be on main loop thread since we have commands that
+> > +     * have assumption to be run on main loop thread (Yeah, we'd
+> > +     * better remove this assumption in the future).
+> 
+> Assert and move this comment in monitor_qmp_bh_dispatcher?
 
-Bug description:
-  This is a bug that i have noticed in qemu 1.7.50 as well as 1.1.50. It
-  was the latter that forced me to clone the repository to check if this
-  is the case with the resent version as well . The latest commit on
-  which the bug is found is f53f3d0a00b6df39ce8dfca942608e5b6a9a4f71 on
-  qemu.git
+I would still prefer to keep it here.  IMHO what really matters is the
+first parameter that passed in to aio_bh_new() below, rather than
+monitor_qmp_bh_dispatcher itself?  Thanks,
 
-  qemu 1.7.50 configured with target list i386-softmmu.
+> 
+> > +     */
+> > +    mon_global.qmp_dispatcher_bh = aio_bh_new(qemu_get_aio_context(),
+> > +                                              monitor_qmp_bh_dispatcher,
+> > +                                              NULL);
+> >  }
+> >  
+> 
+> Fam
 
-  =
-
-  OS: FreeBSD 9.2 Text Install ISO (ftp://ftp.freebsd.org/pub/FreeBSD/relea=
-ses/i386/i386/ISO-IMAGES/9.2/FreeBSD-9.2-RELEASE-i386-disc1.iso)
-  Installed it to a qcow2 format image.
-
-  Command to run QEMU::
-  ./i386-softmmu/qemu-system-i386 -hda <bsd-image> -m 2G -smp 4 -net nic -n=
-et user -monitor stdio
-
-  (boot into multi-user mode)->(login to root account)
-
-  I have the filebench benchmark installed on the image and when i run it t=
-he default root shell (csh) crashes with the error.
-  [pid xxxx (csh) sigreturn eflag =3D 0xXXXX]
-  Here is the piece of kernel code that is getting executed (i think) http:=
-//svnweb.freebsd.org/base/release/9.2.0/sys/i386/i386/machdep.c?view=3Dmark=
-up#l1095
-
-  Here is a related bug
-  https://www.virtualbox.org/ticket/458
-
-  The crash happens randomly. It is not just related with filebench.
-  Here are a few scenarios:
-  * When i run fileserver workload of filebench
-  * After i issue the shutdown -h now shutdown -r now commands
-  * Issuing mount -t linprocfs proc /proc
-
-  Moreover it is not guaranteed that the above scenarios will reproduce it =
-(reliably).
-  The bug manifests after running some commands and getting the CPU and the=
- kernel worked up.
-
-  NOTE: This bug does not occur in qemu-kvm [X]
-  EDIT: Confirmed. This happens on qemu-kvm as well.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1290370/+subscriptions
+-- 
+Peter Xu
