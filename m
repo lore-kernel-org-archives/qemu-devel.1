@@ -1,26 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58064)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44876)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1eTJPI-0002XU-Pd
-	for qemu-devel@nongnu.org; Sun, 24 Dec 2017 22:26:29 -0500
+	(envelope-from <bounces@canonical.com>) id 1eTKPN-0008FX-7S
+	for qemu-devel@nongnu.org; Sun, 24 Dec 2017 23:30:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1eTJPF-00032U-M4
-	for qemu-devel@nongnu.org; Sun, 24 Dec 2017 22:26:28 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:32796)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1eTJPF-00031m-Fa
-	for qemu-devel@nongnu.org; Sun, 24 Dec 2017 22:26:25 -0500
-Date: Mon, 25 Dec 2017 11:26:13 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20171225032613.GD2443@xz-mi>
-References: <20171219084557.9801-1-peterx@redhat.com>
-	<20171219084557.9801-16-peterx@redhat.com>
-	<20171221112738.GL10812@lemon>
+	(envelope-from <bounces@canonical.com>) id 1eTKPK-0003Jj-4D
+	for qemu-devel@nongnu.org; Sun, 24 Dec 2017 23:30:37 -0500
+Received: from indium.canonical.com ([91.189.90.7]:54794)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1eTKPJ-0003Ii-Ts
+	for qemu-devel@nongnu.org; Sun, 24 Dec 2017 23:30:34 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1eTKPH-00072G-LA
+	for <qemu-devel@nongnu.org>; Mon, 25 Dec 2017 04:30:31 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 9EAAA2E8050
+	for <qemu-devel@nongnu.org>; Mon, 25 Dec 2017 04:30:31 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20171221112738.GL10812@lemon>
-Subject: Re: [Qemu-devel] [RFC v6 15/27] monitor: let suspend/resume work
- even with QMPs
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 25 Dec 2017 04:17:38 -0000
+From: Launchpad Bug Tracker <1374905@bugs.launchpad.net>
+Reply-To: Bug 1374905 <1374905@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20140928043504.32411.389.malonedeb@gac.canonical.com>
+Message-Id: <151417545874.5133.266242400739054494.malone@loganberry.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1374905] Re: Pixelation issue in 16-bit color VGA
+ graphics
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,39 +37,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: qemu-devel@nongnu.org, Stefan Hajnoczi <shajnocz@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Juan Quintela <quintela@redhat.com>, mdroth@linux.vnet.ibm.com, Eric Blake <eblake@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Markus Armbruster <armbru@redhat.com>, marcandre.lureau@redhat.com, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: qemu-devel@nongnu.org
 
-On Thu, Dec 21, 2017 at 07:27:38PM +0800, Fam Zheng wrote:
-> On Tue, 12/19 16:45, Peter Xu wrote:
-> > One thing to mention is that for QMPs that are using IOThreads, we need
-> > an explicit kick for the IOThread in case it is sleeping.
-> > 
-> > Since at it, add traces for the operations.
-> > 
-> > Signed-off-by: Peter Xu <peterx@redhat.com>
-> > ---
-> >  monitor.c    | 26 +++++++++++++++++++++-----
-> >  trace-events |  1 +
-> >  2 files changed, 22 insertions(+), 5 deletions(-)
-> > 
-> > diff --git a/monitor.c b/monitor.c
-> > index 844508d134..5f05f2e9da 100644
-> > --- a/monitor.c
-> > +++ b/monitor.c
-> > @@ -3992,19 +3992,35 @@ static void monitor_command_cb(void *opaque, const char *cmdline,
-> >  
-> >  int monitor_suspend(Monitor *mon)
-> >  {
-> > -    if (!mon->rs)
-> > -        return -ENOTTY;
-> 
-> Please add to the commit message why the mon->rs check is dropped, for this and
-> the other one.
+[Expired for QEMU because there has been no activity for 60 days.]
 
-I thought it would be clear enough since mon->rs is only used by HMP
-and the subject tells us that this patch is adding support for QMP.
-But... sure I can add one more sentence for that!
+** Changed in: qemu
+       Status: Incomplete =3D> Expired
 
--- 
-Peter Xu
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1374905
+
+Title:
+  Pixelation issue in 16-bit color VGA graphics
+
+Status in QEMU:
+  Expired
+
+Bug description:
+  What happened:
+  I ran the 9front installation ISO (here: http://r-36.net/9front/9front-38=
+53.02ebd469f43a.iso.bz2) in QEMU, with a blank qcow2, using `qemu-system-i3=
+86 -hda 9front.qcow2.img -cdrom 9front-3853.02ebd469f43a.iso -boot d -vga s=
+td -m 1G`. During the console boot, I accept the default display settings (=
+1024x768x16, VESA, PS2 mouse), and 9front proceeds to the GUI boot. However=
+, every pixel is blurred, making text illegible and the GUI unusable.
+
+  What I expected:
+  Normal pixel rendering / normal display.
+
+  Step by step instructions:
+  0. Install QEMU 2.1.2 (I use Homebrew's bottle, `brew install qemu`)
+  1. Download 9front ISO (9front-3853.02ebd469f43a.iso.bz2)
+  2. Create new QEMU image: `qemu-img create -f qcow2 9front.qcow2.img 20G`.
+  3. Boot 9front ISO: `qemu-system-i386 -hda 9front.qcow2.img -cdrom 9front=
+-3853.02ebd469f43a.iso -boot d -vga std -m 1G`
+  4. It displays a console boot screen; accept default args (local, glenda,=
+ 1024x768x16, vesa, ps2, etc...)
+  5. GUI is drawn.
+  6. Pixel are blurred and unreadable
+
+  Details:
+  This bug does not occur when 32 bit color is used, using the 1024x768x32.=
+ This bug does not occur when QEMU is built with SDL (in Homebrew, `brew in=
+stall qemu --with-sdl`), although the console portion of 9front's boot runs=
+ significantly slower.
+
+  System:
+  OS X 10.9.5 x86-64
+  Macbook Retina Late 2012
+  Intel i7 Ivy Bridge dual core.
+
+  Build:
+  Homebrew's QEMU 2.1.2 bottle, which is build without GTK, SDL, or VDE.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1374905/+subscriptions
