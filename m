@@ -1,34 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44876)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44920)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eTKPN-0008FX-7S
-	for qemu-devel@nongnu.org; Sun, 24 Dec 2017 23:30:38 -0500
+	(envelope-from <bounces@canonical.com>) id 1eTKPO-0008Fp-SP
+	for qemu-devel@nongnu.org; Sun, 24 Dec 2017 23:30:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eTKPK-0003Jj-4D
-	for qemu-devel@nongnu.org; Sun, 24 Dec 2017 23:30:37 -0500
-Received: from indium.canonical.com ([91.189.90.7]:54794)
+	(envelope-from <bounces@canonical.com>) id 1eTKPO-0003Mn-2M
+	for qemu-devel@nongnu.org; Sun, 24 Dec 2017 23:30:38 -0500
+Received: from indium.canonical.com ([91.189.90.7]:54988)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1eTKPJ-0003Ii-Ts
-	for qemu-devel@nongnu.org; Sun, 24 Dec 2017 23:30:34 -0500
+	id 1eTKPN-0003M8-Rr
+	for qemu-devel@nongnu.org; Sun, 24 Dec 2017 23:30:37 -0500
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1eTKPH-00072G-LA
-	for <qemu-devel@nongnu.org>; Mon, 25 Dec 2017 04:30:31 +0000
+	id 1eTKPM-0007J6-OQ
+	for <qemu-devel@nongnu.org>; Mon, 25 Dec 2017 04:30:36 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 9EAAA2E8050
-	for <qemu-devel@nongnu.org>; Mon, 25 Dec 2017 04:30:31 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id B007D2E80C9
+	for <qemu-devel@nongnu.org>; Mon, 25 Dec 2017 04:30:36 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Mon, 25 Dec 2017 04:17:38 -0000
-From: Launchpad Bug Tracker <1374905@bugs.launchpad.net>
-Reply-To: Bug 1374905 <1374905@bugs.launchpad.net>
+Date: Mon, 25 Dec 2017 04:17:39 -0000
+From: Launchpad Bug Tracker <1336801@bugs.launchpad.net>
+Reply-To: Bug 1336801 <1336801@bugs.launchpad.net>
 Sender: bounces@canonical.com
-References: <20140928043504.32411.389.malonedeb@gac.canonical.com>
-Message-Id: <151417545874.5133.266242400739054494.malone@loganberry.canonical.com>
+References: <20140702141735.10601.33631.malonedeb@gac.canonical.com>
+Message-Id: <151417545948.5133.15260835585920404344.malone@loganberry.canonical.com>
 Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1374905] Re: Pixelation issue in 16-bit color VGA
- graphics
+Subject: [Qemu-devel] [Bug 1336801] Re: 12.04 guest hangs on a 14.04 host
+ server with cirrus graphics
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -48,50 +48,32 @@ To: qemu-devel@nongnu.org
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1374905
+https://bugs.launchpad.net/bugs/1336801
 
 Title:
-  Pixelation issue in 16-bit color VGA graphics
+  12.04 guest hangs on a 14.04 host  server with cirrus graphics
 
 Status in QEMU:
   Expired
+Status in qemu package in Ubuntu:
+  Expired
 
 Bug description:
-  What happened:
-  I ran the 9front installation ISO (here: http://r-36.net/9front/9front-38=
-53.02ebd469f43a.iso.bz2) in QEMU, with a blank qcow2, using `qemu-system-i3=
-86 -hda 9front.qcow2.img -cdrom 9front-3853.02ebd469f43a.iso -boot d -vga s=
-td -m 1G`. During the console boot, I accept the default display settings (=
-1024x768x16, VESA, PS2 mouse), and 9front proceeds to the GUI boot. However=
-, every pixel is blurred, making text illegible and the GUI unusable.
+  A new 12.04.4 server guest installation hangs on a 14.04 server host
+  machine.
 
-  What I expected:
-  Normal pixel rendering / normal display.
+  I did the following:
 
-  Step by step instructions:
-  0. Install QEMU 2.1.2 (I use Homebrew's bottle, `brew install qemu`)
-  1. Download 9front ISO (9front-3853.02ebd469f43a.iso.bz2)
-  2. Create new QEMU image: `qemu-img create -f qcow2 9front.qcow2.img 20G`.
-  3. Boot 9front ISO: `qemu-system-i386 -hda 9front.qcow2.img -cdrom 9front=
--3853.02ebd469f43a.iso -boot d -vga std -m 1G`
-  4. It displays a console boot screen; accept default args (local, glenda,=
- 1024x768x16, vesa, ps2, etc...)
-  5. GUI is drawn.
-  6. Pixel are blurred and unreadable
+  Created a new Virtual Machine with the Ubuntu 12.04 template using virt-m=
+anager
+  Ran through the installation without a hitch to install a LAMP+SSH server=
+. All standard options apart from that.
+  On reboot the 12.04 guest started but then hung after doing fsck step.
+  Trying different options (change disk driver, etc) made it progress a cou=
+ple more steps but still hung.
 
-  Details:
-  This bug does not occur when 32 bit color is used, using the 1024x768x32.=
- This bug does not occur when QEMU is built with SDL (in Homebrew, `brew in=
-stall qemu --with-sdl`), although the console portion of 9front's boot runs=
- significantly slower.
-
-  System:
-  OS X 10.9.5 x86-64
-  Macbook Retina Late 2012
-  Intel i7 Ivy Bridge dual core.
-
-  Build:
-  Homebrew's QEMU 2.1.2 bottle, which is build without GTK, SDL, or VDE.
+  The thing that fixed it in the end was to switch to a VGA display
+  driver, away from the default.
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1374905/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1336801/+subscriptions
