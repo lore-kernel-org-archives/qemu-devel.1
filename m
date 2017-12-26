@@ -1,25 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46624)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45246)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1eTfXj-0002pM-Ig
-	for qemu-devel@nongnu.org; Mon, 25 Dec 2017 22:04:40 -0500
+	(envelope-from <bounces@canonical.com>) id 1eTgsF-0004qE-CC
+	for qemu-devel@nongnu.org; Mon, 25 Dec 2017 23:29:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1eTfXf-0004Jh-Gx
-	for qemu-devel@nongnu.org; Mon, 25 Dec 2017 22:04:39 -0500
-Received: from mga14.intel.com ([192.55.52.115]:47519)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
-	id 1eTfXf-0004Hc-8b
-	for qemu-devel@nongnu.org; Mon, 25 Dec 2017 22:04:35 -0500
-Message-ID: <5A41BCC1.5010004@intel.com>
-Date: Tue, 26 Dec 2017 11:06:41 +0800
-From: Wei Wang <wei.w.wang@intel.com>
+	(envelope-from <bounces@canonical.com>) id 1eTgsD-0000Ht-8c
+	for qemu-devel@nongnu.org; Mon, 25 Dec 2017 23:29:55 -0500
+Received: from indium.canonical.com ([91.189.90.7]:38646)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1eTgsD-0000H6-1g
+	for qemu-devel@nongnu.org; Mon, 25 Dec 2017 23:29:53 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1eTgsA-0001IT-8k
+	for <qemu-devel@nongnu.org>; Tue, 26 Dec 2017 04:29:50 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id C72292E80C0
+	for <qemu-devel@nongnu.org>; Tue, 26 Dec 2017 04:29:49 +0000 (UTC)
 MIME-Version: 1.0
-References: <1513685879-21823-5-git-send-email-wei.w.wang@intel.com>	<20171224032121.GA5273@bombadil.infradead.org>	<201712241345.DIG21823.SLFOOJtQFOMVFH@I-love.SAKURA.ne.jp>	<5A3F5A4A.1070009@intel.com>	<5A3F6254.7070306@intel.com>
-	<201712252351.FBE81721.HFOtFOJQSOFLVM@I-love.SAKURA.ne.jp>
-In-Reply-To: <201712252351.FBE81721.HFOtFOJQSOFLVM@I-love.SAKURA.ne.jp>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v20 4/7] virtio-balloon: VIRTIO_BALLOON_F_SG
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 26 Dec 2017 04:17:36 -0000
+From: Launchpad Bug Tracker <1079713@bugs.launchpad.net>
+Reply-To: Bug 1079713 <1079713@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20121116150919.23777.65675.malonedeb@gac.canonical.com>
+Message-Id: <151426185676.1219.10097872736251919967.malone@loganberry.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1079713] Re: failed to set sndbuf on VMs network
+ interface
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,100 +37,108 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>, willy@infradead.org
-Cc: virtio-dev@lists.oasis-open.org, linux-kernel@vger.kernel.org, qemu-devel@nongnu.org, virtualization@lists.linux-foundation.org, kvm@vger.kernel.org, linux-mm@kvack.org, mst@redhat.com, mhocko@kernel.org, akpm@linux-foundation.org, mawilcox@microsoft.com, david@redhat.com, cornelia.huck@de.ibm.com, mgorman@techsingularity.net, aarcange@redhat.com, amit.shah@redhat.com, pbonzini@redhat.com, liliang.opensource@gmail.com, yang.zhang.wz@gmail.com, quan.xu0@gmail.com, nilal@redhat.com, riel@redhat.com
+To: qemu-devel@nongnu.org
 
-On 12/25/2017 10:51 PM, Tetsuo Handa wrote:
-> Wei Wang wrote:
->>>>>> @@ -173,8 +292,15 @@ static unsigned fill_balloon(struct
->>>>>> virtio_balloon *vb, size_t num)
->>>>>>          while ((page = balloon_page_pop(&pages))) {
->>>>>>            balloon_page_enqueue(&vb->vb_dev_info, page);
->>>>>> +        if (use_sg) {
->>>>>> +            if (xb_set_page(vb, page, &pfn_min, &pfn_max) < 0) {
->>>>>> +                __free_page(page);
->>>>>> +                continue;
->>>>>> +            }
->>>>>> +        } else {
->>>>>> +            set_page_pfns(vb, vb->pfns + vb->num_pfns, page);
->>>>>> +        }
->>>>> Is this the right behaviour?
->>>> I don't think so. In the worst case, we can set no bit using
->>>> xb_set_page().
->>>>>                                 If we can't record the page in the xb,
->>>>> wouldn't we rather send it across as a single page?
->>>>>
->>>> I think that we need to be able to fallback to !use_sg path when OOM.
->>> I also have different thoughts:
->>>
->>> 1) For OOM, we have leak_balloon_sg_oom (oom has nothing to do with
->>> fill_balloon), which does not use xbitmap to record pages, thus no
->>> memory allocation.
->>>
->>> 2) If the memory is already under pressure, it is pointless to
->>> continue inflating memory to the host. We need to give thanks to the
->>> memory allocation failure reported by xbitmap, which gets us a chance
->>> to release the inflated pages that have been demonstrated to cause the
->>> memory pressure of the guest.
->>>
->> Forgot to add my conclusion: I think the above behavior is correct.
->>
-> What is the desired behavior when hitting OOM path during inflate/deflate?
-> Once inflation started, the inflation logic is called again and again
-> until the balloon inflates to the requested size.
+[Expired for QEMU because there has been no activity for 60 days.]
 
-The above is true, but I can't agree with the following. Please see below.
+** Changed in: qemu
+       Status: Incomplete =3D> Expired
 
-> Such situation will
-> continue wasting CPU resource between inflate-due-to-host's-request versus
-> deflate-due-to-guest's-OOM. It is pointless but cannot stop doing pointless
-> thing.
+-- =
 
-What we are doing here is to free the pages that were just allocated in 
-this round of inflating. Next round will be sometime later when the 
-balloon work item gets its turn to run. Yes, it will then continue to 
-inflate.
-Here are the two cases that will happen then:
-1) the guest is still under memory pressure, the inflate will fail at 
-memory allocation, which results in a msleep(200), and then it exists 
-for another time to run.
-2) the guest isn't under memory pressure any more (e.g. the task which 
-consumes the huge amount of memory is gone), it will continue to inflate 
-as normal till the requested size.
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1079713
 
-I think what we are doing is a quite sensible behavior, except a small 
-change I plan to make:
+Title:
+  failed to set sndbuf on VMs network interface
 
-         while ((page = balloon_page_pop(&pages))) {
--               balloon_page_enqueue(&vb->vb_dev_info, page);
-                 if (use_sg) {
-                         if (xb_set_page(vb, page, &pfn_min, &pfn_max) < 
-0) {
-                                 __free_page(page);
-                                 continue;
-                         }
-                 } else {
-                         set_page_pfns(vb, vb->pfns + vb->num_pfns, page);
-                 }
-+             balloon_page_enqueue(&vb->vb_dev_info, page);
+Status in QEMU:
+  Expired
+Status in qemu-kvm package in Ubuntu:
+  Expired
 
->
-> Also, as of Linux 4.15, only up to VIRTIO_BALLOON_ARRAY_PFNS_MAX pages (i.e.
-> 1MB) are invisible from deflate request. That amount would be an acceptable
-> error. But your patch makes more pages being invisible, for pages allocated
-> by balloon_page_alloc() without holding balloon_lock are stored into a local
-> variable "LIST_HEAD(pages)" (which means that balloon_page_dequeue() with
-> balloon_lock held won't be able to find pages not yet queued by
-> balloon_page_enqueue()), doesn't it? What if all memory pages were held in
-> "LIST_HEAD(pages)" and balloon_page_dequeue() was called before
-> balloon_page_enqueue() is called?
->
+Bug description:
+  I am trying to set "sndbuf" for a VMs network device to "0".
+  I inserted to my XML file:
+        <tune>
+          <sndbuf>0</sndbuf>
+        </tune>
+  The XML file validates, but I am not able to start the virtual machine.
 
-If we think of the balloon driver just as a regular driver or 
-application, that will be a pretty nature thing. A regular driver can 
-eat a huge amount of memory for its own usages, would this amount of 
-memory be treated as an error as they are invisible to the 
-balloon_page_enqueue?
+  # virsh edit vm3
+  <domain type=3D'kvm'>
+    <name>vm3</name>
+    <uuid><HIDDEN></uuid>
+    <memory unit=3D'KiB'>524288</memory>
+    <currentMemory unit=3D'KiB'>524288</currentMemory>
+    <vcpu placement=3D'static'>1</vcpu>
+    <os>
+      <type arch=3D'x86_64' machine=3D'pc-1.2'>hvm</type>
+      <boot dev=3D'hd'/>
+    </os>
+    <features>
+      <acpi/>
+      <apic/>
+      <pae/>
+    </features>
+    <clock offset=3D'utc'/>
+    <on_poweroff>destroy</on_poweroff>
+    <on_reboot>restart</on_reboot>
+    <on_crash>restart</on_crash>
+    <devices>
+      <emulator>/usr/bin/kvm</emulator>
+      <disk type=3D'file' device=3D'disk'>
+        <driver name=3D'qemu' type=3D'qcow2'/>
+        <source file=3D'<HIDDEN>'/>
+        <target dev=3D'vda' bus=3D'virtio'/>
+        <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x05' =
+function=3D'0x0'/>
+      </disk>
+      <controller type=3D'usb' index=3D'0'>
+        <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x01' =
+function=3D'0x2'/>
+      </controller>
+      <interface type=3D'bridge'>
+        <mac address=3D'<HIDDEN>'/>
+        <source bridge=3D'br2'/>
+        <model type=3D'virtio'/>
+        <tune>
+          <sndbuf>0</sndbuf>
+        </tune>
+        <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x03' =
+function=3D'0x0'/>
+      </interface>
+      <serial type=3D'pty'>
+        <target port=3D'0'/>
+      </serial>
+      <console type=3D'pty'>
+        <target type=3D'serial' port=3D'0'/>
+      </console>
+      <input type=3D'mouse' bus=3D'ps2'/>
+      <graphics type=3D'vnc' port=3D'-1' autoport=3D'yes'/>
+      <sound model=3D'ich6'>
+        <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x04' =
+function=3D'0x0'/>
+      </sound>
+      <video>
+        <model type=3D'cirrus' vram=3D'9216' heads=3D'1'/>
+        <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x02' =
+function=3D'0x0'/>
+      </video>
+      <memballoon model=3D'virtio'>
+        <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x06' =
+function=3D'0x0'/>
+      </memballoon>
+    </devices>
+  </domain>
 
-Best,
-Wei
+  Domain vm3 XML configuration edited.
+
+  # LANG=3Den_US.utf-8 virsh start vm3
+  error: Failed to start domain vm3
+  error: internal error Process exited while reading console log output: ch=
+ar device redirected to /dev/pts/4
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1079713/+subscriptions
