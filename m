@@ -1,29 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56254)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57932)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1eTvFx-0004Fa-SR
-	for qemu-devel@nongnu.org; Tue, 26 Dec 2017 14:51:22 -0500
+	(envelope-from <quintela@redhat.com>) id 1eTvI4-0005AH-2B
+	for qemu-devel@nongnu.org; Tue, 26 Dec 2017 14:53:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1eTvFt-0006Km-N6
-	for qemu-devel@nongnu.org; Tue, 26 Dec 2017 14:51:21 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:38678)
+	(envelope-from <quintela@redhat.com>) id 1eTvHz-000817-Tq
+	for qemu-devel@nongnu.org; Tue, 26 Dec 2017 14:53:32 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:40308)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1eTvFt-0006K7-DX
-	for qemu-devel@nongnu.org; Tue, 26 Dec 2017 14:51:17 -0500
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1eTvHz-00080S-L1
+	for qemu-devel@nongnu.org; Tue, 26 Dec 2017 14:53:27 -0500
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id BB24F356E2
-	for <qemu-devel@nongnu.org>; Tue, 26 Dec 2017 19:51:15 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id BE578267CF
+	for <qemu-devel@nongnu.org>; Tue, 26 Dec 2017 19:53:26 +0000 (UTC)
 From: Juan Quintela <quintela@redhat.com>
-In-Reply-To: <20171205073601.GC2925@xz-mi> (Peter Xu's message of "Tue, 5 Dec
-	2017 15:36:01 +0800")
+In-Reply-To: <20171208104408.GG2403@work-vm> (David Alan Gilbert's message of
+	"Fri, 8 Dec 2017 10:44:08 +0000")
 References: <20171201125813.1437-1-quintela@redhat.com>
 	<20171201125813.1437-3-quintela@redhat.com>
-	<20171205073601.GC2925@xz-mi>
+	<20171208104408.GG2403@work-vm>
 Reply-To: quintela@redhat.com
-Date: Tue, 26 Dec 2017 20:51:10 +0100
-Message-ID: <877et9p8sx.fsf@secure.laptop>
+Date: Tue, 26 Dec 2017 20:53:25 +0100
+Message-ID: <87zi65nu4q.fsf@secure.laptop>
 MIME-Version: 1.0
 Content-Type: text/plain
 Subject: Re: [Qemu-devel] [PATCH v3 2/6] tests: migration test deprecated
@@ -36,11 +36,11 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, dgilbert@redhat.com, lvivier@redhat.com
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: qemu-devel@nongnu.org, lvivier@redhat.com, peterx@redhat.com
 
-Peter Xu <peterx@redhat.com> wrote:
-> On Fri, Dec 01, 2017 at 01:58:09PM +0100, Juan Quintela wrote:
+"Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
+> * Juan Quintela (quintela@redhat.com) wrote:
 >> We now test the deprecated commands everytime that we test the new
 >> commands.  This makes unnecesary to add tests for deprecated commands.
 >> 
@@ -89,35 +89,24 @@ Peter Xu <peterx@redhat.com> wrote:
 >> +        deprecated_set_speed(who, "12345");
 >> +    }
 >
-> I'm fine with current approach, but I would really prefer to put them
-> all into a standalone test, by just calling them one by one with some
-> specific numbers and that's all.
+> I find that odd; you call migrate_set_parameter to set a particular
+> value, but we set them to a different arbitrary value first?
 
-That means another test (at least), and we have, also at least three
-deprecated comands:
-- migrate_set_speed
-- migrate_set_downtime
-- migrate_set_cache_size
+If I do:
 
-And each test makes things slower.  So I *thought* it would we wiser to
-just check _always_ use the deprecated an the not deprecated one.
+migrate_deprecated_command(real_value)
+migrate_non_deprecated_command(real_value)
+  here the value is already set, so I am not sure that it is working.
 
-> (luckily we only have two deprecated commands and limited tests,
->  otherwise extra commands will be M*N, say "number of deprecated
->  command" * "number of test mirations")
-
-Each test takes time, so adding tests make everything much slower.
-Notice that setting a new setting is fast.
-
-This was the way that I understood Dave he wanted.
+This other way, if there is a _deprecated_ command,  I set it to a
+known value, check that it was set correctly, and then set the real
+value.
 
 Later, Juan.
 
-
 >
-> Thanks,
+> Dave
 >
->> +
 >> +    cmd = g_strdup_printf("{ 'execute': 'migrate-set-parameters',"
 >> +                          "'arguments': { '%s': %s } }",
 >> +                          parameter, value);
@@ -145,3 +134,5 @@ Later, Juan.
 >> -- 
 >> 2.14.3
 >> 
+> --
+> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
