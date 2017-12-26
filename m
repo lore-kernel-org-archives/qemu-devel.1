@@ -1,27 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36259)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42961)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <a175818323@gmail.com>) id 1eTnYB-0003M0-7t
-	for qemu-devel@nongnu.org; Tue, 26 Dec 2017 06:37:40 -0500
+	(envelope-from <drjones@redhat.com>) id 1eTnis-00068X-9P
+	for qemu-devel@nongnu.org; Tue, 26 Dec 2017 06:48:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <a175818323@gmail.com>) id 1eTnY9-0000Hp-PQ
-	for qemu-devel@nongnu.org; Tue, 26 Dec 2017 06:37:39 -0500
-Received: from mail-io0-x22f.google.com ([2607:f8b0:4001:c06::22f]:37029)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <a175818323@gmail.com>)
-	id 1eTnY9-0000HU-IC
-	for qemu-devel@nongnu.org; Tue, 26 Dec 2017 06:37:37 -0500
-Received: by mail-io0-x22f.google.com with SMTP id n14so9106541iob.4
-	for <qemu-devel@nongnu.org>; Tue, 26 Dec 2017 03:37:37 -0800 (PST)
+	(envelope-from <drjones@redhat.com>) id 1eTnir-0006Ux-BI
+	for qemu-devel@nongnu.org; Tue, 26 Dec 2017 06:48:42 -0500
+Date: Tue, 26 Dec 2017 12:48:28 +0100
+From: Andrew Jones <drjones@redhat.com>
+Message-ID: <20171226114828.lz3s5qztk6rcm2vi@hawk.localdomain>
+References: <1513925567-5184-1-git-send-email-zhaoshenglong@huawei.com>
 MIME-Version: 1.0
-In-Reply-To: <A2975661238FB949B60364EF0F2C257439B2BAD8@SHSMSX104.ccr.corp.intel.com>
-References: <CAMxP3BRqxD8tC1-M3+Pr8q8JZ1G_fGPbcvNQehwdPGFykdEk0g@mail.gmail.com>
-	<A2975661238FB949B60364EF0F2C257439B2BAD8@SHSMSX104.ccr.corp.intel.com>
-From: Bob Chen <a175818323@gmail.com>
-Date: Tue, 26 Dec 2017 19:37:36 +0800
-Message-ID: <CAMxP3BQ8zt3oOh7UoUxJYD00Lv=L54iJiC4JJS8XLaFf1NRKzg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [GPU and VFIO] qemu hang at startup,
- VFIO_IOMMU_MAP_DMA is extremely slow
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1513925567-5184-1-git-send-email-zhaoshenglong@huawei.com>
+Subject: Re: [Qemu-devel] [PATCH] Virt: ACPI: fix qemu assert due to
+ re-assigned table data address
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,115 +23,114 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Liu, Yi L" <yi.l.liu@intel.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: Shannon Zhao <zhaoshenglong@huawei.com>
+Cc: qemu-arm@nongnu.org, peter.maydell@linaro.org, lersek@redhat.com, qemu-devel@nongnu.org
 
-2017-12-26 18:51 GMT+08:00 Liu, Yi L <yi.l.liu@intel.com>:
+On Fri, Dec 22, 2017 at 02:52:47PM +0800, Shannon Zhao wrote:
+> acpi_data_push uses g_array_set_size to resize the memory size. If there is no
+> enough contiguous memory, the address will be changed. If we use the old value,
+> it will assert.
+> qemu-kvm: hw/acpi/bios-linker-loader.c:214: bios_linker_loader_add_checksum:
+> Assertion `start_offset < file->blob->len' failed.`
+> 
+> Signed-off-by: Shannon Zhao <zhaoshenglong@huawei.com>
+> ---
+>  hw/arm/virt-acpi-build.c | 18 +++++++++++-------
+>  1 file changed, 11 insertions(+), 7 deletions(-)
+> 
+> diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
+> index 3d78ff6..5901142 100644
+> --- a/hw/arm/virt-acpi-build.c
+> +++ b/hw/arm/virt-acpi-build.c
+> @@ -453,6 +453,7 @@ build_spcr(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
+>      AcpiSerialPortConsoleRedirection *spcr;
+>      const MemMapEntry *uart_memmap = &vms->memmap[VIRT_UART];
+>      int irq = vms->irqmap[VIRT_UART] + ARM_SPI_BASE;
+> +    int spcr_start = table_data->len;
+>  
+>      spcr = acpi_data_push(table_data, sizeof(*spcr));
+>  
+> @@ -476,8 +477,8 @@ build_spcr(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
+>      spcr->pci_device_id = 0xffff;  /* PCI Device ID: not a PCI device */
+>      spcr->pci_vendor_id = 0xffff;  /* PCI Vendor ID: not a PCI device */
+>  
+> -    build_header(linker, table_data, (void *)spcr, "SPCR", sizeof(*spcr), 2,
+> -                 NULL, NULL);
+> +    build_header(linker, table_data, (void *)(table_data->data + spcr_start),
+> +                 "SPCR", table_data->len - spcr_start, 2, NULL, NULL);
+>  }
 
-> > -----Original Message-----
-> > From: Qemu-devel [mailto:qemu-devel-bounces+yi.l.liu=
-> intel.com@nongnu.org]
-> > On Behalf Of Bob Chen
-> > Sent: Tuesday, December 26, 2017 6:30 PM
-> > To: qemu-devel@nongnu.org
-> > Subject: [Qemu-devel] [GPU and VFIO] qemu hang at startup,
-> > VFIO_IOMMU_MAP_DMA is extremely slow
-> >
-> > Hi,
-> >
-> > I have a host server with multiple GPU cards, and was assigning them to
-> qemu
-> > with VFIO.
-> >
-> > I found that when setting up the last free GPU, the qemu process would
-> hang
+We don't need to change build_spcr(), as acpi_data_push() is only called
+once, so spcr == new table_data->data + old table_data->len and new
+table_data->len - spcr == sizeof(*spcr) (the size used in the only
+acpi_data_push() call)
+
+>  
+>  static void
+> @@ -512,8 +513,8 @@ build_srat(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
+>          mem_base += numa_info[i].node_mem;
+>      }
+>  
+> -    build_header(linker, table_data, (void *)srat, "SRAT",
+> -                 table_data->len - srat_start, 3, NULL, NULL);
+> +    build_header(linker, table_data, (void *)(table_data->data + srat_start),
+> +                 "SRAT", table_data->len - srat_start, 3, NULL, NULL);
+
+Yes, we need this fix, as there are many acpi_data_push() calls in this
+function. I guess this was the table that triggered the assert.
+
+>  }
+>  
+>  static void
+> @@ -522,6 +523,7 @@ build_mcfg(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
+>      AcpiTableMcfg *mcfg;
+>      const MemMapEntry *memmap = vms->memmap;
+>      int len = sizeof(*mcfg) + sizeof(mcfg->allocation[0]);
+> +    int mcfg_start = table_data->len;
+>  
+>      mcfg = acpi_data_push(table_data, len);
+>      mcfg->allocation[0].address = cpu_to_le64(memmap[VIRT_PCIE_ECAM].base);
+> @@ -532,7 +534,8 @@ build_mcfg(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
+>      mcfg->allocation[0].end_bus_number = (memmap[VIRT_PCIE_ECAM].size
+>                                            / PCIE_MMCFG_SIZE_MIN) - 1;
+>  
+> -    build_header(linker, table_data, (void *)mcfg, "MCFG", len, 1, NULL, NULL);
+> +    build_header(linker, table_data, (void *)(table_data->data + mcfg_start),
+> +                 "MCFG", len, 1, NULL, NULL);
+>  }
+
+No need to change this one.
+
+>  
+>  /* GTDT */
+> @@ -651,6 +654,7 @@ build_madt(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
+>  static void build_fadt(GArray *table_data, BIOSLinker *linker,
+>                         VirtMachineState *vms, unsigned dsdt_tbl_offset)
+>  {
+> +    int fadt_start = table_data->len;
+>      AcpiFadtDescriptorRev5_1 *fadt = acpi_data_push(table_data, sizeof(*fadt));
+>      unsigned xdsdt_entry_offset = (char *)&fadt->x_dsdt - table_data->data;
+>      uint16_t bootflags;
+> @@ -681,8 +685,8 @@ static void build_fadt(GArray *table_data, BIOSLinker *linker,
+>          ACPI_BUILD_TABLE_FILE, xdsdt_entry_offset, sizeof(fadt->x_dsdt),
+>          ACPI_BUILD_TABLE_FILE, dsdt_tbl_offset);
+>  
+> -    build_header(linker, table_data,
+> -                 (void *)fadt, "FACP", sizeof(*fadt), 5, NULL, NULL);
+> +    build_header(linker, table_data, (void *)(table_data->data + fadt_start),
+> +                 "FACP", table_data->len - fadt_start, 5, NULL, NULL);
+>  }
+
+No need to change this one either.
+
+>  
+>  /* DSDT */
+> -- 
+> 2.0.4
+> 
 >
-> Are all the GPUs in the same iommu group?
->
 
-Each of them is in a single group.
+Please respin only changing the one that needs the fix.
 
-
->
-> > there and took almost 10 minutes before finishing startup. I made some
-> dig by
-> > gdb, and found the slowest part occurred at the
-> > hw/vfio/common.c:vfio_dma_map function call.
->
-> This is to setup mapping and it takes time. This function would be called
-> multiple
-> times and it will take some time. The slowest part, do you mean it takes
-> a long time for a single vfio_dma_map() calling or the whole passthru
-> spends a lot
-> of time on creating mapping. If a single calling takes a lot of time, then
-> it may be
-> a problem.
->
-
-Each vfio_dma_map() takes 3 to 10 mins accordingly.
-
-
->
-> You may paste your Qemu command which might help. And the dmesg in host
-> would also help.
->
-
-cmd line:
-After adding -device vfio-pci,host=09:00.0,multifunction=on,addr=0x15, qemu
-would hang.
-Otherwise, could start immediately without this option.
-
-dmesg:
-[Tue Dec 26 18:39:50 2017] vfio-pci 0000:09:00.0: enabling device (0400 ->
-0402)
-[Tue Dec 26 18:39:51 2017] vfio_ecap_init: 0000:09:00.0 hiding ecap
-0x1e@0x258
-[Tue Dec 26 18:39:51 2017] vfio_ecap_init: 0000:09:00.0 hiding ecap
-0x19@0x900
-[Tue Dec 26 18:39:55 2017] kvm: zapping shadow pages for mmio generation
-wraparound
-[Tue Dec 26 18:39:55 2017] kvm: zapping shadow pages for mmio generation
-wraparound
-[Tue Dec 26 18:40:03 2017] kvm [74663]: vcpu0 ignored rdmsr: 0x345
-
-Kernel:
-3.10.0-514.16.1  CentOS 7.3
-
-
->
-> >
-> >
-> > static int vfio_dma_map(VFIOContainer *container, hwaddr iova, ram_addr_t
-> > size, void *vaddr, bool readonly) { ...
-> >     if (ioctl(container->fd, VFIO_IOMMU_MAP_DMA, &map) == 0 ||
-> >         (errno == EBUSY && vfio_dma_unmap(container, iova, size) == 0 &&
-> >          ioctl(container->fd, VFIO_IOMMU_MAP_DMA, &map) == 0)) {
-> >         return 0;
-> >     }
-> > ...
-> > }
-> >
-> >
-> > The hang was enable to reproduce on one of my hosts, I was setting up a
-> 4GB
-> > memory VM, while the host still had 16GB free. GPU physical mem is 8G.
->
-> Does it happen when you only assign a single GPU?
->
-
-Not sure. Didn't try multiple GPUs.
-
-
->
-> > Also, this phenomenon was observed on other hosts occasionally, and the
-> > similarity is that they always happened on the last free GPU.
-> >
-> >
-> > Full stack trace file is attached. Looking forward for you help, thanks
-> >
-> >
-> > - Bob
->
-> Regards,
-> Yi L
->
+Thanks,
+drew 
