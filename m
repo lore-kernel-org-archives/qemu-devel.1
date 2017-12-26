@@ -1,26 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45354)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49199)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1eTlnb-0007RZ-Fw
-	for qemu-devel@nongnu.org; Tue, 26 Dec 2017 04:45:28 -0500
+	(envelope-from <a175818323@gmail.com>) id 1eTmV9-0001vp-34
+	for qemu-devel@nongnu.org; Tue, 26 Dec 2017 05:30:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1eTlna-00024Z-38
-	for qemu-devel@nongnu.org; Tue, 26 Dec 2017 04:45:27 -0500
-Date: Tue, 26 Dec 2017 17:45:09 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20171226094509.GG9418@lemon>
-References: <20171113162053.58795-1-vsementsov@virtuozzo.com>
-	<20171213041248.GB31040@lemon>
-	<af98ffe7-71fb-0493-c4da-4b77a4c453f5@virtuozzo.com>
-	<696c198b-e3d8-fab6-0128-de9ed34e4cff@redhat.com>
-	<d5df7e51-fe6b-da89-9bf1-9b03c1afdd67@virtuozzo.com>
-	<20171226070715.GF9418@lemon>
-	<9b13b53f-996c-4f19-ecf8-8cd4620f231a@virtuozzo.com>
+	(envelope-from <a175818323@gmail.com>) id 1eTmV7-0007IH-Am
+	for qemu-devel@nongnu.org; Tue, 26 Dec 2017 05:30:26 -0500
+Received: from mail-it0-x22b.google.com ([2607:f8b0:4001:c0b::22b]:35242)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <a175818323@gmail.com>)
+	id 1eTmV6-0007Hr-OJ
+	for qemu-devel@nongnu.org; Tue, 26 Dec 2017 05:30:25 -0500
+Received: by mail-it0-x22b.google.com with SMTP id f143so22463169itb.0
+	for <qemu-devel@nongnu.org>; Tue, 26 Dec 2017 02:30:24 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <9b13b53f-996c-4f19-ecf8-8cd4620f231a@virtuozzo.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH for-2.12 0/4] qmp dirty bitmap API
+From: Bob Chen <a175818323@gmail.com>
+Date: Tue, 26 Dec 2017 18:30:22 +0800
+Message-ID: <CAMxP3BRqxD8tC1-M3+Pr8q8JZ1G_fGPbcvNQehwdPGFykdEk0g@mail.gmail.com>
+Content-Type: multipart/mixed; boundary="001a1144003c3bb26105613bc539"
+Subject: [Qemu-devel] [GPU and VFIO] qemu hang at startup,
+ VFIO_IOMMU_MAP_DMA is extremely slow
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,155 +27,176 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Cc: John Snow <jsnow@redhat.com>, kwolf@redhat.com, qemu-block@nongnu.org, armbru@redhat.com, qemu-devel@nongnu.org, mnestratov@virtuozzo.com, mreitz@redhat.com, nshirokovskiy@virtuozzo.com, stefanha@redhat.com, pbonzini@redhat.com, den@openvz.org, dev@acronis.com
+To: qemu-devel@nongnu.org
 
-On Tue, 12/26 11:57, Vladimir Sementsov-Ogievskiy wrote:
-> 26.12.2017 10:07, Fam Zheng wrote:
-> > On Wed, 12/20 11:20, Vladimir Sementsov-Ogievskiy wrote:
-> > > external backup:
-> > >=20
-> > > 0. we have active_disk and attached to it dirty bitmap bitmap0
-> > > 1. qmp blockdev-add tmp_disk (backing=3Dactive_disk)
-> > > 2. guest fsfreeze
-> > > 3. qmp transaction:
-> > >  =A0=A0=A0=A0=A0=A0=A0 - block-dirty-bitmap-add node=3Dactive_disk =
-name=3Dbitmap1
-> > >  =A0=A0=A0=A0=A0=A0=A0 - block-dirty-bitmap-disable node=3Dactive_d=
-isk name=3Dbitmap0
-> > >  =A0=A0=A0=A0=A0=A0=A0 - blockdev-backup drive=3Dactive_disk target=
-=3Dtmp_disk sync=3Dnone
-> > > 4. guest fsthaw
-> > > 5. (? not designed yet) qmp blockdev-add filter_node - special filt=
-er node
-> > > over tmp_disk for synchronization of nbd-reads and backup(sync=3Dno=
-ne) cow
-> > > requests (like it is done in block/replication)
-> > > 6. qmp nbd-server-start
-> > > 7. qmp nbd-server-add filter_node (there should be possibility of e=
-xporting
-> > > bitmap of child node filter_node->tmp_disk->active_disk->bitmap0)
-> > >=20
-> > > then, external tool can connect to nbd server and get exported bitm=
-ap and
-> > > read data (including bitmap0) accordingly to nbd specification.
-> > > (also, external tool may get a merge of several bitmaps, if we alre=
-ady have
-> > > a sequence of them)
-> > > then, after backup finish, what can be done:
-> > >=20
-> > > 1. qmp block-job-cancel device=3Dactive_disk (stop our backup(sync=3D=
-none))
-> > > 2. qmp nbd-server-stop (or qmp nbd-server-remove filter_node)
-> > > 3. qmp blockdev-remove filter_node
-> > > 4. qmp blockdev-remove tmp_disk
-> > >=20
-> > > on successful backup, you can drop old bitmap if you want (or do no=
-t drop
-> > > it, if you need to keep sequence of disabled bitmaps):
-> > > 1. block-dirty-bitmap-remove node=3Dactive_disk name=3Dbitmap0
-> > >=20
-> > > on failed backup, you can merge bitmaps, to make it look like nothi=
-ng
-> > > happened:
-> > > 1. qmp transaction:
-> > >  =A0=A0=A0=A0=A0=A0 - block-dirty-bitmap-merge node=3Dactive_disk n=
-ame-source=3Dbitmap1
-> > > name-target=3Dbitmap0
-> > Being done in a transaction, will merging a large-ish bitmap synchron=
-ously hurt
-> > the responsiveness? Because we have the BQL lock held here which paus=
-es all
-> > device emulation.
-> >=20
-> > Have you measured how long it takes to merge two typical bitmaps. Say=
-, for a 1TB
-> > disk?
-> >=20
-> > Fam
->=20
-> We don't need merge in a transaction.
+--001a1144003c3bb26105613bc539
+Content-Type: text/plain; charset="UTF-8"
 
-Yes. Either way, the command is synchronous and the whole merge process i=
-s done
-with BQL held, so my question still stands. But your numbers have answere=
-d it
-and the time is neglectable.
+Hi,
 
-Bitmap merging even doesn't have to be synchronous if it really matters, =
-but we
-can live with a synchronous implementation for now.
+I have a host server with multiple GPU cards, and was assigning them to
+qemu with VFIO.
 
-Thanks!
+I found that when setting up the last free GPU, the qemu process would hang
+there and took almost 10 minutes before finishing startup. I made some dig
+by gdb, and found the slowest part occurred at the
+hw/vfio/common.c:vfio_dma_map function call.
 
-Fam
 
->=20
-> Anyway, good question.
->=20
-> two full of ones bitmaps, 64k granularity, 1tb disk:
-> # time virsh qemu-monitor-command tmp '{"execute":
-> "block-dirty-bitmap-merge", "arguments": {"node": "disk", "src_name": "=
-a",
-> "dst_name": "b"}}'
-> {"return":{},"id":"libvirt-1181"}
-> real=A0=A0=A0 0m0.009s
-> user=A0=A0=A0 0m0.006s
-> sys=A0=A0=A0=A0 0m0.002s
->=20
-> and this is fine:
-> for last level of hbitmap we will have
-> =A0=A0 disk_size / granularity / nb_bits_in_long =3D (1024 ^ 4) / (64 *=
- 1024) / 64
-> =3D 262144
-> oparations, which is quite a few
->=20
->=20
->=20
-> bitmaps in gdb:
->=20
-> (gdb) p bdrv_lookup_bs ("disk", "disk", 0)
-> $1 =3D (BlockDriverState *) 0x7fd3f6274940
-> (gdb) p *$1->dirty_bitmaps.lh_first
-> $2 =3D {mutex =3D 0x7fd3f6277b28, bitmap =3D 0x7fd3f5a5adc0, meta =3D 0=
-x0, successor
-> =3D 0x0,
-> =A0 name =3D 0x7fd3f637b410 "b", size =3D 1099511627776, disabled =3D f=
-alse,
-> active_iterators =3D 0,
-> =A0 readonly =3D false, autoload =3D false, persistent =3D false, list =
-=3D {le_next =3D
-> 0x7fd3f567c650,
-> =A0=A0=A0 le_prev =3D 0x7fd3f6277b58}}
-> (gdb) p *$1->dirty_bitmaps.lh_first ->bitmap
-> $3 =3D {size =3D 16777216, count =3D 16777216, granularity =3D 16, meta=
- =3D 0x0,
-> levels =3D {0x7fd3f6279a90,
-> =A0=A0=A0 0x7fd3f5506350, 0x7fd3f5affcb0, 0x7fd3f547a860, 0x7fd3f637b20=
-0,
-> 0x7fd3f67ff5c0, 0x7fd3d8dfe010},
-> =A0 sizes =3D {1, 1, 1, 1, 64, 4096, 262144}}
-> (gdb) p *$1->dirty_bitmaps.lh_first ->list .le_next
-> $4 =3D {mutex =3D 0x7fd3f6277b28, bitmap =3D 0x7fd3f567cb30, meta =3D 0=
-x0, successor
-> =3D 0x0,
-> =A0 name =3D 0x7fd3f5482fb0 "a", size =3D 1099511627776, disabled =3D f=
-alse,
-> active_iterators =3D 0,
-> =A0 readonly =3D false, autoload =3D false, persistent =3D false, list =
-=3D {le_next =3D
-> 0x0,
-> =A0=A0=A0 le_prev =3D 0x7fd3f6c779e0}}
-> (gdb) p *$1->dirty_bitmaps.lh_first ->list .le_next ->bitmap
-> $5 =3D {size =3D 16777216, count =3D 16777216, granularity =3D 16, meta=
- =3D 0x0,
-> levels =3D {0x7fd3f5ef8880,
-> =A0=A0=A0 0x7fd3f5facea0, 0x7fd3f5f1cec0, 0x7fd3f5f40a00, 0x7fd3f6c80a0=
-0,
-> 0x7fd3f66e5f60, 0x7fd3d8fff010},
-> =A0 sizes =3D {1, 1, 1, 1, 64, 4096, 262144}}
->=20
-> --=20
-> Best regards,
-> Vladimir
->=20
+static int vfio_dma_map(VFIOContainer *container, hwaddr iova, ram_addr_t
+size, void *vaddr, bool readonly)
+{
+...
+    if (ioctl(container->fd, VFIO_IOMMU_MAP_DMA, &map) == 0 ||
+        (errno == EBUSY && vfio_dma_unmap(container, iova, size) == 0 &&
+         ioctl(container->fd, VFIO_IOMMU_MAP_DMA, &map) == 0)) {
+        return 0;
+    }
+...
+}
+
+
+The hang was enable to reproduce on one of my hosts, I was setting up a 4GB
+memory VM, while the host still had 16GB free. GPU physical mem is 8G.
+
+Also, this phenomenon was observed on other hosts occasionally, and the
+similarity is that they always happened on the last free GPU.
+
+
+Full stack trace file is attached. Looking forward for you help, thanks
+
+
+- Bob
+
+--001a1144003c3bb26105613bc539
+Content-Type: text/plain; charset="UTF-8"; name="full_stack_trace.txt"
+Content-Disposition: attachment; filename="full_stack_trace.txt"
+Content-Transfer-Encoding: base64
+X-Attachment-Id: f_jbnhpmpi0
+
+IzAgIHZmaW9fZG1hX21hcCAoY29udGFpbmVyPTB4NTU1NTU2YjFmODgwLCBpb3ZhPTAsIHNpemU9
+NjU1MzYwLCB2YWRkcj0weDdmZmVjZmUwMDAwMCwgcmVhZG9ubHk9ZmFsc2UpIGF0IC91c3Ivc3Jj
+L2RlYnVnL3FlbXUtMi42LjIvaHcvdmZpby9jb21tb24uYzoyMjcKICAgICAgICBtYXAgPSB7YXJn
+c3ogPSA2NTUzNTksIGZsYWdzID0gMCwgdmFkZHIgPSAwLCBpb3ZhID0gMTQwNzM3NDg4MzM5MjQ4
+LCBzaXplID0gOTM4MjQ5OTQxNDE2OTF9CiMxICAweDAwMDA1NTU1NTU3NzEyZGMgaW4gdmZpb19s
+aXN0ZW5lcl9yZWdpb25fYWRkIChsaXN0ZW5lcj0weDU1NTU1NmIxZjg5MCwgc2VjdGlvbj0weDdm
+ZmZmZmZmYzFmMCkgYXQgL3Vzci9zcmMvZGVidWcvcWVtdS0yLjYuMi9ody92ZmlvL2NvbW1vbi5j
+OjQxOQogICAgICAgIGNvbnRhaW5lciA9IDB4NTU1NTU2YjFmODgwCiAgICAgICAgaW92YSA9IDAK
+ICAgICAgICBlbmQgPSA2NTUzNTkKICAgICAgICBsbGVuZCA9IHtsbyA9IDY1NTM2MCwgaGkgPSAw
+fQogICAgICAgIGxsc2l6ZSA9IHtsbyA9IDY1NTM2MCwgaGkgPSAwfQogICAgICAgIHZhZGRyID0g
+MHg3ZmZlY2ZlMDAwMDAKICAgICAgICByZXQgPSA3CiAgICAgICAgX19mdW5jX18gPSAidmZpb19s
+aXN0ZW5lcl9yZWdpb25fYWRkIgojMiAgMHgwMDAwNTU1NTU1NzI4NDY1IGluIGxpc3RlbmVyX2Fk
+ZF9hZGRyZXNzX3NwYWNlIChsaXN0ZW5lcj0weDU1NTU1NmIxZjg5MCwgYXM9MHg1NTU1NTYwODIz
+ZTAgPGFkZHJlc3Nfc3BhY2VfbWVtb3J5PikKICAgIGF0IC91c3Ivc3JjL2RlYnVnL3FlbXUtMi42
+LjIvbWVtb3J5LmM6MjE3OQogICAgICAgIHNlY3Rpb24gPSB7bXIgPSAweDU1NTU1NjZlYzU3MCwg
+YWRkcmVzc19zcGFjZSA9IDB4NTU1NTU2MDgyM2UwIDxhZGRyZXNzX3NwYWNlX21lbW9yeT4sIG9m
+ZnNldF93aXRoaW5fcmVnaW9uID0gMCwgc2l6ZSA9IHtsbyA9IDY1NTM2MCwgaGkgPSAwfSwKICAg
+ICAgICAgIG9mZnNldF93aXRoaW5fYWRkcmVzc19zcGFjZSA9IDAsIHJlYWRvbmx5ID0gZmFsc2V9
+CiAgICAgICAgdmlldyA9IDB4NTU1NTU3YWUzYmQwCiAgICAgICAgZnIgPSAweDU1NTU1NjZmMGMw
+MAojMyAgMHgwMDAwNTU1NTU1NzI4NjBkIGluIG1lbW9yeV9saXN0ZW5lcl9yZWdpc3RlciAobGlz
+dGVuZXI9MHg1NTU1NTZiMWY4OTAsIGZpbHRlcj0weDU1NTU1NjA4MjNlMCA8YWRkcmVzc19zcGFj
+ZV9tZW1vcnk+KQogICAgYXQgL3Vzci9zcmMvZGVidWcvcWVtdS0yLjYuMi9tZW1vcnkuYzoyMjA4
+CiAgICAgICAgb3RoZXIgPSAweDU1NTU1NjViNDkxMAogICAgICAgIGFzID0gMHg1NTU1NTYwODIz
+ZTAgPGFkZHJlc3Nfc3BhY2VfbWVtb3J5PgojNCAgMHgwMDAwNTU1NTU1NzcyODExIGluIHZmaW9f
+Y29ubmVjdF9jb250YWluZXIgKGdyb3VwPTB4NTU1NTU3ODRiY2UwLCBhcz0weDU1NTU1NjA4MjNl
+MCA8YWRkcmVzc19zcGFjZV9tZW1vcnk+KQogICAgYXQgL3Vzci9zcmMvZGVidWcvcWVtdS0yLjYu
+Mi9ody92ZmlvL2NvbW1vbi5jOjkwMAogICAgICAgIGNvbnRhaW5lciA9IDB4NTU1NTU2YjFmODgw
+CiAgICAgICAgcmV0ID0gMAogICAgICAgIGZkID0gMzUKICAgICAgICBzcGFjZSA9IDB4NTU1NTU3
+ODRiZDIwCiM1ICAweDAwMDA1NTU1NTU3NzJjYmMgaW4gdmZpb19nZXRfZ3JvdXAgKGdyb3VwaWQ9
+MjUsIGFzPTB4NTU1NTU2MDgyM2UwIDxhZGRyZXNzX3NwYWNlX21lbW9yeT4pIGF0IC91c3Ivc3Jj
+L2RlYnVnL3FlbXUtMi42LjIvaHcvdmZpby9jb21tb24uYzoxMDA4CiAgICAgICAgZ3JvdXAgPSAw
+eDU1NTU1Nzg0YmNlMAogICAgICAgIHBhdGggPSAiL2Rldi92ZmlvLzI1XDAwMFVcMDAwXDAwMFBc
+MzAzXDM3N1wzNzdcMzc3XDE3N1wwMDBcMDAwXDMzMlFcMjI0VVVVXDAwMCIKICAgICAgICBzdGF0
+dXMgPSB7YXJnc3ogPSA4LCBmbGFncyA9IDF9CiM2ICAweDAwMDA1NTU1NTU3N2FmNWMgaW4gdmZp
+b19pbml0Zm4gKHBkZXY9MHg1NTU1NTgxNjcyYjApIGF0IC91c3Ivc3JjL2RlYnVnL3FlbXUtMi42
+LjIvaHcvdmZpby9wY2kuYzoyNDQ3CiAgICAgICAgdmRldiA9IDB4NTU1NTU4MTY3MmIwCiAgICAg
+ICAgdmJhc2VkZXZfaXRlciA9IDB4NDBiMDAwMDAwMDAKICAgICAgICBncm91cCA9IDB4NTU1NTU1
+YmJjNjVkCiAgICAgICAgdG1wID0gMHg1NTU1NTc2NDBiNjAgIiIKICAgICAgICBncm91cF9wYXRo
+ID0gIi4uLy4uLy4uLy4uLy4uLy4uL2tlcm5lbC9pb21tdV9ncm91cHMvMjVcMDAwXDAwMFwwMDBc
+MDAwXDM0M1wwMDNcMDAwXDAwMFwwMzHEu1VVVVwwMDBcMDAwXDAwMFwwMDBcMDAwXDAwMFwwMDBc
+MDAwXDAwMFwwMDBcMjIwXDMwNFwzNzdcMzc3XDM3N1wxNzdcMDAwXDAwMF3Gu1VcYVwwMDBcMDAw
+XDAwMFwzMjDJu1VVVVwwMDBcMDAwXDM2MFwzMDRcMzc3XDM3N1x2XDAwNFwwMDBcMDAwXDMwMFwz
+MDVcMzc3XDM3N1wzNzdcMTc3XDAwMFwwMDBJXDI1MlwyNjBVVVVcMDAwXDAwMFwzNjBcMzA0XDM3
+N1wzNzdcMzc3XDEtCjc3XDAwMFwwMDBcMDAwXDAwMFwwMDBcMDAwXDAwMFwwMDBcMDAwXDAwMFwz
+MjBcMzA0XDM3N1wzNzdcMzc3XDE3N1wwMDBcMDAwXca7VVVVXDAwMFwwMDBcMjYwybtVVVVcMDAw
+XDAwMGbLslVcMzQzXDAwM1wwMDBcMDAwXDI0MTpcMDAwXDAwMFwwMDBcMjAwXDM3N1wzNzdcMDAy
+IiwgJ1wwMDAnIDxyZXBlYXRzIDIzIHRpbWVzPiwgIlwwNjBcMDAwXDAwMFwwMDBbXDAwMFwwMDBc
+MDAwYFwzMDVcMzc3XDM3N1wzNzdcMTc3Ii4uLgogICAgICAgIGdyb3VwX25hbWUgPSAweDdmZmZm
+ZmZmYzQ2NiAiMjUiCiAgICAgICAgbGVuID0gNDAKICAgICAgICBzdCA9IHtzdF9kZXYgPSAxNywg
+c3RfaW5vID0gMzkxMjcsIHN0X25saW5rID0gMywgc3RfbW9kZSA9IDE2ODc3LCBzdF91aWQgPSAw
+LCBzdF9naWQgPSAwLCBfX3BhZDAgPSAwLCBzdF9yZGV2ID0gMCwgc3Rfc2l6ZSA9IDAsIHN0X2Js
+a3NpemUgPSA0MDk2LAogICAgICAgICAgc3RfYmxvY2tzID0gMCwgc3RfYXRpbSA9IHt0dl9zZWMg
+PSAxNTEzOTM5NDE3LCB0dl9uc2VjID0gOTQzNjU3Mzg2fSwgc3RfbXRpbSA9IHt0dl9zZWMgPSAx
+NTEwMTEzMTg2LCB0dl9uc2VjID0gNTk2MDAwMDAxfSwgc3RfY3RpbSA9IHsKICAgICAgICAgICAg
+dHZfc2VjID0gMTUxMDExMzE4NiwgdHZfbnNlYyA9IDU5NjAwMDAwMX0sIF9fdW51c2VkID0gezAs
+IDAsIDB9fQogICAgICAgIGdyb3VwaWQgPSAyNQogICAgICAgIHJldCA9IDIxODQ1CiM3ICAweDAw
+MDA1NTU1NTU5NDNiNjUgaW4gcGNpX2RlZmF1bHRfcmVhbGl6ZSAoZGV2PTB4NTU1NTU4MTY3MmIw
+LCBlcnJwPTB4N2ZmZmZmZmZkNGI4KSBhdCBody9wY2kvcGNpLmM6MTg5NQogICAgICAgIHBjID0g
+MHg1NTU1NTY1NjhlNzAKICAgICAgICBfX2Z1bmNfXyA9ICJwY2lfZGVmYXVsdF9yZWFsaXplIgoj
+OCAgMHgwMDAwNTU1NTU1OTQzYTA4IGluIHBjaV9xZGV2X3JlYWxpemUgKHFkZXY9MHg1NTU1NTgx
+NjcyYjAsIGVycnA9MHg3ZmZmZmZmZmQ1MjApIGF0IGh3L3BjaS9wY2kuYzoxODY3CiAgICAgICAg
+cGNpX2RldiA9IDB4NTU1NTU4MTY3MmIwCiAgICAgICAgcGMgPSAweDU1NTU1NjU2OGU3MAogICAg
+ICAgIF9fZnVuY19fID0gInBjaV9xZGV2X3JlYWxpemUiCiAgICAgICAgbG9jYWxfZXJyID0gMHgw
+CiAgICAgICAgYnVzID0gMHg1NTU1NTY5YmFlYTAKICAgICAgICBpc19kZWZhdWx0X3JvbSA9IGZh
+bHNlCiM5ICAweDAwMDA1NTU1NTU4YWY4ZGEgaW4gZGV2aWNlX3NldF9yZWFsaXplZCAob2JqPTB4
+NTU1NTU4MTY3MmIwLCB2YWx1ZT10cnVlLCBlcnJwPTB4N2ZmZmZmZmZkNmUwKSBhdCBody9jb3Jl
+L3FkZXYuYzoxMDY2CiAgICAgICAgZGV2ID0gMHg1NTU1NTgxNjcyYjAKICAgICAgICBfX2Z1bmNf
+XyA9ICJkZXZpY2Vfc2V0X3JlYWxpemVkIgogICAgICAgIGRjID0gMHg1NTU1NTY1NjhlNzAKICAg
+ICAgICBob3RwbHVnX2N0cmwgPSAweDU1NTU1NWFmODNjZiA8dmlzaXRfdHlwZV9ib29sKzUwPgog
+ICAgICAgIGJ1cyA9IDB4N2ZmZmZmZmZkNWM3CiAgICAgICAgbG9jYWxfZXJyID0gMHgwCiMxMCAw
+eDAwMDA1NTU1NTVhMzc1NGQgaW4gcHJvcGVydHlfc2V0X2Jvb2wgKG9iaj0weDU1NTU1ODE2NzJi
+MCwgdj0weDU1NTU1NjVhOTE0MCwgbmFtZT0weDU1NTU1NWI0OTRlOSAicmVhbGl6ZWQiLCBvcGFx
+dWU9MHg1NTU1NTZjMDkyZjAsCiAgICBlcnJwPTB4N2ZmZmZmZmZkNmUwKSBhdCBxb20vb2JqZWN0
+LmM6MTg1MwogICAgICAgIHByb3AgPSAweDU1NTU1NmMwOTJmMAogICAgICAgIHZhbHVlID0gdHJ1
+ZQogICAgICAgIGxvY2FsX2VyciA9IDB4MAojMTEgMHgwMDAwNTU1NTU1YTM1YTMzIGluIG9iamVj
+dF9wcm9wZXJ0eV9zZXQgKG9iaj0weDU1NTU1ODE2NzJiMCwgdj0weDU1NTU1NjVhOTE0MCwgbmFt
+ZT0weDU1NTU1NWI0OTRlOSAicmVhbGl6ZWQiLCBlcnJwPTB4N2ZmZmZmZmZkNmUwKQogICAgYXQg
+cW9tL29iamVjdC5jOjEwODEKICAgICAgICBwcm9wID0gMHg1NTU1NTZkMmI4ZTAKICAgICAgICBf
+X2Z1bmNfXyA9ICJvYmplY3RfcHJvcGVydHlfc2V0IgojMTIgMHgwMDAwNTU1NTU1YTM4OGJmIGlu
+IG9iamVjdF9wcm9wZXJ0eV9zZXRfcW9iamVjdCAob2JqPTB4NTU1NTU4MTY3MmIwLCB2YWx1ZT0w
+eDU1NTU1ODNhY2ViMCwgbmFtZT0weDU1NTU1NWI0OTRlOSAicmVhbGl6ZWQiLCBlcnJwPTB4N2Zm
+ZmZmZmZkNmUwKQogICAgYXQgcW9tL3FvbS1xb2JqZWN0LmM6MjYKICAgICAgICBxaXYgPSAweDU1
+NTU1NjVhOTE0MAojMTMgMHgwMDAwNTU1NTU1YTM1Y2M5IGluIG9iamVjdF9wcm9wZXJ0eV9zZXRf
+Ym9vbCAob2JqPTB4NTU1NTU4MTY3MmIwLCB2YWx1ZT10cnVlLCBuYW1lPTB4NTU1NTU1YjQ5NGU5
+ICJyZWFsaXplZCIsIGVycnA9MHg3ZmZmZmZmZmQ2ZTApCiAgICBhdCBxb20vb2JqZWN0LmM6MTE1
+MAogICAgICAgIHFib29sID0gMHg1NTU1NTgzYWNlYjAKIzE0IDB4MDAwMDU1NTU1NTgyY2YxNSBp
+biBxZGV2X2RldmljZV9hZGQgKG9wdHM9MHg1NTU1NTY1NjQ3ZDAsIGVycnA9MHg3ZmZmZmZmZmQ3
+NjgpIGF0IHFkZXYtbW9uaXRvci5jOjYxOAogICAgICAgIGRjID0gMHg1NTU1NTY1NjhlNzAKICAg
+ICAgICBkcml2ZXIgPSAweDU1NTU1NjU2NDg4MCAidmZpby1wY2kiCiAgICAgICAgcGF0aCA9IDB4
+MAogICAgICAgIGlkID0gMHgwCiAgICAgICAgZGV2ID0gMHg1NTU1NTgxNjcyYjAKICAgICAgICBi
+dXMgPSAweDU1NTU1NjliYWVhMAogICAgICAgIGVyciA9IDB4MAogICAgICAgIF9fZnVuY19fID0g
+InFkZXZfZGV2aWNlX2FkZCIKIzE1IDB4MDAwMDU1NTU1NTgzZWUyYyBpbiBkZXZpY2VfaW5pdF9m
+dW5jIChvcGFxdWU9MHgwLCBvcHRzPTB4NTU1NTU2NTY0N2QwLCBlcnJwPTB4MCkgYXQgdmwuYzoy
+MzU4CiAgICAgICAgZXJyID0gMHgwCiAgICAgICAgZGV2ID0gMHg1NTU1NTdkNDM5YzAKIzE2IDB4
+MDAwMDU1NTU1NWIxOTU4ZCBpbiBxZW11X29wdHNfZm9yZWFjaCAobGlzdD0weDU1NTU1NWZiYTZh
+MCA8cWVtdV9kZXZpY2Vfb3B0cz4sIGZ1bmM9MHg1NTU1NTU4M2VkZWUgPGRldmljZV9pbml0X2Z1
+bmM+LCBvcGFxdWU9MHgwLCBlcnJwPTB4MCkKICAgIGF0IHV0aWwvcWVtdS1vcHRpb24uYzoxMTE2
+CiAgICAgICAgbG9jID0ge2tpbmQgPSBMT0NfQ01ETElORSwgbnVtID0gMiwgcHRyID0gMHg3ZmZm
+ZmZmZmRjZjAsIHByZXYgPSAweDU1NTU1NjUxMTA3MCA8c3RkX2xvYz59CiAgICAgICAgb3B0cyA9
+IDB4NTU1NTU2NTY0N2QwCiAgICAgICAgcmMgPSAwCiAgICAgICAgX19QUkVUVFlfRlVOQ1RJT05f
+XyA9ICJxZW11X29wdHNfZm9yZWFjaCIKIzE3IDB4MDAwMDU1NTU1NTg0M2ZlZSBpbiBtYWluIChh
+cmdjPTYzLCBhcmd2PTB4N2ZmZmZmZmZkYmM4LCBlbnZwPTB4N2ZmZmZmZmZkZGM4KSBhdCB2bC5j
+OjQ1NDYKICAgICAgICBpID0gLTk5NTIKICAgICAgICBzbmFwc2hvdCA9IDAKICAgICAgICBsaW51
+eF9ib290ID0gMAogICAgICAgIGluaXRyZF9maWxlbmFtZSA9IDB4MAogICAgICAgIGtlcm5lbF9m
+aWxlbmFtZSA9IDB4MAogICAgICAgIGtlcm5lbF9jbWRsaW5lID0gMHg1NTU1NTViNGNkNjYgIiIK
+ICAgICAgICBib290X29yZGVyID0gMHg1NTU1NTY1NjQ2NDAgImNkbiIKICAgICAgICBib290X29u
+Y2UgPSAweDAKICAgICAgICBkcyA9IDB4ZmZmZmZmZmU3ZmZmZmZmZgogICAgICAgIGN5bHMgPSAw
+CiAgICAgICAgaGVhZHMgPSAwCiAgICAgICAgc2VjcyA9IDAKICAgICAgICB0cmFuc2xhdGlvbiA9
+IDAKICAgICAgICBoZGFfb3B0cyA9IDB4MAogICAgICAgIG9wdHMgPSAweDU1NTU1NjU2NDU5MAog
+ICAgICAgIG1hY2hpbmVfb3B0cyA9IDB4NTU1NTU2NTYzMzkwCiAgICAgICAgaWNvdW50X29wdHMg
+PSAweDAKICAgICAgICBvbGlzdCA9IDB4NTU1NTU1ZmJiMDgwIDxxZW11X21hY2hpbmVfb3B0cz4K
+ICAgICAgICBvcHRpbmQgPSA2MwogICAgICAgIG9wdGFyZyA9IDB4N2ZmZmZmZmZlNzc5ICJ2aXJ0
+c2VyaWFscG9ydCxjaGFyZGV2PXFnYTAsbmFtZT1vcmcucWVtdS5ndWVzdF9hZ2VudC4wIgogICAg
+ICAgIGxvYWR2bSA9IDB4MAogICAgICAgIG1hY2hpbmVfY2xhc3MgPSAweDU1NTU1NjU3Nzg2MAog
+ICAgICAgIGNwdV9tb2RlbCA9IDB4N2ZmZmZmZmZlMDZiICJob3N0LGh2X3JlbGF4ZWQsaHZfc3Bp
+bmxvY2tzPTB4MWZmZixodl92YXBpYyxodl90aW1lIgogICAgICAgIHZnYV9tb2RlbCA9IDB4N2Zm
+ZmZmZmZlMjQ1ICJzdGQiCiAgICAgICAgcXRlc3RfY2hyZGV2ID0gMHgwCiAgICAgICAgcXRlc3Rf
+bG9nID0gMHgwCiAgICAgICAgcGlkX2ZpbGUgPSAweDdmZmZmZmZmZTY5ZiAiL29wdC9jbG91ZC93
+b3Jrc3BhY2Uvc2VydmVycy9iYjVlNDkzNS1mM2E5LTQ1ZGItYTI0OC1iN2Q0NDI2MTNmMzQvcGlk
+IgogICAgICAgIGluY29taW5nID0gMHgwCiAgICAgICAgc2hvd192bmNfcG9ydCA9IDAKICAgICAg
+ICBkZWZjb25maWcgPSBmYWxzZQogICAgICAgIHVzZXJjb25maWcgPSB0cnVlCiAgICAgICAgbG9n
+X21hc2sgPSAweDAKICAgICAgICBsb2dfZmlsZSA9IDB4MAogICAgICAgIHRyYWNlX2ZpbGUgPSAw
+eDAKICAgICAgICBtYXhyYW1fc2l6ZSA9IDI3NDg3NzkwNjk0NAogICAgICAgIHJhbV9zbG90cyA9
+IDQKICAgICAgICB2bXN0YXRlX2R1bXBfZmlsZSA9IDB4MAogICAgICAgIG1haW5fbG9vcF9lcnIg
+PSAweDAKICAgICAgICBlcnIgPSAweDAKICAgICAgICBfX2Z1bmNfXyA9ICJtYWluIg==
+--001a1144003c3bb26105613bc539--
