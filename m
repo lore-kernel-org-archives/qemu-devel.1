@@ -1,24 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49199)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56576)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <a175818323@gmail.com>) id 1eTmV9-0001vp-34
-	for qemu-devel@nongnu.org; Tue, 26 Dec 2017 05:30:28 -0500
+	(envelope-from <penguin-kernel@I-love.SAKURA.ne.jp>)
+	id 1eTmfM-0005Og-VL
+	for qemu-devel@nongnu.org; Tue, 26 Dec 2017 05:41:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <a175818323@gmail.com>) id 1eTmV7-0007IH-Am
-	for qemu-devel@nongnu.org; Tue, 26 Dec 2017 05:30:26 -0500
-Received: from mail-it0-x22b.google.com ([2607:f8b0:4001:c0b::22b]:35242)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <a175818323@gmail.com>)
-	id 1eTmV6-0007Hr-OJ
-	for qemu-devel@nongnu.org; Tue, 26 Dec 2017 05:30:25 -0500
-Received: by mail-it0-x22b.google.com with SMTP id f143so22463169itb.0
-	for <qemu-devel@nongnu.org>; Tue, 26 Dec 2017 02:30:24 -0800 (PST)
-MIME-Version: 1.0
-From: Bob Chen <a175818323@gmail.com>
-Date: Tue, 26 Dec 2017 18:30:22 +0800
-Message-ID: <CAMxP3BRqxD8tC1-M3+Pr8q8JZ1G_fGPbcvNQehwdPGFykdEk0g@mail.gmail.com>
-Content-Type: multipart/mixed; boundary="001a1144003c3bb26105613bc539"
-Subject: [Qemu-devel] [GPU and VFIO] qemu hang at startup,
- VFIO_IOMMU_MAP_DMA is extremely slow
+	(envelope-from <penguin-kernel@I-love.SAKURA.ne.jp>)
+	id 1eTmfJ-00063E-Ot
+	for qemu-devel@nongnu.org; Tue, 26 Dec 2017 05:41:01 -0500
+Received: from www262.sakura.ne.jp ([2001:e42:101:1:202:181:97:72]:58383)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <penguin-kernel@I-love.SAKURA.ne.jp>)
+	id 1eTmfJ-0004df-3q
+	for qemu-devel@nongnu.org; Tue, 26 Dec 2017 05:40:57 -0500
+From: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+References: <201712241345.DIG21823.SLFOOJtQFOMVFH@I-love.SAKURA.ne.jp>
+	<5A3F5A4A.1070009@intel.com> <5A3F6254.7070306@intel.com>
+	<201712252351.FBE81721.HFOtFOJQSOFLVM@I-love.SAKURA.ne.jp>
+	<5A41BCC1.5010004@intel.com>
+In-Reply-To: <5A41BCC1.5010004@intel.com>
+Message-Id: <201712261938.IFF64061.LtFMOVJFHOSFQO@I-love.SAKURA.ne.jp>
+Date: Tue, 26 Dec 2017 19:38:13 +0900
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Subject: Re: [Qemu-devel] [PATCH v20 4/7] virtio-balloon: VIRTIO_BALLOON_F_SG
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,176 +31,121 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: wei.w.wang@intel.com, willy@infradead.org
+Cc: virtio-dev@lists.oasis-open.org, linux-kernel@vger.kernel.org, qemu-devel@nongnu.org, virtualization@lists.linux-foundation.org, kvm@vger.kernel.org, linux-mm@kvack.org, mst@redhat.com, mhocko@kernel.org, akpm@linux-foundation.org, mawilcox@microsoft.com, david@redhat.com, cornelia.huck@de.ibm.com, mgorman@techsingularity.net, aarcange@redhat.com, amit.shah@redhat.com, pbonzini@redhat.com, liliang.opensource@gmail.com, yang.zhang.wz@gmail.com, quan.xu0@gmail.com, nilal@redhat.com, riel@redhat.com
 
---001a1144003c3bb26105613bc539
-Content-Type: text/plain; charset="UTF-8"
+Wei Wang wrote:
+> On 12/25/2017 10:51 PM, Tetsuo Handa wrote:
+> > Wei Wang wrote:
+> >>>>>> @@ -173,8 +292,15 @@ static unsigned fill_balloon(struct
+> >>>>>> virtio_balloon *vb, size_t num)
+> >>>>>>          while ((page = balloon_page_pop(&pages))) {
+> >>>>>>            balloon_page_enqueue(&vb->vb_dev_info, page);
+> >>>>>> +        if (use_sg) {
+> >>>>>> +            if (xb_set_page(vb, page, &pfn_min, &pfn_max) < 0) {
+> >>>>>> +                __free_page(page);
+> >>>>>> +                continue;
+> >>>>>> +            }
+> >>>>>> +        } else {
+> >>>>>> +            set_page_pfns(vb, vb->pfns + vb->num_pfns, page);
+> >>>>>> +        }
+> >>>>> Is this the right behaviour?
+> >>>> I don't think so. In the worst case, we can set no bit using
+> >>>> xb_set_page().
+> >>>>>                                 If we can't record the page in the xb,
+> >>>>> wouldn't we rather send it across as a single page?
+> >>>>>
+> >>>> I think that we need to be able to fallback to !use_sg path when OOM.
+> >>> I also have different thoughts:
+> >>>
+> >>> 1) For OOM, we have leak_balloon_sg_oom (oom has nothing to do with
+> >>> fill_balloon), which does not use xbitmap to record pages, thus no
+> >>> memory allocation.
+> >>>
+> >>> 2) If the memory is already under pressure, it is pointless to
+> >>> continue inflating memory to the host. We need to give thanks to the
+> >>> memory allocation failure reported by xbitmap, which gets us a chance
+> >>> to release the inflated pages that have been demonstrated to cause the
+> >>> memory pressure of the guest.
+> >>>
+> >> Forgot to add my conclusion: I think the above behavior is correct.
+> >>
+> > What is the desired behavior when hitting OOM path during inflate/deflate?
+> > Once inflation started, the inflation logic is called again and again
+> > until the balloon inflates to the requested size.
+> 
+> The above is true, but I can't agree with the following. Please see below.
+> 
+> > Such situation will
+> > continue wasting CPU resource between inflate-due-to-host's-request versus
+> > deflate-due-to-guest's-OOM. It is pointless but cannot stop doing pointless
+> > thing.
+> 
+> What we are doing here is to free the pages that were just allocated in 
+> this round of inflating. Next round will be sometime later when the 
+> balloon work item gets its turn to run. Yes, it will then continue to 
+> inflate.
+> Here are the two cases that will happen then:
+> 1) the guest is still under memory pressure, the inflate will fail at 
+> memory allocation, which results in a msleep(200), and then it exists 
+> for another time to run.
+> 2) the guest isn't under memory pressure any more (e.g. the task which 
+> consumes the huge amount of memory is gone), it will continue to inflate 
+> as normal till the requested size.
+> 
 
-Hi,
+How likely does 2) occur? It is not so likely. msleep(200) is enough to spam
+the guest with puff messages. Next round is starting too quickly.
 
-I have a host server with multiple GPU cards, and was assigning them to
-qemu with VFIO.
+> I think what we are doing is a quite sensible behavior, except a small 
+> change I plan to make:
+> 
+>          while ((page = balloon_page_pop(&pages))) {
+> -               balloon_page_enqueue(&vb->vb_dev_info, page);
+>                  if (use_sg) {
+>                          if (xb_set_page(vb, page, &pfn_min, &pfn_max) < 
+> 0) {
+>                                  __free_page(page);
+>                                  continue;
+>                          }
+>                  } else {
+>                          set_page_pfns(vb, vb->pfns + vb->num_pfns, page);
+>                  }
+> +             balloon_page_enqueue(&vb->vb_dev_info, page);
+> 
+> >
+> > Also, as of Linux 4.15, only up to VIRTIO_BALLOON_ARRAY_PFNS_MAX pages (i.e.
+> > 1MB) are invisible from deflate request. That amount would be an acceptable
+> > error. But your patch makes more pages being invisible, for pages allocated
+> > by balloon_page_alloc() without holding balloon_lock are stored into a local
+> > variable "LIST_HEAD(pages)" (which means that balloon_page_dequeue() with
+> > balloon_lock held won't be able to find pages not yet queued by
+> > balloon_page_enqueue()), doesn't it? What if all memory pages were held in
+> > "LIST_HEAD(pages)" and balloon_page_dequeue() was called before
+> > balloon_page_enqueue() is called?
+> >
+> 
+> If we think of the balloon driver just as a regular driver or 
+> application, that will be a pretty nature thing. A regular driver can 
+> eat a huge amount of memory for its own usages, would this amount of 
+> memory be treated as an error as they are invisible to the 
+> balloon_page_enqueue?
+> 
 
-I found that when setting up the last free GPU, the qemu process would hang
-there and took almost 10 minutes before finishing startup. I made some dig
-by gdb, and found the slowest part occurred at the
-hw/vfio/common.c:vfio_dma_map function call.
+No. Memory used by applications which consumed a lot of memory in their
+mm_struct is reclaimed by the OOM killer/reaper. Drivers try to avoid
+allocating more memory than they need. If drivers allocate more memory
+than they need, they have a hook for releasing unused memory (i.e.
+register_shrinker() or OOM notifier). What I'm saying here is that
+the hook for releasing unused memory does not work unless memory held in
+LIST_HEAD(pages) becomes visible to balloon_page_dequeue().
 
-
-static int vfio_dma_map(VFIOContainer *container, hwaddr iova, ram_addr_t
-size, void *vaddr, bool readonly)
-{
-...
-    if (ioctl(container->fd, VFIO_IOMMU_MAP_DMA, &map) == 0 ||
-        (errno == EBUSY && vfio_dma_unmap(container, iova, size) == 0 &&
-         ioctl(container->fd, VFIO_IOMMU_MAP_DMA, &map) == 0)) {
-        return 0;
-    }
-...
-}
-
-
-The hang was enable to reproduce on one of my hosts, I was setting up a 4GB
-memory VM, while the host still had 16GB free. GPU physical mem is 8G.
-
-Also, this phenomenon was observed on other hosts occasionally, and the
-similarity is that they always happened on the last free GPU.
-
-
-Full stack trace file is attached. Looking forward for you help, thanks
-
-
-- Bob
-
---001a1144003c3bb26105613bc539
-Content-Type: text/plain; charset="UTF-8"; name="full_stack_trace.txt"
-Content-Disposition: attachment; filename="full_stack_trace.txt"
-Content-Transfer-Encoding: base64
-X-Attachment-Id: f_jbnhpmpi0
-
-IzAgIHZmaW9fZG1hX21hcCAoY29udGFpbmVyPTB4NTU1NTU2YjFmODgwLCBpb3ZhPTAsIHNpemU9
-NjU1MzYwLCB2YWRkcj0weDdmZmVjZmUwMDAwMCwgcmVhZG9ubHk9ZmFsc2UpIGF0IC91c3Ivc3Jj
-L2RlYnVnL3FlbXUtMi42LjIvaHcvdmZpby9jb21tb24uYzoyMjcKICAgICAgICBtYXAgPSB7YXJn
-c3ogPSA2NTUzNTksIGZsYWdzID0gMCwgdmFkZHIgPSAwLCBpb3ZhID0gMTQwNzM3NDg4MzM5MjQ4
-LCBzaXplID0gOTM4MjQ5OTQxNDE2OTF9CiMxICAweDAwMDA1NTU1NTU3NzEyZGMgaW4gdmZpb19s
-aXN0ZW5lcl9yZWdpb25fYWRkIChsaXN0ZW5lcj0weDU1NTU1NmIxZjg5MCwgc2VjdGlvbj0weDdm
-ZmZmZmZmYzFmMCkgYXQgL3Vzci9zcmMvZGVidWcvcWVtdS0yLjYuMi9ody92ZmlvL2NvbW1vbi5j
-OjQxOQogICAgICAgIGNvbnRhaW5lciA9IDB4NTU1NTU2YjFmODgwCiAgICAgICAgaW92YSA9IDAK
-ICAgICAgICBlbmQgPSA2NTUzNTkKICAgICAgICBsbGVuZCA9IHtsbyA9IDY1NTM2MCwgaGkgPSAw
-fQogICAgICAgIGxsc2l6ZSA9IHtsbyA9IDY1NTM2MCwgaGkgPSAwfQogICAgICAgIHZhZGRyID0g
-MHg3ZmZlY2ZlMDAwMDAKICAgICAgICByZXQgPSA3CiAgICAgICAgX19mdW5jX18gPSAidmZpb19s
-aXN0ZW5lcl9yZWdpb25fYWRkIgojMiAgMHgwMDAwNTU1NTU1NzI4NDY1IGluIGxpc3RlbmVyX2Fk
-ZF9hZGRyZXNzX3NwYWNlIChsaXN0ZW5lcj0weDU1NTU1NmIxZjg5MCwgYXM9MHg1NTU1NTYwODIz
-ZTAgPGFkZHJlc3Nfc3BhY2VfbWVtb3J5PikKICAgIGF0IC91c3Ivc3JjL2RlYnVnL3FlbXUtMi42
-LjIvbWVtb3J5LmM6MjE3OQogICAgICAgIHNlY3Rpb24gPSB7bXIgPSAweDU1NTU1NjZlYzU3MCwg
-YWRkcmVzc19zcGFjZSA9IDB4NTU1NTU2MDgyM2UwIDxhZGRyZXNzX3NwYWNlX21lbW9yeT4sIG9m
-ZnNldF93aXRoaW5fcmVnaW9uID0gMCwgc2l6ZSA9IHtsbyA9IDY1NTM2MCwgaGkgPSAwfSwKICAg
-ICAgICAgIG9mZnNldF93aXRoaW5fYWRkcmVzc19zcGFjZSA9IDAsIHJlYWRvbmx5ID0gZmFsc2V9
-CiAgICAgICAgdmlldyA9IDB4NTU1NTU3YWUzYmQwCiAgICAgICAgZnIgPSAweDU1NTU1NjZmMGMw
-MAojMyAgMHgwMDAwNTU1NTU1NzI4NjBkIGluIG1lbW9yeV9saXN0ZW5lcl9yZWdpc3RlciAobGlz
-dGVuZXI9MHg1NTU1NTZiMWY4OTAsIGZpbHRlcj0weDU1NTU1NjA4MjNlMCA8YWRkcmVzc19zcGFj
-ZV9tZW1vcnk+KQogICAgYXQgL3Vzci9zcmMvZGVidWcvcWVtdS0yLjYuMi9tZW1vcnkuYzoyMjA4
-CiAgICAgICAgb3RoZXIgPSAweDU1NTU1NjViNDkxMAogICAgICAgIGFzID0gMHg1NTU1NTYwODIz
-ZTAgPGFkZHJlc3Nfc3BhY2VfbWVtb3J5PgojNCAgMHgwMDAwNTU1NTU1NzcyODExIGluIHZmaW9f
-Y29ubmVjdF9jb250YWluZXIgKGdyb3VwPTB4NTU1NTU3ODRiY2UwLCBhcz0weDU1NTU1NjA4MjNl
-MCA8YWRkcmVzc19zcGFjZV9tZW1vcnk+KQogICAgYXQgL3Vzci9zcmMvZGVidWcvcWVtdS0yLjYu
-Mi9ody92ZmlvL2NvbW1vbi5jOjkwMAogICAgICAgIGNvbnRhaW5lciA9IDB4NTU1NTU2YjFmODgw
-CiAgICAgICAgcmV0ID0gMAogICAgICAgIGZkID0gMzUKICAgICAgICBzcGFjZSA9IDB4NTU1NTU3
-ODRiZDIwCiM1ICAweDAwMDA1NTU1NTU3NzJjYmMgaW4gdmZpb19nZXRfZ3JvdXAgKGdyb3VwaWQ9
-MjUsIGFzPTB4NTU1NTU2MDgyM2UwIDxhZGRyZXNzX3NwYWNlX21lbW9yeT4pIGF0IC91c3Ivc3Jj
-L2RlYnVnL3FlbXUtMi42LjIvaHcvdmZpby9jb21tb24uYzoxMDA4CiAgICAgICAgZ3JvdXAgPSAw
-eDU1NTU1Nzg0YmNlMAogICAgICAgIHBhdGggPSAiL2Rldi92ZmlvLzI1XDAwMFVcMDAwXDAwMFBc
-MzAzXDM3N1wzNzdcMzc3XDE3N1wwMDBcMDAwXDMzMlFcMjI0VVVVXDAwMCIKICAgICAgICBzdGF0
-dXMgPSB7YXJnc3ogPSA4LCBmbGFncyA9IDF9CiM2ICAweDAwMDA1NTU1NTU3N2FmNWMgaW4gdmZp
-b19pbml0Zm4gKHBkZXY9MHg1NTU1NTgxNjcyYjApIGF0IC91c3Ivc3JjL2RlYnVnL3FlbXUtMi42
-LjIvaHcvdmZpby9wY2kuYzoyNDQ3CiAgICAgICAgdmRldiA9IDB4NTU1NTU4MTY3MmIwCiAgICAg
-ICAgdmJhc2VkZXZfaXRlciA9IDB4NDBiMDAwMDAwMDAKICAgICAgICBncm91cCA9IDB4NTU1NTU1
-YmJjNjVkCiAgICAgICAgdG1wID0gMHg1NTU1NTc2NDBiNjAgIiIKICAgICAgICBncm91cF9wYXRo
-ID0gIi4uLy4uLy4uLy4uLy4uLy4uL2tlcm5lbC9pb21tdV9ncm91cHMvMjVcMDAwXDAwMFwwMDBc
-MDAwXDM0M1wwMDNcMDAwXDAwMFwwMzHEu1VVVVwwMDBcMDAwXDAwMFwwMDBcMDAwXDAwMFwwMDBc
-MDAwXDAwMFwwMDBcMjIwXDMwNFwzNzdcMzc3XDM3N1wxNzdcMDAwXDAwMF3Gu1VcYVwwMDBcMDAw
-XDAwMFwzMjDJu1VVVVwwMDBcMDAwXDM2MFwzMDRcMzc3XDM3N1x2XDAwNFwwMDBcMDAwXDMwMFwz
-MDVcMzc3XDM3N1wzNzdcMTc3XDAwMFwwMDBJXDI1MlwyNjBVVVVcMDAwXDAwMFwzNjBcMzA0XDM3
-N1wzNzdcMzc3XDEtCjc3XDAwMFwwMDBcMDAwXDAwMFwwMDBcMDAwXDAwMFwwMDBcMDAwXDAwMFwz
-MjBcMzA0XDM3N1wzNzdcMzc3XDE3N1wwMDBcMDAwXca7VVVVXDAwMFwwMDBcMjYwybtVVVVcMDAw
-XDAwMGbLslVcMzQzXDAwM1wwMDBcMDAwXDI0MTpcMDAwXDAwMFwwMDBcMjAwXDM3N1wzNzdcMDAy
-IiwgJ1wwMDAnIDxyZXBlYXRzIDIzIHRpbWVzPiwgIlwwNjBcMDAwXDAwMFwwMDBbXDAwMFwwMDBc
-MDAwYFwzMDVcMzc3XDM3N1wzNzdcMTc3Ii4uLgogICAgICAgIGdyb3VwX25hbWUgPSAweDdmZmZm
-ZmZmYzQ2NiAiMjUiCiAgICAgICAgbGVuID0gNDAKICAgICAgICBzdCA9IHtzdF9kZXYgPSAxNywg
-c3RfaW5vID0gMzkxMjcsIHN0X25saW5rID0gMywgc3RfbW9kZSA9IDE2ODc3LCBzdF91aWQgPSAw
-LCBzdF9naWQgPSAwLCBfX3BhZDAgPSAwLCBzdF9yZGV2ID0gMCwgc3Rfc2l6ZSA9IDAsIHN0X2Js
-a3NpemUgPSA0MDk2LAogICAgICAgICAgc3RfYmxvY2tzID0gMCwgc3RfYXRpbSA9IHt0dl9zZWMg
-PSAxNTEzOTM5NDE3LCB0dl9uc2VjID0gOTQzNjU3Mzg2fSwgc3RfbXRpbSA9IHt0dl9zZWMgPSAx
-NTEwMTEzMTg2LCB0dl9uc2VjID0gNTk2MDAwMDAxfSwgc3RfY3RpbSA9IHsKICAgICAgICAgICAg
-dHZfc2VjID0gMTUxMDExMzE4NiwgdHZfbnNlYyA9IDU5NjAwMDAwMX0sIF9fdW51c2VkID0gezAs
-IDAsIDB9fQogICAgICAgIGdyb3VwaWQgPSAyNQogICAgICAgIHJldCA9IDIxODQ1CiM3ICAweDAw
-MDA1NTU1NTU5NDNiNjUgaW4gcGNpX2RlZmF1bHRfcmVhbGl6ZSAoZGV2PTB4NTU1NTU4MTY3MmIw
-LCBlcnJwPTB4N2ZmZmZmZmZkNGI4KSBhdCBody9wY2kvcGNpLmM6MTg5NQogICAgICAgIHBjID0g
-MHg1NTU1NTY1NjhlNzAKICAgICAgICBfX2Z1bmNfXyA9ICJwY2lfZGVmYXVsdF9yZWFsaXplIgoj
-OCAgMHgwMDAwNTU1NTU1OTQzYTA4IGluIHBjaV9xZGV2X3JlYWxpemUgKHFkZXY9MHg1NTU1NTgx
-NjcyYjAsIGVycnA9MHg3ZmZmZmZmZmQ1MjApIGF0IGh3L3BjaS9wY2kuYzoxODY3CiAgICAgICAg
-cGNpX2RldiA9IDB4NTU1NTU4MTY3MmIwCiAgICAgICAgcGMgPSAweDU1NTU1NjU2OGU3MAogICAg
-ICAgIF9fZnVuY19fID0gInBjaV9xZGV2X3JlYWxpemUiCiAgICAgICAgbG9jYWxfZXJyID0gMHgw
-CiAgICAgICAgYnVzID0gMHg1NTU1NTY5YmFlYTAKICAgICAgICBpc19kZWZhdWx0X3JvbSA9IGZh
-bHNlCiM5ICAweDAwMDA1NTU1NTU4YWY4ZGEgaW4gZGV2aWNlX3NldF9yZWFsaXplZCAob2JqPTB4
-NTU1NTU4MTY3MmIwLCB2YWx1ZT10cnVlLCBlcnJwPTB4N2ZmZmZmZmZkNmUwKSBhdCBody9jb3Jl
-L3FkZXYuYzoxMDY2CiAgICAgICAgZGV2ID0gMHg1NTU1NTgxNjcyYjAKICAgICAgICBfX2Z1bmNf
-XyA9ICJkZXZpY2Vfc2V0X3JlYWxpemVkIgogICAgICAgIGRjID0gMHg1NTU1NTY1NjhlNzAKICAg
-ICAgICBob3RwbHVnX2N0cmwgPSAweDU1NTU1NWFmODNjZiA8dmlzaXRfdHlwZV9ib29sKzUwPgog
-ICAgICAgIGJ1cyA9IDB4N2ZmZmZmZmZkNWM3CiAgICAgICAgbG9jYWxfZXJyID0gMHgwCiMxMCAw
-eDAwMDA1NTU1NTVhMzc1NGQgaW4gcHJvcGVydHlfc2V0X2Jvb2wgKG9iaj0weDU1NTU1ODE2NzJi
-MCwgdj0weDU1NTU1NjVhOTE0MCwgbmFtZT0weDU1NTU1NWI0OTRlOSAicmVhbGl6ZWQiLCBvcGFx
-dWU9MHg1NTU1NTZjMDkyZjAsCiAgICBlcnJwPTB4N2ZmZmZmZmZkNmUwKSBhdCBxb20vb2JqZWN0
-LmM6MTg1MwogICAgICAgIHByb3AgPSAweDU1NTU1NmMwOTJmMAogICAgICAgIHZhbHVlID0gdHJ1
-ZQogICAgICAgIGxvY2FsX2VyciA9IDB4MAojMTEgMHgwMDAwNTU1NTU1YTM1YTMzIGluIG9iamVj
-dF9wcm9wZXJ0eV9zZXQgKG9iaj0weDU1NTU1ODE2NzJiMCwgdj0weDU1NTU1NjVhOTE0MCwgbmFt
-ZT0weDU1NTU1NWI0OTRlOSAicmVhbGl6ZWQiLCBlcnJwPTB4N2ZmZmZmZmZkNmUwKQogICAgYXQg
-cW9tL29iamVjdC5jOjEwODEKICAgICAgICBwcm9wID0gMHg1NTU1NTZkMmI4ZTAKICAgICAgICBf
-X2Z1bmNfXyA9ICJvYmplY3RfcHJvcGVydHlfc2V0IgojMTIgMHgwMDAwNTU1NTU1YTM4OGJmIGlu
-IG9iamVjdF9wcm9wZXJ0eV9zZXRfcW9iamVjdCAob2JqPTB4NTU1NTU4MTY3MmIwLCB2YWx1ZT0w
-eDU1NTU1ODNhY2ViMCwgbmFtZT0weDU1NTU1NWI0OTRlOSAicmVhbGl6ZWQiLCBlcnJwPTB4N2Zm
-ZmZmZmZkNmUwKQogICAgYXQgcW9tL3FvbS1xb2JqZWN0LmM6MjYKICAgICAgICBxaXYgPSAweDU1
-NTU1NjVhOTE0MAojMTMgMHgwMDAwNTU1NTU1YTM1Y2M5IGluIG9iamVjdF9wcm9wZXJ0eV9zZXRf
-Ym9vbCAob2JqPTB4NTU1NTU4MTY3MmIwLCB2YWx1ZT10cnVlLCBuYW1lPTB4NTU1NTU1YjQ5NGU5
-ICJyZWFsaXplZCIsIGVycnA9MHg3ZmZmZmZmZmQ2ZTApCiAgICBhdCBxb20vb2JqZWN0LmM6MTE1
-MAogICAgICAgIHFib29sID0gMHg1NTU1NTgzYWNlYjAKIzE0IDB4MDAwMDU1NTU1NTgyY2YxNSBp
-biBxZGV2X2RldmljZV9hZGQgKG9wdHM9MHg1NTU1NTY1NjQ3ZDAsIGVycnA9MHg3ZmZmZmZmZmQ3
-NjgpIGF0IHFkZXYtbW9uaXRvci5jOjYxOAogICAgICAgIGRjID0gMHg1NTU1NTY1NjhlNzAKICAg
-ICAgICBkcml2ZXIgPSAweDU1NTU1NjU2NDg4MCAidmZpby1wY2kiCiAgICAgICAgcGF0aCA9IDB4
-MAogICAgICAgIGlkID0gMHgwCiAgICAgICAgZGV2ID0gMHg1NTU1NTgxNjcyYjAKICAgICAgICBi
-dXMgPSAweDU1NTU1NjliYWVhMAogICAgICAgIGVyciA9IDB4MAogICAgICAgIF9fZnVuY19fID0g
-InFkZXZfZGV2aWNlX2FkZCIKIzE1IDB4MDAwMDU1NTU1NTgzZWUyYyBpbiBkZXZpY2VfaW5pdF9m
-dW5jIChvcGFxdWU9MHgwLCBvcHRzPTB4NTU1NTU2NTY0N2QwLCBlcnJwPTB4MCkgYXQgdmwuYzoy
-MzU4CiAgICAgICAgZXJyID0gMHgwCiAgICAgICAgZGV2ID0gMHg1NTU1NTdkNDM5YzAKIzE2IDB4
-MDAwMDU1NTU1NWIxOTU4ZCBpbiBxZW11X29wdHNfZm9yZWFjaCAobGlzdD0weDU1NTU1NWZiYTZh
-MCA8cWVtdV9kZXZpY2Vfb3B0cz4sIGZ1bmM9MHg1NTU1NTU4M2VkZWUgPGRldmljZV9pbml0X2Z1
-bmM+LCBvcGFxdWU9MHgwLCBlcnJwPTB4MCkKICAgIGF0IHV0aWwvcWVtdS1vcHRpb24uYzoxMTE2
-CiAgICAgICAgbG9jID0ge2tpbmQgPSBMT0NfQ01ETElORSwgbnVtID0gMiwgcHRyID0gMHg3ZmZm
-ZmZmZmRjZjAsIHByZXYgPSAweDU1NTU1NjUxMTA3MCA8c3RkX2xvYz59CiAgICAgICAgb3B0cyA9
-IDB4NTU1NTU2NTY0N2QwCiAgICAgICAgcmMgPSAwCiAgICAgICAgX19QUkVUVFlfRlVOQ1RJT05f
-XyA9ICJxZW11X29wdHNfZm9yZWFjaCIKIzE3IDB4MDAwMDU1NTU1NTg0M2ZlZSBpbiBtYWluIChh
-cmdjPTYzLCBhcmd2PTB4N2ZmZmZmZmZkYmM4LCBlbnZwPTB4N2ZmZmZmZmZkZGM4KSBhdCB2bC5j
-OjQ1NDYKICAgICAgICBpID0gLTk5NTIKICAgICAgICBzbmFwc2hvdCA9IDAKICAgICAgICBsaW51
-eF9ib290ID0gMAogICAgICAgIGluaXRyZF9maWxlbmFtZSA9IDB4MAogICAgICAgIGtlcm5lbF9m
-aWxlbmFtZSA9IDB4MAogICAgICAgIGtlcm5lbF9jbWRsaW5lID0gMHg1NTU1NTViNGNkNjYgIiIK
-ICAgICAgICBib290X29yZGVyID0gMHg1NTU1NTY1NjQ2NDAgImNkbiIKICAgICAgICBib290X29u
-Y2UgPSAweDAKICAgICAgICBkcyA9IDB4ZmZmZmZmZmU3ZmZmZmZmZgogICAgICAgIGN5bHMgPSAw
-CiAgICAgICAgaGVhZHMgPSAwCiAgICAgICAgc2VjcyA9IDAKICAgICAgICB0cmFuc2xhdGlvbiA9
-IDAKICAgICAgICBoZGFfb3B0cyA9IDB4MAogICAgICAgIG9wdHMgPSAweDU1NTU1NjU2NDU5MAog
-ICAgICAgIG1hY2hpbmVfb3B0cyA9IDB4NTU1NTU2NTYzMzkwCiAgICAgICAgaWNvdW50X29wdHMg
-PSAweDAKICAgICAgICBvbGlzdCA9IDB4NTU1NTU1ZmJiMDgwIDxxZW11X21hY2hpbmVfb3B0cz4K
-ICAgICAgICBvcHRpbmQgPSA2MwogICAgICAgIG9wdGFyZyA9IDB4N2ZmZmZmZmZlNzc5ICJ2aXJ0
-c2VyaWFscG9ydCxjaGFyZGV2PXFnYTAsbmFtZT1vcmcucWVtdS5ndWVzdF9hZ2VudC4wIgogICAg
-ICAgIGxvYWR2bSA9IDB4MAogICAgICAgIG1hY2hpbmVfY2xhc3MgPSAweDU1NTU1NjU3Nzg2MAog
-ICAgICAgIGNwdV9tb2RlbCA9IDB4N2ZmZmZmZmZlMDZiICJob3N0LGh2X3JlbGF4ZWQsaHZfc3Bp
-bmxvY2tzPTB4MWZmZixodl92YXBpYyxodl90aW1lIgogICAgICAgIHZnYV9tb2RlbCA9IDB4N2Zm
-ZmZmZmZlMjQ1ICJzdGQiCiAgICAgICAgcXRlc3RfY2hyZGV2ID0gMHgwCiAgICAgICAgcXRlc3Rf
-bG9nID0gMHgwCiAgICAgICAgcGlkX2ZpbGUgPSAweDdmZmZmZmZmZTY5ZiAiL29wdC9jbG91ZC93
-b3Jrc3BhY2Uvc2VydmVycy9iYjVlNDkzNS1mM2E5LTQ1ZGItYTI0OC1iN2Q0NDI2MTNmMzQvcGlk
-IgogICAgICAgIGluY29taW5nID0gMHgwCiAgICAgICAgc2hvd192bmNfcG9ydCA9IDAKICAgICAg
-ICBkZWZjb25maWcgPSBmYWxzZQogICAgICAgIHVzZXJjb25maWcgPSB0cnVlCiAgICAgICAgbG9n
-X21hc2sgPSAweDAKICAgICAgICBsb2dfZmlsZSA9IDB4MAogICAgICAgIHRyYWNlX2ZpbGUgPSAw
-eDAKICAgICAgICBtYXhyYW1fc2l6ZSA9IDI3NDg3NzkwNjk0NAogICAgICAgIHJhbV9zbG90cyA9
-IDQKICAgICAgICB2bXN0YXRlX2R1bXBfZmlsZSA9IDB4MAogICAgICAgIG1haW5fbG9vcF9lcnIg
-PSAweDAKICAgICAgICBlcnIgPSAweDAKICAgICAgICBfX2Z1bmNfXyA9ICJtYWluIg==
---001a1144003c3bb26105613bc539--
+If a system has 128GB of memory, and 127GB of memory was stored into
+LIST_HEAD(pages) upon first fill_balloon() request, and somebody held
+balloon_lock from OOM notifier path from out_of_memory() before
+fill_balloon() holds balloon_lock, leak_balloon_sg_oom() finds that
+no memory can be freed because balloon_page_enqueue() was never called,
+and allows the caller of out_of_memory() to invoke the OOM killer despite
+there is 127GB of memory which can be freed if fill_balloon() was able
+to hold balloon_lock before leak_balloon_sg_oom() holds balloon_lock.
+I don't think that that amount is an acceptable error.
