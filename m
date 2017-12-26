@@ -1,22 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42347)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38550)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <drjones@redhat.com>) id 1eTosZ-0007mm-Sl
-	for qemu-devel@nongnu.org; Tue, 26 Dec 2017 08:02:49 -0500
+	(envelope-from <penguin-kernel@I-love.SAKURA.ne.jp>)
+	id 1eTpVY-000125-IO
+	for qemu-devel@nongnu.org; Tue, 26 Dec 2017 08:43:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <drjones@redhat.com>) id 1eTosY-0004Ab-Ms
-	for qemu-devel@nongnu.org; Tue, 26 Dec 2017 08:02:47 -0500
-Date: Tue, 26 Dec 2017 14:02:27 +0100
-From: Andrew Jones <drjones@redhat.com>
-Message-ID: <20171226130227.3bdva5rxynpltsss@hawk.localdomain>
-References: <1513925567-5184-1-git-send-email-zhaoshenglong@huawei.com>
-	<20171226114828.lz3s5qztk6rcm2vi@hawk.localdomain>
-	<5A423867.203@huawei.com>
-MIME-Version: 1.0
+	(envelope-from <penguin-kernel@I-love.SAKURA.ne.jp>)
+	id 1eTpVV-0001B1-8v
+	for qemu-devel@nongnu.org; Tue, 26 Dec 2017 08:43:04 -0500
+Received: from www262.sakura.ne.jp ([2001:e42:101:1:202:181:97:72]:10039)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <penguin-kernel@I-love.SAKURA.ne.jp>)
+	id 1eTpVU-0008LT-9a
+	for qemu-devel@nongnu.org; Tue, 26 Dec 2017 08:43:01 -0500
+From: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+References: <5A3F5A4A.1070009@intel.com> <5A3F6254.7070306@intel.com>
+	<201712252351.FBE81721.HFOtFOJQSOFLVM@I-love.SAKURA.ne.jp>
+	<5A41BCC1.5010004@intel.com>
+	<201712261938.IFF64061.LtFMOVJFHOSFQO@I-love.SAKURA.ne.jp>
+In-Reply-To: <201712261938.IFF64061.LtFMOVJFHOSFQO@I-love.SAKURA.ne.jp>
+Message-Id: <201712262240.CJG26093.JQtMOFOSFOVHFL@I-love.SAKURA.ne.jp>
+Date: Tue, 26 Dec 2017 22:40:16 +0900
+Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <5A423867.203@huawei.com>
-Subject: Re: [Qemu-devel] [PATCH] Virt: ACPI: fix qemu assert due to
- re-assigned table data address
+Subject: Re: [Qemu-devel] [PATCH v20 4/7] virtio-balloon: VIRTIO_BALLOON_F_SG
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,132 +31,126 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Shannon Zhao <zhaoshenglong@huawei.com>
-Cc: qemu-arm@nongnu.org, peter.maydell@linaro.org, lersek@redhat.com, qemu-devel@nongnu.org
+To: wei.w.wang@intel.com, willy@infradead.org, mst@redhat.com
+Cc: virtio-dev@lists.oasis-open.org, linux-kernel@vger.kernel.org, qemu-devel@nongnu.org, virtualization@lists.linux-foundation.org, kvm@vger.kernel.org, linux-mm@kvack.org, mhocko@kernel.org, akpm@linux-foundation.org, mawilcox@microsoft.com, david@redhat.com, cornelia.huck@de.ibm.com, mgorman@techsingularity.net, aarcange@redhat.com, amit.shah@redhat.com, pbonzini@redhat.com, liliang.opensource@gmail.com, yang.zhang.wz@gmail.com, quan.xu0@gmail.com, nilal@redhat.com, riel@redhat.com
 
-On Tue, Dec 26, 2017 at 07:54:15PM +0800, Shannon Zhao wrote:
+Wei Wang wrote:
+> On 12/26/2017 06:38 PM, Tetsuo Handa wrote:
+> > Wei Wang wrote:
+> >> On 12/25/2017 10:51 PM, Tetsuo Handa wrote:
+> >>> Wei Wang wrote:
+> >>>
+> >> What we are doing here is to free the pages that were just allocated in
+> >> this round of inflating. Next round will be sometime later when the
+> >> balloon work item gets its turn to run. Yes, it will then continue to
+> >> inflate.
+> >> Here are the two cases that will happen then:
+> >> 1) the guest is still under memory pressure, the inflate will fail at
+> >> memory allocation, which results in a msleep(200), and then it exists
+> >> for another time to run.
+> >> 2) the guest isn't under memory pressure any more (e.g. the task which
+> >> consumes the huge amount of memory is gone), it will continue to inflate
+> >> as normal till the requested size.
+> >>
+> > How likely does 2) occur? It is not so likely. msleep(200) is enough to spam
+> > the guest with puff messages. Next round is starting too quickly.
 > 
+> I meant one of the two cases, 1) or 2), would happen, rather than 2) 
+> happens after 1).
 > 
-> On 2017/12/26 19:48, Andrew Jones wrote:
-> > On Fri, Dec 22, 2017 at 02:52:47PM +0800, Shannon Zhao wrote:
-> >> acpi_data_push uses g_array_set_size to resize the memory size. If there is no
-> >> enough contiguous memory, the address will be changed. If we use the old value,
-> >> it will assert.
-> >> qemu-kvm: hw/acpi/bios-linker-loader.c:214: bios_linker_loader_add_checksum:
-> >> Assertion `start_offset < file->blob->len' failed.`
-> >>
-> >> Signed-off-by: Shannon Zhao <zhaoshenglong@huawei.com>
-> >> ---
-> >>  hw/arm/virt-acpi-build.c | 18 +++++++++++-------
-> >>  1 file changed, 11 insertions(+), 7 deletions(-)
-> >>
-> >> diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
-> >> index 3d78ff6..5901142 100644
-> >> --- a/hw/arm/virt-acpi-build.c
-> >> +++ b/hw/arm/virt-acpi-build.c
-> >> @@ -453,6 +453,7 @@ build_spcr(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
-> >>      AcpiSerialPortConsoleRedirection *spcr;
-> >>      const MemMapEntry *uart_memmap = &vms->memmap[VIRT_UART];
-> >>      int irq = vms->irqmap[VIRT_UART] + ARM_SPI_BASE;
-> >> +    int spcr_start = table_data->len;
-> >>  
-> >>      spcr = acpi_data_push(table_data, sizeof(*spcr));
-> >>  
-> >> @@ -476,8 +477,8 @@ build_spcr(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
-> >>      spcr->pci_device_id = 0xffff;  /* PCI Device ID: not a PCI device */
-> >>      spcr->pci_vendor_id = 0xffff;  /* PCI Vendor ID: not a PCI device */
-> >>  
-> >> -    build_header(linker, table_data, (void *)spcr, "SPCR", sizeof(*spcr), 2,
-> >> -                 NULL, NULL);
-> >> +    build_header(linker, table_data, (void *)(table_data->data + spcr_start),
-> >> +                 "SPCR", table_data->len - spcr_start, 2, NULL, NULL);
-> >>  }
-> > 
-> > We don't need to change build_spcr(), as acpi_data_push() is only called
-> > once, so spcr == new table_data->data + old table_data->len and new
-> > table_data->len - spcr == sizeof(*spcr) (the size used in the only
-> > acpi_data_push() call)
-> > 
-> >>  
-> >>  static void
-> >> @@ -512,8 +513,8 @@ build_srat(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
-> >>          mem_base += numa_info[i].node_mem;
-> >>      }
-> >>  
-> >> -    build_header(linker, table_data, (void *)srat, "SRAT",
-> >> -                 table_data->len - srat_start, 3, NULL, NULL);
-> >> +    build_header(linker, table_data, (void *)(table_data->data + srat_start),
-> >> +                 "SRAT", table_data->len - srat_start, 3, NULL, NULL);
-> > 
-> > Yes, we need this fix, as there are many acpi_data_push() calls in this
-> > function. I guess this was the table that triggered the assert.
-> > 
-> >>  }
-> >>  
-> >>  static void
-> >> @@ -522,6 +523,7 @@ build_mcfg(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
-> >>      AcpiTableMcfg *mcfg;
-> >>      const MemMapEntry *memmap = vms->memmap;
-> >>      int len = sizeof(*mcfg) + sizeof(mcfg->allocation[0]);
-> >> +    int mcfg_start = table_data->len;
-> >>  
-> >>      mcfg = acpi_data_push(table_data, len);
-> >>      mcfg->allocation[0].address = cpu_to_le64(memmap[VIRT_PCIE_ECAM].base);
-> >> @@ -532,7 +534,8 @@ build_mcfg(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
-> >>      mcfg->allocation[0].end_bus_number = (memmap[VIRT_PCIE_ECAM].size
-> >>                                            / PCIE_MMCFG_SIZE_MIN) - 1;
-> >>  
-> >> -    build_header(linker, table_data, (void *)mcfg, "MCFG", len, 1, NULL, NULL);
-> >> +    build_header(linker, table_data, (void *)(table_data->data + mcfg_start),
-> >> +                 "MCFG", len, 1, NULL, NULL);
-> >>  }
-> > 
-> > No need to change this one.
-> > 
-> >>  
-> >>  /* GTDT */
-> >> @@ -651,6 +654,7 @@ build_madt(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
-> >>  static void build_fadt(GArray *table_data, BIOSLinker *linker,
-> >>                         VirtMachineState *vms, unsigned dsdt_tbl_offset)
-> >>  {
-> >> +    int fadt_start = table_data->len;
-> >>      AcpiFadtDescriptorRev5_1 *fadt = acpi_data_push(table_data, sizeof(*fadt));
-> >>      unsigned xdsdt_entry_offset = (char *)&fadt->x_dsdt - table_data->data;
-> >>      uint16_t bootflags;
-> >> @@ -681,8 +685,8 @@ static void build_fadt(GArray *table_data, BIOSLinker *linker,
-> >>          ACPI_BUILD_TABLE_FILE, xdsdt_entry_offset, sizeof(fadt->x_dsdt),
-> >>          ACPI_BUILD_TABLE_FILE, dsdt_tbl_offset);
-> >>  
-> >> -    build_header(linker, table_data,
-> >> -                 (void *)fadt, "FACP", sizeof(*fadt), 5, NULL, NULL);
-> >> +    build_header(linker, table_data, (void *)(table_data->data + fadt_start),
-> >> +                 "FACP", table_data->len - fadt_start, 5, NULL, NULL);
-> >>  }
-> > 
-> > No need to change this one either.
-> > 
-> >>  
-> >>  /* DSDT */
-> >> -- 
-> >> 2.0.4
-> >>
-> >>
-> > 
-> > Please respin only changing the one that needs the fix.
-> > 
-> Hi Andrew,
-> 
-> Thanks for your comments. What you said is right that only the
-> build_srat needs to be fixed but I thought we need to unify the style
-> and avoid new issues if add some acpi_data_push in other functions in
-> the future.
+> If 2) doesn't happen, then 1) happens. It will continue to try to 
+> inflate round by round. But the memory allocation won't succeed, so 
+> there will be no pages to inflate to the host. That is, the inflating is 
+> simply a code path to the msleep(200) as long as the guest is under 
+> memory pressure.
 
-Our style is unified with the x86 style which doesn't bother with the
-_start offsets when only one push is used. I agree it's a bit error
-prone, though, so I won't insist on not changing the ones that don't
-need it. However if you choose to keep them, then I think the commit
-message should be updated to explain that only SRAT needs the change,
-and the other changes are for future-proofing and pattern consistency.
+No. See http://lkml.kernel.org/r/201710181959.ACI05296.JLMVQOOFtHSOFF@I-love.SAKURA.ne.jp .
+Did you try how unlikely 2) occurs if once 1) started?
 
-Thanks,
-drew
+> 
+> Back to our code change, it doesn't result in incorrect behavior as 
+> explained above.
+
+The guest will be effectively unusable due to spam.
+
+> 
+> >> I think what we are doing is a quite sensible behavior, except a small
+> >> change I plan to make:
+> >>
+> >>           while ((page = balloon_page_pop(&pages))) {
+> >> -               balloon_page_enqueue(&vb->vb_dev_info, page);
+> >>                   if (use_sg) {
+> >>                           if (xb_set_page(vb, page, &pfn_min, &pfn_max) <
+> >> 0) {
+> >>                                   __free_page(page);
+> >>                                   continue;
+> >>                           }
+> >>                   } else {
+> >>                           set_page_pfns(vb, vb->pfns + vb->num_pfns, page);
+> >>                   }
+> >> +             balloon_page_enqueue(&vb->vb_dev_info, page);
+> >>
+> >>> Also, as of Linux 4.15, only up to VIRTIO_BALLOON_ARRAY_PFNS_MAX pages (i.e.
+> >>> 1MB) are invisible from deflate request. That amount would be an acceptable
+> >>> error. But your patch makes more pages being invisible, for pages allocated
+> >>> by balloon_page_alloc() without holding balloon_lock are stored into a local
+> >>> variable "LIST_HEAD(pages)" (which means that balloon_page_dequeue() with
+> >>> balloon_lock held won't be able to find pages not yet queued by
+> >>> balloon_page_enqueue()), doesn't it? What if all memory pages were held in
+> >>> "LIST_HEAD(pages)" and balloon_page_dequeue() was called before
+> >>> balloon_page_enqueue() is called?
+> >>>
+> >> If we think of the balloon driver just as a regular driver or
+> >> application, that will be a pretty nature thing. A regular driver can
+> >> eat a huge amount of memory for its own usages, would this amount of
+> >> memory be treated as an error as they are invisible to the
+> >> balloon_page_enqueue?
+> >>
+> > No. Memory used by applications which consumed a lot of memory in their
+> > mm_struct is reclaimed by the OOM killer/reaper. Drivers try to avoid
+> > allocating more memory than they need. If drivers allocate more memory
+> > than they need, they have a hook for releasing unused memory (i.e.
+> > register_shrinker() or OOM notifier). What I'm saying here is that
+> > the hook for releasing unused memory does not work unless memory held in
+> > LIST_HEAD(pages) becomes visible to balloon_page_dequeue().
+> >
+> > If a system has 128GB of memory, and 127GB of memory was stored into
+> > LIST_HEAD(pages) upon first fill_balloon() request, and somebody held
+> > balloon_lock from OOM notifier path from out_of_memory() before
+> > fill_balloon() holds balloon_lock, leak_balloon_sg_oom() finds that
+> > no memory can be freed because balloon_page_enqueue() was never called,
+> > and allows the caller of out_of_memory() to invoke the OOM killer despite
+> > there is 127GB of memory which can be freed if fill_balloon() was able
+> > to hold balloon_lock before leak_balloon_sg_oom() holds balloon_lock.
+> > I don't think that that amount is an acceptable error.
+> 
+> I understand you are worried that OOM couldn't get balloon pages while 
+> there are some in the local list. This is a debatable issue, and it may 
+> lead to a long discussion. If this is considered to be a big issue, we 
+> can make the local list to be global in vb, and accessed by oom 
+> notifier, this won't affect this patch, and can be achieved with an 
+> add-on patch. How about leaving this discussion as a second step outside 
+> this series?
+
+No. This is a big issue. Even changing balloon_page_alloc() to exclude
+__GFP_DIRECT_RECLAIM might be the better, for we don't want to try so hard.
+Reclaiming all reclaimable memory results in hitting OOM notifier path which
+after all releases memory reclaimed by a lot of effort. Though I don't know whether
+  (GFP_HIGHUSER[_MOVABLE] | __GFP_NOMEMALLOC | __GFP_NORETRY | __GFP_NOWARN) & ~__GFP_DIRECT_RECLAIM
+has undesirable side effect.
+
+>              Balloon has something more that can be improved, and this 
+> patch series is already big.
+
+The reason this patch series becomes big is that you are doing a lot of
+changes in this series. This series is too optimistic about worst/corner
+cases and difficult for me to check. Please always consider the worst case,
+and write patches in a way that can survive the worst case.
+
+Please compose this series with patch 1/2 for xbitmap and patch 2/2 for
+VIRTIO_BALLOON_F_SG. Nothing more to append. Of course, after we came to
+an agreement about whether virtio_balloon should use preload. (We are
+waiting for response from Matthew Wilcox, aren't we?) Also, adding some
+cond_resched() might be needed. Also, comparing (maybe benchmarking)
+Matthew's radix tree implementation and my B+ tree implementation is
+another TODO thing before merging this series.
