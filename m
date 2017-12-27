@@ -1,34 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49690)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53922)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eUFva-0004fa-8n
-	for qemu-devel@nongnu.org; Wed, 27 Dec 2017 12:55:43 -0500
+	(envelope-from <davem@davemloft.net>) id 1eUJUw-0007tB-Iu
+	for qemu-devel@nongnu.org; Wed, 27 Dec 2017 16:44:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eUFvX-00031n-4R
-	for qemu-devel@nongnu.org; Wed, 27 Dec 2017 12:55:42 -0500
-Received: from indium.canonical.com ([91.189.90.7]:39746)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1eUFvW-0002zU-Tb
-	for qemu-devel@nongnu.org; Wed, 27 Dec 2017 12:55:39 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1eUFvU-0001K5-DQ
-	for <qemu-devel@nongnu.org>; Wed, 27 Dec 2017 17:55:36 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 639BA2E80C7
-	for <qemu-devel@nongnu.org>; Wed, 27 Dec 2017 17:55:36 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 27 Dec 2017 17:48:48 -0000
-From: Michal Nowak <mnowak@startmail.com>
-Reply-To: Bug 1738283 <1738283@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <151328724563.26325.11755910452939969450.malonedeb@wampee.canonical.com>
-Message-Id: <151439692880.26125.9637733122997213757.malone@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1738283] Re: 'Less than' (<), 'more than' (>),
- and 'pipe' (|) can't be typed via VNC
+	(envelope-from <davem@davemloft.net>) id 1eUJUf-0002Nq-Kj
+	for qemu-devel@nongnu.org; Wed, 27 Dec 2017 16:44:25 -0500
+Received: from shards.monkeyblade.net ([184.105.139.130]:40588)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <davem@davemloft.net>) id 1eUJUE-0001xv-8q
+	for qemu-devel@nongnu.org; Wed, 27 Dec 2017 16:44:08 -0500
+Date: Wed, 27 Dec 2017 16:43:34 -0500 (EST)
+Message-Id: <20171227.164334.2079471466039224265.davem@davemloft.net>
+From: David Miller <davem@davemloft.net>
+In-Reply-To: <44da522ecee60792ec918234ee4d61a84e4574f0.1513974243.git.jbaron@akamai.com>
+References: <1513979641-7999-1-git-send-email-jbaron@akamai.com>
+	<cover.1513974243.git.jbaron@akamai.com>
+	<44da522ecee60792ec918234ee4d61a84e4574f0.1513974243.git.jbaron@akamai.com>
+Mime-Version: 1.0
+Content-Type: Text/Plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH net-next v2 1/3] virtio_net: propagate
+ linkspeed/duplex settings from the hypervisor
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,47 +29,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: jbaron@akamai.com
+Cc: netdev@vger.kernel.org, virtualization@lists.linux-foundation.org, qemu-devel@nongnu.org, mst@redhat.com, jasowang@redhat.com
 
-I found Adam's patch from Fedora Rawhide
-(https://src.fedoraproject.org/rpms/qemu/c/f81be8f0261cce74799f946e99f23d57=
-f8db7e17?branch=3Dmaster)
-when applied to openSUSE's 2.11.0 QEMU effective in openQA as well as
-manually with vncviewer.
+From: Jason Baron <jbaron@akamai.com>
+Date: Fri, 22 Dec 2017 16:54:01 -0500
 
--- =
+> The ability to set speed and duplex for virtio_net in useful in various
+> scenarios as described here:
+> 
+> 16032be virtio_net: add ethtool support for set and get of settings
+> 
+> However, it would be nice to be able to set this from the hypervisor,
+> such that virtio_net doesn't require custom guest ethtool commands.
+> 
+> Introduce a new feature flag, VIRTIO_NET_F_SPEED_DUPLEX, which allows
+> the hypervisor to export a linkspeed and duplex setting. The user can
+> subsequently overwrite it later if desired via: 'ethtool -s'.
+> 
+> Signed-off-by: Jason Baron <jbaron@akamai.com>
+> Cc: "Michael S. Tsirkin" <mst@redhat.com>
+> Cc: Jason Wang <jasowang@redhat.com>
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1738283
+Looks mostly fine to me but need some virtio_net reviewers on this one.
 
-Title:
-  'Less than' (<), 'more than' (>), and 'pipe' (|) can't be typed via
-  VNC
+> @@ -57,6 +57,8 @@
+>  					 * Steering */
+>  #define VIRTIO_NET_F_CTRL_MAC_ADDR 23	/* Set MAC address */
+>  
+> +#define VIRTIO_NET_F_SPEED_DUPLEX 63	/* Host set linkspeed and duplex */
+> +
 
-Status in QEMU:
-  New
+Why use a value so far away from the largest existing one?
 
-Bug description:
-  If I start QEMU 2.11 (from
-  https://build.opensuse.org/package/show/Virtualization/qemu) VM with
-  VNC, I am unable to type following three characters: 'less than' (<),
-  'more than' (>), and 'pipe' (|) on en_US QWERTY keyboard. Other
-  characters work fine. QEMu version 2.10.1 worked fine.
-
-  /usr/bin/qemu-kvm -m 2048 -cpu kvm64 -drive
-  media=3Dcdrom,if=3Dnone,id=3Dcd0,format=3Draw,file=3DOI-hipster-
-  minimal-20171031.iso -device ide-cd,drive=3Dcd0 -boot once=3Dd,menu=3Don
-  ,splash-time=3D5000 -device usb-ehci -device usb-tablet -smp 1 -enable-
-  kvm -vnc :91,share=3Dforce-shared
-
-  The ISO can be downloaded here: https://www.openindiana.org/download/
-
-  Also tried Fedora-Server-dvd-x86_64-25-1.3.iso and it's the same
-  situation.
-
-  If I run the same command without '-vnc :91,share=3Dforce-shared',
-  everything works just fine.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1738283/+subscriptions
+Just curious.
