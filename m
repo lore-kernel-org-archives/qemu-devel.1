@@ -1,25 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53682)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37711)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1eUBk0-0001rw-25
-	for qemu-devel@nongnu.org; Wed, 27 Dec 2017 08:27:37 -0500
+	(envelope-from <bounces@canonical.com>) id 1eU59s-0003FS-I1
+	for qemu-devel@nongnu.org; Wed, 27 Dec 2017 01:25:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1eUBjs-000136-HT
-	for qemu-devel@nongnu.org; Wed, 27 Dec 2017 08:27:27 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:58524)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1eUBjs-000101-6y
-	for qemu-devel@nongnu.org; Wed, 27 Dec 2017 08:27:20 -0500
-Date: Wed, 27 Dec 2017 14:27:07 +0100
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20171227142707.50888166@igors-macbook-pro.local>
-In-Reply-To: <20171218201340.27583-8-dgilbert@redhat.com>
-References: <20171218201340.27583-1-dgilbert@redhat.com>
-	<20171218201340.27583-8-dgilbert@redhat.com>
+	(envelope-from <bounces@canonical.com>) id 1eU59o-0005Yl-Hy
+	for qemu-devel@nongnu.org; Wed, 27 Dec 2017 01:25:44 -0500
+Received: from indium.canonical.com ([91.189.90.7]:49788)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1eU59o-0005Wf-Bx
+	for qemu-devel@nongnu.org; Wed, 27 Dec 2017 01:25:40 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1eU59n-0008Af-Do
+	for <qemu-devel@nongnu.org>; Wed, 27 Dec 2017 06:25:39 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 602582E8050
+	for <qemu-devel@nongnu.org>; Wed, 27 Dec 2017 06:25:39 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v5 7/7] vhost: Merge and delete unused
- callbacks
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 27 Dec 2017 06:18:45 -0000
+From: LukeShu <lukeshu@sbcglobal.net>
+Reply-To: Bug 1740219 <1740219@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <151435405424.26166.7757673860586517511.malonedeb@gac.canonical.com>
+Message-Id: <151435552559.23918.6033377001432341545.malone@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1740219] Re: static linux-user emulation has
+ several-second startup time
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,82 +37,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Cc: qemu-devel@nongnu.org, pbonzini@redhat.com, maxime.coquelin@redhat.com, mst@redhat.com, groug@kaod.org
+To: qemu-devel@nongnu.org
 
-On Mon, 18 Dec 2017 20:13:40 +0000
-"Dr. David Alan Gilbert (git)" <dgilbert@redhat.com> wrote:
+Actually, it seems that the `[base+0xffff0000,
+base+0xffff0000+page_size]` segment is only mapped on 32-bit ARM.  So
+this is 32-bit ARM-specific.
 
-> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-> 
-> Now that the olf vhost_set_memory code is gone, the _nop and _add
-> callbacks are identical and can be merged.  The _del callback is
-> no longer needed.
-> 
-> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-With style nit fixed
+** Tags added: arm linux-user
 
-Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+** Summary changed:
 
-> ---
->  hw/virtio/vhost.c | 31 ++++---------------------------
->  1 file changed, 4 insertions(+), 27 deletions(-)
-> 
-> diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
-> index 358ceb3033..4eaa4f889f 100644
-> --- a/hw/virtio/vhost.c
-> +++ b/hw/virtio/vhost.c
-> @@ -555,7 +555,8 @@ static void vhost_region_add_section(struct vhost_dev *dev,
->      }
->  }
->  
-> -static void vhost_region_add(MemoryListener *listener,
-> +/* Used for both add and nop callbacks */
-> +static void vhost_region_addnop(MemoryListener *listener,
->                               MemoryRegionSection *section)
-argument alignment should on '('
+- static linux-user emulation has several-second startup time
++ static linux-user ARM emulation has several-second startup time
 
->  {
->      struct vhost_dev *dev = container_of(listener, struct vhost_dev,
-> @@ -567,29 +568,6 @@ static void vhost_region_add(MemoryListener *listener,
->      vhost_region_add_section(dev, section);
->  }
->  
-> -/* Called on regions that have not changed */
-> -static void vhost_region_nop(MemoryListener *listener,
-> -                             MemoryRegionSection *section)
-> -{
-> -    struct vhost_dev *dev = container_of(listener, struct vhost_dev,
-> -                                         memory_listener);
-> -
-> -    if (!vhost_section(section)) {
-> -        return;
-> -    }
-> -
-> -    vhost_region_add_section(dev, section);
-> -}
-> -
-> -static void vhost_region_del(MemoryListener *listener,
-> -                             MemoryRegionSection *section)
-> -{
-> -    if (!vhost_section(section)) {
-> -        return;
-> -    }
-> -
-> -}
-> -
->  static void vhost_iommu_unmap_notify(IOMMUNotifier *n, IOMMUTLBEntry *iotlb)
->  {
->      struct vhost_iommu *iommu = container_of(n, struct vhost_iommu, n);
-> @@ -1158,9 +1136,8 @@ int vhost_dev_init(struct vhost_dev *hdev, void *opaque,
->      hdev->memory_listener = (MemoryListener) {
->          .begin = vhost_begin,
->          .commit = vhost_commit,
-> -        .region_add = vhost_region_add,
-> -        .region_del = vhost_region_del,
-> -        .region_nop = vhost_region_nop,
-> +        .region_add = vhost_region_addnop,
-> +        .region_nop = vhost_region_addnop,
->          .log_start = vhost_log_start,
->          .log_stop = vhost_log_stop,
->          .log_sync = vhost_log_sync,
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1740219
+
+Title:
+  static linux-user ARM emulation has several-second startup time
+
+Status in QEMU:
+  New
+
+Bug description:
+  static linux-user emulation has several-second startup time
+
+  My problem: I'm a Parabola packager, and I'm updating our
+  qemu-user-static package from 2.8 to 2.11.  With my new
+  statically-linked 2.11, running `qemu-arm /my/arm-chroot/bin/true`
+  went from taking 0.006s to 3s!  This does not happen with the normal
+  dynamically linked 2.11, or the old static 2.8.
+
+  What happens is it gets stuck in
+  `linux-user/elfload.c:init_guest_space()`.  What `init_guest_space`
+  does is map 2 parts of the address space: `[base, base+guest_size]`
+  and `[base+0xffff0000, base+0xffff0000+page_size]`; where it must find
+  an acceptable `base`.  Its strategy is to `mmap(NULL, guest_size,
+  ...)` decide where the first range is, and then check if that
+  +0xffff0000 is also available.  If it isn't, then it starts trying
+  `mmap(base, ...)` for the entire address space from low-address to
+  high-address.
+
+  "Normally," it finds an accaptable `base` within the first 2 tries.
+  With a static 2.11, it's taking thousands of tries.
+
+  ----
+
+  Now, from my understanding, there are 2 factors working together to
+  cause that in static 2.11 but not the other builds:
+
+   - 2.11 increased the default `guest_size` from 0xf7000000 to 0xffff0000
+   - PIE (and thus ASLR) is disabled for static builds
+
+  For some reason that I don't understand, with the smaller
+  `guest_size` the initial `mmap(NULL, guest_size, ...)` usually
+  returns an acceptable address range; but larger `guest_size` makes it
+  consistently return a block of memory that butts right up against
+  another already mapped chunk of memory.  This isn't just true on the
+  older builds, it's true with the 2.11 builds if I use the `-R` flag to
+  shrink the `guest_size` back down to 0xf7000000.  That is with
+  linux-hardened 4.13.13 on x86-64.
+
+  So then, it it falls back to crawling the entire address space; so it
+  tries base=3D0x00001000.  With ASLR, that probably succeeds.  But with
+  ASLR being disabled on static builds, the text segment is at
+  0x60000000; which is does not leave room for the needed
+  0xffff1000-size block before it.  So then it tries base=3D0x00002000.
+  And so on, more than 6000 times until it finally gets to and passes
+  the text segment; calling mmap more than 12000 times.
+
+  ----
+
+  I'm not sure what the fix is.  Perhaps try to mmap a continuous chunk
+  of size 0xffff1000, then munmap it and then mmap the 2 chunks that we
+  actually need.  The disadvantage to that is that it does not support
+  the sparse address space that the current algorithm supports for
+  `guest_size < 0xffff0000`.  If `guest_size < 0xffff0000` *and* the big
+  mmap fails, then it could fall back to a sparse search; though I'm not
+  sure the current algorithm is a good choice for it, as we see in this
+  bug.  Perhaps it should inspect /proc/self/maps to try to find a
+  suitable range before ever calling mmap?
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1740219/+subscriptions
