@@ -1,21 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42199)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52653)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1eUAKC-00050W-JW
-	for qemu-devel@nongnu.org; Wed, 27 Dec 2017 06:56:46 -0500
+	(envelope-from <imammedo@redhat.com>) id 1eUAYB-0000eX-8F
+	for qemu-devel@nongnu.org; Wed, 27 Dec 2017 07:11:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1eUAK8-0004c5-F7
-	for qemu-devel@nongnu.org; Wed, 27 Dec 2017 06:56:44 -0500
-Date: Wed, 27 Dec 2017 12:56:27 +0100
+	(envelope-from <imammedo@redhat.com>) id 1eUAY7-0003bB-TU
+	for qemu-devel@nongnu.org; Wed, 27 Dec 2017 07:11:11 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:51050)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1eUAY7-0003aW-KE
+	for qemu-devel@nongnu.org; Wed, 27 Dec 2017 07:11:07 -0500
+Date: Wed, 27 Dec 2017 13:10:54 +0100
 From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20171227125627.5c3affd1@igors-macbook-pro.local>
-In-Reply-To: <20171218201340.27583-2-dgilbert@redhat.com>
-References: <20171218201340.27583-1-dgilbert@redhat.com>
-	<20171218201340.27583-2-dgilbert@redhat.com>
+Message-ID: <20171227131054.7601e26f@igors-macbook-pro.local>
+In-Reply-To: <20171214152010.GA4380@work-vm>
+References: <20171213180807.7066-1-dgilbert@redhat.com>
+	<20171213180807.7066-2-dgilbert@redhat.com>
+	<20171214153028.25c12b0e@redhat.com>
+	<20171214152010.GA4380@work-vm>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v5 1/7] vhost: Build temporary section list
- and deref after commit
+Subject: Re: [Qemu-devel] [PATCH v4 1/6] vhost: Move log_dirty check
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,183 +29,116 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Cc: qemu-devel@nongnu.org, pbonzini@redhat.com, maxime.coquelin@redhat.com, mst@redhat.com, groug@kaod.org, qemu-stable@nongnu.org
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: qemu-devel@nongnu.org, pbonzini@redhat.com, maxime.coquelin@redhat.com, mst@redhat.com, groug@kaod.org
 
-On Mon, 18 Dec 2017 20:13:34 +0000
-"Dr. David Alan Gilbert (git)" <dgilbert@redhat.com> wrote:
+On Thu, 14 Dec 2017 15:20:10 +0000
+"Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
 
-> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+> * Igor Mammedov (imammedo@redhat.com) wrote:
+> > On Wed, 13 Dec 2017 18:08:02 +0000
+> > "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com> wrote:
+> > 
+> > > From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+> > > 
+> > > Move the log_dirty check into vhost_section.
+> > > 
+> > > Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> > > ---
+> > >  hw/virtio/trace-events |  3 +++
+> > >  hw/virtio/vhost.c      | 20 +++++++++++++-------
+> > >  2 files changed, 16 insertions(+), 7 deletions(-)
+> > > 
+> > > diff --git a/hw/virtio/trace-events b/hw/virtio/trace-events
+> > > index 775461ae98..4a493bcd46 100644
+> > > --- a/hw/virtio/trace-events
+> > > +++ b/hw/virtio/trace-events
+> > > @@ -1,5 +1,8 @@
+> > >  # See docs/devel/tracing.txt for syntax documentation.
+> > >  
+> > > +# hw/virtio/vhost.c
+> > > +vhost_section(const char *name, int r) "%s:%d"
+> > > +
+> > >  # hw/virtio/virtio.c
+> > >  virtqueue_alloc_element(void *elem, size_t sz, unsigned in_num, unsigned out_num) "elem %p size %zd in_num %u out_num %u"
+> > >  virtqueue_fill(void *vq, const void *elem, unsigned int len, unsigned int idx) "vq %p elem %p len %u idx %u"
+> > > diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
+> > > index e4290ce93d..e923219e63 100644
+> > > --- a/hw/virtio/vhost.c
+> > > +++ b/hw/virtio/vhost.c
+> > > @@ -27,6 +27,7 @@
+> > >  #include "hw/virtio/virtio-access.h"
+> > >  #include "migration/blocker.h"
+> > >  #include "sysemu/dma.h"
+> > > +#include "trace.h"
+> > >  
+> > >  /* enabled until disconnected backend stabilizes */
+> > >  #define _VHOST_DEBUG 1
+> > > @@ -567,18 +568,12 @@ static void vhost_set_memory(MemoryListener *listener,
+> > >                                           memory_listener);
+> > >      hwaddr start_addr = section->offset_within_address_space;
+> > >      ram_addr_t size = int128_get64(section->size);
+> > > -    bool log_dirty =
+> > > -        memory_region_get_dirty_log_mask(section->mr) & ~(1 << DIRTY_MEMORY_MIGRATION);
+> > >      int s = offsetof(struct vhost_memory, regions) +
+> > >          (dev->mem->nregions + 1) * sizeof dev->mem->regions[0];
+> > >      void *ram;
+> > >  
+> > >      dev->mem = g_realloc(dev->mem, s);
+> > >  
+> > > -    if (log_dirty) {
+> > > -        add = false;
+> > > -    }
+> > > -
+> > >      assert(size);
+> > >  
+> > >      /* Optimize no-change case. At least cirrus_vga does this a lot at this time. */
+> > > @@ -611,8 +606,19 @@ static void vhost_set_memory(MemoryListener *listener,
+> > >  
+> > >  static bool vhost_section(MemoryRegionSection *section)
+> > >  {
+> > > -    return memory_region_is_ram(section->mr) &&
+> > > +    bool result;
+> > > +    bool log_dirty = memory_region_get_dirty_log_mask(section->mr) &
+> > > +                     ~(1 << DIRTY_MEMORY_MIGRATION);
+> > > +    result = memory_region_is_ram(section->mr) &&
+> > >          !memory_region_is_rom(section->mr);
+> > > +
+> > > +    /* Vhost doesn't handle any block which is doing dirty-tracking other
+> > > +     * than migration; this typically fires on VGA areas.
+> > > +     */
+> > > +    result &= !log_dirty;
+> > before patch even if log_dirty, vhost_set_memory will still proceed
+> > and may remove dirty section from memmap and set memory_changed = true
+> > 
+> > but with this patch it will just ignore such section,
+> > I'm not sure it's right (it might be right with new approach add/nop
+> > but then this patch should go after new code in place and old one
+> > if gone).
 > 
-> Igor spotted that there's a race, where a region that's unref'd
-> in a _del callback might be free'd before the set_mem_table call in
-> the _commit callback, and thus the vhost might end up using free memory.
-> 
-> Fix this by building a complete temporary sections list, ref'ing every
-> section (during add and nop) and then unref'ing the whole list right
-> at the end of commit.
-> 
-> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> I thought about that, but then I came to the conclusion that the whole
+> idea is that we're supposed to be ignoring these regions - so why
+> should they cause any change to the behaviour of vhost at all?
+> Thus this way seems safer.
+the thing is that with originally with old code backend will use memap
+with not yet dirty region, then after region becomes dirty current code
+will REMOVE dirty region from map and NOTIFY backend.
 
-As Michael've suggested it should go into stable (CCed)
+While this patch is fine for new approach as memmap is build from scratch,
+it doesn't look correct for current code since region that just became
+dirty will not be removed from memap and might be used backend.
+Whether it would really break something or not I'm not sure,
+maybe Michael may Ack this patch ii using dirty region is fine.
 
-Reviewed-by: Igor Mammedov <imammedo@redhat.com>
-
-> ---
->  hw/virtio/vhost.c         | 73 ++++++++++++++++++++++++++++++-----------------
->  include/hw/virtio/vhost.h |  2 ++
->  2 files changed, 49 insertions(+), 26 deletions(-)
 > 
-> diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
-> index e4290ce93d..610bfe6945 100644
-> --- a/hw/virtio/vhost.c
-> +++ b/hw/virtio/vhost.c
-> @@ -621,6 +621,8 @@ static void vhost_begin(MemoryListener *listener)
->                                           memory_listener);
->      dev->mem_changed_end_addr = 0;
->      dev->mem_changed_start_addr = -1;
-> +    dev->tmp_sections = NULL;
-> +    dev->n_tmp_sections = 0;
->  }
->  
->  static void vhost_commit(MemoryListener *listener)
-> @@ -629,17 +631,25 @@ static void vhost_commit(MemoryListener *listener)
->                                           memory_listener);
->      hwaddr start_addr = 0;
->      ram_addr_t size = 0;
-> +    MemoryRegionSection *old_sections;
-> +    int n_old_sections;
-> +
->      uint64_t log_size;
->      int r;
->  
-> +    old_sections = dev->mem_sections;
-> +    n_old_sections = dev->n_mem_sections;
-> +    dev->mem_sections = dev->tmp_sections;
-> +    dev->n_mem_sections = dev->n_tmp_sections;
-> +
->      if (!dev->memory_changed) {
-> -        return;
-> +        goto out;
->      }
->      if (!dev->started) {
-> -        return;
-> +        goto out;
->      }
->      if (dev->mem_changed_start_addr > dev->mem_changed_end_addr) {
-> -        return;
-> +        goto out;
->      }
->  
->      if (dev->started) {
-> @@ -656,7 +666,7 @@ static void vhost_commit(MemoryListener *listener)
->              VHOST_OPS_DEBUG("vhost_set_mem_table failed");
->          }
->          dev->memory_changed = false;
-> -        return;
-> +        goto out;
->      }
->      log_size = vhost_get_log_size(dev);
->      /* We allocate an extra 4K bytes to log,
-> @@ -675,6 +685,27 @@ static void vhost_commit(MemoryListener *listener)
->          vhost_dev_log_resize(dev, log_size);
->      }
->      dev->memory_changed = false;
-> +
-> +out:
-> +    /* Deref the old list of sections, this must happen _after_ the
-> +     * vhost_set_mem_table to ensure the client isn't still using the
-> +     * section we're about to unref.
-> +     */
-> +    while (n_old_sections--) {
-> +        memory_region_unref(old_sections[n_old_sections].mr);
-> +    }
-> +    g_free(old_sections);
-> +    return;
-> +}
-> +
-> +static void vhost_add_section(struct vhost_dev *dev,
-> +                              MemoryRegionSection *section)
-> +{
-> +    ++dev->n_tmp_sections;
-> +    dev->tmp_sections = g_renew(MemoryRegionSection, dev->tmp_sections,
-> +                                dev->n_tmp_sections);
-> +    dev->tmp_sections[dev->n_tmp_sections - 1] = *section;
-> +    memory_region_ref(section->mr);
->  }
->  
->  static void vhost_region_add(MemoryListener *listener,
-> @@ -687,36 +718,31 @@ static void vhost_region_add(MemoryListener *listener,
->          return;
->      }
->  
-> -    ++dev->n_mem_sections;
-> -    dev->mem_sections = g_renew(MemoryRegionSection, dev->mem_sections,
-> -                                dev->n_mem_sections);
-> -    dev->mem_sections[dev->n_mem_sections - 1] = *section;
-> -    memory_region_ref(section->mr);
-> +    vhost_add_section(dev, section);
->      vhost_set_memory(listener, section, true);
->  }
->  
-> -static void vhost_region_del(MemoryListener *listener,
-> +static void vhost_region_nop(MemoryListener *listener,
->                               MemoryRegionSection *section)
->  {
->      struct vhost_dev *dev = container_of(listener, struct vhost_dev,
->                                           memory_listener);
-> -    int i;
->  
->      if (!vhost_section(section)) {
->          return;
->      }
->  
-> -    vhost_set_memory(listener, section, false);
-> -    memory_region_unref(section->mr);
-> -    for (i = 0; i < dev->n_mem_sections; ++i) {
-> -        if (dev->mem_sections[i].offset_within_address_space
-> -            == section->offset_within_address_space) {
-> -            --dev->n_mem_sections;
-> -            memmove(&dev->mem_sections[i], &dev->mem_sections[i+1],
-> -                    (dev->n_mem_sections - i) * sizeof(*dev->mem_sections));
-> -            break;
-> -        }
-> +    vhost_add_section(dev, section);
-> +}
-> +
-> +static void vhost_region_del(MemoryListener *listener,
-> +                             MemoryRegionSection *section)
-> +{
-> +    if (!vhost_section(section)) {
-> +        return;
->      }
-> +
-> +    vhost_set_memory(listener, section, false);
->  }
->  
->  static void vhost_iommu_unmap_notify(IOMMUNotifier *n, IOMMUTLBEntry *iotlb)
-> @@ -783,11 +809,6 @@ static void vhost_iommu_region_del(MemoryListener *listener,
->      }
->  }
->  
-> -static void vhost_region_nop(MemoryListener *listener,
-> -                             MemoryRegionSection *section)
-> -{
-> -}
-> -
->  static int vhost_virtqueue_set_addr(struct vhost_dev *dev,
->                                      struct vhost_virtqueue *vq,
->                                      unsigned idx, bool enable_log)
-> diff --git a/include/hw/virtio/vhost.h b/include/hw/virtio/vhost.h
-> index 467dc7794b..21f3022499 100644
-> --- a/include/hw/virtio/vhost.h
-> +++ b/include/hw/virtio/vhost.h
-> @@ -54,6 +54,8 @@ struct vhost_dev {
->      struct vhost_memory *mem;
->      int n_mem_sections;
->      MemoryRegionSection *mem_sections;
-> +    int n_tmp_sections;
-> +    MemoryRegionSection *tmp_sections;
->      struct vhost_virtqueue *vqs;
->      int nvqs;
->      /* the first virtqueue which would be used by this vhost dev */
+> Dave
+> 
+> > > +
+> > > +    trace_vhost_section(section->mr->name, result);
+> > > +    return result;
+> > >  }
+> > >  
+> > >  static void vhost_begin(MemoryListener *listener)
+> > 
+> --
+> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
