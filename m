@@ -1,26 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53922)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57845)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <davem@davemloft.net>) id 1eUJUw-0007tB-Iu
-	for qemu-devel@nongnu.org; Wed, 27 Dec 2017 16:44:54 -0500
+	(envelope-from <vase@selfip.ru>) id 1eUJXO-0000go-E0
+	for qemu-devel@nongnu.org; Wed, 27 Dec 2017 16:46:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <davem@davemloft.net>) id 1eUJUf-0002Nq-Kj
-	for qemu-devel@nongnu.org; Wed, 27 Dec 2017 16:44:25 -0500
-Received: from shards.monkeyblade.net ([184.105.139.130]:40588)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <davem@davemloft.net>) id 1eUJUE-0001xv-8q
-	for qemu-devel@nongnu.org; Wed, 27 Dec 2017 16:44:08 -0500
-Date: Wed, 27 Dec 2017 16:43:34 -0500 (EST)
-Message-Id: <20171227.164334.2079471466039224265.davem@davemloft.net>
-From: David Miller <davem@davemloft.net>
-In-Reply-To: <44da522ecee60792ec918234ee4d61a84e4574f0.1513974243.git.jbaron@akamai.com>
-References: <1513979641-7999-1-git-send-email-jbaron@akamai.com>
-	<cover.1513974243.git.jbaron@akamai.com>
-	<44da522ecee60792ec918234ee4d61a84e4574f0.1513974243.git.jbaron@akamai.com>
-Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH net-next v2 1/3] virtio_net: propagate
- linkspeed/duplex settings from the hypervisor
+	(envelope-from <vase@selfip.ru>) id 1eUJXL-0004hk-5W
+	for qemu-devel@nongnu.org; Wed, 27 Dec 2017 16:46:58 -0500
+Received: from mail-it0-x243.google.com ([2607:f8b0:4001:c0b::243]:44523)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <vase@selfip.ru>) id 1eUJXK-0004gW-OB
+	for qemu-devel@nongnu.org; Wed, 27 Dec 2017 16:46:54 -0500
+Received: by mail-it0-x243.google.com with SMTP id b5so26382167itc.3
+	for <qemu-devel@nongnu.org>; Wed, 27 Dec 2017 13:46:54 -0800 (PST)
+MIME-Version: 1.0
+Sender: vase@selfip.ru
+In-Reply-To: <20171222092308.GF30605@redhat.com>
+References: <CACaajQsL3e+XWR0hBDLThmG_fd=ih-n+HJVz++XcnwLhhVstgg@mail.gmail.com>
+	<56c5bcbb-02c0-a3f7-4363-e3141476b2f8@redhat.com>
+	<20171222092308.GF30605@redhat.com>
+From: Vasiliy Tolstov <v.tolstov@selfip.ru>
+Date: Thu, 28 Dec 2017 00:46:33 +0300
+Message-ID: <CACaajQsUQao1AVfvORQ-3h4nNF-AzkomsimigdcN+WTiHiitkQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] qemu 2.9.0 qcow2 file failed to open after hard
+ server reset
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,37 +31,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: jbaron@akamai.com
-Cc: netdev@vger.kernel.org, virtualization@lists.linux-foundation.org, qemu-devel@nongnu.org, mst@redhat.com, jasowang@redhat.com
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: John Snow <jsnow@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, Qemu-block <qemu-block@nongnu.org>
 
-From: Jason Baron <jbaron@akamai.com>
-Date: Fri, 22 Dec 2017 16:54:01 -0500
+2017-12-22 12:23 GMT+03:00 Daniel P. Berrange <berrange@redhat.com>:
+> On Thu, Dec 21, 2017 at 05:58:47PM -0500, John Snow wrote:
+>>
+>>
+>> On 12/21/2017 05:13 PM, Vasiliy Tolstov wrote:
+>> > Hi! Today my server have forced reboot and one of my vm can't start
+>> > with message:
+>> > qcow2: Marking image as corrupt: L2 table offset 0x3f786d6c207600
+>> > unaligned (L1 index: 0); further corruption events will be suppressed
+>> >
+>> > i'm use debian jessie with hand builded qemu 2.9.0, i'm try to
+>> > qemu-img check but it not helps. How can i recover data inside qcow2
+>> > file? (i'm not use compression or encryption inside it).
+>> >
+>>
+>> Not looking good if you're missing the very first L2 table in its entirety.
+>>
+>> You might be able to go through this thing by hand and learn for
+>> yourself where the L2 table is (it will be a 64KiB region, aligned to a
+>> 64KiB boundary, that all contain 64bit, 64KiB aligned pointers that will
+>> be less than the size of the file. the offset of this missing region is
+>> not likely to be referenced elsewhere in your file.)
 
-> The ability to set speed and duplex for virtio_net in useful in various
-> scenarios as described here:
-> 
-> 16032be virtio_net: add ethtool support for set and get of settings
-> 
-> However, it would be nice to be able to set this from the hypervisor,
-> such that virtio_net doesn't require custom guest ethtool commands.
-> 
-> Introduce a new feature flag, VIRTIO_NET_F_SPEED_DUPLEX, which allows
-> the hypervisor to export a linkspeed and duplex setting. The user can
-> subsequently overwrite it later if desired via: 'ethtool -s'.
-> 
-> Signed-off-by: Jason Baron <jbaron@akamai.com>
-> Cc: "Michael S. Tsirkin" <mst@redhat.com>
-> Cc: Jason Wang <jasowang@redhat.com>
+Too hard, client restored backup because he don't want to wait for me =))
 
-Looks mostly fine to me but need some virtio_net reviewers on this one.
+>
+> Fun. That rather makes you wish that every single distinct type of table
+> in QCow2 files had a unique UUID value stored in it, to make forensics
+> like this easier :-)
+>
 
-> @@ -57,6 +57,8 @@
->  					 * Steering */
->  #define VIRTIO_NET_F_CTRL_MAC_ADDR 23	/* Set MAC address */
->  
-> +#define VIRTIO_NET_F_SPEED_DUPLEX 63	/* Host set linkspeed and duplex */
-> +
+=)
 
-Why use a value so far away from the largest existing one?
-
-Just curious.
+-- 
+Vasiliy Tolstov,
+e-mail: v.tolstov@selfip.ru
