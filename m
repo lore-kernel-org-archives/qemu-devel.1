@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59353)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34026)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1eUAhc-00032y-DB
-	for qemu-devel@nongnu.org; Wed, 27 Dec 2017 07:20:57 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1eUAm7-0004dU-0p
+	for qemu-devel@nongnu.org; Wed, 27 Dec 2017 07:25:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1eUAhZ-0003EZ-NJ
-	for qemu-devel@nongnu.org; Wed, 27 Dec 2017 07:20:56 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:43662)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1eUAhZ-0003DW-ES
-	for qemu-devel@nongnu.org; Wed, 27 Dec 2017 07:20:53 -0500
-Date: Wed, 27 Dec 2017 13:20:41 +0100
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20171227132041.15301234@igors-macbook-pro.local>
-In-Reply-To: <20171218201340.27583-4-dgilbert@redhat.com>
-References: <20171218201340.27583-1-dgilbert@redhat.com>
-	<20171218201340.27583-4-dgilbert@redhat.com>
+	(envelope-from <vsementsov@virtuozzo.com>) id 1eUAm4-0007q7-8e
+	for qemu-devel@nongnu.org; Wed, 27 Dec 2017 07:25:34 -0500
+Received: from mail-he1eur01on0139.outbound.protection.outlook.com
+	([104.47.0.139]:62784
+	helo=EUR01-HE1-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+	id 1eUAm2-0007mT-Qy
+	for qemu-devel@nongnu.org; Wed, 27 Dec 2017 07:25:31 -0500
+References: <20170801160419.14180-1-marcandre.lureau@redhat.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <b3ccb2a7-efe3-2b0b-62ee-a3ab126e0205@virtuozzo.com>
+Date: Wed, 27 Dec 2017 15:25:23 +0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v5 3/7] vhost: Simplify ring verification
- checks
+In-Reply-To: <20170801160419.14180-1-marcandre.lureau@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
+Content-Language: en-US
+Subject: Re: [Qemu-devel] [PATCH] migration: fix small leaks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,170 +30,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Cc: qemu-devel@nongnu.org, pbonzini@redhat.com, maxime.coquelin@redhat.com, mst@redhat.com, groug@kaod.org
+To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org
+Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Juan Quintela <quintela@redhat.com>
 
-On Mon, 18 Dec 2017 20:13:36 +0000
-"Dr. David Alan Gilbert (git)" <dgilbert@redhat.com> wrote:
+Hi all!
 
-> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-> 
-> vhost_verify_ring_mappings() were used to verify that
-> rings are still accessible and related memory hasn't
-> been moved after flatview is updated.
-> 
-> It was doing checks by mapping ring's GPA+len and
-> checking that HVA hadn't changed with new memory map.
-> To avoid maybe expensive mapping call, we were
-> identifying address range that changed and were doing
-> mapping only if ring was in changed range.
-> 
-> However it's not neccessary to perform ring's GPA
-> mapping as we already have its current HVA and all
-> we need is to verify that ring's GPA translates to
-> the same HVA in updated flatview.
-> 
-> This will allow the following patches to simplify the range
-> comparison that was previously needed to avoid expensive
-> verify_ring_mapping calls.
-> 
-> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-> with modifications by:
-> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Hmm, looks like leak is not fixed here: I've checked it while running=20
+iotest 181, that
+migration_instance_finalize is not called.
 
-Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+If I understand correct, to call it we need unref current_migration=20
+object somewhere.
 
+Or, may be I'm missing something..
+
+01.08.2017 19:04, Marc-Andr=C3=A9 Lureau wrote:
+> Spotted thanks to valgrind and tests/device-introspect-test:
+>
+> =3D=3D11711=3D=3D 1 bytes in 1 blocks are definitely lost in loss record =
+6 of 14,537
+> =3D=3D11711=3D=3D    at 0x4C2EB6B: malloc (vg_replace_malloc.c:299)
+> =3D=3D11711=3D=3D    by 0x1E0CDBD8: g_malloc (gmem.c:94)
+> =3D=3D11711=3D=3D    by 0x1E0E696E: g_strdup (gstrfuncs.c:363)
+> =3D=3D11711=3D=3D    by 0x695693: migration_instance_init (migration.c:22=
+26)
+> =3D=3D11711=3D=3D    by 0x717C4B: object_init_with_type (object.c:344)
+> =3D=3D11711=3D=3D    by 0x717E80: object_initialize_with_type (object.c:3=
+75)
+> =3D=3D11711=3D=3D    by 0x7182EB: object_new_with_type (object.c:483)
+> =3D=3D11711=3D=3D    by 0x718328: object_new (object.c:493)
+> =3D=3D11711=3D=3D    by 0x4B8A29: qmp_device_list_properties (qmp.c:542)
+> =3D=3D11711=3D=3D    by 0x4A9561: qmp_marshal_device_list_properties (qmp=
+-marshal.c:1425)
+> =3D=3D11711=3D=3D    by 0x819D4A: do_qmp_dispatch (qmp-dispatch.c:104)
+> =3D=3D11711=3D=3D    by 0x819E82: qmp_dispatch (qmp-dispatch.c:131)
+>
+> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 > ---
->  hw/virtio/vhost.c | 75 +++++++++++++++++++++++++++++--------------------------
->  1 file changed, 40 insertions(+), 35 deletions(-)
-> 
-> diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
-> index d4710fc05c..18611f0d40 100644
-> --- a/hw/virtio/vhost.c
-> +++ b/hw/virtio/vhost.c
-> @@ -450,35 +450,37 @@ static void vhost_memory_unmap(struct vhost_dev *dev, void *buffer,
->      }
->  }
->  
-> -static int vhost_verify_ring_part_mapping(struct vhost_dev *dev,
-> -                                          void *part,
-> -                                          uint64_t part_addr,
-> -                                          uint64_t part_size,
-> -                                          uint64_t start_addr,
-> -                                          uint64_t size)
-> +static int vhost_verify_ring_part_mapping(void *ring_hva,
-> +                                          uint64_t ring_gpa,
-> +                                          uint64_t ring_size,
-> +                                          void *reg_hva,
-> +                                          uint64_t reg_gpa,
-> +                                          uint64_t reg_size)
->  {
-> -    hwaddr l;
-> -    void *p;
-> -    int r = 0;
-> +    uint64_t hva_ring_offset;
-> +    uint64_t ring_last = range_get_last(ring_gpa, ring_size);
-> +    uint64_t reg_last = range_get_last(reg_gpa, reg_size);
->  
-> -    if (!ranges_overlap(start_addr, size, part_addr, part_size)) {
-> +    if (ring_last < reg_gpa || ring_gpa > reg_last) {
->          return 0;
->      }
-> -    l = part_size;
-> -    p = vhost_memory_map(dev, part_addr, &l, 1);
-> -    if (!p || l != part_size) {
-> -        r = -ENOMEM;
-> +    /* check that whole ring's is mapped */
-> +    if (ring_last > reg_last) {
-> +        return -ENOMEM;
->      }
-> -    if (p != part) {
-> -        r = -EBUSY;
-> +    /* check that ring's MemoryRegion wasn't replaced */
-> +    hva_ring_offset = ring_gpa - reg_gpa;
-> +    if (ring_hva != reg_hva + hva_ring_offset) {
-> +        return -EBUSY;
->      }
-> -    vhost_memory_unmap(dev, p, l, 0, 0);
-> -    return r;
+>   migration/migration.c | 10 ++++++++++
+>   1 file changed, 10 insertions(+)
+>
+> diff --git a/migration/migration.c b/migration/migration.c
+> index 085c32c994..c3fe0ed9ca 100644
+> --- a/migration/migration.c
+> +++ b/migration/migration.c
+> @@ -2214,6 +2214,15 @@ static void migration_class_init(ObjectClass *klas=
+s, void *data)
+>       dc->props =3D migration_properties;
+>   }
+>  =20
+> +static void migration_instance_finalize(Object *obj)
+> +{
+> +    MigrationState *ms =3D MIGRATION_OBJ(obj);
+> +    MigrationParameters *params =3D &ms->parameters;
 > +
-> +    return 0;
->  }
->  
->  static int vhost_verify_ring_mappings(struct vhost_dev *dev,
-> -                                      uint64_t start_addr,
-> -                                      uint64_t size)
-> +                                      void *reg_hva,
-> +                                      uint64_t reg_gpa,
-> +                                      uint64_t reg_size)
->  {
->      int i, j;
->      int r = 0;
-> @@ -492,22 +494,25 @@ static int vhost_verify_ring_mappings(struct vhost_dev *dev,
->          struct vhost_virtqueue *vq = dev->vqs + i;
->  
->          j = 0;
-> -        r = vhost_verify_ring_part_mapping(dev, vq->desc, vq->desc_phys,
-> -                                           vq->desc_size, start_addr, size);
-> +        r = vhost_verify_ring_part_mapping(
-> +                vq->desc, vq->desc_phys, vq->desc_size,
-> +                reg_hva, reg_gpa, reg_size);
->          if (r) {
->              break;
->          }
->  
->          j++;
-> -        r = vhost_verify_ring_part_mapping(dev, vq->avail, vq->avail_phys,
-> -                                           vq->avail_size, start_addr, size);
-> +        r = vhost_verify_ring_part_mapping(
-> +                vq->desc, vq->desc_phys, vq->desc_size,
-> +                reg_hva, reg_gpa, reg_size);
->          if (r) {
->              break;
->          }
->  
->          j++;
-> -        r = vhost_verify_ring_part_mapping(dev, vq->used, vq->used_phys,
-> -                                           vq->used_size, start_addr, size);
-> +        r = vhost_verify_ring_part_mapping(
-> +                vq->desc, vq->desc_phys, vq->desc_size,
-> +                reg_hva, reg_gpa, reg_size);
->          if (r) {
->              break;
->          }
-> @@ -635,13 +640,11 @@ static void vhost_commit(MemoryListener *listener)
->  {
->      struct vhost_dev *dev = container_of(listener, struct vhost_dev,
->                                           memory_listener);
-> -    hwaddr start_addr = 0;
-> -    ram_addr_t size = 0;
->      MemoryRegionSection *old_sections;
->      int n_old_sections;
-> -
->      uint64_t log_size;
->      int r;
-> +    int i;
->  
->      old_sections = dev->mem_sections;
->      n_old_sections = dev->n_mem_sections;
-> @@ -658,12 +661,14 @@ static void vhost_commit(MemoryListener *listener)
->          goto out;
->      }
->  
-> -    if (dev->started) {
-> -        start_addr = dev->mem_changed_start_addr;
-> -        size = dev->mem_changed_end_addr - dev->mem_changed_start_addr + 1;
-> -
-> -        r = vhost_verify_ring_mappings(dev, start_addr, size);
-> -        assert(r >= 0);
-> +    for (i = 0; i < dev->mem->nregions; i++) {
-> +        if (vhost_verify_ring_mappings(dev,
-> +                           (void *)dev->mem->regions[i].userspace_addr,
-> +                           dev->mem->regions[i].guest_phys_addr,
-> +                           dev->mem->regions[i].memory_size)) {
-> +            error_report("Verify ring failure on region %d", i);
-> +            abort();
-> +        }
->      }
->  
->      if (!dev->log_enabled) {
+> +    g_free(params->tls_hostname);
+> +    g_free(params->tls_creds);
+> +}
+> +
+>   static void migration_instance_init(Object *obj)
+>   {
+>       MigrationState *ms =3D MIGRATION_OBJ(obj);
+> @@ -2282,6 +2291,7 @@ static const TypeInfo migration_type =3D {
+>       .class_size =3D sizeof(MigrationClass),
+>       .instance_size =3D sizeof(MigrationState),
+>       .instance_init =3D migration_instance_init,
+> +    .instance_finalize =3D migration_instance_finalize,
+>   };
+>  =20
+>   static void register_migration_types(void)
+
+
+--=20
+Best regards,
+Vladimir
