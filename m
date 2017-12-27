@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34026)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41685)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1eUAm7-0004dU-0p
-	for qemu-devel@nongnu.org; Wed, 27 Dec 2017 07:25:36 -0500
+	(envelope-from <imammedo@redhat.com>) id 1eUAuj-00072z-Jz
+	for qemu-devel@nongnu.org; Wed, 27 Dec 2017 07:34:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1eUAm4-0007q7-8e
-	for qemu-devel@nongnu.org; Wed, 27 Dec 2017 07:25:34 -0500
-Received: from mail-he1eur01on0139.outbound.protection.outlook.com
-	([104.47.0.139]:62784
-	helo=EUR01-HE1-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
-	id 1eUAm2-0007mT-Qy
-	for qemu-devel@nongnu.org; Wed, 27 Dec 2017 07:25:31 -0500
-References: <20170801160419.14180-1-marcandre.lureau@redhat.com>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <b3ccb2a7-efe3-2b0b-62ee-a3ab126e0205@virtuozzo.com>
-Date: Wed, 27 Dec 2017 15:25:23 +0300
+	(envelope-from <imammedo@redhat.com>) id 1eUAuf-0000w9-Cr
+	for qemu-devel@nongnu.org; Wed, 27 Dec 2017 07:34:29 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:51696)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1eUAuf-0000uU-42
+	for qemu-devel@nongnu.org; Wed, 27 Dec 2017 07:34:25 -0500
+Date: Wed, 27 Dec 2017 13:34:03 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20171227133403.42d43cf1@igors-macbook-pro.local>
+In-Reply-To: <20171218201340.27583-5-dgilbert@redhat.com>
+References: <20171218201340.27583-1-dgilbert@redhat.com>
+	<20171218201340.27583-5-dgilbert@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20170801160419.14180-1-marcandre.lureau@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH] migration: fix small leaks
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v5 4/7] vhost: Merge sections added to
+ temporary list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,77 +28,140 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org
-Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Juan Quintela <quintela@redhat.com>
+To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
+Cc: qemu-devel@nongnu.org, pbonzini@redhat.com, maxime.coquelin@redhat.com, mst@redhat.com, groug@kaod.org
 
-Hi all!
+On Mon, 18 Dec 2017 20:13:37 +0000
+"Dr. David Alan Gilbert (git)" <dgilbert@redhat.com> wrote:
 
-Hmm, looks like leak is not fixed here: I've checked it while running=20
-iotest 181, that
-migration_instance_finalize is not called.
+> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+> 
+> As sections are reported by the listener to the _nop and _add
+> methods, add them to the temporary section list but now merge them
+> with the previous section if the new one abuts and the backend allows.
+> 
+> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+beside small nit patch looks good to me, so with it fixed
 
-If I understand correct, to call it we need unref current_migration=20
-object somewhere.
+Reviewed-by: Igor Mammedov <imammedo@redhat.com>
 
-Or, may be I'm missing something..
-
-01.08.2017 19:04, Marc-Andr=C3=A9 Lureau wrote:
-> Spotted thanks to valgrind and tests/device-introspect-test:
->
-> =3D=3D11711=3D=3D 1 bytes in 1 blocks are definitely lost in loss record =
-6 of 14,537
-> =3D=3D11711=3D=3D    at 0x4C2EB6B: malloc (vg_replace_malloc.c:299)
-> =3D=3D11711=3D=3D    by 0x1E0CDBD8: g_malloc (gmem.c:94)
-> =3D=3D11711=3D=3D    by 0x1E0E696E: g_strdup (gstrfuncs.c:363)
-> =3D=3D11711=3D=3D    by 0x695693: migration_instance_init (migration.c:22=
-26)
-> =3D=3D11711=3D=3D    by 0x717C4B: object_init_with_type (object.c:344)
-> =3D=3D11711=3D=3D    by 0x717E80: object_initialize_with_type (object.c:3=
-75)
-> =3D=3D11711=3D=3D    by 0x7182EB: object_new_with_type (object.c:483)
-> =3D=3D11711=3D=3D    by 0x718328: object_new (object.c:493)
-> =3D=3D11711=3D=3D    by 0x4B8A29: qmp_device_list_properties (qmp.c:542)
-> =3D=3D11711=3D=3D    by 0x4A9561: qmp_marshal_device_list_properties (qmp=
--marshal.c:1425)
-> =3D=3D11711=3D=3D    by 0x819D4A: do_qmp_dispatch (qmp-dispatch.c:104)
-> =3D=3D11711=3D=3D    by 0x819E82: qmp_dispatch (qmp-dispatch.c:131)
->
-> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 > ---
->   migration/migration.c | 10 ++++++++++
->   1 file changed, 10 insertions(+)
->
-> diff --git a/migration/migration.c b/migration/migration.c
-> index 085c32c994..c3fe0ed9ca 100644
-> --- a/migration/migration.c
-> +++ b/migration/migration.c
-> @@ -2214,6 +2214,15 @@ static void migration_class_init(ObjectClass *klas=
-s, void *data)
->       dc->props =3D migration_properties;
->   }
->  =20
-> +static void migration_instance_finalize(Object *obj)
-> +{
-> +    MigrationState *ms =3D MIGRATION_OBJ(obj);
-> +    MigrationParameters *params =3D &ms->parameters;
-> +
-> +    g_free(params->tls_hostname);
-> +    g_free(params->tls_creds);
-> +}
-> +
->   static void migration_instance_init(Object *obj)
->   {
->       MigrationState *ms =3D MIGRATION_OBJ(obj);
-> @@ -2282,6 +2291,7 @@ static const TypeInfo migration_type =3D {
->       .class_size =3D sizeof(MigrationClass),
->       .instance_size =3D sizeof(MigrationState),
->       .instance_init =3D migration_instance_init,
-> +    .instance_finalize =3D migration_instance_finalize,
->   };
->  =20
->   static void register_migration_types(void)
+>  hw/virtio/trace-events |  2 ++
+>  hw/virtio/vhost.c      | 70 +++++++++++++++++++++++++++++++++++++++++++-------
+>  2 files changed, 63 insertions(+), 9 deletions(-)
+> 
+> diff --git a/hw/virtio/trace-events b/hw/virtio/trace-events
+> index 4a493bcd46..0e63c8739d 100644
+> --- a/hw/virtio/trace-events
+> +++ b/hw/virtio/trace-events
+> @@ -1,6 +1,8 @@
+>  # See docs/devel/tracing.txt for syntax documentation.
+>  
+>  # hw/virtio/vhost.c
+> +vhost_region_add_section(const char *name, uint64_t gpa, uint64_t size, uint64_t host) "%s: 0x%"PRIx64"+0x%"PRIx64" @ 0x%"PRIx64
+> +vhost_region_add_section_abut(const char *name, uint64_t new_size) "%s: 0x%"PRIx64
+>  vhost_section(const char *name, int r) "%s:%d"
+>  
+>  # hw/virtio/virtio.c
+> diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
+> index 18611f0d40..57d15acd2b 100644
+> --- a/hw/virtio/vhost.c
+> +++ b/hw/virtio/vhost.c
+> @@ -709,14 +709,65 @@ out:
+>      return;
+>  }
+>  
+> -static void vhost_add_section(struct vhost_dev *dev,
+> -                              MemoryRegionSection *section)
+> +/* Adds the section data to the tmp_section structure.
+> + * It relies on the listener calling us in memory address order
+> + * and for each region (via the _add and _nop methods) to
+> + * join neighbours.
+> + */
+> +static void vhost_region_add_section(struct vhost_dev *dev,
+> +                                 MemoryRegionSection *section)
+wrong alignment, should be on '('
 
-
---=20
-Best regards,
-Vladimir
+>  {
+> -    ++dev->n_tmp_sections;
+> -    dev->tmp_sections = g_renew(MemoryRegionSection, dev->tmp_sections,
+> -                                dev->n_tmp_sections);
+> -    dev->tmp_sections[dev->n_tmp_sections - 1] = *section;
+> -    memory_region_ref(section->mr);
+> +    bool need_add = true;
+> +    uint64_t mrs_size = int128_get64(section->size);
+> +    uint64_t mrs_gpa = section->offset_within_address_space;
+> +    uintptr_t mrs_host = (uintptr_t)memory_region_get_ram_ptr(section->mr) +
+> +                         section->offset_within_region;
+> +
+> +    trace_vhost_region_add_section(section->mr->name, mrs_gpa, mrs_size,
+> +                                   mrs_host);
+> +
+> +    if (dev->n_tmp_sections) {
+> +        /* Since we already have at least one section, lets see if
+> +         * this extends it; since we're scanning in order, we only
+> +         * have to look at the last one, and the FlatView that calls
+> +         * us shouldn't have overlaps.
+> +         */
+> +        MemoryRegionSection *prev_sec = dev->tmp_sections +
+> +                                               (dev->n_tmp_sections - 1);
+> +        uint64_t prev_gpa_start = prev_sec->offset_within_address_space;
+> +        uint64_t prev_size = int128_get64(prev_sec->size);
+> +        uint64_t prev_gpa_end   = range_get_last(prev_gpa_start, prev_size);
+> +        uint64_t prev_host_start =
+> +                        (uintptr_t)memory_region_get_ram_ptr(prev_sec->mr) +
+> +                        prev_sec->offset_within_region;
+> +        uint64_t prev_host_end   = range_get_last(prev_host_start, prev_size);
+> +
+> +        if (prev_gpa_end + 1 == mrs_gpa &&
+> +            prev_host_end + 1 == mrs_host &&
+> +            section->mr == prev_sec->mr &&
+> +            (!dev->vhost_ops->vhost_backend_can_merge ||
+> +                dev->vhost_ops->vhost_backend_can_merge(dev,
+> +                    mrs_host, mrs_size,
+> +                    prev_host_start, prev_size))) {
+> +            /* The two sections abut */
+> +            need_add = false;
+> +            prev_sec->size = int128_add(prev_sec->size, section->size);
+> +            trace_vhost_region_add_section_abut(section->mr->name,
+> +                                                mrs_size + prev_size);
+> +        }
+> +    }
+> +
+> +    if (need_add) {
+> +        ++dev->n_tmp_sections;
+> +        dev->tmp_sections = g_renew(MemoryRegionSection, dev->tmp_sections,
+> +                                    dev->n_tmp_sections);
+> +        dev->tmp_sections[dev->n_tmp_sections - 1] = *section;
+> +        /* The flatview isn't stable and we don't use it, making it NULL
+> +         * means we can memcmp the list.
+> +         */
+> +        dev->tmp_sections[dev->n_tmp_sections - 1].fv = NULL;
+> +        memory_region_ref(section->mr);
+> +    }
+>  }
+>  
+>  static void vhost_region_add(MemoryListener *listener,
+> @@ -728,11 +779,12 @@ static void vhost_region_add(MemoryListener *listener,
+>      if (!vhost_section(section)) {
+>          return;
+>      }
+> +    vhost_region_add_section(dev, section);
+>  
+> -    vhost_add_section(dev, section);
+>      vhost_set_memory(listener, section, true);
+>  }
+>  
+> +/* Called on regions that have not changed */
+>  static void vhost_region_nop(MemoryListener *listener,
+>                               MemoryRegionSection *section)
+>  {
+> @@ -743,7 +795,7 @@ static void vhost_region_nop(MemoryListener *listener,
+>          return;
+>      }
+>  
+> -    vhost_add_section(dev, section);
+> +    vhost_region_add_section(dev, section);
+>  }
+>  
+>  static void vhost_region_del(MemoryListener *listener,
