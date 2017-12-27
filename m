@@ -1,20 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52630)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54152)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jan.dakinevich@virtuozzo.com>) id 1eUCKG-000436-U6
-	for qemu-devel@nongnu.org; Wed, 27 Dec 2017 09:04:58 -0500
+	(envelope-from <imammedo@redhat.com>) id 1eUCLy-0004vl-TG
+	for qemu-devel@nongnu.org; Wed, 27 Dec 2017 09:06:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jan.dakinevich@virtuozzo.com>) id 1eUCKA-0002tr-S0
-	for qemu-devel@nongnu.org; Wed, 27 Dec 2017 09:04:55 -0500
-Received: from mailhub.sw.ru ([195.214.232.25]:21475 helo=relay.sw.ru)
+	(envelope-from <imammedo@redhat.com>) id 1eUCLu-0005Y6-48
+	for qemu-devel@nongnu.org; Wed, 27 Dec 2017 09:06:42 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:53840)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jan.dakinevich@virtuozzo.com>)
-	id 1eUCKA-0002oX-C3
-	for qemu-devel@nongnu.org; Wed, 27 Dec 2017 09:04:50 -0500
-From: Jan Dakinevich <jan.dakinevich@virtuozzo.com>
-Date: Wed, 27 Dec 2017 17:04:26 +0300
-Message-Id: <1514383466-7257-1-git-send-email-jan.dakinevich@virtuozzo.com>
-Subject: [Qemu-devel] [PATCH] i386/cpu/kvm: look at PMU's CPUID before
- setting MSRs
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1eUCLt-0005TS-HW
+	for qemu-devel@nongnu.org; Wed, 27 Dec 2017 09:06:37 -0500
+Date: Wed, 27 Dec 2017 15:06:21 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20171227150621.0955a09d@igors-macbook-pro.local>
+In-Reply-To: <20171218201340.27583-4-dgilbert@redhat.com>
+References: <20171218201340.27583-1-dgilbert@redhat.com>
+	<20171218201340.27583-4-dgilbert@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v5 3/7] vhost: Simplify ring verification
+ checks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,156 +28,174 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: "Denis V. Lunev" <den@virtuozzo.com>, Roman Kagan <rkagan@virtuozzo.com>, Jan Dakinevich <jan.dakinevich@virtuozzo.com>, Paolo Bonzini <pbonzini@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, kvm@vger.kernel.org
+To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
+Cc: qemu-devel@nongnu.org, pbonzini@redhat.com, maxime.coquelin@redhat.com, mst@redhat.com, groug@kaod.org
 
-Certain PMU-related MSRs are not supported for CPUs with PMU
-architecture below version 2. KVM rejects any access to them (see
-intel_is_valid_msr_idx routine in KVM), and QEMU fails on the following
-assertion:
+On Mon, 18 Dec 2017 20:13:36 +0000
+"Dr. David Alan Gilbert (git)" <dgilbert@redhat.com> wrote:
 
-  kvm_put_msrs: Assertion `ret == cpu->kvm_msr_buf->nmsrs' failed.
+> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+> 
+> vhost_verify_ring_mappings() were used to verify that
+> rings are still accessible and related memory hasn't
+> been moved after flatview is updated.
+> 
+> It was doing checks by mapping ring's GPA+len and
+> checking that HVA hadn't changed with new memory map.
+> To avoid maybe expensive mapping call, we were
+> identifying address range that changed and were doing
+> mapping only if ring was in changed range.
+> 
+> However it's not neccessary to perform ring's GPA
+> mapping as we already have its current HVA and all
+> we need is to verify that ring's GPA translates to
+> the same HVA in updated flatview.
+> 
+> This will allow the following patches to simplify the range
+> comparison that was previously needed to avoid expensive
+> verify_ring_mapping calls.
+> 
+> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+> with modifications by:
+> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 
-QEMU also could fail if KVM exposes less fixed counters then 3. It could
-happen if host system run inside another hypervisor, which is tweaking
-PMU-related CPUID. To prevent possible fail, number of fixed counters now is
-obtained in the same way as number of GP counters.
+an additional question,
 
-Reviewed-by: Roman Kagan <rkagan@virtuozzo.com>
-Signed-off-by: Jan Dakinevich <jan.dakinevich@virtuozzo.com>
----
- target/i386/kvm.c | 80 +++++++++++++++++++++++++++++++++----------------------
- 1 file changed, 48 insertions(+), 32 deletions(-)
+in iommu case ring_hva == ring_gpa if we look in to vhost_memory_map()
+have you check if iommu case is working with new code?
 
-diff --git a/target/i386/kvm.c b/target/i386/kvm.c
-index 351b64f..a6790db 100644
---- a/target/i386/kvm.c
-+++ b/target/i386/kvm.c
-@@ -92,8 +92,9 @@ static bool has_msr_hv_stimer;
- static bool has_msr_hv_frequencies;
- static bool has_msr_xss;
- 
--static bool has_msr_architectural_pmu;
--static uint32_t num_architectural_pmu_counters;
-+static uint32_t has_architectural_pmu_version;
-+static uint32_t num_architectural_pmu_gp_counters;
-+static uint32_t num_architectural_pmu_fixed_counters;
- 
- static int has_xsave;
- static int has_xcrs;
-@@ -872,19 +873,28 @@ int kvm_arch_init_vcpu(CPUState *cs)
-     }
- 
-     if (limit >= 0x0a) {
--        uint32_t ver;
-+        uint32_t eax, edx;
- 
--        cpu_x86_cpuid(env, 0x0a, 0, &ver, &unused, &unused, &unused);
--        if ((ver & 0xff) > 0) {
--            has_msr_architectural_pmu = true;
--            num_architectural_pmu_counters = (ver & 0xff00) >> 8;
-+        cpu_x86_cpuid(env, 0x0a, 0, &eax, &unused, &unused, &edx);
-+
-+        has_architectural_pmu_version = eax & 0xff;
-+        if (has_architectural_pmu_version > 0) {
-+            num_architectural_pmu_gp_counters = (eax & 0xff00) >> 8;
- 
-             /* Shouldn't be more than 32, since that's the number of bits
-              * available in EBX to tell us _which_ counters are available.
-              * Play it safe.
-              */
--            if (num_architectural_pmu_counters > MAX_GP_COUNTERS) {
--                num_architectural_pmu_counters = MAX_GP_COUNTERS;
-+            if (num_architectural_pmu_gp_counters > MAX_GP_COUNTERS) {
-+                num_architectural_pmu_gp_counters = MAX_GP_COUNTERS;
-+            }
-+
-+            if (has_architectural_pmu_version > 1) {
-+                num_architectural_pmu_fixed_counters = edx & 0x1f;
-+
-+                if (num_architectural_pmu_fixed_counters > MAX_FIXED_COUNTERS) {
-+                    num_architectural_pmu_fixed_counters = MAX_FIXED_COUNTERS;
-+                }
-             }
-         }
-     }
-@@ -1652,32 +1662,36 @@ static int kvm_put_msrs(X86CPU *cpu, int level)
-         if (env->features[FEAT_KVM] & (1 << KVM_FEATURE_STEAL_TIME)) {
-             kvm_msr_entry_add(cpu, MSR_KVM_STEAL_TIME, env->steal_time_msr);
-         }
--        if (has_msr_architectural_pmu) {
--            /* Stop the counter.  */
--            kvm_msr_entry_add(cpu, MSR_CORE_PERF_FIXED_CTR_CTRL, 0);
--            kvm_msr_entry_add(cpu, MSR_CORE_PERF_GLOBAL_CTRL, 0);
-+        if (has_architectural_pmu_version > 0) {
-+            if (has_architectural_pmu_version > 1) {
-+                /* Stop the counter.  */
-+                kvm_msr_entry_add(cpu, MSR_CORE_PERF_FIXED_CTR_CTRL, 0);
-+                kvm_msr_entry_add(cpu, MSR_CORE_PERF_GLOBAL_CTRL, 0);
-+            }
- 
-             /* Set the counter values.  */
--            for (i = 0; i < MAX_FIXED_COUNTERS; i++) {
-+            for (i = 0; i < num_architectural_pmu_fixed_counters; i++) {
-                 kvm_msr_entry_add(cpu, MSR_CORE_PERF_FIXED_CTR0 + i,
-                                   env->msr_fixed_counters[i]);
-             }
--            for (i = 0; i < num_architectural_pmu_counters; i++) {
-+            for (i = 0; i < num_architectural_pmu_gp_counters; i++) {
-                 kvm_msr_entry_add(cpu, MSR_P6_PERFCTR0 + i,
-                                   env->msr_gp_counters[i]);
-                 kvm_msr_entry_add(cpu, MSR_P6_EVNTSEL0 + i,
-                                   env->msr_gp_evtsel[i]);
-             }
--            kvm_msr_entry_add(cpu, MSR_CORE_PERF_GLOBAL_STATUS,
--                              env->msr_global_status);
--            kvm_msr_entry_add(cpu, MSR_CORE_PERF_GLOBAL_OVF_CTRL,
--                              env->msr_global_ovf_ctrl);
--
--            /* Now start the PMU.  */
--            kvm_msr_entry_add(cpu, MSR_CORE_PERF_FIXED_CTR_CTRL,
--                              env->msr_fixed_ctr_ctrl);
--            kvm_msr_entry_add(cpu, MSR_CORE_PERF_GLOBAL_CTRL,
--                              env->msr_global_ctrl);
-+            if (has_architectural_pmu_version > 1) {
-+                kvm_msr_entry_add(cpu, MSR_CORE_PERF_GLOBAL_STATUS,
-+                                  env->msr_global_status);
-+                kvm_msr_entry_add(cpu, MSR_CORE_PERF_GLOBAL_OVF_CTRL,
-+                                  env->msr_global_ovf_ctrl);
-+
-+                /* Now start the PMU.  */
-+                kvm_msr_entry_add(cpu, MSR_CORE_PERF_FIXED_CTR_CTRL,
-+                                  env->msr_fixed_ctr_ctrl);
-+                kvm_msr_entry_add(cpu, MSR_CORE_PERF_GLOBAL_CTRL,
-+                                  env->msr_global_ctrl);
-+            }
-         }
-         /*
-          * Hyper-V partition-wide MSRs: to avoid clearing them on cpu hot-add,
-@@ -2032,15 +2046,17 @@ static int kvm_get_msrs(X86CPU *cpu)
-     if (env->features[FEAT_KVM] & (1 << KVM_FEATURE_STEAL_TIME)) {
-         kvm_msr_entry_add(cpu, MSR_KVM_STEAL_TIME, 0);
-     }
--    if (has_msr_architectural_pmu) {
--        kvm_msr_entry_add(cpu, MSR_CORE_PERF_FIXED_CTR_CTRL, 0);
--        kvm_msr_entry_add(cpu, MSR_CORE_PERF_GLOBAL_CTRL, 0);
--        kvm_msr_entry_add(cpu, MSR_CORE_PERF_GLOBAL_STATUS, 0);
--        kvm_msr_entry_add(cpu, MSR_CORE_PERF_GLOBAL_OVF_CTRL, 0);
--        for (i = 0; i < MAX_FIXED_COUNTERS; i++) {
-+    if (has_architectural_pmu_version > 0) {
-+        if (has_architectural_pmu_version > 1) {
-+            kvm_msr_entry_add(cpu, MSR_CORE_PERF_FIXED_CTR_CTRL, 0);
-+            kvm_msr_entry_add(cpu, MSR_CORE_PERF_GLOBAL_CTRL, 0);
-+            kvm_msr_entry_add(cpu, MSR_CORE_PERF_GLOBAL_STATUS, 0);
-+            kvm_msr_entry_add(cpu, MSR_CORE_PERF_GLOBAL_OVF_CTRL, 0);
-+        }
-+        for (i = 0; i < num_architectural_pmu_fixed_counters; i++) {
-             kvm_msr_entry_add(cpu, MSR_CORE_PERF_FIXED_CTR0 + i, 0);
-         }
--        for (i = 0; i < num_architectural_pmu_counters; i++) {
-+        for (i = 0; i < num_architectural_pmu_gp_counters; i++) {
-             kvm_msr_entry_add(cpu, MSR_P6_PERFCTR0 + i, 0);
-             kvm_msr_entry_add(cpu, MSR_P6_EVNTSEL0 + i, 0);
-         }
--- 
-2.1.4
+
+> ---
+>  hw/virtio/vhost.c | 75 +++++++++++++++++++++++++++++--------------------------
+>  1 file changed, 40 insertions(+), 35 deletions(-)
+> 
+> diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
+> index d4710fc05c..18611f0d40 100644
+> --- a/hw/virtio/vhost.c
+> +++ b/hw/virtio/vhost.c
+> @@ -450,35 +450,37 @@ static void vhost_memory_unmap(struct vhost_dev *dev, void *buffer,
+>      }
+>  }
+>  
+> -static int vhost_verify_ring_part_mapping(struct vhost_dev *dev,
+> -                                          void *part,
+> -                                          uint64_t part_addr,
+> -                                          uint64_t part_size,
+> -                                          uint64_t start_addr,
+> -                                          uint64_t size)
+> +static int vhost_verify_ring_part_mapping(void *ring_hva,
+> +                                          uint64_t ring_gpa,
+> +                                          uint64_t ring_size,
+> +                                          void *reg_hva,
+> +                                          uint64_t reg_gpa,
+> +                                          uint64_t reg_size)
+>  {
+> -    hwaddr l;
+> -    void *p;
+> -    int r = 0;
+> +    uint64_t hva_ring_offset;
+> +    uint64_t ring_last = range_get_last(ring_gpa, ring_size);
+> +    uint64_t reg_last = range_get_last(reg_gpa, reg_size);
+>  
+> -    if (!ranges_overlap(start_addr, size, part_addr, part_size)) {
+> +    if (ring_last < reg_gpa || ring_gpa > reg_last) {
+>          return 0;
+>      }
+> -    l = part_size;
+> -    p = vhost_memory_map(dev, part_addr, &l, 1);
+> -    if (!p || l != part_size) {
+> -        r = -ENOMEM;
+> +    /* check that whole ring's is mapped */
+> +    if (ring_last > reg_last) {
+> +        return -ENOMEM;
+>      }
+> -    if (p != part) {
+> -        r = -EBUSY;
+> +    /* check that ring's MemoryRegion wasn't replaced */
+> +    hva_ring_offset = ring_gpa - reg_gpa;
+> +    if (ring_hva != reg_hva + hva_ring_offset) {
+> +        return -EBUSY;
+>      }
+> -    vhost_memory_unmap(dev, p, l, 0, 0);
+> -    return r;
+> +
+> +    return 0;
+>  }
+>  
+>  static int vhost_verify_ring_mappings(struct vhost_dev *dev,
+> -                                      uint64_t start_addr,
+> -                                      uint64_t size)
+> +                                      void *reg_hva,
+> +                                      uint64_t reg_gpa,
+> +                                      uint64_t reg_size)
+>  {
+>      int i, j;
+>      int r = 0;
+> @@ -492,22 +494,25 @@ static int vhost_verify_ring_mappings(struct vhost_dev *dev,
+>          struct vhost_virtqueue *vq = dev->vqs + i;
+>  
+>          j = 0;
+> -        r = vhost_verify_ring_part_mapping(dev, vq->desc, vq->desc_phys,
+> -                                           vq->desc_size, start_addr, size);
+> +        r = vhost_verify_ring_part_mapping(
+> +                vq->desc, vq->desc_phys, vq->desc_size,
+> +                reg_hva, reg_gpa, reg_size);
+>          if (r) {
+>              break;
+>          }
+>  
+>          j++;
+> -        r = vhost_verify_ring_part_mapping(dev, vq->avail, vq->avail_phys,
+> -                                           vq->avail_size, start_addr, size);
+> +        r = vhost_verify_ring_part_mapping(
+> +                vq->desc, vq->desc_phys, vq->desc_size,
+> +                reg_hva, reg_gpa, reg_size);
+>          if (r) {
+>              break;
+>          }
+>  
+>          j++;
+> -        r = vhost_verify_ring_part_mapping(dev, vq->used, vq->used_phys,
+> -                                           vq->used_size, start_addr, size);
+> +        r = vhost_verify_ring_part_mapping(
+> +                vq->desc, vq->desc_phys, vq->desc_size,
+> +                reg_hva, reg_gpa, reg_size);
+>          if (r) {
+>              break;
+>          }
+> @@ -635,13 +640,11 @@ static void vhost_commit(MemoryListener *listener)
+>  {
+>      struct vhost_dev *dev = container_of(listener, struct vhost_dev,
+>                                           memory_listener);
+> -    hwaddr start_addr = 0;
+> -    ram_addr_t size = 0;
+>      MemoryRegionSection *old_sections;
+>      int n_old_sections;
+> -
+>      uint64_t log_size;
+>      int r;
+> +    int i;
+>  
+>      old_sections = dev->mem_sections;
+>      n_old_sections = dev->n_mem_sections;
+> @@ -658,12 +661,14 @@ static void vhost_commit(MemoryListener *listener)
+>          goto out;
+>      }
+>  
+> -    if (dev->started) {
+> -        start_addr = dev->mem_changed_start_addr;
+> -        size = dev->mem_changed_end_addr - dev->mem_changed_start_addr + 1;
+> -
+> -        r = vhost_verify_ring_mappings(dev, start_addr, size);
+> -        assert(r >= 0);
+> +    for (i = 0; i < dev->mem->nregions; i++) {
+> +        if (vhost_verify_ring_mappings(dev,
+> +                           (void *)dev->mem->regions[i].userspace_addr,
+> +                           dev->mem->regions[i].guest_phys_addr,
+> +                           dev->mem->regions[i].memory_size)) {
+> +            error_report("Verify ring failure on region %d", i);
+> +            abort();
+> +        }
+>      }
+>  
+>      if (!dev->log_enabled) {
