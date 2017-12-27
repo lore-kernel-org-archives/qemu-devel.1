@@ -1,20 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34671)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50140)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <haozhong.zhang@intel.com>) id 1eU5eJ-0000Pe-OD
-	for qemu-devel@nongnu.org; Wed, 27 Dec 2017 01:57:12 -0500
+	(envelope-from <zhaoshenglong@huawei.com>) id 1eU6tG-00080Q-Ew
+	for qemu-devel@nongnu.org; Wed, 27 Dec 2017 03:16:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <haozhong.zhang@intel.com>) id 1eU5eF-0002QG-3P
-	for qemu-devel@nongnu.org; Wed, 27 Dec 2017 01:57:11 -0500
-Received: from mga11.intel.com ([192.55.52.93]:40921)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <haozhong.zhang@intel.com>)
-	id 1eU5eE-0002Ng-Rb
-	for qemu-devel@nongnu.org; Wed, 27 Dec 2017 01:57:07 -0500
-From: Haozhong Zhang <haozhong.zhang@intel.com>
-Date: Wed, 27 Dec 2017 14:56:20 +0800
-Message-Id: <20171227065620.20889-1-haozhong.zhang@intel.com>
-Subject: [Qemu-devel] [PATCH] util/mmap-alloc: support MAP_SYNC in
- qemu_ram_mmap()
+	(envelope-from <zhaoshenglong@huawei.com>) id 1eU6tF-0002qv-9g
+	for qemu-devel@nongnu.org; Wed, 27 Dec 2017 03:16:42 -0500
+From: Shannon Zhao <zhaoshenglong@huawei.com>
+Date: Wed, 27 Dec 2017 16:16:12 +0800
+Message-ID: <1514362572-1624-1-git-send-email-zhaoshenglong@huawei.com>
+MIME-Version: 1.0
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH v2] Virt: ACPI: fix qemu assert due to
+ re-assigned table data address
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,90 +20,97 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Xiao Guangrong <xiaoguangrong.eric@gmail.com>, mst@redhat.com, Eduardo Habkost <ehabkost@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Dan Williams <dan.j.williams@intel.com>, Haozhong Zhang <haozhong.zhang@intel.com>
+To: qemu-arm@nongnu.org, peter.maydell@linaro.org, lersek@redhat.com
+Cc: qemu-devel@nongnu.org, drjones@redhat.com
 
-When a file supporting DAX is used as vNVDIMM backend, mmap it with
-MAP_SYNC flag in addition can guarantee the persistence of guest write
-to the backend file without other QEMU actions (e.g., periodic fsync()
-by QEMU).
+From: Zhaoshenglong <zhaoshenglong@huawei.com>
 
-By using MAP_SHARED_VALIDATE flag with MAP_SYNC, we can ensure mmap
-with MAP_SYNC fails if MAP_SYNC is not supported by the kernel or the
-backend file. On such failures, QEMU retries mmap without MAP_SYNC and
-MAP_SHARED_VALIDATE.
+acpi_data_push uses g_array_set_size to resize the memory size. If there
+is no enough contiguous memory, the address will be changed. If we use
+the old value, it will assert.
+qemu-kvm: hw/acpi/bios-linker-loader.c:214: bios_linker_loader_add_checksum:
+Assertion `start_offset < file->blob->len' failed.`
 
-Signed-off-by: Haozhong Zhang <haozhong.zhang@intel.com>
+This issue only happens in building SRAT table now but here we unify the
+pattern for other tables as well to avoid possible issues in the future.
+
+Signed-off-by: Zhaoshenglong <zhaoshenglong@huawei.com>
 ---
- util/mmap-alloc.c | 36 +++++++++++++++++++++++++++++++++++-
- 1 file changed, 35 insertions(+), 1 deletion(-)
+v2: update the commit message according to Andrew's comments
+---
+ hw/arm/virt-acpi-build.c | 18 +++++++++++-------
+ 1 file changed, 11 insertions(+), 7 deletions(-)
 
-diff --git a/util/mmap-alloc.c b/util/mmap-alloc.c
-index 2fd8cbcc6f..37b302f057 100644
---- a/util/mmap-alloc.c
-+++ b/util/mmap-alloc.c
-@@ -18,7 +18,18 @@
+diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
+index 3d78ff6..5901142 100644
+--- a/hw/arm/virt-acpi-build.c
++++ b/hw/arm/virt-acpi-build.c
+@@ -453,6 +453,7 @@ build_spcr(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
+     AcpiSerialPortConsoleRedirection *spcr;
+     const MemMapEntry *uart_memmap = &vms->memmap[VIRT_UART];
+     int irq = vms->irqmap[VIRT_UART] + ARM_SPI_BASE;
++    int spcr_start = table_data->len;
  
- #ifdef CONFIG_LINUX
- #include <sys/vfs.h>
-+
-+/*
-+ * MAP_SHARED_VALIDATE and MAP_SYNC were introduced in 4.15 kernel, so
-+ * they may not be defined when compiling on older kernels.
-+ */
-+#ifndef MAP_SHARED_VALIDATE
-+#define MAP_SHARED_VALIDATE   0x3
- #endif
-+#ifndef MAP_SYNC
-+#define MAP_SYNC              0x80000
-+#endif
-+#endif /* CONFIG_LINUX */
+     spcr = acpi_data_push(table_data, sizeof(*spcr));
  
- size_t qemu_fd_getpagesize(int fd)
- {
-@@ -97,6 +108,7 @@ void *qemu_ram_mmap(int fd, size_t size, size_t align, bool shared)
- #endif
-     size_t offset;
-     void *ptr1;
-+    int xflags = 0;
+@@ -476,8 +477,8 @@ build_spcr(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
+     spcr->pci_device_id = 0xffff;  /* PCI Device ID: not a PCI device */
+     spcr->pci_vendor_id = 0xffff;  /* PCI Vendor ID: not a PCI device */
  
-     if (ptr == MAP_FAILED) {
-         return MAP_FAILED;
-@@ -107,12 +119,34 @@ void *qemu_ram_mmap(int fd, size_t size, size_t align, bool shared)
-     assert(align >= getpagesize());
+-    build_header(linker, table_data, (void *)spcr, "SPCR", sizeof(*spcr), 2,
+-                 NULL, NULL);
++    build_header(linker, table_data, (void *)(table_data->data + spcr_start),
++                 "SPCR", table_data->len - spcr_start, 2, NULL, NULL);
+ }
  
-     offset = QEMU_ALIGN_UP((uintptr_t)ptr, align) - (uintptr_t)ptr;
-+
-+#if defined(__linux__)
-+    /*
-+     * If 'fd' refers to a file supporting DAX, mmap it with MAP_SYNC
-+     * will guarantee the guest write persistence without other
-+     * actions in QEMU (e.g., fsync() in QEMU).
-+     *
-+     * MAP_SHARED_VALIDATE ensures mmap with MAP_SYNC fails if
-+     * MAP_SYNC is not supported by the kernel or the file.
-+     *
-+     * On failures of mmap with xflags, QEMU will retry mmap without
-+     * xflags.
-+     */
-+    xflags = shared ? (MAP_SHARED_VALIDATE | MAP_SYNC) : 0;
-+#endif
-+
-+ retry_mmap_fd:
-     ptr1 = mmap(ptr + offset, size, PROT_READ | PROT_WRITE,
-                 MAP_FIXED |
-                 (fd == -1 ? MAP_ANONYMOUS : 0) |
--                (shared ? MAP_SHARED : MAP_PRIVATE),
-+                (shared ? MAP_SHARED : MAP_PRIVATE) | xflags,
-                 fd, 0);
-     if (ptr1 == MAP_FAILED) {
-+        if (xflags) {
-+            xflags = 0;
-+            goto retry_mmap_fd;
-+        }
-+
-         munmap(ptr, total);
-         return MAP_FAILED;
+ static void
+@@ -512,8 +513,8 @@ build_srat(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
+         mem_base += numa_info[i].node_mem;
      }
+ 
+-    build_header(linker, table_data, (void *)srat, "SRAT",
+-                 table_data->len - srat_start, 3, NULL, NULL);
++    build_header(linker, table_data, (void *)(table_data->data + srat_start),
++                 "SRAT", table_data->len - srat_start, 3, NULL, NULL);
+ }
+ 
+ static void
+@@ -522,6 +523,7 @@ build_mcfg(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
+     AcpiTableMcfg *mcfg;
+     const MemMapEntry *memmap = vms->memmap;
+     int len = sizeof(*mcfg) + sizeof(mcfg->allocation[0]);
++    int mcfg_start = table_data->len;
+ 
+     mcfg = acpi_data_push(table_data, len);
+     mcfg->allocation[0].address = cpu_to_le64(memmap[VIRT_PCIE_ECAM].base);
+@@ -532,7 +534,8 @@ build_mcfg(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
+     mcfg->allocation[0].end_bus_number = (memmap[VIRT_PCIE_ECAM].size
+                                           / PCIE_MMCFG_SIZE_MIN) - 1;
+ 
+-    build_header(linker, table_data, (void *)mcfg, "MCFG", len, 1, NULL, NULL);
++    build_header(linker, table_data, (void *)(table_data->data + mcfg_start),
++                 "MCFG", len, 1, NULL, NULL);
+ }
+ 
+ /* GTDT */
+@@ -651,6 +654,7 @@ build_madt(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
+ static void build_fadt(GArray *table_data, BIOSLinker *linker,
+                        VirtMachineState *vms, unsigned dsdt_tbl_offset)
+ {
++    int fadt_start = table_data->len;
+     AcpiFadtDescriptorRev5_1 *fadt = acpi_data_push(table_data, sizeof(*fadt));
+     unsigned xdsdt_entry_offset = (char *)&fadt->x_dsdt - table_data->data;
+     uint16_t bootflags;
+@@ -681,8 +685,8 @@ static void build_fadt(GArray *table_data, BIOSLinker *linker,
+         ACPI_BUILD_TABLE_FILE, xdsdt_entry_offset, sizeof(fadt->x_dsdt),
+         ACPI_BUILD_TABLE_FILE, dsdt_tbl_offset);
+ 
+-    build_header(linker, table_data,
+-                 (void *)fadt, "FACP", sizeof(*fadt), 5, NULL, NULL);
++    build_header(linker, table_data, (void *)(table_data->data + fadt_start),
++                 "FACP", table_data->len - fadt_start, 5, NULL, NULL);
+ }
+ 
+ /* DSDT */
 -- 
-2.14.1
+2.0.4
