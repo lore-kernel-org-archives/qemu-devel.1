@@ -1,29 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57732)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60371)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1eUYPU-0006HP-4M
-	for qemu-devel@nongnu.org; Thu, 28 Dec 2017 08:39:49 -0500
+	(envelope-from <jianjay.zhou@huawei.com>) id 1eUYSm-0007bW-Jq
+	for qemu-devel@nongnu.org; Thu, 28 Dec 2017 08:43:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1eUYPQ-0001cj-3E
-	for qemu-devel@nongnu.org; Thu, 28 Dec 2017 08:39:48 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:53124)
+	(envelope-from <jianjay.zhou@huawei.com>) id 1eUYSi-0004f7-L1
+	for qemu-devel@nongnu.org; Thu, 28 Dec 2017 08:43:12 -0500
+Received: from szxga02-in.huawei.com ([45.249.212.188]:2301 helo=huawei.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1eUYPP-0001bK-Pn
-	for qemu-devel@nongnu.org; Thu, 28 Dec 2017 08:39:44 -0500
-Date: Thu, 28 Dec 2017 14:39:31 +0100
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20171228143931.516b9e60@igors-macbook-pro.local>
-In-Reply-To: <CAKmqyKP4ewwxLgQ0+fBbMzpSOA1rh23XaER-yoJQuBQOiXFPzg@mail.gmail.com>
-References: <cover.1513729519.git.alistair.francis@xilinx.com>
-	<CAFEAcA-dvs-E83ZCEk6VAyyQkpghX9oF-d-D62vOKs7kfjPzaw@mail.gmail.com>
-	<CAKmqyKPHHQcQ3HYs4r7f4uUDfdMqSq=-mUJn6becXw8WXNAwNQ@mail.gmail.com>
-	<CAKmqyKMKL_BGSbaetubaPv8gkmF9XFFdDwkXAPsUZdV1qkOyqA@mail.gmail.com>
-	<20171220220608.GH24025@localhost.localdomain>
-	<CAKmqyKO+UvsEuK3fuEP7jmK3i5hb=rzp8DWye6-P7-BZ2CVXuQ@mail.gmail.com>
-	<CAKmqyKP4ewwxLgQ0+fBbMzpSOA1rh23XaER-yoJQuBQOiXFPzg@mail.gmail.com>
+	(Exim 4.71) (envelope-from <jianjay.zhou@huawei.com>)
+	id 1eUYSh-0004YM-Up
+	for qemu-devel@nongnu.org; Thu, 28 Dec 2017 08:43:08 -0500
+From: "Zhoujian (jay)" <jianjay.zhou@huawei.com>
+Date: Thu, 28 Dec 2017 13:42:51 +0000
+Message-ID: <B2D15215269B544CADD246097EACE7473AB1D517@DGGEMM505-MBS.china.huawei.com>
+References: <1513327555-17520-1-git-send-email-jianjay.zhou@huawei.com>
+	<1513327555-17520-2-git-send-email-jianjay.zhou@huawei.com>
+	<20171222172513.4157adcc@igors-macbook-pro.local>
+	<20171222200305.171cd7fb@igors-macbook-pro.local>
+	<B2D15215269B544CADD246097EACE7473AB196EF@DGGEMM505-MBS.china.huawei.com>
+	<20171228121155.0c1cc273@igors-macbook-pro.local>
+In-Reply-To: <20171228121155.0c1cc273@igors-macbook-pro.local>
+Content-Language: zh-CN
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v4 0/5] Add a valid_cpu_types property
+Subject: Re: [Qemu-devel] [PATCH v2 1/2] vhost: add used memslot number for
+ vhost-user and vhost-kernel separately
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,114 +34,186 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alistair Francis <alistair.francis@xilinx.com>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, Philippe =?UTF-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-
-On Fri, 22 Dec 2017 11:47:00 -0800
-Alistair Francis <alistair.francis@xilinx.com> wrote:
-
-> On Fri, Dec 22, 2017 at 10:45 AM, Alistair Francis
-> <alistair.francis@xilinx.com> wrote:
-> > On Wed, Dec 20, 2017 at 2:06 PM, Eduardo Habkost <ehabkost@redhat.com> wrote:
-> >> On Tue, Dec 19, 2017 at 05:03:59PM -0800, Alistair Francis wrote:
-> >>> On Tue, Dec 19, 2017 at 4:55 PM, Alistair Francis
-> >>> <alistair.francis@xilinx.com> wrote:
-> >>> > On Tue, Dec 19, 2017 at 4:43 PM, Peter Maydell <peter.maydell@linaro.org> wrote:
-> >>> >> On 20 December 2017 at 00:27, Alistair Francis
-> >>> >> <alistair.francis@xilinx.com> wrote:
-> >>> >>> There are numorous QEMU machines that only have a single or a handful of
-> >>> >>> valid CPU options. To simplyfy the management of specificying which CPU
-> >>> >>> is/isn't valid let's create a property that can be set in the machine
-> >>> >>> init. We can then check to see if the user supplied CPU is in that list
-> >>> >>> or not.
-> >>> >>>
-> >>> >>> I have added the valid_cpu_types for some ARM machines only at the
-> >>> >>> moment.
-> >>> >>>
-> >>> >>> Here is what specifying the CPUs looks like now:
-> >>> >>>
-> >>> >>> $ aarch64-softmmu/qemu-system-aarch64 -M netduino2 -kernel ./u-boot.elf -nographic -cpu "cortex-m3" -S
-> >>> >>> QEMU 2.10.50 monitor - type 'help' for more information
-> >>> >>> (qemu) info cpus
-> >>> >>> * CPU #0: thread_id=24175
-> >>> >>> (qemu) q
-> >>> >>>
-> >>> >>> $ aarch64-softmmu/qemu-system-aarch64 -M netduino2 -kernel ./u-boot.elf -nographic -cpu "cortex-m4" -S
-> >>> >>> QEMU 2.10.50 monitor - type 'help' for more information
-> >>> >>> (qemu) q
-> >>> >>>
-> >>> >>> $ aarch64-softmmu/qemu-system-aarch64 -M netduino2 -kernel ./u-boot.elf -nographic -cpu "cortex-m5" -S
-> >>> >>> qemu-system-aarch64: unable to find CPU model 'cortex-m5'
-> >>> >>>
-> >>> >>> $ aarch64-softmmu/qemu-system-aarch64 -M netduino2 -kernel ./u-boot.elf -nographic -cpu "cortex-a9" -S
-> >>> >>> qemu-system-aarch64: Invalid CPU type: cortex-a9-arm-cpu
-> >>> >>> The valid types are: cortex-m3-arm-cpu, cortex-m4-arm-cpu
-> >>> >>
-> >>> >> Thanks for this; we really should be more strict about
-> >>> >> forbidding "won't work" combinations than we have
-> >>> >> been in the past.
-> >>> >>
-> >>> >> In the last of these cases, I think that when we
-> >>> >> list the invalid CPU type and the valid types
-> >>> >> we should use the same names we want the user to
-> >>> >> use on the command line, without the "-arm-cpu"
-> >>> >> suffixes.
-> >>> >
-> >>> > Hmm... That is a good point, it is confusing that they don't line up.
-> >>
-> >> Agreed.
-> >>
-> >>> >
-> >>> > The problem is that we are just doing a simple
-> >>> > object_class_dynamic_cast() in hw/core/machine.c which I think
-> >>> > (untested) requires us to have the full name in the valid cpu array.
-> >> [...]
-> >>>
-> >>> I think an earlier version of my previous series adding the support to
-> >>> machine.c did string comparison, but it was decided to utilise objects
-> >>> instead. One option is to make the array 2 wide and have the second
-> >>> string be user friendly?
-> >>
-> >> Making the array 2-column will duplicate information that we can
-> >> already find out using other methods, and it won't solve the
-> >> problem if an entry has a parent class with multiple subclasses
-> >> (the original reason I suggested object_class_dynamic_cast()).
-> >>
-> >> The main obstacle to fix this easily is that we do have a common
-> >>   ObjectClass *cpu_class_by_name(const char *cpu_model)
-> >> function, but not a common method to get the model name from a
-> >> CPUClass.  Implementing this is possible, but probably better to
-> >> do it after moving the existing arch-specific CPU model
-> >> enumeration hooks to common code (currently we duplicate lots of
-> >> CPU enumeration/lookup boilerplate code that we shouldn't have
-> >> to).
-> >>
-> >> Listing only the human-friendly names in the array like in the
-> >> original patch could be a reasonable temporary solution.  It
-> >> won't allow us to use a single entry for all subclasses of a
-> >> given type by now (e.g. listing only TYPE_X86_CPU on PC), but at
-> >> least we can address this issue without waiting for a refactor of
-> >> the CPU model enumeration code.
-> 
-> Ah, I just re-read this. Do you mean go back to the original RFC and
-> just use strcmp() to compare the human readable cpu_model?
-It's sort of going backwards but I won't object to this as far as you
-won't use machine->cpu_model (which is in process of being removed)
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: "Huangweidong (C)" <weidong.huang@huawei.com>, "mst@redhat.com" <mst@redhat.com>, "wangxin (U)" <wangxinxin.wang@huawei.com>, "dgilbert@redhat.com" <dgilbert@redhat.com>, "Liuzhe (Cloud Open Labs,
+	NFV)" <gary.liuzhe@huawei.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "Gonglei (Arei)" <arei.gonglei@huawei.com>
 
 
-BTW:
-how hard is it, to add  cpu_type2cpu_name function?
 
-> Alistair
-> 
+> -----Original Message-----
+> From: Igor Mammedov [mailto:imammedo@redhat.com]
+> Sent: Thursday, December 28, 2017 7:12 PM
+> To: Zhoujian (jay) <jianjay.zhou@huawei.com>
+> Cc: Huangweidong (C) <weidong.huang@huawei.com>; mst@redhat.com; wangxin
+> (U) <wangxinxin.wang@huawei.com>; dgilbert@redhat.com; Liuzhe (Cloud Open
+> Labs, NFV) <gary.liuzhe@huawei.com>; qemu-devel@nongnu.org; Gonglei (Arei=
+)
+> <arei.gonglei@huawei.com>
+> Subject: Re: [Qemu-devel] [PATCH v2 1/2] vhost: add used memslot number
+> for vhost-user and vhost-kernel separately
+>=20
+> On Sat, 23 Dec 2017 07:09:51 +0000
+> "Zhoujian (jay)" <jianjay.zhou@huawei.com> wrote:
+>=20
+> > Hi Igor,
 > >
-> > Ok, so it sounds like I'll respin this series with an extra column in
-> > the array for human readable names. Then in the future we can work on
-> > removing that.
+> > > -----Original Message-----
+> > > From: Igor Mammedov [mailto:imammedo@redhat.com]
+> > > Sent: Saturday, December 23, 2017 3:03 AM
+> > > To: Zhoujian (jay) <jianjay.zhou@huawei.com>
+> > > Cc: Huangweidong (C) <weidong.huang@huawei.com>; mst@redhat.com;
+> > > wangxin
+> > > (U) <wangxinxin.wang@huawei.com>; qemu-devel@nongnu.org; Liuzhe
+> > > (Cloud Open Labs, NFV) <gary.liuzhe@huawei.com>;
+> > > dgilbert@redhat.com; Gonglei
+> > > (Arei) <arei.gonglei@huawei.com>
+> > > Subject: Re: [Qemu-devel] [PATCH v2 1/2] vhost: add used memslot
+> > > number for vhost-user and vhost-kernel separately
+> > >
+> > > On Fri, 22 Dec 2017 17:25:13 +0100
+> > > Igor Mammedov <imammedo@redhat.com> wrote:
+> > >
+> > > > On Fri, 15 Dec 2017 16:45:54 +0800 Jay Zhou
+> > > > <jianjay.zhou@huawei.com> wrote:
+> > > [...]
+> > >
+> > > > > +static void vhost_user_set_used_memslots(struct vhost_dev *dev) =
+{
+> > > > > +    int counter =3D 0;
+> > > > > +    int i;
+> > > > > +
+> > > > > +    for (i =3D 0; i < dev->mem->nregions; ++i) {
+> > > > > +        struct vhost_memory_region *reg =3D dev->mem->regions + =
+i;
+> > > > > +        ram_addr_t offset;
+> > > > > +        MemoryRegion *mr;
+> > > > > +        int fd;
+> > > > > +
+> > > > > +        assert((uintptr_t)reg->userspace_addr =3D=3D reg-
+> >userspace_addr);
+> > > > > +        mr =3D memory_region_from_host((void *)(uintptr_t)reg-
+> > > >userspace_addr,
+> > > > > +                                    &offset);
+> > > > > +        fd =3D memory_region_get_fd(mr);
+> > > > > +        if (fd > 0) {
+> > > > > +            counter++;
+> > > > > +        }
+> > > > > +    }
+> > > > vhost_user_set_mem_table() already does the same counting, there
+> > > > is no point in duplicating it, just drop vhost_set_used_memslots
+> > > > callback
+> > > >
+> > > > > +    vhost_user_used_memslots =3D counter;
+> > > > and update this value from vhost_user_set_mem_table()
+> > > never mind, updating it from vhost_user_set_mem_table() as it's
+> > > called only when device is started which is not the case when
+> > > backend is initialized, so the way you did it should work for both
+> > > cases
+> > >
 > >
-> > Alistair
+> > How about do it like this(not sure whether the best way, any idea?):
 > >
-> >>
-> >> --
-> >> Eduardo
-> >>
+> > Define a new function, e.g.
+> >
+> > static void vhost_user_set_used_memslots_and_msgs(struct vhost_dev *dev=
+,
+> >                             VhostUserMsg *msg, size_t *fd_num, int
+> > *fds)
+> s/vhost_user_set_used_memslots_and_msgs/vhost_user_prepare_msg/
+
+Ok
+
+>=20
+> > {
+> >     int num =3D 0;
+> >     int i;
+> >
+> >     for (i =3D 0; i < dev->mem->nregions; ++i) {
+> >         struct vhost_memory_region *reg =3D dev->mem->regions + i;
+> >         ram_addr_t offset;
+> >         MemoryRegion *mr;
+> >         int fd;
+> >
+> >         assert((uintptr_t)reg->userspace_addr =3D=3D reg->userspace_add=
+r);
+> >         mr =3D memory_region_from_host((void *)(uintptr_t)reg-
+> >userspace_addr,
+> >                                 &offset);
+> >         fd =3D memory_region_get_fd(mr);
+> >         if (fd > 0) {
+> >             if (msg && fd_num && fds) {
+> >                 msg->payload.memory.regions[num].userspace_addr
+> >                                         =3D reg->userspace_addr;
+> >                 msg->payload.memory.regions[num].memory_size
+> >                                         =3D reg->memory_size;
+> >                 msg->payload.memory.regions[num].guest_phys_addr
+> >                                         =3D reg->guest_phys_addr;
+> >                 msg->payload.memory.regions[num].mmap_offset =3D offset=
+;
+> >                 assert(num < VHOST_MEMORY_MAX_NREGIONS);
+> there is no need to assert here function can return error.
+
+Ok
+
+>=20
+> >                 fds[num++] =3D fd;
+> Is num counting in wrong place?
+>=20
+>    if (msg && fd_num && fds) =3D> false
+> is the case vhost_user_set_used_memslots(), so it won't count 'num'
+> which is later used to intialize vhost_user_used_memslots.
+
+My bad, will fix.
+
+> >             }
+> >         }
+> >     }
+> >     vhost_user_used_memslots =3D num;
+> add comment here as it won't be obvious to reader why
+> vhost_user_used_memslots is here
+
+Will do.
+
+>=20
+> >     if (fd_num)
+> >         *fd_num =3D num;
+> msg.payload.memory.nregions can be used directly instead of num amd fd_nu=
+m
+> and it's 1 less argument to pass out of function.
+>=20
+> > }
+> >
+> > And call it when the backend is initialized and the device is started
+> > respectively,
+> >
+> > static void vhost_user_set_used_memslots(struct vhost_dev *dev)
+> static int
+>=20
+> for return value
+>=20
+> > {
+> > 	vhost_user_set_used_memslots_and_msgs(dev, NULL, NULL, NULL);
+> we can do here
+>         vhost_user_set_used_memslots_and_msgs(dev, &msg, &fd_num, fds);
+> and discard/ignore results, that way it will be less conditionals inside
+> of called function
+>=20
+> > }
+> >
+> > static int vhost_user_set_mem_table(struct vhost_dev *dev,
+> > 						struct vhost_memory *mem)
+> > {
+> > 	[...]
+> >
+> > 	vhost_user_set_used_memslots_and_msgs(dev, &msg, &fd_num, fds);
+>    rc =3D vhost_user_set_used_memslots_and_msgs(dev, &msg, &fd_num, fds);
+>=20
+> and return error from vhost_user_set_mem_table(), caller should be able t=
+o
+> coupe with error.
+>=20
+
+Will fix all of them in the next version.
+
+Regards,
+Jay
