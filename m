@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52735)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39269)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1eUUIb-0000RC-CT
-	for qemu-devel@nongnu.org; Thu, 28 Dec 2017 04:16:26 -0500
+	(envelope-from <den@openvz.org>) id 1eUUc0-0005o9-6r
+	for qemu-devel@nongnu.org; Thu, 28 Dec 2017 04:36:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1eUUIY-0003W7-67
-	for qemu-devel@nongnu.org; Thu, 28 Dec 2017 04:16:25 -0500
-Received: from mailhub.sw.ru ([195.214.232.25]:33714 helo=relay.sw.ru)
+	(envelope-from <den@openvz.org>) id 1eUUbv-0004gb-5u
+	for qemu-devel@nongnu.org; Thu, 28 Dec 2017 04:36:28 -0500
+Received: from mailhub.sw.ru ([195.214.232.25]:37458 helo=relay.sw.ru)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
-	id 1eUUIX-0003U5-Qa
-	for qemu-devel@nongnu.org; Thu, 28 Dec 2017 04:16:22 -0500
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Thu, 28 Dec 2017 12:16:16 +0300
-Message-Id: <20171228091616.7999-1-vsementsov@virtuozzo.com>
-Subject: [Qemu-devel] [PATCH] migration: finalize current_migration object
+	(Exim 4.71) (envelope-from <den@openvz.org>) id 1eUUbu-0004VP-Q2
+	for qemu-devel@nongnu.org; Thu, 28 Dec 2017 04:36:23 -0500
+From: "Denis V. Lunev" <den@openvz.org>
+Date: Thu, 28 Dec 2017 12:36:18 +0300
+Message-Id: <1514453778-5363-1-git-send-email-den@openvz.org>
+Subject: [Qemu-devel] [PATCH 1/1] io/channel-websock: handle continuous
+ reads without any data
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,63 +23,53 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: pbonzini@redhat.com, dgilbert@redhat.com, quintela@redhat.com, peterx@redhat.com
+Cc: Edgar Kaziakhmedov <edgar.kaziakhmedov@virtuozzo.com>, "Denis V . Lunev" <den@openvz.org>, "Daniel P . Berrange" <berrange@redhat.com>
 
-current_migration has .instance_finalize callback, but it is not
-called, because nobody unrefs current_migration. Fix that.
+From: Edgar Kaziakhmedov <edgar.kaziakhmedov@virtuozzo.com>
 
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+According to the current implementation of websocket protocol in QEMU,
+qio_channel_websock_handshake_io tries to read handshake from the
+channel to start communication over tcp socket. But this subroutine
+doesn't cover scenario when socket was closed while handshaking. Therefore,
+if G_IO_IN is caught and qio_channel_websock_handshake_read returns
+zero, error has to be set and connection has to be done.
+
+Such behaviour causes 100% CPU load in main QEMU loop, because main loop
+poll continues to receive and handle G_IO_IN events from websocket.
+
+Step to reproduce 100% CPU load:
+- start qemu with the simplest configuration
+    $ qemu -vnc [::1]:1,websocket=7500
+2) open any vnc listener (which doesn't follow websocket protocol)
+    $ vncviewer :7500
+3) kill listener
+4) qemu main thread eats 100% CPU usage
+
+Signed-off-by: Edgar Kaziakhmedov <edgar.kaziakhmedov@virtuozzo.com>
+Signed-off-by: Denis V. Lunev <den@openvz.org>
+CC: Daniel P. Berrange <berrange@redhat.com>
 ---
+ io/channel-websock.c | 8 +++++---
+ 1 file changed, 5 insertions(+), 3 deletions(-)
 
-Note: migration_object_init() is called from main() too.
-      _finalize looks a bit weird after all _cleanp's, but
-      it finally calls migration_instance_finalize, so it
-      should be more correct.
-
- include/migration/misc.h | 1 +
- migration/migration.c    | 5 +++++
- vl.c                     | 1 +
- 3 files changed, 7 insertions(+)
-
-diff --git a/include/migration/misc.h b/include/migration/misc.h
-index c079b7771b..77fd4f587c 100644
---- a/include/migration/misc.h
-+++ b/include/migration/misc.h
-@@ -44,6 +44,7 @@ void dump_vmstate_json_to_file(FILE *out_fp);
- 
- /* migration/migration.c */
- void migration_object_init(void);
-+void migration_object_finalize(void);
- void qemu_start_incoming_migration(const char *uri, Error **errp);
- bool migration_is_idle(void);
- void add_migration_state_change_notifier(Notifier *notify);
-diff --git a/migration/migration.c b/migration/migration.c
-index 4de3b551fe..090678f6a8 100644
---- a/migration/migration.c
-+++ b/migration/migration.c
-@@ -132,6 +132,11 @@ void migration_object_init(void)
+diff --git a/io/channel-websock.c b/io/channel-websock.c
+index 87ebdeb..71f046a 100644
+--- a/io/channel-websock.c
++++ b/io/channel-websock.c
+@@ -581,9 +581,11 @@ static gboolean qio_channel_websock_handshake_io(QIOChannel *ioc,
+         return FALSE;
      }
- }
+     if (ret == 0) {
+-        trace_qio_channel_websock_handshake_pending(ioc, G_IO_IN);
+-        /* need more data still */
+-        return TRUE;
++        /* If G_IN_IO happened and there is no data to read, close connection */
++        error_setg(&err, "connection was closed");
++        qio_task_set_error(task, err);
++        qio_task_complete(task);
++        return FALSE;
+     }
  
-+void migration_object_finalize(void)
-+{
-+    object_unref(OBJECT(current_migration));
-+}
-+
- /* For outgoing */
- MigrationState *migrate_get_current(void)
- {
-diff --git a/vl.c b/vl.c
-index d3a5c5d021..073aef4b84 100644
---- a/vl.c
-+++ b/vl.c
-@@ -4874,6 +4874,7 @@ int main(int argc, char **argv, char **envp)
-     monitor_cleanup();
-     qemu_chr_cleanup();
-     user_creatable_cleanup();
-+    migration_object_finalize();
-     /* TODO: unref root container, check all devices are ok */
- 
-     return 0;
+     if (err) {
 -- 
-2.11.1
+2.7.4
