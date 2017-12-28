@@ -1,23 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45396)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48573)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1eUWAc-00022L-0k
-	for qemu-devel@nongnu.org; Thu, 28 Dec 2017 06:16:19 -0500
+	(envelope-from <imammedo@redhat.com>) id 1eUWEH-0003bJ-3T
+	for qemu-devel@nongnu.org; Thu, 28 Dec 2017 06:20:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1eUWAX-0006bz-0X
-	for qemu-devel@nongnu.org; Thu, 28 Dec 2017 06:16:17 -0500
-References: <20171220154945.88410-1-vsementsov@virtuozzo.com>
-	<20171220154945.88410-4-vsementsov@virtuozzo.com>
-	<20171228052418.GC9192@lemon>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <f6637c9d-047b-b9f3-1a5a-4b59baf49cbc@virtuozzo.com>
-Date: Thu, 28 Dec 2017 14:16:06 +0300
+	(envelope-from <imammedo@redhat.com>) id 1eUWEC-0002kE-K7
+	for qemu-devel@nongnu.org; Thu, 28 Dec 2017 06:20:05 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:40622)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1eUWEC-0002ix-Bq
+	for qemu-devel@nongnu.org; Thu, 28 Dec 2017 06:20:00 -0500
+Date: Thu, 28 Dec 2017 12:19:49 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20171228121949.0d3f7d77@igors-macbook-pro.local>
+In-Reply-To: <B2D15215269B544CADD246097EACE7473AB19758@DGGEMM505-MBS.china.huawei.com>
+References: <1513327555-17520-1-git-send-email-jianjay.zhou@huawei.com>
+	<1513327555-17520-3-git-send-email-jianjay.zhou@huawei.com>
+	<20171222194855.6d1139f1@igors-macbook-pro.local>
+	<B2D15215269B544CADD246097EACE7473AB19758@DGGEMM505-MBS.china.huawei.com>
 MIME-Version: 1.0
-In-Reply-To: <20171228052418.GC9192@lemon>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH v9 03/13] block/dirty-bitmap: add _locked
- version of bdrv_reclaim_dirty_bitmap
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 2/2] vhost: double check used memslots
+ number
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,118 +30,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, pbonzini@redhat.com, armbru@redhat.com, eblake@redhat.com, stefanha@redhat.com, amit.shah@redhat.com, quintela@redhat.com, mreitz@redhat.com, kwolf@redhat.com, peter.maydell@linaro.org, dgilbert@redhat.com, den@openvz.org, jsnow@redhat.com, lirans@il.ibm.com
+To: "Zhoujian (jay)" <jianjay.zhou@huawei.com>
+Cc: "Huangweidong (C)" <weidong.huang@huawei.com>, "mst@redhat.com" <mst@redhat.com>, "wangxin (U)" <wangxinxin.wang@huawei.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "Liuzhe (Cloud Open Labs,
+	NFV)" <gary.liuzhe@huawei.com>, "dgilbert@redhat.com" <dgilbert@redhat.com>, "Gonglei (Arei)" <arei.gonglei@huawei.com>
 
-28.12.2017 08:24, Fam Zheng wrote:
-> On Wed, 12/20 18:49, Vladimir Sementsov-Ogievskiy wrote:
->> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
->> ---
->>   include/block/dirty-bitmap.h |  3 +++
->>   block/dirty-bitmap.c         | 25 ++++++++++++++++---------
->>   2 files changed, 19 insertions(+), 9 deletions(-)
->>
->> diff --git a/include/block/dirty-bitmap.h b/include/block/dirty-bitmap.h
->> index 93d4336505..caf1f3d861 100644
->> --- a/include/block/dirty-bitmap.h
->> +++ b/include/block/dirty-bitmap.h
->> @@ -92,5 +92,8 @@ bool bdrv_has_changed_persistent_bitmaps(BlockDriverSt=
-ate *bs);
->>   BdrvDirtyBitmap *bdrv_dirty_bitmap_next(BlockDriverState *bs,
->>                                           BdrvDirtyBitmap *bitmap);
->>   char *bdrv_dirty_bitmap_sha256(const BdrvDirtyBitmap *bitmap, Error **=
-errp);
->> +BdrvDirtyBitmap *bdrv_reclaim_dirty_bitmap_locked(BlockDriverState *bs,
->> +                                                  BdrvDirtyBitmap *bitm=
-ap,
->> +                                                  Error **errp);
->>  =20
->>   #endif
->> diff --git a/block/dirty-bitmap.c b/block/dirty-bitmap.c
->> index d83da077d5..fe27ddfb83 100644
->> --- a/block/dirty-bitmap.c
->> +++ b/block/dirty-bitmap.c
->> @@ -327,15 +327,11 @@ BdrvDirtyBitmap *bdrv_dirty_bitmap_abdicate(BlockD=
-riverState *bs,
->>    * The merged parent will be un-frozen, but not explicitly re-enabled.
->>    * Called with BQL taken.
-> Maybe update the comment as
->
-> s/Called with BQL taken/Called within bdrv_dirty_bitmap_lock..unlock/
->
-> and ...
+On Sat, 23 Dec 2017 08:27:25 +0000
+"Zhoujian (jay)" <jianjay.zhou@huawei.com> wrote:
 
-we have the following comment:
+> 
+> 
+> > -----Original Message-----
+> > From: Igor Mammedov [mailto:imammedo@redhat.com]
+> > Sent: Saturday, December 23, 2017 2:49 AM
+> > To: Zhoujian (jay) <jianjay.zhou@huawei.com>
+> > Cc: qemu-devel@nongnu.org; mst@redhat.com; Huangweidong (C)
+> > <weidong.huang@huawei.com>; Gonglei (Arei) <arei.gonglei@huawei.com>;
+> > wangxin (U) <wangxinxin.wang@huawei.com>; Liuzhe (Cloud Open Labs, NFV)
+> > <gary.liuzhe@huawei.com>; dgilbert@redhat.com
+> > Subject: Re: [PATCH v2 2/2] vhost: double check used memslots number
+> > 
+> > On Fri, 15 Dec 2017 16:45:55 +0800
+> > Jay Zhou <jianjay.zhou@huawei.com> wrote:
+> > 
+> > > If the VM already has N(N>8) available memory slots for vhost user,
+> > > the VM will be crashed in vhost_user_set_mem_table if we try to
+> > > hotplug the first vhost user NIC.
+> > > This patch checks if memslots number exceeded or not after updating
+> > > vhost_user_used_memslots.
+> > Can't understand commit message, pls rephrase (what is being fixed, and
+> > how it's fixed) also include reproducing steps for crash and maybe
+> > describe call flow/backtrace that triggers crash.
+> 
+> Sorry about my pool english
+> 
+> > 
+> > PS:
+> > I wasn't able to reproduce crash
+> 
+> Steps to reproduce:
+> (1) start up a VM successfully without any vhost device
+> (2) hotplug 8 DIMM memory successfully
+> (3) hotplug a vhost-user NIC, the VM crashed, it asserted
+>     at the line
+>         assert(fd_num < VHOST_MEMORY_MAX_NREGIONS);
+quick fix for this crash could be:
 
- =C2=A0=C2=A0=C2=A0 /* Writing to the list requires the BQL _and_ the dirty=
-_bitmap_mutex.
- =C2=A0=C2=A0=C2=A0=C2=A0 * Reading from the list can be done with either t=
-he BQL or the
- =C2=A0=C2=A0=C2=A0=C2=A0 * dirty_bitmap_mutex.=C2=A0 Modifying a bitmap on=
-ly requires
- =C2=A0=C2=A0=C2=A0=C2=A0 * dirty_bitmap_mutex. */
- =C2=A0=C2=A0=C2=A0 QemuMutex dirty_bitmap_mutex;
+diff --git a/hw/virtio/vhost-user.c b/hw/virtio/vhost-user.c
+index 093675ed98..07a37537dd 100644
+--- a/hw/virtio/vhost-user.c
++++ b/hw/virtio/vhost-user.c
+@@ -321,7 +321,9 @@ static int vhost_user_set_mem_table(struct vhost_dev *dev,
+             msg.payload.memory.regions[fd_num].memory_size  = reg->memory_size;
+             msg.payload.memory.regions[fd_num].guest_phys_addr = reg->guest_phys_addr;
+             msg.payload.memory.regions[fd_num].mmap_offset = offset;
+-            assert(fd_num < VHOST_MEMORY_MAX_NREGIONS);
++            if (fd_num == VHOST_MEMORY_MAX_NREGIONS) {
++                return -1;
++            }
+             fds[fd_num++] = fd;
+         }
+     }
 
-(I don't understand well the logic, why is it so. Paolo introduced the=20
-lock, but didn't update some functions..)
+it should gracefully prevent device to start.
 
-so, actually, here we need both BQL and mutex.
-
->
->>    */
->> -BdrvDirtyBitmap *bdrv_reclaim_dirty_bitmap(BlockDriverState *bs,
->> -                                           BdrvDirtyBitmap *parent,
->> -                                           Error **errp)
->> +BdrvDirtyBitmap *bdrv_reclaim_dirty_bitmap_locked(BlockDriverState *bs,
->> +                                                  BdrvDirtyBitmap *pare=
-nt,
->> +                                                  Error **errp)
->>   {
->> -    BdrvDirtyBitmap *successor;
->> -
->> -    qemu_mutex_lock(parent->mutex);
->> -
->> -    successor =3D parent->successor;
->> +    BdrvDirtyBitmap *successor =3D parent->successor;
->>  =20
->>       if (!successor) {
->>           error_setg(errp, "Cannot reclaim a successor when none is pres=
-ent");
->> @@ -349,9 +345,20 @@ BdrvDirtyBitmap *bdrv_reclaim_dirty_bitmap(BlockDri=
-verState *bs,
->>       bdrv_release_dirty_bitmap_locked(bs, successor);
->>       parent->successor =3D NULL;
->>  =20
->> +    return parent;
->> +}
->> +
-> ... move the "Called with BQL taken" comment here?
-
-and here BQL.
-
-Ok, I'll add/fix comments.
-
->
->> +BdrvDirtyBitmap *bdrv_reclaim_dirty_bitmap(BlockDriverState *bs,
->> +                                           BdrvDirtyBitmap *parent,
->> +                                           Error **errp)
->> +{
->> +    BdrvDirtyBitmap *ret;
->> +
->> +    qemu_mutex_lock(parent->mutex);
->> +    ret =3D bdrv_reclaim_dirty_bitmap_locked(bs, parent, errp);
->>       qemu_mutex_unlock(parent->mutex);
->>  =20
->> -    return parent;
->> +    return ret;
->>   }
->>  =20
->>   /**
->> --=20
->> 2.11.1
->>
-
-
---=20
-Best regards,
-Vladimir
+>     in vhost_user_set_mem_table()
+> 
+> Regards,
+> Jay
+[...]
