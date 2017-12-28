@@ -1,34 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58059)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58080)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eUPpe-000151-7K
+	(envelope-from <bounces@canonical.com>) id 1eUPpe-000153-Tj
 	for qemu-devel@nongnu.org; Wed, 27 Dec 2017 23:30:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eUPpb-0001Ip-EA
+	(envelope-from <bounces@canonical.com>) id 1eUPpd-0001NN-VW
 	for qemu-devel@nongnu.org; Wed, 27 Dec 2017 23:30:14 -0500
-Received: from indium.canonical.com ([91.189.90.7]:58788)
+Received: from indium.canonical.com ([91.189.90.7]:58838)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1eUPpb-0001Hr-7a
-	for qemu-devel@nongnu.org; Wed, 27 Dec 2017 23:30:11 -0500
+	id 1eUPpd-0001Lt-B1
+	for qemu-devel@nongnu.org; Wed, 27 Dec 2017 23:30:13 -0500
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1eUPpa-0007Qk-FI
-	for <qemu-devel@nongnu.org>; Thu, 28 Dec 2017 04:30:10 +0000
+	id 1eUPpc-0007SN-KZ
+	for <qemu-devel@nongnu.org>; Thu, 28 Dec 2017 04:30:12 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 708762E8060
-	for <qemu-devel@nongnu.org>; Thu, 28 Dec 2017 04:30:10 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 98DAB2E8060
+	for <qemu-devel@nongnu.org>; Thu, 28 Dec 2017 04:30:12 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Thu, 28 Dec 2017 04:17:20 -0000
-From: Launchpad Bug Tracker <1336123@bugs.launchpad.net>
-Reply-To: Bug 1336123 <1336123@bugs.launchpad.net>
+Date: Thu, 28 Dec 2017 04:17:22 -0000
+From: Launchpad Bug Tracker <1332297@bugs.launchpad.net>
+Reply-To: Bug 1332297 <1332297@bugs.launchpad.net>
 Sender: bounces@canonical.com
-References: <20140701023616.19098.65962.malonedeb@gac.canonical.com>
-Message-Id: <151443464148.28609.15417449887888776668.malone@loganberry.canonical.com>
+References: <20140619191312.10674.6213.malonedeb@soybean.canonical.com>
+Message-Id: <151443464247.28609.14953690081923563168.malone@loganberry.canonical.com>
 Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1336123] Re: bad switch,
- segfault in hw/pci-host/bonito.c bonito_readl
+Subject: [Qemu-devel] [Bug 1332297] Re: qemu-img: crash on check of an image
+ with large value in the 'size' header field
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -48,27 +48,29 @@ To: qemu-devel@nongnu.org
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1336123
+https://bugs.launchpad.net/bugs/1332297
 
 Title:
-  bad switch, segfault in hw/pci-host/bonito.c bonito_readl
+  qemu-img: crash on check of an image with large value in the 'size'
+  header field
 
 Status in QEMU:
   Expired
 
 Bug description:
-  http://git.qemu.org/?p=3Dqemu.git;a=3Dblob;f=3Dhw/pci-
-  host/bonito.c;h=3D56292adb03cd1a9873c2c9e5a0b2978fd0572214;hb=3Dmaster#l3=
-01
+  The qemu-img crashes on the next command:
 
-  The switch statement is error-prone, since two branches return the
-  same result.
+  qemu-img check test_image
 
-  Segfault reproducing steps:
-  1. make a Linux kernel(for example 3.16.0-rc2) with fuloong2e_defconfig
-  2. use 'qemu-system-mips64el -machine fulong2e' to boot the vmlinux
+  'test_image' can be found in the attachment. It's a fuzzed test image
+  with the qcow2 image header only. Suppositional cause of the failure
+  is the value of 'size' header field set to maximum uint_64 value.
 
-  qemu versions tried: 2.0.0, 1.6.2
+  System information:
+
+  qemu.git: 6baa963f4dcc2118
+  Host: Linux 3.14.7-200.fc20.x86_64 #1 SMP Wed Jun 11 22:38:05 UTC 2014 x8=
+6_64  GNU/Linux
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1336123/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1332297/+subscriptions
