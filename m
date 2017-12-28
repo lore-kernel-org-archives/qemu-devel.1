@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58188)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39328)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1eUcA1-0005N6-OX
-	for qemu-devel@nongnu.org; Thu, 28 Dec 2017 12:40:06 -0500
+	(envelope-from <laurent@vivier.eu>) id 1eUcK8-0000iy-LD
+	for qemu-devel@nongnu.org; Thu, 28 Dec 2017 12:50:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1eUc9x-0006Jr-FD
-	for qemu-devel@nongnu.org; Thu, 28 Dec 2017 12:40:05 -0500
-Received: from mout.kundenserver.de ([212.227.126.134]:54789)
+	(envelope-from <laurent@vivier.eu>) id 1eUcK5-0005pH-3b
+	for qemu-devel@nongnu.org; Thu, 28 Dec 2017 12:50:32 -0500
+Received: from mout.kundenserver.de ([212.227.126.134]:60800)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1eUc9w-0006H4-Rt
-	for qemu-devel@nongnu.org; Thu, 28 Dec 2017 12:40:01 -0500
-References: <20171228150038.16450-1-samuel.thibault@ens-lyon.org>
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1eUcK4-0005oA-IO
+	for qemu-devel@nongnu.org; Thu, 28 Dec 2017 12:50:28 -0500
+References: <20171228141104.15198-1-samuel.thibault@ens-lyon.org>
 From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <ae60a724-48bc-b39e-8082-c1ee618ed5da@vivier.eu>
-Date: Thu, 28 Dec 2017 18:39:40 +0100
+Message-ID: <189dec5d-6408-31d6-1df8-52e3397c8a98@vivier.eu>
+Date: Thu, 28 Dec 2017 18:50:14 +0100
 MIME-Version: 1.0
-In-Reply-To: <20171228150038.16450-1-samuel.thibault@ens-lyon.org>
+In-Reply-To: <20171228141104.15198-1-samuel.thibault@ens-lyon.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] linux-user: Add getcpu() support
+Subject: Re: [Qemu-devel] [PATCH] linux-user: Fix sched_get/setaffinity
+ conversion
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,50 +30,64 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Samuel Thibault <samuel.thibault@ens-lyon.org>, qemu-devel@nongnu.org, Riku Voipio <riku.voipio@iki.fi>
 
-Le 28/12/2017 à 16:00, Samuel Thibault a écrit :
+Le 28/12/2017 à 15:11, Samuel Thibault a écrit :
+> sched_get/setaffinity linux-user syscalls were missing conversions for
+> little/big endian, which is hairy since longs may not be the same size
+> either.
+> 
+> For simplicity, this just introduces loops to convert bit by bit like is
+> done for select.
+> 
+
+I think you should introduce two new functions:
+target_to_host_cpu_mask()/host_to_target_cpu_mask().
+
 > Signed-off-by: Samuel Thibault <samuel.thibault@ens-lyon.org>
 > ---
->  linux-user/syscall.c | 16 ++++++++++++++++
->  1 file changed, 16 insertions(+)
+>  linux-user/syscall.c | 48 ++++++++++++++++++++++++++++++++++++++++++++----
+>  1 file changed, 44 insertions(+), 4 deletions(-)
 > 
 > diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-> index 8ec7de96ce..bb8cb726f5 100644
+> index 11c9116c4a..8ec7de96ce 100644
 > --- a/linux-user/syscall.c
 > +++ b/linux-user/syscall.c
-> @@ -296,6 +296,8 @@ _syscall3(int, sys_sched_getaffinity, pid_t, pid, unsigned int, len,
->  #define __NR_sys_sched_setaffinity __NR_sched_setaffinity
->  _syscall3(int, sys_sched_setaffinity, pid_t, pid, unsigned int, len,
->            unsigned long *, user_mask_ptr);
-> +#define __NR_sys_getcpu __NR_getcpu
-> +_syscall3(int, sys_getcpu, unsigned *, cpu, unsigned *, node, void *, tcache);
->  _syscall4(int, reboot, int, magic1, int, magic2, unsigned int, cmd,
->            void *, arg);
->  _syscall2(int, capget, struct __user_cap_header_struct *, header,
-> @@ -10443,6 +10445,20 @@ abi_long do_syscall(void *cpu_env, int num, abi_long arg1,
->              ret = get_errno(sys_sched_setaffinity(arg1, mask_size, mask));
->          }
->          break> +    case TARGET_NR_getcpu:
-> +        {
-> +            unsigned cpu, node;
-> +            ret = get_errno(sys_getcpu(arg1 ? &cpu : NULL,
-> +                                       arg2 ? &node : NULL,
-> +                                       NULL));
-> +            if (arg1) {
-> +                put_user(cpu, arg1, abi_uint);
-> +            }
-> +            if (arg2) {
-> +                put_user(node, arg2, abi_uint);
-> +            }
+> @@ -10341,6 +10341,8 @@ abi_long do_syscall(void *cpu_env, int num, abi_long arg1,
+>          {
+>              unsigned int mask_size;
+>              unsigned long *mask;
+> +            abi_ulong *abimask;
+> +            unsigned i, j;
+>  
+>              /*
+>               * sched_getaffinity needs multiples of ulong, so need to take
+> @@ -10353,6 +10355,7 @@ abi_long do_syscall(void *cpu_env, int num, abi_long arg1,
+>              mask_size = (arg2 + (sizeof(*mask) - 1)) & ~(sizeof(*mask) - 1);
+>  
+>              mask = alloca(mask_size);
+> +            memset(mask, 0, mask_size);
+>              ret = get_errno(sys_sched_getaffinity(arg1, mask_size, mask));
+>  
+>              if (!is_error(ret)) {
+> @@ -10372,9 +10375,27 @@ abi_long do_syscall(void *cpu_env, int num, abi_long arg1,
+>                      ret = arg2;
+>                  }
+>  
+> -                if (copy_to_user(arg3, mask, ret)) {
+> +                abimask = lock_user(VERIFY_WRITE, arg3, arg2, 0);
+> +                if (!abimask) {
+>                      goto efault;
+>                  }
+> +
+> +                for (i = 0 ; i < arg2 / sizeof(abi_ulong); i++) {
+> +                    unsigned abi_ubits = sizeof(abi_ulong) * 8;
+> +                    unsigned ubits = sizeof(*mask) * 8;
+> +                    unsigned bit = i * abi_ubits;
+> +                    abi_ulong val = 0;
+> +
+> +                    for (j = 0; j < abi_ubits; j++, bit++) {
+> +                        if (mask[bit / ubits] & (1UL << (bit % ubits))) {
 
-You must check for EFAULT.
-
-    if (arg1 && put_user_u32(cpu, arg1)) {
-        goto efault;
-    }
-...
-
-I don't think you need to use the abi_uint type as we are using
-put_user_u32() for all the other syscalls for unsigned int.
+You should use __CPUMASK() and introduce a TARGET_CPUMASK().
 
 Thanks,
 Laurent
