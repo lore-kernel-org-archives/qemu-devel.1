@@ -1,34 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58397)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34685)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eUPq5-0001OD-PS
-	for qemu-devel@nongnu.org; Wed, 27 Dec 2017 23:30:42 -0500
+	(envelope-from <famz@redhat.com>) id 1eUQYo-0000XQ-DC
+	for qemu-devel@nongnu.org; Thu, 28 Dec 2017 00:16:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eUPq1-0001qa-RS
-	for qemu-devel@nongnu.org; Wed, 27 Dec 2017 23:30:41 -0500
-Received: from indium.canonical.com ([91.189.90.7]:59618)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1eUPq1-0001po-Kc
-	for qemu-devel@nongnu.org; Wed, 27 Dec 2017 23:30:37 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1eUPq0-0007mt-EP
-	for <qemu-devel@nongnu.org>; Thu, 28 Dec 2017 04:30:36 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 6BCA82E80C7
-	for <qemu-devel@nongnu.org>; Thu, 28 Dec 2017 04:30:36 +0000 (UTC)
+	(envelope-from <famz@redhat.com>) id 1eUQYn-0000aj-7o
+	for qemu-devel@nongnu.org; Thu, 28 Dec 2017 00:16:54 -0500
+Date: Thu, 28 Dec 2017 13:16:37 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20171228051637.GA9192@lemon>
+References: <20171220154945.88410-1-vsementsov@virtuozzo.com>
+	<20171220154945.88410-2-vsementsov@virtuozzo.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 28 Dec 2017 04:17:28 -0000
-From: Launchpad Bug Tracker <1239008@bugs.launchpad.net>
-Reply-To: Bug 1239008 <1239008@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20131011233333.16273.25871.malonedeb@soybean.canonical.com>
-Message-Id: <151443464899.28609.7223389676104693051.malone@loganberry.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1239008] Re: qemu fails to scroll screen on
- ^Vidmem output
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20171220154945.88410-2-vsementsov@virtuozzo.com>
+Subject: Re: [Qemu-devel] [PATCH v9 01/13] block/dirty-bitmap: add
+ bdrv_dirty_bitmap_enable_successor()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,50 +24,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, kwolf@redhat.com, peter.maydell@linaro.org, lirans@il.ibm.com, quintela@redhat.com, jsnow@redhat.com, armbru@redhat.com, mreitz@redhat.com, stefanha@redhat.com, den@openvz.org, amit.shah@redhat.com, pbonzini@redhat.com, dgilbert@redhat.com
 
-[Expired for QEMU because there has been no activity for 60 days.]
+On Wed, 12/20 18:49, Vladimir Sementsov-Ogievskiy wrote:
+> Enabling bitmap successor is necessary to enable successors of bitmaps
+> being migrated before target vm start.
+> 
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> Reviewed-by: John Snow <jsnow@redhat.com>
+> ---
+>  include/block/dirty-bitmap.h | 1 +
+>  block/dirty-bitmap.c         | 8 ++++++++
+>  2 files changed, 9 insertions(+)
+> 
+> diff --git a/include/block/dirty-bitmap.h b/include/block/dirty-bitmap.h
+> index 3579a7597c..93d4336505 100644
+> --- a/include/block/dirty-bitmap.h
+> +++ b/include/block/dirty-bitmap.h
+> @@ -20,6 +20,7 @@ BdrvDirtyBitmap *bdrv_dirty_bitmap_abdicate(BlockDriverState *bs,
+>  BdrvDirtyBitmap *bdrv_reclaim_dirty_bitmap(BlockDriverState *bs,
+>                                             BdrvDirtyBitmap *bitmap,
+>                                             Error **errp);
+> +void bdrv_dirty_bitmap_enable_successor(BdrvDirtyBitmap *bitmap);
+>  BdrvDirtyBitmap *bdrv_find_dirty_bitmap(BlockDriverState *bs,
+>                                          const char *name);
+>  void bdrv_dirty_bitmap_make_anon(BdrvDirtyBitmap *bitmap);
+> diff --git a/block/dirty-bitmap.c b/block/dirty-bitmap.c
+> index bd04e991b1..81adbeb6d4 100644
+> --- a/block/dirty-bitmap.c
+> +++ b/block/dirty-bitmap.c
+> @@ -237,6 +237,14 @@ int bdrv_dirty_bitmap_create_successor(BlockDriverState *bs,
+>      return 0;
+>  }
+>  
+> +/* Called with BQL taken. */
+> +void bdrv_dirty_bitmap_enable_successor(BdrvDirtyBitmap *bitmap)
+> +{
+> +    qemu_mutex_lock(bitmap->mutex);
+> +    bdrv_enable_dirty_bitmap(bitmap->successor);
+> +    qemu_mutex_unlock(bitmap->mutex);
+> +}
+> +
+>  /**
+>   * For a bitmap with a successor, yield our name to the successor,
+>   * delete the old bitmap, and return a handle to the new bitmap.
+> -- 
+> 2.11.1
+> 
+> 
 
-** Changed in: qemu
-       Status: Incomplete =3D> Expired
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1239008
-
-Title:
-  qemu fails to scroll screen on ^Vidmem output
-
-Status in QEMU:
-  Expired
-Status in qemu package in Ubuntu:
-  Expired
-
-Bug description:
-  Pascal uses ^Vidmem for B800 console output. The terminal does not
-  oblige the Pascal OS code to scroll the output. Virtualbox emulation
-  works, so this must be a qemu bug. Using QEMU in KVM mode as Ubuntu
-  LTS.
-
-  Source line to trip bug(in theory pushes VideoMem up one line):
-
-  procedure Scroll;
-  //this is whats causing crashes. FIXME:Virtualbox not affected.QEMU BUG?
-  begin
-    if scrolldisabled then exit;
-        if (CursorPosY >=3D 24) then begin  //in case called before end of =
-screen
-      blank:=3D $20 or (TextAttr shl 8);
-      Move((VidMem+(2*80))^,VidMem^,24*(2*80));
-      // Empty last line
-      FillWord((VidMem+(24*2*80))^,80,Blank);
-      CursorPosX:=3D1;
-      CursorPosY:=3D23;
-      update_cursor;
-    end;
-  end;
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1239008/+subscriptions
+Reviewed-by: Fam Zheng <famz@redhat.com>
