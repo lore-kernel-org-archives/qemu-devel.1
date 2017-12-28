@@ -1,17 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42259)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56945)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhaoshenglong@huawei.com>) id 1eUMn9-0000qG-LE
-	for qemu-devel@nongnu.org; Wed, 27 Dec 2017 20:15:30 -0500
+	(envelope-from <peterx@redhat.com>) id 1eUNnO-000734-6L
+	for qemu-devel@nongnu.org; Wed, 27 Dec 2017 21:19:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zhaoshenglong@huawei.com>) id 1eUMn8-000286-5U
-	for qemu-devel@nongnu.org; Wed, 27 Dec 2017 20:15:27 -0500
-From: Shannon Zhao <zhaoshenglong@huawei.com>
-Date: Thu, 28 Dec 2017 09:14:40 +0800
-Message-ID: <1514423680-11132-1-git-send-email-zhaoshenglong@huawei.com>
+	(envelope-from <peterx@redhat.com>) id 1eUNnJ-0004uI-79
+	for qemu-devel@nongnu.org; Wed, 27 Dec 2017 21:19:46 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:57348)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1eUNnI-0004sx-UL
+	for qemu-devel@nongnu.org; Wed, 27 Dec 2017 21:19:41 -0500
+Date: Thu, 28 Dec 2017 10:19:31 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20171228021931.GB22514@xz-mi>
+References: <20170801160419.14180-1-marcandre.lureau@redhat.com>
+	<b3ccb2a7-efe3-2b0b-62ee-a3ab126e0205@virtuozzo.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v3] Virt: ACPI: fix qemu assert due to
- re-assigned table data address
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <b3ccb2a7-efe3-2b0b-62ee-a3ab126e0205@virtuozzo.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] migration: fix small leaks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,98 +28,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-arm@nongnu.org, peter.maydell@linaro.org, lersek@redhat.com
-Cc: qemu-devel@nongnu.org, drjones@redhat.com
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Cc: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Juan Quintela <quintela@redhat.com>
 
-From: Zhaoshenglong <zhaoshenglong@huawei.com>
+On Wed, Dec 27, 2017 at 03:25:23PM +0300, Vladimir Sementsov-Ogievskiy wr=
+ote:
+> Hi all!
+>=20
+> Hmm, looks like leak is not fixed here: I've checked it while running i=
+otest
+> 181, that
+> migration_instance_finalize is not called.
+>=20
+> If I understand correct, to call it we need unref current_migration obj=
+ect
+> somewhere.
+>=20
+> Or, may be I'm missing something..
 
-acpi_data_push uses g_array_set_size to resize the memory size. If there
-is no enough contiguous memory, the address will be changed. If we use
-the old value, it will assert.
-qemu-kvm: hw/acpi/bios-linker-loader.c:214: bios_linker_loader_add_checksum:
-Assertion `start_offset < file->blob->len' failed.`
+I think you are right.
 
-This issue only happens in building SRAT table now but here we unify the
-pattern for other tables as well to avoid possible issues in the future.
+It does not matter much though since we don't dynamically allocate
+migration object (there is only one and it lives forever).  Do you
+want to post a patch?  I guess the safest place to unref it is at the
+end of main() to make sure no one will be using it any more.
 
-Signed-off-by: Zhaoshenglong <zhaoshenglong@huawei.com>
----
-v3: unify the pattern for MCFG
-v2: update the commit message according to Andrew's comments
----
- hw/arm/virt-acpi-build.c | 18 +++++++++++-------
- 1 file changed, 11 insertions(+), 7 deletions(-)
+(Hmm, the incoming migration state is still static)
 
-diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
-index 3d78ff6..f7fa795 100644
---- a/hw/arm/virt-acpi-build.c
-+++ b/hw/arm/virt-acpi-build.c
-@@ -453,6 +453,7 @@ build_spcr(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
-     AcpiSerialPortConsoleRedirection *spcr;
-     const MemMapEntry *uart_memmap = &vms->memmap[VIRT_UART];
-     int irq = vms->irqmap[VIRT_UART] + ARM_SPI_BASE;
-+    int spcr_start = table_data->len;
- 
-     spcr = acpi_data_push(table_data, sizeof(*spcr));
- 
-@@ -476,8 +477,8 @@ build_spcr(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
-     spcr->pci_device_id = 0xffff;  /* PCI Device ID: not a PCI device */
-     spcr->pci_vendor_id = 0xffff;  /* PCI Vendor ID: not a PCI device */
- 
--    build_header(linker, table_data, (void *)spcr, "SPCR", sizeof(*spcr), 2,
--                 NULL, NULL);
-+    build_header(linker, table_data, (void *)(table_data->data + spcr_start),
-+                 "SPCR", table_data->len - spcr_start, 2, NULL, NULL);
- }
- 
- static void
-@@ -512,8 +513,8 @@ build_srat(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
-         mem_base += numa_info[i].node_mem;
-     }
- 
--    build_header(linker, table_data, (void *)srat, "SRAT",
--                 table_data->len - srat_start, 3, NULL, NULL);
-+    build_header(linker, table_data, (void *)(table_data->data + srat_start),
-+                 "SRAT", table_data->len - srat_start, 3, NULL, NULL);
- }
- 
- static void
-@@ -522,6 +523,7 @@ build_mcfg(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
-     AcpiTableMcfg *mcfg;
-     const MemMapEntry *memmap = vms->memmap;
-     int len = sizeof(*mcfg) + sizeof(mcfg->allocation[0]);
-+    int mcfg_start = table_data->len;
- 
-     mcfg = acpi_data_push(table_data, len);
-     mcfg->allocation[0].address = cpu_to_le64(memmap[VIRT_PCIE_ECAM].base);
-@@ -532,7 +534,8 @@ build_mcfg(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
-     mcfg->allocation[0].end_bus_number = (memmap[VIRT_PCIE_ECAM].size
-                                           / PCIE_MMCFG_SIZE_MIN) - 1;
- 
--    build_header(linker, table_data, (void *)mcfg, "MCFG", len, 1, NULL, NULL);
-+    build_header(linker, table_data, (void *)(table_data->data + mcfg_start),
-+                 "MCFG", table_data->len - mcfg_start, 1, NULL, NULL);
- }
- 
- /* GTDT */
-@@ -651,6 +654,7 @@ build_madt(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
- static void build_fadt(GArray *table_data, BIOSLinker *linker,
-                        VirtMachineState *vms, unsigned dsdt_tbl_offset)
- {
-+    int fadt_start = table_data->len;
-     AcpiFadtDescriptorRev5_1 *fadt = acpi_data_push(table_data, sizeof(*fadt));
-     unsigned xdsdt_entry_offset = (char *)&fadt->x_dsdt - table_data->data;
-     uint16_t bootflags;
-@@ -681,8 +685,8 @@ static void build_fadt(GArray *table_data, BIOSLinker *linker,
-         ACPI_BUILD_TABLE_FILE, xdsdt_entry_offset, sizeof(fadt->x_dsdt),
-         ACPI_BUILD_TABLE_FILE, dsdt_tbl_offset);
- 
--    build_header(linker, table_data,
--                 (void *)fadt, "FACP", sizeof(*fadt), 5, NULL, NULL);
-+    build_header(linker, table_data, (void *)(table_data->data + fadt_start),
-+                 "FACP", table_data->len - fadt_start, 5, NULL, NULL);
- }
- 
- /* DSDT */
--- 
-2.0.4
+Thanks,
+
+>=20
+> 01.08.2017 19:04, Marc-Andr=C3=A9 Lureau wrote:
+> > Spotted thanks to valgrind and tests/device-introspect-test:
+> >=20
+> > =3D=3D11711=3D=3D 1 bytes in 1 blocks are definitely lost in loss rec=
+ord 6 of 14,537
+> > =3D=3D11711=3D=3D    at 0x4C2EB6B: malloc (vg_replace_malloc.c:299)
+> > =3D=3D11711=3D=3D    by 0x1E0CDBD8: g_malloc (gmem.c:94)
+> > =3D=3D11711=3D=3D    by 0x1E0E696E: g_strdup (gstrfuncs.c:363)
+> > =3D=3D11711=3D=3D    by 0x695693: migration_instance_init (migration.=
+c:2226)
+> > =3D=3D11711=3D=3D    by 0x717C4B: object_init_with_type (object.c:344=
+)
+> > =3D=3D11711=3D=3D    by 0x717E80: object_initialize_with_type (object=
+.c:375)
+> > =3D=3D11711=3D=3D    by 0x7182EB: object_new_with_type (object.c:483)
+> > =3D=3D11711=3D=3D    by 0x718328: object_new (object.c:493)
+> > =3D=3D11711=3D=3D    by 0x4B8A29: qmp_device_list_properties (qmp.c:5=
+42)
+> > =3D=3D11711=3D=3D    by 0x4A9561: qmp_marshal_device_list_properties =
+(qmp-marshal.c:1425)
+> > =3D=3D11711=3D=3D    by 0x819D4A: do_qmp_dispatch (qmp-dispatch.c:104=
+)
+> > =3D=3D11711=3D=3D    by 0x819E82: qmp_dispatch (qmp-dispatch.c:131)
+> >=20
+> > Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> > ---
+> >   migration/migration.c | 10 ++++++++++
+> >   1 file changed, 10 insertions(+)
+> >=20
+> > diff --git a/migration/migration.c b/migration/migration.c
+> > index 085c32c994..c3fe0ed9ca 100644
+> > --- a/migration/migration.c
+> > +++ b/migration/migration.c
+> > @@ -2214,6 +2214,15 @@ static void migration_class_init(ObjectClass *=
+klass, void *data)
+> >       dc->props =3D migration_properties;
+> >   }
+> > +static void migration_instance_finalize(Object *obj)
+> > +{
+> > +    MigrationState *ms =3D MIGRATION_OBJ(obj);
+> > +    MigrationParameters *params =3D &ms->parameters;
+> > +
+> > +    g_free(params->tls_hostname);
+> > +    g_free(params->tls_creds);
+> > +}
+> > +
+> >   static void migration_instance_init(Object *obj)
+> >   {
+> >       MigrationState *ms =3D MIGRATION_OBJ(obj);
+> > @@ -2282,6 +2291,7 @@ static const TypeInfo migration_type =3D {
+> >       .class_size =3D sizeof(MigrationClass),
+> >       .instance_size =3D sizeof(MigrationState),
+> >       .instance_init =3D migration_instance_init,
+> > +    .instance_finalize =3D migration_instance_finalize,
+> >   };
+> >   static void register_migration_types(void)
+>=20
+>=20
+> --=20
+> Best regards,
+> Vladimir
+>=20
+>=20
+
+--=20
+Peter Xu
