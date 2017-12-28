@@ -1,28 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33741)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44687)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jbaron@akamai.com>) id 1eUaVR-0004T3-NN
-	for qemu-devel@nongnu.org; Thu, 28 Dec 2017 10:54:06 -0500
+	(envelope-from <imammedo@redhat.com>) id 1eUbtu-0006pc-2c
+	for qemu-devel@nongnu.org; Thu, 28 Dec 2017 12:23:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jbaron@akamai.com>) id 1eUaVO-0002N7-FO
-	for qemu-devel@nongnu.org; Thu, 28 Dec 2017 10:54:05 -0500
-Received: from mx0a-00190b01.pphosted.com ([2620:100:9001:583::1]:45200)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jbaron@akamai.com>) id 1eUaVO-0002L4-6T
-	for qemu-devel@nongnu.org; Thu, 28 Dec 2017 10:54:02 -0500
-References: <1513979641-7999-1-git-send-email-jbaron@akamai.com>
-	<cover.1513974243.git.jbaron@akamai.com>
-	<44da522ecee60792ec918234ee4d61a84e4574f0.1513974243.git.jbaron@akamai.com>
-	<20171227.164334.2079471466039224265.davem@davemloft.net>
-From: Jason Baron <jbaron@akamai.com>
-Message-ID: <93b66082-f37c-0463-e977-d4b430a44008@akamai.com>
-Date: Thu, 28 Dec 2017 10:53:54 -0500
-MIME-Version: 1.0
-In-Reply-To: <20171227.164334.2079471466039224265.davem@davemloft.net>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH net-next v2 1/3] virtio_net: propagate
- linkspeed/duplex settings from the hypervisor
+	(envelope-from <imammedo@redhat.com>) id 1eUbtq-0006QP-02
+	for qemu-devel@nongnu.org; Thu, 28 Dec 2017 12:23:26 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:51222)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1eUbtp-0006PE-Ma
+	for qemu-devel@nongnu.org; Thu, 28 Dec 2017 12:23:21 -0500
+From: Igor Mammedov <imammedo@redhat.com>
+Date: Thu, 28 Dec 2017 18:22:55 +0100
+Message-Id: <1514481779-184817-1-git-send-email-imammedo@redhat.com>
+Subject: [Qemu-devel] [RFC v2 0/4] enable numa configuration before machine
+ is running from HMP/QMP
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,57 +22,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Miller <davem@davemloft.net>
-Cc: netdev@vger.kernel.org, virtualization@lists.linux-foundation.org, qemu-devel@nongnu.org, mst@redhat.com, jasowang@redhat.com
+To: qemu-devel@nongnu.org
+Cc: eblake@redhat.com, armbru@redhat.com, ehabkost@redhat.com, pkrempa@redhat.com, david@gibson.dropbear.id.au, peter.maydell@linaro.org, pbonzini@redhat.com
 
 
+As were suggested at (1) and at bof session where we discussed subj,
+I'm posting variant with late numa 'configuration' i.e. when QEMU is
+started with '-S' option in paused state and numa is configured via
+monitor/QMP before machine cpus are allowed to run.
 
-On 12/27/2017 04:43 PM, David Miller wrote:
-> From: Jason Baron <jbaron@akamai.com>
-> Date: Fri, 22 Dec 2017 16:54:01 -0500
-> 
->> The ability to set speed and duplex for virtio_net in useful in various
->> scenarios as described here:
->>
->> 16032be virtio_net: add ethtool support for set and get of settings
->>
->> However, it would be nice to be able to set this from the hypervisor,
->> such that virtio_net doesn't require custom guest ethtool commands.
->>
->> Introduce a new feature flag, VIRTIO_NET_F_SPEED_DUPLEX, which allows
->> the hypervisor to export a linkspeed and duplex setting. The user can
->> subsequently overwrite it later if desired via: 'ethtool -s'.
->>
->> Signed-off-by: Jason Baron <jbaron@akamai.com>
->> Cc: "Michael S. Tsirkin" <mst@redhat.com>
->> Cc: Jason Wang <jasowang@redhat.com>
-> 
-> Looks mostly fine to me but need some virtio_net reviewers on this one.
-> 
->> @@ -57,6 +57,8 @@
->>  					 * Steering */
->>  #define VIRTIO_NET_F_CTRL_MAC_ADDR 23	/* Set MAC address */
->>  
->> +#define VIRTIO_NET_F_SPEED_DUPLEX 63	/* Host set linkspeed and duplex */
->> +
-> 
-> Why use a value so far away from the largest existing one?
-> 
-> Just curious.
-> 
+Suggested idea was to try 'late' numa configuration as it might result in
+shortcut approach allowing us reuse current pause point (-S) versus adding
+another preconfig option with earlier pause point.
+So this series tries to show how feasible this approach.
 
-So that came from a discussion with Michael about which bit to use for
-this, and he suggested using 63:
+Currently numa options mainly affect only firmware blobs (ACPI/FDT tables),
+it should have been possible to regenerate those blobs right before we start
+CPUs, which would allow us setup numa configuration at first pause point and
+get firmware blobs with updated numa information.
 
-"
-Transports started from bit 24 and are growing up.
-So I would say devices should start from bit 63 and grow down.
-"
+Series implements idea for x86 ans spapr machines and uses machine reset,
+to reconfigure firmware and other machine structures after each numa
+configuration command (HMP or QMP).
 
-https://patchwork.ozlabs.org/patch/848814/#1826669
+It was relatively not hard to implement for above machines as they already
+rebuild firmware blobs at reset time. But it still was a pain as QEMU isn't
+written with dynamic reconfiguration in mind and one need to update device
+state with new data (I think I've got it right but not 100% sure)
 
-I will add a comment to explain it.
+However when it comes to the last target supporting NUMA, ARM
+all simplification versus v1 goes down the drain, since FDT blob is build
+incrementally during machine_init(), -device, machine_done() time, and
+it turns out into huge refactoring to isolate scattered FDT pieces into
+single FDT build function (like we do for ACPI). It's job that we would need
+to do anyways for hotplug to work properly on ARM, but I don't think it
+should get in the way of numa refactoring.
+So that was the point where I gave up and decided to post only x86/spapr
+pieces for demo purposes.
 
-Thanks,
+I'm inclined towards avoiding 'v2 shortcut' and going in direction of v1,
+as I didn't see v2 as the right way in general, since one would have to:
+  - build machine / connect / initalize / devices one way and then find out
+    devices / connections that need to be fixed/updated with new configuration,
+    it's very fragile and easy break.
 
--Jason
+If I remember correctly the bof session, consensus was that we would like to have
+early configuration interface (like v1) in the end, so I'd rather send time
+on addressing v1 drawbacks instead of hacking machine init order to make numa work
+in backwards way.
+
+CC: eblake@redhat.com
+CC: armbru@redhat.com
+CC: ehabkost@redhat.com
+CC: pkrempa@redhat.com
+CC: david@gibson.dropbear.id.au
+CC: peter.maydell@linaro.org
+CC: pbonzini@redhat.com
+
+[1]
+v1 for reference:
+[Qemu-devel] [RFC 0/6] enable numa configuration before machine_init() from HMP/QMP
+    https://lists.nongnu.org/archive/html/qemu-devel/2017-10/msg03583.html
+
+PS:
+exercise wasn't waste as it resulted in cleanups that were already merged.
+
+
+Igor Mammedov (4):
+  numa: split out NumaOptions parsing into parse_NumaOptions()
+  HMP: add set-numa-node command
+  QMP: add set-numa-node command
+  numa: pc: reset machine if numa config has changed in prelaunch time
+
+ hmp.h                 |  1 +
+ include/hw/boards.h   |  1 +
+ include/sysemu/numa.h |  1 +
+ hmp-commands.hx       | 13 +++++++++++
+ hmp.c                 | 23 +++++++++++++++++++
+ hw/core/machine.c     |  3 ++-
+ hw/i386/pc.c          |  1 +
+ numa.c                | 63 +++++++++++++++++++++++++++++++++++----------------
+ qapi-schema.json      | 13 +++++++++++
+ vl.c                  |  4 ++++
+ 10 files changed, 102 insertions(+), 21 deletions(-)
+
+-- 
+2.7.4
