@@ -1,34 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58080)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58060)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eUPpe-000153-Tj
+	(envelope-from <bounces@canonical.com>) id 1eUPpe-000152-7O
 	for qemu-devel@nongnu.org; Wed, 27 Dec 2017 23:30:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eUPpd-0001NN-VW
+	(envelope-from <bounces@canonical.com>) id 1eUPpa-0001Gl-9S
 	for qemu-devel@nongnu.org; Wed, 27 Dec 2017 23:30:14 -0500
-Received: from indium.canonical.com ([91.189.90.7]:58838)
+Received: from indium.canonical.com ([91.189.90.7]:58754)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1eUPpd-0001Lt-B1
-	for qemu-devel@nongnu.org; Wed, 27 Dec 2017 23:30:13 -0500
+	id 1eUPpa-0001Fx-3A
+	for qemu-devel@nongnu.org; Wed, 27 Dec 2017 23:30:10 -0500
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1eUPpc-0007SN-KZ
-	for <qemu-devel@nongnu.org>; Thu, 28 Dec 2017 04:30:12 +0000
+	id 1eUPpY-0007PH-CY
+	for <qemu-devel@nongnu.org>; Thu, 28 Dec 2017 04:30:08 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 98DAB2E8060
-	for <qemu-devel@nongnu.org>; Thu, 28 Dec 2017 04:30:12 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 5B8A72E8060
+	for <qemu-devel@nongnu.org>; Thu, 28 Dec 2017 04:30:08 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Thu, 28 Dec 2017 04:17:22 -0000
-From: Launchpad Bug Tracker <1332297@bugs.launchpad.net>
-Reply-To: Bug 1332297 <1332297@bugs.launchpad.net>
+Date: Thu, 28 Dec 2017 04:17:27 -0000
+From: Launchpad Bug Tracker <1358287@bugs.launchpad.net>
+Reply-To: Bug 1358287 <1358287@bugs.launchpad.net>
 Sender: bounces@canonical.com
-References: <20140619191312.10674.6213.malonedeb@soybean.canonical.com>
-Message-Id: <151443464247.28609.14953690081923563168.malone@loganberry.canonical.com>
+References: <20140818133018.28331.75813.malonedeb@chaenomeles.canonical.com>
+Message-Id: <151443464725.28609.8118381305991674030.malone@loganberry.canonical.com>
 Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1332297] Re: qemu-img: crash on check of an image
- with large value in the 'size' header field
+Subject: [Qemu-devel] [Bug 1358287] Re: -readconfig file doesn't interpret
+ memory size correctly
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -48,29 +48,26 @@ To: qemu-devel@nongnu.org
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1332297
+https://bugs.launchpad.net/bugs/1358287
 
 Title:
-  qemu-img: crash on check of an image with large value in the 'size'
-  header field
+  -readconfig file doesn't interpret memory size correctly
 
 Status in QEMU:
   Expired
 
 Bug description:
-  The qemu-img crashes on the next command:
+  I'm running Qemu 2.1 and have issues with the config file format.
 
-  qemu-img check test_image
+  Specifically Qemu wrote the following snippet with '-writeconfig':
 
-  'test_image' can be found in the attachment. It's a fuzzed test image
-  with the qcow2 image header only. Suppositional cause of the failure
-  is the value of 'size' header field set to maximum uint_64 value.
+  [memory]
+    size =3D "1024"
 
-  System information:
+  However, upon starting a VM with this setting it only receives 128MiB
+  (the default size).
 
-  qemu.git: 6baa963f4dcc2118
-  Host: Linux 3.14.7-200.fc20.x86_64 #1 SMP Wed Jun 11 22:38:05 UTC 2014 x8=
-6_64  GNU/Linux
+  I'm reverting back to using the command line option now - that works.
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1332297/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1358287/+subscriptions
