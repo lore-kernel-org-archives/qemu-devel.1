@@ -1,34 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58060)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58231)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eUPpe-000152-7O
-	for qemu-devel@nongnu.org; Wed, 27 Dec 2017 23:30:15 -0500
+	(envelope-from <bounces@canonical.com>) id 1eUPpv-0001F7-8p
+	for qemu-devel@nongnu.org; Wed, 27 Dec 2017 23:30:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eUPpa-0001Gl-9S
-	for qemu-devel@nongnu.org; Wed, 27 Dec 2017 23:30:14 -0500
-Received: from indium.canonical.com ([91.189.90.7]:58754)
+	(envelope-from <bounces@canonical.com>) id 1eUPpr-0001de-9v
+	for qemu-devel@nongnu.org; Wed, 27 Dec 2017 23:30:31 -0500
+Received: from indium.canonical.com ([91.189.90.7]:59248)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1eUPpa-0001Fx-3A
-	for qemu-devel@nongnu.org; Wed, 27 Dec 2017 23:30:10 -0500
+	id 1eUPpr-0001cA-3S
+	for qemu-devel@nongnu.org; Wed, 27 Dec 2017 23:30:27 -0500
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1eUPpY-0007PH-CY
-	for <qemu-devel@nongnu.org>; Thu, 28 Dec 2017 04:30:08 +0000
+	id 1eUPpp-0007VL-Ul
+	for <qemu-devel@nongnu.org>; Thu, 28 Dec 2017 04:30:26 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 5B8A72E8060
-	for <qemu-devel@nongnu.org>; Thu, 28 Dec 2017 04:30:08 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id E76F22E80C7
+	for <qemu-devel@nongnu.org>; Thu, 28 Dec 2017 04:30:25 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Thu, 28 Dec 2017 04:17:27 -0000
-From: Launchpad Bug Tracker <1358287@bugs.launchpad.net>
-Reply-To: Bug 1358287 <1358287@bugs.launchpad.net>
+Date: Thu, 28 Dec 2017 04:17:23 -0000
+From: Launchpad Bug Tracker <1297781@bugs.launchpad.net>
+Reply-To: Bug 1297781 <1297781@bugs.launchpad.net>
 Sender: bounces@canonical.com
-References: <20140818133018.28331.75813.malonedeb@chaenomeles.canonical.com>
-Message-Id: <151443464725.28609.8118381305991674030.malone@loganberry.canonical.com>
+References: <20140326104715.22580.86566.malonedeb@wampee.canonical.com>
+Message-Id: <151443464324.28609.12786266300875910412.malone@loganberry.canonical.com>
 Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1358287] Re: -readconfig file doesn't interpret
- memory size correctly
+Subject: [Qemu-devel] [Bug 1297781] Re: Network device cannot communicate
+ with host machine
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -48,26 +48,30 @@ To: qemu-devel@nongnu.org
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1358287
+https://bugs.launchpad.net/bugs/1297781
 
 Title:
-  -readconfig file doesn't interpret memory size correctly
+  Network device cannot communicate with host machine
 
 Status in QEMU:
   Expired
 
 Bug description:
-  I'm running Qemu 2.1 and have issues with the config file format.
+  I know this used to work but it doesnt work any more using qemu 1.4.2  on=
+ fedora 19 everything works fine
+  except when i add a NIC sharing the main interface from the host (not the=
+ virtual network)
 
-  Specifically Qemu wrote the following snippet with '-writeconfig':
+  the hosts ip is 10.0.0.4, the router is 10.0.0.1 so when i boot my virtua=
+l machine it gets an ip from the router no problem =
 
-  [memory]
-    size =3D "1024"
-
-  However, upon starting a VM with this setting it only receives 128MiB
-  (the default size).
-
-  I'm reverting back to using the command line option now - that works.
+  i get on the internet fine, and i can connect (ping,ftp, samba whatever) =
+to all the computers on the network except the host
+  10.0.0.4 i can't ping it, i cant do anything to it, but i can connect to =
+all the other computers on the network and i know i used to be able to do t=
+his because thats how i shared files between the host and windows guest, wi=
+th samba... but now i can't browse the host computer because it can't commu=
+nicate... please help.
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1358287/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1297781/+subscriptions
