@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42545)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42535)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <gengdongjiu@huawei.com>) id 1eUQjd-0004q9-Ht
+	(envelope-from <gengdongjiu@huawei.com>) id 1eUQjc-0004pF-VR
 	for qemu-devel@nongnu.org; Thu, 28 Dec 2017 00:28:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <gengdongjiu@huawei.com>) id 1eUQjb-0000Sx-NM
-	for qemu-devel@nongnu.org; Thu, 28 Dec 2017 00:28:05 -0500
+	(envelope-from <gengdongjiu@huawei.com>) id 1eUQjb-0000Ry-5N
+	for qemu-devel@nongnu.org; Thu, 28 Dec 2017 00:28:04 -0500
 From: Dongjiu Geng <gengdongjiu@huawei.com>
-Date: Thu, 28 Dec 2017 13:54:18 +0800
-Message-ID: <1514440458-10515-10-git-send-email-gengdongjiu@huawei.com>
+Date: Thu, 28 Dec 2017 13:54:15 +0800
+Message-ID: <1514440458-10515-7-git-send-email-gengdongjiu@huawei.com>
 In-Reply-To: <1514440458-10515-1-git-send-email-gengdongjiu@huawei.com>
 References: <1514440458-10515-1-git-send-email-gengdongjiu@huawei.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v14 9/9] target-arm: kvm64: handle SIGBUS
- signal from kernel or KVM
+Subject: [Qemu-devel] [PATCH v14 6/9] Move related hwpoison page functions
+ to accel/kvm/ folder
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,123 +25,127 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: pbonzini@redhat.com, mst@redhat.com, imammedo@redhat.com, zhaoshenglong@huawei.com, peter.maydell@linaro.org, mtosatti@redhat.com, rth@twiddle.net, ehabkost@redhat.com, james.morse@arm.com, christoffer.dall@linaro.org, marc.zyngier@arm.com, kvm@vger.kernel.org, qemu-devel@nongnu.org, qemu-arm@nongnu.org
 Cc: gengdongjiu@huawei.com, huangshaoyu@huawei.com, zhengqiang10@huawei.com, xuwei5@hisilicon.com
 
-Add SIGBUS signal handler. In this handler, it checks the SIGBUS type,
-translates the host VA which is delivered by host to guest PA, then fill
-this PA to CPER and fill the CPER to guest APEI GHES memory, finally
-notify guest according to the SIGBUS type. There are two kinds of SIGBUS
-that QEMU needs to handle, which are BUS_MCEERR_AO and BUS_MCEERR_AR.
+kvm_hwpoison_page_add() and kvm_unpoison_all() will be used both
+by X86 and ARM platforms, so move these functions to a common
+accel/kvm/ folder to avoid duplicate code.
 
-If guest accesses the poisoned memory, it generates Synchronous External
-Abort(SEA). Then host kernel gets an APEI notification and call memory_failure()
-to unmapped the affected page from the guest's stage2, and SIGBUS_MCEERR_AO
-is delivered to Qemu's main thread. If Qemu receives this SIGBUS, it will
-create a new CPER and add it to guest APEI GHES memory, then notify the
-guest with a GPIO-Signal notification.
-
-When guest hits a PG_hwpoison page, it will trap to KVM as stage2 fault, then a
-SIGBUS_MCEERR_AR synchronous signal is delivered to Qemu, Qemu record this error
-into guest APEI GHES memory and notify guest using Synchronous-External-Abort(SEA).
-
-Suggested-by: James Morse <james.morse@arm.com>
 Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
 ---
-Address James's comments to record CPER and notify guest for SIGBUS signal handling.
-Shown some discussion in [1].
+Address Peter's comments to move related hwpoison page function to accel/kvm folder in [1]
+Address Paolo's comments to move HWPoisonPage definition back to accel/kvm/kvm-all.c
 
 [1]:
-https://lkml.org/lkml/2017/2/27/246
-https://lkml.org/lkml/2017/9/14/241
-https://lkml.org/lkml/2017/9/22/499
+https://lists.gnu.org/archive/html/qemu-arm/2017-09/msg00077.html
+https://lists.gnu.org/archive/html/qemu-arm/2017-09/msg00152.html
 ---
- include/sysemu/kvm.h |  2 +-
- target/arm/kvm.c     |  2 ++
- target/arm/kvm64.c   | 34 ++++++++++++++++++++++++++++++++++
- 3 files changed, 37 insertions(+), 1 deletion(-)
+ accel/kvm/kvm-all.c     | 33 +++++++++++++++++++++++++++++++++
+ include/exec/ram_addr.h |  5 +++++
+ target/i386/kvm.c       | 33 ---------------------------------
+ 3 files changed, 38 insertions(+), 33 deletions(-)
 
-diff --git a/include/sysemu/kvm.h b/include/sysemu/kvm.h
-index 3a458f5..90c1605 100644
---- a/include/sysemu/kvm.h
-+++ b/include/sysemu/kvm.h
-@@ -361,7 +361,7 @@ bool kvm_vcpu_id_is_valid(int vcpu_id);
- /* Returns VCPU ID to be used on KVM_CREATE_VCPU ioctl() */
- unsigned long kvm_arch_vcpu_id(CPUState *cpu);
- 
--#ifdef TARGET_I386
-+#if defined(TARGET_I386) || defined(TARGET_AARCH64)
- #define KVM_HAVE_MCE_INJECTION 1
- void kvm_arch_on_sigbus_vcpu(CPUState *cpu, int code, void *addr);
- #endif
-diff --git a/target/arm/kvm.c b/target/arm/kvm.c
-index 7c17f0d..9d25f51 100644
---- a/target/arm/kvm.c
-+++ b/target/arm/kvm.c
-@@ -26,6 +26,7 @@
- #include "exec/address-spaces.h"
- #include "hw/boards.h"
- #include "qemu/log.h"
-+#include "exec/ram_addr.h"
- 
- const KVMCapabilityInfo kvm_arch_required_capabilities[] = {
-     KVM_CAP_LAST_INFO
-@@ -182,6 +183,7 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
- 
-     cap_has_mp_state = kvm_check_extension(s, KVM_CAP_MP_STATE);
- 
-+    qemu_register_reset(kvm_unpoison_all, NULL);
-     type_register_static(&host_arm_cpu_type_info);
- 
-     return 0;
-diff --git a/target/arm/kvm64.c b/target/arm/kvm64.c
-index c00450d..6955d85 100644
---- a/target/arm/kvm64.c
-+++ b/target/arm/kvm64.c
-@@ -27,6 +27,9 @@
- #include "kvm_arm.h"
- #include "internals.h"
- #include "hw/arm/arm.h"
-+#include "exec/ram_addr.h"
-+#include "hw/acpi/acpi-defs.h"
-+#include "hw/acpi/hest_ghes.h"
- 
- static bool have_guest_debug;
- 
-@@ -944,6 +947,37 @@ int kvm_arch_get_registers(CPUState *cs)
+diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
+index 46ce479..2412ea6 100644
+--- a/accel/kvm/kvm-all.c
++++ b/accel/kvm/kvm-all.c
+@@ -564,6 +564,39 @@ int kvm_vm_check_extension(KVMState *s, unsigned int extension)
      return ret;
  }
  
-+void kvm_arch_on_sigbus_vcpu(CPUState *c, int code, void *addr)
-+{
++typedef struct HWPoisonPage {
 +    ram_addr_t ram_addr;
-+    hwaddr paddr;
++    QLIST_ENTRY(HWPoisonPage) list;
++} HWPoisonPage;
 +
-+    assert(code == BUS_MCEERR_AR || code == BUS_MCEERR_AO);
-+    if (addr) {
-+        ram_addr = qemu_ram_addr_from_host(addr);
-+        if (ram_addr != RAM_ADDR_INVALID &&
-+            kvm_physical_memory_addr_from_host(c->kvm_state, addr, &paddr)) {
-+            kvm_hwpoison_page_add(ram_addr);
-+            if (code == BUS_MCEERR_AR) {
-+                kvm_cpu_synchronize_state(c);
-+                ghes_record_errors(ACPI_HEST_NOTIFY_SEA, paddr);
-+                kvm_inject_arm_sea(c);
-+            } else if (code == BUS_MCEERR_AO) {
-+                ghes_record_errors(ACPI_HEST_NOTIFY_GPIO, paddr);
-+                qemu_hardware_error_notify();
-+            }
-+            return;
-+        }
-+        fprintf(stderr, "Hardware memory error for memory used by "
-+                "QEMU itself instead of guest system!\n");
-+    }
++static QLIST_HEAD(, HWPoisonPage) hwpoison_page_list =
++    QLIST_HEAD_INITIALIZER(hwpoison_page_list);
 +
-+    if (code == BUS_MCEERR_AR) {
-+        fprintf(stderr, "Hardware memory error!\n");
-+        exit(1);
++void kvm_unpoison_all(void *param)
++{
++    HWPoisonPage *page, *next_page;
++
++    QLIST_FOREACH_SAFE(page, &hwpoison_page_list, list, next_page) {
++        QLIST_REMOVE(page, list);
++        qemu_ram_remap(page->ram_addr, TARGET_PAGE_SIZE);
++        g_free(page);
 +    }
 +}
 +
- /* C6.6.29 BRK instruction */
- static const uint32_t brk_insn = 0xd4200000;
++void kvm_hwpoison_page_add(ram_addr_t ram_addr)
++{
++    HWPoisonPage *page;
++
++    QLIST_FOREACH(page, &hwpoison_page_list, list) {
++        if (page->ram_addr == ram_addr) {
++            return;
++        }
++    }
++    page = g_new(HWPoisonPage, 1);
++    page->ram_addr = ram_addr;
++    QLIST_INSERT_HEAD(&hwpoison_page_list, page, list);
++}
++
+ static uint32_t adjust_ioeventfd_endianness(uint32_t val, uint32_t size)
+ {
+ #if defined(HOST_WORDS_BIGENDIAN) != defined(TARGET_WORDS_BIGENDIAN)
+diff --git a/include/exec/ram_addr.h b/include/exec/ram_addr.h
+index d017639..41d9c37 100644
+--- a/include/exec/ram_addr.h
++++ b/include/exec/ram_addr.h
+@@ -80,6 +80,11 @@ void qemu_ram_free(RAMBlock *block);
  
+ int qemu_ram_resize(RAMBlock *block, ram_addr_t newsize, Error **errp);
+ 
++/* Add a poisoned page to the list */
++void kvm_hwpoison_page_add(ram_addr_t ram_addr);
++/* Free and remove all the poisoned pages in the list */
++void kvm_unpoison_all(void *param);
++
+ #define DIRTY_CLIENTS_ALL     ((1 << DIRTY_MEMORY_NUM) - 1)
+ #define DIRTY_CLIENTS_NOCODE  (DIRTY_CLIENTS_ALL & ~(1 << DIRTY_MEMORY_CODE))
+ 
+diff --git a/target/i386/kvm.c b/target/i386/kvm.c
+index 6db7783..3e1afb6 100644
+--- a/target/i386/kvm.c
++++ b/target/i386/kvm.c
+@@ -390,39 +390,6 @@ uint32_t kvm_arch_get_supported_cpuid(KVMState *s, uint32_t function,
+     return ret;
+ }
+ 
+-typedef struct HWPoisonPage {
+-    ram_addr_t ram_addr;
+-    QLIST_ENTRY(HWPoisonPage) list;
+-} HWPoisonPage;
+-
+-static QLIST_HEAD(, HWPoisonPage) hwpoison_page_list =
+-    QLIST_HEAD_INITIALIZER(hwpoison_page_list);
+-
+-static void kvm_unpoison_all(void *param)
+-{
+-    HWPoisonPage *page, *next_page;
+-
+-    QLIST_FOREACH_SAFE(page, &hwpoison_page_list, list, next_page) {
+-        QLIST_REMOVE(page, list);
+-        qemu_ram_remap(page->ram_addr, TARGET_PAGE_SIZE);
+-        g_free(page);
+-    }
+-}
+-
+-static void kvm_hwpoison_page_add(ram_addr_t ram_addr)
+-{
+-    HWPoisonPage *page;
+-
+-    QLIST_FOREACH(page, &hwpoison_page_list, list) {
+-        if (page->ram_addr == ram_addr) {
+-            return;
+-        }
+-    }
+-    page = g_new(HWPoisonPage, 1);
+-    page->ram_addr = ram_addr;
+-    QLIST_INSERT_HEAD(&hwpoison_page_list, page, list);
+-}
+-
+ static int kvm_get_mce_cap_supported(KVMState *s, uint64_t *mce_cap,
+                                      int *max_banks)
+ {
 -- 
 1.8.3.1
