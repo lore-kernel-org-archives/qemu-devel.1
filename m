@@ -1,21 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39968)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33431)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1eUXJY-0004IV-Kj
-	for qemu-devel@nongnu.org; Thu, 28 Dec 2017 07:29:37 -0500
+	(envelope-from <pisa@cmp.felk.cvut.cz>) id 1eUXpa-00051Q-WB
+	for qemu-devel@nongnu.org; Thu, 28 Dec 2017 08:02:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1eUXJX-00051i-Fb
-	for qemu-devel@nongnu.org; Thu, 28 Dec 2017 07:29:36 -0500
-Date: Thu, 28 Dec 2017 13:29:10 +0100
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20171228132910.6594110a@igors-macbook-pro.local>
-In-Reply-To: <1514440458-10515-2-git-send-email-gengdongjiu@huawei.com>
-References: <1514440458-10515-1-git-send-email-gengdongjiu@huawei.com>
-	<1514440458-10515-2-git-send-email-gengdongjiu@huawei.com>
+	(envelope-from <pisa@cmp.felk.cvut.cz>) id 1eUXpX-0005cq-Rn
+	for qemu-devel@nongnu.org; Thu, 28 Dec 2017 08:02:43 -0500
+Received: from relay.felk.cvut.cz ([2001:718:2:1611:0:1:0:70]:24797)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <pisa@cmp.felk.cvut.cz>) id 1eUXpX-0005aT-D8
+	for qemu-devel@nongnu.org; Thu, 28 Dec 2017 08:02:39 -0500
+From: Pavel Pisa <pisa@cmp.felk.cvut.cz>
+Date: Thu, 28 Dec 2017 14:02:04 +0100
+References: <6f7f4691-1755-d4bd-5f38-6f2e3cc3be17@rempel-privat.de>
+	<aec8d44e-114d-0dc4-8697-ba9c078f2c00@rempel-privat.de>
+	<201712111524.13653.pisa@cmp.felk.cvut.cz>
+In-Reply-To: <201712111524.13653.pisa@cmp.felk.cvut.cz>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v14 1/9] ACPI: add some GHES structures and
- macros definition
+Content-Type: Text/Plain;
+  charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+Message-Id: <201712281402.05139.pisa@cmp.felk.cvut.cz>
+Subject: Re: [Qemu-devel] QEMU CAN bus work
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,109 +30,204 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Dongjiu Geng <gengdongjiu@huawei.com>
-Cc: pbonzini@redhat.com, mst@redhat.com, zhaoshenglong@huawei.com, peter.maydell@linaro.org, mtosatti@redhat.com, rth@twiddle.net, ehabkost@redhat.com, james.morse@arm.com, christoffer.dall@linaro.org, marc.zyngier@arm.com, kvm@vger.kernel.org, qemu-devel@nongnu.org, qemu-arm@nongnu.org, huangshaoyu@huawei.com, zhengqiang10@huawei.com, xuwei5@hisilicon.com
+To: Oleksij Rempel <o.rempel@pengutronix.de>, Philippe =?utf-8?q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Cc: Marc Kleine-Budde <mkl@pengutronix.de>, Marek Vasut <marex@denx.de>, qemu-devel@nongnu.org, Konrad Frederic <frederic.konrad@adacore.com>
 
-On Thu, 28 Dec 2017 13:54:10 +0800
-Dongjiu Geng <gengdongjiu@huawei.com> wrote:
+Hello Oleksij and Philippe,
 
-> Add Generic Error Status Block structures and some macros
-> definitions, which is referred to the ACPI 4.0 or ACPI 6.1. The
-> HEST table generation and CPER record will use them.
-> 
-> Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
-> ---
-> Change since v13:
-> 1. Clean the new added structures and macros definition
-> 
-> Change since v12:
-> 1. Address Igor's comments to to get rid of most structures and use
-> build_append_int_noprefix() API to compose whole error status block
-> and APEI table in [1]
-> 
-> [1]: https://lkml.org/lkml/2017/8/29/187
-> ---
->  include/hw/acpi/acpi-defs.h | 52 +++++++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 52 insertions(+)
-> 
-> diff --git a/include/hw/acpi/acpi-defs.h b/include/hw/acpi/acpi-defs.h
-> index 72be675..fb2110c 100644
-> --- a/include/hw/acpi/acpi-defs.h
-> +++ b/include/hw/acpi/acpi-defs.h
-> @@ -298,6 +298,25 @@ typedef struct AcpiMultipleApicTable AcpiMultipleApicTable;
->  #define ACPI_APIC_RESERVED              16   /* 16 and greater are reserved */
->  
->  /*
-> + * Hardware Error Notification
-> + */
-> +enum AcpiHestNotifyType {
-> +    ACPI_HEST_NOTIFY_POLLED = 0,
-> +    ACPI_HEST_NOTIFY_EXTERNAL = 1,
-> +    ACPI_HEST_NOTIFY_LOCAL = 2,
-> +    ACPI_HEST_NOTIFY_SCI = 3,
-> +    ACPI_HEST_NOTIFY_NMI = 4,
-> +    ACPI_HEST_NOTIFY_CMCI = 5,  /* ACPI 5.0 */
-for stuff coming from spec comment should be something like this
-/* ACPI 1.0b: 16.2.5.3 Type 1 Opcodes Encoding: DefReturn */
+I have found some time to update QEMU CAN
+patch series and test it with actual QEMU master.
 
-i.e. concrete version, chapter/table
-otherwise it could be hard to find definition in huge spec 
+As QEMU 2.11 is realeased now, I hope that
+it is time to disscuss integration of initial/simple
+CAN bus emulation now.
 
-> +    ACPI_HEST_NOTIFY_MCE = 6,   /* ACPI 5.0 */
-> +    ACPI_HEST_NOTIFY_GPIO = 7,  /* ACPI 6.0 */
-> +    ACPI_HEST_NOTIFY_SEA = 8,   /* ACPI 6.1 */
-> +    ACPI_HEST_NOTIFY_SEI = 9,   /* ACPI 6.1 */
-> +    ACPI_HEST_NOTIFY_GSIV = 10, /* ACPI 6.1 */
-> +    ACPI_HEST_NOTIFY_SDEI = 11, /* ACPI 6.2 */
-> +    ACPI_HEST_NOTIFY_RESERVED = 12 /* 12 and greater are reserved */
-> +};
-> +
-> +/*
->   * MADT sub-structures (Follow MULTIPLE_APIC_DESCRIPTION_TABLE)
->   */
->  #define ACPI_SUB_HEADER_DEF   /* Common ACPI sub-structure header */\
-> @@ -474,6 +493,39 @@ struct AcpiSystemResourceAffinityTable {
->  } QEMU_PACKED;
->  typedef struct AcpiSystemResourceAffinityTable AcpiSystemResourceAffinityTable;
->  
-> +/*
-> + * Generic Error Status Block
-> + */
-> +struct AcpiGenericErrorStatus {
-> +    /* It is a bitmask composed of ACPI_GEBS_xxx macros */
-> +    uint32_t block_status;
-> +    uint32_t raw_data_offset;
-> +    uint32_t raw_data_length;
-> +    uint32_t data_length;
-> +    uint32_t error_severity;
-> +} QEMU_PACKED;
-> +typedef struct AcpiGenericErrorStatus AcpiGenericErrorStatus;
-> +
-> +/*
-> + * Masks for Block Status field above
-> + */
-> +#define ACPI_GEBS_UNCORRECTABLE          (1)
-() are usually used with an expression and not with single value,
-so drop that to be consistent with style of the header
+The actual version can be found on branch
+can-pci in our faculty GitLab
 
-> +
-> +/*
-> + * Value for Error Severity field above
-> + */
-> +enum AcpiGenericErrorSeverity {
-> +    ACPI_CPER_SEV_RECOVERABLE,
-> +    ACPI_CPER_SEV_FATAL,
-> +    ACPI_CPER_SEV_CORRECTED,
-> +    ACPI_CPER_SEV_NONE,
-> +};
-> +
-> +/*
-> + * Generic Hardware Error Source version 2
-> + */
-> +#define ACPI_HEST_SOURCE_GENERIC_ERROR_V2    (10)
-ditto
+  https://gitlab.fel.cvut.cz/canbus/qemu-canbus
 
-> +
->  #define ACPI_SRAT_PROCESSOR_APIC     0
->  #define ACPI_SRAT_MEMORY             1
->  #define ACPI_SRAT_PROCESSOR_x2APIC   2
+I have followed SJA1000 manual to implement (hopefully)
+complete logic in can_sja_accept_filter().
+Linux driver in standard setup does not use
+it to limit range of received messages
+so the functionality is not so important.
+But because can_bus_client_set_filters()
+is not implemented in QEMU CAN core yet as well.
+SJA1000 filters handling is quite specific anyway
+so keep exact final filtering in SJA1000 code
+is reasonable if used by some guest drivers
+in futire.
+
+I have followed Philippe's comments where
+I have no questions.
+
+I hope I find some time in January to follow
+development and Oleksij has offered some time
+as well.
+
+On Thursday 02 of November 2017 02:53:46 Philippe Mathieu-Daud=C3=A9 wrote:
+> - separate CAN bus emulation core functions and connection to Linux
+> SocketCAN host (as suggested by Frederic Konrad).
+
+> Hmm Id rather start having this part in hw/can/linux_socketcan.c but
+> this can indeed be moved later.
+>
+
+Yes that is the right solution and relatively easy
+if I get hint how should the commandline look like.
+
+The host connection is (can be) part of device specification now
+
+  -device kvaser_pci,canbus=3Dcanbus0,host=3Dcan0
+
+The concept of bus works so it is possible to connect
+multiple QOM devices to it and host interface can be
+reimplemented as QOM object too. So I have no problem
+change setup to something like
+
+  -device kvaser_pci,canbus=3Dcanbus0 \
+  -device can_to_host,canbus=3Dcanbus0,host=3Dcan0
+
+or some other syntax. I am not sure if such infrastructure
+object should be organized under "device" and what is the
+best parent for such object, it should not be "PCIDevice"
+for sure.
+
+What is order of calling of QOM object methods?
+
+If I do something like=20
+
+  type_init(can_socketcan_host_register_types)
+
+it it is quaranteed that some class init method is called
+before other class properties are delivered into
+
+  kvaser_pci_init(PCIDevice *pci_dev)
+
+Because if that is a case then I can call
+some registering of default host interface from
+
+  can_socketcan_host_register_types
+
+type/class initialization registration before=20
+Kvaser PCI instance is called and reads host
+property.
+
+This way can be preserved even simpler single "device"
+parameter initialization even after separation
+of host connection to another object and source file.
+
+> > diff --git a/default-configs/pci.mak b/default-configs/pci.mak
+> > index e514bdef42..bbe11887a1 100644
+> > --- a/default-configs/pci.mak
+> > +++ b/default-configs/pci.mak
+> > @@ -31,6 +31,7 @@ CONFIG_ESP_PCI=3Dy
+> >  CONFIG_SERIAL=3Dy
+> >  CONFIG_SERIAL_ISA=3Dy
+> >  CONFIG_SERIAL_PCI=3Dy
+> > +CONFIG_CAN_CORE=3Dy
+>
+> CAN Bus is not PCI specific, your model (MF624) uses the PCI.
+>
+> This looks weird to me here, but why not.
+>
+
+I have seen that others devices classes (which do not have
+their own top level make and are used on PCI only for now)
+use this solution as well. But if there is better option then
+I would follow it.
+
+> > +#else /*__linux__*/
+> > +int can_bus_connect_to_host_device(CanBusState *bus, const char *name)
+> > +{
+> > +    error_report("CAN bus connect to host device not supported on this
+> > system"); +    exit(1);
+> > +}
+>
+> This would be normally be in 'can-stubs.c'
+>
+> > +#endif /*__linux__*/
+
+Stub and ifdefs are not required if host support is separated.
+
+> > diff --git a/include/can/can_emu.h b/include/can/can_emu.h
+> > new file mode 100644
+> > index 0000000000..86b35aef32
+> > --- /dev/null
+> > +++ b/include/can/can_emu.h
+> > @@ -0,0 +1,133 @@
+> > +/*
+
+> > +#ifndef NET_CAN_EMU_H
+> > +#define NET_CAN_EMU_H
+> > +
+> > +#include "qemu/queue.h"
+> > +
+> > +/* NOTE: the following two structures is copied from <linux/can.h>. */
+> > +
+>
+> maybe you can import it in include/standard-headers/
+>
+> (see scripts/update-linux-headers.sh)
+>
+> > +/*
+
+> > + * The filter can be inverted (CAN_INV_FILTER bit set in can_id) or it
+> > can + * filter for error message frames (CAN_ERR_FLAG bit set in mask).=
+ +
+> > */
+> > +typedef struct qemu_can_filter {
+> > +    qemu_canid_t    can_id;
+> > +    qemu_canid_t    can_mask;
+> > +} qemu_can_filter;
+> > +
+> > +#define CAN_INV_FILTER 0x20000000U /* to be set in
+> > qemu_can_filter.can_id */
+>
+> ^ this part should go in "include/hw/can/can.h"
+>
+> and the following in "include/sysemu/can.h"?
+>
+
+I am not sure if hard fixing of QEMU CAN frame format to Linux
+one is an optimal solution. I have introduced new defines
+with QEMU_CAN_ as temporal solution and to document
+two meaning of the defines and structures still
+in can_emu.h
+
+#define QEMU_CAN_EFF_FLAG 0x80000000U /* EFF/SFF is set in the MSB */
+#define QEMU_CAN_RTR_FLAG 0x40000000U /* remote transmission request */
+#define QEMU_CAN_ERR_FLAG 0x20000000U /* error message frame */
+
+#define QEMU_CAN_SFF_MASK 0x000007FFU /* standard frame format (SFF) */
+#define QEMU_CAN_EFF_MASK 0x1FFFFFFFU /* extended frame format (EFF) */
+
+and have added asserts in socketcan specific code which
+has to see Linux definitions to check that they are the same
+for now
+
+    /* Check that QEMU and Linux kernel flags encoding matches */
+    assert(QEMU_CAN_EFF_FLAG =3D=3D CAN_EFF_FLAG);
+    assert(QEMU_CAN_RTR_FLAG =3D=3D CAN_RTR_FLAG);
+    assert(QEMU_CAN_ERR_FLAG =3D=3D CAN_ERR_FLAG);
+
+    assert(QEMU_CAN_INV_FILTER =3D=3D CAN_INV_FILTER);
+
+It is possible to do there transformation if they change/diverge
+in future and flags and whole message format transformation is necessary
+for other host systems anyway. There are many other CAN APIs even for
+Linux (Peak etc.). It is great that Linux is heading to consolidation
+but it is Linux case only.
+
+I would appreciate suggestions what should go to which header
+file and how to maintain functionality in long term.
+
+I hope to find time to prepare and submit updated patch
+series in January. I am heading to mountains to rest
+a little now till January 2.
+
+Best wishes and strong health to you and your bellowed,
+happy New year,
+
+Pavel
