@@ -1,23 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40589)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39968)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1eUWge-000431-0Q
-	for qemu-devel@nongnu.org; Thu, 28 Dec 2017 06:49:28 -0500
+	(envelope-from <imammedo@redhat.com>) id 1eUXJY-0004IV-Kj
+	for qemu-devel@nongnu.org; Thu, 28 Dec 2017 07:29:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1eUWga-0007i9-Tu
-	for qemu-devel@nongnu.org; Thu, 28 Dec 2017 06:49:24 -0500
-References: <20171220154945.88410-1-vsementsov@virtuozzo.com>
-	<20171220154945.88410-14-vsementsov@virtuozzo.com>
-	<20171228063330.GL9192@lemon>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <e7950241-1eee-a415-3e28-9468f1020d1b@virtuozzo.com>
-Date: Thu, 28 Dec 2017 14:49:12 +0300
+	(envelope-from <imammedo@redhat.com>) id 1eUXJX-00051i-Fb
+	for qemu-devel@nongnu.org; Thu, 28 Dec 2017 07:29:36 -0500
+Date: Thu, 28 Dec 2017 13:29:10 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20171228132910.6594110a@igors-macbook-pro.local>
+In-Reply-To: <1514440458-10515-2-git-send-email-gengdongjiu@huawei.com>
+References: <1514440458-10515-1-git-send-email-gengdongjiu@huawei.com>
+	<1514440458-10515-2-git-send-email-gengdongjiu@huawei.com>
 MIME-Version: 1.0
-In-Reply-To: <20171228063330.GL9192@lemon>
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH v9 13/13] iotests: add dirty bitmap
- postcopy test
+Subject: Re: [Qemu-devel] [PATCH v14 1/9] ACPI: add some GHES structures and
+ macros definition
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,11 +24,109 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, kwolf@redhat.com, peter.maydell@linaro.org, lirans@il.ibm.com, quintela@redhat.com, jsnow@redhat.com, armbru@redhat.com, mreitz@redhat.com, stefanha@redhat.com, den@openvz.org, amit.shah@redhat.com, pbonzini@redhat.com, dgilbert@redhat.com
+To: Dongjiu Geng <gengdongjiu@huawei.com>
+Cc: pbonzini@redhat.com, mst@redhat.com, zhaoshenglong@huawei.com, peter.maydell@linaro.org, mtosatti@redhat.com, rth@twiddle.net, ehabkost@redhat.com, james.morse@arm.com, christoffer.dall@linaro.org, marc.zyngier@arm.com, kvm@vger.kernel.org, qemu-devel@nongnu.org, qemu-arm@nongnu.org, huangshaoyu@huawei.com, zhengqiang10@huawei.com, xuwei5@hisilicon.com
 
-Thank you for reviewing my code!
+On Thu, 28 Dec 2017 13:54:10 +0800
+Dongjiu Geng <gengdongjiu@huawei.com> wrote:
 
--- 
-Best regards,
-Vladimir
+> Add Generic Error Status Block structures and some macros
+> definitions, which is referred to the ACPI 4.0 or ACPI 6.1. The
+> HEST table generation and CPER record will use them.
+> 
+> Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
+> ---
+> Change since v13:
+> 1. Clean the new added structures and macros definition
+> 
+> Change since v12:
+> 1. Address Igor's comments to to get rid of most structures and use
+> build_append_int_noprefix() API to compose whole error status block
+> and APEI table in [1]
+> 
+> [1]: https://lkml.org/lkml/2017/8/29/187
+> ---
+>  include/hw/acpi/acpi-defs.h | 52 +++++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 52 insertions(+)
+> 
+> diff --git a/include/hw/acpi/acpi-defs.h b/include/hw/acpi/acpi-defs.h
+> index 72be675..fb2110c 100644
+> --- a/include/hw/acpi/acpi-defs.h
+> +++ b/include/hw/acpi/acpi-defs.h
+> @@ -298,6 +298,25 @@ typedef struct AcpiMultipleApicTable AcpiMultipleApicTable;
+>  #define ACPI_APIC_RESERVED              16   /* 16 and greater are reserved */
+>  
+>  /*
+> + * Hardware Error Notification
+> + */
+> +enum AcpiHestNotifyType {
+> +    ACPI_HEST_NOTIFY_POLLED = 0,
+> +    ACPI_HEST_NOTIFY_EXTERNAL = 1,
+> +    ACPI_HEST_NOTIFY_LOCAL = 2,
+> +    ACPI_HEST_NOTIFY_SCI = 3,
+> +    ACPI_HEST_NOTIFY_NMI = 4,
+> +    ACPI_HEST_NOTIFY_CMCI = 5,  /* ACPI 5.0 */
+for stuff coming from spec comment should be something like this
+/* ACPI 1.0b: 16.2.5.3 Type 1 Opcodes Encoding: DefReturn */
+
+i.e. concrete version, chapter/table
+otherwise it could be hard to find definition in huge spec 
+
+> +    ACPI_HEST_NOTIFY_MCE = 6,   /* ACPI 5.0 */
+> +    ACPI_HEST_NOTIFY_GPIO = 7,  /* ACPI 6.0 */
+> +    ACPI_HEST_NOTIFY_SEA = 8,   /* ACPI 6.1 */
+> +    ACPI_HEST_NOTIFY_SEI = 9,   /* ACPI 6.1 */
+> +    ACPI_HEST_NOTIFY_GSIV = 10, /* ACPI 6.1 */
+> +    ACPI_HEST_NOTIFY_SDEI = 11, /* ACPI 6.2 */
+> +    ACPI_HEST_NOTIFY_RESERVED = 12 /* 12 and greater are reserved */
+> +};
+> +
+> +/*
+>   * MADT sub-structures (Follow MULTIPLE_APIC_DESCRIPTION_TABLE)
+>   */
+>  #define ACPI_SUB_HEADER_DEF   /* Common ACPI sub-structure header */\
+> @@ -474,6 +493,39 @@ struct AcpiSystemResourceAffinityTable {
+>  } QEMU_PACKED;
+>  typedef struct AcpiSystemResourceAffinityTable AcpiSystemResourceAffinityTable;
+>  
+> +/*
+> + * Generic Error Status Block
+> + */
+> +struct AcpiGenericErrorStatus {
+> +    /* It is a bitmask composed of ACPI_GEBS_xxx macros */
+> +    uint32_t block_status;
+> +    uint32_t raw_data_offset;
+> +    uint32_t raw_data_length;
+> +    uint32_t data_length;
+> +    uint32_t error_severity;
+> +} QEMU_PACKED;
+> +typedef struct AcpiGenericErrorStatus AcpiGenericErrorStatus;
+> +
+> +/*
+> + * Masks for Block Status field above
+> + */
+> +#define ACPI_GEBS_UNCORRECTABLE          (1)
+() are usually used with an expression and not with single value,
+so drop that to be consistent with style of the header
+
+> +
+> +/*
+> + * Value for Error Severity field above
+> + */
+> +enum AcpiGenericErrorSeverity {
+> +    ACPI_CPER_SEV_RECOVERABLE,
+> +    ACPI_CPER_SEV_FATAL,
+> +    ACPI_CPER_SEV_CORRECTED,
+> +    ACPI_CPER_SEV_NONE,
+> +};
+> +
+> +/*
+> + * Generic Hardware Error Source version 2
+> + */
+> +#define ACPI_HEST_SOURCE_GENERIC_ERROR_V2    (10)
+ditto
+
+> +
+>  #define ACPI_SRAT_PROCESSOR_APIC     0
+>  #define ACPI_SRAT_MEMORY             1
+>  #define ACPI_SRAT_PROCESSOR_x2APIC   2
