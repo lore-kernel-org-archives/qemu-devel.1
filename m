@@ -1,29 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46862)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60980)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1eUKOg-0007AN-2a
-	for qemu-devel@nongnu.org; Wed, 27 Dec 2017 17:42:02 -0500
+	(envelope-from <programmingkidx@gmail.com>) id 1eULtZ-0006E8-9Y
+	for qemu-devel@nongnu.org; Wed, 27 Dec 2017 19:18:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1eUKOc-00070b-Jf
-	for qemu-devel@nongnu.org; Wed, 27 Dec 2017 17:42:01 -0500
-Received: from mail-pf0-x229.google.com ([2607:f8b0:400e:c00::229]:45411)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1eUKOc-0006xo-8b
-	for qemu-devel@nongnu.org; Wed, 27 Dec 2017 17:41:58 -0500
-Received: by mail-pf0-x229.google.com with SMTP id u19so20249148pfa.12
-	for <qemu-devel@nongnu.org>; Wed, 27 Dec 2017 14:41:57 -0800 (PST)
-References: <20171218171758.16964-1-richard.henderson@linaro.org>
-	<20171218171758.16964-9-richard.henderson@linaro.org>
-	<alpine.DEB.2.20.1712271821081.4787@bulbul.intra.ispras.ru>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <c098868c-352d-e69e-3cc6-ba1c5378250d@linaro.org>
-Date: Wed, 27 Dec 2017 14:41:53 -0800
-MIME-Version: 1.0
-In-Reply-To: <alpine.DEB.2.20.1712271821081.4787@bulbul.intra.ispras.ru>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v7 08/26] tcg/i386: Add vector operations
+	(envelope-from <programmingkidx@gmail.com>) id 1eULtV-0004Rt-7v
+	for qemu-devel@nongnu.org; Wed, 27 Dec 2017 19:18:01 -0500
+From: John Arbuckle <programmingkidx@gmail.com>
+Date: Wed, 27 Dec 2017 19:17:42 -0500
+Message-Id: <20171228001742.62202-1-programmingkidx@gmail.com>
+Subject: [Qemu-devel] [PATCH] Update dtc to fix compilation problem on Mac
+ OS 10.6
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,17 +18,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kirill Batuzov <batuzovk@ispras.ru>
-Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org
+To: david@gibson.dropbear.id.au, qemu-devel@nongnu.org, peter.maydell@linaro.org, qemu-ppc@nongnu.org
+Cc: John Arbuckle <programmingkidx@gmail.com>
 
-On 12/27/2017 07:31 AM, Kirill Batuzov wrote:
-> I think something is wrong with instruction encodings here. Looks like
->   tcg_out_mov(&tcg_ctx, TCG_TYPE_I64, TCG_REG_EBP, TCG_REG_XMM0)
-> produces
->   vmovq %xmm5, %rax
-> instead.
+Currently QEMU does not build on Mac OS 10.6
+because of a missing patch in the dtc
+subproject. Updating dtc to make the patch
+available fixes this problem.
 
-Bah.  The operands are swapped -- ebp == 5 and eax == 0.
+Signed-off-by: John Arbuckle <programmingkidx@gmail.com>
+---
+ dtc | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-
-r~
+diff --git a/dtc b/dtc
+index 558cd81bdd..e671852042 160000
+--- a/dtc
++++ b/dtc
+@@ -1 +1 @@
+-Subproject commit 558cd81bdd432769b59bff01240c44f82cfb1a9d
++Subproject commit e671852042a77b15ec72ca908291c7d647e4fb01
+-- 
+2.14.3 (Apple Git-98)
