@@ -1,24 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57591)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57638)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eUyoJ-0003si-C5
-	for qemu-devel@nongnu.org; Fri, 29 Dec 2017 12:51:12 -0500
+	id 1eUyoM-0003vZ-4D
+	for qemu-devel@nongnu.org; Fri, 29 Dec 2017 12:51:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eUyoI-0007UF-8X
-	for qemu-devel@nongnu.org; Fri, 29 Dec 2017 12:51:11 -0500
+	id 1eUyoL-0007Xk-2d
+	for qemu-devel@nongnu.org; Fri, 29 Dec 2017 12:51:14 -0500
+Received: from mail-qk0-x243.google.com ([2607:f8b0:400d:c09::243]:36358)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1eUyoK-0007XW-Tm
+	for qemu-devel@nongnu.org; Fri, 29 Dec 2017 12:51:12 -0500
+Received: by mail-qk0-x243.google.com with SMTP id g123so21621557qka.3
+	for <qemu-devel@nongnu.org>; Fri, 29 Dec 2017 09:51:12 -0800 (PST)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Fri, 29 Dec 2017 14:49:19 -0300
-Message-Id: <20171229174933.1781-29-f4bug@amsat.org>
+Date: Fri, 29 Dec 2017 14:49:20 -0300
+Message-Id: <20171229174933.1781-30-f4bug@amsat.org>
 In-Reply-To: <20171229174933.1781-1-f4bug@amsat.org>
 References: <20171229174933.1781-1-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v3 28/42] hw/arm/xilinx_zynq: implement SDHCI
- Spec v2
+Subject: [Qemu-devel] [PATCH v3 29/42] sdhci: add qtest to check the SD Spec
+ version
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,96 +34,126 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alistair Francis <alistair.francis@xilinx.com>, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, Peter Maydell <peter.maydell@linaro.org>, Andrey Smirnov <andrew.smirnov@gmail.com>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, Peter Crosthwaite <crosthwaite.peter@gmail.com>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, "open list:Xilinx Zynq" <qemu-arm@nongnu.org>
+To: Alistair Francis <alistair.francis@xilinx.com>, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, Peter Maydell <peter.maydell@linaro.org>, Igor Mitsyanko <i.mitsyanko@gmail.com>, Krzysztof Kozlowski <krzk@kernel.org>, Andrey Smirnov <andrew.smirnov@gmail.com>
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, Peter Crosthwaite <crosthwaite.peter@gmail.com>
+
+with check_specs_version()
 
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 ---
- hw/arm/xilinx_zynq.c | 64 ++++++++++++++++++++++++++++++++--------------------
- 1 file changed, 40 insertions(+), 24 deletions(-)
+ tests/sdhci-test.c     | 82 ++++++++++++++++++++++++++++++++++++++++++++++++++
+ tests/Makefile.include |  2 ++
+ 2 files changed, 84 insertions(+)
+ create mode 100644 tests/sdhci-test.c
 
-diff --git a/hw/arm/xilinx_zynq.c b/hw/arm/xilinx_zynq.c
-index 1836a4ed45..9a106db7b7 100644
---- a/hw/arm/xilinx_zynq.c
-+++ b/hw/arm/xilinx_zynq.c
-@@ -165,10 +165,8 @@ static void zynq_init(MachineState *machine)
-     MemoryRegion *address_space_mem = get_system_memory();
-     MemoryRegion *ext_ram = g_new(MemoryRegion, 1);
-     MemoryRegion *ocm_ram = g_new(MemoryRegion, 1);
--    DeviceState *dev, *carddev;
-+    DeviceState *dev;
-     SysBusDevice *busdev;
--    DriveInfo *di;
--    BlockBackend *blk;
-     qemu_irq pic[64];
-     int n;
- 
-@@ -247,27 +245,45 @@ static void zynq_init(MachineState *machine)
-     gem_init(&nd_table[0], 0xE000B000, pic[54-IRQ_OFFSET]);
-     gem_init(&nd_table[1], 0xE000C000, pic[77-IRQ_OFFSET]);
- 
--    dev = qdev_create(NULL, TYPE_SYSBUS_SDHCI);
--    qdev_init_nofail(dev);
--    sysbus_mmio_map(SYS_BUS_DEVICE(dev), 0, 0xE0100000);
--    sysbus_connect_irq(SYS_BUS_DEVICE(dev), 0, pic[56-IRQ_OFFSET]);
--
--    di = drive_get_next(IF_SD);
--    blk = di ? blk_by_legacy_dinfo(di) : NULL;
--    carddev = qdev_create(qdev_get_child_bus(dev, "sd-bus"), TYPE_SD_CARD);
--    qdev_prop_set_drive(carddev, "drive", blk, &error_fatal);
--    object_property_set_bool(OBJECT(carddev), true, "realized", &error_fatal);
--
--    dev = qdev_create(NULL, TYPE_SYSBUS_SDHCI);
--    qdev_init_nofail(dev);
--    sysbus_mmio_map(SYS_BUS_DEVICE(dev), 0, 0xE0101000);
--    sysbus_connect_irq(SYS_BUS_DEVICE(dev), 0, pic[79-IRQ_OFFSET]);
--
--    di = drive_get_next(IF_SD);
--    blk = di ? blk_by_legacy_dinfo(di) : NULL;
--    carddev = qdev_create(qdev_get_child_bus(dev, "sd-bus"), TYPE_SD_CARD);
--    qdev_prop_set_drive(carddev, "drive", blk, &error_fatal);
--    object_property_set_bool(OBJECT(carddev), true, "realized", &error_fatal);
-+    for (n = 0; n < 2; n++) {
-+        int hci_irq = n ? 79 : 56;
-+        hwaddr hci_addr = n ? 0xE0101000 : 0xE0100000;
-+        DriveInfo *di;
-+        BlockBackend *blk;
-+        DeviceState *carddev;
+diff --git a/tests/sdhci-test.c b/tests/sdhci-test.c
+new file mode 100644
+index 0000000000..492b332588
+--- /dev/null
++++ b/tests/sdhci-test.c
+@@ -0,0 +1,82 @@
++/*
++ * QTest testcase for SDHCI controllers
++ *
++ * Written by Philippe Mathieu-Daudé <f4bug@amsat.org>
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or later.
++ * See the COPYING file in the top-level directory.
++ */
++#include "qemu/osdep.h"
++#include "libqtest.h"
 +
-+        /* Compatible with:
-+         * - SD Host Controller Specification Version 2.0 Part A2
-+         * - SDIO Specification Version 2.0
-+         * - MMC Specification Version 3.31
-+         *
-+         * - SDMA (single operation DMA)
-+         * - ADMA1 (4 KB boundary limited DMA)
-+         * - ADMA2
-+         *
-+         * - up to seven functions in SD1, SD4, but does not support SPI mode
-+         * - SD high-speed (SDHS) card
-+         * - SD High Capacity (SDHC) card
-+         *
-+         * - Low-speed, 1 KHz to 400 KHz
-+         * - Full-speed, 1 MHz to 50 MHz (25 MB/sec)
-+         */
-+        dev = qdev_create(NULL, TYPE_SYSBUS_SDHCI);
-+        qdev_prop_set_uint8(dev, "sd-spec-version", 2);
-+        qdev_prop_set_bit(dev, "adma1", true);
-+        qdev_prop_set_bit(dev, "high-speed", true);
-+        qdev_prop_set_uint16(dev, "max-block-length", 1024);
-+        qdev_init_nofail(dev);
-+        sysbus_mmio_map(SYS_BUS_DEVICE(dev), 0, hci_addr);
-+        sysbus_connect_irq(SYS_BUS_DEVICE(dev), 0, pic[hci_irq - IRQ_OFFSET]);
++#define SDHC_HCVER                      0xFE
 +
-+        di = drive_get_next(IF_SD);
-+        blk = di ? blk_by_legacy_dinfo(di) : NULL;
-+        carddev = qdev_create(qdev_get_child_bus(dev, "sd-bus"), TYPE_SD_CARD);
-+        qdev_prop_set_drive(carddev, "drive", blk, &error_fatal);
-+        object_property_set_bool(OBJECT(carddev), true, "realized",
-+                                 &error_fatal);
++static const struct sdhci_t {
++    const char *arch;
++    const char *machine;
++    struct {
++        uintptr_t addr;
++        uint8_t version;
++        uint8_t baseclock;
++        struct {
++            bool sdma;
++            uint64_t reg;
++        } capab;
++    } sdhci;
++} models[] = {
++    /* Exynos4210 */
++    { "arm",    "smdkc210",
++        {0x12510000, 2, 0, {1, 0x5e80080} } },
++
++    /* Zynq-7000 */
++    { "arm",    "xilinx-zynq-a9",
++        {0xe0100000, 2, 0, {1, 0x01790080} } },
++};
++
++static uint32_t sdhci_readl(uintptr_t base, uint32_t reg_addr)
++{
++    QTestState *qtest = global_qtest;
++
++    return qtest_readl(qtest, base + reg_addr);
++}
++
++static void check_specs_version(uintptr_t addr, uint8_t version)
++{
++    uint32_t v;
++
++    v = sdhci_readl(addr, SDHC_HCVER);
++    v &= 0xff;
++    v += 1;
++    g_assert_cmpuint(v, ==, version);
++}
++
++static void test_machine(const void *data)
++{
++    const struct sdhci_t *test = data;
++
++    global_qtest = qtest_startf("-machine %s -d unimp", test->machine);
++
++    check_specs_version(test->sdhci.addr, test->sdhci.version);
++
++    qtest_quit(global_qtest);
++}
++
++int main(int argc, char *argv[])
++{
++    const char *arch = qtest_get_arch();
++    char *name;
++    int i;
++
++    g_test_init(&argc, &argv, NULL);
++
++    for (i = 0; i < ARRAY_SIZE(models); i++) {
++        if (strcmp(arch, models[i].arch)) {
++            continue;
++        }
++        name = g_strdup_printf("sdhci/%s", models[i].machine);
++        qtest_add_data_func(name, &models[i], test_machine);
++        g_free(name);
 +    }
++
++    return g_test_run();
++}
+diff --git a/tests/Makefile.include b/tests/Makefile.include
+index 77f8183117..2d7058ca4c 100644
+--- a/tests/Makefile.include
++++ b/tests/Makefile.include
+@@ -357,6 +357,7 @@ check-qtest-arm-y += tests/virtio-blk-test$(EXESUF)
+ gcov-files-arm-y += arm-softmmu/hw/block/virtio-blk.c
+ check-qtest-arm-y += tests/test-arm-mptimer$(EXESUF)
+ gcov-files-arm-y += hw/timer/arm_mptimer.c
++check-qtest-arm-y += tests/sdhci-test$(EXESUF)
  
-     dev = qdev_create(NULL, TYPE_ZYNQ_XADC);
-     qdev_init_nofail(dev);
+ check-qtest-aarch64-y = tests/numa-test$(EXESUF)
+ 
+@@ -612,6 +613,7 @@ tests/test-qht-par$(EXESUF): tests/test-qht-par.o tests/qht-bench$(EXESUF) $(tes
+ tests/qht-bench$(EXESUF): tests/qht-bench.o $(test-util-obj-y)
+ tests/test-bufferiszero$(EXESUF): tests/test-bufferiszero.o $(test-util-obj-y)
+ tests/atomic_add-bench$(EXESUF): tests/atomic_add-bench.o $(test-util-obj-y)
++tests/sdhci-test$(EXESUF): tests/sdhci-test.o
+ 
+ tests/test-qdev-global-props$(EXESUF): tests/test-qdev-global-props.o \
+ 	hw/core/qdev.o hw/core/qdev-properties.o hw/core/hotplug.o\
 -- 
 2.15.1
