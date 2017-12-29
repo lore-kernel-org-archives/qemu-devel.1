@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39345)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39301)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <hpoussin@reactos.org>) id 1eUvg9-0000Dx-AX
-	for qemu-devel@nongnu.org; Fri, 29 Dec 2017 09:30:34 -0500
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <hpoussin@reactos.org>) id 1eUvg8-0006Jl-CC
+	(envelope-from <hpoussin@reactos.org>) id 1eUvg8-0000Dp-1g
 	for qemu-devel@nongnu.org; Fri, 29 Dec 2017 09:30:33 -0500
-Received: from iserv.reactos.org ([2a01:4f8:221:4c5::3]:38310)
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <hpoussin@reactos.org>) id 1eUvg7-0006IP-3g
+	for qemu-devel@nongnu.org; Fri, 29 Dec 2017 09:30:32 -0500
+Received: from iserv.reactos.org ([2a01:4f8:221:4c5::3]:38300)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <hpoussin@reactos.org>)
-	id 1eUvg8-0006DI-6R
-	for qemu-devel@nongnu.org; Fri, 29 Dec 2017 09:30:32 -0500
+	id 1eUvg6-0006CO-TV
+	for qemu-devel@nongnu.org; Fri, 29 Dec 2017 09:30:31 -0500
 From: =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>
-Date: Fri, 29 Dec 2017 15:29:18 +0100
-Message-Id: <20171229142922.31701-13-hpoussin@reactos.org>
+Date: Fri, 29 Dec 2017 15:29:09 +0100
+Message-Id: <20171229142922.31701-4-hpoussin@reactos.org>
 In-Reply-To: <20171229142922.31701-1-hpoussin@reactos.org>
 References: <20171229142922.31701-1-hpoussin@reactos.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v3 12/16] piix4: add a mc146818rtc controller
- as specified in datasheet
+Subject: [Qemu-devel] [PATCH v3 03/16] mc146818rtc: move structure to header
+ file
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,87 +31,94 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Aurelien Jarno <aurelien@aurel32.net>, Yongbok Kim <yongbok.kim@mips.com>, "Michael S . Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
 Cc: =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>
 
-Remove mc146818rtc instanciated in malta board, to not have it twice.
+We are now able to embed a timer in another object.
 
 Signed-off-by: Hervé Poussineau <hpoussin@reactos.org>
 ---
- hw/isa/piix4.c       | 12 ++++++++++++
- hw/mips/mips_malta.c |  5 -----
- 2 files changed, 12 insertions(+), 5 deletions(-)
+ hw/timer/mc146818rtc.c         | 30 ------------------------------
+ include/hw/timer/mc146818rtc.h | 29 +++++++++++++++++++++++++++++
+ 2 files changed, 29 insertions(+), 30 deletions(-)
 
-diff --git a/hw/isa/piix4.c b/hw/isa/piix4.c
-index f672af21cd..09388ff286 100644
---- a/hw/isa/piix4.c
-+++ b/hw/isa/piix4.c
-@@ -31,6 +31,7 @@
- #include "hw/char/isa.h"
- #include "hw/sysbus.h"
- #include "hw/timer/i8254.h"
-+#include "hw/timer/mc146818rtc.h"
- #include "qapi/error.h"
+diff --git a/hw/timer/mc146818rtc.c b/hw/timer/mc146818rtc.c
+index 35a05a64cc..3e8c0b7d33 100644
+--- a/hw/timer/mc146818rtc.c
++++ b/hw/timer/mc146818rtc.c
+@@ -62,36 +62,6 @@
+ #define RTC_CLOCK_RATE            32768
+ #define UIP_HOLD_LENGTH           (8 * NANOSECONDS_PER_SECOND / 32768)
  
- PCIDevice *piix4_dev;
-@@ -43,6 +44,7 @@ typedef struct PIIX4State {
-     FDCtrlISABus floppy;
-     ISASerialState serial[2];
-     ISAParallelState parallel;
-+    RTCState rtc;
- 
-     /* Reset Control Register */
-     MemoryRegion rcr_mem;
-@@ -213,6 +215,15 @@ static void piix4_realize(PCIDevice *pci, Error **errp)
-         return;
-     }
- 
-+    /* timer */
-+    qdev_set_parent_bus(DEVICE(&s->rtc), BUS(isa_bus));
-+    object_property_set_bool(OBJECT(&s->rtc), true, "realized", &err);
-+    if (err) {
-+        error_propagate(errp, err);
-+        return;
-+    }
-+    isa_init_irq(ISA_DEVICE(&s->rtc), &s->rtc.irq, RTC_ISA_IRQ);
-+
-     piix4_dev = pci;
-     qemu_register_reset(piix4_reset, s);
- }
-@@ -227,6 +238,7 @@ static void piix4_init(Object *obj)
-         object_initialize(&s->serial[i], sizeof(s->serial[i]), TYPE_ISA_SERIAL);
-     }
-     object_initialize(&s->parallel, sizeof(s->parallel), TYPE_ISA_PARALLEL);
-+    object_initialize(&s->rtc, sizeof(s->rtc), TYPE_MC146818_RTC);
- 
-     object_property_add_alias(obj, "floppy", OBJECT(&s->floppy), "driveA",
-                               &error_abort);
-diff --git a/hw/mips/mips_malta.c b/hw/mips/mips_malta.c
-index 30fb30fc0e..3d304a6e0a 100644
---- a/hw/mips/mips_malta.c
-+++ b/hw/mips/mips_malta.c
-@@ -995,7 +995,6 @@ void mips_malta_init(MachineState *machine)
-     uint8_t *smbus_eeprom_buf = g_malloc0(smbus_eeprom_size);
-     int64_t kernel_entry, bootloader_run_addr;
-     PCIBus *pci_bus;
--    ISABus *isa_bus;
-     qemu_irq cbus_irq, i8259_irq;
-     PCIDevice *pci;
-     int piix4_devfn;
-@@ -1197,7 +1196,6 @@ void mips_malta_init(MachineState *machine)
-     qdev_prop_set_chr(dev, "parallel", parallel_hds[0]);
- 
-     qdev_init_nofail(dev);
--    isa_bus = ISA_BUS(qdev_get_child_bus(dev, "isa.0"));
-     piix4_devfn = pci->devfn;
- 
-     /* Interrupt controller */
-@@ -1213,9 +1211,6 @@ void mips_malta_init(MachineState *machine)
-     smbus_eeprom_init(smbus, 8, smbus_eeprom_buf, smbus_eeprom_size);
-     g_free(smbus_eeprom_buf);
- 
--    /* Super I/O */
--    mc146818_rtc_init(isa_bus, 2000, NULL);
+-#define MC146818_RTC(obj) OBJECT_CHECK(RTCState, (obj), TYPE_MC146818_RTC)
 -
-     /* Network card */
-     network_init(pci_bus);
+-typedef struct RTCState {
+-    ISADevice parent_obj;
+-
+-    MemoryRegion io;
+-    uint8_t cmos_data[128];
+-    uint8_t cmos_index;
+-    int32_t base_year;
+-    uint64_t base_rtc;
+-    uint64_t last_update;
+-    int64_t offset;
+-    qemu_irq irq;
+-    int it_shift;
+-    /* periodic timer */
+-    QEMUTimer *periodic_timer;
+-    int64_t next_periodic_time;
+-    /* update-ended timer */
+-    QEMUTimer *update_timer;
+-    uint64_t next_alarm_time;
+-    uint16_t irq_reinject_on_ack_count;
+-    uint32_t irq_coalesced;
+-    uint32_t period;
+-    QEMUTimer *coalesced_timer;
+-    Notifier clock_reset_notifier;
+-    LostTickPolicy lost_tick_policy;
+-    Notifier suspend_notifier;
+-    QLIST_ENTRY(RTCState) link;
+-} RTCState;
+-
+ static void rtc_set_time(RTCState *s);
+ static void rtc_update_time(RTCState *s);
+ static void rtc_set_cmos(RTCState *s, const struct tm *tm);
+diff --git a/include/hw/timer/mc146818rtc.h b/include/hw/timer/mc146818rtc.h
+index fe6ed63f71..7385622604 100644
+--- a/include/hw/timer/mc146818rtc.h
++++ b/include/hw/timer/mc146818rtc.h
+@@ -5,6 +5,35 @@
+ #include "hw/timer/mc146818rtc_regs.h"
  
+ #define TYPE_MC146818_RTC "mc146818rtc"
++#define MC146818_RTC(obj) OBJECT_CHECK(RTCState, (obj), TYPE_MC146818_RTC)
++
++typedef struct RTCState {
++    ISADevice parent_obj;
++
++    MemoryRegion io;
++    uint8_t cmos_data[128];
++    uint8_t cmos_index;
++    int32_t base_year;
++    uint64_t base_rtc;
++    uint64_t last_update;
++    int64_t offset;
++    qemu_irq irq;
++    int it_shift;
++    /* periodic timer */
++    QEMUTimer *periodic_timer;
++    int64_t next_periodic_time;
++    /* update-ended timer */
++    QEMUTimer *update_timer;
++    uint64_t next_alarm_time;
++    uint16_t irq_reinject_on_ack_count;
++    uint32_t irq_coalesced;
++    uint32_t period;
++    QEMUTimer *coalesced_timer;
++    Notifier clock_reset_notifier;
++    LostTickPolicy lost_tick_policy;
++    Notifier suspend_notifier;
++    QLIST_ENTRY(RTCState) link;
++} RTCState;
+ 
+ ISADevice *mc146818_rtc_init(ISABus *bus, int base_year,
+                              qemu_irq intercept_irq);
 -- 
 2.11.0
