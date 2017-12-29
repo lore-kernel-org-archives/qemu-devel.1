@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36955)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38999)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1eUkqq-0004Ud-4L
-	for qemu-devel@nongnu.org; Thu, 28 Dec 2017 21:56:52 -0500
+	(envelope-from <famz@redhat.com>) id 1eUkuY-0005v4-W2
+	for qemu-devel@nongnu.org; Thu, 28 Dec 2017 22:00:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1eUkqp-00038S-Ck
-	for qemu-devel@nongnu.org; Thu, 28 Dec 2017 21:56:52 -0500
-Date: Fri, 29 Dec 2017 10:56:42 +0800
+	(envelope-from <famz@redhat.com>) id 1eUkuY-0004p1-Bj
+	for qemu-devel@nongnu.org; Thu, 28 Dec 2017 22:00:43 -0500
+Date: Fri, 29 Dec 2017 11:00:31 +0800
 From: Fam Zheng <famz@redhat.com>
-Message-ID: <20171229025642.GH13004@lemon>
+Message-ID: <20171229030031.GI13004@lemon>
 References: <20171207203036.14993-1-eblake@redhat.com>
-	<20171207203036.14993-9-eblake@redhat.com>
+	<20171207203036.14993-11-eblake@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20171207203036.14993-9-eblake@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v6 08/20] null: Switch to
+In-Reply-To: <20171207203036.14993-11-eblake@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v6 10/20] qcow: Switch to
  .bdrv_co_block_status()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -29,10 +29,10 @@ Cc: qemu-devel@nongnu.org, kwolf@redhat.com, qemu-block@nongnu.org, vsementsov@v
 
 On Thu, 12/07 14:30, Eric Blake wrote:
 > We are gradually moving away from sector-based interfaces, towards
-> byte-based.  Update the null driver accordingly.
+> byte-based.  Update the qcow driver accordingly.  There is no
+> intent to optimize based on the want_zero flag for this format.
 > 
 > Signed-off-by: Eric Blake <eblake@redhat.com>
 > Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> 
 
 Reviewed-by: Fam Zheng <famz@redhat.com>
