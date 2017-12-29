@@ -1,26 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42867)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42864)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1eV0NN-0000n5-NT
-	for qemu-devel@nongnu.org; Fri, 29 Dec 2017 14:31:30 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1eV0NN-0000my-KG
+	for qemu-devel@nongnu.org; Fri, 29 Dec 2017 14:31:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1eV0NI-0000Ho-RG
+	(envelope-from <richard.henderson@linaro.org>) id 1eV0NL-0000O6-Cs
 	for qemu-devel@nongnu.org; Fri, 29 Dec 2017 14:31:29 -0500
-Received: from mail-pf0-x241.google.com ([2607:f8b0:400e:c00::241]:35735)
+Received: from mail-pf0-x244.google.com ([2607:f8b0:400e:c00::244]:38017)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1eV0NI-0000GT-K2
-	for qemu-devel@nongnu.org; Fri, 29 Dec 2017 14:31:24 -0500
-Received: by mail-pf0-x241.google.com with SMTP id j124so22438915pfc.2
-	for <qemu-devel@nongnu.org>; Fri, 29 Dec 2017 11:31:24 -0800 (PST)
+	id 1eV0NL-0000MG-5F
+	for qemu-devel@nongnu.org; Fri, 29 Dec 2017 14:31:27 -0500
+Received: by mail-pf0-x244.google.com with SMTP id u25so22418441pfg.5
+	for <qemu-devel@nongnu.org>; Fri, 29 Dec 2017 11:31:27 -0800 (PST)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Fri, 29 Dec 2017 11:31:10 -0800
-Message-Id: <20171229193113.11753-6-richard.henderson@linaro.org>
+Date: Fri, 29 Dec 2017 11:31:12 -0800
+Message-Id: <20171229193113.11753-8-richard.henderson@linaro.org>
 In-Reply-To: <20171229193113.11753-1-richard.henderson@linaro.org>
 References: <20171229193113.11753-1-richard.henderson@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 5/8] tcg: Generalize TCGOp parameters
+Subject: [Qemu-devel] [PULL 7/8] tcg: Allow 6 arguments to TCG helpers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,129 +29,199 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org
 
-We had two fields specific to INDEX_op_call.  Rename these and
-add some macros so that the fields may be reused for other opcodes.
+We already handle this in the backends, and the lifetime datum
+for the TCGOp is already large enough.
 
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- tcg/tcg.h      | 10 ++++++----
- tcg/optimize.c |  4 ++--
- tcg/tcg.c      | 22 +++++++++++-----------
- 3 files changed, 19 insertions(+), 17 deletions(-)
+ include/exec/helper-gen.h   | 11 +++++++++++
+ include/exec/helper-head.h  |  2 ++
+ include/exec/helper-proto.h |  5 +++++
+ include/exec/helper-tcg.h   |  7 +++++++
+ tcg/tcg.h                   |  2 +-
+ tcg/tci.c                   | 12 ++++++++----
+ tcg/tci/tcg-target.inc.c    |  6 ++++--
+ 7 files changed, 38 insertions(+), 7 deletions(-)
 
+diff --git a/include/exec/helper-gen.h b/include/exec/helper-gen.h
+index 15204ab961..22381a1708 100644
+--- a/include/exec/helper-gen.h
++++ b/include/exec/helper-gen.h
+@@ -56,6 +56,16 @@ static inline void glue(gen_helper_, name)(dh_retvar_decl(ret)          \
+   tcg_gen_callN(HELPER(name), dh_retvar(ret), 5, args);                 \
+ }
+ 
++#define DEF_HELPER_FLAGS_6(name, flags, ret, t1, t2, t3, t4, t5, t6)    \
++static inline void glue(gen_helper_, name)(dh_retvar_decl(ret)          \
++    dh_arg_decl(t1, 1),  dh_arg_decl(t2, 2), dh_arg_decl(t3, 3),        \
++    dh_arg_decl(t4, 4), dh_arg_decl(t5, 5), dh_arg_decl(t6, 6))         \
++{                                                                       \
++  TCGTemp *args[6] = { dh_arg(t1, 1), dh_arg(t2, 2), dh_arg(t3, 3),     \
++                     dh_arg(t4, 4), dh_arg(t5, 5), dh_arg(t6, 6) };     \
++  tcg_gen_callN(HELPER(name), dh_retvar(ret), 6, args);                 \
++}
++
+ #include "helper.h"
+ #include "trace/generated-helpers.h"
+ #include "trace/generated-helpers-wrappers.h"
+@@ -67,6 +77,7 @@ static inline void glue(gen_helper_, name)(dh_retvar_decl(ret)          \
+ #undef DEF_HELPER_FLAGS_3
+ #undef DEF_HELPER_FLAGS_4
+ #undef DEF_HELPER_FLAGS_5
++#undef DEF_HELPER_FLAGS_6
+ #undef GEN_HELPER
+ 
+ #endif /* HELPER_GEN_H */
+diff --git a/include/exec/helper-head.h b/include/exec/helper-head.h
+index 639eefdbc0..e1fd08f2ba 100644
+--- a/include/exec/helper-head.h
++++ b/include/exec/helper-head.h
+@@ -125,6 +125,8 @@
+     DEF_HELPER_FLAGS_4(name, 0, ret, t1, t2, t3, t4)
+ #define DEF_HELPER_5(name, ret, t1, t2, t3, t4, t5) \
+     DEF_HELPER_FLAGS_5(name, 0, ret, t1, t2, t3, t4, t5)
++#define DEF_HELPER_6(name, ret, t1, t2, t3, t4, t5, t6) \
++    DEF_HELPER_FLAGS_6(name, 0, ret, t1, t2, t3, t4, t5, t6)
+ 
+ /* MAX_OPC_PARAM_IARGS must be set to n if last entry is DEF_HELPER_FLAGS_n. */
+ 
+diff --git a/include/exec/helper-proto.h b/include/exec/helper-proto.h
+index 954bef85ce..74943edb13 100644
+--- a/include/exec/helper-proto.h
++++ b/include/exec/helper-proto.h
+@@ -26,6 +26,10 @@ dh_ctype(ret) HELPER(name) (dh_ctype(t1), dh_ctype(t2), dh_ctype(t3), \
+ dh_ctype(ret) HELPER(name) (dh_ctype(t1), dh_ctype(t2), dh_ctype(t3), \
+                             dh_ctype(t4), dh_ctype(t5));
+ 
++#define DEF_HELPER_FLAGS_6(name, flags, ret, t1, t2, t3, t4, t5, t6) \
++dh_ctype(ret) HELPER(name) (dh_ctype(t1), dh_ctype(t2), dh_ctype(t3), \
++                            dh_ctype(t4), dh_ctype(t5), dh_ctype(t6));
++
+ #include "helper.h"
+ #include "trace/generated-helpers.h"
+ #include "tcg-runtime.h"
+@@ -36,5 +40,6 @@ dh_ctype(ret) HELPER(name) (dh_ctype(t1), dh_ctype(t2), dh_ctype(t3), \
+ #undef DEF_HELPER_FLAGS_3
+ #undef DEF_HELPER_FLAGS_4
+ #undef DEF_HELPER_FLAGS_5
++#undef DEF_HELPER_FLAGS_6
+ 
+ #endif /* HELPER_PROTO_H */
+diff --git a/include/exec/helper-tcg.h b/include/exec/helper-tcg.h
+index b0c5bafa99..b3bdb0c399 100644
+--- a/include/exec/helper-tcg.h
++++ b/include/exec/helper-tcg.h
+@@ -39,6 +39,12 @@
+     | dh_sizemask(t2, 2) | dh_sizemask(t3, 3) | dh_sizemask(t4, 4) \
+     | dh_sizemask(t5, 5) },
+ 
++#define DEF_HELPER_FLAGS_6(NAME, FLAGS, ret, t1, t2, t3, t4, t5, t6) \
++  { .func = HELPER(NAME), .name = str(NAME), .flags = FLAGS, \
++    .sizemask = dh_sizemask(ret, 0) | dh_sizemask(t1, 1) \
++    | dh_sizemask(t2, 2) | dh_sizemask(t3, 3) | dh_sizemask(t4, 4) \
++    | dh_sizemask(t5, 5) | dh_sizemask(t6, 6) },
++
+ #include "helper.h"
+ #include "trace/generated-helpers.h"
+ #include "tcg-runtime.h"
+@@ -50,5 +56,6 @@
+ #undef DEF_HELPER_FLAGS_3
+ #undef DEF_HELPER_FLAGS_4
+ #undef DEF_HELPER_FLAGS_5
++#undef DEF_HELPER_FLAGS_6
+ 
+ #endif /* HELPER_TCG_H */
 diff --git a/tcg/tcg.h b/tcg/tcg.h
-index a577447846..f25efa9795 100644
+index 8c45f7edbc..2ce497cebf 100644
 --- a/tcg/tcg.h
 +++ b/tcg/tcg.h
-@@ -566,10 +566,9 @@ typedef uint16_t TCGLifeData;
- typedef struct TCGOp {
-     TCGOpcode opc   : 8;        /*  8 */
+@@ -41,7 +41,7 @@
+ #else
+ #define MAX_OPC_PARAM_PER_ARG 1
+ #endif
+-#define MAX_OPC_PARAM_IARGS 5
++#define MAX_OPC_PARAM_IARGS 6
+ #define MAX_OPC_PARAM_OARGS 1
+ #define MAX_OPC_PARAM_ARGS (MAX_OPC_PARAM_IARGS + MAX_OPC_PARAM_OARGS)
  
--    /* The number of out and in parameter for a call.  */
--    unsigned calli  : 4;        /* 12 */
--    unsigned callo  : 2;        /* 14 */
--    unsigned        : 2;        /* 16 */
-+    /* Parameters for this opcode.  See below.  */
-+    unsigned param1 : 4;        /* 12 */
-+    unsigned param2 : 4;        /* 16 */
+diff --git a/tcg/tci.c b/tcg/tci.c
+index 63f2cd54ab..33edca1903 100644
+--- a/tcg/tci.c
++++ b/tcg/tci.c
+@@ -40,11 +40,12 @@
+         tcg_abort(); \
+     } while (0)
  
-     /* Lifetime data of the operands.  */
-     unsigned life   : 16;       /* 32 */
-@@ -581,6 +580,9 @@ typedef struct TCGOp {
-     TCGArg args[MAX_OPC_PARAM];
- } TCGOp;
+-#if MAX_OPC_PARAM_IARGS != 5
++#if MAX_OPC_PARAM_IARGS != 6
+ # error Fix needed, number of supported input arguments changed!
+ #endif
+ #if TCG_TARGET_REG_BITS == 32
+ typedef uint64_t (*helper_function)(tcg_target_ulong, tcg_target_ulong,
++                                    tcg_target_ulong, tcg_target_ulong,
+                                     tcg_target_ulong, tcg_target_ulong,
+                                     tcg_target_ulong, tcg_target_ulong,
+                                     tcg_target_ulong, tcg_target_ulong,
+@@ -52,7 +53,7 @@ typedef uint64_t (*helper_function)(tcg_target_ulong, tcg_target_ulong,
+ #else
+ typedef uint64_t (*helper_function)(tcg_target_ulong, tcg_target_ulong,
+                                     tcg_target_ulong, tcg_target_ulong,
+-                                    tcg_target_ulong);
++                                    tcg_target_ulong, tcg_target_ulong);
+ #endif
  
-+#define TCGOP_CALLI(X)    (X)->param1
-+#define TCGOP_CALLO(X)    (X)->param2
-+
- /* Make sure operands fit in the bitfields above.  */
- QEMU_BUILD_BUG_ON(NB_OPS > (1 << 8));
+ static tcg_target_ulong tci_read_reg(const tcg_target_ulong *regs, TCGReg index)
+@@ -520,7 +521,9 @@ uintptr_t tcg_qemu_tb_exec(CPUArchState *env, uint8_t *tb_ptr)
+                                           tci_read_reg(regs, TCG_REG_R7),
+                                           tci_read_reg(regs, TCG_REG_R8),
+                                           tci_read_reg(regs, TCG_REG_R9),
+-                                          tci_read_reg(regs, TCG_REG_R10));
++                                          tci_read_reg(regs, TCG_REG_R10),
++                                          tci_read_reg(regs, TCG_REG_R11),
++                                          tci_read_reg(regs, TCG_REG_R12));
+             tci_write_reg(regs, TCG_REG_R0, tmp64);
+             tci_write_reg(regs, TCG_REG_R1, tmp64 >> 32);
+ #else
+@@ -528,7 +531,8 @@ uintptr_t tcg_qemu_tb_exec(CPUArchState *env, uint8_t *tb_ptr)
+                                           tci_read_reg(regs, TCG_REG_R1),
+                                           tci_read_reg(regs, TCG_REG_R2),
+                                           tci_read_reg(regs, TCG_REG_R3),
+-                                          tci_read_reg(regs, TCG_REG_R5));
++                                          tci_read_reg(regs, TCG_REG_R5),
++                                          tci_read_reg(regs, TCG_REG_R6));
+             tci_write_reg(regs, TCG_REG_R0, tmp64);
+ #endif
+             break;
+diff --git a/tcg/tci/tcg-target.inc.c b/tcg/tci/tcg-target.inc.c
+index 913c3802a3..cc949bea85 100644
+--- a/tcg/tci/tcg-target.inc.c
++++ b/tcg/tci/tcg-target.inc.c
+@@ -292,7 +292,7 @@ static const int tcg_target_reg_alloc_order[] = {
+ #endif
+ };
  
-diff --git a/tcg/optimize.c b/tcg/optimize.c
-index e495680e95..2cbbeefd53 100644
---- a/tcg/optimize.c
-+++ b/tcg/optimize.c
-@@ -627,8 +627,8 @@ void tcg_optimize(TCGContext *s)
-         /* Count the arguments, and initialize the temps that are
-            going to be used */
-         if (opc == INDEX_op_call) {
--            nb_oargs = op->callo;
--            nb_iargs = op->calli;
-+            nb_oargs = TCGOP_CALLO(op);
-+            nb_iargs = TCGOP_CALLI(op);
-             for (i = 0; i < nb_oargs + nb_iargs; i++) {
-                 TCGTemp *ts = arg_temp(op->args[i]);
-                 if (ts) {
-diff --git a/tcg/tcg.c b/tcg/tcg.c
-index f26949a900..93caa0be93 100644
---- a/tcg/tcg.c
-+++ b/tcg/tcg.c
-@@ -1430,7 +1430,7 @@ void tcg_gen_callN(void *func, TCGTemp *ret, int nargs, TCGTemp **args)
-     } else {
-         nb_rets = 0;
-     }
--    op->callo = nb_rets;
-+    TCGOP_CALLO(op) = nb_rets;
+-#if MAX_OPC_PARAM_IARGS != 5
++#if MAX_OPC_PARAM_IARGS != 6
+ # error Fix needed, number of supported input arguments changed!
+ #endif
  
-     real_args = 0;
-     for (i = 0; i < nargs; i++) {
-@@ -1469,10 +1469,10 @@ void tcg_gen_callN(void *func, TCGTemp *ret, int nargs, TCGTemp **args)
-     }
-     op->args[pi++] = (uintptr_t)func;
-     op->args[pi++] = flags;
--    op->calli = real_args;
-+    TCGOP_CALLI(op) = real_args;
- 
-     /* Make sure the fields didn't overflow.  */
--    tcg_debug_assert(op->calli == real_args);
-+    tcg_debug_assert(TCGOP_CALLI(op) == real_args);
-     tcg_debug_assert(pi <= ARRAY_SIZE(op->args));
- 
- #if defined(__sparc__) && !defined(__arch64__) \
-@@ -1634,8 +1634,8 @@ void tcg_dump_ops(TCGContext *s)
-             }
-         } else if (c == INDEX_op_call) {
-             /* variable number of arguments */
--            nb_oargs = op->callo;
--            nb_iargs = op->calli;
-+            nb_oargs = TCGOP_CALLO(op);
-+            nb_iargs = TCGOP_CALLI(op);
-             nb_cargs = def->nb_cargs;
- 
-             /* function name, flags, out args */
-@@ -1996,8 +1996,8 @@ static void liveness_pass_1(TCGContext *s)
-             {
-                 int call_flags;
- 
--                nb_oargs = op->callo;
--                nb_iargs = op->calli;
-+                nb_oargs = TCGOP_CALLO(op);
-+                nb_iargs = TCGOP_CALLI(op);
-                 call_flags = op->args[nb_oargs + nb_iargs + 1];
- 
-                 /* pure functions can be removed if their result is unused */
-@@ -2233,8 +2233,8 @@ static bool liveness_pass_2(TCGContext *s)
-         TCGTemp *arg_ts, *dir_ts;
- 
-         if (opc == INDEX_op_call) {
--            nb_oargs = op->callo;
--            nb_iargs = op->calli;
-+            nb_oargs = TCGOP_CALLO(op);
-+            nb_iargs = TCGOP_CALLI(op);
-             call_flags = op->args[nb_oargs + nb_iargs + 1];
-         } else {
-             nb_iargs = def->nb_iargs;
-@@ -2915,8 +2915,8 @@ static void tcg_reg_alloc_op(TCGContext *s, const TCGOp *op)
- 
- static void tcg_reg_alloc_call(TCGContext *s, TCGOp *op)
- {
--    const int nb_oargs = op->callo;
--    const int nb_iargs = op->calli;
-+    const int nb_oargs = TCGOP_CALLO(op);
-+    const int nb_iargs = TCGOP_CALLI(op);
-     const TCGLifeData arg_life = op->life;
-     int flags, nb_regs, i;
-     TCGReg reg;
+@@ -305,14 +305,16 @@ static const int tcg_target_call_iarg_regs[] = {
+     TCG_REG_R4,
+ #endif
+     TCG_REG_R5,
++    TCG_REG_R6,
+ #if TCG_TARGET_REG_BITS == 32
+     /* 32 bit hosts need 2 * MAX_OPC_PARAM_IARGS registers. */
+-    TCG_REG_R6,
+     TCG_REG_R7,
+ #if TCG_TARGET_NB_REGS >= 16
+     TCG_REG_R8,
+     TCG_REG_R9,
+     TCG_REG_R10,
++    TCG_REG_R11,
++    TCG_REG_R12,
+ #else
+ # error Too few input registers available
+ #endif
 -- 
 2.14.3
