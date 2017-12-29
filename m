@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50821)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50812)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1eUoDM-00036i-39
+	(envelope-from <richard.henderson@linaro.org>) id 1eUoDL-00036h-Gg
 	for qemu-devel@nongnu.org; Fri, 29 Dec 2017 01:32:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1eUoDK-0004mL-Mz
-	for qemu-devel@nongnu.org; Fri, 29 Dec 2017 01:32:20 -0500
-Received: from mail-pl0-x244.google.com ([2607:f8b0:400e:c01::244]:43785)
+	(envelope-from <richard.henderson@linaro.org>) id 1eUoDI-0004kn-B1
+	for qemu-devel@nongnu.org; Fri, 29 Dec 2017 01:32:19 -0500
+Received: from mail-pl0-x242.google.com ([2607:f8b0:400e:c01::242]:46063)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1eUoDK-0004m8-EU
-	for qemu-devel@nongnu.org; Fri, 29 Dec 2017 01:32:18 -0500
-Received: by mail-pl0-x244.google.com with SMTP id z5so22529651plo.10
-	for <qemu-devel@nongnu.org>; Thu, 28 Dec 2017 22:32:18 -0800 (PST)
+	id 1eUoDI-0004jq-33
+	for qemu-devel@nongnu.org; Fri, 29 Dec 2017 01:32:16 -0500
+Received: by mail-pl0-x242.google.com with SMTP id o2so22510896plk.12
+	for <qemu-devel@nongnu.org>; Thu, 28 Dec 2017 22:32:15 -0800 (PST)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Thu, 28 Dec 2017 22:31:29 -0800
-Message-Id: <20171229063145.29167-23-richard.henderson@linaro.org>
+Date: Thu, 28 Dec 2017 22:31:27 -0800
+Message-Id: <20171229063145.29167-21-richard.henderson@linaro.org>
 In-Reply-To: <20171229063145.29167-1-richard.henderson@linaro.org>
 References: <20171229063145.29167-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH 22/38] target/hppa: Implement I*TLBA and I*TLBP
- insns
+Subject: [Qemu-devel] [PATCH 20/38] target/hppa: Implement the interval timer
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,220 +29,186 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: deller@gmx.de
 
-The TLB can now be populated, but it cannot yet be cleared.
-
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/hppa/helper.h     |  2 ++
- target/hppa/mem_helper.c | 80 ++++++++++++++++++++++++++++++++++++++++++++++--
- target/hppa/translate.c  | 54 ++++++++++++++++++++++++++++++--
- 3 files changed, 132 insertions(+), 4 deletions(-)
+ target/hppa/cpu.h        |  2 ++
+ target/hppa/helper.h     |  3 +++
+ target/hppa/cpu.c        |  8 ++++++++
+ target/hppa/int_helper.c |  6 ++++++
+ target/hppa/op_helper.c  | 36 ++++++++++++++++++++++++++++++++++++
+ target/hppa/translate.c  | 16 ++++++++++++----
+ 6 files changed, 67 insertions(+), 4 deletions(-)
 
+diff --git a/target/hppa/cpu.h b/target/hppa/cpu.h
+index bd91ec57e6..156dbfd761 100644
+--- a/target/hppa/cpu.h
++++ b/target/hppa/cpu.h
+@@ -234,6 +234,7 @@ struct HPPACPU {
+     /*< public >*/
+ 
+     CPUHPPAState env;
++    QEMUTimer *alarm_timer;
+ };
+ 
+ static inline HPPACPU *hppa_env_get_cpu(CPUHPPAState *env)
+@@ -343,6 +344,7 @@ int hppa_cpu_handle_mmu_fault(CPUState *cpu, vaddr address, int rw, int midx);
+ int hppa_get_physical_address(CPUHPPAState *env, vaddr addr, int mmu_idx,
+                               MMUAccessType type, hwaddr *pphys, int *pprot);
+ extern const MemoryRegionOps hppa_io_eir_ops;
++void hppa_cpu_alarm_timer(void *);
+ #endif
+ 
+ #endif /* HPPA_CPU_H */
 diff --git a/target/hppa/helper.h b/target/hppa/helper.h
-index 744b11cb66..d412093914 100644
+index 535f086ab4..744b11cb66 100644
 --- a/target/hppa/helper.h
 +++ b/target/hppa/helper.h
-@@ -86,4 +86,6 @@ DEF_HELPER_FLAGS_2(write_interval_timer, TCG_CALL_NO_RWG, void, env, tr)
+@@ -77,9 +77,12 @@ DEF_HELPER_FLAGS_4(fmpynfadd_s, TCG_CALL_NO_RWG, i32, env, i32, i32, i32)
+ DEF_HELPER_FLAGS_4(fmpyfadd_d, TCG_CALL_NO_RWG, i64, env, i64, i64, i64)
+ DEF_HELPER_FLAGS_4(fmpynfadd_d, TCG_CALL_NO_RWG, i64, env, i64, i64, i64)
+ 
++DEF_HELPER_FLAGS_0(read_interval_timer, TCG_CALL_NO_RWG, tr)
++
+ #ifndef CONFIG_USER_ONLY
+ DEF_HELPER_1(rfi, void, env)
+ DEF_HELPER_1(rfi_r, void, env)
++DEF_HELPER_FLAGS_2(write_interval_timer, TCG_CALL_NO_RWG, void, env, tr)
  DEF_HELPER_FLAGS_2(write_eirr, TCG_CALL_NO_RWG, void, env, tr)
  DEF_HELPER_FLAGS_2(write_eiem, TCG_CALL_NO_RWG, void, env, tr)
  DEF_HELPER_FLAGS_2(swap_system_mask, TCG_CALL_NO_RWG, tr, env, tr)
-+DEF_HELPER_FLAGS_3(itlba, TCG_CALL_NO_RWG, void, env, tl, tr)
-+DEF_HELPER_FLAGS_3(itlbp, TCG_CALL_NO_RWG, void, env, tl, tr)
- #endif
-diff --git a/target/hppa/mem_helper.c b/target/hppa/mem_helper.c
-index 4e92e35957..9d4bf132d6 100644
---- a/target/hppa/mem_helper.c
-+++ b/target/hppa/mem_helper.c
-@@ -42,13 +42,40 @@ static hppa_tlb_entry *hppa_find_tlb(CPUHPPAState *env, vaddr addr)
+diff --git a/target/hppa/cpu.c b/target/hppa/cpu.c
+index 8e10649aaa..586b42067a 100644
+--- a/target/hppa/cpu.c
++++ b/target/hppa/cpu.c
+@@ -91,6 +91,14 @@ static void hppa_cpu_realizefn(DeviceState *dev, Error **errp)
  
-     for (i = 0; i < ARRAY_SIZE(env->tlb); ++i) {
-         hppa_tlb_entry *ent = &env->tlb[i];
--        if (ent->va_b <= addr && addr <= ent->va_e && ent->entry_valid) {
-+        if (ent->va_b <= addr && addr <= ent->va_e) {
-             return ent;
-         }
-     }
-     return NULL;
- }
- 
-+static void hppa_flush_tlb_ent(CPUHPPAState *env, hppa_tlb_entry *ent)
-+{
-+    CPUState *cs = CPU(hppa_env_get_cpu(env));
-+    unsigned i, n = 1 << (2 * ent->page_size);
-+    uint64_t addr = ent->va_b;
+     qemu_init_vcpu(cs);
+     acc->parent_realize(dev, errp);
 +
-+    for (i = 0; i < n; ++i, addr += TARGET_PAGE_SIZE) {
-+        /* Do not flush MMU_PHYS_IDX.  */
-+        tlb_flush_page_by_mmuidx(cs, addr, 0xf);
-+    }
-+
-+    memset(ent, 0, sizeof(*ent));
-+    ent->va_b = -1;
-+}
-+
-+static hppa_tlb_entry *hppa_alloc_tlb_ent(CPUHPPAState *env)
-+{
-+    hppa_tlb_entry *ent;
-+    uint32_t i = env->tlb_last;
-+
-+    env->tlb_last = (i == ARRAY_SIZE(env->tlb) - 1 ? 0 : i + 1);
-+    ent = &env->tlb[i];
-+
-+    hppa_flush_tlb_ent(env, ent);
-+    return ent;
-+}
-+
- int hppa_get_physical_address(CPUHPPAState *env, vaddr addr, int mmu_idx,
-                               MMUAccessType type, hwaddr *pphys, int *pprot)
- {
-@@ -67,7 +94,7 @@ int hppa_get_physical_address(CPUHPPAState *env, vaddr addr, int mmu_idx,
- 
-     /* Find a valid tlb entry that matches the virtual address.  */
-     ent = hppa_find_tlb(env, addr);
--    if (ent == NULL) {
-+    if (ent == NULL || !ent->entry_valid) {
-         phys = 0;
-         prot = 0;
-         ret = (ifetch ? EXCP_ITLB_MISS : EXCP_DTLB_MISS);
-@@ -192,4 +219,53 @@ void tlb_fill(CPUState *cs, target_ulong addr, MMUAccessType type,
-     tlb_set_page(cs, addr & TARGET_PAGE_MASK, phys & TARGET_PAGE_MASK,
-                  prot, mmu_idx, TARGET_PAGE_SIZE);
- }
-+
-+/* Insert (Insn/Data) TLB Address.  Note this is PA 1.1 only.  */
-+void HELPER(itlba)(CPUHPPAState *env, target_ulong addr, target_ureg reg)
-+{
-+    hppa_tlb_entry *empty = NULL;
-+    int i;
-+
-+    /* Zap any old entries covering ADDR; notice empty entries on the way.  */
-+    for (i = 0; i < ARRAY_SIZE(env->tlb); ++i) {
-+        hppa_tlb_entry *ent = &env->tlb[i];
-+        if (!ent->entry_valid) {
-+            empty = ent;
-+        } else if (ent->va_b <= addr && addr <= ent->va_e) {
-+            hppa_flush_tlb_ent(env, ent);
-+            empty = ent;
-+        }
-+    }
-+
-+    /* If we didn't see an empty entry, evict one.  */
-+    if (empty == NULL) {
-+        empty = hppa_alloc_tlb_ent(env);
-+    }
-+
-+    /* Note that empty->entry_valid == 0 already.  */
-+    empty->va_b = addr & TARGET_PAGE_MASK;
-+    empty->va_e = empty->va_b + TARGET_PAGE_SIZE - 1;
-+    empty->pa = extract32(reg, 5, 20) << TARGET_PAGE_BITS;
-+}
-+
-+/* Insert (Insn/Data) TLB Protection.  Note this is PA 1.1 only.  */
-+void HELPER(itlbp)(CPUHPPAState *env, target_ulong addr, target_ureg reg)
-+{
-+    hppa_tlb_entry *ent = hppa_find_tlb(env, addr);
-+
-+    if (unlikely(ent == NULL || ent->entry_valid)) {
-+        qemu_log_mask(LOG_GUEST_ERROR, "ITLBP not following ITLBA\n");
-+        return;
-+    }
-+
-+    ent->access_id = extract32(reg, 1, 18);
-+    ent->u = extract32(reg, 19, 1);
-+    ent->ar_pl2 = extract32(reg, 20, 2);
-+    ent->ar_pl1 = extract32(reg, 22, 2);
-+    ent->ar_type = extract32(reg, 24, 3);
-+    ent->b = extract32(reg, 27, 1);
-+    ent->d = extract32(reg, 28, 1);
-+    ent->t = extract32(reg, 29, 1);
-+    ent->entry_valid = 1;
-+}
- #endif /* CONFIG_USER_ONLY */
-diff --git a/target/hppa/translate.c b/target/hppa/translate.c
-index a670d9d777..13ac727583 100644
---- a/target/hppa/translate.c
-+++ b/target/hppa/translate.c
-@@ -1335,7 +1335,10 @@ static DisasJumpType do_unit(DisasContext *ctx, unsigned rt, TCGv_reg in1,
- }
- 
- #ifndef CONFIG_USER_ONLY
--/* Top 2 bits of the base register select sp[4-7].  */
-+/* The "normal" usage is SP >= 0, wherein SP == 0 selects the space
-+   from the top 2 bits of the base register.  There are a few system
-+   instructions that have a 3-bit space specifier, for which SR0 is
-+   not special.  To handle this, pass ~SP.  */
- static TCGv_i64 space_select(DisasContext *ctx, int sp, TCGv_reg base)
- {
-     TCGv_ptr ptr;
-@@ -1343,7 +1346,12 @@ static TCGv_i64 space_select(DisasContext *ctx, int sp, TCGv_reg base)
-     TCGv_i64 spc;
- 
-     if (sp != 0) {
--        return cpu_sr[sp];
-+        if (sp < 0) {
-+            sp = ~sp;
-+        }
-+        spc = get_temp_tl(ctx);
-+        load_spr(ctx, spc, sp);
-+        return spc;
-     }
- 
-     ptr = tcg_temp_new_ptr();
-@@ -2346,6 +2354,42 @@ static DisasJumpType trans_probe(DisasContext *ctx, uint32_t insn,
-     return nullify_end(ctx, DISAS_NEXT);
- }
- 
 +#ifndef CONFIG_USER_ONLY
-+static DisasJumpType trans_ixtlbx(DisasContext *ctx, uint32_t insn,
-+                                  const DisasInsn *di)
-+{
-+    unsigned sp;
-+    unsigned rr = extract32(insn, 16, 5);
-+    unsigned rb = extract32(insn, 21, 5);
-+    unsigned is_data = insn & 0x1000;
-+    unsigned is_addr = insn & 0x40;
-+    TCGv_tl addr;
-+    TCGv_reg ofs, reg;
-+
-+    if (is_data) {
-+        sp = extract32(insn, 14, 2);
-+    } else {
-+        sp = ~assemble_sr3(insn);
++    {
++        HPPACPU *cpu = HPPA_CPU(cs);
++        cpu->alarm_timer = timer_new_ns(QEMU_CLOCK_VIRTUAL,
++                                        hppa_cpu_alarm_timer, cpu);
 +    }
-+
-+    CHECK_MOST_PRIVILEGED(EXCP_PRIV_OPR);
-+    nullify_over(ctx);
-+
-+    form_gva(ctx, &addr, &ofs, rb, 0, 0, 0, sp, 0, false);
-+    reg = load_gpr(ctx, rr);
-+    if (is_addr) {
-+        gen_helper_itlba(cpu_env, addr, reg);
-+    } else {
-+        gen_helper_itlbp(cpu_env, addr, reg);
-+    }
-+
-+    /* Exit TB for ITLB change if mmu is enabled.  This *should* not be
-+       the case, since the OS TLB fill handler runs with mmu disabled.  */
-+    return nullify_end(ctx, !is_data && (ctx->base.tb->flags & PSW_C)
-+                       ? DISAS_IAQ_N_STALE : DISAS_NEXT);
-+}
-+#endif /* !CONFIG_USER_ONLY */
-+
- static const DisasInsn table_mem_mgmt[] = {
-     { 0x04003280u, 0xfc003fffu, trans_nop },          /* fdc, disp */
-     { 0x04001280u, 0xfc003fffu, trans_nop },          /* fdc, index */
-@@ -2362,6 +2406,12 @@ static const DisasInsn table_mem_mgmt[] = {
-     { 0x04002720u, 0xfc003fffu, trans_base_idx_mod }, /* pdc, base mod */
-     { 0x04001180u, 0xfc003fa0u, trans_probe },        /* probe */
-     { 0x04003180u, 0xfc003fa0u, trans_probe },        /* probei */
-+#ifndef CONFIG_USER_ONLY
-+    { 0x04000000u, 0xfc001fffu, trans_ixtlbx },       /* iitlbp */
-+    { 0x04000040u, 0xfc001fffu, trans_ixtlbx },       /* iitlba */
-+    { 0x04001000u, 0xfc001fffu, trans_ixtlbx },       /* idtlbp */
-+    { 0x04001040u, 0xfc001fffu, trans_ixtlbx },       /* idtlba */
 +#endif
+ }
+ 
+ /* Sort hppabetically by type name. */
+diff --git a/target/hppa/int_helper.c b/target/hppa/int_helper.c
+index 74ab34f306..ee72769544 100644
+--- a/target/hppa/int_helper.c
++++ b/target/hppa/int_helper.c
+@@ -67,6 +67,12 @@ const MemoryRegionOps hppa_io_eir_ops = {
+     .impl.max_access_size = 4,
  };
  
- static DisasJumpType trans_add(DisasContext *ctx, uint32_t insn,
++void hppa_cpu_alarm_timer(void *opaque)
++{
++    /* Raise interrupt 0.  */
++    io_eir_write(opaque, 0, 0, 4);
++}
++
+ void HELPER(write_eirr)(CPUHPPAState *env, target_ureg val)
+ {
+     env->cr[CR_EIRR] &= ~val;
+diff --git a/target/hppa/op_helper.c b/target/hppa/op_helper.c
+index 1963b2439b..6d19cab6c9 100644
+--- a/target/hppa/op_helper.c
++++ b/target/hppa/op_helper.c
+@@ -22,6 +22,8 @@
+ #include "exec/exec-all.h"
+ #include "exec/helper-proto.h"
+ #include "exec/cpu_ldst.h"
++#include "qemu/timer.h"
++
+ 
+ void QEMU_NORETURN HELPER(excp)(CPUHPPAState *env, int excp)
+ {
+@@ -602,7 +604,41 @@ float64 HELPER(fmpynfadd_d)(CPUHPPAState *env, float64 a, float64 b, float64 c)
+     return ret;
+ }
+ 
++target_ureg HELPER(read_interval_timer)(void)
++{
++#ifdef CONFIG_USER_ONLY
++    /* In user-mode, QEMU_CLOCK_VIRTUAL doesn't exist.
++       Just pass through the host cpu clock ticks.  */
++    return cpu_get_host_ticks();
++#else
++    /* In system mode we have access to a decent high-resolution clock.
++       In order to make OS-level time accounting work with the cr16,
++       present it with a well-timed clock fixed at 250MHz.  */
++    return qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) >> 2;
++#endif
++}
++
+ #ifndef CONFIG_USER_ONLY
++void HELPER(write_interval_timer)(CPUHPPAState *env, target_ureg val)
++{
++    HPPACPU *cpu = hppa_env_get_cpu(env);
++    uint64_t current = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
++    uint64_t timeout;
++
++    /* Even in 64-bit mode, the comparator is always 32-bit.  But the
++       value we expose to the guest is 1/4 of the speed of the clock,
++       so moosh in 34 bits.  */
++    timeout = deposit64(current, 0, 34, (uint64_t)val << 2);
++
++    /* If the mooshing puts the clock in the past, advance to next round.  */
++    if (timeout < current + 1000) {
++        timeout += 1ULL << 34;
++    }
++
++    cpu->env.cr[CR_IT] = timeout;
++    timer_mod(cpu->alarm_timer, timeout);
++}
++
+ target_ureg HELPER(swap_system_mask)(CPUHPPAState *env, target_ureg nsm)
+ {
+     target_ulong psw = env->psw;
+diff --git a/target/hppa/translate.c b/target/hppa/translate.c
+index ce2a6c21d6..77d3821924 100644
+--- a/target/hppa/translate.c
++++ b/target/hppa/translate.c
+@@ -2029,6 +2029,7 @@ static DisasJumpType trans_mfctl(DisasContext *ctx, uint32_t insn,
+     unsigned rt = extract32(insn, 0, 5);
+     unsigned ctl = extract32(insn, 21, 5);
+     TCGv_reg tmp;
++    DisasJumpType ret;
+ 
+     switch (ctl) {
+     case CR_SAR:
+@@ -2047,9 +2048,17 @@ static DisasJumpType trans_mfctl(DisasContext *ctx, uint32_t insn,
+         /* FIXME: Respect PSW_S bit.  */
+         nullify_over(ctx);
+         tmp = dest_gpr(ctx, rt);
+-        tcg_gen_movi_reg(tmp, 0); /* FIXME */
++        if (ctx->base.tb->cflags & CF_USE_ICOUNT) {
++            gen_io_start();
++            gen_helper_read_interval_timer(tmp);
++            gen_io_end();
++            ret = DISAS_IAQ_N_STALE;
++        } else {
++            gen_helper_read_interval_timer(tmp);
++            ret = DISAS_NEXT;
++        }
+         save_gpr(ctx, rt, tmp);
+-        break;
++        return nullify_end(ctx, ret);
+     case 26:
+     case 27:
+         break;
+@@ -2123,9 +2132,8 @@ static DisasJumpType trans_mtctl(DisasContext *ctx, uint32_t insn,
+     nullify_over(ctx);
+     switch (ctl) {
+     case CR_IT:
+-        /* ??? modify interval timer offset */
++        gen_helper_write_interval_timer(cpu_env, reg);
+         break;
+-
+     case CR_EIRR:
+         gen_helper_write_eirr(cpu_env, reg);
+         break;
 -- 
 2.14.3
