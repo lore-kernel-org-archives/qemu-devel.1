@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56957)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56978)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eUyng-0003Jt-Ef
+	id 1eUyni-0003KA-MT
 	for qemu-devel@nongnu.org; Fri, 29 Dec 2017 12:50:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eUynf-0006TW-4p
-	for qemu-devel@nongnu.org; Fri, 29 Dec 2017 12:50:32 -0500
-Received: from mail-qt0-x244.google.com ([2607:f8b0:400d:c0d::244]:39263)
+	id 1eUynh-0006X6-TJ
+	for qemu-devel@nongnu.org; Fri, 29 Dec 2017 12:50:34 -0500
+Received: from mail-qk0-x243.google.com ([2607:f8b0:400d:c09::243]:43336)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eUynf-0006Ss-0O
-	for qemu-devel@nongnu.org; Fri, 29 Dec 2017 12:50:31 -0500
-Received: by mail-qt0-x244.google.com with SMTP id k19so54933612qtj.6
-	for <qemu-devel@nongnu.org>; Fri, 29 Dec 2017 09:50:30 -0800 (PST)
+	id 1eUynh-0006Wi-OQ
+	for qemu-devel@nongnu.org; Fri, 29 Dec 2017 12:50:33 -0500
+Received: by mail-qk0-x243.google.com with SMTP id j137so35734192qke.10
+	for <qemu-devel@nongnu.org>; Fri, 29 Dec 2017 09:50:33 -0800 (PST)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Fri, 29 Dec 2017 14:49:05 -0300
-Message-Id: <20171229174933.1781-15-f4bug@amsat.org>
+Date: Fri, 29 Dec 2017 14:49:06 -0300
+Message-Id: <20171229174933.1781-16-f4bug@amsat.org>
 In-Reply-To: <20171229174933.1781-1-f4bug@amsat.org>
 References: <20171229174933.1781-1-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v3 14/42] sdhci: fix CAPAB/MAXCURR registers,
- both are 64bit and read-only
+Subject: [Qemu-devel] [PATCH v3 15/42] sdhci: Implement write method of
+ ACMD12ERRSTS register
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,89 +34,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alistair Francis <alistair.francis@xilinx.com>, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, Peter Maydell <peter.maydell@linaro.org>, Igor Mitsyanko <i.mitsyanko@gmail.com>, Andrey Smirnov <andrew.smirnov@gmail.com>, Prasad J Pandit <pjp@fedoraproject.org>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, Peter Crosthwaite <crosthwaite.peter@gmail.com>
+To: Alistair Francis <alistair.francis@xilinx.com>, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, Peter Maydell <peter.maydell@linaro.org>, Andrey Smirnov <andrew.smirnov@gmail.com>, Prasad J Pandit <pjp@fedoraproject.org>
+Cc: qemu-devel@nongnu.org, Peter Crosthwaite <crosthwaite.peter@gmail.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 
-running qtests:
+From: Andrey Smirnov <andrew.smirnov@gmail.com>
 
-  $ make check-qtest-arm
-    GTESTER check-qtest-arm
-  SDHC rd_4b @0x44 not implemented
-  SDHC wr_4b @0x40 <- 0x89abcdef not implemented
-  SDHC wr_4b @0x44 <- 0x01234567 not implemented
-
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Signed-off-by: Andrey Smirnov <andrew.smirnov@gmail.com>
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- include/hw/sd/sdhci.h |  4 ++--
- hw/sd/sdhci.c         | 23 +++++++++++++++++++----
- 2 files changed, 21 insertions(+), 6 deletions(-)
+ hw/sd/sdhci.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/include/hw/sd/sdhci.h b/include/hw/sd/sdhci.h
-index da943a6562..9436375b1e 100644
---- a/include/hw/sd/sdhci.h
-+++ b/include/hw/sd/sdhci.h
-@@ -86,9 +86,9 @@ typedef struct SDHCIState {
- 
-     /* Read-only registers */
-     /* 0x40 */
--    uint32_t capareg;      /* Capabilities Register */
-+    uint64_t capareg;      /* Capabilities Register */
-     /* 0x48 */
--    uint32_t maxcurr;      /* Maximum Current Capabilities Register */
-+    uint64_t maxcurr;      /* Maximum Current Capabilities Register */
- 
-     uint8_t  *fifo_buffer; /* SD host i/o FIFO buffer */
-     uint32_t buf_maxsz;
 diff --git a/hw/sd/sdhci.c b/hw/sd/sdhci.c
-index 604ad525f6..ae84af46da 100644
+index ae84af46da..a47ed61248 100644
 --- a/hw/sd/sdhci.c
 +++ b/hw/sd/sdhci.c
-@@ -904,10 +904,16 @@ static uint64_t sdhci_read(void *opaque, hwaddr offset, unsigned size)
-         ret = s->acmd12errsts;
-         break;
-     case SDHC_CAPAB:
--        ret = s->capareg;
-+        ret = (uint32_t)s->capareg;
-+        break;
-+    case SDHC_CAPAB + 4:
-+        ret = (uint32_t)(s->capareg >> 32);
-         break;
-     case SDHC_MAXCURR:
--        ret = s->maxcurr;
-+        ret = (uint32_t)s->maxcurr;
-+        break;
-+    case SDHC_MAXCURR + 4:
-+        ret = (uint32_t)(s->maxcurr >> 32);
-         break;
-     case SDHC_ADMAERR:
-         ret =  s->admaerr;
-@@ -1129,6 +1135,15 @@ sdhci_write(void *opaque, hwaddr offset, uint64_t val, unsigned size)
+@@ -1135,6 +1135,9 @@ sdhci_write(void *opaque, hwaddr offset, uint64_t val, unsigned size)
          }
          sdhci_update_irq(s);
          break;
-+
-+    case SDHC_CAPAB:
-+    case SDHC_CAPAB + 4:
-+    case SDHC_MAXCURR:
-+    case SDHC_MAXCURR + 4:
-+        qemu_log_mask(LOG_GUEST_ERROR, "SDHC wr_%ub @0x%02" HWADDR_PRIx
-+                      " <- 0x%08x read-only\n", size, offset, value >> shift);
++    case SDHC_ACMD12ERRSTS:
++        MASKED_WRITE(s->acmd12errsts, mask, value);
 +        break;
-+
-     default:
-         qemu_log_mask(LOG_UNIMP, "SDHC wr_%ub @0x%02" HWADDR_PRIx " <- 0x%08x "
-                       "not implemented\n", size, offset, value >> shift);
-@@ -1260,9 +1275,9 @@ const VMStateDescription sdhci_vmstate = {
- /* Capabilities registers provide information on supported features of this
-  * specific host controller implementation */
- static Property sdhci_properties[] = {
--    DEFINE_PROP_UINT32("capareg", SDHCIState, capareg,
-+    DEFINE_PROP_UINT64("capareg", SDHCIState, capareg,
-             SDHC_CAPAB_REG_DEFAULT),
--    DEFINE_PROP_UINT32("maxcurr", SDHCIState, maxcurr, 0),
-+    DEFINE_PROP_UINT64("maxcurr", SDHCIState, maxcurr, 0),
-     DEFINE_PROP_BOOL("pending-insert-quirk", SDHCIState, pending_insert_quirk,
-                      false),
-     DEFINE_PROP_END_OF_LIST(),
+ 
+     case SDHC_CAPAB:
+     case SDHC_CAPAB + 4:
 -- 
 2.15.1
