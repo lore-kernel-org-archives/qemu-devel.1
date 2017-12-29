@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50769)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50821)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1eUoDI-000343-6Z
+	(envelope-from <richard.henderson@linaro.org>) id 1eUoDM-00036i-39
 	for qemu-devel@nongnu.org; Fri, 29 Dec 2017 01:32:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1eUoDG-0004io-Tw
-	for qemu-devel@nongnu.org; Fri, 29 Dec 2017 01:32:16 -0500
-Received: from mail-pl0-x242.google.com ([2607:f8b0:400e:c01::242]:33154)
+	(envelope-from <richard.henderson@linaro.org>) id 1eUoDK-0004mL-Mz
+	for qemu-devel@nongnu.org; Fri, 29 Dec 2017 01:32:20 -0500
+Received: from mail-pl0-x244.google.com ([2607:f8b0:400e:c01::244]:43785)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1eUoDG-0004iB-Mr
-	for qemu-devel@nongnu.org; Fri, 29 Dec 2017 01:32:14 -0500
-Received: by mail-pl0-x242.google.com with SMTP id 1so21073905plv.0
-	for <qemu-devel@nongnu.org>; Thu, 28 Dec 2017 22:32:14 -0800 (PST)
+	id 1eUoDK-0004m8-EU
+	for qemu-devel@nongnu.org; Fri, 29 Dec 2017 01:32:18 -0500
+Received: by mail-pl0-x244.google.com with SMTP id z5so22529651plo.10
+	for <qemu-devel@nongnu.org>; Thu, 28 Dec 2017 22:32:18 -0800 (PST)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Thu, 28 Dec 2017 22:31:26 -0800
-Message-Id: <20171229063145.29167-20-richard.henderson@linaro.org>
+Date: Thu, 28 Dec 2017 22:31:29 -0800
+Message-Id: <20171229063145.29167-23-richard.henderson@linaro.org>
 In-Reply-To: <20171229063145.29167-1-richard.henderson@linaro.org>
 References: <20171229063145.29167-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH 19/38] target/hppa: Implement external
- interrupts
+Subject: [Qemu-devel] [PATCH 22/38] target/hppa: Implement I*TLBA and I*TLBP
+ insns
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,172 +30,220 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: deller@gmx.de
 
+The TLB can now be populated, but it cannot yet be cleared.
+
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/hppa/cpu.h        |  1 +
  target/hppa/helper.h     |  2 ++
- target/hppa/cpu.c        |  6 +++++
- target/hppa/int_helper.c | 59 ++++++++++++++++++++++++++++++++++++++++++++++++
- target/hppa/translate.c  | 16 ++++++++++++-
- 5 files changed, 83 insertions(+), 1 deletion(-)
+ target/hppa/mem_helper.c | 80 ++++++++++++++++++++++++++++++++++++++++++++++--
+ target/hppa/translate.c  | 54 ++++++++++++++++++++++++++++++--
+ 3 files changed, 132 insertions(+), 4 deletions(-)
 
-diff --git a/target/hppa/cpu.h b/target/hppa/cpu.h
-index d09f9faa86..bd91ec57e6 100644
---- a/target/hppa/cpu.h
-+++ b/target/hppa/cpu.h
-@@ -342,6 +342,7 @@ int hppa_cpu_handle_mmu_fault(CPUState *cpu, vaddr address, int rw, int midx);
- #else
- int hppa_get_physical_address(CPUHPPAState *env, vaddr addr, int mmu_idx,
-                               MMUAccessType type, hwaddr *pphys, int *pprot);
-+extern const MemoryRegionOps hppa_io_eir_ops;
- #endif
- 
- #endif /* HPPA_CPU_H */
 diff --git a/target/hppa/helper.h b/target/hppa/helper.h
-index 79d22ae486..535f086ab4 100644
+index 744b11cb66..d412093914 100644
 --- a/target/hppa/helper.h
 +++ b/target/hppa/helper.h
-@@ -80,5 +80,7 @@ DEF_HELPER_FLAGS_4(fmpynfadd_d, TCG_CALL_NO_RWG, i64, env, i64, i64, i64)
- #ifndef CONFIG_USER_ONLY
- DEF_HELPER_1(rfi, void, env)
- DEF_HELPER_1(rfi_r, void, env)
-+DEF_HELPER_FLAGS_2(write_eirr, TCG_CALL_NO_RWG, void, env, tr)
-+DEF_HELPER_FLAGS_2(write_eiem, TCG_CALL_NO_RWG, void, env, tr)
+@@ -86,4 +86,6 @@ DEF_HELPER_FLAGS_2(write_interval_timer, TCG_CALL_NO_RWG, void, env, tr)
+ DEF_HELPER_FLAGS_2(write_eirr, TCG_CALL_NO_RWG, void, env, tr)
+ DEF_HELPER_FLAGS_2(write_eiem, TCG_CALL_NO_RWG, void, env, tr)
  DEF_HELPER_FLAGS_2(swap_system_mask, TCG_CALL_NO_RWG, tr, env, tr)
++DEF_HELPER_FLAGS_3(itlba, TCG_CALL_NO_RWG, void, env, tl, tr)
++DEF_HELPER_FLAGS_3(itlbp, TCG_CALL_NO_RWG, void, env, tl, tr)
  #endif
-diff --git a/target/hppa/cpu.c b/target/hppa/cpu.c
-index fbda7956bc..8e10649aaa 100644
---- a/target/hppa/cpu.c
-+++ b/target/hppa/cpu.c
-@@ -51,6 +51,11 @@ static void hppa_cpu_synchronize_from_tb(CPUState *cs, TranslationBlock *tb)
-     cpu->env.psw_n = (tb->flags & PSW_N) != 0;
+diff --git a/target/hppa/mem_helper.c b/target/hppa/mem_helper.c
+index 4e92e35957..9d4bf132d6 100644
+--- a/target/hppa/mem_helper.c
++++ b/target/hppa/mem_helper.c
+@@ -42,13 +42,40 @@ static hppa_tlb_entry *hppa_find_tlb(CPUHPPAState *env, vaddr addr)
+ 
+     for (i = 0; i < ARRAY_SIZE(env->tlb); ++i) {
+         hppa_tlb_entry *ent = &env->tlb[i];
+-        if (ent->va_b <= addr && addr <= ent->va_e && ent->entry_valid) {
++        if (ent->va_b <= addr && addr <= ent->va_e) {
+             return ent;
+         }
+     }
+     return NULL;
  }
  
-+static bool hppa_cpu_has_work(CPUState *cs)
++static void hppa_flush_tlb_ent(CPUHPPAState *env, hppa_tlb_entry *ent)
 +{
-+    return cs->interrupt_request & CPU_INTERRUPT_HARD;
-+}
++    CPUState *cs = CPU(hppa_env_get_cpu(env));
++    unsigned i, n = 1 << (2 * ent->page_size);
++    uint64_t addr = ent->va_b;
 +
- static void hppa_cpu_disas_set_info(CPUState *cs, disassemble_info *info)
- {
-     info->mach = bfd_mach_hppa20;
-@@ -151,6 +156,7 @@ static void hppa_cpu_class_init(ObjectClass *oc, void *data)
-     dc->realize = hppa_cpu_realizefn;
- 
-     cc->class_by_name = hppa_cpu_class_by_name;
-+    cc->has_work = hppa_cpu_has_work;
-     cc->do_interrupt = hppa_cpu_do_interrupt;
-     cc->cpu_exec_interrupt = hppa_cpu_exec_interrupt;
-     cc->dump_state = hppa_cpu_dump_state;
-diff --git a/target/hppa/int_helper.c b/target/hppa/int_helper.c
-index e66ca26941..74ab34f306 100644
---- a/target/hppa/int_helper.c
-+++ b/target/hppa/int_helper.c
-@@ -24,6 +24,65 @@
- #include "exec/helper-proto.h"
- #include "qom/cpu.h"
- 
-+#ifndef CONFIG_USER_ONLY
-+static void eval_interrupt(HPPACPU *cpu)
-+{
-+    CPUState *cs = CPU(cpu);
-+    if (cpu->env.cr[CR_EIRR] & cpu->env.cr[CR_EIEM]) {
-+        cpu_interrupt(cs, CPU_INTERRUPT_HARD);
-+    } else {
-+        cpu_reset_interrupt(cs, CPU_INTERRUPT_HARD);
++    for (i = 0; i < n; ++i, addr += TARGET_PAGE_SIZE) {
++        /* Do not flush MMU_PHYS_IDX.  */
++        tlb_flush_page_by_mmuidx(cs, addr, 0xf);
 +    }
++
++    memset(ent, 0, sizeof(*ent));
++    ent->va_b = -1;
 +}
 +
-+/* Each CPU has a word mapped into the GSC bus.  Anything on the GSC bus
-+ * can write to this word to raise an external interrupt on the target CPU.
-+ * This includes the system controler (DINO) for regular devices, or
-+ * another CPU for SMP interprocessor interrupts.
-+ */
-+static uint64_t io_eir_read(void *opaque, hwaddr addr, unsigned size)
++static hppa_tlb_entry *hppa_alloc_tlb_ent(CPUHPPAState *env)
 +{
-+    HPPACPU *cpu = opaque;
++    hppa_tlb_entry *ent;
++    uint32_t i = env->tlb_last;
 +
-+    /* ??? What does a read of this register over the GSC bus do?  */
-+    return cpu->env.cr[CR_EIRR];
++    env->tlb_last = (i == ARRAY_SIZE(env->tlb) - 1 ? 0 : i + 1);
++    ent = &env->tlb[i];
++
++    hppa_flush_tlb_ent(env, ent);
++    return ent;
 +}
 +
-+static void io_eir_write(void *opaque, hwaddr addr,
-+                         uint64_t data, unsigned size)
-+{
-+    HPPACPU *cpu = opaque;
-+    int le_bit = ~data & (TARGET_REGISTER_BITS - 1);
-+
-+    cpu->env.cr[CR_EIRR] |= (target_ureg)1 << le_bit;
-+    eval_interrupt(cpu);
-+}
-+
-+const MemoryRegionOps hppa_io_eir_ops = {
-+    .read = io_eir_read,
-+    .write = io_eir_write,
-+    .valid.min_access_size = 4,
-+    .valid.max_access_size = 4,
-+    .impl.min_access_size = 4,
-+    .impl.max_access_size = 4,
-+};
-+
-+void HELPER(write_eirr)(CPUHPPAState *env, target_ureg val)
-+{
-+    env->cr[CR_EIRR] &= ~val;
-+    qemu_mutex_lock_iothread();
-+    eval_interrupt(hppa_env_get_cpu(env));
-+    qemu_mutex_unlock_iothread();
-+}
-+
-+void HELPER(write_eiem)(CPUHPPAState *env, target_ureg val)
-+{
-+    env->cr[CR_EIEM] = val;
-+    qemu_mutex_lock_iothread();
-+    eval_interrupt(hppa_env_get_cpu(env));
-+    qemu_mutex_unlock_iothread();
-+}
-+#endif /* !CONFIG_USER_ONLY */
- 
- void hppa_cpu_do_interrupt(CPUState *cs)
+ int hppa_get_physical_address(CPUHPPAState *env, vaddr addr, int mmu_idx,
+                               MMUAccessType type, hwaddr *pphys, int *pprot)
  {
+@@ -67,7 +94,7 @@ int hppa_get_physical_address(CPUHPPAState *env, vaddr addr, int mmu_idx,
+ 
+     /* Find a valid tlb entry that matches the virtual address.  */
+     ent = hppa_find_tlb(env, addr);
+-    if (ent == NULL) {
++    if (ent == NULL || !ent->entry_valid) {
+         phys = 0;
+         prot = 0;
+         ret = (ifetch ? EXCP_ITLB_MISS : EXCP_DTLB_MISS);
+@@ -192,4 +219,53 @@ void tlb_fill(CPUState *cs, target_ulong addr, MMUAccessType type,
+     tlb_set_page(cs, addr & TARGET_PAGE_MASK, phys & TARGET_PAGE_MASK,
+                  prot, mmu_idx, TARGET_PAGE_SIZE);
+ }
++
++/* Insert (Insn/Data) TLB Address.  Note this is PA 1.1 only.  */
++void HELPER(itlba)(CPUHPPAState *env, target_ulong addr, target_ureg reg)
++{
++    hppa_tlb_entry *empty = NULL;
++    int i;
++
++    /* Zap any old entries covering ADDR; notice empty entries on the way.  */
++    for (i = 0; i < ARRAY_SIZE(env->tlb); ++i) {
++        hppa_tlb_entry *ent = &env->tlb[i];
++        if (!ent->entry_valid) {
++            empty = ent;
++        } else if (ent->va_b <= addr && addr <= ent->va_e) {
++            hppa_flush_tlb_ent(env, ent);
++            empty = ent;
++        }
++    }
++
++    /* If we didn't see an empty entry, evict one.  */
++    if (empty == NULL) {
++        empty = hppa_alloc_tlb_ent(env);
++    }
++
++    /* Note that empty->entry_valid == 0 already.  */
++    empty->va_b = addr & TARGET_PAGE_MASK;
++    empty->va_e = empty->va_b + TARGET_PAGE_SIZE - 1;
++    empty->pa = extract32(reg, 5, 20) << TARGET_PAGE_BITS;
++}
++
++/* Insert (Insn/Data) TLB Protection.  Note this is PA 1.1 only.  */
++void HELPER(itlbp)(CPUHPPAState *env, target_ulong addr, target_ureg reg)
++{
++    hppa_tlb_entry *ent = hppa_find_tlb(env, addr);
++
++    if (unlikely(ent == NULL || ent->entry_valid)) {
++        qemu_log_mask(LOG_GUEST_ERROR, "ITLBP not following ITLBA\n");
++        return;
++    }
++
++    ent->access_id = extract32(reg, 1, 18);
++    ent->u = extract32(reg, 19, 1);
++    ent->ar_pl2 = extract32(reg, 20, 2);
++    ent->ar_pl1 = extract32(reg, 22, 2);
++    ent->ar_type = extract32(reg, 24, 3);
++    ent->b = extract32(reg, 27, 1);
++    ent->d = extract32(reg, 28, 1);
++    ent->t = extract32(reg, 29, 1);
++    ent->entry_valid = 1;
++}
+ #endif /* CONFIG_USER_ONLY */
 diff --git a/target/hppa/translate.c b/target/hppa/translate.c
-index d928bfe335..ce2a6c21d6 100644
+index a670d9d777..13ac727583 100644
 --- a/target/hppa/translate.c
 +++ b/target/hppa/translate.c
-@@ -2115,12 +2115,25 @@ static DisasJumpType trans_mtctl(DisasContext *ctx, uint32_t insn,
-     /* All other control registers are privileged or read-only.  */
-     CHECK_MOST_PRIVILEGED(EXCP_PRIV_REG);
- 
-+#ifdef CONFIG_USER_ONLY
-+    g_assert_not_reached();
-+#else
-+    DisasJumpType ret = DISAS_NEXT;
-+
-     nullify_over(ctx);
-     switch (ctl) {
-     case CR_IT:
-         /* ??? modify interval timer offset */
-         break;
- 
-+    case CR_EIRR:
-+        gen_helper_write_eirr(cpu_env, reg);
-+        break;
-+    case CR_EIEM:
-+        gen_helper_write_eiem(cpu_env, reg);
-+        ret = DISAS_IAQ_N_STALE_EXIT;
-+        break;
-+
-     case CR_IIASQ:
-     case CR_IIAOQ:
-         /* FIXME: Respect PSW_Q bit */
-@@ -2137,7 +2150,8 @@ static DisasJumpType trans_mtctl(DisasContext *ctx, uint32_t insn,
-         tcg_gen_st_reg(reg, cpu_env, offsetof(CPUHPPAState, cr[ctl]));
-         break;
-     }
--    return nullify_end(ctx, DISAS_NEXT);
-+    return nullify_end(ctx, ret);
-+#endif
+@@ -1335,7 +1335,10 @@ static DisasJumpType do_unit(DisasContext *ctx, unsigned rt, TCGv_reg in1,
  }
  
- static DisasJumpType trans_mtsarcm(DisasContext *ctx, uint32_t insn,
+ #ifndef CONFIG_USER_ONLY
+-/* Top 2 bits of the base register select sp[4-7].  */
++/* The "normal" usage is SP >= 0, wherein SP == 0 selects the space
++   from the top 2 bits of the base register.  There are a few system
++   instructions that have a 3-bit space specifier, for which SR0 is
++   not special.  To handle this, pass ~SP.  */
+ static TCGv_i64 space_select(DisasContext *ctx, int sp, TCGv_reg base)
+ {
+     TCGv_ptr ptr;
+@@ -1343,7 +1346,12 @@ static TCGv_i64 space_select(DisasContext *ctx, int sp, TCGv_reg base)
+     TCGv_i64 spc;
+ 
+     if (sp != 0) {
+-        return cpu_sr[sp];
++        if (sp < 0) {
++            sp = ~sp;
++        }
++        spc = get_temp_tl(ctx);
++        load_spr(ctx, spc, sp);
++        return spc;
+     }
+ 
+     ptr = tcg_temp_new_ptr();
+@@ -2346,6 +2354,42 @@ static DisasJumpType trans_probe(DisasContext *ctx, uint32_t insn,
+     return nullify_end(ctx, DISAS_NEXT);
+ }
+ 
++#ifndef CONFIG_USER_ONLY
++static DisasJumpType trans_ixtlbx(DisasContext *ctx, uint32_t insn,
++                                  const DisasInsn *di)
++{
++    unsigned sp;
++    unsigned rr = extract32(insn, 16, 5);
++    unsigned rb = extract32(insn, 21, 5);
++    unsigned is_data = insn & 0x1000;
++    unsigned is_addr = insn & 0x40;
++    TCGv_tl addr;
++    TCGv_reg ofs, reg;
++
++    if (is_data) {
++        sp = extract32(insn, 14, 2);
++    } else {
++        sp = ~assemble_sr3(insn);
++    }
++
++    CHECK_MOST_PRIVILEGED(EXCP_PRIV_OPR);
++    nullify_over(ctx);
++
++    form_gva(ctx, &addr, &ofs, rb, 0, 0, 0, sp, 0, false);
++    reg = load_gpr(ctx, rr);
++    if (is_addr) {
++        gen_helper_itlba(cpu_env, addr, reg);
++    } else {
++        gen_helper_itlbp(cpu_env, addr, reg);
++    }
++
++    /* Exit TB for ITLB change if mmu is enabled.  This *should* not be
++       the case, since the OS TLB fill handler runs with mmu disabled.  */
++    return nullify_end(ctx, !is_data && (ctx->base.tb->flags & PSW_C)
++                       ? DISAS_IAQ_N_STALE : DISAS_NEXT);
++}
++#endif /* !CONFIG_USER_ONLY */
++
+ static const DisasInsn table_mem_mgmt[] = {
+     { 0x04003280u, 0xfc003fffu, trans_nop },          /* fdc, disp */
+     { 0x04001280u, 0xfc003fffu, trans_nop },          /* fdc, index */
+@@ -2362,6 +2406,12 @@ static const DisasInsn table_mem_mgmt[] = {
+     { 0x04002720u, 0xfc003fffu, trans_base_idx_mod }, /* pdc, base mod */
+     { 0x04001180u, 0xfc003fa0u, trans_probe },        /* probe */
+     { 0x04003180u, 0xfc003fa0u, trans_probe },        /* probei */
++#ifndef CONFIG_USER_ONLY
++    { 0x04000000u, 0xfc001fffu, trans_ixtlbx },       /* iitlbp */
++    { 0x04000040u, 0xfc001fffu, trans_ixtlbx },       /* iitlba */
++    { 0x04001000u, 0xfc001fffu, trans_ixtlbx },       /* idtlbp */
++    { 0x04001040u, 0xfc001fffu, trans_ixtlbx },       /* idtlba */
++#endif
+ };
+ 
+ static DisasJumpType trans_add(DisasContext *ctx, uint32_t insn,
 -- 
 2.14.3
