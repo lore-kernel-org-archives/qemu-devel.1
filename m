@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41993)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55307)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1eUwPH-0004It-SL
-	for qemu-devel@nongnu.org; Fri, 29 Dec 2017 10:17:12 -0500
+	(envelope-from <afaerber@suse.de>) id 1eUxMN-0003JT-4a
+	for qemu-devel@nongnu.org; Fri, 29 Dec 2017 11:18:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1eUwPH-00062K-2F
-	for qemu-devel@nongnu.org; Fri, 29 Dec 2017 10:17:11 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:49684)
+	(envelope-from <afaerber@suse.de>) id 1eUxMJ-00012f-50
+	for qemu-devel@nongnu.org; Fri, 29 Dec 2017 11:18:15 -0500
+Received: from mx2.suse.de ([195.135.220.15]:49569)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1eUwPG-00061z-T2
-	for qemu-devel@nongnu.org; Fri, 29 Dec 2017 10:17:11 -0500
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 22C9E2CE92B
-	for <qemu-devel@nongnu.org>; Fri, 29 Dec 2017 15:17:10 +0000 (UTC)
-From: Igor Mammedov <imammedo@redhat.com>
-Date: Fri, 29 Dec 2017 16:16:42 +0100
-Message-Id: <1514560602-280058-6-git-send-email-imammedo@redhat.com>
-In-Reply-To: <1514560602-280058-1-git-send-email-imammedo@redhat.com>
-References: <1514560602-280058-1-git-send-email-imammedo@redhat.com>
-Subject: [Qemu-devel] [PATCH 5/5] tests: acpi: fix FADT not being compared
- to reference table
+	(Exim 4.71) (envelope-from <afaerber@suse.de>) id 1eUxMI-0000yA-UA
+	for qemu-devel@nongnu.org; Fri, 29 Dec 2017 11:18:11 -0500
+References: <20171229063145.29167-1-richard.henderson@linaro.org>
+	<20171229063145.29167-36-richard.henderson@linaro.org>
+From: =?UTF-8?Q?Andreas_F=c3=a4rber?= <afaerber@suse.de>
+Message-ID: <303eb005-cabe-9948-55ad-c89b958789da@suse.de>
+Date: Fri, 29 Dec 2017 17:18:06 +0100
+MIME-Version: 1.0
+In-Reply-To: <20171229063145.29167-36-richard.henderson@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 35/38] qom: Add MMU_DEBUG_LOAD
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,40 +28,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: "Michael S . Tsirkin " <mst@redhat.com>, Thomas Huth <thuth@redhat.com>
+To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
+Cc: deller@gmx.de
 
-It turns out that FADT isn't actually tested for changes
-against reference table, since it happens to be the 1st
-table in RSDT which is currently ignored.
-Fix it by making sure that all tables from RSDT are added
-to test list.
+Hi,
 
-Signed-off-by: Igor Mammedov <imammedo@redhat.com>
----
- tests/bios-tables-test.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+Since you're specifically CC'ing me, some nits:
 
-diff --git a/tests/bios-tables-test.c b/tests/bios-tables-test.c
-index 81c558e..c5dccdb 100644
---- a/tests/bios-tables-test.c
-+++ b/tests/bios-tables-test.c
-@@ -248,14 +248,14 @@ static void test_acpi_dsdt_table(test_data *data)
- /* Load all tables and add to test list directly RSDT referenced tables */
- static void fetch_rsdt_referenced_tables(test_data *data)
- {
--    int tables_nr = data->rsdt_tables_nr - 1; /* fadt is first */
-+    int tables_nr = data->rsdt_tables_nr;
-     int i;
- 
-     for (i = 0; i < tables_nr; i++) {
-         AcpiSdtTable ssdt_table;
-         uint32_t addr;
- 
--        addr = le32_to_cpu(data->rsdt_tables_addr[i + 1]); /* fadt is first */
-+        addr = le32_to_cpu(data->rsdt_tables_addr[i]);
-         fetch_table(&ssdt_table, addr);
- 
-         /* Add table to ASL test tables list */
--- 
-2.7.4
+Am 29.12.2017 um 07:31 schrieb Richard Henderson:
+> This lets us tell bottom levels of virtual memory translation
+> routines that the access is from within QEMU itself and bypass
+> certain tests.
+
+This sentence could use a tweak for clarity: tell bottom levels of
+virtual memory translation routines ... to bypass? or that the access
+... bypasses? or that this lets us ... bypass?
+
+>=20
+> Cc: Andreas F=C3=A4rber <afaerber@suse.de>
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> ---
+>  include/qom/cpu.h | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
+>=20
+> diff --git a/include/qom/cpu.h b/include/qom/cpu.h
+> index c2fa151228..d5361ffd0e 100644
+> --- a/include/qom/cpu.h
+> +++ b/include/qom/cpu.h
+> @@ -64,7 +64,8 @@ typedef uint64_t vaddr;
+>  typedef enum MMUAccessType {
+>      MMU_DATA_LOAD  =3D 0,
+>      MMU_DATA_STORE =3D 1,
+> -    MMU_INST_FETCH =3D 2
+> +    MMU_INST_FETCH =3D 2,
+> +    MMU_DEBUG_LOAD =3D 3
+
+Given that you had to touch the previous line for your comma, it would
+be advisable to add one on the new line to avoid that next time.
+
+>  } MMUAccessType;
+> =20
+>  typedef struct CPUWatchpoint CPUWatchpoint;
+
+Either way please take the patch through a suitable tree.
+
+Cheers,
+Andreas
+
+--=20
+SUSE Linux GmbH, Maxfeldstr. 5, 90409 N=C3=BCrnberg, Germany
+GF: Felix Imend=C3=B6rffer, Jane Smithard, Graham Norton
+HRB 21284 (AG N=C3=BCrnberg)
