@@ -1,23 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42862)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42867)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1eV0NN-0000mx-Je
+	(envelope-from <richard.henderson@linaro.org>) id 1eV0NN-0000n5-NT
 	for qemu-devel@nongnu.org; Fri, 29 Dec 2017 14:31:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1eV0NM-0000Qu-JZ
+	(envelope-from <richard.henderson@linaro.org>) id 1eV0NI-0000Ho-RG
 	for qemu-devel@nongnu.org; Fri, 29 Dec 2017 14:31:29 -0500
-Received: from mail-pf0-x242.google.com ([2607:f8b0:400e:c00::242]:38016)
+Received: from mail-pf0-x241.google.com ([2607:f8b0:400e:c00::241]:35735)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1eV0NM-0000PB-DU
-	for qemu-devel@nongnu.org; Fri, 29 Dec 2017 14:31:28 -0500
-Received: by mail-pf0-x242.google.com with SMTP id u25so22418458pfg.5
-	for <qemu-devel@nongnu.org>; Fri, 29 Dec 2017 11:31:28 -0800 (PST)
+	id 1eV0NI-0000GT-K2
+	for qemu-devel@nongnu.org; Fri, 29 Dec 2017 14:31:24 -0500
+Received: by mail-pf0-x241.google.com with SMTP id j124so22438915pfc.2
+	for <qemu-devel@nongnu.org>; Fri, 29 Dec 2017 11:31:24 -0800 (PST)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Fri, 29 Dec 2017 11:31:13 -0800
-Message-Id: <20171229193113.11753-9-richard.henderson@linaro.org>
+Date: Fri, 29 Dec 2017 11:31:10 -0800
+Message-Id: <20171229193113.11753-6-richard.henderson@linaro.org>
 In-Reply-To: <20171229193113.11753-1-richard.henderson@linaro.org>
 References: <20171229193113.11753-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PULL 8/8] tcg: add cs_base and flags to -d exec output
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PULL 5/8] tcg: Generalize TCGOp parameters
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,51 +30,131 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, Paolo Bonzini <pbonzini@redhat.com>
+Cc: peter.maydell@linaro.org
 
-From: Paolo Bonzini <pbonzini@redhat.com>
+We had two fields specific to INDEX_op_call.  Rename these and
+add some macros so that the fields may be reused for other opcodes.
 
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-Message-Id: <20171217055023.29225-1-pbonzini@redhat.com>
-[rth: Also change the Chain logging in helper_lookup_tb_ptr.]
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- accel/tcg/cpu-exec.c    | 6 ++++--
- accel/tcg/tcg-runtime.c | 5 +++--
- 2 files changed, 7 insertions(+), 4 deletions(-)
+ tcg/tcg.h      | 10 ++++++----
+ tcg/optimize.c |  4 ++--
+ tcg/tcg.c      | 22 +++++++++++-----------
+ 3 files changed, 19 insertions(+), 17 deletions(-)
 
-diff --git a/accel/tcg/cpu-exec.c b/accel/tcg/cpu-exec.c
-index 4452cd9856..280200f737 100644
---- a/accel/tcg/cpu-exec.c
-+++ b/accel/tcg/cpu-exec.c
-@@ -146,8 +146,10 @@ static inline tcg_target_ulong cpu_tb_exec(CPUState *cpu, TranslationBlock *itb)
-     uint8_t *tb_ptr = itb->tc.ptr;
+diff --git a/tcg/tcg.h b/tcg/tcg.h
+index a577447846..f25efa9795 100644
+--- a/tcg/tcg.h
++++ b/tcg/tcg.h
+@@ -566,10 +566,9 @@ typedef uint16_t TCGLifeData;
+ typedef struct TCGOp {
+     TCGOpcode opc   : 8;        /*  8 */
  
-     qemu_log_mask_and_addr(CPU_LOG_EXEC, itb->pc,
--                           "Trace %p [%d: " TARGET_FMT_lx "] %s\n",
--                           itb->tc.ptr, cpu->cpu_index, itb->pc,
-+                           "Trace %d: %p ["
-+                           TARGET_FMT_lx "/" TARGET_FMT_lx "/%#x] %s\n",
-+                           cpu->cpu_index, itb->tc.ptr,
-+                           itb->cs_base, itb->pc, itb->flags,
-                            lookup_symbol(itb->pc));
+-    /* The number of out and in parameter for a call.  */
+-    unsigned calli  : 4;        /* 12 */
+-    unsigned callo  : 2;        /* 14 */
+-    unsigned        : 2;        /* 16 */
++    /* Parameters for this opcode.  See below.  */
++    unsigned param1 : 4;        /* 12 */
++    unsigned param2 : 4;        /* 16 */
  
- #if defined(DEBUG_DISAS)
-diff --git a/accel/tcg/tcg-runtime.c b/accel/tcg/tcg-runtime.c
-index 4172ffda82..d0d4484406 100644
---- a/accel/tcg/tcg-runtime.c
-+++ b/accel/tcg/tcg-runtime.c
-@@ -156,8 +156,9 @@ void *HELPER(lookup_tb_ptr)(CPUArchState *env)
-         return tcg_ctx->code_gen_epilogue;
+     /* Lifetime data of the operands.  */
+     unsigned life   : 16;       /* 32 */
+@@ -581,6 +580,9 @@ typedef struct TCGOp {
+     TCGArg args[MAX_OPC_PARAM];
+ } TCGOp;
+ 
++#define TCGOP_CALLI(X)    (X)->param1
++#define TCGOP_CALLO(X)    (X)->param2
++
+ /* Make sure operands fit in the bitfields above.  */
+ QEMU_BUILD_BUG_ON(NB_OPS > (1 << 8));
+ 
+diff --git a/tcg/optimize.c b/tcg/optimize.c
+index e495680e95..2cbbeefd53 100644
+--- a/tcg/optimize.c
++++ b/tcg/optimize.c
+@@ -627,8 +627,8 @@ void tcg_optimize(TCGContext *s)
+         /* Count the arguments, and initialize the temps that are
+            going to be used */
+         if (opc == INDEX_op_call) {
+-            nb_oargs = op->callo;
+-            nb_iargs = op->calli;
++            nb_oargs = TCGOP_CALLO(op);
++            nb_iargs = TCGOP_CALLI(op);
+             for (i = 0; i < nb_oargs + nb_iargs; i++) {
+                 TCGTemp *ts = arg_temp(op->args[i]);
+                 if (ts) {
+diff --git a/tcg/tcg.c b/tcg/tcg.c
+index f26949a900..93caa0be93 100644
+--- a/tcg/tcg.c
++++ b/tcg/tcg.c
+@@ -1430,7 +1430,7 @@ void tcg_gen_callN(void *func, TCGTemp *ret, int nargs, TCGTemp **args)
+     } else {
+         nb_rets = 0;
      }
-     qemu_log_mask_and_addr(CPU_LOG_EXEC, pc,
--                           "Chain %p [%d: " TARGET_FMT_lx "] %s\n",
--                           tb->tc.ptr, cpu->cpu_index, pc,
-+                           "Chain %d: %p ["
-+                           TARGET_FMT_lx "/" TARGET_FMT_lx "/%#x] %s\n",
-+                           cpu->cpu_index, tb->tc.ptr, cs_base, pc, flags,
-                            lookup_symbol(pc));
-     return tb->tc.ptr;
- }
+-    op->callo = nb_rets;
++    TCGOP_CALLO(op) = nb_rets;
+ 
+     real_args = 0;
+     for (i = 0; i < nargs; i++) {
+@@ -1469,10 +1469,10 @@ void tcg_gen_callN(void *func, TCGTemp *ret, int nargs, TCGTemp **args)
+     }
+     op->args[pi++] = (uintptr_t)func;
+     op->args[pi++] = flags;
+-    op->calli = real_args;
++    TCGOP_CALLI(op) = real_args;
+ 
+     /* Make sure the fields didn't overflow.  */
+-    tcg_debug_assert(op->calli == real_args);
++    tcg_debug_assert(TCGOP_CALLI(op) == real_args);
+     tcg_debug_assert(pi <= ARRAY_SIZE(op->args));
+ 
+ #if defined(__sparc__) && !defined(__arch64__) \
+@@ -1634,8 +1634,8 @@ void tcg_dump_ops(TCGContext *s)
+             }
+         } else if (c == INDEX_op_call) {
+             /* variable number of arguments */
+-            nb_oargs = op->callo;
+-            nb_iargs = op->calli;
++            nb_oargs = TCGOP_CALLO(op);
++            nb_iargs = TCGOP_CALLI(op);
+             nb_cargs = def->nb_cargs;
+ 
+             /* function name, flags, out args */
+@@ -1996,8 +1996,8 @@ static void liveness_pass_1(TCGContext *s)
+             {
+                 int call_flags;
+ 
+-                nb_oargs = op->callo;
+-                nb_iargs = op->calli;
++                nb_oargs = TCGOP_CALLO(op);
++                nb_iargs = TCGOP_CALLI(op);
+                 call_flags = op->args[nb_oargs + nb_iargs + 1];
+ 
+                 /* pure functions can be removed if their result is unused */
+@@ -2233,8 +2233,8 @@ static bool liveness_pass_2(TCGContext *s)
+         TCGTemp *arg_ts, *dir_ts;
+ 
+         if (opc == INDEX_op_call) {
+-            nb_oargs = op->callo;
+-            nb_iargs = op->calli;
++            nb_oargs = TCGOP_CALLO(op);
++            nb_iargs = TCGOP_CALLI(op);
+             call_flags = op->args[nb_oargs + nb_iargs + 1];
+         } else {
+             nb_iargs = def->nb_iargs;
+@@ -2915,8 +2915,8 @@ static void tcg_reg_alloc_op(TCGContext *s, const TCGOp *op)
+ 
+ static void tcg_reg_alloc_call(TCGContext *s, TCGOp *op)
+ {
+-    const int nb_oargs = op->callo;
+-    const int nb_iargs = op->calli;
++    const int nb_oargs = TCGOP_CALLO(op);
++    const int nb_iargs = TCGOP_CALLI(op);
+     const TCGLifeData arg_life = op->life;
+     int flags, nb_regs, i;
+     TCGReg reg;
 -- 
 2.14.3
