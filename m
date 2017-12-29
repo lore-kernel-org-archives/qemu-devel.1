@@ -1,34 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35198)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38673)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eUgEU-00028Y-Ez
-	for qemu-devel@nongnu.org; Thu, 28 Dec 2017 17:00:59 -0500
+	(envelope-from <famz@redhat.com>) id 1eUjWi-0008UG-5x
+	for qemu-devel@nongnu.org; Thu, 28 Dec 2017 20:32:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eUgER-0001px-5l
-	for qemu-devel@nongnu.org; Thu, 28 Dec 2017 17:00:58 -0500
-Received: from indium.canonical.com ([91.189.90.7]:55508)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1eUgEQ-0001oo-TC
-	for qemu-devel@nongnu.org; Thu, 28 Dec 2017 17:00:55 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1eUgEO-0002x2-DI
-	for <qemu-devel@nongnu.org>; Thu, 28 Dec 2017 22:00:52 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 5B1BE2E8078
-	for <qemu-devel@nongnu.org>; Thu, 28 Dec 2017 22:00:51 +0000 (UTC)
+	(envelope-from <famz@redhat.com>) id 1eUjWg-0000V2-VP
+	for qemu-devel@nongnu.org; Thu, 28 Dec 2017 20:31:59 -0500
+Date: Fri, 29 Dec 2017 09:31:40 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20171229013140.GA13004@lemon>
+References: <20171220154945.88410-1-vsementsov@virtuozzo.com>
+	<20171220154945.88410-4-vsementsov@virtuozzo.com>
+	<20171228052418.GC9192@lemon>
+	<f6637c9d-047b-b9f3-1a5a-4b59baf49cbc@virtuozzo.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <f6637c9d-047b-b9f3-1a5a-4b59baf49cbc@virtuozzo.com>
 Content-Transfer-Encoding: quoted-printable
-Date: Thu, 28 Dec 2017 21:50:33 -0000
-From: Matthew Schumacher <1712818@bugs.launchpad.net>
-Reply-To: Bug 1712818 <1712818@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <150357954932.16920.8202218494274187188.malonedeb@gac.canonical.com>
-Message-Id: <151449783340.2939.8248956253845310155.malone@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1712818] Re: live migration with storage
- encounter assert(!(bs->open_flags & BDRV_O_INACTIVE)) crashes
+Subject: Re: [Qemu-devel] [PATCH v9 03/13] block/dirty-bitmap: add _locked
+ version of bdrv_reclaim_dirty_bitmap
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,54 +27,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Cc: kwolf@redhat.com, peter.maydell@linaro.org, lirans@il.ibm.com, qemu-block@nongnu.org, quintela@redhat.com, jsnow@redhat.com, qemu-devel@nongnu.org, armbru@redhat.com, stefanha@redhat.com, den@openvz.org, amit.shah@redhat.com, pbonzini@redhat.com, mreitz@redhat.com, dgilbert@redhat.com
 
-I see the same thing:
+On Thu, 12/28 14:16, Vladimir Sementsov-Ogievskiy wrote:
+> 28.12.2017 08:24, Fam Zheng wrote:
+> > On Wed, 12/20 18:49, Vladimir Sementsov-Ogievskiy wrote:
+> > > Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.c=
+om>
+> > > ---
+> > >   include/block/dirty-bitmap.h |  3 +++
+> > >   block/dirty-bitmap.c         | 25 ++++++++++++++++---------
+> > >   2 files changed, 19 insertions(+), 9 deletions(-)
+> > >=20
+> > > diff --git a/include/block/dirty-bitmap.h b/include/block/dirty-bit=
+map.h
+> > > index 93d4336505..caf1f3d861 100644
+> > > --- a/include/block/dirty-bitmap.h
+> > > +++ b/include/block/dirty-bitmap.h
+> > > @@ -92,5 +92,8 @@ bool bdrv_has_changed_persistent_bitmaps(BlockDri=
+verState *bs);
+> > >   BdrvDirtyBitmap *bdrv_dirty_bitmap_next(BlockDriverState *bs,
+> > >                                           BdrvDirtyBitmap *bitmap);
+> > >   char *bdrv_dirty_bitmap_sha256(const BdrvDirtyBitmap *bitmap, Err=
+or **errp);
+> > > +BdrvDirtyBitmap *bdrv_reclaim_dirty_bitmap_locked(BlockDriverState=
+ *bs,
+> > > +                                                  BdrvDirtyBitmap =
+*bitmap,
+> > > +                                                  Error **errp);
+> > >   #endif
+> > > diff --git a/block/dirty-bitmap.c b/block/dirty-bitmap.c
+> > > index d83da077d5..fe27ddfb83 100644
+> > > --- a/block/dirty-bitmap.c
+> > > +++ b/block/dirty-bitmap.c
+> > > @@ -327,15 +327,11 @@ BdrvDirtyBitmap *bdrv_dirty_bitmap_abdicate(B=
+lockDriverState *bs,
+> > >    * The merged parent will be un-frozen, but not explicitly re-ena=
+bled.
+> > >    * Called with BQL taken.
+> > Maybe update the comment as
+> >=20
+> > s/Called with BQL taken/Called within bdrv_dirty_bitmap_lock..unlock/
+> >=20
+> > and ...
+>=20
+> we have the following comment:
+>=20
+> =A0=A0=A0 /* Writing to the list requires the BQL _and_ the dirty_bitma=
+p_mutex.
+> =A0=A0=A0=A0 * Reading from the list can be done with either the BQL or=
+ the
+> =A0=A0=A0=A0 * dirty_bitmap_mutex.=A0 Modifying a bitmap only requires
+> =A0=A0=A0=A0 * dirty_bitmap_mutex. */
+> =A0=A0=A0 QemuMutex dirty_bitmap_mutex;
+>=20
+> (I don't understand well the logic, why is it so. Paolo introduced the =
+lock,
+> but didn't update some functions..)
+>=20
+> so, actually, here we need both BQL and mutex.
 
-2017-12-28 21:36:26.837+0000: initiating migration
-qemu-system-x86_64: block/io.c:1537: bdrv_co_pwritev: Assertion `!(bs->open=
-_flags & BDRV_O_INACTIVE)' failed.
-2017-12-28 21:36:40.516+0000: shutting down, reason=3Dcrashed
-~
+Yes, because of that comment my interpretion has been both "BQL and the m=
+utex"
+whereever we say "within bdrv_dirty_bitmap_lock..unlock", as to some othe=
+r
+places in this file.
 
-Running:
-QEMU emulator version 2.10.1
-libvirtd (libvirt) 3.10.0
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1712818
-
-Title:
-  live migration with storage encounter assert(!(bs->open_flags &
-  BDRV_O_INACTIVE)) crashes
-
-Status in QEMU:
-  New
-
-Bug description:
-  The vm guest runs a iotest program, and i migrate it with virsh
-  --copy-storage-all,then the qemu process on the source host happens to
-  crash with the following message:
-
-  kvm: block/io.c:1543: bdrv_co_pwritev: Assertion `!(bs->open_flags & 0x08=
-00)' failed.
-  2017-08-24 11:43:45.919+0000: shutting down, reason=3Dcrashed
-
-  here is the release:
-  qemu 2.7 & 2.10.rc3 were tested.
-  libvirt 3.0.0 & 3.2.0 were tested.
-
-  command line:
-  src_host:virsh migrate --verbose --live --persistent --copy-storage-all v=
-m-core qemu+ssh://dst_host/system
-
-  Possible Reason: After bdrv_inactivate_all() was called, mirror_run
-  coroutine still writes the left dirty disk data to remote nbd server,
-  which triggers the assertion. But I don't known how to avoid the
-  problem, help is needed!  Thanks.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1712818/+subscriptions
+Fam
