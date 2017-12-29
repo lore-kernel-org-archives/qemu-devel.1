@@ -1,30 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57079)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57117)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eUynt-0003Sv-TI
-	for qemu-devel@nongnu.org; Fri, 29 Dec 2017 12:50:47 -0500
+	id 1eUynv-0003VO-U9
+	for qemu-devel@nongnu.org; Fri, 29 Dec 2017 12:50:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eUyns-0006ql-G8
-	for qemu-devel@nongnu.org; Fri, 29 Dec 2017 12:50:45 -0500
-Received: from mail-qk0-x242.google.com ([2607:f8b0:400d:c09::242]:37638)
+	id 1eUynu-0006tJ-Um
+	for qemu-devel@nongnu.org; Fri, 29 Dec 2017 12:50:47 -0500
+Received: from mail-qk0-x244.google.com ([2607:f8b0:400d:c09::244]:38444)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eUyns-0006qK-BC
-	for qemu-devel@nongnu.org; Fri, 29 Dec 2017 12:50:44 -0500
-Received: by mail-qk0-x242.google.com with SMTP id p13so37523070qke.4
-	for <qemu-devel@nongnu.org>; Fri, 29 Dec 2017 09:50:44 -0800 (PST)
+	id 1eUynu-0006sl-Pv
+	for qemu-devel@nongnu.org; Fri, 29 Dec 2017 12:50:46 -0500
+Received: by mail-qk0-x244.google.com with SMTP id l19so19373445qke.5
+	for <qemu-devel@nongnu.org>; Fri, 29 Dec 2017 09:50:46 -0800 (PST)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Fri, 29 Dec 2017 14:49:10 -0300
-Message-Id: <20171229174933.1781-20-f4bug@amsat.org>
+Date: Fri, 29 Dec 2017 14:49:11 -0300
+Message-Id: <20171229174933.1781-21-f4bug@amsat.org>
 In-Reply-To: <20171229174933.1781-1-f4bug@amsat.org>
 References: <20171229174933.1781-1-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v3 19/42] sdhci: add basic Spec v1 capabilities
+Subject: [Qemu-devel] [PATCH v3 20/42] sdhci: add max-block-length
+ capability (Spec v1)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,201 +39,121 @@ Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nong
 
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- hw/sd/sdhci-internal.h | 22 ++++++++++++++++++-
- include/hw/sd/sdhci.h  |  6 ++++++
- hw/sd/sdhci.c          | 58 ++++++++++++++++++++++++++++++++++++--------------
- 3 files changed, 69 insertions(+), 17 deletions(-)
+ hw/sd/sdhci-internal.h |  1 -
+ include/hw/sd/sdhci.h  |  1 +
+ hw/sd/sdhci.c          | 38 +++++++++++++-------------------------
+ 3 files changed, 14 insertions(+), 26 deletions(-)
 
 diff --git a/hw/sd/sdhci-internal.h b/hw/sd/sdhci-internal.h
-index cf4a055159..6944fcaf00 100644
+index 6944fcaf00..0561e6eaf7 100644
 --- a/hw/sd/sdhci-internal.h
 +++ b/hw/sd/sdhci-internal.h
-@@ -86,6 +86,9 @@ FIELD(SDHC_PRNSTS, WRITE_PROTECT,      19, 1);
- 
- /* R/W Host control Register 0x0 */
- #define SDHC_HOSTCTL                   0x28
-+FIELD(SDHC_HOSTCTL, LED_CTRL,          0, 1);
-+FIELD(SDHC_HOSTCTL, DATATRANSFERWIDTH, 1, 1); /* SD mode only */
-+FIELD(SDHC_HOSTCTL, HIGH_SPEED,        2, 1);
- #define SDHC_CTRL_DMA_CHECK_MASK       0x18
- #define SDHC_CTRL_SDMA                 0x00
- #define SDHC_CTRL_ADMA1_32             0x08
-@@ -96,6 +99,7 @@ FIELD(SDHC_PRNSTS, WRITE_PROTECT,      19, 1);
- /* R/W Power Control Register 0x0 */
- #define SDHC_PWRCON                    0x29
- #define SDHC_POWER_ON                  (1 << 0)
-+FIELD(SDHC_PWRCON, BUS_VOLTAGE,        1, 3);
- 
- /* R/W Block Gap Control Register 0x0 */
- #define SDHC_BLKGAP                    0x2A
-@@ -118,6 +122,7 @@ FIELD(SDHC_PRNSTS, WRITE_PROTECT,      19, 1);
- 
- /* R/W Timeout Control Register 0x0 */
- #define SDHC_TIMEOUTCON                0x2E
-+FIELD(SDHC_TIMEOUTCON, COUNTER,        0, 4);
- 
- /* R/W Software Reset Register 0x0 */
- #define SDHC_SWRST                     0x2F
-@@ -174,17 +179,32 @@ FIELD(SDHC_PRNSTS, WRITE_PROTECT,      19, 1);
- 
- /* ROC Auto CMD12 error status register 0x0 */
- #define SDHC_ACMD12ERRSTS              0x3C
-+FIELD(SDHC_ACMD12ERRSTS, TIMEOUT_ERR,  1, 1);
-+FIELD(SDHC_ACMD12ERRSTS, CRC_ERR,      2, 1);
-+FIELD(SDHC_ACMD12ERRSTS, INDEX_ERR,    4, 1);
- 
- /* HWInit Capabilities Register 0x05E80080 */
- #define SDHC_CAPAB                     0x40
--#define SDHC_CAN_DO_DMA                0x00400000
+@@ -188,7 +188,6 @@ FIELD(SDHC_ACMD12ERRSTS, INDEX_ERR,    4, 1);
  #define SDHC_CAN_DO_ADMA2              0x00080000
  #define SDHC_CAN_DO_ADMA1              0x00100000
  #define SDHC_64_BIT_BUS_SUPPORT        (1 << 28)
- #define SDHC_CAPAB_BLOCKSIZE(x)        (((x) >> 16) & 0x3)
-+FIELD(SDHC_CAPAB, TOCLKFREQ,           0, 6);
-+FIELD(SDHC_CAPAB, TOUNIT,              7, 1);
-+FIELD(SDHC_CAPAB, BASECLKFREQ,         8, 8);
-+FIELD(SDHC_CAPAB, MAXBLOCKLENGTH,     16, 2);
-+FIELD(SDHC_CAPAB, HIGHSPEED,          21, 1);
-+FIELD(SDHC_CAPAB, SDMA,               22, 1);
-+FIELD(SDHC_CAPAB, SUSPRESUME,         23, 1);
-+FIELD(SDHC_CAPAB, V33,                24, 1);
-+FIELD(SDHC_CAPAB, V30,                25, 1);
-+FIELD(SDHC_CAPAB, V18,                26, 1);
- 
- /* HWInit Maximum Current Capabilities Register 0x0 */
- #define SDHC_MAXCURR                   0x48
-+FIELD(SDHC_MAXCURR, V33_VDD1,          0, 8);
-+FIELD(SDHC_MAXCURR, V30_VDD1,          8, 8);
-+FIELD(SDHC_MAXCURR, V18_VDD1,         16, 8);
- 
- /* W Force Event Auto CMD12 Error Interrupt Register 0x0000 */
- #define SDHC_FEAER                     0x50
+-#define SDHC_CAPAB_BLOCKSIZE(x)        (((x) >> 16) & 0x3)
+ FIELD(SDHC_CAPAB, TOCLKFREQ,           0, 6);
+ FIELD(SDHC_CAPAB, TOUNIT,              7, 1);
+ FIELD(SDHC_CAPAB, BASECLKFREQ,         8, 8);
 diff --git a/include/hw/sd/sdhci.h b/include/hw/sd/sdhci.h
-index ddd5040410..266030dc8d 100644
+index 266030dc8d..2703da1d5a 100644
 --- a/include/hw/sd/sdhci.h
 +++ b/include/hw/sd/sdhci.h
-@@ -102,6 +102,12 @@ typedef struct SDHCIState {
-     /* Configurable properties */
+@@ -103,6 +103,7 @@ typedef struct SDHCIState {
      bool pending_insert_quirk; /* Quirk for Raspberry Pi card insert int */
      uint8_t spec_version;
-+    struct {
-+        bool suspend;
-+        bool high_speed;
-+        bool sdma;
-+        bool v33, v30, v18;
-+    } cap;
- } SDHCIState;
- 
- #define TYPE_PCI_SDHCI "sdhci-pci"
+     struct {
++        uint16_t max_blk_len;
+         bool suspend;
+         bool high_speed;
+         bool sdma;
 diff --git a/hw/sd/sdhci.c b/hw/sd/sdhci.c
-index bd13f2a0b6..738db6edcf 100644
+index 738db6edcf..820d161db2 100644
 --- a/hw/sd/sdhci.c
 +++ b/hw/sd/sdhci.c
-@@ -44,12 +44,6 @@
-  * 0 - not supported, 1 - supported, other - prohibited.
-  */
+@@ -46,9 +46,6 @@
  #define SDHC_CAPAB_64BITBUS       0ul        /* 64-bit System Bus Support */
--#define SDHC_CAPAB_18V            1ul        /* Voltage support 1.8v */
--#define SDHC_CAPAB_30V            0ul        /* Voltage support 3.0v */
--#define SDHC_CAPAB_33V            1ul        /* Voltage support 3.3v */
--#define SDHC_CAPAB_SUSPRESUME     0ul        /* Suspend/resume support */
--#define SDHC_CAPAB_SDMA           1ul        /* SDMA support */
--#define SDHC_CAPAB_HIGHSPEED      1ul        /* High speed support */
  #define SDHC_CAPAB_ADMA1          1ul        /* ADMA1 support */
  #define SDHC_CAPAB_ADMA2          1ul        /* ADMA2 support */
- /* Maximum host controller R/W buffers size
-@@ -63,9 +57,7 @@
- #define SDHC_CAPAB_TOCLKFREQ      52ul
- 
- /* Now check all parameters and calculate CAPABILITIES REGISTER value */
--#if SDHC_CAPAB_64BITBUS > 1 || SDHC_CAPAB_18V > 1 || SDHC_CAPAB_30V > 1 ||     \
--    SDHC_CAPAB_33V > 1 || SDHC_CAPAB_SUSPRESUME > 1 || SDHC_CAPAB_SDMA > 1 ||  \
--    SDHC_CAPAB_HIGHSPEED > 1 || SDHC_CAPAB_ADMA2 > 1 || SDHC_CAPAB_ADMA1 > 1 ||\
-+#if SDHC_CAPAB_64BITBUS > 1 || SDHC_CAPAB_ADMA2 > 1 || SDHC_CAPAB_ADMA1 > 1 || \
-     SDHC_CAPAB_TOUNIT > 1
+-/* Maximum host controller R/W buffers size
+- * Possible values: 512, 1024, 2048 bytes */
+-#define SDHC_CAPAB_MAXBLOCKLENGTH 512ul
+ /* Maximum clock frequency for SDclock in MHz
+  * value in range 10-63 MHz, 0 - not defined */
+ #define SDHC_CAPAB_BASECLKFREQ    52ul
+@@ -62,16 +59,6 @@
  #error Capabilities features can have value 0 or 1 only!
  #endif
-@@ -90,16 +82,33 @@
- #endif
+ 
+-#if SDHC_CAPAB_MAXBLOCKLENGTH == 512
+-#define MAX_BLOCK_LENGTH 0ul
+-#elif SDHC_CAPAB_MAXBLOCKLENGTH == 1024
+-#define MAX_BLOCK_LENGTH 1ul
+-#elif SDHC_CAPAB_MAXBLOCKLENGTH == 2048
+-#define MAX_BLOCK_LENGTH 2ul
+-#else
+-#error Max host controller block size can have value 512, 1024 or 2048 only!
+-#endif
+-
+ #if (SDHC_CAPAB_BASECLKFREQ > 0 && SDHC_CAPAB_BASECLKFREQ < 10) || \
+     SDHC_CAPAB_BASECLKFREQ > 63
+ #error SDclock frequency can have value in range 0, 10-63 only!
+@@ -83,7 +70,7 @@
  
  #define SDHC_CAPAB_REG_DEFAULT                                 \
--   ((SDHC_CAPAB_64BITBUS << 28) | (SDHC_CAPAB_18V << 26) |     \
--    (SDHC_CAPAB_30V << 25) | (SDHC_CAPAB_33V << 24) |          \
--    (SDHC_CAPAB_SUSPRESUME << 23) | (SDHC_CAPAB_SDMA << 22) |  \
--    (SDHC_CAPAB_HIGHSPEED << 21) | (SDHC_CAPAB_ADMA1 << 20) |  \
-+   ((SDHC_CAPAB_64BITBUS << 28) | (SDHC_CAPAB_ADMA1 << 20) |   \
-     (SDHC_CAPAB_ADMA2 << 19) | (MAX_BLOCK_LENGTH << 16) |      \
+    ((SDHC_CAPAB_64BITBUS << 28) | (SDHC_CAPAB_ADMA1 << 20) |   \
+-    (SDHC_CAPAB_ADMA2 << 19) | (MAX_BLOCK_LENGTH << 16) |      \
++    (SDHC_CAPAB_ADMA2 << 19) |                                 \
      (SDHC_CAPAB_BASECLKFREQ << 8) | (SDHC_CAPAB_TOUNIT << 7) | \
      (SDHC_CAPAB_TOCLKFREQ))
  
- #define MASKED_WRITE(reg, mask, val)  (reg = (reg & (mask)) | (val))
- 
-+static void sdhci_init_capareg(SDHCIState *s, Error **errp)
-+{
-+    uint64_t capareg = 0;
-+
-+    switch (s->spec_version) {
-+    case 1:
-+        capareg = FIELD_DP64(capareg, SDHC_CAPAB, HIGHSPEED, s->cap.high_speed);
-+        capareg = FIELD_DP64(capareg, SDHC_CAPAB, SDMA, s->cap.sdma);
-+        capareg = FIELD_DP64(capareg, SDHC_CAPAB, SUSPRESUME, s->cap.suspend);
-+        capareg = FIELD_DP64(capareg, SDHC_CAPAB, V33, s->cap.v33);
-+        capareg = FIELD_DP64(capareg, SDHC_CAPAB, V30, s->cap.v30);
-+        capareg = FIELD_DP64(capareg, SDHC_CAPAB, V18, s->cap.v18);
-+        break;
-+
-+    default:
-+        error_setg(errp, "Unsupported spec version: %u", s->spec_version);
-+    }
-+    s->capareg = capareg;
-+}
-+
- static uint8_t sdhci_slotint(SDHCIState *s)
+@@ -92,9 +79,17 @@
+ static void sdhci_init_capareg(SDHCIState *s, Error **errp)
  {
-     return (s->norintsts & s->norintsigen) || (s->errintsts & s->errintsigen) ||
-@@ -1032,7 +1041,7 @@ sdhci_write(void *opaque, hwaddr offset, uint64_t val, unsigned size)
-     case SDHC_TRNMOD:
-         /* DMA can be enabled only if it is supported as indicated by
-          * capabilities register */
--        if (!(s->capareg & SDHC_CAN_DO_DMA)) {
-+        if (!(s->capareg & R_SDHC_CAPAB_SDMA_MASK)) {
-             value &= ~SDHC_TRNS_DMA;
-         }
-         MASKED_WRITE(s->trnmod, mask, value & SDHC_TRNMOD_MASK);
-@@ -1186,6 +1195,10 @@ static void sdhci_init_readonly_registers(SDHCIState *s, Error **errp)
-         return;
-     }
-     s->version = (SDHC_HCVER_VENDOR << 8) | (s->spec_version - 1);
+     uint64_t capareg = 0;
++    uint32_t val;
+ 
+     switch (s->spec_version) {
+     case 1:
++        val = ctz32(s->cap.max_blk_len >> 9);
++        if (val >= 0b11) {
++            error_setg(errp, "block size can be 512, 1024 or 2048 only");
++            return;
++        }
++        capareg = FIELD_DP64(capareg, SDHC_CAPAB, MAXBLOCKLENGTH, val);
 +
-+    if (s->capareg == UINT64_MAX) {
-+        sdhci_init_capareg(s, errp);
-+    }
+         capareg = FIELD_DP64(capareg, SDHC_CAPAB, HIGHSPEED, s->cap.high_speed);
+         capareg = FIELD_DP64(capareg, SDHC_CAPAB, SDMA, s->cap.sdma);
+         capareg = FIELD_DP64(capareg, SDHC_CAPAB, SUSPRESUME, s->cap.suspend);
+@@ -1175,17 +1170,7 @@ static const MemoryRegionOps sdhci_mmio_ops = {
+ 
+ static inline unsigned int sdhci_get_fifolen(SDHCIState *s)
+ {
+-    switch (SDHC_CAPAB_BLOCKSIZE(s->capareg)) {
+-    case 0:
+-        return 512;
+-    case 1:
+-        return 1024;
+-    case 2:
+-        return 2048;
+-    default:
+-        hw_error("SDHC: unsupported value for maximum block size\n");
+-        return 0;
+-    }
++    return 1 << (9 + FIELD_EX32(s->capareg, SDHC_CAPAB, MAXBLOCKLENGTH));
  }
  
- static void sdhci_initfn(SDHCIState *s)
-@@ -1299,8 +1312,21 @@ const VMStateDescription sdhci_vmstate = {
-  * specific host controller implementation */
+ static void sdhci_init_readonly_registers(SDHCIState *s, Error **errp)
+@@ -1313,6 +1298,9 @@ const VMStateDescription sdhci_vmstate = {
  static Property sdhci_properties[] = {
      DEFINE_PROP_UINT8("sd-spec-version", SDHCIState, spec_version, 1),
--    DEFINE_PROP_UINT64("capareg", SDHCIState, capareg,
--            SDHC_CAPAB_REG_DEFAULT),
-+
-+    /* DMA */
-+    DEFINE_PROP_BOOL("sdma", SDHCIState, cap.sdma, true),
-+    /* Suspend/resume support */
-+    DEFINE_PROP_BOOL("suspend", SDHCIState, cap.suspend, false),
-+    /* High speed support */
-+    DEFINE_PROP_BOOL("high-speed", SDHCIState, cap.high_speed, true),
-+    /* Voltage support 3.3/3.0/1.8V */
-+    DEFINE_PROP_BOOL("3v3", SDHCIState, cap.v33, true),
-+    DEFINE_PROP_BOOL("3v0", SDHCIState, cap.v30, false),
-+    DEFINE_PROP_BOOL("1v8", SDHCIState, cap.v18, false),
-+
-+    /* capareg: deprecated */
-+    DEFINE_PROP_UINT64("capareg", SDHCIState, capareg, UINT64_MAX),
-+
-     DEFINE_PROP_UINT64("maxcurr", SDHCIState, maxcurr, 0),
-     DEFINE_PROP_BOOL("pending-insert-quirk", SDHCIState, pending_insert_quirk,
-                      false),
+ 
++    /* Maximum host controller R/W buffers size
++     * Possible values: 512, 1024, 2048 bytes */
++    DEFINE_PROP_UINT16("max-block-length", SDHCIState, cap.max_blk_len, 512),
+     /* DMA */
+     DEFINE_PROP_BOOL("sdma", SDHCIState, cap.sdma, true),
+     /* Suspend/resume support */
 -- 
 2.15.1
