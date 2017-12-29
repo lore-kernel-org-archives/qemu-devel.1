@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40100)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54094)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1eV0sF-0007JO-4m
-	for qemu-devel@nongnu.org; Fri, 29 Dec 2017 15:03:24 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1eV1hN-0006Rx-PE
+	for qemu-devel@nongnu.org; Fri, 29 Dec 2017 15:56:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1eV0sB-0005RU-Rd
-	for qemu-devel@nongnu.org; Fri, 29 Dec 2017 15:03:23 -0500
-Resent-Message-Id: <E1eV0sB-0005RU-Rd@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21306)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1eV0sB-0005Qc-Iv
-	for qemu-devel@nongnu.org; Fri, 29 Dec 2017 15:03:19 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1eV1hK-0002V5-C5
+	for qemu-devel@nongnu.org; Fri, 29 Dec 2017 15:56:13 -0500
+Received: from mail-pg0-x241.google.com ([2607:f8b0:400e:c05::241]:46085)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1eV1hK-0002TF-5O
+	for qemu-devel@nongnu.org; Fri, 29 Dec 2017 15:56:10 -0500
+Received: by mail-pg0-x241.google.com with SMTP id r2so5940818pgq.13
+	for <qemu-devel@nongnu.org>; Fri, 29 Dec 2017 12:56:09 -0800 (PST)
+From: Richard Henderson <richard.henderson@linaro.org>
+Date: Fri, 29 Dec 2017 12:56:05 -0800
+Message-Id: <20171229205605.21108-1-richard.henderson@linaro.org>
 In-Reply-To: <20171229193113.11753-1-richard.henderson@linaro.org>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <151457776887.138.5270336836398282456@5adcb62bf0d6>
+References: <20171229193113.11753-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Fri, 29 Dec 2017 12:02:49 -0800 (PST)
-Subject: Re: [Qemu-devel] [PULL 0/8] tcg queued patches
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PULL v2 0/8] tcg queued patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,63 +29,93 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: richard.henderson@linaro.org
-Cc: famz@redhat.com, qemu-devel@nongnu.org, peter.maydell@linaro.org
+To: qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
-c3NhZ2UtaWQ6IDIwMTcxMjI5MTkzMTEzLjExNzUzLTEtcmljaGFyZC5oZW5kZXJzb25AbGluYXJv
-Lm9yZwpTdWJqZWN0OiBbUWVtdS1kZXZlbF0gW1BVTEwgMC84XSB0Y2cgcXVldWVkIHBhdGNoZXMK
-Cj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKCkJBU0U9YmFzZQpuPTEKdG90
-YWw9JChnaXQgbG9nIC0tb25lbGluZSAkQkFTRS4uIHwgd2MgLWwpCmZhaWxlZD0wCgpnaXQgY29u
-ZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJl
-bmFtZXMgVHJ1ZQoKY29tbWl0cz0iJChnaXQgbG9nIC0tZm9ybWF0PSVIIC0tcmV2ZXJzZSAkQkFT
-RS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7IGRvCiAgICBlY2hvICJDaGVja2luZyBQQVRDSCAkbi8k
-dG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVzICRjKS4uLiIKICAgIGlmICEgZ2l0IHNo
-b3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNr
-IC07IHRoZW4KICAgICAgICBmYWlsZWQ9MQogICAgICAgIGVjaG8KICAgIGZpCiAgICBuPSQoKG4r
-MSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcg
-M2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApTd2l0Y2hlZCB0byBhIG5l
-dyBicmFuY2ggJ3Rlc3QnCjBlZWUxYzE5M2IgdGNnOiBhZGQgY3NfYmFzZSBhbmQgZmxhZ3MgdG8g
-LWQgZXhlYyBvdXRwdXQKMGFlODI1YTIxMSB0Y2c6IEFsbG93IDYgYXJndW1lbnRzIHRvIFRDRyBo
-ZWxwZXJzCmIyMWJlM2IxNTcgdGNnOiBBZGQgdGNnX3NpZ25lZF9jb25kCmM0ZGZlN2RjZWMgdGNn
-OiBHZW5lcmFsaXplIFRDR09wIHBhcmFtZXRlcnMKOGE4ODliNmI0NSB0Y2c6IER5bmFtaWNhbGx5
-IGFsbG9jYXRlIFRDR09wcwo4OGI4OWQzZjE3IHRjZzogUmVtb3ZlIFRDR1ZfVU5VU0VEKiBhbmQg
-VENHVl9JU19VTlVTRUQqCjZiZjQ5YTY1MDMgdGFyZ2V0L21veGllOiBGaXggdGxiX2ZpbGwKMzk4
-NDMyYThhOCB0YXJnZXQvKmhlbHBlcjogZG9uJ3QgY2hlY2sgcmV0YWRkciBiZWZvcmUgY2FsbGlu
-ZyBjcHVfcmVzdG9yZV9zdGF0ZQoKPT09IE9VVFBVVCBCRUdJTiA9PT0KQ2hlY2tpbmcgUEFUQ0gg
-MS84OiB0YXJnZXQvKmhlbHBlcjogZG9uJ3QgY2hlY2sgcmV0YWRkciBiZWZvcmUgY2FsbGluZyBj
-cHVfcmVzdG9yZV9zdGF0ZS4uLgpDaGVja2luZyBQQVRDSCAyLzg6IHRhcmdldC9tb3hpZTogRml4
-IHRsYl9maWxsLi4uCkNoZWNraW5nIFBBVENIIDMvODogdGNnOiBSZW1vdmUgVENHVl9VTlVTRUQq
-IGFuZCBUQ0dWX0lTX1VOVVNFRCouLi4KQ2hlY2tpbmcgUEFUQ0ggNC84OiB0Y2c6IER5bmFtaWNh
-bGx5IGFsbG9jYXRlIFRDR09wcy4uLgpFUlJPUjogbGluZSBvdmVyIDkwIGNoYXJhY3RlcnMKIzY0
-OiBGSUxFOiBpbmNsdWRlL3FlbXUvcXVldWUuaDo0MzA6CisgICAgICAgICAgICAgKHZhcikgJiYg
-KChwcmV2X3ZhcikgPSAoKigoKHN0cnVjdCBoZWFkbmFtZSAqKSgodmFyKS0+ZmllbGQudHFlX3By
-ZXYpKS0+dHFoX2xhc3QpKSwgMSk7IFwKCkVSUk9SOiBzcGFjZXMgcHJvaGliaXRlZCBhcm91bmQg
-dGhhdCAnOicgKGN0eDpXeFcpCiM1Mzg6IEZJTEU6IHRjZy90Y2cuaDo1NzU6CisgICAgdW5zaWdu
-ZWQgbGlmZSAgIDogMTY7ICAgICAgIC8qIDMyICovCiAgICAgICAgICAgICAgICAgICAgIF4KCnRv
-dGFsOiAyIGVycm9ycywgMCB3YXJuaW5ncywgNTIwIGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2gg
-aGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9y
-cwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUK
-Q0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCkNoZWNraW5nIFBBVENIIDUvODogdGNnOiBHZW5l
-cmFsaXplIFRDR09wIHBhcmFtZXRlcnMuLi4KRVJST1I6IHNwYWNlcyBwcm9oaWJpdGVkIGFyb3Vu
-ZCB0aGF0ICc6JyAoY3R4Old4VykKIzExNDogRklMRTogdGNnL3RjZy5oOjU3MDoKKyAgICB1bnNp
-Z25lZCBwYXJhbTEgOiA0OyAgICAgICAgLyogMTIgKi8KICAgICAgICAgICAgICAgICAgICAgXgoK
-RVJST1I6IHNwYWNlcyBwcm9oaWJpdGVkIGFyb3VuZCB0aGF0ICc6JyAoY3R4Old4VykKIzExNTog
-RklMRTogdGNnL3RjZy5oOjU3MToKKyAgICB1bnNpZ25lZCBwYXJhbTIgOiA0OyAgICAgICAgLyog
-MTYgKi8KICAgICAgICAgICAgICAgICAgICAgXgoKRVJST1I6IE1hY3JvcyB3aXRoIGNvbXBsZXgg
-dmFsdWVzIHNob3VsZCBiZSBlbmNsb3NlZCBpbiBwYXJlbnRoZXNpcwojMTIzOiBGSUxFOiB0Y2cv
-dGNnLmg6NTgzOgorI2RlZmluZSBUQ0dPUF9DQUxMSShYKSAgICAoWCktPnBhcmFtMQoKRVJST1I6
-IE1hY3JvcyB3aXRoIGNvbXBsZXggdmFsdWVzIHNob3VsZCBiZSBlbmNsb3NlZCBpbiBwYXJlbnRo
-ZXNpcwojMTI0OiBGSUxFOiB0Y2cvdGNnLmg6NTg0OgorI2RlZmluZSBUQ0dPUF9DQUxMTyhYKSAg
-ICAoWCktPnBhcmFtMgoKdG90YWw6IDQgZXJyb3JzLCAwIHdhcm5pbmdzLCA5MiBsaW5lcyBjaGVj
-a2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFu
-eSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUg
-bWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgpDaGVja2luZyBQQVRD
-SCA2Lzg6IHRjZzogQWRkIHRjZ19zaWduZWRfY29uZC4uLgpDaGVja2luZyBQQVRDSCA3Lzg6IHRj
-ZzogQWxsb3cgNiBhcmd1bWVudHMgdG8gVENHIGhlbHBlcnMuLi4KQ2hlY2tpbmcgUEFUQ0ggOC84
-OiB0Y2c6IGFkZCBjc19iYXNlIGFuZCBmbGFncyB0byAtZCBleGVjIG91dHB1dC4uLgo9PT0gT1VU
-UFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKLS0tCkVtYWls
-IGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRjaGV3Lm9yZy9d
-LgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAZnJlZWxpc3RzLm9y
-Zw==
+Ho hum.  While rebasing I accidentally used a constrained build
+tree that didn't build sh4-linux-user, and an extra reference to
+the removed TCGV_IS_UNUSED had crept in in the meantime.
+
+I have pushed a revised tag with the same name.
+
+
+r~
+
+
+The following changes since commit 281f327487c9c9b1599f93c589a408bbf4a651b8:
+
+  Merge remote-tracking branch 'remotes/vivier/tags/m68k-for-2.12-pull-request' into staging (2017-12-22 00:11:36 +0000)
+
+are available in the Git repository at:
+
+  git://github.com/rth7680/qemu.git tags/pull-tcg-20171229
+
+for you to fetch changes up to 4fad446bc955fcaa08a21388cf82268824bea10e:
+
+  tcg: add cs_base and flags to -d exec output (2017-12-29 12:43:40 -0800)
+
+----------------------------------------------------------------
+Queued TCG patches
+
+----------------------------------------------------------------
+Alex Bennée (1):
+      target/*helper: don't check retaddr before calling cpu_restore_state
+
+Paolo Bonzini (1):
+      tcg: add cs_base and flags to -d exec output
+
+Richard Henderson (6):
+      target/moxie: Fix tlb_fill
+      tcg: Remove TCGV_UNUSED* and TCGV_IS_UNUSED*
+      tcg: Dynamically allocate TCGOps
+      tcg: Generalize TCGOp parameters
+      tcg: Add tcg_signed_cond
+      tcg: Allow 6 arguments to TCG helpers
+
+ include/exec/gen-icount.h                  |   9 +-
+ include/exec/helper-gen.h                  |  11 +++
+ include/exec/helper-head.h                 |   2 +
+ include/exec/helper-proto.h                |   5 +
+ include/exec/helper-tcg.h                  |   7 ++
+ include/qemu/queue.h                       |   5 +
+ target/arm/translate.h                     |  10 +-
+ tcg/tcg-op.h                               |   4 -
+ tcg/tcg.h                                  |  60 +++++-------
+ accel/tcg/cpu-exec.c                       |   6 +-
+ accel/tcg/tcg-runtime.c                    |   5 +-
+ target/alpha/mem_helper.c                  |  13 +--
+ target/alpha/translate.c                   |  22 ++---
+ target/arm/op_helper.c                     |  18 ++--
+ target/arm/translate-a64.c                 |  37 ++++---
+ target/arm/translate.c                     |  31 +++---
+ target/cris/translate.c                    |   4 +-
+ target/hppa/translate.c                    |  63 ++++++------
+ target/i386/svm_helper.c                   |   4 +-
+ target/i386/translate.c                    |  13 ++-
+ target/lm32/op_helper.c                    |   7 +-
+ target/lm32/translate.c                    |   2 -
+ target/m68k/op_helper.c                    |   7 +-
+ target/m68k/translate.c                    |  14 +--
+ target/microblaze/op_helper.c              |   7 +-
+ target/microblaze/translate.c              |   4 -
+ target/mips/translate.c                    |   2 +-
+ target/moxie/helper.c                      |   5 +-
+ target/nios2/mmu.c                         |   7 +-
+ target/nios2/translate.c                   |   6 +-
+ target/openrisc/mmu_helper.c               |   6 +-
+ target/ppc/translate.c                     |   2 +-
+ target/s390x/translate.c                   |  42 ++++----
+ target/sh4/translate.c                     |   4 +-
+ target/sparc/translate.c                   |   2 +-
+ target/tilegx/translate.c                  |  10 +-
+ target/tricore/op_helper.c                 |  13 +--
+ target/unicore32/op_helper.c               |   7 +-
+ target/unicore32/translate.c               |   4 +-
+ tcg/optimize.c                             |  20 +---
+ tcg/tcg-op.c                               |  24 -----
+ tcg/tcg.c                                  | 149 +++++++++++------------------
+ tcg/tci.c                                  |  12 ++-
+ tcg/tci/tcg-target.inc.c                   |   6 +-
+ scripts/coccinelle/cpu_restore_state.cocci |  19 ++++
+ 45 files changed, 313 insertions(+), 397 deletions(-)
+ create mode 100644 scripts/coccinelle/cpu_restore_state.cocci
