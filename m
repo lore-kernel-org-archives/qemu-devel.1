@@ -1,26 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59933)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49057)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1eVERd-0002h8-Ag
-	for qemu-devel@nongnu.org; Sat, 30 Dec 2017 05:32:50 -0500
+	(envelope-from <programmingkidx@gmail.com>) id 1eVK1j-0006Zz-7A
+	for qemu-devel@nongnu.org; Sat, 30 Dec 2017 11:30:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1eVERY-0006M8-Pw
-	for qemu-devel@nongnu.org; Sat, 30 Dec 2017 05:32:49 -0500
-Resent-Message-Id: <E1eVERY-0006M8-Pw@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21419)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1eVERY-0006K6-I2
-	for qemu-devel@nongnu.org; Sat, 30 Dec 2017 05:32:44 -0500
-In-Reply-To: <20171229183101.9372-1-richard.henderson@linaro.org>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <151457311672.138.10990872638117953444@5adcb62bf0d6>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Fri, 29 Dec 2017 10:45:18 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH v3] linux-user: Use *at functions instead
- of caching interp_prefix contents
+	(envelope-from <programmingkidx@gmail.com>) id 1eVK1e-0007Jy-Rr
+	for qemu-devel@nongnu.org; Sat, 30 Dec 2017 11:30:26 -0500
+Received: from mail-io0-x244.google.com ([2607:f8b0:4001:c06::244]:39164)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <programmingkidx@gmail.com>)
+	id 1eVK1e-0007J0-NF
+	for qemu-devel@nongnu.org; Sat, 30 Dec 2017 11:30:22 -0500
+Received: by mail-io0-x244.google.com with SMTP id g70so31162864ioj.6
+	for <qemu-devel@nongnu.org>; Sat, 30 Dec 2017 08:30:22 -0800 (PST)
+From: John Arbuckle <programmingkidx@gmail.com>
+Date: Sat, 30 Dec 2017 11:30:12 -0500
+Message-Id: <20171230163012.95032-1-programmingkidx@gmail.com>
+Subject: [Qemu-devel] [PATCH] cocoa.m: Fix scroll wheel support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,82 +24,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: richard.henderson@linaro.org
-Cc: famz@redhat.com, qemu-devel@nongnu.org, peter.maydell@linaro.org, rth@twiddle.net
+To: peter.maydell@linaro.org, qemu-devel@nongnu.org
+Cc: John Arbuckle <programmingkidx@gmail.com>
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
-c3NhZ2UtaWQ6IDIwMTcxMjI5MTgzMTAxLjkzNzItMS1yaWNoYXJkLmhlbmRlcnNvbkBsaW5hcm8u
-b3JnClN1YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0ggdjNdIGxpbnV4LXVzZXI6IFVzZSAqYXQg
-ZnVuY3Rpb25zIGluc3RlYWQgb2YgY2FjaGluZyBpbnRlcnBfcHJlZml4IGNvbnRlbnRzCgo9PT0g
-VEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCgpCQVNFPWJhc2UKbj0xCnRvdGFsPSQo
-Z2l0IGxvZyAtLW9uZWxpbmUgJEJBU0UuLiB8IHdjIC1sKQpmYWlsZWQ9MAoKZ2l0IGNvbmZpZyAt
-LWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVz
-IFRydWUKCmNvbW1pdHM9IiQoZ2l0IGxvZyAtLWZvcm1hdD0lSCAtLXJldmVyc2UgJEJBU0UuLiki
-CmZvciBjIGluICRjb21taXRzOyBkbwogICAgZWNobyAiQ2hlY2tpbmcgUEFUQ0ggJG4vJHRvdGFs
-OiAkKGdpdCBsb2cgLW4gMSAtLWZvcm1hdD0lcyAkYykuLi4iCiAgICBpZiAhIGdpdCBzaG93ICRj
-IC0tZm9ybWF0PWVtYWlsIHwgLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayAtOyB0
-aGVuCiAgICAgICAgZmFpbGVkPTEKICAgICAgICBlY2hvCiAgICBmaQogICAgbj0kKChuKzEpKQpk
-b25lCgpleGl0ICRmYWlsZWQKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVwZGF0aW5nIDNjOGNm
-NWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKU3dpdGNoZWQgdG8gYSBuZXcgYnJh
-bmNoICd0ZXN0JwoyMTQ3NjNhMDA3IGxpbnV4LXVzZXI6IFVzZSAqYXQgZnVuY3Rpb25zIGluc3Rl
-YWQgb2YgY2FjaGluZyBpbnRlcnBfcHJlZml4IGNvbnRlbnRzCgo9PT0gT1VUUFVUIEJFR0lOID09
-PQpDaGVja2luZyBQQVRDSCAxLzE6IGxpbnV4LXVzZXI6IFVzZSAqYXQgZnVuY3Rpb25zIGluc3Rl
-YWQgb2YgY2FjaGluZyBpbnRlcnBfcHJlZml4IGNvbnRlbnRzLi4uCkVSUk9SOiBkbyBub3QgdXNl
-IGFzc2lnbm1lbnQgaW4gaWYgY29uZGl0aW9uCiMyNTogRklMRTogbGludXgtdXNlci9lbGZsb2Fk
-LmM6MjIwNjoKKyAgICBpZiAoaW50ZXJwX2RpcmZkIDwgMAoKRVJST1I6IGRvIG5vdCB1c2UgYXNz
-aWdubWVudCBpbiBpZiBjb25kaXRpb24KIzc2OiBGSUxFOiBsaW51eC11c2VyL3N5c2NhbGwuYzo3
-MjMxOgorICAgIGlmIChpbnRlcnBfZGlyZmQgPCAwCgpFUlJPUjogZG8gbm90IHVzZSBhc3NpZ25t
-ZW50IGluIGlmIGNvbmRpdGlvbgojOTk6IEZJTEU6IGxpbnV4LXVzZXIvc3lzY2FsbC5jOjc2NTM6
-CisgICAgaWYgKGludGVycF9kaXJmZCA8IDAKCkVSUk9SOiBkbyBub3QgdXNlIGFzc2lnbm1lbnQg
-aW4gaWYgY29uZGl0aW9uCiMxMjI6IEZJTEU6IGxpbnV4LXVzZXIvc3lzY2FsbC5jOjgyNzc6Cisg
-ICAgICAgICAgICBpZiAoIShmbiA9IGxvY2tfdXNlcl9zdHJpbmcoYXJnMikpKSB7CgpFUlJPUjog
-ZG8gbm90IHVzZSBhc3NpZ25tZW50IGluIGlmIGNvbmRpdGlvbgojMTI3OiBGSUxFOiBsaW51eC11
-c2VyL3N5c2NhbGwuYzo4MjgwOgorICAgICAgICAgICAgaWYgKGludGVycF9kaXJmZCA8IDAKCkVS
-Uk9SOiBkbyBub3QgdXNlIGFzc2lnbm1lbnQgaW4gaWYgY29uZGl0aW9uCiMxNDM6IEZJTEU6IGxp
-bnV4LXVzZXIvc3lzY2FsbC5jOjgzMDE6CisgICAgICAgIGlmICghKGZuID0gbG9ja191c2VyX3N0
-cmluZyhhcmcxKSkpIHsKCkVSUk9SOiBkbyBub3QgdXNlIGFzc2lnbm1lbnQgaW4gaWYgY29uZGl0
-aW9uCiMxNDg6IEZJTEU6IGxpbnV4LXVzZXIvc3lzY2FsbC5jOjgzMDQ6CisgICAgICAgIGlmIChp
-bnRlcnBfZGlyZmQgPCAwCgpFUlJPUjogZG8gbm90IHVzZSBhc3NpZ25tZW50IGluIGlmIGNvbmRp
-dGlvbgojMTYxOiBGSUxFOiBsaW51eC11c2VyL3N5c2NhbGwuYzo4MzE2OgorICAgICAgICBpZiAo
-IShmbiA9IGxvY2tfdXNlcl9zdHJpbmcoYXJnMikpKSB7CgpFUlJPUjogZG8gbm90IHVzZSBhc3Np
-Z25tZW50IGluIGlmIGNvbmRpdGlvbgojMTY2OiBGSUxFOiBsaW51eC11c2VyL3N5c2NhbGwuYzo4
-MzE5OgorICAgICAgICBpZiAoaW50ZXJwX2RpcmZkIDwgMAoKRVJST1I6IGRvIG5vdCB1c2UgYXNz
-aWdubWVudCBpbiBpZiBjb25kaXRpb24KIzIwOTogRklMRTogbGludXgtdXNlci9zeXNjYWxsLmM6
-OTI0MDoKKyAgICAgICAgICAgICAgICBpZiAoaW50ZXJwX2RpcmZkIDwgMAoKRVJST1I6IGRvIG5v
-dCB1c2UgYXNzaWdubWVudCBpbiBpZiBjb25kaXRpb24KIzI0MTogRklMRTogbGludXgtdXNlci9z
-eXNjYWxsLmM6OTI2NzoKKyAgICAgICAgICAgICAgICBpZiAoaW50ZXJwX2RpcmZkIDwgMAoKRVJS
-T1I6IGRvIG5vdCB1c2UgYXNzaWdubWVudCBpbiBpZiBjb25kaXRpb24KIzI3ODogRklMRTogbGlu
-dXgtdXNlci9zeXNjYWxsLmM6OTcwNDoKKyAgICAgICAgaWYgKCEoZm4gPSBsb2NrX3VzZXJfc3Ry
-aW5nKGFyZzEpKSkgewoKRVJST1I6IGRvIG5vdCB1c2UgYXNzaWdubWVudCBpbiBpZiBjb25kaXRp
-b24KIzI4MzogRklMRTogbGludXgtdXNlci9zeXNjYWxsLmM6OTcwNzoKKyAgICAgICAgaWYgKGlu
-dGVycF9kaXJmZCA8IDAKCkVSUk9SOiBkbyBub3QgdXNlIGFzc2lnbm1lbnQgaW4gaWYgY29uZGl0
-aW9uCiMyOTY6IEZJTEU6IGxpbnV4LXVzZXIvc3lzY2FsbC5jOjk3MTk6CisgICAgICAgIGlmICgh
-KGZuID0gbG9ja191c2VyX3N0cmluZyhhcmcxKSkpIHsKCkVSUk9SOiBkbyBub3QgdXNlIGFzc2ln
-bm1lbnQgaW4gaWYgY29uZGl0aW9uCiMzMDE6IEZJTEU6IGxpbnV4LXVzZXIvc3lzY2FsbC5jOjk3
-MjI6CisgICAgICAgIGlmIChpbnRlcnBfZGlyZmQgPCAwCgpFUlJPUjogZG8gbm90IHVzZSBhc3Np
-Z25tZW50IGluIGlmIGNvbmRpdGlvbgojMzE3OiBGSUxFOiBsaW51eC11c2VyL3N5c2NhbGwuYzox
-MDgwOToKKyAgICAgICAgaWYgKCEoZm4gPSBsb2NrX3VzZXJfc3RyaW5nKGFyZzEpKSkgewoKRVJS
-T1I6IGRvIG5vdCB1c2UgYXNzaWdubWVudCBpbiBpZiBjb25kaXRpb24KIzMyMjogRklMRTogbGlu
-dXgtdXNlci9zeXNjYWxsLmM6MTA4MTI6CisgICAgICAgIGlmIChpbnRlcnBfZGlyZmQgPCAwCgpF
-UlJPUjogZG8gbm90IHVzZSBhc3NpZ25tZW50IGluIGlmIGNvbmRpdGlvbgojMzM3OiBGSUxFOiBs
-aW51eC11c2VyL3N5c2NhbGwuYzoxMDgyNjoKKyAgICAgICAgaWYgKCEoZm4gPSBsb2NrX3VzZXJf
-c3RyaW5nKGFyZzEpKSkgewoKRVJST1I6IGRvIG5vdCB1c2UgYXNzaWdubWVudCBpbiBpZiBjb25k
-aXRpb24KIzM0MjogRklMRTogbGludXgtdXNlci9zeXNjYWxsLmM6MTA4Mjk6CisgICAgICAgIGlm
-IChpbnRlcnBfZGlyZmQgPCAwCgpFUlJPUjogZG8gbm90IHVzZSBhc3NpZ25tZW50IGluIGlmIGNv
-bmRpdGlvbgojMzU4OiBGSUxFOiBsaW51eC11c2VyL3N5c2NhbGwuYzoxMDg1NToKKyAgICAgICAg
-aWYgKCEoZm4gPSBsb2NrX3VzZXJfc3RyaW5nKGFyZzIpKSkgewoKRVJST1I6IGRvIG5vdCB1c2Ug
-YXNzaWdubWVudCBpbiBpZiBjb25kaXRpb24KIzM2MjogRklMRTogbGludXgtdXNlci9zeXNjYWxs
-LmM6MTA4NTg6CisgICAgICAgIGlmIChpbnRlcnBfZGlyZmQgPCAwCgpFUlJPUjogZG8gbm90IHVz
-ZSBhc3NpZ25tZW50IGluIGlmIGNvbmRpdGlvbgojMzgwOiBGSUxFOiBsaW51eC11c2VyL3N5c2Nh
-bGwuYzoxMTg2MjoKKyAgICAgICAgICAgICAgICBpZiAoIShmbiA9IGxvY2tfdXNlcl9zdHJpbmco
-YXJnMikpKSB7CgpFUlJPUjogZG8gbm90IHVzZSBhc3NpZ25tZW50IGluIGlmIGNvbmRpdGlvbgoj
-Mzg1OiBGSUxFOiBsaW51eC11c2VyL3N5c2NhbGwuYzoxMTg2NToKKyAgICAgICAgICAgICAgICBp
-ZiAoaW50ZXJwX2RpcmZkIDwgMAoKdG90YWw6IDIzIGVycm9ycywgMCB3YXJuaW5ncywgMzUyIGxp
-bmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3
-LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVt
-IHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCj09PSBP
-VVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgotLS0KRW1h
-aWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3Jn
-L10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEBmcmVlbGlzdHMu
-b3Jn
+When using a mouse's scroll wheel in a guest with the cocoa front-end, the mouse pointer moves up and down instead of scrolling the window. This patch fixes this problem.
+
+Signed-off-by: John Arbuckle <programmingkidx@gmail.com>
+---
+ ui/cocoa.m | 17 ++++++++++++-----
+ 1 file changed, 12 insertions(+), 5 deletions(-)
+
+diff --git a/ui/cocoa.m b/ui/cocoa.m
+index 330ccebf90..d2e5f80b74 100644
+--- a/ui/cocoa.m
++++ b/ui/cocoa.m
+@@ -786,11 +786,18 @@ - (void) handleEvent:(NSEvent *)event
+             mouse_event = true;
+             break;
+         case NSEventTypeScrollWheel:
+-            if (isMouseGrabbed) {
+-                buttons |= ([event deltaY] < 0) ?
+-                    MOUSE_EVENT_WHEELUP : MOUSE_EVENT_WHEELDN;
+-            }
+-            mouse_event = true;
++            /* Determine if this is a scroll up or scroll down event */
++            buttons = ([event scrollingDeltaY] > 0) ?
++                INPUT_BUTTON_WHEEL_UP : INPUT_BUTTON_WHEEL_DOWN;
++            qemu_input_queue_btn(dcl->con, buttons, true);
++            qemu_input_event_sync();
++            qemu_input_queue_btn(dcl->con, buttons, false);
++            qemu_input_event_sync();
++            /*
++             * Since deltaY also reports scroll wheel events we prevent mouse
++             * movement code from executing.
++             */
++            mouse_event = false;
+             break;
+         default:
+             [NSApp sendEvent:event];
+-- 
+2.14.3 (Apple Git-98)
