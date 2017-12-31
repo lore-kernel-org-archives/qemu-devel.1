@@ -1,35 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35886)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48755)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <fziglio@redhat.com>) id 1eVagh-0001YT-2M
-	for qemu-devel@nongnu.org; Sun, 31 Dec 2017 05:17:52 -0500
+	(envelope-from <mst@redhat.com>) id 1eVfxN-000409-OS
+	for qemu-devel@nongnu.org; Sun, 31 Dec 2017 10:55:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <fziglio@redhat.com>) id 1eVagd-0008VP-SH
-	for qemu-devel@nongnu.org; Sun, 31 Dec 2017 05:17:51 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:33032)
+	(envelope-from <mst@redhat.com>) id 1eVfxG-0000Ei-HP
+	for qemu-devel@nongnu.org; Sun, 31 Dec 2017 10:55:23 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:54532)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <fziglio@redhat.com>) id 1eVagd-0008NA-JF
-	for qemu-devel@nongnu.org; Sun, 31 Dec 2017 05:17:47 -0500
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 82ED17AE8B
-	for <qemu-devel@nongnu.org>; Sun, 31 Dec 2017 10:17:45 +0000 (UTC)
-Received: from colo-mx.corp.redhat.com
-	(colo-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.20])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 78F7760C8A
-	for <qemu-devel@nongnu.org>; Sun, 31 Dec 2017 10:17:45 +0000 (UTC)
-Date: Sun, 31 Dec 2017 05:17:43 -0500 (EST)
-From: Frediano Ziglio <fziglio@redhat.com>
-Message-ID: <1014182222.2350600.1514715463787.JavaMail.zimbra@redhat.com>
-In-Reply-To: <911826618.967890.1513682427088.JavaMail.zimbra@redhat.com>
-References: <20171122135625.16625-1-fziglio@redhat.com>
-	<2083994092.34289761.1512637514012.JavaMail.zimbra@redhat.com>
-	<911826618.967890.1513682427088.JavaMail.zimbra@redhat.com>
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1eVfxG-0000Dp-8D
+	for qemu-devel@nongnu.org; Sun, 31 Dec 2017 10:55:18 -0500
+Date: Sun, 31 Dec 2017 17:55:14 +0200
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20171231175434-mutt-send-email-mst@kernel.org>
+References: <20171225010611.32621-1-haozhong.zhang@intel.com>
+	<20171225010611.32621-2-haozhong.zhang@intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 1/4] spice: remove QXLWorker interface field
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20171225010611.32621-2-haozhong.zhang@intel.com>
+Subject: Re: [Qemu-devel] [PATCH 1/2] util/pmem: add function to make writes
+ to pmem persistent
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,77 +28,207 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: kraxel@redhat.com
-Cc: qemu-devel@nongnu.org
+To: Haozhong Zhang <haozhong.zhang@intel.com>
+Cc: qemu-devel@nongnu.org, Igor Mammedov <imammedo@redhat.com>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, Stefan Hajnoczi <stefanha@gmail.com>, Dan Williams <dan.j.williams@intel.com>
 
-ping
+On Mon, Dec 25, 2017 at 09:06:10AM +0800, Haozhong Zhang wrote:
+> The new function pmem_persistent() flushes the previous cached writes
+> on the specified memory buffer, which ensures the write persistence if
+> the buffer is in persistent memory.
+> 
+> Signed-off-by: Haozhong Zhang <haozhong.zhang@intel.com>
+> ---
+>  include/qemu/pmem.h |  25 ++++++++++
+>  util/Makefile.objs  |   1 +
+>  util/pmem.c         | 132 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+>  3 files changed, 158 insertions(+)
+>  create mode 100644 include/qemu/pmem.h
+>  create mode 100644 util/pmem.c
+> 
+> diff --git a/include/qemu/pmem.h b/include/qemu/pmem.h
+> new file mode 100644
+> index 0000000000..6593ae1d5c
+> --- /dev/null
+> +++ b/include/qemu/pmem.h
+> @@ -0,0 +1,25 @@
+> +/*
+> + * Helper functions to operate on persistent memory.
+> + *
+> + * Copyright (c) 2017 Intel Corporation.
+> + *
+> + * Author: Haozhong Zhang <haozhong.zhang@intel.com>
+> + *
+> + * This work is licensed under the terms of the GNU GPL, version 2 or later.
+> + * See the COPYING file in the top-level directory.
+> + */
+> +
+> +#ifndef QEMU_PMEM_H
+> +#define QEMU_PMEM_H
+> +
+> +/**
+> + * Flush previous cached writes to the specified memory buffer. If the
+> + * buffer is in persistent memory, this function will ensure the write
+> + * persistence.
+> + *
+> + * @p: the pointer to the memory buffer
+> + * @len: the length in bytes of the memory buffer
+> + */
+> +void pmem_persistent(void *p, unsigned long len);
+> +
+> +#endif /* QEMU_PMEM_H */
+> diff --git a/util/Makefile.objs b/util/Makefile.objs
+> index 2973b0a323..2614a84a9e 100644
+> --- a/util/Makefile.objs
+> +++ b/util/Makefile.objs
+> @@ -41,6 +41,7 @@ util-obj-y += timed-average.o
+>  util-obj-y += base64.o
+>  util-obj-y += log.o
+>  util-obj-y += pagesize.o
+> +util-obj-y += pmem.o
+>  util-obj-y += qdist.o
+>  util-obj-y += qht.o
+>  util-obj-y += range.o
+> diff --git a/util/pmem.c b/util/pmem.c
+> new file mode 100644
+> index 0000000000..44be1dde58
+> --- /dev/null
+> +++ b/util/pmem.c
+> @@ -0,0 +1,132 @@
+> +/*
+> + * Helper functions to operate on persistent memory.
+> + *
+> + * Copyright (c) 2017 Intel Corporation.
+> + *
+> + * Author: Haozhong Zhang <haozhong.zhang@intel.com>
+> + *
+> + * This work is licensed under the terms of the GNU GPL, version 2 or later.
+> + * See the COPYING file in the top-level directory.
+> + */
+> +
+> +#include "qemu/osdep.h"
+> +#include "qemu-common.h"
+> +#include "qemu/pmem.h"
+> +
+> +static size_t cache_line_size;
+> +
+> +typedef void (*cache_flush_func_t)(void *p);
+> +typedef void (*store_fence_func_t)(void);
+> +
+> +static cache_flush_func_t cache_flush_func;
+> +static store_fence_func_t store_fence_func;
+> +
+> +#if defined(__x86_64__) || defined(__i386__)
+> +
+> +#define CPUID_1_0_EBX_CLSIZE_MASK   0x0000ff00
+> +#define CPUID_1_0_EBX_CLSIZE_SHIFT  8
+> +#define CPUID_1_0_EDX_CLFLUSH       (1U << 19)
+> +#define CPUID_7_0_EBX_CLFLUSHOPT    (1U << 23)
+> +#define CPUID_7_0_EBX_CLWB          (1U << 24)
+> +
+> +static inline void cpuid(uint32_t function, uint32_t count,
+> +                         uint32_t *eax, uint32_t *ebx,
+> +                         uint32_t *ecx, uint32_t *edx)
+> +{
+> +    uint32_t vec[4];
+> +
+> +#ifdef __x86_64__
+> +    asm volatile("cpuid"
+> +                 : "=a"(vec[0]), "=b"(vec[1]),
+> +                   "=c"(vec[2]), "=d"(vec[3])
+> +                 : "0"(function), "c"(count) : "cc");
+> +#else
+> +    asm volatile("pusha\n\t"
+> +                 "cpuid\n\t"
+> +                 "mov %%eax, 0(%2)\n\t"
+> +                 "mov %%ebx, 4(%2)\n\t"
+> +                 "mov %%ecx, 8(%2)\n\t"
+> +                 "mov %%edx, 12(%2)\n\t"
+> +                 "popa"
+> +                 : : "a"(function), "c"(count), "S"(vec)
+> +                 : "memory", "cc");
+> +#endif
+> +
+> +    if (eax) {
+> +        *eax = vec[0];
+> +    }
+> +    if (ebx) {
+> +        *ebx = vec[1];
+> +    }
+> +    if (ecx) {
+> +        *ecx = vec[2];
+> +    }
+> +    if (edx) {
+> +        *edx = vec[3];
+> +    }
+> +}
+> +
+> +static void clflush(void *p)
+> +{
+> +    asm volatile("clflush %0" : "+m" (*(volatile char *)p));
+> +}
+> +
+> +static void clflushopt(void *p)
+> +{
+> +    asm volatile(".byte 0x66; clflush %0" : "+m" (*(volatile char *)p));
+> +}
+> +
+> +static void clwb(void *p)
+> +{
+> +    asm volatile(".byte 0x66; xsaveopt %0" : "+m" (*(volatile char *)p));
+> +}
+> +
+> +static void sfence(void)
+> +{
+> +    asm volatile("sfence" : : : "memory");
+> +}
+> +
+> +static void __attribute__((constructor)) init_funcs(void)
+> +{
+> +    uint32_t ebx, edx;
+> +
+> +    cpuid(0x1, 0x0, NULL, &ebx, NULL, &edx);
+> +
+> +    cache_line_size = ((ebx & CPUID_1_0_EBX_CLSIZE_MASK) >>
+> +                       CPUID_1_0_EBX_CLSIZE_SHIFT) * 8;
+> +    assert(cache_line_size && !(cache_line_size & (cache_line_size - 1)));
+> +
+> +    cpuid(0x7, 0x0, NULL, &ebx, NULL, NULL);
+> +    if (ebx & CPUID_7_0_EBX_CLWB) {
+> +        cache_flush_func = clwb;
+> +    } else if (ebx & CPUID_7_0_EBX_CLFLUSHOPT) {
+> +        cache_flush_func = clflushopt;
+> +    } else {
+> +        if (edx & CPUID_1_0_EDX_CLFLUSH) {
+> +            cache_flush_func = clflush;
+> +        }
+> +    }
+> +
+> +    store_fence_func = sfence;
+> +}
+> +
+> +#endif /* __x86_64__ || __i386__ */
+> +
+> +void pmem_persistent(void *p, unsigned long len)
+> +{
+> +    uintptr_t s, e;
+> +
+> +    if (!cache_flush_func || !store_fence_func) {
+> +        return;
+> +    }
+> +
+> +    s = (uintptr_t)p & ~(cache_line_size - 1);
+> +    e = (uintptr_t)p + len;
+> +
+> +    while (s < e) {
+> +        cache_flush_func((void *)s);
+> +        s +=  cache_line_size;
+> +    }
+> +
+> +    store_fence_func();
+> +}
 
-> 
-> ping
-> 
-> > 
-> > ping the series
-> > 
-> > > 
-> > > This fields points to an old interface that is no more
-> > > used in the current code.
-> > > 
-> > > Signed-off-by: Frediano Ziglio <fziglio@redhat.com>
-> > > ---
-> > >  hw/display/qxl.c           | 1 -
-> > >  include/ui/spice-display.h | 1 -
-> > >  ui/spice-display.c         | 2 --
-> > >  3 files changed, 4 deletions(-)
-> > > 
-> > > diff --git a/hw/display/qxl.c b/hw/display/qxl.c
-> > > index 99365c3e8f..b9fa067f6e 100644
-> > > --- a/hw/display/qxl.c
-> > > +++ b/hw/display/qxl.c
-> > > @@ -518,7 +518,6 @@ static void interface_attach_worker(QXLInstance *sin,
-> > > QXLWorker *qxl_worker)
-> > >      PCIQXLDevice *qxl = container_of(sin, PCIQXLDevice, ssd.qxl);
-> > >  
-> > >      trace_qxl_interface_attach_worker(qxl->id);
-> > > -    qxl->ssd.worker = qxl_worker;
-> > >  }
-> > >  
-> > >  static void interface_set_compression_level(QXLInstance *sin, int level)
-> > > diff --git a/include/ui/spice-display.h b/include/ui/spice-display.h
-> > > index aaf2019889..6b5c73b21c 100644
-> > > --- a/include/ui/spice-display.h
-> > > +++ b/include/ui/spice-display.h
-> > > @@ -86,7 +86,6 @@ struct SimpleSpiceDisplay {
-> > >      DisplayChangeListener dcl;
-> > >      void *buf;
-> > >      int bufsize;
-> > > -    QXLWorker *worker;
-> > >      QXLInstance qxl;
-> > >      uint32_t unique;
-> > >      pixman_image_t *surface;
-> > > diff --git a/ui/spice-display.c b/ui/spice-display.c
-> > > index ad1ceafb3f..85a72fe76a 100644
-> > > --- a/ui/spice-display.c
-> > > +++ b/ui/spice-display.c
-> > > @@ -519,7 +519,6 @@ static void interface_attach_worker(QXLInstance *sin,
-> > > QXLWorker *qxl_worker)
-> > >      SimpleSpiceDisplay *ssd = container_of(sin, SimpleSpiceDisplay,
-> > >      qxl);
-> > >  
-> > >      dprint(1, "%s/%d:\n", __func__, ssd->qxl.id);
-> > > -    ssd->worker = qxl_worker;
-> > >  }
-> > >  
-> > >  static void interface_set_compression_level(QXLInstance *sin, int level)
-> > > @@ -1028,7 +1027,6 @@ static void qemu_spice_display_init_one(QemuConsole
-> > > *con)
-> > >  
-> > >      ssd->qxl.base.sif = &dpy_interface.base;
-> > >      qemu_spice_add_display_interface(&ssd->qxl, con);
-> > > -    assert(ssd->worker);
-> > >      qemu_spice_create_host_memslot(ssd);
-> > >  
-> > >      register_displaychangelistener(&ssd->dcl);
-> > 
-> > 
-> 
-> 
+
+Shouldn't something be done for non x86 platforms?
+
+> -- 
+> 2.14.1
