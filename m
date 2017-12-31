@@ -1,34 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48936)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35886)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eVVFh-0001hG-J4
-	for qemu-devel@nongnu.org; Sat, 30 Dec 2017 23:29:38 -0500
+	(envelope-from <fziglio@redhat.com>) id 1eVagh-0001YT-2M
+	for qemu-devel@nongnu.org; Sun, 31 Dec 2017 05:17:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eVVFe-0001gA-V8
-	for qemu-devel@nongnu.org; Sat, 30 Dec 2017 23:29:37 -0500
-Received: from indium.canonical.com ([91.189.90.7]:47048)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1eVVFe-0001b4-PQ
-	for qemu-devel@nongnu.org; Sat, 30 Dec 2017 23:29:34 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1eVVFb-00060Y-OL
-	for <qemu-devel@nongnu.org>; Sun, 31 Dec 2017 04:29:31 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id B581C2E80D5
-	for <qemu-devel@nongnu.org>; Sun, 31 Dec 2017 04:29:31 +0000 (UTC)
+	(envelope-from <fziglio@redhat.com>) id 1eVagd-0008VP-SH
+	for qemu-devel@nongnu.org; Sun, 31 Dec 2017 05:17:51 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:33032)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <fziglio@redhat.com>) id 1eVagd-0008NA-JF
+	for qemu-devel@nongnu.org; Sun, 31 Dec 2017 05:17:47 -0500
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 82ED17AE8B
+	for <qemu-devel@nongnu.org>; Sun, 31 Dec 2017 10:17:45 +0000 (UTC)
+Received: from colo-mx.corp.redhat.com
+	(colo-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.20])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 78F7760C8A
+	for <qemu-devel@nongnu.org>; Sun, 31 Dec 2017 10:17:45 +0000 (UTC)
+Date: Sun, 31 Dec 2017 05:17:43 -0500 (EST)
+From: Frediano Ziglio <fziglio@redhat.com>
+Message-ID: <1014182222.2350600.1514715463787.JavaMail.zimbra@redhat.com>
+In-Reply-To: <911826618.967890.1513682427088.JavaMail.zimbra@redhat.com>
+References: <20171122135625.16625-1-fziglio@redhat.com>
+	<2083994092.34289761.1512637514012.JavaMail.zimbra@redhat.com>
+	<911826618.967890.1513682427088.JavaMail.zimbra@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Sun, 31 Dec 2017 04:17:27 -0000
-From: Launchpad Bug Tracker <1318091@bugs.launchpad.net>
-Reply-To: Bug 1318091 <1318091@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20140509224205.21323.62439.malonedeb@chaenomeles.canonical.com>
-Message-Id: <151469384723.19538.2341499867820832214.malone@loganberry.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1318091] Re: Perfctr MSRs not available to Guest
- OS on AMD Phenom II
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 1/4] spice: remove QXLWorker interface field
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,82 +38,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: kraxel@redhat.com
+Cc: qemu-devel@nongnu.org
 
-[Expired for QEMU because there has been no activity for 60 days.]
+ping
 
-** Changed in: qemu
-       Status: Incomplete =3D> Expired
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1318091
-
-Title:
-  Perfctr MSRs not available to Guest OS on AMD Phenom II
-
-Status in QEMU:
-  Expired
-
-Bug description:
-  The  AMD Phenom(tm) II X4 965 Processor (family 16, model 4, stepping
-  3) has the 4 architecturally supported perf counters at MSRs.  The
-  selectors are c001000-c001003, and the counters are c001004-c001007.
-  I've verified that the MSRs are there and working by manually setting
-  the MSRs with msr-tools to count cycles.
-
-  The processor does not support the extended perfctr or the perfctr_nb.
-  These are in cpuid leaf 8000_0001.  Qemu also sees that these cpuid
-  flags are not set, when I try launching with  -cpu
-  host,perfctr_core,check.  However, this flag is only for the extended
-  perfctr MSRs, which also happen to map the original four counters at
-  c0010200.
-
-  When I run a Guest OS, that OS is unable to use the perf counter
-  registers from c001000-7.  rdmsr and wrmsr complete, but the results
-  are always 0.  By contrast, a wrmsr to one of the c0010200 registers
-  causes a general protection fault (as it should, since those aren't
-  supported).
-
-  Kernel: 3.14.0-gentoo
-  Qemu: 2.0.0 (gentoo) and also with 2.0.50 (commit 06b4f00d5)
-  Qemu command: qemu-system-x86_64 -enable-kvm -cpu host -smp 8 -m 1024 -no=
-graphic -monitor /dev/pts/4 mnt/hdd.img
-  cat /proc/cpuinfo:
-  processor	: 3
-  vendor_id	: AuthenticAMD
-  cpu family	: 16
-  model		: 4
-  model name	: AMD Phenom(tm) II X4 965 Processor
-  stepping	: 3
-  cpu MHz		: 800.000
-  cache size	: 512 KB
-  physical id	: 0
-  siblings	: 4
-  core id		: 3
-  cpu cores	: 4
-  apicid		: 3
-  initial apicid	: 3
-  fpu		: yes
-  fpu_exception	: yes
-  cpuid level	: 5
-  wp		: yes
-  flags		: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pa=
-t pse36 clflush mmx fxsr sse sse2 ht syscall nx mmxext fxsr_opt pdpe1gb rdt=
-scp lm 3dnowext 3dnow constant_tsc rep_good nopl nonstop_tsc extd_apicid pn=
-i monitor cx16 popcnt lahf_lm cmp_legacy svm extapic cr8_legacy abm sse4a m=
-isalignsse 3dnowprefetch osvw ibs skinit wdt hw_pstate npt lbrv svm_lock nr=
-ip_save
-  bogomips	: 6803.79
-  TLB size	: 1024 4K pages
-  clflush size	: 64
-  cache_alignment	: 64
-  address sizes	: 48 bits physical, 48 bits virtual
-  power management: ts ttp tm stc 100mhzsteps hwpstate
-
-  thanks.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1318091/+subscriptions
+> 
+> ping
+> 
+> > 
+> > ping the series
+> > 
+> > > 
+> > > This fields points to an old interface that is no more
+> > > used in the current code.
+> > > 
+> > > Signed-off-by: Frediano Ziglio <fziglio@redhat.com>
+> > > ---
+> > >  hw/display/qxl.c           | 1 -
+> > >  include/ui/spice-display.h | 1 -
+> > >  ui/spice-display.c         | 2 --
+> > >  3 files changed, 4 deletions(-)
+> > > 
+> > > diff --git a/hw/display/qxl.c b/hw/display/qxl.c
+> > > index 99365c3e8f..b9fa067f6e 100644
+> > > --- a/hw/display/qxl.c
+> > > +++ b/hw/display/qxl.c
+> > > @@ -518,7 +518,6 @@ static void interface_attach_worker(QXLInstance *sin,
+> > > QXLWorker *qxl_worker)
+> > >      PCIQXLDevice *qxl = container_of(sin, PCIQXLDevice, ssd.qxl);
+> > >  
+> > >      trace_qxl_interface_attach_worker(qxl->id);
+> > > -    qxl->ssd.worker = qxl_worker;
+> > >  }
+> > >  
+> > >  static void interface_set_compression_level(QXLInstance *sin, int level)
+> > > diff --git a/include/ui/spice-display.h b/include/ui/spice-display.h
+> > > index aaf2019889..6b5c73b21c 100644
+> > > --- a/include/ui/spice-display.h
+> > > +++ b/include/ui/spice-display.h
+> > > @@ -86,7 +86,6 @@ struct SimpleSpiceDisplay {
+> > >      DisplayChangeListener dcl;
+> > >      void *buf;
+> > >      int bufsize;
+> > > -    QXLWorker *worker;
+> > >      QXLInstance qxl;
+> > >      uint32_t unique;
+> > >      pixman_image_t *surface;
+> > > diff --git a/ui/spice-display.c b/ui/spice-display.c
+> > > index ad1ceafb3f..85a72fe76a 100644
+> > > --- a/ui/spice-display.c
+> > > +++ b/ui/spice-display.c
+> > > @@ -519,7 +519,6 @@ static void interface_attach_worker(QXLInstance *sin,
+> > > QXLWorker *qxl_worker)
+> > >      SimpleSpiceDisplay *ssd = container_of(sin, SimpleSpiceDisplay,
+> > >      qxl);
+> > >  
+> > >      dprint(1, "%s/%d:\n", __func__, ssd->qxl.id);
+> > > -    ssd->worker = qxl_worker;
+> > >  }
+> > >  
+> > >  static void interface_set_compression_level(QXLInstance *sin, int level)
+> > > @@ -1028,7 +1027,6 @@ static void qemu_spice_display_init_one(QemuConsole
+> > > *con)
+> > >  
+> > >      ssd->qxl.base.sif = &dpy_interface.base;
+> > >      qemu_spice_add_display_interface(&ssd->qxl, con);
+> > > -    assert(ssd->worker);
+> > >      qemu_spice_create_host_memslot(ssd);
+> > >  
+> > >      register_displaychangelistener(&ssd->dcl);
+> > 
+> > 
+> 
+> 
