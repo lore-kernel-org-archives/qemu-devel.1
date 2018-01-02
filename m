@@ -1,21 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54143)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48713)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1eWUTu-0002y6-34
-	for qemu-devel@nongnu.org; Tue, 02 Jan 2018 16:52:23 -0500
+	(envelope-from <eblake@redhat.com>) id 1eWVB4-0007MS-U8
+	for qemu-devel@nongnu.org; Tue, 02 Jan 2018 17:36:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1eWUTs-0002fc-Nz
-	for qemu-devel@nongnu.org; Tue, 02 Jan 2018 16:52:22 -0500
-Date: Tue, 2 Jan 2018 16:52:09 -0500
-From: Jeff Cody <jcody@redhat.com>
-Message-ID: <20180102215209.GD26116@localhost.localdomain>
+	(envelope-from <eblake@redhat.com>) id 1eWVB4-0004ss-1H
+	for qemu-devel@nongnu.org; Tue, 02 Jan 2018 17:36:58 -0500
 References: <20171207203036.14993-1-eblake@redhat.com>
-	<20171207203036.14993-15-eblake@redhat.com>
+	<20171207203036.14993-7-eblake@redhat.com>
+	<20180102214316.GC26116@localhost.localdomain>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <fb4cfc88-4477-eeb5-136a-a827542bd2c2@redhat.com>
+Date: Tue, 2 Jan 2018 16:36:47 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20171207203036.14993-15-eblake@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v6 14/20] sheepdog: Switch to
- .bdrv_co_block_status()
+In-Reply-To: <20180102214316.GC26116@localhost.localdomain>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="1JqzSqbY1RkuykvEjPEoQdZLPRABRz14H"
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v6 06/20] iscsi: Switch
+ iscsi_allocmap_update() to byte-based
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,101 +26,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org, kwolf@redhat.com, vsementsov@virtuozzo.com, famz@redhat.com, qemu-block@nongnu.org, Hitoshi Mitake <mitake.hitoshi@lab.ntt.co.jp>, Max Reitz <mreitz@redhat.com>, "open list:Sheepdog" <sheepdog@lists.wpkg.org>, Liu Yuan <namei.unix@gmail.com>
+To: Jeff Cody <jcody@redhat.com>
+Cc: qemu-devel@nongnu.org, kwolf@redhat.com, vsementsov@virtuozzo.com, famz@redhat.com, qemu-block@nongnu.org, Peter Lieven <pl@kamp.de>, Max Reitz <mreitz@redhat.com>, Ronnie Sahlberg <ronniesahlberg@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-On Thu, Dec 07, 2017 at 02:30:30PM -0600, Eric Blake wrote:
-> We are gradually moving away from sector-based interfaces, towards
-> byte-based.  Update the sheepdog driver accordingly.
-> 
-> Signed-off-by: Eric Blake <eblake@redhat.com>
-> Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> 
-> ---
-> v5: no change
-> v4: update to interface tweak
-> v3: no change
-> v2: rebase to mapping flag
-> ---
->  block/sheepdog.c | 26 +++++++++++++-------------
->  1 file changed, 13 insertions(+), 13 deletions(-)
-> 
-> diff --git a/block/sheepdog.c b/block/sheepdog.c
-> index 696a71442a..0af8b07892 100644
-> --- a/block/sheepdog.c
-> +++ b/block/sheepdog.c
-> @@ -2988,19 +2988,19 @@ static coroutine_fn int sd_co_pdiscard(BlockDriverState *bs, int64_t offset,
->      return acb.ret;
->  }
-> 
-> -static coroutine_fn int64_t
-> -sd_co_get_block_status(BlockDriverState *bs, int64_t sector_num, int nb_sectors,
-> -                       int *pnum, BlockDriverState **file)
-> +static coroutine_fn int
-> +sd_co_block_status(BlockDriverState *bs, bool want_zero, int64_t offset,
-> +                   int64_t bytes, int64_t *pnum, int64_t *map,
-> +                   BlockDriverState **file)
->  {
->      BDRVSheepdogState *s = bs->opaque;
->      SheepdogInode *inode = &s->inode;
->      uint32_t object_size = (UINT32_C(1) << inode->block_size_shift);
-> -    uint64_t offset = sector_num * BDRV_SECTOR_SIZE;
->      unsigned long start = offset / object_size,
-> -                  end = DIV_ROUND_UP((sector_num + nb_sectors) *
-> -                                     BDRV_SECTOR_SIZE, object_size);
-> +                  end = DIV_ROUND_UP(offset + bytes, object_size);
->      unsigned long idx;
-> -    int64_t ret = BDRV_BLOCK_DATA | BDRV_BLOCK_OFFSET_VALID | offset;
-> +    *map = offset;
-> +    int ret = BDRV_BLOCK_DATA | BDRV_BLOCK_OFFSET_VALID;
-> 
->      for (idx = start; idx < end; idx++) {
->          if (inode->data_vdi_id[idx] == 0) {
-> @@ -3017,9 +3017,9 @@ sd_co_get_block_status(BlockDriverState *bs, int64_t sector_num, int nb_sectors,
->          }
->      }
-> 
-> -    *pnum = (idx - start) * object_size / BDRV_SECTOR_SIZE;
-> -    if (*pnum > nb_sectors) {
-> -        *pnum = nb_sectors;
-> +    *pnum = (idx - start) * object_size;
-> +    if (*pnum > bytes) {
-> +        *pnum = bytes;
->      }
->      if (ret > 0 && ret & BDRV_BLOCK_OFFSET_VALID) {
->          *file = bs;
-> @@ -3097,7 +3097,7 @@ static BlockDriver bdrv_sheepdog = {
->      .bdrv_co_writev = sd_co_writev,
->      .bdrv_co_flush_to_disk  = sd_co_flush_to_disk,
->      .bdrv_co_pdiscard = sd_co_pdiscard,
-> -    .bdrv_co_get_block_status = sd_co_get_block_status,
-> +    .bdrv_co_block_status   = sd_co_block_status,
-> 
->      .bdrv_snapshot_create   = sd_snapshot_create,
->      .bdrv_snapshot_goto     = sd_snapshot_goto,
-> @@ -3133,7 +3133,7 @@ static BlockDriver bdrv_sheepdog_tcp = {
->      .bdrv_co_writev = sd_co_writev,
->      .bdrv_co_flush_to_disk  = sd_co_flush_to_disk,
->      .bdrv_co_pdiscard = sd_co_pdiscard,
-> -    .bdrv_co_get_block_status = sd_co_get_block_status,
-> +    .bdrv_co_block_status   = sd_co_block_status,
-> 
->      .bdrv_snapshot_create   = sd_snapshot_create,
->      .bdrv_snapshot_goto     = sd_snapshot_goto,
-> @@ -3169,7 +3169,7 @@ static BlockDriver bdrv_sheepdog_unix = {
->      .bdrv_co_writev = sd_co_writev,
->      .bdrv_co_flush_to_disk  = sd_co_flush_to_disk,
->      .bdrv_co_pdiscard = sd_co_pdiscard,
-> -    .bdrv_co_get_block_status = sd_co_get_block_status,
-> +    .bdrv_co_block_status   = sd_co_block_status,
-> 
->      .bdrv_snapshot_create   = sd_snapshot_create,
->      .bdrv_snapshot_goto     = sd_snapshot_goto,
-> -- 
-> 2.14.3
-> 
-> 
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--1JqzSqbY1RkuykvEjPEoQdZLPRABRz14H
+From: Eric Blake <eblake@redhat.com>
+To: Jeff Cody <jcody@redhat.com>
+Cc: qemu-devel@nongnu.org, kwolf@redhat.com, vsementsov@virtuozzo.com,
+ famz@redhat.com, qemu-block@nongnu.org, Peter Lieven <pl@kamp.de>,
+ Max Reitz <mreitz@redhat.com>, Ronnie Sahlberg <ronniesahlberg@gmail.com>,
+ Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <fb4cfc88-4477-eeb5-136a-a827542bd2c2@redhat.com>
+Subject: Re: [Qemu-block] [PATCH v6 06/20] iscsi: Switch
+ iscsi_allocmap_update() to byte-based
+References: <20171207203036.14993-1-eblake@redhat.com>
+ <20171207203036.14993-7-eblake@redhat.com>
+ <20180102214316.GC26116@localhost.localdomain>
+In-Reply-To: <20180102214316.GC26116@localhost.localdomain>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Minor conflicts here with head, but straightforward to fix.
+On 01/02/2018 03:43 PM, Jeff Cody wrote:
+> On Thu, Dec 07, 2017 at 02:30:22PM -0600, Eric Blake wrote:
+>> We are gradually converting to byte-based interfaces, as they are
+>> easier to reason about than sector-based.  Convert all uses of
+>> the allocmap (no semantic change).  Callers that already had bytes
+>> available are simpler, and callers that now scale to bytes will be
+>> easier to switch to byte-based in the future.
+>>
+>> Signed-off-by: Eric Blake <eblake@redhat.com>
+>> Acked-by: Paolo Bonzini <pbonzini@redhat.com>
+>>
+>> ---
+>> v3-v5: no change
+>> v2: rebase to count/bytes rename
+>=20
+> Looks like this one will need a rebase, I get conflicts on master (and =
+when
+> trying to naively rebase your repo's master on qemu master).
 
-Reviewed-by: Jeff Cody <jcody@redhat.com>
+Yep, I'm seeing it to when rebasing on top of Kevin's block branch
+(currently at 1a63a907 on top of master at 281f3274).  I'll post a v7 soo=
+n.
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--1JqzSqbY1RkuykvEjPEoQdZLPRABRz14H
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlpMCYAACgkQp6FrSiUn
+Q2pSDgf9HMgpVe6+BGkAWCsu7UirzbSAkJbF8t3hCBA2gA98rIsyaWnMNuTYWh02
+cQUFtMmspWRCcvGe4ARHIOOoOSiXvL/aF+p0O4wPH5R1SUK/uk28W5kd1vge8/lT
+eym/7xZt26cto62jUwYXQ4IxyC0TZSUjFTqW8y+4BULNIVxMfCe/7NVpX620Ty53
+Y/wuFUn+A9XzxDutnrmXApObhwBzvWab7gwfBrHnHeQQuWJJoM8/wBsUesDnylZz
+AT5RVFYmmsk8D6Veq8TNovR4kgPow1XEL0uY1tdyFbn3hSSTw4sR7mlIVUjxugKI
+UC8i0pP0ZDUu9cNt8t7Tr/GxeOiVxA==
+=IcyU
+-----END PGP SIGNATURE-----
+
+--1JqzSqbY1RkuykvEjPEoQdZLPRABRz14H--
