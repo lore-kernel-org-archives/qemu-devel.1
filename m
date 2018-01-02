@@ -1,22 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56868)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58875)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eWToq-0001c2-Hy
-	for qemu-devel@nongnu.org; Tue, 02 Jan 2018 16:09:57 -0500
+	(envelope-from <eblake@redhat.com>) id 1eWTsB-0002t3-8P
+	for qemu-devel@nongnu.org; Tue, 02 Jan 2018 16:13:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eWTop-0002SU-Ke
-	for qemu-devel@nongnu.org; Tue, 02 Jan 2018 16:09:56 -0500
-References: <20171226025247.11082-1-famz@redhat.com>
-	<20171226025247.11082-2-famz@redhat.com>
+	(envelope-from <eblake@redhat.com>) id 1eWTs7-0004F2-6G
+	for qemu-devel@nongnu.org; Tue, 02 Jan 2018 16:13:23 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:49010)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1eWTs6-0004Df-TV
+	for qemu-devel@nongnu.org; Tue, 02 Jan 2018 16:13:19 -0500
+References: <20180102170936.6150-1-danielhb@linux.vnet.ibm.com>
+	<20180102170936.6150-2-danielhb@linux.vnet.ibm.com>
+	<d83ea302-8e38-26bf-7e1f-18b6373e158b@redhat.com>
+	<2e316196-0b13-1394-018f-c5324b0ade71@linux.vnet.ibm.com>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <3c943c7a-5aa0-9584-772f-2ce1df633898@redhat.com>
-Date: Tue, 2 Jan 2018 15:09:40 -0600
+Message-ID: <ab1e4789-6815-ac63-d34f-1acf7d5bee1b@redhat.com>
+Date: Tue, 2 Jan 2018 15:13:15 -0600
 MIME-Version: 1.0
-In-Reply-To: <20171226025247.11082-2-famz@redhat.com>
+In-Reply-To: <2e316196-0b13-1394-018f-c5324b0ade71@linux.vnet.ibm.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="y9mUQOJAQK4qwdLj1lxAV7hd188Y7T2VT"
-Subject: Re: [Qemu-devel] [PATCH v5 1/2] qemu-img.texi: Clean up parameter
- list
+	boundary="OG5PWdpAjnm5YHwc2wweq8Xe8dVwBKakk"
+Subject: Re: [Qemu-devel] [PATCH v2 1/2] qmp: adding
+ 'wakeup-suspend-support' in query-target
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,35 +31,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, stefanha@redhat.com, kchamart@redhat.com, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
+To: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>, qemu-devel@nongnu.org
+Cc: armbru@redhat.com, mdroth@linux.vnet.ibm.com, dgilbert@redhat.com
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---y9mUQOJAQK4qwdLj1lxAV7hd188Y7T2VT
+--OG5PWdpAjnm5YHwc2wweq8Xe8dVwBKakk
 From: Eric Blake <eblake@redhat.com>
-To: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, stefanha@redhat.com, kchamart@redhat.com,
- Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
-Message-ID: <3c943c7a-5aa0-9584-772f-2ce1df633898@redhat.com>
-Subject: Re: [PATCH v5 1/2] qemu-img.texi: Clean up parameter list
-References: <20171226025247.11082-1-famz@redhat.com>
- <20171226025247.11082-2-famz@redhat.com>
-In-Reply-To: <20171226025247.11082-2-famz@redhat.com>
+To: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>,
+ qemu-devel@nongnu.org
+Cc: armbru@redhat.com, mdroth@linux.vnet.ibm.com, dgilbert@redhat.com
+Message-ID: <ab1e4789-6815-ac63-d34f-1acf7d5bee1b@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 1/2] qmp: adding 'wakeup-suspend-support'
+ in query-target
+References: <20180102170936.6150-1-danielhb@linux.vnet.ibm.com>
+ <20180102170936.6150-2-danielhb@linux.vnet.ibm.com>
+ <d83ea302-8e38-26bf-7e1f-18b6373e158b@redhat.com>
+ <2e316196-0b13-1394-018f-c5324b0ade71@linux.vnet.ibm.com>
+In-Reply-To: <2e316196-0b13-1394-018f-c5324b0ade71@linux.vnet.ibm.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On 12/25/2017 08:52 PM, Fam Zheng wrote:
-> Split options out of the "@table @var" section and create a "@table
-> @option", then use whitespaces and blank lines consistently.
->=20
-> Suggested-by: Kevin Wolf <kwolf@redhat.com>
-> Signed-off-by: Fam Zheng <famz@redhat.com>
-> ---
->  qemu-img.texi | 66 +++++++++++++++++++++++++++++++++++----------------=
---------
->  1 file changed, 39 insertions(+), 27 deletions(-)
+On 01/02/2018 02:28 PM, Daniel Henrique Barboza wrote:
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
+>>> With this extra tool, management can avoid situations where a guest
+>>> that does not have proper suspend/wake capabilities ends up in
+>>> inconsistent state (e.g.
+>>> https://github.com/open-power-host-os/qemu/issues/31).
+>>>
+>>> Signed-off-by: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
+>>> ---
+>> Only an interface review:
+>>
+
+>>> @@ -2388,11 +2388,12 @@
+>>> =C2=A0 # Information describing the QEMU target.
+>>> =C2=A0 #
+>>> =C2=A0 # @arch: the target architecture (eg "x86_64", "i386", etc)
+>>> +# @wakeup-suspend-support: true if the target supports wake up from
+>>> suspend
+>> Missing a '(since 2.12)' notation.
+>=20
+> TargetInfo is marked as "Since 1.2.0".=C2=A0 Should I add the 2.12.0 no=
+tation
+> to the
+> new parameter or change the 1.2.0 notation of TargetInfo?
+
+Just on the new field, as in:
+
+##
+# @TargetInfo:
+#
+# Information describing the QEMU target.
+#
+# @arch: the target architecture (eg "x86_64", "i386", etc)
+# @wakeup-suspend-support: true if the target supports wake up from
+#                          suspend (since 2.12)
+#
+# Since: 1.2.0
+##
 
 --=20
 Eric Blake, Principal Software Engineer
@@ -61,7 +96,7 @@ Red Hat, Inc.           +1-919-301-3266
 Virtualization:  qemu.org | libvirt.org
 
 
---y9mUQOJAQK4qwdLj1lxAV7hd188Y7T2VT
+--OG5PWdpAjnm5YHwc2wweq8Xe8dVwBKakk
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
@@ -70,14 +105,14 @@ Content-Disposition: attachment; filename="signature.asc"
 Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
 Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlpL9RQACgkQp6FrSiUn
-Q2q7NQf/aKNkr4sKb1cyFMcHzskv3YsLyVAy97Z8DmDiL2YMMoJBwd9+Vs/EDCwE
-r2+9dQsw+0T4JoyHqGyh+RbAGE0xm4Mf80bL71+wHJouKNB2IZOZzWvF2dVxdkGg
-VgU7di0xf5X5DLGkvfQWiGq2K1UUXOFgqiUVK+pOuqUG7kodrMoGw2iGS+vYPVVC
-ktG4B2kVcSlUGDIyH+Ph5Z3O6si/EM7wauTekuLW94s3ZXFAlaWt33yuo9buRWO2
-mg2VEnzfkyqwkhpqF1CXyeZnzOUk/crJJ+E0mVvOwNLpZnHUMDWsIlzsFB0Mx8Lz
-AwzTC2/lLoj9MkqniGH1BXW2KVVUdQ==
-=4mOS
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlpL9esACgkQp6FrSiUn
+Q2q8hwgAosXqmCeS3N86txI6qKtMI2pfg8CiOXx9JegFCCwSIVzXacn9K7o6NqNn
+1Gx4D34FcUx/ndyLEX0QQVITKbpVMM9PtKyW+ZZpc/WYcXxQHnThYgIK8i6s/Yth
+egYLaqm3u+mzF601BNbmhwTg+Az1rPSMM5+tlGPsUSOqB3tl7kZzBwPOB+mJkhU8
+/dVb+fGvTMe7N5hAvY8AbfvW3CAYYR90EPj+kQ5EsKPIPgHkFJcXAmaaYMrxeYFK
+onLXM/EhgZHzMTLftJ3SB+HicSyuh8ARJaG2KgS7bcP1Hl5wivdD3DNqZWyxYNJq
+7mRhqkvhcMvQQjSMpHZg+7wvze5mBA==
+=gbj+
 -----END PGP SIGNATURE-----
 
---y9mUQOJAQK4qwdLj1lxAV7hd188Y7T2VT--
+--OG5PWdpAjnm5YHwc2wweq8Xe8dVwBKakk--
