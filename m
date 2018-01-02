@@ -1,27 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58236)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34563)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <willy@infradead.org>) id 1eWMYl-0001XN-8C
-	for qemu-devel@nongnu.org; Tue, 02 Jan 2018 08:24:52 -0500
+	(envelope-from <laurent@vivier.eu>) id 1eWMiv-0005Iu-VU
+	for qemu-devel@nongnu.org; Tue, 02 Jan 2018 08:35:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <willy@infradead.org>) id 1eWMYg-0006kV-Lj
-	for qemu-devel@nongnu.org; Tue, 02 Jan 2018 08:24:51 -0500
-Received: from bombadil.infradead.org ([65.50.211.133]:46584)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <willy@infradead.org>) id 1eWMYg-0006cY-CM
-	for qemu-devel@nongnu.org; Tue, 02 Jan 2018 08:24:46 -0500
-Date: Tue, 2 Jan 2018 05:24:19 -0800
-From: Matthew Wilcox <willy@infradead.org>
-Message-ID: <20180102132419.GB8222@bombadil.infradead.org>
-References: <1513685879-21823-1-git-send-email-wei.w.wang@intel.com>
-	<1513685879-21823-5-git-send-email-wei.w.wang@intel.com>
-	<20171224032121.GA5273@bombadil.infradead.org>
-	<201712241345.DIG21823.SLFOOJtQFOMVFH@I-love.SAKURA.ne.jp>
-	<5A3F5A4A.1070009@intel.com>
+	(envelope-from <laurent@vivier.eu>) id 1eWMiv-0004cg-07
+	for qemu-devel@nongnu.org; Tue, 02 Jan 2018 08:35:21 -0500
+References: <20171207065639.164900-1-lepton@google.com>
+	<CAOvqHj4P17JQ=bJqpZsA3n-sfw927Sad3-YD2FUHff1zhpanGA@mail.gmail.com>
+	<CAOvqHj7Cx7dJLq2kYgpG3M-RoeBd64XM-BT0Hs4=vvnTg9zgAQ@mail.gmail.com>
+From: Laurent Vivier <laurent@vivier.eu>
+Message-ID: <7675c1e9-806c-1120-31c1-e5750d2110d7@vivier.eu>
+Date: Tue, 2 Jan 2018 14:35:04 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <5A3F5A4A.1070009@intel.com>
-Subject: Re: [Qemu-devel] [PATCH v20 4/7] virtio-balloon: VIRTIO_BALLOON_F_SG
+In-Reply-To: <CAOvqHj7Cx7dJLq2kYgpG3M-RoeBd64XM-BT0Hs4=vvnTg9zgAQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH] hw/input/hid: Add support for several keys.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,57 +25,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Wei Wang <wei.w.wang@intel.com>
-Cc: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>, virtio-dev@lists.oasis-open.org, linux-kernel@vger.kernel.org, qemu-devel@nongnu.org, virtualization@lists.linux-foundation.org, kvm@vger.kernel.org, linux-mm@kvack.org, mst@redhat.com, mhocko@kernel.org, akpm@linux-foundation.org, mawilcox@microsoft.com, david@redhat.com, cornelia.huck@de.ibm.com, mgorman@techsingularity.net, aarcange@redhat.com, amit.shah@redhat.com, pbonzini@redhat.com, liliang.opensource@gmail.com, yang.zhang.wz@gmail.com, quan.xu0@gmail.com, nilal@redhat.com, riel@redhat.com
+To: =?UTF-8?B?VGFvIFd1KOWQtOa2m0BFbmcp?= <lepton@google.com>, QEMU <qemu-devel@nongnu.org>
+Cc: qemu-trivial@nongnu.org, kraxel@redhat.com, mjt@tls.msk.ru
 
-On Sun, Dec 24, 2017 at 03:42:02PM +0800, Wei Wang wrote:
-> On 12/24/2017 12:45 PM, Tetsuo Handa wrote:
-> > Matthew Wilcox wrote:
-> > > If you can't preload with anything better than that, I think that
-> > > xb_set_bit() should attempt an allocation with GFP_NOWAIT | __GFP_NOWARN,
-> > > and then you can skip the preload; it has no value for you.
-> > Yes, that's why I suggest directly using kzalloc() at xb_set_bit().
-> 
-> It has some possibilities to remove that preload if we also do the bitmap
-> allocation in the xb_set_bit():
-> 
-> bitmap = rcu_dereference_raw(*slot);
-> if (!bitmap) {
->     bitmap = this_cpu_xchg(ida_bitmap, NULL);
->     if (!bitmap) {
->         bitmap = kmalloc(sizeof(*bitmap), gfp);
->         if (!bitmap)
->             return -ENOMEM;
->     }
-> }
-> 
-> But why not just follow the radix tree implementation style that puts the
-> allocation in preload, which would be invoked with a more relaxed gfp in
-> other use cases?
+Le 02/01/2018 à 10:03, Tao Wu(吴涛@Eng) a écrit :
+> Ping?
 
-Actually, the radix tree does attempt allocation, and falls back to the
-preload.  The IDA was the odd one out that doesn't attempt allocation,
-and that was where I copied the code from.  For other users, the preload
-API is beneficial, so I will leave it in.
+Your patch has been Merged by michael with his pull request of 17/12/2017.
 
-> Its usage in virtio_balloon is just a little special that we need to put the
-> allocation within the balloon_lock, which doesn't give us the benefit of
-> using a relaxed gfp in preload, but it doesn't prevent us from living with
-> the current APIs (i.e. the preload + xb_set pattern).
-> On the other side, if we do it as above, we have more things that need to
-> consider. For example, what if the a use case just want the radix tree
-> implementation style, which means it doesn't want allocation within
-> xb_set(), then would we be troubled with how to avoid the allocation path in
-> that case?
-> 
-> So, I think it is better to stick with the convention by putting the
-> allocation in preload. Breaking the convention should show obvious
-> advantages, IMHO.
+Thanks,
+Laurent
 
-The radix tree convention is objectively awful, which is why I'm working
-to change it.  Specifying the GFP flags at radix tree initialisation time
-rather than allocation time leads to all kinds of confusion.  The preload
-API is a pretty awful workaround, and it will go away once the XArray
-is working correctly.  That said, there's no alternative to it without
-making XBitmap depend on XArray, and I don't want to hold you up there.
-So there's an xb_preload for the moment.
+> On Thu, Dec 14, 2017 at 1:25 PM, Tao Wu(吴涛@Eng) <lepton@google.com> wrote:
+>> Anybody can merge this?
+>>
+>> It's a simple change:  actually it only changed 4 bytes in hid usage
+>> table to enable 4 keys: audiomute volumeup volumedown and power.
+>>
+>> It's easy to verify what the patch is doing:
+>>
+>> Boot some guest os with argument "-usbdevice keyboard"  and use qemu
+>> monitor console to do "sendkey audiomute", without this patch, nothing
+>> happend inside guest os. with this patch,  all these 4 keys work correctly.
+>>
+>> On Wed, Dec 6, 2017 at 10:56 PM, Tao Wu <lepton@google.com> wrote:
+>>> Add support for these keys: audiomute volumedown volumeup power.
+>>> Tested with "sendkey" command in monitor and verify the behavior
+>>> in guest OS.
+>>>
+>>> Signed-off-by: Tao Wu <lepton@google.com>
+>>> ---
+>>>  hw/input/hid.c | 8 ++++----
+>>>  1 file changed, 4 insertions(+), 4 deletions(-)
+>>>
+>>> diff --git a/hw/input/hid.c b/hw/input/hid.c
+>>> index 0d049ff61c..aa4fb826fd 100644
+>>> --- a/hw/input/hid.c
+>>> +++ b/hw/input/hid.c
+>>> @@ -57,14 +57,14 @@ static const uint8_t hid_usage_keys[0x100] = {
+>>>      0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+>>>      0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+>>>      0x00, 0x00, 0x00, 0x00, 0x58, 0xe4, 0x00, 0x00,
+>>> -    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+>>> -    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+>>> -    0x00, 0x00, 0x00, 0x00, 0x00, 0x54, 0x00, 0x46,
+>>> +    0x7f, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+>>> +    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x81, 0x00,
+>>> +    0x80, 0x00, 0x00, 0x00, 0x00, 0x54, 0x00, 0x46,
+>>>      0xe6, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+>>>      0x00, 0x00, 0x00, 0x00, 0x00, 0x48, 0x48, 0x4a,
+>>>      0x52, 0x4b, 0x00, 0x50, 0x00, 0x4f, 0x00, 0x4d,
+>>>      0x51, 0x4e, 0x49, 0x4c, 0x00, 0x00, 0x00, 0x00,
+>>> -    0x00, 0x00, 0x00, 0xe3, 0xe7, 0x65, 0x00, 0x00,
+>>> +    0x00, 0x00, 0x00, 0xe3, 0xe7, 0x65, 0x66, 0x00,
+>>>      0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+>>>      0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+>>>      0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+>>> --
+>>> 2.15.1.424.g9478a66081-goog
+>>>
