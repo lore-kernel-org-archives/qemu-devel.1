@@ -1,27 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39230)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49105)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eWU4y-0001kB-5T
-	for qemu-devel@nongnu.org; Tue, 02 Jan 2018 16:26:39 -0500
+	(envelope-from <jcody@redhat.com>) id 1eWULI-0007er-86
+	for qemu-devel@nongnu.org; Tue, 02 Jan 2018 16:43:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eWU4t-0003Dz-Vl
-	for qemu-devel@nongnu.org; Tue, 02 Jan 2018 16:26:36 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:43648)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1eWU4t-0003DL-Ly
-	for qemu-devel@nongnu.org; Tue, 02 Jan 2018 16:26:31 -0500
-References: <1509369390-8285-1-git-send-email-a.perevalov@samsung.com>
-	<CGME20171030131650eucas1p183c745b845ded5e02e842582bb44fd7b@eucas1p1.samsung.com>
-	<1509369390-8285-7-git-send-email-a.perevalov@samsung.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <64a69d83-c575-5bd2-66f4-5b88172418a2@redhat.com>
-Date: Tue, 2 Jan 2018 15:26:19 -0600
+	(envelope-from <jcody@redhat.com>) id 1eWULH-0005dF-05
+	for qemu-devel@nongnu.org; Tue, 02 Jan 2018 16:43:28 -0500
+Date: Tue, 2 Jan 2018 16:43:16 -0500
+From: Jeff Cody <jcody@redhat.com>
+Message-ID: <20180102214316.GC26116@localhost.localdomain>
+References: <20171207203036.14993-1-eblake@redhat.com>
+	<20171207203036.14993-7-eblake@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <1509369390-8285-7-git-send-email-a.perevalov@samsung.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="4pfvnRjDXp2cgMTuZNpI86PhXwfUlL6Du"
-Subject: Re: [Qemu-devel] [PATCH v12 6/6] migration: add postcopy total
- blocktime into query-migrate
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20171207203036.14993-7-eblake@redhat.com>
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v6 06/20] iscsi: Switch
+ iscsi_allocmap_update() to byte-based
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,121 +24,233 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alexey Perevalov <a.perevalov@samsung.com>, qemu-devel@nongnu.org
-Cc: heetae82.ahn@samsung.com, quintela@redhat.com, dgilbert@redhat.com, peterx@redhat.com, i.maximets@samsung.com
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org, kwolf@redhat.com, vsementsov@virtuozzo.com, famz@redhat.com, qemu-block@nongnu.org, Peter Lieven <pl@kamp.de>, Max Reitz <mreitz@redhat.com>, Ronnie Sahlberg <ronniesahlberg@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---4pfvnRjDXp2cgMTuZNpI86PhXwfUlL6Du
-From: Eric Blake <eblake@redhat.com>
-To: Alexey Perevalov <a.perevalov@samsung.com>, qemu-devel@nongnu.org
-Cc: heetae82.ahn@samsung.com, quintela@redhat.com, dgilbert@redhat.com,
- peterx@redhat.com, i.maximets@samsung.com
-Message-ID: <64a69d83-c575-5bd2-66f4-5b88172418a2@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v12 6/6] migration: add postcopy total
- blocktime into query-migrate
-References: <1509369390-8285-1-git-send-email-a.perevalov@samsung.com>
- <CGME20171030131650eucas1p183c745b845ded5e02e842582bb44fd7b@eucas1p1.samsung.com>
- <1509369390-8285-7-git-send-email-a.perevalov@samsung.com>
-In-Reply-To: <1509369390-8285-7-git-send-email-a.perevalov@samsung.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 10/30/2017 08:16 AM, Alexey Perevalov wrote:
-> Postcopy total blocktime is available on destination side only.
-> But query-migrate was possible only for source. This patch
-> adds ability to call query-migrate on destination.
-> To be able to see postcopy blocktime, need to request postcopy-blocktim=
-e
-> capability.
-
-Why not display the stats unconditionally when they are available,
-instead of having to set a capability knob to request them?
-
->=20
-> The query-migrate command will show following sample result:
-> {"return":
->     "postcopy-vcpu-blocktime": [115, 100],
->     "status": "completed",
->     "postcopy-blocktime": 100
-> }}
->=20
-> postcopy_vcpu_blocktime contains list, where the first item is the firs=
-t
-> vCPU in QEMU.
->=20
-> This patch has a drawback, it combines states of incoming and
-> outgoing migration. Ongoing migration state will overwrite incoming
-> state. Looks like better to separate query-migrate for incoming and
-> outgoing migration or add parameter to indicate type of migration.
->=20
-> Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> Signed-off-by: Alexey Perevalov <a.perevalov@samsung.com>
+On Thu, Dec 07, 2017 at 02:30:22PM -0600, Eric Blake wrote:
+> We are gradually converting to byte-based interfaces, as they are
+> easier to reason about than sector-based.  Convert all uses of
+> the allocmap (no semantic change).  Callers that already had bytes
+> available are simpler, and callers that now scale to bytes will be
+> easier to switch to byte-based in the future.
+> 
+> Signed-off-by: Eric Blake <eblake@redhat.com>
+> Acked-by: Paolo Bonzini <pbonzini@redhat.com>
+> 
 > ---
+> v3-v5: no change
+> v2: rebase to count/bytes rename
 
-> +++ b/qapi/migration.json
-> @@ -156,6 +156,13 @@
->  #              @status is 'failed'. Clients should not attempt to pars=
-e the
->  #              error strings. (Since 2.7)
->  #
-> +# @postcopy-blocktime: total time when all vCPU were blocked during po=
-stcopy
-> +#           live migration (Since 2.11)
+Looks like this one will need a rebase, I get conflicts on master (and when
+trying to naively rebase your repo's master on qemu master).
 
-2.12 now.
-
-Should this mention the capability knob needed to enable this stat (or
-else get rid of the capability knob and always expose this when possible)=
-?
-
-> +#
-> +# @postcopy-vcpu-blocktime: list of the postcopy blocktime per vCPU (S=
-ince 2.11)
-
-Also 2.12.
-
-> +#
-> +
-> +#
->  # Since: 0.14.0
->  ##
->  { 'struct': 'MigrationInfo',
-> @@ -167,7 +174,9 @@
->             '*downtime': 'int',
->             '*setup-time': 'int',
->             '*cpu-throttle-percentage': 'int',
-> -           '*error-desc': 'str'} }
-> +           '*error-desc': 'str',
-> +           '*postcopy-blocktime' : 'int64',
-> +           '*postcopy-vcpu-blocktime': ['int64']} }
-> =20
->  ##
->  # @query-migrate:
->=20
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---4pfvnRjDXp2cgMTuZNpI86PhXwfUlL6Du
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlpL+PsACgkQp6FrSiUn
-Q2rDAAf+JB72nqgwPXS4lCOJUdf0WJERvT0DcXruI2bx19mcqDoOFlQ4RpvUtvA8
-H+tIaDFrZW9J2VXBujarmFhdTXzMa9mPqdwRf2vzmCUb3Gw0FPhZl6VrjHbF3cdK
-OhooIii8Cj7L9kpZQ9HXQLk+wAzJdKJmH5/Yq6h1QLCuUmeZXlsYYseYiovQFUUO
-NJM0AKwuZ4om/E6Z+fX8bjwyWf3/8SnaL4a/M6EIZ5VYVCkF0UCDZXFGbYcFYhmw
-ty/nMVDyFksWPhnER5sNRThv5eSB9Ub/OtBuLiimPVaquE3BNSx/JGWOf1FL/C/j
-oDfq2O6ai7+XvSvjaRcS4ingRVUZIQ==
-=T39G
------END PGP SIGNATURE-----
-
---4pfvnRjDXp2cgMTuZNpI86PhXwfUlL6Du--
+> ---
+>  block/iscsi.c | 90 +++++++++++++++++++++++++++++------------------------------
+>  1 file changed, 44 insertions(+), 46 deletions(-)
+> 
+> diff --git a/block/iscsi.c b/block/iscsi.c
+> index 8f903d8370..4896d50d6e 100644
+> --- a/block/iscsi.c
+> +++ b/block/iscsi.c
+> @@ -455,24 +455,22 @@ static int iscsi_allocmap_init(IscsiLun *iscsilun, int open_flags)
+>  }
+> 
+>  static void
+> -iscsi_allocmap_update(IscsiLun *iscsilun, int64_t sector_num,
+> -                      int nb_sectors, bool allocated, bool valid)
+> +iscsi_allocmap_update(IscsiLun *iscsilun, int64_t offset,
+> +                      int64_t bytes, bool allocated, bool valid)
+>  {
+>      int64_t cl_num_expanded, nb_cls_expanded, cl_num_shrunk, nb_cls_shrunk;
+> -    int cluster_sectors = iscsilun->cluster_size >> BDRV_SECTOR_BITS;
+> 
+>      if (iscsilun->allocmap == NULL) {
+>          return;
+>      }
+>      /* expand to entirely contain all affected clusters */
+> -    assert(cluster_sectors);
+> -    cl_num_expanded = sector_num / cluster_sectors;
+> -    nb_cls_expanded = DIV_ROUND_UP(sector_num + nb_sectors,
+> -                                   cluster_sectors) - cl_num_expanded;
+> +    assert(iscsilun->cluster_size);
+> +    cl_num_expanded = offset / iscsilun->cluster_size;
+> +    nb_cls_expanded = DIV_ROUND_UP(offset + bytes, iscsilun->cluster_size)
+> +        - cl_num_expanded;
+>      /* shrink to touch only completely contained clusters */
+> -    cl_num_shrunk = DIV_ROUND_UP(sector_num, cluster_sectors);
+> -    nb_cls_shrunk = (sector_num + nb_sectors) / cluster_sectors
+> -                      - cl_num_shrunk;
+> +    cl_num_shrunk = DIV_ROUND_UP(offset, iscsilun->cluster_size);
+> +    nb_cls_shrunk = (offset + bytes) / iscsilun->cluster_size - cl_num_shrunk;
+>      if (allocated) {
+>          bitmap_set(iscsilun->allocmap, cl_num_expanded, nb_cls_expanded);
+>      } else {
+> @@ -495,26 +493,26 @@ iscsi_allocmap_update(IscsiLun *iscsilun, int64_t sector_num,
+>  }
+> 
+>  static void
+> -iscsi_allocmap_set_allocated(IscsiLun *iscsilun, int64_t sector_num,
+> -                             int nb_sectors)
+> +iscsi_allocmap_set_allocated(IscsiLun *iscsilun, int64_t offset,
+> +                             int64_t bytes)
+>  {
+> -    iscsi_allocmap_update(iscsilun, sector_num, nb_sectors, true, true);
+> +    iscsi_allocmap_update(iscsilun, offset, bytes, true, true);
+>  }
+> 
+>  static void
+> -iscsi_allocmap_set_unallocated(IscsiLun *iscsilun, int64_t sector_num,
+> -                               int nb_sectors)
+> +iscsi_allocmap_set_unallocated(IscsiLun *iscsilun, int64_t offset,
+> +                               int64_t bytes)
+>  {
+>      /* Note: if cache.direct=on the fifth argument to iscsi_allocmap_update
+>       * is ignored, so this will in effect be an iscsi_allocmap_set_invalid.
+>       */
+> -    iscsi_allocmap_update(iscsilun, sector_num, nb_sectors, false, true);
+> +    iscsi_allocmap_update(iscsilun, offset, bytes, false, true);
+>  }
+> 
+> -static void iscsi_allocmap_set_invalid(IscsiLun *iscsilun, int64_t sector_num,
+> -                                       int nb_sectors)
+> +static void iscsi_allocmap_set_invalid(IscsiLun *iscsilun, int64_t offset,
+> +                                       int64_t bytes)
+>  {
+> -    iscsi_allocmap_update(iscsilun, sector_num, nb_sectors, false, false);
+> +    iscsi_allocmap_update(iscsilun, offset, bytes, false, false);
+>  }
+> 
+>  static void iscsi_allocmap_invalidate(IscsiLun *iscsilun)
+> @@ -528,34 +526,30 @@ static void iscsi_allocmap_invalidate(IscsiLun *iscsilun)
+>  }
+> 
+>  static inline bool
+> -iscsi_allocmap_is_allocated(IscsiLun *iscsilun, int64_t sector_num,
+> -                            int nb_sectors)
+> +iscsi_allocmap_is_allocated(IscsiLun *iscsilun, int64_t offset,
+> +                            int64_t bytes)
+>  {
+>      unsigned long size;
+>      if (iscsilun->allocmap == NULL) {
+>          return true;
+>      }
+>      assert(iscsilun->cluster_size);
+> -    size = DIV_ROUND_UP(sector_num + nb_sectors,
+> -                        iscsilun->cluster_size >> BDRV_SECTOR_BITS);
+> +    size = DIV_ROUND_UP(offset + bytes, iscsilun->cluster_size);
+>      return !(find_next_bit(iscsilun->allocmap, size,
+> -                           sector_num * BDRV_SECTOR_SIZE /
+> -                           iscsilun->cluster_size) == size);
+> +                           offset / iscsilun->cluster_size) == size);
+>  }
+> 
+>  static inline bool iscsi_allocmap_is_valid(IscsiLun *iscsilun,
+> -                                           int64_t sector_num, int nb_sectors)
+> +                                           int64_t offset, int64_t bytes)
+>  {
+>      unsigned long size;
+>      if (iscsilun->allocmap_valid == NULL) {
+>          return false;
+>      }
+>      assert(iscsilun->cluster_size);
+> -    size = DIV_ROUND_UP(sector_num + nb_sectors,
+> -                        iscsilun->cluster_size >> BDRV_SECTOR_BITS);
+> +    size = DIV_ROUND_UP(offset + bytes, iscsilun->cluster_size);
+>      return (find_next_zero_bit(iscsilun->allocmap_valid, size,
+> -                               sector_num * BDRV_SECTOR_SIZE /
+> -                               iscsilun->cluster_size) == size);
+> +                               offset / iscsilun->cluster_size) == size);
+>  }
+> 
+>  static int coroutine_fn
+> @@ -637,12 +631,14 @@ retry:
+>      }
+> 
+>      if (iTask.status != SCSI_STATUS_GOOD) {
+> -        iscsi_allocmap_set_invalid(iscsilun, sector_num, nb_sectors);
+> +        iscsi_allocmap_set_invalid(iscsilun, sector_num * BDRV_SECTOR_SIZE,
+> +                                   nb_sectors * BDRV_SECTOR_SIZE);
+>          r = iTask.err_code;
+>          goto out_unlock;
+>      }
+> 
+> -    iscsi_allocmap_set_allocated(iscsilun, sector_num, nb_sectors);
+> +    iscsi_allocmap_set_allocated(iscsilun, sector_num * BDRV_SECTOR_SIZE,
+> +                                 nb_sectors * BDRV_SECTOR_SIZE);
+> 
+>  out_unlock:
+>      qemu_mutex_unlock(&iscsilun->mutex);
+> @@ -737,9 +733,11 @@ retry:
+>      }
+> 
+>      if (ret & BDRV_BLOCK_ZERO) {
+> -        iscsi_allocmap_set_unallocated(iscsilun, sector_num, *pnum);
+> +        iscsi_allocmap_set_unallocated(iscsilun, sector_num * BDRV_SECTOR_SIZE,
+> +                                       *pnum * BDRV_SECTOR_SIZE);
+>      } else {
+> -        iscsi_allocmap_set_allocated(iscsilun, sector_num, *pnum);
+> +        iscsi_allocmap_set_allocated(iscsilun, sector_num * BDRV_SECTOR_SIZE,
+> +                                     *pnum * BDRV_SECTOR_SIZE);
+>      }
+> 
+>      if (*pnum > nb_sectors) {
+> @@ -777,15 +775,19 @@ static int coroutine_fn iscsi_co_readv(BlockDriverState *bs,
+>      /* if cache.direct is off and we have a valid entry in our allocation map
+>       * we can skip checking the block status and directly return zeroes if
+>       * the request falls within an unallocated area */
+> -    if (iscsi_allocmap_is_valid(iscsilun, sector_num, nb_sectors) &&
+> -        !iscsi_allocmap_is_allocated(iscsilun, sector_num, nb_sectors)) {
+> +    if (iscsi_allocmap_is_valid(iscsilun, sector_num * BDRV_SECTOR_SIZE,
+> +                                nb_sectors * BDRV_SECTOR_SIZE) &&
+> +        !iscsi_allocmap_is_allocated(iscsilun, sector_num * BDRV_SECTOR_SIZE,
+> +                                     nb_sectors * BDRV_SECTOR_SIZE)) {
+>              qemu_iovec_memset(iov, 0, 0x00, iov->size);
+>              return 0;
+>      }
+> 
+>      if (nb_sectors >= ISCSI_CHECKALLOC_THRES &&
+> -        !iscsi_allocmap_is_valid(iscsilun, sector_num, nb_sectors) &&
+> -        !iscsi_allocmap_is_allocated(iscsilun, sector_num, nb_sectors)) {
+> +        !iscsi_allocmap_is_valid(iscsilun, sector_num * BDRV_SECTOR_SIZE,
+> +                                 nb_sectors * BDRV_SECTOR_SIZE) &&
+> +        !iscsi_allocmap_is_allocated(iscsilun, sector_num * BDRV_SECTOR_SIZE,
+> +                                     nb_sectors * BDRV_SECTOR_SIZE)) {
+>          int pnum;
+>          BlockDriverState *file;
+>          /* check the block status from the beginning of the cluster
+> @@ -1154,8 +1156,7 @@ retry:
+>          goto out_unlock;
+>      }
+> 
+> -    iscsi_allocmap_set_invalid(iscsilun, offset >> BDRV_SECTOR_BITS,
+> -                               bytes >> BDRV_SECTOR_BITS);
+> +    iscsi_allocmap_set_invalid(iscsilun, offset, bytes);
+> 
+>  out_unlock:
+>      qemu_mutex_unlock(&iscsilun->mutex);
+> @@ -1253,18 +1254,15 @@ retry:
+>      }
+> 
+>      if (iTask.status != SCSI_STATUS_GOOD) {
+> -        iscsi_allocmap_set_invalid(iscsilun, offset >> BDRV_SECTOR_BITS,
+> -                                   bytes >> BDRV_SECTOR_BITS);
+> +        iscsi_allocmap_set_invalid(iscsilun, offset, bytes);
+>          r = iTask.err_code;
+>          goto out_unlock;
+>      }
+> 
+>      if (flags & BDRV_REQ_MAY_UNMAP) {
+> -        iscsi_allocmap_set_invalid(iscsilun, offset >> BDRV_SECTOR_BITS,
+> -                                   bytes >> BDRV_SECTOR_BITS);
+> +        iscsi_allocmap_set_invalid(iscsilun, offset, bytes);
+>      } else {
+> -        iscsi_allocmap_set_allocated(iscsilun, offset >> BDRV_SECTOR_BITS,
+> -                                     bytes >> BDRV_SECTOR_BITS);
+> +        iscsi_allocmap_set_allocated(iscsilun, offset, bytes);
+>      }
+> 
+>  out_unlock:
+> -- 
+> 2.14.3
+> 
+> 
