@@ -1,31 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34171)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53066)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1eWHsB-0002Bf-VA
-	for qemu-devel@nongnu.org; Tue, 02 Jan 2018 03:24:36 -0500
+	(envelope-from <lepton@google.com>) id 1eWITp-0004Mp-F4
+	for qemu-devel@nongnu.org; Tue, 02 Jan 2018 04:03:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1eWHs8-0003RM-Ri
-	for qemu-devel@nongnu.org; Tue, 02 Jan 2018 03:24:35 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:47972)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1eWHs8-0003Qn-LY
-	for qemu-devel@nongnu.org; Tue, 02 Jan 2018 03:24:32 -0500
-From: Markus Armbruster <armbru@redhat.com>
-References: <1511273358-21789-1-git-send-email-s1seetee@linux.vnet.ibm.com>
-	<20171212164114.GF2409@work-vm>
-	<e37d8871-544f-3c4f-3a59-bb66dc5c8b67@linux.vnet.ibm.com>
-	<b5c7e566-34f0-adb0-0fcb-bf272cbb0a81@redhat.com>
-	<225a4478-dc5e-a067-f207-e8a183afa0d9@linux.vnet.ibm.com>
-	<9b719ebe-8b38-708c-45a7-d377a583f899@redhat.com>
-	<5e07b5ea-e8b0-521a-b1af-31017fc52578@redhat.com>
-	<87shc3rz5d.fsf@dusky.pond.sub.org>
-	<bd60d7e7-8d33-3f87-b6be-89918c1e7ef6@linux.vnet.ibm.com>
-Date: Tue, 02 Jan 2018 09:24:28 +0100
-In-Reply-To: <bd60d7e7-8d33-3f87-b6be-89918c1e7ef6@linux.vnet.ibm.com>
-	(seeteena's message of "Tue, 2 Jan 2018 12:12:49 +0530")
-Message-ID: <87mv1w6537.fsf@dusky.pond.sub.org>
+	(envelope-from <lepton@google.com>) id 1eWITo-0008Al-Jc
+	for qemu-devel@nongnu.org; Tue, 02 Jan 2018 04:03:29 -0500
+Received: from mail-wr0-x242.google.com ([2a00:1450:400c:c0c::242]:40974)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <lepton@google.com>) id 1eWITo-0008A6-D6
+	for qemu-devel@nongnu.org; Tue, 02 Jan 2018 04:03:28 -0500
+Received: by mail-wr0-x242.google.com with SMTP id p69so39055579wrb.8
+	for <qemu-devel@nongnu.org>; Tue, 02 Jan 2018 01:03:27 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v1] hmp: 'info snapshots' not showing the id
+In-Reply-To: <CAOvqHj4P17JQ=bJqpZsA3n-sfw927Sad3-YD2FUHff1zhpanGA@mail.gmail.com>
+References: <20171207065639.164900-1-lepton@google.com>
+	<CAOvqHj4P17JQ=bJqpZsA3n-sfw927Sad3-YD2FUHff1zhpanGA@mail.gmail.com>
+From: =?UTF-8?B?VGFvIFd1KOWQtOa2m0BFbmcp?= <lepton@google.com>
+Date: Tue, 2 Jan 2018 01:03:25 -0800
+Message-ID: <CAOvqHj7Cx7dJLq2kYgpG3M-RoeBd64XM-BT0Hs4=vvnTg9zgAQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] hw/input/hid: Add support for several keys.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,46 +29,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: seeteena <s1seetee@linux.vnet.ibm.com>
-Cc: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org, lma@suse.com, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Max Reitz <mreitz@redhat.com>
+To: QEMU <qemu-devel@nongnu.org>
+Cc: qemu-trivial@nongnu.org, kraxel@redhat.com, mjt@tls.msk.ru, Laurent Vivier <laurent@vivier.eu>, Tao Wu <lepton@google.com>
 
-seeteena <s1seetee@linux.vnet.ibm.com> writes:
+Ping?
 
-> On 12/22/2017 01:07 PM, Markus Armbruster wrote:
->> Eric Blake <eblake@redhat.com> writes:
->>
->>> On 12/19/2017 08:20 AM, Max Reitz wrote:
->>>
->>>> So there are three things:
->>>>
->>>> (1) We probably should not allow snapshot names that could be IDs.
->>>> Easiest way to solve this: Names have to start with a non-digit.
->>> Yes, that would be a nice change.  It is not strictly backwards
->>> compatible (so we'd still have to cope with images that didn't follow
->>> the rule, whether created by older qemu or by non-qemu implementations
->>> of qcow2), but would alleviate a lot of confusion.
->> I recommend to restrict ID strings to letters, digits, '-', '.', '_',
->> starting with a letter.  Use id_wellformed() to check.
-> char *id_generate(IdSubSystems id) autogenates ID in the format eg- 
-> "#block146" with starting with '#' always.
-> restricting ID strings to use id_wellformed() means we need to force
-> ID to start with letter.
+On Thu, Dec 14, 2017 at 1:25 PM, Tao Wu(=E5=90=B4=E6=B6=9B@Eng) <lepton@goo=
+gle.com> wrote:
+> Anybody can merge this?
 >
-> #define ID_SPECIAL_CHAR '#' needs to change to (some letter)
-> #define ID_SPECIAL_CHAR 'A'
-
-Ensuring auto-generated IDs cannot clash with IDs chosen by the user is
-a good idea.  We generally fail to do that in QEMU.
-
-An obvious way to do it is to require the user's IDs to start with a
-letter, and auto-generated IDs to start with another suitable character.
-In theory, starting with '#' is problematic, because it needs to be
-quoted in shell at the beginning of words.  Only matters if
-auto-generated IDs make sense in command lines, which I guess they
-currently don't.  I'd prefer a 'shell-safe' character all the same.
-
->> If backward compatibility is an issue, deprecate offending IDs (with a
->> suitable warning), and kill them off after the customary grace period.
+> It's a simple change:  actually it only changed 4 bytes in hid usage
+> table to enable 4 keys: audiomute volumeup volumedown and power.
+>
+> It's easy to verify what the patch is doing:
+>
+> Boot some guest os with argument "-usbdevice keyboard"  and use qemu
+> monitor console to do "sendkey audiomute", without this patch, nothing
+> happend inside guest os. with this patch,  all these 4 keys work correctl=
+y.
+>
+> On Wed, Dec 6, 2017 at 10:56 PM, Tao Wu <lepton@google.com> wrote:
+>> Add support for these keys: audiomute volumedown volumeup power.
+>> Tested with "sendkey" command in monitor and verify the behavior
+>> in guest OS.
 >>
->> IDs embedded in image files and such you may have to keep working
->> somehow indefinitely.
+>> Signed-off-by: Tao Wu <lepton@google.com>
+>> ---
+>>  hw/input/hid.c | 8 ++++----
+>>  1 file changed, 4 insertions(+), 4 deletions(-)
+>>
+>> diff --git a/hw/input/hid.c b/hw/input/hid.c
+>> index 0d049ff61c..aa4fb826fd 100644
+>> --- a/hw/input/hid.c
+>> +++ b/hw/input/hid.c
+>> @@ -57,14 +57,14 @@ static const uint8_t hid_usage_keys[0x100] =3D {
+>>      0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+>>      0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+>>      0x00, 0x00, 0x00, 0x00, 0x58, 0xe4, 0x00, 0x00,
+>> -    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+>> -    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+>> -    0x00, 0x00, 0x00, 0x00, 0x00, 0x54, 0x00, 0x46,
+>> +    0x7f, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+>> +    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x81, 0x00,
+>> +    0x80, 0x00, 0x00, 0x00, 0x00, 0x54, 0x00, 0x46,
+>>      0xe6, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+>>      0x00, 0x00, 0x00, 0x00, 0x00, 0x48, 0x48, 0x4a,
+>>      0x52, 0x4b, 0x00, 0x50, 0x00, 0x4f, 0x00, 0x4d,
+>>      0x51, 0x4e, 0x49, 0x4c, 0x00, 0x00, 0x00, 0x00,
+>> -    0x00, 0x00, 0x00, 0xe3, 0xe7, 0x65, 0x00, 0x00,
+>> +    0x00, 0x00, 0x00, 0xe3, 0xe7, 0x65, 0x66, 0x00,
+>>      0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+>>      0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+>>      0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+>> --
+>> 2.15.1.424.g9478a66081-goog
+>>
