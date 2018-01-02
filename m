@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58586)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58602)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <andrew.smirnov@gmail.com>) id 1eWSMd-0003Ga-CX
+	(envelope-from <andrew.smirnov@gmail.com>) id 1eWSMd-0003Gu-Ou
 	for qemu-devel@nongnu.org; Tue, 02 Jan 2018 14:36:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <andrew.smirnov@gmail.com>) id 1eWSMb-0000LA-SA
+	(envelope-from <andrew.smirnov@gmail.com>) id 1eWSMc-0000Ll-81
 	for qemu-devel@nongnu.org; Tue, 02 Jan 2018 14:36:43 -0500
 From: Andrey Smirnov <andrew.smirnov@gmail.com>
-Date: Tue,  2 Jan 2018 11:36:14 -0800
-Message-Id: <20180102193622.27215-4-andrew.smirnov@gmail.com>
+Date: Tue,  2 Jan 2018 11:36:15 -0800
+Message-Id: <20180102193622.27215-5-andrew.smirnov@gmail.com>
 In-Reply-To: <20180102193622.27215-1-andrew.smirnov@gmail.com>
 References: <20180102193622.27215-1-andrew.smirnov@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v3 03/11] imx_fec: Change queue flushing
- heuristics
+Subject: [Qemu-devel] [PATCH v3 04/11] imx_fec: Move Tx frame buffer away
+ from the stack
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,50 +26,8 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-arm@nongnu.org
 Cc: Andrey Smirnov <andrew.smirnov@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, Jason Wang <jasowang@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, yurovsky@gmail.com
 
-In current implementation, packet queue flushing logic seem to suffer
-from a deadlock like scenario if a packet is received by the interface
-before before Rx ring is initialized by Guest's driver. Consider the
-following sequence of events:
-
-	1. A QEMU instance is started against a TAP device on Linux
-	   host, running Linux guest, e. g., something to the effect
-	   of:
-
-	   qemu-system-arm \
-	      -net nic,model=imx.fec,netdev=lan0 \
-	      netdev tap,id=lan0,ifname=tap0,script=no,downscript=no \
-	      ... rest of the arguments ...
-
-	2. Once QEMU starts, but before guest reaches the point where
-	   FEC deriver is done initializing the HW, Guest, via TAP
-	   interface, receives a number of multicast MDNS packets from
-	   Host (not necessarily true for every OS, but it happens at
-	   least on Fedora 25)
-
-	3. Recieving a packet in such a state results in
-	   imx_eth_can_receive() returning '0', which in turn causes
-	   tap_send() to disable corresponding event (tap.c:203)
-
-	4. Once Guest's driver reaches the point where it is ready to
-	   recieve packets it prepares Rx ring descriptors and writes
-	   ENET_RDAR_RDAR to ENET_RDAR register to indicate to HW that
-	   more descriptors are ready. And at this points emulation
-	   layer does this:
-
-	   	 s->regs[index] = ENET_RDAR_RDAR;
-                 imx_eth_enable_rx(s);
-
-	   which, combined with:
-
-	   	  if (!s->regs[ENET_RDAR]) {
-		     qemu_flush_queued_packets(qemu_get_queue(s->nic));
-		  }
-
-	   results in Rx queue never being flushed and corresponding
-	   I/O event beign disabled.
-
-To prevent the problem, change the code to always flush packet queue
-when ENET_RDAR transitions 0 -> ENET_RDAR_RDAR.
+Make Tx frame assembly buffer to be a paort of IMXFECState structure
+to avoid a concern about having large data buffer on the stack.
 
 Cc: Peter Maydell <peter.maydell@linaro.org>
 Cc: Jason Wang <jasowang@redhat.com>
@@ -77,69 +35,90 @@ Cc: Philippe Mathieu-Daudé <f4bug@amsat.org>
 Cc: qemu-devel@nongnu.org
 Cc: qemu-arm@nongnu.org
 Cc: yurovsky@gmail.com
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Andrey Smirnov <andrew.smirnov@gmail.com>
 ---
- hw/net/imx_fec.c | 12 ++++++------
- 1 file changed, 6 insertions(+), 6 deletions(-)
+ hw/net/imx_fec.c         | 22 +++++++++++-----------
+ include/hw/net/imx_fec.h |  3 +++
+ 2 files changed, 14 insertions(+), 11 deletions(-)
 
 diff --git a/hw/net/imx_fec.c b/hw/net/imx_fec.c
-index 8b2e4b8ffe..eb034ffd0c 100644
+index eb034ffd0c..56cb72273c 100644
 --- a/hw/net/imx_fec.c
 +++ b/hw/net/imx_fec.c
-@@ -533,7 +533,7 @@ static void imx_eth_do_tx(IMXFECState *s)
-     }
- }
- 
--static void imx_eth_enable_rx(IMXFECState *s)
-+static void imx_eth_enable_rx(IMXFECState *s, bool flush)
+@@ -405,8 +405,7 @@ static void imx_eth_update(IMXFECState *s)
+ static void imx_fec_do_tx(IMXFECState *s)
  {
-     IMXFECBufDesc bd;
-     bool rx_ring_full;
-@@ -544,7 +544,7 @@ static void imx_eth_enable_rx(IMXFECState *s)
+     int frame_size = 0, descnt = 0;
+-    uint8_t frame[ENET_MAX_FRAME_SIZE];
+-    uint8_t *ptr = frame;
++    uint8_t *ptr = s->frame;
+     uint32_t addr = s->tx_descriptor;
  
-     if (rx_ring_full) {
-         FEC_PRINTF("RX buffer full\n");
--    } else if (!s->regs[ENET_RDAR]) {
-+    } else if (flush) {
-         qemu_flush_queued_packets(qemu_get_queue(s->nic));
-     }
+     while (descnt++ < IMX_MAX_DESC) {
+@@ -431,8 +430,8 @@ static void imx_fec_do_tx(IMXFECState *s)
+         frame_size += len;
+         if (bd.flags & ENET_BD_L) {
+             /* Last buffer in frame.  */
+-            qemu_send_packet(qemu_get_queue(s->nic), frame, frame_size);
+-            ptr = frame;
++            qemu_send_packet(qemu_get_queue(s->nic), s->frame, frame_size);
++            ptr = s->frame;
+             frame_size = 0;
+             s->regs[ENET_EIR] |= ENET_INT_TXF;
+         }
+@@ -456,8 +455,7 @@ static void imx_fec_do_tx(IMXFECState *s)
+ static void imx_enet_do_tx(IMXFECState *s)
+ {
+     int frame_size = 0, descnt = 0;
+-    uint8_t frame[ENET_MAX_FRAME_SIZE];
+-    uint8_t *ptr = frame;
++    uint8_t *ptr = s->frame;
+     uint32_t addr = s->tx_descriptor;
  
-@@ -807,7 +807,7 @@ static void imx_eth_write(void *opaque, hwaddr offset, uint64_t value,
-         if (s->regs[ENET_ECR] & ENET_ECR_ETHEREN) {
-             if (!s->regs[index]) {
-                 s->regs[index] = ENET_RDAR_RDAR;
--                imx_eth_enable_rx(s);
-+                imx_eth_enable_rx(s, true);
+     while (descnt++ < IMX_MAX_DESC) {
+@@ -482,13 +480,13 @@ static void imx_enet_do_tx(IMXFECState *s)
+         frame_size += len;
+         if (bd.flags & ENET_BD_L) {
+             if (bd.option & ENET_BD_PINS) {
+-                struct ip_header *ip_hd = PKT_GET_IP_HDR(frame);
++                struct ip_header *ip_hd = PKT_GET_IP_HDR(s->frame);
+                 if (IP_HEADER_VERSION(ip_hd) == 4) {
+-                    net_checksum_calculate(frame, frame_size);
++                    net_checksum_calculate(s->frame, frame_size);
+                 }
              }
-         } else {
-             s->regs[index] = 0;
-@@ -930,7 +930,7 @@ static int imx_eth_can_receive(NetClientState *nc)
+             if (bd.option & ENET_BD_IINS) {
+-                struct ip_header *ip_hd = PKT_GET_IP_HDR(frame);
++                struct ip_header *ip_hd = PKT_GET_IP_HDR(s->frame);
+                 /* We compute checksum only for IPv4 frames */
+                 if (IP_HEADER_VERSION(ip_hd) == 4) {
+                     uint16_t csum;
+@@ -498,8 +496,10 @@ static void imx_enet_do_tx(IMXFECState *s)
+                 }
+             }
+             /* Last buffer in frame.  */
+-            qemu_send_packet(qemu_get_queue(s->nic), frame, len);
+-            ptr = frame;
++
++            qemu_send_packet(qemu_get_queue(s->nic), s->frame, len);
++            ptr = s->frame;
++
+             frame_size = 0;
+             if (bd.option & ENET_BD_TX_INT) {
+                 s->regs[ENET_EIR] |= ENET_INT_TXF;
+diff --git a/include/hw/net/imx_fec.h b/include/hw/net/imx_fec.h
+index 62ad473b05..67993870a2 100644
+--- a/include/hw/net/imx_fec.h
++++ b/include/hw/net/imx_fec.h
+@@ -252,6 +252,9 @@ typedef struct IMXFECState {
+     uint32_t phy_int_mask;
  
-     FEC_PRINTF("\n");
+     bool is_fec;
++
++    /* Buffer used to assemble a Tx frame */
++    uint8_t frame[ENET_MAX_FRAME_SIZE];
+ } IMXFECState;
  
--    return s->regs[ENET_RDAR] ? 1 : 0;
-+    return !!s->regs[ENET_RDAR];
- }
- 
- static ssize_t imx_fec_receive(NetClientState *nc, const uint8_t *buf,
-@@ -1020,7 +1020,7 @@ static ssize_t imx_fec_receive(NetClientState *nc, const uint8_t *buf,
-         }
-     }
-     s->rx_descriptor = addr;
--    imx_eth_enable_rx(s);
-+    imx_eth_enable_rx(s, false);
-     imx_eth_update(s);
-     return len;
- }
-@@ -1116,7 +1116,7 @@ static ssize_t imx_enet_receive(NetClientState *nc, const uint8_t *buf,
-         }
-     }
-     s->rx_descriptor = addr;
--    imx_eth_enable_rx(s);
-+    imx_eth_enable_rx(s, false);
-     imx_eth_update(s);
-     return len;
- }
+ #endif
 -- 
 2.14.3
