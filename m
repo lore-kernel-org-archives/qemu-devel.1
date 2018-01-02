@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52414)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52388)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1eWWBT-00079H-NP
-	for qemu-devel@nongnu.org; Tue, 02 Jan 2018 18:41:28 -0500
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1eWWBQ-00039u-VT
+	(envelope-from <laurent@vivier.eu>) id 1eWWBR-00077t-VP
 	for qemu-devel@nongnu.org; Tue, 02 Jan 2018 18:41:27 -0500
-Received: from mout.kundenserver.de ([212.227.126.134]:51142)
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <laurent@vivier.eu>) id 1eWWBP-000394-8Z
+	for qemu-devel@nongnu.org; Tue, 02 Jan 2018 18:41:26 -0500
+Received: from mout.kundenserver.de ([212.227.126.131]:53067)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1eWWBQ-00039U-LS
-	for qemu-devel@nongnu.org; Tue, 02 Jan 2018 18:41:24 -0500
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1eWWBO-00038M-Ut
+	for qemu-devel@nongnu.org; Tue, 02 Jan 2018 18:41:23 -0500
 From: Laurent Vivier <laurent@vivier.eu>
-Date: Wed,  3 Jan 2018 00:41:02 +0100
-Message-Id: <20180102234108.32713-12-laurent@vivier.eu>
+Date: Wed,  3 Jan 2018 00:41:00 +0100
+Message-Id: <20180102234108.32713-10-laurent@vivier.eu>
 In-Reply-To: <20180102234108.32713-1-laurent@vivier.eu>
 References: <20180102234108.32713-1-laurent@vivier.eu>
-Subject: [Qemu-devel] [PATCH v6 11/17] target/m68k: add reset
+Subject: [Qemu-devel] [PATCH v6 09/17] target/m68k: softmmu cleanup
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,76 +26,143 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Richard Henderson <richard.henderson@linaro.org>, Thomas Huth <huth@tuxfamily.org>, Laurent Vivier <laurent@vivier.eu>
 
-The instruction traps if the CPU is not in
-Supervisor state but the helper is empty because
-there is no easy way to reset all the peripherals
-without resetting the CPU itself.
+don't compile supervisor only instructions in linux-user mode
 
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/m68k/helper.c    |  7 +++++++
- target/m68k/helper.h    |  4 ++++
- target/m68k/translate.c | 13 +++++++++++++
- 3 files changed, 24 insertions(+)
+ target/m68k/translate.c | 39 +++++++++++++++++++++++++++++++++------
+ 1 file changed, 33 insertions(+), 6 deletions(-)
 
-diff --git a/target/m68k/helper.c b/target/m68k/helper.c
-index af57ffcea9..52b054e1a3 100644
---- a/target/m68k/helper.c
-+++ b/target/m68k/helper.c
-@@ -711,3 +711,10 @@ void HELPER(set_mac_extu)(CPUM68KState *env, uint32_t val, uint32_t acc)
-     res |= (uint64_t)(val & 0xffff0000) << 16;
-     env->macc[acc + 1] = res;
- }
-+
-+#if defined(CONFIG_SOFTMMU)
-+void HELPER(reset)(CPUM68KState *env)
-+{
-+    /* FIXME: reset all except CPU */
-+}
-+#endif
-diff --git a/target/m68k/helper.h b/target/m68k/helper.h
-index 78483da003..d27ea37d60 100644
---- a/target/m68k/helper.h
-+++ b/target/m68k/helper.h
-@@ -97,3 +97,7 @@ DEF_HELPER_FLAGS_4(bfffo_mem, TCG_CALL_NO_WG, i64, env, i32, s32, i32)
- 
- DEF_HELPER_3(chk, void, env, s32, s32)
- DEF_HELPER_4(chk2, void, env, s32, s32, s32)
-+
-+#if defined(CONFIG_SOFTMMU)
-+DEF_HELPER_FLAGS_1(reset, TCG_CALL_NO_RWG, void, env)
-+#endif
 diff --git a/target/m68k/translate.c b/target/m68k/translate.c
-index 75be38973e..69bd347a70 100644
+index 662a518f16..ae3fd3db26 100644
 --- a/target/m68k/translate.c
 +++ b/target/m68k/translate.c
-@@ -2762,6 +2762,18 @@ DISAS_INSN(unlk)
-     tcg_temp_free(src);
+@@ -4392,6 +4392,7 @@ DISAS_INSN(move_from_sr)
+     DEST_EA(env, insn, OS_WORD, sr, NULL);
  }
  
 +#if defined(CONFIG_SOFTMMU)
-+DISAS_INSN(reset)
-+{
+ DISAS_INSN(move_to_sr)
+ {
+     if (IS_USER(s)) {
+@@ -4424,6 +4425,11 @@ DISAS_INSN(move_to_usp)
+ 
+ DISAS_INSN(halt)
+ {
 +    if (IS_USER(s)) {
 +        gen_exception(s, s->insn_pc, EXCP_PRIVILEGE);
 +        return;
 +    }
 +
-+    gen_helper_reset(cpu_env);
-+}
-+#endif
-+
- DISAS_INSN(nop)
- {
+     gen_exception(s, s->pc, EXCP_HALT_INSN);
  }
-@@ -5573,6 +5585,7 @@ void register_m68k_insns (CPUM68KState *env)
- #if defined(CONFIG_SOFTMMU)
+ 
+@@ -4507,6 +4513,7 @@ DISAS_INSN(wdebug)
+     /* TODO: Implement wdebug.  */
+     cpu_abort(CPU(cpu), "WDEBUG not implemented");
+ }
++#endif
+ 
+ DISAS_INSN(trap)
+ {
+@@ -5064,10 +5071,16 @@ DISAS_INSN(fscc)
+     tcg_temp_free(tmp);
+ }
+ 
++#if defined(CONFIG_SOFTMMU)
+ DISAS_INSN(frestore)
+ {
+     M68kCPU *cpu = m68k_env_get_cpu(env);
+ 
++    if (IS_USER(s)) {
++        gen_exception(s, s->insn_pc, EXCP_PRIVILEGE);
++        return;
++    }
++
+     /* TODO: Implement frestore.  */
+     cpu_abort(CPU(cpu), "FRESTORE not implemented");
+ }
+@@ -5076,9 +5089,15 @@ DISAS_INSN(fsave)
+ {
+     M68kCPU *cpu = m68k_env_get_cpu(env);
+ 
++    if (IS_USER(s)) {
++        gen_exception(s, s->insn_pc, EXCP_PRIVILEGE);
++        return;
++    }
++
+     /* TODO: Implement fsave.  */
+     cpu_abort(CPU(cpu), "FSAVE not implemented");
+ }
++#endif
+ 
+ static inline TCGv gen_mac_extract_word(DisasContext *s, TCGv val, int upper)
+ {
+@@ -5503,7 +5522,9 @@ void register_m68k_insns (CPUM68KState *env)
+     INSN(not,       4680, fff8, CF_ISA_A);
+     INSN(not,       4600, ff00, M68000);
+     INSN(undef,     46c0, ffc0, M68000);
++#if defined(CONFIG_SOFTMMU)
+     INSN(move_to_sr, 46c0, ffc0, CF_ISA_A);
++#endif
+     INSN(nbcd,      4800, ffc0, M68000);
+     INSN(linkl,     4808, fff8, M68000);
+     BASE(pea,       4840, ffc0);
+@@ -5518,7 +5539,9 @@ void register_m68k_insns (CPUM68KState *env)
+     BASE(tst,       4a00, ff00);
+     INSN(tas,       4ac0, ffc0, CF_ISA_B);
+     INSN(tas,       4ac0, ffc0, M68000);
++#if defined(CONFIG_SOFTMMU)
+     INSN(halt,      4ac8, ffff, CF_ISA_A);
++#endif
+     INSN(pulse,     4acc, ffff, CF_ISA_A);
+     BASE(illegal,   4afc, ffff);
+     INSN(mull,      4c00, ffc0, CF_ISA_A);
+@@ -5529,14 +5552,16 @@ void register_m68k_insns (CPUM68KState *env)
+     BASE(trap,      4e40, fff0);
+     BASE(link,      4e50, fff8);
+     BASE(unlk,      4e58, fff8);
++#if defined(CONFIG_SOFTMMU)
      INSN(move_to_usp, 4e60, fff8, USP);
      INSN(move_from_usp, 4e68, fff8, USP);
-+    INSN(reset,     4e70, ffff, M68000);
+-    BASE(nop,       4e71, ffff);
      BASE(stop,      4e72, ffff);
      BASE(rte,       4e73, ffff);
-     INSN(movec,     4e7b, ffff, CF_ISA_A);
++    INSN(movec,     4e7b, ffff, CF_ISA_A);
++#endif
++    BASE(nop,       4e71, ffff);
+     INSN(rtd,       4e74, ffff, RTD);
+     BASE(rts,       4e75, ffff);
+-    INSN(movec,     4e7b, ffff, CF_ISA_A);
+     BASE(jump,      4e80, ffc0);
+     BASE(jump,      4ec0, ffc0);
+     INSN(addsubq,   5000, f080, M68000);
+@@ -5640,19 +5665,21 @@ void register_m68k_insns (CPUM68KState *env)
+     BASE(undef_fpu, f000, f000);
+     INSN(fpu,       f200, ffc0, CF_FPU);
+     INSN(fbcc,      f280, ffc0, CF_FPU);
+-    INSN(frestore,  f340, ffc0, CF_FPU);
+-    INSN(fsave,     f300, ffc0, CF_FPU);
+     INSN(fpu,       f200, ffc0, FPU);
+     INSN(fscc,      f240, ffc0, FPU);
+     INSN(fbcc,      f280, ff80, FPU);
++#if defined(CONFIG_SOFTMMU)
++    INSN(frestore,  f340, ffc0, CF_FPU);
++    INSN(fsave,     f300, ffc0, CF_FPU);
+     INSN(frestore,  f340, ffc0, FPU);
+     INSN(fsave,     f300, ffc0, FPU);
+     INSN(intouch,   f340, ffc0, CF_ISA_A);
+     INSN(cpushl,    f428, ff38, CF_ISA_A);
+-    INSN(move16_mem, f600, ffe0, M68040);
+-    INSN(move16_reg, f620, fff8, M68040);
+     INSN(wddata,    fb00, ff00, CF_ISA_A);
+     INSN(wdebug,    fbc0, ffc0, CF_ISA_A);
++#endif
++    INSN(move16_mem, f600, ffe0, M68040);
++    INSN(move16_reg, f620, fff8, M68040);
+ #undef INSN
+ }
+ 
 -- 
 2.14.3
