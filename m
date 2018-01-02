@@ -1,22 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34563)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44929)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1eWMiv-0005Iu-VU
-	for qemu-devel@nongnu.org; Tue, 02 Jan 2018 08:35:23 -0500
+	(envelope-from <wexu@redhat.com>) id 1eWN5a-0004tH-Eo
+	for qemu-devel@nongnu.org; Tue, 02 Jan 2018 08:58:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1eWMiv-0004cg-07
-	for qemu-devel@nongnu.org; Tue, 02 Jan 2018 08:35:21 -0500
-References: <20171207065639.164900-1-lepton@google.com>
-	<CAOvqHj4P17JQ=bJqpZsA3n-sfw927Sad3-YD2FUHff1zhpanGA@mail.gmail.com>
-	<CAOvqHj7Cx7dJLq2kYgpG3M-RoeBd64XM-BT0Hs4=vvnTg9zgAQ@mail.gmail.com>
-From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <7675c1e9-806c-1120-31c1-e5750d2110d7@vivier.eu>
-Date: Tue, 2 Jan 2018 14:35:04 +0100
+	(envelope-from <wexu@redhat.com>) id 1eWN5V-00034J-HC
+	for qemu-devel@nongnu.org; Tue, 02 Jan 2018 08:58:46 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:45802)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <wexu@redhat.com>) id 1eWN5V-00031r-AU
+	for qemu-devel@nongnu.org; Tue, 02 Jan 2018 08:58:41 -0500
+Date: Tue, 2 Jan 2018 22:20:54 +0800
+From: Wei Xu <wexu@redhat.com>
+Message-ID: <20180102142054.jqhbg3zrhjlppg2q@Wei-Dev>
+References: <77f0c119-236d-9d4e-0a99-3519ecc26b23@profihost.ag>
 MIME-Version: 1.0
-In-Reply-To: <CAOvqHj7Cx7dJLq2kYgpG3M-RoeBd64XM-BT0Hs4=vvnTg9zgAQ@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] hw/input/hid: Add support for several keys.
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <77f0c119-236d-9d4e-0a99-3519ecc26b23@profihost.ag>
+Subject: Re: [Qemu-devel] dropped pkts with Qemu on tap interace (RX)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,62 +26,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?B?VGFvIFd1KOWQtOa2m0BFbmcp?= <lepton@google.com>, QEMU <qemu-devel@nongnu.org>
-Cc: qemu-trivial@nongnu.org, kraxel@redhat.com, mjt@tls.msk.ru
+To: Stefan Priebe - Profihost AG <s.priebe@profihost.ag>
+Cc: qemu-devel <qemu-devel@nongnu.org>
 
-Le 02/01/2018 à 10:03, Tao Wu(吴涛@Eng) a écrit :
-> Ping?
+On Tue, Jan 02, 2018 at 12:17:29PM +0100, Stefan Priebe - Profihost AG wrote:
+> Hello,
+> 
+> currently i'm trying to fix a problem where we have "random" missing
+> packets.
+> 
+> We're doing an ssh connect from machine a to machine b every 5 minutes
+> via rsync and ssh.
+> 
+> Sometimes it happens that we get this cron message:
+> "Connection to 192.168.0.2 closed by remote host.
+> rsync: connection unexpectedly closed (0 bytes received so far) [sender]
+> rsync error: unexplained error (code 255) at io.c(226) [sender=3.1.2]
+> ssh: connect to host 192.168.0.2 port 22: Connection refused"
 
-Your patch has been Merged by michael with his pull request of 17/12/2017.
+Hi Stefan,
+What kind of virtio-net backend are you using? Can you paste your qemu
+command line here?
 
-Thanks,
-Laurent
+'Connection refused' usually means that the client gets a TCP Reset rather
+than losing packets, so this might not be a relevant issue.
 
-> On Thu, Dec 14, 2017 at 1:25 PM, Tao Wu(吴涛@Eng) <lepton@google.com> wrote:
->> Anybody can merge this?
->>
->> It's a simple change:  actually it only changed 4 bytes in hid usage
->> table to enable 4 keys: audiomute volumeup volumedown and power.
->>
->> It's easy to verify what the patch is doing:
->>
->> Boot some guest os with argument "-usbdevice keyboard"  and use qemu
->> monitor console to do "sendkey audiomute", without this patch, nothing
->> happend inside guest os. with this patch,  all these 4 keys work correctly.
->>
->> On Wed, Dec 6, 2017 at 10:56 PM, Tao Wu <lepton@google.com> wrote:
->>> Add support for these keys: audiomute volumedown volumeup power.
->>> Tested with "sendkey" command in monitor and verify the behavior
->>> in guest OS.
->>>
->>> Signed-off-by: Tao Wu <lepton@google.com>
->>> ---
->>>  hw/input/hid.c | 8 ++++----
->>>  1 file changed, 4 insertions(+), 4 deletions(-)
->>>
->>> diff --git a/hw/input/hid.c b/hw/input/hid.c
->>> index 0d049ff61c..aa4fb826fd 100644
->>> --- a/hw/input/hid.c
->>> +++ b/hw/input/hid.c
->>> @@ -57,14 +57,14 @@ static const uint8_t hid_usage_keys[0x100] = {
->>>      0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
->>>      0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
->>>      0x00, 0x00, 0x00, 0x00, 0x58, 0xe4, 0x00, 0x00,
->>> -    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
->>> -    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
->>> -    0x00, 0x00, 0x00, 0x00, 0x00, 0x54, 0x00, 0x46,
->>> +    0x7f, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
->>> +    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x81, 0x00,
->>> +    0x80, 0x00, 0x00, 0x00, 0x00, 0x54, 0x00, 0x46,
->>>      0xe6, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
->>>      0x00, 0x00, 0x00, 0x00, 0x00, 0x48, 0x48, 0x4a,
->>>      0x52, 0x4b, 0x00, 0x50, 0x00, 0x4f, 0x00, 0x4d,
->>>      0x51, 0x4e, 0x49, 0x4c, 0x00, 0x00, 0x00, 0x00,
->>> -    0x00, 0x00, 0x00, 0xe3, 0xe7, 0x65, 0x00, 0x00,
->>> +    0x00, 0x00, 0x00, 0xe3, 0xe7, 0x65, 0x66, 0x00,
->>>      0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
->>>      0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
->>>      0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
->>> --
->>> 2.15.1.424.g9478a66081-goog
->>>
+Also you can do a tcpdump on both guests and see what happened to SSH packets
+(tcpdump -i tapXXX port 22).
+
+> 
+> The tap devices on the target vm shows dropped RX packages on BOTH tap
+> interfaces - strangely with the same amount of pkts?
+> 
+> # ifconfig tap317i0; ifconfig tap317i1
+> tap317i0  Link encap:Ethernet  HWaddr 6e:cb:65:94:bb:bf
+>           UP BROADCAST RUNNING PROMISC MULTICAST  MTU:1500  Metric:1
+>           RX packets:2238445 errors:0 dropped:13159 overruns:0 frame:0
+>           TX packets:9655853 errors:0 dropped:0 overruns:0 carrier:0
+>           collisions:0 txqueuelen:1000
+>           RX bytes:177991267 (169.7 MiB)  TX bytes:910412749 (868.2 MiB)
+> 
+> tap317i1  Link encap:Ethernet  HWaddr 96:f8:b5:d0:9a:07
+>           UP BROADCAST RUNNING PROMISC MULTICAST  MTU:1500  Metric:1
+>           RX packets:1516085 errors:0 dropped:13159 overruns:0 frame:0
+>           TX packets:1446964 errors:0 dropped:0 overruns:0 carrier:0
+>           collisions:0 txqueuelen:1000
+>           RX bytes:1597564313 (1.4 GiB)  TX bytes:3517734365 (3.2 GiB)
+> 
+> Any ideas how to inspect this issue?
+
+It seems both tap interfaces lose RX pkts, dropping pkts of RX means the
+host(backend) cann't receive packets from the guest as fast as the guest sends.
+
+Are you running some symmetrical test on both guests? 
+
+Wei
+
+> 
+> Greets,
+> Stefan
+> 
