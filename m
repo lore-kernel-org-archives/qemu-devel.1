@@ -1,34 +1,45 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46251)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34989)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1eWFpB-0001ov-7J
-	for qemu-devel@nongnu.org; Tue, 02 Jan 2018 01:13:22 -0500
+	(envelope-from <s1seetee@linux.vnet.ibm.com>) id 1eWGHw-0000O1-OA
+	for qemu-devel@nongnu.org; Tue, 02 Jan 2018 01:43:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1eWFp7-0001I2-Vz
-	for qemu-devel@nongnu.org; Tue, 02 Jan 2018 01:13:21 -0500
-Received: from mail-io0-x244.google.com ([2607:f8b0:4001:c06::244]:36874)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <aik@ozlabs.ru>) id 1eWFp7-0001Hm-PW
-	for qemu-devel@nongnu.org; Tue, 02 Jan 2018 01:13:17 -0500
-Received: by mail-io0-x244.google.com with SMTP id n14so24716161iob.4
-	for <qemu-devel@nongnu.org>; Mon, 01 Jan 2018 22:13:17 -0800 (PST)
-From: Alexey Kardashevskiy <aik@ozlabs.ru>
-References: <20171016052004.31397-1-aik@ozlabs.ru>
-	<20171016093641.GH2776@umbus.fritz.box>
-	<e419ca8a-6e0b-70eb-14da-03a843fa8b92@ozlabs.ru>
-	<20171019062440.GY2776@umbus.fritz.box>
-	<699e58bf-de22-5341-ecc6-458df7ccbe65@ozlabs.ru>
-	<9227196b-789c-e4b2-c9c5-4fd95ed42b4e@ozlabs.ru>
-	<20171109063822.GD7732@umbus.fritz.box>
-	<d6f4ad92-bd83-b990-4e86-ac89638c44d0@ozlabs.ru>
-Message-ID: <9fabc6c4-9a95-d44e-dc4c-33d91c00fb0c@ozlabs.ru>
-Date: Tue, 2 Jan 2018 17:13:09 +1100
+	(envelope-from <s1seetee@linux.vnet.ibm.com>) id 1eWGHt-0008MX-L2
+	for qemu-devel@nongnu.org; Tue, 02 Jan 2018 01:43:04 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:57580)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <s1seetee@linux.vnet.ibm.com>)
+	id 1eWGHt-0008Lk-Bt
+	for qemu-devel@nongnu.org; Tue, 02 Jan 2018 01:43:01 -0500
+Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	w026cUHM092183
+	for <qemu-devel@nongnu.org>; Tue, 2 Jan 2018 01:42:59 -0500
+Received: from e37.co.us.ibm.com (e37.co.us.ibm.com [32.97.110.158])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2f7rrn16kj-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Tue, 02 Jan 2018 01:42:58 -0500
+Received: from localhost
+	by e37.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <s1seetee@linux.vnet.ibm.com>;
+	Mon, 1 Jan 2018 23:42:57 -0700
+References: <1511273358-21789-1-git-send-email-s1seetee@linux.vnet.ibm.com>
+	<20171212164114.GF2409@work-vm>
+	<e37d8871-544f-3c4f-3a59-bb66dc5c8b67@linux.vnet.ibm.com>
+	<b5c7e566-34f0-adb0-0fcb-bf272cbb0a81@redhat.com>
+	<225a4478-dc5e-a067-f207-e8a183afa0d9@linux.vnet.ibm.com>
+	<9b719ebe-8b38-708c-45a7-d377a583f899@redhat.com>
+	<5e07b5ea-e8b0-521a-b1af-31017fc52578@redhat.com>
+	<87shc3rz5d.fsf@dusky.pond.sub.org>
+From: seeteena <s1seetee@linux.vnet.ibm.com>
+Date: Tue, 2 Jan 2018 12:12:49 +0530
 MIME-Version: 1.0
-In-Reply-To: <d6f4ad92-bd83-b990-4e86-ac89638c44d0@ozlabs.ru>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="T1O2CXFfT7v8NWoHT3Bp0shr5P7Stp9VT"
-Subject: Re: [Qemu-devel] [PATCH qemu v3] RFC: ppc/spapr: Receive and store
- device tree blob from SLOF
+In-Reply-To: <87shc3rz5d.fsf@dusky.pond.sub.org>
+Content-Language: en-US
+Message-Id: <bd60d7e7-8d33-3f87-b6be-89918c1e7ef6@linux.vnet.ibm.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v1] hmp: 'info snapshots' not showing the id
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,111 +48,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Balbir Singh <bsingharora@gmail.com>, Greg Kurz <groug@kaod.org>, slof@lists.ozlabs.org, Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>, Thomas Huth <thuth@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>, Eric Blake <eblake@redhat.com>
+Cc: Max Reitz <mreitz@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, lma@suse.com, qemu-devel@nongnu.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---T1O2CXFfT7v8NWoHT3Bp0shr5P7Stp9VT
-From: Alexey Kardashevskiy <aik@ozlabs.ru>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org,
- Balbir Singh <bsingharora@gmail.com>, Greg Kurz <groug@kaod.org>,
- slof@lists.ozlabs.org, Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>,
- Thomas Huth <thuth@redhat.com>
-Message-ID: <9fabc6c4-9a95-d44e-dc4c-33d91c00fb0c@ozlabs.ru>
-Subject: Re: [PATCH qemu v3] RFC: ppc/spapr: Receive and store device tree
- blob from SLOF
-References: <20171016052004.31397-1-aik@ozlabs.ru>
- <20171016093641.GH2776@umbus.fritz.box>
- <e419ca8a-6e0b-70eb-14da-03a843fa8b92@ozlabs.ru>
- <20171019062440.GY2776@umbus.fritz.box>
- <699e58bf-de22-5341-ecc6-458df7ccbe65@ozlabs.ru>
- <9227196b-789c-e4b2-c9c5-4fd95ed42b4e@ozlabs.ru>
- <20171109063822.GD7732@umbus.fritz.box>
- <d6f4ad92-bd83-b990-4e86-ac89638c44d0@ozlabs.ru>
-In-Reply-To: <d6f4ad92-bd83-b990-4e86-ac89638c44d0@ozlabs.ru>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
 
-On 11/12/17 17:20, Alexey Kardashevskiy wrote:
-> On 09/11/17 17:38, David Gibson wrote:
->> On Tue, Nov 07, 2017 at 06:14:04PM +1100, Alexey Kardashevskiy wrote:
->>> On 20/10/17 11:46, Alexey Kardashevskiy wrote:
->>>> On 19/10/17 17:24, David Gibson wrote:
->>>>> On Tue, Oct 17, 2017 at 04:55:03PM +1100, Alexey Kardashevskiy wrot=
-e:
->>>>>> On 16/10/17 20:36, David Gibson wrote:
->>>>>>> On Mon, Oct 16, 2017 at 04:20:04PM +1100, Alexey Kardashevskiy
->>>>>> wrote:
->>>>> [snip]
->>>>>>> ||
->>>>>>>
->>>>>>> Yeah.. this is all a bit complicated, I'm really thinking about a=
-
->>>>>>> fdt_fsck() function for libfdt.
->>>>>>
->>>>>>
->>>>>> Oh. So what now? Do as below or wait for libdtc update?
->>>>>
->>>>> So I started hacking on this.  It's a bit fiddlier to get right tha=
-n I
->>>>> anticipated.  How about you make a placeholder function to "test" t=
-he
->>>>> tree for now, with a comment that it will be updated once the libfd=
-t
->>>>> extensions are there.
->>>>
->>>> What would the placeholder do? Nothing or my proposed "FDT_CHK" thin=
-gy?
->>>>
->>>> Are we in a hurry with this one at all, or I can wait till libfdt ge=
-ts this
->>>> fsck()?
->>>
->>>
->>> Ping?
->>>
->>> This is not v2.11 material, is it?
+On 12/22/2017 01:07 PM, Markus Armbruster wrote:
+> Eric Blake <eblake@redhat.com> writes:
+>
+>> On 12/19/2017 08:20 AM, Max Reitz wrote:
 >>
->> Not at this stage, no.
->>
->> I've started looking at writing the fdt_fsck() thing, but got
->> sidetracked by a bunch of related fixes to safety of handling
->> corrupted blobs in libfdt.
->=20
-> Please let me know when I can repost the "
-> ppc/spapr: Receive and store device tree blob from SLOF" again. Thanks.=
+>>> So there are three things:
+>>>
+>>> (1) We probably should not allow snapshot names that could be IDs.
+>>> Easiest way to solve this: Names have to start with a non-digit.
+>> Yes, that would be a nice change.  It is not strictly backwards
+>> compatible (so we'd still have to cope with images that didn't follow
+>> the rule, whether created by older qemu or by non-qemu implementations
+>> of qcow2), but would alleviate a lot of confusion.
+> I recommend to restrict ID strings to letters, digits, '-', '.', '_',
+> starting with a letter.  Use id_wellformed() to check.
+char *id_generate(IdSubSystems id) autogenates ID in the format eg- 
+"#block146" with starting with '#' always.
+restricting ID strings to use id_wellformed() means we need to force ID 
+to start with letter.
 
+#define ID_SPECIAL_CHAR '#' needs to change to (some letter)
+#define ID_SPECIAL_CHAR 'A'
 
-
-Still to early to repost?
-
-
---=20
-Alexey
-
-
---T1O2CXFfT7v8NWoHT3Bp0shr5P7Stp9VT
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQJCBAEBCAAsFiEEZSrPibrORRTHQ99dhhM92CvBILkFAlpLIvYOHGFpa0Bvemxh
-YnMucnUACgkQhhM92CvBILmBqBAAnEPgmtY0D/zzUpXT583dqDTzFcJmfBBPl7Z2
-WmEChgB2caJnPtBW4BktD0tU/OYIcIGm3/JlLj1zZ6Wmdbd12dvwpSt6/X7vkmw6
-iPQDKIeyEgTuIW4Cz9zzkSLfNhCBVCSQeRL1B6bNjh/+EQTKTS4/lKEJz94s3VuO
-PGqMmRdo4cAIP3lyLQVKN2/VxVC7driv13ysjPCIJSpWH3v+jCkULO+32Z5IKcjt
-1b48dNn68YS9n5Op90YZcaeM/6GJqXX21FLwy+7IxRM4EZeHE3WASoJRfpVXtjJZ
-ztHGkz9d698mwkstoa31s9ogXphhCFuPXX/lYQQQoVoO9+i+YsqsahLKHf/ngXMV
-NbVtQUrmuC3S8WbZSuPLKrNVrpZ8W/XpKSgE3evSlgR7cMbZW247UDS0/gfvdln/
-7I+e6hBy/nkc6UdnodMtGa6NMIGp3tMZ1GTAXuEeuGRLKJNexYrvQFDZqBJkWHD3
-5zg4FBlYBo7j4ZI1A1BNM9nId3+RPKPy3NB/Y/3TBzqkq8e46p3rxuhnJpFRLKlh
-gdzupESefLt3KInF3R/QpGStlfCmUYZZPLCjK8mYrBqgfUcu5qNofLAv0c8ErkWm
-hchcbyvnqVKmyZN9J0roKeZaYn2h2DYrQIvTIjT/hgDDf2XxWQM7d2tfhCNnMudu
-uaMCkHo=
-=oswB
------END PGP SIGNATURE-----
-
---T1O2CXFfT7v8NWoHT3Bp0shr5P7Stp9VT--
+>
+> If backward compatibility is an issue, deprecate offending IDs (with a
+> suitable warning), and kill them off after the customary grace period.
+>
+> IDs embedded in image files and such you may have to keep working
+> somehow indefinitely.
+>
