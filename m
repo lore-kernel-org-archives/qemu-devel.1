@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36000)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36102)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1eWB6I-0001W4-SU
-	for qemu-devel@nongnu.org; Mon, 01 Jan 2018 20:10:44 -0500
+	(envelope-from <laurent@vivier.eu>) id 1eWB6L-0001XT-3I
+	for qemu-devel@nongnu.org; Mon, 01 Jan 2018 20:10:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1eWB6F-00052a-91
-	for qemu-devel@nongnu.org; Mon, 01 Jan 2018 20:10:42 -0500
-Received: from mout.kundenserver.de ([212.227.126.187]:56374)
+	(envelope-from <laurent@vivier.eu>) id 1eWB6J-00058B-F7
+	for qemu-devel@nongnu.org; Mon, 01 Jan 2018 20:10:45 -0500
+Received: from mout.kundenserver.de ([212.227.126.133]:55187)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1eWB6E-00051V-Up
-	for qemu-devel@nongnu.org; Mon, 01 Jan 2018 20:10:39 -0500
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1eWB6J-00056g-24
+	for qemu-devel@nongnu.org; Mon, 01 Jan 2018 20:10:43 -0500
 From: Laurent Vivier <laurent@vivier.eu>
-Date: Tue,  2 Jan 2018 02:10:19 +0100
-Message-Id: <20180102011032.30056-5-laurent@vivier.eu>
+Date: Tue,  2 Jan 2018 02:10:29 +0100
+Message-Id: <20180102011032.30056-15-laurent@vivier.eu>
 In-Reply-To: <20180102011032.30056-1-laurent@vivier.eu>
 References: <20180102011032.30056-1-laurent@vivier.eu>
-Subject: [Qemu-devel] [PATCH v5 04/17] target-m68k: use insn_pc to generate
- instruction fault address
+Subject: [Qemu-devel] [PATCH v5 14/17] target/m68k: add 680x0 "move to SR"
+ instruction
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,179 +27,95 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Thomas Huth <huth@tuxfamily.org>, Laurent Vivier <laurent@vivier.eu>
 
+Some cleanup, and allows SR to be moved from any addressing mode.
+Previous code was wrong for coldfire: coldfire also allows to
+use addressing mode to set SR/CCR. It only supports Data register
+to get SR/CCR (move from)
+
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 ---
- target/m68k/translate.c | 40 ++++++++++++++++++++--------------------
- 1 file changed, 20 insertions(+), 20 deletions(-)
+ target/m68k/translate.c | 38 ++++++++++++++++++++++----------------
+ 1 file changed, 22 insertions(+), 16 deletions(-)
 
 diff --git a/target/m68k/translate.c b/target/m68k/translate.c
-index 1e9fb01252..a1e424e3db 100644
+index cfe9fd34df..1a462064be 100644
 --- a/target/m68k/translate.c
 +++ b/target/m68k/translate.c
-@@ -1509,12 +1509,12 @@ DISAS_INSN(dbcc)
- 
- DISAS_INSN(undef_mac)
- {
--    gen_exception(s, s->pc - 2, EXCP_LINEA);
-+    gen_exception(s, s->insn_pc, EXCP_LINEA);
+@@ -2162,27 +2162,34 @@ static void gen_set_sr_im(DisasContext *s, uint16_t val, int ccr_only)
+         tcg_gen_movi_i32(QREG_CC_N, val & CCF_N ? -1 : 0);
+         tcg_gen_movi_i32(QREG_CC_X, val & CCF_X ? 1 : 0);
+     } else {
+-        gen_helper_set_sr(cpu_env, tcg_const_i32(val));
++        TCGv sr = tcg_const_i32(val);
++        gen_helper_set_sr(cpu_env, sr);
++        tcg_temp_free(sr);
+     }
+     set_cc_op(s, CC_OP_FLAGS);
  }
  
- DISAS_INSN(undef_fpu)
+-static void gen_set_sr(CPUM68KState *env, DisasContext *s, uint16_t insn,
+-                       int ccr_only)
++static void gen_set_sr(DisasContext *s, TCGv val, int ccr_only)
  {
--    gen_exception(s, s->pc - 2, EXCP_LINEF);
-+    gen_exception(s, s->insn_pc, EXCP_LINEF);
+-    if ((insn & 0x38) == 0) {
+-        if (ccr_only) {
+-            gen_helper_set_ccr(cpu_env, DREG(insn, 0));
+-        } else {
+-            gen_helper_set_sr(cpu_env, DREG(insn, 0));
+-        }
+-        set_cc_op(s, CC_OP_FLAGS);
+-    } else if ((insn & 0x3f) == 0x3c) {
++    if (ccr_only) {
++        gen_helper_set_ccr(cpu_env, val);
++    } else {
++        gen_helper_set_sr(cpu_env, val);
++    }
++    set_cc_op(s, CC_OP_FLAGS);
++}
++
++static void gen_move_to_sr(CPUM68KState *env, DisasContext *s, uint16_t insn,
++                           bool ccr_only)
++{
++    if ((insn & 0x3f) == 0x3c) {
+         uint16_t val;
+         val = read_im16(env, s);
+         gen_set_sr_im(s, val, ccr_only);
+     } else {
+-        disas_undef(env, s, insn);
++        TCGv src;
++        SRC_EA(env, src, OS_WORD, 0, NULL);
++        gen_set_sr(s, src, ccr_only);
+     }
  }
  
- DISAS_INSN(undef)
-@@ -1523,8 +1523,8 @@ DISAS_INSN(undef)
-        for the 680x0 series, as well as those that are implemented
-        but actually illegal for CPU32 or pre-68020.  */
-     qemu_log_mask(LOG_UNIMP, "Illegal instruction: %04x @ %08x",
--                  insn, s->pc - 2);
--    gen_exception(s, s->pc - 2, EXCP_UNSUPPORTED);
-+                  insn, s->insn_pc);
-+    gen_exception(s, s->insn_pc, EXCP_UNSUPPORTED);
+@@ -2557,7 +2564,7 @@ DISAS_INSN(neg)
+ 
+ DISAS_INSN(move_to_ccr)
+ {
+-    gen_set_sr(env, s, insn, 1);
++    gen_move_to_sr(env, s, insn, true);
  }
  
- DISAS_INSN(mulw)
-@@ -2583,7 +2583,7 @@ DISAS_INSN(swap)
- 
- DISAS_INSN(bkpt)
- {
--    gen_exception(s, s->pc - 2, EXCP_DEBUG);
-+    gen_exception(s, s->insn_pc, EXCP_DEBUG);
+ DISAS_INSN(not)
+@@ -4471,7 +4478,7 @@ DISAS_INSN(move_to_sr)
+         gen_exception(s, s->insn_pc, EXCP_PRIVILEGE);
+         return;
+     }
+-    gen_set_sr(env, s, insn, 0);
++    gen_move_to_sr(env, s, insn, false);
+     gen_lookup_tb(s);
  }
  
- DISAS_INSN(pea)
-@@ -2636,7 +2636,7 @@ DISAS_INSN(pulse)
- 
- DISAS_INSN(illegal)
- {
--    gen_exception(s, s->pc - 2, EXCP_ILLEGAL);
-+    gen_exception(s, s->insn_pc, EXCP_ILLEGAL);
- }
- 
- /* ??? This should be atomic.  */
-@@ -2666,7 +2666,7 @@ DISAS_INSN(mull)
- 
-     if (ext & 0x400) {
-         if (!m68k_feature(s->env, M68K_FEATURE_QUAD_MULDIV)) {
--            gen_exception(s, s->pc - 4, EXCP_UNSUPPORTED);
-+            gen_exception(s, s->insn_pc, EXCP_UNSUPPORTED);
-             return;
-         }
- 
-@@ -4240,7 +4240,7 @@ DISAS_INSN(move_from_sr)
-     TCGv sr;
- 
-     if (IS_USER(s) && !m68k_feature(env, M68K_FEATURE_M68000)) {
--        gen_exception(s, s->pc - 2, EXCP_PRIVILEGE);
-+        gen_exception(s, s->insn_pc, EXCP_PRIVILEGE);
-         return;
-     }
-     sr = gen_get_sr(s);
-@@ -4250,7 +4250,7 @@ DISAS_INSN(move_from_sr)
- DISAS_INSN(move_to_sr)
- {
-     if (IS_USER(s)) {
--        gen_exception(s, s->pc - 2, EXCP_PRIVILEGE);
-+        gen_exception(s, s->insn_pc, EXCP_PRIVILEGE);
-         return;
-     }
-     gen_set_sr(env, s, insn, 0);
-@@ -4260,7 +4260,7 @@ DISAS_INSN(move_to_sr)
- DISAS_INSN(move_from_usp)
- {
-     if (IS_USER(s)) {
--        gen_exception(s, s->pc - 2, EXCP_PRIVILEGE);
-+        gen_exception(s, s->insn_pc, EXCP_PRIVILEGE);
-         return;
-     }
-     tcg_gen_ld_i32(AREG(insn, 0), cpu_env,
-@@ -4270,7 +4270,7 @@ DISAS_INSN(move_from_usp)
- DISAS_INSN(move_to_usp)
- {
-     if (IS_USER(s)) {
--        gen_exception(s, s->pc - 2, EXCP_PRIVILEGE);
-+        gen_exception(s, s->insn_pc, EXCP_PRIVILEGE);
-         return;
-     }
-     tcg_gen_st_i32(AREG(insn, 0), cpu_env,
-@@ -4287,7 +4287,7 @@ DISAS_INSN(stop)
-     uint16_t ext;
- 
-     if (IS_USER(s)) {
--        gen_exception(s, s->pc - 2, EXCP_PRIVILEGE);
-+        gen_exception(s, s->insn_pc, EXCP_PRIVILEGE);
-         return;
-     }
- 
-@@ -4301,10 +4301,10 @@ DISAS_INSN(stop)
- DISAS_INSN(rte)
- {
-     if (IS_USER(s)) {
--        gen_exception(s, s->pc - 2, EXCP_PRIVILEGE);
-+        gen_exception(s, s->insn_pc, EXCP_PRIVILEGE);
-         return;
-     }
--    gen_exception(s, s->pc - 2, EXCP_RTE);
-+    gen_exception(s, s->insn_pc, EXCP_RTE);
- }
- 
- DISAS_INSN(movec)
-@@ -4313,7 +4313,7 @@ DISAS_INSN(movec)
-     TCGv reg;
- 
-     if (IS_USER(s)) {
--        gen_exception(s, s->pc - 2, EXCP_PRIVILEGE);
-+        gen_exception(s, s->insn_pc, EXCP_PRIVILEGE);
-         return;
-     }
- 
-@@ -4331,7 +4331,7 @@ DISAS_INSN(movec)
- DISAS_INSN(intouch)
- {
-     if (IS_USER(s)) {
--        gen_exception(s, s->pc - 2, EXCP_PRIVILEGE);
-+        gen_exception(s, s->insn_pc, EXCP_PRIVILEGE);
-         return;
-     }
-     /* ICache fetch.  Implement as no-op.  */
-@@ -4340,7 +4340,7 @@ DISAS_INSN(intouch)
- DISAS_INSN(cpushl)
- {
-     if (IS_USER(s)) {
--        gen_exception(s, s->pc - 2, EXCP_PRIVILEGE);
-+        gen_exception(s, s->insn_pc, EXCP_PRIVILEGE);
-         return;
-     }
-     /* Cache push/invalidate.  Implement as no-op.  */
-@@ -4348,7 +4348,7 @@ DISAS_INSN(cpushl)
- 
- DISAS_INSN(wddata)
- {
--    gen_exception(s, s->pc - 2, EXCP_PRIVILEGE);
-+    gen_exception(s, s->insn_pc, EXCP_PRIVILEGE);
- }
- 
- DISAS_INSN(wdebug)
-@@ -4356,7 +4356,7 @@ DISAS_INSN(wdebug)
-     M68kCPU *cpu = m68k_env_get_cpu(env);
- 
-     if (IS_USER(s)) {
--        gen_exception(s, s->pc - 2, EXCP_PRIVILEGE);
-+        gen_exception(s, s->insn_pc, EXCP_PRIVILEGE);
-         return;
-     }
-     /* TODO: Implement wdebug.  */
-@@ -4365,7 +4365,7 @@ DISAS_INSN(wdebug)
- 
- DISAS_INSN(trap)
- {
--    gen_exception(s, s->pc - 2, EXCP_TRAP0 + (insn & 0xf));
-+    gen_exception(s, s->insn_pc, EXCP_TRAP0 + (insn & 0xf));
- }
- 
- static void gen_load_fcr(DisasContext *s, TCGv res, int reg)
+@@ -5618,9 +5625,8 @@ void register_m68k_insns (CPUM68KState *env)
+     BASE(move_to_ccr, 44c0, ffc0);
+     INSN(not,       4680, fff8, CF_ISA_A);
+     INSN(not,       4600, ff00, M68000);
+-    INSN(undef,     46c0, ffc0, M68000);
+ #if defined(CONFIG_SOFTMMU)
+-    INSN(move_to_sr, 46c0, ffc0, CF_ISA_A);
++    BASE(move_to_sr, 46c0, ffc0);
+ #endif
+     INSN(nbcd,      4800, ffc0, M68000);
+     INSN(linkl,     4808, fff8, M68000);
 -- 
 2.14.3
