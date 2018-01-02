@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52320)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52344)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1eWWBN-00073U-OX
+	(envelope-from <laurent@vivier.eu>) id 1eWWBO-00074V-RA
 	for qemu-devel@nongnu.org; Tue, 02 Jan 2018 18:41:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1eWWBM-00037F-85
-	for qemu-devel@nongnu.org; Tue, 02 Jan 2018 18:41:21 -0500
-Received: from mout.kundenserver.de ([212.227.126.135]:61048)
+	(envelope-from <laurent@vivier.eu>) id 1eWWBN-00038B-TS
+	for qemu-devel@nongnu.org; Tue, 02 Jan 2018 18:41:22 -0500
+Received: from mout.kundenserver.de ([212.227.126.134]:53129)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1eWWBL-00036Q-TH
-	for qemu-devel@nongnu.org; Tue, 02 Jan 2018 18:41:20 -0500
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1eWWBN-00037Z-It
+	for qemu-devel@nongnu.org; Tue, 02 Jan 2018 18:41:21 -0500
 From: Laurent Vivier <laurent@vivier.eu>
-Date: Wed,  3 Jan 2018 00:40:57 +0100
-Message-Id: <20180102234108.32713-7-laurent@vivier.eu>
+Date: Wed,  3 Jan 2018 00:40:59 +0100
+Message-Id: <20180102234108.32713-9-laurent@vivier.eu>
 In-Reply-To: <20180102234108.32713-1-laurent@vivier.eu>
 References: <20180102234108.32713-1-laurent@vivier.eu>
-Subject: [Qemu-devel] [PATCH v6 06/17] target/m68k: manage 680x0 stack frames
+Subject: [Qemu-devel] [PATCH v6 08/17] target/m68k: add move16
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,263 +26,142 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Richard Henderson <richard.henderson@linaro.org>, Thomas Huth <huth@tuxfamily.org>, Laurent Vivier <laurent@vivier.eu>
 
-680x0 manages several stack frame formats:
-  - format 0: four-word stack frame
-  - format 1: four-word throwaway stack frame
-  - format 2: six-word stack frame
-  - format 3: Floating-Point post-instruction stack frame
-  - format 4: eight-word stack frame
-  - format 7: access-error stack frame
+move16 moves the source line to the destination line. Lines are aligned
+to 16-byte boundaries and are 16 bytes long.
 
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 ---
 
 Notes:
-    v6: update SR with the content of CCR in the logs
-        introduce cpu_m68k_set_sr() to set SR instead
-        of calling helper_set_sr().
+    v6: split move16 in two functions
 
- target/m68k/cpu.h       |   1 +
- target/m68k/helper.c    |  10 ++-
- target/m68k/op_helper.c | 160 ++++++++++++++++++++++++++++++++++++++++++++++--
- 3 files changed, 164 insertions(+), 7 deletions(-)
+ target/m68k/cpu.c       | 10 ++++++-
+ target/m68k/cpu.h       |  1 +
+ target/m68k/translate.c | 72 +++++++++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 82 insertions(+), 1 deletion(-)
 
+diff --git a/target/m68k/cpu.c b/target/m68k/cpu.c
+index 57ffcb2114..1936efd170 100644
+--- a/target/m68k/cpu.c
++++ b/target/m68k/cpu.c
+@@ -137,7 +137,15 @@ static void m68020_cpu_initfn(Object *obj)
+     m68k_set_feature(env, M68K_FEATURE_CHK2);
+ }
+ #define m68030_cpu_initfn m68020_cpu_initfn
+-#define m68040_cpu_initfn m68020_cpu_initfn
++
++static void m68040_cpu_initfn(Object *obj)
++{
++    M68kCPU *cpu = M68K_CPU(obj);
++    CPUM68KState *env = &cpu->env;
++
++    m68020_cpu_initfn(obj);
++    m68k_set_feature(env, M68K_FEATURE_M68040);
++}
+ 
+ static void m68060_cpu_initfn(Object *obj)
+ {
 diff --git a/target/m68k/cpu.h b/target/m68k/cpu.h
-index acc2629216..cd4b3a7c7b 100644
+index 68396bdd70..2ac4ab191e 100644
 --- a/target/m68k/cpu.h
 +++ b/target/m68k/cpu.h
-@@ -178,6 +178,7 @@ int cpu_m68k_signal_handler(int host_signum, void *pinfo,
-                            void *puc);
- uint32_t cpu_m68k_get_ccr(CPUM68KState *env);
- void cpu_m68k_set_ccr(CPUM68KState *env, uint32_t);
-+void cpu_m68k_set_sr(CPUM68KState *env, uint32_t);
- void cpu_m68k_set_fpcr(CPUM68KState *env, uint32_t val);
+@@ -306,6 +306,7 @@ enum m68k_features {
+     M68K_FEATURE_BKPT,
+     M68K_FEATURE_RTD,
+     M68K_FEATURE_CHK2,
++    M68K_FEATURE_M68040, /* instructions specific to MC68040 */
+ };
  
- 
-diff --git a/target/m68k/helper.c b/target/m68k/helper.c
-index 7e50ff5871..af57ffcea9 100644
---- a/target/m68k/helper.c
-+++ b/target/m68k/helper.c
-@@ -316,13 +316,17 @@ uint32_t HELPER(sats)(uint32_t val, uint32_t v)
-     return val;
+ static inline int m68k_feature(CPUM68KState *env, int feature)
+diff --git a/target/m68k/translate.c b/target/m68k/translate.c
+index 62e955abc7..662a518f16 100644
+--- a/target/m68k/translate.c
++++ b/target/m68k/translate.c
+@@ -4278,6 +4278,76 @@ DISAS_INSN(chk2)
+     s->cc_op_synced = 1;
  }
  
--void HELPER(set_sr)(CPUM68KState *env, uint32_t val)
-+void cpu_m68k_set_sr(CPUM68KState *env, uint32_t sr)
- {
--    env->sr = val & 0xffe0;
--    cpu_m68k_set_ccr(env, val);
-+    env->sr = sr & 0xffe0;
-+    cpu_m68k_set_ccr(env, sr);
-     m68k_switch_sp(env);
- }
- 
-+void HELPER(set_sr)(CPUM68KState *env, uint32_t val)
++static void m68k_copy_line(TCGv dst, TCGv src, int index)
 +{
-+    cpu_m68k_set_sr(env, val);
-+}
- 
- /* MAC unit.  */
- /* FIXME: The MAC unit implementation is a bit of a mess.  Some helpers
-diff --git a/target/m68k/op_helper.c b/target/m68k/op_helper.c
-index 123981af55..5c7b27b9ca 100644
---- a/target/m68k/op_helper.c
-+++ b/target/m68k/op_helper.c
-@@ -54,7 +54,7 @@ void tlb_fill(CPUState *cs, target_ulong addr, MMUAccessType access_type,
-     }
- }
- 
--static void do_rte(CPUM68KState *env)
-+static void cf_rte(CPUM68KState *env)
- {
-     uint32_t sp;
-     uint32_t fmt;
-@@ -65,7 +65,46 @@ static void do_rte(CPUM68KState *env)
-     sp |= (fmt >> 28) & 3;
-     env->aregs[7] = sp + 8;
- 
--    helper_set_sr(env, fmt);
-+    cpu_m68k_set_sr(env, fmt);
++    TCGv addr;
++    TCGv_i64 t0, t1;
++
++    addr = tcg_temp_new();
++
++    t0 = tcg_temp_new_i64();
++    t1 = tcg_temp_new_i64();
++
++    tcg_gen_andi_i32(addr, src, ~15);
++    tcg_gen_qemu_ld64(t0, addr, index);
++    tcg_gen_addi_i32(addr, addr, 8);
++    tcg_gen_qemu_ld64(t1, addr, index);
++
++    tcg_gen_andi_i32(addr, dst, ~15);
++    tcg_gen_qemu_st64(t0, addr, index);
++    tcg_gen_addi_i32(addr, addr, 8);
++    tcg_gen_qemu_st64(t1, addr, index);
++
++    tcg_temp_free_i64(t0);
++    tcg_temp_free_i64(t1);
++    tcg_temp_free(addr);
 +}
 +
-+static void m68k_rte(CPUM68KState *env)
++DISAS_INSN(move16_reg)
 +{
-+    uint32_t sp;
-+    uint16_t fmt;
-+    uint16_t sr;
++    int index = IS_USER(s);
++    TCGv tmp;
++    uint16_t ext;
 +
-+    sp = env->aregs[7];
-+throwaway:
-+    sr = cpu_lduw_kernel(env, sp);
-+    sp += 2;
-+    env->pc = cpu_ldl_kernel(env, sp);
-+    sp += 4;
-+    if (m68k_feature(env, M68K_FEATURE_QUAD_MULDIV)) {
-+        /*  all except 68000 */
-+        fmt = cpu_lduw_kernel(env, sp);
-+        sp += 2;
-+        switch (fmt >> 12) {
-+        case 0:
-+            break;
-+        case 1:
-+            env->aregs[7] = sp;
-+            cpu_m68k_set_sr(env, sr);
-+            goto throwaway;
-+        case 2:
-+        case 3:
-+            sp += 4;
-+            break;
-+        case 4:
-+            sp += 8;
-+            break;
-+        case 7:
-+            sp += 52;
-+            break;
-+        }
++    ext = read_im16(env, s);
++    if ((ext & (1 << 15)) == 0) {
++        gen_exception(s, s->insn_pc, EXCP_ILLEGAL);
 +    }
-+    env->aregs[7] = sp;
-+    cpu_m68k_set_sr(env, sr);
- }
- 
- static const char *m68k_exception_name(int index)
-@@ -173,7 +212,7 @@ static const char *m68k_exception_name(int index)
-     return "Unassigned";
- }
- 
--static void do_interrupt_all(CPUM68KState *env, int is_hw)
-+static void cf_interrupt_all(CPUM68KState *env, int is_hw)
- {
-     CPUState *cs = CPU(m68k_env_get_cpu(env));
-     uint32_t sp;
-@@ -189,7 +228,7 @@ static void do_interrupt_all(CPUM68KState *env, int is_hw)
-         switch (cs->exception_index) {
-         case EXCP_RTE:
-             /* Return from an exception.  */
--            do_rte(env);
-+            cf_rte(env);
-             return;
-         case EXCP_HALT_INSN:
-             if (semihosting_enabled()
-@@ -247,6 +286,119 @@ static void do_interrupt_all(CPUM68KState *env, int is_hw)
-     env->pc = cpu_ldl_kernel(env, env->vbr + vector);
- }
- 
-+static inline void do_stack_frame(CPUM68KState *env, uint32_t *sp,
-+                                  uint16_t format, uint16_t sr,
-+                                  uint32_t addr, uint32_t retaddr)
-+{
-+    CPUState *cs = CPU(m68k_env_get_cpu(env));
-+    switch (format) {
-+    case 4:
-+        *sp -= 4;
-+        cpu_stl_kernel(env, *sp, env->pc);
-+        *sp -= 4;
-+        cpu_stl_kernel(env, *sp, addr);
-+        break;
-+    case 3:
-+    case 2:
-+        *sp -= 4;
-+        cpu_stl_kernel(env, *sp, addr);
-+        break;
-+    }
-+    *sp -= 2;
-+    cpu_stw_kernel(env, *sp, (format << 12) + (cs->exception_index << 2));
-+    *sp -= 4;
-+    cpu_stl_kernel(env, *sp, retaddr);
-+    *sp -= 2;
-+    cpu_stw_kernel(env, *sp, sr);
++
++    m68k_copy_line(AREG(ext, 12), AREG(insn, 0), index);
++
++    /* Ax can be Ay, so save Ay before incrementing Ax */
++    tmp = tcg_temp_new();
++    tcg_gen_mov_i32(tmp, AREG(ext, 12));
++    tcg_gen_addi_i32(AREG(insn, 0), AREG(insn, 0), 16);
++    tcg_gen_addi_i32(AREG(ext, 12), tmp, 16);
++    tcg_temp_free(tmp);
 +}
 +
-+static void m68k_interrupt_all(CPUM68KState *env, int is_hw)
++DISAS_INSN(move16_mem)
 +{
-+    CPUState *cs = CPU(m68k_env_get_cpu(env));
-+    uint32_t sp;
-+    uint32_t retaddr;
-+    uint32_t vector;
-+    uint16_t sr, oldsr;
++    int index = IS_USER(s);
++    TCGv reg, addr;
 +
-+    retaddr = env->pc;
++    reg = AREG(insn, 0);
++    addr = tcg_const_i32(read_im32(env, s));
 +
-+    if (!is_hw) {
-+        switch (cs->exception_index) {
-+        case EXCP_RTE:
-+            /* Return from an exception.  */
-+            m68k_rte(env);
-+            return;
-+        case EXCP_TRAP0 ...  EXCP_TRAP15:
-+            /* Move the PC after the trap instruction.  */
-+            retaddr += 2;
-+            break;
-+        }
-+    }
-+
-+    vector = cs->exception_index << 2;
-+
-+    sr = env->sr | cpu_m68k_get_ccr(env);
-+    if (qemu_loglevel_mask(CPU_LOG_INT)) {
-+        static int count;
-+        qemu_log("INT %6d: %s(%#x) pc=%08x sp=%08x sr=%04x\n",
-+                 ++count, m68k_exception_name(cs->exception_index),
-+                 vector, env->pc, env->aregs[7], sr);
-+    }
-+
-+    /*
-+     * MC68040UM/AD,  chapter 9.3.10
-+     */
-+
-+    /* "the processor first make an internal copy" */
-+    oldsr = sr;
-+    /* "set the mode to supervisor" */
-+    sr |= SR_S;
-+    /* "suppress tracing" */
-+    sr &= ~SR_T;
-+    /* "sets the processor interrupt mask" */
-+    if (is_hw) {
-+        sr |= (env->sr & ~SR_I) | (env->pending_level << SR_I_SHIFT);
-+    }
-+    cpu_m68k_set_sr(env, sr);
-+    sp = env->aregs[7];
-+
-+    sp &= ~1;
-+    if (cs->exception_index == EXCP_ADDRESS) {
-+        do_stack_frame(env, &sp, 2, oldsr, 0, retaddr);
-+    } else if (cs->exception_index == EXCP_ILLEGAL ||
-+               cs->exception_index == EXCP_DIV0 ||
-+               cs->exception_index == EXCP_CHK ||
-+               cs->exception_index == EXCP_TRAPCC ||
-+               cs->exception_index == EXCP_TRACE) {
-+        /* FIXME: addr is not only env->pc */
-+        do_stack_frame(env, &sp, 2, oldsr, env->pc, retaddr);
-+    } else if (is_hw && oldsr & SR_M &&
-+               cs->exception_index >= EXCP_SPURIOUS &&
-+               cs->exception_index <= EXCP_INT_LEVEL_7) {
-+        do_stack_frame(env, &sp, 0, oldsr, 0, retaddr);
-+        oldsr = sr;
-+        env->aregs[7] = sp;
-+        cpu_m68k_set_sr(env, sr &= ~SR_M);
-+        sp = env->aregs[7] & ~1;
-+        do_stack_frame(env, &sp, 1, oldsr, 0, retaddr);
++    if ((insn >> 3) & 1) {
++        /* MOVE16 (xxx).L, (Ay) */
++        m68k_copy_line(reg, addr, index);
 +    } else {
-+        do_stack_frame(env, &sp, 0, oldsr, 0, retaddr);
++        /* MOVE16 (Ay), (xxx).L */
++        m68k_copy_line(addr, reg, index);
 +    }
 +
-+    env->aregs[7] = sp;
-+    /* Jump to vector.  */
-+    env->pc = cpu_ldl_kernel(env, env->vbr + vector);
-+}
++    tcg_temp_free(addr);
 +
-+static void do_interrupt_all(CPUM68KState *env, int is_hw)
-+{
-+    if (m68k_feature(env, M68K_FEATURE_M68000)) {
-+        m68k_interrupt_all(env, is_hw);
-+        return;
++    if (((insn >> 3) & 2) == 0) {
++        /* (Ay)+ */
++        tcg_gen_addi_i32(reg, reg, 16);
 +    }
-+    cf_interrupt_all(env, is_hw);
 +}
 +
- void m68k_cpu_do_interrupt(CPUState *cs)
+ static TCGv gen_get_sr(DisasContext *s)
  {
-     M68kCPU *cpu = M68K_CPU(cs);
+     TCGv ccr;
+@@ -5579,6 +5649,8 @@ void register_m68k_insns (CPUM68KState *env)
+     INSN(fsave,     f300, ffc0, FPU);
+     INSN(intouch,   f340, ffc0, CF_ISA_A);
+     INSN(cpushl,    f428, ff38, CF_ISA_A);
++    INSN(move16_mem, f600, ffe0, M68040);
++    INSN(move16_reg, f620, fff8, M68040);
+     INSN(wddata,    fb00, ff00, CF_ISA_A);
+     INSN(wdebug,    fbc0, ffc0, CF_ISA_A);
+ #undef INSN
 -- 
 2.14.3
