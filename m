@@ -1,45 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34989)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48953)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <s1seetee@linux.vnet.ibm.com>) id 1eWGHw-0000O1-OA
-	for qemu-devel@nongnu.org; Tue, 02 Jan 2018 01:43:05 -0500
+	(envelope-from <a175818323@gmail.com>) id 1eWGcq-0005dh-9X
+	for qemu-devel@nongnu.org; Tue, 02 Jan 2018 02:04:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <s1seetee@linux.vnet.ibm.com>) id 1eWGHt-0008MX-L2
-	for qemu-devel@nongnu.org; Tue, 02 Jan 2018 01:43:04 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:57580)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <s1seetee@linux.vnet.ibm.com>)
-	id 1eWGHt-0008Lk-Bt
-	for qemu-devel@nongnu.org; Tue, 02 Jan 2018 01:43:01 -0500
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	w026cUHM092183
-	for <qemu-devel@nongnu.org>; Tue, 2 Jan 2018 01:42:59 -0500
-Received: from e37.co.us.ibm.com (e37.co.us.ibm.com [32.97.110.158])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2f7rrn16kj-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 02 Jan 2018 01:42:58 -0500
-Received: from localhost
-	by e37.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <s1seetee@linux.vnet.ibm.com>;
-	Mon, 1 Jan 2018 23:42:57 -0700
-References: <1511273358-21789-1-git-send-email-s1seetee@linux.vnet.ibm.com>
-	<20171212164114.GF2409@work-vm>
-	<e37d8871-544f-3c4f-3a59-bb66dc5c8b67@linux.vnet.ibm.com>
-	<b5c7e566-34f0-adb0-0fcb-bf272cbb0a81@redhat.com>
-	<225a4478-dc5e-a067-f207-e8a183afa0d9@linux.vnet.ibm.com>
-	<9b719ebe-8b38-708c-45a7-d377a583f899@redhat.com>
-	<5e07b5ea-e8b0-521a-b1af-31017fc52578@redhat.com>
-	<87shc3rz5d.fsf@dusky.pond.sub.org>
-From: seeteena <s1seetee@linux.vnet.ibm.com>
-Date: Tue, 2 Jan 2018 12:12:49 +0530
+	(envelope-from <a175818323@gmail.com>) id 1eWGcp-0004cG-4u
+	for qemu-devel@nongnu.org; Tue, 02 Jan 2018 02:04:40 -0500
+Received: from mail-it0-x22f.google.com ([2607:f8b0:4001:c0b::22f]:42393)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <a175818323@gmail.com>)
+	id 1eWGco-0004bp-VX
+	for qemu-devel@nongnu.org; Tue, 02 Jan 2018 02:04:39 -0500
+Received: by mail-it0-x22f.google.com with SMTP id p139so37880252itb.1
+	for <qemu-devel@nongnu.org>; Mon, 01 Jan 2018 23:04:38 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <87shc3rz5d.fsf@dusky.pond.sub.org>
-Content-Language: en-US
-Message-Id: <bd60d7e7-8d33-3f87-b6be-89918c1e7ef6@linux.vnet.ibm.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v1] hmp: 'info snapshots' not showing the id
+In-Reply-To: <CAMxP3BQ8zt3oOh7UoUxJYD00Lv=L54iJiC4JJS8XLaFf1NRKzg@mail.gmail.com>
+References: <CAMxP3BRqxD8tC1-M3+Pr8q8JZ1G_fGPbcvNQehwdPGFykdEk0g@mail.gmail.com>
+	<A2975661238FB949B60364EF0F2C257439B2BAD8@SHSMSX104.ccr.corp.intel.com>
+	<CAMxP3BQ8zt3oOh7UoUxJYD00Lv=L54iJiC4JJS8XLaFf1NRKzg@mail.gmail.com>
+From: Bob Chen <a175818323@gmail.com>
+Date: Tue, 2 Jan 2018 15:04:37 +0800
+Message-ID: <CAMxP3BSapt43LL8frsMXAeZBT4+EiuVMNAHnp1di2Wx7nZvSvw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [GPU and VFIO] qemu hang at startup,
+ VFIO_IOMMU_MAP_DMA is extremely slow
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -48,37 +31,127 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>, Eric Blake <eblake@redhat.com>
-Cc: Max Reitz <mreitz@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, lma@suse.com, qemu-devel@nongnu.org
+To: "Liu, Yi L" <yi.l.liu@intel.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
+Ping...
 
-On 12/22/2017 01:07 PM, Markus Armbruster wrote:
-> Eric Blake <eblake@redhat.com> writes:
+Was it because VFIO_IOMMU_MAP_DMA needs contiguous memory and my host was
+not able to provide them immediately?
+
+2017-12-26 19:37 GMT+08:00 Bob Chen <a175818323@gmail.com>:
+
 >
->> On 12/19/2017 08:20 AM, Max Reitz wrote:
+>
+> 2017-12-26 18:51 GMT+08:00 Liu, Yi L <yi.l.liu@intel.com>:
+>
+>> > -----Original Message-----
+>> > From: Qemu-devel [mailto:qemu-devel-bounces+yi.l.liu=
+>> intel.com@nongnu.org]
+>> > On Behalf Of Bob Chen
+>> > Sent: Tuesday, December 26, 2017 6:30 PM
+>> > To: qemu-devel@nongnu.org
+>> > Subject: [Qemu-devel] [GPU and VFIO] qemu hang at startup,
+>> > VFIO_IOMMU_MAP_DMA is extremely slow
+>> >
+>> > Hi,
+>> >
+>> > I have a host server with multiple GPU cards, and was assigning them to
+>> qemu
+>> > with VFIO.
+>> >
+>> > I found that when setting up the last free GPU, the qemu process would
+>> hang
 >>
->>> So there are three things:
->>>
->>> (1) We probably should not allow snapshot names that could be IDs.
->>> Easiest way to solve this: Names have to start with a non-digit.
->> Yes, that would be a nice change.  It is not strictly backwards
->> compatible (so we'd still have to cope with images that didn't follow
->> the rule, whether created by older qemu or by non-qemu implementations
->> of qcow2), but would alleviate a lot of confusion.
-> I recommend to restrict ID strings to letters, digits, '-', '.', '_',
-> starting with a letter.  Use id_wellformed() to check.
-char *id_generate(IdSubSystems id) autogenates ID in the format eg- 
-"#block146" with starting with '#' always.
-restricting ID strings to use id_wellformed() means we need to force ID 
-to start with letter.
-
-#define ID_SPECIAL_CHAR '#' needs to change to (some letter)
-#define ID_SPECIAL_CHAR 'A'
-
+>> Are all the GPUs in the same iommu group?
+>>
 >
-> If backward compatibility is an issue, deprecate offending IDs (with a
-> suitable warning), and kill them off after the customary grace period.
+> Each of them is in a single group.
 >
-> IDs embedded in image files and such you may have to keep working
-> somehow indefinitely.
+>
+>>
+>> > there and took almost 10 minutes before finishing startup. I made some
+>> dig by
+>> > gdb, and found the slowest part occurred at the
+>> > hw/vfio/common.c:vfio_dma_map function call.
+>>
+>> This is to setup mapping and it takes time. This function would be called
+>> multiple
+>> times and it will take some time. The slowest part, do you mean it takes
+>> a long time for a single vfio_dma_map() calling or the whole passthru
+>> spends a lot
+>> of time on creating mapping. If a single calling takes a lot of time,
+>> then it may be
+>> a problem.
+>>
+>
+> Each vfio_dma_map() takes 3 to 10 mins accordingly.
+>
+>
+>>
+>> You may paste your Qemu command which might help. And the dmesg in host
+>> would also help.
+>>
+>
+> cmd line:
+> After adding -device vfio-pci,host=09:00.0,multifunction=on,addr=0x15,
+> qemu would hang.
+> Otherwise, could start immediately without this option.
+>
+> dmesg:
+> [Tue Dec 26 18:39:50 2017] vfio-pci 0000:09:00.0: enabling device (0400 ->
+> 0402)
+> [Tue Dec 26 18:39:51 2017] vfio_ecap_init: 0000:09:00.0 hiding ecap
+> 0x1e@0x258
+> [Tue Dec 26 18:39:51 2017] vfio_ecap_init: 0000:09:00.0 hiding ecap
+> 0x19@0x900
+> [Tue Dec 26 18:39:55 2017] kvm: zapping shadow pages for mmio generation
+> wraparound
+> [Tue Dec 26 18:39:55 2017] kvm: zapping shadow pages for mmio generation
+> wraparound
+> [Tue Dec 26 18:40:03 2017] kvm [74663]: vcpu0 ignored rdmsr: 0x345
+>
+> Kernel:
+> 3.10.0-514.16.1  CentOS 7.3
+>
+>
+>>
+>> >
+>> >
+>> > static int vfio_dma_map(VFIOContainer *container, hwaddr iova,
+>> ram_addr_t
+>> > size, void *vaddr, bool readonly) { ...
+>> >     if (ioctl(container->fd, VFIO_IOMMU_MAP_DMA, &map) == 0 ||
+>> >         (errno == EBUSY && vfio_dma_unmap(container, iova, size) == 0 &&
+>> >          ioctl(container->fd, VFIO_IOMMU_MAP_DMA, &map) == 0)) {
+>> >         return 0;
+>> >     }
+>> > ...
+>> > }
+>> >
+>> >
+>> > The hang was enable to reproduce on one of my hosts, I was setting up a
+>> 4GB
+>> > memory VM, while the host still had 16GB free. GPU physical mem is 8G.
+>>
+>> Does it happen when you only assign a single GPU?
+>>
+>
+> Not sure. Didn't try multiple GPUs.
+>
+>
+>>
+>> > Also, this phenomenon was observed on other hosts occasionally, and the
+>> > similarity is that they always happened on the last free GPU.
+>> >
+>> >
+>> > Full stack trace file is attached. Looking forward for you help, thanks
+>> >
+>> >
+>> > - Bob
+>>
+>> Regards,
+>> Yi L
+>>
+>
 >
