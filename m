@@ -1,26 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48411)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52256)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1eWW3Q-0004YW-QJ
-	for qemu-devel@nongnu.org; Tue, 02 Jan 2018 18:33:09 -0500
+	(envelope-from <laurent@vivier.eu>) id 1eWWBK-00071a-FJ
+	for qemu-devel@nongnu.org; Tue, 02 Jan 2018 18:41:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1eWW3O-0006Ky-1g
-	for qemu-devel@nongnu.org; Tue, 02 Jan 2018 18:33:08 -0500
-Received: from mout.kundenserver.de ([217.72.192.75]:59983)
+	(envelope-from <laurent@vivier.eu>) id 1eWWBH-00034f-KY
+	for qemu-devel@nongnu.org; Tue, 02 Jan 2018 18:41:18 -0500
+Received: from mout.kundenserver.de ([212.227.126.187]:60918)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1eWW3N-0006Hx-P8
-	for qemu-devel@nongnu.org; Tue, 02 Jan 2018 18:33:05 -0500
-References: <20180102011032.30056-1-laurent@vivier.eu>
-	<20180102011032.30056-8-laurent@vivier.eu>
-	<1acae1a1-68f8-9b16-ecde-7b18d1c89662@linaro.org>
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1eWWBH-00034H-8y
+	for qemu-devel@nongnu.org; Tue, 02 Jan 2018 18:41:15 -0500
 From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <77b9b527-946c-e745-6a51-7646966c4846@vivier.eu>
-Date: Wed, 3 Jan 2018 00:33:00 +0100
-MIME-Version: 1.0
-In-Reply-To: <1acae1a1-68f8-9b16-ecde-7b18d1c89662@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v5 07/17] target/m68k: add chk and chk2
+Date: Wed,  3 Jan 2018 00:40:51 +0100
+Message-Id: <20180102234108.32713-1-laurent@vivier.eu>
+Subject: [Qemu-devel] [PATCH v6 00/17] target/m68k: supervisor mode (part 1)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,71 +21,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
-Cc: Thomas Huth <huth@tuxfamily.org>
+To: qemu-devel@nongnu.org
+Cc: Richard Henderson <richard.henderson@linaro.org>, Thomas Huth <huth@tuxfamily.org>, Laurent Vivier <laurent@vivier.eu>
 
-Le 02/01/2018 à 17:41, Richard Henderson a écrit :
-> On 01/01/2018 05:10 PM, Laurent Vivier wrote:
->> +    SRC_EA(env, tsrc, opsize, 1, NULL);
->> +    src = tcg_temp_local_new();
->> +    tcg_gen_mov_i32(src, tsrc);
->> +
->> +    reg = tcg_temp_local_new();
->> +    gen_ext(reg, DREG(insn, 9), opsize, 1);
->> +    gen_flush_flags(s);
->> +    update_cc_op(s);
->> +
->> +    l1 = gen_new_label();
->> +    l2 = gen_new_label();
->> +    tcg_gen_brcondi_i32(TCG_COND_GE, reg, 0, l1);
->> +    tcg_gen_movi_i32(QREG_CC_N, -1);
->> +    tcg_gen_movi_i32(QREG_PC, s->pc);
->> +    gen_raise_exception(EXCP_CHK);
->> +    tcg_gen_br(l2);
-> 
-> Unreachable branch after exception.
-> 
->> +    gen_set_label(l1);
->> +    tcg_gen_brcond_i32(TCG_COND_LE, reg, src, l2);
->> +    tcg_gen_movi_i32(QREG_CC_N, 0);
->> +    tcg_gen_movi_i32(QREG_PC, s->pc);
->> +    gen_raise_exception(EXCP_CHK);
->> +    gen_set_label(l2);
->> +    tcg_temp_free(src);
->> +    tcg_temp_free(reg);
-> 
-> Does real hardware not change flags at all if the chk passes?  The manual says
+This series is the first series that will allow
+to introduce supervisor mode and execute
+privileged instructions.
 
-Real hardware (68040) always clears N if reg > 0.
+Some of these patches are only cleanup:
 
-> it is undefined, which would greatly simplify all this.  Especially just
-> assigning reg to CC_N...
-> 
-> Generally I put conditional traps like this into a helper, which allows
-> straight-line optimization of the non-trapping path to continue.  In this case,
-> something like
-> 
-> void HELPER(chk)(CPUM68kState *env, int32_t val, int32_t ub)
-> {
->     if (val < 0 || val > ub) {
->         CPUState *cs = CPU(m68k_env_get_cpu(env));
-> 
-> 	/* Recover PC and CC_OP for the beginning of the insn.  */
->         cpu_restore_state(cs, GETPC());
-> 
->         /* Adjust PC and FLAGS to end of the insn.  */
->         env->pc += 2;
->         helper_flush_flags(env, env->cc_op);
->         env->cc_n = val;
-> 
->         cs->exception_index = EXCP_CHK;
->         cpu_loop_exit(cs);
->     }
-> }
+  sync CC_OP before gen_jmp_tb()
+  fix gen_get_ccr()
+  softmmu cleanup
+  add CPU_LOG_INT trace
+  use insn_pc to generate instruction fault address
+  move CCR/SR functions
+  fix m68k_cpu_dump_state()
 
-Even with assigning reg directly to CC_N the use of an helper seems
-better. I'm going to update the patch with your helper, and add one for
-chk2 too.
+We also fix a problem with linux-user mode,
+where the State Register is not updated with
+the CCR value (found while testing "chk/chk2"
+using signal()):
 
-Thanks,
-Laurent
+  correctly manage SR in context
+
+We introduce some new non privileged instructions:
+
+  add chk and chk2
+  add move16
+
+move16 is used by the kernel when it is compiled only for
+68040 (it's a 68040 only instruction).
+
+We add some trivial privileged instructions (most are empty):
+
+  add cpush/cinv
+  add reset
+  implement fsave/frestore
+
+And finally, we add the privileged instructions to
+modify the state register, the Interrupt Stack
+Pointer and the 680x0 stack frame formats:
+
+  add 680x0 "move to SR" instruction
+  add andi/ori/eori to SR/CCR
+  add the Interrupt Stack Pointer
+  manage 680x0 stack frames
+
+The next series will introduce the MC68040 MMU.
+
+v6: introduce cpu_m68k_set_sr() to set SR instead
+    of calling helper_set_sr().
+    update SR with the content of CCR in the logs
+    use helpers as suggested by Richard for chk/chk2
+    split move16 in two functions
+    use cpu_m68k_set_sr() to set SR in GDB stub and in m68k_cpu_reset()
+
+v5: it is in fact v1, there is no previous version.
+    I've messed up with git-publish on an older branch without checking the
+    subject prefix. Sorry...
+
+Laurent Vivier (17):
+  target-m68k: sync CC_OP before gen_jmp_tb()
+  target/m68k: fix gen_get_ccr()
+  linux-user,m68k: correctly manage SR in context
+  target/m68k: use insn_pc to generate instruction fault address
+  target/m68k: add CPU_LOG_INT trace
+  target/m68k: manage 680x0 stack frames
+  target/m68k: add chk and chk2
+  target/m68k: add move16
+  target/m68k: softmmu cleanup
+  target/m68k: add cpush/cinv
+  target/m68k: add reset
+  target/m68k: implement fsave/frestore
+  target/m68k: move CCR/SR functions
+  target/m68k: add 680x0 "move to SR" instruction
+  target/m68k: add andi/ori/eori to SR/CCR
+  target/m68k: add the Interrupt Stack Pointer
+  target/m68k: fix m68k_cpu_dump_state()
+
+ linux-user/main.c       |   7 +
+ linux-user/signal.c     |   7 +-
+ target/m68k/cpu.c       |  20 +-
+ target/m68k/cpu.h       |  84 +++++++-
+ target/m68k/gdbstub.c   |   2 +-
+ target/m68k/helper.c    |  99 +++++++++-
+ target/m68k/helper.h    |  11 +-
+ target/m68k/monitor.c   |   1 +
+ target/m68k/op_helper.c | 314 +++++++++++++++++++++++++++++-
+ target/m68k/translate.c | 498 ++++++++++++++++++++++++++++++++++++++----------
+ 10 files changed, 914 insertions(+), 129 deletions(-)
+
+-- 
+2.14.3
