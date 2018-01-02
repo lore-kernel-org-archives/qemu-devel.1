@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49258)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49259)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eWECq-0008K4-KE
+	(envelope-from <bounces@canonical.com>) id 1eWECq-0008K5-Kf
 	for qemu-devel@nongnu.org; Mon, 01 Jan 2018 23:29:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eWECn-0002Pd-RO
+	(envelope-from <bounces@canonical.com>) id 1eWECn-0002PQ-CG
 	for qemu-devel@nongnu.org; Mon, 01 Jan 2018 23:29:40 -0500
-Received: from indium.canonical.com ([91.189.90.7]:47366)
+Received: from indium.canonical.com ([91.189.90.7]:47256)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1eWECn-0002Ox-LF
+	id 1eWECn-0002Od-5L
 	for qemu-devel@nongnu.org; Mon, 01 Jan 2018 23:29:37 -0500
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1eWECk-0005iM-UC
-	for <qemu-devel@nongnu.org>; Tue, 02 Jan 2018 04:29:35 +0000
+	id 1eWECj-0005ei-9D
+	for <qemu-devel@nongnu.org>; Tue, 02 Jan 2018 04:29:33 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 718592E80C9
-	for <qemu-devel@nongnu.org>; Tue,  2 Jan 2018 04:29:34 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 39E3A2E80D2
+	for <qemu-devel@nongnu.org>; Tue,  2 Jan 2018 04:29:33 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Tue, 02 Jan 2018 04:17:28 -0000
+Date: Tue, 02 Jan 2018 04:17:26 -0000
 From: Launchpad Bug Tracker <1246990@bugs.launchpad.net>
 Reply-To: Bug 1246990 <1246990@bugs.launchpad.net>
 Sender: bounces@canonical.com
 References: <20131101065844.10659.568.malonedeb@soybean.canonical.com>
-Message-Id: <151486664829.7876.10366435791725805961.malone@loganberry.canonical.com>
+Message-Id: <151486664696.7876.7339120288096315773.malone@loganberry.canonical.com>
 Errors-To: bounces@canonical.com
 Subject: [Qemu-devel] [Bug 1246990] Re: [qemu-x86-64-linux-user 1.6.1] qemu:
  uncaught target signal 11 (Segmentation fault) - core dumped
@@ -39,9 +39,10 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-[Expired for QEMU because there has been no activity for 60 days.]
+[Expired for qemu (Ubuntu) because there has been no activity for 60
+days.]
 
-** Changed in: qemu
+** Changed in: qemu (Ubuntu)
        Status: Incomplete =3D> Expired
 
 -- =
