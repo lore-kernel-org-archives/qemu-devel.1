@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34715)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36393)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eWTzD-000673-1b
-	for qemu-devel@nongnu.org; Tue, 02 Jan 2018 16:20:39 -0500
+	(envelope-from <eblake@redhat.com>) id 1eWU18-0007Q3-KM
+	for qemu-devel@nongnu.org; Tue, 02 Jan 2018 16:22:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eWTz8-00005y-QO
-	for qemu-devel@nongnu.org; Tue, 02 Jan 2018 16:20:39 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:54946)
+	(envelope-from <eblake@redhat.com>) id 1eWU14-00018Q-Dw
+	for qemu-devel@nongnu.org; Tue, 02 Jan 2018 16:22:38 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:44918)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1eWTz8-00005j-Fv
-	for qemu-devel@nongnu.org; Tue, 02 Jan 2018 16:20:34 -0500
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1eWU14-00017y-5G
+	for qemu-devel@nongnu.org; Tue, 02 Jan 2018 16:22:34 -0500
 References: <1509369390-8285-1-git-send-email-a.perevalov@samsung.com>
-	<CGME20171030131647eucas1p2ea569225550a2250ee75f76b482b7498@eucas1p2.samsung.com>
-	<1509369390-8285-2-git-send-email-a.perevalov@samsung.com>
+	<CGME20171030131647eucas1p1b5fb0616e683e78fdca767d267400f50@eucas1p1.samsung.com>
+	<1509369390-8285-3-git-send-email-a.perevalov@samsung.com>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <6edfb28b-09fe-5fe9-7457-ed1cf1064a89@redhat.com>
-Date: Tue, 2 Jan 2018 15:20:28 -0600
+Message-ID: <61064b31-b6d5-97b1-89a4-5af719223e5a@redhat.com>
+Date: Tue, 2 Jan 2018 15:22:28 -0600
 MIME-Version: 1.0
-In-Reply-To: <1509369390-8285-2-git-send-email-a.perevalov@samsung.com>
+In-Reply-To: <1509369390-8285-3-git-send-email-a.perevalov@samsung.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="3nAL2poncJxc1WI7Vfld3sPPov9fpQ5hp"
-Subject: Re: [Qemu-devel] [PATCH v12 1/6] migration: introduce
- postcopy-blocktime capability
+	boundary="GTEjKYR346biy4FC9gqHhbNgsf2t65vy2"
+Subject: Re: [Qemu-devel] [PATCH v12 2/6] migration: add postcopy blocktime
+ ctx into MigrationIncomingState
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,73 +34,79 @@ To: Alexey Perevalov <a.perevalov@samsung.com>, qemu-devel@nongnu.org
 Cc: heetae82.ahn@samsung.com, quintela@redhat.com, dgilbert@redhat.com, peterx@redhat.com, i.maximets@samsung.com
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---3nAL2poncJxc1WI7Vfld3sPPov9fpQ5hp
+--GTEjKYR346biy4FC9gqHhbNgsf2t65vy2
 From: Eric Blake <eblake@redhat.com>
 To: Alexey Perevalov <a.perevalov@samsung.com>, qemu-devel@nongnu.org
 Cc: heetae82.ahn@samsung.com, quintela@redhat.com, dgilbert@redhat.com,
  peterx@redhat.com, i.maximets@samsung.com
-Message-ID: <6edfb28b-09fe-5fe9-7457-ed1cf1064a89@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v12 1/6] migration: introduce
- postcopy-blocktime capability
+Message-ID: <61064b31-b6d5-97b1-89a4-5af719223e5a@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v12 2/6] migration: add postcopy blocktime
+ ctx into MigrationIncomingState
 References: <1509369390-8285-1-git-send-email-a.perevalov@samsung.com>
- <CGME20171030131647eucas1p2ea569225550a2250ee75f76b482b7498@eucas1p2.samsung.com>
- <1509369390-8285-2-git-send-email-a.perevalov@samsung.com>
-In-Reply-To: <1509369390-8285-2-git-send-email-a.perevalov@samsung.com>
+ <CGME20171030131647eucas1p1b5fb0616e683e78fdca767d267400f50@eucas1p1.samsung.com>
+ <1509369390-8285-3-git-send-email-a.perevalov@samsung.com>
+In-Reply-To: <1509369390-8285-3-git-send-email-a.perevalov@samsung.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
 On 10/30/2017 08:16 AM, Alexey Perevalov wrote:
-> Right now it could be used on destination side to
-> enable vCPU blocktime calculation for postcopy live migration.
-> vCPU blocktime - it's time since vCPU thread was put into
-> interruptible sleep, till memory page was copied and thread awake.
+> This patch adds request to kernel space for UFFD_FEATURE_THREAD_ID,
+> in case when this feature is provided by kernel.
+
+Either 'in the case when this feature' or 'in case this feature'.
+
+>=20
+> PostcopyBlocktimeContext is incapsulated inside postcopy-ram.c,
+
+s/incapsulated/encapsulated/
+
+> due to it's postcopy only feature.
+
+s/it's postcopy only/it being a postcopy-only/
+
+> Also it defines PostcopyBlocktimeContext's instance live time.
+> Information from PostcopyBlocktimeContext instance will be provided
+> much after postcopy migration end, instance of PostcopyBlocktimeContext=
+
+> will live till QEMU exit, but part of it (vcpu_addr,
+> page_fault_vcpu_time) used only during calculation, will be released
+> when postcopy ended or failed.
+>=20
+> To enable postcopy blocktime calculation on destination, need to reques=
+t
+> proper capabiltiy (Patch for documentation will be at the tail of the p=
+atch
+
+s/capabiltiy/capability/
+
+> set).
+>=20
+> As an example following command enable that capability, assume QEMU was=
+
+> started with
+> -chardev socket,id=3Dcharmonitor,path=3D/var/lib/migrate-vm-monitor.soc=
+k
+> option to control it
+>=20
+> [root@host]#printf "{\"execute\" : \"qmp_capabilities\"}\r\n \
+> {\"execute\": \"migrate-set-capabilities\" , \"arguments\":   {
+> \"capabilities\": [ { \"capability\": \"postcopy-blocktime\", \"state\"=
+:
+> true } ] } }" | nc -U /var/lib/migrate-vm-monitor.sock
+>=20
+> Or just with HMP
+> (qemu) migrate_set_capability postcopy-blocktime on
 >=20
 > Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 > Signed-off-by: Alexey Perevalov <a.perevalov@samsung.com>
 > ---
->  migration/migration.c | 9 +++++++++
->  migration/migration.h | 1 +
->  qapi/migration.json   | 6 +++++-
->  3 files changed, 15 insertions(+), 1 deletion(-)
->=20
-
-Is there any reason this has to be a new capability rather than
-unconditionally enabled?  What are the trade-offs for enabling vs.
-disabling the capability that warrant it being a knob?  Can we do a
-better job of documenting in which cases the user would want to change
-the knob from its default value, if we even need it to be a knob?
-
-> +++ b/qapi/migration.json
-> @@ -352,12 +352,16 @@
->  #
->  # @x-multifd: Use more than one fd for migration (since 2.11)
->  #
-> +# @postcopy-blocktime: Calculate downtime for postcopy live migration
-> +#                     (since 2.11)
-> +#
->  # Since: 1.2
->  ##
->  { 'enum': 'MigrationCapability',
->    'data': ['xbzrle', 'rdma-pin-all', 'auto-converge', 'zero-blocks',
->             'compress', 'events', 'postcopy-ram', 'x-colo', 'release-ra=
-m',
-> -           'block', 'return-path', 'pause-before-switchover', 'x-multi=
-fd' ] }
-> +           'block', 'return-path', 'pause-before-switchover', 'x-multi=
-fd',
-> +           'postcopy-blocktime' ] }
-> =20
->  ##
->  # @MigrationCapabilityStatus:
->=20
-
 --=20
 Eric Blake, Principal Software Engineer
 Red Hat, Inc.           +1-919-301-3266
 Virtualization:  qemu.org | libvirt.org
 
 
---3nAL2poncJxc1WI7Vfld3sPPov9fpQ5hp
+--GTEjKYR346biy4FC9gqHhbNgsf2t65vy2
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
@@ -109,14 +115,14 @@ Content-Disposition: attachment; filename="signature.asc"
 Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
 Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlpL95wACgkQp6FrSiUn
-Q2p1QQgAksCbwnkYSj+p0MmMKByzfi2tJSOstByU1KPcu+7GweeqkppjQW7jL619
-wxa237APox6XQtQjNFYJ1/+Qpoq0tqohq0pKE8Mc/YdxdJBqlckHtgeBBQw5jBbk
-3Xwy4xDP8RuOIHpgY8bqC0DPRksdQQsOZQjcAsXfConFdbplDcxbCR8cwqo7S2Uu
-F8Rb+YUoL0OpKUF9pIj3rLTvM0FN6irNn8UGPlDwBcbGewislLGwKcCmcBCGedOi
-51UYHVc9Z90jLHBDsRb93B/QJ29XjntFjrBzjdA5GxZZtauZPXrLsJjtonbuuJQl
-gdMo9PwXnfTPIaiVzC0H7hOniCLHuA==
-=2YbS
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlpL+BQACgkQp6FrSiUn
+Q2rDNQf+INx7P7/n+qH9+cKiszxpDsJ8QD/IUfMgSuv7nWzcGQPU3NUQ+UGt+WXZ
+FEjSVsuColSjImjRlbOFjjL69Cwtr4N78gQNdYCFwLPWLPf9h1GS94k/AsotNH8c
+WRhJBFAntu92lwEezylOQOPk0TMI0iQy5+lEkNXTPbvS3+lMqHbt7IEFH99snq4t
+paQF1oHfy9yunYZEFG1CRdhIDc7XBJdkaQpGGNj7d17G+GCzl8Oe1JFsZ/b05dM4
+nJ7bVl7h2DhQw3Us1Vh25u1i2sIvENmgQjpwR2hLsNjdOOmr1fFx94GI9zdWIGHw
+NTiTpgHYBSiECZaSAjS33KcvGJqL0g==
+=Sb25
 -----END PGP SIGNATURE-----
 
---3nAL2poncJxc1WI7Vfld3sPPov9fpQ5hp--
+--GTEjKYR346biy4FC9gqHhbNgsf2t65vy2--
