@@ -1,28 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48953)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33168)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <a175818323@gmail.com>) id 1eWGcq-0005dh-9X
-	for qemu-devel@nongnu.org; Tue, 02 Jan 2018 02:04:41 -0500
+	(envelope-from <cunming.liang@intel.com>) id 1eWFRw-0004Gz-6m
+	for qemu-devel@nongnu.org; Tue, 02 Jan 2018 00:49:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <a175818323@gmail.com>) id 1eWGcp-0004cG-4u
-	for qemu-devel@nongnu.org; Tue, 02 Jan 2018 02:04:40 -0500
-Received: from mail-it0-x22f.google.com ([2607:f8b0:4001:c0b::22f]:42393)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <a175818323@gmail.com>)
-	id 1eWGco-0004bp-VX
-	for qemu-devel@nongnu.org; Tue, 02 Jan 2018 02:04:39 -0500
-Received: by mail-it0-x22f.google.com with SMTP id p139so37880252itb.1
-	for <qemu-devel@nongnu.org>; Mon, 01 Jan 2018 23:04:38 -0800 (PST)
+	(envelope-from <cunming.liang@intel.com>) id 1eWFRs-0004EE-9b
+	for qemu-devel@nongnu.org; Tue, 02 Jan 2018 00:49:20 -0500
+Received: from mga05.intel.com ([192.55.52.43]:33918)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cunming.liang@intel.com>)
+	id 1eWFRr-0004DN-V9
+	for qemu-devel@nongnu.org; Tue, 02 Jan 2018 00:49:16 -0500
+From: "Liang, Cunming" <cunming.liang@intel.com>
+Date: Tue, 2 Jan 2018 05:49:09 +0000
+Message-ID: <D0158A423229094DA7ABF71CF2FA0DA34E8420DE@SHSMSX104.ccr.corp.intel.com>
+References: <20171222064151.29266-1-tiwei.bie@intel.com>
+	<367b37c2-a315-5e61-8ac0-69b92c01b9cf@ozlabs.ru>
+In-Reply-To: <367b37c2-a315-5e61-8ac0-69b92c01b9cf@ozlabs.ru>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-In-Reply-To: <CAMxP3BQ8zt3oOh7UoUxJYD00Lv=L54iJiC4JJS8XLaFf1NRKzg@mail.gmail.com>
-References: <CAMxP3BRqxD8tC1-M3+Pr8q8JZ1G_fGPbcvNQehwdPGFykdEk0g@mail.gmail.com>
-	<A2975661238FB949B60364EF0F2C257439B2BAD8@SHSMSX104.ccr.corp.intel.com>
-	<CAMxP3BQ8zt3oOh7UoUxJYD00Lv=L54iJiC4JJS8XLaFf1NRKzg@mail.gmail.com>
-From: Bob Chen <a175818323@gmail.com>
-Date: Tue, 2 Jan 2018 15:04:37 +0800
-Message-ID: <CAMxP3BSapt43LL8frsMXAeZBT4+EiuVMNAHnp1di2Wx7nZvSvw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [GPU and VFIO] qemu hang at startup,
- VFIO_IOMMU_MAP_DMA is extremely slow
+Subject: Re: [Qemu-devel] [RFC 0/3] Extend vhost-user to support VFIO based
+ accelerators
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,127 +30,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Liu, Yi L" <yi.l.liu@intel.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: Alexey Kardashevskiy <aik@ozlabs.ru>, "Bie, Tiwei" <tiwei.bie@intel.com>, "virtio-dev@lists.oasis-open.org" <virtio-dev@lists.oasis-open.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "mst@redhat.com" <mst@redhat.com>, "alex.williamson@redhat.com" <alex.williamson@redhat.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "stefanha@redhat.com" <stefanha@redhat.com>
+Cc: "Tan, Jianfeng" <jianfeng.tan@intel.com>, "Wang, Xiao W" <xiao.w.wang@intel.com>, "Wang, Zhihong" <zhihong.wang@intel.com>, "Daly,
+	Dan" <dan.daly@intel.com>
 
-Ping...
-
-Was it because VFIO_IOMMU_MAP_DMA needs contiguous memory and my host was
-not able to provide them immediately?
-
-2017-12-26 19:37 GMT+08:00 Bob Chen <a175818323@gmail.com>:
-
->
->
-> 2017-12-26 18:51 GMT+08:00 Liu, Yi L <yi.l.liu@intel.com>:
->
->> > -----Original Message-----
->> > From: Qemu-devel [mailto:qemu-devel-bounces+yi.l.liu=
->> intel.com@nongnu.org]
->> > On Behalf Of Bob Chen
->> > Sent: Tuesday, December 26, 2017 6:30 PM
->> > To: qemu-devel@nongnu.org
->> > Subject: [Qemu-devel] [GPU and VFIO] qemu hang at startup,
->> > VFIO_IOMMU_MAP_DMA is extremely slow
->> >
->> > Hi,
->> >
->> > I have a host server with multiple GPU cards, and was assigning them to
->> qemu
->> > with VFIO.
->> >
->> > I found that when setting up the last free GPU, the qemu process would
->> hang
->>
->> Are all the GPUs in the same iommu group?
->>
->
-> Each of them is in a single group.
->
->
->>
->> > there and took almost 10 minutes before finishing startup. I made some
->> dig by
->> > gdb, and found the slowest part occurred at the
->> > hw/vfio/common.c:vfio_dma_map function call.
->>
->> This is to setup mapping and it takes time. This function would be called
->> multiple
->> times and it will take some time. The slowest part, do you mean it takes
->> a long time for a single vfio_dma_map() calling or the whole passthru
->> spends a lot
->> of time on creating mapping. If a single calling takes a lot of time,
->> then it may be
->> a problem.
->>
->
-> Each vfio_dma_map() takes 3 to 10 mins accordingly.
->
->
->>
->> You may paste your Qemu command which might help. And the dmesg in host
->> would also help.
->>
->
-> cmd line:
-> After adding -device vfio-pci,host=09:00.0,multifunction=on,addr=0x15,
-> qemu would hang.
-> Otherwise, could start immediately without this option.
->
-> dmesg:
-> [Tue Dec 26 18:39:50 2017] vfio-pci 0000:09:00.0: enabling device (0400 ->
-> 0402)
-> [Tue Dec 26 18:39:51 2017] vfio_ecap_init: 0000:09:00.0 hiding ecap
-> 0x1e@0x258
-> [Tue Dec 26 18:39:51 2017] vfio_ecap_init: 0000:09:00.0 hiding ecap
-> 0x19@0x900
-> [Tue Dec 26 18:39:55 2017] kvm: zapping shadow pages for mmio generation
-> wraparound
-> [Tue Dec 26 18:39:55 2017] kvm: zapping shadow pages for mmio generation
-> wraparound
-> [Tue Dec 26 18:40:03 2017] kvm [74663]: vcpu0 ignored rdmsr: 0x345
->
-> Kernel:
-> 3.10.0-514.16.1  CentOS 7.3
->
->
->>
->> >
->> >
->> > static int vfio_dma_map(VFIOContainer *container, hwaddr iova,
->> ram_addr_t
->> > size, void *vaddr, bool readonly) { ...
->> >     if (ioctl(container->fd, VFIO_IOMMU_MAP_DMA, &map) == 0 ||
->> >         (errno == EBUSY && vfio_dma_unmap(container, iova, size) == 0 &&
->> >          ioctl(container->fd, VFIO_IOMMU_MAP_DMA, &map) == 0)) {
->> >         return 0;
->> >     }
->> > ...
->> > }
->> >
->> >
->> > The hang was enable to reproduce on one of my hosts, I was setting up a
->> 4GB
->> > memory VM, while the host still had 16GB free. GPU physical mem is 8G.
->>
->> Does it happen when you only assign a single GPU?
->>
->
-> Not sure. Didn't try multiple GPUs.
->
->
->>
->> > Also, this phenomenon was observed on other hosts occasionally, and the
->> > similarity is that they always happened on the last free GPU.
->> >
->> >
->> > Full stack trace file is attached. Looking forward for you help, thanks
->> >
->> >
->> > - Bob
->>
->> Regards,
->> Yi L
->>
->
->
+DQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogQWxleGV5IEthcmRhc2hl
+dnNraXkgW21haWx0bzphaWtAb3psYWJzLnJ1XQ0KPiBTZW50OiBUdWVzZGF5LCBKYW51YXJ5IDIs
+IDIwMTggMTA6NDIgQU0NCj4gVG86IEJpZSwgVGl3ZWkgPHRpd2VpLmJpZUBpbnRlbC5jb20+OyB2
+aXJ0aW8tZGV2QGxpc3RzLm9hc2lzLW9wZW4ub3JnOyBxZW11LQ0KPiBkZXZlbEBub25nbnUub3Jn
+OyBtc3RAcmVkaGF0LmNvbTsgYWxleC53aWxsaWFtc29uQHJlZGhhdC5jb207DQo+IHBib256aW5p
+QHJlZGhhdC5jb207IHN0ZWZhbmhhQHJlZGhhdC5jb20NCj4gQ2M6IFRhbiwgSmlhbmZlbmcgPGpp
+YW5mZW5nLnRhbkBpbnRlbC5jb20+OyBMaWFuZywgQ3VubWluZw0KPiA8Y3VubWluZy5saWFuZ0Bp
+bnRlbC5jb20+OyBXYW5nLCBYaWFvIFcgPHhpYW8udy53YW5nQGludGVsLmNvbT47IFdhbmcsDQo+
+IFpoaWhvbmcgPHpoaWhvbmcud2FuZ0BpbnRlbC5jb20+OyBEYWx5LCBEYW4gPGRhbi5kYWx5QGlu
+dGVsLmNvbT4NCj4gU3ViamVjdDogUmU6IFtRZW11LWRldmVsXSBbUkZDIDAvM10gRXh0ZW5kIHZo
+b3N0LXVzZXIgdG8gc3VwcG9ydCBWRklPIGJhc2VkDQo+IGFjY2VsZXJhdG9ycw0KPiANCj4gT24g
+MjIvMTIvMTcgMTc6NDEsIFRpd2VpIEJpZSB3cm90ZToNCj4gPiBUaGlzIFJGQyBwYXRjaCBzZXQg
+ZG9lcyBzb21lIHNtYWxsIGV4dGVuc2lvbnMgdG8gdmhvc3QtdXNlciBwcm90b2NvbA0KPiA+IHRv
+IHN1cHBvcnQgVkZJTyBiYXNlZCBhY2NlbGVyYXRvcnMsIGFuZCBtYWtlcyBpdCBwb3NzaWJsZSB0
+byBnZXQgdGhlDQo+ID4gc2ltaWxhciBwZXJmb3JtYW5jZSBvZiBWRklPIHBhc3N0aHJ1IHdoaWxl
+IGtlZXBpbmcgdGhlIHZpcnRpbyBkZXZpY2UNCj4gPiBlbXVsYXRpb24gaW4gUUVNVS4NCj4gPg0K
+PiA+IFdoZW4gd2UgaGF2ZSB2aXJ0aW8gcmluZyBjb21wYXRpYmxlIGRldmljZXMsIGl0J3MgcG9z
+c2libGUgdG8gc2V0dXANCj4gPiB0aGUgZGV2aWNlIChETUEgbWFwcGluZywgUENJIGNvbmZpZywg
+ZXRjKSBiYXNlZCBvbiB0aGUgZXhpc3RpbmcgaW5mbw0KPiA+IChtZW1vcnktdGFibGUsIGZlYXR1
+cmVzLCB2cmluZyBpbmZvLCBldGMpIHdoaWNoIGlzIGF2YWlsYWJsZSBvbiB0aGUNCj4gPiB2aG9z
+dC1iYWNrZW5kIChlLmcuIERQREsgdmhvc3QgbGlicmFyeSkuIFRoZW4sIHdlIHdpbGwgYmUgYWJs
+ZSB0byB1c2UNCj4gPiBzdWNoIGRldmljZXMgdG8gYWNjZWxlcmF0ZSB0aGUgZW11bGF0ZWQgZGV2
+aWNlIGZvciB0aGUgVk0uIEFuZCB3ZSBjYWxsDQo+ID4gaXQgdkRQQTogdmhvc3QgRGF0YVBhdGgg
+QWNjZWxlcmF0aW9uLiBUaGUga2V5IGRpZmZlcmVuY2UgYmV0d2VlbiBWRklPDQo+ID4gcGFzc3Ro
+cnUgYW5kIHZEUEEgaXMgdGhhdCwgaW4gdkRQQSBvbmx5IHRoZSBkYXRhIHBhdGggKGUuZy4gcmlu
+ZywNCj4gPiBub3RpZnkgYW5kIHF1ZXVlIGludGVycnVwdCkgaXMgcGFzcy10aHJvdWdoZWQsIHRo
+ZSBkZXZpY2UgY29udHJvbCBwYXRoDQo+ID4gKGUuZy4gUENJIGNvbmZpZ3VyYXRpb24gc3BhY2Ug
+YW5kIE1NSU8gcmVnaW9ucykgaXMgc3RpbGwgZGVmaW5lZCBhbmQNCj4gPiBlbXVsYXRlZCBieSBR
+RU1VLg0KPiA+DQo+ID4gVGhlIGJlbmVmaXRzIG9mIGtlZXBpbmcgdmlydGlvIGRldmljZSBlbXVs
+YXRpb24gaW4gUUVNVSBjb21wYXJlZCB3aXRoDQo+ID4gdmlydGlvIGRldmljZSBWRklPIHBhc3N0
+aHJ1IGluY2x1ZGUgKGJ1dCBub3QgbGltaXQgdG8pOg0KPiA+DQo+ID4gLSBjb25zaXN0ZW50IGRl
+dmljZSBpbnRlcmZhY2UgZnJvbSBndWVzdCBPUzsNCj4gPiAtIG1heCBmbGV4aWJpbGl0eSBvbiBj
+b250cm9sIHBhdGggYW5kIGhhcmR3YXJlIGRlc2lnbjsNCj4gPiAtIGxldmVyYWdpbmcgdGhlIGV4
+aXN0aW5nIHZpcnRpbyBsaXZlLW1pZ3JhdGlvbiBmcmFtZXdvcms7DQo+ID4NCj4gPiBCdXQgdGhl
+IGNyaXRpY2FsIGlzc3VlIGluIHZEUEEgaXMgdGhhdCB0aGUgZGF0YSBwYXRoIHBlcmZvcm1hbmNl
+IGlzDQo+ID4gcmVsYXRpdmVseSBsb3cgYW5kIHNvbWUgaG9zdCB0aHJlYWRzIGFyZSBuZWVkZWQg
+Zm9yIHRoZSBkYXRhIHBhdGgsDQo+ID4gYmVjYXVzZSBzb21lIG5lY2Vzc2FyeSBtZWNoYW5pc21z
+IGFyZSBtaXNzaW5nIHRvIHN1cHBvcnQ6DQo+ID4NCj4gPiAxKSBndWVzdCBkcml2ZXIgbm90aWZp
+ZXMgdGhlIGRldmljZSBkaXJlY3RseTsNCj4gPiAyKSBkZXZpY2UgaW50ZXJydXB0cyB0aGUgZ3Vl
+c3QgZGlyZWN0bHk7DQo+ID4NCj4gPiBTbyB0aGlzIHBhdGNoIHNldCBkb2VzIHNvbWUgc21hbGwg
+ZXh0ZW5zaW9ucyB0byB2aG9zdC11c2VyIHByb3RvY29sIHRvDQo+ID4gbWFrZSBib3RoIG9mIHRo
+ZW0gcG9zc2libGUuIEl0IGxldmVyYWdlcyB0aGUgc2FtZSBtZWNoYW5pc21zIChlLmcuDQo+ID4g
+RVBUIGFuZCBQb3N0ZWQtSW50ZXJydXB0IG9uIEludGVsIHBsYXRmb3JtKSBhcyB0aGUgVkZJTyBw
+YXNzdGhydSB0bw0KPiA+IGFjaGlldmUgdGhlIGRhdGEgcGF0aCBwYXNzIHRocm91Z2guDQo+ID4N
+Cj4gPiBBIG5ldyBwcm90b2NvbCBmZWF0dXJlIGJpdCBpcyBhZGRlZCB0byBuZWdvdGlhdGUgdGhl
+IGFjY2VsZXJhdG9yDQo+ID4gZmVhdHVyZSBzdXBwb3J0LiBUd28gbmV3IHNsYXZlIG1lc3NhZ2Ug
+dHlwZXMgYXJlIGFkZGVkIHRvIGVuYWJsZSB0aGUNCj4gPiBub3RpZnkgYW5kIGludGVycnVwdCBw
+YXNzdGhydSBmb3IgZWFjaCBxdWV1ZS4gRnJvbSB0aGUgdmlldyBvZg0KPiA+IHZob3N0LXVzZXIg
+cHJvdG9jb2wgZGVzaWduLCBpdCdzIHZlcnkgZmxleGlibGUuIFRoZSBwYXNzdGhydSBjYW4gYmUN
+Cj4gPiBlbmFibGVkL2Rpc2FibGVkIGZvciBlYWNoIHF1ZXVlIGluZGl2aWR1YWxseSwgYW5kIGl0
+J3MgcG9zc2libGUgdG8NCj4gPiBhY2NlbGVyYXRlIGVhY2ggcXVldWUgYnkgZGlmZmVyZW50IGRl
+dmljZXMuIE1vcmUgZGVzaWduIGFuZA0KPiA+IGltcGxlbWVudGF0aW9uIGRldGFpbHMgY2FuIGJl
+IGZvdW5kIGZyb20gdGhlIGxhc3QgcGF0Y2guDQo+ID4NCj4gPiBUaGVyZSBhcmUgc29tZSByb3Vn
+aCBlZGdlcyBpbiB0aGlzIHBhdGNoIHNldCAoc28gdGhpcyBpcyBhIFJGQyBwYXRjaA0KPiA+IHNl
+dCBmb3Igbm93KSwgYnV0IGl0J3MgbmV2ZXIgdG9vIGVhcmx5IHRvIGhlYXIgdGhlIHRob3VnaHRz
+IGZyb20gdGhlDQo+ID4gY29tbXVuaXR5ISBTbyBhbnkgY29tbWVudHMgYW5kIHN1Z2dlc3Rpb25z
+IHdvdWxkIGJlIHJlYWxseSBhcHByZWNpYXRlZCENCj4gDQo+IEkgYW0gbWlzc2luZyBhIGxvdCBv
+ZiBjb250ZXh0IGhlcmUuIE91dCBvZiBjdXJpb3NpdHkgLSBob3cgaXMgdGhpcyBhbGwgc3VwcG9z
+ZWQgdG8NCj4gd29yaz8gUUVNVSBjb21tYW5kIGxpbmUgZXhhbXBsZSB3b3VsZCBiZSB1c2VmdWws
+IHdoYXQgd2lsbCB0aGUgZ3Vlc3Qgc2VlPyBBDQo+IHZpcnRpbyBkZXZpY2UgKGkuZS4gUmVkaGF0
+IHZlbmRvciBJRCkgb3IgYW4gYWN0dWFsIFBDSSBkZXZpY2UgKHNpbmNlIFZGSU8gaXMNCj4gbWVu
+dGlvbmVkKT8gVGhhbmtzLg0KDQpJdCdzIGEgbm9ybWFsIHZpcnRpbyBQQ0llIGRldmljZXMgaW4g
+dGhlIGd1ZXN0LiBFeHRlbnNpb25zIG9uIHRoZSBob3N0IGFyZSB0cmFuc3BhcmVudCB0byB0aGUg
+Z3Vlc3QuDQoNCkluIHRlcm1zIG9mIHRoZSB1c2FnZSwgdGhlcmUncyBhIHNhbXBsZSBtYXkgaGVs
+cC4NCmh0dHA6Ly9kcGRrLm9yZy9tbC9hcmNoaXZlcy9kZXYvMjAxNy1EZWNlbWJlci8wODUwNDQu
+aHRtbA0KVGhlIHNhbXBsZSB0YWtlcyB2aXJ0aW8tbmV0IGRldmljZSBpbiBWTSBhcyBkYXRhIHBh
+dGggYWNjZWxlcmF0b3Igb2YgdmlydGlvLW5ldCBpbiBuZXN0ZWQgVk0uDQpXaGVuIHRha2luZyBw
+aHlzaWNhbCBkZXZpY2Ugb24gYmFyZSBtZXRhbCwgaXQgYWNjZWxlcmF0ZXMgdmlydGlvLW5ldCBp
+biBWTSBlcXVpdmFsZW50bHkuDQpUaGVyZSdzIG5vIGFkZGl0aW9uYWwgcGFyYW1zIG9mIFFFTVUg
+Y29tbWFuZCBsaW5lIG5lZWRlZCBmb3Igdmhvc3QtdXNlci4NCg0KT25lIG1vcmUgY29udGV4dCwg
+aW5jbHVkaW5nIHZEUEEgZW5hYmxpbmcgaW4gRFBESyB2aG9zdC11c2VyIGxpYnJhcnkuDQpodHRw
+Oi8vZHBkay5vcmcvbWwvYXJjaGl2ZXMvZGV2LzIwMTctRGVjZW1iZXIvMDg0NzkyLmh0bWwNCg0K
+PiANCj4gDQo+IA0KPiAtLQ0KPiBBbGV4ZXkNCg==
