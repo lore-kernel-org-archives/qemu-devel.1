@@ -1,22 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51502)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53581)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcd@tribudubois.net>) id 1eWKVP-0008UA-NB
-	for qemu-devel@nongnu.org; Tue, 02 Jan 2018 06:13:16 -0500
+	(envelope-from <s.priebe@profihost.ag>) id 1eWKZe-0001vw-Q5
+	for qemu-devel@nongnu.org; Tue, 02 Jan 2018 06:17:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcd@tribudubois.net>) id 1eWKVK-0002xO-Ot
-	for qemu-devel@nongnu.org; Tue, 02 Jan 2018 06:13:15 -0500
-Received: from relay2-d.mail.gandi.net ([217.70.183.194]:50261)
+	(envelope-from <s.priebe@profihost.ag>) id 1eWKZZ-0004xY-Ti
+	for qemu-devel@nongnu.org; Tue, 02 Jan 2018 06:17:38 -0500
+Received: from cloud1-vm154.de-nserver.de ([178.250.10.56]:12839)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jcd@tribudubois.net>) id 1eWKVK-0002vq-IT
-	for qemu-devel@nongnu.org; Tue, 02 Jan 2018 06:13:10 -0500
-From: Jean-Christophe DUBOIS <jcd@tribudubois.net>
-Message-ID: <4b0a136a-7017-0890-6dd9-33bd8ddf3e3d@tribudubois.net>
-Date: Tue, 2 Jan 2018 12:13:06 +0100
+	(Exim 4.71) (envelope-from <s.priebe@profihost.ag>)
+	id 1eWKZZ-0004w1-Hy
+	for qemu-devel@nongnu.org; Tue, 02 Jan 2018 06:17:33 -0500
+From: Stefan Priebe - Profihost AG <s.priebe@profihost.ag>
+Message-ID: <77f0c119-236d-9d4e-0a99-3519ecc26b23@profihost.ag>
+Date: Tue, 2 Jan 2018 12:17:29 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-Subject: [Qemu-devel] [SPARC] question on LEON IRQMP interrupt controller.
+Content-Type: text/plain; charset=utf-8
+Content-Language: de-DE
+Content-Transfer-Encoding: 7bit
+Subject: [Qemu-devel] dropped pkts with Qemu on tap interace (RX)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,80 +26,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Artyom Tarasenko <atar4qemu@gmail.com>
-Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Jean-Christophe Dubois <jcd@tribudubois.net>
+To: qemu-devel <qemu-devel@nongnu.org>
 
-Hi Mark, Artyom,
+Hello,
 
-I am wondering if the IRQMP code in hw/intc/grlib_irqmp.c is correct 
-when it comes to acknowledging interrupts.
+currently i'm trying to fix a problem where we have "random" missing
+packets.
 
-With the actual code an interrupt can be lowered/acked only by an "ack" 
-from the processor which means that the trap handler related to this 
-external interrupt needs to be run for the ack to happen.
+We're doing an ssh connect from machine a to machine b every 5 minutes
+via rsync and ssh.
 
-In particular this means that the interrupt cannot be acked only by 
-software. Even if the software clears the "pending" interrupts (by 
-writing to the CLEAR_OFFSET register before the interrupt handler is 
-run) this does not clear the interrupt to the processor (which is kept 
-asserted until the handler is run and the interrupt acked by the 
-processor). Do you know if this is indeed the intended behavior (I 
-understand that for most operating system the interrupt handler will be 
-run at last and this does not make a difference)?
+Sometimes it happens that we get this cron message:
+"Connection to 192.168.0.2 closed by remote host.
+rsync: connection unexpectedly closed (0 bytes received so far) [sender]
+rsync error: unexplained error (code 255) at io.c(226) [sender=3.1.2]
+ssh: connect to host 192.168.0.2 port 22: Connection refused"
 
-I would expect that clearing interrupt through software (by writing to 
-the CLEAR_OFFSET register) would have the same effect as the processor 
-acknowledgment (and could avoid to run the interrupt handler if things 
-have already been taken care of by software).
+The tap devices on the target vm shows dropped RX packages on BOTH tap
+interfaces - strangely with the same amount of pkts?
 
-Unfortunately the documentation I got (on the web) on the IRQMP is not 
-very clear on the topic.
+# ifconfig tap317i0; ifconfig tap317i1
+tap317i0  Link encap:Ethernet  HWaddr 6e:cb:65:94:bb:bf
+          UP BROADCAST RUNNING PROMISC MULTICAST  MTU:1500  Metric:1
+          RX packets:2238445 errors:0 dropped:13159 overruns:0 frame:0
+          TX packets:9655853 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:1000
+          RX bytes:177991267 (169.7 MiB)  TX bytes:910412749 (868.2 MiB)
 
-Anyway you can find below the patch I'd like to provide for IRQMP.
+tap317i1  Link encap:Ethernet  HWaddr 96:f8:b5:d0:9a:07
+          UP BROADCAST RUNNING PROMISC MULTICAST  MTU:1500  Metric:1
+          RX packets:1516085 errors:0 dropped:13159 overruns:0 frame:0
+          TX packets:1446964 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:1000
+          RX bytes:1597564313 (1.4 GiB)  TX bytes:3517734365 (3.2 GiB)
 
-Thanks
+Any ideas how to inspect this issue?
 
-JC
-
-diff --git a/hw/intc/grlib_irqmp.c b/hw/intc/grlib_irqmp.c
-index 94659ee256..d6f9cb3692 100644
---- a/hw/intc/grlib_irqmp.c
-+++ b/hw/intc/grlib_irqmp.c
-@@ -106,6 +106,15 @@ static void grlib_irqmp_check_irqs(IRQMPState *state)
-      }
-  }
-
-+static void grlib_irqmp_ack_mask(IRQMPState *state, uint32_t mask)
-+{
-+    /* Clear registers */
-+    state->pending  &= ~mask;
-+    state->force[0] &= ~mask; /* Only CPU 0 (No SMP support) */
-+
-+    grlib_irqmp_check_irqs(state);
-+}
-+
-  void grlib_irqmp_ack(DeviceState *dev, int intno)
-  {
-      IRQMP        *irqmp = GRLIB_IRQMP(dev);
-@@ -120,11 +129,7 @@ void grlib_irqmp_ack(DeviceState *dev, int intno)
-
-      trace_grlib_irqmp_ack(intno);
-
--    /* Clear registers */
--    state->pending  &= ~mask;
--    state->force[0] &= ~mask; /* Only CPU 0 (No SMP support) */
--
--    grlib_irqmp_check_irqs(state);
-+    grlib_irqmp_ack_mask(state, mask);
-  }
-
-  void grlib_irqmp_set_irq(void *opaque, int irq, int level)
-@@ -251,7 +256,7 @@ static void grlib_irqmp_write(void *opaque, hwaddr addr,
-
-      case CLEAR_OFFSET:
-          value &= ~1; /* clean up the value */
--        state->pending &= ~value;
-+        grlib_irqmp_ack_mask(state, value);
-          return;
-
-      case MP_STATUS_OFFSET:
+Greets,
+Stefan
