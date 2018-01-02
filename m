@@ -1,33 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54216)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59393)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1eWDRJ-0001JG-Am
-	for qemu-devel@nongnu.org; Mon, 01 Jan 2018 22:40:34 -0500
+	(envelope-from <changpeng.liu@intel.com>) id 1eWDbi-0003fO-VV
+	for qemu-devel@nongnu.org; Mon, 01 Jan 2018 22:51:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1eWDRG-0002wZ-8k
-	for qemu-devel@nongnu.org; Mon, 01 Jan 2018 22:40:33 -0500
-Received: from mail-pf0-x241.google.com ([2607:f8b0:400e:c00::241]:34619)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <aik@ozlabs.ru>) id 1eWDRG-0002vT-24
-	for qemu-devel@nongnu.org; Mon, 01 Jan 2018 22:40:30 -0500
-Received: by mail-pf0-x241.google.com with SMTP id a90so25196712pfk.1
-	for <qemu-devel@nongnu.org>; Mon, 01 Jan 2018 19:40:29 -0800 (PST)
-Received: from [10.61.2.175] ([122.99.82.10])
-	by smtp.googlemail.com with ESMTPSA id
-	a87sm90721123pfg.159.2018.01.01.19.40.26 for <qemu-devel@nongnu.org>
-	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Mon, 01 Jan 2018 19:40:27 -0800 (PST)
-References: <20171215052326.21386-1-aik@ozlabs.ru>
-	<20171215094623.bp3ettoza5llp6vv@starbug-vm.ie.oracle.com>
-From: Alexey Kardashevskiy <aik@ozlabs.ru>
-Message-ID: <60e3a5ae-60e2-7de3-75b2-3d39ff4e4be1@ozlabs.ru>
-Date: Tue, 2 Jan 2018 14:40:24 +1100
-MIME-Version: 1.0
-In-Reply-To: <20171215094623.bp3ettoza5llp6vv@starbug-vm.ie.oracle.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-AU
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH qemu v2] kvm: Add kvm_set_user_memory
- tracepoint
+	(envelope-from <changpeng.liu@intel.com>) id 1eWDbf-0008Qs-Tu
+	for qemu-devel@nongnu.org; Mon, 01 Jan 2018 22:51:19 -0500
+Received: from mga07.intel.com ([134.134.136.100]:54621)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <changpeng.liu@intel.com>)
+	id 1eWDbf-0008Pj-Kw
+	for qemu-devel@nongnu.org; Mon, 01 Jan 2018 22:51:15 -0500
+From: Changpeng Liu <changpeng.liu@intel.com>
+Date: Tue,  2 Jan 2018 11:55:25 +0800
+Message-Id: <1514865329-29258-1-git-send-email-changpeng.liu@intel.com>
+Subject: [Qemu-devel] [PATCH v8 0/4] Introduce a new vhost-user-blk host
+ device to QEMU
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,82 +23,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: changpeng.liu@intel.com, qemu-devel@nongnu.org
+Cc: stefanha@gmail.com, pbonzini@redhat.com, mst@redhat.com, marcandre.lureau@redhat.com, felipe@nutanix.com, james.r.harris@intel.com
 
-On 15/12/17 20:46, Darren Kenny wrote:
-> On Fri, Dec 15, 2017 at 04:23:26PM +1100, Alexey Kardashevskiy wrote:
->> This adds a tracepoint to trace the KVM_SET_USER_MEMORY_REGION ioctl
->> parameters which is quite useful for debugging VFIO memory regions
->> being actually registered with KVM.
->>
->> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
->> ---
->> Changes:
->> v2:
->> * added forgotten change to trace-events
->> ---
->> accel/kvm/kvm-all.c    | 6 +++++-
->> accel/kvm/trace-events | 1 +
->> 2 files changed, 6 insertions(+), 1 deletion(-)
->>
->> diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
->> index f290f48..b91fcb7 100644
->> --- a/accel/kvm/kvm-all.c
->> +++ b/accel/kvm/kvm-all.c
->> @@ -235,6 +235,7 @@ static int
->> kvm_set_user_memory_region(KVMMemoryListener *kml, KVMSlot *slot)
->> {
->>     KVMState *s = kvm_state;
->>     struct kvm_userspace_memory_region mem;
->> +    int ret;
->>
->>     mem.slot = slot->slot | (kml->as_id << 16);
->>     mem.guest_phys_addr = slot->start_addr;
->> @@ -248,7 +249,10 @@ static int
->> kvm_set_user_memory_region(KVMMemoryListener *kml, KVMSlot *slot)
->>         kvm_vm_ioctl(s, KVM_SET_USER_MEMORY_REGION, &mem);
->>     }
->>     mem.memory_size = slot->memory_size;
->> -    return kvm_vm_ioctl(s, KVM_SET_USER_MEMORY_REGION, &mem);
->> +    ret = kvm_vm_ioctl(s, KVM_SET_USER_MEMORY_REGION, &mem);
->> +    trace_kvm_set_user_memory(mem.slot, mem.flags, mem.guest_phys_addr,
->> +                              mem.memory_size, mem.userspace_addr, ret);
->> +    return ret;
->> }
->>
->> int kvm_destroy_vcpu(CPUState *cpu)
->> diff --git a/accel/kvm/trace-events b/accel/kvm/trace-events
->> index f89ba55..58e98ef 100644
->> --- a/accel/kvm/trace-events
->> +++ b/accel/kvm/trace-events
->> @@ -12,4 +12,5 @@ kvm_irqchip_commit_routes(void) ""
->> kvm_irqchip_add_msi_route(char *name, int vector, int virq) "dev %s
->> vector %d virq %d"
->> kvm_irqchip_update_msi_route(int virq) "Updating MSI route virq=%d"
->> kvm_irqchip_release_virq(int virq) "virq %d"
->> +kvm_set_user_memory(uint32_t slot, uint32_t flags, uint64_t
->> guest_phys_addr, uint64_t memory_size, uint64_t userspace_addr, int ret)
->> "Slot#%d flags=0x%x gpa=0x%"PRIx64 " size=0x%"PRIx64 " ua=0x%"PRIx64 "
->> ret=%d"
-> 
-> Should the slot not be %u?:
-> 
->   "Slot#%u ...
+Although virtio scsi specification was designed as a replacement for virtio_blk,
+there are still many users using virtio_blk. QEMU 2.9 introduced a new device
+vhost user scsi which can process I/O in user space for virtio_scsi, this commit
+introduces a new vhost user block host device, which can support virtio_blk in
+Guest OS, and I/O processing in another I/O target.
 
+Due to the limitation for virtio_blk specification, virtio_blk device cannot get
+block information such as capacity, block size etc via the specification, several
+new vhost user messages were added to deliver virtio config space
+information between Qemu and I/O target, VHOST_USER_GET_CONFIG/VHOST_USER_SET_CONFIG
+messages used for get/set config space from/to I/O target, VHOST_USER_SLAVE_CONFIG_CHANGE_MSG
+slave message was added for the event notifier in case the change of virtio config space. Also,
+those messages can be used for vhost device live migration as well.
 
-Could be, repost?
+CHANGES:
+v7-v8: Instead using an event file descriptor for event notifier in case of virtio configuration
+space changed, while here used a new vhost-user slave message to deliver such event. Several small
+optimizations to address the comments from v7.
+v6-v7: change the parameter of set configuration function let it only contain valid data buffer.
+v5-v6: add header flags for vhost-user master so that the slave can know the purpose for
+set config, also vhost-user get/set messages' payload doesn't contain invalid data buffers.
+v4-v5: add header offset and size for virtio config space.
+v3-v4: refactoring the vhost user block example patch based on new libvhost-user library.
+v2-v3: add new vhost user message to get/set virtio config space.
 
+Changpeng Liu (4):
+  vhost-user: add new vhost user messages to support virtio config space
+  vhost-user-blk: introduce a new vhost-user-blk host device
+  contrib/libvhost-user: enable virtio config space messages
+  contrib/vhost-user-blk: introduce a vhost-user-blk sample application
 
-> 
-> Otherwise,
-> 
-> Reviewed-by: Darren Kenny <darren.kenny@oracle.com>
-> 
-> Thanks,
-> 
-> Darren.
-> 
-
+ .gitignore                              |   1 +
+ Makefile                                |   3 +
+ Makefile.objs                           |   1 +
+ contrib/libvhost-user/libvhost-user.c   |  54 ++++
+ contrib/libvhost-user/libvhost-user.h   |  34 +-
+ contrib/vhost-user-blk/Makefile.objs    |   1 +
+ contrib/vhost-user-blk/vhost-user-blk.c | 543 ++++++++++++++++++++++++++++++++
+ default-configs/pci.mak                 |   1 +
+ docs/interop/vhost-user.txt             |  53 ++++
+ hw/block/Makefile.objs                  |   3 +
+ hw/block/vhost-user-blk.c               | 359 +++++++++++++++++++++
+ hw/virtio/vhost-user.c                  | 118 +++++++
+ hw/virtio/vhost.c                       |  32 ++
+ hw/virtio/virtio-pci.c                  |  55 ++++
+ hw/virtio/virtio-pci.h                  |  18 ++
+ include/hw/virtio/vhost-backend.h       |  12 +
+ include/hw/virtio/vhost-user-blk.h      |  41 +++
+ include/hw/virtio/vhost.h               |  15 +
+ 18 files changed, 1343 insertions(+), 1 deletion(-)
+ create mode 100644 contrib/vhost-user-blk/Makefile.objs
+ create mode 100644 contrib/vhost-user-blk/vhost-user-blk.c
+ create mode 100644 hw/block/vhost-user-blk.c
+ create mode 100644 include/hw/virtio/vhost-user-blk.h
 
 -- 
-Alexey
+1.9.3
