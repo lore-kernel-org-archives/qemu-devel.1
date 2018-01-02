@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46162)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46727)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1eWQPl-0001LD-Pu
-	for qemu-devel@nongnu.org; Tue, 02 Jan 2018 12:31:50 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1eWQR0-0002N1-1G
+	for qemu-devel@nongnu.org; Tue, 02 Jan 2018 12:33:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1eWQPj-0000Hs-6s
-	for qemu-devel@nongnu.org; Tue, 02 Jan 2018 12:31:49 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:60480)
+	(envelope-from <pbonzini@redhat.com>) id 1eWQQx-0001lZ-FI
+	for qemu-devel@nongnu.org; Tue, 02 Jan 2018 12:33:06 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:44212)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1eWQPi-0000GW-WF
-	for qemu-devel@nongnu.org; Tue, 02 Jan 2018 12:31:47 -0500
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1eWQQx-0001ka-8n
+	for qemu-devel@nongnu.org; Tue, 02 Jan 2018 12:33:03 -0500
 References: <20171215150659.1811-1-marcandre.lureau@redhat.com>
-	<20171215150659.1811-5-marcandre.lureau@redhat.com>
-	<CAJ+F1CLxk6vC+ZB09BUBMnJj12RuaeYS=S5KwcBGhoHiYbCd5g@mail.gmail.com>
-	<CAJ+F1CLHsFoRFYy825f0MxyAU4T+97YrjMQWfmu6Cni49zyZWQ@mail.gmail.com>
+	<20171215150659.1811-3-marcandre.lureau@redhat.com>
+	<8d27589c-50a3-69b4-adca-f44f076057a8@redhat.com>
+	<CAJ+F1C+z6Yx-z9PEKK6G3a_t+7+msApuiQMeB2WiVeGPWS0zDQ@mail.gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <bfe98eaa-bf87-dabe-ec63-7eae338495a2@redhat.com>
-Date: Tue, 2 Jan 2018 18:31:36 +0100
+Message-ID: <e20b8ff4-0f3e-ea6a-892a-0f4bf3cc0f84@redhat.com>
+Date: Tue, 2 Jan 2018 18:33:00 +0100
 MIME-Version: 1.0
-In-Reply-To: <CAJ+F1CLHsFoRFYy825f0MxyAU4T+97YrjMQWfmu6Cni49zyZWQ@mail.gmail.com>
+In-Reply-To: <CAJ+F1C+z6Yx-z9PEKK6G3a_t+7+msApuiQMeB2WiVeGPWS0zDQ@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 04/13] build-sys: add AddressSanitizer
- when --enable-debug if possible
+Subject: Re: [Qemu-devel] [PATCH v2 02/13] build-sys: silence make by
+ default or V=0
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,31 +31,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@gmail.com>, QEMU <qemu-devel@nongnu.org>
-Cc: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Fam Zheng <famz@redhat.com>
+To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@gmail.com>, Eric Blake <eblake@redhat.com>
+Cc: QEMU <qemu-devel@nongnu.org>
 
 On 02/01/2018 16:49, Marc-Andr=C3=A9 Lureau wrote:
->>> If necessary, we could consider a seperate configure option, although
->>> I like the idea to have it enabled by default with --enable-debug.
->> Peter, Paolo, Fam, any thoughts about having ASAN enabled by default
->> with --enable-debug? (when available)
->>
->> Slow down is not really noticeable to me when running make check, but
->> I can do some measurements if that helps.
->>
->> thanks
-> ping, thanks
+> Hi
 >=20
+> On Tue, Dec 19, 2017 at 5:35 PM, Eric Blake <eblake@redhat.com> wrote:
+>> On 12/15/2017 09:06 AM, Marc-Andr=C3=A9 Lureau wrote:
+>>>
+>>> Move generic make flags in MAKEFLAGS (SUBDIR_MAKEFLAGS is more qemu
+>>> specific).
+>>>
+>>> Use --quiet to silence make 'is up to date' message.
+>>>
+>>> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+>>> ---
+>>>   Makefile  | 2 +-
+>>>   rules.mak | 2 ++
+>>>   2 files changed, 3 insertions(+), 1 deletion(-)
+>>
+>>
+>> Tested-by: Eric Blake <eblake@redhat.com>
+>>
+>> I'd still like a second opinion from another make expert (Paolo?) on w=
+hether
+>> this makes sense.  Thus, even though it looks sane to me, I'm not (yet=
+)
+>> giving R-b.
+>>
+>=20
+> Paolo, what do you think?
 
-Sounds good, but:
-
-1) please remove --enable-debug from existing docker tests and add a new
-one based on tests/docker/test-full;
-
-2) I think removing -O2 from --enable-debug should be removed at the
-same time.  That pretty much guarantees that nobody will use
---enable-debug, and optimized builds are decently debuggable nowadays.
-The best would be to detect -Og, and add either -Og or -O1 depending on
-presence.
+Sounds good to me.
 
 Paolo
