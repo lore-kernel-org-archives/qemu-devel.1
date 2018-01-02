@@ -1,33 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56759)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57236)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eWPEA-00043o-I1
-	for qemu-devel@nongnu.org; Tue, 02 Jan 2018 11:15:47 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1eWPEa-0004MK-H7
+	for qemu-devel@nongnu.org; Tue, 02 Jan 2018 11:16:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eWPE6-0006Xj-IF
-	for qemu-devel@nongnu.org; Tue, 02 Jan 2018 11:15:46 -0500
-Received: from indium.canonical.com ([91.189.90.7]:39102)
+	(envelope-from <richard.henderson@linaro.org>) id 1eWPEZ-0006rw-OD
+	for qemu-devel@nongnu.org; Tue, 02 Jan 2018 11:16:12 -0500
+Received: from mail-pf0-x242.google.com ([2607:f8b0:400e:c00::242]:46234)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1eWPE6-0006XT-C9
-	for qemu-devel@nongnu.org; Tue, 02 Jan 2018 11:15:42 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1eWPE5-0006tR-6z
-	for <qemu-devel@nongnu.org>; Tue, 02 Jan 2018 16:15:41 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 3300F2E804E
-	for <qemu-devel@nongnu.org>; Tue,  2 Jan 2018 16:15:41 +0000 (UTC)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1eWPEZ-0006rE-IP
+	for qemu-devel@nongnu.org; Tue, 02 Jan 2018 11:16:11 -0500
+Received: by mail-pf0-x242.google.com with SMTP id c204so25810691pfc.13
+	for <qemu-devel@nongnu.org>; Tue, 02 Jan 2018 08:16:11 -0800 (PST)
+References: <20180102011032.30056-1-laurent@vivier.eu>
+	<20180102011032.30056-7-laurent@vivier.eu>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <e59dcc83-6982-9cb3-0573-f584b0f5e6fa@linaro.org>
+Date: Tue, 2 Jan 2018 08:16:07 -0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 02 Jan 2018 16:07:34 -0000
-From: charlet franck <1740887@bugs.launchpad.net>
-Reply-To: Bug 1740887 <1740887@bugs.launchpad.net>
-Sender: bounces@canonical.com
-Message-Id: <151490925457.26459.4227536724801475724.malonedeb@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1740887] [NEW] qemu-system-arm &
- qemu-system-aarch64 for windows crash at start
+In-Reply-To: <20180102011032.30056-7-laurent@vivier.eu>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v5 06/17] target/m68k: manage 680x0 stack
+ frames
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,62 +32,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Laurent Vivier <laurent@vivier.eu>, qemu-devel@nongnu.org
+Cc: Thomas Huth <huth@tuxfamily.org>
 
-Public bug reported:
+On 01/01/2018 05:10 PM, Laurent Vivier wrote:
+> 680x0 manages several stack frame formats:
+>   - format 0: four-word stack frame
+>   - format 1: four-word throwaway stack frame
+>   - format 2: six-word stack frame
+>   - format 3: Floating-Point post-instruction stack frame
+>   - format 4: eight-word stack frame
+>   - format 7: access-error stack frame
+> 
+> Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+> ---
+>  target/m68k/op_helper.c | 158 +++++++++++++++++++++++++++++++++++++++++++++++-
+>  1 file changed, 155 insertions(+), 3 deletions(-)
 
-In Windows 7 64 bit (both 32 & 64 bit QEMU emulator version 2.11.0
-(v2.11.0-11693-g21057c841e-dirty)).
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
-With arguments:
-
-qemu-system-arm.exe -M raspi2
-
-It crashes and reports:
-
-ERROR:/home/stefan/src/qemu/repo.or.cz/qemu/ar7/qom/object.c:176:type_get_p=
-arent:
-assertion failed: (type->parent_type !=3D NULL)
-
-Same goes for qemu-system-aarch64.exe or with -M raspi argument.
-
-Have a nice day,
-f.
-
-** Affects: qemu
-     Importance: Undecided
-         Status: New
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1740887
-
-Title:
-  qemu-system-arm & qemu-system-aarch64 for windows crash at start
-
-Status in QEMU:
-  New
-
-Bug description:
-  In Windows 7 64 bit (both 32 & 64 bit QEMU emulator version 2.11.0
-  (v2.11.0-11693-g21057c841e-dirty)).
-
-  With arguments:
-
-  qemu-system-arm.exe -M raspi2
-
-  It crashes and reports:
-
-  ERROR:/home/stefan/src/qemu/repo.or.cz/qemu/ar7/qom/object.c:176:type_get=
-_parent:
-  assertion failed: (type->parent_type !=3D NULL)
-
-  Same goes for qemu-system-aarch64.exe or with -M raspi argument.
-
-  Have a nice day,
-  f.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1740887/+subscriptions
+r~
