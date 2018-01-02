@@ -1,20 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47486)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58542)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <michael@weiser.dinsnail.net>) id 1eWS2U-0005Z4-Ho
-	for qemu-devel@nongnu.org; Tue, 02 Jan 2018 14:15:55 -0500
+	(envelope-from <andrew.smirnov@gmail.com>) id 1eWSMb-0003EU-R6
+	for qemu-devel@nongnu.org; Tue, 02 Jan 2018 14:36:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <michael@weiser.dinsnail.net>) id 1eWS2T-00041s-SI
-	for qemu-devel@nongnu.org; Tue, 02 Jan 2018 14:15:54 -0500
-Date: Tue, 2 Jan 2018 20:02:42 +0100
-From: Michael Weiser <michael.weiser@gmx.de>
-Message-ID: <20180102190242.GC31343@weiser.dinsnail.net>
-References: <20171230225622.97409-1-michael.weiser@gmx.de>
-	<19080078-e96a-cc33-bb02-97f9b726d080@linaro.org>
+	(envelope-from <andrew.smirnov@gmail.com>) id 1eWSMa-0000Jn-PK
+	for qemu-devel@nongnu.org; Tue, 02 Jan 2018 14:36:41 -0500
+From: Andrey Smirnov <andrew.smirnov@gmail.com>
+Date: Tue,  2 Jan 2018 11:36:13 -0800
+Message-Id: <20180102193622.27215-3-andrew.smirnov@gmail.com>
+In-Reply-To: <20180102193622.27215-1-andrew.smirnov@gmail.com>
+References: <20180102193622.27215-1-andrew.smirnov@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <19080078-e96a-cc33-bb02-97f9b726d080@linaro.org>
-Subject: Re: [Qemu-devel] [PATCH v2] target/arm: Fix stlxp for aarch64_be
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH v3 02/11] imx_fec: Refactor imx_eth_enable_rx()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,20 +22,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: qemu-arm@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
+To: qemu-arm@nongnu.org
+Cc: Andrey Smirnov <andrew.smirnov@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, Jason Wang <jasowang@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, yurovsky@gmail.com
 
-Hi Richard,
+Refactor imx_eth_enable_rx() to have more meaningfull variable name
+than 'tmp' and to reduce number of logical negations done.
 
-On Mon, Jan 01, 2018 at 03:06:21PM -0800, Richard Henderson wrote:
+Cc: Peter Maydell <peter.maydell@linaro.org>
+Cc: Jason Wang <jasowang@redhat.com>
+Cc: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Cc: qemu-devel@nongnu.org
+Cc: qemu-arm@nongnu.org
+Cc: yurovsky@gmail.com
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Signed-off-by: Andrey Smirnov <andrew.smirnov@gmail.com>
+---
+ hw/net/imx_fec.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-> > v2:
-> > - make it work for MTTCG as well by catering to the 128bit expectation
-> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-
-> > +     * 128bit store but two doulbewords stored consecutively */
->                                ^^ typo
-
-Fixed for v3. Thanks!
+diff --git a/hw/net/imx_fec.c b/hw/net/imx_fec.c
+index 88b4b049d7..8b2e4b8ffe 100644
+--- a/hw/net/imx_fec.c
++++ b/hw/net/imx_fec.c
+@@ -536,19 +536,19 @@ static void imx_eth_do_tx(IMXFECState *s)
+ static void imx_eth_enable_rx(IMXFECState *s)
+ {
+     IMXFECBufDesc bd;
+-    bool tmp;
++    bool rx_ring_full;
+ 
+     imx_fec_read_bd(&bd, s->rx_descriptor);
+ 
+-    tmp = ((bd.flags & ENET_BD_E) != 0);
++    rx_ring_full = !(bd.flags & ENET_BD_E);
+ 
+-    if (!tmp) {
++    if (rx_ring_full) {
+         FEC_PRINTF("RX buffer full\n");
+     } else if (!s->regs[ENET_RDAR]) {
+         qemu_flush_queued_packets(qemu_get_queue(s->nic));
+     }
+ 
+-    s->regs[ENET_RDAR] = tmp ? ENET_RDAR_RDAR : 0;
++    s->regs[ENET_RDAR] = rx_ring_full ? 0 : ENET_RDAR_RDAR;
+ }
+ 
+ static void imx_eth_reset(DeviceState *d)
 -- 
-Michael
+2.14.3
