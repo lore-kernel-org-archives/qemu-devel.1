@@ -1,19 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58542)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58586)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <andrew.smirnov@gmail.com>) id 1eWSMb-0003EU-R6
-	for qemu-devel@nongnu.org; Tue, 02 Jan 2018 14:36:43 -0500
+	(envelope-from <andrew.smirnov@gmail.com>) id 1eWSMd-0003Ga-CX
+	for qemu-devel@nongnu.org; Tue, 02 Jan 2018 14:36:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <andrew.smirnov@gmail.com>) id 1eWSMa-0000Jn-PK
-	for qemu-devel@nongnu.org; Tue, 02 Jan 2018 14:36:41 -0500
+	(envelope-from <andrew.smirnov@gmail.com>) id 1eWSMb-0000LA-SA
+	for qemu-devel@nongnu.org; Tue, 02 Jan 2018 14:36:43 -0500
 From: Andrey Smirnov <andrew.smirnov@gmail.com>
-Date: Tue,  2 Jan 2018 11:36:13 -0800
-Message-Id: <20180102193622.27215-3-andrew.smirnov@gmail.com>
+Date: Tue,  2 Jan 2018 11:36:14 -0800
+Message-Id: <20180102193622.27215-4-andrew.smirnov@gmail.com>
 In-Reply-To: <20180102193622.27215-1-andrew.smirnov@gmail.com>
 References: <20180102193622.27215-1-andrew.smirnov@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v3 02/11] imx_fec: Refactor imx_eth_enable_rx()
+Subject: [Qemu-devel] [PATCH v3 03/11] imx_fec: Change queue flushing
+ heuristics
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,8 +26,50 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-arm@nongnu.org
 Cc: Andrey Smirnov <andrew.smirnov@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, Jason Wang <jasowang@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, yurovsky@gmail.com
 
-Refactor imx_eth_enable_rx() to have more meaningfull variable name
-than 'tmp' and to reduce number of logical negations done.
+In current implementation, packet queue flushing logic seem to suffer
+from a deadlock like scenario if a packet is received by the interface
+before before Rx ring is initialized by Guest's driver. Consider the
+following sequence of events:
+
+	1. A QEMU instance is started against a TAP device on Linux
+	   host, running Linux guest, e. g., something to the effect
+	   of:
+
+	   qemu-system-arm \
+	      -net nic,model=imx.fec,netdev=lan0 \
+	      netdev tap,id=lan0,ifname=tap0,script=no,downscript=no \
+	      ... rest of the arguments ...
+
+	2. Once QEMU starts, but before guest reaches the point where
+	   FEC deriver is done initializing the HW, Guest, via TAP
+	   interface, receives a number of multicast MDNS packets from
+	   Host (not necessarily true for every OS, but it happens at
+	   least on Fedora 25)
+
+	3. Recieving a packet in such a state results in
+	   imx_eth_can_receive() returning '0', which in turn causes
+	   tap_send() to disable corresponding event (tap.c:203)
+
+	4. Once Guest's driver reaches the point where it is ready to
+	   recieve packets it prepares Rx ring descriptors and writes
+	   ENET_RDAR_RDAR to ENET_RDAR register to indicate to HW that
+	   more descriptors are ready. And at this points emulation
+	   layer does this:
+
+	   	 s->regs[index] = ENET_RDAR_RDAR;
+                 imx_eth_enable_rx(s);
+
+	   which, combined with:
+
+	   	  if (!s->regs[ENET_RDAR]) {
+		     qemu_flush_queued_packets(qemu_get_queue(s->nic));
+		  }
+
+	   results in Rx queue never being flushed and corresponding
+	   I/O event beign disabled.
+
+To prevent the problem, change the code to always flush packet queue
+when ENET_RDAR transitions 0 -> ENET_RDAR_RDAR.
 
 Cc: Peter Maydell <peter.maydell@linaro.org>
 Cc: Jason Wang <jasowang@redhat.com>
@@ -34,40 +77,69 @@ Cc: Philippe Mathieu-Daudé <f4bug@amsat.org>
 Cc: qemu-devel@nongnu.org
 Cc: qemu-arm@nongnu.org
 Cc: yurovsky@gmail.com
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Andrey Smirnov <andrew.smirnov@gmail.com>
 ---
- hw/net/imx_fec.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+ hw/net/imx_fec.c | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
 
 diff --git a/hw/net/imx_fec.c b/hw/net/imx_fec.c
-index 88b4b049d7..8b2e4b8ffe 100644
+index 8b2e4b8ffe..eb034ffd0c 100644
 --- a/hw/net/imx_fec.c
 +++ b/hw/net/imx_fec.c
-@@ -536,19 +536,19 @@ static void imx_eth_do_tx(IMXFECState *s)
- static void imx_eth_enable_rx(IMXFECState *s)
+@@ -533,7 +533,7 @@ static void imx_eth_do_tx(IMXFECState *s)
+     }
+ }
+ 
+-static void imx_eth_enable_rx(IMXFECState *s)
++static void imx_eth_enable_rx(IMXFECState *s, bool flush)
  {
      IMXFECBufDesc bd;
--    bool tmp;
-+    bool rx_ring_full;
+     bool rx_ring_full;
+@@ -544,7 +544,7 @@ static void imx_eth_enable_rx(IMXFECState *s)
  
-     imx_fec_read_bd(&bd, s->rx_descriptor);
- 
--    tmp = ((bd.flags & ENET_BD_E) != 0);
-+    rx_ring_full = !(bd.flags & ENET_BD_E);
- 
--    if (!tmp) {
-+    if (rx_ring_full) {
+     if (rx_ring_full) {
          FEC_PRINTF("RX buffer full\n");
-     } else if (!s->regs[ENET_RDAR]) {
+-    } else if (!s->regs[ENET_RDAR]) {
++    } else if (flush) {
          qemu_flush_queued_packets(qemu_get_queue(s->nic));
      }
  
--    s->regs[ENET_RDAR] = tmp ? ENET_RDAR_RDAR : 0;
-+    s->regs[ENET_RDAR] = rx_ring_full ? 0 : ENET_RDAR_RDAR;
+@@ -807,7 +807,7 @@ static void imx_eth_write(void *opaque, hwaddr offset, uint64_t value,
+         if (s->regs[ENET_ECR] & ENET_ECR_ETHEREN) {
+             if (!s->regs[index]) {
+                 s->regs[index] = ENET_RDAR_RDAR;
+-                imx_eth_enable_rx(s);
++                imx_eth_enable_rx(s, true);
+             }
+         } else {
+             s->regs[index] = 0;
+@@ -930,7 +930,7 @@ static int imx_eth_can_receive(NetClientState *nc)
+ 
+     FEC_PRINTF("\n");
+ 
+-    return s->regs[ENET_RDAR] ? 1 : 0;
++    return !!s->regs[ENET_RDAR];
  }
  
- static void imx_eth_reset(DeviceState *d)
+ static ssize_t imx_fec_receive(NetClientState *nc, const uint8_t *buf,
+@@ -1020,7 +1020,7 @@ static ssize_t imx_fec_receive(NetClientState *nc, const uint8_t *buf,
+         }
+     }
+     s->rx_descriptor = addr;
+-    imx_eth_enable_rx(s);
++    imx_eth_enable_rx(s, false);
+     imx_eth_update(s);
+     return len;
+ }
+@@ -1116,7 +1116,7 @@ static ssize_t imx_enet_receive(NetClientState *nc, const uint8_t *buf,
+         }
+     }
+     s->rx_descriptor = addr;
+-    imx_eth_enable_rx(s);
++    imx_eth_enable_rx(s, false);
+     imx_eth_update(s);
+     return len;
+ }
 -- 
 2.14.3
