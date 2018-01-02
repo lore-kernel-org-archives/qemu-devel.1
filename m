@@ -1,29 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42565)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42763)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1eWOoY-0008S9-1S
-	for qemu-devel@nongnu.org; Tue, 02 Jan 2018 10:49:19 -0500
+	(envelope-from <marcandre.lureau@gmail.com>) id 1eWOp4-0000Hx-Kr
+	for qemu-devel@nongnu.org; Tue, 02 Jan 2018 10:49:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1eWOoX-0000Ss-7w
-	for qemu-devel@nongnu.org; Tue, 02 Jan 2018 10:49:18 -0500
-Received: from mail-wr0-x242.google.com ([2a00:1450:400c:c0c::242]:34584)
+	(envelope-from <marcandre.lureau@gmail.com>) id 1eWOp3-0000df-Tb
+	for qemu-devel@nongnu.org; Tue, 02 Jan 2018 10:49:50 -0500
+Received: from mail-wm0-x244.google.com ([2a00:1450:400c:c09::244]:32952)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1eWOoX-0000SU-0O
-	for qemu-devel@nongnu.org; Tue, 02 Jan 2018 10:49:17 -0500
-Received: by mail-wr0-x242.google.com with SMTP id 36so15611031wrh.1
-	for <qemu-devel@nongnu.org>; Tue, 02 Jan 2018 07:49:16 -0800 (PST)
+	id 1eWOp3-0000dC-MP
+	for qemu-devel@nongnu.org; Tue, 02 Jan 2018 10:49:49 -0500
+Received: by mail-wm0-x244.google.com with SMTP id g130so16818869wme.0
+	for <qemu-devel@nongnu.org>; Tue, 02 Jan 2018 07:49:49 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <8d27589c-50a3-69b4-adca-f44f076057a8@redhat.com>
+In-Reply-To: <CAJ+F1CLxk6vC+ZB09BUBMnJj12RuaeYS=S5KwcBGhoHiYbCd5g@mail.gmail.com>
 References: <20171215150659.1811-1-marcandre.lureau@redhat.com>
-	<20171215150659.1811-3-marcandre.lureau@redhat.com>
-	<8d27589c-50a3-69b4-adca-f44f076057a8@redhat.com>
+	<20171215150659.1811-5-marcandre.lureau@redhat.com>
+	<CAJ+F1CLxk6vC+ZB09BUBMnJj12RuaeYS=S5KwcBGhoHiYbCd5g@mail.gmail.com>
 From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Tue, 2 Jan 2018 16:49:15 +0100
-Message-ID: <CAJ+F1C+z6Yx-z9PEKK6G3a_t+7+msApuiQMeB2WiVeGPWS0zDQ@mail.gmail.com>
+Date: Tue, 2 Jan 2018 16:49:47 +0100
+Message-ID: <CAJ+F1CLHsFoRFYy825f0MxyAU4T+97YrjMQWfmu6Cni49zyZWQ@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 02/13] build-sys: silence make by
- default or V=0
+Subject: Re: [Qemu-devel] [PATCH v2 04/13] build-sys: add AddressSanitizer
+ when --enable-debug if possible
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,76 +32,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: QEMU <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>
+To: QEMU <qemu-devel@nongnu.org>
+Cc: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <famz@redhat.com>
 
-Hi
+On Tue, Dec 19, 2017 at 4:48 PM, Marc-Andr=C3=A9 Lureau
+<marcandre.lureau@gmail.com> wrote:
+> Hi
+>
+> On Fri, Dec 15, 2017 at 4:06 PM, Marc-Andr=C3=A9 Lureau
+> <marcandre.lureau@redhat.com> wrote:
+>> Enable ASAN by default if the compiler supports it.
+>>
+>> If necessary, we could consider a seperate configure option, although
+>> I like the idea to have it enabled by default with --enable-debug.
+>
+> Peter, Paolo, Fam, any thoughts about having ASAN enabled by default
+> with --enable-debug? (when available)
+>
+> Slow down is not really noticeable to me when running make check, but
+> I can do some measurements if that helps.
+>
+> thanks
 
-On Tue, Dec 19, 2017 at 5:35 PM, Eric Blake <eblake@redhat.com> wrote:
-> On 12/15/2017 09:06 AM, Marc-Andr=C3=A9 Lureau wrote:
->>
->> Move generic make flags in MAKEFLAGS (SUBDIR_MAKEFLAGS is more qemu
->> specific).
->>
->> Use --quiet to silence make 'is up to date' message.
->>
+ping, thanks
+
+>
+>
 >> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 >> ---
->>   Makefile  | 2 +-
->>   rules.mak | 2 ++
->>   2 files changed, 3 insertions(+), 1 deletion(-)
->
->
-> Tested-by: Eric Blake <eblake@redhat.com>
->
-> I'd still like a second opinion from another make expert (Paolo?) on whet=
-her
-> this makes sense.  Thus, even though it looks sane to me, I'm not (yet)
-> giving R-b.
->
-
-Paolo, what do you think?
-
-thanks
-
+>>  configure | 5 +++++
+>>  1 file changed, 5 insertions(+)
 >>
->> diff --git a/Makefile b/Makefile
->> index 0331c182ed..199f39fde1 100644
->> --- a/Makefile
->> +++ b/Makefile
->> @@ -274,7 +274,7 @@ else
->>   DOCS=3D
->>   endif
->>   -SUBDIR_MAKEFLAGS=3D$(if $(V),,--no-print-directory)
->> BUILD_DIR=3D$(BUILD_DIR)
->> +SUBDIR_MAKEFLAGS=3DBUILD_DIR=3D$(BUILD_DIR)
->>   SUBDIR_DEVICES_MAK=3D$(patsubst %, %/config-devices.mak, $(TARGET_DIRS=
-))
->>   SUBDIR_DEVICES_MAK_DEP=3D$(patsubst %, %-config-devices.mak.d,
->> $(TARGET_DIRS))
->>   diff --git a/rules.mak b/rules.mak
->> index 6e943335f3..5fb4951561 100644
->> --- a/rules.mak
->> +++ b/rules.mak
->> @@ -131,6 +131,8 @@ modules:
->>   # If called with only a single argument, will print nothing in quiet
->> mode.
->>   quiet-command =3D $(if $(V),$1,$(if $(2),@printf "  %-7s %s\n" $2 $3 &=
-&
->> $1, @$1))
->>   +MAKEFLAGS +=3D $(if $(V),,--no-print-directory --quiet)
->> +
->>   # cc-option
->>   # Usage: CFLAGS+=3D$(call cc-option, -falign-functions=3D0,
->> -malign-functions=3D0)
+>> diff --git a/configure b/configure
+>> index 2b8c71f522..52d9fd71e5 100755
+>> --- a/configure
+>> +++ b/configure
+>> @@ -5129,6 +5129,11 @@ elif test "$fortify_source" =3D "yes" ; then
+>>    CFLAGS=3D"-O2 -U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=3D2 $CFLAGS"
+>>  elif test "$debug" =3D "no"; then
+>>    CFLAGS=3D"-O2 $CFLAGS"
+>> +elif test "$debug" =3D "yes"; then
+>> +    write_c_skeleton;
+>> +    if compile_prog "-fsanitize=3Daddress" ""; then
+>> +        CFLAGS=3D"-fsanitize=3Daddress $CFLAGS"
+>> +    fi
+>>  fi
 >>
+>>  ##########################################
+>> --
+>> 2.15.1.355.g36791d7216
+>>
+>>
+>
 >
 >
 > --
-> Eric Blake, Principal Software Engineer
-> Red Hat, Inc.           +1-919-301-3266
-> Virtualization:  qemu.org | libvirt.org
->
+> Marc-Andr=C3=A9 Lureau
 
 
 
