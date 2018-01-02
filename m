@@ -1,34 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49259)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50198)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eWECq-0008K5-Kf
-	for qemu-devel@nongnu.org; Mon, 01 Jan 2018 23:29:41 -0500
+	(envelope-from <aik@ozlabs.ru>) id 1eWF7Z-0006EJ-4s
+	for qemu-devel@nongnu.org; Tue, 02 Jan 2018 00:28:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eWECn-0002PQ-CG
-	for qemu-devel@nongnu.org; Mon, 01 Jan 2018 23:29:40 -0500
-Received: from indium.canonical.com ([91.189.90.7]:47256)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1eWECn-0002Od-5L
-	for qemu-devel@nongnu.org; Mon, 01 Jan 2018 23:29:37 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1eWECj-0005ei-9D
-	for <qemu-devel@nongnu.org>; Tue, 02 Jan 2018 04:29:33 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 39E3A2E80D2
-	for <qemu-devel@nongnu.org>; Tue,  2 Jan 2018 04:29:33 +0000 (UTC)
+	(envelope-from <aik@ozlabs.ru>) id 1eWF7W-00006e-0f
+	for qemu-devel@nongnu.org; Tue, 02 Jan 2018 00:28:17 -0500
+From: Alexey Kardashevskiy <aik@ozlabs.ru>
+Date: Tue,  2 Jan 2018 16:28:02 +1100
+Message-Id: <20180102052805.20498-1-aik@ozlabs.ru>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Date: Tue, 02 Jan 2018 04:17:26 -0000
-From: Launchpad Bug Tracker <1246990@bugs.launchpad.net>
-Reply-To: Bug 1246990 <1246990@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20131101065844.10659.568.malonedeb@soybean.canonical.com>
-Message-Id: <151486664696.7876.7339120288096315773.malone@loganberry.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1246990] Re: [qemu-x86-64-linux-user 1.6.1] qemu:
- uncaught target signal 11 (Segmentation fault) - core dumped
+Subject: [Qemu-devel] [PATCH qemu 0/3] spapr/iommu: Enable in-kernel TCE
+ acceleration via VFIO KVM device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,84 +22,42 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: Alexey Kardashevskiy <aik@ozlabs.ru>, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Alex Williamson <alex.williamson@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-[Expired for qemu (Ubuntu) because there has been no activity for 60
-days.]
+This is my current queue of the in-kernel TCE acceleration
+enablement.
 
-** Changed in: qemu (Ubuntu)
-       Status: Incomplete =3D> Expired
+Changes since https://lists.gnu.org/archive/html/qemu-devel/2017-12/msg01=
+918.html :
+* 3 patches instead of one, one per maintainership area;
+* added memory_region_iommu_get_attr();
+* removed set_attr() as there is no use for it now;
+* folded the chunk in vfio_listener_region_add() under
+VFIO_SPAPR_TCE_v2_IOMMU branch as the acceleration is only
+enabled when DMA memory is preregistered and this is only supported
+by the v2 IOMMU.
 
--- =
+This is based on sha1
+ad59cde C=C3=A9dric Le Goater "target/ppc: more use of the PPC_*() macros=
+".
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1246990
+Please comment. Thanks.
 
-Title:
-  [qemu-x86-64-linux-user 1.6.1] qemu: uncaught target signal 11
-  (Segmentation fault) - core dumped
 
-Status in QEMU:
-  Expired
-Status in qemu package in Ubuntu:
-  Expired
 
-Bug description:
-  Rjsupplicant is an authentication client of Campus Network in most
-  universities in China. Its Linux version has only x86 and amd64
-  version.
+Alexey Kardashevskiy (3):
+  memory/iommu: Add get_attr()
+  vfio/spapr: Use iommu memory region's get_attr()
+  spapr/iommu: Enable in-kernel TCE acceleration via VFIO KVM device
 
-  On linux:
+ include/exec/memory.h | 22 ++++++++++++++++++++++
+ target/ppc/kvm_ppc.h  |  6 ++++++
+ hw/ppc/spapr_iommu.c  | 19 +++++++++++++++++++
+ hw/vfio/common.c      | 26 ++++++++++++++++++++++++++
+ memory.c              | 13 +++++++++++++
+ target/ppc/kvm.c      |  7 ++++++-
+ hw/vfio/trace-events  |  1 +
+ 7 files changed, 93 insertions(+), 1 deletion(-)
 
-  ./qemu-x86_64 is compiled from latest qemu 1.6.1, with ./configure
-  options: --enable-debug --target-list=3Dx86_64-linux-user . Compiler is
-  gcc version 4.7.3 (Debian 4.7.3-4)
-
-  $ sudo ./qemu-x86_64  ./rjsupplicant -n eth0 -u USER -p PASS -d 1 -s inte=
-rnet =
-
-  qemu: uncaught target signal 11 (Segmentation fault) - core dumped
-
-  $ sudo gdb ./qemu-x86_64
-  (gdb) r ./rjsupplicant -n eth0 -u USER -p PASS -d 1 -s internet
-  (gdb) where
-  #0  0x00005555559c21bd in static_code_gen_buffer ()
-  #1  0x00005555555b74d5 in cpu_tb_exec (cpu=3D0x555557972580, tb_ptr=3D0x5=
-555559c2190 <static_code_gen_buffer+819792> "A\213n\250\205\355\017\205\257=
-")
-      at /home/USER/x/rjsupplicant/x64/qemu-1.6.1/cpu-exec.c:56
-  #2  0x00005555555b817d in cpu_x86_exec (env=3D0x5555579726b0) at /home/US=
-ER/x/rjsupplicant/x64/qemu-1.6.1/cpu-exec.c:631
-  #3  0x00005555555d997a in cpu_loop (env=3D0x5555579726b0) at /home/USER/x=
-/rjsupplicant/x64/qemu-1.6.1/linux-user/main.c:283
-  #4  0x00005555555eca6b in clone_func (arg=3D0x7fffffffc1d0) at /home/USER=
-/x/rjsupplicant/x64/qemu-1.6.1/linux-user/syscall.c:4266
-  #5  0x00007ffff71bfe0e in start_thread (arg=3D0x7ffff7f04700) at pthread_=
-create.c:311
-  #6  0x00007ffff6ef493d in clone () at ../sysdeps/unix/sysv/linux/x86_64/c=
-lone.S:113
-
-  $ file rjsupplicant =
-
-  rjsupplicant: ELF 64-bit LSB  executable, x86-64, version 1 (SYSV), dynam=
-ically linked (uses shared libs), for GNU/Linux 2.6.9, not stripped
-
-  $ uname -r
-  3.10-2-amd64
-
-  =
-
-  And it can be run on Linux amd64 successfully.
-
-  Though I don't have the source code of rjsupplicant, so I don't have
-  further information.
-
-  `qemu-x86_64 -strace ./rjsupplicant -n eth0 -u USER -p PASS -d 1 -s
-  internet` is attached as strace_qemu.log
-
-  =
-
-  The binary is available to download at http://ge.tt/6pgG1tw/v/0
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1246990/+subscriptions
+--=20
+2.11.0
