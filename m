@@ -1,28 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38843)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40179)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1eWOj6-0005Ti-CO
-	for qemu-devel@nongnu.org; Tue, 02 Jan 2018 10:43:42 -0500
+	(envelope-from <imammedo@redhat.com>) id 1eWOlU-0006q3-KV
+	for qemu-devel@nongnu.org; Tue, 02 Jan 2018 10:46:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1eWOj4-0005P9-5P
-	for qemu-devel@nongnu.org; Tue, 02 Jan 2018 10:43:40 -0500
-Received: from mail-wr0-x242.google.com ([2a00:1450:400c:c0c::242]:42713)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1eWOj3-0005Nb-Qp
-	for qemu-devel@nongnu.org; Tue, 02 Jan 2018 10:43:38 -0500
-Received: by mail-wr0-x242.google.com with SMTP id w107so23061330wrb.9
-	for <qemu-devel@nongnu.org>; Tue, 02 Jan 2018 07:43:37 -0800 (PST)
+	(envelope-from <imammedo@redhat.com>) id 1eWOlR-0006Z2-EN
+	for qemu-devel@nongnu.org; Tue, 02 Jan 2018 10:46:08 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:50138)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1eWOlR-0006Y6-5P
+	for qemu-devel@nongnu.org; Tue, 02 Jan 2018 10:46:05 -0500
+Date: Tue, 2 Jan 2018 16:45:57 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20180102164557.51a0b090@redhat.com>
+In-Reply-To: <1514615811-29468-1-git-send-email-jianjay.zhou@huawei.com>
+References: <1514615811-29468-1-git-send-email-jianjay.zhou@huawei.com>
 MIME-Version: 1.0
-In-Reply-To: <1514865329-29258-5-git-send-email-changpeng.liu@intel.com>
-References: <1514865329-29258-1-git-send-email-changpeng.liu@intel.com>
-	<1514865329-29258-5-git-send-email-changpeng.liu@intel.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Tue, 2 Jan 2018 16:43:35 +0100
-Message-ID: <CAJ+F1CJ91EH344TTk2e5q-HJXx-DxcEnRs+CJjiKvUkJfv6ebQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v8 4/4] contrib/vhost-user-blk: introduce a
- vhost-user-blk sample application
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH RESEND v4] vhost: set used memslots for
+ vhost-user and vhost-kernel respectively
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,675 +27,318 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Changpeng Liu <changpeng.liu@intel.com>
-Cc: QEMU <qemu-devel@nongnu.org>, james.r.harris@intel.com, "Michael S. Tsirkin" <mst@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Felipe Franciosi <felipe@nutanix.com>
+To: Jay Zhou <jianjay.zhou@huawei.com>
+Cc: qemu-devel@nongnu.org, weidong.huang@huawei.com, mst@redhat.com, wangxinxin.wang@huawei.com, arei.gonglei@huawei.com, liuzhe13@huawei.com
 
-On Tue, Jan 2, 2018 at 4:55 AM, Changpeng Liu <changpeng.liu@intel.com> wro=
-te:
-> This commit introcudes a vhost-user-blk backend device, it uses UNIX'
+On Sat, 30 Dec 2017 14:36:51 +0800
+Jay Zhou <jianjay.zhou@huawei.com> wrote:
 
-introcudes -> introduces
+> Used_memslots is equal to dev->mem->nregions now, it is true for
+> vhost kernel, but not for vhost user, which uses the memory regions
+> that have file descriptor. In fact, not all of the memory regions
+> have file descriptor.
 
-> domain socket to communicate with QEMU. The vhost-user-blk sample
-> application should be used with QEMU vhost-user-blk-pci device.
->
-> To use it, complie with:
-> make vhost-user-blk
->
-> and start like this:
-> vhost-user-blk -b /dev/sdb -s /path/vhost.socket
->
-> Signed-off-by: Changpeng Liu <changpeng.liu@intel.com>
+> It is usefully in some scenarios, e.g. used_memslots is 8, and only
+> 5 memory slots can be used by vhost user, it is failed to hotplug
+> a new DIMM memory because vhost_has_free_slot just returned false,
+> however we can hotplug it safely in fact.
+It's too long sentence. Please, split and rephrase it so it would be
+clear what is happening.
+
+> Meanwhile, instead of asserting in vhost_user_set_mem_table(),
+> error number is used to gracefully prevent device to start. This
+> fixed the VM crash issue.
+Fix should be in separate patch as I mentioned in previous review.
+It would useful for stable tree, so you should CC it as well.
+
+ 
+> Suggested-by: Igor Mammedov <imammedo@redhat.com>
+> Signed-off-by: Jay Zhou <jianjay.zhou@huawei.com>
+> Signed-off-by: Liuzhe <liuzhe13@huawei.com>
 > ---
->  .gitignore                              |   1 +
->  Makefile                                |   3 +
->  Makefile.objs                           |   1 +
->  contrib/vhost-user-blk/Makefile.objs    |   1 +
->  contrib/vhost-user-blk/vhost-user-blk.c | 543 ++++++++++++++++++++++++++=
-++++++
->  5 files changed, 549 insertions(+)
->  create mode 100644 contrib/vhost-user-blk/Makefile.objs
->  create mode 100644 contrib/vhost-user-blk/vhost-user-blk.c
->
-> diff --git a/.gitignore b/.gitignore
-> index 433f64f..704b222 100644
-> --- a/.gitignore
-> +++ b/.gitignore
-> @@ -54,6 +54,7 @@
->  /module_block.h
->  /scsi/qemu-pr-helper
->  /vhost-user-scsi
-> +/vhost-user-blk
->  /fsdev/virtfs-proxy-helper
->  *.tmp
->  *.[1-9]
-> diff --git a/Makefile b/Makefile
-> index d86ecd2..f021fc8 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -331,6 +331,7 @@ dummy :=3D $(call unnest-vars,, \
->                  ivshmem-server-obj-y \
->                  libvhost-user-obj-y \
->                  vhost-user-scsi-obj-y \
-> +                vhost-user-blk-obj-y \
->                  qga-vss-dll-obj-y \
->                  block-obj-y \
->                  block-obj-m \
-> @@ -562,6 +563,8 @@ ivshmem-server$(EXESUF): $(ivshmem-server-obj-y) $(CO=
-MMON_LDADDS)
->  endif
->  vhost-user-scsi$(EXESUF): $(vhost-user-scsi-obj-y) libvhost-user.a
->         $(call LINK, $^)
-> +vhost-user-blk$(EXESUF): $(vhost-user-blk-obj-y) libvhost-user.a
-> +       $(call LINK, $^)
->
->  module_block.h: $(SRC_PATH)/scripts/modules/module_block.py config-host.=
-mak
->         $(call quiet-command,$(PYTHON) $< $@ \
-> diff --git a/Makefile.objs b/Makefile.objs
-> index 285c6f3..ae9aef7 100644
-> --- a/Makefile.objs
-> +++ b/Makefile.objs
-> @@ -115,6 +115,7 @@ libvhost-user-obj-y =3D contrib/libvhost-user/
->  vhost-user-scsi.o-cflags :=3D $(LIBISCSI_CFLAGS)
->  vhost-user-scsi.o-libs :=3D $(LIBISCSI_LIBS)
->  vhost-user-scsi-obj-y =3D contrib/vhost-user-scsi/
-> +vhost-user-blk-obj-y =3D contrib/vhost-user-blk/
->
->  ######################################################################
->  trace-events-subdirs =3D
-> diff --git a/contrib/vhost-user-blk/Makefile.objs b/contrib/vhost-user-bl=
-k/Makefile.objs
-> new file mode 100644
-> index 0000000..72e2cdc
-> --- /dev/null
-> +++ b/contrib/vhost-user-blk/Makefile.objs
-> @@ -0,0 +1 @@
-> +vhost-user-blk-obj-y =3D vhost-user-blk.o
-> diff --git a/contrib/vhost-user-blk/vhost-user-blk.c b/contrib/vhost-user=
--blk/vhost-user-blk.c
-> new file mode 100644
-> index 0000000..4649435
-> --- /dev/null
-> +++ b/contrib/vhost-user-blk/vhost-user-blk.c
-> @@ -0,0 +1,543 @@
-> +/*
-> + * vhost-user-blk sample application
-> + *
-> + * Copyright (c) 2017 Intel Corporation. All rights reserved.
-> + *
-> + * Author:
-> + *  Changpeng Liu <changpeng.liu@intel.com>
-> + *
-> + * This work is based on the "vhost-user-scsi" sample and "virtio-blk" d=
-river
-> + * implemention by:
-
-implemention -> implementation
-
-> + *  Felipe Franciosi <felipe@nutanix.com>
-> + *  Anthony Liguori <aliguori@us.ibm.com>
-> + *
-> + * This work is licensed under the terms of the GNU GPL, version 2 only.
-> + * See the COPYING file in the top-level directory.
-> + */
+>  hw/virtio/vhost-backend.c         | 15 +++++++-
+>  hw/virtio/vhost-user.c            | 74 +++++++++++++++++++++++++++------------
+>  hw/virtio/vhost.c                 | 18 +++++-----
+>  include/hw/virtio/vhost-backend.h |  6 ++--
+>  4 files changed, 78 insertions(+), 35 deletions(-)
+> 
+> diff --git a/hw/virtio/vhost-backend.c b/hw/virtio/vhost-backend.c
+> index 7f09efa..59def69 100644
+> --- a/hw/virtio/vhost-backend.c
+> +++ b/hw/virtio/vhost-backend.c
+> @@ -15,6 +15,8 @@
+>  #include "hw/virtio/vhost-backend.h"
+>  #include "qemu/error-report.h"
+>  
+> +static unsigned int vhost_kernel_used_memslots;
 > +
-> +#include "qemu/osdep.h"
-> +#include "standard-headers/linux/virtio_blk.h"
-> +#include "contrib/libvhost-user/libvhost-user-glib.h"
-> +#include "contrib/libvhost-user/libvhost-user.h"
-> +
-> +#include <glib.h>
-> +
-> +struct virtio_blk_inhdr {
-> +    unsigned char status;
-> +};
-> +
-> +/* vhost user block device */
-> +typedef struct VubDev {
-> +    VugDev parent;
-> +    int blk_fd;
-> +    struct virtio_blk_config blkcfg;
-> +    char *blk_name;
-> +    GMainLoop *loop;
-> +} VubDev;
-> +
-> +typedef struct VubReq {
-> +    VuVirtqElement *elem;
-> +    int64_t sector_num;
-> +    size_t size;
-> +    struct virtio_blk_inhdr *in;
-> +    struct virtio_blk_outhdr *out;
-> +    VubDev *vdev_blk;
-> +    struct VuVirtq *vq;
-> +} VubReq;
-> +
-> +/**  refer util/iov.c  **/
-
-let's use regular /* comment */ (I know vhost-user-scsi uses both
-style for some reason)
-
-> +static size_t vub_iov_size(const struct iovec *iov,
-> +                              const unsigned int iov_cnt)
+>  static int vhost_kernel_call(struct vhost_dev *dev, unsigned long int request,
+>                               void *arg)
+>  {
+> @@ -62,6 +64,11 @@ static int vhost_kernel_memslots_limit(struct vhost_dev *dev)
+>      return limit;
+>  }
+>  
+> +static bool vhost_kernel_has_free_memslots(struct vhost_dev *dev)
 > +{
-> +    size_t len;
-> +    unsigned int i;
-> +
-> +    len =3D 0;
-> +    for (i =3D 0; i < iov_cnt; i++) {
-> +        len +=3D iov[i].iov_len;
-> +    }
-> +    return len;
+> +    return vhost_kernel_used_memslots < vhost_kernel_memslots_limit(dev);
 > +}
 > +
-> +static void vub_panic_cb(VuDev *vu_dev, const char *buf)
+>  static int vhost_kernel_net_set_backend(struct vhost_dev *dev,
+>                                          struct vhost_vring_file *file)
+>  {
+> @@ -233,11 +240,16 @@ static void vhost_kernel_set_iotlb_callback(struct vhost_dev *dev,
+>          qemu_set_fd_handler((uintptr_t)dev->opaque, NULL, NULL, NULL);
+>  }
+>  
+> +static void vhost_kernel_set_used_memslots(struct vhost_dev *dev)
 > +{
-> +    VugDev *gdev;
-> +    VubDev *vdev_blk;
-> +
-> +    assert(vu_dev);
-> +
-> +    gdev =3D container_of(vu_dev, VugDev, parent);
-> +    vdev_blk =3D container_of(gdev, VubDev, parent);
-> +    if (buf) {
-> +        g_warning("vu_panic: %s", buf);
-> +    }
-> +
-> +    g_main_loop_quit(vdev_blk->loop);
+> +    vhost_kernel_used_memslots = dev->mem->nregions;
 > +}
 > +
-> +static void vub_req_complete(VubReq *req)
+>  static const VhostOps kernel_ops = {
+>          .backend_type = VHOST_BACKEND_TYPE_KERNEL,
+>          .vhost_backend_init = vhost_kernel_init,
+>          .vhost_backend_cleanup = vhost_kernel_cleanup,
+> -        .vhost_backend_memslots_limit = vhost_kernel_memslots_limit,
+> +        .vhost_backend_has_free_memslots = vhost_kernel_has_free_memslots,
+>          .vhost_net_set_backend = vhost_kernel_net_set_backend,
+>          .vhost_scsi_set_endpoint = vhost_kernel_scsi_set_endpoint,
+>          .vhost_scsi_clear_endpoint = vhost_kernel_scsi_clear_endpoint,
+> @@ -264,6 +276,7 @@ static const VhostOps kernel_ops = {
+>  #endif /* CONFIG_VHOST_VSOCK */
+>          .vhost_set_iotlb_callback = vhost_kernel_set_iotlb_callback,
+>          .vhost_send_device_iotlb_msg = vhost_kernel_send_device_iotlb_msg,
+> +        .vhost_set_used_memslots = vhost_kernel_set_used_memslots,
+>  };
+>  
+>  int vhost_set_backend_type(struct vhost_dev *dev, VhostBackendType backend_type)
+> diff --git a/hw/virtio/vhost-user.c b/hw/virtio/vhost-user.c
+> index 093675e..11c7d52 100644
+> --- a/hw/virtio/vhost-user.c
+> +++ b/hw/virtio/vhost-user.c
+> @@ -122,6 +122,8 @@ static VhostUserMsg m __attribute__ ((unused));
+>  /* The version of the protocol we support */
+>  #define VHOST_USER_VERSION    (0x1)
+>  
+> +static bool vhost_user_free_memslots = true;
+> +
+>  struct vhost_user {
+>      CharBackend *chr;
+>      int slave_fd;
+> @@ -289,12 +291,43 @@ static int vhost_user_set_log_base(struct vhost_dev *dev, uint64_t base,
+>      return 0;
+>  }
+>  
+> +static int vhost_user_prepare_msg(struct vhost_dev *dev, VhostUserMemory *mem,
+> +                                  int *fds)
 > +{
-> +    VugDev *gdev =3D &req->vdev_blk->parent;
-> +    VuDev *vu_dev =3D &gdev->parent;
+> +    int i, fd;
 > +
-> +    /* IO size with 1 extra status byte */
-> +    vu_queue_push(vu_dev, req->vq, req->elem,
-> +                  req->size + 1);
-> +    vu_queue_notify(vu_dev, req->vq);
+> +    vhost_user_free_memslots = true;
+> +    for (i = 0, mem->nregions = 0; i < dev->mem->nregions; ++i) {
+> +        struct vhost_memory_region *reg = dev->mem->regions + i;
+> +        ram_addr_t offset;
+> +        MemoryRegion *mr;
 > +
-> +    if (req->elem) {
-> +        free(req->elem);
-> +    }
-> +    g_free(req);
-> +}
-> +
-> +static int vub_open(const char *file_name, bool wce)
-> +{
-> +    int fd;
-> +    int flags =3D O_RDWR;
-> +
-> +    if (!wce) {
-> +        flags |=3D O_DIRECT;
-> +    }
-> +
-> +    fd =3D open(file_name, flags);
-> +    if (fd < 0) {
-> +        fprintf(stderr, "Cannot open file %s, %s\n", file_name,
-> +                strerror(errno));
-> +        return -1;
-> +    }
-> +
-> +    return fd;
-> +}
-> +
-> +static ssize_t
-> +vub_readv(VubReq *req, struct iovec *iov, uint32_t iovcnt)
-> +{
-> +    VubDev *vdev_blk =3D req->vdev_blk;
-> +    ssize_t rc;
-> +
-> +    if (!iovcnt) {
-> +        fprintf(stderr, "Invalid Read IOV count\n");
-> +        return -1;
-> +    }
-> +
-> +    req->size =3D vub_iov_size(iov, iovcnt);
-> +    rc =3D preadv(vdev_blk->blk_fd, iov, iovcnt, req->sector_num * 512);
-> +    if (rc < 0) {
-> +        fprintf(stderr, "%s, Sector %"PRIu64", Size %lu failed with %s\n=
-",
-> +                vdev_blk->blk_name, req->sector_num, req->size,
-> +                strerror(errno));
-> +        return -1;
-> +    }
-> +
-> +    return rc;
-> +}
-> +
-> +static ssize_t
-> +vub_writev(VubReq *req, struct iovec *iov, uint32_t iovcnt)
-> +{
-> +    VubDev *vdev_blk =3D req->vdev_blk;
-> +    ssize_t rc;
-> +
-> +    if (!iovcnt) {
-> +        fprintf(stderr, "Invalid Write IOV count\n");
-> +        return -1;
-> +    }
-> +
-> +    req->size =3D vub_iov_size(iov, iovcnt);
-> +    rc =3D pwritev(vdev_blk->blk_fd, iov, iovcnt, req->sector_num * 512)=
-;
-> +    if (rc < 0) {
-> +        fprintf(stderr, "%s, Sector %"PRIu64", Size %lu failed with %s\n=
-",
-> +                vdev_blk->blk_name, req->sector_num, req->size,
-> +                strerror(errno));
-> +        return -1;
-> +    }
-> +
-> +    return rc;
-> +}
-> +
-> +static void
-> +vub_flush(VubReq *req)
-> +{
-> +    VubDev *vdev_blk =3D req->vdev_blk;
-> +
-> +    fdatasync(vdev_blk->blk_fd);
-> +}
-> +
-> +static int vub_virtio_process_req(VubDev *vdev_blk,
-> +                                     VuVirtq *vq)
-> +{
-> +    VugDev *gdev =3D &vdev_blk->parent;
-> +    VuDev *vu_dev =3D &gdev->parent;
-> +    VuVirtqElement *elem;
-> +    uint32_t type;
-> +    unsigned in_num;
-> +    unsigned out_num;
-> +    VubReq *req;
-> +
-> +    elem =3D vu_queue_pop(vu_dev, vq, sizeof(VuVirtqElement));
-
-(there should be an optimization possible here, where you allocate
-with a size > VuVirtqElement: this should avoid the need for second
-allocation of VubReq)
-
-> +    if (!elem) {
-> +        return -1;
-> +    }
-> +
-> +    /* refer to hw/block/virtio_blk.c */
-> +    if (elem->out_num < 1 || elem->in_num < 1) {
-> +        fprintf(stderr, "virtio-blk request missing headers\n");
-> +        free(elem);
-> +        return -1;
-> +    }
-> +
-> +    req =3D g_new0(VubReq, 1);
-> +    req->vdev_blk =3D vdev_blk;
-> +    req->vq =3D vq;
-> +    req->elem =3D elem;
-> +
-> +    in_num =3D elem->in_num;
-> +    out_num =3D elem->out_num;
-> +
-> +    /* don't support VIRTIO_F_ANY_LAYOUT and virtio 1.0 only */
-> +    if (elem->out_sg[0].iov_len < sizeof(struct virtio_blk_outhdr)) {
-> +        fprintf(stderr, "Invalid outhdr size\n");
-> +        goto err;
-> +    }
-> +    req->out =3D (struct virtio_blk_outhdr *)elem->out_sg[0].iov_base;
-> +    out_num--;
-> +
-> +    if (elem->in_sg[in_num - 1].iov_len < sizeof(struct virtio_blk_inhdr=
-)) {
-> +        fprintf(stderr, "Invalid inhdr size\n");
-> +        goto err;
-> +    }
-> +    req->in =3D (struct virtio_blk_inhdr *)elem->in_sg[in_num - 1].iov_b=
-ase;
-> +    in_num--;
-> +
-> +    type =3D le32toh(req->out->type);
-> +    switch (type & ~(VIRTIO_BLK_T_OUT | VIRTIO_BLK_T_BARRIER)) {
-> +        case VIRTIO_BLK_T_IN: {
-> +            ssize_t ret =3D 0;
-> +            bool is_write =3D type & VIRTIO_BLK_T_OUT;
-> +            req->sector_num =3D le64toh(req->out->sector);
-> +            if (is_write) {
-> +                ret  =3D vub_writev(req, &elem->out_sg[1], out_num);
-> +            } else {
-> +                ret =3D vub_readv(req, &elem->in_sg[0], in_num);
+> +        assert((uintptr_t)reg->userspace_addr == reg->userspace_addr);
+> +        mr = memory_region_from_host((void *)(uintptr_t)reg->userspace_addr,
+> +                                     &offset);
+> +        fd = memory_region_get_fd(mr);
+> +        if (fd > 0) {
+> +            if (mem->nregions == VHOST_MEMORY_MAX_NREGIONS) {
+> +                vhost_user_free_memslots = false;
+> +                return -1;
 > +            }
-> +            if (ret >=3D 0) {
-> +                req->in->status =3D VIRTIO_BLK_S_OK;
-> +            } else {
-> +                req->in->status =3D VIRTIO_BLK_S_IOERR;
-> +            }
-> +            vub_req_complete(req);
-> +            break;
-> +        }
-> +        case VIRTIO_BLK_T_FLUSH: {
-> +            vub_flush(req);
-> +            req->in->status =3D VIRTIO_BLK_S_OK;
-> +            vub_req_complete(req);
-> +            break;
-> +        }
-> +        case VIRTIO_BLK_T_GET_ID: {
-> +            size_t size =3D MIN(vub_iov_size(&elem->in_sg[0], in_num),
-> +                              VIRTIO_BLK_ID_BYTES);
-> +            snprintf(elem->in_sg[0].iov_base, size, "%s", "vhost_user_bl=
-k");
-> +            req->in->status =3D VIRTIO_BLK_S_OK;
-> +            req->size =3D elem->in_sg[0].iov_len;
-> +            vub_req_complete(req);
-> +            break;
-> +        }
-> +        default: {
-> +            req->in->status =3D VIRTIO_BLK_S_UNSUPP;
-> +            vub_req_complete(req);
-> +            break;
+> +
+> +            mem->regions[mem->nregions].userspace_addr = reg->userspace_addr;
+> +            mem->regions[mem->nregions].memory_size = reg->memory_size;
+> +            mem->regions[mem->nregions].guest_phys_addr = reg->guest_phys_addr;
+> +            mem->regions[mem->nregions].mmap_offset = offset;
+> +            fds[mem->nregions++] = fd;
 > +        }
 > +    }
 > +
 > +    return 0;
-> +
-> +err:
-> +    free(elem);
-> +    g_free(req);
-> +    return -1;
 > +}
 > +
-> +static void vub_process_vq(VuDev *vu_dev, int idx)
+>  static int vhost_user_set_mem_table(struct vhost_dev *dev,
+>                                      struct vhost_memory *mem)
+>  {
+>      int fds[VHOST_MEMORY_MAX_NREGIONS];
+> -    int i, fd;
+> -    size_t fd_num = 0;
+> +    size_t fd_num;
+>      bool reply_supported = virtio_has_feature(dev->protocol_features,
+>                                                VHOST_USER_PROTOCOL_F_REPLY_ACK);
+>  
+> @@ -307,26 +340,12 @@ static int vhost_user_set_mem_table(struct vhost_dev *dev,
+>          msg.flags |= VHOST_USER_NEED_REPLY_MASK;
+>      }
+>  
+> -    for (i = 0; i < dev->mem->nregions; ++i) {
+> -        struct vhost_memory_region *reg = dev->mem->regions + i;
+> -        ram_addr_t offset;
+> -        MemoryRegion *mr;
+> -
+> -        assert((uintptr_t)reg->userspace_addr == reg->userspace_addr);
+> -        mr = memory_region_from_host((void *)(uintptr_t)reg->userspace_addr,
+> -                                     &offset);
+> -        fd = memory_region_get_fd(mr);
+> -        if (fd > 0) {
+> -            msg.payload.memory.regions[fd_num].userspace_addr = reg->userspace_addr;
+> -            msg.payload.memory.regions[fd_num].memory_size  = reg->memory_size;
+> -            msg.payload.memory.regions[fd_num].guest_phys_addr = reg->guest_phys_addr;
+> -            msg.payload.memory.regions[fd_num].mmap_offset = offset;
+> -            assert(fd_num < VHOST_MEMORY_MAX_NREGIONS);
+> -            fds[fd_num++] = fd;
+> -        }
+> +    if (vhost_user_prepare_msg(dev, &msg.payload.memory, fds) < 0) {
+> +        error_report("Failed preparing vhost-user memory table msg");
+> +        return -1;
+>      }
+>  
+> -    msg.payload.memory.nregions = fd_num;
+> +    fd_num = msg.payload.memory.nregions;
+>  
+>      if (!fd_num) {
+>          error_report("Failed initializing vhost-user memory map, "
+> @@ -815,9 +834,9 @@ static int vhost_user_get_vq_index(struct vhost_dev *dev, int idx)
+>      return idx;
+>  }
+>  
+> -static int vhost_user_memslots_limit(struct vhost_dev *dev)
+> +static bool vhost_user_has_free_memslots(struct vhost_dev *dev)
+>  {
+> -    return VHOST_MEMORY_MAX_NREGIONS;
+> +    return vhost_user_free_memslots;
+>  }
+>  
+>  static bool vhost_user_requires_shm_log(struct vhost_dev *dev)
+> @@ -922,11 +941,19 @@ static void vhost_user_set_iotlb_callback(struct vhost_dev *dev, int enabled)
+>      /* No-op as the receive channel is not dedicated to IOTLB messages. */
+>  }
+>  
+> +static void vhost_user_set_used_memslots(struct vhost_dev *dev)
 > +{
-> +    VugDev *gdev;
-> +    VubDev *vdev_blk;
-> +    VuVirtq *vq;
-> +    int ret;
+> +    int fds[VHOST_MEMORY_MAX_NREGIONS];
+> +    VhostUserMsg msg;
 > +
-> +    if ((idx < 0) || (idx >=3D VHOST_MAX_NR_VIRTQUEUE)) {
-> +        fprintf(stderr, "VQ Index out of range: %d\n", idx);
-> +        vub_panic_cb(vu_dev, NULL);
-> +        return;
-> +    }
+> +    vhost_user_prepare_msg(dev, &msg.payload.memory, fds);
+> +}
 > +
-> +    gdev =3D container_of(vu_dev, VugDev, parent);
-> +    vdev_blk =3D container_of(gdev, VubDev, parent);
-> +    assert(vdev_blk);
-> +
-> +    vq =3D vu_get_queue(vu_dev, idx);
-> +    assert(vq);
-> +
-> +    while (1) {
-> +        ret =3D vub_virtio_process_req(vdev_blk, vq);
-> +        if (ret) {
-> +            break;
+>  const VhostOps user_ops = {
+>          .backend_type = VHOST_BACKEND_TYPE_USER,
+>          .vhost_backend_init = vhost_user_init,
+>          .vhost_backend_cleanup = vhost_user_cleanup,
+> -        .vhost_backend_memslots_limit = vhost_user_memslots_limit,
+> +        .vhost_backend_has_free_memslots = vhost_user_has_free_memslots,
+>          .vhost_set_log_base = vhost_user_set_log_base,
+>          .vhost_set_mem_table = vhost_user_set_mem_table,
+>          .vhost_set_vring_addr = vhost_user_set_vring_addr,
+> @@ -948,4 +975,5 @@ const VhostOps user_ops = {
+>          .vhost_net_set_mtu = vhost_user_net_set_mtu,
+>          .vhost_set_iotlb_callback = vhost_user_set_iotlb_callback,
+>          .vhost_send_device_iotlb_msg = vhost_user_send_device_iotlb_msg,
+> +        .vhost_set_used_memslots = vhost_user_set_used_memslots,
+>  };
+> diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
+> index e4290ce..1e52825 100644
+> --- a/hw/virtio/vhost.c
+> +++ b/hw/virtio/vhost.c
+> @@ -43,20 +43,20 @@
+>  static struct vhost_log *vhost_log;
+>  static struct vhost_log *vhost_log_shm;
+>  
+> -static unsigned int used_memslots;
+>  static QLIST_HEAD(, vhost_dev) vhost_devices =
+>      QLIST_HEAD_INITIALIZER(vhost_devices);
+>  
+>  bool vhost_has_free_slot(void)
+>  {
+> -    unsigned int slots_limit = ~0U;
+>      struct vhost_dev *hdev;
+>  
+>      QLIST_FOREACH(hdev, &vhost_devices, entry) {
+> -        unsigned int r = hdev->vhost_ops->vhost_backend_memslots_limit(hdev);
+> -        slots_limit = MIN(slots_limit, r);
+> +        if (!hdev->vhost_ops->vhost_backend_has_free_memslots(hdev)) {
+> +            return false;
 > +        }
-> +    }
-> +}
+>      }
+> -    return slots_limit > used_memslots;
 > +
-> +static void vub_queue_set_started(VuDev *vu_dev, int idx, bool started)
-> +{
-> +    VuVirtq *vq;
-> +
-> +    assert(vu_dev);
-> +
-> +    vq =3D vu_get_queue(vu_dev, idx);
-> +    vu_set_queue_handler(vu_dev, vq, started ? vub_process_vq : NULL);
-> +}
-> +
-> +static uint64_t
-> +vub_get_features(VuDev *dev)
-> +{
-> +    return 1ull << VIRTIO_BLK_F_SIZE_MAX |
-> +           1ull << VIRTIO_BLK_F_SEG_MAX |
-> +           1ull << VIRTIO_BLK_F_TOPOLOGY |
-> +           1ull << VIRTIO_BLK_F_BLK_SIZE |
-> +           1ull << VIRTIO_BLK_F_FLUSH |
-> +           1ull << VIRTIO_BLK_F_CONFIG_WCE |
-> +           1ull << VIRTIO_F_VERSION_1 |
-> +           1ull << VHOST_USER_F_PROTOCOL_FEATURES;
-> +}
-> +
-> +static int
-> +vub_get_config(VuDev *vu_dev, uint8_t *config, uint32_t len)
-> +{
-> +    VugDev *gdev;
-> +    VubDev *vdev_blk;
-> +
-> +    gdev =3D container_of(vu_dev, VugDev, parent);
-> +    vdev_blk =3D container_of(gdev, VubDev, parent);
-> +    memcpy(config, &vdev_blk->blkcfg, len);
-> +
-> +    return 0;
-> +}
-> +
-> +static int
-> +vub_set_config(VuDev *vu_dev, const uint8_t *data,
-> +               uint32_t offset, uint32_t size, uint32_t flags)
-> +{
-> +    VugDev *gdev;
-> +    VubDev *vdev_blk;
-> +    uint8_t wce;
-> +    int fd;
-> +
-> +    /* don't support live migration */
-> +    if (flags !=3D VHOST_SET_CONFIG_TYPE_MASTER) {
-> +        return -1;
-> +    }
-> +
-> +    gdev =3D container_of(vu_dev, VugDev, parent);
-> +    vdev_blk =3D container_of(gdev, VubDev, parent);
-> +
-> +    if (offset !=3D offsetof(struct virtio_blk_config, wce) ||
-> +        size !=3D 1) {
-> +        return -1;
-> +    }
-> +
-> +    wce =3D *data;
-> +    if (wce =3D=3D vdev_blk->blkcfg.wce) {
-> +        /* Do nothing as same with old configuration */
-> +        return 0;
-> +    }
-> +
-> +    vdev_blk->blkcfg.wce =3D wce;
-> +    fprintf(stdout, "Write Cache Policy Changed\n");
-> +    if (vdev_blk->blk_fd >=3D 0) {
-> +        close(vdev_blk->blk_fd);
-> +        vdev_blk->blk_fd =3D -1;
-> +    }
-> +
-> +    fd =3D vub_open(vdev_blk->blk_name, wce);
-> +    if (fd < 0) {
-> +        fprintf(stderr, "Error to open block device %s\n", vdev_blk->blk=
-_name);
-> +        vdev_blk->blk_fd =3D -1;
-> +        return -1;
-> +    }
-> +    vdev_blk->blk_fd =3D fd;
-> +
-> +    return 0;
-> +}
-> +
-> +static const VuDevIface vub_iface =3D {
-> +    .get_features =3D vub_get_features,
-> +    .queue_set_started =3D vub_queue_set_started,
-> +    .get_config =3D vub_get_config,
-> +    .set_config =3D vub_set_config,
-> +};
-> +
-> +static int unix_sock_new(char *unix_fn)
-> +{
-> +    int sock;
-> +    struct sockaddr_un un;
-> +    size_t len;
-> +
-> +    assert(unix_fn);
-> +
-> +    sock =3D socket(AF_UNIX, SOCK_STREAM, 0);
-> +    if (sock <=3D 0) {
-> +        perror("socket");
-> +        return -1;
-> +    }
-> +
-> +    un.sun_family =3D AF_UNIX;
-> +    (void)snprintf(un.sun_path, sizeof(un.sun_path), "%s", unix_fn);
-> +    len =3D sizeof(un.sun_family) + strlen(un.sun_path);
-> +
-> +    (void)unlink(unix_fn);
-> +    if (bind(sock, (struct sockaddr *)&un, len) < 0) {
-> +        perror("bind");
-> +        goto fail;
-> +    }
-> +
-> +    if (listen(sock, 1) < 0) {
-> +        perror("listen");
-> +        goto fail;
-> +    }
-> +
-> +    return sock;
-> +
-> +fail:
-> +    (void)close(sock);
-> +
-> +    return -1;
-> +}
-> +
-> +static void vub_free(struct VubDev *vdev_blk)
-> +{
-> +    if (!vdev_blk) {
-> +        return;
-> +    }
-> +
-> +    g_main_loop_unref(vdev_blk->loop);
-> +    if (vdev_blk->blk_fd >=3D 0) {
-> +        close(vdev_blk->blk_fd);
-> +    }
-> +    g_free(vdev_blk);
-> +}
-> +
-> +static uint32_t
-> +vub_get_blocksize(int fd)
-> +{
-> +    uint32_t blocksize =3D 512;
-> +
-> +    #if defined(__linux__) && defined(BLKSSZGET)
+> +    return true;
+>  }
+>  
+>  static void vhost_dev_sync_region(struct vhost_dev *dev,
+> @@ -606,7 +606,7 @@ static void vhost_set_memory(MemoryListener *listener,
+>      dev->mem_changed_start_addr = MIN(dev->mem_changed_start_addr, start_addr);
+>      dev->mem_changed_end_addr = MAX(dev->mem_changed_end_addr, start_addr + size - 1);
+>      dev->memory_changed = true;
+> -    used_memslots = dev->mem->nregions;
+> +    dev->vhost_ops->vhost_set_used_memslots(dev);
+>  }
+>  
+>  static bool vhost_section(MemoryRegionSection *section)
+> @@ -1251,9 +1251,9 @@ int vhost_dev_init(struct vhost_dev *hdev, void *opaque,
+>          goto fail;
+>      }
+>  
+> -    if (used_memslots > hdev->vhost_ops->vhost_backend_memslots_limit(hdev)) {
+> -        error_report("vhost backend memory slots limit is less"
+> -                " than current number of present memory slots");
+> +    if (!hdev->vhost_ops->vhost_backend_has_free_memslots(hdev)) {
+As were noticed in earlier reviews, this check is half working only (in current code),
+and it should happen after memory listener is registered to work properly.
+So move it there and add necessary cleanups in case of failure.
 
-Weird indentation, please keep preprocessor lines at first column.
+Also this fix should be a separate patch,
+so in total you would end up with a series of 3 patches:
+  1. fix crash by removing assert
+  2. fix not working check
+  3. used_memslots refactoring.
 
-> +    if (ioctl(fd, BLKSSZGET, &blocksize) =3D=3D 0) {
-> +        return blocklen;
-> +    }
-> +    #endif
-> +
-> +    return blocksize;
-> +}
-> +
-> +static void
-> +vub_initialize_config(int fd, struct virtio_blk_config *config)
-> +{
-> +    off64_t capacity;
-> +
-> +    capacity =3D lseek64(fd, 0, SEEK_END);
-> +    config->capacity =3D capacity >> 9;
-> +    config->blk_size =3D vub_get_blocksize(fd);
-> +    config->size_max =3D 65536;
-> +    config->seg_max =3D 128 - 2;
-> +    config->min_io_size =3D 1;
-> +    config->opt_io_size =3D 1;
-> +    config->num_queues =3D 1;
-> +}
-> +
-> +static VubDev *
-> +vub_new(char *blk_file)
-> +{
-> +    VubDev *vdev_blk;
-> +
-> +    vdev_blk =3D g_new0(VubDev, 1);
-> +    vdev_blk->loop =3D g_main_loop_new(NULL, FALSE);
-> +    vdev_blk->blk_fd =3D vub_open(blk_file, 0);
-> +    if (vdev_blk->blk_fd  < 0) {
-> +        fprintf(stderr, "Error to open block device %s\n", blk_file);
-> +        return NULL;
+> +        error_report("vhost backend memory slots limit is less than "
+> +                     "current number of present memory slots");
+unrelated change
 
-You leak vdev_blk here.
-
-> +    }
-> +    vdev_blk->blkcfg.wce =3D 0;
-> +    vdev_blk->blk_name =3D blk_file;
-> +
-> +    /* fill virtio_blk_config with block parameters */
-> +    vub_initialize_config(vdev_blk->blk_fd, &vdev_blk->blkcfg);
-> +
-> +    return vdev_blk;
-> +}
-> +
-> +int main(int argc, char **argv)
-> +{
-> +    int opt;
-> +    char *unix_socket =3D NULL;
-> +    char *blk_file =3D NULL;
-> +    int lsock =3D -1, csock =3D -1;
-> +    VubDev *vdev_blk =3D NULL;
-> +
-> +    while ((opt =3D getopt(argc, argv, "b:s:h")) !=3D -1) {
-> +        switch (opt) {
-> +        case 'b':
-> +            blk_file =3D g_strdup(optarg);
-> +            break;
-> +        case 's':
-> +            unix_socket =3D g_strdup(optarg);
-> +            break;
-> +        case 'h':
-> +        default:
-> +            printf("Usage: %s [-b block device or file, -s UNIX domain s=
-ocket]"
-> +                   " | [ -h ]\n", argv[0]);
-> +            return 0;
-> +        }
-> +    }
-> +
-> +    if (!unix_socket || !blk_file) {
-> +        printf("Usage: %s [-b block device or file, -s UNIX domain socke=
-t] |"
-> +               " [ -h ]\n", argv[0]);
-> +        return -1;
-> +    }
-> +
-> +    lsock =3D unix_sock_new(unix_socket);
-> +    if (lsock < 0) {
-> +        goto err;
-> +    }
-> +
-> +    csock =3D accept(lsock, (void *)0, (void *)0);
-> +    if (csock < 0) {
-> +        fprintf(stderr, "Accept error %s\n", strerror(errno));
-> +        goto err;
-> +    }
-> +
-> +    vdev_blk =3D vub_new(blk_file);
-> +    if (!vdev_blk) {
-> +        goto err;
-> +    }
-> +
-> +    vug_init(&vdev_blk->parent, csock, vub_panic_cb, &vub_iface);
-> +
-> +    g_main_loop_run(vdev_blk->loop);
-> +
-> +    vug_deinit(&vdev_blk->parent);
-> +
-> +err:
-> +    vub_free(vdev_blk);
-> +    if (csock >=3D 0) {
-> +        close(csock);
-> +    }
-> +    if (lsock >=3D 0) {
-> +        close(lsock);
-> +    }
-> +    g_free(unix_socket);
-> +    g_free(blk_file);
-> +
-> +    return 0;
-> +}
-> --
-> 1.9.3
->
->
-
-thanks
-
---=20
-Marc-Andr=C3=A9 Lureau
+>          r = -1;
+>          goto fail;
+>      }
+> diff --git a/include/hw/virtio/vhost-backend.h b/include/hw/virtio/vhost-backend.h
+> index a7a5f22..ea01d5f 100644
+> --- a/include/hw/virtio/vhost-backend.h
+> +++ b/include/hw/virtio/vhost-backend.h
+> @@ -31,7 +31,7 @@ struct vhost_iotlb_msg;
+>  
+>  typedef int (*vhost_backend_init)(struct vhost_dev *dev, void *opaque);
+>  typedef int (*vhost_backend_cleanup)(struct vhost_dev *dev);
+> -typedef int (*vhost_backend_memslots_limit)(struct vhost_dev *dev);
+> +typedef bool (*vhost_backend_has_free_memslots)(struct vhost_dev *dev);
+>  
+>  typedef int (*vhost_net_set_backend_op)(struct vhost_dev *dev,
+>                                  struct vhost_vring_file *file);
+> @@ -84,12 +84,13 @@ typedef void (*vhost_set_iotlb_callback_op)(struct vhost_dev *dev,
+>                                             int enabled);
+>  typedef int (*vhost_send_device_iotlb_msg_op)(struct vhost_dev *dev,
+>                                                struct vhost_iotlb_msg *imsg);
+> +typedef void (*vhost_set_used_memslots_op)(struct vhost_dev *dev);
+>  
+>  typedef struct VhostOps {
+>      VhostBackendType backend_type;
+>      vhost_backend_init vhost_backend_init;
+>      vhost_backend_cleanup vhost_backend_cleanup;
+> -    vhost_backend_memslots_limit vhost_backend_memslots_limit;
+> +    vhost_backend_has_free_memslots vhost_backend_has_free_memslots;
+>      vhost_net_set_backend_op vhost_net_set_backend;
+>      vhost_net_set_mtu_op vhost_net_set_mtu;
+>      vhost_scsi_set_endpoint_op vhost_scsi_set_endpoint;
+> @@ -118,6 +119,7 @@ typedef struct VhostOps {
+>      vhost_vsock_set_running_op vhost_vsock_set_running;
+>      vhost_set_iotlb_callback_op vhost_set_iotlb_callback;
+>      vhost_send_device_iotlb_msg_op vhost_send_device_iotlb_msg;
+> +    vhost_set_used_memslots_op vhost_set_used_memslots;
+>  } VhostOps;
+>  
+>  extern const VhostOps user_ops;
