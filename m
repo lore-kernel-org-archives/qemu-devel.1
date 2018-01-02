@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52412)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52396)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1eWWBT-00079G-Ms
-	for qemu-devel@nongnu.org; Tue, 02 Jan 2018 18:41:28 -0500
+	(envelope-from <laurent@vivier.eu>) id 1eWWBS-00078n-L5
+	for qemu-devel@nongnu.org; Tue, 02 Jan 2018 18:41:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1eWWBR-0003AD-QC
-	for qemu-devel@nongnu.org; Tue, 02 Jan 2018 18:41:27 -0500
-Received: from mout.kundenserver.de ([212.227.126.134]:62312)
+	(envelope-from <laurent@vivier.eu>) id 1eWWBP-00039Q-SU
+	for qemu-devel@nongnu.org; Tue, 02 Jan 2018 18:41:26 -0500
+Received: from mout.kundenserver.de ([212.227.126.135]:51347)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1eWWBR-00039m-Go
-	for qemu-devel@nongnu.org; Tue, 02 Jan 2018 18:41:25 -0500
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1eWWBP-00038Z-JJ
+	for qemu-devel@nongnu.org; Tue, 02 Jan 2018 18:41:23 -0500
 From: Laurent Vivier <laurent@vivier.eu>
-Date: Wed,  3 Jan 2018 00:41:03 +0100
-Message-Id: <20180102234108.32713-13-laurent@vivier.eu>
+Date: Wed,  3 Jan 2018 00:41:01 +0100
+Message-Id: <20180102234108.32713-11-laurent@vivier.eu>
 In-Reply-To: <20180102234108.32713-1-laurent@vivier.eu>
 References: <20180102234108.32713-1-laurent@vivier.eu>
-Subject: [Qemu-devel] [PATCH v6 12/17] target/m68k: implement fsave/frestore
+Subject: [Qemu-devel] [PATCH v6 10/17] target/m68k: add cpush/cinv
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,59 +26,54 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Richard Henderson <richard.henderson@linaro.org>, Thomas Huth <huth@tuxfamily.org>, Laurent Vivier <laurent@vivier.eu>
 
+Add cache lines invalidate and cache lines push
+as no-op operations, as we don't have cache.
+
+These instructions are 68040 only.
+
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/m68k/translate.c | 23 +++++++++++++++--------
- 1 file changed, 15 insertions(+), 8 deletions(-)
+ target/m68k/translate.c | 20 ++++++++++++++++++++
+ 1 file changed, 20 insertions(+)
 
 diff --git a/target/m68k/translate.c b/target/m68k/translate.c
-index 69bd347a70..baaa260875 100644
+index ae3fd3db26..75be38973e 100644
 --- a/target/m68k/translate.c
 +++ b/target/m68k/translate.c
-@@ -5104,28 +5104,35 @@ DISAS_INSN(fscc)
- #if defined(CONFIG_SOFTMMU)
- DISAS_INSN(frestore)
- {
--    M68kCPU *cpu = m68k_env_get_cpu(env);
-+    TCGv addr;
- 
-     if (IS_USER(s)) {
-         gen_exception(s, s->insn_pc, EXCP_PRIVILEGE);
-         return;
-     }
--
--    /* TODO: Implement frestore.  */
--    cpu_abort(CPU(cpu), "FRESTORE not implemented");
-+    if (m68k_feature(s->env, M68K_FEATURE_M68040)) {
-+        SRC_EA(env, addr, OS_LONG, 0, NULL);
-+        /* FIXME: check the state frame */
-+    } else {
-+        disas_undef(env, s, insn);
-+    }
+@@ -4497,6 +4497,24 @@ DISAS_INSN(cpushl)
+     /* Cache push/invalidate.  Implement as no-op.  */
  }
  
- DISAS_INSN(fsave)
- {
--    M68kCPU *cpu = m68k_env_get_cpu(env);
--
-     if (IS_USER(s)) {
-         gen_exception(s, s->insn_pc, EXCP_PRIVILEGE);
-         return;
-     }
- 
--    /* TODO: Implement fsave.  */
--    cpu_abort(CPU(cpu), "FSAVE not implemented");
-+    if (m68k_feature(s->env, M68K_FEATURE_M68040)) {
-+        /* always write IDLE */
-+        TCGv idle = tcg_const_i32(0x41000000);
-+        DEST_EA(env, insn, OS_LONG, idle, NULL);
-+        tcg_temp_free(idle);
-+    } else {
-+        disas_undef(env, s, insn);
++DISAS_INSN(cpush)
++{
++    if (IS_USER(s)) {
++        gen_exception(s, s->insn_pc, EXCP_PRIVILEGE);
++        return;
 +    }
- }
++    /* Cache push/invalidate.  Implement as no-op.  */
++}
++
++DISAS_INSN(cinv)
++{
++    if (IS_USER(s)) {
++        gen_exception(s, s->insn_pc, EXCP_PRIVILEGE);
++        return;
++    }
++    /* Invalidate cache line.  Implement as no-op.  */
++}
++
+ DISAS_INSN(wddata)
+ {
+     gen_exception(s, s->insn_pc, EXCP_PRIVILEGE);
+@@ -5675,6 +5693,8 @@ void register_m68k_insns (CPUM68KState *env)
+     INSN(fsave,     f300, ffc0, FPU);
+     INSN(intouch,   f340, ffc0, CF_ISA_A);
+     INSN(cpushl,    f428, ff38, CF_ISA_A);
++    INSN(cpush,     f420, ff20, M68040);
++    INSN(cinv,      f400, ff20, M68040);
+     INSN(wddata,    fb00, ff00, CF_ISA_A);
+     INSN(wdebug,    fbc0, ffc0, CF_ISA_A);
  #endif
- 
 -- 
 2.14.3
