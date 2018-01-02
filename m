@@ -1,20 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52468)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55810)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1eWWBY-0007Cl-W8
-	for qemu-devel@nongnu.org; Tue, 02 Jan 2018 18:41:35 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1eWWJJ-0005SY-7Z
+	for qemu-devel@nongnu.org; Tue, 02 Jan 2018 18:49:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1eWWBW-0003C1-8w
-	for qemu-devel@nongnu.org; Tue, 02 Jan 2018 18:41:33 -0500
-Received: from mout.kundenserver.de ([212.227.126.187]:60469)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1eWWBV-0003Bf-Vi
-	for qemu-devel@nongnu.org; Tue, 02 Jan 2018 18:41:30 -0500
-From: Laurent Vivier <laurent@vivier.eu>
-Date: Wed,  3 Jan 2018 00:41:08 +0100
-Message-Id: <20180102234108.32713-18-laurent@vivier.eu>
-In-Reply-To: <20180102234108.32713-1-laurent@vivier.eu>
-References: <20180102234108.32713-1-laurent@vivier.eu>
-Subject: [Qemu-devel] [PATCH v6 17/17] target/m68k: fix m68k_cpu_dump_state()
+	(envelope-from <richard.henderson@linaro.org>) id 1eWWJE-0007Tl-VY
+	for qemu-devel@nongnu.org; Tue, 02 Jan 2018 18:49:33 -0500
+Received: from mail-pg0-x236.google.com ([2607:f8b0:400e:c05::236]:43058)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1eWWJE-0007TS-O7
+	for qemu-devel@nongnu.org; Tue, 02 Jan 2018 18:49:28 -0500
+Received: by mail-pg0-x236.google.com with SMTP id f18so22538pga.10
+	for <qemu-devel@nongnu.org>; Tue, 02 Jan 2018 15:49:28 -0800 (PST)
+References: <20180102011032.30056-1-laurent@vivier.eu>
+	<20180102011032.30056-9-laurent@vivier.eu>
+	<9ca4c6cb-0a15-de72-b303-d05354dbda93@linaro.org>
+	<bd1a6b92-c328-3b47-e32c-addfccec7c75@vivier.eu>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <a672c1c9-5a8c-8831-489d-06b69382b5e3@linaro.org>
+Date: Tue, 2 Jan 2018 15:49:24 -0800
+MIME-Version: 1.0
+In-Reply-To: <bd1a6b92-c328-3b47-e32c-addfccec7c75@vivier.eu>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v5 08/17] target/m68k: add move16
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,52 +33,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Richard Henderson <richard.henderson@linaro.org>, Thomas Huth <huth@tuxfamily.org>, Laurent Vivier <laurent@vivier.eu>
+To: Laurent Vivier <laurent@vivier.eu>, qemu-devel@nongnu.org
+Cc: Thomas Huth <huth@tuxfamily.org>
 
-Display correctly the Trace bits for 680x0
-(2 bits instead of 1 for Coldfire).
+On 01/02/2018 10:42 AM, Laurent Vivier wrote:
+> Le 02/01/2018 à 17:50, Richard Henderson a écrit :
+>> On 01/01/2018 05:10 PM, Laurent Vivier wrote:
+>>> +    mode = (insn >> 3) & 7;
+>>> +
+>>> +    if (mode & 4) {
+>>
+>> Looks like mode should equal 4 as well.
+>>
+> 
+> Yes, you're right. I will replace the line by:
+> 
+> +    if (mode == 4) {
 
-Signed-off-by: Laurent Vivier <laurent@vivier.eu>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
----
- target/m68k/cpu.h       | 3 ++-
- target/m68k/translate.c | 9 ++++++---
- 2 files changed, 8 insertions(+), 4 deletions(-)
+Well, not quite.  Surely,
 
-diff --git a/target/m68k/cpu.h b/target/m68k/cpu.h
-index 759b30d389..2985b039e1 100644
---- a/target/m68k/cpu.h
-+++ b/target/m68k/cpu.h
-@@ -219,7 +219,8 @@ typedef enum {
- #define SR_I  0x0700
- #define SR_M  0x1000
- #define SR_S  0x2000
--#define SR_T  0x8000
-+#define SR_T_SHIFT 14
-+#define SR_T  0xc000
- 
- #define M68K_SSP    0
- #define M68K_USP    1
-diff --git a/target/m68k/translate.c b/target/m68k/translate.c
-index 9088e87b97..06840c5d00 100644
---- a/target/m68k/translate.c
-+++ b/target/m68k/translate.c
-@@ -5937,9 +5937,12 @@ void m68k_cpu_dump_state(CPUState *cs, FILE *f, fprintf_function cpu_fprintf,
-     }
-     cpu_fprintf (f, "PC = %08x   ", env->pc);
-     sr = env->sr | cpu_m68k_get_ccr(env);
--    cpu_fprintf(f, "SR = %04x %c%c%c%c%c ", sr, (sr & CCF_X) ? 'X' : '-',
--                (sr & CCF_N) ? 'N' : '-', (sr & CCF_Z) ? 'Z' : '-',
--                (sr & CCF_V) ? 'V' : '-', (sr & CCF_C) ? 'C' : '-');
-+    cpu_fprintf(f, "SR = %04x T:%x I:%x %c%c %c%c%c%c%c\n",
-+                sr, (sr & SR_T) >> SR_T_SHIFT, (sr & SR_I) >> SR_I_SHIFT,
-+                (sr & SR_S) ? 'S' : 'U', (sr & SR_M) ? '%' : 'I',
-+                (sr & CCF_X) ? 'X' : '-', (sr & CCF_N) ? 'N' : '-',
-+                (sr & CCF_Z) ? 'Z' : '-', (sr & CCF_V) ? 'V' : '-',
-+                (sr & CCF_C) ? 'C' : '-');
-     cpu_fprintf(f, "FPSR = %08x %c%c%c%c ", env->fpsr,
-                 (env->fpsr & FPSR_CC_A) ? 'A' : '-',
-                 (env->fpsr & FPSR_CC_I) ? 'I' : '-',
--- 
-2.14.3
+  if (mode & 4) {
+    if (mode != 4) {
+      illegal opcode
+
+
+r~
