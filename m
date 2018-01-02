@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36118)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36119)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1eWB6L-0001Y1-L1
+	(envelope-from <laurent@vivier.eu>) id 1eWB6L-0001Y3-Kk
 	for qemu-devel@nongnu.org; Mon, 01 Jan 2018 20:10:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1eWB6I-00056q-9P
+	(envelope-from <laurent@vivier.eu>) id 1eWB6K-00058Y-1E
 	for qemu-devel@nongnu.org; Mon, 01 Jan 2018 20:10:45 -0500
-Received: from mout.kundenserver.de ([212.227.126.131]:57888)
+Received: from mout.kundenserver.de ([212.227.126.131]:56261)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1eWB6H-00055H-VO
-	for qemu-devel@nongnu.org; Mon, 01 Jan 2018 20:10:42 -0500
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1eWB6J-00057L-K9
+	for qemu-devel@nongnu.org; Mon, 01 Jan 2018 20:10:43 -0500
 From: Laurent Vivier <laurent@vivier.eu>
-Date: Tue,  2 Jan 2018 02:10:26 +0100
-Message-Id: <20180102011032.30056-12-laurent@vivier.eu>
+Date: Tue,  2 Jan 2018 02:10:30 +0100
+Message-Id: <20180102011032.30056-16-laurent@vivier.eu>
 In-Reply-To: <20180102011032.30056-1-laurent@vivier.eu>
 References: <20180102011032.30056-1-laurent@vivier.eu>
-Subject: [Qemu-devel] [PATCH v5 11/17] target/m68k: add reset
+Subject: [Qemu-devel] [PATCH v5 15/17] target/m68k: add andi/ori/eori to
+ SR/CCR
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,75 +27,110 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Thomas Huth <huth@tuxfamily.org>, Laurent Vivier <laurent@vivier.eu>
 
-The instruction traps if the CPU is not in
-Supervisor state but the helper is empty because
-there is no easy way to reset all the peripherals
-without resetting the CPU itself.
-
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 ---
- target/m68k/helper.c    |  7 +++++++
- target/m68k/helper.h    |  4 ++++
- target/m68k/translate.c | 13 +++++++++++++
- 3 files changed, 24 insertions(+)
+ target/m68k/translate.c | 53 ++++++++++++++++++++++++++++++++++++++++++-------
+ 1 file changed, 46 insertions(+), 7 deletions(-)
 
-diff --git a/target/m68k/helper.c b/target/m68k/helper.c
-index 7e50ff5871..f8bd456145 100644
---- a/target/m68k/helper.c
-+++ b/target/m68k/helper.c
-@@ -707,3 +707,10 @@ void HELPER(set_mac_extu)(CPUM68KState *env, uint32_t val, uint32_t acc)
-     res |= (uint64_t)(val & 0xffff0000) << 16;
-     env->macc[acc + 1] = res;
- }
-+
-+#if defined(CONFIG_SOFTMMU)
-+void HELPER(reset)(CPUM68KState *env)
-+{
-+    /* FIXME: reset all except CPU */
-+}
-+#endif
-diff --git a/target/m68k/helper.h b/target/m68k/helper.h
-index eebe52dae5..8d0cad7c6b 100644
---- a/target/m68k/helper.h
-+++ b/target/m68k/helper.h
-@@ -94,3 +94,7 @@ DEF_HELPER_FLAGS_4(bfchg_mem, TCG_CALL_NO_WG, i32, env, i32, s32, i32)
- DEF_HELPER_FLAGS_4(bfclr_mem, TCG_CALL_NO_WG, i32, env, i32, s32, i32)
- DEF_HELPER_FLAGS_4(bfset_mem, TCG_CALL_NO_WG, i32, env, i32, s32, i32)
- DEF_HELPER_FLAGS_4(bfffo_mem, TCG_CALL_NO_WG, i64, env, i32, s32, i32)
-+
-+#if defined(CONFIG_SOFTMMU)
-+DEF_HELPER_FLAGS_1(reset, TCG_CALL_NO_RWG, void, env)
-+#endif
 diff --git a/target/m68k/translate.c b/target/m68k/translate.c
-index 2a9a9c8e42..68b67bc0a3 100644
+index 1a462064be..ee59b5bad2 100644
 --- a/target/m68k/translate.c
 +++ b/target/m68k/translate.c
-@@ -2762,6 +2762,18 @@ DISAS_INSN(unlk)
-     tcg_temp_free(src);
+@@ -2201,6 +2201,7 @@ DISAS_INSN(arith_im)
+     TCGv dest;
+     TCGv addr;
+     int opsize;
++    bool with_SR = ((insn & 0x3f) == 0x3c);
+ 
+     op = (insn >> 9) & 7;
+     opsize = insn_opsize(insn);
+@@ -2217,32 +2218,73 @@ DISAS_INSN(arith_im)
+     default:
+        abort();
+     }
+-    SRC_EA(env, src1, opsize, 1, (op == 6) ? NULL : &addr);
++
++    if (with_SR) {
++        /* SR/CCR can only be used with andi/eori/ori */
++        if (op == 2 || op == 3 || op == 6) {
++            disas_undef(env, s, insn);
++            return;
++        }
++        switch (opsize) {
++        case OS_BYTE:
++            src1 = gen_get_ccr(s);
++            break;
++        case OS_WORD:
++            if (IS_USER(s)) {
++                gen_exception(s, s->insn_pc, EXCP_PRIVILEGE);
++                return;
++            }
++            src1 = gen_get_sr(s);
++            break;
++        case OS_LONG:
++            disas_undef(env, s, insn);
++            return;
++        }
++    } else {
++        SRC_EA(env, src1, opsize, 1, (op == 6) ? NULL : &addr);
++    }
+     dest = tcg_temp_new();
+     switch (op) {
+     case 0: /* ori */
+         tcg_gen_or_i32(dest, src1, im);
+-        gen_logic_cc(s, dest, opsize);
++        if (with_SR) {
++            gen_set_sr(s, dest, opsize == OS_BYTE);
++        } else {
++            DEST_EA(env, insn, opsize, dest, &addr);
++            gen_logic_cc(s, dest, opsize);
++        }
+         break;
+     case 1: /* andi */
+         tcg_gen_and_i32(dest, src1, im);
+-        gen_logic_cc(s, dest, opsize);
++        if (with_SR) {
++            gen_set_sr(s, dest, opsize == OS_BYTE);
++        } else {
++            DEST_EA(env, insn, opsize, dest, &addr);
++            gen_logic_cc(s, dest, opsize);
++        }
+         break;
+     case 2: /* subi */
+         tcg_gen_setcond_i32(TCG_COND_LTU, QREG_CC_X, src1, im);
+         tcg_gen_sub_i32(dest, src1, im);
+         gen_update_cc_add(dest, im, opsize);
+         set_cc_op(s, CC_OP_SUBB + opsize);
++        DEST_EA(env, insn, opsize, dest, &addr);
+         break;
+     case 3: /* addi */
+         tcg_gen_add_i32(dest, src1, im);
+         gen_update_cc_add(dest, im, opsize);
+         tcg_gen_setcond_i32(TCG_COND_LTU, QREG_CC_X, dest, im);
+         set_cc_op(s, CC_OP_ADDB + opsize);
++        DEST_EA(env, insn, opsize, dest, &addr);
+         break;
+     case 5: /* eori */
+         tcg_gen_xor_i32(dest, src1, im);
+-        gen_logic_cc(s, dest, opsize);
++        if (with_SR) {
++            gen_set_sr(s, dest, opsize == OS_BYTE);
++        } else {
++            DEST_EA(env, insn, opsize, dest, &addr);
++            gen_logic_cc(s, dest, opsize);
++        }
+         break;
+     case 6: /* cmpi */
+         gen_update_cc_cmp(s, src1, im, opsize);
+@@ -2251,9 +2293,6 @@ DISAS_INSN(arith_im)
+         abort();
+     }
+     tcg_temp_free(im);
+-    if (op != 6) {
+-        DEST_EA(env, insn, opsize, dest, &addr);
+-    }
+     tcg_temp_free(dest);
  }
  
-+#if defined(CONFIG_SOFTMMU)
-+DISAS_INSN(reset)
-+{
-+    if (IS_USER(s)) {
-+        gen_exception(s, s->insn_pc, EXCP_PRIVILEGE);
-+        return;
-+    }
-+
-+    gen_helper_reset(cpu_env);
-+}
-+#endif
-+
- DISAS_INSN(nop)
- {
- }
-@@ -5634,6 +5646,7 @@ void register_m68k_insns (CPUM68KState *env)
- #if defined(CONFIG_SOFTMMU)
-     INSN(move_to_usp, 4e60, fff8, USP);
-     INSN(move_from_usp, 4e68, fff8, USP);
-+    INSN(reset,     4e70, ffff, M68000);
-     BASE(stop,      4e72, ffff);
-     BASE(rte,       4e73, ffff);
-     INSN(movec,     4e7b, ffff, CF_ISA_A);
 -- 
 2.14.3
