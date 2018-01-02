@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36102)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36120)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1eWB6L-0001XT-3I
+	(envelope-from <laurent@vivier.eu>) id 1eWB6L-0001Y4-Kr
 	for qemu-devel@nongnu.org; Mon, 01 Jan 2018 20:10:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1eWB6J-00058B-F7
+	(envelope-from <laurent@vivier.eu>) id 1eWB6I-000570-IS
 	for qemu-devel@nongnu.org; Mon, 01 Jan 2018 20:10:45 -0500
-Received: from mout.kundenserver.de ([212.227.126.133]:55187)
+Received: from mout.kundenserver.de ([212.227.126.131]:53606)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1eWB6J-00056g-24
-	for qemu-devel@nongnu.org; Mon, 01 Jan 2018 20:10:43 -0500
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1eWB6I-00055Z-73
+	for qemu-devel@nongnu.org; Mon, 01 Jan 2018 20:10:42 -0500
 From: Laurent Vivier <laurent@vivier.eu>
-Date: Tue,  2 Jan 2018 02:10:29 +0100
-Message-Id: <20180102011032.30056-15-laurent@vivier.eu>
+Date: Tue,  2 Jan 2018 02:10:27 +0100
+Message-Id: <20180102011032.30056-13-laurent@vivier.eu>
 In-Reply-To: <20180102011032.30056-1-laurent@vivier.eu>
 References: <20180102011032.30056-1-laurent@vivier.eu>
-Subject: [Qemu-devel] [PATCH v5 14/17] target/m68k: add 680x0 "move to SR"
- instruction
+Subject: [Qemu-devel] [PATCH v5 12/17] target/m68k: implement fsave/frestore
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,95 +26,58 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Thomas Huth <huth@tuxfamily.org>, Laurent Vivier <laurent@vivier.eu>
 
-Some cleanup, and allows SR to be moved from any addressing mode.
-Previous code was wrong for coldfire: coldfire also allows to
-use addressing mode to set SR/CCR. It only supports Data register
-to get SR/CCR (move from)
-
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 ---
- target/m68k/translate.c | 38 ++++++++++++++++++++++----------------
- 1 file changed, 22 insertions(+), 16 deletions(-)
+ target/m68k/translate.c | 23 +++++++++++++++--------
+ 1 file changed, 15 insertions(+), 8 deletions(-)
 
 diff --git a/target/m68k/translate.c b/target/m68k/translate.c
-index cfe9fd34df..1a462064be 100644
+index 68b67bc0a3..4fced68ceb 100644
 --- a/target/m68k/translate.c
 +++ b/target/m68k/translate.c
-@@ -2162,27 +2162,34 @@ static void gen_set_sr_im(DisasContext *s, uint16_t val, int ccr_only)
-         tcg_gen_movi_i32(QREG_CC_N, val & CCF_N ? -1 : 0);
-         tcg_gen_movi_i32(QREG_CC_X, val & CCF_X ? 1 : 0);
-     } else {
--        gen_helper_set_sr(cpu_env, tcg_const_i32(val));
-+        TCGv sr = tcg_const_i32(val);
-+        gen_helper_set_sr(cpu_env, sr);
-+        tcg_temp_free(sr);
-     }
-     set_cc_op(s, CC_OP_FLAGS);
- }
- 
--static void gen_set_sr(CPUM68KState *env, DisasContext *s, uint16_t insn,
--                       int ccr_only)
-+static void gen_set_sr(DisasContext *s, TCGv val, int ccr_only)
+@@ -5165,28 +5165,35 @@ DISAS_INSN(fscc)
+ #if defined(CONFIG_SOFTMMU)
+ DISAS_INSN(frestore)
  {
--    if ((insn & 0x38) == 0) {
--        if (ccr_only) {
--            gen_helper_set_ccr(cpu_env, DREG(insn, 0));
--        } else {
--            gen_helper_set_sr(cpu_env, DREG(insn, 0));
--        }
--        set_cc_op(s, CC_OP_FLAGS);
--    } else if ((insn & 0x3f) == 0x3c) {
-+    if (ccr_only) {
-+        gen_helper_set_ccr(cpu_env, val);
-+    } else {
-+        gen_helper_set_sr(cpu_env, val);
-+    }
-+    set_cc_op(s, CC_OP_FLAGS);
-+}
-+
-+static void gen_move_to_sr(CPUM68KState *env, DisasContext *s, uint16_t insn,
-+                           bool ccr_only)
-+{
-+    if ((insn & 0x3f) == 0x3c) {
-         uint16_t val;
-         val = read_im16(env, s);
-         gen_set_sr_im(s, val, ccr_only);
-     } else {
--        disas_undef(env, s, insn);
-+        TCGv src;
-+        SRC_EA(env, src, OS_WORD, 0, NULL);
-+        gen_set_sr(s, src, ccr_only);
-     }
- }
+-    M68kCPU *cpu = m68k_env_get_cpu(env);
++    TCGv addr;
  
-@@ -2557,7 +2564,7 @@ DISAS_INSN(neg)
- 
- DISAS_INSN(move_to_ccr)
- {
--    gen_set_sr(env, s, insn, 1);
-+    gen_move_to_sr(env, s, insn, true);
- }
- 
- DISAS_INSN(not)
-@@ -4471,7 +4478,7 @@ DISAS_INSN(move_to_sr)
+     if (IS_USER(s)) {
          gen_exception(s, s->insn_pc, EXCP_PRIVILEGE);
          return;
      }
--    gen_set_sr(env, s, insn, 0);
-+    gen_move_to_sr(env, s, insn, false);
-     gen_lookup_tb(s);
+-
+-    /* TODO: Implement frestore.  */
+-    cpu_abort(CPU(cpu), "FRESTORE not implemented");
++    if (m68k_feature(s->env, M68K_FEATURE_M68040)) {
++        SRC_EA(env, addr, OS_LONG, 0, NULL);
++        /* FIXME: check the state frame */
++    } else {
++        disas_undef(env, s, insn);
++    }
  }
  
-@@ -5618,9 +5625,8 @@ void register_m68k_insns (CPUM68KState *env)
-     BASE(move_to_ccr, 44c0, ffc0);
-     INSN(not,       4680, fff8, CF_ISA_A);
-     INSN(not,       4600, ff00, M68000);
--    INSN(undef,     46c0, ffc0, M68000);
- #if defined(CONFIG_SOFTMMU)
--    INSN(move_to_sr, 46c0, ffc0, CF_ISA_A);
-+    BASE(move_to_sr, 46c0, ffc0);
+ DISAS_INSN(fsave)
+ {
+-    M68kCPU *cpu = m68k_env_get_cpu(env);
+-
+     if (IS_USER(s)) {
+         gen_exception(s, s->insn_pc, EXCP_PRIVILEGE);
+         return;
+     }
+ 
+-    /* TODO: Implement fsave.  */
+-    cpu_abort(CPU(cpu), "FSAVE not implemented");
++    if (m68k_feature(s->env, M68K_FEATURE_M68040)) {
++        /* always write IDLE */
++        TCGv idle = tcg_const_i32(0x41000000);
++        DEST_EA(env, insn, OS_LONG, idle, NULL);
++        tcg_temp_free(idle);
++    } else {
++        disas_undef(env, s, insn);
++    }
+ }
  #endif
-     INSN(nbcd,      4800, ffc0, M68000);
-     INSN(linkl,     4808, fff8, M68000);
+ 
 -- 
 2.14.3
