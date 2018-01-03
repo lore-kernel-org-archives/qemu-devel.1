@@ -1,25 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50422)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52384)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eWs89-0001gp-I4
-	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 18:07:30 -0500
+	(envelope-from <bounces@canonical.com>) id 1eWsBT-00035v-6F
+	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 18:10:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eWs86-0004xt-3y
-	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 18:07:29 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:54282)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1eWs85-0004wf-Qd
-	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 18:07:26 -0500
-References: <151457311672.138.10990872638117953444@5adcb62bf0d6>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <b7c24661-0816-cf27-6d79-fe6a584e8b7a@redhat.com>
-Date: Wed, 3 Jan 2018 17:07:19 -0600
+	(envelope-from <bounces@canonical.com>) id 1eWsBP-0000Uz-Ob
+	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 18:10:55 -0500
+Received: from indium.canonical.com ([91.189.90.7]:43110)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1eWsBP-0000U8-Iq
+	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 18:10:51 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1eWsBO-0006WP-IC
+	for <qemu-devel@nongnu.org>; Wed, 03 Jan 2018 23:10:50 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 84A562E80C3
+	for <qemu-devel@nongnu.org>; Wed,  3 Jan 2018 23:10:50 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <151457311672.138.10990872638117953444@5adcb62bf0d6>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="Yc1gIEvlkkZcO8GjjFZariIfbGAN4ioW0"
-Subject: Re: [Qemu-devel] [PATCH v3] linux-user: Use *at functions instead
- of caching interp_prefix contents
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 03 Jan 2018 23:00:43 -0000
+From: LukeShu <lukeshu@sbcglobal.net>
+Reply-To: Bug 1740219 <1740219@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <151435405424.26166.7757673860586517511.malonedeb@gac.canonical.com>
+Message-Id: <151502044352.32656.17638520839487835053.malone@wampee.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1740219] Re: static linux-user ARM emulation has
+ several-second startup time
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,75 +37,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, no-reply@patchew.org, richard.henderson@linaro.org
-Cc: peter.maydell@linaro.org, famz@redhat.com, rth@twiddle.net
+To: qemu-devel@nongnu.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---Yc1gIEvlkkZcO8GjjFZariIfbGAN4ioW0
-From: Eric Blake <eblake@redhat.com>
-To: qemu-devel@nongnu.org, no-reply@patchew.org, richard.henderson@linaro.org
-Cc: peter.maydell@linaro.org, famz@redhat.com, rth@twiddle.net
-Message-ID: <b7c24661-0816-cf27-6d79-fe6a584e8b7a@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v3] linux-user: Use *at functions instead of
- caching interp_prefix contents
-References: <151457311672.138.10990872638117953444@5adcb62bf0d6>
-In-Reply-To: <151457311672.138.10990872638117953444@5adcb62bf0d6>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+To have a link to it from here, on the 28th I submitted a patchset to
+fix this: https://lists.nongnu.org/archive/html/qemu-
+devel/2017-12/msg05237.html
 
-On 12/29/2017 12:45 PM, no-reply@patchew.org wrote:
-> Hi,
->=20
-> This series seems to have some coding style problems. See output below =
-for
-> more information:
->=20
-> =3D=3D=3D OUTPUT BEGIN =3D=3D=3D
-> Checking PATCH 1/1: linux-user: Use *at functions instead of caching in=
-terp_prefix contents...
-> ERROR: do not use assignment in if condition
-> #25: FILE: linux-user/elfload.c:2206:
-> +    if (interp_dirfd < 0
+-- =
 
-Given that your compact if with embedded assignment makes the syntax
-checker unhappy, should we look for a v4 that uses the construct we
-debated in v2:
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1740219
 
-while (1) {
-    if (interp_dirfd > 0 && filename[0] =3D=3D '/') {
-        fd =3D openat(interp_dirfd, filename + 1, O_RDONLY);
-        if (fd >=3D 0 || errno !=3D ENOENT) {
-            break;
-        }
-    }
-    fd =3D open(filename, O_RDONLY);
-    break;
-}
+Title:
+  static linux-user ARM emulation has several-second startup time
 
+Status in QEMU:
+  New
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+Bug description:
+  static linux-user emulation has several-second startup time
 
+  My problem: I'm a Parabola packager, and I'm updating our
+  qemu-user-static package from 2.8 to 2.11.  With my new
+  statically-linked 2.11, running `qemu-arm /my/arm-chroot/bin/true`
+  went from taking 0.006s to 3s!  This does not happen with the normal
+  dynamically linked 2.11, or the old static 2.8.
 
---Yc1gIEvlkkZcO8GjjFZariIfbGAN4ioW0
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+  What happens is it gets stuck in
+  `linux-user/elfload.c:init_guest_space()`.  What `init_guest_space`
+  does is map 2 parts of the address space: `[base, base+guest_size]`
+  and `[base+0xffff0000, base+0xffff0000+page_size]`; where it must find
+  an acceptable `base`.  Its strategy is to `mmap(NULL, guest_size,
+  ...)` decide where the first range is, and then check if that
+  +0xffff0000 is also available.  If it isn't, then it starts trying
+  `mmap(base, ...)` for the entire address space from low-address to
+  high-address.
 
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+  "Normally," it finds an accaptable `base` within the first 2 tries.
+  With a static 2.11, it's taking thousands of tries.
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlpNYicACgkQp6FrSiUn
-Q2r4Uwf+OtmPAyQlOamqzpE7ch8fpFOWCxcU+N8iHkisJRvoD51UNSrgQ+ECgRKe
-mFj4yz89k3XLC/x1d4zK0pS+Wtsv01SPf3rP0JbbCg8s0fTEhIY+j8PVvsgfDMJ3
-P2f7kkW6tKjEJ8ytRjz46DxDDQZp6T/3VDPjwM0vbG+HPy650DiDzZMHUXF83oKV
-TMJviywjfCGMEQTcoB33rlYM0/py4Z/3lB3OmaXcn9YWcuTQz7qQ3/pyOXmVM8SC
-BuVGDcB8SdVs/1tOAa/9YuqBpQDsOIzYYh+JuXBxCbR232noL6KY0umohP2XoQC1
-cV863t2KGr7Yzi/ku53KNBT6uoLFQQ==
-=sNAP
------END PGP SIGNATURE-----
+  ----
 
---Yc1gIEvlkkZcO8GjjFZariIfbGAN4ioW0--
+  Now, from my understanding, there are 2 factors working together to
+  cause that in static 2.11 but not the other builds:
+
+   - 2.11 increased the default `guest_size` from 0xf7000000 to 0xffff0000
+   - PIE (and thus ASLR) is disabled for static builds
+
+  For some reason that I don't understand, with the smaller
+  `guest_size` the initial `mmap(NULL, guest_size, ...)` usually
+  returns an acceptable address range; but larger `guest_size` makes it
+  consistently return a block of memory that butts right up against
+  another already mapped chunk of memory.  This isn't just true on the
+  older builds, it's true with the 2.11 builds if I use the `-R` flag to
+  shrink the `guest_size` back down to 0xf7000000.  That is with
+  linux-hardened 4.13.13 on x86-64.
+
+  So then, it it falls back to crawling the entire address space; so it
+  tries base=3D0x00001000.  With ASLR, that probably succeeds.  But with
+  ASLR being disabled on static builds, the text segment is at
+  0x60000000; which is does not leave room for the needed
+  0xffff1000-size block before it.  So then it tries base=3D0x00002000.
+  And so on, more than 6000 times until it finally gets to and passes
+  the text segment; calling mmap more than 12000 times.
+
+  ----
+
+  I'm not sure what the fix is.  Perhaps try to mmap a continuous chunk
+  of size 0xffff1000, then munmap it and then mmap the 2 chunks that we
+  actually need.  The disadvantage to that is that it does not support
+  the sparse address space that the current algorithm supports for
+  `guest_size < 0xffff0000`.  If `guest_size < 0xffff0000` *and* the big
+  mmap fails, then it could fall back to a sparse search; though I'm not
+  sure the current algorithm is a good choice for it, as we see in this
+  bug.  Perhaps it should inspect /proc/self/maps to try to find a
+  suitable range before ever calling mmap?
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1740219/+subscriptions
