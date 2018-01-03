@@ -1,31 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33266)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33337)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eWn2y-0005RR-EU
-	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 12:41:49 -0500
+	(envelope-from <stefanha@gmail.com>) id 1eWn3A-0005Y5-Ce
+	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 12:42:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eWn2x-0007n6-ED
-	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 12:41:48 -0500
-Received: from mail-io0-x244.google.com ([2607:f8b0:4001:c06::244]:34656)
+	(envelope-from <stefanha@gmail.com>) id 1eWn36-0007qG-CJ
+	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 12:42:00 -0500
+Received: from mail-wr0-x241.google.com ([2a00:1450:400c:c0c::241]:37704)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eWn2x-0007mo-8o
-	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 12:41:47 -0500
-Received: by mail-io0-x244.google.com with SMTP id q188so2874822iod.1
-	for <qemu-devel@nongnu.org>; Wed, 03 Jan 2018 09:41:47 -0800 (PST)
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1eWn36-0007pq-23
+	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 12:41:56 -0500
+Received: by mail-wr0-x241.google.com with SMTP id f8so2361639wre.4
+	for <qemu-devel@nongnu.org>; Wed, 03 Jan 2018 09:41:55 -0800 (PST)
+Date: Wed, 3 Jan 2018 17:41:53 +0000
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20180103174152.GC21894@stefanha-x1.localdomain>
+References: <20180103021456.22526-4-peterx@redhat.com>
+	<20180103022418.23165-1-peterx@redhat.com>
 MIME-Version: 1.0
-Sender: philippe.mathieu.daude@gmail.com
-In-Reply-To: <20180103110126.29209-7-f4bug@amsat.org>
-References: <20180103110126.29209-1-f4bug@amsat.org>
-	<20180103110126.29209-7-f4bug@amsat.org>
-From: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Date: Wed, 3 Jan 2018 14:41:46 -0300
-Message-ID: <CAAdtpL7TL7EQXZd3VqBgGiNM-C-i8nDpe33nD2z7QL1xFL4Vkw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v4 06/17] sdhci: refactor common sysbus/pci
- realize() into sdhci_realizefn()
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="4ZLFUWh1odzi/v6L"
+Content-Disposition: inline
+In-Reply-To: <20180103022418.23165-1-peterx@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2.1 3/3] chardev: introduce
+ qemu_chr_timeout_add() and use
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,107 +31,126 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alistair Francis <alistair.francis@xilinx.com>, Fam Zheng <famz@redhat.com>
-Cc: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, Peter Maydell <peter.maydell@linaro.org>, Andrey Smirnov <andrew.smirnov@gmail.com>, Eduardo Habkost <ehabkost@redhat.com>
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, pbonzini@redhat.com, stefanha@redhat.com, marcandre.lureau@redhat.com
 
-Oops I sent this patch too fast.
 
-On Wed, Jan 3, 2018 at 8:01 AM, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.or=
-g> wrote:
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-> Reviewed-by: Alistair Francis <alistair.francis@xilinx.com>
+--4ZLFUWh1odzi/v6L
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Wed, Jan 03, 2018 at 10:24:18AM +0800, Peter Xu wrote:
+> It's a replacement of g_timeout_add[_seconds]() for chardevs.  Chardevs
+> now can have dedicated gcontext, we should always bind chardev tasks
+> onto those gcontext rather than the default main context.  Since there
+> are quite a few of g_timeout_add[_seconds]() callers, a new function
+> qemu_chr_timeout_add() is introduced.
+>=20
+> One thing to mention is that, terminal3270 is still always running on
+> main gcontext.  However let's convert that as well since it's still part
+> of chardev codes and in case one day we'll miss that when we move it out
+> of main gcontext too.
+>=20
+> Signed-off-by: Peter Xu <peterx@redhat.com>
 > ---
->  hw/sd/sdhci.c | 35 ++++++++++++++++++++++++++---------
->  1 file changed, 26 insertions(+), 9 deletions(-)
->
-> diff --git a/hw/sd/sdhci.c b/hw/sd/sdhci.c
-> index 38d82b4c61..d5c6d8ab0b 100644
-> --- a/hw/sd/sdhci.c
-> +++ b/hw/sd/sdhci.c
-> @@ -29,6 +29,7 @@
->  #include "sysemu/dma.h"
->  #include "qemu/timer.h"
->  #include "qemu/bitops.h"
-> +#include "qapi/error.h"
->  #include "hw/sd/sdhci.h"
->  #include "sdhci-internal.h"
->  #include "qemu/log.h"
-> @@ -1194,6 +1195,15 @@ static void sdhci_initfn(SDHCIState *s)
->      s->transfer_timer =3D timer_new_ns(QEMU_CLOCK_VIRTUAL, sdhci_data_tr=
-ansfer, s);
+>=20
+> v2 -> v2.1: Sorry I forgot to do the move in char.h.  Did it in this
+> minor version.
+>=20
+>  chardev/char-pty.c     |  9 ++-------
+>  chardev/char-socket.c  |  4 ++--
+>  chardev/char.c         | 20 ++++++++++++++++++++
+>  hw/char/terminal3270.c |  7 ++++---
+>  include/chardev/char.h |  3 +++
+>  5 files changed, 31 insertions(+), 12 deletions(-)
+>=20
+> diff --git a/chardev/char-pty.c b/chardev/char-pty.c
+> index dd17b1b823..cbd8ac5eb7 100644
+> --- a/chardev/char-pty.c
+> +++ b/chardev/char-pty.c
+> @@ -78,13 +78,8 @@ static void pty_chr_rearm_timer(Chardev *chr, int ms)
+>          s->timer_tag =3D 0;
+>      }
+> =20
+> -    if (ms =3D=3D 1000) {
+> -        name =3D g_strdup_printf("pty-timer-secs-%s", chr->label);
+> -        s->timer_tag =3D g_timeout_add_seconds(1, pty_chr_timer, chr);
+> -    } else {
+> -        name =3D g_strdup_printf("pty-timer-ms-%s", chr->label);
+> -        s->timer_tag =3D g_timeout_add(ms, pty_chr_timer, chr);
+> -    }
+> +    name =3D g_strdup_printf("pty-timer-ms-%s", chr->label);
+> +    s->timer_tag =3D qemu_chr_timeout_add(chr, ms, pty_chr_timer, chr);
+
+The label is user-visible.  Why did you remove the seconds label format?
+
+Please either include justification in the commit description or avoid
+spurious changes like this so reviewers don't need to worry about code
+changes that are not essential.
+
+>      g_source_set_name_by_id(s->timer_tag, name);
+>      g_free(name);
 >  }
->
-> +static void sdhci_realizefn(SDHCIState *s, Error **errp)
-> +{
-> +    s->buf_maxsz =3D sdhci_get_fifolen(s);
-> +    s->fifo_buffer =3D g_malloc0(s->buf_maxsz);
-> +
-> +    memory_region_init_io(&s->iomem, OBJECT(s), &sdhci_mmio_ops, s, "sdh=
-ci",
-> +                          SDHC_REGISTERS_MAP_SIZE);
-> +}
-> +
->  static void sdhci_uninitfn(SDHCIState *s)
->  {
->      timer_del(s->insert_timer);
-> @@ -1290,14 +1300,18 @@ static void sdhci_class_init(ObjectClass *klass, =
-void *data)
->  static void sdhci_pci_realize(PCIDevice *dev, Error **errp)
->  {
->      SDHCIState *s =3D PCI_SDHCI(dev);
-> +    Error *err_local =3D NULL;
-> +
-> +    sdhci_initfn(s);
-> +    sdhci_realizefn(s, errp);
+> diff --git a/chardev/char-socket.c b/chardev/char-socket.c
+> index 630a7f2995..5cca32f963 100644
+> --- a/chardev/char-socket.c
+> +++ b/chardev/char-socket.c
+> @@ -73,8 +73,8 @@ static void qemu_chr_socket_restart_timer(Chardev *chr)
+>      char *name;
+> =20
+>      assert(s->connected =3D=3D 0);
+> -    s->reconnect_timer =3D g_timeout_add_seconds(s->reconnect_time,
+> -                                               socket_reconnect_timeout,=
+ chr);
 
-                                      ^ &err_local
+Here it was clear that reconnect_time is in seconds...
 
-> +    if (errp) {
+> +    s->reconnect_timer =3D qemu_chr_timeout_add(chr, s->reconnect_time *=
+ 1000,
+> +                                              socket_reconnect_timeout, =
+chr);
 
-             ^ err_local
+=2E..now I can't tell what the unit is.
 
-> +        error_propagate(errp, err_local);
-> +        return;
-> +    }
-> +
->      dev->config[PCI_CLASS_PROG] =3D 0x01; /* Standard Host supported DMA=
- */
->      dev->config[PCI_INTERRUPT_PIN] =3D 0x01; /* interrupt pin A */
-> -    sdhci_initfn(s);
-> -    s->buf_maxsz =3D sdhci_get_fifolen(s);
-> -    s->fifo_buffer =3D g_malloc0(s->buf_maxsz);
->      s->irq =3D pci_allocate_irq(dev);
-> -    memory_region_init_io(&s->iomem, OBJECT(s), &sdhci_mmio_ops, s, "sdh=
-ci",
-> -            SDHC_REGISTERS_MAP_SIZE);
->      pci_register_bar(dev, 0, 0, &s->iomem);
+Please rename qemu_chr_timeout_add() to include the units:
+
+  s->reconnect_timer =3D qemu_chr_timeout_add_ms(chr, s->reconnect_time * 1=
+000,
+
+>      name =3D g_strdup_printf("chardev-socket-reconnect-%s", chr->label);
+>      g_source_set_name_by_id(s->reconnect_timer, name);
+>      g_free(name);
+> diff --git a/chardev/char.c b/chardev/char.c
+> index 8c3765ee99..a1de662fec 100644
+> --- a/chardev/char.c
+> +++ b/chardev/char.c
+> @@ -1084,6 +1084,26 @@ void qmp_chardev_send_break(const char *id, Error =
+**errp)
+>      qemu_chr_be_event(chr, CHR_EVENT_BREAK);
 >  }
->
-> @@ -1350,12 +1364,15 @@ static void sdhci_sysbus_realize(DeviceState *dev=
-, Error ** errp)
->  {
->      SDHCIState *s =3D SYSBUS_SDHCI(dev);
->      SysBusDevice *sbd =3D SYS_BUS_DEVICE(dev);
-> +    Error *err_local =3D NULL;
-> +
-> +    sdhci_realizefn(s, &err_local);
-> +    if (errp) {
+> =20
+> +/*
+> + * Add a timeout callback for the chardev (in milliseconds). Please
+> + * use this to add timeout hook for chardev instead of g_timeout_add()
+> + * and g_timeout_add_seconds(), to make sure the gcontext that the
+> + * task bound to is correct.
+> + */
 
-             ^ err_local
+What is the return value?
 
-> +        error_propagate(errp, err_local);
-> +        return;
-> +    }
->
-> -    s->buf_maxsz =3D sdhci_get_fifolen(s);
-> -    s->fifo_buffer =3D g_malloc0(s->buf_maxsz);
->      sysbus_init_irq(sbd, &s->irq);
-> -    memory_region_init_io(&s->iomem, OBJECT(s), &sdhci_mmio_ops, s, "sdh=
-ci",
-> -            SDHC_REGISTERS_MAP_SIZE);
->      sysbus_init_mmio(sbd, &s->iomem);
->  }
->
-> --
-> 2.15.1
->
+--4ZLFUWh1odzi/v6L
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJaTRXgAAoJEJykq7OBq3PIV04H/3hrEgyDFzWqZ3Dri9uBfwKY
+QcUhmLIVMbcVkK+3zCe1+6ImL7dnhxXQQCg/DSND9wxttO8snsiJVkk9TU87xQic
+XQQSX4/CI/bAss1g3phNfU+0K+U8OKMF6QYQ+c/kk6Oy6OBLK0XjgPbQ5G9ylRrX
+re1SOlPiGJqm0sOIVizK8/Yx0pyU/dGinYeX2j92/nQKIxXXY/4dhUqMOmKrwGOi
+JxR9ke7TmhTQ2hpCeuqlpC+uoypfYls1dT7zb1azD3AoKaaW9WUeJYznP9/pcdhF
+E/fLbB4O3qTf/FEbT9MdbR5+y4WX8qdgmGJOWv3S4CEqX9IOijc7xC5Z9GBxX+Q=
+=ONtb
+-----END PGP SIGNATURE-----
+
+--4ZLFUWh1odzi/v6L--
