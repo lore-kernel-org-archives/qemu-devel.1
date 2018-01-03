@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33416)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33382)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1eWabb-0001BX-Ix
+	(envelope-from <dgibson@ozlabs.org>) id 1eWaba-0001AU-UK
 	for qemu-devel@nongnu.org; Tue, 02 Jan 2018 23:24:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1eWabZ-0001yB-Mg
-	for qemu-devel@nongnu.org; Tue, 02 Jan 2018 23:24:43 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1eWabY-0001wn-UC
+	for qemu-devel@nongnu.org; Tue, 02 Jan 2018 23:24:42 -0500
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Wed,  3 Jan 2018 15:24:16 +1100
-Message-Id: <20180103042419.14520-13-david@gibson.dropbear.id.au>
+Date: Wed,  3 Jan 2018 15:24:12 +1100
+Message-Id: <20180103042419.14520-9-david@gibson.dropbear.id.au>
 In-Reply-To: <20180103042419.14520-1-david@gibson.dropbear.id.au>
 References: <20180103042419.14520-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PULL 12/15] spapr: Handle Decimal Floating Point
- (DFP) as an optional capability
+Subject: [Qemu-devel] [PULL 08/15] spapr: Treat Hardware Transactional
+ Memory (HTM) as an optional capability
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,112 +23,163 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: peter.maydell@linaro.org
 Cc: groug@kaod.org, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, lvivier@redhat.com, David Gibson <david@gibson.dropbear.id.au>
 
-Decimal Floating Point has been available on POWER7 and later (server)
-cpus.  However, it can be disabled on the hypervisor, meaning that it's
-not available to guests.
+This adds an spapr capability bit for Hardware Transactional Memory.  It is
+enabled by default for pseries-2.11 and earlier machine types. with POWER8
+or later CPUs (as it must be, since earlier qemu versions would implicitly
+allow it).  However it is disabled by default for the latest pseries-2.12
+machine type.
 
-We currently handle this by conditionally advertising DFP support in the
-device tree depending on whether the guest CPU model supports it - which
-can also depend on what's allowed in the host for -cpu host.  That can lead
-to confusion on migration, since host properties are silently affecting
-guest visible properties.
+This means that with the latest machine type, HTM will not be available,
+regardless of CPU, unless it is explicitly enabled on the command line.
+That change is made on the basis that:
 
-This patch handles it by treating it as an optional capability for the
-pseries machine type.
+ * This way running with -M pseries,accel=tcg will start with whatever cpu
+   and will provide the same guest visible model as with accel=kvm.
+     - More specifically, this means existing make check tests don't have
+       to be modified to use cap-htm=off in order to run with TCG
+
+ * We hope to add a new "HTM without suspend" feature in the not too
+   distant future which could work on both POWER8 and POWER9 cpus, and
+   could be enabled by default.
+
+ * Best guesses suggest that future POWER cpus may well only support the
+   HTM-without-suspend model, not the (frankly, horribly overcomplicated)
+   POWER8 style HTM with suspend.
+
+ * Anecdotal evidence suggests problems with HTM being enabled when it
+   wasn't wanted are more common than being missing when it was.
 
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 Reviewed-by: Greg Kurz <groug@kaod.org>
 ---
- hw/ppc/spapr.c         |  7 ++++---
- hw/ppc/spapr_caps.c    | 18 ++++++++++++++++++
+ hw/ppc/spapr.c         | 15 ++++++++++-----
+ hw/ppc/spapr_caps.c    | 29 ++++++++++++++++++++++++++++-
  include/hw/ppc/spapr.h |  3 +++
- 3 files changed, 25 insertions(+), 3 deletions(-)
+ 3 files changed, 41 insertions(+), 6 deletions(-)
 
 diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index 693dd6f7b3..e22888ba06 100644
+index d472baef8d..f8fee8ebcf 100644
 --- a/hw/ppc/spapr.c
 +++ b/hw/ppc/spapr.c
-@@ -572,7 +572,7 @@ static void spapr_populate_cpu_dt(CPUState *cs, void *fdt, int offset,
-     /* Advertise DFP (Decimal Floating Point) if available
-      *   0 / no property == no DFP
-      *   1               == DFP available */
--    if (env->insns_flags2 & PPC2_DFP) {
-+    if (spapr_has_cap(spapr, SPAPR_CAP_DFP)) {
-         _FDT((fdt_setprop_cell(fdt, offset, "ibm,dfp", 1)));
-     }
- 
-@@ -3834,7 +3834,7 @@ static void spapr_machine_class_init(ObjectClass *oc, void *data)
-      */
-     mc->numa_mem_align_shift = 28;
- 
--    smc->default_caps = spapr_caps(SPAPR_CAP_VSX);
-+    smc->default_caps = spapr_caps(SPAPR_CAP_VSX | SPAPR_CAP_DFP);
-     spapr_caps_add_properties(smc, &error_abort);
+@@ -253,7 +253,9 @@ static int spapr_fixup_cpu_numa_dt(void *fdt, int offset, PowerPCCPU *cpu)
  }
  
-@@ -3916,7 +3916,8 @@ static void spapr_machine_2_11_class_options(MachineClass *mc)
-     sPAPRMachineClass *smc = SPAPR_MACHINE_CLASS(mc);
+ /* Populate the "ibm,pa-features" property */
+-static void spapr_populate_pa_features(PowerPCCPU *cpu, void *fdt, int offset,
++static void spapr_populate_pa_features(sPAPRMachineState *spapr,
++                                       PowerPCCPU *cpu,
++                                       void *fdt, int offset,
+                                        bool legacy_guest)
+ {
+     CPUPPCState *env = &cpu->env;
+@@ -318,7 +320,7 @@ static void spapr_populate_pa_features(PowerPCCPU *cpu, void *fdt, int offset,
+          */
+         pa_features[3] |= 0x20;
+     }
+-    if (kvmppc_has_cap_htm() && pa_size > 24) {
++    if (spapr_has_cap(spapr, SPAPR_CAP_HTM) && pa_size > 24) {
+         pa_features[24] |= 0x80;    /* Transactional memory support */
+     }
+     if (legacy_guest && pa_size > 40) {
+@@ -384,8 +386,8 @@ static int spapr_fixup_cpu_dt(void *fdt, sPAPRMachineState *spapr)
+             return ret;
+         }
  
+-        spapr_populate_pa_features(cpu, fdt, offset,
+-                                         spapr->cas_legacy_guest_workaround);
++        spapr_populate_pa_features(spapr, cpu, fdt, offset,
++                                   spapr->cas_legacy_guest_workaround);
+     }
+     return ret;
+ }
+@@ -579,7 +581,7 @@ static void spapr_populate_cpu_dt(CPUState *cs, void *fdt, int offset,
+                           page_sizes_prop, page_sizes_prop_size)));
+     }
+ 
+-    spapr_populate_pa_features(cpu, fdt, offset, false);
++    spapr_populate_pa_features(spapr, cpu, fdt, offset, false);
+ 
+     _FDT((fdt_setprop_cell(fdt, offset, "ibm,chip-id",
+                            cs->cpu_index / vcpus_per_socket)));
+@@ -3903,7 +3905,10 @@ static void spapr_machine_2_11_instance_options(MachineState *machine)
+ 
+ static void spapr_machine_2_11_class_options(MachineClass *mc)
+ {
++    sPAPRMachineClass *smc = SPAPR_MACHINE_CLASS(mc);
++
      spapr_machine_2_12_class_options(mc);
--    smc->default_caps = spapr_caps(SPAPR_CAP_HTM | SPAPR_CAP_VSX);
-+    smc->default_caps = spapr_caps(SPAPR_CAP_HTM | SPAPR_CAP_VSX
-+                                   | SPAPR_CAP_DFP);
++    smc->default_caps = spapr_caps(SPAPR_CAP_HTM);
      SET_MACHINE_COMPAT(mc, SPAPR_COMPAT_2_11);
  }
  
 diff --git a/hw/ppc/spapr_caps.c b/hw/ppc/spapr_caps.c
-index 7c855c67ad..9d070a306c 100644
+index 968ba7b857..3b35b91a5b 100644
 --- a/hw/ppc/spapr_caps.c
 +++ b/hw/ppc/spapr_caps.c
-@@ -70,6 +70,16 @@ static void cap_vsx_allow(sPAPRMachineState *spapr, Error **errp)
-     }
- }
+@@ -24,6 +24,10 @@
+ #include "qemu/osdep.h"
+ #include "qapi/error.h"
+ #include "qapi/visitor.h"
++#include "sysemu/hw_accel.h"
++#include "target/ppc/cpu.h"
++#include "cpu-models.h"
++#include "kvm_ppc.h"
  
-+static void cap_dfp_allow(sPAPRMachineState *spapr, Error **errp)
+ #include "hw/ppc/spapr.h"
+ 
+@@ -40,18 +44,41 @@ typedef struct sPAPRCapabilityInfo {
+     void (*disallow)(sPAPRMachineState *spapr, Error **errp);
+ } sPAPRCapabilityInfo;
+ 
++static void cap_htm_allow(sPAPRMachineState *spapr, Error **errp)
 +{
-+    PowerPCCPU *cpu = POWERPC_CPU(first_cpu);
-+    CPUPPCState *env = &cpu->env;
-+
-+    if (!(env->insns_flags2 & PPC2_DFP)) {
-+        error_setg(errp, "DFP support not available, try cap-dfp=off");
++    if (tcg_enabled()) {
++        error_setg(errp,
++                   "No Transactional Memory support in TCG, try cap-htm=off");
++    } else if (kvm_enabled() && !kvmppc_has_cap_htm()) {
++        error_setg(errp,
++"KVM implementation does not support Transactional Memory, try cap-htm=off"
++            );
 +    }
 +}
 +
  static sPAPRCapabilityInfo capability_table[] = {
-     {
-         .name = "htm",
-@@ -85,6 +95,13 @@ static sPAPRCapabilityInfo capability_table[] = {
-         .allow = cap_vsx_allow,
-         /* TODO: add cap_vsx_disallow */
-     },
 +    {
-+        .name = "dfp",
-+        .description = "Allow Decimal Floating Point (DFP)",
-+        .flag = SPAPR_CAP_DFP,
-+        .allow = cap_dfp_allow,
-+        /* TODO: add cap_dfp_disallow */
++        .name = "htm",
++        .description = "Allow Hardware Transactional Memory (HTM)",
++        .flag = SPAPR_CAP_HTM,
++        .allow = cap_htm_allow,
++        /* TODO: add cap_htm_disallow */
 +    },
  };
  
  static sPAPRCapabilities default_caps_with_cpu(sPAPRMachineState *spapr,
-@@ -104,6 +121,7 @@ static sPAPRCapabilities default_caps_with_cpu(sPAPRMachineState *spapr,
-     if (!ppc_check_compat(cpu, CPU_POWERPC_LOGICAL_2_06,
-                           0, spapr->max_compat_pvr)) {
-         caps.mask &= ~SPAPR_CAP_VSX;
-+        caps.mask &= ~SPAPR_CAP_DFP;
-     }
+                                                CPUState *cs)
+ {
+     sPAPRMachineClass *smc = SPAPR_MACHINE_GET_CLASS(spapr);
++    PowerPCCPU *cpu = POWERPC_CPU(cs);
+     sPAPRCapabilities caps;
+ 
+     caps = smc->default_caps;
+ 
+-    /* TODO: clamp according to cpu model */
++    if (!ppc_check_compat(cpu, CPU_POWERPC_LOGICAL_2_07,
++                          0, spapr->max_compat_pvr)) {
++        caps.mask &= ~SPAPR_CAP_HTM;
++    }
  
      return caps;
+ }
 diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-index 148a03d189..26ac17e641 100644
+index 5569caf1d4..dc64f4ebcb 100644
 --- a/include/hw/ppc/spapr.h
 +++ b/include/hw/ppc/spapr.h
-@@ -62,6 +62,9 @@ typedef enum {
- /* Vector Scalar Extensions */
- #define SPAPR_CAP_VSX               0x0000000000000002ULL
+@@ -54,6 +54,9 @@ typedef enum {
+  * Capabilities
+  */
  
-+/* Decimal Floating Point */
-+#define SPAPR_CAP_DFP               0x0000000000000004ULL
++/* Hardware Transactional Memory */
++#define SPAPR_CAP_HTM               0x0000000000000001ULL
 +
  typedef struct sPAPRCapabilities sPAPRCapabilities;
  struct sPAPRCapabilities {
