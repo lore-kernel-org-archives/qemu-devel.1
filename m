@@ -1,31 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44673)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44689)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1eWeop-0001WW-0Z
-	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 03:54:39 -0500
+	(envelope-from <wei.w.wang@intel.com>) id 1eWeoq-0001Wm-Ev
+	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 03:54:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1eWeok-0007H2-6l
-	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 03:54:39 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:58694)
+	(envelope-from <wei.w.wang@intel.com>) id 1eWeol-0007HO-Ji
+	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 03:54:40 -0500
+Received: from mga03.intel.com ([134.134.136.65]:27115)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1eWeok-0007Gf-0v
-	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 03:54:34 -0500
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id C56637EA9A
-	for <qemu-devel@nongnu.org>; Wed,  3 Jan 2018 08:54:32 +0000 (UTC)
-Date: Wed, 3 Jan 2018 16:54:21 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20180103085421.GC2557@xz-mi>
-References: <20171228072945.9573-1-peterx@redhat.com>
-	<cd7d1d86-331f-1a0e-2a39-bee1d536157b@redhat.com>
+	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
+	id 1eWeol-0007Fk-Aj
+	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 03:54:35 -0500
+Message-ID: <5A4C9ACF.2090000@intel.com>
+Date: Wed, 03 Jan 2018 16:56:47 +0800
+From: Wei Wang <wei.w.wang@intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <cd7d1d86-331f-1a0e-2a39-bee1d536157b@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 0/3] chardev: convert leftover glib APIs to
- use dedicate gcontext
+References: <1513823406-43632-1-git-send-email-wei.w.wang@intel.com>
+	<20171221210327.GB25009@bombadil.infradead.org>
+	<5A3CC707.9070708@intel.com>
+	<20180102140906.GC8222@bombadil.infradead.org>
+In-Reply-To: <20180102140906.GC8222@bombadil.infradead.org>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v20 3/7 RESEND] xbitmap: add more operations
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,56 +30,153 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+To: Matthew Wilcox <willy@infradead.org>
+Cc: virtio-dev@lists.oasis-open.org, linux-kernel@vger.kernel.org, qemu-devel@nongnu.org, virtualization@lists.linux-foundation.org, kvm@vger.kernel.org, linux-mm@kvack.org, mst@redhat.com, mhocko@kernel.org, akpm@linux-foundation.org, mawilcox@microsoft.com, penguin-kernel@I-love.SAKURA.ne.jp
 
-On Wed, Jan 03, 2018 at 08:10:58AM +0100, Paolo Bonzini wrote:
-> On 28/12/2017 08:29, Peter Xu wrote:
-> > There were existing work that tried to allow chardev to be run in a
-> > dedicated gcontext rather than the default main context/thread.
-> > Basically that work passed in the correct gcontext during
-> > g_source_attach().  However, I found something missing along the way,
-> > that some legacy glib APIs are used by chardev code which take the
-> > main context as default:
-> > 
-> >    g_timeout_add_seconds
-> >    g_timeout_add
-> >    g_idle_add
-> > 
-> > To fully allow the chardevs to be run in dedicated gcontext, we need
-> > to convert all these legacy APIs into g_source_attach() calls as well,
-> > with the correct gcontext passed in.
-> > 
-> > This series tries to clean the rest of things up.
-> > 
-> > I picked up patch 1 from monitor-oob series into this series (which is
-> > a missing of chardev frontend call fix for g_source_attach()), so that
-> > this series can be a complete fix.
-> > 
-> > Please review.  Thanks,
-> > 
-> > Peter Xu (3):
-> >   chardev: use backend chr context when watch for fe
-> >   chardev: let g_idle_add() be with chardev gcontext
-> >   chardev: introduce qemu_chr_timeout_add() and use
-> > 
-> >  chardev/char-fe.c      |  2 +-
-> >  chardev/char-pty.c     | 16 ++++++++--------
-> >  chardev/char-socket.c  |  4 ++--
-> >  chardev/char.c         | 20 ++++++++++++++++++++
-> >  hw/char/terminal3270.c |  7 ++++---
-> >  include/chardev/char.h |  2 ++
-> >  6 files changed, 37 insertions(+), 14 deletions(-)
-> > 
-> 
-> All queued, thanks!
+On 01/02/2018 10:09 PM, Matthew Wilcox wrote:
+> On Fri, Dec 22, 2017 at 04:49:11PM +0800, Wei Wang wrote:
+>> Thanks for the improvement. I also found a small bug in xb_zero. With the
+>> following changes, it has passed the current test cases and tested with the
+>> virtio-balloon usage without any issue.
+> Thanks; I applied the change.  Can you supply a test-case for testing
+> xb_zero please?
+>
 
-Paolo,
+Sure. Please check below the test cases. Do you plan to send out the new 
+version of xbitmap yourself? If so, I will wait for that to send out the 
+virtio-balloon patches.
 
-Would you like to queue V2 of the series which fixed the issue that
-Marc-Andre has pointed out (Note that there is a v2.1 for patch 3).
 
-Thanks anyways!
+static void xbitmap_check_zero_bits(void)
+{
+         assert(xb_empty(&xb1));
 
--- 
-Peter Xu
+         /* Zero an empty xbitmap should work though no real work to do */
+         xb_zero(&xb1, 0, ULONG_MAX);
+         assert(xb_empty(&xb1));
+
+         xb_preload(GFP_KERNEL);
+         assert(xb_set_bit(&xb1, 0) == 0);
+         xb_preload_end();
+
+         /* Overflow test */
+         xb_zero(&xb1, ULONG_MAX - 10, ULONG_MAX);
+         assert(xb_test_bit(&xb1, 0));
+
+         xb_preload(GFP_KERNEL);
+         assert(xb_set_bit(&xb1, ULONG_MAX) == 0);
+         xb_preload_end();
+
+         xb_zero(&xb1, 0, ULONG_MAX);
+         assert(xb_empty(&xb1));
+}
+
+
+/*
+  * In the following tests, preload is called once when all the bits to set
+  * locate in the same ida bitmap. Otherwise, it is recommended to call
+  * preload for each xb_set_bit.
+  */
+static void xbitmap_check_bit_range(void)
+{
+         unsigned long nbit = 0;
+
+         /* Regular test1: node = NULL */
+         xb_preload(GFP_KERNEL);
+         xb_set_bit(&xb1, 700);
+         xb_preload_end();
+         assert(xb_find_set(&xb1, ULONG_MAX, &nbit) == true);
+         assert(nbit == 700);
+         nbit++;
+         assert(xb_find_set(&xb1, ULONG_MAX, &nbit) == false);
+         assert(nbit == 701);
+         xb_zero(&xb1, 0, 1023);
+
+         /*
+          * Regular test2
+          * set bit 2000, 2001, 2040
+          * Next 1 in [0, 2048]          --> 2000
+          * Next 1 in [2000, 2002]       --> 2000
+          * Next 1 in [2002, 2040]       --> 2040
+          * Next 1 in [2002, 2039]       --> none
+          * Next 0 in [2000, 2048]       --> 2002
+          * Next 0 in [2048, 2060]       --> 2048
+          */
+         xb_preload(GFP_KERNEL);
+         assert(!xb_set_bit(&xb1, 2000));
+         assert(!xb_set_bit(&xb1, 2001));
+         assert(!xb_set_bit(&xb1, 2040));
+         nbit = 0;
+         assert(xb_find_set(&xb1, 2048, &nbit) == true);
+         assert(nbit == 2000);
+         assert(xb_find_set(&xb1, 2002, &nbit) == true);
+         assert(nbit == 2000);
+         nbit = 2002;
+         assert(xb_find_set(&xb1, 2040, &nbit) == true);
+         assert(nbit == 2040);
+         nbit = 2002;
+         assert(xb_find_set(&xb1, 2039, &nbit) == false);
+         assert(nbit == 2002);
+         nbit = 2000;
+         assert(xb_find_zero(&xb1, 2048, &nbit) == true);
+         assert(nbit == 2002);
+         nbit = 2048;
+         assert(xb_find_zero(&xb1, 2060, &nbit) == true);
+         assert(nbit == 2048);
+         xb_zero(&xb1, 0, 2048);
+         nbit = 0;
+         assert(xb_find_set(&xb1, 2048, &nbit) == false);
+         assert(nbit == 0);
+         xb_preload_end();
+
+         /*
+          * Overflow tests:
+          * Set bit 1 and ULONG_MAX - 4
+          * Next 1 in [0, ULONG_MAX]                     --> 1
+          * Next 1 in [1, ULONG_MAX]                     --> 1
+          * Next 1 in [2, ULONG_MAX]                     --> ULONG_MAX - 4
+          * Next 1 in [ULONG_MAX - 3, 2]                 --> none
+          * Next 0 in [ULONG_MAX - 4, ULONG_MAX]         --> ULONG_MAX - 3
+          * Zero [ULONG_MAX - 4, ULONG_MAX]
+          * Next 1 in [ULONG_MAX - 10, ULONG_MAX]        --> none
+          * Next 1 in [ULONG_MAX - 1, 2]                 --> none
+          * Zero [0, 1]
+          * Next 1 in [0, 2]                             --> none
+          */
+         xb_preload(GFP_KERNEL);
+         assert(!xb_set_bit(&xb1, 1));
+         xb_preload_end();
+         xb_preload(GFP_KERNEL);
+         assert(!xb_set_bit(&xb1, ULONG_MAX - 4));
+         nbit = 0;
+         assert(xb_find_set(&xb1, ULONG_MAX, &nbit) == true);
+         assert(nbit == 1);
+         nbit = 1;
+         assert(xb_find_set(&xb1, ULONG_MAX, &nbit) == true);
+         assert(nbit == 1);
+         nbit = 2;
+         assert(xb_find_set(&xb1, ULONG_MAX, &nbit) == true);
+         assert(nbit == ULONG_MAX - 4);
+         nbit++;
+         assert(xb_find_set(&xb1, 2, &nbit) == false);
+         assert(nbit == ULONG_MAX - 3);
+         nbit--;
+         assert(xb_find_zero(&xb1, ULONG_MAX, &nbit) == true);
+         assert(nbit == ULONG_MAX - 3);
+         xb_zero(&xb1, ULONG_MAX - 4, ULONG_MAX);
+         nbit = ULONG_MAX - 10;
+         assert(xb_find_set(&xb1, ULONG_MAX, &nbit) == false);
+         assert(nbit == ULONG_MAX - 10);
+         nbit = ULONG_MAX - 1;
+         assert(xb_find_set(&xb1, 2, &nbit) == false);
+         xb_zero(&xb1, 0, 1);
+         nbit = 0;
+         assert(xb_find_set(&xb1, 2, &nbit) == false);
+         assert(nbit == 0);
+         xb_preload_end();
+         assert(xb_empty(&xb1));
+}
+
+
+Best,
+Wei
