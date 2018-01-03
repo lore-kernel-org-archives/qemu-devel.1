@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58928)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58866)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mjc@sifive.com>) id 1eWXCy-0005w9-NA
-	for qemu-devel@nongnu.org; Tue, 02 Jan 2018 19:47:07 -0500
+	(envelope-from <mjc@sifive.com>) id 1eWXCs-0005sR-GX
+	for qemu-devel@nongnu.org; Tue, 02 Jan 2018 19:47:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mjc@sifive.com>) id 1eWXCw-0008Dm-E1
-	for qemu-devel@nongnu.org; Tue, 02 Jan 2018 19:47:04 -0500
-Received: from mail-pl0-x230.google.com ([2607:f8b0:400e:c01::230]:33490)
+	(envelope-from <mjc@sifive.com>) id 1eWXCo-00087t-80
+	for qemu-devel@nongnu.org; Tue, 02 Jan 2018 19:46:58 -0500
+Received: from mail-pg0-x233.google.com ([2607:f8b0:400e:c05::233]:32839)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mjc@sifive.com>) id 1eWXCw-0008DJ-3n
-	for qemu-devel@nongnu.org; Tue, 02 Jan 2018 19:47:02 -0500
-Received: by mail-pl0-x230.google.com with SMTP id 1so148502plv.0
-	for <qemu-devel@nongnu.org>; Tue, 02 Jan 2018 16:47:01 -0800 (PST)
+	(Exim 4.71) (envelope-from <mjc@sifive.com>) id 1eWXCn-00087h-UT
+	for qemu-devel@nongnu.org; Tue, 02 Jan 2018 19:46:54 -0500
+Received: by mail-pg0-x233.google.com with SMTP id g7so83249pgs.0
+	for <qemu-devel@nongnu.org>; Tue, 02 Jan 2018 16:46:53 -0800 (PST)
 From: Michael Clark <mjc@sifive.com>
-Date: Wed,  3 Jan 2018 13:44:18 +1300
-Message-Id: <1514940265-18093-15-git-send-email-mjc@sifive.com>
+Date: Wed,  3 Jan 2018 13:44:15 +1300
+Message-Id: <1514940265-18093-12-git-send-email-mjc@sifive.com>
 In-Reply-To: <1514940265-18093-1-git-send-email-mjc@sifive.com>
 References: <1514940265-18093-1-git-send-email-mjc@sifive.com>
-Subject: [Qemu-devel] [PATCH v1 14/21] SiFive RISC-V PLIC Block
+Subject: [Qemu-devel] [PATCH v1 11/21] RISC-V HTIF Console
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,29 +28,292 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Michael Clark <mjc@sifive.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
 
-The PLIC (Platform Level Interrupt Controller) device provides a
-parameterizable interrupt controller based on SiFive's PLIC specification.
+HTIF (Host Target Interface) provides console emulation for QEMU. HTIF
+allows identical copies of BBL (Berkeley Boot Loader) and linux to run
+on both Spike and QEMU. BBL provides HTIF console access via the
+SBI (Supervisor Binary Interface) and the linux kernel SBI console.
+
+The HTIF interface reads the ELF kernel and locates the 'tohost' and
+'fromhost' symbols which it uses for guest to host console MMIO.
+
+The HTIT chardev implements the pre qom legacy interface consistent
+with the 16550a UART in 'hw/char/serial.c'.
 
 Signed-off-by: Michael Clark <mjc@sifive.com>
 ---
- hw/riscv/sifive_plic.c         | 558 +++++++++++++++++++++++++++++++++++++++++
- include/hw/riscv/sifive_plic.h |  91 +++++++
- 2 files changed, 649 insertions(+)
- create mode 100644 hw/riscv/sifive_plic.c
- create mode 100644 include/hw/riscv/sifive_plic.h
+ hw/riscv/riscv_elf.c          | 244 ++++++++++++++++++++++++++
+ hw/riscv/riscv_htif.c         | 399 ++++++++++++++++++++++++++++++++++++++++++
+ include/hw/riscv/riscv_elf.h  |  69 ++++++++
+ include/hw/riscv/riscv_htif.h |  62 +++++++
+ 4 files changed, 774 insertions(+)
+ create mode 100644 hw/riscv/riscv_elf.c
+ create mode 100644 hw/riscv/riscv_htif.c
+ create mode 100644 include/hw/riscv/riscv_elf.h
+ create mode 100644 include/hw/riscv/riscv_htif.h
 
-diff --git a/hw/riscv/sifive_plic.c b/hw/riscv/sifive_plic.c
+diff --git a/hw/riscv/riscv_elf.c b/hw/riscv/riscv_elf.c
 new file mode 100644
-index 0000000..771dce0
+index 0000000..355a5a1
 --- /dev/null
-+++ b/hw/riscv/sifive_plic.c
-@@ -0,0 +1,558 @@
++++ b/hw/riscv/riscv_elf.c
+@@ -0,0 +1,244 @@
 +/*
-+ * SiFive PLIC (Platform Level Interrupt Controller)
++ * elf.c - A simple package for manipulating symbol tables in elf binaries.
 + *
-+ * Copyright (c) 2017 SiFive, Inc.
++ * Taken from
++ * https://www.cs.cmu.edu/afs/cs.cmu.edu/academic/class/15213-f03/www/
++ * ftrace/elf.c
 + *
-+ * This provides a parameterizable interrupt controller based on SiFive's PLIC.
++ */
++#include <stdio.h>
++#include <stdlib.h>
++#include <unistd.h>
++#include <string.h>
++#include <sys/stat.h>
++#include <sys/types.h>
++#include <sys/mman.h>
++#include <errno.h>
++#include <fcntl.h>
++#include <glib.h>
++
++#include "hw/riscv/riscv_elf.h"
++
++/*
++ * elf_open - Map a binary into the address space and extract the
++ * locations of the static and dynamic symbol tables and their string
++ * tables. Return this information in a Elf object file handle that will
++ * be passed to all of the other elf functions.
++ */
++Elf_obj64 *elf_open64(const char *filename)
++{
++    int i, fd;
++    struct stat sbuf;
++    Elf_obj64 *ep;
++    Elf64_Shdr *shdr;
++
++    ep = g_new(Elf_obj64, 1);
++
++    /* Do some consistency checks on the binary */
++    fd = open(filename, O_RDONLY);
++    if (fd == -1) {
++        fprintf(stderr, "Can't open \"%s\": %s\n", filename, strerror(errno));
++        exit(1);
++    }
++    if (fstat(fd, &sbuf) == -1) {
++        fprintf(stderr, "Can't stat \"%s\": %s\n", filename, strerror(errno));
++        exit(1);
++    }
++    if (sbuf.st_size < sizeof(Elf64_Ehdr)) {
++        fprintf(stderr, "\"%s\" is not an ELF binary object\n", filename);
++        exit(1);
++    }
++
++    /* It looks OK, so map the Elf binary into our address space */
++    ep->mlen = sbuf.st_size;
++    ep->maddr = mmap(NULL, ep->mlen, PROT_READ, MAP_SHARED, fd, 0);
++    if (ep->maddr == (void *)-1) {
++        fprintf(stderr, "Can't mmap \"%s\": %s\n", filename, strerror(errno));
++        exit(1);
++    }
++    close(fd);
++
++    /* The Elf binary begins with the Elf header */
++    ep->ehdr = ep->maddr;
++
++    /* check we have a 64-bit little-endian RISC-V ELF object */
++    if (ep->ehdr->e_ident[EI_MAG0] != ELFMAG0 ||
++        ep->ehdr->e_ident[EI_MAG1] != ELFMAG1 ||
++        ep->ehdr->e_ident[EI_MAG2] != ELFMAG2 ||
++        ep->ehdr->e_ident[EI_MAG3] != ELFMAG3 ||
++        ep->ehdr->e_ident[EI_CLASS] != ELFCLASS64 ||
++        ep->ehdr->e_ident[EI_DATA] != ELFDATA2LSB ||
++        ep->ehdr->e_machine != EM_RISCV)
++    {
++        fprintf(stderr, "\"%s\" is not a 64-bit RISC-V ELF object\n", filename);
++        exit(1);
++    }
++
++    /*
++     * Find the static and dynamic symbol tables and their string
++     * tables in the the mapped binary. The sh_link field in symbol
++     * table section headers gives the section index of the string
++     * table for that symbol table.
++     */
++    shdr = (Elf64_Shdr *)(ep->maddr + ep->ehdr->e_shoff);
++    for (i = 0; i < ep->ehdr->e_shnum; i++) {
++        if (shdr[i].sh_type == SHT_SYMTAB) {   /* Static symbol table */
++            ep->symtab = (Elf64_Sym *)(ep->maddr + shdr[i].sh_offset);
++            ep->symtab_end = (Elf64_Sym *)((char *)ep->symtab +
++                             shdr[i].sh_size);
++            ep->strtab = (char *)(ep->maddr + shdr[shdr[i].sh_link].sh_offset);
++        }
++        if (shdr[i].sh_type == SHT_DYNSYM) {   /* Dynamic symbol table */
++            ep->dsymtab = (Elf64_Sym *)(ep->maddr + shdr[i].sh_offset);
++            ep->dsymtab_end = (Elf64_Sym *)((char *)ep->dsymtab +
++                              shdr[i].sh_size);
++            ep->dstrtab = (char *)(ep->maddr + shdr[shdr[i].sh_link].sh_offset);
++        }
++    }
++    return ep;
++}
++
++Elf_obj32 *elf_open32(const char *filename)
++{
++    int i, fd;
++    struct stat sbuf;
++    Elf_obj32 *ep;
++    Elf32_Shdr *shdr;
++
++    ep = g_new(Elf_obj32, 1);
++
++    /* Do some consistency checks on the binary */
++    fd = open(filename, O_RDONLY);
++    if (fd == -1) {
++        fprintf(stderr, "Can't open \"%s\": %s\n", filename, strerror(errno));
++        exit(1);
++    }
++    if (fstat(fd, &sbuf) == -1) {
++        fprintf(stderr, "Can't stat \"%s\": %s\n", filename, strerror(errno));
++        exit(1);
++    }
++    if (sbuf.st_size < sizeof(Elf32_Ehdr)) {
++        fprintf(stderr, "\"%s\" is not an ELF binary object\n", filename);
++        exit(1);
++    }
++
++    /* It looks OK, so map the Elf binary into our address space */
++    ep->mlen = sbuf.st_size;
++    ep->maddr = mmap(NULL, ep->mlen, PROT_READ, MAP_SHARED, fd, 0);
++    if (ep->maddr == (void *)-1) {
++        fprintf(stderr, "Can't mmap \"%s\": %s\n", filename, strerror(errno));
++        exit(1);
++    }
++    close(fd);
++
++    /* The Elf binary begins with the Elf header */
++    ep->ehdr = ep->maddr;
++
++    /* check we have a 32-bit little-endian RISC-V ELF object */
++    if (ep->ehdr->e_ident[EI_MAG0] != ELFMAG0 ||
++        ep->ehdr->e_ident[EI_MAG1] != ELFMAG1 ||
++        ep->ehdr->e_ident[EI_MAG2] != ELFMAG2 ||
++        ep->ehdr->e_ident[EI_MAG3] != ELFMAG3 ||
++        ep->ehdr->e_ident[EI_CLASS] != ELFCLASS32 ||
++        ep->ehdr->e_ident[EI_DATA] != ELFDATA2LSB ||
++        ep->ehdr->e_machine != EM_RISCV)
++    {
++        fprintf(stderr, "\"%s\" is not a 32-bit RISC-V ELF object\n", filename);
++        exit(1);
++    }
++
++    /*
++     * Find the static and dynamic symbol tables and their string
++     * tables in the the mapped binary. The sh_link field in symbol
++     * table section headers gives the section index of the string
++     * table for that symbol table.
++     */
++    shdr = (Elf32_Shdr *)(ep->maddr + ep->ehdr->e_shoff);
++    for (i = 0; i < ep->ehdr->e_shnum; i++) {
++        if (shdr[i].sh_type == SHT_SYMTAB) {   /* Static symbol table */
++            ep->symtab = (Elf32_Sym *)(ep->maddr + shdr[i].sh_offset);
++            ep->symtab_end = (Elf32_Sym *)((char *)ep->symtab +
++                             shdr[i].sh_size);
++            ep->strtab = (char *)(ep->maddr + shdr[shdr[i].sh_link].sh_offset);
++        }
++        if (shdr[i].sh_type == SHT_DYNSYM) {   /* Dynamic symbol table */
++            ep->dsymtab = (Elf32_Sym *)(ep->maddr + shdr[i].sh_offset);
++            ep->dsymtab_end = (Elf32_Sym *)((char *)ep->dsymtab +
++                              shdr[i].sh_size);
++            ep->dstrtab = (char *)(ep->maddr + shdr[shdr[i].sh_link].sh_offset);
++        }
++    }
++    return ep;
++}
++
++/*
++ * elf_close - Free up the resources of an  elf object
++ */
++void elf_close64(Elf_obj64 *ep)
++{
++    if (munmap(ep->maddr, ep->mlen) < 0) {
++        perror("munmap");
++        exit(1);
++    }
++    free(ep);
++}
++
++void elf_close32(Elf_obj32 *ep)
++{
++    if (munmap(ep->maddr, ep->mlen) < 0) {
++        perror("munmap");
++        exit(1);
++    }
++    free(ep);
++}
++
++/*
++ * elf_symname - Return ASCII name of a static symbol
++ */
++char *elf_symname64(Elf_obj64 *ep, Elf64_Sym *sym)
++{
++    return &ep->strtab[sym->st_name];
++}
++
++char *elf_symname32(Elf_obj32 *ep, Elf32_Sym *sym)
++{
++    return &ep->strtab[sym->st_name];
++}
++
++/*
++ * elf_firstsym - Return ptr to first symbol in static symbol table
++ */
++Elf64_Sym *elf_firstsym64(Elf_obj64 *ep)
++{
++    return ep->symtab;
++}
++
++Elf32_Sym *elf_firstsym32(Elf_obj32 *ep)
++{
++    return ep->symtab;
++}
++
++
++/*
++ * elf_nextsym - Return ptr to next symbol in static symbol table,
++ * or NULL if no more symbols.
++ */
++Elf64_Sym *elf_nextsym64(Elf_obj64 *ep, Elf64_Sym *sym)
++{
++    sym++;
++    if (sym < ep->symtab_end) {
++        return sym;
++    } else {
++        return NULL;
++    }
++}
++
++Elf32_Sym *elf_nextsym32(Elf_obj32 *ep, Elf32_Sym *sym)
++{
++    sym++;
++    if (sym < ep->symtab_end) {
++        return sym;
++    } else {
++        return NULL;
++    }
++}
+diff --git a/hw/riscv/riscv_htif.c b/hw/riscv/riscv_htif.c
+new file mode 100644
+index 0000000..f4272e9
+--- /dev/null
++++ b/hw/riscv/riscv_htif.c
+@@ -0,0 +1,399 @@
++/*
++ * QEMU RISC-V Host Target Interface (HTIF) Emulation
++ *
++ * Author: Sagar Karandikar, sagark@eecs.berkeley.edu
++ *
++ * This provides HTIF device emulation for QEMU. At the moment this allows
++ * for identical copies of bbl/linux to run on both spike and QEMU.
 + *
 + * Permission is hereby granted, free of charge, to any person obtaining a copy
 + * of this software and associated documentation files (the "Software"), to deal
@@ -72,549 +335,461 @@ index 0000000..771dce0
 + */
 +
 +#include "qemu/osdep.h"
-+#include "qemu/error-report.h"
++#include "qapi/error.h"
 +#include "hw/sysbus.h"
-+#include "target/riscv/cpu.h"
-+#include "hw/riscv/sifive_plic.h"
++#include "hw/char/serial.h"
++#include "chardev/char.h"
++#include "chardev/char-fe.h"
++#include "hw/riscv/riscv_htif.h"
++#include "qemu/timer.h"
++#include "exec/address-spaces.h"
++#include "qemu/error-report.h"
++#include "hw/riscv/riscv_elf.h"
 +
-+/* #define RISCV_DEBUG_PLIC */
++#define ENABLE_CHARDEV
++/*#define DEBUG_CHARDEV */
++/*#define DEBUG_HTIF */
 +
-+static PLICMode char_to_mode(char c)
++#ifdef ENABLE_CHARDEV
++/*
++ * Called by the char dev to see if HTIF is ready to accept input.
++ */
++static int htif_can_recv(void *opaque)
 +{
-+    switch (c) {
-+    case 'U': return PLICMode_U;
-+    case 'S': return PLICMode_S;
-+    case 'H': return PLICMode_H;
-+    case 'M': return PLICMode_M;
-+    default:
-+        error_report("plic: invalid mode '%c'", c);
++    return 1;
++}
++
++/*
++ * Called by the char dev to supply input to HTIF console.
++ * We assume that we will receive one character at a time.
++ */
++static void htif_recv(void *opaque, const uint8_t *buf, int size)
++{
++    if (size != 1) {
++        return;
++    }
++
++    HTIFState *htifstate = opaque;
++
++    #ifdef DEBUG_CHARDEV
++    if (htifstate->env->mfromhost != 0x0) {
++        fprintf(stderr, "recv handler: fromhost was not ready to \
++                         accept input\n");
++        fprintf(stderr, "recv handler: prev value was: %016lx\n",
++                htifstate->env->mfromhost);
++    }
++    #endif
++
++    uint64_t val_written = htifstate->pending_read;
++    uint64_t resp = 0x100 | *buf;
++
++    htifstate->env->mfromhost = (val_written >> 48 << 48) | (resp << 16 >> 16);
++    qemu_irq_raise(htifstate->irq);
++}
++
++/*
++ * Called by the char dev to supply special events to the HTIF console.
++ * Not used for HTIF.
++ */
++static void htif_event(void *opaque, int event)
++{
++    #ifdef DEBUG_CHARDEV
++    fprintf(stderr, "GOT EVENT: %d\n", event);
++    #endif
++}
++
++static int htif_be_change(void *opaque)
++{
++    HTIFState *s = opaque;
++
++    qemu_chr_fe_set_handlers(&s->chr, htif_can_recv, htif_recv, htif_event,
++        htif_be_change, s, NULL, true);
++
++    return 0;
++}
++#endif
++
++static void dma_strcopy(HTIFState *htifstate, char *str, hwaddr phys_addr)
++{
++    int i = 0;
++    void *base_copy_addr = htifstate->main_mem_ram_ptr + phys_addr;
++    while (*(str + i)) {
++        stb_p((void *)(base_copy_addr + i), *(str + i));
++        i++;
++    }
++    stb_p((void *)(base_copy_addr + i), 0); /* store null term */
++}
++
++static void htif_handle_tohost_write(HTIFState *htifstate, uint64_t val_written)
++{
++    #ifdef DEBUG_HTIF
++    fprintf(stderr, "TOHOST WRITE WITH val 0x%016lx\n", val_written);
++    #endif
++
++    uint8_t device = val_written >> 56;
++    uint8_t cmd = val_written >> 48;
++    uint64_t payload = val_written & 0xFFFFFFFFFFFFULL;
++
++    uint64_t addr = payload >> 8;
++    hwaddr real_addr = (hwaddr)addr;
++    uint8_t what = payload & 0xFF;
++    int resp;
++
++    resp = 0; /* stop gcc complaining */
++    #ifdef DEBUG_HTIF
++    fprintf(stderr, "mtohost write:\n-device: %d\n-cmd: %d\n-what: %02lx\n\
++                     -payload: %016lx\n", device, cmd, payload & 0xFF, payload);
++    #endif
++
++    /*
++     * Currently, there is a fixed mapping of devices:
++     * 0: riscv-tests Pass/Fail Reporting Only (no syscall proxy)
++     * 1: Console
++     */
++    if (unlikely(device == 0x0)) {
++        /* frontend syscall handler, only test pass/fail support */
++        if (cmd == 0x0) {
++            #ifdef DEBUG_HTIF
++            fprintf(stderr, "frontend syscall handler\n");
++            #endif
++            if (payload & 0x1) {
++                /* test result */
++                if (payload >> 1) {
++                    printf("*** FAILED *** (exitcode = %016" PRIx64 ")\n",
++                           payload >> 1);
++                } else {
++                    printf("TEST PASSED\n");
++                }
++                exit(payload >> 1);
++            }
++            fprintf(stderr, "pk syscall proxy not supported\n");
++        } else if (cmd == 0xFF) {
++            /* use what */
++            if (what == 0xFF) {
++                #ifdef DEBUG_HTIF
++                fprintf(stderr, "registering name\n");
++                #endif
++                dma_strcopy(htifstate, (char *)"syscall_proxy", real_addr);
++            } else if (what == 0x0) {
++                #ifdef DEBUG_HTIF
++                fprintf(stderr, "registering syscall cmd\n");
++                #endif
++                dma_strcopy(htifstate, (char *)"syscall", real_addr);
++            } else {
++                #ifdef DEBUG_HTIF
++                fprintf(stderr, "registering end of cmds list\n");
++                #endif
++                dma_strcopy(htifstate, (char *)"", real_addr);
++            }
++            resp = 0x1; /* write to indicate device name placed */
++        } else {
++            fprintf(stderr, "HTIF device %d: UNKNOWN COMMAND\n", device);
++            exit(1);
++        }
++    } else if (likely(device == 0x1)) {
++        /* HTIF Console */
++        if (cmd == 0x0) {
++            /* this should be a queue, but not yet implemented as such */
++            htifstate->pending_read = val_written;
++            htifstate->env->mtohost = 0; /* clear to indicate we read */
++            return;
++        } else if (cmd == 0x1) {
++            #ifdef ENABLE_CHARDEV
++            qemu_chr_fe_write(&htifstate->chr, (uint8_t *)&payload, 1);
++            #endif
++            resp = 0x100 | (uint8_t)payload;
++        } else if (cmd == 0xFF) {
++            /* use what */
++            if (what == 0xFF) {
++                #ifdef DEBUG_HTIF
++                fprintf(stderr, "registering name\n");
++                #endif
++                dma_strcopy(htifstate, (char *)"bcd", real_addr);
++            } else if (what == 0x0) {
++                #ifdef DEBUG_HTIF
++                fprintf(stderr, "registering read cmd\n");
++                #endif
++                dma_strcopy(htifstate, (char *)"read", real_addr);
++            } else if (what == 0x1) {
++                #ifdef DEBUG_HTIF
++                fprintf(stderr, "registering write cmd\n");
++                #endif
++                dma_strcopy(htifstate, (char *)"write", real_addr);
++            } else {
++                #ifdef DEBUG_HTIF
++                fprintf(stderr, "registering end of cmds list\n");
++                #endif
++                dma_strcopy(htifstate, (char *)"", real_addr);
++            }
++            resp = 0x1; /* write to indicate device name placed */
++        } else {
++            fprintf(stderr, "HTIF device %d: UNKNOWN COMMAND\n", device);
++            exit(1);
++        }
++    /* all other devices */
++    } else if (device == 0x2 && cmd == 0xFF && what == 0xFF) {
++        #ifdef DEBUG_HTIF
++        fprintf(stderr, "registering no device as last\n");
++        #endif
++        stb_p((void *)(htifstate->main_mem_ram_ptr + real_addr), 0);
++        resp = 0x1; /* write to indicate device name placed */
++    } else {
++        fprintf(stderr, "HTIF UNKNOWN DEVICE OR COMMAND!\n");
++        fprintf(stderr, "device: %d\ncmd: %d\nwhat: %02" PRIx64 "\n"
++            "payload: %016" PRIx64 "\n", device, cmd, payload & 0xFF, payload);
++        exit(1);
++    }
++    /*
++     * - latest bbl does not set fromhost to 0 if there is a value in tohost
++     * - with this code enabled, qemu hangs waiting for fromhost to go to 0
++     * - with this code disabled, qemu works with bbl priv v1.9.1 and v1.10
++     * - HTIF needs protocol documentation and a more complete state machine
++
++        while (!htifstate->fromhost_inprogress &&
++            htifstate->env->mfromhost != 0x0) {
++        }
++    */
++    htifstate->env->mfromhost = (val_written >> 48 << 48) | (resp << 16 >> 16);
++    htifstate->env->mtohost = 0; /* clear to indicate we read */
++    if (htifstate->env->mfromhost != 0) {
++        /* raise HTIF interrupt */
++        qemu_irq_raise(htifstate->irq);
++    }
++}
++
++#define TOHOST_OFFSET1 (htifstate->tohost_offset)
++#define TOHOST_OFFSET2 (htifstate->tohost_offset + 4)
++#define FROMHOST_OFFSET1 (htifstate->fromhost_offset)
++#define FROMHOST_OFFSET2 (htifstate->fromhost_offset + 4)
++
++/* CPU wants to read an HTIF register */
++static uint64_t htif_mm_read(void *opaque, hwaddr addr, unsigned size)
++{
++    HTIFState *htifstate = opaque;
++    if (addr == TOHOST_OFFSET1) {
++        return htifstate->env->mtohost & 0xFFFFFFFF;
++    } else if (addr == TOHOST_OFFSET2) {
++        return (htifstate->env->mtohost >> 32) & 0xFFFFFFFF;
++    } else if (addr == FROMHOST_OFFSET1) {
++        return htifstate->env->mfromhost & 0xFFFFFFFF;
++    } else if (addr == FROMHOST_OFFSET2) {
++        return (htifstate->env->mfromhost >> 32) & 0xFFFFFFFF;
++    } else {
++        printf("Invalid htif register address %016" PRIx64 "\n",
++               (uint64_t)addr);
 +        exit(1);
 +    }
 +}
 +
-+#if defined RISCV_DEBUG_PLIC
-+
-+static char mode_to_char(PLICMode m)
++/* CPU wrote to an HTIF register */
++static void htif_mm_write(void *opaque, hwaddr addr,
++                            uint64_t value, unsigned size)
 +{
-+    switch (m) {
-+    case PLICMode_U: return 'U';
-+    case PLICMode_S: return 'S';
-+    case PLICMode_H: return 'H';
-+    case PLICMode_M: return 'M';
-+    default: return '?';
-+    }
-+}
-+
-+static void sifive_plic_print_state(SiFivePLICState *plic)
-+{
-+    int i;
-+    int addrid;
-+
-+    /* pending */
-+    printf("pending       : ");
-+    for (i = plic->bitfield_words - 1; i >= 0; i--) {
-+        printf("%08x", plic->pending[i]);
-+    }
-+    printf("\n");
-+
-+    /* pending */
-+    printf("claimed       : ");
-+    for (i = plic->bitfield_words - 1; i >= 0; i--) {
-+        printf("%08x", plic->claimed[i]);
-+    }
-+    printf("\n");
-+
-+    for (addrid = 0; addrid < plic->num_addrs; addrid++) {
-+        printf("hart%d-%c enable: ",
-+            plic->addr_config[addrid].hartid,
-+            mode_to_char(plic->addr_config[addrid].mode));
-+        for (i = plic->bitfield_words - 1; i >= 0; i--) {
-+            printf("%08x", plic->enable[addrid * plic->bitfield_words + i]);
++    HTIFState *htifstate = opaque;
++    if (addr == TOHOST_OFFSET1) {
++        if (htifstate->env->mtohost == 0x0) {
++            htifstate->allow_tohost = 1;
++            htifstate->env->mtohost = value & 0xFFFFFFFF;
++        } else {
++            htifstate->allow_tohost = 0;
 +        }
-+        printf("\n");
++    } else if (addr == TOHOST_OFFSET2) {
++        if (htifstate->allow_tohost) {
++            htifstate->env->mtohost |= value << 32;
++            htif_handle_tohost_write(htifstate, htifstate->env->mtohost);
++        }
++    } else if (addr == FROMHOST_OFFSET1) {
++        htifstate->fromhost_inprogress = 1;
++        htifstate->env->mfromhost = value & 0xFFFFFFFF;
++    } else if (addr == FROMHOST_OFFSET2) {
++        htifstate->env->mfromhost |= value << 32;
++        if (htifstate->env->mfromhost == 0x0) {
++            qemu_irq_lower(htifstate->irq);
++        }
++        htifstate->fromhost_inprogress = 0;
++    } else {
++        printf("Invalid htif register address %016" PRIx64 "\n",
++               (uint64_t)addr);
++        exit(1);
 +    }
 +}
 +
++static const MemoryRegionOps htif_mm_ops = {
++    .read = htif_mm_read,
++    .write = htif_mm_write,
++};
++
++HTIFState *htif_mm_init(MemoryRegion *address_space,
++    const char *kernel_filename, qemu_irq irq, MemoryRegion *main_mem,
++    CPURISCVState *env, Chardev *chr)
++{
++    uint64_t fromhost_addr = 0, tohost_addr = 0;
++
++    /* get fromhost/tohost addresses from the ELF, as spike/fesvr do */
++    if (kernel_filename) {
++#if defined(TARGET_RISCV64)
++        Elf_obj64 *e = elf_open64(kernel_filename);
++#else
++        Elf_obj32 *e = elf_open32(kernel_filename);
 +#endif
 +
-+static
-+void sifive_plic_set_pending(SiFivePLICState *plic, int irq, bool pending)
-+{
-+    qemu_mutex_lock(&plic->lock);
-+    uint32_t word = irq >> 5;
-+    if (pending) {
-+        plic->pending[word] |= (1 << (irq & 31));
-+    } else {
-+        plic->pending[word] &= ~(1 << (irq & 31));
-+    }
-+    qemu_mutex_unlock(&plic->lock);
-+}
++        const char *fromhost = "fromhost";
++        const char *tohost = "tohost";
 +
-+static
-+void sifive_plic_set_claimed(SiFivePLICState *plic, int irq, bool claimed)
-+{
-+    qemu_mutex_lock(&plic->lock);
-+    uint32_t word = irq >> 5;
-+    if (claimed) {
-+        plic->claimed[word] |= (1 << (irq & 31));
-+    } else {
-+        plic->claimed[word] &= ~(1 << (irq & 31));
-+    }
-+    qemu_mutex_unlock(&plic->lock);
-+}
++#if defined(TARGET_RISCV64)
++        Elf64_Sym *curr_sym = elf_firstsym64(e);
++#else
++        Elf32_Sym *curr_sym = elf_firstsym32(e);
++#endif
++        while (curr_sym) {
++#if defined(TARGET_RISCV64)
++            char *symname = elf_symname64(e, curr_sym);
++#else
++            char *symname = elf_symname32(e, curr_sym);
++#endif
 +
-+static
-+int sifive_plic_num_irqs_pending(SiFivePLICState *plic, uint32_t addrid)
-+{
-+    int i, j, count = 0;
-+    for (i = 0; i < plic->bitfield_words; i++) {
-+        uint32_t pending_enabled_not_claimed =
-+            (plic->pending[i] & ~plic->claimed[i]) &
-+            plic->enable[addrid * plic->bitfield_words + i];
-+        if (!pending_enabled_not_claimed) {
-+            continue;
-+        }
-+        for (j = 0; j < 32; j++) {
-+            int irq = (i << 5) + j;
-+            uint32_t prio = plic->source_priority[irq];
-+            int enabled = pending_enabled_not_claimed & (1 << j);
-+            if (enabled && prio > plic->target_priority[addrid]) {
-+                count++;
-+            }
-+        }
-+    }
-+    return count;
-+}
-+
-+static void sifive_plic_update(SiFivePLICState *plic)
-+{
-+    int addrid;
-+
-+    /* raise irq on harts where this irq is enabled */
-+    for (addrid = 0; addrid < plic->num_addrs; addrid++) {
-+        uint32_t hartid = plic->addr_config[addrid].hartid;
-+        PLICMode mode = plic->addr_config[addrid].mode;
-+        CPUState *cpu = qemu_get_cpu(hartid);
-+        CPURISCVState *env = cpu ? cpu->env_ptr : NULL;
-+        int count = 0;
-+        if (!env) {
-+            continue;
-+        }
-+        if (sifive_plic_num_irqs_pending(plic, addrid) > 0) {
-+            switch (mode) {
-+            case PLICMode_M:
-+                if ((env->mip & MIP_MEIP) == 0) {
-+                    env->mip |= MIP_MEIP;
-+                    count++;
-+                    #if defined RISCV_DEBUG_PLIC
-+                    printf("sifive_plic_update: RAISE hart%d-%c\n",
-+                        hartid, mode_to_char(mode));
-+                    #endif
++            if (strcmp(fromhost, symname) == 0) {
++                /* get fromhost addr */
++                fromhost_addr = curr_sym->st_value;
++                if (curr_sym->st_size != 8) {
++                    error_report("HTIF fromhost must be 8 bytes");
++                    exit(1);
 +                }
-+                break;
-+            case PLICMode_S:
-+                if ((env->mip & MIP_SEIP) == 0) {
-+                    env->mip |= MIP_SEIP;
-+                    count++;
-+                    #if defined RISCV_DEBUG_PLIC
-+                    printf("sifive_plic_update: RAISE hart%d-%c\n",
-+                        hartid, mode_to_char(mode));
-+                    #endif
++            } else if (strcmp(tohost, symname) == 0) {
++                /* get tohost addr */
++                tohost_addr = curr_sym->st_value;
++                if (curr_sym->st_size != 8) {
++                    error_report("HTIF tohost must be 8 bytes");
++                    exit(1);
 +                }
-+                break;
-+            default:
-+                break;
 +            }
-+        } else {
-+            switch (mode) {
-+            case PLICMode_M:
-+                if (env->mip & MIP_MEIP) {
-+                    env->mip &= ~MIP_MEIP;
-+                    #if defined RISCV_DEBUG_PLIC
-+                    printf("sifive_plic_update: LOWER hart%d-%c\n",
-+                        hartid, mode_to_char(mode));
-+                    #endif
-+                }
-+                break;
-+            case PLICMode_S:
-+                if (env->mip & MIP_SEIP) {
-+                    env->mip &= ~MIP_SEIP;
-+                    #if defined RISCV_DEBUG_PLIC
-+                    printf("sifive_plic_update: LOWER hart%d-%c\n",
-+                        hartid, mode_to_char(mode));
-+                    #endif
-+                }
-+                break;
-+            default:
-+                break;
-+            }
++#if defined(TARGET_RISCV64)
++            curr_sym = elf_nextsym64(e, curr_sym);
++#else
++            curr_sym = elf_nextsym32(e, curr_sym);
++#endif
 +        }
-+        if (count > 0) {
-+            cpu_interrupt(cpu, CPU_INTERRUPT_HARD);
-+        }
++
++#if defined(TARGET_RISCV64)
++        elf_close64(e);
++#else
++        elf_close32(e);
++#endif
 +    }
 +
-+    #if defined RISCV_DEBUG_PLIC
-+    sifive_plic_print_state(plic);
-+    #endif
-+}
++    uint64_t base = MIN(tohost_addr, fromhost_addr);
++    uint64_t size = MAX(tohost_addr + 8, fromhost_addr + 8) - base;
++    uint64_t tohost_offset = tohost_addr - base;
++    uint64_t fromhost_offset = fromhost_addr - base;
 +
-+void sifive_plic_raise_irq(SiFivePLICState *plic, uint32_t irq)
-+{
-+    sifive_plic_set_pending(plic, irq, true);
-+    sifive_plic_update(plic);
-+}
-+
-+void sifive_plic_lower_irq(SiFivePLICState *plic, uint32_t irq)
-+{
-+    sifive_plic_set_pending(plic, irq, false);
-+    sifive_plic_update(plic);
-+}
-+
-+static uint32_t sifive_plic_claim(SiFivePLICState *plic, uint32_t addrid)
-+{
-+    int i, j;
-+    for (i = 0; i < plic->bitfield_words; i++) {
-+        uint32_t pending_enabled_not_claimed =
-+            (plic->pending[i] & ~plic->claimed[i]) &
-+            plic->enable[addrid * plic->bitfield_words + i];
-+        if (!pending_enabled_not_claimed) {
-+            continue;
-+        }
-+        for (j = 0; j < 32; j++) {
-+            int irq = (i << 5) + j;
-+            uint32_t prio = plic->source_priority[irq];
-+            int enabled = pending_enabled_not_claimed & (1 << j);
-+            if (enabled && prio > plic->target_priority[addrid]) {
-+                sifive_plic_set_pending(plic, irq, false);
-+                sifive_plic_set_claimed(plic, irq, true);
-+                return irq;
-+            }
-+        }
-+    }
-+    return 0;
-+}
-+
-+/* CPU wants to read rtc or timecmp register */
-+static uint64_t sifive_plic_read(void *opaque, hwaddr addr, unsigned size)
-+{
-+    SiFivePLICState *plic = opaque;
-+
-+    /* writes must be 4 byte words */
-+    if ((addr & 0x3) != 0) {
-+        goto err;
++    HTIFState *s = g_malloc0(sizeof(HTIFState));
++    s->irq = irq;
++    s->address_space = address_space;
++    s->main_mem = main_mem;
++    s->main_mem_ram_ptr = memory_region_get_ram_ptr(main_mem);
++    s->env = env;
++    s->tohost_offset = tohost_offset;
++    s->fromhost_offset = fromhost_offset;
++    s->pending_read = 0;
++    s->allow_tohost = 0;
++    s->fromhost_inprogress = 0;
++#ifdef ENABLE_CHARDEV
++    qemu_chr_fe_init(&s->chr, chr, &error_abort);
++    qemu_chr_fe_set_handlers(&s->chr, htif_can_recv, htif_recv, htif_event,
++        htif_be_change, s, NULL, true);
++#endif
++    if (base) {
++        memory_region_init_io(&s->mmio, NULL, &htif_mm_ops, s,
++                            TYPE_HTIF_UART, size);
++        memory_region_add_subregion(address_space, base, &s->mmio);
 +    }
 +
-+    if (addr >= plic->priority_base && /* 4 bytes per source */
-+        addr < plic->priority_base + (plic->num_sources << 2))
-+    {
-+        uint32_t irq = (addr - plic->priority_base) >> 2;
-+        #if defined RISCV_DEBUG_PLIC
-+        printf("plic: read priority: irq=%d priority=%d\n",
-+            irq, plic->source_priority[irq]);
-+        #endif
-+        return plic->source_priority[irq];
-+    } else if (addr >= plic->pending_base && /* 1 bit per source */
-+               addr < plic->pending_base + (plic->num_sources >> 3))
-+    {
-+        uint32_t word = (addr - plic->priority_base) >> 2;
-+        #if defined RISCV_DEBUG_PLIC
-+        printf("plic: read pending: word=%d value=%d\n",
-+            word, plic->pending[word]);
-+        #endif
-+        return plic->pending[word];
-+    } else if (addr >= plic->enable_base && /* 1 bit per source */
-+             addr < plic->enable_base + plic->num_addrs * plic->enable_stride)
-+    {
-+        uint32_t addrid = (addr - plic->enable_base) / plic->enable_stride;
-+        uint32_t wordid = (addr & (plic->enable_stride - 1)) >> 2;
-+        if (wordid < plic->bitfield_words) {
-+            #if defined RISCV_DEBUG_PLIC
-+            printf("plic: read enable: hart%d-%c word=%d value=%x\n",
-+                plic->addr_config[addrid].hartid,
-+                mode_to_char(plic->addr_config[addrid].mode),
-+                wordid, plic->enable[addrid * plic->bitfield_words + wordid]);
-+            #endif
-+            return plic->enable[addrid * plic->bitfield_words + wordid];
-+        }
-+    } else if (addr >= plic->context_base && /* 1 bit per source */
-+             addr < plic->context_base + plic->num_addrs * plic->context_stride)
-+    {
-+        uint32_t addrid = (addr - plic->context_base) / plic->context_stride;
-+        uint32_t contextid = (addr & (plic->context_stride - 1));
-+        if (contextid == 0) {
-+            #if defined RISCV_DEBUG_PLIC
-+            printf("plic: read priority: hart%d-%c priority=%x\n",
-+                plic->addr_config[addrid].hartid,
-+                mode_to_char(plic->addr_config[addrid].mode),
-+                plic->target_priority[addrid]);
-+            #endif
-+            return plic->target_priority[addrid];
-+        } else if (contextid == 4) {
-+            uint32_t value = sifive_plic_claim(plic, addrid);
-+            #if defined RISCV_DEBUG_PLIC
-+            printf("plic: read claim: hart%d-%c irq=%x\n",
-+                plic->addr_config[addrid].hartid,
-+                mode_to_char(plic->addr_config[addrid].mode),
-+                value);
-+            sifive_plic_print_state(plic);
-+            #endif
-+            return value;
-+        }
-+    }
-+
-+err:
-+    error_report("plic: invalid register read: %08x", (uint32_t)addr);
-+    return 0;
++    return s;
 +}
-+
-+/* CPU wrote to rtc or timecmp register */
-+static void sifive_plic_write(void *opaque, hwaddr addr, uint64_t value,
-+        unsigned size)
-+{
-+    SiFivePLICState *plic = opaque;
-+
-+    /* writes must be 4 byte words */
-+    if ((addr & 0x3) != 0) {
-+        goto err;
-+    }
-+
-+    if (addr >= plic->priority_base && /* 4 bytes per source */
-+        addr < plic->priority_base + (plic->num_sources << 2))
-+    {
-+        uint32_t irq = (addr - plic->priority_base) >> 2;
-+        plic->source_priority[irq] = value & 7;
-+        #if defined RISCV_DEBUG_PLIC
-+        printf("plic: write priority: irq=%d priority=%d\n",
-+            irq, plic->source_priority[irq]);
-+        #endif
-+        return;
-+    } else if (addr >= plic->pending_base && /* 1 bit per source */
-+               addr < plic->pending_base + (plic->num_sources >> 3))
-+    {
-+        error_report("plic: invalid pending write: %08x", (uint32_t)addr);
-+        return;
-+    } else if (addr >= plic->enable_base && /* 1 bit per source */
-+        addr < plic->enable_base + plic->num_addrs * plic->enable_stride)
-+    {
-+        uint32_t addrid = (addr - plic->enable_base) / plic->enable_stride;
-+        uint32_t wordid = (addr & (plic->enable_stride - 1)) >> 2;
-+        if (wordid < plic->bitfield_words) {
-+            plic->enable[addrid * plic->bitfield_words + wordid] = value;
-+            #if defined RISCV_DEBUG_PLIC
-+            printf("plic: write enable: hart%d-%c word=%d value=%x\n",
-+                plic->addr_config[addrid].hartid,
-+                mode_to_char(plic->addr_config[addrid].mode),
-+                wordid, plic->enable[addrid * plic->bitfield_words + wordid]);
-+            #endif
-+            return;
-+        }
-+    } else if (addr >= plic->context_base && /* 4 bytes per reg */
-+        addr < plic->context_base + plic->num_addrs * plic->context_stride)
-+    {
-+        uint32_t addrid = (addr - plic->context_base) / plic->context_stride;
-+        uint32_t contextid = (addr & (plic->context_stride - 1));
-+        if (contextid == 0) {
-+            #if defined RISCV_DEBUG_PLIC
-+            printf("plic: write priority: hart%d-%c priority=%x\n",
-+                plic->addr_config[addrid].hartid,
-+                mode_to_char(plic->addr_config[addrid].mode),
-+                plic->target_priority[addrid]);
-+            #endif
-+            if (value <= plic->num_priorities) {
-+                plic->target_priority[addrid] = value;
-+                sifive_plic_update(plic);
-+            }
-+            return;
-+        } else if (contextid == 4) {
-+            #if defined RISCV_DEBUG_PLIC
-+            printf("plic: write claim: hart%d-%c irq=%x\n",
-+                plic->addr_config[addrid].hartid,
-+                mode_to_char(plic->addr_config[addrid].mode),
-+                (uint32_t)value);
-+            #endif
-+            if (value < plic->num_sources) {
-+                sifive_plic_set_claimed(plic, value, false);
-+                sifive_plic_update(plic);
-+            }
-+            return;
-+        }
-+    }
-+
-+err:
-+    error_report("plic: invalid register write: %08x", (uint32_t)addr);
-+}
-+
-+static const MemoryRegionOps sifive_plic_ops = {
-+    .read = sifive_plic_read,
-+    .write = sifive_plic_write,
-+    .endianness = DEVICE_LITTLE_ENDIAN,
-+    .valid = {
-+        .min_access_size = 4,
-+        .max_access_size = 4
-+    }
-+};
-+
-+static Property sifive_plic_properties[] = {
-+    DEFINE_PROP_STRING("hart-config", SiFivePLICState, hart_config),
-+    DEFINE_PROP_UINT32("num-sources", SiFivePLICState, num_sources, 0),
-+    DEFINE_PROP_UINT32("num-priorities", SiFivePLICState, num_priorities, 0),
-+    DEFINE_PROP_UINT32("priority-base", SiFivePLICState, priority_base, 0),
-+    DEFINE_PROP_UINT32("pending-base", SiFivePLICState, pending_base, 0),
-+    DEFINE_PROP_UINT32("enable-base", SiFivePLICState, enable_base, 0),
-+    DEFINE_PROP_UINT32("enable-stride", SiFivePLICState, enable_stride, 0),
-+    DEFINE_PROP_UINT32("context-base", SiFivePLICState, context_base, 0),
-+    DEFINE_PROP_UINT32("context-stride", SiFivePLICState, context_stride, 0),
-+    DEFINE_PROP_UINT32("aperture-size", SiFivePLICState, aperture_size, 0),
-+    DEFINE_PROP_END_OF_LIST(),
-+};
-+
-+/*
-+ * parse PLIC hart/mode address offset config
-+ *
-+ * "M"              1 hart with M mode
-+ * "MS,MS"          2 harts, 0-1 with M and S mode
-+ * "M,MS,MS,MS,MS"  5 harts, 0 with M mode, 1-5 with M and S mode
-+ */
-+static void parse_hart_config(SiFivePLICState *plic)
-+{
-+    int addrid, hartid, modes;
-+    const char *p;
-+    char c;
-+
-+    /* count and validate hart/mode combinations */
-+    addrid = 0, hartid = 0, modes = 0;
-+    p = plic->hart_config;
-+    while ((c = *p++)) {
-+        if (c == ',') {
-+            addrid += __builtin_popcount(modes);
-+            modes = 0;
-+            hartid++;
-+        } else {
-+            int m = 1 << char_to_mode(c);
-+            if (modes == (modes | m)) {
-+                error_report("plic: duplicate mode '%c' in config: %s",
-+                             c, plic->hart_config);
-+                exit(1);
-+            }
-+            modes |= m;
-+        }
-+    }
-+    if (modes) {
-+        addrid += __builtin_popcount(modes);
-+    }
-+    hartid++;
-+
-+    /* store hart/mode combinations */
-+    plic->num_addrs = addrid;
-+    plic->addr_config = g_new(PLICAddr, plic->num_addrs);
-+    addrid = 0, hartid = 0;
-+    p = plic->hart_config;
-+    while ((c = *p++)) {
-+        if (c == ',') {
-+            hartid++;
-+        } else {
-+            plic->addr_config[addrid].addrid = addrid;
-+            plic->addr_config[addrid].hartid = hartid;
-+            plic->addr_config[addrid].mode = char_to_mode(c);
-+            addrid++;
-+        }
-+    }
-+}
-+
-+static void sifive_plic_irq_request(void *opaque, int irq, int level)
-+{
-+    SiFivePLICState *plic = opaque;
-+    #if defined RISCV_DEBUG_PLIC
-+    printf("sifive_plic_irq_request: irq=%d level=%d\n", irq, level);
-+    #endif
-+    sifive_plic_set_pending(plic, irq, level > 0);
-+    sifive_plic_update(plic);
-+}
-+
-+static void sifive_plic_realize(DeviceState *dev, Error **errp)
-+{
-+    SiFivePLICState *plic = SIFIVE_PLIC(dev);
-+    int i;
-+
-+    memory_region_init_io(&plic->mmio, OBJECT(dev), &sifive_plic_ops, plic,
-+                          TYPE_SIFIVE_PLIC, plic->aperture_size);
-+    parse_hart_config(plic);
-+    qemu_mutex_init(&plic->lock);
-+    plic->bitfield_words = (plic->num_sources + 31) >> 5;
-+    plic->source_priority = g_new0(uint32_t, plic->num_sources);
-+    plic->target_priority = g_new(uint32_t, plic->num_addrs);
-+    plic->pending = g_new0(uint32_t, plic->bitfield_words);
-+    plic->claimed = g_new0(uint32_t, plic->bitfield_words);
-+    plic->enable = g_new0(uint32_t, plic->bitfield_words * plic->num_addrs);
-+    sysbus_init_mmio(SYS_BUS_DEVICE(dev), &plic->mmio);
-+    plic->irqs = g_new0(qemu_irq, plic->num_sources + 1);
-+    for (i = 0; i <= plic->num_sources; i++) {
-+        plic->irqs[i] = qemu_allocate_irq(sifive_plic_irq_request, plic, i);
-+    }
-+}
-+
-+static void sifive_plic_class_init(ObjectClass *klass, void *data)
-+{
-+    DeviceClass *dc = DEVICE_CLASS(klass);
-+
-+    dc->props = sifive_plic_properties;
-+    dc->realize = sifive_plic_realize;
-+}
-+
-+static const TypeInfo sifive_plic_info = {
-+    .name          = TYPE_SIFIVE_PLIC,
-+    .parent        = TYPE_SYS_BUS_DEVICE,
-+    .instance_size = sizeof(SiFivePLICState),
-+    .class_init    = sifive_plic_class_init,
-+};
-+
-+static void sifive_plic_register_types(void)
-+{
-+    type_register_static(&sifive_plic_info);
-+}
-+
-+type_init(sifive_plic_register_types)
-+
-+/*
-+ * Create PLIC device.
-+ */
-+DeviceState *sifive_plic_create(hwaddr addr, char *hart_config,
-+    uint32_t num_sources, uint32_t num_priorities,
-+    uint32_t priority_base, uint32_t pending_base,
-+    uint32_t enable_base, uint32_t enable_stride,
-+    uint32_t context_base, uint32_t context_stride,
-+    uint32_t aperture_size)
-+{
-+    DeviceState *dev = qdev_create(NULL, TYPE_SIFIVE_PLIC);
-+    assert(enable_stride == (enable_stride & -enable_stride));
-+    assert(context_stride == (context_stride & -context_stride));
-+    qdev_prop_set_string(dev, "hart-config", hart_config);
-+    qdev_prop_set_uint32(dev, "num-sources", num_sources);
-+    qdev_prop_set_uint32(dev, "num-priorities", num_priorities);
-+    qdev_prop_set_uint32(dev, "priority-base", priority_base);
-+    qdev_prop_set_uint32(dev, "pending-base", pending_base);
-+    qdev_prop_set_uint32(dev, "enable-base", enable_base);
-+    qdev_prop_set_uint32(dev, "enable-stride", enable_stride);
-+    qdev_prop_set_uint32(dev, "context-base", context_base);
-+    qdev_prop_set_uint32(dev, "context-stride", context_stride);
-+    qdev_prop_set_uint32(dev, "aperture-size", aperture_size);
-+    qdev_init_nofail(dev);
-+    sysbus_mmio_map(SYS_BUS_DEVICE(dev), 0, addr);
-+    return dev;
-+}
-diff --git a/include/hw/riscv/sifive_plic.h b/include/hw/riscv/sifive_plic.h
+diff --git a/include/hw/riscv/riscv_elf.h b/include/hw/riscv/riscv_elf.h
 new file mode 100644
-index 0000000..e1be499
+index 0000000..5771829
 --- /dev/null
-+++ b/include/hw/riscv/sifive_plic.h
-@@ -0,0 +1,91 @@
++++ b/include/hw/riscv/riscv_elf.h
+@@ -0,0 +1,69 @@
 +/*
-+ * SiFive PLIC (Platform Level Interrupt Controller) interface
++ * elf.h - A package for manipulating Elf binaries
 + *
-+ * Copyright (c) 2017 SiFive, Inc.
++ * Taken from:
++ * https://www.cs.cmu.edu/afs/cs.cmu.edu/academic/class/15213-f03/www/ftrace/
++ * elf.h
 + *
-+ * This provides a RISC-V PLIC device
++ */
++
++#ifndef ELF_H
++#define ELF_H
++
++#include <stdint.h>
++#include <elf.h>
++
++/*
++ * This is a handle that is created by elf_open and then used by every
++ * other function in the elf package
++*/
++typedef struct {
++    void *maddr;            /* Start of mapped Elf binary segment in memory */
++    int mlen;               /* Length in bytes of the mapped Elf segment */
++    Elf64_Ehdr *ehdr;       /* Start of main Elf header (same as maddr) */
++    Elf64_Sym *symtab;      /* Start of symbol table */
++    Elf64_Sym *symtab_end;  /* End of symbol table (symtab + size) */
++    char *strtab;           /* Address of string table */
++    Elf64_Sym *dsymtab;     /* Start of dynamic symbol table */
++    Elf64_Sym *dsymtab_end; /* End of dynamic symbol table (dsymtab + size) */
++    char *dstrtab;          /* Address of dynamic string table */
++} Elf_obj64;
++
++typedef struct {
++    void *maddr;            /* Start of mapped Elf binary segment in memory */
++    int mlen;               /* Length in bytes of the mapped Elf segment */
++    Elf32_Ehdr *ehdr;       /* Start of main Elf header (same as maddr) */
++    Elf32_Sym *symtab;      /* Start of symbol table */
++    Elf32_Sym *symtab_end;  /* End of symbol table (symtab + size) */
++    char *strtab;           /* Address of string table */
++    Elf32_Sym *dsymtab;     /* Start of dynamic symbol table */
++    Elf32_Sym *dsymtab_end; /* End of dynamic symbol table (dsymtab + size) */
++    char *dstrtab;          /* Address of dynamic string table */
++} Elf_obj32;
++
++/*
++ * Create and destroy Elf object handles
++ */
++Elf_obj64 *elf_open64(const char *filename);
++Elf_obj32 *elf_open32(const char *filename);
++
++void elf_close64(Elf_obj64 *ep);
++void elf_close32(Elf_obj32 *ep);
++
++/*
++ * Functions for manipulating static symbols
++ */
++
++/* Returns pointer to the first symbol */
++Elf64_Sym *elf_firstsym64(Elf_obj64 *ep);
++Elf32_Sym *elf_firstsym32(Elf_obj32 *ep);
++
++/* Returns pointer to the next symbol, or NULL if no more symbols */
++Elf64_Sym *elf_nextsym64(Elf_obj64 *ep, Elf64_Sym *sym);
++Elf32_Sym *elf_nextsym32(Elf_obj32 *ep, Elf32_Sym *sym);
++
++/* Return symbol string name */
++char *elf_symname64(Elf_obj64 *ep, Elf64_Sym *sym);
++char *elf_symname32(Elf_obj32 *ep, Elf32_Sym *sym);
++
++#endif
+diff --git a/include/hw/riscv/riscv_htif.h b/include/hw/riscv/riscv_htif.h
+new file mode 100644
+index 0000000..d37291d
+--- /dev/null
++++ b/include/hw/riscv/riscv_htif.h
+@@ -0,0 +1,62 @@
++/*
++ * QEMU RISCV Host Target Interface (HTIF) Emulation
++ *
 + *
 + * Permission is hereby granted, free of charge, to any person obtaining a copy
 + * of this software and associated documentation files (the "Software"), to deal
@@ -634,71 +809,45 @@ index 0000000..e1be499
 + * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 + * THE SOFTWARE.
 + */
++#ifndef HW_RISCV_HTIF_H
++#define HW_RISCV_HTIF_H
 +
-+#ifndef HW_SIFIVE_PLIC_H
-+#define HW_SIFIVE_PLIC_H
++#include "hw/hw.h"
++#include "chardev/char.h"
++#include "chardev/char-fe.h"
++#include "sysemu/sysemu.h"
++#include "exec/memory.h"
++#include "target/riscv/cpu.h"
 +
-+#include "hw/irq.h"
++#define TYPE_HTIF_UART "riscv.htif.uart"
 +
-+#define TYPE_SIFIVE_PLIC "riscv.sifive.plic"
++typedef struct HTIFState {
++    int allow_tohost;
++    int fromhost_inprogress;
 +
-+#define SIFIVE_PLIC(obj) \
-+    OBJECT_CHECK(SiFivePLICState, (obj), TYPE_SIFIVE_PLIC)
-+
-+typedef enum PLICMode {
-+    PLICMode_U,
-+    PLICMode_S,
-+    PLICMode_H,
-+    PLICMode_M
-+} PLICMode;
-+
-+typedef struct PLICAddr {
-+    uint32_t addrid;
-+    uint32_t hartid;
-+    PLICMode mode;
-+} PLICAddr;
-+
-+typedef struct SiFivePLICState {
-+    /*< private >*/
-+    SysBusDevice parent_obj;
-+
-+    /*< public >*/
++    hwaddr tohost_offset;
++    hwaddr fromhost_offset;
++    uint64_t tohost_size;
++    uint64_t fromhost_size;
++    qemu_irq irq; /* host interrupt line */
 +    MemoryRegion mmio;
-+    uint32_t num_addrs;
-+    uint32_t bitfield_words;
-+    PLICAddr *addr_config;
-+    uint32_t *source_priority;
-+    uint32_t *target_priority;
-+    uint32_t *pending;
-+    uint32_t *claimed;
-+    uint32_t *enable;
-+    QemuMutex lock;
-+    qemu_irq *irqs;
++    MemoryRegion *address_space;
++    MemoryRegion *main_mem;
++    void *main_mem_ram_ptr;
 +
-+    /* config */
-+    char *hart_config;
-+    uint32_t num_sources;
-+    uint32_t num_priorities;
-+    uint32_t priority_base;
-+    uint32_t pending_base;
-+    uint32_t enable_base;
-+    uint32_t enable_stride;
-+    uint32_t context_base;
-+    uint32_t context_stride;
-+    uint32_t aperture_size;
-+} SiFivePLICState;
++    CPURISCVState *env;
++    CharBackend chr;
++    uint64_t pending_read;
++} HTIFState;
 +
-+void sifive_plic_raise_irq(SiFivePLICState *plic, uint32_t irq);
-+void sifive_plic_lower_irq(SiFivePLICState *plic, uint32_t irq);
++extern const VMStateDescription vmstate_htif;
++extern const MemoryRegionOps htif_io_ops;
 +
-+DeviceState *sifive_plic_create(hwaddr addr, char *hart_config,
-+    uint32_t num_sources, uint32_t num_priorities,
-+    uint32_t priority_base, uint32_t pending_base,
-+    uint32_t enable_base, uint32_t enable_stride,
-+    uint32_t context_base, uint32_t context_stride,
-+    uint32_t aperture_size);
++/* legacy pre qom */
++HTIFState *htif_mm_init(MemoryRegion *address_space,
++    const char *kernel_filename, qemu_irq irq, MemoryRegion *main_mem,
++    CPURISCVState *env, Chardev *chr);
 +
 +#endif
-+
 -- 
 2.7.0
