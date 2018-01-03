@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47928)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47953)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eWgoB-0003Ek-TR
-	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 06:02:08 -0500
+	id 1eWgoE-0003H9-EN
+	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 06:02:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eWgoB-0005zi-1D
-	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 06:02:07 -0500
-Received: from mail-qk0-x244.google.com ([2607:f8b0:400d:c09::244]:35451)
+	id 1eWgoD-00061O-Oa
+	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 06:02:10 -0500
+Received: from mail-qt0-x243.google.com ([2607:f8b0:400d:c0d::243]:39883)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eWgoA-0005zW-T0
-	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 06:02:06 -0500
-Received: by mail-qk0-x244.google.com with SMTP id 143so1051164qki.2
-	for <qemu-devel@nongnu.org>; Wed, 03 Jan 2018 03:02:06 -0800 (PST)
+	id 1eWgoD-000614-L5
+	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 06:02:09 -0500
+Received: by mail-qt0-x243.google.com with SMTP id k19so1631632qtj.6
+	for <qemu-devel@nongnu.org>; Wed, 03 Jan 2018 03:02:09 -0800 (PST)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Wed,  3 Jan 2018 08:01:20 -0300
-Message-Id: <20180103110126.29209-12-f4bug@amsat.org>
+Date: Wed,  3 Jan 2018 08:01:21 -0300
+Message-Id: <20180103110126.29209-13-f4bug@amsat.org>
 In-Reply-To: <20180103110126.29209-1-f4bug@amsat.org>
 References: <20180103110126.29209-1-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v4 11/17] sdhci: move MASK_TRNMOD with other
- SDHC_TRN* defines in "sd-internal.h"
+Subject: [Qemu-devel] [PATCH v4 12/17] sdhci: use FIELD_DP32() macro for the
+ WRITE_PROTECT flag
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,48 +34,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alistair Francis <alistair.francis@xilinx.com>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, Fam Zheng <famz@redhat.com>, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, Peter Maydell <peter.maydell@linaro.org>, Andrey Smirnov <andrew.smirnov@gmail.com>, Eduardo Habkost <ehabkost@redhat.com>
+To: Alistair Francis <alistair.francis@xilinx.com>, Fam Zheng <famz@redhat.com>
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, Peter Maydell <peter.maydell@linaro.org>, Andrey Smirnov <andrew.smirnov@gmail.com>, Eduardo Habkost <ehabkost@redhat.com>
 
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Reviewed-by: Alistair Francis <alistair.francis@xilinx.com>
 ---
- hw/sd/sdhci-internal.h | 1 +
- hw/sd/sdhci.c          | 3 +--
- 2 files changed, 2 insertions(+), 2 deletions(-)
+ hw/sd/sdhci-internal.h | 6 ++++--
+ hw/sd/sdhci.c          | 8 ++------
+ 2 files changed, 6 insertions(+), 8 deletions(-)
 
 diff --git a/hw/sd/sdhci-internal.h b/hw/sd/sdhci-internal.h
-index 248fd027f9..e941bc2386 100644
+index e941bc2386..df240ea046 100644
 --- a/hw/sd/sdhci-internal.h
 +++ b/hw/sd/sdhci-internal.h
-@@ -43,6 +43,7 @@
- #define SDHC_TRNS_ACMD12               0x0004
- #define SDHC_TRNS_READ                 0x0010
- #define SDHC_TRNS_MULTI                0x0020
-+#define SDHC_TRNMOD_MASK               0x0037
+@@ -24,6 +24,8 @@
+ #ifndef SDHCI_INTERNAL_H
+ #define SDHCI_INTERNAL_H
  
- /* R/W Command Register 0x0 */
- #define SDHC_CMDREG                    0x0E
++#include "hw/registerfields.h"
++
+ /* R/W SDMA System Address register 0x0 */
+ #define SDHC_SYSAD                     0x00
+ 
+@@ -77,8 +79,8 @@
+ #define SDHC_SPACE_AVAILABLE           0x00000400
+ #define SDHC_DATA_AVAILABLE            0x00000800
+ #define SDHC_CARD_PRESENT              0x00010000
+-#define SDHC_CARD_DETECT               0x00040000
+-#define SDHC_WRITE_PROTECT             0x00080000
++FIELD(SDHC_PRNSTS, CARD_DETECT,        18, 1);
++FIELD(SDHC_PRNSTS, WRITE_PROTECT,      19, 1);
+ #define TRANSFERRING_DATA(x)           \
+     ((x) & (SDHC_DOING_READ | SDHC_DOING_WRITE))
+ 
 diff --git a/hw/sd/sdhci.c b/hw/sd/sdhci.c
-index 3f550bc7df..dd42820a38 100644
+index dd42820a38..586db181e3 100644
 --- a/hw/sd/sdhci.c
 +++ b/hw/sd/sdhci.c
-@@ -99,7 +99,6 @@
-     (SDHC_CAPAB_BASECLKFREQ << 8) | (SDHC_CAPAB_TOUNIT << 7) | \
-     (SDHC_CAPAB_TOCLKFREQ))
+@@ -160,12 +160,8 @@ static void sdhci_set_readonly(DeviceState *dev, bool level)
+ {
+     SDHCIState *s = (SDHCIState *)dev;
  
--#define MASK_TRNMOD     0x0037
- #define MASKED_WRITE(reg, mask, val)  (reg = (reg & (mask)) | (val))
+-    if (level) {
+-        s->prnsts &= ~SDHC_WRITE_PROTECT;
+-    } else {
+-        /* Write enabled */
+-        s->prnsts |= SDHC_WRITE_PROTECT;
+-    }
++    /* Write enabled */
++    s->prnsts = FIELD_DP32(s->prnsts, SDHC_PRNSTS, WRITE_PROTECT, level);
+ }
  
- static uint8_t sdhci_slotint(SDHCIState *s)
-@@ -1036,7 +1035,7 @@ sdhci_write(void *opaque, hwaddr offset, uint64_t val, unsigned size)
-         if (!(s->capareg & SDHC_CAN_DO_DMA)) {
-             value &= ~SDHC_TRNS_DMA;
-         }
--        MASKED_WRITE(s->trnmod, mask, value & MASK_TRNMOD);
-+        MASKED_WRITE(s->trnmod, mask, value & SDHC_TRNMOD_MASK);
-         MASKED_WRITE(s->cmdreg, mask >> 16, value >> 16);
- 
-         /* Writing to the upper byte of CMDREG triggers SD command generation */
+ static void sdhci_reset(SDHCIState *s)
 -- 
 2.15.1
