@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58952)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59017)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mjc@sifive.com>) id 1eWXD1-0005xI-Q8
-	for qemu-devel@nongnu.org; Tue, 02 Jan 2018 19:47:12 -0500
+	(envelope-from <mjc@sifive.com>) id 1eWXD8-00061q-Er
+	for qemu-devel@nongnu.org; Tue, 02 Jan 2018 19:47:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mjc@sifive.com>) id 1eWXCz-0008FM-6Y
-	for qemu-devel@nongnu.org; Tue, 02 Jan 2018 19:47:07 -0500
-Received: from mail-pf0-x243.google.com ([2607:f8b0:400e:c00::243]:45418)
+	(envelope-from <mjc@sifive.com>) id 1eWXD7-0008JS-4E
+	for qemu-devel@nongnu.org; Tue, 02 Jan 2018 19:47:14 -0500
+Received: from mail-pl0-x242.google.com ([2607:f8b0:400e:c01::242]:42140)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mjc@sifive.com>) id 1eWXCy-0008Ev-UQ
-	for qemu-devel@nongnu.org; Tue, 02 Jan 2018 19:47:05 -0500
-Received: by mail-pf0-x243.google.com with SMTP id u19so73322pfa.12
-	for <qemu-devel@nongnu.org>; Tue, 02 Jan 2018 16:47:04 -0800 (PST)
+	(Exim 4.71) (envelope-from <mjc@sifive.com>) id 1eWXD6-0008J9-SW
+	for qemu-devel@nongnu.org; Tue, 02 Jan 2018 19:47:13 -0500
+Received: by mail-pl0-x242.google.com with SMTP id bd8so136067plb.9
+	for <qemu-devel@nongnu.org>; Tue, 02 Jan 2018 16:47:12 -0800 (PST)
 From: Michael Clark <mjc@sifive.com>
-Date: Wed,  3 Jan 2018 13:44:19 +1300
-Message-Id: <1514940265-18093-16-git-send-email-mjc@sifive.com>
+Date: Wed,  3 Jan 2018 13:44:22 +1300
+Message-Id: <1514940265-18093-19-git-send-email-mjc@sifive.com>
 In-Reply-To: <1514940265-18093-1-git-send-email-mjc@sifive.com>
 References: <1514940265-18093-1-git-send-email-mjc@sifive.com>
-Subject: [Qemu-devel] [PATCH v1 15/21] RISC-V Spike Machines
+Subject: [Qemu-devel] [PATCH v1 18/21] SiFive RISC-V PRCI Block
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,41 +28,29 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Michael Clark <mjc@sifive.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
 
-RISC-V machines compatble with Spike aka riscv-isa-sim, the RISC-V
-Instruction Set Simulator. The following machines are implemented:
-
-- 'spike_v1.9'; HTIF console, config-string, Privileged ISA Version 1.9.1
-- 'spike_v1.10'; HTIF console, device-tree, Privileged ISA Version 1.10
+Simple model of the PRCI  (Power, Reset, Clock, Interrupt) to emulate
+register reads made by the SDK BSP.
 
 Signed-off-by: Michael Clark <mjc@sifive.com>
 ---
- hw/riscv/spike_v1_09.c   | 207 ++++++++++++++++++++++++++++++++++
- hw/riscv/spike_v1_10.c   | 281 +++++++++++++++++++++++++++++++++++++++++++++++
- include/hw/riscv/spike.h |  51 +++++++++
- 3 files changed, 539 insertions(+)
- create mode 100644 hw/riscv/spike_v1_09.c
- create mode 100644 hw/riscv/spike_v1_10.c
- create mode 100644 include/hw/riscv/spike.h
+ hw/riscv/sifive_prci.c         | 107 +++++++++++++++++++++++++++++++++++++++++
+ include/hw/riscv/sifive_prci.h |  43 +++++++++++++++++
+ 2 files changed, 150 insertions(+)
+ create mode 100644 hw/riscv/sifive_prci.c
+ create mode 100644 include/hw/riscv/sifive_prci.h
 
-diff --git a/hw/riscv/spike_v1_09.c b/hw/riscv/spike_v1_09.c
+diff --git a/hw/riscv/sifive_prci.c b/hw/riscv/sifive_prci.c
 new file mode 100644
-index 0000000..9b32c6a
+index 0000000..5c27696
 --- /dev/null
-+++ b/hw/riscv/spike_v1_09.c
-@@ -0,0 +1,207 @@
++++ b/hw/riscv/sifive_prci.c
+@@ -0,0 +1,107 @@
 +/*
-+ * QEMU RISC-V Spike Board
++ * QEMU SiFive PRCI (Power, Reset, Clock, Interrupt)
 + *
-+ * Author: Sagar Karandikar, sagark@eecs.berkeley.edu
++ * Copyright (c) 2017 SiFive, Inc.
 + *
-+ * This provides a RISC-V Board with the following devices:
-+ *
-+ * 0) HTIF Test Pass/Fail Reporting (no syscall proxy)
-+ * 1) HTIF Console
-+ *
-+ * These are created by htif_mm_init below.
-+ *
-+ * This board currently uses a hardcoded devicetree that indicates one hart.
++ * Simple model of the PRCI to emulate register reads made by the SDK BSP
 + *
 + * Permission is hereby granted, free of charge, to any person obtaining a copy
 + * of this software and associated documentation files (the "Software"), to deal
@@ -84,474 +72,94 @@ index 0000000..9b32c6a
 + */
 +
 +#include "qemu/osdep.h"
-+#include "qemu/log.h"
-+#include "qemu/error-report.h"
-+#include "hw/hw.h"
-+#include "hw/boards.h"
-+#include "hw/loader.h"
 +#include "hw/sysbus.h"
 +#include "target/riscv/cpu.h"
-+#include "hw/riscv/riscv_htif.h"
-+#include "hw/riscv/riscv_hart.h"
-+#include "hw/riscv/sifive_clint.h"
-+#include "hw/riscv/spike.h"
-+#include "chardev/char.h"
-+#include "sysemu/arch_init.h"
-+#include "exec/address-spaces.h"
-+#include "elf.h"
++#include "hw/riscv/sifive_prci.h"
 +
-+static const struct MemmapEntry {
-+    hwaddr base;
-+    hwaddr size;
-+} spike_memmap[] = {
-+    [SPIKE_MROM] =     {     0x1000,     0x2000 },
-+    [SPIKE_CLINT] =    {  0x2000000,    0x10000 },
-+    [SPIKE_DRAM] =     { 0x80000000,        0x0 },
-+};
++/* currently implements enough to mock freedom-e-sdk BSP clock programming */
 +
-+static uint64_t identity_translate(void *opaque, uint64_t addr)
++static uint64_t sifive_prci_read(void *opaque, hwaddr addr, unsigned int size)
 +{
-+    return addr;
-+}
-+
-+static uint64_t load_kernel(const char *kernel_filename)
-+{
-+    uint64_t kernel_entry, kernel_high;
-+
-+    if (load_elf(kernel_filename, identity_translate, NULL,
-+                 &kernel_entry, NULL, &kernel_high,
-+                 /* little_endian = */ 0, ELF_MACHINE, 1, 0) < 0) {
-+        error_report("qemu: could not load kernel '%s'", kernel_filename);
-+        exit(1);
++    if (addr == 0 /* PRCI_HFROSCCFG */) {
++        return 1 << 31; /* ROSC_RDY */
 +    }
-+    return kernel_entry;
-+}
-+
-+static void riscv_spike_board_init(MachineState *machine)
-+{
-+    const struct MemmapEntry *memmap = spike_memmap;
-+
-+    SpikeState *s = g_new0(SpikeState, 1);
-+    /* const char *cpu_model = machine->cpu_model; */
-+    /* const char *kernel_cmdline = machine->kernel_cmdline; */
-+    /* const char *initrd_filename = machine->initrd_filename; */
-+    MemoryRegion *system_memory = get_system_memory();
-+    MemoryRegion *main_mem = g_new(MemoryRegion, 1);
-+    MemoryRegion *boot_rom = g_new(MemoryRegion, 1);
-+
-+    /* Initialize SOC */
-+    object_initialize(&s->soc, sizeof(s->soc), TYPE_RISCV_HART_ARRAY);
-+    object_property_add_child(OBJECT(machine), "soc", OBJECT(&s->soc),
-+                              &error_abort);
-+    object_property_set_str(OBJECT(&s->soc), TYPE_RISCV_CPU_IMAFDCSU_PRIV_1_09,
-+                            "cpu-model", &error_abort);
-+    object_property_set_int(OBJECT(&s->soc), smp_cpus, "num-harts",
-+                            &error_abort);
-+    object_property_set_bool(OBJECT(&s->soc), true, "realized",
-+                            &error_abort);
-+
-+    /* register system main memory (actual RAM) */
-+    memory_region_init_ram(main_mem, NULL, "riscv.spike.ram",
-+                           machine->ram_size, &error_fatal);
-+    memory_region_add_subregion(system_memory, DRAM_BASE, main_mem);
-+
-+    /* boot rom */
-+    memory_region_init_ram(boot_rom, NULL, "riscv.spike.bootrom",
-+                           0x40000, &error_fatal);
-+    memory_region_add_subregion(system_memory, 0x0, boot_rom);
-+
-+    if (machine->kernel_filename) {
-+        load_kernel(machine->kernel_filename);
++    if (addr == 8 /* PRCI_PLLCFG    */) {
++        return 1 << 31; /* PLL_LOCK */
 +    }
-+
-+    uint32_t reset_vec[8] = {
-+        0x297 + memmap[SPIKE_DRAM].base - memmap[SPIKE_MROM].base, /* lui */
-+        0x00028067,                   /* jump to DRAM_BASE */
-+        0x00000000,                   /* reserved */
-+        memmap[SPIKE_MROM].base + sizeof(reset_vec), /* config string pointer */
-+        0, 0, 0, 0                    /* trap vector */
-+    };
-+
-+    /* part one of config string - before memory size specified */
-+    const char *config_string_tmpl =
-+        "platform {\n"
-+        "  vendor ucb;\n"
-+        "  arch spike;\n"
-+        "};\n"
-+        "rtc {\n"
-+        "  addr 0x" "40000000" ";\n"
-+        "};\n"
-+        "ram {\n"
-+        "  0 {\n"
-+        "    addr 0x" "80000000" ";\n"
-+        "    size 0x" "%016" PRIx64 ";\n"
-+        "  };\n"
-+        "};\n"
-+        "core {\n"
-+        "  0" " {\n"
-+        "    " "0 {\n"
-+        "      isa " "rv64imafd" ";\n"
-+        "      timecmp 0x" "40000008" ";\n"
-+        "      ipi 0x" "40001000" ";\n" /* match dummy ipi region above */
-+        "    };\n"
-+        "  };\n"
-+        "};\n";
-+
-+    /* build config string with supplied memory size */
-+    size_t config_string_size = strlen(config_string_tmpl) + 16;
-+    char *config_string = malloc(config_string_size);
-+    snprintf(config_string, config_string_size,
-+        config_string_tmpl, (uint64_t)ram_size);
-+    size_t config_string_len = strlen(config_string);
-+
-+    /* copy in the reset vector */
-+    cpu_physical_memory_write(memmap[SPIKE_MROM].base, reset_vec,
-+        sizeof(reset_vec));
-+
-+    /* copy in the config string */
-+    cpu_physical_memory_write(memmap[SPIKE_MROM].base + sizeof(reset_vec),
-+        config_string, config_string_len);
-+
-+    /* add memory mapped htif registers at location specified in the symbol
-+       table of the elf being loaded (thus kernel_filename is passed to the
-+       init rather than an address) */
-+    htif_mm_init(system_memory, machine->kernel_filename,
-+        s->soc.harts[0].env.irq[4], boot_rom,
-+        &s->soc.harts[0].env, serial_hds[0]);
-+
-+    /* Core Local Interruptor (timer and IPI) */
-+    sifive_clint_create(0x40000000, 0x2000, smp_cpus, 0x1000, 0x8, 0x0);
-+}
-+
-+static int riscv_spike_board_sysbus_device_init(SysBusDevice *sysbusdev)
-+{
++    hw_error("%s: read: addr=0x%x\n", __func__, (int)addr);
 +    return 0;
 +}
 +
-+static void riscv_spike_board_class_init(ObjectClass *klass, void *data)
++static void sifive_prci_write(void *opaque, hwaddr addr,
++           uint64_t val64, unsigned int size)
 +{
-+    SysBusDeviceClass *k = SYS_BUS_DEVICE_CLASS(klass);
-+    k->init = riscv_spike_board_sysbus_device_init;
++    /* discard writes */
 +}
 +
-+static const TypeInfo riscv_spike_board_device = {
-+    .name          = TYPE_RISCV_SPIKE_V1_09_1_BOARD,
-+    .parent        = TYPE_SYS_BUS_DEVICE,
-+    .instance_size = sizeof(SpikeState),
-+    .class_init    = riscv_spike_board_class_init,
++static const MemoryRegionOps sifive_prci_ops = {
++    .read = sifive_prci_read,
++    .write = sifive_prci_write,
++    .endianness = DEVICE_NATIVE_ENDIAN,
++    .valid = {
++        .min_access_size = 4,
++        .max_access_size = 4
++    }
 +};
 +
-+static void riscv_spike_board_machine_init(MachineClass *mc)
++static Property sifive_prci_properties[] = {
++    DEFINE_PROP_END_OF_LIST(),
++};
++
++static void sifive_prci_init(Object *obj)
 +{
-+    mc->desc = "RISC-V Spike Board (Privileged ISA v1.9.1)";
-+    mc->init = riscv_spike_board_init;
-+    mc->max_cpus = 1;
-+    mc->is_default = 1;
++    SiFivePRCIState *s = SIFIVE_PRCI(obj);
++
++    memory_region_init_io(&s->mmio, obj, &sifive_prci_ops, s,
++                          TYPE_SIFIVE_PRCI, 0x8000);
++    sysbus_init_mmio(SYS_BUS_DEVICE(obj), &s->mmio);
 +}
 +
-+DEFINE_MACHINE("spike_v1.9", riscv_spike_board_machine_init)
-+
-+static void riscv_spike_board_register_types(void)
++static void sifive_prci_class_init(ObjectClass *klass, void *data)
 +{
-+    type_register_static(&riscv_spike_board_device);
++    DeviceClass *dc = DEVICE_CLASS(klass);
++
++    dc->props = sifive_prci_properties;
 +}
 +
-+type_init(riscv_spike_board_register_types);
-diff --git a/hw/riscv/spike_v1_10.c b/hw/riscv/spike_v1_10.c
-new file mode 100644
-index 0000000..4edff49
---- /dev/null
-+++ b/hw/riscv/spike_v1_10.c
-@@ -0,0 +1,281 @@
++static const TypeInfo sifive_prci_info = {
++    .name          = TYPE_SIFIVE_PRCI,
++    .parent        = TYPE_SYS_BUS_DEVICE,
++    .instance_size = sizeof(SiFivePRCIState),
++    .instance_init = sifive_prci_init,
++    .class_init    = sifive_prci_class_init,
++};
++
++static void sifive_prci_register_types(void)
++{
++    type_register_static(&sifive_prci_info);
++}
++
++type_init(sifive_prci_register_types)
++
++
 +/*
-+ * QEMU RISC-V Spike Board
-+ *
-+ * Author: Sagar Karandikar, sagark@eecs.berkeley.edu
-+ * Author: Michael Clark, mjc@sifive.com
-+ *
-+ * This provides a RISC-V Board with the following devices:
-+ *
-+ * 0) HTIF Test Pass/Fail Reporting (no syscall proxy)
-+ * 1) HTIF Console
-+ *
-+ * These are created by htif_mm_init below.
-+ *
-+ * Permission is hereby granted, free of charge, to any person obtaining a copy
-+ * of this software and associated documentation files (the "Software"), to deal
-+ * in the Software without restriction, including without limitation the rights
-+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-+ * copies of the Software, and to permit persons to whom the Software is
-+ * furnished to do so, subject to the following conditions:
-+ *
-+ * The above copyright notice and this permission notice shall be included in
-+ * all copies or substantial portions of the Software.
-+ *
-+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-+ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-+ * THE SOFTWARE.
++ * Create PRCI device.
 + */
-+
-+#include "qemu/osdep.h"
-+#include "qemu/log.h"
-+#include "qemu/error-report.h"
-+#include "hw/hw.h"
-+#include "hw/boards.h"
-+#include "hw/loader.h"
-+#include "hw/sysbus.h"
-+#include "target/riscv/cpu.h"
-+#include "hw/riscv/riscv_htif.h"
-+#include "hw/riscv/riscv_hart.h"
-+#include "hw/riscv/sifive_clint.h"
-+#include "hw/riscv/spike.h"
-+#include "chardev/char.h"
-+#include "sysemu/arch_init.h"
-+#include "sysemu/device_tree.h"
-+#include "exec/address-spaces.h"
-+#include "elf.h"
-+
-+static const struct MemmapEntry {
-+    hwaddr base;
-+    hwaddr size;
-+} spike_memmap[] = {
-+    [SPIKE_MROM] =     {     0x1000,     0x2000 },
-+    [SPIKE_CLINT] =    {  0x2000000,    0x10000 },
-+    [SPIKE_DRAM] =     { 0x80000000,        0x0 },
-+};
-+
-+static uint64_t identity_translate(void *opaque, uint64_t addr)
++DeviceState *sifive_prci_create(hwaddr addr)
 +{
-+    return addr;
++    DeviceState *dev = qdev_create(NULL, TYPE_SIFIVE_PRCI);
++    qdev_init_nofail(dev);
++    sysbus_mmio_map(SYS_BUS_DEVICE(dev), 0, addr);
++    return dev;
 +}
-+
-+static uint64_t load_kernel(const char *kernel_filename)
-+{
-+    uint64_t kernel_entry, kernel_high;
-+
-+    if (load_elf(kernel_filename, identity_translate, NULL,
-+                 &kernel_entry, NULL, &kernel_high,
-+                 /* little_endian = */ 0, ELF_MACHINE, 1, 0) < 0) {
-+        error_report("qemu: could not load kernel '%s'", kernel_filename);
-+        exit(1);
-+    }
-+    return kernel_entry;
-+}
-+
-+static void create_fdt(SpikeState *s, const struct MemmapEntry *memmap,
-+    uint64_t mem_size, const char *cmdline)
-+{
-+    void *fdt;
-+    int cpu;
-+    uint32_t *cells;
-+    char *nodename;
-+
-+    fdt = s->fdt = create_device_tree(&s->fdt_size);
-+    if (!fdt) {
-+        error_report("create_device_tree() failed");
-+        exit(1);
-+    }
-+
-+    qemu_fdt_setprop_string(fdt, "/", "model", "ucbbar,spike-bare,qemu");
-+    qemu_fdt_setprop_string(fdt, "/", "compatible", "ucbbar,spike-bare-dev");
-+    qemu_fdt_setprop_cell(fdt, "/", "#size-cells", 0x2);
-+    qemu_fdt_setprop_cell(fdt, "/", "#address-cells", 0x2);
-+
-+    qemu_fdt_add_subnode(fdt, "/htif");
-+    qemu_fdt_setprop_string(fdt, "/htif", "compatible", "ucb,htif0");
-+
-+    qemu_fdt_add_subnode(fdt, "/soc");
-+    qemu_fdt_setprop(fdt, "/soc", "ranges", NULL, 0);
-+    qemu_fdt_setprop_string(fdt, "/soc", "compatible", "ucbbar,spike-bare-soc");
-+    qemu_fdt_setprop_cell(fdt, "/soc", "#size-cells", 0x2);
-+    qemu_fdt_setprop_cell(fdt, "/soc", "#address-cells", 0x2);
-+
-+    nodename = g_strdup_printf("/memory@%lx",
-+        (long)memmap[SPIKE_DRAM].base);
-+    qemu_fdt_add_subnode(fdt, nodename);
-+    qemu_fdt_setprop_cells(fdt, nodename, "reg",
-+        memmap[SPIKE_DRAM].base >> 32, memmap[SPIKE_DRAM].base,
-+        mem_size >> 32, mem_size);
-+    qemu_fdt_setprop_string(fdt, nodename, "device_type", "memory");
-+    g_free(nodename);
-+
-+    qemu_fdt_add_subnode(fdt, "/cpus");
-+    qemu_fdt_setprop_cell(fdt, "/cpus", "timebase-frequency", 10000000);
-+    qemu_fdt_setprop_cell(fdt, "/cpus", "#size-cells", 0x0);
-+    qemu_fdt_setprop_cell(fdt, "/cpus", "#address-cells", 0x1);
-+
-+    for (cpu = s->soc.num_harts - 1; cpu >= 0; cpu--) {
-+        nodename = g_strdup_printf("/cpus/cpu@%d", cpu);
-+        char *intc = g_strdup_printf("/cpus/cpu@%d/interrupt-controller", cpu);
-+        char *isa = riscv_isa_string(&s->soc.harts[cpu]);
-+        qemu_fdt_add_subnode(fdt, nodename);
-+        qemu_fdt_setprop_cell(fdt, nodename, "clock-frequency", 1000000000);
-+        qemu_fdt_setprop_string(fdt, nodename, "mmu-type", "riscv,sv48");
-+        qemu_fdt_setprop_string(fdt, nodename, "riscv,isa", isa);
-+        qemu_fdt_setprop_string(fdt, nodename, "compatible", "riscv");
-+        qemu_fdt_setprop_string(fdt, nodename, "status", "okay");
-+        qemu_fdt_setprop_cell(fdt, nodename, "reg", cpu);
-+        qemu_fdt_setprop_string(fdt, nodename, "device_type", "cpu");
-+        qemu_fdt_add_subnode(fdt, intc);
-+        qemu_fdt_setprop_cell(fdt, intc, "phandle", 1);
-+        qemu_fdt_setprop_cell(fdt, intc, "linux,phandle", 1);
-+        qemu_fdt_setprop_string(fdt, intc, "compatible", "riscv,cpu-intc");
-+        qemu_fdt_setprop(fdt, intc, "interrupt-controller", NULL, 0);
-+        qemu_fdt_setprop_cell(fdt, intc, "#interrupt-cells", 1);
-+        g_free(isa);
-+        g_free(intc);
-+        g_free(nodename);
-+    }
-+
-+    cells =  g_new0(uint32_t, s->soc.num_harts * 4);
-+    for (cpu = 0; cpu < s->soc.num_harts; cpu++) {
-+        nodename =
-+            g_strdup_printf("/cpus/cpu@%d/interrupt-controller", cpu);
-+        uint32_t intc_phandle = qemu_fdt_get_phandle(fdt, nodename);
-+        cells[cpu * 4 + 0] = cpu_to_be32(intc_phandle);
-+        cells[cpu * 4 + 1] = cpu_to_be32(IRQ_M_SOFT);
-+        cells[cpu * 4 + 2] = cpu_to_be32(intc_phandle);
-+        cells[cpu * 4 + 3] = cpu_to_be32(IRQ_M_TIMER);
-+        g_free(nodename);
-+    }
-+    nodename = g_strdup_printf("/soc/clint@%lx",
-+        (long)memmap[SPIKE_CLINT].base);
-+    qemu_fdt_add_subnode(fdt, nodename);
-+    qemu_fdt_setprop_string(fdt, nodename, "compatible", "riscv,clint0");
-+    qemu_fdt_setprop_cells(fdt, nodename, "reg",
-+        0x0, memmap[SPIKE_CLINT].base,
-+        0x0, memmap[SPIKE_CLINT].size);
-+    qemu_fdt_setprop(fdt, nodename, "interrupts-extended",
-+        cells, s->soc.num_harts * sizeof(uint32_t) * 4);
-+    g_free(cells);
-+    g_free(nodename);
-+
-+    qemu_fdt_add_subnode(fdt, "/chosen");
-+    qemu_fdt_setprop_string(fdt, "/chosen", "bootargs", cmdline);
-+ }
-+
-+static void riscv_spike_board_init(MachineState *machine)
-+{
-+    const struct MemmapEntry *memmap = spike_memmap;
-+
-+    SpikeState *s = g_new0(SpikeState, 1);
-+    /* const char *cpu_model = machine->cpu_model; */
-+    /* const char *kernel_cmdline = machine->kernel_cmdline; */
-+    /* const char *initrd_filename = machine->initrd_filename; */
-+    MemoryRegion *system_memory = get_system_memory();
-+    MemoryRegion *main_mem = g_new(MemoryRegion, 1);
-+    MemoryRegion *boot_rom = g_new(MemoryRegion, 1);
-+
-+    /* Initialize SOC */
-+    object_initialize(&s->soc, sizeof(s->soc), TYPE_RISCV_HART_ARRAY);
-+    object_property_add_child(OBJECT(machine), "soc", OBJECT(&s->soc),
-+                              &error_abort);
-+    object_property_set_str(OBJECT(&s->soc), TYPE_RISCV_CPU_IMAFDCSU_PRIV_1_10,
-+                            "cpu-model", &error_abort);
-+    object_property_set_int(OBJECT(&s->soc), smp_cpus, "num-harts",
-+                            &error_abort);
-+    object_property_set_bool(OBJECT(&s->soc), true, "realized",
-+                            &error_abort);
-+
-+    /* register system main memory (actual RAM) */
-+    memory_region_init_ram(main_mem, NULL, "riscv.spike.ram",
-+                           machine->ram_size, &error_fatal);
-+    memory_region_add_subregion(system_memory, memmap[SPIKE_DRAM].base,
-+        main_mem);
-+
-+    /* create device tree */
-+    create_fdt(s, memmap, machine->ram_size, machine->kernel_cmdline);
-+
-+    /* boot rom */
-+    memory_region_init_ram(boot_rom, NULL, "riscv.spike.bootrom",
-+                           s->fdt_size + 0x2000, &error_fatal);
-+    memory_region_add_subregion(system_memory, 0x0, boot_rom);
-+
-+    if (machine->kernel_filename) {
-+        load_kernel(machine->kernel_filename);
-+    }
-+
-+    /* reset vector */
-+    uint32_t reset_vec[8] = {
-+        0x00000297,                  /* 1:  auipc  t0, %pcrel_hi(dtb) */
-+        0x02028593,                  /*     addi   a1, t0, %pcrel_lo(1b) */
-+        0xf1402573,                  /*     csrr   a0, mhartid  */
-+#if defined(TARGET_RISCV32)
-+        0x0182a283,                  /*     lw     t0, 24(t0) */
-+#elif defined(TARGET_RISCV64)
-+        0x0182b283,                  /*     ld     t0, 24(t0) */
-+#endif
-+        0x00028067,                  /*     jr     t0 */
-+        0x00000000,
-+        memmap[SPIKE_DRAM].base,     /* start: .dword DRAM_BASE */
-+        0x00000000,
-+                                     /* dtb: */
-+    };
-+
-+    /* copy in the reset vector */
-+    cpu_physical_memory_write(memmap[SPIKE_MROM].base,
-+        reset_vec, sizeof(reset_vec));
-+
-+    /* copy in the device tree */
-+    qemu_fdt_dumpdtb(s->fdt, s->fdt_size);
-+    cpu_physical_memory_write(memmap[SPIKE_MROM].base + sizeof(reset_vec),
-+        s->fdt, s->fdt_size);
-+
-+    /* add memory mapped htif registers at location specified in the symbol
-+       table of the elf being loaded (thus kernel_filename is passed to the
-+       init rather than an address) */
-+    htif_mm_init(system_memory, machine->kernel_filename,
-+        s->soc.harts[0].env.irq[4], boot_rom,
-+        &s->soc.harts[0].env, serial_hds[0]);
-+
-+    /* Core Local Interruptor (timer and IPI) */
-+    sifive_clint_create(0x2000000, 0x10000, smp_cpus,
-+        SIFIVE_SIP_BASE, SIFIVE_TIMECMP_BASE, SIFIVE_TIME_BASE);
-+}
-+
-+static int riscv_spike_board_sysbus_device_init(SysBusDevice *sysbusdev)
-+{
-+    return 0;
-+}
-+
-+static void riscv_spike_board_class_init(ObjectClass *klass, void *data)
-+{
-+    SysBusDeviceClass *k = SYS_BUS_DEVICE_CLASS(klass);
-+    k->init = riscv_spike_board_sysbus_device_init;
-+}
-+
-+static const TypeInfo riscv_spike_board_device = {
-+    .name          = TYPE_RISCV_SPIKE_V1_10_0_BOARD,
-+    .parent        = TYPE_SYS_BUS_DEVICE,
-+    .instance_size = sizeof(SpikeState),
-+    .class_init    = riscv_spike_board_class_init,
-+};
-+
-+static void riscv_spike_board_machine_init(MachineClass *mc)
-+{
-+    mc->desc = "RISC-V Spike Board (Privileged ISA v1.10)";
-+    mc->init = riscv_spike_board_init;
-+    mc->max_cpus = 1;
-+}
-+
-+DEFINE_MACHINE("spike_v1.10", riscv_spike_board_machine_init)
-+
-+static void riscv_spike_board_register_types(void)
-+{
-+    type_register_static(&riscv_spike_board_device);
-+}
-+
-+type_init(riscv_spike_board_register_types);
-diff --git a/include/hw/riscv/spike.h b/include/hw/riscv/spike.h
+diff --git a/include/hw/riscv/sifive_prci.h b/include/hw/riscv/sifive_prci.h
 new file mode 100644
-index 0000000..cb4d6ac
+index 0000000..0e032e5
 --- /dev/null
-+++ b/include/hw/riscv/spike.h
-@@ -0,0 +1,51 @@
++++ b/include/hw/riscv/sifive_prci.h
+@@ -0,0 +1,43 @@
 +/*
-+ * SiFive U500 series machine interface
++ * QEMU SiFive PRCI (Power, Reset, Clock, Interrupt) interface
 + *
 + * Copyright (c) 2017 SiFive, Inc.
 + *
@@ -574,31 +182,23 @@ index 0000000..cb4d6ac
 + * THE SOFTWARE.
 + */
 +
-+#ifndef HW_SPIKE_H
-+#define HW_SPIKE_H
++#ifndef HW_SIFIVE_PRCI_H
++#define HW_SIFIVE_PRCI_H
 +
-+#define TYPE_RISCV_SPIKE_V1_09_1_BOARD "riscv.spike_v1_9"
-+#define TYPE_RISCV_SPIKE_V1_10_0_BOARD "riscv.spike_v1_10"
++#define TYPE_SIFIVE_PRCI "riscv.sifive.prci"
 +
-+#define SPIKE(obj) \
-+    OBJECT_CHECK(SpikeState, (obj), TYPE_RISCV_SPIKE_BOARD)
++#define SIFIVE_PRCI(obj) \
++    OBJECT_CHECK(SiFivePRCIState, (obj), TYPE_SIFIVE_PRCI)
 +
-+typedef struct {
++typedef struct SiFivePRCIState {
 +    /*< private >*/
 +    SysBusDevice parent_obj;
 +
 +    /*< public >*/
-+    RISCVHartArrayState soc;
-+    void *fdt;
-+    int fdt_size;
-+} SpikeState;
++    MemoryRegion mmio;
++} SiFivePRCIState;
 +
-+
-+enum {
-+    SPIKE_MROM,
-+    SPIKE_CLINT,
-+    SPIKE_DRAM
-+};
++DeviceState *sifive_prci_create(hwaddr addr);
 +
 +#endif
 -- 
