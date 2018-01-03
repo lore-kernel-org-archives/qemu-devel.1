@@ -1,28 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60181)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45121)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1eWdE6-00070M-CB
-	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 02:12:39 -0500
+	(envelope-from <famz@redhat.com>) id 1eWdlJ-0001Sv-MQ
+	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 02:46:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1eWdE0-0005og-PR
-	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 02:12:38 -0500
-Received: from mail-io0-x22e.google.com ([2607:f8b0:4001:c06::22e]:46757)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1eWdE0-0005nq-Hh
-	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 02:12:32 -0500
-Received: by mail-io0-x22e.google.com with SMTP id z130so1148817ioe.13
-	for <qemu-devel@nongnu.org>; Tue, 02 Jan 2018 23:12:32 -0800 (PST)
-References: <1514940265-18093-1-git-send-email-mjc@sifive.com>
-	<1514940265-18093-6-git-send-email-mjc@sifive.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <7b4c9965-d0c4-1b10-aa6d-553a3923d598@linaro.org>
-Date: Tue, 2 Jan 2018 23:12:27 -0800
+	(envelope-from <famz@redhat.com>) id 1eWdlF-00022p-Oe
+	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 02:46:57 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:36752)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1eWdlF-00022V-G5
+	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 02:46:53 -0500
+Date: Wed, 3 Jan 2018 15:46:50 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20180103074650.GB25984@localhost.localdomain>
+References: <20171229174933.1781-1-f4bug@amsat.org>
+	<20171229174933.1781-5-f4bug@amsat.org>
 MIME-Version: 1.0
-In-Reply-To: <1514940265-18093-6-git-send-email-mjc@sifive.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v1 05/21] RISC-V CPU Helpers
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <20171229174933.1781-5-f4bug@amsat.org>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v3 04/42] sdhci: refactor same sysbus/pci
+ properties into a common one
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,317 +29,95 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Michael Clark <mjc@sifive.com>, qemu-devel@nongnu.org
-Cc: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Sagar Karandikar <sagark@eecs.berkeley.edu>
+To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
+Cc: Alistair Francis <alistair.francis@xilinx.com>, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, Peter Maydell <peter.maydell@linaro.org>, Andrey Smirnov <andrew.smirnov@gmail.com>, Eduardo Habkost <ehabkost@redhat.com>, Xiaoqiang Zhao <zxq_yx_007@163.com>, qemu-devel@nongnu.org, Peter Crosthwaite <crosthwaite.peter@gmail.com>
 
-On 01/02/2018 04:44 PM, Michael Clark wrote:
-> +    target_ulong mode = env->priv;
-> +    if (access_type != MMU_INST_FETCH) {
-> +        if (get_field(env->mstatus, MSTATUS_MPRV)) {
-> +            mode = get_field(env->mstatus, MSTATUS_MPP);
-> +        }
-> +    }
-> +    if (env->priv_ver >= PRIV_VERSION_1_10_0) {
-> +        if (get_field(env->satp, SATP_MODE) == VM_1_09_MBARE) {
-> +            mode = PRV_M;
-> +        }
-> +    } else {
-> +        if (get_field(env->mstatus, MSTATUS_VM) == VM_1_10_MBARE) {
-> +            mode = PRV_M;
-> +        }
-> +    }
-
-This is replicating cpu_mmu_index.
-Therefore you should be relying on mmu_idx.
-
-> +    /* check to make sure that mmu_idx and mode that we get matches */
-> +    if (unlikely(mode != mmu_idx)) {
-> +        fprintf(stderr, "MODE: mmu_idx mismatch\n");
-> +        exit(1);
-> +    }
-
-As in the opposite of this.
-
+On Fri, 12/29 14:48, Philippe Mathieu-Daud=E9 wrote:
+> add sysbus/pci/sdbus separator comments to keep it clearer
+>=20
+> Signed-off-by: Philippe Mathieu-Daud=E9 <f4bug@amsat.org>
+> ---
+>  hw/sd/sdhci.c | 21 ++++++++++-----------
+>  1 file changed, 10 insertions(+), 11 deletions(-)
+>=20
+> diff --git a/hw/sd/sdhci.c b/hw/sd/sdhci.c
+> index 365bc80009..a11469fbca 100644
+> --- a/hw/sd/sdhci.c
+> +++ b/hw/sd/sdhci.c
+> @@ -1266,13 +1266,17 @@ const VMStateDescription sdhci_vmstate =3D {
+> =20
+>  /* Capabilities registers provide information on supported features of=
+ this
+>   * specific host controller implementation */
+> -static Property sdhci_pci_properties[] =3D {
+> +static Property sdhci_properties[] =3D {
+>      DEFINE_PROP_UINT32("capareg", SDHCIState, capareg,
+>              SDHC_CAPAB_REG_DEFAULT),
+>      DEFINE_PROP_UINT32("maxcurr", SDHCIState, maxcurr, 0),
+> +    DEFINE_PROP_BOOL("pending-insert-quirk", SDHCIState, pending_inser=
+t_quirk,
+> +                     false),
+>      DEFINE_PROP_END_OF_LIST(),
+>  };
+> =20
+> +/* --- qdev PCI --- */
 > +
-> +    if (mode == PRV_M) {
-> +        target_ulong msb_mask = /*0x7FFFFFFFFFFFFFFF; */
-> +            (((target_ulong)2) << (TARGET_LONG_BITS - 1)) - 1;
-> +        *physical = address & msb_mask;
+>  static void sdhci_pci_realize(PCIDevice *dev, Error **errp)
+>  {
+>      SDHCIState *s =3D PCI_SDHCI(dev);
+> @@ -1305,7 +1309,7 @@ static void sdhci_pci_class_init(ObjectClass *kla=
+ss, void *data)
+>      k->class_id =3D PCI_CLASS_SYSTEM_SDHCI;
+>      set_bit(DEVICE_CATEGORY_STORAGE, dc->categories);
+>      dc->vmsd =3D &sdhci_vmstate;
+> -    dc->props =3D sdhci_pci_properties;
+> +    dc->props =3D sdhci_properties;
+>      dc->reset =3D sdhci_poweron_reset;
+>  }
 
-Or perhaps extract64(address, 0, TARGET_LONG_BITS - 1)?
+This is effectively adding "pending-insert-quirk" property to the class. =
+If it
+is intended, should this be explained in the commit message?
 
-> +    if (env->priv_ver >= PRIV_VERSION_1_10_0) {
-> +        base = get_field(env->satp, SATP_PPN) << PGSHIFT;
-> +        sum = get_field(env->mstatus, MSTATUS_SUM);
-> +        vm = get_field(env->satp, SATP_MODE);
-> +        switch (vm) {
-> +        case VM_1_10_SV32:
-> +          levels = 2; ptidxbits = 10; ptesize = 4; break;
-> +        case VM_1_10_SV39:
-> +          levels = 3; ptidxbits = 9; ptesize = 8; break;
-> +        case VM_1_10_SV48:
-> +          levels = 4; ptidxbits = 9; ptesize = 8; break;
-> +        case VM_1_10_SV57:
-> +          levels = 5; ptidxbits = 9; ptesize = 8; break;
-> +        default:
-> +          printf("unsupported SATP_MODE value\n");
-> +          exit(1);
-
-Just qemu_log_mask with LOG_UNIMP or LOG_GUEST_ERROR, and then return
-TRANSLATE_FAIL.  Printing to stdout and exiting isn't kosher.  Lots more
-occurrences within this file.
-
-
-> +static void raise_mmu_exception(CPURISCVState *env, target_ulong address,
-> +                                MMUAccessType access_type)
-> +{
-> +    CPUState *cs = CPU(riscv_env_get_cpu(env));
-> +    int page_fault_exceptions =
-> +        (env->priv_ver >= PRIV_VERSION_1_10_0) &&
-> +        get_field(env->satp, SATP_MODE) != VM_1_10_MBARE;
-> +    int exception = 0;
-> +    if (access_type == MMU_INST_FETCH) { /* inst access */
-> +        exception = page_fault_exceptions ?
-> +            RISCV_EXCP_INST_PAGE_FAULT : RISCV_EXCP_INST_ACCESS_FAULT;
-> +        env->badaddr = address;
-> +    } else if (access_type == MMU_DATA_STORE) { /* store access */
-> +        exception = page_fault_exceptions ?
-> +            RISCV_EXCP_STORE_PAGE_FAULT : RISCV_EXCP_STORE_AMO_ACCESS_FAULT;
-> +        env->badaddr = address;
-> +    } else if (access_type == MMU_DATA_LOAD) { /* load access */
-> +        exception = page_fault_exceptions ?
-> +            RISCV_EXCP_LOAD_PAGE_FAULT : RISCV_EXCP_LOAD_ACCESS_FAULT;
-> +        env->badaddr = address;
-> +    } else {
-> +        fprintf(stderr, "FAIL: invalid access_type\n");
-> +        exit(1);
-
-Switch with a default: g_assert_not_reached(), since access_type is not
-controlled by the guest.
-
-> +void riscv_cpu_do_unaligned_access(CPUState *cs, vaddr addr,
-> +                                   MMUAccessType access_type, int mmu_idx,
-> +                                   uintptr_t retaddr)
-> +{
-> +    RISCVCPU *cpu = RISCV_CPU(cs);
-> +    CPURISCVState *env = &cpu->env;
-> +    if (access_type == MMU_INST_FETCH) {
-> +        fprintf(stderr, "unaligned inst fetch not handled here. should not "
-> +                "trigger\n");
-> +        exit(1);
-
-No exit.  Do something logical.
-
-> +    } else if (access_type == MMU_DATA_STORE) {
-> +        cs->exception_index = RISCV_EXCP_STORE_AMO_ADDR_MIS;
-> +        env->badaddr = addr;
-
-Why does STORE imply AMO?  Why can't a normal store trigger an unaligned trap?
-
-> +        fprintf(stderr, "Invalid MMUAccessType\n");
-> +        exit(1);
-
-I'll stop pointing these out, but there need to be zero instances of exit
-within the backend.
-
-> +void riscv_cpu_do_interrupt(CPUState *cs)
-> +{
-> +#if !defined(CONFIG_USER_ONLY)
+> =20
+> @@ -1320,14 +1324,7 @@ static const TypeInfo sdhci_pci_info =3D {
+>      },
+>  };
+> =20
+> -static Property sdhci_sysbus_properties[] =3D {
+> -    DEFINE_PROP_UINT32("capareg", SDHCIState, capareg,
+> -            SDHC_CAPAB_REG_DEFAULT),
+> -    DEFINE_PROP_UINT32("maxcurr", SDHCIState, maxcurr, 0),
+> -    DEFINE_PROP_BOOL("pending-insert-quirk", SDHCIState, pending_inser=
+t_quirk,
+> -                     false),
+> -    DEFINE_PROP_END_OF_LIST(),
+> -};
+> +/* --- qdev SysBus --- */
+> =20
+>  static void sdhci_sysbus_init(Object *obj)
+>  {
+> @@ -1360,7 +1357,7 @@ static void sdhci_sysbus_class_init(ObjectClass *=
+klass, void *data)
+>      DeviceClass *dc =3D DEVICE_CLASS(klass);
+> =20
+>      dc->vmsd =3D &sdhci_vmstate;
+> -    dc->props =3D sdhci_sysbus_properties;
+> +    dc->props =3D sdhci_properties;
+>      dc->realize =3D sdhci_sysbus_realize;
+>      dc->reset =3D sdhci_poweron_reset;
+>  }
+> @@ -1374,6 +1371,8 @@ static const TypeInfo sdhci_sysbus_info =3D {
+>      .class_init =3D sdhci_sysbus_class_init,
+>  };
+> =20
+> +/* --- qdev bus master --- */
 > +
-> +    RISCVCPU *cpu = RISCV_CPU(cs);
-> +    CPURISCVState *env = &cpu->env;
-> +
-> +    #ifdef RISCV_DEBUG_INTERRUPT
-> +    if (cs->exception_index & 0x70000000) {
-> +        fprintf(stderr, "core   0: exception trap_%s, epc 0x" TARGET_FMT_lx "\n"
-> +                , riscv_interrupt_names[cs->exception_index & 0x0fffffff],
-> +                env->pc);
-> +    } else {
-> +        fprintf(stderr, "core   0: exception trap_%s, epc 0x" TARGET_FMT_lx "\n"
-> +                , riscv_excp_names[cs->exception_index], env->pc);
-> +    }
-> +    #endif
-> +
-> +    if (cs->exception_index == RISCV_EXCP_BREAKPOINT) {
-> +        fprintf(stderr, "debug mode not implemented\n");
-> +    }
-> +
-> +    /* skip dcsr cause check */
-> +
-> +    target_ulong fixed_cause = 0;
-> +    if (cs->exception_index & (0x70000000)) {
-> +        /* hacky for now. the MSB (bit 63) indicates interrupt but cs->exception
-> +           index is only 32 bits wide */
-> +        fixed_cause = cs->exception_index & 0x0FFFFFFF;
-> +        fixed_cause |= ((target_ulong)1) << (TARGET_LONG_BITS - 1);
-> +    } else {
-> +        /* fixup User ECALL -> correct priv ECALL */
-> +        if (cs->exception_index == RISCV_EXCP_U_ECALL) {
-> +            switch (env->priv) {
-> +            case PRV_U:
-> +                fixed_cause = RISCV_EXCP_U_ECALL;
-> +                break;
-> +            case PRV_S:
-> +                fixed_cause = RISCV_EXCP_S_ECALL;
-> +                break;
-> +            case PRV_H:
-> +                fixed_cause = RISCV_EXCP_H_ECALL;
-> +                break;
-> +            case PRV_M:
-> +                fixed_cause = RISCV_EXCP_M_ECALL;
-> +                break;
-> +            }
-> +        } else {
-> +            fixed_cause = cs->exception_index;
-> +        }
-> +    }
-> +
-> +    target_ulong backup_epc = env->pc;
-> +
-> +    target_ulong bit = fixed_cause;
-> +    target_ulong deleg = env->medeleg;
-> +
-> +    int hasbadaddr =
-> +        (fixed_cause == RISCV_EXCP_INST_ADDR_MIS) ||
-> +        (fixed_cause == RISCV_EXCP_INST_ACCESS_FAULT) ||
-> +        (fixed_cause == RISCV_EXCP_LOAD_ADDR_MIS) ||
-> +        (fixed_cause == RISCV_EXCP_STORE_AMO_ADDR_MIS) ||
-> +        (fixed_cause == RISCV_EXCP_LOAD_ACCESS_FAULT) ||
-> +        (fixed_cause == RISCV_EXCP_STORE_AMO_ACCESS_FAULT) ||
-> +        (fixed_cause == RISCV_EXCP_INST_PAGE_FAULT) ||
-> +        (fixed_cause == RISCV_EXCP_LOAD_PAGE_FAULT) ||
-> +        (fixed_cause == RISCV_EXCP_STORE_PAGE_FAULT);
-> +
-> +    if (bit & ((target_ulong)1 << (TARGET_LONG_BITS - 1))) {
-> +        deleg = env->mideleg;
-> +        bit &= ~((target_ulong)1 << (TARGET_LONG_BITS - 1));
-> +    }
-> +
-> +    if (env->priv <= PRV_S && bit < 64 && ((deleg >> bit) & 1)) {
-> +        /* handle the trap in S-mode */
-> +        /* No need to check STVEC for misaligned - lower 2 bits cannot be set */
-> +        env->pc = env->stvec;
-> +        env->scause = fixed_cause;
-> +        env->sepc = backup_epc;
-> +
-> +        if (hasbadaddr) {
-> +            #ifdef RISCV_DEBUG_INTERRUPT
-> +            fprintf(stderr, "core %d: badaddr 0x" TARGET_FMT_lx "\n",
-> +                    env->mhartid, env->badaddr);
-> +            #endif
-> +            env->sbadaddr = env->badaddr;
-> +        }
-> +
-> +        target_ulong s = env->mstatus;
-> +        s = set_field(s, MSTATUS_SPIE, get_field(s, MSTATUS_UIE << env->priv));
-> +        s = set_field(s, MSTATUS_SPP, env->priv);
-> +        s = set_field(s, MSTATUS_SIE, 0);
-> +        csr_write_helper(env, s, CSR_MSTATUS);
-> +        set_privilege(env, PRV_S);
-> +    } else {
-> +        /* No need to check MTVEC for misaligned - lower 2 bits cannot be set */
-> +        env->pc = env->mtvec;
-> +        env->mepc = backup_epc;
-> +        env->mcause = fixed_cause;
-> +
-> +        if (hasbadaddr) {
-> +            #ifdef RISCV_DEBUG_INTERRUPT
-> +            fprintf(stderr, "core %d: badaddr 0x" TARGET_FMT_lx "\n",
-> +                    env->mhartid, env->badaddr);
-> +            #endif
-> +            env->mbadaddr = env->badaddr;
-> +        }
-> +
-> +        target_ulong s = env->mstatus;
-> +        s = set_field(s, MSTATUS_MPIE, get_field(s, MSTATUS_UIE << env->priv));
-> +        s = set_field(s, MSTATUS_MPP, env->priv);
-> +        s = set_field(s, MSTATUS_MIE, 0);
-> +        csr_write_helper(env, s, CSR_MSTATUS);
-> +        set_privilege(env, PRV_M);
-> +    }
-> +    /* TODO yield load reservation  */
-> +#endif
-> +    cs->exception_index = EXCP_NONE; /* mark handled to qemu */
-> +}
+>  static void sdhci_bus_class_init(ObjectClass *klass, void *data)
+>  {
+>      SDBusClass *sbc =3D SD_BUS_CLASS(klass);
+> --=20
+> 2.15.1
+>=20
 
-Marking handled is done generically.  Why do you need to do it here?
-
-> +/* Floating Point - fused */
-> +DEF_HELPER_FLAGS_5(fmadd_s, TCG_CALL_NO_RWG, i64, env, i64, i64, i64, i64)
-
-Ideally these would go in with the patch that adds the helpers, so they're
-easier to validate.  However, I suppose it doesn't really matter.
-
-> +void helper_raise_exception_mbadaddr(CPURISCVState *env, uint32_t exception,
-> +        target_ulong bad_pc) {
-
-Brace on next line.
-
-> +    #ifdef RISCV_DEBUG_PRINT
-> +    fprintf(stderr, "Write CSR reg: 0x" TARGET_FMT_lx "\n", csrno);
-> +    fprintf(stderr, "Write CSR val: 0x" TARGET_FMT_lx "\n", val_to_write);
-> +    #endif
-
-Drop the debugging prints.  Perhaps use the tracing infrastructure?
-
-> +    case CSR_MISA: {
-> +        if (!(val_to_write & (1L << ('F' - 'A')))) {
-> +            val_to_write &= ~(1L << ('D' - 'A'));
-> +        }
-> +
-> +        /* allow MAFDC bits in MISA to be modified */
-> +        target_ulong mask = 0;
-> +        mask |= 1L << ('M' - 'A');
-> +        mask |= 1L << ('A' - 'A');
-> +        mask |= 1L << ('F' - 'A');
-> +        mask |= 1L << ('D' - 'A');
-> +        mask |= 1L << ('C' - 'A');
-> +        mask &= env->misa_mask;
-> +
-> +        env->misa = (val_to_write & mask) | (env->misa & ~mask);
-
-Does this not affect the set of instructions that are allowable?  If so, you'd
-want something like
-
-    new_misa = (val_to_write & mask) | (env->misa & ~mask);
-    if (env->misa != new_misa) {
-        env->misa = new_misa;
-        tb_flush(CPU(riscv_env_get_cpu(env)));
-    }
-
-so that we start with all new translations, which would then check the new
-value of misa, and would then raise INST_ADDR_MIS (or not).
-
-> +inline target_ulong csr_read_helper(CPURISCVState *env, target_ulong csrno)
-
-Why mark such large functions inline?
-
-> +void set_privilege(CPURISCVState *env, target_ulong newpriv)
-> +{
-> +    if (!(newpriv <= PRV_M)) {
-> +        printf("INVALID PRIV SET\n");
-> +        exit(1);
-> +    }
-> +    if (newpriv == PRV_H) {
-> +        newpriv = PRV_U;
-> +    }
-> +    helper_tlb_flush(env);
-
-Why flush?  Doesn't this just switch to a different mmu_idx?
-
-> +void helper_fence_i(CPURISCVState *env)
-> +{
-> +    RISCVCPU *cpu = riscv_env_get_cpu(env);
-> +    CPUState *cs = CPU(cpu);
-> +    /* Flush QEMU's TLB */
-> +    tlb_flush(cs);
-> +    /* ARM port seems to not know if this is okay inside a TB
-> +       But we need to do it */
-> +    tb_flush(cs);
-> +}
-
-You should not require either flush.
-This insn can be implemented in qemu as a nop.
-
-
-r~
+Fam
