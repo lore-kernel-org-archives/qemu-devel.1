@@ -1,23 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53908)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53996)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <gengdongjiu@huawei.com>) id 1eWf7m-0003hY-0U
-	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 04:14:15 -0500
+	(envelope-from <quintela@redhat.com>) id 1eWf8F-00046m-QQ
+	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 04:14:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <gengdongjiu@huawei.com>) id 1eWf7k-0007zP-Mj
-	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 04:14:13 -0500
-References: <1514440458-10515-1-git-send-email-gengdongjiu@huawei.com>
-	<1514440458-10515-10-git-send-email-gengdongjiu@huawei.com>
-	<20171228160727.62d0857d@igors-macbook-pro.local>
-From: gengdongjiu <gengdongjiu@huawei.com>
-Message-ID: <fed83a29-d96f-e696-8b94-dc2d1e81ee21@huawei.com>
-Date: Wed, 3 Jan 2018 17:13:45 +0800
+	(envelope-from <quintela@redhat.com>) id 1eWf8C-0008S3-GU
+	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 04:14:43 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:58792)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1eWf8C-0008Ps-A5
+	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 04:14:40 -0500
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 6C8C66A7CB
+	for <qemu-devel@nongnu.org>; Wed,  3 Jan 2018 09:14:39 +0000 (UTC)
+From: Juan Quintela <quintela@redhat.com>
+In-Reply-To: <20180103054043.25719-9-peterx@redhat.com> (Peter Xu's message of
+	"Wed, 3 Jan 2018 13:40:40 +0800")
+References: <20180103054043.25719-1-peterx@redhat.com>
+	<20180103054043.25719-9-peterx@redhat.com>
+Reply-To: quintela@redhat.com
+Date: Wed, 03 Jan 2018 10:14:33 +0100
+Message-ID: <87fu7n2tja.fsf@secure.laptop>
 MIME-Version: 1.0
-In-Reply-To: <20171228160727.62d0857d@igors-macbook-pro.local>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v14 9/9] target-arm: kvm64: handle SIGBUS
- signal from kernel or KVM
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH 08/11] migration: use switch at the end of
+ migration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,155 +35,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: pbonzini@redhat.com, mst@redhat.com, zhaoshenglong@huawei.com, peter.maydell@linaro.org, mtosatti@redhat.com, rth@twiddle.net, ehabkost@redhat.com, james.morse@arm.com, christoffer.dall@linaro.org, marc.zyngier@arm.com, kvm@vger.kernel.org, qemu-devel@nongnu.org, qemu-arm@nongnu.org, huangshaoyu@huawei.com, zhengqiang10@huawei.com, xuwei5@hisilicon.com
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+
+Peter Xu <peterx@redhat.com> wrote:
+> It converts the old if clauses into switch, explicitly mentions the
+> possible migration states.  The old nested "if"s are not clear on what
+> we do on different states.
+>
+> Signed-off-by: Peter Xu <peterx@redhat.com>
+> ---
+>  migration/migration.c | 32 +++++++++++++++++++++-----------
+>  1 file changed, 21 insertions(+), 11 deletions(-)
+>
+> diff --git a/migration/migration.c b/migration/migration.c
+> index acef54748b..bfcba24caa 100644
+> --- a/migration/migration.c
+> +++ b/migration/migration.c
+> @@ -2296,19 +2296,23 @@ static void *migration_thread(void *opaque)
+>      cpu_throttle_stop();
+>  
+>      qemu_mutex_lock_iothread();
+> -    if (s->state == MIGRATION_STATUS_COMPLETED) {
+> +    switch (s->state) {
+> +    case MIGRATION_STATUS_COMPLETED:
+>          migration_calculate_complete(s);
+>          runstate_set(RUN_STATE_POSTMIGRATE);
+> -    } else {
+> -        if (s->state == MIGRATION_STATUS_ACTIVE) {
+> -            assert(migrate_colo_enabled());
+> -            migrate_start_colo_process(s);
+> -            /*
+> -            * Fixme: we will run VM in COLO no matter its old running state.
+> -            * After exited COLO, we will keep running.
+> -            */
+> -            s->old_vm_running = true;
+> -        }
+> +        break;
+> +
+> +    case MIGRATION_STATUS_ACTIVE:
+> +        assert(migrate_colo_enabled());
+> +        migrate_start_colo_process(s);
+
+I think this line is wrong, you still have to proctect it with the if
+(migrate_cole_enabled).
+
+Rest of cleanup, is something that I like.
+
+Later, Juan.
 
 
+> +        /*
+> +         * Fixme: we will run VM in COLO no matter its old running state.
+> +         * After exited COLO, we will keep running.
+> +         */
+> +        s->old_vm_running = true;
+> +        /* Fallthrough */
 
-On 2017/12/28 23:07, Igor Mammedov wrote:
-> On Thu, 28 Dec 2017 13:54:18 +0800
-> Dongjiu Geng <gengdongjiu@huawei.com> wrote:
-> 
->> Add SIGBUS signal handler. In this handler, it checks the SIGBUS type,
->> translates the host VA which is delivered by host to guest PA, then fill
->> this PA to CPER and fill the CPER to guest APEI GHES memory, finally
->> notify guest according to the SIGBUS type. There are two kinds of SIGBUS
->> that QEMU needs to handle, which are BUS_MCEERR_AO and BUS_MCEERR_AR.
->>
->> If guest accesses the poisoned memory, it generates Synchronous External
->> Abort(SEA). Then host kernel gets an APEI notification and call memory_failure()
->> to unmapped the affected page from the guest's stage2, and SIGBUS_MCEERR_AO
-> s/unmapped/unmap/
-Thanks.
+Actually, I don't like Fallthrought on C, but well, problem is C O:-)
 
-> 
->> is delivered to Qemu's main thread. If Qemu receives this SIGBUS, it will
->> create a new CPER and add it to guest APEI GHES memory, then notify the
->> guest with a GPIO-Signal notification.
-> too long sentence, it's hard get what goes on here, pls split it in simple
-> sentences/rephrase so it would be easy to understand behavior.
-I will split it in simple sentences/rephrase.
-Thanks for your detailed review.
-
-> 
->>
->> When guest hits a PG_hwpoison page, it will trap to KVM as stage2 fault, then a
->> SIGBUS_MCEERR_AR synchronous signal is delivered to Qemu, Qemu record this error
->> into guest APEI GHES memory and notify guest using Synchronous-External-Abort(SEA).
->>
->> Suggested-by: James Morse <james.morse@arm.com>
->> Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
->> ---
->> Address James's comments to record CPER and notify guest for SIGBUS signal handling.
->> Shown some discussion in [1].
->>
->> [1]:
->> https://lkml.org/lkml/2017/2/27/246
->> https://lkml.org/lkml/2017/9/14/241
->> https://lkml.org/lkml/2017/9/22/499
->> ---
->>  include/sysemu/kvm.h |  2 +-
->>  target/arm/kvm.c     |  2 ++
->>  target/arm/kvm64.c   | 34 ++++++++++++++++++++++++++++++++++
->>  3 files changed, 37 insertions(+), 1 deletion(-)
->>
->> diff --git a/include/sysemu/kvm.h b/include/sysemu/kvm.h
->> index 3a458f5..90c1605 100644
->> --- a/include/sysemu/kvm.h
->> +++ b/include/sysemu/kvm.h
->> @@ -361,7 +361,7 @@ bool kvm_vcpu_id_is_valid(int vcpu_id);
->>  /* Returns VCPU ID to be used on KVM_CREATE_VCPU ioctl() */
->>  unsigned long kvm_arch_vcpu_id(CPUState *cpu);
->>  
->> -#ifdef TARGET_I386
->> +#if defined(TARGET_I386) || defined(TARGET_AARCH64)
->>  #define KVM_HAVE_MCE_INJECTION 1
->>  void kvm_arch_on_sigbus_vcpu(CPUState *cpu, int code, void *addr);
->>  #endif
->> diff --git a/target/arm/kvm.c b/target/arm/kvm.c
->> index 7c17f0d..9d25f51 100644
->> --- a/target/arm/kvm.c
->> +++ b/target/arm/kvm.c
->> @@ -26,6 +26,7 @@
->>  #include "exec/address-spaces.h"
->>  #include "hw/boards.h"
->>  #include "qemu/log.h"
->> +#include "exec/ram_addr.h"
->>  
->>  const KVMCapabilityInfo kvm_arch_required_capabilities[] = {
->>      KVM_CAP_LAST_INFO
->> @@ -182,6 +183,7 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
->>  
->>      cap_has_mp_state = kvm_check_extension(s, KVM_CAP_MP_STATE);
->>  
->> +    qemu_register_reset(kvm_unpoison_all, NULL);
->>      type_register_static(&host_arm_cpu_type_info);
->>  
->>      return 0;
->> diff --git a/target/arm/kvm64.c b/target/arm/kvm64.c
->> index c00450d..6955d85 100644
->> --- a/target/arm/kvm64.c
->> +++ b/target/arm/kvm64.c
->> @@ -27,6 +27,9 @@
->>  #include "kvm_arm.h"
->>  #include "internals.h"
->>  #include "hw/arm/arm.h"
->> +#include "exec/ram_addr.h"
->> +#include "hw/acpi/acpi-defs.h"
->> +#include "hw/acpi/hest_ghes.h"
->>  
->>  static bool have_guest_debug;
->>  
->> @@ -944,6 +947,37 @@ int kvm_arch_get_registers(CPUState *cs)
->>      return ret;
->>  }
->>  
->> +void kvm_arch_on_sigbus_vcpu(CPUState *c, int code, void *addr)
->> +{
->> +    ram_addr_t ram_addr;
->> +    hwaddr paddr;
->> +
->> +    assert(code == BUS_MCEERR_AR || code == BUS_MCEERR_AO);
->> +    if (addr) {
->> +        ram_addr = qemu_ram_addr_from_host(addr);
->> +        if (ram_addr != RAM_ADDR_INVALID &&
->> +            kvm_physical_memory_addr_from_host(c->kvm_state, addr, &paddr)) {
->> +            kvm_hwpoison_page_add(ram_addr);
->> +            if (code == BUS_MCEERR_AR) {
->> +                kvm_cpu_synchronize_state(c);
->> +                ghes_record_errors(ACPI_HEST_NOTIFY_SEA, paddr);
->> +                kvm_inject_arm_sea(c);
->> +            } else if (code == BUS_MCEERR_AO) {
->> +                ghes_record_errors(ACPI_HEST_NOTIFY_GPIO, paddr);
->> +                qemu_hardware_error_notify();
->> +            }
->> +            return;
->> +        }
->> +        fprintf(stderr, "Hardware memory error for memory used by "
->> +                "QEMU itself instead of guest system!\n");
-> not quite sure what above message means,
-When the memory error address belong to QEMU itself, not belong to guest OS.
-it will print above message.
-
-Above message means this memory error happens in QEMU application instead of guest OS.
-
-> 
-> also fprintf() probably shouldn't be used by new code.
-how about we use error_report()? thanks
-
-> 
->> +    }
->> +
->> +    if (code == BUS_MCEERR_AR) {
->> +        fprintf(stderr, "Hardware memory error!\n");
->> +        exit(1);
->> +    }
->> +}
->> +
->>  /* C6.6.29 BRK instruction */
->>  static const uint32_t brk_insn = 0xd4200000;
->>  
-> 
-> 
-> .
-> 
+> +    case MIGRATION_STATUS_FAILED:
+> +    case MIGRATION_STATUS_CANCELLED:
+>          if (s->old_vm_running) {
+>              vm_start();
+>          } else {
+> @@ -2316,6 +2320,12 @@ static void *migration_thread(void *opaque)
+>                  runstate_set(RUN_STATE_POSTMIGRATE);
+>              }
+>          }
+> +        break;
+> +
+> +    default:
+> +        /* Should not reach here, but if so, forgive the VM. */
+> +        error_report("%s: Unknown ending state %d", __func__, s->state);
+> +        break;
+>      }
+>      qemu_bh_schedule(s->cleanup_bh);
+>      qemu_mutex_unlock_iothread();
