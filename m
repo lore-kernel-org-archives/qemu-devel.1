@@ -1,31 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33979)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34026)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eWnsX-0003PO-95
-	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 13:35:09 -0500
+	id 1eWnsd-0003XO-Qf
+	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 13:35:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eWnsT-0007UJ-50
-	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 13:35:05 -0500
-Received: from mail-qk0-x242.google.com ([2607:f8b0:400d:c09::242]:37506)
+	id 1eWnsb-0007d7-Lo
+	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 13:35:11 -0500
+Received: from mail-qk0-x241.google.com ([2607:f8b0:400d:c09::241]:33361)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eWnsT-0007UD-1A
-	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 13:35:01 -0500
-Received: by mail-qk0-x242.google.com with SMTP id p13so2661318qke.4
-	for <qemu-devel@nongnu.org>; Wed, 03 Jan 2018 10:35:00 -0800 (PST)
+	id 1eWnsb-0007ce-Gu
+	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 13:35:09 -0500
+Received: by mail-qk0-x241.google.com with SMTP id x7so2661206qkb.0
+	for <qemu-devel@nongnu.org>; Wed, 03 Jan 2018 10:35:09 -0800 (PST)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Wed,  3 Jan 2018 15:34:05 -0300
-Message-Id: <20180103183418.23730-13-f4bug@amsat.org>
+Date: Wed,  3 Jan 2018 15:34:08 -0300
+Message-Id: <20180103183418.23730-16-f4bug@amsat.org>
 In-Reply-To: <20180103183418.23730-1-f4bug@amsat.org>
 References: <20180103183418.23730-1-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v4 12/25] sdhci: add qtest to check the SD Spec
- version
+Subject: [Qemu-devel] [PATCH v4 15/25] sdhci: rename the hostctl1 register
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,126 +33,95 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alistair Francis <alistair.francis@xilinx.com>, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, Peter Maydell <peter.maydell@linaro.org>, Igor Mitsyanko <i.mitsyanko@gmail.com>, Krzysztof Kozlowski <krzk@kernel.org>, Andrey Smirnov <andrew.smirnov@gmail.com>
+To: Alistair Francis <alistair.francis@xilinx.com>, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, Peter Maydell <peter.maydell@linaro.org>, Andrey Smirnov <andrew.smirnov@gmail.com>
 Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, Peter Crosthwaite <crosthwaite.peter@gmail.com>
 
-with check_specs_version()
+As per the Spec v3.00
 
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 ---
- tests/sdhci-test.c     | 82 ++++++++++++++++++++++++++++++++++++++++++++++++++
- tests/Makefile.include |  2 ++
- 2 files changed, 84 insertions(+)
- create mode 100644 tests/sdhci-test.c
+ include/hw/sd/sdhci.h |  2 +-
+ hw/sd/sdhci.c         | 14 +++++++-------
+ 2 files changed, 8 insertions(+), 8 deletions(-)
 
-diff --git a/tests/sdhci-test.c b/tests/sdhci-test.c
-new file mode 100644
-index 0000000000..492b332588
---- /dev/null
-+++ b/tests/sdhci-test.c
-@@ -0,0 +1,82 @@
-+/*
-+ * QTest testcase for SDHCI controllers
-+ *
-+ * Written by Philippe Mathieu-Daudé <f4bug@amsat.org>
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or later.
-+ * See the COPYING file in the top-level directory.
-+ */
-+#include "qemu/osdep.h"
-+#include "libqtest.h"
-+
-+#define SDHC_HCVER                      0xFE
-+
-+static const struct sdhci_t {
-+    const char *arch;
-+    const char *machine;
-+    struct {
-+        uintptr_t addr;
-+        uint8_t version;
-+        uint8_t baseclock;
-+        struct {
-+            bool sdma;
-+            uint64_t reg;
-+        } capab;
-+    } sdhci;
-+} models[] = {
-+    /* Exynos4210 */
-+    { "arm",    "smdkc210",
-+        {0x12510000, 2, 0, {1, 0x5e80080} } },
-+
-+    /* Zynq-7000 */
-+    { "arm",    "xilinx-zynq-a9",
-+        {0xe0100000, 2, 0, {1, 0x01790080} } },
-+};
-+
-+static uint32_t sdhci_readl(uintptr_t base, uint32_t reg_addr)
-+{
-+    QTestState *qtest = global_qtest;
-+
-+    return qtest_readl(qtest, base + reg_addr);
-+}
-+
-+static void check_specs_version(uintptr_t addr, uint8_t version)
-+{
-+    uint32_t v;
-+
-+    v = sdhci_readl(addr, SDHC_HCVER);
-+    v &= 0xff;
-+    v += 1;
-+    g_assert_cmpuint(v, ==, version);
-+}
-+
-+static void test_machine(const void *data)
-+{
-+    const struct sdhci_t *test = data;
-+
-+    global_qtest = qtest_startf("-machine %s -d unimp", test->machine);
-+
-+    check_specs_version(test->sdhci.addr, test->sdhci.version);
-+
-+    qtest_quit(global_qtest);
-+}
-+
-+int main(int argc, char *argv[])
-+{
-+    const char *arch = qtest_get_arch();
-+    char *name;
-+    int i;
-+
-+    g_test_init(&argc, &argv, NULL);
-+
-+    for (i = 0; i < ARRAY_SIZE(models); i++) {
-+        if (strcmp(arch, models[i].arch)) {
-+            continue;
-+        }
-+        name = g_strdup_printf("sdhci/%s", models[i].machine);
-+        qtest_add_data_func(name, &models[i], test_machine);
-+        g_free(name);
-+    }
-+
-+    return g_test_run();
-+}
-diff --git a/tests/Makefile.include b/tests/Makefile.include
-index c002352134..af7f324e07 100644
---- a/tests/Makefile.include
-+++ b/tests/Makefile.include
-@@ -355,6 +355,7 @@ check-qtest-arm-y += tests/virtio-blk-test$(EXESUF)
- gcov-files-arm-y += arm-softmmu/hw/block/virtio-blk.c
- check-qtest-arm-y += tests/test-arm-mptimer$(EXESUF)
- gcov-files-arm-y += hw/timer/arm_mptimer.c
-+check-qtest-arm-y += tests/sdhci-test$(EXESUF)
+diff --git a/include/hw/sd/sdhci.h b/include/hw/sd/sdhci.h
+index 46e1e42fa1..c2da48c17c 100644
+--- a/include/hw/sd/sdhci.h
++++ b/include/hw/sd/sdhci.h
+@@ -65,7 +65,7 @@ typedef struct SDHCIState {
+     /* Buffer Data Port Register - virtual access point to R and W buffers */
+     uint32_t prnsts;       /* Present State Register */
+     /* 0x28 */
+-    uint8_t  hostctl;      /* Host Control Register */
++    uint8_t  hostctl1;     /* Host Control Register */
+     uint8_t  pwrcon;       /* Power control Register */
+     uint8_t  blkgap;       /* Block Gap Control Register */
+     uint8_t  wakcon;       /* WakeUp Control Register */
+diff --git a/hw/sd/sdhci.c b/hw/sd/sdhci.c
+index 58c07bae80..2bd3c5a4b9 100644
+--- a/hw/sd/sdhci.c
++++ b/hw/sd/sdhci.c
+@@ -600,7 +600,7 @@ static void get_adma_description(SDHCIState *s, ADMADescr *dscr)
+     uint32_t adma1 = 0;
+     uint64_t adma2 = 0;
+     hwaddr entry_addr = (hwaddr)s->admasysaddr;
+-    switch (SDHC_DMA_TYPE(s->hostctl)) {
++    switch (SDHC_DMA_TYPE(s->hostctl1)) {
+     case SDHC_CTRL_ADMA2_32:
+         dma_memory_read(&s->dma_as, entry_addr, (uint8_t *)&adma2,
+                         sizeof(adma2));
+@@ -789,7 +789,7 @@ static void sdhci_data_transfer(void *opaque)
+     SDHCIState *s = (SDHCIState *)opaque;
  
- check-qtest-aarch64-y = tests/numa-test$(EXESUF)
- 
-@@ -609,6 +610,7 @@ tests/test-qht-par$(EXESUF): tests/test-qht-par.o tests/qht-bench$(EXESUF) $(tes
- tests/qht-bench$(EXESUF): tests/qht-bench.o $(test-util-obj-y)
- tests/test-bufferiszero$(EXESUF): tests/test-bufferiszero.o $(test-util-obj-y)
- tests/atomic_add-bench$(EXESUF): tests/atomic_add-bench.o $(test-util-obj-y)
-+tests/sdhci-test$(EXESUF): tests/sdhci-test.o
- 
- tests/test-qdev-global-props$(EXESUF): tests/test-qdev-global-props.o \
- 	hw/core/qdev.o hw/core/qdev-properties.o hw/core/hotplug.o\
+     if (s->trnmod & SDHC_TRNS_DMA) {
+-        switch (SDHC_DMA_TYPE(s->hostctl)) {
++        switch (SDHC_DMA_TYPE(s->hostctl1)) {
+         case SDHC_CTRL_SDMA:
+             if ((s->blkcnt == 1) || !(s->trnmod & SDHC_TRNS_MULTI)) {
+                 sdhci_sdma_transfer_single_block(s);
+@@ -898,7 +898,7 @@ static uint64_t sdhci_read(void *opaque, hwaddr offset, unsigned size)
+         ret = s->prnsts;
+         break;
+     case SDHC_HOSTCTL:
+-        ret = s->hostctl | (s->pwrcon << 8) | (s->blkgap << 16) |
++        ret = s->hostctl1 | (s->pwrcon << 8) | (s->blkgap << 16) |
+               (s->wakcon << 24);
+         break;
+     case SDHC_CLKCON:
+@@ -1016,7 +1016,7 @@ sdhci_write(void *opaque, hwaddr offset, uint64_t val, unsigned size)
+         MASKED_WRITE(s->sdmasysad, mask, value);
+         /* Writing to last byte of sdmasysad might trigger transfer */
+         if (!(mask & 0xFF000000) && TRANSFERRING_DATA(s->prnsts) && s->blkcnt &&
+-                s->blksize && SDHC_DMA_TYPE(s->hostctl) == SDHC_CTRL_SDMA) {
++                s->blksize && SDHC_DMA_TYPE(s->hostctl1) == SDHC_CTRL_SDMA) {
+             if (s->trnmod & SDHC_TRNS_MULTI) {
+                 sdhci_sdma_transfer_multi_blocks(s);
+             } else {
+@@ -1068,14 +1068,14 @@ sdhci_write(void *opaque, hwaddr offset, uint64_t val, unsigned size)
+         if (!(mask & 0xFF0000)) {
+             sdhci_blkgap_write(s, value >> 16);
+         }
+-        MASKED_WRITE(s->hostctl, mask, value);
++        MASKED_WRITE(s->hostctl1, mask, value);
+         MASKED_WRITE(s->pwrcon, mask >> 8, value >> 8);
+         MASKED_WRITE(s->wakcon, mask >> 24, value >> 24);
+         if (!(s->prnsts & SDHC_CARD_PRESENT) || ((s->pwrcon >> 1) & 0x7) < 5 ||
+                 !(s->capareg & (1 << (31 - ((s->pwrcon >> 1) & 0x7))))) {
+             s->pwrcon &= ~SDHC_POWER_ON;
+         }
+-        qemu_set_irq(s->access_led, s->hostctl & 1);
++        qemu_set_irq(s->access_led, s->hostctl1 & 1);
+         break;
+     case SDHC_CLKCON:
+         if (!(mask & 0xFF000000)) {
+@@ -1285,7 +1285,7 @@ const VMStateDescription sdhci_vmstate = {
+         VMSTATE_UINT16(cmdreg, SDHCIState),
+         VMSTATE_UINT32_ARRAY(rspreg, SDHCIState, 4),
+         VMSTATE_UINT32(prnsts, SDHCIState),
+-        VMSTATE_UINT8(hostctl, SDHCIState),
++        VMSTATE_UINT8(hostctl1, SDHCIState),
+         VMSTATE_UINT8(pwrcon, SDHCIState),
+         VMSTATE_UINT8(blkgap, SDHCIState),
+         VMSTATE_UINT8(wakcon, SDHCIState),
 -- 
 2.15.1
