@@ -1,26 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44196)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48720)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1eWseL-00046p-4b
-	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 18:40:46 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1eWska-0006yY-Ki
+	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 18:47:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1eWseG-0007Mo-99
-	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 18:40:45 -0500
-Received: from mout.kundenserver.de ([212.227.126.135]:60270)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1eWseF-0007JT-Un
-	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 18:40:40 -0500
-References: <20180102234108.32713-1-laurent@vivier.eu>
-	<20180102234108.32713-8-laurent@vivier.eu>
-	<5630ba80-503f-f7e7-2764-c433aa3ea19a@linaro.org>
-From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <2ec23cfd-ead8-8119-ab37-0f74a62c3df0@vivier.eu>
-Date: Thu, 4 Jan 2018 00:40:34 +0100
+	(envelope-from <richard.henderson@linaro.org>) id 1eWskW-000446-P0
+	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 18:47:12 -0500
+Received: from mail-pf0-x22b.google.com ([2607:f8b0:400e:c00::22b]:46201)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1eWskW-00043A-Iw
+	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 18:47:08 -0500
+Received: by mail-pf0-x22b.google.com with SMTP id c204so5688pfc.13
+	for <qemu-devel@nongnu.org>; Wed, 03 Jan 2018 15:47:08 -0800 (PST)
+References: <1514940265-18093-1-git-send-email-mjc@sifive.com>
+	<1514940265-18093-11-git-send-email-mjc@sifive.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <9831f4cc-c5ad-a43d-d677-8773f9f7b63e@linaro.org>
+Date: Wed, 3 Jan 2018 15:47:04 -0800
 MIME-Version: 1.0
-In-Reply-To: <5630ba80-503f-f7e7-2764-c433aa3ea19a@linaro.org>
+In-Reply-To: <1514940265-18093-11-git-send-email-mjc@sifive.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v6 07/17] target/m68k: add chk and chk2
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v1 10/21] RISC-V Linux User Emulation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,73 +31,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
-Cc: Thomas Huth <huth@tuxfamily.org>
+To: Michael Clark <mjc@sifive.com>, qemu-devel@nongnu.org
+Cc: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Sagar Karandikar <sagark@eecs.berkeley.edu>
 
-Le 03/01/2018 à 22:52, Richard Henderson a écrit :
-> On 01/02/2018 03:40 PM, Laurent Vivier wrote:
->> +void HELPER(chk)(CPUM68KState *env, int32_t val, int32_t ub)
->> +{
->> +    if (val < 0 || val > ub) {
->> +        CPUState *cs = CPU(m68k_env_get_cpu(env));
->> +
->> +        /* Recover PC and CC_OP for the beginning of the insn.  */
->> +        cpu_restore_state(cs, GETPC());
->> +
->> +        /* Adjust PC and FLAGS to end of the insn.  */
->> +        env->pc += 2;
->> +        helper_flush_flags(env, env->cc_op);
->> +        env->cc_n = val;
->> +
->> +        cs->exception_index = EXCP_CHK;
->> +        cpu_loop_exit(cs);
->> +    }
->> +}
->> +
-> 
-> I thought you said for 68040, N is always unset for val >= 0.
-> That would suggest
-> 
->   helper_flush_flags(env, env->cc_op);
->   env->cc_n = val;
->   if (val < 0 || val > ub) {
->     ...
->   }
+On 01/02/2018 04:44 PM, Michael Clark wrote:
+> diff --git a/linux-user/elfload.c b/linux-user/elfload.c
+> index 20f3d8c..178af56 100644
+> --- a/linux-user/elfload.c
+> +++ b/linux-user/elfload.c
+> @@ -1272,6 +1272,28 @@ static inline void init_thread(struct target_pt_regs *regs,
+>  
+>  #endif /* TARGET_TILEGX */
+>  
+> +#ifdef TARGET_RISCV
+> +
+> +#define ELF_START_MMAP 0x80000000
 
-ok, my though was it is better to not update the flag if it is not
-needed (it should be undefined), but what you suggest is closer to the
-real hardware so I will update it.
+For riscv64 too?  Surely closer to ((TASK_SIZE / 3) * 2).
 
-> Did you examine the real hw change to the other flags?
+> diff --git a/linux-user/main.c b/linux-user/main.c
+> index 71696ed..8900141 100644
+> --- a/linux-user/main.c
+> +++ b/linux-user/main.c
+> @@ -227,7 +227,7 @@ void cpu_loop(CPUX86State *env)
+>          cpu_exec_end(cs);
+>          process_queued_cpu_work(cs);
+>  
+> -        switch(trapnr) {
+> +        switch (trapnr) {
 
-yes, C is modified, and the logic is:
-  C = 0 <= ub ? val < 0 || ub < val : val < 0 && ub < val;
-All other flags are not modified.
+Even though the formatting is wrong, don't change unrelated code.
 
-I'm going to update the patch to reflect the change of N and C by the
-real hardware.
+> +        case EXCP_DEBUG:
+> +        gdbstep:
+> +            signum = gdb_handlesig(cs, TARGET_SIGTRAP);
+> +            sigcode = TARGET_TRAP_BRKPT;
+> +            break;
+> +        default:
+> +            EXCP_DUMP(env, "\nqemu: unhandled CPU exception %#x - aborting\n",
+> +                     trapnr);
+> +            exit(EXIT_FAILURE);
 
-> Because they're officially undefined, which suggests
-> 
->   env->cc_n = val;
->   env->cc_op = CC_OP_LOGIC;
-> 
->> +void HELPER(chk2)(CPUM68KState *env, int32_t val, int32_t lb, int32_t ub)
->> +{
->> +    helper_flush_flags(env, env->cc_op);
->> +
->> +    env->cc_z = val != lb && val != ub;
->> +    env->cc_c = lb <= ub ? val < lb || val > ub : val > ub && val < lb;
->> +
->> +    if (env->cc_c) {
->> +        CPUState *cs = CPU(m68k_env_get_cpu(env));
->> +
->> +        cpu_restore_state(cs, GETPC());
->> +        env->cc_op = CC_OP_FLAGS;
-> 
-> A comment that we're reverting a change made during unwind would be helpful here.
+You will need to handle the generic EXCP_ATOMIC as well.
+Though of course you won't see that until you use tcg_gen_atomic_*.
 
-Ok
 
-Thanks,
-Laurent
+r~
