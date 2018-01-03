@@ -1,27 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44689)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45382)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1eWeoq-0001Wm-Ev
-	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 03:54:41 -0500
+	(envelope-from <quintela@redhat.com>) id 1eWeqC-0002Vf-Ko
+	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 03:56:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1eWeol-0007HO-Ji
-	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 03:54:40 -0500
-Received: from mga03.intel.com ([134.134.136.65]:27115)
+	(envelope-from <quintela@redhat.com>) id 1eWeq9-00088Z-69
+	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 03:56:04 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:45446)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
-	id 1eWeol-0007Fk-Aj
-	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 03:54:35 -0500
-Message-ID: <5A4C9ACF.2090000@intel.com>
-Date: Wed, 03 Jan 2018 16:56:47 +0800
-From: Wei Wang <wei.w.wang@intel.com>
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1eWeq9-00087x-0K
+	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 03:56:01 -0500
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 120BB624DA
+	for <qemu-devel@nongnu.org>; Wed,  3 Jan 2018 08:56:00 +0000 (UTC)
+From: Juan Quintela <quintela@redhat.com>
+In-Reply-To: <20180103054043.25719-4-peterx@redhat.com> (Peter Xu's message of
+	"Wed, 3 Jan 2018 13:40:35 +0800")
+References: <20180103054043.25719-1-peterx@redhat.com>
+	<20180103054043.25719-4-peterx@redhat.com>
+Reply-To: quintela@redhat.com
+Date: Wed, 03 Jan 2018 09:55:54 +0100
+Message-ID: <871sj748yt.fsf@secure.laptop>
 MIME-Version: 1.0
-References: <1513823406-43632-1-git-send-email-wei.w.wang@intel.com>
-	<20171221210327.GB25009@bombadil.infradead.org>
-	<5A3CC707.9070708@intel.com>
-	<20180102140906.GC8222@bombadil.infradead.org>
-In-Reply-To: <20180102140906.GC8222@bombadil.infradead.org>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v20 3/7 RESEND] xbitmap: add more operations
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH 03/11] migration: remove "enable_colo" var
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,153 +34,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Matthew Wilcox <willy@infradead.org>
-Cc: virtio-dev@lists.oasis-open.org, linux-kernel@vger.kernel.org, qemu-devel@nongnu.org, virtualization@lists.linux-foundation.org, kvm@vger.kernel.org, linux-mm@kvack.org, mst@redhat.com, mhocko@kernel.org, akpm@linux-foundation.org, mawilcox@microsoft.com, penguin-kernel@I-love.SAKURA.ne.jp
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 
-On 01/02/2018 10:09 PM, Matthew Wilcox wrote:
-> On Fri, Dec 22, 2017 at 04:49:11PM +0800, Wei Wang wrote:
->> Thanks for the improvement. I also found a small bug in xb_zero. With the
->> following changes, it has passed the current test cases and tested with the
->> virtio-balloon usage without any issue.
-> Thanks; I applied the change.  Can you supply a test-case for testing
-> xb_zero please?
+Peter Xu <peterx@redhat.com> wrote:
+> It's only used once, clean it up a bit.
 >
+> Signed-off-by: Peter Xu <peterx@redhat.com>
 
-Sure. Please check below the test cases. Do you plan to send out the new 
-version of xbitmap yourself? If so, I will wait for that to send out the 
-virtio-balloon patches.
+See my previous comment on patch 1.  We can remove the variable, but the
+move to ose assert is wrong IMHO.
 
-
-static void xbitmap_check_zero_bits(void)
-{
-         assert(xb_empty(&xb1));
-
-         /* Zero an empty xbitmap should work though no real work to do */
-         xb_zero(&xb1, 0, ULONG_MAX);
-         assert(xb_empty(&xb1));
-
-         xb_preload(GFP_KERNEL);
-         assert(xb_set_bit(&xb1, 0) == 0);
-         xb_preload_end();
-
-         /* Overflow test */
-         xb_zero(&xb1, ULONG_MAX - 10, ULONG_MAX);
-         assert(xb_test_bit(&xb1, 0));
-
-         xb_preload(GFP_KERNEL);
-         assert(xb_set_bit(&xb1, ULONG_MAX) == 0);
-         xb_preload_end();
-
-         xb_zero(&xb1, 0, ULONG_MAX);
-         assert(xb_empty(&xb1));
-}
+Later, Juan.
 
 
-/*
-  * In the following tests, preload is called once when all the bits to set
-  * locate in the same ida bitmap. Otherwise, it is recommended to call
-  * preload for each xb_set_bit.
-  */
-static void xbitmap_check_bit_range(void)
-{
-         unsigned long nbit = 0;
-
-         /* Regular test1: node = NULL */
-         xb_preload(GFP_KERNEL);
-         xb_set_bit(&xb1, 700);
-         xb_preload_end();
-         assert(xb_find_set(&xb1, ULONG_MAX, &nbit) == true);
-         assert(nbit == 700);
-         nbit++;
-         assert(xb_find_set(&xb1, ULONG_MAX, &nbit) == false);
-         assert(nbit == 701);
-         xb_zero(&xb1, 0, 1023);
-
-         /*
-          * Regular test2
-          * set bit 2000, 2001, 2040
-          * Next 1 in [0, 2048]          --> 2000
-          * Next 1 in [2000, 2002]       --> 2000
-          * Next 1 in [2002, 2040]       --> 2040
-          * Next 1 in [2002, 2039]       --> none
-          * Next 0 in [2000, 2048]       --> 2002
-          * Next 0 in [2048, 2060]       --> 2048
-          */
-         xb_preload(GFP_KERNEL);
-         assert(!xb_set_bit(&xb1, 2000));
-         assert(!xb_set_bit(&xb1, 2001));
-         assert(!xb_set_bit(&xb1, 2040));
-         nbit = 0;
-         assert(xb_find_set(&xb1, 2048, &nbit) == true);
-         assert(nbit == 2000);
-         assert(xb_find_set(&xb1, 2002, &nbit) == true);
-         assert(nbit == 2000);
-         nbit = 2002;
-         assert(xb_find_set(&xb1, 2040, &nbit) == true);
-         assert(nbit == 2040);
-         nbit = 2002;
-         assert(xb_find_set(&xb1, 2039, &nbit) == false);
-         assert(nbit == 2002);
-         nbit = 2000;
-         assert(xb_find_zero(&xb1, 2048, &nbit) == true);
-         assert(nbit == 2002);
-         nbit = 2048;
-         assert(xb_find_zero(&xb1, 2060, &nbit) == true);
-         assert(nbit == 2048);
-         xb_zero(&xb1, 0, 2048);
-         nbit = 0;
-         assert(xb_find_set(&xb1, 2048, &nbit) == false);
-         assert(nbit == 0);
-         xb_preload_end();
-
-         /*
-          * Overflow tests:
-          * Set bit 1 and ULONG_MAX - 4
-          * Next 1 in [0, ULONG_MAX]                     --> 1
-          * Next 1 in [1, ULONG_MAX]                     --> 1
-          * Next 1 in [2, ULONG_MAX]                     --> ULONG_MAX - 4
-          * Next 1 in [ULONG_MAX - 3, 2]                 --> none
-          * Next 0 in [ULONG_MAX - 4, ULONG_MAX]         --> ULONG_MAX - 3
-          * Zero [ULONG_MAX - 4, ULONG_MAX]
-          * Next 1 in [ULONG_MAX - 10, ULONG_MAX]        --> none
-          * Next 1 in [ULONG_MAX - 1, 2]                 --> none
-          * Zero [0, 1]
-          * Next 1 in [0, 2]                             --> none
-          */
-         xb_preload(GFP_KERNEL);
-         assert(!xb_set_bit(&xb1, 1));
-         xb_preload_end();
-         xb_preload(GFP_KERNEL);
-         assert(!xb_set_bit(&xb1, ULONG_MAX - 4));
-         nbit = 0;
-         assert(xb_find_set(&xb1, ULONG_MAX, &nbit) == true);
-         assert(nbit == 1);
-         nbit = 1;
-         assert(xb_find_set(&xb1, ULONG_MAX, &nbit) == true);
-         assert(nbit == 1);
-         nbit = 2;
-         assert(xb_find_set(&xb1, ULONG_MAX, &nbit) == true);
-         assert(nbit == ULONG_MAX - 4);
-         nbit++;
-         assert(xb_find_set(&xb1, 2, &nbit) == false);
-         assert(nbit == ULONG_MAX - 3);
-         nbit--;
-         assert(xb_find_zero(&xb1, ULONG_MAX, &nbit) == true);
-         assert(nbit == ULONG_MAX - 3);
-         xb_zero(&xb1, ULONG_MAX - 4, ULONG_MAX);
-         nbit = ULONG_MAX - 10;
-         assert(xb_find_set(&xb1, ULONG_MAX, &nbit) == false);
-         assert(nbit == ULONG_MAX - 10);
-         nbit = ULONG_MAX - 1;
-         assert(xb_find_set(&xb1, 2, &nbit) == false);
-         xb_zero(&xb1, 0, 1);
-         nbit = 0;
-         assert(xb_find_set(&xb1, 2, &nbit) == false);
-         assert(nbit == 0);
-         xb_preload_end();
-         assert(xb_empty(&xb1));
-}
-
-
-Best,
-Wei
+> ---
+>  migration/migration.c | 3 +--
+>  1 file changed, 1 insertion(+), 2 deletions(-)
+>
+> diff --git a/migration/migration.c b/migration/migration.c
+> index edbda43246..20f7565527 100644
+> --- a/migration/migration.c
+> +++ b/migration/migration.c
+> @@ -2177,7 +2177,6 @@ static void *migration_thread(void *opaque)
+>      bool entered_postcopy = false;
+>      /* The active state we expect to be in; ACTIVE or POSTCOPY_ACTIVE */
+>      enum MigrationStatus current_active_state = MIGRATION_STATUS_ACTIVE;
+> -    bool enable_colo = migrate_colo_enabled();
+>  
+>      rcu_register_thread();
+>  
+> @@ -2305,7 +2304,7 @@ static void *migration_thread(void *opaque)
+>          runstate_set(RUN_STATE_POSTMIGRATE);
+>      } else {
+>          if (s->state == MIGRATION_STATUS_ACTIVE) {
+> -            assert(enable_colo);
+> +            assert(migrate_colo_enabled());
+>              migrate_start_colo_process(s);
+>              /*
+>              * Fixme: we will run VM in COLO no matter its old running state.
