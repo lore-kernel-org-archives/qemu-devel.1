@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41221)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41374)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1eWjII-0001av-M1
-	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 08:41:27 -0500
+	(envelope-from <armbru@redhat.com>) id 1eWjIc-0001j0-11
+	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 08:41:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1eWjIE-00022i-Mq
-	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 08:41:22 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:34572)
+	(envelope-from <armbru@redhat.com>) id 1eWjIY-0002JR-3a
+	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 08:41:42 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:34118)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1eWjIE-0001zo-7F
-	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 08:41:18 -0500
-Date: Wed, 3 Jan 2018 15:41:09 +0200
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20180103153432-mutt-send-email-mst@kernel.org>
-References: <20180103102911.35562-1-marcel@redhat.com>
-	<20180103102911.35562-5-marcel@redhat.com>
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1eWjIX-0002Iu-RS
+	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 08:41:38 -0500
+From: Markus Armbruster <armbru@redhat.com>
+References: <20180102170645.5877-1-danielhb@linux.vnet.ibm.com>
+	<ece03c18-76c3-294d-9c2a-778a23e8d9b4@redhat.com>
+	<5bfd4a4e-26d9-8595-fc30-43c54b9f6bad@linux.vnet.ibm.com>
+Date: Wed, 03 Jan 2018 14:41:31 +0100
+In-Reply-To: <5bfd4a4e-26d9-8595-fc30-43c54b9f6bad@linux.vnet.ibm.com> (Daniel
+	Henrique Barboza's message of "Tue, 2 Jan 2018 18:39:45 -0200")
+Message-ID: <87po6rvz3o.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180103102911.35562-5-marcel@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH V3 4/5] pvrdma: initial implementation
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH RESEND 1/1] qmp.c: system_wakeup: adding
+ RUN_STATE_SUSPENDED check before proceeding
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,204 +29,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Marcel Apfelbaum <marcel@redhat.com>
-Cc: qemu-devel@nongnu.org, yuval.shaia@oracle.com, ehabkost@redhat.com, imammedo@redhat.com, pbonzini@redhat.com, f4bug@amsat.org
+To: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
+Cc: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 
-On Wed, Jan 03, 2018 at 12:29:10PM +0200, Marcel Apfelbaum wrote:
-> diff --git a/hw/rdma/vmw/pvrdma_types.h b/hw/rdma/vmw/pvrdma_types.h
-> new file mode 100644
-> index 0000000000..6cd2c81019
-> --- /dev/null
-> +++ b/hw/rdma/vmw/pvrdma_types.h
-> @@ -0,0 +1,38 @@
-> +/*
-> + * QEMU VMWARE paravirtual RDMA interface definitions
-> + *
-> + * Copyright (C) 2018 Oracle
-> + * Copyright (C) 2018 Red Hat Inc
-> + *
-> + * Authors:
-> + *     Yuval Shaia <yuval.shaia@oracle.com>
-> + *     Marcel Apfelbaum <marcel@redhat.com>
-> + *
-> + * This work is licensed under the terms of the GNU GPL, version 2.
-> + * See the COPYING file in the top-level directory.
-> + *
-> + */
-> +
-> +#ifndef PVRDMA_TYPES_H
-> +#define PVRDMA_TYPES_H
-> +
-> +/* TDOD: All defs here should be removed !!! */
+Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com> writes:
 
-Please do exactly that.
+> On 01/02/2018 06:03 PM, Eric Blake wrote:
+>> On 01/02/2018 11:06 AM, Daniel Henrique Barboza wrote:
+>>> The qmp/hmp command 'system_wakeup' is simply a direct call to
+>>> 'qemu_system_wakeup_request' from vl.c. This function verifies if
+>>> runstate is SUSPENDED and if the wake up reason is valid before
+>>> proceeding. However, no error or warning is thrown if any of those
+>>> pre-requirements isn't met.
+>>>
+>>> This leads to situations such as the one described in
+>>> https://github.com/open-power-host-os/qemu/issues/31, where one
+>>> can induce the OS to be suspended by using pm-suspend (via
+>>> dompmsuspend, for example) but for some reason the machine failed to
+>>> go to the SUSPENDED runstate, staying at runstate RUNNING. The user
+>>> then tries to wake up the guest using system_wakeup (or dompmwakeup),
+>>> no error is thrown but nothing happened either because the wake up
+>>> wasn't fired at all. In the end, the user is left with a guest that
+>>> is dormant and believing that system_wakeup isn't working.
+>>>
+>>> This patch changes qmp_system_wakeup to make the runstate verification
+>>> before proceeding to call qemu_system_wakeup_request, firing up
+>>> an error message if the user tries to wake up a machine that
+>>> isn't in SUSPENDED state. The change isn't made inside
+>>> qemu_system_wakeup_request because it is used in migration,
+>>> ACPI and others where this usage might be valid. This patch
+>>> by no means fixes the situation described above, but it can direct
+>>> the user/management closer to the real problem.
+>> Converting something that silently did nothing successfully into now
+>> returning an error is somewhat backwards-incompatible.  Is this
+>> something that needs to go through a deprecation cycle, to give people a
+>> chance to fix QMP scripts that were relying on the previous no-op
+>> behavior to now work with the new semantics?
 
-> +
-> +#include <stdbool.h>
-> +#include <stdint.h>
-> +#include <asm-generic/int-ll64.h>
-> +#include <include/sysemu/dma.h>
-> +#include <linux/types.h>
-> +
-> +typedef unsigned char uint8_t;
-> +typedef uint8_t           u8;
-> +typedef u8                __u8;
-> +typedef unsigned short    u16;
-> +typedef u16               __u16;
-> +typedef uint32_t          u32;
-> +typedef u32               __u32;
-> +typedef int32_t           __s32;
-> +typedef uint64_t          u64;
-> +typedef __u64 __bitwise   __be64;
-> +
-> +#endif
-> diff --git a/hw/rdma/vmw/pvrdma_utils.c b/hw/rdma/vmw/pvrdma_utils.c
+I doubt it.
 
-Looks like a set of generic utility functions. Why are these under vmw?
+We're fixing a silent failure to be "loud".  How exactly could that
+upset applications?
 
+Applications that don't bother to check the result remain exactly as
+broken as before.
 
-> new file mode 100644
-> index 0000000000..a84a2819d3
-> --- /dev/null
-> +++ b/hw/rdma/vmw/pvrdma_utils.c
-> @@ -0,0 +1,135 @@
-> +#include <qemu/osdep.h>
-> +#include <qemu/error-report.h>
-> +
-> +#include <cpu.h>
-> +#include "../rdma_utils.h"
-> +#include "pvrdma_utils.h"
-> +
-> +void pvrdma_pci_dma_unmap(PCIDevice *dev, void *buffer, dma_addr_t len)
-> +{
-> +    pr_dbg("%p\n", buffer);
-> +    if (buffer) {
-> +        pci_dma_unmap(dev, buffer, len, DMA_DIRECTION_TO_DEVICE, 0);
-> +    }
-> +}
-> +
-> +void *pvrdma_pci_dma_map(PCIDevice *dev, dma_addr_t addr, dma_addr_t plen)
-> +{
-> +    void *p;
-> +    hwaddr len = plen;
-> +
-> +    if (!addr) {
-> +        pr_dbg("addr is NULL\n");
-> +        return NULL;
-> +    }
-> +
-> +    p = pci_dma_map(dev, addr, &len, DMA_DIRECTION_TO_DEVICE);
-> +    if (!p) {
-> +        pr_dbg("Fail in pci_dma_map, addr=0x%llx, len=%ld\n",
-> +               (long long unsigned int)addr, len);
-> +        return NULL;
-> +    }
-> +
-> +    if (len != plen) {
-> +        pvrdma_pci_dma_unmap(dev, p, len);
-> +        return NULL;
-> +    }
-> +
-> +    pr_dbg("0x%llx -> %p (len=%ld)\n", (long long unsigned int)addr, p, len);
-> +
-> +    return p;
-> +}
-> +
-> +void *pvrdma_map_to_pdir(PCIDevice *pdev, uint64_t pdir_dma, uint32_t nchunks,
-> +                         size_t length)
-> +{
-> +    uint64_t *dir = NULL, *tbl = NULL;
-> +    int tbl_idx, dir_idx, addr_idx;
-> +    void *host_virt = NULL, *curr_page;
-> +
-> +    if (!nchunks) {
-> +        pr_dbg("nchunks=0\n");
-> +        goto out;
-> +    }
-> +
-> +    dir = pvrdma_pci_dma_map(pdev, pdir_dma, TARGET_PAGE_SIZE);
-> +    if (!dir) {
-> +        error_report("PVRDMA: Fail to map to page directory");
-> +        goto out;
-> +    }
-> +
-> +    tbl = pvrdma_pci_dma_map(pdev, dir[0], TARGET_PAGE_SIZE);
-> +    if (!tbl) {
-> +        error_report("PVRDMA: Fail to map to page table 0");
-> +        goto out_unmap_dir;
-> +    }
-> +
-> +    curr_page = pvrdma_pci_dma_map(pdev, (dma_addr_t)tbl[0], TARGET_PAGE_SIZE);
-> +    if (!curr_page) {
-> +        error_report("PVRDMA: Fail to map the first page");
-> +        goto out_unmap_tbl;
-> +    }
-> +
-> +    host_virt = mremap(curr_page, 0, length, MREMAP_MAYMOVE);
-> +    if (host_virt == MAP_FAILED) {
-> +        host_virt = NULL;
-> +        error_report("PVRDMA: Fail to remap memory for host_virt");
-> +        goto out_unmap_tbl;
-> +    }
-> +
-> +    pvrdma_pci_dma_unmap(pdev, curr_page, TARGET_PAGE_SIZE);
-> +
-> +    pr_dbg("host_virt=%p\n", host_virt);
-> +
-> +    dir_idx = 0;
-> +    tbl_idx = 1;
-> +    addr_idx = 1;
-> +    while (addr_idx < nchunks) {
-> +        if ((tbl_idx == (TARGET_PAGE_SIZE / sizeof(uint64_t)))) {
-> +            tbl_idx = 0;
-> +            dir_idx++;
-> +            pr_dbg("Mapping to table %d\n", dir_idx);
-> +            pvrdma_pci_dma_unmap(pdev, tbl, TARGET_PAGE_SIZE);
-> +            tbl = pvrdma_pci_dma_map(pdev, dir[dir_idx], TARGET_PAGE_SIZE);
-> +            if (!tbl) {
-> +                error_report("PVRDMA: Fail to map to page table %d", dir_idx);
-> +                goto out_unmap_host_virt;
-> +            }
-> +        }
-> +
-> +        pr_dbg("guest_dma[%d]=0x%lx\n", addr_idx, tbl[tbl_idx]);
-> +
-> +        curr_page = pvrdma_pci_dma_map(pdev, (dma_addr_t)tbl[tbl_idx],
-> +                                       TARGET_PAGE_SIZE);
-> +        if (!curr_page) {
-> +            error_report("PVRDMA: Fail to map to page %d, dir %d", tbl_idx,
-> +                         dir_idx);
-> +            goto out_unmap_host_virt;
-> +        }
-> +
-> +        mremap(curr_page, 0, TARGET_PAGE_SIZE, MREMAP_MAYMOVE | MREMAP_FIXED,
-> +               host_virt + TARGET_PAGE_SIZE * addr_idx);
+Applications that do check become aware of the fact that the command did
+not work as advertized.  I guess this risks breaking them differently.
 
-It does not look like this will do the right thing when the host page
-size exceeds the target page size.
+qmp-spec.txt section 5. gives us license to add errors: "Clients must
+not assume any particular [...]  errors generated by a command, that is,
+new errors can be added to any existing command in newer versions of the
+Server.
 
+>> behavior to now work with the new semantics?  Or should we add an
+>> optional bool parameter to the command, where omitting the parameter
+>> gives the old semantics, but new enough clients can pass the bool to
+>> choose which behavior (no-op or error) they prefer?
+>
+> Good point. Back when I first coded this patch I made sure that no QEMU test
+> were broken, but I didn't consider that existing user scripts that uses
+> system_wakeup might now yield a different result.
+>
+> The extra optional parameter seems a good approach to take here IMO. The
+> current system_wakeup implementation works fine if the user is careful
+> enough to not call it if the guest isn't on SUSPENDED state, so I am unsure
+> if deprecating this behavior in favor of this new one is a bit too extreme.
 
-> +
-> +        pvrdma_pci_dma_unmap(pdev, curr_page, TARGET_PAGE_SIZE);
-> +
-> +        addr_idx++;
-> +
-> +        tbl_idx++;
-> +    }
-> +
-> +    goto out_unmap_tbl;
-> +
-> +out_unmap_host_virt:
-> +    munmap(host_virt, length);
-> +    host_virt = NULL;
-> +
-> +out_unmap_tbl:
-> +    pvrdma_pci_dma_unmap(pdev, tbl, TARGET_PAGE_SIZE);
-> +
-> +out_unmap_dir:
-> +    pvrdma_pci_dma_unmap(pdev, dir, TARGET_PAGE_SIZE);
-> +
-> +out:
-> +    return host_virt;
-> +
-> +}
+I'd say we call the silent failure to wake up the guest a bug, and your
+patch a bug fix.
+
+I figure we could find precedence for turning broken successful behavior
+into a clean error if we looked for it.
