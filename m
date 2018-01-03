@@ -1,31 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36664)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37178)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wei@redhat.com>) id 1eWpQL-0005dy-KB
-	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 15:14:06 -0500
+	(envelope-from <eager@eagerm.com>) id 1eWpRS-0006Wo-Op
+	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 15:15:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wei@redhat.com>) id 1eWpQG-0007Cw-L4
-	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 15:14:05 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:45088)
+	(envelope-from <eager@eagerm.com>) id 1eWpRN-0007vM-Jn
+	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 15:15:14 -0500
+Received: from sub5.mail.dreamhost.com ([208.113.200.129]:50166
+	helo=homiemail-a81.g.dreamhost.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <wei@redhat.com>) id 1eWpQG-0007C8-EO
-	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 15:14:00 -0500
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(Exim 4.71) (envelope-from <eager@eagerm.com>) id 1eWpRN-0007uJ-Bb
+	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 15:15:09 -0500
+Received: from homiemail-a81.g.dreamhost.com (localhost [127.0.0.1])
+	by homiemail-a81.g.dreamhost.com (Postfix) with ESMTP id 0BBD66301
+	for <qemu-devel@nongnu.org>; Wed,  3 Jan 2018 12:15:07 -0800 (PST)
+Received: from [192.168.20.41] (c-73-170-242-219.hsd1.ca.comcast.net
+	[73.170.242.219])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 0AE35C0587FC
-	for <qemu-devel@nongnu.org>; Wed,  3 Jan 2018 20:13:59 +0000 (UTC)
-References: <20180103183336.27709-1-dgilbert@redhat.com>
-From: Wei Huang <wei@redhat.com>
-Message-ID: <5237fe93-dc8e-7f78-468d-d5214f09463b@redhat.com>
-Date: Wed, 3 Jan 2018 14:13:54 -0600
+	(Authenticated sender: eager@eagerm.com)
+	by homiemail-a81.g.dreamhost.com (Postfix) with ESMTPSA id 205C65A25
+	for <qemu-devel@nongnu.org>; Wed,  3 Jan 2018 12:15:05 -0800 (PST)
+From: Michael Eager <eager@eagerm.com>
+Message-ID: <b372ad89-0317-0206-c2aa-4a7acbbda685@eagerm.com>
+Date: Wed, 3 Jan 2018 12:15:08 -0800
 MIME-Version: 1.0
-In-Reply-To: <20180103183336.27709-1-dgilbert@redhat.com>
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] cpu_physical_memory_sync_dirty_bitmap:
- Another alignment fix
+Subject: [Qemu-devel] Clock warping with -icount
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,60 +36,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>, qemu-devel@nongnu.org, pbonzini@redhat.com, quintela@redhat.com
-Cc: peterx@redhat.com
+To: QEMU Developers <qemu-devel@nongnu.org>
 
+I'm trying to get -icount clock warping to work on an older QEMU source 
+base.  In my test case, all vCPUs are idle and there is an outstanding 
+timer.  What should happen (IMO) is that the qemu_icount value should be 
+bumped to the timer value and then the timer callback should be called 
+through qemu_notify_event().  This is not happening.  qemu_icount does 
+not get updated and the code loops forever waiting for this to happen.
 
+In my version of cpus.c in qemu_clock_warp(), the code calls 
+icount_warp_rt(), which does not update qemu_icount, since 
+vm_clock_warp_start is -1.  Subsequently, the pending timer is deleted,
+vm_clock_warp_start is set to the current qemu_icount value, compared 
+with the timer deadline, and then the timer is recreated with the same 
+deadline.  (All of this looks like shuffling deck chairs on the Titanic. 
+  The new timer is exactly the same as the old timer and there is no 
+change in the clocks.)
 
-On 01/03/2018 12:33 PM, Dr. David Alan Gilbert (git) wrote:
-> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-> 
-> This code has an optimised, word aligned version, and a boring
-> unaligned version. My commit f70d345 fixed one alignment issue, but
-> there's another.
-> 
-> The optimised version operates on 'longs' dealing with (typically) 64
-> pages at a time, replacing the whole long by a 0 and counting the bits.
-> If the Ramblock is less than 64bits in length that long can contain bits
-> representing two different RAMBlocks, but the code will update the
-> bmap belinging to the 1st RAMBlock only while having updated the total
-> dirty page count for both.
-> 
-> This probably didn't matter prior to 6b6712ef which split the dirty
-> bitmap by RAMBlock, but now they're separate RAMBlocks we end up
-> with a count that doesn't match the state in the bitmaps.
-> 
-> Symptom:
->   Migration showing a few dirty pages left to be sent constantly
->   Seen on aarch64 and x86 with x86+ovmf
-> 
-> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> Reported-by: Wei Huang <wei@redhat.com>
-> Fixes: 6b6712efccd383b48a909bee0b29e079a57601ec
+I've compared this with the current QEMU sources in cpus.c.  Function 
+names have changed and there are some other changes, but the code looks 
+like it would do the same.  It isn't clear to me when/where qemu_icount 
+or qemu_icount_bias would be modified to warp the clock ahead.
 
-This solves the failure I saw in the migration test case.
+Can someone explain what vm_clock_warp_start is supposed to mean?  The
+warp_delta value is computed by subtracting this from the current clock, 
+which doesn't make sense to me.  IN qemu_start_warp_timer() it is set to 
+the clock value.
 
-Acked-by: Wei Huang <wei@redhat.com>
+Can someone offer me some clarifications on how warping the icount clock 
+is done, or better yet send me (or tell me where to find) a working test 
+case using QEMU and -icount which warps the icount timer when all vCPUs 
+are idle?
 
-> ---
->  include/exec/ram_addr.h | 5 +++--
->  1 file changed, 3 insertions(+), 2 deletions(-)
-> 
-> diff --git a/include/exec/ram_addr.h b/include/exec/ram_addr.h
-> index 6cbc02aa0f..7633ef6342 100644
-> --- a/include/exec/ram_addr.h
-> +++ b/include/exec/ram_addr.h
-> @@ -391,9 +391,10 @@ uint64_t cpu_physical_memory_sync_dirty_bitmap(RAMBlock *rb,
->      uint64_t num_dirty = 0;
->      unsigned long *dest = rb->bmap;
->  
-> -    /* start address is aligned at the start of a word? */
-> +    /* start address and length is aligned at the start of a word? */
->      if (((word * BITS_PER_LONG) << TARGET_PAGE_BITS) ==
-> -         (start + rb->offset)) {
-> +         (start + rb->offset) &&
-> +        !(length & ((BITS_PER_LONG << TARGET_PAGE_BITS) - 1))) {
->          int k;
->          int nr = BITS_TO_LONGS(length >> TARGET_PAGE_BITS);
->          unsigned long * const *src;
-> 
+Thanks in advance.
+
+-- 
+Michael Eager    eager@eagerm.com
+1960 Park Blvd., Palo Alto, CA 94306
