@@ -1,19 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33436)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33413)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1eWabc-0001C7-3S
-	for qemu-devel@nongnu.org; Tue, 02 Jan 2018 23:24:45 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1eWabb-0001BR-Gs
+	for qemu-devel@nongnu.org; Tue, 02 Jan 2018 23:24:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1eWaba-0001zA-HK
-	for qemu-devel@nongnu.org; Tue, 02 Jan 2018 23:24:44 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1eWabZ-0001xW-9E
+	for qemu-devel@nongnu.org; Tue, 02 Jan 2018 23:24:43 -0500
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Wed,  3 Jan 2018 15:24:19 +1100
-Message-Id: <20180103042419.14520-16-david@gibson.dropbear.id.au>
+Date: Wed,  3 Jan 2018 15:24:13 +1100
+Message-Id: <20180103042419.14520-10-david@gibson.dropbear.id.au>
 In-Reply-To: <20180103042419.14520-1-david@gibson.dropbear.id.au>
 References: <20180103042419.14520-1-david@gibson.dropbear.id.au>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 15/15] target/ppc: more use of the PPC_*() macros
+Subject: [Qemu-devel] [PULL 09/15] spapr: Validate capabilities on migration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,146 +20,219 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: groug@kaod.org, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, lvivier@redhat.com, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>, David Gibson <david@gibson.dropbear.id.au>
+Cc: groug@kaod.org, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, lvivier@redhat.com, David Gibson <david@gibson.dropbear.id.au>
 
-From: C=C3=A9dric Le Goater <clg@kaod.org>
+Now that the "pseries" machine type implements optional capabilities (well,
+one so far) there's the possibility of having different capabilities
+available at either end of a migration.  Although arguably a user error,
+it would be nice to catch this situation and fail as gracefully as we can.
 
-Also introduce utilities to manipulate bitmasks (originaly from OPAL)
-which be will be used in the model of the XIVE interrupt controller.
+This adds code to migrate the capabilities flags.  These aren't pulled
+directly into the destination's configuration since what the user has
+specified on the destination command line should take precedence.  However,
+they are checked against the destination capabilities.
 
-Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+If the source was using a capability which is absent on the destination,
+we fail the migration, since that could easily cause a guest crash or other
+bad behaviour.  If the source lacked a capability which is present on the
+destination we warn, but allow the migration to proceed.
+
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+Reviewed-by: Greg Kurz <groug@kaod.org>
 ---
- hw/ppc/pnv_lpc.c        | 10 ++++-----
- target/ppc/cpu.h        | 56 ++++++++++++++++++++++++++++++-------------=
-------
- target/ppc/int_helper.c |  2 +-
- 3 files changed, 40 insertions(+), 28 deletions(-)
+ hw/ppc/spapr.c         |  6 ++++
+ hw/ppc/spapr_caps.c    | 96 ++++++++++++++++++++++++++++++++++++++++++++++++--
+ include/hw/ppc/spapr.h |  6 ++++
+ 3 files changed, 105 insertions(+), 3 deletions(-)
 
-diff --git a/hw/ppc/pnv_lpc.c b/hw/ppc/pnv_lpc.c
-index b777b78e18..c42b4a8f6c 100644
---- a/hw/ppc/pnv_lpc.c
-+++ b/hw/ppc/pnv_lpc.c
-@@ -146,13 +146,13 @@ static bool opb_write(PnvLpcController *lpc, uint32=
-_t addr, uint8_t *data,
-     return success;
+diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+index f8fee8ebcf..86fc83f9c2 100644
+--- a/hw/ppc/spapr.c
++++ b/hw/ppc/spapr.c
+@@ -1589,6 +1589,11 @@ static int spapr_post_load(void *opaque, int version_id)
+     sPAPRMachineState *spapr = (sPAPRMachineState *)opaque;
+     int err = 0;
+ 
++    err = spapr_caps_post_migration(spapr);
++    if (err) {
++        return err;
++    }
++
+     if (!object_dynamic_cast(OBJECT(spapr->ics), TYPE_ICS_KVM)) {
+         CPUState *cs;
+         CPU_FOREACH(cs) {
+@@ -1755,6 +1760,7 @@ static const VMStateDescription vmstate_spapr = {
+         &vmstate_spapr_ov5_cas,
+         &vmstate_spapr_patb_entry,
+         &vmstate_spapr_pending_events,
++        &vmstate_spapr_caps,
+         NULL
+     }
+ };
+diff --git a/hw/ppc/spapr_caps.c b/hw/ppc/spapr_caps.c
+index 3b35b91a5b..cad40fe49a 100644
+--- a/hw/ppc/spapr_caps.c
++++ b/hw/ppc/spapr_caps.c
+@@ -22,6 +22,7 @@
+  * THE SOFTWARE.
+  */
+ #include "qemu/osdep.h"
++#include "qemu/error-report.h"
+ #include "qapi/error.h"
+ #include "qapi/visitor.h"
+ #include "sysemu/hw_accel.h"
+@@ -83,6 +84,93 @@ static sPAPRCapabilities default_caps_with_cpu(sPAPRMachineState *spapr,
+     return caps;
  }
-=20
--#define ECCB_CTL_READ           (1ull << (63 - 15))
-+#define ECCB_CTL_READ           PPC_BIT(15)
- #define ECCB_CTL_SZ_LSH         (63 - 7)
--#define ECCB_CTL_SZ_MASK        (0xfull << ECCB_CTL_SZ_LSH)
--#define ECCB_CTL_ADDR_MASK      0xffffffffu;
-+#define ECCB_CTL_SZ_MASK        PPC_BITMASK(4, 7)
-+#define ECCB_CTL_ADDR_MASK      PPC_BITMASK(32, 63)
-=20
--#define ECCB_STAT_OP_DONE       (1ull << (63 - 52))
--#define ECCB_STAT_OP_ERR        (1ull << (63 - 52))
-+#define ECCB_STAT_OP_DONE       PPC_BIT(52)
-+#define ECCB_STAT_OP_ERR        PPC_BIT(52)
- #define ECCB_STAT_RD_DATA_LSH   (63 - 37)
- #define ECCB_STAT_RD_DATA_MASK  (0xffffffff << ECCB_STAT_RD_DATA_LSH)
-=20
-diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
-index 370b05e76e..a5e49f23e9 100644
---- a/target/ppc/cpu.h
-+++ b/target/ppc/cpu.h
-@@ -93,6 +93,19 @@
- #define PPC_BITMASK(bs, be)     ((PPC_BIT(bs) - PPC_BIT(be)) | PPC_BIT(b=
-s))
- #define PPC_BITMASK32(bs, be)   ((PPC_BIT32(bs) - PPC_BIT32(be)) | \
-                                  PPC_BIT32(bs))
-+#define PPC_BITMASK8(bs, be)    ((PPC_BIT8(bs) - PPC_BIT8(be)) | PPC_BIT=
-8(bs))
+ 
++static bool spapr_caps_needed(void *opaque)
++{
++    sPAPRMachineState *spapr = opaque;
 +
-+#if HOST_LONG_BITS =3D=3D 32
-+# define MASK_TO_LSH(m)          (__builtin_ffsll(m) - 1)
-+#elif HOST_LONG_BITS =3D=3D 64
-+# define MASK_TO_LSH(m)          (__builtin_ffsl(m) - 1)
-+#else
-+# error Unknown sizeof long
-+#endif
++    return (spapr->forced_caps.mask != 0) || (spapr->forbidden_caps.mask != 0);
++}
 +
-+#define GETFIELD(m, v)          (((v) & (m)) >> MASK_TO_LSH(m))
-+#define SETFIELD(m, v, val)                             \
-+        (((v) & ~(m)) | ((((typeof(v))(val)) << MASK_TO_LSH(m)) & (m)))
-=20
- /***********************************************************************=
-******/
- /* Exception vectors definitions                                        =
-     */
-@@ -2349,32 +2362,31 @@ enum {
-=20
- /* Processor Compatibility mask (PCR) */
- enum {
--    PCR_COMPAT_2_05     =3D 1ull << (63-62),
--    PCR_COMPAT_2_06     =3D 1ull << (63-61),
--    PCR_COMPAT_2_07     =3D 1ull << (63-60),
--    PCR_COMPAT_3_00     =3D 1ull << (63-59),
--    PCR_VEC_DIS         =3D 1ull << (63-0), /* Vec. disable (bit NA sinc=
-e POWER8) */
--    PCR_VSX_DIS         =3D 1ull << (63-1), /* VSX disable (bit NA since=
- POWER8) */
--    PCR_TM_DIS          =3D 1ull << (63-2), /* Trans. memory disable (PO=
-WER8) */
-+    PCR_COMPAT_2_05     =3D PPC_BIT(62),
-+    PCR_COMPAT_2_06     =3D PPC_BIT(61),
-+    PCR_COMPAT_2_07     =3D PPC_BIT(60),
-+    PCR_COMPAT_3_00     =3D PPC_BIT(59),
-+    PCR_VEC_DIS         =3D PPC_BIT(0), /* Vec. disable (bit NA since PO=
-WER8) */
-+    PCR_VSX_DIS         =3D PPC_BIT(1), /* VSX disable (bit NA since POW=
-ER8) */
-+    PCR_TM_DIS          =3D PPC_BIT(2), /* Trans. memory disable (POWER8=
-) */
++/* This has to be called from the top-level spapr post_load, not the
++ * caps specific one.  Otherwise it wouldn't be called when the source
++ * caps are all defaults, which could still conflict with overridden
++ * caps on the destination */
++int spapr_caps_post_migration(sPAPRMachineState *spapr)
++{
++    uint64_t allcaps = 0;
++    int i;
++    bool ok = true;
++    sPAPRCapabilities dstcaps = spapr->effective_caps;
++    sPAPRCapabilities srccaps;
++
++    srccaps = default_caps_with_cpu(spapr, first_cpu);
++    srccaps.mask |= spapr->mig_forced_caps.mask;
++    srccaps.mask &= ~spapr->mig_forbidden_caps.mask;
++
++    for (i = 0; i < ARRAY_SIZE(capability_table); i++) {
++        sPAPRCapabilityInfo *info = &capability_table[i];
++
++        allcaps |= info->flag;
++
++        if ((srccaps.mask & info->flag) && !(dstcaps.mask & info->flag)) {
++            error_report("cap-%s=on in incoming stream, but off in destination",
++                         info->name);
++            ok = false;
++        }
++
++        if (!(srccaps.mask & info->flag) && (dstcaps.mask & info->flag)) {
++            warn_report("cap-%s=off in incoming stream, but on in destination",
++                         info->name);
++        }
++    }
++
++    if (spapr->mig_forced_caps.mask & ~allcaps) {
++        error_report(
++            "Unknown capabilities 0x%"PRIx64" enabled in incoming stream",
++            spapr->mig_forced_caps.mask & ~allcaps);
++        ok = false;
++    }
++    if (spapr->mig_forbidden_caps.mask & ~allcaps) {
++        warn_report(
++            "Unknown capabilities 0x%"PRIx64" disabled in incoming stream",
++            spapr->mig_forbidden_caps.mask & ~allcaps);
++    }
++
++    return ok ? 0 : -EINVAL;
++}
++
++static int spapr_caps_pre_save(void *opaque)
++{
++    sPAPRMachineState *spapr = opaque;
++
++    spapr->mig_forced_caps = spapr->forced_caps;
++    spapr->mig_forbidden_caps = spapr->forbidden_caps;
++    return 0;
++}
++
++static int spapr_caps_pre_load(void *opaque)
++{
++    sPAPRMachineState *spapr = opaque;
++
++    spapr->mig_forced_caps = spapr_caps(0);
++    spapr->mig_forbidden_caps = spapr_caps(0);
++    return 0;
++}
++
++const VMStateDescription vmstate_spapr_caps = {
++    .name = "spapr/caps",
++    .version_id = 1,
++    .minimum_version_id = 1,
++    .needed = spapr_caps_needed,
++    .pre_save = spapr_caps_pre_save,
++    .pre_load = spapr_caps_pre_load,
++    .fields = (VMStateField[]) {
++        VMSTATE_UINT64(mig_forced_caps.mask, sPAPRMachineState),
++        VMSTATE_UINT64(mig_forbidden_caps.mask, sPAPRMachineState),
++        VMSTATE_END_OF_LIST()
++    },
++};
++
+ void spapr_caps_reset(sPAPRMachineState *spapr)
+ {
+     Error *local_err = NULL;
+@@ -92,6 +180,11 @@ void spapr_caps_reset(sPAPRMachineState *spapr)
+     /* First compute the actual set of caps we're running with.. */
+     caps = default_caps_with_cpu(spapr, first_cpu);
+ 
++    /* Remove unnecessary forced/forbidden bits (this will help us
++     * with migration) */
++    spapr->forced_caps.mask &= ~caps.mask;
++    spapr->forbidden_caps.mask &= caps.mask;
++
+     caps.mask |= spapr->forced_caps.mask;
+     caps.mask &= ~spapr->forbidden_caps.mask;
+ 
+@@ -175,9 +268,6 @@ void spapr_caps_validate(sPAPRMachineState *spapr, Error **errp)
+         error_setg(errp, "Some sPAPR capabilities set both on and off");
+         return;
+     }
+-
+-    /* Check for any caps incompatible with other caps.  Nothing to do
+-     * yet */
+ }
+ 
+ void spapr_caps_add_properties(sPAPRMachineClass *smc, Error **errp)
+diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
+index dc64f4ebcb..5c85f39c3b 100644
+--- a/include/hw/ppc/spapr.h
++++ b/include/hw/ppc/spapr.h
+@@ -54,6 +54,8 @@ typedef enum {
+  * Capabilities
+  */
+ 
++/* These bits go in the migration stream, so they can't be reassigned */
++
+ /* Hardware Transactional Memory */
+ #define SPAPR_CAP_HTM               0x0000000000000001ULL
+ 
+@@ -142,6 +144,7 @@ struct sPAPRMachineState {
+     const char *icp_type;
+ 
+     sPAPRCapabilities forced_caps, forbidden_caps;
++    sPAPRCapabilities mig_forced_caps, mig_forbidden_caps;
+     sPAPRCapabilities effective_caps;
  };
-=20
- /* HMER/HMEER */
- enum {
--    HMER_MALFUNCTION_ALERT      =3D 1ull << (63 - 0),
--    HMER_PROC_RECV_DONE         =3D 1ull << (63 - 2),
--    HMER_PROC_RECV_ERROR_MASKED =3D 1ull << (63 - 3),
--    HMER_TFAC_ERROR             =3D 1ull << (63 - 4),
--    HMER_TFMR_PARITY_ERROR      =3D 1ull << (63 - 5),
--    HMER_XSCOM_FAIL             =3D 1ull << (63 - 8),
--    HMER_XSCOM_DONE             =3D 1ull << (63 - 9),
--    HMER_PROC_RECV_AGAIN        =3D 1ull << (63 - 11),
--    HMER_WARN_RISE              =3D 1ull << (63 - 14),
--    HMER_WARN_FALL              =3D 1ull << (63 - 15),
--    HMER_SCOM_FIR_HMI           =3D 1ull << (63 - 16),
--    HMER_TRIG_FIR_HMI           =3D 1ull << (63 - 17),
--    HMER_HYP_RESOURCE_ERR       =3D 1ull << (63 - 20),
--    HMER_XSCOM_STATUS_MASK      =3D 7ull << (63 - 23),
--    HMER_XSCOM_STATUS_LSH       =3D (63 - 23),
-+    HMER_MALFUNCTION_ALERT      =3D PPC_BIT(0),
-+    HMER_PROC_RECV_DONE         =3D PPC_BIT(2),
-+    HMER_PROC_RECV_ERROR_MASKED =3D PPC_BIT(3),
-+    HMER_TFAC_ERROR             =3D PPC_BIT(4),
-+    HMER_TFMR_PARITY_ERROR      =3D PPC_BIT(5),
-+    HMER_XSCOM_FAIL             =3D PPC_BIT(8),
-+    HMER_XSCOM_DONE             =3D PPC_BIT(9),
-+    HMER_PROC_RECV_AGAIN        =3D PPC_BIT(11),
-+    HMER_WARN_RISE              =3D PPC_BIT(14),
-+    HMER_WARN_FALL              =3D PPC_BIT(15),
-+    HMER_SCOM_FIR_HMI           =3D PPC_BIT(16),
-+    HMER_TRIG_FIR_HMI           =3D PPC_BIT(17),
-+    HMER_HYP_RESOURCE_ERR       =3D PPC_BIT(20),
-+    HMER_XSCOM_STATUS_MASK      =3D PPC_BITMASK(21, 23),
- };
-=20
- /* Alternate Interrupt Location (AIL) */
-diff --git a/target/ppc/int_helper.c b/target/ppc/int_helper.c
-index 1c013a0ee3..3a50f1e1b7 100644
---- a/target/ppc/int_helper.c
-+++ b/target/ppc/int_helper.c
-@@ -183,7 +183,7 @@ uint64_t helper_bpermd(uint64_t rs, uint64_t rb)
-     for (i =3D 0; i < 8; i++) {
-         int index =3D (rs >> (i*8)) & 0xFF;
-         if (index < 64) {
--            if (rb & (1ull << (63-index))) {
-+            if (rb & PPC_BIT(index)) {
-                 ra |=3D 1 << i;
-             }
-         }
---=20
+ 
+@@ -743,6 +746,8 @@ qemu_irq spapr_qirq(sPAPRMachineState *spapr, int irq);
+ /*
+  * Handling of optional capabilities
+  */
++extern const VMStateDescription vmstate_spapr_caps;
++
+ static inline sPAPRCapabilities spapr_caps(uint64_t mask)
+ {
+     sPAPRCapabilities caps = { mask };
+@@ -757,5 +762,6 @@ static inline bool spapr_has_cap(sPAPRMachineState *spapr, uint64_t cap)
+ void spapr_caps_reset(sPAPRMachineState *spapr);
+ void spapr_caps_validate(sPAPRMachineState *spapr, Error **errp);
+ void spapr_caps_add_properties(sPAPRMachineClass *smc, Error **errp);
++int spapr_caps_post_migration(sPAPRMachineState *spapr);
+ 
+ #endif /* HW_SPAPR_H */
+-- 
 2.14.3
