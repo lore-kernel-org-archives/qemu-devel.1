@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59093)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60068)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mjc@sifive.com>) id 1eWXDI-00069u-Bw
-	for qemu-devel@nongnu.org; Tue, 02 Jan 2018 19:47:26 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1eWXFj-0008S8-El
+	for qemu-devel@nongnu.org; Tue, 02 Jan 2018 19:49:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mjc@sifive.com>) id 1eWXDF-0008UC-8I
-	for qemu-devel@nongnu.org; Tue, 02 Jan 2018 19:47:24 -0500
-Received: from mail-pl0-x242.google.com ([2607:f8b0:400e:c01::242]:44842)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mjc@sifive.com>) id 1eWXDF-0008Tb-0H
-	for qemu-devel@nongnu.org; Tue, 02 Jan 2018 19:47:21 -0500
-Received: by mail-pl0-x242.google.com with SMTP id n13so133442plp.11
-	for <qemu-devel@nongnu.org>; Tue, 02 Jan 2018 16:47:20 -0800 (PST)
-From: Michael Clark <mjc@sifive.com>
-Date: Wed,  3 Jan 2018 13:44:25 +1300
-Message-Id: <1514940265-18093-22-git-send-email-mjc@sifive.com>
-In-Reply-To: <1514940265-18093-1-git-send-email-mjc@sifive.com>
-References: <1514940265-18093-1-git-send-email-mjc@sifive.com>
-Subject: [Qemu-devel] [PATCH v1 21/21] RISC-V Build Infrastructure
+	(envelope-from <dgibson@ozlabs.org>) id 1eWXFf-0001AG-T4
+	for qemu-devel@nongnu.org; Tue, 02 Jan 2018 19:49:55 -0500
+Date: Wed, 3 Jan 2018 11:39:04 +1100
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20180103003904.GH24581@umbus.fritz.box>
+References: <1513618512-30070-1-git-send-email-thuth@redhat.com>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="Rn7IEEq3VEzCw+ji"
+Content-Disposition: inline
+In-Reply-To: <1513618512-30070-1-git-send-email-thuth@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] hw/ppc: Remove the deprecated
+ spapr-pci-vfio-host-bridge device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,282 +24,156 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Michael Clark <mjc@sifive.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
+To: Thomas Huth <thuth@redhat.com>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Alexey Kardashevskiy <aik@ozlabs.ru>
 
-This adds RISC-V into the build system enabling the following targets:
 
-- riscv32-softmmu
-- riscv64-softmmu
-- riscv32-linux-user
-- riscv64-linux-user
+--Rn7IEEq3VEzCw+ji
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-This adds defaults configs for RISC-V, enables the build for the RISC-V
-CPU core, hardware, and Linux User Emulation. The 'qemu-binfmt-conf.sh'
-script is updated to add the RISC-V ELF magic.
+On Mon, Dec 18, 2017 at 06:35:12PM +0100, Thomas Huth wrote:
+> It's a deprecated dummy device since QEMU v2.6.0. That should have
+> been enough time to allow the users to update their scripts in case
+> they still use it, so let's remove this legacy code now.
+>=20
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
 
-Expected checkpatch errors for consistency reasons:
+I'm afraid this has bitrotted due to ongoing changes in the
+ppc-for-2.12 tree, can you rebase and resend, please.
 
-ERROR: line over 90 characters
-FILE: scripts/qemu-binfmt-conf.sh
-Signed-off-by: Michael Clark <mjc@sifive.com>
----
- Makefile.objs                          |  1 +
- arch_init.c                            |  2 ++
- configure                              | 11 +++++++++++
- cpus.c                                 |  6 ++++++
- default-configs/riscv32-linux-user.mak |  1 +
- default-configs/riscv32-softmmu.mak    |  4 ++++
- default-configs/riscv64-linux-user.mak |  1 +
- default-configs/riscv64-softmmu.mak    |  4 ++++
- hw/riscv/Makefile.objs                 | 12 ++++++++++++
- include/sysemu/arch_init.h             |  1 +
- qapi-schema.json                       | 14 +++++++++++++-
- scripts/qemu-binfmt-conf.sh            | 13 ++++++++++++-
- target/riscv/Makefile.objs             |  2 ++
- target/riscv/trace-events              |  1 +
- 14 files changed, 71 insertions(+), 2 deletions(-)
- create mode 100644 default-configs/riscv32-linux-user.mak
- create mode 100644 default-configs/riscv32-softmmu.mak
- create mode 100644 default-configs/riscv64-linux-user.mak
- create mode 100644 default-configs/riscv64-softmmu.mak
- create mode 100644 hw/riscv/Makefile.objs
- create mode 100644 target/riscv/Makefile.objs
- create mode 100644 target/riscv/trace-events
+> ---
+>  hw/ppc/spapr_pci_vfio.c   | 47 -----------------------------------------=
+------
+>  qemu-doc.texi             |  5 -----
+>  scripts/device-crash-test |  1 -
+>  3 files changed, 53 deletions(-)
+>=20
+> diff --git a/hw/ppc/spapr_pci_vfio.c b/hw/ppc/spapr_pci_vfio.c
+> index 8448e0b..053efb0 100644
+> --- a/hw/ppc/spapr_pci_vfio.c
+> +++ b/hw/ppc/spapr_pci_vfio.c
+> @@ -29,31 +29,6 @@
+>  #include "qemu/error-report.h"
+>  #include "sysemu/qtest.h"
+> =20
+> -#define TYPE_SPAPR_PCI_VFIO_HOST_BRIDGE "spapr-pci-vfio-host-bridge"
+> -
+> -#define SPAPR_PCI_VFIO_HOST_BRIDGE(obj) \
+> -    OBJECT_CHECK(sPAPRPHBVFIOState, (obj), TYPE_SPAPR_PCI_VFIO_HOST_BRID=
+GE)
+> -
+> -typedef struct sPAPRPHBVFIOState sPAPRPHBVFIOState;
+> -
+> -struct sPAPRPHBVFIOState {
+> -    sPAPRPHBState phb;
+> -
+> -    int32_t iommugroupid;
+> -};
+> -
+> -static Property spapr_phb_vfio_properties[] =3D {
+> -    DEFINE_PROP_INT32("iommu", sPAPRPHBVFIOState, iommugroupid, -1),
+> -    DEFINE_PROP_END_OF_LIST(),
+> -};
+> -
+> -static void spapr_phb_vfio_instance_init(Object *obj)
+> -{
+> -    if (!qtest_enabled()) {
+> -        error_report("spapr-pci-vfio-host-bridge is deprecated");
+> -    }
+> -}
+> -
+>  bool spapr_phb_eeh_available(sPAPRPHBState *sphb)
+>  {
+>      return vfio_eeh_as_ok(&sphb->iommu_as);
+> @@ -218,25 +193,3 @@ int spapr_phb_vfio_eeh_configure(sPAPRPHBState *sphb)
+> =20
+>      return RTAS_OUT_SUCCESS;
+>  }
+> -
+> -static void spapr_phb_vfio_class_init(ObjectClass *klass, void *data)
+> -{
+> -    DeviceClass *dc =3D DEVICE_CLASS(klass);
+> -
+> -    dc->props =3D spapr_phb_vfio_properties;
+> -}
+> -
+> -static const TypeInfo spapr_phb_vfio_info =3D {
+> -    .name          =3D TYPE_SPAPR_PCI_VFIO_HOST_BRIDGE,
+> -    .parent        =3D TYPE_SPAPR_PCI_HOST_BRIDGE,
+> -    .instance_size =3D sizeof(sPAPRPHBVFIOState),
+> -    .instance_init =3D spapr_phb_vfio_instance_init,
+> -    .class_init    =3D spapr_phb_vfio_class_init,
+> -};
+> -
+> -static void spapr_pci_vfio_register_types(void)
+> -{
+> -    type_register_static(&spapr_phb_vfio_info);
+> -}
+> -
+> -type_init(spapr_pci_vfio_register_types)
+> diff --git a/qemu-doc.texi b/qemu-doc.texi
+> index f7317df..14d818d 100644
+> --- a/qemu-doc.texi
+> +++ b/qemu-doc.texi
+> @@ -2533,11 +2533,6 @@ The ``host_net_remove'' command is replaced by the=
+ ``netdev_del'' command.
+>  The ``ivshmem'' device type is replaced by either the ``ivshmem-plain''
+>  or ``ivshmem-doorbell`` device types.
+> =20
+> -@subsection spapr-pci-vfio-host-bridge (since 2.6.0)
+> -
+> -The ``spapr-pci-vfio-host-bridge'' device type is replaced by
+> -the ``spapr-pci-host-bridge'' device type.
+> -
+>  @section System emulator machines
+> =20
+>  @subsection Xilinx EP108 (since 2.11.0)
+> diff --git a/scripts/device-crash-test b/scripts/device-crash-test
+> index 1aca55f..7417177 100755
+> --- a/scripts/device-crash-test
+> +++ b/scripts/device-crash-test
+> @@ -119,7 +119,6 @@ ERROR_WHITELIST =3D [
+>      {'device':'scsi-generic', 'expected':True},            # drive prope=
+rty not set
+>      {'device':'scsi-hd', 'expected':True},                 # drive prope=
+rty not set
+>      {'device':'spapr-pci-host-bridge', 'expected':True},   # BUID not sp=
+ecified for PHB
+> -    {'device':'spapr-pci-vfio-host-bridge', 'expected':True}, # BUID not=
+ specified for PHB
+>      {'device':'spapr-rng', 'expected':True},               # spapr-rng n=
+eeds an RNG backend!
+>      {'device':'spapr-vty', 'expected':True},               # chardev pro=
+perty not set
+>      {'device':'tpm-tis', 'expected':True},                 # tpm_tis: ba=
+ckend driver with id (null) could not be found
 
-diff --git a/Makefile.objs b/Makefile.objs
-index 285c6f3..ae8658e 100644
---- a/Makefile.objs
-+++ b/Makefile.objs
-@@ -164,6 +164,7 @@ trace-events-subdirs += target/mips
- trace-events-subdirs += target/sparc
- trace-events-subdirs += target/s390x
- trace-events-subdirs += target/ppc
-+trace-events-subdirs += target/riscv
- trace-events-subdirs += qom
- trace-events-subdirs += linux-user
- trace-events-subdirs += qapi
-diff --git a/arch_init.c b/arch_init.c
-index a0b8ed6..dcf356b 100644
---- a/arch_init.c
-+++ b/arch_init.c
-@@ -69,6 +69,8 @@ int graphic_depth = 32;
- #define QEMU_ARCH QEMU_ARCH_OPENRISC
- #elif defined(TARGET_PPC)
- #define QEMU_ARCH QEMU_ARCH_PPC
-+#elif defined(TARGET_RISCV)
-+#define QEMU_ARCH QEMU_ARCH_RISCV
- #elif defined(TARGET_S390X)
- #define QEMU_ARCH QEMU_ARCH_S390X
- #elif defined(TARGET_SH4)
-diff --git a/configure b/configure
-index 100309c..832e025 100755
---- a/configure
-+++ b/configure
-@@ -6530,6 +6530,14 @@ case "$target_name" in
-     echo "TARGET_ABI32=y" >> $config_target_mak
-     gdb_xml_files="power64-core.xml power-fpu.xml power-altivec.xml power-spe.xml power-vsx.xml"
-   ;;
-+  riscv32)
-+    TARGET_BASE_ARCH=riscv
-+    TARGET_ABI_DIR=riscv
-+  ;;
-+  riscv64)
-+    TARGET_BASE_ARCH=riscv
-+    TARGET_ABI_DIR=riscv
-+  ;;
-   sh4|sh4eb)
-     TARGET_ARCH=sh4
-     bflt="yes"
-@@ -6692,6 +6700,9 @@ for i in $ARCH $TARGET_BASE_ARCH ; do
-   ppc*)
-     disas_config "PPC"
-   ;;
-+  riscv)
-+    disas_config "RISCV"
-+  ;;
-   s390*)
-     disas_config "S390"
-   ;;
-diff --git a/cpus.c b/cpus.c
-index 83700c1..702da8b 100644
---- a/cpus.c
-+++ b/cpus.c
-@@ -1909,6 +1909,9 @@ CpuInfoList *qmp_query_cpus(Error **errp)
- #elif defined(TARGET_SPARC)
-         SPARCCPU *sparc_cpu = SPARC_CPU(cpu);
-         CPUSPARCState *env = &sparc_cpu->env;
-+#elif defined(TARGET_RISCV)
-+        RISCVCPU *riscv_cpu = RISCV_CPU(cpu);
-+        CPURISCVState *env = &riscv_cpu->env;
- #elif defined(TARGET_MIPS)
-         MIPSCPU *mips_cpu = MIPS_CPU(cpu);
-         CPUMIPSState *env = &mips_cpu->env;
-@@ -1942,6 +1945,9 @@ CpuInfoList *qmp_query_cpus(Error **errp)
- #elif defined(TARGET_TRICORE)
-         info->value->arch = CPU_INFO_ARCH_TRICORE;
-         info->value->u.tricore.PC = env->PC;
-+#elif defined(TARGET_RISCV)
-+        info->value->arch = CPU_INFO_ARCH_RISCV;
-+        info->value->u.riscv.pc = env->pc;
- #else
-         info->value->arch = CPU_INFO_ARCH_OTHER;
- #endif
-diff --git a/default-configs/riscv32-linux-user.mak b/default-configs/riscv32-linux-user.mak
-new file mode 100644
-index 0000000..865b362
---- /dev/null
-+++ b/default-configs/riscv32-linux-user.mak
-@@ -0,0 +1 @@
-+# Default configuration for riscv-linux-user
-diff --git a/default-configs/riscv32-softmmu.mak b/default-configs/riscv32-softmmu.mak
-new file mode 100644
-index 0000000..f9e7421
---- /dev/null
-+++ b/default-configs/riscv32-softmmu.mak
-@@ -0,0 +1,4 @@
-+# Default configuration for riscv-softmmu
-+
-+CONFIG_SERIAL=y
-+CONFIG_VIRTIO=y
-diff --git a/default-configs/riscv64-linux-user.mak b/default-configs/riscv64-linux-user.mak
-new file mode 100644
-index 0000000..865b362
---- /dev/null
-+++ b/default-configs/riscv64-linux-user.mak
-@@ -0,0 +1 @@
-+# Default configuration for riscv-linux-user
-diff --git a/default-configs/riscv64-softmmu.mak b/default-configs/riscv64-softmmu.mak
-new file mode 100644
-index 0000000..f9e7421
---- /dev/null
-+++ b/default-configs/riscv64-softmmu.mak
-@@ -0,0 +1,4 @@
-+# Default configuration for riscv-softmmu
-+
-+CONFIG_SERIAL=y
-+CONFIG_VIRTIO=y
-diff --git a/hw/riscv/Makefile.objs b/hw/riscv/Makefile.objs
-new file mode 100644
-index 0000000..a0c31ae
---- /dev/null
-+++ b/hw/riscv/Makefile.objs
-@@ -0,0 +1,12 @@
-+obj-y += riscv_elf.o
-+obj-y += riscv_htif.o
-+obj-y += riscv_hart.o
-+obj-y += sifive_e300.o
-+obj-y += sifive_clint.o
-+obj-y += sifive_prci.o
-+obj-y += sifive_plic.o
-+obj-y += sifive_u500.o
-+obj-y += sifive_uart.o
-+obj-y += spike_v1_09.o
-+obj-y += spike_v1_10.o
-+obj-y += virt.o
-diff --git a/include/sysemu/arch_init.h b/include/sysemu/arch_init.h
-index 8751c46..63c6152 100644
---- a/include/sysemu/arch_init.h
-+++ b/include/sysemu/arch_init.h
-@@ -24,6 +24,7 @@ enum {
-     QEMU_ARCH_MOXIE = (1 << 15),
-     QEMU_ARCH_TRICORE = (1 << 16),
-     QEMU_ARCH_NIOS2 = (1 << 17),
-+    QEMU_ARCH_RISCV = (1 << 18),
- };
- 
- extern const uint32_t arch_type;
-diff --git a/qapi-schema.json b/qapi-schema.json
-index 5c06745..a69c9fe 100644
---- a/qapi-schema.json
-+++ b/qapi-schema.json
-@@ -413,7 +413,7 @@
- # Since: 2.6
- ##
- { 'enum': 'CpuInfoArch',
--  'data': ['x86', 'sparc', 'ppc', 'mips', 'tricore', 'other' ] }
-+  'data': ['x86', 'sparc', 'ppc', 'mips', 'tricore', 'riscv', 'other' ] }
- 
- ##
- # @CpuInfo:
-@@ -452,6 +452,7 @@
-             'ppc': 'CpuInfoPPC',
-             'mips': 'CpuInfoMIPS',
-             'tricore': 'CpuInfoTricore',
-+            'riscv': 'CpuInfoRISCV',
-             'other': 'CpuInfoOther' } }
- 
- ##
-@@ -512,6 +513,17 @@
- { 'struct': 'CpuInfoTricore', 'data': { 'PC': 'int' } }
- 
- ##
-+# @CpuInfoRISCV:
-+#
-+# Additional information about a virtual RISCV CPU
-+#
-+# @pc: the instruction pointer
-+#
-+# Since 2.8
-+##
-+{ 'struct': 'CpuInfoRISCV', 'data': { 'pc': 'int' } }
-+
-+##
- # @CpuInfoOther:
- #
- # No additional information is available about the virtual CPU
-diff --git a/scripts/qemu-binfmt-conf.sh b/scripts/qemu-binfmt-conf.sh
-index 8afc3eb..c5ac660 100755
---- a/scripts/qemu-binfmt-conf.sh
-+++ b/scripts/qemu-binfmt-conf.sh
-@@ -4,7 +4,7 @@
- 
- qemu_target_list="i386 i486 alpha arm sparc32plus ppc ppc64 ppc64le m68k \
- mips mipsel mipsn32 mipsn32el mips64 mips64el \
--sh4 sh4eb s390x aarch64 hppa"
-+sh4 sh4eb s390x aarch64 hppa riscv32 riscv64"
- 
- i386_magic='\x7fELF\x01\x01\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02\x00\x03\x00'
- i386_mask='\xff\xff\xff\xff\xff\xfe\xfe\xff\xff\xff\xff\xff\xff\xff\xff\xff\xfe\xff\xff\xff'
-@@ -96,6 +96,14 @@ hppa_magic='\x7f\x45\x4c\x46\x01\x02\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00
- hppa_mask='\xff\xff\xff\xff\xff\xff\xff\x00\xff\xff\xff\xff\xff\xff\xff\xff\xff\xfe\xff\xff'
- hppa_family=hppa
- 
-+riscv32_magic='\x7fELF\x01\x01\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02\x00\xf3\x00'
-+riscv32_mask='\xff\xff\xff\xff\xff\xff\xff\x00\xff\xff\xff\xff\xff\xff\xff\xff\xfe\xff\xff\xff'
-+riscv32_family=riscv
-+
-+riscv64_magic='\x7fELF\x02\x01\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02\x00\xf3\x00'
-+riscv64_mask='\xff\xff\xff\xff\xff\xff\xff\x00\xff\xff\xff\xff\xff\xff\xff\xff\xfe\xff\xff\xff'
-+riscv64_family=riscv
-+
- qemu_get_family() {
-     cpu=${HOST_ARCH:-$(uname -m)}
-     case "$cpu" in
-@@ -117,6 +125,9 @@ qemu_get_family() {
-     sparc*)
-         echo "sparc"
-         ;;
-+    riscv*)
-+        echo "riscv"
-+        ;;
-     *)
-         echo "$cpu"
-         ;;
-diff --git a/target/riscv/Makefile.objs b/target/riscv/Makefile.objs
-new file mode 100644
-index 0000000..0c08263
---- /dev/null
-+++ b/target/riscv/Makefile.objs
-@@ -0,0 +1,2 @@
-+obj-y += translate.o op_helper.o helper.o cpu.o fpu_helper.o \
-+	user_syscall.o user_atomic.o gdbstub.o pmp.o
-diff --git a/target/riscv/trace-events b/target/riscv/trace-events
-new file mode 100644
-index 0000000..9284b1f
---- /dev/null
-+++ b/target/riscv/trace-events
-@@ -0,0 +1 @@
-+# See docs/devel/tracing.txt for syntax documentation.
--- 
-2.7.0
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--Rn7IEEq3VEzCw+ji
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlpMJiUACgkQbDjKyiDZ
+s5LhSRAAl/P/qDLw67iUj7w2tTWTtSbHGYrbB7OjhLgLvRcrC2XoKpdXlciF9KID
+WKZGusCvCkWgV5m/Q3bivu2NVNrs+Q3qboGXt6ybIZAxZSVzc2cADzYTBuj+neo0
+aN4ui+44ctUhcbMIkysIXJmHUS7j1TZ5g1/jWItWM1e4heXk1BHzN0KhP+IQSC87
+e9aAXzu9y7GH4xa28sfAxfFnRrzwbHpFv21XwEDonACwz9WJMiSVSB1hOLDpwHbX
+0xrQXJCQEqb1UscA7D7Ob0Jk7MC12FfSIhJ0DmrLWuLA1a/rFH+GiPjim+ZmlMci
+xjzeFnzNlTYxUuANbBUsY9W9y9HDlNEaMe3sBA9Di+DEclarSE9tEIbKHDNbuZDs
+rXFUtHKoWlEizRG1hvMjMfxip3iaK1P8+L1jjkfEiVjWEG5R6mn4ZmRzYny4rKSO
+6fyjdoCsHgP2cgnIXEerNlWWzISwQNuSszaq77YC1qgnU7QG7fd8OLPYhhfMGdgL
++Husb30rzED5UlJ9m1pXV6sxkTS/i/RCd3sCOADlL6G6xGkFKCE8fC0pHdBcQQKs
+cWyiVt426qM3AJc5Nh5ZHzYW90lN2w9cLSk/Io11gw1eZZgzAufmIB3ExR6LCdmM
+nhUs55rZ95g4o1esXGWweGHWvCoLlIBapfI0TKBWHeNqIbxG4M4=
+=eUd7
+-----END PGP SIGNATURE-----
+
+--Rn7IEEq3VEzCw+ji--
