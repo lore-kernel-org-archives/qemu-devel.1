@@ -1,30 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47977)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48792)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eWnTL-0000qA-RB
-	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 13:09:04 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1eWnVC-0002b8-UC
+	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 13:10:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eWnTK-0007AS-Ez
-	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 13:09:03 -0500
-Received: from mail-qt0-x242.google.com ([2607:f8b0:400d:c0d::242]:42900)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eWnTK-0007AN-AJ
-	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 13:09:02 -0500
-Received: by mail-qt0-x242.google.com with SMTP id g9so3109597qth.9
-	for <qemu-devel@nongnu.org>; Wed, 03 Jan 2018 10:09:02 -0800 (PST)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Wed,  3 Jan 2018 15:08:05 -0300
-Message-Id: <20180103180805.18140-18-f4bug@amsat.org>
-In-Reply-To: <20180103180805.18140-1-f4bug@amsat.org>
-References: <20180103180805.18140-1-f4bug@amsat.org>
+	(envelope-from <pbonzini@redhat.com>) id 1eWnV9-0008Cw-P9
+	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 13:10:58 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:37400)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1eWnV9-0008CV-Jy
+	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 13:10:55 -0500
+References: <20171215150659.1811-1-marcandre.lureau@redhat.com>
+	<20171215150659.1811-5-marcandre.lureau@redhat.com>
+	<CAJ+F1CLxk6vC+ZB09BUBMnJj12RuaeYS=S5KwcBGhoHiYbCd5g@mail.gmail.com>
+	<CAJ+F1CLHsFoRFYy825f0MxyAU4T+97YrjMQWfmu6Cni49zyZWQ@mail.gmail.com>
+	<bfe98eaa-bf87-dabe-ec63-7eae338495a2@redhat.com>
+	<CAFEAcA96TDZR7O75q_NH_vOdLBYr3ygnx-qzoZrQaeRqfrHAkA@mail.gmail.com>
+	<CAJ+F1C+xQGWy8jCEXwzPg17vWJxixVydzEf_jb-FvjohTKwPng@mail.gmail.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <f73e4d0b-ced0-2063-6475-2061511434e0@redhat.com>
+Date: Wed, 3 Jan 2018 19:10:48 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v5 17/17] sdhci: add a "dma-memory" property
+In-Reply-To: <CAJ+F1C+xQGWy8jCEXwzPg17vWJxixVydzEf_jb-FvjohTKwPng@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 04/13] build-sys: add AddressSanitizer
+ when --enable-debug if possible
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,151 +34,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alistair Francis <alistair.francis@xilinx.com>, Fam Zheng <famz@redhat.com>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, Peter Maydell <peter.maydell@linaro.org>, Andrey Smirnov <andrew.smirnov@gmail.com>, Eduardo Habkost <ehabkost@redhat.com>
+To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@gmail.com>, Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU <qemu-devel@nongnu.org>, Fam Zheng <famz@redhat.com>
 
-Add a dma property allowing machine creation to provide the address-space
-sdhci dma operates on.
+On 03/01/2018 19:02, Marc-Andr=C3=A9 Lureau wrote:
+> Hi
+>=20
+> On Wed, Jan 3, 2018 at 6:52 PM, Peter Maydell <peter.maydell@linaro.org=
+> wrote:
+>> On 2 January 2018 at 17:31, Paolo Bonzini <pbonzini@redhat.com> wrote:
+>>> 2) I think removing -O2 from --enable-debug should be removed at the
+>>> same time.  That pretty much guarantees that nobody will use
+>>> --enable-debug, and optimized builds are decently debuggable nowadays=
+.
+>>> The best would be to detect -Og, and add either -Og or -O1 depending =
+on
+>>> presence.
+>>
+>> Hmm. I use --enable-debug all the time and one of the reasons
+>> I use it is that the optimized build is usually more pain
+>> to debug with...
+>=20
+>        -Og Optimize debugging experience.  -Og enables optimizations
+> that do not interfere with debugging. It should be the optimization
+> level of choice for the standard edit-compile-debug cycle, offering
+>            a reasonable level of optimization while maintaining fast
+> compilation and a good debugging experience.
+>=20
+> That should cover debugging nicely. Tbh, I am quite happy with
+> compiler default to O0 when --enable-debug. Og doesn't give me much
+> different experience.
+>=20
+> However, it produces false-positive warnings with gcc.
 
-[based on a patch from Alistair Francis <alistair.francis@xilinx.com>
- from qemu/xilinx tag xilinx-v2016.1]
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Reviewed-by: Alistair Francis <alistair.francis@xilinx.com>
----
- include/hw/sd/sdhci.h |  2 ++
- hw/sd/sdhci.c         | 36 +++++++++++++++++++++++-------------
- 2 files changed, 25 insertions(+), 13 deletions(-)
+-O0 doesn't enable those warnings at all, because it would have even
+more false positives. :)
 
-diff --git a/include/hw/sd/sdhci.h b/include/hw/sd/sdhci.h
-index 9436375b1e..2aea20f1d8 100644
---- a/include/hw/sd/sdhci.h
-+++ b/include/hw/sd/sdhci.h
-@@ -41,6 +41,8 @@ typedef struct SDHCIState {
-     /*< public >*/
-     SDBus sdbus;
-     MemoryRegion iomem;
-+    MemoryRegion *dma_mr;
-+    AddressSpace dma_as;
- 
-     QEMUTimer *insert_timer;       /* timer for 'changing' sd card. */
-     QEMUTimer *transfer_timer;
-diff --git a/hw/sd/sdhci.c b/hw/sd/sdhci.c
-index 5ed4b472c6..b080950f80 100644
---- a/hw/sd/sdhci.c
-+++ b/hw/sd/sdhci.c
-@@ -501,7 +501,7 @@ static void sdhci_sdma_transfer_multi_blocks(SDHCIState *s)
-                     s->blkcnt--;
-                 }
-             }
--            dma_memory_write(&address_space_memory, s->sdmasysad,
-+            dma_memory_write(&s->dma_as, s->sdmasysad,
-                              &s->fifo_buffer[begin], s->data_count - begin);
-             s->sdmasysad += s->data_count - begin;
-             if (s->data_count == block_size) {
-@@ -523,7 +523,7 @@ static void sdhci_sdma_transfer_multi_blocks(SDHCIState *s)
-                 s->data_count = block_size;
-                 boundary_count -= block_size - begin;
-             }
--            dma_memory_read(&address_space_memory, s->sdmasysad,
-+            dma_memory_read(&s->dma_as, s->sdmasysad,
-                             &s->fifo_buffer[begin], s->data_count - begin);
-             s->sdmasysad += s->data_count - begin;
-             if (s->data_count == block_size) {
-@@ -561,11 +561,9 @@ static void sdhci_sdma_transfer_single_block(SDHCIState *s)
-         for (n = 0; n < datacnt; n++) {
-             s->fifo_buffer[n] = sdbus_read_data(&s->sdbus);
-         }
--        dma_memory_write(&address_space_memory, s->sdmasysad, s->fifo_buffer,
--                         datacnt);
-+        dma_memory_write(&s->dma_as, s->sdmasysad, s->fifo_buffer, datacnt);
-     } else {
--        dma_memory_read(&address_space_memory, s->sdmasysad, s->fifo_buffer,
--                        datacnt);
-+        dma_memory_read(&s->dma_as, s->sdmasysad, s->fifo_buffer, datacnt);
-         for (n = 0; n < datacnt; n++) {
-             sdbus_write_data(&s->sdbus, s->fifo_buffer[n]);
-         }
-@@ -589,7 +587,7 @@ static void get_adma_description(SDHCIState *s, ADMADescr *dscr)
-     hwaddr entry_addr = (hwaddr)s->admasysaddr;
-     switch (SDHC_DMA_TYPE(s->hostctl)) {
-     case SDHC_CTRL_ADMA2_32:
--        dma_memory_read(&address_space_memory, entry_addr, (uint8_t *)&adma2,
-+        dma_memory_read(&s->dma_as, entry_addr, (uint8_t *)&adma2,
-                         sizeof(adma2));
-         adma2 = le64_to_cpu(adma2);
-         /* The spec does not specify endianness of descriptor table.
-@@ -601,7 +599,7 @@ static void get_adma_description(SDHCIState *s, ADMADescr *dscr)
-         dscr->incr = 8;
-         break;
-     case SDHC_CTRL_ADMA1_32:
--        dma_memory_read(&address_space_memory, entry_addr, (uint8_t *)&adma1,
-+        dma_memory_read(&s->dma_as, entry_addr, (uint8_t *)&adma1,
-                         sizeof(adma1));
-         adma1 = le32_to_cpu(adma1);
-         dscr->addr = (hwaddr)(adma1 & 0xFFFFF000);
-@@ -614,12 +612,12 @@ static void get_adma_description(SDHCIState *s, ADMADescr *dscr)
-         }
-         break;
-     case SDHC_CTRL_ADMA2_64:
--        dma_memory_read(&address_space_memory, entry_addr,
-+        dma_memory_read(&s->dma_as, entry_addr,
-                         (uint8_t *)(&dscr->attr), 1);
--        dma_memory_read(&address_space_memory, entry_addr + 2,
-+        dma_memory_read(&s->dma_as, entry_addr + 2,
-                         (uint8_t *)(&dscr->length), 2);
-         dscr->length = le16_to_cpu(dscr->length);
--        dma_memory_read(&address_space_memory, entry_addr + 4,
-+        dma_memory_read(&s->dma_as, entry_addr + 4,
-                         (uint8_t *)(&dscr->addr), 8);
-         dscr->attr = le64_to_cpu(dscr->attr);
-         dscr->attr &= 0xfffffff8;
-@@ -678,7 +676,7 @@ static void sdhci_do_adma(SDHCIState *s)
-                         s->data_count = block_size;
-                         length -= block_size - begin;
-                     }
--                    dma_memory_write(&address_space_memory, dscr.addr,
-+                    dma_memory_write(&s->dma_as, dscr.addr,
-                                      &s->fifo_buffer[begin],
-                                      s->data_count - begin);
-                     dscr.addr += s->data_count - begin;
-@@ -702,7 +700,7 @@ static void sdhci_do_adma(SDHCIState *s)
-                         s->data_count = block_size;
-                         length -= block_size - begin;
-                     }
--                    dma_memory_read(&address_space_memory, dscr.addr,
-+                    dma_memory_read(&s->dma_as, dscr.addr,
-                                     &s->fifo_buffer[begin],
-                                     s->data_count - begin);
-                     dscr.addr += s->data_count - begin;
-@@ -1197,10 +1195,20 @@ static void sdhci_common_realize(SDHCIState *s, Error **errp)
- 
-     memory_region_init_io(&s->iomem, OBJECT(s), &sdhci_mmio_ops, s, "sdhci",
-                           SDHC_REGISTERS_MAP_SIZE);
-+
-+    /* use system_memory() if property "dma-memory" not set */
-+    address_space_init(&s->dma_as,
-+                       s->dma_mr ? s->dma_mr : get_system_memory(),
-+                       "sdhci-dma");
- }
- 
- static void sdhci_common_unrealize(SDHCIState *s, Error **errp)
- {
-+    if (s->dma_mr) {
-+        address_space_destroy(&s->dma_as);
-+        object_unparent(OBJECT(&s->dma_mr));
-+    }
-+
-     /* This function is expected to be called only once for each class:
-      * - SysBus:    via DeviceClass->unrealize(),
-      * - PCI:       via PCIDeviceClass->exit().
-@@ -1287,6 +1295,8 @@ static Property sdhci_properties[] = {
-     DEFINE_PROP_UINT64("maxcurr", SDHCIState, maxcurr, 0),
-     DEFINE_PROP_BOOL("pending-insert-quirk", SDHCIState, pending_insert_quirk,
-                      false),
-+    DEFINE_PROP_LINK("dma-memory", SDHCIState, dma_mr,
-+                     TYPE_MEMORY_REGION, MemoryRegion *),
-     DEFINE_PROP_END_OF_LIST(),
- };
- 
--- 
-2.15.1
+Paolo
