@@ -1,27 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37569)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44256)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wexu@redhat.com>) id 1eWZq7-0001sJ-DR
-	for qemu-devel@nongnu.org; Tue, 02 Jan 2018 22:35:40 -0500
+	(envelope-from <gengdongjiu@huawei.com>) id 1eWa2v-0005Qm-6A
+	for qemu-devel@nongnu.org; Tue, 02 Jan 2018 22:48:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wexu@redhat.com>) id 1eWZq3-0006Bh-58
-	for qemu-devel@nongnu.org; Tue, 02 Jan 2018 22:35:39 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:33328)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <wexu@redhat.com>) id 1eWZq2-0006B2-SZ
-	for qemu-devel@nongnu.org; Tue, 02 Jan 2018 22:35:35 -0500
-Date: Wed, 3 Jan 2018 11:57:49 +0800
-From: Wei Xu <wexu@redhat.com>
-Message-ID: <20180103035749.uz4lmjsc7z4kuewu@Wei-Dev>
-References: <77f0c119-236d-9d4e-0a99-3519ecc26b23@profihost.ag>
-	<20180102142054.jqhbg3zrhjlppg2q@Wei-Dev>
-	<895f121e-c8fb-e669-592c-73e807d1f8f7@profihost.ag>
-	<20180102170459.wkvqrrlal4jbobdu@Wei-Dev>
-	<de5af082-f6b5-6b96-9503-54e3105d46f4@profihost.ag>
+	(envelope-from <gengdongjiu@huawei.com>) id 1eWa2t-000082-DF
+	for qemu-devel@nongnu.org; Tue, 02 Jan 2018 22:48:53 -0500
+References: <1514440458-10515-1-git-send-email-gengdongjiu@huawei.com>
+	<1514440458-10515-8-git-send-email-gengdongjiu@huawei.com>
+	<20171228155310.312e95bb@igors-macbook-pro.local>
+From: gengdongjiu <gengdongjiu@huawei.com>
+Message-ID: <fc9e6c01-3334-f79c-5416-499177234044@huawei.com>
+Date: Wed, 3 Jan 2018 11:48:30 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <de5af082-f6b5-6b96-9503-54e3105d46f4@profihost.ag>
-Subject: Re: [Qemu-devel] dropped pkts with Qemu on tap interace (RX)
+In-Reply-To: <20171228155310.312e95bb@igors-macbook-pro.local>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v14 7/9] ARM: ACPI: Add GPIO notification
+ type for hardware RAS error
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,90 +26,297 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Priebe - Profihost AG <s.priebe@profihost.ag>
-Cc: qemu-devel <qemu-devel@nongnu.org>
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: pbonzini@redhat.com, mst@redhat.com, zhaoshenglong@huawei.com, peter.maydell@linaro.org, mtosatti@redhat.com, rth@twiddle.net, ehabkost@redhat.com, james.morse@arm.com, christoffer.dall@linaro.org, marc.zyngier@arm.com, kvm@vger.kernel.org, qemu-devel@nongnu.org, qemu-arm@nongnu.org, huangshaoyu@huawei.com, zhengqiang10@huawei.com, xuwei5@hisilicon.com
 
-On Tue, Jan 02, 2018 at 10:17:25PM +0100, Stefan Priebe - Profihost AG wrote:
+On 2017/12/28 22:53, Igor Mammedov wrote:
+> On Thu, 28 Dec 2017 13:54:16 +0800
+> Dongjiu Geng <gengdongjiu@huawei.com> wrote:
 > 
-> Am 02.01.2018 um 18:04 schrieb Wei Xu:
-> > On Tue, Jan 02, 2018 at 04:24:33PM +0100, Stefan Priebe - Profihost AG wrote:
-> >> Hi,
-> >> Am 02.01.2018 um 15:20 schrieb Wei Xu:
-> >>> On Tue, Jan 02, 2018 at 12:17:29PM +0100, Stefan Priebe - Profihost AG wrote:
-> >>>> Hello,
-> >>>>
-> >>>> currently i'm trying to fix a problem where we have "random" missing
-> >>>> packets.
-> >>>>
-> >>>> We're doing an ssh connect from machine a to machine b every 5 minutes
-> >>>> via rsync and ssh.
-> >>>>
-> >>>> Sometimes it happens that we get this cron message:
-> >>>> "Connection to 192.168.0.2 closed by remote host.
-> >>>> rsync: connection unexpectedly closed (0 bytes received so far) [sender]
-> >>>> rsync error: unexplained error (code 255) at io.c(226) [sender=3.1.2]
-> >>>> ssh: connect to host 192.168.0.2 port 22: Connection refused"
-> >>>
-> >>> Hi Stefan,
-> >>> What kind of virtio-net backend are you using? Can you paste your qemu
-> >>> command line here?
-> >>
-> >> Sure netdev part:
-> >> -netdev
-> >> type=tap,id=net0,ifname=tap317i0,script=/var/lib/qemu-server/pve-bridge,downscript=/var/lib/qemu-server/pve-bridgedown,vhost=on
-> >> -device
-> >> virtio-net-pci,mac=EA:37:42:5C:F3:33,netdev=net0,bus=pci.0,addr=0x12,id=net0,bootindex=300
-> >> -netdev
-> >> type=tap,id=net1,ifname=tap317i1,script=/var/lib/qemu-server/pve-bridge,downscript=/var/lib/qemu-server/pve-bridgedown,vhost=on,queues=4
-> >> -device
-> >> virtio-net-pci,mac=6A:8E:74:45:1A:0B,nedev=net1,bus=pci.0,addr=0x13,id=net1,vectors=10,mq=on,bootindex=301
-> > 
-> > According to what you have mentioned, the traffic is not heavy for the guests,
-> > the dropping shouldn't happen for regular case.
-> 
-> The avg traffic is around 300kb/s.
-> 
-> > What is your hardware platform?
-> 
-> Dual Intel Xeon E5-2680 v4
-> 
-> > and Which versions are you using for both
-> > guest/host kernel
-> Kernel v4.4.103
-> 
-> > and qemu?
-> 2.9.1
-> 
-> > Are there other VMs on the same host?
-> Yes.
+>> In ARM platform we implements a notification of error events
+>> via a GPIO pin. For this GPIO-signaled events, we choose GPIO
+>> pin 4 for hardware error device (PNP0C33), So _E04 should be
+>> added to ACPI DSDT table. When GPIO-pin 4 signaled a events,
+>> the guest ACPI driver will receive this notification and
+>> handing the error.
+>>
+>> In order to better trigger the GPIO IRQ, we defined a notifier
+>> hardware_error_notifiers. If Qemu wants to deliver a GPIO-Signal
+>> notification, will call it.
+>>
+>> Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
+>> ---
+>> 1. Address discussion result about guest APEI notification type for SIGBUS_MCEERR_AO SIGBUS in [1],
+>>    the discussion conclusion is using GPIO-Signal
+>>
+>> [1]:
+>> https://lists.gnu.org/archive/html/qemu-devel/2017-10/msg03397.html
+>> https://lists.gnu.org/archive/html/qemu-devel/2017-10/msg03467.html
+>> https://lists.gnu.org/archive/html/qemu-devel/2017-10/msg03601.html
+>> https://lists.gnu.org/archive/html/qemu-devel/2017-10/msg03775.html
+>>
+>> 2. The ASL dump for the GPIO and hardware error device
+>>
+>> ................
+>> Device (GPO0)
+>> {
+>>     Name (_AEI, ResourceTemplate ()  // _AEI: ACPI Event Interrupts
+>>     {
+>>         .............
+>>         GpioInt (Edge, ActiveHigh, Exclusive, PullUp, 0x0000,
+>>             "GPO0", 0x00, ResourceConsumer, ,
+>>             )
+>>             {   // Pin list
+>>                 0x0004
+>>             }
+>>     })
+>>     Method (_E04, 0, NotSerialized)  // _Exx: Edge-Triggered GPE
+>>     {
+>>         Notify (ERRD, 0x80) // Status Change
+>>     }
+>> }
+>> Device (ERRD)
+>> {
+>>     Name (_HID, EisaId ("PNP0C33") /* Error Device */)  // _HID: Hardware ID
+>>     Name (_UID, Zero)  // _UID: Unique ID
+>>     Method (_STA, 0, NotSerialized)  // _STA: Status
+>>     {
+>>         Return (0x0F)
+>>     }
+>> }
+>>
+>> 3. Below is the guest log when Qemu notifies guest using GPIO-signal after record a CPER
+>> [  504.164899] {1}[Hardware Error]: Hardware error from APEI Generic Hardware Error Source: 7
+>> [  504.166970] {1}[Hardware Error]: event severity: recoverable
+>> [  504.251650] {1}[Hardware Error]:  Error 0, type: recoverable
+>> [  504.252974] {1}[Hardware Error]:   section_type: memory error
+>> [  504.254380] {1}[Hardware Error]:   physical_address: 0x00000000000003ec
+>> [  504.255879] {1}[Hardware Error]:   error_type: 3, multi-bit ECC
+>> ---
+>>  hw/arm/virt-acpi-build.c | 31 ++++++++++++++++++++++++++++++-
+>>  hw/arm/virt.c            | 18 ++++++++++++++++++
+>>  include/sysemu/sysemu.h  |  3 +++
+>>  vl.c                     | 12 ++++++++++++
+>>  4 files changed, 63 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
+>> index b7d45cd..06c14b3 100644
+>> --- a/hw/arm/virt-acpi-build.c
+>> +++ b/hw/arm/virt-acpi-build.c
+>> @@ -49,6 +49,7 @@
+>>  
+>>  #define ARM_SPI_BASE 32
+>>  #define ACPI_POWER_BUTTON_DEVICE "PWRB"
+>> +#define ACPI_HARDWARE_ERROR_DEVICE "ERRD"
+>>  
+>>  static void acpi_dsdt_add_cpus(Aml *scope, int smp_cpus)
+>>  {
+>> @@ -340,7 +341,13 @@ static void acpi_dsdt_add_gpio(Aml *scope, const MemMapEntry *gpio_memmap,
+>>  
+>>      Aml *aei = aml_resource_template();
+>>      /* Pin 3 for power button */
+>> -    const uint32_t pin_list[1] = {3};
+>> +    uint32_t pin_list[1] = {3};
+>> +    aml_append(aei, aml_gpio_int(AML_CONSUMER, AML_EDGE, AML_ACTIVE_HIGH,
+>> +                                 AML_EXCLUSIVE, AML_PULL_UP, 0, pin_list, 1,
+>> +                                 "GPO0", NULL, 0));
+>> +
+>> +    /* Pin 4 for hardware error device */
+>> +    pin_list[0] = 4;
+>>      aml_append(aei, aml_gpio_int(AML_CONSUMER, AML_EDGE, AML_ACTIVE_HIGH,
+>>                                   AML_EXCLUSIVE, AML_PULL_UP, 0, pin_list, 1,
+>>                                   "GPO0", NULL, 0));
+>> @@ -351,6 +358,13 @@ static void acpi_dsdt_add_gpio(Aml *scope, const MemMapEntry *gpio_memmap,
+>>      aml_append(method, aml_notify(aml_name(ACPI_POWER_BUTTON_DEVICE),
+>>                                    aml_int(0x80)));
+>>      aml_append(dev, method);
+>> +
+>> +    /* _E04 is handle for hardware error */
+>> +    method = aml_method("_E04", 0, AML_NOTSERIALIZED);
+>> +    aml_append(method, aml_notify(aml_name(ACPI_HARDWARE_ERROR_DEVICE),
+>> +                                  aml_int(0x80)));
+> aml_int(0x80) /* ACPI ... : Notification For Generic Error Sources */
+sure. thanks
 
-What about the CPU load? 
+> 
+>> +    aml_append(dev, method);
+>> +
+>>      aml_append(scope, dev);
+>>  }
+>>  
+>> @@ -363,6 +377,20 @@ static void acpi_dsdt_add_power_button(Aml *scope)
+>>      aml_append(scope, dev);
+>>  }
+>>  
+>> +static void acpi_dsdt_add_error_device(Aml *scope)
+>> +{
+>> +    Aml *dev = aml_device(ACPI_HARDWARE_ERROR_DEVICE);
+>> +    Aml *method;
+>> +
+>> +    aml_append(dev, aml_name_decl("_HID", aml_eisaid("PNP0C33")));
+>> +    aml_append(dev, aml_name_decl("_UID", aml_int(0)));
+>> +
+>> +    method = aml_method("_STA", 0, AML_NOTSERIALIZED);
+>> +    aml_append(method, aml_return(aml_int(0x0f)));
+> no need for dummy _STA method, device is assumed to be present if there is no _STA 
+Igor,
+  do you mean remove above two line code as shown in [1]?
+I dump the DSDT table in my host Ubuntu PC for the error device (PNP0C33), it has the _STA, as shown in [2].
+do we not want to add the _STA for guest?
+
+[1]
++    method = aml_method("_STA", 0, AML_NOTSERIALIZED);
++    aml_append(method, aml_return(aml_int(0x0f)));
+
+[2]:
+        Device (WERR)
+        {
+            Name (_HID, EisaId ("PNP0C33"))  // _HID: Hardware ID
+            Method (_STA, 0, NotSerialized)  // _STA: Status
+            {
+                If (LGreaterEqual (OSYS, 0x07D9))
+                {
+                    Return (0x0F)
+                }
+                Else
+                {
+                    Return (Zero)
+                }
+            }
+        }
+> 
+>> +    aml_append(dev, method);
+>> +    aml_append(scope, dev);
+>> +}
+>> +
+>>  /* RSDP */
+>>  static GArray *
+>>  build_rsdp(GArray *rsdp_table, BIOSLinker *linker, unsigned xsdt_tbl_offset)
+>> @@ -716,6 +744,7 @@ build_dsdt(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
+>>      acpi_dsdt_add_gpio(scope, &memmap[VIRT_GPIO],
+>>                         (irqmap[VIRT_GPIO] + ARM_SPI_BASE));
+>>      acpi_dsdt_add_power_button(scope);
+>> +    acpi_dsdt_add_error_device(scope);
+>>  
+>>      aml_append(dsdt, scope);
+>>  
+>> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+>> index 6b7a0fe..68495c2 100644
+>> --- a/hw/arm/virt.c
+>> +++ b/hw/arm/virt.c
+>> @@ -701,16 +701,27 @@ static void create_rtc(const VirtMachineState *vms, qemu_irq *pic)
+>>  }
+>>  
+>>  static DeviceState *gpio_key_dev;
+>> +static DeviceState *gpio_err_dev;
+>>  static void virt_powerdown_req(Notifier *n, void *opaque)
+>>  {
+>>      /* use gpio Pin 3 for power button event */
+>>      qemu_set_irq(qdev_get_gpio_in(gpio_key_dev, 0), 1);
+>>  }
+>>  
+>> +static void virt_error_notify_req(Notifier *n, void *opaque)
+>> +{
+>> +    /* use gpio Pin 4 for hardware error event */
+>> +    qemu_set_irq(qdev_get_gpio_in(gpio_err_dev, 0), 1);
+>> +}
+>> +
+>>  static Notifier virt_system_powerdown_notifier = {
+>>      .notify = virt_powerdown_req
+>>  };
+>>  
+>> +static Notifier virt_hardware_error_notifier = {
+>> +    .notify = virt_error_notify_req
+>> +};
+>> +
+>>  static void create_gpio(const VirtMachineState *vms, qemu_irq *pic)
+>>  {
+>>      char *nodename;
+>> @@ -739,6 +750,10 @@ static void create_gpio(const VirtMachineState *vms, qemu_irq *pic)
+>>  
+>>      gpio_key_dev = sysbus_create_simple("gpio-key", -1,
+>>                                          qdev_get_gpio_in(pl061_dev, 3));
+>> +
+>> +    gpio_err_dev = sysbus_create_simple("gpio-key", -1,
+>> +                                        qdev_get_gpio_in(pl061_dev, 4));
+>> +
+>>      qemu_fdt_add_subnode(vms->fdt, "/gpio-keys");
+>>      qemu_fdt_setprop_string(vms->fdt, "/gpio-keys", "compatible", "gpio-keys");
+>>      qemu_fdt_setprop_cell(vms->fdt, "/gpio-keys", "#size-cells", 0);
+>> @@ -755,6 +770,9 @@ static void create_gpio(const VirtMachineState *vms, qemu_irq *pic)
+>>      /* connect powerdown request */
+>>      qemu_register_powerdown_notifier(&virt_system_powerdown_notifier);
+>>  
+>> +    /* connect hardware error notify request */
+>> +    qemu_register_hardware_error_notifier(&virt_hardware_error_notifier);
+>> +
+>>      g_free(nodename);
+>>  }
+>>  
+>> diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
+>> index b213696..86931cf 100644
+>> --- a/include/sysemu/sysemu.h
+>> +++ b/include/sysemu/sysemu.h
+>> @@ -75,6 +75,7 @@ void qemu_register_wakeup_notifier(Notifier *notifier);
+>>  void qemu_system_shutdown_request(ShutdownCause reason);
+>>  void qemu_system_powerdown_request(void);
+>>  void qemu_register_powerdown_notifier(Notifier *notifier);
+>> +void qemu_register_hardware_error_notifier(Notifier *notifier);
+>>  void qemu_system_debug_request(void);
+>>  void qemu_system_vmstop_request(RunState reason);
+>>  void qemu_system_vmstop_request_prepare(void);
+>> @@ -93,6 +94,8 @@ void qemu_remove_machine_init_done_notifier(Notifier *notify);
+>>  
+>>  void qemu_announce_self(void);
+>>  
+>> +void qemu_hardware_error_notify(void);
+>> +
+>>  extern int autostart;
+>>  
+>>  typedef enum {
+>> diff --git a/vl.c b/vl.c
+>> index d632693..3552f7d 100644
+>> --- a/vl.c
+>> +++ b/vl.c
+>> @@ -1614,6 +1614,8 @@ static int suspend_requested;
+>>  static WakeupReason wakeup_reason;
+>>  static NotifierList powerdown_notifiers =
+>>      NOTIFIER_LIST_INITIALIZER(powerdown_notifiers);
+>> +static NotifierList hardware_error_notifiers =
+>> +    NOTIFIER_LIST_INITIALIZER(hardware_error_notifiers);
+>>  static NotifierList suspend_notifiers =
+>>      NOTIFIER_LIST_INITIALIZER(suspend_notifiers);
+>>  static NotifierList wakeup_notifiers =
+>> @@ -1850,12 +1852,22 @@ void qemu_register_powerdown_notifier(Notifier *notifier)
+>>      notifier_list_add(&powerdown_notifiers, notifier);
+>>  }
+>>  
+>> +void qemu_register_hardware_error_notifier(Notifier *notifier)
+>> +{
+>> +    notifier_list_add(&hardware_error_notifiers, notifier);
+>> +}
+>> +
+>>  void qemu_system_debug_request(void)
+>>  {
+>>      debug_requested = 1;
+>>      qemu_notify_event();
+>>  }
+>>  
+>> +void qemu_hardware_error_notify(void)
+>> +{
+>> +    notifier_list_notify(&hardware_error_notifiers, NULL);
+>> +}
+> 
+> I'd prefer if you'd replace all this Notifier code with a machine callback
+> and call it when needed.
+Ok, thanks for this suggestion. I will check the code and see how to add a machine callback.
+
 
 > 
+>>  static bool main_loop_should_exit(void)
+>>  {
+>>      RunState r;
 > 
-> >>> 'Connection refused' usually means that the client gets a TCP Reset rather
-> >>> than losing packets, so this might not be a relevant issue.
-> >>
-> >> Mhm so you mean these might be two seperate ones?
-> > 
-> > Yes.
-> > 
-> >>
-> >>> Also you can do a tcpdump on both guests and see what happened to SSH packets
-> >>> (tcpdump -i tapXXX port 22).
-> >>
-> >> Sadly not as there's too much traffic on that part as rsync is syncing
-> >> every 5 minutes through ssh.
-> > 
-> > You can do a tcpdump for the entire traffic from the guest and host and compare
-> > what kind of packets are dropped if the traffic is not overloaded.
 > 
-> Are you sure? I don't get why the same amount and same kind of packets
-> should be received by both tap which are connected to different bridges
-> to different HW and physical interfaces.
-
-Exactly, possibly this would be a host or guest kernel bug cos than qemu issue
-you are using vhost kernel as the backend and the two stats are independent,
-you might have to check out what is happening inside the traffic.
-
-Wei
+> .
+> 
