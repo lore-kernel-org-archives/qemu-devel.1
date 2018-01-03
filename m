@@ -1,26 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60892)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35392)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mjc@sifive.com>) id 1eWrCJ-0006IY-Js
-	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 17:07:45 -0500
+	(envelope-from <alistair23@gmail.com>) id 1eWrFk-0008VQ-08
+	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 17:11:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mjc@sifive.com>) id 1eWrCH-0006qI-Qw
-	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 17:07:43 -0500
-Received: from mail-oi0-x242.google.com ([2607:f8b0:4003:c06::242]:36126)
+	(envelope-from <alistair23@gmail.com>) id 1eWrFj-0001ft-1Q
+	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 17:11:15 -0500
+Received: from mail-wm0-x234.google.com ([2a00:1450:400c:c09::234]:38134)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mjc@sifive.com>) id 1eWrCH-0006p2-IK
-	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 17:07:41 -0500
-Received: by mail-oi0-x242.google.com with SMTP id j14so1896078oih.3
-	for <qemu-devel@nongnu.org>; Wed, 03 Jan 2018 14:07:41 -0800 (PST)
+	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
+	id 1eWrFi-0001ek-Ol
+	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 17:11:14 -0500
+Received: by mail-wm0-x234.google.com with SMTP id 64so267002wme.3
+	for <qemu-devel@nongnu.org>; Wed, 03 Jan 2018 14:11:14 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <b40d2c79-4655-376d-80b1-58a21e32e927@adacore.com>
-References: <1514940265-18093-1-git-send-email-mjc@sifive.com>
-	<1514940265-18093-19-git-send-email-mjc@sifive.com>
-	<b40d2c79-4655-376d-80b1-58a21e32e927@adacore.com>
-From: Michael Clark <mjc@sifive.com>
-Date: Thu, 4 Jan 2018 11:07:40 +1300
-Message-ID: <CAHNT7NtTqc4ZPhcSYNufL-E__joUieKjzU8wd1ZemaSB=axrJg@mail.gmail.com>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Wed, 3 Jan 2018 14:10:42 -0800
+Message-ID: <CAKmqyKPZ3AUwGFwp6zK+aFSd6R3p8c+pP-i-W-g=t6ZfR5GVaA@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v1 18/21] SiFive RISC-V PRCI Block
+Subject: [Qemu-devel] MTTCG External Halt
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,230 +26,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: KONRAD Frederic <frederic.konrad@adacore.com>
-Cc: qemu-devel@nongnu.org, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Sagar Karandikar <sagark@eecs.berkeley.edu>
+To: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
+Cc: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, Alistair Francis <alistair.francis@xilinx.com>
 
-On Thu, Jan 4, 2018 at 4:02 AM, KONRAD Frederic <frederic.konrad@adacore.com
-> wrote:
+Hey guys, I'm super stuck with an ugly MTTCG issue and was wondering
+if anyone had any ideas.
 
->
->
-> On 01/03/2018 01:44 AM, Michael Clark wrote:
->
->> Simple model of the PRCI  (Power, Reset, Clock, Interrupt) to emulate
->> register reads made by the SDK BSP.
->>
->> Signed-off-by: Michael Clark <mjc@sifive.com>
->> ---
->>   hw/riscv/sifive_prci.c         | 107 ++++++++++++++++++++++++++++++
->> +++++++++++
->>   include/hw/riscv/sifive_prci.h |  43 +++++++++++++++++
->>   2 files changed, 150 insertions(+)
->>   create mode 100644 hw/riscv/sifive_prci.c
->>   create mode 100644 include/hw/riscv/sifive_prci.h
->>
->> diff --git a/hw/riscv/sifive_prci.c b/hw/riscv/sifive_prci.c
->> new file mode 100644
->> index 0000000..5c27696
->> --- /dev/null
->> +++ b/hw/riscv/sifive_prci.c
->> @@ -0,0 +1,107 @@
->> +/*
->> + * QEMU SiFive PRCI (Power, Reset, Clock, Interrupt)
->> + *
->> + * Copyright (c) 2017 SiFive, Inc.
->> + *
->> + * Simple model of the PRCI to emulate register reads made by the SDK BSP
->> + *
->> + * Permission is hereby granted, free of charge, to any person obtaining
->> a copy
->> + * of this software and associated documentation files (the "Software"),
->> to deal
->> + * in the Software without restriction, including without limitation the
->> rights
->> + * to use, copy, modify, merge, publish, distribute, sublicense, and/or
->> sell
->> + * copies of the Software, and to permit persons to whom the Software is
->> + * furnished to do so, subject to the following conditions:
->> + *
->> + * The above copyright notice and this permission notice shall be
->> included in
->> + * all copies or substantial portions of the Software.
->> + *
->> + * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
->> EXPRESS OR
->> + * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
->> MERCHANTABILITY,
->> + * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT
->> SHALL
->> + * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR
->> OTHER
->> + * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
->> ARISING FROM,
->> + * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
->> DEALINGS IN
->> + * THE SOFTWARE.
->> + */
->> +
->> +#include "qemu/osdep.h"
->> +#include "hw/sysbus.h"
->> +#include "target/riscv/cpu.h"
->> +#include "hw/riscv/sifive_prci.h"
->> +
->> +/* currently implements enough to mock freedom-e-sdk BSP clock
->> programming */
->> +
->> +static uint64_t sifive_prci_read(void *opaque, hwaddr addr, unsigned int
->> size)
->> +{
->> +    if (addr == 0 /* PRCI_HFROSCCFG */) {
->> +        return 1 << 31; /* ROSC_RDY */
->> +    }
->> +    if (addr == 8 /* PRCI_PLLCFG    */) {
->> +        return 1 << 31; /* PLL_LOCK */
->> +    }
->> +    hw_error("%s: read: addr=0x%x\n", __func__, (int)addr);
->> +    return 0;
->> +}
->> +
->> +static void sifive_prci_write(void *opaque, hwaddr addr,
->> +           uint64_t val64, unsigned int size)
->> +{
->> +    /* discard writes */
->> +}
->> +
->> +static const MemoryRegionOps sifive_prci_ops = {
->> +    .read = sifive_prci_read,
->> +    .write = sifive_prci_write,
->> +    .endianness = DEVICE_NATIVE_ENDIAN,
->> +    .valid = {
->> +        .min_access_size = 4,
->> +        .max_access_size = 4
->> +    }
->> +};
->> +
->> +static Property sifive_prci_properties[] = {
->> +    DEFINE_PROP_END_OF_LIST(),
->> +};
->>
->
-> Is that needed?
+In the Xilinx fork of QEMU (based on 2.11) we have a way for CPUs to
+halt other CPUs. This is used for example when the power control unit
+halts the ARM A53s. To do this we have internal GPIO signals that end
+up calling a function that basically does this:
 
+To halt:
+    cpu->halted = true;
+    cpu_interrupt(cpu, CPU_INTERRUPT_HALT);
 
-At this point it is redundant.
+To un-halt
+    cpu->halted = false;
+    cpu_reset_interrupt(cpu, CPU_INTERRUPT_HALT);
 
-I will remove it from the next spin of the patch set.
+We also have the standard ARM WFI (Wait For Interrupt) implementation
+in op_helper.c:
+    cs->halted = 1;
+    cs->exception_index = EXCP_HLT;
+    cpu_loop_exit(cs);
 
-+
->> +static void sifive_prci_init(Object *obj)
->> +{
->> +    SiFivePRCIState *s = SIFIVE_PRCI(obj);
->> +
->> +    memory_region_init_io(&s->mmio, obj, &sifive_prci_ops, s,
->> +                          TYPE_SIFIVE_PRCI, 0x8000);
->> +    sysbus_init_mmio(SYS_BUS_DEVICE(obj), &s->mmio);
->> +}
->> +
->> +static void sifive_prci_class_init(ObjectClass *klass, void *data)
->> +{
->> +    DeviceClass *dc = DEVICE_CLASS(klass);
->> +
->> +    dc->props = sifive_prci_properties;
->> +}
->> +
->> +static const TypeInfo sifive_prci_info = {
->> +    .name          = TYPE_SIFIVE_PRCI,
->> +    .parent        = TYPE_SYS_BUS_DEVICE,
->> +    .instance_size = sizeof(SiFivePRCIState),
->> +    .instance_init = sifive_prci_init,
->> +    .class_init    = sifive_prci_class_init,
->> +};
->> +
->> +static void sifive_prci_register_types(void)
->> +{
->> +    type_register_static(&sifive_prci_info);
->> +}
->> +
->> +type_init(sifive_prci_register_types)
->>
->
-> That's what is missing in the previous patch.
->
-> Fred
->
->
-> +
->> +
->> +/*
->> + * Create PRCI device.
->> + */
->> +DeviceState *sifive_prci_create(hwaddr addr)
->> +{
->> +    DeviceState *dev = qdev_create(NULL, TYPE_SIFIVE_PRCI);
->> +    qdev_init_nofail(dev);
->> +    sysbus_mmio_map(SYS_BUS_DEVICE(dev), 0, addr);
->> +    return dev;
->> +}
->> diff --git a/include/hw/riscv/sifive_prci.h
->> b/include/hw/riscv/sifive_prci.h
->> new file mode 100644
->> index 0000000..0e032e5
->> --- /dev/null
->> +++ b/include/hw/riscv/sifive_prci.h
->> @@ -0,0 +1,43 @@
->> +/*
->> + * QEMU SiFive PRCI (Power, Reset, Clock, Interrupt) interface
->> + *
->> + * Copyright (c) 2017 SiFive, Inc.
->> + *
->> + * Permission is hereby granted, free of charge, to any person obtaining
->> a copy
->> + * of this software and associated documentation files (the "Software"),
->> to deal
->> + * in the Software without restriction, including without limitation the
->> rights
->> + * to use, copy, modify, merge, publish, distribute, sublicense, and/or
->> sell
->> + * copies of the Software, and to permit persons to whom the Software is
->> + * furnished to do so, subject to the following conditions:
->> + *
->> + * The above copyright notice and this permission notice shall be
->> included in
->> + * all copies or substantial portions of the Software.
->> + *
->> + * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
->> EXPRESS OR
->> + * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
->> MERCHANTABILITY,
->> + * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT
->> SHALL
->> + * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR
->> OTHER
->> + * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
->> ARISING FROM,
->> + * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
->> DEALINGS IN
->> + * THE SOFTWARE.
->> + */
->> +
->> +#ifndef HW_SIFIVE_PRCI_H
->> +#define HW_SIFIVE_PRCI_H
->> +
->> +#define TYPE_SIFIVE_PRCI "riscv.sifive.prci"
->> +
->> +#define SIFIVE_PRCI(obj) \
->> +    OBJECT_CHECK(SiFivePRCIState, (obj), TYPE_SIFIVE_PRCI)
->> +
->> +typedef struct SiFivePRCIState {
->> +    /*< private >*/
->> +    SysBusDevice parent_obj;
->> +
->> +    /*< public >*/
->> +    MemoryRegion mmio;
->> +} SiFivePRCIState;
->> +
->> +DeviceState *sifive_prci_create(hwaddr addr);
->> +
->> +#endif
->>
->>
+Before MTTCG this used to work great, but now either we end up with
+the guest Linux complaining about CPU stalls or we hit:
+ERROR:/scratch/alistai/master-qemu/cpus.c:1516:qemu_tcg_cpu_thread_fn:
+assertion failed: (cpu->halted)
+
+If I remove the instances of manually setting cpu->halted then I don't
+see the asserts(), but the the WFI instruction doesn't work correctly.
+So it seems like setting the halted status externally from the CPU
+causes the issue. I have tried setting it inside a lock, using atomic
+operations and running the setter async on the CPU, but nothing works.
+
+Any chance any one has some insight into a way to externally set a
+vCPU as halted/un-halted?
+
+Thanks,
+Alistair
