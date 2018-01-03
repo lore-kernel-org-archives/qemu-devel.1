@@ -1,30 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44039)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44146)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eWquv-0000kj-KV
-	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 16:49:46 -0500
+	id 1eWquz-0000ov-Iy
+	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 16:49:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eWquu-0003vn-Md
-	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 16:49:45 -0500
-Received: from mail-qk0-x244.google.com ([2607:f8b0:400d:c09::244]:40247)
+	id 1eWquy-0003zh-75
+	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 16:49:49 -0500
+Received: from mail-qt0-x243.google.com ([2607:f8b0:400d:c0d::243]:35995)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eWquu-0003vN-Hi
-	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 16:49:44 -0500
-Received: by mail-qk0-x244.google.com with SMTP id q14so3326151qke.7
-	for <qemu-devel@nongnu.org>; Wed, 03 Jan 2018 13:49:44 -0800 (PST)
+	id 1eWquy-0003z9-29
+	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 16:49:48 -0500
+Received: by mail-qt0-x243.google.com with SMTP id a16so3882041qtj.3
+	for <qemu-devel@nongnu.org>; Wed, 03 Jan 2018 13:49:47 -0800 (PST)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Wed,  3 Jan 2018 18:49:24 -0300
-Message-Id: <20180103214925.16677-4-f4bug@amsat.org>
+Date: Wed,  3 Jan 2018 18:49:25 -0300
+Message-Id: <20180103214925.16677-5-f4bug@amsat.org>
 In-Reply-To: <20180103214925.16677-1-f4bug@amsat.org>
 References: <20180103214925.16677-1-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [RFC PATCH v2 3/4] libqos: implement sdbus QMP driver
+Subject: [Qemu-devel] [RFC PATCH v2 4/4] tests: add some sdcard qtest
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,159 +38,187 @@ Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nong
 
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- tests/libqos/sdbus-qmp.c | 130 +++++++++++++++++++++++++++++++++++++++++++++++
- tests/Makefile.include   |   2 +-
- 2 files changed, 131 insertions(+), 1 deletion(-)
- create mode 100644 tests/libqos/sdbus-qmp.c
+ tests/sdbus-test.c     | 151 +++++++++++++++++++++++++++++++++++++++++++++++++
+ tests/Makefile.include |   2 +
+ 2 files changed, 153 insertions(+)
+ create mode 100644 tests/sdbus-test.c
 
-diff --git a/tests/libqos/sdbus-qmp.c b/tests/libqos/sdbus-qmp.c
+diff --git a/tests/sdbus-test.c b/tests/sdbus-test.c
 new file mode 100644
-index 0000000000..565e2481db
+index 0000000000..9c38be13cb
 --- /dev/null
-+++ b/tests/libqos/sdbus-qmp.c
-@@ -0,0 +1,130 @@
++++ b/tests/sdbus-test.c
+@@ -0,0 +1,151 @@
 +/*
-+ * QTest SD/MMC Bus QMP driver
++ * QTest testcase for the SD/MMC cards
 + *
 + * Copyright (c) 2017 Philippe Mathieu-Daudé
 + *
 + * This work is licensed under the terms of the GNU GPL, version 2 or later.
 + * See the COPYING file in the top-level directory.
 + */
++
 +#include "qemu/osdep.h"
-+#include "qapi/qmp/qdict.h"
-+#include "qapi/qmp/qstring.h"
++#include "qemu/bswap.h"
++#include "qemu/cutils.h"
 +
-+#include "libqos/sdbus.h"
 +#include "libqtest.h"
++#include "libqos/sdbus.h"
 +
-+typedef struct QMPSDBus {
-+    SDBusAdapter parent;
++enum {
++    PROTO_SD,
++    PROTO_MMC,
++    PROTO_SPI,
++    PROTO_COUNT
++};
 +
-+    const char *qom_path;
-+} QMPSDBus;
++static const char *proto_name[PROTO_COUNT] = {
++    [PROTO_SD]  = "sd",
++    [PROTO_MMC] = "mmc",
++    [PROTO_SPI] = "spi"
++};
 +
++static const char *machines[PROTO_COUNT] = {
++    [PROTO_SD] = "nuri",
++    //[PROTO_MMC] = "vexpress-a9",
++    //[PROTO_SPI] = "lm3s6965evb"
++};
 +
-+static const char *qmp_sdbus_getpath(const char *blkname)
++static const uint64_t sizes[] = {
++    //512 * M_BYTE,
++    //1 * G_BYTE,
++    4 * G_BYTE,
++    //64 * G_BYTE,
++};
++
++typedef struct {
++    int protocol;
++    uint64_t size;
++} TestCase;
++
++static void test1(SDBusAdapter *mmc, uint64_t size)
 +{
-+    QDict *response, *minfo;
-+    QList *list;
-+    const QListEntry *le;
-+    QString *qstr;
-+    const char *mname;
-+    QObject *qobj;
++    uint8_t *response;
++    uint16_t rca;
++    ssize_t sz;
 +
-+    response = qmp("{ 'execute': 'query-block' }");
-+    g_assert_nonnull(response);
-+    list = qdict_get_qlist(response, "return");
-+    g_assert_nonnull(list);
++    sz = sdbus_do_cmd(mmc, GO_IDLE_STATE, 0, NULL);
++    g_assert_cmpuint(sz, ==, 0);
 +
-+    QLIST_FOREACH_ENTRY(list, le) {
-+        QDict *response2;
++    sz = sdbus_do_cmd(mmc, SEND_IF_COND, 0x1aa, NULL);
++    //g_assert_cmpuint(sz, ==, 0);
 +
-+        minfo = qobject_to_qdict(qlist_entry_obj(le));
-+        g_assert(minfo);
-+        qobj = qdict_get(minfo, "qdev");
-+        if (!qobj) {
-+            continue;
-+        }
-+        qstr = qobject_to_qstring(qobj);
-+        g_assert(qstr);
-+        mname = qstring_get_str(qstr);
++    sz = sdbus_do_acmd(mmc, SEND_OP_COND, 0x40300000, 0, NULL);
++    g_assert_cmpuint(sz, ==, 4);
 +
-+        response2 = qmp("{ 'execute': 'qom-get',"
-+                        "  'arguments': { 'path': %s,"
-+                        "   'property': \"parent_bus\"}"
-+                        "}", mname);
-+        g_assert(response2);
-+        g_assert(qdict_haskey(response2, "return"));
-+        qobj = qdict_get(response2, "return");
-+        qstr = qobject_to_qstring(qobj);
-+        g_assert(qstr);
-+        mname = qstring_get_str(qstr);
++    /* CID */
++    sz = sdbus_do_cmd(mmc, ALL_SEND_CID, 0, &response);
++    g_assert_cmpuint(sz, ==, 16);
++    g_assert_cmpmem (&response[3], 5, "QEMU!", 5);
++    g_assert_cmphex(be32_to_cpu(*(uint32_t *)&response[9]), ==, 0xdeadbeef);
++    g_free(response);
 +
-+        return mname;
-+    }
-+    return NULL;
++    /* RCA */
++    sz = sdbus_do_cmd(mmc, SEND_RELATIVE_ADDR, 0, &response);
++    g_assert_cmpuint(sz, ==, 4);
++    rca = be16_to_cpu(*(uint16_t *)response);
++    g_assert_cmphex(rca, ==, 0x4567);
++    g_free(response);
++
++    /* CSD */
++    sz = sdbus_do_cmd(mmc, SEND_CSD, rca << 16, &response);
++    g_assert_cmpuint(sz, ==, 16);
++    g_assert_cmphex(response[3], ==, 0x32);
++    g_assert_cmphex(response[4], ==, 0x5b); /* class */
++    g_assert_cmphex(response[5], ==, 0x59);
++    /* (SDHC test) */
++    g_assert_cmphex(be32_to_cpu(*(uint32_t *)&response[6]),
++                    ==, (size >> 19) - 1);
++    g_assert_cmphex(response[10], ==, 0x7f);
++    g_assert_cmphex(response[11], ==, 0x80);
++    g_assert_cmphex(response[12], ==, 0x0a);
++    g_assert_cmphex(response[13], ==, 0x40);
++    g_assert_cmphex(response[14], ==, 0);
++    g_assert_cmphex(response[15], ==, 0);
++    g_free(response);
++
++    sz = sdbus_do_cmd(mmc, SELECT_CARD, rca << 16, NULL);
++
++    sz = sdbus_do_acmd(mmc, SEND_SCR, 0, rca, &response);
++    g_assert_cmpuint(sz, ==, 4);
++    g_free(response);
++
++    // TODO 8x: sdcard_read_data len 512
++
++    //sz = sdbus_do_acmd(mmc, SEND_STATUS, 0, rca, &response);
++    //g_free(response);
 +}
 +
-+static ssize_t qmp_mmc_do_cmd(SDBusAdapter *adapter, enum NCmd cmd, uint32_t arg,
-+                              uint8_t **response)
++static void sdcard_tests(gconstpointer data)
 +{
-+    QMPSDBus *s = (QMPSDBus *)adapter;
-+    QDict *response1;
-+    QObject *qobj;
++    const TestCase *test = data;
++    SDBusAdapter *sdbus;
 +
-+    response1 = qmp("{ 'execute': 'x-debug-sdbus-command',"
-+                    "  'arguments': { 'qom-path': %s,"
-+                    "                 'command': %u, 'arg': %u}"
-+                    "}",
-+                    s->qom_path, cmd, arg);
-+    g_assert(qdict_haskey(response1, "return"));
-+    qobj = qdict_get(response1, "return");
-+    //QDECREF(response);
++    global_qtest = qtest_startf("-machine %s "
++                         "-drive if=sd,driver=null-co,size=%lu,id=mmc0",
++                         machines[test->protocol], test->size);
++    sdbus = qmp_sdbus_create("sd-bus");
 +
-+    if (!qobj) {
-+        return -1;
-+    }
++    test1(sdbus, test->size);
++    g_free(sdbus);
 +
-+    {
-+        QString *qstr;
-+        const gchar *mname;
-+        guchar *uc;
-+        gsize out_len;
-+        QDict *response2 = qobject_to_qdict(qobj);
-+
-+        if (!qdict_haskey(response2, "base64")) {
-+            return 0;
-+        }
-+        qobj = qdict_get(response2, "base64");
-+        qstr = qobject_to_qstring(qobj);
-+        if (!qstr) {
-+            puts("!qstr");
-+            return 0;
-+        }
-+        mname = qstring_get_str(qstr);
-+
-+        uc = g_base64_decode(mname, &out_len);
-+        if (response) {
-+            *response = uc;
-+        } else {
-+            g_free(uc);
-+        }
-+        return out_len;
-+
-+    }
-+
-+    return 0;
++    qtest_quit(global_qtest);
 +}
 +
-+SDBusAdapter *qmp_sdbus_create(const char *bus_name)
++int main(int argc, char **argv)
 +{
-+    QMPSDBus *s;
-+    SDBusAdapter *mmc;
++    const char *arch = qtest_get_arch();
++    int iproto, isize;
++    gchar *path;
++    TestCase *test;
 +
-+    s = g_new(QMPSDBus, 1);
-+    s->qom_path = qmp_sdbus_getpath(bus_name);
-+    g_assert_nonnull(s->qom_path);
++    g_test_init(&argc, &argv, NULL);
 +
-+    mmc = (SDBusAdapter *)s;
-+    mmc->do_command = qmp_mmc_do_cmd;
++    if (strcmp(arch, "arm") == 0 || strcmp(arch, "aarch64") == 0) {
++        for (iproto = 0; iproto < PROTO_COUNT; iproto++) {
++            if (!machines[iproto]) {
++                continue;
++            }
++            for (isize = 0; isize < ARRAY_SIZE(sizes); isize++) {
++                test = g_new(TestCase, 1);
 +
-+    return mmc;
++                test->protocol = iproto;
++                test->size = sizes[isize];
++
++                path = g_strdup_printf("sdcard/%s/%lu", proto_name[iproto], sizes[isize]);
++                qtest_add_data_func(path, test, sdcard_tests);
++                g_free(path);
++                // g_free(test)?
++            }
++        }
++    }
++
++    return g_test_run();
 +}
 diff --git a/tests/Makefile.include b/tests/Makefile.include
-index c22925d4db..409784a189 100644
+index 409784a189..e4434cdfff 100644
 --- a/tests/Makefile.include
 +++ b/tests/Makefile.include
-@@ -715,7 +715,7 @@ tests/test-crypto-block$(EXESUF): tests/test-crypto-block.o $(test-crypto-obj-y)
+@@ -348,6 +348,7 @@ check-qtest-sparc64-y = tests/endianness-test$(EXESUF)
+ check-qtest-sparc64-y += tests/prom-env-test$(EXESUF)
  
- libqos-obj-y = tests/libqos/pci.o tests/libqos/fw_cfg.o tests/libqos/malloc.o
- libqos-obj-y += tests/libqos/i2c.o tests/libqos/libqos.o
--libqos-obj-y += tests/libqos/sdbus.o
-+libqos-obj-y += tests/libqos/sdbus.o tests/libqos/sdbus-qmp.o
- libqos-spapr-obj-y = $(libqos-obj-y) tests/libqos/malloc-spapr.o
- libqos-spapr-obj-y += tests/libqos/libqos-spapr.o
- libqos-spapr-obj-y += tests/libqos/rtas.o
+ check-qtest-arm-y = tests/tmp105-test$(EXESUF)
++check-qtest-arm-y = tests/sdbus-test$(EXESUF)
+ check-qtest-arm-y += tests/ds1338-test$(EXESUF)
+ check-qtest-arm-y += tests/m25p80-test$(EXESUF)
+ gcov-files-arm-y += hw/misc/tmp105.c
+@@ -748,6 +749,7 @@ tests/bios-tables-test$(EXESUF): tests/bios-tables-test.o \
+ 	tests/boot-sector.o tests/acpi-utils.o $(libqos-obj-y)
+ tests/pxe-test$(EXESUF): tests/pxe-test.o tests/boot-sector.o $(libqos-obj-y)
+ tests/tmp105-test$(EXESUF): tests/tmp105-test.o $(libqos-omap-obj-y)
++tests/sdbus-test$(EXESUF): tests/sdbus-test.o $(libqos-obj-y)
+ tests/ds1338-test$(EXESUF): tests/ds1338-test.o $(libqos-imx-obj-y)
+ tests/m25p80-test$(EXESUF): tests/m25p80-test.o
+ tests/i440fx-test$(EXESUF): tests/i440fx-test.o $(libqos-pc-obj-y)
 -- 
 2.15.1
