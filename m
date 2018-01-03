@@ -1,30 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47646)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47658)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eWgnh-0002s6-Mu
-	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 06:01:38 -0500
+	id 1eWgni-0002sA-74
+	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 06:01:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eWgng-0005ga-RT
-	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 06:01:37 -0500
-Received: from mail-qk0-x243.google.com ([2607:f8b0:400d:c09::243]:33771)
+	id 1eWgne-0005f0-4I
+	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 06:01:38 -0500
+Received: from mail-qk0-x242.google.com ([2607:f8b0:400d:c09::242]:33770)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eWgng-0005gA-NS
-	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 06:01:36 -0500
-Received: by mail-qk0-x243.google.com with SMTP id x7so1054717qkb.0
-	for <qemu-devel@nongnu.org>; Wed, 03 Jan 2018 03:01:36 -0800 (PST)
+	id 1eWgnd-0005ej-Ub
+	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 06:01:34 -0500
+Received: by mail-qk0-x242.google.com with SMTP id x7so1054599qkb.0
+	for <qemu-devel@nongnu.org>; Wed, 03 Jan 2018 03:01:33 -0800 (PST)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Wed,  3 Jan 2018 08:01:10 -0300
-Message-Id: <20180103110126.29209-2-f4bug@amsat.org>
-In-Reply-To: <20180103110126.29209-1-f4bug@amsat.org>
-References: <20180103110126.29209-1-f4bug@amsat.org>
+Date: Wed,  3 Jan 2018 08:01:09 -0300
+Message-Id: <20180103110126.29209-1-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v4 01/17] sdhci: clean up includes
+Subject: [Qemu-devel] [PATCH v4 00/17] SDHCI: housekeeping
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,92 +31,107 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alistair Francis <alistair.francis@xilinx.com>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, Fam Zheng <famz@redhat.com>, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, Peter Maydell <peter.maydell@linaro.org>, Andrey Smirnov <andrew.smirnov@gmail.com>, Eduardo Habkost <ehabkost@redhat.com>
+To: Alistair Francis <alistair.francis@xilinx.com>, Fam Zheng <famz@redhat.com>
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, Peter Maydell <peter.maydell@linaro.org>, Andrey Smirnov <andrew.smirnov@gmail.com>, Eduardo Habkost <ehabkost@redhat.com>
 
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Reviewed-by: Alistair Francis <alistair.francis@xilinx.com>
----
- hw/sd/sdhci-internal.h | 4 ----
- include/hw/sd/sdhci.h  | 7 ++++++-
- hw/sd/sdhci.c          | 1 +
- 3 files changed, 7 insertions(+), 5 deletions(-)
+Since v3:
+- since the series was getting too big and first part reviewed, split in 2. 
+- addressed Fam's review from "refactor the common sysbus/pci qdev"
+  - improved commit descriptions
+  - restored useful s->fifo_buffer = NULL
+- added Alistair R-b
 
-diff --git a/hw/sd/sdhci-internal.h b/hw/sd/sdhci-internal.h
-index 161177cf39..248fd027f9 100644
---- a/hw/sd/sdhci-internal.h
-+++ b/hw/sd/sdhci-internal.h
-@@ -24,8 +24,6 @@
- #ifndef SDHCI_INTERNAL_H
- #define SDHCI_INTERNAL_H
- 
--#include "hw/sd/sdhci.h"
--
- /* R/W SDMA System Address register 0x0 */
- #define SDHC_SYSAD                     0x00
- 
-@@ -227,6 +225,4 @@ enum {
-     sdhc_gap_write  = 2   /* SDHC stopped at block gap during write operation */
- };
- 
--extern const VMStateDescription sdhci_vmstate;
--
- #endif
-diff --git a/include/hw/sd/sdhci.h b/include/hw/sd/sdhci.h
-index 0f0c3f1e64..1335373d3c 100644
---- a/include/hw/sd/sdhci.h
-+++ b/include/hw/sd/sdhci.h
-@@ -26,17 +26,19 @@
- #define SDHCI_H
- 
- #include "qemu-common.h"
--#include "hw/block/block.h"
- #include "hw/pci/pci.h"
- #include "hw/sysbus.h"
- #include "hw/sd/sd.h"
- 
- /* SD/MMC host controller state */
- typedef struct SDHCIState {
-+    /*< private >*/
-     union {
-         PCIDevice pcidev;
-         SysBusDevice busdev;
-     };
-+
-+    /*< public >*/
-     SDBus sdbus;
-     MemoryRegion iomem;
- 
-@@ -46,6 +48,7 @@ typedef struct SDHCIState {
-     qemu_irq ro_cb;
-     qemu_irq irq;
- 
-+    /* Registers cleared on reset */
-     uint32_t sdmasysad;    /* SDMA System Address register */
-     uint16_t blksize;      /* Host DMA Buff Boundary and Transfer BlkSize Reg */
-     uint16_t blkcnt;       /* Blocks count for current transfer */
-@@ -70,8 +73,10 @@ typedef struct SDHCIState {
-     uint16_t acmd12errsts; /* Auto CMD12 error status register */
-     uint64_t admasysaddr;  /* ADMA System Address Register */
- 
-+    /* Read-only registers */
-     uint32_t capareg;      /* Capabilities Register */
-     uint32_t maxcurr;      /* Maximum Current Capabilities Register */
-+
-     uint8_t  *fifo_buffer; /* SD host i/o FIFO buffer */
-     uint32_t buf_maxsz;
-     uint16_t data_count;   /* current element in FIFO buffer */
-diff --git a/hw/sd/sdhci.c b/hw/sd/sdhci.c
-index b064a087c9..b7d2a20985 100644
---- a/hw/sd/sdhci.c
-+++ b/hw/sd/sdhci.c
-@@ -29,6 +29,7 @@
- #include "sysemu/dma.h"
- #include "qemu/timer.h"
- #include "qemu/bitops.h"
-+#include "hw/sd/sdhci.h"
- #include "sdhci-internal.h"
- #include "qemu/log.h"
- 
+Patches still missing review: 4, 5, 7, 12.
+
+Since v2:
+- more detailed 'capabilities', all boards converted to use these properties
+- since all qtests pass, removed the previous 'capareg' property
+- added Stefan/Alistair R-b
+- corrected 'access' LED behavior (Alistair's review)
+- more uses of the registerfields API
+- remove some dead code
+- cosmetix:
+  - added more comments
+  - renamed a pair of registers
+  - reordered few struct members
+
+Note, the bcm2835 seems to have 1KB minimum blocksize, however the current
+model is implemented with 512B. I didn't change the current value.
+
+Since v1:
+- addressed Alistair Francis review comments, added some R-b
+- only move register defines to "sd-internal.h"
+- fixed deposit64() arguments
+- dropped unuseful s->fifo_buffer = NULL
+- use a qemu_irq for the LED, restrict the logging to ON/OFF
+- fixed a trace format string error
+- included Andrey Smirnov ACMD12ERRSTS write patch
+- dropped few unuseful patches, and separate the Python polemical ones for later
+
+>From the "SDHCI housekeeping" series:
+- 1: we restrict part of "sd/sd.h" into local "sd-internal.h",
+- 2,3: we somehow beautiful the code, no logical changes,
+- 4-7: we refactor the common sysbus/pci qdev code,
+- 8-10: we add plenty of trace events which will result useful later,
+- 11: we finally expose a "dma-memory" property.
+>From the "SDHCI: add a qtest and fix few issues" series:
+- 12,13: fix registers
+- 14,15: boards can specify which SDHCI Spec to use (v2 and v3 so far)
+- 15-20: HCI qtest
+
+Regards,
+
+Phil.
+
+$ git backport-diff
+[----] : patches are identical
+[####] : number of functional differences between upstream/downstream patch
+The flags [FC] indicate (F)unctional and (C)ontextual differences, respectively
+
+001/17:[----] [--] 'sdhci: clean up includes'
+002/17:[----] [--] 'sdhci: sort registers comments'
+003/17:[----] [--] 'sdhci: remove dead code'
+004/17:[----] [--] 'sdhci: refactor same sysbus/pci properties into a common one'
+005/17:[----] [--] 'sdhci: refactor common sysbus/pci class_init() into sdhci_class_init()'
+006/17:[0021] [FC] 'sdhci: refactor common sysbus/pci realize() into sdhci_realizefn()'
+007/17:[0008] [FC] 'sdhci: refactor common sysbus/pci unrealize() into sdhci_unrealizefn()'
+008/17:[----] [--] 'sdhci: use qemu_log_mask(UNIMP) instead of fprintf()'
+009/17:[----] [--] 'sdhci: convert the DPRINT() calls into trace events'
+010/17:[----] [--] 'sdhci: add a GPIO for the 'access control' LED'
+011/17:[----] [--] 'sdhci: move MASK_TRNMOD with other SDHC_TRN* defines in "sd-internal.h"'
+012/17:[----] [--] 'sdhci: use FIELD_DP32() macro for the WRITE_PROTECT flag'
+013/17:[----] [--] 'sdhci: rename the SDHC_CAPAB register'
+014/17:[----] [--] 'sdhci: fix CAPAB/MAXCURR registers, both are 64bit and read-only'
+015/17:[----] [--] 'sdhci: Implement write method of ACMD12ERRSTS register'
+016/17:[----] [--] 'sdhci: use deposit64() on admasysaddr'
+017/17:[----] [-C] 'sdhci: add a "dma-memory" property'
+
+Andrey Smirnov (1):
+  sdhci: Implement write method of ACMD12ERRSTS register
+
+Philippe Mathieu-Daudé (16):
+  sdhci: clean up includes
+  sdhci: sort registers comments
+  sdhci: remove dead code
+  sdhci: refactor same sysbus/pci properties into a common one
+  sdhci: refactor common sysbus/pci class_init() into sdhci_class_init()
+  sdhci: refactor common sysbus/pci realize() into sdhci_realizefn()
+  sdhci: refactor common sysbus/pci unrealize() into sdhci_unrealizefn()
+  sdhci: use qemu_log_mask(UNIMP) instead of fprintf()
+  sdhci: convert the DPRINT() calls into trace events
+  sdhci: add a GPIO for the 'access control' LED
+  sdhci: move MASK_TRNMOD with other SDHC_TRN* defines in "sd-internal.h"
+  sdhci: use FIELD_DP32() macro for the WRITE_PROTECT flag
+  sdhci: rename the SDHC_CAPAB register
+  sdhci: fix CAPAB/MAXCURR registers, both are 64bit and read-only
+  sdhci: use deposit64() on admasysaddr
+  sdhci: add a "dma-memory" property
+
+ include/hw/sd/sdhci.h  |  38 +++++--
+ hw/sd/sdhci-internal.h |  11 +-
+ hw/sd/sdhci.c          | 291 ++++++++++++++++++++++++++++---------------------
+ hw/sd/trace-events     |  15 +++
+ 4 files changed, 216 insertions(+), 139 deletions(-)
+
 -- 
 2.15.1
