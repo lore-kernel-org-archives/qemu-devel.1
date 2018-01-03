@@ -1,26 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41374)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42975)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1eWjIc-0001j0-11
-	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 08:41:43 -0500
+	(envelope-from <imammedo@redhat.com>) id 1eWjLo-0003hH-JZ
+	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 08:45:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1eWjIY-0002JR-3a
-	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 08:41:42 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:34118)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1eWjIX-0002Iu-RS
-	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 08:41:38 -0500
-From: Markus Armbruster <armbru@redhat.com>
-References: <20180102170645.5877-1-danielhb@linux.vnet.ibm.com>
-	<ece03c18-76c3-294d-9c2a-778a23e8d9b4@redhat.com>
-	<5bfd4a4e-26d9-8595-fc30-43c54b9f6bad@linux.vnet.ibm.com>
-Date: Wed, 03 Jan 2018 14:41:31 +0100
-In-Reply-To: <5bfd4a4e-26d9-8595-fc30-43c54b9f6bad@linux.vnet.ibm.com> (Daniel
-	Henrique Barboza's message of "Tue, 2 Jan 2018 18:39:45 -0200")
-Message-ID: <87po6rvz3o.fsf@dusky.pond.sub.org>
+	(envelope-from <imammedo@redhat.com>) id 1eWjLn-0003UJ-1o
+	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 08:45:00 -0500
+Date: Wed, 3 Jan 2018 14:44:42 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20180103144442.21efd2c7@redhat.com>
+In-Reply-To: <fed83a29-d96f-e696-8b94-dc2d1e81ee21@huawei.com>
+References: <1514440458-10515-1-git-send-email-gengdongjiu@huawei.com>
+	<1514440458-10515-10-git-send-email-gengdongjiu@huawei.com>
+	<20171228160727.62d0857d@igors-macbook-pro.local>
+	<fed83a29-d96f-e696-8b94-dc2d1e81ee21@huawei.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH RESEND 1/1] qmp.c: system_wakeup: adding
- RUN_STATE_SUSPENDED check before proceeding
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v14 9/9] target-arm: kvm64: handle SIGBUS
+ signal from kernel or KVM
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,75 +26,161 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
-Cc: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: gengdongjiu <gengdongjiu@huawei.com>
+Cc: pbonzini@redhat.com, mst@redhat.com, zhaoshenglong@huawei.com, peter.maydell@linaro.org, mtosatti@redhat.com, rth@twiddle.net, ehabkost@redhat.com, james.morse@arm.com, christoffer.dall@linaro.org, marc.zyngier@arm.com, kvm@vger.kernel.org, qemu-devel@nongnu.org, qemu-arm@nongnu.org, huangshaoyu@huawei.com, zhengqiang10@huawei.com, xuwei5@hisilicon.com
 
-Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com> writes:
+On Wed, 3 Jan 2018 17:13:45 +0800
+gengdongjiu <gengdongjiu@huawei.com> wrote:
 
-> On 01/02/2018 06:03 PM, Eric Blake wrote:
->> On 01/02/2018 11:06 AM, Daniel Henrique Barboza wrote:
->>> The qmp/hmp command 'system_wakeup' is simply a direct call to
->>> 'qemu_system_wakeup_request' from vl.c. This function verifies if
->>> runstate is SUSPENDED and if the wake up reason is valid before
->>> proceeding. However, no error or warning is thrown if any of those
->>> pre-requirements isn't met.
->>>
->>> This leads to situations such as the one described in
->>> https://github.com/open-power-host-os/qemu/issues/31, where one
->>> can induce the OS to be suspended by using pm-suspend (via
->>> dompmsuspend, for example) but for some reason the machine failed to
->>> go to the SUSPENDED runstate, staying at runstate RUNNING. The user
->>> then tries to wake up the guest using system_wakeup (or dompmwakeup),
->>> no error is thrown but nothing happened either because the wake up
->>> wasn't fired at all. In the end, the user is left with a guest that
->>> is dormant and believing that system_wakeup isn't working.
->>>
->>> This patch changes qmp_system_wakeup to make the runstate verification
->>> before proceeding to call qemu_system_wakeup_request, firing up
->>> an error message if the user tries to wake up a machine that
->>> isn't in SUSPENDED state. The change isn't made inside
->>> qemu_system_wakeup_request because it is used in migration,
->>> ACPI and others where this usage might be valid. This patch
->>> by no means fixes the situation described above, but it can direct
->>> the user/management closer to the real problem.
->> Converting something that silently did nothing successfully into now
->> returning an error is somewhat backwards-incompatible.  Is this
->> something that needs to go through a deprecation cycle, to give people a
->> chance to fix QMP scripts that were relying on the previous no-op
->> behavior to now work with the new semantics?
+> On 2017/12/28 23:07, Igor Mammedov wrote:
+> > On Thu, 28 Dec 2017 13:54:18 +0800
+> > Dongjiu Geng <gengdongjiu@huawei.com> wrote:
+> >   
+> >> Add SIGBUS signal handler. In this handler, it checks the SIGBUS type,
+> >> translates the host VA which is delivered by host to guest PA, then fill
+> >> this PA to CPER and fill the CPER to guest APEI GHES memory, finally
+> >> notify guest according to the SIGBUS type. There are two kinds of SIGBUS
+> >> that QEMU needs to handle, which are BUS_MCEERR_AO and BUS_MCEERR_AR.
+> >>
+> >> If guest accesses the poisoned memory, it generates Synchronous External
+> >> Abort(SEA). Then host kernel gets an APEI notification and call memory_failure()
+> >> to unmapped the affected page from the guest's stage2, and SIGBUS_MCEERR_AO  
+> > s/unmapped/unmap/  
+> Thanks.
+> 
+> >   
+> >> is delivered to Qemu's main thread. If Qemu receives this SIGBUS, it will
+> >> create a new CPER and add it to guest APEI GHES memory, then notify the
+> >> guest with a GPIO-Signal notification.  
+> > too long sentence, it's hard get what goes on here, pls split it in simple
+> > sentences/rephrase so it would be easy to understand behavior.  
+> I will split it in simple sentences/rephrase.
+> Thanks for your detailed review.
+> 
+> >   
+> >>
+> >> When guest hits a PG_hwpoison page, it will trap to KVM as stage2 fault, then a
+> >> SIGBUS_MCEERR_AR synchronous signal is delivered to Qemu, Qemu record this error
+> >> into guest APEI GHES memory and notify guest using Synchronous-External-Abort(SEA).
+> >>
+> >> Suggested-by: James Morse <james.morse@arm.com>
+> >> Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
+> >> ---
+> >> Address James's comments to record CPER and notify guest for SIGBUS signal handling.
+> >> Shown some discussion in [1].
+> >>
+> >> [1]:
+> >> https://lkml.org/lkml/2017/2/27/246
+> >> https://lkml.org/lkml/2017/9/14/241
+> >> https://lkml.org/lkml/2017/9/22/499
+> >> ---
+> >>  include/sysemu/kvm.h |  2 +-
+> >>  target/arm/kvm.c     |  2 ++
+> >>  target/arm/kvm64.c   | 34 ++++++++++++++++++++++++++++++++++
+> >>  3 files changed, 37 insertions(+), 1 deletion(-)
+> >>
+> >> diff --git a/include/sysemu/kvm.h b/include/sysemu/kvm.h
+> >> index 3a458f5..90c1605 100644
+> >> --- a/include/sysemu/kvm.h
+> >> +++ b/include/sysemu/kvm.h
+> >> @@ -361,7 +361,7 @@ bool kvm_vcpu_id_is_valid(int vcpu_id);
+> >>  /* Returns VCPU ID to be used on KVM_CREATE_VCPU ioctl() */
+> >>  unsigned long kvm_arch_vcpu_id(CPUState *cpu);
+> >>  
+> >> -#ifdef TARGET_I386
+> >> +#if defined(TARGET_I386) || defined(TARGET_AARCH64)
+> >>  #define KVM_HAVE_MCE_INJECTION 1
+> >>  void kvm_arch_on_sigbus_vcpu(CPUState *cpu, int code, void *addr);
+> >>  #endif
+> >> diff --git a/target/arm/kvm.c b/target/arm/kvm.c
+> >> index 7c17f0d..9d25f51 100644
+> >> --- a/target/arm/kvm.c
+> >> +++ b/target/arm/kvm.c
+> >> @@ -26,6 +26,7 @@
+> >>  #include "exec/address-spaces.h"
+> >>  #include "hw/boards.h"
+> >>  #include "qemu/log.h"
+> >> +#include "exec/ram_addr.h"
+> >>  
+> >>  const KVMCapabilityInfo kvm_arch_required_capabilities[] = {
+> >>      KVM_CAP_LAST_INFO
+> >> @@ -182,6 +183,7 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
+> >>  
+> >>      cap_has_mp_state = kvm_check_extension(s, KVM_CAP_MP_STATE);
+> >>  
+> >> +    qemu_register_reset(kvm_unpoison_all, NULL);
+> >>      type_register_static(&host_arm_cpu_type_info);
+> >>  
+> >>      return 0;
+> >> diff --git a/target/arm/kvm64.c b/target/arm/kvm64.c
+> >> index c00450d..6955d85 100644
+> >> --- a/target/arm/kvm64.c
+> >> +++ b/target/arm/kvm64.c
+> >> @@ -27,6 +27,9 @@
+> >>  #include "kvm_arm.h"
+> >>  #include "internals.h"
+> >>  #include "hw/arm/arm.h"
+> >> +#include "exec/ram_addr.h"
+> >> +#include "hw/acpi/acpi-defs.h"
+> >> +#include "hw/acpi/hest_ghes.h"
+> >>  
+> >>  static bool have_guest_debug;
+> >>  
+> >> @@ -944,6 +947,37 @@ int kvm_arch_get_registers(CPUState *cs)
+> >>      return ret;
+> >>  }
+> >>  
+> >> +void kvm_arch_on_sigbus_vcpu(CPUState *c, int code, void *addr)
+> >> +{
+> >> +    ram_addr_t ram_addr;
+> >> +    hwaddr paddr;
+> >> +
+> >> +    assert(code == BUS_MCEERR_AR || code == BUS_MCEERR_AO);
+> >> +    if (addr) {
+> >> +        ram_addr = qemu_ram_addr_from_host(addr);
+> >> +        if (ram_addr != RAM_ADDR_INVALID &&
+> >> +            kvm_physical_memory_addr_from_host(c->kvm_state, addr, &paddr)) {
+> >> +            kvm_hwpoison_page_add(ram_addr);
+> >> +            if (code == BUS_MCEERR_AR) {
+> >> +                kvm_cpu_synchronize_state(c);
+> >> +                ghes_record_errors(ACPI_HEST_NOTIFY_SEA, paddr);
+> >> +                kvm_inject_arm_sea(c);
+> >> +            } else if (code == BUS_MCEERR_AO) {
+> >> +                ghes_record_errors(ACPI_HEST_NOTIFY_GPIO, paddr);
+> >> +                qemu_hardware_error_notify();
+> >> +            }
+> >> +            return;
+> >> +        }
+> >> +        fprintf(stderr, "Hardware memory error for memory used by "
+> >> +                "QEMU itself instead of guest system!\n");  
+> > not quite sure what above message means,  
+> When the memory error address belong to QEMU itself, not belong to guest OS.
+> it will print above message.
+> 
+> Above message means this memory error happens in QEMU application instead of guest OS.
+I'm not really understand what's going here and how it could happen,
+so I can't suggest something. Perhaps someone else could comment on it.
+ 
+> > also fprintf() probably shouldn't be used by new code.  
+> how about we use error_report()? thanks
+I'm not sure what current trend is, but I'd use error_report() vs fprintf()
 
-I doubt it.
+Also series could benefit from trace-points (I haven't noticed any).
 
-We're fixing a silent failure to be "loud".  How exactly could that
-upset applications?
-
-Applications that don't bother to check the result remain exactly as
-broken as before.
-
-Applications that do check become aware of the fact that the command did
-not work as advertized.  I guess this risks breaking them differently.
-
-qmp-spec.txt section 5. gives us license to add errors: "Clients must
-not assume any particular [...]  errors generated by a command, that is,
-new errors can be added to any existing command in newer versions of the
-Server.
-
->> behavior to now work with the new semantics?  Or should we add an
->> optional bool parameter to the command, where omitting the parameter
->> gives the old semantics, but new enough clients can pass the bool to
->> choose which behavior (no-op or error) they prefer?
->
-> Good point. Back when I first coded this patch I made sure that no QEMU test
-> were broken, but I didn't consider that existing user scripts that uses
-> system_wakeup might now yield a different result.
->
-> The extra optional parameter seems a good approach to take here IMO. The
-> current system_wakeup implementation works fine if the user is careful
-> enough to not call it if the guest isn't on SUSPENDED state, so I am unsure
-> if deprecating this behavior in favor of this new one is a bit too extreme.
-
-I'd say we call the silent failure to wake up the guest a bug, and your
-patch a bug fix.
-
-I figure we could find precedence for turning broken successful behavior
-into a clean error if we looked for it.
+> >   
+> >> +    }
+> >> +
+> >> +    if (code == BUS_MCEERR_AR) {
+> >> +        fprintf(stderr, "Hardware memory error!\n");
+> >> +        exit(1);
+> >> +    }
+> >> +}
+> >> +
+> >>  /* C6.6.29 BRK instruction */
+> >>  static const uint32_t brk_insn = 0xd4200000;
+> >>    
+> > 
+> > 
+> > .
+> >   
+> 
