@@ -1,17 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33453)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33436)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1eWabc-0001Cn-OE
-	for qemu-devel@nongnu.org; Tue, 02 Jan 2018 23:24:46 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1eWabc-0001C7-3S
+	for qemu-devel@nongnu.org; Tue, 02 Jan 2018 23:24:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1eWaba-0001zW-Qc
+	(envelope-from <dgibson@ozlabs.org>) id 1eWaba-0001zA-HK
 	for qemu-devel@nongnu.org; Tue, 02 Jan 2018 23:24:44 -0500
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Wed,  3 Jan 2018 15:24:15 +1100
-Message-Id: <20180103042419.14520-12-david@gibson.dropbear.id.au>
+Date: Wed,  3 Jan 2018 15:24:19 +1100
+Message-Id: <20180103042419.14520-16-david@gibson.dropbear.id.au>
 In-Reply-To: <20180103042419.14520-1-david@gibson.dropbear.id.au>
 References: <20180103042419.14520-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PULL 11/15] spapr: Handle VMX/VSX presence as an
- spapr capability flag
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 15/15] target/ppc: more use of the PPC_*() macros
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,143 +23,146 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: groug@kaod.org, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, lvivier@redhat.com, David Gibson <david@gibson.dropbear.id.au>
+Cc: groug@kaod.org, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, lvivier@redhat.com, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>, David Gibson <david@gibson.dropbear.id.au>
 
-We currently have some conditionals in the spapr device tree code to decide
-whether or not to advertise the availability of the VMX (aka Altivec) and
-VSX vector extensions to the guest, based on whether the guest cpu has
-those features.
+From: C=C3=A9dric Le Goater <clg@kaod.org>
 
-This can lead to confusion and subtle failures on migration, since it makes
-a guest visible change based only on host capabilities.  We now have a
-better mechanism for this, in spapr capabilities flags, which explicitly
-depend on user options rather than host capabilities.
+Also introduce utilities to manipulate bitmasks (originaly from OPAL)
+which be will be used in the model of the XIVE interrupt controller.
 
-Rework the advertisement of VSX and VMX based on a new VSX capability.  We
-no longer bother with a conditional for VMX support, because every CPU
-that's ever been supported by the pseries machine type supports VMX.
-
-NOTE: Some userspace distributions (e.g. RHEL7.4) already rely on
-availability of VSX in libc, so using cap-vsx=off may lead to a fatal
-SIGILL in init.
-
+Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-Reviewed-by: Greg Kurz <groug@kaod.org>
 ---
- hw/ppc/spapr.c         | 20 +++++++++++---------
- hw/ppc/spapr_caps.c    | 25 +++++++++++++++++++++++++
- include/hw/ppc/spapr.h |  3 +++
- 3 files changed, 39 insertions(+), 9 deletions(-)
+ hw/ppc/pnv_lpc.c        | 10 ++++-----
+ target/ppc/cpu.h        | 56 ++++++++++++++++++++++++++++++-------------=
+------
+ target/ppc/int_helper.c |  2 +-
+ 3 files changed, 40 insertions(+), 28 deletions(-)
 
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index 86fc83f9c2..693dd6f7b3 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -557,14 +557,16 @@ static void spapr_populate_cpu_dt(CPUState *cs, void *fdt, int offset,
-                           segs, sizeof(segs))));
-     }
- 
--    /* Advertise VMX/VSX (vector extensions) if available
--     *   0 / no property == no vector extensions
-+    /* Advertise VSX (vector extensions) if available
-      *   1               == VMX / Altivec available
--     *   2               == VSX available */
--    if (env->insns_flags & PPC_ALTIVEC) {
--        uint32_t vmx = (env->insns_flags2 & PPC2_VSX) ? 2 : 1;
--
--        _FDT((fdt_setprop_cell(fdt, offset, "ibm,vmx", vmx)));
-+     *   2               == VSX available
-+     *
-+     * Only CPUs for which we create core types in spapr_cpu_core.c
-+     * are possible, and all of those have VMX */
-+    if (spapr_has_cap(spapr, SPAPR_CAP_VSX)) {
-+        _FDT((fdt_setprop_cell(fdt, offset, "ibm,vmx", 2)));
-+    } else {
-+        _FDT((fdt_setprop_cell(fdt, offset, "ibm,vmx", 1)));
-     }
- 
-     /* Advertise DFP (Decimal Floating Point) if available
-@@ -3832,7 +3834,7 @@ static void spapr_machine_class_init(ObjectClass *oc, void *data)
-      */
-     mc->numa_mem_align_shift = 28;
- 
--    smc->default_caps = spapr_caps(0);
-+    smc->default_caps = spapr_caps(SPAPR_CAP_VSX);
-     spapr_caps_add_properties(smc, &error_abort);
+diff --git a/hw/ppc/pnv_lpc.c b/hw/ppc/pnv_lpc.c
+index b777b78e18..c42b4a8f6c 100644
+--- a/hw/ppc/pnv_lpc.c
++++ b/hw/ppc/pnv_lpc.c
+@@ -146,13 +146,13 @@ static bool opb_write(PnvLpcController *lpc, uint32=
+_t addr, uint8_t *data,
+     return success;
  }
- 
-@@ -3914,7 +3916,7 @@ static void spapr_machine_2_11_class_options(MachineClass *mc)
-     sPAPRMachineClass *smc = SPAPR_MACHINE_CLASS(mc);
- 
-     spapr_machine_2_12_class_options(mc);
--    smc->default_caps = spapr_caps(SPAPR_CAP_HTM);
-+    smc->default_caps = spapr_caps(SPAPR_CAP_HTM | SPAPR_CAP_VSX);
-     SET_MACHINE_COMPAT(mc, SPAPR_COMPAT_2_11);
- }
- 
-diff --git a/hw/ppc/spapr_caps.c b/hw/ppc/spapr_caps.c
-index cad40fe49a..7c855c67ad 100644
---- a/hw/ppc/spapr_caps.c
-+++ b/hw/ppc/spapr_caps.c
-@@ -57,6 +57,19 @@ static void cap_htm_allow(sPAPRMachineState *spapr, Error **errp)
-     }
- }
- 
-+static void cap_vsx_allow(sPAPRMachineState *spapr, Error **errp)
-+{
-+    PowerPCCPU *cpu = POWERPC_CPU(first_cpu);
-+    CPUPPCState *env = &cpu->env;
+=20
+-#define ECCB_CTL_READ           (1ull << (63 - 15))
++#define ECCB_CTL_READ           PPC_BIT(15)
+ #define ECCB_CTL_SZ_LSH         (63 - 7)
+-#define ECCB_CTL_SZ_MASK        (0xfull << ECCB_CTL_SZ_LSH)
+-#define ECCB_CTL_ADDR_MASK      0xffffffffu;
++#define ECCB_CTL_SZ_MASK        PPC_BITMASK(4, 7)
++#define ECCB_CTL_ADDR_MASK      PPC_BITMASK(32, 63)
+=20
+-#define ECCB_STAT_OP_DONE       (1ull << (63 - 52))
+-#define ECCB_STAT_OP_ERR        (1ull << (63 - 52))
++#define ECCB_STAT_OP_DONE       PPC_BIT(52)
++#define ECCB_STAT_OP_ERR        PPC_BIT(52)
+ #define ECCB_STAT_RD_DATA_LSH   (63 - 37)
+ #define ECCB_STAT_RD_DATA_MASK  (0xffffffff << ECCB_STAT_RD_DATA_LSH)
+=20
+diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
+index 370b05e76e..a5e49f23e9 100644
+--- a/target/ppc/cpu.h
++++ b/target/ppc/cpu.h
+@@ -93,6 +93,19 @@
+ #define PPC_BITMASK(bs, be)     ((PPC_BIT(bs) - PPC_BIT(be)) | PPC_BIT(b=
+s))
+ #define PPC_BITMASK32(bs, be)   ((PPC_BIT32(bs) - PPC_BIT32(be)) | \
+                                  PPC_BIT32(bs))
++#define PPC_BITMASK8(bs, be)    ((PPC_BIT8(bs) - PPC_BIT8(be)) | PPC_BIT=
+8(bs))
 +
-+    /* Allowable CPUs in spapr_cpu_core.c should already have gotten
-+     * rid of anything that doesn't do VMX */
-+    g_assert(env->insns_flags & PPC_ALTIVEC);
-+    if (!(env->insns_flags2 & PPC2_VSX)) {
-+        error_setg(errp, "VSX support not available, try cap-vsx=off");
-+    }
-+}
++#if HOST_LONG_BITS =3D=3D 32
++# define MASK_TO_LSH(m)          (__builtin_ffsll(m) - 1)
++#elif HOST_LONG_BITS =3D=3D 64
++# define MASK_TO_LSH(m)          (__builtin_ffsl(m) - 1)
++#else
++# error Unknown sizeof long
++#endif
 +
- static sPAPRCapabilityInfo capability_table[] = {
-     {
-         .name = "htm",
-@@ -65,6 +78,13 @@ static sPAPRCapabilityInfo capability_table[] = {
-         .allow = cap_htm_allow,
-         /* TODO: add cap_htm_disallow */
-     },
-+    {
-+        .name = "vsx",
-+        .description = "Allow Vector Scalar Extensions (VSX)",
-+        .flag = SPAPR_CAP_VSX,
-+        .allow = cap_vsx_allow,
-+        /* TODO: add cap_vsx_disallow */
-+    },
++#define GETFIELD(m, v)          (((v) & (m)) >> MASK_TO_LSH(m))
++#define SETFIELD(m, v, val)                             \
++        (((v) & ~(m)) | ((((typeof(v))(val)) << MASK_TO_LSH(m)) & (m)))
+=20
+ /***********************************************************************=
+******/
+ /* Exception vectors definitions                                        =
+     */
+@@ -2349,32 +2362,31 @@ enum {
+=20
+ /* Processor Compatibility mask (PCR) */
+ enum {
+-    PCR_COMPAT_2_05     =3D 1ull << (63-62),
+-    PCR_COMPAT_2_06     =3D 1ull << (63-61),
+-    PCR_COMPAT_2_07     =3D 1ull << (63-60),
+-    PCR_COMPAT_3_00     =3D 1ull << (63-59),
+-    PCR_VEC_DIS         =3D 1ull << (63-0), /* Vec. disable (bit NA sinc=
+e POWER8) */
+-    PCR_VSX_DIS         =3D 1ull << (63-1), /* VSX disable (bit NA since=
+ POWER8) */
+-    PCR_TM_DIS          =3D 1ull << (63-2), /* Trans. memory disable (PO=
+WER8) */
++    PCR_COMPAT_2_05     =3D PPC_BIT(62),
++    PCR_COMPAT_2_06     =3D PPC_BIT(61),
++    PCR_COMPAT_2_07     =3D PPC_BIT(60),
++    PCR_COMPAT_3_00     =3D PPC_BIT(59),
++    PCR_VEC_DIS         =3D PPC_BIT(0), /* Vec. disable (bit NA since PO=
+WER8) */
++    PCR_VSX_DIS         =3D PPC_BIT(1), /* VSX disable (bit NA since POW=
+ER8) */
++    PCR_TM_DIS          =3D PPC_BIT(2), /* Trans. memory disable (POWER8=
+) */
  };
- 
- static sPAPRCapabilities default_caps_with_cpu(sPAPRMachineState *spapr,
-@@ -81,6 +101,11 @@ static sPAPRCapabilities default_caps_with_cpu(sPAPRMachineState *spapr,
-         caps.mask &= ~SPAPR_CAP_HTM;
-     }
- 
-+    if (!ppc_check_compat(cpu, CPU_POWERPC_LOGICAL_2_06,
-+                          0, spapr->max_compat_pvr)) {
-+        caps.mask &= ~SPAPR_CAP_VSX;
-+    }
-+
-     return caps;
- }
- 
-diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-index 5c85f39c3b..148a03d189 100644
---- a/include/hw/ppc/spapr.h
-+++ b/include/hw/ppc/spapr.h
-@@ -59,6 +59,9 @@ typedef enum {
- /* Hardware Transactional Memory */
- #define SPAPR_CAP_HTM               0x0000000000000001ULL
- 
-+/* Vector Scalar Extensions */
-+#define SPAPR_CAP_VSX               0x0000000000000002ULL
-+
- typedef struct sPAPRCapabilities sPAPRCapabilities;
- struct sPAPRCapabilities {
-     uint64_t mask;
--- 
+=20
+ /* HMER/HMEER */
+ enum {
+-    HMER_MALFUNCTION_ALERT      =3D 1ull << (63 - 0),
+-    HMER_PROC_RECV_DONE         =3D 1ull << (63 - 2),
+-    HMER_PROC_RECV_ERROR_MASKED =3D 1ull << (63 - 3),
+-    HMER_TFAC_ERROR             =3D 1ull << (63 - 4),
+-    HMER_TFMR_PARITY_ERROR      =3D 1ull << (63 - 5),
+-    HMER_XSCOM_FAIL             =3D 1ull << (63 - 8),
+-    HMER_XSCOM_DONE             =3D 1ull << (63 - 9),
+-    HMER_PROC_RECV_AGAIN        =3D 1ull << (63 - 11),
+-    HMER_WARN_RISE              =3D 1ull << (63 - 14),
+-    HMER_WARN_FALL              =3D 1ull << (63 - 15),
+-    HMER_SCOM_FIR_HMI           =3D 1ull << (63 - 16),
+-    HMER_TRIG_FIR_HMI           =3D 1ull << (63 - 17),
+-    HMER_HYP_RESOURCE_ERR       =3D 1ull << (63 - 20),
+-    HMER_XSCOM_STATUS_MASK      =3D 7ull << (63 - 23),
+-    HMER_XSCOM_STATUS_LSH       =3D (63 - 23),
++    HMER_MALFUNCTION_ALERT      =3D PPC_BIT(0),
++    HMER_PROC_RECV_DONE         =3D PPC_BIT(2),
++    HMER_PROC_RECV_ERROR_MASKED =3D PPC_BIT(3),
++    HMER_TFAC_ERROR             =3D PPC_BIT(4),
++    HMER_TFMR_PARITY_ERROR      =3D PPC_BIT(5),
++    HMER_XSCOM_FAIL             =3D PPC_BIT(8),
++    HMER_XSCOM_DONE             =3D PPC_BIT(9),
++    HMER_PROC_RECV_AGAIN        =3D PPC_BIT(11),
++    HMER_WARN_RISE              =3D PPC_BIT(14),
++    HMER_WARN_FALL              =3D PPC_BIT(15),
++    HMER_SCOM_FIR_HMI           =3D PPC_BIT(16),
++    HMER_TRIG_FIR_HMI           =3D PPC_BIT(17),
++    HMER_HYP_RESOURCE_ERR       =3D PPC_BIT(20),
++    HMER_XSCOM_STATUS_MASK      =3D PPC_BITMASK(21, 23),
+ };
+=20
+ /* Alternate Interrupt Location (AIL) */
+diff --git a/target/ppc/int_helper.c b/target/ppc/int_helper.c
+index 1c013a0ee3..3a50f1e1b7 100644
+--- a/target/ppc/int_helper.c
++++ b/target/ppc/int_helper.c
+@@ -183,7 +183,7 @@ uint64_t helper_bpermd(uint64_t rs, uint64_t rb)
+     for (i =3D 0; i < 8; i++) {
+         int index =3D (rs >> (i*8)) & 0xFF;
+         if (index < 64) {
+-            if (rb & (1ull << (63-index))) {
++            if (rb & PPC_BIT(index)) {
+                 ra |=3D 1 << i;
+             }
+         }
+--=20
 2.14.3
