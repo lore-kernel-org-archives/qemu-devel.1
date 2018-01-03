@@ -1,34 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38602)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45182)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1eWhOl-0007jl-9v
-	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 06:39:56 -0500
+	(envelope-from <danielhb@linux.vnet.ibm.com>) id 1eWhdc-0005SM-4r
+	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 06:55:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1eWhOh-0004cj-7S
-	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 06:39:55 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:49626)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1eWhOh-0004cQ-1X
-	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 06:39:51 -0500
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 3F08CC0587FD
-	for <qemu-devel@nongnu.org>; Wed,  3 Jan 2018 11:39:50 +0000 (UTC)
-Date: Wed, 3 Jan 2018 19:39:45 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20180103113945.GO2557@xz-mi>
-References: <20180103054043.25719-1-peterx@redhat.com>
-	<20180103054043.25719-3-peterx@redhat.com>
-	<87efn72the.fsf@secure.laptop> <20180103093619.GH2557@xz-mi>
-	<87shbn1bv8.fsf@secure.laptop> <20180103102632.GJ2557@xz-mi>
-	<87k1wz197l.fsf@secure.laptop>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <87k1wz197l.fsf@secure.laptop>
-Subject: Re: [Qemu-devel] [PATCH 02/11] migration:
- qemu_savevm_state_cleanup() in cleanup
+	(envelope-from <danielhb@linux.vnet.ibm.com>) id 1eWhdX-0003cX-P9
+	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 06:55:16 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:60388
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <danielhb@linux.vnet.ibm.com>)
+	id 1eWhdX-0003c2-KR
+	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 06:55:11 -0500
+Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	w03BsLBO050144
+	for <qemu-devel@nongnu.org>; Wed, 3 Jan 2018 06:55:10 -0500
+Received: from e14.ny.us.ibm.com (e14.ny.us.ibm.com [129.33.205.204])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2f8vapxh37-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Wed, 03 Jan 2018 06:55:10 -0500
+Received: from localhost
+	by e14.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <danielhb@linux.vnet.ibm.com>;
+	Wed, 3 Jan 2018 06:55:09 -0500
+From: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
+Date: Wed,  3 Jan 2018 09:54:53 -0200
+Message-Id: <20180103115455.25843-1-danielhb@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH v3 0/2] qmp: 'wakeup-suspend-support' in
+ query-target
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,61 +37,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Juan Quintela <quintela@redhat.com>
-Cc: qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: mdroth@linux.vnet.ibm.com, armbru@redhat.com, dgilbert@redhat.com, eblake@redhat.com, Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
 
-On Wed, Jan 03, 2018 at 12:18:54PM +0100, Juan Quintela wrote:
-> Peter Xu <peterx@redhat.com> wrote:
-> > On Wed, Jan 03, 2018 at 11:21:31AM +0100, Juan Quintela wrote:
-> >> Peter Xu <peterx@redhat.com> wrote:
-> >> > On Wed, Jan 03, 2018 at 10:15:41AM +0100, Juan Quintela wrote:
-> >> >> Peter Xu <peterx@redhat.com> wrote:
-> >> >> > Moving existing callers all into migrate_fd_cleanup().  It simplifies
-> >> >> > migration_thread() a bit.
-> >> >> >
-> >> >> > Signed-off-by: Peter Xu <peterx@redhat.com>
-> >> >> 
-> >> >> Reviewed-by: Juan Quintela <quintela@redhat.com>
-> >> >
-> >> > Thanks.
-> >> >
-> >> >> 
-> >> >> I am trying to see if we can call migrate_fd_cleanup() twice.  As far as
-> >> >> I can see, we are not doing it.  But, and it is a big but, we are not
-> >> >> checking that we are not calling qemu_savevm_state_cleanup() twice.  If
-> >> >> that happens, we can get double frees and similar.
-> >> >> 
-> >> >> I put the reviewed-by anyways, because I *think* that we are doing it
-> >> >> right now, and otherwise, we should make sure that we are not calling it
-> >> >> twice, not papering over it.
-> >> >> 
-> >> >> Once here, I have notice that we call block_cleanup_parameters() in
-> >> >> *three* places.  We call notifier_list_notify() on two of this places (I
-> >> >> can't see any good reason *why* we don't call the notifier for
-> >> >> migrate_fd_cancel).
-> >> >
-> >> > Indeed.
-> >> >
-> >> > IMHO we can remove two calls of block_cleanup_parameters(), only keep
-> >> > the one in migrate_fd_cleanup(), and remove on notifier_list_notify()
-> >> > in migrate_fd_error() (these can be two more patches).  What do you
-> >> > think?
-> >> 
-> >> I think we need to make sure that we have a function that we always
-> >> call at the end.  I think that we have that on migration_fd_cleanup(),
-> >> so put everything there should be ok, no?
-> >
-> > IMHO that's exactly what I mean, no? :)
-> >
-> > For notifier_list_notify(), it's different - I just remove the extra
-> > one in migrate_fd_error() because it'll be called in
-> > migrate_fd_cleanup() as well, which is a duplicate.
-> 
-> then what call the one when we do a cancel?  the one in cleanup also?
+v3:
+- added a "(since 2.12)" notation in the new flag, as suggested by
+Eric Blake
+- added a "backwards compatible" note in the commit msg
+- previous version link:
+https://lists.gnu.org/archive/html/qemu-devel/2018-01/msg00093.html
 
-Yes, IIUC migrate_fd_cancel() tells the thread to cancel, then the
-migrate_fd_cleanup() is called there (finally in the bottom half of
-main loop, of course).
+v2:
+- changed the approach based on v1 discussions: instead of a new API, add
+the required flag in QMP query-target
+- dropped patch 2 since query-target does not have an HMP counterpart
+- previous version link:
+https://lists.gnu.org/archive/html/qemu-devel/2017-12/msg00889.html
+
+Daniel Henrique Barboza (2):
+  qmp: adding 'wakeup-suspend-support' in query-target
+  qga: update guest-suspend-ram and guest-suspend-hybrid descriptions
+
+ arch_init.c             |  1 +
+ include/sysemu/sysemu.h |  1 +
+ qapi-schema.json        |  4 +++-
+ qga/qapi-schema.json    | 14 ++++++++++----
+ vl.c                    |  5 +++++
+ 5 files changed, 20 insertions(+), 5 deletions(-)
 
 -- 
-Peter Xu
+2.13.6
