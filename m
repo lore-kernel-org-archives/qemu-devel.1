@@ -1,31 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45382)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46665)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1eWeqC-0002Vf-Ko
-	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 03:56:05 -0500
+	(envelope-from <wei.w.wang@intel.com>) id 1eWesM-0003pu-TH
+	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 03:58:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1eWeq9-00088Z-69
-	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 03:56:04 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:45446)
+	(envelope-from <wei.w.wang@intel.com>) id 1eWesJ-0001Zb-2F
+	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 03:58:19 -0500
+Received: from mga11.intel.com ([192.55.52.93]:43012)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1eWeq9-00087x-0K
-	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 03:56:01 -0500
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 120BB624DA
-	for <qemu-devel@nongnu.org>; Wed,  3 Jan 2018 08:56:00 +0000 (UTC)
-From: Juan Quintela <quintela@redhat.com>
-In-Reply-To: <20180103054043.25719-4-peterx@redhat.com> (Peter Xu's message of
-	"Wed, 3 Jan 2018 13:40:35 +0800")
-References: <20180103054043.25719-1-peterx@redhat.com>
-	<20180103054043.25719-4-peterx@redhat.com>
-Reply-To: quintela@redhat.com
-Date: Wed, 03 Jan 2018 09:55:54 +0100
-Message-ID: <871sj748yt.fsf@secure.laptop>
+	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
+	id 1eWesI-0001Yu-OY
+	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 03:58:14 -0500
+Message-ID: <5A4C9BAC.3040808@intel.com>
+Date: Wed, 03 Jan 2018 17:00:28 +0800
+From: Wei Wang <wei.w.wang@intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH 03/11] migration: remove "enable_colo" var
+References: <1513685879-21823-5-git-send-email-wei.w.wang@intel.com>	<20171224032121.GA5273@bombadil.infradead.org>	<201712241345.DIG21823.SLFOOJtQFOMVFH@I-love.SAKURA.ne.jp>	<5A3F5A4A.1070009@intel.com>	<20180102132419.GB8222@bombadil.infradead.org>
+	<201801031129.JFC18298.FJMHtOFLVSQOFO@I-love.SAKURA.ne.jp>
+In-Reply-To: <201801031129.JFC18298.FJMHtOFLVSQOFO@I-love.SAKURA.ne.jp>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v20 4/7] virtio-balloon: VIRTIO_BALLOON_F_SG
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,42 +28,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>, willy@infradead.org
+Cc: virtio-dev@lists.oasis-open.org, linux-kernel@vger.kernel.org, qemu-devel@nongnu.org, virtualization@lists.linux-foundation.org, kvm@vger.kernel.org, linux-mm@kvack.org, mst@redhat.com, mhocko@kernel.org, akpm@linux-foundation.org, mawilcox@microsoft.com, david@redhat.com, cornelia.huck@de.ibm.com, mgorman@techsingularity.net, aarcange@redhat.com, amit.shah@redhat.com, pbonzini@redhat.com, liliang.opensource@gmail.com, yang.zhang.wz@gmail.com, quan.xu0@gmail.com, nilal@redhat.com, riel@redhat.com
 
-Peter Xu <peterx@redhat.com> wrote:
-> It's only used once, clean it up a bit.
->
-> Signed-off-by: Peter Xu <peterx@redhat.com>
+On 01/03/2018 10:29 AM, Tetsuo Handa wrote:
+> Matthew Wilcox wrote:
+>> The radix tree convention is objectively awful, which is why I'm working
+>> to change it.  Specifying the GFP flags at radix tree initialisation time
+>> rather than allocation time leads to all kinds of confusion.  The preload
+>> API is a pretty awful workaround, and it will go away once the XArray
+>> is working correctly.  That said, there's no alternative to it without
+>> making XBitmap depend on XArray, and I don't want to hold you up there.
+>> So there's an xb_preload for the moment.
+> I'm ready to propose cvbmp shown below as an alternative to xbitmap (but
+> specialized for virtio-balloon case). Wei, can you do some benchmarking
+> between xbitmap and cvbmp?
+> ----------------------------------------
+> cvbmp: clustered values bitmap
 
-See my previous comment on patch 1.  We can remove the variable, but the
-move to ose assert is wrong IMHO.
+I don't think we need to replace xbitmap, at least at this stage. The 
+new implementation doesn't look simpler at all, and virtio-balloon has 
+worked well with xbitmap.
 
-Later, Juan.
+I would suggest you to send out the new implementation for discussion 
+after this series ends, and justify with better performance results if 
+you could get.
 
-
-> ---
->  migration/migration.c | 3 +--
->  1 file changed, 1 insertion(+), 2 deletions(-)
->
-> diff --git a/migration/migration.c b/migration/migration.c
-> index edbda43246..20f7565527 100644
-> --- a/migration/migration.c
-> +++ b/migration/migration.c
-> @@ -2177,7 +2177,6 @@ static void *migration_thread(void *opaque)
->      bool entered_postcopy = false;
->      /* The active state we expect to be in; ACTIVE or POSTCOPY_ACTIVE */
->      enum MigrationStatus current_active_state = MIGRATION_STATUS_ACTIVE;
-> -    bool enable_colo = migrate_colo_enabled();
->  
->      rcu_register_thread();
->  
-> @@ -2305,7 +2304,7 @@ static void *migration_thread(void *opaque)
->          runstate_set(RUN_STATE_POSTMIGRATE);
->      } else {
->          if (s->state == MIGRATION_STATUS_ACTIVE) {
-> -            assert(enable_colo);
-> +            assert(migrate_colo_enabled());
->              migrate_start_colo_process(s);
->              /*
->              * Fixme: we will run VM in COLO no matter its old running state.
+Best,
+Wei
