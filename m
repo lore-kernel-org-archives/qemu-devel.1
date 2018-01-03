@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58866)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58952)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mjc@sifive.com>) id 1eWXCs-0005sR-GX
-	for qemu-devel@nongnu.org; Tue, 02 Jan 2018 19:47:01 -0500
+	(envelope-from <mjc@sifive.com>) id 1eWXD1-0005xI-Q8
+	for qemu-devel@nongnu.org; Tue, 02 Jan 2018 19:47:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mjc@sifive.com>) id 1eWXCo-00087t-80
-	for qemu-devel@nongnu.org; Tue, 02 Jan 2018 19:46:58 -0500
-Received: from mail-pg0-x233.google.com ([2607:f8b0:400e:c05::233]:32839)
+	(envelope-from <mjc@sifive.com>) id 1eWXCz-0008FM-6Y
+	for qemu-devel@nongnu.org; Tue, 02 Jan 2018 19:47:07 -0500
+Received: from mail-pf0-x243.google.com ([2607:f8b0:400e:c00::243]:45418)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mjc@sifive.com>) id 1eWXCn-00087h-UT
-	for qemu-devel@nongnu.org; Tue, 02 Jan 2018 19:46:54 -0500
-Received: by mail-pg0-x233.google.com with SMTP id g7so83249pgs.0
-	for <qemu-devel@nongnu.org>; Tue, 02 Jan 2018 16:46:53 -0800 (PST)
+	(Exim 4.71) (envelope-from <mjc@sifive.com>) id 1eWXCy-0008Ev-UQ
+	for qemu-devel@nongnu.org; Tue, 02 Jan 2018 19:47:05 -0500
+Received: by mail-pf0-x243.google.com with SMTP id u19so73322pfa.12
+	for <qemu-devel@nongnu.org>; Tue, 02 Jan 2018 16:47:04 -0800 (PST)
 From: Michael Clark <mjc@sifive.com>
-Date: Wed,  3 Jan 2018 13:44:15 +1300
-Message-Id: <1514940265-18093-12-git-send-email-mjc@sifive.com>
+Date: Wed,  3 Jan 2018 13:44:19 +1300
+Message-Id: <1514940265-18093-16-git-send-email-mjc@sifive.com>
 In-Reply-To: <1514940265-18093-1-git-send-email-mjc@sifive.com>
 References: <1514940265-18093-1-git-send-email-mjc@sifive.com>
-Subject: [Qemu-devel] [PATCH v1 11/21] RISC-V HTIF Console
+Subject: [Qemu-devel] [PATCH v1 15/21] RISC-V Spike Machines
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,292 +28,41 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Michael Clark <mjc@sifive.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
 
-HTIF (Host Target Interface) provides console emulation for QEMU. HTIF
-allows identical copies of BBL (Berkeley Boot Loader) and linux to run
-on both Spike and QEMU. BBL provides HTIF console access via the
-SBI (Supervisor Binary Interface) and the linux kernel SBI console.
+RISC-V machines compatble with Spike aka riscv-isa-sim, the RISC-V
+Instruction Set Simulator. The following machines are implemented:
 
-The HTIF interface reads the ELF kernel and locates the 'tohost' and
-'fromhost' symbols which it uses for guest to host console MMIO.
-
-The HTIT chardev implements the pre qom legacy interface consistent
-with the 16550a UART in 'hw/char/serial.c'.
+- 'spike_v1.9'; HTIF console, config-string, Privileged ISA Version 1.9.1
+- 'spike_v1.10'; HTIF console, device-tree, Privileged ISA Version 1.10
 
 Signed-off-by: Michael Clark <mjc@sifive.com>
 ---
- hw/riscv/riscv_elf.c          | 244 ++++++++++++++++++++++++++
- hw/riscv/riscv_htif.c         | 399 ++++++++++++++++++++++++++++++++++++++++++
- include/hw/riscv/riscv_elf.h  |  69 ++++++++
- include/hw/riscv/riscv_htif.h |  62 +++++++
- 4 files changed, 774 insertions(+)
- create mode 100644 hw/riscv/riscv_elf.c
- create mode 100644 hw/riscv/riscv_htif.c
- create mode 100644 include/hw/riscv/riscv_elf.h
- create mode 100644 include/hw/riscv/riscv_htif.h
+ hw/riscv/spike_v1_09.c   | 207 ++++++++++++++++++++++++++++++++++
+ hw/riscv/spike_v1_10.c   | 281 +++++++++++++++++++++++++++++++++++++++++++++++
+ include/hw/riscv/spike.h |  51 +++++++++
+ 3 files changed, 539 insertions(+)
+ create mode 100644 hw/riscv/spike_v1_09.c
+ create mode 100644 hw/riscv/spike_v1_10.c
+ create mode 100644 include/hw/riscv/spike.h
 
-diff --git a/hw/riscv/riscv_elf.c b/hw/riscv/riscv_elf.c
+diff --git a/hw/riscv/spike_v1_09.c b/hw/riscv/spike_v1_09.c
 new file mode 100644
-index 0000000..355a5a1
+index 0000000..9b32c6a
 --- /dev/null
-+++ b/hw/riscv/riscv_elf.c
-@@ -0,0 +1,244 @@
++++ b/hw/riscv/spike_v1_09.c
+@@ -0,0 +1,207 @@
 +/*
-+ * elf.c - A simple package for manipulating symbol tables in elf binaries.
-+ *
-+ * Taken from
-+ * https://www.cs.cmu.edu/afs/cs.cmu.edu/academic/class/15213-f03/www/
-+ * ftrace/elf.c
-+ *
-+ */
-+#include <stdio.h>
-+#include <stdlib.h>
-+#include <unistd.h>
-+#include <string.h>
-+#include <sys/stat.h>
-+#include <sys/types.h>
-+#include <sys/mman.h>
-+#include <errno.h>
-+#include <fcntl.h>
-+#include <glib.h>
-+
-+#include "hw/riscv/riscv_elf.h"
-+
-+/*
-+ * elf_open - Map a binary into the address space and extract the
-+ * locations of the static and dynamic symbol tables and their string
-+ * tables. Return this information in a Elf object file handle that will
-+ * be passed to all of the other elf functions.
-+ */
-+Elf_obj64 *elf_open64(const char *filename)
-+{
-+    int i, fd;
-+    struct stat sbuf;
-+    Elf_obj64 *ep;
-+    Elf64_Shdr *shdr;
-+
-+    ep = g_new(Elf_obj64, 1);
-+
-+    /* Do some consistency checks on the binary */
-+    fd = open(filename, O_RDONLY);
-+    if (fd == -1) {
-+        fprintf(stderr, "Can't open \"%s\": %s\n", filename, strerror(errno));
-+        exit(1);
-+    }
-+    if (fstat(fd, &sbuf) == -1) {
-+        fprintf(stderr, "Can't stat \"%s\": %s\n", filename, strerror(errno));
-+        exit(1);
-+    }
-+    if (sbuf.st_size < sizeof(Elf64_Ehdr)) {
-+        fprintf(stderr, "\"%s\" is not an ELF binary object\n", filename);
-+        exit(1);
-+    }
-+
-+    /* It looks OK, so map the Elf binary into our address space */
-+    ep->mlen = sbuf.st_size;
-+    ep->maddr = mmap(NULL, ep->mlen, PROT_READ, MAP_SHARED, fd, 0);
-+    if (ep->maddr == (void *)-1) {
-+        fprintf(stderr, "Can't mmap \"%s\": %s\n", filename, strerror(errno));
-+        exit(1);
-+    }
-+    close(fd);
-+
-+    /* The Elf binary begins with the Elf header */
-+    ep->ehdr = ep->maddr;
-+
-+    /* check we have a 64-bit little-endian RISC-V ELF object */
-+    if (ep->ehdr->e_ident[EI_MAG0] != ELFMAG0 ||
-+        ep->ehdr->e_ident[EI_MAG1] != ELFMAG1 ||
-+        ep->ehdr->e_ident[EI_MAG2] != ELFMAG2 ||
-+        ep->ehdr->e_ident[EI_MAG3] != ELFMAG3 ||
-+        ep->ehdr->e_ident[EI_CLASS] != ELFCLASS64 ||
-+        ep->ehdr->e_ident[EI_DATA] != ELFDATA2LSB ||
-+        ep->ehdr->e_machine != EM_RISCV)
-+    {
-+        fprintf(stderr, "\"%s\" is not a 64-bit RISC-V ELF object\n", filename);
-+        exit(1);
-+    }
-+
-+    /*
-+     * Find the static and dynamic symbol tables and their string
-+     * tables in the the mapped binary. The sh_link field in symbol
-+     * table section headers gives the section index of the string
-+     * table for that symbol table.
-+     */
-+    shdr = (Elf64_Shdr *)(ep->maddr + ep->ehdr->e_shoff);
-+    for (i = 0; i < ep->ehdr->e_shnum; i++) {
-+        if (shdr[i].sh_type == SHT_SYMTAB) {   /* Static symbol table */
-+            ep->symtab = (Elf64_Sym *)(ep->maddr + shdr[i].sh_offset);
-+            ep->symtab_end = (Elf64_Sym *)((char *)ep->symtab +
-+                             shdr[i].sh_size);
-+            ep->strtab = (char *)(ep->maddr + shdr[shdr[i].sh_link].sh_offset);
-+        }
-+        if (shdr[i].sh_type == SHT_DYNSYM) {   /* Dynamic symbol table */
-+            ep->dsymtab = (Elf64_Sym *)(ep->maddr + shdr[i].sh_offset);
-+            ep->dsymtab_end = (Elf64_Sym *)((char *)ep->dsymtab +
-+                              shdr[i].sh_size);
-+            ep->dstrtab = (char *)(ep->maddr + shdr[shdr[i].sh_link].sh_offset);
-+        }
-+    }
-+    return ep;
-+}
-+
-+Elf_obj32 *elf_open32(const char *filename)
-+{
-+    int i, fd;
-+    struct stat sbuf;
-+    Elf_obj32 *ep;
-+    Elf32_Shdr *shdr;
-+
-+    ep = g_new(Elf_obj32, 1);
-+
-+    /* Do some consistency checks on the binary */
-+    fd = open(filename, O_RDONLY);
-+    if (fd == -1) {
-+        fprintf(stderr, "Can't open \"%s\": %s\n", filename, strerror(errno));
-+        exit(1);
-+    }
-+    if (fstat(fd, &sbuf) == -1) {
-+        fprintf(stderr, "Can't stat \"%s\": %s\n", filename, strerror(errno));
-+        exit(1);
-+    }
-+    if (sbuf.st_size < sizeof(Elf32_Ehdr)) {
-+        fprintf(stderr, "\"%s\" is not an ELF binary object\n", filename);
-+        exit(1);
-+    }
-+
-+    /* It looks OK, so map the Elf binary into our address space */
-+    ep->mlen = sbuf.st_size;
-+    ep->maddr = mmap(NULL, ep->mlen, PROT_READ, MAP_SHARED, fd, 0);
-+    if (ep->maddr == (void *)-1) {
-+        fprintf(stderr, "Can't mmap \"%s\": %s\n", filename, strerror(errno));
-+        exit(1);
-+    }
-+    close(fd);
-+
-+    /* The Elf binary begins with the Elf header */
-+    ep->ehdr = ep->maddr;
-+
-+    /* check we have a 32-bit little-endian RISC-V ELF object */
-+    if (ep->ehdr->e_ident[EI_MAG0] != ELFMAG0 ||
-+        ep->ehdr->e_ident[EI_MAG1] != ELFMAG1 ||
-+        ep->ehdr->e_ident[EI_MAG2] != ELFMAG2 ||
-+        ep->ehdr->e_ident[EI_MAG3] != ELFMAG3 ||
-+        ep->ehdr->e_ident[EI_CLASS] != ELFCLASS32 ||
-+        ep->ehdr->e_ident[EI_DATA] != ELFDATA2LSB ||
-+        ep->ehdr->e_machine != EM_RISCV)
-+    {
-+        fprintf(stderr, "\"%s\" is not a 32-bit RISC-V ELF object\n", filename);
-+        exit(1);
-+    }
-+
-+    /*
-+     * Find the static and dynamic symbol tables and their string
-+     * tables in the the mapped binary. The sh_link field in symbol
-+     * table section headers gives the section index of the string
-+     * table for that symbol table.
-+     */
-+    shdr = (Elf32_Shdr *)(ep->maddr + ep->ehdr->e_shoff);
-+    for (i = 0; i < ep->ehdr->e_shnum; i++) {
-+        if (shdr[i].sh_type == SHT_SYMTAB) {   /* Static symbol table */
-+            ep->symtab = (Elf32_Sym *)(ep->maddr + shdr[i].sh_offset);
-+            ep->symtab_end = (Elf32_Sym *)((char *)ep->symtab +
-+                             shdr[i].sh_size);
-+            ep->strtab = (char *)(ep->maddr + shdr[shdr[i].sh_link].sh_offset);
-+        }
-+        if (shdr[i].sh_type == SHT_DYNSYM) {   /* Dynamic symbol table */
-+            ep->dsymtab = (Elf32_Sym *)(ep->maddr + shdr[i].sh_offset);
-+            ep->dsymtab_end = (Elf32_Sym *)((char *)ep->dsymtab +
-+                              shdr[i].sh_size);
-+            ep->dstrtab = (char *)(ep->maddr + shdr[shdr[i].sh_link].sh_offset);
-+        }
-+    }
-+    return ep;
-+}
-+
-+/*
-+ * elf_close - Free up the resources of an  elf object
-+ */
-+void elf_close64(Elf_obj64 *ep)
-+{
-+    if (munmap(ep->maddr, ep->mlen) < 0) {
-+        perror("munmap");
-+        exit(1);
-+    }
-+    free(ep);
-+}
-+
-+void elf_close32(Elf_obj32 *ep)
-+{
-+    if (munmap(ep->maddr, ep->mlen) < 0) {
-+        perror("munmap");
-+        exit(1);
-+    }
-+    free(ep);
-+}
-+
-+/*
-+ * elf_symname - Return ASCII name of a static symbol
-+ */
-+char *elf_symname64(Elf_obj64 *ep, Elf64_Sym *sym)
-+{
-+    return &ep->strtab[sym->st_name];
-+}
-+
-+char *elf_symname32(Elf_obj32 *ep, Elf32_Sym *sym)
-+{
-+    return &ep->strtab[sym->st_name];
-+}
-+
-+/*
-+ * elf_firstsym - Return ptr to first symbol in static symbol table
-+ */
-+Elf64_Sym *elf_firstsym64(Elf_obj64 *ep)
-+{
-+    return ep->symtab;
-+}
-+
-+Elf32_Sym *elf_firstsym32(Elf_obj32 *ep)
-+{
-+    return ep->symtab;
-+}
-+
-+
-+/*
-+ * elf_nextsym - Return ptr to next symbol in static symbol table,
-+ * or NULL if no more symbols.
-+ */
-+Elf64_Sym *elf_nextsym64(Elf_obj64 *ep, Elf64_Sym *sym)
-+{
-+    sym++;
-+    if (sym < ep->symtab_end) {
-+        return sym;
-+    } else {
-+        return NULL;
-+    }
-+}
-+
-+Elf32_Sym *elf_nextsym32(Elf_obj32 *ep, Elf32_Sym *sym)
-+{
-+    sym++;
-+    if (sym < ep->symtab_end) {
-+        return sym;
-+    } else {
-+        return NULL;
-+    }
-+}
-diff --git a/hw/riscv/riscv_htif.c b/hw/riscv/riscv_htif.c
-new file mode 100644
-index 0000000..f4272e9
---- /dev/null
-+++ b/hw/riscv/riscv_htif.c
-@@ -0,0 +1,399 @@
-+/*
-+ * QEMU RISC-V Host Target Interface (HTIF) Emulation
++ * QEMU RISC-V Spike Board
 + *
 + * Author: Sagar Karandikar, sagark@eecs.berkeley.edu
 + *
-+ * This provides HTIF device emulation for QEMU. At the moment this allows
-+ * for identical copies of bbl/linux to run on both spike and QEMU.
++ * This provides a RISC-V Board with the following devices:
++ *
++ * 0) HTIF Test Pass/Fail Reporting (no syscall proxy)
++ * 1) HTIF Console
++ *
++ * These are created by htif_mm_init below.
++ *
++ * This board currently uses a hardcoded devicetree that indicates one hart.
 + *
 + * Permission is hereby granted, free of charge, to any person obtaining a copy
 + * of this software and associated documentation files (the "Software"), to deal
@@ -335,461 +84,197 @@ index 0000000..f4272e9
 + */
 +
 +#include "qemu/osdep.h"
-+#include "qapi/error.h"
-+#include "hw/sysbus.h"
-+#include "hw/char/serial.h"
-+#include "chardev/char.h"
-+#include "chardev/char-fe.h"
-+#include "hw/riscv/riscv_htif.h"
-+#include "qemu/timer.h"
-+#include "exec/address-spaces.h"
++#include "qemu/log.h"
 +#include "qemu/error-report.h"
-+#include "hw/riscv/riscv_elf.h"
++#include "hw/hw.h"
++#include "hw/boards.h"
++#include "hw/loader.h"
++#include "hw/sysbus.h"
++#include "target/riscv/cpu.h"
++#include "hw/riscv/riscv_htif.h"
++#include "hw/riscv/riscv_hart.h"
++#include "hw/riscv/sifive_clint.h"
++#include "hw/riscv/spike.h"
++#include "chardev/char.h"
++#include "sysemu/arch_init.h"
++#include "exec/address-spaces.h"
++#include "elf.h"
 +
-+#define ENABLE_CHARDEV
-+/*#define DEBUG_CHARDEV */
-+/*#define DEBUG_HTIF */
-+
-+#ifdef ENABLE_CHARDEV
-+/*
-+ * Called by the char dev to see if HTIF is ready to accept input.
-+ */
-+static int htif_can_recv(void *opaque)
-+{
-+    return 1;
-+}
-+
-+/*
-+ * Called by the char dev to supply input to HTIF console.
-+ * We assume that we will receive one character at a time.
-+ */
-+static void htif_recv(void *opaque, const uint8_t *buf, int size)
-+{
-+    if (size != 1) {
-+        return;
-+    }
-+
-+    HTIFState *htifstate = opaque;
-+
-+    #ifdef DEBUG_CHARDEV
-+    if (htifstate->env->mfromhost != 0x0) {
-+        fprintf(stderr, "recv handler: fromhost was not ready to \
-+                         accept input\n");
-+        fprintf(stderr, "recv handler: prev value was: %016lx\n",
-+                htifstate->env->mfromhost);
-+    }
-+    #endif
-+
-+    uint64_t val_written = htifstate->pending_read;
-+    uint64_t resp = 0x100 | *buf;
-+
-+    htifstate->env->mfromhost = (val_written >> 48 << 48) | (resp << 16 >> 16);
-+    qemu_irq_raise(htifstate->irq);
-+}
-+
-+/*
-+ * Called by the char dev to supply special events to the HTIF console.
-+ * Not used for HTIF.
-+ */
-+static void htif_event(void *opaque, int event)
-+{
-+    #ifdef DEBUG_CHARDEV
-+    fprintf(stderr, "GOT EVENT: %d\n", event);
-+    #endif
-+}
-+
-+static int htif_be_change(void *opaque)
-+{
-+    HTIFState *s = opaque;
-+
-+    qemu_chr_fe_set_handlers(&s->chr, htif_can_recv, htif_recv, htif_event,
-+        htif_be_change, s, NULL, true);
-+
-+    return 0;
-+}
-+#endif
-+
-+static void dma_strcopy(HTIFState *htifstate, char *str, hwaddr phys_addr)
-+{
-+    int i = 0;
-+    void *base_copy_addr = htifstate->main_mem_ram_ptr + phys_addr;
-+    while (*(str + i)) {
-+        stb_p((void *)(base_copy_addr + i), *(str + i));
-+        i++;
-+    }
-+    stb_p((void *)(base_copy_addr + i), 0); /* store null term */
-+}
-+
-+static void htif_handle_tohost_write(HTIFState *htifstate, uint64_t val_written)
-+{
-+    #ifdef DEBUG_HTIF
-+    fprintf(stderr, "TOHOST WRITE WITH val 0x%016lx\n", val_written);
-+    #endif
-+
-+    uint8_t device = val_written >> 56;
-+    uint8_t cmd = val_written >> 48;
-+    uint64_t payload = val_written & 0xFFFFFFFFFFFFULL;
-+
-+    uint64_t addr = payload >> 8;
-+    hwaddr real_addr = (hwaddr)addr;
-+    uint8_t what = payload & 0xFF;
-+    int resp;
-+
-+    resp = 0; /* stop gcc complaining */
-+    #ifdef DEBUG_HTIF
-+    fprintf(stderr, "mtohost write:\n-device: %d\n-cmd: %d\n-what: %02lx\n\
-+                     -payload: %016lx\n", device, cmd, payload & 0xFF, payload);
-+    #endif
-+
-+    /*
-+     * Currently, there is a fixed mapping of devices:
-+     * 0: riscv-tests Pass/Fail Reporting Only (no syscall proxy)
-+     * 1: Console
-+     */
-+    if (unlikely(device == 0x0)) {
-+        /* frontend syscall handler, only test pass/fail support */
-+        if (cmd == 0x0) {
-+            #ifdef DEBUG_HTIF
-+            fprintf(stderr, "frontend syscall handler\n");
-+            #endif
-+            if (payload & 0x1) {
-+                /* test result */
-+                if (payload >> 1) {
-+                    printf("*** FAILED *** (exitcode = %016" PRIx64 ")\n",
-+                           payload >> 1);
-+                } else {
-+                    printf("TEST PASSED\n");
-+                }
-+                exit(payload >> 1);
-+            }
-+            fprintf(stderr, "pk syscall proxy not supported\n");
-+        } else if (cmd == 0xFF) {
-+            /* use what */
-+            if (what == 0xFF) {
-+                #ifdef DEBUG_HTIF
-+                fprintf(stderr, "registering name\n");
-+                #endif
-+                dma_strcopy(htifstate, (char *)"syscall_proxy", real_addr);
-+            } else if (what == 0x0) {
-+                #ifdef DEBUG_HTIF
-+                fprintf(stderr, "registering syscall cmd\n");
-+                #endif
-+                dma_strcopy(htifstate, (char *)"syscall", real_addr);
-+            } else {
-+                #ifdef DEBUG_HTIF
-+                fprintf(stderr, "registering end of cmds list\n");
-+                #endif
-+                dma_strcopy(htifstate, (char *)"", real_addr);
-+            }
-+            resp = 0x1; /* write to indicate device name placed */
-+        } else {
-+            fprintf(stderr, "HTIF device %d: UNKNOWN COMMAND\n", device);
-+            exit(1);
-+        }
-+    } else if (likely(device == 0x1)) {
-+        /* HTIF Console */
-+        if (cmd == 0x0) {
-+            /* this should be a queue, but not yet implemented as such */
-+            htifstate->pending_read = val_written;
-+            htifstate->env->mtohost = 0; /* clear to indicate we read */
-+            return;
-+        } else if (cmd == 0x1) {
-+            #ifdef ENABLE_CHARDEV
-+            qemu_chr_fe_write(&htifstate->chr, (uint8_t *)&payload, 1);
-+            #endif
-+            resp = 0x100 | (uint8_t)payload;
-+        } else if (cmd == 0xFF) {
-+            /* use what */
-+            if (what == 0xFF) {
-+                #ifdef DEBUG_HTIF
-+                fprintf(stderr, "registering name\n");
-+                #endif
-+                dma_strcopy(htifstate, (char *)"bcd", real_addr);
-+            } else if (what == 0x0) {
-+                #ifdef DEBUG_HTIF
-+                fprintf(stderr, "registering read cmd\n");
-+                #endif
-+                dma_strcopy(htifstate, (char *)"read", real_addr);
-+            } else if (what == 0x1) {
-+                #ifdef DEBUG_HTIF
-+                fprintf(stderr, "registering write cmd\n");
-+                #endif
-+                dma_strcopy(htifstate, (char *)"write", real_addr);
-+            } else {
-+                #ifdef DEBUG_HTIF
-+                fprintf(stderr, "registering end of cmds list\n");
-+                #endif
-+                dma_strcopy(htifstate, (char *)"", real_addr);
-+            }
-+            resp = 0x1; /* write to indicate device name placed */
-+        } else {
-+            fprintf(stderr, "HTIF device %d: UNKNOWN COMMAND\n", device);
-+            exit(1);
-+        }
-+    /* all other devices */
-+    } else if (device == 0x2 && cmd == 0xFF && what == 0xFF) {
-+        #ifdef DEBUG_HTIF
-+        fprintf(stderr, "registering no device as last\n");
-+        #endif
-+        stb_p((void *)(htifstate->main_mem_ram_ptr + real_addr), 0);
-+        resp = 0x1; /* write to indicate device name placed */
-+    } else {
-+        fprintf(stderr, "HTIF UNKNOWN DEVICE OR COMMAND!\n");
-+        fprintf(stderr, "device: %d\ncmd: %d\nwhat: %02" PRIx64 "\n"
-+            "payload: %016" PRIx64 "\n", device, cmd, payload & 0xFF, payload);
-+        exit(1);
-+    }
-+    /*
-+     * - latest bbl does not set fromhost to 0 if there is a value in tohost
-+     * - with this code enabled, qemu hangs waiting for fromhost to go to 0
-+     * - with this code disabled, qemu works with bbl priv v1.9.1 and v1.10
-+     * - HTIF needs protocol documentation and a more complete state machine
-+
-+        while (!htifstate->fromhost_inprogress &&
-+            htifstate->env->mfromhost != 0x0) {
-+        }
-+    */
-+    htifstate->env->mfromhost = (val_written >> 48 << 48) | (resp << 16 >> 16);
-+    htifstate->env->mtohost = 0; /* clear to indicate we read */
-+    if (htifstate->env->mfromhost != 0) {
-+        /* raise HTIF interrupt */
-+        qemu_irq_raise(htifstate->irq);
-+    }
-+}
-+
-+#define TOHOST_OFFSET1 (htifstate->tohost_offset)
-+#define TOHOST_OFFSET2 (htifstate->tohost_offset + 4)
-+#define FROMHOST_OFFSET1 (htifstate->fromhost_offset)
-+#define FROMHOST_OFFSET2 (htifstate->fromhost_offset + 4)
-+
-+/* CPU wants to read an HTIF register */
-+static uint64_t htif_mm_read(void *opaque, hwaddr addr, unsigned size)
-+{
-+    HTIFState *htifstate = opaque;
-+    if (addr == TOHOST_OFFSET1) {
-+        return htifstate->env->mtohost & 0xFFFFFFFF;
-+    } else if (addr == TOHOST_OFFSET2) {
-+        return (htifstate->env->mtohost >> 32) & 0xFFFFFFFF;
-+    } else if (addr == FROMHOST_OFFSET1) {
-+        return htifstate->env->mfromhost & 0xFFFFFFFF;
-+    } else if (addr == FROMHOST_OFFSET2) {
-+        return (htifstate->env->mfromhost >> 32) & 0xFFFFFFFF;
-+    } else {
-+        printf("Invalid htif register address %016" PRIx64 "\n",
-+               (uint64_t)addr);
-+        exit(1);
-+    }
-+}
-+
-+/* CPU wrote to an HTIF register */
-+static void htif_mm_write(void *opaque, hwaddr addr,
-+                            uint64_t value, unsigned size)
-+{
-+    HTIFState *htifstate = opaque;
-+    if (addr == TOHOST_OFFSET1) {
-+        if (htifstate->env->mtohost == 0x0) {
-+            htifstate->allow_tohost = 1;
-+            htifstate->env->mtohost = value & 0xFFFFFFFF;
-+        } else {
-+            htifstate->allow_tohost = 0;
-+        }
-+    } else if (addr == TOHOST_OFFSET2) {
-+        if (htifstate->allow_tohost) {
-+            htifstate->env->mtohost |= value << 32;
-+            htif_handle_tohost_write(htifstate, htifstate->env->mtohost);
-+        }
-+    } else if (addr == FROMHOST_OFFSET1) {
-+        htifstate->fromhost_inprogress = 1;
-+        htifstate->env->mfromhost = value & 0xFFFFFFFF;
-+    } else if (addr == FROMHOST_OFFSET2) {
-+        htifstate->env->mfromhost |= value << 32;
-+        if (htifstate->env->mfromhost == 0x0) {
-+            qemu_irq_lower(htifstate->irq);
-+        }
-+        htifstate->fromhost_inprogress = 0;
-+    } else {
-+        printf("Invalid htif register address %016" PRIx64 "\n",
-+               (uint64_t)addr);
-+        exit(1);
-+    }
-+}
-+
-+static const MemoryRegionOps htif_mm_ops = {
-+    .read = htif_mm_read,
-+    .write = htif_mm_write,
++static const struct MemmapEntry {
++    hwaddr base;
++    hwaddr size;
++} spike_memmap[] = {
++    [SPIKE_MROM] =     {     0x1000,     0x2000 },
++    [SPIKE_CLINT] =    {  0x2000000,    0x10000 },
++    [SPIKE_DRAM] =     { 0x80000000,        0x0 },
 +};
 +
-+HTIFState *htif_mm_init(MemoryRegion *address_space,
-+    const char *kernel_filename, qemu_irq irq, MemoryRegion *main_mem,
-+    CPURISCVState *env, Chardev *chr)
++static uint64_t identity_translate(void *opaque, uint64_t addr)
 +{
-+    uint64_t fromhost_addr = 0, tohost_addr = 0;
-+
-+    /* get fromhost/tohost addresses from the ELF, as spike/fesvr do */
-+    if (kernel_filename) {
-+#if defined(TARGET_RISCV64)
-+        Elf_obj64 *e = elf_open64(kernel_filename);
-+#else
-+        Elf_obj32 *e = elf_open32(kernel_filename);
-+#endif
-+
-+        const char *fromhost = "fromhost";
-+        const char *tohost = "tohost";
-+
-+#if defined(TARGET_RISCV64)
-+        Elf64_Sym *curr_sym = elf_firstsym64(e);
-+#else
-+        Elf32_Sym *curr_sym = elf_firstsym32(e);
-+#endif
-+        while (curr_sym) {
-+#if defined(TARGET_RISCV64)
-+            char *symname = elf_symname64(e, curr_sym);
-+#else
-+            char *symname = elf_symname32(e, curr_sym);
-+#endif
-+
-+            if (strcmp(fromhost, symname) == 0) {
-+                /* get fromhost addr */
-+                fromhost_addr = curr_sym->st_value;
-+                if (curr_sym->st_size != 8) {
-+                    error_report("HTIF fromhost must be 8 bytes");
-+                    exit(1);
-+                }
-+            } else if (strcmp(tohost, symname) == 0) {
-+                /* get tohost addr */
-+                tohost_addr = curr_sym->st_value;
-+                if (curr_sym->st_size != 8) {
-+                    error_report("HTIF tohost must be 8 bytes");
-+                    exit(1);
-+                }
-+            }
-+#if defined(TARGET_RISCV64)
-+            curr_sym = elf_nextsym64(e, curr_sym);
-+#else
-+            curr_sym = elf_nextsym32(e, curr_sym);
-+#endif
-+        }
-+
-+#if defined(TARGET_RISCV64)
-+        elf_close64(e);
-+#else
-+        elf_close32(e);
-+#endif
-+    }
-+
-+    uint64_t base = MIN(tohost_addr, fromhost_addr);
-+    uint64_t size = MAX(tohost_addr + 8, fromhost_addr + 8) - base;
-+    uint64_t tohost_offset = tohost_addr - base;
-+    uint64_t fromhost_offset = fromhost_addr - base;
-+
-+    HTIFState *s = g_malloc0(sizeof(HTIFState));
-+    s->irq = irq;
-+    s->address_space = address_space;
-+    s->main_mem = main_mem;
-+    s->main_mem_ram_ptr = memory_region_get_ram_ptr(main_mem);
-+    s->env = env;
-+    s->tohost_offset = tohost_offset;
-+    s->fromhost_offset = fromhost_offset;
-+    s->pending_read = 0;
-+    s->allow_tohost = 0;
-+    s->fromhost_inprogress = 0;
-+#ifdef ENABLE_CHARDEV
-+    qemu_chr_fe_init(&s->chr, chr, &error_abort);
-+    qemu_chr_fe_set_handlers(&s->chr, htif_can_recv, htif_recv, htif_event,
-+        htif_be_change, s, NULL, true);
-+#endif
-+    if (base) {
-+        memory_region_init_io(&s->mmio, NULL, &htif_mm_ops, s,
-+                            TYPE_HTIF_UART, size);
-+        memory_region_add_subregion(address_space, base, &s->mmio);
-+    }
-+
-+    return s;
++    return addr;
 +}
-diff --git a/include/hw/riscv/riscv_elf.h b/include/hw/riscv/riscv_elf.h
++
++static uint64_t load_kernel(const char *kernel_filename)
++{
++    uint64_t kernel_entry, kernel_high;
++
++    if (load_elf(kernel_filename, identity_translate, NULL,
++                 &kernel_entry, NULL, &kernel_high,
++                 /* little_endian = */ 0, ELF_MACHINE, 1, 0) < 0) {
++        error_report("qemu: could not load kernel '%s'", kernel_filename);
++        exit(1);
++    }
++    return kernel_entry;
++}
++
++static void riscv_spike_board_init(MachineState *machine)
++{
++    const struct MemmapEntry *memmap = spike_memmap;
++
++    SpikeState *s = g_new0(SpikeState, 1);
++    /* const char *cpu_model = machine->cpu_model; */
++    /* const char *kernel_cmdline = machine->kernel_cmdline; */
++    /* const char *initrd_filename = machine->initrd_filename; */
++    MemoryRegion *system_memory = get_system_memory();
++    MemoryRegion *main_mem = g_new(MemoryRegion, 1);
++    MemoryRegion *boot_rom = g_new(MemoryRegion, 1);
++
++    /* Initialize SOC */
++    object_initialize(&s->soc, sizeof(s->soc), TYPE_RISCV_HART_ARRAY);
++    object_property_add_child(OBJECT(machine), "soc", OBJECT(&s->soc),
++                              &error_abort);
++    object_property_set_str(OBJECT(&s->soc), TYPE_RISCV_CPU_IMAFDCSU_PRIV_1_09,
++                            "cpu-model", &error_abort);
++    object_property_set_int(OBJECT(&s->soc), smp_cpus, "num-harts",
++                            &error_abort);
++    object_property_set_bool(OBJECT(&s->soc), true, "realized",
++                            &error_abort);
++
++    /* register system main memory (actual RAM) */
++    memory_region_init_ram(main_mem, NULL, "riscv.spike.ram",
++                           machine->ram_size, &error_fatal);
++    memory_region_add_subregion(system_memory, DRAM_BASE, main_mem);
++
++    /* boot rom */
++    memory_region_init_ram(boot_rom, NULL, "riscv.spike.bootrom",
++                           0x40000, &error_fatal);
++    memory_region_add_subregion(system_memory, 0x0, boot_rom);
++
++    if (machine->kernel_filename) {
++        load_kernel(machine->kernel_filename);
++    }
++
++    uint32_t reset_vec[8] = {
++        0x297 + memmap[SPIKE_DRAM].base - memmap[SPIKE_MROM].base, /* lui */
++        0x00028067,                   /* jump to DRAM_BASE */
++        0x00000000,                   /* reserved */
++        memmap[SPIKE_MROM].base + sizeof(reset_vec), /* config string pointer */
++        0, 0, 0, 0                    /* trap vector */
++    };
++
++    /* part one of config string - before memory size specified */
++    const char *config_string_tmpl =
++        "platform {\n"
++        "  vendor ucb;\n"
++        "  arch spike;\n"
++        "};\n"
++        "rtc {\n"
++        "  addr 0x" "40000000" ";\n"
++        "};\n"
++        "ram {\n"
++        "  0 {\n"
++        "    addr 0x" "80000000" ";\n"
++        "    size 0x" "%016" PRIx64 ";\n"
++        "  };\n"
++        "};\n"
++        "core {\n"
++        "  0" " {\n"
++        "    " "0 {\n"
++        "      isa " "rv64imafd" ";\n"
++        "      timecmp 0x" "40000008" ";\n"
++        "      ipi 0x" "40001000" ";\n" /* match dummy ipi region above */
++        "    };\n"
++        "  };\n"
++        "};\n";
++
++    /* build config string with supplied memory size */
++    size_t config_string_size = strlen(config_string_tmpl) + 16;
++    char *config_string = malloc(config_string_size);
++    snprintf(config_string, config_string_size,
++        config_string_tmpl, (uint64_t)ram_size);
++    size_t config_string_len = strlen(config_string);
++
++    /* copy in the reset vector */
++    cpu_physical_memory_write(memmap[SPIKE_MROM].base, reset_vec,
++        sizeof(reset_vec));
++
++    /* copy in the config string */
++    cpu_physical_memory_write(memmap[SPIKE_MROM].base + sizeof(reset_vec),
++        config_string, config_string_len);
++
++    /* add memory mapped htif registers at location specified in the symbol
++       table of the elf being loaded (thus kernel_filename is passed to the
++       init rather than an address) */
++    htif_mm_init(system_memory, machine->kernel_filename,
++        s->soc.harts[0].env.irq[4], boot_rom,
++        &s->soc.harts[0].env, serial_hds[0]);
++
++    /* Core Local Interruptor (timer and IPI) */
++    sifive_clint_create(0x40000000, 0x2000, smp_cpus, 0x1000, 0x8, 0x0);
++}
++
++static int riscv_spike_board_sysbus_device_init(SysBusDevice *sysbusdev)
++{
++    return 0;
++}
++
++static void riscv_spike_board_class_init(ObjectClass *klass, void *data)
++{
++    SysBusDeviceClass *k = SYS_BUS_DEVICE_CLASS(klass);
++    k->init = riscv_spike_board_sysbus_device_init;
++}
++
++static const TypeInfo riscv_spike_board_device = {
++    .name          = TYPE_RISCV_SPIKE_V1_09_1_BOARD,
++    .parent        = TYPE_SYS_BUS_DEVICE,
++    .instance_size = sizeof(SpikeState),
++    .class_init    = riscv_spike_board_class_init,
++};
++
++static void riscv_spike_board_machine_init(MachineClass *mc)
++{
++    mc->desc = "RISC-V Spike Board (Privileged ISA v1.9.1)";
++    mc->init = riscv_spike_board_init;
++    mc->max_cpus = 1;
++    mc->is_default = 1;
++}
++
++DEFINE_MACHINE("spike_v1.9", riscv_spike_board_machine_init)
++
++static void riscv_spike_board_register_types(void)
++{
++    type_register_static(&riscv_spike_board_device);
++}
++
++type_init(riscv_spike_board_register_types);
+diff --git a/hw/riscv/spike_v1_10.c b/hw/riscv/spike_v1_10.c
 new file mode 100644
-index 0000000..5771829
+index 0000000..4edff49
 --- /dev/null
-+++ b/include/hw/riscv/riscv_elf.h
-@@ -0,0 +1,69 @@
++++ b/hw/riscv/spike_v1_10.c
+@@ -0,0 +1,281 @@
 +/*
-+ * elf.h - A package for manipulating Elf binaries
++ * QEMU RISC-V Spike Board
 + *
-+ * Taken from:
-+ * https://www.cs.cmu.edu/afs/cs.cmu.edu/academic/class/15213-f03/www/ftrace/
-+ * elf.h
++ * Author: Sagar Karandikar, sagark@eecs.berkeley.edu
++ * Author: Michael Clark, mjc@sifive.com
 + *
-+ */
-+
-+#ifndef ELF_H
-+#define ELF_H
-+
-+#include <stdint.h>
-+#include <elf.h>
-+
-+/*
-+ * This is a handle that is created by elf_open and then used by every
-+ * other function in the elf package
-+*/
-+typedef struct {
-+    void *maddr;            /* Start of mapped Elf binary segment in memory */
-+    int mlen;               /* Length in bytes of the mapped Elf segment */
-+    Elf64_Ehdr *ehdr;       /* Start of main Elf header (same as maddr) */
-+    Elf64_Sym *symtab;      /* Start of symbol table */
-+    Elf64_Sym *symtab_end;  /* End of symbol table (symtab + size) */
-+    char *strtab;           /* Address of string table */
-+    Elf64_Sym *dsymtab;     /* Start of dynamic symbol table */
-+    Elf64_Sym *dsymtab_end; /* End of dynamic symbol table (dsymtab + size) */
-+    char *dstrtab;          /* Address of dynamic string table */
-+} Elf_obj64;
-+
-+typedef struct {
-+    void *maddr;            /* Start of mapped Elf binary segment in memory */
-+    int mlen;               /* Length in bytes of the mapped Elf segment */
-+    Elf32_Ehdr *ehdr;       /* Start of main Elf header (same as maddr) */
-+    Elf32_Sym *symtab;      /* Start of symbol table */
-+    Elf32_Sym *symtab_end;  /* End of symbol table (symtab + size) */
-+    char *strtab;           /* Address of string table */
-+    Elf32_Sym *dsymtab;     /* Start of dynamic symbol table */
-+    Elf32_Sym *dsymtab_end; /* End of dynamic symbol table (dsymtab + size) */
-+    char *dstrtab;          /* Address of dynamic string table */
-+} Elf_obj32;
-+
-+/*
-+ * Create and destroy Elf object handles
-+ */
-+Elf_obj64 *elf_open64(const char *filename);
-+Elf_obj32 *elf_open32(const char *filename);
-+
-+void elf_close64(Elf_obj64 *ep);
-+void elf_close32(Elf_obj32 *ep);
-+
-+/*
-+ * Functions for manipulating static symbols
-+ */
-+
-+/* Returns pointer to the first symbol */
-+Elf64_Sym *elf_firstsym64(Elf_obj64 *ep);
-+Elf32_Sym *elf_firstsym32(Elf_obj32 *ep);
-+
-+/* Returns pointer to the next symbol, or NULL if no more symbols */
-+Elf64_Sym *elf_nextsym64(Elf_obj64 *ep, Elf64_Sym *sym);
-+Elf32_Sym *elf_nextsym32(Elf_obj32 *ep, Elf32_Sym *sym);
-+
-+/* Return symbol string name */
-+char *elf_symname64(Elf_obj64 *ep, Elf64_Sym *sym);
-+char *elf_symname32(Elf_obj32 *ep, Elf32_Sym *sym);
-+
-+#endif
-diff --git a/include/hw/riscv/riscv_htif.h b/include/hw/riscv/riscv_htif.h
-new file mode 100644
-index 0000000..d37291d
---- /dev/null
-+++ b/include/hw/riscv/riscv_htif.h
-@@ -0,0 +1,62 @@
-+/*
-+ * QEMU RISCV Host Target Interface (HTIF) Emulation
++ * This provides a RISC-V Board with the following devices:
 + *
++ * 0) HTIF Test Pass/Fail Reporting (no syscall proxy)
++ * 1) HTIF Console
++ *
++ * These are created by htif_mm_init below.
 + *
 + * Permission is hereby granted, free of charge, to any person obtaining a copy
 + * of this software and associated documentation files (the "Software"), to deal
@@ -809,44 +294,311 @@ index 0000000..d37291d
 + * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 + * THE SOFTWARE.
 + */
-+#ifndef HW_RISCV_HTIF_H
-+#define HW_RISCV_HTIF_H
 +
++#include "qemu/osdep.h"
++#include "qemu/log.h"
++#include "qemu/error-report.h"
 +#include "hw/hw.h"
-+#include "chardev/char.h"
-+#include "chardev/char-fe.h"
-+#include "sysemu/sysemu.h"
-+#include "exec/memory.h"
++#include "hw/boards.h"
++#include "hw/loader.h"
++#include "hw/sysbus.h"
 +#include "target/riscv/cpu.h"
++#include "hw/riscv/riscv_htif.h"
++#include "hw/riscv/riscv_hart.h"
++#include "hw/riscv/sifive_clint.h"
++#include "hw/riscv/spike.h"
++#include "chardev/char.h"
++#include "sysemu/arch_init.h"
++#include "sysemu/device_tree.h"
++#include "exec/address-spaces.h"
++#include "elf.h"
 +
-+#define TYPE_HTIF_UART "riscv.htif.uart"
++static const struct MemmapEntry {
++    hwaddr base;
++    hwaddr size;
++} spike_memmap[] = {
++    [SPIKE_MROM] =     {     0x1000,     0x2000 },
++    [SPIKE_CLINT] =    {  0x2000000,    0x10000 },
++    [SPIKE_DRAM] =     { 0x80000000,        0x0 },
++};
 +
-+typedef struct HTIFState {
-+    int allow_tohost;
-+    int fromhost_inprogress;
++static uint64_t identity_translate(void *opaque, uint64_t addr)
++{
++    return addr;
++}
 +
-+    hwaddr tohost_offset;
-+    hwaddr fromhost_offset;
-+    uint64_t tohost_size;
-+    uint64_t fromhost_size;
-+    qemu_irq irq; /* host interrupt line */
-+    MemoryRegion mmio;
-+    MemoryRegion *address_space;
-+    MemoryRegion *main_mem;
-+    void *main_mem_ram_ptr;
++static uint64_t load_kernel(const char *kernel_filename)
++{
++    uint64_t kernel_entry, kernel_high;
 +
-+    CPURISCVState *env;
-+    CharBackend chr;
-+    uint64_t pending_read;
-+} HTIFState;
++    if (load_elf(kernel_filename, identity_translate, NULL,
++                 &kernel_entry, NULL, &kernel_high,
++                 /* little_endian = */ 0, ELF_MACHINE, 1, 0) < 0) {
++        error_report("qemu: could not load kernel '%s'", kernel_filename);
++        exit(1);
++    }
++    return kernel_entry;
++}
 +
-+extern const VMStateDescription vmstate_htif;
-+extern const MemoryRegionOps htif_io_ops;
++static void create_fdt(SpikeState *s, const struct MemmapEntry *memmap,
++    uint64_t mem_size, const char *cmdline)
++{
++    void *fdt;
++    int cpu;
++    uint32_t *cells;
++    char *nodename;
 +
-+/* legacy pre qom */
-+HTIFState *htif_mm_init(MemoryRegion *address_space,
-+    const char *kernel_filename, qemu_irq irq, MemoryRegion *main_mem,
-+    CPURISCVState *env, Chardev *chr);
++    fdt = s->fdt = create_device_tree(&s->fdt_size);
++    if (!fdt) {
++        error_report("create_device_tree() failed");
++        exit(1);
++    }
++
++    qemu_fdt_setprop_string(fdt, "/", "model", "ucbbar,spike-bare,qemu");
++    qemu_fdt_setprop_string(fdt, "/", "compatible", "ucbbar,spike-bare-dev");
++    qemu_fdt_setprop_cell(fdt, "/", "#size-cells", 0x2);
++    qemu_fdt_setprop_cell(fdt, "/", "#address-cells", 0x2);
++
++    qemu_fdt_add_subnode(fdt, "/htif");
++    qemu_fdt_setprop_string(fdt, "/htif", "compatible", "ucb,htif0");
++
++    qemu_fdt_add_subnode(fdt, "/soc");
++    qemu_fdt_setprop(fdt, "/soc", "ranges", NULL, 0);
++    qemu_fdt_setprop_string(fdt, "/soc", "compatible", "ucbbar,spike-bare-soc");
++    qemu_fdt_setprop_cell(fdt, "/soc", "#size-cells", 0x2);
++    qemu_fdt_setprop_cell(fdt, "/soc", "#address-cells", 0x2);
++
++    nodename = g_strdup_printf("/memory@%lx",
++        (long)memmap[SPIKE_DRAM].base);
++    qemu_fdt_add_subnode(fdt, nodename);
++    qemu_fdt_setprop_cells(fdt, nodename, "reg",
++        memmap[SPIKE_DRAM].base >> 32, memmap[SPIKE_DRAM].base,
++        mem_size >> 32, mem_size);
++    qemu_fdt_setprop_string(fdt, nodename, "device_type", "memory");
++    g_free(nodename);
++
++    qemu_fdt_add_subnode(fdt, "/cpus");
++    qemu_fdt_setprop_cell(fdt, "/cpus", "timebase-frequency", 10000000);
++    qemu_fdt_setprop_cell(fdt, "/cpus", "#size-cells", 0x0);
++    qemu_fdt_setprop_cell(fdt, "/cpus", "#address-cells", 0x1);
++
++    for (cpu = s->soc.num_harts - 1; cpu >= 0; cpu--) {
++        nodename = g_strdup_printf("/cpus/cpu@%d", cpu);
++        char *intc = g_strdup_printf("/cpus/cpu@%d/interrupt-controller", cpu);
++        char *isa = riscv_isa_string(&s->soc.harts[cpu]);
++        qemu_fdt_add_subnode(fdt, nodename);
++        qemu_fdt_setprop_cell(fdt, nodename, "clock-frequency", 1000000000);
++        qemu_fdt_setprop_string(fdt, nodename, "mmu-type", "riscv,sv48");
++        qemu_fdt_setprop_string(fdt, nodename, "riscv,isa", isa);
++        qemu_fdt_setprop_string(fdt, nodename, "compatible", "riscv");
++        qemu_fdt_setprop_string(fdt, nodename, "status", "okay");
++        qemu_fdt_setprop_cell(fdt, nodename, "reg", cpu);
++        qemu_fdt_setprop_string(fdt, nodename, "device_type", "cpu");
++        qemu_fdt_add_subnode(fdt, intc);
++        qemu_fdt_setprop_cell(fdt, intc, "phandle", 1);
++        qemu_fdt_setprop_cell(fdt, intc, "linux,phandle", 1);
++        qemu_fdt_setprop_string(fdt, intc, "compatible", "riscv,cpu-intc");
++        qemu_fdt_setprop(fdt, intc, "interrupt-controller", NULL, 0);
++        qemu_fdt_setprop_cell(fdt, intc, "#interrupt-cells", 1);
++        g_free(isa);
++        g_free(intc);
++        g_free(nodename);
++    }
++
++    cells =  g_new0(uint32_t, s->soc.num_harts * 4);
++    for (cpu = 0; cpu < s->soc.num_harts; cpu++) {
++        nodename =
++            g_strdup_printf("/cpus/cpu@%d/interrupt-controller", cpu);
++        uint32_t intc_phandle = qemu_fdt_get_phandle(fdt, nodename);
++        cells[cpu * 4 + 0] = cpu_to_be32(intc_phandle);
++        cells[cpu * 4 + 1] = cpu_to_be32(IRQ_M_SOFT);
++        cells[cpu * 4 + 2] = cpu_to_be32(intc_phandle);
++        cells[cpu * 4 + 3] = cpu_to_be32(IRQ_M_TIMER);
++        g_free(nodename);
++    }
++    nodename = g_strdup_printf("/soc/clint@%lx",
++        (long)memmap[SPIKE_CLINT].base);
++    qemu_fdt_add_subnode(fdt, nodename);
++    qemu_fdt_setprop_string(fdt, nodename, "compatible", "riscv,clint0");
++    qemu_fdt_setprop_cells(fdt, nodename, "reg",
++        0x0, memmap[SPIKE_CLINT].base,
++        0x0, memmap[SPIKE_CLINT].size);
++    qemu_fdt_setprop(fdt, nodename, "interrupts-extended",
++        cells, s->soc.num_harts * sizeof(uint32_t) * 4);
++    g_free(cells);
++    g_free(nodename);
++
++    qemu_fdt_add_subnode(fdt, "/chosen");
++    qemu_fdt_setprop_string(fdt, "/chosen", "bootargs", cmdline);
++ }
++
++static void riscv_spike_board_init(MachineState *machine)
++{
++    const struct MemmapEntry *memmap = spike_memmap;
++
++    SpikeState *s = g_new0(SpikeState, 1);
++    /* const char *cpu_model = machine->cpu_model; */
++    /* const char *kernel_cmdline = machine->kernel_cmdline; */
++    /* const char *initrd_filename = machine->initrd_filename; */
++    MemoryRegion *system_memory = get_system_memory();
++    MemoryRegion *main_mem = g_new(MemoryRegion, 1);
++    MemoryRegion *boot_rom = g_new(MemoryRegion, 1);
++
++    /* Initialize SOC */
++    object_initialize(&s->soc, sizeof(s->soc), TYPE_RISCV_HART_ARRAY);
++    object_property_add_child(OBJECT(machine), "soc", OBJECT(&s->soc),
++                              &error_abort);
++    object_property_set_str(OBJECT(&s->soc), TYPE_RISCV_CPU_IMAFDCSU_PRIV_1_10,
++                            "cpu-model", &error_abort);
++    object_property_set_int(OBJECT(&s->soc), smp_cpus, "num-harts",
++                            &error_abort);
++    object_property_set_bool(OBJECT(&s->soc), true, "realized",
++                            &error_abort);
++
++    /* register system main memory (actual RAM) */
++    memory_region_init_ram(main_mem, NULL, "riscv.spike.ram",
++                           machine->ram_size, &error_fatal);
++    memory_region_add_subregion(system_memory, memmap[SPIKE_DRAM].base,
++        main_mem);
++
++    /* create device tree */
++    create_fdt(s, memmap, machine->ram_size, machine->kernel_cmdline);
++
++    /* boot rom */
++    memory_region_init_ram(boot_rom, NULL, "riscv.spike.bootrom",
++                           s->fdt_size + 0x2000, &error_fatal);
++    memory_region_add_subregion(system_memory, 0x0, boot_rom);
++
++    if (machine->kernel_filename) {
++        load_kernel(machine->kernel_filename);
++    }
++
++    /* reset vector */
++    uint32_t reset_vec[8] = {
++        0x00000297,                  /* 1:  auipc  t0, %pcrel_hi(dtb) */
++        0x02028593,                  /*     addi   a1, t0, %pcrel_lo(1b) */
++        0xf1402573,                  /*     csrr   a0, mhartid  */
++#if defined(TARGET_RISCV32)
++        0x0182a283,                  /*     lw     t0, 24(t0) */
++#elif defined(TARGET_RISCV64)
++        0x0182b283,                  /*     ld     t0, 24(t0) */
++#endif
++        0x00028067,                  /*     jr     t0 */
++        0x00000000,
++        memmap[SPIKE_DRAM].base,     /* start: .dword DRAM_BASE */
++        0x00000000,
++                                     /* dtb: */
++    };
++
++    /* copy in the reset vector */
++    cpu_physical_memory_write(memmap[SPIKE_MROM].base,
++        reset_vec, sizeof(reset_vec));
++
++    /* copy in the device tree */
++    qemu_fdt_dumpdtb(s->fdt, s->fdt_size);
++    cpu_physical_memory_write(memmap[SPIKE_MROM].base + sizeof(reset_vec),
++        s->fdt, s->fdt_size);
++
++    /* add memory mapped htif registers at location specified in the symbol
++       table of the elf being loaded (thus kernel_filename is passed to the
++       init rather than an address) */
++    htif_mm_init(system_memory, machine->kernel_filename,
++        s->soc.harts[0].env.irq[4], boot_rom,
++        &s->soc.harts[0].env, serial_hds[0]);
++
++    /* Core Local Interruptor (timer and IPI) */
++    sifive_clint_create(0x2000000, 0x10000, smp_cpus,
++        SIFIVE_SIP_BASE, SIFIVE_TIMECMP_BASE, SIFIVE_TIME_BASE);
++}
++
++static int riscv_spike_board_sysbus_device_init(SysBusDevice *sysbusdev)
++{
++    return 0;
++}
++
++static void riscv_spike_board_class_init(ObjectClass *klass, void *data)
++{
++    SysBusDeviceClass *k = SYS_BUS_DEVICE_CLASS(klass);
++    k->init = riscv_spike_board_sysbus_device_init;
++}
++
++static const TypeInfo riscv_spike_board_device = {
++    .name          = TYPE_RISCV_SPIKE_V1_10_0_BOARD,
++    .parent        = TYPE_SYS_BUS_DEVICE,
++    .instance_size = sizeof(SpikeState),
++    .class_init    = riscv_spike_board_class_init,
++};
++
++static void riscv_spike_board_machine_init(MachineClass *mc)
++{
++    mc->desc = "RISC-V Spike Board (Privileged ISA v1.10)";
++    mc->init = riscv_spike_board_init;
++    mc->max_cpus = 1;
++}
++
++DEFINE_MACHINE("spike_v1.10", riscv_spike_board_machine_init)
++
++static void riscv_spike_board_register_types(void)
++{
++    type_register_static(&riscv_spike_board_device);
++}
++
++type_init(riscv_spike_board_register_types);
+diff --git a/include/hw/riscv/spike.h b/include/hw/riscv/spike.h
+new file mode 100644
+index 0000000..cb4d6ac
+--- /dev/null
++++ b/include/hw/riscv/spike.h
+@@ -0,0 +1,51 @@
++/*
++ * SiFive U500 series machine interface
++ *
++ * Copyright (c) 2017 SiFive, Inc.
++ *
++ * Permission is hereby granted, free of charge, to any person obtaining a copy
++ * of this software and associated documentation files (the "Software"), to deal
++ * in the Software without restriction, including without limitation the rights
++ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
++ * copies of the Software, and to permit persons to whom the Software is
++ * furnished to do so, subject to the following conditions:
++ *
++ * The above copyright notice and this permission notice shall be included in
++ * all copies or substantial portions of the Software.
++ *
++ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
++ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
++ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
++ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
++ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
++ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
++ * THE SOFTWARE.
++ */
++
++#ifndef HW_SPIKE_H
++#define HW_SPIKE_H
++
++#define TYPE_RISCV_SPIKE_V1_09_1_BOARD "riscv.spike_v1_9"
++#define TYPE_RISCV_SPIKE_V1_10_0_BOARD "riscv.spike_v1_10"
++
++#define SPIKE(obj) \
++    OBJECT_CHECK(SpikeState, (obj), TYPE_RISCV_SPIKE_BOARD)
++
++typedef struct {
++    /*< private >*/
++    SysBusDevice parent_obj;
++
++    /*< public >*/
++    RISCVHartArrayState soc;
++    void *fdt;
++    int fdt_size;
++} SpikeState;
++
++
++enum {
++    SPIKE_MROM,
++    SPIKE_CLINT,
++    SPIKE_DRAM
++};
 +
 +#endif
 -- 
