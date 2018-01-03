@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52752)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52789)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <frederic.konrad@adacore.com>) id 1eWkYt-0005aa-2B
-	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 10:02:38 -0500
+	(envelope-from <marcel@redhat.com>) id 1eWkYx-0005d0-7T
+	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 10:02:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <frederic.konrad@adacore.com>) id 1eWkYp-0003KY-Pm
-	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 10:02:35 -0500
-Received: from mel.act-europe.fr ([194.98.77.210]:59047
-	helo=smtp.eu.adacore.com)
+	(envelope-from <marcel@redhat.com>) id 1eWkYt-0003PF-7H
+	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 10:02:39 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:46106)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <frederic.konrad@adacore.com>)
-	id 1eWkYp-0003J4-GQ
-	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 10:02:31 -0500
-References: <1514940265-18093-1-git-send-email-mjc@sifive.com>
-	<1514940265-18093-19-git-send-email-mjc@sifive.com>
-From: KONRAD Frederic <frederic.konrad@adacore.com>
-Message-ID: <b40d2c79-4655-376d-80b1-58a21e32e927@adacore.com>
-Date: Wed, 3 Jan 2018 16:02:27 +0100
-MIME-Version: 1.0
-In-Reply-To: <1514940265-18093-19-git-send-email-mjc@sifive.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v1 18/21] SiFive RISC-V PRCI Block
+	(Exim 4.71) (envelope-from <marcel@redhat.com>) id 1eWkYt-0003OT-0q
+	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 10:02:35 -0500
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 0DF5D2D1A6
+	for <qemu-devel@nongnu.org>; Wed,  3 Jan 2018 15:02:34 +0000 (UTC)
+From: Marcel Apfelbaum <marcel@redhat.com>
+Date: Wed,  3 Jan 2018 17:02:29 +0200
+Message-Id: <20180103150229.52155-1-marcel@redhat.com>
+Subject: [Qemu-devel] [PATCH] MAINTAINERS: Add myself as maintainer to X86
+ machines
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,191 +28,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Michael Clark <mjc@sifive.com>, qemu-devel@nongnu.org
-Cc: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Sagar Karandikar <sagark@eecs.berkeley.edu>
+To: qemu-devel@nongnu.org
+Cc: marcel@redhat.com, mst@redhat.com
 
+Signed-off-by: Marcel Apfelbaum <marcel@redhat.com>
+---
 
+Hi,
 
-On 01/03/2018 01:44 AM, Michael Clark wrote:
-> Simple model of the PRCI  (Power, Reset, Clock, Interrupt) to emulate
-> register reads made by the SDK BSP.
-> 
-> Signed-off-by: Michael Clark <mjc@sifive.com>
-> ---
->   hw/riscv/sifive_prci.c         | 107 +++++++++++++++++++++++++++++++++++++++++
->   include/hw/riscv/sifive_prci.h |  43 +++++++++++++++++
->   2 files changed, 150 insertions(+)
->   create mode 100644 hw/riscv/sifive_prci.c
->   create mode 100644 include/hw/riscv/sifive_prci.h
-> 
-> diff --git a/hw/riscv/sifive_prci.c b/hw/riscv/sifive_prci.c
-> new file mode 100644
-> index 0000000..5c27696
-> --- /dev/null
-> +++ b/hw/riscv/sifive_prci.c
-> @@ -0,0 +1,107 @@
-> +/*
-> + * QEMU SiFive PRCI (Power, Reset, Clock, Interrupt)
-> + *
-> + * Copyright (c) 2017 SiFive, Inc.
-> + *
-> + * Simple model of the PRCI to emulate register reads made by the SDK BSP
-> + *
-> + * Permission is hereby granted, free of charge, to any person obtaining a copy
-> + * of this software and associated documentation files (the "Software"), to deal
-> + * in the Software without restriction, including without limitation the rights
-> + * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-> + * copies of the Software, and to permit persons to whom the Software is
-> + * furnished to do so, subject to the following conditions:
-> + *
-> + * The above copyright notice and this permission notice shall be included in
-> + * all copies or substantial portions of the Software.
-> + *
-> + * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-> + * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-> + * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-> + * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-> + * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-> + * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-> + * THE SOFTWARE.
-> + */
-> +
-> +#include "qemu/osdep.h"
-> +#include "hw/sysbus.h"
-> +#include "target/riscv/cpu.h"
-> +#include "hw/riscv/sifive_prci.h"
-> +
-> +/* currently implements enough to mock freedom-e-sdk BSP clock programming */
-> +
-> +static uint64_t sifive_prci_read(void *opaque, hwaddr addr, unsigned int size)
-> +{
-> +    if (addr == 0 /* PRCI_HFROSCCFG */) {
-> +        return 1 << 31; /* ROSC_RDY */
-> +    }
-> +    if (addr == 8 /* PRCI_PLLCFG    */) {
-> +        return 1 << 31; /* PLL_LOCK */
-> +    }
-> +    hw_error("%s: read: addr=0x%x\n", __func__, (int)addr);
-> +    return 0;
-> +}
-> +
-> +static void sifive_prci_write(void *opaque, hwaddr addr,
-> +           uint64_t val64, unsigned int size)
-> +{
-> +    /* discard writes */
-> +}
-> +
-> +static const MemoryRegionOps sifive_prci_ops = {
-> +    .read = sifive_prci_read,
-> +    .write = sifive_prci_write,
-> +    .endianness = DEVICE_NATIVE_ENDIAN,
-> +    .valid = {
-> +        .min_access_size = 4,
-> +        .max_access_size = 4
-> +    }
-> +};
-> +
-> +static Property sifive_prci_properties[] = {
-> +    DEFINE_PROP_END_OF_LIST(),
-> +};
+Getting CC-ed will help me be more responsive.
 
-Is that needed?
+Thanks,
+Marcel
 
-> +
-> +static void sifive_prci_init(Object *obj)
-> +{
-> +    SiFivePRCIState *s = SIFIVE_PRCI(obj);
-> +
-> +    memory_region_init_io(&s->mmio, obj, &sifive_prci_ops, s,
-> +                          TYPE_SIFIVE_PRCI, 0x8000);
-> +    sysbus_init_mmio(SYS_BUS_DEVICE(obj), &s->mmio);
-> +}
-> +
-> +static void sifive_prci_class_init(ObjectClass *klass, void *data)
-> +{
-> +    DeviceClass *dc = DEVICE_CLASS(klass);
-> +
-> +    dc->props = sifive_prci_properties;
-> +}
-> +
-> +static const TypeInfo sifive_prci_info = {
-> +    .name          = TYPE_SIFIVE_PRCI,
-> +    .parent        = TYPE_SYS_BUS_DEVICE,
-> +    .instance_size = sizeof(SiFivePRCIState),
-> +    .instance_init = sifive_prci_init,
-> +    .class_init    = sifive_prci_class_init,
-> +};
-> +
-> +static void sifive_prci_register_types(void)
-> +{
-> +    type_register_static(&sifive_prci_info);
-> +}
-> +
-> +type_init(sifive_prci_register_types)
+ MAINTAINERS | 1 +
+ 1 file changed, 1 insertion(+)
 
-That's what is missing in the previous patch.
-
-Fred
-
-> +
-> +
-> +/*
-> + * Create PRCI device.
-> + */
-> +DeviceState *sifive_prci_create(hwaddr addr)
-> +{
-> +    DeviceState *dev = qdev_create(NULL, TYPE_SIFIVE_PRCI);
-> +    qdev_init_nofail(dev);
-> +    sysbus_mmio_map(SYS_BUS_DEVICE(dev), 0, addr);
-> +    return dev;
-> +}
-> diff --git a/include/hw/riscv/sifive_prci.h b/include/hw/riscv/sifive_prci.h
-> new file mode 100644
-> index 0000000..0e032e5
-> --- /dev/null
-> +++ b/include/hw/riscv/sifive_prci.h
-> @@ -0,0 +1,43 @@
-> +/*
-> + * QEMU SiFive PRCI (Power, Reset, Clock, Interrupt) interface
-> + *
-> + * Copyright (c) 2017 SiFive, Inc.
-> + *
-> + * Permission is hereby granted, free of charge, to any person obtaining a copy
-> + * of this software and associated documentation files (the "Software"), to deal
-> + * in the Software without restriction, including without limitation the rights
-> + * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-> + * copies of the Software, and to permit persons to whom the Software is
-> + * furnished to do so, subject to the following conditions:
-> + *
-> + * The above copyright notice and this permission notice shall be included in
-> + * all copies or substantial portions of the Software.
-> + *
-> + * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-> + * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-> + * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-> + * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-> + * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-> + * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-> + * THE SOFTWARE.
-> + */
-> +
-> +#ifndef HW_SIFIVE_PRCI_H
-> +#define HW_SIFIVE_PRCI_H
-> +
-> +#define TYPE_SIFIVE_PRCI "riscv.sifive.prci"
-> +
-> +#define SIFIVE_PRCI(obj) \
-> +    OBJECT_CHECK(SiFivePRCIState, (obj), TYPE_SIFIVE_PRCI)
-> +
-> +typedef struct SiFivePRCIState {
-> +    /*< private >*/
-> +    SysBusDevice parent_obj;
-> +
-> +    /*< public >*/
-> +    MemoryRegion mmio;
-> +} SiFivePRCIState;
-> +
-> +DeviceState *sifive_prci_create(hwaddr addr);
-> +
-> +#endif
-> 
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 73a5555735..0b319573c3 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -845,6 +845,7 @@ X86 Machines
+ ------------
+ PC
+ M: Michael S. Tsirkin <mst@redhat.com>
++M: Marcel Apfelbaum <marcel@redhat.com>
+ S: Supported
+ F: include/hw/i386/
+ F: hw/i386/
+-- 
+2.13.5
