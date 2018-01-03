@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47890)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47885)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1eWbnS-00033G-Ge
+	(envelope-from <peterx@redhat.com>) id 1eWbnS-00033A-CI
 	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 00:41:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1eWbnR-0000wd-Du
+	(envelope-from <peterx@redhat.com>) id 1eWbnP-0000ut-4l
 	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 00:41:02 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:55862)
+Received: from mx1.redhat.com ([209.132.183.28]:42658)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1eWbnR-0000w4-5n
-	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 00:41:01 -0500
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1eWbnO-0000uE-Sr
+	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 00:40:59 -0500
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
 	[10.5.11.12])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 549305AFED
-	for <qemu-devel@nongnu.org>; Wed,  3 Jan 2018 05:41:00 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 0C6D67E423
+	for <qemu-devel@nongnu.org>; Wed,  3 Jan 2018 05:40:58 +0000 (UTC)
 From: Peter Xu <peterx@redhat.com>
-Date: Wed,  3 Jan 2018 13:40:37 +0800
-Message-Id: <20180103054043.25719-6-peterx@redhat.com>
+Date: Wed,  3 Jan 2018 13:40:36 +0800
+Message-Id: <20180103054043.25719-5-peterx@redhat.com>
 In-Reply-To: <20180103054043.25719-1-peterx@redhat.com>
 References: <20180103054043.25719-1-peterx@redhat.com>
-Subject: [Qemu-devel] [PATCH 05/11] migration: move vm_old_running into
- global state
+Subject: [Qemu-devel] [PATCH 04/11] migration: split use of
+ MigrationState.total_time
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,130 +33,84 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Laurent Vivier <lvivier@redhat.com>, Juan Quintela <quintela@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, peterx@redhat.com
 
-Firstly, it was passed around.  Let's just move it into MigrationState
-just like many other variables as state of migration.
+It was used either to:
 
-One thing to mention is that for postcopy, we actually don't need this
-knowledge at all since postcopy can't resume a VM even if it fails (we
-can see that from the old code too: when we try to resume we also check
-against "entered_postcopy" variable).  So further we do this:
+1. store initial timestamp of migration start, and
+2. store total time used by last migration
 
-- in postcopy_start(), we don't update vm_old_running since useless
-- in migration_thread(), we don't need to check entered_postcopy when
-  resume, since it's only used for precopy.
-
-Comment this out too for that variable definition.
+Let's provide two parameters for each of them.  Mix use of the two is
+slightly misleading.
 
 Signed-off-by: Peter Xu <peterx@redhat.com>
 ---
- migration/migration.c | 17 +++++++----------
- migration/migration.h |  6 ++++++
- 2 files changed, 13 insertions(+), 10 deletions(-)
+ migration/migration.c | 13 +++++++------
+ migration/migration.h |  5 ++++-
+ 2 files changed, 11 insertions(+), 7 deletions(-)
 
 diff --git a/migration/migration.c b/migration/migration.c
-index b684c2005d..62b3766852 100644
+index 20f7565527..b684c2005d 100644
 --- a/migration/migration.c
 +++ b/migration/migration.c
-@@ -1272,6 +1272,7 @@ MigrationState *migrate_init(void)
+@@ -613,7 +613,7 @@ MigrationInfo *qmp_query_migrate(Error **errp)
+         info->has_status = true;
+         info->has_total_time = true;
+         info->total_time = qemu_clock_get_ms(QEMU_CLOCK_REALTIME)
+-            - s->total_time;
++            - s->mig_start_time;
+         info->has_expected_downtime = true;
+         info->expected_downtime = s->expected_downtime;
+         info->has_setup_time = true;
+@@ -629,7 +629,7 @@ MigrationInfo *qmp_query_migrate(Error **errp)
+     case MIGRATION_STATUS_COMPLETED:
+         info->has_status = true;
+         info->has_total_time = true;
+-        info->total_time = s->total_time;
++        info->total_time = s->mig_total_time;
+         info->has_downtime = true;
+         info->downtime = s->downtime;
+         info->has_setup_time = true;
+@@ -1270,7 +1270,8 @@ MigrationState *migrate_init(void)
  
-     s->mig_start_time = qemu_clock_get_ms(QEMU_CLOCK_REALTIME);
-     s->mig_total_time = 0;
-+    s->old_vm_running = false;
+     migrate_set_state(&s->state, MIGRATION_STATUS_NONE, MIGRATION_STATUS_SETUP);
+ 
+-    s->total_time = qemu_clock_get_ms(QEMU_CLOCK_REALTIME);
++    s->mig_start_time = qemu_clock_get_ms(QEMU_CLOCK_REALTIME);
++    s->mig_total_time = 0;
      return s;
  }
  
-@@ -1846,7 +1847,7 @@ static int await_return_path_close_on_source(MigrationState *ms)
-  * Switch from normal iteration to postcopy
-  * Returns non-0 on error
-  */
--static int postcopy_start(MigrationState *ms, bool *old_vm_running)
-+static int postcopy_start(MigrationState *ms)
- {
-     int ret;
-     QIOChannelBuffer *bioc;
-@@ -1864,7 +1865,6 @@ static int postcopy_start(MigrationState *ms, bool *old_vm_running)
-     trace_postcopy_start_set_run();
- 
-     qemu_system_wakeup_request(QEMU_WAKEUP_REASON_OTHER);
--    *old_vm_running = runstate_is_running();
-     global_state_store();
-     ret = vm_stop_force_state(RUN_STATE_FINISH_MIGRATE);
-     if (ret < 0) {
-@@ -2055,11 +2055,9 @@ static int migration_maybe_pause(MigrationState *s,
-  *
-  * @s: Current migration state
-  * @current_active_state: The migration state we expect to be in
-- * @*old_vm_running: Pointer to old_vm_running flag
-  * @*start_time: Pointer to time to update
-  */
- static void migration_completion(MigrationState *s, int current_active_state,
--                                 bool *old_vm_running,
-                                  int64_t *start_time)
- {
-     int ret;
-@@ -2068,7 +2066,7 @@ static void migration_completion(MigrationState *s, int current_active_state,
-         qemu_mutex_lock_iothread();
-         *start_time = qemu_clock_get_ms(QEMU_CLOCK_REALTIME);
-         qemu_system_wakeup_request(QEMU_WAKEUP_REASON_OTHER);
--        *old_vm_running = runstate_is_running();
-+        s->old_vm_running = runstate_is_running();
-         ret = global_state_store();
- 
-         if (!ret) {
-@@ -2174,7 +2172,6 @@ static void *migration_thread(void *opaque)
-     int64_t threshold_size = 0;
-     int64_t start_time = initial_time;
-     int64_t end_time;
--    bool old_vm_running = false;
-     bool entered_postcopy = false;
-     /* The active state we expect to be in; ACTIVE or POSTCOPY_ACTIVE */
-     enum MigrationStatus current_active_state = MIGRATION_STATUS_ACTIVE;
-@@ -2233,7 +2230,7 @@ static void *migration_thread(void *opaque)
-                     pend_nonpost <= threshold_size &&
-                     atomic_read(&s->start_postcopy)) {
- 
--                    if (!postcopy_start(s, &old_vm_running)) {
-+                    if (!postcopy_start(s)) {
-                         current_active_state = MIGRATION_STATUS_POSTCOPY_ACTIVE;
-                         entered_postcopy = true;
-                     }
-@@ -2245,7 +2242,7 @@ static void *migration_thread(void *opaque)
-             } else {
-                 trace_migration_thread_low_pending(pending_size);
-                 migration_completion(s, current_active_state,
--                                     &old_vm_running, &start_time);
-+                                     &start_time);
-                 break;
-             }
+@@ -2293,13 +2294,13 @@ static void *migration_thread(void *opaque)
+     qemu_mutex_lock_iothread();
+     if (s->state == MIGRATION_STATUS_COMPLETED) {
+         uint64_t transferred_bytes = qemu_ftell(s->to_dst_file);
+-        s->total_time = end_time - s->total_time;
++        s->mig_total_time = end_time - s->mig_start_time;
+         if (!entered_postcopy) {
+             s->downtime = end_time - start_time;
          }
-@@ -2311,9 +2308,9 @@ static void *migration_thread(void *opaque)
-             * Fixme: we will run VM in COLO no matter its old running state.
-             * After exited COLO, we will keep running.
-             */
--            old_vm_running = true;
-+            s->old_vm_running = true;
+-        if (s->total_time) {
++        if (s->mig_total_time) {
+             s->mbps = (((double) transferred_bytes * 8.0) /
+-                       ((double) s->total_time)) / 1000;
++                       ((double) s->mig_total_time)) / 1000;
          }
--        if (old_vm_running && !entered_postcopy) {
-+        if (s->old_vm_running) {
-             vm_start();
-         } else {
-             if (runstate_check(RUN_STATE_FINISH_MIGRATE)) {
+         runstate_set(RUN_STATE_POSTMIGRATE);
+     } else {
 diff --git a/migration/migration.h b/migration/migration.h
-index ac74a12713..0f5df2367c 100644
+index 663415fe48..ac74a12713 100644
 --- a/migration/migration.h
 +++ b/migration/migration.h
-@@ -111,6 +111,12 @@ struct MigrationState
+@@ -103,7 +103,10 @@ struct MigrationState
+     } rp_state;
+ 
+     double mbps;
+-    int64_t total_time;
++    /* Timestamp when recent migration starts (ms) */
++    int64_t mig_start_time;
++    /* Total time used by latest migration (ms) */
++    int64_t mig_total_time;
+     int64_t downtime;
      int64_t expected_downtime;
      bool enabled_capabilities[MIGRATION_CAPABILITY__MAX];
-     int64_t setup_time;
-+    /*
-+     * Whether the old VM is running for the last migration.  This is
-+     * used to resume the VM when precopy failed or cancelled somehow.
-+     * It's never used for postcopy.
-+     */
-+    bool old_vm_running;
- 
-     /* Flag set once the migration has been asked to enter postcopy */
-     bool start_postcopy;
 -- 
 2.14.3
