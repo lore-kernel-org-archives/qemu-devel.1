@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59034)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59050)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mjc@sifive.com>) id 1eWXDB-00064v-LH
-	for qemu-devel@nongnu.org; Tue, 02 Jan 2018 19:47:19 -0500
+	(envelope-from <mjc@sifive.com>) id 1eWXDE-000680-LP
+	for qemu-devel@nongnu.org; Tue, 02 Jan 2018 19:47:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mjc@sifive.com>) id 1eWXDA-0008N7-0n
-	for qemu-devel@nongnu.org; Tue, 02 Jan 2018 19:47:17 -0500
-Received: from mail-pf0-x241.google.com ([2607:f8b0:400e:c00::241]:33819)
+	(envelope-from <mjc@sifive.com>) id 1eWXDC-0008Rh-Ni
+	for qemu-devel@nongnu.org; Tue, 02 Jan 2018 19:47:20 -0500
+Received: from mail-pg0-x242.google.com ([2607:f8b0:400e:c05::242]:34066)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mjc@sifive.com>) id 1eWXD9-0008M9-Ny
-	for qemu-devel@nongnu.org; Tue, 02 Jan 2018 19:47:15 -0500
-Received: by mail-pf0-x241.google.com with SMTP id a90so85904pfk.1
-	for <qemu-devel@nongnu.org>; Tue, 02 Jan 2018 16:47:15 -0800 (PST)
+	(Exim 4.71) (envelope-from <mjc@sifive.com>) id 1eWXDC-0008Qd-G3
+	for qemu-devel@nongnu.org; Tue, 02 Jan 2018 19:47:18 -0500
+Received: by mail-pg0-x242.google.com with SMTP id j4so83663pgp.1
+	for <qemu-devel@nongnu.org>; Tue, 02 Jan 2018 16:47:18 -0800 (PST)
 From: Michael Clark <mjc@sifive.com>
-Date: Wed,  3 Jan 2018 13:44:23 +1300
-Message-Id: <1514940265-18093-20-git-send-email-mjc@sifive.com>
+Date: Wed,  3 Jan 2018 13:44:24 +1300
+Message-Id: <1514940265-18093-21-git-send-email-mjc@sifive.com>
 In-Reply-To: <1514940265-18093-1-git-send-email-mjc@sifive.com>
 References: <1514940265-18093-1-git-send-email-mjc@sifive.com>
-Subject: [Qemu-devel] [PATCH v1 19/21] SiFive Freedom E300 RISC-V Machine
+Subject: [Qemu-devel] [PATCH v1 20/21] SiFive Freedom U500 RISC-V Machine
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,41 +28,38 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Michael Clark <mjc@sifive.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
 
-This provides a RISC-V Board compatible with the the SiFive E300 SDK.
+This provides a RISC-V Board compatible with the the SiFive U500 SDK.
 The following machine is implemented:
 
-- 'sifive_e300'; CLINT, PLIC, UART, AON, GPIO, QSPI, PWM
+- 'sifive_u500'; CLINT, PLIC, UART, device-tree
 
 Signed-off-by: Michael Clark <mjc@sifive.com>
 ---
- hw/riscv/sifive_e300.c         | 232 +++++++++++++++++++++++++++++++++++++++++
- include/hw/riscv/sifive_e300.h |  79 ++++++++++++++
- 2 files changed, 311 insertions(+)
- create mode 100644 hw/riscv/sifive_e300.c
- create mode 100644 include/hw/riscv/sifive_e300.h
+ hw/riscv/sifive_u500.c         | 338 +++++++++++++++++++++++++++++++++++++++++
+ include/hw/riscv/sifive_u500.h |  69 +++++++++
+ 2 files changed, 407 insertions(+)
+ create mode 100644 hw/riscv/sifive_u500.c
+ create mode 100644 include/hw/riscv/sifive_u500.h
 
-diff --git a/hw/riscv/sifive_e300.c b/hw/riscv/sifive_e300.c
+diff --git a/hw/riscv/sifive_u500.c b/hw/riscv/sifive_u500.c
 new file mode 100644
-index 0000000..bbea55a
+index 0000000..9cc411e
 --- /dev/null
-+++ b/hw/riscv/sifive_e300.c
-@@ -0,0 +1,232 @@
++++ b/hw/riscv/sifive_u500.c
+@@ -0,0 +1,338 @@
 +/*
-+ * QEMU RISC-V Board Compatible with SiFive E300 SDK
++ * QEMU RISC-V Board Compatible with SiFive U500 SDK
 + *
++ * Copyright (c) 2016-2017 Sagar Karandikar, sagark@eecs.berkeley.edu
 + * Copyright (c) 2017 SiFive, Inc.
 + *
-+ * Provides a board compatible with the bsp in the SiFive E300 SDK:
++ * This provides a RISC-V Board compatible with the the SiFive U500 SDK
 + *
 + * 0) UART
 + * 1) CLINT (Core Level Interruptor)
 + * 2) PLIC (Platform Level Interrupt Controller)
-+ * 3) PRCI (Power, Reset, Clock, Interrupt)
-+ * 4) Registers emulated as RAM: AON, GPIO, QSPI, PWM
-+ * 5) Flash memory emulated as RAM
 + *
-+ * The Mask ROM reset vector jumps to the flash payload at 0x2040_0000.
-+ * The OTP ROM and Flash boot code will be emulated in a future version.
++ * This board currently uses a hardcoded devicetree that indicates one hart.
 + *
 + * Permission is hereby granted, free of charge, to any person obtaining a copy
 + * of this software and associated documentation files (the "Software"), to deal
@@ -95,37 +92,26 @@ index 0000000..bbea55a
 +#include "hw/riscv/riscv_hart.h"
 +#include "hw/riscv/sifive_plic.h"
 +#include "hw/riscv/sifive_clint.h"
-+#include "hw/riscv/sifive_prci.h"
 +#include "hw/riscv/sifive_uart.h"
-+#include "hw/riscv/sifive_e300.h"
++#include "hw/riscv/sifive_prci.h"
++#include "hw/riscv/sifive_u500.h"
 +#include "chardev/char.h"
 +#include "sysemu/arch_init.h"
++#include "sysemu/device_tree.h"
 +#include "exec/address-spaces.h"
 +#include "elf.h"
 +
 +static const struct MemmapEntry {
 +    hwaddr base;
 +    hwaddr size;
-+} sifive_e300_memmap[] = {
-+    [SIFIVE_E300_DEBUG] =    {        0x0,      0x100 },
-+    [SIFIVE_E300_MROM] =     {     0x1000,     0x2000 },
-+    [SIFIVE_E300_OTP] =      {    0x20000,     0x2000 },
-+    [SIFIVE_E300_CLINT] =    {  0x2000000,    0x10000 },
-+    [SIFIVE_E300_PLIC] =     {  0xc000000,  0x4000000 },
-+    [SIFIVE_E300_AON] =      { 0x10000000,     0x8000 },
-+    [SIFIVE_E300_PRCI] =     { 0x10008000,     0x8000 },
-+    [SIFIVE_E300_OTP_CTRL] = { 0x10010000,     0x1000 },
-+    [SIFIVE_E300_GPIO0] =    { 0x10012000,     0x1000 },
-+    [SIFIVE_E300_UART0] =    { 0x10013000,     0x1000 },
-+    [SIFIVE_E300_QSPI0] =    { 0x10014000,     0x1000 },
-+    [SIFIVE_E300_PWM0] =     { 0x10015000,     0x1000 },
-+    [SIFIVE_E300_UART1] =    { 0x10023000,     0x1000 },
-+    [SIFIVE_E300_QSPI1] =    { 0x10024000,     0x1000 },
-+    [SIFIVE_E300_PWM1] =     { 0x10025000,     0x1000 },
-+    [SIFIVE_E300_QSPI2] =    { 0x10034000,     0x1000 },
-+    [SIFIVE_E300_PWM2] =     { 0x10035000,     0x1000 },
-+    [SIFIVE_E300_XIP] =      { 0x20000000, 0x20000000 },
-+    [SIFIVE_E300_DTIM] =     { 0x80000000,     0x4000 }
++} sifive_u500_memmap[] = {
++    [SIFIVE_U500_DEBUG] =    {        0x0,      0x100 },
++    [SIFIVE_U500_MROM] =     {     0x1000,     0x2000 },
++    [SIFIVE_U500_CLINT] =    {  0x2000000,    0x10000 },
++    [SIFIVE_U500_PLIC] =     {  0xc000000,  0x4000000 },
++    [SIFIVE_U500_UART0] =    { 0x10013000,     0x1000 },
++    [SIFIVE_U500_UART1] =    { 0x10023000,     0x1000 },
++    [SIFIVE_U500_DRAM] =     { 0x80000000,        0x0 },
 +};
 +
 +static uint64_t identity_translate(void *opaque, uint64_t addr)
@@ -146,147 +132,267 @@ index 0000000..bbea55a
 +    return kernel_entry;
 +}
 +
-+static void sifive_mmio_emulate(MemoryRegion *parent, const char *name,
-+                             uintptr_t offset, uintptr_t length)
++static void create_fdt(SiFiveU500State *s, const struct MemmapEntry *memmap,
++    uint64_t mem_size, const char *cmdline)
 +{
-+    MemoryRegion *mock_mmio = g_new(MemoryRegion, 1);
-+    memory_region_init_ram(mock_mmio, NULL, name, length, &error_fatal);
-+    memory_region_add_subregion(parent, offset, mock_mmio);
++    void *fdt;
++    int cpu;
++    uint32_t *cells;
++    char *nodename;
++    uint32_t plic_phandle;
++
++    fdt = s->fdt = create_device_tree(&s->fdt_size);
++    if (!fdt) {
++        error_report("create_device_tree() failed");
++        exit(1);
++    }
++
++    qemu_fdt_setprop_string(fdt, "/", "model", "ucbbar,spike-bare,qemu");
++    qemu_fdt_setprop_string(fdt, "/", "compatible", "ucbbar,spike-bare-dev");
++    qemu_fdt_setprop_cell(fdt, "/", "#size-cells", 0x2);
++    qemu_fdt_setprop_cell(fdt, "/", "#address-cells", 0x2);
++
++    qemu_fdt_add_subnode(fdt, "/soc");
++    qemu_fdt_setprop(fdt, "/soc", "ranges", NULL, 0);
++    qemu_fdt_setprop_string(fdt, "/soc", "compatible", "ucbbar,spike-bare-soc");
++    qemu_fdt_setprop_cell(fdt, "/soc", "#size-cells", 0x2);
++    qemu_fdt_setprop_cell(fdt, "/soc", "#address-cells", 0x2);
++
++    nodename = g_strdup_printf("/memory@%lx",
++        (long)memmap[SIFIVE_U500_DRAM].base);
++    qemu_fdt_add_subnode(fdt, nodename);
++    qemu_fdt_setprop_cells(fdt, nodename, "reg",
++        memmap[SIFIVE_U500_DRAM].base >> 32, memmap[SIFIVE_U500_DRAM].base,
++        mem_size >> 32, mem_size);
++    qemu_fdt_setprop_string(fdt, nodename, "device_type", "memory");
++    g_free(nodename);
++
++    qemu_fdt_add_subnode(fdt, "/cpus");
++    qemu_fdt_setprop_cell(fdt, "/cpus", "timebase-frequency", 10000000);
++    qemu_fdt_setprop_cell(fdt, "/cpus", "#size-cells", 0x0);
++    qemu_fdt_setprop_cell(fdt, "/cpus", "#address-cells", 0x1);
++
++    for (cpu = s->soc.num_harts - 1; cpu >= 0; cpu--) {
++        nodename = g_strdup_printf("/cpus/cpu@%d", cpu);
++        char *intc = g_strdup_printf("/cpus/cpu@%d/interrupt-controller", cpu);
++        char *isa = riscv_isa_string(&s->soc.harts[cpu]);
++        qemu_fdt_add_subnode(fdt, nodename);
++        qemu_fdt_setprop_cell(fdt, nodename, "clock-frequency", 1000000000);
++        qemu_fdt_setprop_string(fdt, nodename, "mmu-type", "riscv,sv48");
++        qemu_fdt_setprop_string(fdt, nodename, "riscv,isa", isa);
++        qemu_fdt_setprop_string(fdt, nodename, "compatible", "riscv");
++        qemu_fdt_setprop_string(fdt, nodename, "status", "okay");
++        qemu_fdt_setprop_cell(fdt, nodename, "reg", cpu);
++        qemu_fdt_setprop_string(fdt, nodename, "device_type", "cpu");
++        qemu_fdt_add_subnode(fdt, intc);
++        qemu_fdt_setprop_cell(fdt, intc, "phandle", 1);
++        qemu_fdt_setprop_cell(fdt, intc, "linux,phandle", 1);
++        qemu_fdt_setprop_string(fdt, intc, "compatible", "riscv,cpu-intc");
++        qemu_fdt_setprop(fdt, intc, "interrupt-controller", NULL, 0);
++        qemu_fdt_setprop_cell(fdt, intc, "#interrupt-cells", 1);
++        g_free(isa);
++        g_free(intc);
++        g_free(nodename);
++    }
++
++    cells =  g_new0(uint32_t, s->soc.num_harts * 4);
++    for (cpu = 0; cpu < s->soc.num_harts; cpu++) {
++        nodename =
++            g_strdup_printf("/cpus/cpu@%d/interrupt-controller", cpu);
++        uint32_t intc_phandle = qemu_fdt_get_phandle(fdt, nodename);
++        cells[cpu * 4 + 0] = cpu_to_be32(intc_phandle);
++        cells[cpu * 4 + 1] = cpu_to_be32(IRQ_M_SOFT);
++        cells[cpu * 4 + 2] = cpu_to_be32(intc_phandle);
++        cells[cpu * 4 + 3] = cpu_to_be32(IRQ_M_TIMER);
++        g_free(nodename);
++    }
++    nodename = g_strdup_printf("/soc/clint@%lx",
++        (long)memmap[SIFIVE_U500_CLINT].base);
++    qemu_fdt_add_subnode(fdt, nodename);
++    qemu_fdt_setprop_string(fdt, nodename, "compatible", "riscv,clint0");
++    qemu_fdt_setprop_cells(fdt, nodename, "reg",
++        0x0, memmap[SIFIVE_U500_CLINT].base,
++        0x0, memmap[SIFIVE_U500_CLINT].size);
++    qemu_fdt_setprop(fdt, nodename, "interrupts-extended",
++        cells, s->soc.num_harts * sizeof(uint32_t) * 4);
++    g_free(cells);
++    g_free(nodename);
++
++    cells =  g_new0(uint32_t, s->soc.num_harts * 4);
++    for (cpu = 0; cpu < s->soc.num_harts; cpu++) {
++        nodename =
++            g_strdup_printf("/cpus/cpu@%d/interrupt-controller", cpu);
++        uint32_t intc_phandle = qemu_fdt_get_phandle(fdt, nodename);
++        cells[cpu * 4 + 0] = cpu_to_be32(intc_phandle);
++        cells[cpu * 4 + 1] = cpu_to_be32(IRQ_M_EXT);
++        cells[cpu * 4 + 2] = cpu_to_be32(intc_phandle);
++        cells[cpu * 4 + 3] = cpu_to_be32(IRQ_S_EXT);
++        g_free(nodename);
++    }
++    nodename = g_strdup_printf("/soc/interrupt-controller@%lx",
++        (long)memmap[SIFIVE_U500_PLIC].base);
++    qemu_fdt_add_subnode(fdt, nodename);
++    qemu_fdt_setprop_cell(fdt, nodename, "#interrupt-cells", 1);
++    qemu_fdt_setprop_string(fdt, nodename, "compatible", "riscv,plic0");
++    qemu_fdt_setprop(fdt, nodename, "interrupt-controller", NULL, 0);
++    qemu_fdt_setprop(fdt, nodename, "interrupts-extended",
++        cells, s->soc.num_harts * sizeof(uint32_t) * 4);
++    qemu_fdt_setprop_cells(fdt, nodename, "reg",
++        0x0, memmap[SIFIVE_U500_PLIC].base,
++        0x0, memmap[SIFIVE_U500_PLIC].size);
++    qemu_fdt_setprop_string(fdt, nodename, "reg-names", "control");
++    qemu_fdt_setprop_cell(fdt, nodename, "riscv,max-priority", 7);
++    qemu_fdt_setprop_cell(fdt, nodename, "riscv,ndev", 4);
++    qemu_fdt_setprop_cells(fdt, nodename, "phandle", 2);
++    qemu_fdt_setprop_cells(fdt, nodename, "linux,phandle", 2);
++    plic_phandle = qemu_fdt_get_phandle(fdt, nodename);
++    g_free(cells);
++    g_free(nodename);
++
++    nodename = g_strdup_printf("/uart@%lx",
++        (long)memmap[SIFIVE_U500_UART0].base);
++    qemu_fdt_add_subnode(fdt, nodename);
++    qemu_fdt_setprop_string(fdt, nodename, "compatible", "sifive,uart0");
++    qemu_fdt_setprop_cells(fdt, nodename, "reg",
++        0x0, memmap[SIFIVE_U500_UART0].base,
++        0x0, memmap[SIFIVE_U500_UART0].size);
++    qemu_fdt_setprop_cells(fdt, nodename, "interrupt-parent", plic_phandle);
++    qemu_fdt_setprop_cells(fdt, nodename, "interrupts", 1);
++
++    qemu_fdt_add_subnode(fdt, "/chosen");
++    qemu_fdt_setprop_string(fdt, "/chosen", "stdout-path", nodename);
++    qemu_fdt_setprop_string(fdt, "/chosen", "bootargs", cmdline);
++    g_free(nodename);
 +}
 +
-+static void riscv_sifive_e300_init(MachineState *machine)
++static void riscv_sifive_u500_init(MachineState *machine)
 +{
-+    const struct MemmapEntry *memmap = sifive_e300_memmap;
++    const struct MemmapEntry *memmap = sifive_u500_memmap;
 +
-+    SiFiveE300State *s = g_new0(SiFiveE300State, 1);
-+    MemoryRegion *sys_mem = get_system_memory();
++    SiFiveU500State *s = g_new0(SiFiveU500State, 1);
++    MemoryRegion *sys_memory = get_system_memory();
 +    MemoryRegion *main_mem = g_new(MemoryRegion, 1);
-+    MemoryRegion *mask_rom = g_new(MemoryRegion, 1);
-+    MemoryRegion *xip_mem = g_new(MemoryRegion, 1);
++    MemoryRegion *boot_rom = g_new(MemoryRegion, 1);
 +
 +    /* Initialize SOC */
 +    object_initialize(&s->soc, sizeof(s->soc), TYPE_RISCV_HART_ARRAY);
 +    object_property_add_child(OBJECT(machine), "soc", OBJECT(&s->soc),
 +                              &error_abort);
-+    object_property_set_str(OBJECT(&s->soc), TYPE_RISCV_CPU_IMAC_PRIV_1_10,
++    object_property_set_str(OBJECT(&s->soc), TYPE_RISCV_CPU_IMAFDCSU_PRIV_1_10,
 +                            "cpu-model", &error_abort);
 +    object_property_set_int(OBJECT(&s->soc), smp_cpus, "num-harts",
 +                            &error_abort);
 +    object_property_set_bool(OBJECT(&s->soc), true, "realized",
 +                            &error_abort);
 +
-+    /* Data Tightly Integrated Memory */
-+    memory_region_init_ram(main_mem, NULL, "riscv.sifive.e300.ram",
-+        memmap[SIFIVE_E300_DTIM].size, &error_fatal);
-+    memory_region_add_subregion(sys_mem,
-+        memmap[SIFIVE_E300_DTIM].base, main_mem);
++    /* register RAM */
++    memory_region_init_ram(main_mem, NULL, "riscv.sifive.u500.ram",
++                           machine->ram_size, &error_fatal);
++    /* for phys mem size check in page table walk */
++    memory_region_add_subregion(sys_memory, memmap[SIFIVE_U500_DRAM].base,
++        main_mem);
 +
-+    /* Mask ROM */
-+    memory_region_init_ram(mask_rom, NULL, "riscv.sifive.e300.mrom",
-+        memmap[SIFIVE_E300_MROM].size, &error_fatal);
-+    memory_region_add_subregion(sys_mem,
-+        memmap[SIFIVE_E300_MROM].base, mask_rom);
++    /* create device tree */
++    create_fdt(s, memmap, machine->ram_size, machine->kernel_cmdline);
 +
-+    /* MMIO */
-+    s->plic = sifive_plic_create(memmap[SIFIVE_E300_PLIC].base,
-+        (char *)SIFIVE_E300_PLIC_HART_CONFIG,
-+        SIFIVE_E300_PLIC_NUM_SOURCES,
-+        SIFIVE_E300_PLIC_NUM_PRIORITIES,
-+        SIFIVE_E300_PLIC_PRIORITY_BASE,
-+        SIFIVE_E300_PLIC_PENDING_BASE,
-+        SIFIVE_E300_PLIC_ENABLE_BASE,
-+        SIFIVE_E300_PLIC_ENABLE_STRIDE,
-+        SIFIVE_E300_PLIC_CONTEXT_BASE,
-+        SIFIVE_E300_PLIC_CONTEXT_STRIDE,
-+        memmap[SIFIVE_E300_PLIC].size);
-+    sifive_clint_create(memmap[SIFIVE_E300_CLINT].base,
-+        memmap[SIFIVE_E300_CLINT].size, smp_cpus,
-+        SIFIVE_SIP_BASE, SIFIVE_TIMECMP_BASE, SIFIVE_TIME_BASE);
-+    sifive_mmio_emulate(sys_mem, "riscv.sifive.e300.aon",
-+        memmap[SIFIVE_E300_AON].base, memmap[SIFIVE_E300_AON].size);
-+    sifive_prci_create(memmap[SIFIVE_E300_PRCI].base);
-+    sifive_mmio_emulate(sys_mem, "riscv.sifive.e300.gpio0",
-+        memmap[SIFIVE_E300_GPIO0].base, memmap[SIFIVE_E300_GPIO0].size);
-+    sifive_uart_create(sys_mem, memmap[SIFIVE_E300_UART0].base,
-+        serial_hds[0], SIFIVE_PLIC(s->plic)->irqs[SIFIVE_E300_UART0_IRQ]);
-+    sifive_mmio_emulate(sys_mem, "riscv.sifive.e300.qspi0",
-+        memmap[SIFIVE_E300_QSPI0].base, memmap[SIFIVE_E300_QSPI0].size);
-+    sifive_mmio_emulate(sys_mem, "riscv.sifive.e300.pwm0",
-+        memmap[SIFIVE_E300_PWM0].base, memmap[SIFIVE_E300_PWM0].size);
-+    /* sifive_uart_create(sys_mem, memmap[SIFIVE_E300_UART1].base,
-+        serial_hds[1], SIFIVE_PLIC(s->plic)->irqs[SIFIVE_E300_UART1_IRQ]); */
-+    sifive_mmio_emulate(sys_mem, "riscv.sifive.e300.qspi1",
-+        memmap[SIFIVE_E300_QSPI1].base, memmap[SIFIVE_E300_QSPI1].size);
-+    sifive_mmio_emulate(sys_mem, "riscv.sifive.e300.pwm1",
-+        memmap[SIFIVE_E300_PWM1].base, memmap[SIFIVE_E300_PWM1].size);
-+    sifive_mmio_emulate(sys_mem, "riscv.sifive.e300.qspi2",
-+        memmap[SIFIVE_E300_QSPI2].base, memmap[SIFIVE_E300_QSPI2].size);
-+    sifive_mmio_emulate(sys_mem, "riscv.sifive.e300.pwm2",
-+        memmap[SIFIVE_E300_PWM2].base, memmap[SIFIVE_E300_PWM2].size);
-+
-+    /* Flash memory */
-+    memory_region_init_ram(xip_mem, NULL, "riscv.sifive.e300.xip",
-+        memmap[SIFIVE_E300_XIP].size, &error_fatal);
-+    memory_region_set_readonly(xip_mem, true);
-+    memory_region_add_subregion(sys_mem,
-+        memmap[SIFIVE_E300_XIP].base, xip_mem);
-+
-+    /* Mask ROM reset vector */
-+    uint32_t reset_vec[2] = {
-+        0x204002b7,        /* 0x1000: lui     t0,0x20400 */
-+        0x00028067,        /* 0x1004: jr      t0 */
-+    };
-+
-+    /* copy in the reset vector */
-+    cpu_physical_memory_write(0x1000, reset_vec, sizeof(reset_vec));
-+    memory_region_set_readonly(mask_rom, true);
++    /* boot rom */
++    memory_region_init_ram(boot_rom, NULL, "riscv.sifive.u500.bootrom",
++                           0x10000, &error_fatal);
++    memory_region_set_readonly(boot_rom, true);
++    memory_region_add_subregion(sys_memory, 0x0, boot_rom);
 +
 +    if (machine->kernel_filename) {
 +        load_kernel(machine->kernel_filename);
 +    }
++
++    /* reset vector */
++    uint32_t reset_vec[8] = {
++        0x00000297,                    /* 1:  auipc  t0, %pcrel_hi(dtb) */
++        0x02028593,                    /*     addi   a1, t0, %pcrel_lo(1b) */
++        0xf1402573,                    /*     csrr   a0, mhartid  */
++#if defined(TARGET_RISCV32)
++        0x0182a283,                    /*     lw     t0, 24(t0) */
++#elif defined(TARGET_RISCV64)
++        0x0182b283,                    /*     ld     t0, 24(t0) */
++#endif
++        0x00028067,                    /*     jr     t0 */
++        0x00000000,
++        memmap[SIFIVE_U500_DRAM].base, /* start: .dword DRAM_BASE */
++        0x00000000,
++                                       /* dtb: */
++    };
++
++    /* copy in the reset vector */
++    cpu_physical_memory_write(memmap[SIFIVE_U500_MROM].base,
++        reset_vec, sizeof(reset_vec));
++
++    /* copy in the device tree */
++    qemu_fdt_dumpdtb(s->fdt, s->fdt_size);
++    cpu_physical_memory_write(memmap[SIFIVE_U500_MROM].base +
++        sizeof(reset_vec), s->fdt, s->fdt_size);
++
++    /* MMIO */
++    s->plic = sifive_plic_create(memmap[SIFIVE_U500_PLIC].base,
++        (char *)SIFIVE_U500_PLIC_HART_CONFIG,
++        SIFIVE_U500_PLIC_NUM_SOURCES,
++        SIFIVE_U500_PLIC_NUM_PRIORITIES,
++        SIFIVE_U500_PLIC_PRIORITY_BASE,
++        SIFIVE_U500_PLIC_PENDING_BASE,
++        SIFIVE_U500_PLIC_ENABLE_BASE,
++        SIFIVE_U500_PLIC_ENABLE_STRIDE,
++        SIFIVE_U500_PLIC_CONTEXT_BASE,
++        SIFIVE_U500_PLIC_CONTEXT_STRIDE,
++        memmap[SIFIVE_U500_PLIC].size);
++    sifive_uart_create(sys_memory, memmap[SIFIVE_U500_UART0].base,
++        serial_hds[0], SIFIVE_PLIC(s->plic)->irqs[SIFIVE_U500_UART0_IRQ]);
++    /* sifive_uart_create(sys_memory, memmap[SIFIVE_U500_UART1].base,
++        serial_hds[1], SIFIVE_PLIC(s->plic)->irqs[SIFIVE_U500_UART1_IRQ]); */
++    sifive_clint_create(memmap[SIFIVE_U500_CLINT].base,
++        memmap[SIFIVE_U500_CLINT].size, smp_cpus,
++        SIFIVE_SIP_BASE, SIFIVE_TIMECMP_BASE, SIFIVE_TIME_BASE);
 +}
 +
-+static int riscv_sifive_e300_sysbus_device_init(SysBusDevice *sysbusdev)
++static int riscv_sifive_u500_sysbus_device_init(SysBusDevice *sysbusdev)
 +{
 +    return 0;
 +}
 +
-+static void riscv_sifive_e300_class_init(ObjectClass *klass, void *data)
++static void riscv_sifive_u500_class_init(ObjectClass *klass, void *data)
 +{
 +    SysBusDeviceClass *k = SYS_BUS_DEVICE_CLASS(klass);
-+    k->init = riscv_sifive_e300_sysbus_device_init;
++    k->init = riscv_sifive_u500_sysbus_device_init;
 +}
 +
-+static const TypeInfo riscv_sifive_e300_device = {
-+    .name          = TYPE_SIFIVE_E300,
++static const TypeInfo riscv_sifive_u500_device = {
++    .name          = TYPE_SIFIVE_U500,
 +    .parent        = TYPE_SYS_BUS_DEVICE,
-+    .instance_size = sizeof(SiFiveE300State),
-+    .class_init    = riscv_sifive_e300_class_init,
++    .instance_size = sizeof(SiFiveU500State),
++    .class_init    = riscv_sifive_u500_class_init,
 +};
 +
-+static void riscv_sifive_e300_machine_init(MachineClass *mc)
++static void riscv_sifive_u500_register_types(void)
 +{
-+    mc->desc = "RISC-V Board compatible with SiFive E300 SDK";
-+    mc->init = riscv_sifive_e300_init;
++    type_register_static(&riscv_sifive_u500_device);
++}
++
++type_init(riscv_sifive_u500_register_types);
++
++static void riscv_sifive_u500_machine_init(MachineClass *mc)
++{
++    mc->desc = "RISC-V Board compatible with SiFive U500 SDK";
++    mc->init = riscv_sifive_u500_init;
 +    mc->max_cpus = 1;
 +}
 +
-+DEFINE_MACHINE("sifive_e300", riscv_sifive_e300_machine_init)
-+
-+static void riscv_sifive_e300_register_types(void)
-+{
-+    type_register_static(&riscv_sifive_e300_device);
-+}
-+
-+type_init(riscv_sifive_e300_register_types);
-diff --git a/include/hw/riscv/sifive_e300.h b/include/hw/riscv/sifive_e300.h
++DEFINE_MACHINE("sifive_u500", riscv_sifive_u500_machine_init)
+diff --git a/include/hw/riscv/sifive_u500.h b/include/hw/riscv/sifive_u500.h
 new file mode 100644
-index 0000000..453c43b
+index 0000000..1e0486f
 --- /dev/null
-+++ b/include/hw/riscv/sifive_e300.h
-@@ -0,0 +1,79 @@
++++ b/include/hw/riscv/sifive_u500.h
+@@ -0,0 +1,69 @@
 +/*
-+ * SiFive E300 series machine interface
++ * SiFive U500 series machine interface
 + *
 + * Copyright (c) 2017 SiFive, Inc.
 + *
@@ -309,59 +415,49 @@ index 0000000..453c43b
 + * THE SOFTWARE.
 + */
 +
-+#ifndef HW_SIFIVE_E300_H
-+#define HW_SIFIVE_E300_H
++#ifndef HW_SIFIVE_U500_H
++#define HW_SIFIVE_U500_H
 +
-+#define TYPE_SIFIVE_E300 "riscv.sifive.e300"
++#define TYPE_SIFIVE_U500 "riscv.sifive_u500"
 +
-+#define SIFIVE_E300(obj) \
-+    OBJECT_CHECK(SiFiveE300State, (obj), TYPE_SIFIVE_E300)
++#define SIFIVE_U500(obj) \
++    OBJECT_CHECK(SiFiveU500State, (obj), TYPE_SIFIVE_U500)
 +
-+typedef struct SiFiveE300State {
++typedef struct SiFiveU500State {
 +    /*< private >*/
 +    SysBusDevice parent_obj;
 +
 +    /*< public >*/
 +    RISCVHartArrayState soc;
 +    DeviceState *plic;
-+} SiFiveE300State;
++    void *fdt;
++    int fdt_size;
++} SiFiveU500State;
 +
 +enum {
-+    SIFIVE_E300_DEBUG,
-+    SIFIVE_E300_MROM,
-+    SIFIVE_E300_OTP,
-+    SIFIVE_E300_CLINT,
-+    SIFIVE_E300_PLIC,
-+    SIFIVE_E300_AON,
-+    SIFIVE_E300_PRCI,
-+    SIFIVE_E300_OTP_CTRL,
-+    SIFIVE_E300_GPIO0,
-+    SIFIVE_E300_UART0,
-+    SIFIVE_E300_QSPI0,
-+    SIFIVE_E300_PWM0,
-+    SIFIVE_E300_UART1,
-+    SIFIVE_E300_QSPI1,
-+    SIFIVE_E300_PWM1,
-+    SIFIVE_E300_QSPI2,
-+    SIFIVE_E300_PWM2,
-+    SIFIVE_E300_XIP,
-+    SIFIVE_E300_DTIM
++    SIFIVE_U500_DEBUG,
++    SIFIVE_U500_MROM,
++    SIFIVE_U500_CLINT,
++    SIFIVE_U500_PLIC,
++    SIFIVE_U500_UART0,
++    SIFIVE_U500_UART1,
++    SIFIVE_U500_DRAM
 +};
 +
 +enum {
-+    SIFIVE_E300_UART0_IRQ = 3,
-+    SIFIVE_E300_UART1_IRQ = 4
++    SIFIVE_U500_UART0_IRQ = 3,
++    SIFIVE_U500_UART1_IRQ = 4
 +};
 +
-+#define SIFIVE_E300_PLIC_HART_CONFIG "M"
-+#define SIFIVE_E300_PLIC_NUM_SOURCES 127
-+#define SIFIVE_E300_PLIC_NUM_PRIORITIES 7
-+#define SIFIVE_E300_PLIC_PRIORITY_BASE 0x0
-+#define SIFIVE_E300_PLIC_PENDING_BASE 0x1000
-+#define SIFIVE_E300_PLIC_ENABLE_BASE 0x2000
-+#define SIFIVE_E300_PLIC_ENABLE_STRIDE 0x80
-+#define SIFIVE_E300_PLIC_CONTEXT_BASE 0x200000
-+#define SIFIVE_E300_PLIC_CONTEXT_STRIDE 0x1000
++#define SIFIVE_U500_PLIC_HART_CONFIG "MS"
++#define SIFIVE_U500_PLIC_NUM_SOURCES 127
++#define SIFIVE_U500_PLIC_NUM_PRIORITIES 7
++#define SIFIVE_U500_PLIC_PRIORITY_BASE 0x0
++#define SIFIVE_U500_PLIC_PENDING_BASE 0x1000
++#define SIFIVE_U500_PLIC_ENABLE_BASE 0x2000
++#define SIFIVE_U500_PLIC_ENABLE_STRIDE 0x80
++#define SIFIVE_U500_PLIC_CONTEXT_BASE 0x200000
++#define SIFIVE_U500_PLIC_CONTEXT_STRIDE 0x1000
 +
 +#endif
 -- 
