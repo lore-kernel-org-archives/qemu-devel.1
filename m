@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53840)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60181)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1eWbym-0003b1-TJ
-	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 00:52:46 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1eWdE6-00070M-CB
+	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 02:12:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1eWbyl-0007pt-CZ
-	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 00:52:44 -0500
-Received: from ozlabs.org ([2401:3900:2:1::2]:44595)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgibson@ozlabs.org>) id 1eWbyk-0007n6-M1
-	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 00:52:43 -0500
-Date: Wed, 3 Jan 2018 16:52:31 +1100
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20180103055231.GQ24581@umbus.fritz.box>
-References: <1514481779-184817-1-git-send-email-imammedo@redhat.com>
+	(envelope-from <richard.henderson@linaro.org>) id 1eWdE0-0005og-PR
+	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 02:12:38 -0500
+Received: from mail-io0-x22e.google.com ([2607:f8b0:4001:c06::22e]:46757)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1eWdE0-0005nq-Hh
+	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 02:12:32 -0500
+Received: by mail-io0-x22e.google.com with SMTP id z130so1148817ioe.13
+	for <qemu-devel@nongnu.org>; Tue, 02 Jan 2018 23:12:32 -0800 (PST)
+References: <1514940265-18093-1-git-send-email-mjc@sifive.com>
+	<1514940265-18093-6-git-send-email-mjc@sifive.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <7b4c9965-d0c4-1b10-aa6d-553a3923d598@linaro.org>
+Date: Tue, 2 Jan 2018 23:12:27 -0800
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="bEjdSXxHv0Az5++U"
-Content-Disposition: inline
-In-Reply-To: <1514481779-184817-1-git-send-email-imammedo@redhat.com>
-Subject: Re: [Qemu-devel] [RFC v2 0/4] enable numa configuration before
- machine is running from HMP/QMP
+In-Reply-To: <1514940265-18093-6-git-send-email-mjc@sifive.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v1 05/21] RISC-V CPU Helpers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,158 +31,317 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: qemu-devel@nongnu.org, eblake@redhat.com, armbru@redhat.com, ehabkost@redhat.com, pkrempa@redhat.com, peter.maydell@linaro.org, pbonzini@redhat.com
+To: Michael Clark <mjc@sifive.com>, qemu-devel@nongnu.org
+Cc: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Sagar Karandikar <sagark@eecs.berkeley.edu>
+
+On 01/02/2018 04:44 PM, Michael Clark wrote:
+> +    target_ulong mode = env->priv;
+> +    if (access_type != MMU_INST_FETCH) {
+> +        if (get_field(env->mstatus, MSTATUS_MPRV)) {
+> +            mode = get_field(env->mstatus, MSTATUS_MPP);
+> +        }
+> +    }
+> +    if (env->priv_ver >= PRIV_VERSION_1_10_0) {
+> +        if (get_field(env->satp, SATP_MODE) == VM_1_09_MBARE) {
+> +            mode = PRV_M;
+> +        }
+> +    } else {
+> +        if (get_field(env->mstatus, MSTATUS_VM) == VM_1_10_MBARE) {
+> +            mode = PRV_M;
+> +        }
+> +    }
+
+This is replicating cpu_mmu_index.
+Therefore you should be relying on mmu_idx.
+
+> +    /* check to make sure that mmu_idx and mode that we get matches */
+> +    if (unlikely(mode != mmu_idx)) {
+> +        fprintf(stderr, "MODE: mmu_idx mismatch\n");
+> +        exit(1);
+> +    }
+
+As in the opposite of this.
+
+> +
+> +    if (mode == PRV_M) {
+> +        target_ulong msb_mask = /*0x7FFFFFFFFFFFFFFF; */
+> +            (((target_ulong)2) << (TARGET_LONG_BITS - 1)) - 1;
+> +        *physical = address & msb_mask;
+
+Or perhaps extract64(address, 0, TARGET_LONG_BITS - 1)?
+
+> +    if (env->priv_ver >= PRIV_VERSION_1_10_0) {
+> +        base = get_field(env->satp, SATP_PPN) << PGSHIFT;
+> +        sum = get_field(env->mstatus, MSTATUS_SUM);
+> +        vm = get_field(env->satp, SATP_MODE);
+> +        switch (vm) {
+> +        case VM_1_10_SV32:
+> +          levels = 2; ptidxbits = 10; ptesize = 4; break;
+> +        case VM_1_10_SV39:
+> +          levels = 3; ptidxbits = 9; ptesize = 8; break;
+> +        case VM_1_10_SV48:
+> +          levels = 4; ptidxbits = 9; ptesize = 8; break;
+> +        case VM_1_10_SV57:
+> +          levels = 5; ptidxbits = 9; ptesize = 8; break;
+> +        default:
+> +          printf("unsupported SATP_MODE value\n");
+> +          exit(1);
+
+Just qemu_log_mask with LOG_UNIMP or LOG_GUEST_ERROR, and then return
+TRANSLATE_FAIL.  Printing to stdout and exiting isn't kosher.  Lots more
+occurrences within this file.
 
 
---bEjdSXxHv0Az5++U
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+> +static void raise_mmu_exception(CPURISCVState *env, target_ulong address,
+> +                                MMUAccessType access_type)
+> +{
+> +    CPUState *cs = CPU(riscv_env_get_cpu(env));
+> +    int page_fault_exceptions =
+> +        (env->priv_ver >= PRIV_VERSION_1_10_0) &&
+> +        get_field(env->satp, SATP_MODE) != VM_1_10_MBARE;
+> +    int exception = 0;
+> +    if (access_type == MMU_INST_FETCH) { /* inst access */
+> +        exception = page_fault_exceptions ?
+> +            RISCV_EXCP_INST_PAGE_FAULT : RISCV_EXCP_INST_ACCESS_FAULT;
+> +        env->badaddr = address;
+> +    } else if (access_type == MMU_DATA_STORE) { /* store access */
+> +        exception = page_fault_exceptions ?
+> +            RISCV_EXCP_STORE_PAGE_FAULT : RISCV_EXCP_STORE_AMO_ACCESS_FAULT;
+> +        env->badaddr = address;
+> +    } else if (access_type == MMU_DATA_LOAD) { /* load access */
+> +        exception = page_fault_exceptions ?
+> +            RISCV_EXCP_LOAD_PAGE_FAULT : RISCV_EXCP_LOAD_ACCESS_FAULT;
+> +        env->badaddr = address;
+> +    } else {
+> +        fprintf(stderr, "FAIL: invalid access_type\n");
+> +        exit(1);
 
-On Thu, Dec 28, 2017 at 06:22:55PM +0100, Igor Mammedov wrote:
->=20
-> As were suggested at (1) and at bof session where we discussed subj,
-> I'm posting variant with late numa 'configuration' i.e. when QEMU is
-> started with '-S' option in paused state and numa is configured via
-> monitor/QMP before machine cpus are allowed to run.
->=20
-> Suggested idea was to try 'late' numa configuration as it might result in
-> shortcut approach allowing us reuse current pause point (-S) versus adding
-> another preconfig option with earlier pause point.
-> So this series tries to show how feasible this approach.
->=20
-> Currently numa options mainly affect only firmware blobs (ACPI/FDT tables=
-),
-> it should have been possible to regenerate those blobs right before we st=
-art
-> CPUs, which would allow us setup numa configuration at first pause point =
-and
-> get firmware blobs with updated numa information.
->=20
-> Series implements idea for x86 ans spapr machines and uses machine reset,
-> to reconfigure firmware and other machine structures after each numa
-> configuration command (HMP or QMP).
->=20
-> It was relatively not hard to implement for above machines as they already
-> rebuild firmware blobs at reset time. But it still was a pain as QEMU isn=
-'t
-> written with dynamic reconfiguration in mind and one need to update device
-> state with new data (I think I've got it right but not 100% sure)
->=20
-> However when it comes to the last target supporting NUMA, ARM
-> all simplification versus v1 goes down the drain, since FDT blob is build
-> incrementally during machine_init(), -device, machine_done() time, and
-> it turns out into huge refactoring to isolate scattered FDT pieces into
-> single FDT build function (like we do for ACPI). It's job that we would n=
-eed
-> to do anyways for hotplug to work properly on ARM,
+Switch with a default: g_assert_not_reached(), since access_type is not
+controlled by the guest.
 
-Kind of irrelevant to this series, but I agree.  pseries started out
-with the FDT being almost static created at init time, with a few tiny
-adjustments later on.  But as the platform developed we needed to move
-more and more of the FDT generation to later on (reset time, roughly).
-For a long time we had an ugly split between the "skeleton" built at
-init time and the stuff built at reset time, until I eventually moved
-it all to reset time.
+> +void riscv_cpu_do_unaligned_access(CPUState *cs, vaddr addr,
+> +                                   MMUAccessType access_type, int mmu_idx,
+> +                                   uintptr_t retaddr)
+> +{
+> +    RISCVCPU *cpu = RISCV_CPU(cs);
+> +    CPURISCVState *env = &cpu->env;
+> +    if (access_type == MMU_INST_FETCH) {
+> +        fprintf(stderr, "unaligned inst fetch not handled here. should not "
+> +                "trigger\n");
+> +        exit(1);
 
-I'm pretty sure ARM will want the same thing, for hotplug as you
-mention, but also for other things.  I also think it'll save effort
-over all to do it sooner rather than later.
+No exit.  Do something logical.
 
-I had stuff in the works for ages to make DT building easier,
-including a full "live" DT model for qemu (fdt is a good format for
-passing the DT from one unit to another, but it gets clunky to do lots
-of manipulation with it).  Unfortunately I've been sufficiently busy
-with other things that I haven't really gotten anywhere with that for
-the last year or more.
+> +    } else if (access_type == MMU_DATA_STORE) {
+> +        cs->exception_index = RISCV_EXCP_STORE_AMO_ADDR_MIS;
+> +        env->badaddr = addr;
 
-> but I don't think it
-> should get in the way of numa refactoring.
-> So that was the point where I gave up and decided to post only x86/spapr
-> pieces for demo purposes.
+Why does STORE imply AMO?  Why can't a normal store trigger an unaligned trap?
 
-Fair enough.
+> +        fprintf(stderr, "Invalid MMUAccessType\n");
+> +        exit(1);
 
->=20
-> I'm inclined towards avoiding 'v2 shortcut' and going in direction of v1,
-> as I didn't see v2 as the right way in general, since one would have to:
->   - build machine / connect / initalize / devices one way and then find o=
-ut
->     devices / connections that need to be fixed/updated with new configur=
-ation,
->     it's very fragile and easy break.
->=20
-> If I remember correctly the bof session, consensus was that we would like=
- to have
-> early configuration interface (like v1) in the end, so I'd rather send ti=
-me
-> on addressing v1 drawbacks instead of hacking machine init order to make =
-numa work
-> in backwards way.
->=20
-> CC: eblake@redhat.com
-> CC: armbru@redhat.com
-> CC: ehabkost@redhat.com
-> CC: pkrempa@redhat.com
-> CC: david@gibson.dropbear.id.au
-> CC: peter.maydell@linaro.org
-> CC: pbonzini@redhat.com
->=20
-> [1]
-> v1 for reference:
-> [Qemu-devel] [RFC 0/6] enable numa configuration before machine_init() fr=
-om HMP/QMP
->     https://lists.nongnu.org/archive/html/qemu-devel/2017-10/msg03583.html
->=20
-> PS:
-> exercise wasn't waste as it resulted in cleanups that were already merged.
->=20
->=20
-> Igor Mammedov (4):
->   numa: split out NumaOptions parsing into parse_NumaOptions()
->   HMP: add set-numa-node command
->   QMP: add set-numa-node command
->   numa: pc: reset machine if numa config has changed in prelaunch time
->=20
->  hmp.h                 |  1 +
->  include/hw/boards.h   |  1 +
->  include/sysemu/numa.h |  1 +
->  hmp-commands.hx       | 13 +++++++++++
->  hmp.c                 | 23 +++++++++++++++++++
->  hw/core/machine.c     |  3 ++-
->  hw/i386/pc.c          |  1 +
->  numa.c                | 63 +++++++++++++++++++++++++++++++++++----------=
-------
->  qapi-schema.json      | 13 +++++++++++
->  vl.c                  |  4 ++++
->  10 files changed, 102 insertions(+), 21 deletions(-)
->=20
+I'll stop pointing these out, but there need to be zero instances of exit
+within the backend.
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
+> +void riscv_cpu_do_interrupt(CPUState *cs)
+> +{
+> +#if !defined(CONFIG_USER_ONLY)
+> +
+> +    RISCVCPU *cpu = RISCV_CPU(cs);
+> +    CPURISCVState *env = &cpu->env;
+> +
+> +    #ifdef RISCV_DEBUG_INTERRUPT
+> +    if (cs->exception_index & 0x70000000) {
+> +        fprintf(stderr, "core   0: exception trap_%s, epc 0x" TARGET_FMT_lx "\n"
+> +                , riscv_interrupt_names[cs->exception_index & 0x0fffffff],
+> +                env->pc);
+> +    } else {
+> +        fprintf(stderr, "core   0: exception trap_%s, epc 0x" TARGET_FMT_lx "\n"
+> +                , riscv_excp_names[cs->exception_index], env->pc);
+> +    }
+> +    #endif
+> +
+> +    if (cs->exception_index == RISCV_EXCP_BREAKPOINT) {
+> +        fprintf(stderr, "debug mode not implemented\n");
+> +    }
+> +
+> +    /* skip dcsr cause check */
+> +
+> +    target_ulong fixed_cause = 0;
+> +    if (cs->exception_index & (0x70000000)) {
+> +        /* hacky for now. the MSB (bit 63) indicates interrupt but cs->exception
+> +           index is only 32 bits wide */
+> +        fixed_cause = cs->exception_index & 0x0FFFFFFF;
+> +        fixed_cause |= ((target_ulong)1) << (TARGET_LONG_BITS - 1);
+> +    } else {
+> +        /* fixup User ECALL -> correct priv ECALL */
+> +        if (cs->exception_index == RISCV_EXCP_U_ECALL) {
+> +            switch (env->priv) {
+> +            case PRV_U:
+> +                fixed_cause = RISCV_EXCP_U_ECALL;
+> +                break;
+> +            case PRV_S:
+> +                fixed_cause = RISCV_EXCP_S_ECALL;
+> +                break;
+> +            case PRV_H:
+> +                fixed_cause = RISCV_EXCP_H_ECALL;
+> +                break;
+> +            case PRV_M:
+> +                fixed_cause = RISCV_EXCP_M_ECALL;
+> +                break;
+> +            }
+> +        } else {
+> +            fixed_cause = cs->exception_index;
+> +        }
+> +    }
+> +
+> +    target_ulong backup_epc = env->pc;
+> +
+> +    target_ulong bit = fixed_cause;
+> +    target_ulong deleg = env->medeleg;
+> +
+> +    int hasbadaddr =
+> +        (fixed_cause == RISCV_EXCP_INST_ADDR_MIS) ||
+> +        (fixed_cause == RISCV_EXCP_INST_ACCESS_FAULT) ||
+> +        (fixed_cause == RISCV_EXCP_LOAD_ADDR_MIS) ||
+> +        (fixed_cause == RISCV_EXCP_STORE_AMO_ADDR_MIS) ||
+> +        (fixed_cause == RISCV_EXCP_LOAD_ACCESS_FAULT) ||
+> +        (fixed_cause == RISCV_EXCP_STORE_AMO_ACCESS_FAULT) ||
+> +        (fixed_cause == RISCV_EXCP_INST_PAGE_FAULT) ||
+> +        (fixed_cause == RISCV_EXCP_LOAD_PAGE_FAULT) ||
+> +        (fixed_cause == RISCV_EXCP_STORE_PAGE_FAULT);
+> +
+> +    if (bit & ((target_ulong)1 << (TARGET_LONG_BITS - 1))) {
+> +        deleg = env->mideleg;
+> +        bit &= ~((target_ulong)1 << (TARGET_LONG_BITS - 1));
+> +    }
+> +
+> +    if (env->priv <= PRV_S && bit < 64 && ((deleg >> bit) & 1)) {
+> +        /* handle the trap in S-mode */
+> +        /* No need to check STVEC for misaligned - lower 2 bits cannot be set */
+> +        env->pc = env->stvec;
+> +        env->scause = fixed_cause;
+> +        env->sepc = backup_epc;
+> +
+> +        if (hasbadaddr) {
+> +            #ifdef RISCV_DEBUG_INTERRUPT
+> +            fprintf(stderr, "core %d: badaddr 0x" TARGET_FMT_lx "\n",
+> +                    env->mhartid, env->badaddr);
+> +            #endif
+> +            env->sbadaddr = env->badaddr;
+> +        }
+> +
+> +        target_ulong s = env->mstatus;
+> +        s = set_field(s, MSTATUS_SPIE, get_field(s, MSTATUS_UIE << env->priv));
+> +        s = set_field(s, MSTATUS_SPP, env->priv);
+> +        s = set_field(s, MSTATUS_SIE, 0);
+> +        csr_write_helper(env, s, CSR_MSTATUS);
+> +        set_privilege(env, PRV_S);
+> +    } else {
+> +        /* No need to check MTVEC for misaligned - lower 2 bits cannot be set */
+> +        env->pc = env->mtvec;
+> +        env->mepc = backup_epc;
+> +        env->mcause = fixed_cause;
+> +
+> +        if (hasbadaddr) {
+> +            #ifdef RISCV_DEBUG_INTERRUPT
+> +            fprintf(stderr, "core %d: badaddr 0x" TARGET_FMT_lx "\n",
+> +                    env->mhartid, env->badaddr);
+> +            #endif
+> +            env->mbadaddr = env->badaddr;
+> +        }
+> +
+> +        target_ulong s = env->mstatus;
+> +        s = set_field(s, MSTATUS_MPIE, get_field(s, MSTATUS_UIE << env->priv));
+> +        s = set_field(s, MSTATUS_MPP, env->priv);
+> +        s = set_field(s, MSTATUS_MIE, 0);
+> +        csr_write_helper(env, s, CSR_MSTATUS);
+> +        set_privilege(env, PRV_M);
+> +    }
+> +    /* TODO yield load reservation  */
+> +#endif
+> +    cs->exception_index = EXCP_NONE; /* mark handled to qemu */
+> +}
 
---bEjdSXxHv0Az5++U
-Content-Type: application/pgp-signature; name="signature.asc"
+Marking handled is done generically.  Why do you need to do it here?
 
------BEGIN PGP SIGNATURE-----
+> +/* Floating Point - fused */
+> +DEF_HELPER_FLAGS_5(fmadd_s, TCG_CALL_NO_RWG, i64, env, i64, i64, i64, i64)
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlpMb5wACgkQbDjKyiDZ
-s5LO0xAAuGpkY9TesZ5DP/e+2+mDSaxopWnvymtIevLyty73+hMzRmVJw57fSrVq
-0aJOfPzmnGWkYOvp5ombzXkzQbXD+Wcee50C4WykCtxoh7QujC/mLaRaW9esDGZh
-KCQvXnZKzcMYzvBvmBRMl28qsizHtGA2Eukj6rSpKAl9BwtwRVdlWhjFrxGWSQZ5
-T1cyGs73DubX0ctRSoLgu1gj8Bh4tHfC3A0QnJ9K7TlkXc2ZRmXpjMv8eiZbW395
-ic+JS2325mSQ1Y0UEfkN5LKPcV0QRCLvYhfZqyY4AnMKN9LYj9EPPYqXwCcXn19f
-tfEd2aSdLzgl+JWx4OlEA1KvCZyz7Z3DZJ/2v3hSTqKFUR5g19bT8+CMwJ6M/4Gy
-MyL6gESpK+PSzHrNwfapgCOp0PG2GcmgaFX+2m5y0Tx6rbhUofhdYX0FmBjEm+1B
-l9hOjS5wqhvIBzkiNbSdGSX98OPPisOZ06gWLQtWBbhdhYD0elDnW9F/NcFn8Cr7
-EuxFMxFmO9XY9B1EwOo79FIBOruXEctrddQ4CPVUp99UtH4zI7xn0RSbd9oqbl8k
-93gZqnFEzP+nZJTqHZr0QGQ1xJAmCLMtjCRPfum88gsccWeq+ZpM1HeU7uez8ik+
-ZdaR6pH3e+wqvdrRAxJBWYrEms3f9j90cQm24LH6Qei91072Ig4=
-=Dxkk
------END PGP SIGNATURE-----
+Ideally these would go in with the patch that adds the helpers, so they're
+easier to validate.  However, I suppose it doesn't really matter.
 
---bEjdSXxHv0Az5++U--
+> +void helper_raise_exception_mbadaddr(CPURISCVState *env, uint32_t exception,
+> +        target_ulong bad_pc) {
+
+Brace on next line.
+
+> +    #ifdef RISCV_DEBUG_PRINT
+> +    fprintf(stderr, "Write CSR reg: 0x" TARGET_FMT_lx "\n", csrno);
+> +    fprintf(stderr, "Write CSR val: 0x" TARGET_FMT_lx "\n", val_to_write);
+> +    #endif
+
+Drop the debugging prints.  Perhaps use the tracing infrastructure?
+
+> +    case CSR_MISA: {
+> +        if (!(val_to_write & (1L << ('F' - 'A')))) {
+> +            val_to_write &= ~(1L << ('D' - 'A'));
+> +        }
+> +
+> +        /* allow MAFDC bits in MISA to be modified */
+> +        target_ulong mask = 0;
+> +        mask |= 1L << ('M' - 'A');
+> +        mask |= 1L << ('A' - 'A');
+> +        mask |= 1L << ('F' - 'A');
+> +        mask |= 1L << ('D' - 'A');
+> +        mask |= 1L << ('C' - 'A');
+> +        mask &= env->misa_mask;
+> +
+> +        env->misa = (val_to_write & mask) | (env->misa & ~mask);
+
+Does this not affect the set of instructions that are allowable?  If so, you'd
+want something like
+
+    new_misa = (val_to_write & mask) | (env->misa & ~mask);
+    if (env->misa != new_misa) {
+        env->misa = new_misa;
+        tb_flush(CPU(riscv_env_get_cpu(env)));
+    }
+
+so that we start with all new translations, which would then check the new
+value of misa, and would then raise INST_ADDR_MIS (or not).
+
+> +inline target_ulong csr_read_helper(CPURISCVState *env, target_ulong csrno)
+
+Why mark such large functions inline?
+
+> +void set_privilege(CPURISCVState *env, target_ulong newpriv)
+> +{
+> +    if (!(newpriv <= PRV_M)) {
+> +        printf("INVALID PRIV SET\n");
+> +        exit(1);
+> +    }
+> +    if (newpriv == PRV_H) {
+> +        newpriv = PRV_U;
+> +    }
+> +    helper_tlb_flush(env);
+
+Why flush?  Doesn't this just switch to a different mmu_idx?
+
+> +void helper_fence_i(CPURISCVState *env)
+> +{
+> +    RISCVCPU *cpu = riscv_env_get_cpu(env);
+> +    CPUState *cs = CPU(cpu);
+> +    /* Flush QEMU's TLB */
+> +    tlb_flush(cs);
+> +    /* ARM port seems to not know if this is okay inside a TB
+> +       But we need to do it */
+> +    tb_flush(cs);
+> +}
+
+You should not require either flush.
+This insn can be implemented in qemu as a nop.
+
+
+r~
