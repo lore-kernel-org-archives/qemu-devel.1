@@ -1,33 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58003)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58142)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1eWgFc-0000ib-2O
-	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 05:26:25 -0500
+	(envelope-from <peterx@redhat.com>) id 1eWgFs-0000qw-NV
+	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 05:26:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1eWgFY-0007Tc-U2
-	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 05:26:24 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:33768)
+	(envelope-from <peterx@redhat.com>) id 1eWgFp-0007du-In
+	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 05:26:40 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:42474)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1eWgFY-0007St-My
-	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 05:26:20 -0500
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1eWgFp-0007d1-CY
+	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 05:26:37 -0500
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id A1E0BC059B6B
-	for <qemu-devel@nongnu.org>; Wed,  3 Jan 2018 10:26:19 +0000 (UTC)
-From: Juan Quintela <quintela@redhat.com>
-In-Reply-To: <20180103092025.GF2557@xz-mi> (Peter Xu's message of "Wed, 3 Jan
-	2018 17:20:25 +0800")
+	by mx1.redhat.com (Postfix) with ESMTPS id 9A23076A06
+	for <qemu-devel@nongnu.org>; Wed,  3 Jan 2018 10:26:36 +0000 (UTC)
+Date: Wed, 3 Jan 2018 18:26:32 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20180103102632.GJ2557@xz-mi>
 References: <20180103054043.25719-1-peterx@redhat.com>
-	<20180103054043.25719-6-peterx@redhat.com>
-	<87shbn2tz0.fsf@secure.laptop> <20180103092025.GF2557@xz-mi>
-Reply-To: quintela@redhat.com
-Date: Wed, 03 Jan 2018 11:26:12 +0100
-Message-ID: <87o9mb1bnf.fsf@secure.laptop>
+	<20180103054043.25719-3-peterx@redhat.com>
+	<87efn72the.fsf@secure.laptop> <20180103093619.GH2557@xz-mi>
+	<87shbn1bv8.fsf@secure.laptop>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH 05/11] migration: move vm_old_running into
- global state
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <87shbn1bv8.fsf@secure.laptop>
+Subject: Re: [Qemu-devel] [PATCH 02/11] migration:
+ qemu_savevm_state_cleanup() in cleanup
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,58 +36,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
+To: Juan Quintela <quintela@redhat.com>
 Cc: qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 
-Peter Xu <peterx@redhat.com> wrote:
-> On Wed, Jan 03, 2018 at 10:05:07AM +0100, Juan Quintela wrote:
->> Peter Xu <peterx@redhat.com> wrote:
->> > Firstly, it was passed around.  Let's just move it into MigrationState
->> > just like many other variables as state of migration.
->> >
->> > One thing to mention is that for postcopy, we actually don't need this
->> > knowledge at all since postcopy can't resume a VM even if it fails (we
->> > can see that from the old code too: when we try to resume we also check
->> > against "entered_postcopy" variable).  So further we do this:
->> >
->> > - in postcopy_start(), we don't update vm_old_running since useless
->> > - in migration_thread(), we don't need to check entered_postcopy when
->> >   resume, since it's only used for precopy.
->> >
->> > Comment this out too for that variable definition.
+On Wed, Jan 03, 2018 at 11:21:31AM +0100, Juan Quintela wrote:
+> Peter Xu <peterx@redhat.com> wrote:
+> > On Wed, Jan 03, 2018 at 10:15:41AM +0100, Juan Quintela wrote:
+> >> Peter Xu <peterx@redhat.com> wrote:
+> >> > Moving existing callers all into migrate_fd_cleanup().  It simplifies
+> >> > migration_thread() a bit.
+> >> >
+> >> > Signed-off-by: Peter Xu <peterx@redhat.com>
+> >> 
+> >> Reviewed-by: Juan Quintela <quintela@redhat.com>
+> >
+> > Thanks.
+> >
+> >> 
+> >> I am trying to see if we can call migrate_fd_cleanup() twice.  As far as
+> >> I can see, we are not doing it.  But, and it is a big but, we are not
+> >> checking that we are not calling qemu_savevm_state_cleanup() twice.  If
+> >> that happens, we can get double frees and similar.
+> >> 
+> >> I put the reviewed-by anyways, because I *think* that we are doing it
+> >> right now, and otherwise, we should make sure that we are not calling it
+> >> twice, not papering over it.
+> >> 
+> >> Once here, I have notice that we call block_cleanup_parameters() in
+> >> *three* places.  We call notifier_list_notify() on two of this places (I
+> >> can't see any good reason *why* we don't call the notifier for
+> >> migrate_fd_cancel).
+> >
+> > Indeed.
+> >
+> > IMHO we can remove two calls of block_cleanup_parameters(), only keep
+> > the one in migrate_fd_cleanup(), and remove on notifier_list_notify()
+> > in migrate_fd_error() (these can be two more patches).  What do you
+> > think?
+> 
+> I think we need to make sure that we have a function that we always
+> call at the end.  I think that we have that on migration_fd_cleanup(),
+> so put everything there should be ok, no?
 
->> I think this comment is right for precopy, but not for colo.  BTW, I
->> think that I would put the postcopy comment on its use, not here.
->
-> Or, how about I just don't mention postcopy at all?
+IMHO that's exactly what I mean, no? :)
 
-Fully agree.
->> 
->> /me tries to improve the comment
->> 
->>   Guest was running when we enter the completion stage.  If migration don't
->>   sucess, we need to continue running guest on source.
->> 
->> What do you think?
->
-> I think it's generally good.  Maybe a tiny fix like:
->
->   s/Guest was/Whether guest was/
+For notifier_list_notify(), it's different - I just remove the extra
+one in migrate_fd_error() because it'll be called in
+migrate_fd_cleanup() as well, which is a duplicate.
 
-ok.
-
->   s/If migration don't sucess/If migration failed/
-
-We also use it in case of migration_cancel.  Cancel is not one error,
-that is why I wrote it that way.  What about:
-
-Whether guest was running when we enter the completion stage.  If
-migration is interrupted by any reason, we need to continue running the
-guest on source.
-
-What do you think?
-
-Later, Juan.
-
-
-> ?  Thanks,
+-- 
+Peter Xu
