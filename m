@@ -1,21 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33627)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33737)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eWnrz-0002ub-H1
-	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 13:34:39 -0500
+	id 1eWnsA-00031d-Gc
+	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 13:34:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eWnrv-0007A3-IP
-	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 13:34:31 -0500
+	id 1eWns9-0007IF-3S
+	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 13:34:42 -0500
+Received: from mail-qk0-x242.google.com ([2607:f8b0:400d:c09::242]:41604)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1eWns8-0007Hi-UW
+	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 13:34:41 -0500
+Received: by mail-qk0-x242.google.com with SMTP id a8so2659948qkb.8
+	for <qemu-devel@nongnu.org>; Wed, 03 Jan 2018 10:34:40 -0800 (PST)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Wed,  3 Jan 2018 15:33:53 -0300
-Message-Id: <20180103183418.23730-1-f4bug@amsat.org>
+Date: Wed,  3 Jan 2018 15:33:58 -0300
+Message-Id: <20180103183418.23730-6-f4bug@amsat.org>
+In-Reply-To: <20180103183418.23730-1-f4bug@amsat.org>
+References: <20180103183418.23730-1-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v4 00/25] SDHCI: add qtests and fix few issues
+Subject: [Qemu-devel] [PATCH v4 05/25] sdhci: add DMA and 64-bit
+ capabilities (Spec v2)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,126 +34,180 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alistair Francis <alistair.francis@xilinx.com>, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, Peter Maydell <peter.maydell@linaro.org>, Andrey Smirnov <andrew.smirnov@gmail.com>, Sai Pavan Boddu <saipava@xilinx.com>, Clement Deschamps <clement.deschamps@antfield.fr>, Jean-Christophe Dubois <jcd@tribudubois.net>, =?UTF-8?q?Gr=C3=A9gory=20Estrade?= <gregory.estrade@gmail.com>, Igor Mitsyanko <i.mitsyanko@gmail.com>, Krzysztof Kozlowski <krzk@kernel.org>, Andrew Baumann <Andrew.Baumann@microsoft.com>, Prasad J Pandit <pjp@fedoraproject.org>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, qemu-arm@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Stefan Hajnoczi <stefanha@redhat.com>
+To: Alistair Francis <alistair.francis@xilinx.com>, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, Peter Maydell <peter.maydell@linaro.org>, Andrey Smirnov <andrew.smirnov@gmail.com>, =?UTF-8?q?Gr=C3=A9gory=20Estrade?= <gregory.estrade@gmail.com>
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, Peter Crosthwaite <crosthwaite.peter@gmail.com>
 
-Since v3:
-- no change, but split back in 2 series, 1st part is "SDHCI: housekeeping v5",
-Based-on: 20180103180805.18140-18-f4bug@amsat.org
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+---
+ hw/sd/sdhci-internal.h | 14 +++++++-------
+ include/hw/sd/sdhci.h  |  4 ++++
+ hw/sd/sdhci.c          | 40 ++++++++++++++++++----------------------
+ 3 files changed, 29 insertions(+), 29 deletions(-)
 
-Since v2:
-- more detailed 'capabilities', all boards converted to use these properties
-- since all qtests pass, removed the previous 'capareg' property
-- added Stefan/Alistair R-b
-- corrected 'access' LED behavior (Alistair's review)
-- more uses of the registerfields API
-- remove some dead code
-- cosmetix:
-  - added more comments
-  - renamed a pair of registers
-  - reordered few struct members
-
-Note, the bcm2835 seems to have 1KB minimum blocksize, however the current
-model is implemented with 512B. I didn't change the current value.
-
-Since v1:
-- addressed Alistair Francis review comments, added some R-b
-- only move register defines to "sd-internal.h"
-- fixed deposit64() arguments
-- dropped unuseful s->fifo_buffer = NULL
-- use a qemu_irq for the LED, restrict the logging to ON/OFF
-- fixed a trace format string error
-- included Andrey Smirnov ACMD12ERRSTS write patch
-- dropped few unuseful patches, and separate the Python polemical ones for later
-
->From the "SDHCI housekeeping" series:
-- 1: we restrict part of "sd/sd.h" into local "sd-internal.h",
-- 2,3: we somehow beautiful the code, no logical changes,
-- 4-7: we refactor the common sysbus/pci qdev code,
-- 8-10: we add plenty of trace events which will result useful later,
-- 11: we finally expose a "dma-memory" property.
->From the "SDHCI: add a qtest and fix few issues" series:
-- 12,13: fix registers
-- 14,15: boards can specify which SDHCI Spec to use (v2 and v3 so far)
-- 15-20: HCI qtest
-
-Regards,
-
-Phil.
-
-$ git backport-diff # with v2
-[----] : patches are identical
-[####] : number of functional differences between upstream/downstream patch
-[down] : patch is downstream-only
-The flags [FC] indicate (F)unctional and (C)ontextual differences, respectively
-
-001/25:[down] 'sdhci: add a spec_version property'
-002/25:[down] 'sdhci: add basic Spec v1 capabilities'
-003/25:[down] 'sdhci: add max-block-length capability (Spec v1)'
-004/25:[down] 'sdhci: add clock capabilities (Spec v1)'
-005/25:[down] 'sdhci: add DMA and 64-bit capabilities (Spec v2)'
-006/25:[down] 'sdhci: default to Spec v2'
-007/25:[down] 'sdhci: add a 'dma' shortcut property'
-008/25:[down] 'sdhci: add BLOCK_SIZE_MASK for DMA'
-009/25:[down] 'sdhci: Fix 64-bit ADMA2'
-010/25:[down] 'hw/arm/exynos4210: implement SDHCI Spec v2'
-011/25:[down] 'hw/arm/xilinx_zynq: implement SDHCI Spec v2'
-012/25:[0022] [FC] 'sdhci: add qtest to check the SD Spec version'
-013/25:[down] 'sdhci: check Spec v2 capabilities qtest'
-014/25:[down] 'sdhci: add v3 capabilities'
-015/25:[down] 'sdhci: rename the hostctl1 register'
-016/25:[down] 'hw/arm/bcm2835_peripherals: implement SDHCI Spec v3'
-017/25:[down] 'hw/arm/fsl-imx6: implement SDHCI Spec v3'
-018/25:[down] 'hw/arm/xilinx_zynqmp: implement SDHCI Spec v3'
-019/25:[down] 'sdhci: check Spec v3 capabilities qtest'
-020/25:[down] 'sdhci: remove the deprecated 'capareg' property'
-021/25:[0008] [FC] 'sdhci: add check_capab_readonly() qtest'
-022/25:[0009] [FC] 'sdhci: add a check_capab_baseclock() qtest'
-023/25:[0011] [FC] 'sdhci: add a check_capab_sdma() qtest'
-024/25:[----] [-C] 'sdhci: add a check_capab_v3() qtest'
-025/25:[down] 'sdhci: add Spec v4.2 register definitions'
-
-Philippe Mathieu-Daudé (24):
-  sdhci: add a spec_version property
-  sdhci: add basic Spec v1 capabilities
-  sdhci: add max-block-length capability (Spec v1)
-  sdhci: add clock capabilities (Spec v1)
-  sdhci: add DMA and 64-bit capabilities (Spec v2)
-  sdhci: default to Spec v2
-  sdhci: add a 'dma' shortcut property
-  sdhci: add BLOCK_SIZE_MASK for DMA
-  hw/arm/exynos4210: implement SDHCI Spec v2
-  hw/arm/xilinx_zynq: implement SDHCI Spec v2
-  sdhci: add qtest to check the SD Spec version
-  sdhci: check Spec v2 capabilities qtest
-  sdhci: add v3 capabilities
-  sdhci: rename the hostctl1 register
-  hw/arm/bcm2835_peripherals: implement SDHCI Spec v3
-  hw/arm/fsl-imx6: implement SDHCI Spec v3
-  hw/arm/xilinx_zynqmp: implement SDHCI Spec v3
-  sdhci: check Spec v3 capabilities qtest
-  sdhci: remove the deprecated 'capareg' property
-  sdhci: add check_capab_readonly() qtest
-  sdhci: add a check_capab_baseclock() qtest
-  sdhci: add a check_capab_sdma() qtest
-  sdhci: add a check_capab_v3() qtest
-  sdhci: add Spec v4.2 register definitions
-
-Sai Pavan Boddu (1):
-  sdhci: Fix 64-bit ADMA2
-
- include/hw/sd/sdhci.h        |  21 +++-
- hw/sd/sdhci-internal.h       |  70 +++++++++++--
- hw/arm/bcm2835_peripherals.c |  35 +++++--
- hw/arm/exynos4210.c          |  13 ++-
- hw/arm/fsl-imx6.c            |  12 +++
- hw/arm/xilinx_zynq.c         |  64 +++++++-----
- hw/arm/xlnx-zynqmp.c         |  38 +++++--
- hw/sd/sdhci.c                | 243 ++++++++++++++++++++++++++-----------------
- tests/sdhci-test.c           | 177 +++++++++++++++++++++++++++++++
- tests/Makefile.include       |   3 +
- 10 files changed, 521 insertions(+), 155 deletions(-)
- create mode 100644 tests/sdhci-test.c
-
+diff --git a/hw/sd/sdhci-internal.h b/hw/sd/sdhci-internal.h
+index 0561e6eaf7..affbe4015c 100644
+--- a/hw/sd/sdhci-internal.h
++++ b/hw/sd/sdhci-internal.h
+@@ -89,12 +89,12 @@ FIELD(SDHC_PRNSTS, WRITE_PROTECT,      19, 1);
+ FIELD(SDHC_HOSTCTL, LED_CTRL,          0, 1);
+ FIELD(SDHC_HOSTCTL, DATATRANSFERWIDTH, 1, 1); /* SD mode only */
+ FIELD(SDHC_HOSTCTL, HIGH_SPEED,        2, 1);
+-#define SDHC_CTRL_DMA_CHECK_MASK       0x18
++FIELD(SDHC_HOSTCTL, DMA,               3, 2);
+ #define SDHC_CTRL_SDMA                 0x00
+-#define SDHC_CTRL_ADMA1_32             0x08
++#define SDHC_CTRL_ADMA1_32             0x08 /* NOT ALLOWED since v2 */
+ #define SDHC_CTRL_ADMA2_32             0x10
+-#define SDHC_CTRL_ADMA2_64             0x18
+-#define SDHC_DMA_TYPE(x)               ((x) & SDHC_CTRL_DMA_CHECK_MASK)
++#define SDHC_CTRL_ADMA2_64             0x18 /* only v1 & v2 (v3 optional) */
++#define SDHC_DMA_TYPE(x)               ((x) & R_SDHC_HOSTCTL_DMA_MASK)
+ 
+ /* R/W Power Control Register 0x0 */
+ #define SDHC_PWRCON                    0x29
+@@ -185,19 +185,19 @@ FIELD(SDHC_ACMD12ERRSTS, INDEX_ERR,    4, 1);
+ 
+ /* HWInit Capabilities Register 0x05E80080 */
+ #define SDHC_CAPAB                     0x40
+-#define SDHC_CAN_DO_ADMA2              0x00080000
+-#define SDHC_CAN_DO_ADMA1              0x00100000
+-#define SDHC_64_BIT_BUS_SUPPORT        (1 << 28)
+ FIELD(SDHC_CAPAB, TOCLKFREQ,           0, 6);
+ FIELD(SDHC_CAPAB, TOUNIT,              7, 1);
+ FIELD(SDHC_CAPAB, BASECLKFREQ,         8, 8);
+ FIELD(SDHC_CAPAB, MAXBLOCKLENGTH,     16, 2);
++FIELD(SDHC_CAPAB, ADMA2,              19, 1); /* since v2 */
++FIELD(SDHC_CAPAB, ADMA1,              20, 1); /* v1 only? */
+ FIELD(SDHC_CAPAB, HIGHSPEED,          21, 1);
+ FIELD(SDHC_CAPAB, SDMA,               22, 1);
+ FIELD(SDHC_CAPAB, SUSPRESUME,         23, 1);
+ FIELD(SDHC_CAPAB, V33,                24, 1);
+ FIELD(SDHC_CAPAB, V30,                25, 1);
+ FIELD(SDHC_CAPAB, V18,                26, 1);
++FIELD(SDHC_CAPAB, BUS64BIT,           28, 1); /* since v2 */
+ 
+ /* HWInit Maximum Current Capabilities Register 0x0 */
+ #define SDHC_MAXCURR                   0x48
+diff --git a/include/hw/sd/sdhci.h b/include/hw/sd/sdhci.h
+index c1602becd2..4a9c3e9175 100644
+--- a/include/hw/sd/sdhci.h
++++ b/include/hw/sd/sdhci.h
+@@ -103,6 +103,7 @@ typedef struct SDHCIState {
+     bool pending_insert_quirk; /* Quirk for Raspberry Pi card insert int */
+     uint8_t spec_version;
+     struct {
++        /* v1 */
+         uint8_t timeout_clk_freq, base_clk_freq_mhz;
+         bool timeout_clk_in_mhz;
+         uint16_t max_blk_len;
+@@ -110,6 +111,9 @@ typedef struct SDHCIState {
+         bool high_speed;
+         bool sdma;
+         bool v33, v30, v18;
++        /* v2 */
++        bool adma1, adma2;
++        bool bus64;
+     } cap;
+ } SDHCIState;
+ 
+diff --git a/hw/sd/sdhci.c b/hw/sd/sdhci.c
+index 737d6c09a2..f8423f969e 100644
+--- a/hw/sd/sdhci.c
++++ b/hw/sd/sdhci.c
+@@ -38,24 +38,6 @@
+ #define TYPE_SDHCI_BUS "sdhci-bus"
+ #define SDHCI_BUS(obj) OBJECT_CHECK(SDBus, (obj), TYPE_SDHCI_BUS)
+ 
+-/* Default SD/MMC host controller features information, which will be
+- * presented in CAPABILITIES register of generic SD host controller at reset.
+- * If not stated otherwise:
+- * 0 - not supported, 1 - supported, other - prohibited.
+- */
+-#define SDHC_CAPAB_64BITBUS       0ul        /* 64-bit System Bus Support */
+-#define SDHC_CAPAB_ADMA1          1ul        /* ADMA1 support */
+-#define SDHC_CAPAB_ADMA2          1ul        /* ADMA2 support */
+-
+-/* Now check all parameters and calculate CAPABILITIES REGISTER value */
+-#if SDHC_CAPAB_64BITBUS > 1 || SDHC_CAPAB_ADMA2 > 1 || SDHC_CAPAB_ADMA1 > 1
+-#error Capabilities features can have value 0 or 1 only!
+-#endif
+-
+-#define SDHC_CAPAB_REG_DEFAULT                                 \
+-   ((SDHC_CAPAB_64BITBUS << 28) | (SDHC_CAPAB_ADMA1 << 20) |   \
+-    (SDHC_CAPAB_ADMA2 << 19))
+-
+ #define MASKED_WRITE(reg, mask, val)  (reg = (reg & (mask)) | (val))
+ 
+ static void sdhci_check_capab_freq_range(SDHCIState *s, const char *desc,
+@@ -71,12 +53,22 @@ static void sdhci_check_capab_freq_range(SDHCIState *s, const char *desc,
+     }
+ }
+ 
++/* Default SD/MMC host controller features information, which will be
++ * presented in CAPABILITIES register of generic SD host controller at reset. */
+ static void sdhci_init_capareg(SDHCIState *s, Error **errp)
+ {
+     uint64_t capareg = 0;
+     uint32_t val;
+ 
+     switch (s->spec_version) {
++    /* fallback */
++    case 2:
++        capareg = FIELD_DP64(capareg, SDHC_CAPAB, ADMA1, s->cap.adma1);
++        capareg = FIELD_DP64(capareg, SDHC_CAPAB, ADMA2, s->cap.adma2);
++        /* 64-bit System Bus Support */
++        capareg = FIELD_DP64(capareg, SDHC_CAPAB, BUS64BIT, s->cap.bus64);
++
++    /* fallback */
+     case 1:
+         sdhci_check_capab_freq_range(s, "Timeout", s->cap.timeout_clk_freq,
+                                      errp);
+@@ -794,7 +786,7 @@ static void sdhci_data_transfer(void *opaque)
+ 
+             break;
+         case SDHC_CTRL_ADMA1_32:
+-            if (!(s->capareg & SDHC_CAN_DO_ADMA1)) {
++            if (!(s->capareg & R_SDHC_CAPAB_ADMA1_MASK)) {
+                 trace_sdhci_error("ADMA1 not supported");
+                 break;
+             }
+@@ -802,7 +794,7 @@ static void sdhci_data_transfer(void *opaque)
+             sdhci_do_adma(s);
+             break;
+         case SDHC_CTRL_ADMA2_32:
+-            if (!(s->capareg & SDHC_CAN_DO_ADMA2)) {
++            if (!(s->capareg & R_SDHC_CAPAB_ADMA2_MASK)) {
+                 trace_sdhci_error("ADMA2 not supported");
+                 break;
+             }
+@@ -810,8 +802,8 @@ static void sdhci_data_transfer(void *opaque)
+             sdhci_do_adma(s);
+             break;
+         case SDHC_CTRL_ADMA2_64:
+-            if (!(s->capareg & SDHC_CAN_DO_ADMA2) ||
+-                    !(s->capareg & SDHC_64_BIT_BUS_SUPPORT)) {
++            if (!(s->capareg & R_SDHC_CAPAB_ADMA2_MASK) ||
++                    !(s->capareg & R_SDHC_CAPAB_BUS64BIT_MASK)) {
+                 trace_sdhci_error("64 bit ADMA not supported");
+                 break;
+             }
+@@ -1321,6 +1313,8 @@ static Property sdhci_properties[] = {
+     DEFINE_PROP_UINT16("max-block-length", SDHCIState, cap.max_blk_len, 512),
+     /* DMA */
+     DEFINE_PROP_BOOL("sdma", SDHCIState, cap.sdma, true),
++    DEFINE_PROP_BOOL("adma1", SDHCIState, cap.adma1, false),
++    DEFINE_PROP_BOOL("adma2", SDHCIState, cap.adma2, true),
+     /* Suspend/resume support */
+     DEFINE_PROP_BOOL("suspend", SDHCIState, cap.suspend, false),
+     /* High speed support */
+@@ -1330,6 +1324,8 @@ static Property sdhci_properties[] = {
+     DEFINE_PROP_BOOL("3v0", SDHCIState, cap.v30, false),
+     DEFINE_PROP_BOOL("1v8", SDHCIState, cap.v18, false),
+ 
++    DEFINE_PROP_BOOL("64bit", SDHCIState, cap.bus64, false),
++
+     /* capareg: deprecated */
+     DEFINE_PROP_UINT64("capareg", SDHCIState, capareg, UINT64_MAX),
+ 
 -- 
 2.15.1
