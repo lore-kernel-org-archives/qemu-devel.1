@@ -1,23 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36935)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38602)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rjones@redhat.com>) id 1eWhKr-0006RK-P4
-	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 06:35:54 -0500
+	(envelope-from <peterx@redhat.com>) id 1eWhOl-0007jl-9v
+	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 06:39:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rjones@redhat.com>) id 1eWhKn-0002eI-Lx
-	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 06:35:53 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:56674)
+	(envelope-from <peterx@redhat.com>) id 1eWhOh-0004cj-7S
+	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 06:39:55 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:49626)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <rjones@redhat.com>) id 1eWhKn-0002dU-EN
-	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 06:35:49 -0500
-Date: Wed, 3 Jan 2018 11:35:45 +0000
-From: "Richard W.M. Jones" <rjones@redhat.com>
-Message-ID: <20180103113544.GI2450@redhat.com>
-References: <1514940265-18093-1-git-send-email-mjc@sifive.com>
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1eWhOh-0004cQ-1X
+	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 06:39:51 -0500
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 3F08CC0587FD
+	for <qemu-devel@nongnu.org>; Wed,  3 Jan 2018 11:39:50 +0000 (UTC)
+Date: Wed, 3 Jan 2018 19:39:45 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20180103113945.GO2557@xz-mi>
+References: <20180103054043.25719-1-peterx@redhat.com>
+	<20180103054043.25719-3-peterx@redhat.com>
+	<87efn72the.fsf@secure.laptop> <20180103093619.GH2557@xz-mi>
+	<87shbn1bv8.fsf@secure.laptop> <20180103102632.GJ2557@xz-mi>
+	<87k1wz197l.fsf@secure.laptop>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <1514940265-18093-1-git-send-email-mjc@sifive.com>
-Subject: Re: [Qemu-devel] [PATCH v1 00/21] RISC-V QEMU Port Submission v1
+In-Reply-To: <87k1wz197l.fsf@secure.laptop>
+Subject: Re: [Qemu-devel] [PATCH 02/11] migration:
+ qemu_savevm_state_cleanup() in cleanup
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,42 +37,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Michael Clark <mjc@sifive.com>
-Cc: qemu-devel@nongnu.org, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Sagar Karandikar <sagark@eecs.berkeley.edu>
+To: Juan Quintela <quintela@redhat.com>
+Cc: qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 
-Just a few small points:
+On Wed, Jan 03, 2018 at 12:18:54PM +0100, Juan Quintela wrote:
+> Peter Xu <peterx@redhat.com> wrote:
+> > On Wed, Jan 03, 2018 at 11:21:31AM +0100, Juan Quintela wrote:
+> >> Peter Xu <peterx@redhat.com> wrote:
+> >> > On Wed, Jan 03, 2018 at 10:15:41AM +0100, Juan Quintela wrote:
+> >> >> Peter Xu <peterx@redhat.com> wrote:
+> >> >> > Moving existing callers all into migrate_fd_cleanup().  It simplifies
+> >> >> > migration_thread() a bit.
+> >> >> >
+> >> >> > Signed-off-by: Peter Xu <peterx@redhat.com>
+> >> >> 
+> >> >> Reviewed-by: Juan Quintela <quintela@redhat.com>
+> >> >
+> >> > Thanks.
+> >> >
+> >> >> 
+> >> >> I am trying to see if we can call migrate_fd_cleanup() twice.  As far as
+> >> >> I can see, we are not doing it.  But, and it is a big but, we are not
+> >> >> checking that we are not calling qemu_savevm_state_cleanup() twice.  If
+> >> >> that happens, we can get double frees and similar.
+> >> >> 
+> >> >> I put the reviewed-by anyways, because I *think* that we are doing it
+> >> >> right now, and otherwise, we should make sure that we are not calling it
+> >> >> twice, not papering over it.
+> >> >> 
+> >> >> Once here, I have notice that we call block_cleanup_parameters() in
+> >> >> *three* places.  We call notifier_list_notify() on two of this places (I
+> >> >> can't see any good reason *why* we don't call the notifier for
+> >> >> migrate_fd_cancel).
+> >> >
+> >> > Indeed.
+> >> >
+> >> > IMHO we can remove two calls of block_cleanup_parameters(), only keep
+> >> > the one in migrate_fd_cleanup(), and remove on notifier_list_notify()
+> >> > in migrate_fd_error() (these can be two more patches).  What do you
+> >> > think?
+> >> 
+> >> I think we need to make sure that we have a function that we always
+> >> call at the end.  I think that we have that on migration_fd_cleanup(),
+> >> so put everything there should be ok, no?
+> >
+> > IMHO that's exactly what I mean, no? :)
+> >
+> > For notifier_list_notify(), it's different - I just remove the extra
+> > one in migrate_fd_error() because it'll be called in
+> > migrate_fd_cleanup() as well, which is a duplicate.
+> 
+> then what call the one when we do a cancel?  the one in cleanup also?
 
-(1) I've built Fedora RPMs from this patch set [approximately - I'm
-using a very slightly different / slightly older version, but it's not
-substantively different]:
-
-  http://copr-fe.cloud.fedoraproject.org/coprs/rjones/riscv/
-
-It works well for me building plenty of Fedora packages over the past
-few weeks, except for a possible Linux kernel bug which interacts with
-the patch set not handling EBREAK correctly, which I had to patch
-around (in the kernel):
-
-  https://groups.google.com/a/groups.riscv.org/forum/#!msg/sw-dev/v05FjcGC1EI/atXXUAcsCgAJ
-
-(2) I'm worried that this patch starts off using virtio-mmio instead
-of virtio-pci.  virtio-pci is better in every respect than
-virtio-mmio, and while it may be a good interim solution I think we
-need to have a plan to get rid of it eventually, and should make it
-clear that virtio-mmio is not a permanent ABI so we don't get into the
-same situation that we did with -M virt on ARM.
-
-(3) poweroff doesn't work if you use -M virt (and hence don't use
-HTIF).  I wrote a dummy poweroff device to get around this, but I
-think it could raise a bigger point: Why bother to support HTIF
-machine types at all?  The reason given in the patch set is because
-spike (the cycle-accurate RISC-V emulator) only supports HTIF but
-is that a good reason?
-
-Rich.
+Yes, IIUC migrate_fd_cancel() tells the thread to cancel, then the
+migrate_fd_cleanup() is called there (finally in the bottom half of
+main loop, of course).
 
 -- 
-Richard Jones, Virtualization Group, Red Hat http://people.redhat.com/~rjones
-Read my programming and virtualization blog: http://rwmj.wordpress.com
-virt-builder quickly builds VMs from scratch
-http://libguestfs.org/virt-builder.1.html
+Peter Xu
