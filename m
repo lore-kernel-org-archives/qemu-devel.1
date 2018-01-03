@@ -1,29 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55598)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58003)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <penguin-kernel@I-love.SAKURA.ne.jp>)
-	id 1eWgB9-0006vl-Md
-	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 05:21:48 -0500
+	(envelope-from <quintela@redhat.com>) id 1eWgFc-0000ib-2O
+	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 05:26:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <penguin-kernel@I-love.SAKURA.ne.jp>)
-	id 1eWgB6-0005Sj-Gx
-	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 05:21:47 -0500
-Received: from www262.sakura.ne.jp ([2001:e42:101:1:202:181:97:72]:39845)
+	(envelope-from <quintela@redhat.com>) id 1eWgFY-0007Tc-U2
+	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 05:26:24 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:33768)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <penguin-kernel@I-love.SAKURA.ne.jp>)
-	id 1eWgB6-0004R9-23
-	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 05:21:44 -0500
-From: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
-References: <201712241345.DIG21823.SLFOOJtQFOMVFH@I-love.SAKURA.ne.jp>
-	<5A3F5A4A.1070009@intel.com>
-	<20180102132419.GB8222@bombadil.infradead.org>
-	<201801031129.JFC18298.FJMHtOFLVSQOFO@I-love.SAKURA.ne.jp>
-	<5A4C9BAC.3040808@intel.com>
-In-Reply-To: <5A4C9BAC.3040808@intel.com>
-Message-Id: <201801031918.GGJ69207.JOFSHQLMFtVOFO@I-love.SAKURA.ne.jp>
-Date: Wed, 3 Jan 2018 19:19:00 +0900
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Subject: Re: [Qemu-devel] [PATCH v20 4/7] virtio-balloon: VIRTIO_BALLOON_F_SG
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1eWgFY-0007St-My
+	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 05:26:20 -0500
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id A1E0BC059B6B
+	for <qemu-devel@nongnu.org>; Wed,  3 Jan 2018 10:26:19 +0000 (UTC)
+From: Juan Quintela <quintela@redhat.com>
+In-Reply-To: <20180103092025.GF2557@xz-mi> (Peter Xu's message of "Wed, 3 Jan
+	2018 17:20:25 +0800")
+References: <20180103054043.25719-1-peterx@redhat.com>
+	<20180103054043.25719-6-peterx@redhat.com>
+	<87shbn2tz0.fsf@secure.laptop> <20180103092025.GF2557@xz-mi>
+Reply-To: quintela@redhat.com
+Date: Wed, 03 Jan 2018 11:26:12 +0100
+Message-ID: <87o9mb1bnf.fsf@secure.laptop>
+MIME-Version: 1.0
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH 05/11] migration: move vm_old_running into
+ global state
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,35 +36,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: wei.w.wang@intel.com, willy@infradead.org
-Cc: virtio-dev@lists.oasis-open.org, linux-kernel@vger.kernel.org, qemu-devel@nongnu.org, virtualization@lists.linux-foundation.org, kvm@vger.kernel.org, linux-mm@kvack.org, mst@redhat.com, mhocko@kernel.org, akpm@linux-foundation.org, mawilcox@microsoft.com, david@redhat.com, cornelia.huck@de.ibm.com, mgorman@techsingularity.net, aarcange@redhat.com, amit.shah@redhat.com, pbonzini@redhat.com, liliang.opensource@gmail.com, yang.zhang.wz@gmail.com, quan.xu0@gmail.com, nilal@redhat.com, riel@redhat.com
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 
-Wei Wang wrote:
-> On 01/03/2018 10:29 AM, Tetsuo Handa wrote:
-> > Matthew Wilcox wrote:
-> >> The radix tree convention is objectively awful, which is why I'm working
-> >> to change it.  Specifying the GFP flags at radix tree initialisation time
-> >> rather than allocation time leads to all kinds of confusion.  The preload
-> >> API is a pretty awful workaround, and it will go away once the XArray
-> >> is working correctly.  That said, there's no alternative to it without
-> >> making XBitmap depend on XArray, and I don't want to hold you up there.
-> >> So there's an xb_preload for the moment.
-> > I'm ready to propose cvbmp shown below as an alternative to xbitmap (but
-> > specialized for virtio-balloon case). Wei, can you do some benchmarking
-> > between xbitmap and cvbmp?
-> > ----------------------------------------
-> > cvbmp: clustered values bitmap
-> 
-> I don't think we need to replace xbitmap, at least at this stage. The 
-> new implementation doesn't look simpler at all, and virtio-balloon has 
-> worked well with xbitmap.
-> 
-> I would suggest you to send out the new implementation for discussion 
-> after this series ends, and justify with better performance results if 
-> you could get.
+Peter Xu <peterx@redhat.com> wrote:
+> On Wed, Jan 03, 2018 at 10:05:07AM +0100, Juan Quintela wrote:
+>> Peter Xu <peterx@redhat.com> wrote:
+>> > Firstly, it was passed around.  Let's just move it into MigrationState
+>> > just like many other variables as state of migration.
+>> >
+>> > One thing to mention is that for postcopy, we actually don't need this
+>> > knowledge at all since postcopy can't resume a VM even if it fails (we
+>> > can see that from the old code too: when we try to resume we also check
+>> > against "entered_postcopy" variable).  So further we do this:
+>> >
+>> > - in postcopy_start(), we don't update vm_old_running since useless
+>> > - in migration_thread(), we don't need to check entered_postcopy when
+>> >   resume, since it's only used for precopy.
+>> >
+>> > Comment this out too for that variable definition.
 
-I'm VMware Workstation Player user, and I don't have environment for doing
-performance test using virtio-balloon. Thus, I need to ask you.
+>> I think this comment is right for precopy, but not for colo.  BTW, I
+>> think that I would put the postcopy comment on its use, not here.
+>
+> Or, how about I just don't mention postcopy at all?
 
-Also, please look at
-http://lkml.kernel.org/r/1514904621-39186-1-git-send-email-penguin-kernel@I-love.SAKURA.ne.jp .
+Fully agree.
+>> 
+>> /me tries to improve the comment
+>> 
+>>   Guest was running when we enter the completion stage.  If migration don't
+>>   sucess, we need to continue running guest on source.
+>> 
+>> What do you think?
+>
+> I think it's generally good.  Maybe a tiny fix like:
+>
+>   s/Guest was/Whether guest was/
+
+ok.
+
+>   s/If migration don't sucess/If migration failed/
+
+We also use it in case of migration_cancel.  Cancel is not one error,
+that is why I wrote it that way.  What about:
+
+Whether guest was running when we enter the completion stage.  If
+migration is interrupted by any reason, we need to continue running the
+guest on source.
+
+What do you think?
+
+Later, Juan.
+
+
+> ?  Thanks,
