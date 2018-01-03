@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51620)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51684)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eWqXG-0002H8-MQ
-	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 16:25:19 -0500
+	id 1eWqXO-0002OA-Dl
+	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 16:25:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eWqXF-0007rt-HK
-	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 16:25:18 -0500
-Received: from mail-qk0-x243.google.com ([2607:f8b0:400d:c09::243]:33450)
+	id 1eWqXK-0007uS-1I
+	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 16:25:26 -0500
+Received: from mail-qk0-x244.google.com ([2607:f8b0:400d:c09::244]:33453)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eWqXF-0007ri-98
-	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 16:25:17 -0500
-Received: by mail-qk0-x243.google.com with SMTP id x7so3255544qkb.0
-	for <qemu-devel@nongnu.org>; Wed, 03 Jan 2018 13:25:17 -0800 (PST)
+	id 1eWqXJ-0007tx-Sw
+	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 16:25:21 -0500
+Received: by mail-qk0-x244.google.com with SMTP id x7so3255769qkb.0
+	for <qemu-devel@nongnu.org>; Wed, 03 Jan 2018 13:25:21 -0800 (PST)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Wed,  3 Jan 2018 18:24:18 -0300
-Message-Id: <20180103212436.15762-8-f4bug@amsat.org>
+Date: Wed,  3 Jan 2018 18:24:19 -0300
+Message-Id: <20180103212436.15762-9-f4bug@amsat.org>
 In-Reply-To: <20180103212436.15762-1-f4bug@amsat.org>
 References: <20180103212436.15762-1-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v2 07/25] sdcard: rename sd_set_$REG()
- functions called once as sd_reset_$REG()
+Subject: [Qemu-devel] [PATCH v2 08/25] sdcard: use the registerfields API to
+ access the OCR register
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,100 +37,74 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Alistair Francis <alistair.francis@xilinx.com>, Peter Maydell <peter.maydell@linaro.org>, Igor Mitsyanko <i.mitsyanko@gmail.com>, Andrew Baumann <Andrew.Baumann@microsoft.com>, Olbrich <m.olbrich@pengutronix.de>, Andrzej Zaborowski <balrogg@gmail.com>
 Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, Prasad J Pandit <pjp@fedoraproject.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Paul Brook <paul@codesourcery.com>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-All are only called once at reset.
-
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- hw/sd/sd.c | 31 ++++++++++++++++++-------------
- 1 file changed, 18 insertions(+), 13 deletions(-)
+ hw/sd/sd.c | 18 +++++++++++-------
+ 1 file changed, 11 insertions(+), 7 deletions(-)
 
 diff --git a/hw/sd/sd.c b/hw/sd/sd.c
-index b0e54f69d8..7d43ab072b 100644
+index 7d43ab072b..1f209b8199 100644
 --- a/hw/sd/sd.c
 +++ b/hw/sd/sd.c
-@@ -293,7 +293,7 @@ static uint16_t sd_crc16(void *message, size_t width)
+@@ -32,6 +32,7 @@
+ #include "qemu/osdep.h"
+ #include "hw/qdev.h"
+ #include "hw/hw.h"
++#include "hw/registerfields.h"
+ #include "sysemu/block-backend.h"
+ #include "hw/sd/sd.h"
+ #include "hw/sd/sdcard_legacy.h"
+@@ -53,8 +54,6 @@ do { fprintf(stderr, "SD: " fmt , ## __VA_ARGS__); } while (0)
+ #endif
+ 
+ #define ACMD41_ENQUIRY_MASK     0x00ffffff
+-#define OCR_POWER_UP            0x80000000
+-#define OCR_POWER_DELAY_NS      500000 /* 0.5ms */
+ 
+ #define SDCARD_CMD_MAX 64
+ 
+@@ -293,6 +292,10 @@ static uint16_t sd_crc16(void *message, size_t width)
      return shift_reg;
  }
  
--static void sd_set_ocr(SDState *sd)
-+static void sd_reset_ocr(SDState *sd)
++FIELD(OCR, CARD_POWER_UP,              31, 1);
++
++#define OCR_POWER_DELAY_NS      500000 /* 0.5ms */
++
+ static void sd_reset_ocr(SDState *sd)
  {
      /* All voltages OK, Standard Capacity SD Memory Card, not yet powered up */
-     sd->ocr = 0x00ffff00;
-@@ -308,7 +308,7 @@ static void sd_ocr_powerup(void *opaque)
-     sd->ocr |= OCR_POWER_UP;
- }
- 
--static void sd_set_scr(SDState *sd)
-+static void sd_reset_scr(SDState *sd)
+@@ -303,9 +306,10 @@ static void sd_ocr_powerup(void *opaque)
  {
-     sd->scr[0] = 0x00;		/* SCR Structure */
-     sd->scr[1] = 0x2f;		/* SD Security Support */
-@@ -327,7 +327,7 @@ static void sd_set_scr(SDState *sd)
- #define MDT_YR	2006
- #define MDT_MON	2
+     SDState *sd = opaque;
  
--static void sd_set_cid(SDState *sd)
-+static void sd_reset_cid(SDState *sd)
- {
-     sd->cid[0] = MID;		/* Fake card manufacturer ID (MID) */
-     sd->cid[1] = OID[0];	/* OEM/Application ID (OID) */
-@@ -359,7 +359,7 @@ static const uint8_t sd_csd_rw_mask[16] = {
-     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xfc, 0xfe,
- };
- 
--static void sd_set_csd(SDState *sd, uint64_t size)
-+static void sd_reset_csd(SDState *sd, uint64_t size)
- {
-     uint32_t csize = (size >> (CMULT_SHIFT + HWBLOCK_SHIFT)) - 1;
-     uint32_t sectsize = (1 << (SECTOR_SHIFT + 1)) - 1;
-@@ -414,6 +414,11 @@ static void sd_set_csd(SDState *sd, uint64_t size)
-     }
- }
- 
-+static void sd_reset_rca(SDState *sd)
-+{
-+    sd->rca = 0;
-+}
+-    /* Set powered up bit in OCR */
+-    assert(!(sd->ocr & OCR_POWER_UP));
+-    sd->ocr |= OCR_POWER_UP;
++    assert(!FIELD_EX32(sd->ocr, OCR, CARD_POWER_UP));
 +
- static void sd_set_rca(SDState *sd)
- {
-     sd->rca += 0x4567;
-@@ -428,12 +433,12 @@ static void sd_set_rca(SDState *sd)
- #define CARD_STATUS_B	0x00c01e00
- #define CARD_STATUS_C	0xfd39a028
- 
--static void sd_set_cardstatus(SDState *sd)
-+static void sd_reset_cardstatus(SDState *sd)
- {
-     sd->card_status = 0x00000100;
++    /* card power-up OK */
++    sd->ocr = FIELD_DP32(sd->ocr, OCR, CARD_POWER_UP, 1);
  }
  
--static void sd_set_sdstatus(SDState *sd)
-+static void sd_reset_sdstatus(SDState *sd)
- {
-     memset(sd->sd_status, 0, 64);
+ static void sd_reset_scr(SDState *sd)
+@@ -594,7 +598,7 @@ static bool sd_ocr_vmstate_needed(void *opaque)
+     SDState *sd = opaque;
+ 
+     /* Include the OCR state (and timer) if it is not yet powered up */
+-    return !(sd->ocr & OCR_POWER_UP);
++    return !FIELD_EX32(sd->ocr, OCR, CARD_POWER_UP);
  }
-@@ -517,13 +522,13 @@ static void sd_reset(DeviceState *dev)
-     sect = sd_addr_to_wpnum(size) + 1;
  
-     sd->state = sd_idle_state;
--    sd->rca = 0x0000;
--    sd_set_ocr(sd);
--    sd_set_scr(sd);
--    sd_set_cid(sd);
--    sd_set_csd(sd, size);
--    sd_set_cardstatus(sd);
--    sd_set_sdstatus(sd);
-+    sd_reset_rca(sd);
-+    sd_reset_ocr(sd);
-+    sd_reset_scr(sd);
-+    sd_reset_cid(sd);
-+    sd_reset_csd(sd, size);
-+    sd_reset_cardstatus(sd);
-+    sd_reset_sdstatus(sd);
- 
-     g_free(sd->wp_groups);
-     sd->wp_switch = sd->blk ? blk_is_read_only(sd->blk) : false;
+ static const VMStateDescription sd_ocr_vmstate = {
+@@ -1494,7 +1498,7 @@ static sd_rsp_type_t sd_app_command(SDState *sd,
+              * UEFI, which sends an initial enquiry ACMD41, but
+              * assumes that the card is in ready state as soon as it
+              * sees the power up bit set. */
+-            if (!(sd->ocr & OCR_POWER_UP)) {
++            if (!FIELD_EX32(sd->ocr, OCR, CARD_POWER_UP)) {
+                 if ((req.arg & ACMD41_ENQUIRY_MASK) != 0) {
+                     timer_del(sd->ocr_power_timer);
+                     sd_ocr_powerup(sd);
 -- 
 2.15.1
