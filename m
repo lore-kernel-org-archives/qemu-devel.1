@@ -1,32 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46716)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46916)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1eWesQ-0003rX-4b
-	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 03:58:23 -0500
+	(envelope-from <peterx@redhat.com>) id 1eWest-0004L8-LB
+	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 03:58:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1eWesM-0001bf-82
-	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 03:58:22 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:38848)
+	(envelope-from <peterx@redhat.com>) id 1eWesp-0001pI-Q0
+	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 03:58:51 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:36234)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1eWesL-0001bB-VR
-	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 03:58:18 -0500
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1eWesp-0001oz-Jm
+	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 03:58:47 -0500
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 0A944356DF
-	for <qemu-devel@nongnu.org>; Wed,  3 Jan 2018 08:58:17 +0000 (UTC)
-From: Juan Quintela <quintela@redhat.com>
-In-Reply-To: <20180103054043.25719-5-peterx@redhat.com> (Peter Xu's message of
-	"Wed, 3 Jan 2018 13:40:36 +0800")
+	by mx1.redhat.com (Postfix) with ESMTPS id B1F0AC00C905
+	for <qemu-devel@nongnu.org>; Wed,  3 Jan 2018 08:58:46 +0000 (UTC)
+Date: Wed, 3 Jan 2018 16:58:42 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20180103085842.GD2557@xz-mi>
 References: <20180103054043.25719-1-peterx@redhat.com>
-	<20180103054043.25719-5-peterx@redhat.com>
-Reply-To: quintela@redhat.com
-Date: Wed, 03 Jan 2018 09:58:10 +0100
-Message-ID: <87wp0z2ual.fsf@secure.laptop>
+	<20180103054043.25719-2-peterx@redhat.com>
+	<87a7xv49r7.fsf@secure.laptop>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH 04/11] migration: split use of
- MigrationState.total_time
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <87a7xv49r7.fsf@secure.laptop>
+Subject: Re: [Qemu-devel] [PATCH 01/11] migration: assert colo instead of
+ check
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,99 +35,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
+To: Juan Quintela <quintela@redhat.com>
 Cc: qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 
-Peter Xu <peterx@redhat.com> wrote:
-> It was used either to:
->
-> 1. store initial timestamp of migration start, and
-> 2. store total time used by last migration
->
-> Let's provide two parameters for each of them.  Mix use of the two is
-> slightly misleading.
->
-> Signed-off-by: Peter Xu <peterx@redhat.com>
+On Wed, Jan 03, 2018 at 09:38:52AM +0100, Juan Quintela wrote:
+> Peter Xu <peterx@redhat.com> wrote:
+> > When reaching here if we are still "active" it means we must be in colo
+> > state.  Assert it instead of check it in if condition.
+> 
+> I don't think so.
+> 
+> > Finally I want to use "switch" here rather than lots of complicated if
+> > clauses.
+> >
+> > Signed-off-by: Peter Xu <peterx@redhat.com>
+> > ---
+> >  migration/migration.c | 3 ++-
+> >  1 file changed, 2 insertions(+), 1 deletion(-)
+> >
+> > diff --git a/migration/migration.c b/migration/migration.c
+> > index 4de3b551fe..0ee4b4c27c 100644
+> > --- a/migration/migration.c
+> > +++ b/migration/migration.c
+> > @@ -2309,7 +2309,8 @@ static void *migration_thread(void *opaque)
+> >          }
+> >          runstate_set(RUN_STATE_POSTMIGRATE);
+> >      } else {
+> > -        if (s->state == MIGRATION_STATUS_ACTIVE && enable_colo) {
+> > +        if (s->state == MIGRATION_STATUS_ACTIVE) {
+> 
+> We want to run this code iff:
+> - we are in ACTIVE state
+> - we are using colo
+> 
+> We can be doing a normal migration, with colo compliled in, but not
+> enabled, no?
 
-Reviewed-by: Juan Quintela <quintela@redhat.com>
+If COLO is not enabled (even if it is compiled in), IMHO we won't
+reach this state.  Note that we have this in migration_completion():
 
-If you have to respin, I would like to use the names:
+    if (!migrate_colo_enabled()) {
+        migrate_set_state(&s->state, current_active_state,
+                          MIGRATION_STATUS_COMPLETED);
+    }
 
-start_time and total_time, i.e. without the mig_ preffix, because they
-are in an struct that is clearly named migration O:-)
+That's where we kept the ACTIVE state, and that should be the only
+place. And, this is exactly what this patch is going to do - I want to
+remove COLO hacks if possible.
 
-For the rest, good cleanup.
+Thanks,
 
-Later, Juan.
-
-
-> ---
->  migration/migration.c | 13 +++++++------
->  migration/migration.h |  5 ++++-
->  2 files changed, 11 insertions(+), 7 deletions(-)
->
-> diff --git a/migration/migration.c b/migration/migration.c
-> index 20f7565527..b684c2005d 100644
-> --- a/migration/migration.c
-> +++ b/migration/migration.c
-> @@ -613,7 +613,7 @@ MigrationInfo *qmp_query_migrate(Error **errp)
->          info->has_status = true;
->          info->has_total_time = true;
->          info->total_time = qemu_clock_get_ms(QEMU_CLOCK_REALTIME)
-> -            - s->total_time;
-> +            - s->mig_start_time;
->          info->has_expected_downtime = true;
->          info->expected_downtime = s->expected_downtime;
->          info->has_setup_time = true;
-> @@ -629,7 +629,7 @@ MigrationInfo *qmp_query_migrate(Error **errp)
->      case MIGRATION_STATUS_COMPLETED:
->          info->has_status = true;
->          info->has_total_time = true;
-> -        info->total_time = s->total_time;
-> +        info->total_time = s->mig_total_time;
->          info->has_downtime = true;
->          info->downtime = s->downtime;
->          info->has_setup_time = true;
-> @@ -1270,7 +1270,8 @@ MigrationState *migrate_init(void)
->  
->      migrate_set_state(&s->state, MIGRATION_STATUS_NONE, MIGRATION_STATUS_SETUP);
->  
-> -    s->total_time = qemu_clock_get_ms(QEMU_CLOCK_REALTIME);
-> +    s->mig_start_time = qemu_clock_get_ms(QEMU_CLOCK_REALTIME);
-> +    s->mig_total_time = 0;
->      return s;
->  }
->  
-> @@ -2293,13 +2294,13 @@ static void *migration_thread(void *opaque)
->      qemu_mutex_lock_iothread();
->      if (s->state == MIGRATION_STATUS_COMPLETED) {
->          uint64_t transferred_bytes = qemu_ftell(s->to_dst_file);
-> -        s->total_time = end_time - s->total_time;
-> +        s->mig_total_time = end_time - s->mig_start_time;
->          if (!entered_postcopy) {
->              s->downtime = end_time - start_time;
->          }
-> -        if (s->total_time) {
-> +        if (s->mig_total_time) {
->              s->mbps = (((double) transferred_bytes * 8.0) /
-> -                       ((double) s->total_time)) / 1000;
-> +                       ((double) s->mig_total_time)) / 1000;
->          }
->          runstate_set(RUN_STATE_POSTMIGRATE);
->      } else {
-> diff --git a/migration/migration.h b/migration/migration.h
-> index 663415fe48..ac74a12713 100644
-> --- a/migration/migration.h
-> +++ b/migration/migration.h
-> @@ -103,7 +103,10 @@ struct MigrationState
->      } rp_state;
->  
->      double mbps;
-> -    int64_t total_time;
-> +    /* Timestamp when recent migration starts (ms) */
-> +    int64_t mig_start_time;
-> +    /* Total time used by latest migration (ms) */
-> +    int64_t mig_total_time;
->      int64_t downtime;
->      int64_t expected_downtime;
->      bool enabled_capabilities[MIGRATION_CAPABILITY__MAX];
+-- 
+Peter Xu
