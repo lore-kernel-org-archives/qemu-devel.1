@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33413)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33479)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1eWabb-0001BR-Gs
+	(envelope-from <dgibson@ozlabs.org>) id 1eWabd-0001Da-6V
 	for qemu-devel@nongnu.org; Tue, 02 Jan 2018 23:24:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1eWabZ-0001xW-9E
-	for qemu-devel@nongnu.org; Tue, 02 Jan 2018 23:24:43 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1eWabb-0001zz-5d
+	for qemu-devel@nongnu.org; Tue, 02 Jan 2018 23:24:45 -0500
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Wed,  3 Jan 2018 15:24:13 +1100
-Message-Id: <20180103042419.14520-10-david@gibson.dropbear.id.au>
+Date: Wed,  3 Jan 2018 15:24:17 +1100
+Message-Id: <20180103042419.14520-14-david@gibson.dropbear.id.au>
 In-Reply-To: <20180103042419.14520-1-david@gibson.dropbear.id.au>
 References: <20180103042419.14520-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PULL 09/15] spapr: Validate capabilities on migration
+Subject: [Qemu-devel] [PULL 13/15] spapr_pci: use warn_report()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,217 +22,46 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: peter.maydell@linaro.org
 Cc: groug@kaod.org, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, lvivier@redhat.com, David Gibson <david@gibson.dropbear.id.au>
 
-Now that the "pseries" machine type implements optional capabilities (well,
-one so far) there's the possibility of having different capabilities
-available at either end of a migration.  Although arguably a user error,
-it would be nice to catch this situation and fail as gracefully as we can.
+From: Greg Kurz <groug@kaod.org>
 
-This adds code to migrate the capabilities flags.  These aren't pulled
-directly into the destination's configuration since what the user has
-specified on the destination command line should take precedence.  However,
-they are checked against the destination capabilities.
+These two are definitely warnings. Let's use the appropriate API.
 
-If the source was using a capability which is absent on the destination,
-we fail the migration, since that could easily cause a guest crash or other
-bad behaviour.  If the source lacked a capability which is present on the
-destination we warn, but allow the migration to proceed.
-
+Signed-off-by: Greg Kurz <groug@kaod.org>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-Reviewed-by: Greg Kurz <groug@kaod.org>
 ---
- hw/ppc/spapr.c         |  6 ++++
- hw/ppc/spapr_caps.c    | 96 ++++++++++++++++++++++++++++++++++++++++++++++++--
- include/hw/ppc/spapr.h |  6 ++++
- 3 files changed, 105 insertions(+), 3 deletions(-)
+ hw/ppc/spapr_pci.c      | 6 +++---
+ hw/ppc/spapr_pci_vfio.c | 2 +-
+ 2 files changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index f8fee8ebcf..86fc83f9c2 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -1589,6 +1589,11 @@ static int spapr_post_load(void *opaque, int version_id)
-     sPAPRMachineState *spapr = (sPAPRMachineState *)opaque;
-     int err = 0;
- 
-+    err = spapr_caps_post_migration(spapr);
-+    if (err) {
-+        return err;
-+    }
-+
-     if (!object_dynamic_cast(OBJECT(spapr->ics), TYPE_ICS_KVM)) {
-         CPUState *cs;
-         CPU_FOREACH(cs) {
-@@ -1755,6 +1760,7 @@ static const VMStateDescription vmstate_spapr = {
-         &vmstate_spapr_ov5_cas,
-         &vmstate_spapr_patb_entry,
-         &vmstate_spapr_pending_events,
-+        &vmstate_spapr_caps,
-         NULL
+diff --git a/hw/ppc/spapr_pci.c b/hw/ppc/spapr_pci.c
+index 88797b3d36..695c820911 100644
+--- a/hw/ppc/spapr_pci.c
++++ b/hw/ppc/spapr_pci.c
+@@ -1696,9 +1696,9 @@ static void spapr_phb_realize(DeviceState *dev, Error **errp)
+     /* DMA setup */
+     if (((sphb->page_size_mask & qemu_getrampagesize()) == 0)
+         && kvm_enabled()) {
+-        error_report("System page size 0x%lx is not enabled in page_size_mask "
+-                     "(0x%"PRIx64"). Performance may be slow",
+-                     qemu_getrampagesize(), sphb->page_size_mask);
++        warn_report("System page size 0x%lx is not enabled in page_size_mask "
++                    "(0x%"PRIx64"). Performance may be slow",
++                    qemu_getrampagesize(), sphb->page_size_mask);
      }
- };
-diff --git a/hw/ppc/spapr_caps.c b/hw/ppc/spapr_caps.c
-index 3b35b91a5b..cad40fe49a 100644
---- a/hw/ppc/spapr_caps.c
-+++ b/hw/ppc/spapr_caps.c
-@@ -22,6 +22,7 @@
-  * THE SOFTWARE.
-  */
- #include "qemu/osdep.h"
-+#include "qemu/error-report.h"
- #include "qapi/error.h"
- #include "qapi/visitor.h"
- #include "sysemu/hw_accel.h"
-@@ -83,6 +84,93 @@ static sPAPRCapabilities default_caps_with_cpu(sPAPRMachineState *spapr,
-     return caps;
+ 
+     for (i = 0; i < windows_supported; ++i) {
+diff --git a/hw/ppc/spapr_pci_vfio.c b/hw/ppc/spapr_pci_vfio.c
+index 8448e0b024..1f775ea93d 100644
+--- a/hw/ppc/spapr_pci_vfio.c
++++ b/hw/ppc/spapr_pci_vfio.c
+@@ -50,7 +50,7 @@ static Property spapr_phb_vfio_properties[] = {
+ static void spapr_phb_vfio_instance_init(Object *obj)
+ {
+     if (!qtest_enabled()) {
+-        error_report("spapr-pci-vfio-host-bridge is deprecated");
++        warn_report("spapr-pci-vfio-host-bridge is deprecated");
+     }
  }
  
-+static bool spapr_caps_needed(void *opaque)
-+{
-+    sPAPRMachineState *spapr = opaque;
-+
-+    return (spapr->forced_caps.mask != 0) || (spapr->forbidden_caps.mask != 0);
-+}
-+
-+/* This has to be called from the top-level spapr post_load, not the
-+ * caps specific one.  Otherwise it wouldn't be called when the source
-+ * caps are all defaults, which could still conflict with overridden
-+ * caps on the destination */
-+int spapr_caps_post_migration(sPAPRMachineState *spapr)
-+{
-+    uint64_t allcaps = 0;
-+    int i;
-+    bool ok = true;
-+    sPAPRCapabilities dstcaps = spapr->effective_caps;
-+    sPAPRCapabilities srccaps;
-+
-+    srccaps = default_caps_with_cpu(spapr, first_cpu);
-+    srccaps.mask |= spapr->mig_forced_caps.mask;
-+    srccaps.mask &= ~spapr->mig_forbidden_caps.mask;
-+
-+    for (i = 0; i < ARRAY_SIZE(capability_table); i++) {
-+        sPAPRCapabilityInfo *info = &capability_table[i];
-+
-+        allcaps |= info->flag;
-+
-+        if ((srccaps.mask & info->flag) && !(dstcaps.mask & info->flag)) {
-+            error_report("cap-%s=on in incoming stream, but off in destination",
-+                         info->name);
-+            ok = false;
-+        }
-+
-+        if (!(srccaps.mask & info->flag) && (dstcaps.mask & info->flag)) {
-+            warn_report("cap-%s=off in incoming stream, but on in destination",
-+                         info->name);
-+        }
-+    }
-+
-+    if (spapr->mig_forced_caps.mask & ~allcaps) {
-+        error_report(
-+            "Unknown capabilities 0x%"PRIx64" enabled in incoming stream",
-+            spapr->mig_forced_caps.mask & ~allcaps);
-+        ok = false;
-+    }
-+    if (spapr->mig_forbidden_caps.mask & ~allcaps) {
-+        warn_report(
-+            "Unknown capabilities 0x%"PRIx64" disabled in incoming stream",
-+            spapr->mig_forbidden_caps.mask & ~allcaps);
-+    }
-+
-+    return ok ? 0 : -EINVAL;
-+}
-+
-+static int spapr_caps_pre_save(void *opaque)
-+{
-+    sPAPRMachineState *spapr = opaque;
-+
-+    spapr->mig_forced_caps = spapr->forced_caps;
-+    spapr->mig_forbidden_caps = spapr->forbidden_caps;
-+    return 0;
-+}
-+
-+static int spapr_caps_pre_load(void *opaque)
-+{
-+    sPAPRMachineState *spapr = opaque;
-+
-+    spapr->mig_forced_caps = spapr_caps(0);
-+    spapr->mig_forbidden_caps = spapr_caps(0);
-+    return 0;
-+}
-+
-+const VMStateDescription vmstate_spapr_caps = {
-+    .name = "spapr/caps",
-+    .version_id = 1,
-+    .minimum_version_id = 1,
-+    .needed = spapr_caps_needed,
-+    .pre_save = spapr_caps_pre_save,
-+    .pre_load = spapr_caps_pre_load,
-+    .fields = (VMStateField[]) {
-+        VMSTATE_UINT64(mig_forced_caps.mask, sPAPRMachineState),
-+        VMSTATE_UINT64(mig_forbidden_caps.mask, sPAPRMachineState),
-+        VMSTATE_END_OF_LIST()
-+    },
-+};
-+
- void spapr_caps_reset(sPAPRMachineState *spapr)
- {
-     Error *local_err = NULL;
-@@ -92,6 +180,11 @@ void spapr_caps_reset(sPAPRMachineState *spapr)
-     /* First compute the actual set of caps we're running with.. */
-     caps = default_caps_with_cpu(spapr, first_cpu);
- 
-+    /* Remove unnecessary forced/forbidden bits (this will help us
-+     * with migration) */
-+    spapr->forced_caps.mask &= ~caps.mask;
-+    spapr->forbidden_caps.mask &= caps.mask;
-+
-     caps.mask |= spapr->forced_caps.mask;
-     caps.mask &= ~spapr->forbidden_caps.mask;
- 
-@@ -175,9 +268,6 @@ void spapr_caps_validate(sPAPRMachineState *spapr, Error **errp)
-         error_setg(errp, "Some sPAPR capabilities set both on and off");
-         return;
-     }
--
--    /* Check for any caps incompatible with other caps.  Nothing to do
--     * yet */
- }
- 
- void spapr_caps_add_properties(sPAPRMachineClass *smc, Error **errp)
-diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-index dc64f4ebcb..5c85f39c3b 100644
---- a/include/hw/ppc/spapr.h
-+++ b/include/hw/ppc/spapr.h
-@@ -54,6 +54,8 @@ typedef enum {
-  * Capabilities
-  */
- 
-+/* These bits go in the migration stream, so they can't be reassigned */
-+
- /* Hardware Transactional Memory */
- #define SPAPR_CAP_HTM               0x0000000000000001ULL
- 
-@@ -142,6 +144,7 @@ struct sPAPRMachineState {
-     const char *icp_type;
- 
-     sPAPRCapabilities forced_caps, forbidden_caps;
-+    sPAPRCapabilities mig_forced_caps, mig_forbidden_caps;
-     sPAPRCapabilities effective_caps;
- };
- 
-@@ -743,6 +746,8 @@ qemu_irq spapr_qirq(sPAPRMachineState *spapr, int irq);
- /*
-  * Handling of optional capabilities
-  */
-+extern const VMStateDescription vmstate_spapr_caps;
-+
- static inline sPAPRCapabilities spapr_caps(uint64_t mask)
- {
-     sPAPRCapabilities caps = { mask };
-@@ -757,5 +762,6 @@ static inline bool spapr_has_cap(sPAPRMachineState *spapr, uint64_t cap)
- void spapr_caps_reset(sPAPRMachineState *spapr);
- void spapr_caps_validate(sPAPRMachineState *spapr, Error **errp);
- void spapr_caps_add_properties(sPAPRMachineClass *smc, Error **errp);
-+int spapr_caps_post_migration(sPAPRMachineState *spapr);
- 
- #endif /* HW_SPAPR_H */
 -- 
 2.14.3
