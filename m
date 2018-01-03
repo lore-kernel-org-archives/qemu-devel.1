@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43995)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45156)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <haozhong.zhang@intel.com>) id 1eWYQB-0008KO-4f
-	for qemu-devel@nongnu.org; Tue, 02 Jan 2018 21:04:48 -0500
+	(envelope-from <peterx@redhat.com>) id 1eWYSJ-0001SN-Ii
+	for qemu-devel@nongnu.org; Tue, 02 Jan 2018 21:07:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <haozhong.zhang@intel.com>) id 1eWYQ7-0006GZ-7F
-	for qemu-devel@nongnu.org; Tue, 02 Jan 2018 21:04:47 -0500
-Received: from mga01.intel.com ([192.55.52.88]:54020)
+	(envelope-from <peterx@redhat.com>) id 1eWYSF-0007Kb-HO
+	for qemu-devel@nongnu.org; Tue, 02 Jan 2018 21:06:59 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:41860)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <haozhong.zhang@intel.com>)
-	id 1eWYQ6-0006FQ-Rx
-	for qemu-devel@nongnu.org; Tue, 02 Jan 2018 21:04:43 -0500
-Date: Wed, 3 Jan 2018 10:04:58 +0800
-From: Haozhong Zhang <haozhong.zhang@intel.com>
-Message-ID: <20180103020458.gdnvfqhc24m4x2ez@hz-desktop>
-References: <20171225010611.32621-1-haozhong.zhang@intel.com>
-	<20171225010611.32621-2-haozhong.zhang@intel.com>
-	<20171231175434-mutt-send-email-mst@kernel.org>
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1eWYSF-0007Jf-8H
+	for qemu-devel@nongnu.org; Tue, 02 Jan 2018 21:06:55 -0500
+Date: Wed, 3 Jan 2018 10:06:46 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20180103020646.GA2557@xz-mi>
+References: <20171228072945.9573-1-peterx@redhat.com>
+	<20171228072945.9573-4-peterx@redhat.com>
+	<CAJ+F1CKQrtdm69Tgk-52ZXL6Ze3vH-bYG65Y7fsuhSMKX5Osrw@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20171231175434-mutt-send-email-mst@kernel.org>
-Subject: Re: [Qemu-devel] [PATCH 1/2] util/pmem: add function to make writes
- to pmem persistent
+In-Reply-To: <CAJ+F1CKQrtdm69Tgk-52ZXL6Ze3vH-bYG65Y7fsuhSMKX5Osrw@mail.gmail.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 3/3] chardev: introduce
+ qemu_chr_timeout_add() and use
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,218 +30,171 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: qemu-devel@nongnu.org, Igor Mammedov <imammedo@redhat.com>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, Stefan Hajnoczi <stefanha@gmail.com>, Dan Williams <dan.j.williams@intel.com>
+To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@gmail.com>
+Cc: QEMU <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
-On 12/31/17 17:55 +0200, Michael S. Tsirkin wrote:
-> On Mon, Dec 25, 2017 at 09:06:10AM +0800, Haozhong Zhang wrote:
-> > The new function pmem_persistent() flushes the previous cached writes
-> > on the specified memory buffer, which ensures the write persistence if
-> > the buffer is in persistent memory.
-> > 
-> > Signed-off-by: Haozhong Zhang <haozhong.zhang@intel.com>
+On Tue, Jan 02, 2018 at 05:10:01PM +0100, Marc-Andr=C3=A9 Lureau wrote:
+> Hi
+>=20
+> On Thu, Dec 28, 2017 at 8:29 AM, Peter Xu <peterx@redhat.com> wrote:
+> > It's a replacement of g_timeout_add[_seconds]() for chardevs.  Charde=
+vs
+> > now can have dedicated gcontext, we should always bind chardev tasks
+> > onto those gcontext rather than the default main context.  Since ther=
+e
+> > are quite a few of g_timeout_add[_seconds]() callers, a new function
+> > qemu_chr_timeout_add() is introduced.
+> >
+> > One thing to mention is that, terminal3270 is still always running on
+> > main gcontext.  However let's convert that as well since it's still p=
+art
+> > of chardev codes and in case one day we'll miss that when we move it =
+out
+> > of main gcontext too.
+> >
+> > Signed-off-by: Peter Xu <peterx@redhat.com>
 > > ---
-> >  include/qemu/pmem.h |  25 ++++++++++
-> >  util/Makefile.objs  |   1 +
-> >  util/pmem.c         | 132 ++++++++++++++++++++++++++++++++++++++++++++++++++++
-> >  3 files changed, 158 insertions(+)
-> >  create mode 100644 include/qemu/pmem.h
-> >  create mode 100644 util/pmem.c
-> > 
-> > diff --git a/include/qemu/pmem.h b/include/qemu/pmem.h
-> > new file mode 100644
-> > index 0000000000..6593ae1d5c
-> > --- /dev/null
-> > +++ b/include/qemu/pmem.h
-> > @@ -0,0 +1,25 @@
+> >  chardev/char-pty.c     |  9 ++-------
+> >  chardev/char-socket.c  |  4 ++--
+> >  chardev/char.c         | 20 ++++++++++++++++++++
+> >  hw/char/terminal3270.c |  7 ++++---
+> >  include/chardev/char.h |  2 ++
+> >  5 files changed, 30 insertions(+), 12 deletions(-)
+> >
+> > diff --git a/chardev/char-pty.c b/chardev/char-pty.c
+> > index dd17b1b823..cbd8ac5eb7 100644
+> > --- a/chardev/char-pty.c
+> > +++ b/chardev/char-pty.c
+> > @@ -78,13 +78,8 @@ static void pty_chr_rearm_timer(Chardev *chr, int =
+ms)
+> >          s->timer_tag =3D 0;
+> >      }
+> >
+> > -    if (ms =3D=3D 1000) {
+> > -        name =3D g_strdup_printf("pty-timer-secs-%s", chr->label);
+> > -        s->timer_tag =3D g_timeout_add_seconds(1, pty_chr_timer, chr=
+);
+> > -    } else {
+> > -        name =3D g_strdup_printf("pty-timer-ms-%s", chr->label);
+> > -        s->timer_tag =3D g_timeout_add(ms, pty_chr_timer, chr);
+> > -    }
+> > +    name =3D g_strdup_printf("pty-timer-ms-%s", chr->label);
+> > +    s->timer_tag =3D qemu_chr_timeout_add(chr, ms, pty_chr_timer, ch=
+r);
+> >      g_source_set_name_by_id(s->timer_tag, name);
+> >      g_free(name);
+> >  }
+> > diff --git a/chardev/char-socket.c b/chardev/char-socket.c
+> > index 630a7f2995..644a620599 100644
+> > --- a/chardev/char-socket.c
+> > +++ b/chardev/char-socket.c
+> > @@ -73,8 +73,8 @@ static void qemu_chr_socket_restart_timer(Chardev *=
+chr)
+> >      char *name;
+> >
+> >      assert(s->connected =3D=3D 0);
+> > -    s->reconnect_timer =3D g_timeout_add_seconds(s->reconnect_time,
+> > -                                               socket_reconnect_time=
+out, chr);
+> > +    s->reconnect_timer =3D qemu_chr_timeout_add(chr, s->reconnect_ti=
+me,
+>=20
+> reconnect_time is in second, you should * 1000.
+
+Yes.  Will fix them all.
+
+>=20
+> > +                                              socket_reconnect_timeo=
+ut, chr);
+> >      name =3D g_strdup_printf("chardev-socket-reconnect-%s", chr->lab=
+el);
+> >      g_source_set_name_by_id(s->reconnect_timer, name);
+> >      g_free(name);
+> > diff --git a/chardev/char.c b/chardev/char.c
+> > index 8c3765ee99..a1de662fec 100644
+> > --- a/chardev/char.c
+> > +++ b/chardev/char.c
+> > @@ -1084,6 +1084,26 @@ void qmp_chardev_send_break(const char *id, Er=
+ror **errp)
+> >      qemu_chr_be_event(chr, CHR_EVENT_BREAK);
+> >  }
+> >
 > > +/*
-> > + * Helper functions to operate on persistent memory.
-> > + *
-> > + * Copyright (c) 2017 Intel Corporation.
-> > + *
-> > + * Author: Haozhong Zhang <haozhong.zhang@intel.com>
-> > + *
-> > + * This work is licensed under the terms of the GNU GPL, version 2 or later.
-> > + * See the COPYING file in the top-level directory.
+> > + * Add a timeout callback for the chardev (in milliseconds). Please
+> > + * use this to add timeout hook for chardev instead of g_timeout_add=
+()
+> > + * and g_timeout_add_seconds(), to make sure the gcontext that the
+> > + * task bound to is correct.
 > > + */
-> > +
-> > +#ifndef QEMU_PMEM_H
-> > +#define QEMU_PMEM_H
-> > +
-> > +/**
-> > + * Flush previous cached writes to the specified memory buffer. If the
-> > + * buffer is in persistent memory, this function will ensure the write
-> > + * persistence.
-> > + *
-> > + * @p: the pointer to the memory buffer
-> > + * @len: the length in bytes of the memory buffer
-> > + */
-> > +void pmem_persistent(void *p, unsigned long len);
-> > +
-> > +#endif /* QEMU_PMEM_H */
-> > diff --git a/util/Makefile.objs b/util/Makefile.objs
-> > index 2973b0a323..2614a84a9e 100644
-> > --- a/util/Makefile.objs
-> > +++ b/util/Makefile.objs
-> > @@ -41,6 +41,7 @@ util-obj-y += timed-average.o
-> >  util-obj-y += base64.o
-> >  util-obj-y += log.o
-> >  util-obj-y += pagesize.o
-> > +util-obj-y += pmem.o
-> >  util-obj-y += qdist.o
-> >  util-obj-y += qht.o
-> >  util-obj-y += range.o
-> > diff --git a/util/pmem.c b/util/pmem.c
-> > new file mode 100644
-> > index 0000000000..44be1dde58
-> > --- /dev/null
-> > +++ b/util/pmem.c
-> > @@ -0,0 +1,132 @@
-> > +/*
-> > + * Helper functions to operate on persistent memory.
-> > + *
-> > + * Copyright (c) 2017 Intel Corporation.
-> > + *
-> > + * Author: Haozhong Zhang <haozhong.zhang@intel.com>
-> > + *
-> > + * This work is licensed under the terms of the GNU GPL, version 2 or later.
-> > + * See the COPYING file in the top-level directory.
-> > + */
-> > +
-> > +#include "qemu/osdep.h"
-> > +#include "qemu-common.h"
-> > +#include "qemu/pmem.h"
-> > +
-> > +static size_t cache_line_size;
-> > +
-> > +typedef void (*cache_flush_func_t)(void *p);
-> > +typedef void (*store_fence_func_t)(void);
-> > +
-> > +static cache_flush_func_t cache_flush_func;
-> > +static store_fence_func_t store_fence_func;
-> > +
-> > +#if defined(__x86_64__) || defined(__i386__)
-> > +
-> > +#define CPUID_1_0_EBX_CLSIZE_MASK   0x0000ff00
-> > +#define CPUID_1_0_EBX_CLSIZE_SHIFT  8
-> > +#define CPUID_1_0_EDX_CLFLUSH       (1U << 19)
-> > +#define CPUID_7_0_EBX_CLFLUSHOPT    (1U << 23)
-> > +#define CPUID_7_0_EBX_CLWB          (1U << 24)
-> > +
-> > +static inline void cpuid(uint32_t function, uint32_t count,
-> > +                         uint32_t *eax, uint32_t *ebx,
-> > +                         uint32_t *ecx, uint32_t *edx)
+> > +guint qemu_chr_timeout_add(Chardev *chr, guint ms, GSourceFunc func,
+> > +                           void *private)
 > > +{
-> > +    uint32_t vec[4];
+> > +    GSource *source =3D g_timeout_source_new(ms);
+> > +    guint id;
 > > +
-> > +#ifdef __x86_64__
-> > +    asm volatile("cpuid"
-> > +                 : "=a"(vec[0]), "=b"(vec[1]),
-> > +                   "=c"(vec[2]), "=d"(vec[3])
-> > +                 : "0"(function), "c"(count) : "cc");
-> > +#else
-> > +    asm volatile("pusha\n\t"
-> > +                 "cpuid\n\t"
-> > +                 "mov %%eax, 0(%2)\n\t"
-> > +                 "mov %%ebx, 4(%2)\n\t"
-> > +                 "mov %%ecx, 8(%2)\n\t"
-> > +                 "mov %%edx, 12(%2)\n\t"
-> > +                 "popa"
-> > +                 : : "a"(function), "c"(count), "S"(vec)
-> > +                 : "memory", "cc");
-> > +#endif
+> > +    assert(func);
+> > +    g_source_set_callback(source, func, private, NULL);
+> > +    id =3D g_source_attach(source, chr->gcontext);
+> > +    g_source_unref(source);
 > > +
-> > +    if (eax) {
-> > +        *eax = vec[0];
-> > +    }
-> > +    if (ebx) {
-> > +        *ebx = vec[1];
-> > +    }
-> > +    if (ecx) {
-> > +        *ecx = vec[2];
-> > +    }
-> > +    if (edx) {
-> > +        *edx = vec[3];
-> > +    }
+> > +    return id;
 > > +}
 > > +
-> > +static void clflush(void *p)
-> > +{
-> > +    asm volatile("clflush %0" : "+m" (*(volatile char *)p));
-> > +}
-> > +
-> > +static void clflushopt(void *p)
-> > +{
-> > +    asm volatile(".byte 0x66; clflush %0" : "+m" (*(volatile char *)p));
-> > +}
-> > +
-> > +static void clwb(void *p)
-> > +{
-> > +    asm volatile(".byte 0x66; xsaveopt %0" : "+m" (*(volatile char *)p));
-> > +}
-> > +
-> > +static void sfence(void)
-> > +{
-> > +    asm volatile("sfence" : : : "memory");
-> > +}
-> > +
-> > +static void __attribute__((constructor)) init_funcs(void)
-> > +{
-> > +    uint32_t ebx, edx;
-> > +
-> > +    cpuid(0x1, 0x0, NULL, &ebx, NULL, &edx);
-> > +
-> > +    cache_line_size = ((ebx & CPUID_1_0_EBX_CLSIZE_MASK) >>
-> > +                       CPUID_1_0_EBX_CLSIZE_SHIFT) * 8;
-> > +    assert(cache_line_size && !(cache_line_size & (cache_line_size - 1)));
-> > +
-> > +    cpuid(0x7, 0x0, NULL, &ebx, NULL, NULL);
-> > +    if (ebx & CPUID_7_0_EBX_CLWB) {
-> > +        cache_flush_func = clwb;
-> > +    } else if (ebx & CPUID_7_0_EBX_CLFLUSHOPT) {
-> > +        cache_flush_func = clflushopt;
-> > +    } else {
-> > +        if (edx & CPUID_1_0_EDX_CLFLUSH) {
-> > +            cache_flush_func = clflush;
-> > +        }
-> > +    }
-> > +
-> > +    store_fence_func = sfence;
-> > +}
-> > +
-> > +#endif /* __x86_64__ || __i386__ */
-> > +
-> > +void pmem_persistent(void *p, unsigned long len)
-> > +{
-> > +    uintptr_t s, e;
-> > +
-> > +    if (!cache_flush_func || !store_fence_func) {
-> > +        return;
-> > +    }
-> > +
-> > +    s = (uintptr_t)p & ~(cache_line_size - 1);
-> > +    e = (uintptr_t)p + len;
-> > +
-> > +    while (s < e) {
-> > +        cache_flush_func((void *)s);
-> > +        s +=  cache_line_size;
-> > +    }
-> > +
-> > +    store_fence_func();
-> > +}
-> 
-> 
-> Shouldn't something be done for non x86 platforms?
+> >  void qemu_chr_cleanup(void)
+> >  {
+> >      object_unparent(get_chardevs_root());
+> > diff --git a/hw/char/terminal3270.c b/hw/char/terminal3270.c
+> > index a109ce5987..479e4554d6 100644
+> > --- a/hw/char/terminal3270.c
+> > +++ b/hw/char/terminal3270.c
+> > @@ -94,8 +94,8 @@ static void terminal_read(void *opaque, const uint8=
+_t *buf, int size)
+> >          g_source_remove(t->timer_tag);
+> >          t->timer_tag =3D 0;
+> >      }
+> > -    t->timer_tag =3D g_timeout_add_seconds(600, send_timing_mark_cb,=
+ t);
+> > -
+> > +    t->timer_tag =3D qemu_chr_timeout_add(t->chr.chr, 600,
+>=20
+> same here
+>=20
+> > +                                        send_timing_mark_cb, t);
+> >      memcpy(&t->inv[t->in_len], buf, size);
+> >      t->in_len +=3D size;
+> >      if (t->in_len < 2) {
+> > @@ -157,7 +157,8 @@ static void chr_event(void *opaque, int event)
+> >           * char-socket.c. Once qemu receives the terminal-type of th=
+e
+> >           * client, mark handshake done and trigger everything rollin=
+g again.
+> >           */
+> > -        t->timer_tag =3D g_timeout_add_seconds(600, send_timing_mark=
+_cb, t);
+> > +        t->timer_tag =3D qemu_chr_timeout_add(t->chr.chr, 600,
+>=20
+> and again
+>=20
+> > +                                            send_timing_mark_cb, t);
+> >          break;
+> >      case CHR_EVENT_CLOSED:
+> >          sch->curr_status.scsw.dstat =3D SCSW_DSTAT_DEVICE_END;
+> > diff --git a/include/chardev/char.h b/include/chardev/char.h
+> > index 778d610295..4970e46457 100644
+> > --- a/include/chardev/char.h
+> > +++ b/include/chardev/char.h
+> > @@ -258,5 +258,7 @@ extern int term_escape_char;
+> >
+> >  /* console.c */
+> >  void qemu_chr_parse_vc(QemuOpts *opts, ChardevBackend *backend, Erro=
+r **errp);
+> > +guint qemu_chr_timeout_add(Chardev *chr, guint ms, GSourceFunc func,
+> > +                           void *private);
+> >
+>=20
+> Please put the declaration before the /* console.c */ comment.
 
-This patch basically follows what pmdk [1] does. Recently there is an
-initial AARCH64 port to pmdk [2]. I can add those instruction changes
-to this patch series as well.
+Sure.  Thanks for review.
 
-For other platforms, pmem_persistent() currently does nothing, and we
-can add their support later when it's clear what changes are needed.
-
-[1] Formerly known as nvml, http://pmem.io/pmdk/
-[2] https://github.com/vvenkates27/nvml/commit/aeabe1d4bf9fc88c2b645d45ebce3de969e13a31
-
-
-Haozhong
+--=20
+Peter Xu
