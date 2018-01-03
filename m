@@ -1,33 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58142)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59326)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1eWgFs-0000qw-NV
-	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 05:26:41 -0500
+	(envelope-from <marcel@redhat.com>) id 1eWgIY-0002Kx-5N
+	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 05:29:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1eWgFp-0007du-In
-	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 05:26:40 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:42474)
+	(envelope-from <marcel@redhat.com>) id 1eWgIW-0001JF-UV
+	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 05:29:26 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:44978)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1eWgFp-0007d1-CY
-	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 05:26:37 -0500
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 9A23076A06
-	for <qemu-devel@nongnu.org>; Wed,  3 Jan 2018 10:26:36 +0000 (UTC)
-Date: Wed, 3 Jan 2018 18:26:32 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20180103102632.GJ2557@xz-mi>
-References: <20180103054043.25719-1-peterx@redhat.com>
-	<20180103054043.25719-3-peterx@redhat.com>
-	<87efn72the.fsf@secure.laptop> <20180103093619.GH2557@xz-mi>
-	<87shbn1bv8.fsf@secure.laptop>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <87shbn1bv8.fsf@secure.laptop>
-Subject: Re: [Qemu-devel] [PATCH 02/11] migration:
- qemu_savevm_state_cleanup() in cleanup
+	(Exim 4.71) (envelope-from <marcel@redhat.com>) id 1eWgIW-0001Iz-OT
+	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 05:29:24 -0500
+From: Marcel Apfelbaum <marcel@redhat.com>
+Date: Wed,  3 Jan 2018 12:29:07 +0200
+Message-Id: <20180103102911.35562-2-marcel@redhat.com>
+In-Reply-To: <20180103102911.35562-1-marcel@redhat.com>
+References: <20180103102911.35562-1-marcel@redhat.com>
+Subject: [Qemu-devel] [PATCH V3 1/5] pci/shpc: Move function to generic
+ header file
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,53 +24,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Juan Quintela <quintela@redhat.com>
-Cc: qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: yuval.shaia@oracle.com, marcel@redhat.com, mst@redhat.com, ehabkost@redhat.com, imammedo@redhat.com, pbonzini@redhat.com, f4bug@amsat.org
 
-On Wed, Jan 03, 2018 at 11:21:31AM +0100, Juan Quintela wrote:
-> Peter Xu <peterx@redhat.com> wrote:
-> > On Wed, Jan 03, 2018 at 10:15:41AM +0100, Juan Quintela wrote:
-> >> Peter Xu <peterx@redhat.com> wrote:
-> >> > Moving existing callers all into migrate_fd_cleanup().  It simplifies
-> >> > migration_thread() a bit.
-> >> >
-> >> > Signed-off-by: Peter Xu <peterx@redhat.com>
-> >> 
-> >> Reviewed-by: Juan Quintela <quintela@redhat.com>
-> >
-> > Thanks.
-> >
-> >> 
-> >> I am trying to see if we can call migrate_fd_cleanup() twice.  As far as
-> >> I can see, we are not doing it.  But, and it is a big but, we are not
-> >> checking that we are not calling qemu_savevm_state_cleanup() twice.  If
-> >> that happens, we can get double frees and similar.
-> >> 
-> >> I put the reviewed-by anyways, because I *think* that we are doing it
-> >> right now, and otherwise, we should make sure that we are not calling it
-> >> twice, not papering over it.
-> >> 
-> >> Once here, I have notice that we call block_cleanup_parameters() in
-> >> *three* places.  We call notifier_list_notify() on two of this places (I
-> >> can't see any good reason *why* we don't call the notifier for
-> >> migrate_fd_cancel).
-> >
-> > Indeed.
-> >
-> > IMHO we can remove two calls of block_cleanup_parameters(), only keep
-> > the one in migrate_fd_cleanup(), and remove on notifier_list_notify()
-> > in migrate_fd_error() (these can be two more patches).  What do you
-> > think?
-> 
-> I think we need to make sure that we have a function that we always
-> call at the end.  I think that we have that on migration_fd_cleanup(),
-> so put everything there should be ok, no?
+From: Yuval Shaia <yuval.shaia@oracle.com>
 
-IMHO that's exactly what I mean, no? :)
+This function should be declared in generic header file so we can
+utilize it.
 
-For notifier_list_notify(), it's different - I just remove the extra
-one in migrate_fd_error() because it'll be called in
-migrate_fd_cleanup() as well, which is a duplicate.
+Signed-off-by: Yuval Shaia <yuval.shaia@oracle.com>
+Signed-off-by: Marcel Apfelbaum <marcel@redhat.com>
+---
+ hw/pci/shpc.c             | 13 ++-----------
+ include/qemu/host-utils.h | 10 ++++++++++
+ 2 files changed, 12 insertions(+), 11 deletions(-)
 
+diff --git a/hw/pci/shpc.c b/hw/pci/shpc.c
+index 69fc14b218..a8462d48bb 100644
+--- a/hw/pci/shpc.c
++++ b/hw/pci/shpc.c
+@@ -1,6 +1,7 @@
+ #include "qemu/osdep.h"
+ #include "qapi/error.h"
+ #include "qemu-common.h"
++#include "qemu/host-utils.h"
+ #include "qemu/range.h"
+ #include "qemu/error-report.h"
+ #include "hw/pci/shpc.h"
+@@ -122,16 +123,6 @@
+ #define SHPC_PCI_TO_IDX(pci_slot) ((pci_slot) - 1)
+ #define SHPC_IDX_TO_PHYSICAL(slot) ((slot) + 1)
+ 
+-static int roundup_pow_of_two(int x)
+-{
+-    x |= (x >> 1);
+-    x |= (x >> 2);
+-    x |= (x >> 4);
+-    x |= (x >> 8);
+-    x |= (x >> 16);
+-    return x + 1;
+-}
+-
+ static uint16_t shpc_get_status(SHPCDevice *shpc, int slot, uint16_t msk)
+ {
+     uint8_t *status = shpc->config + SHPC_SLOT_STATUS(slot);
+@@ -656,7 +647,7 @@ int shpc_init(PCIDevice *d, PCIBus *sec_bus, MemoryRegion *bar,
+ 
+ int shpc_bar_size(PCIDevice *d)
+ {
+-    return roundup_pow_of_two(SHPC_SLOT_REG(SHPC_MAX_SLOTS));
++    return pow2roundup32(SHPC_SLOT_REG(SHPC_MAX_SLOTS));
+ }
+ 
+ void shpc_cleanup(PCIDevice *d, MemoryRegion *bar)
+diff --git a/include/qemu/host-utils.h b/include/qemu/host-utils.h
+index 5ac621cf1f..9fadb3f1ba 100644
+--- a/include/qemu/host-utils.h
++++ b/include/qemu/host-utils.h
+@@ -400,6 +400,16 @@ static inline uint64_t pow2ceil(uint64_t value)
+     return 0x8000000000000000ull >> (n - 1);
+ }
+ 
++static inline int pow2roundup32(int x)
++{
++    x |= (x >> 1);
++    x |= (x >> 2);
++    x |= (x >> 4);
++    x |= (x >> 8);
++    x |= (x >> 16);
++    return x + 1;
++}
++
+ /**
+  * urshift - 128-bit Unsigned Right Shift.
+  * @plow: in/out - lower 64-bit integer.
 -- 
-Peter Xu
+2.13.5
