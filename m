@@ -1,30 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47711)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47723)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eWgno-0002vC-GE
+	id 1eWgnq-0002wb-RJ
 	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 06:01:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eWgnk-0005jO-FY
-	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 06:01:44 -0500
-Received: from mail-qk0-x244.google.com ([2607:f8b0:400d:c09::244]:36055)
+	id 1eWgnq-0005n3-1Q
+	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 06:01:46 -0500
+Received: from mail-qk0-x244.google.com ([2607:f8b0:400d:c09::244]:43206)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eWgnk-0005ip-Aa
-	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 06:01:40 -0500
-Received: by mail-qk0-x244.google.com with SMTP id g123so1057716qka.3
-	for <qemu-devel@nongnu.org>; Wed, 03 Jan 2018 03:01:40 -0800 (PST)
+	id 1eWgnp-0005mw-TT
+	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 06:01:45 -0500
+Received: by mail-qk0-x244.google.com with SMTP id j137so1056071qke.10
+	for <qemu-devel@nongnu.org>; Wed, 03 Jan 2018 03:01:45 -0800 (PST)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Wed,  3 Jan 2018 08:01:11 -0300
-Message-Id: <20180103110126.29209-3-f4bug@amsat.org>
+Date: Wed,  3 Jan 2018 08:01:13 -0300
+Message-Id: <20180103110126.29209-5-f4bug@amsat.org>
 In-Reply-To: <20180103110126.29209-1-f4bug@amsat.org>
 References: <20180103110126.29209-1-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v4 02/17] sdhci: sort registers comments
+Subject: [Qemu-devel] [PATCH v4 04/17] sdhci: refactor same sysbus/pci
+ properties into a common one
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,79 +34,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alistair Francis <alistair.francis@xilinx.com>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, Fam Zheng <famz@redhat.com>, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, Peter Maydell <peter.maydell@linaro.org>, Andrey Smirnov <andrew.smirnov@gmail.com>, Eduardo Habkost <ehabkost@redhat.com>
+To: Alistair Francis <alistair.francis@xilinx.com>, Fam Zheng <famz@redhat.com>
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, Peter Maydell <peter.maydell@linaro.org>, Andrey Smirnov <andrew.smirnov@gmail.com>, Eduardo Habkost <ehabkost@redhat.com>
+
+Now both sysbus/pci classes inherit of the 'pending-insert-quirk' property,
+which is a HCI dependent property (regardless if accessed through a MMIO
+sysbus or a PCI bus).
+So far only the BCM implementation has to use it.
+
+Add sysbus/pci/sdbus comments to have clearer code blocks separation.
 
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Acked-by: Alistair Francis <alistair.francis@xilinx.com>
 ---
- include/hw/sd/sdhci.h | 21 +++++++++++++++------
- 1 file changed, 15 insertions(+), 6 deletions(-)
+ hw/sd/sdhci.c | 21 ++++++++++-----------
+ 1 file changed, 10 insertions(+), 11 deletions(-)
 
-diff --git a/include/hw/sd/sdhci.h b/include/hw/sd/sdhci.h
-index 1335373d3c..749cc279ed 100644
---- a/include/hw/sd/sdhci.h
-+++ b/include/hw/sd/sdhci.h
-@@ -49,14 +49,20 @@ typedef struct SDHCIState {
-     qemu_irq irq;
+diff --git a/hw/sd/sdhci.c b/hw/sd/sdhci.c
+index 365bc80009..a11469fbca 100644
+--- a/hw/sd/sdhci.c
++++ b/hw/sd/sdhci.c
+@@ -1266,13 +1266,17 @@ const VMStateDescription sdhci_vmstate = {
  
-     /* Registers cleared on reset */
-+    /* 0x00 */
-     uint32_t sdmasysad;    /* SDMA System Address register */
-     uint16_t blksize;      /* Host DMA Buff Boundary and Transfer BlkSize Reg */
-     uint16_t blkcnt;       /* Blocks count for current transfer */
-+    /* 0x08 */
-     uint32_t argument;     /* Command Argument Register */
-     uint16_t trnmod;       /* Transfer Mode Setting Register */
-     uint16_t cmdreg;       /* Command Register */
-+    /* 0x10 */
-     uint32_t rspreg[4];    /* Response Registers 0-3 */
-+    /* 0x20 */
-+    /* Buffer Data Port Register - virtual access point to R and W buffers */
-     uint32_t prnsts;       /* Present State Register */
-+    /* 0x28 */
-     uint8_t  hostctl;      /* Host Control Register */
-     uint8_t  pwrcon;       /* Power control Register */
-     uint8_t  blkgap;       /* Block Gap Control Register */
-@@ -64,6 +70,7 @@ typedef struct SDHCIState {
-     uint16_t clkcon;       /* Clock control Register */
-     uint8_t  timeoutcon;   /* Timeout Control Register */
-     uint8_t  admaerr;      /* ADMA Error Status Register */
-+    /* 0x30 */
-     uint16_t norintsts;    /* Normal Interrupt Status Register */
-     uint16_t errintsts;    /* Error Interrupt Status Register */
-     uint16_t norintstsen;  /* Normal Interrupt Status Enable Register */
-@@ -71,23 +78,25 @@ typedef struct SDHCIState {
-     uint16_t norintsigen;  /* Normal Interrupt Signal Enable Register */
-     uint16_t errintsigen;  /* Error Interrupt Signal Enable Register */
-     uint16_t acmd12errsts; /* Auto CMD12 error status register */
-+    /* 0x50 */
-+    /* Force Event Auto CMD12 Error Interrupt Reg - write only */
-+    /* Force Event Error Interrupt Register- write only */
-+    /* 0x58 */
-     uint64_t admasysaddr;  /* ADMA System Address Register */
+ /* Capabilities registers provide information on supported features of this
+  * specific host controller implementation */
+-static Property sdhci_pci_properties[] = {
++static Property sdhci_properties[] = {
+     DEFINE_PROP_UINT32("capareg", SDHCIState, capareg,
+             SDHC_CAPAB_REG_DEFAULT),
+     DEFINE_PROP_UINT32("maxcurr", SDHCIState, maxcurr, 0),
++    DEFINE_PROP_BOOL("pending-insert-quirk", SDHCIState, pending_insert_quirk,
++                     false),
+     DEFINE_PROP_END_OF_LIST(),
+ };
  
-     /* Read-only registers */
-+    /* 0x40 */
-     uint32_t capareg;      /* Capabilities Register */
-+    /* 0x48 */
-     uint32_t maxcurr;      /* Maximum Current Capabilities Register */
++/* --- qdev PCI --- */
++
+ static void sdhci_pci_realize(PCIDevice *dev, Error **errp)
+ {
+     SDHCIState *s = PCI_SDHCI(dev);
+@@ -1305,7 +1309,7 @@ static void sdhci_pci_class_init(ObjectClass *klass, void *data)
+     k->class_id = PCI_CLASS_SYSTEM_SDHCI;
+     set_bit(DEVICE_CATEGORY_STORAGE, dc->categories);
+     dc->vmsd = &sdhci_vmstate;
+-    dc->props = sdhci_pci_properties;
++    dc->props = sdhci_properties;
+     dc->reset = sdhci_poweron_reset;
+ }
  
-     uint8_t  *fifo_buffer; /* SD host i/o FIFO buffer */
-     uint32_t buf_maxsz;
-     uint16_t data_count;   /* current element in FIFO buffer */
-     uint8_t  stopped_state;/* Current SDHC state */
--    bool     pending_insert_quirk;/* Quirk for Raspberry Pi card insert int */
-     bool     pending_insert_state;
--    /* Buffer Data Port Register - virtual access point to R and W buffers */
--    /* Software Reset Register - always reads as 0 */
--    /* Force Event Auto CMD12 Error Interrupt Reg - write only */
--    /* Force Event Error Interrupt Register- write only */
--    /* RO Host Controller Version Register always reads as 0x2401 */
-+    /* Configurable properties */
-+    bool pending_insert_quirk; /* Quirk for Raspberry Pi card insert int */
- } SDHCIState;
+@@ -1320,14 +1324,7 @@ static const TypeInfo sdhci_pci_info = {
+     },
+ };
  
- #define TYPE_PCI_SDHCI "sdhci-pci"
+-static Property sdhci_sysbus_properties[] = {
+-    DEFINE_PROP_UINT32("capareg", SDHCIState, capareg,
+-            SDHC_CAPAB_REG_DEFAULT),
+-    DEFINE_PROP_UINT32("maxcurr", SDHCIState, maxcurr, 0),
+-    DEFINE_PROP_BOOL("pending-insert-quirk", SDHCIState, pending_insert_quirk,
+-                     false),
+-    DEFINE_PROP_END_OF_LIST(),
+-};
++/* --- qdev SysBus --- */
+ 
+ static void sdhci_sysbus_init(Object *obj)
+ {
+@@ -1360,7 +1357,7 @@ static void sdhci_sysbus_class_init(ObjectClass *klass, void *data)
+     DeviceClass *dc = DEVICE_CLASS(klass);
+ 
+     dc->vmsd = &sdhci_vmstate;
+-    dc->props = sdhci_sysbus_properties;
++    dc->props = sdhci_properties;
+     dc->realize = sdhci_sysbus_realize;
+     dc->reset = sdhci_poweron_reset;
+ }
+@@ -1374,6 +1371,8 @@ static const TypeInfo sdhci_sysbus_info = {
+     .class_init = sdhci_sysbus_class_init,
+ };
+ 
++/* --- qdev bus master --- */
++
+ static void sdhci_bus_class_init(ObjectClass *klass, void *data)
+ {
+     SDBusClass *sbc = SD_BUS_CLASS(klass);
 -- 
 2.15.1
