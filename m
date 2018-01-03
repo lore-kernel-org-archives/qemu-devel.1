@@ -1,32 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52124)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52298)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1eWf4C-0001KN-Io
-	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 04:10:33 -0500
+	(envelope-from <thuth@redhat.com>) id 1eWf4R-0001SN-H3
+	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 04:10:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1eWf48-0003Fn-JH
-	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 04:10:32 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:44502)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1eWf48-0003EQ-CG
-	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 04:10:28 -0500
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 6C81E267F4
-	for <qemu-devel@nongnu.org>; Wed,  3 Jan 2018 09:10:27 +0000 (UTC)
-From: Juan Quintela <quintela@redhat.com>
-In-Reply-To: <20180103054043.25719-7-peterx@redhat.com> (Peter Xu's message of
-	"Wed, 3 Jan 2018 13:40:38 +0800")
-References: <20180103054043.25719-1-peterx@redhat.com>
-	<20180103054043.25719-7-peterx@redhat.com>
-Reply-To: quintela@redhat.com
-Date: Wed, 03 Jan 2018 10:10:21 +0100
-Message-ID: <87o9mb2tqa.fsf@secure.laptop>
-MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH 06/11] migration: introduce
- vm_down_start_time
+	(envelope-from <thuth@redhat.com>) id 1eWf4N-0003Wl-HJ
+	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 04:10:47 -0500
+From: Thomas Huth <thuth@redhat.com>
+Date: Wed,  3 Jan 2018 10:10:38 +0100
+Message-Id: <1514970638-12868-1-git-send-email-thuth@redhat.com>
+Subject: [Qemu-devel] [PATCH v2] hw/ppc: Remove the deprecated
+ spapr-pci-vfio-host-bridge device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,36 +18,112 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: David Gibson <david@gibson.dropbear.id.au>, qemu-ppc@nongnu.org
+Cc: qemu-devel@nongnu.org, Alexey Kardashevskiy <aik@ozlabs.ru>
 
-Peter Xu <peterx@redhat.com> wrote:
-> Introduce MigrationState.vm_down_start_time to replace the local
-> variable "start_time" in migration_thread to avoid passing things around.
->
-> Signed-off-by: Peter Xu <peterx@redhat.com>
+It's a deprecated dummy device since QEMU v2.6.0. That should have
+been enough time to allow the users to update their scripts in case
+they still use it, so let's remove this legacy code now.
 
-Reviewed-by: Juan Quintela <quintela@redhat.com>
+Reviewed-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+---
+ v2: Rebased to the ppc-for-2.12 branch to solve a conflict
 
-But I would suggest renaming the variable?
+ hw/ppc/spapr_pci_vfio.c   | 47 -----------------------------------------------
+ qemu-doc.texi             |  5 -----
+ scripts/device-crash-test |  1 -
+ 3 files changed, 53 deletions(-)
 
-Later, Juan.
-
-
-> diff --git a/migration/migration.h b/migration/migration.h
-> index 0f5df2367c..3ab5506233 100644
-> --- a/migration/migration.h
-> +++ b/migration/migration.h
-> @@ -107,6 +107,8 @@ struct MigrationState
->      int64_t mig_start_time;
->      /* Total time used by latest migration (ms) */
->      int64_t mig_total_time;
-> +    /* Timestamp when VM is down (ms) to migrate the last stuff */
-> +    int64_t vm_down_start_time;
-
-downtime_start?
-
-
->      int64_t downtime;
->      int64_t expected_downtime;
->      bool enabled_capabilities[MIGRATION_CAPABILITY__MAX];
+diff --git a/hw/ppc/spapr_pci_vfio.c b/hw/ppc/spapr_pci_vfio.c
+index 1f775ea..053efb0 100644
+--- a/hw/ppc/spapr_pci_vfio.c
++++ b/hw/ppc/spapr_pci_vfio.c
+@@ -29,31 +29,6 @@
+ #include "qemu/error-report.h"
+ #include "sysemu/qtest.h"
+ 
+-#define TYPE_SPAPR_PCI_VFIO_HOST_BRIDGE "spapr-pci-vfio-host-bridge"
+-
+-#define SPAPR_PCI_VFIO_HOST_BRIDGE(obj) \
+-    OBJECT_CHECK(sPAPRPHBVFIOState, (obj), TYPE_SPAPR_PCI_VFIO_HOST_BRIDGE)
+-
+-typedef struct sPAPRPHBVFIOState sPAPRPHBVFIOState;
+-
+-struct sPAPRPHBVFIOState {
+-    sPAPRPHBState phb;
+-
+-    int32_t iommugroupid;
+-};
+-
+-static Property spapr_phb_vfio_properties[] = {
+-    DEFINE_PROP_INT32("iommu", sPAPRPHBVFIOState, iommugroupid, -1),
+-    DEFINE_PROP_END_OF_LIST(),
+-};
+-
+-static void spapr_phb_vfio_instance_init(Object *obj)
+-{
+-    if (!qtest_enabled()) {
+-        warn_report("spapr-pci-vfio-host-bridge is deprecated");
+-    }
+-}
+-
+ bool spapr_phb_eeh_available(sPAPRPHBState *sphb)
+ {
+     return vfio_eeh_as_ok(&sphb->iommu_as);
+@@ -218,25 +193,3 @@ int spapr_phb_vfio_eeh_configure(sPAPRPHBState *sphb)
+ 
+     return RTAS_OUT_SUCCESS;
+ }
+-
+-static void spapr_phb_vfio_class_init(ObjectClass *klass, void *data)
+-{
+-    DeviceClass *dc = DEVICE_CLASS(klass);
+-
+-    dc->props = spapr_phb_vfio_properties;
+-}
+-
+-static const TypeInfo spapr_phb_vfio_info = {
+-    .name          = TYPE_SPAPR_PCI_VFIO_HOST_BRIDGE,
+-    .parent        = TYPE_SPAPR_PCI_HOST_BRIDGE,
+-    .instance_size = sizeof(sPAPRPHBVFIOState),
+-    .instance_init = spapr_phb_vfio_instance_init,
+-    .class_init    = spapr_phb_vfio_class_init,
+-};
+-
+-static void spapr_pci_vfio_register_types(void)
+-{
+-    type_register_static(&spapr_phb_vfio_info);
+-}
+-
+-type_init(spapr_pci_vfio_register_types)
+diff --git a/qemu-doc.texi b/qemu-doc.texi
+index 90bea73..5449695 100644
+--- a/qemu-doc.texi
++++ b/qemu-doc.texi
+@@ -2744,11 +2744,6 @@ The ``host_net_remove'' command is replaced by the ``netdev_del'' command.
+ The ``ivshmem'' device type is replaced by either the ``ivshmem-plain''
+ or ``ivshmem-doorbell`` device types.
+ 
+-@subsection spapr-pci-vfio-host-bridge (since 2.6.0)
+-
+-The ``spapr-pci-vfio-host-bridge'' device type is replaced by
+-the ``spapr-pci-host-bridge'' device type.
+-
+ @section System emulator machines
+ 
+ @subsection Xilinx EP108 (since 2.11.0)
+diff --git a/scripts/device-crash-test b/scripts/device-crash-test
+index c11fd81..827d8ec 100755
+--- a/scripts/device-crash-test
++++ b/scripts/device-crash-test
+@@ -119,7 +119,6 @@ ERROR_WHITELIST = [
+     {'device':'scsi-generic', 'expected':True},            # drive property not set
+     {'device':'scsi-hd', 'expected':True},                 # drive property not set
+     {'device':'spapr-pci-host-bridge', 'expected':True},   # BUID not specified for PHB
+-    {'device':'spapr-pci-vfio-host-bridge', 'expected':True}, # BUID not specified for PHB
+     {'device':'spapr-rng', 'expected':True},               # spapr-rng needs an RNG backend!
+     {'device':'spapr-vty', 'expected':True},               # chardev property not set
+     {'device':'tpm-tis', 'expected':True},                 # tpm_tis: backend driver with id (null) could not be found
+-- 
+1.8.3.1
