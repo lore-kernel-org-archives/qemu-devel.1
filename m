@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52174)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52737)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1eWjcH-0002tt-Nu
-	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 09:02:07 -0500
+	(envelope-from <mst@redhat.com>) id 1eWjdO-0003vS-Aq
+	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 09:03:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1eWjcE-0003TP-Li
-	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 09:02:01 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:60656)
+	(envelope-from <mst@redhat.com>) id 1eWjdI-0004Cw-8M
+	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 09:03:10 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:19852)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1eWjcE-0003T9-Cv
-	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 09:01:58 -0500
-Date: Wed, 3 Jan 2018 16:01:55 +0200
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1eWjdH-0004CO-W0
+	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 09:03:04 -0500
+Date: Wed, 3 Jan 2018 16:03:01 +0200
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20180103155026-mutt-send-email-mst@kernel.org>
+Message-ID: <20180103160203-mutt-send-email-mst@kernel.org>
 References: <cover.1513974243.git.jbaron@akamai.com>
 	<44da522ecee60792ec918234ee4d61a84e4574f0.1513974243.git.jbaron@akamai.com>
 MIME-Version: 1.0
@@ -47,6 +47,10 @@ On Fri, Dec 22, 2017 at 04:54:01PM -0500, Jason Baron wrote:
 > Signed-off-by: Jason Baron <jbaron@akamai.com>
 > Cc: "Michael S. Tsirkin" <mst@redhat.com>
 > Cc: Jason Wang <jasowang@redhat.com>
+
+Same as any host/guest API change, please send a copy to the virtio TC
+to make sure we avoid conflicts.
+
 > ---
 >  drivers/net/virtio_net.c        | 17 ++++++++++++++++-
 >  include/uapi/linux/virtio_net.h |  5 +++++
@@ -77,10 +81,6 @@ On Fri, Dec 22, 2017 at 04:54:01PM -0500, Jason Baron wrote:
 >  
 >  	err = register_netdev(dev);
 >  	if (err) {
-
-It would seem that speed/duplex can change at link up time.
-Update it from virtnet_config_changed_work please.
-
 > @@ -2746,7 +2760,8 @@ static struct virtio_device_id id_table[] = {
 >  	VIRTIO_NET_F_CTRL_RX, VIRTIO_NET_F_CTRL_VLAN, \
 >  	VIRTIO_NET_F_GUEST_ANNOUNCE, VIRTIO_NET_F_MQ, \
@@ -101,9 +101,6 @@ Update it from virtnet_config_changed_work please.
 >  
 > +#define VIRTIO_NET_F_SPEED_DUPLEX 63	/* Host set linkspeed and duplex */
 > +
-
-Host -> device, to match virtio spec terminology.
-
 >  #ifndef VIRTIO_NET_NO_LEGACY
 >  #define VIRTIO_NET_F_GSO	6	/* Host handles pkts w/ any GSO type */
 >  #endif /* VIRTIO_NET_NO_LEGACY */
@@ -112,25 +109,8 @@ Host -> device, to match virtio spec terminology.
 >  	/* Default maximum transmit unit advice */
 >  	__u16 mtu;
 > +	/* Host exported linkspeed and duplex */
-
-I would rather drop this and document each field.
-
-/*
-speed, in units of 1Mb. All values 0 to INT_MAX are legal.
-Any other value stands for unknown.
-*/
-
 > +	__u32 speed;
-
-/*
-0x00 - half duplex
-0x01 - full duplex
-Any other value stands for unknown.
-*/
-
 > +	__u8 duplex;
-
-
 >  } __attribute__((packed));
 >  
 >  /*
