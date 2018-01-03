@@ -1,32 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44738)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47645)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1eWnNP-0006kP-Cz
-	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 13:02:59 -0500
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1eWnSb-0000AQ-JV
+	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 13:08:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1eWnNN-0003RR-3u
-	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 13:02:55 -0500
-Received: from mail-wm0-x22e.google.com ([2a00:1450:400c:c09::22e]:39917)
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1eWnSY-0006sE-DJ
+	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 13:08:17 -0500
+Received: from mail-qt0-x243.google.com ([2607:f8b0:400d:c0d::243]:37924)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1eWnNM-0003PM-NN
-	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 13:02:52 -0500
-Received: by mail-wm0-x22e.google.com with SMTP id i11so4074801wmf.4
-	for <qemu-devel@nongnu.org>; Wed, 03 Jan 2018 10:02:52 -0800 (PST)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1eWnSY-0006sA-86
+	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 13:08:14 -0500
+Received: by mail-qt0-x243.google.com with SMTP id d4so3126542qtj.5
+	for <qemu-devel@nongnu.org>; Wed, 03 Jan 2018 10:08:14 -0800 (PST)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Date: Wed,  3 Jan 2018 15:07:48 -0300
+Message-Id: <20180103180805.18140-1-f4bug@amsat.org>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA96TDZR7O75q_NH_vOdLBYr3ygnx-qzoZrQaeRqfrHAkA@mail.gmail.com>
-References: <20171215150659.1811-1-marcandre.lureau@redhat.com>
-	<20171215150659.1811-5-marcandre.lureau@redhat.com>
-	<CAJ+F1CLxk6vC+ZB09BUBMnJj12RuaeYS=S5KwcBGhoHiYbCd5g@mail.gmail.com>
-	<CAJ+F1CLHsFoRFYy825f0MxyAU4T+97YrjMQWfmu6Cni49zyZWQ@mail.gmail.com>
-	<bfe98eaa-bf87-dabe-ec63-7eae338495a2@redhat.com>
-	<CAFEAcA96TDZR7O75q_NH_vOdLBYr3ygnx-qzoZrQaeRqfrHAkA@mail.gmail.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Wed, 3 Jan 2018 19:02:50 +0100
-Message-ID: <CAJ+F1C+xQGWy8jCEXwzPg17vWJxixVydzEf_jb-FvjohTKwPng@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 04/13] build-sys: add AddressSanitizer
- when --enable-debug if possible
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH v5 00/17] SDHCI: housekeeping
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,86 +31,110 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, QEMU <qemu-devel@nongnu.org>, Fam Zheng <famz@redhat.com>
+To: Alistair Francis <alistair.francis@xilinx.com>, Fam Zheng <famz@redhat.com>
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, Peter Maydell <peter.maydell@linaro.org>, Andrey Smirnov <andrew.smirnov@gmail.com>, Eduardo Habkost <ehabkost@redhat.com>
 
-Hi
+Patches still missing review: 4, 5, 6, 7, 12.
 
-On Wed, Jan 3, 2018 at 6:52 PM, Peter Maydell <peter.maydell@linaro.org> wr=
-ote:
-> On 2 January 2018 at 17:31, Paolo Bonzini <pbonzini@redhat.com> wrote:
->> 2) I think removing -O2 from --enable-debug should be removed at the
->> same time.  That pretty much guarantees that nobody will use
->> --enable-debug, and optimized builds are decently debuggable nowadays.
->> The best would be to detect -Og, and add either -Og or -O1 depending on
->> presence.
->
-> Hmm. I use --enable-debug all the time and one of the reasons
-> I use it is that the optimized build is usually more pain
-> to debug with...
+Since v4:
+- fixed incorrect use of &local_err in sdhci_sysbus/pci_realize()
 
-       -Og Optimize debugging experience.  -Og enables optimizations
-that do not interfere with debugging. It should be the optimization
-level of choice for the standard edit-compile-debug cycle, offering
-           a reasonable level of optimization while maintaining fast
-compilation and a good debugging experience.
+Since v3:
+- since the series was getting too big and first part reviewed, split in 2. 
+- addressed Fam's review from "refactor the common sysbus/pci qdev"
+  - improved commit descriptions
+  - restored useful s->fifo_buffer = NULL
+- added Alistair R-b
 
-That should cover debugging nicely. Tbh, I am quite happy with
-compiler default to O0 when --enable-debug. Og doesn't give me much
-different experience.
+Since v2:
+- more detailed 'capabilities', all boards converted to use these properties
+- since all qtests pass, removed the previous 'capareg' property
+- added Stefan/Alistair R-b
+- corrected 'access' LED behavior (Alistair's review)
+- more uses of the registerfields API
+- remove some dead code
+- cosmetix:
+  - added more comments
+  - renamed a pair of registers
+  - reordered few struct members
 
-However, it produces false-positive warnings with gcc. Quoting the
-patch I was about to send:
+Note, the bcm2835 seems to have 1KB minimum blocksize, however the current
+model is implemented with 512B. I didn't change the current value.
 
-    Unfortunately, gcc has many false-positive maybe-uninitialized
-    errors with Og and O1 (f27 gcc 7.2.1 20170915):
+Since v1:
+- addressed Alistair Francis review comments, added some R-b
+- only move register defines to "sd-internal.h"
+- fixed deposit64() arguments
+- dropped unuseful s->fifo_buffer = NULL
+- use a qemu_irq for the LED, restrict the logging to ON/OFF
+- fixed a trace format string error
+- included Andrey Smirnov ACMD12ERRSTS write patch
+- dropped few unuseful patches, and separate the Python polemical ones for later
 
-    /home/elmarco/src/qemu/hw/ipmi/isa_ipmi_kcs.c: In function
-=E2=80=98ipmi_kcs_ioport_read=E2=80=99:
-    /home/elmarco/src/qemu/hw/ipmi/isa_ipmi_kcs.c:279:12: error: =E2=80=98r=
-et=E2=80=99
-may be used uninitialized in this function
-[-Werror=3Dmaybe-uninitialized]
-         return ret;
-                ^~~
-    cc1: all warnings being treated as errors
-    make: *** [/home/elmarco/src/qemu/rules.mak:66:
-hw/ipmi/isa_ipmi_kcs.o] Error 1
-    make: *** Waiting for unfinished jobs....
-    /home/elmarco/src/qemu/hw/ide/ahci.c: In function =E2=80=98ahci_populat=
-e_sglist=E2=80=99:
-    /home/elmarco/src/qemu/hw/ide/ahci.c:903:58: error:
-=E2=80=98tbl_entry_size=E2=80=99 may be used uninitialized in this function
-[-Werror=3Dmaybe-uninitialized]
-             if ((off_idx =3D=3D -1) || (off_pos < 0) || (off_pos >
-tbl_entry_size)) {
-                                                     ~~~~~~~~~^~~~~~~~~~~~~=
-~~~~
-    cc1: all warnings being treated as errors
-    make: *** [/home/elmarco/src/qemu/rules.mak:66: hw/ide/ahci.o] Error 1
-    /home/elmarco/src/qemu/hw/display/qxl.c: In function =E2=80=98qxl_add_m=
-emslot=E2=80=99:
-    /home/elmarco/src/qemu/hw/display/qxl.c:1397:52: error:
-=E2=80=98pci_start=E2=80=99 may be used uninitialized in this function
-[-Werror=3Dmaybe-uninitialized]
-         memslot.virt_end   =3D virt_start + (guest_end   - pci_start);
-                                           ~~~~~~~~~~~~~^~~~~~~~~~~~
-    /home/elmarco/src/qemu/hw/display/qxl.c:1389:9: error:
-=E2=80=98pci_region=E2=80=99 may be used uninitialized in this function
-[-Werror=3Dmaybe-uninitialized]
-             qxl_set_guest_bug(d, "%s: pci_region =3D %d", __func__, pci_re=
-gion);
-             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~=
-~~~
-    cc1: all warnings being treated as errors
+>From the "SDHCI housekeeping" series:
+- 1: we restrict part of "sd/sd.h" into local "sd-internal.h",
+- 2,3: we somehow beautiful the code, no logical changes,
+- 4-7: we refactor the common sysbus/pci qdev code,
+- 8-10: we add plenty of trace events which will result useful later,
+- 11: we finally expose a "dma-memory" property.
+>From the "SDHCI: add a qtest and fix few issues" series:
+- 12,13: fix registers
+- 14,15: boards can specify which SDHCI Spec to use (v2 and v3 so far)
+- 15-20: HCI qtest
 
-    There seems to be a long list of related bugs in upstream GCC, some of
-    them are being fixed very recently:
-    https://gcc.gnu.org/bugzilla/show_bug.cgi?id=3D24639
+Regards,
 
-    For now, let's workaround it by using Wno-maybe-uninitialized (gcc-only=
-).
+Phil.
 
+$ git backport-diff
+[----] : patches are identical
+[####] : number of functional differences between upstream/downstream patch
+The flags [FC] indicate (F)unctional and (C)ontextual differences, respectively
 
---=20
-Marc-Andr=C3=A9 Lureau
+001/17:[----] [--] 'sdhci: clean up includes'
+002/17:[----] [--] 'sdhci: sort registers comments'
+003/17:[----] [--] 'sdhci: remove dead code'
+004/17:[----] [--] 'sdhci: refactor same sysbus/pci properties into a common one'
+005/17:[----] [--] 'sdhci: refactor common sysbus/pci class_init() into sdhci_common_class_init()'
+006/17:[0021] [FC] 'sdhci: refactor common sysbus/pci realize() into sdhci_common_realize()'
+007/17:[0008] [FC] 'sdhci: refactor common sysbus/pci unrealize() into sdhci_common_unrealize()'
+008/17:[----] [--] 'sdhci: use qemu_log_mask(UNIMP) instead of fprintf()'
+009/17:[----] [--] 'sdhci: convert the DPRINT() calls into trace events'
+010/17:[----] [--] 'sdhci: add a GPIO for the 'access control' LED'
+011/17:[----] [--] 'sdhci: move MASK_TRNMOD with other SDHC_TRN* defines in "sd-internal.h"'
+012/17:[----] [--] 'sdhci: use FIELD_DP32() macro for the WRITE_PROTECT flag'
+013/17:[----] [--] 'sdhci: rename the SDHC_CAPAB register'
+014/17:[----] [--] 'sdhci: fix CAPAB/MAXCURR registers, both are 64bit and read-only'
+015/17:[----] [--] 'sdhci: Implement write method of ACMD12ERRSTS register'
+016/17:[----] [--] 'sdhci: use deposit64() on admasysaddr'
+017/17:[----] [-C] 'sdhci: add a "dma-memory" property'
+
+Andrey Smirnov (1):
+  sdhci: Implement write method of ACMD12ERRSTS register
+
+Philippe Mathieu-Daudé (16):
+  sdhci: clean up includes
+  sdhci: sort registers comments
+  sdhci: remove dead code
+  sdhci: refactor same sysbus/pci properties into a common one
+  sdhci: refactor common sysbus/pci class_init() into sdhci_common_class_init()
+  sdhci: refactor common sysbus/pci realize() into sdhci_common_realize()
+  sdhci: refactor common sysbus/pci unrealize() into sdhci_common_unrealize()
+  sdhci: use qemu_log_mask(UNIMP) instead of fprintf()
+  sdhci: convert the DPRINT() calls into trace events
+  sdhci: add a GPIO for the 'access control' LED
+  sdhci: move MASK_TRNMOD with other SDHC_TRN* defines in "sd-internal.h"
+  sdhci: use FIELD_DP32() macro for the WRITE_PROTECT flag
+  sdhci: rename the SDHC_CAPAB register
+  sdhci: fix CAPAB/MAXCURR registers, both are 64bit and read-only
+  sdhci: use deposit64() on admasysaddr
+  sdhci: add a "dma-memory" property
+
+ include/hw/sd/sdhci.h  |  38 +++++--
+ hw/sd/sdhci-internal.h |  11 +-
+ hw/sd/sdhci.c          | 286 ++++++++++++++++++++++++++++---------------------
+ hw/sd/trace-events     |  15 +++
+ 4 files changed, 211 insertions(+), 139 deletions(-)
+
+-- 
+2.15.1
