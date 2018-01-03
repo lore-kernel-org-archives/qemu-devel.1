@@ -1,22 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46331)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46788)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1eWqxO-0002xu-3f
-	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 16:52:19 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1eWqy3-0003Xj-E9
+	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 16:53:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1eWqxN-0006BS-3s
-	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 16:52:18 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1eWqy0-0006bb-RK
+	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 16:52:59 -0500
+Received: from mail-pl0-x244.google.com ([2607:f8b0:400e:c01::244]:34985)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1eWqy0-0006b7-Kd
+	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 16:52:56 -0500
+Received: by mail-pl0-x244.google.com with SMTP id b96so2034406pli.2
+	for <qemu-devel@nongnu.org>; Wed, 03 Jan 2018 13:52:56 -0800 (PST)
+References: <20180102234108.32713-1-laurent@vivier.eu>
+	<20180102234108.32713-8-laurent@vivier.eu>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <5630ba80-503f-f7e7-2764-c433aa3ea19a@linaro.org>
+Date: Wed, 3 Jan 2018 13:52:52 -0800
 MIME-Version: 1.0
-Sender: alistair23@gmail.com
-In-Reply-To: <20180103162400.10396-2-f4bug@amsat.org>
-References: <20180103162400.10396-1-f4bug@amsat.org>
-	<20180103162400.10396-2-f4bug@amsat.org>
-From: Alistair Francis <alistair.francis@xilinx.com>
-Date: Wed, 3 Jan 2018 13:51:42 -0800
-Message-ID: <CAKmqyKOMRixd+TkE=FKwmQFctJAB_RJ1WFdnY2_8VteRszVB9A@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 1/6] hw/sd/milkymist-memcard: use
- qemu_log_mask()
+In-Reply-To: <20180102234108.32713-8-laurent@vivier.eu>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v6 07/17] target/m68k: add chk and chk2
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,84 +31,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Cc: Alistair Francis <alistair.francis@xilinx.com>, Michael Walle <michael@walle.cc>, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, Peter Maydell <peter.maydell@linaro.org>, qemu-arm <qemu-arm@nongnu.org>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
+To: Laurent Vivier <laurent@vivier.eu>, qemu-devel@nongnu.org
+Cc: Thomas Huth <huth@tuxfamily.org>
 
-On Wed, Jan 3, 2018 at 8:23 AM, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.or=
-g> wrote:
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-> ---
->  hw/sd/milkymist-memcard.c | 16 +++++++++-------
->  1 file changed, 9 insertions(+), 7 deletions(-)
->
-> diff --git a/hw/sd/milkymist-memcard.c b/hw/sd/milkymist-memcard.c
-> index 4008c81002..5de3e00e2f 100644
-> --- a/hw/sd/milkymist-memcard.c
-> +++ b/hw/sd/milkymist-memcard.c
-> @@ -26,7 +26,7 @@
->  #include "hw/sysbus.h"
->  #include "sysemu/sysemu.h"
->  #include "trace.h"
-> -#include "qemu/error-report.h"
-> +#include "include/qapi/error.h"
->  #include "sysemu/block-backend.h"
->  #include "sysemu/blockdev.h"
->  #include "hw/sd/sd.h"
-> @@ -138,8 +138,8 @@ static uint64_t memcard_read(void *opaque, hwaddr add=
-r,
->          } else {
->              r =3D s->response[s->response_read_ptr++];
->              if (s->response_read_ptr > s->response_len) {
-> -                error_report("milkymist_memcard: "
-> -                        "read more cmd bytes than available. Clipping.")=
-;
-> +                qemu_log_mask(LOG_GUEST_ERROR, "milkymist_memcard: "
-> +                              "read more cmd bytes than available. Clipp=
-ing.");
->                  s->response_read_ptr =3D 0;
->              }
->          }
-> @@ -163,8 +163,9 @@ static uint64_t memcard_read(void *opaque, hwaddr add=
-r,
->          break;
->
->      default:
-> -        error_report("milkymist_memcard: read access to unknown register=
- 0x"
-> -                TARGET_FMT_plx, addr << 2);
-> +        qemu_log_mask(LOG_UNIMP, "milkymist_memcard: "
-> +                      "read access to unknown register 0x%" HWADDR_PRIx =
-"\n",
-> +                      addr << 2);
->          break;
->      }
->
-> @@ -220,8 +221,9 @@ static void memcard_write(void *opaque, hwaddr addr, =
-uint64_t value,
->          break;
->
->      default:
-> -        error_report("milkymist_memcard: write access to unknown registe=
-r 0x"
-> -                TARGET_FMT_plx, addr << 2);
-> +        qemu_log_mask(LOG_UNIMP, "milkymist_memcard: "
-> +                      "write access to unknown register 0x%" HWADDR_PRIx=
- " "
-> +                      "(value 0x%" PRIx64 ")\n", addr << 2, value);
+On 01/02/2018 03:40 PM, Laurent Vivier wrote:
+> +void HELPER(chk)(CPUM68KState *env, int32_t val, int32_t ub)
+> +{
+> +    if (val < 0 || val > ub) {
+> +        CPUState *cs = CPU(m68k_env_get_cpu(env));
+> +
+> +        /* Recover PC and CC_OP for the beginning of the insn.  */
+> +        cpu_restore_state(cs, GETPC());
+> +
+> +        /* Adjust PC and FLAGS to end of the insn.  */
+> +        env->pc += 2;
+> +        helper_flush_flags(env, env->cc_op);
+> +        env->cc_n = val;
+> +
+> +        cs->exception_index = EXCP_CHK;
+> +        cpu_loop_exit(cs);
+> +    }
+> +}
+> +
 
-Can you fix up the secondary lines indentation?
+I thought you said for 68040, N is always unset for val >= 0.
+That would suggest
 
-After that:
+  helper_flush_flags(env, env->cc_op);
+  env->cc_n = val;
+  if (val < 0 || val > ub) {
+    ...
+  }
 
-Reviewed-by: Alistair Francis <alistair.francis@xilinx.com>
+Did you examine the real hw change to the other flags?
+Because they're officially undefined, which suggests
 
-Alistair
+  env->cc_n = val;
+  env->cc_op = CC_OP_LOGIC;
+
+> +void HELPER(chk2)(CPUM68KState *env, int32_t val, int32_t lb, int32_t ub)
+> +{
+> +    helper_flush_flags(env, env->cc_op);
+> +
+> +    env->cc_z = val != lb && val != ub;
+> +    env->cc_c = lb <= ub ? val < lb || val > ub : val > ub && val < lb;
+> +
+> +    if (env->cc_c) {
+> +        CPUState *cs = CPU(m68k_env_get_cpu(env));
+> +
+> +        cpu_restore_state(cs, GETPC());
+> +        env->cc_op = CC_OP_FLAGS;
+
+A comment that we're reverting a change made during unwind would be helpful here.
 
 
->          break;
->      }
->  }
-> --
-> 2.15.1
->
->
+r~
