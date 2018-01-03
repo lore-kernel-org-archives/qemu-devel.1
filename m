@@ -1,21 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43963)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53402)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1eWWig-0003gX-Qw
-	for qemu-devel@nongnu.org; Tue, 02 Jan 2018 19:15:48 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1eWX2D-0001sj-Hy
+	for qemu-devel@nongnu.org; Tue, 02 Jan 2018 19:35:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1eWWif-0000Kq-4y
-	for qemu-devel@nongnu.org; Tue, 02 Jan 2018 19:15:46 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1eWX2C-00021j-GK
+	for qemu-devel@nongnu.org; Tue, 02 Jan 2018 19:35:57 -0500
+Date: Wed, 3 Jan 2018 11:09:47 +1100
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20180103000947.GE24581@umbus.fritz.box>
+References: <20171016052004.31397-1-aik@ozlabs.ru>
+	<20171016093641.GH2776@umbus.fritz.box>
+	<e419ca8a-6e0b-70eb-14da-03a843fa8b92@ozlabs.ru>
+	<20171019062440.GY2776@umbus.fritz.box>
+	<699e58bf-de22-5341-ecc6-458df7ccbe65@ozlabs.ru>
+	<9227196b-789c-e4b2-c9c5-4fd95ed42b4e@ozlabs.ru>
+	<20171109063822.GD7732@umbus.fritz.box>
+	<d6f4ad92-bd83-b990-4e86-ac89638c44d0@ozlabs.ru>
+	<9fabc6c4-9a95-d44e-dc4c-33d91c00fb0c@ozlabs.ru>
 MIME-Version: 1.0
-Sender: alistair23@gmail.com
-In-Reply-To: <20171229174933.1781-1-f4bug@amsat.org>
-References: <20171229174933.1781-1-f4bug@amsat.org>
-From: Alistair Francis <alistair.francis@xilinx.com>
-Date: Tue, 2 Jan 2018 16:15:13 -0800
-Message-ID: <CAKmqyKNDbhAQWXYPrhFnbqcCRDO_ZeBdUuC_xna9XpqCvw452g@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3 00/42] SDHCI: housekeeping,
- add a qtest and fix few issues
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="MIdTMoZhcV1D07fI"
+Content-Disposition: inline
+In-Reply-To: <9fabc6c4-9a95-d44e-dc4c-33d91c00fb0c@ozlabs.ru>
+Subject: Re: [Qemu-devel] [PATCH qemu v3] RFC: ppc/spapr: Receive and store
+ device tree blob from SLOF
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,179 +32,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Cc: Alistair Francis <alistair.francis@xilinx.com>, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, Peter Maydell <peter.maydell@linaro.org>, Andrey Smirnov <andrew.smirnov@gmail.com>, Sai Pavan Boddu <saipava@xilinx.com>, Clement Deschamps <clement.deschamps@antfield.fr>, Jean-Christophe Dubois <jcd@tribudubois.net>, =?UTF-8?Q?Gr=C3=A9gory_Estrade?= <gregory.estrade@gmail.com>, Igor Mitsyanko <i.mitsyanko@gmail.com>, Krzysztof Kozlowski <krzk@kernel.org>, Andrew Baumann <Andrew.Baumann@microsoft.com>, Prasad J Pandit <pjp@fedoraproject.org>, Eduardo Habkost <ehabkost@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>
+To: Alexey Kardashevskiy <aik@ozlabs.ru>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Balbir Singh <bsingharora@gmail.com>, Greg Kurz <groug@kaod.org>, slof@lists.ozlabs.org, Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>, Thomas Huth <thuth@redhat.com>
 
-On Fri, Dec 29, 2017 at 9:48 AM, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.o=
-rg> wrote:
-> Since v2:
-> - more detailed 'capabilities', all boards converted to use these propert=
-ies
-> - since all qtests pass, removed the previous 'capareg' property
-> - added Stefan/Alistair R-b
-> - corrected 'access' LED behavior (Alistair's review)
-> - more uses of the registerfields API
-> - remove some dead code
-> - cosmetix:
->   - added more comments
->   - renamed a pair of registers
->   - reordered few struct members
->
-> Note, the bcm2835 seems to have 1KB minimum blocksize, however the curren=
-t
-> model is implemented with 512B. I didn't change the current value.
->
-> Since v1:
-> - addressed Alistair Francis review comments, added some R-b
-> - only move register defines to "sd-internal.h"
-> - fixed deposit64() arguments
-> - dropped unuseful s->fifo_buffer =3D NULL
-> - use a qemu_irq for the LED, restrict the logging to ON/OFF
-> - fixed a trace format string error
-> - included Andrey Smirnov ACMD12ERRSTS write patch
-> - dropped few unuseful patches, and separate the Python polemical ones fo=
-r later
->
-> From the "SDHCI housekeeping" series:
-> - 1: we restrict part of "sd/sd.h" into local "sd-internal.h",
-> - 2,3: we somehow beautiful the code, no logical changes,
-> - 4-7: we refactor the common sysbus/pci qdev code,
-> - 8-10: we add plenty of trace events which will result useful later,
-> - 11: we finally expose a "dma-memory" property.
-> From the "SDHCI: add a qtest and fix few issues" series:
-> - 12,13: fix registers
-> - 14,15: boards can specify which SDHCI Spec to use (v2 and v3 so far)
-> - 15-20: HCI qtest
->
-> Regards,
->
-> Phil.
->
-> $ git backport-diff
-> [----] : patches are identical
-> [####] : number of functional differences between upstream/downstream pat=
-ch
-> [down] : patch is downstream-only
-> The flags [FC] indicate (F)unctional and (C)ontextual differences, respec=
-tively
->
-> 001/42:[0003] [FC] 'sdhci: clean up includes'
-> 002/42:[down] 'sdhci: sort registers comments'
-> 003/42:[down] 'sdhci: remove dead code'
-> 004/42:[----] [--] 'sdhci: refactor same sysbus/pci properties'
-> 005/42:[----] [--] 'sdhci: refactor common sysbus/pci class_init()'
-> 006/42:[----] [--] 'sdhci: refactor common sysbus/pci realize()'
-> 007/42:[0001] [FC] 'sdhci: refactor common sysbus/pci unrealize()'
-> 008/42:[----] [--] 'sdhci: use qemu_log_mask(UNIMP) instead of fprintf()'
-> 009/42:[----] [--] 'sdhci: convert the DPRINT() calls into trace events'
-> 010/42:[down] 'sdhci: add a GPIO for the 'access control' LED'
-> 011/42:[----] [--] 'sdhci: move MASK_TRNMOD with other SDHC_TRN* defines'
-> 012/42:[down] 'sdhci: use FIELD_DP32() macro for the WRITE_PROTECT flag'
-> 013/42:[down] 'sdhci: rename the SDHC_CAPAB register'
-> 014/42:[0008] [FC] 'sdhci: fix CAPAB/MAXCURR registers, 64bit and read-on=
-ly'
-> 015/42:[----] [-C] 'sdhci: Implement write method of ACMD12ERRSTS registe=
-r'
-> 016/42:[down] 'sdhci: use deposit64() on admasysaddr'
-> 017/42:[----] [-C] 'sdhci: add a "dma-memory" property'
-> 018/42:[down] 'sdhci: add a spec_version property'
-> 019/42:[down] 'sdhci: add basic Spec v1 capabilities'
-> 020/42:[down] 'sdhci: add max-block-length capability (Spec v1)'
-> 021/42:[down] 'sdhci: add clock capabilities (Spec v1)'
-> 022/42:[down] 'sdhci: add DMA and 64-bit capabilities (Spec v2)'
-> 023/42:[down] 'sdhci: default to Spec v2'
-> 024/42:[down] 'sdhci: add a 'dma' shortcut property'
-> 025/42:[down] 'sdhci: add BLOCK_SIZE_MASK for DMA'
-> 026/42:[down] 'sdhci: Fix 64-bit ADMA2'
-> 027/42:[down] 'hw/arm/exynos4210: implement SDHCI Spec v2'
-> 028/42:[down] 'hw/arm/xilinx_zynq: implement SDHCI Spec v2'
-> 029/42:[0022] [FC] 'sdhci: add qtest to check the SD Spec version'
-> 030/42:[down] 'sdhci: check Spec v2 capabilities qtest'
-> 031/42:[down] 'sdhci: add v3 capabilities'
-> 032/42:[down] 'sdhci: rename the hostctl1 register'
-> 033/42:[down] 'hw/arm/bcm2835_peripherals: implement SDHCI Spec v3'
-> 034/42:[down] 'hw/arm/fsl-imx6: implement SDHCI Spec v3'
-> 035/42:[down] 'hw/arm/xilinx_zynqmp: implement SDHCI Spec v3'
-> 036/42:[down] 'sdhci: check Spec v3 capabilities qtest'
-> 037/42:[down] 'sdhci: remove the deprecated 'capareg' property'
-> 038/42:[0008] [FC] 'sdhci: add check_capab_readonly() qtest'
-> 039/42:[0009] [FC] 'sdhci: add a check_capab_baseclock() qtest'
-> 040/42:[0011] [FC] 'sdhci: add a check_capab_sdma() qtest'
-> 041/42:[----] [-C] 'sdhci: add a check_capab_v3() qtest'
-> 042/42:[down] 'sdhci: add Spec v4.2 register definitions'
 
-We are making progress here. Do you think it would be worth splitting
-out the earlier patches that have been reviewed so far so they can be
-merged? A 42 patch series it pretty daunting and most of the first 20
-are pretty straightforward and have been reviewed.
+--MIdTMoZhcV1D07fI
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Alistair
+On Tue, Jan 02, 2018 at 05:13:09PM +1100, Alexey Kardashevskiy wrote:
+> On 11/12/17 17:20, Alexey Kardashevskiy wrote:
+> > On 09/11/17 17:38, David Gibson wrote:
+> >> On Tue, Nov 07, 2017 at 06:14:04PM +1100, Alexey Kardashevskiy wrote:
+> >>> On 20/10/17 11:46, Alexey Kardashevskiy wrote:
+> >>>> On 19/10/17 17:24, David Gibson wrote:
+> >>>>> On Tue, Oct 17, 2017 at 04:55:03PM +1100, Alexey Kardashevskiy wrot=
+e:
+> >>>>>> On 16/10/17 20:36, David Gibson wrote:
+> >>>>>>> On Mon, Oct 16, 2017 at 04:20:04PM +1100, Alexey Kardashevskiy
+> >>>>>> wrote:
+> >>>>> [snip]
+> >>>>>>> ||
+> >>>>>>>
+> >>>>>>> Yeah.. this is all a bit complicated, I'm really thinking about a
+> >>>>>>> fdt_fsck() function for libfdt.
+> >>>>>>
+> >>>>>>
+> >>>>>> Oh. So what now? Do as below or wait for libdtc update?
+> >>>>>
+> >>>>> So I started hacking on this.  It's a bit fiddlier to get right tha=
+n I
+> >>>>> anticipated.  How about you make a placeholder function to "test" t=
+he
+> >>>>> tree for now, with a comment that it will be updated once the libfdt
+> >>>>> extensions are there.
+> >>>>
+> >>>> What would the placeholder do? Nothing or my proposed "FDT_CHK" thin=
+gy?
+> >>>>
+> >>>> Are we in a hurry with this one at all, or I can wait till libfdt ge=
+ts this
+> >>>> fsck()?
+> >>>
+> >>>
+> >>> Ping?
+> >>>
+> >>> This is not v2.11 material, is it?
+> >>
+> >> Not at this stage, no.
+> >>
+> >> I've started looking at writing the fdt_fsck() thing, but got
+> >> sidetracked by a bunch of related fixes to safety of handling
+> >> corrupted blobs in libfdt.
+> >=20
+> > Please let me know when I can repost the "
+> > ppc/spapr: Receive and store device tree blob from SLOF" again. Thanks.
+>=20
+>=20
+> Still to early to repost?
 
->
-> Andrey Smirnov (1):
->   sdhci: Implement write method of ACMD12ERRSTS register
->
-> Philippe Mathieu-Daud=C3=A9 (40):
->   sdhci: clean up includes
->   sdhci: sort registers comments
->   sdhci: remove dead code
->   sdhci: refactor same sysbus/pci properties into a common one
->   sdhci: refactor common sysbus/pci class_init() into sdhci_class_init()
->   sdhci: refactor common sysbus/pci realize() into sdhci_realizefn()
->   sdhci: refactor common sysbus/pci unrealize() into sdhci_unrealizefn()
->   sdhci: use qemu_log_mask(UNIMP) instead of fprintf()
->   sdhci: convert the DPRINT() calls into trace events
->   sdhci: add a GPIO for the 'access control' LED
->   sdhci: move MASK_TRNMOD with other SDHC_TRN* defines in "sd-internal.h"
->   sdhci: use FIELD_DP32() macro for the WRITE_PROTECT flag
->   sdhci: rename the SDHC_CAPAB register
->   sdhci: fix CAPAB/MAXCURR registers, both are 64bit and read-only
->   sdhci: use deposit64() on admasysaddr
->   sdhci: add a "dma-memory" property
->   sdhci: add a spec_version property
->   sdhci: add basic Spec v1 capabilities
->   sdhci: add max-block-length capability (Spec v1)
->   sdhci: add clock capabilities (Spec v1)
->   sdhci: add DMA and 64-bit capabilities (Spec v2)
->   sdhci: default to Spec v2
->   sdhci: add a 'dma' shortcut property
->   sdhci: add BLOCK_SIZE_MASK for DMA
->   hw/arm/exynos4210: implement SDHCI Spec v2
->   hw/arm/xilinx_zynq: implement SDHCI Spec v2
->   sdhci: add qtest to check the SD Spec version
->   sdhci: check Spec v2 capabilities qtest
->   sdhci: add v3 capabilities
->   sdhci: rename the hostctl1 register
->   hw/arm/bcm2835_peripherals: implement SDHCI Spec v3
->   hw/arm/fsl-imx6: implement SDHCI Spec v3
->   hw/arm/xilinx_zynqmp: implement SDHCI Spec v3
->   sdhci: check Spec v3 capabilities qtest
->   sdhci: remove the deprecated 'capareg' property
->   sdhci: add check_capab_readonly() qtest
->   sdhci: add a check_capab_baseclock() qtest
->   sdhci: add a check_capab_sdma() qtest
->   sdhci: add a check_capab_v3() qtest
->   sdhci: add Spec v4.2 register definitions
->
-> Sai Pavan Boddu (1):
->   sdhci: Fix 64-bit ADMA2
->
->  include/hw/sd/sdhci.h        |  59 ++++-
->  hw/sd/sdhci-internal.h       |  81 +++++--
->  hw/arm/bcm2835_peripherals.c |  35 ++-
->  hw/arm/exynos4210.c          |  13 +-
->  hw/arm/fsl-imx6.c            |  12 +
->  hw/arm/xilinx_zynq.c         |  64 ++++--
->  hw/arm/xlnx-zynqmp.c         |  38 +++-
->  hw/sd/sdhci.c                | 513 +++++++++++++++++++++++++------------=
-------
->  tests/sdhci-test.c           | 177 +++++++++++++++
->  hw/sd/trace-events           |  15 ++
->  tests/Makefile.include       |   3 +
->  11 files changed, 718 insertions(+), 292 deletions(-)
->  create mode 100644 tests/sdhci-test.c
->
-> --
-> 2.15.1
->
->
+No.
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--MIdTMoZhcV1D07fI
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlpMH0oACgkQbDjKyiDZ
+s5Ie2g//YUNtN7iqAZy6CNal4s6NpFJNx4xtqXT3DBoBe0Rqz0wczk+ja3INUQT5
+ggR70BqIt5ZnipEY49q0mx2LFlTHACyyjg+/WKmyhUbfu0dK/5hX8xjyEACy5jxV
+a7P65/0UymD1B3ckoTsKxaLn0dUMvQnAeaCIFhX13VvpDbOfUYGOX0wKxNAaJate
+Gw2wn7gKqzZD6+Sxm7xTGvxMiYEj9RvyDUmfcFAtqKIK6ylCj3EUH8lTa8ySc6GU
+hhGeMAunMR4Q6G4fmxHtD2d8ez51pT8z37Oq/UukLkMCDNvWTyC86/o8p1OdWSAB
+vIcSL1Y1HOmZTf0UYJzkkZH2zk4GlYHTJaFPpESTOmg7AqdY1fwiEq5ngxAuco/V
+kItKdnA1L7ewbvl2T4pukkY8nWLMrUXegZMAQKguspxRXUZu5EFE4V6IR9TjlETp
+JldEhR24xIOTk+beMMnl0b6E2LpDb3E93SrypzSomTE7ZzjbDWoY2ehViK4bzobs
+D97ITQIaw0gRrYv7+lfaHvpfbUSQ7oDS/qb2UnDlErJ6i3Gadpzm1UK29vZi2mMZ
+QRHxDJF9W5DAFhTpW95K3FU1aeEBF/B1avnhJbxc6fX2yrorAiBSpd+O9UnI0dAP
+XVcy8vWtXV3xR80cdM5Dfp5PbO++tIZ0n2MuZKidG2Elilc7kvs=
+=WT73
+-----END PGP SIGNATURE-----
+
+--MIdTMoZhcV1D07fI--
