@@ -1,34 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51055)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54289)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mlureau@redhat.com>) id 1eWg1p-0002Lh-QX
-	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 05:12:10 -0500
+	(envelope-from <quintela@redhat.com>) id 1eWg8j-0005Vd-Qr
+	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 05:19:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mlureau@redhat.com>) id 1eWg1l-00088s-PI
-	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 05:12:09 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:60373)
+	(envelope-from <quintela@redhat.com>) id 1eWg8g-000457-Ku
+	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 05:19:17 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:57326)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1eWg1l-00087Y-HA
-	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 05:12:05 -0500
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1eWg8g-00044N-FL
+	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 05:19:14 -0500
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id BB8E97E423
-	for <qemu-devel@nongnu.org>; Wed,  3 Jan 2018 10:12:03 +0000 (UTC)
-Received: from colo-mx.corp.redhat.com
-	(colo-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.20])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id B149A61F20
-	for <qemu-devel@nongnu.org>; Wed,  3 Jan 2018 10:12:03 +0000 (UTC)
-Date: Wed, 3 Jan 2018 05:12:03 -0500 (EST)
-From: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
-Message-ID: <723441556.3191617.1514974323484.JavaMail.zimbra@redhat.com>
-In-Reply-To: <20180103022418.23165-1-peterx@redhat.com>
-References: <20180103022418.23165-1-peterx@redhat.com>
+	by mx1.redhat.com (Postfix) with ESMTPS id 77BDB49035
+	for <qemu-devel@nongnu.org>; Wed,  3 Jan 2018 10:19:13 +0000 (UTC)
+From: Juan Quintela <quintela@redhat.com>
+In-Reply-To: <20180103054043.25719-11-peterx@redhat.com> (Peter Xu's message
+	of "Wed, 3 Jan 2018 13:40:42 +0800")
+References: <20180103054043.25719-1-peterx@redhat.com>
+	<20180103054043.25719-11-peterx@redhat.com>
+Reply-To: quintela@redhat.com
+Date: Wed, 03 Jan 2018 11:19:06 +0100
+Message-ID: <871sj72qjp.fsf@secure.laptop>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2.1 3/3] chardev: introduce
- qemu_chr_timeout_add() and use
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH 10/11] migration: major cleanup for migrate
+ iterations
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,154 +36,18 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, pbonzini@redhat.com, stefanha@redhat.com
+Cc: qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 
-
-
------ Original Message -----
-> It's a replacement of g_timeout_add[_seconds]() for chardevs.  Chardevs
-> now can have dedicated gcontext, we should always bind chardev tasks
-> onto those gcontext rather than the default main context.  Since there
-> are quite a few of g_timeout_add[_seconds]() callers, a new function
-> qemu_chr_timeout_add() is introduced.
->=20
-> One thing to mention is that, terminal3270 is still always running on
-> main gcontext.  However let's convert that as well since it's still part
-> of chardev codes and in case one day we'll miss that when we move it out
-> of main gcontext too.
->=20
+Peter Xu <peterx@redhat.com> wrote:
+> The major work for migration iterations are to move RAM/block/... data
+> via qemu_savevm_state_iterate().  Generalize those part into a single
+> function.
+>
 > Signed-off-by: Peter Xu <peterx@redhat.com>
 
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Reviewed-by: Juan Quintela <quintela@redhat.com>
 
-> ---
->=20
-> v2 -> v2.1: Sorry I forgot to do the move in char.h.  Did it in this
-> minor version.
->=20
->  chardev/char-pty.c     |  9 ++-------
->  chardev/char-socket.c  |  4 ++--
->  chardev/char.c         | 20 ++++++++++++++++++++
->  hw/char/terminal3270.c |  7 ++++---
->  include/chardev/char.h |  3 +++
->  5 files changed, 31 insertions(+), 12 deletions(-)
->=20
-> diff --git a/chardev/char-pty.c b/chardev/char-pty.c
-> index dd17b1b823..cbd8ac5eb7 100644
-> --- a/chardev/char-pty.c
-> +++ b/chardev/char-pty.c
-> @@ -78,13 +78,8 @@ static void pty_chr_rearm_timer(Chardev *chr, int ms)
->          s->timer_tag =3D 0;
->      }
-> =20
-> -    if (ms =3D=3D 1000) {
-> -        name =3D g_strdup_printf("pty-timer-secs-%s", chr->label);
-> -        s->timer_tag =3D g_timeout_add_seconds(1, pty_chr_timer, chr);
-> -    } else {
-> -        name =3D g_strdup_printf("pty-timer-ms-%s", chr->label);
-> -        s->timer_tag =3D g_timeout_add(ms, pty_chr_timer, chr);
-> -    }
-> +    name =3D g_strdup_printf("pty-timer-ms-%s", chr->label);
-> +    s->timer_tag =3D qemu_chr_timeout_add(chr, ms, pty_chr_timer, chr);
->      g_source_set_name_by_id(s->timer_tag, name);
->      g_free(name);
->  }
-> diff --git a/chardev/char-socket.c b/chardev/char-socket.c
-> index 630a7f2995..5cca32f963 100644
-> --- a/chardev/char-socket.c
-> +++ b/chardev/char-socket.c
-> @@ -73,8 +73,8 @@ static void qemu_chr_socket_restart_timer(Chardev *chr)
->      char *name;
-> =20
->      assert(s->connected =3D=3D 0);
-> -    s->reconnect_timer =3D g_timeout_add_seconds(s->reconnect_time,
-> -                                               socket_reconnect_timeout,
-> chr);
-> +    s->reconnect_timer =3D qemu_chr_timeout_add(chr, s->reconnect_time *=
- 1000,
-> +                                              socket_reconnect_timeout,
-> chr);
->      name =3D g_strdup_printf("chardev-socket-reconnect-%s", chr->label);
->      g_source_set_name_by_id(s->reconnect_timer, name);
->      g_free(name);
-> diff --git a/chardev/char.c b/chardev/char.c
-> index 8c3765ee99..a1de662fec 100644
-> --- a/chardev/char.c
-> +++ b/chardev/char.c
-> @@ -1084,6 +1084,26 @@ void qmp_chardev_send_break(const char *id, Error
-> **errp)
->      qemu_chr_be_event(chr, CHR_EVENT_BREAK);
->  }
-> =20
-> +/*
-> + * Add a timeout callback for the chardev (in milliseconds). Please
-> + * use this to add timeout hook for chardev instead of g_timeout_add()
-> + * and g_timeout_add_seconds(), to make sure the gcontext that the
-> + * task bound to is correct.
-> + */
-> +guint qemu_chr_timeout_add(Chardev *chr, guint ms, GSourceFunc func,
-> +                           void *private)
-> +{
-> +    GSource *source =3D g_timeout_source_new(ms);
-> +    guint id;
-> +
-> +    assert(func);
-> +    g_source_set_callback(source, func, private, NULL);
-> +    id =3D g_source_attach(source, chr->gcontext);
-> +    g_source_unref(source);
-> +
-> +    return id;
-> +}
-> +
->  void qemu_chr_cleanup(void)
->  {
->      object_unparent(get_chardevs_root());
-> diff --git a/hw/char/terminal3270.c b/hw/char/terminal3270.c
-> index a109ce5987..250137b78b 100644
-> --- a/hw/char/terminal3270.c
-> +++ b/hw/char/terminal3270.c
-> @@ -94,8 +94,8 @@ static void terminal_read(void *opaque, const uint8_t *=
-buf,
-> int size)
->          g_source_remove(t->timer_tag);
->          t->timer_tag =3D 0;
->      }
-> -    t->timer_tag =3D g_timeout_add_seconds(600, send_timing_mark_cb, t);
-> -
-> +    t->timer_tag =3D qemu_chr_timeout_add(t->chr.chr, 600 * 1000,
-> +                                        send_timing_mark_cb, t);
->      memcpy(&t->inv[t->in_len], buf, size);
->      t->in_len +=3D size;
->      if (t->in_len < 2) {
-> @@ -157,7 +157,8 @@ static void chr_event(void *opaque, int event)
->           * char-socket.c. Once qemu receives the terminal-type of the
->           * client, mark handshake done and trigger everything rolling ag=
-ain.
->           */
-> -        t->timer_tag =3D g_timeout_add_seconds(600, send_timing_mark_cb,=
- t);
-> +        t->timer_tag =3D qemu_chr_timeout_add(t->chr.chr, 600 * 1000,
-> +                                            send_timing_mark_cb, t);
->          break;
->      case CHR_EVENT_CLOSED:
->          sch->curr_status.scsw.dstat =3D SCSW_DSTAT_DEVICE_END;
-> diff --git a/include/chardev/char.h b/include/chardev/char.h
-> index 778d610295..7f71f0def0 100644
-> --- a/include/chardev/char.h
-> +++ b/include/chardev/char.h
-> @@ -256,6 +256,9 @@ Chardev *qemu_chardev_new(const char *id, const char
-> *typename,
-> =20
->  extern int term_escape_char;
-> =20
-> +guint qemu_chr_timeout_add(Chardev *chr, guint ms, GSourceFunc func,
-> +                           void *private);
-> +
->  /* console.c */
->  void qemu_chr_parse_vc(QemuOpts *opts, ChardevBackend *backend, Error
->  **errp);
-> =20
-> --
-> 2.14.3
->=20
->=20
+I am not fan of having to add yet another state enumeration, but I can
+think of a clearer way of doing it, so the reviewed-by.
+
+Thanks, Juan.
