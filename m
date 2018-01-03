@@ -1,30 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44146)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44833)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eWquz-0000ov-Iy
-	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 16:49:55 -0500
+	(envelope-from <mjc@sifive.com>) id 1eWqvO-0001H8-ME
+	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 16:50:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eWquy-0003zh-75
-	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 16:49:49 -0500
-Received: from mail-qt0-x243.google.com ([2607:f8b0:400d:c0d::243]:35995)
+	(envelope-from <mjc@sifive.com>) id 1eWqvI-0004J1-Qy
+	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 16:50:14 -0500
+Received: from mail-ot0-x22d.google.com ([2607:f8b0:4003:c0f::22d]:37411)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eWquy-0003z9-29
-	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 16:49:48 -0500
-Received: by mail-qt0-x243.google.com with SMTP id a16so3882041qtj.3
-	for <qemu-devel@nongnu.org>; Wed, 03 Jan 2018 13:49:47 -0800 (PST)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Wed,  3 Jan 2018 18:49:25 -0300
-Message-Id: <20180103214925.16677-5-f4bug@amsat.org>
-In-Reply-To: <20180103214925.16677-1-f4bug@amsat.org>
-References: <20180103214925.16677-1-f4bug@amsat.org>
+	(Exim 4.71) (envelope-from <mjc@sifive.com>) id 1eWqvI-0004Hy-Du
+	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 16:50:08 -0500
+Received: by mail-ot0-x22d.google.com with SMTP id p31so2434710ota.4
+	for <qemu-devel@nongnu.org>; Wed, 03 Jan 2018 13:50:08 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [RFC PATCH v2 4/4] tests: add some sdcard qtest
+In-Reply-To: <20180103113544.GI2450@redhat.com>
+References: <1514940265-18093-1-git-send-email-mjc@sifive.com>
+	<20180103113544.GI2450@redhat.com>
+From: Michael Clark <mjc@sifive.com>
+Date: Thu, 4 Jan 2018 10:50:06 +1300
+Message-ID: <CAHNT7Nvo-O2s6xX7kdh-EDd+TSpKHqHAzpGUS7vcUWJBV2Op3w@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v1 00/21] RISC-V QEMU Port Submission v1
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,192 +28,125 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alistair Francis <alistair.francis@xilinx.com>, Peter Maydell <peter.maydell@linaro.org>, Eric Blake <eblake@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, Markus Armbruster <armbru@redhat.com>, Thomas Huth <thuth@redhat.com>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+To: "Richard W.M. Jones" <rjones@redhat.com>
+Cc: qemu-devel@nongnu.org, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Sagar Karandikar <sagark@eecs.berkeley.edu>
 
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
----
- tests/sdbus-test.c     | 151 +++++++++++++++++++++++++++++++++++++++++++++++++
- tests/Makefile.include |   2 +
- 2 files changed, 153 insertions(+)
- create mode 100644 tests/sdbus-test.c
+On Thu, Jan 4, 2018 at 12:35 AM, Richard W.M. Jones <rjones@redhat.com>
+wrote:
 
-diff --git a/tests/sdbus-test.c b/tests/sdbus-test.c
-new file mode 100644
-index 0000000000..9c38be13cb
---- /dev/null
-+++ b/tests/sdbus-test.c
-@@ -0,0 +1,151 @@
-+/*
-+ * QTest testcase for the SD/MMC cards
-+ *
-+ * Copyright (c) 2017 Philippe Mathieu-Daudé
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or later.
-+ * See the COPYING file in the top-level directory.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "qemu/bswap.h"
-+#include "qemu/cutils.h"
-+
-+#include "libqtest.h"
-+#include "libqos/sdbus.h"
-+
-+enum {
-+    PROTO_SD,
-+    PROTO_MMC,
-+    PROTO_SPI,
-+    PROTO_COUNT
-+};
-+
-+static const char *proto_name[PROTO_COUNT] = {
-+    [PROTO_SD]  = "sd",
-+    [PROTO_MMC] = "mmc",
-+    [PROTO_SPI] = "spi"
-+};
-+
-+static const char *machines[PROTO_COUNT] = {
-+    [PROTO_SD] = "nuri",
-+    //[PROTO_MMC] = "vexpress-a9",
-+    //[PROTO_SPI] = "lm3s6965evb"
-+};
-+
-+static const uint64_t sizes[] = {
-+    //512 * M_BYTE,
-+    //1 * G_BYTE,
-+    4 * G_BYTE,
-+    //64 * G_BYTE,
-+};
-+
-+typedef struct {
-+    int protocol;
-+    uint64_t size;
-+} TestCase;
-+
-+static void test1(SDBusAdapter *mmc, uint64_t size)
-+{
-+    uint8_t *response;
-+    uint16_t rca;
-+    ssize_t sz;
-+
-+    sz = sdbus_do_cmd(mmc, GO_IDLE_STATE, 0, NULL);
-+    g_assert_cmpuint(sz, ==, 0);
-+
-+    sz = sdbus_do_cmd(mmc, SEND_IF_COND, 0x1aa, NULL);
-+    //g_assert_cmpuint(sz, ==, 0);
-+
-+    sz = sdbus_do_acmd(mmc, SEND_OP_COND, 0x40300000, 0, NULL);
-+    g_assert_cmpuint(sz, ==, 4);
-+
-+    /* CID */
-+    sz = sdbus_do_cmd(mmc, ALL_SEND_CID, 0, &response);
-+    g_assert_cmpuint(sz, ==, 16);
-+    g_assert_cmpmem (&response[3], 5, "QEMU!", 5);
-+    g_assert_cmphex(be32_to_cpu(*(uint32_t *)&response[9]), ==, 0xdeadbeef);
-+    g_free(response);
-+
-+    /* RCA */
-+    sz = sdbus_do_cmd(mmc, SEND_RELATIVE_ADDR, 0, &response);
-+    g_assert_cmpuint(sz, ==, 4);
-+    rca = be16_to_cpu(*(uint16_t *)response);
-+    g_assert_cmphex(rca, ==, 0x4567);
-+    g_free(response);
-+
-+    /* CSD */
-+    sz = sdbus_do_cmd(mmc, SEND_CSD, rca << 16, &response);
-+    g_assert_cmpuint(sz, ==, 16);
-+    g_assert_cmphex(response[3], ==, 0x32);
-+    g_assert_cmphex(response[4], ==, 0x5b); /* class */
-+    g_assert_cmphex(response[5], ==, 0x59);
-+    /* (SDHC test) */
-+    g_assert_cmphex(be32_to_cpu(*(uint32_t *)&response[6]),
-+                    ==, (size >> 19) - 1);
-+    g_assert_cmphex(response[10], ==, 0x7f);
-+    g_assert_cmphex(response[11], ==, 0x80);
-+    g_assert_cmphex(response[12], ==, 0x0a);
-+    g_assert_cmphex(response[13], ==, 0x40);
-+    g_assert_cmphex(response[14], ==, 0);
-+    g_assert_cmphex(response[15], ==, 0);
-+    g_free(response);
-+
-+    sz = sdbus_do_cmd(mmc, SELECT_CARD, rca << 16, NULL);
-+
-+    sz = sdbus_do_acmd(mmc, SEND_SCR, 0, rca, &response);
-+    g_assert_cmpuint(sz, ==, 4);
-+    g_free(response);
-+
-+    // TODO 8x: sdcard_read_data len 512
-+
-+    //sz = sdbus_do_acmd(mmc, SEND_STATUS, 0, rca, &response);
-+    //g_free(response);
-+}
-+
-+static void sdcard_tests(gconstpointer data)
-+{
-+    const TestCase *test = data;
-+    SDBusAdapter *sdbus;
-+
-+    global_qtest = qtest_startf("-machine %s "
-+                         "-drive if=sd,driver=null-co,size=%lu,id=mmc0",
-+                         machines[test->protocol], test->size);
-+    sdbus = qmp_sdbus_create("sd-bus");
-+
-+    test1(sdbus, test->size);
-+    g_free(sdbus);
-+
-+    qtest_quit(global_qtest);
-+}
-+
-+int main(int argc, char **argv)
-+{
-+    const char *arch = qtest_get_arch();
-+    int iproto, isize;
-+    gchar *path;
-+    TestCase *test;
-+
-+    g_test_init(&argc, &argv, NULL);
-+
-+    if (strcmp(arch, "arm") == 0 || strcmp(arch, "aarch64") == 0) {
-+        for (iproto = 0; iproto < PROTO_COUNT; iproto++) {
-+            if (!machines[iproto]) {
-+                continue;
-+            }
-+            for (isize = 0; isize < ARRAY_SIZE(sizes); isize++) {
-+                test = g_new(TestCase, 1);
-+
-+                test->protocol = iproto;
-+                test->size = sizes[isize];
-+
-+                path = g_strdup_printf("sdcard/%s/%lu", proto_name[iproto], sizes[isize]);
-+                qtest_add_data_func(path, test, sdcard_tests);
-+                g_free(path);
-+                // g_free(test)?
-+            }
-+        }
-+    }
-+
-+    return g_test_run();
-+}
-diff --git a/tests/Makefile.include b/tests/Makefile.include
-index 409784a189..e4434cdfff 100644
---- a/tests/Makefile.include
-+++ b/tests/Makefile.include
-@@ -348,6 +348,7 @@ check-qtest-sparc64-y = tests/endianness-test$(EXESUF)
- check-qtest-sparc64-y += tests/prom-env-test$(EXESUF)
- 
- check-qtest-arm-y = tests/tmp105-test$(EXESUF)
-+check-qtest-arm-y = tests/sdbus-test$(EXESUF)
- check-qtest-arm-y += tests/ds1338-test$(EXESUF)
- check-qtest-arm-y += tests/m25p80-test$(EXESUF)
- gcov-files-arm-y += hw/misc/tmp105.c
-@@ -748,6 +749,7 @@ tests/bios-tables-test$(EXESUF): tests/bios-tables-test.o \
- 	tests/boot-sector.o tests/acpi-utils.o $(libqos-obj-y)
- tests/pxe-test$(EXESUF): tests/pxe-test.o tests/boot-sector.o $(libqos-obj-y)
- tests/tmp105-test$(EXESUF): tests/tmp105-test.o $(libqos-omap-obj-y)
-+tests/sdbus-test$(EXESUF): tests/sdbus-test.o $(libqos-obj-y)
- tests/ds1338-test$(EXESUF): tests/ds1338-test.o $(libqos-imx-obj-y)
- tests/m25p80-test$(EXESUF): tests/m25p80-test.o
- tests/i440fx-test$(EXESUF): tests/i440fx-test.o $(libqos-pc-obj-y)
--- 
-2.15.1
+> Just a few small points:
+>
+> (1) I've built Fedora RPMs from this patch set [approximately - I'm
+> using a very slightly different / slightly older version, but it's not
+> substantively different]:
+>
+>   http://copr-fe.cloud.fedoraproject.org/coprs/rjones/riscv/
+>
+> It works well for me building plenty of Fedora packages over the past
+> few weeks, except for a possible Linux kernel bug which interacts with
+> the patch set not handling EBREAK correctly, which I had to patch
+> around (in the kernel):
+>
+>   https://groups.google.com/a/groups.riscv.org/forum/#!msg/
+> sw-dev/v05FjcGC1EI/atXXUAcsCgAJ
+
+
+Do you have any evidence that the RISC-V QEMU port is not handling ebreak
+correctly? I've reviewed the code and looked at your kernel oops and QEMU
+appears to be correctly trapping with a breapoint exception. At this point
+I think the issue is a riscv linux-kernel bug until we have any evidence to
+the contrary. I suspect from your ooops message that you are encountering
+an ebreak in kernel code given mepc contained a kernel address. GCC 7.x now
+inserts ebreaks in certain conditions i.e. if there is a null dereference
+that should not be reached.
+
+There is an erroneous fprintf that should perhaps be removed, as the debug
+mode support is not required to handle breakpoint exceptions.
+
+-
+https://github.com/riscv/riscv-qemu/blob/qemu-upstream-v1/target/riscv/helper.c#L394-L396
+
+Debug mode in the fprintf is referring to JTAG debug as specified in the
+Draft RISC-V External Debug Support specification. We don't intend to
+implement JTAG debug emulation in RISC-V QEMU any time soon, so ebreak
+should just trap and the printf can be removed. We could potentially add
+trace support for exceptions. The RISC-V support doesn't yet implement any
+tracing hooks. I've been trying to adjust stray printf's to use
+error_report but this is one I missed. I would like to add trace support
+for interrupts and exceptions which would be more generally useful.
+
+(2) I'm worried that this patch starts off using virtio-mmio instead
+> of virtio-pci.  virtio-pci is better in every respect than
+> virtio-mmio, and while it may be a good interim solution I think we
+> need to have a plan to get rid of it eventually, and should make it
+> clear that virtio-mmio is not a permanent ABI so we don't get into the
+> same situation that we did with -M virt on ARM.
+>
+
+I've noted in [PATCH v1 00/00] that we have a goal to add GPEX to the
+SiFive RISC-V virt board. The idea with the initial version of the virt
+board is to provide enough infrastructure so that distro builders can use
+RISC-V QEMU. Prior to the work to implement PLIC, device-tree and VirtIO,
+there was no network and block device support so it was not possible to use
+QEMU for distro bring up. Now RISC-V QEMU is usable. Data point: the arm
+'virt' board still supports VirtIO MMIO. I don't think this should be a
+blocking issue. I've looked at device support in other ports and it seems
+unreasonable to set such a high bar for inclusion of a port. We would, as
+mentioned in [PATCH v1 00/00], like to shift our development focus to
+upstream QEMU versus maintaining an out-of-tree port so I don't think some
+as yet unsupported feature should be a barrier to inclusion. We also don't
+/yet/ support live migration. We currently only support 8 CPUs due to a
+hardcoded limit in BBL. There is also RISC-V FPGA Soft Core IP that uses
+the XILINX PCIe controller, and given that we have a goal to maintain
+compatibility with Soft Core IP, there may be RISC-V machines that use the
+XILINX PCIe controller.
+
+You can be certain that we are aware of the benefits of VirtIO PCI.
+
+If PCI is a blocking issue we can remove the 'virt' machine from the
+patchset. It's not necessary for the RISC-V port to be usable. i.e. we can
+maintain it in the riscv.org tree.
+
+(3) poweroff doesn't work if you use -M virt (and hence don't use
+> HTIF).  I wrote a dummy poweroff device to get around this, but I
+> think it could raise a bigger point: Why bother to support HTIF
+> machine types at all?  The reason given in the patch set is because
+> spike (the cycle-accurate RISC-V emulator) only supports HTIF but
+> is that a good reason?
+>
+
+Spike (aka 'riscv-isa-sim') is not a cycle-accurate simulator. It's the
+RISC-V "golden reference" ISA simulator. i.e. is the canonical behavioural
+simulator for the RISC-V ISA.
+
+We are going to support HTIF on the Spike machines and this patch set is
+consistent with that policy. Currently HTIF is the only IO mechanism
+supported by Spike. It is our goal to maintain Spike compatible machines.
+This is important for binary compatibility and verification reasons that we
+can emulate 'riscv-isa-sim'. HTIF is not appropriate for the other machines
+for reasons already discussed on the RISC-V Software Development mailing
+list however HTIF will be maintained and supported while it remains the
+only supported IO mechanism on Spike. If it was removed, we would need to
+remove the Spike machines which would be quite unfortunate.
+
+The plan for power off and reset is to implement SiFive's AON/PRCI block
+(Always On / Power, Reset, Interrupt). We may indeed rename 'virt' to
+'sifive_virt' to avoid any comparisons with the arm 'virt' machine. The
+SiFive 'virt' machine is derived from SiFive's Freedom U500 machine and
+implements the SiFive CLINT (Core Local Interruptor) and PLIC (Platform
+Level Interrupt Controller). It's device-tree is unique to the device-tree
+used by SiFive's hardware.
+
+If HTIF is a blocking issue we can remove the 'spike' machines from the
+patchset. It's not necessary for the RISC-V port to be usable. i.e. we can
+maintain it in the riscv.org tree.
+
+The sooner we can get through patch review for the bulk of the port, the
+sooner we can shift our attention to future development. i.e. AON/PRCI for
+power off and reset and GPEX for virtio-pci.
+
+There is already ~14,000 LOC for review so I don't think deferring
+inclusion based on as yet undeveloped features is a very good rationale.
+RISC-V has not been around for 30+ years so comparison to arm features at
+this point is a little bit unfair. EM_MOXIE 223 and EM_RISCV 243 are
+perhaps more fair comparisons, although moxie is already in QEMU.
