@@ -1,28 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46900)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50422)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1eWs4F-0007y4-Ak
-	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 18:03:28 -0500
+	(envelope-from <eblake@redhat.com>) id 1eWs89-0001gp-I4
+	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 18:07:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1eWs4B-0005bT-Vn
-	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 18:03:27 -0500
-Received: from mail-pf0-x243.google.com ([2607:f8b0:400e:c00::243]:32970)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1eWs4B-0005aW-Ow
-	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 18:03:23 -0500
-Received: by mail-pf0-x243.google.com with SMTP id y89so1356417pfk.0
-	for <qemu-devel@nongnu.org>; Wed, 03 Jan 2018 15:03:23 -0800 (PST)
-References: <1514940265-18093-1-git-send-email-mjc@sifive.com>
-	<1514940265-18093-10-git-send-email-mjc@sifive.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <d2f758ef-d699-7b4d-cef5-bd692b8ba791@linaro.org>
-Date: Wed, 3 Jan 2018 15:03:19 -0800
+	(envelope-from <eblake@redhat.com>) id 1eWs86-0004xt-3y
+	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 18:07:29 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:54282)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1eWs85-0004wf-Qd
+	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 18:07:26 -0500
+References: <151457311672.138.10990872638117953444@5adcb62bf0d6>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <b7c24661-0816-cf27-6d79-fe6a584e8b7a@redhat.com>
+Date: Wed, 3 Jan 2018 17:07:19 -0600
 MIME-Version: 1.0
-In-Reply-To: <1514940265-18093-10-git-send-email-mjc@sifive.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v1 09/21] RISC-V Physical Memory Protection
+In-Reply-To: <151457311672.138.10990872638117953444@5adcb62bf0d6>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="Yc1gIEvlkkZcO8GjjFZariIfbGAN4ioW0"
+Subject: Re: [Qemu-devel] [PATCH v3] linux-user: Use *at functions instead
+ of caching interp_prefix contents
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,98 +28,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Michael Clark <mjc@sifive.com>, qemu-devel@nongnu.org
-Cc: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Sagar Karandikar <sagark@eecs.berkeley.edu>
+To: qemu-devel@nongnu.org, no-reply@patchew.org, richard.henderson@linaro.org
+Cc: peter.maydell@linaro.org, famz@redhat.com, rth@twiddle.net
 
-On 01/02/2018 04:44 PM, Michael Clark wrote:
-> +#ifdef DEBUG_PMP
-> +#define PMP_PRINTF(fmt, ...) \
-> +do { fprintf(stderr, "pmp: " fmt, ## __VA_ARGS__); } while (0)
-> +#else
-> +#define PMP_PRINTF(fmt, ...) \
-> +do {} while (0)
-> +#endif
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--Yc1gIEvlkkZcO8GjjFZariIfbGAN4ioW0
+From: Eric Blake <eblake@redhat.com>
+To: qemu-devel@nongnu.org, no-reply@patchew.org, richard.henderson@linaro.org
+Cc: peter.maydell@linaro.org, famz@redhat.com, rth@twiddle.net
+Message-ID: <b7c24661-0816-cf27-6d79-fe6a584e8b7a@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v3] linux-user: Use *at functions instead of
+ caching interp_prefix contents
+References: <151457311672.138.10990872638117953444@5adcb62bf0d6>
+In-Reply-To: <151457311672.138.10990872638117953444@5adcb62bf0d6>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Debugging goes to qemu_log.
+On 12/29/2017 12:45 PM, no-reply@patchew.org wrote:
+> Hi,
+>=20
+> This series seems to have some coding style problems. See output below =
+for
+> more information:
+>=20
+> =3D=3D=3D OUTPUT BEGIN =3D=3D=3D
+> Checking PATCH 1/1: linux-user: Use *at functions instead of caching in=
+terp_prefix contents...
+> ERROR: do not use assignment in if condition
+> #25: FILE: linux-user/elfload.c:2206:
+> +    if (interp_dirfd < 0
 
-Rearrange this so that formatting is always compile-time checked.
-E.g.
+Given that your compact if with embedded assignment makes the syntax
+checker unhappy, should we look for a v4 that uses the construct we
+debated in v2:
 
-#define DEBUG_PMP 0
-#define PMP_PRINTF(fmt, ...)                  \
-  do {                                        \
-    if (DEBUG_PMP) {                          \
-      qemu_log("pmp: " fmt, ##__VA_ARGS__);   \
-    }                                         \
-  } while (0)
-
-> 
-> +static target_ulong pmp_get_napot_base_and_range(target_ulong reg,
-> +    target_ulong *range)
-> +{
-> +    /* construct a mask of all bits bar the top bit */
-> +    target_ulong mask = 0u;
-> +    target_ulong base = reg;
-> +    target_ulong numbits = (sizeof(target_ulong) * 8u) + 2u;
-> +    mask = (mask - 1u) >> 1;
-> +
-> +    while (mask) {
-> +        if ((reg & mask) == mask) {
-> +            /* this is the mask to use */
-> +            base = reg & ~mask;
-> +            break;
-> +        }
-> +        mask >>= 1;
-> +        numbits--;
-> +    }
-> +
-> +    *range = (1lu << numbits) - 1u;
-> +    return base;
-> +}
-
-You can compute napot with ctz64(~reg).
-More useless LU suffixes.
-
-> +    if (pmp_index >= 1u) {
-> +        prev_addr = env->pmp_state.pmp[pmp_index].addr_reg;
-
-pmp_index - 1
-
-> 
-> +    for (i = 0; i < MAX_RISCV_PMPS; i++) {
-> +        const uint8_t a_field =
-> +            pmp_get_a_field(env->pmp_state.pmp[i].cfg_reg);
-> +        if (PMP_AMATCH_OFF != a_field) {
-> +            env->pmp_state.num_rules++;
-> +        }
-> +    }
-
-Doesn't this mean that pmp_index ordering != pmp_state ordering?  Which would
-mean that you'd be matching rules in the wrong order for the static prioirity.
-
-> +static int pmp_is_in_range(CPURISCVState *env, int pmp_index, target_ulong addr)
-> +{
-> +    int result = 0;
-> +
-> +    if ((addr >= env->pmp_state.addr[pmp_index].sa)
-> +        && (addr < env->pmp_state.addr[pmp_index].ea)) {
-> +        result = 1;
-
-Given how the range is computed in pmp_update_rule, surely <= ea.
-
-> +        s = pmp_is_in_range(env, i, addr);
-> +        e = pmp_is_in_range(env, i, addr + size);
-
-Surely addr + size - 1.
-
-> 
-> +    /* val &= 0x3ffffffffffffful; */
-> +
-
-Why is this commented out?  Surely that's exactly what the spec says.
-Although it's easier to compare as
-
-  val = extract64(val, 0, 54);
+while (1) {
+    if (interp_dirfd > 0 && filename[0] =3D=3D '/') {
+        fd =3D openat(interp_dirfd, filename + 1, O_RDONLY);
+        if (fd >=3D 0 || errno !=3D ENOENT) {
+            break;
+        }
+    }
+    fd =3D open(filename, O_RDONLY);
+    break;
+}
 
 
-r~
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--Yc1gIEvlkkZcO8GjjFZariIfbGAN4ioW0
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlpNYicACgkQp6FrSiUn
+Q2r4Uwf+OtmPAyQlOamqzpE7ch8fpFOWCxcU+N8iHkisJRvoD51UNSrgQ+ECgRKe
+mFj4yz89k3XLC/x1d4zK0pS+Wtsv01SPf3rP0JbbCg8s0fTEhIY+j8PVvsgfDMJ3
+P2f7kkW6tKjEJ8ytRjz46DxDDQZp6T/3VDPjwM0vbG+HPy650DiDzZMHUXF83oKV
+TMJviywjfCGMEQTcoB33rlYM0/py4Z/3lB3OmaXcn9YWcuTQz7qQ3/pyOXmVM8SC
+BuVGDcB8SdVs/1tOAa/9YuqBpQDsOIzYYh+JuXBxCbR232noL6KY0umohP2XoQC1
+cV863t2KGr7Yzi/ku53KNBT6uoLFQQ==
+=sNAP
+-----END PGP SIGNATURE-----
+
+--Yc1gIEvlkkZcO8GjjFZariIfbGAN4ioW0--
