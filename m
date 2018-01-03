@@ -1,29 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42163)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43963)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1eWWg6-0002KE-2s
-	for qemu-devel@nongnu.org; Tue, 02 Jan 2018 19:13:06 -0500
+	(envelope-from <alistair23@gmail.com>) id 1eWWig-0003gX-Qw
+	for qemu-devel@nongnu.org; Tue, 02 Jan 2018 19:15:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1eWWg5-00072j-8g
-	for qemu-devel@nongnu.org; Tue, 02 Jan 2018 19:13:06 -0500
-Received: from mail-wr0-x242.google.com ([2a00:1450:400c:c0c::242]:43900)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
-	id 1eWWg5-00072P-1u
-	for qemu-devel@nongnu.org; Tue, 02 Jan 2018 19:13:05 -0500
-Received: by mail-wr0-x242.google.com with SMTP id w68so71275wrc.10
-	for <qemu-devel@nongnu.org>; Tue, 02 Jan 2018 16:13:05 -0800 (PST)
+	(envelope-from <alistair23@gmail.com>) id 1eWWif-0000Kq-4y
+	for qemu-devel@nongnu.org; Tue, 02 Jan 2018 19:15:46 -0500
 MIME-Version: 1.0
 Sender: alistair23@gmail.com
-In-Reply-To: <20171229174933.1781-14-f4bug@amsat.org>
+In-Reply-To: <20171229174933.1781-1-f4bug@amsat.org>
 References: <20171229174933.1781-1-f4bug@amsat.org>
-	<20171229174933.1781-14-f4bug@amsat.org>
 From: Alistair Francis <alistair.francis@xilinx.com>
-Date: Tue, 2 Jan 2018 16:12:33 -0800
-Message-ID: <CAKmqyKME07gNWYsi6GcH+NCCgkYuHFazFn70x-3XC6vXUnTo8w@mail.gmail.com>
+Date: Tue, 2 Jan 2018 16:15:13 -0800
+Message-ID: <CAKmqyKNDbhAQWXYPrhFnbqcCRDO_ZeBdUuC_xna9XpqCvw452g@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3 13/42] sdhci: rename the SDHC_CAPAB
- register
+Subject: Re: [Qemu-devel] [PATCH v3 00/42] SDHCI: housekeeping,
+ add a qtest and fix few issues
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,48 +25,177 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Cc: Alistair Francis <alistair.francis@xilinx.com>, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, Peter Maydell <peter.maydell@linaro.org>, Andrey Smirnov <andrew.smirnov@gmail.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
+Cc: Alistair Francis <alistair.francis@xilinx.com>, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, Peter Maydell <peter.maydell@linaro.org>, Andrey Smirnov <andrew.smirnov@gmail.com>, Sai Pavan Boddu <saipava@xilinx.com>, Clement Deschamps <clement.deschamps@antfield.fr>, Jean-Christophe Dubois <jcd@tribudubois.net>, =?UTF-8?Q?Gr=C3=A9gory_Estrade?= <gregory.estrade@gmail.com>, Igor Mitsyanko <i.mitsyanko@gmail.com>, Krzysztof Kozlowski <krzk@kernel.org>, Andrew Baumann <Andrew.Baumann@microsoft.com>, Prasad J Pandit <pjp@fedoraproject.org>, Eduardo Habkost <ehabkost@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>
 
-On Fri, Dec 29, 2017 at 9:49 AM, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.o=
+On Fri, Dec 29, 2017 at 9:48 AM, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.o=
 rg> wrote:
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+> Since v2:
+> - more detailed 'capabilities', all boards converted to use these propert=
+ies
+> - since all qtests pass, removed the previous 'capareg' property
+> - added Stefan/Alistair R-b
+> - corrected 'access' LED behavior (Alistair's review)
+> - more uses of the registerfields API
+> - remove some dead code
+> - cosmetix:
+>   - added more comments
+>   - renamed a pair of registers
+>   - reordered few struct members
+>
+> Note, the bcm2835 seems to have 1KB minimum blocksize, however the curren=
+t
+> model is implemented with 512B. I didn't change the current value.
+>
+> Since v1:
+> - addressed Alistair Francis review comments, added some R-b
+> - only move register defines to "sd-internal.h"
+> - fixed deposit64() arguments
+> - dropped unuseful s->fifo_buffer =3D NULL
+> - use a qemu_irq for the LED, restrict the logging to ON/OFF
+> - fixed a trace format string error
+> - included Andrey Smirnov ACMD12ERRSTS write patch
+> - dropped few unuseful patches, and separate the Python polemical ones fo=
+r later
+>
+> From the "SDHCI housekeeping" series:
+> - 1: we restrict part of "sd/sd.h" into local "sd-internal.h",
+> - 2,3: we somehow beautiful the code, no logical changes,
+> - 4-7: we refactor the common sysbus/pci qdev code,
+> - 8-10: we add plenty of trace events which will result useful later,
+> - 11: we finally expose a "dma-memory" property.
+> From the "SDHCI: add a qtest and fix few issues" series:
+> - 12,13: fix registers
+> - 14,15: boards can specify which SDHCI Spec to use (v2 and v3 so far)
+> - 15-20: HCI qtest
+>
+> Regards,
+>
+> Phil.
+>
+> $ git backport-diff
+> [----] : patches are identical
+> [####] : number of functional differences between upstream/downstream pat=
+ch
+> [down] : patch is downstream-only
+> The flags [FC] indicate (F)unctional and (C)ontextual differences, respec=
+tively
+>
+> 001/42:[0003] [FC] 'sdhci: clean up includes'
+> 002/42:[down] 'sdhci: sort registers comments'
+> 003/42:[down] 'sdhci: remove dead code'
+> 004/42:[----] [--] 'sdhci: refactor same sysbus/pci properties'
+> 005/42:[----] [--] 'sdhci: refactor common sysbus/pci class_init()'
+> 006/42:[----] [--] 'sdhci: refactor common sysbus/pci realize()'
+> 007/42:[0001] [FC] 'sdhci: refactor common sysbus/pci unrealize()'
+> 008/42:[----] [--] 'sdhci: use qemu_log_mask(UNIMP) instead of fprintf()'
+> 009/42:[----] [--] 'sdhci: convert the DPRINT() calls into trace events'
+> 010/42:[down] 'sdhci: add a GPIO for the 'access control' LED'
+> 011/42:[----] [--] 'sdhci: move MASK_TRNMOD with other SDHC_TRN* defines'
+> 012/42:[down] 'sdhci: use FIELD_DP32() macro for the WRITE_PROTECT flag'
+> 013/42:[down] 'sdhci: rename the SDHC_CAPAB register'
+> 014/42:[0008] [FC] 'sdhci: fix CAPAB/MAXCURR registers, 64bit and read-on=
+ly'
+> 015/42:[----] [-C] 'sdhci: Implement write method of ACMD12ERRSTS registe=
+r'
+> 016/42:[down] 'sdhci: use deposit64() on admasysaddr'
+> 017/42:[----] [-C] 'sdhci: add a "dma-memory" property'
+> 018/42:[down] 'sdhci: add a spec_version property'
+> 019/42:[down] 'sdhci: add basic Spec v1 capabilities'
+> 020/42:[down] 'sdhci: add max-block-length capability (Spec v1)'
+> 021/42:[down] 'sdhci: add clock capabilities (Spec v1)'
+> 022/42:[down] 'sdhci: add DMA and 64-bit capabilities (Spec v2)'
+> 023/42:[down] 'sdhci: default to Spec v2'
+> 024/42:[down] 'sdhci: add a 'dma' shortcut property'
+> 025/42:[down] 'sdhci: add BLOCK_SIZE_MASK for DMA'
+> 026/42:[down] 'sdhci: Fix 64-bit ADMA2'
+> 027/42:[down] 'hw/arm/exynos4210: implement SDHCI Spec v2'
+> 028/42:[down] 'hw/arm/xilinx_zynq: implement SDHCI Spec v2'
+> 029/42:[0022] [FC] 'sdhci: add qtest to check the SD Spec version'
+> 030/42:[down] 'sdhci: check Spec v2 capabilities qtest'
+> 031/42:[down] 'sdhci: add v3 capabilities'
+> 032/42:[down] 'sdhci: rename the hostctl1 register'
+> 033/42:[down] 'hw/arm/bcm2835_peripherals: implement SDHCI Spec v3'
+> 034/42:[down] 'hw/arm/fsl-imx6: implement SDHCI Spec v3'
+> 035/42:[down] 'hw/arm/xilinx_zynqmp: implement SDHCI Spec v3'
+> 036/42:[down] 'sdhci: check Spec v3 capabilities qtest'
+> 037/42:[down] 'sdhci: remove the deprecated 'capareg' property'
+> 038/42:[0008] [FC] 'sdhci: add check_capab_readonly() qtest'
+> 039/42:[0009] [FC] 'sdhci: add a check_capab_baseclock() qtest'
+> 040/42:[0011] [FC] 'sdhci: add a check_capab_sdma() qtest'
+> 041/42:[----] [-C] 'sdhci: add a check_capab_v3() qtest'
+> 042/42:[down] 'sdhci: add Spec v4.2 register definitions'
 
-Reviewed-by: Alistair Francis <alistair.francis@xilinx.com>
+We are making progress here. Do you think it would be worth splitting
+out the earlier patches that have been reviewed so far so they can be
+merged? A 42 patch series it pretty daunting and most of the first 20
+are pretty straightforward and have been reviewed.
 
 Alistair
 
-> ---
->  hw/sd/sdhci-internal.h | 2 +-
->  hw/sd/sdhci.c          | 2 +-
->  2 files changed, 2 insertions(+), 2 deletions(-)
 >
-> diff --git a/hw/sd/sdhci-internal.h b/hw/sd/sdhci-internal.h
-> index df240ea046..b7475a1b7b 100644
-> --- a/hw/sd/sdhci-internal.h
-> +++ b/hw/sd/sdhci-internal.h
-> @@ -176,7 +176,7 @@ FIELD(SDHC_PRNSTS, WRITE_PROTECT,      19, 1);
->  #define SDHC_ACMD12ERRSTS              0x3C
+> Andrey Smirnov (1):
+>   sdhci: Implement write method of ACMD12ERRSTS register
 >
->  /* HWInit Capabilities Register 0x05E80080 */
-> -#define SDHC_CAPAREG                   0x40
-> +#define SDHC_CAPAB                     0x40
->  #define SDHC_CAN_DO_DMA                0x00400000
->  #define SDHC_CAN_DO_ADMA2              0x00080000
->  #define SDHC_CAN_DO_ADMA1              0x00100000
-> diff --git a/hw/sd/sdhci.c b/hw/sd/sdhci.c
-> index b5ecbc9969..604ad525f6 100644
-> --- a/hw/sd/sdhci.c
-> +++ b/hw/sd/sdhci.c
-> @@ -903,7 +903,7 @@ static uint64_t sdhci_read(void *opaque, hwaddr offse=
-t, unsigned size)
->      case SDHC_ACMD12ERRSTS:
->          ret =3D s->acmd12errsts;
->          break;
-> -    case SDHC_CAPAREG:
-> +    case SDHC_CAPAB:
->          ret =3D s->capareg;
->          break;
->      case SDHC_MAXCURR:
+> Philippe Mathieu-Daud=C3=A9 (40):
+>   sdhci: clean up includes
+>   sdhci: sort registers comments
+>   sdhci: remove dead code
+>   sdhci: refactor same sysbus/pci properties into a common one
+>   sdhci: refactor common sysbus/pci class_init() into sdhci_class_init()
+>   sdhci: refactor common sysbus/pci realize() into sdhci_realizefn()
+>   sdhci: refactor common sysbus/pci unrealize() into sdhci_unrealizefn()
+>   sdhci: use qemu_log_mask(UNIMP) instead of fprintf()
+>   sdhci: convert the DPRINT() calls into trace events
+>   sdhci: add a GPIO for the 'access control' LED
+>   sdhci: move MASK_TRNMOD with other SDHC_TRN* defines in "sd-internal.h"
+>   sdhci: use FIELD_DP32() macro for the WRITE_PROTECT flag
+>   sdhci: rename the SDHC_CAPAB register
+>   sdhci: fix CAPAB/MAXCURR registers, both are 64bit and read-only
+>   sdhci: use deposit64() on admasysaddr
+>   sdhci: add a "dma-memory" property
+>   sdhci: add a spec_version property
+>   sdhci: add basic Spec v1 capabilities
+>   sdhci: add max-block-length capability (Spec v1)
+>   sdhci: add clock capabilities (Spec v1)
+>   sdhci: add DMA and 64-bit capabilities (Spec v2)
+>   sdhci: default to Spec v2
+>   sdhci: add a 'dma' shortcut property
+>   sdhci: add BLOCK_SIZE_MASK for DMA
+>   hw/arm/exynos4210: implement SDHCI Spec v2
+>   hw/arm/xilinx_zynq: implement SDHCI Spec v2
+>   sdhci: add qtest to check the SD Spec version
+>   sdhci: check Spec v2 capabilities qtest
+>   sdhci: add v3 capabilities
+>   sdhci: rename the hostctl1 register
+>   hw/arm/bcm2835_peripherals: implement SDHCI Spec v3
+>   hw/arm/fsl-imx6: implement SDHCI Spec v3
+>   hw/arm/xilinx_zynqmp: implement SDHCI Spec v3
+>   sdhci: check Spec v3 capabilities qtest
+>   sdhci: remove the deprecated 'capareg' property
+>   sdhci: add check_capab_readonly() qtest
+>   sdhci: add a check_capab_baseclock() qtest
+>   sdhci: add a check_capab_sdma() qtest
+>   sdhci: add a check_capab_v3() qtest
+>   sdhci: add Spec v4.2 register definitions
+>
+> Sai Pavan Boddu (1):
+>   sdhci: Fix 64-bit ADMA2
+>
+>  include/hw/sd/sdhci.h        |  59 ++++-
+>  hw/sd/sdhci-internal.h       |  81 +++++--
+>  hw/arm/bcm2835_peripherals.c |  35 ++-
+>  hw/arm/exynos4210.c          |  13 +-
+>  hw/arm/fsl-imx6.c            |  12 +
+>  hw/arm/xilinx_zynq.c         |  64 ++++--
+>  hw/arm/xlnx-zynqmp.c         |  38 +++-
+>  hw/sd/sdhci.c                | 513 +++++++++++++++++++++++++------------=
+------
+>  tests/sdhci-test.c           | 177 +++++++++++++++
+>  hw/sd/trace-events           |  15 ++
+>  tests/Makefile.include       |   3 +
+>  11 files changed, 718 insertions(+), 292 deletions(-)
+>  create mode 100644 tests/sdhci-test.c
+>
 > --
 > 2.15.1
 >
