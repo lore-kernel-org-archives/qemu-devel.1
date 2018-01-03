@@ -1,25 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39692)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40530)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1eWrLx-00037f-Rk
-	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 17:17:43 -0500
+	(envelope-from <eblake@redhat.com>) id 1eWrNF-0003yR-P0
+	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 17:19:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1eWrLu-0001DA-Bx
-	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 17:17:41 -0500
-Resent-Message-Id: <E1eWrLu-0001DA-Bx@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21429)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1eWrLu-0001Bb-4s
-	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 17:17:38 -0500
-In-Reply-To: <20180103214925.16677-1-f4bug@amsat.org>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <151501782817.222.12607040982466347272@5adcb62bf0d6>
+	(envelope-from <eblake@redhat.com>) id 1eWrNE-0003gD-HV
+	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 17:19:01 -0500
+References: <20171225025107.23985-1-famz@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <270e884b-9a6a-3902-b9d4-4e4635d73fec@redhat.com>
+Date: Wed, 3 Jan 2018 16:18:50 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Wed, 3 Jan 2018 14:17:09 -0800 (PST)
-Subject: Re: [Qemu-devel] [RFC PATCH v2 0/4] sdbus: testing sdcards
+In-Reply-To: <20171225025107.23985-1-famz@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="pw3MarJnw28eBxwZ8Vg7Uc9CqKmz12Z1e"
+Subject: Re: [Qemu-devel] [PATCH v2] iotests: Test creating overlay when
+ guest running
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,79 +24,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: f4bug@amsat.org
-Cc: famz@redhat.com, alistair.francis@xilinx.com, peter.maydell@linaro.org, eblake@redhat.com, pbonzini@redhat.com, kwolf@redhat.com, armbru@redhat.com, stefanha@redhat.com, edgar.iglesias@xilinx.com, marcandre.lureau@redhat.com, thuth@redhat.com, qemu-devel@nongnu.org
+To: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org, Jeff Cody <jcody@redhat.com>
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
-c3NhZ2UtaWQ6IDIwMTgwMTAzMjE0OTI1LjE2Njc3LTEtZjRidWdAYW1zYXQub3JnClN1YmplY3Q6
-IFtRZW11LWRldmVsXSBbUkZDIFBBVENIIHYyIDAvNF0gc2RidXM6IHRlc3Rpbmcgc2RjYXJkcwoK
-PT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaAoKQkFTRT1iYXNlCm49MQp0b3Rh
-bD0kKGdpdCBsb2cgLS1vbmVsaW5lICRCQVNFLi4gfCB3YyAtbCkKZmFpbGVkPTAKCmdpdCBjb25m
-aWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVu
-YW1lcyBUcnVlCgpjb21taXRzPSIkKGdpdCBsb2cgLS1mb3JtYXQ9JUggLS1yZXZlcnNlICRCQVNF
-Li4pIgpmb3IgYyBpbiAkY29tbWl0czsgZG8KICAgIGVjaG8gIkNoZWNraW5nIFBBVENIICRuLyR0
-b3RhbDogJChnaXQgbG9nIC1uIDEgLS1mb3JtYXQ9JXMgJGMpLi4uIgogICAgaWYgISBnaXQgc2hv
-dyAkYyAtLWZvcm1hdD1lbWFpbCB8IC4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sg
-LTsgdGhlbgogICAgICAgIGZhaWxlZD0xCiAgICAgICAgZWNobwogICAgZmkKICAgIG49JCgobisx
-KSkKZG9uZQoKZXhpdCAkZmFpbGVkCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAz
-YzhjZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0CkZyb20gaHR0cHM6Ly9naXRo
-dWIuY29tL3BhdGNoZXctcHJvamVjdC9xZW11CiB0IFt0YWcgdXBkYXRlXSAgICAgICAgICAgIHBh
-dGNoZXcvMjAxODAxMDIyMzQxMDguMzI3MTMtMS1sYXVyZW50QHZpdmllci5ldSAtPiBwYXRjaGV3
-LzIwMTgwMTAyMjM0MTA4LjMyNzEzLTEtbGF1cmVudEB2aXZpZXIuZXUKIHQgW3RhZyB1cGRhdGVd
-ICAgICAgICAgICAgcGF0Y2hldy8yMDE4MDEwMzE2MjQwMC4xMDM5Ni0xLWY0YnVnQGFtc2F0Lm9y
-ZyAtPiBwYXRjaGV3LzIwMTgwMTAzMTYyNDAwLjEwMzk2LTEtZjRidWdAYW1zYXQub3JnCiB0IFt0
-YWcgdXBkYXRlXSAgICAgICAgICAgIHBhdGNoZXcvMjAxODAxMDMxNjQxMTcuMTE4NTAtMS1mNGJ1
-Z0BhbXNhdC5vcmcgLT4gcGF0Y2hldy8yMDE4MDEwMzE2NDExNy4xMTg1MC0xLWY0YnVnQGFtc2F0
-Lm9yZwpTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCjJmZWE5Mzc0OWYgdGVzdHM6IGFk
-ZCBzb21lIHNkY2FyZCBxdGVzdAowYjFiYjAyY2E3IGxpYnFvczogaW1wbGVtZW50IHNkYnVzIFFN
-UCBkcml2ZXIKZmFiNTdkYzU5NCBsaWJxb3M6IGFkZCBhIHNkYnVzIEFQSQo1MDU5ZTJhNzZlIHNk
-YnVzOiBhZGQgYSBRTVAgY29tbWFuZCB0byBhY2Nlc3MgYSBTREJ1cwoKPT09IE9VVFBVVCBCRUdJ
-TiA9PT0KQ2hlY2tpbmcgUEFUQ0ggMS80OiBzZGJ1czogYWRkIGEgUU1QIGNvbW1hbmQgdG8gYWNj
-ZXNzIGEgU0RCdXMuLi4KQ2hlY2tpbmcgUEFUQ0ggMi80OiBsaWJxb3M6IGFkZCBhIHNkYnVzIEFQ
-SS4uLgpFUlJPUjogZG8gbm90IHVzZSBDOTkgLy8gY29tbWVudHMKIzkxOiBGSUxFOiB0ZXN0cy9s
-aWJxb3Mvc2RidXMuYzo2MToKKyAgICAvLyBUT0RPIGNoZWNrIHJ2PwoKdG90YWw6IDEgZXJyb3Jz
-LCAwIHdhcm5pbmdzLCAxMjYgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJv
-YmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBw
-b3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGlu
-IE1BSU5UQUlORVJTLgoKQ2hlY2tpbmcgUEFUQ0ggMy80OiBsaWJxb3M6IGltcGxlbWVudCBzZGJ1
-cyBRTVAgZHJpdmVyLi4uCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiM5NzogRklM
-RTogdGVzdHMvbGlicW9zL3NkYnVzLXFtcC5jOjY2Ogorc3RhdGljIHNzaXplX3QgcW1wX21tY19k
-b19jbWQoU0RCdXNBZGFwdGVyICphZGFwdGVyLCBlbnVtIE5DbWQgY21kLCB1aW50MzJfdCBhcmcs
-CgpFUlJPUjogZG8gbm90IHVzZSBDOTkgLy8gY29tbWVudHMKIzExMTogRklMRTogdGVzdHMvbGli
-cW9zL3NkYnVzLXFtcC5jOjgwOgorICAgIC8vUURFQ1JFRihyZXNwb25zZSk7Cgp0b3RhbDogMSBl
-cnJvcnMsIDEgd2FybmluZ3MsIDEzOCBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHls
-ZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZh
-bHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFU
-Q0ggaW4gTUFJTlRBSU5FUlMuCgpDaGVja2luZyBQQVRDSCA0LzQ6IHRlc3RzOiBhZGQgc29tZSBz
-ZGNhcmQgcXRlc3QuLi4KRVJST1I6IGRvIG5vdCB1c2UgQzk5IC8vIGNvbW1lbnRzCiM3MDogRklM
-RTogdGVzdHMvc2RidXMtdGVzdC5jOjMyOgorICAgIC8vW1BST1RPX01NQ10gPSAidmV4cHJlc3Mt
-YTkiLAoKRVJST1I6IGRvIG5vdCB1c2UgQzk5IC8vIGNvbW1lbnRzCiM3MTogRklMRTogdGVzdHMv
-c2RidXMtdGVzdC5jOjMzOgorICAgIC8vW1BST1RPX1NQSV0gPSAibG0zczY5NjVldmIiCgpFUlJP
-UjogZG8gbm90IHVzZSBDOTkgLy8gY29tbWVudHMKIzc1OiBGSUxFOiB0ZXN0cy9zZGJ1cy10ZXN0
-LmM6Mzc6CisgICAgLy81MTIgKiBNX0JZVEUsCgpFUlJPUjogZG8gbm90IHVzZSBDOTkgLy8gY29t
-bWVudHMKIzc2OiBGSUxFOiB0ZXN0cy9zZGJ1cy10ZXN0LmM6Mzg6CisgICAgLy8xICogR19CWVRF
-LAoKRVJST1I6IGRvIG5vdCB1c2UgQzk5IC8vIGNvbW1lbnRzCiM3ODogRklMRTogdGVzdHMvc2Ri
-dXMtdGVzdC5jOjQwOgorICAgIC8vNjQgKiBHX0JZVEUsCgpFUlJPUjogZG8gbm90IHVzZSBDOTkg
-Ly8gY29tbWVudHMKIzk2OiBGSUxFOiB0ZXN0cy9zZGJ1cy10ZXN0LmM6NTg6CisgICAgLy9nX2Fz
-c2VydF9jbXB1aW50KHN6LCA9PSwgMCk7CgpFUlJPUjogc3BhY2UgcHJvaGliaXRlZCBiZXR3ZWVu
-IGZ1bmN0aW9uIG5hbWUgYW5kIG9wZW4gcGFyZW50aGVzaXMgJygnCiMxMDQ6IEZJTEU6IHRlc3Rz
-L3NkYnVzLXRlc3QuYzo2NjoKKyAgICBnX2Fzc2VydF9jbXBtZW0gKCZyZXNwb25zZVszXSwgNSwg
-IlFFTVUhIiwgNSk7CgpFUlJPUjogZG8gbm90IHVzZSBDOTkgLy8gY29tbWVudHMKIzEzODogRklM
-RTogdGVzdHMvc2RidXMtdGVzdC5jOjEwMDoKKyAgICAvLyBUT0RPIDh4OiBzZGNhcmRfcmVhZF9k
-YXRhIGxlbiA1MTIKCkVSUk9SOiBkbyBub3QgdXNlIEM5OSAvLyBjb21tZW50cwojMTQwOiBGSUxF
-OiB0ZXN0cy9zZGJ1cy10ZXN0LmM6MTAyOgorICAgIC8vc3ogPSBzZGJ1c19kb19hY21kKG1tYywg
-U0VORF9TVEFUVVMsIDAsIHJjYSwgJnJlc3BvbnNlKTsKCkVSUk9SOiBkbyBub3QgdXNlIEM5OSAv
-LyBjb21tZW50cwojMTQxOiBGSUxFOiB0ZXN0cy9zZGJ1cy10ZXN0LmM6MTAzOgorICAgIC8vZ19m
-cmVlKHJlc3BvbnNlKTsKCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiMxODA6IEZJ
-TEU6IHRlc3RzL3NkYnVzLXRlc3QuYzoxNDI6CisgICAgICAgICAgICAgICAgcGF0aCA9IGdfc3Ry
-ZHVwX3ByaW50Zigic2RjYXJkLyVzLyVsdSIsIHByb3RvX25hbWVbaXByb3RvXSwgc2l6ZXNbaXNp
-emVdKTsKCkVSUk9SOiBkbyBub3QgdXNlIEM5OSAvLyBjb21tZW50cwojMTgzOiBGSUxFOiB0ZXN0
-cy9zZGJ1cy10ZXN0LmM6MTQ1OgorICAgICAgICAgICAgICAgIC8vIGdfZnJlZSh0ZXN0KT8KCnRv
-dGFsOiAxMSBlcnJvcnMsIDEgd2FybmluZ3MsIDE2NSBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNo
-IGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJv
-cnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2Vl
-CkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29t
-bWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNh
-bGx5IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZl
-ZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAZnJlZWxpc3RzLm9yZw==
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--pw3MarJnw28eBxwZ8Vg7Uc9CqKmz12Z1e
+From: Eric Blake <eblake@redhat.com>
+To: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>,
+ qemu-block@nongnu.org, Jeff Cody <jcody@redhat.com>
+Message-ID: <270e884b-9a6a-3902-b9d4-4e4635d73fec@redhat.com>
+Subject: Re: [PATCH v2] iotests: Test creating overlay when guest running
+References: <20171225025107.23985-1-famz@redhat.com>
+In-Reply-To: <20171225025107.23985-1-famz@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 12/24/2017 08:51 PM, Fam Zheng wrote:
+> Signed-off-by: Fam Zheng <famz@redhat.com>
+>=20
+> ---
+>=20
+> v2: Actually test the thing. [Kevin]
+> ---
+>  tests/qemu-iotests/153     | 8 +++++---
+>  tests/qemu-iotests/153.out | 7 ++++---
+>  2 files changed, 9 insertions(+), 6 deletions(-)
+
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
+>=20
+> diff --git a/tests/qemu-iotests/153 b/tests/qemu-iotests/153
+> index fa25eb24bd..adfd02695b 100755
+> --- a/tests/qemu-iotests/153
+> +++ b/tests/qemu-iotests/153
+> @@ -32,6 +32,7 @@ _cleanup()
+>  {
+>      _cleanup_test_img
+>      rm -f "${TEST_IMG}.base"
+> +    rm -f "${TEST_IMG}.overlay"
+
+Trivial conflict with Jeff's work to do per-test temporary directories
+in iotests.
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--pw3MarJnw28eBxwZ8Vg7Uc9CqKmz12Z1e
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlpNVsoACgkQp6FrSiUn
+Q2oZgQf/Ttndk9r+EdzXwv6GVUKrZz1u6CZTCx1Fhbv7hafcZvkqexmy5QMq8f85
+YDwMTqZfUuJeInxnepoO52fcPyhi4cxP14x08kturpFspF/KKccr70wcrK0MyFnM
+j1t2Buwrrlw6+5/CZ9BAL0Q+uOjlUd4LHNV/s0TjP4Iy/0lcpwu9m/2xhCep2teM
+bo+WEoOlxx87k8rL+xWpKc0w72WJbrIfsJENqkdfiI8Xy7A2Rc/VuLuJpRVR2Kwv
+QJpJW3hax/f2W8C5tN2nrfd4OKaC59OcVIMGobnA7ZNdnUl2WNaoOw1WyLA3iouj
+LxusyNnMENEZMCWWqZcq6YWbBrTe8g==
+=alQc
+-----END PGP SIGNATURE-----
+
+--pw3MarJnw28eBxwZ8Vg7Uc9CqKmz12Z1e--
