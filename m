@@ -1,26 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50001)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56652)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1eWdui-0005ZY-D6
-	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 02:56:41 -0500
+	(envelope-from <aderumier@oxygem.tv>) id 1eWeBw-0001xx-MW
+	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 03:14:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1eWdue-0000nf-HI
-	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 02:56:40 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:49482)
+	(envelope-from <aderumier@oxygem.tv>) id 1eWeBs-00055e-4s
+	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 03:14:28 -0500
+Received: from mailpro.odiso.net ([89.248.211.110]:55758)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1eWdue-0000nG-AE
-	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 02:56:36 -0500
-Date: Wed, 3 Jan 2018 15:56:33 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20180103075633.GE25984@localhost.localdomain>
-References: <20171229174933.1781-1-f4bug@amsat.org>
-	<20171229174933.1781-8-f4bug@amsat.org>
+	(Exim 4.71) (envelope-from <aderumier@oxygem.tv>) id 1eWeBr-0004ya-To
+	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 03:14:24 -0500
+Date: Wed, 3 Jan 2018 09:14:10 +0100 (CET)
+From: Alexandre DERUMIER <aderumier@odiso.com>
+Message-ID: <826605310.756359.1514967250373.JavaMail.zimbra@oxygem.tv>
+In-Reply-To: <77f0c119-236d-9d4e-0a99-3519ecc26b23@profihost.ag>
+References: <77f0c119-236d-9d4e-0a99-3519ecc26b23@profihost.ag>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <20171229174933.1781-8-f4bug@amsat.org>
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3 07/42] sdhci: refactor common sysbus/pci
- unrealize() into sdhci_unrealizefn()
+Subject: Re: [Qemu-devel] dropped pkts with Qemu on tap interace (RX)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,88 +26,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
-Cc: Alistair Francis <alistair.francis@xilinx.com>, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, Peter Maydell <peter.maydell@linaro.org>, Eduardo Habkost <ehabkost@redhat.com>, Xiaoqiang Zhao <zxq_yx_007@163.com>, Andrey Smirnov <andrew.smirnov@gmail.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, qemu-devel@nongnu.org
+To: "Stefan Priebe, Profihost AG" <s.priebe@profihost.ag>
+Cc: qemu-devel <qemu-devel@nongnu.org>
 
-On Fri, 12/29 14:48, Philippe Mathieu-Daud=E9 wrote:
-> Signed-off-by: Philippe Mathieu-Daud=E9 <f4bug@amsat.org>
-> ---
->  hw/sd/sdhci.c | 19 ++++++++++++++++---
->  1 file changed, 16 insertions(+), 3 deletions(-)
->=20
-> diff --git a/hw/sd/sdhci.c b/hw/sd/sdhci.c
-> index ad5853d527..06a1ec6f91 100644
-> --- a/hw/sd/sdhci.c
-> +++ b/hw/sd/sdhci.c
-> @@ -31,6 +31,7 @@
->  #include "qemu/bitops.h"
->  #include "hw/sd/sdhci.h"
->  #include "sdhci-internal.h"
-> +#include "qapi/error.h"
->  #include "qemu/log.h"
-> =20
->  /* host controller debug messages */
-> @@ -1203,15 +1204,17 @@ static void sdhci_realizefn(SDHCIState *s, Erro=
-r **errp)
->                            SDHC_REGISTERS_MAP_SIZE);
->  }
-> =20
-> +static void sdhci_unrealizefn(SDHCIState *s, Error **errp)
-> +{
-> +    g_free(s->fifo_buffer);
+Hi Stefan,
 
-Set s->fifo_buffer to NULL to avoid double-free and/or use-after-free?
-Especially since you call this from both the ->exit and the ->unrealize
-callbacks.
+>>The tap devices on the target vm shows dropped RX packages on BOTH tap=20
+>>interfaces - strangely with the same amount of pkts?=20
 
-> +}
-> +
->  static void sdhci_uninitfn(SDHCIState *s)
->  {
->      timer_del(s->insert_timer);
->      timer_free(s->insert_timer);
->      timer_del(s->transfer_timer);
->      timer_free(s->transfer_timer);
-> -
-> -    g_free(s->fifo_buffer);
-> -    s->fifo_buffer =3D NULL;
->  }
-> =20
->  static bool sdhci_pending_insert_vmstate_needed(void *opaque)
-> @@ -1312,6 +1315,8 @@ static void sdhci_pci_realize(PCIDevice *dev, Err=
-or **errp)
->  static void sdhci_pci_exit(PCIDevice *dev)
->  {
->      SDHCIState *s =3D PCI_SDHCI(dev);
-> +
-> +    sdhci_unrealizefn(s, &error_abort);
->      sdhci_uninitfn(s);
->  }
-> =20
-> @@ -1365,11 +1370,19 @@ static void sdhci_sysbus_realize(DeviceState *d=
-ev, Error ** errp)
->      sysbus_init_mmio(sbd, &s->iomem);
->  }
-> =20
-> +static void sdhci_sysbus_unrealize(DeviceState *dev, Error **errp)
-> +{
-> +    SDHCIState *s =3D SYSBUS_SDHCI(dev);
-> +
-> +    sdhci_unrealizefn(s, errp);
-> +}
-> +
->  static void sdhci_sysbus_class_init(ObjectClass *klass, void *data)
->  {
->      DeviceClass *dc =3D DEVICE_CLASS(klass);
-> =20
->      dc->realize =3D sdhci_sysbus_realize;
-> +    dc->unrealize =3D sdhci_sysbus_unrealize;
-> =20
->      sdhci_class_init(klass, data);
->  }
-> --=20
-> 2.15.1
->=20
->=20
+that's strange indeed.=20
+if you tcpdump tap interfaces, do you see incoming traffic only on 1 interf=
+ace, or both random ?
 
-Fam
+(can you provide the network configuration in the guest for both interfaces=
+ ?)
+
+
+I'm seeing that you have enable multiqueue on 1 of the interfaces, do you h=
+ave setup correctly the multiqueue part inside the guest.
+do you have enough vcpu to handle all the queues ?
+
+
+----- Mail original -----
+De: "Stefan Priebe, Profihost AG" <s.priebe@profihost.ag>
+=C3=80: "qemu-devel" <qemu-devel@nongnu.org>
+Envoy=C3=A9: Mardi 2 Janvier 2018 12:17:29
+Objet: [Qemu-devel] dropped pkts with Qemu on tap interace (RX)
+
+Hello,=20
+
+currently i'm trying to fix a problem where we have "random" missing=20
+packets.=20
+
+We're doing an ssh connect from machine a to machine b every 5 minutes=20
+via rsync and ssh.=20
+
+Sometimes it happens that we get this cron message:=20
+"Connection to 192.168.0.2 closed by remote host.=20
+rsync: connection unexpectedly closed (0 bytes received so far) [sender]=20
+rsync error: unexplained error (code 255) at io.c(226) [sender=3D3.1.2]=20
+ssh: connect to host 192.168.0.2 port 22: Connection refused"=20
+
+The tap devices on the target vm shows dropped RX packages on BOTH tap=20
+interfaces - strangely with the same amount of pkts?=20
+
+# ifconfig tap317i0; ifconfig tap317i1=20
+tap317i0 Link encap:Ethernet HWaddr 6e:cb:65:94:bb:bf=20
+UP BROADCAST RUNNING PROMISC MULTICAST MTU:1500 Metric:1=20
+RX packets:2238445 errors:0 dropped:13159 overruns:0 frame:0=20
+TX packets:9655853 errors:0 dropped:0 overruns:0 carrier:0=20
+collisions:0 txqueuelen:1000=20
+RX bytes:177991267 (169.7 MiB) TX bytes:910412749 (868.2 MiB)=20
+
+tap317i1 Link encap:Ethernet HWaddr 96:f8:b5:d0:9a:07=20
+UP BROADCAST RUNNING PROMISC MULTICAST MTU:1500 Metric:1=20
+RX packets:1516085 errors:0 dropped:13159 overruns:0 frame:0=20
+TX packets:1446964 errors:0 dropped:0 overruns:0 carrier:0=20
+collisions:0 txqueuelen:1000=20
+RX bytes:1597564313 (1.4 GiB) TX bytes:3517734365 (3.2 GiB)=20
+
+Any ideas how to inspect this issue?=20
+
+Greets,=20
+Stefan=20
