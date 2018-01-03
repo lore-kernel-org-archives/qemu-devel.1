@@ -1,28 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38597)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41104)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1eWWZw-0007QL-63
-	for qemu-devel@nongnu.org; Tue, 02 Jan 2018 19:06:45 -0500
+	(envelope-from <alistair23@gmail.com>) id 1eWWeI-0000w7-1m
+	for qemu-devel@nongnu.org; Tue, 02 Jan 2018 19:11:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1eWWZv-0002TE-C2
-	for qemu-devel@nongnu.org; Tue, 02 Jan 2018 19:06:44 -0500
-Received: from mail-wr0-x244.google.com ([2a00:1450:400c:c0c::244]:45309)
+	(envelope-from <alistair23@gmail.com>) id 1eWWeH-0005L0-3K
+	for qemu-devel@nongnu.org; Tue, 02 Jan 2018 19:11:14 -0500
+Received: from mail-wr0-x243.google.com ([2a00:1450:400c:c0c::243]:39602)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
-	id 1eWWZv-0002Sh-5v
-	for qemu-devel@nongnu.org; Tue, 02 Jan 2018 19:06:43 -0500
-Received: by mail-wr0-x244.google.com with SMTP id o15so60081wrf.12
-	for <qemu-devel@nongnu.org>; Tue, 02 Jan 2018 16:06:43 -0800 (PST)
+	id 1eWWeG-0005KA-SA
+	for qemu-devel@nongnu.org; Tue, 02 Jan 2018 19:11:13 -0500
+Received: by mail-wr0-x243.google.com with SMTP id o101so73921wrb.6
+	for <qemu-devel@nongnu.org>; Tue, 02 Jan 2018 16:11:12 -0800 (PST)
 MIME-Version: 1.0
 Sender: alistair23@gmail.com
-In-Reply-To: <20171229174933.1781-4-f4bug@amsat.org>
+In-Reply-To: <20171229174933.1781-11-f4bug@amsat.org>
 References: <20171229174933.1781-1-f4bug@amsat.org>
-	<20171229174933.1781-4-f4bug@amsat.org>
+	<20171229174933.1781-11-f4bug@amsat.org>
 From: Alistair Francis <alistair.francis@xilinx.com>
-Date: Tue, 2 Jan 2018 16:06:11 -0800
-Message-ID: <CAKmqyKP_WA0Ziso09kXOZ5jXZV+b04jkkmqzuwa2v6jzyA5T6w@mail.gmail.com>
+Date: Tue, 2 Jan 2018 16:10:41 -0800
+Message-ID: <CAKmqyKP5jaU3=GDR4Vk5QFSqTiCOQuws1NK1aD2=H177eOz=Mw@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3 03/42] sdhci: remove dead code
+Subject: Re: [Qemu-devel] [PATCH v3 10/42] sdhci: add a GPIO for the 'access
+ control' LED
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,45 +35,108 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
 Cc: Alistair Francis <alistair.francis@xilinx.com>, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, Peter Maydell <peter.maydell@linaro.org>, Igor Mitsyanko <i.mitsyanko@gmail.com>, Andrey Smirnov <andrew.smirnov@gmail.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
 
-On Fri, Dec 29, 2017 at 9:48 AM, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.o=
+On Fri, Dec 29, 2017 at 9:49 AM, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.o=
 rg> wrote:
+> It blinks to caution the user not to remove the card while the SD card is
+> being accessed.
+> So far it only emit a trace event.
+
+s/emit/emits/g
+
+>
 > Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 
-Reviewed-by: Alistair Francis <alistair.francis@xilinx.com>
+Acked-by: Alistair Francis <alistair.francis@xilinx.com>
 
 Alistair
 
 > ---
->  include/hw/sd/sdhci.h | 2 --
->  hw/sd/sdhci.c         | 2 --
->  2 files changed, 4 deletions(-)
+>  include/hw/sd/sdhci.h |  2 ++
+>  hw/sd/sdhci.c         | 14 ++++++++++++++
+>  hw/sd/trace-events    |  1 +
+>  3 files changed, 17 insertions(+)
 >
 > diff --git a/include/hw/sd/sdhci.h b/include/hw/sd/sdhci.h
-> index 749cc279ed..a6fe064f51 100644
+> index a6fe064f51..da943a6562 100644
 > --- a/include/hw/sd/sdhci.h
 > +++ b/include/hw/sd/sdhci.h
-> @@ -44,8 +44,6 @@ typedef struct SDHCIState {
->
+> @@ -45,6 +45,8 @@ typedef struct SDHCIState {
 >      QEMUTimer *insert_timer;       /* timer for 'changing' sd card. */
 >      QEMUTimer *transfer_timer;
-> -    qemu_irq eject_cb;
-> -    qemu_irq ro_cb;
 >      qemu_irq irq;
+> +    qemu_irq access_led;
+> +    int access_led_level;
 >
 >      /* Registers cleared on reset */
+>      /* 0x00 */
 > diff --git a/hw/sd/sdhci.c b/hw/sd/sdhci.c
-> index b7d2a20985..365bc80009 100644
+> index acd5aa1e19..4679a6d5ed 100644
 > --- a/hw/sd/sdhci.c
 > +++ b/hw/sd/sdhci.c
-> @@ -1200,8 +1200,6 @@ static void sdhci_uninitfn(SDHCIState *s)
+> @@ -203,6 +203,16 @@ static void sdhci_poweron_reset(DeviceState *dev)
+>      }
+>  }
+>
+> +static void sdhci_led_handler(void *opaque, int line, int level)
+> +{
+> +    SDHCIState *s =3D (SDHCIState *)opaque;
+> +
+> +    if (s->access_led_level !=3D level) {
+> +        trace_sdhci_led(level);
+> +        s->access_led_level =3D level;
+> +    }
+> +}
+> +
+>  static void sdhci_data_transfer(void *opaque);
+>
+>  static void sdhci_send_command(SDHCIState *s)
+> @@ -1051,6 +1061,7 @@ sdhci_write(void *opaque, hwaddr offset, uint64_t v=
+al, unsigned size)
+>                  !(s->capareg & (1 << (31 - ((s->pwrcon >> 1) & 0x7))))) =
+{
+>              s->pwrcon &=3D ~SDHC_POWER_ON;
+>          }
+> +        qemu_set_irq(s->access_led, s->hostctl & 1);
+>          break;
+>      case SDHC_CLKCON:
+>          if (!(mask & 0xFF000000)) {
+> @@ -1163,6 +1174,7 @@ static void sdhci_initfn(SDHCIState *s)
+>      qbus_create_inplace(&s->sdbus, sizeof(s->sdbus),
+>                          TYPE_SDHCI_BUS, DEVICE(s), "sd-bus");
+>
+> +    s->access_led =3D qemu_allocate_irq(sdhci_led_handler, s, 0);
+>      s->insert_timer =3D timer_new_ns(QEMU_CLOCK_VIRTUAL, sdhci_raise_ins=
+ertion_irq, s);
+>      s->transfer_timer =3D timer_new_ns(QEMU_CLOCK_VIRTUAL, sdhci_data_tr=
+ansfer, s);
+>  }
+> @@ -1187,6 +1199,8 @@ static void sdhci_uninitfn(SDHCIState *s)
 >      timer_free(s->insert_timer);
 >      timer_del(s->transfer_timer);
 >      timer_free(s->transfer_timer);
-> -    qemu_free_irq(s->eject_cb);
-> -    qemu_free_irq(s->ro_cb);
+> +
+> +    qemu_free_irq(s->access_led);
+>  }
 >
->      g_free(s->fifo_buffer);
->      s->fifo_buffer =3D NULL;
+>  static bool sdhci_pending_insert_vmstate_needed(void *opaque)
+> diff --git a/hw/sd/trace-events b/hw/sd/trace-events
+> index e4e26c6d73..f821db2046 100644
+> --- a/hw/sd/trace-events
+> +++ b/hw/sd/trace-events
+> @@ -13,6 +13,7 @@ sdhci_adma_transfer_completed(void) "ADMA transfer comp=
+leted"
+>  sdhci_access(const char *access, unsigned int size, uint64_t offset, con=
+st char *dir, uint64_t val, uint64_t val2) "%s %ub: addr[0x%04" PRIx64 "] %=
+s %" PRIu64 "(0x%" PRIx64 ")"
+>  sdhci_read_dataport(uint16_t data_count) "all %u bytes of data have been=
+ read from input buffer"
+>  sdhci_write_dataport(uint16_t data_count) "write buffer filled with %u b=
+ytes of data"
+> +sdhci_led(bool state) "LED: %u"
+>
+>  # hw/sd/milkymist-memcard.c
+>  milkymist_memcard_memory_read(uint32_t addr, uint32_t value) "addr 0x%08=
+x value 0x%08x"
 > --
 > 2.15.1
 >
