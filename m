@@ -1,25 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33254)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33626)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1eWnrF-0002LS-Am
-	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 13:33:46 -0500
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1eWnrz-0002ua-H3
+	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 13:34:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1eWnrB-0006ZX-DQ
-	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 13:33:45 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:52708)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1eWnrB-0006XN-7q
-	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 13:33:41 -0500
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 9006A806A8
-	for <qemu-devel@nongnu.org>; Wed,  3 Jan 2018 18:33:39 +0000 (UTC)
-From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Date: Wed,  3 Jan 2018 18:33:36 +0000
-Message-Id: <20180103183336.27709-1-dgilbert@redhat.com>
-Subject: [Qemu-devel] [PATCH] cpu_physical_memory_sync_dirty_bitmap: Another
- alignment fix
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1eWnrx-0007BT-WD
+	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 13:34:31 -0500
+Received: from mail-qt0-x242.google.com ([2607:f8b0:400d:c0d::242]:47072)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1eWnrx-0007BJ-RC
+	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 13:34:29 -0500
+Received: by mail-qt0-x242.google.com with SMTP id r39so3191060qtr.13
+	for <qemu-devel@nongnu.org>; Wed, 03 Jan 2018 10:34:29 -0800 (PST)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Date: Wed,  3 Jan 2018 15:33:54 -0300
+Message-Id: <20180103183418.23730-2-f4bug@amsat.org>
+In-Reply-To: <20180103183418.23730-1-f4bug@amsat.org>
+References: <20180103183418.23730-1-f4bug@amsat.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH v4 01/25] sdhci: add a spec_version property
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,53 +33,112 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, pbonzini@redhat.com, wei@redhat.com, quintela@redhat.com
-Cc: peterx@redhat.com
+To: Alistair Francis <alistair.francis@xilinx.com>, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, Peter Maydell <peter.maydell@linaro.org>, Andrey Smirnov <andrew.smirnov@gmail.com>
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, Peter Crosthwaite <crosthwaite.peter@gmail.com>
 
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+default to Spec v2.00
 
-This code has an optimised, word aligned version, and a boring
-unaligned version. My commit f70d345 fixed one alignment issue, but
-there's another.
-
-The optimised version operates on 'longs' dealing with (typically) 64
-pages at a time, replacing the whole long by a 0 and counting the bits.
-If the Ramblock is less than 64bits in length that long can contain bits
-representing two different RAMBlocks, but the code will update the
-bmap belinging to the 1st RAMBlock only while having updated the total
-dirty page count for both.
-
-This probably didn't matter prior to 6b6712ef which split the dirty
-bitmap by RAMBlock, but now they're separate RAMBlocks we end up
-with a count that doesn't match the state in the bitmaps.
-
-Symptom:
-  Migration showing a few dirty pages left to be sent constantly
-  Seen on aarch64 and x86 with x86+ovmf
-
-Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-Reported-by: Wei Huang <wei@redhat.com>
-Fixes: 6b6712efccd383b48a909bee0b29e079a57601ec
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- include/exec/ram_addr.h | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+ hw/sd/sdhci-internal.h |  4 ++--
+ include/hw/sd/sdhci.h  |  3 +++
+ hw/sd/sdhci.c          | 19 +++++++++++++++++--
+ 3 files changed, 22 insertions(+), 4 deletions(-)
 
-diff --git a/include/exec/ram_addr.h b/include/exec/ram_addr.h
-index 6cbc02aa0f..7633ef6342 100644
---- a/include/exec/ram_addr.h
-+++ b/include/exec/ram_addr.h
-@@ -391,9 +391,10 @@ uint64_t cpu_physical_memory_sync_dirty_bitmap(RAMBlock *rb,
-     uint64_t num_dirty = 0;
-     unsigned long *dest = rb->bmap;
+diff --git a/hw/sd/sdhci-internal.h b/hw/sd/sdhci-internal.h
+index b7475a1b7b..cf4a055159 100644
+--- a/hw/sd/sdhci-internal.h
++++ b/hw/sd/sdhci-internal.h
+@@ -212,9 +212,9 @@ FIELD(SDHC_PRNSTS, WRITE_PROTECT,      19, 1);
+ /* Slot interrupt status */
+ #define SDHC_SLOT_INT_STATUS            0xFC
  
--    /* start address is aligned at the start of a word? */
-+    /* start address and length is aligned at the start of a word? */
-     if (((word * BITS_PER_LONG) << TARGET_PAGE_BITS) ==
--         (start + rb->offset)) {
-+         (start + rb->offset) &&
-+        !(length & ((BITS_PER_LONG << TARGET_PAGE_BITS) - 1))) {
-         int k;
-         int nr = BITS_TO_LONGS(length >> TARGET_PAGE_BITS);
-         unsigned long * const *src;
+-/* HWInit Host Controller Version Register 0x0401 */
++/* HWInit Host Controller Version Register */
+ #define SDHC_HCVER                      0xFE
+-#define SD_HOST_SPECv2_VERS             0x2401
++#define SDHC_HCVER_VENDOR               0x24
+ 
+ #define SDHC_REGISTERS_MAP_SIZE         0x100
+ #define SDHC_INSERTION_DELAY            (NANOSECONDS_PER_SECOND)
+diff --git a/include/hw/sd/sdhci.h b/include/hw/sd/sdhci.h
+index 2aea20f1d8..ddd5040410 100644
+--- a/include/hw/sd/sdhci.h
++++ b/include/hw/sd/sdhci.h
+@@ -91,6 +91,8 @@ typedef struct SDHCIState {
+     uint64_t capareg;      /* Capabilities Register */
+     /* 0x48 */
+     uint64_t maxcurr;      /* Maximum Current Capabilities Register */
++    /* 0xfe */
++    uint16_t version;      /* Host Controller Version Register */
+ 
+     uint8_t  *fifo_buffer; /* SD host i/o FIFO buffer */
+     uint32_t buf_maxsz;
+@@ -99,6 +101,7 @@ typedef struct SDHCIState {
+     bool     pending_insert_state;
+     /* Configurable properties */
+     bool pending_insert_quirk; /* Quirk for Raspberry Pi card insert int */
++    uint8_t spec_version;
+ } SDHCIState;
+ 
+ #define TYPE_PCI_SDHCI "sdhci-pci"
+diff --git a/hw/sd/sdhci.c b/hw/sd/sdhci.c
+index b080950f80..ae8ddf4e3b 100644
+--- a/hw/sd/sdhci.c
++++ b/hw/sd/sdhci.c
+@@ -169,7 +169,8 @@ static void sdhci_reset(SDHCIState *s)
+ 
+     timer_del(s->insert_timer);
+     timer_del(s->transfer_timer);
+-    /* Set all registers to 0. Capabilities registers are not cleared
++
++    /* Set all registers to 0. Capabilities/Version registers are not cleared
+      * and assumed to always preserve their value, given to them during
+      * initialization */
+     memset(&s->sdmasysad, 0, (uintptr_t)&s->capareg - (uintptr_t)&s->sdmasysad);
+@@ -923,7 +924,7 @@ static uint64_t sdhci_read(void *opaque, hwaddr offset, unsigned size)
+         ret = (uint32_t)(s->admasysaddr >> 32);
+         break;
+     case SDHC_SLOT_INT_STATUS:
+-        ret = (SD_HOST_SPECv2_VERS << 16) | sdhci_slotint(s);
++        ret = (s->version << 16) | sdhci_slotint(s);
+         break;
+     default:
+         qemu_log_mask(LOG_UNIMP, "SDHC rd_%ub @0x%02" HWADDR_PRIx " "
+@@ -1178,6 +1179,15 @@ static inline unsigned int sdhci_get_fifolen(SDHCIState *s)
+     }
+ }
+ 
++static void sdhci_init_readonly_registers(SDHCIState *s, Error **errp)
++{
++    if (s->spec_version < 1) {
++        error_setg(errp, "spec version invalid");
++        return;
++    }
++    s->version = (SDHC_HCVER_VENDOR << 8) | (s->spec_version - 1);
++}
++
+ static void sdhci_initfn(SDHCIState *s)
+ {
+     qbus_create_inplace(&s->sdbus, sizeof(s->sdbus),
+@@ -1190,6 +1200,10 @@ static void sdhci_initfn(SDHCIState *s)
+ 
+ static void sdhci_common_realize(SDHCIState *s, Error **errp)
+ {
++    sdhci_init_readonly_registers(s, errp);
++    if (errp && *errp) {
++        return;
++    }
+     s->buf_maxsz = sdhci_get_fifolen(s);
+     s->fifo_buffer = g_malloc0(s->buf_maxsz);
+ 
+@@ -1290,6 +1304,7 @@ const VMStateDescription sdhci_vmstate = {
+ /* Capabilities registers provide information on supported features of this
+  * specific host controller implementation */
+ static Property sdhci_properties[] = {
++    DEFINE_PROP_UINT8("sd-spec-version", SDHCIState, spec_version, 1),
+     DEFINE_PROP_UINT64("capareg", SDHCIState, capareg,
+             SDHC_CAPAB_REG_DEFAULT),
+     DEFINE_PROP_UINT64("maxcurr", SDHCIState, maxcurr, 0),
 -- 
-2.14.3
+2.15.1
