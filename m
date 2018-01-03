@@ -1,28 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33426)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33659)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1eWeNB-0007Au-Ek
-	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 03:26:06 -0500
+	(envelope-from <bounces@canonical.com>) id 1eWeNR-0007JY-CM
+	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 03:26:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1eWeN6-0006HZ-LJ
-	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 03:26:05 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:52226)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1eWeN6-0006H8-Ej
-	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 03:26:00 -0500
-From: Juan Quintela <quintela@redhat.com>
-In-Reply-To: <61064b31-b6d5-97b1-89a4-5af719223e5a@redhat.com> (Eric Blake's
-	message of "Tue, 2 Jan 2018 15:22:28 -0600")
-References: <1509369390-8285-1-git-send-email-a.perevalov@samsung.com>
-	<CGME20171030131647eucas1p1b5fb0616e683e78fdca767d267400f50@eucas1p1.samsung.com>
-	<1509369390-8285-3-git-send-email-a.perevalov@samsung.com>
-	<61064b31-b6d5-97b1-89a4-5af719223e5a@redhat.com>
-Reply-To: quintela@redhat.com
-Date: Wed, 03 Jan 2018 09:25:52 +0100
-Message-ID: <87efn74acv.fsf@secure.laptop>
+	(envelope-from <bounces@canonical.com>) id 1eWeNM-0006Vy-A5
+	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 03:26:21 -0500
+Received: from indium.canonical.com ([91.189.90.7]:54842)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1eWeNM-0006VU-3j
+	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 03:26:16 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1eWeNL-0004Rn-0s
+	for <qemu-devel@nongnu.org>; Wed, 03 Jan 2018 08:26:15 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id F03142E8021
+	for <qemu-devel@nongnu.org>; Wed,  3 Jan 2018 08:26:14 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v12 2/6] migration: add postcopy blocktime
- ctx into MigrationIncomingState
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 03 Jan 2018 08:13:10 -0000
+From: Thomas Huth <1158912@bugs.launchpad.net>
+Reply-To: Bug 1158912 <1158912@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20130322175114.10747.75661.malonedeb@wampee.canonical.com>
+Message-Id: <151496719120.31853.17455486129871198498.launchpad@wampee.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1158912] Re: QEMU Version 1.4.0 - SLIRP hangs VM
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,58 +36,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: Alexey Perevalov <a.perevalov@samsung.com>, qemu-devel@nongnu.org, heetae82.ahn@samsung.com, dgilbert@redhat.com, peterx@redhat.com, i.maximets@samsung.com
+To: qemu-devel@nongnu.org
 
-Eric Blake <eblake@redhat.com> wrote:
-> On 10/30/2017 08:16 AM, Alexey Perevalov wrote:
->> This patch adds request to kernel space for UFFD_FEATURE_THREAD_ID,
->> in case when this feature is provided by kernel.
->
-> Either 'in the case when this feature' or 'in case this feature'.
->
->> 
->> PostcopyBlocktimeContext is incapsulated inside postcopy-ram.c,
->
-> s/incapsulated/encapsulated/
->
->> due to it's postcopy only feature.
->
-> s/it's postcopy only/it being a postcopy-only/
+** Changed in: qemu
+       Status: Incomplete =3D> Fix Released
 
+-- =
 
->
->> Also it defines PostcopyBlocktimeContext's instance live time.
->> Information from PostcopyBlocktimeContext instance will be provided
->> much after postcopy migration end, instance of PostcopyBlocktimeContext
->> will live till QEMU exit, but part of it (vcpu_addr,
->> page_fault_vcpu_time) used only during calculation, will be released
->> when postcopy ended or failed.
->> 
->> To enable postcopy blocktime calculation on destination, need to request
->> proper capabiltiy (Patch for documentation will be at the tail of the patch
->
-> s/capabiltiy/capability/
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1158912
 
-Changed for the pull request
+Title:
+  QEMU Version 1.4.0 - SLIRP hangs VM
 
+Status in QEMU:
+  Fix Released
 
->
->> set).
->> 
->> As an example following command enable that capability, assume QEMU was
->> started with
->> -chardev socket,id=charmonitor,path=/var/lib/migrate-vm-monitor.sock
->> option to control it
->> 
->> [root@host]#printf "{\"execute\" : \"qmp_capabilities\"}\r\n \
->> {\"execute\": \"migrate-set-capabilities\" , \"arguments\":   {
->> \"capabilities\": [ { \"capability\": \"postcopy-blocktime\", \"state\":
->> true } ] } }" | nc -U /var/lib/migrate-vm-monitor.sock
->> 
->> Or just with HMP
->> (qemu) migrate_set_capability postcopy-blocktime on
->> 
->> Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
->> Signed-off-by: Alexey Perevalov <a.perevalov@samsung.com>
->> ---
+Bug description:
+  (Note: problem is not present in version 1.3.0)
+
+  Stacktrace: please see attached gdb log file.
+
+  Steps to reproduce:
+
+  1. gdb -x debug-qemu.gdb testing/qemu-1.4.0/ppc64-softmmu/qemu-system-
+  ppc64
+
+  Contents of debug-qemu.gdb:
+
+  run -L ./testing/qemu-1.4.0/pc-bios  -name "[DEBUG] Software und
+  System-Entwicklung IBM POWER7" -cpu POWER7_v2.3 -M pseries -m 1024
+  -rtc base=3Dutc -nodefaults -vga std -monitor vc -serial vc -netdev
+  type=3Duser,id=3Dmynet0,hostfwd=3Dtcp:127.0.0.1:9011-10.0.2.11:22 -device
+  virtio-net-pci,netdev=3Dmynet0 -drive file=3Dimages/suse-
+  ppc.img,if=3Dvirtio,index=3D0,media=3Ddisk,cache=3Dunsafe -kernel
+  images/iso/suseboot/vmlinux -append "root=3D/dev/mapper/system-root ro
+  audit=3D0 selinux=3D0 apparmor=3D0" -initrd images/iso/suseboot/initrd.img
+  -drive if=3Dscsi,bus=3D0,unit=3D0,media=3Dcdrom
+
+  =
+
+  2. build information
+      QEMU: ppc64 full emulation, version 1.4.0
+      Host OS: Windows XP
+      Guest OS: openSUSE 12.2 kernel 3.4.6-2.10-ppc64
+
+      PATH=3D/usr/i686-pc-mingw32/sys-root/mingw/bin:$PATH
+      PKG_CONFIG_LIBDIR=3D/usr/i686-pc-mingw32/sys-root/mingw/lib/pkgconfig
+      THREADS=3D4
+      export PKG_CONFIG_LIBDIR
+      =
+
+      sed -i 's/--static-libs/--static --libs/' configure
+      CC=3Di686-pc-mingw32-gcc ./configure \
+            --target-list=3Dppc64-softmmu \
+            --enable-debug \
+            --enable-sdl \
+            --static \
+            --enable-fdt && \
+      sed -i 's/ -Wl,--dynamicbase//g; s/-Wl,--nxcompat //g;'  config-host.=
+mak && \
+      make -j$THREADS && {
+            echo "renaming binw.exe to bin.exe..."
+            for i in `echo $TARGET_LIST | tr ',' ' '`; do
+                   BINARCH=3D`echo $i | sed 's/-softmmu//'`
+                   mv $i/qemu-system-${BINARCH}w.exe \
+                          $i/qemu-system-$BINARCH.exe
+            done
+      }
+
+     =
+
+  3. From VM: =
+
+      Command to hang VM: zypper dup
+      Last message before VM hang:  Retrieving repository 'openSUSE-12.2-12=
+.2-0' metadata -----------------------[|]
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1158912/+subscriptions
