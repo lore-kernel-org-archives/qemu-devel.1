@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48621)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50001)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1eWdr7-00047X-BA
-	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 02:52:58 -0500
+	(envelope-from <famz@redhat.com>) id 1eWdui-0005ZY-D6
+	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 02:56:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1eWdr3-0006uF-Fb
-	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 02:52:57 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:60986)
+	(envelope-from <famz@redhat.com>) id 1eWdue-0000nf-HI
+	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 02:56:40 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:49482)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1eWdr3-0006te-76
-	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 02:52:53 -0500
-Date: Wed, 3 Jan 2018 15:52:49 +0800
+	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1eWdue-0000nG-AE
+	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 02:56:36 -0500
+Date: Wed, 3 Jan 2018 15:56:33 +0800
 From: Fam Zheng <famz@redhat.com>
-Message-ID: <20180103075249.GD25984@localhost.localdomain>
+Message-ID: <20180103075633.GE25984@localhost.localdomain>
 References: <20171229174933.1781-1-f4bug@amsat.org>
-	<20171229174933.1781-7-f4bug@amsat.org>
+	<20171229174933.1781-8-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <20171229174933.1781-7-f4bug@amsat.org>
+In-Reply-To: <20171229174933.1781-8-f4bug@amsat.org>
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3 06/42] sdhci: refactor common sysbus/pci
- realize() into sdhci_realizefn()
+Subject: Re: [Qemu-devel] [PATCH v3 07/42] sdhci: refactor common sysbus/pci
+ unrealize() into sdhci_unrealizefn()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,78 +34,83 @@ Cc: Alistair Francis <alistair.francis@xilinx.com>, "Edgar E . Iglesias" <edgar.
 
 On Fri, 12/29 14:48, Philippe Mathieu-Daud=E9 wrote:
 > Signed-off-by: Philippe Mathieu-Daud=E9 <f4bug@amsat.org>
-> Reviewed-by: Alistair Francis <alistair.francis@xilinx.com>
 > ---
->  hw/sd/sdhci.c | 22 ++++++++++++++--------
->  1 file changed, 14 insertions(+), 8 deletions(-)
+>  hw/sd/sdhci.c | 19 ++++++++++++++++---
+>  1 file changed, 16 insertions(+), 3 deletions(-)
 >=20
 > diff --git a/hw/sd/sdhci.c b/hw/sd/sdhci.c
-> index 38d82b4c61..ad5853d527 100644
+> index ad5853d527..06a1ec6f91 100644
 > --- a/hw/sd/sdhci.c
 > +++ b/hw/sd/sdhci.c
-> @@ -1194,6 +1194,15 @@ static void sdhci_initfn(SDHCIState *s)
->      s->transfer_timer =3D timer_new_ns(QEMU_CLOCK_VIRTUAL, sdhci_data_=
-transfer, s);
+> @@ -31,6 +31,7 @@
+>  #include "qemu/bitops.h"
+>  #include "hw/sd/sdhci.h"
+>  #include "sdhci-internal.h"
+> +#include "qapi/error.h"
+>  #include "qemu/log.h"
+> =20
+>  /* host controller debug messages */
+> @@ -1203,15 +1204,17 @@ static void sdhci_realizefn(SDHCIState *s, Erro=
+r **errp)
+>                            SDHC_REGISTERS_MAP_SIZE);
 >  }
 > =20
-> +static void sdhci_realizefn(SDHCIState *s, Error **errp)
-
-errp is not used here. It doesn't hurt to have it but if the contract is =
-"the
-function MAY return error", the callers should check and handle it correc=
-tly
-(like return early instead of continuing).
-
-Fam
-
+> +static void sdhci_unrealizefn(SDHCIState *s, Error **errp)
 > +{
-> +    s->buf_maxsz =3D sdhci_get_fifolen(s);
-> +    s->fifo_buffer =3D g_malloc0(s->buf_maxsz);
-> +
-> +    memory_region_init_io(&s->iomem, OBJECT(s), &sdhci_mmio_ops, s, "s=
-dhci",
-> +                          SDHC_REGISTERS_MAP_SIZE);
+> +    g_free(s->fifo_buffer);
+
+Set s->fifo_buffer to NULL to avoid double-free and/or use-after-free?
+Especially since you call this from both the ->exit and the ->unrealize
+callbacks.
+
 > +}
 > +
 >  static void sdhci_uninitfn(SDHCIState *s)
 >  {
 >      timer_del(s->insert_timer);
-> @@ -1292,12 +1301,11 @@ static void sdhci_pci_realize(PCIDevice *dev, E=
-rror **errp)
->      SDHCIState *s =3D PCI_SDHCI(dev);
->      dev->config[PCI_CLASS_PROG] =3D 0x01; /* Standard Host supported D=
-MA */
->      dev->config[PCI_INTERRUPT_PIN] =3D 0x01; /* interrupt pin A */
-> +
->      sdhci_initfn(s);
-> -    s->buf_maxsz =3D sdhci_get_fifolen(s);
-> -    s->fifo_buffer =3D g_malloc0(s->buf_maxsz);
-> +    sdhci_realizefn(s, errp);
-> +
->      s->irq =3D pci_allocate_irq(dev);
-> -    memory_region_init_io(&s->iomem, OBJECT(s), &sdhci_mmio_ops, s, "s=
-dhci",
-> -            SDHC_REGISTERS_MAP_SIZE);
->      pci_register_bar(dev, 0, 0, &s->iomem);
+>      timer_free(s->insert_timer);
+>      timer_del(s->transfer_timer);
+>      timer_free(s->transfer_timer);
+> -
+> -    g_free(s->fifo_buffer);
+> -    s->fifo_buffer =3D NULL;
 >  }
 > =20
-> @@ -1351,11 +1359,9 @@ static void sdhci_sysbus_realize(DeviceState *de=
-v, Error ** errp)
->      SDHCIState *s =3D SYSBUS_SDHCI(dev);
->      SysBusDevice *sbd =3D SYS_BUS_DEVICE(dev);
-> =20
-> -    s->buf_maxsz =3D sdhci_get_fifolen(s);
-> -    s->fifo_buffer =3D g_malloc0(s->buf_maxsz);
-> +    sdhci_realizefn(s, errp);
+>  static bool sdhci_pending_insert_vmstate_needed(void *opaque)
+> @@ -1312,6 +1315,8 @@ static void sdhci_pci_realize(PCIDevice *dev, Err=
+or **errp)
+>  static void sdhci_pci_exit(PCIDevice *dev)
+>  {
+>      SDHCIState *s =3D PCI_SDHCI(dev);
 > +
->      sysbus_init_irq(sbd, &s->irq);
-> -    memory_region_init_io(&s->iomem, OBJECT(s), &sdhci_mmio_ops, s, "s=
-dhci",
-> -            SDHC_REGISTERS_MAP_SIZE);
+> +    sdhci_unrealizefn(s, &error_abort);
+>      sdhci_uninitfn(s);
+>  }
+> =20
+> @@ -1365,11 +1370,19 @@ static void sdhci_sysbus_realize(DeviceState *d=
+ev, Error ** errp)
 >      sysbus_init_mmio(sbd, &s->iomem);
 >  }
 > =20
+> +static void sdhci_sysbus_unrealize(DeviceState *dev, Error **errp)
+> +{
+> +    SDHCIState *s =3D SYSBUS_SDHCI(dev);
+> +
+> +    sdhci_unrealizefn(s, errp);
+> +}
+> +
+>  static void sdhci_sysbus_class_init(ObjectClass *klass, void *data)
+>  {
+>      DeviceClass *dc =3D DEVICE_CLASS(klass);
+> =20
+>      dc->realize =3D sdhci_sysbus_realize;
+> +    dc->unrealize =3D sdhci_sysbus_unrealize;
+> =20
+>      sdhci_class_init(klass, data);
+>  }
 > --=20
 > 2.15.1
 >=20
 >=20
+
+Fam
