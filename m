@@ -1,20 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59527)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37064)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcel@redhat.com>) id 1eWgJ0-0002is-To
-	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 05:30:12 -0500
+	(envelope-from <no-reply@patchew.org>) id 1eWgTL-0000xo-NH
+	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 05:40:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcel@redhat.com>) id 1eWgIo-0001Rr-IQ
-	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 05:29:54 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:35360)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <marcel@redhat.com>) id 1eWgIn-0001RT-Rt
-	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 05:29:42 -0500
-From: Marcel Apfelbaum <marcel@redhat.com>
-Date: Wed,  3 Jan 2018 12:29:10 +0200
-Message-Id: <20180103102911.35562-5-marcel@redhat.com>
+	(envelope-from <no-reply@patchew.org>) id 1eWgTF-0007bP-CW
+	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 05:40:35 -0500
+Resent-Message-Id: <E1eWgTF-0007bP-CW@eggs.gnu.org>
+Received: from sender-of-o52.zoho.com ([135.84.80.217]:21382)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1eWgTE-0007aD-Rr
+	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 05:40:29 -0500
 In-Reply-To: <20180103102911.35562-1-marcel@redhat.com>
-References: <20180103102911.35562-1-marcel@redhat.com>
-Subject: [Qemu-devel]  [PATCH V3 4/5] pvrdma: initial implementation
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <151497600471.189.7640153461089756154@5adcb62bf0d6>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Wed, 3 Jan 2018 02:40:05 -0800 (PST)
+Subject: Re: [Qemu-devel] [PATCH V3 0/5] hw/pvrdma: PVRDMA device
+ implementation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,5218 +29,1132 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: yuval.shaia@oracle.com, marcel@redhat.com, mst@redhat.com, ehabkost@redhat.com, imammedo@redhat.com, pbonzini@redhat.com, f4bug@amsat.org
+To: marcel@redhat.com
+Cc: famz@redhat.com, qemu-devel@nongnu.org, ehabkost@redhat.com, mst@redhat.com, f4bug@amsat.org, yuval.shaia@oracle.com, pbonzini@redhat.com, imammedo@redhat.com
 
-From: Yuval Shaia <yuval.shaia@oracle.com>
-
-PVRDMA is the QEMU implementation of VMware's paravirtualized RDMA device.
-It works with its Linux Kernel driver AS IS, no need for any special guest
-modifications.
-
-While it complies with the VMware device, it can also communicate with bare
-metal RDMA-enabled machines and does not require an RDMA HCA in the host, it
-can work with Soft-RoCE (rxe).
-
-It does not require the whole guest RAM to be pinned allowing memory
-over-commit and, even if not implemented yet, migration support will be
-possible with some HW assistance.
-
-Signed-off-by: Yuval Shaia <yuval.shaia@oracle.com>
-Signed-off-by: Marcel Apfelbaum <marcel@redhat.com>
----
- Makefile.objs                      |   2 +
- configure                          |   9 +-
- default-configs/arm-softmmu.mak    |   1 +
- default-configs/i386-softmmu.mak   |   1 +
- default-configs/x86_64-softmmu.mak |   1 +
- hw/Makefile.objs                   |   1 +
- hw/rdma/Makefile.objs              |   7 +
- hw/rdma/rdma_backend.c             | 815 +++++++++++++++++++++++++++++++++++++
- hw/rdma/rdma_backend.h             |  92 +++++
- hw/rdma/rdma_backend_defs.h        |  62 +++
- hw/rdma/rdma_rm.c                  | 619 ++++++++++++++++++++++++++++
- hw/rdma/rdma_rm.h                  |  69 ++++
- hw/rdma/rdma_rm_defs.h             | 106 +++++
- hw/rdma/rdma_utils.h               |  36 ++
- hw/rdma/trace-events               |   5 +
- hw/rdma/vmw/pvrdma.h               | 123 ++++++
- hw/rdma/vmw/pvrdma_cmd.c           | 585 ++++++++++++++++++++++++++
- hw/rdma/vmw/pvrdma_dev_api.h       | 580 ++++++++++++++++++++++++++
- hw/rdma/vmw/pvrdma_dev_ring.c      | 140 +++++++
- hw/rdma/vmw/pvrdma_dev_ring.h      |  43 ++
- hw/rdma/vmw/pvrdma_ib_verbs.h      | 400 ++++++++++++++++++
- hw/rdma/vmw/pvrdma_main.c          | 644 +++++++++++++++++++++++++++++
- hw/rdma/vmw/pvrdma_qp_ops.c        | 212 ++++++++++
- hw/rdma/vmw/pvrdma_qp_ops.h        |  27 ++
- hw/rdma/vmw/pvrdma_ring.h          | 134 ++++++
- hw/rdma/vmw/pvrdma_types.h         |  38 ++
- hw/rdma/vmw/pvrdma_utils.c         | 135 ++++++
- hw/rdma/vmw/pvrdma_utils.h         |  26 ++
- hw/rdma/vmw/trace-events           |   5 +
- include/hw/pci/pci_ids.h           |   3 +
- 30 files changed, 4917 insertions(+), 4 deletions(-)
- create mode 100644 hw/rdma/Makefile.objs
- create mode 100644 hw/rdma/rdma_backend.c
- create mode 100644 hw/rdma/rdma_backend.h
- create mode 100644 hw/rdma/rdma_backend_defs.h
- create mode 100644 hw/rdma/rdma_rm.c
- create mode 100644 hw/rdma/rdma_rm.h
- create mode 100644 hw/rdma/rdma_rm_defs.h
- create mode 100644 hw/rdma/rdma_utils.h
- create mode 100644 hw/rdma/trace-events
- create mode 100644 hw/rdma/vmw/pvrdma.h
- create mode 100644 hw/rdma/vmw/pvrdma_cmd.c
- create mode 100644 hw/rdma/vmw/pvrdma_dev_api.h
- create mode 100644 hw/rdma/vmw/pvrdma_dev_ring.c
- create mode 100644 hw/rdma/vmw/pvrdma_dev_ring.h
- create mode 100644 hw/rdma/vmw/pvrdma_ib_verbs.h
- create mode 100644 hw/rdma/vmw/pvrdma_main.c
- create mode 100644 hw/rdma/vmw/pvrdma_qp_ops.c
- create mode 100644 hw/rdma/vmw/pvrdma_qp_ops.h
- create mode 100644 hw/rdma/vmw/pvrdma_ring.h
- create mode 100644 hw/rdma/vmw/pvrdma_types.h
- create mode 100644 hw/rdma/vmw/pvrdma_utils.c
- create mode 100644 hw/rdma/vmw/pvrdma_utils.h
- create mode 100644 hw/rdma/vmw/trace-events
-
-diff --git a/Makefile.objs b/Makefile.objs
-index 285c6f3c15..4acaa1352d 100644
---- a/Makefile.objs
-+++ b/Makefile.objs
-@@ -129,6 +129,8 @@ trace-events-subdirs += hw/block/dataplane
- trace-events-subdirs += hw/char
- trace-events-subdirs += hw/intc
- trace-events-subdirs += hw/net
-+trace-events-subdirs += hw/rdma
-+trace-events-subdirs += hw/rdma/vmw
- trace-events-subdirs += hw/virtio
- trace-events-subdirs += hw/audio
- trace-events-subdirs += hw/misc
-diff --git a/configure b/configure
-index 100309c33f..d36466f622 100755
---- a/configure
-+++ b/configure
-@@ -1529,7 +1529,7 @@ disabled with --disable-FEATURE, default is enabled if available:
-   bluez           bluez stack connectivity
-   kvm             KVM acceleration support
-   hax             HAX acceleration support
--  rdma            RDMA-based migration support
-+  rdma            Enable RDMA-based migration support and PVRDMA
-   vde             support for vde network
-   netmap          support for netmap network
-   linux-aio       Linux AIO support
-@@ -2856,15 +2856,16 @@ if test "$rdma" != "no" ; then
- #include <rdma/rdma_cma.h>
- int main(void) { return 0; }
- EOF
--  rdma_libs="-lrdmacm -libverbs"
-+  rdma_libs="-lrdmacm -libverbs -libumad"
-   if compile_prog "" "$rdma_libs" ; then
-     rdma="yes"
-   else
-+    libs_softmmu="$libs_softmmu $rdma_libs"
-     if test "$rdma" = "yes" ; then
-         error_exit \
--            " OpenFabrics librdmacm/libibverbs not present." \
-+            " OpenFabrics librdmacm/libibverbs/libibumad not present." \
-             " Your options:" \
--            "  (1) Fast: Install infiniband packages from your distro." \
-+            "  (1) Fast: Install infiniband packages (devel) from your distro." \
-             "  (2) Cleanest: Install libraries from www.openfabrics.org" \
-             "  (3) Also: Install softiwarp if you don't have RDMA hardware"
-     fi
-diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-softmmu.mak
-index b0d6e65038..0e7a3c1700 100644
---- a/default-configs/arm-softmmu.mak
-+++ b/default-configs/arm-softmmu.mak
-@@ -132,3 +132,4 @@ CONFIG_GPIO_KEY=y
- CONFIG_MSF2=y
- CONFIG_FW_CFG_DMA=y
- CONFIG_XILINX_AXI=y
-+CONFIG_PVRDMA=y
-diff --git a/default-configs/i386-softmmu.mak b/default-configs/i386-softmmu.mak
-index 95ac4b464a..88298e4ef5 100644
---- a/default-configs/i386-softmmu.mak
-+++ b/default-configs/i386-softmmu.mak
-@@ -61,3 +61,4 @@ CONFIG_HYPERV_TESTDEV=$(CONFIG_KVM)
- CONFIG_PXB=y
- CONFIG_ACPI_VMGENID=y
- CONFIG_FW_CFG_DMA=y
-+CONFIG_PVRDMA=y
-diff --git a/default-configs/x86_64-softmmu.mak b/default-configs/x86_64-softmmu.mak
-index 0221236825..f571da36eb 100644
---- a/default-configs/x86_64-softmmu.mak
-+++ b/default-configs/x86_64-softmmu.mak
-@@ -61,3 +61,4 @@ CONFIG_HYPERV_TESTDEV=$(CONFIG_KVM)
- CONFIG_PXB=y
- CONFIG_ACPI_VMGENID=y
- CONFIG_FW_CFG_DMA=y
-+CONFIG_PVRDMA=y
-diff --git a/hw/Makefile.objs b/hw/Makefile.objs
-index cf4cb2010b..6a0ffe0afd 100644
---- a/hw/Makefile.objs
-+++ b/hw/Makefile.objs
-@@ -18,6 +18,7 @@ devices-dirs-$(CONFIG_IPMI) += ipmi/
- devices-dirs-$(CONFIG_SOFTMMU) += isa/
- devices-dirs-$(CONFIG_SOFTMMU) += misc/
- devices-dirs-$(CONFIG_SOFTMMU) += net/
-+devices-dirs-$(CONFIG_SOFTMMU) += rdma/
- devices-dirs-$(CONFIG_SOFTMMU) += nvram/
- devices-dirs-$(CONFIG_SOFTMMU) += pci/
- devices-dirs-$(CONFIG_PCI) += pci-bridge/ pci-host/
-diff --git a/hw/rdma/Makefile.objs b/hw/rdma/Makefile.objs
-new file mode 100644
-index 0000000000..0537e36c39
---- /dev/null
-+++ b/hw/rdma/Makefile.objs
-@@ -0,0 +1,7 @@
-+ifeq ($(CONFIG_RDMA),y)
-+obj-$(CONFIG_PVRDMA) += rdma_backend.o rdma_rm.o
-+obj-$(CONFIG_PVRDMA) += vmw/pvrdma_dev_ring.o vmw/pvrdma_cmd.o \
-+                        vmw/pvrdma_utils.o vmw/pvrdma_qp_ops.o \
-+                        vmw/pvrdma_main.o
-+endif
-+
-diff --git a/hw/rdma/rdma_backend.c b/hw/rdma/rdma_backend.c
-new file mode 100644
-index 0000000000..dcb799f49b
---- /dev/null
-+++ b/hw/rdma/rdma_backend.c
-@@ -0,0 +1,815 @@
-+/*
-+ * QEMU paravirtual RDMA - Generic RDMA backend
-+ *
-+ * Copyright (C) 2018 Oracle
-+ * Copyright (C) 2018 Red Hat Inc
-+ *
-+ * Authors:
-+ *     Yuval Shaia <yuval.shaia@oracle.com>
-+ *     Marcel Apfelbaum <marcel@redhat.com>
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2.
-+ * See the COPYING file in the top-level directory.
-+ *
-+ */
-+
-+#include <qemu/osdep.h>
-+#include <qemu/error-report.h>
-+#include <qapi/error.h>
-+
-+#include <infiniband/verbs.h>
-+
-+#include "trace.h"
-+#include "rdma_utils.h"
-+#include "rdma_rm.h"
-+#include "rdma_backend.h"
-+
-+/* Vendor Errors */
-+#define VENDOR_ERR_FAIL_BACKEND     0x201
-+#define VENDOR_ERR_TOO_MANY_SGES    0x202
-+#define VENDOR_ERR_NOMEM            0x203
-+#define VENDOR_ERR_QP0              0x204
-+#define VENDOR_ERR_NO_SGE           0x205
-+#define VENDOR_ERR_MAD_SEND         0x206
-+#define VENDOR_ERR_INVLKEY          0x207
-+#define VENDOR_ERR_MR_SMALL         0x208
-+
-+typedef struct BackendCtx {
-+    void *up_ctx;
-+    uint64_t req_id;
-+    bool is_tx_req;
-+} BackendCtx;
-+
-+static void (*comp_handler)(int status, unsigned int vendor_err, void *ctx);
-+
-+static void dummy_comp_handler(int status, unsigned int vendor_err, void *ctx)
-+{
-+    pr_err("No completion handler is registered\n");
-+}
-+
-+static void poll_cq(RdmaDeviceResources *rdma_dev_res, struct ibv_cq *ibcq,
-+                    bool one_poll)
-+{
-+    int i, ne;
-+    BackendCtx *bctx;
-+    struct ibv_wc wc[2];
-+
-+    pr_dbg("Entering poll_cq loop on cq %p\n", ibcq);
-+    do {
-+        ne = ibv_poll_cq(ibcq, 2, wc);
-+        if (ne == 0 && one_poll) {
-+            pr_dbg("CQ is empty\n");
-+            return;
-+        }
-+    } while (ne < 0);
-+
-+    pr_dbg("Got %d completion(s) from cq %p\n", ne, ibcq);
-+
-+    for (i = 0; i < ne; i++) {
-+        pr_dbg("wr_id=0x%lx\n", wc[i].wr_id);
-+        pr_dbg("status=%d\n", wc[i].status);
-+
-+        bctx = rdma_rm_get_cqe_ctx(rdma_dev_res, wc[i].wr_id);
-+        if (unlikely(!bctx)) {
-+            pr_dbg("Error: Fail to find ctx for req %ld\n", wc[i].wr_id);
-+            continue;
-+        }
-+        pr_dbg("Processing %s CQE\n", bctx->is_tx_req ? "send" : "recv");
-+
-+        comp_handler(wc[i].status, wc[i].vendor_err, bctx->up_ctx);
-+
-+        rdma_rm_dealloc_cqe_ctx(rdma_dev_res, wc[i].wr_id);
-+        free(bctx);
-+    }
-+}
-+
-+static void *comp_handler_thread(void *arg)
-+{
-+    RdmaBackendDev *backend_dev = (RdmaBackendDev *)arg;
-+    int rc;
-+    struct ibv_cq *ev_cq;
-+    void *ev_ctx;
-+
-+    pr_dbg("Starting\n");
-+
-+    while (backend_dev->comp_thread.run) {
-+        pr_dbg("Waiting for completion on channel %p\n", backend_dev->channel);
-+        rc = ibv_get_cq_event(backend_dev->channel, &ev_cq, &ev_ctx);
-+        pr_dbg("ibv_get_cq_event=%d\n", rc);
-+        if (unlikely(rc)) {
-+            pr_dbg("---> ibv_get_cq_event (%d)\n", rc);
-+            continue;
-+        }
-+
-+        if (unlikely(ibv_req_notify_cq(ev_cq, 0))) {
-+            pr_dbg("---> ibv_req_notify_cq\n");
-+        }
-+
-+        poll_cq(backend_dev->rdma_dev_res, ev_cq, false);
-+
-+        ibv_ack_cq_events(ev_cq, 1);
-+    }
-+
-+    pr_dbg("Going down\n");
-+    /* TODO: Post cqe for all remaining buffs that were posted */
-+
-+    return NULL;
-+}
-+
-+void rdma_backend_register_comp_handler(void (*handler)(int status,
-+                                        unsigned int vendor_err, void *ctx))
-+{
-+    comp_handler = handler;
-+}
-+
-+void rdma_backend_unregister_comp_handler(void)
-+{
-+    rdma_backend_register_comp_handler(dummy_comp_handler);
-+}
-+
-+int rdma_backend_query_port(RdmaBackendDev *backend_dev,
-+                            struct ibv_port_attr *port_attr)
-+{
-+    int rc;
-+
-+    memset(port_attr, 0, sizeof(*port_attr));
-+
-+    rc = ibv_query_port(backend_dev->context, backend_dev->port_num, port_attr);
-+    if (rc) {
-+        pr_dbg("Error %d from ibv_query_port\n", rc);
-+        return -EIO;
-+    }
-+
-+    return 0;
-+}
-+
-+void rdma_backend_poll_cq(RdmaDeviceResources *rdma_dev_res, RdmaBackendCQ *cq)
-+{
-+    poll_cq(rdma_dev_res, cq->ibcq, true);
-+}
-+
-+static GHashTable *ah_hash;
-+
-+static struct ibv_ah *create_ah(RdmaBackendDev *backend_dev, struct ibv_pd *pd,
-+                                uint8_t sgid_idx, union ibv_gid *dgid)
-+{
-+    GBytes *ah_key = g_bytes_new(dgid, sizeof(*dgid));
-+    struct ibv_ah *ah = g_hash_table_lookup(ah_hash, ah_key);
-+
-+    if (ah) {
-+        trace_create_ah_cache_hit(be64_to_cpu(dgid->global.subnet_prefix),
-+                                  be64_to_cpu(dgid->global.interface_id));
-+        g_bytes_unref(ah_key);
-+    } else {
-+        struct ibv_ah_attr ah_attr = {
-+            .is_global     = 1,
-+            .port_num      = backend_dev->port_num,
-+            .grh.hop_limit = 1,
-+        };
-+
-+        ah_attr.grh.dgid = *dgid;
-+        ah_attr.grh.sgid_index = sgid_idx;
-+
-+        ah = ibv_create_ah(pd, &ah_attr);
-+        if (ah) {
-+            g_hash_table_insert(ah_hash, ah_key, ah);
-+        } else {
-+            pr_dbg("ibv_create_ah failed for gid <%lx %lx>\n",
-+                    be64_to_cpu(dgid->global.subnet_prefix),
-+                    be64_to_cpu(dgid->global.interface_id));
-+        }
-+
-+        trace_create_ah_cache_miss(be64_to_cpu(dgid->global.subnet_prefix),
-+                                   be64_to_cpu(dgid->global.interface_id));
-+    }
-+
-+    return ah;
-+}
-+
-+static void destroy_ah_hash_key(gpointer data)
-+{
-+    g_bytes_unref(data);
-+}
-+
-+static void destroy_ah_hast_data(gpointer data)
-+{
-+    struct ibv_ah *ah = data;
-+    ibv_destroy_ah(ah);
-+}
-+
-+static void ah_cache_init(void)
-+{
-+    ah_hash = g_hash_table_new_full(g_bytes_hash, g_bytes_equal,
-+                                    destroy_ah_hash_key, destroy_ah_hast_data);
-+}
-+
-+static int build_host_sge_array(RdmaDeviceResources *rdma_dev_res,
-+                                struct ibv_sge *dsge, struct ibv_sge *ssge,
-+                                uint8_t num_sge)
-+{
-+    RdmaRmMR *mr;
-+    int ssge_idx;
-+    int ret = 0;
-+
-+    pr_dbg("num_sge=%d\n", num_sge);
-+
-+    for (ssge_idx = 0; ssge_idx < num_sge; ssge_idx++) {
-+        mr = rdma_rm_get_mr(rdma_dev_res, ssge[ssge_idx].lkey);
-+        if (unlikely(!mr)) {
-+            ret = VENDOR_ERR_INVLKEY | ssge[ssge_idx].lkey;
-+            pr_dbg("Invalid lkey %d\n", ssge[ssge_idx].lkey);
-+            goto out;
-+        }
-+
-+        dsge->addr = mr->user_mr.host_virt + ssge[ssge_idx].addr -
-+                     mr->user_mr.guest_start;
-+        dsge->length = ssge[ssge_idx].length;
-+        dsge->lkey = rdma_backend_mr_lkey(&mr->backend_mr);
-+
-+        pr_dbg("ssge->addr=0x%lx\n", (uint64_t)ssge[ssge_idx].addr);
-+        pr_dbg("dsge->addr=0x%lx\n", dsge->addr);
-+        pr_dbg("dsge->lenght=%d\n", dsge->length);
-+        pr_dbg("dsge->lkey=0x%x\n", dsge->lkey);
-+
-+        dsge++;
-+    }
-+
-+out:
-+    return ret;
-+}
-+
-+void rdma_backend_post_send(RdmaBackendDev *backend_dev,
-+                            RdmaDeviceResources *rdma_dev_res,
-+                            RdmaBackendQP *qp, uint8_t qp_type,
-+                            struct ibv_sge *sge, uint32_t num_sge,
-+                            union ibv_gid *dgid, uint32_t dqpn,
-+                            uint32_t dqkey, void *ctx)
-+{
-+    BackendCtx *bctx;
-+    struct ibv_sge new_sge[MAX_SGE];
-+    uint32_t bctx_id;
-+    int rc;
-+    struct ibv_send_wr wr = {0}, *bad_wr;
-+
-+    if (!qp->ibqp && qp_type == 0) {
-+        pr_dbg("QP0 is not supported\n");
-+        comp_handler(IBV_WC_GENERAL_ERR, VENDOR_ERR_QP0, ctx);
-+        return;
-+    }
-+
-+    pr_dbg("num_sge=%d\n", num_sge);
-+
-+    if (!qp->ibqp && qp_type == 1) {
-+        pr_dbg("QP1\n");
-+        comp_handler(IBV_WC_GENERAL_ERR, VENDOR_ERR_MAD_SEND, ctx);
-+    }
-+
-+    if (!num_sge) {
-+        pr_dbg("num_sge=0\n");
-+        comp_handler(IBV_WC_GENERAL_ERR, VENDOR_ERR_NO_SGE, ctx);
-+        return;
-+    }
-+
-+    bctx = malloc(sizeof(*bctx));
-+    if (unlikely(!bctx)) {
-+        pr_dbg("Fail to allocate request ctx\n");
-+        comp_handler(IBV_WC_GENERAL_ERR, VENDOR_ERR_NOMEM, ctx);
-+        return;
-+    }
-+    memset(bctx, 0, sizeof(*bctx));
-+
-+    bctx->up_ctx = ctx;
-+    bctx->is_tx_req = 1;
-+
-+    rc = rdma_rm_alloc_cqe_ctx(rdma_dev_res, &bctx_id, bctx);
-+    if (unlikely(rc)) {
-+        pr_dbg("Fail to allocate cqe_ctx\n");
-+        comp_handler(IBV_WC_GENERAL_ERR, VENDOR_ERR_NOMEM, ctx);
-+        goto out_free_bctx;
-+    }
-+
-+    rc = build_host_sge_array(rdma_dev_res, new_sge, sge, num_sge);
-+    if (rc) {
-+        pr_dbg("Error: Fail to build host SGE array\n");
-+        comp_handler(IBV_WC_GENERAL_ERR, rc, ctx);
-+        goto out_dealloc_cqe_ctx;
-+    }
-+
-+    if (qp_type == IBV_QPT_UD) {
-+        wr.wr.ud.ah = create_ah(backend_dev, qp->ibpd,
-+                                backend_dev->backend_gid_idx, dgid);
-+        wr.wr.ud.remote_qpn = dqpn;
-+        wr.wr.ud.remote_qkey = dqkey;
-+    }
-+
-+    wr.num_sge = num_sge;
-+    wr.opcode = IBV_WR_SEND;
-+    wr.send_flags = IBV_SEND_SIGNALED;
-+    wr.sg_list = &new_sge[0];
-+    wr.wr_id = bctx_id;
-+
-+    rc = ibv_post_send(qp->ibqp, &wr, &bad_wr);
-+    pr_dbg("ibv_post_send=%d\n", rc);
-+    if (rc) {
-+        pr_dbg("Fail (%d, %d) to post send WQE to qpn %d\n", rc, errno,
-+                qp->ibqp->qp_num);
-+        comp_handler(IBV_WC_GENERAL_ERR, VENDOR_ERR_FAIL_BACKEND, ctx);
-+        goto out_dealloc_cqe_ctx;
-+    }
-+
-+    return;
-+
-+out_dealloc_cqe_ctx:
-+    rdma_rm_dealloc_cqe_ctx(rdma_dev_res, bctx_id);
-+
-+out_free_bctx:
-+    free(bctx);
-+}
-+
-+void rdma_backend_post_recv(RdmaBackendDev *backend_dev,
-+                            RdmaDeviceResources *rdma_dev_res,
-+                            RdmaBackendQP *qp, uint8_t qp_type,
-+                            struct ibv_sge *sge, uint32_t num_sge, void *ctx)
-+{
-+    BackendCtx *bctx;
-+    struct ibv_sge new_sge[MAX_SGE];
-+    uint32_t bctx_id;
-+    int rc;
-+    struct ibv_recv_wr wr = {0}, *bad_wr;
-+
-+    if (!qp->ibqp && qp_type == 0) {
-+        pr_dbg("QP0 is not supported\n");
-+        comp_handler(IBV_WC_GENERAL_ERR, VENDOR_ERR_QP0, ctx);
-+        return;
-+    }
-+
-+    pr_dbg("num_sge=%d\n", num_sge);
-+
-+    if (!qp->ibqp && qp_type == 1) {
-+        pr_dbg("QP1\n");
-+        comp_handler(IBV_WC_GENERAL_ERR, VENDOR_ERR_MAD_SEND, ctx);
-+        return;
-+    }
-+
-+    if (!num_sge) {
-+        pr_dbg("num_sge=0\n");
-+        comp_handler(IBV_WC_GENERAL_ERR, VENDOR_ERR_NO_SGE, ctx);
-+        return;
-+    }
-+
-+    bctx = malloc(sizeof(*bctx));
-+    if (unlikely(!bctx)) {
-+        pr_dbg("Fail to allocate request ctx\n");
-+        comp_handler(IBV_WC_GENERAL_ERR, VENDOR_ERR_NOMEM, ctx);
-+        return;
-+    }
-+    memset(bctx, 0, sizeof(*bctx));
-+
-+    bctx->up_ctx = ctx;
-+    bctx->is_tx_req = 0;
-+
-+    rc = rdma_rm_alloc_cqe_ctx(rdma_dev_res, &bctx_id, bctx);
-+    if (unlikely(rc)) {
-+        pr_dbg("Fail to allocate cqe_ctx\n");
-+        comp_handler(IBV_WC_GENERAL_ERR, VENDOR_ERR_NOMEM, ctx);
-+        goto out_free_bctx;
-+    }
-+
-+    rc = build_host_sge_array(rdma_dev_res, new_sge, sge, num_sge);
-+    if (rc) {
-+        pr_dbg("Error: Fail to build host SGE array\n");
-+        comp_handler(IBV_WC_GENERAL_ERR, rc, ctx);
-+        goto out_dealloc_cqe_ctx;
-+    }
-+
-+    wr.num_sge = num_sge;
-+    wr.sg_list = &new_sge[0];
-+    wr.wr_id = bctx_id;
-+    rc = ibv_post_recv(qp->ibqp, &wr, &bad_wr);
-+    pr_dbg("ibv_post_recv=%d\n", rc);
-+    if (rc) {
-+        pr_dbg("Fail (%d, %d) to post recv WQE to qpn %d\n", rc, errno,
-+                qp->ibqp->qp_num);
-+        comp_handler(IBV_WC_GENERAL_ERR, VENDOR_ERR_FAIL_BACKEND, ctx);
-+        goto out_dealloc_cqe_ctx;
-+    }
-+
-+    return;
-+
-+out_dealloc_cqe_ctx:
-+    rdma_rm_dealloc_cqe_ctx(rdma_dev_res, bctx_id);
-+
-+out_free_bctx:
-+    free(bctx);
-+}
-+
-+int rdma_backend_create_pd(RdmaBackendDev *backend_dev, RdmaBackendPD *pd)
-+{
-+    pd->ibpd = ibv_alloc_pd(backend_dev->context);
-+
-+    return pd->ibpd ? 0 : -EIO;
-+}
-+
-+void rdma_backend_destroy_pd(RdmaBackendPD *pd)
-+{
-+    if (pd->ibpd) {
-+        ibv_dealloc_pd(pd->ibpd);
-+    }
-+}
-+
-+int rdma_backend_create_mr(RdmaBackendMR *mr, RdmaBackendPD *pd, uint64_t addr,
-+                           size_t length, int access)
-+{
-+    pr_dbg("addr=0x%lx\n", addr);
-+    pr_dbg("len=%ld\n", length);
-+    mr->ibpd = pd->ibpd;
-+    mr->ibmr = ibv_reg_mr(mr->ibpd, (void *)addr, length, access);
-+
-+    if (mr->ibmr) {
-+        pr_dbg("lkey=0x%x\n", mr->ibmr->lkey);
-+        pr_dbg("rkey=0x%x\n", mr->ibmr->rkey);
-+    }
-+
-+    return mr->ibmr ? 0 : -EIO;
-+}
-+
-+void rdma_backend_destroy_mr(RdmaBackendMR *mr)
-+{
-+    if (mr->ibmr) {
-+        ibv_dereg_mr(mr->ibmr);
-+    }
-+}
-+
-+int rdma_backend_create_cq(RdmaBackendDev *backend_dev, RdmaBackendCQ *cq,
-+                           int cqe)
-+{
-+    pr_dbg("cqe=%d\n", cqe);
-+
-+    pr_dbg("dev->channel=%p\n", backend_dev->channel);
-+    cq->ibcq = ibv_create_cq(backend_dev->context, cqe + 1, NULL,
-+                             backend_dev->channel, 0);
-+
-+    if (cq->ibcq) {
-+        if (ibv_req_notify_cq(cq->ibcq, 0)) {
-+            pr_dbg("---> ibv_req_notify_cq\n");
-+        }
-+    }
-+
-+    cq->backend_dev = backend_dev;
-+
-+    return cq->ibcq ? 0 : -EIO;
-+}
-+
-+void rdma_backend_destroy_cq(RdmaBackendCQ *cq)
-+{
-+    if (cq->ibcq) {
-+        ibv_req_notify_cq(cq->ibcq, 0);
-+
-+        /* Cleanup the queue before destruction */
-+        poll_cq(cq->backend_dev->rdma_dev_res, cq->ibcq, false);
-+
-+        ibv_destroy_cq(cq->ibcq);
-+    }
-+}
-+
-+int rdma_backend_create_qp(RdmaBackendQP *qp, uint8_t qp_type,
-+                           RdmaBackendPD *pd, RdmaBackendCQ *scq,
-+                           RdmaBackendCQ *rcq, uint32_t max_send_wr,
-+                           uint32_t max_recv_wr, uint32_t max_send_sge,
-+                           uint32_t max_recv_sge)
-+{
-+    struct ibv_qp_init_attr attr = {0};
-+
-+    qp->ibqp = 0;
-+    pr_dbg("qp_type=%d\n", qp_type);
-+
-+    if (qp_type == 0) {
-+        pr_dbg("QP0 is not supported\n");
-+        return -EPERM;
-+    }
-+
-+    if (qp_type == 1) {
-+        pr_dbg("QP1\n");
-+        return 0;
-+    }
-+
-+    attr.qp_type = qp_type;
-+    attr.send_cq = scq->ibcq;
-+    attr.recv_cq = rcq->ibcq;
-+    attr.cap.max_send_wr = max_send_wr;
-+    attr.cap.max_recv_wr = max_recv_wr;
-+    attr.cap.max_send_sge = max_send_sge;
-+    attr.cap.max_recv_sge = max_recv_sge;
-+
-+    pr_dbg("max_send_wr=%d\n", max_send_wr);
-+    pr_dbg("max_recv_wr=%d\n", max_recv_wr);
-+    pr_dbg("max_send_sge=%d\n", max_send_sge);
-+    pr_dbg("max_recv_sge=%d\n", max_recv_sge);
-+
-+    qp->ibpd = pd->ibpd;
-+    qp->ibqp = ibv_create_qp(qp->ibpd, &attr);
-+
-+    if (likely(!qp->ibqp)) {
-+        pr_dbg("Error from ibv_create_qp\n");
-+        return -EIO;
-+    }
-+
-+    /* TODO: Query QP to get max_inline_data and save it to be used in send */
-+
-+    pr_dbg("qpn=0x%x\n", qp->ibqp->qp_num);
-+
-+    return 0;
-+}
-+
-+int rdma_backend_qp_state_init(RdmaBackendDev *backend_dev, RdmaBackendQP *qp,
-+                               uint8_t qp_type, uint32_t qkey)
-+{
-+    struct ibv_qp_attr attr = {0};
-+    int rc, attr_mask;
-+
-+    pr_dbg("qpn=0x%x\n", qp->ibqp->qp_num);
-+    pr_dbg("sport_num=%d\n", backend_dev->port_num);
-+
-+    attr_mask = IBV_QP_STATE | IBV_QP_PKEY_INDEX | IBV_QP_PORT;
-+    attr.qp_state        = IBV_QPS_INIT;
-+    attr.pkey_index      = 0;
-+    attr.port_num        = backend_dev->port_num;
-+    if (qp_type == IBV_QPT_RC) {
-+        attr_mask |= IBV_QP_ACCESS_FLAGS;
-+    }
-+    if (qp_type == IBV_QPT_UD) {
-+        attr.qkey = qkey;
-+        if (qkey) {
-+            attr_mask |= IBV_QP_QKEY;
-+        }
-+    }
-+
-+    rc = ibv_modify_qp(qp->ibqp, &attr, attr_mask);
-+    if (rc) {
-+        pr_dbg("Error %d from ibv_modify_qp\n", rc);
-+        return -EIO;
-+    }
-+
-+    return 0;
-+}
-+
-+int rdma_backend_qp_state_rtr(RdmaBackendDev *backend_dev, RdmaBackendQP *qp,
-+                              uint8_t qp_type, union ibv_gid *dgid,
-+                              uint32_t dqpn, uint32_t rq_psn, uint32_t qkey)
-+{
-+    struct ibv_qp_attr attr = {0};
-+    union ibv_gid ibv_gid = {
-+        .global.interface_id = dgid->global.interface_id,
-+        .global.subnet_prefix = dgid->global.subnet_prefix
-+    };
-+    int rc, attr_mask = 0;
-+
-+    attr.qp_state = IBV_QPS_RTR;
-+    attr_mask = IBV_QP_STATE;
-+
-+    if (qp_type == IBV_QPT_RC) {
-+        pr_dbg("dgid=0x%lx,%lx\n", be64_to_cpu(ibv_gid.global.subnet_prefix),
-+               be64_to_cpu(ibv_gid.global.interface_id));
-+        pr_dbg("dqpn=0x%x\n", dqpn);
-+        pr_dbg("sgid_idx=%d\n", backend_dev->backend_gid_idx);
-+        pr_dbg("sport_num=%d\n", backend_dev->port_num);
-+        pr_dbg("rq_psn=0x%x\n", rq_psn);
-+
-+        attr.path_mtu               = IBV_MTU_1024;
-+        attr.dest_qp_num            = dqpn;
-+        attr.max_dest_rd_atomic     = 1;
-+        attr.min_rnr_timer          = 12;
-+        attr.ah_attr.port_num       = backend_dev->port_num;
-+        attr.ah_attr.is_global      = 1;
-+        attr.ah_attr.grh.hop_limit  = 1;
-+        attr.ah_attr.grh.dgid       = ibv_gid;
-+        attr.ah_attr.grh.sgid_index = backend_dev->backend_gid_idx;
-+        attr.rq_psn                 = rq_psn;
-+
-+        attr_mask |= IBV_QP_AV | IBV_QP_PATH_MTU | IBV_QP_DEST_QPN |
-+                     IBV_QP_RQ_PSN | IBV_QP_MAX_DEST_RD_ATOMIC |
-+                     IBV_QP_MIN_RNR_TIMER;
-+    }
-+
-+    if (qp_type == IBV_QPT_UD) {
-+        pr_dbg("qkey=0x%x\n", qkey);
-+        attr.qkey = qkey;
-+        if (qkey) {
-+            attr_mask |= IBV_QP_QKEY;
-+        }
-+    }
-+
-+    rc = ibv_modify_qp(qp->ibqp, &attr, attr_mask);
-+    if (rc) {
-+        pr_dbg("Error %d from ibv_modify_qp\n", rc);
-+        return -EIO;
-+    }
-+
-+    return 0;
-+}
-+
-+int rdma_backend_qp_state_rts(RdmaBackendQP *qp, uint8_t qp_type,
-+                              uint32_t sq_psn, uint32_t qkey)
-+{
-+    struct ibv_qp_attr attr = {0};
-+    int rc, attr_mask = 0;
-+
-+    pr_dbg("qpn=0x%x\n", qp->ibqp->qp_num);
-+    pr_dbg("sq_psn=0x%x\n", sq_psn);
-+
-+    attr_mask |= IBV_QP_SQ_PSN;
-+    attr.sq_psn = sq_psn;
-+
-+    attr.qp_state = IBV_QPS_RTS;
-+    attr_mask = IBV_QP_STATE | IBV_QP_SQ_PSN;
-+
-+    if (qp_type == IBV_QPT_RC) {
-+        attr.timeout       = 14;
-+        attr.retry_cnt     = 7;
-+        attr.rnr_retry     = 7;
-+        attr.max_rd_atomic = 1;
-+
-+        attr_mask |= IBV_QP_TIMEOUT | IBV_QP_RETRY_CNT | IBV_QP_RNR_RETRY |
-+                     IBV_QP_MAX_QP_RD_ATOMIC;
-+    }
-+
-+    if (qp_type == IBV_QPT_UD) {
-+        attr.qkey = qkey;
-+        if (qkey) {
-+            attr_mask |= IBV_QP_QKEY;
-+        }
-+    }
-+
-+    rc = ibv_modify_qp(qp->ibqp, &attr, attr_mask);
-+    if (rc) {
-+        pr_dbg("Error %d from ibv_modify_qp\n", rc);
-+        return -EIO;
-+    }
-+
-+    return 0;
-+}
-+
-+void rdma_backend_destroy_qp(RdmaBackendQP *qp)
-+{
-+    if (qp->ibqp) {
-+        ibv_destroy_qp(qp->ibqp);
-+    }
-+}
-+
-+#define CHK_ATTR(req, dev, member, fmt) ({ \
-+    pr_dbg("%s="fmt","fmt"\n", #member, dev.member, req->member); \
-+    if (req->member > dev.member) { \
-+        warn_report("Setting of %s to 0x%lx higher than host device capability 0x%lx", \
-+                    #member, (uint64_t)req->member, (uint64_t)dev.member); \
-+        req->member = dev.member; \
-+    } \
-+    pr_dbg("%s="fmt"\n", #member, req->member); })
-+
-+static int init_device_caps(RdmaBackendDev *backend_dev,
-+                            struct ibv_device_attr *dev_attr)
-+{
-+    memset(&backend_dev->dev_attr, 0, sizeof(backend_dev->dev_attr));
-+
-+    if (ibv_query_device(backend_dev->context, &backend_dev->dev_attr)) {
-+        return -EIO;
-+    }
-+
-+    CHK_ATTR(dev_attr, backend_dev->dev_attr, max_mr_size, "%ld");
-+    CHK_ATTR(dev_attr, backend_dev->dev_attr, max_qp, "%d");
-+    CHK_ATTR(dev_attr, backend_dev->dev_attr, max_sge, "%d");
-+    CHK_ATTR(dev_attr, backend_dev->dev_attr, max_qp_wr, "%d");
-+    CHK_ATTR(dev_attr, backend_dev->dev_attr, max_cq, "%d");
-+    CHK_ATTR(dev_attr, backend_dev->dev_attr, max_cqe, "%d");
-+    CHK_ATTR(dev_attr, backend_dev->dev_attr, max_mr, "%d");
-+    CHK_ATTR(dev_attr, backend_dev->dev_attr, max_pd, "%d");
-+    CHK_ATTR(dev_attr, backend_dev->dev_attr, max_qp_rd_atom, "%d");
-+    CHK_ATTR(dev_attr, backend_dev->dev_attr, max_qp_init_rd_atom, "%d");
-+    CHK_ATTR(dev_attr, backend_dev->dev_attr, max_ah, "%d");
-+
-+    return 0;
-+}
-+
-+int rdma_backend_init(RdmaBackendDev *backend_dev,
-+                      RdmaDeviceResources *rdma_dev_res,
-+                      const char *backend_device_name, uint8_t port_num,
-+                      uint8_t backend_gid_idx, struct ibv_device_attr *dev_attr,
-+                      Error **errp)
-+{
-+    int i;
-+    int ret = 0;
-+    int num_ibv_devices;
-+    char thread_name[80] = {0};
-+    struct ibv_device **dev_list;
-+    struct ibv_port_attr port_attr;
-+
-+    backend_dev->backend_gid_idx = backend_gid_idx;
-+    backend_dev->port_num = port_num;
-+    backend_dev->rdma_dev_res = rdma_dev_res;
-+
-+    rdma_backend_register_comp_handler(dummy_comp_handler);
-+
-+    dev_list = ibv_get_device_list(&num_ibv_devices);
-+    if (!dev_list) {
-+        error_setg(errp, "Failed to get IB devices list");
-+        ret = -EIO;
-+        goto out;
-+    }
-+    if (num_ibv_devices == 0) {
-+        error_setg(errp, "No IB devices were found");
-+        ret = -ENXIO;
-+        goto out;
-+    }
-+
-+    if (backend_device_name) {
-+        for (i = 0; dev_list[i]; ++i) {
-+            if (!strcmp(ibv_get_device_name(dev_list[i]),
-+                        backend_device_name)) {
-+                break;
-+            }
-+        }
-+
-+        backend_dev->ib_dev = dev_list[i];
-+        if (!backend_dev->ib_dev) {
-+            error_setg(errp, "Failed to find IB device %s",
-+                       backend_device_name);
-+            ret = -EIO;
-+            goto out;
-+        }
-+    } else {
-+        backend_dev->ib_dev = *dev_list;
-+    }
-+    ibv_free_device_list(dev_list);
-+
-+    pr_dbg("Using backend device %s, port %d, gid_idx %d\n",
-+           ibv_get_device_name(backend_dev->ib_dev),
-+           backend_dev->port_num, backend_dev->backend_gid_idx);
-+
-+    backend_dev->context = ibv_open_device(backend_dev->ib_dev);
-+    if (!backend_dev->context) {
-+        error_setg(errp, "Failed to open IB device");
-+        ret = -EIO;
-+        goto out;
-+    }
-+
-+    backend_dev->channel = ibv_create_comp_channel(backend_dev->context);
-+    if (!backend_dev->channel) {
-+        error_setg(errp, "Failed to create IB communication channel");
-+        ret = -EIO;
-+        goto out_close_device;
-+    }
-+    pr_dbg("dev->backend_dev.channel=%p\n", backend_dev->channel);
-+
-+    ret = ibv_query_gid(backend_dev->context, backend_dev->port_num,
-+                         backend_dev->backend_gid_idx, &backend_dev->gid);
-+    if (ret) {
-+        error_setg(errp, "Failed to query gid %d",
-+                   backend_dev->backend_gid_idx);
-+        ret = -EIO;
-+        goto out_destroy_comm_channel;
-+    }
-+    pr_dbg("subnet_prefix=0x%lx\n",
-+           be64_to_cpu(backend_dev->gid.global.subnet_prefix));
-+    pr_dbg("interface_id=0x%lx\n",
-+           be64_to_cpu(backend_dev->gid.global.interface_id));
-+
-+    ret = ibv_query_port(backend_dev->context, backend_dev->port_num,
-+                         &port_attr);
-+    if (ret) {
-+        error_setg(errp, "Error %d from ibv_query_port", ret);
-+        ret = -EIO;
-+        goto out_destroy_comm_channel;
-+    }
-+
-+    ret = init_device_caps(backend_dev, dev_attr);
-+    if (ret) {
-+        error_setg(errp, "Fail to initialize device capabilities");
-+        ret = -EIO;
-+        goto out_destroy_comm_channel;
-+    }
-+
-+    sprintf(thread_name, "pvrdma_comp_%s",
-+            ibv_get_device_name(backend_dev->ib_dev));
-+    backend_dev->comp_thread.run = true;
-+    qemu_thread_create(&backend_dev->comp_thread.thread, thread_name,
-+                       comp_handler_thread, backend_dev, QEMU_THREAD_DETACHED);
-+
-+    ah_cache_init();
-+
-+    goto out;
-+
-+out_destroy_comm_channel:
-+    ibv_destroy_comp_channel(backend_dev->channel);
-+
-+out_close_device:
-+    ibv_close_device(backend_dev->context);
-+
-+out:
-+    return ret;
-+}
-+
-+void rdma_backend_fini(RdmaBackendDev *backend_dev)
-+{
-+    g_hash_table_destroy(ah_hash);
-+    ibv_destroy_comp_channel(backend_dev->channel);
-+    ibv_close_device(backend_dev->context);
-+}
-diff --git a/hw/rdma/rdma_backend.h b/hw/rdma/rdma_backend.h
-new file mode 100644
-index 0000000000..0a594a42ca
---- /dev/null
-+++ b/hw/rdma/rdma_backend.h
-@@ -0,0 +1,92 @@
-+/*
-+ *  RDMA device: Definitions of Backend Device functions
-+ *
-+ * Copyright (C) 2018 Oracle
-+ * Copyright (C) 2018 Red Hat Inc
-+ *
-+ * Authors:
-+ *     Yuval Shaia <yuval.shaia@oracle.com>
-+ *     Marcel Apfelbaum <marcel@redhat.com>
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2.
-+ * See the COPYING file in the top-level directory.
-+ *
-+ */
-+
-+#ifndef RDMA_BACKEND_H
-+#define RDMA_BACKEND_H
-+
-+#include <qapi/error.h>
-+#include "rdma_rm_defs.h"
-+#include "rdma_backend_defs.h"
-+
-+static inline union ibv_gid *rdma_backend_gid(RdmaBackendDev *dev)
-+{
-+    return &dev->gid;
-+}
-+
-+static inline uint32_t rdma_backend_qpn(RdmaBackendQP *qp)
-+{
-+    return qp->ibqp ? qp->ibqp->qp_num : 0;
-+}
-+
-+static inline uint32_t rdma_backend_mr_lkey(RdmaBackendMR *mr)
-+{
-+    return mr->ibmr ? mr->ibmr->lkey : 0;
-+}
-+
-+static inline uint32_t rdma_backend_mr_rkey(RdmaBackendMR *mr)
-+{
-+    return mr->ibmr ? mr->ibmr->rkey : 0;
-+}
-+
-+int rdma_backend_init(RdmaBackendDev *backend_dev,
-+                      RdmaDeviceResources *rdma_dev_res,
-+                      const char *backend_device_name, uint8_t port_num,
-+                      uint8_t backend_gid_idx, struct ibv_device_attr *dev_attr,
-+                      Error **errp);
-+void rdma_backend_fini(RdmaBackendDev *backend_dev);
-+void rdma_backend_register_comp_handler(void (*handler)(int status,
-+                                        unsigned int vendor_err, void *ctx));
-+void rdma_backend_unregister_comp_handler(void);
-+
-+int rdma_backend_query_port(RdmaBackendDev *backend_dev,
-+                            struct ibv_port_attr *port_attr);
-+int rdma_backend_create_pd(RdmaBackendDev *backend_dev, RdmaBackendPD *pd);
-+void rdma_backend_destroy_pd(RdmaBackendPD *pd);
-+
-+int rdma_backend_create_mr(RdmaBackendMR *mr, RdmaBackendPD *pd, uint64_t addr,
-+                           size_t length, int access);
-+void rdma_backend_destroy_mr(RdmaBackendMR *mr);
-+
-+int rdma_backend_create_cq(RdmaBackendDev *backend_dev, RdmaBackendCQ *cq,
-+                           int cqe);
-+void rdma_backend_destroy_cq(RdmaBackendCQ *cq);
-+void rdma_backend_poll_cq(RdmaDeviceResources *rdma_dev_res, RdmaBackendCQ *cq);
-+
-+int rdma_backend_create_qp(RdmaBackendQP *qp, uint8_t qp_type,
-+                           RdmaBackendPD *pd, RdmaBackendCQ *scq,
-+                           RdmaBackendCQ *rcq, uint32_t max_send_wr,
-+                           uint32_t max_recv_wr, uint32_t max_send_sge,
-+                           uint32_t max_recv_sge);
-+int rdma_backend_qp_state_init(RdmaBackendDev *backend_dev, RdmaBackendQP *qp,
-+                               uint8_t qp_type, uint32_t qkey);
-+int rdma_backend_qp_state_rtr(RdmaBackendDev *backend_dev, RdmaBackendQP *qp,
-+                              uint8_t qp_type, union ibv_gid *dgid,
-+                              uint32_t dqpn, uint32_t rq_psn, uint32_t qkey);
-+int rdma_backend_qp_state_rts(RdmaBackendQP *qp, uint8_t qp_type,
-+                              uint32_t sq_psn, uint32_t qkey);
-+void rdma_backend_destroy_qp(RdmaBackendQP *qp);
-+
-+void rdma_backend_post_send(RdmaBackendDev *backend_dev,
-+                            RdmaDeviceResources *rdma_dev_res,
-+                            RdmaBackendQP *qp, uint8_t qp_type,
-+                            struct ibv_sge *sge, uint32_t num_sge,
-+                            union ibv_gid *dgid, uint32_t dqpn, uint32_t dqkey,
-+                            void *ctx);
-+void rdma_backend_post_recv(RdmaBackendDev *backend_dev,
-+                            RdmaDeviceResources *rdma_dev_res,
-+                            RdmaBackendQP *qp, uint8_t qp_type,
-+                            struct ibv_sge *sge, uint32_t num_sge, void *ctx);
-+
-+#endif
-diff --git a/hw/rdma/rdma_backend_defs.h b/hw/rdma/rdma_backend_defs.h
-new file mode 100644
-index 0000000000..516e6e0b19
---- /dev/null
-+++ b/hw/rdma/rdma_backend_defs.h
-@@ -0,0 +1,62 @@
-+/*
-+ *  RDMA device: Definitions of Backend Device structures
-+ *
-+ * Copyright (C) 2018 Oracle
-+ * Copyright (C) 2018 Red Hat Inc
-+ *
-+ * Authors:
-+ *     Yuval Shaia <yuval.shaia@oracle.com>
-+ *     Marcel Apfelbaum <marcel@redhat.com>
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2.
-+ * See the COPYING file in the top-level directory.
-+ *
-+ */
-+
-+#ifndef RDMA_BACKEND_DEFS_H
-+#define RDMA_BACKEND_DEFS_H
-+
-+#include <infiniband/verbs.h>
-+#include <qemu/thread.h>
-+
-+typedef struct RdmaDeviceResources RdmaDeviceResources;
-+
-+typedef struct RdmaBackendThread {
-+    QemuThread thread;
-+    QemuMutex mutex;
-+    bool run;
-+} RdmaBackendThread;
-+
-+typedef struct RdmaBackendDev {
-+    PCIDevice *dev;
-+    RdmaBackendThread comp_thread;
-+    struct ibv_device *ib_dev;
-+    uint8_t port_num;
-+    struct ibv_context *context;
-+    struct ibv_comp_channel *channel;
-+    union ibv_gid gid;
-+    struct ibv_device_attr dev_attr;
-+    uint8_t backend_gid_idx;
-+    RdmaDeviceResources *rdma_dev_res;
-+} RdmaBackendDev;
-+
-+typedef struct RdmaBackendPD {
-+    struct ibv_pd *ibpd;
-+} RdmaBackendPD;
-+
-+typedef struct RdmaBackendMR {
-+    struct ibv_pd *ibpd;
-+    struct ibv_mr *ibmr;
-+} RdmaBackendMR;
-+
-+typedef struct RdmaBackendCQ {
-+    RdmaBackendDev *backend_dev;
-+    struct ibv_cq *ibcq;
-+} RdmaBackendCQ;
-+
-+typedef struct RdmaBackendQP {
-+    struct ibv_pd *ibpd;
-+    struct ibv_qp *ibqp;
-+} RdmaBackendQP;
-+
-+#endif
-diff --git a/hw/rdma/rdma_rm.c b/hw/rdma/rdma_rm.c
-new file mode 100644
-index 0000000000..8d9d87cc27
---- /dev/null
-+++ b/hw/rdma/rdma_rm.c
-@@ -0,0 +1,619 @@
-+/*
-+ * QEMU paravirtual RDMA - Resource Manager Implementation
-+ *
-+ * Copyright (C) 2018 Oracle
-+ * Copyright (C) 2018 Red Hat Inc
-+ *
-+ * Authors:
-+ *     Yuval Shaia <yuval.shaia@oracle.com>
-+ *     Marcel Apfelbaum <marcel@redhat.com>
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2.
-+ * See the COPYING file in the top-level directory.
-+ *
-+ */
-+
-+#include <qemu/osdep.h>
-+#include <qapi/error.h>
-+#include <cpu.h>
-+
-+#include "rdma_utils.h"
-+#include "rdma_backend.h"
-+#include "rdma_rm.h"
-+
-+#define MAX_RM_TBL_NAME 16
-+
-+/* Page directory and page tables */
-+#define PG_DIR_SZ { TARGET_PAGE_SIZE / sizeof(__u64) }
-+#define PG_TBL_SZ { TARGET_PAGE_SIZE / sizeof(__u64) }
-+
-+static inline int res_tbl_init(const char *name, RdmaRmResTbl *tbl,
-+                               uint32_t tbl_sz, uint32_t res_sz)
-+{
-+    tbl->tbl = malloc(tbl_sz * res_sz);
-+    if (!tbl->tbl) {
-+        return -ENOMEM;
-+    }
-+
-+    strncpy(tbl->name, name, MAX_RM_TBL_NAME);
-+    tbl->name[MAX_RM_TBL_NAME - 1] = 0;
-+
-+    tbl->bitmap = bitmap_new(tbl_sz);
-+    tbl->tbl_sz = tbl_sz;
-+    tbl->res_sz = res_sz;
-+    qemu_mutex_init(&tbl->lock);
-+
-+    return 0;
-+}
-+
-+static inline void res_tbl_free(RdmaRmResTbl *tbl)
-+{
-+    qemu_mutex_destroy(&tbl->lock);
-+    free(tbl->tbl);
-+    bitmap_zero_extend(tbl->bitmap, tbl->tbl_sz, 0);
-+}
-+
-+static inline void *res_tbl_get(RdmaRmResTbl *tbl, uint32_t handle)
-+{
-+    pr_dbg("%s, handle=%d\n", tbl->name, handle);
-+
-+    if ((handle < tbl->tbl_sz) && (test_bit(handle, tbl->bitmap))) {
-+        return tbl->tbl + handle * tbl->res_sz;
-+    } else {
-+        pr_dbg("Invalid handle %d\n", handle);
-+        return NULL;
-+    }
-+}
-+
-+static inline void *res_tbl_alloc(RdmaRmResTbl *tbl, uint32_t *handle)
-+{
-+    qemu_mutex_lock(&tbl->lock);
-+
-+    *handle = find_first_zero_bit(tbl->bitmap, tbl->tbl_sz);
-+    if (*handle > tbl->tbl_sz) {
-+        pr_dbg("Fail to alloc, bitmap is full\n");
-+        qemu_mutex_unlock(&tbl->lock);
-+        return NULL;
-+    }
-+
-+    set_bit(*handle, tbl->bitmap);
-+
-+    qemu_mutex_unlock(&tbl->lock);
-+
-+    memset(tbl->tbl + *handle * tbl->res_sz, 0, tbl->res_sz);
-+
-+    pr_dbg("%s, handle=%d\n", tbl->name, *handle);
-+
-+    return tbl->tbl + *handle * tbl->res_sz;
-+}
-+
-+static inline void res_tbl_dealloc(RdmaRmResTbl *tbl, uint32_t handle)
-+{
-+    pr_dbg("%s, handle=%d\n", tbl->name, handle);
-+
-+    qemu_mutex_lock(&tbl->lock);
-+
-+    if (handle < tbl->tbl_sz) {
-+        clear_bit(handle, tbl->bitmap);
-+    }
-+
-+    qemu_mutex_unlock(&tbl->lock);
-+}
-+
-+int rdma_rm_alloc_pd(RdmaDeviceResources *dev_res, RdmaBackendDev *backend_dev,
-+                     uint32_t *pd_handle, uint32_t ctx_handle)
-+{
-+    RdmaRmPD *pd;
-+    int ret = -ENOMEM;
-+
-+    pd = res_tbl_alloc(&dev_res->pd_tbl, pd_handle);
-+    if (!pd) {
-+        goto out;
-+    }
-+
-+    ret = rdma_backend_create_pd(backend_dev, &pd->backend_pd);
-+    if (ret) {
-+        ret = -EIO;
-+        goto out_tbl_dealloc;
-+    }
-+
-+    pd->ctx_handle = ctx_handle;
-+
-+    return 0;
-+
-+out_tbl_dealloc:
-+    res_tbl_dealloc(&dev_res->pd_tbl, *pd_handle);
-+
-+out:
-+    return ret;
-+}
-+
-+RdmaRmPD *rdma_rm_get_pd(RdmaDeviceResources *dev_res, uint32_t pd_handle)
-+{
-+    return res_tbl_get(&dev_res->pd_tbl, pd_handle);
-+}
-+
-+void rdma_rm_dealloc_pd(RdmaDeviceResources *dev_res, uint32_t pd_handle)
-+{
-+    RdmaRmPD *pd = rdma_rm_get_pd(dev_res, pd_handle);
-+
-+    if (pd) {
-+        rdma_backend_destroy_pd(&pd->backend_pd);
-+        res_tbl_dealloc(&dev_res->pd_tbl, pd_handle);
-+    }
-+}
-+
-+int rdma_rm_alloc_mr(RdmaDeviceResources *dev_res, uint32_t pd_handle,
-+                     uint64_t guest_start, size_t guest_length, void *host_virt,
-+                     int access_flags, uint32_t *mr_handle, uint32_t *lkey,
-+                     uint32_t *rkey)
-+{
-+    RdmaRmMR *mr;
-+    int ret = 0;
-+    RdmaRmPD *pd;
-+    uint64_t addr;
-+    size_t length;
-+
-+    pd = rdma_rm_get_pd(dev_res, pd_handle);
-+    if (!pd) {
-+        pr_dbg("Invalid PD\n");
-+        ret = -EINVAL;
-+        goto out;
-+    }
-+
-+    mr = res_tbl_alloc(&dev_res->mr_tbl, mr_handle);
-+    if (!mr) {
-+        pr_dbg("Fail to allocate obj in table\n");
-+        ret = -ENOMEM;
-+        goto out;
-+    }
-+
-+    if (!host_virt) {
-+        /* TODO: This is my guess but not so sure that this needs to be
-+         * done */
-+        length = mr->length = TARGET_PAGE_SIZE;
-+        addr = mr->addr = (uint64_t)malloc(length);
-+    } else {
-+        mr->addr = 0;
-+
-+        mr->user_mr.host_virt = (uint64_t) host_virt;
-+        pr_dbg("host_virt=0x%lx\n", mr->user_mr.host_virt);
-+        mr->user_mr.length = guest_length;
-+        pr_dbg("length=0x%lx\n", guest_length);
-+        mr->user_mr.guest_start = guest_start;
-+        pr_dbg("guest_start=0x%lx\n", mr->user_mr.guest_start);
-+
-+        length = mr->user_mr.length;
-+        addr = mr->user_mr.host_virt;
-+    }
-+
-+    ret = rdma_backend_create_mr(&mr->backend_mr, &pd->backend_pd, addr, length,
-+                                 access_flags);
-+    if (ret) {
-+        pr_dbg("Fail in rdma_backend_create_mr, err=%d\n", ret);
-+        ret = -EIO;
-+        goto out_dealloc_mr;
-+    }
-+
-+    if (!host_virt) {
-+        *lkey = mr->lkey = rdma_backend_mr_lkey(&mr->backend_mr);
-+        *rkey = mr->rkey = rdma_backend_mr_rkey(&mr->backend_mr);
-+    } else {
-+        /* We keep mr_handle in lkey so send and recv get get mr ptr */
-+        *lkey = *mr_handle;
-+        *rkey = -1;
-+    }
-+
-+    mr->pd_handle = pd_handle;
-+
-+    return 0;
-+
-+out_dealloc_mr:
-+    res_tbl_dealloc(&dev_res->mr_tbl, *mr_handle);
-+
-+out:
-+    return ret;
-+}
-+
-+RdmaRmMR *rdma_rm_get_mr(RdmaDeviceResources *dev_res, uint32_t mr_handle)
-+{
-+    return res_tbl_get(&dev_res->mr_tbl, mr_handle);
-+}
-+
-+void rdma_rm_dealloc_mr(RdmaDeviceResources *dev_res, uint32_t mr_handle)
-+{
-+    RdmaRmMR *mr = rdma_rm_get_mr(dev_res, mr_handle);
-+
-+    if (mr) {
-+        rdma_backend_destroy_mr(&mr->backend_mr);
-+        munmap((void *)mr->user_mr.host_virt, mr->user_mr.length);
-+        free((void *)mr->addr);
-+        res_tbl_dealloc(&dev_res->mr_tbl, mr_handle);
-+    }
-+}
-+
-+int rdma_rm_alloc_uc(RdmaDeviceResources *dev_res, uint32_t pfn,
-+                     uint32_t *uc_handle)
-+{
-+    RdmaRmUC *uc;
-+
-+    /* TODO: Need to make sure pfn is between bar start address and
-+     * bsd+RDMA_BAR2_UAR_SIZE
-+    if (pfn > RDMA_BAR2_UAR_SIZE) {
-+        pr_err("pfn out of range (%d > %d)\n", pfn, RDMA_BAR2_UAR_SIZE);
-+        return -ENOMEM;
-+    }
-+    */
-+
-+    uc = res_tbl_alloc(&dev_res->uc_tbl, uc_handle);
-+    if (!uc) {
-+        return -ENOMEM;
-+    }
-+
-+    return 0;
-+}
-+
-+RdmaRmUC *rdma_rm_get_uc(RdmaDeviceResources *dev_res, uint32_t uc_handle)
-+{
-+    return res_tbl_get(&dev_res->uc_tbl, uc_handle);
-+}
-+
-+void rdma_rm_dealloc_uc(RdmaDeviceResources *dev_res, uint32_t uc_handle)
-+{
-+    RdmaRmUC *uc = rdma_rm_get_uc(dev_res, uc_handle);
-+
-+    if (uc) {
-+        res_tbl_dealloc(&dev_res->uc_tbl, uc_handle);
-+    }
-+}
-+
-+RdmaRmCQ *rdma_rm_get_cq(RdmaDeviceResources *dev_res, uint32_t cq_handle)
-+{
-+    return res_tbl_get(&dev_res->cq_tbl, cq_handle);
-+}
-+
-+int rdma_rm_alloc_cq(RdmaDeviceResources *dev_res, RdmaBackendDev *backend_dev,
-+                     uint32_t cqe, uint32_t *cq_handle, void *opaque)
-+{
-+    int rc = -ENOMEM;
-+    RdmaRmCQ *cq;
-+
-+    cq = res_tbl_alloc(&dev_res->cq_tbl, cq_handle);
-+    if (!cq) {
-+        return -ENOMEM;
-+    }
-+
-+    cq->opaque = opaque;
-+    cq->notify = false;
-+
-+    rc = rdma_backend_create_cq(backend_dev, &cq->backend_cq, cqe);
-+    if (rc) {
-+        rc = -EIO;
-+        goto out_dealloc_cq;
-+    }
-+
-+    goto out;
-+
-+out_dealloc_cq:
-+    rdma_rm_dealloc_cq(dev_res, *cq_handle);
-+
-+out:
-+    return rc;
-+}
-+
-+void rdma_rm_req_notify_cq(RdmaDeviceResources *dev_res, uint32_t cq_handle,
-+                           bool notify)
-+{
-+    RdmaRmCQ *cq;
-+
-+    pr_dbg("cq_handle=%d, notify=0x%x\n", cq_handle, notify);
-+
-+    cq = rdma_rm_get_cq(dev_res, cq_handle);
-+    if (!cq) {
-+        return;
-+    }
-+
-+    cq->notify = notify;
-+    pr_dbg("notify=%d\n", cq->notify);
-+}
-+
-+void rdma_rm_dealloc_cq(RdmaDeviceResources *dev_res, uint32_t cq_handle)
-+{
-+    RdmaRmCQ *cq;
-+
-+    cq = rdma_rm_get_cq(dev_res, cq_handle);
-+    if (!cq) {
-+        return;
-+    }
-+
-+    rdma_backend_destroy_cq(&cq->backend_cq);
-+
-+    res_tbl_dealloc(&dev_res->cq_tbl, cq_handle);
-+}
-+
-+RdmaRmQP *rdma_rm_get_qp(RdmaDeviceResources *dev_res, uint32_t qpn)
-+{
-+    GBytes *key = g_bytes_new(&qpn, sizeof(qpn));
-+
-+    RdmaRmQP *qp = g_hash_table_lookup(dev_res->qp_hash, key);
-+
-+    g_bytes_unref(key);
-+
-+    return qp;
-+}
-+
-+int rdma_rm_alloc_qp(RdmaDeviceResources *dev_res, uint32_t pd_handle,
-+                     uint8_t qp_type, uint32_t max_send_wr,
-+                     uint32_t max_send_sge, uint32_t send_cq_handle,
-+                     uint32_t max_recv_wr, uint32_t max_recv_sge,
-+                     uint32_t recv_cq_handle, void *opaque, uint32_t *qpn)
-+{
-+    int rc = 0;
-+    RdmaRmQP *qp;
-+    RdmaRmCQ *scq, *rcq;
-+    RdmaRmPD *pd;
-+    uint32_t rm_qpn;
-+
-+    pr_dbg("qp_type=%d\n", qp_type);
-+
-+    pd = rdma_rm_get_pd(dev_res, pd_handle);
-+    if (!pd) {
-+        pr_err("Invalid pd handle (%d)\n", pd_handle);
-+        return -EINVAL;
-+    }
-+
-+    scq = rdma_rm_get_cq(dev_res, send_cq_handle);
-+    rcq = rdma_rm_get_cq(dev_res, recv_cq_handle);
-+
-+    if (!scq || !rcq) {
-+        pr_err("Invalid send_cqn or recv_cqn (%d, %d)\n",
-+               send_cq_handle, recv_cq_handle);
-+        return -EINVAL;
-+    }
-+
-+    qp = res_tbl_alloc(&dev_res->qp_tbl, &rm_qpn);
-+    if (!qp) {
-+        return -ENOMEM;
-+    }
-+    pr_dbg("rm_qpn=%d\n", rm_qpn);
-+
-+    qp->qpn = rm_qpn;
-+    qp->qp_state = IBV_QPS_ERR;
-+    qp->qp_type = qp_type;
-+    qp->send_cq_handle = send_cq_handle;
-+    qp->recv_cq_handle = recv_cq_handle;
-+    qp->opaque = opaque;
-+
-+    rc = rdma_backend_create_qp(&qp->backend_qp, qp_type, &pd->backend_pd,
-+                                &scq->backend_cq, &rcq->backend_cq, max_send_wr,
-+                                max_recv_wr, max_send_sge, max_recv_sge);
-+    if (rc) {
-+        rc = -EIO;
-+        goto out_dealloc_qp;
-+    }
-+
-+    *qpn = rdma_backend_qpn(&qp->backend_qp);
-+    pr_dbg("rm_qpn=%d, backend_qpn=0x%x\n", rm_qpn, *qpn);
-+    g_hash_table_insert(dev_res->qp_hash, g_bytes_new(qpn, sizeof(*qpn)), qp);
-+
-+    return 0;
-+
-+out_dealloc_qp:
-+    res_tbl_dealloc(&dev_res->qp_tbl, qp->qpn);
-+
-+    return rc;
-+}
-+
-+int rdma_rm_modify_qp(RdmaDeviceResources *dev_res, RdmaBackendDev *backend_dev,
-+                      uint32_t qp_handle, uint32_t attr_mask,
-+                      union ibv_gid *dgid, uint32_t dqpn,
-+                      enum ibv_qp_state qp_state, uint32_t qkey,
-+                      uint32_t rq_psn, uint32_t sq_psn)
-+{
-+    RdmaRmQP *qp;
-+    int ret;
-+
-+    pr_dbg("qpn=%d\n", qp_handle);
-+
-+    qp = rdma_rm_get_qp(dev_res, qp_handle);
-+    if (!qp) {
-+        return -EINVAL;
-+    }
-+
-+    pr_dbg("qp_type=%d\n", qp->qp_type);
-+    pr_dbg("attr_mask=0x%x\n", attr_mask);
-+
-+    if (qp->qp_type == 0) {
-+        pr_dbg("QP0 is not supported\n");
-+        return -EPERM;
-+    }
-+
-+    if (qp->qp_type == 1) {
-+        pr_dbg("QP1\n");
-+        return 0;
-+    }
-+
-+    if (attr_mask & IBV_QP_STATE) {
-+        qp->qp_state = qp_state;
-+        pr_dbg("qp_state=%d\n", qp->qp_state);
-+
-+        if (qp->qp_state == IBV_QPS_INIT) {
-+            ret = rdma_backend_qp_state_init(backend_dev, &qp->backend_qp,
-+                                             qp->qp_type, qkey);
-+            if (ret) {
-+                return -EIO;
-+            }
-+        }
-+
-+        if (qp->qp_state == IBV_QPS_RTR) {
-+            if (!(attr_mask & IBV_QP_DEST_QPN) && qp->qp_type == IBV_QPT_RC) {
-+                pr_dbg("IBV_QPS_RTR but not IBV_QP_DEST_QPN\n");
-+                return -EIO;
-+            }
-+            if (!(attr_mask & IBV_QP_AV) && qp->qp_type == IBV_QPT_RC) {
-+                pr_dbg("IBV_QPS_RTR but not IBV_QP_AV\n");
-+                return -EIO;
-+            }
-+
-+            ret = rdma_backend_qp_state_rtr(backend_dev, &qp->backend_qp,
-+                                            qp->qp_type, dgid, dqpn, rq_psn,
-+                                            qkey);
-+            if (ret) {
-+                return -EIO;
-+            }
-+        }
-+
-+        if (qp->qp_state == IBV_QPS_RTS) {
-+            ret = rdma_backend_qp_state_rts(&qp->backend_qp, qp->qp_type,
-+                                            sq_psn, qkey);
-+            if (ret) {
-+                return -EIO;
-+            }
-+        }
-+    }
-+
-+    return 0;
-+}
-+
-+void rdma_rm_dealloc_qp(RdmaDeviceResources *dev_res, uint32_t qp_handle)
-+{
-+    RdmaRmQP *qp;
-+    GBytes *key;
-+
-+    key = g_bytes_new(&qp_handle, sizeof(qp_handle));
-+    qp = g_hash_table_lookup(dev_res->qp_hash, key);
-+    if (!qp) {
-+        return;
-+    }
-+    g_hash_table_remove(dev_res->qp_hash, key);
-+    g_bytes_unref(key);
-+
-+    rdma_backend_destroy_qp(&qp->backend_qp);
-+
-+    res_tbl_dealloc(&dev_res->qp_tbl, qp->qpn);
-+}
-+
-+void *rdma_rm_get_cqe_ctx(RdmaDeviceResources *dev_res, uint32_t cqe_ctx_id)
-+{
-+    void **cqe_ctx;
-+
-+    cqe_ctx = res_tbl_get(&dev_res->cqe_ctx_tbl, cqe_ctx_id);
-+    if (!cqe_ctx) {
-+        return NULL;
-+    }
-+
-+    pr_dbg("ctx=%p\n", *cqe_ctx);
-+
-+    return *cqe_ctx;
-+}
-+
-+int rdma_rm_alloc_cqe_ctx(RdmaDeviceResources *dev_res, uint32_t *cqe_ctx_id,
-+                          void *ctx)
-+{
-+    void **cqe_ctx;
-+
-+    cqe_ctx = res_tbl_alloc(&dev_res->cqe_ctx_tbl, cqe_ctx_id);
-+    if (!cqe_ctx) {
-+        return -ENOMEM;
-+    }
-+
-+    pr_dbg("ctx=%p\n", ctx);
-+    *cqe_ctx = ctx;
-+
-+    return 0;
-+}
-+
-+void rdma_rm_dealloc_cqe_ctx(RdmaDeviceResources *dev_res, uint32_t cqe_ctx_id)
-+{
-+    res_tbl_dealloc(&dev_res->cqe_ctx_tbl, cqe_ctx_id);
-+}
-+
-+static void destroy_qp_hash_key(gpointer data)
-+{
-+    g_bytes_unref(data);
-+}
-+
-+int rdma_rm_init(RdmaDeviceResources *dev_res, struct ibv_device_attr *dev_attr,
-+                 Error **errp)
-+{
-+    int ret = 0;
-+
-+    ret = res_tbl_init("PD", &dev_res->pd_tbl, dev_attr->max_pd,
-+                       sizeof(RdmaRmPD));
-+    if (ret) {
-+        goto out;
-+    }
-+
-+    ret = res_tbl_init("CQ", &dev_res->cq_tbl, dev_attr->max_cq,
-+                       sizeof(RdmaRmCQ));
-+    if (ret) {
-+        goto cln_pds;
-+    }
-+
-+    ret = res_tbl_init("MR", &dev_res->mr_tbl, dev_attr->max_mr,
-+                       sizeof(RdmaRmMR));
-+    if (ret) {
-+        goto cln_cqs;
-+    }
-+
-+    ret = res_tbl_init("QP", &dev_res->qp_tbl, dev_attr->max_qp,
-+                       sizeof(RdmaRmQP));
-+    if (ret) {
-+        goto cln_mrs;
-+    }
-+
-+    ret = res_tbl_init("CQE_CTX", &dev_res->cqe_ctx_tbl, dev_attr->max_qp *
-+                       dev_attr->max_qp_wr, sizeof(void *));
-+    if (ret) {
-+        goto cln_qps;
-+    }
-+
-+    ret = res_tbl_init("UC", &dev_res->uc_tbl, MAX_UCS, sizeof(RdmaRmUC));
-+    if (ret) {
-+        goto cln_cqe_ctxs;
-+    }
-+
-+    dev_res->qp_hash = g_hash_table_new_full(g_bytes_hash, g_bytes_equal,
-+                                             destroy_qp_hash_key, NULL);
-+    if (!dev_res->qp_hash) {
-+        goto cln_ucs;
-+    }
-+
-+    goto out;
-+
-+cln_ucs:
-+    res_tbl_free(&dev_res->uc_tbl);
-+
-+cln_cqe_ctxs:
-+    res_tbl_free(&dev_res->cqe_ctx_tbl);
-+
-+cln_qps:
-+    res_tbl_free(&dev_res->qp_tbl);
-+
-+cln_mrs:
-+    res_tbl_free(&dev_res->mr_tbl);
-+
-+cln_cqs:
-+    res_tbl_free(&dev_res->cq_tbl);
-+
-+cln_pds:
-+    res_tbl_free(&dev_res->pd_tbl);
-+
-+out:
-+    if (ret) {
-+        error_setg(errp, "Fail to initialize RM");
-+    }
-+
-+    return ret;
-+}
-+
-+void rdma_rm_fini(RdmaDeviceResources *dev_res)
-+{
-+    res_tbl_free(&dev_res->uc_tbl);
-+    res_tbl_free(&dev_res->cqe_ctx_tbl);
-+    res_tbl_free(&dev_res->qp_tbl);
-+    res_tbl_free(&dev_res->cq_tbl);
-+    res_tbl_free(&dev_res->mr_tbl);
-+    res_tbl_free(&dev_res->pd_tbl);
-+    g_hash_table_destroy(dev_res->qp_hash);
-+}
-diff --git a/hw/rdma/rdma_rm.h b/hw/rdma/rdma_rm.h
-new file mode 100644
-index 0000000000..82a1026629
---- /dev/null
-+++ b/hw/rdma/rdma_rm.h
-@@ -0,0 +1,69 @@
-+/*
-+ * RDMA device: Definitions of Resource Manager functions
-+ *
-+ * Copyright (C) 2018 Oracle
-+ * Copyright (C) 2018 Red Hat Inc
-+ *
-+ * Authors:
-+ *     Yuval Shaia <yuval.shaia@oracle.com>
-+ *     Marcel Apfelbaum <marcel@redhat.com>
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2.
-+ * See the COPYING file in the top-level directory.
-+ *
-+ */
-+
-+#ifndef RDMA_RM_H
-+#define RDMA_RM_H
-+
-+#include <qapi/error.h>
-+#include "rdma_backend_defs.h"
-+#include "rdma_rm_defs.h"
-+
-+int rdma_rm_init(RdmaDeviceResources *dev_res, struct ibv_device_attr *dev_attr,
-+                 Error **errp);
-+void rdma_rm_fini(RdmaDeviceResources *dev_res);
-+
-+int rdma_rm_alloc_pd(RdmaDeviceResources *dev_res, RdmaBackendDev *backend_dev,
-+                     uint32_t *pd_handle, uint32_t ctx_handle);
-+RdmaRmPD *rdma_rm_get_pd(RdmaDeviceResources *dev_res, uint32_t pd_handle);
-+void rdma_rm_dealloc_pd(RdmaDeviceResources *dev_res, uint32_t pd_handle);
-+
-+int rdma_rm_alloc_mr(RdmaDeviceResources *dev_res, uint32_t pd_handle,
-+                     uint64_t guest_start, size_t guest_length, void *host_virt,
-+                     int access_flags, uint32_t *mr_handle, uint32_t *lkey,
-+                     uint32_t *rkey);
-+RdmaRmMR *rdma_rm_get_mr(RdmaDeviceResources *dev_res, uint32_t mr_handle);
-+void rdma_rm_dealloc_mr(RdmaDeviceResources *dev_res, uint32_t mr_handle);
-+
-+int rdma_rm_alloc_uc(RdmaDeviceResources *dev_res, uint32_t pfn,
-+                     uint32_t *uc_handle);
-+RdmaRmUC *rdma_rm_get_uc(RdmaDeviceResources *dev_res, uint32_t uc_handle);
-+void rdma_rm_dealloc_uc(RdmaDeviceResources *dev_res, uint32_t uc_handle);
-+
-+int rdma_rm_alloc_cq(RdmaDeviceResources *dev_res, RdmaBackendDev *backend_dev,
-+                     uint32_t cqe, uint32_t *cq_handle, void *opaque);
-+RdmaRmCQ *rdma_rm_get_cq(RdmaDeviceResources *dev_res, uint32_t cq_handle);
-+void rdma_rm_req_notify_cq(RdmaDeviceResources *dev_res, uint32_t cq_handle,
-+                           bool notify);
-+void rdma_rm_dealloc_cq(RdmaDeviceResources *dev_res, uint32_t cq_handle);
-+
-+int rdma_rm_alloc_qp(RdmaDeviceResources *dev_res, uint32_t pd_handle,
-+                     uint8_t qp_type, uint32_t max_send_wr,
-+                     uint32_t max_send_sge, uint32_t send_cq_handle,
-+                     uint32_t max_recv_wr, uint32_t max_recv_sge,
-+                     uint32_t recv_cq_handle, void *opaque, uint32_t *qpn);
-+RdmaRmQP *rdma_rm_get_qp(RdmaDeviceResources *dev_res, uint32_t qpn);
-+int rdma_rm_modify_qp(RdmaDeviceResources *dev_res, RdmaBackendDev *backend_dev,
-+                      uint32_t qp_handle, uint32_t attr_mask,
-+                      union ibv_gid *dgid, uint32_t dqpn,
-+                      enum ibv_qp_state qp_state, uint32_t qkey,
-+                      uint32_t rq_psn, uint32_t sq_psn);
-+void rdma_rm_dealloc_qp(RdmaDeviceResources *dev_res, uint32_t qp_handle);
-+
-+int rdma_rm_alloc_cqe_ctx(RdmaDeviceResources *dev_res, uint32_t *cqe_ctx_id,
-+                          void *ctx);
-+void *rdma_rm_get_cqe_ctx(RdmaDeviceResources *dev_res, uint32_t cqe_ctx_id);
-+void rdma_rm_dealloc_cqe_ctx(RdmaDeviceResources *dev_res, uint32_t cqe_ctx_id);
-+
-+#endif
-diff --git a/hw/rdma/rdma_rm_defs.h b/hw/rdma/rdma_rm_defs.h
-new file mode 100644
-index 0000000000..e327b7177a
---- /dev/null
-+++ b/hw/rdma/rdma_rm_defs.h
-@@ -0,0 +1,106 @@
-+/*
-+ * RDMA device: Definitions of Resource Manager structures
-+ *
-+ * Copyright (C) 2018 Oracle
-+ * Copyright (C) 2018 Red Hat Inc
-+ *
-+ * Authors:
-+ *     Yuval Shaia <yuval.shaia@oracle.com>
-+ *     Marcel Apfelbaum <marcel@redhat.com>
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2.
-+ * See the COPYING file in the top-level directory.
-+ *
-+ */
-+
-+#ifndef RDMA_RM_DEFS_H
-+#define RDMA_RM_DEFS_H
-+
-+#include "rdma_backend_defs.h"
-+
-+#define MAX_PORTS             1
-+#define MAX_PORT_GIDS         1
-+#define MAX_PORT_PKEYS        1
-+#define MAX_PKEYS             1
-+#define MAX_GIDS              2048
-+#define MAX_UCS               512
-+#define MAX_MR_SIZE           (1UL << 27)
-+#define MAX_QP                1024
-+#define MAX_SGE               4
-+#define MAX_CQ                2048
-+#define MAX_MR                1024
-+#define MAX_PD                1024
-+#define MAX_QP_RD_ATOM        16
-+#define MAX_QP_INIT_RD_ATOM   16
-+#define MAX_AH                64
-+
-+#define MAX_RMRESTBL_NAME_SZ 16
-+typedef struct RdmaRmResTbl {
-+    char name[MAX_RMRESTBL_NAME_SZ];
-+    unsigned long *bitmap;
-+    size_t tbl_sz;
-+    size_t res_sz;
-+    void *tbl;
-+    QemuMutex lock;
-+} RdmaRmResTbl;
-+
-+typedef struct RdmaRmPD {
-+    uint32_t ctx_handle;
-+    RdmaBackendPD backend_pd;
-+} RdmaRmPD;
-+
-+typedef struct RdmaRmCQ {
-+    void *opaque;
-+    bool notify;
-+    RdmaBackendCQ backend_cq;
-+} RdmaRmCQ;
-+
-+typedef struct RdmaRmUserMR {
-+    uint64_t host_virt;
-+    uint64_t guest_start;
-+    size_t length;
-+} RdmaRmUserMR;
-+
-+/* MR (DMA region) */
-+typedef struct RdmaRmMR {
-+    uint32_t pd_handle;
-+    uint32_t lkey;
-+    uint32_t rkey;
-+    RdmaBackendMR backend_mr;
-+    RdmaRmUserMR user_mr;
-+    uint64_t addr;
-+    size_t length;
-+} RdmaRmMR;
-+
-+typedef struct RdmaRmUC {
-+    uint64_t uc_handle;
-+} RdmaRmUC;
-+
-+typedef struct RdmaRmQP {
-+    uint32_t qp_type;
-+    enum ibv_qp_state qp_state;
-+    uint32_t qpn;
-+    void *opaque;
-+    uint32_t send_cq_handle;
-+    uint32_t recv_cq_handle;
-+    RdmaBackendQP backend_qp;
-+} RdmaRmQP;
-+
-+typedef struct RdmaRmPort {
-+    enum ibv_port_state state;
-+    union ibv_gid gid_tbl[MAX_PORT_GIDS];
-+    int *pkey_tbl; /* TODO: Not yet supported */
-+} RdmaRmPort;
-+
-+typedef struct RdmaDeviceResources {
-+    RdmaRmPort ports[MAX_PORTS];
-+    RdmaRmResTbl pd_tbl;
-+    RdmaRmResTbl mr_tbl;
-+    RdmaRmResTbl uc_tbl;
-+    RdmaRmResTbl qp_tbl;
-+    RdmaRmResTbl cq_tbl;
-+    RdmaRmResTbl cqe_ctx_tbl;
-+    GHashTable *qp_hash; /* Keeps mapping between real and emulated */
-+} RdmaDeviceResources;
-+
-+#endif
-diff --git a/hw/rdma/rdma_utils.h b/hw/rdma/rdma_utils.h
-new file mode 100644
-index 0000000000..5ae9d59126
---- /dev/null
-+++ b/hw/rdma/rdma_utils.h
-@@ -0,0 +1,36 @@
-+/*
-+ * RDMA device: Debug utilities
-+ *
-+ * Copyright (C) 2018 Oracle
-+ * Copyright (C) 2018 Red Hat Inc
-+ *
-+ *
-+ * Authors:
-+ *     Yuval Shaia <yuval.shaia@oracle.com>
-+ *     Marcel Apfelbaum <marcel@redhat.com>
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2.
-+ * See the COPYING file in the top-level directory.
-+ *
-+ */
-+
-+#ifndef RDMA_UTILS_H
-+#define RDMA_UTILS_H
-+
-+#define pr_info(fmt, ...) \
-+    fprintf(stdout, "%s: %-20s (%3d): " fmt, "pvrdma",  __func__, __LINE__,\
-+           ## __VA_ARGS__)
-+
-+#define pr_err(fmt, ...) \
-+    fprintf(stderr, "%s: Error at %-20s (%3d): " fmt, "pvrdma", __func__, \
-+        __LINE__, ## __VA_ARGS__)
-+
-+#ifdef PVRDMA_DEBUG
-+#define pr_dbg(fmt, ...) \
-+    fprintf(stdout, "%s: %-20s (%3d): " fmt, "pvrdma", __func__, __LINE__,\
-+           ## __VA_ARGS__)
-+#else
-+#define pr_dbg(fmt, ...)
-+#endif
-+
-+#endif
-diff --git a/hw/rdma/trace-events b/hw/rdma/trace-events
-new file mode 100644
-index 0000000000..421986adbe
---- /dev/null
-+++ b/hw/rdma/trace-events
-@@ -0,0 +1,5 @@
-+# See docs/tracing.txt for syntax documentation.
-+
-+#hw/rdma/rdma_backend.c
-+create_ah_cache_hit(uint64_t subnet, uint64_t net_id) "subnet = 0x%lx net_id = 0x%lx"
-+create_ah_cache_miss(uint64_t subnet, uint64_t net_id) "subnet = 0x%lx net_id = 0x%lx"
-diff --git a/hw/rdma/vmw/pvrdma.h b/hw/rdma/vmw/pvrdma.h
-new file mode 100644
-index 0000000000..8d667e5e42
---- /dev/null
-+++ b/hw/rdma/vmw/pvrdma.h
-@@ -0,0 +1,123 @@
-+/*
-+ * QEMU VMWARE paravirtual RDMA device definitions
-+ *
-+ * Copyright (C) 2018 Oracle
-+ * Copyright (C) 2018 Red Hat Inc
-+ *
-+ * Authors:
-+ *     Yuval Shaia <yuval.shaia@oracle.com>
-+ *     Marcel Apfelbaum <marcel@redhat.com>
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2.
-+ * See the COPYING file in the top-level directory.
-+ *
-+ */
-+
-+#ifndef PVRDMA_PVRDMA_H
-+#define PVRDMA_PVRDMA_H
-+
-+#include <rdma/vmw_pvrdma-abi.h>
-+#include <hw/pci/pci.h>
-+#include <hw/pci/msix.h>
-+
-+#include "../rdma_backend_defs.h"
-+#include "../rdma_rm_defs.h"
-+
-+#include "pvrdma_dev_api.h"
-+#include "pvrdma_ring.h"
-+#include "pvrdma_dev_ring.h"
-+
-+/* BARs */
-+#define RDMA_MSIX_BAR_IDX    0
-+#define RDMA_REG_BAR_IDX     1
-+#define RDMA_UAR_BAR_IDX     2
-+#define RDMA_BAR0_MSIX_SIZE  (16 * 1024)
-+#define RDMA_BAR1_REGS_SIZE  256
-+#define RDMA_BAR2_UAR_SIZE   (0x1000 * MAX_UCS) /* each uc gets page */
-+
-+/* MSIX */
-+#define RDMA_MAX_INTRS       3
-+#define RDMA_MSIX_TABLE      0x0000
-+#define RDMA_MSIX_PBA        0x2000
-+
-+/* Interrupts Vectors */
-+#define INTR_VEC_CMD_RING            0
-+#define INTR_VEC_CMD_ASYNC_EVENTS    1
-+#define INTR_VEC_CMD_COMPLETION_Q    2
-+
-+/* HW attributes */
-+#define PVRDMA_HW_NAME       "pvrdma"
-+#define PVRDMA_HW_VERSION    17
-+#define PVRDMA_FW_VERSION    14
-+
-+typedef struct DSRInfo {
-+    dma_addr_t dma;
-+    struct pvrdma_device_shared_region *dsr;
-+
-+    union pvrdma_cmd_req *req;
-+    union pvrdma_cmd_resp *rsp;
-+
-+    struct pvrdma_ring *async_ring_state;
-+    PvrdmaRing async;
-+
-+    struct pvrdma_ring *cq_ring_state;
-+    PvrdmaRing cq;
-+} DSRInfo;
-+
-+typedef struct PVRDMADev {
-+    PCIDevice parent_obj;
-+    MemoryRegion msix;
-+    MemoryRegion regs;
-+    __u32 regs_data[RDMA_BAR1_REGS_SIZE];
-+    MemoryRegion uar;
-+    __u32 uar_data[RDMA_BAR2_UAR_SIZE];
-+    DSRInfo dsr_info;
-+    int interrupt_mask;
-+    struct ibv_device_attr dev_attr;
-+    u64 node_guid;
-+    char *backend_device_name;
-+    u8 backend_gid_idx;
-+    u8 backend_port_num;
-+    RdmaBackendDev backend_dev;
-+    RdmaDeviceResources rdma_dev_res;
-+} PVRDMADev;
-+#define PVRDMA_DEV(dev) OBJECT_CHECK(PVRDMADev, (dev), PVRDMA_HW_NAME)
-+
-+static inline int get_reg_val(PVRDMADev *dev, hwaddr addr, __u32 *val)
-+{
-+    int idx = addr >> 2;
-+
-+    if (idx > RDMA_BAR1_REGS_SIZE) {
-+        return -EINVAL;
-+    }
-+
-+    *val = dev->regs_data[idx];
-+
-+    return 0;
-+}
-+
-+static inline int set_reg_val(PVRDMADev *dev, hwaddr addr, __u32 val)
-+{
-+    int idx = addr >> 2;
-+
-+    if (idx > RDMA_BAR1_REGS_SIZE) {
-+        return -EINVAL;
-+    }
-+
-+    dev->regs_data[idx] = val;
-+
-+    return 0;
-+}
-+
-+static inline void post_interrupt(PVRDMADev *dev, unsigned vector)
-+{
-+    PCIDevice *pci_dev = PCI_DEVICE(dev);
-+
-+    if (likely(!dev->interrupt_mask)) {
-+        msix_notify(pci_dev, vector);
-+    }
-+}
-+
-+int execute_command(PVRDMADev *dev);
-+
-+#endif
-diff --git a/hw/rdma/vmw/pvrdma_cmd.c b/hw/rdma/vmw/pvrdma_cmd.c
-new file mode 100644
-index 0000000000..a6268930de
---- /dev/null
-+++ b/hw/rdma/vmw/pvrdma_cmd.c
-@@ -0,0 +1,585 @@
-+#include <qemu/osdep.h>
-+#include <cpu.h>
-+#include "hw/hw.h"
-+#include "hw/pci/pci.h"
-+#include "hw/pci/pci_ids.h"
-+
-+#include "../rdma_backend.h"
-+#include "../rdma_rm.h"
-+#include "../rdma_utils.h"
-+
-+#include "pvrdma_utils.h"
-+#include "pvrdma.h"
-+
-+static int query_port(PVRDMADev *dev, union pvrdma_cmd_req *req,
-+                      union pvrdma_cmd_resp *rsp)
-+{
-+    struct pvrdma_cmd_query_port *cmd = &req->query_port;
-+    struct pvrdma_cmd_query_port_resp *resp = &rsp->query_port_resp;
-+    struct pvrdma_port_attr attrs = {0};
-+
-+    pr_dbg("port=%d\n", cmd->port_num);
-+
-+    if (rdma_backend_query_port(&dev->backend_dev,
-+                                (struct ibv_port_attr *)&attrs)) {
-+        return -ENOMEM;
-+    }
-+
-+    memset(resp, 0, sizeof(*resp));
-+    resp->hdr.response = cmd->hdr.response;
-+    resp->hdr.ack = PVRDMA_CMD_QUERY_PORT_RESP;
-+    resp->hdr.err = 0;
-+
-+    resp->attrs.state = attrs.state;
-+    resp->attrs.max_mtu = attrs.max_mtu;
-+    resp->attrs.active_mtu = attrs.active_mtu;
-+    resp->attrs.phys_state = attrs.phys_state;
-+    resp->attrs.gid_tbl_len = MIN(MAX_PORT_GIDS, attrs.gid_tbl_len);
-+    resp->attrs.port_cap_flags = 0;
-+    resp->attrs.max_msg_sz = 1024;
-+    resp->attrs.bad_pkey_cntr = 0;
-+    resp->attrs.qkey_viol_cntr = 0;
-+    resp->attrs.pkey_tbl_len = MIN(MAX_PORT_PKEYS, attrs.pkey_tbl_len);
-+    resp->attrs.lid = 0;
-+    resp->attrs.sm_lid = 0;
-+    resp->attrs.lmc = 0;
-+    resp->attrs.max_vl_num = 0;
-+    resp->attrs.sm_sl = 0;
-+    resp->attrs.subnet_timeout = 0;
-+    resp->attrs.init_type_reply = 0;
-+    resp->attrs.active_width = 1;
-+    resp->attrs.active_speed = 1;
-+
-+    return 0;
-+}
-+
-+static int query_pkey(PVRDMADev *dev, union pvrdma_cmd_req *req,
-+                      union pvrdma_cmd_resp *rsp)
-+{
-+    struct pvrdma_cmd_query_pkey *cmd = &req->query_pkey;
-+    struct pvrdma_cmd_query_pkey_resp *resp = &rsp->query_pkey_resp;
-+
-+    pr_dbg("port=%d\n", cmd->port_num);
-+    pr_dbg("index=%d\n", cmd->index);
-+
-+    memset(resp, 0, sizeof(*resp));
-+    resp->hdr.response = cmd->hdr.response;
-+    resp->hdr.ack = PVRDMA_CMD_QUERY_PKEY_RESP;
-+    resp->hdr.err = 0;
-+
-+    resp->pkey = 0x7FFF;
-+    pr_dbg("pkey=0x%x\n", resp->pkey);
-+
-+    return 0;
-+}
-+
-+static int create_pd(PVRDMADev *dev, union pvrdma_cmd_req *req,
-+                     union pvrdma_cmd_resp *rsp)
-+{
-+    struct pvrdma_cmd_create_pd *cmd = &req->create_pd;
-+    struct pvrdma_cmd_create_pd_resp *resp = &rsp->create_pd_resp;
-+
-+    pr_dbg("context=0x%x\n", cmd->ctx_handle ? cmd->ctx_handle : 0);
-+
-+    memset(resp, 0, sizeof(*resp));
-+    resp->hdr.response = cmd->hdr.response;
-+    resp->hdr.ack = PVRDMA_CMD_CREATE_PD_RESP;
-+    resp->hdr.err = rdma_rm_alloc_pd(&dev->rdma_dev_res, &dev->backend_dev,
-+                                     &resp->pd_handle, cmd->ctx_handle);
-+
-+    pr_dbg("ret=%d\n", resp->hdr.err);
-+    return resp->hdr.err;
-+}
-+
-+static int destroy_pd(PVRDMADev *dev, union pvrdma_cmd_req *req,
-+                      union pvrdma_cmd_resp *rsp)
-+{
-+    struct pvrdma_cmd_destroy_pd *cmd = &req->destroy_pd;
-+
-+    pr_dbg("pd_handle=%d\n", cmd->pd_handle);
-+
-+    rdma_rm_dealloc_pd(&dev->rdma_dev_res, cmd->pd_handle);
-+
-+    return 0;
-+}
-+
-+static int create_mr(PVRDMADev *dev, union pvrdma_cmd_req *req,
-+                     union pvrdma_cmd_resp *rsp)
-+{
-+    struct pvrdma_cmd_create_mr *cmd = &req->create_mr;
-+    struct pvrdma_cmd_create_mr_resp *resp = &rsp->create_mr_resp;
-+    PCIDevice *pci_dev = PCI_DEVICE(dev);
-+    void *host_virt;
-+
-+    memset(resp, 0, sizeof(*resp));
-+    resp->hdr.response = cmd->hdr.response;
-+    resp->hdr.ack = PVRDMA_CMD_CREATE_MR_RESP;
-+
-+    pr_dbg("pd_handle=%d\n", cmd->pd_handle);
-+    pr_dbg("access_flags=0x%x\n", cmd->access_flags);
-+    pr_dbg("flags=0x%x\n", cmd->flags);
-+
-+    if (!(cmd->flags & PVRDMA_MR_FLAG_DMA)) {
-+        host_virt = pvrdma_map_to_pdir(pci_dev, cmd->pdir_dma, cmd->nchunks,
-+                                       cmd->length);
-+        if (!host_virt) {
-+            pr_dbg("Fail to map to pdir\n");
-+            resp->hdr.err = -EINVAL;
-+            goto out;
-+        }
-+    }
-+
-+    resp->hdr.err = rdma_rm_alloc_mr(&dev->rdma_dev_res, cmd->pd_handle,
-+                                     cmd->start, cmd->length, host_virt,
-+                                     cmd->access_flags, &resp->mr_handle,
-+                                     &resp->lkey, &resp->rkey);
-+    if (!resp->hdr.err) {
-+        munmap(host_virt, cmd->length);
-+    }
-+
-+out:
-+    pr_dbg("ret=%d\n", resp->hdr.err);
-+    return resp->hdr.err;
-+}
-+
-+static int destroy_mr(PVRDMADev *dev, union pvrdma_cmd_req *req,
-+                      union pvrdma_cmd_resp *rsp)
-+{
-+    struct pvrdma_cmd_destroy_mr *cmd = &req->destroy_mr;
-+
-+    pr_dbg("mr_handle=%d\n", cmd->mr_handle);
-+
-+    rdma_rm_dealloc_mr(&dev->rdma_dev_res, cmd->mr_handle);
-+
-+    return 0;
-+}
-+
-+static int create_cq_ring(PCIDevice *pci_dev , PvrdmaRing **ring, u64 pdir_dma,
-+                          u32 nchunks, u32 cqe)
-+{
-+    u64 *dir, *tbl;
-+    PvrdmaRing *r;
-+    int rc = -EINVAL;
-+    char ring_name[MAX_RING_NAME_SZ];
-+
-+    pr_dbg("pdir_dma=0x%llx\n", (long long unsigned int)pdir_dma);
-+    dir = pvrdma_pci_dma_map(pci_dev, pdir_dma, TARGET_PAGE_SIZE);
-+    if (!dir) {
-+        pr_dbg("Fail to map to CQ page directory\n");
-+        goto out;
-+    }
-+
-+    tbl = pvrdma_pci_dma_map(pci_dev, dir[0], TARGET_PAGE_SIZE);
-+    if (!tbl) {
-+        pr_dbg("Fail to map to CQ page table\n");
-+        goto out;
-+    }
-+
-+    r = malloc(sizeof(*r));
-+    if (!r) {
-+        pr_dbg("Fail allocate memory for CQ ring\n");
-+        rc = -ENOMEM;
-+        goto out;
-+    }
-+    *ring = r;
-+
-+    r->ring_state = (struct pvrdma_ring *)
-+        pvrdma_pci_dma_map(pci_dev, tbl[0], TARGET_PAGE_SIZE);
-+
-+    if (!r->ring_state) {
-+        pr_dbg("Fail to map to CQ ring state\n");
-+        goto out_free_ring;
-+    }
-+
-+    sprintf(ring_name, "cq_ring_%lx", pdir_dma);
-+    rc = pvrdma_ring_init(r, ring_name, pci_dev, &r->ring_state[1],
-+                          cqe, sizeof(struct pvrdma_cqe),
-+                          /* first page is ring state */
-+                          (dma_addr_t *)&tbl[1], nchunks - 1);
-+    if (rc) {
-+        goto out_unmap_ring_state;
-+    }
-+
-+    goto out;
-+
-+out_unmap_ring_state:
-+    /* ring_state was in slot 1, not 0 so need to jump back */
-+    pvrdma_pci_dma_unmap(pci_dev, --r->ring_state, TARGET_PAGE_SIZE);
-+
-+out_free_ring:
-+    free(r);
-+    r = NULL;
-+
-+out:
-+    pvrdma_pci_dma_unmap(pci_dev, tbl, TARGET_PAGE_SIZE);
-+    pvrdma_pci_dma_unmap(pci_dev, dir, TARGET_PAGE_SIZE);
-+
-+    return rc;
-+}
-+
-+static int create_cq(PVRDMADev *dev, union pvrdma_cmd_req *req,
-+                     union pvrdma_cmd_resp *rsp)
-+{
-+    struct pvrdma_cmd_create_cq *cmd = &req->create_cq;
-+    struct pvrdma_cmd_create_cq_resp *resp = &rsp->create_cq_resp;
-+    PvrdmaRing *ring;
-+
-+    memset(resp, 0, sizeof(*resp));
-+    resp->hdr.response = cmd->hdr.response;
-+    resp->hdr.ack = PVRDMA_CMD_CREATE_CQ_RESP;
-+
-+    resp->cqe = cmd->cqe;
-+
-+    resp->hdr.err = create_cq_ring(PCI_DEVICE(dev), &ring, cmd->pdir_dma,
-+                                   cmd->nchunks, cmd->cqe);
-+    if (resp->hdr.err) {
-+        goto out;
-+    }
-+
-+    pr_dbg("ring=%p\n", ring);
-+
-+    resp->hdr.err = rdma_rm_alloc_cq(&dev->rdma_dev_res, &dev->backend_dev,
-+                                     cmd->cqe, &resp->cq_handle, ring);
-+    resp->cqe = cmd->cqe;
-+
-+out:
-+    pr_dbg("ret=%d\n", resp->hdr.err);
-+    return resp->hdr.err;
-+}
-+
-+static int destroy_cq(PVRDMADev *dev, union pvrdma_cmd_req *req,
-+                      union pvrdma_cmd_resp *rsp)
-+{
-+    struct pvrdma_cmd_destroy_cq *cmd = &req->destroy_cq;
-+    RdmaRmCQ *cq;
-+    PvrdmaRing *ring;
-+
-+    pr_dbg("cq_handle=%d\n", cmd->cq_handle);
-+
-+    cq = rdma_rm_get_cq(&dev->rdma_dev_res, cmd->cq_handle);
-+    if (!cq) {
-+        pr_dbg("Invalid CQ handle\n");
-+        return -EINVAL;
-+    }
-+
-+    ring = (PvrdmaRing *)cq->opaque;
-+    pvrdma_ring_free(ring);
-+    /* ring_state was in slot 1, not 0 so need to jump back */
-+    pvrdma_pci_dma_unmap(PCI_DEVICE(dev), --ring->ring_state, TARGET_PAGE_SIZE);
-+    free(ring);
-+
-+    rdma_rm_dealloc_cq(&dev->rdma_dev_res, cmd->cq_handle);
-+
-+    return 0;
-+}
-+
-+static int create_qp_rings(PCIDevice *pci_dev, u64 pdir_dma, PvrdmaRing **rings,
-+                           u32 scqe, u32 smax_sge, u32 spages, u32 rcqe,
-+                           u32 rmax_sge, u32 rpages)
-+{
-+    u64 *dir, *tbl;
-+    PvrdmaRing *sr, *rr;
-+    int rc = -EINVAL;;
-+    char ring_name[MAX_RING_NAME_SZ];
-+    size_t wqe_sz;
-+
-+    pr_dbg("pdir_dma=0x%llx\n", (long long unsigned int)pdir_dma);
-+    dir = pvrdma_pci_dma_map(pci_dev, pdir_dma, TARGET_PAGE_SIZE);
-+    if (!dir) {
-+        pr_dbg("Fail to map to CQ page directory\n");
-+        goto out;
-+    }
-+
-+    tbl = pvrdma_pci_dma_map(pci_dev, dir[0], TARGET_PAGE_SIZE);
-+    if (!tbl) {
-+        pr_dbg("Fail to map to CQ page table\n");
-+        goto out;
-+    }
-+
-+    sr = malloc(2 * sizeof(*rr));
-+    if (!sr) {
-+        pr_dbg("Fail allocate memory for QP send and recv rings\n");
-+        rc = -ENOMEM;
-+        goto out;
-+    }
-+    rr = &sr[1];
-+    pr_dbg("sring=%p\n", sr);
-+    pr_dbg("rring=%p\n", rr);
-+
-+    *rings = sr;
-+
-+    pr_dbg("scqe=%d\n", scqe);
-+    pr_dbg("smax_sge=%d\n", smax_sge);
-+    pr_dbg("spages=%d\n", spages);
-+    pr_dbg("rcqe=%d\n", rcqe);
-+    pr_dbg("rmax_sge=%d\n", rmax_sge);
-+    pr_dbg("rpages=%d\n", rpages);
-+
-+    /* Create send ring */
-+    sr->ring_state = (struct pvrdma_ring *)
-+        pvrdma_pci_dma_map(pci_dev, tbl[0], TARGET_PAGE_SIZE);
-+    if (!sr->ring_state) {
-+        pr_dbg("Fail to map to CQ ring state\n");
-+        goto out_free_sr_mem;
-+    }
-+
-+    wqe_sz = pow2roundup32(sizeof(struct pvrdma_sq_wqe_hdr) +
-+                           sizeof(struct pvrdma_sge) * smax_sge - 1);
-+
-+    sprintf(ring_name, "qp_sring_%lx", pdir_dma);
-+    rc = pvrdma_ring_init(sr, ring_name, pci_dev, sr->ring_state,
-+                          scqe, wqe_sz, (dma_addr_t *)&tbl[1], spages);
-+    if (rc) {
-+        goto out_unmap_ring_state;
-+    }
-+
-+    /* Create recv ring */
-+    rr->ring_state = &sr->ring_state[1];
-+    wqe_sz = pow2roundup32(sizeof(struct pvrdma_rq_wqe_hdr) +
-+                           sizeof(struct pvrdma_sge) * rmax_sge - 1);
-+    sprintf(ring_name, "qp_rring_%lx", pdir_dma);
-+    rc = pvrdma_ring_init(rr, ring_name, pci_dev, rr->ring_state,
-+                          rcqe, wqe_sz, (dma_addr_t *)&tbl[1 + spages], rpages);
-+    if (rc) {
-+        goto out_free_sr;
-+    }
-+
-+    goto out;
-+
-+out_free_sr:
-+    pvrdma_ring_free(sr);
-+
-+out_unmap_ring_state:
-+    pvrdma_pci_dma_unmap(pci_dev, sr->ring_state, TARGET_PAGE_SIZE);
-+
-+out_free_sr_mem:
-+    free(sr);
-+    sr = NULL;
-+
-+out:
-+    pvrdma_pci_dma_unmap(pci_dev, tbl, TARGET_PAGE_SIZE);
-+    pvrdma_pci_dma_unmap(pci_dev, dir, TARGET_PAGE_SIZE);
-+
-+    return rc;
-+}
-+
-+static int create_qp(PVRDMADev *dev, union pvrdma_cmd_req *req,
-+                     union pvrdma_cmd_resp *rsp)
-+{
-+    struct pvrdma_cmd_create_qp *cmd = &req->create_qp;
-+    struct pvrdma_cmd_create_qp_resp *resp = &rsp->create_qp_resp;
-+    PvrdmaRing *rings;
-+
-+    memset(resp, 0, sizeof(*resp));
-+    resp->hdr.response = cmd->hdr.response;
-+    resp->hdr.ack = PVRDMA_CMD_CREATE_QP_RESP;
-+
-+    pr_dbg("total_chunks=%d\n", cmd->total_chunks);
-+    pr_dbg("send_chunks=%d\n", cmd->send_chunks);
-+
-+    resp->hdr.err = create_qp_rings(PCI_DEVICE(dev), cmd->pdir_dma, &rings,
-+                                    cmd->max_send_wr, cmd->max_send_sge,
-+                                    cmd->send_chunks, cmd->max_recv_wr,
-+                                    cmd->max_recv_sge, cmd->total_chunks -
-+                                    cmd->send_chunks - 1);
-+    if (resp->hdr.err) {
-+        goto out;
-+    }
-+
-+    pr_dbg("rings=%p\n", rings);
-+
-+    resp->hdr.err = rdma_rm_alloc_qp(&dev->rdma_dev_res, cmd->pd_handle,
-+                                     cmd->qp_type, cmd->max_send_wr,
-+                                     cmd->max_send_sge, cmd->send_cq_handle,
-+                                     cmd->max_recv_wr, cmd->max_recv_sge,
-+                                     cmd->recv_cq_handle, rings, &resp->qpn);
-+
-+    resp->max_send_wr = cmd->max_send_wr;
-+    resp->max_recv_wr = cmd->max_recv_wr;
-+    resp->max_send_sge = cmd->max_send_sge;
-+    resp->max_recv_sge = cmd->max_recv_sge;
-+    resp->max_inline_data = cmd->max_inline_data;
-+
-+out:
-+    pr_dbg("ret=%d\n", resp->hdr.err);
-+    return resp->hdr.err;
-+}
-+
-+static int modify_qp(PVRDMADev *dev, union pvrdma_cmd_req *req,
-+                     union pvrdma_cmd_resp *rsp)
-+{
-+    struct pvrdma_cmd_modify_qp *cmd = &req->modify_qp;
-+
-+    pr_dbg("qp_handle=%d\n", cmd->qp_handle);
-+
-+    memset(rsp, 0, sizeof(*rsp));
-+    rsp->hdr.response = cmd->hdr.response;
-+    rsp->hdr.ack = PVRDMA_CMD_MODIFY_QP_RESP;
-+
-+    rsp->hdr.err = rdma_rm_modify_qp(&dev->rdma_dev_res, &dev->backend_dev,
-+                                 cmd->qp_handle, cmd->attr_mask,
-+                                 (union ibv_gid *)&cmd->attrs.ah_attr.grh.dgid,
-+                                 cmd->attrs.dest_qp_num, cmd->attrs.qp_state,
-+                                 cmd->attrs.qkey, cmd->attrs.rq_psn,
-+                                 cmd->attrs.sq_psn);
-+
-+    pr_dbg("ret=%d\n", rsp->hdr.err);
-+    return rsp->hdr.err;
-+}
-+
-+static int destroy_qp(PVRDMADev *dev, union pvrdma_cmd_req *req,
-+                      union pvrdma_cmd_resp *rsp)
-+{
-+    struct pvrdma_cmd_destroy_qp *cmd = &req->destroy_qp;
-+    RdmaRmQP *qp;
-+    PvrdmaRing *ring;
-+
-+    qp = rdma_rm_get_qp(&dev->rdma_dev_res, cmd->qp_handle);
-+    if (!qp) {
-+        pr_dbg("Invalid QP handle\n");
-+        return -EINVAL;
-+    }
-+
-+    rdma_rm_dealloc_qp(&dev->rdma_dev_res, cmd->qp_handle);
-+
-+    ring = (PvrdmaRing *)qp->opaque;
-+    pr_dbg("sring=%p\n", &ring[0]);
-+    pvrdma_ring_free(&ring[0]);
-+    pr_dbg("rring=%p\n", &ring[1]);
-+    pvrdma_ring_free(&ring[1]);
-+
-+    pvrdma_pci_dma_unmap(PCI_DEVICE(dev), ring->ring_state, TARGET_PAGE_SIZE);
-+    free(ring);
-+
-+    return 0;
-+}
-+
-+static int create_bind(PVRDMADev *dev, union pvrdma_cmd_req *req,
-+                       union pvrdma_cmd_resp *rsp)
-+{
-+    struct pvrdma_cmd_create_bind *cmd = &req->create_bind;
-+#ifdef PVRDMA_DEBUG
-+    __be64 *subnet = (__be64 *)&cmd->new_gid[0];
-+    __be64 *if_id = (__be64 *)&cmd->new_gid[8];
-+#endif
-+
-+    pr_dbg("index=%d\n", cmd->index);
-+
-+    if (cmd->index > MAX_PORT_GIDS) {
-+        return -EINVAL;
-+    }
-+
-+    pr_dbg("gid[%d]=0x%llx,0x%llx\n", cmd->index,
-+           (long long unsigned int)be64_to_cpu(*subnet),
-+           (long long unsigned int)be64_to_cpu(*if_id));
-+
-+    /* Driver forces to one port only */
-+    memcpy(dev->rdma_dev_res.ports[0].gid_tbl[cmd->index].raw, &cmd->new_gid,
-+           sizeof(cmd->new_gid));
-+
-+    /* TODO: Since drivers stores node_guid at load_dsr phase then this
-+     * assignment is not relevant, i need to figure out a way how to
-+     * retrieve MAC of our netdev */
-+    dev->node_guid = dev->rdma_dev_res.ports[0].gid_tbl[0].global.interface_id;
-+    pr_dbg("dev->node_guid=0x%llx\n",
-+           (long long unsigned int)be64_to_cpu(dev->node_guid));
-+
-+    return 0;
-+}
-+
-+static int destroy_bind(PVRDMADev *dev, union pvrdma_cmd_req *req,
-+                        union pvrdma_cmd_resp *rsp)
-+{
-+    struct pvrdma_cmd_destroy_bind *cmd = &req->destroy_bind;
-+
-+    pr_dbg("clear index %d\n", cmd->index);
-+
-+    memset(dev->rdma_dev_res.ports[0].gid_tbl[cmd->index].raw, 0,
-+           sizeof(dev->rdma_dev_res.ports[0].gid_tbl[cmd->index].raw));
-+
-+    return 0;
-+}
-+
-+static int create_uc(PVRDMADev *dev, union pvrdma_cmd_req *req,
-+                     union pvrdma_cmd_resp *rsp)
-+{
-+    struct pvrdma_cmd_create_uc *cmd = &req->create_uc;
-+    struct pvrdma_cmd_create_uc_resp *resp = &rsp->create_uc_resp;
-+
-+    pr_dbg("pfn=%d\n", cmd->pfn);
-+
-+    memset(resp, 0, sizeof(*resp));
-+    resp->hdr.response = cmd->hdr.response;
-+    resp->hdr.ack = PVRDMA_CMD_CREATE_UC_RESP;
-+    resp->hdr.err = rdma_rm_alloc_uc(&dev->rdma_dev_res, cmd->pfn,
-+                                     &resp->ctx_handle);
-+
-+    pr_dbg("ret=%d\n", resp->hdr.err);
-+
-+    return 0;
-+}
-+
-+static int destroy_uc(PVRDMADev *dev, union pvrdma_cmd_req *req,
-+                      union pvrdma_cmd_resp *rsp)
-+{
-+    struct pvrdma_cmd_destroy_uc *cmd = &req->destroy_uc;
-+
-+    pr_dbg("ctx_handle=%d\n", cmd->ctx_handle);
-+
-+    rdma_rm_dealloc_uc(&dev->rdma_dev_res, cmd->ctx_handle);
-+
-+    return 0;
-+}
-+struct cmd_handler {
-+    __u32 cmd;
-+    int (*exec)(PVRDMADev *dev, union pvrdma_cmd_req *req,
-+            union pvrdma_cmd_resp *rsp);
-+};
-+
-+static struct cmd_handler cmd_handlers[] = {
-+    {PVRDMA_CMD_QUERY_PORT, query_port},
-+    {PVRDMA_CMD_QUERY_PKEY, query_pkey},
-+    {PVRDMA_CMD_CREATE_PD, create_pd},
-+    {PVRDMA_CMD_DESTROY_PD, destroy_pd},
-+    {PVRDMA_CMD_CREATE_MR, create_mr},
-+    {PVRDMA_CMD_DESTROY_MR, destroy_mr},
-+    {PVRDMA_CMD_CREATE_CQ, create_cq},
-+    {PVRDMA_CMD_RESIZE_CQ, NULL},
-+    {PVRDMA_CMD_DESTROY_CQ, destroy_cq},
-+    {PVRDMA_CMD_CREATE_QP, create_qp},
-+    {PVRDMA_CMD_MODIFY_QP, modify_qp},
-+    {PVRDMA_CMD_QUERY_QP, NULL},
-+    {PVRDMA_CMD_DESTROY_QP, destroy_qp},
-+    {PVRDMA_CMD_CREATE_UC, create_uc},
-+    {PVRDMA_CMD_DESTROY_UC, destroy_uc},
-+    {PVRDMA_CMD_CREATE_BIND, create_bind},
-+    {PVRDMA_CMD_DESTROY_BIND, destroy_bind},
-+};
-+
-+int execute_command(PVRDMADev *dev)
-+{
-+    int err = 0xFFFF;
-+    DSRInfo *dsr_info;
-+
-+    dsr_info = &dev->dsr_info;
-+
-+    pr_dbg("cmd=%d\n", dsr_info->req->hdr.cmd);
-+    if (dsr_info->req->hdr.cmd >= sizeof(cmd_handlers) /
-+                      sizeof(struct cmd_handler)) {
-+        pr_dbg("Unsupported command\n");
-+        goto out;
-+    }
-+
-+    if (!cmd_handlers[dsr_info->req->hdr.cmd].exec) {
-+        pr_dbg("Unsupported command (not implemented yet)\n");
-+        goto out;
-+    }
-+
-+    err = cmd_handlers[dsr_info->req->hdr.cmd].exec(dev, dsr_info->req,
-+                            dsr_info->rsp);
-+out:
-+    set_reg_val(dev, PVRDMA_REG_ERR, err);
-+    post_interrupt(dev, INTR_VEC_CMD_RING);
-+
-+    return (err == 0) ? 0 : -EINVAL;
-+}
-diff --git a/hw/rdma/vmw/pvrdma_dev_api.h b/hw/rdma/vmw/pvrdma_dev_api.h
-new file mode 100644
-index 0000000000..3ba135734e
---- /dev/null
-+++ b/hw/rdma/vmw/pvrdma_dev_api.h
-@@ -0,0 +1,580 @@
-+/*
-+ * Copyright (c) 2012-2016 VMware, Inc.  All rights reserved.
-+ *
-+ * This program is free software; you can redistribute it and/or
-+ * modify it under the terms of EITHER the GNU General Public License
-+ * version 2 as published by the Free Software Foundation or the BSD
-+ * 2-Clause License. This program is distributed in the hope that it
-+ * will be useful, but WITHOUT ANY WARRANTY; WITHOUT EVEN THE IMPLIED
-+ * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
-+ * See the GNU General Public License version 2 for more details at
-+ * http://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html.
-+ *
-+ * You should have received a copy of the GNU General Public License
-+ * along with this program available in the file COPYING in the main
-+ * directory of this source tree.
-+ *
-+ * The BSD 2-Clause License
-+ *
-+ *     Redistribution and use in source and binary forms, with or
-+ *     without modification, are permitted provided that the following
-+ *     conditions are met:
-+ *
-+ *      - Redistributions of source code must retain the above
-+ *        copyright notice, this list of conditions and the following
-+ *        disclaimer.
-+ *
-+ *      - Redistributions in binary form must reproduce the above
-+ *        copyright notice, this list of conditions and the following
-+ *        disclaimer in the documentation and/or other materials
-+ *        provided with the distribution.
-+ *
-+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
-+ * FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
-+ * COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
-+ * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
-+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
-+ * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
-+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
-+ * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
-+ * OF THE POSSIBILITY OF SUCH DAMAGE.
-+ */
-+
-+#ifndef PVRDMA_DEV_API_H
-+#define PVRDMA_DEV_API_H
-+
-+#include <linux/types.h>
-+
-+#include "pvrdma_ib_verbs.h"
-+
-+#define PVRDMA_VERSION            17
-+#define PVRDMA_BOARD_ID            1
-+#define PVRDMA_REV_ID            1
-+
-+/*
-+ * Masks and accessors for page directory, which is a two-level lookup:
-+ * page directory -> page table -> page. Only one directory for now, but we
-+ * could expand that easily. 9 bits for tables, 9 bits for pages, gives one
-+ * gigabyte for memory regions and so forth.
-+ */
-+
-+#define PVRDMA_PDIR_SHIFT        18
-+#define PVRDMA_PTABLE_SHIFT        9
-+#define PVRDMA_PAGE_DIR_DIR(x)        (((x) >> PVRDMA_PDIR_SHIFT) & 0x1)
-+#define PVRDMA_PAGE_DIR_TABLE(x)    (((x) >> PVRDMA_PTABLE_SHIFT) & 0x1ff)
-+#define PVRDMA_PAGE_DIR_PAGE(x)        ((x) & 0x1ff)
-+#define PVRDMA_PAGE_DIR_MAX_PAGES    (1 * 512 * 512)
-+#define PVRDMA_MAX_FAST_REG_PAGES    128
-+
-+/*
-+ * Max MSI-X vectors.
-+ */
-+
-+#define PVRDMA_MAX_INTERRUPTS    3
-+
-+/* Register offsets within PCI resource on BAR1. */
-+#define PVRDMA_REG_VERSION    0x00    /* R: Version of device. */
-+#define PVRDMA_REG_DSRLOW    0x04    /* W: Device shared region low PA. */
-+#define PVRDMA_REG_DSRHIGH    0x08    /* W: Device shared region high PA. */
-+#define PVRDMA_REG_CTL        0x0c    /* W: PVRDMA_DEVICE_CTL */
-+#define PVRDMA_REG_REQUEST    0x10    /* W: Indicate device request. */
-+#define PVRDMA_REG_ERR        0x14    /* R: Device error. */
-+#define PVRDMA_REG_ICR        0x18    /* R: Interrupt cause. */
-+#define PVRDMA_REG_IMR        0x1c    /* R/W: Interrupt mask. */
-+#define PVRDMA_REG_MACL        0x20    /* R/W: MAC address low. */
-+#define PVRDMA_REG_MACH        0x24    /* R/W: MAC address high. */
-+
-+/* Object flags. */
-+#define PVRDMA_CQ_FLAG_ARMED_SOL    BIT(0)    /* Armed for solicited-only. */
-+#define PVRDMA_CQ_FLAG_ARMED        BIT(1)    /* Armed. */
-+#define PVRDMA_MR_FLAG_DMA        BIT(0)    /* DMA region. */
-+#define PVRDMA_MR_FLAG_FRMR        BIT(1)    /* Fast reg memory region. */
-+
-+/*
-+ * Atomic operation capability (masked versions are extended atomic
-+ * operations.
-+ */
-+
-+#define PVRDMA_ATOMIC_OP_COMP_SWAP    BIT(0)    /* Compare and swap. */
-+#define PVRDMA_ATOMIC_OP_FETCH_ADD    BIT(1)    /* Fetch and add. */
-+#define PVRDMA_ATOMIC_OP_MASK_COMP_SWAP    BIT(2) /* Masked compare and swap. */
-+#define PVRDMA_ATOMIC_OP_MASK_FETCH_ADD    BIT(3) /* Masked fetch and add. */
-+
-+/*
-+ * Base Memory Management Extension flags to support Fast Reg Memory Regions
-+ * and Fast Reg Work Requests. Each flag represents a verb operation and we
-+ * must support all of them to qualify for the BMME device cap.
-+ */
-+
-+#define PVRDMA_BMME_FLAG_LOCAL_INV    BIT(0)    /* Local Invalidate. */
-+#define PVRDMA_BMME_FLAG_REMOTE_INV    BIT(1)    /* Remote Invalidate. */
-+#define PVRDMA_BMME_FLAG_FAST_REG_WR    BIT(2)    /* Fast Reg Work Request. */
-+
-+/*
-+ * GID types. The interpretation of the gid_types bit field in the device
-+ * capabilities will depend on the device mode. For now, the device only
-+ * supports RoCE as mode, so only the different GID types for RoCE are
-+ * defined.
-+ */
-+
-+#define PVRDMA_GID_TYPE_FLAG_ROCE_V1    BIT(0)
-+#define PVRDMA_GID_TYPE_FLAG_ROCE_V2    BIT(1)
-+
-+enum pvrdma_pci_resource {
-+    PVRDMA_PCI_RESOURCE_MSIX,    /* BAR0: MSI-X, MMIO. */
-+    PVRDMA_PCI_RESOURCE_REG,    /* BAR1: Registers, MMIO. */
-+    PVRDMA_PCI_RESOURCE_UAR,    /* BAR2: UAR pages, MMIO, 64-bit. */
-+    PVRDMA_PCI_RESOURCE_LAST,    /* Last. */
-+};
-+
-+enum pvrdma_device_ctl {
-+    PVRDMA_DEVICE_CTL_ACTIVATE,    /* Activate device. */
-+    PVRDMA_DEVICE_CTL_UNQUIESCE,    /* Unquiesce device. */
-+    PVRDMA_DEVICE_CTL_RESET,    /* Reset device. */
-+};
-+
-+enum pvrdma_intr_vector {
-+    PVRDMA_INTR_VECTOR_RESPONSE,    /* Command response. */
-+    PVRDMA_INTR_VECTOR_ASYNC,    /* Async events. */
-+    PVRDMA_INTR_VECTOR_CQ,        /* CQ notification. */
-+    /* Additional CQ notification vectors. */
-+};
-+
-+enum pvrdma_intr_cause {
-+    PVRDMA_INTR_CAUSE_RESPONSE    = (1 << PVRDMA_INTR_VECTOR_RESPONSE),
-+    PVRDMA_INTR_CAUSE_ASYNC        = (1 << PVRDMA_INTR_VECTOR_ASYNC),
-+    PVRDMA_INTR_CAUSE_CQ        = (1 << PVRDMA_INTR_VECTOR_CQ),
-+};
-+
-+enum pvrdma_gos_bits {
-+    PVRDMA_GOS_BITS_UNK,        /* Unknown. */
-+    PVRDMA_GOS_BITS_32,        /* 32-bit. */
-+    PVRDMA_GOS_BITS_64,        /* 64-bit. */
-+};
-+
-+enum pvrdma_gos_type {
-+    PVRDMA_GOS_TYPE_UNK,        /* Unknown. */
-+    PVRDMA_GOS_TYPE_LINUX,        /* Linux. */
-+};
-+
-+enum pvrdma_device_mode {
-+    PVRDMA_DEVICE_MODE_ROCE,    /* RoCE. */
-+    PVRDMA_DEVICE_MODE_IWARP,    /* iWarp. */
-+    PVRDMA_DEVICE_MODE_IB,        /* InfiniBand. */
-+};
-+
-+struct pvrdma_gos_info {
-+    u32 gos_bits:2;            /* W: PVRDMA_GOS_BITS_ */
-+    u32 gos_type:4;            /* W: PVRDMA_GOS_TYPE_ */
-+    u32 gos_ver:16;            /* W: Guest OS version. */
-+    u32 gos_misc:10;        /* W: Other. */
-+    u32 pad;            /* Pad to 8-byte alignment. */
-+};
-+
-+struct pvrdma_device_caps {
-+    u64 fw_ver;                /* R: Query device. */
-+    __be64 node_guid;
-+    __be64 sys_image_guid;
-+    u64 max_mr_size;
-+    u64 page_size_cap;
-+    u64 atomic_arg_sizes;            /* EX verbs. */
-+    u32 ex_comp_mask;            /* EX verbs. */
-+    u32 device_cap_flags2;            /* EX verbs. */
-+    u32 max_fa_bit_boundary;        /* EX verbs. */
-+    u32 log_max_atomic_inline_arg;        /* EX verbs. */
-+    u32 vendor_id;
-+    u32 vendor_part_id;
-+    u32 hw_ver;
-+    u32 max_qp;
-+    u32 max_qp_wr;
-+    u32 device_cap_flags;
-+    u32 max_sge;
-+    u32 max_sge_rd;
-+    u32 max_cq;
-+    u32 max_cqe;
-+    u32 max_mr;
-+    u32 max_pd;
-+    u32 max_qp_rd_atom;
-+    u32 max_ee_rd_atom;
-+    u32 max_res_rd_atom;
-+    u32 max_qp_init_rd_atom;
-+    u32 max_ee_init_rd_atom;
-+    u32 max_ee;
-+    u32 max_rdd;
-+    u32 max_mw;
-+    u32 max_raw_ipv6_qp;
-+    u32 max_raw_ethy_qp;
-+    u32 max_mcast_grp;
-+    u32 max_mcast_qp_attach;
-+    u32 max_total_mcast_qp_attach;
-+    u32 max_ah;
-+    u32 max_fmr;
-+    u32 max_map_per_fmr;
-+    u32 max_srq;
-+    u32 max_srq_wr;
-+    u32 max_srq_sge;
-+    u32 max_uar;
-+    u32 gid_tbl_len;
-+    u16 max_pkeys;
-+    u8  local_ca_ack_delay;
-+    u8  phys_port_cnt;
-+    u8  mode;                /* PVRDMA_DEVICE_MODE_ */
-+    u8  atomic_ops;                /* PVRDMA_ATOMIC_OP_* bits */
-+    u8  bmme_flags;                /* FRWR Mem Mgmt Extensions */
-+    u8  gid_types;                /* PVRDMA_GID_TYPE_FLAG_ */
-+    u8  reserved[4];
-+};
-+
-+struct pvrdma_ring_page_info {
-+    u32 num_pages;                /* Num pages incl. header. */
-+    u32 reserved;                /* Reserved. */
-+    u64 pdir_dma;                /* Page directory PA. */
-+};
-+
-+#pragma pack(push, 1)
-+
-+struct pvrdma_device_shared_region {
-+    u32 driver_version;            /* W: Driver version. */
-+    u32 pad;                /* Pad to 8-byte align. */
-+    struct pvrdma_gos_info gos_info;    /* W: Guest OS information. */
-+    u64 cmd_slot_dma;            /* W: Command slot address. */
-+    u64 resp_slot_dma;            /* W: Response slot address. */
-+    struct pvrdma_ring_page_info async_ring_pages;
-+                        /* W: Async ring page info. */
-+    struct pvrdma_ring_page_info cq_ring_pages;
-+                        /* W: CQ ring page info. */
-+    u32 uar_pfn;                /* W: UAR pageframe. */
-+    u32 pad2;                /* Pad to 8-byte align. */
-+    struct pvrdma_device_caps caps;        /* R: Device capabilities. */
-+};
-+
-+#pragma pack(pop)
-+
-+/* Event types. Currently a 1:1 mapping with enum ib_event. */
-+enum pvrdma_eqe_type {
-+    PVRDMA_EVENT_CQ_ERR,
-+    PVRDMA_EVENT_QP_FATAL,
-+    PVRDMA_EVENT_QP_REQ_ERR,
-+    PVRDMA_EVENT_QP_ACCESS_ERR,
-+    PVRDMA_EVENT_COMM_EST,
-+    PVRDMA_EVENT_SQ_DRAINED,
-+    PVRDMA_EVENT_PATH_MIG,
-+    PVRDMA_EVENT_PATH_MIG_ERR,
-+    PVRDMA_EVENT_DEVICE_FATAL,
-+    PVRDMA_EVENT_PORT_ACTIVE,
-+    PVRDMA_EVENT_PORT_ERR,
-+    PVRDMA_EVENT_LID_CHANGE,
-+    PVRDMA_EVENT_PKEY_CHANGE,
-+    PVRDMA_EVENT_SM_CHANGE,
-+    PVRDMA_EVENT_SRQ_ERR,
-+    PVRDMA_EVENT_SRQ_LIMIT_REACHED,
-+    PVRDMA_EVENT_QP_LAST_WQE_REACHED,
-+    PVRDMA_EVENT_CLIENT_REREGISTER,
-+    PVRDMA_EVENT_GID_CHANGE,
-+};
-+
-+/* Event queue element. */
-+struct pvrdma_eqe {
-+    u32 type;    /* Event type. */
-+    u32 info;    /* Handle, other. */
-+};
-+
-+/* CQ notification queue element. */
-+struct pvrdma_cqne {
-+    u32 info;    /* Handle */
-+};
-+
-+enum {
-+    PVRDMA_CMD_FIRST,
-+    PVRDMA_CMD_QUERY_PORT = PVRDMA_CMD_FIRST,
-+    PVRDMA_CMD_QUERY_PKEY,
-+    PVRDMA_CMD_CREATE_PD,
-+    PVRDMA_CMD_DESTROY_PD,
-+    PVRDMA_CMD_CREATE_MR,
-+    PVRDMA_CMD_DESTROY_MR,
-+    PVRDMA_CMD_CREATE_CQ,
-+    PVRDMA_CMD_RESIZE_CQ,
-+    PVRDMA_CMD_DESTROY_CQ,
-+    PVRDMA_CMD_CREATE_QP,
-+    PVRDMA_CMD_MODIFY_QP,
-+    PVRDMA_CMD_QUERY_QP,
-+    PVRDMA_CMD_DESTROY_QP,
-+    PVRDMA_CMD_CREATE_UC,
-+    PVRDMA_CMD_DESTROY_UC,
-+    PVRDMA_CMD_CREATE_BIND,
-+    PVRDMA_CMD_DESTROY_BIND,
-+    PVRDMA_CMD_MAX,
-+};
-+
-+enum {
-+    PVRDMA_CMD_FIRST_RESP = (1 << 31),
-+    PVRDMA_CMD_QUERY_PORT_RESP = PVRDMA_CMD_FIRST_RESP,
-+    PVRDMA_CMD_QUERY_PKEY_RESP,
-+    PVRDMA_CMD_CREATE_PD_RESP,
-+    PVRDMA_CMD_DESTROY_PD_RESP_NOOP,
-+    PVRDMA_CMD_CREATE_MR_RESP,
-+    PVRDMA_CMD_DESTROY_MR_RESP_NOOP,
-+    PVRDMA_CMD_CREATE_CQ_RESP,
-+    PVRDMA_CMD_RESIZE_CQ_RESP,
-+    PVRDMA_CMD_DESTROY_CQ_RESP_NOOP,
-+    PVRDMA_CMD_CREATE_QP_RESP,
-+    PVRDMA_CMD_MODIFY_QP_RESP,
-+    PVRDMA_CMD_QUERY_QP_RESP,
-+    PVRDMA_CMD_DESTROY_QP_RESP,
-+    PVRDMA_CMD_CREATE_UC_RESP,
-+    PVRDMA_CMD_DESTROY_UC_RESP_NOOP,
-+    PVRDMA_CMD_CREATE_BIND_RESP_NOOP,
-+    PVRDMA_CMD_DESTROY_BIND_RESP_NOOP,
-+    PVRDMA_CMD_MAX_RESP,
-+};
-+
-+struct pvrdma_cmd_hdr {
-+    u64 response;        /* Key for response lookup. */
-+    u32 cmd;        /* PVRDMA_CMD_ */
-+    u32 reserved;        /* Reserved. */
-+};
-+
-+struct pvrdma_cmd_resp_hdr {
-+    u64 response;        /* From cmd hdr. */
-+    u32 ack;        /* PVRDMA_CMD_XXX_RESP */
-+    u8 err;            /* Error. */
-+    u8 reserved[3];        /* Reserved. */
-+};
-+
-+struct pvrdma_cmd_query_port {
-+    struct pvrdma_cmd_hdr hdr;
-+    u8 port_num;
-+    u8 reserved[7];
-+};
-+
-+struct pvrdma_cmd_query_port_resp {
-+    struct pvrdma_cmd_resp_hdr hdr;
-+    struct pvrdma_port_attr attrs;
-+};
-+
-+struct pvrdma_cmd_query_pkey {
-+    struct pvrdma_cmd_hdr hdr;
-+    u8 port_num;
-+    u8 index;
-+    u8 reserved[6];
-+};
-+
-+struct pvrdma_cmd_query_pkey_resp {
-+    struct pvrdma_cmd_resp_hdr hdr;
-+    u16 pkey;
-+    u8 reserved[6];
-+};
-+
-+struct pvrdma_cmd_create_uc {
-+    struct pvrdma_cmd_hdr hdr;
-+    u32 pfn; /* UAR page frame number */
-+    u8 reserved[4];
-+};
-+
-+struct pvrdma_cmd_create_uc_resp {
-+    struct pvrdma_cmd_resp_hdr hdr;
-+    u32 ctx_handle;
-+    u8 reserved[4];
-+};
-+
-+struct pvrdma_cmd_destroy_uc {
-+    struct pvrdma_cmd_hdr hdr;
-+    u32 ctx_handle;
-+    u8 reserved[4];
-+};
-+
-+struct pvrdma_cmd_create_pd {
-+    struct pvrdma_cmd_hdr hdr;
-+    u32 ctx_handle;
-+    u8 reserved[4];
-+};
-+
-+struct pvrdma_cmd_create_pd_resp {
-+    struct pvrdma_cmd_resp_hdr hdr;
-+    u32 pd_handle;
-+    u8 reserved[4];
-+};
-+
-+struct pvrdma_cmd_destroy_pd {
-+    struct pvrdma_cmd_hdr hdr;
-+    u32 pd_handle;
-+    u8 reserved[4];
-+};
-+
-+struct pvrdma_cmd_create_mr {
-+    struct pvrdma_cmd_hdr hdr;
-+    u64 start;
-+    u64 length;
-+    u64 pdir_dma;
-+    u32 pd_handle;
-+    u32 access_flags;
-+    u32 flags;
-+    u32 nchunks;
-+};
-+
-+struct pvrdma_cmd_create_mr_resp {
-+    struct pvrdma_cmd_resp_hdr hdr;
-+    u32 mr_handle;
-+    u32 lkey;
-+    u32 rkey;
-+    u8 reserved[4];
-+};
-+
-+struct pvrdma_cmd_destroy_mr {
-+    struct pvrdma_cmd_hdr hdr;
-+    u32 mr_handle;
-+    u8 reserved[4];
-+};
-+
-+struct pvrdma_cmd_create_cq {
-+    struct pvrdma_cmd_hdr hdr;
-+    u64 pdir_dma;
-+    u32 ctx_handle;
-+    u32 cqe;
-+    u32 nchunks;
-+    u8 reserved[4];
-+};
-+
-+struct pvrdma_cmd_create_cq_resp {
-+    struct pvrdma_cmd_resp_hdr hdr;
-+    u32 cq_handle;
-+    u32 cqe;
-+};
-+
-+struct pvrdma_cmd_resize_cq {
-+    struct pvrdma_cmd_hdr hdr;
-+    u32 cq_handle;
-+    u32 cqe;
-+};
-+
-+struct pvrdma_cmd_resize_cq_resp {
-+    struct pvrdma_cmd_resp_hdr hdr;
-+    u32 cqe;
-+    u8 reserved[4];
-+};
-+
-+struct pvrdma_cmd_destroy_cq {
-+    struct pvrdma_cmd_hdr hdr;
-+    u32 cq_handle;
-+    u8 reserved[4];
-+};
-+
-+struct pvrdma_cmd_create_qp {
-+    struct pvrdma_cmd_hdr hdr;
-+    u64 pdir_dma;
-+    u32 pd_handle;
-+    u32 send_cq_handle;
-+    u32 recv_cq_handle;
-+    u32 srq_handle;
-+    u32 max_send_wr;
-+    u32 max_recv_wr;
-+    u32 max_send_sge;
-+    u32 max_recv_sge;
-+    u32 max_inline_data;
-+    u32 lkey;
-+    u32 access_flags;
-+    u16 total_chunks;
-+    u16 send_chunks;
-+    u16 max_atomic_arg;
-+    u8 sq_sig_all;
-+    u8 qp_type;
-+    u8 is_srq;
-+    u8 reserved[3];
-+};
-+
-+struct pvrdma_cmd_create_qp_resp {
-+    struct pvrdma_cmd_resp_hdr hdr;
-+    u32 qpn;
-+    u32 max_send_wr;
-+    u32 max_recv_wr;
-+    u32 max_send_sge;
-+    u32 max_recv_sge;
-+    u32 max_inline_data;
-+};
-+
-+struct pvrdma_cmd_modify_qp {
-+    struct pvrdma_cmd_hdr hdr;
-+    u32 qp_handle;
-+    u32 attr_mask;
-+    struct pvrdma_qp_attr attrs;
-+};
-+
-+struct pvrdma_cmd_query_qp {
-+    struct pvrdma_cmd_hdr hdr;
-+    u32 qp_handle;
-+    u32 attr_mask;
-+};
-+
-+struct pvrdma_cmd_query_qp_resp {
-+    struct pvrdma_cmd_resp_hdr hdr;
-+    struct pvrdma_qp_attr attrs;
-+};
-+
-+struct pvrdma_cmd_destroy_qp {
-+    struct pvrdma_cmd_hdr hdr;
-+    u32 qp_handle;
-+    u8 reserved[4];
-+};
-+
-+struct pvrdma_cmd_destroy_qp_resp {
-+    struct pvrdma_cmd_resp_hdr hdr;
-+    u32 events_reported;
-+    u8 reserved[4];
-+};
-+
-+struct pvrdma_cmd_create_bind {
-+    struct pvrdma_cmd_hdr hdr;
-+    u32 mtu;
-+    u32 vlan;
-+    u32 index;
-+    u8 new_gid[16];
-+    u8 gid_type;
-+    u8 reserved[3];
-+};
-+
-+struct pvrdma_cmd_destroy_bind {
-+    struct pvrdma_cmd_hdr hdr;
-+    u32 index;
-+    u8 dest_gid[16];
-+    u8 reserved[4];
-+};
-+
-+union pvrdma_cmd_req {
-+    struct pvrdma_cmd_hdr hdr;
-+    struct pvrdma_cmd_query_port query_port;
-+    struct pvrdma_cmd_query_pkey query_pkey;
-+    struct pvrdma_cmd_create_uc create_uc;
-+    struct pvrdma_cmd_destroy_uc destroy_uc;
-+    struct pvrdma_cmd_create_pd create_pd;
-+    struct pvrdma_cmd_destroy_pd destroy_pd;
-+    struct pvrdma_cmd_create_mr create_mr;
-+    struct pvrdma_cmd_destroy_mr destroy_mr;
-+    struct pvrdma_cmd_create_cq create_cq;
-+    struct pvrdma_cmd_resize_cq resize_cq;
-+    struct pvrdma_cmd_destroy_cq destroy_cq;
-+    struct pvrdma_cmd_create_qp create_qp;
-+    struct pvrdma_cmd_modify_qp modify_qp;
-+    struct pvrdma_cmd_query_qp query_qp;
-+    struct pvrdma_cmd_destroy_qp destroy_qp;
-+    struct pvrdma_cmd_create_bind create_bind;
-+    struct pvrdma_cmd_destroy_bind destroy_bind;
-+};
-+
-+union pvrdma_cmd_resp {
-+    struct pvrdma_cmd_resp_hdr hdr;
-+    struct pvrdma_cmd_query_port_resp query_port_resp;
-+    struct pvrdma_cmd_query_pkey_resp query_pkey_resp;
-+    struct pvrdma_cmd_create_uc_resp create_uc_resp;
-+    struct pvrdma_cmd_create_pd_resp create_pd_resp;
-+    struct pvrdma_cmd_create_mr_resp create_mr_resp;
-+    struct pvrdma_cmd_create_cq_resp create_cq_resp;
-+    struct pvrdma_cmd_resize_cq_resp resize_cq_resp;
-+    struct pvrdma_cmd_create_qp_resp create_qp_resp;
-+    struct pvrdma_cmd_query_qp_resp query_qp_resp;
-+    struct pvrdma_cmd_destroy_qp_resp destroy_qp_resp;
-+};
-+
-+#endif /* PVRDMA_DEV_API_H */
-diff --git a/hw/rdma/vmw/pvrdma_dev_ring.c b/hw/rdma/vmw/pvrdma_dev_ring.c
-new file mode 100644
-index 0000000000..c0900bccf2
---- /dev/null
-+++ b/hw/rdma/vmw/pvrdma_dev_ring.c
-@@ -0,0 +1,140 @@
-+#include <qemu/osdep.h>
-+#include <hw/pci/pci.h>
-+#include <cpu.h>
-+
-+#include "../rdma_utils.h"
-+#include "pvrdma_ring.h"
-+#include "pvrdma_dev_ring.h"
-+#include "pvrdma_utils.h"
-+
-+int pvrdma_ring_init(PvrdmaRing *ring, const char *name, PCIDevice *dev,
-+              struct pvrdma_ring *ring_state, size_t max_elems, size_t elem_sz,
-+              dma_addr_t *tbl, dma_addr_t npages)
-+{
-+    int i;
-+    int rc = 0;
-+
-+    strncpy(ring->name, name, MAX_RING_NAME_SZ);
-+    ring->name[MAX_RING_NAME_SZ - 1] = 0;
-+    pr_dbg("Initializing %s ring\n", ring->name);
-+    ring->dev = dev;
-+    ring->ring_state = ring_state;
-+    ring->max_elems = max_elems;
-+    ring->elem_sz = elem_sz;
-+    pr_dbg("ring->elem_sz=%ld\n", ring->elem_sz);
-+    pr_dbg("npages=%ld\n", npages);
-+    /* TODO: Give a moment to think if we want to redo driver settings
-+    atomic_set(&ring->ring_state->prod_tail, 0);
-+    atomic_set(&ring->ring_state->cons_head, 0);
-+    */
-+    ring->npages = npages;
-+    ring->pages = malloc(npages * sizeof(void *));
-+    for (i = 0; i < npages; i++) {
-+        if (!tbl[i]) {
-+            pr_err("npages=%ld but tbl[%d] is NULL\n", (long)npages, i);
-+            continue;
-+        }
-+
-+        ring->pages[i] = pvrdma_pci_dma_map(dev, tbl[i], TARGET_PAGE_SIZE);
-+        if (!ring->pages[i]) {
-+            rc = -ENOMEM;
-+            pr_dbg("Fail to map to page %d\n", i);
-+            goto out_free;
-+        }
-+        memset(ring->pages[i], 0, TARGET_PAGE_SIZE);
-+    }
-+
-+    goto out;
-+
-+out_free:
-+    while (i--) {
-+        pvrdma_pci_dma_unmap(dev, ring->pages[i], TARGET_PAGE_SIZE);
-+    }
-+    free(ring->pages);
-+
-+out:
-+    return rc;
-+}
-+
-+void *pvrdma_ring_next_elem_read(PvrdmaRing *ring)
-+{
-+    unsigned int idx = 0, offset;
-+
-+    /*
-+    pr_dbg("%s: t=%d, h=%d\n", ring->name, ring->ring_state->prod_tail,
-+           ring->ring_state->cons_head);
-+    */
-+
-+    if (!pvrdma_idx_ring_has_data(ring->ring_state, ring->max_elems, &idx)) {
-+        pr_dbg("No more data in ring\n");
-+        return NULL;
-+    }
-+
-+    offset = idx * ring->elem_sz;
-+    /*
-+    pr_dbg("idx=%d\n", idx);
-+    pr_dbg("offset=%d\n", offset);
-+    */
-+    return ring->pages[offset / TARGET_PAGE_SIZE] + (offset % TARGET_PAGE_SIZE);
-+}
-+
-+void pvrdma_ring_read_inc(PvrdmaRing *ring)
-+{
-+    pvrdma_idx_ring_inc(&ring->ring_state->cons_head, ring->max_elems);
-+    /*
-+    pr_dbg("%s: t=%d, h=%d, m=%ld\n", ring->name,
-+           ring->ring_state->prod_tail, ring->ring_state->cons_head,
-+           ring->max_elems);
-+    */
-+}
-+
-+void *pvrdma_ring_next_elem_write(PvrdmaRing *ring)
-+{
-+    unsigned int idx, offset, tail;
-+
-+    /*
-+    pr_dbg("%s: t=%d, h=%d\n", ring->name, ring->ring_state->prod_tail,
-+           ring->ring_state->cons_head);
-+    */
-+
-+    if (!pvrdma_idx_ring_has_space(ring->ring_state, ring->max_elems, &tail)) {
-+        pr_dbg("CQ is full\n");
-+        return NULL;
-+    }
-+
-+    idx = pvrdma_idx(&ring->ring_state->prod_tail, ring->max_elems);
-+    /* TODO: tail == idx */
-+
-+    offset = idx * ring->elem_sz;
-+    return ring->pages[offset / TARGET_PAGE_SIZE] + (offset % TARGET_PAGE_SIZE);
-+}
-+
-+void pvrdma_ring_write_inc(PvrdmaRing *ring)
-+{
-+    pvrdma_idx_ring_inc(&ring->ring_state->prod_tail, ring->max_elems);
-+    /*
-+    pr_dbg("%s: t=%d, h=%d, m=%ld\n", ring->name,
-+           ring->ring_state->prod_tail, ring->ring_state->cons_head,
-+           ring->max_elems);
-+    */
-+}
-+
-+void pvrdma_ring_free(PvrdmaRing *ring)
-+{
-+    if (!ring) {
-+        return;
-+    }
-+
-+    if (!ring->pages) {
-+        return;
-+    }
-+
-+    pr_dbg("ring->npages=%d\n", ring->npages);
-+    while (ring->npages--) {
-+        pvrdma_pci_dma_unmap(ring->dev, ring->pages[ring->npages],
-+                             TARGET_PAGE_SIZE);
-+    }
-+
-+    free(ring->pages);
-+    ring->pages = NULL;
-+}
-diff --git a/hw/rdma/vmw/pvrdma_dev_ring.h b/hw/rdma/vmw/pvrdma_dev_ring.h
-new file mode 100644
-index 0000000000..a25c07d72e
---- /dev/null
-+++ b/hw/rdma/vmw/pvrdma_dev_ring.h
-@@ -0,0 +1,43 @@
-+/*
-+ * QEMU VMWARE paravirtual RDMA ring utilities
-+ *
-+ * Copyright (C) 2018 Oracle
-+ * Copyright (C) 2018 Red Hat Inc
-+ *
-+ * Authors:
-+ *     Yuval Shaia <yuval.shaia@oracle.com>
-+ *     Marcel Apfelbaum <marcel@redhat.com>
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2.
-+ * See the COPYING file in the top-level directory.
-+ *
-+ */
-+
-+#ifndef PVRDMA_DEV_RING_H
-+#define PVRDMA_DEV_RING_H
-+
-+#include <qemu/typedefs.h>
-+#include "pvrdma_types.h"
-+
-+#define MAX_RING_NAME_SZ 32
-+
-+typedef struct PvrdmaRing {
-+    char name[MAX_RING_NAME_SZ];
-+    PCIDevice *dev;
-+    size_t max_elems;
-+    size_t elem_sz;
-+    struct pvrdma_ring *ring_state; /* used only for unmap */
-+    int npages;
-+    void **pages;
-+} PvrdmaRing;
-+
-+int pvrdma_ring_init(PvrdmaRing *ring, const char *name, PCIDevice *dev,
-+                     struct pvrdma_ring *ring_state, size_t max_elems,
-+                     size_t elem_sz, dma_addr_t *tbl, dma_addr_t npages);
-+void *pvrdma_ring_next_elem_read(PvrdmaRing *ring);
-+void pvrdma_ring_read_inc(PvrdmaRing *ring);
-+void *pvrdma_ring_next_elem_write(PvrdmaRing *ring);
-+void pvrdma_ring_write_inc(PvrdmaRing *ring);
-+void pvrdma_ring_free(PvrdmaRing *ring);
-+
-+#endif
-diff --git a/hw/rdma/vmw/pvrdma_ib_verbs.h b/hw/rdma/vmw/pvrdma_ib_verbs.h
-new file mode 100644
-index 0000000000..f7399d8e83
---- /dev/null
-+++ b/hw/rdma/vmw/pvrdma_ib_verbs.h
-@@ -0,0 +1,400 @@
-+/*
-+ * [PLEASE NOTE:  VMWARE, INC. ELECTS TO USE AND DISTRIBUTE THIS COMPONENT
-+ * UNDER THE TERMS OF THE OpenIB.org BSD license.  THE ORIGINAL LICENSE TERMS
-+ * ARE REPRODUCED BELOW ONLY AS A REFERENCE.]
-+ *
-+ * Copyright (c) 2004 Mellanox Technologies Ltd.  All rights reserved.
-+ * Copyright (c) 2004 Infinicon Corporation.  All rights reserved.
-+ * Copyright (c) 2004 Intel Corporation.  All rights reserved.
-+ * Copyright (c) 2004 Topspin Corporation.  All rights reserved.
-+ * Copyright (c) 2004 Voltaire Corporation.  All rights reserved.
-+ * Copyright (c) 2005 Sun Microsystems, Inc. All rights reserved.
-+ * Copyright (c) 2005, 2006, 2007 Cisco Systems.  All rights reserved.
-+ * Copyright (c) 2015-2016 VMware, Inc.  All rights reserved.
-+ *
-+ * This software is available to you under a choice of one of two
-+ * licenses.  You may choose to be licensed under the terms of the GNU
-+ * General Public License (GPL) Version 2, available from the file
-+ * COPYING in the main directory of this source tree, or the
-+ * OpenIB.org BSD license below:
-+ *
-+ *     Redistribution and use in source and binary forms, with or
-+ *     without modification, are permitted provided that the following
-+ *     conditions are met:
-+ *
-+ *      - Redistributions of source code must retain the above
-+ *        copyright notice, this list of conditions and the following
-+ *        disclaimer.
-+ *
-+ *      - Redistributions in binary form must reproduce the above
-+ *        copyright notice, this list of conditions and the following
-+ *        disclaimer in the documentation and/or other materials
-+ *        provided with the distribution.
-+ *
-+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-+ * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
-+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS
-+ * BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN
-+ * ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
-+ * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-+ * SOFTWARE.
-+ */
-+
-+#ifndef PVRDMA_IB_VERBS_H
-+#define PVRDMA_IB_VERBS_H
-+
-+#include "pvrdma_types.h"
-+#include <linux/types.h>
-+
-+union pvrdma_gid {
-+    u8    raw[16];
-+    struct {
-+        __be64    subnet_prefix;
-+        __be64    interface_id;
-+    } global;
-+};
-+
-+enum pvrdma_link_layer {
-+    PVRDMA_LINK_LAYER_UNSPECIFIED,
-+    PVRDMA_LINK_LAYER_INFINIBAND,
-+    PVRDMA_LINK_LAYER_ETHERNET,
-+};
-+
-+enum pvrdma_mtu {
-+    PVRDMA_MTU_256  = 1,
-+    PVRDMA_MTU_512  = 2,
-+    PVRDMA_MTU_1024 = 3,
-+    PVRDMA_MTU_2048 = 4,
-+    PVRDMA_MTU_4096 = 5,
-+};
-+
-+static inline int pvrdma_mtu_enum_to_int(enum pvrdma_mtu mtu)
-+{
-+    switch (mtu) {
-+    case PVRDMA_MTU_256:    return  256;
-+    case PVRDMA_MTU_512:    return  512;
-+    case PVRDMA_MTU_1024:    return 1024;
-+    case PVRDMA_MTU_2048:    return 2048;
-+    case PVRDMA_MTU_4096:    return 4096;
-+    default:        return   -1;
-+    }
-+}
-+
-+static inline enum pvrdma_mtu pvrdma_mtu_int_to_enum(int mtu)
-+{
-+    switch (mtu) {
-+    case 256:    return PVRDMA_MTU_256;
-+    case 512:    return PVRDMA_MTU_512;
-+    case 1024:    return PVRDMA_MTU_1024;
-+    case 2048:    return PVRDMA_MTU_2048;
-+    case 4096:
-+    default:    return PVRDMA_MTU_4096;
-+    }
-+}
-+
-+enum pvrdma_port_state {
-+    PVRDMA_PORT_NOP            = 0,
-+    PVRDMA_PORT_DOWN        = 1,
-+    PVRDMA_PORT_INIT        = 2,
-+    PVRDMA_PORT_ARMED        = 3,
-+    PVRDMA_PORT_ACTIVE        = 4,
-+    PVRDMA_PORT_ACTIVE_DEFER    = 5,
-+};
-+
-+enum pvrdma_port_cap_flags {
-+    PVRDMA_PORT_SM                = 1 <<  1,
-+    PVRDMA_PORT_NOTICE_SUP            = 1 <<  2,
-+    PVRDMA_PORT_TRAP_SUP            = 1 <<  3,
-+    PVRDMA_PORT_OPT_IPD_SUP            = 1 <<  4,
-+    PVRDMA_PORT_AUTO_MIGR_SUP        = 1 <<  5,
-+    PVRDMA_PORT_SL_MAP_SUP            = 1 <<  6,
-+    PVRDMA_PORT_MKEY_NVRAM            = 1 <<  7,
-+    PVRDMA_PORT_PKEY_NVRAM            = 1 <<  8,
-+    PVRDMA_PORT_LED_INFO_SUP        = 1 <<  9,
-+    PVRDMA_PORT_SM_DISABLED            = 1 << 10,
-+    PVRDMA_PORT_SYS_IMAGE_GUID_SUP        = 1 << 11,
-+    PVRDMA_PORT_PKEY_SW_EXT_PORT_TRAP_SUP    = 1 << 12,
-+    PVRDMA_PORT_EXTENDED_SPEEDS_SUP        = 1 << 14,
-+    PVRDMA_PORT_CM_SUP            = 1 << 16,
-+    PVRDMA_PORT_SNMP_TUNNEL_SUP        = 1 << 17,
-+    PVRDMA_PORT_REINIT_SUP            = 1 << 18,
-+    PVRDMA_PORT_DEVICE_MGMT_SUP        = 1 << 19,
-+    PVRDMA_PORT_VENDOR_CLASS_SUP        = 1 << 20,
-+    PVRDMA_PORT_DR_NOTICE_SUP        = 1 << 21,
-+    PVRDMA_PORT_CAP_MASK_NOTICE_SUP        = 1 << 22,
-+    PVRDMA_PORT_BOOT_MGMT_SUP        = 1 << 23,
-+    PVRDMA_PORT_LINK_LATENCY_SUP        = 1 << 24,
-+    PVRDMA_PORT_CLIENT_REG_SUP        = 1 << 25,
-+    PVRDMA_PORT_IP_BASED_GIDS        = 1 << 26,
-+    PVRDMA_PORT_CAP_FLAGS_MAX        = PVRDMA_PORT_IP_BASED_GIDS,
-+};
-+
-+enum pvrdma_port_width {
-+    PVRDMA_WIDTH_1X        = 1,
-+    PVRDMA_WIDTH_4X        = 2,
-+    PVRDMA_WIDTH_8X        = 4,
-+    PVRDMA_WIDTH_12X    = 8,
-+};
-+
-+static inline int pvrdma_width_enum_to_int(enum pvrdma_port_width width)
-+{
-+    switch (width) {
-+    case PVRDMA_WIDTH_1X:    return  1;
-+    case PVRDMA_WIDTH_4X:    return  4;
-+    case PVRDMA_WIDTH_8X:    return  8;
-+    case PVRDMA_WIDTH_12X:    return 12;
-+    default:        return -1;
-+    }
-+}
-+
-+enum pvrdma_port_speed {
-+    PVRDMA_SPEED_SDR    = 1,
-+    PVRDMA_SPEED_DDR    = 2,
-+    PVRDMA_SPEED_QDR    = 4,
-+    PVRDMA_SPEED_FDR10    = 8,
-+    PVRDMA_SPEED_FDR    = 16,
-+    PVRDMA_SPEED_EDR    = 32,
-+};
-+
-+struct pvrdma_port_attr {
-+    enum pvrdma_port_state    state;
-+    enum pvrdma_mtu        max_mtu;
-+    enum pvrdma_mtu        active_mtu;
-+    u32            gid_tbl_len;
-+    u32            port_cap_flags;
-+    u32            max_msg_sz;
-+    u32            bad_pkey_cntr;
-+    u32            qkey_viol_cntr;
-+    u16            pkey_tbl_len;
-+    u16            lid;
-+    u16            sm_lid;
-+    u8            lmc;
-+    u8            max_vl_num;
-+    u8            sm_sl;
-+    u8            subnet_timeout;
-+    u8            init_type_reply;
-+    u8            active_width;
-+    u8            active_speed;
-+    u8            phys_state;
-+    u8            reserved[2];
-+};
-+
-+struct pvrdma_global_route {
-+    union pvrdma_gid    dgid;
-+    u32            flow_label;
-+    u8            sgid_index;
-+    u8            hop_limit;
-+    u8            traffic_class;
-+    u8            reserved;
-+};
-+
-+struct pvrdma_grh {
-+    __be32            version_tclass_flow;
-+    __be16            paylen;
-+    u8            next_hdr;
-+    u8            hop_limit;
-+    union pvrdma_gid    sgid;
-+    union pvrdma_gid    dgid;
-+};
-+
-+enum pvrdma_ah_flags {
-+    PVRDMA_AH_GRH = 1,
-+};
-+
-+enum pvrdma_rate {
-+    PVRDMA_RATE_PORT_CURRENT    = 0,
-+    PVRDMA_RATE_2_5_GBPS        = 2,
-+    PVRDMA_RATE_5_GBPS        = 5,
-+    PVRDMA_RATE_10_GBPS        = 3,
-+    PVRDMA_RATE_20_GBPS        = 6,
-+    PVRDMA_RATE_30_GBPS        = 4,
-+    PVRDMA_RATE_40_GBPS        = 7,
-+    PVRDMA_RATE_60_GBPS        = 8,
-+    PVRDMA_RATE_80_GBPS        = 9,
-+    PVRDMA_RATE_120_GBPS        = 10,
-+    PVRDMA_RATE_14_GBPS        = 11,
-+    PVRDMA_RATE_56_GBPS        = 12,
-+    PVRDMA_RATE_112_GBPS        = 13,
-+    PVRDMA_RATE_168_GBPS        = 14,
-+    PVRDMA_RATE_25_GBPS        = 15,
-+    PVRDMA_RATE_100_GBPS        = 16,
-+    PVRDMA_RATE_200_GBPS        = 17,
-+    PVRDMA_RATE_300_GBPS        = 18,
-+};
-+
-+struct pvrdma_ah_attr {
-+    struct pvrdma_global_route    grh;
-+    u16                dlid;
-+    u16                vlan_id;
-+    u8                sl;
-+    u8                src_path_bits;
-+    u8                static_rate;
-+    u8                ah_flags;
-+    u8                port_num;
-+    u8                dmac[6];
-+    u8                reserved;
-+};
-+
-+enum pvrdma_cq_notify_flags {
-+    PVRDMA_CQ_SOLICITED        = 1 << 0,
-+    PVRDMA_CQ_NEXT_COMP        = 1 << 1,
-+    PVRDMA_CQ_SOLICITED_MASK    = PVRDMA_CQ_SOLICITED |
-+                      PVRDMA_CQ_NEXT_COMP,
-+    PVRDMA_CQ_REPORT_MISSED_EVENTS    = 1 << 2,
-+};
-+
-+struct pvrdma_qp_cap {
-+    u32    max_send_wr;
-+    u32    max_recv_wr;
-+    u32    max_send_sge;
-+    u32    max_recv_sge;
-+    u32    max_inline_data;
-+    u32    reserved;
-+};
-+
-+enum pvrdma_sig_type {
-+    PVRDMA_SIGNAL_ALL_WR,
-+    PVRDMA_SIGNAL_REQ_WR,
-+};
-+
-+enum pvrdma_qp_type {
-+    PVRDMA_QPT_SMI,
-+    PVRDMA_QPT_GSI,
-+    PVRDMA_QPT_RC,
-+    PVRDMA_QPT_UC,
-+    PVRDMA_QPT_UD,
-+    PVRDMA_QPT_RAW_IPV6,
-+    PVRDMA_QPT_RAW_ETHERTYPE,
-+    PVRDMA_QPT_RAW_PACKET = 8,
-+    PVRDMA_QPT_XRC_INI = 9,
-+    PVRDMA_QPT_XRC_TGT,
-+    PVRDMA_QPT_MAX,
-+};
-+
-+enum pvrdma_qp_create_flags {
-+    PVRDMA_QP_CREATE_IPOPVRDMA_UD_LSO        = 1 << 0,
-+    PVRDMA_QP_CREATE_BLOCK_MULTICAST_LOOPBACK    = 1 << 1,
-+};
-+
-+enum pvrdma_qp_attr_mask {
-+    PVRDMA_QP_STATE            = 1 << 0,
-+    PVRDMA_QP_CUR_STATE        = 1 << 1,
-+    PVRDMA_QP_EN_SQD_ASYNC_NOTIFY    = 1 << 2,
-+    PVRDMA_QP_ACCESS_FLAGS        = 1 << 3,
-+    PVRDMA_QP_PKEY_INDEX        = 1 << 4,
-+    PVRDMA_QP_PORT            = 1 << 5,
-+    PVRDMA_QP_QKEY            = 1 << 6,
-+    PVRDMA_QP_AV            = 1 << 7,
-+    PVRDMA_QP_PATH_MTU        = 1 << 8,
-+    PVRDMA_QP_TIMEOUT        = 1 << 9,
-+    PVRDMA_QP_RETRY_CNT        = 1 << 10,
-+    PVRDMA_QP_RNR_RETRY        = 1 << 11,
-+    PVRDMA_QP_RQ_PSN        = 1 << 12,
-+    PVRDMA_QP_MAX_QP_RD_ATOMIC    = 1 << 13,
-+    PVRDMA_QP_ALT_PATH        = 1 << 14,
-+    PVRDMA_QP_MIN_RNR_TIMER        = 1 << 15,
-+    PVRDMA_QP_SQ_PSN        = 1 << 16,
-+    PVRDMA_QP_MAX_DEST_RD_ATOMIC    = 1 << 17,
-+    PVRDMA_QP_PATH_MIG_STATE    = 1 << 18,
-+    PVRDMA_QP_CAP            = 1 << 19,
-+    PVRDMA_QP_DEST_QPN        = 1 << 20,
-+    PVRDMA_QP_ATTR_MASK_MAX        = PVRDMA_QP_DEST_QPN,
-+};
-+
-+enum pvrdma_qp_state {
-+    PVRDMA_QPS_RESET,
-+    PVRDMA_QPS_INIT,
-+    PVRDMA_QPS_RTR,
-+    PVRDMA_QPS_RTS,
-+    PVRDMA_QPS_SQD,
-+    PVRDMA_QPS_SQE,
-+    PVRDMA_QPS_ERR,
-+};
-+
-+enum pvrdma_mig_state {
-+    PVRDMA_MIG_MIGRATED,
-+    PVRDMA_MIG_REARM,
-+    PVRDMA_MIG_ARMED,
-+};
-+
-+enum pvrdma_mw_type {
-+    PVRDMA_MW_TYPE_1 = 1,
-+    PVRDMA_MW_TYPE_2 = 2,
-+};
-+
-+struct pvrdma_qp_attr {
-+    enum pvrdma_qp_state    qp_state;
-+    enum pvrdma_qp_state    cur_qp_state;
-+    enum pvrdma_mtu        path_mtu;
-+    enum pvrdma_mig_state    path_mig_state;
-+    u32            qkey;
-+    u32            rq_psn;
-+    u32            sq_psn;
-+    u32            dest_qp_num;
-+    u32            qp_access_flags;
-+    u16            pkey_index;
-+    u16            alt_pkey_index;
-+    u8            en_sqd_async_notify;
-+    u8            sq_draining;
-+    u8            max_rd_atomic;
-+    u8            max_dest_rd_atomic;
-+    u8            min_rnr_timer;
-+    u8            port_num;
-+    u8            timeout;
-+    u8            retry_cnt;
-+    u8            rnr_retry;
-+    u8            alt_port_num;
-+    u8            alt_timeout;
-+    u8            reserved[5];
-+    struct pvrdma_qp_cap    cap;
-+    struct pvrdma_ah_attr    ah_attr;
-+    struct pvrdma_ah_attr    alt_ah_attr;
-+};
-+
-+enum pvrdma_send_flags {
-+    PVRDMA_SEND_FENCE    = 1 << 0,
-+    PVRDMA_SEND_SIGNALED    = 1 << 1,
-+    PVRDMA_SEND_SOLICITED    = 1 << 2,
-+    PVRDMA_SEND_INLINE    = 1 << 3,
-+    PVRDMA_SEND_IP_CSUM    = 1 << 4,
-+    PVRDMA_SEND_FLAGS_MAX    = PVRDMA_SEND_IP_CSUM,
-+};
-+
-+enum pvrdma_access_flags {
-+    PVRDMA_ACCESS_LOCAL_WRITE    = 1 << 0,
-+    PVRDMA_ACCESS_REMOTE_WRITE    = 1 << 1,
-+    PVRDMA_ACCESS_REMOTE_READ    = 1 << 2,
-+    PVRDMA_ACCESS_REMOTE_ATOMIC    = 1 << 3,
-+    PVRDMA_ACCESS_MW_BIND        = 1 << 4,
-+    PVRDMA_ZERO_BASED        = 1 << 5,
-+    PVRDMA_ACCESS_ON_DEMAND        = 1 << 6,
-+    PVRDMA_ACCESS_FLAGS_MAX        = PVRDMA_ACCESS_ON_DEMAND,
-+};
-+
-+enum ib_wc_status {
-+    IB_WC_SUCCESS,
-+    IB_WC_LOC_LEN_ERR,
-+    IB_WC_LOC_QP_OP_ERR,
-+    IB_WC_LOC_EEC_OP_ERR,
-+    IB_WC_LOC_PROT_ERR,
-+    IB_WC_WR_FLUSH_ERR,
-+    IB_WC_MW_BIND_ERR,
-+    IB_WC_BAD_RESP_ERR,
-+    IB_WC_LOC_ACCESS_ERR,
-+    IB_WC_REM_INV_REQ_ERR,
-+    IB_WC_REM_ACCESS_ERR,
-+    IB_WC_REM_OP_ERR,
-+    IB_WC_RETRY_EXC_ERR,
-+    IB_WC_RNR_RETRY_EXC_ERR,
-+    IB_WC_LOC_RDD_VIOL_ERR,
-+    IB_WC_REM_INV_RD_REQ_ERR,
-+    IB_WC_REM_ABORT_ERR,
-+    IB_WC_INV_EECN_ERR,
-+    IB_WC_INV_EEC_STATE_ERR,
-+    IB_WC_FATAL_ERR,
-+    IB_WC_RESP_TIMEOUT_ERR,
-+    IB_WC_GENERAL_ERR
-+};
-+
-+#endif /* PVRDMA_IB_VERBS_H */
-diff --git a/hw/rdma/vmw/pvrdma_main.c b/hw/rdma/vmw/pvrdma_main.c
-new file mode 100644
-index 0000000000..33acb0f508
---- /dev/null
-+++ b/hw/rdma/vmw/pvrdma_main.c
-@@ -0,0 +1,644 @@
-+#include <qemu/osdep.h>
-+#include <qapi/error.h>
-+#include <hw/hw.h>
-+#include <hw/pci/pci.h>
-+#include <hw/pci/pci_ids.h>
-+#include <hw/pci/msi.h>
-+#include <hw/pci/msix.h>
-+#include <hw/qdev-core.h>
-+#include <hw/qdev-properties.h>
-+#include <cpu.h>
-+#include "trace.h"
-+
-+#include "../rdma_rm.h"
-+#include "../rdma_backend.h"
-+#include "../rdma_utils.h"
-+
-+#include "pvrdma_utils.h"
-+#include "pvrdma.h"
-+#include "pvrdma_dev_api.h"
-+#include "pvrdma_qp_ops.h"
-+
-+static Property pvrdma_dev_properties[] = {
-+    DEFINE_PROP_STRING("backend-dev", PVRDMADev, backend_device_name),
-+    DEFINE_PROP_UINT8("backend-port", PVRDMADev, backend_port_num, 1),
-+    DEFINE_PROP_UINT8("backend-gid-idx", PVRDMADev, backend_gid_idx, 0),
-+    DEFINE_PROP_UINT64("dev-caps-max-mr-size", PVRDMADev, dev_attr.max_mr_size,
-+                       MAX_MR_SIZE),
-+    DEFINE_PROP_INT32("dev-caps-max-qp", PVRDMADev, dev_attr.max_qp, MAX_QP),
-+    DEFINE_PROP_INT32("dev-caps-max-sge", PVRDMADev, dev_attr.max_sge, MAX_SGE),
-+    DEFINE_PROP_INT32("dev-caps-max-cq", PVRDMADev, dev_attr.max_cq, MAX_CQ),
-+    DEFINE_PROP_INT32("dev-caps-max-mr", PVRDMADev, dev_attr.max_mr, MAX_MR),
-+    DEFINE_PROP_INT32("dev-caps-max-pd", PVRDMADev, dev_attr.max_pd, MAX_PD),
-+    DEFINE_PROP_INT32("dev-caps-qp-rd-atom", PVRDMADev, dev_attr.max_qp_rd_atom,
-+                      MAX_QP_RD_ATOM),
-+    DEFINE_PROP_INT32("dev-caps-max-qp-init-rd-atom", PVRDMADev,
-+                      dev_attr.max_qp_init_rd_atom, MAX_QP_INIT_RD_ATOM),
-+    DEFINE_PROP_INT32("dev-caps-max-ah", PVRDMADev, dev_attr.max_ah, MAX_AH),
-+    DEFINE_PROP_END_OF_LIST(),
-+};
-+
-+static void free_dev_ring(PCIDevice *pci_dev, PvrdmaRing *ring,
-+                          void *ring_state)
-+{
-+    pvrdma_ring_free(ring);
-+    pvrdma_pci_dma_unmap(pci_dev, ring_state, TARGET_PAGE_SIZE);
-+}
-+
-+static int init_dev_ring(PvrdmaRing *ring, struct pvrdma_ring **ring_state,
-+                         const char *name, PCIDevice *pci_dev,
-+                         dma_addr_t dir_addr, u32 num_pages)
-+{
-+    __u64 *dir, *tbl;
-+    int rc = 0;
-+
-+    pr_dbg("Initializing device ring %s\n", name);
-+    pr_dbg("pdir_dma=0x%llx\n", (long long unsigned int)dir_addr);
-+    pr_dbg("num_pages=%d\n", num_pages);
-+    dir = pvrdma_pci_dma_map(pci_dev, dir_addr, TARGET_PAGE_SIZE);
-+    if (!dir) {
-+        pr_err("Fail to map to page directory\n");
-+        rc = -ENOMEM;
-+        goto out;
-+    }
-+    tbl = pvrdma_pci_dma_map(pci_dev, dir[0], TARGET_PAGE_SIZE);
-+    if (!tbl) {
-+        pr_err("Fail to map to page table\n");
-+        rc = -ENOMEM;
-+        goto out_free_dir;
-+    }
-+
-+    *ring_state = pvrdma_pci_dma_map(pci_dev, tbl[0], TARGET_PAGE_SIZE);
-+    if (!*ring_state) {
-+        pr_err("Fail to map to ring state\n");
-+        rc = -ENOMEM;
-+        goto out_free_tbl;
-+    }
-+    /* RX ring is the second */
-+    (struct pvrdma_ring *)(*ring_state)++;
-+    rc = pvrdma_ring_init(ring, name, pci_dev,
-+                          (struct pvrdma_ring *)*ring_state,
-+                          (num_pages - 1) * TARGET_PAGE_SIZE /
-+                          sizeof(struct pvrdma_cqne),
-+                          sizeof(struct pvrdma_cqne),
-+                          (dma_addr_t *)&tbl[1], (dma_addr_t)num_pages - 1);
-+    if (rc) {
-+        pr_err("Fail to initialize ring\n");
-+        rc = -ENOMEM;
-+        goto out_free_ring_state;
-+    }
-+
-+    goto out_free_tbl;
-+
-+out_free_ring_state:
-+    pvrdma_pci_dma_unmap(pci_dev, *ring_state, TARGET_PAGE_SIZE);
-+
-+out_free_tbl:
-+    pvrdma_pci_dma_unmap(pci_dev, tbl, TARGET_PAGE_SIZE);
-+
-+out_free_dir:
-+    pvrdma_pci_dma_unmap(pci_dev, dir, TARGET_PAGE_SIZE);
-+
-+out:
-+    return rc;
-+}
-+
-+static void free_dsr(PVRDMADev *dev)
-+{
-+    PCIDevice *pci_dev = PCI_DEVICE(dev);
-+
-+    if (!dev->dsr_info.dsr) {
-+        return;
-+    }
-+
-+    free_dev_ring(pci_dev, &dev->dsr_info.async,
-+                  dev->dsr_info.async_ring_state);
-+
-+    free_dev_ring(pci_dev, &dev->dsr_info.cq, dev->dsr_info.cq_ring_state);
-+
-+    pvrdma_pci_dma_unmap(pci_dev, dev->dsr_info.req,
-+                         sizeof(union pvrdma_cmd_req));
-+
-+    pvrdma_pci_dma_unmap(pci_dev, dev->dsr_info.rsp,
-+                         sizeof(union pvrdma_cmd_resp));
-+
-+    pvrdma_pci_dma_unmap(pci_dev, dev->dsr_info.dsr,
-+                         sizeof(struct pvrdma_device_shared_region));
-+
-+    dev->dsr_info.dsr = NULL;
-+}
-+
-+static int load_dsr(PVRDMADev *dev)
-+{
-+    int rc = 0;
-+    PCIDevice *pci_dev = PCI_DEVICE(dev);
-+    DSRInfo *dsr_info;
-+    struct pvrdma_device_shared_region *dsr;
-+
-+    free_dsr(dev);
-+
-+    /* Map to DSR */
-+    pr_dbg("dsr_dma=0x%llx\n", (long long unsigned int)dev->dsr_info.dma);
-+    dev->dsr_info.dsr = pvrdma_pci_dma_map(pci_dev, dev->dsr_info.dma,
-+                                sizeof(struct pvrdma_device_shared_region));
-+    if (!dev->dsr_info.dsr) {
-+        pr_err("Fail to map to DSR\n");
-+        rc = -ENOMEM;
-+        goto out;
-+    }
-+
-+    /* Shortcuts */
-+    dsr_info = &dev->dsr_info;
-+    dsr = dsr_info->dsr;
-+
-+    /* Map to command slot */
-+    pr_dbg("cmd_dma=0x%llx\n", (long long unsigned int)dsr->cmd_slot_dma);
-+    dsr_info->req = pvrdma_pci_dma_map(pci_dev, dsr->cmd_slot_dma,
-+                                       sizeof(union pvrdma_cmd_req));
-+    if (!dsr_info->req) {
-+        pr_err("Fail to map to command slot address\n");
-+        rc = -ENOMEM;
-+        goto out_free_dsr;
-+    }
-+
-+    /* Map to response slot */
-+    pr_dbg("rsp_dma=0x%llx\n", (long long unsigned int)dsr->resp_slot_dma);
-+    dsr_info->rsp = pvrdma_pci_dma_map(pci_dev, dsr->resp_slot_dma,
-+                                       sizeof(union pvrdma_cmd_resp));
-+    if (!dsr_info->rsp) {
-+        pr_err("Fail to map to response slot address\n");
-+        rc = -ENOMEM;
-+        goto out_free_req;
-+    }
-+
-+    /* Map to CQ notification ring */
-+    rc = init_dev_ring(&dsr_info->cq, &dsr_info->cq_ring_state, "dev_cq",
-+                       pci_dev, dsr->cq_ring_pages.pdir_dma,
-+                       dsr->cq_ring_pages.num_pages);
-+    if (rc) {
-+        pr_err("Fail to map to initialize CQ ring\n");
-+        rc = -ENOMEM;
-+        goto out_free_rsp;
-+    }
-+
-+    /* Map to event notification ring */
-+    rc = init_dev_ring(&dsr_info->async, &dsr_info->async_ring_state,
-+                       "dev_async", pci_dev, dsr->async_ring_pages.pdir_dma,
-+                       dsr->async_ring_pages.num_pages);
-+    if (rc) {
-+        pr_err("Fail to map to initialize event ring\n");
-+        rc = -ENOMEM;
-+        goto out_free_rsp;
-+    }
-+
-+    goto out;
-+
-+out_free_rsp:
-+    pvrdma_pci_dma_unmap(pci_dev, dsr_info->rsp, sizeof(union pvrdma_cmd_resp));
-+
-+out_free_req:
-+    pvrdma_pci_dma_unmap(pci_dev, dsr_info->req, sizeof(union pvrdma_cmd_req));
-+
-+out_free_dsr:
-+    pvrdma_pci_dma_unmap(pci_dev, dsr_info->dsr,
-+                         sizeof(struct pvrdma_device_shared_region));
-+    dsr_info->dsr = NULL;
-+
-+out:
-+    return rc;
-+}
-+
-+static void init_dsr_dev_caps(PVRDMADev *dev)
-+{
-+    struct pvrdma_device_shared_region *dsr;
-+
-+    if (dev->dsr_info.dsr == NULL) {
-+        pr_err("Can't initialized DSR\n");
-+        return;
-+    }
-+
-+    dsr = dev->dsr_info.dsr;
-+
-+    dsr->caps.fw_ver = PVRDMA_FW_VERSION;
-+    pr_dbg("fw_ver=0x%lx\n", dsr->caps.fw_ver);
-+
-+    dsr->caps.mode = PVRDMA_DEVICE_MODE_ROCE;
-+    pr_dbg("mode=%d\n", dsr->caps.mode);
-+
-+    dsr->caps.gid_types |= PVRDMA_GID_TYPE_FLAG_ROCE_V1;
-+    pr_dbg("gid_types=0x%x\n", dsr->caps.gid_types);
-+
-+    dsr->caps.max_uar = RDMA_BAR2_UAR_SIZE;
-+    pr_dbg("max_uar=%d\n", dsr->caps.max_uar);
-+
-+    dsr->caps.max_mr_size = dev->dev_attr.max_mr_size;
-+    dsr->caps.max_qp = dev->dev_attr.max_qp;
-+    dsr->caps.max_qp_wr = dev->dev_attr.max_qp_wr;
-+    dsr->caps.max_sge = dev->dev_attr.max_sge;
-+    dsr->caps.max_cq = dev->dev_attr.max_cq;
-+    dsr->caps.max_cqe = dev->dev_attr.max_cqe;
-+    dsr->caps.max_mr = dev->dev_attr.max_mr;
-+    dsr->caps.max_pd = dev->dev_attr.max_pd;
-+    dsr->caps.max_ah = dev->dev_attr.max_ah;
-+
-+    dsr->caps.gid_tbl_len = MAX_GIDS;
-+    pr_dbg("gid_tbl_len=%d\n", dsr->caps.gid_tbl_len);
-+
-+    dsr->caps.sys_image_guid = 0;
-+    pr_dbg("sys_image_guid=%llx\n", dsr->caps.sys_image_guid);
-+
-+    dsr->caps.node_guid = cpu_to_be64(dev->node_guid);
-+    pr_dbg("node_guid=%llx\n",
-+           (long long unsigned int)be64_to_cpu(dsr->caps.node_guid));
-+
-+    dsr->caps.phys_port_cnt = MAX_PORTS;
-+    pr_dbg("phys_port_cnt=%d\n", dsr->caps.phys_port_cnt);
-+
-+    dsr->caps.max_pkeys = MAX_PKEYS;
-+    pr_dbg("max_pkeys=%d\n", dsr->caps.max_pkeys);
-+
-+    pr_dbg("Initialized\n");
-+}
-+
-+static void free_ports(PVRDMADev *dev)
-+{
-+    int i;
-+
-+    for (i = 0; i < MAX_PORTS; i++) {
-+        free(dev->rdma_dev_res.ports[i].gid_tbl);
-+    }
-+}
-+
-+static int init_ports(PVRDMADev *dev, Error **errp)
-+{
-+    int i, ret = 0;
-+
-+    memset(dev->rdma_dev_res.ports, 0, sizeof(dev->rdma_dev_res.ports));
-+
-+    for (i = 0; i < MAX_PORTS; i++) {
-+        dev->rdma_dev_res.ports[i].state = PVRDMA_PORT_DOWN;
-+
-+        dev->rdma_dev_res.ports[i].pkey_tbl =
-+            malloc(sizeof(*dev->rdma_dev_res.ports[i].pkey_tbl) *
-+                   MAX_PORT_PKEYS);
-+        if (dev->rdma_dev_res.ports[i].gid_tbl == NULL) {
-+            goto err_free_ports;
-+        }
-+
-+        memset(dev->rdma_dev_res.ports[i].gid_tbl, 0,
-+               sizeof(dev->rdma_dev_res.ports[i].gid_tbl));
-+    }
-+
-+    return 0;
-+
-+err_free_ports:
-+    free_ports(dev);
-+
-+    error_setg(errp, "Fail to initialize device's ports");
-+
-+    return ret;
-+}
-+
-+static void activate_device(PVRDMADev *dev)
-+{
-+    set_reg_val(dev, PVRDMA_REG_ERR, 0);
-+    pr_dbg("Device activated\n");
-+}
-+
-+static int unquiesce_device(PVRDMADev *dev)
-+{
-+    pr_dbg("Device unquiesced\n");
-+    return 0;
-+}
-+
-+static int reset_device(PVRDMADev *dev)
-+{
-+    pr_dbg("Device reset complete\n");
-+    return 0;
-+}
-+
-+static uint64_t regs_read(void *opaque, hwaddr addr, unsigned size)
-+{
-+    PVRDMADev *dev = opaque;
-+    __u32 val;
-+
-+    /* pr_dbg("addr=0x%lx, size=%d\n", addr, size); */
-+
-+    if (get_reg_val(dev, addr, &val)) {
-+        pr_dbg("Error trying to read REG value from address 0x%x\n",
-+               (__u32)addr);
-+        return -EINVAL;
-+    }
-+
-+    trace_pvrdma_regs_read(addr, val);
-+
-+    return val;
-+}
-+
-+static void regs_write(void *opaque, hwaddr addr, uint64_t val, unsigned size)
-+{
-+    PVRDMADev *dev = opaque;
-+
-+    /* pr_dbg("addr=0x%lx, val=0x%x, size=%d\n", addr, (uint32_t)val, size); */
-+
-+    if (set_reg_val(dev, addr, val)) {
-+        pr_err("Error trying to set REG value, addr=0x%lx, val=0x%lx\n",
-+               (uint64_t)addr, val);
-+        return;
-+    }
-+
-+    trace_pvrdma_regs_write(addr, val);
-+
-+    switch (addr) {
-+    case PVRDMA_REG_DSRLOW:
-+        dev->dsr_info.dma = val;
-+        break;
-+    case PVRDMA_REG_DSRHIGH:
-+        dev->dsr_info.dma |= val << 32;
-+        load_dsr(dev);
-+        init_dsr_dev_caps(dev);
-+        break;
-+    case PVRDMA_REG_CTL:
-+        switch (val) {
-+        case PVRDMA_DEVICE_CTL_ACTIVATE:
-+            activate_device(dev);
-+            break;
-+        case PVRDMA_DEVICE_CTL_UNQUIESCE:
-+            unquiesce_device(dev);
-+            break;
-+        case PVRDMA_DEVICE_CTL_RESET:
-+            reset_device(dev);
-+            break;
-+        }
-+    break;
-+    case PVRDMA_REG_IMR:
-+        pr_dbg("Interrupt mask=0x%lx\n", val);
-+        dev->interrupt_mask = val;
-+        break;
-+    case PVRDMA_REG_REQUEST:
-+        if (val == 0) {
-+            execute_command(dev);
-+        }
-+    break;
-+    default:
-+        break;
-+    }
-+}
-+
-+static const MemoryRegionOps regs_ops = {
-+    .read = regs_read,
-+    .write = regs_write,
-+    .endianness = DEVICE_LITTLE_ENDIAN,
-+    .impl = {
-+        .min_access_size = sizeof(uint32_t),
-+        .max_access_size = sizeof(uint32_t),
-+    },
-+};
-+
-+static void uar_write(void *opaque, hwaddr addr, uint64_t val, unsigned size)
-+{
-+    PVRDMADev *dev = opaque;
-+
-+    /* pr_dbg("addr=0x%lx, val=0x%x, size=%d\n", addr, (uint32_t)val, size); */
-+
-+    switch (addr & 0xFFF) { /* Mask with 0xFFF as each UC gets page */
-+    case PVRDMA_UAR_QP_OFFSET:
-+        pr_dbg("UAR QP command, addr=0x%x, val=0x%lx\n", (__u32)addr, val);
-+        if (val & PVRDMA_UAR_QP_SEND) {
-+            pvrdma_qp_send(dev, val & PVRDMA_UAR_HANDLE_MASK);
-+        }
-+        if (val & PVRDMA_UAR_QP_RECV) {
-+            pvrdma_qp_recv(dev, val & PVRDMA_UAR_HANDLE_MASK);
-+        }
-+        break;
-+    case PVRDMA_UAR_CQ_OFFSET:
-+        /* pr_dbg("UAR CQ cmd, addr=0x%x, val=0x%lx\n", (__u32)addr, val); */
-+        if (val & PVRDMA_UAR_CQ_ARM) {
-+            rdma_rm_req_notify_cq(&dev->rdma_dev_res,
-+                                  val & PVRDMA_UAR_HANDLE_MASK,
-+                                  !!(val & PVRDMA_UAR_CQ_ARM_SOL));
-+        }
-+        if (val & PVRDMA_UAR_CQ_ARM_SOL) {
-+            pr_dbg("UAR_CQ_ARM_SOL (%ld)\n", val & PVRDMA_UAR_HANDLE_MASK);
-+        }
-+        if (val & PVRDMA_UAR_CQ_POLL) {
-+            pr_dbg("UAR_CQ_POLL (%ld)\n", val & PVRDMA_UAR_HANDLE_MASK);
-+            pvrdma_cq_poll(&dev->rdma_dev_res, val & PVRDMA_UAR_HANDLE_MASK);
-+        }
-+        break;
-+    default:
-+        pr_err("Unsupported command, addr=0x%lx, val=0x%lx\n",
-+               (uint64_t)addr, val);
-+        break;
-+    }
-+}
-+
-+static const MemoryRegionOps uar_ops = {
-+    .write = uar_write,
-+    .endianness = DEVICE_LITTLE_ENDIAN,
-+    .impl = {
-+        .min_access_size = sizeof(uint32_t),
-+        .max_access_size = sizeof(uint32_t),
-+    },
-+};
-+
-+static void init_pci_config(PCIDevice *pdev)
-+{
-+    pdev->config[PCI_INTERRUPT_PIN] = 1;
-+}
-+
-+static void init_bars(PCIDevice *pdev)
-+{
-+    PVRDMADev *dev = PVRDMA_DEV(pdev);
-+
-+    /* BAR 0 - MSI-X */
-+    memory_region_init(&dev->msix, OBJECT(dev), "pvrdma-msix",
-+                       RDMA_BAR0_MSIX_SIZE);
-+    pci_register_bar(pdev, RDMA_MSIX_BAR_IDX, PCI_BASE_ADDRESS_SPACE_MEMORY,
-+                     &dev->msix);
-+
-+    /* BAR 1 - Registers */
-+    memset(&dev->regs_data, 0, sizeof(dev->regs_data));
-+    memory_region_init_io(&dev->regs, OBJECT(dev), &regs_ops, dev,
-+                          "pvrdma-regs", RDMA_BAR1_REGS_SIZE);
-+    pci_register_bar(pdev, RDMA_REG_BAR_IDX, PCI_BASE_ADDRESS_SPACE_MEMORY,
-+                     &dev->regs);
-+
-+    /* BAR 2 - UAR */
-+    memset(&dev->uar_data, 0, sizeof(dev->uar_data));
-+    memory_region_init_io(&dev->uar, OBJECT(dev), &uar_ops, dev, "rdma-uar",
-+                          RDMA_BAR2_UAR_SIZE);
-+    pci_register_bar(pdev, RDMA_UAR_BAR_IDX, PCI_BASE_ADDRESS_SPACE_MEMORY,
-+                     &dev->uar);
-+}
-+
-+static void init_regs(PCIDevice *pdev)
-+{
-+    PVRDMADev *dev = PVRDMA_DEV(pdev);
-+
-+    set_reg_val(dev, PVRDMA_REG_VERSION, PVRDMA_HW_VERSION);
-+    set_reg_val(dev, PVRDMA_REG_ERR, 0xFFFF);
-+}
-+
-+static void uninit_msix(PCIDevice *pdev, int used_vectors)
-+{
-+    PVRDMADev *dev = PVRDMA_DEV(pdev);
-+    int i;
-+
-+    for (i = 0; i < used_vectors; i++) {
-+        msix_vector_unuse(pdev, i);
-+    }
-+
-+    msix_uninit(pdev, &dev->msix, &dev->msix);
-+}
-+
-+static int init_msix(PCIDevice *pdev, Error **errp)
-+{
-+    PVRDMADev *dev = PVRDMA_DEV(pdev);
-+    int i;
-+    int rc;
-+
-+    rc = msix_init(pdev, RDMA_MAX_INTRS, &dev->msix, RDMA_MSIX_BAR_IDX,
-+                   RDMA_MSIX_TABLE, &dev->msix, RDMA_MSIX_BAR_IDX,
-+                   RDMA_MSIX_PBA, 0, NULL);
-+
-+    if (rc < 0) {
-+        error_setg(errp, "Fail to initialize MSI-X");
-+        return rc;
-+    }
-+
-+    for (i = 0; i < RDMA_MAX_INTRS; i++) {
-+        rc = msix_vector_use(PCI_DEVICE(dev), i);
-+        if (rc < 0) {
-+            error_setg(errp, "Fail mark MSI-X vercor %d", i);
-+            uninit_msix(pdev, i);
-+            return rc;
-+        }
-+    }
-+
-+    return 0;
-+}
-+
-+static void init_dev_caps(PVRDMADev *dev)
-+{
-+    size_t pg_tbl_bytes = TARGET_PAGE_SIZE * (TARGET_PAGE_SIZE / sizeof(u64));
-+    size_t wr_sz = MAX(sizeof(struct pvrdma_sq_wqe_hdr),
-+                       sizeof(struct pvrdma_rq_wqe_hdr));
-+
-+    dev->dev_attr.max_qp_wr = pg_tbl_bytes /
-+                              (wr_sz + sizeof(struct pvrdma_sge) * MAX_SGE) -
-+                              TARGET_PAGE_SIZE; /* First page is ring state */
-+    pr_dbg("max_qp_wr=%d\n", dev->dev_attr.max_qp_wr);
-+
-+    dev->dev_attr.max_cqe = pg_tbl_bytes / sizeof(struct pvrdma_cqe) -
-+                            TARGET_PAGE_SIZE; /* First page is ring state */
-+    pr_dbg("max_cqe=%d\n", dev->dev_attr.max_cqe);
-+}
-+
-+static void pvrdma_realize(PCIDevice *pdev, Error **errp)
-+{
-+    int rc;
-+    PVRDMADev *dev = PVRDMA_DEV(pdev);
-+
-+    pr_dbg("Initializing device %s %x.%x\n", pdev->name,
-+           PCI_SLOT(pdev->devfn), PCI_FUNC(pdev->devfn));
-+
-+    dev->dsr_info.dsr = NULL;
-+
-+    init_pci_config(pdev);
-+
-+    init_bars(pdev);
-+
-+    init_regs(pdev);
-+
-+    init_dev_caps(dev);
-+
-+    rc = init_msix(pdev, errp);
-+    if (rc) {
-+        goto out;
-+    }
-+
-+    rc = rdma_backend_init(&dev->backend_dev, &dev->rdma_dev_res,
-+                           dev->backend_device_name, dev->backend_port_num,
-+                           dev->backend_gid_idx, &dev->dev_attr, errp);
-+    if (rc) {
-+        goto out;
-+    }
-+
-+    rc = rdma_rm_init(&dev->rdma_dev_res, &dev->dev_attr, errp);
-+    if (rc) {
-+        goto out;
-+    }
-+
-+    rc = init_ports(dev, errp);
-+    if (rc) {
-+        goto out;
-+    }
-+
-+    rc = pvrdma_qp_ops_init();
-+    if (rc) {
-+        goto out;
-+    }
-+
-+out:
-+    if (rc) {
-+        error_append_hint(errp, "Device fail to load\n");
-+    }
-+}
-+
-+static void pvrdma_exit(PCIDevice *pdev)
-+{
-+    PVRDMADev *dev = PVRDMA_DEV(pdev);
-+
-+    pr_dbg("Closing device %s %x.%x\n", pdev->name, PCI_SLOT(pdev->devfn),
-+           PCI_FUNC(pdev->devfn));
-+
-+    pvrdma_qp_ops_fini();
-+
-+    free_ports(dev);
-+
-+    rdma_rm_fini(&dev->rdma_dev_res);
-+
-+    rdma_backend_fini(&dev->backend_dev);
-+
-+    free_dsr(dev);
-+
-+    if (msix_enabled(pdev)) {
-+        uninit_msix(pdev, RDMA_MAX_INTRS);
-+    }
-+}
-+
-+static void pvrdma_class_init(ObjectClass *klass, void *data)
-+{
-+    DeviceClass *dc = DEVICE_CLASS(klass);
-+    PCIDeviceClass *k = PCI_DEVICE_CLASS(klass);
-+
-+    k->realize = pvrdma_realize;
-+    k->exit = pvrdma_exit;
-+    k->vendor_id = PCI_VENDOR_ID_VMWARE;
-+    k->device_id = PCI_DEVICE_ID_VMWARE_PVRDMA;
-+    k->revision = 0x00;
-+    k->class_id = PCI_CLASS_NETWORK_OTHER;
-+
-+    dc->desc = "RDMA Device";
-+    dc->props = pvrdma_dev_properties;
-+    set_bit(DEVICE_CATEGORY_NETWORK, dc->categories);
-+}
-+
-+static const TypeInfo pvrdma_info = {
-+    .name = PVRDMA_HW_NAME,
-+    .parent = TYPE_PCI_DEVICE,
-+    .instance_size = sizeof(PVRDMADev),
-+    .class_init = pvrdma_class_init,
-+    .interfaces = (InterfaceInfo[]) {
-+        { INTERFACE_CONVENTIONAL_PCI_DEVICE },
-+        { }
-+    }
-+};
-+
-+static void register_types(void)
-+{
-+    type_register_static(&pvrdma_info);
-+}
-+
-+type_init(register_types)
-diff --git a/hw/rdma/vmw/pvrdma_qp_ops.c b/hw/rdma/vmw/pvrdma_qp_ops.c
-new file mode 100644
-index 0000000000..4b2d02a61f
---- /dev/null
-+++ b/hw/rdma/vmw/pvrdma_qp_ops.c
-@@ -0,0 +1,212 @@
-+#include <qemu/osdep.h>
-+
-+#include "../rdma_utils.h"
-+#include "../rdma_rm.h"
-+#include "../rdma_backend.h"
-+
-+#include "pvrdma.h"
-+#include "pvrdma_utils.h"
-+#include "pvrdma_qp_ops.h"
-+
-+typedef struct CompHandlerCtx {
-+    PVRDMADev *dev;
-+    u32 cq_handle;
-+    struct pvrdma_cqe cqe;
-+} CompHandlerCtx;
-+
-+/* Send Queue WQE */
-+typedef struct PvrdmaSqWqe {
-+    struct pvrdma_sq_wqe_hdr hdr;
-+    struct pvrdma_sge sge[0];
-+} PvrdmaSqWqe;
-+
-+/* Recv Queue WQE */
-+typedef struct PvrdmaRqWqe {
-+    struct pvrdma_rq_wqe_hdr hdr;
-+    struct pvrdma_sge sge[0];
-+} PvrdmaRqWqe;
-+
-+/*
-+ * 1. Put CQE on send CQ ring
-+ * 2. Put CQ number on dsr completion ring
-+ * 3. Interrupt host
-+ */
-+static int pvrdma_post_cqe(PVRDMADev *dev, u32 cq_handle,
-+                           struct pvrdma_cqe *cqe)
-+{
-+    struct pvrdma_cqe *cqe1;
-+    struct pvrdma_cqne *cqne;
-+    PvrdmaRing *ring;
-+    RdmaRmCQ *cq = rdma_rm_get_cq(&dev->rdma_dev_res, cq_handle);
-+
-+    if (unlikely(!cq)) {
-+        pr_dbg("Invalid cqn %d\n", cq_handle);
-+        return -EINVAL;
-+    }
-+
-+    ring = (PvrdmaRing *)cq->opaque;
-+    pr_dbg("ring=%p\n", ring);
-+
-+    /* Step #1: Put CQE on CQ ring */
-+    pr_dbg("Writing CQE\n");
-+    cqe1 = pvrdma_ring_next_elem_write(ring);
-+    if (unlikely(!cqe1)) {
-+        return -EINVAL;
-+    }
-+
-+    cqe1->wr_id = cqe->wr_id;
-+    cqe1->qp = cqe->qp;
-+    cqe1->opcode = cqe->opcode;
-+    cqe1->status = cqe->status;
-+    cqe1->vendor_err = cqe->vendor_err;
-+
-+    pvrdma_ring_write_inc(ring);
-+
-+    /* Step #2: Put CQ number on dsr completion ring */
-+    pr_dbg("Writing CQNE\n");
-+    cqne = pvrdma_ring_next_elem_write(&dev->dsr_info.cq);
-+    if (unlikely(!cqne)) {
-+        return -EINVAL;
-+    }
-+
-+    cqne->info = cq_handle;
-+    pvrdma_ring_write_inc(&dev->dsr_info.cq);
-+
-+    pr_dbg("cq->notify=%d\n", cq->notify);
-+    if (cq->notify) {
-+        cq->notify = false;
-+        post_interrupt(dev, INTR_VEC_CMD_COMPLETION_Q);
-+    }
-+
-+    return 0;
-+}
-+
-+static void pvrdma_qp_ops_comp_handler(int status, unsigned int vendor_err,
-+                                       void *ctx)
-+{
-+    CompHandlerCtx *comp_ctx = (CompHandlerCtx *)ctx;
-+
-+    pr_dbg("cq_handle=%d\n", comp_ctx->cq_handle);
-+    pr_dbg("wr_id=%lld\n", comp_ctx->cqe.wr_id);
-+    pr_dbg("status=%d\n", status);
-+    pr_dbg("vendor_err=0x%x\n", vendor_err);
-+    comp_ctx->cqe.status = status;
-+    comp_ctx->cqe.vendor_err = vendor_err;
-+    pvrdma_post_cqe(comp_ctx->dev, comp_ctx->cq_handle, &comp_ctx->cqe);
-+    free(ctx);
-+}
-+
-+void pvrdma_qp_ops_fini(void)
-+{
-+    rdma_backend_unregister_comp_handler();
-+}
-+
-+int pvrdma_qp_ops_init(void)
-+{
-+    rdma_backend_register_comp_handler(pvrdma_qp_ops_comp_handler);
-+
-+    return 0;
-+}
-+
-+int pvrdma_qp_send(PVRDMADev *dev, __u32 qp_handle)
-+{
-+    RdmaRmQP *qp;
-+    PvrdmaSqWqe *wqe;
-+    PvrdmaRing *ring;
-+
-+    qp = rdma_rm_get_qp(&dev->rdma_dev_res, qp_handle);
-+    if (unlikely(!qp)) {
-+        return -EINVAL;
-+    }
-+
-+    ring = (PvrdmaRing *)qp->opaque;
-+    pr_dbg("sring=%p\n", ring);
-+
-+    if (qp->qp_state < IBV_QPS_RTS) {
-+        pr_dbg("Invalid QP state for send (%d < %d) for qp %d\n", qp->qp_state,
-+               IBV_QPS_RTS, qp_handle);
-+        return -EINVAL;
-+    }
-+
-+    wqe = (struct PvrdmaSqWqe *)pvrdma_ring_next_elem_read(ring);
-+    while (wqe) {
-+        CompHandlerCtx *comp_ctx;
-+
-+        pr_dbg("wr_id=%lld\n", wqe->hdr.wr_id);
-+
-+        /* Prepare CQE */
-+        comp_ctx = malloc(sizeof(CompHandlerCtx));
-+        comp_ctx->dev = dev;
-+        comp_ctx->cq_handle = qp->send_cq_handle;
-+        comp_ctx->cqe.wr_id = wqe->hdr.wr_id;
-+        comp_ctx->cqe.qp = qp_handle;
-+        comp_ctx->cqe.opcode = wqe->hdr.opcode;
-+
-+        rdma_backend_post_send(&dev->backend_dev, &dev->rdma_dev_res,
-+                               &qp->backend_qp, qp->qp_type,
-+                               (struct ibv_sge *)&wqe->sge[0], wqe->hdr.num_sge,
-+                               (union ibv_gid *)wqe->hdr.wr.ud.av.dgid,
-+                               wqe->hdr.wr.ud.remote_qpn,
-+                               wqe->hdr.wr.ud.remote_qkey, comp_ctx);
-+
-+        pvrdma_ring_read_inc(ring);
-+
-+        wqe = pvrdma_ring_next_elem_read(ring);
-+    }
-+
-+    return 0;
-+}
-+
-+int pvrdma_qp_recv(PVRDMADev *dev, __u32 qp_handle)
-+{
-+    RdmaRmQP *qp;
-+    PvrdmaRqWqe *wqe;
-+    PvrdmaRing *ring;
-+
-+    pr_dbg("qp_handle=%d\n", qp_handle);
-+
-+    qp = rdma_rm_get_qp(&dev->rdma_dev_res, qp_handle);
-+    if (unlikely(!qp)) {
-+        return -EINVAL;
-+    }
-+
-+    ring = &((PvrdmaRing *)qp->opaque)[1];
-+    pr_dbg("rring=%p\n", ring);
-+
-+    wqe = (struct PvrdmaRqWqe *)pvrdma_ring_next_elem_read(ring);
-+    while (wqe) {
-+        CompHandlerCtx *comp_ctx;
-+
-+        pr_dbg("wr_id=%lld\n", wqe->hdr.wr_id);
-+
-+        /* Prepare CQE */
-+        comp_ctx = malloc(sizeof(CompHandlerCtx));
-+        comp_ctx->dev = dev;
-+        comp_ctx->cq_handle = qp->recv_cq_handle;
-+        comp_ctx->cqe.qp = qp_handle;
-+        comp_ctx->cqe.wr_id = wqe->hdr.wr_id;
-+
-+        rdma_backend_post_recv(&dev->backend_dev, &dev->rdma_dev_res,
-+                               &qp->backend_qp, qp->qp_type,
-+                               (struct ibv_sge *)&wqe->sge[0], wqe->hdr.num_sge,
-+                               comp_ctx);
-+
-+        pvrdma_ring_read_inc(ring);
-+
-+        wqe = pvrdma_ring_next_elem_read(ring);
-+    }
-+
-+    return 0;
-+}
-+
-+void pvrdma_cq_poll(RdmaDeviceResources *dev_res, __u32 cq_handle)
-+{
-+    RdmaRmCQ *cq;
-+
-+    cq = rdma_rm_get_cq(dev_res, cq_handle);
-+    if (!cq) {
-+        pr_dbg("Invalid CQ# %d\n", cq_handle);
-+    }
-+
-+    rdma_backend_poll_cq(dev_res, &cq->backend_cq);
-+}
-diff --git a/hw/rdma/vmw/pvrdma_qp_ops.h b/hw/rdma/vmw/pvrdma_qp_ops.h
-new file mode 100644
-index 0000000000..61ec036835
---- /dev/null
-+++ b/hw/rdma/vmw/pvrdma_qp_ops.h
-@@ -0,0 +1,27 @@
-+/*
-+ * QEMU VMWARE paravirtual RDMA QP Operations
-+ *
-+ * Copyright (C) 2018 Oracle
-+ * Copyright (C) 2018 Red Hat Inc
-+ *
-+ * Authors:
-+ *     Yuval Shaia <yuval.shaia@oracle.com>
-+ *     Marcel Apfelbaum <marcel@redhat.com>
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2.
-+ * See the COPYING file in the top-level directory.
-+ *
-+ */
-+
-+#ifndef PVRDMA_QP_H
-+#define PVRDMA_QP_H
-+
-+#include "pvrdma.h"
-+
-+int pvrdma_qp_ops_init(void);
-+void pvrdma_qp_ops_fini(void);
-+int pvrdma_qp_send(PVRDMADev *dev, __u32 qp_handle);
-+int pvrdma_qp_recv(PVRDMADev *dev, __u32 qp_handle);
-+void pvrdma_cq_poll(RdmaDeviceResources *dev_res, __u32 cq_handle);
-+
-+#endif
-diff --git a/hw/rdma/vmw/pvrdma_ring.h b/hw/rdma/vmw/pvrdma_ring.h
-new file mode 100644
-index 0000000000..c616cc586c
---- /dev/null
-+++ b/hw/rdma/vmw/pvrdma_ring.h
-@@ -0,0 +1,134 @@
-+/*
-+ * Copyright (c) 2012-2016 VMware, Inc.  All rights reserved.
-+ *
-+ * This program is free software; you can redistribute it and/or
-+ * modify it under the terms of EITHER the GNU General Public License
-+ * version 2 as published by the Free Software Foundation or the BSD
-+ * 2-Clause License. This program is distributed in the hope that it
-+ * will be useful, but WITHOUT ANY WARRANTY; WITHOUT EVEN THE IMPLIED
-+ * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
-+ * See the GNU General Public License version 2 for more details at
-+ * http://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html.
-+ *
-+ * You should have received a copy of the GNU General Public License
-+ * along with this program available in the file COPYING in the main
-+ * directory of this source tree.
-+ *
-+ * The BSD 2-Clause License
-+ *
-+ *     Redistribution and use in source and binary forms, with or
-+ *     without modification, are permitted provided that the following
-+ *     conditions are met:
-+ *
-+ *      - Redistributions of source code must retain the above
-+ *        copyright notice, this list of conditions and the following
-+ *        disclaimer.
-+ *
-+ *      - Redistributions in binary form must reproduce the above
-+ *        copyright notice, this list of conditions and the following
-+ *        disclaimer in the documentation and/or other materials
-+ *        provided with the distribution.
-+ *
-+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
-+ * FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
-+ * COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
-+ * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
-+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
-+ * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
-+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
-+ * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
-+ * OF THE POSSIBILITY OF SUCH DAMAGE.
-+ */
-+
-+#ifndef PVRDMA_RING_H
-+#define PVRDMA_RING_H
-+
-+#include <qemu/atomic.h>
-+#include <linux/types.h>
-+
-+#define PVRDMA_INVALID_IDX -1 /* Invalid index. */
-+
-+struct pvrdma_ring {
-+    int prod_tail;  /* Producer tail. */
-+    int cons_head;  /* Consumer head. */
-+};
-+
-+struct pvrdma_ring_state {
-+    struct pvrdma_ring tx; /* Tx ring. */
-+    struct pvrdma_ring rx; /* Rx ring. */
-+};
-+
-+static inline int pvrdma_idx_valid(__u32 idx, __u32 max_elems)
-+{
-+    /* Generates fewer instructions than a less-than. */
-+    return (idx & ~((max_elems << 1) - 1)) == 0;
-+}
-+
-+static inline __s32 pvrdma_idx(int *var, __u32 max_elems)
-+{
-+    const unsigned int idx = atomic_read(var);
-+
-+    if (pvrdma_idx_valid(idx, max_elems)) {
-+        return idx & (max_elems - 1);
-+    }
-+    return PVRDMA_INVALID_IDX;
-+}
-+
-+static inline void pvrdma_idx_ring_inc(int *var, __u32 max_elems)
-+{
-+    __u32 idx = atomic_read(var) + 1; /* Increment. */
-+
-+    idx &= (max_elems << 1) - 1; /* Modulo size, flip gen. */
-+    atomic_set(var, idx);
-+}
-+
-+static inline __s32 pvrdma_idx_ring_has_space(const struct pvrdma_ring *r,
-+                                              __u32 max_elems, __u32 *out_tail)
-+{
-+    const __u32 tail = atomic_read(&r->prod_tail);
-+    const __u32 head = atomic_read(&r->cons_head);
-+
-+    if (pvrdma_idx_valid(tail, max_elems) &&
-+        pvrdma_idx_valid(head, max_elems)) {
-+        *out_tail = tail & (max_elems - 1);
-+        return tail != (head ^ max_elems);
-+    }
-+    return PVRDMA_INVALID_IDX;
-+}
-+
-+static inline __s32 pvrdma_idx_ring_has_data(const struct pvrdma_ring *r,
-+                                             __u32 max_elems, __u32 *out_head)
-+{
-+    const __u32 tail = atomic_read(&r->prod_tail);
-+    const __u32 head = atomic_read(&r->cons_head);
-+
-+    if (pvrdma_idx_valid(tail, max_elems) &&
-+        pvrdma_idx_valid(head, max_elems)) {
-+        *out_head = head & (max_elems - 1);
-+        return tail != head;
-+    }
-+    return PVRDMA_INVALID_IDX;
-+}
-+
-+static inline bool pvrdma_idx_ring_is_valid_idx(const struct pvrdma_ring *r,
-+                                                __u32 max_elems, __u32 *idx)
-+{
-+    const __u32 tail = atomic_read(&r->prod_tail);
-+    const __u32 head = atomic_read(&r->cons_head);
-+
-+    if (pvrdma_idx_valid(tail, max_elems) &&
-+        pvrdma_idx_valid(head, max_elems) &&
-+        pvrdma_idx_valid(*idx, max_elems)) {
-+        if (tail > head && (*idx < tail && *idx >= head)) {
-+            return true;
-+        } else if (head > tail && (*idx >= head || *idx < tail)) {
-+            return true;
-+        }
-+    }
-+    return false;
-+}
-+
-+#endif /* PVRDMA_RING_H */
-diff --git a/hw/rdma/vmw/pvrdma_types.h b/hw/rdma/vmw/pvrdma_types.h
-new file mode 100644
-index 0000000000..6cd2c81019
---- /dev/null
-+++ b/hw/rdma/vmw/pvrdma_types.h
-@@ -0,0 +1,38 @@
-+/*
-+ * QEMU VMWARE paravirtual RDMA interface definitions
-+ *
-+ * Copyright (C) 2018 Oracle
-+ * Copyright (C) 2018 Red Hat Inc
-+ *
-+ * Authors:
-+ *     Yuval Shaia <yuval.shaia@oracle.com>
-+ *     Marcel Apfelbaum <marcel@redhat.com>
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2.
-+ * See the COPYING file in the top-level directory.
-+ *
-+ */
-+
-+#ifndef PVRDMA_TYPES_H
-+#define PVRDMA_TYPES_H
-+
-+/* TDOD: All defs here should be removed !!! */
-+
-+#include <stdbool.h>
-+#include <stdint.h>
-+#include <asm-generic/int-ll64.h>
-+#include <include/sysemu/dma.h>
-+#include <linux/types.h>
-+
-+typedef unsigned char uint8_t;
-+typedef uint8_t           u8;
-+typedef u8                __u8;
-+typedef unsigned short    u16;
-+typedef u16               __u16;
-+typedef uint32_t          u32;
-+typedef u32               __u32;
-+typedef int32_t           __s32;
-+typedef uint64_t          u64;
-+typedef __u64 __bitwise   __be64;
-+
-+#endif
-diff --git a/hw/rdma/vmw/pvrdma_utils.c b/hw/rdma/vmw/pvrdma_utils.c
-new file mode 100644
-index 0000000000..a84a2819d3
---- /dev/null
-+++ b/hw/rdma/vmw/pvrdma_utils.c
-@@ -0,0 +1,135 @@
-+#include <qemu/osdep.h>
-+#include <qemu/error-report.h>
-+
-+#include <cpu.h>
-+#include "../rdma_utils.h"
-+#include "pvrdma_utils.h"
-+
-+void pvrdma_pci_dma_unmap(PCIDevice *dev, void *buffer, dma_addr_t len)
-+{
-+    pr_dbg("%p\n", buffer);
-+    if (buffer) {
-+        pci_dma_unmap(dev, buffer, len, DMA_DIRECTION_TO_DEVICE, 0);
-+    }
-+}
-+
-+void *pvrdma_pci_dma_map(PCIDevice *dev, dma_addr_t addr, dma_addr_t plen)
-+{
-+    void *p;
-+    hwaddr len = plen;
-+
-+    if (!addr) {
-+        pr_dbg("addr is NULL\n");
-+        return NULL;
-+    }
-+
-+    p = pci_dma_map(dev, addr, &len, DMA_DIRECTION_TO_DEVICE);
-+    if (!p) {
-+        pr_dbg("Fail in pci_dma_map, addr=0x%llx, len=%ld\n",
-+               (long long unsigned int)addr, len);
-+        return NULL;
-+    }
-+
-+    if (len != plen) {
-+        pvrdma_pci_dma_unmap(dev, p, len);
-+        return NULL;
-+    }
-+
-+    pr_dbg("0x%llx -> %p (len=%ld)\n", (long long unsigned int)addr, p, len);
-+
-+    return p;
-+}
-+
-+void *pvrdma_map_to_pdir(PCIDevice *pdev, uint64_t pdir_dma, uint32_t nchunks,
-+                         size_t length)
-+{
-+    uint64_t *dir = NULL, *tbl = NULL;
-+    int tbl_idx, dir_idx, addr_idx;
-+    void *host_virt = NULL, *curr_page;
-+
-+    if (!nchunks) {
-+        pr_dbg("nchunks=0\n");
-+        goto out;
-+    }
-+
-+    dir = pvrdma_pci_dma_map(pdev, pdir_dma, TARGET_PAGE_SIZE);
-+    if (!dir) {
-+        error_report("PVRDMA: Fail to map to page directory");
-+        goto out;
-+    }
-+
-+    tbl = pvrdma_pci_dma_map(pdev, dir[0], TARGET_PAGE_SIZE);
-+    if (!tbl) {
-+        error_report("PVRDMA: Fail to map to page table 0");
-+        goto out_unmap_dir;
-+    }
-+
-+    curr_page = pvrdma_pci_dma_map(pdev, (dma_addr_t)tbl[0], TARGET_PAGE_SIZE);
-+    if (!curr_page) {
-+        error_report("PVRDMA: Fail to map the first page");
-+        goto out_unmap_tbl;
-+    }
-+
-+    host_virt = mremap(curr_page, 0, length, MREMAP_MAYMOVE);
-+    if (host_virt == MAP_FAILED) {
-+        host_virt = NULL;
-+        error_report("PVRDMA: Fail to remap memory for host_virt");
-+        goto out_unmap_tbl;
-+    }
-+
-+    pvrdma_pci_dma_unmap(pdev, curr_page, TARGET_PAGE_SIZE);
-+
-+    pr_dbg("host_virt=%p\n", host_virt);
-+
-+    dir_idx = 0;
-+    tbl_idx = 1;
-+    addr_idx = 1;
-+    while (addr_idx < nchunks) {
-+        if ((tbl_idx == (TARGET_PAGE_SIZE / sizeof(uint64_t)))) {
-+            tbl_idx = 0;
-+            dir_idx++;
-+            pr_dbg("Mapping to table %d\n", dir_idx);
-+            pvrdma_pci_dma_unmap(pdev, tbl, TARGET_PAGE_SIZE);
-+            tbl = pvrdma_pci_dma_map(pdev, dir[dir_idx], TARGET_PAGE_SIZE);
-+            if (!tbl) {
-+                error_report("PVRDMA: Fail to map to page table %d", dir_idx);
-+                goto out_unmap_host_virt;
-+            }
-+        }
-+
-+        pr_dbg("guest_dma[%d]=0x%lx\n", addr_idx, tbl[tbl_idx]);
-+
-+        curr_page = pvrdma_pci_dma_map(pdev, (dma_addr_t)tbl[tbl_idx],
-+                                       TARGET_PAGE_SIZE);
-+        if (!curr_page) {
-+            error_report("PVRDMA: Fail to map to page %d, dir %d", tbl_idx,
-+                         dir_idx);
-+            goto out_unmap_host_virt;
-+        }
-+
-+        mremap(curr_page, 0, TARGET_PAGE_SIZE, MREMAP_MAYMOVE | MREMAP_FIXED,
-+               host_virt + TARGET_PAGE_SIZE * addr_idx);
-+
-+        pvrdma_pci_dma_unmap(pdev, curr_page, TARGET_PAGE_SIZE);
-+
-+        addr_idx++;
-+
-+        tbl_idx++;
-+    }
-+
-+    goto out_unmap_tbl;
-+
-+out_unmap_host_virt:
-+    munmap(host_virt, length);
-+    host_virt = NULL;
-+
-+out_unmap_tbl:
-+    pvrdma_pci_dma_unmap(pdev, tbl, TARGET_PAGE_SIZE);
-+
-+out_unmap_dir:
-+    pvrdma_pci_dma_unmap(pdev, dir, TARGET_PAGE_SIZE);
-+
-+out:
-+    return host_virt;
-+
-+}
-diff --git a/hw/rdma/vmw/pvrdma_utils.h b/hw/rdma/vmw/pvrdma_utils.h
-new file mode 100644
-index 0000000000..d0d902b24d
---- /dev/null
-+++ b/hw/rdma/vmw/pvrdma_utils.h
-@@ -0,0 +1,26 @@
-+/*
-+ * QEMU VMWARE paravirtual RDMA address mapping utilities
-+ *
-+ * Copyright (C) 2018 Oracle
-+ * Copyright (C) 2018 Red Hat Inc
-+ *
-+ * Authors:
-+ *     Yuval Shaia <yuval.shaia@oracle.com>
-+ *     Marcel Apfelbaum <marcel@redhat.com>
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2.
-+ * See the COPYING file in the top-level directory.
-+ *
-+ */
-+
-+#ifndef PVRDMA_UTILS_H
-+#define PVRDMA_UTILS_H
-+
-+#include <include/hw/pci/pci.h>
-+
-+void pvrdma_pci_dma_unmap(PCIDevice *dev, void *buffer, dma_addr_t len);
-+void *pvrdma_pci_dma_map(PCIDevice *dev, dma_addr_t addr, dma_addr_t plen);
-+void *pvrdma_map_to_pdir(PCIDevice *pdev, uint64_t pdir_dma, uint32_t nchunks,
-+                         size_t length);
-+
-+#endif
-diff --git a/hw/rdma/vmw/trace-events b/hw/rdma/vmw/trace-events
-new file mode 100644
-index 0000000000..dd4dde311e
---- /dev/null
-+++ b/hw/rdma/vmw/trace-events
-@@ -0,0 +1,5 @@
-+# See docs/tracing.txt for syntax documentation.
-+
-+# hw/rdma/vmw/pvrdma_main.c
-+pvrdma_regs_read(uint64_t addr, uint64_t val) "regs[0x%lx] = 0x%lx"
-+pvrdma_regs_write(uint64_t addr, uint64_t val) "regs[0x%lx] = 0x%lx"
-diff --git a/include/hw/pci/pci_ids.h b/include/hw/pci/pci_ids.h
-index 35df1874a9..1dbf53627c 100644
---- a/include/hw/pci/pci_ids.h
-+++ b/include/hw/pci/pci_ids.h
-@@ -266,4 +266,7 @@
- #define PCI_VENDOR_ID_TEWS               0x1498
- #define PCI_DEVICE_ID_TEWS_TPCI200       0x30C8
- 
-+#define PCI_VENDOR_ID_VMWARE             0x15ad
-+#define PCI_DEVICE_ID_VMWARE_PVRDMA      0x0820
-+
- #endif
--- 
-2.13.5
+SGksCgpUaGlzIHNlcmllcyBmYWlsZWQgYXV0b21hdGljIGJ1aWxkIHRlc3QuIFBsZWFzZSBmaW5k
+IHRoZSB0ZXN0aW5nIGNvbW1hbmRzIGFuZAp0aGVpciBvdXRwdXQgYmVsb3cuIElmIHlvdSBoYXZl
+IGRvY2tlciBpbnN0YWxsZWQsIHlvdSBjYW4gcHJvYmFibHkgcmVwcm9kdWNlIGl0CmxvY2FsbHku
+CgpUeXBlOiBzZXJpZXMKTWVzc2FnZS1pZDogMjAxODAxMDMxMDI5MTEuMzU1NjItMS1tYXJjZWxA
+cmVkaGF0LmNvbQpTdWJqZWN0OiBbUWVtdS1kZXZlbF0gW1BBVENIIFYzIDAvNV0gaHcvcHZyZG1h
+OiBQVlJETUEgZGV2aWNlIGltcGxlbWVudGF0aW9uCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09
+CiMhL2Jpbi9iYXNoCnNldCAtZQpnaXQgc3VibW9kdWxlIHVwZGF0ZSAtLWluaXQgZHRjCiMgTGV0
+IGRvY2tlciB0ZXN0cyBkdW1wIGVudmlyb25tZW50IGluZm8KZXhwb3J0IFNIT1dfRU5WPTEKZXhw
+b3J0IEo9OAp0aW1lIG1ha2UgZG9ja2VyLXRlc3QtcXVpY2tAY2VudG9zNgp0aW1lIG1ha2UgZG9j
+a2VyLXRlc3QtYnVpbGRAbWluLWdsaWIKdGltZSBtYWtlIGRvY2tlci10ZXN0LW1pbmd3QGZlZG9y
+YQojIGlvdGVzdHMgaXMgYnJva2VuIG5vdywgc2tpcAojIHRpbWUgbWFrZSBkb2NrZXItdGVzdC1i
+bG9ja0BmZWRvcmEKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIx
+ZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKRnJvbSBodHRwczovL2dpdGh1Yi5jb20vcGF0
+Y2hldy1wcm9qZWN0L3FlbXUKIHQgW3RhZyB1cGRhdGVdICAgICAgICAgICAgcGF0Y2hldy8yMDE4
+MDEwMzA1NDA0My4yNTcxOS0xLXBldGVyeEByZWRoYXQuY29tIC0+IHBhdGNoZXcvMjAxODAxMDMw
+NTQwNDMuMjU3MTktMS1wZXRlcnhAcmVkaGF0LmNvbQogKiBbbmV3IHRhZ10gICAgICAgICAgICAg
+ICBwYXRjaGV3LzIwMTgwMTAzMTAyOTExLjM1NTYyLTEtbWFyY2VsQHJlZGhhdC5jb20gLT4gcGF0
+Y2hldy8yMDE4MDEwMzEwMjkxMS4zNTU2Mi0xLW1hcmNlbEByZWRoYXQuY29tClN3aXRjaGVkIHRv
+IGEgbmV3IGJyYW5jaCAndGVzdCcKYzFhYzI1Mjc1NCBNQUlOVEFJTkVSUzogYWRkIGVudHJ5IGZv
+ciBody9yZG1hCjQzZjRjMGQxZDIgcHZyZG1hOiBpbml0aWFsIGltcGxlbWVudGF0aW9uCmExZmY1
+OTczYmUgZG9jczogYWRkIHB2cmRtYSBkZXZpY2UgZG9jdW1lbnRhdGlvbi4KM2NiMTA2ODk2OSBt
+ZW06IGFkZCBzaGFyZSBwYXJhbWV0ZXIgdG8gbWVtb3J5LWJhY2tlbmQtcmFtCmRlZjUxMzJmMDkg
+cGNpL3NocGM6IE1vdmUgZnVuY3Rpb24gdG8gZ2VuZXJpYyBoZWFkZXIgZmlsZQoKPT09IE9VVFBV
+VCBCRUdJTiA9PT0KU3VibW9kdWxlICdkdGMnIChnaXQ6Ly9naXQucWVtdS1wcm9qZWN0Lm9yZy9k
+dGMuZ2l0KSByZWdpc3RlcmVkIGZvciBwYXRoICdkdGMnCkNsb25pbmcgaW50byAnL3Zhci90bXAv
+cGF0Y2hldy10ZXN0ZXItdG1wLTB4ZDE3bGkzL3NyYy9kdGMnLi4uClN1Ym1vZHVsZSBwYXRoICdk
+dGMnOiBjaGVja2VkIG91dCAnNTU4Y2Q4MWJkZDQzMjc2OWI1OWJmZjAxMjQwYzQ0ZjgyY2ZiMWE5
+ZCcKICBCVUlMRCAgIGNlbnRvczYKbWFrZVsxXTogRW50ZXJpbmcgZGlyZWN0b3J5ICcvdmFyL3Rt
+cC9wYXRjaGV3LXRlc3Rlci10bXAtMHhkMTdsaTMvc3JjJwogIEdFTiAgICAgL3Zhci90bXAvcGF0
+Y2hldy10ZXN0ZXItdG1wLTB4ZDE3bGkzL3NyYy9kb2NrZXItc3JjLjIwMTgtMDEtMDMtMDUuMzcu
+MDkuNDcwNC9xZW11LnRhcgpDbG9uaW5nIGludG8gJy92YXIvdG1wL3BhdGNoZXctdGVzdGVyLXRt
+cC0weGQxN2xpMy9zcmMvZG9ja2VyLXNyYy4yMDE4LTAxLTAzLTA1LjM3LjA5LjQ3MDQvcWVtdS50
+YXIudnJvb3QnLi4uCmRvbmUuCkNoZWNraW5nIG91dCBmaWxlczogIDQ5JSAoMjgzNy81NzA2KSAg
+IApDaGVja2luZyBvdXQgZmlsZXM6ICA1MCUgKDI4NTMvNTcwNikgICAKQ2hlY2tpbmcgb3V0IGZp
+bGVzOiAgNTElICgyOTExLzU3MDYpICAgCkNoZWNraW5nIG91dCBmaWxlczogIDUyJSAoMjk2OC81
+NzA2KSAgIApDaGVja2luZyBvdXQgZmlsZXM6ICA1MyUgKDMwMjUvNTcwNikgICAKQ2hlY2tpbmcg
+b3V0IGZpbGVzOiAgNTQlICgzMDgyLzU3MDYpICAgCkNoZWNraW5nIG91dCBmaWxlczogIDU1JSAo
+MzEzOS81NzA2KSAgIApDaGVja2luZyBvdXQgZmlsZXM6ICA1NiUgKDMxOTYvNTcwNikgICAKQ2hl
+Y2tpbmcgb3V0IGZpbGVzOiAgNTclICgzMjUzLzU3MDYpICAgCkNoZWNraW5nIG91dCBmaWxlczog
+IDU4JSAoMzMxMC81NzA2KSAgIApDaGVja2luZyBvdXQgZmlsZXM6ICA1OSUgKDMzNjcvNTcwNikg
+ICAKQ2hlY2tpbmcgb3V0IGZpbGVzOiAgNjAlICgzNDI0LzU3MDYpICAgCkNoZWNraW5nIG91dCBm
+aWxlczogIDYxJSAoMzQ4MS81NzA2KSAgIApDaGVja2luZyBvdXQgZmlsZXM6ICA2MiUgKDM1Mzgv
+NTcwNikgICAKQ2hlY2tpbmcgb3V0IGZpbGVzOiAgNjMlICgzNTk1LzU3MDYpICAgCkNoZWNraW5n
+IG91dCBmaWxlczogIDY0JSAoMzY1Mi81NzA2KSAgIApDaGVja2luZyBvdXQgZmlsZXM6ICA2NSUg
+KDM3MDkvNTcwNikgICAKQ2hlY2tpbmcgb3V0IGZpbGVzOiAgNjYlICgzNzY2LzU3MDYpICAgCkNo
+ZWNraW5nIG91dCBmaWxlczogIDY3JSAoMzgyNC81NzA2KSAgIApDaGVja2luZyBvdXQgZmlsZXM6
+ICA2OCUgKDM4ODEvNTcwNikgICAKQ2hlY2tpbmcgb3V0IGZpbGVzOiAgNjklICgzOTM4LzU3MDYp
+ICAgCkNoZWNraW5nIG91dCBmaWxlczogIDcwJSAoMzk5NS81NzA2KSAgIApDaGVja2luZyBvdXQg
+ZmlsZXM6ICA3MSUgKDQwNTIvNTcwNikgICAKQ2hlY2tpbmcgb3V0IGZpbGVzOiAgNzIlICg0MTA5
+LzU3MDYpICAgCkNoZWNraW5nIG91dCBmaWxlczogIDczJSAoNDE2Ni81NzA2KSAgIApDaGVja2lu
+ZyBvdXQgZmlsZXM6ICA3NCUgKDQyMjMvNTcwNikgICAKQ2hlY2tpbmcgb3V0IGZpbGVzOiAgNzUl
+ICg0MjgwLzU3MDYpICAgCkNoZWNraW5nIG91dCBmaWxlczogIDc2JSAoNDMzNy81NzA2KSAgIApD
+aGVja2luZyBvdXQgZmlsZXM6ICA3NyUgKDQzOTQvNTcwNikgICAKQ2hlY2tpbmcgb3V0IGZpbGVz
+OiAgNzglICg0NDUxLzU3MDYpICAgCkNoZWNraW5nIG91dCBmaWxlczogIDc5JSAoNDUwOC81NzA2
+KSAgIApDaGVja2luZyBvdXQgZmlsZXM6ICA4MCUgKDQ1NjUvNTcwNikgICAKQ2hlY2tpbmcgb3V0
+IGZpbGVzOiAgODElICg0NjIyLzU3MDYpICAgCkNoZWNraW5nIG91dCBmaWxlczogIDgyJSAoNDY3
+OS81NzA2KSAgIApDaGVja2luZyBvdXQgZmlsZXM6ICA4MyUgKDQ3MzYvNTcwNikgICAKQ2hlY2tp
+bmcgb3V0IGZpbGVzOiAgODQlICg0Nzk0LzU3MDYpICAgCkNoZWNraW5nIG91dCBmaWxlczogIDg1
+JSAoNDg1MS81NzA2KSAgIApDaGVja2luZyBvdXQgZmlsZXM6ICA4NiUgKDQ5MDgvNTcwNikgICAK
+Q2hlY2tpbmcgb3V0IGZpbGVzOiAgODclICg0OTY1LzU3MDYpICAgCkNoZWNraW5nIG91dCBmaWxl
+czogIDg4JSAoNTAyMi81NzA2KSAgIApDaGVja2luZyBvdXQgZmlsZXM6ICA4OSUgKDUwNzkvNTcw
+NikgICAKQ2hlY2tpbmcgb3V0IGZpbGVzOiAgOTAlICg1MTM2LzU3MDYpICAgCkNoZWNraW5nIG91
+dCBmaWxlczogIDkxJSAoNTE5My81NzA2KSAgIApDaGVja2luZyBvdXQgZmlsZXM6ICA5MiUgKDUy
+NTAvNTcwNikgICAKQ2hlY2tpbmcgb3V0IGZpbGVzOiAgOTMlICg1MzA3LzU3MDYpICAgCkNoZWNr
+aW5nIG91dCBmaWxlczogIDk0JSAoNTM2NC81NzA2KSAgIApDaGVja2luZyBvdXQgZmlsZXM6ICA5
+NSUgKDU0MjEvNTcwNikgICAKQ2hlY2tpbmcgb3V0IGZpbGVzOiAgOTYlICg1NDc4LzU3MDYpICAg
+CkNoZWNraW5nIG91dCBmaWxlczogIDk3JSAoNTUzNS81NzA2KSAgIApDaGVja2luZyBvdXQgZmls
+ZXM6ICA5OCUgKDU1OTIvNTcwNikgICAKQ2hlY2tpbmcgb3V0IGZpbGVzOiAgOTklICg1NjQ5LzU3
+MDYpICAgCkNoZWNraW5nIG91dCBmaWxlczogMTAwJSAoNTcwNi81NzA2KSAgIApDaGVja2luZyBv
+dXQgZmlsZXM6IDEwMCUgKDU3MDYvNTcwNiksIGRvbmUuCllvdXIgYnJhbmNoIGlzIHVwLXRvLWRh
+dGUgd2l0aCAnb3JpZ2luL3Rlc3QnLgpTdWJtb2R1bGUgJ2R0YycgKGdpdDovL2dpdC5xZW11LXBy
+b2plY3Qub3JnL2R0Yy5naXQpIHJlZ2lzdGVyZWQgZm9yIHBhdGggJ2R0YycKQ2xvbmluZyBpbnRv
+ICcvdmFyL3RtcC9wYXRjaGV3LXRlc3Rlci10bXAtMHhkMTdsaTMvc3JjL2RvY2tlci1zcmMuMjAx
+OC0wMS0wMy0wNS4zNy4wOS40NzA0L3FlbXUudGFyLnZyb290L2R0YycuLi4KU3VibW9kdWxlIHBh
+dGggJ2R0Yyc6IGNoZWNrZWQgb3V0ICc1NThjZDgxYmRkNDMyNzY5YjU5YmZmMDEyNDBjNDRmODJj
+ZmIxYTlkJwpTdWJtb2R1bGUgJ3VpL2tleWNvZGVtYXBkYicgKGdpdDovL2dpdC5xZW11Lm9yZy9r
+ZXljb2RlbWFwZGIuZ2l0KSByZWdpc3RlcmVkIGZvciBwYXRoICd1aS9rZXljb2RlbWFwZGInCkNs
+b25pbmcgaW50byAnL3Zhci90bXAvcGF0Y2hldy10ZXN0ZXItdG1wLTB4ZDE3bGkzL3NyYy9kb2Nr
+ZXItc3JjLjIwMTgtMDEtMDMtMDUuMzcuMDkuNDcwNC9xZW11LnRhci52cm9vdC91aS9rZXljb2Rl
+bWFwZGInLi4uClN1Ym1vZHVsZSBwYXRoICd1aS9rZXljb2RlbWFwZGInOiBjaGVja2VkIG91dCAn
+MTA3MzlhYTI2MDUxYTVkNDlkODgxMzI2MDQ1MzlkM2VkMDg1ZTcyZScKICBDT1BZICAgIFJVTk5F
+UgogICAgUlVOIHRlc3QtcXVpY2sgaW4gcWVtdTpjZW50b3M2IApQYWNrYWdlcyBpbnN0YWxsZWQ6
+ClNETC1kZXZlbC0xLjIuMTQtNy5lbDZfNy4xLng4Nl82NApiaXNvbi0yLjQuMS01LmVsNi54ODZf
+NjQKYnppcDItZGV2ZWwtMS4wLjUtNy5lbDZfMC54ODZfNjQKY2NhY2hlLTMuMS42LTIuZWw2Lng4
+Nl82NApjc25hcHB5LWRldmVsLTAtNi4yMDE1MDcyOWdpdGQ3YmM2ODMuZWw2Lng4Nl82NApmbGV4
+LTIuNS4zNS05LmVsNi54ODZfNjQKZ2NjLTQuNC43LTE4LmVsNi54ODZfNjQKZ2V0dGV4dC0wLjE3
+LTE4LmVsNi54ODZfNjQKZ2l0LTEuNy4xLTkuZWw2XzkueDg2XzY0CmdsaWIyLWRldmVsLTIuMjgu
+OC05LmVsNi54ODZfNjQKbGliZXBveHktZGV2ZWwtMS4yLTMuZWw2Lng4Nl82NApsaWJmZHQtZGV2
+ZWwtMS40LjAtMS5lbDYueDg2XzY0CmxpYnJkbWFjbS1kZXZlbC0xLjAuMjEtMC5lbDYueDg2XzY0
+Cmx6by1kZXZlbC0yLjAzLTMuMS5lbDZfNS4xLng4Nl82NAptYWtlLTMuODEtMjMuZWw2Lng4Nl82
+NAptZXNhLWxpYkVHTC1kZXZlbC0xMS4wLjctNC5lbDYueDg2XzY0Cm1lc2EtbGliZ2JtLWRldmVs
+LTExLjAuNy00LmVsNi54ODZfNjQKcGFja2FnZSBnKysgaXMgbm90IGluc3RhbGxlZApwaXhtYW4t
+ZGV2ZWwtMC4zMi44LTEuZWw2Lng4Nl82NApzcGljZS1nbGliLWRldmVsLTAuMjYtOC5lbDYueDg2
+XzY0CnNwaWNlLXNlcnZlci1kZXZlbC0wLjEyLjQtMTYuZWw2Lng4Nl82NAp0YXItMS4yMy0xNS5l
+bDZfOC54ODZfNjQKdnRlLWRldmVsLTAuMjUuMS05LmVsNi54ODZfNjQKeGVuLWRldmVsLTQuNi42
+LTIuZWw2Lng4Nl82NAp6bGliLWRldmVsLTEuMi4zLTI5LmVsNi54ODZfNjQKCkVudmlyb25tZW50
+IHZhcmlhYmxlczoKUEFDS0FHRVM9Ymlzb24gICAgIGJ6aXAyLWRldmVsICAgICBjY2FjaGUgICAg
+IGNzbmFwcHktZGV2ZWwgICAgIGZsZXggICAgIGcrKyAgICAgZ2NjICAgICBnZXR0ZXh0ICAgICBn
+aXQgICAgIGdsaWIyLWRldmVsICAgICBsaWJlcG94eS1kZXZlbCAgICAgbGliZmR0LWRldmVsICAg
+ICBsaWJyZG1hY20tZGV2ZWwgICAgIGx6by1kZXZlbCAgICAgbWFrZSAgICAgbWVzYS1saWJFR0wt
+ZGV2ZWwgICAgIG1lc2EtbGliZ2JtLWRldmVsICAgICBwaXhtYW4tZGV2ZWwgICAgIFNETC1kZXZl
+bCAgICAgc3BpY2UtZ2xpYi1kZXZlbCAgICAgc3BpY2Utc2VydmVyLWRldmVsICAgICB0YXIgICAg
+IHZ0ZS1kZXZlbCAgICAgeGVuLWRldmVsICAgICB6bGliLWRldmVsCkhPU1ROQU1FPTI2ZTcxODhl
+ODJjZQpNQUtFRkxBR1M9IC1qOApKPTgKQ0NBQ0hFX0RJUj0vdmFyL3RtcC9jY2FjaGUKRVhUUkFf
+Q09ORklHVVJFX09QVFM9ClY9ClNIT1dfRU5WPTEKUEFUSD0vdXNyL2xpYi9jY2FjaGU6L3Vzci9s
+aWI2NC9jY2FjaGU6L3Vzci9sb2NhbC9zYmluOi91c3IvbG9jYWwvYmluOi91c3Ivc2JpbjovdXNy
+L2Jpbjovc2JpbjovYmluClBXRD0vClRBUkdFVF9MSVNUPQpTSExWTD0xCkhPTUU9L3Jvb3QKVEVT
+VF9ESVI9L3RtcC9xZW11LXRlc3QKRkVBVFVSRVM9IGR0YwpERUJVRz0KXz0vdXNyL2Jpbi9lbnYK
+CkNvbmZpZ3VyZSBvcHRpb25zOgotLWVuYWJsZS13ZXJyb3IgLS10YXJnZXQtbGlzdD14ODZfNjQt
+c29mdG1tdSxhYXJjaDY0LXNvZnRtbXUgLS1wcmVmaXg9L3RtcC9xZW11LXRlc3QvaW5zdGFsbApO
+byBDKysgY29tcGlsZXIgYXZhaWxhYmxlOyBkaXNhYmxpbmcgQysrIHNwZWNpZmljIG9wdGlvbmFs
+IGNvZGUKSW5zdGFsbCBwcmVmaXggICAgL3RtcC9xZW11LXRlc3QvaW5zdGFsbApCSU9TIGRpcmVj
+dG9yeSAgICAvdG1wL3FlbXUtdGVzdC9pbnN0YWxsL3NoYXJlL3FlbXUKZmlybXdhcmUgcGF0aCAg
+ICAgL3RtcC9xZW11LXRlc3QvaW5zdGFsbC9zaGFyZS9xZW11LWZpcm13YXJlCmJpbmFyeSBkaXJl
+Y3RvcnkgIC90bXAvcWVtdS10ZXN0L2luc3RhbGwvYmluCmxpYnJhcnkgZGlyZWN0b3J5IC90bXAv
+cWVtdS10ZXN0L2luc3RhbGwvbGliCm1vZHVsZSBkaXJlY3RvcnkgIC90bXAvcWVtdS10ZXN0L2lu
+c3RhbGwvbGliL3FlbXUKbGliZXhlYyBkaXJlY3RvcnkgL3RtcC9xZW11LXRlc3QvaW5zdGFsbC9s
+aWJleGVjCmluY2x1ZGUgZGlyZWN0b3J5IC90bXAvcWVtdS10ZXN0L2luc3RhbGwvaW5jbHVkZQpj
+b25maWcgZGlyZWN0b3J5ICAvdG1wL3FlbXUtdGVzdC9pbnN0YWxsL2V0Ywpsb2NhbCBzdGF0ZSBk
+aXJlY3RvcnkgICAvdG1wL3FlbXUtdGVzdC9pbnN0YWxsL3ZhcgpNYW51YWwgZGlyZWN0b3J5ICAv
+dG1wL3FlbXUtdGVzdC9pbnN0YWxsL3NoYXJlL21hbgpFTEYgaW50ZXJwIHByZWZpeCAvdXNyL2du
+ZW11bC9xZW11LSVNClNvdXJjZSBwYXRoICAgICAgIC90bXAvcWVtdS10ZXN0L3NyYwpHSVQgYmlu
+YXJ5ICAgICAgICBnaXQKR0lUIHN1Ym1vZHVsZXMgICAgCkMgY29tcGlsZXIgICAgICAgIGNjCkhv
+c3QgQyBjb21waWxlciAgIGNjCkMrKyBjb21waWxlciAgICAgIApPYmplY3RpdmUtQyBjb21waWxl
+ciBjYwpBUkZMQUdTICAgICAgICAgICBydgpDRkxBR1MgICAgICAgICAgICAtTzIgLVVfRk9SVElG
+WV9TT1VSQ0UgLURfRk9SVElGWV9TT1VSQ0U9MiAtZyAKUUVNVV9DRkxBR1MgICAgICAgLUkvdXNy
+L2luY2x1ZGUvcGl4bWFuLTEgICAtSSQoU1JDX1BBVEgpL2R0Yy9saWJmZHQgLXB0aHJlYWQgLUkv
+dXNyL2luY2x1ZGUvZ2xpYi0yLjAgLUkvdXNyL2xpYjY0L2dsaWItMi4wL2luY2x1ZGUgICAtRE5D
+VVJTRVNfV0lERUNIQVIgICAtZlBJRSAtRFBJRSAtbTY0IC1tY3gxNiAtRF9HTlVfU09VUkNFIC1E
+X0ZJTEVfT0ZGU0VUX0JJVFM9NjQgLURfTEFSR0VGSUxFX1NPVVJDRSAtV3N0cmljdC1wcm90b3R5
+cGVzIC1XcmVkdW5kYW50LWRlY2xzIC1XYWxsIC1XdW5kZWYgLVd3cml0ZS1zdHJpbmdzIC1XbWlz
+c2luZy1wcm90b3R5cGVzIC1mbm8tc3RyaWN0LWFsaWFzaW5nIC1mbm8tY29tbW9uIC1md3JhcHYg
+IC1XZW5kaWYtbGFiZWxzIC1Xbm8tbWlzc2luZy1pbmNsdWRlLWRpcnMgLVdlbXB0eS1ib2R5IC1X
+bmVzdGVkLWV4dGVybnMgLVdmb3JtYXQtc2VjdXJpdHkgLVdmb3JtYXQteTJrIC1XaW5pdC1zZWxm
+IC1XaWdub3JlZC1xdWFsaWZpZXJzIC1Xb2xkLXN0eWxlLWRlY2xhcmF0aW9uIC1Xb2xkLXN0eWxl
+LWRlZmluaXRpb24gLVd0eXBlLWxpbWl0cyAtZnN0YWNrLXByb3RlY3Rvci1hbGwgLVduby1taXNz
+aW5nLWJyYWNlcyAgLUkvdXNyL2luY2x1ZGUvbGlicG5nMTIgICAtSS91c3IvaW5jbHVkZS9saWJk
+cm0gICAgIC1JL3Vzci9pbmNsdWRlL3NwaWNlLXNlcnZlciAtSS91c3IvaW5jbHVkZS9jYWNhcmQg
+LUkvdXNyL2luY2x1ZGUvZ2xpYi0yLjAgLUkvdXNyL2xpYjY0L2dsaWItMi4wL2luY2x1ZGUgLUkv
+dXNyL2luY2x1ZGUvcGl4bWFuLTEgLUkvdXNyL2luY2x1ZGUvbnNzMyAtSS91c3IvaW5jbHVkZS9u
+c3ByNCAtSS91c3IvaW5jbHVkZS9zcGljZS0xICAKTERGTEFHUyAgICAgICAgICAgLVdsLC0td2Fy
+bi1jb21tb24gLVdsLC16LHJlbHJvIC1XbCwteixub3cgLXBpZSAtbTY0IC1nIAptYWtlICAgICAg
+ICAgICAgICBtYWtlCmluc3RhbGwgICAgICAgICAgIGluc3RhbGwKcHl0aG9uICAgICAgICAgICAg
+cHl0aG9uIC1CCnNtYmQgICAgICAgICAgICAgIC91c3Ivc2Jpbi9zbWJkCm1vZHVsZSBzdXBwb3J0
+ICAgIG5vCmhvc3QgQ1BVICAgICAgICAgIHg4Nl82NApob3N0IGJpZyBlbmRpYW4gICBubwp0YXJn
+ZXQgbGlzdCAgICAgICB4ODZfNjQtc29mdG1tdSBhYXJjaDY0LXNvZnRtbXUKZ3Byb2YgZW5hYmxl
+ZCAgICAgbm8Kc3BhcnNlIGVuYWJsZWQgICAgbm8Kc3RyaXAgYmluYXJpZXMgICAgeWVzCnByb2Zp
+bGVyICAgICAgICAgIG5vCnN0YXRpYyBidWlsZCAgICAgIG5vClNETCBzdXBwb3J0ICAgICAgIHll
+cyAoMS4yLjE0KQpHVEsgc3VwcG9ydCAgICAgICB5ZXMgKDIuMjQuMjMpCkdUSyBHTCBzdXBwb3J0
+ICAgIG5vClZURSBzdXBwb3J0ICAgICAgIHllcyAoMC4yNS4xKQpUTFMgcHJpb3JpdHkgICAgICBO
+T1JNQUwKR05VVExTIHN1cHBvcnQgICAgbm8KR05VVExTIHJuZCAgICAgICAgbm8KbGliZ2NyeXB0
+ICAgICAgICAgbm8KbGliZ2NyeXB0IGtkZiAgICAgbm8KbmV0dGxlICAgICAgICAgICAgbm8gCm5l
+dHRsZSBrZGYgICAgICAgIG5vCmxpYnRhc24xICAgICAgICAgIG5vCmN1cnNlcyBzdXBwb3J0ICAg
+IHllcwp2aXJnbCBzdXBwb3J0ICAgICBubwpjdXJsIHN1cHBvcnQgICAgICBubwptaW5ndzMyIHN1
+cHBvcnQgICBubwpBdWRpbyBkcml2ZXJzICAgICBvc3MKQmxvY2sgd2hpdGVsaXN0IChydykgCkJs
+b2NrIHdoaXRlbGlzdCAocm8pIApWaXJ0RlMgc3VwcG9ydCAgICBubwpNdWx0aXBhdGggc3VwcG9y
+dCBubwpWTkMgc3VwcG9ydCAgICAgICB5ZXMKVk5DIFNBU0wgc3VwcG9ydCAgbm8KVk5DIEpQRUcg
+c3VwcG9ydCAgeWVzClZOQyBQTkcgc3VwcG9ydCAgIHllcwp4ZW4gc3VwcG9ydCAgICAgICB5ZXMK
+eGVuIGN0cmwgdmVyc2lvbiAgNDA2MDAKcHYgZG9tIGJ1aWxkICAgICAgbm8KYnJsYXBpIHN1cHBv
+cnQgICAgbm8KYmx1ZXogIHN1cHBvcnQgICAgbm8KRG9jdW1lbnRhdGlvbiAgICAgbm8KUElFICAg
+ICAgICAgICAgICAgeWVzCnZkZSBzdXBwb3J0ICAgICAgIG5vCm5ldG1hcCBzdXBwb3J0ICAgIG5v
+CkxpbnV4IEFJTyBzdXBwb3J0IG5vCkFUVFIvWEFUVFIgc3VwcG9ydCB5ZXMKSW5zdGFsbCBibG9i
+cyAgICAgeWVzCktWTSBzdXBwb3J0ICAgICAgIHllcwpIQVggc3VwcG9ydCAgICAgICBubwpUQ0cg
+c3VwcG9ydCAgICAgICB5ZXMKVENHIGRlYnVnIGVuYWJsZWQgbm8KVENHIGludGVycHJldGVyICAg
+bm8KbWFsbG9jIHRyaW0gc3VwcG9ydCB5ZXMKUkRNQSBzdXBwb3J0ICAgICAgbm8KZmR0IHN1cHBv
+cnQgICAgICAgeWVzCnByZWFkdiBzdXBwb3J0ICAgIHllcwpmZGF0YXN5bmMgICAgICAgICB5ZXMK
+bWFkdmlzZSAgICAgICAgICAgeWVzCnBvc2l4X21hZHZpc2UgICAgIHllcwpsaWJjYXAtbmcgc3Vw
+cG9ydCBubwp2aG9zdC1uZXQgc3VwcG9ydCB5ZXMKdmhvc3Qtc2NzaSBzdXBwb3J0IHllcwp2aG9z
+dC12c29jayBzdXBwb3J0IHllcwp2aG9zdC11c2VyIHN1cHBvcnQgeWVzClRyYWNlIGJhY2tlbmRz
+ICAgIGxvZwpzcGljZSBzdXBwb3J0ICAgICB5ZXMgKDAuMTIuNi8wLjEyLjQpCnJiZCBzdXBwb3J0
+ICAgICAgIG5vCnhmc2N0bCBzdXBwb3J0ICAgIG5vCnNtYXJ0Y2FyZCBzdXBwb3J0IHllcwpsaWJ1
+c2IgICAgICAgICAgICBubwp1c2IgbmV0IHJlZGlyICAgICBubwpPcGVuR0wgc3VwcG9ydCAgICB5
+ZXMKT3BlbkdMIGRtYWJ1ZnMgICAgbm8KbGliaXNjc2kgc3VwcG9ydCAgbm8KbGlibmZzIHN1cHBv
+cnQgICAgbm8KYnVpbGQgZ3Vlc3QgYWdlbnQgeWVzClFHQSBWU1Mgc3VwcG9ydCAgIG5vClFHQSB3
+MzIgZGlzayBpbmZvIG5vClFHQSBNU0kgc3VwcG9ydCAgIG5vCnNlY2NvbXAgc3VwcG9ydCAgIG5v
+CmNvcm91dGluZSBiYWNrZW5kIHVjb250ZXh0CmNvcm91dGluZSBwb29sICAgIHllcwpkZWJ1ZyBz
+dGFjayB1c2FnZSBubwpjcnlwdG8gYWZhbGcgICAgICBubwpHbHVzdGVyRlMgc3VwcG9ydCBubwpn
+Y292ICAgICAgICAgICAgICBnY292Cmdjb3YgZW5hYmxlZCAgICAgIG5vClRQTSBzdXBwb3J0ICAg
+ICAgIHllcwpsaWJzc2gyIHN1cHBvcnQgICBubwpUUE0gcGFzc3Rocm91Z2ggICB5ZXMKVFBNIGVt
+dWxhdG9yICAgICAgeWVzClFPTSBkZWJ1Z2dpbmcgICAgIHllcwpMaXZlIGJsb2NrIG1pZ3JhdGlv
+biB5ZXMKbHpvIHN1cHBvcnQgICAgICAgeWVzCnNuYXBweSBzdXBwb3J0ICAgIG5vCmJ6aXAyIHN1
+cHBvcnQgICAgIHllcwpOVU1BIGhvc3Qgc3VwcG9ydCBubwp0Y21hbGxvYyBzdXBwb3J0ICBubwpq
+ZW1hbGxvYyBzdXBwb3J0ICBubwphdngyIG9wdGltaXphdGlvbiBubwpyZXBsaWNhdGlvbiBzdXBw
+b3J0IHllcwpWeEhTIGJsb2NrIGRldmljZSBubwpjYXBzdG9uZSAgICAgICAgICBubwpta2RpciAt
+cCBkdGMvbGliZmR0Cm1rZGlyIC1wIGR0Yy90ZXN0cwogIEdFTiAgICAgYWFyY2g2NC1zb2Z0bW11
+L2NvbmZpZy1kZXZpY2VzLm1hay50bXAKICBHRU4gICAgIHg4Nl82NC1zb2Z0bW11L2NvbmZpZy1k
+ZXZpY2VzLm1hay50bXAKICBHRU4gICAgIGNvbmZpZy1ob3N0LmgKICBHRU4gICAgIHFlbXUtb3B0
+aW9ucy5kZWYKICBHRU4gICAgIHFtcC1jb21tYW5kcy5oCiAgR0VOICAgICBxYXBpLXR5cGVzLmgK
+ICBHRU4gICAgIHFhcGktdmlzaXQuaAogIEdFTiAgICAgcWFwaS1ldmVudC5oCiAgR0VOICAgICB4
+ODZfNjQtc29mdG1tdS9jb25maWctZGV2aWNlcy5tYWsKICBHRU4gICAgIGFhcmNoNjQtc29mdG1t
+dS9jb25maWctZGV2aWNlcy5tYWsKICBHRU4gICAgIHFtcC1tYXJzaGFsLmMKICBHRU4gICAgIHFh
+cGktdHlwZXMuYwogIEdFTiAgICAgcWFwaS12aXNpdC5jCiAgR0VOICAgICBxYXBpLWV2ZW50LmMK
+ICBHRU4gICAgIHFtcC1pbnRyb3NwZWN0LmgKICBHRU4gICAgIHFtcC1pbnRyb3NwZWN0LmMKICBH
+RU4gICAgIHRyYWNlL2dlbmVyYXRlZC10Y2ctdHJhY2Vycy5oCiAgR0VOICAgICB0cmFjZS9nZW5l
+cmF0ZWQtaGVscGVycy13cmFwcGVycy5oCiAgR0VOICAgICB0cmFjZS9nZW5lcmF0ZWQtaGVscGVy
+cy5oCiAgR0VOICAgICB0cmFjZS9nZW5lcmF0ZWQtaGVscGVycy5jCiAgR0VOICAgICBtb2R1bGVf
+YmxvY2suaAogIEdFTiAgICAgdWkvaW5wdXQta2V5bWFwLWxpbnV4LXRvLXFjb2RlLmMKICBHRU4g
+ICAgIHVpL2lucHV0LWtleW1hcC1xY29kZS10by1xbnVtLmMKICBHRU4gICAgIHVpL2lucHV0LWtl
+eW1hcC1xbnVtLXRvLXFjb2RlLmMKICBHRU4gICAgIHVpL2lucHV0LWtleW1hcC1xY29kZS10by1s
+aW51eC5jCiAgR0VOICAgICB0ZXN0cy90ZXN0LXFhcGktdHlwZXMuaAogIEdFTiAgICAgdGVzdHMv
+dGVzdC1xYXBpLXZpc2l0LmgKICBHRU4gICAgIHRlc3RzL3Rlc3QtcW1wLWNvbW1hbmRzLmgKICBH
+RU4gICAgIHRlc3RzL3Rlc3QtcWFwaS1ldmVudC5oCiAgR0VOICAgICB0ZXN0cy90ZXN0LXFtcC1p
+bnRyb3NwZWN0LmgKICBHRU4gICAgIHRyYWNlLXJvb3QuaAogIEdFTiAgICAgdXRpbC90cmFjZS5o
+CiAgR0VOICAgICBjcnlwdG8vdHJhY2UuaAogIEdFTiAgICAgaW8vdHJhY2UuaAogIEdFTiAgICAg
+bWlncmF0aW9uL3RyYWNlLmgKICBHRU4gICAgIGJsb2NrL3RyYWNlLmgKICBHRU4gICAgIGNoYXJk
+ZXYvdHJhY2UuaAogIEdFTiAgICAgaHcvYmxvY2svdHJhY2UuaAogIEdFTiAgICAgaHcvYmxvY2sv
+ZGF0YXBsYW5lL3RyYWNlLmgKICBHRU4gICAgIGh3L2NoYXIvdHJhY2UuaAogIEdFTiAgICAgaHcv
+aW50Yy90cmFjZS5oCiAgR0VOICAgICBody9uZXQvdHJhY2UuaAogIEdFTiAgICAgaHcvcmRtYS90
+cmFjZS5oCiAgR0VOICAgICBody9yZG1hL3Ztdy90cmFjZS5oCiAgR0VOICAgICBody92aXJ0aW8v
+dHJhY2UuaAogIEdFTiAgICAgaHcvYXVkaW8vdHJhY2UuaAogIEdFTiAgICAgaHcvbWlzYy90cmFj
+ZS5oCiAgR0VOICAgICBody91c2IvdHJhY2UuaAogIEdFTiAgICAgaHcvc2NzaS90cmFjZS5oCiAg
+R0VOICAgICBody9udnJhbS90cmFjZS5oCiAgR0VOICAgICBody9kaXNwbGF5L3RyYWNlLmgKICBH
+RU4gICAgIGh3L2lucHV0L3RyYWNlLmgKICBHRU4gICAgIGh3L3RpbWVyL3RyYWNlLmgKICBHRU4g
+ICAgIGh3L2RtYS90cmFjZS5oCiAgR0VOICAgICBody9zcGFyYy90cmFjZS5oCiAgR0VOICAgICBo
+dy9zZC90cmFjZS5oCiAgR0VOICAgICBody9pc2EvdHJhY2UuaAogIEdFTiAgICAgaHcvbWVtL3Ry
+YWNlLmgKICBHRU4gICAgIGh3L2kzODYvdHJhY2UuaAogIEdFTiAgICAgaHcvaTM4Ni94ZW4vdHJh
+Y2UuaAogIEdFTiAgICAgaHcvOXBmcy90cmFjZS5oCiAgR0VOICAgICBody9wcGMvdHJhY2UuaAog
+IEdFTiAgICAgaHcvcGNpL3RyYWNlLmgKICBHRU4gICAgIGh3L3MzOTB4L3RyYWNlLmgKICBHRU4g
+ICAgIGh3L3ZmaW8vdHJhY2UuaAogIEdFTiAgICAgaHcvYWNwaS90cmFjZS5oCiAgR0VOICAgICBo
+dy9hcm0vdHJhY2UuaAogIEdFTiAgICAgaHcvYWxwaGEvdHJhY2UuaAogIEdFTiAgICAgaHcveGVu
+L3RyYWNlLmgKICBHRU4gICAgIGh3L2lkZS90cmFjZS5oCiAgR0VOICAgICB1aS90cmFjZS5oCiAg
+R0VOICAgICBhdWRpby90cmFjZS5oCiAgR0VOICAgICBuZXQvdHJhY2UuaAogIEdFTiAgICAgdGFy
+Z2V0L2FybS90cmFjZS5oCiAgR0VOICAgICB0YXJnZXQvaTM4Ni90cmFjZS5oCiAgR0VOICAgICB0
+YXJnZXQvbWlwcy90cmFjZS5oCiAgR0VOICAgICB0YXJnZXQvc3BhcmMvdHJhY2UuaAogIEdFTiAg
+ICAgdGFyZ2V0L3MzOTB4L3RyYWNlLmgKICBHRU4gICAgIHRhcmdldC9wcGMvdHJhY2UuaAogIEdF
+TiAgICAgcW9tL3RyYWNlLmgKICBHRU4gICAgIGxpbnV4LXVzZXIvdHJhY2UuaAogIEdFTiAgICAg
+cWFwaS90cmFjZS5oCiAgR0VOICAgICBhY2NlbC90Y2cvdHJhY2UuaAogIEdFTiAgICAgYWNjZWwv
+a3ZtL3RyYWNlLmgKICBHRU4gICAgIG5iZC90cmFjZS5oCiAgR0VOICAgICBzY3NpL3RyYWNlLmgK
+ICBHRU4gICAgIHRyYWNlLXJvb3QuYwogIEdFTiAgICAgdXRpbC90cmFjZS5jCiAgR0VOICAgICBj
+cnlwdG8vdHJhY2UuYwogIEdFTiAgICAgaW8vdHJhY2UuYwogIEdFTiAgICAgbWlncmF0aW9uL3Ry
+YWNlLmMKICBHRU4gICAgIGJsb2NrL3RyYWNlLmMKICBHRU4gICAgIGNoYXJkZXYvdHJhY2UuYwog
+IEdFTiAgICAgaHcvYmxvY2svdHJhY2UuYwogIEdFTiAgICAgaHcvYmxvY2svZGF0YXBsYW5lL3Ry
+YWNlLmMKICBHRU4gICAgIGh3L2NoYXIvdHJhY2UuYwogIEdFTiAgICAgaHcvaW50Yy90cmFjZS5j
+CiAgR0VOICAgICBody9uZXQvdHJhY2UuYwogIEdFTiAgICAgaHcvcmRtYS90cmFjZS5jCiAgR0VO
+ICAgICBody9yZG1hL3Ztdy90cmFjZS5jCiAgR0VOICAgICBody92aXJ0aW8vdHJhY2UuYwogIEdF
+TiAgICAgaHcvYXVkaW8vdHJhY2UuYwogIEdFTiAgICAgaHcvbWlzYy90cmFjZS5jCiAgR0VOICAg
+ICBody91c2IvdHJhY2UuYwogIEdFTiAgICAgaHcvc2NzaS90cmFjZS5jCiAgR0VOICAgICBody9u
+dnJhbS90cmFjZS5jCiAgR0VOICAgICBody9kaXNwbGF5L3RyYWNlLmMKICBHRU4gICAgIGh3L2lu
+cHV0L3RyYWNlLmMKICBHRU4gICAgIGh3L3RpbWVyL3RyYWNlLmMKICBHRU4gICAgIGh3L2RtYS90
+cmFjZS5jCiAgR0VOICAgICBody9zcGFyYy90cmFjZS5jCiAgR0VOICAgICBody9zZC90cmFjZS5j
+CiAgR0VOICAgICBody9pc2EvdHJhY2UuYwogIEdFTiAgICAgaHcvbWVtL3RyYWNlLmMKICBHRU4g
+ICAgIGh3L2kzODYvdHJhY2UuYwogIEdFTiAgICAgaHcvaTM4Ni94ZW4vdHJhY2UuYwogIEdFTiAg
+ICAgaHcvOXBmcy90cmFjZS5jCiAgR0VOICAgICBody9wcGMvdHJhY2UuYwogIEdFTiAgICAgaHcv
+cGNpL3RyYWNlLmMKICBHRU4gICAgIGh3L3MzOTB4L3RyYWNlLmMKICBHRU4gICAgIGh3L3ZmaW8v
+dHJhY2UuYwogIEdFTiAgICAgaHcvYWNwaS90cmFjZS5jCiAgR0VOICAgICBody9hcm0vdHJhY2Uu
+YwogIEdFTiAgICAgaHcvYWxwaGEvdHJhY2UuYwogIEdFTiAgICAgaHcveGVuL3RyYWNlLmMKICBH
+RU4gICAgIGh3L2lkZS90cmFjZS5jCiAgR0VOICAgICB1aS90cmFjZS5jCiAgR0VOICAgICBhdWRp
+by90cmFjZS5jCiAgR0VOICAgICBuZXQvdHJhY2UuYwogIEdFTiAgICAgdGFyZ2V0L2FybS90cmFj
+ZS5jCiAgR0VOICAgICB0YXJnZXQvaTM4Ni90cmFjZS5jCiAgR0VOICAgICB0YXJnZXQvbWlwcy90
+cmFjZS5jCiAgR0VOICAgICB0YXJnZXQvc3BhcmMvdHJhY2UuYwogIEdFTiAgICAgdGFyZ2V0L3Mz
+OTB4L3RyYWNlLmMKICBHRU4gICAgIHRhcmdldC9wcGMvdHJhY2UuYwogIEdFTiAgICAgcW9tL3Ry
+YWNlLmMKICBHRU4gICAgIGxpbnV4LXVzZXIvdHJhY2UuYwogIEdFTiAgICAgcWFwaS90cmFjZS5j
+CiAgR0VOICAgICBhY2NlbC90Y2cvdHJhY2UuYwogIEdFTiAgICAgYWNjZWwva3ZtL3RyYWNlLmMK
+ICBHRU4gICAgIG5iZC90cmFjZS5jCiAgR0VOICAgICBzY3NpL3RyYWNlLmMKICBHRU4gICAgIGNv
+bmZpZy1hbGwtZGV2aWNlcy5tYWsKCSBERVAgL3RtcC9xZW11LXRlc3Qvc3JjL2R0Yy90ZXN0cy9k
+dW1wdHJlZXMuYwoJIERFUCAvdG1wL3FlbXUtdGVzdC9zcmMvZHRjL3Rlc3RzL3RyZWVzLlMKCSBE
+RVAgL3RtcC9xZW11LXRlc3Qvc3JjL2R0Yy90ZXN0cy90ZXN0dXRpbHMuYwoJIERFUCAvdG1wL3Fl
+bXUtdGVzdC9zcmMvZHRjL3Rlc3RzL3ZhbHVlLWxhYmVscy5jCgkgREVQIC90bXAvcWVtdS10ZXN0
+L3NyYy9kdGMvdGVzdHMvYXNtX3RyZWVfZHVtcC5jCgkgREVQIC90bXAvcWVtdS10ZXN0L3NyYy9k
+dGMvdGVzdHMvdHJ1bmNhdGVkX3Byb3BlcnR5LmMKCSBERVAgL3RtcC9xZW11LXRlc3Qvc3JjL2R0
+Yy90ZXN0cy9jaGVja19wYXRoLmMKCSBERVAgL3RtcC9xZW11LXRlc3Qvc3JjL2R0Yy90ZXN0cy9v
+dmVybGF5X2JhZF9maXh1cC5jCgkgREVQIC90bXAvcWVtdS10ZXN0L3NyYy9kdGMvdGVzdHMvb3Zl
+cmxheS5jCgkgREVQIC90bXAvcWVtdS10ZXN0L3NyYy9kdGMvdGVzdHMvc3Vibm9kZV9pdGVyYXRl
+LmMKCSBERVAgL3RtcC9xZW11LXRlc3Qvc3JjL2R0Yy90ZXN0cy9wcm9wZXJ0eV9pdGVyYXRlLmMK
+CSBERVAgL3RtcC9xZW11LXRlc3Qvc3JjL2R0Yy90ZXN0cy9pbnRlZ2VyLWV4cHJlc3Npb25zLmMK
+CSBERVAgL3RtcC9xZW11LXRlc3Qvc3JjL2R0Yy90ZXN0cy91dGlsZmR0X3Rlc3QuYwoJIERFUCAv
+dG1wL3FlbXUtdGVzdC9zcmMvZHRjL3Rlc3RzL3BhdGhfb2Zmc2V0X2FsaWFzZXMuYwoJIERFUCAv
+dG1wL3FlbXUtdGVzdC9zcmMvZHRjL3Rlc3RzL2FkZF9zdWJub2RlX3dpdGhfbm9wcy5jCgkgREVQ
+IC90bXAvcWVtdS10ZXN0L3NyYy9kdGMvdGVzdHMvZHRic19lcXVhbF91bm9yZGVyZWQuYwoJIERF
+UCAvdG1wL3FlbXUtdGVzdC9zcmMvZHRjL3Rlc3RzL2R0Yl9yZXZlcnNlLmMKCSBERVAgL3RtcC9x
+ZW11LXRlc3Qvc3JjL2R0Yy90ZXN0cy9kdGJzX2VxdWFsX29yZGVyZWQuYwoJIERFUCAvdG1wL3Fl
+bXUtdGVzdC9zcmMvZHRjL3Rlc3RzL2luY2Jpbi5jCgkgREVQIC90bXAvcWVtdS10ZXN0L3NyYy9k
+dGMvdGVzdHMvZXh0cmEtdGVybWluYXRpbmctbnVsbC5jCgkgREVQIC90bXAvcWVtdS10ZXN0L3Ny
+Yy9kdGMvdGVzdHMvYm9vdC1jcHVpZC5jCgkgREVQIC90bXAvcWVtdS10ZXN0L3NyYy9kdGMvdGVz
+dHMvcGhhbmRsZV9mb3JtYXQuYwoJIERFUCAvdG1wL3FlbXUtdGVzdC9zcmMvZHRjL3Rlc3RzL3Bh
+dGgtcmVmZXJlbmNlcy5jCgkgREVQIC90bXAvcWVtdS10ZXN0L3NyYy9kdGMvdGVzdHMvcmVmZXJl
+bmNlcy5jCgkgREVQIC90bXAvcWVtdS10ZXN0L3NyYy9kdGMvdGVzdHMvc3RyaW5nX2VzY2FwZXMu
+YwoJIERFUCAvdG1wL3FlbXUtdGVzdC9zcmMvZHRjL3Rlc3RzL3Byb3BuYW1lX2VzY2FwZXMuYwoJ
+IERFUCAvdG1wL3FlbXUtdGVzdC9zcmMvZHRjL3Rlc3RzL2FwcGVuZHByb3AyLmMKCSBERVAgL3Rt
+cC9xZW11LXRlc3Qvc3JjL2R0Yy90ZXN0cy9hcHBlbmRwcm9wMS5jCgkgREVQIC90bXAvcWVtdS10
+ZXN0L3NyYy9kdGMvdGVzdHMvZGVsX25vZGUuYwoJIERFUCAvdG1wL3FlbXUtdGVzdC9zcmMvZHRj
+L3Rlc3RzL2RlbF9wcm9wZXJ0eS5jCgkgREVQIC90bXAvcWVtdS10ZXN0L3NyYy9kdGMvdGVzdHMv
+c2V0cHJvcC5jCgkgREVQIC90bXAvcWVtdS10ZXN0L3NyYy9kdGMvdGVzdHMvc2V0X25hbWUuYwoJ
+IERFUCAvdG1wL3FlbXUtdGVzdC9zcmMvZHRjL3Rlc3RzL3J3X3RyZWUxLmMKCSBERVAgL3RtcC9x
+ZW11LXRlc3Qvc3JjL2R0Yy90ZXN0cy9vcGVuX3BhY2suYwoJIERFUCAvdG1wL3FlbXUtdGVzdC9z
+cmMvZHRjL3Rlc3RzL25vcHVsYXRlLmMKCSBERVAgL3RtcC9xZW11LXRlc3Qvc3JjL2R0Yy90ZXN0
+cy9tYW5nbGUtbGF5b3V0LmMKCSBERVAgL3RtcC9xZW11LXRlc3Qvc3JjL2R0Yy90ZXN0cy9tb3Zl
+X2FuZF9zYXZlLmMKCSBERVAgL3RtcC9xZW11LXRlc3Qvc3JjL2R0Yy90ZXN0cy9zd190cmVlMS5j
+CgkgREVQIC90bXAvcWVtdS10ZXN0L3NyYy9kdGMvdGVzdHMvbm9wX25vZGUuYwoJIERFUCAvdG1w
+L3FlbXUtdGVzdC9zcmMvZHRjL3Rlc3RzL25vcF9wcm9wZXJ0eS5jCgkgREVQIC90bXAvcWVtdS10
+ZXN0L3NyYy9kdGMvdGVzdHMvc2V0cHJvcF9pbnBsYWNlLmMKCSBERVAgL3RtcC9xZW11LXRlc3Qv
+c3JjL2R0Yy90ZXN0cy9zdHJpbmdsaXN0LmMKCSBERVAgL3RtcC9xZW11LXRlc3Qvc3JjL2R0Yy90
+ZXN0cy9hZGRyX3NpemVfY2VsbHMuYwoJIERFUCAvdG1wL3FlbXUtdGVzdC9zcmMvZHRjL3Rlc3Rz
+L25vdGZvdW5kLmMKCSBERVAgL3RtcC9xZW11LXRlc3Qvc3JjL2R0Yy90ZXN0cy9zaXplZF9jZWxs
+cy5jCgkgREVQIC90bXAvcWVtdS10ZXN0L3NyYy9kdGMvdGVzdHMvY2hhcl9saXRlcmFsLmMKCSBE
+RVAgL3RtcC9xZW11LXRlc3Qvc3JjL2R0Yy90ZXN0cy9ub2RlX2NoZWNrX2NvbXBhdGlibGUuYwoJ
+IERFUCAvdG1wL3FlbXUtdGVzdC9zcmMvZHRjL3Rlc3RzL25vZGVfb2Zmc2V0X2J5X2NvbXBhdGli
+bGUuYwoJIERFUCAvdG1wL3FlbXUtdGVzdC9zcmMvZHRjL3Rlc3RzL2dldF9hbGlhcy5jCgkgREVQ
+IC90bXAvcWVtdS10ZXN0L3NyYy9kdGMvdGVzdHMvbm9kZV9vZmZzZXRfYnlfcGhhbmRsZS5jCgkg
+REVQIC90bXAvcWVtdS10ZXN0L3NyYy9kdGMvdGVzdHMvbm9kZV9vZmZzZXRfYnlfcHJvcF92YWx1
+ZS5jCgkgREVQIC90bXAvcWVtdS10ZXN0L3NyYy9kdGMvdGVzdHMvcGFyZW50X29mZnNldC5jCgkg
+REVQIC90bXAvcWVtdS10ZXN0L3NyYy9kdGMvdGVzdHMvc3VwZXJub2RlX2F0ZGVwdGhfb2Zmc2V0
+LmMKCSBERVAgL3RtcC9xZW11LXRlc3Qvc3JjL2R0Yy90ZXN0cy9nZXRfcGF0aC5jCgkgREVQIC90
+bXAvcWVtdS10ZXN0L3NyYy9kdGMvdGVzdHMvZ2V0X3BoYW5kbGUuYwoJIERFUCAvdG1wL3FlbXUt
+dGVzdC9zcmMvZHRjL3Rlc3RzL2dldF9uYW1lLmMKCSBERVAgL3RtcC9xZW11LXRlc3Qvc3JjL2R0
+Yy90ZXN0cy9nZXRwcm9wLmMKCSBERVAgL3RtcC9xZW11LXRlc3Qvc3JjL2R0Yy90ZXN0cy9wYXRo
+X29mZnNldC5jCgkgREVQIC90bXAvcWVtdS10ZXN0L3NyYy9kdGMvdGVzdHMvc3Vibm9kZV9vZmZz
+ZXQuYwoJIERFUCAvdG1wL3FlbXUtdGVzdC9zcmMvZHRjL3Rlc3RzL2ZpbmRfcHJvcGVydHkuYwoJ
+IERFUCAvdG1wL3FlbXUtdGVzdC9zcmMvZHRjL3Rlc3RzL3Jvb3Rfbm9kZS5jCgkgREVQIC90bXAv
+cWVtdS10ZXN0L3NyYy9kdGMvdGVzdHMvZ2V0X21lbV9yc3YuYwoJIERFUCAvdG1wL3FlbXUtdGVz
+dC9zcmMvZHRjL2xpYmZkdC9mZHRfb3ZlcmxheS5jCgkgREVQIC90bXAvcWVtdS10ZXN0L3NyYy9k
+dGMvbGliZmR0L2ZkdF9hZGRyZXNzZXMuYwoJIERFUCAvdG1wL3FlbXUtdGVzdC9zcmMvZHRjL2xp
+YmZkdC9mZHRfZW1wdHlfdHJlZS5jCgkgREVQIC90bXAvcWVtdS10ZXN0L3NyYy9kdGMvbGliZmR0
+L2ZkdF9ydy5jCgkgREVQIC90bXAvcWVtdS10ZXN0L3NyYy9kdGMvbGliZmR0L2ZkdF9zdHJlcnJv
+ci5jCgkgREVQIC90bXAvcWVtdS10ZXN0L3NyYy9kdGMvbGliZmR0L2ZkdF9zdy5jCgkgREVQIC90
+bXAvcWVtdS10ZXN0L3NyYy9kdGMvbGliZmR0L2ZkdF93aXAuYwoJIERFUCAvdG1wL3FlbXUtdGVz
+dC9zcmMvZHRjL2xpYmZkdC9mZHRfcm8uYwoJIERFUCAvdG1wL3FlbXUtdGVzdC9zcmMvZHRjL2xp
+YmZkdC9mZHQuYwoJIERFUCAvdG1wL3FlbXUtdGVzdC9zcmMvZHRjL3V0aWwuYwoJIERFUCAvdG1w
+L3FlbXUtdGVzdC9zcmMvZHRjL2ZkdHB1dC5jCgkgREVQIC90bXAvcWVtdS10ZXN0L3NyYy9kdGMv
+ZmR0Z2V0LmMKCSBERVAgL3RtcC9xZW11LXRlc3Qvc3JjL2R0Yy9mZHRkdW1wLmMKCSBMRVggY29u
+dmVydC1kdHN2MC1sZXhlci5sZXguYwoJIERFUCAvdG1wL3FlbXUtdGVzdC9zcmMvZHRjL3NyY3Bv
+cy5jCgkgQklTT04gZHRjLXBhcnNlci50YWIuYwoJIERFUCAvdG1wL3FlbXUtdGVzdC9zcmMvZHRj
+L3RyZWVzb3VyY2UuYwoJIERFUCAvdG1wL3FlbXUtdGVzdC9zcmMvZHRjL2xpdmV0cmVlLmMKCSBM
+RVggZHRjLWxleGVyLmxleC5jCgkgREVQIC90bXAvcWVtdS10ZXN0L3NyYy9kdGMvZnN0cmVlLmMK
+CSBERVAgL3RtcC9xZW11LXRlc3Qvc3JjL2R0Yy9mbGF0dHJlZS5jCgkgREVQIC90bXAvcWVtdS10
+ZXN0L3NyYy9kdGMvZHRjLmMKCSBERVAgL3RtcC9xZW11LXRlc3Qvc3JjL2R0Yy9kYXRhLmMKCSBE
+RVAgL3RtcC9xZW11LXRlc3Qvc3JjL2R0Yy9jaGVja3MuYwoJIERFUCBjb252ZXJ0LWR0c3YwLWxl
+eGVyLmxleC5jCgkgREVQIGR0Yy1wYXJzZXIudGFiLmMKCSBERVAgZHRjLWxleGVyLmxleC5jCglD
+SEsgdmVyc2lvbl9nZW4uaAoJVVBEIHZlcnNpb25fZ2VuLmgKCSBERVAgL3RtcC9xZW11LXRlc3Qv
+c3JjL2R0Yy91dGlsLmMKCSBDQyBsaWJmZHQvZmR0Lm8KCSBDQyBsaWJmZHQvZmR0X3JvLm8KCSBD
+QyBsaWJmZHQvZmR0X3N3Lm8KCSBDQyBsaWJmZHQvZmR0X3dpcC5vCgkgQ0MgbGliZmR0L2ZkdF9l
+bXB0eV90cmVlLm8KCSBDQyBsaWJmZHQvZmR0X3N0cmVycm9yLm8KCSBDQyBsaWJmZHQvZmR0X2Fk
+ZHJlc3Nlcy5vCgkgQ0MgbGliZmR0L2ZkdF9ydy5vCgkgQ0MgbGliZmR0L2ZkdF9vdmVybGF5Lm8K
+CSBBUiBsaWJmZHQvbGliZmR0LmEKYXI6IGNyZWF0aW5nIGxpYmZkdC9saWJmZHQuYQphIC0gbGli
+ZmR0L2ZkdC5vCmEgLSBsaWJmZHQvZmR0X3JvLm8KYSAtIGxpYmZkdC9mZHRfd2lwLm8KYSAtIGxp
+YmZkdC9mZHRfc3cubwphIC0gbGliZmR0L2ZkdF9ydy5vCmEgLSBsaWJmZHQvZmR0X3N0cmVycm9y
+Lm8KYSAtIGxpYmZkdC9mZHRfZW1wdHlfdHJlZS5vCmEgLSBsaWJmZHQvZmR0X2FkZHJlc3Nlcy5v
+CmEgLSBsaWJmZHQvZmR0X292ZXJsYXkubwpta2RpciAtcCBkdGMvbGliZmR0Cm1rZGlyIC1wIGR0
+Yy90ZXN0cwogIENDICAgICAgdGVzdHMvcWVtdS1pb3Rlc3RzL3NvY2tldF9zY21faGVscGVyLm8K
+ICBHRU4gICAgIHFnYS9xYXBpLWdlbmVyYXRlZC9xZ2EtcWFwaS10eXBlcy5oCiAgR0VOICAgICBx
+Z2EvcWFwaS1nZW5lcmF0ZWQvcWdhLXFtcC1jb21tYW5kcy5oCiAgR0VOICAgICBxZ2EvcWFwaS1n
+ZW5lcmF0ZWQvcWdhLXFhcGktdHlwZXMuYwogIEdFTiAgICAgcWdhL3FhcGktZ2VuZXJhdGVkL3Fn
+YS1xYXBpLXZpc2l0LmMKICBHRU4gICAgIHFnYS9xYXBpLWdlbmVyYXRlZC9xZ2EtcW1wLW1hcnNo
+YWwuYwogIENDICAgICAgcW1wLWludHJvc3BlY3QubwogIEdFTiAgICAgcWdhL3FhcGktZ2VuZXJh
+dGVkL3FnYS1xYXBpLXZpc2l0LmgKICBDQyAgICAgIHFhcGktdHlwZXMubwogIENDICAgICAgcWFw
+aS12aXNpdC5vCiAgQ0MgICAgICBxYXBpLWV2ZW50Lm8KICBDQyAgICAgIHFhcGkvcWFwaS12aXNp
+dC1jb3JlLm8KICBDQyAgICAgIHFhcGkvcW9iamVjdC1pbnB1dC12aXNpdG9yLm8KICBDQyAgICAg
+IHFhcGkvcWFwaS1kZWFsbG9jLXZpc2l0b3IubwogIENDICAgICAgcWFwaS9xb2JqZWN0LW91dHB1
+dC12aXNpdG9yLm8KICBDQyAgICAgIHFhcGkvcW1wLXJlZ2lzdHJ5Lm8KICBDQyAgICAgIHFhcGkv
+cW1wLWRpc3BhdGNoLm8KICBDQyAgICAgIHFhcGkvc3RyaW5nLWlucHV0LXZpc2l0b3IubwogIEND
+ICAgICAgcWFwaS9zdHJpbmctb3V0cHV0LXZpc2l0b3IubwogIENDICAgICAgcWFwaS9vcHRzLXZp
+c2l0b3IubwogIENDICAgICAgcWFwaS9xYXBpLWNsb25lLXZpc2l0b3IubwogIENDICAgICAgcWFw
+aS9xbXAtZXZlbnQubwogIENDICAgICAgcWFwaS9xYXBpLXV0aWwubwogIENDICAgICAgcW9iamVj
+dC9xbnVsbC5vCiAgQ0MgICAgICBxb2JqZWN0L3FudW0ubwogIENDICAgICAgcW9iamVjdC9xc3Ry
+aW5nLm8KICBDQyAgICAgIHFvYmplY3QvcWRpY3QubwogIENDICAgICAgcW9iamVjdC9xbGlzdC5v
+CiAgQ0MgICAgICBxb2JqZWN0L3Fib29sLm8KICBDQyAgICAgIHFvYmplY3QvcWxpdC5vCiAgQ0Mg
+ICAgICBxb2JqZWN0L3Fqc29uLm8KICBDQyAgICAgIHFvYmplY3QvcW9iamVjdC5vCiAgQ0MgICAg
+ICBxb2JqZWN0L2pzb24tbGV4ZXIubwogIENDICAgICAgcW9iamVjdC9qc29uLXN0cmVhbWVyLm8K
+ICBDQyAgICAgIHFvYmplY3QvanNvbi1wYXJzZXIubwogIENDICAgICAgdHJhY2UvY29udHJvbC5v
+CiAgQ0MgICAgICB0cmFjZS9xbXAubwogIENDICAgICAgdXRpbC9vc2RlcC5vCiAgQ0MgICAgICB1
+dGlsL2N1dGlscy5vCiAgQ0MgICAgICB1dGlsL3VuaWNvZGUubwogIENDICAgICAgdXRpbC9xZW11
+LXRpbWVyLWNvbW1vbi5vCiAgQ0MgICAgICB1dGlsL2J1ZmZlcmlzemVyby5vCiAgQ0MgICAgICB1
+dGlsL2xvY2tjbnQubwogIENDICAgICAgdXRpbC9haW9jYi5vCiAgQ0MgICAgICB1dGlsL2FzeW5j
+Lm8KICBDQyAgICAgIHV0aWwvdGhyZWFkLXBvb2wubwogIENDICAgICAgdXRpbC9xZW11LXRpbWVy
+Lm8KICBDQyAgICAgIHV0aWwvbWFpbi1sb29wLm8KICBDQyAgICAgIHV0aWwvaW9oYW5kbGVyLm8K
+ICBDQyAgICAgIHV0aWwvYWlvLXBvc2l4Lm8KICBDQyAgICAgIHV0aWwvY29tcGF0ZmQubwogIEND
+ICAgICAgdXRpbC9ldmVudF9ub3RpZmllci1wb3NpeC5vCiAgQ0MgICAgICB1dGlsL21tYXAtYWxs
+b2MubwogIENDICAgICAgdXRpbC9vc2xpYi1wb3NpeC5vCiAgQ0MgICAgICB1dGlsL3FlbXUtb3Bl
+bnB0eS5vCiAgQ0MgICAgICB1dGlsL3FlbXUtdGhyZWFkLXBvc2l4Lm8KICBDQyAgICAgIHV0aWwv
+bWVtZmQubwogIENDICAgICAgdXRpbC9lbnZsaXN0Lm8KICBDQyAgICAgIHV0aWwvcGF0aC5vCiAg
+Q0MgICAgICB1dGlsL21vZHVsZS5vCiAgQ0MgICAgICB1dGlsL2hvc3QtdXRpbHMubwogIENDICAg
+ICAgdXRpbC9iaXRtYXAubwogIENDICAgICAgdXRpbC9iaXRvcHMubwogIENDICAgICAgdXRpbC9o
+Yml0bWFwLm8KICBDQyAgICAgIHV0aWwvZmlmbzgubwogIENDICAgICAgdXRpbC9hY2wubwogIEND
+ICAgICAgdXRpbC9jYWNoZWluZm8ubwogIENDICAgICAgdXRpbC9lcnJvci5vCiAgQ0MgICAgICB1
+dGlsL3FlbXUtZXJyb3IubwogIENDICAgICAgdXRpbC9pZC5vCiAgQ0MgICAgICB1dGlsL2lvdi5v
+CiAgQ0MgICAgICB1dGlsL3FlbXUtY29uZmlnLm8KICBDQyAgICAgIHV0aWwvcWVtdS1zb2NrZXRz
+Lm8KICBDQyAgICAgIHV0aWwvdXJpLm8KICBDQyAgICAgIHV0aWwvbm90aWZ5Lm8KICBDQyAgICAg
+IHV0aWwvcWVtdS1vcHRpb24ubwogIENDICAgICAgdXRpbC9xZW11LXByb2dyZXNzLm8KICBDQyAg
+ICAgIHV0aWwva2V5dmFsLm8KICBDQyAgICAgIHV0aWwvaGV4ZHVtcC5vCiAgQ0MgICAgICB1dGls
+L2NyYzMyYy5vCiAgQ0MgICAgICB1dGlsL3V1aWQubwogIENDICAgICAgdXRpbC90aHJvdHRsZS5v
+CiAgQ0MgICAgICB1dGlsL2dldGF1eHZhbC5vCiAgQ0MgICAgICB1dGlsL3JlYWRsaW5lLm8KICBD
+QyAgICAgIHV0aWwvcmN1Lm8KICBDQyAgICAgIHV0aWwvcWVtdS1jb3JvdXRpbmUubwogIENDICAg
+ICAgdXRpbC9xZW11LWNvcm91dGluZS1sb2NrLm8KICBDQyAgICAgIHV0aWwvcWVtdS1jb3JvdXRp
+bmUtaW8ubwogIENDICAgICAgdXRpbC9xZW11LWNvcm91dGluZS1zbGVlcC5vCiAgQ0MgICAgICB1
+dGlsL2Nvcm91dGluZS11Y29udGV4dC5vCiAgQ0MgICAgICB1dGlsL2J1ZmZlci5vCiAgQ0MgICAg
+ICB1dGlsL3RpbWVkLWF2ZXJhZ2UubwogIENDICAgICAgdXRpbC9iYXNlNjQubwogIENDICAgICAg
+dXRpbC9sb2cubwogIENDICAgICAgdXRpbC9wYWdlc2l6ZS5vCiAgQ0MgICAgICB1dGlsL3FkaXN0
+Lm8KICBDQyAgICAgIHV0aWwvcWh0Lm8KICBDQyAgICAgIHV0aWwvcmFuZ2UubwogIENDICAgICAg
+dXRpbC9zdGF0czY0Lm8KICBDQyAgICAgIHV0aWwvc3lzdGVtZC5vCiAgQ0MgICAgICB0cmFjZS1y
+b290Lm8KICBDQyAgICAgIHV0aWwvdHJhY2UubwogIENDICAgICAgY3J5cHRvL3RyYWNlLm8KICBD
+QyAgICAgIGlvL3RyYWNlLm8KICBDQyAgICAgIG1pZ3JhdGlvbi90cmFjZS5vCiAgQ0MgICAgICBi
+bG9jay90cmFjZS5vCiAgQ0MgICAgICBjaGFyZGV2L3RyYWNlLm8KICBDQyAgICAgIGh3L2Jsb2Nr
+L3RyYWNlLm8KICBDQyAgICAgIGh3L2Jsb2NrL2RhdGFwbGFuZS90cmFjZS5vCiAgQ0MgICAgICBo
+dy9jaGFyL3RyYWNlLm8KICBDQyAgICAgIGh3L2ludGMvdHJhY2UubwogIENDICAgICAgaHcvbmV0
+L3RyYWNlLm8KICBDQyAgICAgIGh3L3JkbWEvdHJhY2UubwogIENDICAgICAgaHcvcmRtYS92bXcv
+dHJhY2UubwogIENDICAgICAgaHcvdmlydGlvL3RyYWNlLm8KICBDQyAgICAgIGh3L2F1ZGlvL3Ry
+YWNlLm8KICBDQyAgICAgIGh3L21pc2MvdHJhY2UubwogIENDICAgICAgaHcvdXNiL3RyYWNlLm8K
+ICBDQyAgICAgIGh3L3Njc2kvdHJhY2UubwogIENDICAgICAgaHcvbnZyYW0vdHJhY2UubwogIEND
+ICAgICAgaHcvZGlzcGxheS90cmFjZS5vCiAgQ0MgICAgICBody9pbnB1dC90cmFjZS5vCiAgQ0Mg
+ICAgICBody90aW1lci90cmFjZS5vCiAgQ0MgICAgICBody9kbWEvdHJhY2UubwogIENDICAgICAg
+aHcvc3BhcmMvdHJhY2UubwogIENDICAgICAgaHcvc2QvdHJhY2UubwogIENDICAgICAgaHcvaXNh
+L3RyYWNlLm8KICBDQyAgICAgIGh3L21lbS90cmFjZS5vCiAgQ0MgICAgICBody9pMzg2L3RyYWNl
+Lm8KICBDQyAgICAgIGh3L2kzODYveGVuL3RyYWNlLm8KICBDQyAgICAgIGh3LzlwZnMvdHJhY2Uu
+bwogIENDICAgICAgaHcvcHBjL3RyYWNlLm8KICBDQyAgICAgIGh3L3BjaS90cmFjZS5vCiAgQ0Mg
+ICAgICBody9zMzkweC90cmFjZS5vCiAgQ0MgICAgICBody92ZmlvL3RyYWNlLm8KICBDQyAgICAg
+IGh3L2FjcGkvdHJhY2UubwogIENDICAgICAgaHcvYXJtL3RyYWNlLm8KICBDQyAgICAgIGh3L2Fs
+cGhhL3RyYWNlLm8KICBDQyAgICAgIGh3L3hlbi90cmFjZS5vCiAgQ0MgICAgICBody9pZGUvdHJh
+Y2UubwogIENDICAgICAgdWkvdHJhY2UubwogIENDICAgICAgYXVkaW8vdHJhY2UubwogIENDICAg
+ICAgbmV0L3RyYWNlLm8KICBDQyAgICAgIHRhcmdldC9hcm0vdHJhY2UubwogIENDICAgICAgdGFy
+Z2V0L2kzODYvdHJhY2UubwogIENDICAgICAgdGFyZ2V0L21pcHMvdHJhY2UubwogIENDICAgICAg
+dGFyZ2V0L3NwYXJjL3RyYWNlLm8KICBDQyAgICAgIHRhcmdldC9zMzkweC90cmFjZS5vCiAgQ0Mg
+ICAgICB0YXJnZXQvcHBjL3RyYWNlLm8KICBDQyAgICAgIHFvbS90cmFjZS5vCiAgQ0MgICAgICBs
+aW51eC11c2VyL3RyYWNlLm8KICBDQyAgICAgIHFhcGkvdHJhY2UubwogIENDICAgICAgYWNjZWwv
+dGNnL3RyYWNlLm8KICBDQyAgICAgIGFjY2VsL2t2bS90cmFjZS5vCiAgQ0MgICAgICBuYmQvdHJh
+Y2UubwogIENDICAgICAgc2NzaS90cmFjZS5vCiAgQ0MgICAgICBjcnlwdG8vcGJrZGYtc3R1Yi5v
+CiAgQ0MgICAgICBzdHVicy9hcmNoLXF1ZXJ5LWNwdS1kZWYubwogIENDICAgICAgc3R1YnMvYXJj
+aC1xdWVyeS1jcHUtbW9kZWwtZXhwYW5zaW9uLm8KICBDQyAgICAgIHN0dWJzL2FyY2gtcXVlcnkt
+Y3B1LW1vZGVsLWNvbXBhcmlzb24ubwogIENDICAgICAgc3R1YnMvYXJjaC1xdWVyeS1jcHUtbW9k
+ZWwtYmFzZWxpbmUubwogIENDICAgICAgc3R1YnMvYmRydi1uZXh0LW1vbml0b3Itb3duZWQubwog
+IENDICAgICAgc3R1YnMvYmxvY2tkZXYtY2xvc2UtYWxsLWJkcnYtc3RhdGVzLm8KICBDQyAgICAg
+IHN0dWJzL2Jsay1jb21taXQtYWxsLm8KICBDQyAgICAgIHN0dWJzL2Nsb2NrLXdhcnAubwogIEND
+ICAgICAgc3R1YnMvY3B1LWdldC1jbG9jay5vCiAgQ0MgICAgICBzdHVicy9jcHUtZ2V0LWljb3Vu
+dC5vCiAgQ0MgICAgICBzdHVicy9kdW1wLm8KICBDQyAgICAgIHN0dWJzL2Vycm9yLXByaW50Zi5v
+CiAgQ0MgICAgICBzdHVicy9mZHNldC5vCiAgQ0MgICAgICBzdHVicy9nZGJzdHViLm8KICBDQyAg
+ICAgIHN0dWJzL2dldC12bS1uYW1lLm8KICBDQyAgICAgIHN0dWJzL2lvdGhyZWFkLm8KICBDQyAg
+ICAgIHN0dWJzL2lvdGhyZWFkLWxvY2subwogIENDICAgICAgc3R1YnMvaXMtZGFlbW9uaXplZC5v
+CiAgQ0MgICAgICBzdHVicy9tYWNoaW5lLWluaXQtZG9uZS5vCiAgQ0MgICAgICBzdHVicy9taWdy
+LWJsb2NrZXIubwogIENDICAgICAgc3R1YnMvY2hhbmdlLXN0YXRlLWhhbmRsZXIubwogIENDICAg
+ICAgc3R1YnMvbW9uaXRvci5vCiAgQ0MgICAgICBzdHVicy9ub3RpZnktZXZlbnQubwogIENDICAg
+ICAgc3R1YnMvcXRlc3QubwogIENDICAgICAgc3R1YnMvcmVwbGF5Lm8KICBDQyAgICAgIHN0dWJz
+L3J1bnN0YXRlLWNoZWNrLm8KICBDQyAgICAgIHN0dWJzL3NldC1mZC1oYW5kbGVyLm8KICBDQyAg
+ICAgIHN0dWJzL3NsaXJwLm8KICBDQyAgICAgIHN0dWJzL3N5c2J1cy5vCiAgQ0MgICAgICBzdHVi
+cy90cG0ubwogIENDICAgICAgc3R1YnMvdHJhY2UtY29udHJvbC5vCiAgQ0MgICAgICBzdHVicy91
+dWlkLm8KICBDQyAgICAgIHN0dWJzL3ZtLXN0b3AubwogIENDICAgICAgc3R1YnMvdm1zdGF0ZS5v
+CiAgQ0MgICAgICBzdHVicy9xbXBfcGNfZGltbS5vCiAgQ0MgICAgICBzdHVicy90YXJnZXQtbW9u
+aXRvci1kZWZzLm8KICBDQyAgICAgIHN0dWJzL3RhcmdldC1nZXQtbW9uaXRvci1kZWYubwogIEND
+ICAgICAgc3R1YnMvcGNfbWFkdF9jcHVfZW50cnkubwogIENDICAgICAgc3R1YnMvdm1nZW5pZC5v
+CiAgQ0MgICAgICBzdHVicy94ZW4tY29tbW9uLm8KICBDQyAgICAgIHN0dWJzL3hlbi1odm0ubwog
+IENDICAgICAgc3R1YnMvcGNpLWhvc3QtcGlpeC5vCiAgQ0MgICAgICBjb250cmliL2l2c2htZW0t
+Y2xpZW50L2l2c2htZW0tY2xpZW50Lm8KICBDQyAgICAgIGNvbnRyaWIvaXZzaG1lbS1jbGllbnQv
+bWFpbi5vCiAgQ0MgICAgICBjb250cmliL2l2c2htZW0tc2VydmVyL2l2c2htZW0tc2VydmVyLm8K
+ICBDQyAgICAgIGNvbnRyaWIvaXZzaG1lbS1zZXJ2ZXIvbWFpbi5vCiAgQ0MgICAgICBxZW11LW5i
+ZC5vCiAgQ0MgICAgICBibG9jay5vCiAgQ0MgICAgICBibG9ja2pvYi5vCiAgQ0MgICAgICBxZW11
+LWlvLWNtZHMubwogIENDICAgICAgcmVwbGljYXRpb24ubwogIENDICAgICAgYmxvY2svcmF3LWZv
+cm1hdC5vCiAgQ0MgICAgICBibG9jay9xY293Lm8KICBDQyAgICAgIGJsb2NrL3ZkaS5vCiAgQ0Mg
+ICAgICBibG9jay92bWRrLm8KICBDQyAgICAgIGJsb2NrL2Nsb29wLm8KICBDQyAgICAgIGJsb2Nr
+L2JvY2hzLm8KICBDQyAgICAgIGJsb2NrL3ZwYy5vCiAgQ0MgICAgICBibG9jay92dmZhdC5vCiAg
+Q0MgICAgICBibG9jay9kbWcubwogIENDICAgICAgYmxvY2svcWNvdzIubwogIENDICAgICAgYmxv
+Y2svcWNvdzItcmVmY291bnQubwogIENDICAgICAgYmxvY2svcWNvdzItY2x1c3Rlci5vCiAgQ0Mg
+ICAgICBibG9jay9xY293Mi1zbmFwc2hvdC5vCiAgQ0MgICAgICBibG9jay9xY293Mi1jYWNoZS5v
+CiAgQ0MgICAgICBibG9jay9xY293Mi1iaXRtYXAubwogIENDICAgICAgYmxvY2svcWVkLm8KICBD
+QyAgICAgIGJsb2NrL3FlZC1sMi1jYWNoZS5vCiAgQ0MgICAgICBibG9jay9xZWQtdGFibGUubwog
+IENDICAgICAgYmxvY2svcWVkLWNsdXN0ZXIubwogIENDICAgICAgYmxvY2svcWVkLWNoZWNrLm8K
+ICBDQyAgICAgIGJsb2NrL3ZoZHgubwogIENDICAgICAgYmxvY2svdmhkeC1lbmRpYW4ubwogIEND
+ICAgICAgYmxvY2svdmhkeC1sb2cubwogIENDICAgICAgYmxvY2svcXVvcnVtLm8KICBDQyAgICAg
+IGJsb2NrL3BhcmFsbGVscy5vCiAgQ0MgICAgICBibG9jay9ibGtkZWJ1Zy5vCiAgQ0MgICAgICBi
+bG9jay9ibGt2ZXJpZnkubwogIENDICAgICAgYmxvY2svYmxrcmVwbGF5Lm8KICBDQyAgICAgIGJs
+b2NrL2Jsb2NrLWJhY2tlbmQubwogIENDICAgICAgYmxvY2svc25hcHNob3QubwogIENDICAgICAg
+YmxvY2svcWFwaS5vCiAgQ0MgICAgICBibG9jay9maWxlLXBvc2l4Lm8KICBDQyAgICAgIGJsb2Nr
+L251bGwubwogIENDICAgICAgYmxvY2svbWlycm9yLm8KICBDQyAgICAgIGJsb2NrL2NvbW1pdC5v
+CiAgQ0MgICAgICBibG9jay9pby5vCiAgQ0MgICAgICBibG9jay90aHJvdHRsZS1ncm91cHMubwog
+IENDICAgICAgYmxvY2svbmJkLm8KICBDQyAgICAgIGJsb2NrL25iZC1jbGllbnQubwogIENDICAg
+ICAgYmxvY2svc2hlZXBkb2cubwogIENDICAgICAgYmxvY2svYWNjb3VudGluZy5vCiAgQ0MgICAg
+ICBibG9jay9kaXJ0eS1iaXRtYXAubwogIENDICAgICAgYmxvY2svd3JpdGUtdGhyZXNob2xkLm8K
+ICBDQyAgICAgIGJsb2NrL2JhY2t1cC5vCiAgQ0MgICAgICBibG9jay9yZXBsaWNhdGlvbi5vCiAg
+Q0MgICAgICBibG9jay90aHJvdHRsZS5vCiAgQ0MgICAgICBibG9jay9jcnlwdG8ubwogIENDICAg
+ICAgbmJkL3NlcnZlci5vCiAgQ0MgICAgICBuYmQvY2xpZW50Lm8KICBDQyAgICAgIG5iZC9jb21t
+b24ubwogIENDICAgICAgc2NzaS91dGlscy5vCiAgQ0MgICAgICBzY3NpL3ByLW1hbmFnZXIubwog
+IENDICAgICAgc2NzaS9wci1tYW5hZ2VyLWhlbHBlci5vCiAgQ0MgICAgICBibG9jay9kbWctYnoy
+Lm8KICBDQyAgICAgIGNyeXB0by9pbml0Lm8KICBDQyAgICAgIGNyeXB0by9oYXNoLm8KICBDQyAg
+ICAgIGNyeXB0by9oYXNoLWdsaWIubwogIENDICAgICAgY3J5cHRvL2htYWMubwogIENDICAgICAg
+Y3J5cHRvL2htYWMtZ2xpYi5vCiAgQ0MgICAgICBjcnlwdG8vYWVzLm8KICBDQyAgICAgIGNyeXB0
+by9kZXNyZmIubwogIENDICAgICAgY3J5cHRvL2NpcGhlci5vCiAgQ0MgICAgICBjcnlwdG8vdGxz
+Y3JlZHMubwogIENDICAgICAgY3J5cHRvL3Rsc2NyZWRzYW5vbi5vCiAgQ0MgICAgICBjcnlwdG8v
+dGxzY3JlZHN4NTA5Lm8KICBDQyAgICAgIGNyeXB0by90bHNzZXNzaW9uLm8KICBDQyAgICAgIGNy
+eXB0by9zZWNyZXQubwogIENDICAgICAgY3J5cHRvL3JhbmRvbS1wbGF0Zm9ybS5vCiAgQ0MgICAg
+ICBjcnlwdG8vcGJrZGYubwogIENDICAgICAgY3J5cHRvL2l2Z2VuLm8KICBDQyAgICAgIGNyeXB0
+by9pdmdlbi1lc3Npdi5vCiAgQ0MgICAgICBjcnlwdG8vaXZnZW4tcGxhaW4ubwogIENDICAgICAg
+Y3J5cHRvL2l2Z2VuLXBsYWluNjQubwogIENDICAgICAgY3J5cHRvL2Fmc3BsaXQubwogIENDICAg
+ICAgY3J5cHRvL3h0cy5vCiAgQ0MgICAgICBjcnlwdG8vYmxvY2subwogIENDICAgICAgY3J5cHRv
+L2Jsb2NrLXFjb3cubwogIENDICAgICAgY3J5cHRvL2Jsb2NrLWx1a3MubwogIENDICAgICAgaW8v
+Y2hhbm5lbC5vCiAgQ0MgICAgICBpby9jaGFubmVsLWJ1ZmZlci5vCiAgQ0MgICAgICBpby9jaGFu
+bmVsLWNvbW1hbmQubwogIENDICAgICAgaW8vY2hhbm5lbC1maWxlLm8KICBDQyAgICAgIGlvL2No
+YW5uZWwtc29ja2V0Lm8KICBDQyAgICAgIGlvL2NoYW5uZWwtdGxzLm8KICBDQyAgICAgIGlvL2No
+YW5uZWwtd2F0Y2gubwogIENDICAgICAgaW8vY2hhbm5lbC13ZWJzb2NrLm8KICBDQyAgICAgIGlv
+L2NoYW5uZWwtdXRpbC5vCiAgQ0MgICAgICBpby9kbnMtcmVzb2x2ZXIubwogIENDICAgICAgaW8v
+bmV0LWxpc3RlbmVyLm8KICBDQyAgICAgIGlvL3Rhc2subwogIENDICAgICAgcW9tL29iamVjdC5v
+CiAgQ0MgICAgICBxb20vY29udGFpbmVyLm8KICBDQyAgICAgIHFvbS9xb20tcW9iamVjdC5vCiAg
+Q0MgICAgICBxb20vb2JqZWN0X2ludGVyZmFjZXMubwogIEdFTiAgICAgcWVtdS1pbWctY21kcy5o
+CiAgQ0MgICAgICBxZW11LWlvLm8KICBDQyAgICAgIHNjc2kvcWVtdS1wci1oZWxwZXIubwogIEND
+ICAgICAgcWVtdS1icmlkZ2UtaGVscGVyLm8KICBDQyAgICAgIGJsb2NrZGV2Lm8KICBDQyAgICAg
+IGJsb2NrZGV2LW5iZC5vCiAgQ0MgICAgICBib290ZGV2aWNlLm8KICBDQyAgICAgIGlvdGhyZWFk
+Lm8KICBDQyAgICAgIHFkZXYtbW9uaXRvci5vCiAgQ0MgICAgICBkZXZpY2UtaG90cGx1Zy5vCiAg
+Q0MgICAgICBvcy1wb3NpeC5vCiAgQ0MgICAgICBidC1ob3N0Lm8KICBDQyAgICAgIGJ0LXZoY2ku
+bwogIENDICAgICAgZG1hLWhlbHBlcnMubwogIENDICAgICAgdmwubwogIENDICAgICAgdHBtLm8K
+ICBDQyAgICAgIGRldmljZV90cmVlLm8KICBDQyAgICAgIHFtcC1tYXJzaGFsLm8KICBDQyAgICAg
+IHFtcC5vCiAgQ0MgICAgICBobXAubwogIENDICAgICAgY3B1cy1jb21tb24ubwogIENDICAgICAg
+YXVkaW8vYXVkaW8ubwogIENDICAgICAgYXVkaW8vbm9hdWRpby5vCiAgQ0MgICAgICBhdWRpby93
+YXZhdWRpby5vCiAgQ0MgICAgICBhdWRpby9taXhlbmcubwogIENDICAgICAgYXVkaW8vc2RsYXVk
+aW8ubwogIENDICAgICAgYXVkaW8vb3NzYXVkaW8ubwogIENDICAgICAgYXVkaW8vc3BpY2VhdWRp
+by5vCiAgQ0MgICAgICBhdWRpby93YXZjYXB0dXJlLm8KICBDQyAgICAgIGJhY2tlbmRzL3JuZy5v
+CiAgQ0MgICAgICBiYWNrZW5kcy9ybmctcmFuZG9tLm8KICBDQyAgICAgIGJhY2tlbmRzL3JuZy1l
+Z2QubwogIENDICAgICAgYmFja2VuZHMvdHBtLm8KICBDQyAgICAgIGJhY2tlbmRzL2hvc3RtZW0u
+bwogIENDICAgICAgYmFja2VuZHMvaG9zdG1lbS1yYW0ubwogIENDICAgICAgYmFja2VuZHMvaG9z
+dG1lbS1maWxlLm8KICBDQyAgICAgIGJhY2tlbmRzL2NyeXB0b2Rldi5vCiAgQ0MgICAgICBiYWNr
+ZW5kcy9jcnlwdG9kZXYtYnVpbHRpbi5vCiAgQ0MgICAgICBibG9jay9zdHJlYW0ubwogIENDICAg
+ICAgY2hhcmRldi9tc21vdXNlLm8KICBDQyAgICAgIGNoYXJkZXYvd2N0YWJsZXQubwogIENDICAg
+ICAgY2hhcmRldi90ZXN0ZGV2Lm8KICBDQyAgICAgIGNoYXJkZXYvc3BpY2UubwogIENDICAgICAg
+ZGlzYXMvYXJtLm8KICBDQyAgICAgIGRpc2FzL2kzODYubwogIENDICAgICAgZnNkZXYvcWVtdS1m
+c2Rldi1kdW1teS5vCiAgQ0MgICAgICBmc2Rldi9xZW11LWZzZGV2LW9wdHMubwogIENDICAgICAg
+ZnNkZXYvcWVtdS1mc2Rldi10aHJvdHRsZS5vCiAgQ0MgICAgICBody9hY3BpL2NvcmUubwogIEND
+ICAgICAgaHcvYWNwaS9wY2locC5vCiAgQ0MgICAgICBody9hY3BpL3BpaXg0Lm8KICBDQyAgICAg
+IGh3L2FjcGkvaWNoOS5vCiAgQ0MgICAgICBody9hY3BpL3Rjby5vCiAgQ0MgICAgICBody9hY3Bp
+L2NwdV9ob3RwbHVnLm8KICBDQyAgICAgIGh3L2FjcGkvbWVtb3J5X2hvdHBsdWcubwogIENDICAg
+ICAgaHcvYWNwaS9jcHUubwogIENDICAgICAgaHcvYWNwaS9udmRpbW0ubwogIENDICAgICAgaHcv
+YWNwaS92bWdlbmlkLm8KICBDQyAgICAgIGh3L2FjcGkvYWNwaV9pbnRlcmZhY2UubwogIENDICAg
+ICAgaHcvYWNwaS9iaW9zLWxpbmtlci1sb2FkZXIubwogIENDICAgICAgaHcvYWNwaS9hbWwtYnVp
+bGQubwogIENDICAgICAgaHcvYWNwaS9pcG1pLm8KICBDQyAgICAgIGh3L2FjcGkvYWNwaS1zdHVi
+Lm8KICBDQyAgICAgIGh3L2FjcGkvaXBtaS1zdHViLm8KICBDQyAgICAgIGh3L2F1ZGlvL3NiMTYu
+bwogIENDICAgICAgaHcvYXVkaW8vZXMxMzcwLm8KICBDQyAgICAgIGh3L2F1ZGlvL2FjOTcubwog
+IENDICAgICAgaHcvYXVkaW8vZm1vcGwubwogIENDICAgICAgaHcvYXVkaW8vYWRsaWIubwogIEND
+ICAgICAgaHcvYXVkaW8vZ3VzLm8KICBDQyAgICAgIGh3L2F1ZGlvL2d1c2VtdV9oYWwubwogIEND
+ICAgICAgaHcvYXVkaW8vZ3VzZW11X21peGVyLm8KICBDQyAgICAgIGh3L2F1ZGlvL2NzNDIzMWEu
+bwogIENDICAgICAgaHcvYXVkaW8vaW50ZWwtaGRhLm8KICBDQyAgICAgIGh3L2F1ZGlvL2hkYS1j
+b2RlYy5vCiAgQ0MgICAgICBody9hdWRpby9wY3Nway5vCiAgQ0MgICAgICBody9hdWRpby93bTg3
+NTAubwogIENDICAgICAgaHcvYXVkaW8vcGwwNDEubwogIENDICAgICAgaHcvYXVkaW8vbG00NTQ5
+Lm8KICBDQyAgICAgIGh3L2F1ZGlvL21hcnZlbGxfODh3ODYxOC5vCiAgQ0MgICAgICBody9hdWRp
+by9zb3VuZGh3Lm8KICBDQyAgICAgIGh3L2Jsb2NrL2Jsb2NrLm8KICBDQyAgICAgIGh3L2Jsb2Nr
+L2Nkcm9tLm8KICBDQyAgICAgIGh3L2Jsb2NrL2hkLWdlb21ldHJ5Lm8KICBDQyAgICAgIGh3L2Js
+b2NrL2ZkYy5vCiAgQ0MgICAgICBody9ibG9jay9tMjVwODAubwogIENDICAgICAgaHcvYmxvY2sv
+bmFuZC5vCiAgQ0MgICAgICBody9ibG9jay9wZmxhc2hfY2ZpMDEubwogIENDICAgICAgaHcvYmxv
+Y2svcGZsYXNoX2NmaTAyLm8KICBDQyAgICAgIGh3L2Jsb2NrL3hlbl9kaXNrLm8KICBDQyAgICAg
+IGh3L2Jsb2NrL2VjYy5vCiAgQ0MgICAgICBody9ibG9jay9vbmVuYW5kLm8KICBDQyAgICAgIGh3
+L2Jsb2NrL252bWUubwogIENDICAgICAgaHcvYnQvY29yZS5vCiAgQ0MgICAgICBody9idC9sMmNh
+cC5vCiAgQ0MgICAgICBody9idC9zZHAubwogIENDICAgICAgaHcvYnQvaGNpLm8KICBDQyAgICAg
+IGh3L2J0L2hpZC5vCiAgQ0MgICAgICBody9idC9oY2ktY3NyLm8KICBDQyAgICAgIGh3L2NoYXIv
+aXBvY3RhbDIzMi5vCiAgQ0MgICAgICBody9jaGFyL3BhcmFsbGVsLm8KICBDQyAgICAgIGh3L2No
+YXIvcGwwMTEubwogIENDICAgICAgaHcvY2hhci9zZXJpYWwubwogIENDICAgICAgaHcvY2hhci9z
+ZXJpYWwtaXNhLm8KICBDQyAgICAgIGh3L2NoYXIvc2VyaWFsLXBjaS5vCiAgQ0MgICAgICBody9j
+aGFyL3ZpcnRpby1jb25zb2xlLm8KICBDQyAgICAgIGh3L2NoYXIveGVuX2NvbnNvbGUubwogIEND
+ICAgICAgaHcvY2hhci9jYWRlbmNlX3VhcnQubwogIENDICAgICAgaHcvY2hhci9jbXNkay1hcGIt
+dWFydC5vCiAgQ0MgICAgICBody9jaGFyL2RlYnVnY29uLm8KICBDQyAgICAgIGh3L2NoYXIvaW14
+X3NlcmlhbC5vCiAgQ0MgICAgICBody9jb3JlL3FkZXYubwogIENDICAgICAgaHcvY29yZS9idXMu
+bwogIENDICAgICAgaHcvY29yZS9xZGV2LXByb3BlcnRpZXMubwogIENDICAgICAgaHcvY29yZS9y
+ZXNldC5vCiAgQ0MgICAgICBody9jb3JlL2Z3LXBhdGgtcHJvdmlkZXIubwogIENDICAgICAgaHcv
+Y29yZS9pcnEubwogIENDICAgICAgaHcvY29yZS9ob3RwbHVnLm8KICBDQyAgICAgIGh3L2NvcmUv
+bm1pLm8KICBDQyAgICAgIGh3L2NvcmUvc3RyZWFtLm8KICBDQyAgICAgIGh3L2NvcmUvcHRpbWVy
+Lm8KICBDQyAgICAgIGh3L2NvcmUvc3lzYnVzLm8KICBDQyAgICAgIGh3L2NvcmUvbWFjaGluZS5v
+CiAgQ0MgICAgICBody9jb3JlL2xvYWRlci5vCiAgQ0MgICAgICBody9jb3JlL3FkZXYtcHJvcGVy
+dGllcy1zeXN0ZW0ubwogIENDICAgICAgaHcvY29yZS9yZWdpc3Rlci5vCiAgQ0MgICAgICBody9j
+b3JlL29yLWlycS5vCiAgQ0MgICAgICBody9jb3JlL3BsYXRmb3JtLWJ1cy5vCiAgQ0MgICAgICBo
+dy9jcHUvY29yZS5vCiAgQ0MgICAgICBody9kaXNwbGF5L2Fkczc4NDYubwogIENDICAgICAgaHcv
+ZGlzcGxheS9jaXJydXNfdmdhLm8KICBDQyAgICAgIGh3L2Rpc3BsYXkvcGwxMTAubwogIENDICAg
+ICAgaHcvZGlzcGxheS9zc2QwMzAzLm8KICBDQyAgICAgIGh3L2Rpc3BsYXkvc3NkMDMyMy5vCiAg
+Q0MgICAgICBody9kaXNwbGF5L3hlbmZiLm8KICBDQyAgICAgIGh3L2Rpc3BsYXkvdmdhLXBjaS5v
+CiAgQ0MgICAgICBody9kaXNwbGF5L3ZnYS1pc2EubwogIENDICAgICAgaHcvZGlzcGxheS92bXdh
+cmVfdmdhLm8KICBDQyAgICAgIGh3L2Rpc3BsYXkvYmxpenphcmQubwogIENDICAgICAgaHcvZGlz
+cGxheS9leHlub3M0MjEwX2ZpbWQubwogIENDICAgICAgaHcvZGlzcGxheS9mcmFtZWJ1ZmZlci5v
+CiAgQ0MgICAgICBody9kaXNwbGF5L3RjNjM5M3hiLm8KICBDQyAgICAgIGh3L2Rpc3BsYXkvcXhs
+Lm8KICBDQyAgICAgIGh3L2Rpc3BsYXkvcXhsLWxvZ2dlci5vCiAgQ0MgICAgICBody9kaXNwbGF5
+L3F4bC1yZW5kZXIubwogIENDICAgICAgaHcvZG1hL3BsMDgwLm8KICBDQyAgICAgIGh3L2RtYS9w
+bDMzMC5vCiAgQ0MgICAgICBody9kbWEvaTgyNTcubwogIENDICAgICAgaHcvZG1hL3hpbGlueF9h
+eGlkbWEubwogIENDICAgICAgaHcvZG1hL3hsbngtenlucS1kZXZjZmcubwogIENDICAgICAgaHcv
+Z3Bpby9tYXg3MzEwLm8KICBDQyAgICAgIGh3L2dwaW8vcGwwNjEubwogIENDICAgICAgaHcvZ3Bp
+by96YXVydXMubwogIENDICAgICAgaHcvZ3Bpby9ncGlvX2tleS5vCiAgQ0MgICAgICBody9pMmMv
+Y29yZS5vCiAgQ0MgICAgICBody9pMmMvc21idXMubwogIENDICAgICAgaHcvaTJjL3NtYnVzX2Vl
+cHJvbS5vCiAgQ0MgICAgICBody9pMmMvaTJjLWRkYy5vCiAgQ0MgICAgICBody9pMmMvdmVyc2F0
+aWxlX2kyYy5vCiAgQ0MgICAgICBody9pMmMvc21idXNfaWNoOS5vCiAgQ0MgICAgICBody9pMmMv
+cG1fc21idXMubwogIENDICAgICAgaHcvaTJjL2JpdGJhbmdfaTJjLm8KICBDQyAgICAgIGh3L2ky
+Yy9leHlub3M0MjEwX2kyYy5vCiAgQ0MgICAgICBody9pMmMvaW14X2kyYy5vCiAgQ0MgICAgICBo
+dy9pMmMvYXNwZWVkX2kyYy5vCiAgQ0MgICAgICBody9pZGUvY29yZS5vCiAgQ0MgICAgICBody9p
+ZGUvYXRhcGkubwogIENDICAgICAgaHcvaWRlL3FkZXYubwogIENDICAgICAgaHcvaWRlL3BjaS5v
+CiAgQ0MgICAgICBody9pZGUvaXNhLm8KICBDQyAgICAgIGh3L2lkZS9waWl4Lm8KICBDQyAgICAg
+IGh3L2lkZS9taWNyb2RyaXZlLm8KICBDQyAgICAgIGh3L2lkZS9haGNpLm8KICBDQyAgICAgIGh3
+L2lkZS9pY2gubwogIENDICAgICAgaHcvaWRlL2FoY2ktYWxsd2lubmVyLm8KICBDQyAgICAgIGh3
+L2lucHV0L2hpZC5vCiAgQ0MgICAgICBody9pbnB1dC9sbTgzMngubwogIENDICAgICAgaHcvaW5w
+dXQvcGNrYmQubwogIENDICAgICAgaHcvaW5wdXQvcGwwNTAubwogIENDICAgICAgaHcvaW5wdXQv
+cHMyLm8KICBDQyAgICAgIGh3L2lucHV0L3N0ZWxsYXJpc19pbnB1dC5vCiAgQ0MgICAgICBody9p
+bnB1dC90c2MyMDA1Lm8KICBDQyAgICAgIGh3L2lucHV0L3ZpcnRpby1pbnB1dC5vCiAgQ0MgICAg
+ICBody9pbnB1dC92aXJ0aW8taW5wdXQtaGlkLm8KICBDQyAgICAgIGh3L2lucHV0L3ZpcnRpby1p
+bnB1dC1ob3N0Lm8KICBDQyAgICAgIGh3L2ludGMvaTgyNTlfY29tbW9uLm8KICBDQyAgICAgIGh3
+L2ludGMvaTgyNTkubwogIENDICAgICAgaHcvaW50Yy9wbDE5MC5vCiAgQ0MgICAgICBody9pbnRj
+L2lteF9hdmljLm8KICBDQyAgICAgIGh3L2ludGMvcmVhbHZpZXdfZ2ljLm8KICBDQyAgICAgIGh3
+L2ludGMvaW9hcGljX2NvbW1vbi5vCiAgQ0MgICAgICBody9pbnRjL2FybV9naWNfY29tbW9uLm8K
+ICBDQyAgICAgIGh3L2ludGMvYXJtX2dpYy5vCiAgQ0MgICAgICBody9pbnRjL2FybV9naWN2Mm0u
+bwogIENDICAgICAgaHcvaW50Yy9hcm1fZ2ljdjNfY29tbW9uLm8KICBDQyAgICAgIGh3L2ludGMv
+YXJtX2dpY3YzLm8KICBDQyAgICAgIGh3L2ludGMvYXJtX2dpY3YzX2Rpc3QubwogIENDICAgICAg
+aHcvaW50Yy9hcm1fZ2ljdjNfcmVkaXN0Lm8KICBDQyAgICAgIGh3L2ludGMvYXJtX2dpY3YzX2l0
+c19jb21tb24ubwogIENDICAgICAgaHcvaW50Yy9pbnRjLm8KICBDQyAgICAgIGh3L2lwYWNrL2lw
+YWNrLm8KICBDQyAgICAgIGh3L2lwYWNrL3RwY2kyMDAubwogIENDICAgICAgaHcvaXBtaS9pcG1p
+Lm8KICBDQyAgICAgIGh3L2lwbWkvaXBtaV9ibWNfc2ltLm8KICBDQyAgICAgIGh3L2lwbWkvaXBt
+aV9ibWNfZXh0ZXJuLm8KICBDQyAgICAgIGh3L2lwbWkvaXNhX2lwbWlfa2NzLm8KICBDQyAgICAg
+IGh3L2lwbWkvaXNhX2lwbWlfYnQubwogIENDICAgICAgaHcvaXNhL2lzYS1idXMubwogIENDICAg
+ICAgaHcvaXNhL2FwbS5vCiAgQ0MgICAgICBody9tZW0vcGMtZGltbS5vCiAgQ0MgICAgICBody9t
+ZW0vbnZkaW1tLm8KICBDQyAgICAgIGh3L21pc2MvYXBwbGVzbWMubwogIENDICAgICAgaHcvbWlz
+Yy9tYXgxMTF4Lm8KICBDQyAgICAgIGh3L21pc2MvdG1wMTA1Lm8KICBDQyAgICAgIGh3L21pc2Mv
+dG1wNDIxLm8KICBDQyAgICAgIGh3L21pc2MvZGVidWdleGl0Lm8KICBDQyAgICAgIGh3L21pc2Mv
+c2dhLm8KICBDQyAgICAgIGh3L21pc2MvcGMtdGVzdGRldi5vCiAgQ0MgICAgICBody9taXNjL3Bj
+aS10ZXN0ZGV2Lm8KICBDQyAgICAgIGh3L21pc2MvZWR1Lm8KICBDQyAgICAgIGh3L21pc2MvdW5p
+bXAubwogIENDICAgICAgaHcvbWlzYy92bWNvcmVpbmZvLm8KICBDQyAgICAgIGh3L21pc2MvYXJt
+X2wyeDAubwogIENDICAgICAgaHcvbWlzYy9hcm1faW50ZWdyYXRvcl9kZWJ1Zy5vCiAgQ0MgICAg
+ICBody9taXNjL2E5c2N1Lm8KICBDQyAgICAgIGh3L21pc2MvYXJtMTFzY3UubwogIENDICAgICAg
+aHcvbmV0L3hlbl9uaWMubwogIENDICAgICAgaHcvbmV0L25lMjAwMC5vCiAgQ0MgICAgICBody9u
+ZXQvZWVwcm8xMDAubwogIENDICAgICAgaHcvbmV0L3BjbmV0LXBjaS5vCiAgQ0MgICAgICBody9u
+ZXQvcGNuZXQubwogIENDICAgICAgaHcvbmV0L2UxMDAwLm8KICBDQyAgICAgIGh3L25ldC9lMTAw
+MHhfY29tbW9uLm8KICBDQyAgICAgIGh3L25ldC9uZXRfdHhfcGt0Lm8KICBDQyAgICAgIGh3L25l
+dC9uZXRfcnhfcGt0Lm8KICBDQyAgICAgIGh3L25ldC9lMTAwMGUubwogIENDICAgICAgaHcvbmV0
+L2UxMDAwZV9jb3JlLm8KICBDQyAgICAgIGh3L25ldC9ydGw4MTM5Lm8KICBDQyAgICAgIGh3L25l
+dC92bXhuZXQzLm8KICBDQyAgICAgIGh3L25ldC9zbWM5MWMxMTEubwogIENDICAgICAgaHcvbmV0
+L2xhbjkxMTgubwogIENDICAgICAgaHcvbmV0L25lMjAwMC1pc2EubwogIENDICAgICAgaHcvbmV0
+L3hnbWFjLm8KICBDQyAgICAgIGh3L25ldC94aWxpbnhfYXhpZW5ldC5vCiAgQ0MgICAgICBody9u
+ZXQvYWxsd2lubmVyX2VtYWMubwogIENDICAgICAgaHcvbmV0L2lteF9mZWMubwogIENDICAgICAg
+aHcvbmV0L2NhZGVuY2VfZ2VtLm8KICBDQyAgICAgIGh3L25ldC9zdGVsbGFyaXNfZW5ldC5vCiAg
+Q0MgICAgICBody9uZXQvZnRnbWFjMTAwLm8KICBDQyAgICAgIGh3L25ldC9yb2NrZXIvcm9ja2Vy
+Lm8KICBDQyAgICAgIGh3L25ldC9yb2NrZXIvcm9ja2VyX2ZwLm8KICBDQyAgICAgIGh3L25ldC9y
+b2NrZXIvcm9ja2VyX2Rlc2MubwogIENDICAgICAgaHcvbmV0L3JvY2tlci9yb2NrZXJfd29ybGQu
+bwogIENDICAgICAgaHcvbmV0L3JvY2tlci9yb2NrZXJfb2ZfZHBhLm8KICBDQyAgICAgIGh3L252
+cmFtL2VlcHJvbTkzeHgubwogIENDICAgICAgaHcvbnZyYW0vZWVwcm9tX2F0MjRjLm8KICBDQyAg
+ICAgIGh3L252cmFtL2Z3X2NmZy5vCiAgQ0MgICAgICBody9udnJhbS9jaHJwX252cmFtLm8KICBD
+QyAgICAgIGh3L3BjaS1icmlkZ2UvcGNpX2JyaWRnZV9kZXYubwogIENDICAgICAgaHcvcGNpLWJy
+aWRnZS9wY2llX3Jvb3RfcG9ydC5vCiAgQ0MgICAgICBody9wY2ktYnJpZGdlL2dlbl9wY2llX3Jv
+b3RfcG9ydC5vCiAgQ0MgICAgICBody9wY2ktYnJpZGdlL3BjaWVfcGNpX2JyaWRnZS5vCiAgQ0Mg
+ICAgICBody9wY2ktYnJpZGdlL3BjaV9leHBhbmRlcl9icmlkZ2UubwogIENDICAgICAgaHcvcGNp
+LWJyaWRnZS94aW8zMTMwX3Vwc3RyZWFtLm8KICBDQyAgICAgIGh3L3BjaS1icmlkZ2UveGlvMzEz
+MF9kb3duc3RyZWFtLm8KICBDQyAgICAgIGh3L3BjaS1icmlkZ2UvaW9oMzQyMC5vCiAgQ0MgICAg
+ICBody9wY2ktYnJpZGdlL2k4MjgwMWIxMS5vCiAgQ0MgICAgICBody9wY2ktaG9zdC9wYW0ubwog
+IENDICAgICAgaHcvcGNpLWhvc3QvdmVyc2F0aWxlLm8KICBDQyAgICAgIGh3L3BjaS1ob3N0L3Bp
+aXgubwogIENDICAgICAgaHcvcGNpLWhvc3QvcTM1Lm8KICBDQyAgICAgIGh3L3BjaS1ob3N0L2dw
+ZXgubwogIENDICAgICAgaHcvcGNpL3BjaS5vCiAgQ0MgICAgICBody9wY2kvcGNpX2JyaWRnZS5v
+CiAgQ0MgICAgICBody9wY2kvbXNpeC5vCiAgQ0MgICAgICBody9wY2kvbXNpLm8KICBDQyAgICAg
+IGh3L3BjaS9zaHBjLm8KICBDQyAgICAgIGh3L3BjaS9zbG90aWRfY2FwLm8KICBDQyAgICAgIGh3
+L3BjaS9wY2lfaG9zdC5vCiAgQ0MgICAgICBody9wY2kvcGNpZV9ob3N0Lm8KICBDQyAgICAgIGh3
+L3BjaS9wY2llLm8KICBDQyAgICAgIGh3L3BjaS9wY2llX2Flci5vCiAgQ0MgICAgICBody9wY2kv
+cGNpZV9wb3J0Lm8KICBDQyAgICAgIGh3L3BjaS9wY2ktc3R1Yi5vCiAgQ0MgICAgICBody9wY21j
+aWEvcGNtY2lhLm8KICBDQyAgICAgIGh3L3Njc2kvc2NzaS1kaXNrLm8KICBDQyAgICAgIGh3L3Nj
+c2kvc2NzaS1nZW5lcmljLm8KICBDQyAgICAgIGh3L3Njc2kvc2NzaS1idXMubwogIENDICAgICAg
+aHcvc2NzaS9sc2k1M2M4OTVhLm8KICBDQyAgICAgIGh3L3Njc2kvbXB0c2FzLm8KICBDQyAgICAg
+IGh3L3Njc2kvbXB0Y29uZmlnLm8KICBDQyAgICAgIGh3L3Njc2kvbXB0ZW5kaWFuLm8KICBDQyAg
+ICAgIGh3L3Njc2kvbWVnYXNhcy5vCiAgQ0MgICAgICBody9zY3NpL3Ztd19wdnNjc2kubwogIEND
+ICAgICAgaHcvc2NzaS9lc3AubwogIENDICAgICAgaHcvc2NzaS9lc3AtcGNpLm8KICBDQyAgICAg
+IGh3L3NkL3BsMTgxLm8KICBDQyAgICAgIGh3L3NkL3NzaS1zZC5vCiAgQ0MgICAgICBody9zZC9z
+ZC5vCiAgQ0MgICAgICBody9zZC9jb3JlLm8KICBDQyAgICAgIGh3L3NkL3NkaGNpLm8KICBDQyAg
+ICAgIGh3L3NtYmlvcy9zbWJpb3MubwogIENDICAgICAgaHcvc21iaW9zL3NtYmlvc190eXBlXzM4
+Lm8KICBDQyAgICAgIGh3L3NtYmlvcy9zbWJpb3Mtc3R1Yi5vCiAgQ0MgICAgICBody9zbWJpb3Mv
+c21iaW9zX3R5cGVfMzgtc3R1Yi5vCiAgQ0MgICAgICBody9zc2kvcGwwMjIubwogIENDICAgICAg
+aHcvc3NpL3NzaS5vCiAgQ0MgICAgICBody9zc2kveGlsaW54X3NwaXBzLm8KICBDQyAgICAgIGh3
+L3NzaS9hc3BlZWRfc21jLm8KICBDQyAgICAgIGh3L3NzaS9zdG0zMmYyeHhfc3BpLm8KICBDQyAg
+ICAgIGh3L3NzaS9tc3Mtc3BpLm8KICBDQyAgICAgIGh3L3RpbWVyL2FybV90aW1lci5vCiAgQ0Mg
+ICAgICBody90aW1lci9hcm1fbXB0aW1lci5vCiAgQ0MgICAgICBody90aW1lci9hcm12N21fc3lz
+dGljay5vCiAgQ0MgICAgICBody90aW1lci9hOWd0aW1lci5vCiAgQ0MgICAgICBody90aW1lci9j
+YWRlbmNlX3R0Yy5vCiAgQ0MgICAgICBody90aW1lci9kczEzMzgubwogIENDICAgICAgaHcvdGlt
+ZXIvaHBldC5vCiAgQ0MgICAgICBody90aW1lci9pODI1NF9jb21tb24ubwogIENDICAgICAgaHcv
+dGltZXIvaTgyNTQubwogIENDICAgICAgaHcvdGltZXIvcGwwMzEubwogIENDICAgICAgaHcvdGlt
+ZXIvdHdsOTIyMzAubwogIENDICAgICAgaHcvdGltZXIvaW14X2VwaXQubwogIENDICAgICAgaHcv
+dGltZXIvaW14X2dwdC5vCiAgQ0MgICAgICBody90aW1lci9zdG0zMmYyeHhfdGltZXIubwogIEND
+ICAgICAgaHcvdGltZXIvYXNwZWVkX3RpbWVyLm8KICBDQyAgICAgIGh3L3RpbWVyL2Ntc2RrLWFw
+Yi10aW1lci5vCiAgQ0MgICAgICBody90aW1lci9tc3MtdGltZXIubwogIENDICAgICAgaHcvdHBt
+L3RwbV91dGlsLm8KICBDQyAgICAgIGh3L3RwbS90cG1fdGlzLm8KICBDQyAgICAgIGh3L3RwbS90
+cG1fcGFzc3Rocm91Z2gubwogIENDICAgICAgaHcvdHBtL3RwbV9lbXVsYXRvci5vCiAgQ0MgICAg
+ICBody91c2IvY29yZS5vCiAgQ0MgICAgICBody91c2IvY29tYmluZWQtcGFja2V0Lm8KICBDQyAg
+ICAgIGh3L3VzYi9idXMubwogIENDICAgICAgaHcvdXNiL2xpYmh3Lm8KICBDQyAgICAgIGh3L3Vz
+Yi9kZXNjLm8KICBDQyAgICAgIGh3L3VzYi9kZXNjLW1zb3MubwogIENDICAgICAgaHcvdXNiL2hj
+ZC11aGNpLm8KICBDQyAgICAgIGh3L3VzYi9oY2Qtb2hjaS5vCiAgQ0MgICAgICBody91c2IvaGNk
+LWVoY2kubwogIENDICAgICAgaHcvdXNiL2hjZC1laGNpLXBjaS5vCiAgQ0MgICAgICBody91c2Iv
+aGNkLWVoY2ktc3lzYnVzLm8KICBDQyAgICAgIGh3L3VzYi9oY2QteGhjaS5vCiAgQ0MgICAgICBo
+dy91c2IvaGNkLXhoY2ktbmVjLm8KICBDQyAgICAgIGh3L3VzYi9oY2QtbXVzYi5vCiAgQ0MgICAg
+ICBody91c2IvZGV2LWh1Yi5vCiAgQ0MgICAgICBody91c2IvZGV2LWhpZC5vCiAgQ0MgICAgICBo
+dy91c2IvZGV2LXdhY29tLm8KICBDQyAgICAgIGh3L3VzYi9kZXYtc3RvcmFnZS5vCiAgQ0MgICAg
+ICBody91c2IvZGV2LXVhcy5vCiAgQ0MgICAgICBody91c2IvZGV2LWF1ZGlvLm8KICBDQyAgICAg
+IGh3L3VzYi9kZXYtc2VyaWFsLm8KICBDQyAgICAgIGh3L3VzYi9kZXYtbmV0d29yay5vCiAgQ0Mg
+ICAgICBody91c2IvZGV2LWJsdWV0b290aC5vCiAgQ0MgICAgICBody91c2IvZGV2LXNtYXJ0Y2Fy
+ZC1yZWFkZXIubwogIENDICAgICAgaHcvdXNiL2NjaWQtY2FyZC1wYXNzdGhydS5vCiAgQ0MgICAg
+ICBody91c2IvY2NpZC1jYXJkLWVtdWxhdGVkLm8KICBDQyAgICAgIGh3L3VzYi9kZXYtbXRwLm8K
+ICBDQyAgICAgIGh3L3VzYi9ob3N0LXN0dWIubwogIENDICAgICAgaHcvdmlydGlvL3ZpcnRpby1y
+bmcubwogIENDICAgICAgaHcvdmlydGlvL3ZpcnRpby1wY2kubwogIENDICAgICAgaHcvdmlydGlv
+L3ZpcnRpby1idXMubwogIENDICAgICAgaHcvdmlydGlvL3ZpcnRpby1tbWlvLm8KICBDQyAgICAg
+IGh3L3ZpcnRpby92aG9zdC1zdHViLm8KICBDQyAgICAgIGh3L3dhdGNoZG9nL3dhdGNoZG9nLm8K
+ICBDQyAgICAgIGh3L3dhdGNoZG9nL3dkdF9pNjMwMGVzYi5vCiAgQ0MgICAgICBody93YXRjaGRv
+Zy93ZHRfaWI3MDAubwogIENDICAgICAgaHcvd2F0Y2hkb2cvd2R0X2FzcGVlZC5vCiAgQ0MgICAg
+ICBody94ZW4veGVuX2JhY2tlbmQubwogIENDICAgICAgaHcveGVuL3hlbl9kZXZjb25maWcubwog
+IENDICAgICAgaHcveGVuL3hlbl9wdmRldi5vCiAgQ0MgICAgICBody94ZW4veGVuLWNvbW1vbi5v
+CiAgQ0MgICAgICBtaWdyYXRpb24vbWlncmF0aW9uLm8KICBDQyAgICAgIG1pZ3JhdGlvbi9zb2Nr
+ZXQubwogIENDICAgICAgbWlncmF0aW9uL2ZkLm8KICBDQyAgICAgIG1pZ3JhdGlvbi9leGVjLm8K
+ICBDQyAgICAgIG1pZ3JhdGlvbi90bHMubwogIENDICAgICAgbWlncmF0aW9uL2NoYW5uZWwubwog
+IENDICAgICAgbWlncmF0aW9uL3NhdmV2bS5vCiAgQ0MgICAgICBtaWdyYXRpb24vY29sby1jb21t
+Lm8KICBDQyAgICAgIG1pZ3JhdGlvbi9jb2xvLm8KICBDQyAgICAgIG1pZ3JhdGlvbi9jb2xvLWZh
+aWxvdmVyLm8KICBDQyAgICAgIG1pZ3JhdGlvbi92bXN0YXRlLm8KICBDQyAgICAgIG1pZ3JhdGlv
+bi92bXN0YXRlLXR5cGVzLm8KICBDQyAgICAgIG1pZ3JhdGlvbi9wYWdlX2NhY2hlLm8KICBDQyAg
+ICAgIG1pZ3JhdGlvbi9xZW11LWZpbGUubwogIENDICAgICAgbWlncmF0aW9uL2dsb2JhbF9zdGF0
+ZS5vCiAgQ0MgICAgICBtaWdyYXRpb24vcWVtdS1maWxlLWNoYW5uZWwubwogIENDICAgICAgbWln
+cmF0aW9uL3hienJsZS5vCiAgQ0MgICAgICBtaWdyYXRpb24vcG9zdGNvcHktcmFtLm8KICBDQyAg
+ICAgIG1pZ3JhdGlvbi9xanNvbi5vCiAgQ0MgICAgICBtaWdyYXRpb24vYmxvY2subwogIENDICAg
+ICAgbmV0L25ldC5vCiAgQ0MgICAgICBuZXQvcXVldWUubwogIENDICAgICAgbmV0L2NoZWNrc3Vt
+Lm8KICBDQyAgICAgIG5ldC91dGlsLm8KICBDQyAgICAgIG5ldC9odWIubwogIENDICAgICAgbmV0
+L3NvY2tldC5vCiAgQ0MgICAgICBuZXQvZHVtcC5vCiAgQ0MgICAgICBuZXQvZXRoLm8KICBDQyAg
+ICAgIG5ldC9sMnRwdjMubwogIENDICAgICAgbmV0L3Zob3N0LXVzZXIubwogIENDICAgICAgbmV0
+L3NsaXJwLm8KICBDQyAgICAgIG5ldC9maWx0ZXIubwogIENDICAgICAgbmV0L2ZpbHRlci1idWZm
+ZXIubwogIENDICAgICAgbmV0L2ZpbHRlci1taXJyb3IubwogIENDICAgICAgbmV0L2NvbG8tY29t
+cGFyZS5vCiAgQ0MgICAgICBuZXQvY29sby5vCiAgQ0MgICAgICBuZXQvZmlsdGVyLXJld3JpdGVy
+Lm8KICBDQyAgICAgIG5ldC9maWx0ZXItcmVwbGF5Lm8KICBDQyAgICAgIG5ldC90YXAubwogIEND
+ICAgICAgbmV0L3RhcC1saW51eC5vCiAgQ0MgICAgICBxb20vY3B1Lm8KICBDQyAgICAgIHJlcGxh
+eS9yZXBsYXkubwogIENDICAgICAgcmVwbGF5L3JlcGxheS1pbnRlcm5hbC5vCiAgQ0MgICAgICBy
+ZXBsYXkvcmVwbGF5LWV2ZW50cy5vCiAgQ0MgICAgICByZXBsYXkvcmVwbGF5LXRpbWUubwogIEND
+ICAgICAgcmVwbGF5L3JlcGxheS1pbnB1dC5vCiAgQ0MgICAgICByZXBsYXkvcmVwbGF5LWNoYXIu
+bwovdG1wL3FlbXUtdGVzdC9zcmMvcmVwbGF5L3JlcGxheS1pbnRlcm5hbC5jOiBJbiBmdW5jdGlv
+biAncmVwbGF5X3B1dF9hcnJheSc6Ci90bXAvcWVtdS10ZXN0L3NyYy9yZXBsYXkvcmVwbGF5LWlu
+dGVybmFsLmM6NjU6IHdhcm5pbmc6IGlnbm9yaW5nIHJldHVybiB2YWx1ZSBvZiAnZndyaXRlJywg
+ZGVjbGFyZWQgd2l0aCBhdHRyaWJ1dGUgd2Fybl91bnVzZWRfcmVzdWx0CiAgQ0MgICAgICByZXBs
+YXkvcmVwbGF5LXNuYXBzaG90Lm8KICBDQyAgICAgIHJlcGxheS9yZXBsYXktbmV0Lm8KICBDQyAg
+ICAgIHJlcGxheS9yZXBsYXktYXVkaW8ubwogIENDICAgICAgc2xpcnAvY2tzdW0ubwogIENDICAg
+ICAgc2xpcnAvaWYubwogIENDICAgICAgc2xpcnAvaXBfaWNtcC5vCiAgQ0MgICAgICBzbGlycC9p
+cDZfaWNtcC5vCiAgQ0MgICAgICBzbGlycC9pcDZfaW5wdXQubwogIENDICAgICAgc2xpcnAvaXA2
+X291dHB1dC5vCiAgQ0MgICAgICBzbGlycC9pcF9pbnB1dC5vCiAgQ0MgICAgICBzbGlycC9pcF9v
+dXRwdXQubwogIENDICAgICAgc2xpcnAvZG5zc2VhcmNoLm8KICBDQyAgICAgIHNsaXJwL2RoY3B2
+Ni5vCiAgQ0MgICAgICBzbGlycC9zbGlycC5vCiAgQ0MgICAgICBzbGlycC9tYnVmLm8KICBDQyAg
+ICAgIHNsaXJwL21pc2MubwogIENDICAgICAgc2xpcnAvc2J1Zi5vCiAgQ0MgICAgICBzbGlycC9z
+b2NrZXQubwogIENDICAgICAgc2xpcnAvdGNwX2lucHV0Lm8KICBDQyAgICAgIHNsaXJwL3RjcF9v
+dXRwdXQubwogIENDICAgICAgc2xpcnAvdGNwX3N1YnIubwogIENDICAgICAgc2xpcnAvdGNwX3Rp
+bWVyLm8KICBDQyAgICAgIHNsaXJwL3VkcC5vCiAgQ0MgICAgICBzbGlycC91ZHA2Lm8KICBDQyAg
+ICAgIHNsaXJwL2Jvb3RwLm8KICBDQyAgICAgIHNsaXJwL3RmdHAubwogIENDICAgICAgc2xpcnAv
+YXJwX3RhYmxlLm8KICBDQyAgICAgIHNsaXJwL25kcF90YWJsZS5vCiAgQ0MgICAgICBzbGlycC9u
+Y3NpLm8KICBDQyAgICAgIHVpL2tleW1hcHMubwogIENDICAgICAgdWkvY29uc29sZS5vCi90bXAv
+cWVtdS10ZXN0L3NyYy9zbGlycC90Y3BfaW5wdXQuYzogSW4gZnVuY3Rpb24gJ3RjcF9pbnB1dCc6
+Ci90bXAvcWVtdS10ZXN0L3NyYy9zbGlycC90Y3BfaW5wdXQuYzoyMTk6IHdhcm5pbmc6ICdzYXZl
+X2lwLmlwX3AnIG1heSBiZSB1c2VkIHVuaW5pdGlhbGl6ZWQgaW4gdGhpcyBmdW5jdGlvbgovdG1w
+L3FlbXUtdGVzdC9zcmMvc2xpcnAvdGNwX2lucHV0LmM6MjE5OiB3YXJuaW5nOiAnc2F2ZV9pcC5p
+cF9sZW4nIG1heSBiZSB1c2VkIHVuaW5pdGlhbGl6ZWQgaW4gdGhpcyBmdW5jdGlvbgovdG1wL3Fl
+bXUtdGVzdC9zcmMvc2xpcnAvdGNwX2lucHV0LmM6MjE5OiB3YXJuaW5nOiAnc2F2ZV9pcC5pcF90
+b3MnIG1heSBiZSB1c2VkIHVuaW5pdGlhbGl6ZWQgaW4gdGhpcyBmdW5jdGlvbgovdG1wL3FlbXUt
+dGVzdC9zcmMvc2xpcnAvdGNwX2lucHV0LmM6MjE5OiB3YXJuaW5nOiAnc2F2ZV9pcC5pcF9pZCcg
+bWF5IGJlIHVzZWQgdW5pbml0aWFsaXplZCBpbiB0aGlzIGZ1bmN0aW9uCi90bXAvcWVtdS10ZXN0
+L3NyYy9zbGlycC90Y3BfaW5wdXQuYzoyMTk6IHdhcm5pbmc6ICdzYXZlX2lwLmlwX29mZicgbWF5
+IGJlIHVzZWQgdW5pbml0aWFsaXplZCBpbiB0aGlzIGZ1bmN0aW9uCi90bXAvcWVtdS10ZXN0L3Ny
+Yy9zbGlycC90Y3BfaW5wdXQuYzoyMTk6IHdhcm5pbmc6ICdzYXZlX2lwLmlwX3R0bCcgbWF5IGJl
+IHVzZWQgdW5pbml0aWFsaXplZCBpbiB0aGlzIGZ1bmN0aW9uCi90bXAvcWVtdS10ZXN0L3NyYy9z
+bGlycC90Y3BfaW5wdXQuYzoyMTk6IHdhcm5pbmc6ICdzYXZlX2lwLmlwX3N1bScgbWF5IGJlIHVz
+ZWQgdW5pbml0aWFsaXplZCBpbiB0aGlzIGZ1bmN0aW9uCi90bXAvcWVtdS10ZXN0L3NyYy9zbGly
+cC90Y3BfaW5wdXQuYzoyMTk6IHdhcm5pbmc6ICdzYXZlX2lwLmlwX3NyYy5zX2FkZHInIG1heSBi
+ZSB1c2VkIHVuaW5pdGlhbGl6ZWQgaW4gdGhpcyBmdW5jdGlvbgovdG1wL3FlbXUtdGVzdC9zcmMv
+c2xpcnAvdGNwX2lucHV0LmM6MjE5OiB3YXJuaW5nOiAnc2F2ZV9pcC5pcF9kc3Quc19hZGRyJyBt
+YXkgYmUgdXNlZCB1bmluaXRpYWxpemVkIGluIHRoaXMgZnVuY3Rpb24KL3RtcC9xZW11LXRlc3Qv
+c3JjL3NsaXJwL3RjcF9pbnB1dC5jOjIyMDogd2FybmluZzogJ3NhdmVfaXA2LmlwX25oJyBtYXkg
+YmUgdXNlZCB1bmluaXRpYWxpemVkIGluIHRoaXMgZnVuY3Rpb24KICBDQyAgICAgIHVpL2N1cnNv
+ci5vCiAgQ0MgICAgICB1aS9xZW11LXBpeG1hbi5vCiAgQ0MgICAgICB1aS9pbnB1dC5vCiAgQ0Mg
+ICAgICB1aS9pbnB1dC1rZXltYXAubwogIENDICAgICAgdWkvaW5wdXQtbGVnYWN5Lm8KICBDQyAg
+ICAgIHVpL2lucHV0LWxpbnV4Lm8KICBDQyAgICAgIHVpL3NwaWNlLWNvcmUubwogIENDICAgICAg
+dWkvc3BpY2UtaW5wdXQubwogIENDICAgICAgdWkvc3BpY2UtZGlzcGxheS5vCiAgQ0MgICAgICB1
+aS9zZGwubwogIENDICAgICAgdWkvc2RsX3pvb20ubwogIENDICAgICAgdWkveF9rZXltYXAubwog
+IENDICAgICAgdWkvY3Vyc2VzLm8KICBDQyAgICAgIHVpL3ZuYy5vCiAgQ0MgICAgICB1aS92bmMt
+ZW5jLXpsaWIubwogIENDICAgICAgdWkvdm5jLWVuYy1oZXh0aWxlLm8KICBDQyAgICAgIHVpL3Zu
+Yy1lbmMtdGlnaHQubwogIENDICAgICAgdWkvdm5jLXBhbGV0dGUubwogIENDICAgICAgdWkvdm5j
+LWVuYy16cmxlLm8KICBDQyAgICAgIHVpL3ZuYy1hdXRoLXZlbmNyeXB0Lm8KICBDQyAgICAgIHVp
+L3ZuYy13cy5vCiAgQ0MgICAgICB1aS92bmMtam9icy5vCiAgQ0MgICAgICB1aS9ndGsubwogIFZF
+UlQgICAgdWkvc2hhZGVyL3RleHR1cmUtYmxpdC12ZXJ0LmgKICBWRVJUICAgIHVpL3NoYWRlci90
+ZXh0dXJlLWJsaXQtZmxpcC12ZXJ0LmgKICBGUkFHICAgIHVpL3NoYWRlci90ZXh0dXJlLWJsaXQt
+ZnJhZy5oCiAgQ0MgICAgICB1aS9jb25zb2xlLWdsLm8KICBDQyAgICAgIHVpL2VnbC1oZWxwZXJz
+Lm8KICBDQyAgICAgIHVpL2VnbC1jb250ZXh0Lm8KICBDQyAgICAgIHVpL2d0ay1lZ2wubwogIEND
+ICAgICAgY2hhcmRldi9jaGFyLm8KICBDQyAgICAgIGNoYXJkZXYvY2hhci1mZC5vCiAgQ0MgICAg
+ICBjaGFyZGV2L2NoYXItZmUubwogIENDICAgICAgY2hhcmRldi9jaGFyLWZpbGUubwogIENDICAg
+ICAgY2hhcmRldi9jaGFyLWlvLm8KICBDQyAgICAgIGNoYXJkZXYvY2hhci1tdXgubwogIENDICAg
+ICAgY2hhcmRldi9jaGFyLW51bGwubwogIENDICAgICAgY2hhcmRldi9jaGFyLXBhcmFsbGVsLm8K
+ICBDQyAgICAgIGNoYXJkZXYvY2hhci1waXBlLm8KSW4gZmlsZSBpbmNsdWRlZCBmcm9tIC91c3Iv
+aW5jbHVkZS9ndGstMi4wL2d0ay9ndGsuaDoyMzUsCiAgICAgICAgICAgICAgICAgZnJvbSAvdG1w
+L3FlbXUtdGVzdC9zcmMvaW5jbHVkZS91aS9ndGsuaDoxMCwKICAgICAgICAgICAgICAgICBmcm9t
+IC90bXAvcWVtdS10ZXN0L3NyYy91aS9ndGstZWdsLmM6MjE6Ci91c3IvaW5jbHVkZS9ndGstMi4w
+L2d0ay9ndGtpdGVtZmFjdG9yeS5oOjQ3OiB3YXJuaW5nOiBmdW5jdGlvbiBkZWNsYXJhdGlvbiBp
+c24ndCBhIHByb3RvdHlwZQpJbiBmaWxlIGluY2x1ZGVkIGZyb20gL3Vzci9pbmNsdWRlL2d0ay0y
+LjAvZ3RrL2d0ay5oOjIzNSwKICAgICAgICAgICAgICAgICBmcm9tIC90bXAvcWVtdS10ZXN0L3Ny
+Yy9pbmNsdWRlL3VpL2d0ay5oOjEwLAogICAgICAgICAgICAgICAgIGZyb20gL3RtcC9xZW11LXRl
+c3Qvc3JjL3VpL2d0ay5jOjQzOgovdXNyL2luY2x1ZGUvZ3RrLTIuMC9ndGsvZ3RraXRlbWZhY3Rv
+cnkuaDo0Nzogd2FybmluZzogZnVuY3Rpb24gZGVjbGFyYXRpb24gaXNuJ3QgYSBwcm90b3R5cGUK
+ICBDQyAgICAgIGNoYXJkZXYvY2hhci1wdHkubwogIENDICAgICAgY2hhcmRldi9jaGFyLXJpbmdi
+dWYubwogIENDICAgICAgY2hhcmRldi9jaGFyLXNlcmlhbC5vCiAgQ0MgICAgICBjaGFyZGV2L2No
+YXItc29ja2V0Lm8KICBDQyAgICAgIGNoYXJkZXYvY2hhci1zdGRpby5vCiAgQ0MgICAgICBjaGFy
+ZGV2L2NoYXItdWRwLm8KICBMSU5LICAgIHRlc3RzL3FlbXUtaW90ZXN0cy9zb2NrZXRfc2NtX2hl
+bHBlcgogIENDICAgICAgcWdhL2NvbW1hbmRzLm8KICBDQyAgICAgIHFnYS9ndWVzdC1hZ2VudC1j
+b21tYW5kLXN0YXRlLm8KICBDQyAgICAgIHFnYS9tYWluLm8KICBBUyAgICAgIG9wdGlvbnJvbS9t
+dWx0aWJvb3QubwogIEFTICAgICAgb3B0aW9ucm9tL2xpbnV4Ym9vdC5vCiAgQ0MgICAgICBvcHRp
+b25yb20vbGludXhib290X2RtYS5vCmNjOiB1bnJlY29nbml6ZWQgb3B0aW9uICctbm8taW50ZWdy
+YXRlZC1hcycKY2M6IHVucmVjb2duaXplZCBvcHRpb24gJy1uby1pbnRlZ3JhdGVkLWFzJwogIEND
+ICAgICAgcWdhL2NvbW1hbmRzLXBvc2l4Lm8KICBBUyAgICAgIG9wdGlvbnJvbS9rdm12YXBpYy5v
+CiAgQlVJTEQgICBvcHRpb25yb20vbXVsdGlib290LmltZwogIEJVSUxEICAgb3B0aW9ucm9tL2xp
+bnV4Ym9vdC5pbWcKICBCVUlMRCAgIG9wdGlvbnJvbS9saW51eGJvb3RfZG1hLmltZwogIEJVSUxE
+ICAgb3B0aW9ucm9tL2t2bXZhcGljLmltZwogIEJVSUxEICAgb3B0aW9ucm9tL211bHRpYm9vdC5y
+YXcKICBCVUlMRCAgIG9wdGlvbnJvbS9saW51eGJvb3QucmF3CiAgQlVJTEQgICBvcHRpb25yb20v
+bGludXhib290X2RtYS5yYXcKICBCVUlMRCAgIG9wdGlvbnJvbS9rdm12YXBpYy5yYXcKICBTSUdO
+ICAgIG9wdGlvbnJvbS9tdWx0aWJvb3QuYmluCiAgQ0MgICAgICBxZ2EvY2hhbm5lbC1wb3NpeC5v
+CiAgU0lHTiAgICBvcHRpb25yb20vbGludXhib290LmJpbgogIFNJR04gICAgb3B0aW9ucm9tL2xp
+bnV4Ym9vdF9kbWEuYmluCiAgU0lHTiAgICBvcHRpb25yb20va3ZtdmFwaWMuYmluCiAgQ0MgICAg
+ICBxZ2EvcWFwaS1nZW5lcmF0ZWQvcWdhLXFhcGktdHlwZXMubwogIENDICAgICAgcWdhL3FhcGkt
+Z2VuZXJhdGVkL3FnYS1xYXBpLXZpc2l0Lm8KICBDQyAgICAgIHFnYS9xYXBpLWdlbmVyYXRlZC9x
+Z2EtcW1wLW1hcnNoYWwubwogIEFSICAgICAgbGlicWVtdXV0aWwuYQogIENDICAgICAgcWVtdS1p
+bWcubwogIExJTksgICAgcWVtdS1pbwogIExJTksgICAgc2NzaS9xZW11LXByLWhlbHBlcgogIExJ
+TksgICAgcWVtdS1icmlkZ2UtaGVscGVyCiAgQ0MgICAgICB1aS9zaGFkZXIubwogIExJTksgICAg
+aXZzaG1lbS1jbGllbnQKICBMSU5LICAgIGl2c2htZW0tc2VydmVyCiAgTElOSyAgICBxZW11LW5i
+ZAogIExJTksgICAgcWVtdS1nYQogIEdFTiAgICAgYWFyY2g2NC1zb2Z0bW11L2htcC1jb21tYW5k
+cy5oCiAgR0VOICAgICBhYXJjaDY0LXNvZnRtbXUvaG1wLWNvbW1hbmRzLWluZm8uaAogIEdFTiAg
+ICAgYWFyY2g2NC1zb2Z0bW11L2NvbmZpZy10YXJnZXQuaAogIEdFTiAgICAgeDg2XzY0LXNvZnRt
+bXUvaG1wLWNvbW1hbmRzLmgKICBHRU4gICAgIHg4Nl82NC1zb2Z0bW11L2htcC1jb21tYW5kcy1p
+bmZvLmgKICBHRU4gICAgIHg4Nl82NC1zb2Z0bW11L2NvbmZpZy10YXJnZXQuaAogIENDICAgICAg
+eDg2XzY0LXNvZnRtbXUvdGNnL3RjZy1vcC5vCiAgQ0MgICAgICB4ODZfNjQtc29mdG1tdS9leGVj
+Lm8KICBDQyAgICAgIHg4Nl82NC1zb2Z0bW11L3RjZy90Y2ctY29tbW9uLm8KICBDQyAgICAgIHg4
+Nl82NC1zb2Z0bW11L3RjZy90Y2cubwogIENDICAgICAgeDg2XzY0LXNvZnRtbXUvdGNnL29wdGlt
+aXplLm8KICBDQyAgICAgIHg4Nl82NC1zb2Z0bW11L2ZwdS9zb2Z0ZmxvYXQubwogIENDICAgICAg
+YWFyY2g2NC1zb2Z0bW11L2V4ZWMubwogIENDICAgICAgYWFyY2g2NC1zb2Z0bW11L3RjZy90Y2cu
+bwogIENDICAgICAgeDg2XzY0LXNvZnRtbXUvZGlzYXMubwogIEdFTiAgICAgeDg2XzY0LXNvZnRt
+bXUvZ2Ric3R1Yi14bWwuYwogIENDICAgICAgYWFyY2g2NC1zb2Z0bW11L3RjZy90Y2ctb3Aubwog
+IENDICAgICAgYWFyY2g2NC1zb2Z0bW11L3RjZy9vcHRpbWl6ZS5vCiAgQ0MgICAgICBhYXJjaDY0
+LXNvZnRtbXUvdGNnL3RjZy1jb21tb24ubwogIENDICAgICAgYWFyY2g2NC1zb2Z0bW11L2ZwdS9z
+b2Z0ZmxvYXQubwogIENDICAgICAgYWFyY2g2NC1zb2Z0bW11L2Rpc2FzLm8KICBHRU4gICAgIGFh
+cmNoNjQtc29mdG1tdS9nZGJzdHViLXhtbC5jCiAgTElOSyAgICBxZW11LWltZwogIENDICAgICAg
+YWFyY2g2NC1zb2Z0bW11L2FyY2hfaW5pdC5vCiAgQ0MgICAgICBhYXJjaDY0LXNvZnRtbXUvY3B1
+cy5vCiAgQ0MgICAgICBhYXJjaDY0LXNvZnRtbXUvbW9uaXRvci5vCiAgQ0MgICAgICBhYXJjaDY0
+LXNvZnRtbXUvZ2Ric3R1Yi5vCiAgQ0MgICAgICBhYXJjaDY0LXNvZnRtbXUvYmFsbG9vbi5vCiAg
+Q0MgICAgICBhYXJjaDY0LXNvZnRtbXUvaW9wb3J0Lm8KICBDQyAgICAgIGFhcmNoNjQtc29mdG1t
+dS9udW1hLm8KICBDQyAgICAgIGFhcmNoNjQtc29mdG1tdS9xdGVzdC5vCiAgQ0MgICAgICBhYXJj
+aDY0LXNvZnRtbXUvbWVtb3J5Lm8KICBDQyAgICAgIGFhcmNoNjQtc29mdG1tdS9tZW1vcnlfbWFw
+cGluZy5vCiAgQ0MgICAgICB4ODZfNjQtc29mdG1tdS9hcmNoX2luaXQubwogIENDICAgICAgeDg2
+XzY0LXNvZnRtbXUvY3B1cy5vCiAgQ0MgICAgICBhYXJjaDY0LXNvZnRtbXUvZHVtcC5vCiAgQ0Mg
+ICAgICB4ODZfNjQtc29mdG1tdS9tb25pdG9yLm8KICBDQyAgICAgIGFhcmNoNjQtc29mdG1tdS9t
+aWdyYXRpb24vcmFtLm8KICBDQyAgICAgIGFhcmNoNjQtc29mdG1tdS9hY2NlbC9hY2NlbC5vCiAg
+Q0MgICAgICBhYXJjaDY0LXNvZnRtbXUvYWNjZWwvc3R1YnMvaGF4LXN0dWIubwogIENDICAgICAg
+YWFyY2g2NC1zb2Z0bW11L2FjY2VsL3N0dWJzL2t2bS1zdHViLm8KICBDQyAgICAgIGFhcmNoNjQt
+c29mdG1tdS9hY2NlbC90Y2cvdGNnLWFsbC5vCiAgQ0MgICAgICBhYXJjaDY0LXNvZnRtbXUvYWNj
+ZWwvdGNnL2NwdXRsYi5vCiAgQ0MgICAgICBhYXJjaDY0LXNvZnRtbXUvYWNjZWwvdGNnL3RjZy1y
+dW50aW1lLm8KICBDQyAgICAgIGFhcmNoNjQtc29mdG1tdS9hY2NlbC90Y2cvY3B1LWV4ZWMubwog
+IENDICAgICAgeDg2XzY0LXNvZnRtbXUvZ2Ric3R1Yi5vCiAgQ0MgICAgICBhYXJjaDY0LXNvZnRt
+bXUvYWNjZWwvdGNnL2NwdS1leGVjLWNvbW1vbi5vCiAgQ0MgICAgICB4ODZfNjQtc29mdG1tdS9i
+YWxsb29uLm8KICBDQyAgICAgIHg4Nl82NC1zb2Z0bW11L2lvcG9ydC5vCiAgQ0MgICAgICBhYXJj
+aDY0LXNvZnRtbXUvYWNjZWwvdGNnL3RyYW5zbGF0ZS1hbGwubwogIENDICAgICAgeDg2XzY0LXNv
+ZnRtbXUvbnVtYS5vCiAgQ0MgICAgICB4ODZfNjQtc29mdG1tdS9xdGVzdC5vCiAgQ0MgICAgICBh
+YXJjaDY0LXNvZnRtbXUvYWNjZWwvdGNnL3RyYW5zbGF0b3IubwogIENDICAgICAgeDg2XzY0LXNv
+ZnRtbXUvbWVtb3J5Lm8KICBDQyAgICAgIHg4Nl82NC1zb2Z0bW11L21lbW9yeV9tYXBwaW5nLm8K
+ICBDQyAgICAgIGFhcmNoNjQtc29mdG1tdS9ody9hZGMvc3RtMzJmMnh4X2FkYy5vCiAgQ0MgICAg
+ICBhYXJjaDY0LXNvZnRtbXUvaHcvYmxvY2svdmlydGlvLWJsay5vCiAgQ0MgICAgICBhYXJjaDY0
+LXNvZnRtbXUvaHcvYmxvY2svZGF0YXBsYW5lL3ZpcnRpby1ibGsubwogIENDICAgICAgYWFyY2g2
+NC1zb2Z0bW11L2h3L2NoYXIvZXh5bm9zNDIxMF91YXJ0Lm8KICBDQyAgICAgIGFhcmNoNjQtc29m
+dG1tdS9ody9jaGFyL29tYXBfdWFydC5vCiAgQ0MgICAgICBhYXJjaDY0LXNvZnRtbXUvaHcvY2hh
+ci9kaWdpYy11YXJ0Lm8KICBDQyAgICAgIGFhcmNoNjQtc29mdG1tdS9ody9jaGFyL3N0bTMyZjJ4
+eF91c2FydC5vCiAgQ0MgICAgICB4ODZfNjQtc29mdG1tdS9kdW1wLm8KICBDQyAgICAgIGFhcmNo
+NjQtc29mdG1tdS9ody9jaGFyL2JjbTI4MzVfYXV4Lm8KICBDQyAgICAgIGFhcmNoNjQtc29mdG1t
+dS9ody9jaGFyL3ZpcnRpby1zZXJpYWwtYnVzLm8KICBDQyAgICAgIGFhcmNoNjQtc29mdG1tdS9o
+dy9jb3JlL2dlbmVyaWMtbG9hZGVyLm8KICBDQyAgICAgIGFhcmNoNjQtc29mdG1tdS9ody9jb3Jl
+L251bGwtbWFjaGluZS5vCiAgQ0MgICAgICB4ODZfNjQtc29mdG1tdS9taWdyYXRpb24vcmFtLm8K
+ICBDQyAgICAgIGFhcmNoNjQtc29mdG1tdS9ody9jcHUvYXJtMTFtcGNvcmUubwogIENDICAgICAg
+YWFyY2g2NC1zb2Z0bW11L2h3L2NwdS9yZWFsdmlld19tcGNvcmUubwogIENDICAgICAgYWFyY2g2
+NC1zb2Z0bW11L2h3L2NwdS9hOW1wY29yZS5vCiAgQ0MgICAgICBhYXJjaDY0LXNvZnRtbXUvaHcv
+Y3B1L2ExNW1wY29yZS5vCiAgQ0MgICAgICBhYXJjaDY0LXNvZnRtbXUvaHcvZGlzcGxheS9vbWFw
+X2Rzcy5vCiAgQ0MgICAgICB4ODZfNjQtc29mdG1tdS9hY2NlbC9hY2NlbC5vCiAgQ0MgICAgICBh
+YXJjaDY0LXNvZnRtbXUvaHcvZGlzcGxheS9vbWFwX2xjZGMubwogIENDICAgICAgeDg2XzY0LXNv
+ZnRtbXUvYWNjZWwva3ZtL2t2bS1hbGwubwogIENDICAgICAgYWFyY2g2NC1zb2Z0bW11L2h3L2Rp
+c3BsYXkvcHhhMnh4X2xjZC5vCiAgQ0MgICAgICBhYXJjaDY0LXNvZnRtbXUvaHcvZGlzcGxheS9i
+Y20yODM1X2ZiLm8KICBDQyAgICAgIHg4Nl82NC1zb2Z0bW11L2FjY2VsL3N0dWJzL2hheC1zdHVi
+Lm8KICBDQyAgICAgIHg4Nl82NC1zb2Z0bW11L2FjY2VsL3RjZy90Y2ctYWxsLm8KICBDQyAgICAg
+IHg4Nl82NC1zb2Z0bW11L2FjY2VsL3RjZy9jcHV0bGIubwogIENDICAgICAgYWFyY2g2NC1zb2Z0
+bW11L2h3L2Rpc3BsYXkvdmdhLm8KICBDQyAgICAgIGFhcmNoNjQtc29mdG1tdS9ody9kaXNwbGF5
+L3ZpcnRpby1ncHUubwogIENDICAgICAgYWFyY2g2NC1zb2Z0bW11L2h3L2Rpc3BsYXkvdmlydGlv
+LWdwdS0zZC5vCiAgQ0MgICAgICB4ODZfNjQtc29mdG1tdS9hY2NlbC90Y2cvdGNnLXJ1bnRpbWUu
+bwogIENDICAgICAgYWFyY2g2NC1zb2Z0bW11L2h3L2Rpc3BsYXkvdmlydGlvLWdwdS1wY2kubwog
+IENDICAgICAgYWFyY2g2NC1zb2Z0bW11L2h3L2Rpc3BsYXkvZHBjZC5vCiAgQ0MgICAgICB4ODZf
+NjQtc29mdG1tdS9hY2NlbC90Y2cvY3B1LWV4ZWMubwogIENDICAgICAgeDg2XzY0LXNvZnRtbXUv
+YWNjZWwvdGNnL2NwdS1leGVjLWNvbW1vbi5vCiAgQ0MgICAgICBhYXJjaDY0LXNvZnRtbXUvaHcv
+ZGlzcGxheS94bG54X2RwLm8KICBDQyAgICAgIGFhcmNoNjQtc29mdG1tdS9ody9kbWEveGxueF9k
+cGRtYS5vCiAgQ0MgICAgICBhYXJjaDY0LXNvZnRtbXUvaHcvZG1hL29tYXBfZG1hLm8KICBDQyAg
+ICAgIGFhcmNoNjQtc29mdG1tdS9ody9kbWEvc29jX2RtYS5vCiAgQ0MgICAgICB4ODZfNjQtc29m
+dG1tdS9hY2NlbC90Y2cvdHJhbnNsYXRlLWFsbC5vCiAgQ0MgICAgICBhYXJjaDY0LXNvZnRtbXUv
+aHcvZG1hL3B4YTJ4eF9kbWEubwogIENDICAgICAgYWFyY2g2NC1zb2Z0bW11L2h3L2RtYS9iY20y
+ODM1X2RtYS5vCiAgQ0MgICAgICBhYXJjaDY0LXNvZnRtbXUvaHcvZ3Bpby9vbWFwX2dwaW8ubwog
+IENDICAgICAgeDg2XzY0LXNvZnRtbXUvYWNjZWwvdGNnL3RyYW5zbGF0b3IubwogIENDICAgICAg
+YWFyY2g2NC1zb2Z0bW11L2h3L2dwaW8vaW14X2dwaW8ubwogIENDICAgICAgYWFyY2g2NC1zb2Z0
+bW11L2h3L2dwaW8vYmNtMjgzNV9ncGlvLm8KICBDQyAgICAgIHg4Nl82NC1zb2Z0bW11L2h3L2Js
+b2NrL3ZpcnRpby1ibGsubwogIENDICAgICAgYWFyY2g2NC1zb2Z0bW11L2h3L2kyYy9vbWFwX2ky
+Yy5vCiAgQ0MgICAgICB4ODZfNjQtc29mdG1tdS9ody9ibG9jay9kYXRhcGxhbmUvdmlydGlvLWJs
+ay5vCiAgQ0MgICAgICBhYXJjaDY0LXNvZnRtbXUvaHcvaW5wdXQvcHhhMnh4X2tleXBhZC5vCiAg
+Q0MgICAgICBhYXJjaDY0LXNvZnRtbXUvaHcvaW5wdXQvdHNjMjEweC5vCiAgQ0MgICAgICBhYXJj
+aDY0LXNvZnRtbXUvaHcvaW50Yy9hcm12N21fbnZpYy5vCiAgQ0MgICAgICB4ODZfNjQtc29mdG1t
+dS9ody9jaGFyL3ZpcnRpby1zZXJpYWwtYnVzLm8KICBDQyAgICAgIGFhcmNoNjQtc29mdG1tdS9o
+dy9pbnRjL2V4eW5vczQyMTBfZ2ljLm8KICBDQyAgICAgIHg4Nl82NC1zb2Z0bW11L2h3L2NvcmUv
+Z2VuZXJpYy1sb2FkZXIubwogIENDICAgICAgYWFyY2g2NC1zb2Z0bW11L2h3L2ludGMvZXh5bm9z
+NDIxMF9jb21iaW5lci5vCiAgQ0MgICAgICBhYXJjaDY0LXNvZnRtbXUvaHcvaW50Yy9vbWFwX2lu
+dGMubwogIENDICAgICAgYWFyY2g2NC1zb2Z0bW11L2h3L2ludGMvYmNtMjgzNV9pYy5vCiAgQ0Mg
+ICAgICB4ODZfNjQtc29mdG1tdS9ody9jb3JlL251bGwtbWFjaGluZS5vCiAgQ0MgICAgICBhYXJj
+aDY0LXNvZnRtbXUvaHcvaW50Yy9iY20yODM2X2NvbnRyb2wubwogIENDICAgICAgYWFyY2g2NC1z
+b2Z0bW11L2h3L2ludGMvYWxsd2lubmVyLWExMC1waWMubwogIENDICAgICAgYWFyY2g2NC1zb2Z0
+bW11L2h3L2ludGMvYXNwZWVkX3ZpYy5vCiAgQ0MgICAgICB4ODZfNjQtc29mdG1tdS9ody9kaXNw
+bGF5L3ZnYS5vCiAgQ0MgICAgICBhYXJjaDY0LXNvZnRtbXUvaHcvaW50Yy9hcm1fZ2ljdjNfY3B1
+aWYubwogIENDICAgICAgeDg2XzY0LXNvZnRtbXUvaHcvZGlzcGxheS92aXJ0aW8tZ3B1Lm8KICBD
+QyAgICAgIGFhcmNoNjQtc29mdG1tdS9ody9taXNjL2l2c2htZW0ubwogIENDICAgICAgYWFyY2g2
+NC1zb2Z0bW11L2h3L21pc2MvYXJtX3N5c2N0bC5vCiAgQ0MgICAgICB4ODZfNjQtc29mdG1tdS9o
+dy9kaXNwbGF5L3ZpcnRpby1ncHUtM2QubwogIENDICAgICAgYWFyY2g2NC1zb2Z0bW11L2h3L21p
+c2MvY2J1cy5vCiAgQ0MgICAgICBhYXJjaDY0LXNvZnRtbXUvaHcvbWlzYy9leHlub3M0MjEwX3Bt
+dS5vCiAgQ0MgICAgICB4ODZfNjQtc29mdG1tdS9ody9kaXNwbGF5L3ZpcnRpby1ncHUtcGNpLm8K
+ICBDQyAgICAgIHg4Nl82NC1zb2Z0bW11L2h3L2Rpc3BsYXkvdmlydGlvLXZnYS5vCiAgQ0MgICAg
+ICBhYXJjaDY0LXNvZnRtbXUvaHcvbWlzYy9leHlub3M0MjEwX2Nsay5vCiAgQ0MgICAgICB4ODZf
+NjQtc29mdG1tdS9ody9pbnRjL2FwaWMubwogIENDICAgICAgYWFyY2g2NC1zb2Z0bW11L2h3L21p
+c2MvZXh5bm9zNDIxMF9ybmcubwogIENDICAgICAgeDg2XzY0LXNvZnRtbXUvaHcvaW50Yy9hcGlj
+X2NvbW1vbi5vCiAgQ0MgICAgICBhYXJjaDY0LXNvZnRtbXUvaHcvbWlzYy9pbXhfY2NtLm8KICBD
+QyAgICAgIGFhcmNoNjQtc29mdG1tdS9ody9taXNjL2lteDMxX2NjbS5vCiAgQ0MgICAgICB4ODZf
+NjQtc29mdG1tdS9ody9pbnRjL2lvYXBpYy5vCiAgQ0MgICAgICB4ODZfNjQtc29mdG1tdS9ody9p
+c2EvbHBjX2ljaDkubwogIENDICAgICAgeDg2XzY0LXNvZnRtbXUvaHcvbWlzYy9pdnNobWVtLm8K
+ICBDQyAgICAgIHg4Nl82NC1zb2Z0bW11L2h3L21pc2MvcHZwYW5pYy5vCiAgQ0MgICAgICB4ODZf
+NjQtc29mdG1tdS9ody9taXNjL2h5cGVydl90ZXN0ZGV2Lm8KICBDQyAgICAgIHg4Nl82NC1zb2Z0
+bW11L2h3L21pc2MvbW1pb19pbnRlcmZhY2UubwogIENDICAgICAgYWFyY2g2NC1zb2Z0bW11L2h3
+L21pc2MvaW14MjVfY2NtLm8KICBDQyAgICAgIHg4Nl82NC1zb2Z0bW11L2h3L25ldC92aXJ0aW8t
+bmV0Lm8KICBDQyAgICAgIHg4Nl82NC1zb2Z0bW11L2h3L25ldC92aG9zdF9uZXQubwogIENDICAg
+ICAgYWFyY2g2NC1zb2Z0bW11L2h3L21pc2MvaW14Nl9jY20ubwogIENDICAgICAgeDg2XzY0LXNv
+ZnRtbXUvaHcvc2NzaS92aXJ0aW8tc2NzaS5vCiAgQ0MgICAgICB4ODZfNjQtc29mdG1tdS9ody9z
+Y3NpL3ZpcnRpby1zY3NpLWRhdGFwbGFuZS5vCiAgQ0MgICAgICB4ODZfNjQtc29mdG1tdS9ody9z
+Y3NpL3Zob3N0LXNjc2ktY29tbW9uLm8KICBDQyAgICAgIHg4Nl82NC1zb2Z0bW11L2h3L3Njc2kv
+dmhvc3Qtc2NzaS5vCiAgQ0MgICAgICB4ODZfNjQtc29mdG1tdS9ody9zY3NpL3Zob3N0LXVzZXIt
+c2NzaS5vCiAgQ0MgICAgICBhYXJjaDY0LXNvZnRtbXUvaHcvbWlzYy9pbXg2X3NyYy5vCiAgQ0Mg
+ICAgICB4ODZfNjQtc29mdG1tdS9ody90aW1lci9tYzE0NjgxOHJ0Yy5vCiAgQ0MgICAgICB4ODZf
+NjQtc29mdG1tdS9ody92ZmlvL2NvbW1vbi5vCiAgQ0MgICAgICB4ODZfNjQtc29mdG1tdS9ody92
+ZmlvL3BjaS5vCiAgQ0MgICAgICB4ODZfNjQtc29mdG1tdS9ody92ZmlvL3BjaS1xdWlya3Mubwog
+IENDICAgICAgYWFyY2g2NC1zb2Z0bW11L2h3L21pc2MvbXN0X2ZwZ2EubwogIENDICAgICAgeDg2
+XzY0LXNvZnRtbXUvaHcvdmZpby9wbGF0Zm9ybS5vCiAgQ0MgICAgICB4ODZfNjQtc29mdG1tdS9o
+dy92ZmlvL3NwYXByLm8KICBDQyAgICAgIHg4Nl82NC1zb2Z0bW11L2h3L3ZpcnRpby92aXJ0aW8u
+bwogIENDICAgICAgYWFyY2g2NC1zb2Z0bW11L2h3L21pc2Mvb21hcF9jbGsubwogIENDICAgICAg
+YWFyY2g2NC1zb2Z0bW11L2h3L21pc2Mvb21hcF9ncG1jLm8KICBDQyAgICAgIHg4Nl82NC1zb2Z0
+bW11L2h3L3ZpcnRpby92aXJ0aW8tYmFsbG9vbi5vCiAgQ0MgICAgICB4ODZfNjQtc29mdG1tdS9o
+dy92aXJ0aW8vdmhvc3QubwogIENDICAgICAgYWFyY2g2NC1zb2Z0bW11L2h3L21pc2Mvb21hcF9s
+NC5vCiAgQ0MgICAgICB4ODZfNjQtc29mdG1tdS9ody92aXJ0aW8vdmhvc3QtYmFja2VuZC5vCiAg
+Q0MgICAgICBhYXJjaDY0LXNvZnRtbXUvaHcvbWlzYy9vbWFwX3NkcmMubwogIENDICAgICAgYWFy
+Y2g2NC1zb2Z0bW11L2h3L21pc2Mvb21hcF90YXAubwogIENDICAgICAgeDg2XzY0LXNvZnRtbXUv
+aHcvdmlydGlvL3Zob3N0LXVzZXIubwogIENDICAgICAgeDg2XzY0LXNvZnRtbXUvaHcvdmlydGlv
+L3Zob3N0LXZzb2NrLm8KICBDQyAgICAgIHg4Nl82NC1zb2Z0bW11L2h3L3ZpcnRpby92aXJ0aW8t
+Y3J5cHRvLm8KICBDQyAgICAgIGFhcmNoNjQtc29mdG1tdS9ody9taXNjL2JjbTI4MzVfbWJveC5v
+CiAgQ0MgICAgICB4ODZfNjQtc29mdG1tdS9ody92aXJ0aW8vdmlydGlvLWNyeXB0by1wY2kubwog
+IENDICAgICAgYWFyY2g2NC1zb2Z0bW11L2h3L21pc2MvYmNtMjgzNV9wcm9wZXJ0eS5vCiAgQ0Mg
+ICAgICBhYXJjaDY0LXNvZnRtbXUvaHcvbWlzYy9iY20yODM1X3JuZy5vCiAgQ0MgICAgICBhYXJj
+aDY0LXNvZnRtbXUvaHcvbWlzYy96eW5xX3NsY3IubwogIENDICAgICAgeDg2XzY0LXNvZnRtbXUv
+aHcveGVuL3hlbi1ob3N0LXBjaS1kZXZpY2UubwogIENDICAgICAgYWFyY2g2NC1zb2Z0bW11L2h3
+L21pc2MvenlucS14YWRjLm8KICBDQyAgICAgIGFhcmNoNjQtc29mdG1tdS9ody9taXNjL3N0bTMy
+ZjJ4eF9zeXNjZmcubwogIENDICAgICAgeDg2XzY0LXNvZnRtbXUvaHcveGVuL3hlbl9wdC5vCiAg
+Q0MgICAgICB4ODZfNjQtc29mdG1tdS9ody94ZW4veGVuX3B0X2NvbmZpZ19pbml0Lm8KICBDQyAg
+ICAgIGFhcmNoNjQtc29mdG1tdS9ody9taXNjL21wczItc2NjLm8KICBDQyAgICAgIGFhcmNoNjQt
+c29mdG1tdS9ody9taXNjL2F1eGJ1cy5vCiAgQ0MgICAgICBhYXJjaDY0LXNvZnRtbXUvaHcvbWlz
+Yy9hc3BlZWRfc2N1Lm8KICBDQyAgICAgIHg4Nl82NC1zb2Z0bW11L2h3L3hlbi94ZW5fcHRfZ3Jh
+cGhpY3MubwogIENDICAgICAgYWFyY2g2NC1zb2Z0bW11L2h3L21pc2MvYXNwZWVkX3NkbWMubwog
+IENDICAgICAgYWFyY2g2NC1zb2Z0bW11L2h3L21pc2MvbW1pb19pbnRlcmZhY2UubwogIENDICAg
+ICAgYWFyY2g2NC1zb2Z0bW11L2h3L21pc2MvbXNmMi1zeXNyZWcubwogIENDICAgICAgYWFyY2g2
+NC1zb2Z0bW11L2h3L25ldC92aXJ0aW8tbmV0Lm8KICBDQyAgICAgIHg4Nl82NC1zb2Z0bW11L2h3
+L3hlbi94ZW5fcHRfbXNpLm8KICBDQyAgICAgIHg4Nl82NC1zb2Z0bW11L2h3L3hlbi94ZW5fcHRf
+bG9hZF9yb20ubwogIENDICAgICAgYWFyY2g2NC1zb2Z0bW11L2h3L25ldC92aG9zdF9uZXQubwog
+IENDICAgICAgYWFyY2g2NC1zb2Z0bW11L2h3L3BjbWNpYS9weGEyeHgubwogIENDICAgICAgeDg2
+XzY0LXNvZnRtbXUvaHcvaTM4Ni9tdWx0aWJvb3QubwogIENDICAgICAgeDg2XzY0LXNvZnRtbXUv
+aHcvaTM4Ni9wYy5vCiAgQ0MgICAgICBhYXJjaDY0LXNvZnRtbXUvaHcvc2NzaS92aXJ0aW8tc2Nz
+aS5vCiAgQ0MgICAgICBhYXJjaDY0LXNvZnRtbXUvaHcvc2NzaS92aXJ0aW8tc2NzaS1kYXRhcGxh
+bmUubwogIENDICAgICAgYWFyY2g2NC1zb2Z0bW11L2h3L3Njc2kvdmhvc3Qtc2NzaS1jb21tb24u
+bwogIENDICAgICAgeDg2XzY0LXNvZnRtbXUvaHcvaTM4Ni9wY19waWl4Lm8KICBDQyAgICAgIHg4
+Nl82NC1zb2Z0bW11L2h3L2kzODYvcGNfcTM1Lm8KICBDQyAgICAgIHg4Nl82NC1zb2Z0bW11L2h3
+L2kzODYvcGNfc3lzZncubwogIENDICAgICAgYWFyY2g2NC1zb2Z0bW11L2h3L3Njc2kvdmhvc3Qt
+c2NzaS5vCiAgQ0MgICAgICBhYXJjaDY0LXNvZnRtbXUvaHcvc2NzaS92aG9zdC11c2VyLXNjc2ku
+bwogIENDICAgICAgYWFyY2g2NC1zb2Z0bW11L2h3L3NkL29tYXBfbW1jLm8KICBDQyAgICAgIHg4
+Nl82NC1zb2Z0bW11L2h3L2kzODYveDg2LWlvbW11Lm8KICBDQyAgICAgIHg4Nl82NC1zb2Z0bW11
+L2h3L2kzODYvaW50ZWxfaW9tbXUubwogIENDICAgICAgYWFyY2g2NC1zb2Z0bW11L2h3L3NkL3B4
+YTJ4eF9tbWNpLm8KICBDQyAgICAgIGFhcmNoNjQtc29mdG1tdS9ody9zZC9iY20yODM1X3NkaG9z
+dC5vCiAgQ0MgICAgICBhYXJjaDY0LXNvZnRtbXUvaHcvc3NpL29tYXBfc3BpLm8KICBDQyAgICAg
+IHg4Nl82NC1zb2Z0bW11L2h3L2kzODYvYW1kX2lvbW11Lm8KICBDQyAgICAgIHg4Nl82NC1zb2Z0
+bW11L2h3L2kzODYvdm1wb3J0Lm8KICBDQyAgICAgIHg4Nl82NC1zb2Z0bW11L2h3L2kzODYvdm1t
+b3VzZS5vCi90bXAvcWVtdS10ZXN0L3NyYy9ody9pMzg2L3BjX3BpaXguYzogSW4gZnVuY3Rpb24g
+J2lnZF9wYXNzdGhyb3VnaF9pc2FfYnJpZGdlX2NyZWF0ZSc6Ci90bXAvcWVtdS10ZXN0L3NyYy9o
+dy9pMzg2L3BjX3BpaXguYzoxMDczOiB3YXJuaW5nOiAncGNoX3Jldl9pZCcgbWF5IGJlIHVzZWQg
+dW5pbml0aWFsaXplZCBpbiB0aGlzIGZ1bmN0aW9uCiAgQ0MgICAgICBhYXJjaDY0LXNvZnRtbXUv
+aHcvc3NpL2lteF9zcGkubwogIENDICAgICAgYWFyY2g2NC1zb2Z0bW11L2h3L3RpbWVyL2V4eW5v
+czQyMTBfbWN0Lm8KICBDQyAgICAgIGFhcmNoNjQtc29mdG1tdS9ody90aW1lci9leHlub3M0MjEw
+X3B3bS5vCiAgQ0MgICAgICB4ODZfNjQtc29mdG1tdS9ody9pMzg2L2t2bXZhcGljLm8KICBDQyAg
+ICAgIHg4Nl82NC1zb2Z0bW11L2h3L2kzODYvYWNwaS1idWlsZC5vCiAgQ0MgICAgICBhYXJjaDY0
+LXNvZnRtbXUvaHcvdGltZXIvZXh5bm9zNDIxMF9ydGMubwogIENDICAgICAgeDg2XzY0LXNvZnRt
+bXUvaHcvaTM4Ni8uLi94ZW5wdi94ZW5fbWFjaGluZV9wdi5vCiAgQ0MgICAgICBhYXJjaDY0LXNv
+ZnRtbXUvaHcvdGltZXIvb21hcF9ncHRpbWVyLm8KICBDQyAgICAgIGFhcmNoNjQtc29mdG1tdS9o
+dy90aW1lci9vbWFwX3N5bmN0aW1lci5vCiAgQ0MgICAgICB4ODZfNjQtc29mdG1tdS9ody9pMzg2
+L2t2bS9jbG9jay5vCiAgQ0MgICAgICB4ODZfNjQtc29mdG1tdS9ody9pMzg2L2t2bS9hcGljLm8K
+ICBDQyAgICAgIGFhcmNoNjQtc29mdG1tdS9ody90aW1lci9weGEyeHhfdGltZXIubwogIENDICAg
+ICAgeDg2XzY0LXNvZnRtbXUvaHcvaTM4Ni9rdm0vaTgyNTkubwogIENDICAgICAgYWFyY2g2NC1z
+b2Z0bW11L2h3L3RpbWVyL2RpZ2ljLXRpbWVyLm8KICBDQyAgICAgIGFhcmNoNjQtc29mdG1tdS9o
+dy90aW1lci9hbGx3aW5uZXItYTEwLXBpdC5vCiAgQ0MgICAgICB4ODZfNjQtc29mdG1tdS9ody9p
+Mzg2L2t2bS9pb2FwaWMubwogIENDICAgICAgeDg2XzY0LXNvZnRtbXUvaHcvaTM4Ni9rdm0vaTgy
+NTQubwogIENDICAgICAgeDg2XzY0LXNvZnRtbXUvaHcvaTM4Ni94ZW4veGVuX3BsYXRmb3JtLm8K
+ICBDQyAgICAgIHg4Nl82NC1zb2Z0bW11L2h3L2kzODYveGVuL3hlbl9hcGljLm8KICBDQyAgICAg
+IGFhcmNoNjQtc29mdG1tdS9ody91c2IvdHVzYjYwMTAubwogIENDICAgICAgYWFyY2g2NC1zb2Z0
+bW11L2h3L3ZmaW8vY29tbW9uLm8KICBDQyAgICAgIHg4Nl82NC1zb2Z0bW11L2h3L2kzODYveGVu
+L3hlbl9wdmRldmljZS5vCiAgQ0MgICAgICB4ODZfNjQtc29mdG1tdS9ody9pMzg2L3hlbi94ZW4t
+aHZtLm8KICBDQyAgICAgIHg4Nl82NC1zb2Z0bW11L2h3L2kzODYveGVuL3hlbi1tYXBjYWNoZS5v
+CiAgQ0MgICAgICB4ODZfNjQtc29mdG1tdS90YXJnZXQvaTM4Ni9oZWxwZXIubwovdG1wL3FlbXUt
+dGVzdC9zcmMvaHcvaTM4Ni9hY3BpLWJ1aWxkLmM6IEluIGZ1bmN0aW9uICdidWlsZF9hcHBlbmRf
+cGNpX2J1c19kZXZpY2VzJzoKL3RtcC9xZW11LXRlc3Qvc3JjL2h3L2kzODYvYWNwaS1idWlsZC5j
+OjUwOTogd2FybmluZzogJ25vdGlmeV9tZXRob2QnIG1heSBiZSB1c2VkIHVuaW5pdGlhbGl6ZWQg
+aW4gdGhpcyBmdW5jdGlvbgogIENDICAgICAgeDg2XzY0LXNvZnRtbXUvdGFyZ2V0L2kzODYvY3B1
+Lm8KICBDQyAgICAgIGFhcmNoNjQtc29mdG1tdS9ody92ZmlvL3BjaS5vCiAgQ0MgICAgICB4ODZf
+NjQtc29mdG1tdS90YXJnZXQvaTM4Ni9nZGJzdHViLm8KICBDQyAgICAgIHg4Nl82NC1zb2Z0bW11
+L3RhcmdldC9pMzg2L3hzYXZlX2hlbHBlci5vCiAgQ0MgICAgICB4ODZfNjQtc29mdG1tdS90YXJn
+ZXQvaTM4Ni90cmFuc2xhdGUubwogIENDICAgICAgeDg2XzY0LXNvZnRtbXUvdGFyZ2V0L2kzODYv
+YnB0X2hlbHBlci5vCiAgQ0MgICAgICB4ODZfNjQtc29mdG1tdS90YXJnZXQvaTM4Ni9jY19oZWxw
+ZXIubwogIENDICAgICAgeDg2XzY0LXNvZnRtbXUvdGFyZ2V0L2kzODYvZXhjcF9oZWxwZXIubwog
+IENDICAgICAgeDg2XzY0LXNvZnRtbXUvdGFyZ2V0L2kzODYvZnB1X2hlbHBlci5vCiAgQ0MgICAg
+ICB4ODZfNjQtc29mdG1tdS90YXJnZXQvaTM4Ni9pbnRfaGVscGVyLm8KICBDQyAgICAgIHg4Nl82
+NC1zb2Z0bW11L3RhcmdldC9pMzg2L21lbV9oZWxwZXIubwogIENDICAgICAgYWFyY2g2NC1zb2Z0
+bW11L2h3L3ZmaW8vcGNpLXF1aXJrcy5vCiAgQ0MgICAgICB4ODZfNjQtc29mdG1tdS90YXJnZXQv
+aTM4Ni9taXNjX2hlbHBlci5vCiAgQ0MgICAgICB4ODZfNjQtc29mdG1tdS90YXJnZXQvaTM4Ni9t
+cHhfaGVscGVyLm8KICBDQyAgICAgIHg4Nl82NC1zb2Z0bW11L3RhcmdldC9pMzg2L3NlZ19oZWxw
+ZXIubwogIENDICAgICAgYWFyY2g2NC1zb2Z0bW11L2h3L3ZmaW8vcGxhdGZvcm0ubwogIENDICAg
+ICAgeDg2XzY0LXNvZnRtbXUvdGFyZ2V0L2kzODYvc21tX2hlbHBlci5vCiAgQ0MgICAgICB4ODZf
+NjQtc29mdG1tdS90YXJnZXQvaTM4Ni9zdm1faGVscGVyLm8KICBDQyAgICAgIHg4Nl82NC1zb2Z0
+bW11L3RhcmdldC9pMzg2L21hY2hpbmUubwogIENDICAgICAgYWFyY2g2NC1zb2Z0bW11L2h3L3Zm
+aW8vY2FseGVkYS14Z21hYy5vCiAgQ0MgICAgICB4ODZfNjQtc29mdG1tdS90YXJnZXQvaTM4Ni9h
+cmNoX21lbW9yeV9tYXBwaW5nLm8KICBDQyAgICAgIGFhcmNoNjQtc29mdG1tdS9ody92ZmlvL2Ft
+ZC14Z2JlLm8KICBDQyAgICAgIHg4Nl82NC1zb2Z0bW11L3RhcmdldC9pMzg2L2FyY2hfZHVtcC5v
+CiAgQ0MgICAgICB4ODZfNjQtc29mdG1tdS90YXJnZXQvaTM4Ni9tb25pdG9yLm8KICBDQyAgICAg
+IGFhcmNoNjQtc29mdG1tdS9ody92ZmlvL3NwYXByLm8KICBDQyAgICAgIHg4Nl82NC1zb2Z0bW11
+L3RhcmdldC9pMzg2L2t2bS5vCiAgQ0MgICAgICBhYXJjaDY0LXNvZnRtbXUvaHcvdmlydGlvL3Zp
+cnRpby5vCiAgQ0MgICAgICB4ODZfNjQtc29mdG1tdS90YXJnZXQvaTM4Ni9oeXBlcnYubwogIEdF
+TiAgICAgdHJhY2UvZ2VuZXJhdGVkLWhlbHBlcnMuYwogIENDICAgICAgeDg2XzY0LXNvZnRtbXUv
+dHJhY2UvY29udHJvbC10YXJnZXQubwogIENDICAgICAgYWFyY2g2NC1zb2Z0bW11L2h3L3ZpcnRp
+by92aXJ0aW8tYmFsbG9vbi5vCiAgQ0MgICAgICB4ODZfNjQtc29mdG1tdS9nZGJzdHViLXhtbC5v
+CiAgQ0MgICAgICBhYXJjaDY0LXNvZnRtbXUvaHcvdmlydGlvL3Zob3N0Lm8KICBDQyAgICAgIGFh
+cmNoNjQtc29mdG1tdS9ody92aXJ0aW8vdmhvc3QtYmFja2VuZC5vCiAgQ0MgICAgICB4ODZfNjQt
+c29mdG1tdS90cmFjZS9nZW5lcmF0ZWQtaGVscGVycy5vCiAgQ0MgICAgICBhYXJjaDY0LXNvZnRt
+bXUvaHcvdmlydGlvL3Zob3N0LXVzZXIubwogIENDICAgICAgYWFyY2g2NC1zb2Z0bW11L2h3L3Zp
+cnRpby92aG9zdC12c29jay5vCiAgQ0MgICAgICBhYXJjaDY0LXNvZnRtbXUvaHcvdmlydGlvL3Zp
+cnRpby1jcnlwdG8ubwogIENDICAgICAgYWFyY2g2NC1zb2Z0bW11L2h3L3ZpcnRpby92aXJ0aW8t
+Y3J5cHRvLXBjaS5vCiAgQ0MgICAgICBhYXJjaDY0LXNvZnRtbXUvaHcvYXJtL2Jvb3QubwogIEND
+ICAgICAgYWFyY2g2NC1zb2Z0bW11L2h3L2FybS9jb2xsaWUubwogIENDICAgICAgYWFyY2g2NC1z
+b2Z0bW11L2h3L2FybS9leHlub3M0X2JvYXJkcy5vCiAgQ0MgICAgICBhYXJjaDY0LXNvZnRtbXUv
+aHcvYXJtL2d1bXN0aXgubwogIENDICAgICAgYWFyY2g2NC1zb2Z0bW11L2h3L2FybS9oaWdoYmFu
+ay5vCiAgQ0MgICAgICBhYXJjaDY0LXNvZnRtbXUvaHcvYXJtL2RpZ2ljX2JvYXJkcy5vCiAgQ0Mg
+ICAgICBhYXJjaDY0LXNvZnRtbXUvaHcvYXJtL2ludGVncmF0b3JjcC5vCiAgQ0MgICAgICBhYXJj
+aDY0LXNvZnRtbXUvaHcvYXJtL21haW5zdG9uZS5vCiAgQ0MgICAgICBhYXJjaDY0LXNvZnRtbXUv
+aHcvYXJtL211c2ljcGFsLm8KICBDQyAgICAgIGFhcmNoNjQtc29mdG1tdS9ody9hcm0vbnNlcmll
+cy5vCiAgQ0MgICAgICBhYXJjaDY0LXNvZnRtbXUvaHcvYXJtL29tYXBfc3gxLm8KICBDQyAgICAg
+IGFhcmNoNjQtc29mdG1tdS9ody9hcm0vcGFsbS5vCiAgQ0MgICAgICBhYXJjaDY0LXNvZnRtbXUv
+aHcvYXJtL3JlYWx2aWV3Lm8KICBDQyAgICAgIGFhcmNoNjQtc29mdG1tdS9ody9hcm0vc3BpdHou
+bwogIENDICAgICAgYWFyY2g2NC1zb2Z0bW11L2h3L2FybS9zdGVsbGFyaXMubwogIENDICAgICAg
+YWFyY2g2NC1zb2Z0bW11L2h3L2FybS90b3NhLm8KICBDQyAgICAgIGFhcmNoNjQtc29mdG1tdS9o
+dy9hcm0vdmVyc2F0aWxlcGIubwogIENDICAgICAgYWFyY2g2NC1zb2Z0bW11L2h3L2FybS92ZXhw
+cmVzcy5vCiAgQ0MgICAgICBhYXJjaDY0LXNvZnRtbXUvaHcvYXJtL3ZpcnQubwogIENDICAgICAg
+YWFyY2g2NC1zb2Z0bW11L2h3L2FybS94aWxpbnhfenlucS5vCiAgQ0MgICAgICBhYXJjaDY0LXNv
+ZnRtbXUvaHcvYXJtL3oyLm8KICBDQyAgICAgIGFhcmNoNjQtc29mdG1tdS9ody9hcm0vdmlydC1h
+Y3BpLWJ1aWxkLm8KICBDQyAgICAgIGFhcmNoNjQtc29mdG1tdS9ody9hcm0vbmV0ZHVpbm8yLm8K
+ICBDQyAgICAgIGFhcmNoNjQtc29mdG1tdS9ody9hcm0vc3lzYnVzLWZkdC5vCiAgQ0MgICAgICBh
+YXJjaDY0LXNvZnRtbXUvaHcvYXJtL2FybXY3bS5vCiAgQ0MgICAgICBhYXJjaDY0LXNvZnRtbXUv
+aHcvYXJtL2V4eW5vczQyMTAubwogIENDICAgICAgYWFyY2g2NC1zb2Z0bW11L2h3L2FybS9weGEy
+eHgubwogIENDICAgICAgYWFyY2g2NC1zb2Z0bW11L2h3L2FybS9weGEyeHhfZ3Bpby5vCiAgQ0Mg
+ICAgICBhYXJjaDY0LXNvZnRtbXUvaHcvYXJtL3B4YTJ4eF9waWMubwogIENDICAgICAgYWFyY2g2
+NC1zb2Z0bW11L2h3L2FybS9kaWdpYy5vCiAgQ0MgICAgICBhYXJjaDY0LXNvZnRtbXUvaHcvYXJt
+L29tYXAxLm8KICBDQyAgICAgIGFhcmNoNjQtc29mdG1tdS9ody9hcm0vb21hcDIubwogIENDICAg
+ICAgYWFyY2g2NC1zb2Z0bW11L2h3L2FybS9zdHJvbmdhcm0ubwogIENDICAgICAgYWFyY2g2NC1z
+b2Z0bW11L2h3L2FybS9hbGx3aW5uZXItYTEwLm8KICBDQyAgICAgIGFhcmNoNjQtc29mdG1tdS9o
+dy9hcm0vY3ViaWVib2FyZC5vCiAgQ0MgICAgICBhYXJjaDY0LXNvZnRtbXUvaHcvYXJtL2JjbTI4
+MzVfcGVyaXBoZXJhbHMubwogIENDICAgICAgYWFyY2g2NC1zb2Z0bW11L2h3L2FybS9iY20yODM2
+Lm8KICBDQyAgICAgIGFhcmNoNjQtc29mdG1tdS9ody9hcm0vcmFzcGkubwogIENDICAgICAgYWFy
+Y2g2NC1zb2Z0bW11L2h3L2FybS9zdG0zMmYyMDVfc29jLm8KICBDQyAgICAgIGFhcmNoNjQtc29m
+dG1tdS9ody9hcm0veGxueC16eW5xbXAubwogIENDICAgICAgYWFyY2g2NC1zb2Z0bW11L2h3L2Fy
+bS94bG54LXpjdTEwMi5vCiAgQ0MgICAgICBhYXJjaDY0LXNvZnRtbXUvaHcvYXJtL2ZzbC1pbXgy
+NS5vCiAgQ0MgICAgICBhYXJjaDY0LXNvZnRtbXUvaHcvYXJtL2lteDI1X3Bkay5vCiAgQ0MgICAg
+ICBhYXJjaDY0LXNvZnRtbXUvaHcvYXJtL2ZzbC1pbXgzMS5vCiAgQ0MgICAgICBhYXJjaDY0LXNv
+ZnRtbXUvaHcvYXJtL2t6bS5vCiAgQ0MgICAgICBhYXJjaDY0LXNvZnRtbXUvaHcvYXJtL2ZzbC1p
+bXg2Lm8KICBDQyAgICAgIGFhcmNoNjQtc29mdG1tdS9ody9hcm0vc2FicmVsaXRlLm8KICBDQyAg
+ICAgIGFhcmNoNjQtc29mdG1tdS9ody9hcm0vYXNwZWVkX3NvYy5vCiAgQ0MgICAgICBhYXJjaDY0
+LXNvZnRtbXUvaHcvYXJtL2FzcGVlZC5vCiAgQ0MgICAgICBhYXJjaDY0LXNvZnRtbXUvaHcvYXJt
+L21wczIubwogIENDICAgICAgYWFyY2g2NC1zb2Z0bW11L2h3L2FybS9tc2YyLXNvYy5vCiAgQ0Mg
+ICAgICBhYXJjaDY0LXNvZnRtbXUvaHcvYXJtL21zZjItc29tLm8KICBDQyAgICAgIGFhcmNoNjQt
+c29mdG1tdS90YXJnZXQvYXJtL2FybS1zZW1pLm8KICBDQyAgICAgIGFhcmNoNjQtc29mdG1tdS90
+YXJnZXQvYXJtL21hY2hpbmUubwogIENDICAgICAgYWFyY2g2NC1zb2Z0bW11L3RhcmdldC9hcm0v
+cHNjaS5vCiAgTElOSyAgICB4ODZfNjQtc29mdG1tdS9xZW11LXN5c3RlbS14ODZfNjQKICBDQyAg
+ICAgIGFhcmNoNjQtc29mdG1tdS90YXJnZXQvYXJtL2FyY2hfZHVtcC5vCiAgQ0MgICAgICBhYXJj
+aDY0LXNvZnRtbXUvdGFyZ2V0L2FybS9tb25pdG9yLm8KICBDQyAgICAgIGFhcmNoNjQtc29mdG1t
+dS90YXJnZXQvYXJtL2t2bS1zdHViLm8KICBDQyAgICAgIGFhcmNoNjQtc29mdG1tdS90YXJnZXQv
+YXJtL3RyYW5zbGF0ZS5vCiAgQ0MgICAgICBhYXJjaDY0LXNvZnRtbXUvdGFyZ2V0L2FybS9vcF9o
+ZWxwZXIubwogIENDICAgICAgYWFyY2g2NC1zb2Z0bW11L3RhcmdldC9hcm0vaGVscGVyLm8KL3Vz
+ci9iaW4vbGQ6IGNhbm5vdCBmaW5kIC1saWJ1bWFkCmNvbGxlY3QyOiBsZCByZXR1cm5lZCAxIGV4
+aXQgc3RhdHVzCm1ha2VbMV06ICoqKiBbcWVtdS1zeXN0ZW0teDg2XzY0XSBFcnJvciAxCm1ha2U6
+ICoqKiBbc3ViZGlyLXg4Nl82NC1zb2Z0bW11XSBFcnJvciAyCm1ha2U6ICoqKiBXYWl0aW5nIGZv
+ciB1bmZpbmlzaGVkIGpvYnMuLi4uCiAgQ0MgICAgICBhYXJjaDY0LXNvZnRtbXUvdGFyZ2V0L2Fy
+bS9jcHUubwogIENDICAgICAgYWFyY2g2NC1zb2Z0bW11L3RhcmdldC9hcm0vbmVvbl9oZWxwZXIu
+bwogIENDICAgICAgYWFyY2g2NC1zb2Z0bW11L3RhcmdldC9hcm0vaXdtbXh0X2hlbHBlci5vCiAg
+Q0MgICAgICBhYXJjaDY0LXNvZnRtbXUvdGFyZ2V0L2FybS9nZGJzdHViLm8KICBDQyAgICAgIGFh
+cmNoNjQtc29mdG1tdS90YXJnZXQvYXJtL2NwdTY0Lm8KICBDQyAgICAgIGFhcmNoNjQtc29mdG1t
+dS90YXJnZXQvYXJtL3RyYW5zbGF0ZS1hNjQubwogIENDICAgICAgYWFyY2g2NC1zb2Z0bW11L3Rh
+cmdldC9hcm0vaGVscGVyLWE2NC5vCiAgQ0MgICAgICBhYXJjaDY0LXNvZnRtbXUvdGFyZ2V0L2Fy
+bS9nZGJzdHViNjQubwogIENDICAgICAgYWFyY2g2NC1zb2Z0bW11L3RhcmdldC9hcm0vY3J5cHRv
+X2hlbHBlci5vCiAgQ0MgICAgICBhYXJjaDY0LXNvZnRtbXUvdGFyZ2V0L2FybS9hcm0tcG93ZXJj
+dGwubwogIEdFTiAgICAgdHJhY2UvZ2VuZXJhdGVkLWhlbHBlcnMuYwogIENDICAgICAgYWFyY2g2
+NC1zb2Z0bW11L3RyYWNlL2NvbnRyb2wtdGFyZ2V0Lm8KICBDQyAgICAgIGFhcmNoNjQtc29mdG1t
+dS9nZGJzdHViLXhtbC5vCiAgQ0MgICAgICBhYXJjaDY0LXNvZnRtbXUvdHJhY2UvZ2VuZXJhdGVk
+LWhlbHBlcnMubwovdG1wL3FlbXUtdGVzdC9zcmMvdGFyZ2V0L2FybS90cmFuc2xhdGUtYTY0LmM6
+IEluIGZ1bmN0aW9uICdoYW5kbGVfc2hyaV93aXRoX3JuZGFjYyc6Ci90bXAvcWVtdS10ZXN0L3Ny
+Yy90YXJnZXQvYXJtL3RyYW5zbGF0ZS1hNjQuYzo2MzkyOiB3YXJuaW5nOiAndGNnX3NyY19oaScg
+bWF5IGJlIHVzZWQgdW5pbml0aWFsaXplZCBpbiB0aGlzIGZ1bmN0aW9uCi90bXAvcWVtdS10ZXN0
+L3NyYy90YXJnZXQvYXJtL3RyYW5zbGF0ZS1hNjQuYzogSW4gZnVuY3Rpb24gJ2Rpc2FzX3NpbWRf
+c2NhbGFyX3R3b19yZWdfbWlzYyc6Ci90bXAvcWVtdS10ZXN0L3NyYy90YXJnZXQvYXJtL3RyYW5z
+bGF0ZS1hNjQuYzo4MTE5OiB3YXJuaW5nOiAncm1vZGUnIG1heSBiZSB1c2VkIHVuaW5pdGlhbGl6
+ZWQgaW4gdGhpcyBmdW5jdGlvbgogIExJTksgICAgYWFyY2g2NC1zb2Z0bW11L3FlbXUtc3lzdGVt
+LWFhcmNoNjQKL3Vzci9iaW4vbGQ6IGNhbm5vdCBmaW5kIC1saWJ1bWFkCmNvbGxlY3QyOiBsZCBy
+ZXR1cm5lZCAxIGV4aXQgc3RhdHVzCm1ha2VbMV06ICoqKiBbcWVtdS1zeXN0ZW0tYWFyY2g2NF0g
+RXJyb3IgMQptYWtlOiAqKiogW3N1YmRpci1hYXJjaDY0LXNvZnRtbXVdIEVycm9yIDIKVHJhY2Vi
+YWNrIChtb3N0IHJlY2VudCBjYWxsIGxhc3QpOgogIEZpbGUgIi4vdGVzdHMvZG9ja2VyL2RvY2tl
+ci5weSIsIGxpbmUgNDA3LCBpbiA8bW9kdWxlPgogICAgc3lzLmV4aXQobWFpbigpKQogIEZpbGUg
+Ii4vdGVzdHMvZG9ja2VyL2RvY2tlci5weSIsIGxpbmUgNDA0LCBpbiBtYWluCiAgICByZXR1cm4g
+YXJncy5jbWRvYmoucnVuKGFyZ3MsIGFyZ3YpCiAgRmlsZSAiLi90ZXN0cy9kb2NrZXIvZG9ja2Vy
+LnB5IiwgbGluZSAyNjEsIGluIHJ1bgogICAgcmV0dXJuIERvY2tlcigpLnJ1bihhcmd2LCBhcmdz
+LmtlZXAsIHF1aWV0PWFyZ3MucXVpZXQpCiAgRmlsZSAiLi90ZXN0cy9kb2NrZXIvZG9ja2VyLnB5
+IiwgbGluZSAyMjksIGluIHJ1bgogICAgcXVpZXQ9cXVpZXQpCiAgRmlsZSAiLi90ZXN0cy9kb2Nr
+ZXIvZG9ja2VyLnB5IiwgbGluZSAxNDcsIGluIF9kb19jaGVjawogICAgcmV0dXJuIHN1YnByb2Nl
+c3MuY2hlY2tfY2FsbChzZWxmLl9jb21tYW5kICsgY21kLCAqKmt3YXJncykKICBGaWxlICIvdXNy
+L2xpYjY0L3B5dGhvbjIuNy9zdWJwcm9jZXNzLnB5IiwgbGluZSAxODYsIGluIGNoZWNrX2NhbGwK
+ICAgIHJhaXNlIENhbGxlZFByb2Nlc3NFcnJvcihyZXRjb2RlLCBjbWQpCnN1YnByb2Nlc3MuQ2Fs
+bGVkUHJvY2Vzc0Vycm9yOiBDb21tYW5kICdbJ2RvY2tlcicsICdydW4nLCAnLS1sYWJlbCcsICdj
+b20ucWVtdS5pbnN0YW5jZS51dWlkPTEyYzk1NmFlZjA3MjExZTdhYzI5NTI1NDAwNjljODMwJywg
+Jy11JywgJzAnLCAnLS1zZWN1cml0eS1vcHQnLCAnc2VjY29tcD11bmNvbmZpbmVkJywgJy0tcm0n
+LCAnLS1uZXQ9bm9uZScsICctZScsICdUQVJHRVRfTElTVD0nLCAnLWUnLCAnRVhUUkFfQ09ORklH
+VVJFX09QVFM9JywgJy1lJywgJ1Y9JywgJy1lJywgJ0o9OCcsICctZScsICdERUJVRz0nLCAnLWUn
+LCAnU0hPV19FTlY9MScsICctZScsICdDQ0FDSEVfRElSPS92YXIvdG1wL2NjYWNoZScsICctdics
+ICcvcm9vdC8uY2FjaGUvcWVtdS1kb2NrZXItY2NhY2hlOi92YXIvdG1wL2NjYWNoZTp6JywgJy12
+JywgJy92YXIvdG1wL3BhdGNoZXctdGVzdGVyLXRtcC0weGQxN2xpMy9zcmMvZG9ja2VyLXNyYy4y
+MDE4LTAxLTAzLTA1LjM3LjA5LjQ3MDQ6L3Zhci90bXAvcWVtdTp6LHJvJywgJ3FlbXU6Y2VudG9z
+NicsICcvdmFyL3RtcC9xZW11L3J1bicsICd0ZXN0LXF1aWNrJ10nIHJldHVybmVkIG5vbi16ZXJv
+IGV4aXQgc3RhdHVzIDIKbWFrZVsxXTogKioqIFt0ZXN0cy9kb2NrZXIvTWFrZWZpbGUuaW5jbHVk
+ZToxMjk6IGRvY2tlci1ydW5dIEVycm9yIDEKbWFrZVsxXTogTGVhdmluZyBkaXJlY3RvcnkgJy92
+YXIvdG1wL3BhdGNoZXctdGVzdGVyLXRtcC0weGQxN2xpMy9zcmMnCm1ha2U6ICoqKiBbdGVzdHMv
+ZG9ja2VyL01ha2VmaWxlLmluY2x1ZGU6MTYzOiBkb2NrZXItcnVuLXRlc3QtcXVpY2tAY2VudG9z
+Nl0gRXJyb3IgMgoKcmVhbAkybTU1Ljc2NnMKdXNlcgkwbTMuOTgwcwpzeXMJMG0yLjkzM3MKPT09
+IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMgoKCi0tLQpF
+bWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5v
+cmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQGZyZWVsaXN0
+cy5vcmc=
