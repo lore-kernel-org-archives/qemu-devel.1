@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34735)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34738)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1eWfVq-0007KV-C4
+	(envelope-from <quintela@redhat.com>) id 1eWfVq-0007Kk-Mi
 	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 04:39:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1eWfVp-0007GU-EK
+	(envelope-from <quintela@redhat.com>) id 1eWfVm-0007Dc-PS
 	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 04:39:06 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:33892)
+Received: from mx1.redhat.com ([209.132.183.28]:53700)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1eWfVp-0007FQ-8R
-	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 04:39:05 -0500
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1eWfVm-0007Co-K3
+	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 04:39:02 -0500
 From: Juan Quintela <quintela@redhat.com>
-Date: Wed,  3 Jan 2018 10:38:31 +0100
-Message-Id: <20180103093834.20879-12-quintela@redhat.com>
+Date: Wed,  3 Jan 2018 10:38:30 +0100
+Message-Id: <20180103093834.20879-11-quintela@redhat.com>
 In-Reply-To: <20180103093834.20879-1-quintela@redhat.com>
 References: <20180103093834.20879-1-quintela@redhat.com>
-Subject: [Qemu-devel] [PULL 11/14] migration: add blocktime calculation into
- migration-test
+Subject: [Qemu-devel] [PULL 10/14] migration: postcopy_blocktime
+ documentation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,72 +29,38 @@ Cc: dgilbert@redhat.com, lvivier@redhat.com, peterx@redhat.com, Alexey Perevalov
 
 From: Alexey Perevalov <a.perevalov@samsung.com>
 
-This patch just requests blocktime calculation,
-and check it in case when UFFD_FEATURE_THREAD_ID feature is set
-on the host.
-
 Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 Signed-off-by: Alexey Perevalov <a.perevalov@samsung.com>
 Reviewed-by: Juan Quintela <quintela@redhat.com>
 Signed-off-by: Juan Quintela <quintela@redhat.com>
 ---
- tests/migration-test.c | 16 ++++++++++++++++
- 1 file changed, 16 insertions(+)
+ docs/devel/migration.rst | 14 ++++++++++++++
+ 1 file changed, 14 insertions(+)
 
-diff --git a/tests/migration-test.c b/tests/migration-test.c
-index 799e24ebc6..9fd5dadc0d 100644
---- a/tests/migration-test.c
-+++ b/tests/migration-test.c
-@@ -25,6 +25,7 @@
- const unsigned start_address = 1024 * 1024;
- const unsigned end_address = 100 * 1024 * 1024;
- bool got_stop;
-+static bool uffd_feature_thread_id;
+diff --git a/docs/devel/migration.rst b/docs/devel/migration.rst
+index bf97080dac..015a9ebdf7 100644
+--- a/docs/devel/migration.rst
++++ b/docs/devel/migration.rst
+@@ -401,6 +401,20 @@ will now cause the transition from precopy to postcopy.
+ It can be issued immediately after migration is started or any
+ time later on.  Issuing it after the end of a migration is harmless.
  
- #if defined(__linux__)
- #include <sys/syscall.h>
-@@ -54,6 +55,7 @@ static bool ufd_version_check(void)
-         g_test_message("Skipping test: UFFDIO_API failed");
-         return false;
-     }
-+    uffd_feature_thread_id = api_struct.features & UFFD_FEATURE_THREAD_ID;
- 
-     ioctl_mask = (__u64)1 << _UFFDIO_REGISTER |
-                  (__u64)1 << _UFFDIO_UNREGISTER;
-@@ -266,6 +268,16 @@ static uint64_t get_migration_pass(QTestState *who)
-     return result;
- }
- 
-+static void read_blocktime(QTestState *who)
-+{
-+    QDict *rsp, *rsp_return;
++Blocktime is a postcopy live migration metric, intended to show how
++long the vCPU was in state of interruptable sleep due to pagefault.
++That metric is calculated both for all vCPUs as overlapped value, and
++separately for each vCPU. These values are calculated on destination
++side.  To enable postcopy blocktime calculation, enter following
++command on destination monitor:
 +
-+    rsp = wait_command(who, "{ 'execute': 'query-migrate' }");
-+    rsp_return = qdict_get_qdict(rsp, "return");
-+    g_assert(qdict_haskey(rsp_return, "postcopy-blocktime"));
-+    QDECREF(rsp);
-+}
++``migrate_set_capability postcopy-blocktime on``
 +
- static void wait_for_migration_complete(QTestState *who)
- {
-     QDict *rsp, *rsp_return;
-@@ -525,6 +537,7 @@ static void test_migrate(void)
- 
-     migrate_set_capability(from, "postcopy-ram", "true");
-     migrate_set_capability(to, "postcopy-ram", "true");
-+    migrate_set_capability(to, "postcopy-blocktime", "true");
- 
-     /* We want to pick a speed slow enough that the test completes
-      * quickly, but that it doesn't complete precopy even on a slow
-@@ -553,6 +566,9 @@ static void test_migrate(void)
-     wait_for_serial("dest_serial");
-     wait_for_migration_complete(from);
- 
-+    if (uffd_feature_thread_id) {
-+        read_blocktime(to);
-+    }
-     g_free(uri);
- 
-     test_migrate_end(from, to);
++Postcopy blocktime can be retrieved by query-migrate qmp command.
++postcopy-blocktime value of qmp command will show overlapped blocking
++time for all vCPU, postcopy-vcpu-blocktime will show list of blocking
++time per vCPU.
++
+ .. note::
+   During the postcopy phase, the bandwidth limits set using
+   ``migrate_set_speed`` is ignored (to avoid delaying requested pages that
 -- 
 2.14.3
