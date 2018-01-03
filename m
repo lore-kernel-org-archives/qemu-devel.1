@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47861)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47872)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eWnT3-0000Yn-FY
-	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 13:08:46 -0500
+	id 1eWnT4-0000Zv-JO
+	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 13:08:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eWnT0-00073d-U7
-	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 13:08:45 -0500
-Received: from mail-qk0-x242.google.com ([2607:f8b0:400d:c09::242]:45427)
+	id 1eWnT3-00074W-Na
+	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 13:08:46 -0500
+Received: from mail-qk0-x241.google.com ([2607:f8b0:400d:c09::241]:43629)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eWnT0-00073U-Pg
-	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 13:08:42 -0500
-Received: by mail-qk0-x242.google.com with SMTP id o126so2556955qke.12
-	for <qemu-devel@nongnu.org>; Wed, 03 Jan 2018 10:08:42 -0800 (PST)
+	id 1eWnT3-00074O-J4
+	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 13:08:45 -0500
+Received: by mail-qk0-x241.google.com with SMTP id j137so2559348qke.10
+	for <qemu-devel@nongnu.org>; Wed, 03 Jan 2018 10:08:45 -0800 (PST)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Wed,  3 Jan 2018 15:07:58 -0300
-Message-Id: <20180103180805.18140-11-f4bug@amsat.org>
+Date: Wed,  3 Jan 2018 15:07:59 -0300
+Message-Id: <20180103180805.18140-12-f4bug@amsat.org>
 In-Reply-To: <20180103180805.18140-1-f4bug@amsat.org>
 References: <20180103180805.18140-1-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v5 10/17] sdhci: add a GPIO for the 'access
- control' LED
+Subject: [Qemu-devel] [PATCH v5 11/17] sdhci: move MASK_TRNMOD with other
+ SDHC_TRN* defines in "sd-internal.h"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,88 +37,45 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Alistair Francis <alistair.francis@xilinx.com>
 Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, Fam Zheng <famz@redhat.com>, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, Peter Maydell <peter.maydell@linaro.org>, Andrey Smirnov <andrew.smirnov@gmail.com>, Eduardo Habkost <ehabkost@redhat.com>
 
-It blinks to caution the user not to remove the card while the SD card is
-being accessed.
-So far it only emits a trace event.
-
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Acked-by: Alistair Francis <alistair.francis@xilinx.com>
+Reviewed-by: Alistair Francis <alistair.francis@xilinx.com>
 ---
- include/hw/sd/sdhci.h |  2 ++
- hw/sd/sdhci.c         | 14 ++++++++++++++
- hw/sd/trace-events    |  1 +
- 3 files changed, 17 insertions(+)
+ hw/sd/sdhci-internal.h | 1 +
+ hw/sd/sdhci.c          | 3 +--
+ 2 files changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/include/hw/sd/sdhci.h b/include/hw/sd/sdhci.h
-index a6fe064f51..da943a6562 100644
---- a/include/hw/sd/sdhci.h
-+++ b/include/hw/sd/sdhci.h
-@@ -45,6 +45,8 @@ typedef struct SDHCIState {
-     QEMUTimer *insert_timer;       /* timer for 'changing' sd card. */
-     QEMUTimer *transfer_timer;
-     qemu_irq irq;
-+    qemu_irq access_led;
-+    int access_led_level;
+diff --git a/hw/sd/sdhci-internal.h b/hw/sd/sdhci-internal.h
+index 248fd027f9..e941bc2386 100644
+--- a/hw/sd/sdhci-internal.h
++++ b/hw/sd/sdhci-internal.h
+@@ -43,6 +43,7 @@
+ #define SDHC_TRNS_ACMD12               0x0004
+ #define SDHC_TRNS_READ                 0x0010
+ #define SDHC_TRNS_MULTI                0x0020
++#define SDHC_TRNMOD_MASK               0x0037
  
-     /* Registers cleared on reset */
-     /* 0x00 */
+ /* R/W Command Register 0x0 */
+ #define SDHC_CMDREG                    0x0E
 diff --git a/hw/sd/sdhci.c b/hw/sd/sdhci.c
-index a781cc5211..de9c4e5a83 100644
+index de9c4e5a83..ede51d7e45 100644
 --- a/hw/sd/sdhci.c
 +++ b/hw/sd/sdhci.c
-@@ -203,6 +203,16 @@ static void sdhci_poweron_reset(DeviceState *dev)
-     }
- }
+@@ -98,7 +98,6 @@
+     (SDHC_CAPAB_BASECLKFREQ << 8) | (SDHC_CAPAB_TOUNIT << 7) | \
+     (SDHC_CAPAB_TOCLKFREQ))
  
-+static void sdhci_led_handler(void *opaque, int line, int level)
-+{
-+    SDHCIState *s = (SDHCIState *)opaque;
-+
-+    if (s->access_led_level != level) {
-+        trace_sdhci_led(level);
-+        s->access_led_level = level;
-+    }
-+}
-+
- static void sdhci_data_transfer(void *opaque);
+-#define MASK_TRNMOD     0x0037
+ #define MASKED_WRITE(reg, mask, val)  (reg = (reg & (mask)) | (val))
  
- static void sdhci_send_command(SDHCIState *s)
-@@ -1051,6 +1061,7 @@ sdhci_write(void *opaque, hwaddr offset, uint64_t val, unsigned size)
-                 !(s->capareg & (1 << (31 - ((s->pwrcon >> 1) & 0x7))))) {
-             s->pwrcon &= ~SDHC_POWER_ON;
+ static uint8_t sdhci_slotint(SDHCIState *s)
+@@ -1035,7 +1034,7 @@ sdhci_write(void *opaque, hwaddr offset, uint64_t val, unsigned size)
+         if (!(s->capareg & SDHC_CAN_DO_DMA)) {
+             value &= ~SDHC_TRNS_DMA;
          }
-+        qemu_set_irq(s->access_led, s->hostctl & 1);
-         break;
-     case SDHC_CLKCON:
-         if (!(mask & 0xFF000000)) {
-@@ -1163,6 +1174,7 @@ static void sdhci_initfn(SDHCIState *s)
-     qbus_create_inplace(&s->sdbus, sizeof(s->sdbus),
-                         TYPE_SDHCI_BUS, DEVICE(s), "sd-bus");
+-        MASKED_WRITE(s->trnmod, mask, value & MASK_TRNMOD);
++        MASKED_WRITE(s->trnmod, mask, value & SDHC_TRNMOD_MASK);
+         MASKED_WRITE(s->cmdreg, mask >> 16, value >> 16);
  
-+    s->access_led = qemu_allocate_irq(sdhci_led_handler, s, 0);
-     s->insert_timer = timer_new_ns(QEMU_CLOCK_VIRTUAL, sdhci_raise_insertion_irq, s);
-     s->transfer_timer = timer_new_ns(QEMU_CLOCK_VIRTUAL, sdhci_data_transfer, s);
- }
-@@ -1193,6 +1205,8 @@ static void sdhci_uninitfn(SDHCIState *s)
-     timer_free(s->insert_timer);
-     timer_del(s->transfer_timer);
-     timer_free(s->transfer_timer);
-+
-+    qemu_free_irq(s->access_led);
- }
- 
- static bool sdhci_pending_insert_vmstate_needed(void *opaque)
-diff --git a/hw/sd/trace-events b/hw/sd/trace-events
-index e4e26c6d73..f821db2046 100644
---- a/hw/sd/trace-events
-+++ b/hw/sd/trace-events
-@@ -13,6 +13,7 @@ sdhci_adma_transfer_completed(void) "ADMA transfer completed"
- sdhci_access(const char *access, unsigned int size, uint64_t offset, const char *dir, uint64_t val, uint64_t val2) "%s %ub: addr[0x%04" PRIx64 "] %s %" PRIu64 "(0x%" PRIx64 ")"
- sdhci_read_dataport(uint16_t data_count) "all %u bytes of data have been read from input buffer"
- sdhci_write_dataport(uint16_t data_count) "write buffer filled with %u bytes of data"
-+sdhci_led(bool state) "LED: %u"
- 
- # hw/sd/milkymist-memcard.c
- milkymist_memcard_memory_read(uint32_t addr, uint32_t value) "addr 0x%08x value 0x%08x"
+         /* Writing to the upper byte of CMDREG triggers SD command generation */
 -- 
 2.15.1
