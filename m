@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49178)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51613)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mjc@sifive.com>) id 1eWrYo-0000Ak-KJ
-	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 17:31:00 -0500
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1eWrcA-0001Sq-0k
+	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 17:34:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mjc@sifive.com>) id 1eWrYm-0002u0-F0
-	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 17:30:58 -0500
-Received: from mail-oi0-x244.google.com ([2607:f8b0:4003:c06::244]:45031)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mjc@sifive.com>) id 1eWrYm-0002tB-6P
-	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 17:30:56 -0500
-Received: by mail-oi0-x244.google.com with SMTP id g6so1922817oib.11
-	for <qemu-devel@nongnu.org>; Wed, 03 Jan 2018 14:30:56 -0800 (PST)
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1eWrc7-0008Kp-Bs
+	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 17:34:26 -0500
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20180103164117.11850-1-f4bug@amsat.org>
+	<20180103164117.11850-3-f4bug@amsat.org>
+	<CAKmqyKOFBVv0n-+-3RgZ7_-Ve8GWoxE7H60gPGqdXwY+Wu2zog@mail.gmail.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <bb769df0-e20d-bdc2-a11f-b5ffd94d5685@amsat.org>
+Date: Wed, 3 Jan 2018 19:34:18 -0300
 MIME-Version: 1.0
-In-Reply-To: <0a498d8a-e59e-616f-9489-1e874a956341@linaro.org>
-References: <1514940265-18093-1-git-send-email-mjc@sifive.com>
-	<1514940265-18093-4-git-send-email-mjc@sifive.com>
-	<0a498d8a-e59e-616f-9489-1e874a956341@linaro.org>
-From: Michael Clark <mjc@sifive.com>
-Date: Thu, 4 Jan 2018 11:30:55 +1300
-Message-ID: <CAHNT7NtvroDROTOx1VrfO4U3p4udxFknvALVmASdyWe+vk2htg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v1 03/21] RISC-V CPU Core Definition
+In-Reply-To: <CAKmqyKOFBVv0n-+-3RgZ7_-Ve8GWoxE7H60gPGqdXwY+Wu2zog@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 2/2] hw/sd/pxa2xx_mmci: add read/write()
+ trace events
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,232 +30,167 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: qemu-devel@nongnu.org, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Sagar Karandikar <sagark@eecs.berkeley.edu>
+To: Alistair Francis <alistair.francis@xilinx.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, Andrzej Zaborowski <balrogg@gmail.com>, qemu-arm <qemu-arm@nongnu.org>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
 
-On Wed, Jan 3, 2018 at 6:21 PM, Richard Henderson <
-richard.henderson@linaro.org> wrote:
+On 01/03/2018 06:54 PM, Alistair Francis wrote:
+> On Wed, Jan 3, 2018 at 8:41 AM, Philippe Mathieu-Daudé <f4bug@amsat.org> wrote:
+>> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+>> ---
+>>  hw/sd/pxa2xx_mmci.c | 63 ++++++++++++++++++++++++++++++++++-------------------
+>>  hw/sd/trace-events  |  4 ++++
+>>  2 files changed, 44 insertions(+), 23 deletions(-)
+>>
+>> diff --git a/hw/sd/pxa2xx_mmci.c b/hw/sd/pxa2xx_mmci.c
+>> index 3deccf02c9..0759a0d2eb 100644
+>> --- a/hw/sd/pxa2xx_mmci.c
+>> +++ b/hw/sd/pxa2xx_mmci.c
+>> @@ -19,6 +19,7 @@
+>>  #include "hw/qdev.h"
+>>  #include "hw/qdev-properties.h"
+>>  #include "qemu/error-report.h"
+>> +#include "trace.h"
+>>
+>>  #define TYPE_PXA2XX_MMCI "pxa2xx-mmci"
+>>  #define PXA2XX_MMCI(obj) OBJECT_CHECK(PXA2xxMMCIState, (obj), TYPE_PXA2XX_MMCI)
+>> @@ -278,43 +279,55 @@ static void pxa2xx_mmci_wakequeues(PXA2xxMMCIState *s)
+>>  static uint64_t pxa2xx_mmci_read(void *opaque, hwaddr offset, unsigned size)
+>>  {
+>>      PXA2xxMMCIState *s = (PXA2xxMMCIState *) opaque;
+>> -    uint32_t ret;
+>> +    uint32_t ret = 0;
+>>
+>>      switch (offset) {
+>>      case MMC_STRPCL:
+>> -        return 0;
+>> +        break;
+>>      case MMC_STAT:
+>> -        return s->status;
+>> +        ret = s->status;
+>> +        break;
+>>      case MMC_CLKRT:
+>> -        return s->clkrt;
+>> +        ret = s->clkrt;
+>> +        break;
+>>      case MMC_SPI:
+>> -        return s->spi;
+>> +        ret = s->spi;
+>> +        break;
+>>      case MMC_CMDAT:
+>> -        return s->cmdat;
+>> +        ret = s->cmdat;
+>> +        break;
+>>      case MMC_RESTO:
+>> -        return s->resp_tout;
+>> +        ret = s->resp_tout;
+>> +        break;
+>>      case MMC_RDTO:
+>> -        return s->read_tout;
+>> +        ret = s->read_tout;
+>> +        break;
+>>      case MMC_BLKLEN:
+>> -        return s->blklen;
+>> +        ret = s->blklen;
+>> +        break;
+>>      case MMC_NUMBLK:
+>> -        return s->numblk;
+>> +        ret = s->numblk;
+>> +        break;
+>>      case MMC_PRTBUF:
+>> -        return 0;
+>> +        break;
+>>      case MMC_I_MASK:
+>> -        return s->intmask;
+>> +        ret = s->intmask;
+>> +        break;
+>>      case MMC_I_REG:
+>> -        return s->intreq;
+>> +        ret = s->intreq;
+>> +        break;
+>>      case MMC_CMD:
+>> -        return s->cmd | 0x40;
+>> +        ret = s->cmd | 0x40;
+>> +        break;
+>>      case MMC_ARGH:
+>> -        return s->arg >> 16;
+>> +        ret = s->arg >> 16;
+>> +        break;
+>>      case MMC_ARGL:
+>> -        return s->arg & 0xffff;
+>> +        ret = s->arg & 0xffff;
+>> +        break;
+>>      case MMC_RES:
+>> -        if (s->resp_len < 9)
+>> -            return s->resp_fifo[s->resp_len ++];
+>> -        return 0;
+>> +        ret = (s->resp_len < 9) ? s->resp_fifo[s->resp_len++] : 0;
+>> +        break;
+>>      case MMC_RXFIFO:
+>>          ret = 0;
+>>          while (size-- && s->rx_len) {
+>> @@ -324,16 +337,19 @@ static uint64_t pxa2xx_mmci_read(void *opaque, hwaddr offset, unsigned size)
+>>          }
+>>          s->intreq &= ~INT_RXFIFO_REQ;
+>>          pxa2xx_mmci_fifo_update(s);
+>> -        return ret;
+>> +        break;
+>> +        ret = ret;
 
-> On 01/02/2018 04:44 PM, Michael Clark wrote:
-> > +#ifdef CONFIG_USER_ONLY
-> > +static bool riscv_cpu_has_work(CPUState *cs)
-> > +{
-> > +    return 0;
-> > +}
-> > +#else
-> > +static bool riscv_cpu_has_work(CPUState *cs)
-> > +{
-> > +    return cs->interrupt_request & CPU_INTERRUPT_HARD;
-> > +}
-> > +#endif
->
-> There's no need to conditionalize this.
+Oops...
 
+>>      case MMC_RDWAIT:
+>> -        return 0;
+>> +        break;
+>>      case MMC_BLKS_REM:
+>> -        return s->numblk;
+>> +        ret = s->numblk;
+>> +        break;
+>>      default:
+>>          hw_error("%s: Bad offset " REG_FMT "\n", __FUNCTION__, offset);
+> 
+> Maybe worth removing this as well?
 
-Got it. Will be in the next spin.
+Indeed!
 
+> 
+> Either way:
+> 
+> Reviewed-by: Alistair Francis <alistair.francis@xilinx.com>
 
-> > +static void riscv_cpu_reset(CPUState *cs)
-> > +{
-> > +    RISCVCPU *cpu = RISCV_CPU(cs);
-> > +    RISCVCPUClass *mcc = RISCV_CPU_GET_CLASS(cpu);
-> > +    CPURISCVState *env = &cpu->env;
-> > +
-> > +    mcc->parent_reset(cs);
-> > +#ifndef CONFIG_USER_ONLY
-> > +    tlb_flush(cs);
->
-> Flush is now generic.  Remove it from here.
+Thanks :)
 
-
-OK.
-
-> +static void riscv_cpu_realize(DeviceState *dev, Error **errp)
-> > +{
-> > +    CPUState *cs = CPU(dev);
-> > +    RISCVCPU *cpu = RISCV_CPU(dev);
-> > +    RISCVCPUClass *mcc = RISCV_CPU_GET_CLASS(dev);
-> > +    CPURISCVState *env = &cpu->env;
-> > +    Error *local_err = NULL;
-> > +
-> > +    cpu_exec_realizefn(cs, &local_err);
-> > +    if (local_err != NULL) {
-> > +        error_propagate(errp, local_err);
-> > +        return;
-> > +    }
-> > +
-> > +    if (env->misa & RVM) {
-> > +        set_feature(env, RISCV_FEATURE_RVM);
-> > +    }
->
-> What's the point of replicating this information?
->
-
-This is inherited code. I noticed this too. In this version they are
-actually in sync with each other, which they weren't several weeks ago :-D
-
-It may well be that the features flags pre-date the addition of the 'misa'
-register in the privilege spec.
-
-This will take a bit of re-work as a reasonable amount of code uses the
-FEATURE flags vs misa.
-
-Are you happy for this to be a pending work item? I don't like it either
-and eventually want to fix, and already did some work to sync it with
-'misa', but it's not a critical issue.
-
-> +static void cpu_register(const RISCVCPUInfo *info)
-> > +{
-> > +    TypeInfo type_info = {
-> > +        .name = g_strdup(info->name),
-> > +        .parent = TYPE_RISCV_CPU,
-> > +        .instance_size = sizeof(RISCVCPU),
-> > +        .instance_init = info->initfn,
-> > +    };
-> > +
-> > +    type_register(&type_info);
-> > +    g_free((void *)type_info.name);
-> > +}
->
-> I think type_register does its own strdup; you don't need to do your own.
-
-
-Got it.
-
-
-> > diff --git a/target/riscv/cpu.h b/target/riscv/cpu.h
-> > new file mode 100644
-> > index 0000000..0480127
-> > --- /dev/null
-> > +++ b/target/riscv/cpu.h
-> > @@ -0,0 +1,363 @@
-> > +#ifndef RISCV_CPU_H
->
-> Header comment and license?
->
-> > +#define TARGET_HAS_ICE 1
->
-> What's this for?
-
-
-It's redundant. Inherited code. Looks like it came from nios2. Will remove.
-
-
-> > +#define RV(x) (1L << (x - 'A'))
->
-> L is useless since the type of long is variable.  Either U or ULL.
->
-> > +typedef struct CPURISCVState CPURISCVState;
-> > +
-> > +#include "pmp.h"
-> > +
-> > +typedef struct CPURISCVState {
->
-> Duplicate typedef.
->
-
-Got it.
-
-
-> > +    target_ulong gpr[32];
-> > +    uint64_t fpr[32]; /* assume both F and D extensions */
-> > +    target_ulong pc;
-> > +    target_ulong load_res;
-> > +
-> > +    target_ulong frm;
-> > +    target_ulong fstatus;
-> > +    target_ulong fflags;
-> > +
-> > +    target_ulong badaddr;
-> > +
-> > +    uint32_t mucounteren;
-> > +
-> > +    target_ulong user_ver;
-> > +    target_ulong priv_ver;
-> > +    target_ulong misa_mask;
-> > +    target_ulong misa;
-> > +
-> > +#ifdef CONFIG_USER_ONLY
-> > +    uint32_t amoinsn;
-> > +    target_long amoaddr;
-> > +    target_long amotest;
-> > +#else
-> > +    target_ulong priv;
-> > +
-> > +    target_ulong mhartid;
-> > +    target_ulong mstatus;
-> > +    target_ulong mip;
-> > +    target_ulong mie;
-> > +    target_ulong mideleg;
-> > +
-> > +    target_ulong sptbr;  /* until: priv-1.9.1 */
-> > +    target_ulong satp;   /* since: priv-1.10.0 */
-> > +    target_ulong sbadaddr;
-> > +    target_ulong mbadaddr;
-> > +    target_ulong medeleg;
-> > +
-> > +    target_ulong stvec;
-> > +    target_ulong sepc;
-> > +    target_ulong scause;
-> > +
-> > +    target_ulong mtvec;
-> > +    target_ulong mepc;
-> > +    target_ulong mcause;
-> > +    target_ulong mtval;  /* since: priv-1.10.0 */
-> > +
-> > +    uint32_t mscounteren;
-> > +    target_ulong scounteren; /* since: priv-1.10.0 */
-> > +    target_ulong mcounteren; /* since: priv-1.10.0 */
-> > +
-> > +    target_ulong sscratch;
-> > +    target_ulong mscratch;
-> > +
-> > +    /* temporary htif regs */
-> > +    uint64_t mfromhost;
-> > +    uint64_t mtohost;
-> > +    uint64_t timecmp;
-> > +
-> > +    /* physical memory protection */
-> > +    pmp_table_t pmp_state;
-> > +#endif
-> > +
-> > +    float_status fp_status;
-> > +
-> > +    /* Internal CPU feature flags. */
-> > +    uint64_t features;
-> > +
-> > +    /* QEMU */
-> > +    CPU_COMMON
-> > +
-> > +    /* Fields from here on are preserved across CPU reset. */
-> > +    void *irq[8];
-> > +    QEMUTimer *timer; /* Internal timer */
->
-> FWIW, other targets have moved this timer to RISCVCPU struct.
-
-
-I'll look into this. It seems like it should be a simple change and easy to
-include in the next spin.
-
-> +static inline void cpu_get_tb_cpu_state(CPURISCVState *env, target_ulong
-> *pc,
-> > +                                        target_ulong *cs_base, uint32_t
-> *flags)
-> > +{
-> > +    *pc = env->pc;
-> > +    *cs_base = 0;
-> > +    *flags = 0; /* necessary to avoid compiler warning */
->
-> Remove the comment -- the assignment is necessary full stop.
->
-> > +#define MSTATUS64_UXL       0x0000000300000000
-> > +#define MSTATUS64_SXL       0x0000000C00000000
->
-> 64-bit constants must use ULL.  Otherwise builds from a 32-bit host will
-> fail.
-> There are lots more instances within this file.
-
-
-Got it. Will fix these in the next spin.
-
-Thanks!
+> 
+> Alistair
+> 
+>>      }
+>> +    trace_pxa2xx_mmci_read(size, offset, ret);
+>>
+>> -    return 0;
+>> +    return ret;
+>>  }
+>>
+>>  static void pxa2xx_mmci_write(void *opaque,
+>> @@ -341,6 +357,7 @@ static void pxa2xx_mmci_write(void *opaque,
+>>  {
+>>      PXA2xxMMCIState *s = (PXA2xxMMCIState *) opaque;
+>>
+>> +    trace_pxa2xx_mmci_write(size, offset, value);
+>>      switch (offset) {
+>>      case MMC_STRPCL:
+>>          if (value & STRPCL_STRT_CLK) {
+>> diff --git a/hw/sd/trace-events b/hw/sd/trace-events
+>> index 1fc0bcf44b..6eca3470e2 100644
+>> --- a/hw/sd/trace-events
+>> +++ b/hw/sd/trace-events
+>> @@ -3,3 +3,7 @@
+>>  # hw/sd/milkymist-memcard.c
+>>  milkymist_memcard_memory_read(uint32_t addr, uint32_t value) "addr 0x%08x value 0x%08x"
+>>  milkymist_memcard_memory_write(uint32_t addr, uint32_t value) "addr 0x%08x value 0x%08x"
+>> +
+>> +# hw/sd/pxa2xx_mmci.c
+>> +pxa2xx_mmci_read(uint8_t size, uint32_t addr, uint32_t value) "size %d addr 0x%02x value 0x%08x"
+>> +pxa2xx_mmci_write(uint8_t size, uint32_t addr, uint32_t value) "size %d addr 0x%02x value 0x%08x"
+>> --
+>> 2.15.1
+>>
+>>
