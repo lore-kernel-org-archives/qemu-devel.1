@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34656)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34682)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1eWfVe-000788-KA
-	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 04:38:55 -0500
+	(envelope-from <quintela@redhat.com>) id 1eWfVh-0007CS-2m
+	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 04:38:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1eWfVd-000752-NH
-	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 04:38:54 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:60356)
+	(envelope-from <quintela@redhat.com>) id 1eWfVf-00077I-Nv
+	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 04:38:57 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:39620)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1eWfVd-00074E-Hi
-	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 04:38:53 -0500
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1eWfVf-00076H-FA
+	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 04:38:55 -0500
 From: Juan Quintela <quintela@redhat.com>
-Date: Wed,  3 Jan 2018 10:38:27 +0100
-Message-Id: <20180103093834.20879-8-quintela@redhat.com>
+Date: Wed,  3 Jan 2018 10:38:28 +0100
+Message-Id: <20180103093834.20879-9-quintela@redhat.com>
 In-Reply-To: <20180103093834.20879-1-quintela@redhat.com>
 References: <20180103093834.20879-1-quintela@redhat.com>
-Subject: [Qemu-devel] [PULL 07/14] migration: introduce postcopy-blocktime
- capability
+Subject: [Qemu-devel] [PULL 08/14] migration: add postcopy blocktime ctx
+ into MigrationIncomingState
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,74 +29,146 @@ Cc: dgilbert@redhat.com, lvivier@redhat.com, peterx@redhat.com, Alexey Perevalov
 
 From: Alexey Perevalov <a.perevalov@samsung.com>
 
-Right now it could be used on destination side to
-enable vCPU blocktime calculation for postcopy live migration.
-vCPU blocktime - it's time since vCPU thread was put into
-interruptible sleep, till memory page was copied and thread awake.
+This patch adds request to kernel space for UFFD_FEATURE_THREAD_ID, in
+case this feature is provided by kernel.
+
+PostcopyBlocktimeContext is encapsulated inside postcopy-ram.c,
+due to it being a postcopy-only feature.
+Also it defines PostcopyBlocktimeContext's instance live time.
+Information from PostcopyBlocktimeContext instance will be provided
+much after postcopy migration end, instance of PostcopyBlocktimeContext
+will live till QEMU exit, but part of it (vcpu_addr,
+page_fault_vcpu_time) used only during calculation, will be released
+when postcopy ended or failed.
+
+To enable postcopy blocktime calculation on destination, need to
+request proper compatibility (Patch for documentation will be at the
+tail of the patch set).
+
+As an example following command enable that capability, assume QEMU was
+started with
+-chardev socket,id=charmonitor,path=/var/lib/migrate-vm-monitor.sock
+option to control it
+
+[root@host]#printf "{\"execute\" : \"qmp_capabilities\"}\r\n \
+{\"execute\": \"migrate-set-capabilities\" , \"arguments\":   {
+\"capabilities\": [ { \"capability\": \"postcopy-blocktime\", \"state\":
+true } ] } }" | nc -U /var/lib/migrate-vm-monitor.sock
+
+Or just with HMP
+(qemu) migrate_set_capability postcopy-blocktime on
 
 Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 Signed-off-by: Alexey Perevalov <a.perevalov@samsung.com>
 Reviewed-by: Juan Quintela <quintela@redhat.com>
 Signed-off-by: Juan Quintela <quintela@redhat.com>
 ---
- migration/migration.c | 9 +++++++++
- migration/migration.h | 1 +
- qapi/migration.json   | 6 +++++-
- 3 files changed, 15 insertions(+), 1 deletion(-)
+ migration/migration.h    |  8 +++++++
+ migration/postcopy-ram.c | 59 ++++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 67 insertions(+)
 
-diff --git a/migration/migration.c b/migration/migration.c
-index 19917a4b5b..fb876e9fca 100644
---- a/migration/migration.c
-+++ b/migration/migration.c
-@@ -1499,6 +1499,15 @@ bool migrate_zero_blocks(void)
-     return s->enabled_capabilities[MIGRATION_CAPABILITY_ZERO_BLOCKS];
- }
- 
-+bool migrate_postcopy_blocktime(void)
-+{
-+    MigrationState *s;
-+
-+    s = migrate_get_current();
-+
-+    return s->enabled_capabilities[MIGRATION_CAPABILITY_POSTCOPY_BLOCKTIME];
-+}
-+
- bool migrate_use_compression(void)
- {
-     MigrationState *s;
 diff --git a/migration/migration.h b/migration/migration.h
-index 663415fe48..9ab8d07004 100644
+index 9ab8d07004..7e06c11773 100644
 --- a/migration/migration.h
 +++ b/migration/migration.h
-@@ -201,6 +201,7 @@ int migrate_compress_level(void);
- int migrate_compress_threads(void);
- int migrate_decompress_threads(void);
- bool migrate_use_events(void);
-+bool migrate_postcopy_blocktime(void);
+@@ -22,6 +22,8 @@
+ #include "hw/qdev.h"
+ #include "io/channel.h"
  
- /* Sending on the return path - generic and then for each message type */
- void migrate_send_rp_shut(MigrationIncomingState *mis,
-diff --git a/qapi/migration.json b/qapi/migration.json
-index 4cd3d13158..4d8ccdf776 100644
---- a/qapi/migration.json
-+++ b/qapi/migration.json
-@@ -352,12 +352,16 @@
- #
- # @x-multifd: Use more than one fd for migration (since 2.11)
- #
-+# @postcopy-blocktime: Calculate downtime for postcopy live migration
-+#                     (since 2.12)
-+#
- # Since: 1.2
- ##
- { 'enum': 'MigrationCapability',
-   'data': ['xbzrle', 'rdma-pin-all', 'auto-converge', 'zero-blocks',
-            'compress', 'events', 'postcopy-ram', 'x-colo', 'release-ram',
--           'block', 'return-path', 'pause-before-switchover', 'x-multifd' ] }
-+           'block', 'return-path', 'pause-before-switchover', 'x-multifd',
-+           'postcopy-blocktime' ] }
++struct PostcopyBlocktimeContext;
++
+ /* State for the incoming migration */
+ struct MigrationIncomingState {
+     QEMUFile *from_src_file;
+@@ -59,6 +61,12 @@ struct MigrationIncomingState {
+     /* The coroutine we should enter (back) after failover */
+     Coroutine *migration_incoming_co;
+     QemuSemaphore colo_incoming_sem;
++
++    /*
++     * PostcopyBlocktimeContext to keep information for postcopy
++     * live migration, to calculate vCPU block time
++     * */
++    struct PostcopyBlocktimeContext *blocktime_ctx;
+ };
  
- ##
- # @MigrationCapabilityStatus:
+ MigrationIncomingState *migration_incoming_get_current(void);
+diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
+index bec6c2c66b..c18ec5aa18 100644
+--- a/migration/postcopy-ram.c
++++ b/migration/postcopy-ram.c
+@@ -61,6 +61,52 @@ struct PostcopyDiscardState {
+ #include <sys/eventfd.h>
+ #include <linux/userfaultfd.h>
+ 
++typedef struct PostcopyBlocktimeContext {
++    /* time when page fault initiated per vCPU */
++    int64_t *page_fault_vcpu_time;
++    /* page address per vCPU */
++    uint64_t *vcpu_addr;
++    int64_t total_blocktime;
++    /* blocktime per vCPU */
++    int64_t *vcpu_blocktime;
++    /* point in time when last page fault was initiated */
++    int64_t last_begin;
++    /* number of vCPU are suspended */
++    int smp_cpus_down;
++
++    /*
++     * Handler for exit event, necessary for
++     * releasing whole blocktime_ctx
++     */
++    Notifier exit_notifier;
++} PostcopyBlocktimeContext;
++
++static void destroy_blocktime_context(struct PostcopyBlocktimeContext *ctx)
++{
++    g_free(ctx->page_fault_vcpu_time);
++    g_free(ctx->vcpu_addr);
++    g_free(ctx->vcpu_blocktime);
++    g_free(ctx);
++}
++
++static void migration_exit_cb(Notifier *n, void *data)
++{
++    PostcopyBlocktimeContext *ctx = container_of(n, PostcopyBlocktimeContext,
++                                                 exit_notifier);
++    destroy_blocktime_context(ctx);
++}
++
++static struct PostcopyBlocktimeContext *blocktime_context_new(void)
++{
++    PostcopyBlocktimeContext *ctx = g_new0(PostcopyBlocktimeContext, 1);
++    ctx->page_fault_vcpu_time = g_new0(int64_t, smp_cpus);
++    ctx->vcpu_addr = g_new0(uint64_t, smp_cpus);
++    ctx->vcpu_blocktime = g_new0(int64_t, smp_cpus);
++
++    ctx->exit_notifier.notify = migration_exit_cb;
++    qemu_add_exit_notifier(&ctx->exit_notifier);
++    return ctx;
++}
+ 
+ /**
+  * receive_ufd_features: check userfault fd features, to request only supported
+@@ -153,6 +199,19 @@ static bool ufd_check_and_apply(int ufd, MigrationIncomingState *mis)
+         }
+     }
+ 
++#ifdef UFFD_FEATURE_THREAD_ID
++    if (migrate_postcopy_blocktime() && mis &&
++        UFFD_FEATURE_THREAD_ID & supported_features) {
++        /* kernel supports that feature */
++        /* don't create blocktime_context if it exists */
++        if (!mis->blocktime_ctx) {
++            mis->blocktime_ctx = blocktime_context_new();
++        }
++
++        asked_features |= UFFD_FEATURE_THREAD_ID;
++    }
++#endif
++
+     /*
+      * request features, even if asked_features is 0, due to
+      * kernel expects UFFD_API before UFFDIO_REGISTER, per
 -- 
 2.14.3
