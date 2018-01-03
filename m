@@ -1,32 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33679)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34535)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1eWfTI-0005gQ-Vr
-	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 04:36:29 -0500
+	(envelope-from <quintela@redhat.com>) id 1eWfVU-0006mL-36
+	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 04:38:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1eWfTF-0003qU-Ts
-	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 04:36:29 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:40130)
+	(envelope-from <quintela@redhat.com>) id 1eWfVQ-0006qn-Vb
+	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 04:38:44 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:37202)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1eWfTF-0003pD-Mf
-	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 04:36:25 -0500
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1eWfVQ-0006p7-PO
+	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 04:38:40 -0500
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 61EF661491
-	for <qemu-devel@nongnu.org>; Wed,  3 Jan 2018 09:36:24 +0000 (UTC)
-Date: Wed, 3 Jan 2018 17:36:19 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20180103093619.GH2557@xz-mi>
-References: <20180103054043.25719-1-peterx@redhat.com>
-	<20180103054043.25719-3-peterx@redhat.com>
-	<87efn72the.fsf@secure.laptop>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <87efn72the.fsf@secure.laptop>
-Subject: Re: [Qemu-devel] [PATCH 02/11] migration:
- qemu_savevm_state_cleanup() in cleanup
+	by mx1.redhat.com (Postfix) with ESMTPS id E9303C04AC57
+	for <qemu-devel@nongnu.org>; Wed,  3 Jan 2018 09:38:39 +0000 (UTC)
+From: Juan Quintela <quintela@redhat.com>
+Date: Wed,  3 Jan 2018 10:38:20 +0100
+Message-Id: <20180103093834.20879-1-quintela@redhat.com>
+Subject: [Qemu-devel] [PULL 00/14] Migration pull request
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,41 +27,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Juan Quintela <quintela@redhat.com>
-Cc: qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: dgilbert@redhat.com, lvivier@redhat.com, peterx@redhat.com
 
-On Wed, Jan 03, 2018 at 10:15:41AM +0100, Juan Quintela wrote:
-> Peter Xu <peterx@redhat.com> wrote:
-> > Moving existing callers all into migrate_fd_cleanup().  It simplifies
-> > migration_thread() a bit.
-> >
-> > Signed-off-by: Peter Xu <peterx@redhat.com>
-> 
-> Reviewed-by: Juan Quintela <quintela@redhat.com>
+Hi
 
-Thanks.
+This are the changes for migration that are already reviewed.
 
-> 
-> I am trying to see if we can call migrate_fd_cleanup() twice.  As far as
-> I can see, we are not doing it.  But, and it is a big but, we are not
-> checking that we are not calling qemu_savevm_state_cleanup() twice.  If
-> that happens, we can get double frees and similar.
-> 
-> I put the reviewed-by anyways, because I *think* that we are doing it
-> right now, and otherwise, we should make sure that we are not calling it
-> twice, not papering over it.
-> 
-> Once here, I have notice that we call block_cleanup_parameters() in
-> *three* places.  We call notifier_list_notify() on two of this places (I
-> can't see any good reason *why* we don't call the notifier for
-> migrate_fd_cancel).
+Please, apply.
 
-Indeed.
+Later, Juan.
 
-IMHO we can remove two calls of block_cleanup_parameters(), only keep
-the one in migrate_fd_cleanup(), and remove on notifier_list_notify()
-in migrate_fd_error() (these can be two more patches).  What do you
-think?
 
--- 
-Peter Xu
+The following changes since commit 281f327487c9c9b1599f93c589a408bbf4a651b8:
+
+  Merge remote-tracking branch 'remotes/vivier/tags/m68k-for-2.12-pull-request' into staging (2017-12-22 00:11:36 +0000)
+
+are available in the Git repository at:
+
+  git://github.com/juanquintela/qemu.git tags/migration/20180103
+
+for you to fetch changes up to 8a18afdcd8d2d6ab31f9de89d2f20fdadb89beb8:
+
+  migration: finalize current_migration object (2018-01-03 09:28:56 +0100)
+
+----------------------------------------------------------------
+migration/next for 20180103
+
+----------------------------------------------------------------
+Alexey Perevalov (6):
+      migration: introduce postcopy-blocktime capability
+      migration: add postcopy blocktime ctx into MigrationIncomingState
+      migration: calculate vCPU blocktime on dst side
+      migration: postcopy_blocktime documentation
+      migration: add blocktime calculation into migration-test
+      migration: add postcopy total blocktime into query-migrate
+
+Dr. David Alan Gilbert (2):
+      docs: Convert migration.txt to rst
+      migration: Guard ram_bytes_remaining against early call
+
+Juan Quintela (4):
+      migration: Use proper types in json
+      migration: print features as on off
+      migration: free addr in the same function that we created it
+      migration: free result string
+
+Laurent Vivier (1):
+      migration: fix analyze-migration.py script with radix table
+
+Vladimir Sementsov-Ogievskiy (1):
+      migration: finalize current_migration object
+
+ docs/devel/{migration.txt => migration.rst} | 484 +++++++++++++++-------------
+ hmp.c                                       |  37 ++-
+ include/migration/misc.h                    |   1 +
+ migration/migration.c                       | 118 ++++---
+ migration/migration.h                       |  13 +
+ migration/postcopy-ram.c                    | 258 ++++++++++++++-
+ migration/ram.c                             |   3 +-
+ migration/socket.c                          |   4 +-
+ migration/trace-events                      |   6 +-
+ qapi/migration.json                         |  37 ++-
+ scripts/analyze-migration.py                |   4 +
+ tests/migration-test.c                      |  19 +-
+ vl.c                                        |   1 +
+ 13 files changed, 696 insertions(+), 289 deletions(-)
+ rename docs/devel/{migration.txt => migration.rst} (58%)
