@@ -1,28 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33356)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38267)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1eWn3C-0005Zh-Ot
-	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 12:42:03 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1eWnDj-00010X-Qh
+	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 12:52:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1eWn3B-0007sX-Tv
-	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 12:42:02 -0500
-Received: from mail-wm0-x232.google.com ([2a00:1450:400c:c09::232]:35829)
+	(envelope-from <peter.maydell@linaro.org>) id 1eWnDj-0004nw-3T
+	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 12:52:55 -0500
+Received: from mail-oi0-x236.google.com ([2607:f8b0:4003:c06::236]:40828)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1eWn3B-0007s0-MW
-	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 12:42:01 -0500
-Received: by mail-wm0-x232.google.com with SMTP id a79so3985172wma.0
-	for <qemu-devel@nongnu.org>; Wed, 03 Jan 2018 09:42:01 -0800 (PST)
-Date: Wed, 3 Jan 2018 17:41:58 +0000
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20180103174158.GD21894@stefanha-x1.localdomain>
-References: <20180103021456.22526-1-peterx@redhat.com>
-	<20180103021456.22526-3-peterx@redhat.com>
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1eWnDi-0004nD-VG
+	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 12:52:55 -0500
+Received: by mail-oi0-x236.google.com with SMTP id w125so1452931oie.7
+	for <qemu-devel@nongnu.org>; Wed, 03 Jan 2018 09:52:54 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="Ycz6tD7Th1CMF4v7"
-Content-Disposition: inline
-In-Reply-To: <20180103021456.22526-3-peterx@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 2/3] chardev: let g_idle_add() be with
- chardev gcontext
+In-Reply-To: <bfe98eaa-bf87-dabe-ec63-7eae338495a2@redhat.com>
+References: <20171215150659.1811-1-marcandre.lureau@redhat.com>
+	<20171215150659.1811-5-marcandre.lureau@redhat.com>
+	<CAJ+F1CLxk6vC+ZB09BUBMnJj12RuaeYS=S5KwcBGhoHiYbCd5g@mail.gmail.com>
+	<CAJ+F1CLHsFoRFYy825f0MxyAU4T+97YrjMQWfmu6Cni49zyZWQ@mail.gmail.com>
+	<bfe98eaa-bf87-dabe-ec63-7eae338495a2@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Wed, 3 Jan 2018 17:52:33 +0000
+Message-ID: <CAFEAcA96TDZR7O75q_NH_vOdLBYr3ygnx-qzoZrQaeRqfrHAkA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v2 04/13] build-sys: add AddressSanitizer
+ when --enable-debug if possible
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,42 +33,19 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>, QEMU <qemu-devel@nongnu.org>, =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>, Fam Zheng <famz@redhat.com>
 
+On 2 January 2018 at 17:31, Paolo Bonzini <pbonzini@redhat.com> wrote:
+> 2) I think removing -O2 from --enable-debug should be removed at the
+> same time.  That pretty much guarantees that nobody will use
+> --enable-debug, and optimized builds are decently debuggable nowadays.
+> The best would be to detect -Og, and add either -Og or -O1 depending on
+> presence.
 
---Ycz6tD7Th1CMF4v7
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Hmm. I use --enable-debug all the time and one of the reasons
+I use it is that the optimized build is usually more pain
+to debug with...
 
-On Wed, Jan 03, 2018 at 10:14:55AM +0800, Peter Xu wrote:
-> The idle task will be attached to main gcontext even if the chardev
-> backend is running in another gcontext.  Fix the only caller by
-> extending the g_idle_add() logic into the more powerful
-> g_source_attach().  It's basically g_idle_add_full() implementation, but
-> with the chardev's gcontext passed in.
->=20
-> Reviewed-by: Marc-Andr=E9 Lureau <marcandre.lureau@redhat.com>
-> Signed-off-by: Peter Xu <peterx@redhat.com>
-> ---
->  chardev/char-pty.c | 7 ++++++-
->  1 file changed, 6 insertions(+), 1 deletion(-)
-
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-
---Ycz6tD7Th1CMF4v7
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJaTRXmAAoJEJykq7OBq3PISTwH/3bgwNY1Q0c5P58wdhwRr4YU
-SydDua9ZXXtH0CFu9dM2wR7III9XFth5/xM436NDZdw4rXCmGyWipVB6fHHkTud8
-gmio7gTa/1zSVXpjHenf2B+R+HFupxLt9dON2WzhBNt1+inrt23slK6AjFmtG9sK
-3uTAA43i1zHOidyjnXl3u45i4UmL+Quhc5DisTSmKSvLYOgVssxG62dDgouvb0eN
-+zfh+LvWleEfdiUEyDU6AwREiKbOyQcz6YsBW/dQCLfANIFtb2OcodEfPVNu2OgY
-uarEpMCMeQzVgD91lkJVZvoN00kM97l2rxcrz3kpus6sY341qgjuMO+63XNXBZo=
-=xR7A
------END PGP SIGNATURE-----
-
---Ycz6tD7Th1CMF4v7--
+thanks
+-- PMM
