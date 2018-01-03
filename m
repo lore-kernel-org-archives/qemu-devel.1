@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59050)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59093)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mjc@sifive.com>) id 1eWXDE-000680-LP
-	for qemu-devel@nongnu.org; Tue, 02 Jan 2018 19:47:24 -0500
+	(envelope-from <mjc@sifive.com>) id 1eWXDI-00069u-Bw
+	for qemu-devel@nongnu.org; Tue, 02 Jan 2018 19:47:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mjc@sifive.com>) id 1eWXDC-0008Rh-Ni
-	for qemu-devel@nongnu.org; Tue, 02 Jan 2018 19:47:20 -0500
-Received: from mail-pg0-x242.google.com ([2607:f8b0:400e:c05::242]:34066)
+	(envelope-from <mjc@sifive.com>) id 1eWXDF-0008UC-8I
+	for qemu-devel@nongnu.org; Tue, 02 Jan 2018 19:47:24 -0500
+Received: from mail-pl0-x242.google.com ([2607:f8b0:400e:c01::242]:44842)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mjc@sifive.com>) id 1eWXDC-0008Qd-G3
-	for qemu-devel@nongnu.org; Tue, 02 Jan 2018 19:47:18 -0500
-Received: by mail-pg0-x242.google.com with SMTP id j4so83663pgp.1
-	for <qemu-devel@nongnu.org>; Tue, 02 Jan 2018 16:47:18 -0800 (PST)
+	(Exim 4.71) (envelope-from <mjc@sifive.com>) id 1eWXDF-0008Tb-0H
+	for qemu-devel@nongnu.org; Tue, 02 Jan 2018 19:47:21 -0500
+Received: by mail-pl0-x242.google.com with SMTP id n13so133442plp.11
+	for <qemu-devel@nongnu.org>; Tue, 02 Jan 2018 16:47:20 -0800 (PST)
 From: Michael Clark <mjc@sifive.com>
-Date: Wed,  3 Jan 2018 13:44:24 +1300
-Message-Id: <1514940265-18093-21-git-send-email-mjc@sifive.com>
+Date: Wed,  3 Jan 2018 13:44:25 +1300
+Message-Id: <1514940265-18093-22-git-send-email-mjc@sifive.com>
 In-Reply-To: <1514940265-18093-1-git-send-email-mjc@sifive.com>
 References: <1514940265-18093-1-git-send-email-mjc@sifive.com>
-Subject: [Qemu-devel] [PATCH v1 20/21] SiFive Freedom U500 RISC-V Machine
+Subject: [Qemu-devel] [PATCH v1 21/21] RISC-V Build Infrastructure
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,437 +28,279 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Michael Clark <mjc@sifive.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
 
-This provides a RISC-V Board compatible with the the SiFive U500 SDK.
-The following machine is implemented:
+This adds RISC-V into the build system enabling the following targets:
 
-- 'sifive_u500'; CLINT, PLIC, UART, device-tree
+- riscv32-softmmu
+- riscv64-softmmu
+- riscv32-linux-user
+- riscv64-linux-user
 
+This adds defaults configs for RISC-V, enables the build for the RISC-V
+CPU core, hardware, and Linux User Emulation. The 'qemu-binfmt-conf.sh'
+script is updated to add the RISC-V ELF magic.
+
+Expected checkpatch errors for consistency reasons:
+
+ERROR: line over 90 characters
+FILE: scripts/qemu-binfmt-conf.sh
 Signed-off-by: Michael Clark <mjc@sifive.com>
 ---
- hw/riscv/sifive_u500.c         | 338 +++++++++++++++++++++++++++++++++++++++++
- include/hw/riscv/sifive_u500.h |  69 +++++++++
- 2 files changed, 407 insertions(+)
- create mode 100644 hw/riscv/sifive_u500.c
- create mode 100644 include/hw/riscv/sifive_u500.h
+ Makefile.objs                          |  1 +
+ arch_init.c                            |  2 ++
+ configure                              | 11 +++++++++++
+ cpus.c                                 |  6 ++++++
+ default-configs/riscv32-linux-user.mak |  1 +
+ default-configs/riscv32-softmmu.mak    |  4 ++++
+ default-configs/riscv64-linux-user.mak |  1 +
+ default-configs/riscv64-softmmu.mak    |  4 ++++
+ hw/riscv/Makefile.objs                 | 12 ++++++++++++
+ include/sysemu/arch_init.h             |  1 +
+ qapi-schema.json                       | 14 +++++++++++++-
+ scripts/qemu-binfmt-conf.sh            | 13 ++++++++++++-
+ target/riscv/Makefile.objs             |  2 ++
+ target/riscv/trace-events              |  1 +
+ 14 files changed, 71 insertions(+), 2 deletions(-)
+ create mode 100644 default-configs/riscv32-linux-user.mak
+ create mode 100644 default-configs/riscv32-softmmu.mak
+ create mode 100644 default-configs/riscv64-linux-user.mak
+ create mode 100644 default-configs/riscv64-softmmu.mak
+ create mode 100644 hw/riscv/Makefile.objs
+ create mode 100644 target/riscv/Makefile.objs
+ create mode 100644 target/riscv/trace-events
 
-diff --git a/hw/riscv/sifive_u500.c b/hw/riscv/sifive_u500.c
+diff --git a/Makefile.objs b/Makefile.objs
+index 285c6f3..ae8658e 100644
+--- a/Makefile.objs
++++ b/Makefile.objs
+@@ -164,6 +164,7 @@ trace-events-subdirs += target/mips
+ trace-events-subdirs += target/sparc
+ trace-events-subdirs += target/s390x
+ trace-events-subdirs += target/ppc
++trace-events-subdirs += target/riscv
+ trace-events-subdirs += qom
+ trace-events-subdirs += linux-user
+ trace-events-subdirs += qapi
+diff --git a/arch_init.c b/arch_init.c
+index a0b8ed6..dcf356b 100644
+--- a/arch_init.c
++++ b/arch_init.c
+@@ -69,6 +69,8 @@ int graphic_depth = 32;
+ #define QEMU_ARCH QEMU_ARCH_OPENRISC
+ #elif defined(TARGET_PPC)
+ #define QEMU_ARCH QEMU_ARCH_PPC
++#elif defined(TARGET_RISCV)
++#define QEMU_ARCH QEMU_ARCH_RISCV
+ #elif defined(TARGET_S390X)
+ #define QEMU_ARCH QEMU_ARCH_S390X
+ #elif defined(TARGET_SH4)
+diff --git a/configure b/configure
+index 100309c..832e025 100755
+--- a/configure
++++ b/configure
+@@ -6530,6 +6530,14 @@ case "$target_name" in
+     echo "TARGET_ABI32=y" >> $config_target_mak
+     gdb_xml_files="power64-core.xml power-fpu.xml power-altivec.xml power-spe.xml power-vsx.xml"
+   ;;
++  riscv32)
++    TARGET_BASE_ARCH=riscv
++    TARGET_ABI_DIR=riscv
++  ;;
++  riscv64)
++    TARGET_BASE_ARCH=riscv
++    TARGET_ABI_DIR=riscv
++  ;;
+   sh4|sh4eb)
+     TARGET_ARCH=sh4
+     bflt="yes"
+@@ -6692,6 +6700,9 @@ for i in $ARCH $TARGET_BASE_ARCH ; do
+   ppc*)
+     disas_config "PPC"
+   ;;
++  riscv)
++    disas_config "RISCV"
++  ;;
+   s390*)
+     disas_config "S390"
+   ;;
+diff --git a/cpus.c b/cpus.c
+index 83700c1..702da8b 100644
+--- a/cpus.c
++++ b/cpus.c
+@@ -1909,6 +1909,9 @@ CpuInfoList *qmp_query_cpus(Error **errp)
+ #elif defined(TARGET_SPARC)
+         SPARCCPU *sparc_cpu = SPARC_CPU(cpu);
+         CPUSPARCState *env = &sparc_cpu->env;
++#elif defined(TARGET_RISCV)
++        RISCVCPU *riscv_cpu = RISCV_CPU(cpu);
++        CPURISCVState *env = &riscv_cpu->env;
+ #elif defined(TARGET_MIPS)
+         MIPSCPU *mips_cpu = MIPS_CPU(cpu);
+         CPUMIPSState *env = &mips_cpu->env;
+@@ -1942,6 +1945,9 @@ CpuInfoList *qmp_query_cpus(Error **errp)
+ #elif defined(TARGET_TRICORE)
+         info->value->arch = CPU_INFO_ARCH_TRICORE;
+         info->value->u.tricore.PC = env->PC;
++#elif defined(TARGET_RISCV)
++        info->value->arch = CPU_INFO_ARCH_RISCV;
++        info->value->u.riscv.pc = env->pc;
+ #else
+         info->value->arch = CPU_INFO_ARCH_OTHER;
+ #endif
+diff --git a/default-configs/riscv32-linux-user.mak b/default-configs/riscv32-linux-user.mak
 new file mode 100644
-index 0000000..9cc411e
+index 0000000..865b362
 --- /dev/null
-+++ b/hw/riscv/sifive_u500.c
-@@ -0,0 +1,338 @@
-+/*
-+ * QEMU RISC-V Board Compatible with SiFive U500 SDK
-+ *
-+ * Copyright (c) 2016-2017 Sagar Karandikar, sagark@eecs.berkeley.edu
-+ * Copyright (c) 2017 SiFive, Inc.
-+ *
-+ * This provides a RISC-V Board compatible with the the SiFive U500 SDK
-+ *
-+ * 0) UART
-+ * 1) CLINT (Core Level Interruptor)
-+ * 2) PLIC (Platform Level Interrupt Controller)
-+ *
-+ * This board currently uses a hardcoded devicetree that indicates one hart.
-+ *
-+ * Permission is hereby granted, free of charge, to any person obtaining a copy
-+ * of this software and associated documentation files (the "Software"), to deal
-+ * in the Software without restriction, including without limitation the rights
-+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-+ * copies of the Software, and to permit persons to whom the Software is
-+ * furnished to do so, subject to the following conditions:
-+ *
-+ * The above copyright notice and this permission notice shall be included in
-+ * all copies or substantial portions of the Software.
-+ *
-+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-+ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-+ * THE SOFTWARE.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "qemu/log.h"
-+#include "qemu/error-report.h"
-+#include "hw/hw.h"
-+#include "hw/boards.h"
-+#include "hw/loader.h"
-+#include "hw/sysbus.h"
-+#include "hw/char/serial.h"
-+#include "target/riscv/cpu.h"
-+#include "hw/riscv/riscv_hart.h"
-+#include "hw/riscv/sifive_plic.h"
-+#include "hw/riscv/sifive_clint.h"
-+#include "hw/riscv/sifive_uart.h"
-+#include "hw/riscv/sifive_prci.h"
-+#include "hw/riscv/sifive_u500.h"
-+#include "chardev/char.h"
-+#include "sysemu/arch_init.h"
-+#include "sysemu/device_tree.h"
-+#include "exec/address-spaces.h"
-+#include "elf.h"
-+
-+static const struct MemmapEntry {
-+    hwaddr base;
-+    hwaddr size;
-+} sifive_u500_memmap[] = {
-+    [SIFIVE_U500_DEBUG] =    {        0x0,      0x100 },
-+    [SIFIVE_U500_MROM] =     {     0x1000,     0x2000 },
-+    [SIFIVE_U500_CLINT] =    {  0x2000000,    0x10000 },
-+    [SIFIVE_U500_PLIC] =     {  0xc000000,  0x4000000 },
-+    [SIFIVE_U500_UART0] =    { 0x10013000,     0x1000 },
-+    [SIFIVE_U500_UART1] =    { 0x10023000,     0x1000 },
-+    [SIFIVE_U500_DRAM] =     { 0x80000000,        0x0 },
-+};
-+
-+static uint64_t identity_translate(void *opaque, uint64_t addr)
-+{
-+    return addr;
-+}
-+
-+static uint64_t load_kernel(const char *kernel_filename)
-+{
-+    uint64_t kernel_entry, kernel_high;
-+
-+    if (load_elf(kernel_filename, identity_translate, NULL,
-+                 &kernel_entry, NULL, &kernel_high,
-+                 /* little_endian = */ 0, ELF_MACHINE, 1, 0) < 0) {
-+        error_report("qemu: could not load kernel '%s'", kernel_filename);
-+        exit(1);
-+    }
-+    return kernel_entry;
-+}
-+
-+static void create_fdt(SiFiveU500State *s, const struct MemmapEntry *memmap,
-+    uint64_t mem_size, const char *cmdline)
-+{
-+    void *fdt;
-+    int cpu;
-+    uint32_t *cells;
-+    char *nodename;
-+    uint32_t plic_phandle;
-+
-+    fdt = s->fdt = create_device_tree(&s->fdt_size);
-+    if (!fdt) {
-+        error_report("create_device_tree() failed");
-+        exit(1);
-+    }
-+
-+    qemu_fdt_setprop_string(fdt, "/", "model", "ucbbar,spike-bare,qemu");
-+    qemu_fdt_setprop_string(fdt, "/", "compatible", "ucbbar,spike-bare-dev");
-+    qemu_fdt_setprop_cell(fdt, "/", "#size-cells", 0x2);
-+    qemu_fdt_setprop_cell(fdt, "/", "#address-cells", 0x2);
-+
-+    qemu_fdt_add_subnode(fdt, "/soc");
-+    qemu_fdt_setprop(fdt, "/soc", "ranges", NULL, 0);
-+    qemu_fdt_setprop_string(fdt, "/soc", "compatible", "ucbbar,spike-bare-soc");
-+    qemu_fdt_setprop_cell(fdt, "/soc", "#size-cells", 0x2);
-+    qemu_fdt_setprop_cell(fdt, "/soc", "#address-cells", 0x2);
-+
-+    nodename = g_strdup_printf("/memory@%lx",
-+        (long)memmap[SIFIVE_U500_DRAM].base);
-+    qemu_fdt_add_subnode(fdt, nodename);
-+    qemu_fdt_setprop_cells(fdt, nodename, "reg",
-+        memmap[SIFIVE_U500_DRAM].base >> 32, memmap[SIFIVE_U500_DRAM].base,
-+        mem_size >> 32, mem_size);
-+    qemu_fdt_setprop_string(fdt, nodename, "device_type", "memory");
-+    g_free(nodename);
-+
-+    qemu_fdt_add_subnode(fdt, "/cpus");
-+    qemu_fdt_setprop_cell(fdt, "/cpus", "timebase-frequency", 10000000);
-+    qemu_fdt_setprop_cell(fdt, "/cpus", "#size-cells", 0x0);
-+    qemu_fdt_setprop_cell(fdt, "/cpus", "#address-cells", 0x1);
-+
-+    for (cpu = s->soc.num_harts - 1; cpu >= 0; cpu--) {
-+        nodename = g_strdup_printf("/cpus/cpu@%d", cpu);
-+        char *intc = g_strdup_printf("/cpus/cpu@%d/interrupt-controller", cpu);
-+        char *isa = riscv_isa_string(&s->soc.harts[cpu]);
-+        qemu_fdt_add_subnode(fdt, nodename);
-+        qemu_fdt_setprop_cell(fdt, nodename, "clock-frequency", 1000000000);
-+        qemu_fdt_setprop_string(fdt, nodename, "mmu-type", "riscv,sv48");
-+        qemu_fdt_setprop_string(fdt, nodename, "riscv,isa", isa);
-+        qemu_fdt_setprop_string(fdt, nodename, "compatible", "riscv");
-+        qemu_fdt_setprop_string(fdt, nodename, "status", "okay");
-+        qemu_fdt_setprop_cell(fdt, nodename, "reg", cpu);
-+        qemu_fdt_setprop_string(fdt, nodename, "device_type", "cpu");
-+        qemu_fdt_add_subnode(fdt, intc);
-+        qemu_fdt_setprop_cell(fdt, intc, "phandle", 1);
-+        qemu_fdt_setprop_cell(fdt, intc, "linux,phandle", 1);
-+        qemu_fdt_setprop_string(fdt, intc, "compatible", "riscv,cpu-intc");
-+        qemu_fdt_setprop(fdt, intc, "interrupt-controller", NULL, 0);
-+        qemu_fdt_setprop_cell(fdt, intc, "#interrupt-cells", 1);
-+        g_free(isa);
-+        g_free(intc);
-+        g_free(nodename);
-+    }
-+
-+    cells =  g_new0(uint32_t, s->soc.num_harts * 4);
-+    for (cpu = 0; cpu < s->soc.num_harts; cpu++) {
-+        nodename =
-+            g_strdup_printf("/cpus/cpu@%d/interrupt-controller", cpu);
-+        uint32_t intc_phandle = qemu_fdt_get_phandle(fdt, nodename);
-+        cells[cpu * 4 + 0] = cpu_to_be32(intc_phandle);
-+        cells[cpu * 4 + 1] = cpu_to_be32(IRQ_M_SOFT);
-+        cells[cpu * 4 + 2] = cpu_to_be32(intc_phandle);
-+        cells[cpu * 4 + 3] = cpu_to_be32(IRQ_M_TIMER);
-+        g_free(nodename);
-+    }
-+    nodename = g_strdup_printf("/soc/clint@%lx",
-+        (long)memmap[SIFIVE_U500_CLINT].base);
-+    qemu_fdt_add_subnode(fdt, nodename);
-+    qemu_fdt_setprop_string(fdt, nodename, "compatible", "riscv,clint0");
-+    qemu_fdt_setprop_cells(fdt, nodename, "reg",
-+        0x0, memmap[SIFIVE_U500_CLINT].base,
-+        0x0, memmap[SIFIVE_U500_CLINT].size);
-+    qemu_fdt_setprop(fdt, nodename, "interrupts-extended",
-+        cells, s->soc.num_harts * sizeof(uint32_t) * 4);
-+    g_free(cells);
-+    g_free(nodename);
-+
-+    cells =  g_new0(uint32_t, s->soc.num_harts * 4);
-+    for (cpu = 0; cpu < s->soc.num_harts; cpu++) {
-+        nodename =
-+            g_strdup_printf("/cpus/cpu@%d/interrupt-controller", cpu);
-+        uint32_t intc_phandle = qemu_fdt_get_phandle(fdt, nodename);
-+        cells[cpu * 4 + 0] = cpu_to_be32(intc_phandle);
-+        cells[cpu * 4 + 1] = cpu_to_be32(IRQ_M_EXT);
-+        cells[cpu * 4 + 2] = cpu_to_be32(intc_phandle);
-+        cells[cpu * 4 + 3] = cpu_to_be32(IRQ_S_EXT);
-+        g_free(nodename);
-+    }
-+    nodename = g_strdup_printf("/soc/interrupt-controller@%lx",
-+        (long)memmap[SIFIVE_U500_PLIC].base);
-+    qemu_fdt_add_subnode(fdt, nodename);
-+    qemu_fdt_setprop_cell(fdt, nodename, "#interrupt-cells", 1);
-+    qemu_fdt_setprop_string(fdt, nodename, "compatible", "riscv,plic0");
-+    qemu_fdt_setprop(fdt, nodename, "interrupt-controller", NULL, 0);
-+    qemu_fdt_setprop(fdt, nodename, "interrupts-extended",
-+        cells, s->soc.num_harts * sizeof(uint32_t) * 4);
-+    qemu_fdt_setprop_cells(fdt, nodename, "reg",
-+        0x0, memmap[SIFIVE_U500_PLIC].base,
-+        0x0, memmap[SIFIVE_U500_PLIC].size);
-+    qemu_fdt_setprop_string(fdt, nodename, "reg-names", "control");
-+    qemu_fdt_setprop_cell(fdt, nodename, "riscv,max-priority", 7);
-+    qemu_fdt_setprop_cell(fdt, nodename, "riscv,ndev", 4);
-+    qemu_fdt_setprop_cells(fdt, nodename, "phandle", 2);
-+    qemu_fdt_setprop_cells(fdt, nodename, "linux,phandle", 2);
-+    plic_phandle = qemu_fdt_get_phandle(fdt, nodename);
-+    g_free(cells);
-+    g_free(nodename);
-+
-+    nodename = g_strdup_printf("/uart@%lx",
-+        (long)memmap[SIFIVE_U500_UART0].base);
-+    qemu_fdt_add_subnode(fdt, nodename);
-+    qemu_fdt_setprop_string(fdt, nodename, "compatible", "sifive,uart0");
-+    qemu_fdt_setprop_cells(fdt, nodename, "reg",
-+        0x0, memmap[SIFIVE_U500_UART0].base,
-+        0x0, memmap[SIFIVE_U500_UART0].size);
-+    qemu_fdt_setprop_cells(fdt, nodename, "interrupt-parent", plic_phandle);
-+    qemu_fdt_setprop_cells(fdt, nodename, "interrupts", 1);
-+
-+    qemu_fdt_add_subnode(fdt, "/chosen");
-+    qemu_fdt_setprop_string(fdt, "/chosen", "stdout-path", nodename);
-+    qemu_fdt_setprop_string(fdt, "/chosen", "bootargs", cmdline);
-+    g_free(nodename);
-+}
-+
-+static void riscv_sifive_u500_init(MachineState *machine)
-+{
-+    const struct MemmapEntry *memmap = sifive_u500_memmap;
-+
-+    SiFiveU500State *s = g_new0(SiFiveU500State, 1);
-+    MemoryRegion *sys_memory = get_system_memory();
-+    MemoryRegion *main_mem = g_new(MemoryRegion, 1);
-+    MemoryRegion *boot_rom = g_new(MemoryRegion, 1);
-+
-+    /* Initialize SOC */
-+    object_initialize(&s->soc, sizeof(s->soc), TYPE_RISCV_HART_ARRAY);
-+    object_property_add_child(OBJECT(machine), "soc", OBJECT(&s->soc),
-+                              &error_abort);
-+    object_property_set_str(OBJECT(&s->soc), TYPE_RISCV_CPU_IMAFDCSU_PRIV_1_10,
-+                            "cpu-model", &error_abort);
-+    object_property_set_int(OBJECT(&s->soc), smp_cpus, "num-harts",
-+                            &error_abort);
-+    object_property_set_bool(OBJECT(&s->soc), true, "realized",
-+                            &error_abort);
-+
-+    /* register RAM */
-+    memory_region_init_ram(main_mem, NULL, "riscv.sifive.u500.ram",
-+                           machine->ram_size, &error_fatal);
-+    /* for phys mem size check in page table walk */
-+    memory_region_add_subregion(sys_memory, memmap[SIFIVE_U500_DRAM].base,
-+        main_mem);
-+
-+    /* create device tree */
-+    create_fdt(s, memmap, machine->ram_size, machine->kernel_cmdline);
-+
-+    /* boot rom */
-+    memory_region_init_ram(boot_rom, NULL, "riscv.sifive.u500.bootrom",
-+                           0x10000, &error_fatal);
-+    memory_region_set_readonly(boot_rom, true);
-+    memory_region_add_subregion(sys_memory, 0x0, boot_rom);
-+
-+    if (machine->kernel_filename) {
-+        load_kernel(machine->kernel_filename);
-+    }
-+
-+    /* reset vector */
-+    uint32_t reset_vec[8] = {
-+        0x00000297,                    /* 1:  auipc  t0, %pcrel_hi(dtb) */
-+        0x02028593,                    /*     addi   a1, t0, %pcrel_lo(1b) */
-+        0xf1402573,                    /*     csrr   a0, mhartid  */
-+#if defined(TARGET_RISCV32)
-+        0x0182a283,                    /*     lw     t0, 24(t0) */
-+#elif defined(TARGET_RISCV64)
-+        0x0182b283,                    /*     ld     t0, 24(t0) */
-+#endif
-+        0x00028067,                    /*     jr     t0 */
-+        0x00000000,
-+        memmap[SIFIVE_U500_DRAM].base, /* start: .dword DRAM_BASE */
-+        0x00000000,
-+                                       /* dtb: */
-+    };
-+
-+    /* copy in the reset vector */
-+    cpu_physical_memory_write(memmap[SIFIVE_U500_MROM].base,
-+        reset_vec, sizeof(reset_vec));
-+
-+    /* copy in the device tree */
-+    qemu_fdt_dumpdtb(s->fdt, s->fdt_size);
-+    cpu_physical_memory_write(memmap[SIFIVE_U500_MROM].base +
-+        sizeof(reset_vec), s->fdt, s->fdt_size);
-+
-+    /* MMIO */
-+    s->plic = sifive_plic_create(memmap[SIFIVE_U500_PLIC].base,
-+        (char *)SIFIVE_U500_PLIC_HART_CONFIG,
-+        SIFIVE_U500_PLIC_NUM_SOURCES,
-+        SIFIVE_U500_PLIC_NUM_PRIORITIES,
-+        SIFIVE_U500_PLIC_PRIORITY_BASE,
-+        SIFIVE_U500_PLIC_PENDING_BASE,
-+        SIFIVE_U500_PLIC_ENABLE_BASE,
-+        SIFIVE_U500_PLIC_ENABLE_STRIDE,
-+        SIFIVE_U500_PLIC_CONTEXT_BASE,
-+        SIFIVE_U500_PLIC_CONTEXT_STRIDE,
-+        memmap[SIFIVE_U500_PLIC].size);
-+    sifive_uart_create(sys_memory, memmap[SIFIVE_U500_UART0].base,
-+        serial_hds[0], SIFIVE_PLIC(s->plic)->irqs[SIFIVE_U500_UART0_IRQ]);
-+    /* sifive_uart_create(sys_memory, memmap[SIFIVE_U500_UART1].base,
-+        serial_hds[1], SIFIVE_PLIC(s->plic)->irqs[SIFIVE_U500_UART1_IRQ]); */
-+    sifive_clint_create(memmap[SIFIVE_U500_CLINT].base,
-+        memmap[SIFIVE_U500_CLINT].size, smp_cpus,
-+        SIFIVE_SIP_BASE, SIFIVE_TIMECMP_BASE, SIFIVE_TIME_BASE);
-+}
-+
-+static int riscv_sifive_u500_sysbus_device_init(SysBusDevice *sysbusdev)
-+{
-+    return 0;
-+}
-+
-+static void riscv_sifive_u500_class_init(ObjectClass *klass, void *data)
-+{
-+    SysBusDeviceClass *k = SYS_BUS_DEVICE_CLASS(klass);
-+    k->init = riscv_sifive_u500_sysbus_device_init;
-+}
-+
-+static const TypeInfo riscv_sifive_u500_device = {
-+    .name          = TYPE_SIFIVE_U500,
-+    .parent        = TYPE_SYS_BUS_DEVICE,
-+    .instance_size = sizeof(SiFiveU500State),
-+    .class_init    = riscv_sifive_u500_class_init,
-+};
-+
-+static void riscv_sifive_u500_register_types(void)
-+{
-+    type_register_static(&riscv_sifive_u500_device);
-+}
-+
-+type_init(riscv_sifive_u500_register_types);
-+
-+static void riscv_sifive_u500_machine_init(MachineClass *mc)
-+{
-+    mc->desc = "RISC-V Board compatible with SiFive U500 SDK";
-+    mc->init = riscv_sifive_u500_init;
-+    mc->max_cpus = 1;
-+}
-+
-+DEFINE_MACHINE("sifive_u500", riscv_sifive_u500_machine_init)
-diff --git a/include/hw/riscv/sifive_u500.h b/include/hw/riscv/sifive_u500.h
++++ b/default-configs/riscv32-linux-user.mak
+@@ -0,0 +1 @@
++# Default configuration for riscv-linux-user
+diff --git a/default-configs/riscv32-softmmu.mak b/default-configs/riscv32-softmmu.mak
 new file mode 100644
-index 0000000..1e0486f
+index 0000000..f9e7421
 --- /dev/null
-+++ b/include/hw/riscv/sifive_u500.h
-@@ -0,0 +1,69 @@
-+/*
-+ * SiFive U500 series machine interface
-+ *
-+ * Copyright (c) 2017 SiFive, Inc.
-+ *
-+ * Permission is hereby granted, free of charge, to any person obtaining a copy
-+ * of this software and associated documentation files (the "Software"), to deal
-+ * in the Software without restriction, including without limitation the rights
-+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-+ * copies of the Software, and to permit persons to whom the Software is
-+ * furnished to do so, subject to the following conditions:
-+ *
-+ * The above copyright notice and this permission notice shall be included in
-+ * all copies or substantial portions of the Software.
-+ *
-+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-+ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-+ * THE SOFTWARE.
-+ */
++++ b/default-configs/riscv32-softmmu.mak
+@@ -0,0 +1,4 @@
++# Default configuration for riscv-softmmu
 +
-+#ifndef HW_SIFIVE_U500_H
-+#define HW_SIFIVE_U500_H
++CONFIG_SERIAL=y
++CONFIG_VIRTIO=y
+diff --git a/default-configs/riscv64-linux-user.mak b/default-configs/riscv64-linux-user.mak
+new file mode 100644
+index 0000000..865b362
+--- /dev/null
++++ b/default-configs/riscv64-linux-user.mak
+@@ -0,0 +1 @@
++# Default configuration for riscv-linux-user
+diff --git a/default-configs/riscv64-softmmu.mak b/default-configs/riscv64-softmmu.mak
+new file mode 100644
+index 0000000..f9e7421
+--- /dev/null
++++ b/default-configs/riscv64-softmmu.mak
+@@ -0,0 +1,4 @@
++# Default configuration for riscv-softmmu
 +
-+#define TYPE_SIFIVE_U500 "riscv.sifive_u500"
++CONFIG_SERIAL=y
++CONFIG_VIRTIO=y
+diff --git a/hw/riscv/Makefile.objs b/hw/riscv/Makefile.objs
+new file mode 100644
+index 0000000..a0c31ae
+--- /dev/null
++++ b/hw/riscv/Makefile.objs
+@@ -0,0 +1,12 @@
++obj-y += riscv_elf.o
++obj-y += riscv_htif.o
++obj-y += riscv_hart.o
++obj-y += sifive_e300.o
++obj-y += sifive_clint.o
++obj-y += sifive_prci.o
++obj-y += sifive_plic.o
++obj-y += sifive_u500.o
++obj-y += sifive_uart.o
++obj-y += spike_v1_09.o
++obj-y += spike_v1_10.o
++obj-y += virt.o
+diff --git a/include/sysemu/arch_init.h b/include/sysemu/arch_init.h
+index 8751c46..63c6152 100644
+--- a/include/sysemu/arch_init.h
++++ b/include/sysemu/arch_init.h
+@@ -24,6 +24,7 @@ enum {
+     QEMU_ARCH_MOXIE = (1 << 15),
+     QEMU_ARCH_TRICORE = (1 << 16),
+     QEMU_ARCH_NIOS2 = (1 << 17),
++    QEMU_ARCH_RISCV = (1 << 18),
+ };
+ 
+ extern const uint32_t arch_type;
+diff --git a/qapi-schema.json b/qapi-schema.json
+index 5c06745..a69c9fe 100644
+--- a/qapi-schema.json
++++ b/qapi-schema.json
+@@ -413,7 +413,7 @@
+ # Since: 2.6
+ ##
+ { 'enum': 'CpuInfoArch',
+-  'data': ['x86', 'sparc', 'ppc', 'mips', 'tricore', 'other' ] }
++  'data': ['x86', 'sparc', 'ppc', 'mips', 'tricore', 'riscv', 'other' ] }
+ 
+ ##
+ # @CpuInfo:
+@@ -452,6 +452,7 @@
+             'ppc': 'CpuInfoPPC',
+             'mips': 'CpuInfoMIPS',
+             'tricore': 'CpuInfoTricore',
++            'riscv': 'CpuInfoRISCV',
+             'other': 'CpuInfoOther' } }
+ 
+ ##
+@@ -512,6 +513,17 @@
+ { 'struct': 'CpuInfoTricore', 'data': { 'PC': 'int' } }
+ 
+ ##
++# @CpuInfoRISCV:
++#
++# Additional information about a virtual RISCV CPU
++#
++# @pc: the instruction pointer
++#
++# Since 2.8
++##
++{ 'struct': 'CpuInfoRISCV', 'data': { 'pc': 'int' } }
 +
-+#define SIFIVE_U500(obj) \
-+    OBJECT_CHECK(SiFiveU500State, (obj), TYPE_SIFIVE_U500)
++##
+ # @CpuInfoOther:
+ #
+ # No additional information is available about the virtual CPU
+diff --git a/scripts/qemu-binfmt-conf.sh b/scripts/qemu-binfmt-conf.sh
+index 8afc3eb..c5ac660 100755
+--- a/scripts/qemu-binfmt-conf.sh
++++ b/scripts/qemu-binfmt-conf.sh
+@@ -4,7 +4,7 @@
+ 
+ qemu_target_list="i386 i486 alpha arm sparc32plus ppc ppc64 ppc64le m68k \
+ mips mipsel mipsn32 mipsn32el mips64 mips64el \
+-sh4 sh4eb s390x aarch64 hppa"
++sh4 sh4eb s390x aarch64 hppa riscv32 riscv64"
+ 
+ i386_magic='\x7fELF\x01\x01\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02\x00\x03\x00'
+ i386_mask='\xff\xff\xff\xff\xff\xfe\xfe\xff\xff\xff\xff\xff\xff\xff\xff\xff\xfe\xff\xff\xff'
+@@ -96,6 +96,14 @@ hppa_magic='\x7f\x45\x4c\x46\x01\x02\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00
+ hppa_mask='\xff\xff\xff\xff\xff\xff\xff\x00\xff\xff\xff\xff\xff\xff\xff\xff\xff\xfe\xff\xff'
+ hppa_family=hppa
+ 
++riscv32_magic='\x7fELF\x01\x01\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02\x00\xf3\x00'
++riscv32_mask='\xff\xff\xff\xff\xff\xff\xff\x00\xff\xff\xff\xff\xff\xff\xff\xff\xfe\xff\xff\xff'
++riscv32_family=riscv
 +
-+typedef struct SiFiveU500State {
-+    /*< private >*/
-+    SysBusDevice parent_obj;
++riscv64_magic='\x7fELF\x02\x01\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02\x00\xf3\x00'
++riscv64_mask='\xff\xff\xff\xff\xff\xff\xff\x00\xff\xff\xff\xff\xff\xff\xff\xff\xfe\xff\xff\xff'
++riscv64_family=riscv
 +
-+    /*< public >*/
-+    RISCVHartArrayState soc;
-+    DeviceState *plic;
-+    void *fdt;
-+    int fdt_size;
-+} SiFiveU500State;
-+
-+enum {
-+    SIFIVE_U500_DEBUG,
-+    SIFIVE_U500_MROM,
-+    SIFIVE_U500_CLINT,
-+    SIFIVE_U500_PLIC,
-+    SIFIVE_U500_UART0,
-+    SIFIVE_U500_UART1,
-+    SIFIVE_U500_DRAM
-+};
-+
-+enum {
-+    SIFIVE_U500_UART0_IRQ = 3,
-+    SIFIVE_U500_UART1_IRQ = 4
-+};
-+
-+#define SIFIVE_U500_PLIC_HART_CONFIG "MS"
-+#define SIFIVE_U500_PLIC_NUM_SOURCES 127
-+#define SIFIVE_U500_PLIC_NUM_PRIORITIES 7
-+#define SIFIVE_U500_PLIC_PRIORITY_BASE 0x0
-+#define SIFIVE_U500_PLIC_PENDING_BASE 0x1000
-+#define SIFIVE_U500_PLIC_ENABLE_BASE 0x2000
-+#define SIFIVE_U500_PLIC_ENABLE_STRIDE 0x80
-+#define SIFIVE_U500_PLIC_CONTEXT_BASE 0x200000
-+#define SIFIVE_U500_PLIC_CONTEXT_STRIDE 0x1000
-+
-+#endif
+ qemu_get_family() {
+     cpu=${HOST_ARCH:-$(uname -m)}
+     case "$cpu" in
+@@ -117,6 +125,9 @@ qemu_get_family() {
+     sparc*)
+         echo "sparc"
+         ;;
++    riscv*)
++        echo "riscv"
++        ;;
+     *)
+         echo "$cpu"
+         ;;
+diff --git a/target/riscv/Makefile.objs b/target/riscv/Makefile.objs
+new file mode 100644
+index 0000000..0c08263
+--- /dev/null
++++ b/target/riscv/Makefile.objs
+@@ -0,0 +1,2 @@
++obj-y += translate.o op_helper.o helper.o cpu.o fpu_helper.o \
++	user_syscall.o user_atomic.o gdbstub.o pmp.o
+diff --git a/target/riscv/trace-events b/target/riscv/trace-events
+new file mode 100644
+index 0000000..9284b1f
+--- /dev/null
++++ b/target/riscv/trace-events
+@@ -0,0 +1 @@
++# See docs/devel/tracing.txt for syntax documentation.
 -- 
 2.7.0
