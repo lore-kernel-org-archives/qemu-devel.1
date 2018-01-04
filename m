@@ -1,14 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50282)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52920)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1eWvUR-0002I8-Dm
-	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 21:42:44 -0500
+	(envelope-from <wexu@redhat.com>) id 1eWvYf-0003yd-Kv
+	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 21:47:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1eWvUQ-0000sq-LZ
-	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 21:42:43 -0500
-From: Fam Zheng <famz@redhat.com>
-Date: Thu,  4 Jan 2018 10:42:28 +0800
-Message-Id: <20180104024228.11780-1-famz@redhat.com>
-Subject: [Qemu-devel] [PATCH] scsi: Don't deference in_buf if NULL
+	(envelope-from <wexu@redhat.com>) id 1eWvYa-0004PB-KB
+	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 21:47:05 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:47358)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <wexu@redhat.com>) id 1eWvYa-0004Lt-AM
+	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 21:47:00 -0500
+Date: Thu, 4 Jan 2018 11:09:12 +0800
+From: Wei Xu <wexu@redhat.com>
+Message-ID: <20180104030912.dnaiby5prbkgdcwb@Wei-Dev>
+References: <77f0c119-236d-9d4e-0a99-3519ecc26b23@profihost.ag>
+	<20180102142054.jqhbg3zrhjlppg2q@Wei-Dev>
+	<895f121e-c8fb-e669-592c-73e807d1f8f7@profihost.ag>
+	<20180102170459.wkvqrrlal4jbobdu@Wei-Dev>
+	<de5af082-f6b5-6b96-9503-54e3105d46f4@profihost.ag>
+	<20180103035749.uz4lmjsc7z4kuewu@Wei-Dev>
+	<b38e7429-2419-c392-aa3b-3ac5edf00300@profihost.ag>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <b38e7429-2419-c392-aa3b-3ac5edf00300@profihost.ag>
+Subject: Re: [Qemu-devel] dropped pkts with Qemu on tap interace (RX)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -17,33 +32,121 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <famz@redhat.com>, qemu-block@nongnu.org
+To: Stefan Priebe - Profihost AG <s.priebe@profihost.ag>
+Cc: qemu-devel <qemu-devel@nongnu.org>
 
-scsi_disk_emulate_command passes in_buf=NULL and in_len=0 in the
-REQUEST_SENSE branch. Inline the fixed_in evaluation and put it after
-the in_len test.
+On Wed, Jan 03, 2018 at 04:07:44PM +0100, Stefan Priebe - Profihost AG wrote:
+> 
+> Am 03.01.2018 um 04:57 schrieb Wei Xu:
+> > On Tue, Jan 02, 2018 at 10:17:25PM +0100, Stefan Priebe - Profihost AG wrote:
+> >>
+> >> Am 02.01.2018 um 18:04 schrieb Wei Xu:
+> >>> On Tue, Jan 02, 2018 at 04:24:33PM +0100, Stefan Priebe - Profihost AG wrote:
+> >>>> Hi,
+> >>>> Am 02.01.2018 um 15:20 schrieb Wei Xu:
+> >>>>> On Tue, Jan 02, 2018 at 12:17:29PM +0100, Stefan Priebe - Profihost AG wrote:
+> >>>>>> Hello,
+> >>>>>>
+> >>>>>> currently i'm trying to fix a problem where we have "random" missing
+> >>>>>> packets.
+> >>>>>>
+> >>>>>> We're doing an ssh connect from machine a to machine b every 5 minutes
+> >>>>>> via rsync and ssh.
+> >>>>>>
+> >>>>>> Sometimes it happens that we get this cron message:
+> >>>>>> "Connection to 192.168.0.2 closed by remote host.
+> >>>>>> rsync: connection unexpectedly closed (0 bytes received so far) [sender]
+> >>>>>> rsync error: unexplained error (code 255) at io.c(226) [sender=3.1.2]
+> >>>>>> ssh: connect to host 192.168.0.2 port 22: Connection refused"
+> >>>>>
+> >>>>> Hi Stefan,
+> >>>>> What kind of virtio-net backend are you using? Can you paste your qemu
+> >>>>> command line here?
+> >>>>
+> >>>> Sure netdev part:
+> >>>> -netdev
+> >>>> type=tap,id=net0,ifname=tap317i0,script=/var/lib/qemu-server/pve-bridge,downscript=/var/lib/qemu-server/pve-bridgedown,vhost=on
+> >>>> -device
+> >>>> virtio-net-pci,mac=EA:37:42:5C:F3:33,netdev=net0,bus=pci.0,addr=0x12,id=net0,bootindex=300
+> >>>> -netdev
+> >>>> type=tap,id=net1,ifname=tap317i1,script=/var/lib/qemu-server/pve-bridge,downscript=/var/lib/qemu-server/pve-bridgedown,vhost=on,queues=4
+> >>>> -device
+> >>>> virtio-net-pci,mac=6A:8E:74:45:1A:0B,nedev=net1,bus=pci.0,addr=0x13,id=net1,vectors=10,mq=on,bootindex=301
+> >>>
+> >>> According to what you have mentioned, the traffic is not heavy for the guests,
+> >>> the dropping shouldn't happen for regular case.
+> >>
+> >> The avg traffic is around 300kb/s.
+> >>
+> >>> What is your hardware platform?
+> >>
+> >> Dual Intel Xeon E5-2680 v4
+> >>
+> >>> and Which versions are you using for both
+> >>> guest/host kernel
+> >> Kernel v4.4.103
+> >>
+> >>> and qemu?
+> >> 2.9.1
+> >>
+> >>> Are there other VMs on the same host?
+> >> Yes.
+> > 
+> > What about the CPU load? 
+> 
+> Host:
+> 80-90% Idle
+> LoadAvg: 6-7
+> 
+> VM:
+> 97%-99% Idle
+> 
 
-Signed-off-by: Fam Zheng <famz@redhat.com>
----
- scsi/utils.c | 4 +---
- 1 file changed, 1 insertion(+), 3 deletions(-)
+OK, then this shouldn't be a concern.
 
-diff --git a/scsi/utils.c b/scsi/utils.c
-index ddae650a99..9a0a925ef9 100644
---- a/scsi/utils.c
-+++ b/scsi/utils.c
-@@ -320,10 +320,8 @@ int scsi_convert_sense(uint8_t *in_buf, int in_len,
-                        uint8_t *buf, int len, bool fixed)
- {
-     SCSISense sense;
--    bool fixed_in;
- 
--    fixed_in = (in_buf[0] & 2) == 0;
--    if (in_len && fixed == fixed_in) {
-+    if (in_len && !!fixed == ((in_buf[0] & 2) == 0)) {
-         memcpy(buf, in_buf, MIN(len, in_len));
-         return MIN(len, in_len);
-     }
--- 
-2.14.3
+> >>>>> 'Connection refused' usually means that the client gets a TCP Reset rather
+> >>>>> than losing packets, so this might not be a relevant issue.
+> >>>>
+> >>>> Mhm so you mean these might be two seperate ones?
+> >>>
+> >>> Yes.
+> >>>
+> >>>>
+> >>>>> Also you can do a tcpdump on both guests and see what happened to SSH packets
+> >>>>> (tcpdump -i tapXXX port 22).
+> >>>>
+> >>>> Sadly not as there's too much traffic on that part as rsync is syncing
+> >>>> every 5 minutes through ssh.
+> >>>
+> >>> You can do a tcpdump for the entire traffic from the guest and host and compare
+> >>> what kind of packets are dropped if the traffic is not overloaded.
+> >>
+> >> Are you sure? I don't get why the same amount and same kind of packets
+> >> should be received by both tap which are connected to different bridges
+> >> to different HW and physical interfaces.
+> > 
+> > Exactly, possibly this would be a host or guest kernel bug cos than qemu issue
+> > you are using vhost kernel as the backend and the two stats are independent,
+> > you might have to check out what is happening inside the traffic.
+> 
+> What do you mean by inside the traffic?
+
+You might need to figure what kind of packets are dropped on host tap interface,
+are they random packets or specific packets?
+
+There are few other tests which help to see what happened besides triaging
+the traffic, or you can try alternative tests according to your test bed.
+
+1). Upgrade host & guest kernel to latest kernel and see if it comes up, you can
+use net-next tree.
+    git://git.kernel.org/pub/scm/linux/kernel/git/davem/net-next.git
+
+2). Do some traffic throughput(netperf, iperf, etc) on both guests(traffic from 
+guest to host if the guests are isolated due to your comments) and check out
+the statistics.
+
+Wei
+
+> 
+> Stefan
+> 
