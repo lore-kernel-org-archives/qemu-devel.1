@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55395)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55459)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1eX8bd-0007bC-Ln
+	(envelope-from <laurent@vivier.eu>) id 1eX8bf-0007dq-DZ
 	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 11:43:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1eX8bZ-0003ZC-Oq
-	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 11:43:01 -0500
-Received: from mout.kundenserver.de ([212.227.126.130]:56582)
+	(envelope-from <laurent@vivier.eu>) id 1eX8bd-0003gN-Nr
+	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 11:43:03 -0500
+Received: from mout.kundenserver.de ([212.227.126.135]:60482)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1eX8bZ-0003Wm-CZ
-	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 11:42:57 -0500
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1eX8bd-0003e8-BV
+	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 11:43:01 -0500
 From: Laurent Vivier <laurent@vivier.eu>
-Date: Thu,  4 Jan 2018 17:42:41 +0100
-Message-Id: <20180104164251.26494-8-laurent@vivier.eu>
+Date: Thu,  4 Jan 2018 17:42:51 +0100
+Message-Id: <20180104164251.26494-18-laurent@vivier.eu>
 In-Reply-To: <20180104164251.26494-1-laurent@vivier.eu>
 References: <20180104164251.26494-1-laurent@vivier.eu>
-Subject: [Qemu-devel] [PULL 07/17] target/m68k: add chk and chk2
+Subject: [Qemu-devel] [PULL 17/17] target/m68k: fix m68k_cpu_dump_state()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,253 +26,50 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Laurent Vivier <laurent@vivier.eu>
 
-chk and chk2 compare a value to boundaries, and
-trigger a CHK exception if the value is out of bounds.
+Display correctly the Trace bits for 680x0
+(2 bits instead of 1 for Coldfire).
 
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
-Suggested-by: Richard Henderson <richard.henderson@linaro.org>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Message-Id: <20180104012913.30763-8-laurent@vivier.eu>
+Message-Id: <20180104012913.30763-18-laurent@vivier.eu>
 ---
- linux-user/main.c       |  7 +++++
- target/m68k/cpu.c       |  2 ++
- target/m68k/cpu.h       |  1 +
- target/m68k/helper.h    |  3 ++
- target/m68k/op_helper.c | 61 +++++++++++++++++++++++++++++++++++++++
- target/m68k/translate.c | 77 ++++++++++++++++++++++++++++++++++++++++++++++++-
- 6 files changed, 150 insertions(+), 1 deletion(-)
+ target/m68k/cpu.h       | 3 ++-
+ target/m68k/translate.c | 9 ++++++---
+ 2 files changed, 8 insertions(+), 4 deletions(-)
 
-diff --git a/linux-user/main.c b/linux-user/main.c
-index 71696ed33d..99a551b04f 100644
---- a/linux-user/main.c
-+++ b/linux-user/main.c
-@@ -2985,6 +2985,13 @@ void cpu_loop(CPUM68KState *env)
-             info._sifields._sigfault._addr = env->pc;
-             queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
-             break;
-+        case EXCP_CHK:
-+            info.si_signo = TARGET_SIGFPE;
-+            info.si_errno = 0;
-+            info.si_code = TARGET_FPE_INTOVF;
-+            info._sifields._sigfault._addr = env->pc;
-+            queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
-+            break;
-         case EXCP_DIV0:
-             info.si_signo = TARGET_SIGFPE;
-             info.si_errno = 0;
-diff --git a/target/m68k/cpu.c b/target/m68k/cpu.c
-index 0a3dd83548..57ffcb2114 100644
---- a/target/m68k/cpu.c
-+++ b/target/m68k/cpu.c
-@@ -134,6 +134,7 @@ static void m68020_cpu_initfn(Object *obj)
-     m68k_set_feature(env, M68K_FEATURE_CAS);
-     m68k_set_feature(env, M68K_FEATURE_BKPT);
-     m68k_set_feature(env, M68K_FEATURE_RTD);
-+    m68k_set_feature(env, M68K_FEATURE_CHK2);
- }
- #define m68030_cpu_initfn m68020_cpu_initfn
- #define m68040_cpu_initfn m68020_cpu_initfn
-@@ -156,6 +157,7 @@ static void m68060_cpu_initfn(Object *obj)
-     m68k_set_feature(env, M68K_FEATURE_CAS);
-     m68k_set_feature(env, M68K_FEATURE_BKPT);
-     m68k_set_feature(env, M68K_FEATURE_RTD);
-+    m68k_set_feature(env, M68K_FEATURE_CHK2);
- }
- 
- static void m5208_cpu_initfn(Object *obj)
 diff --git a/target/m68k/cpu.h b/target/m68k/cpu.h
-index cd4b3a7c7b..68396bdd70 100644
+index 759b30d389..2985b039e1 100644
 --- a/target/m68k/cpu.h
 +++ b/target/m68k/cpu.h
-@@ -305,6 +305,7 @@ enum m68k_features {
-     M68K_FEATURE_CAS,
-     M68K_FEATURE_BKPT,
-     M68K_FEATURE_RTD,
-+    M68K_FEATURE_CHK2,
- };
+@@ -219,7 +219,8 @@ typedef enum {
+ #define SR_I  0x0700
+ #define SR_M  0x1000
+ #define SR_S  0x2000
+-#define SR_T  0x8000
++#define SR_T_SHIFT 14
++#define SR_T  0xc000
  
- static inline int m68k_feature(CPUM68KState *env, int feature)
-diff --git a/target/m68k/helper.h b/target/m68k/helper.h
-index eebe52dae5..78483da003 100644
---- a/target/m68k/helper.h
-+++ b/target/m68k/helper.h
-@@ -94,3 +94,6 @@ DEF_HELPER_FLAGS_4(bfchg_mem, TCG_CALL_NO_WG, i32, env, i32, s32, i32)
- DEF_HELPER_FLAGS_4(bfclr_mem, TCG_CALL_NO_WG, i32, env, i32, s32, i32)
- DEF_HELPER_FLAGS_4(bfset_mem, TCG_CALL_NO_WG, i32, env, i32, s32, i32)
- DEF_HELPER_FLAGS_4(bfffo_mem, TCG_CALL_NO_WG, i64, env, i32, s32, i32)
-+
-+DEF_HELPER_3(chk, void, env, s32, s32)
-+DEF_HELPER_4(chk2, void, env, s32, s32, s32)
-diff --git a/target/m68k/op_helper.c b/target/m68k/op_helper.c
-index 5c7b27b9ca..7e97d03f82 100644
---- a/target/m68k/op_helper.c
-+++ b/target/m68k/op_helper.c
-@@ -947,3 +947,64 @@ uint64_t HELPER(bfffo_mem)(CPUM68KState *env, uint32_t addr,
-        is already zero.  */
-     return n | ffo;
- }
-+
-+void HELPER(chk)(CPUM68KState *env, int32_t val, int32_t ub)
-+{
-+    /* From the specs:
-+     *   X: Not affected, C,V,Z: Undefined,
-+     *   N: Set if val < 0; cleared if val > ub, undefined otherwise
-+     * We implement here values found from a real MC68040:
-+     *   X,V,Z: Not affected
-+     *   N: Set if val < 0; cleared if val >= 0
-+     *   C: if 0 <= ub: set if val < 0 or val > ub, cleared otherwise
-+     *      if 0 > ub: set if val > ub and val < 0, cleared otherwise
-+     */
-+    env->cc_n = val;
-+    env->cc_c = 0 <= ub ? val < 0 || val > ub : val > ub && val < 0;
-+
-+    if (val < 0 || val > ub) {
-+        CPUState *cs = CPU(m68k_env_get_cpu(env));
-+
-+        /* Recover PC and CC_OP for the beginning of the insn.  */
-+        cpu_restore_state(cs, GETPC());
-+
-+        /* flags have been modified by gen_flush_flags() */
-+        env->cc_op = CC_OP_FLAGS;
-+        /* Adjust PC to end of the insn.  */
-+        env->pc += 2;
-+
-+        cs->exception_index = EXCP_CHK;
-+        cpu_loop_exit(cs);
-+    }
-+}
-+
-+void HELPER(chk2)(CPUM68KState *env, int32_t val, int32_t lb, int32_t ub)
-+{
-+    /* From the specs:
-+     *   X: Not affected, N,V: Undefined,
-+     *   Z: Set if val is equal to lb or ub
-+     *   C: Set if val < lb or val > ub, cleared otherwise
-+     * We implement here values found from a real MC68040:
-+     *   X,N,V: Not affected
-+     *   Z: Set if val is equal to lb or ub
-+     *   C: if lb <= ub: set if val < lb or val > ub, cleared otherwise
-+     *      if lb > ub: set if val > ub and val < lb, cleared otherwise
-+     */
-+    env->cc_z = val != lb && val != ub;
-+    env->cc_c = lb <= ub ? val < lb || val > ub : val > ub && val < lb;
-+
-+    if (env->cc_c) {
-+        CPUState *cs = CPU(m68k_env_get_cpu(env));
-+
-+        /* Recover PC and CC_OP for the beginning of the insn.  */
-+        cpu_restore_state(cs, GETPC());
-+
-+        /* flags have been modified by gen_flush_flags() */
-+        env->cc_op = CC_OP_FLAGS;
-+        /* Adjust PC to end of the insn.  */
-+        env->pc += 4;
-+
-+        cs->exception_index = EXCP_CHK;
-+        cpu_loop_exit(cs);
-+    }
-+}
+ #define M68K_SSP    0
+ #define M68K_USP    1
 diff --git a/target/m68k/translate.c b/target/m68k/translate.c
-index a1e424e3db..7f52065375 100644
+index 4d5173c4be..4a6d799ee2 100644
 --- a/target/m68k/translate.c
 +++ b/target/m68k/translate.c
-@@ -4203,6 +4203,80 @@ DISAS_INSN(ff1)
-     gen_helper_ff1(reg, reg);
- }
- 
-+DISAS_INSN(chk)
-+{
-+    TCGv src, reg;
-+    int opsize;
-+
-+    switch ((insn >> 7) & 3) {
-+    case 3:
-+        opsize = OS_WORD;
-+        break;
-+    case 2:
-+        if (m68k_feature(env, M68K_FEATURE_CHK2)) {
-+            opsize = OS_LONG;
-+            break;
-+        }
-+        /* fallthru */
-+    default:
-+        gen_exception(s, s->insn_pc, EXCP_ILLEGAL);
-+        return;
-+    }
-+    SRC_EA(env, src, opsize, 1, NULL);
-+    reg = gen_extend(DREG(insn, 9), opsize, 1);
-+
-+    gen_flush_flags(s);
-+    gen_helper_chk(cpu_env, reg, src);
-+}
-+
-+DISAS_INSN(chk2)
-+{
-+    uint16_t ext;
-+    TCGv addr1, addr2, bound1, bound2, reg;
-+    int opsize;
-+
-+    switch ((insn >> 9) & 3) {
-+    case 0:
-+        opsize = OS_BYTE;
-+        break;
-+    case 1:
-+        opsize = OS_WORD;
-+        break;
-+    case 2:
-+        opsize = OS_LONG;
-+        break;
-+    default:
-+        gen_exception(s, s->insn_pc, EXCP_ILLEGAL);
-+        return;
-+    }
-+
-+    ext = read_im16(env, s);
-+    if ((ext & 0x0800) == 0) {
-+        gen_exception(s, s->insn_pc, EXCP_ILLEGAL);
-+        return;
-+    }
-+
-+    addr1 = gen_lea(env, s, insn, OS_UNSIZED);
-+    addr2 = tcg_temp_new();
-+    tcg_gen_addi_i32(addr2, addr1, opsize_bytes(opsize));
-+
-+    bound1 = gen_load(s, opsize, addr1, 1);
-+    tcg_temp_free(addr1);
-+    bound2 = gen_load(s, opsize, addr2, 1);
-+    tcg_temp_free(addr2);
-+
-+    reg = tcg_temp_new();
-+    if (ext & 0x8000) {
-+        tcg_gen_mov_i32(reg, AREG(ext, 12));
-+    } else {
-+        gen_ext(reg, DREG(ext, 12), opsize, 1);
-+    }
-+
-+    gen_flush_flags(s);
-+    gen_helper_chk2(cpu_env, reg, bound1, bound2);
-+    tcg_temp_free(reg);
-+}
-+
- static TCGv gen_get_sr(DisasContext *s)
- {
-     TCGv ccr;
-@@ -5306,7 +5380,7 @@ void register_m68k_insns (CPUM68KState *env)
-     BASE(undef,     0000, 0000);
-     INSN(arith_im,  0080, fff8, CF_ISA_A);
-     INSN(arith_im,  0000, ff00, M68000);
--    INSN(undef,     00c0, ffc0, M68000);
-+    INSN(chk2,      00c0, f9c0, CHK2);
-     INSN(bitrev,    00c0, fff8, CF_ISA_APLUSC);
-     BASE(bitop_reg, 0100, f1c0);
-     BASE(bitop_reg, 0140, f1c0);
-@@ -5339,6 +5413,7 @@ void register_m68k_insns (CPUM68KState *env)
-     BASE(move,      1000, f000);
-     BASE(move,      2000, f000);
-     BASE(move,      3000, f000);
-+    INSN(chk,       4000, f040, M68000);
-     INSN(strldsr,   40e7, ffff, CF_ISA_APLUSC);
-     INSN(negx,      4080, fff8, CF_ISA_A);
-     INSN(negx,      4000, ff00, M68000);
+@@ -5936,9 +5936,12 @@ void m68k_cpu_dump_state(CPUState *cs, FILE *f, fprintf_function cpu_fprintf,
+     }
+     cpu_fprintf (f, "PC = %08x   ", env->pc);
+     sr = env->sr | cpu_m68k_get_ccr(env);
+-    cpu_fprintf(f, "SR = %04x %c%c%c%c%c ", sr, (sr & CCF_X) ? 'X' : '-',
+-                (sr & CCF_N) ? 'N' : '-', (sr & CCF_Z) ? 'Z' : '-',
+-                (sr & CCF_V) ? 'V' : '-', (sr & CCF_C) ? 'C' : '-');
++    cpu_fprintf(f, "SR = %04x T:%x I:%x %c%c %c%c%c%c%c\n",
++                sr, (sr & SR_T) >> SR_T_SHIFT, (sr & SR_I) >> SR_I_SHIFT,
++                (sr & SR_S) ? 'S' : 'U', (sr & SR_M) ? '%' : 'I',
++                (sr & CCF_X) ? 'X' : '-', (sr & CCF_N) ? 'N' : '-',
++                (sr & CCF_Z) ? 'Z' : '-', (sr & CCF_V) ? 'V' : '-',
++                (sr & CCF_C) ? 'C' : '-');
+     cpu_fprintf(f, "FPSR = %08x %c%c%c%c ", env->fpsr,
+                 (env->fpsr & FPSR_CC_A) ? 'A' : '-',
+                 (env->fpsr & FPSR_CC_I) ? 'I' : '-',
 -- 
 2.14.3
