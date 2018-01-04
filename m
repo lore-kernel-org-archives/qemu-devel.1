@@ -1,21 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39903)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44438)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1eXB5q-000058-Mf
-	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 14:22:23 -0500
+	(envelope-from <programmingkidx@gmail.com>) id 1eXB9X-0003FB-Jy
+	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 14:26:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1eXB5p-0002BD-Kj
-	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 14:22:22 -0500
-Date: Thu, 4 Jan 2018 17:22:03 -0200
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20180104192203.GD3407@localhost.localdomain>
-References: <20180104144046.30793-1-f4bug@amsat.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <20180104144046.30793-1-f4bug@amsat.org>
+	(envelope-from <programmingkidx@gmail.com>) id 1eXB9T-00069t-JF
+	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 14:26:11 -0500
+Received: from mail-io0-x243.google.com ([2607:f8b0:4001:c06::243]:36049)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <programmingkidx@gmail.com>)
+	id 1eXB9T-00069E-DZ
+	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 14:26:07 -0500
+Received: by mail-io0-x243.google.com with SMTP id i143so3346023ioa.3
+	for <qemu-devel@nongnu.org>; Thu, 04 Jan 2018 11:26:07 -0800 (PST)
+Content-Type: text/plain; charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
+From: Programmingkid <programmingkidx@gmail.com>
+In-Reply-To: <bee022ee-30de-586a-d892-68291159de77@vivier.eu>
+Date: Thu, 4 Jan 2018 14:26:05 -0500
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC PATCH 0/6] qom: introduce TypeInfo name
- aliases
+Message-Id: <6975EB15-A268-4332-AA38-B31BFA22F4E8@gmail.com>
+References: <mailman.16196.1515084191.27993.qemu-devel@nongnu.org>
+	<AE31CFE4-27FD-40F8-81E3-0D7A8A9DE36E@gmail.com>
+	<bee022ee-30de-586a-d892-68291159de77@vivier.eu>
+Subject: Re: [Qemu-devel] [PULL 00/17] M68k for 2.12 patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,62 +31,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
-Cc: Alistair Francis <alistair.francis@xilinx.com>, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, Andreas =?iso-8859-1?Q?F=E4rber?= <afaerber@suse.de>, Igor Mammedov <imammedo@redhat.com>, Markus Armbruster <armbru@redhat.com>, Sascha Silbe <silbe@linux.vnet.ibm.com>, Alexander Graf <agraf@suse.de>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, qemu-devel@nongnu.org, qemu-arm@nongnu.org, Fam Zheng <famz@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>, Juan Quintela <quintela@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-
-On Thu, Jan 04, 2018 at 11:40:40AM -0300, Philippe Mathieu-Daud=E9 wrote:
-> Hi,
->=20
-> This RFC series is intended to simplify Flattened Device Tree support,
-> in particular the 'compatible' FDT entry, when Linux names mismatches
-> QEMU ones, but this is the same device modelled.
->=20
-> Eventually this might help to remove the QDevAlias qdev_alias_table[]
-> in qdev-monitor.c.
->=20
-
-Didn't look closely at the patches yet, but this sounds like a
-nice generic way to replace other alias systems.  We have at
-least:
-
-* qdev-monitor.c: qdev_alias_table[] (as mentioned above)
-* chardev/char.c: chardev_alias_table[]
-* target/alpha/cpu.c: alpha_cpu_aliases[]
-* target/ppc/cpu-models.c: ppc_cpu_aliases[]
-* include/hw/boards.h: MachineClass::alias
-
-Probably there are others I couldn't find.
+To: Laurent Vivier <laurent@vivier.eu>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
 
-> So far this is only a 'proof of concept'.
-> To see how the qtests perform, I only modified 3 devices, 2 used by the
-> Xilinx Zynq machines (Cadence), and the e1000 (used by the PXE test).
+> On Jan 4, 2018, at 12:32 PM, Laurent Vivier <laurent@vivier.eu> wrote:
 >=20
-> Regards,
+> Le 04/01/2018 =C3=A0 18:09, Programmingkid a =C3=A9crit :
+>> What operating systems boot with this patch set? Does any version of =
+the Mac OS run in this 68k emulator?=20
+>>=20
 >=20
-> Phil.
+> For the moment you can't boot anything more than the coldfire linux
+> kernel with the semi-hosting patch.
 >=20
-> Philippe Mathieu-Daud=E9 (6):
->   qom: introduce TypeInfo name aliases
->   hw/net/e1000: real device name is 'e1000-82540em', 'e1000' is an alia=
-s
->   hw/char/cadence_uart: add FDT aliases
->   arm/xlnx-zynq: use FDT names for the Cadence UART
->   hw/net/cadence_gem: add FDT names as alias
->   hw/arm/xlnx-zynq: use FDT names for the Cadence GEM
+> The remaining patches I have in my git branch allows to boot a debian
+> etch-m68k with GNOME or a the latest debian unstable (without GNOME)
 >=20
->  include/qom/object.h   |  3 +++
->  hw/arm/xilinx_zynq.c   |  2 ++
->  hw/arm/xlnx-zynqmp.c   |  4 ++--
->  hw/char/cadence_uart.c |  7 +++++++
->  hw/net/cadence_gem.c   |  6 ++++++
->  hw/net/e1000.c         |  5 ++++-
->  qom/object.c           | 18 ++++++++++++++++--
->  7 files changed, 40 insertions(+), 5 deletions(-)
+> git clone -b q800-dev https://github.com/vivier/qemu-m68k.git
 >=20
-> --=20
-> 2.15.1
+> I'm working on booting MacOS...
 >=20
+> I think we should also be able to boot NeXTSTEP , but the work of =
+Bryce
+> Lanham (GSoC 2011) must be rebased on my branch and cleaned up.
 
---=20
-Eduardo
+If you have any pictures of guests running in QEMU I would be interested =
+in posting the pictures on the wiki page here: =
+https://wiki.qemu.org/Documentation/Platforms/68k.=
