@@ -1,29 +1,39 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52262)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52980)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1eX9pk-00011n-8L
-	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 13:01:41 -0500
+	(envelope-from <danielhb@linux.vnet.ibm.com>) id 1eX9qP-0001eg-7p
+	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 13:02:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1eX9pf-0001TU-CI
-	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 13:01:40 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:21955)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1eX9pf-0001Q4-3o
-	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 13:01:35 -0500
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 5BEFF3DE44
-	for <qemu-devel@nongnu.org>; Thu,  4 Jan 2018 18:01:33 +0000 (UTC)
-Date: Thu, 4 Jan 2018 16:01:30 -0200
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20180104180130.GB3407@localhost.localdomain>
-References: <20180104175609.9085-1-pbonzini@redhat.com>
+	(envelope-from <danielhb@linux.vnet.ibm.com>) id 1eX9qL-0002Fu-9r
+	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 13:02:21 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:39982)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <danielhb@linux.vnet.ibm.com>)
+	id 1eX9qK-0002DF-Py
+	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 13:02:17 -0500
+Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	w04Hwmcj126414
+	for <qemu-devel@nongnu.org>; Thu, 4 Jan 2018 13:02:14 -0500
+Received: from e19.ny.us.ibm.com (e19.ny.us.ibm.com [129.33.205.209])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2f9prtxpq7-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Thu, 04 Jan 2018 13:02:13 -0500
+Received: from localhost
+	by e19.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <danielhb@linux.vnet.ibm.com>;
+	Thu, 4 Jan 2018 13:02:12 -0500
+References: <20180104042405.29773-1-david@gibson.dropbear.id.au>
+From: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
+Date: Thu, 4 Jan 2018 16:02:05 -0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180104175609.9085-1-pbonzini@redhat.com>
-Subject: Re: [Qemu-devel] [qemu-web PATCH] add a blog post about "Spectre"
+In-Reply-To: <20180104042405.29773-1-david@gibson.dropbear.id.au>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+Message-Id: <7e394ec8-a0fd-f89b-379f-4a85758627d5@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH] spapr: Correct compatibility
+ mode setting for hotplugged CPUs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,89 +42,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: David Gibson <david@gibson.dropbear.id.au>, groug@kaod.org, mdroth@linux.vnet.ibm.com, surajjs@au1.ibm.com
+Cc: satheera@in.ibm.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 
-On Thu, Jan 04, 2018 at 06:56:09PM +0100, Paolo Bonzini wrote:
+
+
+On 01/04/2018 02:24 AM, David Gibson wrote:
+> Currently the pseries machine sets the compatibility mode for the
+> guest's cpus in two places: 1) at machine reset and 2) after CAS
+> negotiation.
+>
+> This means that if we set or negotiate a compatiblity mode, then
+
+s/compatiblity/compatibility
+
+> hotplug a cpu, the hotplugged cpu doesn't get the right mode set and
+> will incorrectly have the full native features.
+>
+> To correct this, we set the compatibility mode on a cpu when it is
+> brought online with the 'start-cpu' RTAS call.  Given that we no
+> longer need to set the compatibility mode on all CPUs at machine
+> reset, so we change that to only set the mode for the boot cpu.
+>
+> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 > ---
->  _posts/2018-01-04-spectre.md | 60 ++++++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 60 insertions(+)
->  create mode 100644 _posts/2018-01-04-spectre.md
-
-Thanks for writing it up!
-
-Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
-
-> 
-> diff --git a/_posts/2018-01-04-spectre.md b/_posts/2018-01-04-spectre.md
-> new file mode 100644
-> index 0000000..1be86d0
-> --- /dev/null
-> +++ b/_posts/2018-01-04-spectre.md
-> @@ -0,0 +1,60 @@
-> +---
-> +layout: post
-> +title:  "QEMU and the Spectre and Meltdown attacks"
-> +date:   2018-01-04 18:00:00 +0000
-> +author: Paolo Bonzini and Eduardo Habkost
-> +categories: [meltdown, spectre, security, x86]
-> +---
-> +As you probably know by now, three critical architectural flaws in CPUs have
-> +been recently disclosed that allow user processes to read kernel or hypervisor
-> +memory through cache side-channel attacks.  These flaws, collectively
-> +named _Meltdown_ and _Spectre_, affect in one way or another almost
-> +all processors that perform out-of-order execution, including x86 (from
-> +Intel and AMD), POWER, s390 and ARM processors.
+Reviewed-by: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
+>   hw/ppc/spapr.c      | 2 +-
+>   hw/ppc/spapr_rtas.c | 8 ++++++++
+>   2 files changed, 9 insertions(+), 1 deletion(-)
+>
+> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> index e22888ba06..d1acfe8858 100644
+> --- a/hw/ppc/spapr.c
+> +++ b/hw/ppc/spapr.c
+> @@ -1510,7 +1510,7 @@ static void spapr_machine_reset(void)
+>           spapr_ovec_cleanup(spapr->ov5_cas);
+>           spapr->ov5_cas = spapr_ovec_new();
+>
+> -        ppc_set_compat_all(spapr->max_compat_pvr, &error_fatal);
+> +        ppc_set_compat(first_ppc_cpu, spapr->max_compat_pvr, &error_fatal);
+>       }
+>
+>       fdt = spapr_build_fdt(spapr, rtas_addr, spapr->rtas_size);
+> diff --git a/hw/ppc/spapr_rtas.c b/hw/ppc/spapr_rtas.c
+> index 4bb939d3d1..2ed00548c1 100644
+> --- a/hw/ppc/spapr_rtas.c
+> +++ b/hw/ppc/spapr_rtas.c
+> @@ -163,6 +163,7 @@ static void rtas_start_cpu(PowerPCCPU *cpu_, sPAPRMachineState *spapr,
+>           CPUState *cs = CPU(cpu);
+>           CPUPPCState *env = &cpu->env;
+>           PowerPCCPUClass *pcc = POWERPC_CPU_GET_CLASS(cpu);
+> +        Error *local_err = NULL;
+>
+>           if (!cs->halted) {
+>               rtas_st(rets, 0, RTAS_OUT_HW_ERROR);
+> @@ -174,6 +175,13 @@ static void rtas_start_cpu(PowerPCCPU *cpu_, sPAPRMachineState *spapr,
+>            * new cpu enters */
+>           kvm_cpu_synchronize_state(cs);
+>
+> +        /* Set compatibility mode to match existing cpus */
+> +        ppc_set_compat(cpu, POWERPC_CPU(first_cpu)->compat_pvr, &local_err);
+> +        if (local_err) {
+> +            rtas_st(rets, 0, RTAS_OUT_HW_ERROR);
+> +            return;
+> +        }
 > +
-> +No microcode updates are required to block the _Meltdown_ attack; it is
-> +enough to update the guest operating system to a version that separates
-> +the user and kernel address spaces (known as _page table isolation_ for
-> +the Linux kernel).  Therefore, this post will focus on _Spectre_, and
-> +especially on [CVE-2017-5715](https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2017-5715).
-> +
-> +Fixing or mitigating _Spectre_ in general, and CVE-2017-5715 in particular,
-> +requires cooperation between the processor and the operating system kernel or
-> +hypervisor; the processor can be updated through microcode or millicode
-> +patches to provide the required functionality.  CVE-2017-5715 allows guests
-> +to read potentially sensitive data from hypervisor memory; however, __patching
-> +the host kernel is sufficient to block this attack__.
-> +
-> +On the other hand, in order to protect the guest kernel from a malicious
-> +userspace, updates are also needed to the guest kernel and, depending on
-> +the processor architecture, to QEMU.  Just like on bare-metal, the guest
-> +kernel will use the new functionality provided by the microcode or millicode
-> +updates.  When running under a hypervisor, processor emulation is mostly out of
-> +QEMU's scope, so QEMU's role in the fix is small, but nevertheless important.
-> +In the case of KVM:
-> +
-> +* QEMU configures the hypervisor to emulate a specific processor model.
-> +For x86, QEMU has to be aware of new CPUID bits introduced by the microcode
-> +update, and it must provide them to guests depending on how the guest is
-> +configured.
-> +
-> +* upon virtual machine migration, QEMU reads the CPU state on the source
-> +and transmits it to the destination.  For x86, QEMU has to be aware of new
-> +model specific registers (MSRs).
-> +
-> +Right now, there are no public patches to KVM that expose the new CPUID bits
-> +and MSRs to the virtual machines, therefore there is no urgent need to update
-> +QEMU; remember that __updating the host kernel is enough to protect the
-> +host from malicious guests__.  Nevertheless, updates will be posted to the
-> +qemu-devel mailing list in the next few days, and a 2.11.1 patch release
-> +will be released with the fix.
-> +
-> +As of today, the QEMU project is not aware of whether similar changes will
-> +be required for non-x86 processors.  If so, they will also posted to the
-> +mailing list and backported to recent stable releases.
-> +
-> +For more information on the vulnerabilities, please refer to the [Google Security
-> +Blog](https://security.googleblog.com/2018/01/todays-cpu-vulnerability-what-you-need.html)
-> +and [Google Project
-> +Zero](https://googleprojectzero.blogspot.it/2018/01/reading-privileged-memory-with-side.html)
-> +posts on the topic, as well as the [Spectre and Meltdown FAQ](https://meltdownattack.com/#faq).
-> -- 
-> 2.14.3
-> 
-
--- 
-Eduardo
+>           env->msr = (1ULL << MSR_SF) | (1ULL << MSR_ME);
+>
+>           /* Enable Power-saving mode Exit Cause exceptions for the new CPU */
