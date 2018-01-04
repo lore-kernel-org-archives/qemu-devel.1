@@ -1,19 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39472)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40343)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aderumier@oxygem.tv>) id 1eWztK-0000az-3B
-	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 02:24:46 -0500
+	(envelope-from <aderumier@oxygem.tv>) id 1eWzvl-0001a5-JP
+	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 02:27:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aderumier@oxygem.tv>) id 1eWztG-0007ax-1o
-	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 02:24:42 -0500
-Received: from mailpro.odiso.net ([89.248.211.110]:48188)
+	(envelope-from <aderumier@oxygem.tv>) id 1eWzvh-00014Q-H2
+	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 02:27:13 -0500
+Received: from mailpro.odiso.net ([89.248.211.110]:48836)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <aderumier@oxygem.tv>) id 1eWztF-0007ae-R9
-	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 02:24:37 -0500
-Date: Thu, 4 Jan 2018 08:24:34 +0100 (CET)
+	(Exim 4.71) (envelope-from <aderumier@oxygem.tv>) id 1eWzvh-00013X-AF
+	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 02:27:09 -0500
+Date: Thu, 4 Jan 2018 08:27:08 +0100 (CET)
 From: Alexandre DERUMIER <aderumier@odiso.com>
-Message-ID: <446087972.818501.1515050674109.JavaMail.zimbra@oxygem.tv>
-In-Reply-To: <6d95cc4b-155c-44cb-1fc0-18ba848741ac@profihost.ag>
+Message-ID: <1548618960.818551.1515050828217.JavaMail.zimbra@oxygem.tv>
+In-Reply-To: <446087972.818501.1515050674109.JavaMail.zimbra@oxygem.tv>
 References: <6d95cc4b-155c-44cb-1fc0-18ba848741ac@profihost.ag>
+	<446087972.818501.1515050674109.JavaMail.zimbra@oxygem.tv>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
@@ -29,17 +30,30 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: "Stefan Priebe, Profihost AG" <s.priebe@profihost.ag>
 Cc: qemu-devel <qemu-devel@nongnu.org>
 
->>Can anybody point me to the relevant qemu patches?=20
+does somebody have a redhat account to see te content of:=20
 
-I don't have find them yet.
-
-Do you known if a vm using kvm64 cpu model is protected or not ?
+https://access.redhat.com/solutions/3307851
+"Impacts of CVE-2017-5754, CVE-2017-5753, and CVE-2017-5715 to Red Hat Virt=
+ualization products"
 
 ----- Mail original -----
-De: "Stefan Priebe, Profihost AG" <s.priebe@profihost.ag>
-=C3=80: "qemu-devel" <qemu-devel@nongnu.org>
-Envoy=C3=A9: Jeudi 4 Janvier 2018 07:27:01
-Objet: [Qemu-devel] CVE-2017-5715: relevant qemu patches
+De: "aderumier" <aderumier@odiso.com>
+=C3=80: "Stefan Priebe, Profihost AG" <s.priebe@profihost.ag>
+Cc: "qemu-devel" <qemu-devel@nongnu.org>
+Envoy=C3=A9: Jeudi 4 Janvier 2018 08:24:34
+Objet: Re: [Qemu-devel] CVE-2017-5715: relevant qemu patches
+
+>>Can anybody point me to the relevant qemu patches?=20
+
+I don't have find them yet.=20
+
+Do you known if a vm using kvm64 cpu model is protected or not ?=20
+
+----- Mail original -----=20
+De: "Stefan Priebe, Profihost AG" <s.priebe@profihost.ag>=20
+=C3=80: "qemu-devel" <qemu-devel@nongnu.org>=20
+Envoy=C3=A9: Jeudi 4 Janvier 2018 07:27:01=20
+Objet: [Qemu-devel] CVE-2017-5715: relevant qemu patches=20
 
 Hello,=20
 
