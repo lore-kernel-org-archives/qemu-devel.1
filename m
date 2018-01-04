@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57820)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59595)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1eX0ed-0004WC-5I
-	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 03:13:36 -0500
+	(envelope-from <s.priebe@profihost.ag>) id 1eX0ij-0006MG-0I
+	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 03:17:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1eX0eY-0000Hx-IU
-	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 03:13:35 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:48738)
+	(envelope-from <s.priebe@profihost.ag>) id 1eX0if-0002oK-0o
+	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 03:17:48 -0500
+Received: from cloud1-vm154.de-nserver.de ([178.250.10.56]:23848)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1eX0eY-0000GS-8u
-	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 03:13:30 -0500
-References: <cover.1514169758.git.maozy.fnst@cn.fujitsu.com>
-	<16edd8d2-92e5-702c-f698-0b798db16580@cn.fujitsu.com>
-From: Jason Wang <jasowang@redhat.com>
-Message-ID: <a51f896c-8e71-6737-3a5c-19fb6529807d@redhat.com>
-Date: Thu, 4 Jan 2018 16:13:24 +0800
+	(Exim 4.71) (envelope-from <s.priebe@profihost.ag>)
+	id 1eX0ie-0002n4-KL
+	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 03:17:44 -0500
+References: <6d95cc4b-155c-44cb-1fc0-18ba848741ac@profihost.ag>
+	<446087972.818501.1515050674109.JavaMail.zimbra@oxygem.tv>
+	<1548618960.818551.1515050828217.JavaMail.zimbra@oxygem.tv>
+From: Stefan Priebe - Profihost AG <s.priebe@profihost.ag>
+Message-ID: <cb656289-97ee-d45e-cfcc-51e86b9a11ce@profihost.ag>
+Date: Thu, 4 Jan 2018 09:17:41 +0100
 MIME-Version: 1.0
-In-Reply-To: <16edd8d2-92e5-702c-f698-0b798db16580@cn.fujitsu.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v4 0/2] Rewrite TCP packet comparison in
- colo
+In-Reply-To: <1548618960.818551.1515050828217.JavaMail.zimbra@oxygem.tv>
+Content-Type: text/plain; charset=utf-8
+Content-Language: de-DE
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] CVE-2017-5715: relevant qemu patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,77 +30,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>, qemu-devel@nongnu.org
-Cc: =?UTF-8?B?TGksIFpoaWppYW4v5p2OIOaZuuWdmg==?= <lizhijian@cn.fujitsu.com>, Zhang Chen <zhangckid@gmail.com>
+To: Alexandre DERUMIER <aderumier@odiso.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>
 
 
+Am 04.01.2018 um 08:27 schrieb Alexandre DERUMIER:
+> does somebody have a redhat account to see te content of: 
+> 
+> https://access.redhat.com/solutions/3307851
+> "Impacts of CVE-2017-5754, CVE-2017-5753, and CVE-2017-5715 to Red Hat Virtualization products"
 
-On 2018=E5=B9=B401=E6=9C=8804=E6=97=A5 15:42, Mao Zhongyi wrote:
-> Hi, Jason
->
-> Long time no news, Ping...
->
-> Thanks,
-> Mao
->
+i don't have one but the content might be something like this:
+https://www.suse.com/de-de/support/kb/doc/?id=7022512
 
-Sorry for the delay.
+So you need:
+1.) intel / amd cpu microcode update
+2.) qemu update to pass the new MSR and CPU flags from the microcode update
+3.) host kernel update
+4.) guest kernel update
 
-Queued.
+The microcode update and the kernel update is publicly available but i'm
+missing the qemu one.
 
-Thanks
+Greets,
+Stefan
 
-> On 12/25/2017 10:54 AM, Mao Zhongyi wrote:
->> v4:
->> =C2=A0 p2: fix some typo
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 [Zhang Chen]
->> v3:
->> =C2=A0 p1: merged the patch1 and patch2 from v2
->> =C2=A0 p2: -merged the patch3 and patch4 from v2
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 -implement the same process flow for tc=
-p, udp and icmp
->>
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 [Zhang Chen]
->> v2:
->> =C2=A0 p1: a new patch
->> =C2=A0 p2: a new patch
->> =C2=A0 p3: -rename the fill_pkt_seq to fill_pkt_tcp_info
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 -rename pdsize & hdsize to payload_size=
- & header_size
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 -reuse duplicated code
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 -modified colo_packet_compare_common() =
-to suit the tcp packet
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 comparison instead of build a new=
- function service for tcp.
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 -add more comments for the 'max_ack'
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 [Zhang Chen]
->>
->> Cc: Zhang Chen <zhangckid@gmail.com>
->> Cc: Li Zhijian <lizhijian@cn.fujitsu.com>
->> Cc: Jason Wang <jasowang@redhat.com>
->>
->> Mao Zhongyi (2):
->> =C2=A0 colo: modified the payload compare function
->> =C2=A0 colo: compare the packet based on the tcp sequence number
->>
->> =C2=A0net/colo-compare.c | 411=20
->> +++++++++++++++++++++++++++++++++--------------------
->> =C2=A0net/colo.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0=
-=C2=A0 9 ++
->> =C2=A0net/colo.h=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0=
- 15 ++
->> =C2=A0net/trace-events=C2=A0=C2=A0 |=C2=A0=C2=A0 2 +-
->> =C2=A04 files changed, 284 insertions(+), 153 deletions(-)
->>
->
->
->
+> ----- Mail original -----
+> De: "aderumier" <aderumier@odiso.com>
+> À: "Stefan Priebe, Profihost AG" <s.priebe@profihost.ag>
+> Cc: "qemu-devel" <qemu-devel@nongnu.org>
+> Envoyé: Jeudi 4 Janvier 2018 08:24:34
+> Objet: Re: [Qemu-devel] CVE-2017-5715: relevant qemu patches
+> 
+>>> Can anybody point me to the relevant qemu patches? 
+> 
+> I don't have find them yet. 
+> 
+> Do you known if a vm using kvm64 cpu model is protected or not ? 
+> 
+> ----- Mail original ----- 
+> De: "Stefan Priebe, Profihost AG" <s.priebe@profihost.ag> 
+> À: "qemu-devel" <qemu-devel@nongnu.org> 
+> Envoyé: Jeudi 4 Janvier 2018 07:27:01 
+> Objet: [Qemu-devel] CVE-2017-5715: relevant qemu patches 
+> 
+> Hello, 
+> 
+> i've seen some vendors have updated qemu regarding meltdown / spectre. 
+> 
+> f.e.: 
+> 
+> CVE-2017-5715: QEMU was updated to allow passing through new MSR and 
+> CPUID flags from the host VM to the CPU, to allow enabling/disabling 
+> branch prediction features in the Intel CPU. (bsc#1068032) 
+> 
+> Can anybody point me to the relevant qemu patches? 
+> 
+> Thanks! 
+> 
+> Greets, 
+> Stefan 
+> 
