@@ -1,28 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53989)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33362)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1eXAAs-0006gD-4K
-	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 13:23:32 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1eXAdM-0001OF-Br
+	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 13:52:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1eXAAh-0000DP-DP
-	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 13:23:29 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:53962)
+	(envelope-from <dgilbert@redhat.com>) id 1eXAdI-0006fQ-EY
+	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 13:52:56 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:58138)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1eXAAg-0000BQ-Sq
-	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 13:23:19 -0500
-Date: Thu, 4 Jan 2018 20:23:15 +0200
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20180104202250-mutt-send-email-mst@kernel.org>
-References: <cover.1515041373.git.jbaron@akamai.com>
-	<e185a03168d0ab68150d21770bf0d02c5ef537c2.1515041373.git.jbaron@akamai.com>
-	<20180104190309-mutt-send-email-mst@kernel.org>
-	<c5e2f8d5-3961-606a-8c60-168f1465bd6e@akamai.com>
-	<20180104201934-mutt-send-email-mst@kernel.org>
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1eXAdI-0006eh-8O
+	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 13:52:52 -0500
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 803079387B
+	for <qemu-devel@nongnu.org>; Thu,  4 Jan 2018 18:52:50 +0000 (UTC)
+Date: Thu, 4 Jan 2018 18:52:38 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20180104185238.GB2635@work-vm>
+References: <20180103183336.27709-1-dgilbert@redhat.com>
+	<7f455464-a32b-b709-1e0e-70dd16274efe@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20180104201934-mutt-send-email-mst@kernel.org>
-Subject: Re: [Qemu-devel] [PATCH net-next v3 1/3] virtio_net: propagate
- linkspeed/duplex settings from the hypervisor
+In-Reply-To: <7f455464-a32b-b709-1e0e-70dd16274efe@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] cpu_physical_memory_sync_dirty_bitmap:
+ Another alignment fix
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,163 +34,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jason Baron <jbaron@akamai.com>
-Cc: davem@davemloft.net, jasowang@redhat.com, netdev@vger.kernel.org, virtualization@lists.linux-foundation.org, qemu-devel@nongnu.org, virtio-dev@lists.oasis-open.org
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org, wei@redhat.com, quintela@redhat.com, peterx@redhat.com
 
-On Thu, Jan 04, 2018 at 08:22:08PM +0200, Michael S. Tsirkin wrote:
-> On Thu, Jan 04, 2018 at 01:12:30PM -0500, Jason Baron wrote:
-> > 
-> > 
-> > On 01/04/2018 12:05 PM, Michael S. Tsirkin wrote:
-> > > On Thu, Jan 04, 2018 at 12:16:44AM -0500, Jason Baron wrote:
-> > >> The ability to set speed and duplex for virtio_net is useful in various
-> > >> scenarios as described here:
-> > >>
-> > >> 16032be virtio_net: add ethtool support for set and get of settings
-> > >>
-> > >> However, it would be nice to be able to set this from the hypervisor,
-> > >> such that virtio_net doesn't require custom guest ethtool commands.
-> > >>
-> > >> Introduce a new feature flag, VIRTIO_NET_F_SPEED_DUPLEX, which allows
-> > >> the hypervisor to export a linkspeed and duplex setting. The user can
-> > >> subsequently overwrite it later if desired via: 'ethtool -s'.
-> > >>
-> > >> Note that VIRTIO_NET_F_SPEED_DUPLEX is defined as bit 63, the intention
-> > >> is that device feature bits are to grow down from bit 63, since the
-> > >> transports are starting from bit 24 and growing up.
-> > >>
-> > >> Signed-off-by: Jason Baron <jbaron@akamai.com>
-> > >> Cc: "Michael S. Tsirkin" <mst@redhat.com>
-> > >> Cc: Jason Wang <jasowang@redhat.com>
-> > >> Cc: virtio-dev@lists.oasis-open.org
-> > >> ---
-> > >>  drivers/net/virtio_net.c        | 19 ++++++++++++++++++-
-> > >>  include/uapi/linux/virtio_net.h | 13 +++++++++++++
-> > >>  2 files changed, 31 insertions(+), 1 deletion(-)
-> > >>
-> > >> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-> > >> index 6fb7b65..0b2d314 100644
-> > >> --- a/drivers/net/virtio_net.c
-> > >> +++ b/drivers/net/virtio_net.c
-> > >> @@ -2146,6 +2146,22 @@ static void virtnet_config_changed_work(struct work_struct *work)
-> > >>  
-> > >>  	vi->status = v;
-> > >>  
-> > >> +	if (virtio_has_feature(vi->vdev, VIRTIO_NET_F_SPEED_DUPLEX)) {
-> > > 
-> > > BTW we can avoid this read for when link goes down.
-> > > Not a big deal but still.
-> > 
-> > So you are saying that we can just set vi->speed and vi->duplex to
-> > 'unknown' when the link goes down and not check for the presence of
-> > VIRTIO_NET_F_SPEED_DUPLEX?
-> > 
-> > If so, that could over-write what the user may have configured in the
-> > guest via 'ethtool -s' when the link goes down, so that would be a
-> > change in behavior, but perhaps that is ok?
+* Paolo Bonzini (pbonzini@redhat.com) wrote:
+> On 03/01/2018 19:33, Dr. David Alan Gilbert (git) wrote:
+> > The optimised version operates on 'longs' dealing with (typically) 64
+> > pages at a time, replacing the whole long by a 0 and counting the bits.
+> > If the Ramblock is less than 64bits in length that long can contain bits
+> > representing two different RAMBlocks, but the code will update the
+> > bmap belinging to the 1st RAMBlock only while having updated the total
+> > dirty page count for both.
 > 
-> No - what I am saying is that your patch overwrites the values
-> set by user when link goes down.
-> 
-> I suggest limiting this call to when
-> 
-> if (vi->status & VIRTIO_NET_S_LINK_UP)
-> 
-> and then the values are overwritten when link goes up
-> which seems closer to what a user might expect.
-> 
-> > 
-> > I think I would prefer to have the link down event still check for
-> > VIRTIO_NET_F_SPEED_DUPLEX before changing speed/duplex. That way we
-> > still have 2 modes for updating the fields:
-> > 
-> > 1) completely guest controlled. Same as we have now and host does not
-> > change any values and does not set VIRTIO_NET_F_SPEED_DUPLEX flag (hence
-> > don't remove above check).
-> > 
-> > 2) if speed or duplex or speed is set in the qemu command line, then set
-> > the VIRTIO_NET_F_SPEED_DUPLEX and have host control the settings of
-> > speed/duplex (with ability of guest to over-write if it wanted to).
+> The patch is obviously correct, but would it make sense also to align
+> the RAMBlocks' initial ram_addr_t to a multiple of BITS_PER_LONG <<
+> TARGET_PAGE_BITS?
 
+Yes, I can do that as a separate patch.  The alignment starts getting
+a little silly - say 4k target page, 64 bits long so aligning a 4k
+RAMBlock to 256kb boundary - but I think it's OK.
 
-I agree - I don't see a reason to touch the speed/duplex values when
-VIRTIO_NET_F_SPEED_DUPLEX has not been negotiated.
+Dave
+P.S. I'd be careful of saying 'obviously correct' given how many small
+fixes this function has had recently!
 
-> > 
-> > 
-> > > 
-> > >> +		u32 speed;
-> > >> +		u8 duplex;
-> > >> +
-> > >> +		speed = virtio_cread32(vi->vdev,
-> > >> +				       offsetof(struct virtio_net_config,
-> > >> +						speed));
-> > >> +		if (ethtool_validate_speed(speed))
-> > >> +			vi->speed = speed;
-> > >> +		duplex = virtio_cread8(vi->vdev,
-> > >> +				       offsetof(struct virtio_net_config,
-> > >> +						duplex));
-> > >> +		if (ethtool_validate_duplex(duplex))
-> > >> +			vi->duplex = duplex;
-> > >> +	}
-> > >> +
-> > >>  	if (vi->status & VIRTIO_NET_S_LINK_UP) {
-> > >>  		netif_carrier_on(vi->dev);
-> > >>  		netif_tx_wake_all_queues(vi->dev);
-> > > 
-> > > OK so this handles the case when VIRTIO_NET_F_STATUS is set,
-> > > but when it's clear we need to call this from virtnet_probe.
-> > > 
-> > > I propose moving this chunk to a function and calling from two places.
-> > > 
-> > 
-> > good point. will update.
-> > 
-> > Thanks,
-> > 
-> > -Jason
-> > 
-> > > 
-> > >> @@ -2796,7 +2812,8 @@ static struct virtio_device_id id_table[] = {
-> > >>  	VIRTIO_NET_F_CTRL_RX, VIRTIO_NET_F_CTRL_VLAN, \
-> > >>  	VIRTIO_NET_F_GUEST_ANNOUNCE, VIRTIO_NET_F_MQ, \
-> > >>  	VIRTIO_NET_F_CTRL_MAC_ADDR, \
-> > >> -	VIRTIO_NET_F_MTU, VIRTIO_NET_F_CTRL_GUEST_OFFLOADS
-> > >> +	VIRTIO_NET_F_MTU, VIRTIO_NET_F_CTRL_GUEST_OFFLOADS, \
-> > >> +	VIRTIO_NET_F_SPEED_DUPLEX
-> > >>  
-> > >>  static unsigned int features[] = {
-> > >>  	VIRTNET_FEATURES,
-> > >> diff --git a/include/uapi/linux/virtio_net.h b/include/uapi/linux/virtio_net.h
-> > >> index fc353b5..5de6ed3 100644
-> > >> --- a/include/uapi/linux/virtio_net.h
-> > >> +++ b/include/uapi/linux/virtio_net.h
-> > >> @@ -57,6 +57,8 @@
-> > >>  					 * Steering */
-> > >>  #define VIRTIO_NET_F_CTRL_MAC_ADDR 23	/* Set MAC address */
-> > >>  
-> > >> +#define VIRTIO_NET_F_SPEED_DUPLEX 63	/* Device set linkspeed and duplex */
-> > >> +
-> > >>  #ifndef VIRTIO_NET_NO_LEGACY
-> > >>  #define VIRTIO_NET_F_GSO	6	/* Host handles pkts w/ any GSO type */
-> > >>  #endif /* VIRTIO_NET_NO_LEGACY */
-> > >> @@ -76,6 +78,17 @@ struct virtio_net_config {
-> > >>  	__u16 max_virtqueue_pairs;
-> > >>  	/* Default maximum transmit unit advice */
-> > >>  	__u16 mtu;
-> > >> +	/*
-> > >> +	 * speed, in units of 1Mb. All values 0 to INT_MAX are legal.
-> > >> +	 * Any other value stands for unknown.
-> > >> +	 */
-> > >> +	__u32 speed;
-> > >> +	/*
-> > >> +	 * 0x00 - half duplex
-> > >> +	 * 0x01 - full duplex
-> > >> +	 * Any other value stands for unknown.
-> > >> +	 */
-> > >> +	__u8 duplex;
-> > >>  } __attribute__((packed));
-> > >>  
-> > >>  /*
-> > >> -- 
-> > >> 2.6.1
+> Thanks,
+> 
+> Paolo
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
