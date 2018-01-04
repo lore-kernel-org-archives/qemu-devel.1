@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58424)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58461)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1eWuLV-0000te-FX
-	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 20:29:26 -0500
+	(envelope-from <laurent@vivier.eu>) id 1eWuLW-0000vH-TP
+	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 20:29:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1eWuLS-00079n-8r
-	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 20:29:25 -0500
-Received: from mout.kundenserver.de ([217.72.192.74]:64775)
+	(envelope-from <laurent@vivier.eu>) id 1eWuLV-0007EA-Ri
+	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 20:29:26 -0500
+Received: from mout.kundenserver.de ([217.72.192.74]:58657)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1eWuLR-000780-U3
-	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 20:29:22 -0500
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1eWuLV-0007CO-HF
+	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 20:29:25 -0500
 From: Laurent Vivier <laurent@vivier.eu>
-Date: Thu,  4 Jan 2018 02:29:04 +0100
-Message-Id: <20180104012913.30763-9-laurent@vivier.eu>
+Date: Thu,  4 Jan 2018 02:29:10 +0100
+Message-Id: <20180104012913.30763-15-laurent@vivier.eu>
 In-Reply-To: <20180104012913.30763-1-laurent@vivier.eu>
 References: <20180104012913.30763-1-laurent@vivier.eu>
-Subject: [Qemu-devel] [PATCH v7 08/17] target/m68k: add move16
+Subject: [Qemu-devel] [PATCH v7 14/17] target/m68k: add 680x0 "move to SR"
+ instruction
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,143 +27,96 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Richard Henderson <richard.henderson@linaro.org>, Thomas Huth <huth@tuxfamily.org>, Laurent Vivier <laurent@vivier.eu>
 
-move16 moves the source line to the destination line. Lines are aligned
-to 16-byte boundaries and are 16 bytes long.
+Some cleanup, and allows SR to be moved from any addressing mode.
+Previous code was wrong for coldfire: coldfire also allows to
+use addressing mode to set SR/CCR. It only supports Data register
+to get SR/CCR (move from)
 
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 ---
+ target/m68k/translate.c | 38 ++++++++++++++++++++++----------------
+ 1 file changed, 22 insertions(+), 16 deletions(-)
 
-Notes:
-    v6: split move16 in two functions
-
- target/m68k/cpu.c       | 10 ++++++-
- target/m68k/cpu.h       |  1 +
- target/m68k/translate.c | 72 +++++++++++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 82 insertions(+), 1 deletion(-)
-
-diff --git a/target/m68k/cpu.c b/target/m68k/cpu.c
-index 57ffcb2114..1936efd170 100644
---- a/target/m68k/cpu.c
-+++ b/target/m68k/cpu.c
-@@ -137,7 +137,15 @@ static void m68020_cpu_initfn(Object *obj)
-     m68k_set_feature(env, M68K_FEATURE_CHK2);
- }
- #define m68030_cpu_initfn m68020_cpu_initfn
--#define m68040_cpu_initfn m68020_cpu_initfn
-+
-+static void m68040_cpu_initfn(Object *obj)
-+{
-+    M68kCPU *cpu = M68K_CPU(obj);
-+    CPUM68KState *env = &cpu->env;
-+
-+    m68020_cpu_initfn(obj);
-+    m68k_set_feature(env, M68K_FEATURE_M68040);
-+}
- 
- static void m68060_cpu_initfn(Object *obj)
- {
-diff --git a/target/m68k/cpu.h b/target/m68k/cpu.h
-index 68396bdd70..2ac4ab191e 100644
---- a/target/m68k/cpu.h
-+++ b/target/m68k/cpu.h
-@@ -306,6 +306,7 @@ enum m68k_features {
-     M68K_FEATURE_BKPT,
-     M68K_FEATURE_RTD,
-     M68K_FEATURE_CHK2,
-+    M68K_FEATURE_M68040, /* instructions specific to MC68040 */
- };
- 
- static inline int m68k_feature(CPUM68KState *env, int feature)
 diff --git a/target/m68k/translate.c b/target/m68k/translate.c
-index 7f52065375..0ef933a545 100644
+index 1f867a4f7a..8f23cade04 100644
 --- a/target/m68k/translate.c
 +++ b/target/m68k/translate.c
-@@ -4277,6 +4277,76 @@ DISAS_INSN(chk2)
-     tcg_temp_free(reg);
+@@ -2162,27 +2162,34 @@ static void gen_set_sr_im(DisasContext *s, uint16_t val, int ccr_only)
+         tcg_gen_movi_i32(QREG_CC_N, val & CCF_N ? -1 : 0);
+         tcg_gen_movi_i32(QREG_CC_X, val & CCF_X ? 1 : 0);
+     } else {
+-        gen_helper_set_sr(cpu_env, tcg_const_i32(val));
++        TCGv sr = tcg_const_i32(val);
++        gen_helper_set_sr(cpu_env, sr);
++        tcg_temp_free(sr);
+     }
+     set_cc_op(s, CC_OP_FLAGS);
  }
  
-+static void m68k_copy_line(TCGv dst, TCGv src, int index)
-+{
-+    TCGv addr;
-+    TCGv_i64 t0, t1;
-+
-+    addr = tcg_temp_new();
-+
-+    t0 = tcg_temp_new_i64();
-+    t1 = tcg_temp_new_i64();
-+
-+    tcg_gen_andi_i32(addr, src, ~15);
-+    tcg_gen_qemu_ld64(t0, addr, index);
-+    tcg_gen_addi_i32(addr, addr, 8);
-+    tcg_gen_qemu_ld64(t1, addr, index);
-+
-+    tcg_gen_andi_i32(addr, dst, ~15);
-+    tcg_gen_qemu_st64(t0, addr, index);
-+    tcg_gen_addi_i32(addr, addr, 8);
-+    tcg_gen_qemu_st64(t1, addr, index);
-+
-+    tcg_temp_free_i64(t0);
-+    tcg_temp_free_i64(t1);
-+    tcg_temp_free(addr);
-+}
-+
-+DISAS_INSN(move16_reg)
-+{
-+    int index = IS_USER(s);
-+    TCGv tmp;
-+    uint16_t ext;
-+
-+    ext = read_im16(env, s);
-+    if ((ext & (1 << 15)) == 0) {
-+        gen_exception(s, s->insn_pc, EXCP_ILLEGAL);
-+    }
-+
-+    m68k_copy_line(AREG(ext, 12), AREG(insn, 0), index);
-+
-+    /* Ax can be Ay, so save Ay before incrementing Ax */
-+    tmp = tcg_temp_new();
-+    tcg_gen_mov_i32(tmp, AREG(ext, 12));
-+    tcg_gen_addi_i32(AREG(insn, 0), AREG(insn, 0), 16);
-+    tcg_gen_addi_i32(AREG(ext, 12), tmp, 16);
-+    tcg_temp_free(tmp);
-+}
-+
-+DISAS_INSN(move16_mem)
-+{
-+    int index = IS_USER(s);
-+    TCGv reg, addr;
-+
-+    reg = AREG(insn, 0);
-+    addr = tcg_const_i32(read_im32(env, s));
-+
-+    if ((insn >> 3) & 1) {
-+        /* MOVE16 (xxx).L, (Ay) */
-+        m68k_copy_line(reg, addr, index);
-+    } else {
-+        /* MOVE16 (Ay), (xxx).L */
-+        m68k_copy_line(addr, reg, index);
-+    }
-+
-+    tcg_temp_free(addr);
-+
-+    if (((insn >> 3) & 2) == 0) {
-+        /* (Ay)+ */
-+        tcg_gen_addi_i32(reg, reg, 16);
-+    }
-+}
-+
- static TCGv gen_get_sr(DisasContext *s)
+-static void gen_set_sr(CPUM68KState *env, DisasContext *s, uint16_t insn,
+-                       int ccr_only)
++static void gen_set_sr(DisasContext *s, TCGv val, int ccr_only)
  {
-     TCGv ccr;
-@@ -5578,6 +5648,8 @@ void register_m68k_insns (CPUM68KState *env)
-     INSN(fsave,     f300, ffc0, FPU);
-     INSN(intouch,   f340, ffc0, CF_ISA_A);
-     INSN(cpushl,    f428, ff38, CF_ISA_A);
-+    INSN(move16_mem, f600, ffe0, M68040);
-+    INSN(move16_reg, f620, fff8, M68040);
-     INSN(wddata,    fb00, ff00, CF_ISA_A);
-     INSN(wdebug,    fbc0, ffc0, CF_ISA_A);
- #undef INSN
+-    if ((insn & 0x38) == 0) {
+-        if (ccr_only) {
+-            gen_helper_set_ccr(cpu_env, DREG(insn, 0));
+-        } else {
+-            gen_helper_set_sr(cpu_env, DREG(insn, 0));
+-        }
+-        set_cc_op(s, CC_OP_FLAGS);
+-    } else if ((insn & 0x3f) == 0x3c) {
++    if (ccr_only) {
++        gen_helper_set_ccr(cpu_env, val);
++    } else {
++        gen_helper_set_sr(cpu_env, val);
++    }
++    set_cc_op(s, CC_OP_FLAGS);
++}
++
++static void gen_move_to_sr(CPUM68KState *env, DisasContext *s, uint16_t insn,
++                           bool ccr_only)
++{
++    if ((insn & 0x3f) == 0x3c) {
+         uint16_t val;
+         val = read_im16(env, s);
+         gen_set_sr_im(s, val, ccr_only);
+     } else {
+-        disas_undef(env, s, insn);
++        TCGv src;
++        SRC_EA(env, src, OS_WORD, 0, NULL);
++        gen_set_sr(s, src, ccr_only);
+     }
+ }
+ 
+@@ -2557,7 +2564,7 @@ DISAS_INSN(neg)
+ 
+ DISAS_INSN(move_to_ccr)
+ {
+-    gen_set_sr(env, s, insn, 1);
++    gen_move_to_sr(env, s, insn, true);
+ }
+ 
+ DISAS_INSN(not)
+@@ -4409,7 +4416,7 @@ DISAS_INSN(move_to_sr)
+         gen_exception(s, s->insn_pc, EXCP_PRIVILEGE);
+         return;
+     }
+-    gen_set_sr(env, s, insn, 0);
++    gen_move_to_sr(env, s, insn, false);
+     gen_lookup_tb(s);
+ }
+ 
+@@ -5556,9 +5563,8 @@ void register_m68k_insns (CPUM68KState *env)
+     BASE(move_to_ccr, 44c0, ffc0);
+     INSN(not,       4680, fff8, CF_ISA_A);
+     INSN(not,       4600, ff00, M68000);
+-    INSN(undef,     46c0, ffc0, M68000);
+ #if defined(CONFIG_SOFTMMU)
+-    INSN(move_to_sr, 46c0, ffc0, CF_ISA_A);
++    BASE(move_to_sr, 46c0, ffc0);
+ #endif
+     INSN(nbcd,      4800, ffc0, M68000);
+     INSN(linkl,     4808, fff8, M68000);
 -- 
 2.14.3
