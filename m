@@ -1,30 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50530)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35698)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <programmingkidx@gmail.com>) id 1eXELd-0004rD-Va
-	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 17:50:57 -0500
+	(envelope-from <mst@redhat.com>) id 1eXEXQ-0002nL-LC
+	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 18:03:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <programmingkidx@gmail.com>) id 1eXELZ-0007s0-Cb
-	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 17:50:53 -0500
-Received: from mail-io0-x243.google.com ([2607:f8b0:4001:c06::243]:35360)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <programmingkidx@gmail.com>)
-	id 1eXELY-0007qW-LG
-	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 17:50:49 -0500
-Received: by mail-io0-x243.google.com with SMTP id 14so3879577iou.2
-	for <qemu-devel@nongnu.org>; Thu, 04 Jan 2018 14:50:48 -0800 (PST)
-Content-Type: text/plain; charset=utf-8
-Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
-From: Programmingkid <programmingkidx@gmail.com>
-In-Reply-To: <f555034b-6952-0261-04d6-8707f7c11969@vivier.eu>
-Date: Thu, 4 Jan 2018 17:50:45 -0500
+	(envelope-from <mst@redhat.com>) id 1eXEXN-0003z9-M7
+	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 18:03:04 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:22086)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1eXEXN-0003yK-9K
+	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 18:03:01 -0500
+Date: Fri, 5 Jan 2018 01:02:58 +0200
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20180105010246-mutt-send-email-mst@kernel.org>
+References: <1515030814-4621-1-git-send-email-changpeng.liu@intel.com>
+	<CAJ+F1CLgVdZ62TwuTame-=oASSUR0fhgssLPuC5yZhtD9UiNiQ@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <CAJ+F1CLgVdZ62TwuTame-=oASSUR0fhgssLPuC5yZhtD9UiNiQ@mail.gmail.com>
 Content-Transfer-Encoding: quoted-printable
-Message-Id: <31ABCA2A-0DF0-4744-BA75-AA56FEBB753F@gmail.com>
-References: <mailman.16196.1515084191.27993.qemu-devel@nongnu.org>
-	<AE31CFE4-27FD-40F8-81E3-0D7A8A9DE36E@gmail.com>
-	<bee022ee-30de-586a-d892-68291159de77@vivier.eu>
-	<6975EB15-A268-4332-AA38-B31BFA22F4E8@gmail.com>
-	<f555034b-6952-0261-04d6-8707f7c11969@vivier.eu>
-Subject: Re: [Qemu-devel] [PULL 00/17] M68k for 2.12 patches
+Subject: Re: [Qemu-devel] [PATCH v10 0/4] Introduce a new vhost-user-blk
+ host device to QEMU
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,47 +29,109 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Vivier <laurent@vivier.eu>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@gmail.com>
+Cc: Changpeng Liu <changpeng.liu@intel.com>, QEMU <qemu-devel@nongnu.org>, james.r.harris@intel.com, Stefan Hajnoczi <stefanha@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Felipe Franciosi <felipe@nutanix.com>
 
+On Thu, Jan 04, 2018 at 12:07:39PM +0100, Marc-Andr=E9 Lureau wrote:
+> Hi
+>=20
+> On Thu, Jan 4, 2018 at 2:53 AM, Changpeng Liu <changpeng.liu@intel.com>=
+ wrote:
+> > Although virtio scsi specification was designed as a replacement for =
+virtio_blk,
+> > there are still many users using virtio_blk. QEMU 2.9 introduced a ne=
+w device
+> > vhost user scsi which can process I/O in user space for virtio_scsi, =
+this commit
+> > introduces a new vhost user block host device, which can support virt=
+io_blk in
+> > Guest OS, and I/O processing in another I/O target.
+> >
+> > Due to the limitation for virtio_blk specification, virtio_blk device=
+ cannot get
+> > block information such as capacity, block size etc via the specificat=
+ion, several
+> > new vhost user messages were added to deliver virtio config space
+> > information between Qemu and I/O target, VHOST_USER_GET_CONFIG/VHOST_=
+USER_SET_CONFIG
+> > messages used for get/set config space from/to I/O target, VHOST_USER=
+_SLAVE_CONFIG_CHANGE_MSG
+> > slave message was added for the event notifier in case the change of =
+virtio config space. Also,
+> > those messages can be used for vhost device live migration as well.
+> >
+> > CHANGES:
+> > v10: fix the code style error.
+> > v8-v9: Several small optimization and code cleanup according to the c=
+omments.
+> > v7-v8: Instead using an event file descriptor for event notifier in c=
+ase of virtio
+> > configuration space changed, while here used a new vhost-user slave m=
+essage to deliver
+> > such event. Several small optimizations to address the comments from =
+v7.
+> > v6-v7: change the parameter of set configuration function let it only=
+ contain valid data buffer.
+> > v5-v6: add header flags for vhost-user master so that the slave can k=
+now the purpose for
+> > set config, also vhost-user get/set messages' payload doesn't contain=
+ invalid data buffers.
+> > v4-v5: add header offset and size for virtio config space.
+> > v3-v4: refactoring the vhost user block example patch based on new li=
+bvhost-user library.
+> > v2-v3: add new vhost user message to get/set virtio config space.
+> >
+> > Changpeng Liu (4):
+> >   vhost-user: add new vhost user messages to support virtio config sp=
+ace
+> >   vhost-user-blk: introduce a new vhost-user-blk host device
+> >   contrib/libvhost-user: enable virtio config space messages
+> >   contrib/vhost-user-blk: introduce a vhost-user-blk sample applicati=
+on
+>=20
+> Series:
+> Reviewed-by: Marc-Andr=E9 Lureau <marcandre.lureau@redhat.com>
+>=20
+> Michael, do you take it?
+> thanks
 
-> On Jan 4, 2018, at 2:52 PM, Laurent Vivier <laurent@vivier.eu> wrote:
->=20
-> Le 04/01/2018 =C3=A0 20:26, Programmingkid a =C3=A9crit :
->>=20
->>> On Jan 4, 2018, at 12:32 PM, Laurent Vivier <laurent@vivier.eu> =
-wrote:
->>>=20
->>> Le 04/01/2018 =C3=A0 18:09, Programmingkid a =C3=A9crit :
->>>> What operating systems boot with this patch set? Does any version =
-of the Mac OS run in this 68k emulator?=20
->>>>=20
->>>=20
->>> For the moment you can't boot anything more than the coldfire linux
->>> kernel with the semi-hosting patch.
->>>=20
->>> The remaining patches I have in my git branch allows to boot a =
-debian
->>> etch-m68k with GNOME or a the latest debian unstable (without GNOME)
->>>=20
->>> git clone -b q800-dev https://github.com/vivier/qemu-m68k.git
->>>=20
->>> I'm working on booting MacOS...
->>>=20
->>> I think we should also be able to boot NeXTSTEP , but the work of =
-Bryce
->>> Lanham (GSoC 2011) must be rebased on my branch and cleaned up.
->>=20
->> If you have any pictures of guests running in QEMU I would be =
-interested in posting the pictures on the wiki page here: =
-https://wiki.qemu.org/Documentation/Platforms/68k.
->>=20
->=20
-> Can you add a video instead?
->=20
-> https://www.youtube.com/watch?v=3DwKpzBwsLmhw
->=20
-> Laurent
+Plan to.
+Thanks,
 
-Ok, it is done. Is there anything else you would like me to change on =
-the 68k wiki page?=
+MST
+
+> >
+> >  .gitignore                              |   1 +
+> >  Makefile                                |   3 +
+> >  Makefile.objs                           |   1 +
+> >  contrib/libvhost-user/libvhost-user.c   |  42 +++
+> >  contrib/libvhost-user/libvhost-user.h   |  33 ++
+> >  contrib/vhost-user-blk/Makefile.objs    |   1 +
+> >  contrib/vhost-user-blk/vhost-user-blk.c | 545 ++++++++++++++++++++++=
+++++++++++
+> >  default-configs/pci.mak                 |   1 +
+> >  docs/interop/vhost-user.txt             |  55 ++++
+> >  hw/block/Makefile.objs                  |   3 +
+> >  hw/block/vhost-user-blk.c               | 359 +++++++++++++++++++++
+> >  hw/virtio/vhost-user.c                  | 118 +++++++
+> >  hw/virtio/vhost.c                       |  32 ++
+> >  hw/virtio/virtio-pci.c                  |  55 ++++
+> >  hw/virtio/virtio-pci.h                  |  18 ++
+> >  include/hw/virtio/vhost-backend.h       |  12 +
+> >  include/hw/virtio/vhost-user-blk.h      |  41 +++
+> >  include/hw/virtio/vhost.h               |  15 +
+> >  18 files changed, 1335 insertions(+)
+> >  create mode 100644 contrib/vhost-user-blk/Makefile.objs
+> >  create mode 100644 contrib/vhost-user-blk/vhost-user-blk.c
+> >  create mode 100644 hw/block/vhost-user-blk.c
+> >  create mode 100644 include/hw/virtio/vhost-user-blk.h
+> >
+> > --
+> > 1.9.3
+> >
+> >
+>=20
+>=20
+>=20
+> --=20
+> Marc-Andr=E9 Lureau
