@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50730)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55321)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jbaron@akamai.com>) id 1eWxuB-00083t-SJ
-	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 00:17:29 -0500
+	(envelope-from <jianjay.zhou@huawei.com>) id 1eWy7j-0004mc-PS
+	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 00:31:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jbaron@akamai.com>) id 1eWxuA-0000C0-Om
-	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 00:17:27 -0500
-Received: from mx0a-00190b01.pphosted.com ([2620:100:9001:583::1]:50340)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jbaron@akamai.com>) id 1eWxuA-0000AX-Ej
-	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 00:17:26 -0500
-From: Jason Baron <jbaron@akamai.com>
-Date: Thu,  4 Jan 2018 00:16:45 -0500
-Message-Id: <045deae35c270264b14550fd41bd14f5b75e76e9.1515042044.git.jbaron@akamai.com>
-In-Reply-To: <cover.1515041373.git.jbaron@akamai.com>
-References: <cover.1515041373.git.jbaron@akamai.com>
-References: <cover.1515041373.git.jbaron@akamai.com>
-Subject: [Qemu-devel] [PATCH v3 3/3] qemu: add linkspeed and duplex settings
- to virtio-net
+	(envelope-from <jianjay.zhou@huawei.com>) id 1eWy7f-0001Wk-0i
+	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 00:31:27 -0500
+Received: from [45.249.212.35] (port=40458 helo=huawei.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jianjay.zhou@huawei.com>)
+	id 1eWy7e-0001RN-Ah
+	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 00:31:22 -0500
+From: Jay Zhou <jianjay.zhou@huawei.com>
+Date: Thu, 4 Jan 2018 13:29:48 +0800
+Message-ID: <1515043788-38300-1-git-send-email-jianjay.zhou@huawei.com>
+MIME-Version: 1.0
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH] memory: update comments and fix some typos
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,147 +24,138 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: mst@redhat.com, davem@davemloft.net
-Cc: jasowang@redhat.com, netdev@vger.kernel.org, virtualization@lists.linux-foundation.org, qemu-devel@nongnu.org, virtio-dev@lists.oasis-open.org
+To: qemu-devel@nongnu.org
+Cc: pbonzini@redhat.com, weidong.huang@huawei.com, wangxinxin.wang@huawei.com, jianjay.zhou@huawei.com
 
-Although linkspeed and duplex can be set in a linux guest via 'ethtool -s',
-this requires custom ethtool commands for virtio-net by default.
-
-Introduce a new feature flag, VIRTIO_NET_F_SPEED_DUPLEX, which allows
-the hypervisor to export a linkspeed and duplex setting. The user can
-subsequently overwrite it later if desired via: 'ethtool -s'.
-
-Linkspeed and duplex settings can be set as:
-'-device virtio-net,speed=10000,duplex=full'
-
-where speed is [-1...INT_MAX], and duplex is ["half"|"full"].
-
-Signed-off-by: Jason Baron <jbaron@akamai.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Jason Wang <jasowang@redhat.com>
-Cc: virtio-dev@lists.oasis-open.org
+Signed-off-by: Jay Zhou <jianjay.zhou@huawei.com>
 ---
- hw/net/virtio-net.c                         | 35 +++++++++++++++++++++++++++++
- include/hw/virtio/virtio-net.h              |  3 +++
- include/standard-headers/linux/virtio_net.h | 13 +++++++++++
- 3 files changed, 51 insertions(+)
+ include/exec/memory.h | 27 +++++++++++++++------------
+ 1 file changed, 15 insertions(+), 12 deletions(-)
 
-diff --git a/hw/net/virtio-net.c b/hw/net/virtio-net.c
-index adc20df..eec8422 100644
---- a/hw/net/virtio-net.c
-+++ b/hw/net/virtio-net.c
-@@ -40,6 +40,12 @@
- #define VIRTIO_NET_RX_QUEUE_MIN_SIZE VIRTIO_NET_RX_QUEUE_DEFAULT_SIZE
- #define VIRTIO_NET_TX_QUEUE_MIN_SIZE VIRTIO_NET_TX_QUEUE_DEFAULT_SIZE
+diff --git a/include/exec/memory.h b/include/exec/memory.h
+index a4cabdf..6e5684d 100644
+--- a/include/exec/memory.h
++++ b/include/exec/memory.h
+@@ -324,7 +324,7 @@ FlatView *address_space_to_flatview(AddressSpace *as);
+  * MemoryRegionSection: describes a fragment of a #MemoryRegion
+  *
+  * @mr: the region, or %NULL if empty
+- * @address_space: the address space the region is mapped in
++ * @fv: the flat view of the address space the region is mapped in
+  * @offset_within_region: the beginning of the section, relative to @mr's start
+  * @size: the size of the section; will not exceed @mr's boundaries
+  * @offset_within_address_space: the address of the first byte of the section
+@@ -607,6 +607,7 @@ void memory_region_init_rom_nomigrate(MemoryRegion *mr,
+  * @mr: the #MemoryRegion to be initialized.
+  * @owner: the object that tracks the region's reference count
+  * @ops: callbacks for write access handling (must not be NULL).
++ * @opaque: passed to the read and write callbacks of the @ops structure.
+  * @name: Region name, becomes part of RAMBlock name used in migration stream
+  *        must be unique within any device
+  * @size: size of the region.
+@@ -650,11 +651,10 @@ static inline void memory_region_init_reservation(MemoryRegion *mr,
+  * An IOMMU region translates addresses and forwards accesses to a target
+  * memory region.
+  *
+- * @typename: QOM class name
+  * @_iommu_mr: the #IOMMUMemoryRegion to be initialized
+  * @instance_size: the IOMMUMemoryRegion subclass instance size
++ * @mrtypename: the type name of the #IOMMUMemoryRegion
+  * @owner: the object that tracks the region's reference count
+- * @ops: a function that translates addresses into the @target region
+  * @name: used for debugging; not visible to the user or ABI
+  * @size: size of the region.
+  */
+@@ -824,8 +824,8 @@ static inline IOMMUMemoryRegion *memory_region_get_iommu(MemoryRegion *mr)
+  * memory_region_get_iommu_class_nocheck: returns iommu memory region class
+  *   if an iommu or NULL if not
+  *
+- * Returns pointer to IOMMUMemoryRegioniClass if a memory region is an iommu,
+- * otherwise NULL. This is fast path avoinding QOM checking, use with caution.
++ * Returns pointer to IOMMUMemoryRegionClass if a memory region is an iommu,
++ * otherwise NULL. This is fast path avoiding QOM checking, use with caution.
+  *
+  * @mr: the memory region being queried
+  */
+@@ -990,7 +990,8 @@ int memory_region_get_fd(MemoryRegion *mr);
+  * protecting the pointer, such as a reference to the region that includes
+  * the incoming ram_addr_t.
+  *
+- * @mr: the memory region being queried.
++ * @ptr: the host pointer to be converted
++ * @offset: the offset within memory region
+  */
+ MemoryRegion *memory_region_from_host(void *ptr, ram_addr_t *offset);
  
-+/* duplex and speed */
-+#define DUPLEX_UNKNOWN          0xff
-+#define DUPLEX_HALF             0x00
-+#define DUPLEX_FULL             0x01
-+#define SPEED_UNKNOWN           -1
-+
- /*
-  * Calculate the number of bytes up to and including the given 'field' of
-  * 'container'.
-@@ -61,6 +67,8 @@ static VirtIOFeature feature_sizes[] = {
-      .end = endof(struct virtio_net_config, max_virtqueue_pairs)},
-     {.flags = 1ULL << VIRTIO_NET_F_MTU,
-      .end = endof(struct virtio_net_config, mtu)},
-+    {.flags = 1ULL << VIRTIO_NET_F_SPEED_DUPLEX,
-+     .end = endof(struct virtio_net_config, duplex)},
-     {}
- };
- 
-@@ -89,6 +97,14 @@ static void virtio_net_get_config(VirtIODevice *vdev, uint8_t *config)
-     virtio_stw_p(vdev, &netcfg.max_virtqueue_pairs, n->max_queues);
-     virtio_stw_p(vdev, &netcfg.mtu, n->net_conf.mtu);
-     memcpy(netcfg.mac, n->mac, ETH_ALEN);
-+    if (n->status & VIRTIO_NET_S_LINK_UP) {
-+        virtio_stl_p(vdev, &netcfg.speed, n->net_conf.speed);
-+        netcfg.duplex = n->net_conf.duplex;
-+    } else {
-+        virtio_stl_p(vdev, &netcfg.speed, SPEED_UNKNOWN);
-+        netcfg.duplex = DUPLEX_UNKNOWN;
-+    }
-+
-     memcpy(config, &netcfg, n->config_size);
- }
- 
-@@ -1941,6 +1957,23 @@ static void virtio_net_device_realize(DeviceState *dev, Error **errp)
-         n->host_features |= (1ULL << VIRTIO_NET_F_MTU);
-     }
- 
-+    n->host_features |= (1ULL << VIRTIO_NET_F_SPEED_DUPLEX);
-+    if (n->net_conf.duplex_str) {
-+        if (strncmp(n->net_conf.duplex_str, "half", 5) == 0) {
-+            n->net_conf.duplex = DUPLEX_HALF;
-+        } else if (strncmp(n->net_conf.duplex_str, "full", 5) == 0) {
-+            n->net_conf.duplex = DUPLEX_FULL;
-+        } else {
-+            error_setg(errp, "'duplex' must be 'half' or 'full'");
-+        }
-+    } else {
-+        n->net_conf.duplex = DUPLEX_UNKNOWN;
-+    }
-+    if (n->net_conf.speed < SPEED_UNKNOWN) {
-+            error_setg(errp, "'speed' must be between -1 (SPEED_UNKOWN) and "
-+                       "INT_MAX");
-+    }
-+
-     virtio_net_set_config_size(n, n->host_features);
-     virtio_init(vdev, "virtio-net", VIRTIO_ID_NET, n->config_size);
- 
-@@ -2160,6 +2193,8 @@ static Property virtio_net_properties[] = {
-     DEFINE_PROP_UINT16("host_mtu", VirtIONet, net_conf.mtu, 0),
-     DEFINE_PROP_BOOL("x-mtu-bypass-backend", VirtIONet, mtu_bypass_backend,
-                      true),
-+    DEFINE_PROP_INT32("speed", VirtIONet, net_conf.speed, SPEED_UNKNOWN),
-+    DEFINE_PROP_STRING("duplex", VirtIONet, net_conf.duplex_str),
-     DEFINE_PROP_END_OF_LIST(),
- };
- 
-diff --git a/include/hw/virtio/virtio-net.h b/include/hw/virtio/virtio-net.h
-index e7634c9..02484dc 100644
---- a/include/hw/virtio/virtio-net.h
-+++ b/include/hw/virtio/virtio-net.h
-@@ -38,6 +38,9 @@ typedef struct virtio_net_conf
-     uint16_t rx_queue_size;
-     uint16_t tx_queue_size;
-     uint16_t mtu;
-+    int32_t speed;
-+    char *duplex_str;
-+    uint8_t duplex;
- } virtio_net_conf;
- 
- /* Maximum packet size we can receive from tap device: header + 64k */
-diff --git a/include/standard-headers/linux/virtio_net.h b/include/standard-headers/linux/virtio_net.h
-index 30ff249..17c8531 100644
---- a/include/standard-headers/linux/virtio_net.h
-+++ b/include/standard-headers/linux/virtio_net.h
-@@ -57,6 +57,8 @@
- 					 * Steering */
- #define VIRTIO_NET_F_CTRL_MAC_ADDR 23	/* Set MAC address */
- 
-+#define VIRTIO_NET_F_SPEED_DUPLEX 63   /* Device set linkspeed and duplex */
-+
- #ifndef VIRTIO_NET_NO_LEGACY
- #define VIRTIO_NET_F_GSO	6	/* Host handles pkts w/ any GSO type */
- #endif /* VIRTIO_NET_NO_LEGACY */
-@@ -76,6 +78,17 @@ struct virtio_net_config {
- 	uint16_t max_virtqueue_pairs;
- 	/* Default maximum transmit unit advice */
- 	uint16_t mtu;
-+	/*
-+	 * speed, in units of 1Mb. All values 0 to INT_MAX are legal.
-+	 * Any other value stands for unknown.
-+	 */
-+	uint32_t speed;
-+	/*
-+	 * 0x00 - half duplex
-+	 * 0x01 - full duplex
-+	 * Any other value stands for unknown.
-+	 */
-+	uint8_t duplex;
- } QEMU_PACKED;
- 
- /*
+@@ -1267,7 +1268,7 @@ void memory_region_clear_global_locking(MemoryRegion *mr);
+  * @size: the size of the access to trigger the eventfd
+  * @match_data: whether to match against @data, instead of just @addr
+  * @data: the data to match against the guest write
+- * @fd: the eventfd to be triggered when @addr, @size, and @data all match.
++ * @e: event notifier to be triggered when @addr, @size, and @data all match.
+  **/
+ void memory_region_add_eventfd(MemoryRegion *mr,
+                                hwaddr addr,
+@@ -1287,7 +1288,7 @@ void memory_region_add_eventfd(MemoryRegion *mr,
+  * @size: the size of the access to trigger the eventfd
+  * @match_data: whether to match against @data, instead of just @addr
+  * @data: the data to match against the guest write
+- * @fd: the eventfd to be triggered when @addr, @size, and @data all match.
++ * @e: event notifier to be triggered when @addr, @size, and @data all match.
+  */
+ void memory_region_del_eventfd(MemoryRegion *mr,
+                                hwaddr addr,
+@@ -1523,7 +1524,7 @@ bool memory_region_request_mmio_ptr(MemoryRegion *mr, hwaddr addr);
+  * will need to request the pointer again.
+  *
+  * @mr: #MemoryRegion associated to the pointer.
+- * @addr: address within that region
++ * @offset: offset within the memory region
+  * @size: size of that area.
+  */
+ void memory_region_invalidate_mmio_ptr(MemoryRegion *mr, hwaddr offset,
+@@ -1592,6 +1593,7 @@ void address_space_destroy(AddressSpace *as);
+  * @addr: address within that address space
+  * @attrs: memory transaction attributes
+  * @buf: buffer with the data transferred
++ * @len: the number of bytes to read or write
+  * @is_write: indicates the transfer direction
+  */
+ MemTxResult address_space_rw(AddressSpace *as, hwaddr addr,
+@@ -1609,6 +1611,7 @@ MemTxResult address_space_rw(AddressSpace *as, hwaddr addr,
+  * @addr: address within that address space
+  * @attrs: memory transaction attributes
+  * @buf: buffer with the data transferred
++ * @len: the number of bytes to write
+  */
+ MemTxResult address_space_write(AddressSpace *as, hwaddr addr,
+                                 MemTxAttrs attrs,
+@@ -1807,7 +1810,7 @@ IOMMUTLBEntry address_space_get_iotlb_entry(AddressSpace *as, hwaddr addr,
+  * called from an RCU critical section, to avoid that the last reference
+  * to the returned region disappears after address_space_translate returns.
+  *
+- * @as: #AddressSpace to be accessed
++ * @fv: #FlatView to be accessed
+  * @addr: address within that address space
+  * @xlat: pointer to address within the returned memory region section's
+  * #MemoryRegion.
+@@ -1865,7 +1868,7 @@ void *address_space_map(AddressSpace *as, hwaddr addr,
+  * the amount of memory that was actually read or written by the caller.
+  *
+  * @as: #AddressSpace used
+- * @addr: address within that address space
++ * @buffer: host pointer as returned by address_space_map()
+  * @len: buffer length as returned by address_space_map()
+  * @access_len: amount of data actually transferred
+  * @is_write: indicates the transfer direction
+@@ -1902,7 +1905,7 @@ static inline bool memory_access_is_direct(MemoryRegion *mr, bool is_write)
+  * or failed (eg unassigned memory, device rejected the transaction,
+  * IOMMU fault).
+  *
+- * @as: #AddressSpace to be accessed
++ * @fv: #FlatView to be accessed
+  * @addr: address within that address space
+  * @attrs: memory transaction attributes
+  * @buf: buffer with the data transferred
+-- 
+1.8.3.1
