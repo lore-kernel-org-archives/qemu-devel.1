@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55306)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55323)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1eX8bb-0007YZ-42
-	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 11:43:00 -0500
+	(envelope-from <laurent@vivier.eu>) id 1eX8bb-0007Yu-H1
+	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 11:43:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1eX8bX-0003Vi-UA
+	(envelope-from <laurent@vivier.eu>) id 1eX8bY-0003Wb-D0
 	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 11:42:59 -0500
-Received: from mout.kundenserver.de ([212.227.126.134]:56586)
+Received: from mout.kundenserver.de ([212.227.126.134]:50937)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1eX8bX-0003Th-I7
-	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 11:42:55 -0500
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1eX8bX-0003UX-Tz
+	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 11:42:56 -0500
 From: Laurent Vivier <laurent@vivier.eu>
-Date: Thu,  4 Jan 2018 17:42:36 +0100
-Message-Id: <20180104164251.26494-3-laurent@vivier.eu>
+Date: Thu,  4 Jan 2018 17:42:38 +0100
+Message-Id: <20180104164251.26494-5-laurent@vivier.eu>
 In-Reply-To: <20180104164251.26494-1-laurent@vivier.eu>
 References: <20180104164251.26494-1-laurent@vivier.eu>
-Subject: [Qemu-devel] [PULL 02/17] target/m68k: fix gen_get_ccr()
+Subject: [Qemu-devel] [PULL 04/17] target/m68k: use insn_pc to generate
+ instruction fault address
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,30 +27,181 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Laurent Vivier <laurent@vivier.eu>
 
-As gen_helper_get_ccr() is able to compute CCR from cc_op and
-flags, we don't need to flush flags before to call it.
-flush_flags() and get_ccr() use COMPUTE_CCR() to compute
-flags. get_ccr() computes CCR value,
-whereas flush_flags update live cc_op and flags.
-
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Message-Id: <20180104012913.30763-3-laurent@vivier.eu>
+Message-Id: <20180104012913.30763-5-laurent@vivier.eu>
 ---
- target/m68k/translate.c | 1 -
- 1 file changed, 1 deletion(-)
+ target/m68k/translate.c | 40 ++++++++++++++++++++--------------------
+ 1 file changed, 20 insertions(+), 20 deletions(-)
 
 diff --git a/target/m68k/translate.c b/target/m68k/translate.c
-index 0e9d651a2a..1e9fb01252 100644
+index 1e9fb01252..a1e424e3db 100644
 --- a/target/m68k/translate.c
 +++ b/target/m68k/translate.c
-@@ -2478,7 +2478,6 @@ static TCGv gen_get_ccr(DisasContext *s)
- {
-     TCGv dest;
+@@ -1509,12 +1509,12 @@ DISAS_INSN(dbcc)
  
--    gen_flush_flags(s);
-     update_cc_op(s);
-     dest = tcg_temp_new();
-     gen_helper_get_ccr(dest, cpu_env);
+ DISAS_INSN(undef_mac)
+ {
+-    gen_exception(s, s->pc - 2, EXCP_LINEA);
++    gen_exception(s, s->insn_pc, EXCP_LINEA);
+ }
+ 
+ DISAS_INSN(undef_fpu)
+ {
+-    gen_exception(s, s->pc - 2, EXCP_LINEF);
++    gen_exception(s, s->insn_pc, EXCP_LINEF);
+ }
+ 
+ DISAS_INSN(undef)
+@@ -1523,8 +1523,8 @@ DISAS_INSN(undef)
+        for the 680x0 series, as well as those that are implemented
+        but actually illegal for CPU32 or pre-68020.  */
+     qemu_log_mask(LOG_UNIMP, "Illegal instruction: %04x @ %08x",
+-                  insn, s->pc - 2);
+-    gen_exception(s, s->pc - 2, EXCP_UNSUPPORTED);
++                  insn, s->insn_pc);
++    gen_exception(s, s->insn_pc, EXCP_UNSUPPORTED);
+ }
+ 
+ DISAS_INSN(mulw)
+@@ -2583,7 +2583,7 @@ DISAS_INSN(swap)
+ 
+ DISAS_INSN(bkpt)
+ {
+-    gen_exception(s, s->pc - 2, EXCP_DEBUG);
++    gen_exception(s, s->insn_pc, EXCP_DEBUG);
+ }
+ 
+ DISAS_INSN(pea)
+@@ -2636,7 +2636,7 @@ DISAS_INSN(pulse)
+ 
+ DISAS_INSN(illegal)
+ {
+-    gen_exception(s, s->pc - 2, EXCP_ILLEGAL);
++    gen_exception(s, s->insn_pc, EXCP_ILLEGAL);
+ }
+ 
+ /* ??? This should be atomic.  */
+@@ -2666,7 +2666,7 @@ DISAS_INSN(mull)
+ 
+     if (ext & 0x400) {
+         if (!m68k_feature(s->env, M68K_FEATURE_QUAD_MULDIV)) {
+-            gen_exception(s, s->pc - 4, EXCP_UNSUPPORTED);
++            gen_exception(s, s->insn_pc, EXCP_UNSUPPORTED);
+             return;
+         }
+ 
+@@ -4240,7 +4240,7 @@ DISAS_INSN(move_from_sr)
+     TCGv sr;
+ 
+     if (IS_USER(s) && !m68k_feature(env, M68K_FEATURE_M68000)) {
+-        gen_exception(s, s->pc - 2, EXCP_PRIVILEGE);
++        gen_exception(s, s->insn_pc, EXCP_PRIVILEGE);
+         return;
+     }
+     sr = gen_get_sr(s);
+@@ -4250,7 +4250,7 @@ DISAS_INSN(move_from_sr)
+ DISAS_INSN(move_to_sr)
+ {
+     if (IS_USER(s)) {
+-        gen_exception(s, s->pc - 2, EXCP_PRIVILEGE);
++        gen_exception(s, s->insn_pc, EXCP_PRIVILEGE);
+         return;
+     }
+     gen_set_sr(env, s, insn, 0);
+@@ -4260,7 +4260,7 @@ DISAS_INSN(move_to_sr)
+ DISAS_INSN(move_from_usp)
+ {
+     if (IS_USER(s)) {
+-        gen_exception(s, s->pc - 2, EXCP_PRIVILEGE);
++        gen_exception(s, s->insn_pc, EXCP_PRIVILEGE);
+         return;
+     }
+     tcg_gen_ld_i32(AREG(insn, 0), cpu_env,
+@@ -4270,7 +4270,7 @@ DISAS_INSN(move_from_usp)
+ DISAS_INSN(move_to_usp)
+ {
+     if (IS_USER(s)) {
+-        gen_exception(s, s->pc - 2, EXCP_PRIVILEGE);
++        gen_exception(s, s->insn_pc, EXCP_PRIVILEGE);
+         return;
+     }
+     tcg_gen_st_i32(AREG(insn, 0), cpu_env,
+@@ -4287,7 +4287,7 @@ DISAS_INSN(stop)
+     uint16_t ext;
+ 
+     if (IS_USER(s)) {
+-        gen_exception(s, s->pc - 2, EXCP_PRIVILEGE);
++        gen_exception(s, s->insn_pc, EXCP_PRIVILEGE);
+         return;
+     }
+ 
+@@ -4301,10 +4301,10 @@ DISAS_INSN(stop)
+ DISAS_INSN(rte)
+ {
+     if (IS_USER(s)) {
+-        gen_exception(s, s->pc - 2, EXCP_PRIVILEGE);
++        gen_exception(s, s->insn_pc, EXCP_PRIVILEGE);
+         return;
+     }
+-    gen_exception(s, s->pc - 2, EXCP_RTE);
++    gen_exception(s, s->insn_pc, EXCP_RTE);
+ }
+ 
+ DISAS_INSN(movec)
+@@ -4313,7 +4313,7 @@ DISAS_INSN(movec)
+     TCGv reg;
+ 
+     if (IS_USER(s)) {
+-        gen_exception(s, s->pc - 2, EXCP_PRIVILEGE);
++        gen_exception(s, s->insn_pc, EXCP_PRIVILEGE);
+         return;
+     }
+ 
+@@ -4331,7 +4331,7 @@ DISAS_INSN(movec)
+ DISAS_INSN(intouch)
+ {
+     if (IS_USER(s)) {
+-        gen_exception(s, s->pc - 2, EXCP_PRIVILEGE);
++        gen_exception(s, s->insn_pc, EXCP_PRIVILEGE);
+         return;
+     }
+     /* ICache fetch.  Implement as no-op.  */
+@@ -4340,7 +4340,7 @@ DISAS_INSN(intouch)
+ DISAS_INSN(cpushl)
+ {
+     if (IS_USER(s)) {
+-        gen_exception(s, s->pc - 2, EXCP_PRIVILEGE);
++        gen_exception(s, s->insn_pc, EXCP_PRIVILEGE);
+         return;
+     }
+     /* Cache push/invalidate.  Implement as no-op.  */
+@@ -4348,7 +4348,7 @@ DISAS_INSN(cpushl)
+ 
+ DISAS_INSN(wddata)
+ {
+-    gen_exception(s, s->pc - 2, EXCP_PRIVILEGE);
++    gen_exception(s, s->insn_pc, EXCP_PRIVILEGE);
+ }
+ 
+ DISAS_INSN(wdebug)
+@@ -4356,7 +4356,7 @@ DISAS_INSN(wdebug)
+     M68kCPU *cpu = m68k_env_get_cpu(env);
+ 
+     if (IS_USER(s)) {
+-        gen_exception(s, s->pc - 2, EXCP_PRIVILEGE);
++        gen_exception(s, s->insn_pc, EXCP_PRIVILEGE);
+         return;
+     }
+     /* TODO: Implement wdebug.  */
+@@ -4365,7 +4365,7 @@ DISAS_INSN(wdebug)
+ 
+ DISAS_INSN(trap)
+ {
+-    gen_exception(s, s->pc - 2, EXCP_TRAP0 + (insn & 0xf));
++    gen_exception(s, s->insn_pc, EXCP_TRAP0 + (insn & 0xf));
+ }
+ 
+ static void gen_load_fcr(DisasContext *s, TCGv res, int reg)
 -- 
 2.14.3
