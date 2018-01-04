@@ -1,27 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47251)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49885)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eX8U9-0001Kh-OE
-	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 11:35:18 -0500
+	(envelope-from <marcel@redhat.com>) id 1eX8Vy-0002Ti-9h
+	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 11:37:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eX8U6-0006Lr-Ld
-	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 11:35:17 -0500
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20180104144046.30793-1-f4bug@amsat.org>
-	<20180104144046.30793-3-f4bug@amsat.org>
-	<20180104162400.GB2618@work-vm>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <44abdde4-4543-f5a4-aca3-d6549497bd7b@amsat.org>
-Date: Thu, 4 Jan 2018 13:34:53 -0300
+	(envelope-from <marcel@redhat.com>) id 1eX8Vt-00011n-MW
+	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 11:37:10 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:4295)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <marcel@redhat.com>) id 1eX8Vt-0000yr-4s
+	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 11:37:05 -0500
+From: Marcel Apfelbaum <marcel@redhat.com>
+Date: Thu,  4 Jan 2018 18:36:47 +0200
+Message-Id: <20180104163652.65450-1-marcel@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20180104162400.GB2618@work-vm>
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature";
-	boundary="IMIMlEpK339LLWUaM8A7z63exhsJNsl39"
-Subject: Re: [Qemu-devel] [RFC PATCH 2/6] hw/net/e1000: real device name is
- 'e1000-82540em', 'e1000' is an alias
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH V4 0/5] hw/pvrdma: PVRDMA device implementation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,120 +24,171 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: Alistair Francis <alistair.francis@xilinx.com>, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, =?UTF-8?Q?Andreas_F=c3=a4rber?= <afaerber@suse.de>, Igor Mammedov <imammedo@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Markus Armbruster <armbru@redhat.com>, Sascha Silbe <silbe@linux.vnet.ibm.com>, Alexander Graf <agraf@suse.de>, Fam Zheng <famz@redhat.com>, Jason Wang <jasowang@redhat.com>, qemu-devel@nongnu.org, qemu-arm@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: ehabkost@redhat.com, imammedo@redhat.com, yuval.shaia@oracle.com, marcel@redhat.com, pbonzini@redhat.com, mst@redhat.com, f4bug@amsat.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---IMIMlEpK339LLWUaM8A7z63exhsJNsl39
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: Alistair Francis <alistair.francis@xilinx.com>,
- "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>,
- =?UTF-8?Q?Andreas_F=c3=a4rber?= <afaerber@suse.de>,
- Igor Mammedov <imammedo@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
- Markus Armbruster <armbru@redhat.com>,
- Sascha Silbe <silbe@linux.vnet.ibm.com>, Alexander Graf <agraf@suse.de>,
- Fam Zheng <famz@redhat.com>, Jason Wang <jasowang@redhat.com>,
- qemu-devel@nongnu.org, qemu-arm@nongnu.org,
- Stefan Hajnoczi <stefanha@redhat.com>,
- =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <44abdde4-4543-f5a4-aca3-d6549497bd7b@amsat.org>
-Subject: Re: [Qemu-devel] [RFC PATCH 2/6] hw/net/e1000: real device name is
- 'e1000-82540em', 'e1000' is an alias
-References: <20180104144046.30793-1-f4bug@amsat.org>
- <20180104144046.30793-3-f4bug@amsat.org> <20180104162400.GB2618@work-vm>
-In-Reply-To: <20180104162400.GB2618@work-vm>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+V3 -> V4:
+ - Fixed documentation (added more impl details)
+ - Fixed compilation errors discovered by patchew.
+ - Addressed Michael S. Tsirkin comments:
+   - Removed unnecessary typedefs and replace them with
+     macros in VMware header files, together with explanations.
+   - Moved more code from vmw specific to rdma generic code.
+   - Added page size limitations to the documentation.
 
-Hi David,
+V2 -> V3:
+ - Addressed Michael S. Tsirkin and Philippe Mathieu-Daud=C3=A9 comments:
+   - Moved the device to hw/rdma
+ - Addressed Michael S. Tsirkin comments:
+   - Split the code into generic (hw/rdma) and VMWare
+     specific (hw/rdma/vmw)
+   - Added more details to documentation - VMware guest-host protocol.
+   - Remove mad processing
+   - limited the memory the Guest can pin.
+ - Addressed Philippe Mathieu-Daud=C3=A9 comment:
+   - s/roundup_pow_of_two/pow2roundup32 and move it to qemu/host-utils.h=20
+ - Added Shamit Rabinovici's review to documentation
+ - Rebased to latest master=20
 
-On 01/04/2018 01:24 PM, Dr. David Alan Gilbert wrote:
-> * Philippe Mathieu-Daud=C3=A9 (f4bug@amsat.org) wrote:
->> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
->> ---
->>  hw/net/e1000.c | 5 ++++-
->>  1 file changed, 4 insertions(+), 1 deletion(-)
->>
->> diff --git a/hw/net/e1000.c b/hw/net/e1000.c
->> index 05a00cba31..2280f7fdf9 100644
->> --- a/hw/net/e1000.c
->> +++ b/hw/net/e1000.c
->> @@ -1648,6 +1648,7 @@ typedef struct E1000Info {
->>      uint16_t   device_id;
->>      uint8_t    revision;
->>      uint16_t   phy_id2;
->> +    const char **aliases;
->>  } E1000Info;
->> =20
->>  static void e1000_class_init(ObjectClass *klass, void *data)
->> @@ -1695,10 +1696,11 @@ static const TypeInfo e1000_base_info =3D {
->> =20
->>  static const E1000Info e1000_devices[] =3D {
->>      {
->> -        .name      =3D "e1000",
->> +        .name      =3D "e1000-82540em",
->>          .device_id =3D E1000_DEV_ID_82540EM,
->>          .revision  =3D 0x03,
->>          .phy_id2   =3D E1000_PHY_ID2_8254xx_DEFAULT,
->> +        .aliases   =3D (const char * []) {"e1000", NULL},
->>      },
->>      {
->>          .name      =3D "e1000-82544gc",
->> @@ -1725,6 +1727,7 @@ static void e1000_register_types(void)
->> =20
->>          type_info.name =3D info->name;
->>          type_info.parent =3D TYPE_E1000_BASE;
->> +        type_info.aliases =3D info->aliases;
->>          type_info.class_data =3D (void *)info;
->>          type_info.class_init =3D e1000_class_init;
->>          type_info.instance_init =3D e1000_instance_init;
->=20
-> Can you just check that this doesn't break migration compatibility
-> either way please;  I think there's some alias code somewhere but I
-> can't remember the details.
-
-Good point.
-
-Something related to qdev-monitor.c?
-
-> One thing I do remember that broke when it previously changed was
-> entries in PC_COMPAT_* tables like the one in hw/i386/pc_piix.c's
-> PC_COMPAT_1_3 - so check with an 'info qtree' that the property is OK.
-
-Ok, I'll verify and think about a qtest for that.
-
-I took this device because I wanted to test another arch than ARM (which
-strongly use FDT).
-If there is an issue migrating this particular device we can drop this
-patch for this only device, and the series still stands for the ARM/FDT.
-
-Regards,
-
-Phil.
+RFC -> V2:
+ - Full implementation of the pvrdma device
+ - Backend is an ibdevice interface, no need for the KDBR module
 
 
---IMIMlEpK339LLWUaM8A7z63exhsJNsl39
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+General description
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+PVRDMA is the QEMU implementation of VMware's paravirtualized RDMA device=
+.
+It works with its Linux Kernel driver AS IS, no need for any special gues=
+t
+modifications.
 
------BEGIN PGP SIGNATURE-----
+While it complies with the VMware device, it can also communicate with ba=
+re
+metal RDMA-enabled machines and does not require an RDMA HCA in the host,=
+ it
+can work with Soft-RoCE (rxe).
 
-iQIzBAEBCgAdFiEE+qvnXhKRciHc/Wuy4+MsLN6twN4FAlpOV60ACgkQ4+MsLN6t
-wN7r7RAApE+zrGk2w6iVqwut6wBuXlzxOqISa1i0YilJCrd0dNKaWmWjlRwtlXA8
-OM3w3Xgnr2+EXFGbVnM3LBn4ZBkARd1pOSEqSI2sovOWiv64z7MY8EmNNHP+9hcE
-Yiiiv7xxNCvHrYf9bAe/yBOuAFPKXYOLovtmZDYfkrzKRR1LrifeI1Rr08Ma7IuX
-qQkxPrUqtZgvjJFI4Kyvl+VtsU2dH4QdvHnTPMgMku5StQdC++WTm3eGCwTCG8nm
-LmUdLFtvweQrsQVgJTzPBXkMQUcQ6X7QE0yQfugKoKczOXinjkKfdoi1bjOILzU1
-U/VqZpU9I3QZ8KtI/sr7FZ+uazrP63ijitqe/4Vk2rsZqiqLrUhzldCofJZeH7Tr
-NXJabRfHAuWMRJ6TvvesuwcNPHTVg7UQSu58+zyhyoBvbadTgvKj2ZHAc0Ae9I8Q
-THxVBIUh+ItuF/9AgfRDVvhEWyc7AqDt3jaBC/saDNIWCqoMxcXp0BcVtESZ+Gjs
-LwHgiuTDFqwgKut9kbU0qIbRw37BArCHsbxZKCuGgmA3LP7i943gFeZx5ODKtV4G
-+3zQO9IAFzRq1b8X2E/7VmaE5sBgEMLX0a2Sr/gPRh//jbeQgFA9oTngYNTgpDWB
-vJBT/Qn0qTDKPYlf4RBd9zD8CNNAn9LC0N/8oLZsYZhonJSM3p8=
-=Yfjd
------END PGP SIGNATURE-----
+It does not require the whole guest RAM to be pinned allowing memory
+over-commit and, even if not implemented yet, migration support will be
+possible with some HW assistance.
 
---IMIMlEpK339LLWUaM8A7z63exhsJNsl39--
+
+ Design
+ =3D=3D=3D=3D=3D=3D
+ - Follows the behavior of VMware's pvrdma device, however is not tightly
+   coupled with it and most of the code can be reused if we decide to
+   continue to a Virtio based RDMA device.
+
+ - It exposes 3 BARs:
+    BAR 0 - MSIX, utilize 3 vectors for command ring, async events and
+            completions
+    BAR 1 - Configuration of registers
+    BAR 2 - UAR, used to pass HW commands from driver.
+
+ - The device performs internal management of the RDMA
+   resources (PDs, CQs, QPs, ...), meaning the objects
+   are not directly coupled to a physical RDMA device resources.
+
+The pvrdma backend is an ibdevice interface that can be exposed
+either by a Soft-RoCE(rxe) device on machines with no RDMA device,
+or an HCA SRIOV function(VF/PF).
+Note that ibdevice interfaces can't be shared between pvrdma devices,
+each one requiring a separate instance (rxe or SRIOV VF).
+
+
+Tests and performance
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+Tested with SoftRoCE backend (rxe)/Mellanox ConnectX3,
+and Mellanox ConnectX4 HCAs with:
+  - VMs in the same host
+  - VMs in different hosts=20
+  - VMs to bare metal.
+
+The best performance achieved with ConnectX HCAs and buffer size
+bigger than 1MB which was the line rate ~ 50Gb/s.
+The conclusion is that using the PVRDMA device there are no
+actual performance penalties compared to bare metal for big enough
+buffers (which is quite common when using RDMA), while allowing
+memory overcommit.
+
+Marcel Apfelbaum (3):
+  mem: add share parameter to memory-backend-ram
+  docs: add pvrdma device documentation.
+  MAINTAINERS: add entry for hw/rdma
+
+Yuval Shaia (2):
+  pci/shpc: Move function to generic header file
+  pvrdma: initial implementation
+
+ MAINTAINERS                        |   8 +
+ Makefile.objs                      |   2 +
+ backends/hostmem-file.c            |  25 +-
+ backends/hostmem-ram.c             |   4 +-
+ backends/hostmem.c                 |  21 +
+ configure                          |   9 +-
+ default-configs/arm-softmmu.mak    |   1 +
+ default-configs/i386-softmmu.mak   |   1 +
+ default-configs/x86_64-softmmu.mak |   1 +
+ docs/pvrdma.txt                    | 254 ++++++++++++
+ exec.c                             |  26 +-
+ hw/Makefile.objs                   |   1 +
+ hw/pci/shpc.c                      |  13 +-
+ hw/rdma/Makefile.objs              |   6 +
+ hw/rdma/rdma_backend.c             | 815 +++++++++++++++++++++++++++++++=
+++++++
+ hw/rdma/rdma_backend.h             |  92 +++++
+ hw/rdma/rdma_backend_defs.h        |  62 +++
+ hw/rdma/rdma_rm.c                  | 619 ++++++++++++++++++++++++++++
+ hw/rdma/rdma_rm.h                  |  69 ++++
+ hw/rdma/rdma_rm_defs.h             | 106 +++++
+ hw/rdma/rdma_utils.c               |  52 +++
+ hw/rdma/rdma_utils.h               |  43 ++
+ hw/rdma/trace-events               |   5 +
+ hw/rdma/vmw/pvrdma.h               | 123 ++++++
+ hw/rdma/vmw/pvrdma_cmd.c           | 678 ++++++++++++++++++++++++++++++
+ hw/rdma/vmw/pvrdma_dev_api.h       | 602 +++++++++++++++++++++++++++
+ hw/rdma/vmw/pvrdma_dev_ring.c      | 139 +++++++
+ hw/rdma/vmw/pvrdma_dev_ring.h      |  42 ++
+ hw/rdma/vmw/pvrdma_ib_verbs.h      | 433 ++++++++++++++++++++
+ hw/rdma/vmw/pvrdma_main.c          | 643 +++++++++++++++++++++++++++++
+ hw/rdma/vmw/pvrdma_qp_ops.c        | 211 ++++++++++
+ hw/rdma/vmw/pvrdma_qp_ops.h        |  27 ++
+ hw/rdma/vmw/pvrdma_ring.h          | 134 ++++++
+ hw/rdma/vmw/trace-events           |   5 +
+ include/exec/memory.h              |  23 ++
+ include/exec/ram_addr.h            |   3 +-
+ include/hw/pci/pci_ids.h           |   3 +
+ include/qemu/host-utils.h          |  10 +
+ include/qemu/osdep.h               |   2 +-
+ include/sysemu/hostmem.h           |   2 +-
+ include/sysemu/kvm.h               |   2 +-
+ memory.c                           |  16 +-
+ util/oslib-posix.c                 |   4 +-
+ util/oslib-win32.c                 |   2 +-
+ 44 files changed, 5277 insertions(+), 62 deletions(-)
+ create mode 100644 docs/pvrdma.txt
+ create mode 100644 hw/rdma/Makefile.objs
+ create mode 100644 hw/rdma/rdma_backend.c
+ create mode 100644 hw/rdma/rdma_backend.h
+ create mode 100644 hw/rdma/rdma_backend_defs.h
+ create mode 100644 hw/rdma/rdma_rm.c
+ create mode 100644 hw/rdma/rdma_rm.h
+ create mode 100644 hw/rdma/rdma_rm_defs.h
+ create mode 100644 hw/rdma/rdma_utils.c
+ create mode 100644 hw/rdma/rdma_utils.h
+ create mode 100644 hw/rdma/trace-events
+ create mode 100644 hw/rdma/vmw/pvrdma.h
+ create mode 100644 hw/rdma/vmw/pvrdma_cmd.c
+ create mode 100644 hw/rdma/vmw/pvrdma_dev_api.h
+ create mode 100644 hw/rdma/vmw/pvrdma_dev_ring.c
+ create mode 100644 hw/rdma/vmw/pvrdma_dev_ring.h
+ create mode 100644 hw/rdma/vmw/pvrdma_ib_verbs.h
+ create mode 100644 hw/rdma/vmw/pvrdma_main.c
+ create mode 100644 hw/rdma/vmw/pvrdma_qp_ops.c
+ create mode 100644 hw/rdma/vmw/pvrdma_qp_ops.h
+ create mode 100644 hw/rdma/vmw/pvrdma_ring.h
+ create mode 100644 hw/rdma/vmw/trace-events
+
+--=20
+2.13.5
