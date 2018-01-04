@@ -1,14 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50124)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52325)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1eX7Wt-00067E-GT
-	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 10:34:04 -0500
+	(envelope-from <thuth@redhat.com>) id 1eX7YQ-000808-Ls
+	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 10:35:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1eX7Wq-0007mz-Le
-	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 10:34:03 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:49376)
+	(envelope-from <thuth@redhat.com>) id 1eX7YN-00018R-S8
+	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 10:35:38 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:36252)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1eX7Wq-0007m1-GN
-	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 10:34:00 -0500
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1eX7YN-00016o-49
+	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 10:35:35 -0500
 References: <1515071752-22961-1-git-send-email-thuth@redhat.com>
 	<20180104140930.7hbtnen3lw7epmrh@var.youpi.perso.aquilenet.fr>
 	<a78b6f7a-3eb2-6749-ccba-ad1ba4d525ae@redhat.com>
@@ -18,9 +18,9 @@ References: <1515071752-22961-1-git-send-email-thuth@redhat.com>
 	<20180104152402.fv52umjmlb2g22wc@var.youpi.perso.aquilenet.fr>
 	<b1a86fed-8a98-cc1d-46ca-5462f8be3fc7@redhat.com>
 	<20180104153219.wsxtkzuznu2iwra7@var.youpi.perso.aquilenet.fr>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <44b5fa49-3a0b-1bea-9770-e4d06ce1ae5b@redhat.com>
-Date: Thu, 4 Jan 2018 16:33:55 +0100
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <bb6eae87-85b2-4bf2-ad36-26fa95816315@redhat.com>
+Date: Thu, 4 Jan 2018 16:35:28 +0100
 MIME-Version: 1.0
 In-Reply-To: <20180104153219.wsxtkzuznu2iwra7@var.youpi.perso.aquilenet.fr>
 Content-Type: text/plain; charset=utf-8
@@ -35,18 +35,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Samuel Thibault <samuel.thibault@gnu.org>
-Cc: Thomas Huth <thuth@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, kraxel@redhat.com, qemu-devel@nongnu.org
+To: Samuel Thibault <samuel.thibault@gnu.org>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, kraxel@redhat.com, qemu-devel@nongnu.org
 
-On 04/01/2018 16:32, Samuel Thibault wrote:
+On 04.01.2018 16:32, Samuel Thibault wrote:
+> Paolo Bonzini, on jeu. 04 janv. 2018 16:28:27 +0100, wrote:
+>> On 04/01/2018 16:24, Samuel Thibault wrote:
+>>>> Maybe we can add "-braille" instead.
+>>> I guess such legacy-looking option would be frowned up :)
+>>
+>> Not really.  As long as it doesn't propagate everywhere in device code,
+>> it's fine.  We are not going to deprecate "-serial mon:stdio", so...
+>>
 >>> And anyway we need to be able to specify either -serial braille or
 >>> -device usb-braille.
+>>
 >> So "-braille serial" and "-braille usb"?
+> 
 > Well, why not, it just doesn't seem to me much simpler than
 > "-serial braille" and "-device usb-braille" :)
 
-The difference is that "-device usb-braille" would have magic character
-backend creation in usb_braille_realize.  *That* is what I really frown
-upon.
+FWIW, I think I'd also rather prefer to add some little bit of "magic"
+to "-device usb-braille" instead of introducing yet another command line
+parameter. QEMU's command line interface is already way too much
+overcrowded, so IMHO we should try to avoid new parameters if possible.
 
-Paolo
+ Thomas
