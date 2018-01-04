@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55403)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55386)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1eX8bd-0007bL-Rp
+	(envelope-from <laurent@vivier.eu>) id 1eX8bd-0007b0-Fi
 	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 11:43:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1eX8bb-0003c1-BE
+	(envelope-from <laurent@vivier.eu>) id 1eX8ba-0003Zx-6Z
 	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 11:43:01 -0500
-Received: from mout.kundenserver.de ([212.227.126.134]:49267)
+Received: from mout.kundenserver.de ([212.227.126.134]:50011)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1eX8ba-0003Zf-Rv
-	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 11:42:59 -0500
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1eX8bZ-0003Xd-No
+	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 11:42:58 -0500
 From: Laurent Vivier <laurent@vivier.eu>
-Date: Thu,  4 Jan 2018 17:42:45 +0100
-Message-Id: <20180104164251.26494-12-laurent@vivier.eu>
+Date: Thu,  4 Jan 2018 17:42:42 +0100
+Message-Id: <20180104164251.26494-9-laurent@vivier.eu>
 In-Reply-To: <20180104164251.26494-1-laurent@vivier.eu>
 References: <20180104164251.26494-1-laurent@vivier.eu>
-Subject: [Qemu-devel] [PULL 11/17] target/m68k: add reset
+Subject: [Qemu-devel] [PULL 08/17] target/m68k: add move16
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,77 +26,140 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Laurent Vivier <laurent@vivier.eu>
 
-The instruction traps if the CPU is not in
-Supervisor state but the helper is empty because
-there is no easy way to reset all the peripherals
-without resetting the CPU itself.
+move16 moves the source line to the destination line. Lines are aligned
+to 16-byte boundaries and are 16 bytes long.
 
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Message-Id: <20180104012913.30763-12-laurent@vivier.eu>
+Message-Id: <20180104012913.30763-9-laurent@vivier.eu>
 ---
- target/m68k/helper.c    |  7 +++++++
- target/m68k/helper.h    |  4 ++++
- target/m68k/translate.c | 13 +++++++++++++
- 3 files changed, 24 insertions(+)
+ target/m68k/cpu.c       | 10 ++++++-
+ target/m68k/cpu.h       |  1 +
+ target/m68k/translate.c | 72 +++++++++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 82 insertions(+), 1 deletion(-)
 
-diff --git a/target/m68k/helper.c b/target/m68k/helper.c
-index af57ffcea9..52b054e1a3 100644
---- a/target/m68k/helper.c
-+++ b/target/m68k/helper.c
-@@ -711,3 +711,10 @@ void HELPER(set_mac_extu)(CPUM68KState *env, uint32_t val, uint32_t acc)
-     res |= (uint64_t)(val & 0xffff0000) << 16;
-     env->macc[acc + 1] = res;
+diff --git a/target/m68k/cpu.c b/target/m68k/cpu.c
+index 57ffcb2114..1936efd170 100644
+--- a/target/m68k/cpu.c
++++ b/target/m68k/cpu.c
+@@ -137,7 +137,15 @@ static void m68020_cpu_initfn(Object *obj)
+     m68k_set_feature(env, M68K_FEATURE_CHK2);
  }
+ #define m68030_cpu_initfn m68020_cpu_initfn
+-#define m68040_cpu_initfn m68020_cpu_initfn
 +
-+#if defined(CONFIG_SOFTMMU)
-+void HELPER(reset)(CPUM68KState *env)
++static void m68040_cpu_initfn(Object *obj)
 +{
-+    /* FIXME: reset all except CPU */
-+}
-+#endif
-diff --git a/target/m68k/helper.h b/target/m68k/helper.h
-index 78483da003..d27ea37d60 100644
---- a/target/m68k/helper.h
-+++ b/target/m68k/helper.h
-@@ -97,3 +97,7 @@ DEF_HELPER_FLAGS_4(bfffo_mem, TCG_CALL_NO_WG, i64, env, i32, s32, i32)
- 
- DEF_HELPER_3(chk, void, env, s32, s32)
- DEF_HELPER_4(chk2, void, env, s32, s32, s32)
++    M68kCPU *cpu = M68K_CPU(obj);
++    CPUM68KState *env = &cpu->env;
 +
-+#if defined(CONFIG_SOFTMMU)
-+DEF_HELPER_FLAGS_1(reset, TCG_CALL_NO_RWG, void, env)
-+#endif
++    m68020_cpu_initfn(obj);
++    m68k_set_feature(env, M68K_FEATURE_M68040);
++}
+ 
+ static void m68060_cpu_initfn(Object *obj)
+ {
+diff --git a/target/m68k/cpu.h b/target/m68k/cpu.h
+index 68396bdd70..2ac4ab191e 100644
+--- a/target/m68k/cpu.h
++++ b/target/m68k/cpu.h
+@@ -306,6 +306,7 @@ enum m68k_features {
+     M68K_FEATURE_BKPT,
+     M68K_FEATURE_RTD,
+     M68K_FEATURE_CHK2,
++    M68K_FEATURE_M68040, /* instructions specific to MC68040 */
+ };
+ 
+ static inline int m68k_feature(CPUM68KState *env, int feature)
 diff --git a/target/m68k/translate.c b/target/m68k/translate.c
-index 98efe6b976..e8f7d07f3f 100644
+index 7f52065375..0ef933a545 100644
 --- a/target/m68k/translate.c
 +++ b/target/m68k/translate.c
-@@ -2762,6 +2762,18 @@ DISAS_INSN(unlk)
-     tcg_temp_free(src);
+@@ -4277,6 +4277,76 @@ DISAS_INSN(chk2)
+     tcg_temp_free(reg);
  }
  
-+#if defined(CONFIG_SOFTMMU)
-+DISAS_INSN(reset)
++static void m68k_copy_line(TCGv dst, TCGv src, int index)
 +{
-+    if (IS_USER(s)) {
-+        gen_exception(s, s->insn_pc, EXCP_PRIVILEGE);
-+        return;
++    TCGv addr;
++    TCGv_i64 t0, t1;
++
++    addr = tcg_temp_new();
++
++    t0 = tcg_temp_new_i64();
++    t1 = tcg_temp_new_i64();
++
++    tcg_gen_andi_i32(addr, src, ~15);
++    tcg_gen_qemu_ld64(t0, addr, index);
++    tcg_gen_addi_i32(addr, addr, 8);
++    tcg_gen_qemu_ld64(t1, addr, index);
++
++    tcg_gen_andi_i32(addr, dst, ~15);
++    tcg_gen_qemu_st64(t0, addr, index);
++    tcg_gen_addi_i32(addr, addr, 8);
++    tcg_gen_qemu_st64(t1, addr, index);
++
++    tcg_temp_free_i64(t0);
++    tcg_temp_free_i64(t1);
++    tcg_temp_free(addr);
++}
++
++DISAS_INSN(move16_reg)
++{
++    int index = IS_USER(s);
++    TCGv tmp;
++    uint16_t ext;
++
++    ext = read_im16(env, s);
++    if ((ext & (1 << 15)) == 0) {
++        gen_exception(s, s->insn_pc, EXCP_ILLEGAL);
 +    }
 +
-+    gen_helper_reset(cpu_env);
-+}
-+#endif
++    m68k_copy_line(AREG(ext, 12), AREG(insn, 0), index);
 +
- DISAS_INSN(nop)
++    /* Ax can be Ay, so save Ay before incrementing Ax */
++    tmp = tcg_temp_new();
++    tcg_gen_mov_i32(tmp, AREG(ext, 12));
++    tcg_gen_addi_i32(AREG(insn, 0), AREG(insn, 0), 16);
++    tcg_gen_addi_i32(AREG(ext, 12), tmp, 16);
++    tcg_temp_free(tmp);
++}
++
++DISAS_INSN(move16_mem)
++{
++    int index = IS_USER(s);
++    TCGv reg, addr;
++
++    reg = AREG(insn, 0);
++    addr = tcg_const_i32(read_im32(env, s));
++
++    if ((insn >> 3) & 1) {
++        /* MOVE16 (xxx).L, (Ay) */
++        m68k_copy_line(reg, addr, index);
++    } else {
++        /* MOVE16 (Ay), (xxx).L */
++        m68k_copy_line(addr, reg, index);
++    }
++
++    tcg_temp_free(addr);
++
++    if (((insn >> 3) & 2) == 0) {
++        /* (Ay)+ */
++        tcg_gen_addi_i32(reg, reg, 16);
++    }
++}
++
+ static TCGv gen_get_sr(DisasContext *s)
  {
- }
-@@ -5572,6 +5584,7 @@ void register_m68k_insns (CPUM68KState *env)
- #if defined(CONFIG_SOFTMMU)
-     INSN(move_to_usp, 4e60, fff8, USP);
-     INSN(move_from_usp, 4e68, fff8, USP);
-+    INSN(reset,     4e70, ffff, M68000);
-     BASE(stop,      4e72, ffff);
-     BASE(rte,       4e73, ffff);
-     INSN(movec,     4e7b, ffff, CF_ISA_A);
+     TCGv ccr;
+@@ -5578,6 +5648,8 @@ void register_m68k_insns (CPUM68KState *env)
+     INSN(fsave,     f300, ffc0, FPU);
+     INSN(intouch,   f340, ffc0, CF_ISA_A);
+     INSN(cpushl,    f428, ff38, CF_ISA_A);
++    INSN(move16_mem, f600, ffe0, M68040);
++    INSN(move16_reg, f620, fff8, M68040);
+     INSN(wddata,    fb00, ff00, CF_ISA_A);
+     INSN(wdebug,    fbc0, ffc0, CF_ISA_A);
+ #undef INSN
 -- 
 2.14.3
