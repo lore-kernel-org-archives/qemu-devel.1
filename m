@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42445)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50431)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1eX9Nq-0000f8-Mt
-	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 12:32:59 -0500
+	(envelope-from <eblake@redhat.com>) id 1eX9Ti-0004xd-Mj
+	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 12:38:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1eX9NZ-0003wn-J2
-	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 12:32:50 -0500
-Received: from mout.kundenserver.de ([212.227.126.131]:62961)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1eX9NZ-0003ux-6j
-	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 12:32:33 -0500
-References: <mailman.16196.1515084191.27993.qemu-devel@nongnu.org>
-	<AE31CFE4-27FD-40F8-81E3-0D7A8A9DE36E@gmail.com>
-From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <bee022ee-30de-586a-d892-68291159de77@vivier.eu>
-Date: Thu, 4 Jan 2018 18:32:30 +0100
+	(envelope-from <eblake@redhat.com>) id 1eX9Te-0001pb-49
+	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 12:38:54 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:46588)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1eX9Td-0001oy-RN
+	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 12:38:50 -0500
+References: <1515068847-20311-1-git-send-email-thuth@redhat.com>
+	<CAFEAcA-7+woO3ByXgJntLzg+yJd6YDS-tZXqZFjiHEW3tbgMUw@mail.gmail.com>
+	<2efc072a-a0d7-a3f3-a3a9-9ec6ad86e170@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <f5e00a0c-2a6c-6e13-2164-164a72875f3a@redhat.com>
+Date: Thu, 4 Jan 2018 11:38:41 -0600
 MIME-Version: 1.0
-In-Reply-To: <AE31CFE4-27FD-40F8-81E3-0D7A8A9DE36E@gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PULL 00/17] M68k for 2.12 patches
+In-Reply-To: <2efc072a-a0d7-a3f3-a3a9-9ec6ad86e170@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="XTpb1EAnlvTKsagdvmOzb4HbWD5F44e5m"
+Subject: Re: [Qemu-devel] [PATCH] usb: Remove legacy -usbdevice option
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,24 +29,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Programmingkid <programmingkidx@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>
+To: Thomas Huth <thuth@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
+Cc: Samuel Thibault <samuel.thibault@ens-lyon.org>, Paolo Bonzini <pbonzini@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
 
-Le 04/01/2018 à 18:09, Programmingkid a écrit :
-> What operating systems boot with this patch set? Does any version of the Mac OS run in this 68k emulator? 
-> 
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--XTpb1EAnlvTKsagdvmOzb4HbWD5F44e5m
+From: Eric Blake <eblake@redhat.com>
+To: Thomas Huth <thuth@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
+Cc: Samuel Thibault <samuel.thibault@ens-lyon.org>,
+ Paolo Bonzini <pbonzini@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>
+Message-ID: <f5e00a0c-2a6c-6e13-2164-164a72875f3a@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] usb: Remove legacy -usbdevice option
+References: <1515068847-20311-1-git-send-email-thuth@redhat.com>
+ <CAFEAcA-7+woO3ByXgJntLzg+yJd6YDS-tZXqZFjiHEW3tbgMUw@mail.gmail.com>
+ <2efc072a-a0d7-a3f3-a3a9-9ec6ad86e170@redhat.com>
+In-Reply-To: <2efc072a-a0d7-a3f3-a3a9-9ec6ad86e170@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-For the moment you can't boot anything more than the coldfire linux
-kernel with the semi-hosting patch.
+On 01/04/2018 06:44 AM, Thomas Huth wrote:
+> On 04.01.2018 13:33, Peter Maydell wrote:
+>> On 4 January 2018 at 12:27, Thomas Huth <thuth@redhat.com> wrote:
+>>> The option has been marked as deprecated since QEMU 2.10, and so far
+>>> nobody complained that it is urgently required anymore. So let's now
+>>> get rid of this legacy pile, to simplify the usb code quite a bit.
+>>>
+>>> Signed-off-by: Thomas Huth <thuth@redhat.com>
+>>
+>> The diffstat is nice, but can we retain the "please use
+>> $NEWOPTION instead of $OLDOPTION" message for a bit?
+>> I'm pretty sure there will be users out there who've
+>> been happily ignoring deprecation notices, and I think
+>> we'll reduce the amount of support traffic if they
+>> get a new QEMU with a specific error message telling them
+>> what they need to fix, rather than one which just prints
+>> a generic "unknown option" message.
+>=20
+> Sounds like a good idea at the first glance ... but at a second thought=
+:
+> Don't we confuse the management layers like libvirt this way, which
+> might probe for the availability of this option by executing QEMU with
+> this parameter?
 
-The remaining patches I have in my git branch allows to boot a debian
-etch-m68k with GNOME or a the latest debian unstable (without GNOME)
+At least for libvirt, probing for supported command line arguments is
+preferable via QMP commands; if there is an easy way to make the
+-usbdevice command line argument exist to emit the warning, but not show
+up in the list of commands exposed over QMP, that is nicest (but I don't
+know how that would interact with Markus' plans to make ALL command line
+arguments introspectible, instead of our current ad hoc mix where some
+are and others are not).
 
-git clone -b q800-dev https://github.com/vivier/qemu-m68k.git
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
 
-I'm working on booting MacOS...
 
-I think we should also be able to boot NeXTSTEP , but the work of Bryce
-Lanham (GSoC 2011) must be rebased on my branch and cleaned up.
+--XTpb1EAnlvTKsagdvmOzb4HbWD5F44e5m
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-Thanks,
-Laurent
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlpOZqEACgkQp6FrSiUn
+Q2p4lwgAmfUC8Q3Y1Z6LTqJQS3nHHJb3Ky0oC9svHTg/ePNsUHBkNlJvx6a21mK9
+Udw5kI5ib5mTLg8hul1DqDSWWQq86oOt7RiiuEHjN7YZiFkCcmqTQFJc88rJ9hT4
+jfgHORF/UX+5wMyxHi1uX2f0fM5vxwph3l97otVtvKvGh0cqWWIXyQbp4W6fgKuY
+y0AOCq0ZCZn2w+JRAj2WEAqK3OxDfPNx+L9nyv1AgUg/wX+BvnMnICIhWwJX3UHh
+e8atlsIxOx6IBZGEskQCIyQLl6rPjJBHuNIct2cd8vCAV1GyW2b3Q32S1o3kobBP
+xBmMEnUDCnkmMe8C+Tv2o+Ytge1gQA==
+=GSko
+-----END PGP SIGNATURE-----
+
+--XTpb1EAnlvTKsagdvmOzb4HbWD5F44e5m--
