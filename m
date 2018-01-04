@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55386)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55436)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1eX8bd-0007b0-Fi
-	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 11:43:03 -0500
+	(envelope-from <laurent@vivier.eu>) id 1eX8be-0007c9-O6
+	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 11:43:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1eX8ba-0003Zx-6Z
-	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 11:43:01 -0500
-Received: from mout.kundenserver.de ([212.227.126.134]:50011)
+	(envelope-from <laurent@vivier.eu>) id 1eX8bc-0003dt-8x
+	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 11:43:02 -0500
+Received: from mout.kundenserver.de ([212.227.126.133]:53421)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1eX8bZ-0003Xd-No
-	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 11:42:58 -0500
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1eX8bb-0003b3-NE
+	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 11:43:00 -0500
 From: Laurent Vivier <laurent@vivier.eu>
-Date: Thu,  4 Jan 2018 17:42:42 +0100
-Message-Id: <20180104164251.26494-9-laurent@vivier.eu>
+Date: Thu,  4 Jan 2018 17:42:47 +0100
+Message-Id: <20180104164251.26494-14-laurent@vivier.eu>
 In-Reply-To: <20180104164251.26494-1-laurent@vivier.eu>
 References: <20180104164251.26494-1-laurent@vivier.eu>
-Subject: [Qemu-devel] [PULL 08/17] target/m68k: add move16
+Subject: [Qemu-devel] [PULL 13/17] target/m68k: move CCR/SR functions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,140 +26,158 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Laurent Vivier <laurent@vivier.eu>
 
-move16 moves the source line to the destination line. Lines are aligned
-to 16-byte boundaries and are 16 bytes long.
+The following patches will be clearer if we move
+functions before adding new ones.
 
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Message-Id: <20180104012913.30763-9-laurent@vivier.eu>
+Message-Id: <20180104012913.30763-14-laurent@vivier.eu>
 ---
- target/m68k/cpu.c       | 10 ++++++-
- target/m68k/cpu.h       |  1 +
- target/m68k/translate.c | 72 +++++++++++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 82 insertions(+), 1 deletion(-)
+ target/m68k/translate.c | 111 ++++++++++++++++++++++++------------------------
+ 1 file changed, 55 insertions(+), 56 deletions(-)
 
-diff --git a/target/m68k/cpu.c b/target/m68k/cpu.c
-index 57ffcb2114..1936efd170 100644
---- a/target/m68k/cpu.c
-+++ b/target/m68k/cpu.c
-@@ -137,7 +137,15 @@ static void m68020_cpu_initfn(Object *obj)
-     m68k_set_feature(env, M68K_FEATURE_CHK2);
- }
- #define m68030_cpu_initfn m68020_cpu_initfn
--#define m68040_cpu_initfn m68020_cpu_initfn
-+
-+static void m68040_cpu_initfn(Object *obj)
-+{
-+    M68kCPU *cpu = M68K_CPU(obj);
-+    CPUM68KState *env = &cpu->env;
-+
-+    m68020_cpu_initfn(obj);
-+    m68k_set_feature(env, M68K_FEATURE_M68040);
-+}
- 
- static void m68060_cpu_initfn(Object *obj)
- {
-diff --git a/target/m68k/cpu.h b/target/m68k/cpu.h
-index 68396bdd70..2ac4ab191e 100644
---- a/target/m68k/cpu.h
-+++ b/target/m68k/cpu.h
-@@ -306,6 +306,7 @@ enum m68k_features {
-     M68K_FEATURE_BKPT,
-     M68K_FEATURE_RTD,
-     M68K_FEATURE_CHK2,
-+    M68K_FEATURE_M68040, /* instructions specific to MC68040 */
- };
- 
- static inline int m68k_feature(CPUM68KState *env, int feature)
 diff --git a/target/m68k/translate.c b/target/m68k/translate.c
-index 7f52065375..0ef933a545 100644
+index b8ed85c237..1f867a4f7a 100644
 --- a/target/m68k/translate.c
 +++ b/target/m68k/translate.c
-@@ -4277,6 +4277,76 @@ DISAS_INSN(chk2)
-     tcg_temp_free(reg);
+@@ -2131,6 +2131,61 @@ DISAS_INSN(bitop_im)
+     }
  }
  
-+static void m68k_copy_line(TCGv dst, TCGv src, int index)
++static TCGv gen_get_ccr(DisasContext *s)
 +{
-+    TCGv addr;
-+    TCGv_i64 t0, t1;
++    TCGv dest;
 +
-+    addr = tcg_temp_new();
-+
-+    t0 = tcg_temp_new_i64();
-+    t1 = tcg_temp_new_i64();
-+
-+    tcg_gen_andi_i32(addr, src, ~15);
-+    tcg_gen_qemu_ld64(t0, addr, index);
-+    tcg_gen_addi_i32(addr, addr, 8);
-+    tcg_gen_qemu_ld64(t1, addr, index);
-+
-+    tcg_gen_andi_i32(addr, dst, ~15);
-+    tcg_gen_qemu_st64(t0, addr, index);
-+    tcg_gen_addi_i32(addr, addr, 8);
-+    tcg_gen_qemu_st64(t1, addr, index);
-+
-+    tcg_temp_free_i64(t0);
-+    tcg_temp_free_i64(t1);
-+    tcg_temp_free(addr);
++    update_cc_op(s);
++    dest = tcg_temp_new();
++    gen_helper_get_ccr(dest, cpu_env);
++    return dest;
 +}
 +
-+DISAS_INSN(move16_reg)
++static TCGv gen_get_sr(DisasContext *s)
 +{
-+    int index = IS_USER(s);
-+    TCGv tmp;
-+    uint16_t ext;
++    TCGv ccr;
++    TCGv sr;
 +
-+    ext = read_im16(env, s);
-+    if ((ext & (1 << 15)) == 0) {
-+        gen_exception(s, s->insn_pc, EXCP_ILLEGAL);
-+    }
-+
-+    m68k_copy_line(AREG(ext, 12), AREG(insn, 0), index);
-+
-+    /* Ax can be Ay, so save Ay before incrementing Ax */
-+    tmp = tcg_temp_new();
-+    tcg_gen_mov_i32(tmp, AREG(ext, 12));
-+    tcg_gen_addi_i32(AREG(insn, 0), AREG(insn, 0), 16);
-+    tcg_gen_addi_i32(AREG(ext, 12), tmp, 16);
-+    tcg_temp_free(tmp);
++    ccr = gen_get_ccr(s);
++    sr = tcg_temp_new();
++    tcg_gen_andi_i32(sr, QREG_SR, 0xffe0);
++    tcg_gen_or_i32(sr, sr, ccr);
++    return sr;
 +}
 +
-+DISAS_INSN(move16_mem)
++static void gen_set_sr_im(DisasContext *s, uint16_t val, int ccr_only)
 +{
-+    int index = IS_USER(s);
-+    TCGv reg, addr;
-+
-+    reg = AREG(insn, 0);
-+    addr = tcg_const_i32(read_im32(env, s));
-+
-+    if ((insn >> 3) & 1) {
-+        /* MOVE16 (xxx).L, (Ay) */
-+        m68k_copy_line(reg, addr, index);
++    if (ccr_only) {
++        tcg_gen_movi_i32(QREG_CC_C, val & CCF_C ? 1 : 0);
++        tcg_gen_movi_i32(QREG_CC_V, val & CCF_V ? -1 : 0);
++        tcg_gen_movi_i32(QREG_CC_Z, val & CCF_Z ? 0 : 1);
++        tcg_gen_movi_i32(QREG_CC_N, val & CCF_N ? -1 : 0);
++        tcg_gen_movi_i32(QREG_CC_X, val & CCF_X ? 1 : 0);
 +    } else {
-+        /* MOVE16 (Ay), (xxx).L */
-+        m68k_copy_line(addr, reg, index);
++        gen_helper_set_sr(cpu_env, tcg_const_i32(val));
 +    }
++    set_cc_op(s, CC_OP_FLAGS);
++}
 +
-+    tcg_temp_free(addr);
-+
-+    if (((insn >> 3) & 2) == 0) {
-+        /* (Ay)+ */
-+        tcg_gen_addi_i32(reg, reg, 16);
++static void gen_set_sr(CPUM68KState *env, DisasContext *s, uint16_t insn,
++                       int ccr_only)
++{
++    if ((insn & 0x38) == 0) {
++        if (ccr_only) {
++            gen_helper_set_ccr(cpu_env, DREG(insn, 0));
++        } else {
++            gen_helper_set_sr(cpu_env, DREG(insn, 0));
++        }
++        set_cc_op(s, CC_OP_FLAGS);
++    } else if ((insn & 0x3f) == 0x3c) {
++        uint16_t val;
++        val = read_im16(env, s);
++        gen_set_sr_im(s, val, ccr_only);
++    } else {
++        disas_undef(env, s, insn);
 +    }
 +}
 +
- static TCGv gen_get_sr(DisasContext *s)
+ DISAS_INSN(arith_im)
+ {
+     int op;
+@@ -2474,16 +2529,6 @@ DISAS_INSN(clr)
+     tcg_temp_free(zero);
+ }
+ 
+-static TCGv gen_get_ccr(DisasContext *s)
+-{
+-    TCGv dest;
+-
+-    update_cc_op(s);
+-    dest = tcg_temp_new();
+-    gen_helper_get_ccr(dest, cpu_env);
+-    return dest;
+-}
+-
+ DISAS_INSN(move_from_ccr)
  {
      TCGv ccr;
-@@ -5578,6 +5648,8 @@ void register_m68k_insns (CPUM68KState *env)
-     INSN(fsave,     f300, ffc0, FPU);
-     INSN(intouch,   f340, ffc0, CF_ISA_A);
-     INSN(cpushl,    f428, ff38, CF_ISA_A);
-+    INSN(move16_mem, f600, ffe0, M68040);
-+    INSN(move16_reg, f620, fff8, M68040);
-     INSN(wddata,    fb00, ff00, CF_ISA_A);
-     INSN(wdebug,    fbc0, ffc0, CF_ISA_A);
- #undef INSN
+@@ -2510,40 +2555,6 @@ DISAS_INSN(neg)
+     tcg_temp_free(dest);
+ }
+ 
+-static void gen_set_sr_im(DisasContext *s, uint16_t val, int ccr_only)
+-{
+-    if (ccr_only) {
+-        tcg_gen_movi_i32(QREG_CC_C, val & CCF_C ? 1 : 0);
+-        tcg_gen_movi_i32(QREG_CC_V, val & CCF_V ? -1 : 0);
+-        tcg_gen_movi_i32(QREG_CC_Z, val & CCF_Z ? 0 : 1);
+-        tcg_gen_movi_i32(QREG_CC_N, val & CCF_N ? -1 : 0);
+-        tcg_gen_movi_i32(QREG_CC_X, val & CCF_X ? 1 : 0);
+-    } else {
+-        gen_helper_set_sr(cpu_env, tcg_const_i32(val));
+-    }
+-    set_cc_op(s, CC_OP_FLAGS);
+-}
+-
+-static void gen_set_sr(CPUM68KState *env, DisasContext *s, uint16_t insn,
+-                       int ccr_only)
+-{
+-    if ((insn & 0x38) == 0) {
+-        if (ccr_only) {
+-            gen_helper_set_ccr(cpu_env, DREG(insn, 0));
+-        } else {
+-            gen_helper_set_sr(cpu_env, DREG(insn, 0));
+-        }
+-        set_cc_op(s, CC_OP_FLAGS);
+-    } else if ((insn & 0x3f) == 0x3c) {
+-        uint16_t val;
+-        val = read_im16(env, s);
+-        gen_set_sr_im(s, val, ccr_only);
+-    } else {
+-        disas_undef(env, s, insn);
+-    }
+-}
+-
+-
+ DISAS_INSN(move_to_ccr)
+ {
+     gen_set_sr(env, s, insn, 1);
+@@ -4359,18 +4370,6 @@ DISAS_INSN(move16_mem)
+     }
+ }
+ 
+-static TCGv gen_get_sr(DisasContext *s)
+-{
+-    TCGv ccr;
+-    TCGv sr;
+-
+-    ccr = gen_get_ccr(s);
+-    sr = tcg_temp_new();
+-    tcg_gen_andi_i32(sr, QREG_SR, 0xffe0);
+-    tcg_gen_or_i32(sr, sr, ccr);
+-    return sr;
+-}
+-
+ DISAS_INSN(strldsr)
+ {
+     uint16_t ext;
 -- 
 2.14.3
