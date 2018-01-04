@@ -1,20 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55437)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37473)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1eX8be-0007cA-Od
-	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 11:43:08 -0500
+	(envelope-from <mst@redhat.com>) id 1eX8lq-0002Td-4g
+	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 11:53:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1eX8bc-0003ew-TO
-	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 11:43:02 -0500
-Received: from mout.kundenserver.de ([212.227.126.135]:53387)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1eX8bc-0003cO-Fh
-	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 11:43:00 -0500
-From: Laurent Vivier <laurent@vivier.eu>
-Date: Thu,  4 Jan 2018 17:42:49 +0100
-Message-Id: <20180104164251.26494-16-laurent@vivier.eu>
-In-Reply-To: <20180104164251.26494-1-laurent@vivier.eu>
-References: <20180104164251.26494-1-laurent@vivier.eu>
-Subject: [Qemu-devel] [PULL 15/17] target/m68k: add andi/ori/eori to SR/CCR
+	(envelope-from <mst@redhat.com>) id 1eX8lc-0004Bt-1o
+	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 11:53:34 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:35052)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1eX8lb-0004BD-Ro
+	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 11:53:19 -0500
+Date: Thu, 4 Jan 2018 18:53:07 +0200
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20180104184236-mutt-send-email-mst@kernel.org>
+References: <20171219162151.GA10889@stefanha-x1.localdomain>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20171219162151.GA10889@stefanha-x1.localdomain>
+Subject: Re: [Qemu-devel] vhost-user graceful connect/disconnect
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,115 +26,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Laurent Vivier <laurent@vivier.eu>
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Cc: qemu-devel@nongnu.org, mukawa@igel.co.jp, marcandre.lureau@redhat.com, Wei Wang <wei.w.wang@intel.com>, Maxime Coquelin <maxime.coquelin@redhat.com>, n.nikolaev@virtualopensystems.com
 
-Signed-off-by: Laurent Vivier <laurent@vivier.eu>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Message-Id: <20180104012913.30763-16-laurent@vivier.eu>
----
- target/m68k/translate.c | 53 ++++++++++++++++++++++++++++++++++++++++++-------
- 1 file changed, 46 insertions(+), 7 deletions(-)
+On Tue, Dec 19, 2017 at 04:21:51PM +0000, Stefan Hajnoczi wrote:
+> Hi,
+> Vhost-user implementations assume the slave is already running before
+> the master starts.  The slave is required during virtio device
+> initialization (e.g. feature bit negotiation) and so it is simplest to
+> assume that the master is already available and will respond immediately
+> to the VHOST_USER_GET_FEATURES message.
+> 
+> I have thought about how to let master and slave start in any order.
+> Some approaches involve changes to the VIRTIO specification so that
+> guest drivers can wait until the vhost-user connection is established.
+> 
+> We can avoid spec changes using PCI hotplug:
+> 
+> 1. Introduce a new vhost-user object that manages a connection:
+> 
+>    -chardev ...
+>    -object vhost-user,id=vhost-user0,chardev=chr0
+> 
+>    Note this object is *not* a NetClient.  It's a resource for managing
+>    a vhost-user connection and can be used with any device type (net,
+>    scsi, blk, etc).
+> 
+>    This object tries to establish a connection.  When a connection is
+>    established it sends vhost-user protocol messages to fetch
+>    information needed for virtio device initialization (like the number
+>    of virtqueues supported, features bits, etc).  This information is
+>    stashed so that vhost_*() calls later on do not require synchronous
+>    communication with the vhost-user slave.
 
-diff --git a/target/m68k/translate.c b/target/m68k/translate.c
-index 8f23cade04..499aaa2f3d 100644
---- a/target/m68k/translate.c
-+++ b/target/m68k/translate.c
-@@ -2201,6 +2201,7 @@ DISAS_INSN(arith_im)
-     TCGv dest;
-     TCGv addr;
-     int opsize;
-+    bool with_SR = ((insn & 0x3f) == 0x3c);
- 
-     op = (insn >> 9) & 7;
-     opsize = insn_opsize(insn);
-@@ -2217,32 +2218,73 @@ DISAS_INSN(arith_im)
-     default:
-        abort();
-     }
--    SRC_EA(env, src1, opsize, 1, (op == 6) ? NULL : &addr);
-+
-+    if (with_SR) {
-+        /* SR/CCR can only be used with andi/eori/ori */
-+        if (op == 2 || op == 3 || op == 6) {
-+            disas_undef(env, s, insn);
-+            return;
-+        }
-+        switch (opsize) {
-+        case OS_BYTE:
-+            src1 = gen_get_ccr(s);
-+            break;
-+        case OS_WORD:
-+            if (IS_USER(s)) {
-+                gen_exception(s, s->insn_pc, EXCP_PRIVILEGE);
-+                return;
-+            }
-+            src1 = gen_get_sr(s);
-+            break;
-+        case OS_LONG:
-+            disas_undef(env, s, insn);
-+            return;
-+        }
-+    } else {
-+        SRC_EA(env, src1, opsize, 1, (op == 6) ? NULL : &addr);
-+    }
-     dest = tcg_temp_new();
-     switch (op) {
-     case 0: /* ori */
-         tcg_gen_or_i32(dest, src1, im);
--        gen_logic_cc(s, dest, opsize);
-+        if (with_SR) {
-+            gen_set_sr(s, dest, opsize == OS_BYTE);
-+        } else {
-+            DEST_EA(env, insn, opsize, dest, &addr);
-+            gen_logic_cc(s, dest, opsize);
-+        }
-         break;
-     case 1: /* andi */
-         tcg_gen_and_i32(dest, src1, im);
--        gen_logic_cc(s, dest, opsize);
-+        if (with_SR) {
-+            gen_set_sr(s, dest, opsize == OS_BYTE);
-+        } else {
-+            DEST_EA(env, insn, opsize, dest, &addr);
-+            gen_logic_cc(s, dest, opsize);
-+        }
-         break;
-     case 2: /* subi */
-         tcg_gen_setcond_i32(TCG_COND_LTU, QREG_CC_X, src1, im);
-         tcg_gen_sub_i32(dest, src1, im);
-         gen_update_cc_add(dest, im, opsize);
-         set_cc_op(s, CC_OP_SUBB + opsize);
-+        DEST_EA(env, insn, opsize, dest, &addr);
-         break;
-     case 3: /* addi */
-         tcg_gen_add_i32(dest, src1, im);
-         gen_update_cc_add(dest, im, opsize);
-         tcg_gen_setcond_i32(TCG_COND_LTU, QREG_CC_X, dest, im);
-         set_cc_op(s, CC_OP_ADDB + opsize);
-+        DEST_EA(env, insn, opsize, dest, &addr);
-         break;
-     case 5: /* eori */
-         tcg_gen_xor_i32(dest, src1, im);
--        gen_logic_cc(s, dest, opsize);
-+        if (with_SR) {
-+            gen_set_sr(s, dest, opsize == OS_BYTE);
-+        } else {
-+            DEST_EA(env, insn, opsize, dest, &addr);
-+            gen_logic_cc(s, dest, opsize);
-+        }
-         break;
-     case 6: /* cmpi */
-         gen_update_cc_cmp(s, src1, im, opsize);
-@@ -2251,9 +2293,6 @@ DISAS_INSN(arith_im)
-         abort();
-     }
-     tcg_temp_free(im);
--    if (op != 6) {
--        DEST_EA(env, insn, opsize, dest, &addr);
--    }
-     tcg_temp_free(dest);
- }
- 
+I'm not sure how important or feasible this last part is.
+
+> 2. When the vhost-user connection is established the object emits a QMP
+>    event so management software can hotplug the virtio device:
+> 
+>    VHOST_USER_CONNECTED source=vhost-user0
+> 
+> 3. The management software hotplugs the virtio device:
+> 
+>    (qmp) netdev_add vhost-user,id=netdev0,vhost-user=vhost-user0
+>    (qmp) device_add virtio-net-pci,netdev=netdev0
+> 
+> Advantages of this approach:
+> 
+>  * Does not require spec changes.
+>  * Can be implemented without vhost-user.c qemu_chr_fe_read/write_all()
+>    calls that hang QEMU until the slave sends data.
+>  * Allows slave to set the number of queues, feature bits, etc via the
+>    vhost-user socket.  It is not necessary to manually specify feature
+>    bitmasks and other slave-specific information on the QEMU
+>    command-line.
+> 
+> I haven't thought through disconnection but I imagine the vhost-user
+> object would emit a VHOST_USER_DISCONNECTED event so the management
+> software can hot unplug the device.
+> 
+> Thoughts?
+> 
+> Stefan
+
+This sounds like an interesting set of ideas to me.
+Something to keep in mind for the future.
+
+Thanks!
+
 -- 
-2.14.3
+MST
