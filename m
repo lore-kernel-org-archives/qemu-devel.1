@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55429)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55395)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1eX8be-0007bo-Ef
-	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 11:43:09 -0500
+	(envelope-from <laurent@vivier.eu>) id 1eX8bd-0007bC-Ln
+	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 11:43:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1eX8ba-0003as-L2
-	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 11:43:02 -0500
-Received: from mout.kundenserver.de ([212.227.126.187]:56652)
+	(envelope-from <laurent@vivier.eu>) id 1eX8bZ-0003ZC-Oq
+	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 11:43:01 -0500
+Received: from mout.kundenserver.de ([212.227.126.130]:56582)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1eX8ba-0003YR-70
-	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 11:42:58 -0500
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1eX8bZ-0003Wm-CZ
+	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 11:42:57 -0500
 From: Laurent Vivier <laurent@vivier.eu>
-Date: Thu,  4 Jan 2018 17:42:43 +0100
-Message-Id: <20180104164251.26494-10-laurent@vivier.eu>
+Date: Thu,  4 Jan 2018 17:42:41 +0100
+Message-Id: <20180104164251.26494-8-laurent@vivier.eu>
 In-Reply-To: <20180104164251.26494-1-laurent@vivier.eu>
 References: <20180104164251.26494-1-laurent@vivier.eu>
-Subject: [Qemu-devel] [PULL 09/17] target/m68k: softmmu cleanup
+Subject: [Qemu-devel] [PULL 07/17] target/m68k: add chk and chk2
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,144 +26,253 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Laurent Vivier <laurent@vivier.eu>
 
-don't compile supervisor only instructions in linux-user mode
+chk and chk2 compare a value to boundaries, and
+trigger a CHK exception if the value is out of bounds.
 
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+Suggested-by: Richard Henderson <richard.henderson@linaro.org>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Message-Id: <20180104012913.30763-10-laurent@vivier.eu>
+Message-Id: <20180104012913.30763-8-laurent@vivier.eu>
 ---
- target/m68k/translate.c | 39 +++++++++++++++++++++++++++++++++------
- 1 file changed, 33 insertions(+), 6 deletions(-)
+ linux-user/main.c       |  7 +++++
+ target/m68k/cpu.c       |  2 ++
+ target/m68k/cpu.h       |  1 +
+ target/m68k/helper.h    |  3 ++
+ target/m68k/op_helper.c | 61 +++++++++++++++++++++++++++++++++++++++
+ target/m68k/translate.c | 77 ++++++++++++++++++++++++++++++++++++++++++++++++-
+ 6 files changed, 150 insertions(+), 1 deletion(-)
 
+diff --git a/linux-user/main.c b/linux-user/main.c
+index 71696ed33d..99a551b04f 100644
+--- a/linux-user/main.c
++++ b/linux-user/main.c
+@@ -2985,6 +2985,13 @@ void cpu_loop(CPUM68KState *env)
+             info._sifields._sigfault._addr = env->pc;
+             queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
+             break;
++        case EXCP_CHK:
++            info.si_signo = TARGET_SIGFPE;
++            info.si_errno = 0;
++            info.si_code = TARGET_FPE_INTOVF;
++            info._sifields._sigfault._addr = env->pc;
++            queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
++            break;
+         case EXCP_DIV0:
+             info.si_signo = TARGET_SIGFPE;
+             info.si_errno = 0;
+diff --git a/target/m68k/cpu.c b/target/m68k/cpu.c
+index 0a3dd83548..57ffcb2114 100644
+--- a/target/m68k/cpu.c
++++ b/target/m68k/cpu.c
+@@ -134,6 +134,7 @@ static void m68020_cpu_initfn(Object *obj)
+     m68k_set_feature(env, M68K_FEATURE_CAS);
+     m68k_set_feature(env, M68K_FEATURE_BKPT);
+     m68k_set_feature(env, M68K_FEATURE_RTD);
++    m68k_set_feature(env, M68K_FEATURE_CHK2);
+ }
+ #define m68030_cpu_initfn m68020_cpu_initfn
+ #define m68040_cpu_initfn m68020_cpu_initfn
+@@ -156,6 +157,7 @@ static void m68060_cpu_initfn(Object *obj)
+     m68k_set_feature(env, M68K_FEATURE_CAS);
+     m68k_set_feature(env, M68K_FEATURE_BKPT);
+     m68k_set_feature(env, M68K_FEATURE_RTD);
++    m68k_set_feature(env, M68K_FEATURE_CHK2);
+ }
+ 
+ static void m5208_cpu_initfn(Object *obj)
+diff --git a/target/m68k/cpu.h b/target/m68k/cpu.h
+index cd4b3a7c7b..68396bdd70 100644
+--- a/target/m68k/cpu.h
++++ b/target/m68k/cpu.h
+@@ -305,6 +305,7 @@ enum m68k_features {
+     M68K_FEATURE_CAS,
+     M68K_FEATURE_BKPT,
+     M68K_FEATURE_RTD,
++    M68K_FEATURE_CHK2,
+ };
+ 
+ static inline int m68k_feature(CPUM68KState *env, int feature)
+diff --git a/target/m68k/helper.h b/target/m68k/helper.h
+index eebe52dae5..78483da003 100644
+--- a/target/m68k/helper.h
++++ b/target/m68k/helper.h
+@@ -94,3 +94,6 @@ DEF_HELPER_FLAGS_4(bfchg_mem, TCG_CALL_NO_WG, i32, env, i32, s32, i32)
+ DEF_HELPER_FLAGS_4(bfclr_mem, TCG_CALL_NO_WG, i32, env, i32, s32, i32)
+ DEF_HELPER_FLAGS_4(bfset_mem, TCG_CALL_NO_WG, i32, env, i32, s32, i32)
+ DEF_HELPER_FLAGS_4(bfffo_mem, TCG_CALL_NO_WG, i64, env, i32, s32, i32)
++
++DEF_HELPER_3(chk, void, env, s32, s32)
++DEF_HELPER_4(chk2, void, env, s32, s32, s32)
+diff --git a/target/m68k/op_helper.c b/target/m68k/op_helper.c
+index 5c7b27b9ca..7e97d03f82 100644
+--- a/target/m68k/op_helper.c
++++ b/target/m68k/op_helper.c
+@@ -947,3 +947,64 @@ uint64_t HELPER(bfffo_mem)(CPUM68KState *env, uint32_t addr,
+        is already zero.  */
+     return n | ffo;
+ }
++
++void HELPER(chk)(CPUM68KState *env, int32_t val, int32_t ub)
++{
++    /* From the specs:
++     *   X: Not affected, C,V,Z: Undefined,
++     *   N: Set if val < 0; cleared if val > ub, undefined otherwise
++     * We implement here values found from a real MC68040:
++     *   X,V,Z: Not affected
++     *   N: Set if val < 0; cleared if val >= 0
++     *   C: if 0 <= ub: set if val < 0 or val > ub, cleared otherwise
++     *      if 0 > ub: set if val > ub and val < 0, cleared otherwise
++     */
++    env->cc_n = val;
++    env->cc_c = 0 <= ub ? val < 0 || val > ub : val > ub && val < 0;
++
++    if (val < 0 || val > ub) {
++        CPUState *cs = CPU(m68k_env_get_cpu(env));
++
++        /* Recover PC and CC_OP for the beginning of the insn.  */
++        cpu_restore_state(cs, GETPC());
++
++        /* flags have been modified by gen_flush_flags() */
++        env->cc_op = CC_OP_FLAGS;
++        /* Adjust PC to end of the insn.  */
++        env->pc += 2;
++
++        cs->exception_index = EXCP_CHK;
++        cpu_loop_exit(cs);
++    }
++}
++
++void HELPER(chk2)(CPUM68KState *env, int32_t val, int32_t lb, int32_t ub)
++{
++    /* From the specs:
++     *   X: Not affected, N,V: Undefined,
++     *   Z: Set if val is equal to lb or ub
++     *   C: Set if val < lb or val > ub, cleared otherwise
++     * We implement here values found from a real MC68040:
++     *   X,N,V: Not affected
++     *   Z: Set if val is equal to lb or ub
++     *   C: if lb <= ub: set if val < lb or val > ub, cleared otherwise
++     *      if lb > ub: set if val > ub and val < lb, cleared otherwise
++     */
++    env->cc_z = val != lb && val != ub;
++    env->cc_c = lb <= ub ? val < lb || val > ub : val > ub && val < lb;
++
++    if (env->cc_c) {
++        CPUState *cs = CPU(m68k_env_get_cpu(env));
++
++        /* Recover PC and CC_OP for the beginning of the insn.  */
++        cpu_restore_state(cs, GETPC());
++
++        /* flags have been modified by gen_flush_flags() */
++        env->cc_op = CC_OP_FLAGS;
++        /* Adjust PC to end of the insn.  */
++        env->pc += 4;
++
++        cs->exception_index = EXCP_CHK;
++        cpu_loop_exit(cs);
++    }
++}
 diff --git a/target/m68k/translate.c b/target/m68k/translate.c
-index 0ef933a545..f77005215f 100644
+index a1e424e3db..7f52065375 100644
 --- a/target/m68k/translate.c
 +++ b/target/m68k/translate.c
-@@ -4391,6 +4391,7 @@ DISAS_INSN(move_from_sr)
-     DEST_EA(env, insn, OS_WORD, sr, NULL);
+@@ -4203,6 +4203,80 @@ DISAS_INSN(ff1)
+     gen_helper_ff1(reg, reg);
  }
  
-+#if defined(CONFIG_SOFTMMU)
- DISAS_INSN(move_to_sr)
- {
-     if (IS_USER(s)) {
-@@ -4423,6 +4424,11 @@ DISAS_INSN(move_to_usp)
- 
- DISAS_INSN(halt)
- {
-+    if (IS_USER(s)) {
-+        gen_exception(s, s->insn_pc, EXCP_PRIVILEGE);
++DISAS_INSN(chk)
++{
++    TCGv src, reg;
++    int opsize;
++
++    switch ((insn >> 7) & 3) {
++    case 3:
++        opsize = OS_WORD;
++        break;
++    case 2:
++        if (m68k_feature(env, M68K_FEATURE_CHK2)) {
++            opsize = OS_LONG;
++            break;
++        }
++        /* fallthru */
++    default:
++        gen_exception(s, s->insn_pc, EXCP_ILLEGAL);
++        return;
++    }
++    SRC_EA(env, src, opsize, 1, NULL);
++    reg = gen_extend(DREG(insn, 9), opsize, 1);
++
++    gen_flush_flags(s);
++    gen_helper_chk(cpu_env, reg, src);
++}
++
++DISAS_INSN(chk2)
++{
++    uint16_t ext;
++    TCGv addr1, addr2, bound1, bound2, reg;
++    int opsize;
++
++    switch ((insn >> 9) & 3) {
++    case 0:
++        opsize = OS_BYTE;
++        break;
++    case 1:
++        opsize = OS_WORD;
++        break;
++    case 2:
++        opsize = OS_LONG;
++        break;
++    default:
++        gen_exception(s, s->insn_pc, EXCP_ILLEGAL);
 +        return;
 +    }
 +
-     gen_exception(s, s->pc, EXCP_HALT_INSN);
- }
- 
-@@ -4506,6 +4512,7 @@ DISAS_INSN(wdebug)
-     /* TODO: Implement wdebug.  */
-     cpu_abort(CPU(cpu), "WDEBUG not implemented");
- }
-+#endif
- 
- DISAS_INSN(trap)
- {
-@@ -5063,10 +5070,16 @@ DISAS_INSN(fscc)
-     tcg_temp_free(tmp);
- }
- 
-+#if defined(CONFIG_SOFTMMU)
- DISAS_INSN(frestore)
- {
-     M68kCPU *cpu = m68k_env_get_cpu(env);
- 
-+    if (IS_USER(s)) {
-+        gen_exception(s, s->insn_pc, EXCP_PRIVILEGE);
++    ext = read_im16(env, s);
++    if ((ext & 0x0800) == 0) {
++        gen_exception(s, s->insn_pc, EXCP_ILLEGAL);
 +        return;
 +    }
 +
-     /* TODO: Implement frestore.  */
-     cpu_abort(CPU(cpu), "FRESTORE not implemented");
- }
-@@ -5075,9 +5088,15 @@ DISAS_INSN(fsave)
- {
-     M68kCPU *cpu = m68k_env_get_cpu(env);
- 
-+    if (IS_USER(s)) {
-+        gen_exception(s, s->insn_pc, EXCP_PRIVILEGE);
-+        return;
++    addr1 = gen_lea(env, s, insn, OS_UNSIZED);
++    addr2 = tcg_temp_new();
++    tcg_gen_addi_i32(addr2, addr1, opsize_bytes(opsize));
++
++    bound1 = gen_load(s, opsize, addr1, 1);
++    tcg_temp_free(addr1);
++    bound2 = gen_load(s, opsize, addr2, 1);
++    tcg_temp_free(addr2);
++
++    reg = tcg_temp_new();
++    if (ext & 0x8000) {
++        tcg_gen_mov_i32(reg, AREG(ext, 12));
++    } else {
++        gen_ext(reg, DREG(ext, 12), opsize, 1);
 +    }
 +
-     /* TODO: Implement fsave.  */
-     cpu_abort(CPU(cpu), "FSAVE not implemented");
- }
-+#endif
- 
- static inline TCGv gen_mac_extract_word(DisasContext *s, TCGv val, int upper)
++    gen_flush_flags(s);
++    gen_helper_chk2(cpu_env, reg, bound1, bound2);
++    tcg_temp_free(reg);
++}
++
+ static TCGv gen_get_sr(DisasContext *s)
  {
-@@ -5502,7 +5521,9 @@ void register_m68k_insns (CPUM68KState *env)
-     INSN(not,       4680, fff8, CF_ISA_A);
-     INSN(not,       4600, ff00, M68000);
-     INSN(undef,     46c0, ffc0, M68000);
-+#if defined(CONFIG_SOFTMMU)
-     INSN(move_to_sr, 46c0, ffc0, CF_ISA_A);
-+#endif
-     INSN(nbcd,      4800, ffc0, M68000);
-     INSN(linkl,     4808, fff8, M68000);
-     BASE(pea,       4840, ffc0);
-@@ -5517,7 +5538,9 @@ void register_m68k_insns (CPUM68KState *env)
-     BASE(tst,       4a00, ff00);
-     INSN(tas,       4ac0, ffc0, CF_ISA_B);
-     INSN(tas,       4ac0, ffc0, M68000);
-+#if defined(CONFIG_SOFTMMU)
-     INSN(halt,      4ac8, ffff, CF_ISA_A);
-+#endif
-     INSN(pulse,     4acc, ffff, CF_ISA_A);
-     BASE(illegal,   4afc, ffff);
-     INSN(mull,      4c00, ffc0, CF_ISA_A);
-@@ -5528,14 +5551,16 @@ void register_m68k_insns (CPUM68KState *env)
-     BASE(trap,      4e40, fff0);
-     BASE(link,      4e50, fff8);
-     BASE(unlk,      4e58, fff8);
-+#if defined(CONFIG_SOFTMMU)
-     INSN(move_to_usp, 4e60, fff8, USP);
-     INSN(move_from_usp, 4e68, fff8, USP);
--    BASE(nop,       4e71, ffff);
-     BASE(stop,      4e72, ffff);
-     BASE(rte,       4e73, ffff);
-+    INSN(movec,     4e7b, ffff, CF_ISA_A);
-+#endif
-+    BASE(nop,       4e71, ffff);
-     INSN(rtd,       4e74, ffff, RTD);
-     BASE(rts,       4e75, ffff);
--    INSN(movec,     4e7b, ffff, CF_ISA_A);
-     BASE(jump,      4e80, ffc0);
-     BASE(jump,      4ec0, ffc0);
-     INSN(addsubq,   5000, f080, M68000);
-@@ -5639,19 +5664,21 @@ void register_m68k_insns (CPUM68KState *env)
-     BASE(undef_fpu, f000, f000);
-     INSN(fpu,       f200, ffc0, CF_FPU);
-     INSN(fbcc,      f280, ffc0, CF_FPU);
--    INSN(frestore,  f340, ffc0, CF_FPU);
--    INSN(fsave,     f300, ffc0, CF_FPU);
-     INSN(fpu,       f200, ffc0, FPU);
-     INSN(fscc,      f240, ffc0, FPU);
-     INSN(fbcc,      f280, ff80, FPU);
-+#if defined(CONFIG_SOFTMMU)
-+    INSN(frestore,  f340, ffc0, CF_FPU);
-+    INSN(fsave,     f300, ffc0, CF_FPU);
-     INSN(frestore,  f340, ffc0, FPU);
-     INSN(fsave,     f300, ffc0, FPU);
-     INSN(intouch,   f340, ffc0, CF_ISA_A);
-     INSN(cpushl,    f428, ff38, CF_ISA_A);
--    INSN(move16_mem, f600, ffe0, M68040);
--    INSN(move16_reg, f620, fff8, M68040);
-     INSN(wddata,    fb00, ff00, CF_ISA_A);
-     INSN(wdebug,    fbc0, ffc0, CF_ISA_A);
-+#endif
-+    INSN(move16_mem, f600, ffe0, M68040);
-+    INSN(move16_reg, f620, fff8, M68040);
- #undef INSN
- }
- 
+     TCGv ccr;
+@@ -5306,7 +5380,7 @@ void register_m68k_insns (CPUM68KState *env)
+     BASE(undef,     0000, 0000);
+     INSN(arith_im,  0080, fff8, CF_ISA_A);
+     INSN(arith_im,  0000, ff00, M68000);
+-    INSN(undef,     00c0, ffc0, M68000);
++    INSN(chk2,      00c0, f9c0, CHK2);
+     INSN(bitrev,    00c0, fff8, CF_ISA_APLUSC);
+     BASE(bitop_reg, 0100, f1c0);
+     BASE(bitop_reg, 0140, f1c0);
+@@ -5339,6 +5413,7 @@ void register_m68k_insns (CPUM68KState *env)
+     BASE(move,      1000, f000);
+     BASE(move,      2000, f000);
+     BASE(move,      3000, f000);
++    INSN(chk,       4000, f040, M68000);
+     INSN(strldsr,   40e7, ffff, CF_ISA_APLUSC);
+     INSN(negx,      4080, fff8, CF_ISA_A);
+     INSN(negx,      4000, ff00, M68000);
 -- 
 2.14.3
