@@ -1,21 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58474)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38420)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1eWuLX-0000vg-AG
-	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 20:29:30 -0500
+	(envelope-from <no-reply@patchew.org>) id 1eWuXf-0001q5-CB
+	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 20:42:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1eWuLW-0007Ea-9r
-	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 20:29:27 -0500
-Received: from mout.kundenserver.de ([217.72.192.73]:59349)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1eWuLV-0007D7-VP
-	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 20:29:26 -0500
-From: Laurent Vivier <laurent@vivier.eu>
-Date: Thu,  4 Jan 2018 02:29:11 +0100
-Message-Id: <20180104012913.30763-16-laurent@vivier.eu>
-In-Reply-To: <20180104012913.30763-1-laurent@vivier.eu>
-References: <20180104012913.30763-1-laurent@vivier.eu>
-Subject: [Qemu-devel] [PATCH v7 15/17] target/m68k: add andi/ori/eori to
- SR/CCR
+	(envelope-from <no-reply@patchew.org>) id 1eWuXc-0005sd-63
+	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 20:41:59 -0500
+Resent-Message-Id: <E1eWuXc-0005sd-63@eggs.gnu.org>
+Received: from sender-of-o52.zoho.com ([135.84.80.217]:21343)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1eWuXb-0005rI-Vd
+	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 20:41:56 -0500
+In-Reply-To: <1515029086-4206-1-git-send-email-changpeng.liu@intel.com>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <151503008576.249.16610856768419621606@5adcb62bf0d6>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Wed, 3 Jan 2018 17:41:27 -0800 (PST)
+Subject: Re: [Qemu-devel] [PATCH v9 0/4] Introduce a new vhost-user-blk host
+ device to QEMU
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,114 +29,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Richard Henderson <richard.henderson@linaro.org>, Thomas Huth <huth@tuxfamily.org>, Laurent Vivier <laurent@vivier.eu>
+To: changpeng.liu@intel.com
+Cc: famz@redhat.com, qemu-devel@nongnu.org, james.r.harris@intel.com, mst@redhat.com, stefanha@gmail.com, pbonzini@redhat.com, felipe@nutanix.com, marcandre.lureau@redhat.com
 
-Signed-off-by: Laurent Vivier <laurent@vivier.eu>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
----
- target/m68k/translate.c | 53 ++++++++++++++++++++++++++++++++++++++++++-------
- 1 file changed, 46 insertions(+), 7 deletions(-)
-
-diff --git a/target/m68k/translate.c b/target/m68k/translate.c
-index 8f23cade04..499aaa2f3d 100644
---- a/target/m68k/translate.c
-+++ b/target/m68k/translate.c
-@@ -2201,6 +2201,7 @@ DISAS_INSN(arith_im)
-     TCGv dest;
-     TCGv addr;
-     int opsize;
-+    bool with_SR = ((insn & 0x3f) == 0x3c);
- 
-     op = (insn >> 9) & 7;
-     opsize = insn_opsize(insn);
-@@ -2217,32 +2218,73 @@ DISAS_INSN(arith_im)
-     default:
-        abort();
-     }
--    SRC_EA(env, src1, opsize, 1, (op == 6) ? NULL : &addr);
-+
-+    if (with_SR) {
-+        /* SR/CCR can only be used with andi/eori/ori */
-+        if (op == 2 || op == 3 || op == 6) {
-+            disas_undef(env, s, insn);
-+            return;
-+        }
-+        switch (opsize) {
-+        case OS_BYTE:
-+            src1 = gen_get_ccr(s);
-+            break;
-+        case OS_WORD:
-+            if (IS_USER(s)) {
-+                gen_exception(s, s->insn_pc, EXCP_PRIVILEGE);
-+                return;
-+            }
-+            src1 = gen_get_sr(s);
-+            break;
-+        case OS_LONG:
-+            disas_undef(env, s, insn);
-+            return;
-+        }
-+    } else {
-+        SRC_EA(env, src1, opsize, 1, (op == 6) ? NULL : &addr);
-+    }
-     dest = tcg_temp_new();
-     switch (op) {
-     case 0: /* ori */
-         tcg_gen_or_i32(dest, src1, im);
--        gen_logic_cc(s, dest, opsize);
-+        if (with_SR) {
-+            gen_set_sr(s, dest, opsize == OS_BYTE);
-+        } else {
-+            DEST_EA(env, insn, opsize, dest, &addr);
-+            gen_logic_cc(s, dest, opsize);
-+        }
-         break;
-     case 1: /* andi */
-         tcg_gen_and_i32(dest, src1, im);
--        gen_logic_cc(s, dest, opsize);
-+        if (with_SR) {
-+            gen_set_sr(s, dest, opsize == OS_BYTE);
-+        } else {
-+            DEST_EA(env, insn, opsize, dest, &addr);
-+            gen_logic_cc(s, dest, opsize);
-+        }
-         break;
-     case 2: /* subi */
-         tcg_gen_setcond_i32(TCG_COND_LTU, QREG_CC_X, src1, im);
-         tcg_gen_sub_i32(dest, src1, im);
-         gen_update_cc_add(dest, im, opsize);
-         set_cc_op(s, CC_OP_SUBB + opsize);
-+        DEST_EA(env, insn, opsize, dest, &addr);
-         break;
-     case 3: /* addi */
-         tcg_gen_add_i32(dest, src1, im);
-         gen_update_cc_add(dest, im, opsize);
-         tcg_gen_setcond_i32(TCG_COND_LTU, QREG_CC_X, dest, im);
-         set_cc_op(s, CC_OP_ADDB + opsize);
-+        DEST_EA(env, insn, opsize, dest, &addr);
-         break;
-     case 5: /* eori */
-         tcg_gen_xor_i32(dest, src1, im);
--        gen_logic_cc(s, dest, opsize);
-+        if (with_SR) {
-+            gen_set_sr(s, dest, opsize == OS_BYTE);
-+        } else {
-+            DEST_EA(env, insn, opsize, dest, &addr);
-+            gen_logic_cc(s, dest, opsize);
-+        }
-         break;
-     case 6: /* cmpi */
-         gen_update_cc_cmp(s, src1, im, opsize);
-@@ -2251,9 +2293,6 @@ DISAS_INSN(arith_im)
-         abort();
-     }
-     tcg_temp_free(im);
--    if (op != 6) {
--        DEST_EA(env, insn, opsize, dest, &addr);
--    }
-     tcg_temp_free(dest);
- }
- 
--- 
-2.14.3
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IDE1MTUwMjkwODYtNDIwNi0xLWdpdC1zZW5kLWVtYWlsLWNoYW5ncGVuZy5saXVA
+aW50ZWwuY29tClN1YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0ggdjkgMC80XSBJbnRyb2R1Y2Ug
+YSBuZXcgdmhvc3QtdXNlci1ibGsgaG9zdCBkZXZpY2UgdG8gUUVNVQoKPT09IFRFU1QgU0NSSVBU
+IEJFR0lOID09PQojIS9iaW4vYmFzaAoKQkFTRT1iYXNlCm49MQp0b3RhbD0kKGdpdCBsb2cgLS1v
+bmVsaW5lICRCQVNFLi4gfCB3YyAtbCkKZmFpbGVkPTAKCmdpdCBjb25maWcgLS1sb2NhbCBkaWZm
+LnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCgpjb21t
+aXRzPSIkKGdpdCBsb2cgLS1mb3JtYXQ9JUggLS1yZXZlcnNlICRCQVNFLi4pIgpmb3IgYyBpbiAk
+Y29tbWl0czsgZG8KICAgIGVjaG8gIkNoZWNraW5nIFBBVENIICRuLyR0b3RhbDogJChnaXQgbG9n
+IC1uIDEgLS1mb3JtYXQ9JXMgJGMpLi4uIgogICAgaWYgISBnaXQgc2hvdyAkYyAtLWZvcm1hdD1l
+bWFpbCB8IC4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgLTsgdGhlbgogICAgICAg
+IGZhaWxlZD0xCiAgICAgICAgZWNobwogICAgZmkKICAgIG49JCgobisxKSkKZG9uZQoKZXhpdCAk
+ZmFpbGVkCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4
+MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0ClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcK
+MmRhY2ZhOWE1YyBjb250cmliL3Zob3N0LXVzZXItYmxrOiBpbnRyb2R1Y2UgYSB2aG9zdC11c2Vy
+LWJsayBzYW1wbGUgYXBwbGljYXRpb24KZjBhZmRjZTUwZSBjb250cmliL2xpYnZob3N0LXVzZXI6
+IGVuYWJsZSB2aXJ0aW8gY29uZmlnIHNwYWNlIG1lc3NhZ2VzCjkwNjc0ZDkxOTcgdmhvc3QtdXNl
+ci1ibGs6IGludHJvZHVjZSBhIG5ldyB2aG9zdC11c2VyLWJsayBob3N0IGRldmljZQo3NTQwODZj
+MjAwIHZob3N0LXVzZXI6IGFkZCBuZXcgdmhvc3QgdXNlciBtZXNzYWdlcyB0byBzdXBwb3J0IHZp
+cnRpbyBjb25maWcgc3BhY2UKCj09PSBPVVRQVVQgQkVHSU4gPT09CkNoZWNraW5nIFBBVENIIDEv
+NDogdmhvc3QtdXNlcjogYWRkIG5ldyB2aG9zdCB1c2VyIG1lc3NhZ2VzIHRvIHN1cHBvcnQgdmly
+dGlvIGNvbmZpZyBzcGFjZS4uLgpDaGVja2luZyBQQVRDSCAyLzQ6IHZob3N0LXVzZXItYmxrOiBp
+bnRyb2R1Y2UgYSBuZXcgdmhvc3QtdXNlci1ibGsgaG9zdCBkZXZpY2UuLi4KQ2hlY2tpbmcgUEFU
+Q0ggMy80OiBjb250cmliL2xpYnZob3N0LXVzZXI6IGVuYWJsZSB2aXJ0aW8gY29uZmlnIHNwYWNl
+IG1lc3NhZ2VzLi4uCkNoZWNraW5nIFBBVENIIDQvNDogY29udHJpYi92aG9zdC11c2VyLWJsazog
+aW50cm9kdWNlIGEgdmhvc3QtdXNlci1ibGsgc2FtcGxlIGFwcGxpY2F0aW9uLi4uCkVSUk9SOiBz
+cGFjZSByZXF1aXJlZCBhZnRlciB0aGF0ICcsJyAoY3R4OlZ4VikKIzI2ODogRklMRTogY29udHJp
+Yi92aG9zdC11c2VyLWJsay92aG9zdC11c2VyLWJsay5jOjE5MToKKyAgICByZXEgPSBnX25ldzAo
+VnViUmVxLDEpOwogICAgICAgICAgICAgICAgICAgICAgICBeCgpXQVJOSU5HOiBhcmNoaXRlY3R1
+cmUgc3BlY2lmaWMgZGVmaW5lcyBzaG91bGQgYmUgYXZvaWRlZAojNTEyOiBGSUxFOiBjb250cmli
+L3Zob3N0LXVzZXItYmxrL3Zob3N0LXVzZXItYmxrLmM6NDM1OgorI2lmIGRlZmluZWQoX19saW51
+eF9fKSAmJiBkZWZpbmVkKEJMS1NTWkdFVCkKCnRvdGFsOiAxIGVycm9ycywgMSB3YXJuaW5ncywg
+NTc1IGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2Ug
+cmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9y
+dCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4K
+Cj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgot
+LS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNo
+ZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEBmcmVl
+bGlzdHMub3Jn
