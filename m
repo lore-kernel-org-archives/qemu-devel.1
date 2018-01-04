@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58306)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58329)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1eWuLR-0000p6-IA
-	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 20:29:23 -0500
+	(envelope-from <laurent@vivier.eu>) id 1eWuLS-0000pb-CB
+	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 20:29:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1eWuLO-00072x-AQ
-	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 20:29:21 -0500
-Received: from mout.kundenserver.de ([217.72.192.73]:55118)
+	(envelope-from <laurent@vivier.eu>) id 1eWuLQ-00077l-Sj
+	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 20:29:22 -0500
+Received: from mout.kundenserver.de ([212.227.17.10]:61974)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1eWuLN-0006zj-VZ
-	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 20:29:18 -0500
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1eWuLQ-00076X-HS
+	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 20:29:20 -0500
 From: Laurent Vivier <laurent@vivier.eu>
-Date: Thu,  4 Jan 2018 02:28:56 +0100
-Message-Id: <20180104012913.30763-1-laurent@vivier.eu>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v7 00/17] target/m68k: supervisor mode (part 1)
+Date: Thu,  4 Jan 2018 02:29:02 +0100
+Message-Id: <20180104012913.30763-7-laurent@vivier.eu>
+In-Reply-To: <20180104012913.30763-1-laurent@vivier.eu>
+References: <20180104012913.30763-1-laurent@vivier.eu>
+Subject: [Qemu-devel] [PATCH v7 06/17] target/m68k: manage 680x0 stack frames
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,101 +26,263 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Richard Henderson <richard.henderson@linaro.org>, Thomas Huth <huth@tuxfamily.org>, Laurent Vivier <laurent@vivier.eu>
 
-This series is the first series that will allow
-to introduce supervisor mode and execute
-privileged instructions.
+680x0 manages several stack frame formats:
+  - format 0: four-word stack frame
+  - format 1: four-word throwaway stack frame
+  - format 2: six-word stack frame
+  - format 3: Floating-Point post-instruction stack frame
+  - format 4: eight-word stack frame
+  - format 7: access-error stack frame
 
-Some of these patches are only cleanup:
+Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+---
 
-  sync CC_OP before gen_jmp_tb()
-  fix gen_get_ccr()
-  softmmu cleanup
-  add CPU_LOG_INT trace
-  use insn_pc to generate instruction fault address
-  move CCR/SR functions
-  fix m68k_cpu_dump_state()
+Notes:
+    v6: update SR with the content of CCR in the logs
+        introduce cpu_m68k_set_sr() to set SR instead
+        of calling helper_set_sr().
 
-We also fix a problem with linux-user mode,
-where the State Register is not updated with
-the CCR value (found while testing "chk/chk2"
-using signal()):
+ target/m68k/cpu.h       |   1 +
+ target/m68k/helper.c    |  10 ++-
+ target/m68k/op_helper.c | 160 ++++++++++++++++++++++++++++++++++++++++++++++--
+ 3 files changed, 164 insertions(+), 7 deletions(-)
 
-  correctly manage SR in context
-
-We introduce some new non privileged instructions:
-
-  add chk and chk2
-  add move16
-
-move16 is used by the kernel when it is compiled only for
-68040 (it's a 68040 only instruction).
-
-We add some trivial privileged instructions (most are empty):
-
-  add cpush/cinv
-  add reset
-  implement fsave/frestore
-
-And finally, we add the privileged instructions to
-modify the state register, the Interrupt Stack
-Pointer and the 680x0 stack frame formats:
-
-  add 680x0 "move to SR" instruction
-  add andi/ori/eori to SR/CCR
-  add the Interrupt Stack Pointer
-  manage 680x0 stack frames
-
-The next series will introduce the MC68040 MMU.
-
-v7: chk: always update C and N flags
-    chk,chk2: add some comments
-    chk,chk2: move flush_flags() from the helper to the
-    code generator, because otherwise we need
-    to do an update_cc_op() before calling the
-    helper to be sure env->cc_op and s->cc_op
-    are synchronized
-
-v6: introduce cpu_m68k_set_sr() to set SR instead
-    of calling helper_set_sr().
-    update SR with the content of CCR in the logs
-    use helpers as suggested by Richard for chk/chk2
-    split move16 in two functions
-    use cpu_m68k_set_sr() to set SR in GDB stub and in m68k_cpu_reset()
-
-v5: it is in fact v1, there is no previous version.
-    I've messed up with git-publish on an older branch without checking the
-    subject prefix. Sorry...
-
-Laurent Vivier (17):
-  target-m68k: sync CC_OP before gen_jmp_tb()
-  target/m68k: fix gen_get_ccr()
-  linux-user,m68k: correctly manage SR in context
-  target/m68k: use insn_pc to generate instruction fault address
-  target/m68k: add CPU_LOG_INT trace
-  target/m68k: manage 680x0 stack frames
-  target/m68k: add chk and chk2
-  target/m68k: add move16
-  target/m68k: softmmu cleanup
-  target/m68k: add cpush/cinv
-  target/m68k: add reset
-  target/m68k: implement fsave/frestore
-  target/m68k: move CCR/SR functions
-  target/m68k: add 680x0 "move to SR" instruction
-  target/m68k: add andi/ori/eori to SR/CCR
-  target/m68k: add the Interrupt Stack Pointer
-  target/m68k: fix m68k_cpu_dump_state()
-
- linux-user/main.c       |   7 +
- linux-user/signal.c     |   7 +-
- target/m68k/cpu.c       |  20 +-
- target/m68k/cpu.h       |  84 +++++++-
- target/m68k/gdbstub.c   |   2 +-
- target/m68k/helper.c    |  99 +++++++++-
- target/m68k/helper.h    |  11 +-
- target/m68k/monitor.c   |   1 +
- target/m68k/op_helper.c | 338 +++++++++++++++++++++++++++++++-
- target/m68k/translate.c | 497 ++++++++++++++++++++++++++++++++++++++----------
- 10 files changed, 937 insertions(+), 129 deletions(-)
-
+diff --git a/target/m68k/cpu.h b/target/m68k/cpu.h
+index acc2629216..cd4b3a7c7b 100644
+--- a/target/m68k/cpu.h
++++ b/target/m68k/cpu.h
+@@ -178,6 +178,7 @@ int cpu_m68k_signal_handler(int host_signum, void *pinfo,
+                            void *puc);
+ uint32_t cpu_m68k_get_ccr(CPUM68KState *env);
+ void cpu_m68k_set_ccr(CPUM68KState *env, uint32_t);
++void cpu_m68k_set_sr(CPUM68KState *env, uint32_t);
+ void cpu_m68k_set_fpcr(CPUM68KState *env, uint32_t val);
+ 
+ 
+diff --git a/target/m68k/helper.c b/target/m68k/helper.c
+index 7e50ff5871..af57ffcea9 100644
+--- a/target/m68k/helper.c
++++ b/target/m68k/helper.c
+@@ -316,13 +316,17 @@ uint32_t HELPER(sats)(uint32_t val, uint32_t v)
+     return val;
+ }
+ 
+-void HELPER(set_sr)(CPUM68KState *env, uint32_t val)
++void cpu_m68k_set_sr(CPUM68KState *env, uint32_t sr)
+ {
+-    env->sr = val & 0xffe0;
+-    cpu_m68k_set_ccr(env, val);
++    env->sr = sr & 0xffe0;
++    cpu_m68k_set_ccr(env, sr);
+     m68k_switch_sp(env);
+ }
+ 
++void HELPER(set_sr)(CPUM68KState *env, uint32_t val)
++{
++    cpu_m68k_set_sr(env, val);
++}
+ 
+ /* MAC unit.  */
+ /* FIXME: The MAC unit implementation is a bit of a mess.  Some helpers
+diff --git a/target/m68k/op_helper.c b/target/m68k/op_helper.c
+index 123981af55..5c7b27b9ca 100644
+--- a/target/m68k/op_helper.c
++++ b/target/m68k/op_helper.c
+@@ -54,7 +54,7 @@ void tlb_fill(CPUState *cs, target_ulong addr, MMUAccessType access_type,
+     }
+ }
+ 
+-static void do_rte(CPUM68KState *env)
++static void cf_rte(CPUM68KState *env)
+ {
+     uint32_t sp;
+     uint32_t fmt;
+@@ -65,7 +65,46 @@ static void do_rte(CPUM68KState *env)
+     sp |= (fmt >> 28) & 3;
+     env->aregs[7] = sp + 8;
+ 
+-    helper_set_sr(env, fmt);
++    cpu_m68k_set_sr(env, fmt);
++}
++
++static void m68k_rte(CPUM68KState *env)
++{
++    uint32_t sp;
++    uint16_t fmt;
++    uint16_t sr;
++
++    sp = env->aregs[7];
++throwaway:
++    sr = cpu_lduw_kernel(env, sp);
++    sp += 2;
++    env->pc = cpu_ldl_kernel(env, sp);
++    sp += 4;
++    if (m68k_feature(env, M68K_FEATURE_QUAD_MULDIV)) {
++        /*  all except 68000 */
++        fmt = cpu_lduw_kernel(env, sp);
++        sp += 2;
++        switch (fmt >> 12) {
++        case 0:
++            break;
++        case 1:
++            env->aregs[7] = sp;
++            cpu_m68k_set_sr(env, sr);
++            goto throwaway;
++        case 2:
++        case 3:
++            sp += 4;
++            break;
++        case 4:
++            sp += 8;
++            break;
++        case 7:
++            sp += 52;
++            break;
++        }
++    }
++    env->aregs[7] = sp;
++    cpu_m68k_set_sr(env, sr);
+ }
+ 
+ static const char *m68k_exception_name(int index)
+@@ -173,7 +212,7 @@ static const char *m68k_exception_name(int index)
+     return "Unassigned";
+ }
+ 
+-static void do_interrupt_all(CPUM68KState *env, int is_hw)
++static void cf_interrupt_all(CPUM68KState *env, int is_hw)
+ {
+     CPUState *cs = CPU(m68k_env_get_cpu(env));
+     uint32_t sp;
+@@ -189,7 +228,7 @@ static void do_interrupt_all(CPUM68KState *env, int is_hw)
+         switch (cs->exception_index) {
+         case EXCP_RTE:
+             /* Return from an exception.  */
+-            do_rte(env);
++            cf_rte(env);
+             return;
+         case EXCP_HALT_INSN:
+             if (semihosting_enabled()
+@@ -247,6 +286,119 @@ static void do_interrupt_all(CPUM68KState *env, int is_hw)
+     env->pc = cpu_ldl_kernel(env, env->vbr + vector);
+ }
+ 
++static inline void do_stack_frame(CPUM68KState *env, uint32_t *sp,
++                                  uint16_t format, uint16_t sr,
++                                  uint32_t addr, uint32_t retaddr)
++{
++    CPUState *cs = CPU(m68k_env_get_cpu(env));
++    switch (format) {
++    case 4:
++        *sp -= 4;
++        cpu_stl_kernel(env, *sp, env->pc);
++        *sp -= 4;
++        cpu_stl_kernel(env, *sp, addr);
++        break;
++    case 3:
++    case 2:
++        *sp -= 4;
++        cpu_stl_kernel(env, *sp, addr);
++        break;
++    }
++    *sp -= 2;
++    cpu_stw_kernel(env, *sp, (format << 12) + (cs->exception_index << 2));
++    *sp -= 4;
++    cpu_stl_kernel(env, *sp, retaddr);
++    *sp -= 2;
++    cpu_stw_kernel(env, *sp, sr);
++}
++
++static void m68k_interrupt_all(CPUM68KState *env, int is_hw)
++{
++    CPUState *cs = CPU(m68k_env_get_cpu(env));
++    uint32_t sp;
++    uint32_t retaddr;
++    uint32_t vector;
++    uint16_t sr, oldsr;
++
++    retaddr = env->pc;
++
++    if (!is_hw) {
++        switch (cs->exception_index) {
++        case EXCP_RTE:
++            /* Return from an exception.  */
++            m68k_rte(env);
++            return;
++        case EXCP_TRAP0 ...  EXCP_TRAP15:
++            /* Move the PC after the trap instruction.  */
++            retaddr += 2;
++            break;
++        }
++    }
++
++    vector = cs->exception_index << 2;
++
++    sr = env->sr | cpu_m68k_get_ccr(env);
++    if (qemu_loglevel_mask(CPU_LOG_INT)) {
++        static int count;
++        qemu_log("INT %6d: %s(%#x) pc=%08x sp=%08x sr=%04x\n",
++                 ++count, m68k_exception_name(cs->exception_index),
++                 vector, env->pc, env->aregs[7], sr);
++    }
++
++    /*
++     * MC68040UM/AD,  chapter 9.3.10
++     */
++
++    /* "the processor first make an internal copy" */
++    oldsr = sr;
++    /* "set the mode to supervisor" */
++    sr |= SR_S;
++    /* "suppress tracing" */
++    sr &= ~SR_T;
++    /* "sets the processor interrupt mask" */
++    if (is_hw) {
++        sr |= (env->sr & ~SR_I) | (env->pending_level << SR_I_SHIFT);
++    }
++    cpu_m68k_set_sr(env, sr);
++    sp = env->aregs[7];
++
++    sp &= ~1;
++    if (cs->exception_index == EXCP_ADDRESS) {
++        do_stack_frame(env, &sp, 2, oldsr, 0, retaddr);
++    } else if (cs->exception_index == EXCP_ILLEGAL ||
++               cs->exception_index == EXCP_DIV0 ||
++               cs->exception_index == EXCP_CHK ||
++               cs->exception_index == EXCP_TRAPCC ||
++               cs->exception_index == EXCP_TRACE) {
++        /* FIXME: addr is not only env->pc */
++        do_stack_frame(env, &sp, 2, oldsr, env->pc, retaddr);
++    } else if (is_hw && oldsr & SR_M &&
++               cs->exception_index >= EXCP_SPURIOUS &&
++               cs->exception_index <= EXCP_INT_LEVEL_7) {
++        do_stack_frame(env, &sp, 0, oldsr, 0, retaddr);
++        oldsr = sr;
++        env->aregs[7] = sp;
++        cpu_m68k_set_sr(env, sr &= ~SR_M);
++        sp = env->aregs[7] & ~1;
++        do_stack_frame(env, &sp, 1, oldsr, 0, retaddr);
++    } else {
++        do_stack_frame(env, &sp, 0, oldsr, 0, retaddr);
++    }
++
++    env->aregs[7] = sp;
++    /* Jump to vector.  */
++    env->pc = cpu_ldl_kernel(env, env->vbr + vector);
++}
++
++static void do_interrupt_all(CPUM68KState *env, int is_hw)
++{
++    if (m68k_feature(env, M68K_FEATURE_M68000)) {
++        m68k_interrupt_all(env, is_hw);
++        return;
++    }
++    cf_interrupt_all(env, is_hw);
++}
++
+ void m68k_cpu_do_interrupt(CPUState *cs)
+ {
+     M68kCPU *cpu = M68K_CPU(cs);
 -- 
 2.14.3
