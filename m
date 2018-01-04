@@ -1,29 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53940)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56940)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jbaron@akamai.com>) id 1eXBHU-0006Ew-BQ
-	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 14:34:25 -0500
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1eXBJY-0007ce-K5
+	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 14:36:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jbaron@akamai.com>) id 1eXBHQ-0007PP-AX
-	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 14:34:24 -0500
-Received: from mx0b-00190b01.pphosted.com ([2620:100:9005:57f::1]:51308)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jbaron@akamai.com>) id 1eXBHQ-0007Nr-36
-	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 14:34:20 -0500
-References: <cover.1515041373.git.jbaron@akamai.com>
-	<e185a03168d0ab68150d21770bf0d02c5ef537c2.1515041373.git.jbaron@akamai.com>
-	<20180104190309-mutt-send-email-mst@kernel.org>
-	<c5e2f8d5-3961-606a-8c60-168f1465bd6e@akamai.com>
-	<20180104201934-mutt-send-email-mst@kernel.org>
-From: Jason Baron <jbaron@akamai.com>
-Message-ID: <19218c87-596c-3a8a-7d60-941a4fe5eb6f@akamai.com>
-Date: Thu, 4 Jan 2018 14:34:09 -0500
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1eXBJU-0001UA-I9
+	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 14:36:32 -0500
+Received: from mail-qk0-x243.google.com ([2607:f8b0:400d:c09::243]:34325)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1eXBJU-0001TN-CN
+	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 14:36:28 -0500
+Received: by mail-qk0-x243.google.com with SMTP id g81so3296424qke.1
+	for <qemu-devel@nongnu.org>; Thu, 04 Jan 2018 11:36:28 -0800 (PST)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20180103183418.23730-1-f4bug@amsat.org>
+	<20180103183418.23730-2-f4bug@amsat.org>
+	<CAKmqyKOPccW5Ug+2DvWaB1TXvbd3JpPwhY7LMqa3pECfM98NAw@mail.gmail.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <7138da0b-5837-f42c-bf1f-f051d1651159@amsat.org>
+Date: Thu, 4 Jan 2018 16:36:24 -0300
 MIME-Version: 1.0
-In-Reply-To: <20180104201934-mutt-send-email-mst@kernel.org>
+In-Reply-To: <CAKmqyKOPccW5Ug+2DvWaB1TXvbd3JpPwhY7LMqa3pECfM98NAw@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH net-next v3 1/3] virtio_net: propagate
- linkspeed/duplex settings from the hypervisor
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v4 01/25] sdhci: add a spec_version property
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,166 +36,132 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: davem@davemloft.net, jasowang@redhat.com, netdev@vger.kernel.org, virtualization@lists.linux-foundation.org, qemu-devel@nongnu.org, virtio-dev@lists.oasis-open.org
+To: Alistair Francis <alistair.francis@xilinx.com>
+Cc: "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, Peter Maydell <peter.maydell@linaro.org>, Andrey Smirnov <andrew.smirnov@gmail.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
 
-
-
-On 01/04/2018 01:22 PM, Michael S. Tsirkin wrote:
-> On Thu, Jan 04, 2018 at 01:12:30PM -0500, Jason Baron wrote:
+On 01/04/2018 02:51 PM, Alistair Francis wrote:
+> On Wed, Jan 3, 2018 at 10:33 AM, Philippe Mathieu-Daudé <f4bug@amsat.org> wrote:
+>> default to Spec v2.00
 >>
+>> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+>> ---
+>>  hw/sd/sdhci-internal.h |  4 ++--
+>>  include/hw/sd/sdhci.h  |  3 +++
+>>  hw/sd/sdhci.c          | 19 +++++++++++++++++--
+>>  3 files changed, 22 insertions(+), 4 deletions(-)
 >>
->> On 01/04/2018 12:05 PM, Michael S. Tsirkin wrote:
->>> On Thu, Jan 04, 2018 at 12:16:44AM -0500, Jason Baron wrote:
->>>> The ability to set speed and duplex for virtio_net is useful in various
->>>> scenarios as described here:
->>>>
->>>> 16032be virtio_net: add ethtool support for set and get of settings
->>>>
->>>> However, it would be nice to be able to set this from the hypervisor,
->>>> such that virtio_net doesn't require custom guest ethtool commands.
->>>>
->>>> Introduce a new feature flag, VIRTIO_NET_F_SPEED_DUPLEX, which allows
->>>> the hypervisor to export a linkspeed and duplex setting. The user can
->>>> subsequently overwrite it later if desired via: 'ethtool -s'.
->>>>
->>>> Note that VIRTIO_NET_F_SPEED_DUPLEX is defined as bit 63, the intention
->>>> is that device feature bits are to grow down from bit 63, since the
->>>> transports are starting from bit 24 and growing up.
->>>>
->>>> Signed-off-by: Jason Baron <jbaron@akamai.com>
->>>> Cc: "Michael S. Tsirkin" <mst@redhat.com>
->>>> Cc: Jason Wang <jasowang@redhat.com>
->>>> Cc: virtio-dev@lists.oasis-open.org
->>>> ---
->>>>  drivers/net/virtio_net.c        | 19 ++++++++++++++++++-
->>>>  include/uapi/linux/virtio_net.h | 13 +++++++++++++
->>>>  2 files changed, 31 insertions(+), 1 deletion(-)
->>>>
->>>> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
->>>> index 6fb7b65..0b2d314 100644
->>>> --- a/drivers/net/virtio_net.c
->>>> +++ b/drivers/net/virtio_net.c
->>>> @@ -2146,6 +2146,22 @@ static void virtnet_config_changed_work(struct work_struct *work)
->>>>  
->>>>  	vi->status = v;
->>>>  
->>>> +	if (virtio_has_feature(vi->vdev, VIRTIO_NET_F_SPEED_DUPLEX)) {
->>>
->>> BTW we can avoid this read for when link goes down.
->>> Not a big deal but still.
+>> diff --git a/hw/sd/sdhci-internal.h b/hw/sd/sdhci-internal.h
+>> index b7475a1b7b..cf4a055159 100644
+>> --- a/hw/sd/sdhci-internal.h
+>> +++ b/hw/sd/sdhci-internal.h
+>> @@ -212,9 +212,9 @@ FIELD(SDHC_PRNSTS, WRITE_PROTECT,      19, 1);
+>>  /* Slot interrupt status */
+>>  #define SDHC_SLOT_INT_STATUS            0xFC
 >>
->> So you are saying that we can just set vi->speed and vi->duplex to
->> 'unknown' when the link goes down and not check for the presence of
->> VIRTIO_NET_F_SPEED_DUPLEX?
+>> -/* HWInit Host Controller Version Register 0x0401 */
+>> +/* HWInit Host Controller Version Register */
+>>  #define SDHC_HCVER                      0xFE
+>> -#define SD_HOST_SPECv2_VERS             0x2401
+>> +#define SDHC_HCVER_VENDOR               0x24
 >>
->> If so, that could over-write what the user may have configured in the
->> guest via 'ethtool -s' when the link goes down, so that would be a
->> change in behavior, but perhaps that is ok?
+>>  #define SDHC_REGISTERS_MAP_SIZE         0x100
+>>  #define SDHC_INSERTION_DELAY            (NANOSECONDS_PER_SECOND)
+>> diff --git a/include/hw/sd/sdhci.h b/include/hw/sd/sdhci.h
+>> index 2aea20f1d8..ddd5040410 100644
+>> --- a/include/hw/sd/sdhci.h
+>> +++ b/include/hw/sd/sdhci.h
+>> @@ -91,6 +91,8 @@ typedef struct SDHCIState {
+>>      uint64_t capareg;      /* Capabilities Register */
+>>      /* 0x48 */
+>>      uint64_t maxcurr;      /* Maximum Current Capabilities Register */
+>> +    /* 0xfe */
+>> +    uint16_t version;      /* Host Controller Version Register */
+>>
+>>      uint8_t  *fifo_buffer; /* SD host i/o FIFO buffer */
+>>      uint32_t buf_maxsz;
+>> @@ -99,6 +101,7 @@ typedef struct SDHCIState {
+>>      bool     pending_insert_state;
+>>      /* Configurable properties */
+>>      bool pending_insert_quirk; /* Quirk for Raspberry Pi card insert int */
+>> +    uint8_t spec_version;
+>>  } SDHCIState;
+>>
+>>  #define TYPE_PCI_SDHCI "sdhci-pci"
+>> diff --git a/hw/sd/sdhci.c b/hw/sd/sdhci.c
+>> index b080950f80..ae8ddf4e3b 100644
+>> --- a/hw/sd/sdhci.c
+>> +++ b/hw/sd/sdhci.c
+>> @@ -169,7 +169,8 @@ static void sdhci_reset(SDHCIState *s)
+>>
+>>      timer_del(s->insert_timer);
+>>      timer_del(s->transfer_timer);
+>> -    /* Set all registers to 0. Capabilities registers are not cleared
+>> +
+>> +    /* Set all registers to 0. Capabilities/Version registers are not cleared
+>>       * and assumed to always preserve their value, given to them during
+>>       * initialization */
+>>      memset(&s->sdmasysad, 0, (uintptr_t)&s->capareg - (uintptr_t)&s->sdmasysad);
+>> @@ -923,7 +924,7 @@ static uint64_t sdhci_read(void *opaque, hwaddr offset, unsigned size)
+>>          ret = (uint32_t)(s->admasysaddr >> 32);
+>>          break;
+>>      case SDHC_SLOT_INT_STATUS:
+>> -        ret = (SD_HOST_SPECv2_VERS << 16) | sdhci_slotint(s);
+>> +        ret = (s->version << 16) | sdhci_slotint(s);
+>>          break;
+>>      default:
+>>          qemu_log_mask(LOG_UNIMP, "SDHC rd_%ub @0x%02" HWADDR_PRIx " "
+>> @@ -1178,6 +1179,15 @@ static inline unsigned int sdhci_get_fifolen(SDHCIState *s)
+>>      }
+>>  }
+>>
+>> +static void sdhci_init_readonly_registers(SDHCIState *s, Error **errp)
+>> +{
+>> +    if (s->spec_version < 1) {
+>> +        error_setg(errp, "spec version invalid");
 > 
-> No - what I am saying is that your patch overwrites the values
-> set by user when link goes down.
-> 
-> I suggest limiting this call to when
-> 
-> if (vi->status & VIRTIO_NET_S_LINK_UP)
-> 
-> and then the values are overwritten when link goes up
-> which seems closer to what a user might expect.
-ok, will update this for v4.
+> Can we tell the user that the version must be greater then 1?
 
-Thanks,
+Good idea.
 
--Jason
+I started this at v1 to start verifying v1 features expected to be
+working for v2, but we don't have v1-only HCI, so I'll see to have this
+default to v2 directly.
 
 > 
+>> +        return;
+>> +    }
+>> +    s->version = (SDHC_HCVER_VENDOR << 8) | (s->spec_version - 1);
+>> +}
+>> +
+>>  static void sdhci_initfn(SDHCIState *s)
+>>  {
+>>      qbus_create_inplace(&s->sdbus, sizeof(s->sdbus),
+>> @@ -1190,6 +1200,10 @@ static void sdhci_initfn(SDHCIState *s)
 >>
->> I think I would prefer to have the link down event still check for
->> VIRTIO_NET_F_SPEED_DUPLEX before changing speed/duplex. That way we
->> still have 2 modes for updating the fields:
+>>  static void sdhci_common_realize(SDHCIState *s, Error **errp)
+>>  {
+>> +    sdhci_init_readonly_registers(s, errp);
+>> +    if (errp && *errp) {
+>> +        return;
+>> +    }
+>>      s->buf_maxsz = sdhci_get_fifolen(s);
+>>      s->fifo_buffer = g_malloc0(s->buf_maxsz);
 >>
->> 1) completely guest controlled. Same as we have now and host does not
->> change any values and does not set VIRTIO_NET_F_SPEED_DUPLEX flag (hence
->> don't remove above check).
+>> @@ -1290,6 +1304,7 @@ const VMStateDescription sdhci_vmstate = {
+>>  /* Capabilities registers provide information on supported features of this
+>>   * specific host controller implementation */
+>>  static Property sdhci_properties[] = {
+>> +    DEFINE_PROP_UINT8("sd-spec-version", SDHCIState, spec_version, 1),
+> 
+> This changes what we used to report to the guest. This at least needs
+> to be mentioned in the commit message.
+
+Yes you right, I'll use a default v2 to avoid this guest change.
+
+>>      DEFINE_PROP_UINT64("capareg", SDHCIState, capareg,
+>>              SDHC_CAPAB_REG_DEFAULT),
+>>      DEFINE_PROP_UINT64("maxcurr", SDHCIState, maxcurr, 0),
+>> --
+>> 2.15.1
 >>
->> 2) if speed or duplex or speed is set in the qemu command line, then set
->> the VIRTIO_NET_F_SPEED_DUPLEX and have host control the settings of
->> speed/duplex (with ability of guest to over-write if it wanted to).
 >>
->>
->>>
->>>> +		u32 speed;
->>>> +		u8 duplex;
->>>> +
->>>> +		speed = virtio_cread32(vi->vdev,
->>>> +				       offsetof(struct virtio_net_config,
->>>> +						speed));
->>>> +		if (ethtool_validate_speed(speed))
->>>> +			vi->speed = speed;
->>>> +		duplex = virtio_cread8(vi->vdev,
->>>> +				       offsetof(struct virtio_net_config,
->>>> +						duplex));
->>>> +		if (ethtool_validate_duplex(duplex))
->>>> +			vi->duplex = duplex;
->>>> +	}
->>>> +
->>>>  	if (vi->status & VIRTIO_NET_S_LINK_UP) {
->>>>  		netif_carrier_on(vi->dev);
->>>>  		netif_tx_wake_all_queues(vi->dev);
->>>
->>> OK so this handles the case when VIRTIO_NET_F_STATUS is set,
->>> but when it's clear we need to call this from virtnet_probe.
->>>
->>> I propose moving this chunk to a function and calling from two places.
->>>
->>
->> good point. will update.
->>
->> Thanks,
->>
->> -Jason
->>
->>>
->>>> @@ -2796,7 +2812,8 @@ static struct virtio_device_id id_table[] = {
->>>>  	VIRTIO_NET_F_CTRL_RX, VIRTIO_NET_F_CTRL_VLAN, \
->>>>  	VIRTIO_NET_F_GUEST_ANNOUNCE, VIRTIO_NET_F_MQ, \
->>>>  	VIRTIO_NET_F_CTRL_MAC_ADDR, \
->>>> -	VIRTIO_NET_F_MTU, VIRTIO_NET_F_CTRL_GUEST_OFFLOADS
->>>> +	VIRTIO_NET_F_MTU, VIRTIO_NET_F_CTRL_GUEST_OFFLOADS, \
->>>> +	VIRTIO_NET_F_SPEED_DUPLEX
->>>>  
->>>>  static unsigned int features[] = {
->>>>  	VIRTNET_FEATURES,
->>>> diff --git a/include/uapi/linux/virtio_net.h b/include/uapi/linux/virtio_net.h
->>>> index fc353b5..5de6ed3 100644
->>>> --- a/include/uapi/linux/virtio_net.h
->>>> +++ b/include/uapi/linux/virtio_net.h
->>>> @@ -57,6 +57,8 @@
->>>>  					 * Steering */
->>>>  #define VIRTIO_NET_F_CTRL_MAC_ADDR 23	/* Set MAC address */
->>>>  
->>>> +#define VIRTIO_NET_F_SPEED_DUPLEX 63	/* Device set linkspeed and duplex */
->>>> +
->>>>  #ifndef VIRTIO_NET_NO_LEGACY
->>>>  #define VIRTIO_NET_F_GSO	6	/* Host handles pkts w/ any GSO type */
->>>>  #endif /* VIRTIO_NET_NO_LEGACY */
->>>> @@ -76,6 +78,17 @@ struct virtio_net_config {
->>>>  	__u16 max_virtqueue_pairs;
->>>>  	/* Default maximum transmit unit advice */
->>>>  	__u16 mtu;
->>>> +	/*
->>>> +	 * speed, in units of 1Mb. All values 0 to INT_MAX are legal.
->>>> +	 * Any other value stands for unknown.
->>>> +	 */
->>>> +	__u32 speed;
->>>> +	/*
->>>> +	 * 0x00 - half duplex
->>>> +	 * 0x01 - full duplex
->>>> +	 * Any other value stands for unknown.
->>>> +	 */
->>>> +	__u8 duplex;
->>>>  } __attribute__((packed));
->>>>  
->>>>  /*
->>>> -- 
->>>> 2.6.1
