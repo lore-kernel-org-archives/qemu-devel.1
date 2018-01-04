@@ -1,33 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40186)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43318)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1eX7js-0007ya-QW
-	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 10:47:29 -0500
+	(envelope-from <marcel@redhat.com>) id 1eX7mg-00015X-R9
+	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 10:50:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1eX7jo-0000PJ-6I
-	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 10:47:28 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:56476)
+	(envelope-from <marcel@redhat.com>) id 1eX7mb-0002wm-W2
+	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 10:50:22 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:48728)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1eX7jn-0000Ob-Vi
-	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 10:47:24 -0500
-References: <1515071752-22961-1-git-send-email-thuth@redhat.com>
-	<20180104140930.7hbtnen3lw7epmrh@var.youpi.perso.aquilenet.fr>
-	<a78b6f7a-3eb2-6749-ccba-ad1ba4d525ae@redhat.com>
-	<20180104141524.m5xy66jsn2hiajwl@var.youpi.perso.aquilenet.fr>
-	<20180104142101.rivje5qn5dasb6jw@var.youpi.perso.aquilenet.fr>
-	<aea97804-c6a9-d903-13d8-23bc6b46af86@redhat.com>
-	<20180104152402.fv52umjmlb2g22wc@var.youpi.perso.aquilenet.fr>
-	<b1a86fed-8a98-cc1d-46ca-5462f8be3fc7@redhat.com>
-	<20180104153219.wsxtkzuznu2iwra7@var.youpi.perso.aquilenet.fr>
-	<bb6eae87-85b2-4bf2-ad36-26fa95816315@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <9b392599-a318-90c5-daa8-89ade40c64e5@redhat.com>
-Date: Thu, 4 Jan 2018 16:47:16 +0100
+	(Exim 4.71) (envelope-from <marcel@redhat.com>) id 1eX7mb-0002w2-FR
+	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 10:50:17 -0500
+References: <20171229142922.31701-1-hpoussin@reactos.org>
+	<20171229142922.31701-7-hpoussin@reactos.org>
+From: Marcel Apfelbaum <marcel@redhat.com>
+Message-ID: <f888dde1-6b46-b9f5-f819-6fb8d48019de@redhat.com>
+Date: Thu, 4 Jan 2018 17:50:06 +0200
 MIME-Version: 1.0
-In-Reply-To: <bb6eae87-85b2-4bf2-ad36-26fa95816315@redhat.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20171229142922.31701-7-hpoussin@reactos.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2] usb: Remove legacy -usbdevice option
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v3 06/16] piix4: add Reset Control Register
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,30 +28,104 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, Samuel Thibault <samuel.thibault@gnu.org>
-Cc: Peter Maydell <peter.maydell@linaro.org>, kraxel@redhat.com, qemu-devel@nongnu.org
+To: =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>, Aurelien Jarno <aurelien@aurel32.net>, Yongbok Kim <yongbok.kim@mips.com>, "Michael S . Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
 
-On 04/01/2018 16:35, Thomas Huth wrote:
->> Well, why not, it just doesn't seem to me much simpler than
->> "-serial braille" and "-device usb-braille" :)
->
-> FWIW, I think I'd also rather prefer to add some little bit of "magic"
-> to "-device usb-braille" instead of introducing yet another command line
-> parameter. QEMU's command line interface is already way too much
-> overcrowded, so IMHO we should try to avoid new parameters if possible.
+On 29/12/2017 16:29, Herv=C3=A9 Poussineau wrote:
+> The RCR I/O port (0xcf9) is used to generate a hard reset or a soft res=
+et.
+>=20
+> Signed-off-by: Herv=C3=A9 Poussineau <hpoussin@reactos.org>
+> ---
+>   hw/isa/piix4.c | 35 +++++++++++++++++++++++++++++++++++
+>   1 file changed, 35 insertions(+)
+>=20
+> diff --git a/hw/isa/piix4.c b/hw/isa/piix4.c
+> index 4f476dc7e6..7c83e7c23d 100644
+> --- a/hw/isa/piix4.c
+> +++ b/hw/isa/piix4.c
+> @@ -2,6 +2,7 @@
+>    * QEMU PIIX4 PCI Bridge Emulation
+>    *
+>    * Copyright (c) 2006 Fabrice Bellard
+> + * Copyright (c) 2016 Herv=C3=A9 Poussineau
 
-The point of deprecation is not to make the interface simpler, it is to
-avoid cases where one option is doing too much and/or crossing
-abstraction boundaries, for example -net creating both a device and a
-hub port.
+I think 2018 :)
 
-"-serial" is okay because it only creates the front-end, it's the board
-that decides how to attach it to the back-end.
+>    *
+>    * Permission is hereby granted, free of charge, to any person obtain=
+ing a copy
+>    * of this software and associated documentation files (the "Software=
+"), to deal
+> @@ -33,6 +34,10 @@ PCIDevice *piix4_dev;
+>  =20
+>   typedef struct PIIX4State {
+>       PCIDevice dev;
+> +
+> +    /* Reset Control Register */
+> +    MemoryRegion rcr_mem;
+> +    uint8_t rcr;
+>   } PIIX4State;
+>  =20
+>   #define TYPE_PIIX4_PCI_DEVICE "PIIX4"
+> @@ -87,6 +92,30 @@ static const VMStateDescription vmstate_piix4 =3D {
+>       }
+>   };
+>  =20
+> +static void piix4_rcr_write(void *opaque, hwaddr addr, uint64_t val,
+> +                            unsigned int len)
+> +{
+> +    PIIX4State *s =3D opaque;
+> +
+> +    if (val & 4) {
+> +        qemu_system_reset_request(SHUTDOWN_CAUSE_GUEST_RESET);
+> +        return;
+> +    }
+> +    s->rcr =3D val & 2; /* keep System Reset type only */
 
--usbdevice creating both a front-end and a back-end is not a problem per
-se.  The issue with -usbdevice is just that it's too much code.
+How does it work? When do we reset the value?
 
-However, adding magic to "-device usb-braille" that creates both a
-front-end and a back-end is completely the opposite of sane...
+> +}
+> +
+> +static uint64_t piix4_rcr_read(void *opaque, hwaddr addr, unsigned int=
+ len)
+> +{
+> +    PIIX4State *s =3D opaque;
+> +    return s->rcr;
+> +}
+> +
+> +static const MemoryRegionOps piix4_rcr_ops =3D {
+> +    .read =3D piix4_rcr_read,
+> +    .write =3D piix4_rcr_write,
+> +    .endianness =3D DEVICE_LITTLE_ENDIAN
 
-Paolo
+Maybe we need to specify the access_size.
+Something like:
+.impl =3D {
+         .min_access_size =3D 1,
+         .max_access_size =3D 1,
+     },
+
+Thanks,
+Marcel
+
+> +};
+> +
+>   static void piix4_realize(PCIDevice *pci, Error **errp)
+>   {
+>       DeviceState *dev =3D DEVICE(pci);
+> @@ -96,6 +125,12 @@ static void piix4_realize(PCIDevice *pci, Error **e=
+rrp)
+>                        pci_address_space_io(pci), errp)) {
+>           return;
+>       }
+> +
+> +    memory_region_init_io(&s->rcr_mem, OBJECT(dev), &piix4_rcr_ops, s,
+> +                          "reset-control", 1);
+> +    memory_region_add_subregion_overlap(pci_address_space_io(pci), 0xc=
+f9,
+> +                                        &s->rcr_mem, 1);
+> +
+>       piix4_dev =3D pci;
+>       qemu_register_reset(piix4_reset, s);
+>   }
+>=20
