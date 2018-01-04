@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36715)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36741)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhangckid@gmail.com>) id 1eWyb9-0003U2-6v
-	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 01:01:52 -0500
+	(envelope-from <zhangckid@gmail.com>) id 1eWybC-0003Va-44
+	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 01:01:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zhangckid@gmail.com>) id 1eWyb7-0003vt-TU
-	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 01:01:51 -0500
-Received: from mail-pg0-x242.google.com ([2607:f8b0:400e:c05::242]:41969)
+	(envelope-from <zhangckid@gmail.com>) id 1eWybB-0003xu-90
+	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 01:01:54 -0500
+Received: from mail-pl0-x243.google.com ([2607:f8b0:400e:c01::243]:45258)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <zhangckid@gmail.com>) id 1eWyb7-0003vV-LV
-	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 01:01:49 -0500
-Received: by mail-pg0-x242.google.com with SMTP id 77so337307pgd.8
-	for <qemu-devel@nongnu.org>; Wed, 03 Jan 2018 22:01:49 -0800 (PST)
+	(Exim 4.71) (envelope-from <zhangckid@gmail.com>) id 1eWybB-0003xT-2y
+	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 01:01:53 -0500
+Received: by mail-pl0-x243.google.com with SMTP id o2so502853plk.12
+	for <qemu-devel@nongnu.org>; Wed, 03 Jan 2018 22:01:52 -0800 (PST)
 From: Zhang Chen <zhangckid@gmail.com>
-Date: Thu,  4 Jan 2018 14:01:01 +0800
-Message-Id: <1515045675-6993-3-git-send-email-zhangckid@gmail.com>
+Date: Thu,  4 Jan 2018 14:01:02 +0800
+Message-Id: <1515045675-6993-4-git-send-email-zhangckid@gmail.com>
 In-Reply-To: <1515045675-6993-1-git-send-email-zhangckid@gmail.com>
 References: <1515045675-6993-1-git-send-email-zhangckid@gmail.com>
-Subject: [Qemu-devel] [PATCH RESEND V3 02/16] colo-compare: implement the
- process of checkpoint
+Subject: [Qemu-devel] [PATCH RESEND V3 03/16] colo-compare: use notifier to
+ notify packets comparing result
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,207 +29,103 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu devel <qemu-devel@nongnu.org>
 Cc: Zhang Chen <zhangckid@gmail.com>, Jason Wang <jasowang@redhat.com>, zhanghailiang <zhang.zhanghailiang@huawei.com>
 
-While do checkpoint, we need to flush all the unhandled packets,
-By using the filter notifier mechanism, we can easily to notify
-every compare object to do this process, which runs inside
-of compare threads as a coroutine.
+It's a good idea to use notifier to notify COLO frame of
+inconsistent packets comparing.
 
 Cc: Jason Wang <jasowang@redhat.com>
-Signed-off-by: zhanghailiang <zhang.zhanghailiang@huawei.com>
 Signed-off-by: Zhang Chen <zhangckid@gmail.com>
+Signed-off-by: zhanghailiang <zhang.zhanghailiang@huawei.com>
 ---
- include/migration/colo.h |  6 ++++
- net/colo-compare.c       | 71 ++++++++++++++++++++++++++++++++++++++++++++++++
- net/colo-compare.h       | 22 +++++++++++++++
- 3 files changed, 99 insertions(+)
- create mode 100644 net/colo-compare.h
+ net/colo-compare.c | 32 +++++++++++++++++++++++++-------
+ net/colo-compare.h |  2 ++
+ 2 files changed, 27 insertions(+), 7 deletions(-)
 
-diff --git a/include/migration/colo.h b/include/migration/colo.h
-index ff9874e..6adf3a5 100644
---- a/include/migration/colo.h
-+++ b/include/migration/colo.h
-@@ -15,6 +15,12 @@
- 
- #include "qemu-common.h"
- 
-+enum colo_event {
-+    COLO_EVENT_NONE,
-+    COLO_EVENT_CHECKPOINT,
-+    COLO_EVENT_FAILOVER,
-+};
-+
- void colo_info_init(void);
- 
- void migrate_start_colo_process(MigrationState *s);
 diff --git a/net/colo-compare.c b/net/colo-compare.c
-index 0ebdec9..e9cfca2 100644
+index e9cfca2..dfaa81f 100644
 --- a/net/colo-compare.c
 +++ b/net/colo-compare.c
-@@ -29,17 +29,28 @@
- #include "qapi-visit.h"
- #include "net/colo.h"
+@@ -31,6 +31,7 @@
  #include "sysemu/iothread.h"
-+#include "net/colo-compare.h"
-+#include "migration/colo.h"
+ #include "net/colo-compare.h"
+ #include "migration/colo.h"
++#include "migration/migration.h"
  
  #define TYPE_COLO_COMPARE "colo-compare"
  #define COLO_COMPARE(obj) \
-     OBJECT_CHECK(CompareState, (obj), TYPE_COLO_COMPARE)
+@@ -39,6 +40,9 @@
+ static QTAILQ_HEAD(, CompareState) net_compares =
+        QTAILQ_HEAD_INITIALIZER(net_compares);
  
-+static QTAILQ_HEAD(, CompareState) net_compares =
-+       QTAILQ_HEAD_INITIALIZER(net_compares);
++static NotifierList colo_compare_notifiers =
++    NOTIFIER_LIST_INITIALIZER(colo_compare_notifiers);
 +
  #define COMPARE_READ_LEN_MAX NET_BUFSIZE
  #define MAX_QUEUE_SIZE 1024
  
- /* TODO: Should be configurable */
- #define REGULAR_PACKET_CHECK_MS 3000
- 
-+static QemuMutex event_mtx = { .lock = PTHREAD_MUTEX_INITIALIZER,
-+                               .initialized = true };
-+static QemuCond event_complete_cond = { .cond = PTHREAD_COND_INITIALIZER,
-+                                        .initialized = true};
-+static int event_unhandled_count;
-+
- /*
-  *  + CompareState ++
-  *  |               |
-@@ -86,6 +97,11 @@ typedef struct CompareState {
-     IOThread *iothread;
-     GMainContext *worker_context;
-     QEMUTimer *packet_check_timer;
-+
-+    QEMUBH *event_bh;
-+    enum colo_event event;
-+
-+    QTAILQ_ENTRY(CompareState) next;
- } CompareState;
- 
- typedef struct CompareClass {
-@@ -631,6 +647,25 @@ static void check_old_packet_regular(void *opaque)
-                 REGULAR_PACKET_CHECK_MS);
+@@ -454,8 +458,24 @@ static int colo_old_packet_check_one(Packet *pkt, int64_t *check_time)
+     }
  }
  
-+/* Public API, Used for COLO frame to notify compare event */
-+void colo_notify_compares_event(void *opaque, int event, Error **errp)
++static void colo_compare_inconsistent_notify(void)
 +{
-+    CompareState *s;
-+
-+    qemu_mutex_lock(&event_mtx);
-+    QTAILQ_FOREACH(s, &net_compares, next) {
-+        s->event = event;
-+        qemu_bh_schedule(s->event_bh);
-+        event_unhandled_count++;
-+    }
-+    /* Wait all compare threads to finish handling this event */
-+    while (event_unhandled_count > 0) {
-+        qemu_cond_wait(&event_complete_cond, &event_mtx);
-+    }
-+
-+    qemu_mutex_unlock(&event_mtx);
++    notifier_list_notify(&colo_compare_notifiers,
++                migrate_get_current());
 +}
 +
- static void colo_compare_timer_init(CompareState *s)
- {
-     AioContext *ctx = iothread_get_aio_context(s->iothread);
-@@ -651,6 +686,28 @@ static void colo_compare_timer_del(CompareState *s)
-     }
-  }
- 
-+static void colo_flush_packets(void *opaque, void *user_data);
-+
-+static void colo_compare_handle_event(void *opaque)
++void colo_compare_register_notifier(Notifier *notify)
 +{
-+    CompareState *s = opaque;
-+
-+    switch (s->event) {
-+    case COLO_EVENT_CHECKPOINT:
-+        g_queue_foreach(&s->conn_list, colo_flush_packets, s);
-+        break;
-+    case COLO_EVENT_FAILOVER:
-+        break;
-+    default:
-+        break;
-+    }
-+    qemu_mutex_lock(&event_mtx);
-+    assert(event_unhandled_count > 0);
-+    event_unhandled_count--;
-+    qemu_cond_broadcast(&event_complete_cond);
-+    qemu_mutex_unlock(&event_mtx);
++    notifier_list_add(&colo_compare_notifiers, notify);
 +}
 +
- static void colo_compare_iothread(CompareState *s)
- {
-     object_ref(OBJECT(s->iothread));
-@@ -664,6 +721,7 @@ static void colo_compare_iothread(CompareState *s)
-                              s, s->worker_context, true);
- 
-     colo_compare_timer_init(s);
-+    s->event_bh = qemu_bh_new(colo_compare_handle_event, s);
- }
- 
- static char *compare_get_pri_indev(Object *obj, Error **errp)
-@@ -821,6 +879,8 @@ static void colo_compare_complete(UserCreatable *uc, Error **errp)
-     net_socket_rs_init(&s->pri_rs, compare_pri_rs_finalize, s->vnet_hdr);
-     net_socket_rs_init(&s->sec_rs, compare_sec_rs_finalize, s->vnet_hdr);
- 
-+    QTAILQ_INSERT_TAIL(&net_compares, s, next);
++void colo_compare_unregister_notifier(Notifier *notify)
++{
++    notifier_remove(notify);
++}
 +
-     g_queue_init(&s->conn_list);
- 
-     s->connection_track_table = g_hash_table_new_full(connection_key_hash,
-@@ -885,6 +945,7 @@ static void colo_compare_init(Object *obj)
- static void colo_compare_finalize(Object *obj)
+ static int colo_old_packet_check_one_conn(Connection *conn,
+-                                          void *user_data)
++                                           void *user_data)
  {
-     CompareState *s = COLO_COMPARE(obj);
-+    CompareState *tmp = NULL;
+     GList *result = NULL;
+     int64_t check_time = REGULAR_PACKET_CHECK_MS;
+@@ -466,10 +486,7 @@ static int colo_old_packet_check_one_conn(Connection *conn,
  
-     qemu_chr_fe_deinit(&s->chr_pri_in, false);
-     qemu_chr_fe_deinit(&s->chr_sec_in, false);
-@@ -892,6 +953,16 @@ static void colo_compare_finalize(Object *obj)
-     if (s->iothread) {
-         colo_compare_timer_del(s);
+     if (result) {
+         /* Do checkpoint will flush old packet */
+-        /*
+-         * TODO: Notify colo frame to do checkpoint.
+-         * colo_compare_inconsistent_notify();
+-         */
++        colo_compare_inconsistent_notify();
+         return 0;
      }
-+
-+    qemu_bh_delete(s->event_bh);
-+
-+    QTAILQ_FOREACH(tmp, &net_compares, next) {
-+        if (!strcmp(tmp->outdev, s->outdev)) {
-+            QTAILQ_REMOVE(&net_compares, s, next);
-+            break;
-+        }
-+    }
-+
-     /* Release all unhandled packets after compare thead exited */
-     g_queue_foreach(&s->conn_list, colo_flush_packets, s);
  
+@@ -544,11 +561,12 @@ static void colo_compare_connection(void *opaque, void *user_data)
+             /*
+              * If one packet arrive late, the secondary_list or
+              * primary_list will be empty, so we can't compare it
+-             * until next comparison.
++             * until next comparison. If the packets in the list are
++             * timeout, it will trigger a checkpoint request.
+              */
+             trace_colo_compare_main("packet different");
+             g_queue_push_head(&conn->primary_list, pkt);
+-            /* TODO: colo_notify_checkpoint();*/
++            colo_compare_inconsistent_notify();
+             break;
+         }
+     }
 diff --git a/net/colo-compare.h b/net/colo-compare.h
-new file mode 100644
-index 0000000..1b1ce76
---- /dev/null
+index 1b1ce76..22ddd51 100644
+--- a/net/colo-compare.h
 +++ b/net/colo-compare.h
-@@ -0,0 +1,22 @@
-+/*
-+ * COarse-grain LOck-stepping Virtual Machines for Non-stop Service (COLO)
-+ * (a.k.a. Fault Tolerance or Continuous Replication)
-+ *
-+ * Copyright (c) 2017 HUAWEI TECHNOLOGIES CO., LTD.
-+ * Copyright (c) 2017 FUJITSU LIMITED
-+ * Copyright (c) 2017 Intel Corporation
-+ *
-+ * Authors:
-+ *    zhanghailiang <zhang.zhanghailiang@huawei.com>
-+ *    Zhang Chen <zhangckid@gmail.com>
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or
-+ * later.  See the COPYING file in the top-level directory.
-+ */
-+
-+#ifndef QEMU_COLO_COMPARE_H
-+#define QEMU_COLO_COMPARE_H
-+
-+void colo_notify_compares_event(void *opaque, int event, Error **errp);
-+
-+#endif /* QEMU_COLO_COMPARE_H */
+@@ -18,5 +18,7 @@
+ #define QEMU_COLO_COMPARE_H
+ 
+ void colo_notify_compares_event(void *opaque, int event, Error **errp);
++void colo_compare_register_notifier(Notifier *notify);
++void colo_compare_unregister_notifier(Notifier *notify);
+ 
+ #endif /* QEMU_COLO_COMPARE_H */
 -- 
 2.7.4
