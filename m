@@ -1,33 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57845)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60211)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eX8zV-00083I-Ow
-	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 12:07:42 -0500
+	(envelope-from <programmingkidx@gmail.com>) id 1eX91g-0003HN-7D
+	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 12:09:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eX8zR-0005wg-OE
-	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 12:07:41 -0500
-Received: from mail-qk0-x241.google.com ([2607:f8b0:400d:c09::241]:46629)
+	(envelope-from <programmingkidx@gmail.com>) id 1eX91c-0000is-9i
+	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 12:09:56 -0500
+Received: from mail-it0-x230.google.com ([2607:f8b0:4001:c0b::230]:32974)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eX8zR-0005wB-JR
-	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 12:07:37 -0500
-Received: by mail-qk0-x241.google.com with SMTP id l12so2373505qke.13
-	for <qemu-devel@nongnu.org>; Thu, 04 Jan 2018 09:07:37 -0800 (PST)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20180104160523.22995-1-marcandre.lureau@redhat.com>
-	<20180104160523.22995-8-marcandre.lureau@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <caaceadf-57b6-febf-8338-6dfb998bdb80@amsat.org>
-Date: Thu, 4 Jan 2018 14:07:33 -0300
-MIME-Version: 1.0
-In-Reply-To: <20180104160523.22995-8-marcandre.lureau@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v3 07/18] build-sys: add some sanitizers
- when --enable-debug if possible
+	(Exim 4.71) (envelope-from <programmingkidx@gmail.com>)
+	id 1eX91c-0000ib-4h
+	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 12:09:52 -0500
+Received: by mail-it0-x230.google.com with SMTP id o130so2104375itg.0
+	for <qemu-devel@nongnu.org>; Thu, 04 Jan 2018 09:09:52 -0800 (PST)
+From: Programmingkid <programmingkidx@gmail.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: quoted-printable
+Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
+Date: Thu, 4 Jan 2018 12:09:49 -0500
+References: <mailman.16196.1515084191.27993.qemu-devel@nongnu.org>
+In-Reply-To: <mailman.16196.1515084191.27993.qemu-devel@nongnu.org>
+Message-Id: <AE31CFE4-27FD-40F8-81E3-0D7A8A9DE36E@gmail.com>
+Subject: Re: [Qemu-devel] [PULL 00/17] M68k for 2.12 patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,42 +29,7 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org
-Cc: pbonzini@redhat.com, famz@redhat.com
+To: Laurent Vivier <laurent@vivier.eu>, QEMU Developers <qemu-devel@nongnu.org>
 
-On 01/04/2018 01:05 PM, Marc-André Lureau wrote:
-> Enable ASAN/UBSan by default if the compiler supports it.
-> 
-> Typical slowdown introduced by AddressSanitizer is 2x.
-> UBSan shouldn't have much impact on runtime cost.
-> 
-> Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
-
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-
-docker-debian-amd64 with QEMU_CONFIGURE_OPTS=--enable-debug:
-Tested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-
-> ---
->  configure | 7 +++++++
->  1 file changed, 7 insertions(+)
-> 
-> diff --git a/configure b/configure
-> index 3953859314..de1477c93a 100755
-> --- a/configure
-> +++ b/configure
-> @@ -5161,6 +5161,13 @@ if test "$gcov" = "yes" ; then
->  elif test "$fortify_source" = "yes" ; then
->    CFLAGS="-O2 -U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=2 $CFLAGS"
->  elif test "$debug" = "yes"; then
-> +  write_c_skeleton;
-> +  if compile_prog "-fsanitize=address" ""; then
-> +      CFLAGS="-fsanitize=address $CFLAGS"
-> +  fi
-> +  if compile_prog "-fsanitize=undefined" ""; then
-> +      CFLAGS="-fsanitize=undefined $CFLAGS"
-> +  fi
->    if compile_prog "-Og" ""; then
->        CFLAGS="-Og $CFLAGS"
->    elif compile_prog "-O1" ""; then
-> 
+What operating systems boot with this patch set? Does any version of the =
+Mac OS run in this 68k emulator?=20=
