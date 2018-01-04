@@ -1,23 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52524)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53989)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aderumier@oxygem.tv>) id 1eXAAF-00061T-5d
-	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 13:22:52 -0500
+	(envelope-from <mst@redhat.com>) id 1eXAAs-0006gD-4K
+	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 13:23:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aderumier@oxygem.tv>) id 1eXAAC-0007yA-0E
-	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 13:22:51 -0500
-Received: from mailpro.odiso.net ([89.248.211.110]:32784)
+	(envelope-from <mst@redhat.com>) id 1eXAAh-0000DP-DP
+	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 13:23:29 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:53962)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <aderumier@oxygem.tv>) id 1eXAAB-0007xK-Mg
-	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 13:22:47 -0500
-Date: Thu, 4 Jan 2018 19:13:43 +0100 (CET)
-From: Alexandre DERUMIER <aderumier@odiso.com>
-Message-ID: <87448218.845975.1515089623014.JavaMail.zimbra@oxygem.tv>
-In-Reply-To: <20180104175609.9085-1-pbonzini@redhat.com>
-References: <20180104175609.9085-1-pbonzini@redhat.com>
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1eXAAg-0000BQ-Sq
+	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 13:23:19 -0500
+Date: Thu, 4 Jan 2018 20:23:15 +0200
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20180104202250-mutt-send-email-mst@kernel.org>
+References: <cover.1515041373.git.jbaron@akamai.com>
+	<e185a03168d0ab68150d21770bf0d02c5ef537c2.1515041373.git.jbaron@akamai.com>
+	<20180104190309-mutt-send-email-mst@kernel.org>
+	<c5e2f8d5-3961-606a-8c60-168f1465bd6e@akamai.com>
+	<20180104201934-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [qemu-web PATCH] add a blog post about "Spectre"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180104201934-mutt-send-email-mst@kernel.org>
+Subject: Re: [Qemu-devel] [PATCH net-next v3 1/3] virtio_net: propagate
+ linkspeed/duplex settings from the hypervisor
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,123 +31,163 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: pbonzini <pbonzini@redhat.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, ehabkost <ehabkost@redhat.com>
+To: Jason Baron <jbaron@akamai.com>
+Cc: davem@davemloft.net, jasowang@redhat.com, netdev@vger.kernel.org, virtualization@lists.linux-foundation.org, qemu-devel@nongnu.org, virtio-dev@lists.oasis-open.org
 
-Thanks Paolo !
+On Thu, Jan 04, 2018 at 08:22:08PM +0200, Michael S. Tsirkin wrote:
+> On Thu, Jan 04, 2018 at 01:12:30PM -0500, Jason Baron wrote:
+> > 
+> > 
+> > On 01/04/2018 12:05 PM, Michael S. Tsirkin wrote:
+> > > On Thu, Jan 04, 2018 at 12:16:44AM -0500, Jason Baron wrote:
+> > >> The ability to set speed and duplex for virtio_net is useful in various
+> > >> scenarios as described here:
+> > >>
+> > >> 16032be virtio_net: add ethtool support for set and get of settings
+> > >>
+> > >> However, it would be nice to be able to set this from the hypervisor,
+> > >> such that virtio_net doesn't require custom guest ethtool commands.
+> > >>
+> > >> Introduce a new feature flag, VIRTIO_NET_F_SPEED_DUPLEX, which allows
+> > >> the hypervisor to export a linkspeed and duplex setting. The user can
+> > >> subsequently overwrite it later if desired via: 'ethtool -s'.
+> > >>
+> > >> Note that VIRTIO_NET_F_SPEED_DUPLEX is defined as bit 63, the intention
+> > >> is that device feature bits are to grow down from bit 63, since the
+> > >> transports are starting from bit 24 and growing up.
+> > >>
+> > >> Signed-off-by: Jason Baron <jbaron@akamai.com>
+> > >> Cc: "Michael S. Tsirkin" <mst@redhat.com>
+> > >> Cc: Jason Wang <jasowang@redhat.com>
+> > >> Cc: virtio-dev@lists.oasis-open.org
+> > >> ---
+> > >>  drivers/net/virtio_net.c        | 19 ++++++++++++++++++-
+> > >>  include/uapi/linux/virtio_net.h | 13 +++++++++++++
+> > >>  2 files changed, 31 insertions(+), 1 deletion(-)
+> > >>
+> > >> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
+> > >> index 6fb7b65..0b2d314 100644
+> > >> --- a/drivers/net/virtio_net.c
+> > >> +++ b/drivers/net/virtio_net.c
+> > >> @@ -2146,6 +2146,22 @@ static void virtnet_config_changed_work(struct work_struct *work)
+> > >>  
+> > >>  	vi->status = v;
+> > >>  
+> > >> +	if (virtio_has_feature(vi->vdev, VIRTIO_NET_F_SPEED_DUPLEX)) {
+> > > 
+> > > BTW we can avoid this read for when link goes down.
+> > > Not a big deal but still.
+> > 
+> > So you are saying that we can just set vi->speed and vi->duplex to
+> > 'unknown' when the link goes down and not check for the presence of
+> > VIRTIO_NET_F_SPEED_DUPLEX?
+> > 
+> > If so, that could over-write what the user may have configured in the
+> > guest via 'ethtool -s' when the link goes down, so that would be a
+> > change in behavior, but perhaps that is ok?
+> 
+> No - what I am saying is that your patch overwrites the values
+> set by user when link goes down.
+> 
+> I suggest limiting this call to when
+> 
+> if (vi->status & VIRTIO_NET_S_LINK_UP)
+> 
+> and then the values are overwritten when link goes up
+> which seems closer to what a user might expect.
+> 
+> > 
+> > I think I would prefer to have the link down event still check for
+> > VIRTIO_NET_F_SPEED_DUPLEX before changing speed/duplex. That way we
+> > still have 2 modes for updating the fields:
+> > 
+> > 1) completely guest controlled. Same as we have now and host does not
+> > change any values and does not set VIRTIO_NET_F_SPEED_DUPLEX flag (hence
+> > don't remove above check).
+> > 
+> > 2) if speed or duplex or speed is set in the qemu command line, then set
+> > the VIRTIO_NET_F_SPEED_DUPLEX and have host control the settings of
+> > speed/duplex (with ability of guest to over-write if it wanted to).
 
-Do we need to update guest kernel too, if qemu use cpumodel=3Dqemu64 ?
 
-(For example,  I have some very old guests where kernel update is not possi=
-ble)
+I agree - I don't see a reason to touch the speed/duplex values when
+VIRTIO_NET_F_SPEED_DUPLEX has not been negotiated.
 
-Regards,
-
-Alexandre
-
------ Mail original -----
-De: "pbonzini" <pbonzini@redhat.com>
-=C3=80: "qemu-devel" <qemu-devel@nongnu.org>
-Cc: "ehabkost" <ehabkost@redhat.com>
-Envoy=C3=A9: Jeudi 4 Janvier 2018 18:56:09
-Objet: [Qemu-devel] [qemu-web PATCH] add a blog post about "Spectre"
-
----=20
-_posts/2018-01-04-spectre.md | 60 +++++++++++++++++++++++++++++++++++++++++=
-+++=20
-1 file changed, 60 insertions(+)=20
-create mode 100644 _posts/2018-01-04-spectre.md=20
-
-diff --git a/_posts/2018-01-04-spectre.md b/_posts/2018-01-04-spectre.md=20
-new file mode 100644=20
-index 0000000..1be86d0=20
---- /dev/null=20
-+++ b/_posts/2018-01-04-spectre.md=20
-@@ -0,0 +1,60 @@=20
-+---=20
-+layout: post=20
-+title: "QEMU and the Spectre and Meltdown attacks"=20
-+date: 2018-01-04 18:00:00 +0000=20
-+author: Paolo Bonzini and Eduardo Habkost=20
-+categories: [meltdown, spectre, security, x86]=20
-+---=20
-+As you probably know by now, three critical architectural flaws in CPUs ha=
-ve=20
-+been recently disclosed that allow user processes to read kernel or hyperv=
-isor=20
-+memory through cache side-channel attacks. These flaws, collectively=20
-+named _Meltdown_ and _Spectre_, affect in one way or another almost=20
-+all processors that perform out-of-order execution, including x86 (from=20
-+Intel and AMD), POWER, s390 and ARM processors.=20
-+=20
-+No microcode updates are required to block the _Meltdown_ attack; it is=20
-+enough to update the guest operating system to a version that separates=20
-+the user and kernel address spaces (known as _page table isolation_ for=20
-+the Linux kernel). Therefore, this post will focus on _Spectre_, and=20
-+especially on [CVE-2017-5715](https://cve.mitre.org/cgi-bin/cvename.cgi?na=
-me=3DCVE-2017-5715).=20
-+=20
-+Fixing or mitigating _Spectre_ in general, and CVE-2017-5715 in particular=
-,=20
-+requires cooperation between the processor and the operating system kernel=
- or=20
-+hypervisor; the processor can be updated through microcode or millicode=20
-+patches to provide the required functionality. CVE-2017-5715 allows guests=
-=20
-+to read potentially sensitive data from hypervisor memory; however, __patc=
-hing=20
-+the host kernel is sufficient to block this attack__.=20
-+=20
-+On the other hand, in order to protect the guest kernel from a malicious=
-=20
-+userspace, updates are also needed to the guest kernel and, depending on=
-=20
-+the processor architecture, to QEMU. Just like on bare-metal, the guest=20
-+kernel will use the new functionality provided by the microcode or millico=
-de=20
-+updates. When running under a hypervisor, processor emulation is mostly ou=
-t of=20
-+QEMU's scope, so QEMU's role in the fix is small, but nevertheless importa=
-nt.=20
-+In the case of KVM:=20
-+=20
-+* QEMU configures the hypervisor to emulate a specific processor model.=20
-+For x86, QEMU has to be aware of new CPUID bits introduced by the microcod=
-e=20
-+update, and it must provide them to guests depending on how the guest is=
-=20
-+configured.=20
-+=20
-+* upon virtual machine migration, QEMU reads the CPU state on the source=
-=20
-+and transmits it to the destination. For x86, QEMU has to be aware of new=
-=20
-+model specific registers (MSRs).=20
-+=20
-+Right now, there are no public patches to KVM that expose the new CPUID bi=
-ts=20
-+and MSRs to the virtual machines, therefore there is no urgent need to upd=
-ate=20
-+QEMU; remember that __updating the host kernel is enough to protect the=20
-+host from malicious guests__. Nevertheless, updates will be posted to the=
-=20
-+qemu-devel mailing list in the next few days, and a 2.11.1 patch release=
-=20
-+will be released with the fix.=20
-+=20
-+As of today, the QEMU project is not aware of whether similar changes will=
-=20
-+be required for non-x86 processors. If so, they will also posted to the=20
-+mailing list and backported to recent stable releases.=20
-+=20
-+For more information on the vulnerabilities, please refer to the [Google S=
-ecurity=20
-+Blog](https://security.googleblog.com/2018/01/todays-cpu-vulnerability-wha=
-t-you-need.html)=20
-+and [Google Project=20
-+Zero](https://googleprojectzero.blogspot.it/2018/01/reading-privileged-mem=
-ory-with-side.html)=20
-+posts on the topic, as well as the [Spectre and Meltdown FAQ](https://melt=
-downattack.com/#faq).=20
---=20
-2.14.3=20
+> > 
+> > 
+> > > 
+> > >> +		u32 speed;
+> > >> +		u8 duplex;
+> > >> +
+> > >> +		speed = virtio_cread32(vi->vdev,
+> > >> +				       offsetof(struct virtio_net_config,
+> > >> +						speed));
+> > >> +		if (ethtool_validate_speed(speed))
+> > >> +			vi->speed = speed;
+> > >> +		duplex = virtio_cread8(vi->vdev,
+> > >> +				       offsetof(struct virtio_net_config,
+> > >> +						duplex));
+> > >> +		if (ethtool_validate_duplex(duplex))
+> > >> +			vi->duplex = duplex;
+> > >> +	}
+> > >> +
+> > >>  	if (vi->status & VIRTIO_NET_S_LINK_UP) {
+> > >>  		netif_carrier_on(vi->dev);
+> > >>  		netif_tx_wake_all_queues(vi->dev);
+> > > 
+> > > OK so this handles the case when VIRTIO_NET_F_STATUS is set,
+> > > but when it's clear we need to call this from virtnet_probe.
+> > > 
+> > > I propose moving this chunk to a function and calling from two places.
+> > > 
+> > 
+> > good point. will update.
+> > 
+> > Thanks,
+> > 
+> > -Jason
+> > 
+> > > 
+> > >> @@ -2796,7 +2812,8 @@ static struct virtio_device_id id_table[] = {
+> > >>  	VIRTIO_NET_F_CTRL_RX, VIRTIO_NET_F_CTRL_VLAN, \
+> > >>  	VIRTIO_NET_F_GUEST_ANNOUNCE, VIRTIO_NET_F_MQ, \
+> > >>  	VIRTIO_NET_F_CTRL_MAC_ADDR, \
+> > >> -	VIRTIO_NET_F_MTU, VIRTIO_NET_F_CTRL_GUEST_OFFLOADS
+> > >> +	VIRTIO_NET_F_MTU, VIRTIO_NET_F_CTRL_GUEST_OFFLOADS, \
+> > >> +	VIRTIO_NET_F_SPEED_DUPLEX
+> > >>  
+> > >>  static unsigned int features[] = {
+> > >>  	VIRTNET_FEATURES,
+> > >> diff --git a/include/uapi/linux/virtio_net.h b/include/uapi/linux/virtio_net.h
+> > >> index fc353b5..5de6ed3 100644
+> > >> --- a/include/uapi/linux/virtio_net.h
+> > >> +++ b/include/uapi/linux/virtio_net.h
+> > >> @@ -57,6 +57,8 @@
+> > >>  					 * Steering */
+> > >>  #define VIRTIO_NET_F_CTRL_MAC_ADDR 23	/* Set MAC address */
+> > >>  
+> > >> +#define VIRTIO_NET_F_SPEED_DUPLEX 63	/* Device set linkspeed and duplex */
+> > >> +
+> > >>  #ifndef VIRTIO_NET_NO_LEGACY
+> > >>  #define VIRTIO_NET_F_GSO	6	/* Host handles pkts w/ any GSO type */
+> > >>  #endif /* VIRTIO_NET_NO_LEGACY */
+> > >> @@ -76,6 +78,17 @@ struct virtio_net_config {
+> > >>  	__u16 max_virtqueue_pairs;
+> > >>  	/* Default maximum transmit unit advice */
+> > >>  	__u16 mtu;
+> > >> +	/*
+> > >> +	 * speed, in units of 1Mb. All values 0 to INT_MAX are legal.
+> > >> +	 * Any other value stands for unknown.
+> > >> +	 */
+> > >> +	__u32 speed;
+> > >> +	/*
+> > >> +	 * 0x00 - half duplex
+> > >> +	 * 0x01 - full duplex
+> > >> +	 * Any other value stands for unknown.
+> > >> +	 */
+> > >> +	__u8 duplex;
+> > >>  } __attribute__((packed));
+> > >>  
+> > >>  /*
+> > >> -- 
+> > >> 2.6.1
