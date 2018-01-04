@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53233)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54864)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1eX3N9-0003DE-Rc
-	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 06:07:45 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1eX3O6-0004JV-U7
+	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 06:08:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1eX3N7-0004Tp-2r
-	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 06:07:43 -0500
-Received: from mail-wr0-x242.google.com ([2a00:1450:400c:c0c::242]:40157)
+	(envelope-from <alex.bennee@linaro.org>) id 1eX3O0-0005Xk-Pp
+	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 06:08:42 -0500
+Received: from mail-wm0-x232.google.com ([2a00:1450:400c:c09::232]:42081)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1eX3N6-0004Su-Py
-	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 06:07:40 -0500
-Received: by mail-wr0-x242.google.com with SMTP id p17so1130778wre.7
-	for <qemu-devel@nongnu.org>; Thu, 04 Jan 2018 03:07:40 -0800 (PST)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1eX3O0-0005WY-G2
+	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 06:08:36 -0500
+Received: by mail-wm0-x232.google.com with SMTP id b141so2787109wme.1
+	for <qemu-devel@nongnu.org>; Thu, 04 Jan 2018 03:08:36 -0800 (PST)
+References: <CAKmqyKPZ3AUwGFwp6zK+aFSd6R3p8c+pP-i-W-g=t6ZfR5GVaA@mail.gmail.com>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <CAKmqyKPZ3AUwGFwp6zK+aFSd6R3p8c+pP-i-W-g=t6ZfR5GVaA@mail.gmail.com>
+Date: Thu, 04 Jan 2018 11:08:33 +0000
+Message-ID: <87lghd3mq6.fsf@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <1515030814-4621-1-git-send-email-changpeng.liu@intel.com>
-References: <1515030814-4621-1-git-send-email-changpeng.liu@intel.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Thu, 4 Jan 2018 12:07:39 +0100
-Message-ID: <CAJ+F1CLgVdZ62TwuTame-=oASSUR0fhgssLPuC5yZhtD9UiNiQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v10 0/4] Introduce a new vhost-user-blk
- host device to QEMU
+Subject: Re: [Qemu-devel] MTTCG External Halt
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,100 +29,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Changpeng Liu <changpeng.liu@intel.com>
-Cc: QEMU <qemu-devel@nongnu.org>, james.r.harris@intel.com, "Michael S. Tsirkin" <mst@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Felipe Franciosi <felipe@nutanix.com>
+To: Alistair Francis <alistair23@gmail.com>
+Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Alistair Francis <alistair.francis@xilinx.com>
 
-Hi
 
-On Thu, Jan 4, 2018 at 2:53 AM, Changpeng Liu <changpeng.liu@intel.com> wro=
-te:
-> Although virtio scsi specification was designed as a replacement for virt=
-io_blk,
-> there are still many users using virtio_blk. QEMU 2.9 introduced a new de=
-vice
-> vhost user scsi which can process I/O in user space for virtio_scsi, this=
- commit
-> introduces a new vhost user block host device, which can support virtio_b=
-lk in
-> Guest OS, and I/O processing in another I/O target.
+Alistair Francis <alistair23@gmail.com> writes:
+
+> Hey guys, I'm super stuck with an ugly MTTCG issue and was wondering
+> if anyone had any ideas.
 >
-> Due to the limitation for virtio_blk specification, virtio_blk device can=
-not get
-> block information such as capacity, block size etc via the specification,=
- several
-> new vhost user messages were added to deliver virtio config space
-> information between Qemu and I/O target, VHOST_USER_GET_CONFIG/VHOST_USER=
-_SET_CONFIG
-> messages used for get/set config space from/to I/O target, VHOST_USER_SLA=
-VE_CONFIG_CHANGE_MSG
-> slave message was added for the event notifier in case the change of virt=
-io config space. Also,
-> those messages can be used for vhost device live migration as well.
+> In the Xilinx fork of QEMU (based on 2.11) we have a way for CPUs to
+> halt other CPUs. This is used for example when the power control unit
+> halts the ARM A53s. To do this we have internal GPIO signals that end
+> up calling a function that basically does this:
 >
-> CHANGES:
-> v10: fix the code style error.
-> v8-v9: Several small optimization and code cleanup according to the comme=
-nts.
-> v7-v8: Instead using an event file descriptor for event notifier in case =
-of virtio
-> configuration space changed, while here used a new vhost-user slave messa=
-ge to deliver
-> such event. Several small optimizations to address the comments from v7.
-> v6-v7: change the parameter of set configuration function let it only con=
-tain valid data buffer.
-> v5-v6: add header flags for vhost-user master so that the slave can know =
-the purpose for
-> set config, also vhost-user get/set messages' payload doesn't contain inv=
-alid data buffers.
-> v4-v5: add header offset and size for virtio config space.
-> v3-v4: refactoring the vhost user block example patch based on new libvho=
-st-user library.
-> v2-v3: add new vhost user message to get/set virtio config space.
->
-> Changpeng Liu (4):
->   vhost-user: add new vhost user messages to support virtio config space
->   vhost-user-blk: introduce a new vhost-user-blk host device
->   contrib/libvhost-user: enable virtio config space messages
->   contrib/vhost-user-blk: introduce a vhost-user-blk sample application
+> To halt:
+>     cpu->halted =3D true;
+>     cpu_interrupt(cpu, CPU_INTERRUPT_HALT);
 
-Series:
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Hmm I don't think you should be setting cpu->halted unless you know it
+is safe to do so. As the other CPUs free-run during BQL this isn't
+enough for a cross vCPU interaction. However you can schedule work to
+run in the target vCPUs context safely.
 
-Michael, do you take it?
-thanks
+That said isn't the cpu_interrupt enough to trigger the target vCPU to
+halt?
 
 >
->  .gitignore                              |   1 +
->  Makefile                                |   3 +
->  Makefile.objs                           |   1 +
->  contrib/libvhost-user/libvhost-user.c   |  42 +++
->  contrib/libvhost-user/libvhost-user.h   |  33 ++
->  contrib/vhost-user-blk/Makefile.objs    |   1 +
->  contrib/vhost-user-blk/vhost-user-blk.c | 545 ++++++++++++++++++++++++++=
-++++++
->  default-configs/pci.mak                 |   1 +
->  docs/interop/vhost-user.txt             |  55 ++++
->  hw/block/Makefile.objs                  |   3 +
->  hw/block/vhost-user-blk.c               | 359 +++++++++++++++++++++
->  hw/virtio/vhost-user.c                  | 118 +++++++
->  hw/virtio/vhost.c                       |  32 ++
->  hw/virtio/virtio-pci.c                  |  55 ++++
->  hw/virtio/virtio-pci.h                  |  18 ++
->  include/hw/virtio/vhost-backend.h       |  12 +
->  include/hw/virtio/vhost-user-blk.h      |  41 +++
->  include/hw/virtio/vhost.h               |  15 +
->  18 files changed, 1335 insertions(+)
->  create mode 100644 contrib/vhost-user-blk/Makefile.objs
->  create mode 100644 contrib/vhost-user-blk/vhost-user-blk.c
->  create mode 100644 hw/block/vhost-user-blk.c
->  create mode 100644 include/hw/virtio/vhost-user-blk.h
+> To un-halt
+>     cpu->halted =3D false;
+>     cpu_reset_interrupt(cpu, CPU_INTERRUPT_HALT);
+
+Again if cross vCPU context this needs to be scheduled against the
+target vCPU.
+
 >
-> --
-> 1.9.3
+> We also have the standard ARM WFI (Wait For Interrupt) implementation
+> in op_helper.c:
+>     cs->halted =3D 1;
+>     cs->exception_index =3D EXCP_HLT;
+>     cpu_loop_exit(cs);
 >
+> Before MTTCG this used to work great, but now either we end up with
+> the guest Linux complaining about CPU stalls or we hit:
+> ERROR:/scratch/alistai/master-qemu/cpus.c:1516:qemu_tcg_cpu_thread_fn:
+> assertion failed: (cpu->halted)
 >
+> If I remove the instances of manually setting cpu->halted then I don't
+> see the asserts(), but the the WFI instruction doesn't work correctly.
+> So it seems like setting the halted status externally from the CPU
+> causes the issue.
+
+  /* during start-up the vCPU is reset and the thread is
+   * kicked several times. If we don't ensure we go back
+   * to sleep in the halted state we won't cleanly
+   * start-up when the vCPU is enabled.
+   *
+   * cpu->halted should ensure we sleep in wait_io_event
+   */
+
+I think what I'm trying to say is we should never be halted without
+having gone via wait_io_event where we can sleep.
 
 
+> I have tried setting it inside a lock, using atomic
+> operations and running the setter async on the CPU, but nothing works.
+>
+> Any chance any one has some insight into a way to externally set a
+> vCPU as halted/un-halted?
 
---=20
-Marc-Andr=C3=A9 Lureau
+See the PSCI code which uses the async interface for exactly this.
+
+>
+> Thanks,
+> Alistair
+
+
+--
+Alex Benn=C3=A9e
