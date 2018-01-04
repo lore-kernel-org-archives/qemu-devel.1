@@ -1,29 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48394)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48846)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1eX9lw-0005HW-Q7
-	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 12:57:47 -0500
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1eX9m6-0005Xw-Ty
+	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 12:57:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1eX9lr-0006gz-Tu
-	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 12:57:43 -0500
-Received: from mail-wm0-x241.google.com ([2a00:1450:400c:c09::241]:44694)
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1eX9m6-00071o-22
+	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 12:57:55 -0500
+Received: from mail-io0-x232.google.com ([2607:f8b0:4001:c06::232]:42984)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
-	id 1eX9lr-0006ea-LK
-	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 12:57:39 -0500
-Received: by mail-wm0-x241.google.com with SMTP id t8so4942450wmc.3
-	for <qemu-devel@nongnu.org>; Thu, 04 Jan 2018 09:57:39 -0800 (PST)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1eX9m5-00070m-QT
+	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 12:57:53 -0500
+Received: by mail-io0-x232.google.com with SMTP id x67so3062518ioi.9
+	for <qemu-devel@nongnu.org>; Thu, 04 Jan 2018 09:57:53 -0800 (PST)
 MIME-Version: 1.0
-Sender: alistair23@gmail.com
-In-Reply-To: <20180103180805.18140-5-f4bug@amsat.org>
-References: <20180103180805.18140-1-f4bug@amsat.org>
-	<20180103180805.18140-5-f4bug@amsat.org>
-From: Alistair Francis <alistair.francis@xilinx.com>
-Date: Thu, 4 Jan 2018 09:57:07 -0800
-Message-ID: <CAKmqyKN7H0OFRBk0kviq6BkeUVsEpA7P+46pZkWLcvKFq+06eQ@mail.gmail.com>
+Sender: philippe.mathieu.daude@gmail.com
+In-Reply-To: <34798C74-612D-4484-9781-A3CFB261C383@gmail.com>
+References: <mailman.15762.1515014732.27992.qemu-devel@nongnu.org>
+	<34798C74-612D-4484-9781-A3CFB261C383@gmail.com>
+From: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Date: Thu, 4 Jan 2018 14:57:52 -0300
+Message-ID: <CAAdtpL69Nw_a0x=mg53N7E8bXJGfNgMQUfqA1GGxLEOvVBuinw@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v5 04/17] sdhci: refactor same sysbus/pci
- properties into a common one
+Subject: Re: [Qemu-devel] [PATCH v2 00/25] SDCard: housekeeping, improve SPI,
+ introduce new Specs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,101 +33,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Cc: Alistair Francis <alistair.francis@xilinx.com>, Fam Zheng <famz@redhat.com>, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, Peter Maydell <peter.maydell@linaro.org>, Eduardo Habkost <ehabkost@redhat.com>, Andrey Smirnov <andrew.smirnov@gmail.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
+To: Programmingkid <programmingkidx@gmail.com>, Kevin O'Connor <kevin@koconnor.net>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Alistair Francis <alistair.francis@xilinx.com>, Peter Maydell <peter.maydell@linaro.org>, Igor Mitsyanko <i.mitsyanko@gmail.com>, Andrew Baumann <Andrew.Baumann@microsoft.com>, m.olbrich@pengutronix.de, Andrzej Zaborowski <balrogg@gmail.com>, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, Prasad J Pandit <pjp@fedoraproject.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Paul Brook <paul@codesourcery.com>, Marc-Andr? Lureau <marcandre.lureau@redhat.com>
 
-On Wed, Jan 3, 2018 at 10:07 AM, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.o=
-rg> wrote:
-> Now both sysbus/pci classes inherit of the 'pending-insert-quirk' propert=
-y,
-> which is a HCI dependent property (regardless if accessed through a MMIO
-> sysbus or a PCI bus).
-> So far only the BCM implementation has to use it.
->
-> Add sysbus/pci/sdbus comments to have clearer code blocks separation.
->
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+Hi John,
 
-Reviewed-by: Alistair Francis <alistair.francis@xilinx.com>
+> Is there a way to make this SD card reader work with Mac OS X or Windows guests?
 
-Alistair
+As noted by Kevin here:
+http://lists.nongnu.org/archive/html/qemu-devel/2017-12/msg02765.html
 
-> ---
->  hw/sd/sdhci.c | 21 ++++++++++-----------
->  1 file changed, 10 insertions(+), 11 deletions(-)
->
-> diff --git a/hw/sd/sdhci.c b/hw/sd/sdhci.c
-> index 365bc80009..a11469fbca 100644
-> --- a/hw/sd/sdhci.c
-> +++ b/hw/sd/sdhci.c
-> @@ -1266,13 +1266,17 @@ const VMStateDescription sdhci_vmstate =3D {
->
->  /* Capabilities registers provide information on supported features of t=
-his
->   * specific host controller implementation */
-> -static Property sdhci_pci_properties[] =3D {
-> +static Property sdhci_properties[] =3D {
->      DEFINE_PROP_UINT32("capareg", SDHCIState, capareg,
->              SDHC_CAPAB_REG_DEFAULT),
->      DEFINE_PROP_UINT32("maxcurr", SDHCIState, maxcurr, 0),
-> +    DEFINE_PROP_BOOL("pending-insert-quirk", SDHCIState, pending_insert_=
-quirk,
-> +                     false),
->      DEFINE_PROP_END_OF_LIST(),
->  };
->
-> +/* --- qdev PCI --- */
-> +
->  static void sdhci_pci_realize(PCIDevice *dev, Error **errp)
->  {
->      SDHCIState *s =3D PCI_SDHCI(dev);
-> @@ -1305,7 +1309,7 @@ static void sdhci_pci_class_init(ObjectClass *klass=
-, void *data)
->      k->class_id =3D PCI_CLASS_SYSTEM_SDHCI;
->      set_bit(DEVICE_CATEGORY_STORAGE, dc->categories);
->      dc->vmsd =3D &sdhci_vmstate;
-> -    dc->props =3D sdhci_pci_properties;
-> +    dc->props =3D sdhci_properties;
->      dc->reset =3D sdhci_poweron_reset;
->  }
->
-> @@ -1320,14 +1324,7 @@ static const TypeInfo sdhci_pci_info =3D {
->      },
->  };
->
-> -static Property sdhci_sysbus_properties[] =3D {
-> -    DEFINE_PROP_UINT32("capareg", SDHCIState, capareg,
-> -            SDHC_CAPAB_REG_DEFAULT),
-> -    DEFINE_PROP_UINT32("maxcurr", SDHCIState, maxcurr, 0),
-> -    DEFINE_PROP_BOOL("pending-insert-quirk", SDHCIState, pending_insert_=
-quirk,
-> -                     false),
-> -    DEFINE_PROP_END_OF_LIST(),
-> -};
-> +/* --- qdev SysBus --- */
->
->  static void sdhci_sysbus_init(Object *obj)
->  {
-> @@ -1360,7 +1357,7 @@ static void sdhci_sysbus_class_init(ObjectClass *kl=
-ass, void *data)
->      DeviceClass *dc =3D DEVICE_CLASS(klass);
->
->      dc->vmsd =3D &sdhci_vmstate;
-> -    dc->props =3D sdhci_sysbus_properties;
-> +    dc->props =3D sdhci_properties;
->      dc->realize =3D sdhci_sysbus_realize;
->      dc->reset =3D sdhci_poweron_reset;
->  }
-> @@ -1374,6 +1371,8 @@ static const TypeInfo sdhci_sysbus_info =3D {
->      .class_init =3D sdhci_sysbus_class_init,
->  };
->
-> +/* --- qdev bus master --- */
-> +
->  static void sdhci_bus_class_init(ObjectClass *klass, void *data)
->  {
->      SDBusClass *sbc =3D SD_BUS_CLASS(klass);
-> --
-> 2.15.1
->
->
+If your machine has a PCI bus you can plug it there:
+http://pcidb.net/view/1b36/0007
+
+Linux kmod 'sdhci-pci' recognize it well.
+
+I don't know if OSX/Win guests have a such driver.
+
+If no, we could model the PCI7612:
+https://pci-ids.ucw.cz/read/PC/104c/803b
+
+Regards,
+
+Phil.
