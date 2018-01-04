@@ -1,22 +1,48 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55085)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55379)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1eX8K6-0007zF-Da
-	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 11:25:18 -0500
+	(envelope-from <s1seetee@linux.vnet.ibm.com>) id 1eX8KD-000878-SA
+	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 11:25:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1eX8Ju-0006tM-T0
-	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 11:24:54 -0500
-Date: Thu, 4 Jan 2018 16:24:01 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180104162400.GB2618@work-vm>
-References: <20180104144046.30793-1-f4bug@amsat.org>
-	<20180104144046.30793-3-f4bug@amsat.org>
+	(envelope-from <s1seetee@linux.vnet.ibm.com>) id 1eX8Jy-00072k-Oe
+	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 11:25:01 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:57320
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <s1seetee@linux.vnet.ibm.com>)
+	id 1eX8Jy-0006R8-6g
+	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 11:24:46 -0500
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	w04GOESx068742
+	for <qemu-devel@nongnu.org>; Thu, 4 Jan 2018 11:24:27 -0500
+Received: from e34.co.us.ibm.com (e34.co.us.ibm.com [32.97.110.152])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2f9n8gq3yd-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Thu, 04 Jan 2018 11:24:26 -0500
+Received: from localhost
+	by e34.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <s1seetee@linux.vnet.ibm.com>;
+	Thu, 4 Jan 2018 09:24:26 -0700
+References: <1511273358-21789-1-git-send-email-s1seetee@linux.vnet.ibm.com>
+	<20171212164114.GF2409@work-vm>
+	<e37d8871-544f-3c4f-3a59-bb66dc5c8b67@linux.vnet.ibm.com>
+	<b5c7e566-34f0-adb0-0fcb-bf272cbb0a81@redhat.com>
+	<225a4478-dc5e-a067-f207-e8a183afa0d9@linux.vnet.ibm.com>
+	<9b719ebe-8b38-708c-45a7-d377a583f899@redhat.com>
+	<5e07b5ea-e8b0-521a-b1af-31017fc52578@redhat.com>
+	<87shc3rz5d.fsf@dusky.pond.sub.org>
+	<bd60d7e7-8d33-3f87-b6be-89918c1e7ef6@linux.vnet.ibm.com>
+	<87mv1w6537.fsf@dusky.pond.sub.org>
+From: seeteena <s1seetee@linux.vnet.ibm.com>
+Date: Thu, 4 Jan 2018 21:54:17 +0530
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <20180104144046.30793-3-f4bug@amsat.org>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC PATCH 2/6] hw/net/e1000: real device name is
- 'e1000-82540em', 'e1000' is an alias
+In-Reply-To: <87mv1w6537.fsf@dusky.pond.sub.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+Message-Id: <bf3bd954-e990-85e2-b7d5-787b6e622fe5@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH v1] hmp: 'info snapshots' not showing the id
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,62 +51,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
-Cc: Alistair Francis <alistair.francis@xilinx.com>, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, Andreas =?iso-8859-1?Q?F=E4rber?= <afaerber@suse.de>, Igor Mammedov <imammedo@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Markus Armbruster <armbru@redhat.com>, Sascha Silbe <silbe@linux.vnet.ibm.com>, Alexander Graf <agraf@suse.de>, Fam Zheng <famz@redhat.com>, Jason Wang <jasowang@redhat.com>, qemu-devel@nongnu.org, qemu-arm@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org, lma@suse.com, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-* Philippe Mathieu-Daud=E9 (f4bug@amsat.org) wrote:
-> Signed-off-by: Philippe Mathieu-Daud=E9 <f4bug@amsat.org>
-> ---
->  hw/net/e1000.c | 5 ++++-
->  1 file changed, 4 insertions(+), 1 deletion(-)
->=20
-> diff --git a/hw/net/e1000.c b/hw/net/e1000.c
-> index 05a00cba31..2280f7fdf9 100644
-> --- a/hw/net/e1000.c
-> +++ b/hw/net/e1000.c
-> @@ -1648,6 +1648,7 @@ typedef struct E1000Info {
->      uint16_t   device_id;
->      uint8_t    revision;
->      uint16_t   phy_id2;
-> +    const char **aliases;
->  } E1000Info;
-> =20
->  static void e1000_class_init(ObjectClass *klass, void *data)
-> @@ -1695,10 +1696,11 @@ static const TypeInfo e1000_base_info =3D {
-> =20
->  static const E1000Info e1000_devices[] =3D {
->      {
-> -        .name      =3D "e1000",
-> +        .name      =3D "e1000-82540em",
->          .device_id =3D E1000_DEV_ID_82540EM,
->          .revision  =3D 0x03,
->          .phy_id2   =3D E1000_PHY_ID2_8254xx_DEFAULT,
-> +        .aliases   =3D (const char * []) {"e1000", NULL},
->      },
->      {
->          .name      =3D "e1000-82544gc",
-> @@ -1725,6 +1727,7 @@ static void e1000_register_types(void)
-> =20
->          type_info.name =3D info->name;
->          type_info.parent =3D TYPE_E1000_BASE;
-> +        type_info.aliases =3D info->aliases;
->          type_info.class_data =3D (void *)info;
->          type_info.class_init =3D e1000_class_init;
->          type_info.instance_init =3D e1000_instance_init;
 
-Can you just check that this doesn't break migration compatibility
-either way please;  I think there's some alias code somewhere but I
-can't remember the details.
 
-One thing I do remember that broke when it previously changed was
-entries in PC_COMPAT_* tables like the one in hw/i386/pc_piix.c's
-PC_COMPAT_1_3 - so check with an 'info qtree' that the property is OK.
+On 01/02/2018 01:54 PM, Markus Armbruster wrote:
+> seeteena <s1seetee@linux.vnet.ibm.com> writes:
+>
+>> On 12/22/2017 01:07 PM, Markus Armbruster wrote:
+>>> Eric Blake <eblake@redhat.com> writes:
+>>>
+>>>> On 12/19/2017 08:20 AM, Max Reitz wrote:
+>>>>
+>>>>> So there are three things:
+>>>>>
+>>>>> (1) We probably should not allow snapshot names that could be IDs.
+>>>>> Easiest way to solve this: Names have to start with a non-digit.
+>>>> Yes, that would be a nice change.  It is not strictly backwards
+>>>> compatible (so we'd still have to cope with images that didn't follow
+>>>> the rule, whether created by older qemu or by non-qemu implementations
+>>>> of qcow2), but would alleviate a lot of confusion.
+>>> I recommend to restrict ID strings to letters, digits, '-', '.', '_',
+>>> starting with a letter.  Use id_wellformed() to check.
+>> char *id_generate(IdSubSystems id) autogenates ID in the format eg-
+>> "#block146" with starting with '#' always.
+>> restricting ID strings to use id_wellformed() means we need to force
+>> ID to start with letter.
+>>
+>> #define ID_SPECIAL_CHAR '#' needs to change to (some letter)
+>> #define ID_SPECIAL_CHAR 'A'
+> Ensuring auto-generated IDs cannot clash with IDs chosen by the user is
+> a good idea.  We generally fail to do that in QEMU.
+>
+> An obvious way to do it is to require the user's IDs to start with a
+> letter, and auto-generated IDs to start with another suitable character.
+> In theory, starting with '#' is problematic, because it needs to be
+> quoted in shell at the beginning of words.  Only matters if
+> auto-generated IDs make sense in command lines, which I guess they
+> currently don't.  I'd prefer a 'shell-safe' character all the same.
 
-Dave
+I was using loaned system from other team for recreate and it appears 
+there is some issue in that system and I am not able to recreate the 
+issue now.
 
-> --=20
-> 2.15.1
->=20
->=20
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+
+QEMU 2.11.50 monitor - type 'help' for more information
+(qemu) savevm 0
+Error while creating snapshot on 'rootdisk'
+(qemu) savevm 0
+Error while creating snapshot on 'rootdisk'
+(qemu) savevm 0
+Error while creating snapshot on 'rootdisk'
+(qemu) savevm 1
+Error while creating snapshot on 'rootdisk'
+(qemu)
+
+>
+>>> If backward compatibility is an issue, deprecate offending IDs (with a
+>>> suitable warning), and kill them off after the customary grace period.
+>>>
+>>> IDs embedded in image files and such you may have to keep working
+>>> somehow indefinitely.
