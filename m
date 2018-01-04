@@ -1,26 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40115)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52213)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcel@redhat.com>) id 1eX6av-0003gn-I4
-	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 09:34:13 -0500
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1eX6hZ-0000b1-Mq
+	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 09:41:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcel@redhat.com>) id 1eX6ap-0008Cl-Jm
-	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 09:34:09 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:55008)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <marcel@redhat.com>) id 1eX6ap-0008Ba-En
-	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 09:34:03 -0500
-References: <20171229142922.31701-1-hpoussin@reactos.org>
-	<20171229142922.31701-6-hpoussin@reactos.org>
-From: Marcel Apfelbaum <marcel@redhat.com>
-Message-ID: <a6bfd7bf-3f09-1a3b-431a-1dfa45214fac@redhat.com>
-Date: Thu, 4 Jan 2018 16:33:55 +0200
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1eX6hU-0002fk-VC
+	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 09:41:01 -0500
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Date: Thu,  4 Jan 2018 11:40:40 -0300
+Message-Id: <20180104144046.30793-1-f4bug@amsat.org>
 MIME-Version: 1.0
-In-Reply-To: <20171229142922.31701-6-hpoussin@reactos.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3 05/16] piix4: rename some variables in
- realize function
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [RFC PATCH 0/6] qom: introduce TypeInfo name aliases
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,50 +24,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>, Aurelien Jarno <aurelien@aurel32.net>, Yongbok Kim <yongbok.kim@mips.com>, "Michael S . Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+To: Alistair Francis <alistair.francis@xilinx.com>, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, =?UTF-8?q?Andreas=20F=C3=A4rber?= <afaerber@suse.de>, Igor Mammedov <imammedo@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Markus Armbruster <armbru@redhat.com>, Sascha Silbe <silbe@linux.vnet.ibm.com>, Alexander Graf <agraf@suse.de>, Peter Crosthwaite <crosthwaite.peter@gmail.com>
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, qemu-arm@nongnu.org, Fam Zheng <famz@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, Juan Quintela <quintela@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-On 29/12/2017 16:29, Herv=C3=A9 Poussineau wrote:
-> PIIX4 structure is now 's'
-> PCI device is now 'pci'
+Hi,
 
-Please don't use 'pci'. Use pci_dev', the former is too wide,
+This RFC series is intended to simplify Flattened Device Tree support,
+in particular the 'compatible' FDT entry, when Linux names mismatches
+QEMU ones, but this is the same device modelled.
 
-Thanks,
-Marcel
+Eventually this might help to remove the QDevAlias qdev_alias_table[]
+in qdev-monitor.c.
 
-> DeviceState is now 'dev'
->=20
-> Signed-off-by: Herv=C3=A9 Poussineau <hpoussin@reactos.org>
-> ---
->   hw/isa/piix4.c | 13 +++++++------
->   1 file changed, 7 insertions(+), 6 deletions(-)
->=20
-> diff --git a/hw/isa/piix4.c b/hw/isa/piix4.c
-> index 6b8bc3faf0..4f476dc7e6 100644
-> --- a/hw/isa/piix4.c
-> +++ b/hw/isa/piix4.c
-> @@ -87,16 +87,17 @@ static const VMStateDescription vmstate_piix4 =3D {
->       }
->   };
->  =20
-> -static void piix4_realize(PCIDevice *dev, Error **errp)
-> +static void piix4_realize(PCIDevice *pci, Error **errp)
->   {
-> -    PIIX4State *d =3D PIIX4_PCI_DEVICE(dev);
-> +    DeviceState *dev =3D DEVICE(pci);
-> +    PIIX4State *s =3D DO_UPCAST(PIIX4State, dev, pci);
->  =20
-> -    if (!isa_bus_new(DEVICE(d), pci_address_space(dev),
-> -                     pci_address_space_io(dev), errp)) {
-> +    if (!isa_bus_new(dev, pci_address_space(pci),
-> +                     pci_address_space_io(pci), errp)) {
->           return;
->       }
-> -    piix4_dev =3D &d->dev;
-> -    qemu_register_reset(piix4_reset, d);
-> +    piix4_dev =3D pci;
-> +    qemu_register_reset(piix4_reset, s);
->   }
->  =20
->   int piix4_init(PCIBus *bus, ISABus **isa_bus, int devfn)
->=20
+So far this is only a 'proof of concept'.
+To see how the qtests perform, I only modified 3 devices, 2 used by the
+Xilinx Zynq machines (Cadence), and the e1000 (used by the PXE test).
+
+Regards,
+
+Phil.
+
+Philippe Mathieu-Daudé (6):
+  qom: introduce TypeInfo name aliases
+  hw/net/e1000: real device name is 'e1000-82540em', 'e1000' is an alias
+  hw/char/cadence_uart: add FDT aliases
+  arm/xlnx-zynq: use FDT names for the Cadence UART
+  hw/net/cadence_gem: add FDT names as alias
+  hw/arm/xlnx-zynq: use FDT names for the Cadence GEM
+
+ include/qom/object.h   |  3 +++
+ hw/arm/xilinx_zynq.c   |  2 ++
+ hw/arm/xlnx-zynqmp.c   |  4 ++--
+ hw/char/cadence_uart.c |  7 +++++++
+ hw/net/cadence_gem.c   |  6 ++++++
+ hw/net/e1000.c         |  5 ++++-
+ qom/object.c           | 18 ++++++++++++++++--
+ 7 files changed, 40 insertions(+), 5 deletions(-)
+
+-- 
+2.15.1
