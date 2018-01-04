@@ -1,34 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51200)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36869)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eXC0Z-0001bm-JZ
-	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 15:21:01 -0500
+	(envelope-from <hpoussin@reactos.org>) id 1eXCDL-0007lD-S6
+	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 15:34:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eXC0V-0002EI-E2
-	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 15:20:59 -0500
-Received: from indium.canonical.com ([91.189.90.7]:58524)
+	(envelope-from <hpoussin@reactos.org>) id 1eXCDK-0007XX-OO
+	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 15:34:11 -0500
+Received: from iserv.reactos.org ([2a01:4f8:221:4c5::3]:38886)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1eXC0V-0002DA-7M
-	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 15:20:55 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1eXC0T-0005cy-1n
-	for <qemu-devel@nongnu.org>; Thu, 04 Jan 2018 20:20:53 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 28CA92E8190
-	for <qemu-devel@nongnu.org>; Thu,  4 Jan 2018 20:20:51 +0000 (UTC)
+	(Exim 4.71) (envelope-from <hpoussin@reactos.org>)
+	id 1eXCDK-0007Og-Hs
+	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 15:34:10 -0500
+References: <20171229142922.31701-1-hpoussin@reactos.org>
+	<20171229142922.31701-5-hpoussin@reactos.org>
+	<48e5c12c-d598-4917-5c59-e0017ed52ffa@redhat.com>
+From: =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>
+Message-ID: <8b3faae9-e8c6-8e40-1202-fc6b43112175@reactos.org>
+Date: Thu, 4 Jan 2018 21:34:02 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 04 Jan 2018 20:14:38 -0000
-From: =?utf-8?q?Murilo_Opsfelder_Ara=C3=BAjo?= <1727259@bugs.launchpad.net>
-Reply-To: Bug 1727259 <1727259@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <150892430716.18436.10907121916690603983.malonedeb@chaenomeles.canonical.com>
-Message-Id: <151509687931.23749.6576953462825733343.malone@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1727259] Re: qemu-io-test 58 segfaults when
- configured with gcov
+In-Reply-To: <48e5c12c-d598-4917-5c59-e0017ed52ffa@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v3 04/16] mc146818rtc: always register rtc
+ to rtc list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,125 +31,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Marcel Apfelbaum <marcel@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>, Yongbok Kim <yongbok.kim@mips.com>, "Michael S . Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
 
-I'll work on this.
+Le 04/01/2018 à 15:30, Marcel Apfelbaum a écrit :
+> On 29/12/2017 16:29, Hervé Poussineau wrote:
+>> We are not required anymore to use rtc_init() function.
+>>
+>> Signed-off-by: Hervé Poussineau <hpoussin@reactos.org>
+>> ---
+>>   hw/timer/mc146818rtc.c | 13 ++++++++-----
+>>   1 file changed, 8 insertions(+), 5 deletions(-)
+>>
+>> diff --git a/hw/timer/mc146818rtc.c b/hw/timer/mc146818rtc.c
+>> index 3e8c0b7d33..0b0da691cc 100644
+>> --- a/hw/timer/mc146818rtc.c
+>> +++ b/hw/timer/mc146818rtc.c
+>> @@ -905,6 +905,13 @@ static void rtc_get_date(Object *obj, struct tm *current_tm, Error **errp)
+>>       rtc_get_time(s, current_tm);
+>>   }
+>> +static int rtc_initfn(DeviceState *dev)
+>> +{
+>> +    RTCState *s = MC146818_RTC(dev);
+>> +    QLIST_INSERT_HEAD(&rtc_devices, s, link);
+>> +    return 0;
+>> +}
+>> +
+>>   static void rtc_realizefn(DeviceState *dev, Error **errp)
+>>   {
+>>       ISADevice *isadev = ISA_DEVICE(dev);
+>> @@ -973,11 +980,9 @@ ISADevice *mc146818_rtc_init(ISABus *bus, int base_year, qemu_irq intercept_irq)
+>>   {
+>>       DeviceState *dev;
+>>       ISADevice *isadev;
+>> -    RTCState *s;
+>>       isadev = isa_create(bus, TYPE_MC146818_RTC);
+>>       dev = DEVICE(isadev);
+>> -    s = MC146818_RTC(isadev);
+>>       qdev_prop_set_int32(dev, "base_year", base_year);
+>>       qdev_init_nofail(dev);
+>>       if (intercept_irq) {
+>> @@ -985,7 +990,6 @@ ISADevice *mc146818_rtc_init(ISABus *bus, int base_year, qemu_irq intercept_irq)
+>>       } else {
+>>           isa_connect_gpio_out(isadev, 0, RTC_ISA_IRQ);
+>>       }
+>> -    QLIST_INSERT_HEAD(&rtc_devices, s, link);
+>>       return isadev;
+>>   }
+>> @@ -1012,12 +1016,11 @@ static void rtc_class_initfn(ObjectClass *klass, void *data)
+>>   {
+>>       DeviceClass *dc = DEVICE_CLASS(klass);
+>> +    dc->init = rtc_initfn;
+> 
+> I am not sure you want to use dc->init function.
+> 
+> I think you need TypeInfo's instance_init.
 
-** Changed in: qemu
-     Assignee: (unassigned) =3D> Murilo Opsfelder Ara=C3=BAjo (mopsfelder)
+OK, I will move list insertion to existing function rtc_realizefn.
 
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1727259
-
-Title:
-  qemu-io-test 58 segfaults when configured with gcov
-
-Status in QEMU:
-  New
-
-Bug description:
-  Head is at 3d7196d43bfe12efe98568cb60057e273652b99b
-
-  Steps to re-produce:
-  1. git clone
-  ./configure --enable-gcov --target-list=3Dppc64-softmmu
-  make
-  cd tests/qemu-iotests
-
-  2. export qemu binary, in my environment
-  export QEMU_PROG=3D/home/nasastry/qemu_gcov/ppc64-softmmu/qemu-system-ppc=
-64
-
-  3. Run test 58 with format qcow2
-  ./check -qcow2 58
-
-  QEMU          -- "/home/nasastry/qemu_gcov/ppc64-softmmu/qemu-system-ppc6=
-4" -nodefaults -machine accel=3Dqtest
-  QEMU_IMG      -- "/home/nasastry/qemu_gcov/qemu-img"
-  QEMU_IO       -- "/home/nasastry/qemu_gcov/qemu-io"  --cache writeback -f=
- qcow2
-  QEMU_NBD      -- "/home/nasastry/qemu_gcov/qemu-nbd"
-  IMGFMT        -- qcow2 (compat=3D1.1)
-  IMGPROTO      -- file
-  PLATFORM      -- Linux/ppc64le zzfp365-lp1 4.13.0-4.rel.git49564cb.el7.ce=
-ntos.ppc64le
-  TEST_DIR      -- /home/nasastry/qemu_gcov/tests/qemu-iotests/scratch
-  SOCKET_SCM_HELPER -- /home/nasastry/qemu_gcov/tests/qemu-iotests/socket_s=
-cm_helper
-
-  058 1s ... - output mismatch (see 058.out.bad)
-  --- /home/nasastry/qemu_gcov/tests/qemu-iotests/058.out	2017-10-09 14:09:=
-04.262726912 +0530
-  +++ /home/nasastry/qemu_gcov/tests/qemu-iotests/058.out.bad	2017-10-25 15=
-:00:52.037515025 +0530
-  @@ -19,16 +19,28 @@
-   4 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-
-   =3D=3D verifying the exported snapshot with patterns, method 1 =3D=3D
-  -read 4096/4096 bytes at offset 4096
-  -4 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-  -read 4096/4096 bytes at offset 8192
-  -4 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-  +./common.rc: line 66: 36255 Segmentation fault      (core dumped) ( if [=
- "${VALGRIND_QEMU}" =3D=3D "y" ]; then
-  +    exec valgrind --log-file=3D"${VALGRIND_LOGFILE}" --error-exitcode=3D=
-99 "$QEMU_IO_PROG" $QEMU_IO_ARGS "$@";
-  +else
-  +    exec "$QEMU_IO_PROG" $QEMU_IO_ARGS "$@";
-  +fi )
-  +./common.rc: line 66: 36262 Segmentation fault      (core dumped) ( if [=
- "${VALGRIND_QEMU}" =3D=3D "y" ]; then
-  +    exec valgrind --log-file=3D"${VALGRIND_LOGFILE}" --error-exitcode=3D=
-99 "$QEMU_IO_PROG" $QEMU_IO_ARGS "$@";
-  +else
-  +    exec "$QEMU_IO_PROG" $QEMU_IO_ARGS "$@";
-  +fi )
-
-   =3D=3D verifying the exported snapshot with patterns, method 2 =3D=3D
-  -read 4096/4096 bytes at offset 4096
-  -4 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-  -read 4096/4096 bytes at offset 8192
-  -4 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-  +./common.rc: line 66: 36274 Segmentation fault      (core dumped) ( if [=
- "${VALGRIND_QEMU}" =3D=3D "y" ]; then
-  +    exec valgrind --log-file=3D"${VALGRIND_LOGFILE}" --error-exitcode=3D=
-99 "$QEMU_IO_PROG" $QEMU_IO_ARGS "$@";
-  +else
-  +    exec "$QEMU_IO_PROG" $QEMU_IO_ARGS "$@";
-  +fi )
-  +./common.rc: line 66: 36282 Segmentation fault      (core dumped) ( if [=
- "${VALGRIND_QEMU}" =3D=3D "y" ]; then
-  +    exec valgrind --log-file=3D"${VALGRIND_LOGFILE}" --error-exitcode=3D=
-99 "$QEMU_IO_PROG" $QEMU_IO_ARGS "$@";
-  +else
-  +    exec "$QEMU_IO_PROG" $QEMU_IO_ARGS "$@";
-  +fi )
-
-   =3D=3D verifying the converted snapshot with patterns, method 1 =3D=3D
-   read 4096/4096 bytes at offset 4096
-  Failures: 058
-  Failed 1 of 1 tests
-
-  with out gcov configured this test case is pass.
-  # ./check -qcow2 58
-  QEMU          -- "/home/nasastry/qemu/ppc64-softmmu/qemu-system-ppc64" -n=
-odefaults -machine accel=3Dqtest
-  QEMU_IMG      -- "/home/nasastry/qemu/qemu-img"
-  QEMU_IO       -- "/home/nasastry/qemu/qemu-io"  --cache writeback -f qcow2
-  QEMU_NBD      -- "/home/nasastry/qemu/qemu-nbd"
-  IMGFMT        -- qcow2 (compat=3D1.1)
-  IMGPROTO      -- file
-  PLATFORM      -- Linux/ppc64le zzfp365-lp1 4.13.0-4.rel.git49564cb.el7.ce=
-ntos.ppc64le
-  TEST_DIR      -- /home/nasastry/qemu/tests/qemu-iotests/scratch
-  SOCKET_SCM_HELPER -- /home/nasastry/qemu/tests/qemu-iotests/socket_scm_he=
-lper
-
-  058 0s ...
-  Passed all 1 tests
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1727259/+subscriptions
+> 
+> Thanks,
+> Marcel
+> 
+>>       dc->realize = rtc_realizefn;
+>>       dc->reset = rtc_resetdev;
+>>       dc->vmsd = &vmstate_rtc;
+>>       dc->props = mc146818rtc_properties;
+>> -    /* Reason: needs to be wired up by rtc_init() */
+>> -    dc->user_creatable = false;
+>>   }
+>>   static void rtc_finalize(Object *obj)
+>>
+> 
+> 
