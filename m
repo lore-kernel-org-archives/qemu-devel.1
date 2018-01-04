@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55321)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36646)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jianjay.zhou@huawei.com>) id 1eWy7j-0004mc-PS
-	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 00:31:29 -0500
+	(envelope-from <zhangckid@gmail.com>) id 1eWyb0-0003Qg-5t
+	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 01:01:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jianjay.zhou@huawei.com>) id 1eWy7f-0001Wk-0i
-	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 00:31:27 -0500
-Received: from [45.249.212.35] (port=40458 helo=huawei.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jianjay.zhou@huawei.com>)
-	id 1eWy7e-0001RN-Ah
-	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 00:31:22 -0500
-From: Jay Zhou <jianjay.zhou@huawei.com>
-Date: Thu, 4 Jan 2018 13:29:48 +0800
-Message-ID: <1515043788-38300-1-git-send-email-jianjay.zhou@huawei.com>
-MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH] memory: update comments and fix some typos
+	(envelope-from <zhangckid@gmail.com>) id 1eWyaw-0003md-0Q
+	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 01:01:42 -0500
+Received: from mail-pg0-x235.google.com ([2607:f8b0:400e:c05::235]:41978)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <zhangckid@gmail.com>) id 1eWyav-0003mF-Qj
+	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 01:01:37 -0500
+Received: by mail-pg0-x235.google.com with SMTP id 77so337169pgd.8
+	for <qemu-devel@nongnu.org>; Wed, 03 Jan 2018 22:01:37 -0800 (PST)
+From: Zhang Chen <zhangckid@gmail.com>
+Date: Thu,  4 Jan 2018 14:00:59 +0800
+Message-Id: <1515045675-6993-1-git-send-email-zhangckid@gmail.com>
+Subject: [Qemu-devel] [PATCH RESEND V3 00/16] COLO: integrate colo frame
+ with block replication and COLO proxy
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,138 +24,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: pbonzini@redhat.com, weidong.huang@huawei.com, wangxinxin.wang@huawei.com, jianjay.zhou@huawei.com
+To: qemu devel <qemu-devel@nongnu.org>
+Cc: Zhang Chen <zhangckid@gmail.com>
 
-Signed-off-by: Jay Zhou <jianjay.zhou@huawei.com>
----
- include/exec/memory.h | 27 +++++++++++++++------------
- 1 file changed, 15 insertions(+), 12 deletions(-)
+Hi~
 
-diff --git a/include/exec/memory.h b/include/exec/memory.h
-index a4cabdf..6e5684d 100644
---- a/include/exec/memory.h
-+++ b/include/exec/memory.h
-@@ -324,7 +324,7 @@ FlatView *address_space_to_flatview(AddressSpace *as);
-  * MemoryRegionSection: describes a fragment of a #MemoryRegion
-  *
-  * @mr: the region, or %NULL if empty
-- * @address_space: the address space the region is mapped in
-+ * @fv: the flat view of the address space the region is mapped in
-  * @offset_within_region: the beginning of the section, relative to @mr's start
-  * @size: the size of the section; will not exceed @mr's boundaries
-  * @offset_within_address_space: the address of the first byte of the section
-@@ -607,6 +607,7 @@ void memory_region_init_rom_nomigrate(MemoryRegion *mr,
-  * @mr: the #MemoryRegion to be initialized.
-  * @owner: the object that tracks the region's reference count
-  * @ops: callbacks for write access handling (must not be NULL).
-+ * @opaque: passed to the read and write callbacks of the @ops structure.
-  * @name: Region name, becomes part of RAMBlock name used in migration stream
-  *        must be unique within any device
-  * @size: size of the region.
-@@ -650,11 +651,10 @@ static inline void memory_region_init_reservation(MemoryRegion *mr,
-  * An IOMMU region translates addresses and forwards accesses to a target
-  * memory region.
-  *
-- * @typename: QOM class name
-  * @_iommu_mr: the #IOMMUMemoryRegion to be initialized
-  * @instance_size: the IOMMUMemoryRegion subclass instance size
-+ * @mrtypename: the type name of the #IOMMUMemoryRegion
-  * @owner: the object that tracks the region's reference count
-- * @ops: a function that translates addresses into the @target region
-  * @name: used for debugging; not visible to the user or ABI
-  * @size: size of the region.
-  */
-@@ -824,8 +824,8 @@ static inline IOMMUMemoryRegion *memory_region_get_iommu(MemoryRegion *mr)
-  * memory_region_get_iommu_class_nocheck: returns iommu memory region class
-  *   if an iommu or NULL if not
-  *
-- * Returns pointer to IOMMUMemoryRegioniClass if a memory region is an iommu,
-- * otherwise NULL. This is fast path avoinding QOM checking, use with caution.
-+ * Returns pointer to IOMMUMemoryRegionClass if a memory region is an iommu,
-+ * otherwise NULL. This is fast path avoiding QOM checking, use with caution.
-  *
-  * @mr: the memory region being queried
-  */
-@@ -990,7 +990,8 @@ int memory_region_get_fd(MemoryRegion *mr);
-  * protecting the pointer, such as a reference to the region that includes
-  * the incoming ram_addr_t.
-  *
-- * @mr: the memory region being queried.
-+ * @ptr: the host pointer to be converted
-+ * @offset: the offset within memory region
-  */
- MemoryRegion *memory_region_from_host(void *ptr, ram_addr_t *offset);
- 
-@@ -1267,7 +1268,7 @@ void memory_region_clear_global_locking(MemoryRegion *mr);
-  * @size: the size of the access to trigger the eventfd
-  * @match_data: whether to match against @data, instead of just @addr
-  * @data: the data to match against the guest write
-- * @fd: the eventfd to be triggered when @addr, @size, and @data all match.
-+ * @e: event notifier to be triggered when @addr, @size, and @data all match.
-  **/
- void memory_region_add_eventfd(MemoryRegion *mr,
-                                hwaddr addr,
-@@ -1287,7 +1288,7 @@ void memory_region_add_eventfd(MemoryRegion *mr,
-  * @size: the size of the access to trigger the eventfd
-  * @match_data: whether to match against @data, instead of just @addr
-  * @data: the data to match against the guest write
-- * @fd: the eventfd to be triggered when @addr, @size, and @data all match.
-+ * @e: event notifier to be triggered when @addr, @size, and @data all match.
-  */
- void memory_region_del_eventfd(MemoryRegion *mr,
-                                hwaddr addr,
-@@ -1523,7 +1524,7 @@ bool memory_region_request_mmio_ptr(MemoryRegion *mr, hwaddr addr);
-  * will need to request the pointer again.
-  *
-  * @mr: #MemoryRegion associated to the pointer.
-- * @addr: address within that region
-+ * @offset: offset within the memory region
-  * @size: size of that area.
-  */
- void memory_region_invalidate_mmio_ptr(MemoryRegion *mr, hwaddr offset,
-@@ -1592,6 +1593,7 @@ void address_space_destroy(AddressSpace *as);
-  * @addr: address within that address space
-  * @attrs: memory transaction attributes
-  * @buf: buffer with the data transferred
-+ * @len: the number of bytes to read or write
-  * @is_write: indicates the transfer direction
-  */
- MemTxResult address_space_rw(AddressSpace *as, hwaddr addr,
-@@ -1609,6 +1611,7 @@ MemTxResult address_space_rw(AddressSpace *as, hwaddr addr,
-  * @addr: address within that address space
-  * @attrs: memory transaction attributes
-  * @buf: buffer with the data transferred
-+ * @len: the number of bytes to write
-  */
- MemTxResult address_space_write(AddressSpace *as, hwaddr addr,
-                                 MemTxAttrs attrs,
-@@ -1807,7 +1810,7 @@ IOMMUTLBEntry address_space_get_iotlb_entry(AddressSpace *as, hwaddr addr,
-  * called from an RCU critical section, to avoid that the last reference
-  * to the returned region disappears after address_space_translate returns.
-  *
-- * @as: #AddressSpace to be accessed
-+ * @fv: #FlatView to be accessed
-  * @addr: address within that address space
-  * @xlat: pointer to address within the returned memory region section's
-  * #MemoryRegion.
-@@ -1865,7 +1868,7 @@ void *address_space_map(AddressSpace *as, hwaddr addr,
-  * the amount of memory that was actually read or written by the caller.
-  *
-  * @as: #AddressSpace used
-- * @addr: address within that address space
-+ * @buffer: host pointer as returned by address_space_map()
-  * @len: buffer length as returned by address_space_map()
-  * @access_len: amount of data actually transferred
-  * @is_write: indicates the transfer direction
-@@ -1902,7 +1905,7 @@ static inline bool memory_access_is_direct(MemoryRegion *mr, bool is_write)
-  * or failed (eg unassigned memory, device rejected the transaction,
-  * IOMMU fault).
-  *
-- * @as: #AddressSpace to be accessed
-+ * @fv: #FlatView to be accessed
-  * @addr: address within that address space
-  * @attrs: memory transaction attributes
-  * @buf: buffer with the data transferred
+(Sorry, I forgot add the qemu-devel maillist, resend this series)
+
+COLO Frame, block replication and COLO proxy(colo-compare,filter-mirror,
+filter-redirector,filter-rewriter) have been exist in qemu
+for long time, it's time to integrate these three parts to make COLO really works.
+
+In this series, we have some optimizations for COLO frame, including separating the
+process of saving ram and device state, using an COLO_EXIT event to notify users that
+VM exits COLO, for these parts, most of them have been reviewed long time ago in old version,
+but since this series have just rebased on upstream which had merged a new series of migration,
+parts of pathes in this series deserve review again.
+
+We use notifier/callback method for COLO compare to notify COLO frame about
+net packets inconsistent event, and add a handle_event method for NetFilterClass to
+help COLO frame to notify filters and colo-compare about checkpoint/failover event, 
+it is flexible.
+
+For the neweset version, please refer to:
+https://github.com/zhangckid/qemu/tree/qemu-colo-18jan4
+
+Please review, thanks.
+
+V3:
+ - Address community comments from V2.
+ - Rebase on upstream codes.
+ - Fix several bugs.
+ - Splite shared disk part to indepentent patch set.
+ - Optimize codes.
+
+Zhang Chen (8):
+  filter-rewriter: fix memory leak for connection in
+    connection_track_table
+  colo-compare: implement the process of checkpoint
+  colo-compare: use notifier to notify packets comparing result
+  COLO: integrate colo compare with colo frame
+  COLO: Add block replication into colo process
+  ram/COLO: Record the dirty pages that SVM received
+  filter: Add handle_event method for NetFilterClass
+  filter-rewriter: handle checkpoint and failover event
+
+zhanghailiang (8):
+  COLO: Remove colo_state migration struct
+  COLO: Load dirty pages into SVM's RAM cache firstly
+  COLO: Flush memory data from ram cache
+  qmp event: Add COLO_EXIT event to notify users while exited COLO
+  savevm: split the process of different stages for loadvm/savevm
+  COLO: flush host dirty ram from cache
+  COLO: notify net filters about checkpoint/failover event
+  COLO: quick failover process by kick COLO thread
+
+ include/exec/ram_addr.h  |   1 +
+ include/migration/colo.h |  11 ++-
+ include/net/filter.h     |   5 ++
+ migration/Makefile.objs  |   2 +-
+ migration/colo-comm.c    |  76 -------------------
+ migration/colo.c         | 188 ++++++++++++++++++++++++++++++++++++++++++++---
+ migration/migration.c    |  38 +++++++++-
+ migration/ram.c          | 181 ++++++++++++++++++++++++++++++++++++++++++++-
+ migration/ram.h          |   4 +
+ migration/savevm.c       |  54 ++++++++++++--
+ migration/savevm.h       |   5 ++
+ migration/trace-events   |   3 +
+ net/colo-compare.c       | 103 ++++++++++++++++++++++++--
+ net/colo-compare.h       |  24 ++++++
+ net/colo.h               |   4 +
+ net/filter-rewriter.c    | 109 +++++++++++++++++++++++++--
+ net/filter.c             |  17 +++++
+ net/net.c                |  28 +++++++
+ qapi-schema.json         |  21 ++++++
+ qapi/migration.json      |  13 ++++
+ vl.c                     |   2 -
+ 21 files changed, 771 insertions(+), 118 deletions(-)
+ delete mode 100644 migration/colo-comm.c
+ create mode 100644 net/colo-compare.h
+
 -- 
-1.8.3.1
+2.7.4
