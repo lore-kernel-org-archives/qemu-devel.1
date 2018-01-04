@@ -1,23 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37473)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38676)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1eX8lq-0002Td-4g
-	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 11:53:35 -0500
+	(envelope-from <antonynpavlov@gmail.com>) id 1eX8nU-00041z-T8
+	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 11:55:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1eX8lc-0004Bt-1o
-	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 11:53:34 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:35052)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1eX8lb-0004BD-Ro
-	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 11:53:19 -0500
-Date: Thu, 4 Jan 2018 18:53:07 +0200
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20180104184236-mutt-send-email-mst@kernel.org>
-References: <20171219162151.GA10889@stefanha-x1.localdomain>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20171219162151.GA10889@stefanha-x1.localdomain>
-Subject: Re: [Qemu-devel] vhost-user graceful connect/disconnect
+	(envelope-from <antonynpavlov@gmail.com>) id 1eX8nQ-0005pk-1C
+	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 11:55:16 -0500
+Received: from mail-lf0-x243.google.com ([2a00:1450:4010:c07::243]:43553)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <antonynpavlov@gmail.com>)
+	id 1eX8nP-0005oe-N9
+	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 11:55:11 -0500
+Received: by mail-lf0-x243.google.com with SMTP id o26so2421663lfc.10
+	for <qemu-devel@nongnu.org>; Thu, 04 Jan 2018 08:55:11 -0800 (PST)
+Date: Thu, 4 Jan 2018 20:09:07 +0300
+From: Antony Pavlov <antonynpavlov@gmail.com>
+Message-Id: <20180104200907.7232a1e131af98e25931faa5@gmail.com>
+In-Reply-To: <1514940265-18093-22-git-send-email-mjc@sifive.com>
+References: <1514940265-18093-1-git-send-email-mjc@sifive.com>
+	<1514940265-18093-22-git-send-email-mjc@sifive.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v1 21/21] RISC-V Build Infrastructure
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,73 +30,145 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: qemu-devel@nongnu.org, mukawa@igel.co.jp, marcandre.lureau@redhat.com, Wei Wang <wei.w.wang@intel.com>, Maxime Coquelin <maxime.coquelin@redhat.com>, n.nikolaev@virtualopensystems.com
+To: Michael Clark <mjc@sifive.com>
+Cc: qemu-devel@nongnu.org, Sagar Karandikar <sagark@eecs.berkeley.edu>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
 
-On Tue, Dec 19, 2017 at 04:21:51PM +0000, Stefan Hajnoczi wrote:
-> Hi,
-> Vhost-user implementations assume the slave is already running before
-> the master starts.  The slave is required during virtio device
-> initialization (e.g. feature bit negotiation) and so it is simplest to
-> assume that the master is already available and will respond immediately
-> to the VHOST_USER_GET_FEATURES message.
-> 
-> I have thought about how to let master and slave start in any order.
-> Some approaches involve changes to the VIRTIO specification so that
-> guest drivers can wait until the vhost-user connection is established.
-> 
-> We can avoid spec changes using PCI hotplug:
-> 
-> 1. Introduce a new vhost-user object that manages a connection:
-> 
->    -chardev ...
->    -object vhost-user,id=vhost-user0,chardev=chr0
-> 
->    Note this object is *not* a NetClient.  It's a resource for managing
->    a vhost-user connection and can be used with any device type (net,
->    scsi, blk, etc).
-> 
->    This object tries to establish a connection.  When a connection is
->    established it sends vhost-user protocol messages to fetch
->    information needed for virtio device initialization (like the number
->    of virtqueues supported, features bits, etc).  This information is
->    stashed so that vhost_*() calls later on do not require synchronous
->    communication with the vhost-user slave.
+On Wed,  3 Jan 2018 13:44:25 +1300
+Michael Clark <mjc@sifive.com> wrote:
 
-I'm not sure how important or feasible this last part is.
+> This adds RISC-V into the build system enabling the following targets:
+>=20
+> - riscv32-softmmu
+> - riscv64-softmmu
+> - riscv32-linux-user
+> - riscv64-linux-user
+>=20
 
-> 2. When the vhost-user connection is established the object emits a QMP
->    event so management software can hotplug the virtio device:
-> 
->    VHOST_USER_CONNECTED source=vhost-user0
-> 
-> 3. The management software hotplugs the virtio device:
-> 
->    (qmp) netdev_add vhost-user,id=netdev0,vhost-user=vhost-user0
->    (qmp) device_add virtio-net-pci,netdev=netdev0
-> 
-> Advantages of this approach:
-> 
->  * Does not require spec changes.
->  * Can be implemented without vhost-user.c qemu_chr_fe_read/write_all()
->    calls that hang QEMU until the slave sends data.
->  * Allows slave to set the number of queues, feature bits, etc via the
->    vhost-user socket.  It is not necessary to manually specify feature
->    bitmasks and other slave-specific information on the QEMU
->    command-line.
-> 
-> I haven't thought through disconnection but I imagine the vhost-user
-> object would emit a VHOST_USER_DISCONNECTED event so the management
-> software can hot unplug the device.
-> 
-> Thoughts?
-> 
-> Stefan
+...
 
-This sounds like an interesting set of ideas to me.
-Something to keep in mind for the future.
+> diff --git a/default-configs/riscv32-softmmu.mak b/default-configs/riscv3=
+2-softmmu.mak
+> new file mode 100644
+> index 0000000..f9e7421
+> --- /dev/null
+> +++ b/default-configs/riscv32-softmmu.mak
+> @@ -0,0 +1,4 @@
+> +# Default configuration for riscv-softmmu
+> +
+> +CONFIG_SERIAL=3Dy
+> +CONFIG_VIRTIO=3Dy
+> diff --git a/default-configs/riscv64-linux-user.mak b/default-configs/ris=
+cv64-linux-user.mak
+> new file mode 100644
+> index 0000000..865b362
+> --- /dev/null
+> +++ b/default-configs/riscv64-linux-user.mak
+> @@ -0,0 +1 @@
+> +# Default configuration for riscv-linux-user
+> diff --git a/default-configs/riscv64-softmmu.mak b/default-configs/riscv6=
+4-softmmu.mak
+> new file mode 100644
+> index 0000000..f9e7421
+> --- /dev/null
+> +++ b/default-configs/riscv64-softmmu.mak
+> @@ -0,0 +1,4 @@
+> +# Default configuration for riscv-softmmu
+> +
+> +CONFIG_SERIAL=3Dy
+> +CONFIG_VIRTIO=3Dy
+> diff --git a/hw/riscv/Makefile.objs b/hw/riscv/Makefile.objs
+> new file mode 100644
+> index 0000000..a0c31ae
+> --- /dev/null
+> +++ b/hw/riscv/Makefile.objs
+> @@ -0,0 +1,12 @@
+> +obj-y +=3D riscv_elf.o
+> +obj-y +=3D riscv_htif.o
+> +obj-y +=3D riscv_hart.o
+> +obj-y +=3D sifive_e300.o
+> +obj-y +=3D sifive_clint.o
+> +obj-y +=3D sifive_prci.o
+> +obj-y +=3D sifive_plic.o
+> +obj-y +=3D sifive_u500.o
+> +obj-y +=3D sifive_uart.o
+> +obj-y +=3D spike_v1_09.o
+> +obj-y +=3D spike_v1_10.o
+> +obj-y +=3D virt.o
 
-Thanks!
+According to https://www.sifive.com/products/freedom/
+Freedom E300 Platform uses RV32IMAC Architecture
+and Freedom U500 Platform uses RV64GC Architecture.
 
--- 
-MST
+Which means that qemu-system-riscv32 has to have E300 support but not U500 =
+support.
+qemu-system-riscv64 has to have U500 support but not E300 support.
+
+However please see this log:
+
+riscv-qemu$ ./riscv32-softmmu/qemu-system-riscv32 -M ?
+Supported machines are:
+none                 empty machine
+sifive_e300          RISC-V Board compatible with SiFive E300 SDK
+sifive_u500          RISC-V Board compatible with SiFive U500 SDK <<<<<< U5=
+00 in 32-bit mode
+spike_v1.10          RISC-V Spike Board (Privileged ISA v1.10)
+spike_v1.9           RISC-V Spike Board (Privileged ISA v1.9.1) (default)
+virt                 RISC-V VirtIO Board (Privileged spec v1.10)
+riscv-qemu$ ./riscv64-softmmu/qemu-system-riscv64 -M ?
+Supported machines are:
+none                 empty machine
+sifive_e300          RISC-V Board compatible with SiFive E300 SDK <<<<<< E3=
+00 in 64-bit mode
+sifive_u500          RISC-V Board compatible with SiFive U500 SDK
+spike_v1.10          RISC-V Spike Board (Privileged ISA v1.10)
+spike_v1.9           RISC-V Spike Board (Privileged ISA v1.9.1) (default)
+virt                 RISC-V VirtIO Board (Privileged spec v1.10)
+
+I propose at least this fixup:
+
+diff --git a/default-configs/riscv32-softmmu.mak b/default-configs/riscv32-=
+softmmu.mak
+index f9e742120c..6a807f5f96 100644
+--- a/default-configs/riscv32-softmmu.mak
++++ b/default-configs/riscv32-softmmu.mak
+@@ -1,4 +1,5 @@
+-# Default configuration for riscv-softmmu
++# Default configuration for riscv32-softmmu
+=20
+ CONFIG_SERIAL=3Dy
+ CONFIG_VIRTIO=3Dy
++CONFIG_SIFIVE_E300=3Dy
+diff --git a/default-configs/riscv64-softmmu.mak b/default-configs/riscv64-=
+softmmu.mak
+index f9e742120c..1a0349fe27 100644
+--- a/default-configs/riscv64-softmmu.mak
++++ b/default-configs/riscv64-softmmu.mak
+@@ -1,4 +1,5 @@
+-# Default configuration for riscv-softmmu
++# Default configuration for riscv64-softmmu
+=20
+ CONFIG_SERIAL=3Dy
+ CONFIG_VIRTIO=3Dy
++CONFIG_SIFIVE_U500=3Dy
+diff --git a/hw/riscv/Makefile.objs b/hw/riscv/Makefile.objs
+index a0c31ae25e..bac5faa603 100644
+--- a/hw/riscv/Makefile.objs
++++ b/hw/riscv/Makefile.objs
+@@ -1,11 +1,11 @@
+ obj-y +=3D riscv_elf.o
+ obj-y +=3D riscv_htif.o
+ obj-y +=3D riscv_hart.o
+-obj-y +=3D sifive_e300.o
++obj-$(CONFIG_SIFIVE_E300) +=3D sifive_e300.o
+ obj-y +=3D sifive_clint.o
+ obj-y +=3D sifive_prci.o
+ obj-y +=3D sifive_plic.o
+-obj-y +=3D sifive_u500.o
++obj-$(CONFIG_SIFIVE_U500) +=3D sifive_u500.o
+ obj-y +=3D sifive_uart.o
+ obj-y +=3D spike_v1_09.o
+ obj-y +=3D spike_v1_10.o
+
+--=20
+Best regards,
+=A0 Antony Pavlov
