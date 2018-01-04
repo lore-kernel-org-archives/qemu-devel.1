@@ -1,31 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33362)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39903)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1eXAdM-0001OF-Br
-	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 13:52:57 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1eXB5q-000058-Mf
+	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 14:22:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1eXAdI-0006fQ-EY
-	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 13:52:56 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:58138)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1eXAdI-0006eh-8O
-	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 13:52:52 -0500
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 803079387B
-	for <qemu-devel@nongnu.org>; Thu,  4 Jan 2018 18:52:50 +0000 (UTC)
-Date: Thu, 4 Jan 2018 18:52:38 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180104185238.GB2635@work-vm>
-References: <20180103183336.27709-1-dgilbert@redhat.com>
-	<7f455464-a32b-b709-1e0e-70dd16274efe@redhat.com>
+	(envelope-from <ehabkost@redhat.com>) id 1eXB5p-0002BD-Kj
+	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 14:22:22 -0500
+Date: Thu, 4 Jan 2018 17:22:03 -0200
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20180104192203.GD3407@localhost.localdomain>
+References: <20180104144046.30793-1-f4bug@amsat.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <7f455464-a32b-b709-1e0e-70dd16274efe@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] cpu_physical_memory_sync_dirty_bitmap:
- Another alignment fix
+In-Reply-To: <20180104144046.30793-1-f4bug@amsat.org>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [RFC PATCH 0/6] qom: introduce TypeInfo name
+ aliases
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,32 +24,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-devel@nongnu.org, wei@redhat.com, quintela@redhat.com, peterx@redhat.com
+To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
+Cc: Alistair Francis <alistair.francis@xilinx.com>, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, Andreas =?iso-8859-1?Q?F=E4rber?= <afaerber@suse.de>, Igor Mammedov <imammedo@redhat.com>, Markus Armbruster <armbru@redhat.com>, Sascha Silbe <silbe@linux.vnet.ibm.com>, Alexander Graf <agraf@suse.de>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, qemu-devel@nongnu.org, qemu-arm@nongnu.org, Fam Zheng <famz@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>, Juan Quintela <quintela@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-* Paolo Bonzini (pbonzini@redhat.com) wrote:
-> On 03/01/2018 19:33, Dr. David Alan Gilbert (git) wrote:
-> > The optimised version operates on 'longs' dealing with (typically) 64
-> > pages at a time, replacing the whole long by a 0 and counting the bits.
-> > If the Ramblock is less than 64bits in length that long can contain bits
-> > representing two different RAMBlocks, but the code will update the
-> > bmap belinging to the 1st RAMBlock only while having updated the total
-> > dirty page count for both.
-> 
-> The patch is obviously correct, but would it make sense also to align
-> the RAMBlocks' initial ram_addr_t to a multiple of BITS_PER_LONG <<
-> TARGET_PAGE_BITS?
+On Thu, Jan 04, 2018 at 11:40:40AM -0300, Philippe Mathieu-Daud=E9 wrote:
+> Hi,
+>=20
+> This RFC series is intended to simplify Flattened Device Tree support,
+> in particular the 'compatible' FDT entry, when Linux names mismatches
+> QEMU ones, but this is the same device modelled.
+>=20
+> Eventually this might help to remove the QDevAlias qdev_alias_table[]
+> in qdev-monitor.c.
+>=20
 
-Yes, I can do that as a separate patch.  The alignment starts getting
-a little silly - say 4k target page, 64 bits long so aligning a 4k
-RAMBlock to 256kb boundary - but I think it's OK.
+Didn't look closely at the patches yet, but this sounds like a
+nice generic way to replace other alias systems.  We have at
+least:
 
-Dave
-P.S. I'd be careful of saying 'obviously correct' given how many small
-fixes this function has had recently!
+* qdev-monitor.c: qdev_alias_table[] (as mentioned above)
+* chardev/char.c: chardev_alias_table[]
+* target/alpha/cpu.c: alpha_cpu_aliases[]
+* target/ppc/cpu-models.c: ppc_cpu_aliases[]
+* include/hw/boards.h: MachineClass::alias
 
-> Thanks,
-> 
-> Paolo
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Probably there are others I couldn't find.
+
+
+> So far this is only a 'proof of concept'.
+> To see how the qtests perform, I only modified 3 devices, 2 used by the
+> Xilinx Zynq machines (Cadence), and the e1000 (used by the PXE test).
+>=20
+> Regards,
+>=20
+> Phil.
+>=20
+> Philippe Mathieu-Daud=E9 (6):
+>   qom: introduce TypeInfo name aliases
+>   hw/net/e1000: real device name is 'e1000-82540em', 'e1000' is an alia=
+s
+>   hw/char/cadence_uart: add FDT aliases
+>   arm/xlnx-zynq: use FDT names for the Cadence UART
+>   hw/net/cadence_gem: add FDT names as alias
+>   hw/arm/xlnx-zynq: use FDT names for the Cadence GEM
+>=20
+>  include/qom/object.h   |  3 +++
+>  hw/arm/xilinx_zynq.c   |  2 ++
+>  hw/arm/xlnx-zynqmp.c   |  4 ++--
+>  hw/char/cadence_uart.c |  7 +++++++
+>  hw/net/cadence_gem.c   |  6 ++++++
+>  hw/net/e1000.c         |  5 ++++-
+>  qom/object.c           | 18 ++++++++++++++++--
+>  7 files changed, 40 insertions(+), 5 deletions(-)
+>=20
+> --=20
+> 2.15.1
+>=20
+
+--=20
+Eduardo
