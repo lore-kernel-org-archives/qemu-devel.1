@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50479)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52262)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1eX9nx-0007Ze-QA
-	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 12:59:51 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1eX9pk-00011n-8L
+	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 13:01:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1eX9nt-0008Tq-Rk
-	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 12:59:49 -0500
-Received: from mail-wm0-f51.google.com ([74.125.82.51]:42607)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1eX9nt-0008TC-KP
-	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 12:59:45 -0500
-Received: by mail-wm0-f51.google.com with SMTP id b141so5009928wme.1
-	for <qemu-devel@nongnu.org>; Thu, 04 Jan 2018 09:59:45 -0800 (PST)
-From: Paolo Bonzini <pbonzini@redhat.com>
+	(envelope-from <ehabkost@redhat.com>) id 1eX9pf-0001TU-CI
+	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 13:01:40 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:21955)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1eX9pf-0001Q4-3o
+	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 13:01:35 -0500
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 5BEFF3DE44
+	for <qemu-devel@nongnu.org>; Thu,  4 Jan 2018 18:01:33 +0000 (UTC)
+Date: Thu, 4 Jan 2018 16:01:30 -0200
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20180104180130.GB3407@localhost.localdomain>
 References: <20180104175609.9085-1-pbonzini@redhat.com>
-Message-ID: <eaa0ee88-b3c3-9b12-dcd5-100fc6983c8a@redhat.com>
-Date: Thu, 4 Jan 2018 18:59:42 +0100
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 In-Reply-To: <20180104175609.9085-1-pbonzini@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
 Subject: Re: [Qemu-devel] [qemu-web PATCH] add a blog post about "Spectre"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -29,21 +32,20 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: ehabkost@redhat.com
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-On 04/01/2018 18:56, Paolo Bonzini wrote:
+On Thu, Jan 04, 2018 at 06:56:09PM +0100, Paolo Bonzini wrote:
 > ---
 >  _posts/2018-01-04-spectre.md | 60 ++++++++++++++++++++++++++++++++++++++++++++
 >  1 file changed, 60 insertions(+)
 >  create mode 100644 _posts/2018-01-04-spectre.md
 
-Something on TCG ("it is not considered a security boundary, so it's
-vulnerable to the CVE and no fix is planned") may be worth adding too.
-It can be updated later.
+Thanks for writing it up!
 
-Paolo
+Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
 
+> 
 > diff --git a/_posts/2018-01-04-spectre.md b/_posts/2018-01-04-spectre.md
 > new file mode 100644
 > index 0000000..1be86d0
@@ -110,4 +112,9 @@ Paolo
 > +and [Google Project
 > +Zero](https://googleprojectzero.blogspot.it/2018/01/reading-privileged-memory-with-side.html)
 > +posts on the topic, as well as the [Spectre and Meltdown FAQ](https://meltdownattack.com/#faq).
+> -- 
+> 2.14.3
 > 
+
+-- 
+Eduardo
