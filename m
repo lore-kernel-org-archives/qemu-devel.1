@@ -1,33 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46092)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46433)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eX99G-0003tW-Dq
-	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 12:17:51 -0500
+	(envelope-from <no-reply@patchew.org>) id 1eX99O-000447-PH
+	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 12:18:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eX99D-0002I9-6V
-	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 12:17:46 -0500
-Received: from mail-qt0-x241.google.com ([2607:f8b0:400d:c0d::241]:33692)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eX99D-0002HT-1o
-	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 12:17:43 -0500
-Received: by mail-qt0-x241.google.com with SMTP id e2so2702075qti.0
-	for <qemu-devel@nongnu.org>; Thu, 04 Jan 2018 09:17:43 -0800 (PST)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20180104160523.22995-1-marcandre.lureau@redhat.com>
-	<20180104160523.22995-5-marcandre.lureau@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <ac153cd4-64c0-744f-8fdd-423985bd5433@amsat.org>
-Date: Thu, 4 Jan 2018 14:17:38 -0300
+	(envelope-from <no-reply@patchew.org>) id 1eX99J-0002Xb-6E
+	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 12:17:54 -0500
+Resent-Message-Id: <E1eX99J-0002Xb-6E@eggs.gnu.org>
+Received: from sender-of-o52.zoho.com ([135.84.80.217]:21474)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1eX99I-0002VK-UO
+	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 12:17:49 -0500
+In-Reply-To: <20180104160523.22995-1-marcandre.lureau@redhat.com>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <151508534322.255.14688889110580008206@5adcb62bf0d6>
 MIME-Version: 1.0
-In-Reply-To: <20180104160523.22995-5-marcandre.lureau@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v3 04/18] build-sys: compile with -Og or
- -O1 when --enable-debug
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Thu, 4 Jan 2018 09:02:24 -0800 (PST)
+Subject: Re: [Qemu-devel] [PATCH v3 00/18] Various build-sys and sanitizer
+ related fixes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,81 +29,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org
-Cc: pbonzini@redhat.com, famz@redhat.com
+To: marcandre.lureau@redhat.com
+Cc: famz@redhat.com, qemu-devel@nongnu.org, pbonzini@redhat.comfamz@redhat.com
 
-On 01/04/2018 01:05 PM, Marc-André Lureau wrote:
-> When --enable-debug is turned on, configure doesn't set -O level, and
-> uses default compiler -O0 level, which is slow.
-> 
-> Instead, use -Og if supported by the compiler (optimize debugging
-> experience), or -O1 (keeps code somewhat debuggable and works around
-> compiler bugs).
-> 
-> Unfortunately, gcc has many false-positive maybe-uninitialized
-> errors with Og and O1 (f27 gcc 7.2.1 20170915):
-> 
-> /home/elmarco/src/qemu/hw/ipmi/isa_ipmi_kcs.c: In function ‘ipmi_kcs_ioport_read’:
-> /home/elmarco/src/qemu/hw/ipmi/isa_ipmi_kcs.c:279:12: error: ‘ret’ may be used uninitialized in this function [-Werror=maybe-uninitialized]
->      return ret;
->             ^~~
-> cc1: all warnings being treated as errors
-> make: *** [/home/elmarco/src/qemu/rules.mak:66: hw/ipmi/isa_ipmi_kcs.o] Error 1
-> make: *** Waiting for unfinished jobs....
-> /home/elmarco/src/qemu/hw/ide/ahci.c: In function ‘ahci_populate_sglist’:
-> /home/elmarco/src/qemu/hw/ide/ahci.c:903:58: error: ‘tbl_entry_size’ may be used uninitialized in this function [-Werror=maybe-uninitialized]
->          if ((off_idx == -1) || (off_pos < 0) || (off_pos > tbl_entry_size)) {
->                                                  ~~~~~~~~~^~~~~~~~~~~~~~~~~
-> cc1: all warnings being treated as errors
-> make: *** [/home/elmarco/src/qemu/rules.mak:66: hw/ide/ahci.o] Error 1
-> /home/elmarco/src/qemu/hw/display/qxl.c: In function ‘qxl_add_memslot’:
-> /home/elmarco/src/qemu/hw/display/qxl.c:1397:52: error: ‘pci_start’ may be used uninitialized in this function [-Werror=maybe-uninitialized]
->      memslot.virt_end   = virt_start + (guest_end   - pci_start);
->                                        ~~~~~~~~~~~~~^~~~~~~~~~~~
-> /home/elmarco/src/qemu/hw/display/qxl.c:1389:9: error: ‘pci_region’ may be used uninitialized in this function [-Werror=maybe-uninitialized]
->          qxl_set_guest_bug(d, "%s: pci_region = %d", __func__, pci_region);
->          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-> cc1: all warnings being treated as errors
-> 
-> There seems to be a long list of related bugs in upstream GCC, some of
-> them are being fixed very recently:
-> https://gcc.gnu.org/bugzilla/show_bug.cgi?id=24639
-> 
-> For now, let's workaround it by using Wno-maybe-uninitialized (gcc-only).
-> 
-> Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
-> Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
-
-Tested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-
-> ---
->  configure | 15 +++++++++++++--
->  1 file changed, 13 insertions(+), 2 deletions(-)
-> 
-> diff --git a/configure b/configure
-> index de1f939a28..3953859314 100755
-> --- a/configure
-> +++ b/configure
-> @@ -5160,8 +5160,19 @@ if test "$gcov" = "yes" ; then
->    LDFLAGS="-fprofile-arcs -ftest-coverage $LDFLAGS"
->  elif test "$fortify_source" = "yes" ; then
->    CFLAGS="-O2 -U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=2 $CFLAGS"
-> -elif test "$debug" = "no"; then
-> -  CFLAGS="-O2 $CFLAGS"
-> +elif test "$debug" = "yes"; then
-> +  if compile_prog "-Og" ""; then
-> +      CFLAGS="-Og $CFLAGS"
-> +  elif compile_prog "-O1" ""; then
-> +      CFLAGS="-O1 $CFLAGS"
-> +  fi
-> +  # Workaround GCC false-positive Wuninitialized bugs with Og or O1:
-> +  # https://gcc.gnu.org/bugzilla/show_bug.cgi?id=24639
-> +  if cc_has_warning_flag "-Wno-maybe-uninitialized"; then
-> +      CFLAGS="-Wno-maybe-uninitialized $CFLAGS"
-> +  fi
-> +else
-> +    CFLAGS="-O2 $CFLAGS"
->  fi
->  
->  ##########################################
-> 
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IDIwMTgwMTA0MTYwNTIzLjIyOTk1LTEtbWFyY2FuZHJlLmx1cmVhdUByZWRoYXQu
+Y29tClN1YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0ggdjMgMDAvMThdIFZhcmlvdXMgYnVpbGQt
+c3lzIGFuZCBzYW5pdGl6ZXIgcmVsYXRlZCBmaXhlcwoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09
+PQojIS9iaW4vYmFzaAoKQkFTRT1iYXNlCm49MQp0b3RhbD0kKGdpdCBsb2cgLS1vbmVsaW5lICRC
+QVNFLi4gfCB3YyAtbCkKZmFpbGVkPTAKCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxp
+bWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCgpjb21taXRzPSIkKGdp
+dCBsb2cgLS1mb3JtYXQ9JUggLS1yZXZlcnNlICRCQVNFLi4pIgpmb3IgYyBpbiAkY29tbWl0czsg
+ZG8KICAgIGVjaG8gIkNoZWNraW5nIFBBVENIICRuLyR0b3RhbDogJChnaXQgbG9nIC1uIDEgLS1m
+b3JtYXQ9JXMgJGMpLi4uIgogICAgaWYgISBnaXQgc2hvdyAkYyAtLWZvcm1hdD1lbWFpbCB8IC4v
+c2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgLTsgdGhlbgogICAgICAgIGZhaWxlZD0x
+CiAgICAgICAgZWNobwogICAgZmkKICAgIG49JCgobisxKSkKZG9uZQoKZXhpdCAkZmFpbGVkCj09
+PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVm
+N2Y0NGJkODg4NzEzMzg0CkZyb20gaHR0cHM6Ly9naXRodWIuY29tL3BhdGNoZXctcHJvamVjdC9x
+ZW11CiB0IFt0YWcgdXBkYXRlXSAgICAgICAgICAgIHBhdGNoZXcvMjAxODAxMDQxNjA1MjMuMjI5
+OTUtMS1tYXJjYW5kcmUubHVyZWF1QHJlZGhhdC5jb20gLT4gcGF0Y2hldy8yMDE4MDEwNDE2MDUy
+My4yMjk5NS0xLW1hcmNhbmRyZS5sdXJlYXVAcmVkaGF0LmNvbQogKiBbbmV3IHRhZ10gICAgICAg
+ICAgICAgICBwYXRjaGV3LzIwMTgwMTA0MTYzNjUyLjY1NDUwLTEtbWFyY2VsQHJlZGhhdC5jb20g
+LT4gcGF0Y2hldy8yMDE4MDEwNDE2MzY1Mi42NTQ1MC0xLW1hcmNlbEByZWRoYXQuY29tClN3aXRj
+aGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKOTZjYWZhMmJlNCBkaXNhcy9zMzkwOiBmaXggZ2xv
+YmFsLWJ1ZmZlci1vdmVyZmxvdwo0MjQ1ZWJkNTJhIG1pcHM6IGZpeCBwb3RlbnRpYWwgZm9wZW4o
+TlVMTCwuLi4pCjNiYWNmNWIyYWMgdGVzdHM6IGZpeCBjb3JvdXRpbmUgbGVhayBpbiAvYmFzaWMv
+ZW50ZXJlZApkNDA3OTg0NzdjIHVjb250ZXh0OiBhbm5vdGF0ZSBjb3JvdXRpbmUgc3RhY2sgZm9y
+IEFTQU4KMmJkMzk2NjQ1NSB0ZXN0czogZml4IHFtcC10ZXN0IGxlYWsKOTE5NjkxZGI1YSBxZW11
+LWNvbmZpZzogZml4IGxlYWsgaW4gcXVlcnktY29tbWFuZC1saW5lLW9wdGlvbnMKNzM2ZTIxNTg0
+MCBjcnlwdG86IGZpeCBzdGFjay1idWZmZXItb3ZlcmZsb3cgZXJyb3IKNTVmZjQxYWYyNSB0ZXN0
+czogZml4IG1pZ3JhdGlvbi10ZXN0IGxlYWsKZTgwZjE0MDM3MiByZWFkbGluZTogYWRkIGEgZnJl
+ZSBmdW5jdGlvbgo2NDVlOTdiYTkzIHZsOiBmaXggZGlyZWN0IGZpcm13YXJlIGRpcmVjdG9yaWVz
+IGxlYWsKNmM3OWQ0YmVmYSB0ZXN0czogZml4IGNoZWNrLXFvYmplY3QgbGVhawpmZjFmOWExMTM2
+IGJ1aWxkLXN5czogYWRkIHNvbWUgc2FuaXRpemVycyB3aGVuIC0tZW5hYmxlLWRlYnVnIGlmIHBv
+c3NpYmxlCjJjODc5N2JjYWQgdGVzdHMvZG9ja2VyOiBhZGQgdGVzdC1kZWJ1Zwo0NDhmMWMwNWUx
+IHRlc3RzL2RvY2tlcjogYWRkIHNvbWUgc2FuaXRpemVycyB0byBmZWRvcmEgZG9ja2VyZmlsZQo3
+YTFjZjhlM2E4IGJ1aWxkLXN5czogY29tcGlsZSB3aXRoIC1PZyBvciAtTzEgd2hlbiAtLWVuYWJs
+ZS1kZWJ1Zwo1MDg1NjQwYjE2IGJ1aWxkLXN5czogYWRkIGEgcnVsZSB0byBwcmludCBhIHZhcmlh
+YmxlCjI0MzZlYjY0ZTEgYnVpbGQtc3lzOiBzaWxlbmNlIG1ha2UgYnkgZGVmYXVsdCBvciBWPTAK
+MzRiYzBmOWI0YiBidWlsZC1zeXM6IGZpeCBxZW11LWdhIC1wdGhyZWFkIGxpbmtpbmcKCj09PSBP
+VVRQVVQgQkVHSU4gPT09CkNoZWNraW5nIFBBVENIIDEvMTg6IGJ1aWxkLXN5czogZml4IHFlbXUt
+Z2EgLXB0aHJlYWQgbGlua2luZy4uLgpDaGVja2luZyBQQVRDSCAyLzE4OiBidWlsZC1zeXM6IHNp
+bGVuY2UgbWFrZSBieSBkZWZhdWx0IG9yIFY9MC4uLgpDaGVja2luZyBQQVRDSCAzLzE4OiBidWls
+ZC1zeXM6IGFkZCBhIHJ1bGUgdG8gcHJpbnQgYSB2YXJpYWJsZS4uLgpDaGVja2luZyBQQVRDSCA0
+LzE4OiBidWlsZC1zeXM6IGNvbXBpbGUgd2l0aCAtT2cgb3IgLU8xIHdoZW4gLS1lbmFibGUtZGVi
+dWcuLi4KQ2hlY2tpbmcgUEFUQ0ggNS8xODogdGVzdHMvZG9ja2VyOiBhZGQgc29tZSBzYW5pdGl6
+ZXJzIHRvIGZlZG9yYSBkb2NrZXJmaWxlLi4uCkNoZWNraW5nIFBBVENIIDYvMTg6IHRlc3RzL2Rv
+Y2tlcjogYWRkIHRlc3QtZGVidWcuLi4KQ2hlY2tpbmcgUEFUQ0ggNy8xODogYnVpbGQtc3lzOiBh
+ZGQgc29tZSBzYW5pdGl6ZXJzIHdoZW4gLS1lbmFibGUtZGVidWcgaWYgcG9zc2libGUuLi4KQ2hl
+Y2tpbmcgUEFUQ0ggOC8xODogdGVzdHM6IGZpeCBjaGVjay1xb2JqZWN0IGxlYWsuLi4KQ2hlY2tp
+bmcgUEFUQ0ggOS8xODogdmw6IGZpeCBkaXJlY3QgZmlybXdhcmUgZGlyZWN0b3JpZXMgbGVhay4u
+LgpDaGVja2luZyBQQVRDSCAxMC8xODogcmVhZGxpbmU6IGFkZCBhIGZyZWUgZnVuY3Rpb24uLi4K
+Q2hlY2tpbmcgUEFUQ0ggMTEvMTg6IHRlc3RzOiBmaXggbWlncmF0aW9uLXRlc3QgbGVhay4uLgpD
+aGVja2luZyBQQVRDSCAxMi8xODogY3J5cHRvOiBmaXggc3RhY2stYnVmZmVyLW92ZXJmbG93IGVy
+cm9yLi4uCkNoZWNraW5nIFBBVENIIDEzLzE4OiBxZW11LWNvbmZpZzogZml4IGxlYWsgaW4gcXVl
+cnktY29tbWFuZC1saW5lLW9wdGlvbnMuLi4KQ2hlY2tpbmcgUEFUQ0ggMTQvMTg6IHRlc3RzOiBm
+aXggcW1wLXRlc3QgbGVhay4uLgpDaGVja2luZyBQQVRDSCAxNS8xODogdWNvbnRleHQ6IGFubm90
+YXRlIGNvcm91dGluZSBzdGFjayBmb3IgQVNBTi4uLgpXQVJOSU5HOiBhcmNoaXRlY3R1cmUgc3Bl
+Y2lmaWMgZGVmaW5lcyBzaG91bGQgYmUgYXZvaWRlZAojMjk6IEZJTEU6IGluY2x1ZGUvcWVtdS9j
+b21waWxlci5oOjExNDoKKyNpZm5kZWYgX19oYXNfZmVhdHVyZQoKV0FSTklORzogYXJjaGl0ZWN0
+dXJlIHNwZWNpZmljIGRlZmluZXMgc2hvdWxkIGJlIGF2b2lkZWQKIzQyOiBGSUxFOiB1dGlsL2Nv
+cm91dGluZS11Y29udGV4dC5jOjM0OgorI2lmIGRlZmluZWQoX19TQU5JVElaRV9BRERSRVNTX18p
+IHx8IF9faGFzX2ZlYXR1cmUoYWRkcmVzc19zYW5pdGl6ZXIpCgp0b3RhbDogMCBlcnJvcnMsIDIg
+d2FybmluZ3MsIDEwNyBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVt
+cywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0
+aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJ
+TlRBSU5FUlMuCkNoZWNraW5nIFBBVENIIDE2LzE4OiB0ZXN0czogZml4IGNvcm91dGluZSBsZWFr
+IGluIC9iYXNpYy9lbnRlcmVkLi4uCkNoZWNraW5nIFBBVENIIDE3LzE4OiBtaXBzOiBmaXggcG90
+ZW50aWFsIGZvcGVuKE5VTEwsLi4uKS4uLgpDaGVja2luZyBQQVRDSCAxOC8xODogZGlzYXMvczM5
+MDogZml4IGdsb2JhbC1idWZmZXItb3ZlcmZsb3cuLi4KRVJST1I6IGJyYWNlcyB7fSBhcmUgbmVj
+ZXNzYXJ5IGV2ZW4gZm9yIHNpbmdsZSBzdGF0ZW1lbnQgYmxvY2tzCiM4MzogRklMRTogZGlzYXMv
+czM5MC5jOjIxNjoKKyAgZm9yIChpID0gczM5MF9udW1fb3Bjb2RlczsgaS0tOyApCisgICAgb3Bj
+X2luZGV4W3MzOTBfb3Bjb2Rlc1tpXS5vcGNvZGVbMF1dID0gaTsKCnRvdGFsOiAxIGVycm9ycywg
+MCB3YXJuaW5ncywgMjQgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxl
+bXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3Np
+dGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1B
+SU5UQUlORVJTLgoKPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGgg
+Y29kZTogMQoKCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFto
+dHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3
+LWRldmVsQGZyZWVsaXN0cy5vcmc=
