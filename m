@@ -1,23 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55389)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55445)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1eX8bd-0007b4-HI
-	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 11:43:04 -0500
+	(envelope-from <laurent@vivier.eu>) id 1eX8bf-0007d2-1m
+	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 11:43:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1eX8bZ-0003Xx-14
-	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 11:43:01 -0500
-Received: from mout.kundenserver.de ([212.227.126.135]:56239)
+	(envelope-from <laurent@vivier.eu>) id 1eX8bc-0003ek-QU
+	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 11:43:03 -0500
+Received: from mout.kundenserver.de ([212.227.126.133]:57770)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1eX8bY-0003VN-Kh
-	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 11:42:56 -0500
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1eX8bc-0003bm-90
+	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 11:43:00 -0500
 From: Laurent Vivier <laurent@vivier.eu>
-Date: Thu,  4 Jan 2018 17:42:39 +0100
-Message-Id: <20180104164251.26494-6-laurent@vivier.eu>
+Date: Thu,  4 Jan 2018 17:42:48 +0100
+Message-Id: <20180104164251.26494-15-laurent@vivier.eu>
 In-Reply-To: <20180104164251.26494-1-laurent@vivier.eu>
 References: <20180104164251.26494-1-laurent@vivier.eu>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 05/17] target/m68k: add CPU_LOG_INT trace
+Subject: [Qemu-devel] [PULL 14/17] target/m68k: add 680x0 "move to SR"
+ instruction
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,191 +27,97 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Laurent Vivier <laurent@vivier.eu>
 
-Display the interrupts/exceptions information
-in QEMU logs (-d int)
+Some cleanup, and allows SR to be moved from any addressing mode.
+Previous code was wrong for coldfire: coldfire also allows to
+use addressing mode to set SR/CCR. It only supports Data register
+to get SR/CCR (move from)
 
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Message-Id: <20180104012913.30763-6-laurent@vivier.eu>
+Message-Id: <20180104012913.30763-15-laurent@vivier.eu>
 ---
- target/m68k/cpu.h       |   8 ++++
- target/m68k/op_helper.c | 117 +++++++++++++++++++++++++++++++++++++++++++++++-
- 2 files changed, 123 insertions(+), 2 deletions(-)
+ target/m68k/translate.c | 38 ++++++++++++++++++++++----------------
+ 1 file changed, 22 insertions(+), 16 deletions(-)
 
-diff --git a/target/m68k/cpu.h b/target/m68k/cpu.h
-index 5d03764eab..acc2629216 100644
---- a/target/m68k/cpu.h
-+++ b/target/m68k/cpu.h
-@@ -45,6 +45,8 @@
- #define EXCP_ADDRESS        3   /* Address error.  */
- #define EXCP_ILLEGAL        4   /* Illegal instruction.  */
- #define EXCP_DIV0           5   /* Divide by zero */
-+#define EXCP_CHK            6   /* CHK, CHK2 Instructions */
-+#define EXCP_TRAPCC         7   /* FTRAPcc, TRAPcc, TRAPV Instructions */
- #define EXCP_PRIVILEGE      8   /* Privilege violation.  */
- #define EXCP_TRACE          9
- #define EXCP_LINEA          10  /* Unimplemented line-A (MAC) opcode.  */
-@@ -53,6 +55,9 @@
- #define EXCP_DEBEGBP        13  /* Breakpoint debug interrupt.  */
- #define EXCP_FORMAT         14  /* RTE format error.  */
- #define EXCP_UNINITIALIZED  15
-+#define EXCP_SPURIOUS       24  /* Spurious interrupt */
-+#define EXCP_INT_LEVEL_1    25  /* Level 1 Interrupt autovector */
-+#define EXCP_INT_LEVEL_7    31  /* Level 7 Interrupt autovector */
- #define EXCP_TRAP0          32   /* User trap #0.  */
- #define EXCP_TRAP15         47   /* User trap #15.  */
- #define EXCP_FP_BSUN        48 /* Branch Set on Unordered */
-@@ -63,6 +68,9 @@
- #define EXCP_FP_OVFL        53 /* Overflow */
- #define EXCP_FP_SNAN        54 /* Signaling Not-A-Number */
- #define EXCP_FP_UNIMP       55 /* Unimplemented Data type */
-+#define EXCP_MMU_CONF       56  /* MMU Configuration Error */
-+#define EXCP_MMU_ILLEGAL    57  /* MMU Illegal Operation Error */
-+#define EXCP_MMU_ACCESS     58  /* MMU Access Level Violation Error */
- #define EXCP_UNSUPPORTED    61
- 
- #define EXCP_RTE            0x100
-diff --git a/target/m68k/op_helper.c b/target/m68k/op_helper.c
-index 63089511cb..123981af55 100644
---- a/target/m68k/op_helper.c
-+++ b/target/m68k/op_helper.c
-@@ -68,10 +68,116 @@ static void do_rte(CPUM68KState *env)
-     helper_set_sr(env, fmt);
+diff --git a/target/m68k/translate.c b/target/m68k/translate.c
+index 1f867a4f7a..8f23cade04 100644
+--- a/target/m68k/translate.c
++++ b/target/m68k/translate.c
+@@ -2162,27 +2162,34 @@ static void gen_set_sr_im(DisasContext *s, uint16_t val, int ccr_only)
+         tcg_gen_movi_i32(QREG_CC_N, val & CCF_N ? -1 : 0);
+         tcg_gen_movi_i32(QREG_CC_X, val & CCF_X ? 1 : 0);
+     } else {
+-        gen_helper_set_sr(cpu_env, tcg_const_i32(val));
++        TCGv sr = tcg_const_i32(val);
++        gen_helper_set_sr(cpu_env, sr);
++        tcg_temp_free(sr);
+     }
+     set_cc_op(s, CC_OP_FLAGS);
  }
  
-+static const char *m68k_exception_name(int index)
-+{
-+    switch (index) {
-+    case EXCP_ACCESS:
-+        return "Access Fault";
-+    case EXCP_ADDRESS:
-+        return "Address Error";
-+    case EXCP_ILLEGAL:
-+        return "Illegal Instruction";
-+    case EXCP_DIV0:
-+        return "Divide by Zero";
-+    case EXCP_CHK:
-+        return "CHK/CHK2";
-+    case EXCP_TRAPCC:
-+        return "FTRAPcc, TRAPcc, TRAPV";
-+    case EXCP_PRIVILEGE:
-+        return "Privilege Violation";
-+    case EXCP_TRACE:
-+        return "Trace";
-+    case EXCP_LINEA:
-+        return "A-Line";
-+    case EXCP_LINEF:
-+        return "F-Line";
-+    case EXCP_DEBEGBP: /* 68020/030 only */
-+        return "Copro Protocol Violation";
-+    case EXCP_FORMAT:
-+        return "Format Error";
-+    case EXCP_UNINITIALIZED:
-+        return "Unitialized Interruot";
-+    case EXCP_SPURIOUS:
-+        return "Spurious Interrupt";
-+    case EXCP_INT_LEVEL_1:
-+        return "Level 1 Interrupt";
-+    case EXCP_INT_LEVEL_1 + 1:
-+        return "Level 2 Interrupt";
-+    case EXCP_INT_LEVEL_1 + 2:
-+        return "Level 3 Interrupt";
-+    case EXCP_INT_LEVEL_1 + 3:
-+        return "Level 4 Interrupt";
-+    case EXCP_INT_LEVEL_1 + 4:
-+        return "Level 5 Interrupt";
-+    case EXCP_INT_LEVEL_1 + 5:
-+        return "Level 6 Interrupt";
-+    case EXCP_INT_LEVEL_1 + 6:
-+        return "Level 7 Interrupt";
-+    case EXCP_TRAP0:
-+        return "TRAP #0";
-+    case EXCP_TRAP0 + 1:
-+        return "TRAP #1";
-+    case EXCP_TRAP0 + 2:
-+        return "TRAP #2";
-+    case EXCP_TRAP0 + 3:
-+        return "TRAP #3";
-+    case EXCP_TRAP0 + 4:
-+        return "TRAP #4";
-+    case EXCP_TRAP0 + 5:
-+        return "TRAP #5";
-+    case EXCP_TRAP0 + 6:
-+        return "TRAP #6";
-+    case EXCP_TRAP0 + 7:
-+        return "TRAP #7";
-+    case EXCP_TRAP0 + 8:
-+        return "TRAP #8";
-+    case EXCP_TRAP0 + 9:
-+        return "TRAP #9";
-+    case EXCP_TRAP0 + 10:
-+        return "TRAP #10";
-+    case EXCP_TRAP0 + 11:
-+        return "TRAP #11";
-+    case EXCP_TRAP0 + 12:
-+        return "TRAP #12";
-+    case EXCP_TRAP0 + 13:
-+        return "TRAP #13";
-+    case EXCP_TRAP0 + 14:
-+        return "TRAP #14";
-+    case EXCP_TRAP0 + 15:
-+        return "TRAP #15";
-+    case EXCP_FP_BSUN:
-+        return "FP Branch/Set on unordered condition";
-+    case EXCP_FP_INEX:
-+        return "FP Inexact Result";
-+    case EXCP_FP_DZ:
-+        return "FP Divide by Zero";
-+    case EXCP_FP_UNFL:
-+        return "FP Underflow";
-+    case EXCP_FP_OPERR:
-+        return "FP Operand Error";
-+    case EXCP_FP_OVFL:
-+        return "FP Overflow";
-+    case EXCP_FP_SNAN:
-+        return "FP Signaling NAN";
-+    case EXCP_FP_UNIMP:
-+        return "FP Unimplemented Data Type";
-+    case EXCP_MMU_CONF: /* 68030/68851 only */
-+        return "MMU Configuration Error";
-+    case EXCP_MMU_ILLEGAL: /* 68851 only */
-+        return "MMU Illegal Operation";
-+    case EXCP_MMU_ACCESS: /* 68851 only */
-+        return "MMU Access Level Violation";
-+    case 64 ... 255:
-+        return "User Defined Vector";
+-static void gen_set_sr(CPUM68KState *env, DisasContext *s, uint16_t insn,
+-                       int ccr_only)
++static void gen_set_sr(DisasContext *s, TCGv val, int ccr_only)
+ {
+-    if ((insn & 0x38) == 0) {
+-        if (ccr_only) {
+-            gen_helper_set_ccr(cpu_env, DREG(insn, 0));
+-        } else {
+-            gen_helper_set_sr(cpu_env, DREG(insn, 0));
+-        }
+-        set_cc_op(s, CC_OP_FLAGS);
+-    } else if ((insn & 0x3f) == 0x3c) {
++    if (ccr_only) {
++        gen_helper_set_ccr(cpu_env, val);
++    } else {
++        gen_helper_set_sr(cpu_env, val);
 +    }
-+    return "Unassigned";
++    set_cc_op(s, CC_OP_FLAGS);
 +}
 +
- static void do_interrupt_all(CPUM68KState *env, int is_hw)
++static void gen_move_to_sr(CPUM68KState *env, DisasContext *s, uint16_t insn,
++                           bool ccr_only)
++{
++    if ((insn & 0x3f) == 0x3c) {
+         uint16_t val;
+         val = read_im16(env, s);
+         gen_set_sr_im(s, val, ccr_only);
+     } else {
+-        disas_undef(env, s, insn);
++        TCGv src;
++        SRC_EA(env, src, OS_WORD, 0, NULL);
++        gen_set_sr(s, src, ccr_only);
+     }
+ }
+ 
+@@ -2557,7 +2564,7 @@ DISAS_INSN(neg)
+ 
+ DISAS_INSN(move_to_ccr)
  {
-     CPUState *cs = CPU(m68k_env_get_cpu(env));
-     uint32_t sp;
-+    uint32_t sr;
-     uint32_t fmt;
-     uint32_t retaddr;
-     uint32_t vector;
-@@ -109,10 +215,17 @@ static void do_interrupt_all(CPUM68KState *env, int is_hw)
+-    gen_set_sr(env, s, insn, 1);
++    gen_move_to_sr(env, s, insn, true);
+ }
  
-     vector = cs->exception_index << 2;
+ DISAS_INSN(not)
+@@ -4409,7 +4416,7 @@ DISAS_INSN(move_to_sr)
+         gen_exception(s, s->insn_pc, EXCP_PRIVILEGE);
+         return;
+     }
+-    gen_set_sr(env, s, insn, 0);
++    gen_move_to_sr(env, s, insn, false);
+     gen_lookup_tb(s);
+ }
  
-+    sr = env->sr | cpu_m68k_get_ccr(env);
-+    if (qemu_loglevel_mask(CPU_LOG_INT)) {
-+        static int count;
-+        qemu_log("INT %6d: %s(%#x) pc=%08x sp=%08x sr=%04x\n",
-+                 ++count, m68k_exception_name(cs->exception_index),
-+                 vector, env->pc, env->aregs[7], sr);
-+    }
-+
-     fmt |= 0x40000000;
-     fmt |= vector << 16;
--    fmt |= env->sr;
--    fmt |= cpu_m68k_get_ccr(env);
-+    fmt |= sr;
- 
-     env->sr |= SR_S;
-     if (is_hw) {
+@@ -5556,9 +5563,8 @@ void register_m68k_insns (CPUM68KState *env)
+     BASE(move_to_ccr, 44c0, ffc0);
+     INSN(not,       4680, fff8, CF_ISA_A);
+     INSN(not,       4600, ff00, M68000);
+-    INSN(undef,     46c0, ffc0, M68000);
+ #if defined(CONFIG_SOFTMMU)
+-    INSN(move_to_sr, 46c0, ffc0, CF_ISA_A);
++    BASE(move_to_sr, 46c0, ffc0);
+ #endif
+     INSN(nbcd,      4800, ffc0, M68000);
+     INSN(linkl,     4808, fff8, M68000);
 -- 
 2.14.3
