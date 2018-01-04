@@ -1,34 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47948)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48394)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1eX9lg-0004xN-U3
-	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 12:57:29 -0500
+	(envelope-from <alistair23@gmail.com>) id 1eX9lw-0005HW-Q7
+	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 12:57:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1eX9ld-0006MK-07
-	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 12:57:29 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:38124)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1eX9lc-0006Le-PW
-	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 12:57:24 -0500
-References: <20180104141524.m5xy66jsn2hiajwl@var.youpi.perso.aquilenet.fr>
-	<20180104142101.rivje5qn5dasb6jw@var.youpi.perso.aquilenet.fr>
-	<aea97804-c6a9-d903-13d8-23bc6b46af86@redhat.com>
-	<20180104152402.fv52umjmlb2g22wc@var.youpi.perso.aquilenet.fr>
-	<b1a86fed-8a98-cc1d-46ca-5462f8be3fc7@redhat.com>
-	<20180104153219.wsxtkzuznu2iwra7@var.youpi.perso.aquilenet.fr>
-	<bb6eae87-85b2-4bf2-ad36-26fa95816315@redhat.com>
-	<9b392599-a318-90c5-daa8-89ade40c64e5@redhat.com>
-	<20180104155640.6rznzu4koy354pyn@var.youpi.perso.aquilenet.fr>
-	<4055e106-b24f-09b5-29cd-a4927ecad433@redhat.com>
-	<20180104174545.5p2aaypp2asbdoxx@var.youpi.perso.aquilenet.fr>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <d6e1a2a2-5246-c160-eb20-450d0598247c@redhat.com>
-Date: Thu, 4 Jan 2018 18:57:18 +0100
+	(envelope-from <alistair23@gmail.com>) id 1eX9lr-0006gz-Tu
+	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 12:57:43 -0500
+Received: from mail-wm0-x241.google.com ([2a00:1450:400c:c09::241]:44694)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
+	id 1eX9lr-0006ea-LK
+	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 12:57:39 -0500
+Received: by mail-wm0-x241.google.com with SMTP id t8so4942450wmc.3
+	for <qemu-devel@nongnu.org>; Thu, 04 Jan 2018 09:57:39 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20180104174545.5p2aaypp2asbdoxx@var.youpi.perso.aquilenet.fr>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2] usb: Remove legacy -usbdevice option
+Sender: alistair23@gmail.com
+In-Reply-To: <20180103180805.18140-5-f4bug@amsat.org>
+References: <20180103180805.18140-1-f4bug@amsat.org>
+	<20180103180805.18140-5-f4bug@amsat.org>
+From: Alistair Francis <alistair.francis@xilinx.com>
+Date: Thu, 4 Jan 2018 09:57:07 -0800
+Message-ID: <CAKmqyKN7H0OFRBk0kviq6BkeUVsEpA7P+46pZkWLcvKFq+06eQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v5 04/17] sdhci: refactor same sysbus/pci
+ properties into a common one
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,27 +32,101 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Samuel Thibault <samuel.thibault@gnu.org>
-Cc: Thomas Huth <thuth@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, kraxel@redhat.com, qemu-devel@nongnu.org
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Cc: Alistair Francis <alistair.francis@xilinx.com>, Fam Zheng <famz@redhat.com>, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, Peter Maydell <peter.maydell@linaro.org>, Eduardo Habkost <ehabkost@redhat.com>, Andrey Smirnov <andrew.smirnov@gmail.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
 
-On 04/01/2018 18:45, Samuel Thibault wrote:
-> Paolo Bonzini, on jeu. 04 janv. 2018 18:11:00 +0100, wrote:
->> On 04/01/2018 16:56, Samuel Thibault wrote:
->>>> However, adding magic to "-device usb-braille" that creates both a
->>>> front-end and a back-end is completely the opposite of sane...
->>> Well, this is also what happens with -device usb-mouse, usb-kbd etc.:
->>> they also plug with keyboard & mouse pipes of the qemu graphical
->>> frontend. braille is just the same vein for the user.
->>
->> No, they don't create a new UI object magically that wasn't there
->> before.  They just let you add a device, e.g. a USB tablet, that listens
->> on an _existing_ UI (GTK+ or SDL or similar).
-> 
-> Technically for the qemu developper, yes.
-> 
-> But for the user, no.
+On Wed, Jan 3, 2018 at 10:07 AM, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.o=
+rg> wrote:
+> Now both sysbus/pci classes inherit of the 'pending-insert-quirk' propert=
+y,
+> which is a HCI dependent property (regardless if accessed through a MMIO
+> sysbus or a PCI bus).
+> So far only the BCM implementation has to use it.
+>
+> Add sysbus/pci/sdbus comments to have clearer code blocks separation.
+>
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 
-That's not true.   With or without "-usbdevice tablet", you use the same
-mouse or keyboard device as the input source.
+Reviewed-by: Alistair Francis <alistair.francis@xilinx.com>
 
-Paolo
+Alistair
+
+> ---
+>  hw/sd/sdhci.c | 21 ++++++++++-----------
+>  1 file changed, 10 insertions(+), 11 deletions(-)
+>
+> diff --git a/hw/sd/sdhci.c b/hw/sd/sdhci.c
+> index 365bc80009..a11469fbca 100644
+> --- a/hw/sd/sdhci.c
+> +++ b/hw/sd/sdhci.c
+> @@ -1266,13 +1266,17 @@ const VMStateDescription sdhci_vmstate =3D {
+>
+>  /* Capabilities registers provide information on supported features of t=
+his
+>   * specific host controller implementation */
+> -static Property sdhci_pci_properties[] =3D {
+> +static Property sdhci_properties[] =3D {
+>      DEFINE_PROP_UINT32("capareg", SDHCIState, capareg,
+>              SDHC_CAPAB_REG_DEFAULT),
+>      DEFINE_PROP_UINT32("maxcurr", SDHCIState, maxcurr, 0),
+> +    DEFINE_PROP_BOOL("pending-insert-quirk", SDHCIState, pending_insert_=
+quirk,
+> +                     false),
+>      DEFINE_PROP_END_OF_LIST(),
+>  };
+>
+> +/* --- qdev PCI --- */
+> +
+>  static void sdhci_pci_realize(PCIDevice *dev, Error **errp)
+>  {
+>      SDHCIState *s =3D PCI_SDHCI(dev);
+> @@ -1305,7 +1309,7 @@ static void sdhci_pci_class_init(ObjectClass *klass=
+, void *data)
+>      k->class_id =3D PCI_CLASS_SYSTEM_SDHCI;
+>      set_bit(DEVICE_CATEGORY_STORAGE, dc->categories);
+>      dc->vmsd =3D &sdhci_vmstate;
+> -    dc->props =3D sdhci_pci_properties;
+> +    dc->props =3D sdhci_properties;
+>      dc->reset =3D sdhci_poweron_reset;
+>  }
+>
+> @@ -1320,14 +1324,7 @@ static const TypeInfo sdhci_pci_info =3D {
+>      },
+>  };
+>
+> -static Property sdhci_sysbus_properties[] =3D {
+> -    DEFINE_PROP_UINT32("capareg", SDHCIState, capareg,
+> -            SDHC_CAPAB_REG_DEFAULT),
+> -    DEFINE_PROP_UINT32("maxcurr", SDHCIState, maxcurr, 0),
+> -    DEFINE_PROP_BOOL("pending-insert-quirk", SDHCIState, pending_insert_=
+quirk,
+> -                     false),
+> -    DEFINE_PROP_END_OF_LIST(),
+> -};
+> +/* --- qdev SysBus --- */
+>
+>  static void sdhci_sysbus_init(Object *obj)
+>  {
+> @@ -1360,7 +1357,7 @@ static void sdhci_sysbus_class_init(ObjectClass *kl=
+ass, void *data)
+>      DeviceClass *dc =3D DEVICE_CLASS(klass);
+>
+>      dc->vmsd =3D &sdhci_vmstate;
+> -    dc->props =3D sdhci_sysbus_properties;
+> +    dc->props =3D sdhci_properties;
+>      dc->realize =3D sdhci_sysbus_realize;
+>      dc->reset =3D sdhci_poweron_reset;
+>  }
+> @@ -1374,6 +1371,8 @@ static const TypeInfo sdhci_sysbus_info =3D {
+>      .class_init =3D sdhci_sysbus_class_init,
+>  };
+>
+> +/* --- qdev bus master --- */
+> +
+>  static void sdhci_bus_class_init(ObjectClass *klass, void *data)
+>  {
+>      SDBusClass *sbc =3D SD_BUS_CLASS(klass);
+> --
+> 2.15.1
+>
+>
