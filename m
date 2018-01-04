@@ -1,21 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59219)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41328)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1eX2db-00047Y-5C
-	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 05:20:39 -0500
+	(envelope-from <peterx@redhat.com>) id 1eX305-00021Y-Eo
+	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 05:43:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1eX2da-0006vl-Bd
-	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 05:20:39 -0500
-Date: Thu, 4 Jan 2018 10:20:28 +0000
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20180104102028.GB10106@stefanha-x1.localdomain>
-References: <20171226025247.11082-1-famz@redhat.com>
+	(envelope-from <peterx@redhat.com>) id 1eX302-0001I4-B1
+	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 05:43:53 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:54316)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1eX302-0001HH-4U
+	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 05:43:50 -0500
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id A0BDFC002302
+	for <qemu-devel@nongnu.org>; Thu,  4 Jan 2018 10:43:48 +0000 (UTC)
+From: Peter Xu <peterx@redhat.com>
+Date: Thu,  4 Jan 2018 18:43:33 +0800
+Message-Id: <20180104104336.2794-1-peterx@redhat.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="2B/JsCI69OhZNC5r"
-Content-Disposition: inline
-In-Reply-To: <20171226025247.11082-1-famz@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v5 0/2] qemu-img: Document --force-share /
- -U
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v3 0/3] chardev: convert leftover glib APIs to
+ use dedicate gcontext
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,44 +31,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, kchamart@redhat.com, Kevin Wolf <kwolf@redhat.com>, eblake@redhat.com, Max Reitz <mreitz@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, peterx@redhat.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
+v3:
+- rename function to qemu_chr_timeout_add_ms() [Stefan]
+- add comment on return code [Stefan]
+- add comment in commit message on why change GSource name [Stefan]
 
---2B/JsCI69OhZNC5r
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+v2:
+- add r-bs
+- fix patch 3 on some s->ms conversion [Marc-Andr=C3=A9]
 
-On Tue, Dec 26, 2017 at 10:52:45AM +0800, Fam Zheng wrote:
-> v5: Clean up the @table @var section first. [Kevin, Peter]
->=20
-> Fam Zheng (2):
->   qemu-img.texi: Clean up parameter list
->   qemu-img: Document --force-share / -U
->=20
->  qemu-img.texi | 75 ++++++++++++++++++++++++++++++++++++++---------------=
-------
->  1 file changed, 48 insertions(+), 27 deletions(-)
->=20
-> --=20
-> 2.14.3
->=20
+There were existing work that tried to allow chardev to be run in a
+dedicated gcontext rather than the default main context/thread.
+Basically that work passed in the correct gcontext during
+g_source_attach().  However, I found something missing along the way,
+that some legacy glib APIs are used by chardev code which take the
+main context as default:
 
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+   g_timeout_add_seconds
+   g_timeout_add
+   g_idle_add
 
---2B/JsCI69OhZNC5r
-Content-Type: application/pgp-signature; name="signature.asc"
+To fully allow the chardevs to be run in dedicated gcontext, we need
+to convert all these legacy APIs into g_source_attach() calls as well,
+with the correct gcontext passed in.
 
------BEGIN PGP SIGNATURE-----
+This series tries to clean the rest of things up.
 
-iQEcBAEBAgAGBQJaTf/sAAoJEJykq7OBq3PICiAH/2zr9gWQJd3ikq4zilQlA3N9
-KRuP/VSdhuY21YmTO843crToqzxsSN2j4C7sJnkc8fezQr7hs3XWsUpJmmF7zXZO
-PjY+h52SmdkiIdk2GKxv53MZd5wR0kojmyXW7rBclTIFjZ4Jz3j2uick9+WDZKzP
-gMqt1lRvEiyTCBmYwHBsCexGCM7222tEXtxl/ggmmOgxO2DjVXQbOmTIFmPw2rPt
-aGC3zN1tpsPJIOUiAOR+BZt6Ni8gvahmXgI2EtUNX6dRXxyFvHfQ9KWE9Zql9Hvv
-q/I79R9J2KKW3Wwpk/toY6SHBk0/mxb8LrL7+RD3+S9F8oe6lG89nIgKh8cQkb8=
-=4iGa
------END PGP SIGNATURE-----
+I picked up patch 1 from monitor-oob series into this series (which is
+a missing of chardev frontend call fix for g_source_attach()), so that
+this series can be a complete fix.
 
---2B/JsCI69OhZNC5r--
+Please review.  Thanks,
+
+Peter Xu (3):
+  chardev: use backend chr context when watch for fe
+  chardev: let g_idle_add() be with chardev gcontext
+  chardev: introduce qemu_chr_timeout_add_ms()
+
+ chardev/char-fe.c      |  2 +-
+ chardev/char-pty.c     | 16 ++++++++--------
+ chardev/char-socket.c  |  6 ++++--
+ chardev/char.c         | 21 +++++++++++++++++++++
+ hw/char/terminal3270.c |  7 ++++---
+ include/chardev/char.h |  3 +++
+ 6 files changed, 41 insertions(+), 14 deletions(-)
+
+--=20
+2.14.3
