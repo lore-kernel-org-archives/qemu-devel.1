@@ -1,20 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56397)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40000)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <hikarupsp@gmail.com>) id 1eX9uK-0005rq-Qp
-	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 13:06:25 -0500
+	(envelope-from <jbaron@akamai.com>) id 1eXA12-00047K-AW
+	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 13:13:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <hikarupsp@gmail.com>) id 1eX9uJ-00064A-Gl
-	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 13:06:24 -0500
+	(envelope-from <jbaron@akamai.com>) id 1eXA0j-0005hn-Tn
+	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 13:13:20 -0500
+Received: from mx0a-00190b01.pphosted.com ([2620:100:9001:583::1]:59188)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jbaron@akamai.com>) id 1eXA0j-0005fg-Ah
+	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 13:13:01 -0500
+References: <cover.1515041373.git.jbaron@akamai.com>
+	<e185a03168d0ab68150d21770bf0d02c5ef537c2.1515041373.git.jbaron@akamai.com>
+	<20180104190309-mutt-send-email-mst@kernel.org>
+From: Jason Baron <jbaron@akamai.com>
+Message-ID: <c5e2f8d5-3961-606a-8c60-168f1465bd6e@akamai.com>
+Date: Thu, 4 Jan 2018 13:12:30 -0500
 MIME-Version: 1.0
-In-Reply-To: <CAD-w0GB+KZK_=7HZhXfarfNEFF_Y992=wc8XZ=CX6FTC107zfw@mail.gmail.com>
-References: <1513573243-29022-1-git-send-email-hikarupsp@gmail.com>
-	<CAD-w0GB+KZK_=7HZhXfarfNEFF_Y992=wc8XZ=CX6FTC107zfw@mail.gmail.com>
-From: Hikaru Nishida <hikarupsp@gmail.com>
-Date: Fri, 5 Jan 2018 03:06:05 +0900
-Message-ID: <CAD-w0GDkw7GgtevSxTb-+yu1BMv2yzy5u-izgOX3qpZ=gsgCDw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH] hw/block: Fix pin-based interrupt
- behaviour of NVMe
+In-Reply-To: <20180104190309-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH net-next v3 1/3] virtio_net: propagate
+ linkspeed/duplex settings from the hypervisor
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,119 +30,145 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Hikaru Nishida <hikarupsp@gmail.com>, Keith Busch <keith.busch@intel.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, "open list:nvme" <qemu-block@nongnu.org>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: davem@davemloft.net, jasowang@redhat.com, netdev@vger.kernel.org, virtualization@lists.linux-foundation.org, qemu-devel@nongnu.org, virtio-dev@lists.oasis-open.org
 
-ping...
 
-2017-12-22 16:31 GMT+09:00 Hikaru Nishida <hikarupsp@gmail.com>:
-> ping
-> http://patchwork.ozlabs.org/patch/849786/
->
-> 2017-12-18 14:00 GMT+09:00 Hikaru Nishida <hikarupsp@gmail.com>:
->> Pin-based interrupt of NVMe controller did not work properly
->> because using an obsolated function pci_irq_pulse().
->> To fix this, change to use pci_irq_assert() / pci_irq_deassert()
->> instead of pci_irq_pulse().
+
+On 01/04/2018 12:05 PM, Michael S. Tsirkin wrote:
+> On Thu, Jan 04, 2018 at 12:16:44AM -0500, Jason Baron wrote:
+>> The ability to set speed and duplex for virtio_net is useful in various
+>> scenarios as described here:
 >>
->> Signed-off-by: Hikaru Nishida <hikarupsp@gmail.com>
+>> 16032be virtio_net: add ethtool support for set and get of settings
+>>
+>> However, it would be nice to be able to set this from the hypervisor,
+>> such that virtio_net doesn't require custom guest ethtool commands.
+>>
+>> Introduce a new feature flag, VIRTIO_NET_F_SPEED_DUPLEX, which allows
+>> the hypervisor to export a linkspeed and duplex setting. The user can
+>> subsequently overwrite it later if desired via: 'ethtool -s'.
+>>
+>> Note that VIRTIO_NET_F_SPEED_DUPLEX is defined as bit 63, the intention
+>> is that device feature bits are to grow down from bit 63, since the
+>> transports are starting from bit 24 and growing up.
+>>
+>> Signed-off-by: Jason Baron <jbaron@akamai.com>
+>> Cc: "Michael S. Tsirkin" <mst@redhat.com>
+>> Cc: Jason Wang <jasowang@redhat.com>
+>> Cc: virtio-dev@lists.oasis-open.org
 >> ---
->>  hw/block/nvme.c | 39 ++++++++++++++++++++++++++++++++++-----
->>  hw/block/nvme.h |  1 +
->>  2 files changed, 35 insertions(+), 5 deletions(-)
+>>  drivers/net/virtio_net.c        | 19 ++++++++++++++++++-
+>>  include/uapi/linux/virtio_net.h | 13 +++++++++++++
+>>  2 files changed, 31 insertions(+), 1 deletion(-)
 >>
->> diff --git a/hw/block/nvme.c b/hw/block/nvme.c
->> index 441e21e..2d164fc 100644
->> --- a/hw/block/nvme.c
->> +++ b/hw/block/nvme.c
->> @@ -82,13 +82,40 @@ static uint8_t nvme_sq_empty(NvmeSQueue *sq)
->>      return sq->head == sq->tail;
->>  }
->>
->> -static void nvme_isr_notify(NvmeCtrl *n, NvmeCQueue *cq)
->> +static void nvme_irq_check(NvmeCtrl *n)
->> +{
->> +    if (msix_enabled(&(n->parent_obj))) {
->> +        return;
->> +    }
->> +    if (~n->bar.intms & n->irq_status) {
->> +        pci_irq_assert(&n->parent_obj);
->> +    } else {
->> +        pci_irq_deassert(&n->parent_obj);
->> +    }
->> +}
+>> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
+>> index 6fb7b65..0b2d314 100644
+>> --- a/drivers/net/virtio_net.c
+>> +++ b/drivers/net/virtio_net.c
+>> @@ -2146,6 +2146,22 @@ static void virtnet_config_changed_work(struct work_struct *work)
+>>  
+>>  	vi->status = v;
+>>  
+>> +	if (virtio_has_feature(vi->vdev, VIRTIO_NET_F_SPEED_DUPLEX)) {
+> 
+> BTW we can avoid this read for when link goes down.
+> Not a big deal but still.
+
+So you are saying that we can just set vi->speed and vi->duplex to
+'unknown' when the link goes down and not check for the presence of
+VIRTIO_NET_F_SPEED_DUPLEX?
+
+If so, that could over-write what the user may have configured in the
+guest via 'ethtool -s' when the link goes down, so that would be a
+change in behavior, but perhaps that is ok?
+
+I think I would prefer to have the link down event still check for
+VIRTIO_NET_F_SPEED_DUPLEX before changing speed/duplex. That way we
+still have 2 modes for updating the fields:
+
+1) completely guest controlled. Same as we have now and host does not
+change any values and does not set VIRTIO_NET_F_SPEED_DUPLEX flag (hence
+don't remove above check).
+
+2) if speed or duplex or speed is set in the qemu command line, then set
+the VIRTIO_NET_F_SPEED_DUPLEX and have host control the settings of
+speed/duplex (with ability of guest to over-write if it wanted to).
+
+
+> 
+>> +		u32 speed;
+>> +		u8 duplex;
 >> +
->> +static void nvme_irq_assert(NvmeCtrl *n, NvmeCQueue *cq)
->>  {
->>      if (cq->irq_enabled) {
->>          if (msix_enabled(&(n->parent_obj))) {
->>              msix_notify(&(n->parent_obj), cq->vector);
->>          } else {
->> -            pci_irq_pulse(&n->parent_obj);
->> +            assert(cq->cqid < 64);
->> +            n->irq_status |= 1 << cq->cqid;
->> +            nvme_irq_check(n);
->> +        }
->> +    }
->> +}
+>> +		speed = virtio_cread32(vi->vdev,
+>> +				       offsetof(struct virtio_net_config,
+>> +						speed));
+>> +		if (ethtool_validate_speed(speed))
+>> +			vi->speed = speed;
+>> +		duplex = virtio_cread8(vi->vdev,
+>> +				       offsetof(struct virtio_net_config,
+>> +						duplex));
+>> +		if (ethtool_validate_duplex(duplex))
+>> +			vi->duplex = duplex;
+>> +	}
 >> +
->> +static void nvme_irq_deassert(NvmeCtrl *n, NvmeCQueue *cq)
->> +{
->> +    if (cq->irq_enabled) {
->> +        if (msix_enabled(&(n->parent_obj))) {
->> +            return;
->> +        } else {
->> +            assert(cq->cqid < 64);
->> +            n->irq_status &= ~(1 << cq->cqid);
->> +            nvme_irq_check(n);
->>          }
->>      }
->>  }
->> @@ -220,7 +247,7 @@ static void nvme_post_cqes(void *opaque)
->>              sizeof(req->cqe));
->>          QTAILQ_INSERT_TAIL(&sq->req_list, req, entry);
->>      }
->> -    nvme_isr_notify(n, cq);
->> +    nvme_irq_assert(n, cq);
->>  }
->>
->>  static void nvme_enqueue_req_completion(NvmeCQueue *cq, NvmeRequest *req)
->> @@ -753,10 +780,12 @@ static void nvme_write_bar(NvmeCtrl *n, hwaddr offset, uint64_t data,
->>      case 0xc:
->>          n->bar.intms |= data & 0xffffffff;
->>          n->bar.intmc = n->bar.intms;
->> +        nvme_irq_check(n);
->>          break;
->>      case 0x10:
->>          n->bar.intms &= ~(data & 0xffffffff);
->>          n->bar.intmc = n->bar.intms;
->> +        nvme_irq_check(n);
->>          break;
->>      case 0x14:
->>          /* Windows first sends data, then sends enable bit */
->> @@ -851,8 +880,8 @@ static void nvme_process_db(NvmeCtrl *n, hwaddr addr, int val)
->>              timer_mod(cq->timer, qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) + 500);
->>          }
->>
->> -        if (cq->tail != cq->head) {
->> -            nvme_isr_notify(n, cq);
->> +        if (cq->tail == cq->head) {
->> +            nvme_irq_deassert(n, cq);
->>          }
->>      } else {
->>          uint16_t new_tail = val & 0xffff;
->> diff --git a/hw/block/nvme.h b/hw/block/nvme.h
->> index 6aab338..7b62dad 100644
->> --- a/hw/block/nvme.h
->> +++ b/hw/block/nvme.h
->> @@ -775,6 +775,7 @@ typedef struct NvmeCtrl {
->>      uint32_t    cmbsz;
->>      uint32_t    cmbloc;
->>      uint8_t     *cmbuf;
->> +    uint64_t    irq_status;
->>
->>      char            *serial;
->>      NvmeNamespace   *namespaces;
->> --
->> 2.7.4
->>
+>>  	if (vi->status & VIRTIO_NET_S_LINK_UP) {
+>>  		netif_carrier_on(vi->dev);
+>>  		netif_tx_wake_all_queues(vi->dev);
+> 
+> OK so this handles the case when VIRTIO_NET_F_STATUS is set,
+> but when it's clear we need to call this from virtnet_probe.
+> 
+> I propose moving this chunk to a function and calling from two places.
+> 
+
+good point. will update.
+
+Thanks,
+
+-Jason
+
+> 
+>> @@ -2796,7 +2812,8 @@ static struct virtio_device_id id_table[] = {
+>>  	VIRTIO_NET_F_CTRL_RX, VIRTIO_NET_F_CTRL_VLAN, \
+>>  	VIRTIO_NET_F_GUEST_ANNOUNCE, VIRTIO_NET_F_MQ, \
+>>  	VIRTIO_NET_F_CTRL_MAC_ADDR, \
+>> -	VIRTIO_NET_F_MTU, VIRTIO_NET_F_CTRL_GUEST_OFFLOADS
+>> +	VIRTIO_NET_F_MTU, VIRTIO_NET_F_CTRL_GUEST_OFFLOADS, \
+>> +	VIRTIO_NET_F_SPEED_DUPLEX
+>>  
+>>  static unsigned int features[] = {
+>>  	VIRTNET_FEATURES,
+>> diff --git a/include/uapi/linux/virtio_net.h b/include/uapi/linux/virtio_net.h
+>> index fc353b5..5de6ed3 100644
+>> --- a/include/uapi/linux/virtio_net.h
+>> +++ b/include/uapi/linux/virtio_net.h
+>> @@ -57,6 +57,8 @@
+>>  					 * Steering */
+>>  #define VIRTIO_NET_F_CTRL_MAC_ADDR 23	/* Set MAC address */
+>>  
+>> +#define VIRTIO_NET_F_SPEED_DUPLEX 63	/* Device set linkspeed and duplex */
+>> +
+>>  #ifndef VIRTIO_NET_NO_LEGACY
+>>  #define VIRTIO_NET_F_GSO	6	/* Host handles pkts w/ any GSO type */
+>>  #endif /* VIRTIO_NET_NO_LEGACY */
+>> @@ -76,6 +78,17 @@ struct virtio_net_config {
+>>  	__u16 max_virtqueue_pairs;
+>>  	/* Default maximum transmit unit advice */
+>>  	__u16 mtu;
+>> +	/*
+>> +	 * speed, in units of 1Mb. All values 0 to INT_MAX are legal.
+>> +	 * Any other value stands for unknown.
+>> +	 */
+>> +	__u32 speed;
+>> +	/*
+>> +	 * 0x00 - half duplex
+>> +	 * 0x01 - full duplex
+>> +	 * Any other value stands for unknown.
+>> +	 */
+>> +	__u8 duplex;
+>>  } __attribute__((packed));
+>>  
+>>  /*
+>> -- 
+>> 2.6.1
