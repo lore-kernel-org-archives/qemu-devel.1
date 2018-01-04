@@ -1,32 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53920)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54241)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1eX8Zf-0005fP-Qj
-	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 11:41:02 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1eX8a0-0005wy-Mc
+	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 11:41:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1eX8Ze-0007QA-GM
-	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 11:40:59 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:37022)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1eX8Ze-0007OF-7d
-	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 11:40:58 -0500
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 65DBC629C6
-	for <qemu-devel@nongnu.org>; Thu,  4 Jan 2018 16:40:57 +0000 (UTC)
-References: <20180104160523.22995-1-marcandre.lureau@redhat.com>
-	<20180104160523.22995-13-marcandre.lureau@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <3c07180c-f65c-fdcf-fb53-2369f6af5cf6@redhat.com>
-Date: Thu, 4 Jan 2018 17:40:36 +0100
+	(envelope-from <dgilbert@redhat.com>) id 1eX8Zz-0000NM-Qy
+	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 11:41:20 -0500
+Date: Thu, 4 Jan 2018 16:41:03 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20180104164103.GA2635@work-vm>
+References: <20180104144046.30793-1-f4bug@amsat.org>
+	<20180104144046.30793-3-f4bug@amsat.org>
+	<20180104162400.GB2618@work-vm>
+	<44abdde4-4543-f5a4-aca3-d6549497bd7b@amsat.org>
 MIME-Version: 1.0
-In-Reply-To: <20180104160523.22995-13-marcandre.lureau@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <44abdde4-4543-f5a4-aca3-d6549497bd7b@amsat.org>
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3 12/18] crypto: fix stack-buffer-overflow
- error
+Subject: Re: [Qemu-devel] [RFC PATCH 2/6] hw/net/e1000: real device name is
+ 'e1000-82540em', 'e1000' is an alias
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,120 +27,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org
-Cc: pbonzini@redhat.com, famz@redhat.com
+To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
+Cc: Alistair Francis <alistair.francis@xilinx.com>, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, Andreas =?iso-8859-1?Q?F=E4rber?= <afaerber@suse.de>, Igor Mammedov <imammedo@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Markus Armbruster <armbru@redhat.com>, Sascha Silbe <silbe@linux.vnet.ibm.com>, Alexander Graf <agraf@suse.de>, Fam Zheng <famz@redhat.com>, Jason Wang <jasowang@redhat.com>, qemu-devel@nongnu.org, qemu-arm@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-On 04.01.2018 17:05, Marc-Andr=C3=A9 Lureau wrote:
-> ASAN complains about:
+* Philippe Mathieu-Daud=E9 (f4bug@amsat.org) wrote:
+> Hi David,
 >=20
-> =3D=3D8856=3D=3DERROR: AddressSanitizer: stack-buffer-overflow on addre=
-ss 0x7ffd8a1fe168 at pc 0x561136cb4451 bp 0x7ffd8a1fe130 sp 0x7ffd8a1fd8e=
-0
-> READ of size 16 at 0x7ffd8a1fe168 thread T0
->     #0 0x561136cb4450 in __asan_memcpy (/home/elmarco/src/qq/build/test=
-s/test-crypto-ivgen+0x110450)
->     #1 0x561136d2a6a7 in qcrypto_ivgen_essiv_calculate /home/elmarco/sr=
-c/qq/crypto/ivgen-essiv.c:83:5
->     #2 0x561136d29af8 in qcrypto_ivgen_calculate /home/elmarco/src/qq/c=
-rypto/ivgen.c:72:12
->     #3 0x561136d07c8e in test_ivgen /home/elmarco/src/qq/tests/test-cry=
-pto-ivgen.c:148:5
->     #4 0x7f77772c3b04 in test_case_run /home/elmarco/src/gnome/glib/bui=
-lddir/../glib/gtestutils.c:2237
->     #5 0x7f77772c3ec4 in g_test_run_suite_internal /home/elmarco/src/gn=
-ome/glib/builddir/../glib/gtestutils.c:2321
->     #6 0x7f77772c3f6d in g_test_run_suite_internal /home/elmarco/src/gn=
-ome/glib/builddir/../glib/gtestutils.c:2333
->     #7 0x7f77772c3f6d in g_test_run_suite_internal /home/elmarco/src/gn=
-ome/glib/builddir/../glib/gtestutils.c:2333
->     #8 0x7f77772c3f6d in g_test_run_suite_internal /home/elmarco/src/gn=
-ome/glib/builddir/../glib/gtestutils.c:2333
->     #9 0x7f77772c4184 in g_test_run_suite /home/elmarco/src/gnome/glib/=
-builddir/../glib/gtestutils.c:2408
->     #10 0x7f77772c2e0d in g_test_run /home/elmarco/src/gnome/glib/build=
-dir/../glib/gtestutils.c:1674
->     #11 0x561136d0799b in main /home/elmarco/src/qq/tests/test-crypto-i=
-vgen.c:173:12
->     #12 0x7f77756e6039 in __libc_start_main (/lib64/libc.so.6+0x21039)
->     #13 0x561136c13d89 in _start (/home/elmarco/src/qq/build/tests/test=
--crypto-ivgen+0x6fd89)
+> On 01/04/2018 01:24 PM, Dr. David Alan Gilbert wrote:
+> > * Philippe Mathieu-Daud=E9 (f4bug@amsat.org) wrote:
+> >> Signed-off-by: Philippe Mathieu-Daud=E9 <f4bug@amsat.org>
+> >> ---
+> >>  hw/net/e1000.c | 5 ++++-
+> >>  1 file changed, 4 insertions(+), 1 deletion(-)
+> >>
+> >> diff --git a/hw/net/e1000.c b/hw/net/e1000.c
+> >> index 05a00cba31..2280f7fdf9 100644
+> >> --- a/hw/net/e1000.c
+> >> +++ b/hw/net/e1000.c
+> >> @@ -1648,6 +1648,7 @@ typedef struct E1000Info {
+> >>      uint16_t   device_id;
+> >>      uint8_t    revision;
+> >>      uint16_t   phy_id2;
+> >> +    const char **aliases;
+> >>  } E1000Info;
+> >> =20
+> >>  static void e1000_class_init(ObjectClass *klass, void *data)
+> >> @@ -1695,10 +1696,11 @@ static const TypeInfo e1000_base_info =3D {
+> >> =20
+> >>  static const E1000Info e1000_devices[] =3D {
+> >>      {
+> >> -        .name      =3D "e1000",
+> >> +        .name      =3D "e1000-82540em",
+> >>          .device_id =3D E1000_DEV_ID_82540EM,
+> >>          .revision  =3D 0x03,
+> >>          .phy_id2   =3D E1000_PHY_ID2_8254xx_DEFAULT,
+> >> +        .aliases   =3D (const char * []) {"e1000", NULL},
+> >>      },
+> >>      {
+> >>          .name      =3D "e1000-82544gc",
+> >> @@ -1725,6 +1727,7 @@ static void e1000_register_types(void)
+> >> =20
+> >>          type_info.name =3D info->name;
+> >>          type_info.parent =3D TYPE_E1000_BASE;
+> >> +        type_info.aliases =3D info->aliases;
+> >>          type_info.class_data =3D (void *)info;
+> >>          type_info.class_init =3D e1000_class_init;
+> >>          type_info.instance_init =3D e1000_instance_init;
+> >=20
+> > Can you just check that this doesn't break migration compatibility
+> > either way please;  I think there's some alias code somewhere but I
+> > can't remember the details.
 >=20
-> Address 0x7ffd8a1fe168 is located in stack of thread T0 at offset 40 in=
- frame
->     #0 0x561136d2a40f in qcrypto_ivgen_essiv_calculate /home/elmarco/sr=
-c/qq/crypto/ivgen-essiv.c:76
+> Good point.
 >=20
->   This frame has 1 object(s):
->     [32, 40) 'sector.addr' <=3D=3D Memory access at offset 40 overflows=
- this variable
-> HINT: this may be a false positive if your program uses some custom sta=
-ck unwind mechanism or swapcontext
->       (longjmp and C++ exceptions *are* supported)
-> SUMMARY: AddressSanitizer: stack-buffer-overflow (/home/elmarco/src/qq/=
-build/tests/test-crypto-ivgen+0x110450) in __asan_memcpy
-> Shadow bytes around the buggy address:
->   0x100031437bd0: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
->   0x100031437be0: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
->   0x100031437bf0: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
->   0x100031437c00: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
->   0x100031437c10: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-> =3D>0x100031437c20: 00 00 00 00 00 00 00 00 f1 f1 f1 f1 00[f3]f3 f3
->   0x100031437c30: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
->   0x100031437c40: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
->   0x100031437c50: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
->   0x100031437c60: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
->   0x100031437c70: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-> Shadow byte legend (one shadow byte represents 8 application bytes):
->   Addressable:           00
->   Partially addressable: 01 02 03 04 05 06 07
->   Heap left redzone:       fa
->   Freed heap region:       fd
->   Stack left redzone:      f1
->   Stack mid redzone:       f2
->   Stack right redzone:     f3
->   Stack after return:      f5
->   Stack use after scope:   f8
->   Global redzone:          f9
->   Global init order:       f6
->   Poisoned by user:        f7
->   Container overflow:      fc
->   Array cookie:            ac
->   Intra object redzone:    bb
->   ASan internal:           fe
->   Left alloca redzone:     ca
->   Right alloca redzone:    cb
+> Something related to qdev-monitor.c?
+
+The thing I was worrying about was when names end up in the migration
+stream;  that can be a bit subtle so the only way is to just check it
+doesn't break.
+
+> > One thing I do remember that broke when it previously changed was
+> > entries in PC_COMPAT_* tables like the one in hw/i386/pc_piix.c's
+> > PC_COMPAT_1_3 - so check with an 'info qtree' that the property is OK=
+.
 >=20
-> It looks like the rest of the code copes with ndata being larger than
-> sizeof(sector), so limit the memcpy() range.
+> Ok, I'll verify and think about a qtest for that.
 >=20
-> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> Reviewed-by: Daniel P. Berrange <berrange@redhat.com>
-> ---
->  crypto/ivgen-essiv.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+> I took this device because I wanted to test another arch than ARM (whic=
+h
+> strongly use FDT).
+> If there is an issue migrating this particular device we can drop this
+> patch for this only device, and the series still stands for the ARM/FDT=
+.
+
+Yes, although my concern was more general, I just had a previous case
+where I had to fix e1000 downstream because of renaming; but just keep
+in mind other places where names turn up, like the compatibility lists.
+
+Dave
+
+> Regards,
 >=20
-> diff --git a/crypto/ivgen-essiv.c b/crypto/ivgen-essiv.c
-> index cba20bde6c..ad4d926c19 100644
-> --- a/crypto/ivgen-essiv.c
-> +++ b/crypto/ivgen-essiv.c
-> @@ -79,7 +79,7 @@ static int qcrypto_ivgen_essiv_calculate(QCryptoIVGen=
- *ivgen,
->      uint8_t *data =3D g_new(uint8_t, ndata);
-> =20
->      sector =3D cpu_to_le64(sector);
-> -    memcpy(data, (uint8_t *)&sector, ndata);
-> +    memcpy(data, (uint8_t *)&sector, MIN(sizeof(sector), ndata));
->      if (sizeof(sector) < ndata) {
->          memset(data + sizeof(sector), 0, ndata - sizeof(sector));
->      }
+> Phil.
 >=20
 
-Ah, funny, completely unaware of your patch series, I accidentally came
-to the same conclusion two days ago:
 
- https://lists.gnu.org/archive/html/qemu-devel/2018-01/msg00062.html
 
-So if you like, feel free to add:
-
-Reviewed-by: Thomas Huth <thuth@redhat.com>
-Tested-by: Thomas Huth <thuth@redhat.com>
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
