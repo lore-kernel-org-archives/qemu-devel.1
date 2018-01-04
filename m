@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58482)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58474)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1eWuLX-0000vt-Hk
+	(envelope-from <laurent@vivier.eu>) id 1eWuLX-0000vg-AG
 	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 20:29:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1eWuLW-0007F6-Ju
+	(envelope-from <laurent@vivier.eu>) id 1eWuLW-0007Ea-9r
 	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 20:29:27 -0500
-Received: from mout.kundenserver.de ([217.72.192.73]:65235)
+Received: from mout.kundenserver.de ([217.72.192.73]:59349)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1eWuLW-0007Dh-B6
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1eWuLV-0007D7-VP
 	for qemu-devel@nongnu.org; Wed, 03 Jan 2018 20:29:26 -0500
 From: Laurent Vivier <laurent@vivier.eu>
-Date: Thu,  4 Jan 2018 02:29:13 +0100
-Message-Id: <20180104012913.30763-18-laurent@vivier.eu>
+Date: Thu,  4 Jan 2018 02:29:11 +0100
+Message-Id: <20180104012913.30763-16-laurent@vivier.eu>
 In-Reply-To: <20180104012913.30763-1-laurent@vivier.eu>
 References: <20180104012913.30763-1-laurent@vivier.eu>
-Subject: [Qemu-devel] [PATCH v7 17/17] target/m68k: fix m68k_cpu_dump_state()
+Subject: [Qemu-devel] [PATCH v7 15/17] target/m68k: add andi/ori/eori to
+ SR/CCR
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,49 +27,111 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Richard Henderson <richard.henderson@linaro.org>, Thomas Huth <huth@tuxfamily.org>, Laurent Vivier <laurent@vivier.eu>
 
-Display correctly the Trace bits for 680x0
-(2 bits instead of 1 for Coldfire).
-
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/m68k/cpu.h       | 3 ++-
- target/m68k/translate.c | 9 ++++++---
- 2 files changed, 8 insertions(+), 4 deletions(-)
+ target/m68k/translate.c | 53 ++++++++++++++++++++++++++++++++++++++++++-------
+ 1 file changed, 46 insertions(+), 7 deletions(-)
 
-diff --git a/target/m68k/cpu.h b/target/m68k/cpu.h
-index 759b30d389..2985b039e1 100644
---- a/target/m68k/cpu.h
-+++ b/target/m68k/cpu.h
-@@ -219,7 +219,8 @@ typedef enum {
- #define SR_I  0x0700
- #define SR_M  0x1000
- #define SR_S  0x2000
--#define SR_T  0x8000
-+#define SR_T_SHIFT 14
-+#define SR_T  0xc000
- 
- #define M68K_SSP    0
- #define M68K_USP    1
 diff --git a/target/m68k/translate.c b/target/m68k/translate.c
-index 4d5173c4be..4a6d799ee2 100644
+index 8f23cade04..499aaa2f3d 100644
 --- a/target/m68k/translate.c
 +++ b/target/m68k/translate.c
-@@ -5936,9 +5936,12 @@ void m68k_cpu_dump_state(CPUState *cs, FILE *f, fprintf_function cpu_fprintf,
+@@ -2201,6 +2201,7 @@ DISAS_INSN(arith_im)
+     TCGv dest;
+     TCGv addr;
+     int opsize;
++    bool with_SR = ((insn & 0x3f) == 0x3c);
+ 
+     op = (insn >> 9) & 7;
+     opsize = insn_opsize(insn);
+@@ -2217,32 +2218,73 @@ DISAS_INSN(arith_im)
+     default:
+        abort();
      }
-     cpu_fprintf (f, "PC = %08x   ", env->pc);
-     sr = env->sr | cpu_m68k_get_ccr(env);
--    cpu_fprintf(f, "SR = %04x %c%c%c%c%c ", sr, (sr & CCF_X) ? 'X' : '-',
--                (sr & CCF_N) ? 'N' : '-', (sr & CCF_Z) ? 'Z' : '-',
--                (sr & CCF_V) ? 'V' : '-', (sr & CCF_C) ? 'C' : '-');
-+    cpu_fprintf(f, "SR = %04x T:%x I:%x %c%c %c%c%c%c%c\n",
-+                sr, (sr & SR_T) >> SR_T_SHIFT, (sr & SR_I) >> SR_I_SHIFT,
-+                (sr & SR_S) ? 'S' : 'U', (sr & SR_M) ? '%' : 'I',
-+                (sr & CCF_X) ? 'X' : '-', (sr & CCF_N) ? 'N' : '-',
-+                (sr & CCF_Z) ? 'Z' : '-', (sr & CCF_V) ? 'V' : '-',
-+                (sr & CCF_C) ? 'C' : '-');
-     cpu_fprintf(f, "FPSR = %08x %c%c%c%c ", env->fpsr,
-                 (env->fpsr & FPSR_CC_A) ? 'A' : '-',
-                 (env->fpsr & FPSR_CC_I) ? 'I' : '-',
+-    SRC_EA(env, src1, opsize, 1, (op == 6) ? NULL : &addr);
++
++    if (with_SR) {
++        /* SR/CCR can only be used with andi/eori/ori */
++        if (op == 2 || op == 3 || op == 6) {
++            disas_undef(env, s, insn);
++            return;
++        }
++        switch (opsize) {
++        case OS_BYTE:
++            src1 = gen_get_ccr(s);
++            break;
++        case OS_WORD:
++            if (IS_USER(s)) {
++                gen_exception(s, s->insn_pc, EXCP_PRIVILEGE);
++                return;
++            }
++            src1 = gen_get_sr(s);
++            break;
++        case OS_LONG:
++            disas_undef(env, s, insn);
++            return;
++        }
++    } else {
++        SRC_EA(env, src1, opsize, 1, (op == 6) ? NULL : &addr);
++    }
+     dest = tcg_temp_new();
+     switch (op) {
+     case 0: /* ori */
+         tcg_gen_or_i32(dest, src1, im);
+-        gen_logic_cc(s, dest, opsize);
++        if (with_SR) {
++            gen_set_sr(s, dest, opsize == OS_BYTE);
++        } else {
++            DEST_EA(env, insn, opsize, dest, &addr);
++            gen_logic_cc(s, dest, opsize);
++        }
+         break;
+     case 1: /* andi */
+         tcg_gen_and_i32(dest, src1, im);
+-        gen_logic_cc(s, dest, opsize);
++        if (with_SR) {
++            gen_set_sr(s, dest, opsize == OS_BYTE);
++        } else {
++            DEST_EA(env, insn, opsize, dest, &addr);
++            gen_logic_cc(s, dest, opsize);
++        }
+         break;
+     case 2: /* subi */
+         tcg_gen_setcond_i32(TCG_COND_LTU, QREG_CC_X, src1, im);
+         tcg_gen_sub_i32(dest, src1, im);
+         gen_update_cc_add(dest, im, opsize);
+         set_cc_op(s, CC_OP_SUBB + opsize);
++        DEST_EA(env, insn, opsize, dest, &addr);
+         break;
+     case 3: /* addi */
+         tcg_gen_add_i32(dest, src1, im);
+         gen_update_cc_add(dest, im, opsize);
+         tcg_gen_setcond_i32(TCG_COND_LTU, QREG_CC_X, dest, im);
+         set_cc_op(s, CC_OP_ADDB + opsize);
++        DEST_EA(env, insn, opsize, dest, &addr);
+         break;
+     case 5: /* eori */
+         tcg_gen_xor_i32(dest, src1, im);
+-        gen_logic_cc(s, dest, opsize);
++        if (with_SR) {
++            gen_set_sr(s, dest, opsize == OS_BYTE);
++        } else {
++            DEST_EA(env, insn, opsize, dest, &addr);
++            gen_logic_cc(s, dest, opsize);
++        }
+         break;
+     case 6: /* cmpi */
+         gen_update_cc_cmp(s, src1, im, opsize);
+@@ -2251,9 +2293,6 @@ DISAS_INSN(arith_im)
+         abort();
+     }
+     tcg_temp_free(im);
+-    if (op != 6) {
+-        DEST_EA(env, insn, opsize, dest, &addr);
+-    }
+     tcg_temp_free(dest);
+ }
+ 
 -- 
 2.14.3
