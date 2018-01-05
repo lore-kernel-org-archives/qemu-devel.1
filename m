@@ -1,29 +1,37 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36165)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58748)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1eXRgj-0002Rc-V0
-	for qemu-devel@nongnu.org; Fri, 05 Jan 2018 08:05:34 -0500
+	(envelope-from <muriloo@linux.vnet.ibm.com>) id 1eXS7w-0003Np-1c
+	for qemu-devel@nongnu.org; Fri, 05 Jan 2018 08:33:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1eXRgg-0006AM-Mm
-	for qemu-devel@nongnu.org; Fri, 05 Jan 2018 08:05:33 -0500
-Received: from mail-wr0-x241.google.com ([2a00:1450:400c:c0c::241]:33784)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1eXRgg-00069x-FY
-	for qemu-devel@nongnu.org; Fri, 05 Jan 2018 08:05:30 -0500
-Received: by mail-wr0-x241.google.com with SMTP id p6so4310505wrd.0
-	for <qemu-devel@nongnu.org>; Fri, 05 Jan 2018 05:05:30 -0800 (PST)
-References: <20171211125705.16120-1-alex.bennee@linaro.org>
-	<20171211125705.16120-7-alex.bennee@linaro.org>
-	<1524831e-0651-5c64-76b4-7d2ef7c8fb9f@linaro.org>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <1524831e-0651-5c64-76b4-7d2ef7c8fb9f@linaro.org>
-Date: Fri, 05 Jan 2018 13:05:27 +0000
-Message-ID: <87k1wwcv6w.fsf@linaro.org>
+	(envelope-from <muriloo@linux.vnet.ibm.com>) id 1eXS7r-0004wY-3d
+	for qemu-devel@nongnu.org; Fri, 05 Jan 2018 08:33:40 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:45642
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <muriloo@linux.vnet.ibm.com>)
+	id 1eXS7q-0004vb-Ub
+	for qemu-devel@nongnu.org; Fri, 05 Jan 2018 08:33:35 -0500
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	w05DSbAN081328
+	for <qemu-devel@nongnu.org>; Fri, 5 Jan 2018 08:33:33 -0500
+Received: from e17.ny.us.ibm.com (e17.ny.us.ibm.com [129.33.205.207])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2fa8da4r9r-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Fri, 05 Jan 2018 08:33:32 -0500
+Received: from localhost
+	by e17.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <muriloo@linux.vnet.ibm.com>;
+	Fri, 5 Jan 2018 08:33:32 -0500
+From: Murilo Opsfelder Araujo <muriloo@linux.vnet.ibm.com>
+Date: Fri,  5 Jan 2018 11:32:40 -0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v1 06/19] fpu/softfloat: propagate
- signalling NaNs in MINMAX
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+Message-Id: <20180105133241.14141-1-muriloo@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH 0/1] qemu/nbd: fix segmentation fault when
+ .desc is not null-terminated
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,38 +40,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: peter.maydell@linaro.org, laurent@vivier.eu, bharata@linux.vnet.ibm.com, andrew@andrewdutcher.com, aleksandar.markovic@imgtec.com, qemu-devel@nongnu.org, Aurelien Jarno <aurelien@aurel32.net>
+To: qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, qemu-ppc@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Eric Blake <eblake@redhat.com>, R Nageswara Sastry <nasastry@in.ibm.com>, Murilo Opsfelder Araujo <muriloo@linux.vnet.ibm.com>
 
+Hello, QEMU community.
 
-Richard Henderson <richard.henderson@linaro.org> writes:
+The following patch is to fix a segmentation fault when nbd_runtime_opts.desc is
+not null-terminated.
 
-> On 12/11/2017 04:56 AM, Alex Benn=C3=A9e wrote:
->> While a comparison between a QNaN and a number will return the number
->> it is not the same with a signaling NaN. In this case the SNaN will
->> "win" and after potentially raising an exception it will be quietened.
->>
->> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
->>
->> ---
->> v2
->>   - added return for propageFloat
->> ---
->>  fpu/softfloat.c | 8 ++++++--
->>  1 file changed, 6 insertions(+), 2 deletions(-)
->
-> I suppose this fixes minmax for float128 too,
-> and is thus not redundant with patch 18?
+This issue emerged when building QEMU with --enable-gcov, as described by
+https://bugs.launchpad.net/qemu/+bug/1727259.
 
-It was never expanded so I guess no one does float128 minmax's at the momen=
-t.
+To reproduce on ppc64le, run the following commands on QEMU git tree:
 
->
-> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
->
->
-> r~
+mkdir build
+mkdir -p tests/qemu-iotests/scratch
+cd build
+../configure --target-list=ppc64-softmmu --enable-gcov
+make -j$(nproc)
 
+./qemu-img create -f qcow2 -o compat=1.1 ./tests/qemu-iotests/scratch/t.qcow2 64M
+./qemu-io --cache writeback -f qcow2 -c "write -P 0xa 0x1000 0x1000" ./tests/qemu-iotests/scratch/t.qcow2
+./qemu-io --cache writeback -f qcow2 -c "write -P 0xb 0x2000 0x1000" ./tests/qemu-iotests/scratch/t.qcow2
+./qemu-img snapshot -c sn1 ./tests/qemu-iotests/scratch/t.qcow2
+./qemu-io --cache writeback -f qcow2 -c "write -P 0xc 0x1000 0x1000" ./tests/qemu-iotests/scratch/t.qcow2
+./qemu-io --cache writeback -f qcow2 -c "write -P 0xd 0x2000 0x1000" ./tests/qemu-iotests/scratch/t.qcow2
+./qemu-img check -f qcow2 ./tests/qemu-iotests/scratch/t.qcow2
+./qemu-io --cache writeback -f qcow2 -c "read -P 0xc 0x1000 0x1000" ./tests/qemu-iotests/scratch/t.qcow2
+./qemu-io --cache writeback -f qcow2 -c "read -P 0xd 0x2000 0x1000" ./tests/qemu-iotests/scratch/t.qcow2
 
---
-Alex Benn=C3=A9e
+# run in background, wait some seconds until it starts
+./qemu-nbd -v -t -k ${PWD}/tests/qemu-iotests/scratch/test_qemu_nbd_socket ./tests/qemu-iotests/scratch/t.qcow2 -l sn1 &
+sleep 5
+
+# this will cause qemu-io to segfault
+./qemu-io --cache writeback -f qcow2 -f raw --cache=writeback -r -c "read -P 0xa 0x1000 0x1000" nbd:unix:${PWD}/tests/qemu-iotests/scratch/test_qemu_nbd_socket
+
+# kill qemu-nbd
+kill $(pidof qemu-nbd)
+
+Cheers
+Murilo
+
+Murilo Opsfelder Araujo (1):
+  block/nbd: fix segmentation fault when .desc is not null-terminated
+
+ block/nbd.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+-- 
+2.14.3
