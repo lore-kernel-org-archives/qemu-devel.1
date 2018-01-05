@@ -1,34 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39999)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40180)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eXSTK-0005P7-O2
-	for qemu-devel@nongnu.org; Fri, 05 Jan 2018 08:55:48 -0500
+	(envelope-from <eblake@redhat.com>) id 1eXSUo-0006Cr-LU
+	for qemu-devel@nongnu.org; Fri, 05 Jan 2018 08:57:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eXSTG-0004yo-RG
-	for qemu-devel@nongnu.org; Fri, 05 Jan 2018 08:55:46 -0500
-Received: from indium.canonical.com ([91.189.90.7]:42184)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1eXSTG-0004xd-Kn
-	for qemu-devel@nongnu.org; Fri, 05 Jan 2018 08:55:42 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1eXSTF-0001Ej-7j
-	for <qemu-devel@nongnu.org>; Fri, 05 Jan 2018 13:55:41 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id BC5D52E8075
-	for <qemu-devel@nongnu.org>; Fri,  5 Jan 2018 13:55:40 +0000 (UTC)
+	(envelope-from <eblake@redhat.com>) id 1eXSUn-00069y-HP
+	for qemu-devel@nongnu.org; Fri, 05 Jan 2018 08:57:18 -0500
+References: <20180105133241.14141-1-muriloo@linux.vnet.ibm.com>
+	<20180105133241.14141-2-muriloo@linux.vnet.ibm.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <07c8789d-bebb-deed-b64c-806edf17f99c@redhat.com>
+Date: Fri, 5 Jan 2018 07:57:07 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 05 Jan 2018 13:49:04 -0000
-From: =?utf-8?q?Murilo_Opsfelder_Ara=C3=BAjo?= <1727259@bugs.launchpad.net>
-Reply-To: Bug 1727259 <1727259@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <150892430716.18436.10907121916690603983.malonedeb@chaenomeles.canonical.com>
-Message-Id: <151516014431.32346.16213189854676629061.malone@wampee.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1727259] Re: qemu-io-test 58 segfaults when
- configured with gcov
+In-Reply-To: <20180105133241.14141-2-muriloo@linux.vnet.ibm.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="AAaXQFfVLO3rXjsl9f30AXSjfQ4lYSmAY"
+Subject: Re: [Qemu-devel] [PATCH 1/1] block/nbd: fix segmentation fault when
+ .desc is not null-terminated
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,126 +25,101 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Murilo Opsfelder Araujo <muriloo@linux.vnet.ibm.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, qemu-ppc@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, R Nageswara Sastry <nasastry@in.ibm.com>, qemu-stable <qemu-stable@nongnu.org>
 
-Patch sent:
-http://lists.nongnu.org/archive/html/qemu-devel/2018-01/msg00883.html
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--AAaXQFfVLO3rXjsl9f30AXSjfQ4lYSmAY
+From: Eric Blake <eblake@redhat.com>
+To: Murilo Opsfelder Araujo <muriloo@linux.vnet.ibm.com>,
+ qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, qemu-ppc@nongnu.org, Max Reitz
+ <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, R Nageswara Sastry
+ <nasastry@in.ibm.com>, qemu-stable <qemu-stable@nongnu.org>
+Message-ID: <07c8789d-bebb-deed-b64c-806edf17f99c@redhat.com>
+Subject: Re: [PATCH 1/1] block/nbd: fix segmentation fault when .desc is not
+ null-terminated
+References: <20180105133241.14141-1-muriloo@linux.vnet.ibm.com>
+ <20180105133241.14141-2-muriloo@linux.vnet.ibm.com>
+In-Reply-To: <20180105133241.14141-2-muriloo@linux.vnet.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-** Changed in: qemu
-       Status: New =3D> In Progress
+On 01/05/2018 07:32 AM, Murilo Opsfelder Araujo wrote:
+> The find_desc_by_name() from util/qemu-option.c relies on the .name not=
+ being
+> NULL to call strcmp(). This check becomes unsafe when the list is not
+> NULL-terminated, which is the case of nbd_runtime_opts in block/nbd.c, =
+and can
+> result in segmentation fault when strcmp() tries to access an invalid m=
+emory:
 
--- =
+Thanks for the report and patch.  Adding qemu-stable in cc.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1727259
+>=20
+> This patch fixes the segmentation fault in strcmp() by adding a NULL el=
+ement at
+> the end of nbd_runtime_opts.desc list, which is the common practice to =
+most of
+> other structs like runtime_opts in block/null.c. Thus, the desc[i].name=
+ !=3D NULL
+> check becomes safe because it will not evaluate to true when .desc list=
+ reached
+> its end.
+>=20
+> Reported-by: R. Nageswara Sastry <nasastry@in.ibm.com>
+> Buglink: https://bugs.launchpad.net/qemu/+bug/1727259
+> Signed-off-by: Murilo Opsfelder Araujo <muriloo@linux.vnet.ibm.com>
 
-Title:
-  qemu-io-test 58 segfaults when configured with gcov
+I'll update the commit message to add in the commit id that introduced
+the problem, as well as check that other QemuOptsList do not have a
+similar problem; I'm queueing this on the NBD tree and will submit a
+pull request soon.
 
-Status in QEMU:
-  In Progress
+Reviewed-by: Eric Blake <eblake@redhat.com>
 
-Bug description:
-  Head is at 3d7196d43bfe12efe98568cb60057e273652b99b
+> ---
+>  block/nbd.c | 1 +
+>  1 file changed, 1 insertion(+)
+>=20
+> diff --git a/block/nbd.c b/block/nbd.c
+> index a50d24b50a..8b8ba56cdd 100644
+> --- a/block/nbd.c
+> +++ b/block/nbd.c
+> @@ -388,6 +388,7 @@ static QemuOptsList nbd_runtime_opts =3D {
+>              .type =3D QEMU_OPT_STRING,
+>              .help =3D "ID of the TLS credentials to use",
+>          },
+> +        { /* end of list */ }
+>      },
+>  };
+> =20
+>=20
 
-  Steps to re-produce:
-  1. git clone
-  ./configure --enable-gcov --target-list=3Dppc64-softmmu
-  make
-  cd tests/qemu-iotests
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
 
-  2. export qemu binary, in my environment
-  export QEMU_PROG=3D/home/nasastry/qemu_gcov/ppc64-softmmu/qemu-system-ppc=
-64
 
-  3. Run test 58 with format qcow2
-  ./check -qcow2 58
+--AAaXQFfVLO3rXjsl9f30AXSjfQ4lYSmAY
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-  QEMU          -- "/home/nasastry/qemu_gcov/ppc64-softmmu/qemu-system-ppc6=
-4" -nodefaults -machine accel=3Dqtest
-  QEMU_IMG      -- "/home/nasastry/qemu_gcov/qemu-img"
-  QEMU_IO       -- "/home/nasastry/qemu_gcov/qemu-io"  --cache writeback -f=
- qcow2
-  QEMU_NBD      -- "/home/nasastry/qemu_gcov/qemu-nbd"
-  IMGFMT        -- qcow2 (compat=3D1.1)
-  IMGPROTO      -- file
-  PLATFORM      -- Linux/ppc64le zzfp365-lp1 4.13.0-4.rel.git49564cb.el7.ce=
-ntos.ppc64le
-  TEST_DIR      -- /home/nasastry/qemu_gcov/tests/qemu-iotests/scratch
-  SOCKET_SCM_HELPER -- /home/nasastry/qemu_gcov/tests/qemu-iotests/socket_s=
-cm_helper
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-  058 1s ... - output mismatch (see 058.out.bad)
-  --- /home/nasastry/qemu_gcov/tests/qemu-iotests/058.out	2017-10-09 14:09:=
-04.262726912 +0530
-  +++ /home/nasastry/qemu_gcov/tests/qemu-iotests/058.out.bad	2017-10-25 15=
-:00:52.037515025 +0530
-  @@ -19,16 +19,28 @@
-   4 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlpPhDMACgkQp6FrSiUn
+Q2rjsQf/SvkkDxx8t8bpkBsqD3yb95cMqBbzDopdHZMgdscV8QeR11kZT+X9uUeM
+IKtBKOfx3Wzd96DrbNSm5EEwU8WCN2tXKOldquAu45o9h1IH3JXOwafjLpDNlvX2
+3EY5aeWlYJY1ednVQc0gYBhKjmpC2e17VmvGWoqx80HwDG59NPGlapA3WTyYu8Ah
+5j/dDIO8Z0St06fwADMOr5OdBnqBzPoqrACQEBvQQAru/c/ws7uEEnl+vMoc8Ng2
+V4X0wBGd+WKBLWSk3hy2NSykL/fEzwvt1+4dHDJr4x1mU+l98lH0VgBi+zF5PhPc
+iJgLxdMJJECk/atXM4uc5PMaehedMA==
+=Syfw
+-----END PGP SIGNATURE-----
 
-   =3D=3D verifying the exported snapshot with patterns, method 1 =3D=3D
-  -read 4096/4096 bytes at offset 4096
-  -4 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-  -read 4096/4096 bytes at offset 8192
-  -4 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-  +./common.rc: line 66: 36255 Segmentation fault      (core dumped) ( if [=
- "${VALGRIND_QEMU}" =3D=3D "y" ]; then
-  +    exec valgrind --log-file=3D"${VALGRIND_LOGFILE}" --error-exitcode=3D=
-99 "$QEMU_IO_PROG" $QEMU_IO_ARGS "$@";
-  +else
-  +    exec "$QEMU_IO_PROG" $QEMU_IO_ARGS "$@";
-  +fi )
-  +./common.rc: line 66: 36262 Segmentation fault      (core dumped) ( if [=
- "${VALGRIND_QEMU}" =3D=3D "y" ]; then
-  +    exec valgrind --log-file=3D"${VALGRIND_LOGFILE}" --error-exitcode=3D=
-99 "$QEMU_IO_PROG" $QEMU_IO_ARGS "$@";
-  +else
-  +    exec "$QEMU_IO_PROG" $QEMU_IO_ARGS "$@";
-  +fi )
-
-   =3D=3D verifying the exported snapshot with patterns, method 2 =3D=3D
-  -read 4096/4096 bytes at offset 4096
-  -4 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-  -read 4096/4096 bytes at offset 8192
-  -4 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-  +./common.rc: line 66: 36274 Segmentation fault      (core dumped) ( if [=
- "${VALGRIND_QEMU}" =3D=3D "y" ]; then
-  +    exec valgrind --log-file=3D"${VALGRIND_LOGFILE}" --error-exitcode=3D=
-99 "$QEMU_IO_PROG" $QEMU_IO_ARGS "$@";
-  +else
-  +    exec "$QEMU_IO_PROG" $QEMU_IO_ARGS "$@";
-  +fi )
-  +./common.rc: line 66: 36282 Segmentation fault      (core dumped) ( if [=
- "${VALGRIND_QEMU}" =3D=3D "y" ]; then
-  +    exec valgrind --log-file=3D"${VALGRIND_LOGFILE}" --error-exitcode=3D=
-99 "$QEMU_IO_PROG" $QEMU_IO_ARGS "$@";
-  +else
-  +    exec "$QEMU_IO_PROG" $QEMU_IO_ARGS "$@";
-  +fi )
-
-   =3D=3D verifying the converted snapshot with patterns, method 1 =3D=3D
-   read 4096/4096 bytes at offset 4096
-  Failures: 058
-  Failed 1 of 1 tests
-
-  with out gcov configured this test case is pass.
-  # ./check -qcow2 58
-  QEMU          -- "/home/nasastry/qemu/ppc64-softmmu/qemu-system-ppc64" -n=
-odefaults -machine accel=3Dqtest
-  QEMU_IMG      -- "/home/nasastry/qemu/qemu-img"
-  QEMU_IO       -- "/home/nasastry/qemu/qemu-io"  --cache writeback -f qcow2
-  QEMU_NBD      -- "/home/nasastry/qemu/qemu-nbd"
-  IMGFMT        -- qcow2 (compat=3D1.1)
-  IMGPROTO      -- file
-  PLATFORM      -- Linux/ppc64le zzfp365-lp1 4.13.0-4.rel.git49564cb.el7.ce=
-ntos.ppc64le
-  TEST_DIR      -- /home/nasastry/qemu/tests/qemu-iotests/scratch
-  SOCKET_SCM_HELPER -- /home/nasastry/qemu/tests/qemu-iotests/socket_scm_he=
-lper
-
-  058 0s ...
-  Passed all 1 tests
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1727259/+subscriptions
+--AAaXQFfVLO3rXjsl9f30AXSjfQ4lYSmAY--
