@@ -1,27 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44248)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47246)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1eXUFP-0006zM-PG
-	for qemu-devel@nongnu.org; Fri, 05 Jan 2018 10:49:32 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1eXUHv-0008Jm-CU
+	for qemu-devel@nongnu.org; Fri, 05 Jan 2018 10:52:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1eXUFL-0005qS-OM
-	for qemu-devel@nongnu.org; Fri, 05 Jan 2018 10:49:31 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:36862)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1eXUFL-0005pN-Fp
-	for qemu-devel@nongnu.org; Fri, 05 Jan 2018 10:49:27 -0500
-Date: Fri, 5 Jan 2018 15:49:14 +0000
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20180105154914.GH28322@stefanha-x1.localdomain>
-References: <20171219162151.GA10889@stefanha-x1.localdomain>
-	<1512291492.2209478.1513854089861.JavaMail.zimbra@redhat.com>
-	<20180104104744.GC10106@stefanha-x1.localdomain>
-	<5A4E0CDA.4060409@intel.com>
+	(envelope-from <alex.bennee@linaro.org>) id 1eXUHr-0001Ek-BE
+	for qemu-devel@nongnu.org; Fri, 05 Jan 2018 10:52:07 -0500
+Received: from mail-wm0-x22c.google.com ([2a00:1450:400c:c09::22c]:38127)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1eXUHq-0001Bh-PG
+	for qemu-devel@nongnu.org; Fri, 05 Jan 2018 10:52:03 -0500
+Received: by mail-wm0-x22c.google.com with SMTP id 64so3230812wme.3
+	for <qemu-devel@nongnu.org>; Fri, 05 Jan 2018 07:52:02 -0800 (PST)
+References: <20171211125705.16120-1-alex.bennee@linaro.org>
+	<20171211125705.16120-17-alex.bennee@linaro.org>
+	<04791c4d-cc8a-c279-d1a8-8a86c9d470ac@linaro.org>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <04791c4d-cc8a-c279-d1a8-8a86c9d470ac@linaro.org>
+Date: Fri, 05 Jan 2018 15:51:59 +0000
+Message-ID: <87incgcnhc.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="LZFKeWUZP29EKQNE"
-Content-Disposition: inline
-In-Reply-To: <5A4E0CDA.4060409@intel.com>
-Subject: Re: [Qemu-devel] vhost-user graceful connect/disconnect
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v1 16/19] fpu/softfloat: re-factor int/uint
+ to float
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,61 +32,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Wei Wang <wei.w.wang@intel.com>
-Cc: =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org, mukawa@igel.co.jp, "Michael S. Tsirkin" <mst@redhat.com>, Maxime Coquelin <maxime.coquelin@redhat.com>, n nikolaev <n.nikolaev@virtualopensystems.com>
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: peter.maydell@linaro.org, laurent@vivier.eu, bharata@linux.vnet.ibm.com, andrew@andrewdutcher.com, aleksandar.markovic@imgtec.com, qemu-devel@nongnu.org, Aurelien Jarno <aurelien@aurel32.net>
 
 
---LZFKeWUZP29EKQNE
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Richard Henderson <richard.henderson@linaro.org> writes:
 
-On Thu, Jan 04, 2018 at 07:15:38PM +0800, Wei Wang wrote:
-> On 01/04/2018 06:47 PM, Stefan Hajnoczi wrote:
-> > On Thu, Dec 21, 2017 at 06:01:29AM -0500, Marc-Andr=E9 Lureau wrote:
-> >=20
-> > I'm not going to prototype this yet, I'm working on virtio-vhost-user
-> > first, but eventually I might get back to -object vhost-user(-backend).
-> >=20
->=20
-> Hi Stefan, are you implementing the guest slave and vhost-pci driver (we'=
-ve
-> posted to the dpdk mailinglist) as well? and do you have an estimation wh=
-en
-> would the prototype be ready?
+> On 12/11/2017 04:57 AM, Alex Benn=C3=A9e wrote:
+>> These are considerably simpler as the lower order integers can just
+>> use the higher order conversion function. As the decomposed fractional
+>> part is a full 64 bit rounding and inexact handling comes from the
+>> pack functions.
+>>
+>> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+<snip>
+>>
+>>  static uint32_t uint32_pack_decomposed(decomposed_parts p, float_status=
+ *s)
+>>  {
+>>      uint64_t r =3D uint64_pack_decomposed(p, s);
+>> -    return r > UINT32_MAX ? UINT32_MAX : r;
+>> +    if (r > UINT32_MAX) {
+>> +        s->float_exception_flags |=3D float_flag_invalid;
+>> +        r =3D UINT32_MAX;
+>> +    }
+>> +    return r;
+>>  }
+>>
+>>  #define F
+>
+> Ah, the fix for the bug in patch 15 got squashed into the wrong patch.
+> ;-)
 
-I'm implementing the "[RFC virtio-dev] vhost-user-slave: add vhost-user
-slave device type" device in QEMU and DPDK in order to show how the
-ideas we've discussed work.
+Hmm slip of the re-base... the fix has been moved.
 
-Here is the VIRTIO spec link again:
-https://stefanha.github.io/virtio/vhost-user-slave.html#x1-2830007
+>
+>> +float16 int16_to_float16(int16_t a, float_status *status)
+>> +{
+>> +    return int64_to_float16((int64_t) a, status);
+>> +}
+>
+> Kill all of the redundant casts?
 
-It integrates into DPDK's librte_vhost so that existing vhost-user code
-works over AF_UNIX and virtio-vhost-user without code duplication or
-rewriting the devices.
+Ack.
 
-I hope you'll like the code when it's done.  If not, it still has useful
-code and ideas that would be needed to complete the vhost-pci RFC work
-like extending the PCI transport in the VIRTIO spec, handling vhost-user
-reconnection, etc.
+>
+> Otherwise, as amended in your followup,
+>
+> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+>
+>
+> r~
 
-I'm aiming to send an RFC in the next 2 weeks.
 
-Stefan
-
---LZFKeWUZP29EKQNE
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEbBAEBAgAGBQJaT556AAoJEJykq7OBq3PIROkH91N4PwZ9/IrAZO6WedIq0AEq
-K/UsBAaDA4Oje969gU0ZvnyxMGI3ac3Di+1O4q8AQprdEVyJlWlPB2F+Ku2hIs6q
-YhctLfNkVZO0DqRiX2QKzBz4Qfu7LFTptKAdYXRtApyf78Mh+2vpHLCwxcUoMrnu
-/0ijdEKTFyQkOWfGXVr7xZu8ygkDpNsDeBNxpwb9Iw0TYUjzDT2jbiigvEqB7T2O
-z/7jHnUWwcB2oGbzuage03j5+fdwGeTlfShbSvsoBpL3yV6/0oAWPiyuyD5eTpr3
-sUQ0SqQXYxdM9dBgIbmQQAHXQrli/cYr4+IFgz44s0otcUL16HRUjVgfSpedhg==
-=Aqyq
------END PGP SIGNATURE-----
-
---LZFKeWUZP29EKQNE--
+--
+Alex Benn=C3=A9e
