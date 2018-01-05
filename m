@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58790)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33859)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1eXTlY-0000GN-E5
-	for qemu-devel@nongnu.org; Fri, 05 Jan 2018 10:18:41 -0500
+	(envelope-from <stefanha@redhat.com>) id 1eXTsg-0003rD-7g
+	for qemu-devel@nongnu.org; Fri, 05 Jan 2018 10:26:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1eXTlV-0005nh-99
-	for qemu-devel@nongnu.org; Fri, 05 Jan 2018 10:18:40 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:56460)
+	(envelope-from <stefanha@redhat.com>) id 1eXTsd-0005hx-1X
+	for qemu-devel@nongnu.org; Fri, 05 Jan 2018 10:26:02 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:45688)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1eXTlU-0005mw-VT
-	for qemu-devel@nongnu.org; Fri, 05 Jan 2018 10:18:37 -0500
-Date: Fri, 5 Jan 2018 15:18:34 +0000
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1eXTsc-0005gr-Os
+	for qemu-devel@nongnu.org; Fri, 05 Jan 2018 10:25:58 -0500
+Date: Fri, 5 Jan 2018 15:25:52 +0000
 From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20180105151834.GD28322@stefanha-x1.localdomain>
+Message-ID: <20180105152552.GE28322@stefanha-x1.localdomain>
 References: <20180103214925.16677-1-f4bug@amsat.org>
-	<20180103214925.16677-3-f4bug@amsat.org>
+	<20180103214925.16677-4-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="XvKFcGCOAo53UbWW"
+	protocol="application/pgp-signature"; boundary="G6nVm6DDWH/FONJq"
 Content-Disposition: inline
-In-Reply-To: <20180103214925.16677-3-f4bug@amsat.org>
-Subject: Re: [Qemu-devel] [RFC PATCH v2 2/4] libqos: add a sdbus API
+In-Reply-To: <20180103214925.16677-4-f4bug@amsat.org>
+Subject: Re: [Qemu-devel] [RFC PATCH v2 3/4] libqos: implement sdbus QMP
+ driver
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,70 +33,140 @@ To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
 Cc: Alistair Francis <alistair.francis@xilinx.com>, Peter Maydell <peter.maydell@linaro.org>, Eric Blake <eblake@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, Markus Armbruster <armbru@redhat.com>, Thomas Huth <thuth@redhat.com>, =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>
 
 
---XvKFcGCOAo53UbWW
+--G6nVm6DDWH/FONJq
 Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Jan 03, 2018 at 06:49:23PM -0300, Philippe Mathieu-Daud=E9 wrote:
-> +typedef struct SDBusAdapter SDBusAdapter;
-> +struct SDBusAdapter {
-> +
-> +    ssize_t (*do_command)(SDBusAdapter *adapter, enum NCmd cmd, uint32_t=
- arg,
-> +                          uint8_t **response);
-> +    void (*write_byte)(SDBusAdapter *adapter, uint8_t value);
-> +    uint8_t (*read_byte)(SDBusAdapter *adapter);
-> +};
-
-Is it necessary to expose the struct definition?  qmp_sdbus_create()
-allocates this struct so the caller cannot embed it anyway and does not
-need to know sizeof.
-
-> +
-> +ssize_t sdbus_do_cmd(SDBusAdapter *adapter, enum NCmd cmd, uint32_t arg,
-> +                     uint8_t **response);
-> +ssize_t sdbus_do_acmd(SDBusAdapter *adapter, enum ACmd acmd, uint32_t ar=
-g,
-> +                      uint16_t address, uint8_t **response);
-> +void sdbus_write_byte(SDBusAdapter *adapter, uint8_t value);
-> +uint8_t sdbus_read_byte(SDBusAdapter *adapter);
-> +
-> +SDBusAdapter *qmp_sdbus_create(const char *bus_name);
-
-Does this function belong in another patch?
-
-> +static bool verbose;
-> +#define DPRINTF(fmt, ...)                           \
-> +    do {                                            \
-> +        if (verbose) {                              \
-
-I suggest using if (getenv("V")) directly and removing the verbose
-global.  The verbose global is error-prone because it requires that the
-caller first initializes it.
-
-> +ssize_t sdbus_do_acmd(SDBusAdapter *adapter, enum ACmd acmd, uint32_t ar=
-g,
-> +                      uint16_t address, uint8_t **response)
+On Wed, Jan 03, 2018 at 06:49:24PM -0300, Philippe Mathieu-Daud=E9 wrote:
+> +static const char *qmp_sdbus_getpath(const char *blkname)
 > +{
-> +    do_cmd(adapter, 55, address << 16, NULL, false);
-> +    // TODO check rv?
+> +    QDict *response, *minfo;
+> +    QList *list;
+> +    const QListEntry *le;
+> +    QString *qstr;
+> +    const char *mname;
+> +    QObject *qobj;
+> +
+> +    response =3D qmp("{ 'execute': 'query-block' }");
 
-Even if there is no actual error handling, g_assert_...() could be used
-here.
+This function implicitly uses global_qtest.  If you ever want to do
+multi-VM (e.g. migration) tests then this may become a problem because
+there's no way to say which QEMU process to talk to.
 
---XvKFcGCOAo53UbWW
+This can be addressed by adding a QTestState *s argument to these
+functions so that global_qtest isn't hardcoded.  Use qtest_qmp()
+instead.
+
+> +    g_assert_nonnull(response);
+> +    list =3D qdict_get_qlist(response, "return");
+> +    g_assert_nonnull(list);
+> +
+> +    QLIST_FOREACH_ENTRY(list, le) {
+> +        QDict *response2;
+> +
+> +        minfo =3D qobject_to_qdict(qlist_entry_obj(le));
+> +        g_assert(minfo);
+> +        qobj =3D qdict_get(minfo, "qdev");
+> +        if (!qobj) {
+> +            continue;
+> +        }
+> +        qstr =3D qobject_to_qstring(qobj);
+> +        g_assert(qstr);
+> +        mname =3D qstring_get_str(qstr);
+> +
+> +        response2 =3D qmp("{ 'execute': 'qom-get',"
+> +                        "  'arguments': { 'path': %s,"
+> +                        "   'property': \"parent_bus\"}"
+> +                        "}", mname);
+> +        g_assert(response2);
+> +        g_assert(qdict_haskey(response2, "return"));
+> +        qobj =3D qdict_get(response2, "return");
+> +        qstr =3D qobject_to_qstring(qobj);
+> +        g_assert(qstr);
+> +        mname =3D qstring_get_str(qstr);
+> +
+> +        return mname;
+> +    }
+> +    return NULL;
+> +}
+
+response is leaked.  I think something like this is needed:
+
+  char *mname =3D g_strdup(qstring_get_str(qstr));
+  QDECREF(response);
+  return mname;
+
+The caller must g_free() the return value too and the type must be char
+* instead of const char *.
+
+> +
+> +static ssize_t qmp_mmc_do_cmd(SDBusAdapter *adapter, enum NCmd cmd, uint=
+32_t arg,
+> +                              uint8_t **response)
+> +{
+> +    QMPSDBus *s =3D (QMPSDBus *)adapter;
+> +    QDict *response1;
+> +    QObject *qobj;
+> +
+> +    response1 =3D qmp("{ 'execute': 'x-debug-sdbus-command',"
+> +                    "  'arguments': { 'qom-path': %s,"
+> +                    "                 'command': %u, 'arg': %u}"
+> +                    "}",
+> +                    s->qom_path, cmd, arg);
+> +    g_assert(qdict_haskey(response1, "return"));
+> +    qobj =3D qdict_get(response1, "return");
+> +    //QDECREF(response);
+> +
+> +    if (!qobj) {
+> +        return -1;
+> +    }
+> +
+> +    {
+> +        QString *qstr;
+> +        const gchar *mname;
+> +        guchar *uc;
+> +        gsize out_len;
+> +        QDict *response2 =3D qobject_to_qdict(qobj);
+> +
+> +        if (!qdict_haskey(response2, "base64")) {
+> +            return 0;
+> +        }
+> +        qobj =3D qdict_get(response2, "base64");
+> +        qstr =3D qobject_to_qstring(qobj);
+> +        if (!qstr) {
+> +            puts("!qstr");
+> +            return 0;
+> +        }
+> +        mname =3D qstring_get_str(qstr);
+> +
+> +        uc =3D g_base64_decode(mname, &out_len);
+> +        if (response) {
+> +            *response =3D uc;
+> +        } else {
+> +            g_free(uc);
+> +        }
+> +        return out_len;
+> +
+> +    }
+> +
+> +    return 0;
+> +}
+
+Please fix memory leaks here, too.  For example, response1 is leaked.
+
+--G6nVm6DDWH/FONJq
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEcBAEBAgAGBQJaT5dKAAoJEJykq7OBq3PIRFYH/0HRPYki5KV0DlhPe+2CnET/
-YKd9wGWxNE+j5DckQUi87l7lWZTCp7wMOi6stylLGO6fwM0sIbg7B2pdTXFAheP/
-5R6AzcE64Mj9fEuytnL5cgS6UQoCtKVNdlQ43cxuar8OULGE+n+5ZDbT2wGR+eQq
-yz/YC12ROndsPjY/U0USF1vP8Jf9bTV8N0cfZSpkUNurLBC2srUl5wCaSiUnGhHS
-2bzbC6g3Xt83t6OdD4I+5wvUY7/G6o1O3Bp4ZDAkds3NvZfdbwX/Tk+K5Sjy3xcy
-j6HmsVrRSa/GyH8Nf7/HLpt1+RwIeIQO6RrUow5XDRHbQpzs+8nNwUGqJHM+HK0=
-=et5d
+iQEcBAEBAgAGBQJaT5kAAAoJEJykq7OBq3PIZHgH/RzDTH/29Vpttg22Q7Rzklv/
+K6H51gXxfI2AnayC6x5P5f0t5nRNz9Ko8K7XiTWloDa86slG4GPxeziI0ZK8Merz
+6QIPjiaH4MMritVQPz8rSxUewThhPdDyRqRMpcNpg+949Xt3hlU/OAy6b3jDJOGJ
+EdEkSSd+E/N4xKWwUQD6fVqdEKT/jaB7Sn+QXh41UduMyyAFB5GuFRWwQk3y2mkT
+PK+Q+qJpqIgp5cYPc0E+KL0f0RnRJf1Ul91jOOGijiwFvYGyGF4/aWC+EAE2Ep0h
+rOAfbKNQFi/+tuZoFQoBZ5pasz1uzsYeUn4qNPz3gcamSqqEoa13LtBIvDXvw1s=
+=Gy27
 -----END PGP SIGNATURE-----
 
---XvKFcGCOAo53UbWW--
+--G6nVm6DDWH/FONJq--
