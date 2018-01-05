@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52305)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55148)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1eXVNg-0003BZ-7g
-	for qemu-devel@nongnu.org; Fri, 05 Jan 2018 12:02:09 -0500
+	(envelope-from <eblake@redhat.com>) id 1eXVTy-00086J-5P
+	for qemu-devel@nongnu.org; Fri, 05 Jan 2018 12:08:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1eXVNc-0000bj-BN
-	for qemu-devel@nongnu.org; Fri, 05 Jan 2018 12:02:08 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:47446)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1eXVNb-0000al-O4
-	for qemu-devel@nongnu.org; Fri, 05 Jan 2018 12:02:03 -0500
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id CE43CA49F1
-	for <qemu-devel@nongnu.org>; Fri,  5 Jan 2018 17:02:02 +0000 (UTC)
-From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Date: Fri,  5 Jan 2018 17:01:38 +0000
-Message-Id: <20180105170138.23357-3-dgilbert@redhat.com>
-In-Reply-To: <20180105170138.23357-1-dgilbert@redhat.com>
-References: <20180105170138.23357-1-dgilbert@redhat.com>
-Subject: [Qemu-devel] [PATCH 2/2] find_ram_offset: Align ram_addr_t
- allocation on long boundaries
+	(envelope-from <eblake@redhat.com>) id 1eXVTw-00079z-S9
+	for qemu-devel@nongnu.org; Fri, 05 Jan 2018 12:08:38 -0500
+References: <20180105133241.14141-1-muriloo@linux.vnet.ibm.com>
+	<20180105133241.14141-2-muriloo@linux.vnet.ibm.com>
+	<07c8789d-bebb-deed-b64c-806edf17f99c@redhat.com>
+	<fb11ac10-0b17-b9d6-0e2a-540cac882900@linux.vnet.ibm.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <3dd18c73-5410-3306-2252-56afe45ff3e1@redhat.com>
+Date: Fri, 5 Jan 2018 11:08:28 -0600
+MIME-Version: 1.0
+In-Reply-To: <fb11ac10-0b17-b9d6-0e2a-540cac882900@linux.vnet.ibm.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="HbrsVO8Ppw6a8hldDrn2Oksv8XajXIzCG"
+Subject: Re: [Qemu-devel] [PATCH 1/1] block/nbd: fix segmentation fault when
+ .desc is not null-terminated
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,58 +27,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, pbonzini@redhat.com
+To: =?UTF-8?Q?Murilo_Opsfelder_Ara=c3=bajo?= <muriloo@linux.vnet.ibm.com>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-ppc@nongnu.org, qemu-block@nongnu.org, qemu-stable <qemu-stable@nongnu.org>, Max Reitz <mreitz@redhat.com>, R Nageswara Sastry <nasastry@in.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--HbrsVO8Ppw6a8hldDrn2Oksv8XajXIzCG
+From: Eric Blake <eblake@redhat.com>
+To: =?UTF-8?Q?Murilo_Opsfelder_Ara=c3=bajo?= <muriloo@linux.vnet.ibm.com>,
+ qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-ppc@nongnu.org,
+ qemu-block@nongnu.org, qemu-stable <qemu-stable@nongnu.org>,
+ Max Reitz <mreitz@redhat.com>, R Nageswara Sastry <nasastry@in.ibm.com>,
+ Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <3dd18c73-5410-3306-2252-56afe45ff3e1@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 1/1] block/nbd: fix segmentation fault when
+ .desc is not null-terminated
+References: <20180105133241.14141-1-muriloo@linux.vnet.ibm.com>
+ <20180105133241.14141-2-muriloo@linux.vnet.ibm.com>
+ <07c8789d-bebb-deed-b64c-806edf17f99c@redhat.com>
+ <fb11ac10-0b17-b9d6-0e2a-540cac882900@linux.vnet.ibm.com>
+In-Reply-To: <fb11ac10-0b17-b9d6-0e2a-540cac882900@linux.vnet.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-The dirty bitmaps are built from 'long'sand there is fast-path code
-for synchronising the case where the RAMBlock is aligned to the start
-of a long boundary.  Align the allocation to this boundary
-to cause the fast path to be used.
+On 01/05/2018 08:47 AM, Murilo Opsfelder Ara=C3=BAjo wrote:
 
-Offsets before change:
-11398@1515169675.018566:find_ram_offset size: 0x1e0000 @ 0x8000000
-11398@1515169675.020064:find_ram_offset size: 0x20000 @ 0x81e0000
-11398@1515169675.020244:find_ram_offset size: 0x20000 @ 0x8200000
-11398@1515169675.024343:find_ram_offset size: 0x1000000 @ 0x8220000
-11398@1515169675.025154:find_ram_offset size: 0x10000 @ 0x9220000
-11398@1515169675.027682:find_ram_offset size: 0x40000 @ 0x9230000
-11398@1515169675.032921:find_ram_offset size: 0x200000 @ 0x9270000
-11398@1515169675.033307:find_ram_offset size: 0x1000 @ 0x9470000
-11398@1515169675.033601:find_ram_offset size: 0x1000 @ 0x9471000
+>>> This patch fixes the segmentation fault in strcmp() by adding a NULL =
+element at
+>>> the end of nbd_runtime_opts.desc list, which is the common practice t=
+o most of
+>>> other structs like runtime_opts in block/null.c. Thus, the desc[i].na=
+me !=3D NULL
+>>> check becomes safe because it will not evaluate to true when .desc li=
+st reached
+>>> its end.
+>>>
+>>> Reported-by: R. Nageswara Sastry <nasastry@in.ibm.com>
+>>> Buglink: https://bugs.launchpad.net/qemu/+bug/1727259
+>>> Signed-off-by: Murilo Opsfelder Araujo <muriloo@linux.vnet.ibm.com>
+>>
+>> I'll update the commit message to add in the commit id that introduced=
 
-after change:
-10923@1515169108.818245:find_ram_offset size: 0x1e0000 @ 0x8000000
-10923@1515169108.819410:find_ram_offset size: 0x20000 @ 0x8200000
-10923@1515169108.819587:find_ram_offset size: 0x20000 @ 0x8240000
-10923@1515169108.823708:find_ram_offset size: 0x1000000 @ 0x8280000
-10923@1515169108.824503:find_ram_offset size: 0x10000 @ 0x9280000
-10923@1515169108.827093:find_ram_offset size: 0x40000 @ 0x92c0000
-10923@1515169108.833045:find_ram_offset size: 0x200000 @ 0x9300000
-10923@1515169108.833504:find_ram_offset size: 0x1000 @ 0x9500000
-10923@1515169108.833787:find_ram_offset size: 0x1000 @ 0x9540000
 
-Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
-Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
----
- exec.c | 5 +++++
- 1 file changed, 5 insertions(+)
+Commit 7ccc44fd7, in 2.7.0.
 
-diff --git a/exec.c b/exec.c
-index 7966570231..644603f05e 100644
---- a/exec.c
-+++ b/exec.c
-@@ -1694,6 +1694,11 @@ static ram_addr_t find_ram_offset(ram_addr_t size)
-             }
-         }
- 
-+        /* Align blocks to start on a 'long' in the bitmap
-+         * which makes the bitmap sync'ing take the fast path.
-+         */
-+        end = ROUND_UP(end, BITS_PER_LONG << TARGET_PAGE_BITS);
-+
-         /* If it fits remember our place and remember the size
-          * of gap, but keep going so that we might find a smaller
-          * gap to fill so avoiding fragmentation.
--- 
-2.14.3
+>> the problem, as well as check that other QemuOptsList do not have a
+>> similar problem; I'm queueing this on the NBD tree and will submit a
+>> pull request soon.
+>>
+>> Reviewed-by: Eric Blake <eblake@redhat.com>
+>=20
+> Hi, Eric.
+>=20
+> A quick look brought my attention to:
+>=20
+> block/ssh.c
+> 530:static QemuOptsList ssh_runtime_opts =3D {
+>=20
+> I've sent a patch to fix it too.
+
+And my audit matches yours that there were no other culprits besides
+those two.
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--HbrsVO8Ppw6a8hldDrn2Oksv8XajXIzCG
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlpPsQ0ACgkQp6FrSiUn
+Q2oiowf+JA/MndvbkBwkig7iyrdz4YGHem+Lu4shedB3Jvyn2Lk/A0dg4yu3sMvZ
+maHBG/S1KAbQRR9kvm0NaB4IhTqDuHzAWctHOd0nOs74+KuEdWfcVKnMO96G9d+h
+zKFdoy0onNw57UDv+zJFLK6JEICd0RWQ33Uriyj4x5zOXs9m81L789A3ffo6vPdB
+FPNrm1qM1fFwgxPHl/xm5L7BxK1vSb3q8fWMV33kOHNDbA9berG1PRGsQKl40Gx2
+adJUoRTplFU7njXnHsCJH9zgsq6OQAcPA3XMXe11uKynAxn9RuLjovn9mAg3OXrZ
+X3isV7108wd52GYswPYIW84J2kTzCA==
+=uk9B
+-----END PGP SIGNATURE-----
+
+--HbrsVO8Ppw6a8hldDrn2Oksv8XajXIzCG--
