@@ -1,30 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50018)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58613)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eXQZ5-00048u-F0
-	for qemu-devel@nongnu.org; Fri, 05 Jan 2018 06:53:36 -0500
+	(envelope-from <a.perevalov@samsung.com>) id 1eXQpD-0008PK-Vq
+	for qemu-devel@nongnu.org; Fri, 05 Jan 2018 07:10:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eXQZ4-0003Lw-Pb
-	for qemu-devel@nongnu.org; Fri, 05 Jan 2018 06:53:35 -0500
-Received: from mail-io0-x230.google.com ([2607:f8b0:4001:c06::230]:40847)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eXQZ4-0003LH-Jz
-	for qemu-devel@nongnu.org; Fri, 05 Jan 2018 06:53:34 -0500
-Received: by mail-io0-x230.google.com with SMTP id v30so5544256iov.7
-	for <qemu-devel@nongnu.org>; Fri, 05 Jan 2018 03:53:34 -0800 (PST)
-MIME-Version: 1.0
-Sender: philippe.mathieu.daude@gmail.com
-In-Reply-To: <04819f44-5df0-04f7-4dc2-6c66fe6a7aec@redhat.com>
-References: <20171229142922.31701-1-hpoussin@reactos.org>
-	<04819f44-5df0-04f7-4dc2-6c66fe6a7aec@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philippe@mathieu-daude.net>
-Date: Fri, 5 Jan 2018 08:53:33 -0300
-Message-ID: <CAAdtpL7UNko1AvgWA8j03J_1w7AnzQLFyxy6_g5q5_3OPPN6Bg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3 00/16] piix4: cleanup and improvements
+	(envelope-from <a.perevalov@samsung.com>) id 1eXQp9-0002zn-Uz
+	for qemu-devel@nongnu.org; Fri, 05 Jan 2018 07:10:15 -0500
+Received: from mailout2.w1.samsung.com ([210.118.77.12]:41937)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <a.perevalov@samsung.com>)
+	id 1eXQp9-0002xG-EF
+	for qemu-devel@nongnu.org; Fri, 05 Jan 2018 07:10:11 -0500
+From: Alexey Perevalov <a.perevalov@samsung.com>
+Message-id: <e640381f-f64a-b541-1d08-14fcf7d22319@samsung.com>
+Date: Fri, 05 Jan 2018 15:10:03 +0300
+MIME-version: 1.0
+In-reply-to: <6edfb28b-09fe-5fe9-7457-ed1cf1064a89@redhat.com>
+Content-type: text/plain; charset="utf-8"; format="flowed"
+Content-transfer-encoding: 7bit
+Content-language: en-GB
+References: <1509369390-8285-1-git-send-email-a.perevalov@samsung.com>
+	<CGME20171030131647eucas1p2ea569225550a2250ee75f76b482b7498@eucas1p2.samsung.com>
+	<1509369390-8285-2-git-send-email-a.perevalov@samsung.com>
+	<6edfb28b-09fe-5fe9-7457-ed1cf1064a89@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v12 1/6] migration: introduce
+ postcopy-blocktime capability
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,34 +32,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: =?UTF-8?Q?Herv=C3=A9_Poussineau?= <hpoussin@reactos.org>, Aurelien Jarno <aurelien@aurel32.net>, Yongbok Kim <yongbok.kim@mips.com>, "Michael S . Tsirkin" <mst@redhat.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+Cc: heetae82.ahn@samsung.com, quintela@redhat.com, dgilbert@redhat.com, peterx@redhat.com, i.maximets@samsung.com
 
->> This patchset is a cleanup of the PIIX4 PCI-ISA bridge. Lots of devices
->> are moved from MIPS Malta board (which has a PIIX4) to PIIX4, where devi=
-ces
->> belong. This lets us reuse PIIX4 in other machines, while not loosing an=
-y
->> functionality.
+On 01/03/2018 12:20 AM, Eric Blake wrote:
+> On 10/30/2017 08:16 AM, Alexey Perevalov wrote:
+>> Right now it could be used on destination side to
+>> enable vCPU blocktime calculation for postcopy live migration.
+>> vCPU blocktime - it's time since vCPU thread was put into
+>> interruptible sleep, till memory page was copied and thread awake.
 >>
->> Last patch allows adding a new PIIX4 device directly from command line.
->> Note that this will work only as long no other ISA bus already exist on =
-the
->> machine.
+>> Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+>> Signed-off-by: Alexey Perevalov <a.perevalov@samsung.com>
+>> ---
+>>   migration/migration.c | 9 +++++++++
+>>   migration/migration.h | 1 +
+>>   qapi/migration.json   | 6 +++++-
+>>   3 files changed, 15 insertions(+), 1 deletion(-)
+>>
+> Is there any reason this has to be a new capability rather than
+> unconditionally enabled?  What are the trade-offs for enabling vs.
+> disabling the capability that warrant it being a knob?  Can we do a
+> better job of documenting in which cases the user would want to change
+> the knob from its default value, if we even need it to be a knob?
+Hello Eric,
+sorry for late response, it's holiday in whole Russia.
+
+The reason we decided to introduce new capability it's
+performance penalty, memory & cpu usage, in current version
+it's not so high as in initial, it affects hot path of post-copy live 
+migration.
+Regarding documentation part, I'll answer in
+"[PATCH v12 6/6] migration: add postcopy total blocktime into query-migrate"
+thread.
+
 >
-> Thanks, I think this is the right place to draw the line.  The more
-> "correct" one would be like pc87312, where the serial and parallel ports
-> are e.g. also included in the SuperI/O chip, but then you get
+>> +++ b/qapi/migration.json
+>> @@ -352,12 +352,16 @@
+>>   #
+>>   # @x-multifd: Use more than one fd for migration (since 2.11)
+>>   #
+>> +# @postcopy-blocktime: Calculate downtime for postcopy live migration
+>> +#                     (since 2.11)
+>> +#
+>>   # Since: 1.2
+>>   ##
+>>   { 'enum': 'MigrationCapability',
+>>     'data': ['xbzrle', 'rdma-pin-all', 'auto-converge', 'zero-blocks',
+>>              'compress', 'events', 'postcopy-ram', 'x-colo', 'release-ram',
+>> -           'block', 'return-path', 'pause-before-switchover', 'x-multifd' ] }
+>> +           'block', 'return-path', 'pause-before-switchover', 'x-multifd',
+>> +           'postcopy-blocktime' ] }
+>>   
+>>   ##
+>>   # @MigrationCapabilityStatus:
+>>
 
-Yes, this is how I did in my "remove 'i386/pc.h' dependency" series ...
-
->
->             /* FIXME use a qdev chardev prop instead of serial_hds[] */
->             chr =3D serial_hds[i];
->
-> so you have to mark the bridge as not user-creatable.
-
-... using qdev chardev and getting ride of this serial_hds[] limitation.
-
-I suggested Herv=C3=A9 we have an IRC meeting today at 7PM GMT+1 to talk
-about sharing common efforts.
+-- 
+Best regards,
+Alexey Perevalov
