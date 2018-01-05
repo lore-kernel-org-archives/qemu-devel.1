@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35872)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36719)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <antonynpavlov@gmail.com>) id 1eXZih-0006Hs-0C
-	for qemu-devel@nongnu.org; Fri, 05 Jan 2018 16:40:07 -0500
+	(envelope-from <eblake@redhat.com>) id 1eXZn4-0008OI-GX
+	for qemu-devel@nongnu.org; Fri, 05 Jan 2018 16:44:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <antonynpavlov@gmail.com>) id 1eXZid-0000yw-PH
-	for qemu-devel@nongnu.org; Fri, 05 Jan 2018 16:40:06 -0500
-Received: from mail-lf0-x242.google.com ([2a00:1450:4010:c07::242]:34965)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <antonynpavlov@gmail.com>)
-	id 1eXZid-0000yT-EG
-	for qemu-devel@nongnu.org; Fri, 05 Jan 2018 16:40:03 -0500
-Received: by mail-lf0-x242.google.com with SMTP id h5so6505676lfj.2
-	for <qemu-devel@nongnu.org>; Fri, 05 Jan 2018 13:40:03 -0800 (PST)
-Date: Sat, 6 Jan 2018 00:54:02 +0300
-From: Antony Pavlov <antonynpavlov@gmail.com>
-Message-Id: <20180106005402.caea79a9e9676296e6eb805b@gmail.com>
-In-Reply-To: <1514940265-18093-20-git-send-email-mjc@sifive.com>
+	(envelope-from <eblake@redhat.com>) id 1eXZn1-0004cA-Aa
+	for qemu-devel@nongnu.org; Fri, 05 Jan 2018 16:44:38 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:57284)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1eXZn0-0004aU-Tm
+	for qemu-devel@nongnu.org; Fri, 05 Jan 2018 16:44:35 -0500
 References: <1514940265-18093-1-git-send-email-mjc@sifive.com>
-	<1514940265-18093-20-git-send-email-mjc@sifive.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v1 19/21] SiFive Freedom E300 RISC-V Machine
+	<1514940265-18093-13-git-send-email-mjc@sifive.com>
+	<20180106004105.281b992abcf939b0cf45b88f@gmail.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <b829219c-23e2-d3b6-3381-ecfa97d1d9b2@redhat.com>
+Date: Fri, 5 Jan 2018 15:44:31 -0600
+MIME-Version: 1.0
+In-Reply-To: <20180106004105.281b992abcf939b0cf45b88f@gmail.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="TsUopMqxCAw3WuZiB7KLsmU31qMEeqLvY"
+Subject: Re: [Qemu-devel] [PATCH v1 12/21] RISC-V HART Array
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,87 +29,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Michael Clark <mjc@sifive.com>
-Cc: qemu-devel@nongnu.org, Sagar Karandikar <sagark@eecs.berkeley.edu>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
+To: Antony Pavlov <antonynpavlov@gmail.com>, Michael Clark <mjc@sifive.com>
+Cc: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, qemu-devel@nongnu.org, Sagar Karandikar <sagark@eecs.berkeley.edu>
 
-On Wed,  3 Jan 2018 13:44:23 +1300
-Michael Clark <mjc@sifive.com> wrote:
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--TsUopMqxCAw3WuZiB7KLsmU31qMEeqLvY
+From: Eric Blake <eblake@redhat.com>
+To: Antony Pavlov <antonynpavlov@gmail.com>, Michael Clark <mjc@sifive.com>
+Cc: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
+ qemu-devel@nongnu.org, Sagar Karandikar <sagark@eecs.berkeley.edu>
+Message-ID: <b829219c-23e2-d3b6-3381-ecfa97d1d9b2@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v1 12/21] RISC-V HART Array
+References: <1514940265-18093-1-git-send-email-mjc@sifive.com>
+ <1514940265-18093-13-git-send-email-mjc@sifive.com>
+ <20180106004105.281b992abcf939b0cf45b88f@gmail.com>
+In-Reply-To: <20180106004105.281b992abcf939b0cf45b88f@gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-> This provides a RISC-V Board compatible with the the SiFive E300 SDK.
-> The following machine is implemented:
+On 01/05/2018 03:41 PM, Antony Pavlov wrote:
+> On Wed,  3 Jan 2018 13:44:16 +1300
+> Michael Clark <mjc@sifive.com> wrote:
 >=20
-> - 'sifive_e300'; CLINT, PLIC, UART, AON, GPIO, QSPI, PWM
+>> Holds the state of a heterogenous array of RISC-V hardware threads.
 >=20
 
-...
+>=20
+> Hmm, you use SysBusDevice, uint32_t and RISCVCPU types but there is no =
+header files
+> inclusion to define these types.
+>=20
+> I propose this fixup:
+>=20
+> --- a/include/hw/riscv/riscv_hart.h
+> +++ b/include/hw/riscv/riscv_hart.h
+> @@ -27,6 +27,10 @@
+>  #ifndef HW_RISCV_HART_H
+>  #define HW_RISCV_HART_H
+> =20
+> +#include "qemu/osdep.h"
 
-> diff --git a/include/hw/riscv/sifive_e300.h b/include/hw/riscv/sifive_e30=
-0.h
-> new file mode 100644
-> index 0000000..453c43b
-> --- /dev/null
-> +++ b/include/hw/riscv/sifive_e300.h
-> @@ -0,0 +1,79 @@
-> +/*
-> + * SiFive E300 series machine interface
-> + *
-> + * Copyright (c) 2017 SiFive, Inc.
-> + *
-> + * Permission is hereby granted, free of charge, to any person obtaining=
- a copy
-> + * of this software and associated documentation files (the "Software"),=
- to deal
-> + * in the Software without restriction, including without limitation the=
- rights
-> + * to use, copy, modify, merge, publish, distribute, sublicense, and/or =
-sell
-> + * copies of the Software, and to permit persons to whom the Software is
-> + * furnished to do so, subject to the following conditions:
-> + *
-> + * The above copyright notice and this permission notice shall be includ=
-ed in
-> + * all copies or substantial portions of the Software.
-> + *
-> + * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRE=
-SS OR
-> + * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILI=
-TY,
-> + * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHA=
-LL
-> + * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR =
-OTHER
-> + * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISI=
-NG FROM,
-> + * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALING=
-S IN
-> + * THE SOFTWARE.
-> + */
-> +
-> +#ifndef HW_SIFIVE_E300_H
-> +#define HW_SIFIVE_E300_H
-> +
-> +#define TYPE_SIFIVE_E300 "riscv.sifive.e300"
-> +
-> +#define SIFIVE_E300(obj) \
-> +    OBJECT_CHECK(SiFiveE300State, (obj), TYPE_SIFIVE_E300)
-> +
-> +typedef struct SiFiveE300State {
-> +    /*< private >*/
-> +    SysBusDevice parent_obj;
-> +
-> +    /*< public >*/
-> +    RISCVHartArrayState soc;
+NACK to this part.  Our policy is that all .c files should include
+osdep.h before anything else, and therefore, all .h files can assume
+that osdep.h has already been included.  Extending that logic, uint32_t
+is always available for use in any .h, without having to add any includes=
+=2E
 
-I suppose that name 'soc' is misleading because it contain only CPU core-re=
-lated information
-but it does not contain any SoC-related information.
+> +#include "hw/sysbus.h"
+> +#include "target/riscv/cpu.h"
 
-> +    DeviceState *plic;
-> +} SiFiveE300State;
-> +
-
-
+But including these headers for SysBusDevice and RISCVCPU makes sense.
 
 --=20
-Best regards,
-=A0 Antony Pavlov
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--TsUopMqxCAw3WuZiB7KLsmU31qMEeqLvY
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlpP8cAACgkQp6FrSiUn
+Q2qzzgf/cyC5mIcP0SQ97Lhr8adSEnKuFCbjhISTM2OITxzzIwKihPXa4fg3bbxm
+RFI42JuRD192CscrhI7R+SgoUA5Pd4+zYOyjVyvikGUkQ84UqMrc1AIDbnHpyMrG
+JzGvsOgobfbQgGCzFTNbESeX9H42pVKL4ow9s2Yj6DsO2bRnjIdE7WBtO0uCpJ1g
+HIHx1x6rNpeRIDotpppgpkJUdV+yfYFYa9t7JkAaohcbF1yGnPqcrKPbmX5dUVtE
++BMlbhO4H3SURxY8KO49NHz9Jsi/XS76NP7ZgVf4LZhIz08f9Zwqa+y9fS2uMPh9
+8SJWOJafZne7lR4Sq9aO4j9aQBijEA==
+=ELeU
+-----END PGP SIGNATURE-----
+
+--TsUopMqxCAw3WuZiB7KLsmU31qMEeqLvY--
