@@ -1,32 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34221)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40117)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1eXPhC-0000AW-5D
-	for qemu-devel@nongnu.org; Fri, 05 Jan 2018 05:57:55 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1eXPqa-0002UA-UH
+	for qemu-devel@nongnu.org; Fri, 05 Jan 2018 06:07:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1eXPh9-0004Dy-0a
-	for qemu-devel@nongnu.org; Fri, 05 Jan 2018 05:57:54 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:40374)
+	(envelope-from <pbonzini@redhat.com>) id 1eXPqV-0004Qa-T0
+	for qemu-devel@nongnu.org; Fri, 05 Jan 2018 06:07:36 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:59138)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1eXPh8-0004D9-QG
-	for qemu-devel@nongnu.org; Fri, 05 Jan 2018 05:57:50 -0500
-References: <6d95cc4b-155c-44cb-1fc0-18ba848741ac@profihost.ag>
-	<446087972.818501.1515050674109.JavaMail.zimbra@oxygem.tv>
-	<1548618960.818551.1515050828217.JavaMail.zimbra@oxygem.tv>
-	<cb656289-97ee-d45e-cfcc-51e86b9a11ce@profihost.ag>
-	<130240891.820052.1515054901352.JavaMail.zimbra@oxygem.tv>
-	<671681eb-5d03-1797-4b0e-70b6e8b7b257@redhat.com>
-	<b3231ee0-a232-057b-dbfe-bd31e0d4bf02@profihost.ag>
-	<24204049-c489-df35-3775-ee5121e13f0f@redhat.com>
-	<27133122-E470-4CDB-8732-FD83A1ADF2AF@profihost.ag>
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1eXPqV-0004Q8-JZ
+	for qemu-devel@nongnu.org; Fri, 05 Jan 2018 06:07:31 -0500
+References: <20171229142922.31701-1-hpoussin@reactos.org>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <a72871a4-c3bd-5872-4891-92b98035dd85@redhat.com>
-Date: Fri, 5 Jan 2018 11:57:47 +0100
+Message-ID: <04819f44-5df0-04f7-4dc2-6c66fe6a7aec@redhat.com>
+Date: Fri, 5 Jan 2018 12:07:24 +0100
 MIME-Version: 1.0
-In-Reply-To: <27133122-E470-4CDB-8732-FD83A1ADF2AF@profihost.ag>
+In-Reply-To: <20171229142922.31701-1-hpoussin@reactos.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] CVE-2017-5715: relevant qemu patches
+Subject: Re: [Qemu-devel] [PATCH v3 00/16] piix4: cleanup and improvements
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,50 +27,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Priebe - Profihost AG <s.priebe@profihost.ag>
-Cc: Alexandre DERUMIER <aderumier@odiso.com>, qemu-devel <qemu-devel@nongnu.org>
+To: =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>, Aurelien Jarno <aurelien@aurel32.net>, Yongbok Kim <yongbok.kim@mips.com>, "Michael S . Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org
 
-On 05/01/2018 11:40, Stefan Priebe - Profihost AG wrote:
-> Thanks! But it=E2=80=98s very difficult to get all opinions all togethe=
-r.
+On 29/12/2017 15:29, Herv=C3=A9 Poussineau wrote:
+> Hi,
 >=20
-> SuSE Enterprise told me to update:
-> - kernel
-> - qemu
-> - Intel microcode
+> This patchset is a cleanup of the PIIX4 PCI-ISA bridge. Lots of devices
+> are moved from MIPS Malta board (which has a PIIX4) to PIIX4, where dev=
+ices
+> belong. This lets us reuse PIIX4 in other machines, while not loosing a=
+ny
+> functionality.
 >=20
-> And the released already updates for all of them.
+> Last patch allows adding a new PIIX4 device directly from command line.
+> Note that this will work only as long no other ISA bus already exist on=
+ the
+> machine.
 
-Yes, but live migrate an updated guest from updated to non-updated host
-and you'll have a bad surprise.
+Thanks, I think this is the right place to draw the line.  The more
+"correct" one would be like pc87312, where the serial and parallel ports
+are e.g. also included in the SuperI/O chip, but then you get
+
+            /* FIXME use a qdev chardev prop instead of serial_hds[] */
+            chr =3D serial_hds[i];
+
+so you have to mark the bridge as not user-creatable.
+
+Acked-by: Paolo Bonzini <pbonzini@redhat.com>
 
 Paolo
 
-> Stefan
+> Herv=C3=A9
 >=20
-> Excuse my typo sent from my mobile phone.
+> Changes v2 -> v3:
+> - rebased on master and fixed conflicts
+> - added patch 14 (convert reset function to QOM)
+> - use TYPE_PIIX4_PCI_DEVICE in Malta board (patch 15, Philippe Mathieu-=
+Daud=C3=A9)
 >=20
-> Am 05.01.2018 um 09:33 schrieb Paolo Bonzini <pbonzini@redhat.com
-> <mailto:pbonzini@redhat.com>>:
+> Changes v1 -> v2:
+> - fixed compilation on CentOS 6 (patch 1)
+> - automatically create serial/parallel chardevs if not provided (patch =
+11)
 >=20
->> On 04/01/2018 21:15, Stefan Priebe - Profihost AG wrote:
->>> attached the relevant patch for everybody who needs it.
->>
->> This is the original patch from Intel, which doesn't work unless you
->> have a patched kernel (which you almost certainly don't have) and
->> doesn't even warn you about that.
->>
->> In other words, it's rubbish. =C2=A0Please read
->> https://www.qemu.org/2018/01/04/spectre/ several times, until you
->> understand why there is no urgent need to update QEMU.
->>
->> Days are 24 hours for QEMU developers just like for you (and believe m=
-e,
->> we wished several times that they weren't during the last two months).
->> We are prioritizing the fixes according to their effect in mitigating
->> the vulnerability, their applicability and the availability of patches
->> to the lower levels of the stack. =C2=A0Right now, the most urgent par=
-t is
->> the simple mitigations that can go in Linux 4.15 and stable kernels.
->>
->> Paolo
+> Herv=C3=A9 Poussineau (16):
+>   fdc: move object structures to header file
+>   serial/parallel: move object structures to header file
+>   mc146818rtc: move structure to header file
+>   mc146818rtc: always register rtc to rtc list
+>   piix4: rename some variables in realize function
+>   piix4: add Reset Control Register
+>   piix4: add a i8259 interrupt controller as specified in datasheet
+>   piix4: add a i8257 dma controller as specified in datasheet
+>   piix4: add a i8254 pit controller as specified in datasheet
+>   piix4: add a i8042 keyboard/mouse controller as specified in datashee=
+t
+>   piix4: add a floppy controller, 1 parallel port and 2 serial ports
+>   piix4: add a mc146818rtc controller as specified in datasheet
+>   piix4: add a speaker as specified in datasheet
+>   piix4: convert reset function to QOM
+>   piix4: rename PIIX4 object to piix4-isa
+>   piix4: we can now instanciate a PIIX4 with -device
+>=20
+>  hw/block/fdc.c                 | 102 -----------------------
+>  hw/char/parallel.c             |  31 +------
+>  hw/char/serial-isa.c           |  13 +--
+>  hw/isa/piix4.c                 | 183 +++++++++++++++++++++++++++++++++=
++++-----
+>  hw/mips/mips_malta.c           |  74 +++++++----------
+>  hw/ppc/pnv.c                   |   2 +-
+>  hw/timer/mc146818rtc.c         |  43 ++--------
+>  include/hw/block/fdc.h         | 103 +++++++++++++++++++++++
+>  include/hw/char/isa.h          |  50 +++++++++++
+>  include/hw/char/serial.h       |   1 -
+>  include/hw/i386/pc.h           |   1 -
+>  include/hw/isa/isa.h           |   3 +
+>  include/hw/timer/mc146818rtc.h |  29 +++++++
+>  13 files changed, 389 insertions(+), 246 deletions(-)
+>  create mode 100644 include/hw/char/isa.h
+>=20
