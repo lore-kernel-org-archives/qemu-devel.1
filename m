@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35704)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37628)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mjc@sifive.com>) id 1eXLnB-0000IM-8p
-	for qemu-devel@nongnu.org; Fri, 05 Jan 2018 01:47:50 -0500
+	(envelope-from <mjc@sifive.com>) id 1eXLqO-0001xm-13
+	for qemu-devel@nongnu.org; Fri, 05 Jan 2018 01:51:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mjc@sifive.com>) id 1eXLn9-0003Hd-Qs
-	for qemu-devel@nongnu.org; Fri, 05 Jan 2018 01:47:49 -0500
-Received: from mail-oi0-x22a.google.com ([2607:f8b0:4003:c06::22a]:44311)
+	(envelope-from <mjc@sifive.com>) id 1eXLqM-0006cO-RT
+	for qemu-devel@nongnu.org; Fri, 05 Jan 2018 01:51:08 -0500
+Received: from mail-oi0-x241.google.com ([2607:f8b0:4003:c06::241]:46171)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mjc@sifive.com>) id 1eXLn9-0003GN-Ec
-	for qemu-devel@nongnu.org; Fri, 05 Jan 2018 01:47:47 -0500
-Received: by mail-oi0-x22a.google.com with SMTP id g6so2551732oib.11
-	for <qemu-devel@nongnu.org>; Thu, 04 Jan 2018 22:47:47 -0800 (PST)
+	(Exim 4.71) (envelope-from <mjc@sifive.com>) id 1eXLqM-0006bh-HH
+	for qemu-devel@nongnu.org; Fri, 05 Jan 2018 01:51:06 -0500
+Received: by mail-oi0-x241.google.com with SMTP id t81so2559839oih.13
+	for <qemu-devel@nongnu.org>; Thu, 04 Jan 2018 22:51:06 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <4e3bcfa2-c511-3ffb-44ab-be4567f2fb17@redhat.com>
+In-Reply-To: <9831f4cc-c5ad-a43d-d677-8773f9f7b63e@linaro.org>
 References: <1514940265-18093-1-git-send-email-mjc@sifive.com>
-	<1514940265-18093-22-git-send-email-mjc@sifive.com>
-	<4e3bcfa2-c511-3ffb-44ab-be4567f2fb17@redhat.com>
+	<1514940265-18093-11-git-send-email-mjc@sifive.com>
+	<9831f4cc-c5ad-a43d-d677-8773f9f7b63e@linaro.org>
 From: Michael Clark <mjc@sifive.com>
-Date: Fri, 5 Jan 2018 19:47:46 +1300
-Message-ID: <CAHNT7Ntz2C84DYMf+BM8WZ7kwMTuZ3Q5D+VfUxG0O87H6j94XQ@mail.gmail.com>
+Date: Fri, 5 Jan 2018 19:51:05 +1300
+Message-ID: <CAHNT7Ns5E0KYMX1BQcmAuZRgjK+cP5x-03o=ed2hm_OT+D9FGw@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v1 21/21] RISC-V Build Infrastructure
+Subject: Re: [Qemu-devel] [PATCH v1 10/21] RISC-V Linux User Emulation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,75 +29,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
+To: Richard Henderson <richard.henderson@linaro.org>
 Cc: qemu-devel@nongnu.org, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Sagar Karandikar <sagark@eecs.berkeley.edu>
 
-On Thu, Jan 4, 2018 at 12:23 PM, Eric Blake <eblake@redhat.com> wrote:
+On Thu, Jan 4, 2018 at 12:47 PM, Richard Henderson <
+richard.henderson@linaro.org> wrote:
 
-> On 01/02/2018 06:44 PM, Michael Clark wrote:
-> > This adds RISC-V into the build system enabling the following targets:
+> On 01/02/2018 04:44 PM, Michael Clark wrote:
+> > diff --git a/linux-user/elfload.c b/linux-user/elfload.c
+> > index 20f3d8c..178af56 100644
+> > --- a/linux-user/elfload.c
+> > +++ b/linux-user/elfload.c
+> > @@ -1272,6 +1272,28 @@ static inline void init_thread(struct
+> target_pt_regs *regs,
 > >
-> > - riscv32-softmmu
-> > - riscv64-softmmu
-> > - riscv32-linux-user
-> > - riscv64-linux-user
+> >  #endif /* TARGET_TILEGX */
 > >
-> > This adds defaults configs for RISC-V, enables the build for the RISC-V
-> > CPU core, hardware, and Linux User Emulation. The 'qemu-binfmt-conf.sh'
-> > script is updated to add the RISC-V ELF magic.
+> > +#ifdef TARGET_RISCV
+> > +
+> > +#define ELF_START_MMAP 0x80000000
+>
+> For riscv64 too?  Surely closer to ((TASK_SIZE / 3) * 2).
+>
+> > diff --git a/linux-user/main.c b/linux-user/main.c
+> > index 71696ed..8900141 100644
+> > --- a/linux-user/main.c
+> > +++ b/linux-user/main.c
+> > @@ -227,7 +227,7 @@ void cpu_loop(CPUX86State *env)
+> >          cpu_exec_end(cs);
+> >          process_queued_cpu_work(cs);
 > >
-> > Expected checkpatch errors for consistency reasons:
-> >
-> > ERROR: line over 90 characters
-> > FILE: scripts/qemu-binfmt-conf.sh
-> > Signed-off-by: Michael Clark <mjc@sifive.com>
-> > ---
+> > -        switch(trapnr) {
+> > +        switch (trapnr) {
 >
-> > +++ b/qapi-schema.json
-> > @@ -413,7 +413,7 @@
-> >  # Since: 2.6
-> >  ##
-> >  { 'enum': 'CpuInfoArch',
-> > -  'data': ['x86', 'sparc', 'ppc', 'mips', 'tricore', 'other' ] }
-> > +  'data': ['x86', 'sparc', 'ppc', 'mips', 'tricore', 'riscv', 'other' ]
-> }
->
-> Missing documentation that riscv was added in 2.12 (see QKeyCode in
-> qapi/ui.json for an enum that serves as an example of documenting
-> changes over time).
+> Even though the formatting is wrong, don't change unrelated code.
 
 
-OK. Will add this in the next spin.
+I didn't intend for this to happen. False assumption that only the RISC-V
+code was broken. Will attend to this in the next spin.
 
->
-> >  ##
-> > +# @CpuInfoRISCV:
-> > +#
-> > +# Additional information about a virtual RISCV CPU
-> > +#
-> > +# @pc: the instruction pointer
-> > +#
-> > +# Since 2.8
->
-> 2.12, actually.
->
-> > +##
-> > +{ 'struct': 'CpuInfoRISCV', 'data': { 'pc': 'int' } }
->
-> Should this be 'uint64' or other specific type, rather than the generic
-> 'int' (which happens to be 64 bits, but signed)?  Other architectures
-> use 'int' because of history, but we could use this chance to improve
-> things if desired.
->
 
-I'll have to defer to your better judgement as to whether we need to change
-this. I like consistency. Is it a change that needs to be made to multiple
-arches? It sounds relatively low risk. You decide.
-
-QAPI Schema
-M: Eric Blake <eblake@redhat.com>
-M: Markus Armbruster <armbru@redhat.com>
-S: Supported
-F: qapi-schema.json
-F: qapi/*.json
-T: git git://repo.or.cz/qemu/armbru.git qapi-next
+> > +        case EXCP_DEBUG:
+> > +        gdbstep:
+> > +            signum = gdb_handlesig(cs, TARGET_SIGTRAP);
+> > +            sigcode = TARGET_TRAP_BRKPT;
+> > +            break;
+> > +        default:
+> > +            EXCP_DUMP(env, "\nqemu: unhandled CPU exception %#x -
+> aborting\n",
+> > +                     trapnr);
+> > +            exit(EXIT_FAILURE);
+>
+> You will need to handle the generic EXCP_ATOMIC as well.
+> Though of course you won't see that until you use tcg_gen_atomic_*.
+>
