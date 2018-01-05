@@ -1,33 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60412)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60422)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eXOxi-00058F-KT
-	for qemu-devel@nongnu.org; Fri, 05 Jan 2018 05:11:01 -0500
+	(envelope-from <bounces@canonical.com>) id 1eXOxj-00058K-08
+	for qemu-devel@nongnu.org; Fri, 05 Jan 2018 05:11:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eXOxd-0007EM-QJ
+	(envelope-from <bounces@canonical.com>) id 1eXOxe-0007FX-H0
 	for qemu-devel@nongnu.org; Fri, 05 Jan 2018 05:10:54 -0500
-Received: from indium.canonical.com ([91.189.90.7]:34382)
+Received: from indium.canonical.com ([91.189.90.7]:34406)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1eXOxd-0007CF-BV
-	for qemu-devel@nongnu.org; Fri, 05 Jan 2018 05:10:49 -0500
+	id 1eXOxd-0007Dn-Vj
+	for qemu-devel@nongnu.org; Fri, 05 Jan 2018 05:10:50 -0500
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1eXOxc-0002ZY-8e
-	for <qemu-devel@nongnu.org>; Fri, 05 Jan 2018 10:10:48 +0000
+	id 1eXOxd-0002Zz-44
+	for <qemu-devel@nongnu.org>; Fri, 05 Jan 2018 10:10:49 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 3F6AC2E8059
-	for <qemu-devel@nongnu.org>; Fri,  5 Jan 2018 10:10:48 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 1D2B12E802D
+	for <qemu-devel@nongnu.org>; Fri,  5 Jan 2018 10:10:49 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Fri, 05 Jan 2018 10:01:50 -0000
-From: Ping Li <1740364@bugs.launchpad.net>
+Date: Fri, 05 Jan 2018 10:03:34 -0000
+From: Richard Jones <rjones@redhat.com>
 Reply-To: Bug 1740364 <1740364@bugs.launchpad.net>
 Sender: bounces@canonical.com
 References: <151444692163.26459.1330629893044006612.malonedeb@gac.canonical.com>
-Message-Id: <151514651045.24187.14396256046721592478.malone@chaenomeles.canonical.com>
+	<151512029457.2799.7813958810864461287.malone@soybean.canonical.com>
+Message-Id: <20180105100334.GH2787@redhat.com>
 Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1740364] Re: qemu-img: fails to get shared
+Subject: Re: [Qemu-devel] [Bug 1740364] Re: qemu-img: fails to get shared
  'write' lock
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -39,13 +40,56 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-1. The error prompt may be misleading. I guess your backing image should
-be running. It should report that "failed to get the lock of backing
-image". The operation will be allowed in the future.
+On Fri, Jan 05, 2018 at 02:44:54AM -0000, Ping Li wrote:
+> The behaviour should be expected. Since qemu 2.10, image locking is
+> enabled which make multiple QEMU processes cannot write to the same
+> image, even if boot snapshot and backing file at the same time are
+> not allowed. =
 
-2. Check the help doc of qemu-img, the you can get the support sub-command =
-by force share option "-U".
-$ ./qemu-img --help | grep -- "-U"
+> You could get image info with the option "-U" as below:
+> $qemu-img info -U $ImageName
+> The reason qcow2 is not allowed is because metadata has to be read =
+
+> from the image file, and it is not safe if the image is being used =
+
+> by the VM, because it may update metadata while we read it, =
+
+> resulting in inconsistent or wrong output.
+
+The higher layers deal with inconsistent output.  We want a way to
+turn off locking when *we* know that it's safe, qemu doesn't have a
+way to know that.
+
+Interestingly the -U option is undocumented, but it seems like what we
+want here.
+
+Yaniv, how about this (only lightly tested):
+
+diff --git a/lib/info.c b/lib/info.c
+index 4464df994..460596373 100644
+--- a/lib/info.c
++++ b/lib/info.c
+@@ -193,6 +193,7 @@ get_json_output (guestfs_h *g, const char *filename)
+ =
+
+   guestfs_int_cmd_add_arg (cmd, QEMU_IMG);
+   guestfs_int_cmd_add_arg (cmd, "info");
++  guestfs_int_cmd_add_arg (cmd, "-U");
+   guestfs_int_cmd_add_arg (cmd, "--output");
+   guestfs_int_cmd_add_arg (cmd, "json");
+   guestfs_int_cmd_add_arg (cmd, fdpath);
+
+
+Rich.
+
+-- =
+
+Richard Jones, Virtualization Group, Red Hat http://people.redhat.com/~rjon=
+es
+Read my programming and virtualization blog: http://rwmj.wordpress.com
+virt-df lists disk usage of guests without needing to install any
+software inside the virtual machine.  Supports Linux and Windows.
+http://people.redhat.com/~rjones/virt-df/
 
 -- =
 
