@@ -1,23 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51618)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35494)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1eXIpp-0005d7-4s
-	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 22:38:22 -0500
+	(envelope-from <mjc@sifive.com>) id 1eXL33-0005t0-H6
+	for qemu-devel@nongnu.org; Fri, 05 Jan 2018 01:00:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1eXIpk-0006Rv-RZ
-	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 22:38:21 -0500
-Date: Fri, 5 Jan 2018 14:37:03 +1100
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20180105033703.GF24581@umbus.fritz.box>
-References: <20180104042405.29773-1-david@gibson.dropbear.id.au>
-	<20180104184718.568473a7@bahia.lan>
-	<151510026307.2579.5877378669181689283@sif>
+	(envelope-from <mjc@sifive.com>) id 1eXL2x-00065n-D0
+	for qemu-devel@nongnu.org; Fri, 05 Jan 2018 01:00:09 -0500
+Received: from mail-ot0-x241.google.com ([2607:f8b0:4003:c0f::241]:37476)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <mjc@sifive.com>) id 1eXL2x-00064o-2H
+	for qemu-devel@nongnu.org; Fri, 05 Jan 2018 01:00:03 -0500
+Received: by mail-ot0-x241.google.com with SMTP id p31so3194558ota.4
+	for <qemu-devel@nongnu.org>; Thu, 04 Jan 2018 22:00:02 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="0h4+rw7qdMK7T5x1"
-Content-Disposition: inline
-In-Reply-To: <151510026307.2579.5877378669181689283@sif>
-Subject: Re: [Qemu-devel] [PATCH] spapr: Correct compatibility mode setting
- for hotplugged CPUs
+References: <1514940265-18093-1-git-send-email-mjc@sifive.com>
+	<1514940265-18093-4-git-send-email-mjc@sifive.com>
+	<20180104094759.704eaee0a681d5ec26e9aa9d@gmail.com>
+	<CAHNT7NvROn++kq96OZBwuGPhXk2DOFrCpCKycEUHTc2anR9V4w@mail.gmail.com>
+	<20180104205353.30f96d3b75f8a0e0dbc22583@gmail.com>
+In-Reply-To: <20180104205353.30f96d3b75f8a0e0dbc22583@gmail.com>
+From: Michael Clark <mjc@sifive.com>
+Date: Fri, 05 Jan 2018 05:59:51 +0000
+Message-ID: <CAHNT7NtAQifECd1edNz_-rypGriMzHAQGuJiaEQ5udrPUZEB8g@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v1 03/21] RISC-V CPU Core Definition
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,123 +32,109 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Michael Roth <mdroth@linux.vnet.ibm.com>
-Cc: Greg Kurz <groug@kaod.org>, surajjs@au1.ibm.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, satheera@in.ibm.com
+To: Antony Pavlov <antonynpavlov@gmail.com>
+Cc: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Sagar Karandikar <sagark@eecs.berkeley.edu>, qemu-devel@nongnu.org
+
+On Fri, 5 Jan 2018 at 6:39 AM, Antony Pavlov <antonynpavlov@gmail.com>
+wrote:
+
+> On Thu, 4 Jan 2018 20:33:57 +1300
+> Michael Clark <mjc@sifive.com> wrote:
+>
+> > On Thu, Jan 4, 2018 at 7:47 PM, Antony Pavlov <antonynpavlov@gmail.com>
+> > wrote:
+> >
+> > > On Wed,  3 Jan 2018 13:44:07 +1300
+> > > Michael Clark <mjc@sifive.com> wrote:
+> > >
+> > > > Add CPU state header, CPU definitions and initialization routines
+> > > >
+> > > > Signed-off-by: Michael Clark <mjc@sifive.com>
+> > > > ---
+> > > >  target/riscv/cpu.c      | 338
+> +++++++++++++++++++++++++++++++++++++++
+> > > >  target/riscv/cpu.h      | 363 ++++++++++++++++++++++++++++++
+> > > ++++++++++++
+> > > >  target/riscv/cpu_bits.h | 411 ++++++++++++++++++++++++++++++
+> > > ++++++++++++++++++
+> > > >  3 files changed, 1112 insertions(+)
+> > > >  create mode 100644 target/riscv/cpu.c
+> > > >  create mode 100644 target/riscv/cpu.h
+> > > >  create mode 100644 target/riscv/cpu_bits.h
+> > > >
+> > > > diff --git a/target/riscv/cpu.c b/target/riscv/cpu.c
+> > >
+> > > ...
+> > >
+> > > > +static void riscv_cpu_reset(CPUState *cs)
+> > > > +{
+> > > > +    RISCVCPU *cpu =3D RISCV_CPU(cs);
+> > > > +    RISCVCPUClass *mcc =3D RISCV_CPU_GET_CLASS(cpu);
+> > > > +    CPURISCVState *env =3D &cpu->env;
+> > > > +
+> > > > +    mcc->parent_reset(cs);
+> > > > +#ifndef CONFIG_USER_ONLY
+> > > > +    tlb_flush(cs);
+> > > > +    env->priv =3D PRV_M;
+> > > > +    env->mtvec =3D DEFAULT_MTVEC;
+> > > > +#endif
+> > > > +    env->pc =3D DEFAULT_RSTVEC;
+> > >
+> > > The RISC-V Privileged Architecture Manual v1.10 states that
+> > >
+> > >   The pc is set to an implementation-defined reset vector.
+> > >
+> > > But hard-coded DEFAULT_RSTVEC leaves no chance for changing reset
+> vector.
+> > >
+> > > Can we add a mechanism for changing reset vector?
+> > >
+> >
+> > That can be added very easily at some point when necessary.
+> >
+> > All 5 RISC-V machines in the QEMU port currently have their emulated Ma=
+sk
+> > ROMs at 0x1000 so its not necessary until we add a machine that needs a
+> > different value. I certainly wouldn't reject a patch that adds that
+> > functionality if we had a machine with a different reset vector, althou=
+gh
+> > given we have 5 machines using the same vector, it may remain a sensibl=
+e
+> > default. I would think twice about adding a property that no machines
+> sets,
+> > or duplicate code and have all machines set their reset vector even whe=
+n
+> > they are all the same? Shall we add the functionality when we need it?
+>
+> Actually it is me who needs this functionality.
+>
+> At the moment my board code needs this dirty hack:
+>
+>
+> https://github.com/miet-riscv-workgroup/riscv-qemu/commit/bfc8221d89b9bb8=
+28f3742f17eb89d8513a75aae#diff-429448b1b26e0bc4256cc290758c0ab5
 
 
---0h4+rw7qdMK7T5x1
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Okay, we can add a property. It=E2=80=99s also possible to register a cpu_r=
+eset
+callback and set the pc there, within the machine.
 
-On Thu, Jan 04, 2018 at 03:11:03PM -0600, Michael Roth wrote:
-> Quoting Greg Kurz (2018-01-04 11:47:18)
-> > On Thu,  4 Jan 2018 15:24:05 +1100
-> > David Gibson <david@gibson.dropbear.id.au> wrote:
-> >=20
-> > > Currently the pseries machine sets the compatibility mode for the
-> > > guest's cpus in two places: 1) at machine reset and 2) after CAS
-> > > negotiation.
-> > >=20
-> > > This means that if we set or negotiate a compatiblity mode, then
-> > > hotplug a cpu, the hotplugged cpu doesn't get the right mode set and
-> > > will incorrectly have the full native features.
-> > >=20
-> > > To correct this, we set the compatibility mode on a cpu when it is
-> > > brought online with the 'start-cpu' RTAS call.  Given that we no
-> > > longer need to set the compatibility mode on all CPUs at machine
-> > > reset, so we change that to only set the mode for the boot cpu.
-> > >=20
-> > > Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-> > > ---
-> > >  hw/ppc/spapr.c      | 2 +-
-> > >  hw/ppc/spapr_rtas.c | 8 ++++++++
-> > >  2 files changed, 9 insertions(+), 1 deletion(-)
-> > >=20
-> > > diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> > > index e22888ba06..d1acfe8858 100644
-> > > --- a/hw/ppc/spapr.c
-> > > +++ b/hw/ppc/spapr.c
-> > > @@ -1510,7 +1510,7 @@ static void spapr_machine_reset(void)
-> > >          spapr_ovec_cleanup(spapr->ov5_cas);
-> > >          spapr->ov5_cas =3D spapr_ovec_new();
-> > > =20
-> > > -        ppc_set_compat_all(spapr->max_compat_pvr, &error_fatal);
-> > > +        ppc_set_compat(first_ppc_cpu, spapr->max_compat_pvr, &error_=
-fatal);
-> > >      }
-> > > =20
-> > >      fdt =3D spapr_build_fdt(spapr, rtas_addr, spapr->rtas_size);
-> > > diff --git a/hw/ppc/spapr_rtas.c b/hw/ppc/spapr_rtas.c
-> > > index 4bb939d3d1..2ed00548c1 100644
-> > > --- a/hw/ppc/spapr_rtas.c
-> > > +++ b/hw/ppc/spapr_rtas.c
-> > > @@ -163,6 +163,7 @@ static void rtas_start_cpu(PowerPCCPU *cpu_, sPAP=
-RMachineState *spapr,
-> > >          CPUState *cs =3D CPU(cpu);
-> > >          CPUPPCState *env =3D &cpu->env;
-> > >          PowerPCCPUClass *pcc =3D POWERPC_CPU_GET_CLASS(cpu);
-> > > +        Error *local_err =3D NULL;
-> > > =20
-> > >          if (!cs->halted) {
-> > >              rtas_st(rets, 0, RTAS_OUT_HW_ERROR);
-> > > @@ -174,6 +175,13 @@ static void rtas_start_cpu(PowerPCCPU *cpu_, sPA=
-PRMachineState *spapr,
-> > >           * new cpu enters */
-> > >          kvm_cpu_synchronize_state(cs);
-> > > =20
-> > > +        /* Set compatibility mode to match existing cpus */
-> > > +        ppc_set_compat(cpu, POWERPC_CPU(first_cpu)->compat_pvr, &loc=
-al_err);
-> >=20
-> > Is it okay to report a simple HW error to the guest here instead of abo=
-rting
-> > like we do with first_cpu at reset time ?
->=20
-> And if we don't opt for &error_fatal, we need an error_free() below.
-
-Or better yet an error_report_err() which will display it and free
-it.  I'll make that change.
-
-
->=20
-> >=20
-> > > +        if (local_err) {
-> > > +            rtas_st(rets, 0, RTAS_OUT_HW_ERROR);
-> > > +            return;
-> > > +        }
-> > > +
-> > >          env->msr =3D (1ULL << MSR_SF) | (1ULL << MSR_ME);
-> > > =20
-> > >          /* Enable Power-saving mode Exit Cause exceptions for the ne=
-w CPU */
-> >=20
->=20
-
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---0h4+rw7qdMK7T5x1
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlpO8tsACgkQbDjKyiDZ
-s5K6sBAAmTiNn/VJoGYpR3/8NCCM6Zawb6UMLPGF+EJ3ZMQSgKEW6kkjBRTkoRfc
-tZ0n35hvwbzvXzv67YRovoVJlJvST2OqDWbPPgasS9cYQ+Ie1kEi2MKAZGl1wvfI
-vPM719shNrApU3mYEQ8Y9QbIbU82O13bI/hQbYU91KAjrJYYirdlF75YIHqOrBTX
-2PG+Q1OkD8QiYkMlqXUYd7RXnFovzu7F65YtcKny7u0DyrIIgJ+YNvRSPu4/rjyQ
-Aixe/oDUe1o5zbhjzTxr0QXv1CCX6pxiQaiXVrQDH5zCzsFsgwRjB8dghujbIQJE
-ukC7KiyPpepqpaNb4UwZuLGFn4gxLgpnqJw0dKOECM7iuHh5q31ZzJLt4DUReU5e
-s1T6aj9R96MMPYiJIfVC+eZnkh5tIt93YOsh37ykiyoTXVx3zpZeBsEKbLbP5PKv
-qZXbvLgmaRg5hRXfkgWlESv0y52Ba0h2ro1mA3IC/jxQ4vQu0H0+2NacJ3hcXBE8
-igskr4RprP/v35Yong4sW+OXbJOERgos8U+ihBRtN7EXnbhrCqz9/pGMocKTY6qI
-BLgK21Vcuc2L4+/96KemUB4wDmSY9Mz398Fk9wyaXHX4ZNM+aG8KwnhgmN3r/bai
-usdav6o8UWyLvrbaJJT5/Tvz8FMwmUgXGFfT5abmpK6PKqUKh/g=
-=KSQt
------END PGP SIGNATURE-----
-
---0h4+rw7qdMK7T5x1--
+>
+> > I'd categorise this as a feature request. #define DEFAULT_RSTVEC
+> 0x00001000
+> > is the "implementation-defined reset vector"
+> >
+> > Folk on the RISC-V mailing list are actually seeking guidance on the
+> blanks
+> > in the RISC-V specification so it may be that a de-facto standard emerg=
+es
+> > for some of these "implementation defined" blanks, in which case it may
+> > become part of a platform spec (vs the ISA spec).
+> >
+> > E.g. there is the "reset-hivecs" property in the ARM emulation code
+> > > so SoC-specific code can change reset vector.
+>
+> --
+> Best regards,
+>   Antony Pavlov
+>
