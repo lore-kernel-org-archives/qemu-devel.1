@@ -1,25 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51308)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57708)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1eXOms-0000Ps-5R
-	for qemu-devel@nongnu.org; Fri, 05 Jan 2018 04:59:43 -0500
+	(envelope-from <armbru@redhat.com>) id 1eXOw7-0003t7-QX
+	for qemu-devel@nongnu.org; Fri, 05 Jan 2018 05:09:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1eXOmo-0001l2-6s
-	for qemu-devel@nongnu.org; Fri, 05 Jan 2018 04:59:42 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:48550)
+	(envelope-from <armbru@redhat.com>) id 1eXOw4-0004f4-LU
+	for qemu-devel@nongnu.org; Fri, 05 Jan 2018 05:09:15 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:43906)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1eXOmo-0001hl-13
-	for qemu-devel@nongnu.org; Fri, 05 Jan 2018 04:59:38 -0500
-From: Juan Quintela <quintela@redhat.com>
-In-Reply-To: <ce168bf2-8e61-1f62-8042-7e7df2decd8c@redhat.com> (Eric Blake's
-	message of "Thu, 4 Jan 2018 18:30:32 -0600")
-References: <20180103093834.20879-1-quintela@redhat.com>
-	<ce168bf2-8e61-1f62-8042-7e7df2decd8c@redhat.com>
-Reply-To: quintela@redhat.com
-Date: Fri, 05 Jan 2018 10:59:30 +0100
-Message-ID: <87zi5soccd.fsf@secure.laptop>
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1eXOw4-0004dB-Fl
+	for qemu-devel@nongnu.org; Fri, 05 Jan 2018 05:09:12 -0500
+From: Markus Armbruster <armbru@redhat.com>
+References: <1515071752-22961-1-git-send-email-thuth@redhat.com>
+	<20180104140930.7hbtnen3lw7epmrh@var.youpi.perso.aquilenet.fr>
+	<a78b6f7a-3eb2-6749-ccba-ad1ba4d525ae@redhat.com>
+	<20180104141524.m5xy66jsn2hiajwl@var.youpi.perso.aquilenet.fr>
+	<20180104142101.rivje5qn5dasb6jw@var.youpi.perso.aquilenet.fr>
+	<aea97804-c6a9-d903-13d8-23bc6b46af86@redhat.com>
+	<87tvw0k9am.fsf@dusky.pond.sub.org>
+	<f0cc3ad6-ecdc-20f8-ed62-423477417ec1@redhat.com>
+Date: Fri, 05 Jan 2018 11:09:07 +0100
+In-Reply-To: <f0cc3ad6-ecdc-20f8-ed62-423477417ec1@redhat.com> (Paolo
+	Bonzini's message of "Fri, 5 Jan 2018 10:22:22 +0100")
+Message-ID: <874lo0ipmk.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PULL 00/14] Migration pull request
+Subject: Re: [Qemu-devel] [PATCH v2] usb: Remove legacy -usbdevice option
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,48 +33,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org, lvivier@redhat.com, dgilbert@redhat.com, peterx@redhat.com, Alexey <a.perevalov@samsung.com>, Markus Armbruster <armbru@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, Samuel Thibault <samuel.thibault@gnu.org>, kraxel@redhat.com
 
-Eric Blake <eblake@redhat.com> wrote:
-> On 01/03/2018 03:38 AM, Juan Quintela wrote:
->> Hi
+Paolo Bonzini <pbonzini@redhat.com> writes:
+
+> On 05/01/2018 09:18, Markus Armbruster wrote:
+>>>> Would it be possible to make this automatic?  Before I could tell people
+>>>> "use -usbdevice braille to test braille", and now it would be
+>>>> "use -chardev braille,chardev=foobar -device usb-braille,chardev=foobar"
+>>> Maybe we can add "-braille" instead.  Something like this:
+>> More sugar, ugh!
 >> 
->> This are the changes for migration that are already reviewed.
->> 
->> Please, apply.
->> 
+>> What about giving braille property chardev a sensible default?
+>> Ideally in a self-documenting way, so that -device usb-braille,help
+>> shows the default.
 >
->> Alexey Perevalov (6):
->>       migration: introduce postcopy-blocktime capability
->>       migration: add postcopy blocktime ctx into MigrationIncomingState
->>       migration: calculate vCPU blocktime on dst side
->>       migration: postcopy_blocktime documentation
->>       migration: add blocktime calculation into migration-test
->>       migration: add postcopy total blocktime into query-migrate
->
-> I had unanswered questions about these patches in the v12 series, where
-> I'm not sure if the interface is still quite right.
+> That would mean automatically creating a back-end in a device's realize
+> property.  I'd rather avoid that,
 
-To be fair, I had alroady integrated the patches before I saw your questions.
+That's one way to do it.  A perhaps less odious way would be to make
+qdev core support chardev defaults just like it supports integer
+defaults.  For integers, we specify the default value as parameter for
+DEFINE_PROP_INT64() & friends.  For chardevs, we'd can't specify the
+value, but we could specify the option string to use for creating it.
 
-> We're still early
-> enough that we could adjust the interface after the fact depending on
-> how the questions are answered;
+One reason I like sane defaults better than sugar: users can more easily
+grow from
 
-I think this is the best approach, so far I can see two questions:
+    -device usb-braille
 
-- do we want to make it conditional?  it requires some locking, but I
-  haven't meassured it to see how slow/fast is it.
+to
 
-- the other was documentation.
+    -device usb-braille,chardev=braille-be -chardev id=braille-be,...
 
-I will like Alexey to answer.  Depending of how slow it is, I can agree
-to make it non-optional.
+than from
 
-> but we're also early enough that it may
-> be smarter to get the interface right before including it in a pull
-> request.  I'll leave it to Peter and Juan to sort out whether this means
-> an updated pull request is needed, or to take this as-is.
+    -braille
 
-Thanks, Juan.
+>                                   sugar is not bad per se.
+
+Stirring a teaspoon of sugar into your tea may be of debatable taste,
+but I certainly wouldn't call it bad per se.  However, we're already
+closer to upending the sugar bowl, then raiding the pantry for more.
