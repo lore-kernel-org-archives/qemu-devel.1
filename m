@@ -1,17 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40793)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41800)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1eXLv6-0003p3-HI
-	for qemu-devel@nongnu.org; Fri, 05 Jan 2018 01:56:04 -0500
+	(envelope-from <cunming.liang@intel.com>) id 1eXLxK-0006Fy-Af
+	for qemu-devel@nongnu.org; Fri, 05 Jan 2018 01:58:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1eXLv4-0002PS-AM
-	for qemu-devel@nongnu.org; Fri, 05 Jan 2018 01:56:00 -0500
-From: Fam Zheng <famz@redhat.com>
-Date: Fri,  5 Jan 2018 14:55:37 +0800
-Message-Id: <20180105065538.13375-2-famz@redhat.com>
-In-Reply-To: <20180105065538.13375-1-famz@redhat.com>
-References: <20180105065538.13375-1-famz@redhat.com>
-Subject: [Qemu-devel] [PATCH 1/2] qemu-img: Move img_open error reporting to
- callers
+	(envelope-from <cunming.liang@intel.com>) id 1eXLxG-0004io-8V
+	for qemu-devel@nongnu.org; Fri, 05 Jan 2018 01:58:18 -0500
+Received: from mga07.intel.com ([134.134.136.100]:48694)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cunming.liang@intel.com>)
+	id 1eXLxF-0004gt-Oi
+	for qemu-devel@nongnu.org; Fri, 05 Jan 2018 01:58:14 -0500
+From: "Liang, Cunming" <cunming.liang@intel.com>
+Date: Fri, 5 Jan 2018 06:58:07 +0000
+Message-ID: <D0158A423229094DA7ABF71CF2FA0DA34E845FAD@SHSMSX104.ccr.corp.intel.com>
+References: <20171222064151.29266-1-tiwei.bie@intel.com>
+	<fcf3858e-6643-350c-37b9-71698f1d26a5@redhat.com>
+	<20180104061853.jkdzbueashv2klka@debian-xvivbkq.sh.intel.com>
+	<aca10596-f8d4-417e-26b6-ed09ef766552@redhat.com>
+In-Reply-To: <aca10596-f8d4-417e-26b6-ed09ef766552@redhat.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [virtio-dev] [RFC 0/3] Extend vhost-user to
+ support VFIO based accelerators
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,444 +32,153 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+To: Jason Wang <jasowang@redhat.com>, "Bie, Tiwei" <tiwei.bie@intel.com>
+Cc: "Tan, Jianfeng" <jianfeng.tan@intel.com>, "virtio-dev@lists.oasis-open.org" <virtio-dev@lists.oasis-open.org>, "mst@redhat.com" <mst@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "alex.williamson@redhat.com" <alex.williamson@redhat.com>, "Wang, Xiao W" <xiao.w.wang@intel.com>, "stefanha@redhat.com" <stefanha@redhat.com>, "Wang, Zhihong" <zhihong.wang@intel.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "Daly, Dan" <dan.daly@intel.com>
 
-In the next patch one caller will have a special error handling logic
-than reporting it, add "Error **" parameters to functions and give
-control back to callers, to make that possible.
-
-Update iotests output accordingly.
-
-Signed-off-by: Fam Zheng <famz@redhat.com>
----
- qemu-img.c                 | 115 +++++++++++++++++++++++++++------------------
- tests/qemu-iotests/043.out |   6 +--
- 2 files changed, 73 insertions(+), 48 deletions(-)
-
-diff --git a/qemu-img.c b/qemu-img.c
-index 68b375f998..7d3171c20c 100644
---- a/qemu-img.c
-+++ b/qemu-img.c
-@@ -268,24 +268,22 @@ static int print_block_option_help(const char *filename, const char *fmt)
- 
- static BlockBackend *img_open_opts(const char *optstr,
-                                    QemuOpts *opts, int flags, bool writethrough,
--                                   bool quiet, bool force_share)
-+                                   bool quiet, bool force_share, Error **errp)
- {
-     QDict *options;
--    Error *local_err = NULL;
-     BlockBackend *blk;
-     options = qemu_opts_to_qdict(opts, NULL);
-     if (force_share) {
-         if (qdict_haskey(options, BDRV_OPT_FORCE_SHARE)
-             && !qdict_get_bool(options, BDRV_OPT_FORCE_SHARE)) {
--            error_report("--force-share/-U conflicts with image options");
-+            error_setg(errp, "--force-share/-U conflicts with image options");
-             QDECREF(options);
-             return NULL;
-         }
-         qdict_put_bool(options, BDRV_OPT_FORCE_SHARE, true);
-     }
--    blk = blk_new_open(NULL, NULL, options, flags, &local_err);
-+    blk = blk_new_open(NULL, NULL, options, flags, errp);
-     if (!blk) {
--        error_reportf_err(local_err, "Could not open '%s': ", optstr);
-         return NULL;
-     }
-     blk_set_enable_write_cache(blk, !writethrough);
-@@ -297,10 +295,10 @@ static BlockBackend *img_open_file(const char *filename,
-                                    QDict *options,
-                                    const char *fmt, int flags,
-                                    bool writethrough, bool quiet,
--                                   bool force_share)
-+                                   bool force_share,
-+                                   Error **errp)
- {
-     BlockBackend *blk;
--    Error *local_err = NULL;
- 
-     if (!options) {
-         options = qdict_new();
-@@ -312,9 +310,8 @@ static BlockBackend *img_open_file(const char *filename,
-     if (force_share) {
-         qdict_put_bool(options, BDRV_OPT_FORCE_SHARE, true);
-     }
--    blk = blk_new_open(filename, NULL, options, flags, &local_err);
-+    blk = blk_new_open(filename, NULL, options, flags, errp);
-     if (!blk) {
--        error_reportf_err(local_err, "Could not open '%s': ", filename);
-         return NULL;
-     }
-     blk_set_enable_write_cache(blk, !writethrough);
-@@ -340,7 +337,8 @@ static BlockBackend *img_open_new_file(const char *filename,
-                                        QemuOpts *create_opts,
-                                        const char *fmt, int flags,
-                                        bool writethrough, bool quiet,
--                                       bool force_share)
-+                                       bool force_share,
-+                                       Error **errp)
- {
-     QDict *options = NULL;
- 
-@@ -348,32 +346,32 @@ static BlockBackend *img_open_new_file(const char *filename,
-     qemu_opt_foreach(create_opts, img_add_key_secrets, options, &error_abort);
- 
-     return img_open_file(filename, options, fmt, flags, writethrough, quiet,
--                         force_share);
-+                         force_share, errp);
- }
- 
- 
- static BlockBackend *img_open(bool image_opts,
-                               const char *filename,
-                               const char *fmt, int flags, bool writethrough,
--                              bool quiet, bool force_share)
-+                              bool quiet, bool force_share, Error **errp)
- {
-     BlockBackend *blk;
-     if (image_opts) {
-         QemuOpts *opts;
-         if (fmt) {
--            error_report("--image-opts and --format are mutually exclusive");
-+            error_setg(errp,
-+                       "--image-opts and --format are mutually exclusive");
-             return NULL;
-         }
--        opts = qemu_opts_parse_noisily(qemu_find_opts("source"),
--                                       filename, true);
-+        opts = qemu_opts_parse(qemu_find_opts("source"), filename, true, errp);
-         if (!opts) {
-             return NULL;
-         }
-         blk = img_open_opts(filename, opts, flags, writethrough, quiet,
--                            force_share);
-+                            force_share, errp);
-     } else {
-         blk = img_open_file(filename, NULL, fmt, flags, writethrough, quiet,
--                            force_share);
-+                            force_share, errp);
-     }
-     return blk;
- }
-@@ -670,6 +668,7 @@ static int img_check(int argc, char **argv)
-     bool quiet = false;
-     bool image_opts = false;
-     bool force_share = false;
-+    Error *local_err = NULL;
- 
-     fmt = NULL;
-     output = NULL;
-@@ -769,8 +768,9 @@ static int img_check(int argc, char **argv)
-     }
- 
-     blk = img_open(image_opts, filename, fmt, flags, writethrough, quiet,
--                   force_share);
-+                   force_share, &local_err);
-     if (!blk) {
-+        error_reportf_err(local_err, "Could not open '%s': ", filename);
-         return 1;
-     }
-     bs = blk_bs(blk);
-@@ -979,8 +979,9 @@ static int img_commit(int argc, char **argv)
-     }
- 
-     blk = img_open(image_opts, filename, fmt, flags, writethrough, quiet,
--                   false);
-+                   false, &local_err);
-     if (!blk) {
-+        error_reportf_err(local_err, "Could not open '%s': ", filename);
-         return 1;
-     }
-     bs = blk_bs(blk);
-@@ -1251,6 +1252,7 @@ static int img_compare(int argc, char **argv)
-     uint64_t progress_base;
-     bool image_opts = false;
-     bool force_share = false;
-+    Error *local_err = NULL;
- 
-     cache = BDRV_DEFAULT_CACHE;
-     for (;;) {
-@@ -1343,15 +1345,17 @@ static int img_compare(int argc, char **argv)
-     }
- 
-     blk1 = img_open(image_opts, filename1, fmt1, flags, writethrough, quiet,
--                    force_share);
-+                    force_share, &local_err);
-     if (!blk1) {
-+        error_reportf_err(local_err, "Could not open '%s': ", filename1);
-         ret = 2;
-         goto out3;
-     }
- 
-     blk2 = img_open(image_opts, filename2, fmt2, flags, writethrough, quiet,
--                    force_share);
-+                    force_share, &local_err);
-     if (!blk2) {
-+        error_reportf_err(local_err, "Could not open '%s': ", filename2);
-         ret = 2;
-         goto out2;
-     }
-@@ -2121,8 +2125,10 @@ static int img_convert(int argc, char **argv)
-     for (bs_i = 0; bs_i < s.src_num; bs_i++) {
-         s.src[bs_i] = img_open(image_opts, argv[optind + bs_i],
-                                fmt, src_flags, src_writethrough, quiet,
--                               force_share);
-+                               force_share, &local_err);
-         if (!s.src[bs_i]) {
-+            error_reportf_err(local_err, "Could not open '%s': ",
-+                              argv[optind + bs_i]);
-             ret = -1;
-             goto out;
-         }
-@@ -2273,7 +2279,7 @@ static int img_convert(int argc, char **argv)
- 
-     if (skip_create) {
-         s.target = img_open(tgt_image_opts, out_filename, out_fmt,
--                            flags, writethrough, quiet, false);
-+                            flags, writethrough, quiet, false, &local_err);
-     } else {
-         /* TODO ultimately we should allow --target-image-opts
-          * to be used even when -n is not given.
-@@ -2281,9 +2287,11 @@ static int img_convert(int argc, char **argv)
-          * to allow filenames in option syntax
-          */
-         s.target = img_open_new_file(out_filename, opts, out_fmt,
--                                     flags, writethrough, quiet, false);
-+                                     flags, writethrough, quiet, false,
-+                                     &local_err);
-     }
-     if (!s.target) {
-+        error_reportf_err(local_err, "Could not open '%s': ", out_filename);
-         ret = -1;
-         goto out;
-     }
-@@ -2439,12 +2447,13 @@ static gboolean str_equal_func(gconstpointer a, gconstpointer b)
- static ImageInfoList *collect_image_info_list(bool image_opts,
-                                               const char *filename,
-                                               const char *fmt,
--                                              bool chain, bool force_share)
-+                                              bool chain, bool force_share,
-+                                              Error **errp)
- {
-     ImageInfoList *head = NULL;
-     ImageInfoList **last = &head;
-     GHashTable *filenames;
--    Error *err = NULL;
-+    Error *local_err = NULL;
- 
-     filenames = g_hash_table_new_full(g_str_hash, str_equal_func, NULL, NULL);
- 
-@@ -2455,23 +2464,24 @@ static ImageInfoList *collect_image_info_list(bool image_opts,
-         ImageInfoList *elem;
- 
-         if (g_hash_table_lookup_extended(filenames, filename, NULL, NULL)) {
--            error_report("Backing file '%s' creates an infinite loop.",
--                         filename);
-+            error_setg(errp,
-+                       "Backing file '%s' creates an infinite loop.",
-+                       filename);
-             goto err;
-         }
-         g_hash_table_insert(filenames, (gpointer)filename, NULL);
- 
-         blk = img_open(image_opts, filename, fmt,
-                        BDRV_O_NO_BACKING | BDRV_O_NO_IO, false, false,
--                       force_share);
-+                       force_share, errp);
-         if (!blk) {
-             goto err;
-         }
-         bs = blk_bs(blk);
- 
--        bdrv_query_image_info(bs, &info, &err);
--        if (err) {
--            error_report_err(err);
-+        bdrv_query_image_info(bs, &info, &local_err);
-+        if (local_err) {
-+            error_propagate(errp, local_err);
-             blk_unref(blk);
-             goto err;
-         }
-@@ -2488,9 +2498,10 @@ static ImageInfoList *collect_image_info_list(bool image_opts,
-             if (info->has_full_backing_filename) {
-                 filename = info->full_backing_filename;
-             } else if (info->has_backing_filename) {
--                error_report("Could not determine absolute backing filename,"
--                             " but backing filename '%s' present",
--                             info->backing_filename);
-+                error_setg(errp,
-+                           "Could not determine absolute backing filename,"
-+                           " but backing filename '%s' present",
-+                           info->backing_filename);
-                 goto err;
-             }
-             if (info->has_backing_filename_format) {
-@@ -2516,6 +2527,7 @@ static int img_info(int argc, char **argv)
-     ImageInfoList *list;
-     bool image_opts = false;
-     bool force_share = false;
-+    Error *local_err = NULL;
- 
-     fmt = NULL;
-     output = NULL;
-@@ -2592,8 +2604,9 @@ static int img_info(int argc, char **argv)
-     }
- 
-     list = collect_image_info_list(image_opts, filename, fmt, chain,
--                                   force_share);
-+                                   force_share, &local_err);
-     if (!list) {
-+        error_reportf_err(local_err, "Could not open '%s': ", filename);
-         return 1;
-     }
- 
-@@ -2739,6 +2752,7 @@ static int img_map(int argc, char **argv)
-     int ret = 0;
-     bool image_opts = false;
-     bool force_share = false;
-+    Error *local_err = NULL;
- 
-     fmt = NULL;
-     output = NULL;
-@@ -2810,8 +2824,10 @@ static int img_map(int argc, char **argv)
-         return 1;
-     }
- 
--    blk = img_open(image_opts, filename, fmt, 0, false, false, force_share);
-+    blk = img_open(image_opts, filename, fmt, 0, false, false, force_share,
-+                   &local_err);
-     if (!blk) {
-+        error_reportf_err(local_err, "Could not open '%s': ", filename);
-         return 1;
-     }
-     bs = blk_bs(blk);
-@@ -2961,8 +2977,9 @@ static int img_snapshot(int argc, char **argv)
- 
-     /* Open the image */
-     blk = img_open(image_opts, filename, NULL, bdrv_oflags, false, quiet,
--                   force_share);
-+                   force_share, &err);
-     if (!blk) {
-+        error_reportf_err(err, "Could not open '%s': ", filename);
-         return 1;
-     }
-     bs = blk_bs(blk);
-@@ -3147,8 +3164,9 @@ static int img_rebase(int argc, char **argv)
-      * the reference to a renamed or moved backing file.
-      */
-     blk = img_open(image_opts, filename, fmt, flags, writethrough, quiet,
--                   false);
-+                   false, &local_err);
-     if (!blk) {
-+        error_reportf_err(local_err, "Could not open '%s': ", filename);
-         ret = -1;
-         goto out;
-     }
-@@ -3507,8 +3525,9 @@ static int img_resize(int argc, char **argv)
- 
-     blk = img_open(image_opts, filename, fmt,
-                    BDRV_O_RDWR | BDRV_O_RESIZE, false, quiet,
--                   false);
-+                   false, &err);
-     if (!blk) {
-+        error_reportf_err(err, "Could not open '%s': ", filename);
-         ret = -1;
-         goto out;
-     }
-@@ -3693,8 +3712,9 @@ static int img_amend(int argc, char **argv)
-     }
- 
-     blk = img_open(image_opts, filename, fmt, flags, writethrough, quiet,
--                   false);
-+                   false, &err);
-     if (!blk) {
-+        error_reportf_err(err, "Could not open '%s': ", filename);
-         ret = -1;
-         goto out;
-     }
-@@ -3862,6 +3882,7 @@ static int img_bench(int argc, char **argv)
-     struct timeval t1, t2;
-     int i;
-     bool force_share = false;
-+    Error *local_err = NULL;
- 
-     for (;;) {
-         static const struct option long_options[] = {
-@@ -4018,8 +4039,9 @@ static int img_bench(int argc, char **argv)
-     }
- 
-     blk = img_open(image_opts, filename, fmt, flags, writethrough, quiet,
--                   force_share);
-+                   force_share, &local_err);
-     if (!blk) {
-+        error_reportf_err(local_err, "Could not open '%s': ", filename);
-         ret = -1;
-         goto out;
-     }
-@@ -4301,9 +4323,10 @@ static int img_dd(int argc, char **argv)
-     }
- 
-     blk1 = img_open(image_opts, in.filename, fmt, 0, false, false,
--                    force_share);
-+                    force_share, &local_err);
- 
-     if (!blk1) {
-+        error_reportf_err(local_err, "Could not open '%s': ", in.filename);
-         ret = -1;
-         goto out;
-     }
-@@ -4374,10 +4397,11 @@ static int img_dd(int argc, char **argv)
-      * support image-opts style.
-      */
-     blk2 = img_open_file(out.filename, NULL, out_fmt, BDRV_O_RDWR,
--                         false, false, false);
-+                         false, false, false, &local_err);
- 
-     if (!blk2) {
-         ret = -1;
-+        error_reportf_err(local_err, "Could not open '%s': ", out.filename);
-         goto out;
-     }
- 
-@@ -4600,8 +4624,9 @@ static int img_measure(int argc, char **argv)
- 
-     if (filename) {
-         in_blk = img_open(image_opts, filename, fmt, 0,
--                          false, false, force_share);
-+                          false, false, force_share, &local_err);
-         if (!in_blk) {
-+            error_reportf_err(local_err, "Could not open '%s': ", filename);
-             goto out;
-         }
- 
-diff --git a/tests/qemu-iotests/043.out b/tests/qemu-iotests/043.out
-index b37d2a3807..ee428a4744 100644
---- a/tests/qemu-iotests/043.out
-+++ b/tests/qemu-iotests/043.out
-@@ -2,19 +2,19 @@ QA output created by 043
- Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=134217728
- 
- == backing file references self ==
--qemu-img: Backing file 'TEST_DIR/t.IMGFMT' creates an infinite loop.
-+qemu-img: Could not open 'TEST_DIR/t.IMGFMT': Backing file 'TEST_DIR/t.IMGFMT' creates an infinite loop.
- Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=134217728
- Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=134217728 backing_file=TEST_DIR/t.IMGFMT.base
- 
- == parent references self ==
--qemu-img: Backing file 'TEST_DIR/t.IMGFMT' creates an infinite loop.
-+qemu-img: Could not open 'TEST_DIR/t.IMGFMT': Backing file 'TEST_DIR/t.IMGFMT' creates an infinite loop.
- Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=134217728
- Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=134217728 backing_file=TEST_DIR/t.IMGFMT.1.base
- Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=134217728 backing_file=TEST_DIR/t.IMGFMT.2.base
- Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=134217728 backing_file=TEST_DIR/t.IMGFMT.3.base
- 
- == ancestor references another ancestor ==
--qemu-img: Backing file 'TEST_DIR/t.IMGFMT.2.base' creates an infinite loop.
-+qemu-img: Could not open 'TEST_DIR/t.IMGFMT': Backing file 'TEST_DIR/t.IMGFMT.2.base' creates an infinite loop.
- Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=134217728
- Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=134217728 backing_file=TEST_DIR/t.IMGFMT.1.base
- Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=134217728 backing_file=TEST_DIR/t.IMGFMT.2.base
--- 
-2.14.3
+DQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogSmFzb24gV2FuZyBbbWFp
+bHRvOmphc293YW5nQHJlZGhhdC5jb21dDQo+IFNlbnQ6IFRodXJzZGF5LCBKYW51YXJ5IDQsIDIw
+MTggMzoyMiBQTQ0KPiBUbzogQmllLCBUaXdlaSA8dGl3ZWkuYmllQGludGVsLmNvbT4NCj4gQ2M6
+IFRhbiwgSmlhbmZlbmcgPGppYW5mZW5nLnRhbkBpbnRlbC5jb20+OyB2aXJ0aW8tZGV2QGxpc3Rz
+Lm9hc2lzLW9wZW4ub3JnOw0KPiBtc3RAcmVkaGF0LmNvbTsgTGlhbmcsIEN1bm1pbmcgPGN1bm1p
+bmcubGlhbmdAaW50ZWwuY29tPjsgcWVtdS0NCj4gZGV2ZWxAbm9uZ251Lm9yZzsgYWxleC53aWxs
+aWFtc29uQHJlZGhhdC5jb207IFdhbmcsIFhpYW8gVw0KPiA8eGlhby53LndhbmdAaW50ZWwuY29t
+Pjsgc3RlZmFuaGFAcmVkaGF0LmNvbTsgV2FuZywgWmhpaG9uZw0KPiA8emhpaG9uZy53YW5nQGlu
+dGVsLmNvbT47IHBib256aW5pQHJlZGhhdC5jb207IERhbHksIERhbg0KPiA8ZGFuLmRhbHlAaW50
+ZWwuY29tPg0KPiBTdWJqZWN0OiBSZTogW1FlbXUtZGV2ZWxdIFt2aXJ0aW8tZGV2XSBbUkZDIDAv
+M10gRXh0ZW5kIHZob3N0LXVzZXIgdG8gc3VwcG9ydA0KPiBWRklPIGJhc2VkIGFjY2VsZXJhdG9y
+cw0KPiANCj4gDQo+IA0KPiBPbiAyMDE45bm0MDHmnIgwNOaXpSAxNDoxOCwgVGl3ZWkgQmllIHdy
+b3RlOg0KPiA+IE9uIFdlZCwgSmFuIDAzLCAyMDE4IGF0IDEwOjM0OjM2UE0gKzA4MDAsIEphc29u
+IFdhbmcgd3JvdGU6DQo+ID4+IE9uIDIwMTflubQxMuaciDIy5pelIDE0OjQxLCBUaXdlaSBCaWUg
+d3JvdGU6DQo+ID4+PiBUaGlzIFJGQyBwYXRjaCBzZXQgZG9lcyBzb21lIHNtYWxsIGV4dGVuc2lv
+bnMgdG8gdmhvc3QtdXNlciBwcm90b2NvbA0KPiA+Pj4gdG8gc3VwcG9ydCBWRklPIGJhc2VkIGFj
+Y2VsZXJhdG9ycywgYW5kIG1ha2VzIGl0IHBvc3NpYmxlIHRvIGdldCB0aGUNCj4gPj4+IHNpbWls
+YXIgcGVyZm9ybWFuY2Ugb2YgVkZJTyBwYXNzdGhydSB3aGlsZSBrZWVwaW5nIHRoZSB2aXJ0aW8g
+ZGV2aWNlDQo+ID4+PiBlbXVsYXRpb24gaW4gUUVNVS4NCj4gPj4+DQo+ID4+PiBXaGVuIHdlIGhh
+dmUgdmlydGlvIHJpbmcgY29tcGF0aWJsZSBkZXZpY2VzLCBpdCdzIHBvc3NpYmxlIHRvIHNldHVw
+DQo+ID4+PiB0aGUgZGV2aWNlIChETUEgbWFwcGluZywgUENJIGNvbmZpZywgZXRjKSBiYXNlZCBv
+biB0aGUgZXhpc3RpbmcgaW5mbw0KPiA+Pj4gKG1lbW9yeS10YWJsZSwgZmVhdHVyZXMsIHZyaW5n
+IGluZm8sIGV0Yykgd2hpY2ggaXMgYXZhaWxhYmxlIG9uIHRoZQ0KPiA+Pj4gdmhvc3QtYmFja2Vu
+ZCAoZS5nLiBEUERLIHZob3N0IGxpYnJhcnkpLiBUaGVuLCB3ZSB3aWxsIGJlIGFibGUgdG8NCj4g
+Pj4+IHVzZSBzdWNoIGRldmljZXMgdG8gYWNjZWxlcmF0ZSB0aGUgZW11bGF0ZWQgZGV2aWNlIGZv
+ciB0aGUgVk0uIEFuZA0KPiA+Pj4gd2UgY2FsbCBpdCB2RFBBOiB2aG9zdCBEYXRhUGF0aCBBY2Nl
+bGVyYXRpb24uIFRoZSBrZXkgZGlmZmVyZW5jZQ0KPiA+Pj4gYmV0d2VlbiBWRklPIHBhc3N0aHJ1
+IGFuZCB2RFBBIGlzIHRoYXQsIGluIHZEUEEgb25seSB0aGUgZGF0YSBwYXRoDQo+ID4+PiAoZS5n
+LiByaW5nLCBub3RpZnkgYW5kIHF1ZXVlIGludGVycnVwdCkgaXMgcGFzcy10aHJvdWdoZWQsIHRo
+ZQ0KPiA+Pj4gZGV2aWNlIGNvbnRyb2wgcGF0aCAoZS5nLiBQQ0kgY29uZmlndXJhdGlvbiBzcGFj
+ZSBhbmQgTU1JTyByZWdpb25zKQ0KPiA+Pj4gaXMgc3RpbGwgZGVmaW5lZCBhbmQgZW11bGF0ZWQg
+YnkgUUVNVS4NCj4gPj4+DQo+ID4+PiBUaGUgYmVuZWZpdHMgb2Yga2VlcGluZyB2aXJ0aW8gZGV2
+aWNlIGVtdWxhdGlvbiBpbiBRRU1VIGNvbXBhcmVkDQo+ID4+PiB3aXRoIHZpcnRpbyBkZXZpY2Ug
+VkZJTyBwYXNzdGhydSBpbmNsdWRlIChidXQgbm90IGxpbWl0IHRvKToNCj4gPj4+DQo+ID4+PiAt
+IGNvbnNpc3RlbnQgZGV2aWNlIGludGVyZmFjZSBmcm9tIGd1ZXN0IE9TOw0KPiA+Pj4gLSBtYXgg
+ZmxleGliaWxpdHkgb24gY29udHJvbCBwYXRoIGFuZCBoYXJkd2FyZSBkZXNpZ247DQo+ID4+PiAt
+IGxldmVyYWdpbmcgdGhlIGV4aXN0aW5nIHZpcnRpbyBsaXZlLW1pZ3JhdGlvbiBmcmFtZXdvcms7
+DQo+ID4+Pg0KPiA+Pj4gQnV0IHRoZSBjcml0aWNhbCBpc3N1ZSBpbiB2RFBBIGlzIHRoYXQgdGhl
+IGRhdGEgcGF0aCBwZXJmb3JtYW5jZSBpcw0KPiA+Pj4gcmVsYXRpdmVseSBsb3cgYW5kIHNvbWUg
+aG9zdCB0aHJlYWRzIGFyZSBuZWVkZWQgZm9yIHRoZSBkYXRhIHBhdGgsDQo+ID4+PiBiZWNhdXNl
+IHNvbWUgbmVjZXNzYXJ5IG1lY2hhbmlzbXMgYXJlIG1pc3NpbmcgdG8gc3VwcG9ydDoNCj4gPj4+
+DQo+ID4+PiAxKSBndWVzdCBkcml2ZXIgbm90aWZpZXMgdGhlIGRldmljZSBkaXJlY3RseTsNCj4g
+Pj4+IDIpIGRldmljZSBpbnRlcnJ1cHRzIHRoZSBndWVzdCBkaXJlY3RseTsNCj4gPj4+DQo+ID4+
+PiBTbyB0aGlzIHBhdGNoIHNldCBkb2VzIHNvbWUgc21hbGwgZXh0ZW5zaW9ucyB0byB2aG9zdC11
+c2VyIHByb3RvY29sDQo+ID4+PiB0byBtYWtlIGJvdGggb2YgdGhlbSBwb3NzaWJsZS4gSXQgbGV2
+ZXJhZ2VzIHRoZSBzYW1lIG1lY2hhbmlzbXMgKGUuZy4NCj4gPj4+IEVQVCBhbmQgUG9zdGVkLUlu
+dGVycnVwdCBvbiBJbnRlbCBwbGF0Zm9ybSkgYXMgdGhlIFZGSU8gcGFzc3RocnUgdG8NCj4gPj4+
+IGFjaGlldmUgdGhlIGRhdGEgcGF0aCBwYXNzIHRocm91Z2guDQo+ID4+Pg0KPiA+Pj4gQSBuZXcg
+cHJvdG9jb2wgZmVhdHVyZSBiaXQgaXMgYWRkZWQgdG8gbmVnb3RpYXRlIHRoZSBhY2NlbGVyYXRv
+cg0KPiA+Pj4gZmVhdHVyZSBzdXBwb3J0LiBUd28gbmV3IHNsYXZlIG1lc3NhZ2UgdHlwZXMgYXJl
+IGFkZGVkIHRvIGVuYWJsZSB0aGUNCj4gPj4+IG5vdGlmeSBhbmQgaW50ZXJydXB0IHBhc3N0aHJ1
+IGZvciBlYWNoIHF1ZXVlLiBGcm9tIHRoZSB2aWV3IG9mDQo+ID4+PiB2aG9zdC11c2VyIHByb3Rv
+Y29sIGRlc2lnbiwgaXQncyB2ZXJ5IGZsZXhpYmxlLiBUaGUgcGFzc3RocnUgY2FuIGJlDQo+ID4+
+PiBlbmFibGVkL2Rpc2FibGVkIGZvciBlYWNoIHF1ZXVlIGluZGl2aWR1YWxseSwgYW5kIGl0J3Mg
+cG9zc2libGUgdG8NCj4gPj4+IGFjY2VsZXJhdGUgZWFjaCBxdWV1ZSBieSBkaWZmZXJlbnQgZGV2
+aWNlcy4gTW9yZSBkZXNpZ24gYW5kDQo+ID4+PiBpbXBsZW1lbnRhdGlvbiBkZXRhaWxzIGNhbiBi
+ZSBmb3VuZCBmcm9tIHRoZSBsYXN0IHBhdGNoLg0KPiA+Pj4NCj4gPj4+IFRoZXJlIGFyZSBzb21l
+IHJvdWdoIGVkZ2VzIGluIHRoaXMgcGF0Y2ggc2V0IChzbyB0aGlzIGlzIGEgUkZDIHBhdGNoDQo+
+ID4+PiBzZXQgZm9yIG5vdyksIGJ1dCBpdCdzIG5ldmVyIHRvbyBlYXJseSB0byBoZWFyIHRoZSB0
+aG91Z2h0cyBmcm9tIHRoZQ0KPiA+Pj4gY29tbXVuaXR5ISBTbyBhbnkgY29tbWVudHMgYW5kIHN1
+Z2dlc3Rpb25zIHdvdWxkIGJlIHJlYWxseQ0KPiBhcHByZWNpYXRlZCENCj4gPj4+DQo+ID4+PiBU
+aXdlaSBCaWUgKDMpOg0KPiA+Pj4gICAgIHZob3N0LXVzZXI6IHN1cHBvcnQgcmVjZWl2aW5nIGZp
+bGUgZGVzY3JpcHRvcnMgaW4gc2xhdmVfcmVhZA0KPiA+Pj4gICAgIHZob3N0LXVzZXI6IGludHJv
+ZHVjZSBzaGFyZWQgdmhvc3QtdXNlciBzdGF0ZQ0KPiA+Pj4gICAgIHZob3N0LXVzZXI6IGFkZCBW
+RklPIGJhc2VkIGFjY2VsZXJhdG9ycyBzdXBwb3J0DQo+ID4+Pg0KPiA+Pj4gICAgZG9jcy9pbnRl
+cm9wL3Zob3N0LXVzZXIudHh0ICAgICB8ICA1NyArKysrKysNCj4gPj4+ICAgIGh3L3Njc2kvdmhv
+c3QtdXNlci1zY3NpLmMgICAgICAgfCAgIDYgKy0NCj4gPj4+ICAgIGh3L3ZmaW8vY29tbW9uLmMg
+ICAgICAgICAgICAgICAgfCAgIDIgKy0NCj4gPj4+ICAgIGh3L3ZpcnRpby92aG9zdC11c2VyLmMg
+ICAgICAgICAgfCA0MzANCj4gKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysr
+LQ0KPiA+Pj4gICAgaHcvdmlydGlvL3Zob3N0LmMgICAgICAgICAgICAgICB8ICAgMyArLQ0KPiA+
+Pj4gICAgaHcvdmlydGlvL3ZpcnRpby1wY2kuYyAgICAgICAgICB8ICAgOCAtDQo+ID4+PiAgICBo
+dy92aXJ0aW8vdmlydGlvLXBjaS5oICAgICAgICAgIHwgICA4ICsNCj4gPj4+ICAgIGluY2x1ZGUv
+aHcvdmZpby92ZmlvLmggICAgICAgICAgfCAgIDIgKw0KPiA+Pj4gICAgaW5jbHVkZS9ody92aXJ0
+aW8vdmhvc3QtdXNlci5oICB8ICA0MyArKysrDQo+ID4+PiAgICBpbmNsdWRlL2h3L3ZpcnRpby92
+aXJ0aW8tc2NzaS5oIHwgICA2ICstDQo+ID4+PiAgICBuZXQvdmhvc3QtdXNlci5jICAgICAgICAg
+ICAgICAgIHwgIDMwICstLQ0KPiA+Pj4gICAgMTEgZmlsZXMgY2hhbmdlZCwgNTYxIGluc2VydGlv
+bnMoKyksIDM0IGRlbGV0aW9ucygtKQ0KPiA+Pj4gICAgY3JlYXRlIG1vZGUgMTAwNjQ0IGluY2x1
+ZGUvaHcvdmlydGlvL3Zob3N0LXVzZXIuaA0KPiA+Pj4NCj4gPj4gSSBtYXkgbWlzcyBzb21ldGhp
+bmcsIGJ1dCBtYXkgSSBhc2sgd2h5IHlvdSBtdXN0IGltcGxlbWVudCB0aGVtDQo+ID4+IHRocm91
+Z2ggdmhvc3QtdXNlL2RwZGsuIEl0IGxvb2tzIHRvIG1lIHlvdSBjb3VsZCBwdXQgYWxsIG9mIHRo
+ZW0gaW4NCj4gPj4gcWVtdSB3aGljaCBjb3VsZCBzaW1wbGlmeSBhIGxvdHMgb2YgdGhpbmdzIChq
+dXN0IGxpa2UgdXNlcnNwYWNlIE5WTUUNCj4gZHJpdmVyIHdyb3RlIGJ5IEZhbSkuDQo+ID4+DQo+
+ID4gVGhhbmtzIGZvciB5b3VyIGNvbW1lbnRzISA6LSkNCj4gPg0KPiA+IFllYWgsIHlvdSdyZSBy
+aWdodC4gV2UgY2FuIGFsc28gaW1wbGVtZW50IGV2ZXJ5dGhpbmcgaW4gUUVNVSBsaWtlIHRoZQ0K
+PiA+IHVzZXJzcGFjZSBOVk1FIGRyaXZlciBieSBGYW0uIEl0IHdhcyBhbHNvIGRlc2NyaWJlZCBi
+eSBDdW5taW5nIG9uIHRoZQ0KPiA+IEtWTSBGb3J1bSAyMDE3LiBCZWxvdyBpcyB0aGUgbGluayB0
+byB0aGUNCj4gPiBzbGlkZXM6DQo+ID4NCj4gPiBodHRwczovL2V2ZW50cy5zdGF0aWMubGludXhm
+b3VuZC5vcmcvc2l0ZXMvZXZlbnRzL2ZpbGVzL3NsaWRlcy9LVk0xNyUyDQo+ID4gNy12RFBBLnBk
+Zg0KPiANCj4gVGhhbmtzIGZvciB0aGUgcG9pbnRlci4gTG9va3MgcmF0aGVyIGludGVyZXN0aW5n
+Lg0KPiANCj4gPg0KPiA+IFdlJ3JlIGFsc28gd29ya2luZyBvbiBpdCAoaW5jbHVkaW5nIGRlZmlu
+aW5nIGEgc3RhbmRhcmQgZGV2aWNlIGZvcg0KPiA+IHZob3N0IGRhdGEgcGF0aCBhY2NlbGVyYXRp
+b24gYmFzZWQgb24gbWRldiB0byBoaWRlIHZlbmRvciBzcGVjaWZpYw0KPiA+IGRldGFpbHMpLg0K
+PiANCj4gVGhpcyBpcyBleGFjdGx5IHdoYXQgSSBtZWFuLiBGb3JtIG15IHBvaW50IG9mIHZpZXcs
+IHRoZXJlJ3Mgbm8gbmVlZCBmb3IgYW55DQo+IGV4dGVuc2lvbiBmb3Igdmhvc3QgcHJvdG9jb2ws
+IHdlIGp1c3QgbmVlZCB0byByZXVzZSBxZW11IGlvdGhyZWFkIHRvDQo+IGltcGxlbWVudCBhIHVz
+ZXJzcGFjZSB2aG9zdCBkYXRhcGxhbmUgYW5kIGRvIHRoZSBtZGV2IGluc2lkZSB0aGF0IHRocmVh
+ZC4NCk9uIGZ1bmN0aW9uYWwgcGVyc3BlY3RpdmUsIGl0IG1ha2VzIHNlbnNlIHRvIGhhdmUgcWVt
+dSBuYXRpdmUgc3VwcG9ydCBvZiB0aG9zZSBjZXJ0YWluIHVzYWdlLiBIb3dldmVyLCBxZW11IGRv
+ZXNuJ3QgaGF2ZSB0byB0YWtlIHJlc3BvbnNpYmlsaXR5IGZvciBkYXRhcGxhbmUuIFRoZXJlJ3Jl
+IGFscmVhZHkgaHVnZSBhbW91bnRzIG9mIGNvZGVzIGZvciBkaWZmZXJlbnQgZGV2aWNlcyBlbXVs
+YXRpb24sIGxldmVyYWdpbmcgZXh0ZXJuYWwgZGF0YXBsYW5lIGxpYnJhcnkgaXMgYW4gZWZmZWN0
+aXZlIHdheSB0byBpbnRyb2R1Y2UgbW9yZS4gVGhlIGJlYXV0eSBvZiB2aG9zdF91c2VyIGlzIHRv
+IG9wZW4gYSBkb29yIGZvciB2YXJpYWJsZSB1c2VybGFuZCB3b3JrbG9hZHMoZS5nLiB2c3dpdGNo
+KS4gVGhlIGRhdGFwbGFuZSBjb25uZWN0ZWQgd2l0aCBWTSB1c3VhbGx5IG5lZWQgdG8gYmUgY2xv
+c2UgaW50ZWdyYXRlZCB3aXRoIHRob3NlIHVzZXJsYW5kIHdvcmtsb2FkcywgYSBjb250cm9sIHBs
+YWNlIGludGVyZmFjZSh2aG9zdC11c2VyKSBpcyBiZXR0ZXIgdGhhbiBhIGRhdGFwYXRoIGludGVy
+ZmFjZShlLmcuIHByb3ZpZGVkIGJ5IGRhdGFwbGFjZSBpbiBxZW11IGlvdGhyZWFkKS4gT24gd29y
+a2xvYWRzIHBvaW50IG9mIHZpZXcsIGl0J3Mgbm90IGV4Y2l0ZWQgdG8gYmUgcGFydCBvZiBxZW11
+IHByb2Nlc3MuDQpUaGF0IGNvbWVzIHVwIHdpdGggdGhlIGlkZWEgb2Ygdmhvc3QtdXNlciBleHRl
+bnNpb24uIFVzZXJsYW5kIHdvcmtsb2FkcyBkZWNpZGVzIHRvIGVuYWJsZSBhY2NlbGVyYXRvcnMg
+b3Igbm90LCBxZW11IHByb3ZpZGVzIHRoZSBjb21tb24gY29udHJvbCBwbGFuZSBpbmZyYXN0cnVj
+dHVyZS4NCg0KPiANCj4gPg0KPiA+IEFuZCBJTU8gaXQncyBhbHNvIG5vdCBhIGJhZCBpZGVhIHRv
+IGV4dGVuZCB2aG9zdC11c2VyIHByb3RvY29sDQo+ID4gdG8gc3VwcG9ydCB0aGUgYWNjZWxlcmF0
+b3JzIGlmIHBvc3NpYmxlLiBBbmQgaXQgY291bGQgYmUgbW9yZQ0KPiA+IGZsZXhpYmxlIGJlY2F1
+c2UgaXQgY291bGQgc3VwcG9ydCAoZm9yIGV4YW1wbGUpIGJlbG93IHRoaW5ncw0KPiA+IGVhc2ls
+eSB3aXRob3V0IGludHJvZHVjaW5nIGFueSBjb21wbGV4IGNvbW1hbmQgbGluZSBvcHRpb25zIG9y
+DQo+ID4gbW9uaXRvciBjb21tYW5kcyB0byBRRU1VOg0KPiANCj4gTWF5YmUgSSB3YXMgd3Jvbmcg
+YnV0IEkgZG9uJ3QgdGhpbmsgd2UgY2FyZSBhYm91dCB0aGUgY29tcGxleGl0eSBvZg0KPiBjb21t
+YW5kIGxpbmUgb3IgbW9uaXRvciBjb21tYW5kIGluIHRoaXMgY2FzZS4NCj4gDQo+ID4NCj4gPiAt
+IHRoZSBzd2l0Y2hpbmcgYW1vbmcgZGlmZmVyZW50IGFjY2VsZXJhdG9ycyBhbmQgc29mdHdhcmUg
+dmVyc2lvbg0KPiA+ICAgIGNhbiBiZSBkb25lIGF0IHJ1bnRpbWUgaW4gdmhvc3QgcHJvY2VzczsN
+Cj4gPiAtIHVzZSBkaWZmZXJlbnQgYWNjZWxlcmF0b3JzIHRvIGFjY2VsZXJhdGUgZGlmZmVyZW50
+IHF1ZXVlIHBhaXJzDQo+ID4gICAgb3IganVzdCBhY2NlbGVyYXRlIHNvbWUgKGluc3RlYWQgb2Yg
+YWxsKSBxdWV1ZSBwYWlyczsNCj4gDQo+IFdlbGwsIHRlY2huaWNhbGx5LCBpZiB3ZSB3YW50LCB0
+aGVzZSBjb3VsZCBiZSBpbXBsZW1lbnRlZCBpbiBxZW11IHRvby4NCllvdSdyZSByaWdodCBpZiBq
+dXN0IGNvbnNpZGVyaW5nIEkvTy4gVGhlIHdheXMgdG8gY29uc3VtZSB0aG9zZSBJL08gaXMgYW5v
+dGhlciBwZXJzcGVjdGl2ZS4NClNpbXBseSAxOjEgYXNzb2NpYXRpbmcgZ3Vlc3QgdmlydGlvLW5l
+dCBhbmQgYWNjZWxlcmF0b3Igdy8gU1cgZGF0YXBhdGggZmFsbGJhY2sgaXMgbm90IHRoZSB3aG9s
+ZSBwaWN0dXJlLiBJdCdzIHZhcmlhYmxlIHVzYWdlcyBvbiB3b3JrbG9hZCBzaWRlIHRvIGFic3Ry
+YWN0IHRoZSBkZXZpY2UgKGUuZy4gcG9ydCByZS1wcmVzZW50ZXIgZm9yIHZzd2l0Y2gpIGFuZCBl
+dGMuIEkgZG9uJ3QgdGhpbmsgcWVtdSBpcyBpbnRlcmVzdGVkIGZvciBhbGwgYnVuY2ggb2YgdGhp
+bmdzIHRoZXJlLg0KDQo+IA0KPiBBbmQgaGVyZSdzIHNvbWUgbW9yZSBhZHZhbnRhZ2VzIGlmIHlv
+dSBpbXBsZW1lbnQgaXQgaW4gcWVtdToNCj4gDQo+IDEpIEF2b2lkIGV4dHJhIGRlcGVuZGVuY3kg
+bGlrZSBkcGRrDQo+IDIpIE1vcmUgZmxleGlibGUsIG1kZXYgY291bGQgZXZlbiBjaG9vc2UgdG8g
+bm90IHVzZSBWRklPIG9yIG5vdCBkZXBlbmQNCj4gb24gdkRQQQ0KPiAzKSBNb3JlIGVmZmljaWVu
+dCBndWVzdCBJT01NVSBpbnRlZ3JhdGlvbiBlc3BlY2lhbGx5IGZvciBkeW5hbWljDQo+IG1hcHBp
+bmdzIChkZXZpY2UgSU9UTEIgdHJhbnNhY3Rpb25zIGNvdWxkIGJlIGRvbmUgYnkgZnVuY3Rpb24g
+Y2FsbHMNCj4gaW5zdGVhZCBvZiBzbG93IFVEUCBtZXNzYWdlcykNCj4gNCkgWmVyb2NvcHkgKGZv
+ciBub24gaW50ZWwgdkRQQSkgaXMgbW9yZSBlYXNpZXIgdG8gYmUgaW1wbGVtZW50ZWQNCj4gNSkg
+Q29tcGFyZSB0byB2aG9zdC11c2VyLCB0aWdodGx5IGNvdXBsZWQgd2l0aCBkZXZpY2UgZW11bGF0
+aW9uIGNhbg0KPiBzaW1wbGlmeSBsb3RzIG9mIHRoaW5ncyAoYW4gZXhhbXBsZSBpcyBwcm9ncmFt
+bWFibGUgZmxvdyBkaXJlY3Rvci9SU1MNCj4gaW1wbGVtZW50YXRpb24pLiBBbmQgYW55IGZ1dHVy
+ZSBlbmhhbmNlbWVudCB0byB2aXJ0aW8gZG9lcyBub3QgbmVlZCB0bw0KPiBpbnRyb2R1Y2UgbmV3
+IHR5cGUgb2Ygdmhvc3QtdXNlciBtZXNzYWdlcy4NCj4gDQo+IEkgZG9uJ3Qgb2JqZWN0IHZob3N0
+LXVzZXIvZHBkayBtZXRob2QgYnV0IEkgc2Vjb25kIGZvciBpbXBsZW1lbnRpbmcgYWxsDQo+IHRo
+ZSBzdHVmZnMgaW4gcWVtdS4NCj4gDQo+IFRoYW5rcw0KPiANCj4gPg0KPiA+IEJlc3QgcmVnYXJk
+cywNCj4gPiBUaXdlaSBCaWUNCj4gPg0KDQo=
