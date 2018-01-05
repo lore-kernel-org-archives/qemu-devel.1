@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37252)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38643)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eXTwZ-0005Z6-UF
-	for qemu-devel@nongnu.org; Fri, 05 Jan 2018 10:30:05 -0500
+	(envelope-from <stefanha@redhat.com>) id 1eXTyM-0006lh-N2
+	for qemu-devel@nongnu.org; Fri, 05 Jan 2018 10:31:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eXTwX-0002YW-Eu
-	for qemu-devel@nongnu.org; Fri, 05 Jan 2018 10:30:03 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:43168)
+	(envelope-from <stefanha@redhat.com>) id 1eXTyJ-00053a-JN
+	for qemu-devel@nongnu.org; Fri, 05 Jan 2018 10:31:54 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:59112)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1eXTwX-0002Wk-5n
-	for qemu-devel@nongnu.org; Fri, 05 Jan 2018 10:30:01 -0500
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1eXTyJ-00052T-Bb
+	for qemu-devel@nongnu.org; Fri, 05 Jan 2018 10:31:51 -0500
+Date: Fri, 5 Jan 2018 15:31:36 +0000
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20180105153136.GF28322@stefanha-x1.localdomain>
 References: <20180103214925.16677-1-f4bug@amsat.org>
-	<20180103214925.16677-2-f4bug@amsat.org>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <58860a06-3d3f-ab2a-90ea-dd56dfbe9d79@redhat.com>
-Date: Fri, 5 Jan 2018 09:29:43 -0600
+	<20180103214925.16677-5-f4bug@amsat.org>
 MIME-Version: 1.0
-In-Reply-To: <20180103214925.16677-2-f4bug@amsat.org>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="W4biKDCEaGqSdq1DrQTEyAlLQtS33lTdQ"
-Subject: Re: [Qemu-devel] [PATCH v2 1/4] sdbus: add a QMP command to access
- a SDBus
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="JSkcQAAxhB1h8DcT"
+Content-Disposition: inline
+In-Reply-To: <20180103214925.16677-5-f4bug@amsat.org>
+Subject: Re: [Qemu-devel] [RFC PATCH v2 4/4] tests: add some sdcard qtest
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,222 +28,95 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Alistair Francis <alistair.francis@xilinx.com>, Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
-Cc: qemu-devel@nongnu.org, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, Markus Armbruster <armbru@redhat.com>, Thomas Huth <thuth@redhat.com>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>
+To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
+Cc: Alistair Francis <alistair.francis@xilinx.com>, Peter Maydell <peter.maydell@linaro.org>, Eric Blake <eblake@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, Markus Armbruster <armbru@redhat.com>, Thomas Huth <thuth@redhat.com>, =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---W4biKDCEaGqSdq1DrQTEyAlLQtS33lTdQ
-From: Eric Blake <eblake@redhat.com>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
- Alistair Francis <alistair.francis@xilinx.com>,
- Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini
- <pbonzini@redhat.com>, Kevin Wolf <kwolf@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>,
- "Daniel P . Berrange" <berrange@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>
-Cc: qemu-devel@nongnu.org, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>,
- Markus Armbruster <armbru@redhat.com>, Thomas Huth <thuth@redhat.com>,
- =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>
-Message-ID: <58860a06-3d3f-ab2a-90ea-dd56dfbe9d79@redhat.com>
-Subject: Re: [PATCH v2 1/4] sdbus: add a QMP command to access a SDBus
-References: <20180103214925.16677-1-f4bug@amsat.org>
- <20180103214925.16677-2-f4bug@amsat.org>
-In-Reply-To: <20180103214925.16677-2-f4bug@amsat.org>
-Content-Type: text/plain; charset=utf-8
+
+--JSkcQAAxhB1h8DcT
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On 01/03/2018 03:49 PM, Philippe Mathieu-Daud=C3=A9 wrote:
-> Use Base64 to serialize the binary blobs in JSON.
-> So far at most 512 bytes will be transfered, which result
-
-s/transfered/transferred/
-
-> in a 684 bytes payload.
-> Since this command is intented for qtesting, it is acceptable.
-
-s/intented/intended/
-
-Might be worth mentioning the actual command name,
-x-debug-sdbus-command, in the commit message to make future git log
-trawling easier.
-
->=20
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-> ---
-
-> +##
-> +# @SDBusCommandResponse:
-> +#
-> +# SD Bus command response.
-> +#
-> +# @base64: the command response encoded as a Base64 string, if any (op=
-tional)
-
-s/ (optional)//, now that the documentation engine automatically takes
-care of that.
-
-Even if there is no response, isn't the empty string "" more accurate
-than omitting the string altogether?  In other words, I'm not sure why
-you made the 'base64' member optional.
-
-> +#
-> +# Since: 2.11
-
-2.12
-
-> +##
-> +{ 'struct': 'SDBusCommandResponse', 'data': {'*base64': 'str'} }
+On Wed, Jan 03, 2018 at 06:49:25PM -0300, Philippe Mathieu-Daud=E9 wrote:
+> +static const char *machines[PROTO_COUNT] =3D {
+> +    [PROTO_SD] =3D "nuri",
+> +    //[PROTO_MMC] =3D "vexpress-a9",
+> +    //[PROTO_SPI] =3D "lm3s6965evb"
+> +};
 > +
-> +##
-> +# @x-debug-sdbus-command:
-> +#
-> +# Execute a command on a SD Bus return the response (if any).
-> +#
+> +static const uint64_t sizes[] =3D {
+> +    //512 * M_BYTE,
+> +    //1 * G_BYTE,
+> +    4 * G_BYTE,
+> +    //64 * G_BYTE,
+> +};
 
-Maybe mention that this command is only intended for use during unit
-testing (that information is already implicit from the x-debug prefix,
-but stating it explicitly doesn't hurt).
+Why are these commented out?
 
-> +# @qom-path: the SD Bus path
-> +# @command: the SD protocol command to execute in the bus
-> +# @arg: a 64-bit command argument (optional)
-> +# @crc: the command/argument CRC (optional)
-> +#
-> +# Returns: the response of the command encoded as a Base64 string
-> +#
-> +# Since: 2.11
-
-2.12
-
-> +#
-> +# -> { "execute": "x-debug-sdbus-command",
-> +#      "arguments": { "qom-path": "/machine/unattached/device[32]/sd.0=
-",
-> +#                     "command": 0x01
-
-That's invalid JSON (which does not understand hex numbers).  You need
-"command": 1
-
-> +#      }
-> +#    }
-> +# <- { "return": {'base64': 'A=3D'} }
-> +#
-> +##
-> +{ 'command': 'x-debug-sdbus-command',
-> +  'data': { 'qom-path': 'str',
-> +            'command': 'uint8',
-> +            '*arg': 'uint64',
-> +            '*crc': 'uint16' },
-> +  'returns': 'SDBusCommandResponse'
-> +}
-> diff --git a/hw/sd/sdbus-qmp.c b/hw/sd/sdbus-qmp.c
-> new file mode 100644
-> index 0000000000..8c4b6f2aee
-> --- /dev/null
-> +++ b/hw/sd/sdbus-qmp.c
-> @@ -0,0 +1,65 @@
-> +/*
-> + * SD card bus QMP debugging interface (for QTesting).
-> + *
-> + * Copyright (c) 2017 ?
-
-The question mark in a copyright line is not right.  I don't know what
-you meant to use, but unless you were doing the work on behalf of an
-employer, your own name is probably correct.  You could include 2018 now
-if you wanted.
-
-
-> +SDBusCommandResponse *qmp_x_debug_sdbus_command(const char *qom_path,
-> +                                                uint8_t command,
-> +                                                bool has_arg, uint64_t=
- arg,
-> +                                                bool has_crc, uint16_t=
- crc,
-> +                                                Error **errp)
+> +static void test1(SDBusAdapter *mmc, uint64_t size)
 > +{
-> +    uint8_t response[16 + 1];
-> +    SDBusCommandResponse *res;
-> +    bool ambiguous =3D false;
-> +    Object *obj;
-> +    SDBus *sdbus;
-> +    int sz;
+> +    uint8_t *response;
+> +    uint16_t rca;
+> +    ssize_t sz;
 > +
-> +    obj =3D object_resolve_path(qom_path, &ambiguous);
-> +    if (obj =3D=3D NULL) {
-
-I don't know if the style 'if (!obj) {' is any more prevalent; but it
-doesn't really matter.
-
-> +        if (ambiguous) {
-> +            error_setg(errp, "Path '%s' is ambiguous", qom_path);
-> +        } else {
-> +            error_set(errp, ERROR_CLASS_DEVICE_NOT_FOUND,
-> +                      "Device '%s' not found", qom_path);
-> +        }
-> +        return NULL;
-> +    }
-> +    sdbus =3D (SDBus *)object_dynamic_cast(obj, TYPE_SD_BUS);
-
-Is the cast still necessary, or does object_dynamic_cast() return void*
-so that you can omit the cast?
-
-> +    if (sdbus =3D=3D NULL) {
-> +        error_set(errp, ERROR_CLASS_GENERIC_ERROR,
-> +                  "Device '%s' not a sd-bus", qom_path);
-> +        return NULL;
-> +    }
+> +    sz =3D sdbus_do_cmd(mmc, GO_IDLE_STATE, 0, NULL);
+> +    g_assert_cmpuint(sz, =3D=3D, 0);
 > +
-> +    res =3D g_new0(SDBusCommandResponse, 1);
-> +    sz =3D sdbus_do_command(sdbus,
-> +                          &(SDRequest){ command, arg, has_crc ? crc : =
--1 },
+> +    sz =3D sdbus_do_cmd(mmc, SEND_IF_COND, 0x1aa, NULL);
+> +    //g_assert_cmpuint(sz, =3D=3D, 0);
 
-It's probably safer to use specific initializer assignments, as in:
+Why is this commented out?
 
-&(SDRequest){ .cmd =3D command, .arg =3D arg, ...
-
-
-> +++ b/stubs/qmp_sdbus.c
-> @@ -0,0 +1,12 @@
-> +#include "qemu/osdep.h"
-> +#include "qmp-commands.h"
-> +#include "hw/sd/sd.h"
+> +    // TODO 8x: sdcard_read_data len 512
 > +
-> +SDBusCommandResponse *qmp_x_debug_sdbus_command(const char *qom_path,
-> +                                                uint8_t command,
-> +                                                bool has_arg, uint64_t=
- arg,
-> +                                                bool has_crc, uint16_t=
- crc,
-> +                                                Error **errp)
+> +    //sz =3D sdbus_do_acmd(mmc, SEND_STATUS, 0, rca, &response);
+> +    //g_free(response);
+
+Why is there commenteded out code and TODO here?  Please either
+implement this stuff or remove it from the patch.
+
+> +int main(int argc, char **argv)
 > +{
-> +    return NULL;
+> +    const char *arch =3D qtest_get_arch();
+> +    int iproto, isize;
+> +    gchar *path;
+> +    TestCase *test;
+> +
+> +    g_test_init(&argc, &argv, NULL);
+> +
+> +    if (strcmp(arch, "arm") =3D=3D 0 || strcmp(arch, "aarch64") =3D=3D 0=
+) {
+> +        for (iproto =3D 0; iproto < PROTO_COUNT; iproto++) {
+> +            if (!machines[iproto]) {
+> +                continue;
+> +            }
+> +            for (isize =3D 0; isize < ARRAY_SIZE(sizes); isize++) {
+> +                test =3D g_new(TestCase, 1);
+> +
+> +                test->protocol =3D iproto;
+> +                test->size =3D sizes[isize];
+> +
+> +                path =3D g_strdup_printf("sdcard/%s/%lu", proto_name[ipr=
+oto], sizes[isize]);
+> +                qtest_add_data_func(path, test, sdcard_tests);
+> +                g_free(path);
+> +                // g_free(test)?
 
-In addition to returning NULL, the stub should set errp.
+Please remove this.  qtest_add_data_func() keeps the pointer to test so
+it must not be freed.
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---W4biKDCEaGqSdq1DrQTEyAlLQtS33lTdQ
+--JSkcQAAxhB1h8DcT
 Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlpPmecACgkQp6FrSiUn
-Q2r12ggArLXPQ2gRv0pr99Aou201JAZ+dZy9KB4z6rxBJk4DvDMsCowI8cScGkQ/
-zDxuI4iPY2F2aUoPzhZRtSt/Rl8Gv1jEY4WSIS88BzTNN0eVXH3IFXGswUGCtFII
-ifKmhCE4nIATRRC9/FUJqhour19mOI8q1a2dUFnJoUplyhQ9PaFFdXpS/Py4Vp7P
-US43GHf87N5NNd3e5XESBgleFe0x7ZgwojwT29P2JCc3DS9HhsD0if8iRx5YyX4g
-u8vw3Pn0p2RoqPBrXAX3LNQEzak/A61QKESyxD0uv4vlOjPV0BMRzR7bs1DaLltv
-85lRlkhKl+bphAh9DRdaxFS/dtQOuQ==
-=AhoN
+iQEcBAEBAgAGBQJaT5pYAAoJEJykq7OBq3PIpecIAJRXyMXfmLjNDXCSwkEWVm1M
+EyTM3WIcbVcg2Sz/oqZEBX2B5eSIn9L/K75Ix3HYfezJqdQ7pkaVBEeVHwGQvw+R
+kONLaK+aRfWIvUDqX6Jyd3a1kxPJ0UFOB74F7uC1WTpQhzQUevMlUNUM6GBu3hI/
+NTR8sZYuCAijmOHwU8QY1lqshuZT2zs0ksymU7X5Tq/8yVFP3h5DOuUhlYw/Le3p
+PHNuy2ngPZKbf16pzSlAopEOdU2aD+zb8M4hxxDl68puYUnfh0/ymGpKN86M8d85
+3K3cjjO95OB2KgiOEYIjNcSrnEY0UmzQQGNHYc8PuETuCJrcxpSlunliKeOHjTU=
+=gKL8
 -----END PGP SIGNATURE-----
 
---W4biKDCEaGqSdq1DrQTEyAlLQtS33lTdQ--
+--JSkcQAAxhB1h8DcT--
