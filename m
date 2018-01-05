@@ -1,28 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59048)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37332)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eXUa2-0003Ix-3J
-	for qemu-devel@nongnu.org; Fri, 05 Jan 2018 11:10:51 -0500
+	(envelope-from <stefanha@redhat.com>) id 1eXUe4-0005eI-Ts
+	for qemu-devel@nongnu.org; Fri, 05 Jan 2018 11:15:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eXUZy-00052R-TR
-	for qemu-devel@nongnu.org; Fri, 05 Jan 2018 11:10:50 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:59182)
+	(envelope-from <stefanha@redhat.com>) id 1eXUe1-0001yG-K2
+	for qemu-devel@nongnu.org; Fri, 05 Jan 2018 11:15:00 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:51806)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1eXUZy-000519-Is
-	for qemu-devel@nongnu.org; Fri, 05 Jan 2018 11:10:46 -0500
-References: <20180103214925.16677-1-f4bug@amsat.org>
-	<20180103214925.16677-2-f4bug@amsat.org>
-	<58860a06-3d3f-ab2a-90ea-dd56dfbe9d79@redhat.com>
-	<d393de05-84a7-4053-65be-dfdbdbdb4e43@amsat.org>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <7a1740ae-37af-7b1b-85c9-ca491c078378@redhat.com>
-Date: Fri, 5 Jan 2018 10:10:35 -0600
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1eXUe1-0001xH-6C
+	for qemu-devel@nongnu.org; Fri, 05 Jan 2018 11:14:57 -0500
+Date: Fri, 5 Jan 2018 16:14:53 +0000
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20180105161453.GI28322@stefanha-x1.localdomain>
+References: <20171219162151.GA10889@stefanha-x1.localdomain>
+	<20180104184236-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <d393de05-84a7-4053-65be-dfdbdbdb4e43@amsat.org>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="R3GllQEIR9lnOIydC7MUTKCY4ID0DJRX5"
-Subject: Re: [Qemu-devel] [PATCH v2 1/4] sdbus: add a QMP command to access
- a SDBus
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="2xeD/fx0+7k8I/QN"
+Content-Disposition: inline
+In-Reply-To: <20180104184236-mutt-send-email-mst@kernel.org>
+Subject: Re: [Qemu-devel] vhost-user graceful connect/disconnect
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,82 +28,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Alistair Francis <alistair.francis@xilinx.com>, Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
-Cc: qemu-devel@nongnu.org, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, Markus Armbruster <armbru@redhat.com>, Thomas Huth <thuth@redhat.com>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: qemu-devel@nongnu.org, mukawa@igel.co.jp, marcandre.lureau@redhat.com, Wei Wang <wei.w.wang@intel.com>, Maxime Coquelin <maxime.coquelin@redhat.com>, n.nikolaev@virtualopensystems.com
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---R3GllQEIR9lnOIydC7MUTKCY4ID0DJRX5
-From: Eric Blake <eblake@redhat.com>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
- Alistair Francis <alistair.francis@xilinx.com>,
- Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini
- <pbonzini@redhat.com>, Kevin Wolf <kwolf@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>,
- "Daniel P . Berrange" <berrange@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>
-Cc: qemu-devel@nongnu.org, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>,
- Markus Armbruster <armbru@redhat.com>, Thomas Huth <thuth@redhat.com>,
- =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>
-Message-ID: <7a1740ae-37af-7b1b-85c9-ca491c078378@redhat.com>
-Subject: Re: [PATCH v2 1/4] sdbus: add a QMP command to access a SDBus
-References: <20180103214925.16677-1-f4bug@amsat.org>
- <20180103214925.16677-2-f4bug@amsat.org>
- <58860a06-3d3f-ab2a-90ea-dd56dfbe9d79@redhat.com>
- <d393de05-84a7-4053-65be-dfdbdbdb4e43@amsat.org>
-In-Reply-To: <d393de05-84a7-4053-65be-dfdbdbdb4e43@amsat.org>
-Content-Type: text/plain; charset=utf-8
+
+--2xeD/fx0+7k8I/QN
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On 01/05/2018 10:06 AM, Philippe Mathieu-Daud=C3=A9 wrote:
-> Hi Eric,
+On Thu, Jan 04, 2018 at 06:53:07PM +0200, Michael S. Tsirkin wrote:
+> On Tue, Dec 19, 2017 at 04:21:51PM +0000, Stefan Hajnoczi wrote:
+> > Hi,
+> > Vhost-user implementations assume the slave is already running before
+> > the master starts.  The slave is required during virtio device
+> > initialization (e.g. feature bit negotiation) and so it is simplest to
+> > assume that the master is already available and will respond immediately
+> > to the VHOST_USER_GET_FEATURES message.
+> >=20
+> > I have thought about how to let master and slave start in any order.
+> > Some approaches involve changes to the VIRTIO specification so that
+> > guest drivers can wait until the vhost-user connection is established.
+> >=20
+> > We can avoid spec changes using PCI hotplug:
+> >=20
+> > 1. Introduce a new vhost-user object that manages a connection:
+> >=20
+> >    -chardev ...
+> >    -object vhost-user,id=3Dvhost-user0,chardev=3Dchr0
+> >=20
+> >    Note this object is *not* a NetClient.  It's a resource for managing
+> >    a vhost-user connection and can be used with any device type (net,
+> >    scsi, blk, etc).
+> >=20
+> >    This object tries to establish a connection.  When a connection is
+> >    established it sends vhost-user protocol messages to fetch
+> >    information needed for virtio device initialization (like the number
+> >    of virtqueues supported, features bits, etc).  This information is
+> >    stashed so that vhost_*() calls later on do not require synchronous
+> >    communication with the vhost-user slave.
 >=20
-> On 01/05/2018 12:29 PM, Eric Blake wrote:
->> On 01/03/2018 03:49 PM, Philippe Mathieu-Daud=C3=A9 wrote:
->>> Use Base64 to serialize the binary blobs in JSON.
->>> So far at most 512 bytes will be transfered, which result
->>
->> s/transfered/transferred/
->>
->>> in a 684 bytes payload.
->>> Since this command is intented for qtesting, it is acceptable.
->>
->> s/intented/intended/
->>
->> Might be worth mentioning the actual command name,
->> x-debug-sdbus-command, in the commit message to make future git log
->> trawling easier.
->=20
-> Ok.
->=20
-> What about using 'x-qtest-sdbus-command'?
+> I'm not sure how important or feasible this last part is.
 
-x-debug matches existing practice, x-qtest does not.  I'm fine with the
-name you had chosen, and was just asking that it be mentioned in the
-commit log.
+The guest should not hang if the vhost-user slave fails to respond in a
+timely manner.  This is important to prevent failures cascading if a
+vhost-user network switch hangs, for example.
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+There are a few points where device emulation requires a full vhost-user
+message exchange.  Theses are the vulnerable points.
 
+Depending on how virtio emulation is implemented, it may be possible to
+perform the vhost-user communication out-of-line with vcpu execution.
+That way the vcpu continues to execute while vhost-user communication is
+in progress.
 
---R3GllQEIR9lnOIydC7MUTKCY4ID0DJRX5
+Unfortunately the VIRTIO_PCI_STATUS/VIRTIO_PCI_COMMON_STATUS hardware
+register writes are points where vhost-user message exchanges need to
+happen.  That means the vcpu will hang until vhost-user communication
+has finished.
+
+It's not possible to resume guest execution without waiting for the
+vhost-user slave because the guest might start using the device before
+the vhost-user slave has been fully initialized.
+
+I don't see a way around this problem yet.  If everything was async at
+the virtio hardware level then it would be easy to prevent hangs.
+
+Stefan
+
+--2xeD/fx0+7k8I/QN
 Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlpPo3sACgkQp6FrSiUn
-Q2oSBgf+OevDu2FxuHJYu5ioHPLoO0EuOmsqDRzsFm2XQB1XlpRLVD4uiXImAFH1
-h+TSgfpyBRailWyIVWU1H5Ot3/H7aGW90GsnX4Uh0WkntJuPPeqbyrRO64hF1MSW
-wIgN7rt9ttTVGI+9yftvmaXG/tw5HPC1dUvTFHzLz49jmOQXjufyDS8tfpJYH2lF
-yFAfi8SAcFWvYcLTyA7tsLpCConndag3GQIfSR5KXTcoQAZs/6qHWVL860QDYJw4
-lqtRQufOsuEZtTwRLJnQaQ6fxnzMvTAQPPFuLp3QknraYQTTtMNmIXoPI7F8/al6
-shQXzXPb8uRQkDRhneDj9JnoNOdy5Q==
-=LnSr
+iQEcBAEBAgAGBQJaT6R9AAoJEJykq7OBq3PIKlgH/3anx5iiAJc10+/h0hVIZqH4
+cAykX6z6Csu68ZfAhYnhtkobS/qc+lqnGAeroHdkHDm41ck/s128Zt02QPKj2DuS
+HDZ++F+Nzg8IdjM2jOjgdxR4AoZASIF54D5mVEgJdIYGBT2tpwuYLYt/zrqb88RL
+OVCZMKWDwYNZtCp8VEKOtD/82V3dA1WsvVKNHKA1nrSo9AMS12la+aBCmlvCiL0U
+6V3LHo+8+94asLmNpdzaMjigF0rkhi3sL7+1pw2CvqW+ZitnjLynsfIVYZO1PlNi
+GyxBAAfSrD93MQo2kbwZNyS1x/slNVo48J3hV+IppM4Tv8alW0Yz8LlS4l8VjbM=
+=ZP/E
 -----END PGP SIGNATURE-----
 
---R3GllQEIR9lnOIydC7MUTKCY4ID0DJRX5--
+--2xeD/fx0+7k8I/QN--
