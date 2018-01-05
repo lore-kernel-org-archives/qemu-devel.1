@@ -1,21 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51895)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51612)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1eXINp-0001pq-UJ
-	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 22:09:26 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1eXIpo-0005d2-Ru
+	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 22:38:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1eXINm-0004tx-Gw
-	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 22:09:25 -0500
-Date: Fri, 5 Jan 2018 14:05:42 +1100
+	(envelope-from <dgibson@ozlabs.org>) id 1eXIpk-0006Rn-Rw
+	for qemu-devel@nongnu.org; Thu, 04 Jan 2018 22:38:20 -0500
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20180105030542.GD24581@umbus.fritz.box>
-References: <20180104194952.2836-1-programmingkidx@gmail.com>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="lymARMIdFDV9dylT"
-Content-Disposition: inline
-In-Reply-To: <20180104194952.2836-1-programmingkidx@gmail.com>
-Subject: Re: [Qemu-devel] [PATCH v2] Update dtc to fix compilation problem
- on Mac OS 10.6
+Date: Fri,  5 Jan 2018 14:38:06 +1100
+Message-Id: <20180105033806.14678-1-david@gibson.dropbear.id.au>
+Subject: [Qemu-devel] [PATCHv2] spapr: Correct compatibility mode setting
+ for hotplugged CPUs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,64 +18,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Arbuckle <programmingkidx@gmail.com>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org
+To: groug@kaod.org, mdroth@linux.vnet.ibm.com, surajjs@au1.ibm.com
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, satheera@in.ibm.com, David Gibson <david@gibson.dropbear.id.au>
 
+Currently the pseries machine sets the compatibility mode for the
+guest's cpus in two places: 1) at machine reset and 2) after CAS
+negotiation.
 
---lymARMIdFDV9dylT
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+This means that if we set or negotiate a compatiblity mode, then
+hotplug a cpu, the hotplugged cpu doesn't get the right mode set and
+will incorrectly have the full native features.
 
-On Thu, Jan 04, 2018 at 02:49:52PM -0500, John Arbuckle wrote:
-> Currently QEMU does not build on Mac OS 10.6
-> because of a missing patch in the dtc
-> subproject. Updating dtc to make the patch
-> available fixes this problem.
->=20
-> Signed-off-by: John Arbuckle <programmingkidx@gmail.com>
+To correct this, we set the compatibility mode on a cpu when it is
+brought online with the 'start-cpu' RTAS call.  Given that we no
+longer need to set the compatibility mode on all CPUs at machine
+reset, so we change that to only set the mode for the boot cpu.
 
-Applied, thanks.
+Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+Reviewed-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+---
 
-> ---
-> v2 changes:
-> Updated the commit to point to version 1.4.6.
->=20
->  dtc | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->=20
-> diff --git a/dtc b/dtc
-> index 558cd81bdd..e54388015a 160000
-> --- a/dtc
-> +++ b/dtc
-> @@ -1 +1 @@
-> -Subproject commit 558cd81bdd432769b59bff01240c44f82cfb1a9d
-> +Subproject commit e54388015af1fb4bf04d0bca99caba1074d9cc42
+Changes since v1:
+ * Add an error_report_err() to display and free the error from
+   ppc_set_compat() in rtas_start_cpu().
+ 
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
+ hw/ppc/spapr.c      | 2 +-
+ hw/ppc/spapr_rtas.c | 8 ++++++++
+ 2 files changed, 9 insertions(+), 1 deletion(-)
 
---lymARMIdFDV9dylT
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlpO64MACgkQbDjKyiDZ
-s5IN+Q/9HinTgV+pqolQxN/S/GiBhf77UxJFe4sCim8T/1UcyBP38r7szUMjIBXg
-0bCpE4FR3nhIjhR5rp/NJFqE7psJusIj0ctXqrUspP1YpJxkvNZC/O4BKhDn3rGc
-lPQ7/i6tpgKg5QmVJmP+kGvVAwlkUGNj1Fb0MRNVgTd5piezjCEYDkKcqb9vmESb
-bSxWy6RBQtLB16fpb5K9eR7rwmKpwos4yTZftP9betWsiR7Bz1MUE37arEGLfVAg
-pEssjlhfLv83rGa7Rnfq0rsOU4UR8V5CoUx//bsP6E2/jvpGSDQI3hpkOgypXc2M
-NnZb/YEYgH9v0VHOaO4s7exkgRvZk6qyU4Ab5vBq7q6sx5P7WooX0O4M/SsqI7Sw
-CiIs/p2l3sXi9yYvjUN7/x2p89zf+lfdHy+1IIVjAIIVvaMjB7izAl3kXaPliKkz
-RdkTA/l9WtAgNYeipZ7Myl97YlOudNslCGJ4fTLWvXbDv+xcOEDs6Noqz1RUp1sD
-OVozQnYhg8rU8l931fp4yfMW6oAViMxXISsHrDDMdaorPpSmvXPPzvb1gXfaHWsQ
-qbYxEibeg4AvQvE48p6VSMh29nLlrvhNX3/OEmH/XEPLI+wUiHneG8RHGXiQQ2zX
-+5G0pyC1uuQtHR5yaiAKEkT9KsS4//WHOY5wUmCUhwsEI0/vChg=
-=yQ9Z
------END PGP SIGNATURE-----
-
---lymARMIdFDV9dylT--
+diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+index e22888ba06..d1acfe8858 100644
+--- a/hw/ppc/spapr.c
++++ b/hw/ppc/spapr.c
+@@ -1510,7 +1510,7 @@ static void spapr_machine_reset(void)
+         spapr_ovec_cleanup(spapr->ov5_cas);
+         spapr->ov5_cas = spapr_ovec_new();
+ 
+-        ppc_set_compat_all(spapr->max_compat_pvr, &error_fatal);
++        ppc_set_compat(first_ppc_cpu, spapr->max_compat_pvr, &error_fatal);
+     }
+ 
+     fdt = spapr_build_fdt(spapr, rtas_addr, spapr->rtas_size);
+diff --git a/hw/ppc/spapr_rtas.c b/hw/ppc/spapr_rtas.c
+index 4bb939d3d1..2ed00548c1 100644
+--- a/hw/ppc/spapr_rtas.c
++++ b/hw/ppc/spapr_rtas.c
+@@ -163,6 +163,7 @@ static void rtas_start_cpu(PowerPCCPU *cpu_, sPAPRMachineState *spapr,
+         CPUState *cs = CPU(cpu);
+         CPUPPCState *env = &cpu->env;
+         PowerPCCPUClass *pcc = POWERPC_CPU_GET_CLASS(cpu);
++        Error *local_err = NULL;
+ 
+         if (!cs->halted) {
+             rtas_st(rets, 0, RTAS_OUT_HW_ERROR);
+@@ -174,6 +175,13 @@ static void rtas_start_cpu(PowerPCCPU *cpu_, sPAPRMachineState *spapr,
+          * new cpu enters */
+         kvm_cpu_synchronize_state(cs);
+ 
++        /* Set compatibility mode to match existing cpus */
++        ppc_set_compat(cpu, POWERPC_CPU(first_cpu)->compat_pvr, &local_err);
++        if (local_err) {
++            rtas_st(rets, 0, RTAS_OUT_HW_ERROR);
++            return;
++        }
++
+         env->msr = (1ULL << MSR_SF) | (1ULL << MSR_ME);
+ 
+         /* Enable Power-saving mode Exit Cause exceptions for the new CPU */
+-- 
+2.14.3
