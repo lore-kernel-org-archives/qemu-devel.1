@@ -1,26 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33859)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36887)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1eXTsg-0003rD-7g
-	for qemu-devel@nongnu.org; Fri, 05 Jan 2018 10:26:03 -0500
+	(envelope-from <alex.williamson@redhat.com>) id 1eXTvy-0005Ar-PV
+	for qemu-devel@nongnu.org; Fri, 05 Jan 2018 10:29:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1eXTsd-0005hx-1X
-	for qemu-devel@nongnu.org; Fri, 05 Jan 2018 10:26:02 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:45688)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1eXTsc-0005gr-Os
-	for qemu-devel@nongnu.org; Fri, 05 Jan 2018 10:25:58 -0500
-Date: Fri, 5 Jan 2018 15:25:52 +0000
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20180105152552.GE28322@stefanha-x1.localdomain>
-References: <20180103214925.16677-1-f4bug@amsat.org>
-	<20180103214925.16677-4-f4bug@amsat.org>
+	(envelope-from <alex.williamson@redhat.com>) id 1eXTvv-0001iu-Bx
+	for qemu-devel@nongnu.org; Fri, 05 Jan 2018 10:29:26 -0500
+Date: Fri, 5 Jan 2018 08:29:16 -0700
+From: Alex Williamson <alex.williamson@redhat.com>
+Message-ID: <20180105082916.480132af@t450s.home>
+In-Reply-To: <3af66f82-a8d6-4e7d-4d89-09cae2333198@redhat.com>
+References: <20171215062914.27927-1-aik@ozlabs.ru>
+	<3af66f82-a8d6-4e7d-4d89-09cae2333198@redhat.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="G6nVm6DDWH/FONJq"
-Content-Disposition: inline
-In-Reply-To: <20180103214925.16677-4-f4bug@amsat.org>
-Subject: Re: [Qemu-devel] [RFC PATCH v2 3/4] libqos: implement sdbus QMP
- driver
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH qemu v2] RFC: vfio-pci: Allow mmap of MSIX
+ BAR
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,144 +24,246 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
-Cc: Alistair Francis <alistair.francis@xilinx.com>, Peter Maydell <peter.maydell@linaro.org>, Eric Blake <eblake@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, Markus Armbruster <armbru@redhat.com>, Thomas Huth <thuth@redhat.com>, =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>
+To: Auger Eric <eric.auger@redhat.com>
+Cc: Alexey Kardashevskiy <aik@ozlabs.ru>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
 
+On Fri, 5 Jan 2018 10:48:07 +0100
+Auger Eric <eric.auger@redhat.com> wrote:
 
---G6nVm6DDWH/FONJq
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+> Hi Alexey,
+> 
+> On 15/12/17 07:29, Alexey Kardashevskiy wrote:
+> > This makes use of a new VFIO_REGION_INFO_CAP_MSIX_MAPPABLE capability
+> > which tells that a region with MSIX data can be mapped entirely, i.e.
+> > the VFIO PCI driver won't prevent MSIX vectors area from being mapped.
+> > 
+> > With this change, all BARs are mapped in a single chunk and MSIX vectors
+> > are emulated on top unless the machine requests not to by defining and
+> > enabling a new "vfio-no-msix-emulation" property. At the moment only
+> > sPAPR machine does so - it prohibits MSIX emulation and does not allow
+> > enabling it as it does not define the "set" callback for the new property;
+> > the new property also does not appear in "-machine pseries,help".
+> > 
+> > If the new capability is present, this puts MSIX IO memory region under
+> > mapped memory region. If the capability is not there, it falls back to
+> > the old behaviour with the sparse capability.
+> > 
+> > In MSIX vectors section is not aligned to the page size, the KVM memory
+> > listener does not register it with the KVM as a memory slot and MSIX is
+> > emulated by QEMU as before.
+> > 
+> > This requires the kernel change - "vfio-pci: Allow mapping MSIX BAR" -
+> > for the new capability: https://www.spinics.net/lists/kvm/msg160282.html
+> > 
+> > Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+> > ---
+> > 
+> > This is mtree and flatview BEFORE this patch:
+> > 
+> > "info mtree":
+> > memory-region: pci@800000020000000.mmio
+> >   0000000000000000-ffffffffffffffff (prio 0, i/o): pci@800000020000000.mmio
+> >     0000210000000000-000021000000ffff (prio 1, i/o): 0001:03:00.0 BAR 1
+> >       000021000000e000-000021000000e5ff (prio 0, i/o): msix-table
+> >       000021000000f000-000021000000f00f (prio 0, i/o): msix-pba [disabled]
+> >     0000210000040000-000021000007ffff (prio 1, i/o): 0001:03:00.0 BAR 3
+> >       0000210000040000-000021000007ffff (prio 0, ramd): 0001:03:00.0 BAR 3 mmaps[0]
+> > 
+> > "info mtree -f":
+> > FlatView #0
+> >  AS "memory", root: system
+> >  AS "cpu-memory", root: system
+> >  Root memory region: system
+> >   0000000000000000-000000007fffffff (prio 0, ram): ppc_spapr.ram
+> >   0000210000000000-000021000000dfff (prio 1, i/o): 0001:03:00.0 BAR 1
+> >   000021000000e000-000021000000e5ff (prio 0, i/o): msix-table
+> >   000021000000e600-000021000000ffff (prio 1, i/o): 0001:03:00.0 BAR 1 @000000000000e600
+> >   0000210000040000-000021000007ffff (prio 0, ramd): 0001:03:00.0 BAR 3 mmaps[0]
+> > 
+> > 
+> > 
+> > This is AFTER this patch applied:
+> > 
+> > "info mtree":
+> > memory-region: pci@800000020000000.mmio
+> >   0000000000000000-ffffffffffffffff (prio 0, i/o): pci@800000020000000.mmio
+> >     0000210000000000-000021000000ffff (prio 1, i/o): 0001:03:00.0 BAR 1
+> >       0000210000000000-000021000000ffff (prio 0, ramd): 0001:03:00.0 BAR 1 mmaps[0]
+> >         000021000000e000-000021000000e5ff (prio 0, i/o): msix-table [disabled]
+> >         000021000000f000-000021000000f00f (prio 0, i/o): msix-pba [disabled]
+> >     0000210000040000-000021000007ffff (prio 1, i/o): 0001:03:00.0 BAR 3
+> >       0000210000040000-000021000007ffff (prio 0, ramd): 0001:03:00.0 BAR 3 mmaps[0]
+> > 
+> > 
+> > "info mtree -f":
+> > FlatView #2
+> >  AS "memory", root: system
+> >  AS "cpu-memory", root: system
+> >  Root memory region: system
+> >   0000000000000000-000000007fffffff (prio 0, ram): ppc_spapr.ram
+> >   0000210000000000-000021000000ffff (prio 0, ramd): 0001:03:00.0 BAR 1 mmaps[0]
+> >   0000210000040000-000021000007ffff (prio 0, ramd): 0001:03:00.0 BAR 3 mmaps[0]
+> > 
+> > 
+> > 
+> > This is AFTER this patch applied AND spapr_get_msix_emulation() patched
+> > to enable emulation:
+> > 
+> > "info mtree":
+> > memory-region: pci@800000020000000.mmio
+> >   0000000000000000-ffffffffffffffff (prio 0, i/o): pci@800000020000000.mmio
+> >     0000210000000000-000021000000ffff (prio 1, i/o): 0001:03:00.0 BAR 1
+> >       0000210000000000-000021000000ffff (prio 0, ramd): 0001:03:00.0 BAR 1 mmaps[0]
+> >         000021000000e000-000021000000e5ff (prio 0, i/o): msix-table
+> >         000021000000f000-000021000000f00f (prio 0, i/o): msix-pba [disabled]
+> >     0000210000040000-000021000007ffff (prio 1, i/o): 0001:03:00.0 BAR 3
+> >       0000210000040000-000021000007ffff (prio 0, ramd): 0001:03:00.0 BAR 3 mmaps[0]
+> > 
+> > "info mtree -f":
+> > FlatView #1
+> >  AS "memory", root: system
+> >  AS "cpu-memory", root: system
+> >  Root memory region: system
+> >   0000000000000000-000000007fffffff (prio 0, ram): ppc_spapr.ram
+> >   0000210000000000-000021000000dfff (prio 0, ramd): 0001:03:00.0 BAR 1 mmaps[0]
+> >   000021000000e000-000021000000e5ff (prio 0, i/o): msix-table
+> >   000021000000e600-000021000000ffff (prio 0, ramd): 0001:03:00.0 BAR 1 mmaps[0] @000000000000e600
+> >   0000210000040000-000021000007ffff (prio 0, ramd): 0001:03:00.0 BAR 3 mmaps[0]
+> > ---
+> >  include/hw/vfio/vfio-common.h |  1 +
+> >  linux-headers/linux/vfio.h    |  5 +++++
+> >  hw/ppc/spapr.c                |  8 ++++++++
+> >  hw/vfio/common.c              | 15 +++++++++++++++
+> >  hw/vfio/pci.c                 | 23 +++++++++++++++++++++--
+> >  5 files changed, 50 insertions(+), 2 deletions(-)
+> > 
+> > diff --git a/include/hw/vfio/vfio-common.h b/include/hw/vfio/vfio-common.h
+> > index f3a2ac9..927d600 100644
+> > --- a/include/hw/vfio/vfio-common.h
+> > +++ b/include/hw/vfio/vfio-common.h
+> > @@ -171,6 +171,7 @@ int vfio_get_region_info(VFIODevice *vbasedev, int index,
+> >                           struct vfio_region_info **info);
+> >  int vfio_get_dev_region_info(VFIODevice *vbasedev, uint32_t type,
+> >                               uint32_t subtype, struct vfio_region_info **info);
+> > +bool vfio_is_cap_present(VFIODevice *vbasedev, uint16_t cap_type, int region);
+> >  #endif
+> >  extern const MemoryListener vfio_prereg_listener;
+> >  
+> > diff --git a/linux-headers/linux/vfio.h b/linux-headers/linux/vfio.h
+> > index 4312e96..b45182e 100644
+> > --- a/linux-headers/linux/vfio.h
+> > +++ b/linux-headers/linux/vfio.h
+> > @@ -301,6 +301,11 @@ struct vfio_region_info_cap_type {
+> >  #define VFIO_REGION_SUBTYPE_INTEL_IGD_HOST_CFG	(2)
+> >  #define VFIO_REGION_SUBTYPE_INTEL_IGD_LPC_CFG	(3)
+> >  
+> > +/*
+> > + * The MSIX mappable capability informs that MSIX data of a BAR can be mmapped.
+> > + */
+> > +#define VFIO_REGION_INFO_CAP_MSIX_MAPPABLE	3
+> > +
+> >  /**
+> >   * VFIO_DEVICE_GET_IRQ_INFO - _IOWR(VFIO_TYPE, VFIO_BASE + 9,
+> >   *				    struct vfio_irq_info)
+> > diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> > index 9de63f0..693394a 100644
+> > --- a/hw/ppc/spapr.c
+> > +++ b/hw/ppc/spapr.c
+> > @@ -2772,6 +2772,11 @@ static void spapr_set_modern_hotplug_events(Object *obj, bool value,
+> >      spapr->use_hotplug_event_source = value;
+> >  }
+> >  
+> > +static bool spapr_get_msix_emulation(Object *obj, Error **errp)
+> > +{
+> > +    return true;
+> > +}
+> > +
+> >  static char *spapr_get_resize_hpt(Object *obj, Error **errp)
+> >  {
+> >      sPAPRMachineState *spapr = SPAPR_MACHINE(obj);
+> > @@ -2853,6 +2858,8 @@ static void spapr_machine_initfn(Object *obj)
+> >      object_property_set_description(obj, "vsmt",
+> >                                      "Virtual SMT: KVM behaves as if this were"
+> >                                      " the host's SMT mode", &error_abort);
+> > +    object_property_add_bool(obj, "vfio-no-msix-emulation",
+> > +                             spapr_get_msix_emulation, NULL, NULL);
+> >  }
+> >  
+> >  static void spapr_machine_finalizefn(Object *obj)
+> > @@ -3742,6 +3749,7 @@ static const TypeInfo spapr_machine_info = {
+> >  /*
+> >   * pseries-2.11
+> >   */
+> > +
+> >  static void spapr_machine_2_11_instance_options(MachineState *machine)
+> >  {
+> >  }
+> > diff --git a/hw/vfio/common.c b/hw/vfio/common.c
+> > index 1fb8a8e..da5f182 100644
+> > --- a/hw/vfio/common.c
+> > +++ b/hw/vfio/common.c
+> > @@ -1411,6 +1411,21 @@ int vfio_get_dev_region_info(VFIODevice *vbasedev, uint32_t type,
+> >      return -ENODEV;
+> >  }
+> >  
+> > +bool vfio_is_cap_present(VFIODevice *vbasedev, uint16_t cap_type, int region)
+> > +{
+> > +    struct vfio_region_info *info = NULL;
+> > +    bool ret = false;
+> > +
+> > +    if (!vfio_get_region_info(vbasedev, region, &info)) {
+> > +        if (vfio_get_region_info_cap(info, cap_type)) {
+> > +            ret = true;
+> > +        }
+> > +        g_free(info);
+> > +    }
+> > +
+> > +    return ret;
+> > +}
+> > +
+> >  /*
+> >   * Interfaces for IBM EEH (Enhanced Error Handling)
+> >   */
+> > diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
+> > index c977ee3..27a3706 100644
+> > --- a/hw/vfio/pci.c
+> > +++ b/hw/vfio/pci.c
+> > @@ -1289,6 +1289,11 @@ static void vfio_pci_fixup_msix_region(VFIOPCIDevice *vdev)
+> >      off_t start, end;
+> >      VFIORegion *region = &vdev->bars[vdev->msix->table_bar].region;
+> >  
+> > +    if (vfio_is_cap_present(&vdev->vbasedev, VFIO_REGION_INFO_CAP_MSIX_MAPPABLE,
+> > +                            vdev->msix->table_bar)) {
+> > +        return;
+> > +    }  
+> 
+> I am testing this patch on ARM with a Mellanox CX-4 card. Single bar0 +
+> msix table at 0x2000, using 64kB pages.
+> 
+> 0000000000000000-0000000001ffffff (prio 1, i/o): 0000:01:00.0 BAR 0
+>  0000000000000000-0000000001ffffff (prio 0, ramd): 0000:01:00.0 BAR 0
+> mmaps[0]
+>   0000000000002000-00000000000023ff (prio 0, i/o): msix-table
+>   0000000000003000-0000000000003007 (prio 0, i/o): msix-pba [disabled]
+> 
+> 
+> My kernel includes your "vfio-pci: Allow mapping MSIX BAR" so we bypass
+> vfio_pci_fixup_msix_region. But as the mmaps[0] is not fixed up the
+> vfio_listener_region_add_ram gets called on the first 8kB which cannot
+> be mapped with 64kB page, leading to a qemu abort.
+> 
+> 29520@1515145231.232161:vfio_listener_region_add_ram region_add [ram]
+> 0x8000000000 - 0x8000001fff [0xffffa8820000]
+> qemu-system-aarch64: VFIO_MAP_DMA: -22
+> qemu-system-aarch64: vfio_dma_map(0x1e265f60, 0x8000000000, 0x2000,
+> 0xffffa8820000) = -22 (Invalid argument)
+> qemu: hardware error: vfio: DMA mapping failed, unable to continue
+> 
+> In my case don't we still need the fixup logic?
 
-On Wed, Jan 03, 2018 at 06:49:24PM -0300, Philippe Mathieu-Daud=E9 wrote:
-> +static const char *qmp_sdbus_getpath(const char *blkname)
-> +{
-> +    QDict *response, *minfo;
-> +    QList *list;
-> +    const QListEntry *le;
-> +    QString *qstr;
-> +    const char *mname;
-> +    QObject *qobj;
-> +
-> +    response =3D qmp("{ 'execute': 'query-block' }");
+Ah, I didn't realize you had Alexey's QEMU patch when you asked about
+this.  I'd say no, the fixup shouldn't be needed, but apparently we
+can't remove it until we figure out this bug and who should be filtering
+out sub-page size listener events.  Thanks,
 
-This function implicitly uses global_qtest.  If you ever want to do
-multi-VM (e.g. migration) tests then this may become a problem because
-there's no way to say which QEMU process to talk to.
-
-This can be addressed by adding a QTestState *s argument to these
-functions so that global_qtest isn't hardcoded.  Use qtest_qmp()
-instead.
-
-> +    g_assert_nonnull(response);
-> +    list =3D qdict_get_qlist(response, "return");
-> +    g_assert_nonnull(list);
-> +
-> +    QLIST_FOREACH_ENTRY(list, le) {
-> +        QDict *response2;
-> +
-> +        minfo =3D qobject_to_qdict(qlist_entry_obj(le));
-> +        g_assert(minfo);
-> +        qobj =3D qdict_get(minfo, "qdev");
-> +        if (!qobj) {
-> +            continue;
-> +        }
-> +        qstr =3D qobject_to_qstring(qobj);
-> +        g_assert(qstr);
-> +        mname =3D qstring_get_str(qstr);
-> +
-> +        response2 =3D qmp("{ 'execute': 'qom-get',"
-> +                        "  'arguments': { 'path': %s,"
-> +                        "   'property': \"parent_bus\"}"
-> +                        "}", mname);
-> +        g_assert(response2);
-> +        g_assert(qdict_haskey(response2, "return"));
-> +        qobj =3D qdict_get(response2, "return");
-> +        qstr =3D qobject_to_qstring(qobj);
-> +        g_assert(qstr);
-> +        mname =3D qstring_get_str(qstr);
-> +
-> +        return mname;
-> +    }
-> +    return NULL;
-> +}
-
-response is leaked.  I think something like this is needed:
-
-  char *mname =3D g_strdup(qstring_get_str(qstr));
-  QDECREF(response);
-  return mname;
-
-The caller must g_free() the return value too and the type must be char
-* instead of const char *.
-
-> +
-> +static ssize_t qmp_mmc_do_cmd(SDBusAdapter *adapter, enum NCmd cmd, uint=
-32_t arg,
-> +                              uint8_t **response)
-> +{
-> +    QMPSDBus *s =3D (QMPSDBus *)adapter;
-> +    QDict *response1;
-> +    QObject *qobj;
-> +
-> +    response1 =3D qmp("{ 'execute': 'x-debug-sdbus-command',"
-> +                    "  'arguments': { 'qom-path': %s,"
-> +                    "                 'command': %u, 'arg': %u}"
-> +                    "}",
-> +                    s->qom_path, cmd, arg);
-> +    g_assert(qdict_haskey(response1, "return"));
-> +    qobj =3D qdict_get(response1, "return");
-> +    //QDECREF(response);
-> +
-> +    if (!qobj) {
-> +        return -1;
-> +    }
-> +
-> +    {
-> +        QString *qstr;
-> +        const gchar *mname;
-> +        guchar *uc;
-> +        gsize out_len;
-> +        QDict *response2 =3D qobject_to_qdict(qobj);
-> +
-> +        if (!qdict_haskey(response2, "base64")) {
-> +            return 0;
-> +        }
-> +        qobj =3D qdict_get(response2, "base64");
-> +        qstr =3D qobject_to_qstring(qobj);
-> +        if (!qstr) {
-> +            puts("!qstr");
-> +            return 0;
-> +        }
-> +        mname =3D qstring_get_str(qstr);
-> +
-> +        uc =3D g_base64_decode(mname, &out_len);
-> +        if (response) {
-> +            *response =3D uc;
-> +        } else {
-> +            g_free(uc);
-> +        }
-> +        return out_len;
-> +
-> +    }
-> +
-> +    return 0;
-> +}
-
-Please fix memory leaks here, too.  For example, response1 is leaked.
-
---G6nVm6DDWH/FONJq
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJaT5kAAAoJEJykq7OBq3PIZHgH/RzDTH/29Vpttg22Q7Rzklv/
-K6H51gXxfI2AnayC6x5P5f0t5nRNz9Ko8K7XiTWloDa86slG4GPxeziI0ZK8Merz
-6QIPjiaH4MMritVQPz8rSxUewThhPdDyRqRMpcNpg+949Xt3hlU/OAy6b3jDJOGJ
-EdEkSSd+E/N4xKWwUQD6fVqdEKT/jaB7Sn+QXh41UduMyyAFB5GuFRWwQk3y2mkT
-PK+Q+qJpqIgp5cYPc0E+KL0f0RnRJf1Ul91jOOGijiwFvYGyGF4/aWC+EAE2Ep0h
-rOAfbKNQFi/+tuZoFQoBZ5pasz1uzsYeUn4qNPz3gcamSqqEoa13LtBIvDXvw1s=
-=Gy27
------END PGP SIGNATURE-----
-
---G6nVm6DDWH/FONJq--
+Alex
