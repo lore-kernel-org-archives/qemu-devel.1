@@ -1,41 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44120)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45444)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <muriloo@linux.vnet.ibm.com>) id 1eXTHK-00020S-3g
-	for qemu-devel@nongnu.org; Fri, 05 Jan 2018 09:47:27 -0500
+	(envelope-from <eblake@redhat.com>) id 1eXTJ5-0003VT-Ut
+	for qemu-devel@nongnu.org; Fri, 05 Jan 2018 09:49:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <muriloo@linux.vnet.ibm.com>) id 1eXTHG-0001Pz-51
-	for qemu-devel@nongnu.org; Fri, 05 Jan 2018 09:47:26 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:52210)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <muriloo@linux.vnet.ibm.com>)
-	id 1eXTHF-0001PJ-ST
-	for qemu-devel@nongnu.org; Fri, 05 Jan 2018 09:47:22 -0500
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	w05EinAO057330
-	for <qemu-devel@nongnu.org>; Fri, 5 Jan 2018 09:47:20 -0500
-Received: from e32.co.us.ibm.com (e32.co.us.ibm.com [32.97.110.150])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2fab7nrj7q-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 05 Jan 2018 09:47:20 -0500
-Received: from localhost
-	by e32.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <muriloo@linux.vnet.ibm.com>;
-	Fri, 5 Jan 2018 07:47:19 -0700
-References: <20180105133241.14141-1-muriloo@linux.vnet.ibm.com>
-	<20180105133241.14141-2-muriloo@linux.vnet.ibm.com>
-	<07c8789d-bebb-deed-b64c-806edf17f99c@redhat.com>
-From: =?UTF-8?Q?Murilo_Opsfelder_Ara=c3=bajo?= <muriloo@linux.vnet.ibm.com>
-Date: Fri, 5 Jan 2018 12:47:10 -0200
+	(envelope-from <eblake@redhat.com>) id 1eXTJ2-00031f-70
+	for qemu-devel@nongnu.org; Fri, 05 Jan 2018 09:49:15 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:53502)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1eXTJ1-00030P-Uv
+	for qemu-devel@nongnu.org; Fri, 05 Jan 2018 09:49:12 -0500
+References: <1514940265-18093-1-git-send-email-mjc@sifive.com>
+	<1514940265-18093-22-git-send-email-mjc@sifive.com>
+	<4e3bcfa2-c511-3ffb-44ab-be4567f2fb17@redhat.com>
+	<CAHNT7Ntz2C84DYMf+BM8WZ7kwMTuZ3Q5D+VfUxG0O87H6j94XQ@mail.gmail.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <108446a9-e18b-b81a-66a0-058793a32953@redhat.com>
+Date: Fri, 5 Jan 2018 08:49:09 -0600
 MIME-Version: 1.0
-In-Reply-To: <07c8789d-bebb-deed-b64c-806edf17f99c@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Message-Id: <fb11ac10-0b17-b9d6-0e2a-540cac882900@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH 1/1] block/nbd: fix segmentation fault when
- .desc is not null-terminated
+In-Reply-To: <CAHNT7Ntz2C84DYMf+BM8WZ7kwMTuZ3Q5D+VfUxG0O87H6j94XQ@mail.gmail.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="k8g58DTn16Z0Hrs4ScAsAd8G5z6DO8a4c"
+Subject: Re: [Qemu-devel] [PATCH v1 21/21] RISC-V Build Infrastructure
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -44,45 +30,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-ppc@nongnu.org, qemu-block@nongnu.org, qemu-stable <qemu-stable@nongnu.org>, Max Reitz <mreitz@redhat.com>, R Nageswara Sastry <nasastry@in.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: Michael Clark <mjc@sifive.com>
+Cc: qemu-devel@nongnu.org, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Sagar Karandikar <sagark@eecs.berkeley.edu>
 
-On 01/05/2018 11:57 AM, Eric Blake wrote:
-> On 01/05/2018 07:32 AM, Murilo Opsfelder Araujo wrote:
->> The find_desc_by_name() from util/qemu-option.c relies on the .name not being
->> NULL to call strcmp(). This check becomes unsafe when the list is not
->> NULL-terminated, which is the case of nbd_runtime_opts in block/nbd.c, and can
->> result in segmentation fault when strcmp() tries to access an invalid memory:
-> 
-> Thanks for the report and patch.  Adding qemu-stable in cc.
-> 
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--k8g58DTn16Z0Hrs4ScAsAd8G5z6DO8a4c
+From: Eric Blake <eblake@redhat.com>
+To: Michael Clark <mjc@sifive.com>
+Cc: qemu-devel@nongnu.org, Bastian Koppelmann
+ <kbastian@mail.uni-paderborn.de>, Sagar Karandikar <sagark@eecs.berkeley.edu>
+Message-ID: <108446a9-e18b-b81a-66a0-058793a32953@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v1 21/21] RISC-V Build Infrastructure
+References: <1514940265-18093-1-git-send-email-mjc@sifive.com>
+ <1514940265-18093-22-git-send-email-mjc@sifive.com>
+ <4e3bcfa2-c511-3ffb-44ab-be4567f2fb17@redhat.com>
+ <CAHNT7Ntz2C84DYMf+BM8WZ7kwMTuZ3Q5D+VfUxG0O87H6j94XQ@mail.gmail.com>
+In-Reply-To: <CAHNT7Ntz2C84DYMf+BM8WZ7kwMTuZ3Q5D+VfUxG0O87H6j94XQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 01/05/2018 12:47 AM, Michael Clark wrote:
+
 >>
->> This patch fixes the segmentation fault in strcmp() by adding a NULL element at
->> the end of nbd_runtime_opts.desc list, which is the common practice to most of
->> other structs like runtime_opts in block/null.c. Thus, the desc[i].name != NULL
->> check becomes safe because it will not evaluate to true when .desc list reached
->> its end.
+>>> +##
+>>> +{ 'struct': 'CpuInfoRISCV', 'data': { 'pc': 'int' } }
 >>
->> Reported-by: R. Nageswara Sastry <nasastry@in.ibm.com>
->> Buglink: https://bugs.launchpad.net/qemu/+bug/1727259
->> Signed-off-by: Murilo Opsfelder Araujo <muriloo@linux.vnet.ibm.com>
-> 
-> I'll update the commit message to add in the commit id that introduced
-> the problem, as well as check that other QemuOptsList do not have a
-> similar problem; I'm queueing this on the NBD tree and will submit a
-> pull request soon.
-> 
-> Reviewed-by: Eric Blake <eblake@redhat.com>
+>> Should this be 'uint64' or other specific type, rather than the generi=
+c
+>> 'int' (which happens to be 64 bits, but signed)?  Other architectures
+>> use 'int' because of history, but we could use this chance to improve
+>> things if desired.
+>>
+>=20
+> I'll have to defer to your better judgement as to whether we need to ch=
+ange
+> this. I like consistency. Is it a change that needs to be made to multi=
+ple
+> arches? It sounds relatively low risk. You decide.
+>=20
+> QAPI Schema
+> M: Eric Blake <eblake@redhat.com>
+> M: Markus Armbruster <armbru@redhat.com>
 
-Hi, Eric.
+I'm fine if this patch uses 'int' for consistency, and will wait for
+Markus to chime in on whether changing CpuInfo to use specific integer
+types in general is worth a separate series later on.
 
-A quick look brought my attention to:
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
 
-block/ssh.c
-530:static QemuOptsList ssh_runtime_opts = {
 
-I've sent a patch to fix it too.
+--k8g58DTn16Z0Hrs4ScAsAd8G5z6DO8a4c
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-Thanks.
--- 
-Murilo
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlpPkGUACgkQp6FrSiUn
+Q2rIrQf+OhWBtzEi2WKUSdLjXBzuXoIozm6LF8FJrG0bi2hNAmo/Y9aNkNdMoCzD
+D/aNQFD9bJ5oTOvwg2rH4P5MRhJy70X+LYcU4zgyPlBEJP61dgNMaOkINQMvNmo5
+r0irRBu9BN2PdsKyDlls/BQzG4v+hFLfpOym4yn4tFknss2X1GYcsIJfJsqm07Dv
+rCFW6bNGTjOl8BwyWQfSdgMxAb7AFu0Fz0Tl/O8P4lk+ck+mWhKqmkGb43VG8x43
+jbFVKdosH9meAPuZU15wCKDsy+Xs9lPx9t1fI1pmgvTg4sj+BpKC42TbhhTKVM7A
++YpqxiCN1cTAlMhEhmemFZ1fSPrEWA==
+=Z01A
+-----END PGP SIGNATURE-----
+
+--k8g58DTn16Z0Hrs4ScAsAd8G5z6DO8a4c--
