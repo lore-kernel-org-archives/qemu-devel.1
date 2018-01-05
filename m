@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47736)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47786)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eXawh-0003Fg-GE
-	for qemu-devel@nongnu.org; Fri, 05 Jan 2018 17:58:40 -0500
+	(envelope-from <eblake@redhat.com>) id 1eXawj-0003Hd-TJ
+	for qemu-devel@nongnu.org; Fri, 05 Jan 2018 17:58:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eXawg-0000MB-5y
-	for qemu-devel@nongnu.org; Fri, 05 Jan 2018 17:58:39 -0500
+	(envelope-from <eblake@redhat.com>) id 1eXawi-0000OI-In
+	for qemu-devel@nongnu.org; Fri, 05 Jan 2018 17:58:41 -0500
 From: Eric Blake <eblake@redhat.com>
-Date: Fri,  5 Jan 2018 16:57:45 -0600
-Message-Id: <20180105225753.30509-13-eblake@redhat.com>
+Date: Fri,  5 Jan 2018 16:57:47 -0600
+Message-Id: <20180105225753.30509-15-eblake@redhat.com>
 In-Reply-To: <20180105225753.30509-1-eblake@redhat.com>
 References: <20180105225753.30509-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PATCH v7 12/20] qed: Switch to .bdrv_co_block_status()
+Subject: [Qemu-devel] [PATCH v7 14/20] sheepdog: Switch to
+ .bdrv_co_block_status()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,142 +21,96 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, famz@redhat.com, jcody@redhat.com, qemu-block@nongnu.org, vsementsov@virtuozzo.com, Stefan Hajnoczi <stefanha@redhat.com>, Max Reitz <mreitz@redhat.com>
+Cc: kwolf@redhat.com, famz@redhat.com, jcody@redhat.com, qemu-block@nongnu.org, vsementsov@virtuozzo.com, Hitoshi Mitake <mitake.hitoshi@lab.ntt.co.jp>, Liu Yuan <namei.unix@gmail.com>, Max Reitz <mreitz@redhat.com>, "open list:Sheepdog" <sheepdog@lists.wpkg.org>
 
 We are gradually moving away from sector-based interfaces, towards
-byte-based.  Update the qed driver accordingly, taking the opportunity
-to inline qed_is_allocated_cb() into its lone caller (the callback
-used to be important, until we switched qed to coroutines).  There is
-no intent to optimize based on the want_zero flag for this format.
+byte-based.  Update the sheepdog driver accordingly.
 
 Signed-off-by: Eric Blake <eblake@redhat.com>
 Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 Reviewed-by: Fam Zheng <famz@redhat.com>
+Reviewed-by: Jeff Cody <jcody@redhat.com>
 
 ---
-v6-v7: no change
-v5: initialize len before qed_find_cluster() [Vladimir]
-v4: rebase to interface change, inline pointless callback
+v7: rebase to minor spacing changes in master
+v5-v6: no change
+v4: update to interface tweak
 v3: no change
-v2: rebase to mapping flag, fix mask in qed_is_allocated_cb
+v2: rebase to mapping flag
 ---
- block/qed.c | 84 +++++++++++++++++++++----------------------------------------
- 1 file changed, 28 insertions(+), 56 deletions(-)
+ block/sheepdog.c | 26 +++++++++++++-------------
+ 1 file changed, 13 insertions(+), 13 deletions(-)
 
-diff --git a/block/qed.c b/block/qed.c
-index 821dcaa055..13fbc3e2f1 100644
---- a/block/qed.c
-+++ b/block/qed.c
-@@ -688,74 +688,46 @@ finish:
-     return ret;
+diff --git a/block/sheepdog.c b/block/sheepdog.c
+index f684477328..8a7b688ece 100644
+--- a/block/sheepdog.c
++++ b/block/sheepdog.c
+@@ -2987,19 +2987,19 @@ static coroutine_fn int sd_co_pdiscard(BlockDriverState *bs, int64_t offset,
+     return acb.ret;
  }
 
--typedef struct {
--    BlockDriverState *bs;
--    Coroutine *co;
--    uint64_t pos;
--    int64_t status;
--    int *pnum;
--    BlockDriverState **file;
--} QEDIsAllocatedCB;
--
--/* Called with table_lock held.  */
--static void qed_is_allocated_cb(void *opaque, int ret, uint64_t offset, size_t len)
--{
--    QEDIsAllocatedCB *cb = opaque;
--    BDRVQEDState *s = cb->bs->opaque;
--    *cb->pnum = len / BDRV_SECTOR_SIZE;
--    switch (ret) {
--    case QED_CLUSTER_FOUND:
--        offset |= qed_offset_into_cluster(s, cb->pos);
--        cb->status = BDRV_BLOCK_DATA | BDRV_BLOCK_OFFSET_VALID | offset;
--        *cb->file = cb->bs->file->bs;
--        break;
--    case QED_CLUSTER_ZERO:
--        cb->status = BDRV_BLOCK_ZERO;
--        break;
--    case QED_CLUSTER_L2:
--    case QED_CLUSTER_L1:
--        cb->status = 0;
--        break;
--    default:
--        assert(ret < 0);
--        cb->status = ret;
--        break;
--    }
--
--    if (cb->co) {
--        aio_co_wake(cb->co);
--    }
--}
--
--static int64_t coroutine_fn bdrv_qed_co_get_block_status(BlockDriverState *bs,
--                                                 int64_t sector_num,
--                                                 int nb_sectors, int *pnum,
-+static int coroutine_fn bdrv_qed_co_block_status(BlockDriverState *bs,
-+                                                 bool want_zero,
-+                                                 int64_t pos, int64_t bytes,
-+                                                 int64_t *pnum, int64_t *map,
-                                                  BlockDriverState **file)
+-static coroutine_fn int64_t
+-sd_co_get_block_status(BlockDriverState *bs, int64_t sector_num, int nb_sectors,
+-                       int *pnum, BlockDriverState **file)
++static coroutine_fn int
++sd_co_block_status(BlockDriverState *bs, bool want_zero, int64_t offset,
++                   int64_t bytes, int64_t *pnum, int64_t *map,
++                   BlockDriverState **file)
  {
-     BDRVQEDState *s = bs->opaque;
--    size_t len = (size_t)nb_sectors * BDRV_SECTOR_SIZE;
--    QEDIsAllocatedCB cb = {
--        .bs = bs,
--        .pos = (uint64_t)sector_num * BDRV_SECTOR_SIZE,
--        .status = BDRV_BLOCK_OFFSET_MASK,
--        .pnum = pnum,
--        .file = file,
--    };
-+    size_t len = MIN(bytes, SIZE_MAX);
-+    int status;
-     QEDRequest request = { .l2_table = NULL };
-     uint64_t offset;
-     int ret;
+     BDRVSheepdogState *s = bs->opaque;
+     SheepdogInode *inode = &s->inode;
+     uint32_t object_size = (UINT32_C(1) << inode->block_size_shift);
+-    uint64_t offset = sector_num * BDRV_SECTOR_SIZE;
+     unsigned long start = offset / object_size,
+-                  end = DIV_ROUND_UP((sector_num + nb_sectors) *
+-                                     BDRV_SECTOR_SIZE, object_size);
++                  end = DIV_ROUND_UP(offset + bytes, object_size);
+     unsigned long idx;
+-    int64_t ret = BDRV_BLOCK_DATA | BDRV_BLOCK_OFFSET_VALID | offset;
++    *map = offset;
++    int ret = BDRV_BLOCK_DATA | BDRV_BLOCK_OFFSET_VALID;
 
-     qemu_co_mutex_lock(&s->table_lock);
--    ret = qed_find_cluster(s, &request, cb.pos, &len, &offset);
--    qed_is_allocated_cb(&cb, ret, offset, len);
-+    ret = qed_find_cluster(s, &request, pos, &len, &offset);
+     for (idx = start; idx < end; idx++) {
+         if (inode->data_vdi_id[idx] == 0) {
+@@ -3016,9 +3016,9 @@ sd_co_get_block_status(BlockDriverState *bs, int64_t sector_num, int nb_sectors,
+         }
+     }
 
--    /* The callback was invoked immediately */
--    assert(cb.status != BDRV_BLOCK_OFFSET_MASK);
-+    *pnum = len;
-+    switch (ret) {
-+    case QED_CLUSTER_FOUND:
-+        *map = offset | qed_offset_into_cluster(s, pos);
-+        status = BDRV_BLOCK_DATA | BDRV_BLOCK_OFFSET_VALID;
-+        *file = bs->file->bs;
-+        break;
-+    case QED_CLUSTER_ZERO:
-+        status = BDRV_BLOCK_ZERO;
-+        break;
-+    case QED_CLUSTER_L2:
-+    case QED_CLUSTER_L1:
-+        status = 0;
-+        break;
-+    default:
-+        assert(ret < 0);
-+        status = ret;
-+        break;
-+    }
+-    *pnum = (idx - start) * object_size / BDRV_SECTOR_SIZE;
+-    if (*pnum > nb_sectors) {
+-        *pnum = nb_sectors;
++    *pnum = (idx - start) * object_size;
++    if (*pnum > bytes) {
++        *pnum = bytes;
+     }
+     if (ret > 0 && ret & BDRV_BLOCK_OFFSET_VALID) {
+         *file = bs;
+@@ -3096,7 +3096,7 @@ static BlockDriver bdrv_sheepdog = {
+     .bdrv_co_writev               = sd_co_writev,
+     .bdrv_co_flush_to_disk        = sd_co_flush_to_disk,
+     .bdrv_co_pdiscard             = sd_co_pdiscard,
+-    .bdrv_co_get_block_status     = sd_co_get_block_status,
++    .bdrv_co_block_status         = sd_co_block_status,
 
-     qed_unref_l2_cache_entry(request.l2_table);
-     qemu_co_mutex_unlock(&s->table_lock);
+     .bdrv_snapshot_create         = sd_snapshot_create,
+     .bdrv_snapshot_goto           = sd_snapshot_goto,
+@@ -3132,7 +3132,7 @@ static BlockDriver bdrv_sheepdog_tcp = {
+     .bdrv_co_writev               = sd_co_writev,
+     .bdrv_co_flush_to_disk        = sd_co_flush_to_disk,
+     .bdrv_co_pdiscard             = sd_co_pdiscard,
+-    .bdrv_co_get_block_status     = sd_co_get_block_status,
++    .bdrv_co_block_status         = sd_co_block_status,
 
--    return cb.status;
-+    return status;
- }
+     .bdrv_snapshot_create         = sd_snapshot_create,
+     .bdrv_snapshot_goto           = sd_snapshot_goto,
+@@ -3168,7 +3168,7 @@ static BlockDriver bdrv_sheepdog_unix = {
+     .bdrv_co_writev               = sd_co_writev,
+     .bdrv_co_flush_to_disk        = sd_co_flush_to_disk,
+     .bdrv_co_pdiscard             = sd_co_pdiscard,
+-    .bdrv_co_get_block_status     = sd_co_get_block_status,
++    .bdrv_co_block_status         = sd_co_block_status,
 
- static BDRVQEDState *acb_to_s(QEDAIOCB *acb)
-@@ -1595,7 +1567,7 @@ static BlockDriver bdrv_qed = {
-     .bdrv_child_perm          = bdrv_format_default_perms,
-     .bdrv_create              = bdrv_qed_create,
-     .bdrv_has_zero_init       = bdrv_has_zero_init_1,
--    .bdrv_co_get_block_status = bdrv_qed_co_get_block_status,
-+    .bdrv_co_block_status     = bdrv_qed_co_block_status,
-     .bdrv_co_readv            = bdrv_qed_co_readv,
-     .bdrv_co_writev           = bdrv_qed_co_writev,
-     .bdrv_co_pwrite_zeroes    = bdrv_qed_co_pwrite_zeroes,
+     .bdrv_snapshot_create         = sd_snapshot_create,
+     .bdrv_snapshot_goto           = sd_snapshot_goto,
 -- 
 2.14.3
