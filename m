@@ -1,25 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37332)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37831)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1eXUe4-0005eI-Ts
-	for qemu-devel@nongnu.org; Fri, 05 Jan 2018 11:15:01 -0500
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1eXUeN-0005vj-0v
+	for qemu-devel@nongnu.org; Fri, 05 Jan 2018 11:15:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1eXUe1-0001yG-K2
-	for qemu-devel@nongnu.org; Fri, 05 Jan 2018 11:15:00 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:51806)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1eXUe1-0001xH-6C
-	for qemu-devel@nongnu.org; Fri, 05 Jan 2018 11:14:57 -0500
-Date: Fri, 5 Jan 2018 16:14:53 +0000
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20180105161453.GI28322@stefanha-x1.localdomain>
-References: <20171219162151.GA10889@stefanha-x1.localdomain>
-	<20180104184236-mutt-send-email-mst@kernel.org>
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1eXUeJ-0002L1-0q
+	for qemu-devel@nongnu.org; Fri, 05 Jan 2018 11:15:18 -0500
+Received: from mail-qk0-x242.google.com ([2607:f8b0:400d:c09::242]:39188)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1eXUeI-0002KS-Rk
+	for qemu-devel@nongnu.org; Fri, 05 Jan 2018 11:15:14 -0500
+Received: by mail-qk0-x242.google.com with SMTP id r8so2201646qke.6
+	for <qemu-devel@nongnu.org>; Fri, 05 Jan 2018 08:15:14 -0800 (PST)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20171211125705.16120-1-alex.bennee@linaro.org>
+	<20171211125705.16120-5-alex.bennee@linaro.org>
+	<c17e6c00-0a9f-054a-88c4-5868081daccf@linaro.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <7c848bb5-7439-da58-69db-6908d44aeea8@amsat.org>
+Date: Fri, 5 Jan 2018 13:15:03 -0300
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="2xeD/fx0+7k8I/QN"
-Content-Disposition: inline
-In-Reply-To: <20180104184236-mutt-send-email-mst@kernel.org>
-Subject: Re: [Qemu-devel] vhost-user graceful connect/disconnect
+In-Reply-To: <c17e6c00-0a9f-054a-88c4-5868081daccf@linaro.org>
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature";
+	boundary="pKZvrQMIhRcdIN8BeYSRSeYciFWpCtaZ0"
+Subject: Re: [Qemu-devel] [PATCH v1 04/19] include/fpu/softfloat: implement
+ float16_set_sign helper
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,86 +37,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: qemu-devel@nongnu.org, mukawa@igel.co.jp, marcandre.lureau@redhat.com, Wei Wang <wei.w.wang@intel.com>, Maxime Coquelin <maxime.coquelin@redhat.com>, n.nikolaev@virtualopensystems.com
+To: Richard Henderson <richard.henderson@linaro.org>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>
+Cc: peter.maydell@linaro.org, laurent@vivier.eu, bharata@linux.vnet.ibm.com, andrew@andrewdutcher.com, aleksandar.markovic@imgtec.com, qemu-devel@nongnu.org, Aurelien Jarno <aurelien@aurel32.net>, Alistair Francis <alistair.francis@xilinx.com>
 
-
---2xeD/fx0+7k8I/QN
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--pKZvrQMIhRcdIN8BeYSRSeYciFWpCtaZ0
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+To: Richard Henderson <richard.henderson@linaro.org>,
+ =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ Peter Crosthwaite <crosthwaite.peter@gmail.com>
+Cc: peter.maydell@linaro.org, laurent@vivier.eu, bharata@linux.vnet.ibm.com,
+ andrew@andrewdutcher.com, aleksandar.markovic@imgtec.com,
+ qemu-devel@nongnu.org, Aurelien Jarno <aurelien@aurel32.net>,
+ Alistair Francis <alistair.francis@xilinx.com>
+Message-ID: <7c848bb5-7439-da58-69db-6908d44aeea8@amsat.org>
+Subject: Re: [Qemu-devel] [PATCH v1 04/19] include/fpu/softfloat: implement
+ float16_set_sign helper
+References: <20171211125705.16120-1-alex.bennee@linaro.org>
+ <20171211125705.16120-5-alex.bennee@linaro.org>
+ <c17e6c00-0a9f-054a-88c4-5868081daccf@linaro.org>
+In-Reply-To: <c17e6c00-0a9f-054a-88c4-5868081daccf@linaro.org>
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Jan 04, 2018 at 06:53:07PM +0200, Michael S. Tsirkin wrote:
-> On Tue, Dec 19, 2017 at 04:21:51PM +0000, Stefan Hajnoczi wrote:
-> > Hi,
-> > Vhost-user implementations assume the slave is already running before
-> > the master starts.  The slave is required during virtio device
-> > initialization (e.g. feature bit negotiation) and so it is simplest to
-> > assume that the master is already available and will respond immediately
-> > to the VHOST_USER_GET_FEATURES message.
-> >=20
-> > I have thought about how to let master and slave start in any order.
-> > Some approaches involve changes to the VIRTIO specification so that
-> > guest drivers can wait until the vhost-user connection is established.
-> >=20
-> > We can avoid spec changes using PCI hotplug:
-> >=20
-> > 1. Introduce a new vhost-user object that manages a connection:
-> >=20
-> >    -chardev ...
-> >    -object vhost-user,id=3Dvhost-user0,chardev=3Dchr0
-> >=20
-> >    Note this object is *not* a NetClient.  It's a resource for managing
-> >    a vhost-user connection and can be used with any device type (net,
-> >    scsi, blk, etc).
-> >=20
-> >    This object tries to establish a connection.  When a connection is
-> >    established it sends vhost-user protocol messages to fetch
-> >    information needed for virtio device initialization (like the number
-> >    of virtqueues supported, features bits, etc).  This information is
-> >    stashed so that vhost_*() calls later on do not require synchronous
-> >    communication with the vhost-user slave.
+On 12/18/2017 06:44 PM, Richard Henderson wrote:
+> On 12/11/2017 04:56 AM, Alex Benn=C3=A9e wrote:
+>> +static inline float16 float16_set_sign(float16 a, int sign)
+>> +{
+>> +    return make_float16((float16_val(a) & 0x7fff) | (sign << 15));
+>> +}
+>> +
 >=20
-> I'm not sure how important or feasible this last part is.
+> 1) Do we use this anywhere?
+>=20
+> 2) While this is probably in line with the other implementations,
+> but going to a more qemu-ish style this should use deposit32.
 
-The guest should not hang if the vhost-user slave fails to respond in a
-timely manner.  This is important to prevent failures cascading if a
-vhost-user network switch hangs, for example.
+Yes, it is easier to read while reviewing (no mask or shift), so safer.
 
-There are a few points where device emulation requires a full vhost-user
-message exchange.  Theses are the vulnerable points.
+That's probably why I'm becoming addict of the "hw/registerfields.h"
+API... :)
 
-Depending on how virtio emulation is implemented, it may be possible to
-perform the vhost-user communication out-of-line with vcpu execution.
-That way the vcpu continues to execute while vhost-user communication is
-in progress.
 
-Unfortunately the VIRTIO_PCI_STATUS/VIRTIO_PCI_COMMON_STATUS hardware
-register writes are points where vhost-user message exchanges need to
-happen.  That means the vcpu will hang until vhost-user communication
-has finished.
-
-It's not possible to resume guest execution without waiting for the
-vhost-user slave because the guest might start using the device before
-the vhost-user slave has been fully initialized.
-
-I don't see a way around this problem yet.  If everything was async at
-the virtio hardware level then it would be easy to prevent hangs.
-
-Stefan
-
---2xeD/fx0+7k8I/QN
+--pKZvrQMIhRcdIN8BeYSRSeYciFWpCtaZ0
 Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEcBAEBAgAGBQJaT6R9AAoJEJykq7OBq3PIKlgH/3anx5iiAJc10+/h0hVIZqH4
-cAykX6z6Csu68ZfAhYnhtkobS/qc+lqnGAeroHdkHDm41ck/s128Zt02QPKj2DuS
-HDZ++F+Nzg8IdjM2jOjgdxR4AoZASIF54D5mVEgJdIYGBT2tpwuYLYt/zrqb88RL
-OVCZMKWDwYNZtCp8VEKOtD/82V3dA1WsvVKNHKA1nrSo9AMS12la+aBCmlvCiL0U
-6V3LHo+8+94asLmNpdzaMjigF0rkhi3sL7+1pw2CvqW+ZitnjLynsfIVYZO1PlNi
-GyxBAAfSrD93MQo2kbwZNyS1x/slNVo48J3hV+IppM4Tv8alW0Yz8LlS4l8VjbM=
-=ZP/E
+iQIzBAEBCgAdFiEE+qvnXhKRciHc/Wuy4+MsLN6twN4FAlpPpIcACgkQ4+MsLN6t
+wN7S5w//ZInk2+0dmT2HoP9ESXTGwo/3Hv7yrTor5dju2ckZOHh2LcwOSczzglpm
+yymMVTmNtQEnFgQmzVaXzH8foCF5Kc2xbiQGAERETJcFi7C6jS6L4QG1WCGVWIpY
+OtomIslwG4VkXUP62/Q/UsGcQbiHdVv9JKbFtnw7gVxgxFEHTqkbF9cmprGK2Ka6
+nLbUZY6sR6YL/Njg87WtFPdUyyzwHoxZBXZK9qy00vrjKI9Wgi9BaJUnmMzCyr0Z
+cJoOWUOZU/3PRu1eKbgfcq4fnaLu8igQR6dxL6oNfeNK/fr18SkU05ZjkfxiCMLk
+SYzVHu0Bg7Zr829KEbK3Uch4DCUz00CEusA5xMYFTm5NpiEtUc5o361pXkH8m6+/
++NtO0KLzw2zTxRUkCDxfIm6vJ3csFhCabOfUk3FviV8Te9irhhMVNWCc8TOMotOY
+QZ1QE23MZLdlmlcpl2opO1nSV7dJo+qpUGFrfAYkcKloAPt3rBtGTKqubZ/EpYbV
+Ca/NxObrqohQmZi5EjQY5RzeeHUSWlPQav8Pl04Jf4+WNrCdnfe5ckR1q/4uO4L4
+k395TCmqFpyaUeNO44nYZuZU01RLUNM28HUKiIHJdYrgW8TCoctH/iatH78kFDJB
+7f66qHIYdRZA60DFqIFpt8khr2FGfckwnRna3+Vdn97LtLtSXsw=
+=Gw8Z
 -----END PGP SIGNATURE-----
 
---2xeD/fx0+7k8I/QN--
+--pKZvrQMIhRcdIN8BeYSRSeYciFWpCtaZ0--
