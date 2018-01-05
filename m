@@ -1,39 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58853)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39999)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <muriloo@linux.vnet.ibm.com>) id 1eXS7z-0003Qg-4a
-	for qemu-devel@nongnu.org; Fri, 05 Jan 2018 08:33:44 -0500
+	(envelope-from <bounces@canonical.com>) id 1eXSTK-0005P7-O2
+	for qemu-devel@nongnu.org; Fri, 05 Jan 2018 08:55:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <muriloo@linux.vnet.ibm.com>) id 1eXS7u-0004yo-Tx
-	for qemu-devel@nongnu.org; Fri, 05 Jan 2018 08:33:43 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:42422
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <muriloo@linux.vnet.ibm.com>)
-	id 1eXS7u-0004yi-PY
-	for qemu-devel@nongnu.org; Fri, 05 Jan 2018 08:33:38 -0500
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	w05DSvDR006220
-	for <qemu-devel@nongnu.org>; Fri, 5 Jan 2018 08:33:36 -0500
-Received: from e16.ny.us.ibm.com (e16.ny.us.ibm.com [129.33.205.206])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2fa968jtvq-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 05 Jan 2018 08:33:36 -0500
-Received: from localhost
-	by e16.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <muriloo@linux.vnet.ibm.com>;
-	Fri, 5 Jan 2018 08:33:35 -0500
-From: Murilo Opsfelder Araujo <muriloo@linux.vnet.ibm.com>
-Date: Fri,  5 Jan 2018 11:32:41 -0200
-In-Reply-To: <20180105133241.14141-1-muriloo@linux.vnet.ibm.com>
-References: <20180105133241.14141-1-muriloo@linux.vnet.ibm.com>
+	(envelope-from <bounces@canonical.com>) id 1eXSTG-0004yo-RG
+	for qemu-devel@nongnu.org; Fri, 05 Jan 2018 08:55:46 -0500
+Received: from indium.canonical.com ([91.189.90.7]:42184)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1eXSTG-0004xd-Kn
+	for qemu-devel@nongnu.org; Fri, 05 Jan 2018 08:55:42 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1eXSTF-0001Ej-7j
+	for <qemu-devel@nongnu.org>; Fri, 05 Jan 2018 13:55:41 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id BC5D52E8075
+	for <qemu-devel@nongnu.org>; Fri,  5 Jan 2018 13:55:40 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-Message-Id: <20180105133241.14141-2-muriloo@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH 1/1] block/nbd: fix segmentation fault when
- .desc is not null-terminated
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 05 Jan 2018 13:49:04 -0000
+From: =?utf-8?q?Murilo_Opsfelder_Ara=C3=BAjo?= <1727259@bugs.launchpad.net>
+Reply-To: Bug 1727259 <1727259@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <150892430716.18436.10907121916690603983.malonedeb@chaenomeles.canonical.com>
+Message-Id: <151516014431.32346.16213189854676629061.malone@wampee.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1727259] Re: qemu-io-test 58 segfaults when
+ configured with gcov
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -43,62 +38,125 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, qemu-ppc@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Eric Blake <eblake@redhat.com>, R Nageswara Sastry <nasastry@in.ibm.com>, Murilo Opsfelder Araujo <muriloo@linux.vnet.ibm.com>
 
-The find_desc_by_name() from util/qemu-option.c relies on the .name not being
-NULL to call strcmp(). This check becomes unsafe when the list is not
-NULL-terminated, which is the case of nbd_runtime_opts in block/nbd.c, and can
-result in segmentation fault when strcmp() tries to access an invalid memory:
+Patch sent:
+http://lists.nongnu.org/archive/html/qemu-devel/2018-01/msg00883.html
 
-    #0 0x00007fff8c75f7d4 in __strcmp_power9 () from /lib64/libc.so.6
-    #1 0x00000000102d3ec8 in find_desc_by_name (desc=0x1036d6f0, name=0x28e46670 "server.path") at util/qemu-option.c:166
-    #2 0x00000000102d93e0 in qemu_opts_absorb_qdict (opts=0x28e47a80, qdict=0x28e469a0, errp=0x7fffec247c98) at util/qemu-option.c:1026
-    #3 0x000000001012a2e4 in nbd_open (bs=0x28e42290, options=0x28e469a0, flags=24578, errp=0x7fffec247d80) at block/nbd.c:406
-    #4 0x00000000100144e8 in bdrv_open_driver (bs=0x28e42290, drv=0x1036e070 <bdrv_nbd_unix>, node_name=0x0, options=0x28e469a0, open_flags=24578, errp=0x7fffec247f50) at block.c:1135
-    #5 0x0000000010015b04 in bdrv_open_common (bs=0x28e42290, file=0x0, options=0x28e469a0, errp=0x7fffec247f50) at block.c:1395
+** Changed in: qemu
+       Status: New =3D> In Progress
 
->From gdb, the desc[i].name was not NULL and resulted in strcmp() accessing an
-invalid memory:
+-- =
 
-    >>> p desc[5]
-    $8 = {
-      name = 0x1037f098 "R27A",
-      type = 1561964883,
-      help = 0xc0bbb23e <error: Cannot access memory at address 0xc0bbb23e>,
-      def_value_str = 0x2 <error: Cannot access memory at address 0x2>
-    }
-    >>> p desc[6]
-    $9 = {
-      name = 0x103dac78 <__gcov0.do_qemu_init_bdrv_nbd_init> "\001",
-      type = 272101528,
-      help = 0x29ec0b754403e31f <error: Cannot access memory at address 0x29ec0b754403e31f>,
-      def_value_str = 0x81f343b9 <error: Cannot access memory at address 0x81f343b9>
-    }
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1727259
 
-This patch fixes the segmentation fault in strcmp() by adding a NULL element at
-the end of nbd_runtime_opts.desc list, which is the common practice to most of
-other structs like runtime_opts in block/null.c. Thus, the desc[i].name != NULL
-check becomes safe because it will not evaluate to true when .desc list reached
-its end.
+Title:
+  qemu-io-test 58 segfaults when configured with gcov
 
-Reported-by: R. Nageswara Sastry <nasastry@in.ibm.com>
-Buglink: https://bugs.launchpad.net/qemu/+bug/1727259
-Signed-off-by: Murilo Opsfelder Araujo <muriloo@linux.vnet.ibm.com>
----
- block/nbd.c | 1 +
- 1 file changed, 1 insertion(+)
+Status in QEMU:
+  In Progress
 
-diff --git a/block/nbd.c b/block/nbd.c
-index a50d24b50a..8b8ba56cdd 100644
---- a/block/nbd.c
-+++ b/block/nbd.c
-@@ -388,6 +388,7 @@ static QemuOptsList nbd_runtime_opts = {
-             .type = QEMU_OPT_STRING,
-             .help = "ID of the TLS credentials to use",
-         },
-+        { /* end of list */ }
-     },
- };
- 
--- 
-2.14.3
+Bug description:
+  Head is at 3d7196d43bfe12efe98568cb60057e273652b99b
+
+  Steps to re-produce:
+  1. git clone
+  ./configure --enable-gcov --target-list=3Dppc64-softmmu
+  make
+  cd tests/qemu-iotests
+
+  2. export qemu binary, in my environment
+  export QEMU_PROG=3D/home/nasastry/qemu_gcov/ppc64-softmmu/qemu-system-ppc=
+64
+
+  3. Run test 58 with format qcow2
+  ./check -qcow2 58
+
+  QEMU          -- "/home/nasastry/qemu_gcov/ppc64-softmmu/qemu-system-ppc6=
+4" -nodefaults -machine accel=3Dqtest
+  QEMU_IMG      -- "/home/nasastry/qemu_gcov/qemu-img"
+  QEMU_IO       -- "/home/nasastry/qemu_gcov/qemu-io"  --cache writeback -f=
+ qcow2
+  QEMU_NBD      -- "/home/nasastry/qemu_gcov/qemu-nbd"
+  IMGFMT        -- qcow2 (compat=3D1.1)
+  IMGPROTO      -- file
+  PLATFORM      -- Linux/ppc64le zzfp365-lp1 4.13.0-4.rel.git49564cb.el7.ce=
+ntos.ppc64le
+  TEST_DIR      -- /home/nasastry/qemu_gcov/tests/qemu-iotests/scratch
+  SOCKET_SCM_HELPER -- /home/nasastry/qemu_gcov/tests/qemu-iotests/socket_s=
+cm_helper
+
+  058 1s ... - output mismatch (see 058.out.bad)
+  --- /home/nasastry/qemu_gcov/tests/qemu-iotests/058.out	2017-10-09 14:09:=
+04.262726912 +0530
+  +++ /home/nasastry/qemu_gcov/tests/qemu-iotests/058.out.bad	2017-10-25 15=
+:00:52.037515025 +0530
+  @@ -19,16 +19,28 @@
+   4 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+
+   =3D=3D verifying the exported snapshot with patterns, method 1 =3D=3D
+  -read 4096/4096 bytes at offset 4096
+  -4 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+  -read 4096/4096 bytes at offset 8192
+  -4 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+  +./common.rc: line 66: 36255 Segmentation fault      (core dumped) ( if [=
+ "${VALGRIND_QEMU}" =3D=3D "y" ]; then
+  +    exec valgrind --log-file=3D"${VALGRIND_LOGFILE}" --error-exitcode=3D=
+99 "$QEMU_IO_PROG" $QEMU_IO_ARGS "$@";
+  +else
+  +    exec "$QEMU_IO_PROG" $QEMU_IO_ARGS "$@";
+  +fi )
+  +./common.rc: line 66: 36262 Segmentation fault      (core dumped) ( if [=
+ "${VALGRIND_QEMU}" =3D=3D "y" ]; then
+  +    exec valgrind --log-file=3D"${VALGRIND_LOGFILE}" --error-exitcode=3D=
+99 "$QEMU_IO_PROG" $QEMU_IO_ARGS "$@";
+  +else
+  +    exec "$QEMU_IO_PROG" $QEMU_IO_ARGS "$@";
+  +fi )
+
+   =3D=3D verifying the exported snapshot with patterns, method 2 =3D=3D
+  -read 4096/4096 bytes at offset 4096
+  -4 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+  -read 4096/4096 bytes at offset 8192
+  -4 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+  +./common.rc: line 66: 36274 Segmentation fault      (core dumped) ( if [=
+ "${VALGRIND_QEMU}" =3D=3D "y" ]; then
+  +    exec valgrind --log-file=3D"${VALGRIND_LOGFILE}" --error-exitcode=3D=
+99 "$QEMU_IO_PROG" $QEMU_IO_ARGS "$@";
+  +else
+  +    exec "$QEMU_IO_PROG" $QEMU_IO_ARGS "$@";
+  +fi )
+  +./common.rc: line 66: 36282 Segmentation fault      (core dumped) ( if [=
+ "${VALGRIND_QEMU}" =3D=3D "y" ]; then
+  +    exec valgrind --log-file=3D"${VALGRIND_LOGFILE}" --error-exitcode=3D=
+99 "$QEMU_IO_PROG" $QEMU_IO_ARGS "$@";
+  +else
+  +    exec "$QEMU_IO_PROG" $QEMU_IO_ARGS "$@";
+  +fi )
+
+   =3D=3D verifying the converted snapshot with patterns, method 1 =3D=3D
+   read 4096/4096 bytes at offset 4096
+  Failures: 058
+  Failed 1 of 1 tests
+
+  with out gcov configured this test case is pass.
+  # ./check -qcow2 58
+  QEMU          -- "/home/nasastry/qemu/ppc64-softmmu/qemu-system-ppc64" -n=
+odefaults -machine accel=3Dqtest
+  QEMU_IMG      -- "/home/nasastry/qemu/qemu-img"
+  QEMU_IO       -- "/home/nasastry/qemu/qemu-io"  --cache writeback -f qcow2
+  QEMU_NBD      -- "/home/nasastry/qemu/qemu-nbd"
+  IMGFMT        -- qcow2 (compat=3D1.1)
+  IMGPROTO      -- file
+  PLATFORM      -- Linux/ppc64le zzfp365-lp1 4.13.0-4.rel.git49564cb.el7.ce=
+ntos.ppc64le
+  TEST_DIR      -- /home/nasastry/qemu/tests/qemu-iotests/scratch
+  SOCKET_SCM_HELPER -- /home/nasastry/qemu/tests/qemu-iotests/socket_scm_he=
+lper
+
+  058 0s ...
+  Passed all 1 tests
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1727259/+subscriptions
