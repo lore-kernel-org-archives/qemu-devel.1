@@ -1,32 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58343)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59521)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eXVfp-0003Ut-K6
-	for qemu-devel@nongnu.org; Fri, 05 Jan 2018 12:20:54 -0500
+	(envelope-from <stefanha@redhat.com>) id 1eXVhc-0004Of-Dg
+	for qemu-devel@nongnu.org; Fri, 05 Jan 2018 12:22:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eXVfm-0000Yk-FH
-	for qemu-devel@nongnu.org; Fri, 05 Jan 2018 12:20:53 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:47058)
+	(envelope-from <stefanha@redhat.com>) id 1eXVhZ-0002jO-8K
+	for qemu-devel@nongnu.org; Fri, 05 Jan 2018 12:22:44 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:57498)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1eXVfm-0000XI-3d
-	for qemu-devel@nongnu.org; Fri, 05 Jan 2018 12:20:50 -0500
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 534028BD20
-	for <qemu-devel@nongnu.org>; Fri,  5 Jan 2018 17:20:49 +0000 (UTC)
-References: <20180105170138.23357-1-dgilbert@redhat.com>
-	<20180105170138.23357-2-dgilbert@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <8f12d622-5d32-3317-aa8f-5a36916157e5@redhat.com>
-Date: Fri, 5 Jan 2018 11:20:47 -0600
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1eXVhY-0002i5-St
+	for qemu-devel@nongnu.org; Fri, 05 Jan 2018 12:22:41 -0500
+Date: Fri, 5 Jan 2018 17:22:26 +0000
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20180105172226.GL28322@stefanha-x1.localdomain>
+References: <20171219084557.9801-1-peterx@redhat.com>
+	<20171219084557.9801-11-peterx@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20180105170138.23357-2-dgilbert@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="KwmMXLnBP11NunFFM0lLYZgjLafAhAQnM"
-Subject: Re: [Qemu-devel] [PATCH 1/2] find_ram_offset: Add comments and
- tracing
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="Mit9XoPEfICDqq/V"
+Content-Disposition: inline
+In-Reply-To: <20171219084557.9801-11-peterx@redhat.com>
+Subject: Re: [Qemu-devel] [RFC v6 10/27] monitor: allow to use IO thread for
+ parsing
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,67 +29,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>, qemu-devel@nongnu.org, pbonzini@redhat.com
-
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---KwmMXLnBP11NunFFM0lLYZgjLafAhAQnM
-From: Eric Blake <eblake@redhat.com>
-To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>,
- qemu-devel@nongnu.org, pbonzini@redhat.com
-Message-ID: <8f12d622-5d32-3317-aa8f-5a36916157e5@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 1/2] find_ram_offset: Add comments and
- tracing
-References: <20180105170138.23357-1-dgilbert@redhat.com>
- <20180105170138.23357-2-dgilbert@redhat.com>
-In-Reply-To: <20180105170138.23357-2-dgilbert@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 01/05/2018 11:01 AM, Dr. David Alan Gilbert (git) wrote:
-> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
->=20
-> Add some comments so I can understand the various nested loops.
-> Add some tracing so I can see what they're doing.
->=20
-> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> ---
->  exec.c       | 17 ++++++++++++++++-
->  trace-events |  3 +++
->  2 files changed, 19 insertions(+), 1 deletion(-)
->=20
-
-> +
-> +        /* If it fits remember our place and remember the size
-> +         * of gap, but keep going so that we might find a smaller
-> +         * gap to fill so avoiding fragmentation.
-
-s/so avoiding/in order to avoid/
-
-Reviewed-by: Eric Blake <eblake@redhat.com>
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, Stefan Hajnoczi <shajnocz@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <famz@redhat.com>, Juan Quintela <quintela@redhat.com>, mdroth@linux.vnet.ibm.com, Eric Blake <eblake@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Markus Armbruster <armbru@redhat.com>, marcandre.lureau@redhat.com, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 
 
---KwmMXLnBP11NunFFM0lLYZgjLafAhAQnM
+--Mit9XoPEfICDqq/V
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+
+On Tue, Dec 19, 2017 at 04:45:40PM +0800, Peter Xu wrote:
+>      if (monitor_is_qmp(mon)) {
+> -        qemu_chr_fe_set_handlers(&mon->chr, monitor_can_read, monitor_qmp_read,
+> -                                 monitor_qmp_event, NULL, mon, NULL, true);
+>          qemu_chr_fe_set_echo(&mon->chr, true);
+>          json_message_parser_init(&mon->qmp.parser, handle_qmp_command);
+> +        qemu_chr_fe_set_handlers(&mon->chr, monitor_can_read, monitor_qmp_read,
+> +                                 monitor_qmp_event, NULL, mon, context, true);
+>      } else {
+> +        assert(!context);       /* HMP does not support IOThreads */
+>          qemu_chr_fe_set_handlers(&mon->chr, monitor_can_read, monitor_read,
+>                                   monitor_event, NULL, mon, NULL, true);
+>      }
+
+qemu_chr_fe_set_handlers() isn't thread-safe.  It looks like
+monitor_can_read()/monitor_qmp_read() can run in the IOThread at the
+same time as monitor_qmp_event() runs in the main loop:
+
+  void qemu_chr_fe_set_handlers(CharBackend *b,
+                                IOCanReadHandler *fd_can_read,
+                                IOReadHandler *fd_read,
+                                IOEventHandler *fd_event,
+                                BackendChangeHandler *be_change,
+                                void *opaque,
+                                GMainContext *context,
+                                bool set_open)
+  {
+      ...
+
+      qemu_chr_be_update_read_handlers(s, context);
+        ^-- The IOThread may invoke handler functions from now on!
+
+      <-- Everything below races with the IOThread!
+
+      if (set_open) {
+          qemu_chr_fe_set_open(b, fe_open);
+      }
+
+      if (fe_open) {
+          qemu_chr_fe_take_focus(b);
+          /* We're connecting to an already opened device, so let's make sure we
+             also get the open event */
+          if (s->be_open) {
+              qemu_chr_be_event(s, CHR_EVENT_OPENED);
+          }
+      }
+
+      if (CHARDEV_IS_MUX(s)) {
+          mux_chr_set_handlers(s, context);
+      }
+  }
+
+It looks like chr_*() functions must be called from the event loop
+thread that monitors the chardev.  You can use aio_bh_schedule_oneshot()
+or g_idle_source_new() to execute the last part of monitor_init() in the
+GMainContext.
+
+That way there is no race condition because qemu_chr_fe_set_handlers()
+is called from within the event loop thread.
+
+--Mit9XoPEfICDqq/V
 Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlpPs+8ACgkQp6FrSiUn
-Q2okhwgAhBNWdRryhHBZnyHMX4zn1LDPw62sC6l0i1al4qCrnYAow31RtcGwjAw1
-imgPmZb54e7K4p+s8T23lZowDo6nu6D0CsYaO4k0ieL9yVsCGt7li849iNxjaaKD
-f/8teHmxFhK8Nm5VR9xgOs70N6EtNkwHqFUMUlg1kv3FNgNP4XygrzJx0o25vBAt
-VvZEpogrHnrrWkPdXe5ZwFXGw7xygDl8NkIkcAfP3KjEQI96C7otakCPGkZjTV5M
-6kC7NPIvVaocZTxx2/amsdhlyYbBC/2CQv3GCWotpD+aMKFeSg72SGvp7fAjaK3I
-0d7BBFUoM50qhKxz41AFeqfoLsCAEw==
-=v4Al
+iQEcBAEBAgAGBQJaT7RSAAoJEJykq7OBq3PIhqwH/3PLjEcl7zkDdlh5ZxcCTE6m
+fLSHLSU71kw78i1zgISnfq7aYyX2x4rvWszjQsM3AFM8q+khk2IUlsxD5rYuwx1M
+9gZu9Fr1bXYfi+heqmw2esWc6BEmYJuN6gccfjg1McYxQyH+d0Eg35VA1VPH6ev5
+5MujUWyQBPTliG5VfgPB9Bfr/s2uh6zhAgeLW2lnHABMN60/uOuWmirZuylBxXQx
+6juU5GY5ywBxNCJze7KAH/t9qvvmphqNyNhpWSm4T4fb3g2/e5xNXlKAj3xYpwbk
+JPINTFVH0iMKA9vFCxafquDWdSwMH0S4ajWyr60Trl7uBwyn9UKefa4EwQyxu9g=
+=VNJJ
 -----END PGP SIGNATURE-----
 
---KwmMXLnBP11NunFFM0lLYZgjLafAhAQnM--
+--Mit9XoPEfICDqq/V--
