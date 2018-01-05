@@ -1,22 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42344)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47255)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jbaron@akamai.com>) id 1eXajt-00051W-38
-	for qemu-devel@nongnu.org; Fri, 05 Jan 2018 17:45:26 -0500
+	(envelope-from <eblake@redhat.com>) id 1eXawC-0002nQ-Ob
+	for qemu-devel@nongnu.org; Fri, 05 Jan 2018 17:58:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jbaron@akamai.com>) id 1eXajr-0005eP-9K
-	for qemu-devel@nongnu.org; Fri, 05 Jan 2018 17:45:24 -0500
-Received: from mx0b-00190b01.pphosted.com ([2620:100:9005:57f::1]:53062)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jbaron@akamai.com>) id 1eXajq-0005ds-8K
-	for qemu-devel@nongnu.org; Fri, 05 Jan 2018 17:45:22 -0500
-From: Jason Baron <jbaron@akamai.com>
-Date: Fri,  5 Jan 2018 17:44:55 -0500
-Message-Id: <cb116634b45b4da0c437ca54cd979c703fc6b920.1515190612.git.jbaron@akamai.com>
-In-Reply-To: <cover.1515190238.git.jbaron@akamai.com>
-References: <cover.1515190238.git.jbaron@akamai.com>
-References: <cover.1515190238.git.jbaron@akamai.com>
-Subject: [Qemu-devel] [PATCH v4 3/3] qemu: add linkspeed and duplex settings
- to virtio-net
+	(envelope-from <eblake@redhat.com>) id 1eXawB-0008Qn-F3
+	for qemu-devel@nongnu.org; Fri, 05 Jan 2018 17:58:08 -0500
+From: Eric Blake <eblake@redhat.com>
+Date: Fri,  5 Jan 2018 16:57:33 -0600
+Message-Id: <20180105225753.30509-1-eblake@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v7 00/20] add byte-based block_status driver
+ callbacks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,153 +21,106 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: mst@redhat.com
-Cc: davem@davemloft.net, jasowang@redhat.com, netdev@vger.kernel.org, virtualization@lists.linux-foundation.org, qemu-devel@nongnu.org, virtio-dev@lists.oasis-open.org
+To: qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, famz@redhat.com, jcody@redhat.com, qemu-block@nongnu.org, vsementsov@virtuozzo.com
 
-Although linkspeed and duplex can be set in a linux guest via 'ethtool -s',
-this requires custom ethtool commands for virtio-net by default.
+There are patches floating around to add NBD_CMD_BLOCK_STATUS,
+but NBD wants to report status on byte granularity (even if the
+reporting will probably be naturally aligned to sectors or even
+much higher levels).  I've therefore started the task of
+converting our block status code to report at a byte granularity
+rather than sectors.
 
-Introduce a new feature flag, VIRTIO_NET_F_SPEED_DUPLEX, which allows
-the hypervisor to export a linkspeed and duplex setting. The user can
-subsequently overwrite it later if desired via: 'ethtool -s'.
+These patches have been around for a while, but it's time to
+finish it now that 2.12 is open for patches.
 
-Linkspeed and duplex settings can be set as:
-'-device virtio-net,speed=10000,duplex=full'
+Based-on: <20171222151846.28110-1-kwolf@redhat.com>
+(Kevin's [PULL v3 00/35] Block layer patches)
 
-where speed is [-1...INT_MAX], and duplex is ["half"|"full"].
+The overall conversion currently looks like:
+part 1: bdrv_is_allocated (merged, commit 51b0a488, 2.10)
+part 2: dirty-bitmap (merged, commit ca759622, 2.11)
+part 3: bdrv_get_block_status (merged, commit f0a9c18f, 2.11)
+part 4: .bdrv_co_block_status (this series, v5 was here [1])
 
-Signed-off-by: Jason Baron <jbaron@akamai.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Jason Wang <jasowang@redhat.com>
-Cc: virtio-dev@lists.oasis-open.org
----
- hw/net/virtio-net.c                         | 32 +++++++++++++++++++++++++++++
- include/hw/virtio/virtio-net.h              |  3 +++
- include/standard-headers/linux/virtio_net.h | 13 ++++++++++++
- 3 files changed, 48 insertions(+)
+[1] https://lists.gnu.org/archive/html/qemu-devel/2017-12/msg01246.html
 
-diff --git a/hw/net/virtio-net.c b/hw/net/virtio-net.c
-index 54823af..cd63659 100644
---- a/hw/net/virtio-net.c
-+++ b/hw/net/virtio-net.c
-@@ -40,6 +40,12 @@
- #define VIRTIO_NET_RX_QUEUE_MIN_SIZE VIRTIO_NET_RX_QUEUE_DEFAULT_SIZE
- #define VIRTIO_NET_TX_QUEUE_MIN_SIZE VIRTIO_NET_TX_QUEUE_DEFAULT_SIZE
- 
-+/* duplex and speed */
-+#define DUPLEX_UNKNOWN          0xff
-+#define DUPLEX_HALF             0x00
-+#define DUPLEX_FULL             0x01
-+#define SPEED_UNKNOWN           -1
-+
- /*
-  * Calculate the number of bytes up to and including the given 'field' of
-  * 'container'.
-@@ -61,6 +67,8 @@ static VirtIOFeature feature_sizes[] = {
-      .end = endof(struct virtio_net_config, max_virtqueue_pairs)},
-     {.flags = 1ULL << VIRTIO_NET_F_MTU,
-      .end = endof(struct virtio_net_config, mtu)},
-+    {.flags = 1ULL << VIRTIO_NET_F_SPEED_DUPLEX,
-+     .end = endof(struct virtio_net_config, duplex)},
-     {}
- };
- 
-@@ -89,6 +97,8 @@ static void virtio_net_get_config(VirtIODevice *vdev, uint8_t *config)
-     virtio_stw_p(vdev, &netcfg.max_virtqueue_pairs, n->max_queues);
-     virtio_stw_p(vdev, &netcfg.mtu, n->net_conf.mtu);
-     memcpy(netcfg.mac, n->mac, ETH_ALEN);
-+    virtio_stl_p(vdev, &netcfg.speed, n->net_conf.speed);
-+    netcfg.duplex = n->net_conf.duplex;
-     memcpy(config, &netcfg, n->config_size);
- }
- 
-@@ -1941,6 +1951,26 @@ static void virtio_net_device_realize(DeviceState *dev, Error **errp)
-         n->host_features |= (1ULL << VIRTIO_NET_F_MTU);
-     }
- 
-+    if (n->net_conf.duplex_str) {
-+        if (strncmp(n->net_conf.duplex_str, "half", 5) == 0) {
-+            n->net_conf.duplex = DUPLEX_HALF;
-+        } else if (strncmp(n->net_conf.duplex_str, "full", 5) == 0) {
-+            n->net_conf.duplex = DUPLEX_FULL;
-+        } else {
-+            error_setg(errp, "'duplex' must be 'half' or 'full'");
-+        }
-+        n->host_features |= (1ULL << VIRTIO_NET_F_SPEED_DUPLEX);
-+    } else {
-+        n->net_conf.duplex = DUPLEX_UNKNOWN;
-+    }
-+
-+    if (n->net_conf.speed < SPEED_UNKNOWN) {
-+        error_setg(errp, "'speed' must be between -1 (SPEED_UNKOWN) and "
-+                   "INT_MAX");
-+    } else if (n->net_conf.speed >= 0) {
-+        n->host_features |= (1ULL << VIRTIO_NET_F_SPEED_DUPLEX);
-+    }
-+
-     virtio_net_set_config_size(n, n->host_features);
-     virtio_init(vdev, "virtio-net", VIRTIO_ID_NET, n->config_size);
- 
-@@ -2161,6 +2191,8 @@ static Property virtio_net_properties[] = {
-     DEFINE_PROP_UINT16("host_mtu", VirtIONet, net_conf.mtu, 0),
-     DEFINE_PROP_BOOL("x-mtu-bypass-backend", VirtIONet, mtu_bypass_backend,
-                      true),
-+    DEFINE_PROP_INT32("speed", VirtIONet, net_conf.speed, SPEED_UNKNOWN),
-+    DEFINE_PROP_STRING("duplex", VirtIONet, net_conf.duplex_str),
-     DEFINE_PROP_END_OF_LIST(),
- };
- 
-diff --git a/include/hw/virtio/virtio-net.h b/include/hw/virtio/virtio-net.h
-index e7634c9..02484dc 100644
---- a/include/hw/virtio/virtio-net.h
-+++ b/include/hw/virtio/virtio-net.h
-@@ -38,6 +38,9 @@ typedef struct virtio_net_conf
-     uint16_t rx_queue_size;
-     uint16_t tx_queue_size;
-     uint16_t mtu;
-+    int32_t speed;
-+    char *duplex_str;
-+    uint8_t duplex;
- } virtio_net_conf;
- 
- /* Maximum packet size we can receive from tap device: header + 64k */
-diff --git a/include/standard-headers/linux/virtio_net.h b/include/standard-headers/linux/virtio_net.h
-index 30ff249..17c8531 100644
---- a/include/standard-headers/linux/virtio_net.h
-+++ b/include/standard-headers/linux/virtio_net.h
-@@ -57,6 +57,8 @@
- 					 * Steering */
- #define VIRTIO_NET_F_CTRL_MAC_ADDR 23	/* Set MAC address */
- 
-+#define VIRTIO_NET_F_SPEED_DUPLEX 63   /* Device set linkspeed and duplex */
-+
- #ifndef VIRTIO_NET_NO_LEGACY
- #define VIRTIO_NET_F_GSO	6	/* Host handles pkts w/ any GSO type */
- #endif /* VIRTIO_NET_NO_LEGACY */
-@@ -76,6 +78,17 @@ struct virtio_net_config {
- 	uint16_t max_virtqueue_pairs;
- 	/* Default maximum transmit unit advice */
- 	uint16_t mtu;
-+	/*
-+	 * speed, in units of 1Mb. All values 0 to INT_MAX are legal.
-+	 * Any other value stands for unknown.
-+	 */
-+	uint32_t speed;
-+	/*
-+	 * 0x00 - half duplex
-+	 * 0x01 - full duplex
-+	 * Any other value stands for unknown.
-+	 */
-+	uint8_t duplex;
- } QEMU_PACKED;
- 
- /*
-diff --git a/pixman b/pixman
-new file mode 160000
-index 0000000..87eea99
---- /dev/null
-+++ b/pixman
-@@ -0,0 +1 @@
-+Subproject commit 87eea99e443b389c978cf37efc52788bf03a0ee0
--- 
-2.6.1
+Available as a tag at:
+git fetch git://repo.or.cz/qemu/ericb.git nbd-byte-callback-v7
+
+Since v6:
+- add R-bs
+- improve some commit messages, comments, and variable types [Fam]
+- fix conversion bugs [Vladimir]
+- rebase to master (well, Kevin's pull request) [Jeff]
+
+001/20:[----] [--] 'block: Add .bdrv_co_block_status() callback'
+002/20:[----] [--] 'block: Switch passthrough drivers to .bdrv_co_block_s=
+tatus()'
+003/20:[----] [--] 'file-posix: Switch to .bdrv_co_block_status()'
+004/20:[----] [--] 'gluster: Switch to .bdrv_co_block_status()'
+005/20:[----] [--] 'iscsi: Switch cluster_sectors to byte-based'
+006/20:[0004] [FC] 'iscsi: Switch iscsi_allocmap_update() to byte-based'
+007/20:[0006] [FC] 'iscsi: Switch to .bdrv_co_block_status()'
+008/20:[----] [--] 'null: Switch to .bdrv_co_block_status()'
+009/20:[0002] [FC] 'parallels: Switch to .bdrv_co_block_status()'
+010/20:[----] [--] 'qcow: Switch to .bdrv_co_block_status()'
+011/20:[----] [--] 'qcow2: Switch to .bdrv_co_block_status()'
+012/20:[----] [--] 'qed: Switch to .bdrv_co_block_status()'
+013/20:[----] [--] 'raw: Switch to .bdrv_co_block_status()'
+014/20:[0012] [FC] 'sheepdog: Switch to .bdrv_co_block_status()'
+015/20:[----] [--] 'vdi: Avoid bitrot of debugging code'
+016/20:[----] [--] 'vdi: Switch to .bdrv_co_block_status()'
+017/20:[----] [--] 'vmdk: Switch to .bdrv_co_block_status()'
+018/20:[0002] [FC] 'vpc: Switch to .bdrv_co_block_status()'
+019/20:[----] [--] 'vvfat: Switch to .bdrv_co_block_status()'
+020/20:[----] [--] 'block: Drop unused .bdrv_co_get_block_status()'
+
+Eric Blake (20):
+  block: Add .bdrv_co_block_status() callback
+  block: Switch passthrough drivers to .bdrv_co_block_status()
+  file-posix: Switch to .bdrv_co_block_status()
+  gluster: Switch to .bdrv_co_block_status()
+  iscsi: Switch cluster_sectors to byte-based
+  iscsi: Switch iscsi_allocmap_update() to byte-based
+  iscsi: Switch to .bdrv_co_block_status()
+  null: Switch to .bdrv_co_block_status()
+  parallels: Switch to .bdrv_co_block_status()
+  qcow: Switch to .bdrv_co_block_status()
+  qcow2: Switch to .bdrv_co_block_status()
+  qed: Switch to .bdrv_co_block_status()
+  raw: Switch to .bdrv_co_block_status()
+  sheepdog: Switch to .bdrv_co_block_status()
+  vdi: Avoid bitrot of debugging code
+  vdi: Switch to .bdrv_co_block_status()
+  vmdk: Switch to .bdrv_co_block_status()
+  vpc: Switch to .bdrv_co_block_status()
+  vvfat: Switch to .bdrv_co_block_status()
+  block: Drop unused .bdrv_co_get_block_status()
+
+ include/block/block.h     |  14 ++---
+ include/block/block_int.h |  51 +++++++++------
+ block/io.c                |  86 +++++++++++--------------
+ block/blkdebug.c          |  20 +++---
+ block/commit.c            |   2 +-
+ block/file-posix.c        |  62 +++++++++---------
+ block/gluster.c           |  70 ++++++++++-----------
+ block/iscsi.c             | 157 ++++++++++++++++++++++++----------------=
+------
+ block/mirror.c            |   2 +-
+ block/null.c              |  23 +++----
+ block/parallels.c         |  22 ++++---
+ block/qcow.c              |  27 ++++----
+ block/qcow2.c             |  24 +++----
+ block/qed.c               |  84 +++++++++----------------
+ block/raw-format.c        |  16 ++---
+ block/sheepdog.c          |  26 ++++----
+ block/throttle.c          |   2 +-
+ block/vdi.c               |  45 +++++++------
+ block/vmdk.c              |  38 +++++------
+ block/vpc.c               |  45 ++++++-------
+ block/vvfat.c             |  16 +++--
+ 21 files changed, 404 insertions(+), 428 deletions(-)
+
+--=20
+2.14.3
