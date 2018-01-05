@@ -1,34 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49518)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59392)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eXXiE-0004Le-BY
-	for qemu-devel@nongnu.org; Fri, 05 Jan 2018 14:31:32 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1eXXrk-00082W-00
+	for qemu-devel@nongnu.org; Fri, 05 Jan 2018 14:41:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eXXiB-00064e-6P
-	for qemu-devel@nongnu.org; Fri, 05 Jan 2018 14:31:30 -0500
-Received: from indium.canonical.com ([91.189.90.7]:46132)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1eXXiA-00063r-QV
-	for qemu-devel@nongnu.org; Fri, 05 Jan 2018 14:31:27 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1eXXi8-0000d8-T5
-	for <qemu-devel@nongnu.org>; Fri, 05 Jan 2018 19:31:25 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 1F2C32E81A2
-	for <qemu-devel@nongnu.org>; Fri,  5 Jan 2018 19:31:18 +0000 (UTC)
+	(envelope-from <dgilbert@redhat.com>) id 1eXXre-0007vL-Rg
+	for qemu-devel@nongnu.org; Fri, 05 Jan 2018 14:41:19 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:46218)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1eXXre-0007uS-Ez
+	for qemu-devel@nongnu.org; Fri, 05 Jan 2018 14:41:14 -0500
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id B5EE7780EF
+	for <qemu-devel@nongnu.org>; Fri,  5 Jan 2018 19:41:12 +0000 (UTC)
+Date: Fri, 5 Jan 2018 19:41:04 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20180105194104.GC2490@work-vm>
+References: <20171201125813.1437-1-quintela@redhat.com>
+	<20171201125813.1437-6-quintela@redhat.com>
+	<20171208114241.GJ2403@work-vm> <87r2r4nmbq.fsf@secure.laptop>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 05 Jan 2018 19:23:25 -0000
-From: =?utf-8?q?Murilo_Opsfelder_Ara=C3=BAjo?= <1727250@bugs.launchpad.net>
-Reply-To: Bug 1727250 <1727250@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <150892252192.18283.8177817026945520523.malonedeb@chaenomeles.canonical.com>
-Message-Id: <151518020550.23791.1685099999002350263.malone@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1727250] Re: qemu-io-test 147 segfaults when
- configured with gcov
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <87r2r4nmbq.fsf@secure.laptop>
+Subject: Re: [Qemu-devel] [PATCH v3 5/6] tests: Add migration xbzrle test
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,236 +34,174 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Juan Quintela <quintela@redhat.com>
+Cc: qemu-devel@nongnu.org, lvivier@redhat.com, peterx@redhat.com
 
-I confirmed that my patch http://lists.nongnu.org/archive/html/qemu-
-devel/2018-01/msg00883.html fixes this bug too.
+* Juan Quintela (quintela@redhat.com) wrote:
+> "Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
+> > * Juan Quintela (quintela@redhat.com) wrote:
+> >> Signed-off-by: Juan Quintela <quintela@redhat.com>
+> >> ---
+> >>  tests/migration-test.c | 68 ++++++++++++++++++++++++++++++++++++++++++++++++++
+> >>  1 file changed, 68 insertions(+)
+> >> 
+> >> diff --git a/tests/migration-test.c b/tests/migration-test.c
+> >> index 841c89e28a..41dee78a9a 100644
+> >> --- a/tests/migration-test.c
+> >> +++ b/tests/migration-test.c
+> >> @@ -410,6 +410,20 @@ static void deprecated_set_speed(QTestState *who, const char *value)
+> >>      migrate_check_parameter(who, "max-bandwidth", value);
+> >>  }
+> >>  
+> >> +static void deprecated_set_cache_size(QTestState *who, const char *value)
+> >> +{
+> >> +    QDict *rsp;
+> >> +    gchar *cmd;
+> >> +
+> >> +    cmd = g_strdup_printf("{ 'execute': 'migrate-set-cache-size',"
+> >> +                          "'arguments': { 'value': %s } }", value);
+> >> +    rsp = qtest_qmp(who, cmd);
+> >> +    g_free(cmd);
+> >> +    g_assert(qdict_haskey(rsp, "return"));
+> >> +    QDECREF(rsp);
+> >> +    migrate_check_parameter(who, "xbzrle-cache-size", value);
+> >> +}
+> >> +
+> >>  static void migrate_set_parameter(QTestState *who, const char *parameter,
+> >>                                    const char *value)
+> >>  {
+> >> @@ -424,6 +438,10 @@ static void migrate_set_parameter(QTestState *who, const char *parameter,
+> >>          deprecated_set_speed(who, "12345");
+> >>      }
+> >>  
+> >> +    if (strcmp(parameter, "xbzrle-cache-size") == 0) {
+> >> +        deprecated_set_cache_size(who, "4096");
+> >> +    }
+> >> +
+> >>      cmd = g_strdup_printf("{ 'execute': 'migrate-set-parameters',"
+> >>                            "'arguments': { '%s': %s } }",
+> >>                            parameter, value);
+> >> @@ -673,6 +691,55 @@ static void test_precopy_tcp(void)
+> >>      g_free(port);
+> >>  }
+> >>  
+> >> +static void test_xbzrle(const char *uri)
+> >> +{
+> >> +    QTestState *from, *to;
+> >> +
+> >> +    test_migrate_start(&from, &to, uri);
+> >> +
+> >> +    /* We want to pick a speed slow enough that the test completes
+> >> +     * quickly, but that it doesn't complete precopy even on a slow
+> >> +     * machine, so also set the downtime.
+> >> +     */
+> >> +    /* 100 ms */
+> >> +    migrate_set_parameter(from, "downtime-limit", "1");
+> >
+> > ? That's 1 ms not 100ms as the comment says?
+> 
+> Changed comment.
+> 
+> >
+> >> +    /* 1MB/s slow*/
+> >> +    migrate_set_parameter(from, "max-bandwidth", "1000000000");
+> >
+> > That's still 1GB/s isn't it?
+> 
+> Changed also.
+> 
+> > Don't you need to reduce that if xbzrle is actually working otherwise
+> > it'll complete?
+> 
+> It don't complete on my setup (dunno with a faster machine).
+> 
+> >> +    migrate_set_parameter(from, "xbzrle-cache-size", "33554432");
+> >
+> > That's 32M - why?
+> 
+> I need to check that the command is running, no clue about _which_ one
+> is better here.
+> 
+> > The test continually rewrites 100M of data; only changing one byte/page
+> > - so actually the fun way to do the xbzrle test is to leave this as 32M
+> > here.....
+> 
+> My idea here is that we somke test all the transports/commands.  Not
+> that I fully test everything.
 
-** Changed in: qemu
-       Status: New =3D> In Progress
+OK, but if you set the cache size to 150M instead of 32M then xbzrle
+should actually kick in and be tested; at 32M very little is being
+tested.
 
-** Changed in: qemu
-     Assignee: (unassigned) =3D> Murilo Opsfelder Ara=C3=BAjo (mopsfelder)
+> See on my next series, It already takes around 15 seconds, just adding
+> stuff will make things go longer really fast.
+> 
+> BTW, is there a trivial way to convince qtest/getestr whatevre to run
+> all the migration tests in parallel?
 
--- =
+Not that I know of.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1727250
+Dave
 
-Title:
-  qemu-io-test 147 segfaults when configured with gcov
-
-Status in QEMU:
-  In Progress
-
-Bug description:
-  Head is at 3d7196d43bfe12efe98568cb60057e273652b99b
-
-  Steps to re-produce:
-  1. git clone
-  ./configure --enable-gcov --target-list=3Dppc64-softmmu
-  make
-  cd tests/qemu-iotests
-
-  2. export qemu binary, in my environment
-  export QEMU_PROG=3D/home/nasastry/qemu_gcov/ppc64-softmmu/qemu-system-ppc=
-64
-
-  3. Run test 147 with format qcow2
-  ./check -qcow2 147
-
-  QEMU          -- "/home/nasastry/qemu_gcov/ppc64-softmmu/qemu-system-ppc6=
-4" -nodefaults -machine accel=3Dqtest
-  QEMU_IMG      -- "/home/nasastry/qemu/qemu-img"
-  QEMU_IO       -- "/home/nasastry/qemu/qemu-io"  --cache writeback -f qcow2
-  QEMU_NBD      -- "/home/nasastry/qemu/qemu-nbd"
-  IMGFMT        -- qcow2 (compat=3D1.1)
-  IMGPROTO      -- file
-  PLATFORM      -- Linux/ppc64le zzfp365-lp1 4.13.0-4.rel.git49564cb.el7.ce=
-ntos.ppc64le
-  TEST_DIR      -- /home/nasastry/qemu/tests/qemu-iotests/scratch
-  SOCKET_SCM_HELPER -- /home/nasastry/qemu/tests/qemu-iotests/socket_scm_he=
-lper
-
-  147 0s ... [failed, exit status 1] - output mismatch (see 147.out.bad)
-  --- /home/nasastry/qemu/tests/qemu-iotests/147.out	2017-10-25 14:04:54.97=
-8600753 +0530
-  +++ /home/nasastry/qemu/tests/qemu-iotests/147.out.bad	2017-10-25 14:09:5=
-3.769783770 +0530
-  @@ -1,5 +1,95 @@
-  -......
-  +WARNING:qemu:qemu received signal -11: /home/nasastry/qemu_gcov/ppc64-so=
-ftmmu/qemu-system-ppc64 -chardev socket,id=3Dmon,path=3D/home/nasastry/qemu=
-/tests/qemu-iotests/scratch/qemu-28636-monitor.sock -mon chardev=3Dmon,mode=
-=3Dcontrol -display none -vga none -qtest unix:path=3D/home/nasastry/qemu/t=
-ests/qemu-iotests/scratch/qemu-28636-qtest.sock -machine accel=3Dqtest -nod=
-efaults -machine accel=3Dqtest
-  +WARNING:qemu:qemu received signal -11: /home/nasastry/qemu_gcov/ppc64-so=
-ftmmu/qemu-system-ppc64 -chardev socket,id=3Dmon,path=3D/home/nasastry/qemu=
-/tests/qemu-iotests/scratch/qemu-28636-monitor.sock -mon chardev=3Dmon,mode=
-=3Dcontrol -display none -vga none -qtest unix:path=3D/home/nasastry/qemu/t=
-ests/qemu-iotests/scratch/qemu-28636-qtest.sock -machine accel=3Dqtest -nod=
-efaults -machine accel=3Dqtest
-  +WARNING:qemu:qemu received signal -11: /home/nasastry/qemu_gcov/ppc64-so=
-ftmmu/qemu-system-ppc64 -chardev socket,id=3Dmon,path=3D/home/nasastry/qemu=
-/tests/qemu-iotests/scratch/qemu-28636-monitor.sock -mon chardev=3Dmon,mode=
-=3Dcontrol -display none -vga none -qtest unix:path=3D/home/nasastry/qemu/t=
-ests/qemu-iotests/scratch/qemu-28636-qtest.sock -machine accel=3Dqtest -nod=
-efaults -machine accel=3Dqtest
-  +WARNING:qemu:qemu received signal -11: /home/nasastry/qemu_gcov/ppc64-so=
-ftmmu/qemu-system-ppc64 -chardev socket,id=3Dmon,path=3D/home/nasastry/qemu=
-/tests/qemu-iotests/scratch/qemu-28636-monitor.sock -mon chardev=3Dmon,mode=
-=3Dcontrol -display none -vga none -qtest unix:path=3D/home/nasastry/qemu/t=
-ests/qemu-iotests/scratch/qemu-28636-qtest.sock -machine accel=3Dqtest -nod=
-efaults -machine accel=3Dqtest
-  +WARNING:qemu:qemu received signal -11: /home/nasastry/qemu_gcov/ppc64-so=
-ftmmu/qemu-system-ppc64 -chardev socket,id=3Dmon,path=3D/home/nasastry/qemu=
-/tests/qemu-iotests/scratch/qemu-28636-monitor.sock -mon chardev=3Dmon,mode=
-=3Dcontrol -display none -vga none -qtest unix:path=3D/home/nasastry/qemu/t=
-ests/qemu-iotests/scratch/qemu-28636-qtest.sock -machine accel=3Dqtest -nod=
-efaults -machine accel=3Dqtest
-  +WARNING:qemu:qemu received signal -11: /home/nasastry/qemu_gcov/ppc64-so=
-ftmmu/qemu-system-ppc64 -chardev socket,id=3Dmon,path=3D/home/nasastry/qemu=
-/tests/qemu-iotests/scratch/qemu-28636-monitor.sock -mon chardev=3Dmon,mode=
-=3Dcontrol -display none -vga none -qtest unix:path=3D/home/nasastry/qemu/t=
-ests/qemu-iotests/scratch/qemu-28636-qtest.sock -machine accel=3Dqtest -nod=
-efaults -machine accel=3Dqtest
-  +FFFFFF
-  +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-  +FAIL: test_fd (__main__.BuiltinNBD)
-  +----------------------------------------------------------------------
-  +Traceback (most recent call last):
-  +  File "147", line 203, in test_fd
-  +    self.client_test(filename, flatten_sock_addr(address), 'nbd-export')
-  +  File "147", line 55, in client_test
-  +    self.assert_qmp(result, 'return', {})
-  +  File "/home/nasastry/qemu/tests/qemu-iotests/iotests.py", line 315, in=
- assert_qmp
-  +    result =3D self.dictpath(d, path)
-  +  File "/home/nasastry/qemu/tests/qemu-iotests/iotests.py", line 274, in=
- dictpath
-  +    self.fail('failed path traversal for "%s" in "%s"' % (path, str(d)))
-  +AssertionError: failed path traversal for "return" in "None"
-  +
-  +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-  +FAIL: test_inet (__main__.BuiltinNBD)
-  +----------------------------------------------------------------------
-  +Traceback (most recent call last):
-  +  File "147", line 146, in test_inet
-  +    flatten_sock_addr(address), 'nbd-export')
-  +  File "147", line 55, in client_test
-  +    self.assert_qmp(result, 'return', {})
-  +  File "/home/nasastry/qemu/tests/qemu-iotests/iotests.py", line 315, in=
- assert_qmp
-  +    result =3D self.dictpath(d, path)
-  +  File "/home/nasastry/qemu/tests/qemu-iotests/iotests.py", line 274, in=
- dictpath
-  +    self.fail('failed path traversal for "%s" in "%s"' % (path, str(d)))
-  +AssertionError: failed path traversal for "return" in "None"
-  +
-  +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-  +FAIL: test_inet6 (__main__.BuiltinNBD)
-  +----------------------------------------------------------------------
-  +Traceback (most recent call last):
-  +  File "147", line 171, in test_inet6
-  +    self.client_test(filename, flatten_sock_addr(address), 'nbd-export')
-  +  File "147", line 55, in client_test
-  +    self.assert_qmp(result, 'return', {})
-  +  File "/home/nasastry/qemu/tests/qemu-iotests/iotests.py", line 315, in=
- assert_qmp
-  +    result =3D self.dictpath(d, path)
-  +  File "/home/nasastry/qemu/tests/qemu-iotests/iotests.py", line 274, in=
- dictpath
-  +    self.fail('failed path traversal for "%s" in "%s"' % (path, str(d)))
-  +AssertionError: failed path traversal for "return" in "None"
-  +
-  +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-  +FAIL: test_unix (__main__.BuiltinNBD)
-  +----------------------------------------------------------------------
-  +Traceback (most recent call last):
-  +  File "147", line 179, in test_unix
-  +    flatten_sock_addr(address), 'nbd-export')
-  +  File "147", line 55, in client_test
-  +    self.assert_qmp(result, 'return', {})
-  +  File "/home/nasastry/qemu/tests/qemu-iotests/iotests.py", line 315, in=
- assert_qmp
-  +    result =3D self.dictpath(d, path)
-  +  File "/home/nasastry/qemu/tests/qemu-iotests/iotests.py", line 274, in=
- dictpath
-  +    self.fail('failed path traversal for "%s" in "%s"' % (path, str(d)))
-  +AssertionError: failed path traversal for "return" in "None"
-  +
-  +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-  +FAIL: test_inet (__main__.QemuNBD)
-  +----------------------------------------------------------------------
-  +Traceback (most recent call last):
-  +  File "147", line 96, in test_inet
-  +    flatten_sock_addr(address))
-  +  File "147", line 55, in client_test
-  +    self.assert_qmp(result, 'return', {})
-  +  File "/home/nasastry/qemu/tests/qemu-iotests/iotests.py", line 315, in=
- assert_qmp
-  +    result =3D self.dictpath(d, path)
-  +  File "/home/nasastry/qemu/tests/qemu-iotests/iotests.py", line 274, in=
- dictpath
-  +    self.fail('failed path traversal for "%s" in "%s"' % (path, str(d)))
-  +AssertionError: failed path traversal for "return" in "None"
-  +
-  +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-  +FAIL: test_unix (__main__.QemuNBD)
-  +----------------------------------------------------------------------
-  +Traceback (most recent call last):
-  +  File "147", line 103, in test_unix
-  +    flatten_sock_addr(address))
-  +  File "147", line 55, in client_test
-  +    self.assert_qmp(result, 'return', {})
-  +  File "/home/nasastry/qemu/tests/qemu-iotests/iotests.py", line 315, in=
- assert_qmp
-  +    result =3D self.dictpath(d, path)
-  +  File "/home/nasastry/qemu/tests/qemu-iotests/iotests.py", line 274, in=
- dictpath
-  +    self.fail('failed path traversal for "%s" in "%s"' % (path, str(d)))
-  +AssertionError: failed path traversal for "return" in "None"
-  +
-   ----------------------------------------------------------------------
-   Ran 6 tests
-
-  -OK
-  +FAILED (failures=3D6)
-  Failures: 147
-  Failed 1 of 1 tests
-
-  With out gcov configured, the above test get pass.
-  export QEMU_PROG=3D/home/nasastry/qemu/ppc64-softmmu/qemu-system-ppc64
-  ./check -qcow2 147
-  QEMU          -- "/home/nasastry/qemu/ppc64-softmmu/qemu-system-ppc64" -n=
-odefaults -machine accel=3Dqtest
-  QEMU_IMG      -- "/home/nasastry/qemu/qemu-img"
-  QEMU_IO       -- "/home/nasastry/qemu/qemu-io"  --cache writeback -f qcow2
-  QEMU_NBD      -- "/home/nasastry/qemu/qemu-nbd"
-  IMGFMT        -- qcow2 (compat=3D1.1)
-  IMGPROTO      -- file
-  PLATFORM      -- Linux/ppc64le zzfp365-lp1 4.13.0-4.rel.git49564cb.el7.ce=
-ntos.ppc64le
-  TEST_DIR      -- /home/nasastry/qemu/tests/qemu-iotests/scratch
-  SOCKET_SCM_HELPER -- /home/nasastry/qemu/tests/qemu-iotests/socket_scm_he=
-lper
-
-  147
-  Passed all 1 tests
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1727250/+subscriptions
+> Later, Juan.
+> 
+> 
+> 
+> >> +    migrate_set_capability(from, "xbzrle", "true");
+> >> +    migrate_set_capability(to, "xbzrle", "true");
+> >> +    /* Wait for the first serial output from the source */
+> >> +    wait_for_serial("src_serial");
+> >> +
+> >> +    migrate(from, uri);
+> >> +
+> >> +    wait_for_migration_pass(from);
+> >> +
+> >> +    /* 300ms it should converge */
+> >> +    migrate_set_parameter(from, "downtime-limit", "300");
+> >
+> > but first increase the xvzrle cache to 120M and give it a couple of
+> > seconds delay; you might even find it completes without the downtime
+> > limit schange; but you should still do that after a few seconds.
+> > You can check the stats as well, you should get some xbzrle cache hits
+> > as long as you raised the cache size.
+> >
+> > Dave
+> >
+> >> +    if (!got_stop) {
+> >> +        qtest_qmp_eventwait(from, "STOP");
+> >> +    }
+> >> +    qtest_qmp_eventwait(to, "RESUME");
+> >> +
+> >> +    wait_for_serial("dest_serial");
+> >> +    wait_for_migration_complete(from);
+> >> +
+> >> +    test_migrate_end(from, to);
+> >> +}
+> >> +
+> >> +static void test_xbzrle_unix(void)
+> >> +{
+> >> +    char *uri = g_strdup_printf("unix:%s/migsocket", tmpfs);
+> >> +
+> >> +    test_xbzrle(uri);
+> >> +    g_free(uri);
+> >> +}
+> >> +
+> >> +
+> >>  int main(int argc, char **argv)
+> >>  {
+> >>      char template[] = "/tmp/migration-test-XXXXXX";
+> >> @@ -695,6 +762,7 @@ int main(int argc, char **argv)
+> >>      qtest_add_func("/migration/precopy/unix", test_precopy_unix);
+> >>      qtest_add_func("/migration/precopy/tcp", test_precopy_tcp);
+> >>      qtest_add_func("/migration/postcopy/unix", test_postcopy);
+> >> +    qtest_add_func("/migration/xbzrle/unix", test_xbzrle_unix);
+> >>  
+> >>      ret = g_test_run();
+> >>  
+> >> -- 
+> >> 2.14.3
+> >> 
+> > --
+> > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
