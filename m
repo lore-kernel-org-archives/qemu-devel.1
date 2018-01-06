@@ -1,29 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48271)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48272)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1eXevu-0007TU-0n
-	for qemu-devel@nongnu.org; Fri, 05 Jan 2018 22:14:08 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1eXevu-0007TY-23
+	for qemu-devel@nongnu.org; Fri, 05 Jan 2018 22:14:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1eXevr-0004yf-9L
+	(envelope-from <richard.henderson@linaro.org>) id 1eXevp-0004vT-UR
 	for qemu-devel@nongnu.org; Fri, 05 Jan 2018 22:14:06 -0500
-Received: from mail-pf0-x243.google.com ([2607:f8b0:400e:c00::243]:36022)
+Received: from mail-pg0-x241.google.com ([2607:f8b0:400e:c05::241]:32996)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1eXevr-0004wm-1J
-	for qemu-devel@nongnu.org; Fri, 05 Jan 2018 22:14:03 -0500
-Received: by mail-pf0-x243.google.com with SMTP id 23so296798pfp.3
-	for <qemu-devel@nongnu.org>; Fri, 05 Jan 2018 19:14:03 -0800 (PST)
+	id 1eXevp-0004sU-Js
+	for qemu-devel@nongnu.org; Fri, 05 Jan 2018 22:14:01 -0500
+Received: by mail-pg0-x241.google.com with SMTP id i196so2716454pgd.0
+	for <qemu-devel@nongnu.org>; Fri, 05 Jan 2018 19:14:01 -0800 (PST)
 Received: from cloudburst.twiddle.net (97-113-183-164.tukw.qwest.net.
 	[97.113.183.164]) by smtp.gmail.com with ESMTPSA id
-	g10sm17740595pfe.77.2018.01.05.19.14.00 for <qemu-devel@nongnu.org>
+	g10sm17740595pfe.77.2018.01.05.19.13.58 for <qemu-devel@nongnu.org>
 	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-	Fri, 05 Jan 2018 19:14:00 -0800 (PST)
+	Fri, 05 Jan 2018 19:13:58 -0800 (PST)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Fri,  5 Jan 2018 19:13:30 -0800
-Message-Id: <20180106031346.6650-8-richard.henderson@linaro.org>
+Date: Fri,  5 Jan 2018 19:13:29 -0800
+Message-Id: <20180106031346.6650-7-richard.henderson@linaro.org>
 In-Reply-To: <20180106031346.6650-1-richard.henderson@linaro.org>
 References: <20180106031346.6650-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH v8 07/23] tcg: Add generic vector ops for
- comparisons
+Subject: [Qemu-devel] [PATCH v8 06/23] tcg: Add generic vector ops for
+ constant shifts
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,246 +34,485 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
+Opcodes are added for scalar and vector shifts, but considering the
+varied semantics of these do not expose them to the front ends.  Do
+go ahead and provide them in case they are needed for backend expansion.
+
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- accel/tcg/tcg-runtime.h      |  30 +++++++
- tcg/tcg-op-gvec.h            |   4 +
- tcg/tcg-op.h                 |   3 +
- tcg/tcg-opc.h                |   2 +
- tcg/tcg.h                    |   1 +
- accel/tcg/tcg-runtime-gvec.c |  24 +++++
- tcg/tcg-op-gvec.c            | 202 +++++++++++++++++++++++++++++++++++++++++++
- tcg/tcg-op-vec.c             |  23 +++++
- tcg/tcg.c                    |   2 +
- tcg/README                   |   4 +
- 10 files changed, 295 insertions(+)
+ accel/tcg/tcg-runtime.h      |  15 ++
+ tcg/tcg-op-gvec.h            |  35 +++++
+ tcg/tcg-op.h                 |   5 +
+ tcg/tcg-opc.h                |  12 ++
+ tcg/tcg.h                    |   3 +
+ accel/tcg/tcg-runtime-gvec.c | 149 ++++++++++++++++++++
+ tcg/tcg-op-gvec.c            | 318 ++++++++++++++++++++++++++++++++++++++++++-
+ tcg/tcg-op-vec.c             |  45 ++++++
+ tcg/tcg.c                    |  12 ++
+ tcg/README                   |  29 ++++
+ 10 files changed, 617 insertions(+), 6 deletions(-)
 
 diff --git a/accel/tcg/tcg-runtime.h b/accel/tcg/tcg-runtime.h
-index cb05a755b8..28abf30d76 100644
+index c6de749134..cb05a755b8 100644
 --- a/accel/tcg/tcg-runtime.h
 +++ b/accel/tcg/tcg-runtime.h
-@@ -193,3 +193,33 @@ DEF_HELPER_FLAGS_4(gvec_trn8, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
- DEF_HELPER_FLAGS_4(gvec_trn16, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
- DEF_HELPER_FLAGS_4(gvec_trn32, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
- DEF_HELPER_FLAGS_4(gvec_trn64, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
+@@ -164,6 +164,21 @@ DEF_HELPER_FLAGS_4(gvec_xor, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
+ DEF_HELPER_FLAGS_4(gvec_andc, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
+ DEF_HELPER_FLAGS_4(gvec_orc, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
+ 
++DEF_HELPER_FLAGS_3(gvec_shl8i, TCG_CALL_NO_RWG, void, ptr, ptr, i32)
++DEF_HELPER_FLAGS_3(gvec_shl16i, TCG_CALL_NO_RWG, void, ptr, ptr, i32)
++DEF_HELPER_FLAGS_3(gvec_shl32i, TCG_CALL_NO_RWG, void, ptr, ptr, i32)
++DEF_HELPER_FLAGS_3(gvec_shl64i, TCG_CALL_NO_RWG, void, ptr, ptr, i32)
 +
-+DEF_HELPER_FLAGS_4(gvec_eq8, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_4(gvec_eq16, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_4(gvec_eq32, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_4(gvec_eq64, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
++DEF_HELPER_FLAGS_3(gvec_shr8i, TCG_CALL_NO_RWG, void, ptr, ptr, i32)
++DEF_HELPER_FLAGS_3(gvec_shr16i, TCG_CALL_NO_RWG, void, ptr, ptr, i32)
++DEF_HELPER_FLAGS_3(gvec_shr32i, TCG_CALL_NO_RWG, void, ptr, ptr, i32)
++DEF_HELPER_FLAGS_3(gvec_shr64i, TCG_CALL_NO_RWG, void, ptr, ptr, i32)
 +
-+DEF_HELPER_FLAGS_4(gvec_ne8, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_4(gvec_ne16, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_4(gvec_ne32, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_4(gvec_ne64, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
++DEF_HELPER_FLAGS_3(gvec_sar8i, TCG_CALL_NO_RWG, void, ptr, ptr, i32)
++DEF_HELPER_FLAGS_3(gvec_sar16i, TCG_CALL_NO_RWG, void, ptr, ptr, i32)
++DEF_HELPER_FLAGS_3(gvec_sar32i, TCG_CALL_NO_RWG, void, ptr, ptr, i32)
++DEF_HELPER_FLAGS_3(gvec_sar64i, TCG_CALL_NO_RWG, void, ptr, ptr, i32)
 +
-+DEF_HELPER_FLAGS_4(gvec_lt8, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_4(gvec_lt16, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_4(gvec_lt32, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_4(gvec_lt64, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-+
-+DEF_HELPER_FLAGS_4(gvec_le8, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_4(gvec_le16, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_4(gvec_le32, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_4(gvec_le64, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-+
-+DEF_HELPER_FLAGS_4(gvec_ltu8, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_4(gvec_ltu16, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_4(gvec_ltu32, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_4(gvec_ltu64, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-+
-+DEF_HELPER_FLAGS_4(gvec_leu8, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_4(gvec_leu16, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_4(gvec_leu32, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_4(gvec_leu64, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
+ DEF_HELPER_FLAGS_4(gvec_zip8, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
+ DEF_HELPER_FLAGS_4(gvec_zip16, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
+ DEF_HELPER_FLAGS_4(gvec_zip32, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
 diff --git a/tcg/tcg-op-gvec.h b/tcg/tcg-op-gvec.h
-index 7ca78853f2..c71aded066 100644
+index 1d97e80e18..7ca78853f2 100644
 --- a/tcg/tcg-op-gvec.h
 +++ b/tcg/tcg-op-gvec.h
-@@ -220,6 +220,10 @@ void tcg_gen_gvec_trne(unsigned vece, uint32_t dofs, uint32_t aofs,
- void tcg_gen_gvec_trno(unsigned vece, uint32_t dofs, uint32_t aofs,
-                        uint32_t bofs, uint32_t oprsz, uint32_t maxsz);
+@@ -95,6 +95,25 @@ typedef struct {
+     bool prefer_i64;
+ } GVecGen2;
  
-+void tcg_gen_gvec_cmp(TCGCond cond, unsigned vece, uint32_t dofs,
-+                      uint32_t aofs, uint32_t bofs,
-+                      uint32_t oprsz, uint32_t maxsz);
++typedef struct {
++    /* Expand inline as a 64-bit or 32-bit integer.
++       Only one of these will be non-NULL.  */
++    void (*fni8)(TCGv_i64, TCGv_i64, int64_t);
++    void (*fni4)(TCGv_i32, TCGv_i32, int32_t);
++    /* Expand inline with a host vector type.  */
++    void (*fniv)(unsigned, TCGv_vec, TCGv_vec, int64_t);
++    /* Expand out-of-line helper w/descriptor.  */
++    gen_helper_gvec_2 *fno;
++    /* The opcode, if any, to which this corresponds.  */
++    TCGOpcode opc;
++    /* The vector element size, if applicable.  */
++    uint8_t vece;
++    /* Prefer i64 to v64.  */
++    bool prefer_i64;
++    /* Load dest as a 3rd source operand.  */
++    bool load_dest;
++} GVecGen2i;
 +
- /*
-  * 64-bit vector operations.  Use these when the register has been allocated
-  * with tcg_global_mem_new_i64, and so we cannot also address it via pointer.
+ typedef struct {
+     /* Expand inline as a 64-bit or 32-bit integer.
+        Only one of these will be non-NULL.  */
+@@ -137,6 +156,8 @@ typedef struct {
+ 
+ void tcg_gen_gvec_2(uint32_t dofs, uint32_t aofs,
+                     uint32_t oprsz, uint32_t maxsz, const GVecGen2 *);
++void tcg_gen_gvec_2i(uint32_t dofs, uint32_t aofs, uint32_t oprsz,
++                     uint32_t maxsz, int64_t c, const GVecGen2i *);
+ void tcg_gen_gvec_3(uint32_t dofs, uint32_t aofs, uint32_t bofs,
+                     uint32_t oprsz, uint32_t maxsz, const GVecGen3 *);
+ void tcg_gen_gvec_4(uint32_t dofs, uint32_t aofs, uint32_t bofs, uint32_t cofs,
+@@ -179,6 +200,13 @@ void tcg_gen_gvec_dup16i(uint32_t dofs, uint32_t s, uint32_t m, uint16_t x);
+ void tcg_gen_gvec_dup32i(uint32_t dofs, uint32_t s, uint32_t m, uint32_t x);
+ void tcg_gen_gvec_dup64i(uint32_t dofs, uint32_t s, uint32_t m, uint64_t x);
+ 
++void tcg_gen_gvec_shli(unsigned vece, uint32_t dofs, uint32_t aofs,
++                       uint32_t oprsz, uint32_t maxsz, unsigned shift);
++void tcg_gen_gvec_shri(unsigned vece, uint32_t dofs, uint32_t aofs,
++                       uint32_t oprsz, uint32_t maxsz, unsigned shift);
++void tcg_gen_gvec_sari(unsigned vece, uint32_t dofs, uint32_t aofs,
++                       uint32_t oprsz, uint32_t maxsz, unsigned shift);
++
+ void tcg_gen_gvec_zipl(unsigned vece, uint32_t dofs, uint32_t aofs,
+                        uint32_t bofs, uint32_t oprsz, uint32_t maxsz);
+ void tcg_gen_gvec_ziph(unsigned vece, uint32_t dofs, uint32_t aofs,
+@@ -209,3 +237,10 @@ void tcg_gen_vec_add32_i64(TCGv_i64 d, TCGv_i64 a, TCGv_i64 b);
+ void tcg_gen_vec_sub8_i64(TCGv_i64 d, TCGv_i64 a, TCGv_i64 b);
+ void tcg_gen_vec_sub16_i64(TCGv_i64 d, TCGv_i64 a, TCGv_i64 b);
+ void tcg_gen_vec_sub32_i64(TCGv_i64 d, TCGv_i64 a, TCGv_i64 b);
++
++void tcg_gen_vec_shl8i_i64(TCGv_i64 d, TCGv_i64 a, int64_t);
++void tcg_gen_vec_shl16i_i64(TCGv_i64 d, TCGv_i64 a, int64_t);
++void tcg_gen_vec_shr8i_i64(TCGv_i64 d, TCGv_i64 a, int64_t);
++void tcg_gen_vec_shr16i_i64(TCGv_i64 d, TCGv_i64 a, int64_t);
++void tcg_gen_vec_sar8i_i64(TCGv_i64 d, TCGv_i64 a, int64_t);
++void tcg_gen_vec_sar16i_i64(TCGv_i64 d, TCGv_i64 a, int64_t);
 diff --git a/tcg/tcg-op.h b/tcg/tcg-op.h
-index c002523bea..777db6ad59 100644
+index 87be11a90d..c002523bea 100644
 --- a/tcg/tcg-op.h
 +++ b/tcg/tcg-op.h
-@@ -939,6 +939,9 @@ void tcg_gen_uzpo_vec(unsigned vece, TCGv_vec r, TCGv_vec a, TCGv_vec b);
- void tcg_gen_trne_vec(unsigned vece, TCGv_vec r, TCGv_vec a, TCGv_vec b);
- void tcg_gen_trno_vec(unsigned vece, TCGv_vec r, TCGv_vec a, TCGv_vec b);
- 
-+void tcg_gen_cmp_vec(TCGCond cond, unsigned vece, TCGv_vec r,
-+                     TCGv_vec a, TCGv_vec b);
+@@ -927,6 +927,11 @@ void tcg_gen_andc_vec(unsigned vece, TCGv_vec r, TCGv_vec a, TCGv_vec b);
+ void tcg_gen_orc_vec(unsigned vece, TCGv_vec r, TCGv_vec a, TCGv_vec b);
+ void tcg_gen_not_vec(unsigned vece, TCGv_vec r, TCGv_vec a);
+ void tcg_gen_neg_vec(unsigned vece, TCGv_vec r, TCGv_vec a);
 +
- void tcg_gen_ld_vec(TCGv_vec r, TCGv_ptr base, TCGArg offset);
- void tcg_gen_st_vec(TCGv_vec r, TCGv_ptr base, TCGArg offset);
- void tcg_gen_stl_vec(TCGv_vec r, TCGv_ptr base, TCGArg offset, TCGType t);
++void tcg_gen_shli_vec(unsigned vece, TCGv_vec r, TCGv_vec a, int64_t i);
++void tcg_gen_shri_vec(unsigned vece, TCGv_vec r, TCGv_vec a, int64_t i);
++void tcg_gen_sari_vec(unsigned vece, TCGv_vec r, TCGv_vec a, int64_t i);
++
+ void tcg_gen_zipl_vec(unsigned vece, TCGv_vec r, TCGv_vec a, TCGv_vec b);
+ void tcg_gen_ziph_vec(unsigned vece, TCGv_vec r, TCGv_vec a, TCGv_vec b);
+ void tcg_gen_uzpe_vec(unsigned vece, TCGv_vec r, TCGv_vec a, TCGv_vec b);
 diff --git a/tcg/tcg-opc.h b/tcg/tcg-opc.h
-index a085fc077b..d3fa014507 100644
+index c911d62442..a085fc077b 100644
 --- a/tcg/tcg-opc.h
 +++ b/tcg/tcg-opc.h
-@@ -248,6 +248,8 @@ DEF(uzpo_vec, 1, 2, 0, IMPLVEC | IMPL(TCG_TARGET_HAS_uzp_vec))
- DEF(trne_vec, 1, 2, 0, IMPLVEC | IMPL(TCG_TARGET_HAS_trn_vec))
- DEF(trno_vec, 1, 2, 0, IMPLVEC | IMPL(TCG_TARGET_HAS_trn_vec))
+@@ -229,6 +229,18 @@ DEF(andc_vec, 1, 2, 0, IMPLVEC | IMPL(TCG_TARGET_HAS_andc_vec))
+ DEF(orc_vec, 1, 2, 0, IMPLVEC | IMPL(TCG_TARGET_HAS_orc_vec))
+ DEF(not_vec, 1, 1, 0, IMPLVEC | IMPL(TCG_TARGET_HAS_not_vec))
  
-+DEF(cmp_vec, 1, 2, 1, IMPLVEC)
++DEF(shli_vec, 1, 1, 1, IMPLVEC | IMPL(TCG_TARGET_HAS_shi_vec))
++DEF(shri_vec, 1, 1, 1, IMPLVEC | IMPL(TCG_TARGET_HAS_shi_vec))
++DEF(sari_vec, 1, 1, 1, IMPLVEC | IMPL(TCG_TARGET_HAS_shi_vec))
 +
- DEF(last_generic, 0, 0, 0, TCG_OPF_NOT_PRESENT)
- 
- #if TCG_TARGET_MAYBE_vec
++DEF(shls_vec, 1, 2, 0, IMPLVEC | IMPL(TCG_TARGET_HAS_shs_vec))
++DEF(shrs_vec, 1, 2, 0, IMPLVEC | IMPL(TCG_TARGET_HAS_shs_vec))
++DEF(sars_vec, 1, 2, 0, IMPLVEC | IMPL(TCG_TARGET_HAS_shs_vec))
++
++DEF(shlv_vec, 1, 2, 0, IMPLVEC | IMPL(TCG_TARGET_HAS_shv_vec))
++DEF(shrv_vec, 1, 2, 0, IMPLVEC | IMPL(TCG_TARGET_HAS_shv_vec))
++DEF(sarv_vec, 1, 2, 0, IMPLVEC | IMPL(TCG_TARGET_HAS_shv_vec))
++
+ DEF(zipl_vec, 1, 2, 0, IMPLVEC | IMPL(TCG_TARGET_HAS_zip_vec))
+ DEF(ziph_vec, 1, 2, 0, IMPLVEC | IMPL(TCG_TARGET_HAS_zip_vec))
+ DEF(uzpe_vec, 1, 2, 0, IMPLVEC | IMPL(TCG_TARGET_HAS_uzp_vec))
 diff --git a/tcg/tcg.h b/tcg/tcg.h
-index bdfe058c45..ceef8742b5 100644
+index d0678ac769..bdfe058c45 100644
 --- a/tcg/tcg.h
 +++ b/tcg/tcg.h
-@@ -184,6 +184,7 @@ typedef uint64_t TCGRegSet;
+@@ -178,6 +178,9 @@ typedef uint64_t TCGRegSet;
+ #define TCG_TARGET_HAS_not_vec          0
+ #define TCG_TARGET_HAS_andc_vec         0
+ #define TCG_TARGET_HAS_orc_vec          0
++#define TCG_TARGET_HAS_shi_vec          0
++#define TCG_TARGET_HAS_shs_vec          0
++#define TCG_TARGET_HAS_shv_vec          0
  #define TCG_TARGET_HAS_zip_vec          0
  #define TCG_TARGET_HAS_uzp_vec          0
  #define TCG_TARGET_HAS_trn_vec          0
-+#define TCG_TARGET_HAS_cmp_vec          0
- #else
- #define TCG_TARGET_MAYBE_vec            1
- #endif
 diff --git a/accel/tcg/tcg-runtime-gvec.c b/accel/tcg/tcg-runtime-gvec.c
-index fba62f1192..e0cde3216f 100644
+index 628df811b2..fba62f1192 100644
 --- a/accel/tcg/tcg-runtime-gvec.c
 +++ b/accel/tcg/tcg-runtime-gvec.c
-@@ -520,3 +520,27 @@ DO_TRN(gvec_trn8, uint8_t)
- DO_TRN(gvec_trn16, uint16_t)
- DO_TRN(gvec_trn32, uint32_t)
- DO_TRN(gvec_trn64, uint64_t)
+@@ -36,6 +36,11 @@ typedef uint16_t vec16 __attribute__((vector_size(16)));
+ typedef uint32_t vec32 __attribute__((vector_size(16)));
+ typedef uint64_t vec64 __attribute__((vector_size(16)));
+ 
++typedef int8_t svec8 __attribute__((vector_size(16)));
++typedef int16_t svec16 __attribute__((vector_size(16)));
++typedef int32_t svec32 __attribute__((vector_size(16)));
++typedef int64_t svec64 __attribute__((vector_size(16)));
 +
-+#define DO_CMP1(NAME, TYPE, OP)                                              \
-+void HELPER(NAME)(void *d, void *a, void *b, uint32_t desc)                  \
-+{                                                                            \
-+    intptr_t oprsz = simd_oprsz(desc);                                       \
-+    intptr_t i;                                                              \
-+    for (i = 0; i < oprsz; i += sizeof(vec64)) {                             \
-+        *(TYPE *)(d + i) = *(TYPE *)(a + i) OP *(TYPE *)(b + i);             \
-+    }                                                                        \
-+    clear_high(d, oprsz, desc);                                              \
+ static inline void clear_high(void *d, intptr_t oprsz, uint32_t desc)
+ {
+     intptr_t maxsz = simd_maxsz(desc);
+@@ -294,6 +299,150 @@ void HELPER(gvec_orc)(void *d, void *a, void *b, uint32_t desc)
+     clear_high(d, oprsz, desc);
+ }
+ 
++void HELPER(gvec_shl8i)(void *d, void *a, uint32_t desc)
++{
++    intptr_t oprsz = simd_oprsz(desc);
++    int shift = simd_data(desc);
++    intptr_t i;
++
++    for (i = 0; i < oprsz; i += sizeof(vec8)) {
++        *(vec8 *)(d + i) = *(vec8 *)(a + i) << shift;
++    }
++    clear_high(d, oprsz, desc);
 +}
 +
-+#define DO_CMP2(SZ) \
-+    DO_CMP1(gvec_eq##SZ, vec##SZ, ==)    \
-+    DO_CMP1(gvec_ne##SZ, vec##SZ, !=)    \
-+    DO_CMP1(gvec_lt##SZ, svec##SZ, <)    \
-+    DO_CMP1(gvec_le##SZ, svec##SZ, <=)   \
-+    DO_CMP1(gvec_ltu##SZ, vec##SZ, <)    \
-+    DO_CMP1(gvec_leu##SZ, vec##SZ, <=)
++void HELPER(gvec_shl16i)(void *d, void *a, uint32_t desc)
++{
++    intptr_t oprsz = simd_oprsz(desc);
++    int shift = simd_data(desc);
++    intptr_t i;
 +
-+DO_CMP2(8)
-+DO_CMP2(16)
-+DO_CMP2(32)
-+DO_CMP2(64)
++    for (i = 0; i < oprsz; i += sizeof(vec16)) {
++        *(vec16 *)(d + i) = *(vec16 *)(a + i) << shift;
++    }
++    clear_high(d, oprsz, desc);
++}
++
++void HELPER(gvec_shl32i)(void *d, void *a, uint32_t desc)
++{
++    intptr_t oprsz = simd_oprsz(desc);
++    int shift = simd_data(desc);
++    intptr_t i;
++
++    for (i = 0; i < oprsz; i += sizeof(vec32)) {
++        *(vec32 *)(d + i) = *(vec32 *)(a + i) << shift;
++    }
++    clear_high(d, oprsz, desc);
++}
++
++void HELPER(gvec_shl64i)(void *d, void *a, uint32_t desc)
++{
++    intptr_t oprsz = simd_oprsz(desc);
++    int shift = simd_data(desc);
++    intptr_t i;
++
++    for (i = 0; i < oprsz; i += sizeof(vec64)) {
++        *(vec64 *)(d + i) = *(vec64 *)(a + i) << shift;
++    }
++    clear_high(d, oprsz, desc);
++}
++
++void HELPER(gvec_shr8i)(void *d, void *a, uint32_t desc)
++{
++    intptr_t oprsz = simd_oprsz(desc);
++    int shift = simd_data(desc);
++    intptr_t i;
++
++    for (i = 0; i < oprsz; i += sizeof(vec8)) {
++        *(vec8 *)(d + i) = *(vec8 *)(a + i) >> shift;
++    }
++    clear_high(d, oprsz, desc);
++}
++
++void HELPER(gvec_shr16i)(void *d, void *a, uint32_t desc)
++{
++    intptr_t oprsz = simd_oprsz(desc);
++    int shift = simd_data(desc);
++    intptr_t i;
++
++    for (i = 0; i < oprsz; i += sizeof(vec16)) {
++        *(vec16 *)(d + i) = *(vec16 *)(a + i) >> shift;
++    }
++    clear_high(d, oprsz, desc);
++}
++
++void HELPER(gvec_shr32i)(void *d, void *a, uint32_t desc)
++{
++    intptr_t oprsz = simd_oprsz(desc);
++    int shift = simd_data(desc);
++    intptr_t i;
++
++    for (i = 0; i < oprsz; i += sizeof(vec32)) {
++        *(vec32 *)(d + i) = *(vec32 *)(a + i) >> shift;
++    }
++    clear_high(d, oprsz, desc);
++}
++
++void HELPER(gvec_shr64i)(void *d, void *a, uint32_t desc)
++{
++    intptr_t oprsz = simd_oprsz(desc);
++    int shift = simd_data(desc);
++    intptr_t i;
++
++    for (i = 0; i < oprsz; i += sizeof(vec64)) {
++        *(vec64 *)(d + i) = *(vec64 *)(a + i) >> shift;
++    }
++    clear_high(d, oprsz, desc);
++}
++
++void HELPER(gvec_sar8i)(void *d, void *a, uint32_t desc)
++{
++    intptr_t oprsz = simd_oprsz(desc);
++    int shift = simd_data(desc);
++    intptr_t i;
++
++    for (i = 0; i < oprsz; i += sizeof(vec8)) {
++        *(svec8 *)(d + i) = *(svec8 *)(a + i) >> shift;
++    }
++    clear_high(d, oprsz, desc);
++}
++
++void HELPER(gvec_sar16i)(void *d, void *a, uint32_t desc)
++{
++    intptr_t oprsz = simd_oprsz(desc);
++    int shift = simd_data(desc);
++    intptr_t i;
++
++    for (i = 0; i < oprsz; i += sizeof(vec16)) {
++        *(svec16 *)(d + i) = *(svec16 *)(a + i) >> shift;
++    }
++    clear_high(d, oprsz, desc);
++}
++
++void HELPER(gvec_sar32i)(void *d, void *a, uint32_t desc)
++{
++    intptr_t oprsz = simd_oprsz(desc);
++    int shift = simd_data(desc);
++    intptr_t i;
++
++    for (i = 0; i < oprsz; i += sizeof(vec32)) {
++        *(svec32 *)(d + i) = *(svec32 *)(a + i) >> shift;
++    }
++    clear_high(d, oprsz, desc);
++}
++
++void HELPER(gvec_sar64i)(void *d, void *a, uint32_t desc)
++{
++    intptr_t oprsz = simd_oprsz(desc);
++    int shift = simd_data(desc);
++    intptr_t i;
++
++    for (i = 0; i < oprsz; i += sizeof(vec64)) {
++        *(svec64 *)(d + i) = *(svec64 *)(a + i) >> shift;
++    }
++    clear_high(d, oprsz, desc);
++}
++
+ /* The size of the alloca in the following is currently bounded to 2k.  */
+ 
+ #define DO_ZIP(NAME, TYPE) \
 diff --git a/tcg/tcg-op-gvec.c b/tcg/tcg-op-gvec.c
-index 0ba61dd049..664dcae041 100644
+index c4ecef0e1e..0ba61dd049 100644
 --- a/tcg/tcg-op-gvec.c
 +++ b/tcg/tcg-op-gvec.c
-@@ -2020,3 +2020,205 @@ void tcg_gen_gvec_trno(unsigned vece, uint32_t dofs, uint32_t aofs,
-     tcg_debug_assert(vece <= MO_64);
-     tcg_gen_gvec_3(dofs, aofs, bofs, oprsz, maxsz, &g[vece]);
+@@ -528,6 +528,26 @@ static void expand_2_i32(uint32_t dofs, uint32_t aofs, uint32_t oprsz,
+     tcg_temp_free_i32(t0);
  }
-+
-+/* Expand OPSZ bytes worth of three-operand operations using i32 elements.  */
-+static void expand_cmp_i32(uint32_t dofs, uint32_t aofs, uint32_t bofs,
-+                           uint32_t opsz, TCGCond cond)
+ 
++static void expand_2i_i32(uint32_t dofs, uint32_t aofs, uint32_t oprsz,
++                          int32_t c, bool load_dest,
++                          void (*fni)(TCGv_i32, TCGv_i32, int32_t))
 +{
 +    TCGv_i32 t0 = tcg_temp_new_i32();
 +    TCGv_i32 t1 = tcg_temp_new_i32();
 +    uint32_t i;
 +
-+    for (i = 0; i < opsz; i += 4) {
++    for (i = 0; i < oprsz; i += 4) {
 +        tcg_gen_ld_i32(t0, cpu_env, aofs + i);
-+        tcg_gen_ld_i32(t1, cpu_env, bofs + i);
-+        tcg_gen_setcond_i32(cond, t0, t0, t1);
-+        tcg_gen_neg_i32(t0, t0);
-+        tcg_gen_st_i32(t0, cpu_env, dofs + i);
++        if (load_dest) {
++            tcg_gen_ld_i32(t1, cpu_env, dofs + i);
++        }
++        fni(t1, t0, c);
++        tcg_gen_st_i32(t1, cpu_env, dofs + i);
 +    }
-+    tcg_temp_free_i32(t1);
 +    tcg_temp_free_i32(t0);
++    tcg_temp_free_i32(t1);
 +}
 +
-+static void expand_cmp_i64(uint32_t dofs, uint32_t aofs, uint32_t bofs,
-+                           uint32_t opsz, TCGCond cond)
+ /* Expand OPSZ bytes worth of three-operand operations using i32 elements.  */
+ static void expand_3_i32(uint32_t dofs, uint32_t aofs,
+                          uint32_t bofs, uint32_t oprsz, bool load_dest,
+@@ -554,7 +574,7 @@ static void expand_3_i32(uint32_t dofs, uint32_t aofs,
+ 
+ /* Expand OPSZ bytes worth of three-operand operations using i32 elements.  */
+ static void expand_4_i32(uint32_t dofs, uint32_t aofs, uint32_t bofs,
+-                         uint32_t cofs, uint32_t opsz,
++                         uint32_t cofs, uint32_t oprsz,
+                          void (*fni)(TCGv_i32, TCGv_i32, TCGv_i32, TCGv_i32))
+ {
+     TCGv_i32 t0 = tcg_temp_new_i32();
+@@ -563,7 +583,7 @@ static void expand_4_i32(uint32_t dofs, uint32_t aofs, uint32_t bofs,
+     TCGv_i32 t3 = tcg_temp_new_i32();
+     uint32_t i;
+ 
+-    for (i = 0; i < opsz; i += 4) {
++    for (i = 0; i < oprsz; i += 4) {
+         tcg_gen_ld_i32(t1, cpu_env, aofs + i);
+         tcg_gen_ld_i32(t2, cpu_env, bofs + i);
+         tcg_gen_ld_i32(t3, cpu_env, cofs + i);
+@@ -591,6 +611,26 @@ static void expand_2_i64(uint32_t dofs, uint32_t aofs, uint32_t oprsz,
+     tcg_temp_free_i64(t0);
+ }
+ 
++static void expand_2i_i64(uint32_t dofs, uint32_t aofs, uint32_t oprsz,
++                          int64_t c, bool load_dest,
++                          void (*fni)(TCGv_i64, TCGv_i64, int64_t))
 +{
 +    TCGv_i64 t0 = tcg_temp_new_i64();
 +    TCGv_i64 t1 = tcg_temp_new_i64();
 +    uint32_t i;
 +
-+    for (i = 0; i < opsz; i += 8) {
++    for (i = 0; i < oprsz; i += 8) {
 +        tcg_gen_ld_i64(t0, cpu_env, aofs + i);
-+        tcg_gen_ld_i64(t1, cpu_env, bofs + i);
-+        tcg_gen_setcond_i64(cond, t0, t0, t1);
-+        tcg_gen_neg_i64(t0, t0);
-+        tcg_gen_st_i64(t0, cpu_env, dofs + i);
++        if (load_dest) {
++            tcg_gen_ld_i64(t1, cpu_env, dofs + i);
++        }
++        fni(t1, t0, c);
++        tcg_gen_st_i64(t1, cpu_env, dofs + i);
 +    }
-+    tcg_temp_free_i64(t1);
 +    tcg_temp_free_i64(t0);
++    tcg_temp_free_i64(t1);
 +}
 +
-+static void expand_cmp_vec(unsigned vece, uint32_t dofs, uint32_t aofs,
-+                           uint32_t bofs, uint32_t opsz, uint32_t tysz,
-+                           TCGType type, TCGCond cond)
+ /* Expand OPSZ bytes worth of three-operand operations using i64 elements.  */
+ static void expand_3_i64(uint32_t dofs, uint32_t aofs,
+                          uint32_t bofs, uint32_t oprsz, bool load_dest,
+@@ -617,7 +657,7 @@ static void expand_3_i64(uint32_t dofs, uint32_t aofs,
+ 
+ /* Expand OPSZ bytes worth of three-operand operations using i64 elements.  */
+ static void expand_4_i64(uint32_t dofs, uint32_t aofs, uint32_t bofs,
+-                         uint32_t cofs, uint32_t opsz,
++                         uint32_t cofs, uint32_t oprsz,
+                          void (*fni)(TCGv_i64, TCGv_i64, TCGv_i64, TCGv_i64))
+ {
+     TCGv_i64 t0 = tcg_temp_new_i64();
+@@ -626,7 +666,7 @@ static void expand_4_i64(uint32_t dofs, uint32_t aofs, uint32_t bofs,
+     TCGv_i64 t3 = tcg_temp_new_i64();
+     uint32_t i;
+ 
+-    for (i = 0; i < opsz; i += 8) {
++    for (i = 0; i < oprsz; i += 8) {
+         tcg_gen_ld_i64(t1, cpu_env, aofs + i);
+         tcg_gen_ld_i64(t2, cpu_env, bofs + i);
+         tcg_gen_ld_i64(t3, cpu_env, cofs + i);
+@@ -655,6 +695,29 @@ static void expand_2_vec(unsigned vece, uint32_t dofs, uint32_t aofs,
+     tcg_temp_free_vec(t0);
+ }
+ 
++/* Expand OPSZ bytes worth of two-vector operands and an immediate operand
++   using host vectors.  */
++static void expand_2i_vec(unsigned vece, uint32_t dofs, uint32_t aofs,
++                          uint32_t oprsz, uint32_t tysz, TCGType type,
++                          int64_t c, bool load_dest,
++                          void (*fni)(unsigned, TCGv_vec, TCGv_vec, int64_t))
 +{
 +    TCGv_vec t0 = tcg_temp_new_vec(type);
 +    TCGv_vec t1 = tcg_temp_new_vec(type);
 +    uint32_t i;
 +
-+    for (i = 0; i < opsz; i += tysz) {
++    for (i = 0; i < oprsz; i += tysz) {
 +        tcg_gen_ld_vec(t0, cpu_env, aofs + i);
-+        tcg_gen_ld_vec(t1, cpu_env, bofs + i);
-+        tcg_gen_cmp_vec(cond, vece, t0, t0, t1);
-+        tcg_gen_st_vec(t0, cpu_env, dofs + i);
++        if (load_dest) {
++            tcg_gen_ld_vec(t1, cpu_env, dofs + i);
++        }
++        fni(vece, t1, t0, c);
++        tcg_gen_st_vec(t1, cpu_env, dofs + i);
 +    }
-+    tcg_temp_free_vec(t1);
 +    tcg_temp_free_vec(t0);
++    tcg_temp_free_vec(t1);
 +}
 +
-+void tcg_gen_gvec_cmp(TCGCond cond, unsigned vece, uint32_t dofs,
-+                      uint32_t aofs, uint32_t bofs,
-+                      uint32_t oprsz, uint32_t maxsz)
+ /* Expand OPSZ bytes worth of three-operand operations using host vectors.  */
+ static void expand_3_vec(unsigned vece, uint32_t dofs, uint32_t aofs,
+                          uint32_t bofs, uint32_t oprsz,
+@@ -682,7 +745,7 @@ static void expand_3_vec(unsigned vece, uint32_t dofs, uint32_t aofs,
+ 
+ /* Expand OPSZ bytes worth of four-operand operations using host vectors.  */
+ static void expand_4_vec(unsigned vece, uint32_t dofs, uint32_t aofs,
+-                         uint32_t bofs, uint32_t cofs, uint32_t opsz,
++                         uint32_t bofs, uint32_t cofs, uint32_t oprsz,
+                          uint32_t tysz, TCGType type,
+                          void (*fni)(unsigned, TCGv_vec, TCGv_vec,
+                                      TCGv_vec, TCGv_vec))
+@@ -693,7 +756,7 @@ static void expand_4_vec(unsigned vece, uint32_t dofs, uint32_t aofs,
+     TCGv_vec t3 = tcg_temp_new_vec(type);
+     uint32_t i;
+ 
+-    for (i = 0; i < opsz; i += tysz) {
++    for (i = 0; i < oprsz; i += tysz) {
+         tcg_gen_ld_vec(t1, cpu_env, aofs + i);
+         tcg_gen_ld_vec(t2, cpu_env, bofs + i);
+         tcg_gen_ld_vec(t3, cpu_env, cofs + i);
+@@ -783,6 +846,85 @@ void tcg_gen_gvec_2(uint32_t dofs, uint32_t aofs,
+     tcg_gen_gvec_2_ool(dofs, aofs, oprsz, maxsz, g->data, g->fno);
+ }
+ 
++void tcg_gen_gvec_2i(uint32_t dofs, uint32_t aofs, uint32_t oprsz,
++                     uint32_t maxsz, int64_t c, const GVecGen2i *g)
 +{
-+    static gen_helper_gvec_3 * const eq_fn[4] = {
-+        gen_helper_gvec_eq8, gen_helper_gvec_eq16,
-+        gen_helper_gvec_eq32, gen_helper_gvec_eq64
-+    };
-+    static gen_helper_gvec_3 * const ne_fn[4] = {
-+        gen_helper_gvec_ne8, gen_helper_gvec_ne16,
-+        gen_helper_gvec_ne32, gen_helper_gvec_ne64
-+    };
-+    static gen_helper_gvec_3 * const lt_fn[4] = {
-+        gen_helper_gvec_lt8, gen_helper_gvec_lt16,
-+        gen_helper_gvec_lt32, gen_helper_gvec_lt64
-+    };
-+    static gen_helper_gvec_3 * const le_fn[4] = {
-+        gen_helper_gvec_le8, gen_helper_gvec_le16,
-+        gen_helper_gvec_le32, gen_helper_gvec_le64
-+    };
-+    static gen_helper_gvec_3 * const ltu_fn[4] = {
-+        gen_helper_gvec_ltu8, gen_helper_gvec_ltu16,
-+        gen_helper_gvec_ltu32, gen_helper_gvec_ltu64
-+    };
-+    static gen_helper_gvec_3 * const leu_fn[4] = {
-+        gen_helper_gvec_leu8, gen_helper_gvec_leu16,
-+        gen_helper_gvec_leu32, gen_helper_gvec_leu64
-+    };
-+    gen_helper_gvec_3 *fn;
-+    uint32_t tmp;
-+
-+    check_size_align(oprsz, maxsz, dofs | aofs | bofs);
-+    check_overlap_3(dofs, aofs, bofs, maxsz);
-+
-+    if (cond == TCG_COND_NEVER || cond == TCG_COND_ALWAYS) {
-+        tcg_gen_gvec_dup32i(dofs, oprsz, maxsz, -(cond == TCG_COND_ALWAYS));
-+        return;
-+    }
++    check_size_align(oprsz, maxsz, dofs | aofs);
++    check_overlap_2(dofs, aofs, maxsz);
 +
 +    /* Quick check for sizes we won't support inline.  */
 +    if (oprsz > MAX_UNROLL * 32 || maxsz > MAX_UNROLL * 32) {
@@ -288,52 +527,51 @@ index 0ba61dd049..664dcae041 100644
 +       use a cl-sized store to implement the clearing without an extra
 +       store operation.  This is true for aarch64 and x86_64 hosts.  */
 +
-+    if (TCG_TARGET_HAS_v256 && check_size_impl(oprsz, 32)
-+        && tcg_can_emit_vec_op(INDEX_op_cmp_vec, TCG_TYPE_V256, vece)) {
++    if (TCG_TARGET_HAS_v256 && g->fniv && check_size_impl(oprsz, 32)
++        && (!g->opc || tcg_can_emit_vec_op(g->opc, TCG_TYPE_V256, g->vece))) {
 +        uint32_t done = QEMU_ALIGN_DOWN(oprsz, 32);
-+        expand_cmp_vec(vece, dofs, aofs, bofs, done, 32, TCG_TYPE_V256, cond);
++        expand_2i_vec(g->vece, dofs, aofs, done, 32, TCG_TYPE_V256,
++                      c, g->load_dest, g->fniv);
 +        dofs += done;
 +        aofs += done;
-+        bofs += done;
 +        oprsz -= done;
 +        maxsz -= done;
 +    }
 +
-+    if (TCG_TARGET_HAS_v128 && check_size_impl(oprsz, 16)
-+        && tcg_can_emit_vec_op(INDEX_op_cmp_vec, TCG_TYPE_V128, vece)) {
++    if (TCG_TARGET_HAS_v128 && g->fniv && check_size_impl(oprsz, 16)
++        && (!g->opc || tcg_can_emit_vec_op(g->opc, TCG_TYPE_V128, g->vece))) {
 +        uint32_t done = QEMU_ALIGN_DOWN(oprsz, 16);
-+        expand_cmp_vec(vece, dofs, aofs, bofs, done, 16, TCG_TYPE_V128, cond);
++        expand_2i_vec(g->vece, dofs, aofs, done, 16, TCG_TYPE_V128,
++                      c, g->load_dest, g->fniv);
 +        dofs += done;
 +        aofs += done;
-+        bofs += done;
 +        oprsz -= done;
 +        maxsz -= done;
 +    }
 +
 +    if (check_size_impl(oprsz, 8)) {
 +        uint32_t done = QEMU_ALIGN_DOWN(oprsz, 8);
-+        if (TCG_TARGET_HAS_v64
-+            && (TCG_TARGET_REG_BITS == 32 || vece != MO_64)
-+            && tcg_can_emit_vec_op(INDEX_op_cmp_vec, TCG_TYPE_V64, vece)) {
-+            expand_cmp_vec(vece, dofs, aofs, bofs, done, 8, TCG_TYPE_V64, cond);
-+        } else if (vece == MO_64) {
-+            expand_cmp_i64(dofs, aofs, bofs, done, cond);
++        if (TCG_TARGET_HAS_v64 && g->fniv && !g->prefer_i64
++            && (!g->opc
++                || tcg_can_emit_vec_op(g->opc, TCG_TYPE_V64, g->vece))) {
++            expand_2i_vec(g->vece, dofs, aofs, done, 8, TCG_TYPE_V64,
++                          c, g->load_dest, g->fniv);
++        } else if (g->fni8) {
++            expand_2i_i64(dofs, aofs, done, c, g->load_dest, g->fni8);
 +        } else {
 +            done = 0;
 +        }
 +        dofs += done;
 +        aofs += done;
-+        bofs += done;
 +        oprsz -= done;
 +        maxsz -= done;
 +    }
 +
-+    if (vece == MO_32 && check_size_impl(oprsz, 4)) {
++    if (g->fni4 && check_size_impl(oprsz, 4)) {
 +        uint32_t done = QEMU_ALIGN_DOWN(oprsz, 4);
-+        expand_cmp_i32(dofs, aofs, bofs, done, cond);
++        expand_2i_i32(dofs, aofs, done, c, g->load_dest, g->fni4);
 +        dofs += done;
 +        aofs += done;
-+        bofs += done;
 +        oprsz -= done;
 +        maxsz -= done;
 +    }
@@ -346,107 +584,301 @@ index 0ba61dd049..664dcae041 100644
 +    }
 +
 + do_ool:
-+    switch (cond) {
-+    case TCG_COND_EQ:
-+        fn = eq_fn[vece];
-+        break;
-+    case TCG_COND_NE:
-+        fn = ne_fn[vece];
-+        break;
-+    case TCG_COND_GT:
-+        tmp = aofs, aofs = bofs, bofs = tmp;
-+        /* fallthru */
-+    case TCG_COND_LT:
-+        fn = lt_fn[vece];
-+        break;
-+    case TCG_COND_GE:
-+        tmp = aofs, aofs = bofs, bofs = tmp;
-+        /* fallthru */
-+    case TCG_COND_LE:
-+        fn = le_fn[vece];
-+        break;
-+    case TCG_COND_GTU:
-+        tmp = aofs, aofs = bofs, bofs = tmp;
-+        /* fallthru */
-+    case TCG_COND_LTU:
-+        fn = ltu_fn[vece];
-+        break;
-+    case TCG_COND_GEU:
-+        tmp = aofs, aofs = bofs, bofs = tmp;
-+        /* fallthru */
-+    case TCG_COND_LEU:
-+        fn = leu_fn[vece];
-+        break;
-+    default:
-+        g_assert_not_reached();
-+    }
-+    tcg_gen_gvec_3_ool(dofs, aofs, bofs, oprsz, maxsz, 0, fn);
++    tcg_gen_gvec_2_ool(dofs, aofs, oprsz, maxsz, c, g->fno);
 +}
++
+ /* Expand a vector three-operand operation.  */
+ void tcg_gen_gvec_3(uint32_t dofs, uint32_t aofs, uint32_t bofs,
+                     uint32_t oprsz, uint32_t maxsz, const GVecGen3 *g)
+@@ -1402,6 +1544,170 @@ void tcg_gen_gvec_orc(unsigned vece, uint32_t dofs, uint32_t aofs,
+     tcg_gen_gvec_3(dofs, aofs, bofs, oprsz, maxsz, &g);
+ }
+ 
++void tcg_gen_vec_shl8i_i64(TCGv_i64 d, TCGv_i64 a, int64_t c)
++{
++    uint64_t mask = ((0xff << c) & 0xff) * (-1ull / 0xff);
++    tcg_gen_shli_i64(d, a, c);
++    tcg_gen_andi_i64(d, d, mask);
++}
++
++void tcg_gen_vec_shl16i_i64(TCGv_i64 d, TCGv_i64 a, int64_t c)
++{
++    uint64_t mask = ((0xffff << c) & 0xffff) * (-1ull / 0xffff);
++    tcg_gen_shli_i64(d, a, c);
++    tcg_gen_andi_i64(d, d, mask);
++}
++
++void tcg_gen_gvec_shli(unsigned vece, uint32_t dofs, uint32_t aofs,
++                       uint32_t oprsz, uint32_t maxsz, unsigned shift)
++{
++    static const GVecGen2i g[4] = {
++        { .fni8 = tcg_gen_vec_shl8i_i64,
++          .fniv = tcg_gen_shli_vec,
++          .fno = gen_helper_gvec_shl8i,
++          .opc = INDEX_op_shli_vec,
++          .vece = MO_8 },
++        { .fni8 = tcg_gen_vec_shl16i_i64,
++          .fniv = tcg_gen_shli_vec,
++          .fno = gen_helper_gvec_shl16i,
++          .opc = INDEX_op_shli_vec,
++          .vece = MO_16 },
++        { .fni4 = tcg_gen_shli_i32,
++          .fniv = tcg_gen_shli_vec,
++          .fno = gen_helper_gvec_shl32i,
++          .opc = INDEX_op_shli_vec,
++          .vece = MO_32 },
++        { .fni8 = tcg_gen_shli_i64,
++          .fniv = tcg_gen_shli_vec,
++          .fno = gen_helper_gvec_shl64i,
++          .opc = INDEX_op_shli_vec,
++          .prefer_i64 = TCG_TARGET_REG_BITS == 64,
++          .vece = MO_64 },
++    };
++
++    tcg_debug_assert(vece <= MO_64);
++    tcg_debug_assert(shift < (8 << vece));
++    if (shift == 0) {
++        tcg_gen_gvec_mov(vece, dofs, aofs, oprsz, maxsz);
++    } else {
++        tcg_gen_gvec_2i(dofs, aofs, oprsz, maxsz, shift, &g[vece]);
++    }
++}
++
++void tcg_gen_vec_shr8i_i64(TCGv_i64 d, TCGv_i64 a, int64_t c)
++{
++    uint64_t mask = (0xff >> c) * (-1ull / 0xff);
++    tcg_gen_shri_i64(d, a, c);
++    tcg_gen_andi_i64(d, d, mask);
++}
++
++void tcg_gen_vec_shr16i_i64(TCGv_i64 d, TCGv_i64 a, int64_t c)
++{
++    uint64_t mask = (0xffff >> c) * (-1ull / 0xffff);
++    tcg_gen_shri_i64(d, a, c);
++    tcg_gen_andi_i64(d, d, mask);
++}
++
++void tcg_gen_gvec_shri(unsigned vece, uint32_t dofs, uint32_t aofs,
++                       uint32_t oprsz, uint32_t maxsz, unsigned shift)
++{
++    static const GVecGen2i g[4] = {
++        { .fni8 = tcg_gen_vec_shr8i_i64,
++          .fniv = tcg_gen_shri_vec,
++          .fno = gen_helper_gvec_shr8i,
++          .opc = INDEX_op_shri_vec,
++          .vece = MO_8 },
++        { .fni8 = tcg_gen_vec_shr16i_i64,
++          .fniv = tcg_gen_shri_vec,
++          .fno = gen_helper_gvec_shr16i,
++          .opc = INDEX_op_shri_vec,
++          .vece = MO_16 },
++        { .fni4 = tcg_gen_shri_i32,
++          .fniv = tcg_gen_shri_vec,
++          .fno = gen_helper_gvec_shr32i,
++          .opc = INDEX_op_shri_vec,
++          .vece = MO_32 },
++        { .fni8 = tcg_gen_shri_i64,
++          .fniv = tcg_gen_shri_vec,
++          .fno = gen_helper_gvec_shr64i,
++          .opc = INDEX_op_shri_vec,
++          .prefer_i64 = TCG_TARGET_REG_BITS == 64,
++          .vece = MO_64 },
++    };
++
++    tcg_debug_assert(vece <= MO_64);
++    tcg_debug_assert(shift < (8 << vece));
++    if (shift == 0) {
++        tcg_gen_gvec_mov(vece, dofs, aofs, oprsz, maxsz);
++    } else {
++        tcg_gen_gvec_2i(dofs, aofs, oprsz, maxsz, shift, &g[vece]);
++    }
++}
++
++void tcg_gen_vec_sar8i_i64(TCGv_i64 d, TCGv_i64 a, int64_t c)
++{
++    uint64_t s_mask = (0x80 >> c) * (-1ull / 0xff);
++    uint64_t c_mask = (0xff >> c) * (-1ull / 0xff);
++    TCGv_i64 s = tcg_temp_new_i64();
++
++    tcg_gen_shri_i64(d, a, c);
++    tcg_gen_andi_i64(s, d, s_mask);  /* isolate (shifted) sign bit */
++    tcg_gen_muli_i64(s, s, (2 << c) - 2); /* replicate isolated signs */
++    tcg_gen_andi_i64(d, d, c_mask);  /* clear out bits above sign  */
++    tcg_gen_or_i64(d, d, s);         /* include sign extension */
++    tcg_temp_free_i64(s);
++}
++
++void tcg_gen_vec_sar16i_i64(TCGv_i64 d, TCGv_i64 a, int64_t c)
++{
++    uint64_t s_mask = (0x8000 >> c) * (-1ull / 0xffff);
++    uint64_t c_mask = (0xffff >> c) * (-1ull / 0xffff);
++    TCGv_i64 s = tcg_temp_new_i64();
++
++    tcg_gen_shri_i64(d, a, c);
++    tcg_gen_andi_i64(s, d, s_mask);  /* isolate (shifted) sign bit */
++    tcg_gen_andi_i64(d, d, c_mask);  /* clear out bits above sign  */
++    tcg_gen_muli_i64(s, s, (2 << c) - 2); /* replicate isolated signs */
++    tcg_gen_or_i64(d, d, s);         /* include sign extension */
++    tcg_temp_free_i64(s);
++}
++
++void tcg_gen_gvec_sari(unsigned vece, uint32_t dofs, uint32_t aofs,
++                       uint32_t oprsz, uint32_t maxsz, unsigned shift)
++{
++    static const GVecGen2i g[4] = {
++        { .fni8 = tcg_gen_vec_sar8i_i64,
++          .fniv = tcg_gen_sari_vec,
++          .fno = gen_helper_gvec_sar8i,
++          .opc = INDEX_op_sari_vec,
++          .vece = MO_8 },
++        { .fni8 = tcg_gen_vec_sar16i_i64,
++          .fniv = tcg_gen_sari_vec,
++          .fno = gen_helper_gvec_sar16i,
++          .opc = INDEX_op_sari_vec,
++          .vece = MO_16 },
++        { .fni4 = tcg_gen_sari_i32,
++          .fniv = tcg_gen_sari_vec,
++          .fno = gen_helper_gvec_sar32i,
++          .opc = INDEX_op_sari_vec,
++          .vece = MO_32 },
++        { .fni8 = tcg_gen_sari_i64,
++          .fniv = tcg_gen_sari_vec,
++          .fno = gen_helper_gvec_sar64i,
++          .opc = INDEX_op_sari_vec,
++          .prefer_i64 = TCG_TARGET_REG_BITS == 64,
++          .vece = MO_64 },
++    };
++
++    tcg_debug_assert(vece <= MO_64);
++    tcg_debug_assert(shift < (8 << vece));
++    if (shift == 0) {
++        tcg_gen_gvec_mov(vece, dofs, aofs, oprsz, maxsz);
++    } else {
++        tcg_gen_gvec_2i(dofs, aofs, oprsz, maxsz, shift, &g[vece]);
++    }
++}
++
+ static void do_zip(unsigned vece, uint32_t dofs, uint32_t aofs,
+                    uint32_t bofs, uint32_t oprsz, uint32_t maxsz,
+                    bool high)
 diff --git a/tcg/tcg-op-vec.c b/tcg/tcg-op-vec.c
-index b54d3de19f..b3f0ec324a 100644
+index a5d0ff89c3..b54d3de19f 100644
 --- a/tcg/tcg-op-vec.c
 +++ b/tcg/tcg-op-vec.c
-@@ -480,3 +480,26 @@ void tcg_gen_trno_vec(unsigned vece, TCGv_vec r, TCGv_vec a, TCGv_vec b)
- {
-     do_interleave(INDEX_op_trno_vec, vece, r, a, b);
+@@ -381,6 +381,51 @@ void tcg_gen_neg_vec(unsigned vece, TCGv_vec r, TCGv_vec a)
+     }
  }
-+
-+void tcg_gen_cmp_vec(TCGCond cond, unsigned vece,
-+                     TCGv_vec r, TCGv_vec a, TCGv_vec b)
+ 
++static void do_shifti(TCGOpcode opc, unsigned vece,
++                      TCGv_vec r, TCGv_vec a, int64_t i)
 +{
 +    TCGTemp *rt = tcgv_vec_temp(r);
 +    TCGTemp *at = tcgv_vec_temp(a);
-+    TCGTemp *bt = tcgv_vec_temp(b);
 +    TCGArg ri = temp_arg(rt);
 +    TCGArg ai = temp_arg(at);
-+    TCGArg bi = temp_arg(bt);
 +    TCGType type = rt->base_type;
 +    int can;
 +
 +    tcg_debug_assert(at->base_type == type);
-+    tcg_debug_assert(bt->base_type == type);
-+    can = tcg_can_emit_vec_op(INDEX_op_cmp_vec, type, vece);
++    tcg_debug_assert(i >= 0 && i < (8 << vece));
++
++    if (i == 0) {
++        tcg_gen_mov_vec(r, a);
++        return;
++    }
++
++    can = tcg_can_emit_vec_op(opc, type, vece);
 +    if (can > 0) {
-+        vec_gen_4(INDEX_op_cmp_vec, type, vece, ri, ai, bi, cond);
++        vec_gen_3(opc, type, vece, ri, ai, i);
 +    } else {
++        /* We leave the choice of expansion via scalar or vector shift
++           to the target.  Often, but not always, dupi can feed a vector
++           shift easier than a scalar.  */
 +        tcg_debug_assert(can < 0);
-+        tcg_expand_vec_op(INDEX_op_cmp_vec, type, vece, ri, ai, bi, cond);
++        tcg_expand_vec_op(opc, type, vece, ri, ai, i);
 +    }
 +}
++
++void tcg_gen_shli_vec(unsigned vece, TCGv_vec r, TCGv_vec a, int64_t i)
++{
++    do_shifti(INDEX_op_shli_vec, vece, r, a, i);
++}
++
++void tcg_gen_shri_vec(unsigned vece, TCGv_vec r, TCGv_vec a, int64_t i)
++{
++    do_shifti(INDEX_op_shri_vec, vece, r, a, i);
++}
++
++void tcg_gen_sari_vec(unsigned vece, TCGv_vec r, TCGv_vec a, int64_t i)
++{
++    do_shifti(INDEX_op_sari_vec, vece, r, a, i);
++}
++
+ static void do_interleave(TCGOpcode opc, unsigned vece,
+                           TCGv_vec r, TCGv_vec a, TCGv_vec b)
+ {
 diff --git a/tcg/tcg.c b/tcg/tcg.c
-index f82d6e80b0..a85547a6d2 100644
+index 33e3c03cbc..f82d6e80b0 100644
 --- a/tcg/tcg.c
 +++ b/tcg/tcg.c
-@@ -1392,6 +1392,7 @@ bool tcg_op_supported(TCGOpcode op)
-     case INDEX_op_and_vec:
-     case INDEX_op_or_vec:
-     case INDEX_op_xor_vec:
-+    case INDEX_op_cmp_vec:
-         return have_vec;
-     case INDEX_op_dup2_vec:
-         return have_vec && TCG_TARGET_REG_BITS == 32;
-@@ -1791,6 +1792,7 @@ void tcg_dump_ops(TCGContext *s)
-             case INDEX_op_brcond_i64:
-             case INDEX_op_setcond_i64:
-             case INDEX_op_movcond_i64:
-+            case INDEX_op_cmp_vec:
-                 if (op->args[k] < ARRAY_SIZE(cond_name)
-                     && cond_name[op->args[k]]) {
-                     col += qemu_log(",%s", cond_name[op->args[k++]]);
+@@ -1403,6 +1403,18 @@ bool tcg_op_supported(TCGOpcode op)
+         return have_vec && TCG_TARGET_HAS_andc_vec;
+     case INDEX_op_orc_vec:
+         return have_vec && TCG_TARGET_HAS_orc_vec;
++    case INDEX_op_shli_vec:
++    case INDEX_op_shri_vec:
++    case INDEX_op_sari_vec:
++        return have_vec && TCG_TARGET_HAS_shi_vec;
++    case INDEX_op_shls_vec:
++    case INDEX_op_shrs_vec:
++    case INDEX_op_sars_vec:
++        return have_vec && TCG_TARGET_HAS_shs_vec;
++    case INDEX_op_shlv_vec:
++    case INDEX_op_shrv_vec:
++    case INDEX_op_sarv_vec:
++        return have_vec && TCG_TARGET_HAS_shv_vec;
+     case INDEX_op_zipl_vec:
+     case INDEX_op_ziph_vec:
+         return have_vec && TCG_TARGET_HAS_zip_vec;
 diff --git a/tcg/README b/tcg/README
-index 75db47922d..18b6bbd8f1 100644
+index 8ab8d3ab7e..75db47922d 100644
 --- a/tcg/README
 +++ b/tcg/README
-@@ -630,6 +630,10 @@ E.g. VECL=1 -> 64 << 1 -> v128, and VECE=2 -> 1 << 2 -> i32.
-       v0[2i + 1] = v2[2i + part];
-     }
+@@ -561,6 +561,35 @@ E.g. VECL=1 -> 64 << 1 -> v128, and VECE=2 -> 1 << 2 -> i32.
+   Similarly, logical operations with and without compliment.
+   Note that VECE is unused.
  
-+* cmp_vec  v0, v1, v2, cond
++* shli_vec   v0, v1, i2
++* shls_vec   v0, v1, s2
 +
-+  Compare vectors by element, storing -1 for true and 0 for false.
++  Shift all elements from v1 by a scalar i2/s2.  I.e.
 +
- *********
++    for (i = 0; i < VECL/VECE; ++i) {
++      v0[i] = v1[i] << s2;
++    }
++
++* shri_vec   v0, v1, i2
++* sari_vec   v0, v1, i2
++* shrs_vec   v0, v1, s2
++* sars_vec   v0, v1, s2
++
++  Similarly for logical and arithmetic right shift.
++
++* shlv_vec   v0, v1, v2
++
++  Shift elements from v1 by elements from v2.  I.e.
++
++    for (i = 0; i < VECL/VECE; ++i) {
++      v0[i] = v1[i] << v2[i];
++    }
++
++* shrv_vec   v0, v1, v2
++* sarv_vec   v0, v1, v2
++
++  Similarly for logical and arithmetic right shift.
++
+ * zipl_vec  v0, v1, v2
+ * ziph_vec  v0, v1, v2
  
- Note 1: Some shortcuts are defined when the last operand is known to be
 -- 
 2.14.3
