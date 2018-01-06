@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60732)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32946)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pisa@cmp.felk.cvut.cz>) id 1eXvP6-00078Z-Gj
-	for qemu-devel@nongnu.org; Sat, 06 Jan 2018 15:49:22 -0500
+	(envelope-from <pisa@cmp.felk.cvut.cz>) id 1eXvQL-00089A-Mg
+	for qemu-devel@nongnu.org; Sat, 06 Jan 2018 15:50:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pisa@cmp.felk.cvut.cz>) id 1eXvP1-0008SS-Ik
-	for qemu-devel@nongnu.org; Sat, 06 Jan 2018 15:49:20 -0500
-Received: from smtp8.web4u.cz ([81.91.87.88]:58284 helo=mx-8.mail.web4u.cz)
+	(envelope-from <pisa@cmp.felk.cvut.cz>) id 1eXvQJ-0001A3-Ug
+	for qemu-devel@nongnu.org; Sat, 06 Jan 2018 15:50:37 -0500
+Received: from smtp8.web4u.cz ([81.91.87.88]:58638 helo=mx-8.mail.web4u.cz)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <pisa@cmp.felk.cvut.cz>)
-	id 1eXvP1-0008RV-7z
-	for qemu-devel@nongnu.org; Sat, 06 Jan 2018 15:49:15 -0500
+	id 1eXvQJ-00018w-KK
+	for qemu-devel@nongnu.org; Sat, 06 Jan 2018 15:50:35 -0500
 From: pisa@cmp.felk.cvut.cz
-Date: Sat,  6 Jan 2018 21:47:31 +0100
-Message-Id: <241f9905aea63555d18fb54fa033dec96a7a13f8.1515260163.git.pisa@cmp.felk.cvut.cz>
+Date: Sat,  6 Jan 2018 21:47:33 +0100
+Message-Id: <cede0a35a17d29b5630a309b1e0d24c103387957.1515260163.git.pisa@cmp.felk.cvut.cz>
 In-Reply-To: <cover.1515260163.git.pisa@cmp.felk.cvut.cz>
 References: <cover.1515260163.git.pisa@cmp.felk.cvut.cz>
 In-Reply-To: <cover.1515260163.git.pisa@cmp.felk.cvut.cz>
 References: <cover.1515260163.git.pisa@cmp.felk.cvut.cz>
-Subject: [Qemu-devel] [PATCH 2/7] CAN bus support to connect bust to Linux
- host SocketCAN interface.
+Subject: [Qemu-devel] [PATCH 4/7] CAN bus Kvaser PCI CAN-S (single SJA1000
+ channel) emulation added.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,43 +32,51 @@ Cc: Stefan Hajnoczi <stefanha@gmail.com>, Konrad Frederic <frederic.konrad@adaco
 
 From: Pavel Pisa <pisa@cmp.felk.cvut.cz>
 
-Connection to the real host CAN bus network through
-SocketCAN network interface is available only for Linux
-host system. Mechanism is generic, support for another
-CAN API and operating systems can be implemented in future.
-
 Signed-off-by: Pavel Pisa <pisa@cmp.felk.cvut.cz>
 ---
- hw/can/Makefile.objs   |   4 +
- hw/can/can_socketcan.c | 294 +++++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 298 insertions(+)
- create mode 100644 hw/can/can_socketcan.c
+ default-configs/pci.mak |   1 +
+ hw/can/Makefile.objs    |   1 +
+ hw/can/can_kvaser_pci.c | 375 ++++++++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 377 insertions(+)
+ create mode 100644 hw/can/can_kvaser_pci.c
 
+diff --git a/default-configs/pci.mak b/default-configs/pci.mak
+index 979b649fe5..72c0802ced 100644
+--- a/default-configs/pci.mak
++++ b/default-configs/pci.mak
+@@ -33,6 +33,7 @@ CONFIG_SERIAL_ISA=y
+ CONFIG_SERIAL_PCI=y
+ CONFIG_CAN_CORE=y
+ CONFIG_CAN_SJA1000=y
++CONFIG_CAN_PCI=y
+ CONFIG_IPACK=y
+ CONFIG_WDT_IB6300ESB=y
+ CONFIG_PCI_TESTDEV=y
 diff --git a/hw/can/Makefile.objs b/hw/can/Makefile.objs
-index 1028d7c455..f999085f7a 100644
+index 3c4bf3bfc1..c9d07b9b16 100644
 --- a/hw/can/Makefile.objs
 +++ b/hw/can/Makefile.objs
-@@ -2,5 +2,9 @@
- 
- ifeq ($(CONFIG_CAN_CORE),y)
- common-obj-y += can_core.o
-+ifeq ($(CONFIG_LINUX),y)
-+common-obj-y += can_socketcan.o
-+else
+@@ -8,4 +8,5 @@ else
  common-obj-y += can_host_stub.o
  endif
-+endif
-diff --git a/hw/can/can_socketcan.c b/hw/can/can_socketcan.c
+ common-obj-$(CONFIG_CAN_SJA1000) += can_sja1000.o
++common-obj-$(CONFIG_CAN_PCI) += can_kvaser_pci.o
+ endif
+diff --git a/hw/can/can_kvaser_pci.c b/hw/can/can_kvaser_pci.c
 new file mode 100644
-index 0000000000..130c80ba27
+index 0000000000..d85d38b74b
 --- /dev/null
-+++ b/hw/can/can_socketcan.c
-@@ -0,0 +1,294 @@
++++ b/hw/can/can_kvaser_pci.c
+@@ -0,0 +1,375 @@
 +/*
-+ * CAN socketcan support to connect to the Linux host SocketCAN interfaces
++ * Kvaser PCI CAN device (SJA1000 based) emulation
 + *
 + * Copyright (c) 2013-2014 Jin Yang
-+ * Copyright (c) 2014-2018 Pavel Pisa
++ * Copyright (c) 2014 Pavel Pisa
++ *
++ * Partially based on educational PCIexpress APOHW hardware
++ * emulator used fro class A0B36APO at CTU FEE course by
++ *    Rostislav Lisovy and Pavel Pisa
 + *
 + * Initial development supported by Google GSoC 2013 from RTEMS project slot
 + *
@@ -90,273 +98,350 @@ index 0000000000..130c80ba27
 + * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 + * THE SOFTWARE.
 + */
++
 +#include "qemu/osdep.h"
-+#include "chardev/char.h"
++#include "qemu/event_notifier.h"
++#include "qemu/thread.h"
 +#include "qemu/sockets.h"
 +#include "qemu/error-report.h"
++#include "chardev/char.h"
 +#include "hw/hw.h"
++#include "hw/pci/pci.h"
 +#include "can/can_emu.h"
 +
-+#include <sys/ioctl.h>
-+#include <net/if.h>
-+#include <linux/can.h>
-+#include <linux/can/raw.h>
++#include "can_sja1000.h"
 +
-+#ifndef DEBUG_CAN
-+#define DEBUG_CAN 0
-+#endif /*DEBUG_CAN*/
++#define TYPE_CAN_PCI_DEV "kvaser_pci"
 +
-+#define CAN_READ_BUF_LEN  5
-+typedef struct {
-+    CanBusClientState  bus_client;
-+    qemu_can_filter    *rfilter;
-+    int                rfilter_num;
-+    can_err_mask_t     err_mask;
++#define KVASER_PCI_DEV(obj) \
++    OBJECT_CHECK(KvaserPCIState, (obj), TYPE_CAN_PCI_DEV)
 +
-+    qemu_can_frame     buf[CAN_READ_BUF_LEN];
-+    int                bufcnt;
-+    int                bufptr;
++#ifndef KVASER_PCI_VENDOR_ID1
++#define KVASER_PCI_VENDOR_ID1     0x10e8    /* the PCI device and vendor IDs */
++#endif
 +
-+    int                fd;
-+} CanBusSocketcanConnectState;
++#ifndef KVASER_PCI_DEVICE_ID1
++#define KVASER_PCI_DEVICE_ID1     0x8406
++#endif
 +
-+static void can_display_msg(struct qemu_can_frame *msg)
++#define KVASER_PCI_S5920_RANGE    0x80
++#define KVASER_PCI_SJA_RANGE      0x80
++#define KVASER_PCI_XILINX_RANGE   0x8
++
++#define KVASER_PCI_BYTES_PER_SJA  0x20
++
++#define S5920_OMB                 0x0C
++#define S5920_IMB                 0x1C
++#define S5920_MBEF                0x34
++#define S5920_INTCSR              0x38
++#define S5920_RCR                 0x3C
++#define S5920_PTCR                0x60
++
++#define S5920_INTCSR_ADDON_INTENABLE_M        0x2000
++#define S5920_INTCSR_INTERRUPT_ASSERTED_M     0x800000
++
++#define KVASER_PCI_XILINX_VERINT  7   /* Lower nibble simulate interrupts,
++                                         high nibble version number. */
++
++#define KVASER_PCI_XILINX_VERSION_NUMBER 13
++
++typedef struct KvaserPCIState {
++    /*< private >*/
++    PCIDevice       dev;
++    /*< public >*/
++    MemoryRegion    s5920_io;
++    MemoryRegion    sja_io;
++    MemoryRegion    xilinx_io;
++
++    CanSJA1000State sja_state;
++    qemu_irq        irq;
++
++    uint32_t        s5920_intcsr;
++    uint32_t        s5920_irqstate;
++
++    char            *model; /* The model that support, only SJA1000 now. */
++    char            *canbus;
++    char            *host;
++} KvaserPCIState;
++
++static void kvaser_pci_irq_raise(void *opaque)
 +{
-+    int i;
++    KvaserPCIState *d = (KvaserPCIState *)opaque;
++    d->s5920_irqstate = 1;
 +
-+    /* Check that QEMU and Linux kernel flags encoding matches */
-+    assert(QEMU_CAN_EFF_FLAG == CAN_EFF_FLAG);
-+    assert(QEMU_CAN_RTR_FLAG == CAN_RTR_FLAG);
-+    assert(QEMU_CAN_ERR_FLAG == CAN_ERR_FLAG);
-+
-+    assert(QEMU_CAN_INV_FILTER == CAN_INV_FILTER);
-+
-+    fprintf(stderr, "%03X [%01d]:", (msg->can_id & 0x1fffffff), msg->can_dlc);
-+    for (i = 0; i < msg->can_dlc; i++) {
-+        fprintf(stderr, "  %02X", msg->data[i]);
++    if (d->s5920_intcsr & S5920_INTCSR_ADDON_INTENABLE_M) {
++        qemu_irq_raise(d->irq);
 +    }
-+    fprintf(stderr, "\n");
 +}
 +
-+static void can_bus_socketcan_read(void *opaque)
++static void kvaser_pci_irq_lower(void *opaque)
 +{
-+    CanBusSocketcanConnectState *c;
-+    c = (CanBusSocketcanConnectState *)opaque;
++    KvaserPCIState *d = (KvaserPCIState *)opaque;
++    d->s5920_irqstate = 0;
++    qemu_irq_lower(d->irq);
++}
 +
++static void
++kvaser_pci_reset(void *opaque)
++{
++    KvaserPCIState *d = (KvaserPCIState *)opaque;
++    CanSJA1000State *s = &d->sja_state;
 +
++    can_sja_hardware_reset(s);
++}
 +
-+    /* CAN_READ_BUF_LEN for multiple messages syscall is possible for future */
-+    c->bufcnt = read(c->fd, c->buf, sizeof(qemu_can_frame));
-+    if (c->bufcnt < 0) {
-+        perror("CAN bus host read");
++static uint64_t kvaser_pci_s5920_io_read(void *opaque, hwaddr addr,
++                             unsigned size)
++{
++    KvaserPCIState *d = opaque;
++    uint64_t val;
++
++    switch (addr) {
++    case S5920_INTCSR:
++        val = d->s5920_intcsr;
++        val &= ~S5920_INTCSR_INTERRUPT_ASSERTED_M;
++        if (d->s5920_irqstate) {
++            val |= S5920_INTCSR_INTERRUPT_ASSERTED_M;
++        }
++        return val;
++    }
++    return 0;
++}
++
++static void kvaser_pci_s5920_io_write(void *opaque, hwaddr addr, uint64_t data,
++                                      unsigned size)
++{
++    KvaserPCIState *d = opaque;
++
++    switch (addr) {
++    case S5920_INTCSR:
++        if (~d->s5920_intcsr & data & S5920_INTCSR_ADDON_INTENABLE_M) {
++            if (d->s5920_irqstate) {
++                qemu_irq_raise(d->irq);
++            }
++        }
++        d->s5920_intcsr = data;
++        break;
++    }
++}
++
++static uint64_t kvaser_pci_sja_io_read(void *opaque, hwaddr addr, unsigned size)
++{
++    KvaserPCIState *d = opaque;
++    CanSJA1000State *s = &d->sja_state;
++
++    if (addr >= KVASER_PCI_BYTES_PER_SJA) {
++        return 0;
++    }
++
++    return can_sja_mem_read(s, addr, size);
++}
++
++static void kvaser_pci_sja_io_write(void *opaque, hwaddr addr, uint64_t data,
++                                    unsigned size)
++{
++    KvaserPCIState *d = opaque;
++    CanSJA1000State *s = &d->sja_state;
++
++    if (addr >= KVASER_PCI_BYTES_PER_SJA) {
 +        return;
 +    }
 +
-+    can_bus_client_send(&c->bus_client, c->buf, 1);
-+
-+    if (DEBUG_CAN) {
-+        can_display_msg(c->buf); /* Just display the first one. */
-+    }
++    can_sja_mem_write(s, addr, data, size);
 +}
 +
-+static int can_bus_socketcan_can_receive(CanBusClientState *client)
++static uint64_t kvaser_pci_xilinx_io_read(void *opaque, hwaddr addr,
++                                          unsigned size)
 +{
-+    CanBusSocketcanConnectState *c;
-+    c = container_of(client, CanBusSocketcanConnectState, bus_client);
++    /*KvaserPCIState *d = opaque;*/
 +
-+    if (c->fd < 0) {
-+        return -1;
++    switch (addr) {
++    case KVASER_PCI_XILINX_VERINT:
++        return (KVASER_PCI_XILINX_VERSION_NUMBER << 4) | 0;
 +    }
 +
-+    return 1;
++    return 0;
 +}
 +
-+static ssize_t can_bus_socketcan_receive(CanBusClientState *client,
-+                            const qemu_can_frame *frames, size_t frames_cnt)
++static void kvaser_pci_xilinx_io_write(void *opaque, hwaddr addr, uint64_t data,
++                             unsigned size)
 +{
-+    CanBusSocketcanConnectState *c;
-+    c = container_of(client, CanBusSocketcanConnectState, bus_client);
-+    size_t len = sizeof(qemu_can_frame);
-+    int res;
-+
-+    if (c->fd < 0) {
-+        return -1;
-+    }
-+
-+    res = write(c->fd, frames, len);
-+
-+    if (!res) {
-+        fprintf(stderr, "CAN bus write to host device zero length\n");
-+        return -1;
-+    }
-+
-+    /* send frame */
-+    if (res != len) {
-+        perror("CAN bus write to host device error");
-+        return -1;
-+    }
-+
-+    return 1;
++    /*KvaserPCIState *d = opaque;*/
 +}
 +
-+static void can_bus_socketcan_cleanup(CanBusClientState *client)
++static const MemoryRegionOps kvaser_pci_s5920_io_ops = {
++    .read = kvaser_pci_s5920_io_read,
++    .write = kvaser_pci_s5920_io_write,
++    .endianness = DEVICE_LITTLE_ENDIAN,
++    .impl = {
++        .min_access_size = 4,
++        .max_access_size = 4,
++    },
++};
++
++static const MemoryRegionOps kvaser_pci_sja_io_ops = {
++    .read = kvaser_pci_sja_io_read,
++    .write = kvaser_pci_sja_io_write,
++    .endianness = DEVICE_LITTLE_ENDIAN,
++    .impl = {
++        .min_access_size = 1,
++        .max_access_size = 1,
++    },
++};
++
++static const MemoryRegionOps kvaser_pci_xilinx_io_ops = {
++    .read = kvaser_pci_xilinx_io_read,
++    .write = kvaser_pci_xilinx_io_write,
++    .endianness = DEVICE_LITTLE_ENDIAN,
++    .impl = {
++        .min_access_size = 1,
++        .max_access_size = 1,
++    },
++};
++
++static int kvaser_pci_init(PCIDevice *pci_dev)
 +{
-+    CanBusSocketcanConnectState *c;
-+    c = container_of(client, CanBusSocketcanConnectState, bus_client);
++    KvaserPCIState *d = KVASER_PCI_DEV(pci_dev);
++    CanSJA1000State *s = &d->sja_state;
++    uint8_t *pci_conf;
++    CanBusState *can_bus;
 +
-+    if (c->fd >= 0) {
-+        qemu_set_fd_handler(c->fd, NULL, NULL, c);
-+        close(c->fd);
-+        c->fd = -1;
-+    }
-+
-+    c->rfilter_num = 0;
-+    if (c->rfilter != NULL) {
-+        g_free(c->rfilter);
-+    }
-+}
-+
-+static int can_bus_socketcan_set_filters(CanBusClientState *client,
-+                   const struct qemu_can_filter *filters, size_t filters_cnt)
-+{
-+    CanBusSocketcanConnectState *c;
-+    c = container_of(client, CanBusSocketcanConnectState, bus_client);
-+
-+    int i;
-+
-+    if (filters_cnt > 4) {
-+        return -1;
-+    }
-+
-+    if (DEBUG_CAN) {
-+        for (i = 0; i < filters_cnt; i++) {
-+            fprintf(stderr, "[%i]  id=0x%08x maks=0x%08x\n",
-+                   i, filters[i].can_id, filters[i].can_mask);
++    if (d->model) {
++        if (strncmp(d->model, "pcican-s", 256)) { /* for security reason */
++            error_report("Can't create CAN device, "
++                         "the model %s is not supported now.", d->model);
++            exit(1);
 +        }
 +    }
 +
-+    setsockopt(c->fd, SOL_CAN_RAW, CAN_RAW_FILTER,
-+               filters, filters_cnt * sizeof(qemu_can_filter));
++    can_bus = can_bus_find_by_name(d->canbus, true);
++    if (can_bus == NULL) {
++        error_report("Cannot create can find/allocate CAN bus");
++        exit(1);
++
++    }
++
++    if (d->host != NULL) {
++        if (can_bus_connect_to_host_device(can_bus, d->host) < 0) {
++            error_report("Cannot connect CAN bus to host device \"%s\"",
++                         d->host);
++            exit(1);
++        }
++    }
++
++    pci_conf = pci_dev->config;
++    pci_conf[PCI_INTERRUPT_PIN] = 0x01; /* interrupt pin A */
++
++    d->irq = pci_allocate_irq(&d->dev);
++
++    can_sja_init(s, kvaser_pci_irq_raise, kvaser_pci_irq_lower, d);
++
++    qemu_register_reset(kvaser_pci_reset, d);
++
++    if (can_sja_connect_to_bus(s, can_bus) < 0) {
++        error_report("can_sja_connect_to_bus failed");
++        exit(1);
++    }
++
++    memory_region_init_io(&d->s5920_io, OBJECT(d), &kvaser_pci_s5920_io_ops,
++                          d, "kvaser_pci-s5920", KVASER_PCI_S5920_RANGE);
++    memory_region_init_io(&d->sja_io, OBJECT(d), &kvaser_pci_sja_io_ops,
++                          d, "kvaser_pci-sja", KVASER_PCI_SJA_RANGE);
++    memory_region_init_io(&d->xilinx_io, OBJECT(d), &kvaser_pci_xilinx_io_ops,
++                          d, "kvaser_pci-xilinx", KVASER_PCI_XILINX_RANGE);
++
++    pci_register_bar(&d->dev, /*BAR*/ 0, PCI_BASE_ADDRESS_SPACE_IO,
++                                            &d->s5920_io);
++    pci_register_bar(&d->dev, /*BAR*/ 1, PCI_BASE_ADDRESS_SPACE_IO,
++                                            &d->sja_io);
++    pci_register_bar(&d->dev, /*BAR*/ 2, PCI_BASE_ADDRESS_SPACE_IO,
++                                            &d->xilinx_io);
 +
 +    return 0;
 +}
 +
-+static
-+void can_bus_socketcan_update_read_handler(CanBusSocketcanConnectState *c)
++static void kvaser_pci_exit(PCIDevice *pci_dev)
 +{
-+    if (c->fd >= 0) {
-+        qemu_set_fd_handler(c->fd, can_bus_socketcan_read, NULL, c);
-+    }
++    KvaserPCIState *d = KVASER_PCI_DEV(pci_dev);
++    CanSJA1000State *s = &d->sja_state;
++
++    can_sja_disconnect(s);
++
++    qemu_unregister_reset(kvaser_pci_reset, d);
++
++    /*
++     * regions d->s5920_io, d->sja_io and d->xilinx_io
++     * are destroyed by QOM now
++     */
++
++    can_sja_exit(s);
++
++    qemu_free_irq(d->irq);
 +}
 +
-+static CanBusClientInfo can_bus_socketcan_bus_client_info = {
-+    .can_receive = can_bus_socketcan_can_receive,
-+    .receive = can_bus_socketcan_receive,
-+    .cleanup = can_bus_socketcan_cleanup,
-+    .poll = NULL
++static const VMStateDescription vmstate_kvaser_pci = {
++    .name = "kvaser_pci",
++    .version_id = 1,
++    .minimum_version_id = 1,
++    .minimum_version_id_old = 1,
++    .fields = (VMStateField[]) {
++        VMSTATE_PCI_DEVICE(dev, KvaserPCIState),
++        VMSTATE_STRUCT(sja_state, KvaserPCIState, 0, vmstate_can_sja,
++                       CanSJA1000State),
++        /*char *model,*/
++        VMSTATE_UINT32(s5920_intcsr, KvaserPCIState),
++        VMSTATE_UINT32(s5920_irqstate, KvaserPCIState),
++        VMSTATE_END_OF_LIST()
++    }
 +};
 +
-+static
-+CanBusSocketcanConnectState *can_bus_socketcan_connect_new(const char *host_dev_name)
++static void qdev_kvaser_pci_reset(DeviceState *dev)
 +{
-+    int s; /* can raw socket */
-+    CanBusSocketcanConnectState    *c;
-+    struct sockaddr_can addr;
-+    struct ifreq ifr;
-+
-+    c = g_malloc0(sizeof(CanBusSocketcanConnectState));
-+    if (c == NULL) {
-+        goto fail1;
-+    }
-+
-+    c->fd = -1;
-+
-+    /* open socket */
-+    s = socket(PF_CAN, SOCK_RAW, CAN_RAW);
-+    if (s < 0) {
-+        perror("socket");
-+        goto fail;
-+    }
-+
-+    addr.can_family = AF_CAN;
-+    memset(&ifr.ifr_name, 0, sizeof(ifr.ifr_name));
-+    strcpy(ifr.ifr_name, host_dev_name);
-+    if (ioctl(s, SIOCGIFINDEX, &ifr) < 0) {
-+        perror("SIOCGIFINDEX");
-+        goto fail;
-+    }
-+    addr.can_ifindex = ifr.ifr_ifindex;
-+
-+    c->err_mask = 0xffffffff; /* Receive error frame. */
-+    setsockopt(s, SOL_CAN_RAW, CAN_RAW_ERR_FILTER,
-+                   &c->err_mask, sizeof(c->err_mask));
-+
-+    c->rfilter_num = 1;
-+    c->rfilter = g_malloc0(c->rfilter_num * sizeof(struct qemu_can_filter));
-+    if (c->rfilter == NULL) {
-+        goto fail;
-+    }
-+
-+    /* Receive all data frame. If |= CAN_INV_FILTER no data. */
-+    c->rfilter[0].can_id = 0;
-+    c->rfilter[0].can_mask = 0;
-+    c->rfilter[0].can_mask &= ~CAN_ERR_FLAG;
-+
-+    setsockopt(s, SOL_CAN_RAW, CAN_RAW_FILTER, c->rfilter,
-+               c->rfilter_num * sizeof(struct qemu_can_filter));
-+
-+    if (bind(s, (struct sockaddr *)&addr, sizeof(addr)) < 0) {
-+        perror("bind");
-+        goto fail;
-+    }
-+
-+    c->fd = s;
-+
-+    c->bus_client.info = &can_bus_socketcan_bus_client_info;
-+
-+    can_bus_socketcan_update_read_handler(c);
-+
-+    return c;
-+
-+fail:
-+    can_bus_socketcan_cleanup(&c->bus_client);
-+    g_free(c);
-+fail1:
-+
-+    return NULL;
++    KvaserPCIState *d = KVASER_PCI_DEV(dev);
++    kvaser_pci_reset(d);
 +}
 +
-+static
-+int can_bus_connect_to_host_socketcan(CanBusState *bus, const char *host_dev_name)
++static Property kvaser_pci_properties[] = {
++    DEFINE_PROP_STRING("canbus",   KvaserPCIState, canbus),
++    DEFINE_PROP_STRING("host",  KvaserPCIState, host),
++    DEFINE_PROP_STRING("model", KvaserPCIState, model),
++    DEFINE_PROP_END_OF_LIST(),
++};
++
++static void kvaser_pci_class_init(ObjectClass *klass, void *data)
 +{
-+    CanBusSocketcanConnectState *c;
++    DeviceClass *dc = DEVICE_CLASS(klass);
++    PCIDeviceClass *k = PCI_DEVICE_CLASS(klass);
 +
-+    c = can_bus_socketcan_connect_new(host_dev_name);
-+    if (c == NULL) {
-+        error_report("CAN bus setup of host connect to \"%s\" failed",
-+                      host_dev_name);
-+        exit(1);
-+    }
-+
-+    if (can_bus_insert_client(bus, &c->bus_client) < 0) {
-+        error_report("CAN host device \"%s\" connect to bus \"%s\" failed",
-+                      host_dev_name, bus->name);
-+        exit(1);
-+    }
-+
-+    if (0) {
-+        /*
-+         * Not used there or as a CanBusSocketcanConnectState method
-+         * for now but included there for documentation purposes
-+         * and to suppress warning.
-+         */
-+        can_bus_socketcan_set_filters(&c->bus_client, NULL, 0);
-+    }
-+
-+    return 0;
++    k->init = kvaser_pci_init;
++    k->exit = kvaser_pci_exit;
++    k->vendor_id = KVASER_PCI_VENDOR_ID1;
++    k->device_id = KVASER_PCI_DEVICE_ID1;
++    k->revision = 0x00;
++    k->class_id = 0x00ff00;
++    dc->desc = "Kvaser PCICANx";
++    dc->props = kvaser_pci_properties;
++    dc->vmsd = &vmstate_kvaser_pci;
++    set_bit(DEVICE_CATEGORY_MISC, dc->categories);
++    dc->reset = qdev_kvaser_pci_reset;
 +}
 +
-+int (*can_bus_connect_to_host_variant)(CanBusState *bus, const char *name) =
-+        can_bus_connect_to_host_socketcan;
++static const TypeInfo kvaser_pci_info = {
++    .name          = TYPE_CAN_PCI_DEV,
++    .parent        = TYPE_PCI_DEVICE,
++    .instance_size = sizeof(KvaserPCIState),
++    .class_init    = kvaser_pci_class_init,
++    .interfaces = (InterfaceInfo[]) {
++        { INTERFACE_CONVENTIONAL_PCI_DEVICE },
++        { },
++    },
++};
++
++static void kvaser_pci_register_types(void)
++{
++    type_register_static(&kvaser_pci_info);
++}
++
++type_init(kvaser_pci_register_types)
 -- 
 2.11.0
