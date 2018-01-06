@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32956)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33014)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pisa@cmp.felk.cvut.cz>) id 1eXvQN-00089M-24
-	for qemu-devel@nongnu.org; Sat, 06 Jan 2018 15:50:43 -0500
+	(envelope-from <pisa@cmp.felk.cvut.cz>) id 1eXvQQ-0008CC-T1
+	for qemu-devel@nongnu.org; Sat, 06 Jan 2018 15:50:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pisa@cmp.felk.cvut.cz>) id 1eXvQI-00018G-44
-	for qemu-devel@nongnu.org; Sat, 06 Jan 2018 15:50:39 -0500
-Received: from smtp8.web4u.cz ([81.91.87.88]:58620 helo=mx-8.mail.web4u.cz)
+	(envelope-from <pisa@cmp.felk.cvut.cz>) id 1eXvQO-0001Cv-JX
+	for qemu-devel@nongnu.org; Sat, 06 Jan 2018 15:50:42 -0500
+Received: from smtp8.web4u.cz ([81.91.87.88]:58665 helo=mx-8.mail.web4u.cz)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <pisa@cmp.felk.cvut.cz>)
-	id 1eXvQH-00017W-Ki
-	for qemu-devel@nongnu.org; Sat, 06 Jan 2018 15:50:34 -0500
+	id 1eXvQO-0001Br-80
+	for qemu-devel@nongnu.org; Sat, 06 Jan 2018 15:50:40 -0500
 From: pisa@cmp.felk.cvut.cz
-Date: Sat,  6 Jan 2018 21:47:32 +0100
-Message-Id: <35fcc8967d1b1b90de7587b8b9fd839c94b19029.1515260163.git.pisa@cmp.felk.cvut.cz>
+Date: Sat,  6 Jan 2018 21:47:35 +0100
+Message-Id: <efb6cfcaaafb950e7e83695402b1b21e0438a2bd.1515260163.git.pisa@cmp.felk.cvut.cz>
 In-Reply-To: <cover.1515260163.git.pisa@cmp.felk.cvut.cz>
 References: <cover.1515260163.git.pisa@cmp.felk.cvut.cz>
 In-Reply-To: <cover.1515260163.git.pisa@cmp.felk.cvut.cz>
 References: <cover.1515260163.git.pisa@cmp.felk.cvut.cz>
-Subject: [Qemu-devel] [PATCH 3/7] CAN bus SJA1000 chip register level
- emulation for QEMU
+Subject: [Qemu-devel] [PATCH 6/7] CAN bus MIOe-3680 PCI (dual SJA1000
+ channel) emulation added.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,63 +30,38 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Stefan Hajnoczi <stefanha@gmail.com>, Konrad Frederic <frederic.konrad@adacore.com>, Deniz Eren <deniz.eren@icloud.com>, Oliver Hartkopp <socketcan@hartkopp.net>, Marek Vasut <marex@denx.de>, Jan Kiszka <jan.kiszka@siemens.com>, Oleksij Rempel <o.rempel@pengutronix.de>, Pavel Pisa <pisa@cmp.felk.cvut.cz>
 
-From: Pavel Pisa <pisa@cmp.felk.cvut.cz>
-
-The core SJA1000 support is independent of following
-patches which map SJA1000 chip to PCI boards.
-
-The work is based on Jin Yang GSoC 2013 work funded
-by Google and mentored in frame of RTEMS project GSoC
-slot donated to QEMU.
-
-Rewritten for QEMU-2.0+ versions and architecture cleanup
-by Pavel Pisa (Czech Technical University in Prague).
+From: Deniz Eren <deniz.eren@icloud.com>
 
 Signed-off-by: Pavel Pisa <pisa@cmp.felk.cvut.cz>
 ---
- default-configs/pci.mak |   1 +
- hw/can/Makefile.objs    |   1 +
- hw/can/can_sja1000.c    | 996 ++++++++++++++++++++++++++++++++++++++++++++++++
- hw/can/can_sja1000.h    | 176 +++++++++
- 4 files changed, 1174 insertions(+)
- create mode 100644 hw/can/can_sja1000.c
- create mode 100644 hw/can/can_sja1000.h
+ hw/can/Makefile.objs      |   1 +
+ hw/can/can_mioe3680_pci.c | 335 ++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 336 insertions(+)
+ create mode 100644 hw/can/can_mioe3680_pci.c
 
-diff --git a/default-configs/pci.mak b/default-configs/pci.mak
-index bbe11887a1..979b649fe5 100644
---- a/default-configs/pci.mak
-+++ b/default-configs/pci.mak
-@@ -32,6 +32,7 @@ CONFIG_SERIAL=y
- CONFIG_SERIAL_ISA=y
- CONFIG_SERIAL_PCI=y
- CONFIG_CAN_CORE=y
-+CONFIG_CAN_SJA1000=y
- CONFIG_IPACK=y
- CONFIG_WDT_IB6300ESB=y
- CONFIG_PCI_TESTDEV=y
 diff --git a/hw/can/Makefile.objs b/hw/can/Makefile.objs
-index f999085f7a..3c4bf3bfc1 100644
+index 6a328f0c3a..8fcc455800 100644
 --- a/hw/can/Makefile.objs
 +++ b/hw/can/Makefile.objs
-@@ -7,4 +7,5 @@ common-obj-y += can_socketcan.o
- else
- common-obj-y += can_host_stub.o
+@@ -10,4 +10,5 @@ endif
+ common-obj-$(CONFIG_CAN_SJA1000) += can_sja1000.o
+ common-obj-$(CONFIG_CAN_PCI) += can_kvaser_pci.o
+ common-obj-$(CONFIG_CAN_PCI) += can_pcm3680_pci.o
++common-obj-$(CONFIG_CAN_PCI) += can_mioe3680_pci.o
  endif
-+common-obj-$(CONFIG_CAN_SJA1000) += can_sja1000.o
- endif
-diff --git a/hw/can/can_sja1000.c b/hw/can/can_sja1000.c
+diff --git a/hw/can/can_mioe3680_pci.c b/hw/can/can_mioe3680_pci.c
 new file mode 100644
-index 0000000000..17e5b46f07
+index 0000000000..799e74a7ac
 --- /dev/null
-+++ b/hw/can/can_sja1000.c
-@@ -0,0 +1,996 @@
++++ b/hw/can/can_mioe3680_pci.c
+@@ -0,0 +1,335 @@
 +/*
-+ * CAN device - SJA1000 chip emulation for QEMU
++ * MIOe-3680 PCI CAN device (SJA1000 based) emulation
 + *
-+ * Copyright (c) 2013-2014 Jin Yang
-+ * Copyright (c) 2014-2017 Pavel Pisa
++ * Copyright (c) 2016 Deniz Eren (deniz.eren@icloud.com)
 + *
-+ * Initial development supported by Google GSoC 2013 from RTEMS project slot
++ * Based on Kvaser PCI CAN device (SJA1000 based) emulation implemented by
++ * Jin Yang and Pavel Pisa
 + *
 + * Permission is hereby granted, free of charge, to any person obtaining a copy
 + * of this software and associated documentation files (the "Software"), to deal
@@ -106,1157 +81,314 @@ index 0000000000..17e5b46f07
 + * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 + * THE SOFTWARE.
 + */
++
 +#include "qemu/osdep.h"
++#include "qemu/event_notifier.h"
++#include "qemu/thread.h"
++#include "qemu/sockets.h"
++#include "qemu/error-report.h"
 +#include "chardev/char.h"
 +#include "hw/hw.h"
++#include "hw/pci/pci.h"
 +#include "can/can_emu.h"
 +
 +#include "can_sja1000.h"
 +
-+#ifndef DEBUG_FILTER
-+#define DEBUG_FILTER 0
-+#endif /*DEBUG_FILTER*/
++#define TYPE_CAN_PCI_DEV "mioe3680_pci"
 +
-+static void can_sja_software_reset(CanSJA1000State *s)
-+{
-+    s->mode        &= ~0x31;
-+    s->mode        |= 0x01;
-+    s->status_pel  &= ~0x37;
-+    s->status_pel  |= 0x34;
++#define MIOe3680_PCI_DEV(obj) \
++    OBJECT_CHECK(Mioe3680PCIState, (obj), TYPE_CAN_PCI_DEV)
 +
-+    s->rxbuf_start = 0x00;
-+    s->rxmsg_cnt   = 0x00;
-+    s->rx_cnt      = 0x00;
-+}
-+
-+void can_sja_hardware_reset(CanSJA1000State *s)
-+{
-+    /* Reset by hardware, p10 */
-+    s->mode        = 0x01;
-+    s->status_pel  = 0x3c;
-+    s->interrupt_pel = 0x00;
-+    s->clock       = 0x00;
-+    s->rxbuf_start = 0x00;
-+    s->rxmsg_cnt   = 0x00;
-+    s->rx_cnt      = 0x00;
-+
-+    s->control     = 0x01;
-+    s->status_bas  = 0x0c;
-+    s->interrupt_bas = 0x00;
-+
-+    s->irq_lower(s->irq_opaque);
-+}
-+
-+static
-+void can_sja_single_filter(struct qemu_can_filter *filter,
-+            const uint8_t *acr,  const uint8_t *amr, int extended)
-+{
-+    if (extended) {
-+        filter->can_id = (uint32_t)acr[0] << 21;
-+        filter->can_id |= (uint32_t)acr[1] << 13;
-+        filter->can_id |= (uint32_t)acr[2] << 5;
-+        filter->can_id |= (uint32_t)acr[3] >> 3;
-+        if (acr[3] & 4) {
-+            filter->can_id |= QEMU_CAN_RTR_FLAG;
-+        }
-+
-+        filter->can_mask = (uint32_t)amr[0] << 21;
-+        filter->can_mask |= (uint32_t)amr[1] << 13;
-+        filter->can_mask |= (uint32_t)amr[2] << 5;
-+        filter->can_mask |= (uint32_t)amr[3] >> 3;
-+        filter->can_mask = ~filter->can_mask & QEMU_CAN_EFF_MASK;
-+        if (!(amr[3] & 4)) {
-+            filter->can_mask |= QEMU_CAN_RTR_FLAG;
-+        }
-+    } else {
-+        filter->can_id = (uint32_t)acr[0] << 3;
-+        filter->can_id |= (uint32_t)acr[1] >> 5;
-+        if (acr[1] & 0x10) {
-+            filter->can_id |= QEMU_CAN_RTR_FLAG;
-+        }
-+
-+        filter->can_mask = (uint32_t)amr[0] << 3;
-+        filter->can_mask |= (uint32_t)amr[1] << 5;
-+        filter->can_mask = ~filter->can_mask & QEMU_CAN_SFF_MASK;
-+        if (!(amr[1] & 4)) {
-+            filter->can_mask |= QEMU_CAN_RTR_FLAG;
-+        }
-+    }
-+}
-+
-+static
-+void can_sja_dual_filter(struct qemu_can_filter *filter,
-+            const uint8_t *acr,  const uint8_t *amr, int extended)
-+{
-+    if (extended) {
-+        filter->can_id = (uint32_t)acr[0] << 21;
-+        filter->can_id |= (uint32_t)acr[1] << 13;
-+
-+        filter->can_mask = (uint32_t)amr[0] << 21;
-+        filter->can_mask |= (uint32_t)amr[1] << 13;
-+        filter->can_mask = ~filter->can_mask & QEMU_CAN_EFF_MASK & ~0x1fff;
-+    } else {
-+        filter->can_id = (uint32_t)acr[0] << 3;
-+        filter->can_id |= (uint32_t)acr[1] >> 5;
-+        if (acr[1] & 0x10) {
-+            filter->can_id |= QEMU_CAN_RTR_FLAG;
-+        }
-+
-+        filter->can_mask = (uint32_t)amr[0] << 3;
-+        filter->can_mask |= (uint32_t)amr[1] >> 5;
-+        filter->can_mask = ~filter->can_mask & QEMU_CAN_SFF_MASK;
-+        if (!(amr[1] & 0x10)) {
-+            filter->can_mask |= QEMU_CAN_RTR_FLAG;
-+        }
-+    }
-+}
-+
-+/* Details in DS-p22, what we need to do here is to test the data. */
-+static
-+int can_sja_accept_filter(CanSJA1000State *s,
-+                                 const qemu_can_frame *frame)
-+{
-+
-+    struct qemu_can_filter filter;
-+
-+    if (s->clock & 0x80) { /* PeliCAN Mode */
-+        if (s->mode & (1 << 3)) { /* Single mode. */
-+            if (frame->can_id & QEMU_CAN_EFF_FLAG) { /* EFF */
-+                can_sja_single_filter(&filter,
-+                    s->code_mask + 0, s->code_mask + 4, 1);
-+
-+                if (!can_bus_filter_match(&filter, frame->can_id)) {
-+                    return 0;
-+                }
-+            } else { /* SFF */
-+                can_sja_single_filter(&filter,
-+                    s->code_mask + 0, s->code_mask + 4, 0);
-+
-+                if (!can_bus_filter_match(&filter, frame->can_id)) {
-+                    return 0;
-+                }
-+
-+                if (frame->can_id & QEMU_CAN_RTR_FLAG) { /* RTR */
-+                    return 1;
-+                }
-+
-+                if (frame->can_dlc == 0) {
-+                    return 1;
-+                }
-+
-+                if ((frame->data[0] & ~(s->code_mask[6])) !=
-+                   (s->code_mask[2] & ~(s->code_mask[6]))) {
-+                    return 0;
-+                }
-+
-+                if (frame->can_dlc < 2) {
-+                    return 1;
-+                }
-+
-+                if ((frame->data[1] & ~(s->code_mask[7])) ==
-+                    (s->code_mask[3] & ~(s->code_mask[7]))) {
-+                    return 1;
-+                }
-+
-+                return 0;
-+            }
-+        } else { /* Dual mode */
-+            if (frame->can_id & QEMU_CAN_EFF_FLAG) { /* EFF */
-+                can_sja_dual_filter(&filter,
-+                    s->code_mask + 0, s->code_mask + 4, 1);
-+
-+                if (can_bus_filter_match(&filter, frame->can_id)) {
-+                    return 1;
-+                }
-+
-+                can_sja_dual_filter(&filter,
-+                    s->code_mask + 2, s->code_mask + 6, 1);
-+
-+                if (can_bus_filter_match(&filter, frame->can_id)) {
-+                    return 1;
-+                }
-+
-+                return 0;
-+            } else {
-+                can_sja_dual_filter(&filter,
-+                    s->code_mask + 0, s->code_mask + 4, 0);
-+
-+                if (can_bus_filter_match(&filter, frame->can_id)) {
-+                    uint8_t expect;
-+                    uint8_t mask;
-+                    expect = s->code_mask[1] << 4;
-+                    expect |= s->code_mask[3] & 0x0f;
-+
-+                    mask = s->code_mask[5] << 4;
-+                    mask |= s->code_mask[7] & 0x0f;
-+                        mask = ~mask & 0xff;
-+
-+                    if ((frame->data[0] & mask) ==
-+                        (expect & mask)) {
-+                        return 1;
-+                    }
-+                }
-+
-+                can_sja_dual_filter(&filter,
-+                    s->code_mask + 2, s->code_mask + 6, 0);
-+
-+                if (can_bus_filter_match(&filter, frame->can_id)) {
-+                    return 1;
-+                }
-+
-+                return 0;
-+            }
-+        }
-+    }
-+
-+    return 1;
-+}
-+
-+static void can_display_msg(const qemu_can_frame *msg)
-+{
-+    int i;
-+
-+    fprintf(stderr, "%03X [%01d] -", (msg->can_id & QEMU_CAN_EFF_MASK),
-+            msg->can_dlc);
-+
-+    if (msg->can_id & QEMU_CAN_EFF_FLAG) {
-+        fprintf(stderr, "EFF ");
-+    } else {
-+        fprintf(stderr, "SFF ");
-+    }
-+    if (msg->can_id & QEMU_CAN_RTR_FLAG) {
-+        fprintf(stderr, "RTR-");
-+    } else {
-+        fprintf(stderr, "DAT-");
-+    }
-+    for (i = 0; i < msg->can_dlc; i++) {
-+        fprintf(stderr, "  %02X", msg->data[i]);
-+    }
-+    for (; i < 8; i++) {
-+        fprintf(stderr, "    ");
-+    }
-+    fflush(stdout);
-+}
-+
-+static void buff2frame_pel(const uint8_t *buff, qemu_can_frame *frame)
-+{
-+    uint8_t i;
-+
-+    frame->can_id = 0;
-+    if (buff[0] & 0x40) { /* RTR */
-+        frame->can_id = QEMU_CAN_RTR_FLAG;
-+    }
-+    frame->can_dlc = buff[0] & 0x0f;
-+
-+    if (buff[0] & 0x80) { /* Extended */
-+        frame->can_id |= QEMU_CAN_EFF_FLAG;
-+        frame->can_id |= buff[1] << 21; /* ID.28~ID.21 */
-+        frame->can_id |= buff[2] << 13; /* ID.20~ID.13 */
-+        frame->can_id |= buff[3] <<  5;
-+        frame->can_id |= buff[4] >>  3;
-+        for (i = 0; i < frame->can_dlc; i++) {
-+            frame->data[i] = buff[5 + i];
-+        }
-+        for (; i < 8; i++) {
-+            frame->data[i] = 0;
-+        }
-+    } else {
-+        frame->can_id |= buff[1] <<  3;
-+        frame->can_id |= buff[2] >>  5;
-+        for (i = 0; i < frame->can_dlc; i++) {
-+            frame->data[i] = buff[3 + i];
-+        }
-+        for (; i < 8; i++) {
-+            frame->data[i] = 0;
-+        }
-+    }
-+}
-+
-+
-+static void buff2frame_bas(const uint8_t *buff, qemu_can_frame *frame)
-+{
-+    uint8_t i;
-+
-+    frame->can_id = ((buff[0] << 3) & (0xff << 3)) + ((buff[1] >> 5) & 0x07);
-+    if (buff[1] & 0x10) { /* RTR */
-+        frame->can_id = QEMU_CAN_RTR_FLAG;
-+    }
-+    frame->can_dlc = buff[1] & 0x0f;
-+
-+    for (i = 0; i < frame->can_dlc; i++) {
-+        frame->data[i] = buff[2 + i];
-+    }
-+    for (; i < 8; i++) {
-+        frame->data[i] = 0;
-+    }
-+}
-+
-+
-+static int frame2buff_pel(const qemu_can_frame *frame, uint8_t *buff)
-+{
-+    int i;
-+
-+    if (frame->can_id & QEMU_CAN_ERR_FLAG) { /* error frame, NOT support now. */
-+        return -1;
-+    }
-+
-+    buff[0] = 0x0f & frame->can_dlc; /* DLC */
-+    if (frame->can_id & QEMU_CAN_RTR_FLAG) { /* RTR */
-+        buff[0] |= (1 << 6);
-+    }
-+    if (frame->can_id & QEMU_CAN_EFF_FLAG) { /* EFF */
-+        buff[0] |= (1 << 7);
-+        buff[1] = extract32(frame->can_id, 21, 8); /* ID.28~ID.21 */
-+        buff[2] = extract32(frame->can_id, 13, 8); /* ID.20~ID.13 */
-+        buff[3] = extract32(frame->can_id, 5, 8);  /* ID.12~ID.05 */
-+        buff[4] = extract32(frame->can_id, 0, 5) << 3; /* ID.04~ID.00,x,x,x */
-+        for (i = 0; i < frame->can_dlc; i++) {
-+            buff[5 + i] = frame->data[i];
-+        }
-+        return frame->can_dlc + 5;
-+    } else { /* SFF */
-+        buff[1] = extract32(frame->can_id, 3, 8); /* ID.10~ID.03 */
-+        buff[2] = extract32(frame->can_id, 0, 3) << 5; /* ID.02~ID.00,x,x,x,x,x */
-+        for (i = 0; i < frame->can_dlc; i++) {
-+            buff[3 + i] = frame->data[i];
-+        }
-+
-+        return frame->can_dlc + 3;
-+    }
-+
-+    return -1;
-+}
-+
-+static int frame2buff_bas(const qemu_can_frame *frame, uint8_t *buff)
-+{
-+    int i;
-+
-+    if ((frame->can_id & QEMU_CAN_EFF_FLAG) || /* EFF, not support for BasicMode. */
-+       (frame->can_id & QEMU_CAN_ERR_FLAG)) {  /* or Error frame, NOT support now. */
-+        return -1;
-+    }
-+
-+    buff[0] = extract32(frame->can_id, 3, 8); /* ID.10~ID.03 */
-+    buff[1] = extract32(frame->can_id, 0, 3) << 5; /* ID.02~ID.00,x,x,x,x,x */
-+    if (frame->can_id & QEMU_CAN_RTR_FLAG) { /* RTR */
-+        buff[1] |= (1 << 4);
-+    }
-+    buff[1] |= frame->can_dlc & 0x0f;
-+    for (i = 0; i < frame->can_dlc; i++) {
-+        buff[2 + i] = frame->data[i];
-+    }
-+
-+    return frame->can_dlc + 2;
-+}
-+
-+void can_sja_mem_write(CanSJA1000State *s, hwaddr addr, uint64_t val,
-+                       unsigned size)
-+{
-+    qemu_can_frame   frame;
-+    uint32_t         tmp;
-+    uint8_t          tmp8, count;
-+
-+
-+    DPRINTF("write 0x%02llx addr 0x%02x\n",
-+            (unsigned long long)val, (unsigned int)addr);
-+
-+    if (addr > CAN_SJA_MEM_SIZE) {
-+        return ;
-+    }
-+
-+    if (s->clock & 0x80) { /* PeliCAN Mode */
-+        switch (addr) {
-+        case SJA_MOD: /* Mode register */
-+            s->mode = 0x1f & val;
-+            if ((s->mode & 0x01) && ((val & 0x01) == 0)) {
-+                /* Go to operation mode from reset mode. */
-+                if (s->mode & (1 << 3)) { /* Single mode. */
-+                    /* For EFF */
-+                    can_sja_single_filter(&s->filter[0],
-+                        s->code_mask + 0, s->code_mask + 4, 1);
-+
-+                    /* For SFF */
-+                    can_sja_single_filter(&s->filter[1],
-+                        s->code_mask + 0, s->code_mask + 4, 0);
-+
-+                    can_bus_client_set_filters(&s->bus_client, s->filter, 2);
-+                } else { /* Dual mode */
-+                    /* For EFF */
-+                    can_sja_dual_filter(&s->filter[0],
-+                        s->code_mask + 0, s->code_mask + 4, 1);
-+
-+                    can_sja_dual_filter(&s->filter[1],
-+                        s->code_mask + 2, s->code_mask + 6, 1);
-+
-+                    /* For SFF */
-+                    can_sja_dual_filter(&s->filter[2],
-+                        s->code_mask + 0, s->code_mask + 4, 0);
-+
-+                    can_sja_dual_filter(&s->filter[3],
-+                        s->code_mask + 2, s->code_mask + 6, 0);
-+
-+                    can_bus_client_set_filters(&s->bus_client, s->filter, 4);
-+                }
-+
-+                s->rxmsg_cnt = 0;
-+                s->rx_cnt = 0;
-+            }
-+            break;
-+
-+        case SJA_CMR: /* Command register. */
-+            if (0x01 & val) { /* Send transmission request. */
-+                buff2frame_pel(s->tx_buff, &frame);
-+                if (DEBUG_FILTER) {
-+                    can_display_msg(&frame);
-+                    fprintf(stderr, "\n");
-+                }
-+
-+                /*
-+                 * Clear transmission complete status,
-+                 * and Transmit Buffer Status.
-+                 * write to the backends.
-+                 */
-+                s->status_pel &= ~(3 << 2);
-+
-+                can_bus_client_send(&s->bus_client, &frame, 1);
-+                s->status_pel |= (3 << 2); /* Set transmission complete status, */
-+                                       /* and Transmit Buffer Status. */
-+                s->status_pel &= ~(1 << 5); /* Clear transmit status. */
-+                s->interrupt_pel |= 0x02;
-+                if (s->interrupt_en & 0x02) {
-+                    s->irq_raise(s->irq_opaque);
-+                }
-+            } else if (0x04 & val) { /* Release Receive Buffer */
-+                if (s->rxmsg_cnt <= 0) {
-+                    break;
-+                }
-+
-+                tmp8 = s->rx_buff[s->rxbuf_start]; count = 0;
-+                if (tmp8 & (1 << 7)) { /* EFF */
-+                    count += 2;
-+                }
-+                count += 3;
-+                if (!(tmp8 & (1 << 6))) { /* DATA */
-+                    count += (tmp8 & 0x0f);
-+                }
-+                s->rxbuf_start += count;
-+                s->rxbuf_start %= SJA_RCV_BUF_LEN;
-+
-+                s->rx_cnt -= count;
-+                s->rxmsg_cnt--;
-+                if (s->rxmsg_cnt == 0) {
-+                    s->status_pel &= ~(1 << 0);
-+                    s->interrupt_pel &= ~(1 << 0);
-+                }
-+                if ((s->interrupt_en & 0x01) && (s->interrupt_pel == 0)) {
-+                    /* no other interrupts. */
-+                    s->irq_lower(s->irq_opaque);
-+                }
-+            } else if (0x08 & val) { /* Clear data overrun */
-+                s->status_pel &= ~(1 << 1);
-+                s->interrupt_pel &= ~(1 << 3);
-+                if ((s->interrupt_en & 0x80) && (s->interrupt_pel == 0)) {
-+                    /* no other interrupts. */
-+                    s->irq_lower(s->irq_opaque);
-+                }
-+            }
-+            break;
-+        case SJA_SR: /* Status register */
-+        case SJA_IR: /* Interrupt register */
-+            break; /* Do nothing */
-+        case SJA_IER: /* Interrupt enable register */
-+            s->interrupt_en = val;
-+            break;
-+        case 16: /* RX frame information addr16-28. */
-+            s->status_pel |= (1 << 5); /* Set transmit status. */
-+        case 17:
-+        case 18:
-+        case 19:
-+        case 20:
-+        case 21:
-+        case 22:
-+        case 23:
-+        case 24:
-+        case 25:
-+        case 26:
-+        case 27:
-+        case 28:
-+            if (s->mode & 0x01) { /* Reset mode */
-+                if (addr < 24) {
-+                    s->code_mask[addr - 16] = val;
-+                }
-+            } else { /* Operation mode */
-+                s->tx_buff[addr - 16] = val; /* Store to TX buffer directly. */
-+            }
-+            break;
-+        case SJA_CDR:
-+            s->clock = val;
-+            break;
-+        }
-+    } else { /* Basic Mode */
-+        switch (addr) {
-+        case SJA_BCAN_CTR: /* Control register, addr 0 */
-+            if ((s->control & 0x01) && ((val & 0x01) == 0)) {
-+                /* Go to operation mode from reset mode. */
-+                s->filter[0].can_id = (s->code << 3) & (0xff << 3);
-+                tmp = (~(s->mask << 3)) & (0xff << 3);
-+                tmp |= QEMU_CAN_EFF_FLAG; /* Only Basic CAN Frame. */
-+                s->filter[0].can_mask = tmp;
-+                can_bus_client_set_filters(&s->bus_client, s->filter, 1);
-+
-+                s->rxmsg_cnt = 0;
-+                s->rx_cnt = 0;
-+            } else if (!(s->control & 0x01) && !(val & 0x01)) {
-+                can_sja_software_reset(s);
-+            }
-+
-+            s->control = 0x1f & val;
-+            break;
-+        case SJA_BCAN_CMR: /* Command register, addr 1 */
-+            if (0x01 & val) { /* Send transmission request. */
-+                buff2frame_bas(s->tx_buff, &frame);
-+                if (DEBUG_FILTER) {
-+                    can_display_msg(&frame);
-+                    fprintf(stderr, "\n");
-+                }
-+
-+                /*
-+                 * Clear transmission complete status,
-+                 * and Transmit Buffer Status.
-+                 */
-+                s->status_bas &= ~(3 << 2);
-+
-+                /* write to the backends. */
-+                can_bus_client_send(&s->bus_client, &frame, 1);
-+                s->status_bas |= (3 << 2); /* Set transmission complete status, */
-+                                       /* and Transmit Buffer Status. */
-+                s->status_bas &= ~(1 << 5); /* Clear transmit status. */
-+                s->interrupt_bas |= 0x02;
-+                if (s->control & 0x04) {
-+                    s->irq_raise(s->irq_opaque);
-+                }
-+            } else if (0x04 & val) { /* Release Receive Buffer */
-+                if (s->rxmsg_cnt <= 0) {
-+                    break;
-+                }
-+
-+                qemu_mutex_lock(&s->rx_lock);
-+                tmp8 = s->rx_buff[(s->rxbuf_start + 1) % SJA_RCV_BUF_LEN];
-+                count = 2 + (tmp8 & 0x0f);
-+
-+                if (DEBUG_FILTER) {
-+                    int i;
-+                    fprintf(stderr, "\nRelease");
-+                    for (i = 0; i < count; i++) {
-+                        fprintf(stderr, " %02X", s->rx_buff[(s->rxbuf_start + i) %
-+                                        SJA_RCV_BUF_LEN]);
-+                    }
-+                    for (; i < 11; i++) {
-+                        fprintf(stderr, "   ");
-+                    }
-+                    fprintf(stderr, "==== cnt=%d, count=%d\n",
-+                            s->rx_cnt, count);
-+                }
-+
-+                s->rxbuf_start += count;
-+                s->rxbuf_start %= SJA_RCV_BUF_LEN;
-+                s->rx_cnt -= count;
-+                s->rxmsg_cnt--;
-+                qemu_mutex_unlock(&s->rx_lock);
-+
-+                if (s->rxmsg_cnt == 0) {
-+                    s->status_bas &= ~(1 << 0);
-+                    s->interrupt_bas &= ~(1 << 0);
-+                }
-+                if ((s->control & 0x02) && (s->interrupt_bas == 0)) {
-+                    /* no other interrupts. */
-+                    s->irq_lower(s->irq_opaque);
-+                }
-+            } else if (0x08 & val) { /* Clear data overrun */
-+                s->status_bas &= ~(1 << 1);
-+                s->interrupt_bas &= ~(1 << 3);
-+                if ((s->control & 0x10) && (s->interrupt_bas == 0)) {
-+                    /* no other interrupts. */
-+                    s->irq_lower(s->irq_opaque);
-+                }
-+            }
-+            break;
-+        case 4:
-+            s->code = val;
-+            break;
-+        case 5:
-+            s->mask = val;
-+            break;
-+        case 10:
-+            s->status_bas |= (1 << 5); /* Set transmit status. */
-+        case 11:
-+        case 12:
-+        case 13:
-+        case 14:
-+        case 15:
-+        case 16:
-+        case 17:
-+        case 18:
-+        case 19:
-+            if ((s->control & 0x01) == 0) { /* Operation mode */
-+                s->tx_buff[addr - 10] = val; /* Store to TX buffer directly. */
-+            }
-+            break;
-+        case SJA_CDR:
-+            s->clock = val;
-+            break;
-+        }
-+    }
-+}
-+
-+uint64_t can_sja_mem_read(CanSJA1000State *s, hwaddr addr, unsigned size)
-+{
-+    uint64_t temp = 0;
-+
-+    DPRINTF("read addr 0x%x", (unsigned int)addr);
-+
-+    if (addr > CAN_SJA_MEM_SIZE) {
-+        return 0;
-+    }
-+
-+    if (s->clock & 0x80) { /* PeliCAN Mode */
-+        switch (addr) {
-+        case SJA_MOD: /* Mode register, addr 0 */
-+            temp = s->mode;
-+            break;
-+        case SJA_CMR: /* Command register, addr 1 */
-+            temp = 0x00; /* Command register, cannot be read. */
-+            break;
-+        case SJA_SR: /* Status register, addr 2 */
-+            temp = s->status_pel;
-+            break;
-+        case SJA_IR: /* Interrupt register, addr 3 */
-+            temp = s->interrupt_pel;
-+            s->interrupt_pel = 0;
-+            if (s->rxmsg_cnt) {
-+                s->interrupt_pel |= (1 << 0); /* Receive interrupt. */
-+                break;
-+            }
-+            s->irq_lower(s->irq_opaque);
-+            break;
-+        case SJA_IER: /* Interrupt enable register, addr 4 */
-+            temp = s->interrupt_en;
-+            break;
-+        case 5: /* Reserved */
-+        case 6: /* Bus timing 0, hardware related, not support now. */
-+        case 7: /* Bus timing 1, hardware related, not support now. */
-+        case 8: /*
-+                 * Output control register, hardware related,
-+                 * not supported for now.
-+                 */
-+        case 9: /* Test. */
-+        case 10: /* Reserved */
-+        case 11:
-+        case 12:
-+        case 13:
-+        case 14:
-+        case 15:
-+            temp = 0x00;
-+            break;
-+
-+        case 16:
-+        case 17:
-+        case 18:
-+        case 19:
-+        case 20:
-+        case 21:
-+        case 22:
-+        case 23:
-+        case 24:
-+        case 25:
-+        case 26:
-+        case 27:
-+        case 28:
-+            if (s->mode & 0x01) { /* Reset mode */
-+                if (addr < 24) {
-+                    temp = s->code_mask[addr - 16];
-+                } else {
-+                    temp = 0x00;
-+                }
-+            } else { /* Operation mode */
-+                temp = s->rx_buff[(s->rxbuf_start + addr - 16) %
-+                       SJA_RCV_BUF_LEN];
-+            }
-+            break;
-+        case SJA_CDR:
-+            temp = s->clock;
-+            break;
-+        default:
-+            temp = 0xff;
-+        }
-+    } else { /* Basic Mode */
-+        switch (addr) {
-+        case SJA_BCAN_CTR: /* Control register, addr 0 */
-+            temp = s->control;
-+            break;
-+        case SJA_BCAN_SR: /* Status register, addr 2 */
-+            temp = s->status_bas;
-+            break;
-+        case SJA_BCAN_IR: /* Interrupt register, addr 3 */
-+            temp = s->interrupt_bas;
-+            s->interrupt_bas = 0;
-+            if (s->rxmsg_cnt) {
-+                s->interrupt_bas |= (1 << 0); /* Receive interrupt. */
-+                break;
-+            }
-+            s->irq_lower(s->irq_opaque);
-+            break;
-+        case 4:
-+            temp = s->code;
-+            break;
-+        case 5:
-+            temp = s->mask;
-+            break;
-+        case 20:
-+            if (DEBUG_FILTER) {
-+                printf("Read   ");
-+            }
-+        case 21:
-+        case 22:
-+        case 23:
-+        case 24:
-+        case 25:
-+        case 26:
-+        case 27:
-+        case 28:
-+        case 29:
-+            temp = s->rx_buff[(s->rxbuf_start + addr - 20) % SJA_RCV_BUF_LEN];
-+            if (DEBUG_FILTER) {
-+                fprintf(stderr, " %02X", (unsigned int)(temp & 0xff));
-+            }
-+            break;
-+        case 31:
-+            temp = s->clock;
-+            break;
-+        default:
-+            temp = 0xff;
-+            break;
-+        }
-+    }
-+    DPRINTF("     %d bytes of 0x%lx from addr %d\n",
-+            size, (long unsigned int)temp, (int)addr);
-+
-+    return temp;
-+}
-+
-+int can_sja_can_receive(CanBusClientState *client)
-+{
-+    CanSJA1000State *s = container_of(client, CanSJA1000State, bus_client);
-+
-+    if (s->clock & 0x80) { /* PeliCAN Mode */
-+        if (s->mode & 0x01) { /* reset mode. */
-+            return 0;
-+        }
-+    } else { /* BasicCAN mode */
-+        if (s->control & 0x01) {
-+            return 0;
-+        }
-+    }
-+
-+    return 1; /* always return 1, when operation mode */
-+}
-+
-+ssize_t can_sja_receive(CanBusClientState *client, const qemu_can_frame *frames,
-+                        size_t frames_cnt)
-+{
-+    CanSJA1000State *s = container_of(client, CanSJA1000State, bus_client);
-+    static uint8_t rcv[SJA_MSG_MAX_LEN];
-+    int i;
-+    int ret = -1;
-+    const qemu_can_frame *frame = frames;
-+
-+    if (frames_cnt <= 0) {
-+        return 0;
-+    }
-+    if (DEBUG_FILTER) {
-+        fprintf(stderr, "#################################################\n");
-+        can_display_msg(frame);
-+    }
-+
-+    qemu_mutex_lock(&s->rx_lock); /* Just do it quickly :) */
-+    if (s->clock & 0x80) { /* PeliCAN Mode */
-+        s->status_pel |= (1 << 4); /* the CAN controller is receiving a message */
-+
-+        if (can_sja_accept_filter(s, frame) == 0) {
-+            s->status_pel &= ~(1 << 4);
-+            if (DEBUG_FILTER) {
-+                fprintf(stderr, "     NOT\n");
-+            }
-+            goto fail;
-+        }
-+
-+        ret = frame2buff_pel(frame, rcv);
-+        if (ret < 0) {
-+            s->status_pel &= ~(1 << 4);
-+            if (DEBUG_FILTER) {
-+                fprintf(stderr, "     ERR\n");
-+            }
-+            goto fail; /* maybe not support now. */
-+        }
-+
-+        if (s->rx_cnt + ret > SJA_RCV_BUF_LEN) { /* Data overrun. */
-+            s->status_pel |= (1 << 1); /* Overrun status */
-+            s->interrupt_pel |= (1 << 3);
-+            if (s->interrupt_en & (1 << 3)) { /* Overrun interrupt enable */
-+                s->irq_raise(s->irq_opaque);
-+            }
-+            s->status_pel &= ~(1 << 4);
-+            if (DEBUG_FILTER) {
-+                fprintf(stderr, "     OVER\n");
-+            }
-+            goto fail;
-+        }
-+        s->rx_cnt += ret;
-+        s->rxmsg_cnt++;
-+        if (DEBUG_FILTER) {
-+            fprintf(stderr, "     OK\n");
-+        }
-+
-+        for (i = 0; i < ret; i++) {
-+            s->rx_buff[(s->rx_ptr++) % SJA_RCV_BUF_LEN] = rcv[i];
-+        }
-+        s->rx_ptr %= SJA_RCV_BUF_LEN; /* update the pointer. */
-+
-+        s->status_pel |= 0x01; /* Set the Receive Buffer Status. DS-p23 */
-+        s->interrupt_pel |= 0x01;
-+        s->status_pel &= ~(1 << 4);
-+        s->status_pel |= (1 << 0);
-+        if (s->interrupt_en & 0x01) { /* Receive Interrupt enable. */
-+            s->irq_raise(s->irq_opaque);
-+        }
-+    } else { /* BasicCAN mode */
-+        s->status_bas |= (1 << 4); /* the CAN controller is receiving a message */
-+
-+        ret = frame2buff_bas(frame, rcv);
-+        if (ret < 0) {
-+            s->status_bas &= ~(1 << 4);
-+            if (DEBUG_FILTER) {
-+                fprintf(stderr, "     NOT\n");
-+            }
-+            goto fail; /* maybe not support now. */
-+        }
-+
-+        if (s->rx_cnt + ret > SJA_RCV_BUF_LEN) { /* Data overrun. */
-+            s->status_bas |= (1 << 1); /* Overrun status */
-+            s->status_bas &= ~(1 << 4);
-+            s->interrupt_bas |= (1 << 3);
-+            if (s->control & (1 << 4)) { /* Overrun interrupt enable */
-+                s->irq_raise(s->irq_opaque);
-+            }
-+            if (DEBUG_FILTER) {
-+                fprintf(stderr, "     OVER\n");
-+            }
-+            goto fail;
-+        }
-+        s->rx_cnt += ret;
-+        s->rxmsg_cnt++;
-+
-+        if (DEBUG_FILTER) {
-+            fprintf(stderr, "     OK\n");
-+            fprintf(stderr, "RCV B ret=%2d, ptr=%2d cnt=%2d msg=%2d\n",
-+                   ret, s->rx_ptr, s->rx_cnt, s->rxmsg_cnt);
-+        }
-+
-+        for (i = 0; i < ret; i++) {
-+            s->rx_buff[(s->rx_ptr++) % SJA_RCV_BUF_LEN] = rcv[i];
-+        }
-+        s->rx_ptr %= SJA_RCV_BUF_LEN; /* update the pointer. */
-+
-+        s->status_bas |= 0x01; /* Set the Receive Buffer Status. DS-p15 */
-+        s->status_bas &= ~(1 << 4);
-+        s->interrupt_bas |= 0x01;
-+        if (s->control & 0x02) { /* Receive Interrupt enable. */
-+            s->irq_raise(s->irq_opaque);
-+        }
-+    }
-+    ret = 1;
-+fail:
-+    qemu_mutex_unlock(&s->rx_lock);
-+
-+    return ret;
-+}
-+
-+static CanBusClientInfo can_sja_bus_client_info = {
-+    .can_receive = can_sja_can_receive,
-+    .receive = can_sja_receive,
-+    .cleanup = NULL,
-+    .poll = NULL
-+};
-+
-+
-+int can_sja_connect_to_bus(CanSJA1000State *s, CanBusState *bus)
-+{
-+    s->bus_client.info = &can_sja_bus_client_info;
-+
-+    if (can_bus_insert_client(bus, &s->bus_client) < 0) {
-+        return -1;
-+    }
-+
-+    return 0;
-+}
-+
-+void can_sja_disconnect(CanSJA1000State *s)
-+{
-+    can_bus_remove_client(&s->bus_client);
-+}
-+
-+int can_sja_init(CanSJA1000State *s, CanSJAIrqRaiseLower *irq_raise,
-+                 CanSJAIrqRaiseLower *irq_lower, void *irq_opaque)
-+{
-+    qemu_mutex_init(&s->rx_lock);
-+
-+    s->irq_raise = irq_raise;
-+    s->irq_lower = irq_lower;
-+    s->irq_opaque = irq_opaque;
-+
-+    s->irq_lower(s->irq_opaque);
-+
-+    can_sja_hardware_reset(s);
-+
-+    return 0;
-+}
-+
-+void can_sja_exit(CanSJA1000State *s)
-+{
-+    qemu_mutex_destroy(&s->rx_lock);
-+}
-+
-+const VMStateDescription vmstate_qemu_can_filter = {
-+    .name = "qemu_can_filter",
-+    .version_id = 1,
-+    .minimum_version_id = 1,
-+    .minimum_version_id_old = 1,
-+    .fields = (VMStateField[]) {
-+        VMSTATE_UINT32(can_id, qemu_can_filter),
-+        VMSTATE_UINT32(can_mask, qemu_can_filter),
-+        VMSTATE_END_OF_LIST()
-+    }
-+};
-+
-+/* VMState is needed for live migration of QEMU images */
-+const VMStateDescription vmstate_can_sja = {
-+    .name = "can_sja",
-+    .version_id = 1,
-+    .minimum_version_id = 1,
-+    .minimum_version_id_old = 1,
-+    .fields = (VMStateField[]) {
-+        VMSTATE_UINT8(mode, CanSJA1000State),
-+
-+        VMSTATE_UINT8(status_pel, CanSJA1000State),
-+        VMSTATE_UINT8(interrupt_pel, CanSJA1000State),
-+        VMSTATE_UINT8(interrupt_en, CanSJA1000State),
-+        VMSTATE_UINT8(rxmsg_cnt, CanSJA1000State),
-+        VMSTATE_UINT8(rxbuf_start, CanSJA1000State),
-+        VMSTATE_UINT8(clock, CanSJA1000State),
-+
-+        VMSTATE_BUFFER(code_mask, CanSJA1000State),
-+        VMSTATE_BUFFER(tx_buff, CanSJA1000State),
-+
-+        VMSTATE_BUFFER(rx_buff, CanSJA1000State),
-+
-+        VMSTATE_UINT32(rx_ptr, CanSJA1000State),
-+        VMSTATE_UINT32(rx_cnt, CanSJA1000State),
-+
-+        VMSTATE_UINT8(control, CanSJA1000State),
-+
-+        VMSTATE_UINT8(status_bas, CanSJA1000State),
-+        VMSTATE_UINT8(interrupt_bas, CanSJA1000State),
-+        VMSTATE_UINT8(code, CanSJA1000State),
-+        VMSTATE_UINT8(mask, CanSJA1000State),
-+
-+        VMSTATE_STRUCT_ARRAY(filter, CanSJA1000State, 4, 0,
-+                             vmstate_qemu_can_filter, qemu_can_filter),
-+
-+
-+        VMSTATE_END_OF_LIST()
-+    }
-+};
-diff --git a/hw/can/can_sja1000.h b/hw/can/can_sja1000.h
-new file mode 100644
-index 0000000000..0830e78456
---- /dev/null
-+++ b/hw/can/can_sja1000.h
-@@ -0,0 +1,176 @@
-+/*
-+ * CAN device - SJA1000 chip emulation for QEMU
-+ *
-+ * Copyright (c) 2013-2014 Jin Yang
-+ * Copyright (c) 2014-2017 Pavel Pisa
-+ *
-+ * Initial development supported by Google GSoC 2013 from RTEMS project slot
-+ *
-+ * Permission is hereby granted, free of charge, to any person obtaining a copy
-+ * of this software and associated documentation files (the "Software"), to deal
-+ * in the Software without restriction, including without limitation the rights
-+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-+ * copies of the Software, and to permit persons to whom the Software is
-+ * furnished to do so, subject to the following conditions:
-+ *
-+ * The above copyright notice and this permission notice shall be included in
-+ * all copies or substantial portions of the Software.
-+ *
-+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-+ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-+ * THE SOFTWARE.
-+ */
-+#ifndef HW_CAN_SJA1000_H
-+#define HW_CAN_SJA1000_H
-+
-+#include "can/can_emu.h"
-+
-+#define CAN_SJA_MEM_SIZE      128
-+
-+/* The max size for a message buffer, EFF and DLC=8, DS-p39 */
-+#define SJA_MSG_MAX_LEN       13
-+/* The receive buffer size. */
-+#define SJA_RCV_BUF_LEN       64
-+
-+//#define DEBUG_CAN
-+
-+#ifndef DEBUG_CAN
-+#define DEBUG_CAN 0
-+#endif /*DEBUG_CAN*/
-+
-+#define DPRINTF(fmt, ...) \
-+    do { \
-+        if (DEBUG_CAN) { \
-+            fprintf(stderr, "[cansja]: " fmt , ## __VA_ARGS__); \
-+        } \
-+    } while (0)
-+
-+typedef void (CanSJAIrqRaiseLower)(void *opaque);
-+
-+typedef struct CanSJA1000State {
-+    /* Some registers ... */
-+    uint8_t         mode;          /* PeliCAN, addr 0, Mode register, DS-p26 */
-+                                   /* PeliCAN, addr 1, Command register */
-+    uint8_t         status_pel;    /* PeliCAN, addr 2, Status register, p15 */
-+    uint8_t         interrupt_pel; /* PeliCAN, addr 3, Interrupt register */
-+    uint8_t         interrupt_en;  /* PeliCAN, addr 4, Interrupt Enable register */
-+    uint8_t         rxmsg_cnt;     /* PeliCAN, addr 29, RX message counter. DS-p49 */
-+    uint8_t         rxbuf_start;   /* PeliCAN, addr 30, RX buffer start address, DS-p49 */
-+    uint8_t         clock;         /* PeliCAN, addr 31, Clock Divider register, DS-p55 */
-+
-+    uint8_t         code_mask[8];  /* PeliCAN, addr 16~23 */
-+    uint8_t         tx_buff[13];   /* PeliCAN, addr 96~108, transmit buffer */
-+                                   /* BasicCAN, addr 10~19, transmit buffer */
-+
-+    uint8_t         rx_buff[SJA_RCV_BUF_LEN];  /* 32~95, 64bytes */
-+    uint32_t        rx_ptr;        /* Count by bytes. */
-+    uint32_t        rx_cnt;        /* Count by bytes. */
-+
-+    uint8_t         control;       /* BasicCAN, addr 0, Control register */
-+                                   /* BasicCAN, addr 1, Command register */
-+    uint8_t         status_bas;    /* BasicCAN, addr 2, Status register */
-+    uint8_t         interrupt_bas; /* BasicCAN, addr 3, Interrupt register */
-+    uint8_t         code;          /* BasicCAN, addr 4, Acceptance code register */
-+    uint8_t         mask;          /* BasicCAN, addr 5, Acceptance mask register */
-+
-+    qemu_can_filter filter[4];
-+
-+    QemuMutex       rx_lock;
-+    CanSJAIrqRaiseLower *irq_raise;
-+    CanSJAIrqRaiseLower *irq_lower;
-+    void            *irq_opaque;
-+    CanBusClientState bus_client;
-+} CanSJA1000State;
-+
-+/* PeliCAN mode */
-+enum SJA1000_PeliCAN_regs {
-+        SJA_MOD      = 0x00,
-+/* Command register */
-+        SJA_CMR      = 0x01,
-+/* Status register */
-+        SJA_SR       = 0x02,
-+/* Interrupt register */
-+        SJA_IR       = 0x03,
-+/* Interrupt Enable */
-+        SJA_IER      = 0x04,
-+/* Bus Timing register 0 */
-+        SJA_BTR0     = 0x06,
-+/* Bus Timing register 1 */
-+        SJA_BTR1     = 0x07,
-+/* Output Control register */
-+        SJA_OCR      = 0x08,
-+/* Arbitration Lost Capture */
-+        SJA_ALC      = 0x0b,
-+/* Error Code Capture */
-+        SJA_ECC      = 0x0c,
-+/* Error Warning Limit */
-+        SJA_EWLR     = 0x0d,
-+/* RX Error Counter */
-+        SJA_RXERR    = 0x0e,
-+/* TX Error Counter */
-+        SJA_TXERR0   = 0x0e,
-+        SJA_TXERR1   = 0x0f,
-+/* Rx Message Counter (number of msgs. in RX FIFO */
-+        SJA_RMC      = 0x1d,
-+/* Rx Buffer Start Addr. (address of current MSG) */
-+        SJA_RBSA     = 0x1e,
-+/* Transmit Buffer (write) Receive Buffer (read) Frame Information */
-+        SJA_FRM      = 0x10,
-+/* ID bytes (11 bits in 0 and 1 or 16 bits in 0,1 and 13 bits in 2,3 (extended)) */
-+        SJA_ID0      = 0x11, SJA_ID1 = 0x12,
-+/* ID cont. for extended frames */
-+        SJA_ID2      = 0x13, SJA_ID3 = 0x14,
-+/* Data start standard frame */
-+        SJA_DATS     = 0x13,
-+/* Data start extended frame */
-+        SJA_DATE     = 0x15,
-+/* Acceptance Code (4 bytes) in RESET mode */
-+        SJA_ACR0     = 0x10,
-+/* Acceptance Mask (4 bytes) in RESET mode */
-+        SJA_AMR0     = 0x14,
-+/* 4 bytes */
-+        SJA_PeliCAN_AC_LEN = 4,
-+/* Clock Divider */
-+        SJA_CDR      = 0x1f
-+};
-+
-+
-+/* PeliCAN mode */
-+enum SJA1000_BasicCAN_regs {
-+        SJA_BCAN_CTR = 0x00,
-+/* Command register */
-+        SJA_BCAN_CMR = 0x01,
-+/* Status register */
-+        SJA_BCAN_SR  = 0x02,
-+/* Interrupt register */
-+        SJA_BCAN_IR  = 0x03
-+};
-+
-+void can_sja_hardware_reset(CanSJA1000State *s);
-+
-+void can_sja_mem_write(CanSJA1000State *s, hwaddr addr, uint64_t val,
-+                       unsigned size);
-+
-+uint64_t can_sja_mem_read(CanSJA1000State *s, hwaddr addr, unsigned size);
-+
-+int can_sja_connect_to_bus(CanSJA1000State *s, CanBusState *bus);
-+
-+void can_sja_disconnect(CanSJA1000State *s);
-+
-+int can_sja_init(CanSJA1000State *s, CanSJAIrqRaiseLower *irq_raise,
-+                 CanSJAIrqRaiseLower *irq_lower, void *irq_opaque);
-+
-+void can_sja_exit(CanSJA1000State *s);
-+
-+int can_sja_can_receive(CanBusClientState *client);
-+
-+ssize_t can_sja_receive(CanBusClientState *client,
-+                        const qemu_can_frame *frames, size_t frames_cnt);
-+
-+extern const VMStateDescription vmstate_can_sja;
-+
++#ifndef MIOe3680_PCI_VENDOR_ID1
++#define MIOe3680_PCI_VENDOR_ID1     0x13fe    /* the PCI device and vendor IDs */
 +#endif
++
++#ifndef MIOe3680_PCI_DEVICE_ID1
++#define MIOe3680_PCI_DEVICE_ID1     0xc302
++#endif
++
++#define MIOe3680_PCI_SJA_RANGE     0x800
++
++#define MIOe3680_PCI_BYTES_PER_SJA 0x80
++
++typedef struct Mioe3680PCIState {
++    /*< private >*/
++    PCIDevice       dev;
++    /*< public >*/
++    MemoryRegion    sja_io[2];
++
++    CanSJA1000State sja_state[2];
++    qemu_irq        irq;
++
++    char            *model; /* The model that support, only SJA1000 now. */
++    char            *canbus[2];
++    char            *host[2];
++} Mioe3680PCIState;
++
++static void mioe3680_pci_irq_raise(void *opaque)
++{
++    Mioe3680PCIState *d = (Mioe3680PCIState *)opaque;
++
++    qemu_irq_raise(d->irq);
++}
++
++static void mioe3680_pci_irq_lower(void *opaque)
++{
++    Mioe3680PCIState *d = (Mioe3680PCIState *)opaque;
++
++    qemu_irq_lower(d->irq);
++}
++
++static void
++mioe3680_pci_reset(void *opaque)
++{
++    Mioe3680PCIState *d = (Mioe3680PCIState *)opaque;
++    CanSJA1000State *s1 = &d->sja_state[0];
++    CanSJA1000State *s2 = &d->sja_state[1];
++
++    can_sja_hardware_reset(s1);
++    can_sja_hardware_reset(s2);
++}
++
++static uint64_t mioe3680_pci_sja1_io_read(void *opaque, hwaddr addr,
++                                          unsigned size)
++{
++    Mioe3680PCIState *d = opaque;
++    CanSJA1000State *s = &d->sja_state[0];
++
++    if (addr >= MIOe3680_PCI_BYTES_PER_SJA) {
++        return 0;
++    }
++
++    return can_sja_mem_read(s, addr >> 2, size);
++}
++
++static void mioe3680_pci_sja1_io_write(void *opaque, hwaddr addr, uint64_t data,
++                             unsigned size)
++{
++    Mioe3680PCIState *d = opaque;
++    CanSJA1000State *s = &d->sja_state[0];
++
++    if (addr >= MIOe3680_PCI_BYTES_PER_SJA) {
++        return;
++    }
++
++    can_sja_mem_write(s, addr >> 2, data, size);
++}
++
++static uint64_t mioe3680_pci_sja2_io_read(void *opaque, hwaddr addr,
++                                          unsigned size)
++{
++    Mioe3680PCIState *d = opaque;
++    CanSJA1000State *s = &d->sja_state[1];
++
++    if (addr >= MIOe3680_PCI_BYTES_PER_SJA) {
++        return 0;
++    }
++
++    return can_sja_mem_read(s, addr >> 2, size);
++}
++
++static void mioe3680_pci_sja2_io_write(void *opaque, hwaddr addr, uint64_t data,
++                             unsigned size)
++{
++    Mioe3680PCIState *d = opaque;
++    CanSJA1000State *s = &d->sja_state[1];
++
++    if (addr >= MIOe3680_PCI_BYTES_PER_SJA) {
++        return;
++    }
++
++    can_sja_mem_write(s, addr >> 2, data, size);
++}
++
++static const MemoryRegionOps mioe3680_pci_sja1_io_ops = {
++    .read = mioe3680_pci_sja1_io_read,
++    .write = mioe3680_pci_sja1_io_write,
++    .endianness = DEVICE_LITTLE_ENDIAN,
++    .impl = {
++        .min_access_size = 1,
++        .max_access_size = 1,
++    },
++};
++
++static const MemoryRegionOps mioe3680_pci_sja2_io_ops = {
++    .read = mioe3680_pci_sja2_io_read,
++    .write = mioe3680_pci_sja2_io_write,
++    .endianness = DEVICE_LITTLE_ENDIAN,
++    .impl = {
++        .min_access_size = 1,
++        .max_access_size = 1,
++    },
++};
++
++static int mioe3680_pci_init(PCIDevice *pci_dev)
++{
++    Mioe3680PCIState *d = MIOe3680_PCI_DEV(pci_dev);
++    CanSJA1000State *s1 = &d->sja_state[0];
++    CanSJA1000State *s2 = &d->sja_state[1];
++    uint8_t *pci_conf;
++    CanBusState *can_bus1;
++    CanBusState *can_bus2;
++
++    if (d->model) {
++        if (strncmp(d->model, "pcican-s", 256)) { /* for security reason */
++            error_report("Can't create CAN device, "
++                         "the model %s is not supported now.", d->model);
++            exit(1);
++        }
++    }
++
++    can_bus1 = can_bus_find_by_name(d->canbus[0], true);
++    if (can_bus1 == NULL) {
++        error_report("Cannot create can find/allocate CAN bus #1");
++        exit(1);
++    }
++
++    can_bus2 = can_bus_find_by_name(d->canbus[1], true);
++    if (can_bus2 == NULL) {
++        error_report("Cannot create can find/allocate CAN bus #2");
++        exit(1);
++    }
++
++    if (d->host[0] != NULL) {
++        if (can_bus_connect_to_host_device(can_bus1, d->host[0]) < 0) {
++            error_report("Cannot connect CAN bus to host #1 device \"%s\"",
++                         d->host[0]);
++            exit(1);
++        }
++    }
++
++    if (d->host[1] != NULL) {
++        if (can_bus_connect_to_host_device(can_bus2, d->host[1]) < 0) {
++            error_report("Cannot connect CAN bus to host #2 device \"%s\"",
++                         d->host[1]);
++            exit(1);
++        }
++    }
++
++    pci_conf = pci_dev->config;
++    pci_conf[PCI_INTERRUPT_PIN] = 0x01; /* interrupt pin A */
++
++    d->irq = pci_allocate_irq(&d->dev);
++
++    can_sja_init(s1, mioe3680_pci_irq_raise, mioe3680_pci_irq_lower, d);
++    can_sja_init(s2, mioe3680_pci_irq_raise, mioe3680_pci_irq_lower, d);
++
++    qemu_register_reset(mioe3680_pci_reset, d);
++
++    if (can_sja_connect_to_bus(s1, can_bus1) < 0) {
++        error_report("can_sja_connect_to_bus failed");
++        exit(1);
++    }
++
++    if (can_sja_connect_to_bus(s2, can_bus2) < 0) {
++        error_report("can_sja_connect_to_bus failed");
++        exit(1);
++    }
++
++    memory_region_init_io(&d->sja_io[0], OBJECT(d), &mioe3680_pci_sja1_io_ops,
++                          d, "mioe3680_pci-sja1", MIOe3680_PCI_SJA_RANGE / 2);
++    memory_region_init_io(&d->sja_io[1], OBJECT(d), &mioe3680_pci_sja2_io_ops,
++                          d, "mioe3680_pci-sja2", MIOe3680_PCI_SJA_RANGE / 2);
++
++    pci_register_bar(&d->dev, /*BAR*/ 0, PCI_BASE_ADDRESS_SPACE_IO,
++                                            &d->sja_io[0]);
++    pci_register_bar(&d->dev, /*BAR*/ 1, PCI_BASE_ADDRESS_SPACE_IO,
++                                            &d->sja_io[1]);
++
++    return 0;
++}
++
++static void mioe3680_pci_exit(PCIDevice *pci_dev)
++{
++    Mioe3680PCIState *d = MIOe3680_PCI_DEV(pci_dev);
++    CanSJA1000State *s1 = &d->sja_state[0];
++    CanSJA1000State *s2 = &d->sja_state[1];
++
++    can_sja_disconnect(s1);
++    can_sja_disconnect(s2);
++
++    qemu_unregister_reset(mioe3680_pci_reset, d);
++
++    /*
++     * region d->sja_io is destroyed by QOM now
++     */
++    /* memory_region_destroy(&d->sja_io[0]); */
++    /* memory_region_destroy(&d->sja_io[1]); */
++
++    can_sja_exit(s1);
++    can_sja_exit(s2);
++
++    qemu_free_irq(d->irq);
++}
++
++static const VMStateDescription vmstate_mioe3680_pci = {
++    .name = "mioe3680_pci",
++    .version_id = 1,
++    .minimum_version_id = 1,
++    .minimum_version_id_old = 1,
++    .fields = (VMStateField[]) {
++        VMSTATE_PCI_DEVICE(dev, Mioe3680PCIState),
++        VMSTATE_STRUCT(sja_state[0], Mioe3680PCIState, 0, vmstate_can_sja,
++                       CanSJA1000State),
++        VMSTATE_STRUCT(sja_state[1], Mioe3680PCIState, 0, vmstate_can_sja,
++                       CanSJA1000State),
++        VMSTATE_END_OF_LIST()
++    }
++};
++
++static void qdev_mioe3680_pci_reset(DeviceState *dev)
++{
++    Mioe3680PCIState *d = MIOe3680_PCI_DEV(dev);
++    mioe3680_pci_reset(d);
++}
++
++static Property mioe3680_pci_properties[] = {
++    DEFINE_PROP_STRING("canbus1",   Mioe3680PCIState, canbus[0]),
++    DEFINE_PROP_STRING("canbus2",   Mioe3680PCIState, canbus[1]),
++    DEFINE_PROP_STRING("host1",  Mioe3680PCIState, host[0]),
++    DEFINE_PROP_STRING("host2",  Mioe3680PCIState, host[1]),
++    DEFINE_PROP_STRING("model", Mioe3680PCIState, model),
++    DEFINE_PROP_END_OF_LIST(),
++};
++
++static void mioe3680_pci_class_init(ObjectClass *klass, void *data)
++{
++    DeviceClass *dc = DEVICE_CLASS(klass);
++    PCIDeviceClass *k = PCI_DEVICE_CLASS(klass);
++
++    k->init = mioe3680_pci_init;
++    k->exit = mioe3680_pci_exit;
++    k->vendor_id = MIOe3680_PCI_VENDOR_ID1;
++    k->device_id = MIOe3680_PCI_DEVICE_ID1;
++    k->revision = 0x00;
++    k->class_id = 0x000c09;
++    k->subsystem_vendor_id = MIOe3680_PCI_VENDOR_ID1;
++    k->subsystem_id = MIOe3680_PCI_DEVICE_ID1;
++    dc->desc = "Mioe3680 PCICANx";
++    dc->props = mioe3680_pci_properties;
++    dc->vmsd = &vmstate_mioe3680_pci;
++    set_bit(DEVICE_CATEGORY_MISC, dc->categories);
++    dc->reset = qdev_mioe3680_pci_reset;
++}
++
++static const TypeInfo mioe3680_pci_info = {
++    .name          = TYPE_CAN_PCI_DEV,
++    .parent        = TYPE_PCI_DEVICE,
++    .instance_size = sizeof(Mioe3680PCIState),
++    .class_init    = mioe3680_pci_class_init,
++    .interfaces = (InterfaceInfo[]) {
++        { INTERFACE_CONVENTIONAL_PCI_DEVICE },
++        { },
++    },
++};
++
++static void mioe3680_pci_register_types(void)
++{
++    type_register_static(&mioe3680_pci_info);
++}
++
++type_init(mioe3680_pci_register_types)
 -- 
 2.11.0
