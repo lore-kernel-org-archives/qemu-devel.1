@@ -1,33 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56657)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56689)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1eXcy2-0007Bm-QK
-	for qemu-devel@nongnu.org; Fri, 05 Jan 2018 20:08:12 -0500
+	(envelope-from <groug@kaod.org>) id 1eXcy3-0007Cd-SA
+	for qemu-devel@nongnu.org; Fri, 05 Jan 2018 20:08:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1eXcxz-0006F7-I4
-	for qemu-devel@nongnu.org; Fri, 05 Jan 2018 20:08:10 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:56784)
+	(envelope-from <groug@kaod.org>) id 1eXcy0-0006Fl-8A
+	for qemu-devel@nongnu.org; Fri, 05 Jan 2018 20:08:11 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:49704)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1eXcxz-0006Dv-3s
-	for qemu-devel@nongnu.org; Fri, 05 Jan 2018 20:08:07 -0500
-Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1eXcxz-0006Es-V9
+	for qemu-devel@nongnu.org; Fri, 05 Jan 2018 20:08:08 -0500
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
 	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	w0615Afb117626
-	for <qemu-devel@nongnu.org>; Fri, 5 Jan 2018 20:08:06 -0500
-Received: from e06smtp11.uk.ibm.com (e06smtp11.uk.ibm.com [195.75.94.107])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2fam3y8qm1-1
+	w06156oN052542
+	for <qemu-devel@nongnu.org>; Fri, 5 Jan 2018 20:08:07 -0500
+Received: from e06smtp15.uk.ibm.com (e06smtp15.uk.ibm.com [195.75.94.111])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2fajpmb9wx-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 05 Jan 2018 20:08:05 -0500
+	for <qemu-devel@nongnu.org>; Fri, 05 Jan 2018 20:08:06 -0500
 Received: from localhost
-	by e06smtp11.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	by e06smtp15.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
 	Only! Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <groug@kaod.org>;
 	Sat, 6 Jan 2018 01:08:03 -0000
 From: Greg Kurz <groug@kaod.org>
-Date: Sat,  6 Jan 2018 02:07:31 +0100
+Date: Sat,  6 Jan 2018 02:07:32 +0100
 In-Reply-To: <20180106010739.18201-1-groug@kaod.org>
 References: <20180106010739.18201-1-groug@kaod.org>
-Message-Id: <20180106010739.18201-5-groug@kaod.org>
-Subject: [Qemu-devel] [PULL 04/12] 9pfs: fix some type definitions
+Message-Id: <20180106010739.18201-6-groug@kaod.org>
+Subject: [Qemu-devel] [PULL 05/12] 9pfs: handle: fix type definition
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -43,111 +43,223 @@ To comply with the QEMU coding style.
 
 Signed-off-by: Greg Kurz <groug@kaod.org>
 ---
- hw/9pfs/9p.c               |  6 +++---
- hw/9pfs/9p.h               | 12 ++++++------
- hw/9pfs/virtio-9p-device.c |  2 +-
- hw/9pfs/xen-9p-backend.c   |  2 +-
- 4 files changed, 11 insertions(+), 11 deletions(-)
+ hw/9pfs/9p-handle.c | 48 ++++++++++++++++++++++++------------------------
+ 1 file changed, 24 insertions(+), 24 deletions(-)
 
-diff --git a/hw/9pfs/9p.c b/hw/9pfs/9p.c
-index 52d46632fe15..76f90f2b7863 100644
---- a/hw/9pfs/9p.c
-+++ b/hw/9pfs/9p.c
-@@ -99,10 +99,10 @@ static int omode_to_uflags(int8_t mode)
-     return ret;
- }
+diff --git a/hw/9pfs/9p-handle.c b/hw/9pfs/9p-handle.c
+index 9875f1894cc5..65b12de230c1 100644
+--- a/hw/9pfs/9p-handle.c
++++ b/hw/9pfs/9p-handle.c
+@@ -41,10 +41,10 @@
+ #define BTRFS_SUPER_MAGIC 0x9123683E
+ #endif
  
--struct dotl_openflag_map {
-+typedef struct DotlOpenflagMap {
-     int dotl_flag;
-     int open_flag;
+-struct handle_data {
++typedef struct HandleData {
+     int mountfd;
+     int handle_bytes;
 -};
-+} DotlOpenflagMap;
++} HandleData;
  
- static int dotl_to_open_flags(int flags)
+ static inline int name_to_handle(int dirfd, const char *name,
+                                  struct file_handle *fh, int *mnt_id, int flags)
+@@ -79,7 +79,7 @@ static int handle_lstat(FsContext *fs_ctx, V9fsPath *fs_path,
+                         struct stat *stbuf)
  {
-@@ -113,7 +113,7 @@ static int dotl_to_open_flags(int flags)
-      */
-     int oflags = flags & O_ACCMODE;
+     int fd, ret;
+-    struct handle_data *data = (struct handle_data *)fs_ctx->private;
++    HandleData *data = (HandleData *) fs_ctx->private;
  
--    struct dotl_openflag_map dotl_oflag_map[] = {
-+    DotlOpenflagMap dotl_oflag_map[] = {
-         { P9_DOTL_CREATE, O_CREAT },
-         { P9_DOTL_EXCL, O_EXCL },
-         { P9_DOTL_NOCTTY , O_NOCTTY },
-diff --git a/hw/9pfs/9p.h b/hw/9pfs/9p.h
-index cdfc4f4ce787..6e3b48391788 100644
---- a/hw/9pfs/9p.h
-+++ b/hw/9pfs/9p.h
-@@ -94,10 +94,10 @@ enum {
-     P9_QTFILE = 0x00,
- };
- 
--enum p9_proto_version {
-+typedef enum P9ProtoVersion {
-     V9FS_PROTO_2000U = 0x01,
-     V9FS_PROTO_2000L = 0x02,
--};
-+} P9ProtoVersion;
- 
- #define P9_NOTAG    UINT16_MAX
- #define P9_NOFID    UINT32_MAX
-@@ -118,6 +118,7 @@ static inline char *rpath(FsContext *ctx, const char *path)
- 
- typedef struct V9fsPDU V9fsPDU;
- typedef struct V9fsState V9fsState;
-+typedef struct V9fsTransport V9fsTransport;
- 
- typedef struct {
-     uint32_t size_le;
-@@ -238,10 +239,10 @@ struct V9fsState
-     FileOperations *ops;
-     FsContext ctx;
-     char *tag;
--    enum p9_proto_version proto_version;
-+    P9ProtoVersion proto_version;
-     int32_t msize;
-     V9fsPDU pdus[MAX_REQ];
--    const struct V9fsTransport *transport;
-+    const V9fsTransport *transport;
-     /*
-      * lock ensuring atomic path update
-      * on rename.
-@@ -367,8 +368,7 @@ struct V9fsTransport {
-     void        (*push_and_notify)(V9fsPDU *pdu);
- };
- 
--static inline int v9fs_register_transport(V9fsState *s,
--        const struct V9fsTransport *t)
-+static inline int v9fs_register_transport(V9fsState *s, const V9fsTransport *t)
+     fd = open_by_handle(data->mountfd, fs_path->data, O_PATH);
+     if (fd < 0) {
+@@ -94,7 +94,7 @@ static ssize_t handle_readlink(FsContext *fs_ctx, V9fsPath *fs_path,
+                                char *buf, size_t bufsz)
  {
-     assert(!s->transport);
-     s->transport = t;
-diff --git a/hw/9pfs/virtio-9p-device.c b/hw/9pfs/virtio-9p-device.c
-index c3ae7de3a2d5..43f4e53f336f 100644
---- a/hw/9pfs/virtio-9p-device.c
-+++ b/hw/9pfs/virtio-9p-device.c
-@@ -184,7 +184,7 @@ static void virtio_init_out_iov_from_pdu(V9fsPDU *pdu, struct iovec **piov,
-     *pniov = elem->out_num;
- }
+     int fd, ret;
+-    struct handle_data *data = (struct handle_data *)fs_ctx->private;
++    HandleData *data = (HandleData *) fs_ctx->private;
  
--static const struct V9fsTransport virtio_9p_transport = {
-+static const V9fsTransport virtio_9p_transport = {
-     .pdu_vmarshal = virtio_pdu_vmarshal,
-     .pdu_vunmarshal = virtio_pdu_vunmarshal,
-     .init_in_iov_from_pdu = virtio_init_in_iov_from_pdu,
-diff --git a/hw/9pfs/xen-9p-backend.c b/hw/9pfs/xen-9p-backend.c
-index ee87f08926a2..df2a4100bf55 100644
---- a/hw/9pfs/xen-9p-backend.c
-+++ b/hw/9pfs/xen-9p-backend.c
-@@ -233,7 +233,7 @@ static void xen_9pfs_push_and_notify(V9fsPDU *pdu)
-     qemu_bh_schedule(ring->bh);
- }
+     fd = open_by_handle(data->mountfd, fs_path->data, O_PATH);
+     if (fd < 0) {
+@@ -118,7 +118,7 @@ static int handle_closedir(FsContext *ctx, V9fsFidOpenState *fs)
+ static int handle_open(FsContext *ctx, V9fsPath *fs_path,
+                        int flags, V9fsFidOpenState *fs)
+ {
+-    struct handle_data *data = (struct handle_data *)ctx->private;
++    HandleData *data = (HandleData *) ctx->private;
  
--static const struct V9fsTransport xen_9p_transport = {
-+static const V9fsTransport xen_9p_transport = {
-     .pdu_vmarshal = xen_9pfs_pdu_vmarshal,
-     .pdu_vunmarshal = xen_9pfs_pdu_vunmarshal,
-     .init_in_iov_from_pdu = xen_9pfs_init_in_iov_from_pdu,
+     fs->fd = open_by_handle(data->mountfd, fs_path->data, flags);
+     return fs->fd;
+@@ -207,7 +207,7 @@ static ssize_t handle_pwritev(FsContext *ctx, V9fsFidOpenState *fs,
+ static int handle_chmod(FsContext *fs_ctx, V9fsPath *fs_path, FsCred *credp)
+ {
+     int fd, ret;
+-    struct handle_data *data = (struct handle_data *)fs_ctx->private;
++    HandleData *data = (HandleData *) fs_ctx->private;
+ 
+     fd = open_by_handle(data->mountfd, fs_path->data, O_NONBLOCK);
+     if (fd < 0) {
+@@ -222,7 +222,7 @@ static int handle_mknod(FsContext *fs_ctx, V9fsPath *dir_path,
+                        const char *name, FsCred *credp)
+ {
+     int dirfd, ret;
+-    struct handle_data *data = (struct handle_data *)fs_ctx->private;
++    HandleData *data = (HandleData *) fs_ctx->private;
+ 
+     dirfd = open_by_handle(data->mountfd, dir_path->data, O_PATH);
+     if (dirfd < 0) {
+@@ -240,7 +240,7 @@ static int handle_mkdir(FsContext *fs_ctx, V9fsPath *dir_path,
+                        const char *name, FsCred *credp)
+ {
+     int dirfd, ret;
+-    struct handle_data *data = (struct handle_data *)fs_ctx->private;
++    HandleData *data = (HandleData *) fs_ctx->private;
+ 
+     dirfd = open_by_handle(data->mountfd, dir_path->data, O_PATH);
+     if (dirfd < 0) {
+@@ -272,7 +272,7 @@ static int handle_open2(FsContext *fs_ctx, V9fsPath *dir_path, const char *name,
+ {
+     int ret;
+     int dirfd, fd;
+-    struct handle_data *data = (struct handle_data *)fs_ctx->private;
++    HandleData *data = (HandleData *) fs_ctx->private;
+ 
+     dirfd = open_by_handle(data->mountfd, dir_path->data, O_PATH);
+     if (dirfd < 0) {
+@@ -297,7 +297,7 @@ static int handle_symlink(FsContext *fs_ctx, const char *oldpath,
+                           V9fsPath *dir_path, const char *name, FsCred *credp)
+ {
+     int fd, dirfd, ret;
+-    struct handle_data *data = (struct handle_data *)fs_ctx->private;
++    HandleData *data = (HandleData *) fs_ctx->private;
+ 
+     dirfd = open_by_handle(data->mountfd, dir_path->data, O_PATH);
+     if (dirfd < 0) {
+@@ -322,7 +322,7 @@ static int handle_link(FsContext *ctx, V9fsPath *oldpath,
+                        V9fsPath *dirpath, const char *name)
+ {
+     int oldfd, newdirfd, ret;
+-    struct handle_data *data = (struct handle_data *)ctx->private;
++    HandleData *data = (HandleData *) ctx->private;
+ 
+     oldfd = open_by_handle(data->mountfd, oldpath->data, O_PATH);
+     if (oldfd < 0) {
+@@ -342,7 +342,7 @@ static int handle_link(FsContext *ctx, V9fsPath *oldpath,
+ static int handle_truncate(FsContext *ctx, V9fsPath *fs_path, off_t size)
+ {
+     int fd, ret;
+-    struct handle_data *data = (struct handle_data *)ctx->private;
++    HandleData *data = (HandleData *) ctx->private;
+ 
+     fd = open_by_handle(data->mountfd, fs_path->data, O_NONBLOCK | O_WRONLY);
+     if (fd < 0) {
+@@ -363,7 +363,7 @@ static int handle_rename(FsContext *ctx, const char *oldpath,
+ static int handle_chown(FsContext *fs_ctx, V9fsPath *fs_path, FsCred *credp)
+ {
+     int fd, ret;
+-    struct handle_data *data = (struct handle_data *)fs_ctx->private;
++    HandleData *data = (HandleData *) fs_ctx->private;
+ 
+     fd = open_by_handle(data->mountfd, fs_path->data, O_PATH);
+     if (fd < 0) {
+@@ -379,7 +379,7 @@ static int handle_utimensat(FsContext *ctx, V9fsPath *fs_path,
+ {
+     int ret;
+     int fd;
+-    struct handle_data *data = (struct handle_data *)ctx->private;
++    HandleData *data = (HandleData *) ctx->private;
+ 
+     fd = open_by_handle(data->mountfd, fs_path->data, O_NONBLOCK);
+     if (fd < 0) {
+@@ -418,7 +418,7 @@ static int handle_statfs(FsContext *ctx, V9fsPath *fs_path,
+                          struct statfs *stbuf)
+ {
+     int fd, ret;
+-    struct handle_data *data = (struct handle_data *)ctx->private;
++    HandleData *data = (HandleData *) ctx->private;
+ 
+     fd = open_by_handle(data->mountfd, fs_path->data, O_NONBLOCK);
+     if (fd < 0) {
+@@ -433,7 +433,7 @@ static ssize_t handle_lgetxattr(FsContext *ctx, V9fsPath *fs_path,
+                                 const char *name, void *value, size_t size)
+ {
+     int fd, ret;
+-    struct handle_data *data = (struct handle_data *)ctx->private;
++    HandleData *data = (HandleData *) ctx->private;
+ 
+     fd = open_by_handle(data->mountfd, fs_path->data, O_NONBLOCK);
+     if (fd < 0) {
+@@ -448,7 +448,7 @@ static ssize_t handle_llistxattr(FsContext *ctx, V9fsPath *fs_path,
+                                  void *value, size_t size)
+ {
+     int fd, ret;
+-    struct handle_data *data = (struct handle_data *)ctx->private;
++    HandleData *data = (HandleData *) ctx->private;
+ 
+     fd = open_by_handle(data->mountfd, fs_path->data, O_NONBLOCK);
+     if (fd < 0) {
+@@ -463,7 +463,7 @@ static int handle_lsetxattr(FsContext *ctx, V9fsPath *fs_path, const char *name,
+                             void *value, size_t size, int flags)
+ {
+     int fd, ret;
+-    struct handle_data *data = (struct handle_data *)ctx->private;
++    HandleData *data = (HandleData *) ctx->private;
+ 
+     fd = open_by_handle(data->mountfd, fs_path->data, O_NONBLOCK);
+     if (fd < 0) {
+@@ -478,7 +478,7 @@ static int handle_lremovexattr(FsContext *ctx, V9fsPath *fs_path,
+                                const char *name)
+ {
+     int fd, ret;
+-    struct handle_data *data = (struct handle_data *)ctx->private;
++    HandleData *data = (HandleData *) ctx->private;
+ 
+     fd = open_by_handle(data->mountfd, fs_path->data, O_NONBLOCK);
+     if (fd < 0) {
+@@ -495,7 +495,7 @@ static int handle_name_to_path(FsContext *ctx, V9fsPath *dir_path,
+     char *buffer;
+     struct file_handle *fh;
+     int dirfd, ret, mnt_id;
+-    struct handle_data *data = (struct handle_data *)ctx->private;
++    HandleData *data = (HandleData *) ctx->private;
+ 
+     /* "." and ".." are not allowed */
+     if (!strcmp(name, ".") || !strcmp(name, "..")) {
+@@ -536,7 +536,7 @@ static int handle_renameat(FsContext *ctx, V9fsPath *olddir,
+                            const char *new_name)
+ {
+     int olddirfd, newdirfd, ret;
+-    struct handle_data *data = (struct handle_data *)ctx->private;
++    HandleData *data = (HandleData *) ctx->private;
+ 
+     olddirfd = open_by_handle(data->mountfd, olddir->data, O_PATH);
+     if (olddirfd < 0) {
+@@ -557,7 +557,7 @@ static int handle_unlinkat(FsContext *ctx, V9fsPath *dir,
+                            const char *name, int flags)
+ {
+     int dirfd, ret;
+-    struct handle_data *data = (struct handle_data *)ctx->private;
++    HandleData *data = (HandleData *) ctx->private;
+     int rflags;
+ 
+     dirfd = open_by_handle(data->mountfd, dir->data, O_PATH);
+@@ -609,7 +609,7 @@ static int handle_init(FsContext *ctx)
+     int ret, mnt_id;
+     struct statfs stbuf;
+     struct file_handle fh;
+-    struct handle_data *data = g_malloc(sizeof(struct handle_data));
++    HandleData *data = g_malloc(sizeof(HandleData));
+ 
+     data->mountfd = open(ctx->fs_root, O_DIRECTORY);
+     if (data->mountfd < 0) {
+@@ -646,7 +646,7 @@ out:
+ 
+ static void handle_cleanup(FsContext *ctx)
+ {
+-    struct handle_data *data = ctx->private;
++    HandleData *data = ctx->private;
+ 
+     close(data->mountfd);
+     g_free(data);
 -- 
 2.13.6
