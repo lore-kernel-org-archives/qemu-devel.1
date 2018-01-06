@@ -1,27 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48884)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49455)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1eXe9y-0001DI-QJ
-	for qemu-devel@nongnu.org; Fri, 05 Jan 2018 21:24:35 -0500
+	(envelope-from <alistair23@gmail.com>) id 1eXeBG-00029f-Ri
+	for qemu-devel@nongnu.org; Fri, 05 Jan 2018 21:25:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1eXe9u-0000JS-W3
-	for qemu-devel@nongnu.org; Fri, 05 Jan 2018 21:24:34 -0500
-Received: from mail-wr0-x232.google.com ([2a00:1450:400c:c0c::232]:43329)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
-	id 1eXe9u-0000Im-Oi
-	for qemu-devel@nongnu.org; Fri, 05 Jan 2018 21:24:30 -0500
-Received: by mail-wr0-x232.google.com with SMTP id s13so3368507wra.10
-	for <qemu-devel@nongnu.org>; Fri, 05 Jan 2018 18:24:30 -0800 (PST)
+	(envelope-from <alistair23@gmail.com>) id 1eXeBF-00016N-Sq
+	for qemu-devel@nongnu.org; Fri, 05 Jan 2018 21:25:54 -0500
 MIME-Version: 1.0
-In-Reply-To: <87lghd3mq6.fsf@linaro.org>
-References: <CAKmqyKPZ3AUwGFwp6zK+aFSd6R3p8c+pP-i-W-g=t6ZfR5GVaA@mail.gmail.com>
-	<87lghd3mq6.fsf@linaro.org>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Fri, 5 Jan 2018 18:23:59 -0800
-Message-ID: <CAKmqyKMgrU+4ABijd0SgomyZriVjVFMYt=TXs5b9--w_kenZ+Q@mail.gmail.com>
+Sender: alistair23@gmail.com
+In-Reply-To: <20180103162400.10396-3-f4bug@amsat.org>
+References: <20180103162400.10396-1-f4bug@amsat.org>
+	<20180103162400.10396-3-f4bug@amsat.org>
+From: Alistair Francis <alistair.francis@xilinx.com>
+Date: Fri, 5 Jan 2018 18:25:19 -0800
+Message-ID: <CAKmqyKPzQhhK80WOnP7qbKMUBsQwfC7yT+2A67u=AU3g2rLUzQ@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] MTTCG External Halt
+Subject: Re: [Qemu-devel] [PATCH 2/6] hw/sd/milkymist-memcard: split
+ realize() out of SysBusDevice init()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,93 +25,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
-Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Alistair Francis <alistair.francis@xilinx.com>
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Cc: Alistair Francis <alistair.francis@xilinx.com>, Peter Maydell <peter.maydell@linaro.org>, Michael Walle <michael@walle.cc>, Xiaoqiang Zhao <zxq_yx_007@163.com>, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, qemu-arm <qemu-arm@nongnu.org>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
 
-On Thu, Jan 4, 2018 at 3:08 AM, Alex Benn=C3=A9e <alex.bennee@linaro.org> w=
-rote:
+On Wed, Jan 3, 2018 at 8:23 AM, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.or=
+g> wrote:
+> Create the SDCard in the realize() function.
 >
-> Alistair Francis <alistair23@gmail.com> writes:
->
->> Hey guys, I'm super stuck with an ugly MTTCG issue and was wondering
->> if anyone had any ideas.
->>
->> In the Xilinx fork of QEMU (based on 2.11) we have a way for CPUs to
->> halt other CPUs. This is used for example when the power control unit
->> halts the ARM A53s. To do this we have internal GPIO signals that end
->> up calling a function that basically does this:
->>
->> To halt:
->>     cpu->halted =3D true;
->>     cpu_interrupt(cpu, CPU_INTERRUPT_HALT);
->
-> Hmm I don't think you should be setting cpu->halted unless you know it
-> is safe to do so. As the other CPUs free-run during BQL this isn't
-> enough for a cross vCPU interaction. However you can schedule work to
-> run in the target vCPUs context safely.
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 
-We actually pretty much only ever set it on reset.
-
->
-> That said isn't the cpu_interrupt enough to trigger the target vCPU to
-> halt?
->
->>
->> To un-halt
->>     cpu->halted =3D false;
->>     cpu_reset_interrupt(cpu, CPU_INTERRUPT_HALT);
->
-> Again if cross vCPU context this needs to be scheduled against the
-> target vCPU.
->
->>
->> We also have the standard ARM WFI (Wait For Interrupt) implementation
->> in op_helper.c:
->>     cs->halted =3D 1;
->>     cs->exception_index =3D EXCP_HLT;
->>     cpu_loop_exit(cs);
->>
->> Before MTTCG this used to work great, but now either we end up with
->> the guest Linux complaining about CPU stalls or we hit:
->> ERROR:/scratch/alistai/master-qemu/cpus.c:1516:qemu_tcg_cpu_thread_fn:
->> assertion failed: (cpu->halted)
->>
->> If I remove the instances of manually setting cpu->halted then I don't
->> see the asserts(), but the the WFI instruction doesn't work correctly.
->> So it seems like setting the halted status externally from the CPU
->> causes the issue.
->
->   /* during start-up the vCPU is reset and the thread is
->    * kicked several times. If we don't ensure we go back
->    * to sleep in the halted state we won't cleanly
->    * start-up when the vCPU is enabled.
->    *
->    * cpu->halted should ensure we sleep in wait_io_event
->    */
->
-> I think what I'm trying to say is we should never be halted without
-> having gone via wait_io_event where we can sleep.
->
->
->> I have tried setting it inside a lock, using atomic
->> operations and running the setter async on the CPU, but nothing works.
->>
->> Any chance any one has some insight into a way to externally set a
->> vCPU as halted/un-halted?
->
-> See the PSCI code which uses the async interface for exactly this.
-
-Yeah, that and a fix to our weird double reset fixed it.
-
-What I don't get is how a double reset would cause the assert() to be hit.
+Reviewed-by: Alistair Francis <alistair.francis@xilinx.com>
 
 Alistair
 
+> ---
+>  hw/sd/milkymist-memcard.c | 24 +++++++++++++++---------
+>  1 file changed, 15 insertions(+), 9 deletions(-)
 >
->>
->> Thanks,
->> Alistair
+> diff --git a/hw/sd/milkymist-memcard.c b/hw/sd/milkymist-memcard.c
+> index 5de3e00e2f..5df3a0f815 100644
+> --- a/hw/sd/milkymist-memcard.c
+> +++ b/hw/sd/milkymist-memcard.c
+> @@ -255,24 +255,29 @@ static void milkymist_memcard_reset(DeviceState *d)
+>  static int milkymist_memcard_init(SysBusDevice *dev)
+>  {
+>      MilkymistMemcardState *s =3D MILKYMIST_MEMCARD(dev);
+> -    DriveInfo *dinfo;
+> +
+> +    memory_region_init_io(&s->regs_region, OBJECT(s), &memcard_mmio_ops,=
+ s,
+> +            "milkymist-memcard", R_MAX * 4);
+> +    sysbus_init_mmio(dev, &s->regs_region);
+> +
+> +    return 0;
+> +}
+> +
+> +static void milkymist_memcard_realize(DeviceState *dev, Error **errp)
+> +{
+> +    MilkymistMemcardState *s =3D MILKYMIST_MEMCARD(dev);
+>      BlockBackend *blk;
+> +    DriveInfo *dinfo;
 >
+>      /* FIXME use a qdev drive property instead of drive_get_next() */
+>      dinfo =3D drive_get_next(IF_SD);
+>      blk =3D dinfo ? blk_by_legacy_dinfo(dinfo) : NULL;
+>      s->card =3D sd_init(blk, false);
+>      if (s->card =3D=3D NULL) {
+> -        return -1;
+> +        error_setg(errp, "failed to init SD card");
+> +        return;
+>      }
+> -
+>      s->enabled =3D blk && blk_is_inserted(blk);
+> -
+> -    memory_region_init_io(&s->regs_region, OBJECT(s), &memcard_mmio_ops,=
+ s,
+> -            "milkymist-memcard", R_MAX * 4);
+> -    sysbus_init_mmio(dev, &s->regs_region);
+> -
+> -    return 0;
+>  }
 >
+>  static const VMStateDescription vmstate_milkymist_memcard =3D {
+> @@ -298,6 +303,7 @@ static void milkymist_memcard_class_init(ObjectClass =
+*klass, void *data)
+>      SysBusDeviceClass *k =3D SYS_BUS_DEVICE_CLASS(klass);
+>
+>      k->init =3D milkymist_memcard_init;
+> +    dc->realize =3D milkymist_memcard_realize;
+>      dc->reset =3D milkymist_memcard_reset;
+>      dc->vmsd =3D &vmstate_milkymist_memcard;
+>      /* Reason: init() method uses drive_get_next() */
 > --
-> Alex Benn=C3=A9e
+> 2.15.1
+>
+>
