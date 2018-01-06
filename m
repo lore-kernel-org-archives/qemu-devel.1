@@ -1,17 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48078)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47837)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eXax2-0003be-8Q
-	for qemu-devel@nongnu.org; Fri, 05 Jan 2018 17:59:01 -0500
+	(envelope-from <joserz@linux.vnet.ibm.com>) id 1eXce9-0000Vj-2G
+	for qemu-devel@nongnu.org; Fri, 05 Jan 2018 19:47:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eXax0-0000dl-Ty
-	for qemu-devel@nongnu.org; Fri, 05 Jan 2018 17:59:00 -0500
-From: Eric Blake <eblake@redhat.com>
-Date: Fri,  5 Jan 2018 16:57:53 -0600
-Message-Id: <20180105225753.30509-21-eblake@redhat.com>
-In-Reply-To: <20180105225753.30509-1-eblake@redhat.com>
-References: <20180105225753.30509-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PATCH v7 20/20] block: Drop unused
- .bdrv_co_get_block_status()
+	(envelope-from <joserz@linux.vnet.ibm.com>) id 1eXce4-0002IY-WA
+	for qemu-devel@nongnu.org; Fri, 05 Jan 2018 19:47:36 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:52702)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <joserz@linux.vnet.ibm.com>)
+	id 1eXce4-0002GY-FW
+	for qemu-devel@nongnu.org; Fri, 05 Jan 2018 19:47:32 -0500
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	w060i2gw004395
+	for <qemu-devel@nongnu.org>; Fri, 5 Jan 2018 19:47:30 -0500
+Received: from e15.ny.us.ibm.com (e15.ny.us.ibm.com [129.33.205.205])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2fajpmar6k-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Fri, 05 Jan 2018 19:47:29 -0500
+Received: from localhost
+	by e15.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <joserz@linux.vnet.ibm.com>;
+	Fri, 5 Jan 2018 19:47:28 -0500
+From: Jose Ricardo Ziviani <joserz@linux.vnet.ibm.com>
+Date: Fri,  5 Jan 2018 22:47:21 -0200
+Message-Id: <20180106004722.1152-1-joserz@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH 0/1] Check SMT based on KVM_CAP_PPC_SMT_POSSIBLE
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,119 +35,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, famz@redhat.com, jcody@redhat.com, qemu-block@nongnu.org, vsementsov@virtuozzo.com, Stefan Hajnoczi <stefanha@redhat.com>, Max Reitz <mreitz@redhat.com>
+To: qemu-ppc@nongnu.org
+Cc: qemu-devel@nongnu.org, david@gibson.dropbear.id.au
 
-We are gradually moving away from sector-based interfaces, towards
-byte-based.  Now that all drivers have been updated to provide the
-byte-based .bdrv_co_block_status(), we can delete the sector-based
-interface.
+If one defines a P9 guest like -smp sockets=1,cores=1,threads=8 QEMU will silently changes threads to 4:
 
-Signed-off-by: Eric Blake <eblake@redhat.com>
-Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Reviewed-by: Fam Zheng <famz@redhat.com>
+(guest) # lscpu
+Architecture:          ppc64le
+Byte Order:            Little Endian
+CPU(s):                4
+On-line CPU(s) list:   0-3
+Thread(s) per core:    4
+Core(s) per socket:    1
+Socket(s):             1
+NUMA node(s):          1
+...
+(qemu) info cpus
+* CPU #0: nip=0xc0000000000db9cc thread_id=9440
+  CPU #1: nip=0xc0000000000db9cc thread_id=9441
+  CPU #2: nip=0xc0000000000db9cc thread_id=9442
+  CPU #3: nip=0xc0000000000db9cc thread_id=9443
+  CPU #4: nip=0x0000000000000100 (halted) thread_id=9444
+  CPU #5: nip=0x0000000000000100 (halted) thread_id=9445
+  CPU #6: nip=0x0000000000000100 (halted) thread_id=9446
+  CPU #7: nip=0x0000000000000100 (halted) thread_id=9447
 
----
-v7: no change
-v6: rebase to changes in patch 1, drop R-b
-v5: rebase to master
-v4: rebase to interface tweak
-v3: no change
-v2: rebase to earlier changes
----
- include/block/block_int.h |  3 ---
- block/io.c                | 50 ++++++++++-------------------------------------
- 2 files changed, 10 insertions(+), 43 deletions(-)
+This behavior is causing confusion and QEMU will crash if one tries to hotplug a CPU. QEMU already has a number of SMT sane checking and this patch adds another one: it verifies if KVM supports (KVM_CAP_PPC_SMT_POSSIBLE) the required number of threads instead of impose a value defined in the compat table.
 
-diff --git a/include/block/block_int.h b/include/block/block_int.h
-index d4509a2711..f019af7dbc 100644
---- a/include/block/block_int.h
-+++ b/include/block/block_int.h
-@@ -217,9 +217,6 @@ struct BlockDriver {
-      * as well as non-NULL pnum, map, and file; in turn, the driver
-      * must return an error or set pnum to an aligned non-zero value.
-      */
--    int64_t coroutine_fn (*bdrv_co_get_block_status)(BlockDriverState *bs,
--        int64_t sector_num, int nb_sectors, int *pnum,
--        BlockDriverState **file);
-     int coroutine_fn (*bdrv_co_block_status)(BlockDriverState *bs,
-         bool want_zero, int64_t offset, int64_t bytes, int64_t *pnum,
-         int64_t *map, BlockDriverState **file);
-diff --git a/block/io.c b/block/io.c
-index 087cb89b86..23af7eff20 100644
---- a/block/io.c
-+++ b/block/io.c
-@@ -1963,7 +1963,7 @@ static int coroutine_fn bdrv_co_block_status(BlockDriverState *bs,
+Result:
+(guest) # lscpu
+Architecture:          ppc64le
+Byte Order:            Little Endian
+CPU(s):                8
+On-line CPU(s) list:   0-7
+Thread(s) per core:    8
+Core(s) per socket:    1
+Socket(s):             1
+...
+(qemu) info cpus
+* CPU #0: nip=0xc0000000000d30ac thread_id=80197
+  CPU #1: nip=0xc0000000000d30ac thread_id=80198
+  CPU #2: nip=0xc0000000000d30ac thread_id=80199
+  CPU #3: nip=0xc0000000000d30ac thread_id=80200
+  CPU #4: nip=0xc0000000000d30ac thread_id=80201
+  CPU #5: nip=0xc0000000000d30ac thread_id=80202
+  CPU #6: nip=0xc0000000000d30ac thread_id=80203
+  CPU #7: nip=0xc0000000000d30ac thread_id=80204
 
-     /* Must be non-NULL or bdrv_getlength() would have failed */
-     assert(bs->drv);
--    if (!bs->drv->bdrv_co_get_block_status && !bs->drv->bdrv_co_block_status) {
-+    if (!bs->drv->bdrv_co_block_status) {
-         *pnum = bytes;
-         ret = BDRV_BLOCK_DATA | BDRV_BLOCK_ALLOCATED;
-         if (offset + bytes == total_size) {
-@@ -1981,53 +1981,23 @@ static int coroutine_fn bdrv_co_block_status(BlockDriverState *bs,
+This patch is based on ppc-for-2.12
 
-     /* Round out to request_alignment boundaries */
-     align = bs->bl.request_alignment;
--    if (bs->drv->bdrv_co_get_block_status && align < BDRV_SECTOR_SIZE) {
--        align = BDRV_SECTOR_SIZE;
--    }
-     aligned_offset = QEMU_ALIGN_DOWN(offset, align);
-     aligned_bytes = ROUND_UP(offset + bytes, align) - aligned_offset;
+Jose Ricardo Ziviani (1):
+  spapr: Check SMT based on KVM_CAP_PPC_SMT_POSSIBLE
 
--    if (bs->drv->bdrv_co_get_block_status) {
--        int count; /* sectors */
--        int64_t longret;
--
--        assert(QEMU_IS_ALIGNED(aligned_offset | aligned_bytes,
--                               BDRV_SECTOR_SIZE));
--        /*
--         * The contract allows us to return pnum smaller than bytes, even
--         * if the next query would see the same status; we truncate the
--         * request to avoid overflowing the driver's 32-bit interface.
--         */
--        longret = bs->drv->bdrv_co_get_block_status(
--            bs, aligned_offset >> BDRV_SECTOR_BITS,
--            MIN(INT_MAX, aligned_bytes) >> BDRV_SECTOR_BITS, &count,
--            &local_file);
--        if (longret < 0) {
--            assert(INT_MIN <= longret);
--            ret = longret;
--            goto out;
--        }
--        if (longret & BDRV_BLOCK_OFFSET_VALID) {
--            local_map = longret & BDRV_BLOCK_OFFSET_MASK;
--        }
--        ret = longret & ~BDRV_BLOCK_OFFSET_MASK;
--        *pnum = count * BDRV_SECTOR_SIZE;
--    } else {
--        ret = bs->drv->bdrv_co_block_status(bs, want_zero, aligned_offset,
--                                            aligned_bytes, pnum, &local_map,
--                                            &local_file);
--        if (ret < 0) {
--            *pnum = 0;
--            goto out;
--        }
--        assert(*pnum); /* The block driver must make progress */
-+    ret = bs->drv->bdrv_co_block_status(bs, want_zero, aligned_offset,
-+                                        aligned_bytes, pnum, &local_map,
-+                                        &local_file);
-+    if (ret < 0) {
-+        *pnum = 0;
-+        goto out;
-     }
+ hw/ppc/spapr.c       | 14 +++++++++++++-
+ hw/ppc/trace-events  |  1 +
+ target/ppc/kvm.c     |  5 +++++
+ target/ppc/kvm_ppc.h |  6 ++++++
+ 4 files changed, 25 insertions(+), 1 deletion(-)
 
-     /*
--     * The driver's result must be a multiple of request_alignment.
-+     * The driver's result must be a non-zero multiple of request_alignment.
-      * Clamp pnum and adjust map to original request.
-      */
--    assert(QEMU_IS_ALIGNED(*pnum, align) && align > offset - aligned_offset);
-+    assert(*pnum && QEMU_IS_ALIGNED(*pnum, align) &&
-+           align > offset - aligned_offset);
-     *pnum -= offset - aligned_offset;
-     if (*pnum > bytes) {
-         *pnum = bytes;
 -- 
-2.14.3
+2.14.1
