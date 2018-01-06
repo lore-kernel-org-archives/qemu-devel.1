@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41040)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41057)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <hpoussin@reactos.org>) id 1eXqaf-0000VP-9O
-	for qemu-devel@nongnu.org; Sat, 06 Jan 2018 10:40:58 -0500
+	(envelope-from <hpoussin@reactos.org>) id 1eXqaf-0000VV-Rv
+	for qemu-devel@nongnu.org; Sat, 06 Jan 2018 10:40:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <hpoussin@reactos.org>) id 1eXqae-00014L-4j
+	(envelope-from <hpoussin@reactos.org>) id 1eXqae-00015f-RA
 	for qemu-devel@nongnu.org; Sat, 06 Jan 2018 10:40:57 -0500
-Received: from iserv.reactos.org ([2a01:4f8:221:4c5::3]:42444)
+Received: from iserv.reactos.org ([2a01:4f8:221:4c5::3]:42413)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <hpoussin@reactos.org>)
-	id 1eXqad-000132-UA
+	id 1eXqae-0000yZ-K3
 	for qemu-devel@nongnu.org; Sat, 06 Jan 2018 10:40:56 -0500
 From: =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>
-Date: Sat,  6 Jan 2018 16:37:20 +0100
-Message-Id: <20180106153730.30313-7-hpoussin@reactos.org>
+Date: Sat,  6 Jan 2018 16:37:17 +0100
+Message-Id: <20180106153730.30313-4-hpoussin@reactos.org>
 In-Reply-To: <20180106153730.30313-1-hpoussin@reactos.org>
 References: <20180106153730.30313-1-hpoussin@reactos.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v4 06/16] piix4: add Reset Control Register
+Subject: [Qemu-devel] [PATCH v4 03/16] mc146818rtc: move structure to header
+ file
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,85 +31,96 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Aurelien Jarno <aurelien@aurel32.net>, Yongbok Kim <yongbok.kim@mips.com>, "Michael S . Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
 Cc: =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>
 
-The RCR I/O port (0xcf9) is used to generate a hard reset or a soft reset.
+We are now able to embed a timer in another object.
 
 Acked-by: Michael S. Tsirkin <mst@redhat.com>
 Acked-by: Paolo Bonzini <pbonzini@redhat.com>
 Signed-off-by: Hervé Poussineau <hpoussin@reactos.org>
 ---
- hw/isa/piix4.c | 39 +++++++++++++++++++++++++++++++++++++++
- 1 file changed, 39 insertions(+)
+ hw/timer/mc146818rtc.c         | 30 ------------------------------
+ include/hw/timer/mc146818rtc.h | 29 +++++++++++++++++++++++++++++
+ 2 files changed, 29 insertions(+), 30 deletions(-)
 
-diff --git a/hw/isa/piix4.c b/hw/isa/piix4.c
-index 7b231b704b..ce15370d4d 100644
---- a/hw/isa/piix4.c
-+++ b/hw/isa/piix4.c
-@@ -2,6 +2,7 @@
-  * QEMU PIIX4 PCI Bridge Emulation
-  *
-  * Copyright (c) 2006 Fabrice Bellard
-+ * Copyright (c) 2018 Hervé Poussineau
-  *
-  * Permission is hereby granted, free of charge, to any person obtaining a copy
-  * of this software and associated documentation files (the "Software"), to deal
-@@ -33,6 +34,10 @@ PCIDevice *piix4_dev;
+diff --git a/hw/timer/mc146818rtc.c b/hw/timer/mc146818rtc.c
+index 35a05a64cc..3e8c0b7d33 100644
+--- a/hw/timer/mc146818rtc.c
++++ b/hw/timer/mc146818rtc.c
+@@ -62,36 +62,6 @@
+ #define RTC_CLOCK_RATE            32768
+ #define UIP_HOLD_LENGTH           (8 * NANOSECONDS_PER_SECOND / 32768)
  
- typedef struct PIIX4State {
-     PCIDevice dev;
-+
-+    /* Reset Control Register */
-+    MemoryRegion rcr_mem;
-+    uint8_t rcr;
- } PIIX4State;
+-#define MC146818_RTC(obj) OBJECT_CHECK(RTCState, (obj), TYPE_MC146818_RTC)
+-
+-typedef struct RTCState {
+-    ISADevice parent_obj;
+-
+-    MemoryRegion io;
+-    uint8_t cmos_data[128];
+-    uint8_t cmos_index;
+-    int32_t base_year;
+-    uint64_t base_rtc;
+-    uint64_t last_update;
+-    int64_t offset;
+-    qemu_irq irq;
+-    int it_shift;
+-    /* periodic timer */
+-    QEMUTimer *periodic_timer;
+-    int64_t next_periodic_time;
+-    /* update-ended timer */
+-    QEMUTimer *update_timer;
+-    uint64_t next_alarm_time;
+-    uint16_t irq_reinject_on_ack_count;
+-    uint32_t irq_coalesced;
+-    uint32_t period;
+-    QEMUTimer *coalesced_timer;
+-    Notifier clock_reset_notifier;
+-    LostTickPolicy lost_tick_policy;
+-    Notifier suspend_notifier;
+-    QLIST_ENTRY(RTCState) link;
+-} RTCState;
+-
+ static void rtc_set_time(RTCState *s);
+ static void rtc_update_time(RTCState *s);
+ static void rtc_set_cmos(RTCState *s, const struct tm *tm);
+diff --git a/include/hw/timer/mc146818rtc.h b/include/hw/timer/mc146818rtc.h
+index fe6ed63f71..7385622604 100644
+--- a/include/hw/timer/mc146818rtc.h
++++ b/include/hw/timer/mc146818rtc.h
+@@ -5,6 +5,35 @@
+ #include "hw/timer/mc146818rtc_regs.h"
  
- #define TYPE_PIIX4_PCI_DEVICE "PIIX4"
-@@ -87,6 +92,34 @@ static const VMStateDescription vmstate_piix4 = {
-     }
- };
+ #define TYPE_MC146818_RTC "mc146818rtc"
++#define MC146818_RTC(obj) OBJECT_CHECK(RTCState, (obj), TYPE_MC146818_RTC)
++
++typedef struct RTCState {
++    ISADevice parent_obj;
++
++    MemoryRegion io;
++    uint8_t cmos_data[128];
++    uint8_t cmos_index;
++    int32_t base_year;
++    uint64_t base_rtc;
++    uint64_t last_update;
++    int64_t offset;
++    qemu_irq irq;
++    int it_shift;
++    /* periodic timer */
++    QEMUTimer *periodic_timer;
++    int64_t next_periodic_time;
++    /* update-ended timer */
++    QEMUTimer *update_timer;
++    uint64_t next_alarm_time;
++    uint16_t irq_reinject_on_ack_count;
++    uint32_t irq_coalesced;
++    uint32_t period;
++    QEMUTimer *coalesced_timer;
++    Notifier clock_reset_notifier;
++    LostTickPolicy lost_tick_policy;
++    Notifier suspend_notifier;
++    QLIST_ENTRY(RTCState) link;
++} RTCState;
  
-+static void piix4_rcr_write(void *opaque, hwaddr addr, uint64_t val,
-+                            unsigned int len)
-+{
-+    PIIX4State *s = opaque;
-+
-+    if (val & 4) {
-+        qemu_system_reset_request(SHUTDOWN_CAUSE_GUEST_RESET);
-+        return;
-+    }
-+    s->rcr = val & 2; /* keep System Reset type only */
-+}
-+
-+static uint64_t piix4_rcr_read(void *opaque, hwaddr addr, unsigned int len)
-+{
-+    PIIX4State *s = opaque;
-+    return s->rcr;
-+}
-+
-+static const MemoryRegionOps piix4_rcr_ops = {
-+    .read = piix4_rcr_read,
-+    .write = piix4_rcr_write,
-+    .endianness = DEVICE_LITTLE_ENDIAN,
-+    .impl = {
-+        .min_access_size = 1,
-+        .max_access_size = 1,
-+    },
-+};
-+
- static void piix4_realize(PCIDevice *pci_dev, Error **errp)
- {
-     DeviceState *dev = DEVICE(pci_dev);
-@@ -96,6 +129,12 @@ static void piix4_realize(PCIDevice *pci_dev, Error **errp)
-                      pci_address_space_io(pci_dev), errp)) {
-         return;
-     }
-+
-+    memory_region_init_io(&s->rcr_mem, OBJECT(dev), &piix4_rcr_ops, s,
-+                          "reset-control", 1);
-+    memory_region_add_subregion_overlap(pci_address_space_io(pci_dev), 0xcf9,
-+                                        &s->rcr_mem, 1);
-+
-     piix4_dev = pci_dev;
-     qemu_register_reset(piix4_reset, s);
- }
+ ISADevice *mc146818_rtc_init(ISABus *bus, int base_year,
+                              qemu_irq intercept_irq);
 -- 
 2.11.0
