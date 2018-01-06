@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45768)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49850)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1eXvkU-0008I3-Hx
-	for qemu-devel@nongnu.org; Sat, 06 Jan 2018 16:11:27 -0500
+	(envelope-from <riemensberger@cadami.net>) id 1eXvyO-0003Zn-7H
+	for qemu-devel@nongnu.org; Sat, 06 Jan 2018 16:25:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1eXvkR-0001aS-9V
-	for qemu-devel@nongnu.org; Sat, 06 Jan 2018 16:11:26 -0500
-Resent-Message-Id: <E1eXvkR-0001aS-9V@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21314)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1eXvkR-0001Tl-2P
-	for qemu-devel@nongnu.org; Sat, 06 Jan 2018 16:11:23 -0500
-In-Reply-To: <cover.1515260163.git.pisa@cmp.felk.cvut.cz>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <151527302620.345.13671865412072873481@5adcb62bf0d6>
+	(envelope-from <riemensberger@cadami.net>) id 1eXvyJ-0007Ka-MO
+	for qemu-devel@nongnu.org; Sat, 06 Jan 2018 16:25:48 -0500
+Received: from dd7730.kasserver.com ([85.13.132.46]:43627)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <riemensberger@cadami.net>)
+	id 1eXvyJ-0007G3-BX
+	for qemu-devel@nongnu.org; Sat, 06 Jan 2018 16:25:43 -0500
+References: <1515258013-85745-1-git-send-email-riemensberger@cadami.net>
+	<0ab16158-74fa-3db1-1e62-2dba5fc9659a@vivier.eu>
+From: Maximilian Riemensberger <riemensberger@cadami.net>
+Message-ID: <7a312220-2989-bb5f-ecc1-ef31509e32fa@cadami.net>
+Date: Sat, 6 Jan 2018 22:25:38 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Sat, 6 Jan 2018 13:10:27 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH 0/7] CAN bus support for QEMU (SJA1000 PCI
- so far)
+In-Reply-To: <0ab16158-74fa-3db1-1e62-2dba5fc9659a@vivier.eu>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] linux-user/mmap.c: Avoid choosing NULL as
+ start address
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,123 +30,94 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: pisa@cmp.felk.cvut.cz
-Cc: famz@redhat.com, qemu-devel@nongnu.org, marex@denx.de, socketcan@hartkopp.net, stefanha@gmail.com, deniz.eren@icloud.com, o.rempel@pengutronix.de, frederic.konrad@adacore.com, jan.kiszka@siemens.com
+To: Laurent Vivier <laurent@vivier.eu>, qemu-devel <qemu-devel@nongnu.org>
+Cc: Riku Voipio <riku.voipio@iki.fi>, Peter Maydell <peter.maydell@linaro.org>
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
-c3NhZ2UtaWQ6IGNvdmVyLjE1MTUyNjAxNjMuZ2l0LnBpc2FAY21wLmZlbGsuY3Z1dC5jegpTdWJq
-ZWN0OiBbUWVtdS1kZXZlbF0gW1BBVENIIDAvN10gQ0FOIGJ1cyBzdXBwb3J0IGZvciBRRU1VIChT
-SkExMDAwIFBDSSBzbyBmYXIpCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNo
-CgpCQVNFPWJhc2UKbj0xCnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJBU0UuLiB8IHdjIC1s
-KQpmYWlsZWQ9MAoKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29u
-ZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKCmNvbW1pdHM9IiQoZ2l0IGxvZyAtLWZvcm1h
-dD0lSCAtLXJldmVyc2UgJEJBU0UuLikiCmZvciBjIGluICRjb21taXRzOyBkbwogICAgZWNobyAi
-Q2hlY2tpbmcgUEFUQ0ggJG4vJHRvdGFsOiAkKGdpdCBsb2cgLW4gMSAtLWZvcm1hdD0lcyAkYyku
-Li4iCiAgICBpZiAhIGdpdCBzaG93ICRjIC0tZm9ybWF0PWVtYWlsIHwgLi9zY3JpcHRzL2NoZWNr
-cGF0Y2gucGwgLS1tYWlsYmFjayAtOyB0aGVuCiAgICAgICAgZmFpbGVkPTEKICAgICAgICBlY2hv
-CiAgICBmaQogICAgbj0kKChuKzEpKQpkb25lCgpleGl0ICRmYWlsZWQKPT09IFRFU1QgU0NSSVBU
-IEVORCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMz
-ODQKU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0JwpmNjU1NWFlZDQ5IFFFTVUgQ0FOIGJ1
-cyBlbXVsYXRpb24gZG9jdW1lbnRhdGlvbgpiNDNiMzFjOGY1IENBTiBidXMgTUlPZS0zNjgwIFBD
-SSAoZHVhbCBTSkExMDAwIGNoYW5uZWwpIGVtdWxhdGlvbiBhZGRlZC4KNDkyMjhiYjg4MSBDQU4g
-YnVzIFBDTS0zNjgwSSBQQ0kgKGR1YWwgU0pBMTAwMCBjaGFubmVsKSBlbXVsYXRpb24gYWRkZWQu
-Cjk0YmY4YTcwNTEgQ0FOIGJ1cyBLdmFzZXIgUENJIENBTi1TIChzaW5nbGUgU0pBMTAwMCBjaGFu
-bmVsKSBlbXVsYXRpb24gYWRkZWQuCjEzN2ViNDQ2MGUgQ0FOIGJ1cyBTSkExMDAwIGNoaXAgcmVn
-aXN0ZXIgbGV2ZWwgZW11bGF0aW9uIGZvciBRRU1VCjdiNDA4ZjMxN2YgQ0FOIGJ1cyBzdXBwb3J0
-IHRvIGNvbm5lY3QgYnVzdCB0byBMaW51eCBob3N0IFNvY2tldENBTiBpbnRlcmZhY2UuCmE1NjY1
-N2M2MzYgQ0FOIGJ1cyBzaW1wbGUgbWVzc2FnZXMgdHJhbnNwb3J0IGltcGxlbWVudGF0aW9uIGZv
-ciBRRU1VCgo9PT0gT1VUUFVUIEJFR0lOID09PQpDaGVja2luZyBQQVRDSCAxLzc6IENBTiBidXMg
-c2ltcGxlIG1lc3NhZ2VzIHRyYW5zcG9ydCBpbXBsZW1lbnRhdGlvbiBmb3IgUUVNVS4uLgpXQVJO
-SU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojMTk5OiBGSUxFOiBody9jYW4vY2FuX2NvcmUu
-YzoxMjU6CisgICAgICAgIGVycm9yX3JlcG9ydCgiQ0FOIGJ1cyBjb25uZWN0IHRvIGhvc3QgZGV2
-aWNlIG5vdCBzdXBwb3J0ZWQgb24gdGhpcyBzeXN0ZW0iKTsKCldBUk5JTkc6IGxpbmUgb3ZlciA4
-MCBjaGFyYWN0ZXJzCiMzMjk6IEZJTEU6IGluY2x1ZGUvY2FuL2Nhbl9lbXUuaDo3ODoKKyNkZWZp
-bmUgUUVNVV9DQU5fSU5WX0ZJTFRFUiAweDIwMDAwMDAwVSAvKiB0byBiZSBzZXQgaW4gcWVtdV9j
-YW5fZmlsdGVyLmNhbl9pZCAqLwoKV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzM2
-NTogRklMRTogaW5jbHVkZS9jYW4vY2FuX2VtdS5oOjExNDoKK2V4dGVybiBpbnQgKCpjYW5fYnVz
-X2Nvbm5lY3RfdG9faG9zdF92YXJpYW50KShDYW5CdXNTdGF0ZSAqYnVzLCBjb25zdCBjaGFyICpu
-YW1lKTsKCnRvdGFsOiAwIGVycm9ycywgMyB3YXJuaW5ncywgMzI4IGxpbmVzIGNoZWNrZWQKCllv
-dXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRo
-ZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFp
-bmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KQ2hlY2tpbmcgUEFUQ0ggMi83OiBD
-QU4gYnVzIHN1cHBvcnQgdG8gY29ubmVjdCBidXN0IHRvIExpbnV4IGhvc3QgU29ja2V0Q0FOIGlu
-dGVyZmFjZS4uLi4KV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzIyODogRklMRTog
-aHcvY2FuL2Nhbl9zb2NrZXRjYW4uYzoxOTQ6CitDYW5CdXNTb2NrZXRjYW5Db25uZWN0U3RhdGUg
-KmNhbl9idXNfc29ja2V0Y2FuX2Nvbm5lY3RfbmV3KGNvbnN0IGNoYXIgKmhvc3RfZGV2X25hbWUp
-CgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojMjk4OiBGSUxFOiBody9jYW4vY2Fu
-X3NvY2tldGNhbi5jOjI2NDoKK2ludCBjYW5fYnVzX2Nvbm5lY3RfdG9faG9zdF9zb2NrZXRjYW4o
-Q2FuQnVzU3RhdGUgKmJ1cywgY29uc3QgY2hhciAqaG9zdF9kZXZfbmFtZSkKCnRvdGFsOiAwIGVy
-cm9ycywgMiB3YXJuaW5ncywgMzAzIGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxl
-IHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFs
-c2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRD
-SCBpbiBNQUlOVEFJTkVSUy4KQ2hlY2tpbmcgUEFUQ0ggMy83OiBDQU4gYnVzIFNKQTEwMDAgY2hp
-cCByZWdpc3RlciBsZXZlbCBlbXVsYXRpb24gZm9yIFFFTVUuLi4KV0FSTklORzogbGluZSBvdmVy
-IDgwIGNoYXJhY3RlcnMKIzM4MzogRklMRTogaHcvY2FuL2Nhbl9zamExMDAwLmM6MzM3OgorICAg
-ICAgICBidWZmWzJdID0gZXh0cmFjdDMyKGZyYW1lLT5jYW5faWQsIDAsIDMpIDw8IDU7IC8qIElE
-LjAyfklELjAwLHgseCx4LHgseCAqLwoKV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMK
-IzM5ODogRklMRTogaHcvY2FuL2Nhbl9zamExMDAwLmM6MzUyOgorICAgIGlmICgoZnJhbWUtPmNh
-bl9pZCAmIFFFTVVfQ0FOX0VGRl9GTEFHKSB8fCAvKiBFRkYsIG5vdCBzdXBwb3J0IGZvciBCYXNp
-Y01vZGUuICovCgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojMzk5OiBGSUxFOiBo
-dy9jYW4vY2FuX3NqYTEwMDAuYzozNTM6CisgICAgICAgKGZyYW1lLT5jYW5faWQgJiBRRU1VX0NB
-Tl9FUlJfRkxBRykpIHsgIC8qIG9yIEVycm9yIGZyYW1lLCBOT1Qgc3VwcG9ydCBub3cuICovCgpX
-QVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojNDg2OiBGSUxFOiBody9jYW4vY2FuX3Nq
-YTEwMDAuYzo0NDA6CisgICAgICAgICAgICAgICAgcy0+c3RhdHVzX3BlbCB8PSAoMyA8PCAyKTsg
-LyogU2V0IHRyYW5zbWlzc2lvbiBjb21wbGV0ZSBzdGF0dXMsICovCgpXQVJOSU5HOiBsaW5lIG92
-ZXIgODAgY2hhcmFjdGVycwojNTk1OiBGSUxFOiBody9jYW4vY2FuX3NqYTEwMDAuYzo1NDk6Cisg
-ICAgICAgICAgICAgICAgcy0+c3RhdHVzX2JhcyB8PSAoMyA8PCAyKTsgLyogU2V0IHRyYW5zbWlz
-c2lvbiBjb21wbGV0ZSBzdGF0dXMsICovCgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVy
-cwojNjE1OiBGSUxFOiBody9jYW4vY2FuX3NqYTEwMDAuYzo1Njk6CisgICAgICAgICAgICAgICAg
-ICAgICAgICBmcHJpbnRmKHN0ZGVyciwgIiAlMDJYIiwgcy0+cnhfYnVmZlsocy0+cnhidWZfc3Rh
-cnQgKyBpKSAlCgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojODQ3OiBGSUxFOiBo
-dy9jYW4vY2FuX3NqYTEwMDAuYzo4MDE6CisgICAgICAgIHMtPnN0YXR1c19wZWwgfD0gKDEgPDwg
-NCk7IC8qIHRoZSBDQU4gY29udHJvbGxlciBpcyByZWNlaXZpbmcgYSBtZXNzYWdlICovCgpXQVJO
-SU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojODk3OiBGSUxFOiBody9jYW4vY2FuX3NqYTEw
-MDAuYzo4NTE6CisgICAgICAgIHMtPnN0YXR1c19iYXMgfD0gKDEgPDwgNCk7IC8qIHRoZSBDQU4g
-Y29udHJvbGxlciBpcyByZWNlaXZpbmcgYSBtZXNzYWdlICovCgpFUlJPUjogZG8gbm90IHVzZSBD
-OTkgLy8gY29tbWVudHMKIzEwODc6IEZJTEU6IGh3L2Nhbi9jYW5fc2phMTAwMC5oOjM5OgorLy8j
-ZGVmaW5lIERFQlVHX0NBTgoKV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzExMDg6
-IEZJTEU6IGh3L2Nhbi9jYW5fc2phMTAwMC5oOjYwOgorICAgIHVpbnQ4X3QgICAgICAgICBpbnRl
-cnJ1cHRfZW47ICAvKiBQZWxpQ0FOLCBhZGRyIDQsIEludGVycnVwdCBFbmFibGUgcmVnaXN0ZXIg
-Ki8KCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiMxMTA5OiBGSUxFOiBody9jYW4v
-Y2FuX3NqYTEwMDAuaDo2MToKKyAgICB1aW50OF90ICAgICAgICAgcnhtc2dfY250OyAgICAgLyog
-UGVsaUNBTiwgYWRkciAyOSwgUlggbWVzc2FnZSBjb3VudGVyLiBEUy1wNDkgKi8KCldBUk5JTkc6
-IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiMxMTEwOiBGSUxFOiBody9jYW4vY2FuX3NqYTEwMDAu
-aDo2MjoKKyAgICB1aW50OF90ICAgICAgICAgcnhidWZfc3RhcnQ7ICAgLyogUGVsaUNBTiwgYWRk
-ciAzMCwgUlggYnVmZmVyIHN0YXJ0IGFkZHJlc3MsIERTLXA0OSAqLwoKV0FSTklORzogbGluZSBv
-dmVyIDgwIGNoYXJhY3RlcnMKIzExMTE6IEZJTEU6IGh3L2Nhbi9jYW5fc2phMTAwMC5oOjYzOgor
-ICAgIHVpbnQ4X3QgICAgICAgICBjbG9jazsgICAgICAgICAvKiBQZWxpQ0FOLCBhZGRyIDMxLCBD
-bG9jayBEaXZpZGVyIHJlZ2lzdGVyLCBEUy1wNTUgKi8KCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBj
-aGFyYWN0ZXJzCiMxMTI1OiBGSUxFOiBody9jYW4vY2FuX3NqYTEwMDAuaDo3NzoKKyAgICB1aW50
-OF90ICAgICAgICAgY29kZTsgICAgICAgICAgLyogQmFzaWNDQU4sIGFkZHIgNCwgQWNjZXB0YW5j
-ZSBjb2RlIHJlZ2lzdGVyICovCgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojMTEy
-NjogRklMRTogaHcvY2FuL2Nhbl9zamExMDAwLmg6Nzg6CisgICAgdWludDhfdCAgICAgICAgIG1h
-c2s7ICAgICAgICAgIC8qIEJhc2ljQ0FOLCBhZGRyIDUsIEFjY2VwdGFuY2UgbWFzayByZWdpc3Rl
-ciAqLwoKV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzExNzE6IEZJTEU6IGh3L2Nh
-bi9jYW5fc2phMTAwMC5oOjEyMzoKKy8qIElEIGJ5dGVzICgxMSBiaXRzIGluIDAgYW5kIDEgb3Ig
-MTYgYml0cyBpbiAwLDEgYW5kIDEzIGJpdHMgaW4gMiwzIChleHRlbmRlZCkpICovCgp0b3RhbDog
-MSBlcnJvcnMsIDE1IHdhcm5pbmdzLCAxMTg0IGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFz
-IHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwph
-cmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hF
-Q0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCkNoZWNraW5nIFBBVENIIDQvNzogQ0FOIGJ1cyBLdmFz
-ZXIgUENJIENBTi1TIChzaW5nbGUgU0pBMTAwMCBjaGFubmVsKSBlbXVsYXRpb24gYWRkZWQuLi4u
-CkNoZWNraW5nIFBBVENIIDUvNzogQ0FOIGJ1cyBQQ00tMzY4MEkgUENJIChkdWFsIFNKQTEwMDAg
-Y2hhbm5lbCkgZW11bGF0aW9uIGFkZGVkLi4uLgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFj
-dGVycwojNzA6IEZJTEU6IGh3L2Nhbi9jYW5fcGNtMzY4MF9wY2kuYzo0NjoKKyNkZWZpbmUgUENN
-MzY4MGlfUENJX1ZFTkRPUl9JRDEgICAgIDB4MTNmZSAgICAvKiB0aGUgUENJIGRldmljZSBhbmQg
-dmVuZG9yIElEcyAqLwoKdG90YWw6IDAgZXJyb3JzLCAxIHdhcm5pbmdzLCAzNDAgbGluZXMgY2hl
-Y2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBh
-bnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhl
-IG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgpDaGVja2luZyBQQVRD
-SCA2Lzc6IENBTiBidXMgTUlPZS0zNjgwIFBDSSAoZHVhbCBTSkExMDAwIGNoYW5uZWwpIGVtdWxh
-dGlvbiBhZGRlZC4uLi4KV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzcwOiBGSUxF
-OiBody9jYW4vY2FuX21pb2UzNjgwX3BjaS5jOjQ2OgorI2RlZmluZSBNSU9lMzY4MF9QQ0lfVkVO
-RE9SX0lEMSAgICAgMHgxM2ZlICAgIC8qIHRoZSBQQ0kgZGV2aWNlIGFuZCB2ZW5kb3IgSURzICov
-Cgp0b3RhbDogMCBlcnJvcnMsIDEgd2FybmluZ3MsIDM0MCBsaW5lcyBjaGVja2VkCgpZb3VyIHBh
-dGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBl
-cnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwg
-c2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCkNoZWNraW5nIFBBVENIIDcvNzogUUVNVSBD
-QU4gYnVzIGVtdWxhdGlvbiBkb2N1bWVudGF0aW9uLi4uCj09PSBPVVRQVVQgRU5EID09PQoKVGVz
-dCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9t
-YXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlv
-dXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEBmcmVlbGlzdHMub3Jn
+
+
+On 06.01.18 21:51, Laurent Vivier wrote:
+> Le 06/01/2018 =C3=A0 18:00, Maximilian Riemensberger a =C3=A9crit=C2=A0=
+:
+>> mmap() is required by the linux kernel ABI and POSIX to return a
+>> non-NULL address when the implementation chooses a start address for t=
+he
+>> mapping.
+>>
+>> The current implementation of mmap_find_vma_reserved() can return NULL
+>> as start address of a mapping which leads to subsequent crashes inside
+>> the guests glibc, e.g. output of qemu-arm-static --strace executing a
+>> test binary stx_test:
+>>
+>>     1879 mmap2(NULL,8388608,PROT_READ|PROT_WRITE,MAP_PRIVATE|MAP_ANONY=
+MOUS|0x20000,-1,0) =3D 0x00000000
+>>     1879 write(2,0xf6fd39d0,79) stx_test: allocatestack.c:514: allocat=
+e_stack: Assertion `mem !=3D NULL' failed.
+>>
+>> This patch fixes mmap_find_vma_reserved() by skipping NULL as start
+>> address while searching for a suitable mapping start address.
+>>
+>> CC: Riku Voipio <riku.voipio@iki.fi>
+>> CC: Laurent Vivier <laurent@vivier.eu>
+>> CC: Peter Maydell <peter.maydell@linaro.org>
+>> Signed-off-by: Maximilian Riemensberger <riemensberger@cadami.net>
+>> ---
+>>  linux-user/mmap.c | 2 +-
+>>  1 file changed, 1 insertion(+), 1 deletion(-)
+>>
+>> diff --git a/linux-user/mmap.c b/linux-user/mmap.c
+>> index 4888f53..20cc5a7 100644
+>> --- a/linux-user/mmap.c
+>> +++ b/linux-user/mmap.c
+>> @@ -221,7 +221,7 @@ static abi_ulong mmap_find_vma_reserved(abi_ulong =
+start, abi_ulong size)
+>>      addr =3D end_addr - qemu_host_page_size;
+>> =20
+>>      while (1) {
+>> -        if (addr > end_addr) {
+>> +        if (!addr || addr > end_addr) {
+>>              if (looped) {
+>>                  return (abi_ulong)-1;
+>>              }
+>=20
+> I think this is correct, but it would be clearer to not exit the loop i=
+f
+> addr is NULL, something like:
+>=20
+> @@ -234,7 +234,7 @@ static abi_ulong mmap_find_vma_reserved(abi_ulong
+> start, abi_ulong size)
+>          if (prot) {
+>              end_addr =3D addr;
+>          }
+> -        if (addr + size =3D=3D end_addr) {
+> +        if (addr && addr + size =3D=3D end_addr) {
+>              break;
+>          }
+>          addr -=3D qemu_host_page_size;
+>=20
+> The result is the same because with the "addr -=3D qemu_host_page_size"
+> addr becomes greater than end_addr on the next loop.
+
+Sure. This patch also fixes the problem for me.  Should I respin
+or do you send this patch directly?
+
+Thanks.
+	Max
+
+>=20
+> Thanks,
+> Laurent
+>=20
+
+--=20
+----------------------------------------------------------------------
+Cadami UG (haftungsbeschr=C3=A4nkt)
+Waagstra=C3=9Fe 10, 85386 Eching (near Munich), Germany
+Office:    c/o Wayra, Kaufingerstra=C3=9Fe 15, 80331 Munich, Germany
+
+Contact:   +49-176-63360306, riemensberger@cadami.net, www.cadami.net
+
+Gesch=C3=A4ftsf=C3=BChrer:         Andreas Dotzler, Michael Heindlmaier,
+                         Thomas K=C3=BChn, Maximilian Riemensberger
+Sitz der Gesellschaft:   Eching, HRB 219979 Amtsgericht M=C3=BCnchen
+USt-IdNr.:               DE301293803
+----------------------------------------------------------------------
