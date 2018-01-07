@@ -1,34 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50479)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58089)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eYFdW-0001VQ-Nv
-	for qemu-devel@nongnu.org; Sun, 07 Jan 2018 13:25:35 -0500
+	(envelope-from <thuth@redhat.com>) id 1eYHqj-0004LV-Ho
+	for qemu-devel@nongnu.org; Sun, 07 Jan 2018 15:47:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eYFdT-0006p7-JV
-	for qemu-devel@nongnu.org; Sun, 07 Jan 2018 13:25:34 -0500
-Received: from indium.canonical.com ([91.189.90.7]:46918)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1eYFdT-0006og-DV
-	for qemu-devel@nongnu.org; Sun, 07 Jan 2018 13:25:31 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1eYFdS-000336-C3
-	for <qemu-devel@nongnu.org>; Sun, 07 Jan 2018 18:25:30 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 56D472E80C8
-	for <qemu-devel@nongnu.org>; Sun,  7 Jan 2018 18:25:30 +0000 (UTC)
+	(envelope-from <thuth@redhat.com>) id 1eYHqg-0005C5-Eu
+	for qemu-devel@nongnu.org; Sun, 07 Jan 2018 15:47:21 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:55924)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1eYHqg-00059X-8Q
+	for qemu-devel@nongnu.org; Sun, 07 Jan 2018 15:47:18 -0500
+References: <00583a19439a026a47fcb4d12cb185130347c636.1515275715.git.crobinso@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <23e5151b-1276-d4e3-a472-c2851eb8a3e0@redhat.com>
+Date: Sun, 7 Jan 2018 21:47:11 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Sun, 07 Jan 2018 18:16:38 -0000
-From: Raphael <rtillet@free.fr>
-Reply-To: Bug 1740887 <1740887@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <151490925457.26459.4227536724801475724.malonedeb@gac.canonical.com>
-Message-Id: <151534899881.26758.12192183473956494648.malone@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1740887] Re: qemu-system-arm &
- qemu-system-aarch64 for windows crash at start
+In-Reply-To: <00583a19439a026a47fcb4d12cb185130347c636.1515275715.git.crobinso@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2] scripts/make-release: Don't archive
+ .git files
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,42 +28,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Cole Robinson <crobinso@redhat.com>, qemu-devel@nongnu.org
+Cc: mdroth@linux.vnet.ibm.com, peter.maydell@linaro.org, Markus Armbruster <armbru@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>
 
-I had to switch back to the following installer "2016-03-03: New QEMU
-installers. Fixed, first version with support for Raspberry Pi 1 and 2."
-for having a working version with the "-M raspi" option.
+On 06.01.2018 22:56, Cole Robinson wrote:
+> As was last done in 379e21c25, we don't want .git files for
+> submodules here, which we aren't presently doing for capstone and
+> keycodemapdb.
+> 
+> Rather than delete the offending files before archiving, ask tar
+> to --exclude=.git
+> 
+> Signed-off-by: Cole Robinson <crobinso@redhat.com>
+> ---
+> v2:
+>     Use armbru's --exclude suggestion, requires tweaking
+>     existing tar options a bit.
+> 
+>  scripts/make-release | 3 +--
+>  1 file changed, 1 insertion(+), 2 deletions(-)
+> 
+> diff --git a/scripts/make-release b/scripts/make-release
+> index 3917df7142..7cbce29475 100755
+> --- a/scripts/make-release
+> +++ b/scripts/make-release
+> @@ -19,11 +19,10 @@ pushd ${destination}
+>  git checkout "v${version}"
+>  git submodule update --init
+>  (cd roms/seabios && git describe --tags --long --dirty > .version)
+> -rm -rf .git roms/*/.git dtc/.git pixman/.git
+>  # FIXME: The following line is a workaround for avoiding filename collisions
+>  # when unpacking u-boot sources on case-insensitive filesystems. Once we
+>  # update to something with u-boot commit 610eec7f0 we can drop this line.
+>  tar cfj roms/u-boot.tar.bz2 -C roms u-boot && rm -rf roms/u-boot
 
--- =
+What about the above tar command? Shouldn't this get the --exclude=.git
+as well?
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1740887
+>  popd
+> -tar cfj ${destination}.tar.bz2 ${destination}
+> +tar --exclude=.git -cjf ${destination}.tar.bz2 ${destination}
+>  rm -rf ${destination}
 
-Title:
-  qemu-system-arm & qemu-system-aarch64 for windows crash at start
-
-Status in QEMU:
-  New
-
-Bug description:
-  In Windows 7 64 bit (both 32 & 64 bit QEMU emulator version 2.11.0
-  (v2.11.0-11693-g21057c841e-dirty)).
-
-  With arguments:
-
-  qemu-system-arm.exe -M raspi2
-
-  It crashes and reports:
-
-  ERROR:/home/stefan/src/qemu/repo.or.cz/qemu/ar7/qom/object.c:176:type_get=
-_parent:
-  assertion failed: (type->parent_type !=3D NULL)
-
-  Same goes for qemu-system-aarch64.exe or with -M raspi argument.
-
-  Have a nice day,
-  f.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1740887/+subscriptions
+ Thomas
