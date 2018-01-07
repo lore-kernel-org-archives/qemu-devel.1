@@ -1,25 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58089)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50764)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1eYHqj-0004LV-Ho
-	for qemu-devel@nongnu.org; Sun, 07 Jan 2018 15:47:22 -0500
+	(envelope-from <patricktsen@gmail.com>) id 1eYJDa-0003Fk-NM
+	for qemu-devel@nongnu.org; Sun, 07 Jan 2018 17:15:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1eYHqg-0005C5-Eu
-	for qemu-devel@nongnu.org; Sun, 07 Jan 2018 15:47:21 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:55924)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1eYHqg-00059X-8Q
-	for qemu-devel@nongnu.org; Sun, 07 Jan 2018 15:47:18 -0500
-References: <00583a19439a026a47fcb4d12cb185130347c636.1515275715.git.crobinso@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <23e5151b-1276-d4e3-a472-c2851eb8a3e0@redhat.com>
-Date: Sun, 7 Jan 2018 21:47:11 +0100
-MIME-Version: 1.0
-In-Reply-To: <00583a19439a026a47fcb4d12cb185130347c636.1515275715.git.crobinso@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2] scripts/make-release: Don't archive
- .git files
+	(envelope-from <patricktsen@gmail.com>) id 1eYJDa-0001Jd-14
+	for qemu-devel@nongnu.org; Sun, 07 Jan 2018 17:15:02 -0500
+Received: from mail-pf0-x22f.google.com ([2607:f8b0:400e:c00::22f]:43941)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <patricktsen@gmail.com>)
+	id 1eYJDZ-0001J5-RM
+	for qemu-devel@nongnu.org; Sun, 07 Jan 2018 17:15:01 -0500
+Received: by mail-pf0-x22f.google.com with SMTP id e3so4642618pfi.10
+	for <qemu-devel@nongnu.org>; Sun, 07 Jan 2018 14:15:01 -0800 (PST)
+From: byxk <patricktsen@gmail.com>
+Date: Sun,  7 Jan 2018 14:14:54 -0800
+Message-Id: <20180107221455.25504-1-patricktsen@gmail.com>
+Subject: [Qemu-devel] [PATCH v2 0/1] input-linux: provide hotkeys for evdev
+ toggle
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,46 +25,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cole Robinson <crobinso@redhat.com>, qemu-devel@nongnu.org
-Cc: mdroth@linux.vnet.ibm.com, peter.maydell@linaro.org, Markus Armbruster <armbru@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: kraxel@redhat.com, byxk <patricktsen@gmail.com>
 
-On 06.01.2018 22:56, Cole Robinson wrote:
-> As was last done in 379e21c25, we don't want .git files for
-> submodules here, which we aren't presently doing for capstone and
-> keycodemapdb.
-> 
-> Rather than delete the offending files before archiving, ask tar
-> to --exclude=.git
-> 
-> Signed-off-by: Cole Robinson <crobinso@redhat.com>
-> ---
-> v2:
->     Use armbru's --exclude suggestion, requires tweaking
->     existing tar options a bit.
-> 
->  scripts/make-release | 3 +--
->  1 file changed, 1 insertion(+), 2 deletions(-)
-> 
-> diff --git a/scripts/make-release b/scripts/make-release
-> index 3917df7142..7cbce29475 100755
-> --- a/scripts/make-release
-> +++ b/scripts/make-release
-> @@ -19,11 +19,10 @@ pushd ${destination}
->  git checkout "v${version}"
->  git submodule update --init
->  (cd roms/seabios && git describe --tags --long --dirty > .version)
-> -rm -rf .git roms/*/.git dtc/.git pixman/.git
->  # FIXME: The following line is a workaround for avoiding filename collisions
->  # when unpacking u-boot sources on case-insensitive filesystems. Once we
->  # update to something with u-boot commit 610eec7f0 we can drop this line.
->  tar cfj roms/u-boot.tar.bz2 -C roms u-boot && rm -rf roms/u-boot
+Added some functionality to change the key combo for evdev toggle.
+example:
+-object input-linux,rhotkey=29,lhotkey=56,evdev=[etc...]
 
-What about the above tar command? Shouldn't this get the --exclude=.git
-as well?
+Set the defaults to LCTRL and RCTRL if not provided.
 
->  popd
-> -tar cfj ${destination}.tar.bz2 ${destination}
-> +tar --exclude=.git -cjf ${destination}.tar.bz2 ${destination}
->  rm -rf ${destination}
+This is my first patch to anything so feedback/help appreciated!
 
- Thomas
+byxk (1):
+  input-linux: provide hotkeys for evdev toggle
+
+ ui/input-linux.c | 77 ++++++++++++++++++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 75 insertions(+), 2 deletions(-)
+
+-- 
+2.15.1
