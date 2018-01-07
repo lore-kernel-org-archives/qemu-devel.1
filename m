@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32848)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48722)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1eY9At-0007wI-Ea
-	for qemu-devel@nongnu.org; Sun, 07 Jan 2018 06:31:36 -0500
+	(envelope-from <patricktsen@gmail.com>) id 1eY9OU-0004ha-IQ
+	for qemu-devel@nongnu.org; Sun, 07 Jan 2018 06:45:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1eY9Aq-0005zT-Ba
-	for qemu-devel@nongnu.org; Sun, 07 Jan 2018 06:31:35 -0500
-Resent-Message-Id: <E1eY9Aq-0005zT-Ba@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21390)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1eY9Aq-0005wt-3b
-	for qemu-devel@nongnu.org; Sun, 07 Jan 2018 06:31:32 -0500
-In-Reply-To: <20180107111341.8879-1-patricktsen@gmail.com>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <151532466559.354.2162830022963745471@5adcb62bf0d6>
+	(envelope-from <patricktsen@gmail.com>) id 1eY9OT-000524-BX
+	for qemu-devel@nongnu.org; Sun, 07 Jan 2018 06:45:38 -0500
+Received: from mail-ot0-x234.google.com ([2607:f8b0:4003:c0f::234]:42819)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <patricktsen@gmail.com>)
+	id 1eY9OT-00051Z-4d
+	for qemu-devel@nongnu.org; Sun, 07 Jan 2018 06:45:37 -0500
+Received: by mail-ot0-x234.google.com with SMTP id d2so7200344oth.9
+	for <qemu-devel@nongnu.org>; Sun, 07 Jan 2018 03:45:36 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Sun, 7 Jan 2018 03:31:06 -0800 (PST)
+In-Reply-To: <151532466559.354.2162830022963745471@5adcb62bf0d6>
+References: <20180107111341.8879-1-patricktsen@gmail.com>
+	<151532466559.354.2162830022963745471@5adcb62bf0d6>
+From: Patrick Tseng <patricktsen@gmail.com>
+Date: Sun, 7 Jan 2018 03:45:15 -0800
+Message-ID: <CAG_FrSJM7wf1wGDSmCOW4LXS9WqVZnZkQn_RA5Lu10YazL6gbQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Subject: Re: [Qemu-devel] [PATCH 0/1] input-linux: provide hotkeys for evdev
  toggle
 List-Id: <qemu-devel.nongnu.org>
@@ -29,36 +30,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: patricktsen@gmail.com
-Cc: famz@redhat.com, qemu-devel@nongnu.org, kraxel@redhat.com
+To: qemu-devel@nongnu.org
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
-c3NhZ2UtaWQ6IDIwMTgwMTA3MTExMzQxLjg4NzktMS1wYXRyaWNrdHNlbkBnbWFpbC5jb20KU3Vi
-amVjdDogW1FlbXUtZGV2ZWxdIFtQQVRDSCAwLzFdIGlucHV0LWxpbnV4OiBwcm92aWRlIGhvdGtl
-eXMgZm9yIGV2ZGV2IHRvZ2dsZQoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFz
-aAoKQkFTRT1iYXNlCm49MQp0b3RhbD0kKGdpdCBsb2cgLS1vbmVsaW5lICRCQVNFLi4gfCB3YyAt
-bCkKZmFpbGVkPTAKCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNv
-bmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCgpjb21taXRzPSIkKGdpdCBsb2cgLS1mb3Jt
-YXQ9JUggLS1yZXZlcnNlICRCQVNFLi4pIgpmb3IgYyBpbiAkY29tbWl0czsgZG8KICAgIGVjaG8g
-IkNoZWNraW5nIFBBVENIICRuLyR0b3RhbDogJChnaXQgbG9nIC1uIDEgLS1mb3JtYXQ9JXMgJGMp
-Li4uIgogICAgaWYgISBnaXQgc2hvdyAkYyAtLWZvcm1hdD1lbWFpbCB8IC4vc2NyaXB0cy9jaGVj
-a3BhdGNoLnBsIC0tbWFpbGJhY2sgLTsgdGhlbgogICAgICAgIGZhaWxlZD0xCiAgICAgICAgZWNo
-bwogICAgZmkKICAgIG49JCgobisxKSkKZG9uZQoKZXhpdCAkZmFpbGVkCj09PSBURVNUIFNDUklQ
-VCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEz
-Mzg0ClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKOGQyZGZjYmQ3MyBpbnB1dC1saW51
-eDogcHJvdmlkZSBob3RrZXlzIGZvciBldmRldiB0b2dnbGUKCj09PSBPVVRQVVQgQkVHSU4gPT09
-CkNoZWNraW5nIFBBVENIIDEvMTogaW5wdXQtbGludXg6IHByb3ZpZGUgaG90a2V5cyBmb3IgZXZk
-ZXYgdG9nZ2xlLi4uCkVSUk9SOiBjb25zaWRlciB1c2luZyBxZW11X3N0cnRvbCBpbiBwcmVmZXJl
-bmNlIHRvIHN0cnRvbAojNzc6IEZJTEU6IHZsLmM6MzM4NDoKKyAgICAgICAgICAgICAgICBxZW11
-X2V2ZGV2X3Job3RrZXkgPSBzdHJ0b2wob3B0YXJnLCBOVUxMLCAwKTsKCkVSUk9SOiBjb25zaWRl
-ciB1c2luZyBxZW11X3N0cnRvbCBpbiBwcmVmZXJlbmNlIHRvIHN0cnRvbAojODA6IEZJTEU6IHZs
-LmM6MzM4NzoKKyAgICAgICAgICAgICAgICBxZW11X2V2ZGV2X2xob3RrZXkgPSBzdHJ0b2wob3B0
-YXJnLCBOVUxMLCAwKTsKCkVSUk9SOiBNaXNzaW5nIFNpZ25lZC1vZmYtYnk6IGxpbmUocykKCnRv
-dGFsOiAzIGVycm9ycywgMCB3YXJuaW5ncywgNTYgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBo
-YXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3Jz
-CmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpD
-SEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1h
-bmQgZXhpdGVkIHdpdGggY29kZTogMQoKCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxs
-eSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVk
-YmFjayB0byBwYXRjaGV3LWRldmVsQGZyZWVsaXN0cy5vcmc=
+Please disregard this patch, I'll have another one ready and actually
+isolated to input-linux.
+
+On Sun, Jan 7, 2018 at 3:31 AM, <no-reply@patchew.org> wrote:
+
+> Hi,
+>
+> This series seems to have some coding style problems. See output below for
+> more information:
+>
+> Type: series
+> Message-id: 20180107111341.8879-1-patricktsen@gmail.com
+> Subject: [Qemu-devel] [PATCH 0/1] input-linux: provide hotkeys for evdev
+> toggle
+>
+> === TEST SCRIPT BEGIN ===
+> #!/bin/bash
+>
+> BASE=base
+> n=1
+> total=$(git log --oneline $BASE.. | wc -l)
+> failed=0
+>
+> git config --local diff.renamelimit 0
+> git config --local diff.renames True
+>
+> commits="$(git log --format=%H --reverse $BASE..)"
+> for c in $commits; do
+>     echo "Checking PATCH $n/$total: $(git log -n 1 --format=%s $c)..."
+>     if ! git show $c --format=email | ./scripts/checkpatch.pl --mailback
+> -; then
+>         failed=1
+>         echo
+>     fi
+>     n=$((n+1))
+> done
+>
+> exit $failed
+> === TEST SCRIPT END ===
+>
+> Updating 3c8cf5a9c21ff8782164d1def7f44bd888713384
+> Switched to a new branch 'test'
+> 8d2dfcbd73 input-linux: provide hotkeys for evdev toggle
+>
+> === OUTPUT BEGIN ===
+> Checking PATCH 1/1: input-linux: provide hotkeys for evdev toggle...
+> ERROR: consider using qemu_strtol in preference to strtol
+> #77: FILE: vl.c:3384:
+> +                qemu_evdev_rhotkey = strtol(optarg, NULL, 0);
+>
+> ERROR: consider using qemu_strtol in preference to strtol
+> #80: FILE: vl.c:3387:
+> +                qemu_evdev_lhotkey = strtol(optarg, NULL, 0);
+>
+> ERROR: Missing Signed-off-by: line(s)
+>
+> total: 3 errors, 0 warnings, 56 lines checked
+>
+> Your patch has style problems, please review.  If any of these errors
+> are false positives report them to the maintainer, see
+> CHECKPATCH in MAINTAINERS.
+>
+> === OUTPUT END ===
+>
+> Test command exited with code: 1
+>
+>
+> ---
+> Email generated automatically by Patchew [http://patchew.org/].
+> Please send your feedback to patchew-devel@freelists.org
