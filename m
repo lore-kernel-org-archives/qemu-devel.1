@@ -1,27 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57992)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58562)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1eYgXv-0007KN-Rv
-	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 18:09:36 -0500
+	(envelope-from <laurent@vivier.eu>) id 1eYgZC-00086w-QJ
+	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 18:10:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1eYgXs-0004up-Je
-	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 18:09:35 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:49362)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1eYgXs-0004uT-9q
-	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 18:09:32 -0500
-Date: Mon, 8 Jan 2018 18:09:30 -0500 (EST)
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <848013447.31735187.1515452970885.JavaMail.zimbra@redhat.com>
-In-Reply-To: <20180108225625.GP6646@localhost.localdomain>
-References: <20180108205052.24385-1-vincent@bernat.im>
-	<20180108211623.GJ6646@localhost.localdomain>
-	<242287261.31733448.1515451036017.JavaMail.zimbra@redhat.com>
-	<20180108225625.GP6646@localhost.localdomain>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] target-i386: add pcid to both Sandy Bridge
- and Ivy Bridge
+	(envelope-from <laurent@vivier.eu>) id 1eYgZ9-0007Nj-FL
+	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 18:10:54 -0500
+Received: from mout.kundenserver.de ([217.72.192.73]:63193)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1eYgZ9-0007Jl-1n
+	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 18:10:51 -0500
+From: Laurent Vivier <laurent@vivier.eu>
+Date: Tue,  9 Jan 2018 00:10:42 +0100
+Message-Id: <20180108231048.23966-1-laurent@vivier.eu>
+Subject: [Qemu-devel] [PATCH 0/6] target/m68k: supervisor mode (part 2)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,65 +21,113 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: Vincent Bernat <vincent@bernat.im>, Richard Henderson <rth@twiddle.net>, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: Laurent Vivier <laurent@vivier.eu>
 
+This series introduces the MC68040 MMU.
 
+But first of all, we need to modify the prototype
+of tlb_fill() and handle_mmu_fault handler to pass
+the size of the access. MC68040 stores this value
+in the exception stack frame.
 
------ Original Message -----
-> From: "Eduardo Habkost" <ehabkost@redhat.com>
-> To: "Paolo Bonzini" <pbonzini@redhat.com>
-> Cc: "Vincent Bernat" <vincent@bernat.im>, "Richard Henderson" <rth@twiddle.net>, qemu-devel@nongnu.org
-> Sent: Monday, January 8, 2018 11:56:25 PM
-> Subject: Re: [PATCH] target-i386: add pcid to both Sandy Bridge and Ivy Bridge
-> 
-> On Mon, Jan 08, 2018 at 05:37:16PM -0500, Paolo Bonzini wrote:
-> > 
-> > 
-> > ----- Original Message -----
-> > > From: "Eduardo Habkost" <ehabkost@redhat.com>
-> > > To: "Vincent Bernat" <vincent@bernat.im>
-> > > Cc: "Paolo Bonzini" <pbonzini@redhat.com>, "Richard Henderson"
-> > > <rth@twiddle.net>, qemu-devel@nongnu.org
-> > > Sent: Monday, January 8, 2018 10:16:23 PM
-> > > Subject: Re: [PATCH] target-i386: add pcid to both Sandy Bridge and Ivy
-> > > Bridge
-> > > 
-> > > On Mon, Jan 08, 2018 at 09:50:52PM +0100, Vincent Bernat wrote:
-> > > > PCID has been introduced in Sandy Bridge and, currently, KVM doesn't
-> > > > object exposing it to VM as long as it is present on the host. Update
-> > > > CPU model for both Sandy Bridge and Ivy Bridge accordingly.
-> > > > 
-> > > > Signed-off-by: Vincent Bernat <vincent@bernat.im>
-> > > 
-> > > Thanks for your patch.
-> > > 
-> > > We need two things, though:
-> > > 
-> > > First, confirming that all hosts where the SandyBridge and
-> > > IvyBridge CPU models are runnable will support exposing PCID to
-> > > guests (otherwise updating QEMU can make a runnable VM
-> > > configuration suddenly stop being runnable).  This can happen if
-> > > the host kernel is too old.
-> > 
-> > I've been reading it's also Westmere.  I'll check more carefully tomorrow.
-> > The difference between consumer and server SKUs is important too.
-> > 
-> > > One possible way to work around this problem is to declare that
-> > > QEMU 2.12 with KVM will require Linux v3.6 and newer (because we
-> > > need Linux kernel commit ad756a1603c5 "KVM: VMX: Implement
-> > > PCID/INVPCID for guests with EPT").
-> > 
-> > Note that PCID is still not supported for guests without EPT, so
-> > this would break ept=0 with recent "-cpu" models.  I'm not sure of
-> > a way to fix it; probably it just has to be documented.
-> 
-> GET_SUPPORTED_CPUID seems to still return PCID as supported
-> without EPT, doesn't it?
+Following patches add:
+- MMU page table and fault handlers,
+- Transparent Translation Registers
+- instruction "moves" to move data
+  between user and kernel space
+- instructions pflush/ptest, to flush TLB and
+  convert virtual address to physical address
+- "info tlb" HMP command
 
-Indeed it is!  It will also be useful for KPTI performance without
-INVPCID, but it won't be useful without EPT.
+I have tested it doesn't break QEMU linux-user mode
+emulation and coldfire softmmu machine.
 
-Paolo
+With the help of these patches I'm able to start
+a debian etch-m68k, but the following patches
+are still missing in master:
+- m68k softfloat series
+- Quadra 800 machine emulation series
+  (VIA emulation, Nubus emulation,
+   ESCC control/data address bit selector,
+   video card emulation, ESP Pseudo-DMA,
+   SWIM floppy controller, Apple Sound Chip
+   emulation, and some big-endian fixes for
+   dp8393x)
 
-> (BTW, is PCID useful for KPTI performance without INVPCID?)
+Laurent Vivier (6):
+  accel/tcg: add size paremeter in tlb_fill()
+  target/m68k: add MC68040 MMU
+  target/m68k: add Transparent Translation
+  target/m68k: add moves
+  target/m68k: add pflush/ptest
+  target/m68k: add HMP command "info tlb"
+
+ accel/tcg/cputlb.c            |  13 +-
+ accel/tcg/softmmu_template.h  |  14 +-
+ accel/tcg/user-exec.c         |   2 +-
+ hmp-commands-info.hx          |   2 +-
+ include/exec/exec-all.h       |   6 +-
+ include/qom/cpu.h             |   2 +-
+ target/alpha/cpu.h            |   2 +-
+ target/alpha/helper.c         |   4 +-
+ target/alpha/mem_helper.c     |   6 +-
+ target/arm/cpu.c              |   4 +-
+ target/arm/op_helper.c        |   4 +-
+ target/cris/cpu.h             |   2 +-
+ target/cris/helper.c          |   4 +-
+ target/cris/op_helper.c       |   6 +-
+ target/hppa/cpu.h             |   3 +-
+ target/hppa/helper.c          |   2 +-
+ target/hppa/op_helper.c       |   2 +-
+ target/i386/cpu.h             |   2 +-
+ target/i386/excp_helper.c     |   4 +-
+ target/i386/mem_helper.c      |   6 +-
+ target/lm32/cpu.h             |   2 +-
+ target/lm32/helper.c          |   2 +-
+ target/lm32/op_helper.c       |   6 +-
+ target/m68k/cpu.c             |   4 +-
+ target/m68k/cpu.h             | 129 +++++++-
+ target/m68k/helper.c          | 673 +++++++++++++++++++++++++++++++++++++++++-
+ target/m68k/helper.h          |   4 +
+ target/m68k/monitor.c         |  22 ++
+ target/m68k/op_helper.c       | 102 ++++++-
+ target/m68k/qregs.def         |   2 +
+ target/m68k/translate.c       | 112 +++++++
+ target/microblaze/cpu.h       |   2 +-
+ target/microblaze/helper.c    |   4 +-
+ target/microblaze/op_helper.c |   6 +-
+ target/mips/helper.c          |   2 +-
+ target/mips/internal.h        |   2 +-
+ target/mips/op_helper.c       |  10 +-
+ target/moxie/cpu.h            |   2 +-
+ target/moxie/helper.c         |  10 +-
+ target/nios2/cpu.h            |   2 +-
+ target/nios2/helper.c         |   6 +-
+ target/nios2/mmu.c            |   6 +-
+ target/openrisc/cpu.h         |   2 +-
+ target/openrisc/mmu.c         |   8 +-
+ target/openrisc/mmu_helper.c  |   6 +-
+ target/ppc/cpu.h              |   2 +-
+ target/ppc/mmu_helper.c       |   4 +-
+ target/ppc/user_only_helper.c |   2 +-
+ target/s390x/excp_helper.c    |   4 +-
+ target/s390x/internal.h       |   2 +-
+ target/s390x/mem_helper.c     |   8 +-
+ target/sh4/cpu.h              |   2 +-
+ target/sh4/helper.c           |   4 +-
+ target/sh4/op_helper.c        |   6 +-
+ target/sparc/cpu.h            |   2 +-
+ target/sparc/ldst_helper.c    |   6 +-
+ target/sparc/mmu_helper.c     |   6 +-
+ target/tilegx/cpu.c           |   4 +-
+ target/tricore/op_helper.c    |   4 +-
+ target/unicore32/cpu.h        |   2 +-
+ target/unicore32/helper.c     |   2 +-
+ target/unicore32/op_helper.c  |   6 +-
+ target/unicore32/softmmu.c    |   2 +-
+ target/xtensa/op_helper.c     |   4 +-
+ 64 files changed, 1156 insertions(+), 132 deletions(-)
+
+-- 
+2.14.3
