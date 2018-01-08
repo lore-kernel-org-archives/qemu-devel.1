@@ -1,22 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43224)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43622)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1eYbYU-0005CW-8l
-	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 12:50:41 -0500
+	(envelope-from <jcmvbkbc@gmail.com>) id 1eYbYx-0005Wf-Lf
+	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 12:51:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1eYbXP-0007WR-4R
-	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 12:49:50 -0500
-Date: Mon, 8 Jan 2018 17:48:30 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180108174829.GG2462@work-vm>
-References: <20171218201340.27583-1-dgilbert@redhat.com>
-	<20171218201340.27583-2-dgilbert@redhat.com>
-	<20171227125627.5c3affd1@igors-macbook-pro.local>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20171227125627.5c3affd1@igors-macbook-pro.local>
-Subject: Re: [Qemu-devel] [PATCH v5 1/7] vhost: Build temporary section list
- and deref after commit
+	(envelope-from <jcmvbkbc@gmail.com>) id 1eYbY8-00080S-4L
+	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 12:50:19 -0500
+Received: from mail-lf0-x22e.google.com ([2a00:1450:4010:c07::22e]:46927)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <jcmvbkbc@gmail.com>) id 1eYbY7-0007zW-M3
+	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 12:49:27 -0500
+Received: by mail-lf0-x22e.google.com with SMTP id a12so12980633lfe.13
+	for <qemu-devel@nongnu.org>; Mon, 08 Jan 2018 09:49:27 -0800 (PST)
+From: Max Filippov <jcmvbkbc@gmail.com>
+Date: Mon,  8 Jan 2018 09:49:09 -0800
+Message-Id: <1515433749-5839-1-git-send-email-jcmvbkbc@gmail.com>
+Subject: [Qemu-devel] [PULL v2 00/16] target/xtensa updates
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,194 +23,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: qemu-devel@nongnu.org, pbonzini@redhat.com, maxime.coquelin@redhat.com, mst@redhat.com, groug@kaod.org, qemu-stable@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, Max Filippov <jcmvbkbc@gmail.com>
 
-* Igor Mammedov (imammedo@redhat.com) wrote:
-> On Mon, 18 Dec 2017 20:13:34 +0000
-> "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com> wrote:
-> 
-> > From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-> > 
-> > Igor spotted that there's a race, where a region that's unref'd
-> > in a _del callback might be free'd before the set_mem_table call in
-> > the _commit callback, and thus the vhost might end up using free memory.
-> > 
-> > Fix this by building a complete temporary sections list, ref'ing every
-> > section (during add and nop) and then unref'ing the whole list right
-> > at the end of commit.
-> > 
-> > Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> 
-> As Michael've suggested it should go into stable (CCed)
+Hi Peter,
 
-OK,
+please pull the following batch of updates for the target/xtensa.
+Changes v1->v2:
+- Drop no longer used function option_bits_enabled.
 
-> Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+The following changes since commit 0a0dc59d27527b78a195c2d838d28b7b49e5a639:
 
-Thanks!
+  Update version for v2.11.0 release (2017-12-13 14:31:09 +0000)
 
-Dave
+are available in the git repository at:
 
-> 
-> > ---
-> >  hw/virtio/vhost.c         | 73 ++++++++++++++++++++++++++++++-----------------
-> >  include/hw/virtio/vhost.h |  2 ++
-> >  2 files changed, 49 insertions(+), 26 deletions(-)
-> > 
-> > diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
-> > index e4290ce93d..610bfe6945 100644
-> > --- a/hw/virtio/vhost.c
-> > +++ b/hw/virtio/vhost.c
-> > @@ -621,6 +621,8 @@ static void vhost_begin(MemoryListener *listener)
-> >                                           memory_listener);
-> >      dev->mem_changed_end_addr = 0;
-> >      dev->mem_changed_start_addr = -1;
-> > +    dev->tmp_sections = NULL;
-> > +    dev->n_tmp_sections = 0;
-> >  }
-> >  
-> >  static void vhost_commit(MemoryListener *listener)
-> > @@ -629,17 +631,25 @@ static void vhost_commit(MemoryListener *listener)
-> >                                           memory_listener);
-> >      hwaddr start_addr = 0;
-> >      ram_addr_t size = 0;
-> > +    MemoryRegionSection *old_sections;
-> > +    int n_old_sections;
-> > +
-> >      uint64_t log_size;
-> >      int r;
-> >  
-> > +    old_sections = dev->mem_sections;
-> > +    n_old_sections = dev->n_mem_sections;
-> > +    dev->mem_sections = dev->tmp_sections;
-> > +    dev->n_mem_sections = dev->n_tmp_sections;
-> > +
-> >      if (!dev->memory_changed) {
-> > -        return;
-> > +        goto out;
-> >      }
-> >      if (!dev->started) {
-> > -        return;
-> > +        goto out;
-> >      }
-> >      if (dev->mem_changed_start_addr > dev->mem_changed_end_addr) {
-> > -        return;
-> > +        goto out;
-> >      }
-> >  
-> >      if (dev->started) {
-> > @@ -656,7 +666,7 @@ static void vhost_commit(MemoryListener *listener)
-> >              VHOST_OPS_DEBUG("vhost_set_mem_table failed");
-> >          }
-> >          dev->memory_changed = false;
-> > -        return;
-> > +        goto out;
-> >      }
-> >      log_size = vhost_get_log_size(dev);
-> >      /* We allocate an extra 4K bytes to log,
-> > @@ -675,6 +685,27 @@ static void vhost_commit(MemoryListener *listener)
-> >          vhost_dev_log_resize(dev, log_size);
-> >      }
-> >      dev->memory_changed = false;
-> > +
-> > +out:
-> > +    /* Deref the old list of sections, this must happen _after_ the
-> > +     * vhost_set_mem_table to ensure the client isn't still using the
-> > +     * section we're about to unref.
-> > +     */
-> > +    while (n_old_sections--) {
-> > +        memory_region_unref(old_sections[n_old_sections].mr);
-> > +    }
-> > +    g_free(old_sections);
-> > +    return;
-> > +}
-> > +
-> > +static void vhost_add_section(struct vhost_dev *dev,
-> > +                              MemoryRegionSection *section)
-> > +{
-> > +    ++dev->n_tmp_sections;
-> > +    dev->tmp_sections = g_renew(MemoryRegionSection, dev->tmp_sections,
-> > +                                dev->n_tmp_sections);
-> > +    dev->tmp_sections[dev->n_tmp_sections - 1] = *section;
-> > +    memory_region_ref(section->mr);
-> >  }
-> >  
-> >  static void vhost_region_add(MemoryListener *listener,
-> > @@ -687,36 +718,31 @@ static void vhost_region_add(MemoryListener *listener,
-> >          return;
-> >      }
-> >  
-> > -    ++dev->n_mem_sections;
-> > -    dev->mem_sections = g_renew(MemoryRegionSection, dev->mem_sections,
-> > -                                dev->n_mem_sections);
-> > -    dev->mem_sections[dev->n_mem_sections - 1] = *section;
-> > -    memory_region_ref(section->mr);
-> > +    vhost_add_section(dev, section);
-> >      vhost_set_memory(listener, section, true);
-> >  }
-> >  
-> > -static void vhost_region_del(MemoryListener *listener,
-> > +static void vhost_region_nop(MemoryListener *listener,
-> >                               MemoryRegionSection *section)
-> >  {
-> >      struct vhost_dev *dev = container_of(listener, struct vhost_dev,
-> >                                           memory_listener);
-> > -    int i;
-> >  
-> >      if (!vhost_section(section)) {
-> >          return;
-> >      }
-> >  
-> > -    vhost_set_memory(listener, section, false);
-> > -    memory_region_unref(section->mr);
-> > -    for (i = 0; i < dev->n_mem_sections; ++i) {
-> > -        if (dev->mem_sections[i].offset_within_address_space
-> > -            == section->offset_within_address_space) {
-> > -            --dev->n_mem_sections;
-> > -            memmove(&dev->mem_sections[i], &dev->mem_sections[i+1],
-> > -                    (dev->n_mem_sections - i) * sizeof(*dev->mem_sections));
-> > -            break;
-> > -        }
-> > +    vhost_add_section(dev, section);
-> > +}
-> > +
-> > +static void vhost_region_del(MemoryListener *listener,
-> > +                             MemoryRegionSection *section)
-> > +{
-> > +    if (!vhost_section(section)) {
-> > +        return;
-> >      }
-> > +
-> > +    vhost_set_memory(listener, section, false);
-> >  }
-> >  
-> >  static void vhost_iommu_unmap_notify(IOMMUNotifier *n, IOMMUTLBEntry *iotlb)
-> > @@ -783,11 +809,6 @@ static void vhost_iommu_region_del(MemoryListener *listener,
-> >      }
-> >  }
-> >  
-> > -static void vhost_region_nop(MemoryListener *listener,
-> > -                             MemoryRegionSection *section)
-> > -{
-> > -}
-> > -
-> >  static int vhost_virtqueue_set_addr(struct vhost_dev *dev,
-> >                                      struct vhost_virtqueue *vq,
-> >                                      unsigned idx, bool enable_log)
-> > diff --git a/include/hw/virtio/vhost.h b/include/hw/virtio/vhost.h
-> > index 467dc7794b..21f3022499 100644
-> > --- a/include/hw/virtio/vhost.h
-> > +++ b/include/hw/virtio/vhost.h
-> > @@ -54,6 +54,8 @@ struct vhost_dev {
-> >      struct vhost_memory *mem;
-> >      int n_mem_sections;
-> >      MemoryRegionSection *mem_sections;
-> > +    int n_tmp_sections;
-> > +    MemoryRegionSection *tmp_sections;
-> >      struct vhost_virtqueue *vqs;
-> >      int nvqs;
-> >      /* the first virtqueue which would be used by this vhost dev */
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+  git://github.com/OSLL/qemu-xtensa.git tags/20180108-xtensa
+
+for you to fetch changes up to 7ffb3123b24e42a3a94e865434b4180025b9f9ca:
+
+  target/xtensa: implement disassembler (2018-01-08 09:37:32 -0800)
+
+----------------------------------------------------------------
+target/xtensa updates:
+
+- add libisa to the xtensa target;
+- change xtensa instruction translator to use it;
+- switch existing xtensa cores to use it;
+- add support for a number of instructions: salt/saltu, const16,
+  GPIO32 group, debug mode and MMU-related;
+- add disassembler for Xtensa.
+
+----------------------------------------------------------------
+Max Filippov (16):
+      target/xtensa: pass actual frame size to the entry helper
+      target/xtensa: import libisa source
+      target/xtensa: extract core opcode translators
+      target/xtensa: extract FPU2000 opcode translators
+      target/xtensa: update import_core.sh script for libisa
+      target/xtensa: switch dc232b to libisa
+      target/xtensa: switch dc233c to libisa
+      target/xtensa: switch fsf to libisa
+      target/xtensa: use libisa for instruction decoding
+      target/xtensa: tests: fix memctl SR test
+      target/xtensa: drop DisasContext::litbase
+      target/xtensa: add internal/noop SRs and opcodes
+      target/xtensa: implement salt/saltu
+      target/xtensa: implement GPIO32
+      target/xtensa: implement const16
+      target/xtensa: implement disassembler
+
+ MAINTAINERS                                |     1 +
+ disas/Makefile.objs                        |     1 +
+ disas/xtensa.c                             |   133 +
+ include/disas/bfd.h                        |     1 +
+ include/hw/xtensa/xtensa-isa.h             |   838 ++
+ target/xtensa/Makefile.objs                |     1 +
+ target/xtensa/core-dc232b.c                |     4 +
+ target/xtensa/core-dc232b/xtensa-modules.c | 14105 +++++++++++++++++++++++++
+ target/xtensa/core-dc233c.c                |     4 +
+ target/xtensa/core-dc233c/xtensa-modules.c | 15232 +++++++++++++++++++++++++++
+ target/xtensa/core-fsf.c                   |     5 +
+ target/xtensa/core-fsf/xtensa-modules.c    |  9841 +++++++++++++++++
+ target/xtensa/cpu.c                        |     9 +
+ target/xtensa/cpu.h                        |    31 +
+ target/xtensa/helper.c                     |    37 +
+ target/xtensa/import_core.sh               |    15 +
+ target/xtensa/op_helper.c                  |     2 +-
+ target/xtensa/translate.c                  |  5900 +++++++----
+ target/xtensa/xtensa-isa-internal.h        |   231 +
+ target/xtensa/xtensa-isa.c                 |  1745 +++
+ target/xtensa/xtensa-isa.h                 |     1 +
+ tests/tcg/xtensa/test_sr.S                 |     2 +-
+ 22 files changed, 45955 insertions(+), 2184 deletions(-)
+ create mode 100644 disas/xtensa.c
+ create mode 100644 include/hw/xtensa/xtensa-isa.h
+ create mode 100644 target/xtensa/core-dc232b/xtensa-modules.c
+ create mode 100644 target/xtensa/core-dc233c/xtensa-modules.c
+ create mode 100644 target/xtensa/core-fsf/xtensa-modules.c
+ create mode 100644 target/xtensa/xtensa-isa-internal.h
+ create mode 100644 target/xtensa/xtensa-isa.c
+ create mode 100644 target/xtensa/xtensa-isa.h
+
+-- 
+Thanks.
+-- Max
