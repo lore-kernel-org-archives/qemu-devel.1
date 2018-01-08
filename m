@@ -1,19 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51837)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54386)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bernat@luffy.cx>) id 1eYeO1-0004XR-Vn
-	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 15:51:14 -0500
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1eYeTI-00076U-0e
+	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 15:56:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bernat@luffy.cx>) id 1eYeNx-00034W-T5
-	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 15:51:14 -0500
-Received: from bart.luffy.cx ([78.47.78.131]:47427)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bernat@luffy.cx>) id 1eYeNx-00030q-Cm
-	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 15:51:09 -0500
-From: Vincent Bernat <vincent@bernat.im>
-Date: Mon,  8 Jan 2018 21:50:52 +0100
-Message-Id: <20180108205052.24385-1-vincent@bernat.im>
-Subject: [Qemu-devel] [PATCH] target-i386: add pcid to both Sandy Bridge and
- Ivy Bridge
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1eYeTE-0007Us-0G
+	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 15:56:40 -0500
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20180108183406.17623-1-f4bug@amsat.org>
+	<40FDE9D4-5C84-4734-A50A-9F9C8CC63D9E@gmail.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <63c52643-defd-a0ac-14f6-aabff83a4f16@amsat.org>
+Date: Mon, 8 Jan 2018 17:56:31 -0300
+MIME-Version: 1.0
+In-Reply-To: <40FDE9D4-5C84-4734-A50A-9F9C8CC63D9E@gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] MAINTAINERS: update Dmitry Fleytman email
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,40 +28,12 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org
-Cc: Vincent Bernat <vincent@bernat.im>
+To: Dmitry Fleytman <dmitry.fleytman@gmail.com>
+Cc: qemu trival <qemu-trivial@nongnu.org>, Qemu Developers <qemu-devel@nongnu.org>
 
-PCID has been introduced in Sandy Bridge and, currently, KVM doesn't
-object exposing it to VM as long as it is present on the host. Update
-CPU model for both Sandy Bridge and Ivy Bridge accordingly.
+On 01/08/2018 04:21 PM, Dmitry Fleytman wrote:
+> Thanks Philippe,
+> 
+> My patch is hanging on the list for some time already: http://lists.nongnu.org/archive/html/qemu-trivial/2017-12/msg00189.html
 
-Signed-off-by: Vincent Bernat <vincent@bernat.im>
----
- target/i386/cpu.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
-
-diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index 3818d7283158..bb2b4bd1b4fe 100644
---- a/target/i386/cpu.c
-+++ b/target/i386/cpu.c
-@@ -1109,7 +1109,7 @@ static X86CPUDefinition builtin_x86_defs[] = {
-             CPUID_EXT_TSC_DEADLINE_TIMER | CPUID_EXT_POPCNT |
-             CPUID_EXT_X2APIC | CPUID_EXT_SSE42 | CPUID_EXT_SSE41 |
-             CPUID_EXT_CX16 | CPUID_EXT_SSSE3 | CPUID_EXT_PCLMULQDQ |
--            CPUID_EXT_SSE3,
-+            CPUID_EXT_SSE3 | CPUID_EXT_PCID,
-         .features[FEAT_8000_0001_EDX] =
-             CPUID_EXT2_LM | CPUID_EXT2_RDTSCP | CPUID_EXT2_NX |
-             CPUID_EXT2_SYSCALL,
-@@ -1140,7 +1140,8 @@ static X86CPUDefinition builtin_x86_defs[] = {
-             CPUID_EXT_TSC_DEADLINE_TIMER | CPUID_EXT_POPCNT |
-             CPUID_EXT_X2APIC | CPUID_EXT_SSE42 | CPUID_EXT_SSE41 |
-             CPUID_EXT_CX16 | CPUID_EXT_SSSE3 | CPUID_EXT_PCLMULQDQ |
--            CPUID_EXT_SSE3 | CPUID_EXT_F16C | CPUID_EXT_RDRAND,
-+            CPUID_EXT_SSE3 | CPUID_EXT_F16C | CPUID_EXT_RDRAND |
-+            CPUID_EXT_PCID,
-         .features[FEAT_7_0_EBX] =
-             CPUID_7_0_EBX_FSGSBASE | CPUID_7_0_EBX_SMEP |
-             CPUID_7_0_EBX_ERMS,
--- 
-2.15.1
+Oops Ok I didn't notice it.
