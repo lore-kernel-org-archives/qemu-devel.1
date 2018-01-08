@@ -1,31 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33674)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40126)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1eYO2p-0000EM-Gd
-	for qemu-devel@nongnu.org; Sun, 07 Jan 2018 22:24:17 -0500
+	(envelope-from <bounces@canonical.com>) id 1eYOcD-0008V8-Mj
+	for qemu-devel@nongnu.org; Sun, 07 Jan 2018 23:00:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1eYO2l-0006Ze-E2
-	for qemu-devel@nongnu.org; Sun, 07 Jan 2018 22:24:15 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:56738)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1eYO2l-0006XC-4x
-	for qemu-devel@nongnu.org; Sun, 07 Jan 2018 22:24:11 -0500
-References: <20171222064151.29266-1-tiwei.bie@intel.com>
-	<fcf3858e-6643-350c-37b9-71698f1d26a5@redhat.com>
-	<20180104061853.jkdzbueashv2klka@debian-xvivbkq.sh.intel.com>
-	<aca10596-f8d4-417e-26b6-ed09ef766552@redhat.com>
-	<D0158A423229094DA7ABF71CF2FA0DA34E845FAD@SHSMSX104.ccr.corp.intel.com>
-	<a1319915-6492-af8d-a35d-5aedad61eb76@redhat.com>
-	<D0158A423229094DA7ABF71CF2FA0DA34E84629B@SHSMSX104.ccr.corp.intel.com>
-From: Jason Wang <jasowang@redhat.com>
-Message-ID: <238ebde1-0fca-9472-ae4e-1d5e67ff6606@redhat.com>
-Date: Mon, 8 Jan 2018 11:23:48 +0800
+	(envelope-from <bounces@canonical.com>) id 1eYOc9-0008Bl-8k
+	for qemu-devel@nongnu.org; Sun, 07 Jan 2018 23:00:49 -0500
+Received: from indium.canonical.com ([91.189.90.7]:55396)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1eYOc8-0008B2-VP
+	for qemu-devel@nongnu.org; Sun, 07 Jan 2018 23:00:45 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1eYOc7-0007mJ-OL
+	for <qemu-devel@nongnu.org>; Mon, 08 Jan 2018 04:00:43 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id B39D72E80C7
+	for <qemu-devel@nongnu.org>; Mon,  8 Jan 2018 04:00:43 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <D0158A423229094DA7ABF71CF2FA0DA34E84629B@SHSMSX104.ccr.corp.intel.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [virtio-dev] [RFC 0/3] Extend vhost-user to
- support VFIO based accelerators
+Date: Mon, 08 Jan 2018 03:51:08 -0000
+From: Liang Dai <1729501@bugs.launchpad.net>
+Reply-To: Bug 1729501 <1729501@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <150960325077.8724.2785366469980820788.malonedeb@wampee.canonical.com>
+Message-Id: <151538346834.3376.18127116364518628451.malone@soybean.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1729501] Re: qemu crashes with assertion error
+ `off_cur_end >= off_cur' failed
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,213 +37,157 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Liang, Cunming" <cunming.liang@intel.com>, "Bie, Tiwei" <tiwei.bie@intel.com>
-Cc: "Tan, Jianfeng" <jianfeng.tan@intel.com>, "virtio-dev@lists.oasis-open.org" <virtio-dev@lists.oasis-open.org>, "mst@redhat.com" <mst@redhat.com>, "Daly, Dan" <dan.daly@intel.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "alex.williamson@redhat.com" <alex.williamson@redhat.com>, "Wang, Xiao W" <xiao.w.wang@intel.com>, Maxime Coquelin <maxime.coquelin@redhat.com>, "stefanha@redhat.com" <stefanha@redhat.com>, "Wang, Zhihong" <zhihong.wang@intel.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>
+To: qemu-devel@nongnu.org
 
+Hi Gerd,
 
+Any chance to have a look?
 
-On 2018=E5=B9=B401=E6=9C=8805=E6=97=A5 18:25, Liang, Cunming wrote:
->
->> -----Original Message-----
->> From: Jason Wang [mailto:jasowang@redhat.com]
->> Sent: Friday, January 5, 2018 4:39 PM
->> To: Liang, Cunming <cunming.liang@intel.com>; Bie, Tiwei
->> <tiwei.bie@intel.com>
->> Cc: Tan, Jianfeng <jianfeng.tan@intel.com>; virtio-dev@lists.oasis-ope=
-n.org;
->> mst@redhat.com; qemu-devel@nongnu.org; alex.williamson@redhat.com;
->> Wang, Xiao W <xiao.w.wang@intel.com>; stefanha@redhat.com; Wang,
->> Zhihong <zhihong.wang@intel.com>; pbonzini@redhat.com; Daly, Dan
->> <dan.daly@intel.com>
->> Subject: Re: [Qemu-devel] [virtio-dev] [RFC 0/3] Extend vhost-user to =
-support
->> VFIO based accelerators
->>
->>
->>
->> On 2018=E5=B9=B401=E6=9C=8805=E6=97=A5 14:58, Liang, Cunming wrote:
->>>> Thanks for the pointer. Looks rather interesting.
->>>>
->>>>> We're also working on it (including defining a standard device for
->>>>> vhost data path acceleration based on mdev to hide vendor specific
->>>>> details).
->>>> This is exactly what I mean. Form my point of view, there's no need
->>>> for any extension for vhost protocol, we just need to reuse qemu
->>>> iothread to implement a userspace vhost dataplane and do the mdev
->> inside that thread.
->>> On functional perspective, it makes sense to have qemu native support=
- of
->> those certain usage. However, qemu doesn't have to take responsibility=
- for
->> dataplane. There're already huge amounts of codes for different device=
-s
->> emulation, leveraging external dataplane library is an effective way t=
-o
->> introduce more.
->>
->> This does not mean to drop external dataplane library. Actually, you c=
-an link
->> dpdk to qemu directly.
-> It's not a bad idea, then the interface comes to be new API/ABI definit=
-ion of external dataplane library instead of existing vhost protocol.
+This issue still can be reproduced with the latest code.
+(commit 281f327487c9c9b1599f93c589a408bbf4a651b8)
 
-These API/ABI should be qemu internal which should be much flexible than=20
-vhost-user.
+Please check the attachment for full gdb backtrace.
 
->   dpdk as a library is not a big deal to link with, customized applicat=
-ion is.
-> In addition, it will ask for qemu to provide flexible process model the=
-n. Lots of application level features (e.g. hot upgrade/fix) becomes burd=
-en.
+** Attachment added: "gdb full stack log"
+   https://bugs.launchpad.net/qemu/+bug/1729501/+attachment/5032471/+files/=
+gdb_full.txt
 
-Don't quite get this, I think we can solve this by migration. Even if a=20
-dpdk userspace backend can do this, it can only do upgrade and fix for=20
-network datapath. This is not a complete solution obviously.
+-- =
 
-It's nice to discuss this but it was a little bit out of the topic.
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1729501
 
-> I'm open to that option, keep eyes on any proposal there.
->
->>> The beauty of vhost_user is to open a door for variable userland
->> workloads(e.g. vswitch). The dataplane connected with VM usually need =
-to
->> be close integrated with those userland workloads, a control place
->> interface(vhost-user) is better than a datapath interface(e.g. provide=
-d by
->> dataplace in qemu iothread).
->>
->> Do we really need vswitch for vDPA?
-> Accelerators come into the picture of vswitch, which usually provides i=
-n-chip EMC for early classification. It gives a fast path for those throu=
-ghput sensitive(SLA) VNF to bypass the further table lookup. It co-exists=
- other VNF whose SLA level is best effort but requires more functions(e.g=
-. stateful conntrack, security check, even higher layer WAF support) supp=
-ort, DPDK based datapath still boost the throughput there. It's not used =
-to be a single choice of dedicated or shared datapath, usually they're co=
--exist.
+Title:
+  qemu crashes with assertion error `off_cur_end >=3D off_cur' failed
 
-So if I understand this correctly, the "vswtich" here is a hardware=20
-function (something like smart NICs or OVS offloaded). So the question=20
-still, is vhost-user a must in this case?
+Status in QEMU:
+  New
 
->
->>>    On workloads point of view, it's not excited to be part of qemu pr=
-ocess.
->> Don't see why, qemu have dataplane for virtio-blk/scsi.
-> Qemu has vhost-user for scsi too. I'm not saying which one is bad, just=
- point out sometime it's very workloads driven. Network is different with=
- blk/scsi/crypto.
+Bug description:
+  My host environment: Xen + QEMU
 
-What's the main difference from your point of view which makes=20
-vhost-user a must in this case?
+  git clones today's xen git and qemu git (2017-11-02)
 
->>> That comes up with the idea of vhost-user extension. Userland workloa=
-ds
->> decides to enable accelerators or not, qemu provides the common contro=
-l
->> plane infrastructure.
->>
->> It brings extra complexity: endless new types of messages and a huge b=
-runch
->> of bugs. And what's more important, the split model tends to be less e=
-fficient
->> in some cases, e.g guest IOMMU integration. I'm pretty sure we will me=
-et
->> more in the future.
-> vIOMMU relevant message has been supported by vhost protocol. It's inde=
-pendent effort there.
+  xen  -- git://xenbits.xen.org/xen.git
+  commit 24fb44e971a62b345c7b6ca3c03b454a1e150abe
 
-The point is vIOMMU integration is very inefficient in vhost-user for=20
-some cases. If you have lots of dynamic mappings, it can have only=20
-5%-10% performance compared to vIOMMU disabled. A huge amount of=20
-translation request will be generated in this case. The main issue here=20
-is you can not offload datapath completely to vhost-user backends=20
-completely, IOMMU translations were still done in qemu. This is one of=20
-the defect of vhost-user when datapath need to access the device state.
+  qemu -- https://github.com/qemu/qemu
+  commit 47ba789c97c8d201d01058b00a14d8a9a85fcfe9
 
-> I don't see this patch introduce endless new types.
+  QEMU was compiled using:
+  ./configure --prefix=3D/mnt/bin/ --enable-xen --target-list=3Di386-softmm=
+u --extra-cflags=3D"-I/mnt/xen/tools/include -I/mnt/xen/tools/libxc -I/mnt/=
+xen/tools/xenstore"        --extra-ldflags=3D"-L/mnt/xen/tools/libxc -L/mnt=
+/xen/tools/xenstore" --enable-debug --enable-debug-stack-usage
 
-Not this patch but we can imagine vhost-user protocol will become=20
-complex in the future.
+  Xen was configured with the above QEMU distribution:
+  ./configure --with-system-qemu=3D/mnt/bin/bin/qemu-system-i386
 
-> My taking of your fundamental concern is about continues adding new fea=
-tures on vhost-user.
-> Feel free to correct me if I misunderstood your point.
+  QEMU command line:
+  /mnt/bin/bin/qemu-system-i386 -xen-domid 28 -chardev socket,id=3Dlibxl-cm=
+d,path=3D/var/run/xen/qmp-libxl-28,server,nowait -no-shutdown -mon chardev=
+=3Dlibxl-cmd,mode=3Dcontrol -chardev socket,id=3Dlibxenstat-cmd,path=3D/var=
+/run/xen/qmp-libxenstat-28,server,nowait -mon chardev=3Dlibxenstat-cmd,mode=
+=3Dcontrol -nodefaults -no-user-config -name ubu_hvm -vnc 0.0.0.0:1,to=3D99=
+ -display none -serial pty -device cirrus-vga,vgamem_mb=3D8 -boot order=3Dc=
+ -smp 2,maxcpus=3D2 -device rtl8139,id=3Dnic0,netdev=3Dnet0,mac=3D00:16:3e:=
+74:34:32 -netdev type=3Dtap,id=3Dnet0,ifname=3Dvif28.0-emu,script=3Dno,down=
+script=3Dno -device rtl8139,id=3Dnic1,netdev=3Dnet1,mac=3D00:16:3e:5f:48:e4=
+ -netdev type=3Dtap,id=3Dnet1,ifname=3Dvif28.1-emu,script=3Dno,downscript=
+=3Dno -machine xenfv -m 1504 -drive file=3D/mnt/10G.hdd,if=3Dide,index=3D0,=
+media=3Ddisk,format=3Draw,cache=3Dwriteback
 
-Unfortunately not, endless itself is not a problem but we'd better only=20
-try to extend it only when it was really needed. The main questions are:
+  Produce:
+  I run a fuzzer program in guest vm, it may set incorrect values for graph=
+ics registers, sequencer registers and other registers.
 
-1) whether or not we need to split things like what you suggested here?
-2) if needed, is vhost-user the best method?
+  Seeing the following error from /var/log/xen/qemu-dm-<vm-name>.log:
+  qemu-system-i386: hw/display/cirrus_vga.c:712: cirrus_invalidate_region: =
+Assertion `off_cur_end >=3D off_cur' failed.
 
->
->>>>> And IMO it's also not a bad idea to extend vhost-user protocol to
->>>>> support the accelerators if possible. And it could be more flexible
->>>>> because it could support (for example) below things easily without
->>>>> introducing any complex command line options or monitor commands to
->>>>> QEMU:
->>>> Maybe I was wrong but I don't think we care about the complexity of
->>>> command line or monitor command in this case.
->>>>
->>>>> - the switching among different accelerators and software version
->>>>>      can be done at runtime in vhost process;
->>>>> - use different accelerators to accelerate different queue pairs
->>>>>      or just accelerate some (instead of all) queue pairs;
->>>> Well, technically, if we want, these could be implemented in qemu to=
-o.
->>> You're right if just considering I/O. The ways to consume those I/O i=
-s
->> another perspective.
->>> Simply 1:1 associating guest virtio-net and accelerator w/ SW datapat=
-h
->> fallback is not the whole picture.
->>
->> Pay attention:
->>
->> 1) What I mean is not a fallback here. You can still do a lot of trick=
-s e.g
->> offloading datapath to hardware or doorbell map.
->> 2) Qemu supports (very old and inefficient) a split model of device em=
-ulation
->> and network backend. This means we can switch between backends (though
->> not implemented).
-> Accelerator won't be defined in the same device layout, it means there'=
-re different kinds of drivers.
+  I can reproduce it at anytime, if you need to gather more diagnostic
+  information or try test patches, I'm happy to help.
 
-Well, you can still use different drivers if you link dpdk or whatever=20
-other dataplane library to qemu.
+  gdb bt:
+  #0  0x00007f81a64f8c37 in __GI_raise (sig=3Dsig@entry=3D6) at ../nptl/sys=
+deps/unix/sysv/linux/raise.c:56
+  #1  0x00007f81a64fc028 in __GI_abort () at abort.c:89
+  #2  0x00007f81a64f1bf6 in __assert_fail_base (fmt=3D0x7f81a6646018 "%s%s%=
+s:%u: %s%sAssertion `%s' failed.\n%n",
+  =C2=A0=C2=A0=C2=A0=C2=A0assertion=3Dassertion@entry=3D0x55d70cf8cdf2 "off=
+_cur_end >=3D off_cur", file=3Dfile@entry=3D0x55d70cf8cda9 "hw/display/cirr=
+us_vga.c", line=3Dline@entry=3D712,
+  =C2=A0=C2=A0=C2=A0=C2=A0function=3Dfunction@entry=3D0x55d70cf8db60 <__PRE=
+TTY_FUNCTION__.40643> "cirrus_invalidate_region") at assert.c:92
+  #3  0x00007f81a64f1ca2 in __GI___assert_fail (assertion=3D0x55d70cf8cdf2 =
+"off_cur_end >=3D off_cur", file=3D0x55d70cf8cda9 "hw/display/cirrus_vga.c"=
+, line=3D712,
+  =C2=A0=C2=A0=C2=A0=C2=A0function=3D0x55d70cf8db60 <__PRETTY_FUNCTION__.40=
+643> "cirrus_invalidate_region") at assert.c:101
+  #4  0x000055d70cb66445 in cirrus_invalidate_region (s=3D0x55d70ee3a4b0, o=
+ff_begin=3D4190568, off_pitch=3D1842, bytesperline=3D5056, lines=3D2922) at=
+ hw/display/cirrus_vga.c:712
+  #5  0x000055d70cb6660c in cirrus_bitblt_common_patterncopy (s=3D0x55d70ee=
+3a4b0) at hw/display/cirrus_vga.c:752
+  #6  0x000055d70cb6676d in cirrus_bitblt_videotovideo_patterncopy (s=3D0x5=
+5d70ee3a4b0) at hw/display/cirrus_vga.c:786
+  #7  0x000055d70cb670c5 in cirrus_bitblt_videotovideo (s=3D0x55d70ee3a4b0)=
+ at hw/display/cirrus_vga.c:986
+  #8  0x000055d70cb678bf in cirrus_bitblt_start (s=3D0x55d70ee3a4b0) at hw/=
+display/cirrus_vga.c:1136
+  #9  0x000055d70cb6880b in cirrus_vga_write_gr (s=3D0x55d70ee3a4b0, reg_in=
+dex=3D42, reg_value=3D228) at hw/display/cirrus_vga.c:1652
+  #10 0x000055d70cb6ab86 in cirrus_vga_ioport_write (opaque=3D0x55d70ee3a4b=
+0, addr=3D975, val=3D228, size=3D1) at hw/display/cirrus_vga.c:2754
+  #11 0x000055d70c91d9c0 in memory_region_write_accessor (mr=3D0x55d70ee4af=
+70, addr=3D31, value=3D0x7fffdaaeaf38, size=3D1, shift=3D8, mask=3D255, att=
+rs=3D...)
+  =C2=A0=C2=A0=C2=A0=C2=A0at /mnt/qemu/memory.c:560
+  #12 0x000055d70c91dc3a in access_with_adjusted_size (addr=3D30, value=3D0=
+x7fffdaaeaf38, size=3D2, access_size_min=3D1, access_size_max=3D1,
+  =C2=A0=C2=A0=C2=A0=C2=A0access_fn=3D0x55d70c91d8c9 <memory_region_write_a=
+ccessor>, mr=3D0x55d70ee4af70, attrs=3D...) at /mnt/qemu/memory.c:627
+  #13 0x000055d70c920f48 in memory_region_dispatch_write (mr=3D0x55d70ee4af=
+70, addr=3D30, data=3D58410, size=3D2, attrs=3D...) at /mnt/qemu/memory.c:1=
+503
+  #14 0x000055d70c8c51e0 in flatview_write_continue (fv=3D0x55d70ecb66d0, a=
+ddr=3D974, attrs=3D..., buf=3D0x7fffdaaeb0f0 "*\344W\026\377\177", len=3D4,=
+ addr1=3D30, l=3D2,
+  =C2=A0=C2=A0=C2=A0=C2=A0mr=3D0x55d70ee4af70) at /mnt/qemu/exec.c:2951
+  #15 0x000055d70c8c5390 in flatview_write (fv=3D0x55d70ecb66d0, addr=3D974=
+, attrs=3D..., buf=3D0x7fffdaaeb0f0 "*\344W\026\377\177", len=3D4) at /mnt/=
+qemu/exec.c:3002
+  #16 0x000055d70c8c5406 in address_space_write (as=3D0x55d70d70d5e0 <addre=
+ss_space_io>, addr=3D974, attrs=3D..., buf=3D0x7fffdaaeb0f0 "*\344W\026\377=
+\177", len=3D4)
+  =C2=A0=C2=A0=C2=A0=C2=A0at /mnt/qemu/exec.c:3014
+  #17 0x000055d70c914fb3 in cpu_outl (addr=3D974, val=3D374858794) at /mnt/=
+qemu/ioport.c:81
+  #18 0x000055d70ca0253f in do_outp (addr=3D974, size=3D4, val=3D374858794)=
+ at /mnt/qemu/hw/i386/xen/xen-hvm.c:782
+  #19 0x000055d70ca02888 in cpu_ioreq_pio (req=3D0x7fffdaaeb210) at /mnt/qe=
+mu/hw/i386/xen/xen-hvm.c:852
+  #20 0x000055d70ca02f2e in handle_ioreq (state=3D0x55d70e0cf3d0, req=3D0x7=
+fffdaaeb210) at /mnt/qemu/hw/i386/xen/xen-hvm.c:961
+  #21 0x000055d70ca0343e in cpu_handle_ioreq (opaque=3D0x55d70e0cf3d0) at /=
+mnt/qemu/hw/i386/xen/xen-hvm.c:1089
+  #22 0x000055d70ce75d69 in aio_dispatch_handlers (ctx=3D0x55d70e098550) at=
+ util/aio-posix.c:406
+  #23 0x000055d70ce75f0b in aio_dispatch (ctx=3D0x55d70e098550) at util/aio=
+-posix.c:437
+  #24 0x000055d70ce70b46 in aio_ctx_dispatch (source=3D0x55d70e098550, call=
+back=3D0x0, user_data=3D0x0) at util/async.c:261
+  #25 0x00007f81a7215e04 in g_main_context_dispatch () from /lib/x86_64-lin=
+ux-gnu/libglib-2.0.so.0
+  #26 0x000055d70ce74455 in glib_pollfds_poll () at util/main-loop.c:214
+  #27 0x000055d70ce7456a in os_host_main_loop_wait (timeout=3D16061710) at =
+util/main-loop.c:261
+  #28 0x000055d70ce7463f in main_loop_wait (nonblocking=3D0) at util/main-l=
+oop.c:515
+  #29 0x000055d70ca8e6a6 in main_loop () at vl.c:1995
+  #30 0x000055d70ca96815 in main (argc=3D42, argv=3D0x7fffdaaeb888, envp=3D=
+0x7fffdaaeb9e0) at vl.c:4897
 
-> Qemu definitely won't like to have HW relevant driver there,
-
-Why not? We've already had userspace NVME driver.
-
->   that's end up with another vhost-vfio in my slides.
-
-I don't get why we can't implement it purely through a userspace driver=20
-inside qemu.
-
->   A mediated device can help to unify the device layout definition, and=
- leave the driver part in its own place.
-
-The point is not about mediated device but why you must use vhost-user=20
-to do it.
-
-Thanks
-
-> This approach is quite good when application doesn't need to put userla=
-nd SW datapath and accelerator datapath in the same picture as which I me=
-ntioned(vswitch cases).
->
->>>    It's variable usages on workload side to abstract the device (e.g.=
- port re-
->> presenter for vswitch) and etc. I don't think qemu is interested for a=
-ll bunch
->> of things there.
->> Again, you can link any dataplane to qemu directly instead of using vh=
-ost-
->> user if vhost-user tends to be less useful in some cases (vDPA is one =
-of the
->> case I think).
-> See my previous words.
->
->> Thanks
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1729501/+subscriptions
