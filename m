@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38093)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39189)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eYWCb-0000WL-8x
-	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 07:06:54 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1eYWFK-0001ly-23
+	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 07:09:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eYWCa-0004jo-BU
-	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 07:06:53 -0500
-Received: from mail-oi0-x244.google.com ([2607:f8b0:4003:c06::244]:43225)
+	(envelope-from <peter.maydell@linaro.org>) id 1eYWFJ-00069g-8Y
+	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 07:09:42 -0500
+Received: from mail-ot0-x243.google.com ([2607:f8b0:4003:c0f::243]:34908)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1eYWCa-0004jU-62
-	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 07:06:52 -0500
-Received: by mail-oi0-x244.google.com with SMTP id t16so1948793oif.10
-	for <qemu-devel@nongnu.org>; Mon, 08 Jan 2018 04:06:52 -0800 (PST)
+	id 1eYWFJ-00069C-4I
+	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 07:09:41 -0500
+Received: by mail-ot0-x243.google.com with SMTP id q5so9035346oth.2
+	for <qemu-devel@nongnu.org>; Mon, 08 Jan 2018 04:09:41 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20171220212308.12614-1-michael.weiser@gmx.de>
-References: <20171220212308.12614-1-michael.weiser@gmx.de>
+In-Reply-To: <20171230225622.97409-1-michael.weiser@gmx.de>
+References: <20171230225622.97409-1-michael.weiser@gmx.de>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 8 Jan 2018 12:06:31 +0000
-Message-ID: <CAFEAcA8A9=7onMxRLM6=L_uz3P4fZmVx=drDY2jv3wqsN7Akug@mail.gmail.com>
+Date: Mon, 8 Jan 2018 12:09:20 +0000
+Message-ID: <CAFEAcA8GgbFnbr0yNkVyrBK6TciTMEk_EZuw4_gvfZ+eEii3Qw@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v3 0/7] Add aarch64_be-linux-user target
+Subject: Re: [Qemu-devel] [PATCH v2] target/arm: Fix stlxp for aarch64_be
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,39 +29,25 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Michael Weiser <michael.weiser@gmx.de>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>
+Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-On 20 December 2017 at 21:23, Michael Weiser <michael.weiser@gmx.de> wrote:
-> Hello,
+On 30 December 2017 at 22:56, Michael Weiser <michael.weiser@gmx.de> wrote:
+> ldxp loads two consecutive doublewords from memory regardless of CPU
+> endianness. On store, stlxp currently assumes to work with a 128bit
+> value and consequently switches order in big-endian mode. With this
+> change it packs the doublewords in reverse order in anticipation of the
+> 128bit big-endian store operation interposing them so they end up in
+> memory in the right order. This makes it work for both MTTCG and !MTTCG.
+> It effectively implements the ARM ARM STLXP operation pseudo-code:
 >
-> below patches add support for big-endian aarch64 to linux-user. Almost
-> everything is already in place. The patches just set up the CPU flags as
-> required for big-endianness, add a distinction in uname and make sure the
-> instructions for the signal trampoline end up in memory little-endian.
-> Finally, configure is extended to allow building of a
-> aarch64_be-linux-user target and scripts/qemu-binfmt-conf.sh to include
-> the binfmt magic for aarch64_be ELF files.
+> data = if BigEndian() then el1:el2 else el2:el1;
 >
-> While at it, scripts/qemu-binfmt-conf.sh is changed again to separate
-> arm/aarch64 targets of differing endianness into separate families so
-> that the binfmt handler for the respective other endianness is indeed
-> registered.  Also, while not strictly relevant to aarch64 support, armeb
-> is actually added to the list of targets, binfmt handlers should
-> registered for.
+> With this change an aarch64_be Linux 4.14.4 kernel succeeds to boot up
+> in system emulation mode.
 >
-> With this I am able to run individual aarch64_be binaries as well as
-> chroot into a full-blown aarch64_be userland using binfmt_misc, running
-> and compiling things (Gentoo crossdev/native).
->
-> v3:
-> - drop changes to aarch64 host support from configure
-> - add binfmt arm CPU family separation
-> - add armeb to binfmt handler targets
->
-> v2:
-> - add binfmt magic to qemu-binfmt-conf.sh
-> - fix style problems (tab indenting)
+> Signed-off-by: Michael Weiser <michael.weiser@gmx.de>
 
-Thanks for this patchset -- I have applied it to target-arm.next.
+Thanks, applied to target-arm.next (with the typo rth pointed out
+fixed).
 
 -- PMM
