@@ -1,29 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52846)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53033)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1eYar2-0004jJ-10
-	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 12:04:57 -0500
+	(envelope-from <bounces@canonical.com>) id 1eYarl-0005Mz-0f
+	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 12:05:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1eYaqx-0007UD-Sv
-	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 12:04:56 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:54884)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1eYaqx-0007Tq-JM
-	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 12:04:51 -0500
-Date: Mon, 8 Jan 2018 19:04:48 +0200
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20180108190345-mutt-send-email-mst@kernel.org>
-References: <1513866427-27125-1-git-send-email-mst@redhat.com>
-	<CAFEAcA_pt7XhXOhL2jSxwH9ooL7xjShmp6eBAYpRLc=dY-=TXQ@mail.gmail.com>
-	<20171221223704-mutt-send-email-mst@kernel.org>
-	<CAAdtpL74ZyVsLwgBjpbsdSHbWdY_Uq6ouRAvgo00UdVevTKq8A@mail.gmail.com>
-	<20171222014258-mutt-send-email-mst@kernel.org>
-	<CAFEAcA8eKTEh3zSOPNm1WgUujNOU+zcNSgBAE5G68QcObQd8sA@mail.gmail.com>
+	(envelope-from <bounces@canonical.com>) id 1eYarg-0007pV-TD
+	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 12:05:41 -0500
+Received: from indium.canonical.com ([91.189.90.7]:55242)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1eYarg-0007pA-Mu
+	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 12:05:36 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1eYarf-0004Q9-3t
+	for <qemu-devel@nongnu.org>; Mon, 08 Jan 2018 17:05:35 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 1C6672E80C0
+	for <qemu-devel@nongnu.org>; Mon,  8 Jan 2018 17:05:35 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAFEAcA8eKTEh3zSOPNm1WgUujNOU+zcNSgBAE5G68QcObQd8sA@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PULL 00/25] pc, pci, virtio: features, fixes,
- cleanups
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 08 Jan 2018 16:57:01 -0000
+From: Peter Maydell <peter.maydell@linaro.org>
+Reply-To: Bug 1739378 <1739378@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <151375741208.25451.9053884797959645588.malonedeb@wampee.canonical.com>
+Message-Id: <151543062236.32165.313662106683843191.launchpad@wampee.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1739378] Re: migration state save/load of sdcard
+ device is broken
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,66 +37,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philippe@mathieu-daude.net>, QEMU Developers <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
 
-On Mon, Jan 08, 2018 at 09:14:41AM +0000, Peter Maydell wrote:
-> On 21 December 2017 at 23:43, Michael S. Tsirkin <mst@redhat.com> wrote:
-> >> you also need to drop "hw/pci: remove obsolete PCIDevice->init()"
-> >> (applied in your tree as 18951fce55d5aa58cd1629b4cb704ee51bab4420)
-> >> else the not-yet-QOM'ified NVME won't work anymore.
-> >
-> > Done that too, thanks a lot
-> 
-> Hi. I'm afraid this pullreq (merge of 880b1ff) has new runtime
-> errors from the clang sanitizer:
-> 
-> /home/petmay01/linaro/qemu-for-merges/hw/net/net_tx_pkt.c:201:27:
-> runtime error: member access within misaligned address 0x55b4ffee8246
-> for type 'struct ip_header', which requires 4 byte alignment
-> 0x55b4ffee8246: note: pointer points here
->  01 00 00 00 45 00  01 a9 01 00 00 00 40 11  78 45 00 00 00 00 ff ff
-> ff ff 00 00 00 00 00 00  00 00
->              ^
-> /home/petmay01/linaro/qemu-for-merges/hw/net/net_tx_pkt.c:201:27:
-> runtime error: load of misaligned address 0x55b4ffee8246 for type
-> 'uint8_t' (aka 'unsigned char'), which requires 4 byte alignment
-> 0x55b4ffee8246: note: pointer points here
->  01 00 00 00 45 00  01 a9 01 00 00 00 40 11  78 45 00 00 00 00 ff ff
-> ff ff 00 00 00 00 00 00  00 00
->              ^
-> /home/petmay01/linaro/qemu-for-merges/hw/net/net_tx_pkt.c:208:65:
-> runtime error: member access within misaligned address 0x55b4ffee8246
-> for type 'struct ip_header', which requires 4 byte alignment
-> 0x55b4ffee8246: note: pointer points here
->  01 00 00 00 45 00  01 a9 01 00 00 00 40 11  78 45 00 00 00 00 ff ff
-> ff ff 00 00 00 00 00 00  00 00
->              ^
-> /home/petmay01/linaro/qemu-for-merges/hw/net/net_tx_pkt.c:210:13:
-> runtime error: member access within misaligned address 0x55b4ffee8246
-> for type 'struct ip_header', which requires 4 byte alignment
-> 0x55b4ffee8246: note: pointer points here
->  01 00 00 00 45 00  01 a9 01 00 00 00 40 11  78 45 00 00 00 00 ff ff
-> ff ff 00 00 00 00 00 00  00 00
->              ^
-> /home/petmay01/linaro/qemu-for-merges/hw/net/net_tx_pkt.c:210:13:
-> runtime error: load of misaligned address 0x55b4ffee8246 for type
-> 'uint8_t' (aka 'unsigned char'), which requires 4 byte alignment
-> 0x55b4ffee8246: note: pointer points here
->  01 00 00 00 45 00  01 a9 01 00 00 00 40 11  78 45 00 00 00 00 ff ff
-> ff ff 00 00 00 00 00 00  00 00
->              ^
-> 
-> Sorry for the late report, I didn't quite have time
-> to process the pull before Christmas holidays.
-> 
-> thanks
-> -- PMM
+** Summary changed:
 
+- qemu git master snapshot doesn't work
++ migration state save/load of sdcard device is broken
 
-Hard to see how my pull could be doing this, but I'll try to bisect.
+-- =
 
-BTW clang build prints lots of error around alignment for me.
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1739378
 
--- 
-MST
+Title:
+  migration state save/load of sdcard device is broken
+
+Status in QEMU:
+  New
+
+Bug description:
+  I'm having different issues trying to have QEMU snapshots working
+  using qemu-system-arm with vexpress-a15 board.
+
+  In this opportunity, I'm trying the git master head version:
+  # git rev-parse HEAD
+  af352675efb7e92a1f5f6461a042a12015ab3d12
+
+  $ /usr/local/bin/qemu-system-arm -kernel kernel/vmlinuz-4.10.0-42-generic=
+ -initrd kernel/initrd.img-4.10.0-42-generic -M vexpress-a15 -m 2048 -appen=
+d 'root=3D/dev/mmcblk0 rootwait console=3Dtty0' -sd vexpress-4G.qcow2 -dtb =
+device-tree/vexpress-v2p-ca15-tc1.dtb
+  audio: Could not init `oss' audio driver
+
+  Later on, when the machine finishes booting I savevm ss and quit.
+  However, when I try to restore it, I have that Missing section footer
+  error:
+
+  $ /usr/local/bin/qemu-system-arm -kernel kernel/vmlinuz-4.10.0-42-generic=
+ -initrd kernel/initrd.img-4.10.0-42-generic -M vexpress-a15 -m 2048 -appen=
+d 'root=3D/dev/mmcblk0 rootwait console=3Dtty0' -sd vexpress-4G.qcow2 -dtb =
+device-tree/vexpress-v2p-ca15-tc1.dtb  -loadvm ss
+  audio: Could not init `oss' audio driver
+  qemu-system-arm: Missing section footer for sd-card
+  qemu-system-arm: Error -22 while loading VM state
+
+  OS: Ubuntu 16.04.3 LTS (xenial)
+
+  $ gcc --version
+  gcc (Ubuntu 5.4.0-6ubuntu1~16.04.5) 5.4.0 20160609
+
+  How have I built it?
+  # git clone git://git.qemu.org/qemu.git
+  # cd qemu
+  # git submodule update --init --checkout
+  # make clean && ./configure --target-list=3Darm-softmmu && make -j8
+  # sudo make install
+
+  I've also tried a different ./configure line, explicitly enabling some
+  of the features, i.e. smartcard, with the same results:
+
+  ./configure '--disable-user' '--enable-system' '--enable-linux-user'
+  '--enable-modules' '--enable-linux-aio' '--audio-drv-list=3Dpa'
+  '--enable-attr' '--enable-brlapi' '--enable-virtfs' '--enable-cap-ng'
+  '--enable-curl' '--enable-fdt' '--enable-gnutls' '--disable-gtk'
+  '--disable-vte' '--enable-libiscsi' '--enable-curses' '--enable-
+  smartcard' '--enable-rbd' '--enable-vnc-sasl' '--enable-seccomp'
+  '--enable-spice' '--enable-libusb' '--enable-usb-redir' '--enable-
+  xfsctl' '--enable-vnc' '--enable-vnc-jpeg' '--enable-vnc-png'
+  '--enable-kvm' '--enable-vhost-net'
+
+  As a reference, and just in case these may be in some way related,
+  I've just submitted another ticket for a different issue with
+  snapshots using Ubuntu Qemu version
+  (https://bugs.launchpad.net/qemu/+bug/1739371)
+
+  Cheers,
+  Gus
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1739378/+subscriptions
