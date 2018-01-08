@@ -1,21 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47045)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48706)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1eYfBI-0000Hn-Oa
-	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 16:42:10 -0500
+	(envelope-from <alistair23@gmail.com>) id 1eYfEu-0007AT-DR
+	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 16:45:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1eYfBH-00073F-JO
-	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 16:42:08 -0500
+	(envelope-from <alistair23@gmail.com>) id 1eYfEt-0000eT-OL
+	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 16:45:52 -0500
+Received: from mail-wm0-x236.google.com ([2a00:1450:400c:c09::236]:40106)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
+	id 1eYfEt-0000dv-FA
+	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 16:45:51 -0500
+Received: by mail-wm0-x236.google.com with SMTP id f206so16868765wmf.5
+	for <qemu-devel@nongnu.org>; Mon, 08 Jan 2018 13:45:51 -0800 (PST)
 MIME-Version: 1.0
 Sender: alistair23@gmail.com
-In-Reply-To: <20180108154303.6522-2-f4bug@amsat.org>
-References: <20180108154303.6522-1-f4bug@amsat.org>
-	<20180108154303.6522-2-f4bug@amsat.org>
+In-Reply-To: <20180103212436.15762-10-f4bug@amsat.org>
+References: <20180103212436.15762-1-f4bug@amsat.org>
+	<20180103212436.15762-10-f4bug@amsat.org>
 From: Alistair Francis <alistair.francis@xilinx.com>
-Date: Mon, 8 Jan 2018 13:41:35 -0800
-Message-ID: <CAKmqyKPQ-pdhXwn1knjj+CPps0uyRSeVELz7km1R-nJsnT4M=A@mail.gmail.com>
+Date: Mon, 8 Jan 2018 13:45:19 -0800
+Message-ID: <CAKmqyKOEiM4=DvnWB5H8ByJMQ_eXrNCY59SeTc-EN_Y4ZSmY0w@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v5 01/31] sdhci: add a spec_version property
+Subject: Re: [Qemu-devel] [PATCH v2 09/25] sdcard: use G_BYTE from cutils
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,11 +32,11 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Cc: Alistair Francis <alistair.francis@xilinx.com>, Peter Maydell <peter.maydell@linaro.org>, Andrey Smirnov <andrew.smirnov@gmail.com>, Igor Mitsyanko <i.mitsyanko@gmail.com>, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, Prasad J Pandit <pjp@fedoraproject.org>, =?UTF-8?Q?Gr=C3=A9gory_Estrade?= <gregory.estrade@gmail.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Krzysztof Kozlowski <krzk@kernel.org>, Jean-Christophe Dubois <jcd@tribudubois.net>, Sai Pavan Boddu <saipava@xilinx.com>, qemu-arm <qemu-arm@nongnu.org>, Clement Deschamps <clement.deschamps@antfield.fr>, Andrew Baumann <Andrew.Baumann@microsoft.com>, Eduardo Habkost <ehabkost@redhat.com>
+Cc: Alistair Francis <alistair.francis@xilinx.com>, Peter Maydell <peter.maydell@linaro.org>, Igor Mitsyanko <i.mitsyanko@gmail.com>, Andrew Baumann <Andrew.Baumann@microsoft.com>, Olbrich <m.olbrich@pengutronix.de>, Andrzej Zaborowski <balrogg@gmail.com>, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, Prasad J Pandit <pjp@fedoraproject.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Paul Brook <paul@codesourcery.com>, =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
 
-On Mon, Jan 8, 2018 at 7:42 AM, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.or=
+On Wed, Jan 3, 2018 at 1:24 PM, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.or=
 g> wrote:
-> default to Spec v2.00
+> code is now easier to read.
 >
 > Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 
@@ -38,112 +45,31 @@ Reviewed-by: Alistair Francis <alistair.francis@xilinx.com>
 Alistair
 
 > ---
->  hw/sd/sdhci-internal.h |  4 ++--
->  include/hw/sd/sdhci.h  |  3 +++
->  hw/sd/sdhci.c          | 19 +++++++++++++++++--
->  3 files changed, 22 insertions(+), 4 deletions(-)
+>  hw/sd/sd.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
 >
-> diff --git a/hw/sd/sdhci-internal.h b/hw/sd/sdhci-internal.h
-> index b7475a1b7b..cf4a055159 100644
-> --- a/hw/sd/sdhci-internal.h
-> +++ b/hw/sd/sdhci-internal.h
-> @@ -212,9 +212,9 @@ FIELD(SDHC_PRNSTS, WRITE_PROTECT,      19, 1);
->  /* Slot interrupt status */
->  #define SDHC_SLOT_INT_STATUS            0xFC
+> diff --git a/hw/sd/sd.c b/hw/sd/sd.c
+> index 1f209b8199..d4aa7b4a92 100644
+> --- a/hw/sd/sd.c
+> +++ b/hw/sd/sd.c
+> @@ -38,6 +38,7 @@
+>  #include "hw/sd/sdcard_legacy.h"
+>  #include "qapi/error.h"
+>  #include "qemu/bitmap.h"
+> +#include "qemu/cutils.h"
+>  #include "hw/qdev-properties.h"
+>  #include "qemu/error-report.h"
+>  #include "qemu/timer.h"
+> @@ -369,7 +370,7 @@ static void sd_reset_csd(SDState *sd, uint64_t size)
+>      uint32_t sectsize =3D (1 << (SECTOR_SHIFT + 1)) - 1;
+>      uint32_t wpsize =3D (1 << (WPGROUP_SHIFT + 1)) - 1;
 >
-> -/* HWInit Host Controller Version Register 0x0401 */
-> +/* HWInit Host Controller Version Register */
->  #define SDHC_HCVER                      0xFE
-> -#define SD_HOST_SPECv2_VERS             0x2401
-> +#define SDHC_HCVER_VENDOR               0x24
->
->  #define SDHC_REGISTERS_MAP_SIZE         0x100
->  #define SDHC_INSERTION_DELAY            (NANOSECONDS_PER_SECOND)
-> diff --git a/include/hw/sd/sdhci.h b/include/hw/sd/sdhci.h
-> index 2aea20f1d8..ddd5040410 100644
-> --- a/include/hw/sd/sdhci.h
-> +++ b/include/hw/sd/sdhci.h
-> @@ -91,6 +91,8 @@ typedef struct SDHCIState {
->      uint64_t capareg;      /* Capabilities Register */
->      /* 0x48 */
->      uint64_t maxcurr;      /* Maximum Current Capabilities Register */
-> +    /* 0xfe */
-> +    uint16_t version;      /* Host Controller Version Register */
->
->      uint8_t  *fifo_buffer; /* SD host i/o FIFO buffer */
->      uint32_t buf_maxsz;
-> @@ -99,6 +101,7 @@ typedef struct SDHCIState {
->      bool     pending_insert_state;
->      /* Configurable properties */
->      bool pending_insert_quirk; /* Quirk for Raspberry Pi card insert int=
+> -    if (size <=3D 0x40000000) {  /* Standard Capacity SD */
+> +    if (size <=3D 1 * G_BYTE /* FIXME 2GB? */) { /* Standard Capacity SD=
  */
-> +    uint8_t spec_version;
->  } SDHCIState;
->
->  #define TYPE_PCI_SDHCI "sdhci-pci"
-> diff --git a/hw/sd/sdhci.c b/hw/sd/sdhci.c
-> index b080950f80..cd4a8efdd7 100644
-> --- a/hw/sd/sdhci.c
-> +++ b/hw/sd/sdhci.c
-> @@ -169,7 +169,8 @@ static void sdhci_reset(SDHCIState *s)
->
->      timer_del(s->insert_timer);
->      timer_del(s->transfer_timer);
-> -    /* Set all registers to 0. Capabilities registers are not cleared
-> +
-> +    /* Set all registers to 0. Capabilities/Version registers are not cl=
-eared
->       * and assumed to always preserve their value, given to them during
->       * initialization */
->      memset(&s->sdmasysad, 0, (uintptr_t)&s->capareg - (uintptr_t)&s->sdm=
-asysad);
-> @@ -923,7 +924,7 @@ static uint64_t sdhci_read(void *opaque, hwaddr offse=
-t, unsigned size)
->          ret =3D (uint32_t)(s->admasysaddr >> 32);
->          break;
->      case SDHC_SLOT_INT_STATUS:
-> -        ret =3D (SD_HOST_SPECv2_VERS << 16) | sdhci_slotint(s);
-> +        ret =3D (s->version << 16) | sdhci_slotint(s);
->          break;
->      default:
->          qemu_log_mask(LOG_UNIMP, "SDHC rd_%ub @0x%02" HWADDR_PRIx " "
-> @@ -1178,6 +1179,15 @@ static inline unsigned int sdhci_get_fifolen(SDHCI=
-State *s)
->      }
->  }
->
-> +static void sdhci_init_readonly_registers(SDHCIState *s, Error **errp)
-> +{
-> +    if (s->spec_version !=3D 2) {
-> +        error_setg(errp, "Only Spec v2 is supported");
-> +        return;
-> +    }
-> +    s->version =3D (SDHC_HCVER_VENDOR << 8) | (s->spec_version - 1);
-> +}
-> +
->  static void sdhci_initfn(SDHCIState *s)
->  {
->      qbus_create_inplace(&s->sdbus, sizeof(s->sdbus),
-> @@ -1190,6 +1200,10 @@ static void sdhci_initfn(SDHCIState *s)
->
->  static void sdhci_common_realize(SDHCIState *s, Error **errp)
->  {
-> +    sdhci_init_readonly_registers(s, errp);
-> +    if (errp && *errp) {
-> +        return;
-> +    }
->      s->buf_maxsz =3D sdhci_get_fifolen(s);
->      s->fifo_buffer =3D g_malloc0(s->buf_maxsz);
->
-> @@ -1290,6 +1304,7 @@ const VMStateDescription sdhci_vmstate =3D {
->  /* Capabilities registers provide information on supported features of t=
-his
->   * specific host controller implementation */
->  static Property sdhci_properties[] =3D {
-> +    DEFINE_PROP_UINT8("sd-spec-version", SDHCIState, spec_version, 2),
->      DEFINE_PROP_UINT64("capareg", SDHCIState, capareg,
->              SDHC_CAPAB_REG_DEFAULT),
->      DEFINE_PROP_UINT64("maxcurr", SDHCIState, maxcurr, 0),
+>          sd->csd[0] =3D 0x00;     /* CSD structure */
+>          sd->csd[1] =3D 0x26;     /* Data read access-time-1 */
+>          sd->csd[2] =3D 0x00;     /* Data read access-time-2 */
 > --
 > 2.15.1
 >
