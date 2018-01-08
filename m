@@ -1,25 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42517)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44296)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1eYaUz-0000Z0-Oh
-	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 11:42:10 -0500
+	(envelope-from <eblake@redhat.com>) id 1eYaZB-0002Q5-O7
+	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 11:46:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1eYaUx-0007hF-57
-	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 11:42:09 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:42688)
+	(envelope-from <eblake@redhat.com>) id 1eYaZ9-0003AO-1Z
+	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 11:46:29 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:45564)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1eYaUw-0007bm-Rz
-	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 11:42:07 -0500
-Date: Mon, 8 Jan 2018 18:41:43 +0200
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20180108183619-mutt-send-email-mst@kernel.org>
-References: <1515108094-11508-1-git-send-email-mst@redhat.com>
-	<CAAdtpL4WQhtLOZcRSTFvTbLGs7f4miRKTPtE-uqrP0h2qOm32A@mail.gmail.com>
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1eYaZ8-00039Y-NI
+	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 11:46:26 -0500
+References: <20170804012551.2714-1-eblake@redhat.com>
+	<20170804012551.2714-6-eblake@redhat.com>
+	<87k22dw4r2.fsf@dusky.pond.sub.org>
+	<c9564021-896a-2c29-8f74-0921e94d292a@redhat.com>
+	<87lgkurtiw.fsf@dusky.pond.sub.org>
+	<7893edd1-4f6c-7954-f682-e27824b8c984@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <f8ef31a0-887d-e315-bd42-40b68c3c7c45@redhat.com>
+Date: Mon, 8 Jan 2018 10:46:23 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <CAAdtpL4WQhtLOZcRSTFvTbLGs7f4miRKTPtE-uqrP0h2qOm32A@mail.gmail.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] isa/piix: move to mips
+In-Reply-To: <7893edd1-4f6c-7954-f682-e27824b8c984@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="oyHGQQ5CrcmudXgZ3zQytfDKrV30i2Usl"
+Subject: Re: [Qemu-devel] [PATCH v4 05/22] qobject: Simplify
+ qobject_from_jsonv()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,83 +33,98 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
-Cc: =?iso-8859-1?Q?Herv=E9?= Poussineau <hpoussin@reactos.org>, Paolo Bonzini <pbonzini@redhat.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Aurelien Jarno <aurelien@aurel32.net>, Yongbok Kim <yongbok.kim@mips.com>, Michael Tokarev <mjt@tls.msk.ru>, Thomas Huth <thuth@redhat.com>, =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: qemu-devel@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>
 
-On Fri, Jan 05, 2018 at 04:15:18PM -0300, Philippe Mathieu-Daud=E9 wrote:
-> Hi Michael,
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--oyHGQQ5CrcmudXgZ3zQytfDKrV30i2Usl
+From: Eric Blake <eblake@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: qemu-devel@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>
+Message-ID: <f8ef31a0-887d-e315-bd42-40b68c3c7c45@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v4 05/22] qobject: Simplify
+ qobject_from_jsonv()
+References: <20170804012551.2714-1-eblake@redhat.com>
+ <20170804012551.2714-6-eblake@redhat.com> <87k22dw4r2.fsf@dusky.pond.sub.org>
+ <c9564021-896a-2c29-8f74-0921e94d292a@redhat.com>
+ <87lgkurtiw.fsf@dusky.pond.sub.org>
+ <7893edd1-4f6c-7954-f682-e27824b8c984@redhat.com>
+In-Reply-To: <7893edd1-4f6c-7954-f682-e27824b8c984@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 10/02/2017 09:30 AM, Eric Blake wrote:
+> On 10/02/2017 12:46 AM, Markus Armbruster wrote:
 >=20
-> On Thu, Jan 4, 2018 at 8:21 PM, Michael S. Tsirkin <mst@redhat.com> wro=
-te:
-> > This device is only used on mips, move to the correct maintainer
-> > section.
-> >
-> > Cc: Aurelien Jarno <aurelien@aurel32.net>
-> > Cc: Yongbok Kim <yongbok.kim@mips.com>
-> > Cc: Herv=E9 Poussineau <hpoussin@reactos.org>
-> > Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-> > ---
-> >  MAINTAINERS | 2 +-
-> >  1 file changed, 1 insertion(+), 1 deletion(-)
-> >
-> > diff --git a/MAINTAINERS b/MAINTAINERS
-> > index 0255113..ab30f1f 100644
-> > --- a/MAINTAINERS
-> > +++ b/MAINTAINERS
-> > @@ -175,6 +175,7 @@ F: include/hw/intc/mips_gic.h
-> >  F: include/hw/timer/mips_gictimer.h
-> >  F: tests/tcg/mips/
-> >  F: disas/mips.c
-> > +F: hw/isa/piix4.c
->=20
-> NACK this isn't the correct section (MIPS architecture),
->=20
-> The section you want to update is the "Malta board" one.
->=20
-> Now the 82371 devices are broadly use with X86 machines, so I am a bit
-> reluctant to this change.
->=20
-> Maybe I am misunderstanding the 'X86 machines PC' entry, but I see you
-> are the unique maintainer of this entry which status is "Supported:
-> Someone is actually paid to look after this".
-> My guess is you are paid to work on _recent_ PC machines and you are
-> probably receiving too many patches.
+>>>>> +    /*
+>>>>> +     * This seemingly unnecessary copy is required in case va_list=
 
-As I said, I don't test mips. As long as isa/piix is not event built
-on x86, it doesn't make sense for me to merge patches.
+>>>>> +     * is an array type.
+>>>>> +     */
+>>>>
+>>>> --verbose?
+>>>>
+>>>>> +    va_copy(ap_copy, ap);
+>>>>> +    obj =3D qobject_from_json_internal(string, &ap_copy, &error_ab=
+ort);
+>>>>> +    va_end(ap_copy);
+>>>
+>>> Code motion. But if the comment needs to be more verbose in the
+>>> destination than it was on the source, the rationale is that C99/POSI=
+X
+>>> allows 'typedef something va_list[]' (that is, where va_list is an ar=
+ray
+>>> of some other type), although I don't know of any modern OS that
+>>> actually defines it like that.  Based on C pointer-decay rules, '&ap'=
 
-> I suggest we split this section in "recent PC" vs "outdated PC".
-> It might be hard to draw a line, but maybe i440FX vs Q35 is a good one.
-> If you agree to unburden some files you don't find relevant to the
-> "recent PC" entry,
-> Herv=E9 and I volunteer for the "outdated PC" one with a "Odd Fixes" st=
-atus
-> (has a maintainer but they don't have time to do much other than throw
-> the odd patch in).
+>>> has a different type based on whether va_list was a struct/pointer or=
+ an
+>>> array type, when 'va_list ap' was passed as a parameter; so we can't
+>>> portably use qobject_from_json_internal(string, &ap, &error_abort).  =
+The
+>>> va_copy() is what lets us guarantee that &ap_list is a pointer to a
+>>> va_list regardless of the type of va_list (because va_copy was declar=
+ed
+>>> locally, rather than in a parameter list, and is therefore not subjec=
+t
+>>> to pointer decay), and NOT an accidental pointer to first element of =
+the
+>>> va_list array on platforms where va_list is an array.
 
-That's not a level of support i440fx needs though, it's used
-in production on too many systems.
+When I first wrote that, I didn't know where it mattered in practice;
+now I do.  Here's a gcc non-bug:
+https://gcc.gnu.org/bugzilla/show_bug.cgi?id=3D14557
 
-> I hope you won't take this suggestion badly, we just offer help :)
->=20
-> Regards,
->=20
-> Phil.
+that documents a workaround of using a macro va_ptr() because there ARE
+existing modern platforms that use an array type for va_list:
+https://sourceware.org/ml/newlib/2017/msg01302.html
 
-For things that are actually used with x86 guests,
-I think we are good, Marcel recently joined with that.
+I don't know if va_ptr() is any more elegant than the va_copy() used in
+my code motion.
 
-I'd like to split out pc bits that are not used with x86 guests.
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
 
-> >  Moxie
-> >  M: Anthony Green <green@moxielogic.com>
-> > @@ -849,7 +850,6 @@ F: hw/pci-host/q35.c
-> >  F: hw/pci-host/pam.c
-> >  F: include/hw/pci-host/q35.h
-> >  F: include/hw/pci-host/pam.h
-> > -F: hw/isa/piix4.c
-> >  F: hw/isa/lpc_ich9.c
-> >  F: hw/i2c/smbus_ich9.c
-> >  F: hw/acpi/piix4.c
-> > --
-> > MST
+
+--oyHGQQ5CrcmudXgZ3zQytfDKrV30i2Usl
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlpToF8ACgkQp6FrSiUn
+Q2oulQgArsxWRvw9nfLCT1+/reRpQTEyB4Jqu7t/uoNaGIRTYpodc6faMstNcBZR
+63QXGdjWQnqFT7DZ60hYOqidjzK3lcXoBSBYE3RPOU/2Vyip8K+gVl+WqiKdU5K5
+1jO6qxnIJoMz8c2od0p4BKDKa7I50MgFsbzOxCP+uu+RlEhiiTP6LqqZ/ZsvGLxY
+LNHPt0ad3mI6cnrDcTmaWXADsxPp55n89nDS4ochgzdGmjwpj+kNVFQfmtikVtn2
+y2lhzGp2rw8K28pkbHlcM5SJQ35Y8f1h0nVJyhNXXuGyHWRRf3Y8TyxpEm3BervQ
+DXYoFEvbEp4g0BaWmub4DVa3AMjJTA==
+=nn15
+-----END PGP SIGNATURE-----
+
+--oyHGQQ5CrcmudXgZ3zQytfDKrV30i2Usl--
