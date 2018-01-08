@@ -1,28 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34217)
-	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eYZJM-0007xo-TF
-	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 10:26:05 -0500
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35020)
+	by lists.gnu.org with esmtp (Exim 4.71) (envelope-from <pl@kamp.de>)
+	id 1eYZL0-0000JF-It
+	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 10:27:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eYZJI-0003gL-Qz
-	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 10:26:04 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:45428)
+	(envelope-from <pl@kamp.de>) id 1eYZKw-0004nP-L2
+	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 10:27:46 -0500
+Received: from mx-v6.kamp.de ([2a02:248:0:51::16]:57327 helo=mx01.kamp.de)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1eYZJI-0003fg-IA
-	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 10:26:00 -0500
-References: <1513908937-16034-1-git-send-email-jasowang@redhat.com>
-	<CAFEAcA_4ZBLNcJXqJ78TmEZz1FqGVqvFuL1NdR2WaWNWxhVLVg@mail.gmail.com>
-	<CAO_EM_nzdoQPPtvcf4tEU1=WoNtDpoAHFUBXBGa=EU7skG+40w@mail.gmail.com>
-	<4a83359d-408a-35a9-1a81-d201783c3465@redhat.com>
-	<b5453cda-5ae3-cbb3-a158-846f83bb027a@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <4506b812-a247-44f8-ea02-5c4c70736354@redhat.com>
-Date: Mon, 8 Jan 2018 09:25:54 -0600
-MIME-Version: 1.0
-In-Reply-To: <b5453cda-5ae3-cbb3-a158-846f83bb027a@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="yznYGSYTxjg144DDf3EXghfISpjMnk8bJ"
-Subject: Re: [Qemu-devel] [PULL 00/18] Net patches
+	(Exim 4.71) (envelope-from <pl@kamp.de>) id 1eYZKw-0004m6-Cf
+	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 10:27:42 -0500
+Received: from submission.kamp.de ([195.62.97.28]) by kerio.kamp.de with ESMTPS
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256 bits))
+	for qemu-devel@nongnu.org; Mon, 8 Jan 2018 16:27:36 +0100
+From: Peter Lieven <pl@kamp.de>
+Date: Mon,  8 Jan 2018 16:27:27 +0100
+Message-Id: <1515425247-21730-1-git-send-email-pl@kamp.de>
+Subject: [Qemu-devel] [PATCH] block/iscsi: fix initialization of iTask in
+ iscsi_co_get_block_status
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,62 +25,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Ed Swierk <eswierk@skyportsystems.com>, Peter Maydell <peter.maydell@linaro.org>
-Cc: Jason Wang <jasowang@redhat.com>, qemu-devel@nongnu.org, Fam Zheng <famz@redhat.com>
+To: qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: mreitz@redhat.com, kwolf@redhat.com, ronniesahlberg@gmail.com, pbonzini@redhat.com, famz@redhat.com, eblake@redhat.com, Peter Lieven <pl@kamp.de>, qemu-stable@nongnu.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---yznYGSYTxjg144DDf3EXghfISpjMnk8bJ
-From: Eric Blake <eblake@redhat.com>
-To: Ed Swierk <eswierk@skyportsystems.com>,
- Peter Maydell <peter.maydell@linaro.org>
-Cc: Jason Wang <jasowang@redhat.com>, qemu-devel@nongnu.org,
- Fam Zheng <famz@redhat.com>
-Message-ID: <4506b812-a247-44f8-ea02-5c4c70736354@redhat.com>
-Subject: Re: [Qemu-devel] [PULL 00/18] Net patches
-References: <1513908937-16034-1-git-send-email-jasowang@redhat.com>
- <CAFEAcA_4ZBLNcJXqJ78TmEZz1FqGVqvFuL1NdR2WaWNWxhVLVg@mail.gmail.com>
- <CAO_EM_nzdoQPPtvcf4tEU1=WoNtDpoAHFUBXBGa=EU7skG+40w@mail.gmail.com>
- <4a83359d-408a-35a9-1a81-d201783c3465@redhat.com>
- <b5453cda-5ae3-cbb3-a158-846f83bb027a@redhat.com>
-In-Reply-To: <b5453cda-5ae3-cbb3-a158-846f83bb027a@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+in case of unaligned requests or on a target that does not support
+block provisioning we leave iTask uninitialized and check iTask.task
+for NULL later.
 
-On 01/08/2018 09:18 AM, Eric Blake wrote:
+Fixes: e38bc23454ef763deb4405ebdee6a1081aa00bc8
+Cc: qemu-stable@nongnu.org
+Signed-off-by: Peter Lieven <pl@kamp.de>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+---
+ block/iscsi.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-> Hmm - we probably ought to enhance checkpatch.pl to insist that patches=
-
-> attributed to qemu-devel@nongnu.org as the author should be flagged as
-> invalid, since the list munging is a 1:M mapping rather than 1:1, and
-> therefore not easily invertable.
-
-Stefan reminded me on IRC that checkpatch.pl doesn't process From: lines
-(it only sees patches, not mboxes) - but that patchew could be taught to
-make this sort of check.
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---yznYGSYTxjg144DDf3EXghfISpjMnk8bJ
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlpTjYIACgkQp6FrSiUn
-Q2qlfgf/civ9BpL0SAXey6Pcm6fJVro/9kg4xZDAgRavRhMOV11UWSTapSTR3Q9z
-xn3CrNu/hXzmjBozDXU8XvBFrwdHcxUAhH68J135i5t0gb7HXsGjnXZ5/fOFNOPv
-2TMMrqi2w5QnqAsK8l14cUKysePGR/pl16T6NuvSuD9IbgeU4NPReaorpdxj8xCE
-4mvz6uHIphdM9MCF4put0ct102VTtiQ4r767IO5XkAqyRosjoJ22cudSmjmmeUUx
-apm2deugwGcDOoqivQ/tdwCc2XiPoWAWnpYEwS/36o3JiR9HPAVbOhPcGTLQI55e
-Tvho7B+n0O7xwhScQ22eUPgjuErDLw==
-=nnfK
------END PGP SIGNATURE-----
-
---yznYGSYTxjg144DDf3EXghfISpjMnk8bJ--
+diff --git a/block/iscsi.c b/block/iscsi.c
+index 5c0a9e5..6a1c537 100644
+--- a/block/iscsi.c
++++ b/block/iscsi.c
+@@ -658,6 +658,8 @@ static int64_t coroutine_fn iscsi_co_get_block_status(BlockDriverState *bs,
+     uint64_t lba;
+     int64_t ret;
+ 
++    iscsi_co_init_iscsitask(iscsilun, &iTask);
++
+     if (!is_sector_request_lun_aligned(sector_num, nb_sectors, iscsilun)) {
+         ret = -EINVAL;
+         goto out;
+@@ -675,7 +677,6 @@ static int64_t coroutine_fn iscsi_co_get_block_status(BlockDriverState *bs,
+ 
+     lba = sector_qemu2lun(sector_num, iscsilun);
+ 
+-    iscsi_co_init_iscsitask(iscsilun, &iTask);
+     qemu_mutex_lock(&iscsilun->mutex);
+ retry:
+     if (iscsi_get_lba_status_task(iscsilun->iscsi, iscsilun->lun,
+-- 
+1.9.1
