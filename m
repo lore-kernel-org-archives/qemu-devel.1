@@ -1,30 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44296)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45588)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eYaZB-0002Q5-O7
-	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 11:46:30 -0500
+	(envelope-from <stefanha@redhat.com>) id 1eYacO-00047V-Ck
+	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 11:49:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eYaZ9-0003AO-1Z
-	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 11:46:29 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:45564)
+	(envelope-from <stefanha@redhat.com>) id 1eYacL-0005b0-RI
+	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 11:49:48 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:48532)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1eYaZ8-00039Y-NI
-	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 11:46:26 -0500
-References: <20170804012551.2714-1-eblake@redhat.com>
-	<20170804012551.2714-6-eblake@redhat.com>
-	<87k22dw4r2.fsf@dusky.pond.sub.org>
-	<c9564021-896a-2c29-8f74-0921e94d292a@redhat.com>
-	<87lgkurtiw.fsf@dusky.pond.sub.org>
-	<7893edd1-4f6c-7954-f682-e27824b8c984@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <f8ef31a0-887d-e315-bd42-40b68c3c7c45@redhat.com>
-Date: Mon, 8 Jan 2018 10:46:23 -0600
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1eYacL-0005ae-Hf
+	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 11:49:45 -0500
+Date: Mon, 8 Jan 2018 16:49:36 +0000
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20180108164936.GG11758@stefanha-x1.localdomain>
+References: <20171219084557.9801-1-peterx@redhat.com>
+	<20171219084557.9801-16-peterx@redhat.com>
+	<20171221112738.GL10812@lemon> <20171225032613.GD2443@xz-mi>
 MIME-Version: 1.0
-In-Reply-To: <7893edd1-4f6c-7954-f682-e27824b8c984@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="oyHGQQ5CrcmudXgZ3zQytfDKrV30i2Usl"
-Subject: Re: [Qemu-devel] [PATCH v4 05/22] qobject: Simplify
- qobject_from_jsonv()
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="KIzF6Cje4W/osXrF"
+Content-Disposition: inline
+In-Reply-To: <20171225032613.GD2443@xz-mi>
+Subject: Re: [Qemu-devel] [RFC v6 15/27] monitor: let suspend/resume work
+ even with QMPs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,98 +30,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: qemu-devel@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>
+To: Peter Xu <peterx@redhat.com>
+Cc: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org, Stefan Hajnoczi <shajnocz@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Juan Quintela <quintela@redhat.com>, mdroth@linux.vnet.ibm.com, Eric Blake <eblake@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Markus Armbruster <armbru@redhat.com>, marcandre.lureau@redhat.com, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---oyHGQQ5CrcmudXgZ3zQytfDKrV30i2Usl
-From: Eric Blake <eblake@redhat.com>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: qemu-devel@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>
-Message-ID: <f8ef31a0-887d-e315-bd42-40b68c3c7c45@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v4 05/22] qobject: Simplify
- qobject_from_jsonv()
-References: <20170804012551.2714-1-eblake@redhat.com>
- <20170804012551.2714-6-eblake@redhat.com> <87k22dw4r2.fsf@dusky.pond.sub.org>
- <c9564021-896a-2c29-8f74-0921e94d292a@redhat.com>
- <87lgkurtiw.fsf@dusky.pond.sub.org>
- <7893edd1-4f6c-7954-f682-e27824b8c984@redhat.com>
-In-Reply-To: <7893edd1-4f6c-7954-f682-e27824b8c984@redhat.com>
-Content-Type: text/plain; charset=utf-8
+
+--KIzF6Cje4W/osXrF
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On 10/02/2017 09:30 AM, Eric Blake wrote:
-> On 10/02/2017 12:46 AM, Markus Armbruster wrote:
->=20
->>>>> +    /*
->>>>> +     * This seemingly unnecessary copy is required in case va_list=
-
->>>>> +     * is an array type.
->>>>> +     */
->>>>
->>>> --verbose?
->>>>
->>>>> +    va_copy(ap_copy, ap);
->>>>> +    obj =3D qobject_from_json_internal(string, &ap_copy, &error_ab=
-ort);
->>>>> +    va_end(ap_copy);
->>>
->>> Code motion. But if the comment needs to be more verbose in the
->>> destination than it was on the source, the rationale is that C99/POSI=
-X
->>> allows 'typedef something va_list[]' (that is, where va_list is an ar=
-ray
->>> of some other type), although I don't know of any modern OS that
->>> actually defines it like that.  Based on C pointer-decay rules, '&ap'=
-
->>> has a different type based on whether va_list was a struct/pointer or=
- an
->>> array type, when 'va_list ap' was passed as a parameter; so we can't
->>> portably use qobject_from_json_internal(string, &ap, &error_abort).  =
-The
->>> va_copy() is what lets us guarantee that &ap_list is a pointer to a
->>> va_list regardless of the type of va_list (because va_copy was declar=
+On Mon, Dec 25, 2017 at 11:26:13AM +0800, Peter Xu wrote:
+> On Thu, Dec 21, 2017 at 07:27:38PM +0800, Fam Zheng wrote:
+> > On Tue, 12/19 16:45, Peter Xu wrote:
+> > > One thing to mention is that for QMPs that are using IOThreads, we ne=
 ed
->>> locally, rather than in a parameter list, and is therefore not subjec=
-t
->>> to pointer decay), and NOT an accidental pointer to first element of =
-the
->>> va_list array on platforms where va_list is an array.
+> > > an explicit kick for the IOThread in case it is sleeping.
+> > >=20
+> > > Since at it, add traces for the operations.
+> > >=20
+> > > Signed-off-by: Peter Xu <peterx@redhat.com>
+> > > ---
+> > >  monitor.c    | 26 +++++++++++++++++++++-----
+> > >  trace-events |  1 +
+> > >  2 files changed, 22 insertions(+), 5 deletions(-)
+> > >=20
+> > > diff --git a/monitor.c b/monitor.c
+> > > index 844508d134..5f05f2e9da 100644
+> > > --- a/monitor.c
+> > > +++ b/monitor.c
+> > > @@ -3992,19 +3992,35 @@ static void monitor_command_cb(void *opaque, =
+const char *cmdline,
+> > > =20
+> > >  int monitor_suspend(Monitor *mon)
+> > >  {
+> > > -    if (!mon->rs)
+> > > -        return -ENOTTY;
+> >=20
+> > Please add to the commit message why the mon->rs check is dropped, for =
+this and
+> > the other one.
+>=20
+> I thought it would be clear enough since mon->rs is only used by HMP
+> and the subject tells us that this patch is adding support for QMP.
+> But... sure I can add one more sentence for that!
 
-When I first wrote that, I didn't know where it mattered in practice;
-now I do.  Here's a gcc non-bug:
-https://gcc.gnu.org/bugzilla/show_bug.cgi?id=3D14557
+This change breaks hmp.c:hmp_migrate():
 
-that documents a workaround of using a macro va_ptr() because there ARE
-existing modern platforms that use an array type for va_list:
-https://sourceware.org/ml/newlib/2017/msg01302.html
+  if (monitor_suspend(mon) < 0) {
+      monitor_printf(mon, "terminal does not allow synchronous "
+                     "migration, continuing detached\n");
+      return;
+  }
 
-I don't know if va_ptr() is any more elegant than the va_copy() used in
-my code motion.
+mon->rs is used by HMP code to determine whether this is an interactive
+terminal.  Both live migration and password prompting rely on this
+because they must be forbidden when doing so would be impossible (e.g.
+GDB stub tunneling HMP commands).
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+Suspending the QMP monitor is useful, but please don't break the HMP
+code.
 
+Stefan
 
---oyHGQQ5CrcmudXgZ3zQytfDKrV30i2Usl
+--KIzF6Cje4W/osXrF
 Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlpToF8ACgkQp6FrSiUn
-Q2oulQgArsxWRvw9nfLCT1+/reRpQTEyB4Jqu7t/uoNaGIRTYpodc6faMstNcBZR
-63QXGdjWQnqFT7DZ60hYOqidjzK3lcXoBSBYE3RPOU/2Vyip8K+gVl+WqiKdU5K5
-1jO6qxnIJoMz8c2od0p4BKDKa7I50MgFsbzOxCP+uu+RlEhiiTP6LqqZ/ZsvGLxY
-LNHPt0ad3mI6cnrDcTmaWXADsxPp55n89nDS4ochgzdGmjwpj+kNVFQfmtikVtn2
-y2lhzGp2rw8K28pkbHlcM5SJQ35Y8f1h0nVJyhNXXuGyHWRRf3Y8TyxpEm3BervQ
-DXYoFEvbEp4g0BaWmub4DVa3AMjJTA==
-=nn15
+iQEcBAEBAgAGBQJaU6EgAAoJEJykq7OBq3PI7FUH/1p2gyJrv+g1gUtpm0/8PYf2
+RBNGVh65kGvdpqs+RRBv/kmowzx/9gpI0V+s4s1syLgaHcXPhiWYQvL0fo4mqgK5
+nXS2V80HLs5NfReJaHQH1wK97kNz9ObgwGluKizL9UszwtudNNzOYYKCaZuJwM+X
+D39mwXuwtV6FFKGK4UusgDmhabI5EOwPZnEmS53GskLr9hWvy0iuqGfzd2rkFpkB
+4Uw9U6ZTbCANyrITsNG9E1S9a1aOtzaXatZnl/UR5YYbY34+/aq0ghvjWlCotcyS
+U4H1rYd0xCJrnyQ1v/h9Cy0ckisCaoIqPSDI+r5tORHKOFgkHaeL+JPUkQx1V+g=
+=g39C
 -----END PGP SIGNATURE-----
 
---oyHGQQ5CrcmudXgZ3zQytfDKrV30i2Usl--
+--KIzF6Cje4W/osXrF--
