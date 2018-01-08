@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42016)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42143)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eYZb2-0001rM-ME
-	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 10:44:21 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1eYZb9-0001xH-An
+	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 10:44:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eYZb1-0007X3-W5
-	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 10:44:20 -0500
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Mon,  8 Jan 2018 12:42:43 -0300
-Message-Id: <20180108154303.6522-12-f4bug@amsat.org>
-In-Reply-To: <20180108154303.6522-1-f4bug@amsat.org>
-References: <20180108154303.6522-1-f4bug@amsat.org>
+	(envelope-from <peter.maydell@linaro.org>) id 1eYZb8-0007cG-Av
+	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 10:44:27 -0500
+Received: from mail-oi0-x22a.google.com ([2607:f8b0:4003:c06::22a]:37642)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1eYZb8-0007bm-5e
+	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 10:44:26 -0500
+Received: by mail-oi0-x22a.google.com with SMTP id e144so2187207oib.4
+	for <qemu-devel@nongnu.org>; Mon, 08 Jan 2018 07:44:26 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v5 11/31] hw/arm/exynos4210: use the "samsung,
- exynos4210-dw-mshc" device
+In-Reply-To: <20171230163012.95032-1-programmingkidx@gmail.com>
+References: <20171230163012.95032-1-programmingkidx@gmail.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 8 Jan 2018 15:44:05 +0000
+Message-ID: <CAFEAcA-3uh+TpvXSNf0b4AakzEQsjUDL_-BrAmAUyvZ-MG62vw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH] cocoa.m: Fix scroll wheel support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,43 +28,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alistair Francis <alistair.francis@xilinx.com>, Peter Maydell <peter.maydell@linaro.org>, Andrey Smirnov <andrew.smirnov@gmail.com>, Igor Mitsyanko <i.mitsyanko@gmail.com>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, Sai Pavan Boddu <saipava@xilinx.com>, Clement Deschamps <clement.deschamps@antfield.fr>, Jean-Christophe Dubois <jcd@tribudubois.net>, =?UTF-8?q?Gr=C3=A9gory=20Estrade?= <gregory.estrade@gmail.com>, Krzysztof Kozlowski <krzk@kernel.org>, Andrew Baumann <Andrew.Baumann@microsoft.com>, Prasad J Pandit <pjp@fedoraproject.org>, qemu-arm@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>
+To: John Arbuckle <programmingkidx@gmail.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
----
- hw/arm/exynos4210.c | 12 ++++--------
- 1 file changed, 4 insertions(+), 8 deletions(-)
+On 30 December 2017 at 16:30, John Arbuckle <programmingkidx@gmail.com> wrote:
+> When using a mouse's scroll wheel in a guest with the cocoa front-end, the mouse pointer moves up and down instead of scrolling the window. This patch fixes this problem.
 
-diff --git a/hw/arm/exynos4210.c b/hw/arm/exynos4210.c
-index e8e1d81e62..eb95131221 100644
---- a/hw/arm/exynos4210.c
-+++ b/hw/arm/exynos4210.c
-@@ -75,7 +75,6 @@
- #define EXYNOS4210_INT_COMBINER_BASE_ADDR   0x10448000
- 
- /* SD/MMC host controllers */
--#define EXYNOS4210_SDHCI_CAPABILITIES       0x05E80080
- #define EXYNOS4210_SDHCI_BASE_ADDR          0x12510000
- #define EXYNOS4210_SDHCI_ADDR(n)            (EXYNOS4210_SDHCI_BASE_ADDR + \
-                                                 0x00010000 * (n))
-@@ -377,13 +376,10 @@ Exynos4210State *exynos4210_init(MemoryRegion *system_mem)
-         BlockBackend *blk;
-         DriveInfo *di;
- 
--        dev = qdev_create(NULL, TYPE_SYSBUS_SDHCI);
--        qdev_prop_set_uint32(dev, "capareg", EXYNOS4210_SDHCI_CAPABILITIES);
--        qdev_init_nofail(dev);
--
--        busdev = SYS_BUS_DEVICE(dev);
--        sysbus_mmio_map(busdev, 0, EXYNOS4210_SDHCI_ADDR(n));
--        sysbus_connect_irq(busdev, 0, s->irq_table[exynos4210_get_irq(29, n)]);
-+        dev = sysbus_create_varargs("samsung,exynos4210-dw-mshc",
-+                                    EXYNOS4210_SDHCI_ADDR(n),
-+                                    s->irq_table[exynos4210_get_irq(29, n)],
-+                                    NULL);
- 
-         di = drive_get(IF_SD, 0, n);
-         blk = di ? blk_by_legacy_dinfo(di) : NULL;
--- 
-2.15.1
+Thanks for this patch. The code looks good to me, but
+you can now also remove the entries for INPUT_BUTTON_WHEEL_UP
+and INPUT_BUTTON_WHEEL_DOWN from the bmap[] array, because
+we can no longer get into that code with those button types.
+
+I think it's also worth having a comment that we send
+wheel events to the guest regardless of window focus now
+(which is in line with standard OSX UI behaviour, so it
+seems like the right thing).
+
+PS: can you line-wrap your commit messages, please?
+
+> Signed-off-by: John Arbuckle <programmingkidx@gmail.com>
+> ---
+>  ui/cocoa.m | 17 ++++++++++++-----
+>  1 file changed, 12 insertions(+), 5 deletions(-)
+>
+> diff --git a/ui/cocoa.m b/ui/cocoa.m
+> index 330ccebf90..d2e5f80b74 100644
+> --- a/ui/cocoa.m
+> +++ b/ui/cocoa.m
+> @@ -786,11 +786,18 @@ - (void) handleEvent:(NSEvent *)event
+>              mouse_event = true;
+>              break;
+>          case NSEventTypeScrollWheel:
+> -            if (isMouseGrabbed) {
+> -                buttons |= ([event deltaY] < 0) ?
+> -                    MOUSE_EVENT_WHEELUP : MOUSE_EVENT_WHEELDN;
+> -            }
+> -            mouse_event = true;
+> +            /* Determine if this is a scroll up or scroll down event */
+> +            buttons = ([event scrollingDeltaY] > 0) ?
+> +                INPUT_BUTTON_WHEEL_UP : INPUT_BUTTON_WHEEL_DOWN;
+> +            qemu_input_queue_btn(dcl->con, buttons, true);
+> +            qemu_input_event_sync();
+> +            qemu_input_queue_btn(dcl->con, buttons, false);
+> +            qemu_input_event_sync();
+> +            /*
+> +             * Since deltaY also reports scroll wheel events we prevent mouse
+> +             * movement code from executing.
+> +             */
+> +            mouse_event = false;
+>              break;
+>          default:
+>              [NSApp sendEvent:event];
+> --
+> 2.14.3 (Apple Git-98)
+>
+
+thanks
+-- PMM
