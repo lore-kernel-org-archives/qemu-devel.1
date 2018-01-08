@@ -1,35 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33562)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33599)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1eYYQG-000343-8o
-	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 09:29:11 -0500
+	(envelope-from <groug@kaod.org>) id 1eYYQJ-000378-DR
+	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 09:29:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1eYYQD-0006Dz-HY
-	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 09:29:08 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:57392
-	helo=mx0a-001b2d01.pphosted.com)
+	(envelope-from <groug@kaod.org>) id 1eYYQG-0006GG-K3
+	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 09:29:11 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:43534)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1eYYQD-0006DX-AG
-	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 09:29:05 -0500
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.21) with SMTP id
-	w08ESwZp145790
-	for <qemu-devel@nongnu.org>; Mon, 8 Jan 2018 09:29:03 -0500
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1eYYQG-0006FH-CR
+	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 09:29:08 -0500
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.21) with SMTP id
+	w08ESv0I089804
+	for <qemu-devel@nongnu.org>; Mon, 8 Jan 2018 09:29:04 -0500
 Received: from e06smtp13.uk.ibm.com (e06smtp13.uk.ibm.com [195.75.94.109])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2fc85k7bde-1
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2fc8f6dwgs-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 08 Jan 2018 09:29:02 -0500
+	for <qemu-devel@nongnu.org>; Mon, 08 Jan 2018 09:28:58 -0500
 Received: from localhost
 	by e06smtp13.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
 	Only! Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <groug@kaod.org>;
-	Mon, 8 Jan 2018 14:28:50 -0000
+	Mon, 8 Jan 2018 14:28:49 -0000
 From: Greg Kurz <groug@kaod.org>
-Date: Mon,  8 Jan 2018 15:28:23 +0100
+Date: Mon,  8 Jan 2018 15:28:18 +0100
 In-Reply-To: <20180108142831.6638-1-groug@kaod.org>
 References: <20180108142831.6638-1-groug@kaod.org>
-Message-Id: <20180108142831.6638-7-groug@kaod.org>
-Subject: [Qemu-devel] [PULL 06/14] 9pfs: fix type in *_parse_opts
- declarations
+Message-Id: <20180108142831.6638-2-groug@kaod.org>
+Subject: [Qemu-devel] [PULL 01/14] virtio-9p: move unrealize/realize after
+ virtio_9p_transport definition
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -41,54 +40,97 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Peter Maydell <peter.maydell@linaro.org>, Greg Kurz <groug@kaod.org>
 
-To comply with the QEMU coding style.
+And drop the now useless forward declaration of virtio_9p_transport.
 
 Signed-off-by: Greg Kurz <groug@kaod.org>
-Reviewed-by: Eric Blake <eblake@redhat.com>
 ---
- hw/9pfs/9p-handle.c | 2 +-
- hw/9pfs/9p-local.c  | 2 +-
- hw/9pfs/9p-proxy.c  | 2 +-
- 3 files changed, 3 insertions(+), 3 deletions(-)
+ hw/9pfs/virtio-9p-device.c | 60 ++++++++++++++++++++++------------------------
+ 1 file changed, 29 insertions(+), 31 deletions(-)
 
-diff --git a/hw/9pfs/9p-handle.c b/hw/9pfs/9p-handle.c
-index 65b12de230c1..26ac90fc5ce3 100644
---- a/hw/9pfs/9p-handle.c
-+++ b/hw/9pfs/9p-handle.c
-@@ -652,7 +652,7 @@ static void handle_cleanup(FsContext *ctx)
-     g_free(data);
+diff --git a/hw/9pfs/virtio-9p-device.c b/hw/9pfs/virtio-9p-device.c
+index 62650b0a6b99..c3ae7de3a2d5 100644
+--- a/hw/9pfs/virtio-9p-device.c
++++ b/hw/9pfs/virtio-9p-device.c
+@@ -20,8 +20,6 @@
+ #include "hw/virtio/virtio-access.h"
+ #include "qemu/iov.h"
+ 
+-static const struct V9fsTransport virtio_9p_transport;
+-
+ static void virtio_9p_push_and_notify(V9fsPDU *pdu)
+ {
+     V9fsState *s = pdu->s;
+@@ -104,35 +102,6 @@ static void virtio_9p_get_config(VirtIODevice *vdev, uint8_t *config)
+     g_free(cfg);
  }
  
--static int handle_parse_opts(QemuOpts *opts, struct FsDriverEntry *fse)
-+static int handle_parse_opts(QemuOpts *opts, FsDriverEntry *fse)
+-static void virtio_9p_device_realize(DeviceState *dev, Error **errp)
+-{
+-    VirtIODevice *vdev = VIRTIO_DEVICE(dev);
+-    V9fsVirtioState *v = VIRTIO_9P(dev);
+-    V9fsState *s = &v->state;
+-
+-    if (v9fs_device_realize_common(s, errp)) {
+-        goto out;
+-    }
+-
+-    v->config_size = sizeof(struct virtio_9p_config) + strlen(s->fsconf.tag);
+-    virtio_init(vdev, "virtio-9p", VIRTIO_ID_9P, v->config_size);
+-    v->vq = virtio_add_queue(vdev, MAX_REQ, handle_9p_output);
+-    v9fs_register_transport(s, &virtio_9p_transport);
+-
+-out:
+-    return;
+-}
+-
+-static void virtio_9p_device_unrealize(DeviceState *dev, Error **errp)
+-{
+-    VirtIODevice *vdev = VIRTIO_DEVICE(dev);
+-    V9fsVirtioState *v = VIRTIO_9P(dev);
+-    V9fsState *s = &v->state;
+-
+-    virtio_cleanup(vdev);
+-    v9fs_device_unrealize_common(s, errp);
+-}
+-
+ static void virtio_9p_reset(VirtIODevice *vdev)
  {
-     const char *sec_model = qemu_opt_get(opts, "security_model");
-     const char *path = qemu_opt_get(opts, "path");
-diff --git a/hw/9pfs/9p-local.c b/hw/9pfs/9p-local.c
-index e51af87309c6..155834db28e1 100644
---- a/hw/9pfs/9p-local.c
-+++ b/hw/9pfs/9p-local.c
-@@ -1459,7 +1459,7 @@ static void local_cleanup(FsContext *ctx)
-     g_free(data);
- }
+     V9fsVirtioState *v = (V9fsVirtioState *)vdev;
+@@ -223,6 +192,35 @@ static const struct V9fsTransport virtio_9p_transport = {
+     .push_and_notify = virtio_9p_push_and_notify,
+ };
  
--static int local_parse_opts(QemuOpts *opts, struct FsDriverEntry *fse)
-+static int local_parse_opts(QemuOpts *opts, FsDriverEntry *fse)
- {
-     const char *sec_model = qemu_opt_get(opts, "security_model");
-     const char *path = qemu_opt_get(opts, "path");
-diff --git a/hw/9pfs/9p-proxy.c b/hw/9pfs/9p-proxy.c
-index 28b20a7c3dfa..652940726e72 100644
---- a/hw/9pfs/9p-proxy.c
-+++ b/hw/9pfs/9p-proxy.c
-@@ -1111,7 +1111,7 @@ static int connect_namedsocket(const char *path)
-     return sockfd;
- }
++static void virtio_9p_device_realize(DeviceState *dev, Error **errp)
++{
++    VirtIODevice *vdev = VIRTIO_DEVICE(dev);
++    V9fsVirtioState *v = VIRTIO_9P(dev);
++    V9fsState *s = &v->state;
++
++    if (v9fs_device_realize_common(s, errp)) {
++        goto out;
++    }
++
++    v->config_size = sizeof(struct virtio_9p_config) + strlen(s->fsconf.tag);
++    virtio_init(vdev, "virtio-9p", VIRTIO_ID_9P, v->config_size);
++    v->vq = virtio_add_queue(vdev, MAX_REQ, handle_9p_output);
++    v9fs_register_transport(s, &virtio_9p_transport);
++
++out:
++    return;
++}
++
++static void virtio_9p_device_unrealize(DeviceState *dev, Error **errp)
++{
++    VirtIODevice *vdev = VIRTIO_DEVICE(dev);
++    V9fsVirtioState *v = VIRTIO_9P(dev);
++    V9fsState *s = &v->state;
++
++    virtio_cleanup(vdev);
++    v9fs_device_unrealize_common(s, errp);
++}
++
+ /* virtio-9p device */
  
--static int proxy_parse_opts(QemuOpts *opts, struct FsDriverEntry *fs)
-+static int proxy_parse_opts(QemuOpts *opts, FsDriverEntry *fs)
- {
-     const char *socket = qemu_opt_get(opts, "socket");
-     const char *sock_fd = qemu_opt_get(opts, "sock_fd");
+ static const VMStateDescription vmstate_virtio_9p = {
 -- 
 2.13.6
