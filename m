@@ -1,20 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35343)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35348)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1eYQNv-0003CI-Li
+	(envelope-from <dgibson@ozlabs.org>) id 1eYQNv-0003CM-NE
 	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 00:54:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1eYQNr-0006S5-LK
+	(envelope-from <dgibson@ozlabs.org>) id 1eYQNu-0006VI-CR
 	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 00:54:11 -0500
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Mon,  8 Jan 2018 16:53:39 +1100
-Message-Id: <20180108055348.20444-4-david@gibson.dropbear.id.au>
+Date: Mon,  8 Jan 2018 16:53:42 +1100
+Message-Id: <20180108055348.20444-7-david@gibson.dropbear.id.au>
 In-Reply-To: <20180108055348.20444-1-david@gibson.dropbear.id.au>
 References: <20180108055348.20444-1-david@gibson.dropbear.id.au>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 03/12] sm501: Add panel hardware cursor
- registers also to read function
+Subject: [Qemu-devel] [PULL 06/12] spapr_pci: use warn_report()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,45 +20,48 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: surajjs@au1.ibm.com, groug@kaod.org, mdroth@linux.vnet.ibm.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, BALATON Zoltan <balaton@eik.bme.hu>, David Gibson <david@gibson.dropbear.id.au>
+Cc: surajjs@au1.ibm.com, groug@kaod.org, mdroth@linux.vnet.ibm.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
 
-From: BALATON Zoltan <balaton@eik.bme.hu>
+From: Greg Kurz <groug@kaod.org>
 
-These were forgotten when adding panel layer support in ffd39257018
-"SM501 emulation for R2D-SH4".
+These two are definitely warnings. Let's use the appropriate API.
 
-Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-[dwg: Added reference to earlier commit in message]
+Signed-off-by: Greg Kurz <groug@kaod.org>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/display/sm501.c | 13 +++++++++++++
- 1 file changed, 13 insertions(+)
+ hw/ppc/spapr_pci.c      | 6 +++---
+ hw/ppc/spapr_pci_vfio.c | 2 +-
+ 2 files changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/hw/display/sm501.c b/hw/display/sm501.c
-index 7f1822421a..b9b611131e 100644
---- a/hw/display/sm501.c
-+++ b/hw/display/sm501.c
-@@ -956,6 +956,19 @@ static uint64_t sm501_disp_ctrl_read(void *opaque, h=
-waddr addr,
-         ret =3D s->dc_panel_v_sync;
-         break;
-=20
-+    case SM501_DC_PANEL_HWC_ADDR:
-+        ret =3D s->dc_panel_hwc_addr;
-+        break;
-+    case SM501_DC_PANEL_HWC_LOC:
-+        ret =3D s->dc_panel_hwc_location;
-+        break;
-+    case SM501_DC_PANEL_HWC_COLOR_1_2:
-+        ret =3D s->dc_panel_hwc_color_1_2;
-+        break;
-+    case SM501_DC_PANEL_HWC_COLOR_3:
-+        ret =3D s->dc_panel_hwc_color_3;
-+        break;
-+
-     case SM501_DC_VIDEO_CONTROL:
-         ret =3D s->dc_video_control;
-         break;
---=20
+diff --git a/hw/ppc/spapr_pci.c b/hw/ppc/spapr_pci.c
+index 88797b3d36..695c820911 100644
+--- a/hw/ppc/spapr_pci.c
++++ b/hw/ppc/spapr_pci.c
+@@ -1696,9 +1696,9 @@ static void spapr_phb_realize(DeviceState *dev, Error **errp)
+     /* DMA setup */
+     if (((sphb->page_size_mask & qemu_getrampagesize()) == 0)
+         && kvm_enabled()) {
+-        error_report("System page size 0x%lx is not enabled in page_size_mask "
+-                     "(0x%"PRIx64"). Performance may be slow",
+-                     qemu_getrampagesize(), sphb->page_size_mask);
++        warn_report("System page size 0x%lx is not enabled in page_size_mask "
++                    "(0x%"PRIx64"). Performance may be slow",
++                    qemu_getrampagesize(), sphb->page_size_mask);
+     }
+ 
+     for (i = 0; i < windows_supported; ++i) {
+diff --git a/hw/ppc/spapr_pci_vfio.c b/hw/ppc/spapr_pci_vfio.c
+index 8448e0b024..1f775ea93d 100644
+--- a/hw/ppc/spapr_pci_vfio.c
++++ b/hw/ppc/spapr_pci_vfio.c
+@@ -50,7 +50,7 @@ static Property spapr_phb_vfio_properties[] = {
+ static void spapr_phb_vfio_instance_init(Object *obj)
+ {
+     if (!qtest_enabled()) {
+-        error_report("spapr-pci-vfio-host-bridge is deprecated");
++        warn_report("spapr-pci-vfio-host-bridge is deprecated");
+     }
+ }
+ 
+-- 
 2.14.3
