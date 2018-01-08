@@ -1,26 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56265)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33979)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eYeYb-0000iJ-Oc
-	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 16:02:10 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1eYemU-0006oe-Lh
+	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 16:16:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eYeYV-0003xq-Vd
-	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 16:02:09 -0500
-Received: from mail-oi0-x22a.google.com ([2607:f8b0:4003:c06::22a]:40902)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1eYeYV-0003wq-QH
-	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 16:02:03 -0500
-Received: by mail-oi0-x22a.google.com with SMTP id u83so122793oie.7
-	for <qemu-devel@nongnu.org>; Mon, 08 Jan 2018 13:02:03 -0800 (PST)
+	(envelope-from <ehabkost@redhat.com>) id 1eYemR-0006Wh-Nx
+	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 16:16:30 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:35992)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1eYemR-0006Vt-GR
+	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 16:16:27 -0500
+Date: Mon, 8 Jan 2018 19:16:23 -0200
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20180108211623.GJ6646@localhost.localdomain>
+References: <20180108205052.24385-1-vincent@bernat.im>
 MIME-Version: 1.0
-In-Reply-To: <20171229205605.21108-1-richard.henderson@linaro.org>
-References: <20171229193113.11753-1-richard.henderson@linaro.org>
-	<20171229205605.21108-1-richard.henderson@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 8 Jan 2018 21:01:42 +0000
-Message-ID: <CAFEAcA9CVrcRKKXkgNVyB+vH+E7Q8YktORC9NrSmk0j9nJyLEg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL v2 0/8] tcg queued patches
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180108205052.24385-1-vincent@bernat.im>
+Subject: Re: [Qemu-devel] [PATCH] target-i386: add pcid to both Sandy Bridge
+ and Ivy Bridge
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,34 +27,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Vincent Bernat <vincent@bernat.im>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, qemu-devel@nongnu.org
 
-On 29 December 2017 at 20:56, Richard Henderson
-<richard.henderson@linaro.org> wrote:
-> Ho hum.  While rebasing I accidentally used a constrained build
-> tree that didn't build sh4-linux-user, and an extra reference to
-> the removed TCGV_IS_UNUSED had crept in in the meantime.
->
-> I have pushed a revised tag with the same name.
->
->
-> r~
->
->
-> The following changes since commit 281f327487c9c9b1599f93c589a408bbf4a651b8:
->
->   Merge remote-tracking branch 'remotes/vivier/tags/m68k-for-2.12-pull-request' into staging (2017-12-22 00:11:36 +0000)
->
-> are available in the Git repository at:
->
->   git://github.com/rth7680/qemu.git tags/pull-tcg-20171229
->
-> for you to fetch changes up to 4fad446bc955fcaa08a21388cf82268824bea10e:
->
->   tcg: add cs_base and flags to -d exec output (2017-12-29 12:43:40 -0800)
->
+On Mon, Jan 08, 2018 at 09:50:52PM +0100, Vincent Bernat wrote:
+> PCID has been introduced in Sandy Bridge and, currently, KVM doesn't
+> object exposing it to VM as long as it is present on the host. Update
+> CPU model for both Sandy Bridge and Ivy Bridge accordingly.
+> 
+> Signed-off-by: Vincent Bernat <vincent@bernat.im>
 
-Applied, thanks.
+Thanks for your patch.
 
--- PMM
+We need two things, though:
+
+First, confirming that all hosts where the SandyBridge and
+IvyBridge CPU models are runnable will support exposing PCID to
+guests (otherwise updating QEMU can make a runnable VM
+configuration suddenly stop being runnable).  This can happen if
+the host kernel is too old.
+
+One possible way to work around this problem is to declare that
+QEMU 2.12 with KVM will require Linux v3.6 and newer (because we
+need Linux kernel commit ad756a1603c5 "KVM: VMX: Implement
+PCID/INVPCID for guests with EPT").  I have proposed something
+similar to allow us to enable kvm_pv_eoi by default, some time
+ago:
+https://www.mail-archive.com/qemu-devel@nongnu.org/msg486559.html
+("qemu-doc: Document minimum kernel version for KVM in x86_64").
+
+Second, we need compatibility entries setting pcid=off on
+PC_COMPAT_2_10 so we don't break compatibility on older
+machine-types.
+
+
+> ---
+>  target/i386/cpu.c | 5 +++--
+>  1 file changed, 3 insertions(+), 2 deletions(-)
+> 
+> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+> index 3818d7283158..bb2b4bd1b4fe 100644
+> --- a/target/i386/cpu.c
+> +++ b/target/i386/cpu.c
+> @@ -1109,7 +1109,7 @@ static X86CPUDefinition builtin_x86_defs[] = {
+>              CPUID_EXT_TSC_DEADLINE_TIMER | CPUID_EXT_POPCNT |
+>              CPUID_EXT_X2APIC | CPUID_EXT_SSE42 | CPUID_EXT_SSE41 |
+>              CPUID_EXT_CX16 | CPUID_EXT_SSSE3 | CPUID_EXT_PCLMULQDQ |
+> -            CPUID_EXT_SSE3,
+> +            CPUID_EXT_SSE3 | CPUID_EXT_PCID,
+>          .features[FEAT_8000_0001_EDX] =
+>              CPUID_EXT2_LM | CPUID_EXT2_RDTSCP | CPUID_EXT2_NX |
+>              CPUID_EXT2_SYSCALL,
+> @@ -1140,7 +1140,8 @@ static X86CPUDefinition builtin_x86_defs[] = {
+>              CPUID_EXT_TSC_DEADLINE_TIMER | CPUID_EXT_POPCNT |
+>              CPUID_EXT_X2APIC | CPUID_EXT_SSE42 | CPUID_EXT_SSE41 |
+>              CPUID_EXT_CX16 | CPUID_EXT_SSSE3 | CPUID_EXT_PCLMULQDQ |
+> -            CPUID_EXT_SSE3 | CPUID_EXT_F16C | CPUID_EXT_RDRAND,
+> +            CPUID_EXT_SSE3 | CPUID_EXT_F16C | CPUID_EXT_RDRAND |
+> +            CPUID_EXT_PCID,
+>          .features[FEAT_7_0_EBX] =
+>              CPUID_7_0_EBX_FSGSBASE | CPUID_7_0_EBX_SMEP |
+>              CPUID_7_0_EBX_ERMS,
+> -- 
+> 2.15.1
+> 
+
+-- 
+Eduardo
