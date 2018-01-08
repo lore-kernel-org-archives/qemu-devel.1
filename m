@@ -1,28 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36059)
-	by lists.gnu.org with esmtp (Exim 4.71) (envelope-from <pl@kamp.de>)
-	id 1eYXLY-0000Lf-99
-	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 08:20:13 -0500
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39870)
+	by lists.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <eswierk@skyportsystems.com>) id 1eYXVg-0004ok-Gr
+	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 08:30:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pl@kamp.de>) id 1eYXLU-0001F0-3s
-	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 08:20:12 -0500
-Received: from mx-v6.kamp.de ([2a02:248:0:51::16]:51801 helo=mx01.kamp.de)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pl@kamp.de>) id 1eYXLT-0001E7-Qb
-	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 08:20:08 -0500
-Received: from submission.kamp.de ([195.62.97.28]) by kerio.kamp.de with ESMTPS
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256 bits))
-	for qemu-devel@nongnu.org; Mon, 8 Jan 2018 14:20:01 +0100
-References: <20180108030946.14991-1-famz@redhat.com>
-From: Peter Lieven <pl@kamp.de>
-Message-ID: <30369c9b-974f-67d4-322f-00d30a25519a@kamp.de>
-Date: Mon, 8 Jan 2018 14:20:02 +0100
+	(envelope-from <eswierk@skyportsystems.com>) id 1eYXVf-0007dN-Cz
+	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 08:30:40 -0500
+Received: from mail-io0-x22b.google.com ([2607:f8b0:4001:c06::22b]:47033)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <eswierk@skyportsystems.com>)
+	id 1eYXVf-0007cr-7J
+	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 08:30:39 -0500
+Received: by mail-io0-x22b.google.com with SMTP id z130so13552494ioe.13
+	for <qemu-devel@nongnu.org>; Mon, 08 Jan 2018 05:30:38 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20180108030946.14991-1-famz@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH] scsi: Don't check uninitialized local
- variable
+In-Reply-To: <CAFEAcA_4ZBLNcJXqJ78TmEZz1FqGVqvFuL1NdR2WaWNWxhVLVg@mail.gmail.com>
+References: <1513908937-16034-1-git-send-email-jasowang@redhat.com>
+	<CAFEAcA_4ZBLNcJXqJ78TmEZz1FqGVqvFuL1NdR2WaWNWxhVLVg@mail.gmail.com>
+From: Ed Swierk <eswierk@skyportsystems.com>
+Date: Mon, 8 Jan 2018 05:30:37 -0800
+Message-ID: <CAO_EM_nzdoQPPtvcf4tEU1=WoNtDpoAHFUBXBGa=EU7skG+40w@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL 00/18] Net patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,82 +29,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-block@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Jason Wang <jasowang@redhat.com>, qemu-devel@nongnu.org
 
-Am 08.01.2018 um 04:09 schrieb Fam Zheng:
-> After the out label there is a check on iTask.task but it is not
-> initialized yet.
+On Jan 8, 2018 02:16, "Peter Maydell" <peter.maydell@linaro.org> wrote:
+
+On 22 December 2017 at 02:15, Jason Wang <jasowang@redhat.com> wrote:
+> The following changes since commit 43ab9a5376c95c61ae898a222c4d04
+bdf60e239b:
 >
-> Fixes: e38bc23454ef763deb4405ebdee6a1081aa00bc8
-> Signed-off-by: Fam Zheng <famz@redhat.com>
-> ---
->   block/iscsi.c | 3 +--
->   1 file changed, 1 insertion(+), 2 deletions(-)
+>   hw/i386/vmport: fix missing definitions with non-log trace backends
+(2017-12-21 22:52:28 +0000)
 >
-> diff --git a/block/iscsi.c b/block/iscsi.c
-> index 5c0a9e55b6..1cb8cc93c5 100644
-> --- a/block/iscsi.c
-> +++ b/block/iscsi.c
-> @@ -659,8 +659,7 @@ static int64_t coroutine_fn iscsi_co_get_block_status(BlockDriverState *bs,
->       int64_t ret;
->   
->       if (!is_sector_request_lun_aligned(sector_num, nb_sectors, iscsilun)) {
-> -        ret = -EINVAL;
-> -        goto out;
-> +        return -EINVAL;
->       }
->   
->       /* default to all sectors allocated */
+> are available in the git repository at:
+>
+>   https://github.com/jasowang/qemu.git tags/net-pull-request
+>
+> for you to fetch changes up to 0065e915192cdf83c2700bb377e5323c2649476e:
+>
+>   qemu-doc: Update the deprecation information of -tftp, -bootp, -redir
+and -smb (2017-12-22 10:06:05 +0800)
+>
+> ----------------------------------------------------------------
+>
+> ----------------------------------------------------------------
 
-If lbpme is 0 we run into the same error. And this is even more likely than an unaligned request.
+Applied, thanks.
 
-I think the right patch is to move the init of iTask up again where it was:
-
-
-diff --git a/block/iscsi.c b/block/iscsi.c
-index 5c0a9e5..6a1c537 100644
---- a/block/iscsi.c
-+++ b/block/iscsi.c
-@@ -658,6 +658,8 @@ static int64_t coroutine_fn iscsi_co_get_block_status(BlockDriverState *bs,
-      uint64_t lba;
-      int64_t ret;
-
-+    iscsi_co_init_iscsitask(iscsilun, &iTask);
-+
-      if (!is_sector_request_lun_aligned(sector_num, nb_sectors, iscsilun)) {
-          ret = -EINVAL;
-          goto out;
-@@ -675,7 +677,6 @@ static int64_t coroutine_fn iscsi_co_get_block_status(BlockDriverState *bs,
-
-      lba = sector_qemu2lun(sector_num, iscsilun);
-
--    iscsi_co_init_iscsitask(iscsilun, &iTask);
-      qemu_mutex_lock(&iscsilun->mutex);
-  retry:
-      if (iscsi_get_lba_status_task(iscsilun->iscsi, iscsilun->lun,
+PS: just noticed, but "Ed Swierk via Qemu-devel <qemu-devel@nongnu.org>"
+is a bit of an odd Author string to end up in git commit logs, so you
+and/or Ed might like to fix that up for any future patches.
 
 
-Peter
+Thanks for pointing that out. I wonder if it's happening because I let
+git-send-email automatically fill in the From: line.
+
+Anyway if it's not too late to fix, the correct address is Ed Swierk <
+eswierk@skyportsystems.com> .
 
 
-
-
--- 
-
-Mit freundlichen Grüßen
-
-Peter Lieven
-
-...........................................................
-
-   KAMP Netzwerkdienste GmbH
-   Vestische Str. 89-91 | 46117 Oberhausen
-   Tel: +49 (0) 208.89 402-50 | Fax: +49 (0) 208.89 402-40
-   pl@kamp.de | http://www.kamp.de
-
-   Geschäftsführer: Heiner Lante | Michael Lante
-   Amtsgericht Duisburg | HRB Nr. 12154
-   USt-Id-Nr.: DE 120607556
-
-...........................................................
+thanks
+-- PMM
