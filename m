@@ -1,22 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49785)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50530)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1eYbip-0003zf-LK
-	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 13:00:33 -0500
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1eYbkx-00050A-I9
+	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 13:02:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1eYbio-0003HS-Bu
-	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 13:00:31 -0500
-Date: Mon, 8 Jan 2018 19:00:15 +0100
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20180108180015.GJ8052@localhost.localdomain>
-References: <20171221142251.18366-1-kwolf@redhat.com>
-	<20171221142251.18366-10-kwolf@redhat.com>
-	<w51lgh88ik0.fsf@maestria.local.igalia.com>
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1eYbkt-000653-N6
+	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 13:02:43 -0500
+Received: from mail-qk0-x242.google.com ([2607:f8b0:400d:c09::242]:35160)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1eYbkt-00064w-J5
+	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 13:02:39 -0500
+Received: by mail-qk0-x242.google.com with SMTP id w184so7056850qka.2
+	for <qemu-devel@nongnu.org>; Mon, 08 Jan 2018 10:02:39 -0800 (PST)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Date: Mon,  8 Jan 2018 15:02:24 -0300
+Message-Id: <20180108180231.21122-1-f4bug@amsat.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <w51lgh88ik0.fsf@maestria.local.igalia.com>
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v2 09/19] block: Nested
- drain_end must still call callbacks
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH 0/7] use QEMU_PACKED and QEMU_ALIGNED macros
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,27 +31,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alberto Garcia <berto@igalia.com>
-Cc: qemu-block@nongnu.org, pbonzini@redhat.com, famz@redhat.com, qemu-devel@nongnu.org
+To: Jiri Pirko <jiri@resnulli.us>, Jason Wang <jasowang@redhat.com>, Dmitry Fleytman <dmitry@daynix.com>, Stefan Weil <sw@weilnetz.de>, Paolo Bonzini <pbonzini@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Richard Henderson <rth@twiddle.net>
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, Eric Blake <eblake@redhat.com>
 
-Am 08.01.2018 um 16:41 hat Alberto Garcia geschrieben:
-> On Thu 21 Dec 2017 03:22:41 PM CET, Kevin Wolf wrote:
-> > bdrv_do_drained_begin() restricts the call of parent callbacks and
-> > aio_disable_external() to the outermost drain section, but the block
-> > driver callbacks are always called. bdrv_do_drained_end() must match
-> > this behaviour, otherwise nodes stay drained even if begin/end calls
-> > were balanced.
-> 
-> Is this patch in the correct place in the series? I was confused becaue
-> you mention bdrv_do_drained_begin() and bdrv_do_drained_end() that don't
-> seem to exist yet, I see you add them in a later patch.
+Still trying to reduce clang -Waddress-of-packed-member warnings.
 
-I think I only forgot to update the commit message when I had to move
-some patches around so I could attack one bug after another and keep the
-series reviewable.
+Philippe Mathieu-Daudé (7):
+  net: struct MACAddr can use the QEMU_PACKED macro
+  net/eth: use the QEMU_PACKED macro
+  net/rocker: use QEMU_PACKED and QEMU_ALIGNED() macros
+  net/rocker: move struct rocker_desc to C file
+  net/eepro100: use QEMU_ALIGNED() macro
+  net/eepro100: reduce alignment to DWORD (32bit)
+  i386/pc: use the QEMU_ALIGNED() macro
 
-The series has landed in master today, so for this kind of thing it's
-too late anyway, but additional review never hurts. If you find
-something, we'll have to do a follow-up patch.
+ hw/net/rocker/rocker_hw.h   | 15 +--------------
+ include/net/eth.h           | 26 +++++++++++++-------------
+ include/net/net.h           |  2 +-
+ hw/i386/pc.c                |  4 ++--
+ hw/net/eepro100.c           |  2 +-
+ hw/net/rocker/rocker_desc.c | 13 +++++++++++++
+ 6 files changed, 31 insertions(+), 31 deletions(-)
 
-Kevin
+-- 
+2.15.1
