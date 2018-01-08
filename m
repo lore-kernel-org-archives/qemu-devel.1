@@ -1,20 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54295)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54889)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <nirsof@gmail.com>) id 1eYauB-0007ae-0J
-	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 12:08:12 -0500
+	(envelope-from <stefanha@redhat.com>) id 1eYavV-0000FH-2o
+	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 12:09:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <nirsof@gmail.com>) id 1eYau6-0000rr-HU
-	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 12:08:10 -0500
+	(envelope-from <stefanha@redhat.com>) id 1eYavQ-0001kM-T3
+	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 12:09:33 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:52438)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1eYavQ-0001jx-KM
+	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 12:09:28 -0500
+Date: Mon, 8 Jan 2018 17:09:16 +0000
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20180108170916.GH11758@stefanha-x1.localdomain>
+References: <20171219084557.9801-1-peterx@redhat.com>
+	<20171219084557.9801-17-peterx@redhat.com>
 MIME-Version: 1.0
-References: <20180105065538.13375-1-famz@redhat.com>
-	<20180108144136.GF8052@localhost.localdomain>
-In-Reply-To: <20180108144136.GF8052@localhost.localdomain>
-From: Nir Soffer <nirsof@gmail.com>
-Date: Mon, 08 Jan 2018 17:07:54 +0000
-Message-ID: <CAMr-obsaegU2HDaH3EFoD+2EYUnPKuqsvQPk4GZ7hTdqXmpoWA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 0/2] qemu-img: Let "info" warn
- and go ahead without -U
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="MGu/vTNewDGZ7tmp"
+Content-Disposition: inline
+In-Reply-To: <20171219084557.9801-17-peterx@redhat.com>
+Subject: Re: [Qemu-devel] [RFC v6 16/27] monitor: separate QMP parser and
+ dispatcher
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,61 +29,102 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Ala Hino <ahino@redhat.com>
-
-On Mon, Jan 8, 2018 at 4:48 PM Kevin Wolf <kwolf@redhat.com> wrote:
-
-> Am 05.01.2018 um 07:55 hat Fam Zheng geschrieben:
-> > Management and users are accustomed to "qemu-img info" to query status of
-> > images even when they are used by guests. Since image locking was added,
-> the -U
-> > (--force-share) option is needed for that to work. The reason has been
-> that due
-> > to possible race with image header update, the output can be misleading.
-> >
-> > But what are likely to happen after we emit the error are that, for
-> interactive
-> > users, '-U' will be used and the command retried; for management (nova,
-> RHV,
-> > etc.), the operation is broken with no knob to workaround this.
-> >
-> > This series changes that error to a warning so that it doesn't get in
-> the way.
->
-> Are management tools actually doing this? There is no good reason to
-> call 'qemu-img info' for an image that is in use by a VM.
->
-
-Yes, ovirt/RHV is using this to get the qcow2 compat of an image since 4.1.
-
-We asked about this here and in private mail, and there was an agreement
-that
-using qemu-img info on an image is safe for this purpose. We know that
-accessing
-image header when a guest is using is may be racy, but we control both the
-guest
-and the image. Nobody is modifying the image properties behind our back.
-
-In 4.2 we will use the new flags[1], but  we cannot fix released code.
-Introducing
-this locking in qemu-img info will break existing installations.
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, Stefan Hajnoczi <shajnocz@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <famz@redhat.com>, Juan Quintela <quintela@redhat.com>, mdroth@linux.vnet.ibm.com, Eric Blake <eblake@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Markus Armbruster <armbru@redhat.com>, marcandre.lureau@redhat.com, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 
 
-> If no, NACK. Automatically disabling locking because it can be
-> inconvenient defeats the purpose of locking.
->
-> If yes, clearly indicate that this usage is deprecated and we'll turn
-> this into an error again with 2.13. Then management tools can be fixed
-> in time.
+--MGu/vTNewDGZ7tmp
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
+On Tue, Dec 19, 2017 at 04:45:46PM +0800, Peter Xu wrote:
+> Originally QMP goes throw these steps:
 
-This will work for us in general, but I'm not sure that when 2.13 will be
-released,
-no user will run code assuming the previous behavior. It will be best to
-wait with
-incompatible changes like this to next major version.
+s/throw/through/
 
-[1] https://gerrit.ovirt.org/85874/
+>=20
+>   JSON Parser --> QMP Dispatcher --> Respond
+>       /|\    (2)                (3)     |
+>    (1) |                               \|/ (4)
+>        +---------  main thread  --------+
+>=20
+> This patch does this:
+>=20
+>   JSON Parser     QMP Dispatcher --> Respond
+>       /|\ |           /|\       (4)     |
+>        |  | (2)        | (3)            |  (5)
+>    (1) |  +----->      |               \|/
+>        +---------  main thread  <-------+
+>=20
+> So the parsing job and the dispatching job is isolated now.  It gives us
+> a chance in following up patches to totally move the parser outside.
+>=20
+> The isloation is done using one QEMUBH. Only one dispatcher QEMUBH is
 
-Nir
+s/isloation/isolation/
+
+> @@ -3897,30 +3920,39 @@ static void monitor_qmp_respond(Monitor *mon, QOb=
+ject *rsp,
+>      qobject_decref(rsp);
+>  }
+> =20
+> -static void handle_qmp_command(JSONMessageParser *parser, GQueue *tokens)
+> +struct QMPRequest {
+> +    /* Owner of the request */
+> +    Monitor *mon;
+> +    /* "id" field of the request */
+> +    QObject *id;
+> +    /* Request object to be handled */
+> +    QObject *req;
+> +    /*
+> +     * Whether we need to resume the monitor afterward.  This flag is
+> +     * used to emulate the old QMP server behavior that only one
+> +     * command is executed for each time.
+
+s/only one command is executed for each time/the current command must
+complete before the next one executes/
+
+> +     */
+> +    bool need_resume;
+
+This isn't really a per-request decision so a QMPRequest field is not
+necessary.  If "oob" is enabled then we dispatch commands without
+waiting.  If "oob" is disabled then we complete the current command
+before dispatching the next one.
+
+If you want to keep this, I don't mind, but the field isn't necessary.
+
+> @@ -4150,6 +4292,15 @@ static void monitor_iothread_init(void)
+>  {
+>      mon_global.mon_iothread =3D iothread_create("mon_iothread",
+>                                                &error_abort);
+> +
+> +    /*
+> +     * This MUST be on main loop thread since we have commands that
+> +     * have assumption to be run on main loop thread (Yeah, we'd
+> +     * better remove this assumption in the future).
+
+"we'd better ..." usually means that it will be necessary.  It is
+stronger than "it would be nice to ...".  I'm not sure which one you
+mean here.
+
+There doesn't seem to be any immediate need or plan to run regular
+commands outside the main loop.  I'm not aware of active work to do
+that.  So what is this comment trying to say?
+
+--MGu/vTNewDGZ7tmp
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJaU6W8AAoJEJykq7OBq3PI4eYH/3rZrik/QwUUY3UJVXS8RrFI
+8AatZQijSJaXlI9ghF+uNWhUhTNgJZil9ye5JUHatUa8Za9W3iJq5OR+yY7v07Rt
+GlUNY8u2F78F8fusPhHZ9cX7k0JPq6JYsPniBkeDTah1sCB54rhUnj3jRA3me37z
+CMWIQ17pF5n1LbI3FU2hqReqfkZtfyUzt3w/B3JrRY8mrTNCEs8U0HE0VrKKOSce
+jQEbFJwCWy7X17+qr68T2KvOFY7tpB0eEGkMQnx/WWW3sOR10qrRoEDdpfLRpXV0
+zWvNY4HokMkpSxTb6dN+PLdNhVTRGWAedhi/Ba5UPGWkTQHBPVmwvHCI509dkKk=
+=HXBo
+-----END PGP SIGNATURE-----
+
+--MGu/vTNewDGZ7tmp--
