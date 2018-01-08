@@ -1,19 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45032)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49543)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1eYYgH-0008U3-Ai
-	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 09:45:42 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1eYYne-0006M7-GN
+	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 09:53:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1eYYgG-0003J4-KC
-	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 09:45:41 -0500
-Date: Mon, 8 Jan 2018 15:45:27 +0100
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20180108144527.GG8052@localhost.localdomain>
-References: <20171226065300.9890-1-famz@redhat.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1eYYnd-0000L9-PU
+	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 09:53:18 -0500
+Received: from mail-ot0-x235.google.com ([2607:f8b0:4003:c0f::235]:44958)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1eYYnd-0000Kj-K2
+	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 09:53:17 -0500
+Received: by mail-ot0-x235.google.com with SMTP id g59so9418894otg.11
+	for <qemu-devel@nongnu.org>; Mon, 08 Jan 2018 06:53:17 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20171226065300.9890-1-famz@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] osdep: Retry SETLK upon EINTR
+In-Reply-To: <20180103224208.30291-1-f4bug@amsat.org>
+References: <20180103224208.30291-1-f4bug@amsat.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 8 Jan 2018 14:52:56 +0000
+Message-ID: <CAFEAcA82rAEcG5RH3LxVTHqKpEVDqL+mnW=NfoW-bQ=_VxoHEQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 0/2] pxa2xx_timer: ignore incorrect
+ registers access to use U-Boot
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,16 +30,20 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-stable@nongnu.org, qemu-block@nongnu.org
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Cc: Alistair Francis <alistair.francis@xilinx.com>, Andrzej Zaborowski <balrogg@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, qemu-arm <qemu-arm@nongnu.org>, Fam Zheng <famz@redhat.com>
 
-Am 26.12.2017 um 07:53 hat Fam Zheng geschrieben:
-> We could hit lock failure if there is a signal that makes fcntl return
-> -1 and errno set to EINTR. In this case we should retry.
-> 
-> Cc: qemu-stable@nongnu.org
-> Signed-off-by: Fam Zheng <famz@redhat.com>
+On 3 January 2018 at 22:42, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> w=
+rote:
+> since v1:
+> - fixed qemu_log_mask() lines indentation (Alistair)
+> - added Alistair's R-b
+>
+> tiny patches that allow to boot a Gumstix Connex board and use U-Boot.
 
-Thanks, applied to the block branch.
+Thanks, applied to target-arm.next. Patch 2 is missing
+a #include "qemu/log.h" (hence the patchew warning) -- I'll
+just fix that in my tree.
 
-Kevin
+thanks
+-- PMM
