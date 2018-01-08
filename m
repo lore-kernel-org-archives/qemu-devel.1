@@ -1,30 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51885)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54235)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eYNTc-0007rn-Cs
-	for qemu-devel@nongnu.org; Sun, 07 Jan 2018 21:47:53 -0500
+	(envelope-from <famz@redhat.com>) id 1eYNcT-0007wZ-3v
+	for qemu-devel@nongnu.org; Sun, 07 Jan 2018 21:57:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eYNTZ-0003Qx-BH
-	for qemu-devel@nongnu.org; Sun, 07 Jan 2018 21:47:52 -0500
-Received: from mail-qk0-x22a.google.com ([2607:f8b0:400d:c09::22a]:41417)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eYNTZ-0003Ql-6P
-	for qemu-devel@nongnu.org; Sun, 07 Jan 2018 21:47:49 -0500
-Received: by mail-qk0-x22a.google.com with SMTP id a8so12538367qkb.8
-	for <qemu-devel@nongnu.org>; Sun, 07 Jan 2018 18:47:49 -0800 (PST)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Sun,  7 Jan 2018 23:45:58 -0300
-Message-Id: <20180108024558.17983-30-f4bug@amsat.org>
-In-Reply-To: <20180108024558.17983-1-f4bug@amsat.org>
-References: <20180108024558.17983-1-f4bug@amsat.org>
+	(envelope-from <famz@redhat.com>) id 1eYNcS-0007ck-AH
+	for qemu-devel@nongnu.org; Sun, 07 Jan 2018 21:57:01 -0500
+Date: Mon, 8 Jan 2018 10:56:48 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20180108025648.GA2123@lemon.usersys.redhat.com>
+References: <20180105225753.30509-1-eblake@redhat.com>
+	<151530501821.348.11085455560260888826@5adcb62bf0d6>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [NOTFORMERGE PATCH 29/29] piix4: add isa_superio_init
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <151530501821.348.11085455560260888826@5adcb62bf0d6>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v7 00/20] add byte-based block_status
+ driver callbacks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,34 +25,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: eblake@redhat.com, kwolf@redhat.com, vsementsov@virtuozzo.com, qemu-block@nongnu.org, jcody@redhat.com, pl@kamp.de
 
-For Hervé to test his VirtualPC2007.
+On Sat, 01/06 22:03, no-reply@patchew.org wrote:
+> /var/tmp/patchew-tester-tmp-zu_flv2_/src/block/iscsi.c: In function =E2=
+=80=98iscsi_co_block_status=E2=80=99:
+> /var/tmp/patchew-tester-tmp-zu_flv2_/src/block/iscsi.c:755:14: error: =E2=
+=80=98iTask.task=E2=80=99 may be used uninitialized in this function [-We=
+rror=3Dmaybe-uninitialized]
+>      if (iTask.task !=3D NULL) {
+>          ~~~~~^~~~~
+> cc1: all warnings being treated as errors
+> make: *** [/var/tmp/patchew-tester-tmp-zu_flv2_/src/rules.mak:66: block=
+/iscsi.o] Error 1
+> make: *** Waiting for unfinished jobs....
+> =3D=3D=3D OUTPUT END =3D=3D=3D
+>=20
+> Test command exited with code: 2
 
- hw/southbridge/piix.c | 3 +++
- 1 file changed, 3 insertions(+)
+Seems introduced by e38bc23454ef763deb4405ebdee6a1081aa00bc8. I think the=
+ easy
+fix is to initialize iTask.task to NULL.
 
-diff --git a/hw/southbridge/piix.c b/hw/southbridge/piix.c
-index 53ee177866..b800d538da 100644
---- a/hw/southbridge/piix.c
-+++ b/hw/southbridge/piix.c
-@@ -32,6 +32,7 @@
- #include "hw/dma/i8257.h"
- #include "hw/audio/pcspk.h"
- #include "hw/timer/i8254.h"
-+#include "hw/isa/superio.h"
- #include "hw/xen/xen.h"
- 
- #define PIIX_NUM_PIC_IRQS       16      /* i8259 * 2 */
-@@ -538,6 +539,8 @@ static void piix4_realize(PCIDevice *pci_dev, Error **errp)
-     /* DMA */
-     i8257_dma_init(s->isa_bus, 0);
- 
-+    isa_superio_init(s->isa_bus, 2, 1, 1);
-+
-     piix4_dev = pci_dev;
- }
- 
--- 
-2.15.1
+Fam
