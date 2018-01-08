@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45009)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51653)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1eYdIq-00013z-PH
-	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 14:41:49 -0500
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1eYdXm-0006Nt-3v
+	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 14:57:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1eYdIn-0005LB-Iv
-	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 14:41:48 -0500
-Resent-Message-Id: <E1eYdIn-0005LB-Iv@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21427)
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1eYdXf-000812-0N
+	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 14:57:14 -0500
+Received: from chuckie.co.uk ([82.165.15.123]:56255
+	helo=s16892447.onlinehome-server.info)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1eYdIn-00059d-CP
-	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 14:41:45 -0500
-In-Reply-To: <20180108172904.8772-1-f4bug@amsat.org>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <151544045999.381.17094285892829948142@5adcb62bf0d6>
+	(Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
+	id 1eYdXe-0007zs-Om
+	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 14:57:06 -0500
+References: <4b0a136a-7017-0890-6dd9-33bd8ddf3e3d@tribudubois.net>
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Message-ID: <4f2f1b89-af18-2d36-8eb5-acf29e180b06@ilande.co.uk>
+Date: Mon, 8 Jan 2018 19:56:58 +0000
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Mon, 8 Jan 2018 11:41:01 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH 00/12] add HOST_SUPPORTS_UNALIGNED_ACCESS,
- reduce slirp warnings
+In-Reply-To: <4b0a136a-7017-0890-6dd9-33bd8ddf3e3d@tribudubois.net>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-GB
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [SPARC] question on LEON IRQMP interrupt
+ controller.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,66 +30,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: f4bug@amsat.org
-Cc: famz@redhat.com, samuel.thibault@ens-lyon.org, jan.kiszka@siemens.com, mst@redhat.com, pbonzini@redhat.com, eblake@redhat.com, thuth@redhat.com, peter.maydell@linaro.org, qemu-devel@nongnu.org
+To: Jean-Christophe DUBOIS <jcd@tribudubois.net>, Artyom Tarasenko <atar4qemu@gmail.com>
+Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
-c3NhZ2UtaWQ6IDIwMTgwMTA4MTcyOTA0Ljg3NzItMS1mNGJ1Z0BhbXNhdC5vcmcKU3ViamVjdDog
-W1FlbXUtZGV2ZWxdIFtQQVRDSCAwMC8xMl0gYWRkIEhPU1RfU1VQUE9SVFNfVU5BTElHTkVEX0FD
-Q0VTUywgcmVkdWNlIHNsaXJwIHdhcm5pbmdzCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMh
-L2Jpbi9iYXNoCgpCQVNFPWJhc2UKbj0xCnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJBU0Uu
-LiB8IHdjIC1sKQpmYWlsZWQ9MAoKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQg
-MApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKCmNvbW1pdHM9IiQoZ2l0IGxv
-ZyAtLWZvcm1hdD0lSCAtLXJldmVyc2UgJEJBU0UuLikiCmZvciBjIGluICRjb21taXRzOyBkbwog
-ICAgZWNobyAiQ2hlY2tpbmcgUEFUQ0ggJG4vJHRvdGFsOiAkKGdpdCBsb2cgLW4gMSAtLWZvcm1h
-dD0lcyAkYykuLi4iCiAgICBpZiAhIGdpdCBzaG93ICRjIC0tZm9ybWF0PWVtYWlsIHwgLi9zY3Jp
-cHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayAtOyB0aGVuCiAgICAgICAgZmFpbGVkPTEKICAg
-ICAgICBlY2hvCiAgICBmaQogICAgbj0kKChuKzEpKQpkb25lCgpleGl0ICRmYWlsZWQKPT09IFRF
-U1QgU0NSSVBUIEVORCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0
-YmQ4ODg3MTMzODQKU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0Jwo1ZDk5NmM2ZmY5IHNs
-aXJwOiB1c2UgSE9TVF9TVVBQT1JUU19VTkFMSUdORURfQUNDRVNTCjE0YTNkNDUwYjggY29uZmln
-dXJlOiBhZGQgSE9TVF9TVVBQT1JUU19VTkFMSUdORURfQUNDRVNTCjczYzExZGExMjUgY29uZmln
-dXJlOiBkaXNhYmxlIHVuYWxpZ25lZCBhY2Nlc3Mgd2FybmluZyBvbiB4ODYgYXJjaAo0ZTVlMzE4
-ZDE2IHNsaXJwOiBhZGQgaW42X2RoY3BfbXVsdGljYXN0KCkKNGNkNzI5M2QxOSBzbGlycDogcmVt
-b3ZlZCB1bnVzZWQgY29kZQoyZTMyNDQxMjliIHNsaXJwOiByZW1vdmUgdW5uZWNlc3NhcnkKMTgw
-MzkxNDk1OCBzbGlycDogcmVtb3ZlIHVudXNlZCBoZWFkZXIKMzgxYjAyNzkzMyBzbGlycDogcG9p
-c29uIElONl8qX0FERFJfKigpIG1hY3JvcyB0byBhdm9pZCB0aGVtCjVmN2JlZTljODQgc2xpcnA6
-IGFkZCBpbjZfbXVsdGljYXN0KCkgYW5kIHVzZSBpdCBpbnN0ZWFkIG9mIElONl9JU19BRERSX01V
-TFRJQ0FTVCgpCjczM2MwZDJmOTIgc2xpcnA6IGF2b2lkIElONl9JU19BRERSX1VOU1BFQ0lGSUVE
-KCksIHJhdGhlciB1c2UgaW42X3plcm8oKQphY2NkMGFjZWYwIHNsaXJwOiBzdHJ1Y3QgaWNtcC9l
-dGhoZHIgQVJFIHBhY2tlZAoyMzYwNTEwYjJiIHNsaXJwOiByZW1vdmUgUUVNVV9QQUNLRUQgZnJv
-bSBzdHJ1Y3R1cmVzIHdpdGggZG9uJ3QgcmVxdWlyZSBpdAoKPT09IE9VVFBVVCBCRUdJTiA9PT0K
-Q2hlY2tpbmcgUEFUQ0ggMS8xMjogc2xpcnA6IHJlbW92ZSBRRU1VX1BBQ0tFRCBmcm9tIHN0cnVj
-dHVyZXMgd2l0aCBkb24ndCByZXF1aXJlIGl0Li4uCkNoZWNraW5nIFBBVENIIDIvMTI6IHNsaXJw
-OiBzdHJ1Y3QgaWNtcC9ldGhoZHIgQVJFIHBhY2tlZC4uLgpDaGVja2luZyBQQVRDSCAzLzEyOiBz
-bGlycDogYXZvaWQgSU42X0lTX0FERFJfVU5TUEVDSUZJRUQoKSwgcmF0aGVyIHVzZSBpbjZfemVy
-bygpLi4uCkNoZWNraW5nIFBBVENIIDQvMTI6IHNsaXJwOiBhZGQgaW42X211bHRpY2FzdCgpIGFu
-ZCB1c2UgaXQgaW5zdGVhZCBvZiBJTjZfSVNfQUREUl9NVUxUSUNBU1QoKS4uLgpDaGVja2luZyBQ
-QVRDSCA1LzEyOiBzbGlycDogcG9pc29uIElONl8qX0FERFJfKigpIG1hY3JvcyB0byBhdm9pZCB0
-aGVtLi4uCldBUk5JTkc6IGFyY2hpdGVjdHVyZSBzcGVjaWZpYyBkZWZpbmVzIHNob3VsZCBiZSBh
-dm9pZGVkCiMyMDogRklMRTogc2xpcnAvaXA2Lmg6MTE6CisjaWZkZWYgX19HTlVDX18KCnRvdGFs
-OiAwIGVycm9ycywgMSB3YXJuaW5ncywgMjUgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMg
-c3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFy
-ZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVD
-S1BBVENIIGluIE1BSU5UQUlORVJTLgpDaGVja2luZyBQQVRDSCA2LzEyOiBzbGlycDogcmVtb3Zl
-IHVudXNlZCBoZWFkZXIuLi4KQ2hlY2tpbmcgUEFUQ0ggNy8xMjogc2xpcnA6IHJlbW92ZSB1bm5l
-Y2Vzc2FyeS4uLgpDaGVja2luZyBQQVRDSCA4LzEyOiBzbGlycDogcmVtb3ZlZCB1bnVzZWQgY29k
-ZS4uLgpDaGVja2luZyBQQVRDSCA5LzEyOiBzbGlycDogYWRkIGluNl9kaGNwX211bHRpY2FzdCgp
-Li4uCkNoZWNraW5nIFBBVENIIDEwLzEyOiBjb25maWd1cmU6IGRpc2FibGUgdW5hbGlnbmVkIGFj
-Y2VzcyB3YXJuaW5nIG9uIHg4NiBhcmNoLi4uCkNoZWNraW5nIFBBVENIIDExLzEyOiBjb25maWd1
-cmU6IGFkZCBIT1NUX1NVUFBPUlRTX1VOQUxJR05FRF9BQ0NFU1MuLi4KQ2hlY2tpbmcgUEFUQ0gg
-MTIvMTI6IHNsaXJwOiB1c2UgSE9TVF9TVVBQT1JUU19VTkFMSUdORURfQUNDRVNTLi4uCkVSUk9S
-OiByZXR1cm4gaXMgbm90IGEgZnVuY3Rpb24sIHBhcmVudGhlc2VzIGFyZSBub3QgcmVxdWlyZWQK
-IzU5OiBGSUxFOiBzbGlycC9pcDYuaDo5ODoKKyAgICByZXR1cm4gKGFhW3ByZWZpeF9sZW4gLyA4
-XSA+PiAoOCAtIChwcmVmaXhfbGVuICUgOCkpKQoKRVJST1I6IHJldHVybiBpcyBub3QgYSBmdW5j
-dGlvbiwgcGFyZW50aGVzZXMgYXJlIG5vdCByZXF1aXJlZAojOTA6IEZJTEU6IHNsaXJwL2lwNi5o
-OjEzOToKKyAgICByZXR1cm4gKGFhW3ByZWZpeF9sZW4gLyA4XSAmICgoMVUgPDwgKDggLSAocHJl
-Zml4X2xlbiAlIDgpKSkgLSAxKSkKCnRvdGFsOiAyIGVycm9ycywgMCB3YXJuaW5ncywgOTIgbGlu
-ZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcu
-ICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0g
-dG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKPT09IE9V
-VFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKCi0tLQpFbWFp
-bCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcv
-XS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQGZyZWVsaXN0cy5v
-cmc=
+On 02/01/18 11:13, Jean-Christophe DUBOIS wrote:
+
+> Hi Mark, Artyom,
+> 
+> I am wondering if the IRQMP code in hw/intc/grlib_irqmp.c is correct 
+> when it comes to acknowledging interrupts.
+> 
+> With the actual code an interrupt can be lowered/acked only by an "ack" 
+> from the processor which means that the trap handler related to this 
+> external interrupt needs to be run for the ack to happen.
+> 
+> In particular this means that the interrupt cannot be acked only by 
+> software. Even if the software clears the "pending" interrupts (by 
+> writing to the CLEAR_OFFSET register before the interrupt handler is 
+> run) this does not clear the interrupt to the processor (which is kept 
+> asserted until the handler is run and the interrupt acked by the 
+> processor). Do you know if this is indeed the intended behavior (I 
+> understand that for most operating system the interrupt handler will be 
+> run at last and this does not make a difference)?
+> 
+> I would expect that clearing interrupt through software (by writing to 
+> the CLEAR_OFFSET register) would have the same effect as the processor 
+> acknowledgment (and could avoid to run the interrupt handler if things 
+> have already been taken care of by software).
+> 
+> Unfortunately the documentation I got (on the web) on the IRQMP is not 
+> very clear on the topic.
+> 
+> Anyway you can find below the patch I'd like to provide for IRQMP.
+> 
+> Thanks
+
+Thanks for the patch! I'm afraid I don't really have any experience with 
+LEON as my focus is sun4m/sun4u, however I'm happy to take patches 
+Acked/Reviewed by Fabien as the current LEON maintainer if they don't 
+cause any regressions in my own tests.
+
+
+ATB,
+
+Mark.
