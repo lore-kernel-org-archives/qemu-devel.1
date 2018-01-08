@@ -1,27 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48231)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49492)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mjc@sifive.com>) id 1eYRKx-00075v-N6
-	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 01:55:14 -0500
+	(envelope-from <peterx@redhat.com>) id 1eYRQH-0000Hl-Ib
+	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 02:00:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mjc@sifive.com>) id 1eYRKv-00084c-HZ
-	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 01:55:11 -0500
-Received: from mail-oi0-x22a.google.com ([2607:f8b0:4003:c06::22a]:43750)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mjc@sifive.com>) id 1eYRKv-000831-8t
-	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 01:55:09 -0500
-Received: by mail-oi0-x22a.google.com with SMTP id t16so1507106oif.10
-	for <qemu-devel@nongnu.org>; Sun, 07 Jan 2018 22:55:07 -0800 (PST)
+	(envelope-from <peterx@redhat.com>) id 1eYRQE-0003wb-H9
+	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 02:00:41 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:50056)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1eYRQE-0003v9-8M
+	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 02:00:38 -0500
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 3FBD37EA8B
+	for <qemu-devel@nongnu.org>; Mon,  8 Jan 2018 07:00:36 +0000 (UTC)
+Date: Mon, 8 Jan 2018 15:00:26 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20180108070026.GB10749@xz-mi>
+References: <20180105205109.683-1-quintela@redhat.com>
+	<20180105205109.683-2-quintela@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <CAHNT7NtvroDROTOx1VrfO4U3p4udxFknvALVmASdyWe+vk2htg@mail.gmail.com>
-References: <1514940265-18093-1-git-send-email-mjc@sifive.com>
-	<1514940265-18093-4-git-send-email-mjc@sifive.com>
-	<0a498d8a-e59e-616f-9489-1e874a956341@linaro.org>
-	<CAHNT7NtvroDROTOx1VrfO4U3p4udxFknvALVmASdyWe+vk2htg@mail.gmail.com>
-From: Michael Clark <mjc@sifive.com>
-Date: Mon, 8 Jan 2018 19:55:06 +1300
-Message-ID: <CAHNT7NsU-qj2oz8t0oEy1f8WEqGKhUKov1MPPDAO3ZS74p1GYw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v1 03/21] RISC-V CPU Core Definition
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20180105205109.683-2-quintela@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v4 1/2] migration: Create tcp_port parameter
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,293 +33,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: qemu-devel@nongnu.org, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Sagar Karandikar <sagark@eecs.berkeley.edu>
+To: Juan Quintela <quintela@redhat.com>
+Cc: qemu-devel@nongnu.org, dgilbert@redhat.com, lvivier@redhat.com
 
-FYI,
+On Fri, Jan 05, 2018 at 09:51:08PM +0100, Juan Quintela wrote:
+> It will be used to store the uri tcp_port parameter.  This is the only
+> parameter than can change and we can need to be able to connect to it.
+> 
+> Signed-off-by: Juan Quintela <quintela@redhat.com>
+> 
+> --
+> 
+> This used to be uri parameter, but it has so many troubles to
+> reproduce that it don't just make sense.
+> ---
+>  hmp.c                 |  7 +++++++
+>  migration/migration.c | 10 ++++++++++
+>  qapi/migration.json   | 19 ++++++++++++++++---
+>  3 files changed, 33 insertions(+), 3 deletions(-)
+> 
+> diff --git a/hmp.c b/hmp.c
+> index 354baaa6b6..1bb9d5d8f8 100644
+> --- a/hmp.c
+> +++ b/hmp.c
+> @@ -360,6 +360,9 @@ void hmp_info_migrate_parameters(Monitor *mon, const QDict *qdict)
+>          monitor_printf(mon, "%s: %" PRIu64 "\n",
+>              MigrationParameter_str(MIGRATION_PARAMETER_XBZRLE_CACHE_SIZE),
+>              params->xbzrle_cache_size);
+> +        monitor_printf(mon, "%s: %d\n",
+> +            MigrationParameter_str(MIGRATION_PARAMETER_TCP_PORT),
+> +            params->tcp_port);
+>      }
+>  
+>      qapi_free_MigrationParameters(params);
+> @@ -1674,6 +1677,10 @@ void hmp_migrate_set_parameter(Monitor *mon, const QDict *qdict)
+>          }
+>          p->xbzrle_cache_size = cache_size;
+>          break;
+> +    case MIGRATION_PARAMETER_TCP_PORT:
+> +        p->has_tcp_port = true;
+> +        visit_type_uint16(v, param, &p->tcp_port, &err);
+> +        break;
+>      default:
+>          assert(0);
+>      }
+> diff --git a/migration/migration.c b/migration/migration.c
+> index 7a77b193c1..4cdd8ee31b 100644
+> --- a/migration/migration.c
+> +++ b/migration/migration.c
+> @@ -522,6 +522,8 @@ MigrationParameters *qmp_query_migrate_parameters(Error **errp)
+>      params->x_multifd_page_count = s->parameters.x_multifd_page_count;
+>      params->has_xbzrle_cache_size = true;
+>      params->xbzrle_cache_size = s->parameters.xbzrle_cache_size;
+> +    params->has_tcp_port = true;
+> +    params->tcp_port = s->parameters.tcp_port;
+>  
+>      return params;
+>  }
+> @@ -923,6 +925,9 @@ static void migrate_params_test_apply(MigrateSetParameters *params,
+>      if (params->has_xbzrle_cache_size) {
+>          dest->xbzrle_cache_size = params->xbzrle_cache_size;
+>      }
+> +    if (params->has_tcp_port) {
+> +        dest->tcp_port = params->tcp_port;
+> +    }
+>  }
+>  
+>  static void migrate_params_apply(MigrateSetParameters *params, Error **errp)
+> @@ -995,6 +1000,9 @@ static void migrate_params_apply(MigrateSetParameters *params, Error **errp)
+>          s->parameters.xbzrle_cache_size = params->xbzrle_cache_size;
+>          xbzrle_cache_resize(params->xbzrle_cache_size, errp);
+>      }
+> +    if (params->has_tcp_port) {
+> +        s->parameters.tcp_port = params->tcp_port;
+> +    }
 
-I've been working on the patch review comments in order of the patches and
-am focusing on cleanup up the cpu and helpers.
+Looks like this version still allows users to set tcp_port, no?
 
-OK [PATCH v1 0001/0021] RISC-V Maintainers
-OK [PATCH v1 0002/0021] RISC-V ELF Machine Definition
-INPROGRESS [PATCH v1 0003/0021] RISC-V CPU Core Definition
-DONE [PATCH v1 0004/0021] RISC-V Disassembler
-INPROGRESS [PATCH v1 0005/0021] RISC-V CPU Helpers
-
-Changelog
-
-- Remove redundant NULL terminators from disassembler register name arrays
-- Change disassembler register name arrays to const
-- Refine disassembler internal function names
-- Update dates in disassembler copyright message
-- Remove #ifdef CONFIG_USER_ONLY version of cpu_has_work
-- Use ULL suffix on 64-bit constants so that builds on 32-bit hosts will
-work
-- Move riscv_cpu_mmu_index from cpu.h to helper.c
-- Move riscv_cpu_hw_interrupts_pending from cpu.h to helper.c
-- Remove redundant TARGET_HAS_ICE from cpu.h
-- Use qemu_irq instead of void* for irq definition in cpu.h
-- Remove duplicate typedef from struct CPURISCVState
-- Remove redundant g_strdup from cpu_register
-- Remove redundant tlb_flush from riscv_cpu_reset
-- Remove redundant mode calculation from get_physical_address
-- Remove redundant debug mode printf and dcsr comment
-- Remove redundant clearing of MSB for bare physical addresses
-- Use g_assert_not_reached for invalid mode in get_physical_address
-- Use g_assert_not_reached for unreachable permission checks in
-get_physical_address
-- Use g_assert_not_reached for unreachable access type in
-raise_mmu_exception
-- Return misalign exception instead of aborting for misalined fetches
-- Move exception defines from cpu.h to cpu_bits.h
-- Remove redundant breakpoint control definitions from cpu_bits.h
-- Implement riscv_cpu_unassigned_access exception handling
-- Log and raise exceptions for unimplemented CSRs
-
-Here is my development tree:
-
-- https://github.com/michaeljclark/riscv-qemu/tree/qemu-devel
-
-I've got individual commit entries for each change to make the deltas
-easier to review and will archive this branch before squashing for the v2
-spin:
-
-- https://github.com/michaeljclark/riscv-qemu/commits/qemu-devel
-
-Hopefully, I'll have a new spin relatively soon... I'm making good progress
-on getting target/riscv clean enough for re-submission...
-
-Michael.
-
-On Thu, Jan 4, 2018 at 11:30 AM, Michael Clark <mjc@sifive.com> wrote:
-
->
->
-> On Wed, Jan 3, 2018 at 6:21 PM, Richard Henderson <
-> richard.henderson@linaro.org> wrote:
->
->> On 01/02/2018 04:44 PM, Michael Clark wrote:
->> > +#ifdef CONFIG_USER_ONLY
->> > +static bool riscv_cpu_has_work(CPUState *cs)
->> > +{
->> > +    return 0;
->> > +}
->> > +#else
->> > +static bool riscv_cpu_has_work(CPUState *cs)
->> > +{
->> > +    return cs->interrupt_request & CPU_INTERRUPT_HARD;
->> > +}
->> > +#endif
->>
->> There's no need to conditionalize this.
->
->
-> Got it. Will be in the next spin.
->
->
->> > +static void riscv_cpu_reset(CPUState *cs)
->> > +{
->> > +    RISCVCPU *cpu = RISCV_CPU(cs);
->> > +    RISCVCPUClass *mcc = RISCV_CPU_GET_CLASS(cpu);
->> > +    CPURISCVState *env = &cpu->env;
->> > +
->> > +    mcc->parent_reset(cs);
->> > +#ifndef CONFIG_USER_ONLY
->> > +    tlb_flush(cs);
->>
->> Flush is now generic.  Remove it from here.
->
->
-> OK.
->
-> > +static void riscv_cpu_realize(DeviceState *dev, Error **errp)
->> > +{
->> > +    CPUState *cs = CPU(dev);
->> > +    RISCVCPU *cpu = RISCV_CPU(dev);
->> > +    RISCVCPUClass *mcc = RISCV_CPU_GET_CLASS(dev);
->> > +    CPURISCVState *env = &cpu->env;
->> > +    Error *local_err = NULL;
->> > +
->> > +    cpu_exec_realizefn(cs, &local_err);
->> > +    if (local_err != NULL) {
->> > +        error_propagate(errp, local_err);
->> > +        return;
->> > +    }
->> > +
->> > +    if (env->misa & RVM) {
->> > +        set_feature(env, RISCV_FEATURE_RVM);
->> > +    }
->>
->> What's the point of replicating this information?
->>
->
-> This is inherited code. I noticed this too. In this version they are
-> actually in sync with each other, which they weren't several weeks ago :-D
->
-> It may well be that the features flags pre-date the addition of the 'misa'
-> register in the privilege spec.
->
-> This will take a bit of re-work as a reasonable amount of code uses the
-> FEATURE flags vs misa.
->
-> Are you happy for this to be a pending work item? I don't like it either
-> and eventually want to fix, and already did some work to sync it with
-> 'misa', but it's not a critical issue.
->
-> > +static void cpu_register(const RISCVCPUInfo *info)
->> > +{
->> > +    TypeInfo type_info = {
->> > +        .name = g_strdup(info->name),
->> > +        .parent = TYPE_RISCV_CPU,
->> > +        .instance_size = sizeof(RISCVCPU),
->> > +        .instance_init = info->initfn,
->> > +    };
->> > +
->> > +    type_register(&type_info);
->> > +    g_free((void *)type_info.name);
->> > +}
->>
->> I think type_register does its own strdup; you don't need to do your own.
->
->
-> Got it.
->
->
->> > diff --git a/target/riscv/cpu.h b/target/riscv/cpu.h
->> > new file mode 100644
->> > index 0000000..0480127
->> > --- /dev/null
->> > +++ b/target/riscv/cpu.h
->> > @@ -0,0 +1,363 @@
->> > +#ifndef RISCV_CPU_H
->>
->> Header comment and license?
->>
->> > +#define TARGET_HAS_ICE 1
->>
->> What's this for?
->
->
-> It's redundant. Inherited code. Looks like it came from nios2. Will remove.
->
->
->> > +#define RV(x) (1L << (x - 'A'))
->>
->> L is useless since the type of long is variable.  Either U or ULL.
->>
->> > +typedef struct CPURISCVState CPURISCVState;
->> > +
->> > +#include "pmp.h"
->> > +
->> > +typedef struct CPURISCVState {
->>
->> Duplicate typedef.
->>
->
-> Got it.
->
->
->> > +    target_ulong gpr[32];
->> > +    uint64_t fpr[32]; /* assume both F and D extensions */
->> > +    target_ulong pc;
->> > +    target_ulong load_res;
->> > +
->> > +    target_ulong frm;
->> > +    target_ulong fstatus;
->> > +    target_ulong fflags;
->> > +
->> > +    target_ulong badaddr;
->> > +
->> > +    uint32_t mucounteren;
->> > +
->> > +    target_ulong user_ver;
->> > +    target_ulong priv_ver;
->> > +    target_ulong misa_mask;
->> > +    target_ulong misa;
->> > +
->> > +#ifdef CONFIG_USER_ONLY
->> > +    uint32_t amoinsn;
->> > +    target_long amoaddr;
->> > +    target_long amotest;
->> > +#else
->> > +    target_ulong priv;
->> > +
->> > +    target_ulong mhartid;
->> > +    target_ulong mstatus;
->> > +    target_ulong mip;
->> > +    target_ulong mie;
->> > +    target_ulong mideleg;
->> > +
->> > +    target_ulong sptbr;  /* until: priv-1.9.1 */
->> > +    target_ulong satp;   /* since: priv-1.10.0 */
->> > +    target_ulong sbadaddr;
->> > +    target_ulong mbadaddr;
->> > +    target_ulong medeleg;
->> > +
->> > +    target_ulong stvec;
->> > +    target_ulong sepc;
->> > +    target_ulong scause;
->> > +
->> > +    target_ulong mtvec;
->> > +    target_ulong mepc;
->> > +    target_ulong mcause;
->> > +    target_ulong mtval;  /* since: priv-1.10.0 */
->> > +
->> > +    uint32_t mscounteren;
->> > +    target_ulong scounteren; /* since: priv-1.10.0 */
->> > +    target_ulong mcounteren; /* since: priv-1.10.0 */
->> > +
->> > +    target_ulong sscratch;
->> > +    target_ulong mscratch;
->> > +
->> > +    /* temporary htif regs */
->> > +    uint64_t mfromhost;
->> > +    uint64_t mtohost;
->> > +    uint64_t timecmp;
->> > +
->> > +    /* physical memory protection */
->> > +    pmp_table_t pmp_state;
->> > +#endif
->> > +
->> > +    float_status fp_status;
->> > +
->> > +    /* Internal CPU feature flags. */
->> > +    uint64_t features;
->> > +
->> > +    /* QEMU */
->> > +    CPU_COMMON
->> > +
->> > +    /* Fields from here on are preserved across CPU reset. */
->> > +    void *irq[8];
->> > +    QEMUTimer *timer; /* Internal timer */
->>
->> FWIW, other targets have moved this timer to RISCVCPU struct.
->
->
-> I'll look into this. It seems like it should be a simple change and easy
-> to include in the next spin.
->
-> > +static inline void cpu_get_tb_cpu_state(CPURISCVState *env,
->> target_ulong *pc,
->> > +                                        target_ulong *cs_base,
->> uint32_t *flags)
->> > +{
->> > +    *pc = env->pc;
->> > +    *cs_base = 0;
->> > +    *flags = 0; /* necessary to avoid compiler warning */
->>
->> Remove the comment -- the assignment is necessary full stop.
->>
->> > +#define MSTATUS64_UXL       0x0000000300000000
->> > +#define MSTATUS64_SXL       0x0000000C00000000
->>
->> 64-bit constants must use ULL.  Otherwise builds from a 32-bit host will
->> fail.
->> There are lots more instances within this file.
->
->
-> Got it. Will fix these in the next spin.
->
-> Thanks!
->
+-- 
+Peter Xu
