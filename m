@@ -1,30 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33743)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33746)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eYbEs-0008Fn-5C
+	id 1eYbEs-0008G7-DE
 	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 12:29:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eYbEo-0000FC-Ni
+	id 1eYbEr-0000Il-Kf
 	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 12:29:34 -0500
-Received: from mail-qk0-x242.google.com ([2607:f8b0:400d:c09::242]:36058)
+Received: from mail-qk0-x244.google.com ([2607:f8b0:400d:c09::244]:39645)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eYbEo-0000EY-KA
-	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 12:29:30 -0500
-Received: by mail-qk0-x242.google.com with SMTP id d21so4110819qkj.3
-	for <qemu-devel@nongnu.org>; Mon, 08 Jan 2018 09:29:30 -0800 (PST)
+	id 1eYbEr-0000IC-Gm
+	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 12:29:33 -0500
+Received: by mail-qk0-x244.google.com with SMTP id r8so10802525qke.6
+	for <qemu-devel@nongnu.org>; Mon, 08 Jan 2018 09:29:33 -0800 (PST)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Mon,  8 Jan 2018 14:28:58 -0300
-Message-Id: <20180108172904.8772-7-f4bug@amsat.org>
+Date: Mon,  8 Jan 2018 14:28:59 -0300
+Message-Id: <20180108172904.8772-8-f4bug@amsat.org>
 In-Reply-To: <20180108172904.8772-1-f4bug@amsat.org>
 References: <20180108172904.8772-1-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH 06/12] slirp: remove unused header
+Subject: [Qemu-devel] [PATCH 07/12] slirp: remove unnecessary
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,20 +38,20 @@ Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nong
 
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- slirp/slirp.h | 1 -
+ slirp/libslirp.h | 1 -
  1 file changed, 1 deletion(-)
 
-diff --git a/slirp/slirp.h b/slirp/slirp.h
-index 9a7287e7cc..447dc045a8 100644
---- a/slirp/slirp.h
-+++ b/slirp/slirp.h
-@@ -1,7 +1,6 @@
- #ifndef SLIRP_H
- #define SLIRP_H
+diff --git a/slirp/libslirp.h b/slirp/libslirp.h
+index f90f0f524c..540b3e5903 100644
+--- a/slirp/libslirp.h
++++ b/slirp/libslirp.h
+@@ -3,7 +3,6 @@
  
--#include "qemu/host-utils.h"
- #include "slirp_config.h"
+ #include "qemu-common.h"
  
- #ifdef _WIN32
+-struct Slirp;
+ typedef struct Slirp Slirp;
+ 
+ int get_dns_addr(struct in_addr *pdns_addr);
 -- 
 2.15.1
