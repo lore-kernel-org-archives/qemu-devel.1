@@ -1,29 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51746)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54402)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1eYZzT-0007Wt-VD
-	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 11:09:36 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1eYa2h-00035m-Cz
+	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 11:12:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1eYZzP-0000cQ-HO
-	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 11:09:35 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:48520)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1eYZzP-0000bp-8G
-	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 11:09:31 -0500
-Date: Mon, 8 Jan 2018 16:09:21 +0000
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20180108160921.GC11758@stefanha-x1.localdomain>
-References: <20171219162151.GA10889@stefanha-x1.localdomain>
-	<1512291492.2209478.1513854089861.JavaMail.zimbra@redhat.com>
-	<20180104104744.GC10106@stefanha-x1.localdomain>
-	<5A4E0CDA.4060409@intel.com>
-	<20180105154914.GH28322@stefanha-x1.localdomain>
-	<5A53547D.2090602@intel.com>
+	(envelope-from <ehabkost@redhat.com>) id 1eYa2g-0003fP-1V
+	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 11:12:55 -0500
+Date: Mon, 8 Jan 2018 14:12:31 -0200
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20180108161231.GF6646@localhost.localdomain>
+References: <20180104144046.30793-1-f4bug@amsat.org>
+	<20180104192203.GD3407@localhost.localdomain>
+	<20180108135122.637e478a@redhat.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="4ZLFUWh1odzi/v6L"
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <5A53547D.2090602@intel.com>
-Subject: Re: [Qemu-devel] vhost-user graceful connect/disconnect
+In-Reply-To: <20180108135122.637e478a@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [RFC PATCH 0/6] qom: introduce TypeInfo name
+ aliases
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,79 +26,137 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Wei Wang <wei.w.wang@intel.com>
-Cc: =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org, mukawa@igel.co.jp, "Michael S. Tsirkin" <mst@redhat.com>, Maxime Coquelin <maxime.coquelin@redhat.com>, n nikolaev <n.nikolaev@virtualopensystems.com>
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>, Alistair Francis <alistair.francis@xilinx.com>, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, Andreas =?iso-8859-1?Q?F=E4rber?= <afaerber@suse.de>, Markus Armbruster <armbru@redhat.com>, Sascha Silbe <silbe@linux.vnet.ibm.com>, Alexander Graf <agraf@suse.de>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, qemu-devel@nongnu.org, qemu-arm@nongnu.org, Fam Zheng <famz@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>, Juan Quintela <quintela@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-
---4ZLFUWh1odzi/v6L
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Mon, Jan 08, 2018 at 07:22:37PM +0800, Wei Wang wrote:
-> On 01/05/2018 11:49 PM, Stefan Hajnoczi wrote:
-> > On Thu, Jan 04, 2018 at 07:15:38PM +0800, Wei Wang wrote:
-> > > On 01/04/2018 06:47 PM, Stefan Hajnoczi wrote:
-> > > > On Thu, Dec 21, 2017 at 06:01:29AM -0500, Marc-Andr=E9 Lureau wrote:
-> > > >=20
-> > > > I'm not going to prototype this yet, I'm working on virtio-vhost-us=
-er
-> > > > first, but eventually I might get back to -object vhost-user(-backe=
-nd).
-> > > >=20
-> > > Hi Stefan, are you implementing the guest slave and vhost-pci driver =
-(we've
-> > > posted to the dpdk mailinglist) as well? and do you have an estimatio=
-n when
-> > > would the prototype be ready?
-> > I'm implementing the "[RFC virtio-dev] vhost-user-slave: add vhost-user
-> > slave device type" device in QEMU and DPDK in order to show how the
-> > ideas we've discussed work.
-> >=20
-> > Here is the VIRTIO spec link again:
-> > https://stefanha.github.io/virtio/vhost-user-slave.html#x1-2830007
+On Mon, Jan 08, 2018 at 01:51:22PM +0100, Igor Mammedov wrote:
+> On Thu, 4 Jan 2018 17:22:03 -0200
+> Eduardo Habkost <ehabkost@redhat.com> wrote:
 >=20
-> There are four virtqueues documented in the spec, would two suffice? Requ=
-est
-> and Response can be distinguished by VHOST_USER_REPLY_MASK.
+> > On Thu, Jan 04, 2018 at 11:40:40AM -0300, Philippe Mathieu-Daud=E9 wr=
+ote:
+> > > Hi,
+> > >=20
+> > > This RFC series is intended to simplify Flattened Device Tree suppo=
+rt,
+> > > in particular the 'compatible' FDT entry, when Linux names mismatch=
+es
+> > > QEMU ones, but this is the same device modelled.
+> > >=20
+> > > Eventually this might help to remove the QDevAlias qdev_alias_table=
+[]
+> > > in qdev-monitor.c.
+> > >  =20
+> >=20
+> > Didn't look closely at the patches yet, but this sounds like a
+> > nice generic way to replace other alias systems.  We have at
+> > least:
+> Though it seems easy and trivial, I'm a bit concerned about using
+> QOM types for the task though.
+> Also see commit 6acbe4c6f which labels aliases as a bad idea
+> and says that they are there only for compatibility and shouldn't
+> be used.
 
-That's a good idea and I'll do it for the master-to-slave virtqueue.
+It's true that they are there only for compatibility.  But I
+don't think commit 6acbe4c6f label aliases in general as a bad
+idea.  It just removes a very limited mechanism and make it
+specific to the only place where it was needed.  Now we have at
+least 5 different places where we do the same thing, so now it
+might be worth it.
 
-Unfortunately virtqueues are asymmetric so a single virtqueue cannot
-support the slave-to-master message flow (VHOST_USER_SET_SLAVE_REQ_FD):
-1. Master puts an empty buffer onto vq.
-2. Slave takes buffer and fills in a request.  The buffer is now used.
-3. Master pops the used buffer but there is no way to reply back to the
-   slave!
+But:
 
-We still need 2 virtqueues for the slave-to-master message flow.
+> So far I agree with that statement, because it introduces
+> ambiguity in code used internally and more worrying is that
+> this ambiguity will increase user visible ABI (think of '-device_add FO=
+O_ALIAS')
+> that we would need to maintain afterwards.
 
-> I think the key issue is that we have a different viewpoint of protocol
-> gating and protocol relaying. It is a high-level direction we need to ali=
-gn
-> first before we could get into more details. Hope your upcoming code can =
-get
-> us a decision. Please also remember to reuse the dpdk code that my cowork=
-er
-> posted to the dpdk mailinglist wherever possible, it may save your time to
-> debug.
+This is a reasonable worry.  If aliases exist only for
+compatibility, they should be restricted to the places where
+compatibility is really needed.
 
-Thanks!
+For example: aliases that affect -cpu shouldn't necessarily
+affect -device.
 
-Stefan
 
---4ZLFUWh1odzi/v6L
-Content-Type: application/pgp-signature; name="signature.asc"
+> It would be nice to have unified alias API, but I think it should
+> be separate one and limited to the same scope (i.e. compat stuff),
+> and even that won't be easy as different alias impl. we have now
+> have a different needs.
 
------BEGIN PGP SIGNATURE-----
+Starting with a separate API would be a good way to understand
+what are our real needs, before deciding if we really want
+aliases that affect all object_new() calls.
 
-iQEcBAEBAgAGBQJaU5exAAoJEJykq7OBq3PINBIH/2q0L25DVSrymvfiMvs9OlaM
-0UwYbbpHa8go9b/NKVlWFRVHpakayGEHfS1fi4ui2dyMKAFk+NBmuBeFyvMyqbVE
-0FvFMvLAzBXk7nCH90vZWMOrmmxT0A2D6cr85QLxScJiNXuqBfVt6yWIWhPsuv43
-bWRUbsvD1+iW8kifizdVTi9r9sKkui87tUV/OUB7UvHUbMDWEr/WUh0NjzcCnrOb
-xwM50MgGl1r3Gjdtb2fg5wk0ptoLL3NE1lzTKx/eYVlARKMNJn6gfpFXDVCFt7v8
-jLEWewMbxrOyZ6cZ0rMzGgiL+iZ0xGieL8istc5dESAd6EgPVLGqcF9OeS6Jzoo=
-=4o42
------END PGP SIGNATURE-----
+>=20
+> wrt this series targeted usage, I'd prefer that object_new/initialize
+> would use real type names when creating devices as it does currently
+>=20
+> FDT linux guest specific names wouldn't seep into device model
+> itself. Firmware (FDT or ACPI) should be separate from device
+> implementation.
 
---4ZLFUWh1odzi/v6L--
+I agree.  The QOM names and FDT names have different expectations
+and assumptions (the commas added to some type names in this
+series are one example).  Having the QOM type and FDT name match
+on most cases is nice, but this shouldn't be a requirement.
+
+I don't think we should rename user-visible QOM types and change
+the command-line interface (and require additional compatibility
+cruft) just to make it more convenient for internal FDT code.
+
+
+>=20
+> If really there is need to dynamically scan present devices
+> and build FDT from result, then probably we should introduce
+> interface that devices could implement if necessary.
+> (I was thinking about such possibility for ACPI). But so far
+> it looked to me as too much overhead for what we do now.
+>=20
+>=20
+> > * qdev-monitor.c: qdev_alias_table[] (as mentioned above)
+> > * chardev/char.c: chardev_alias_table[]
+> > * target/alpha/cpu.c: alpha_cpu_aliases[]
+> > * target/ppc/cpu-models.c: ppc_cpu_aliases[]
+> > * include/hw/boards.h: MachineClass::alias
+> >=20
+> > Probably there are others I couldn't find.
+> >=20
+> >=20
+> > > So far this is only a 'proof of concept'.
+> > > To see how the qtests perform, I only modified 3 devices, 2 used by=
+ the
+> > > Xilinx Zynq machines (Cadence), and the e1000 (used by the PXE test=
+).
+> > >=20
+> > > Regards,
+> > >=20
+> > > Phil.
+> > >=20
+> > > Philippe Mathieu-Daud=E9 (6):
+> > >   qom: introduce TypeInfo name aliases
+> > >   hw/net/e1000: real device name is 'e1000-82540em', 'e1000' is an =
+alias
+> > >   hw/char/cadence_uart: add FDT aliases
+> > >   arm/xlnx-zynq: use FDT names for the Cadence UART
+> > >   hw/net/cadence_gem: add FDT names as alias
+> > >   hw/arm/xlnx-zynq: use FDT names for the Cadence GEM
+> > >=20
+> > >  include/qom/object.h   |  3 +++
+> > >  hw/arm/xilinx_zynq.c   |  2 ++
+> > >  hw/arm/xlnx-zynqmp.c   |  4 ++--
+> > >  hw/char/cadence_uart.c |  7 +++++++
+> > >  hw/net/cadence_gem.c   |  6 ++++++
+> > >  hw/net/e1000.c         |  5 ++++-
+> > >  qom/object.c           | 18 ++++++++++++++++--
+> > >  7 files changed, 40 insertions(+), 5 deletions(-)
+> > >=20
+> > > --=20
+> > > 2.15.1
+> > >  =20
+> >=20
+>=20
+
+--=20
+Eduardo
