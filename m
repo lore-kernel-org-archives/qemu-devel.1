@@ -1,31 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51215)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51237)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eYNS8-0006YA-JV
-	for qemu-devel@nongnu.org; Sun, 07 Jan 2018 21:46:21 -0500
+	id 1eYNSB-0006aR-G1
+	for qemu-devel@nongnu.org; Sun, 07 Jan 2018 21:46:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eYNS5-0002GN-GT
-	for qemu-devel@nongnu.org; Sun, 07 Jan 2018 21:46:20 -0500
-Received: from mail-qt0-x241.google.com ([2607:f8b0:400d:c0d::241]:34501)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eYNS5-0002FZ-Ay
-	for qemu-devel@nongnu.org; Sun, 07 Jan 2018 21:46:17 -0500
-Received: by mail-qt0-x241.google.com with SMTP id 33so12078096qtv.1
-	for <qemu-devel@nongnu.org>; Sun, 07 Jan 2018 18:46:17 -0800 (PST)
+	id 1eYNSA-0002Ix-8l
+	for qemu-devel@nongnu.org; Sun, 07 Jan 2018 21:46:23 -0500
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Sun,  7 Jan 2018 23:45:32 -0300
-Message-Id: <20180108024558.17983-4-f4bug@amsat.org>
+Date: Sun,  7 Jan 2018 23:45:33 -0300
+Message-Id: <20180108024558.17983-5-f4bug@amsat.org>
 In-Reply-To: <20180108024558.17983-1-f4bug@amsat.org>
 References: <20180108024558.17983-1-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH 03/29] hw/isa: extract parallel-isa specific
- code
+Subject: [Qemu-devel] [PATCH 04/29] hw/dma/i8257: rename DMA_init() to
+ i8257_dma_init()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,246 +28,233 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Paolo Bonzini <pbonzini@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>, Aurelien Jarno <aurelien@aurel32.net>, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, Igor Mammedov <imammedo@redhat.com>, Richard Henderson <rth@twiddle.net>, Yongbok Kim <yongbok.kim@mips.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Artyom Tarasenko <atar4qemu@gmail.com>
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, Igor Mammedov <imammedo@redhat.com>, Richard Henderson <rth@twiddle.net>, Yongbok Kim <yongbok.kim@mips.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Artyom Tarasenko <atar4qemu@gmail.com>, "open list:PReP" <qemu-ppc@nongnu.org>
+
+- move the header from hw/isa/ to hw/dma/
+- remove the old i386/pc dependency
 
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- include/hw/char/parallel.h | 14 ++++++++++++++
- include/hw/i386/pc.h       |  8 --------
- hw/char/parallel-isa.c     | 29 +++++++++++++++++++++++++++++
- hw/char/parallel.c         |  2 +-
- hw/i386/pc.c               |  1 +
- hw/isa/isa-bus.c           | 26 --------------------------
- hw/mips/mips_fulong2e.c    |  1 +
- hw/mips/mips_jazz.c        |  1 +
- hw/mips/mips_malta.c       |  1 +
- hw/sparc64/sun4u.c         |  1 +
- MAINTAINERS                |  3 ++-
- hw/char/Makefile.objs      |  1 +
- 12 files changed, 52 insertions(+), 36 deletions(-)
- create mode 100644 include/hw/char/parallel.h
- create mode 100644 hw/char/parallel-isa.c
+ include/hw/{isa => dma}/i8257.h | 6 ++++++
+ include/hw/isa/isa.h            | 2 --
+ hw/dma/i82374.c                 | 3 ++-
+ hw/dma/i8257.c                  | 4 ++--
+ hw/i386/pc.c                    | 3 ++-
+ hw/mips/mips_fulong2e.c         | 3 ++-
+ hw/mips/mips_jazz.c             | 3 ++-
+ hw/mips/mips_malta.c            | 3 ++-
+ hw/sparc/sun4m.c                | 4 ----
+ hw/sparc64/sun4u.c              | 4 ----
+ MAINTAINERS                     | 2 +-
+ 11 files changed, 19 insertions(+), 18 deletions(-)
+ rename include/hw/{isa => dma}/i8257.h (86%)
 
-diff --git a/include/hw/char/parallel.h b/include/hw/char/parallel.h
-new file mode 100644
-index 0000000000..d6dd62fb9f
---- /dev/null
-+++ b/include/hw/char/parallel.h
-@@ -0,0 +1,14 @@
-+#ifndef HW_PARALLEL_H
-+#define HW_PARALLEL_H
-+
-+#include "exec/memory.h"
+diff --git a/include/hw/isa/i8257.h b/include/hw/dma/i8257.h
+similarity index 86%
+rename from include/hw/isa/i8257.h
+rename to include/hw/dma/i8257.h
+index 88a2766a3f..0041565177 100644
+--- a/include/hw/isa/i8257.h
++++ b/include/hw/dma/i8257.h
+@@ -1,6 +1,10 @@
+ #ifndef HW_I8257_H
+ #define HW_I8257_H
+ 
++#include "hw/hw.h"
 +#include "hw/isa/isa.h"
-+#include "chardev/char.h"
++#include "exec/ioport.h"
 +
-+void parallel_hds_isa_init(ISABus *bus, int n);
-+
-+bool parallel_mm_init(MemoryRegion *address_space,
-+                      hwaddr base, int it_shift, qemu_irq irq,
-+                      Chardev *chr);
-+
-+#endif
-diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
-index 780fa049d7..87a377011b 100644
---- a/include/hw/i386/pc.h
-+++ b/include/hw/i386/pc.h
-@@ -151,14 +151,6 @@ struct PCMachineClass {
- #define PC_MACHINE_CLASS(klass) \
-     OBJECT_CLASS_CHECK(PCMachineClass, (klass), TYPE_PC_MACHINE)
+ #define TYPE_I8257 "i8257"
  
--/* parallel.c */
--
--void parallel_hds_isa_init(ISABus *bus, int n);
--
--bool parallel_mm_init(MemoryRegion *address_space,
--                      hwaddr base, int it_shift, qemu_irq irq,
--                      Chardev *chr);
--
- /* i8259.c */
+ typedef struct I8257Regs {
+@@ -40,4 +44,6 @@ typedef struct I8257State {
+     PortioList portio_pageh;
+ } I8257State;
  
- extern DeviceState *isa_pic;
-diff --git a/hw/char/parallel-isa.c b/hw/char/parallel-isa.c
-new file mode 100644
-index 0000000000..906a55a07d
---- /dev/null
-+++ b/hw/char/parallel-isa.c
-@@ -0,0 +1,29 @@
-+#include "qemu/osdep.h"
-+#include "sysemu/sysemu.h"
-+#include "hw/isa/isa.h"
-+#include "hw/char/parallel.h"
++void i8257_dma_init(ISABus *bus, int high_page_enable);
 +
-+static void parallel_init(ISABus *bus, int index, Chardev *chr)
-+{
-+    DeviceState *dev;
-+    ISADevice *isadev;
-+
-+    isadev = isa_create(bus, "isa-parallel");
-+    dev = DEVICE(isadev);
-+    qdev_prop_set_uint32(dev, "index", index);
-+    qdev_prop_set_chr(dev, "chardev", chr);
-+    qdev_init_nofail(dev);
-+}
-+
-+void parallel_hds_isa_init(ISABus *bus, int n)
-+{
-+    int i;
-+
-+    assert(n <= MAX_PARALLEL_PORTS);
-+
-+    for (i = 0; i < n; i++) {
-+        if (parallel_hds[i]) {
-+            parallel_init(bus, i, parallel_hds[i]);
-+        }
-+    }
-+}
-diff --git a/hw/char/parallel.c b/hw/char/parallel.c
-index f79dc76543..1542d62201 100644
---- a/hw/char/parallel.c
-+++ b/hw/char/parallel.c
-@@ -28,7 +28,7 @@
- #include "chardev/char-parallel.h"
- #include "chardev/char-fe.h"
- #include "hw/isa/isa.h"
--#include "hw/i386/pc.h"
-+#include "hw/char/parallel.h"
- #include "sysemu/sysemu.h"
- 
- //#define DEBUG_PARALLEL
-diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-index 3fcf318a95..6d3b2a8d1c 100644
---- a/hw/i386/pc.c
-+++ b/hw/i386/pc.c
-@@ -25,6 +25,7 @@
- #include "hw/hw.h"
- #include "hw/i386/pc.h"
- #include "hw/char/serial.h"
-+#include "hw/char/parallel.h"
- #include "hw/i386/apic.h"
- #include "hw/i386/topology.h"
- #include "sysemu/cpus.h"
-diff --git a/hw/isa/isa-bus.c b/hw/isa/isa-bus.c
-index 348e0eab9d..0f732b5b58 100644
---- a/hw/isa/isa-bus.c
-+++ b/hw/isa/isa-bus.c
-@@ -23,7 +23,6 @@
- #include "hw/sysbus.h"
- #include "sysemu/sysemu.h"
- #include "hw/isa/isa.h"
--#include "hw/i386/pc.h"
- 
- static ISABus *isabus;
- 
-@@ -287,28 +286,3 @@ MemoryRegion *isa_address_space_io(ISADevice *dev)
+ #endif
+diff --git a/include/hw/isa/isa.h b/include/hw/isa/isa.h
+index 95593408ef..b9dbab24b4 100644
+--- a/include/hw/isa/isa.h
++++ b/include/hw/isa/isa.h
+@@ -151,6 +151,4 @@ static inline ISABus *isa_bus_from_device(ISADevice *d)
+     return ISA_BUS(qdev_get_parent_bus(DEVICE(d)));
  }
  
- type_init(isabus_register_types)
--
--static void parallel_init(ISABus *bus, int index, Chardev *chr)
--{
--    DeviceState *dev;
--    ISADevice *isadev;
--
--    isadev = isa_create(bus, "isa-parallel");
--    dev = DEVICE(isadev);
--    qdev_prop_set_uint32(dev, "index", index);
--    qdev_prop_set_chr(dev, "chardev", chr);
--    qdev_init_nofail(dev);
--}
--
--void parallel_hds_isa_init(ISABus *bus, int n)
--{
--    int i;
--
--    assert(n <= MAX_PARALLEL_PORTS);
--
--    for (i = 0; i < n; i++) {
--        if (parallel_hds[i]) {
--            parallel_init(bus, i, parallel_hds[i]);
--        }
--    }
--}
+-/* i8257.c */
+-void DMA_init(ISABus *bus, int high_page_enable);
+ #endif
+diff --git a/hw/dma/i82374.c b/hw/dma/i82374.c
+index 6c0f975df0..0b8a6f4a80 100644
+--- a/hw/dma/i82374.c
++++ b/hw/dma/i82374.c
+@@ -24,6 +24,7 @@
+ 
+ #include "qemu/osdep.h"
+ #include "hw/isa/isa.h"
++#include "hw/dma/i8257.h"
+ 
+ #define TYPE_I82374 "i82374"
+ #define I82374(obj) OBJECT_CHECK(I82374State, (obj), TYPE_I82374)
+@@ -123,7 +124,7 @@ static void i82374_realize(DeviceState *dev, Error **errp)
+     portio_list_add(&s->port_list, isa_address_space_io(&s->parent_obj),
+                     s->iobase);
+ 
+-    DMA_init(isa_bus_from_device(ISA_DEVICE(dev)), 1);
++    i8257_dma_init(isa_bus_from_device(ISA_DEVICE(dev)), 1);
+     memset(s->commands, 0, sizeof(s->commands));
+ }
+ 
+diff --git a/hw/dma/i8257.c b/hw/dma/i8257.c
+index bd23e893bf..07bfbdb618 100644
+--- a/hw/dma/i8257.c
++++ b/hw/dma/i8257.c
+@@ -24,7 +24,7 @@
+ #include "qemu/osdep.h"
+ #include "hw/hw.h"
+ #include "hw/isa/isa.h"
+-#include "hw/isa/i8257.h"
++#include "hw/dma/i8257.h"
+ #include "qemu/main-loop.h"
+ #include "trace.h"
+ 
+@@ -622,7 +622,7 @@ static void i8257_register_types(void)
+ 
+ type_init(i8257_register_types)
+ 
+-void DMA_init(ISABus *bus, int high_page_enable)
++void i8257_dma_init(ISABus *bus, int high_page_enable)
+ {
+     ISADevice *isa1, *isa2;
+     DeviceState *d;
+diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+index 6d3b2a8d1c..e39af3d48c 100644
+--- a/hw/i386/pc.c
++++ b/hw/i386/pc.c
+@@ -40,6 +40,7 @@
+ #include "elf.h"
+ #include "multiboot.h"
+ #include "hw/timer/mc146818rtc.h"
++#include "hw/dma/i8257.h"
+ #include "hw/timer/i8254.h"
+ #include "hw/audio/pcspk.h"
+ #include "hw/pci/msi.h"
+@@ -1605,7 +1606,7 @@ void pc_basic_device_init(ISABus *isa_bus, qemu_irq *gsi,
+     port92_init(port92, a20_line[1]);
+     g_free(a20_line);
+ 
+-    DMA_init(isa_bus, 0);
++    i8257_dma_init(isa_bus, 0);
+ 
+     for(i = 0; i < MAX_FD; i++) {
+         fd[i] = drive_get(IF_FLOPPY, 0, i);
 diff --git a/hw/mips/mips_fulong2e.c b/hw/mips/mips_fulong2e.c
-index 725e25a134..d3c3a6ab61 100644
+index d3c3a6ab61..cbe159034d 100644
 --- a/hw/mips/mips_fulong2e.c
 +++ b/hw/mips/mips_fulong2e.c
-@@ -23,6 +23,7 @@
+@@ -22,6 +22,7 @@
+ #include "qapi/error.h"
  #include "hw/hw.h"
  #include "hw/i386/pc.h"
++#include "hw/dma/i8257.h"
  #include "hw/char/serial.h"
-+#include "hw/char/parallel.h"
+ #include "hw/char/parallel.h"
  #include "hw/block/fdc.h"
- #include "net/net.h"
- #include "hw/boards.h"
+@@ -361,7 +362,7 @@ static void mips_fulong2e_init(MachineState *machine)
+ 
+     /* init other devices */
+     pit = i8254_pit_init(isa_bus, 0x40, 0, NULL);
+-    DMA_init(isa_bus, 0);
++    i8257_dma_init(isa_bus, 0);
+ 
+     /* Super I/O */
+     isa_create_simple(isa_bus, "i8042");
 diff --git a/hw/mips/mips_jazz.c b/hw/mips/mips_jazz.c
-index 0d2c0683ba..afb33beffd 100644
+index afb33beffd..6ed4b83f40 100644
 --- a/hw/mips/mips_jazz.c
 +++ b/hw/mips/mips_jazz.c
-@@ -28,6 +28,7 @@
+@@ -27,6 +27,7 @@
+ #include "hw/mips/mips.h"
  #include "hw/mips/cpudevs.h"
  #include "hw/i386/pc.h"
++#include "hw/dma/i8257.h"
  #include "hw/char/serial.h"
-+#include "hw/char/parallel.h"
+ #include "hw/char/parallel.h"
  #include "hw/isa/isa.h"
- #include "hw/block/fdc.h"
- #include "sysemu/sysemu.h"
+@@ -219,7 +220,7 @@ static void mips_jazz_init(MachineState *machine,
+     /* ISA devices */
+     i8259 = i8259_init(isa_bus, env->irq[4]);
+     isa_bus_irqs(isa_bus, i8259);
+-    DMA_init(isa_bus, 0);
++    i8257_dma_init(isa_bus, 0);
+     pit = i8254_pit_init(isa_bus, 0x40, 0, NULL);
+     pcspk_init(isa_bus, pit);
+ 
 diff --git a/hw/mips/mips_malta.c b/hw/mips/mips_malta.c
-index 37f19428d6..95d22288f4 100644
+index 95d22288f4..0a9e3dedf4 100644
 --- a/hw/mips/mips_malta.c
 +++ b/hw/mips/mips_malta.c
-@@ -28,6 +28,7 @@
+@@ -27,6 +27,7 @@
+ #include "cpu.h"
  #include "hw/hw.h"
  #include "hw/i386/pc.h"
++#include "hw/dma/i8257.h"
  #include "hw/char/serial.h"
-+#include "hw/char/parallel.h"
+ #include "hw/char/parallel.h"
  #include "hw/block/fdc.h"
- #include "net/net.h"
- #include "hw/boards.h"
+@@ -1210,7 +1211,7 @@ void mips_malta_init(MachineState *machine)
+     smbus_eeprom_init(smbus, 8, smbus_eeprom_buf, smbus_eeprom_size);
+     g_free(smbus_eeprom_buf);
+     pit = i8254_pit_init(isa_bus, 0x40, 0, NULL);
+-    DMA_init(isa_bus, 0);
++    i8257_dma_init(isa_bus, 0);
+ 
+     /* Super I/O */
+     isa_create_simple(isa_bus, "i8042");
+diff --git a/hw/sparc/sun4m.c b/hw/sparc/sun4m.c
+index e71648404c..2ed28c4d25 100644
+--- a/hw/sparc/sun4m.c
++++ b/hw/sparc/sun4m.c
+@@ -99,10 +99,6 @@ struct sun4m_hwdef {
+     uint8_t nvram_machine_id;
+ };
+ 
+-void DMA_init(ISABus *bus, int high_page_enable)
+-{
+-}
+-
+ static void fw_cfg_boot_set(void *opaque, const char *boot_device,
+                             Error **errp)
+ {
 diff --git a/hw/sparc64/sun4u.c b/hw/sparc64/sun4u.c
-index 1672f256e7..8bbc210fc8 100644
+index 8bbc210fc8..135f8088ca 100644
 --- a/hw/sparc64/sun4u.c
 +++ b/hw/sparc64/sun4u.c
-@@ -31,6 +31,7 @@
- #include "hw/pci-host/apb.h"
- #include "hw/i386/pc.h"
- #include "hw/char/serial.h"
-+#include "hw/char/parallel.h"
- #include "hw/timer/m48t59.h"
- #include "hw/block/fdc.h"
- #include "net/net.h"
+@@ -87,10 +87,6 @@ typedef struct EbusState {
+     MemoryRegion bar1;
+ } EbusState;
+ 
+-void DMA_init(ISABus *bus, int high_page_enable)
+-{
+-}
+-
+ static void fw_cfg_boot_set(void *opaque, const char *boot_device,
+                             Error **errp)
+ {
 diff --git a/MAINTAINERS b/MAINTAINERS
-index 73a5555735..f11c0386e9 100644
+index f11c0386e9..89810df375 100644
 --- a/MAINTAINERS
 +++ b/MAINTAINERS
-@@ -867,7 +867,7 @@ M: Michael S. Tsirkin <mst@redhat.com>
- M: Paolo Bonzini <pbonzini@redhat.com>
- S: Supported
- F: hw/char/debugcon.c
--F: hw/char/parallel.c
-+F: hw/char/parallel*
- F: hw/char/serial*
- F: hw/dma/i8257*
- F: hw/i2c/pm_smbus.c
-@@ -882,6 +882,7 @@ F: hw/timer/i8254*
- F: hw/timer/mc146818rtc*
+@@ -883,8 +883,8 @@ F: hw/timer/mc146818rtc*
  F: hw/watchdog/wdt_ib700.c
  F: include/hw/display/vga.h
-+F: include/hw/char/parallel.h
+ F: include/hw/char/parallel.h
++F: include/hw/dma/i8257.h
  F: include/hw/i2c/pm_smbus.h
- F: include/hw/isa/i8257.h
+-F: include/hw/isa/i8257.h
  F: include/hw/timer/hpet.h
-diff --git a/hw/char/Makefile.objs b/hw/char/Makefile.objs
-index 1bcd37e98d..1b979100b7 100644
---- a/hw/char/Makefile.objs
-+++ b/hw/char/Makefile.objs
-@@ -1,6 +1,7 @@
- common-obj-$(CONFIG_IPACK) += ipoctal232.o
- common-obj-$(CONFIG_ESCC) += escc.o
- common-obj-$(CONFIG_PARALLEL) += parallel.o
-+common-obj-$(CONFIG_PARALLEL) += parallel-isa.o
- common-obj-$(CONFIG_PL011) += pl011.o
- common-obj-$(CONFIG_SERIAL) += serial.o
- common-obj-$(CONFIG_SERIAL_ISA) += serial-isa.o
+ F: include/hw/timer/i8254*
+ F: include/hw/timer/mc146818rtc*
 -- 
 2.15.1
