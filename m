@@ -1,23 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40867)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45009)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1eYd90-0006zF-KL
-	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 14:31:39 -0500
+	(envelope-from <no-reply@patchew.org>) id 1eYdIq-00013z-PH
+	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 14:41:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1eYd8x-0006qR-FA
-	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 14:31:38 -0500
-Received: from chuckie.co.uk ([82.165.15.123]:56165
-	helo=s16892447.onlinehome-server.info)
+	(envelope-from <no-reply@patchew.org>) id 1eYdIn-0005LB-Iv
+	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 14:41:48 -0500
+Resent-Message-Id: <E1eYdIn-0005LB-Iv@eggs.gnu.org>
+Received: from sender-of-o52.zoho.com ([135.84.80.217]:21427)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
-	id 1eYd8x-0006q3-7w
-	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 14:31:35 -0500
-Date: Mon, 8 Jan 2018 19:31:24 +0000
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Message-ID: <20180108193124.mjei33w5wopmadmk@kentang.home>
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1eYdIn-00059d-CP
+	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 14:41:45 -0500
+In-Reply-To: <20180108172904.8772-1-f4bug@amsat.org>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <151544045999.381.17094285892829948142@5adcb62bf0d6>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Subject: [Qemu-devel] [PULL] qemu-sparc updates
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Mon, 8 Jan 2018 11:41:01 -0800 (PST)
+Subject: Re: [Qemu-devel] [PATCH 00/12] add HOST_SUPPORTS_UNALIGNED_ACCESS,
+ reduce slirp warnings
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,90 +29,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, peter.maydell@linaro.org
+To: f4bug@amsat.org
+Cc: famz@redhat.com, samuel.thibault@ens-lyon.org, jan.kiszka@siemens.com, mst@redhat.com, pbonzini@redhat.com, eblake@redhat.com, thuth@redhat.com, peter.maydell@linaro.org, qemu-devel@nongnu.org
 
-Hi Peter,
-
-Here is the first set of SPARC updates for 2.12. Please pull.
-
-
-ATB,
-
-Mark. 
-
-
-The following changes since commit 4124ea4f5bd367ca6412fb2dfe7ac4d80e1504d9:
-
-  Merge remote-tracking branch 'remotes/rth/tags/pull-tcg-20171229' into staging (2018-01-08 16:17:04 +0000)
-
-are available in the git repository at:
-
-  https://github.com/mcayland/qemu.git tags/qemu-sparc-signed
-
-for you to fetch changes up to 6a52624720e5abc6a1f067a7e7b8239b428e0c95:
-
-  sun4u_iommu: add trace event for IOMMU translations (2018-01-08 19:07:55 +0000)
-
-----------------------------------------------------------------
-qemu-sparc update
-
-----------------------------------------------------------------
-Jean-Christophe Dubois (1):
-      target/sparc: remove MemoryRegionSection check code from sparc_cpu_get_phys_page_debug()
-
-Mark Cave-Ayland (24):
-      apb: move QOM macros and typedefs from apb.c to apb.h
-      sun4u: ebus QOMify tidy-up
-      sun4u: move ISABus inside of EBusState
-      sun4u: remove pci_ebus_init() function
-      sun4u: move initialisation of all ISABus devices into ebus_realize()
-      apb: APB QOMify tidy-up
-      apb: return APBState from pci_apb_init() rather than PCIBus
-      apb: use gpios to wire up the apb device to the SPARC CPU IRQs
-      apb: move the two secondary PCI bridges objects into APBState
-      apb: remove pci_apb_init() and instantiate APB device using qdev
-      apb: split pci_pbm_map_irq() into separate functions for bus A and bus B
-      apb: remove busA property from PBMPCIBridge state
-      ebus: wire up OBIO interrupts to APB pbm via qdev GPIOs
-      apb: replace OBIO interrupt numbers in pci_pbmA_map_irq() with constants
-      sparc64: introduce trace-events for hw/sparc64
-      sun4u: switch from EBUS_DPRINTF() macro to trace-events
-      sun4m: move sun4m_iommu.c from hw/dma to hw/sparc
-      sun4m: move IOMMU declarations from sun4m.h to sun4m_iommu.h
-      sun4m: remove include/hw/sparc/sun4m.h and all references to it
-      apb: QOMify IOMMU
-      sun4u: split IOMMU device out from apb.c to sun4u_iommu.c
-      sun4u_iommu: update to reflect IOMMU is no longer part of the APB device
-      sun4u_iommu: convert from IOMMU_DPRINTF to trace-events
-      sun4u_iommu: add trace event for IOMMU translations
-
- Makefile.objs                   |   1 +
- hw/dma/Makefile.objs            |   1 -
- hw/dma/sparc32_dma.c            |   2 +-
- hw/dma/trace-events             |  10 -
- hw/intc/slavio_intctl.c         |   1 -
- hw/net/lance.c                  |   2 +-
- hw/pci-host/apb.c               | 545 ++++++++--------------------------------
- hw/sparc/Makefile.objs          |   2 +-
- hw/sparc/sun4m.c                |   2 +-
- hw/{dma => sparc}/sun4m_iommu.c |  13 +-
- hw/sparc/trace-events           |  10 +
- hw/sparc64/Makefile.objs        |   1 +
- hw/sparc64/sparc64.c            |   2 +
- hw/sparc64/sun4u.c              | 193 ++++++++------
- hw/sparc64/sun4u_iommu.c        | 342 +++++++++++++++++++++++++
- hw/sparc64/trace-events         |   9 +
- hw/timer/slavio_timer.c         |   1 -
- include/hw/pci-host/apb.h       |  54 +++-
- include/hw/sparc/sparc64.h      |   2 +
- include/hw/sparc/sun4m.h        |  35 ---
- include/hw/sparc/sun4m_iommu.h  |  51 ++++
- include/hw/sparc/sun4u_iommu.h  |  50 ++++
- target/sparc/mmu_helper.c       |   6 -
- 23 files changed, 744 insertions(+), 591 deletions(-)
- rename hw/{dma => sparc}/sun4m_iommu.c (98%)
- create mode 100644 hw/sparc64/sun4u_iommu.c
- create mode 100644 hw/sparc64/trace-events
- delete mode 100644 include/hw/sparc/sun4m.h
- create mode 100644 include/hw/sparc/sun4m_iommu.h
- create mode 100644 include/hw/sparc/sun4u_iommu.h
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IDIwMTgwMTA4MTcyOTA0Ljg3NzItMS1mNGJ1Z0BhbXNhdC5vcmcKU3ViamVjdDog
+W1FlbXUtZGV2ZWxdIFtQQVRDSCAwMC8xMl0gYWRkIEhPU1RfU1VQUE9SVFNfVU5BTElHTkVEX0FD
+Q0VTUywgcmVkdWNlIHNsaXJwIHdhcm5pbmdzCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMh
+L2Jpbi9iYXNoCgpCQVNFPWJhc2UKbj0xCnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJBU0Uu
+LiB8IHdjIC1sKQpmYWlsZWQ9MAoKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQg
+MApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKCmNvbW1pdHM9IiQoZ2l0IGxv
+ZyAtLWZvcm1hdD0lSCAtLXJldmVyc2UgJEJBU0UuLikiCmZvciBjIGluICRjb21taXRzOyBkbwog
+ICAgZWNobyAiQ2hlY2tpbmcgUEFUQ0ggJG4vJHRvdGFsOiAkKGdpdCBsb2cgLW4gMSAtLWZvcm1h
+dD0lcyAkYykuLi4iCiAgICBpZiAhIGdpdCBzaG93ICRjIC0tZm9ybWF0PWVtYWlsIHwgLi9zY3Jp
+cHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayAtOyB0aGVuCiAgICAgICAgZmFpbGVkPTEKICAg
+ICAgICBlY2hvCiAgICBmaQogICAgbj0kKChuKzEpKQpkb25lCgpleGl0ICRmYWlsZWQKPT09IFRF
+U1QgU0NSSVBUIEVORCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0
+YmQ4ODg3MTMzODQKU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0Jwo1ZDk5NmM2ZmY5IHNs
+aXJwOiB1c2UgSE9TVF9TVVBQT1JUU19VTkFMSUdORURfQUNDRVNTCjE0YTNkNDUwYjggY29uZmln
+dXJlOiBhZGQgSE9TVF9TVVBQT1JUU19VTkFMSUdORURfQUNDRVNTCjczYzExZGExMjUgY29uZmln
+dXJlOiBkaXNhYmxlIHVuYWxpZ25lZCBhY2Nlc3Mgd2FybmluZyBvbiB4ODYgYXJjaAo0ZTVlMzE4
+ZDE2IHNsaXJwOiBhZGQgaW42X2RoY3BfbXVsdGljYXN0KCkKNGNkNzI5M2QxOSBzbGlycDogcmVt
+b3ZlZCB1bnVzZWQgY29kZQoyZTMyNDQxMjliIHNsaXJwOiByZW1vdmUgdW5uZWNlc3NhcnkKMTgw
+MzkxNDk1OCBzbGlycDogcmVtb3ZlIHVudXNlZCBoZWFkZXIKMzgxYjAyNzkzMyBzbGlycDogcG9p
+c29uIElONl8qX0FERFJfKigpIG1hY3JvcyB0byBhdm9pZCB0aGVtCjVmN2JlZTljODQgc2xpcnA6
+IGFkZCBpbjZfbXVsdGljYXN0KCkgYW5kIHVzZSBpdCBpbnN0ZWFkIG9mIElONl9JU19BRERSX01V
+TFRJQ0FTVCgpCjczM2MwZDJmOTIgc2xpcnA6IGF2b2lkIElONl9JU19BRERSX1VOU1BFQ0lGSUVE
+KCksIHJhdGhlciB1c2UgaW42X3plcm8oKQphY2NkMGFjZWYwIHNsaXJwOiBzdHJ1Y3QgaWNtcC9l
+dGhoZHIgQVJFIHBhY2tlZAoyMzYwNTEwYjJiIHNsaXJwOiByZW1vdmUgUUVNVV9QQUNLRUQgZnJv
+bSBzdHJ1Y3R1cmVzIHdpdGggZG9uJ3QgcmVxdWlyZSBpdAoKPT09IE9VVFBVVCBCRUdJTiA9PT0K
+Q2hlY2tpbmcgUEFUQ0ggMS8xMjogc2xpcnA6IHJlbW92ZSBRRU1VX1BBQ0tFRCBmcm9tIHN0cnVj
+dHVyZXMgd2l0aCBkb24ndCByZXF1aXJlIGl0Li4uCkNoZWNraW5nIFBBVENIIDIvMTI6IHNsaXJw
+OiBzdHJ1Y3QgaWNtcC9ldGhoZHIgQVJFIHBhY2tlZC4uLgpDaGVja2luZyBQQVRDSCAzLzEyOiBz
+bGlycDogYXZvaWQgSU42X0lTX0FERFJfVU5TUEVDSUZJRUQoKSwgcmF0aGVyIHVzZSBpbjZfemVy
+bygpLi4uCkNoZWNraW5nIFBBVENIIDQvMTI6IHNsaXJwOiBhZGQgaW42X211bHRpY2FzdCgpIGFu
+ZCB1c2UgaXQgaW5zdGVhZCBvZiBJTjZfSVNfQUREUl9NVUxUSUNBU1QoKS4uLgpDaGVja2luZyBQ
+QVRDSCA1LzEyOiBzbGlycDogcG9pc29uIElONl8qX0FERFJfKigpIG1hY3JvcyB0byBhdm9pZCB0
+aGVtLi4uCldBUk5JTkc6IGFyY2hpdGVjdHVyZSBzcGVjaWZpYyBkZWZpbmVzIHNob3VsZCBiZSBh
+dm9pZGVkCiMyMDogRklMRTogc2xpcnAvaXA2Lmg6MTE6CisjaWZkZWYgX19HTlVDX18KCnRvdGFs
+OiAwIGVycm9ycywgMSB3YXJuaW5ncywgMjUgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMg
+c3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFy
+ZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVD
+S1BBVENIIGluIE1BSU5UQUlORVJTLgpDaGVja2luZyBQQVRDSCA2LzEyOiBzbGlycDogcmVtb3Zl
+IHVudXNlZCBoZWFkZXIuLi4KQ2hlY2tpbmcgUEFUQ0ggNy8xMjogc2xpcnA6IHJlbW92ZSB1bm5l
+Y2Vzc2FyeS4uLgpDaGVja2luZyBQQVRDSCA4LzEyOiBzbGlycDogcmVtb3ZlZCB1bnVzZWQgY29k
+ZS4uLgpDaGVja2luZyBQQVRDSCA5LzEyOiBzbGlycDogYWRkIGluNl9kaGNwX211bHRpY2FzdCgp
+Li4uCkNoZWNraW5nIFBBVENIIDEwLzEyOiBjb25maWd1cmU6IGRpc2FibGUgdW5hbGlnbmVkIGFj
+Y2VzcyB3YXJuaW5nIG9uIHg4NiBhcmNoLi4uCkNoZWNraW5nIFBBVENIIDExLzEyOiBjb25maWd1
+cmU6IGFkZCBIT1NUX1NVUFBPUlRTX1VOQUxJR05FRF9BQ0NFU1MuLi4KQ2hlY2tpbmcgUEFUQ0gg
+MTIvMTI6IHNsaXJwOiB1c2UgSE9TVF9TVVBQT1JUU19VTkFMSUdORURfQUNDRVNTLi4uCkVSUk9S
+OiByZXR1cm4gaXMgbm90IGEgZnVuY3Rpb24sIHBhcmVudGhlc2VzIGFyZSBub3QgcmVxdWlyZWQK
+IzU5OiBGSUxFOiBzbGlycC9pcDYuaDo5ODoKKyAgICByZXR1cm4gKGFhW3ByZWZpeF9sZW4gLyA4
+XSA+PiAoOCAtIChwcmVmaXhfbGVuICUgOCkpKQoKRVJST1I6IHJldHVybiBpcyBub3QgYSBmdW5j
+dGlvbiwgcGFyZW50aGVzZXMgYXJlIG5vdCByZXF1aXJlZAojOTA6IEZJTEU6IHNsaXJwL2lwNi5o
+OjEzOToKKyAgICByZXR1cm4gKGFhW3ByZWZpeF9sZW4gLyA4XSAmICgoMVUgPDwgKDggLSAocHJl
+Zml4X2xlbiAlIDgpKSkgLSAxKSkKCnRvdGFsOiAyIGVycm9ycywgMCB3YXJuaW5ncywgOTIgbGlu
+ZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcu
+ICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0g
+dG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKPT09IE9V
+VFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKCi0tLQpFbWFp
+bCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcv
+XS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQGZyZWVsaXN0cy5v
+cmc=
