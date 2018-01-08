@@ -1,34 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53033)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54295)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eYarl-0005Mz-0f
-	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 12:05:42 -0500
+	(envelope-from <nirsof@gmail.com>) id 1eYauB-0007ae-0J
+	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 12:08:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eYarg-0007pV-TD
-	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 12:05:41 -0500
-Received: from indium.canonical.com ([91.189.90.7]:55242)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1eYarg-0007pA-Mu
-	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 12:05:36 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1eYarf-0004Q9-3t
-	for <qemu-devel@nongnu.org>; Mon, 08 Jan 2018 17:05:35 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 1C6672E80C0
-	for <qemu-devel@nongnu.org>; Mon,  8 Jan 2018 17:05:35 +0000 (UTC)
+	(envelope-from <nirsof@gmail.com>) id 1eYau6-0000rr-HU
+	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 12:08:10 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 08 Jan 2018 16:57:01 -0000
-From: Peter Maydell <peter.maydell@linaro.org>
-Reply-To: Bug 1739378 <1739378@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <151375741208.25451.9053884797959645588.malonedeb@wampee.canonical.com>
-Message-Id: <151543062236.32165.313662106683843191.launchpad@wampee.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1739378] Re: migration state save/load of sdcard
- device is broken
+References: <20180105065538.13375-1-famz@redhat.com>
+	<20180108144136.GF8052@localhost.localdomain>
+In-Reply-To: <20180108144136.GF8052@localhost.localdomain>
+From: Nir Soffer <nirsof@gmail.com>
+Date: Mon, 08 Jan 2018 17:07:54 +0000
+Message-ID: <CAMr-obsaegU2HDaH3EFoD+2EYUnPKuqsvQPk4GZ7hTdqXmpoWA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 0/2] qemu-img: Let "info" warn
+ and go ahead without -U
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,83 +23,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Ala Hino <ahino@redhat.com>
 
-** Summary changed:
+On Mon, Jan 8, 2018 at 4:48 PM Kevin Wolf <kwolf@redhat.com> wrote:
 
-- qemu git master snapshot doesn't work
-+ migration state save/load of sdcard device is broken
+> Am 05.01.2018 um 07:55 hat Fam Zheng geschrieben:
+> > Management and users are accustomed to "qemu-img info" to query status of
+> > images even when they are used by guests. Since image locking was added,
+> the -U
+> > (--force-share) option is needed for that to work. The reason has been
+> that due
+> > to possible race with image header update, the output can be misleading.
+> >
+> > But what are likely to happen after we emit the error are that, for
+> interactive
+> > users, '-U' will be used and the command retried; for management (nova,
+> RHV,
+> > etc.), the operation is broken with no knob to workaround this.
+> >
+> > This series changes that error to a warning so that it doesn't get in
+> the way.
+>
+> Are management tools actually doing this? There is no good reason to
+> call 'qemu-img info' for an image that is in use by a VM.
+>
 
--- =
+Yes, ovirt/RHV is using this to get the qcow2 compat of an image since 4.1.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1739378
+We asked about this here and in private mail, and there was an agreement
+that
+using qemu-img info on an image is safe for this purpose. We know that
+accessing
+image header when a guest is using is may be racy, but we control both the
+guest
+and the image. Nobody is modifying the image properties behind our back.
 
-Title:
-  migration state save/load of sdcard device is broken
+In 4.2 we will use the new flags[1], but  we cannot fix released code.
+Introducing
+this locking in qemu-img info will break existing installations.
 
-Status in QEMU:
-  New
 
-Bug description:
-  I'm having different issues trying to have QEMU snapshots working
-  using qemu-system-arm with vexpress-a15 board.
+> If no, NACK. Automatically disabling locking because it can be
+> inconvenient defeats the purpose of locking.
+>
+> If yes, clearly indicate that this usage is deprecated and we'll turn
+> this into an error again with 2.13. Then management tools can be fixed
+> in time.
 
-  In this opportunity, I'm trying the git master head version:
-  # git rev-parse HEAD
-  af352675efb7e92a1f5f6461a042a12015ab3d12
 
-  $ /usr/local/bin/qemu-system-arm -kernel kernel/vmlinuz-4.10.0-42-generic=
- -initrd kernel/initrd.img-4.10.0-42-generic -M vexpress-a15 -m 2048 -appen=
-d 'root=3D/dev/mmcblk0 rootwait console=3Dtty0' -sd vexpress-4G.qcow2 -dtb =
-device-tree/vexpress-v2p-ca15-tc1.dtb
-  audio: Could not init `oss' audio driver
+This will work for us in general, but I'm not sure that when 2.13 will be
+released,
+no user will run code assuming the previous behavior. It will be best to
+wait with
+incompatible changes like this to next major version.
 
-  Later on, when the machine finishes booting I savevm ss and quit.
-  However, when I try to restore it, I have that Missing section footer
-  error:
+[1] https://gerrit.ovirt.org/85874/
 
-  $ /usr/local/bin/qemu-system-arm -kernel kernel/vmlinuz-4.10.0-42-generic=
- -initrd kernel/initrd.img-4.10.0-42-generic -M vexpress-a15 -m 2048 -appen=
-d 'root=3D/dev/mmcblk0 rootwait console=3Dtty0' -sd vexpress-4G.qcow2 -dtb =
-device-tree/vexpress-v2p-ca15-tc1.dtb  -loadvm ss
-  audio: Could not init `oss' audio driver
-  qemu-system-arm: Missing section footer for sd-card
-  qemu-system-arm: Error -22 while loading VM state
-
-  OS: Ubuntu 16.04.3 LTS (xenial)
-
-  $ gcc --version
-  gcc (Ubuntu 5.4.0-6ubuntu1~16.04.5) 5.4.0 20160609
-
-  How have I built it?
-  # git clone git://git.qemu.org/qemu.git
-  # cd qemu
-  # git submodule update --init --checkout
-  # make clean && ./configure --target-list=3Darm-softmmu && make -j8
-  # sudo make install
-
-  I've also tried a different ./configure line, explicitly enabling some
-  of the features, i.e. smartcard, with the same results:
-
-  ./configure '--disable-user' '--enable-system' '--enable-linux-user'
-  '--enable-modules' '--enable-linux-aio' '--audio-drv-list=3Dpa'
-  '--enable-attr' '--enable-brlapi' '--enable-virtfs' '--enable-cap-ng'
-  '--enable-curl' '--enable-fdt' '--enable-gnutls' '--disable-gtk'
-  '--disable-vte' '--enable-libiscsi' '--enable-curses' '--enable-
-  smartcard' '--enable-rbd' '--enable-vnc-sasl' '--enable-seccomp'
-  '--enable-spice' '--enable-libusb' '--enable-usb-redir' '--enable-
-  xfsctl' '--enable-vnc' '--enable-vnc-jpeg' '--enable-vnc-png'
-  '--enable-kvm' '--enable-vhost-net'
-
-  As a reference, and just in case these may be in some way related,
-  I've just submitted another ticket for a different issue with
-  snapshots using Ubuntu Qemu version
-  (https://bugs.launchpad.net/qemu/+bug/1739371)
-
-  Cheers,
-  Gus
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1739378/+subscriptions
+Nir
