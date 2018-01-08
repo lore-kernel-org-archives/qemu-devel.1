@@ -1,27 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38571)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41954)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcel@redhat.com>) id 1eYqqN-0001am-EJ
-	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 05:09:20 -0500
+	(envelope-from <luwei.kang@intel.com>) id 1eYr1x-0004hi-Ut
+	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 05:21:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcel@redhat.com>) id 1eYqqJ-0006Or-FW
-	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 05:09:19 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:54178)
+	(envelope-from <luwei.kang@intel.com>) id 1eYr1u-0004jn-Pf
+	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 05:21:17 -0500
+Received: from mga05.intel.com ([192.55.52.43]:39308)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <marcel@redhat.com>) id 1eYqqJ-0006OX-8p
-	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 05:09:15 -0500
-References: <20180107123224.100877-1-marcel@redhat.com>
-	<20180107123224.100877-4-marcel@redhat.com>
-	<20180109101748.4cfeda03.cohuck@redhat.com>
-From: Marcel Apfelbaum <marcel@redhat.com>
-Message-ID: <1dc8f8d8-141a-5e75-4650-545f98dcfbef@redhat.com>
-Date: Tue, 9 Jan 2018 12:09:14 +0200
-MIME-Version: 1.0
-In-Reply-To: <20180109101748.4cfeda03.cohuck@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH V6 3/5] docs: add pvrdma device
- documentation.
+	(Exim 4.71) (envelope-from <luwei.kang@intel.com>)
+	id 1eYr1u-0004ht-GE
+	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 05:21:14 -0500
+From: Luwei Kang <luwei.kang@intel.com>
+Date: Tue,  9 Jan 2018 04:36:36 +0800
+Message-Id: <1515443797-10837-1-git-send-email-luwei.kang@intel.com>
+Subject: [Qemu-devel] [PATCH RESEND v1 1/2] i386: Add Intel Processor Trace
+ feature support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,41 +23,103 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: qemu-devel@nongnu.org, ehabkost@redhat.com, imammedo@redhat.com, yuval.shaia@oracle.com, pbonzini@redhat.com, mst@redhat.com, borntraeger@de.ibm.com
+To: qemu-devel@nongnu.org, kvm@vger.kernel.org
+Cc: pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com, mtosatti@redhat.com, Chao Peng <chao.p.peng@linux.intel.com>, Luwei Kang <luwei.kang@intel.com>
 
-On 09/01/2018 11:17, Cornelia Huck wrote:
-> On Sun,  7 Jan 2018 14:32:22 +0200
-> Marcel Apfelbaum <marcel@redhat.com> wrote:
-> 
->> Signed-off-by: Marcel Apfelbaum <marcel@redhat.com>
->> Signed-off-by: Yuval Shaia <yuval.shaia@oracle.com>
->> Reviewed-by: Shamir Rabinovitch <shamir.rabinovitch@oracle.com>
->> ---
->>   docs/pvrdma.txt | 254 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
->>   1 file changed, 254 insertions(+)
->>   create mode 100644 docs/pvrdma.txt
-> 
->> +5. Limitations
->> +==============
->> +- The device obviously is limited by the Guest Linux Driver features implementation
->> +  of the VMware device API.
->> +- Memory registration mechanism requires mremap for every page in the buffer in order
->> +  to map it to a contiguous virtual address range. Since this is not the data path
->> +  it should not matter much.
->> +- The device requires target page size to be the same as the host page size.
->> +- QEMU cannot map guest RAM from a file descriptor if a pvrdma device is attached,
->> +  so it can't work with huge pages. The limitation will be addressed in the future,
->> +  however QEMU allocates Gust RAM with MADV_HUGEPAGE so if there are enough huge
-> 
-> s/Gust/Guest/
+From: Chao Peng <chao.p.peng@linux.intel.com>
 
-Fixed (for V7)
+Expose Intel Processor Trace feature to guest.
 
-Thanks!
-Marcel
+Signed-off-by: Chao Peng <chao.p.peng@linux.intel.com>
+Signed-off-by: Luwei Kang <luwei.kang@intel.com>
+---
+ target/i386/cpu.c | 19 ++++++++++++++++++-
+ target/i386/cpu.h |  1 +
+ target/i386/kvm.c | 23 +++++++++++++++++++++++
+ 3 files changed, 42 insertions(+), 1 deletion(-)
 
-> 
->> +  pages available, QEMU will use them.
->> +- As previously stated, migration is not supported yet, however with some hardware
->> +  support can be done.
+diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+index 3818d72..57f8370 100644
+--- a/target/i386/cpu.c
++++ b/target/i386/cpu.c
+@@ -427,7 +427,7 @@ static FeatureWordInfo feature_word_info[FEATURE_WORDS] = {
+             NULL, NULL, "mpx", NULL,
+             "avx512f", "avx512dq", "rdseed", "adx",
+             "smap", "avx512ifma", "pcommit", "clflushopt",
+-            "clwb", NULL, "avx512pf", "avx512er",
++            "clwb", "intel-pt", "avx512pf", "avx512er",
+             "avx512cd", "sha-ni", "avx512bw", "avx512vl",
+         },
+         .cpuid_eax = 7,
+@@ -3006,6 +3006,23 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
+         }
+         break;
+     }
++    case 0x14: {
++        if ((env->features[FEAT_7_0_EBX] & CPUID_7_0_EBX_INTEL_PT) &&
++             kvm_enabled()) {
++            KVMState *s = cs->kvm_state;
++
++            *eax = kvm_arch_get_supported_cpuid(s, 0x14, count, R_EAX);
++            *ebx = kvm_arch_get_supported_cpuid(s, 0x14, count, R_EBX);
++            *ecx = kvm_arch_get_supported_cpuid(s, 0x14, count, R_ECX);
++            *edx = kvm_arch_get_supported_cpuid(s, 0x14, count, R_EDX);
++        } else {
++            *eax = 0;
++            *ebx = 0;
++            *ecx = 0;
++            *edx = 0;
++        }
++        break;
++    }
+     case 0x40000000:
+         /*
+          * CPUID code in kvm_arch_init_vcpu() ignores stuff
+diff --git a/target/i386/cpu.h b/target/i386/cpu.h
+index 62c4742..58a4b6c 100644
+--- a/target/i386/cpu.h
++++ b/target/i386/cpu.h
+@@ -642,6 +642,7 @@ typedef uint32_t FeatureWordArray[FEATURE_WORDS];
+ #define CPUID_7_0_EBX_PCOMMIT  (1U << 22) /* Persistent Commit */
+ #define CPUID_7_0_EBX_CLFLUSHOPT (1U << 23) /* Flush a Cache Line Optimized */
+ #define CPUID_7_0_EBX_CLWB     (1U << 24) /* Cache Line Write Back */
++#define CPUID_7_0_EBX_INTEL_PT (1U << 25) /* Intel Processor Trace */
+ #define CPUID_7_0_EBX_AVX512PF (1U << 26) /* AVX-512 Prefetch */
+ #define CPUID_7_0_EBX_AVX512ER (1U << 27) /* AVX-512 Exponential and Reciprocal */
+ #define CPUID_7_0_EBX_AVX512CD (1U << 28) /* AVX-512 Conflict Detection */
+diff --git a/target/i386/kvm.c b/target/i386/kvm.c
+index 6f69e2f..e13ab58 100644
+--- a/target/i386/kvm.c
++++ b/target/i386/kvm.c
+@@ -863,6 +863,29 @@ int kvm_arch_init_vcpu(CPUState *cs)
+                 c = &cpuid_data.entries[cpuid_i++];
+             }
+             break;
++        case 0x14: {
++            uint32_t times;
++
++            c->function = i;
++            c->index = 0;
++            c->flags = KVM_CPUID_FLAG_SIGNIFCANT_INDEX;
++            cpu_x86_cpuid(env, i, 0, &c->eax, &c->ebx, &c->ecx, &c->edx);
++            times = c->eax;
++
++            for (j = 1; j <= times; ++j) {
++                if (cpuid_i == KVM_MAX_CPUID_ENTRIES) {
++                    fprintf(stderr, "cpuid_data is full, no space for "
++                                "cpuid(eax:0x14,ecx:0x%x)\n", j);
++                    abort();
++                }
++                c = &cpuid_data.entries[cpuid_i++];
++                c->function = i;
++                c->index = j;
++                c->flags = KVM_CPUID_FLAG_SIGNIFCANT_INDEX;
++                cpu_x86_cpuid(env, i, j, &c->eax, &c->ebx, &c->ecx, &c->edx);
++            }
++            break;
++        }
+         default:
+             c->function = i;
+             c->flags = 0;
+-- 
+1.8.3.1
