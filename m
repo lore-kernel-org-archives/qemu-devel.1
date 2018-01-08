@@ -1,36 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46960)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57834)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aneesh.kumar@linux.vnet.ibm.com>) id 1eYSub-0003ys-NH
-	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 03:36:06 -0500
+	(envelope-from <groug@kaod.org>) id 1eYTPT-0005GJ-9i
+	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 04:08:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aneesh.kumar@linux.vnet.ibm.com>) id 1eYSuW-0002qF-QN
-	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 03:36:05 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:35886)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <aneesh.kumar@linux.vnet.ibm.com>)
-	id 1eYSuW-0002pi-Hx
-	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 03:36:00 -0500
-Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.21) with SMTP id
-	w088YNsJ009017
-	for <qemu-devel@nongnu.org>; Mon, 8 Jan 2018 03:35:56 -0500
-Received: from e06smtp11.uk.ibm.com (e06smtp11.uk.ibm.com [195.75.94.107])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2fby7yc697-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 08 Jan 2018 03:35:56 -0500
-Received: from localhost
-	by e06smtp11.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <aneesh.kumar@linux.vnet.ibm.com>;
-	Mon, 8 Jan 2018 08:35:50 -0000
-From: "Aneesh Kumar K.V" <aneesh.kumar@linux.vnet.ibm.com>
-In-Reply-To: <151360476094.18806.1179096997853697345.stgit@bahia.lan>
-References: <151360476094.18806.1179096997853697345.stgit@bahia.lan>
-Date: Mon, 08 Jan 2018 14:05:45 +0530
+	(envelope-from <groug@kaod.org>) id 1eYTPP-0007y4-Py
+	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 04:07:59 -0500
+Received: from 1.mo5.mail-out.ovh.net ([188.165.57.91]:42598)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <groug@kaod.org>) id 1eYTPP-0007xA-Cq
+	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 04:07:55 -0500
+Received: from player786.ha.ovh.net (b7.ovh.net [213.186.33.57])
+	by mo5.mail-out.ovh.net (Postfix) with ESMTP id CFC8E1643BB
+	for <qemu-devel@nongnu.org>; Mon,  8 Jan 2018 10:07:53 +0100 (CET)
+Date: Mon, 8 Jan 2018 10:07:49 +0100
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20180108100749.68d97ec7@bahia.lan>
+In-Reply-To: <20171220135941.3599222f@bahia.lan>
+References: <151359366858.6820.6567549632253797169.stgit@bahia.lan>
+	<151359368310.6820.9701358868942550883.stgit@bahia.lan>
+	<20171220135941.3599222f@bahia.lan>
 MIME-Version: 1.0
-Content-Type: text/plain
-Message-Id: <87mv1ozr1a.fsf@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH] 9pfs: deprecate handle backend
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3 1/2] 9pfs: allow PDU to complete without
+ sending a reply
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,75 +32,173 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org
-Cc: "Daniel P. Berrange" <berrange@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: keno@juliacomputing.com, Stefano Stabellini <sstabellini@kernel.org>
 
-Greg Kurz <groug@kaod.org> writes:
+Stefano, ping ?
 
-> This backend raise some concerns:
->
-> - doesn't support symlinks
-> - fails +100 tests in the PJD POSIX file system test suite [1]
-> - requires the QEMU process to run with the CAP_DAC_READ_SEARCH
->   capability, which isn't recommended for security reasons
->
-> For all these reasons, the handle backend is now deprecated.
->
-> [1] https://www.tuxera.com/community/posix-test-suite/
->
+On Wed, 20 Dec 2017 13:59:41 +0100
+Greg Kurz <groug@kaod.org> wrote:
 
-Reviewed-by: Aneesh Kumar K.V <aneesh.kumar@linux.vnet.ibm.com>
-
-> Signed-off-by: Greg Kurz <groug@kaod.org>
-> ---
->
-> Aneesh,
->
-> Even if I see the benefit of using file handles in a userspace file
-> server, the handle backend still has flaws that make it hardly usable
-> IMHO. Also I haven't received anything about it in years. All users
-> and contributors seem to stick to the local backend.
->
-> My guess is that nobody uses the handle backend, and unless I'm missing
-> something, it wouldn't hurt to drop it. My motivation is to reduce the
-> number of lines that I don't really have time/motivation to maintain,
-> and that could be subject to a CVE in the future.
->
-> Any thoughts ?
-> ---
->  hw/9pfs/9p-handle.c |    2 ++
->  qemu-doc.texi       |    8 ++++++++
->  2 files changed, 10 insertions(+)
->
-> diff --git a/hw/9pfs/9p-handle.c b/hw/9pfs/9p-handle.c
-> index 9875f1894cc5..1291a2db6782 100644
-> --- a/hw/9pfs/9p-handle.c
-> +++ b/hw/9pfs/9p-handle.c
-> @@ -657,6 +657,8 @@ static int handle_parse_opts(QemuOpts *opts, struct FsDriverEntry *fse)
->      const char *sec_model = qemu_opt_get(opts, "security_model");
->      const char *path = qemu_opt_get(opts, "path");
->
-> +    warn_report("handle backend is deprecated");
-> +
->      if (sec_model) {
->          error_report("Invalid argument security_model specified with handle fsdriver");
->          return -1;
-> diff --git a/qemu-doc.texi b/qemu-doc.texi
-> index f7317dfc66cd..bf44e2752cb2 100644
-> --- a/qemu-doc.texi
-> +++ b/qemu-doc.texi
-> @@ -2509,6 +2509,14 @@ default channel subsystem image for guests that do not support multiple
->  channel subsystems, all devices can be put into the default channel
->  subsystem image.
->
-> +@subsection -fsdev handle (since 2.12.0)
-> +
-> +The ``handle'' fsdev backend does not support symlinks and causes the 9p
-> +filesystem in the guest to fail a fair amount of tests from the PJD POSIX
-> +filesystem test suite. Also it requires the CAP_DAC_READ_SEARCH capability,
-> +which is not the recommended way to run QEMU. This backend should not be
-> +used and it will be removed with no replacement.
-> +
->  @section qemu-img command line arguments
->
->  @subsection convert -s (since 2.0.0)
+> On Mon, 18 Dec 2017 11:41:23 +0100
+> Greg Kurz <groug@kaod.org> wrote:
+> 
+> > The 9p protocol mostly relies on a request/reply dialog between the
+> > client and the server. A notable exception to this rule is request
+> > cancellation (ie, flush in 9p wording): the server shouldn't send a
+> > reply when the request was flushed.
+> > 
+> > This patch changes the transport API so that the core 9p code may
+> > choose to discard a reply instead of pushing it back to the client.
+> > As a consequence, the push_and_notify naming isn't quite appropriate
+> > anymore. And by the way, this operation also frees ring descriptors
+> > allocated by the transport, ie, finalizes the completion of the PDU
+> > in the transport layer. It is hence renamed to pdu_complete.
+> > 
+> > This will be used by a subsequent patch to fix request cancellation.
+> > 
+> > Signed-off-by: Greg Kurz <groug@kaod.org>
+> > ---
+> >  hw/9pfs/9p.c               |   10 +++++-----
+> >  hw/9pfs/9p.h               |    2 +-
+> >  hw/9pfs/virtio-9p-device.c |   11 +++++++----
+> >  hw/9pfs/xen-9p-backend.c   |   14 ++++++++------
+> >  4 files changed, 21 insertions(+), 16 deletions(-)
+> > 
+> > diff --git a/hw/9pfs/9p.c b/hw/9pfs/9p.c
+> > index 1e4ebbe57687..dd8b7c6d69c6 100644
+> > --- a/hw/9pfs/9p.c
+> > +++ b/hw/9pfs/9p.c
+> > @@ -642,7 +642,7 @@ static void coroutine_fn pdu_complete(V9fsPDU *pdu, ssize_t len)
+> >  
+> >              ret = pdu_marshal(pdu, len, "s", &str);
+> >              if (ret < 0) {
+> > -                goto out_notify;
+> > +                goto out_complete;
+> >              }
+> >              len += ret;
+> >              id = P9_RERROR;
+> > @@ -650,7 +650,7 @@ static void coroutine_fn pdu_complete(V9fsPDU *pdu, ssize_t len)
+> >  
+> >          ret = pdu_marshal(pdu, len, "d", err);
+> >          if (ret < 0) {
+> > -            goto out_notify;
+> > +            goto out_complete;
+> >          }
+> >          len += ret;
+> >  
+> > @@ -662,15 +662,15 @@ static void coroutine_fn pdu_complete(V9fsPDU *pdu, ssize_t len)
+> >  
+> >      /* fill out the header */
+> >      if (pdu_marshal(pdu, 0, "dbw", (int32_t)len, id, pdu->tag) < 0) {
+> > -        goto out_notify;
+> > +        goto out_complete;
+> >      }
+> >  
+> >      /* keep these in sync */
+> >      pdu->size = len;
+> >      pdu->id = id;
+> >  
+> > -out_notify:
+> > -    pdu->s->transport->push_and_notify(pdu);
+> > +out_complete:
+> > +    pdu->s->transport->pdu_complete(pdu, false);
+> >  
+> >      /* Now wakeup anybody waiting in flush for this request */
+> >      if (!qemu_co_queue_next(&pdu->complete)) {
+> > diff --git a/hw/9pfs/9p.h b/hw/9pfs/9p.h
+> > index ffe658ab8975..ea7657837784 100644
+> > --- a/hw/9pfs/9p.h
+> > +++ b/hw/9pfs/9p.h
+> > @@ -363,7 +363,7 @@ struct V9fsTransport {
+> >                                          unsigned int *pniov, size_t size);
+> >      void        (*init_out_iov_from_pdu)(V9fsPDU *pdu, struct iovec **piov,
+> >                                           unsigned int *pniov, size_t size);
+> > -    void        (*push_and_notify)(V9fsPDU *pdu);
+> > +    void        (*pdu_complete)(V9fsPDU *pdu, bool discard);
+> >  };
+> >  
+> >  static inline int v9fs_register_transport(V9fsState *s, const V9fsTransport *t)
+> > diff --git a/hw/9pfs/virtio-9p-device.c b/hw/9pfs/virtio-9p-device.c
+> > index 43f4e53f336f..083df987fd93 100644
+> > --- a/hw/9pfs/virtio-9p-device.c
+> > +++ b/hw/9pfs/virtio-9p-device.c
+> > @@ -20,14 +20,17 @@
+> >  #include "hw/virtio/virtio-access.h"
+> >  #include "qemu/iov.h"
+> >  
+> > -static void virtio_9p_push_and_notify(V9fsPDU *pdu)
+> > +static void virtio_pdu_complete(V9fsPDU *pdu, bool discard)
+> >  {
+> >      V9fsState *s = pdu->s;
+> >      V9fsVirtioState *v = container_of(s, V9fsVirtioState, state);
+> >      VirtQueueElement *elem = v->elems[pdu->idx];
+> >  
+> > -    /* push onto queue and notify */
+> > -    virtqueue_push(v->vq, elem, pdu->size);
+> > +    if (discard) {
+> > +        virtqueue_detach_element(v->vq, elem, 0);
+> > +    } else {
+> > +        virtqueue_push(v->vq, elem, pdu->size);  
+> 
+> We should only notify the client if we actually push something
+> back, ie, only call virtio_notify() if discard is false...
+> 
+> > +    }
+> >      g_free(elem);
+> >      v->elems[pdu->idx] = NULL;
+> >  
+> > @@ -189,7 +192,7 @@ static const V9fsTransport virtio_9p_transport = {
+> >      .pdu_vunmarshal = virtio_pdu_vunmarshal,
+> >      .init_in_iov_from_pdu = virtio_init_in_iov_from_pdu,
+> >      .init_out_iov_from_pdu = virtio_init_out_iov_from_pdu,
+> > -    .push_and_notify = virtio_9p_push_and_notify,
+> > +    .pdu_complete = virtio_pdu_complete,
+> >  };
+> >  
+> >  static void virtio_9p_device_realize(DeviceState *dev, Error **errp)
+> > diff --git a/hw/9pfs/xen-9p-backend.c b/hw/9pfs/xen-9p-backend.c
+> > index df2a4100bf55..dc1e6c88885d 100644
+> > --- a/hw/9pfs/xen-9p-backend.c
+> > +++ b/hw/9pfs/xen-9p-backend.c
+> > @@ -210,7 +210,7 @@ static void xen_9pfs_init_in_iov_from_pdu(V9fsPDU *pdu,
+> >      *pniov = num;
+> >  }
+> >  
+> > -static void xen_9pfs_push_and_notify(V9fsPDU *pdu)
+> > +static void xen_9pfs_pdu_complete(V9fsPDU *pdu, bool discard)
+> >  {
+> >      RING_IDX prod;
+> >      Xen9pfsDev *priv = container_of(pdu->s, Xen9pfsDev, state);
+> > @@ -222,10 +222,12 @@ static void xen_9pfs_push_and_notify(V9fsPDU *pdu)
+> >      ring->intf->out_cons = ring->out_cons;
+> >      xen_wmb();
+> >  
+> > -    prod = ring->intf->in_prod;
+> > -    xen_rmb();
+> > -    ring->intf->in_prod = prod + pdu->size;
+> > -    xen_wmb();
+> > +    if (!discard) {
+> > +        prod = ring->intf->in_prod;
+> > +        xen_rmb();
+> > +        ring->intf->in_prod = prod + pdu->size;
+> > +        xen_wmb();
+> > +    }
+> >  
+> >      ring->inprogress = false;
+> >      xenevtchn_notify(ring->evtchndev, ring->local_port);  
+> 
+> ... should xenevtchn_notify() be moved to the !discard block ?
+> 
+> > @@ -238,7 +240,7 @@ static const V9fsTransport xen_9p_transport = {
+> >      .pdu_vunmarshal = xen_9pfs_pdu_vunmarshal,
+> >      .init_in_iov_from_pdu = xen_9pfs_init_in_iov_from_pdu,
+> >      .init_out_iov_from_pdu = xen_9pfs_init_out_iov_from_pdu,
+> > -    .push_and_notify = xen_9pfs_push_and_notify,
+> > +    .pdu_complete = xen_9pfs_pdu_complete,
+> >  };
+> >  
+> >  static int xen_9pfs_init(struct XenDevice *xendev)
+> >   
+> 
+> 
