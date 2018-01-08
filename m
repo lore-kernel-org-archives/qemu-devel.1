@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42836)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44896)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1eYYcb-00051J-Pf
-	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 09:41:55 -0500
+	(envelope-from <berto@igalia.com>) id 1eYYfl-000823-IY
+	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 09:45:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1eYYca-0000gt-16
-	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 09:41:53 -0500
-Date: Mon, 8 Jan 2018 15:41:36 +0100
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20180108144136.GF8052@localhost.localdomain>
-References: <20180105065538.13375-1-famz@redhat.com>
+	(envelope-from <berto@igalia.com>) id 1eYYfh-0002wX-Pr
+	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 09:45:09 -0500
+From: Alberto Garcia <berto@igalia.com>
+In-Reply-To: <20171221142251.18366-7-kwolf@redhat.com>
+References: <20171221142251.18366-1-kwolf@redhat.com>
+	<20171221142251.18366-7-kwolf@redhat.com>
+Date: Mon, 08 Jan 2018 15:44:23 +0100
+Message-ID: <w51tvvw8l6g.fsf@maestria.local.igalia.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180105065538.13375-1-famz@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 0/2] qemu-img: Let "info" warn and go ahead
- without -U
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v2 06/19] blockjob: Pause job
+ on draining any job BDS
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,29 +23,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: pbonzini@redhat.com, famz@redhat.com, qemu-devel@nongnu.org
 
-Am 05.01.2018 um 07:55 hat Fam Zheng geschrieben:
-> Management and users are accustomed to "qemu-img info" to query status of
-> images even when they are used by guests. Since image locking was added, the -U
-> (--force-share) option is needed for that to work. The reason has been that due
-> to possible race with image header update, the output can be misleading.
-> 
-> But what are likely to happen after we emit the error are that, for interactive
-> users, '-U' will be used and the command retried; for management (nova, RHV,
-> etc.), the operation is broken with no knob to workaround this.
-> 
-> This series changes that error to a warning so that it doesn't get in the way.
+On Thu 21 Dec 2017 03:22:38 PM CET, Kevin Wolf wrote:
+> Block jobs already paused themselves when their main BlockBackend
+> entered a drained section. This is not good enough: We also want to
+> pause a block job and may not submit new requests if, for example, the
+> mirror target node should be drained.
+>
+> This implements .drained_begin/end callbacks in child_job in order to
+> consider all block nodes related to the job, and removes the
+> BlockBackend callbacks which are unnecessary now because the root of the
+> job main BlockBackend is always referenced with a child_job, too.
+>
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 
-Are management tools actually doing this? There is no good reason to
-call 'qemu-img info' for an image that is in use by a VM.
+Reviewed-by: Alberto Garcia <berto@igalia.com>
 
-If no, NACK. Automatically disabling locking because it can be
-inconvenient defeats the purpose of locking.
-
-If yes, clearly indicate that this usage is deprecated and we'll turn
-this into an error again with 2.13. Then management tools can be fixed
-in time.
-
-Kevin
+Berto
