@@ -1,30 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33769)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33793)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eYbEw-0008JK-AJ
-	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 12:29:39 -0500
+	id 1eYbF1-0008OM-Bw
+	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 12:29:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eYbEv-0000NY-Gp
-	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 12:29:38 -0500
-Received: from mail-qt0-x242.google.com ([2607:f8b0:400d:c0d::242]:41036)
+	id 1eYbEy-0000S1-9z
+	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 12:29:43 -0500
+Received: from mail-qt0-x242.google.com ([2607:f8b0:400d:c0d::242]:42952)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eYbEv-0000N2-Bp
-	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 12:29:37 -0500
-Received: by mail-qt0-x242.google.com with SMTP id i40so14524531qti.8
-	for <qemu-devel@nongnu.org>; Mon, 08 Jan 2018 09:29:37 -0800 (PST)
+	id 1eYbEy-0000RH-5t
+	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 12:29:40 -0500
+Received: by mail-qt0-x242.google.com with SMTP id g9so14527374qth.9
+	for <qemu-devel@nongnu.org>; Mon, 08 Jan 2018 09:29:40 -0800 (PST)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Mon,  8 Jan 2018 14:29:00 -0300
-Message-Id: <20180108172904.8772-9-f4bug@amsat.org>
+Date: Mon,  8 Jan 2018 14:29:01 -0300
+Message-Id: <20180108172904.8772-10-f4bug@amsat.org>
 In-Reply-To: <20180108172904.8772-1-f4bug@amsat.org>
 References: <20180108172904.8772-1-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH 08/12] slirp: removed unused code
+Subject: [Qemu-devel] [PATCH 09/12] slirp: add in6_dhcp_multicast()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,30 +38,36 @@ Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nong
 
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- slirp/ip.h | 13 -------------
- 1 file changed, 13 deletions(-)
+ slirp/dhcpv6.h | 3 +++
+ slirp/udp6.c   | 2 +-
+ 2 files changed, 4 insertions(+), 1 deletion(-)
 
-diff --git a/slirp/ip.h b/slirp/ip.h
-index e29ccd3c9f..71c3642cfe 100644
---- a/slirp/ip.h
-+++ b/slirp/ip.h
-@@ -233,17 +233,4 @@ struct	ipasfrag {
- #define ipf_next     ipf_link.next
- #define ipf_prev     ipf_link.prev
+diff --git a/slirp/dhcpv6.h b/slirp/dhcpv6.h
+index 9189cd3f2d..3373f6cb89 100644
+--- a/slirp/dhcpv6.h
++++ b/slirp/dhcpv6.h
+@@ -17,6 +17,9 @@
+                             0x00, 0x00, 0x00, 0x00,\
+                             0x00, 0x01, 0x00, 0x02 } }
  
--/*
-- * Structure stored in mbuf in inpcb.ip_options
-- * and passed to ip_output when ip options are in use.
-- * The actual length of the options (including ipopt_dst)
-- * is in m_len.
-- */
--#define MAX_IPOPTLEN	40
--
--struct ipoption {
--	struct	in_addr ipopt_dst;	/* first-hop dst if source routed */
--	int8_t	ipopt_list[MAX_IPOPTLEN];	/* options proper */
--} QEMU_PACKED;
--
++#define in6_dhcp_multicast(a)\
++    in6_equal(a, &(struct in6_addr)ALLDHCP_MULTICAST)
++
+ void dhcpv6_input(struct sockaddr_in6 *srcsas, struct mbuf *m);
+ 
  #endif
+diff --git a/slirp/udp6.c b/slirp/udp6.c
+index 9fa314bc2d..7c4a6b003a 100644
+--- a/slirp/udp6.c
++++ b/slirp/udp6.c
+@@ -65,7 +65,7 @@ void udp6_input(struct mbuf *m)
+     /* handle DHCPv6 */
+     if (ntohs(uh->uh_dport) == DHCPV6_SERVER_PORT &&
+         (in6_equal(&ip->ip_dst, &slirp->vhost_addr6) ||
+-         in6_equal(&ip->ip_dst, &(struct in6_addr)ALLDHCP_MULTICAST))) {
++         in6_dhcp_multicast(&ip->ip_dst))) {
+         m->m_data += iphlen;
+         m->m_len -= iphlen;
+         dhcpv6_input(&lhost, m);
 -- 
 2.15.1
