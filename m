@@ -1,27 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50573)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50616)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eYbl2-00054L-Kg
-	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 13:02:49 -0500
+	id 1eYbl8-00058D-15
+	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 13:02:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eYbky-0006Az-LC
-	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 13:02:48 -0500
-Received: from mail-qt0-x22d.google.com ([2607:f8b0:400d:c0d::22d]:33491)
+	id 1eYbl4-0006Fs-4o
+	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 13:02:54 -0500
+Received: from mail-qk0-x241.google.com ([2607:f8b0:400d:c09::241]:45389)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eYbky-0006Ai-GP
-	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 13:02:44 -0500
-Received: by mail-qt0-x22d.google.com with SMTP id e2so14673627qti.0
-	for <qemu-devel@nongnu.org>; Mon, 08 Jan 2018 10:02:44 -0800 (PST)
+	id 1eYbl4-0006FR-0H
+	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 13:02:50 -0500
+Received: by mail-qk0-x241.google.com with SMTP id o126so15226693qke.12
+	for <qemu-devel@nongnu.org>; Mon, 08 Jan 2018 10:02:49 -0800 (PST)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Mon,  8 Jan 2018 15:02:26 -0300
-Message-Id: <20180108180231.21122-3-f4bug@amsat.org>
+Date: Mon,  8 Jan 2018 15:02:28 -0300
+Message-Id: <20180108180231.21122-5-f4bug@amsat.org>
 In-Reply-To: <20180108180231.21122-1-f4bug@amsat.org>
 References: <20180108180231.21122-1-f4bug@amsat.org>
-Subject: [Qemu-devel] [PATCH 2/7] net/eth: use the QEMU_PACKED macro
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH 4/7] net/rocker: move struct rocker_desc to C
+ file
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,115 +34,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jiri Pirko <jiri@resnulli.us>, Jason Wang <jasowang@redhat.com>, Dmitry Fleytman <dmitry@daynix.com>
+To: Jiri Pirko <jiri@resnulli.us>, Jason Wang <jasowang@redhat.com>, Dmitry Fleytman <dmitry@daynix.com>, Stefan Weil <sw@weilnetz.de>
 Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, Eric Blake <eblake@redhat.com>
 
----
- include/net/eth.h | 26 +++++++++++++-------------
- 1 file changed, 13 insertions(+), 13 deletions(-)
+this is the only user.
 
-diff --git a/include/net/eth.h b/include/net/eth.h
-index 09054a506d..87c6499f18 100644
---- a/include/net/eth.h
-+++ b/include/net/eth.h
-@@ -36,12 +36,12 @@ struct eth_header {
-     uint8_t  h_dest[ETH_ALEN];   /* destination eth addr */
-     uint8_t  h_source[ETH_ALEN]; /* source ether addr    */
-     uint16_t h_proto;            /* packet type ID field */
--};
-+} QEMU_PACKED;
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+---
+ hw/net/rocker/rocker_hw.h   | 13 -------------
+ hw/net/rocker/rocker_desc.c | 13 +++++++++++++
+ 2 files changed, 13 insertions(+), 13 deletions(-)
+
+diff --git a/hw/net/rocker/rocker_hw.h b/hw/net/rocker/rocker_hw.h
+index 8b4ce250d5..daaaf4080f 100644
+--- a/hw/net/rocker/rocker_hw.h
++++ b/hw/net/rocker/rocker_hw.h
+@@ -119,19 +119,6 @@ enum {
+  */
+ #define ROCKER_RING_INDEX(reg) ((reg >> 5) & 0x7F)
  
- struct vlan_header {
-     uint16_t  h_tci;     /* priority and VLAN ID  */
-     uint16_t  h_proto;   /* encapsulated protocol */
--};
-+} QEMU_PACKED;
+-/*
+- * Rocker DMA Descriptor
+- */
+-
+-typedef struct rocker_desc {
+-    __le64 buf_addr;
+-    uint64_t cookie;
+-    __le16 buf_size;
+-    __le16 tlv_size;
+-    __le16 rsvd[5];   /* pad to 32 bytes */
+-    __le16 comp_err;
+-} QEMU_PACKED QEMU_ALIGNED(8) RockerDesc;
+-
+ /*
+  * Rocker TLV type fields
+  */
+diff --git a/hw/net/rocker/rocker_desc.c b/hw/net/rocker/rocker_desc.c
+index b009da4f89..2f2de837f8 100644
+--- a/hw/net/rocker/rocker_desc.c
++++ b/hw/net/rocker/rocker_desc.c
+@@ -23,6 +23,19 @@
+ #include "rocker_hw.h"
+ #include "rocker_desc.h"
  
- struct ip_header {
-     uint8_t  ip_ver_len;     /* version and header length */
-@@ -53,9 +53,9 @@ struct ip_header {
-     uint8_t  ip_p;           /* protocol */
-     uint16_t ip_sum;         /* checksum */
-     uint32_t ip_src, ip_dst; /* source and destination address */
--};
-+} QEMU_PACKED;
- 
--typedef struct tcp_header {
-+typedef struct QEMU_PACKED tcp_header {
-     uint16_t th_sport;          /* source port */
-     uint16_t th_dport;          /* destination port */
-     uint32_t th_seq;            /* sequence number */
-@@ -77,14 +77,14 @@ typedef struct tcp_header {
- #define TCP_HEADER_DATA_OFFSET(tcp) \
-     (((be16_to_cpu((tcp)->th_offset_flags) >> 12) & 0xf) << 2)
- 
--typedef struct udp_header {
-+typedef struct QEMU_PACKED udp_header {
-     uint16_t uh_sport; /* source port */
-     uint16_t uh_dport; /* destination port */
-     uint16_t uh_ulen;  /* udp length */
-     uint16_t uh_sum;   /* udp checksum */
- } udp_header;
- 
--typedef struct ip_pseudo_header {
-+typedef struct QEMU_PACKED ip_pseudo_header {
-     uint32_t ip_src;
-     uint32_t ip_dst;
-     uint8_t  zeros;
-@@ -116,9 +116,9 @@ struct ip6_header {
-     } ip6_ctlun;
-     struct in6_address ip6_src;    /* source address */
-     struct in6_address ip6_dst;    /* destination address */
--};
-+} QEMU_PACKED;
- 
--typedef struct ip6_pseudo_header {
-+typedef struct QEMU_PACKED ip6_pseudo_header {
-     struct in6_address ip6_src;
-     struct in6_address ip6_dst;
-     uint32_t           len;
-@@ -129,7 +129,7 @@ typedef struct ip6_pseudo_header {
- struct ip6_ext_hdr {
-     uint8_t        ip6r_nxt;   /* next header */
-     uint8_t        ip6r_len;   /* length in units of 8 octets */
--};
-+} QEMU_PACKED;
- 
- struct ip6_ext_hdr_routing {
-     uint8_t     nxt;
-@@ -137,21 +137,21 @@ struct ip6_ext_hdr_routing {
-     uint8_t     rtype;
-     uint8_t     segleft;
-     uint8_t     rsvd[4];
--};
-+} QEMU_PACKED;
- 
- struct ip6_option_hdr {
- #define IP6_OPT_PAD1   (0x00)
- #define IP6_OPT_HOME   (0xC9)
-     uint8_t type;
-     uint8_t len;
--};
-+} QEMU_PACKED;
- 
- struct udp_hdr {
-   uint16_t uh_sport;           /* source port */
-   uint16_t uh_dport;           /* destination port */
-   uint16_t uh_ulen;            /* udp length */
-   uint16_t uh_sum;             /* udp checksum */
--};
-+} QEMU_PACKED;
- 
- struct tcp_hdr {
-     u_short     th_sport;   /* source port */
-@@ -180,7 +180,7 @@ struct tcp_hdr {
-     u_short th_win;      /* window */
-     u_short th_sum;      /* checksum */
-     u_short th_urp;      /* urgent pointer */
--};
-+} QEMU_PACKED;
- 
- #define ip6_nxt      ip6_ctlun.ip6_un1.ip6_un1_nxt
- #define ip6_ecn_acc  ip6_ctlun.ip6_un3.ip6_un3_ecn
++/*
++ * Rocker DMA Descriptor
++ */
++
++typedef struct rocker_desc {
++    __le64 buf_addr;
++    uint64_t cookie;
++    __le16 buf_size;
++    __le16 tlv_size;
++    __le16 rsvd[5];   /* pad to 32 bytes */
++    __le16 comp_err;
++} QEMU_PACKED QEMU_ALIGNED(8) RockerDesc;
++
+ struct desc_ring {
+     hwaddr base_addr;
+     uint32_t size;
 -- 
 2.15.1
