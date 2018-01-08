@@ -1,32 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57363)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33561)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eYb2P-00037q-Tm
-	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 12:16:43 -0500
+	id 1eYbEZ-00080N-81
+	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 12:29:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eYb2M-0006OE-OJ
-	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 12:16:41 -0500
-Received: from mail-qt0-x22b.google.com ([2607:f8b0:400d:c0d::22b]:42658)
+	id 1eYbEW-0008HE-5X
+	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 12:29:15 -0500
+Received: from mail-qk0-x22b.google.com ([2607:f8b0:400d:c09::22b]:34887)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eYb2M-0006Nx-Gz
-	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 12:16:38 -0500
-Received: by mail-qt0-x22b.google.com with SMTP id g9so14473032qth.9
-	for <qemu-devel@nongnu.org>; Mon, 08 Jan 2018 09:16:38 -0800 (PST)
+	id 1eYbEW-0008Gg-1h
+	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 12:29:12 -0500
+Received: by mail-qk0-x22b.google.com with SMTP id w184so6916842qka.2
+	for <qemu-devel@nongnu.org>; Mon, 08 Jan 2018 09:29:11 -0800 (PST)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
-References: <1515431442-23795-1-git-send-email-peter.maydell@linaro.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <bb1c8d49-c800-fe4f-4a93-ca5274a830f9@amsat.org>
-Date: Mon, 8 Jan 2018 14:16:32 -0300
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Date: Mon,  8 Jan 2018 14:28:52 -0300
+Message-Id: <20180108172904.8772-1-f4bug@amsat.org>
 MIME-Version: 1.0
-In-Reply-To: <1515431442-23795-1-git-send-email-peter.maydell@linaro.org>
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature";
-	boundary="sLCzKEaffJMByuoeevMEKVm2ZrMMKgEhS"
-Subject: Re: [Qemu-devel] [PATCH] configure: Fix incorrect string comparison
- operator
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH 00/12] add HOST_SUPPORTS_UNALIGNED_ACCESS,
+ reduce slirp warnings
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,84 +32,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
-Cc: Sergio Andres Gomez Del Real <sergio.g.delreal@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, patches@linaro.org
+To: Samuel Thibault <samuel.thibault@ens-lyon.org>, Jan Kiszka <jan.kiszka@siemens.com>, "Michael S . Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Eric Blake <eblake@redhat.com>, Thomas Huth <thuth@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---sLCzKEaffJMByuoeevMEKVm2ZrMMKgEhS
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
-Cc: Sergio Andres Gomez Del Real <sergio.g.delreal@gmail.com>,
- Paolo Bonzini <pbonzini@redhat.com>, patches@linaro.org
-Message-ID: <bb1c8d49-c800-fe4f-4a93-ca5274a830f9@amsat.org>
-Subject: Re: [Qemu-devel] [PATCH] configure: Fix incorrect string comparison
- operator
-References: <1515431442-23795-1-git-send-email-peter.maydell@linaro.org>
-In-Reply-To: <1515431442-23795-1-git-send-email-peter.maydell@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Hi,
 
-On 01/08/2018 02:10 PM, Peter Maydell wrote:
-> In commit c97d6d2cdf97ed we accidentally added code to configure
-> that uses '=3D=3D' for string equality testing. This is a bashism --
-> the portable way to write this is '=3D'.
->=20
-> This fixes the "Unexpected operator error" complaint produced
-> if the system /bin/sh is dash.
+A recent mail from Michael remembered me this pre-2.10 series eh :)
 
-Thanks :)
+I tagged the last patch 'RFC' because I find it ugly and hope there is a nicer
+way to write it.
 
->=20
-> Fixes: c97d6d2cdf97ed
-> Reported-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+Regards,
 
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-Tested-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+Phil.
 
-> ---
-> As an aside, it's annoying that this doesn't make configure fail;
-> otherwise it wouldn't have got through my build tests.
-> ---
->  configure | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->=20
-> diff --git a/configure b/configure
-> index 56f9716..6a04082 100755
-> --- a/configure
-> +++ b/configure
-> @@ -5076,7 +5076,7 @@ fi
-> =20
->  #################################################
->  # Check to see if we have the Hypervisor framework
-> -if [ "$darwin" =3D=3D "yes" ] ; then
-> +if [ "$darwin" =3D "yes" ] ; then
->    cat > $TMPC << EOF
->  #include <Hypervisor/hv.h>
->  int main() { return 0;}
->=20
+Philippe Mathieu-Daudé (12):
+  slirp: remove QEMU_PACKED from structures with don't require it
+  slirp: struct icmp/ethhdr ARE packed
+  slirp: avoid IN6_IS_ADDR_UNSPECIFIED(), rather use in6_zero()
+  slirp: add in6_multicast() and use it instead of IN6_IS_ADDR_MULTICAST()
+  slirp: poison IN6_*_ADDR_*() macros to avoid them
+  slirp: remove unused header
+  slirp: remove unnecessary
+  slirp: removed unused code
+  slirp: add in6_dhcp_multicast()
+  configure: disable unaligned access warning on x86 arch
+  configure: add HOST_SUPPORTS_UNALIGNED_ACCESS
+  slirp: use HOST_SUPPORTS_UNALIGNED_ACCESS
 
+ configure         | 18 ++++++++++++
+ slirp/dhcpv6.h    |  3 ++
+ slirp/ip.h        | 23 ++++------------
+ slirp/ip6.h       | 82 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ slirp/ip6_icmp.h  |  6 ++--
+ slirp/ip_icmp.h   |  2 +-
+ slirp/libslirp.h  |  1 -
+ slirp/slirp.h     |  5 ++--
+ slirp/ip6_icmp.c  | 16 +++++------
+ slirp/ndp_table.c |  6 ++--
+ slirp/udp6.c      |  2 +-
+ 11 files changed, 126 insertions(+), 38 deletions(-)
 
---sLCzKEaffJMByuoeevMEKVm2ZrMMKgEhS
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCgAdFiEE+qvnXhKRciHc/Wuy4+MsLN6twN4FAlpTp3AACgkQ4+MsLN6t
-wN6T3g//bIjDSHnbRv10jYiTyecyMWHNNd18H0iTYKxfWFPvb1Nb87o17SUUlenV
-bDdmEsQ2ytaHAKTkHMG7w8lO1cOIOfS5NXXCj2EritzyiK5ezio9aPu2TrUoqu0m
-gepHkhho8Rnok0nivDcgfn/qKDz9Fwz/Fge5o037Em5RCCqdWKAOke9UD7cMdJFB
-HErfaj/j9FJKHilg0n77cd+wy3drLgKh/OMHpUGkag1whT3YMJ653punFuxzrcCB
-gSaybtXl06A4umUc7SgAs8xv8azvL5WI8TnTA9qR3NF80p7F6IDslJToKOGbkGfp
-OTnaePHlupEglZvG8yIH7IjaU4D2fhWdRrkpIcr4YDoA4p3nYSV2QljNW/VbpZid
-lMDsSxJ31E8LepB77/NIMMdyn9PoxBDZIU1J1CKcuB3T0zkpGINmgmA+mHFEsh9j
-iRVPsb8eU6D41XAl+bDn0finTiRDkzCN2kw4mu3Y0OGc+V5kLS2Nbwu53GZTi7VB
-FYW+tPoa2dU4I77chjgFCFp/LLbj6gMyP5FRaqQeY2ZxDf0l1YgkH71DHUoNynTa
-umNvHjxjiGFlM9rvodip/ERLShFgS0+5TG2XwlMCINQ8Pi0936LiMfBt/4nB57Zk
-XTq/JQ0o4Q7u15jgDfxb+gAfMhohulTLGi3d2oc1CoVAZfNrdpU=
-=IfNm
------END PGP SIGNATURE-----
-
---sLCzKEaffJMByuoeevMEKVm2ZrMMKgEhS--
+-- 
+2.15.1
