@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39144)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42463)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1eYTfq-0002gN-Lq
-	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 04:24:56 -0500
+	(envelope-from <armbru@redhat.com>) id 1eYTkL-0004yA-Vq
+	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 04:29:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1eYTfi-0005IC-I6
-	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 04:24:54 -0500
-Received: from 12.mo5.mail-out.ovh.net ([46.105.39.65]:36984)
+	(envelope-from <armbru@redhat.com>) id 1eYTkH-00026B-Uc
+	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 04:29:34 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:48074)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1eYTfi-0005Gd-8O
-	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 04:24:46 -0500
-Received: from player786.ha.ovh.net (b7.ovh.net [213.186.33.57])
-	by mo5.mail-out.ovh.net (Postfix) with ESMTP id 829A115D30F
-	for <qemu-devel@nongnu.org>; Mon,  8 Jan 2018 10:24:44 +0100 (CET)
-Date: Mon, 8 Jan 2018 10:24:42 +0100
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20180108102442.2ed55a71@bahia.lan>
-In-Reply-To: <151379897394.31252.4783267371691256574.stgit@bahia>
-References: <151379897394.31252.4783267371691256574.stgit@bahia>
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1eYTkH-00025A-OT
+	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 04:29:29 -0500
+From: Markus Armbruster <armbru@redhat.com>
+References: <1514940265-18093-1-git-send-email-mjc@sifive.com>
+	<1514940265-18093-22-git-send-email-mjc@sifive.com>
+	<4e3bcfa2-c511-3ffb-44ab-be4567f2fb17@redhat.com>
+	<CAHNT7Ntz2C84DYMf+BM8WZ7kwMTuZ3Q5D+VfUxG0O87H6j94XQ@mail.gmail.com>
+	<108446a9-e18b-b81a-66a0-058793a32953@redhat.com>
+Date: Mon, 08 Jan 2018 10:29:25 +0100
+In-Reply-To: <108446a9-e18b-b81a-66a0-058793a32953@redhat.com> (Eric Blake's
+	message of "Fri, 5 Jan 2018 08:49:09 -0600")
+Message-ID: <87d12kaebu.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] 9pfs: drop v9fs_register_transport()
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v1 21/21] RISC-V Build Infrastructure
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,117 +30,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Stefano Stabellini <sstabellini@kernel.org>
+To: Eric Blake <eblake@redhat.com>
+Cc: Michael Clark <mjc@sifive.com>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, qemu-devel@nongnu.org, Sagar Karandikar <sagark@eecs.berkeley.edu>
 
-Stefano, can you ack/nack this one ?
+Eric Blake <eblake@redhat.com> writes:
 
-On Wed, 20 Dec 2017 20:42:54 +0100
-Greg Kurz <groug@kaod.org> wrote:
+> On 01/05/2018 12:47 AM, Michael Clark wrote:
+>
+>>>
+>>>> +##
+>>>> +{ 'struct': 'CpuInfoRISCV', 'data': { 'pc': 'int' } }
+>>>
+>>> Should this be 'uint64' or other specific type, rather than the generic
+>>> 'int' (which happens to be 64 bits, but signed)?  Other architectures
+>>> use 'int' because of history, but we could use this chance to improve
+>>> things if desired.
+>>>
+>> 
+>> I'll have to defer to your better judgement as to whether we need to change
+>> this. I like consistency. Is it a change that needs to be made to multiple
+>> arches? It sounds relatively low risk. You decide.
+>> 
+>> QAPI Schema
+>> M: Eric Blake <eblake@redhat.com>
+>> M: Markus Armbruster <armbru@redhat.com>
+>
+> I'm fine if this patch uses 'int' for consistency, and will wait for
 
-> No good reasons to do this outside of v9fs_device_realize_common().
-> 
-> Signed-off-by: Greg Kurz <groug@kaod.org>
-> ---
->  hw/9pfs/9p.c               |    6 +++++-
->  hw/9pfs/9p.h               |   10 ++--------
->  hw/9pfs/virtio-9p-device.c |    8 ++------
->  hw/9pfs/xen-9p-backend.c   |    3 +--
->  4 files changed, 10 insertions(+), 17 deletions(-)
-> 
-> diff --git a/hw/9pfs/9p.c b/hw/9pfs/9p.c
-> index ccbc75265a52..2f836a59deac 100644
-> --- a/hw/9pfs/9p.c
-> +++ b/hw/9pfs/9p.c
-> @@ -3502,7 +3502,8 @@ void pdu_submit(V9fsPDU *pdu, P9MsgHeader *hdr)
->  }
->  
->  /* Returns 0 on success, 1 on failure. */
-> -int v9fs_device_realize_common(V9fsState *s, Error **errp)
-> +int v9fs_device_realize_common(V9fsState *s, const V9fsTransport *t,
-> +                               Error **errp)
->  {
->      int i, len;
->      struct stat stat;
-> @@ -3510,6 +3511,9 @@ int v9fs_device_realize_common(V9fsState *s, Error **errp)
->      V9fsPath path;
->      int rc = 1;
->  
-> +    assert(!s->transport);
-> +    s->transport = t;
-> +
->      /* initialize pdu allocator */
->      QLIST_INIT(&s->free_list);
->      QLIST_INIT(&s->active_list);
-> diff --git a/hw/9pfs/9p.h b/hw/9pfs/9p.h
-> index ea7657837784..e2aa64577fe1 100644
-> --- a/hw/9pfs/9p.h
-> +++ b/hw/9pfs/9p.h
-> @@ -346,7 +346,8 @@ void v9fs_path_sprintf(V9fsPath *path, const char *fmt, ...);
->  void v9fs_path_copy(V9fsPath *lhs, V9fsPath *rhs);
->  int v9fs_name_to_path(V9fsState *s, V9fsPath *dirpath,
->                        const char *name, V9fsPath *path);
-> -int v9fs_device_realize_common(V9fsState *s, Error **errp);
-> +int v9fs_device_realize_common(V9fsState *s, const V9fsTransport *t,
-> +                               Error **errp);
->  void v9fs_device_unrealize_common(V9fsState *s, Error **errp);
->  
->  V9fsPDU *pdu_alloc(V9fsState *s);
-> @@ -366,11 +367,4 @@ struct V9fsTransport {
->      void        (*pdu_complete)(V9fsPDU *pdu, bool discard);
->  };
->  
-> -static inline int v9fs_register_transport(V9fsState *s, const V9fsTransport *t)
-> -{
-> -    assert(!s->transport);
-> -    s->transport = t;
-> -    return 0;
-> -}
-> -
->  #endif
-> diff --git a/hw/9pfs/virtio-9p-device.c b/hw/9pfs/virtio-9p-device.c
-> index d874f48467ba..806e7573276c 100644
-> --- a/hw/9pfs/virtio-9p-device.c
-> +++ b/hw/9pfs/virtio-9p-device.c
-> @@ -201,17 +201,13 @@ static void virtio_9p_device_realize(DeviceState *dev, Error **errp)
->      V9fsVirtioState *v = VIRTIO_9P(dev);
->      V9fsState *s = &v->state;
->  
-> -    if (v9fs_device_realize_common(s, errp)) {
-> -        goto out;
-> +    if (v9fs_device_realize_common(s, &virtio_9p_transport, errp)) {
-> +        return;
->      }
->  
->      v->config_size = sizeof(struct virtio_9p_config) + strlen(s->fsconf.tag);
->      virtio_init(vdev, "virtio-9p", VIRTIO_ID_9P, v->config_size);
->      v->vq = virtio_add_queue(vdev, MAX_REQ, handle_9p_output);
-> -    v9fs_register_transport(s, &virtio_9p_transport);
-> -
-> -out:
-> -    return;
->  }
->  
->  static void virtio_9p_device_unrealize(DeviceState *dev, Error **errp)
-> diff --git a/hw/9pfs/xen-9p-backend.c b/hw/9pfs/xen-9p-backend.c
-> index dc1e6c88885d..e2ae1ac148eb 100644
-> --- a/hw/9pfs/xen-9p-backend.c
-> +++ b/hw/9pfs/xen-9p-backend.c
-> @@ -448,7 +448,6 @@ static int xen_9pfs_connect(struct XenDevice *xendev)
->      xen_9pdev->id = s->fsconf.fsdev_id =
->          g_strdup_printf("xen9p%d", xendev->dev);
->      xen_9pdev->tag = s->fsconf.tag = xenstore_read_fe_str(xendev, "tag");
-> -    v9fs_register_transport(s, &xen_9p_transport);
->      fsdev = qemu_opts_create(qemu_find_opts("fsdev"),
->              s->fsconf.tag,
->              1, NULL);
-> @@ -457,7 +456,7 @@ static int xen_9pfs_connect(struct XenDevice *xendev)
->      qemu_opt_set(fsdev, "security_model", xen_9pdev->security_model, NULL);
->      qemu_opts_set_id(fsdev, s->fsconf.fsdev_id);
->      qemu_fsdev_add(fsdev);
-> -    v9fs_device_realize_common(s, NULL);
-> +    v9fs_device_realize_common(s, &xen_9p_transport, NULL);
->  
->      return 0;
->  
-> 
+Me too.
+
+> Markus to chime in on whether changing CpuInfo to use specific integer
+> types in general is worth a separate series later on.
+
+I guess it is.
