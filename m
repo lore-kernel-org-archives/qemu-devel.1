@@ -1,22 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55964)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58286)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1eYfTh-0000wG-5E
-	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 17:01:10 -0500
+	(envelope-from <eblake@redhat.com>) id 1eYfaL-0003YC-Gp
+	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 17:08:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1eYfTf-0002p2-Pg
-	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 17:01:09 -0500
+	(envelope-from <eblake@redhat.com>) id 1eYfaG-0007XI-T8
+	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 17:08:01 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:43452)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1eYfaG-0007Wz-MU
+	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 17:07:56 -0500
+References: <cb61acc7-1a7a-616a-e2f7-29e8226ca0c3@profihost.ag>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <a094668d-3294-e4b8-47a0-08ed8da5f9df@redhat.com>
+Date: Mon, 8 Jan 2018 16:07:53 -0600
 MIME-Version: 1.0
-Sender: alistair23@gmail.com
-In-Reply-To: <20180108154303.6522-3-f4bug@amsat.org>
-References: <20180108154303.6522-1-f4bug@amsat.org>
-	<20180108154303.6522-3-f4bug@amsat.org>
-From: Alistair Francis <alistair.francis@xilinx.com>
-Date: Mon, 8 Jan 2018 14:00:35 -0800
-Message-ID: <CAKmqyKOH3dsA=8xd6sK6foexSdjmZEijjuJP3uiPRxErKmEJ3Q@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v5 02/31] sdhci: add basic Spec v1
- capabilities
+In-Reply-To: <cb61acc7-1a7a-616a-e2f7-29e8226ca0c3@profihost.ag>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="LrlCTaKkInr4b3DYwc0FLWkVjKQvWteQ2"
+Subject: Re: [Qemu-devel] how to pass pcid to guest?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,230 +27,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Cc: Alistair Francis <alistair.francis@xilinx.com>, Peter Maydell <peter.maydell@linaro.org>, Andrey Smirnov <andrew.smirnov@gmail.com>, Igor Mitsyanko <i.mitsyanko@gmail.com>, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, Prasad J Pandit <pjp@fedoraproject.org>, =?UTF-8?Q?Gr=C3=A9gory_Estrade?= <gregory.estrade@gmail.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Krzysztof Kozlowski <krzk@kernel.org>, Jean-Christophe Dubois <jcd@tribudubois.net>, Sai Pavan Boddu <saipava@xilinx.com>, qemu-arm <qemu-arm@nongnu.org>, Clement Deschamps <clement.deschamps@antfield.fr>, Andrew Baumann <Andrew.Baumann@microsoft.com>, Eduardo Habkost <ehabkost@redhat.com>
+To: Stefan Priebe - Profihost AG <s.priebe@profihost.ag>, qemu-devel <qemu-devel@nongnu.org>
 
-On Mon, Jan 8, 2018 at 7:42 AM, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.or=
-g> wrote:
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-> ---
->  hw/sd/sdhci-internal.h | 22 ++++++++++++++++++-
->  include/hw/sd/sdhci.h  |  6 ++++++
->  hw/sd/sdhci.c          | 58 ++++++++++++++++++++++++++++++++++++--------=
-------
->  3 files changed, 69 insertions(+), 17 deletions(-)
->
-> diff --git a/hw/sd/sdhci-internal.h b/hw/sd/sdhci-internal.h
-> index cf4a055159..6944fcaf00 100644
-> --- a/hw/sd/sdhci-internal.h
-> +++ b/hw/sd/sdhci-internal.h
-> @@ -86,6 +86,9 @@ FIELD(SDHC_PRNSTS, WRITE_PROTECT,      19, 1);
->
->  /* R/W Host control Register 0x0 */
->  #define SDHC_HOSTCTL                   0x28
-> +FIELD(SDHC_HOSTCTL, LED_CTRL,          0, 1);
-> +FIELD(SDHC_HOSTCTL, DATATRANSFERWIDTH, 1, 1); /* SD mode only */
-> +FIELD(SDHC_HOSTCTL, HIGH_SPEED,        2, 1);
->  #define SDHC_CTRL_DMA_CHECK_MASK       0x18
->  #define SDHC_CTRL_SDMA                 0x00
->  #define SDHC_CTRL_ADMA1_32             0x08
-> @@ -96,6 +99,7 @@ FIELD(SDHC_PRNSTS, WRITE_PROTECT,      19, 1);
->  /* R/W Power Control Register 0x0 */
->  #define SDHC_PWRCON                    0x29
->  #define SDHC_POWER_ON                  (1 << 0)
-> +FIELD(SDHC_PWRCON, BUS_VOLTAGE,        1, 3);
->
->  /* R/W Block Gap Control Register 0x0 */
->  #define SDHC_BLKGAP                    0x2A
-> @@ -118,6 +122,7 @@ FIELD(SDHC_PRNSTS, WRITE_PROTECT,      19, 1);
->
->  /* R/W Timeout Control Register 0x0 */
->  #define SDHC_TIMEOUTCON                0x2E
-> +FIELD(SDHC_TIMEOUTCON, COUNTER,        0, 4);
->
->  /* R/W Software Reset Register 0x0 */
->  #define SDHC_SWRST                     0x2F
-> @@ -174,17 +179,32 @@ FIELD(SDHC_PRNSTS, WRITE_PROTECT,      19, 1);
->
->  /* ROC Auto CMD12 error status register 0x0 */
->  #define SDHC_ACMD12ERRSTS              0x3C
-> +FIELD(SDHC_ACMD12ERRSTS, TIMEOUT_ERR,  1, 1);
-> +FIELD(SDHC_ACMD12ERRSTS, CRC_ERR,      2, 1);
-> +FIELD(SDHC_ACMD12ERRSTS, INDEX_ERR,    4, 1);
->
->  /* HWInit Capabilities Register 0x05E80080 */
->  #define SDHC_CAPAB                     0x40
-> -#define SDHC_CAN_DO_DMA                0x00400000
->  #define SDHC_CAN_DO_ADMA2              0x00080000
->  #define SDHC_CAN_DO_ADMA1              0x00100000
->  #define SDHC_64_BIT_BUS_SUPPORT        (1 << 28)
->  #define SDHC_CAPAB_BLOCKSIZE(x)        (((x) >> 16) & 0x3)
-> +FIELD(SDHC_CAPAB, TOCLKFREQ,           0, 6);
-> +FIELD(SDHC_CAPAB, TOUNIT,              7, 1);
-> +FIELD(SDHC_CAPAB, BASECLKFREQ,         8, 8);
-> +FIELD(SDHC_CAPAB, MAXBLOCKLENGTH,     16, 2);
-> +FIELD(SDHC_CAPAB, HIGHSPEED,          21, 1);
-> +FIELD(SDHC_CAPAB, SDMA,               22, 1);
-> +FIELD(SDHC_CAPAB, SUSPRESUME,         23, 1);
-> +FIELD(SDHC_CAPAB, V33,                24, 1);
-> +FIELD(SDHC_CAPAB, V30,                25, 1);
-> +FIELD(SDHC_CAPAB, V18,                26, 1);
->
->  /* HWInit Maximum Current Capabilities Register 0x0 */
->  #define SDHC_MAXCURR                   0x48
-> +FIELD(SDHC_MAXCURR, V33_VDD1,          0, 8);
-> +FIELD(SDHC_MAXCURR, V30_VDD1,          8, 8);
-> +FIELD(SDHC_MAXCURR, V18_VDD1,         16, 8);
->
->  /* W Force Event Auto CMD12 Error Interrupt Register 0x0000 */
->  #define SDHC_FEAER                     0x50
-> diff --git a/include/hw/sd/sdhci.h b/include/hw/sd/sdhci.h
-> index ddd5040410..266030dc8d 100644
-> --- a/include/hw/sd/sdhci.h
-> +++ b/include/hw/sd/sdhci.h
-> @@ -102,6 +102,12 @@ typedef struct SDHCIState {
->      /* Configurable properties */
->      bool pending_insert_quirk; /* Quirk for Raspberry Pi card insert int=
- */
->      uint8_t spec_version;
-> +    struct {
-> +        bool suspend;
-> +        bool high_speed;
-> +        bool sdma;
-> +        bool v33, v30, v18;
-> +    } cap;
->  } SDHCIState;
->
->  #define TYPE_PCI_SDHCI "sdhci-pci"
-> diff --git a/hw/sd/sdhci.c b/hw/sd/sdhci.c
-> index cd4a8efdd7..e7dbab2fdc 100644
-> --- a/hw/sd/sdhci.c
-> +++ b/hw/sd/sdhci.c
-> @@ -44,12 +44,6 @@
->   * 0 - not supported, 1 - supported, other - prohibited.
->   */
->  #define SDHC_CAPAB_64BITBUS       0ul        /* 64-bit System Bus Suppor=
-t */
-> -#define SDHC_CAPAB_18V            1ul        /* Voltage support 1.8v */
-> -#define SDHC_CAPAB_30V            0ul        /* Voltage support 3.0v */
-> -#define SDHC_CAPAB_33V            1ul        /* Voltage support 3.3v */
-> -#define SDHC_CAPAB_SUSPRESUME     0ul        /* Suspend/resume support *=
-/
-> -#define SDHC_CAPAB_SDMA           1ul        /* SDMA support */
-> -#define SDHC_CAPAB_HIGHSPEED      1ul        /* High speed support */
->  #define SDHC_CAPAB_ADMA1          1ul        /* ADMA1 support */
->  #define SDHC_CAPAB_ADMA2          1ul        /* ADMA2 support */
->  /* Maximum host controller R/W buffers size
-> @@ -63,9 +57,7 @@
->  #define SDHC_CAPAB_TOCLKFREQ      52ul
->
->  /* Now check all parameters and calculate CAPABILITIES REGISTER value */
-> -#if SDHC_CAPAB_64BITBUS > 1 || SDHC_CAPAB_18V > 1 || SDHC_CAPAB_30V > 1 =
-||     \
-> -    SDHC_CAPAB_33V > 1 || SDHC_CAPAB_SUSPRESUME > 1 || SDHC_CAPAB_SDMA >=
- 1 ||  \
-> -    SDHC_CAPAB_HIGHSPEED > 1 || SDHC_CAPAB_ADMA2 > 1 || SDHC_CAPAB_ADMA1=
- > 1 ||\
-> +#if SDHC_CAPAB_64BITBUS > 1 || SDHC_CAPAB_ADMA2 > 1 || SDHC_CAPAB_ADMA1 =
-> 1 || \
->      SDHC_CAPAB_TOUNIT > 1
->  #error Capabilities features can have value 0 or 1 only!
->  #endif
-> @@ -90,16 +82,33 @@
->  #endif
->
->  #define SDHC_CAPAB_REG_DEFAULT                                 \
-> -   ((SDHC_CAPAB_64BITBUS << 28) | (SDHC_CAPAB_18V << 26) |     \
-> -    (SDHC_CAPAB_30V << 25) | (SDHC_CAPAB_33V << 24) |          \
-> -    (SDHC_CAPAB_SUSPRESUME << 23) | (SDHC_CAPAB_SDMA << 22) |  \
-> -    (SDHC_CAPAB_HIGHSPEED << 21) | (SDHC_CAPAB_ADMA1 << 20) |  \
-> +   ((SDHC_CAPAB_64BITBUS << 28) | (SDHC_CAPAB_ADMA1 << 20) |   \
->      (SDHC_CAPAB_ADMA2 << 19) | (MAX_BLOCK_LENGTH << 16) |      \
->      (SDHC_CAPAB_BASECLKFREQ << 8) | (SDHC_CAPAB_TOUNIT << 7) | \
->      (SDHC_CAPAB_TOCLKFREQ))
->
->  #define MASKED_WRITE(reg, mask, val)  (reg =3D (reg & (mask)) | (val))
->
-> +static void sdhci_init_capareg(SDHCIState *s, Error **errp)
-> +{
-> +    uint64_t capareg =3D 0;
-> +
-> +    switch (s->spec_version) {
-> +    case 1:
-> +        capareg =3D FIELD_DP64(capareg, SDHC_CAPAB, HIGHSPEED, s->cap.hi=
-gh_speed);
-> +        capareg =3D FIELD_DP64(capareg, SDHC_CAPAB, SDMA, s->cap.sdma);
-> +        capareg =3D FIELD_DP64(capareg, SDHC_CAPAB, SUSPRESUME, s->cap.s=
-uspend);
-> +        capareg =3D FIELD_DP64(capareg, SDHC_CAPAB, V33, s->cap.v33);
-> +        capareg =3D FIELD_DP64(capareg, SDHC_CAPAB, V30, s->cap.v30);
-> +        capareg =3D FIELD_DP64(capareg, SDHC_CAPAB, V18, s->cap.v18);
-> +        break;
-> +
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--LrlCTaKkInr4b3DYwc0FLWkVjKQvWteQ2
+From: Eric Blake <eblake@redhat.com>
+To: Stefan Priebe - Profihost AG <s.priebe@profihost.ag>,
+ qemu-devel <qemu-devel@nongnu.org>
+Message-ID: <a094668d-3294-e4b8-47a0-08ed8da5f9df@redhat.com>
+Subject: Re: [Qemu-devel] how to pass pcid to guest?
+References: <cb61acc7-1a7a-616a-e2f7-29e8226ca0c3@profihost.ag>
+In-Reply-To: <cb61acc7-1a7a-616a-e2f7-29e8226ca0c3@profihost.ag>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Don't we need to support v2 here as well? We default to v2 don't we?
+On 01/08/2018 02:03 PM, Stefan Priebe - Profihost AG wrote:
+> Hello,
+>=20
+> for meltdown mitigation and performance it's important to have the pcid=
 
-Alistair
+> flag passed down to the guest (f.e.
+> https://groups.google.com/forum/m/#!topic/mechanical-sympathy/L9mHTbeQL=
+NU).
 
-> +    default:
-> +        error_setg(errp, "Unsupported spec version: %u", s->spec_version=
-);
-> +    }
-> +    s->capareg =3D capareg;
-> +}
-> +
->  static uint8_t sdhci_slotint(SDHCIState *s)
->  {
->      return (s->norintsts & s->norintsigen) || (s->errintsts & s->errints=
-igen) ||
-> @@ -1032,7 +1041,7 @@ sdhci_write(void *opaque, hwaddr offset, uint64_t v=
-al, unsigned size)
->      case SDHC_TRNMOD:
->          /* DMA can be enabled only if it is supported as indicated by
->           * capabilities register */
-> -        if (!(s->capareg & SDHC_CAN_DO_DMA)) {
-> +        if (!(s->capareg & R_SDHC_CAPAB_SDMA_MASK)) {
->              value &=3D ~SDHC_TRNS_DMA;
->          }
->          MASKED_WRITE(s->trnmod, mask, value & SDHC_TRNMOD_MASK);
-> @@ -1186,6 +1195,10 @@ static void sdhci_init_readonly_registers(SDHCISta=
-te *s, Error **errp)
->          return;
->      }
->      s->version =3D (SDHC_HCVER_VENDOR << 8) | (s->spec_version - 1);
-> +
-> +    if (s->capareg =3D=3D UINT64_MAX) {
-> +        sdhci_init_capareg(s, errp);
-> +    }
->  }
->
->  static void sdhci_initfn(SDHCIState *s)
-> @@ -1305,8 +1318,21 @@ const VMStateDescription sdhci_vmstate =3D {
->   * specific host controller implementation */
->  static Property sdhci_properties[] =3D {
->      DEFINE_PROP_UINT8("sd-spec-version", SDHCIState, spec_version, 2),
-> -    DEFINE_PROP_UINT64("capareg", SDHCIState, capareg,
-> -            SDHC_CAPAB_REG_DEFAULT),
-> +
-> +    /* DMA */
-> +    DEFINE_PROP_BOOL("sdma", SDHCIState, cap.sdma, true),
-> +    /* Suspend/resume support */
-> +    DEFINE_PROP_BOOL("suspend", SDHCIState, cap.suspend, false),
-> +    /* High speed support */
-> +    DEFINE_PROP_BOOL("high-speed", SDHCIState, cap.high_speed, true),
-> +    /* Voltage support 3.3/3.0/1.8V */
-> +    DEFINE_PROP_BOOL("3v3", SDHCIState, cap.v33, true),
-> +    DEFINE_PROP_BOOL("3v0", SDHCIState, cap.v30, false),
-> +    DEFINE_PROP_BOOL("1v8", SDHCIState, cap.v18, false),
-> +
-> +    /* capareg: deprecated */
-> +    DEFINE_PROP_UINT64("capareg", SDHCIState, capareg, UINT64_MAX),
-> +
->      DEFINE_PROP_UINT64("maxcurr", SDHCIState, maxcurr, 0),
->      DEFINE_PROP_BOOL("pending-insert-quirk", SDHCIState, pending_insert_=
-quirk,
->                       false),
-> --
-> 2.15.1
->
->
+Indeed; you are still waiting on the qemu patch mentioned here:
+https://www.qemu.org/2018/01/04/spectre/
+
+which is still undergoing the review process, but should be up (in the
+form of 2.11.1) "in the next few days".
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--LrlCTaKkInr4b3DYwc0FLWkVjKQvWteQ2
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlpT67oACgkQp6FrSiUn
+Q2qeUAf/Yt2Xj2wDFoQUiyQWTr6o0LTYYs9TdoKGsCgso6DfrybHM/vFwptkZE08
+BWY+UJDPAjDT7aRpcqIfK9OXKrXf6OwqZirZMJqrj27Eb/uo2EWAkOYGd0HNifPk
+er9P3AiE2nVfRF15dL4JtgesP8+pnJKaMzC71VrNz9JU/MGe76tWlxRSVQZ2tWql
+suy/n89mfWJtugoCA/dUTVBoqGK4uo6qFjHzTMiP0ammkd2zCXEZbP4iTwlZCfYw
+bS1FI7SwkEmIEPFLx9znn5BMycYO5YjTo638ronDb3C8lq8zT63Vuq2amo4XEtD9
+zix7QjJuaosablEEmRSro9c/VNkH5w==
+=fs0V
+-----END PGP SIGNATURE-----
+
+--LrlCTaKkInr4b3DYwc0FLWkVjKQvWteQ2--
