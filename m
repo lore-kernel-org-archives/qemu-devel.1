@@ -1,22 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38629)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40877)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1eYfoz-0005mm-MR
-	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 17:23:10 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1eYfuf-0000Jm-Rs
+	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 17:29:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1eYfoy-0000TU-KC
-	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 17:23:09 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1eYfua-0003aE-Sy
+	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 17:29:01 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:57058)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1eYfua-0003Zj-KO
+	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 17:28:56 -0500
+Date: Mon, 8 Jan 2018 20:28:53 -0200
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20180108222853.GL6646@localhost.localdomain>
+References: <20180108205052.24385-1-vincent@bernat.im>
+	<20180108211623.GJ6646@localhost.localdomain>
+	<m3d12k9fyj.fsf@luffy.cx>
+	<20180108221422.GK6646@localhost.localdomain>
+	<m38td89ej7.fsf@luffy.cx>
 MIME-Version: 1.0
-Sender: alistair23@gmail.com
-In-Reply-To: <20180108154303.6522-5-f4bug@amsat.org>
-References: <20180108154303.6522-1-f4bug@amsat.org>
-	<20180108154303.6522-5-f4bug@amsat.org>
-From: Alistair Francis <alistair.francis@xilinx.com>
-Date: Mon, 8 Jan 2018 14:22:36 -0800
-Message-ID: <CAKmqyKMbf9RxyfqE2s1fvcUGp+t-Ywdwjx5CEQvKO_Pe9HnEFw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <m38td89ej7.fsf@luffy.cx>
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v5 04/31] sdhci: add clock capabilities
- (Spec v1)
+Subject: Re: [Qemu-devel] [PATCH] target-i386: add pcid to both Sandy Bridge
+ and Ivy Bridge
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,139 +32,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Cc: Alistair Francis <alistair.francis@xilinx.com>, Peter Maydell <peter.maydell@linaro.org>, Andrey Smirnov <andrew.smirnov@gmail.com>, Igor Mitsyanko <i.mitsyanko@gmail.com>, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, Prasad J Pandit <pjp@fedoraproject.org>, =?UTF-8?Q?Gr=C3=A9gory_Estrade?= <gregory.estrade@gmail.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Krzysztof Kozlowski <krzk@kernel.org>, Jean-Christophe Dubois <jcd@tribudubois.net>, Sai Pavan Boddu <saipava@xilinx.com>, qemu-arm <qemu-arm@nongnu.org>, Clement Deschamps <clement.deschamps@antfield.fr>, Andrew Baumann <Andrew.Baumann@microsoft.com>, Eduardo Habkost <ehabkost@redhat.com>
+To: Vincent Bernat <vincent@bernat.im>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, qemu-devel@nongnu.org
 
-On Mon, Jan 8, 2018 at 7:42 AM, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.or=
-g> wrote:
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-> ---
->  include/hw/sd/sdhci.h |  2 ++
->  hw/sd/sdhci.c         | 52 +++++++++++++++++++++++++++++++--------------=
-------
->  2 files changed, 34 insertions(+), 20 deletions(-)
->
-> diff --git a/include/hw/sd/sdhci.h b/include/hw/sd/sdhci.h
-> index 2703da1d5a..c1602becd2 100644
-> --- a/include/hw/sd/sdhci.h
-> +++ b/include/hw/sd/sdhci.h
-> @@ -103,6 +103,8 @@ typedef struct SDHCIState {
->      bool pending_insert_quirk; /* Quirk for Raspberry Pi card insert int=
- */
->      uint8_t spec_version;
->      struct {
-> +        uint8_t timeout_clk_freq, base_clk_freq_mhz;
-> +        bool timeout_clk_in_mhz;
->          uint16_t max_blk_len;
->          bool suspend;
->          bool high_speed;
-> diff --git a/hw/sd/sdhci.c b/hw/sd/sdhci.c
-> index c78643fe54..05681c86d6 100644
-> --- a/hw/sd/sdhci.c
-> +++ b/hw/sd/sdhci.c
-> @@ -46,36 +46,31 @@
->  #define SDHC_CAPAB_64BITBUS       0ul        /* 64-bit System Bus Suppor=
-t */
->  #define SDHC_CAPAB_ADMA1          1ul        /* ADMA1 support */
->  #define SDHC_CAPAB_ADMA2          1ul        /* ADMA2 support */
-> -/* Maximum clock frequency for SDclock in MHz
-> - * value in range 10-63 MHz, 0 - not defined */
-> -#define SDHC_CAPAB_BASECLKFREQ    52ul
-> -#define SDHC_CAPAB_TOUNIT         1ul  /* Timeout clock unit 0 - kHz, 1 =
-- MHz */
-> -/* Timeout clock frequency 1-63, 0 - not defined */
-> -#define SDHC_CAPAB_TOCLKFREQ      52ul
->
->  /* Now check all parameters and calculate CAPABILITIES REGISTER value */
-> -#if SDHC_CAPAB_64BITBUS > 1 || SDHC_CAPAB_ADMA2 > 1 || SDHC_CAPAB_ADMA1 =
-> 1 || \
-> -    SDHC_CAPAB_TOUNIT > 1
-> +#if SDHC_CAPAB_64BITBUS > 1 || SDHC_CAPAB_ADMA2 > 1 || SDHC_CAPAB_ADMA1 =
-> 1
->  #error Capabilities features can have value 0 or 1 only!
->  #endif
->
-> -#if (SDHC_CAPAB_BASECLKFREQ > 0 && SDHC_CAPAB_BASECLKFREQ < 10) || \
-> -    SDHC_CAPAB_BASECLKFREQ > 63
-> -#error SDclock frequency can have value in range 0, 10-63 only!
-> -#endif
-> -
-> -#if SDHC_CAPAB_TOCLKFREQ > 63
-> -#error Timeout clock frequency can have value in range 0-63 only!
-> -#endif
-> -
->  #define SDHC_CAPAB_REG_DEFAULT                                 \
->     ((SDHC_CAPAB_64BITBUS << 28) | (SDHC_CAPAB_ADMA1 << 20) |   \
-> -    (SDHC_CAPAB_ADMA2 << 19) |                                 \
-> -    (SDHC_CAPAB_BASECLKFREQ << 8) | (SDHC_CAPAB_TOUNIT << 7) | \
-> -    (SDHC_CAPAB_TOCLKFREQ))
-> +    (SDHC_CAPAB_ADMA2 << 19))
->
->  #define MASKED_WRITE(reg, mask, val)  (reg =3D (reg & (mask)) | (val))
->
-> +static void sdhci_check_capab_freq_range(SDHCIState *s, const char *desc=
-,
-> +                                         uint8_t freq, Error **errp)
-> +{
-> +    switch (freq) {
-> +    case 0:
-> +    case 10 ... 63:
-> +        break;
+On Mon, Jan 08, 2018 at 11:22:36PM +0100, Vincent Bernat wrote:
+>  =E2=9D=A6  8 janvier 2018 20:14 -0200, Eduardo Habkost <ehabkost@redha=
+t.com>=C2=A0:
+>=20
+> >> What are the consequences of running a too old kernel? Would KVM jus=
+t
+> >> hide PCID flag?
+> >
+> > On an old kernel, the SandyBridge and IvyBridge CPU models will
+> > be unexpectedly become not runnable.
+>=20
+> But, isn't it the same for more recent models that already have PCID
+> enabled?
 
-You are missing a default here.
+Yes, the more recent models are already not runnable on those
+hosts.  The key here is "unexpectedly": management software can
+assume that the CPU model won't become unrunnable when it was
+runnable in the past, and logic that decides if/where a VM can be
+started (or migrated to) might break.
 
-Alistair
-
-> +        error_setg(errp, "SD %s clock frequency can have value"
-> +                   "in range 0-63 only", desc);
-> +        return;
-> +    }
-> +}
-> +
->  static void sdhci_init_capareg(SDHCIState *s, Error **errp)
->  {
->      uint64_t capareg =3D 0;
-> @@ -83,6 +78,16 @@ static void sdhci_init_capareg(SDHCIState *s, Error **=
-errp)
->
->      switch (s->spec_version) {
->      case 1:
-> +        sdhci_check_capab_freq_range(s, "Timeout", s->cap.timeout_clk_fr=
-eq,
-> +                                     errp);
-> +        capareg =3D FIELD_DP64(capareg, SDHC_CAPAB, TOCLKFREQ,
-> +                             s->cap.timeout_clk_freq);
-> +        sdhci_check_capab_freq_range(s, "Base", s->cap.base_clk_freq_mhz=
-, errp);
-> +        capareg =3D FIELD_DP64(capareg, SDHC_CAPAB, BASECLKFREQ,
-> +                             s->cap.base_clk_freq_mhz);
-> +        capareg =3D FIELD_DP64(capareg, SDHC_CAPAB, TOUNIT,
-> +                             s->cap.timeout_clk_in_mhz);
-> +
->          val =3D ctz32(s->cap.max_blk_len >> 9);
->          if (val >=3D 0b11) {
->              error_setg(errp, "block size can be 512, 1024 or 2048 only")=
-;
-> @@ -1304,6 +1309,13 @@ const VMStateDescription sdhci_vmstate =3D {
->  static Property sdhci_properties[] =3D {
->      DEFINE_PROP_UINT8("sd-spec-version", SDHCIState, spec_version, 2),
->
-> +    /* Timeout clock frequency 1-63, 0 - not defined */
-> +    DEFINE_PROP_UINT8("timeout-freq", SDHCIState, cap.timeout_clk_freq, =
-0),
-> +    /* Timeout clock unit 0 - kHz, 1 - MHz */
-> +    DEFINE_PROP_BOOL("freq-in-mhz", SDHCIState, cap.timeout_clk_in_mhz, =
-true),
-> +    /* Maximum base clock frequency for SD clock in MHz (range 10-63 MHz=
-, 0) */
-> +    DEFINE_PROP_UINT8("max-frequency", SDHCIState, cap.base_clk_freq_mhz=
-, 0),
-> +
->      /* Maximum host controller R/W buffers size
->       * Possible values: 512, 1024, 2048 bytes */
->      DEFINE_PROP_UINT16("max-block-length", SDHCIState, cap.max_blk_len, =
-512),
-> --
-> 2.15.1
->
->
+--=20
+Eduardo
