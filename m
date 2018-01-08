@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49879)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50549)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eYXxH-0005Gm-1W
-	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 08:59:11 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1eYXym-0006H7-3C
+	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 09:00:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eYXxG-0002p5-7F
-	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 08:59:11 -0500
-Received: from mail-ot0-x232.google.com ([2607:f8b0:4003:c0f::232]:37212)
+	(envelope-from <peter.maydell@linaro.org>) id 1eYXyl-00049E-5l
+	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 09:00:44 -0500
+Received: from mail-oi0-x232.google.com ([2607:f8b0:4003:c06::232]:42390)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1eYXxG-0002od-1T
-	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 08:59:10 -0500
-Received: by mail-ot0-x232.google.com with SMTP id p31so9272881ota.4
-	for <qemu-devel@nongnu.org>; Mon, 08 Jan 2018 05:59:09 -0800 (PST)
+	id 1eYXyl-00048m-10
+	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 09:00:43 -0500
+Received: by mail-oi0-x232.google.com with SMTP id o64so7381508oia.9
+	for <qemu-devel@nongnu.org>; Mon, 08 Jan 2018 06:00:42 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20180102193622.27215-5-andrew.smirnov@gmail.com>
+In-Reply-To: <20180102193622.27215-6-andrew.smirnov@gmail.com>
 References: <20180102193622.27215-1-andrew.smirnov@gmail.com>
-	<20180102193622.27215-5-andrew.smirnov@gmail.com>
+	<20180102193622.27215-6-andrew.smirnov@gmail.com>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 8 Jan 2018 13:58:48 +0000
-Message-ID: <CAFEAcA9aHoR84nhGZwLfHht+_7UKBC+AovOyLwzc-2CsiZSmLw@mail.gmail.com>
+Date: Mon, 8 Jan 2018 14:00:21 +0000
+Message-ID: <CAFEAcA-4=wy==HyXxivLQJE1rRsZxOW0=r7p3raTKfJEtsVPBA@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3 04/11] imx_fec: Move Tx frame buffer
- away from the stack
+Subject: Re: [Qemu-devel] [PATCH v3 05/11] imx_fec: Use ENET_FTRL to
+ determine truncation length
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,8 +36,12 @@ Cc: qemu-arm <qemu-arm@nongnu.org>, Jason Wang <jasowang@redhat.com>, =?UTF-8?Q?
 
 On 2 January 2018 at 19:36, Andrey Smirnov <andrew.smirnov@gmail.com> wrote=
 :
-> Make Tx frame assembly buffer to be a paort of IMXFECState structure
-> to avoid a concern about having large data buffer on the stack.
+> Frame truncation length, TRUNC_FL, is determined by the contents of
+> ENET_FTRL register, so convert the code to use it instead of a
+> hardcoded constant.
+>
+> To avoid the case where TRUNC_FL is greater that ENET_MAX_FRAME_SIZE,
+> increase the value of the latter to its theoretical maximum of 16K.
 >
 > Cc: Peter Maydell <peter.maydell@linaro.org>
 > Cc: Jason Wang <jasowang@redhat.com>
