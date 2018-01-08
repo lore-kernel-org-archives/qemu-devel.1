@@ -1,21 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48661)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50246)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <gson@gson.org>) id 1eYZrz-0000vn-Li
-	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 11:01:52 -0500
+	(envelope-from <cohuck@redhat.com>) id 1eYZw9-0004W0-NX
+	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 11:06:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <gson@gson.org>) id 1eYZru-0003P9-T3
-	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 11:01:51 -0500
+	(envelope-from <cohuck@redhat.com>) id 1eYZw4-0006pe-MW
+	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 11:06:09 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:34294)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1eYZw4-0006oW-Dw
+	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 11:06:04 -0500
+Date: Mon, 8 Jan 2018 17:05:53 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20180108170553.6312b178.cohuck@redhat.com>
+In-Reply-To: <20180107123224.100877-3-marcel@redhat.com>
+References: <20180107123224.100877-1-marcel@redhat.com>
+	<20180107123224.100877-3-marcel@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Message-ID: <23123.38373.555937.75671@guava.gson.org>
-Date: Mon, 8 Jan 2018 18:01:41 +0200
-In-Reply-To: Re: <CAFEAcA_iPT14HSkMG4T43H3vykqBu=rFJpBe4idoVh9LFUEJaA@mail.gmail.com>
-References: <23118.26328.811644.330716@guava.gson.org>
-	<CAFEAcA_iPT14HSkMG4T43H3vykqBu=rFJpBe4idoVh9LFUEJaA@mail.gmail.com>
-From: Andreas Gustafsson <gson@gson.org>
-Subject: Re: [Qemu-devel] [PATCH] oslib-posix: check for posix_memalign in
- configure script
+Subject: [Qemu-devel] Getting rid of phys_mem_set_alloc (was: Re: [PATCH V6
+ 2/5] mem: add share parameter to memory-backend-ram)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,13 +28,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Kamil Rytarowski <kamil@netbsd.org>, QEMU Trivial <qemu-trivial@nongnu.org>
+To: Marcel Apfelbaum <marcel@redhat.com>, borntraeger@de.ibm.com
+Cc: qemu-devel@nongnu.org, ehabkost@redhat.com, imammedo@redhat.com, yuval.shaia@oracle.com, pbonzini@redhat.com, mst@redhat.com
 
-Peter Maydell wrote:
-> Can we put this through the -trivial tree? (cc'd)
+On Sun,  7 Jan 2018 14:32:21 +0200
+Marcel Apfelbaum <marcel@redhat.com> wrote:
 
-I'm not sufficiently familiar with the intenal workflows of the qemu
-project to give a meaningful answer to that question.
--- 
-Andreas Gustafsson, gson@gson.org
+Looking at the churn below...
+
+> diff --git a/exec.c b/exec.c
+> index 4722e521d4..247f8bd0c0 100644
+> --- a/exec.c
+> +++ b/exec.c
+> @@ -1278,7 +1278,7 @@ static int subpage_register (subpage_t *mmio, uint32_t start, uint32_t end,
+>                               uint16_t section);
+>  static subpage_t *subpage_init(FlatView *fv, hwaddr base);
+>  
+> -static void *(*phys_mem_alloc)(size_t size, uint64_t *align) =
+> +static void *(*phys_mem_alloc)(size_t size, uint64_t *align, bool shared) =
+>                                 qemu_anon_ram_alloc;
+>  
+>  /*
+> @@ -1286,7 +1286,7 @@ static void *(*phys_mem_alloc)(size_t size, uint64_t *align) =
+>   * Accelerators with unusual needs may need this.  Hopefully, we can
+>   * get rid of it eventually.
+>   */
+> -void phys_mem_set_alloc(void *(*alloc)(size_t, uint64_t *align))
+> +void phys_mem_set_alloc(void *(*alloc)(size_t, uint64_t *align, bool shared))
+>  {
+>      phys_mem_alloc = alloc;
+>  }
+
+> diff --git a/include/sysemu/kvm.h b/include/sysemu/kvm.h
+> index bbf12a1723..85002ac49a 100644
+> --- a/include/sysemu/kvm.h
+> +++ b/include/sysemu/kvm.h
+> @@ -248,7 +248,7 @@ int kvm_on_sigbus(int code, void *addr);
+>  
+>  /* interface with exec.c */
+>  
+> -void phys_mem_set_alloc(void *(*alloc)(size_t, uint64_t *align));
+> +void phys_mem_set_alloc(void *(*alloc)(size_t, uint64_t *align, bool shared));
+>  
+>  /* internal API */
+>  
+
+> diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
+> index 9b8b59f2a2..6c0fc2f89c 100644
+> --- a/target/s390x/kvm.c
+> +++ b/target/s390x/kvm.c
+> @@ -144,7 +144,7 @@ static int cap_gs;
+>  
+>  static int active_cmma;
+>  
+> -static void *legacy_s390_alloc(size_t size, uint64_t *align);
+> +static void *legacy_s390_alloc(size_t size, uint64_t *align, bool shared);
+>  
+>  static int kvm_s390_query_mem_limit(uint64_t *memory_limit)
+>  {
+> @@ -743,7 +743,7 @@ int kvm_s390_mem_op(S390CPU *cpu, vaddr addr, uint8_t ar, void *hostbuf,
+>   * to grow. We also have to use MAP parameters that avoid
+>   * read-only mapping of guest pages.
+>   */
+> -static void *legacy_s390_alloc(size_t size, uint64_t *align)
+> +static void *legacy_s390_alloc(size_t size, uint64_t *align, bool shared)
+>  {
+>      void *mem;
+>  
+
+...I'm wondering whether we have any chance to get rid of this in the
+future?
+
+s390x/kvm is the only user:
+
+    if (!kvm_check_extension(s, KVM_CAP_S390_GMAP)
+        || !kvm_check_extension(s, KVM_CAP_S390_COW)) {
+        phys_mem_set_alloc(legacy_s390_alloc);
+    }
+
+In practice, this means depending on ESOP in the host. Are there still
+any machines/hypervisors without ESOP that we can reasonably expect
+people to run kvm on?
