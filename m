@@ -1,16 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35421)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35432)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1eYQNy-0003FE-0W
+	(envelope-from <dgibson@ozlabs.org>) id 1eYQNy-0003Fp-Hb
 	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 00:54:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1eYQNu-0006Wc-Vv
+	(envelope-from <dgibson@ozlabs.org>) id 1eYQNu-0006Vr-JF
 	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 00:54:14 -0500
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Mon,  8 Jan 2018 16:53:43 +1100
-Message-Id: <20180108055348.20444-8-david@gibson.dropbear.id.au>
+Date: Mon,  8 Jan 2018 16:53:44 +1100
+Message-Id: <20180108055348.20444-9-david@gibson.dropbear.id.au>
 In-Reply-To: <20180108055348.20444-1-david@gibson.dropbear.id.au>
 References: <20180108055348.20444-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PULL 07/12] hw/ide: Emulate SiI3112 SATA controller
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 08/12] ppc/pnv: change powernv_ prefix to pnv_
+ for overall naming consistency
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,451 +24,586 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: surajjs@au1.ibm.com, groug@kaod.org, mdroth@linux.vnet.ibm.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, BALATON Zoltan <balaton@eik.bme.hu>, David Gibson <david@gibson.dropbear.id.au>
+Cc: surajjs@au1.ibm.com, groug@kaod.org, mdroth@linux.vnet.ibm.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>, David Gibson <david@gibson.dropbear.id.au>
 
-From: BALATON Zoltan <balaton@eik.bme.hu>
+From: C=C3=A9dric Le Goater <clg@kaod.org>
 
-This is a common generic PCI SATA controller that is also used in PCs
-but more importantly guests running on the Sam460ex board prefer this
-card and have a driver for it (unlike for other SATA controllers
-already emulated).
+The 'pnv' prefix is now used for all and the routines populating the
+device tree start with 'pnv_dt'. The handler of the PnvXScomInterface
+is also renamed to 'dt_xscom' which should reflect that it is
+populating the device tree under the 'xscom@' node of the chip.
 
-Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
-Acked-by: John Snow <jsnow@redhat.com>
+Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- MAINTAINERS                        |   6 +
- default-configs/ppcemb-softmmu.mak |   1 +
- hw/ide/Makefile.objs               |   1 +
- hw/ide/sii3112.c                   | 368 +++++++++++++++++++++++++++++++++++++
- hw/ide/trace-events                |   5 +
- 5 files changed, 381 insertions(+)
- create mode 100644 hw/ide/sii3112.c
+ hw/ppc/pnv.c               | 94 ++++++++++++++++++++++------------------=
+------
+ hw/ppc/pnv_bmc.c           |  2 +-
+ hw/ppc/pnv_core.c          |  8 ++--
+ hw/ppc/pnv_lpc.c           |  6 +--
+ hw/ppc/pnv_psi.c           |  4 +-
+ hw/ppc/pnv_xscom.c         | 10 ++---
+ include/hw/ppc/pnv.h       | 10 ++---
+ include/hw/ppc/pnv_xscom.h |  4 +-
+ 8 files changed, 67 insertions(+), 71 deletions(-)
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 73a5555735..40cd7ee841 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -765,6 +765,12 @@ L: qemu-ppc@nongnu.org
- S: Odd Fixes
- F: hw/ppc/virtex_ml507.c
- 
-+sam460ex
-+M: BALATON Zoltan <balaton@eik.bme.hu>
-+L: qemu-ppc@nongnu.org
-+S: Maintained
-+F: hw/ide/sii3112.c
-+
- SH4 Machines
- ------------
- R2D
-diff --git a/default-configs/ppcemb-softmmu.mak b/default-configs/ppcemb-softmmu.mak
-index 13917fb7a3..5db4618a5a 100644
---- a/default-configs/ppcemb-softmmu.mak
-+++ b/default-configs/ppcemb-softmmu.mak
-@@ -16,3 +16,4 @@ CONFIG_I8259=y
- CONFIG_XILINX=y
- CONFIG_XILINX_ETHLITE=y
- CONFIG_SM501=y
-+CONFIG_IDE_SII3112=y
-diff --git a/hw/ide/Makefile.objs b/hw/ide/Makefile.objs
-index f0edca3300..fc328ffbe8 100644
---- a/hw/ide/Makefile.objs
-+++ b/hw/ide/Makefile.objs
-@@ -11,3 +11,4 @@ common-obj-$(CONFIG_MICRODRIVE) += microdrive.o
- common-obj-$(CONFIG_AHCI) += ahci.o
- common-obj-$(CONFIG_AHCI) += ich.o
- common-obj-$(CONFIG_ALLWINNER_A10) += ahci-allwinner.o
-+common-obj-$(CONFIG_IDE_SII3112) += sii3112.o
-diff --git a/hw/ide/sii3112.c b/hw/ide/sii3112.c
-new file mode 100644
-index 0000000000..e2f5562bb7
---- /dev/null
-+++ b/hw/ide/sii3112.c
-@@ -0,0 +1,368 @@
-+/*
-+ * QEMU SiI3112A PCI to Serial ATA Controller Emulation
-+ *
-+ * Copyright (C) 2017 BALATON Zoltan <balaton@eik.bme.hu>
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or later.
-+ * See the COPYING file in the top-level directory.
-+ *
-+ */
-+
-+/* For documentation on this and similar cards see:
-+ * http://wiki.osdev.org/User:Quok/Silicon_Image_Datasheets
-+ */
-+
-+#include <qemu/osdep.h>
-+#include <hw/ide/pci.h>
-+#include "trace.h"
-+
-+#define TYPE_SII3112_PCI "sii3112"
-+#define SII3112_PCI(obj) OBJECT_CHECK(SiI3112PCIState, (obj), \
-+                         TYPE_SII3112_PCI)
-+
-+typedef struct SiI3112Regs {
-+    uint32_t confstat;
-+    uint32_t scontrol;
-+    uint16_t sien;
-+    uint8_t swdata;
-+} SiI3112Regs;
-+
-+typedef struct SiI3112PCIState {
-+    PCIIDEState i;
-+    MemoryRegion mmio;
-+    SiI3112Regs regs[2];
-+} SiI3112PCIState;
-+
-+/* The sii3112_reg_read and sii3112_reg_write functions implement the
-+ * Internal Register Space - BAR5 (section 6.7 of the data sheet).
-+ */
-+
-+static uint64_t sii3112_reg_read(void *opaque, hwaddr addr,
-+                                unsigned int size)
-+{
-+    SiI3112PCIState *d = opaque;
-+    uint64_t val = 0;
-+
-+    switch (addr) {
-+    case 0x00:
-+        val = d->i.bmdma[0].cmd;
-+        break;
-+    case 0x01:
-+        val = d->regs[0].swdata;
-+        break;
-+    case 0x02:
-+        val = d->i.bmdma[0].status;
-+        break;
-+    case 0x03:
-+        val = 0;
-+        break;
-+    case 0x04 ... 0x07:
-+        val = bmdma_addr_ioport_ops.read(&d->i.bmdma[0], addr - 4, size);
-+        break;
-+    case 0x08:
-+        val = d->i.bmdma[1].cmd;
-+        break;
-+    case 0x09:
-+        val = d->regs[1].swdata;
-+        break;
-+    case 0x0a:
-+        val = d->i.bmdma[1].status;
-+        break;
-+    case 0x0b:
-+        val = 0;
-+        break;
-+    case 0x0c ... 0x0f:
-+        val = bmdma_addr_ioport_ops.read(&d->i.bmdma[1], addr - 12, size);
-+        break;
-+    case 0x10:
-+        val = d->i.bmdma[0].cmd;
-+        val |= (d->regs[0].confstat & (1UL << 11) ? (1 << 4) : 0); /*SATAINT0*/
-+        val |= (d->regs[1].confstat & (1UL << 11) ? (1 << 6) : 0); /*SATAINT1*/
-+        val |= (d->i.bmdma[1].status & BM_STATUS_INT ? (1 << 14) : 0);
-+        val |= d->i.bmdma[0].status << 16;
-+        val |= d->i.bmdma[1].status << 24;
-+        break;
-+    case 0x18:
-+        val = d->i.bmdma[1].cmd;
-+        val |= (d->regs[1].confstat & (1UL << 11) ? (1 << 4) : 0);
-+        val |= d->i.bmdma[1].status << 16;
-+        break;
-+    case 0x80 ... 0x87:
-+        if (size == 1) {
-+            val = ide_ioport_read(&d->i.bus[0], addr - 0x80);
-+        } else if (addr == 0x80) {
-+            val = (size == 2) ? ide_data_readw(&d->i.bus[0], 0) :
-+                                ide_data_readl(&d->i.bus[0], 0);
-+        } else {
-+            val = (1ULL << (size * 8)) - 1;
-+        }
-+        break;
-+    case 0x8a:
-+        val = (size == 1) ? ide_status_read(&d->i.bus[0], 4) :
-+                            (1ULL << (size * 8)) - 1;
-+        break;
-+    case 0xa0:
-+        val = d->regs[0].confstat;
-+        break;
-+    case 0xc0 ... 0xc7:
-+        if (size == 1) {
-+            val = ide_ioport_read(&d->i.bus[1], addr - 0xc0);
-+        } else if (addr == 0xc0) {
-+            val = (size == 2) ? ide_data_readw(&d->i.bus[1], 0) :
-+                                ide_data_readl(&d->i.bus[1], 0);
-+        } else {
-+            val = (1ULL << (size * 8)) - 1;
-+        }
-+        break;
-+    case 0xca:
-+        val = (size == 1) ? ide_status_read(&d->i.bus[0], 4) :
-+                            (1ULL << (size * 8)) - 1;
-+        break;
-+    case 0xe0:
-+        val = d->regs[1].confstat;
-+        break;
-+    case 0x100:
-+        val = d->regs[0].scontrol;
-+        break;
-+    case 0x104:
-+        val = (d->i.bus[0].ifs[0].blk) ? 0x113 : 0;
-+        break;
-+    case 0x148:
-+        val = d->regs[0].sien << 16;
-+        break;
-+    case 0x180:
-+        val = d->regs[1].scontrol;
-+        break;
-+    case 0x184:
-+        val = (d->i.bus[1].ifs[0].blk) ? 0x113 : 0;
-+        break;
-+    case 0x1c8:
-+        val = d->regs[1].sien << 16;
-+        break;
-+    default:
-+        val = 0;
-+    }
-+    trace_sii3112_read(size, addr, val);
-+    return val;
-+}
-+
-+static void sii3112_reg_write(void *opaque, hwaddr addr,
-+                              uint64_t val, unsigned int size)
-+{
-+    SiI3112PCIState *d = opaque;
-+
-+    trace_sii3112_write(size, addr, val);
-+    switch (addr) {
-+    case 0x00:
-+    case 0x10:
-+        bmdma_cmd_writeb(&d->i.bmdma[0], val);
-+        break;
-+    case 0x01:
-+    case 0x11:
-+        d->regs[0].swdata = val & 0x3f;
-+        break;
-+    case 0x02:
-+    case 0x12:
-+        d->i.bmdma[0].status = (val & 0x60) | (d->i.bmdma[0].status & 1) |
-+                               (d->i.bmdma[0].status & ~val & 6);
-+        break;
-+    case 0x04 ... 0x07:
-+        bmdma_addr_ioport_ops.write(&d->i.bmdma[0], addr - 4, val, size);
-+        break;
-+    case 0x08:
-+    case 0x18:
-+        bmdma_cmd_writeb(&d->i.bmdma[1], val);
-+        break;
-+    case 0x09:
-+    case 0x19:
-+        d->regs[1].swdata = val & 0x3f;
-+        break;
-+    case 0x0a:
-+    case 0x1a:
-+        d->i.bmdma[1].status = (val & 0x60) | (d->i.bmdma[1].status & 1) |
-+                               (d->i.bmdma[1].status & ~val & 6);
-+        break;
-+    case 0x0c ... 0x0f:
-+        bmdma_addr_ioport_ops.write(&d->i.bmdma[1], addr - 12, val, size);
-+        break;
-+    case 0x80 ... 0x87:
-+        if (size == 1) {
-+            ide_ioport_write(&d->i.bus[0], addr - 0x80, val);
-+        } else if (addr == 0x80) {
-+            if (size == 2) {
-+                ide_data_writew(&d->i.bus[0], 0, val);
-+            } else {
-+                ide_data_writel(&d->i.bus[0], 0, val);
-+            }
-+        }
-+        break;
-+    case 0x8a:
-+        if (size == 1) {
-+            ide_cmd_write(&d->i.bus[0], 4, val);
-+        }
-+        break;
-+    case 0xc0 ... 0xc7:
-+        if (size == 1) {
-+            ide_ioport_write(&d->i.bus[1], addr - 0xc0, val);
-+        } else if (addr == 0xc0) {
-+            if (size == 2) {
-+                ide_data_writew(&d->i.bus[1], 0, val);
-+            } else {
-+                ide_data_writel(&d->i.bus[1], 0, val);
-+            }
-+        }
-+        break;
-+    case 0xca:
-+        if (size == 1) {
-+            ide_cmd_write(&d->i.bus[1], 4, val);
-+        }
-+        break;
-+    case 0x100:
-+        d->regs[0].scontrol = val & 0xfff;
-+        if (val & 1) {
-+            ide_bus_reset(&d->i.bus[0]);
-+        }
-+        break;
-+    case 0x148:
-+        d->regs[0].sien = (val >> 16) & 0x3eed;
-+        break;
-+    case 0x180:
-+        d->regs[1].scontrol = val & 0xfff;
-+        if (val & 1) {
-+            ide_bus_reset(&d->i.bus[1]);
-+        }
-+        break;
-+    case 0x1c8:
-+        d->regs[1].sien = (val >> 16) & 0x3eed;
-+        break;
-+    default:
-+        val = 0;
-+    }
-+}
-+
-+static const MemoryRegionOps sii3112_reg_ops = {
-+    .read = sii3112_reg_read,
-+    .write = sii3112_reg_write,
-+    .endianness = DEVICE_LITTLE_ENDIAN,
-+};
-+
-+/* the PCI irq level is the logical OR of the two channels */
-+static void sii3112_update_irq(SiI3112PCIState *s)
-+{
-+    int i, set = 0;
-+
-+    for (i = 0; i < 2; i++) {
-+        set |= s->regs[i].confstat & (1UL << 11);
-+    }
-+    pci_set_irq(PCI_DEVICE(s), (set ? 1 : 0));
-+}
-+
-+static void sii3112_set_irq(void *opaque, int channel, int level)
-+{
-+    SiI3112PCIState *s = opaque;
-+
-+    trace_sii3112_set_irq(channel, level);
-+    if (level) {
-+        s->regs[channel].confstat |= (1UL << 11);
-+    } else {
-+        s->regs[channel].confstat &= ~(1UL << 11);
-+    }
-+
-+    sii3112_update_irq(s);
-+}
-+
-+static void sii3112_reset(void *opaque)
-+{
-+    SiI3112PCIState *s = opaque;
-+    int i;
-+
-+    for (i = 0; i < 2; i++) {
-+        s->regs[i].confstat = 0x6515 << 16;
-+        ide_bus_reset(&s->i.bus[i]);
-+    }
-+}
-+
-+static void sii3112_pci_realize(PCIDevice *dev, Error **errp)
-+{
-+    SiI3112PCIState *d = SII3112_PCI(dev);
-+    PCIIDEState *s = PCI_IDE(dev);
-+    MemoryRegion *mr;
-+    qemu_irq *irq;
-+    int i;
-+
-+    pci_config_set_interrupt_pin(dev->config, 1);
-+    pci_set_byte(dev->config + PCI_CACHE_LINE_SIZE, 8);
-+
-+    /* BAR5 is in PCI memory space */
-+    memory_region_init_io(&d->mmio, OBJECT(d), &sii3112_reg_ops, d,
-+                         "sii3112.bar5", 0x200);
-+    pci_register_bar(dev, 5, PCI_BASE_ADDRESS_SPACE_MEMORY, &d->mmio);
-+
-+    /* BAR0-BAR4 are PCI I/O space aliases into BAR5 */
-+    mr = g_new(MemoryRegion, 1);
-+    memory_region_init_alias(mr, OBJECT(d), "sii3112.bar0", &d->mmio, 0x80, 8);
-+    pci_register_bar(dev, 0, PCI_BASE_ADDRESS_SPACE_IO, mr);
-+    mr = g_new(MemoryRegion, 1);
-+    memory_region_init_alias(mr, OBJECT(d), "sii3112.bar1", &d->mmio, 0x88, 4);
-+    pci_register_bar(dev, 1, PCI_BASE_ADDRESS_SPACE_IO, mr);
-+    mr = g_new(MemoryRegion, 1);
-+    memory_region_init_alias(mr, OBJECT(d), "sii3112.bar2", &d->mmio, 0xc0, 8);
-+    pci_register_bar(dev, 2, PCI_BASE_ADDRESS_SPACE_IO, mr);
-+    mr = g_new(MemoryRegion, 1);
-+    memory_region_init_alias(mr, OBJECT(d), "sii3112.bar3", &d->mmio, 0xc8, 4);
-+    pci_register_bar(dev, 3, PCI_BASE_ADDRESS_SPACE_IO, mr);
-+    mr = g_new(MemoryRegion, 1);
-+    memory_region_init_alias(mr, OBJECT(d), "sii3112.bar4", &d->mmio, 0, 16);
-+    pci_register_bar(dev, 4, PCI_BASE_ADDRESS_SPACE_IO, mr);
-+
-+    irq = qemu_allocate_irqs(sii3112_set_irq, d, 2);
-+    for (i = 0; i < 2; i++) {
-+        ide_bus_new(&s->bus[i], sizeof(s->bus[i]), DEVICE(dev), i, 1);
-+        ide_init2(&s->bus[i], irq[i]);
-+
-+        bmdma_init(&s->bus[i], &s->bmdma[i], s);
-+        s->bmdma[i].bus = &s->bus[i];
-+        ide_register_restart_cb(&s->bus[i]);
-+    }
-+    qemu_register_reset(sii3112_reset, s);
-+}
-+
-+static void sii3112_pci_exitfn(PCIDevice *dev)
-+{
-+    PCIIDEState *d = PCI_IDE(dev);
-+    int i;
-+
-+    for (i = 0; i < 2; ++i) {
-+        memory_region_del_subregion(&d->bmdma_bar, &d->bmdma[i].extra_io);
-+        memory_region_del_subregion(&d->bmdma_bar, &d->bmdma[i].addr_ioport);
-+    }
-+}
-+
-+static void sii3112_pci_class_init(ObjectClass *klass, void *data)
-+{
-+    DeviceClass *dc = DEVICE_CLASS(klass);
-+    PCIDeviceClass *pd = PCI_DEVICE_CLASS(klass);
-+
-+    pd->vendor_id = 0x1095;
-+    pd->device_id = 0x3112;
-+    pd->class_id = PCI_CLASS_STORAGE_RAID;
-+    pd->revision = 1;
-+    pd->realize = sii3112_pci_realize;
-+    pd->exit = sii3112_pci_exitfn;
-+    dc->desc = "SiI3112A SATA controller";
-+    set_bit(DEVICE_CATEGORY_STORAGE, dc->categories);
-+}
-+
-+static const TypeInfo sii3112_pci_info = {
-+    .name = TYPE_SII3112_PCI,
-+    .parent = TYPE_PCI_IDE,
-+    .instance_size = sizeof(SiI3112PCIState),
-+    .class_init = sii3112_pci_class_init,
-+};
-+
-+static void sii3112_register_types(void)
-+{
-+    type_register_static(&sii3112_pci_info);
-+}
-+
-+type_init(sii3112_register_types)
-diff --git a/hw/ide/trace-events b/hw/ide/trace-events
-index 601bd97d81..0c39cabe72 100644
---- a/hw/ide/trace-events
-+++ b/hw/ide/trace-events
-@@ -37,6 +37,11 @@ bmdma_addr_write(uint64_t data) "data: 0x%016"PRIx64
- bmdma_read(uint64_t addr, uint8_t val) "bmdma: readb 0x%"PRIx64" : 0x%02x"
- bmdma_write(uint64_t addr, uint64_t val) "bmdma: writeb 0x%"PRIx64" : 0x%02"PRIx64
- 
-+# hw/ide/sii3112.c
-+sii3112_read(int size, uint64_t addr, uint64_t val) "bmdma: read (size %d) 0x%"PRIx64" : 0x%02"PRIx64
-+sii3112_write(int size, uint64_t addr, uint64_t val) "bmdma: write (size %d) 0x%"PRIx64" : 0x%02"PRIx64
-+sii3112_set_irq(int channel, int level) "channel %d level %d"
-+
- # hw/ide/via.c
- bmdma_read_via(uint64_t addr, uint32_t val) "bmdma: readb 0x%"PRIx64" : 0x%02x"
- bmdma_write_via(uint64_t addr, uint64_t val) "bmdma: writeb 0x%"PRIx64" : 0x%02"PRIx64
--- 
+diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
+index 94ffc8e137..9475e8479c 100644
+--- a/hw/ppc/pnv.c
++++ b/hw/ppc/pnv.c
+@@ -77,8 +77,7 @@ static const char *pnv_chip_core_typename(const PnvChip=
+ *o)
+  * that has a different "affinity". In practice, it means one range
+  * per chip.
+  */
+-static void powernv_populate_memory_node(void *fdt, int chip_id, hwaddr =
+start,
+-                                         hwaddr size)
++static void pnv_dt_memory(void *fdt, int chip_id, hwaddr start, hwaddr s=
+ize)
+ {
+     char *mem_name;
+     uint64_t mem_reg_property[2];
+@@ -119,7 +118,7 @@ static int get_cpus_node(void *fdt)
+  * device tree, used in XSCOM to address cores and in interrupt
+  * servers.
+  */
+-static void powernv_create_core_node(PnvChip *chip, PnvCore *pc, void *f=
+dt)
++static void pnv_dt_core(PnvChip *chip, PnvCore *pc, void *fdt)
+ {
+     CPUState *cs =3D CPU(DEVICE(pc->threads));
+     DeviceClass *dc =3D DEVICE_GET_CLASS(cs);
+@@ -228,8 +227,8 @@ static void powernv_create_core_node(PnvChip *chip, P=
+nvCore *pc, void *fdt)
+                        servers_prop, sizeof(servers_prop))));
+ }
+=20
+-static void powernv_populate_icp(PnvChip *chip, void *fdt, uint32_t pir,
+-                                 uint32_t nr_threads)
++static void pnv_dt_icp(PnvChip *chip, void *fdt, uint32_t pir,
++                       uint32_t nr_threads)
+ {
+     uint64_t addr =3D PNV_ICP_BASE(chip) | (pir << 12);
+     char *name;
+@@ -277,13 +276,13 @@ static int pnv_chip_lpc_offset(PnvChip *chip, void =
+*fdt)
+     return offset;
+ }
+=20
+-static void powernv_populate_chip(PnvChip *chip, void *fdt)
++static void pnv_dt_chip(PnvChip *chip, void *fdt)
+ {
+     const char *typename =3D pnv_chip_core_typename(chip);
+     size_t typesize =3D object_type_get_instance_size(typename);
+     int i;
+=20
+-    pnv_xscom_populate(chip, fdt, 0);
++    pnv_dt_xscom(chip, fdt, 0);
+=20
+     /* The default LPC bus of a multichip system is on chip 0. It's
+      * recognized by the firmware (skiboot) using a "primary"
+@@ -298,20 +297,18 @@ static void powernv_populate_chip(PnvChip *chip, vo=
+id *fdt)
+     for (i =3D 0; i < chip->nr_cores; i++) {
+         PnvCore *pnv_core =3D PNV_CORE(chip->cores + i * typesize);
+=20
+-        powernv_create_core_node(chip, pnv_core, fdt);
++        pnv_dt_core(chip, pnv_core, fdt);
+=20
+         /* Interrupt Control Presenters (ICP). One per core. */
+-        powernv_populate_icp(chip, fdt, pnv_core->pir,
+-                             CPU_CORE(pnv_core)->nr_threads);
++        pnv_dt_icp(chip, fdt, pnv_core->pir, CPU_CORE(pnv_core)->nr_thre=
+ads);
+     }
+=20
+     if (chip->ram_size) {
+-        powernv_populate_memory_node(fdt, chip->chip_id, chip->ram_start=
+,
+-                                     chip->ram_size);
++        pnv_dt_memory(fdt, chip->chip_id, chip->ram_start, chip->ram_siz=
+e);
+     }
+ }
+=20
+-static void powernv_populate_rtc(ISADevice *d, void *fdt, int lpc_off)
++static void pnv_dt_rtc(ISADevice *d, void *fdt, int lpc_off)
+ {
+     uint32_t io_base =3D d->ioport_id;
+     uint32_t io_regs[] =3D {
+@@ -331,7 +328,7 @@ static void powernv_populate_rtc(ISADevice *d, void *=
+fdt, int lpc_off)
+     _FDT((fdt_setprop_string(fdt, node, "compatible", "pnpPNP,b00")));
+ }
+=20
+-static void powernv_populate_serial(ISADevice *d, void *fdt, int lpc_off=
+)
++static void pnv_dt_serial(ISADevice *d, void *fdt, int lpc_off)
+ {
+     const char compatible[] =3D "ns16550\0pnpPNP,501";
+     uint32_t io_base =3D d->ioport_id;
+@@ -362,7 +359,7 @@ static void powernv_populate_serial(ISADevice *d, voi=
+d *fdt, int lpc_off)
+     _FDT((fdt_setprop_string(fdt, node, "device_type", "serial")));
+ }
+=20
+-static void powernv_populate_ipmi_bt(ISADevice *d, void *fdt, int lpc_of=
+f)
++static void pnv_dt_ipmi_bt(ISADevice *d, void *fdt, int lpc_off)
+ {
+     const char compatible[] =3D "bt\0ipmi-bt";
+     uint32_t io_base;
+@@ -401,17 +398,17 @@ typedef struct ForeachPopulateArgs {
+     int offset;
+ } ForeachPopulateArgs;
+=20
+-static int powernv_populate_isa_device(DeviceState *dev, void *opaque)
++static int pnv_dt_isa_device(DeviceState *dev, void *opaque)
+ {
+     ForeachPopulateArgs *args =3D opaque;
+     ISADevice *d =3D ISA_DEVICE(dev);
+=20
+     if (object_dynamic_cast(OBJECT(dev), TYPE_MC146818_RTC)) {
+-        powernv_populate_rtc(d, args->fdt, args->offset);
++        pnv_dt_rtc(d, args->fdt, args->offset);
+     } else if (object_dynamic_cast(OBJECT(dev), TYPE_ISA_SERIAL)) {
+-        powernv_populate_serial(d, args->fdt, args->offset);
++        pnv_dt_serial(d, args->fdt, args->offset);
+     } else if (object_dynamic_cast(OBJECT(dev), "isa-ipmi-bt")) {
+-        powernv_populate_ipmi_bt(d, args->fdt, args->offset);
++        pnv_dt_ipmi_bt(d, args->fdt, args->offset);
+     } else {
+         error_report("unknown isa device %s@i%x", qdev_fw_name(dev),
+                      d->ioport_id);
+@@ -420,7 +417,7 @@ static int powernv_populate_isa_device(DeviceState *d=
+ev, void *opaque)
+     return 0;
+ }
+=20
+-static void powernv_populate_isa(ISABus *bus, void *fdt, int lpc_offset)
++static void pnv_dt_isa(ISABus *bus, void *fdt, int lpc_offset)
+ {
+     ForeachPopulateArgs args =3D {
+         .fdt =3D fdt,
+@@ -429,14 +426,13 @@ static void powernv_populate_isa(ISABus *bus, void =
+*fdt, int lpc_offset)
+=20
+     /* ISA devices are not necessarily parented to the ISA bus so we
+      * can not use object_child_foreach() */
+-    qbus_walk_children(BUS(bus), powernv_populate_isa_device,
+-                       NULL, NULL, NULL, &args);
++    qbus_walk_children(BUS(bus), pnv_dt_isa_device, NULL, NULL, NULL, &a=
+rgs);
+ }
+=20
+-static void *powernv_create_fdt(MachineState *machine)
++static void *pnv_dt_create(MachineState *machine)
+ {
+     const char plat_compat[] =3D "qemu,powernv\0ibm,powernv";
+-    PnvMachineState *pnv =3D POWERNV_MACHINE(machine);
++    PnvMachineState *pnv =3D PNV_MACHINE(machine);
+     void *fdt;
+     char *buf;
+     int off;
+@@ -479,15 +475,15 @@ static void *powernv_create_fdt(MachineState *machi=
+ne)
+=20
+     /* Populate device tree for each chip */
+     for (i =3D 0; i < pnv->num_chips; i++) {
+-        powernv_populate_chip(pnv->chips[i], fdt);
++        pnv_dt_chip(pnv->chips[i], fdt);
+     }
+=20
+     /* Populate ISA devices on chip 0 */
+     lpc_offset =3D pnv_chip_lpc_offset(pnv->chips[0], fdt);
+-    powernv_populate_isa(pnv->isa_bus, fdt, lpc_offset);
++    pnv_dt_isa(pnv->isa_bus, fdt, lpc_offset);
+=20
+     if (pnv->bmc) {
+-        pnv_bmc_populate_sensors(pnv->bmc, fdt);
++        pnv_dt_bmc_sensors(pnv->bmc, fdt);
+     }
+=20
+     return fdt;
+@@ -495,17 +491,17 @@ static void *powernv_create_fdt(MachineState *machi=
+ne)
+=20
+ static void pnv_powerdown_notify(Notifier *n, void *opaque)
+ {
+-    PnvMachineState *pnv =3D POWERNV_MACHINE(qdev_get_machine());
++    PnvMachineState *pnv =3D PNV_MACHINE(qdev_get_machine());
+=20
+     if (pnv->bmc) {
+         pnv_bmc_powerdown(pnv->bmc);
+     }
+ }
+=20
+-static void ppc_powernv_reset(void)
++static void pnv_reset(void)
+ {
+     MachineState *machine =3D MACHINE(qdev_get_machine());
+-    PnvMachineState *pnv =3D POWERNV_MACHINE(machine);
++    PnvMachineState *pnv =3D PNV_MACHINE(machine);
+     void *fdt;
+     Object *obj;
+=20
+@@ -524,7 +520,7 @@ static void ppc_powernv_reset(void)
+         pnv->bmc =3D IPMI_BMC(obj);
+     }
+=20
+-    fdt =3D powernv_create_fdt(machine);
++    fdt =3D pnv_dt_create(machine);
+=20
+     /* Pack resulting tree */
+     _FDT((fdt_pack(fdt)));
+@@ -552,9 +548,9 @@ static ISABus *pnv_isa_create(PnvChip *chip)
+     return isa_bus;
+ }
+=20
+-static void ppc_powernv_init(MachineState *machine)
++static void pnv_init(MachineState *machine)
+ {
+-    PnvMachineState *pnv =3D POWERNV_MACHINE(machine);
++    PnvMachineState *pnv =3D PNV_MACHINE(machine);
+     MemoryRegion *ram;
+     char *fw_filename;
+     long fw_size;
+@@ -567,7 +563,7 @@ static void ppc_powernv_init(MachineState *machine)
+     }
+=20
+     ram =3D g_new(MemoryRegion, 1);
+-    memory_region_allocate_system_memory(ram, NULL, "ppc_powernv.ram",
++    memory_region_allocate_system_memory(ram, NULL, "pnv.ram",
+                                          machine->ram_size);
+     memory_region_add_subregion(get_system_memory(), 0, ram);
+=20
+@@ -974,7 +970,7 @@ static void pnv_chip_class_init(ObjectClass *klass, v=
+oid *data)
+=20
+ static ICSState *pnv_ics_get(XICSFabric *xi, int irq)
+ {
+-    PnvMachineState *pnv =3D POWERNV_MACHINE(xi);
++    PnvMachineState *pnv =3D PNV_MACHINE(xi);
+     int i;
+=20
+     for (i =3D 0; i < pnv->num_chips; i++) {
+@@ -987,7 +983,7 @@ static ICSState *pnv_ics_get(XICSFabric *xi, int irq)
+=20
+ static void pnv_ics_resend(XICSFabric *xi)
+ {
+-    PnvMachineState *pnv =3D POWERNV_MACHINE(xi);
++    PnvMachineState *pnv =3D PNV_MACHINE(xi);
+     int i;
+=20
+     for (i =3D 0; i < pnv->num_chips; i++) {
+@@ -1021,7 +1017,7 @@ static ICPState *pnv_icp_get(XICSFabric *xi, int pi=
+r)
+ static void pnv_pic_print_info(InterruptStatsProvider *obj,
+                                Monitor *mon)
+ {
+-    PnvMachineState *pnv =3D POWERNV_MACHINE(obj);
++    PnvMachineState *pnv =3D PNV_MACHINE(obj);
+     int i;
+     CPUState *cs;
+=20
+@@ -1039,13 +1035,13 @@ static void pnv_pic_print_info(InterruptStatsProv=
+ider *obj,
+ static void pnv_get_num_chips(Object *obj, Visitor *v, const char *name,
+                               void *opaque, Error **errp)
+ {
+-    visit_type_uint32(v, name, &POWERNV_MACHINE(obj)->num_chips, errp);
++    visit_type_uint32(v, name, &PNV_MACHINE(obj)->num_chips, errp);
+ }
+=20
+ static void pnv_set_num_chips(Object *obj, Visitor *v, const char *name,
+                               void *opaque, Error **errp)
+ {
+-    PnvMachineState *pnv =3D POWERNV_MACHINE(obj);
++    PnvMachineState *pnv =3D PNV_MACHINE(obj);
+     uint32_t num_chips;
+     Error *local_err =3D NULL;
+=20
+@@ -1067,13 +1063,13 @@ static void pnv_set_num_chips(Object *obj, Visito=
+r *v, const char *name,
+     pnv->num_chips =3D num_chips;
+ }
+=20
+-static void powernv_machine_initfn(Object *obj)
++static void pnv_machine_initfn(Object *obj)
+ {
+-    PnvMachineState *pnv =3D POWERNV_MACHINE(obj);
++    PnvMachineState *pnv =3D PNV_MACHINE(obj);
+     pnv->num_chips =3D 1;
+ }
+=20
+-static void powernv_machine_class_props_init(ObjectClass *oc)
++static void pnv_machine_class_props_init(ObjectClass *oc)
+ {
+     object_class_property_add(oc, "num-chips", "uint32",
+                               pnv_get_num_chips, pnv_set_num_chips,
+@@ -1083,15 +1079,15 @@ static void powernv_machine_class_props_init(Obje=
+ctClass *oc)
+                               NULL);
+ }
+=20
+-static void powernv_machine_class_init(ObjectClass *oc, void *data)
++static void pnv_machine_class_init(ObjectClass *oc, void *data)
+ {
+     MachineClass *mc =3D MACHINE_CLASS(oc);
+     XICSFabricClass *xic =3D XICS_FABRIC_CLASS(oc);
+     InterruptStatsProviderClass *ispc =3D INTERRUPT_STATS_PROVIDER_CLASS=
+(oc);
+=20
+     mc->desc =3D "IBM PowerNV (Non-Virtualized)";
+-    mc->init =3D ppc_powernv_init;
+-    mc->reset =3D ppc_powernv_reset;
++    mc->init =3D pnv_init;
++    mc->reset =3D pnv_reset;
+     mc->max_cpus =3D MAX_CPUS;
+     mc->default_cpu_type =3D POWERPC_CPU_TYPE_NAME("power8_v2.0");
+     mc->block_default_type =3D IF_IDE; /* Pnv provides a AHCI device for
+@@ -1104,7 +1100,7 @@ static void powernv_machine_class_init(ObjectClass =
+*oc, void *data)
+     xic->ics_resend =3D pnv_ics_resend;
+     ispc->print_info =3D pnv_pic_print_info;
+=20
+-    powernv_machine_class_props_init(oc);
++    pnv_machine_class_props_init(oc);
+ }
+=20
+ #define DEFINE_PNV_CHIP_TYPE(type, class_initfn) \
+@@ -1116,11 +1112,11 @@ static void powernv_machine_class_init(ObjectClas=
+s *oc, void *data)
+=20
+ static const TypeInfo types[] =3D {
+     {
+-        .name          =3D TYPE_POWERNV_MACHINE,
++        .name          =3D TYPE_PNV_MACHINE,
+         .parent        =3D TYPE_MACHINE,
+         .instance_size =3D sizeof(PnvMachineState),
+-        .instance_init =3D powernv_machine_initfn,
+-        .class_init    =3D powernv_machine_class_init,
++        .instance_init =3D pnv_machine_initfn,
++        .class_init    =3D pnv_machine_class_init,
+         .interfaces =3D (InterfaceInfo[]) {
+             { TYPE_XICS_FABRIC },
+             { TYPE_INTERRUPT_STATS_PROVIDER },
+diff --git a/hw/ppc/pnv_bmc.c b/hw/ppc/pnv_bmc.c
+index 7b60b4c360..b2cf441ee7 100644
+--- a/hw/ppc/pnv_bmc.c
++++ b/hw/ppc/pnv_bmc.c
+@@ -73,7 +73,7 @@ void pnv_bmc_powerdown(IPMIBmc *bmc)
+     pnv_gen_oem_sel(bmc, SOFT_OFF);
+ }
+=20
+-void pnv_bmc_populate_sensors(IPMIBmc *bmc, void *fdt)
++void pnv_dt_bmc_sensors(IPMIBmc *bmc, void *fdt)
+ {
+     int offset;
+     int i;
+diff --git a/hw/ppc/pnv_core.c b/hw/ppc/pnv_core.c
+index 03317db853..7e8a76df44 100644
+--- a/hw/ppc/pnv_core.c
++++ b/hw/ppc/pnv_core.c
+@@ -37,7 +37,7 @@ static const char *pnv_core_cpu_typename(PnvCore *pc)
+     return cpu_type;
+ }
+=20
+-static void powernv_cpu_reset(void *opaque)
++static void pnv_cpu_reset(void *opaque)
+ {
+     PowerPCCPU *cpu =3D opaque;
+     CPUState *cs =3D CPU(cpu);
+@@ -54,7 +54,7 @@ static void powernv_cpu_reset(void *opaque)
+     env->msr |=3D MSR_HVB; /* Hypervisor mode */
+ }
+=20
+-static void powernv_cpu_init(PowerPCCPU *cpu, Error **errp)
++static void pnv_cpu_init(PowerPCCPU *cpu, Error **errp)
+ {
+     CPUPPCState *env =3D &cpu->env;
+     int core_pir;
+@@ -73,7 +73,7 @@ static void powernv_cpu_init(PowerPCCPU *cpu, Error **e=
+rrp)
+     /* Set time-base frequency to 512 MHz */
+     cpu_ppc_tb_init(env, PNV_TIMEBASE_FREQ);
+=20
+-    qemu_register_reset(powernv_cpu_reset, cpu);
++    qemu_register_reset(pnv_cpu_reset, cpu);
+ }
+=20
+ /*
+@@ -139,7 +139,7 @@ static void pnv_core_realize_child(Object *child, XIC=
+SFabric *xi, Error **errp)
+         return;
+     }
+=20
+-    powernv_cpu_init(cpu, &local_err);
++    pnv_cpu_init(cpu, &local_err);
+     if (local_err) {
+         error_propagate(errp, local_err);
+         return;
+diff --git a/hw/ppc/pnv_lpc.c b/hw/ppc/pnv_lpc.c
+index f03a80a29b..b777b78e18 100644
+--- a/hw/ppc/pnv_lpc.c
++++ b/hw/ppc/pnv_lpc.c
+@@ -92,7 +92,7 @@ enum {
+ #define LPC_HC_REGS_OPB_SIZE    0x00001000
+=20
+=20
+-static int pnv_lpc_populate(PnvXScomInterface *dev, void *fdt, int xscom=
+_offset)
++static int pnv_lpc_dt_xscom(PnvXScomInterface *dev, void *fdt, int xscom=
+_offset)
+ {
+     const char compat[] =3D "ibm,power8-lpc\0ibm,lpc";
+     char *name;
+@@ -482,7 +482,7 @@ static void pnv_lpc_class_init(ObjectClass *klass, vo=
+id *data)
+     DeviceClass *dc =3D DEVICE_CLASS(klass);
+     PnvXScomInterfaceClass *xdc =3D PNV_XSCOM_INTERFACE_CLASS(klass);
+=20
+-    xdc->populate =3D pnv_lpc_populate;
++    xdc->dt_xscom =3D pnv_lpc_dt_xscom;
+=20
+     dc->realize =3D pnv_lpc_realize;
+ }
+@@ -515,7 +515,7 @@ type_init(pnv_lpc_register_types)
+  */
+ static void pnv_lpc_isa_irq_handler_cpld(void *opaque, int n, int level)
+ {
+-    PnvMachineState *pnv =3D POWERNV_MACHINE(qdev_get_machine());
++    PnvMachineState *pnv =3D PNV_MACHINE(qdev_get_machine());
+     uint32_t old_state =3D pnv->cpld_irqstate;
+     PnvLpcController *lpc =3D PNV_LPC(opaque);
+=20
+diff --git a/hw/ppc/pnv_psi.c b/hw/ppc/pnv_psi.c
+index 9876c26622..5b969127c3 100644
+--- a/hw/ppc/pnv_psi.c
++++ b/hw/ppc/pnv_psi.c
+@@ -510,7 +510,7 @@ static void pnv_psi_realize(DeviceState *dev, Error *=
+*errp)
+     }
+ }
+=20
+-static int pnv_psi_populate(PnvXScomInterface *dev, void *fdt, int xscom=
+_offset)
++static int pnv_psi_dt_xscom(PnvXScomInterface *dev, void *fdt, int xscom=
+_offset)
+ {
+     const char compat[] =3D "ibm,power8-psihb-x\0ibm,psihb-x";
+     char *name;
+@@ -546,7 +546,7 @@ static void pnv_psi_class_init(ObjectClass *klass, vo=
+id *data)
+     DeviceClass *dc =3D DEVICE_CLASS(klass);
+     PnvXScomInterfaceClass *xdc =3D PNV_XSCOM_INTERFACE_CLASS(klass);
+=20
+-    xdc->populate =3D pnv_psi_populate;
++    xdc->dt_xscom =3D pnv_psi_dt_xscom;
+=20
+     dc->realize =3D pnv_psi_realize;
+     dc->props =3D pnv_psi_properties;
+diff --git a/hw/ppc/pnv_xscom.c b/hw/ppc/pnv_xscom.c
+index 38bc85f117..e51d634f40 100644
+--- a/hw/ppc/pnv_xscom.c
++++ b/hw/ppc/pnv_xscom.c
+@@ -207,15 +207,15 @@ typedef struct ForeachPopulateArgs {
+     int xscom_offset;
+ } ForeachPopulateArgs;
+=20
+-static int xscom_populate_child(Object *child, void *opaque)
++static int xscom_dt_child(Object *child, void *opaque)
+ {
+     if (object_dynamic_cast(child, TYPE_PNV_XSCOM_INTERFACE)) {
+         ForeachPopulateArgs *args =3D opaque;
+         PnvXScomInterface *xd =3D PNV_XSCOM_INTERFACE(child);
+         PnvXScomInterfaceClass *xc =3D PNV_XSCOM_INTERFACE_GET_CLASS(xd)=
+;
+=20
+-        if (xc->populate) {
+-            _FDT((xc->populate(xd, args->fdt, args->xscom_offset)));
++        if (xc->dt_xscom) {
++            _FDT((xc->dt_xscom(xd, args->fdt, args->xscom_offset)));
+         }
+     }
+     return 0;
+@@ -224,7 +224,7 @@ static int xscom_populate_child(Object *child, void *=
+opaque)
+ static const char compat_p8[] =3D "ibm,power8-xscom\0ibm,xscom";
+ static const char compat_p9[] =3D "ibm,power9-xscom\0ibm,xscom";
+=20
+-int pnv_xscom_populate(PnvChip *chip, void *fdt, int root_offset)
++int pnv_dt_xscom(PnvChip *chip, void *fdt, int root_offset)
+ {
+     uint64_t reg[] =3D { cpu_to_be64(PNV_XSCOM_BASE(chip)),
+                        cpu_to_be64(PNV_XSCOM_SIZE) };
+@@ -255,7 +255,7 @@ int pnv_xscom_populate(PnvChip *chip, void *fdt, int =
+root_offset)
+     args.fdt =3D fdt;
+     args.xscom_offset =3D xscom_offset;
+=20
+-    object_child_foreach(OBJECT(chip), xscom_populate_child, &args);
++    object_child_foreach(OBJECT(chip), xscom_dt_child, &args);
+     return 0;
+ }
+=20
+diff --git a/include/hw/ppc/pnv.h b/include/hw/ppc/pnv.h
+index 59524cd42b..61896f9fd7 100644
+--- a/include/hw/ppc/pnv.h
++++ b/include/hw/ppc/pnv.h
+@@ -26,7 +26,7 @@
+ #include "hw/ppc/pnv_psi.h"
+ #include "hw/ppc/pnv_occ.h"
+=20
+-#define TYPE_PNV_CHIP "powernv-chip"
++#define TYPE_PNV_CHIP "pnv-chip"
+ #define PNV_CHIP(obj) OBJECT_CHECK(PnvChip, (obj), TYPE_PNV_CHIP)
+ #define PNV_CHIP_CLASS(klass) \
+      OBJECT_CLASS_CHECK(PnvChipClass, (klass), TYPE_PNV_CHIP)
+@@ -117,9 +117,9 @@ typedef struct PnvChipClass {
+ #define PNV_CHIP_INDEX(chip)                                    \
+     (((chip)->chip_id >> 2) * 2 + ((chip)->chip_id & 0x3))
+=20
+-#define TYPE_POWERNV_MACHINE       MACHINE_TYPE_NAME("powernv")
+-#define POWERNV_MACHINE(obj) \
+-    OBJECT_CHECK(PnvMachineState, (obj), TYPE_POWERNV_MACHINE)
++#define TYPE_PNV_MACHINE       MACHINE_TYPE_NAME("powernv")
++#define PNV_MACHINE(obj) \
++    OBJECT_CHECK(PnvMachineState, (obj), TYPE_PNV_MACHINE)
+=20
+ typedef struct PnvMachineState {
+     /*< private >*/
+@@ -144,7 +144,7 @@ typedef struct PnvMachineState {
+ /*
+  * BMC helpers
+  */
+-void pnv_bmc_populate_sensors(IPMIBmc *bmc, void *fdt);
++void pnv_dt_bmc_sensors(IPMIBmc *bmc, void *fdt);
+ void pnv_bmc_powerdown(IPMIBmc *bmc);
+=20
+ /*
+diff --git a/include/hw/ppc/pnv_xscom.h b/include/hw/ppc/pnv_xscom.h
+index 38077b4796..7252e219e2 100644
+--- a/include/hw/ppc/pnv_xscom.h
++++ b/include/hw/ppc/pnv_xscom.h
+@@ -36,7 +36,7 @@ typedef struct PnvXScomInterface {
+=20
+ typedef struct PnvXScomInterfaceClass {
+     InterfaceClass parent;
+-    int (*populate)(PnvXScomInterface *dev, void *fdt, int offset);
++    int (*dt_xscom)(PnvXScomInterface *dev, void *fdt, int offset);
+ } PnvXScomInterfaceClass;
+=20
+ /*
+@@ -67,7 +67,7 @@ typedef struct PnvXScomInterfaceClass {
+ #define PNV_XSCOM_OCC_SIZE        0x6000
+=20
+ extern void pnv_xscom_realize(PnvChip *chip, Error **errp);
+-extern int pnv_xscom_populate(PnvChip *chip, void *fdt, int offset);
++extern int pnv_dt_xscom(PnvChip *chip, void *fdt, int offset);
+=20
+ extern void pnv_xscom_add_subregion(PnvChip *chip, hwaddr offset,
+                                     MemoryRegion *mr);
+--=20
 2.14.3
