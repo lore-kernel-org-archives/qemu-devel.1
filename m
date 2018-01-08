@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35294)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35296)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1eYQNs-0003Ba-JJ
+	(envelope-from <dgibson@ozlabs.org>) id 1eYQNs-0003Bc-LX
 	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 00:54:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1eYQNr-0006Rz-Lf
+	(envelope-from <dgibson@ozlabs.org>) id 1eYQNr-0006SF-Lv
 	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 00:54:08 -0500
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Mon,  8 Jan 2018 16:53:37 +1100
-Message-Id: <20180108055348.20444-2-david@gibson.dropbear.id.au>
+Date: Mon,  8 Jan 2018 16:53:40 +1100
+Message-Id: <20180108055348.20444-5-david@gibson.dropbear.id.au>
 In-Reply-To: <20180108055348.20444-1-david@gibson.dropbear.id.au>
 References: <20180108055348.20444-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PULL 01/12] target-ppc: optimize cmp translation
+Subject: [Qemu-devel] [PULL 04/12] sm501: Add some more unimplemented
+ registers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,67 +21,74 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: surajjs@au1.ibm.com, groug@kaod.org, mdroth@linux.vnet.ibm.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, "pbonzini@redhat.com" <pbonzini@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
+Cc: surajjs@au1.ibm.com, groug@kaod.org, mdroth@linux.vnet.ibm.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, BALATON Zoltan <balaton@eik.bme.hu>, David Gibson <david@gibson.dropbear.id.au>
 
-From: "pbonzini@redhat.com" <pbonzini@redhat.com>
+From: BALATON Zoltan <balaton@eik.bme.hu>
 
-We know that only one bit (in addition to SO) is going to be set in
-the condition register, so do two movconds instead of three setconds,
-three shifts and two ORs.
+These are not really implemented (just return zero or default values)
+but add these so guests accessing them can run.
 
-For ppc64-linux-user, the code size reduction is around 5% and the
-performance improvement slightly less than 10%.  For softmmu, the
-improvement is around 5%.
-
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- target/ppc/translate.c | 29 ++++++++++++-----------------
- 1 file changed, 12 insertions(+), 17 deletions(-)
+ hw/display/sm501.c | 17 +++++++++++++++++
+ 1 file changed, 17 insertions(+)
 
-diff --git a/target/ppc/translate.c b/target/ppc/translate.c
-index 4075fc8589..8a6bd329d0 100644
---- a/target/ppc/translate.c
-+++ b/target/ppc/translate.c
-@@ -605,27 +605,22 @@ static opc_handler_t invalid_handler = {
- static inline void gen_op_cmp(TCGv arg0, TCGv arg1, int s, int crf)
- {
-     TCGv t0 = tcg_temp_new();
--    TCGv_i32 t1 = tcg_temp_new_i32();
--
--    tcg_gen_trunc_tl_i32(cpu_crf[crf], cpu_so);
--
--    tcg_gen_setcond_tl((s ? TCG_COND_LT: TCG_COND_LTU), t0, arg0, arg1);
--    tcg_gen_trunc_tl_i32(t1, t0);
--    tcg_gen_shli_i32(t1, t1, CRF_LT_BIT);
--    tcg_gen_or_i32(cpu_crf[crf], cpu_crf[crf], t1);
-+    TCGv t1 = tcg_temp_new();
-+    TCGv_i32 t = tcg_temp_new_i32();
+diff --git a/hw/display/sm501.c b/hw/display/sm501.c
+index b9b611131e..4f7dc59b25 100644
+--- a/hw/display/sm501.c
++++ b/hw/display/sm501.c
+@@ -795,6 +795,8 @@ static uint64_t sm501_system_config_read(void *opaque, hwaddr addr,
+     case SM501_ARBTRTN_CONTROL:
+         ret = s->arbitration_control;
+         break;
++    case SM501_COMMAND_LIST_STATUS:
++        ret = 0x00180002; /* FIFOs are empty, everything idle */
+     case SM501_IRQ_MASK:
+         ret = s->irq_mask;
+         break;
+@@ -812,6 +814,9 @@ static uint64_t sm501_system_config_read(void *opaque, hwaddr addr,
+     case SM501_POWER_MODE_CONTROL:
+         ret = s->power_mode_control;
+         break;
++    case SM501_ENDIAN_CONTROL:
++        ret = 0; /* Only default little endian mode is supported */
++        break;
  
--    tcg_gen_setcond_tl((s ? TCG_COND_GT: TCG_COND_GTU), t0, arg0, arg1);
--    tcg_gen_trunc_tl_i32(t1, t0);
--    tcg_gen_shli_i32(t1, t1, CRF_GT_BIT);
--    tcg_gen_or_i32(cpu_crf[crf], cpu_crf[crf], t1);
-+    tcg_gen_movi_tl(t0, CRF_EQ);
-+    tcg_gen_movi_tl(t1, CRF_LT);
-+    tcg_gen_movcond_tl((s ? TCG_COND_LT : TCG_COND_LTU), t0, arg0, arg1, t1, t0);
-+    tcg_gen_movi_tl(t1, CRF_GT);
-+    tcg_gen_movcond_tl((s ? TCG_COND_GT : TCG_COND_GTU), t0, arg0, arg1, t1, t0);
+     default:
+         printf("sm501 system config : not implemented register read."
+@@ -865,6 +870,12 @@ static void sm501_system_config_write(void *opaque, hwaddr addr,
+     case SM501_POWER_MODE_CONTROL:
+         s->power_mode_control = value & 0x00000003;
+         break;
++    case SM501_ENDIAN_CONTROL:
++        if (value & 0x00000001) {
++            printf("sm501 system config : big endian mode not implemented.\n");
++            abort();
++        }
++        break;
  
--    tcg_gen_setcond_tl(TCG_COND_EQ, t0, arg0, arg1);
--    tcg_gen_trunc_tl_i32(t1, t0);
--    tcg_gen_shli_i32(t1, t1, CRF_EQ_BIT);
--    tcg_gen_or_i32(cpu_crf[crf], cpu_crf[crf], t1);
-+    tcg_gen_trunc_tl_i32(t, t0);
-+    tcg_gen_trunc_tl_i32(cpu_crf[crf], cpu_so);
-+    tcg_gen_or_i32(cpu_crf[crf], cpu_crf[crf], t);
- 
-     tcg_temp_free(t0);
--    tcg_temp_free_i32(t1);
-+    tcg_temp_free(t1);
-+    tcg_temp_free_i32(t);
- }
- 
- static inline void gen_op_cmpi(TCGv arg0, target_ulong arg1, int s, int crf)
+     default:
+         printf("sm501 system config : not implemented register write."
+@@ -924,6 +935,9 @@ static uint64_t sm501_disp_ctrl_read(void *opaque, hwaddr addr,
+     case SM501_DC_PANEL_PANNING_CONTROL:
+         ret = s->dc_panel_panning_control;
+         break;
++    case SM501_DC_PANEL_COLOR_KEY:
++        /* Not implemented yet */
++        break;
+     case SM501_DC_PANEL_FB_ADDR:
+         ret = s->dc_panel_fb_addr;
+         break;
+@@ -1035,6 +1049,9 @@ static void sm501_disp_ctrl_write(void *opaque, hwaddr addr,
+     case SM501_DC_PANEL_PANNING_CONTROL:
+         s->dc_panel_panning_control = value & 0xFF3FFF3F;
+         break;
++    case SM501_DC_PANEL_COLOR_KEY:
++        /* Not implemented yet */
++        break;
+     case SM501_DC_PANEL_FB_ADDR:
+         s->dc_panel_fb_addr = value & 0x8FFFFFF0;
+         break;
 -- 
 2.14.3
