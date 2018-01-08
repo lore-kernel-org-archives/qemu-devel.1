@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38118)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40191)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1eYUw9-0003ry-09
-	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 05:45:49 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1eYV1L-0005nB-7i
+	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 05:51:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1eYUw5-0000M8-Sb
-	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 05:45:49 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:35380)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1eYUw5-0000Km-MG
-	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 05:45:45 -0500
-Date: Mon, 8 Jan 2018 11:45:42 +0100
-From: Gerd Hoffmann <kraxel@redhat.com>
-Message-ID: <20180108104542.4r4ww2iaxrj4c2fw@sirius.home.kraxel.org>
-References: <20171117112258.5888-1-makovick@gmail.com>
-	<20180101211600.3f533781@holly>
+	(envelope-from <peter.maydell@linaro.org>) id 1eYV1K-0004yQ-Av
+	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 05:51:11 -0500
+Received: from mail-oi0-x230.google.com ([2607:f8b0:4003:c06::230]:42772)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1eYV1K-0004xQ-5p
+	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 05:51:10 -0500
+Received: by mail-oi0-x230.google.com with SMTP id o64so7062036oia.9
+	for <qemu-devel@nongnu.org>; Mon, 08 Jan 2018 02:51:09 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20180101211600.3f533781@holly>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v4] SDL2 various fixes
+In-Reply-To: <151379548718.11069.3987410517769405650.malone@gac.canonical.com>
+References: <151375741208.25451.9053884797959645588.malonedeb@wampee.canonical.com>
+	<151379548718.11069.3987410517769405650.malone@gac.canonical.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 8 Jan 2018 10:50:48 +0000
+Message-ID: <CAFEAcA_jEVBwkOyWKFp58FurYO4eKqg+kg9mEwXfw45dJqREoA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [Bug 1739378] Re: qemu git master snapshot doesn't
+ work
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,36 +30,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?Q?Jind=C5=99ich_Makovi=C4=8Dka?= <makovick@gmail.com>
-Cc: qemu-devel@nongnu.org
+To: Bug 1739378 <1739378@bugs.launchpad.net>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-On Mon, Jan 01, 2018 at 09:16:00PM +0100, Jind=C5=99ich Makovi=C4=8Dka wr=
-ote:
-> On Fri, 17 Nov 2017 12:22:55 +0100
-> Jindrich Makovicka <makovick@gmail.com> wrote:
->=20
-> > Hi,
-> >=20
-> > here is a respin of the three remaining patches, with checkpatch
-> > errors corrected.
-> >=20
-> > Also added the Fixes: line for "sdl2 uses surface relative
-> > coordinates", and an explaining comment to "sdl2: Ignore UI hotkeys".
-> >=20
-> > Regards, Jindrich
-> >=20
->=20
-> Hi,
->=20
-> these changes somehow got lost. Any chance to have them merged into the
-> next minor?
+On 20 December 2017 at 18:44, Dr. David Alan Gilbert
+<dgilbert@redhat.com> wrote:
+> From a quick look my guess would be the wpgrps_size in sd_vmstate is
+> different on the source and destination for some reason
 
-First master, then possibly backport into -stable.
+Good guess: I added a pre_save hook to sdcard.c's vmstate,
+which reports wpgrps_size as 201, but in the pre_load hook
+it is reported as 0.
 
-Just back from a few weeks of sick leave due to broken finger.
+This seems to be because nothing ever calls the sd_reset()
+function. I suspect this is down to the "legacy" handling
+of sd card setup in sd_init(), or possibly the generic handling
+of reset for devices that connect to SD buses.
 
-Will have to go through my email backlog, then I'll go handle
-pending patches.  Will probably take some days though ...
+(sd_reset() eventually gets called when the guest OS
+probes the SD controller and issues a card reset command,
+which is why it's correctly set by the time we do a vmsave.)
 
-cheers,
-  Gerd
+thanks
+-- PMM
