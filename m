@@ -1,20 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48628)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35294)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1eYPHS-0002yA-Es
-	for qemu-devel@nongnu.org; Sun, 07 Jan 2018 23:43:27 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1eYQNs-0003Ba-JJ
+	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 00:54:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1eYPHR-0004Ho-Fk
-	for qemu-devel@nongnu.org; Sun, 07 Jan 2018 23:43:26 -0500
-Date: Sun, 7 Jan 2018 23:43:16 -0500
-From: Jeff Cody <jcody@redhat.com>
-Message-ID: <20180108044316.GA31768@localhost.localdomain>
-References: <20180105144440.18129-1-muriloo@linux.vnet.ibm.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180105144440.18129-1-muriloo@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH] block/ssh: fix possible segmentation fault
- when .desc is not null-terminated
+	(envelope-from <dgibson@ozlabs.org>) id 1eYQNr-0006Rz-Lf
+	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 00:54:08 -0500
+From: David Gibson <david@gibson.dropbear.id.au>
+Date: Mon,  8 Jan 2018 16:53:37 +1100
+Message-Id: <20180108055348.20444-2-david@gibson.dropbear.id.au>
+In-Reply-To: <20180108055348.20444-1-david@gibson.dropbear.id.au>
+References: <20180108055348.20444-1-david@gibson.dropbear.id.au>
+Subject: [Qemu-devel] [PULL 01/12] target-ppc: optimize cmp translation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,48 +19,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Murilo Opsfelder Araujo <muriloo@linux.vnet.ibm.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Richard W M Jones <rjones@redhat.com>, Eric Blake <eblake@redhat.com>
+To: peter.maydell@linaro.org
+Cc: surajjs@au1.ibm.com, groug@kaod.org, mdroth@linux.vnet.ibm.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, "pbonzini@redhat.com" <pbonzini@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
 
-On Fri, Jan 05, 2018 at 12:44:40PM -0200, Murilo Opsfelder Araujo wrote:
-> This patch prevents a possible segmentation fault when .desc members are checked
-> against NULL.
-> 
-> The ssh_runtime_opts was added by commit
-> 8a6a80896d6af03b8ee0c17cdf37219eca2588a7 ("block/ssh: Use QemuOpts for runtime
-> options").
-> 
-> This fix was inspired by
-> http://lists.nongnu.org/archive/html/qemu-devel/2018-01/msg00883.html.
-> 
-> Fixes: 8a6a80896d6af03b8ee0c17cdf37219eca2588a7 ("block/ssh: Use QemuOpts for runtime options")
-> Cc: Max Reitz <mreitz@redhat.com>
-> Cc: Eric Blake <eblake@redhat.com>
-> Signed-off-by: Murilo Opsfelder Araujo <muriloo@linux.vnet.ibm.com>
-> ---
->  block/ssh.c | 1 +
->  1 file changed, 1 insertion(+)
-> 
-> diff --git a/block/ssh.c b/block/ssh.c
-> index b049a16eb9..8890a0c4ba 100644
-> --- a/block/ssh.c
-> +++ b/block/ssh.c
-> @@ -556,6 +556,7 @@ static QemuOptsList ssh_runtime_opts = {
->              .type = QEMU_OPT_STRING,
->              .help = "Defines how and what to check the host key against",
->          },
-> +        { /* end of list */ }
->      },
->  };
->  
-> -- 
-> 2.14.3
-> 
+From: "pbonzini@redhat.com" <pbonzini@redhat.com>
 
-Thanks,
+We know that only one bit (in addition to SO) is going to be set in
+the condition register, so do two movconds instead of three setconds,
+three shifts and two ORs.
 
-Applied to my block branch:
+For ppc64-linux-user, the code size reduction is around 5% and the
+performance improvement slightly less than 10%.  For softmmu, the
+improvement is around 5%.
 
-git://github.com/codyprime/qemu-kvm-jtc block
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+---
+ target/ppc/translate.c | 29 ++++++++++++-----------------
+ 1 file changed, 12 insertions(+), 17 deletions(-)
 
--Jeff
+diff --git a/target/ppc/translate.c b/target/ppc/translate.c
+index 4075fc8589..8a6bd329d0 100644
+--- a/target/ppc/translate.c
++++ b/target/ppc/translate.c
+@@ -605,27 +605,22 @@ static opc_handler_t invalid_handler = {
+ static inline void gen_op_cmp(TCGv arg0, TCGv arg1, int s, int crf)
+ {
+     TCGv t0 = tcg_temp_new();
+-    TCGv_i32 t1 = tcg_temp_new_i32();
+-
+-    tcg_gen_trunc_tl_i32(cpu_crf[crf], cpu_so);
+-
+-    tcg_gen_setcond_tl((s ? TCG_COND_LT: TCG_COND_LTU), t0, arg0, arg1);
+-    tcg_gen_trunc_tl_i32(t1, t0);
+-    tcg_gen_shli_i32(t1, t1, CRF_LT_BIT);
+-    tcg_gen_or_i32(cpu_crf[crf], cpu_crf[crf], t1);
++    TCGv t1 = tcg_temp_new();
++    TCGv_i32 t = tcg_temp_new_i32();
+ 
+-    tcg_gen_setcond_tl((s ? TCG_COND_GT: TCG_COND_GTU), t0, arg0, arg1);
+-    tcg_gen_trunc_tl_i32(t1, t0);
+-    tcg_gen_shli_i32(t1, t1, CRF_GT_BIT);
+-    tcg_gen_or_i32(cpu_crf[crf], cpu_crf[crf], t1);
++    tcg_gen_movi_tl(t0, CRF_EQ);
++    tcg_gen_movi_tl(t1, CRF_LT);
++    tcg_gen_movcond_tl((s ? TCG_COND_LT : TCG_COND_LTU), t0, arg0, arg1, t1, t0);
++    tcg_gen_movi_tl(t1, CRF_GT);
++    tcg_gen_movcond_tl((s ? TCG_COND_GT : TCG_COND_GTU), t0, arg0, arg1, t1, t0);
+ 
+-    tcg_gen_setcond_tl(TCG_COND_EQ, t0, arg0, arg1);
+-    tcg_gen_trunc_tl_i32(t1, t0);
+-    tcg_gen_shli_i32(t1, t1, CRF_EQ_BIT);
+-    tcg_gen_or_i32(cpu_crf[crf], cpu_crf[crf], t1);
++    tcg_gen_trunc_tl_i32(t, t0);
++    tcg_gen_trunc_tl_i32(cpu_crf[crf], cpu_so);
++    tcg_gen_or_i32(cpu_crf[crf], cpu_crf[crf], t);
+ 
+     tcg_temp_free(t0);
+-    tcg_temp_free_i32(t1);
++    tcg_temp_free(t1);
++    tcg_temp_free_i32(t);
+ }
+ 
+ static inline void gen_op_cmpi(TCGv arg0, target_ulong arg1, int s, int crf)
+-- 
+2.14.3
