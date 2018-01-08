@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42990)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43043)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eYZcb-0003N2-DE
-	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 10:46:00 -0500
+	id 1eYZcg-0003Tv-Sa
+	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 10:46:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eYZca-0000Z9-HQ
-	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 10:45:57 -0500
+	id 1eYZcg-0000eG-3M
+	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 10:46:02 -0500
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Mon,  8 Jan 2018 12:43:02 -0300
-Message-Id: <20180108154303.6522-31-f4bug@amsat.org>
+Date: Mon,  8 Jan 2018 12:43:03 -0300
+Message-Id: <20180108154303.6522-32-f4bug@amsat.org>
 In-Reply-To: <20180108154303.6522-1-f4bug@amsat.org>
 References: <20180108154303.6522-1-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v5 30/31] sdhci: add a check_capab_v3() qtest
+Subject: [Qemu-devel] [PATCH v5 31/31] sdhci: add Spec v4.2 register
+ definitions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,53 +31,41 @@ To: Alistair Francis <alistair.francis@xilinx.com>, Peter Maydell <peter.maydell
 Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, Sai Pavan Boddu <saipava@xilinx.com>, Clement Deschamps <clement.deschamps@antfield.fr>, Jean-Christophe Dubois <jcd@tribudubois.net>, =?UTF-8?q?Gr=C3=A9gory=20Estrade?= <gregory.estrade@gmail.com>, Krzysztof Kozlowski <krzk@kernel.org>, Andrew Baumann <Andrew.Baumann@microsoft.com>, Prasad J Pandit <pjp@fedoraproject.org>, qemu-arm@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>
 
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 ---
- tests/sdhci-test.c | 18 ++++++++++++++++++
- 1 file changed, 18 insertions(+)
+ hw/sd/sdhci-internal.h | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
-diff --git a/tests/sdhci-test.c b/tests/sdhci-test.c
-index 91b1b29d75..6ebe9f4d25 100644
---- a/tests/sdhci-test.c
-+++ b/tests/sdhci-test.c
-@@ -13,6 +13,8 @@
- #define SDHC_CAPAB                      0x40
- FIELD(SDHC_CAPAB, BASECLKFREQ,               8, 8); /* since v2 */
- FIELD(SDHC_CAPAB, SDMA,                     22, 1);
-+FIELD(SDHC_CAPAB, SDR,                      32, 3); /* since v3 */
-+FIELD(SDHC_CAPAB, DRIVER,                   36, 3); /* since v3 */
- #define SDHC_HCVER                      0xFE
+diff --git a/hw/sd/sdhci-internal.h b/hw/sd/sdhci-internal.h
+index 1da91a27b4..8193aa1821 100644
+--- a/hw/sd/sdhci-internal.h
++++ b/hw/sd/sdhci-internal.h
+@@ -191,6 +191,10 @@ FIELD(SDHC_HOSTCTL2, V18_ENA,          3, 1); /* UHS-I only */
+ FIELD(SDHC_HOSTCTL2, DRIVER_STRENGTH,  4, 2); /* UHS-I only */
+ FIELD(SDHC_HOSTCTL2, EXECUTE_TUNING,   6, 1); /* UHS-I only */
+ FIELD(SDHC_HOSTCTL2, SAMPLING_CLKSEL,  7, 1); /* UHS-I only */
++FIELD(SDHC_HOSTCTL2, UHS_II_ENA,       8, 1); /* since v4 */
++FIELD(SDHC_HOSTCTL2, ADMA2_LENGTH,    10, 1); /* since v4 */
++FIELD(SDHC_HOSTCTL2, CMD23_ENA,       11, 1); /* since v4 */
++FIELD(SDHC_HOSTCTL2, VERSION4,        12, 1); /* since v4 */
+ FIELD(SDHC_HOSTCTL2, ASYNC_INT,       14, 1);
+ FIELD(SDHC_HOSTCTL2, PRESET_ENA,      15, 1);
  
- static const struct sdhci_t {
-@@ -123,6 +125,21 @@ static void check_capab_sdma(uintptr_t addr, bool supported)
-     g_assert_cmpuint(capab_sdma, ==, supported);
- }
+@@ -219,12 +223,16 @@ FIELD(SDHC_CAPAB, DRIVER_TYPE_C,      37, 1); /* since v3 */
+ FIELD(SDHC_CAPAB, DRIVER_TYPE_D,      38, 1); /* since v3 */
+ FIELD(SDHC_CAPAB, TIMER_RETUNNING,    40, 4); /* since v3 */
+ FIELD(SDHC_CAPAB, SDR50_TUNNING,      45, 1); /* since v3 */
++FIELD(SDHC_CAPAB, CLK_MUL,            48, 8); /* since v4.20 */
++FIELD(SDHC_CAPAB, ADMA3,              59, 1); /* since v4.20 */
++FIELD(SDHC_CAPAB, V18_VDD2,           60, 1); /* since v4.20 */
  
-+static void check_capab_v3(uintptr_t addr, uint8_t version)
-+{
-+    uint64_t capab, capab_v3;
-+
-+    if (version >= 3) {
-+        return;
-+    }
-+    /* before v3 those fields are RESERVED */
-+    capab = sdhci_readq(addr, SDHC_CAPAB);
-+    capab_v3 = FIELD_EX64(capab, SDHC_CAPAB, SDR);
-+    g_assert_cmpuint(capab_v3, ==, 0);
-+    capab_v3 = FIELD_EX64(capab, SDHC_CAPAB, DRIVER);
-+    g_assert_cmpuint(capab_v3, ==, 0);
-+}
-+
- static void test_machine(const void *data)
- {
-     const struct sdhci_t *test = data;
-@@ -132,6 +149,7 @@ static void test_machine(const void *data)
-     check_capab_capareg(test->sdhci.addr, test->sdhci.capab.reg);
-     check_specs_version(test->sdhci.addr, test->sdhci.version);
-     check_capab_readonly(test->sdhci.addr);
-+    check_capab_v3(test->sdhci.addr, test->sdhci.version);
-     check_capab_sdma(test->sdhci.addr, test->sdhci.capab.sdma);
-     check_capab_baseclock(test->sdhci.addr, test->sdhci.baseclock);
+ /* HWInit Maximum Current Capabilities Register 0x0 */
+ #define SDHC_MAXCURR                   0x48
+ FIELD(SDHC_MAXCURR, V33_VDD1,          0, 8);
+ FIELD(SDHC_MAXCURR, V30_VDD1,          8, 8);
+ FIELD(SDHC_MAXCURR, V18_VDD1,         16, 8);
++FIELD(SDHC_MAXCURR, V18_VDD2,         32, 8); /* since v4.20 */
  
+ /* W Force Event Auto CMD12 Error Interrupt Register 0x0000 */
+ #define SDHC_FEAER                     0x50
 -- 
 2.15.1
