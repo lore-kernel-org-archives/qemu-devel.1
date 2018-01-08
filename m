@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42132)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42187)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eYZb8-0001wR-9I
-	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 10:44:29 -0500
+	id 1eYZbD-00020k-3y
+	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 10:44:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eYZb7-0007b8-4S
-	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 10:44:26 -0500
+	id 1eYZbC-0007eb-5k
+	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 10:44:31 -0500
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Mon,  8 Jan 2018 12:42:44 -0300
-Message-Id: <20180108154303.6522-13-f4bug@amsat.org>
+Date: Mon,  8 Jan 2018 12:42:45 -0300
+Message-Id: <20180108154303.6522-14-f4bug@amsat.org>
 In-Reply-To: <20180108154303.6522-1-f4bug@amsat.org>
 References: <20180108154303.6522-1-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v5 12/31] sdhci: add the generic Arasan SDHCI
- 4.9a PHY controller
+Subject: [Qemu-devel] [PATCH v5 13/31] hw/arm/xilinx_zynq: use the "arasan,
+ sdhci-4.9a" device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,104 +28,72 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Alistair Francis <alistair.francis@xilinx.com>, Peter Maydell <peter.maydell@linaro.org>, Andrey Smirnov <andrew.smirnov@gmail.com>, Igor Mitsyanko <i.mitsyanko@gmail.com>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, Sai Pavan Boddu <saipava@xilinx.com>, Clement Deschamps <clement.deschamps@antfield.fr>, Jean-Christophe Dubois <jcd@tribudubois.net>, =?UTF-8?q?Gr=C3=A9gory=20Estrade?= <gregory.estrade@gmail.com>, Krzysztof Kozlowski <krzk@kernel.org>, Andrew Baumann <Andrew.Baumann@microsoft.com>, Prasad J Pandit <pjp@fedoraproject.org>, qemu-arm@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, Sai Pavan Boddu <saipava@xilinx.com>, Clement Deschamps <clement.deschamps@antfield.fr>, Jean-Christophe Dubois <jcd@tribudubois.net>, =?UTF-8?q?Gr=C3=A9gory=20Estrade?= <gregory.estrade@gmail.com>, Krzysztof Kozlowski <krzk@kernel.org>, Andrew Baumann <Andrew.Baumann@microsoft.com>, Prasad J Pandit <pjp@fedoraproject.org>, qemu-arm@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
 
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- hw/sd/arasan_sdhci.c | 72 ++++++++++++++++++++++++++++++++++++++++++++++++++++
- hw/sd/Makefile.objs  |  1 +
- 2 files changed, 73 insertions(+)
- create mode 100644 hw/sd/arasan_sdhci.c
+ hw/arm/xilinx_zynq.c | 41 +++++++++++++++++------------------------
+ 1 file changed, 17 insertions(+), 24 deletions(-)
 
-diff --git a/hw/sd/arasan_sdhci.c b/hw/sd/arasan_sdhci.c
-new file mode 100644
-index 0000000000..c6d96b2583
---- /dev/null
-+++ b/hw/sd/arasan_sdhci.c
-@@ -0,0 +1,72 @@
-+/*
-+ * Arasan SDHCI Controller emulation
-+ *
-+ * Copyright (C) 2018 Philippe Mathieu-Daudé <f4bug@amsat.org>
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or
-+ * (at your option) any later version.  See the COPYING file in the
-+ * top-level directory.
-+ */
-+#include "qemu/osdep.h"
-+#include "hw/sd/sdhci.h"
-+#include "qapi/error.h"
-+
-+/* Compatible with:
-+ * - SD Host Controller Specification Version 2.0 Part A2
-+ * - SDIO Specification Version 2.0
-+ * - MMC Specification Version 3.31
-+ *
-+ * - SDMA (single operation DMA)
-+ * - ADMA1 (4 KB boundary limited DMA)
-+ * - ADMA2
-+ *
-+ * - up to seven functions in SD1, SD4, but does not support SPI mode
-+ * - SD high-speed (SDHS) card
-+ * - SD High Capacity (SDHC) card
-+ *
-+ * - Low-speed, 1 KHz to 400 KHz
-+ * - Full-speed, 1 MHz to 50 MHz (25 MB/sec)
-+ */
-+static void arasan4_9a_sdhci_realize(DeviceState *dev, Error **errp)
-+{
-+    SDHCICommonClass *cc = SYSBUS_SDHCI_COMMON_GET_CLASS(dev);
-+    Object *obj = OBJECT(dev);
-+    Error *local_err = NULL;
-+
-+    object_property_set_uint(obj, 2, "sd-spec-version", &local_err);
-+    object_property_set_bool(obj, true, "adma1", &local_err);
-+    object_property_set_bool(obj, true, "high-speed", &local_err);
-+    object_property_set_uint(obj, 1024, "max-block-length", &local_err);
-+    if (local_err) {
-+        error_propagate(errp, local_err);
-+        return;
-+    }
-+
-+    cc->parent_realize(dev, &local_err);
-+    if (local_err) {
-+        error_propagate(errp, local_err);
-+        return;
-+    }
-+}
-+
-+static void arasan4_9a_sdhci_class_init(ObjectClass *klass, void *data)
-+{
-+    DeviceClass *dc = DEVICE_CLASS(klass);
-+    SDHCICommonClass *cc = SYSBUS_SDHCI_COMMON_CLASS(klass);
-+
-+    cc->parent_realize = dc->realize;
-+    dc->realize = arasan4_9a_sdhci_realize;
-+}
-+
-+static const TypeInfo arasan4_9a_sdhci_info = {
-+    .name = "arasan,sdhci-4.9a",
-+    .parent = TYPE_SYSBUS_SDHCI,
-+    .class_init = arasan4_9a_sdhci_class_init,
-+};
-+
-+static void arasan_sdhci_register_types(void)
-+{
-+    type_register_static(&arasan4_9a_sdhci_info);
-+}
-+
-+type_init(arasan_sdhci_register_types)
-diff --git a/hw/sd/Makefile.objs b/hw/sd/Makefile.objs
-index fd866d7f94..ef0fc3d3f7 100644
---- a/hw/sd/Makefile.objs
-+++ b/hw/sd/Makefile.objs
-@@ -3,6 +3,7 @@ common-obj-$(CONFIG_SD) += core.o
+diff --git a/hw/arm/xilinx_zynq.c b/hw/arm/xilinx_zynq.c
+index 1836a4ed45..55872d5678 100644
+--- a/hw/arm/xilinx_zynq.c
++++ b/hw/arm/xilinx_zynq.c
+@@ -165,10 +165,8 @@ static void zynq_init(MachineState *machine)
+     MemoryRegion *address_space_mem = get_system_memory();
+     MemoryRegion *ext_ram = g_new(MemoryRegion, 1);
+     MemoryRegion *ocm_ram = g_new(MemoryRegion, 1);
+-    DeviceState *dev, *carddev;
++    DeviceState *dev;
+     SysBusDevice *busdev;
+-    DriveInfo *di;
+-    BlockBackend *blk;
+     qemu_irq pic[64];
+     int n;
  
- # SD/MMC host adapters
- common-obj-$(CONFIG_PL181) += pl181.o
-+common-obj-$(CONFIG_ZYNQ) += arasan_sdhci.o
- common-obj-$(CONFIG_EXYNOS4) += dw-mshc.o
- common-obj-$(CONFIG_SSI_SD) += ssi-sd.o
- common-obj-$(CONFIG_SDHCI) += sdhci.o
+@@ -247,27 +245,22 @@ static void zynq_init(MachineState *machine)
+     gem_init(&nd_table[0], 0xE000B000, pic[54-IRQ_OFFSET]);
+     gem_init(&nd_table[1], 0xE000C000, pic[77-IRQ_OFFSET]);
+ 
+-    dev = qdev_create(NULL, TYPE_SYSBUS_SDHCI);
+-    qdev_init_nofail(dev);
+-    sysbus_mmio_map(SYS_BUS_DEVICE(dev), 0, 0xE0100000);
+-    sysbus_connect_irq(SYS_BUS_DEVICE(dev), 0, pic[56-IRQ_OFFSET]);
+-
+-    di = drive_get_next(IF_SD);
+-    blk = di ? blk_by_legacy_dinfo(di) : NULL;
+-    carddev = qdev_create(qdev_get_child_bus(dev, "sd-bus"), TYPE_SD_CARD);
+-    qdev_prop_set_drive(carddev, "drive", blk, &error_fatal);
+-    object_property_set_bool(OBJECT(carddev), true, "realized", &error_fatal);
+-
+-    dev = qdev_create(NULL, TYPE_SYSBUS_SDHCI);
+-    qdev_init_nofail(dev);
+-    sysbus_mmio_map(SYS_BUS_DEVICE(dev), 0, 0xE0101000);
+-    sysbus_connect_irq(SYS_BUS_DEVICE(dev), 0, pic[79-IRQ_OFFSET]);
+-
+-    di = drive_get_next(IF_SD);
+-    blk = di ? blk_by_legacy_dinfo(di) : NULL;
+-    carddev = qdev_create(qdev_get_child_bus(dev, "sd-bus"), TYPE_SD_CARD);
+-    qdev_prop_set_drive(carddev, "drive", blk, &error_fatal);
+-    object_property_set_bool(OBJECT(carddev), true, "realized", &error_fatal);
++    for (n = 0; n < 2; n++) {
++        int hci_irq = n ? 79 : 56;
++        hwaddr hci_addr = n ? 0xE0101000 : 0xE0100000;
++        DriveInfo *di;
++        BlockBackend *blk;
++        DeviceState *carddev;
++
++        dev = sysbus_create_varargs("arasan,sdhci-4.9a",
++                                    hci_addr, pic[hci_irq - IRQ_OFFSET], NULL);
++        di = drive_get_next(IF_SD);
++        blk = di ? blk_by_legacy_dinfo(di) : NULL;
++        carddev = qdev_create(qdev_get_child_bus(dev, "sd-bus"), TYPE_SD_CARD);
++        qdev_prop_set_drive(carddev, "drive", blk, &error_fatal);
++        object_property_set_bool(OBJECT(carddev), true, "realized",
++                                 &error_fatal);
++    }
+ 
+     dev = qdev_create(NULL, TYPE_ZYNQ_XADC);
+     qdev_init_nofail(dev);
 -- 
 2.15.1
