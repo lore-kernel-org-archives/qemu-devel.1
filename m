@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52370)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54979)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <s.priebe@profihost.ag>) id 1eYdZ0-0007ML-Ee
-	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 14:58:31 -0500
+	(envelope-from <s.priebe@profihost.ag>) id 1eYdde-0001FA-Db
+	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 15:03:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <s.priebe@profihost.ag>) id 1eYdYw-0000ad-Fo
-	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 14:58:30 -0500
-Received: from cloud1-vm154.de-nserver.de ([178.250.10.56]:45380)
+	(envelope-from <s.priebe@profihost.ag>) id 1eYdda-0004UK-Dy
+	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 15:03:18 -0500
+Received: from cloud1-vm154.de-nserver.de ([178.250.10.56]:13349)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <s.priebe@profihost.ag>)
-	id 1eYdYw-0000XN-5T
-	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 14:58:26 -0500
+	id 1eYdda-0004TE-44
+	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 15:03:14 -0500
 From: Stefan Priebe - Profihost AG <s.priebe@profihost.ag>
-Message-ID: <71ce8cd0-1b37-bc93-83b2-2fb3e9d0bbf0@profihost.ag>
-Date: Mon, 8 Jan 2018 20:58:19 +0100
+Message-ID: <cb61acc7-1a7a-616a-e2f7-29e8226ca0c3@profihost.ag>
+Date: Mon, 8 Jan 2018 21:03:11 +0100
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Language: de-DE
 Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] What's needed to pass pciid cpu flag to guest?
+Subject: [Qemu-devel] how to pass pcid to guest?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
