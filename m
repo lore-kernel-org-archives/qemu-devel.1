@@ -1,26 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56099)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56312)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yuval.shaia@oracle.com>) id 1eYrly-0002uQ-UH
-	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 06:08:53 -0500
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1eYrmm-0003Kq-Ue
+	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 06:09:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yuval.shaia@oracle.com>) id 1eYrlv-0005WO-JO
-	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 06:08:50 -0500
-Received: from aserp2130.oracle.com ([141.146.126.79]:40074)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <yuval.shaia@oracle.com>)
-	id 1eYrlv-0005TP-9A
-	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 06:08:47 -0500
-Date: Tue, 9 Jan 2018 13:08:33 +0200
-From: Yuval Shaia <yuval.shaia@oracle.com>
-Message-ID: <20180109110833.GA5975@yuvallap>
-References: <20180107123224.100877-1-marcel@redhat.com>
-	<20180107123224.100877-5-marcel@redhat.com>
-	<20180109113911.1746995b.cohuck@redhat.com>
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1eYrmj-0006wA-Mm
+	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 06:09:40 -0500
+Received: from mail-qk0-x241.google.com ([2607:f8b0:400d:c09::241]:38509)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1eYrmj-0006vH-Fw
+	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 06:09:37 -0500
+Received: by mail-qk0-x241.google.com with SMTP id j185so7187095qkc.5
+	for <qemu-devel@nongnu.org>; Tue, 09 Jan 2018 03:09:37 -0800 (PST)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20180104160523.22995-1-marcandre.lureau@redhat.com>
+	<20180104160523.22995-16-marcandre.lureau@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <8883f760-89d9-b232-a3f1-4b733bef474c@amsat.org>
+Date: Tue, 9 Jan 2018 08:09:30 -0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180109113911.1746995b.cohuck@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH V6 4/5] pvrdma: initial implementation
+In-Reply-To: <20180104160523.22995-16-marcandre.lureau@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature";
+	boundary="jHxxiIVFr3Oq8u5RqAeoHPMVcTjCkjWh1"
+Subject: Re: [Qemu-devel] [PATCH v3 15/18] ucontext: annotate coroutine
+ stack for ASAN
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,309 +36,226 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: Marcel Apfelbaum <marcel@redhat.com>, qemu-devel@nongnu.org, ehabkost@redhat.com, imammedo@redhat.com, pbonzini@redhat.com, mst@redhat.com, borntraeger@de.ibm.com
+To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, pbonzini@redhat.com
+Cc: qemu-devel@nongnu.org, famz@redhat.com, Stefan Hajnoczi <stefanha@redhat.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
 
-On Tue, Jan 09, 2018 at 11:39:11AM +0100, Cornelia Huck wrote:
-> On Sun,  7 Jan 2018 14:32:23 +0200
-> Marcel Apfelbaum <marcel@redhat.com> wrote:
-> 
-> > From: Yuval Shaia <yuval.shaia@oracle.com>
-> > 
-> > PVRDMA is the QEMU implementation of VMware's paravirtualized RDMA device.
-> > It works with its Linux Kernel driver AS IS, no need for any special guest
-> > modifications.
-> > 
-> > While it complies with the VMware device, it can also communicate with bare
-> > metal RDMA-enabled machines and does not require an RDMA HCA in the host, it
-> > can work with Soft-RoCE (rxe).
-> > 
-> > It does not require the whole guest RAM to be pinned allowing memory
-> > over-commit and, even if not implemented yet, migration support will be
-> > possible with some HW assistance.
-> > 
-> > Signed-off-by: Yuval Shaia <yuval.shaia@oracle.com>
-> > Signed-off-by: Marcel Apfelbaum <marcel@redhat.com>
-> > ---
-> >  Makefile.objs                      |   2 +
-> >  configure                          |   9 +-
-> >  default-configs/arm-softmmu.mak    |   1 +
-> >  default-configs/i386-softmmu.mak   |   1 +
-> >  default-configs/x86_64-softmmu.mak |   1 +
-> >  hw/Makefile.objs                   |   1 +
-> >  hw/rdma/Makefile.objs              |   6 +
-> >  hw/rdma/rdma_backend.c             | 815 +++++++++++++++++++++++++++++++++++++
-> >  hw/rdma/rdma_backend.h             |  92 +++++
-> >  hw/rdma/rdma_backend_defs.h        |  62 +++
-> >  hw/rdma/rdma_rm.c                  | 619 ++++++++++++++++++++++++++++
-> >  hw/rdma/rdma_rm.h                  |  69 ++++
-> >  hw/rdma/rdma_rm_defs.h             | 106 +++++
-> >  hw/rdma/rdma_utils.c               |  52 +++
-> >  hw/rdma/rdma_utils.h               |  43 ++
-> >  hw/rdma/trace-events               |   5 +
-> >  hw/rdma/vmw/pvrdma.h               | 122 ++++++
-> >  hw/rdma/vmw/pvrdma_cmd.c           | 679 ++++++++++++++++++++++++++++++
-> >  hw/rdma/vmw/pvrdma_dev_api.h       | 602 +++++++++++++++++++++++++++
-> >  hw/rdma/vmw/pvrdma_dev_ring.c      | 139 +++++++
-> >  hw/rdma/vmw/pvrdma_dev_ring.h      |  42 ++
-> >  hw/rdma/vmw/pvrdma_ib_verbs.h      | 433 ++++++++++++++++++++
-> >  hw/rdma/vmw/pvrdma_main.c          | 644 +++++++++++++++++++++++++++++
-> >  hw/rdma/vmw/pvrdma_qp_ops.c        | 212 ++++++++++
-> >  hw/rdma/vmw/pvrdma_qp_ops.h        |  27 ++
-> >  hw/rdma/vmw/pvrdma_ring.h          | 134 ++++++
-> >  hw/rdma/vmw/trace-events           |   5 +
-> >  hw/rdma/vmw/vmw_pvrdma-abi.h       | 311 ++++++++++++++
-> >  include/hw/pci/pci_ids.h           |   3 +
-> >  29 files changed, 5233 insertions(+), 4 deletions(-)
-> >  create mode 100644 hw/rdma/Makefile.objs
-> >  create mode 100644 hw/rdma/rdma_backend.c
-> >  create mode 100644 hw/rdma/rdma_backend.h
-> >  create mode 100644 hw/rdma/rdma_backend_defs.h
-> >  create mode 100644 hw/rdma/rdma_rm.c
-> >  create mode 100644 hw/rdma/rdma_rm.h
-> >  create mode 100644 hw/rdma/rdma_rm_defs.h
-> >  create mode 100644 hw/rdma/rdma_utils.c
-> >  create mode 100644 hw/rdma/rdma_utils.h
-> >  create mode 100644 hw/rdma/trace-events
-> >  create mode 100644 hw/rdma/vmw/pvrdma.h
-> >  create mode 100644 hw/rdma/vmw/pvrdma_cmd.c
-> >  create mode 100644 hw/rdma/vmw/pvrdma_dev_api.h
-> >  create mode 100644 hw/rdma/vmw/pvrdma_dev_ring.c
-> >  create mode 100644 hw/rdma/vmw/pvrdma_dev_ring.h
-> >  create mode 100644 hw/rdma/vmw/pvrdma_ib_verbs.h
-> >  create mode 100644 hw/rdma/vmw/pvrdma_main.c
-> >  create mode 100644 hw/rdma/vmw/pvrdma_qp_ops.c
-> >  create mode 100644 hw/rdma/vmw/pvrdma_qp_ops.h
-> >  create mode 100644 hw/rdma/vmw/pvrdma_ring.h
-> >  create mode 100644 hw/rdma/vmw/trace-events
-> >  create mode 100644 hw/rdma/vmw/vmw_pvrdma-abi.h
-> 
-> (...)
-> 
-> > diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-softmmu.mak
-> > index b0d6e65038..0e7a3c1700 100644
-> > --- a/default-configs/arm-softmmu.mak
-> > +++ b/default-configs/arm-softmmu.mak
-> > @@ -132,3 +132,4 @@ CONFIG_GPIO_KEY=y
-> >  CONFIG_MSF2=y
-> >  CONFIG_FW_CFG_DMA=y
-> >  CONFIG_XILINX_AXI=y
-> > +CONFIG_PVRDMA=y
-> > diff --git a/default-configs/i386-softmmu.mak b/default-configs/i386-softmmu.mak
-> > index 95ac4b464a..88298e4ef5 100644
-> > --- a/default-configs/i386-softmmu.mak
-> > +++ b/default-configs/i386-softmmu.mak
-> > @@ -61,3 +61,4 @@ CONFIG_HYPERV_TESTDEV=$(CONFIG_KVM)
-> >  CONFIG_PXB=y
-> >  CONFIG_ACPI_VMGENID=y
-> >  CONFIG_FW_CFG_DMA=y
-> > +CONFIG_PVRDMA=y
-> > diff --git a/default-configs/x86_64-softmmu.mak b/default-configs/x86_64-softmmu.mak
-> > index 0221236825..f571da36eb 100644
-> > --- a/default-configs/x86_64-softmmu.mak
-> > +++ b/default-configs/x86_64-softmmu.mak
-> > @@ -61,3 +61,4 @@ CONFIG_HYPERV_TESTDEV=$(CONFIG_KVM)
-> >  CONFIG_PXB=y
-> >  CONFIG_ACPI_VMGENID=y
-> >  CONFIG_FW_CFG_DMA=y
-> > +CONFIG_PVRDMA=y
-> 
-> Any reason you did not add this to other architectures?
-> 
-> I added "CONFIG_PVRDMA=$(CONFIG_PCI)" to s390x-softmmu.mak, and it at
-> least builds (did not try to actually get it to work, although I don't
-> see any immediate blocker for that).
-> 
-> (...)
-> 
-> > diff --git a/hw/rdma/rdma_backend.c b/hw/rdma/rdma_backend.c
-> > new file mode 100644
-> > index 0000000000..dcb799f49b
-> > --- /dev/null
-> > +++ b/hw/rdma/rdma_backend.c
-> 
-> (...)
-> 
-> > +static void poll_cq(RdmaDeviceResources *rdma_dev_res, struct ibv_cq *ibcq,
-> > +                    bool one_poll)
-> > +{
-> > +    int i, ne;
-> > +    BackendCtx *bctx;
-> > +    struct ibv_wc wc[2];
-> > +
-> > +    pr_dbg("Entering poll_cq loop on cq %p\n", ibcq);
-> > +    do {
-> > +        ne = ibv_poll_cq(ibcq, 2, wc);
-> > +        if (ne == 0 && one_poll) {
-> > +            pr_dbg("CQ is empty\n");
-> > +            return;
-> > +        }
-> > +    } while (ne < 0);
-> > +
-> > +    pr_dbg("Got %d completion(s) from cq %p\n", ne, ibcq);
-> > +
-> > +    for (i = 0; i < ne; i++) {
-> > +        pr_dbg("wr_id=0x%lx\n", wc[i].wr_id);
-> > +        pr_dbg("status=%d\n", wc[i].status);
-> > +
-> > +        bctx = rdma_rm_get_cqe_ctx(rdma_dev_res, wc[i].wr_id);
-> > +        if (unlikely(!bctx)) {
-> > +            pr_dbg("Error: Fail to find ctx for req %ld\n", wc[i].wr_id);
-> 
-> s/Fail/Failed/
-> 
-> (A lot of these through out the various files. Just thought I'd point
-> that out; but I don't really have time to do a real review.)
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--jHxxiIVFr3Oq8u5RqAeoHPMVcTjCkjWh1
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
+ pbonzini@redhat.com
+Cc: qemu-devel@nongnu.org, famz@redhat.com,
+ Stefan Hajnoczi <stefanha@redhat.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?=
+ <alex.bennee@linaro.org>
+Message-ID: <8883f760-89d9-b232-a3f1-4b733bef474c@amsat.org>
+Subject: Re: [Qemu-devel] [PATCH v3 15/18] ucontext: annotate coroutine stack
+ for ASAN
+References: <20180104160523.22995-1-marcandre.lureau@redhat.com>
+ <20180104160523.22995-16-marcandre.lureau@redhat.com>
+In-Reply-To: <20180104160523.22995-16-marcandre.lureau@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Thanks!
+Hi Marc-Andr=C3=A9,
 
-> 
-> > +            continue;
-> > +        }
-> > +        pr_dbg("Processing %s CQE\n", bctx->is_tx_req ? "send" : "recv");
-> > +
-> > +        comp_handler(wc[i].status, wc[i].vendor_err, bctx->up_ctx);
-> > +
-> > +        rdma_rm_dealloc_cqe_ctx(rdma_dev_res, wc[i].wr_id);
-> > +        free(bctx);
-> > +    }
-> > +}
-> 
-> (...)
-> 
-> > diff --git a/hw/rdma/vmw/pvrdma_dev_api.h b/hw/rdma/vmw/pvrdma_dev_api.h
-> > new file mode 100644
-> > index 0000000000..bf1986a976
-> > --- /dev/null
-> > +++ b/hw/rdma/vmw/pvrdma_dev_api.h
-> > @@ -0,0 +1,602 @@
-> > +/*
-> > + * QEMU VMWARE paravirtual RDMA device definitions
-> > + *
-> > + * Copyright (C) 2018 Oracle
-> > + * Copyright (C) 2018 Red Hat Inc
-> > + *
-> > + * Authors:
-> > + *     Yuval Shaia <yuval.shaia@oracle.com>
-> > + *     Marcel Apfelbaum <marcel@redhat.com>
-> > + *
-> > + * This work is licensed under the terms of the GNU GPL, version 2.
-> > + * See the COPYING file in the top-level directory.
-> > + *
-> > + */
-> > +
-> > +#ifndef PVRDMA_DEV_API_H
-> > +#define PVRDMA_DEV_API_H
-> > +
-> > +/*
-> > + * Following is an interface definition for PVRDMA device as provided by
-> > + * VMWARE.
-> > + * See original copyright from Linux kernel v4.14.5 header file
-> > + * drivers/infiniband/hw/vmw_pvrdma/pvrdma_dev_api.h
-> 
-> Could that file be exported as UAPI in the kernel and added to the
-> linux-headers script?
+On 01/04/2018 01:05 PM, Marc-Andr=C3=A9 Lureau wrote:
+> It helps ASAN to detect more leaks on coroutine stacks, as found in
+> the following patch.
+>=20
+> A similar work would need to be done for sigaltstack & windows fibers
+> to have similar coverage. Since ucontext is preferred, I didn't bother
+> checking the other coroutine implementations for now.
+>=20
+> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+> Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+> ---
+>  include/qemu/compiler.h   |  4 ++++
+>  util/coroutine-ucontext.c | 46 +++++++++++++++++++++++++++++++++++++++=
++++++++
+>  2 files changed, 50 insertions(+)
+>=20
+> diff --git a/include/qemu/compiler.h b/include/qemu/compiler.h
+> index 340e5fdc09..5fcc4f7ec7 100644
+> --- a/include/qemu/compiler.h
+> +++ b/include/qemu/compiler.h
+> @@ -111,4 +111,8 @@
+>  #define GCC_FMT_ATTR(n, m)
+>  #endif
+> =20
+> +#ifndef __has_feature
+> +#define __has_feature(x) 0 /* compatibility with non-clang compilers *=
+/
+> +#endif
+> +
+>  #endif /* COMPILER_H */
+> diff --git a/util/coroutine-ucontext.c b/util/coroutine-ucontext.c
+> index 6621f3f692..e78eae8766 100644
+> --- a/util/coroutine-ucontext.c
+> +++ b/util/coroutine-ucontext.c
+> @@ -31,6 +31,11 @@
+>  #include <valgrind/valgrind.h>
+>  #endif
+> =20
+> +#if defined(__SANITIZE_ADDRESS__) || __has_feature(address_sanitizer)
+> +#define CONFIG_ASAN 1
+> +#include <sanitizer/asan_interface.h>
+> +#endif
 
-We took this approach as apposed to kernel-headers with the following on
-our mind:
-(1) This is the convention used in vmxnet3.
-(2) vmw_pvrdma was introduced only lately, taking the kernel-headers
-approach will force specific kernel on a host in order to compile QEMU.
-(3) To support VMWare's pvrdma device we took a snapshot of existing
-driver/device settings and breezed there. This is driver/device API and we
-can't allow our self to chase VMWare's tail whenever they are changing the
-API. Just consider a case where they will change for example the ARM bit.
+Sadly this fails on Travis:
 
-Just IMHO.
+$ export CONFIG=3D"--enable-debug --enable-debug-tcg
+--enable-trace-backends=3Dlog"
+$ export CC=3Dgcc
+$ ./configure ${CONFIG}
+C compiler        gcc
+Host C compiler   cc
+C++ compiler      c++
+Objective-C compiler clang
+CFLAGS            -Wno-maybe-uninitialized -Og -fsanitize=3Daddress -g
+[...]
+  CC      util/qemu-coroutine.o
+  CC      util/qemu-coroutine-lock.o
+  CC      util/qemu-coroutine-io.o
+  CC      util/qemu-coroutine-sleep.o
+  CC      util/coroutine-ucontext.o
+util/coroutine-ucontext.c:36:38: fatal error:
+sanitizer/asan_interface.h: No such file or directory
+ #include <sanitizer/asan_interface.h>
+                                      ^
+compilation terminated.
+make: *** [util/coroutine-ucontext.o] Error 1
 
-> 
-> (...)
-> 
-> > diff --git a/hw/rdma/vmw/pvrdma_ib_verbs.h b/hw/rdma/vmw/pvrdma_ib_verbs.h
-> > new file mode 100644
-> > index 0000000000..cf1430024b
-> > --- /dev/null
-> > +++ b/hw/rdma/vmw/pvrdma_ib_verbs.h
-> > @@ -0,0 +1,433 @@
-> > +/*
-> > + * QEMU VMWARE paravirtual RDMA device definitions
-> > + *
-> > + * Copyright (C) 2018 Oracle
-> > + * Copyright (C) 2018 Red Hat Inc
-> > + *
-> > + * Authors:
-> > + *     Yuval Shaia <yuval.shaia@oracle.com>
-> > + *     Marcel Apfelbaum <marcel@redhat.com>
-> > + *
-> > + * This work is licensed under the terms of the GNU GPL, version 2.
-> > + * See the COPYING file in the top-level directory.
-> > + *
-> > + */
-> > +
-> > +#ifndef PVRDMA_IB_VERBS_H
-> > +#define PVRDMA_IB_VERBS_H
-> > +
-> > +/*
-> > + * VMWARE headers we got from Linux kernel do not fully comply QEMU coding
-> > + * standards in sense of types and defines used.
-> > + * Since we didn't want to change VMWARE code, following set of typedefs
-> > + * and defines needed to compile these headers with QEMU introduced.
-> > + */
-> > +
-> > +#define u8     uint8_t
-> > +#define u16    unsigned short
-> > +#define u32    uint32_t
-> > +#define u64    uint64_t
-> 
-> I think the headers update already takes care of some conversions.
-> Otherwise, same comment as for the header above.
+You simply need to update the .travis.yml, but does that mean your
+previous patch "Enable ASAN/UBSan by default if the compiler supports
+it." isn't correct?
 
-Sorry, i'm not following, can you elaborate on that?
+> +
+>  typedef struct {
+>      Coroutine base;
+>      void *stack;
+> @@ -59,11 +64,37 @@ union cc_arg {
+>      int i[2];
+>  };
+> =20
+> +static void finish_switch_fiber(void *fake_stack_save)
+> +{
+> +#ifdef CONFIG_ASAN
+> +    const void *bottom_old;
+> +    size_t size_old;
+> +
+> +    __sanitizer_finish_switch_fiber(fake_stack_save, &bottom_old, &siz=
+e_old);
+> +
+> +    if (!leader.stack) {
+> +        leader.stack =3D (void *)bottom_old;
+> +        leader.stack_size =3D size_old;
+> +    }
+> +#endif
+> +}
+> +
+> +static void start_switch_fiber(void **fake_stack_save,
+> +                               const void *bottom, size_t size)
+> +{
+> +#ifdef CONFIG_ASAN
+> +    __sanitizer_start_switch_fiber(fake_stack_save, bottom, size);
+> +#endif
+> +}
+> +
+>  static void coroutine_trampoline(int i0, int i1)
+>  {
+>      union cc_arg arg;
+>      CoroutineUContext *self;
+>      Coroutine *co;
+> +    void *fake_stack_save =3D NULL;
+> +
+> +    finish_switch_fiber(NULL);
+> =20
+>      arg.i[0] =3D i0;
+>      arg.i[1] =3D i1;
+> @@ -72,9 +103,13 @@ static void coroutine_trampoline(int i0, int i1)
+> =20
+>      /* Initialize longjmp environment and switch back the caller */
+>      if (!sigsetjmp(self->env, 0)) {
+> +        start_switch_fiber(&fake_stack_save,
+> +                           leader.stack, leader.stack_size);
+>          siglongjmp(*(sigjmp_buf *)co->entry_arg, 1);
+>      }
+> =20
+> +    finish_switch_fiber(fake_stack_save);
+> +
+>      while (true) {
+>          co->entry(co->entry_arg);
+>          qemu_coroutine_switch(co, co->caller, COROUTINE_TERMINATE);
+> @@ -87,6 +122,7 @@ Coroutine *qemu_coroutine_new(void)
+>      ucontext_t old_uc, uc;
+>      sigjmp_buf old_env;
+>      union cc_arg arg =3D {0};
+> +    void *fake_stack_save =3D NULL;
+> =20
+>      /* The ucontext functions preserve signal masks which incurs a
+>       * system call overhead.  sigsetjmp(buf, 0)/siglongjmp() does not
+> @@ -122,8 +158,12 @@ Coroutine *qemu_coroutine_new(void)
+> =20
+>      /* swapcontext() in, siglongjmp() back out */
+>      if (!sigsetjmp(old_env, 0)) {
+> +        start_switch_fiber(&fake_stack_save, co->stack, co->stack_size=
+);
+>          swapcontext(&old_uc, &uc);
+>      }
+> +
+> +    finish_switch_fiber(fake_stack_save);
+> +
+>      return &co->base;
+>  }
+> =20
+> @@ -169,13 +209,19 @@ qemu_coroutine_switch(Coroutine *from_, Coroutine=
+ *to_,
+>      CoroutineUContext *from =3D DO_UPCAST(CoroutineUContext, base, fro=
+m_);
+>      CoroutineUContext *to =3D DO_UPCAST(CoroutineUContext, base, to_);=
 
-> 
-> > +
-> > +/*
-> > + * Following is an interface definition for PVRDMA device as provided by
-> > + * VMWARE.
-> > + * See original copyright from Linux kernel v4.14.5 header file
-> > + * drivers/infiniband/hw/vmw_pvrdma/pvrdma_verbs.h
-> > + */
-> 
-> (...)
-> 
-> > diff --git a/hw/rdma/vmw/vmw_pvrdma-abi.h b/hw/rdma/vmw/vmw_pvrdma-abi.h
-> > new file mode 100644
-> > index 0000000000..8cfb9d7745
-> > --- /dev/null
-> > +++ b/hw/rdma/vmw/vmw_pvrdma-abi.h
-> > @@ -0,0 +1,311 @@
-> > +/*
-> > + * QEMU VMWARE paravirtual RDMA device definitions
-> > + *
-> > + * Copyright (C) 2018 Oracle
-> > + * Copyright (C) 2018 Red Hat Inc
-> > + *
-> > + * Authors:
-> > + *     Yuval Shaia <yuval.shaia@oracle.com>
-> > + *     Marcel Apfelbaum <marcel@redhat.com>
-> > + *
-> > + * This work is licensed under the terms of the GNU GPL, version 2.
-> > + * See the COPYING file in the top-level directory.
-> > + *
-> > + */
-> > +
-> > +#ifndef VMW_PVRDMA_ABI_H
-> > +#define VMW_PVRDMA_ABI_H
-> > +
-> > +/*
-> > + * Following is an interface definition for PVRDMA device as provided by
-> > + * VMWARE.
-> > + * See original copyright from Linux kernel v4.14.5 header file
-> > + * include/uapi/rdma/vmw_pvrdma-abi.h
-> > + */
-> 
-> This one is already exported.
+>      int ret;
+> +    void *fake_stack_save =3D NULL;
+> =20
+>      current =3D to_;
+> =20
+>      ret =3D sigsetjmp(from->env, 0);
+>      if (ret =3D=3D 0) {
+> +        start_switch_fiber(action =3D=3D COROUTINE_TERMINATE ?
+> +                           NULL : &fake_stack_save, to->stack, to->sta=
+ck_size);
+>          siglongjmp(to->env, action);
+>      }
+> +
+> +    finish_switch_fiber(fake_stack_save);
+> +
+>      return ret;
+>  }
+> =20
+>=20
 
-Same argument as above.
 
-Yuval
+--jHxxiIVFr3Oq8u5RqAeoHPMVcTjCkjWh1
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCgAdFiEE+qvnXhKRciHc/Wuy4+MsLN6twN4FAlpUouoACgkQ4+MsLN6t
+wN4z4g/+Mgsa72516I2tr0wQn3oWxVEVtmPdQD+6v9Nx28ZA9FTDlxCa6DMvyHo2
+qMt93ECLkzaCy7/O1fyQBTtb3z4MveGvT0/+rcahDRw/CM/BAugHX9qOOKNKCEY6
+Qnh3VTLQ3ZWsazeQCp04PlLJuyecbbCTTdVCBF2/IN1m7ngyQ2rgUKusG7UpLt8v
+swLRXw+7I44CPFLtjq3yRTquLoOkiKjnEJMqz95onNfCDefbLTO0hHDcoCaaOJ/F
+kqa5flMSWxiFt3aeYGKKn/Cc2Npb2NBFRDMscxKsJ6a/f1AoO19qbftN6J2a3yM6
+NVGy5w4aUeQQXgEc1Ww6ixQYub3Wl5b61sSOg+hs0DNndB1VAz0u/hNqIIdtwFVr
+FElyW9xIDgNQZKdnOdmgQad30OUi2qgN7WtqTUFPDqQM0jIKEZALGtBxmCs1bWpc
+QPULpnhuC5FeqaoPjoyQGY7RvVDBjY9r7qLcU+GttuMoLvYq6BeQncqUXn1q/ar/
+QFOR+juRCWPdcH9Y/EVsXhHrMWAlMQnlpQXLTNrDwnEjZ7NLgOwA0J+v6wnykTmI
+Z59fqsrJT+vlkCZn8Su9jZAYcMBgXOyL7TGQW2k/HF8vhM9ytTV2SPxAo/BSA+yj
+VG35WmBgJ3JJRg/HP3Mt1wi7JjDogFDKtTYkbKw8oElUJKZohFI=
+=pbSh
+-----END PGP SIGNATURE-----
+
+--jHxxiIVFr3Oq8u5RqAeoHPMVcTjCkjWh1--
