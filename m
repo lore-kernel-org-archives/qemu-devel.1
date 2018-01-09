@@ -1,26 +1,36 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60337)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33932)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1eYqa4-0002QU-Cf
-	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 04:52:29 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1eYqfO-0004YH-7t
+	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 04:57:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1eYqZz-00036D-OU
-	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 04:52:28 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:41392)
+	(envelope-from <pbonzini@redhat.com>) id 1eYqfJ-0005OJ-BO
+	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 04:57:58 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:48136)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1eYqZz-00035Z-Iq
-	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 04:52:23 -0500
-References: <20180108172904.8772-1-f4bug@amsat.org>
-	<20180108172904.8772-13-f4bug@amsat.org>
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1eYqfJ-0005Nr-3Q
+	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 04:57:53 -0500
+References: <20180104141524.m5xy66jsn2hiajwl@var.youpi.perso.aquilenet.fr>
+	<20180104142101.rivje5qn5dasb6jw@var.youpi.perso.aquilenet.fr>
+	<aea97804-c6a9-d903-13d8-23bc6b46af86@redhat.com>
+	<20180104152402.fv52umjmlb2g22wc@var.youpi.perso.aquilenet.fr>
+	<b1a86fed-8a98-cc1d-46ca-5462f8be3fc7@redhat.com>
+	<20180104153219.wsxtkzuznu2iwra7@var.youpi.perso.aquilenet.fr>
+	<bb6eae87-85b2-4bf2-ad36-26fa95816315@redhat.com>
+	<9b392599-a318-90c5-daa8-89ade40c64e5@redhat.com>
+	<20180104155640.6rznzu4koy354pyn@var.youpi.perso.aquilenet.fr>
+	<4055e106-b24f-09b5-29cd-a4927ecad433@redhat.com>
+	<20180104174545.5p2aaypp2asbdoxx@var.youpi.perso.aquilenet.fr>
+	<d6e1a2a2-5246-c160-eb20-450d0598247c@redhat.com>
+	<1984712a-3077-71e1-4ff9-d8d9a91bf164@redhat.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <36374d47-b912-e208-4d32-4cc8c7985c0f@redhat.com>
-Date: Tue, 9 Jan 2018 10:52:18 +0100
+Message-ID: <19539542-7b3c-9251-866a-34531ed266c0@redhat.com>
+Date: Tue, 9 Jan 2018 10:57:47 +0100
 MIME-Version: 1.0
-In-Reply-To: <20180108172904.8772-13-f4bug@amsat.org>
+In-Reply-To: <1984712a-3077-71e1-4ff9-d8d9a91bf164@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC PATCH 12/12] slirp: use
- HOST_SUPPORTS_UNALIGNED_ACCESS
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2] usb: Remove legacy -usbdevice option
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,26 +39,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Samuel Thibault <samuel.thibault@ens-lyon.org>, Jan Kiszka <jan.kiszka@siemens.com>, "Michael S . Tsirkin" <mst@redhat.com>, Eric Blake <eblake@redhat.com>, Thomas Huth <thuth@redhat.com>, Richard Henderson <rth@twiddle.net>, Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-devel@nongnu.org
+To: Thomas Huth <thuth@redhat.com>, Samuel Thibault <samuel.thibault@gnu.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>, kraxel@redhat.com, qemu-devel@nongnu.org
 
-On 08/01/2018 18:29, Philippe Mathieu-Daud=C3=A9 wrote:
-> Access struct in6_addr with 'void *', then cast to 'u8 *' to avoid alig=
-nment
-> issues.
->=20
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-> ---
-> ugly...
->=20
->  slirp/ip6.h | 58 +++++++++++++++++++++++++++++++++++++++++++++++++++++=
-+++++
->  1 file changed, 58 insertions(+)
+On 08/01/2018 08:43, Thomas Huth wrote:
+> On 04.01.2018 18:57, Paolo Bonzini wrote:
+>> On 04/01/2018 18:45, Samuel Thibault wrote:
+>>> Paolo Bonzini, on jeu. 04 janv. 2018 18:11:00 +0100, wrote:
+>>>> On 04/01/2018 16:56, Samuel Thibault wrote:
+>>>>>> However, adding magic to "-device usb-braille" that creates both a
+>>>>>> front-end and a back-end is completely the opposite of sane...
+>>>>> Well, this is also what happens with -device usb-mouse, usb-kbd etc.:
+>>>>> they also plug with keyboard & mouse pipes of the qemu graphical
+>>>>> frontend. braille is just the same vein for the user.
+>>>>
+>>>> No, they don't create a new UI object magically that wasn't there
+>>>> before.  They just let you add a device, e.g. a USB tablet, that listens
+>>>> on an _existing_ UI (GTK+ or SDL or similar).
+>>>
+>>> Technically for the qemu developper, yes.
+>>>
+>>> But for the user, no.
+>>
+>> That's not true.   With or without "-usbdevice tablet", you use the same
+>> mouse or keyboard device as the input source.
+> 
+> But from a users point of view: Why are the mouse and keyboard input
+> sources available out of the box, while braille has to be specified
+> manually? I think Samuel has a point here...
 
-What is the bug exactly?  If a->s6_addr can be unaligned, this should be
-in the commit message.
+There are two aspects of this:
 
-In any case, there is no need to keep the versions that use struct
-in6_addr, you can use the void* version unconditionally.
+1) You have specified the mouse and keyboard backends, actually---via
+"-display vnc" or "-display gtk" or "-display none".
+
+2) The model for input backends is one-to-many (all guest
+mice/tablets/keyboards share the same backends), while the model for
+chardev backends is one-to-one.
+
+> So just another idea: Instead of adding the magic sugar code to the
+> usb-braille device, we could also add some code to vl.c or somewhere
+> else that checks whether a braille guest device is available and then
+> wires it up automatically with a braille host device (unless
+> -no-defaults has been specified, or the user already set chardev=...
+> there). Would that make more sense in your eyes than to put this code
+> into the usb-braille device directly?
+
+I'm not sure how that would work.  Also, if you use "-device" (or
+"-netdev", or "-blockdev", or "-chardev", or "-mon", or "-fsdev" or
+"-object") you are explicitly saying you don't want any magic.
+
+Magic on the other hand is fully within the scope of legacy options
+("-net", "-drive" especially without "if=none", "-usbdevice", "-serial",
+"-virtfs", etc.).
 
 Paolo
