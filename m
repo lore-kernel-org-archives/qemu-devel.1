@@ -1,27 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59239)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60036)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1eYvY2-0005jE-9E
-	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 10:10:46 -0500
+	(envelope-from <cohuck@redhat.com>) id 1eYva9-000700-DJ
+	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 10:12:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1eYvXz-0006tJ-5Y
-	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 10:10:42 -0500
-Received: from mail-wm0-x22a.google.com ([2a00:1450:400c:c09::22a]:33442)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1eYvXy-0006sI-Uf
-	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 10:10:39 -0500
-Received: by mail-wm0-x22a.google.com with SMTP id 123so1355918wme.0
-	for <qemu-devel@nongnu.org>; Tue, 09 Jan 2018 07:10:38 -0800 (PST)
-Date: Tue, 9 Jan 2018 15:10:35 +0000
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20180109151035.GA1197@stefanha-x1.localdomain>
-References: <1515433816-5700-1-git-send-email-mst@redhat.com>
+	(envelope-from <cohuck@redhat.com>) id 1eYva3-0000Os-Pz
+	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 10:12:53 -0500
+Date: Tue, 9 Jan 2018 16:12:40 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20180109161240.29b2c460.cohuck@redhat.com>
+In-Reply-To: <82678d4e-234a-79a5-7e1d-d66da7460f1c@linux.vnet.ibm.com>
+References: <1513030760-26245-1-git-send-email-walling@linux.vnet.ibm.com>
+	<1513030760-26245-3-git-send-email-walling@linux.vnet.ibm.com>
+	<20171214184157.21fbe3b8.cohuck@redhat.com>
+	<82678d4e-234a-79a5-7e1d-d66da7460f1c@linux.vnet.ibm.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="AhhlLboLdkugWU4S"
-Content-Disposition: inline
-In-Reply-To: <1515433816-5700-1-git-send-email-mst@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 1/2] vhost-user: factor out msg head and
- payload
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v2 2/5] s390-ccw: ipl structs
+ for eckd cdl/ldl
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,31 +26,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: "Collin L. Walling" <walling@linux.vnet.ibm.com>
+Cc: frankja@linux.vnet.ibm.com, thuth@redhat.com, david@redhat.com, qemu-devel@nongnu.org, borntraeger@de.ibm.com, qemu-s390x@nongnu.org
 
+On Mon, 18 Dec 2017 17:11:52 -0500
+"Collin L. Walling" <walling@linux.vnet.ibm.com> wrote:
 
---AhhlLboLdkugWU4S
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+> On 12/14/2017 12:41 PM, Cornelia Huck wrote:
+> > On Mon, 11 Dec 2017 17:19:17 -0500
+> > "Collin L. Walling" <walling@linux.vnet.ibm.com> wrote:
+> > =20
+> >> ECKD DASDs have different IPL structures for CDL and LDL
+> >> formats. The current Ipl1 and Ipl2 structs follow the CDL
+> >> format, so we prepend "EckdCdl" to them. Boot info for LDL
+> >> has been moved to a new struct: EckdLdlIpl1.
+> >>
+> >> Also introduce structs for IPL stages 1 and 1b and for
+> >> disk geometry.
+> >>
+> >> Signed-off-by: Collin L. Walling <walling@linux.vnet.ibm.com>
+> >> Acked-by: Janosch Frank <frankja@linux.vnet.ibm.com>
+> >> ---
+> >>   pc-bios/s390-ccw/bootmap.c | 24 ++++++++++----------
+> >>   pc-bios/s390-ccw/bootmap.h | 55 +++++++++++++++++++++++++++++++++---=
+----------
+> >>   2 files changed, 53 insertions(+), 26 deletions(-)
+> >>
+> >> +    mbr_block_nr =3D
+> >> +        eckd_block_num((void *)&(ipl1->boot_info.bp.ipl.bm_ptr.eckd.b=
+ptr)); =20
+> > Let me nominate this as "crazy nested struct of the week".
+> >
+> > (Just kidding, your patch certainly improves things in general :) =20
+>=20
+>=20
+> FWIW: we can reduce it to just ipl1->boot_info.bp-- the way the structs=20
+> are unioned
+> and the ordering of the fields make this possible.=C2=A0 Thoughts?
 
-On Mon, Jan 08, 2018 at 07:50:38PM +0200, Michael S. Tsirkin wrote:
->  static VhostUserMsg m __attribute__ ((unused));
-
-Can m be dropped now?
-
---AhhlLboLdkugWU4S
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJaVNtrAAoJEJykq7OBq3PIG9wH/R6QPzGR6fSLlKQ04M73HHtH
-INr518ifkUo+y9Fmxz0Kvn7lgOvwnM0feNlbL+CxuNNaE9iihO7Mu5sTIbmzBV62
-9EdHq2OVdVKd71nWdcyMJYf8yDZrx97YLPelrQ6QeD0hFcSy5QzMInzl0jojuiiT
-U9mUX2vzqwgM2dhuG2OA252W1RXhgGhaZHTJYIz/pmIkTIe58RTb0grjxTJZeg0n
-blz9/y9shKbOc58NtNItTKxuU08QNTl9m/ukJSkLA2c3BQenWDTQeAEHiMFEaTdE
-ru/f/b3JFuBfuRld0BdL1ziuLu2Jcm/OHr9cpOICnL30g3cVEJ0ipnJoTBFg3/g=
-=SXGA
------END PGP SIGNATURE-----
-
---AhhlLboLdkugWU4S--
+Ah, missed that one. I'd prefer to be explicit here, even if it is long.
