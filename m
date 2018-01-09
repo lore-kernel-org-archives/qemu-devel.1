@@ -1,22 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38794)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44250)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1eYyrV-0000A8-Lp
-	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 13:43:02 -0500
+	(envelope-from <drjones@redhat.com>) id 1eYyyo-0003Lw-Lz
+	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 13:50:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1eYyrU-0007mf-Rf
-	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 13:43:01 -0500
-References: <20171211134740.8235-1-david@redhat.com>
-	<20171211134740.8235-13-david@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <b69625b2-f5bb-2206-3002-9b74923ba16c@redhat.com>
-Date: Tue, 9 Jan 2018 19:42:47 +0100
+	(envelope-from <drjones@redhat.com>) id 1eYyyY-00056q-Dd
+	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 13:50:34 -0500
+Date: Tue, 9 Jan 2018 19:48:45 +0100
+From: Andrew Jones <drjones@redhat.com>
+Message-ID: <20180109184845.e2ma4po2sibogkua@kamzik.brq.redhat.com>
+References: <1513183941-24300-1-git-send-email-peter.maydell@linaro.org>
+	<CAFEAcA8NbL7ROZs99hWhpAF2Rdi2qEiWLNo3hr_9W7gmgXyw4A@mail.gmail.com>
+	<6d20557d-5722-706f-ca4f-489ab85358c0@redhat.com>
+	<CAFEAcA-Nn4VmSnxT7Of8Nh+p5QgF9cMzkqZ-VBCC=2zRgk-Xdw@mail.gmail.com>
+	<e40cc107-2fe9-d8a5-b4fd-385c0d22c564@redhat.com>
+	<CAFEAcA8QqEna4u92bk88++Y1JrpCJD=KDpSfbJ8DhfSiTRm+=w@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20171211134740.8235-13-david@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v1 for-2-12 12/15] s390x/tcg:
- fix size + content of STSI blocks
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAFEAcA8QqEna4u92bk88++Y1JrpCJD=KDpSfbJ8DhfSiTRm+=w@mail.gmail.com>
+Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH 0/2] GICv2 & GICv3: RAZ/WI
+ reserved addresses rather than aborting
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,20 +28,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org
-Cc: Peter Crosthwaite <crosthwaite.peter@gmail.com>, Cornelia Huck <cohuck@redhat.com>, Alexander Graf <agraf@suse.de>, Christian Borntraeger <borntraeger@de.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Laszlo Ersek <lersek@redhat.com>, Wei Huang <wei@redhat.com>, "patches@linaro.org" <patches@linaro.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, Auger Eric <eric.auger@redhat.com>, qemu-arm <qemu-arm@nongnu.org>, cdall@linaro.org
 
-On 11.12.2017 14:47, David Hildenbrand wrote:
-> All blocks are 4k in size, which is only true for two of them right now.
-> Also some reserved fields were wrong, fix it and convert all reserved
-> fields to u8.
+On Tue, Jan 09, 2018 at 04:35:30PM +0000, Peter Maydell wrote:
+> On 9 January 2018 at 16:29, Laszlo Ersek <lersek@redhat.com> wrote:
+> > On 01/09/18 17:12, Peter Maydell wrote:
+> >> On 9 January 2018 at 15:58, Laszlo Ersek <lersek@redhat.com> wrote:
+> >>> Sorry, no clue about any of this -- where should I read up?
+> >>
+> >> I cc'd you mostly as a heads-up since the QEMU bug is UEFI affecting,
+> >> not because I wanted to make you read the GIC specs :-)
+> >
+> > Thanks (and, thanks :) ) -- from patch #2, looks like GICv2 is affected
+> > too, and the patch seems to be fixing commit a9d853533cc1
+> > ("hw/intc/arm_gic: Switch to read/write callbacks with tx attributes",
+> > 2015-05-12).
+> >
+> > Is that right? That commit was released with v2.4.0. Should I have
+> > experienced the error? Is it KVM / hardware specific? What are the symptoms?
 > 
-> This also fixes the LPAR part output in /proc/sysinfo under TCG. (for
-> now, everything was indicated as 0)
+> Happens under TCG emulation only. The bug got introduced with
+> commit c79c0a314c43b78f6, which changed the effect of a device
+> returning MEMTX_ERROR/MEMTX_DECODE_ERROR from "RAZ/WI" to
+> "guest data abort". That's in general the right thing to do,
+> but in the case of these device models we were returning those
+> values for cases which aren't supposed to provoke aborts.
 > 
-> Signed-off-by: David Hildenbrand <david@redhat.com>
-> ---
->  target/s390x/cpu.h | 22 ++++++++++++++--------
->  1 file changed, 14 insertions(+), 8 deletions(-)
+> The symptom is that if your guest code is poorly behaved and
+> tries to read or write offsets that don't correspond to documented
+> GIC registers, it will take an abort that it didn't before.
+> Linux is fine; this UEFI image I have lying around stopped working.
 
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+Thanks for pointing this out. I had just recently noticed that the
+'gicv3-active' kvm-unit-tests test had stopped passing on TCG, getting
+DABTs when attempting to write GICD_ICACTIVER. I was just about to
+complain in this thread that that register is indeed documented, but
+now I see the implementation of the test was always wrong. It was using
+the wrong register base, RD vs. SGI...
+
+drew
