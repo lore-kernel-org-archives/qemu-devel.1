@@ -1,21 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33249)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34426)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1eYuQ2-0005DR-G2
-	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 08:58:23 -0500
+	(envelope-from <pm215@archaic.org.uk>) id 1eYuTe-00077B-Pf
+	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 09:02:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1eYuPy-0007W1-JV
-	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 08:58:22 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:58934)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1eYuPy-0007VW-E0
-	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 08:58:18 -0500
-Date: Tue, 9 Jan 2018 15:58:11 +0200
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <1515506288-32291-1-git-send-email-mst@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Subject: [Qemu-devel] [PATCH] acpi: switch to a dummy SSDT
+	(envelope-from <pm215@archaic.org.uk>) id 1eYuTe-0001BY-1B
+	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 09:02:06 -0500
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue,  9 Jan 2018 14:01:51 +0000
+Message-Id: <1515506513-31961-3-git-send-email-peter.maydell@linaro.org>
+In-Reply-To: <1515506513-31961-1-git-send-email-peter.maydell@linaro.org>
+References: <1515506513-31961-1-git-send-email-peter.maydell@linaro.org>
+Subject: [Qemu-devel] [PATCH 2/4] hw/sd/milkymist-memcard: Reset SD card on
+ controller reset
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,64 +20,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>
+To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
+Cc: patches@linaro.org, qemu-stable@nongnu.org, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 
-We prefer not changing table sizes depending on parameters,
-that's why we create a dummy table rather than just drop
-the MCFG table.
+Since pl181 is still using the legacy SD card API, the SD
+card created by sd_init() is not plugged into any bus. This
+means that the controller has to reset it manually.
 
-However, a table named "QEMU" could be put to a better
-use than just a stub, e.g. we could use it to pass
-some QEMU specific info to guests.
+Failing to do this mostly didn't affect the guest since the
+guest typically does a programmed SD card reset as part of
+its SD controller driver initialization, but meant that
+migration failed because it's only in sd_reset() that we
+set up the wpgrps_size field.
 
-Replace with an SSDT and pad with the Nop opcode
-to preserve the length.
-
-Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+Cc: qemu-stable@nongnu.org
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- hw/i386/acpi-build.c | 17 ++++++++++++-----
- 1 file changed, 12 insertions(+), 5 deletions(-)
+ hw/sd/milkymist-memcard.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
-index 73519ab..d0afb31e 100644
---- a/hw/i386/acpi-build.c
-+++ b/hw/i386/acpi-build.c
-@@ -2419,6 +2419,8 @@ build_mcfg_q35(GArray *table_data, BIOSLinker *linker, AcpiMcfgInfo *info)
- {
-     AcpiTableMcfg *mcfg;
-     const char *sig;
-+    const char *oem;
-+    const char *oem_id;
-     int len = sizeof(*mcfg) + 1 * sizeof(mcfg->allocation[0]);
- 
-     mcfg = acpi_data_push(table_data, len);
-@@ -2431,16 +2433,21 @@ build_mcfg_q35(GArray *table_data, BIOSLinker *linker, AcpiMcfgInfo *info)
-     /* MCFG is used for ECAM which can be enabled or disabled by guest.
-      * To avoid table size changes (which create migration issues),
-      * always create the table even if there are no allocations,
--     * but set the signature to a reserved value in this case.
--     * ACPI spec requires OSPMs to ignore such tables.
-+     * but fill it with Noop values.
-+     * OSPMs ignore such tables.
-      */
-     if (info->mcfg_base == PCIE_BASE_ADDR_UNMAPPED) {
--        /* Reserved signature: ignored by OSPM */
--        sig = "QEMU";
-+        sig = "SSDT";
-+        oem = "QEMU ";
-+        oem_id = "NOOP";
-+        /* 0xa3 - NoopOp */
-+        memset(&mcfg->reserved, 0xa3, len - offsetof(AcpiTableMcfg, reserved));
-     } else {
-         sig = "MCFG";
-+        oem = NULL;
-+        oem_id = NULL;
+diff --git a/hw/sd/milkymist-memcard.c b/hw/sd/milkymist-memcard.c
+index 4008c81..341da88 100644
+--- a/hw/sd/milkymist-memcard.c
++++ b/hw/sd/milkymist-memcard.c
+@@ -248,6 +248,10 @@ static void milkymist_memcard_reset(DeviceState *d)
+     for (i = 0; i < R_MAX; i++) {
+         s->regs[i] = 0;
      }
--    build_header(linker, table_data, (void *)mcfg, sig, len, 1, NULL, NULL);
-+    build_header(linker, table_data, (void *)mcfg, sig, len, 1, oem, oem_id);
++    /* Since we're still using the legacy SD API the card is not plugged
++     * into any bus, and we must reset it manually.
++     */
++    device_reset(DEVICE(s->card));
  }
  
- /*
+ static int milkymist_memcard_init(SysBusDevice *dev)
 -- 
-MST
+2.7.4
