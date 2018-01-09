@@ -1,26 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35025)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35435)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1eYtNT-0004fx-0B
-	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 07:51:40 -0500
+	(envelope-from <lersek@redhat.com>) id 1eYtO9-0005Eh-9m
+	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 07:52:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1eYtNP-0004ak-Se
-	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 07:51:39 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:60057)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1eYtNP-0004Zl-JS
-	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 07:51:35 -0500
-Date: Tue, 9 Jan 2018 13:51:25 +0100
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20180109135125.2b3a511e.cohuck@redhat.com>
-In-Reply-To: <20180109110833.GA5975@yuvallap>
-References: <20180107123224.100877-1-marcel@redhat.com>
-	<20180107123224.100877-5-marcel@redhat.com>
-	<20180109113911.1746995b.cohuck@redhat.com>
-	<20180109110833.GA5975@yuvallap>
+	(envelope-from <lersek@redhat.com>) id 1eYtO6-0005c3-4y
+	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 07:52:21 -0500
+References: <20180108215007.46471-1-marcel@redhat.com>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <5367c8a4-91bd-7712-525d-0a1ed6e6acab@redhat.com>
+Date: Tue, 9 Jan 2018 13:51:59 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <20180108215007.46471-1-marcel@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH V6 4/5] pvrdma: initial implementation
+Subject: Re: [Qemu-devel] [PATCH] fw_cfg: fix memory corruption when all
+ fw_cfg slots are used
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,165 +24,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Yuval Shaia <yuval.shaia@oracle.com>
-Cc: Marcel Apfelbaum <marcel@redhat.com>, qemu-devel@nongnu.org, ehabkost@redhat.com, imammedo@redhat.com, pbonzini@redhat.com, mst@redhat.com, borntraeger@de.ibm.com
+To: Marcel Apfelbaum <marcel@redhat.com>, qemu-devel@nongnu.org
+Cc: ehabkost@redhat.com, mst@redhat.com, qemu-stable@nongnu.org, kraxel@redhat.com
 
-On Tue, 9 Jan 2018 13:08:33 +0200
-Yuval Shaia <yuval.shaia@oracle.com> wrote:
-
-> On Tue, Jan 09, 2018 at 11:39:11AM +0100, Cornelia Huck wrote:
-> > On Sun,  7 Jan 2018 14:32:23 +0200
-> > Marcel Apfelbaum <marcel@redhat.com> wrote:
-
-> > > diff --git a/hw/rdma/vmw/pvrdma_dev_api.h b/hw/rdma/vmw/pvrdma_dev_api.h
-> > > new file mode 100644
-> > > index 0000000000..bf1986a976
-> > > --- /dev/null
-> > > +++ b/hw/rdma/vmw/pvrdma_dev_api.h
-> > > @@ -0,0 +1,602 @@
-> > > +/*
-> > > + * QEMU VMWARE paravirtual RDMA device definitions
-> > > + *
-> > > + * Copyright (C) 2018 Oracle
-> > > + * Copyright (C) 2018 Red Hat Inc
-> > > + *
-> > > + * Authors:
-> > > + *     Yuval Shaia <yuval.shaia@oracle.com>
-> > > + *     Marcel Apfelbaum <marcel@redhat.com>
-> > > + *
-> > > + * This work is licensed under the terms of the GNU GPL, version 2.
-> > > + * See the COPYING file in the top-level directory.
-> > > + *
-> > > + */
-> > > +
-> > > +#ifndef PVRDMA_DEV_API_H
-> > > +#define PVRDMA_DEV_API_H
-> > > +
-> > > +/*
-> > > + * Following is an interface definition for PVRDMA device as provided by
-> > > + * VMWARE.
-> > > + * See original copyright from Linux kernel v4.14.5 header file
-> > > + * drivers/infiniband/hw/vmw_pvrdma/pvrdma_dev_api.h  
-> > 
-> > Could that file be exported as UAPI in the kernel and added to the
-> > linux-headers script?  
+On 01/08/18 22:50, Marcel Apfelbaum wrote:
+> When all the fw_cfg slots are used, a write is made outside the
+> bounds of the fw_cfg files array as part of the sort algorithm.
 > 
-> We took this approach as apposed to kernel-headers with the following on
-> our mind:
-> (1) This is the convention used in vmxnet3.
-> (2) vmw_pvrdma was introduced only lately, taking the kernel-headers
-> approach will force specific kernel on a host in order to compile QEMU.
-
-qemu will get the kernel headers once from the upstream kernel and then
-will be able to be built everywhere.
-
-> (3) To support VMWare's pvrdma device we took a snapshot of existing
-> driver/device settings and breezed there. This is driver/device API and we
-> can't allow our self to chase VMWare's tail whenever they are changing the
-> API. Just consider a case where they will change for example the ARM bit.
-
-But as want to enable the existing device driver, you'll want to be
-able to produce a compatible device anyway, don't you? Also, wouldn't
-VMWare break older kernels if they suddenly changed the api?
-
-[Also, is there a canonical reference for this API?]
-
+> Fix it by avoiding an unnecessary array element move.
+> Fix also an assert while at it.
 > 
-> Just IMHO.
+> Signed-off-by: Marcel Apfelbaum <marcel@redhat.com>
+> ---
+>  hw/nvram/fw_cfg.c | 6 ++++--
+>  1 file changed, 4 insertions(+), 2 deletions(-)
 > 
-> > 
-> > (...)
-> >   
-> > > diff --git a/hw/rdma/vmw/pvrdma_ib_verbs.h b/hw/rdma/vmw/pvrdma_ib_verbs.h
-> > > new file mode 100644
-> > > index 0000000000..cf1430024b
-> > > --- /dev/null
-> > > +++ b/hw/rdma/vmw/pvrdma_ib_verbs.h
-> > > @@ -0,0 +1,433 @@
-> > > +/*
-> > > + * QEMU VMWARE paravirtual RDMA device definitions
-> > > + *
-> > > + * Copyright (C) 2018 Oracle
-> > > + * Copyright (C) 2018 Red Hat Inc
-> > > + *
-> > > + * Authors:
-> > > + *     Yuval Shaia <yuval.shaia@oracle.com>
-> > > + *     Marcel Apfelbaum <marcel@redhat.com>
-> > > + *
-> > > + * This work is licensed under the terms of the GNU GPL, version 2.
-> > > + * See the COPYING file in the top-level directory.
-> > > + *
-> > > + */
-> > > +
-> > > +#ifndef PVRDMA_IB_VERBS_H
-> > > +#define PVRDMA_IB_VERBS_H
-> > > +
-> > > +/*
-> > > + * VMWARE headers we got from Linux kernel do not fully comply QEMU coding
-> > > + * standards in sense of types and defines used.
-> > > + * Since we didn't want to change VMWARE code, following set of typedefs
-> > > + * and defines needed to compile these headers with QEMU introduced.
-> > > + */
-> > > +
-> > > +#define u8     uint8_t
-> > > +#define u16    unsigned short
-> > > +#define u32    uint32_t
-> > > +#define u64    uint64_t  
-> > 
-> > I think the headers update already takes care of some conversions.
-> > Otherwise, same comment as for the header above.  
+> diff --git a/hw/nvram/fw_cfg.c b/hw/nvram/fw_cfg.c
+> index 753ac0e4ea..4313484b21 100644
+> --- a/hw/nvram/fw_cfg.c
+> +++ b/hw/nvram/fw_cfg.c
+> @@ -784,7 +784,7 @@ void fw_cfg_add_file_callback(FWCfgState *s,  const char *filename,
+>       * index and "i - 1" is the one being copied from, thus the
+>       * unusual start and end in the for statement.
+>       */
+> -    for (i = count + 1; i > index; i--) {
+> +    for (i = count; i > index; i--) {
+>          s->files->f[i] = s->files->f[i - 1];
+>          s->files->f[i].select = cpu_to_be16(FW_CFG_FILE_FIRST + i);
+>          s->entries[0][FW_CFG_FILE_FIRST + i] =
+> @@ -833,7 +833,6 @@ void *fw_cfg_modify_file(FWCfgState *s, const char *filename,
+>      assert(s->files);
+>  
+>      index = be32_to_cpu(s->files->count);
+> -    assert(index < fw_cfg_file_slots(s));
+>  
+>      for (i = 0; i < index; i++) {
+>          if (strcmp(filename, s->files->f[i].name) == 0) {
+> @@ -843,6 +842,9 @@ void *fw_cfg_modify_file(FWCfgState *s, const char *filename,
+>              return ptr;
+>          }
+>      }
+> +
+> +    assert(index < fw_cfg_file_slots(s));
+> +
+>      /* add new one */
+>      fw_cfg_add_file_callback(s, filename, NULL, NULL, NULL, data, len, true);
+>      return NULL;
 > 
-> Sorry, i'm not following, can you elaborate on that?
 
-There's some post processing done by the headers update. But I think
-you'd need to use __u8 and friends for an exported header anyway.
+Given that I was CC'd... I don't understand the purpose of the sorting.
+I've read commit bab47d9a75a3 ("Sort the fw_cfg file list", 2016-04-07),
+yes. It does not spell out the goal.
 
-> 
-> >   
-> > > +
-> > > +/*
-> > > + * Following is an interface definition for PVRDMA device as provided by
-> > > + * VMWARE.
-> > > + * See original copyright from Linux kernel v4.14.5 header file
-> > > + * drivers/infiniband/hw/vmw_pvrdma/pvrdma_verbs.h
-> > > + */  
-> > 
-> > (...)
-> >   
-> > > diff --git a/hw/rdma/vmw/vmw_pvrdma-abi.h b/hw/rdma/vmw/vmw_pvrdma-abi.h
-> > > new file mode 100644
-> > > index 0000000000..8cfb9d7745
-> > > --- /dev/null
-> > > +++ b/hw/rdma/vmw/vmw_pvrdma-abi.h
-> > > @@ -0,0 +1,311 @@
-> > > +/*
-> > > + * QEMU VMWARE paravirtual RDMA device definitions
-> > > + *
-> > > + * Copyright (C) 2018 Oracle
-> > > + * Copyright (C) 2018 Red Hat Inc
-> > > + *
-> > > + * Authors:
-> > > + *     Yuval Shaia <yuval.shaia@oracle.com>
-> > > + *     Marcel Apfelbaum <marcel@redhat.com>
-> > > + *
-> > > + * This work is licensed under the terms of the GNU GPL, version 2.
-> > > + * See the COPYING file in the top-level directory.
-> > > + *
-> > > + */
-> > > +
-> > > +#ifndef VMW_PVRDMA_ABI_H
-> > > +#define VMW_PVRDMA_ABI_H
-> > > +
-> > > +/*
-> > > + * Following is an interface definition for PVRDMA device as provided by
-> > > + * VMWARE.
-> > > + * See original copyright from Linux kernel v4.14.5 header file
-> > > + * include/uapi/rdma/vmw_pvrdma-abi.h
-> > > + */  
-> > 
-> > This one is already exported.  
-> 
-> Same argument as above.
+I assume the idea is migration compatibility for the same machine type
+between QEMU releases. Is that correct? A new release might assign a
+different selector key to the same fw_cfg file, and a guest that is
+migrated while reading fw_cfg could end up with half-half of different
+blobs.
 
-Well, I sure hope VMWare is not planning to change an exported ABI in
-an incompatible way...
+Wasn't this somehow addressed by keeping fw_cfg blobs in RAM blocks or
+some such?
+
+Also, assuming the problem is real (i.e., we need to stick with the same
+numeric values regardless of moving around the insertion points in the
+source code), then why is it safe for "non-legacy" machine types to do
+... er... "something else" than keep the same numeric values? The commit
+says,
+
+    This will avoid any future issues of moving the file creation
+    around, it doesn't matter what order they are created now,
+    the will always be in filename order.
+
+Which is true, but if a new file is introduced (with a pathname in the
+middle), then that will shift up everything behind. Or... is the idea
+that the same machine type on a new QEMU release may only reorder the
+additions of the preexistent fw_cfg files across the source code, but
+must not expose *new* fw_cfg files?
+
+If this is the idea, then keeping the list sorted would indeed ensure
+the same numeric values too -- however, I don't think the assumption is
+safe. Certain devices may expose dedicated, standalone fw_cfg blobs, and
+such devices, when they are implemented, are generally enabled for older
+machine types too, retroactively. ... Hm, in that case, is the argument
+that the device can never be present on the *source* (old version) QEMU,
+so for migration to be even considered, it can also not be present on
+the target (new version) QEMU?
+
+Wow, complex.
+
+Laszlo
