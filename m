@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50879)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51883)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eYzDD-0001fR-Ku
-	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 14:05:28 -0500
+	(envelope-from <eblake@redhat.com>) id 1eYzEH-0002bD-I3
+	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 14:06:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eYzDC-00011s-G8
-	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 14:05:27 -0500
+	(envelope-from <eblake@redhat.com>) id 1eYzEG-0002ix-JF
+	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 14:06:33 -0500
 References: <20171207155102.66622-1-vsementsov@virtuozzo.com>
 	<20171207155102.66622-3-vsementsov@virtuozzo.com>
+	<20171208173321.GR2403@work-vm>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <9c3d475e-ba19-90d3-263d-a7378d648da5@redhat.com>
-Date: Tue, 9 Jan 2018 13:05:10 -0600
+Message-ID: <8711ff94-3d7a-446e-6da1-2e6e2b82899a@redhat.com>
+Date: Tue, 9 Jan 2018 13:06:22 -0600
 MIME-Version: 1.0
-In-Reply-To: <20171207155102.66622-3-vsementsov@virtuozzo.com>
+In-Reply-To: <20171208173321.GR2403@work-vm>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="9qrzpsVA6tOTZjVGKLP8B3DjYfg28h8uI"
+	boundary="thW2h3DLUR28UejUR2UGYVyixBW9t9f0P"
 Subject: Re: [Qemu-devel] [PATCH v2 2/6] qapi: add name parameter to
  nbd-server-add
 List-Id: <qemu-devel.nongnu.org>
@@ -25,53 +26,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: armbru@redhat.com, dgilbert@redhat.com, pbonzini@redhat.com, mreitz@redhat.com, kwolf@redhat.com, den@openvz.org
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, armbru@redhat.com, pbonzini@redhat.com, mreitz@redhat.com, kwolf@redhat.com, den@openvz.org
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---9qrzpsVA6tOTZjVGKLP8B3DjYfg28h8uI
+--thW2h3DLUR28UejUR2UGYVyixBW9t9f0P
 From: Eric Blake <eblake@redhat.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: armbru@redhat.com, dgilbert@redhat.com, pbonzini@redhat.com,
- mreitz@redhat.com, kwolf@redhat.com, den@openvz.org
-Message-ID: <9c3d475e-ba19-90d3-263d-a7378d648da5@redhat.com>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, armbru@redhat.com,
+ pbonzini@redhat.com, mreitz@redhat.com, kwolf@redhat.com, den@openvz.org
+Message-ID: <8711ff94-3d7a-446e-6da1-2e6e2b82899a@redhat.com>
 Subject: Re: [PATCH v2 2/6] qapi: add name parameter to nbd-server-add
 References: <20171207155102.66622-1-vsementsov@virtuozzo.com>
  <20171207155102.66622-3-vsementsov@virtuozzo.com>
-In-Reply-To: <20171207155102.66622-3-vsementsov@virtuozzo.com>
+ <20171208173321.GR2403@work-vm>
+In-Reply-To: <20171208173321.GR2403@work-vm>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On 12/07/2017 09:50 AM, Vladimir Sementsov-Ogievskiy wrote:
-> Allow user to specify name for new export, to not reuse internal
-> node name and to not show it to clients.
->=20
-> This also allows creating several exports per device.
->=20
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> ---
->  qapi/block.json |  9 +++++++--
->  blockdev-nbd.c  | 14 +++++++++-----
->  hmp.c           |  5 +++--
->  3 files changed, 19 insertions(+), 9 deletions(-)
->=20
-> diff --git a/qapi/block.json b/qapi/block.json
-> index f093fa3f27..503d4b287b 100644
-> --- a/qapi/block.json
-> +++ b/qapi/block.json
-> @@ -213,14 +213,19 @@
->  #
->  # @device: The device name or node name of the node to be exported
->  #
-> +# @name: Export name. If unspecified @device parameter used as export =
-name.
+On 12/08/2017 11:33 AM, Dr. David Alan Gilbert wrote:
 
-s/unspecified/unspecified, the/
-s/used as/is used as the/
+>> @@ -2223,7 +2224,7 @@ void hmp_nbd_server_add(Monitor *mon, const QDic=
+t *qdict)
+>>      bool writable =3D qdict_get_try_bool(qdict, "writable", false);
+>>      Error *local_err =3D NULL;
+>> =20
+>> -    qmp_nbd_server_add(device, true, writable, &local_err);
+>> +    qmp_nbd_server_add(device, false, NULL, true, writable, &local_er=
+r);
+>=20
+> I wont insist, but it would be nice if you wired up an optional
+> parameter on HMP as well.
 
-Will tweak as part of applying to my NBD queue.
-Reviewed-by: Eric Blake <eblake@redhat.com>
+Can be done as a followup patch; I'm not sure how many people are
+setting up NBD exports via HMP, and I'm also okay with just stating that
+the full power requires use of QMP.  But I'll give such a followup patch
+a quick try, to see whether it is easy after all.
 
 --=20
 Eric Blake, Principal Software Engineer
@@ -79,7 +70,7 @@ Red Hat, Inc.           +1-919-301-3266
 Virtualization:  qemu.org | libvirt.org
 
 
---9qrzpsVA6tOTZjVGKLP8B3DjYfg28h8uI
+--thW2h3DLUR28UejUR2UGYVyixBW9t9f0P
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
@@ -88,14 +79,14 @@ Content-Disposition: attachment; filename="signature.asc"
 Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
 Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlpVEmYACgkQp6FrSiUn
-Q2rmKgf/dWeQGiuTjYmRYPtoVWXTlSKTMq7AI8vAOAR29Om/L1N9fNJKvAe1u5sI
-sohwdQ8xA5AuChi04KXxhCvqEGxG9yUaWbhxDzA4IbSFGVfm4+FBnYeI+diRS30x
-kd7bFE2H31QoQm5TrzPD4LaoI23uYzVlFFElUYcobq5qrPLnNI5R0zDKx6i8/jDS
-8Z3JYfMgL8GXasXGi/x89X4ys5yK4kxcEXIGXVqz/1nNGsfxs68vz4CUK24T2UnP
-LOcVGdfQLHw5ZACQhGAlOYB1wdfxkmlICAaZHCVieTUqlxsihPzTzbWMXyvU7Ra0
-lZSn3TXMPVBJL4oxTaFvp/Y2w3UcAw==
-=/JXn
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlpVEq4ACgkQp6FrSiUn
+Q2r2cQf/ecppxC53Rc6LbZBIgABZ7ylHfQOYgoW/k/RPmrkBCMJi3Fv2Ia59SmJv
+6gOWP+d+mptQskzyhEUgOrSItL5TxEojWSmgejPUxzEk1EPr6WR6CqIt4JZj4xNs
+o5YlwYIXz8kIyWe6GxvyUIEkvAY4Y24iQtvzFL5+wznRQ4ya9AImCzYRTebCvkWw
+/0SvCPcgdaZ8hMnCei5axWo/MPtjA9C467x77SRp4KygpMqx5vBv4QZbqEELIvJH
+QQU/iczy994zx2aqsXe1SmWsCLLRWL3PW2AlFaUxErVJebkJSGKDB1KzBumy+Owb
+A1lDbuXEuuL63prUVS+sqDuN/0x++w==
+=qTU7
 -----END PGP SIGNATURE-----
 
---9qrzpsVA6tOTZjVGKLP8B3DjYfg28h8uI--
+--thW2h3DLUR28UejUR2UGYVyixBW9t9f0P--
