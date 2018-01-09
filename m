@@ -1,31 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59861)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60043)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1eZ0DF-0000x4-WD
-	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 15:09:35 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1eZ0DR-00016O-AN
+	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 15:09:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1eZ0DD-0004YQ-7h
-	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 15:09:33 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:51696)
+	(envelope-from <ehabkost@redhat.com>) id 1eZ0DO-0004nB-JU
+	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 15:09:45 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:32826)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1eZ0DD-0004Xi-25
-	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 15:09:31 -0500
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1eZ0DO-0004mP-Br
+	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 15:09:42 -0500
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 32D89C049D42
-	for <qemu-devel@nongnu.org>; Tue,  9 Jan 2018 20:09:30 +0000 (UTC)
-Date: Tue, 9 Jan 2018 18:09:26 -0200
+	by mx1.redhat.com (Postfix) with ESMTPS id 97ABBC057F91
+	for <qemu-devel@nongnu.org>; Tue,  9 Jan 2018 20:09:41 +0000 (UTC)
+Date: Tue, 9 Jan 2018 18:09:39 -0200
 From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20180109200926.GC18022@localhost.localdomain>
-References: <1509617407-21191-1-git-send-email-thuth@redhat.com>
-	<c70ea44b-8eb8-2336-7263-77967056265d@redhat.com>
+Message-ID: <20180109200939.GD18022@localhost.localdomain>
+References: <1513613438-11017-1-git-send-email-thuth@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <c70ea44b-8eb8-2336-7263-77967056265d@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH for-2.11 v3 0/2] Check for the availability
- of a hotplug controller before adding a device
+In-Reply-To: <1513613438-11017-1-git-send-email-thuth@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] scripts: Remove fixed entries from the
+ device-crash-test
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,52 +34,15 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Thomas Huth <thuth@redhat.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>, david@redhat.com, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Markus Armbruster <armbru@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-On Mon, Dec 18, 2017 at 12:59:50PM +0100, Thomas Huth wrote:
-> On 02.11.2017 11:10, Thomas Huth wrote:
-> > First patch is a small clean up to the error handling code in
-> > qdev_device_add(), and the second patch adds a proper check for
-> > the availability of a hotplug controller to prevent the possibility
-> > of a crash with device_del.
-> > 
-> > The crash can currently be triggered for example like this:
-> > 
-> > $ s390x-softmmu/qemu-system-s390x -M none -nographic 
-> > QEMU 2.10.50 monitor - type 'help' for more information
-> > (qemu) device_add qemu-s390x-cpu,id=x
-> > (qemu) device_del x
-> > **
-> > ERROR:qemu/qdev-monitor.c:872:qdev_unplug: assertion failed: (hotplug_ctrl)
-> > Aborted (core dumped)
-> > 
-> > v3:
-> >  - Invert the logic of the second error check in the first patch
-> >    as suggested by Igor
-> >  - Updated the patch description of the second patch with the current
-> >    way to crash QEMU
-> > 
-> > v2:
-> >  - Do the check for the availability of the hotplug controller earlier
-> >    in qdev_device_add
-> >  - Use common new err_dev_del handler in case of failure
-> > 
-> > Thomas Huth (2):
-> >   qdev_monitor: Simplify error handling in qdev_device_add()
-> >   qdev: Check for the availability of a hotplug controller before adding
-> >     a device
-> > 
-> >  hw/core/qdev.c         | 28 ++++++++++++++++++++--------
-> >  include/hw/qdev-core.h |  1 +
-> >  qdev-monitor.c         | 21 +++++++++++++--------
-> >  3 files changed, 34 insertions(+), 16 deletions(-)
+On Mon, Dec 18, 2017 at 05:10:38PM +0100, Thomas Huth wrote:
+> These are crashes / errors which have been fixed already in the past
+> months. We can remove these from the device-crash-test script now.
 > 
-> Ping!
-> 
-> Paolo or Eduardo, could one of you please pick up the two patches?
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
 
-Very sorry for the long delay.  I just queued it on machine-next.
-Thanks!
+Queued on machine-next.  Sorry for the long delay.
 
 -- 
 Eduardo
