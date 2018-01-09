@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41282)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41911)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1eYtdF-00048T-RE
-	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 08:07:59 -0500
+	(envelope-from <quintela@redhat.com>) id 1eYteB-0004kK-V9
+	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 08:08:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1eYtdC-00074q-Ky
-	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 08:07:57 -0500
-Resent-Message-Id: <E1eYtdC-00074q-Ky@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21389)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1eYtdC-00073g-EW
-	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 08:07:54 -0500
-In-Reply-To: <20180109122252.17670-1-alex.bennee@linaro.org>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <151550323606.387.3962324373829663448@5adcb62bf0d6>
+	(envelope-from <quintela@redhat.com>) id 1eYte8-0007xy-Nm
+	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 08:08:55 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:35688)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1eYte8-0007xW-Ec
+	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 08:08:52 -0500
+From: Juan Quintela <quintela@redhat.com>
+In-Reply-To: <004301d38940$56013bb0$0203b310$@ru> (Pavel Dovgalyuk's message
+	of "Tue, 9 Jan 2018 14:52:33 +0300")
+References: <20171220100205.16625.84632.stgit@pasha-VirtualBox>
+	<003c01d38923$1c5157f0$54f407d0$@ru> <87efmz1ddp.fsf@secure.laptop>
+	<004301d38940$56013bb0$0203b310$@ru>
+Reply-To: quintela@redhat.com
+Date: Tue, 09 Jan 2018 14:08:46 +0100
+Message-ID: <87zi5nyyap.fsf@secure.laptop>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Tue, 9 Jan 2018 05:07:17 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH v2 00/20] re-factor softfloat and add fp16
- functions
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v2] hpet: recover timer offset correctly
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,175 +29,206 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: alex.bennee@linaro.org
-Cc: famz@redhat.com, richard.henderson@linaro.org, peter.maydell@linaro.org, laurent@vivier.eu, bharata@linux.vnet.ibm.com, andrew@andrewdutcher.com, qemu-devel@nongnu.org
+To: Pavel Dovgalyuk <dovgaluk@ispras.ru>
+Cc: 'Pavel Dovgalyuk' <Pavel.Dovgaluk@ispras.ru>, qemu-devel@nongnu.org, mst@redhat.com, dgilbert@redhat.com, maria.klimushenkova@ispras.ru, pbonzini@redhat.com
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
-c3NhZ2UtaWQ6IDIwMTgwMTA5MTIyMjUyLjE3NjcwLTEtYWxleC5iZW5uZWVAbGluYXJvLm9yZwpT
-dWJqZWN0OiBbUWVtdS1kZXZlbF0gW1BBVENIIHYyIDAwLzIwXSByZS1mYWN0b3Igc29mdGZsb2F0
-IGFuZCBhZGQgZnAxNiBmdW5jdGlvbnMKCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmlu
-L2Jhc2gKCkJBU0U9YmFzZQpuPTEKdG90YWw9JChnaXQgbG9nIC0tb25lbGluZSAkQkFTRS4uIHwg
-d2MgLWwpCmZhaWxlZD0wCgpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdp
-dCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQoKY29tbWl0cz0iJChnaXQgbG9nIC0t
-Zm9ybWF0PSVIIC0tcmV2ZXJzZSAkQkFTRS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7IGRvCiAgICBl
-Y2hvICJDaGVja2luZyBQQVRDSCAkbi8kdG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVz
-ICRjKS4uLiIKICAgIGlmICEgZ2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMv
-Y2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIC07IHRoZW4KICAgICAgICBmYWlsZWQ9MQogICAgICAg
-IGVjaG8KICAgIGZpCiAgICBuPSQoKG4rMSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBT
-Q1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4
-ODcxMzM4NApTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCmQ1Y2FlYWE4NTUgZnB1L3Nv
-ZnRmbG9hdDogcmUtZmFjdG9yIGNvbXBhcmUKNWY0OTQ1OTgwMSBmcHUvc29mdGZsb2F0OiByZS1m
-YWN0b3IgbWlubWF4Cjk0YTQ3MDhjMjAgZnB1L3NvZnRmbG9hdDogcmUtZmFjdG9yIHNjYWxibgox
-ZGY2ZTQwYTU4IGZwdS9zb2Z0ZmxvYXQ6IHJlLWZhY3RvciBpbnQvdWludCB0byBmbG9hdAowM2Yz
-ZDk2MTFlIGZwdS9zb2Z0ZmxvYXQ6IHJlLWZhY3RvciBmbG9hdCB0byBpbnQvdWludApiMDdiNDQ5
-Y2ExIGZwdS9zb2Z0ZmxvYXQ6IHJlLWZhY3RvciByb3VuZF90b19pbnQKY2JiYTc5Njg4OSBmcHUv
-c29mdGZsb2F0OiByZS1mYWN0b3IgbXVsYWRkCmQ4ZWY1NmVmZjYgZnB1L3NvZnRmbG9hdDogcmUt
-ZmFjdG9yIGRpdgoyNjc0ZjU4ODM5IGZwdS9zb2Z0ZmxvYXQ6IHJlLWZhY3RvciBtdWwKMjEyZmU3
-OGUxZiBmcHUvc29mdGZsb2F0OiByZS1mYWN0b3IgYWRkL3N1Ygo1MWYwYzk0NjNhIGZwdS9zb2Z0
-ZmxvYXQ6IGRlZmluZSBkZWNvbXBvc2Ugc3RydWN0dXJlcwoyNDEzOGIzNzRkIGZwdS9zb2Z0Zmxv
-YXQ6IG1vdmUgdGhlIGV4dHJhY3QgZnVuY3Rpb25zIHRvIHRoZSB0b3Agb2YgdGhlIGZpbGUKYTky
-NzllNGE3YiBmcHUvc29mdGZsb2F0OiBpbXByb3ZlIGNvbW1lbnRzIG9uIEFSTSBOYU4gcHJvcGFn
-YXRpb24KYzJjNjg1MDJkZSBmcHUvc29mdGZsb2F0OiBwcm9wYWdhdGUgc2lnbmFsbGluZyBOYU5z
-IGluIE1JTk1BWAo4MzA1OTA5NjNkIGluY2x1ZGUvZnB1L3NvZnRmbG9hdDogYWRkIHNvbWUgZmxv
-YXQxNiBjb25zdGFudHMKMWVjMjE0OGQ4MSBpbmNsdWRlL2ZwdS9zb2Z0ZmxvYXQ6IGltcGxlbWVu
-dCBmbG9hdDE2X3NldF9zaWduIGhlbHBlcgoxMDAyOGQ1NTkxIGluY2x1ZGUvZnB1L3NvZnRmbG9h
-dDogaW1wbGVtZW50IGZsb2F0MTZfY2hzIGhlbHBlcgpmNTIyNzg1ZTA4IGluY2x1ZGUvZnB1L3Nv
-ZnRmbG9hdDogaW1wbGVtZW50IGZsb2F0MTZfYWJzIGhlbHBlcgpkYWNkNzdhN2Y2IGluY2x1ZGUv
-ZnB1L3NvZnRmbG9hdDogcmVtb3ZlIFVTRV9TT0ZURkxPQVRfU1RSVUNUX1RZUEVTCmY4OTVjNDM1
-OTMgZnB1L3NvZnRmbG9hdDogaW1wbGVtZW50IGZsb2F0MTZfc3F1YXNoX2lucHV0X2Rlbm9ybWFs
-Cgo9PT0gT1VUUFVUIEJFR0lOID09PQpDaGVja2luZyBQQVRDSCAxLzIwOiBmcHUvc29mdGZsb2F0
-OiBpbXBsZW1lbnQgZmxvYXQxNl9zcXVhc2hfaW5wdXRfZGVub3JtYWwuLi4KQ2hlY2tpbmcgUEFU
-Q0ggMi8yMDogaW5jbHVkZS9mcHUvc29mdGZsb2F0OiByZW1vdmUgVVNFX1NPRlRGTE9BVF9TVFJV
-Q1RfVFlQRVMuLi4KQ2hlY2tpbmcgUEFUQ0ggMy8yMDogaW5jbHVkZS9mcHUvc29mdGZsb2F0OiBp
-bXBsZW1lbnQgZmxvYXQxNl9hYnMgaGVscGVyLi4uCkNoZWNraW5nIFBBVENIIDQvMjA6IGluY2x1
-ZGUvZnB1L3NvZnRmbG9hdDogaW1wbGVtZW50IGZsb2F0MTZfY2hzIGhlbHBlci4uLgpDaGVja2lu
-ZyBQQVRDSCA1LzIwOiBpbmNsdWRlL2ZwdS9zb2Z0ZmxvYXQ6IGltcGxlbWVudCBmbG9hdDE2X3Nl
-dF9zaWduIGhlbHBlci4uLgpDaGVja2luZyBQQVRDSCA2LzIwOiBpbmNsdWRlL2ZwdS9zb2Z0Zmxv
-YXQ6IGFkZCBzb21lIGZsb2F0MTYgY29uc3RhbnRzLi4uCkNoZWNraW5nIFBBVENIIDcvMjA6IGZw
-dS9zb2Z0ZmxvYXQ6IHByb3BhZ2F0ZSBzaWduYWxsaW5nIE5hTnMgaW4gTUlOTUFYLi4uCkNoZWNr
-aW5nIFBBVENIIDgvMjA6IGZwdS9zb2Z0ZmxvYXQ6IGltcHJvdmUgY29tbWVudHMgb24gQVJNIE5h
-TiBwcm9wYWdhdGlvbi4uLgpDaGVja2luZyBQQVRDSCA5LzIwOiBmcHUvc29mdGZsb2F0OiBtb3Zl
-IHRoZSBleHRyYWN0IGZ1bmN0aW9ucyB0byB0aGUgdG9wIG9mIHRoZSBmaWxlLi4uCkNoZWNraW5n
-IFBBVENIIDEwLzIwOiBmcHUvc29mdGZsb2F0OiBkZWZpbmUgZGVjb21wb3NlIHN0cnVjdHVyZXMu
-Li4KRVJST1I6IHNwYWNlcyBwcm9oaWJpdGVkIGFyb3VuZCB0aGF0ICc6JyAoY3R4Old4VykKIzUz
-OiBGSUxFOiBmcHUvc29mdGZsb2F0LmM6MjEwOgorICAgIHVpbnQ2NF90IGZyYWMgICA6IDY0Owog
-ICAgICAgICAgICAgICAgICAgICBeCgpFUlJPUjogc3BhY2VzIHByb2hpYml0ZWQgYXJvdW5kIHRo
-YXQgJzonIChjdHg6V3hXKQojNTQ6IEZJTEU6IGZwdS9zb2Z0ZmxvYXQuYzoyMTE6CisgICAgaW50
-IGV4cCAgICAgICAgIDogMzI7CiAgICAgICAgICAgICAgICAgICAgIF4KCkVSUk9SOiBzcGFjZSBw
-cm9oaWJpdGVkIGJlZm9yZSB0aGF0ICc6JyAoY3R4Old4VykKIzU2OiBGSUxFOiBmcHUvc29mdGZs
-b2F0LmM6MjEzOgorICAgIGludCAgICAgICAgICAgICA6IDIzOwogICAgICAgICAgICAgICAgICAg
-ICBeCgpFUlJPUjogc3BhY2VzIHByb2hpYml0ZWQgYXJvdW5kIHRoYXQgJzonIChjdHg6V3hXKQoj
-NTc6IEZJTEU6IGZwdS9zb2Z0ZmxvYXQuYzoyMTQ6CisgICAgYm9vbCBzaWduICAgICAgIDogMTsK
-ICAgICAgICAgICAgICAgICAgICAgXgoKdG90YWw6IDQgZXJyb3JzLCAwIHdhcm5pbmdzLCA4MiBs
-aW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmll
-dy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhl
-bSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgpDaGVj
-a2luZyBQQVRDSCAxMS8yMDogZnB1L3NvZnRmbG9hdDogcmUtZmFjdG9yIGFkZC9zdWIuLi4KV0FS
-TklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzE0MTogRklMRTogZnB1L3NvZnRmbG9hdC5j
-OjM2NDoKKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-IGNvbnN0IGRlY29tcG9zZWRfcGFyYW1zICpwYXJtKQoKdG90YWw6IDAgZXJyb3JzLCAxIHdhcm5p
-bmdzLCA5MzggbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBs
-ZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMg
-cmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlO
-RVJTLgpDaGVja2luZyBQQVRDSCAxMi8yMDogZnB1L3NvZnRmbG9hdDogcmUtZmFjdG9yIG11bC4u
-LgpDaGVja2luZyBQQVRDSCAxMy8yMDogZnB1L3NvZnRmbG9hdDogcmUtZmFjdG9yIGRpdi4uLgpD
-aGVja2luZyBQQVRDSCAxNC8yMDogZnB1L3NvZnRmbG9hdDogcmUtZmFjdG9yIG11bGFkZC4uLgpD
-aGVja2luZyBQQVRDSCAxNS8yMDogZnB1L3NvZnRmbG9hdDogcmUtZmFjdG9yIHJvdW5kX3RvX2lu
-dC4uLgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojOTE6IEZJTEU6IGZwdS9zb2Z0
-ZmxvYXQuYzoxMjUyOgorICAgICAgICAgICAgICAgIGluYyA9ICgoYS5mcmFjICYgcm91bmRldmVu
-X21hc2spICE9IGZyYWNfbHNibTEgPyBmcmFjX2xzYm0xIDogMCk7Cgp0b3RhbDogMCBlcnJvcnMs
-IDEgd2FybmluZ3MsIDMyOSBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9i
-bGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBv
-c2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4g
-TUFJTlRBSU5FUlMuCkNoZWNraW5nIFBBVENIIDE2LzIwOiBmcHUvc29mdGZsb2F0OiByZS1mYWN0
-b3IgZmxvYXQgdG8gaW50L3VpbnQuLi4KRVJST1I6IHNwYWNlIHByb2hpYml0ZWQgYWZ0ZXIgdGhh
-dCAnLScgKGN0eDpXeFcpCiM1OTogRklMRTogZnB1L3NvZnRmbG9hdC5jOjEzNDc6CisgICAgICAg
-ICAgICByZXR1cm4gciA8IC0gKHVpbnQ2NF90KSBJTlQ2NF9NSU4gPyAtciA6IElOVDY0X01JTjsK
-ICAgICAgICAgICAgICAgICAgICAgICAgXgoKV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3Rl
-cnMKIzk1OiBGSUxFOiBmcHUvc29mdGZsb2F0LmM6MTM4MzoKK2ludCAjIyBpc3ogIyMgX3QgZmxv
-YXQgIyMgZnN6ICMjIF90b19pbnQgIyMgaXN6KGZsb2F0ICMjIGZzeiBhLCBmbG9hdF9zdGF0dXMg
-KnMpIFwKCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiMxODY6IEZJTEU6IGZwdS9z
-b2Z0ZmxvYXQuYzoxNDc0OgordWludCAjIyBpc3ogIyMgX3QgZmxvYXQgIyMgZnN6ICMjIF90b191
-aW50ICMjIGlzeihmbG9hdCAjIyBmc3ogYSwgZmxvYXRfc3RhdHVzICpzKSBcCgpFUlJPUjogc3Bh
-Y2UgcHJvaGliaXRlZCBhZnRlciB0aGF0IG9wZW4gcGFyZW50aGVzaXMgJygnCiM3MjY6IEZJTEU6
-IGZwdS9zb2Z0ZmxvYXQuYzozNDIxOgorICAgIGlmICggICAgKCAoIGV4dHJhY3RGbG9hdDMyRXhw
-KCBhICkgPT0gMHhGRiApICYmIGV4dHJhY3RGbG9hdDMyRnJhYyggYSApICkKCkVSUk9SOiBzcGFj
-ZSBwcm9oaWJpdGVkIGJlZm9yZSB0aGF0IGNsb3NlIHBhcmVudGhlc2lzICcpJwojNzI2OiBGSUxF
-OiBmcHUvc29mdGZsb2F0LmM6MzQyMToKKyAgICBpZiAoICAgICggKCBleHRyYWN0RmxvYXQzMkV4
-cCggYSApID09IDB4RkYgKSAmJiBleHRyYWN0RmxvYXQzMkZyYWMoIGEgKSApCgpFUlJPUjogc3Bh
-Y2UgcHJvaGliaXRlZCBhZnRlciB0aGF0IG9wZW4gcGFyZW50aGVzaXMgJygnCiM3Mjc6IEZJTEU6
-IGZwdS9zb2Z0ZmxvYXQuYzozNDIyOgorICAgICAgICAgfHwgKCAoIGV4dHJhY3RGbG9hdDMyRXhw
-KCBiICkgPT0gMHhGRiApICYmIGV4dHJhY3RGbG9hdDMyRnJhYyggYiApICkKCkVSUk9SOiBzcGFj
-ZSBwcm9oaWJpdGVkIGJlZm9yZSB0aGF0IGNsb3NlIHBhcmVudGhlc2lzICcpJwojNzI3OiBGSUxF
-OiBmcHUvc29mdGZsb2F0LmM6MzQyMjoKKyAgICAgICAgIHx8ICggKCBleHRyYWN0RmxvYXQzMkV4
-cCggYiApID09IDB4RkYgKSAmJiBleHRyYWN0RmxvYXQzMkZyYWMoIGIgKSApCgpFUlJPUjogc3Bh
-Y2UgcHJvaGliaXRlZCBhZnRlciB0aGF0IG9wZW4gcGFyZW50aGVzaXMgJygnCiM3NDg6IEZJTEU6
-IGZwdS9zb2Z0ZmxvYXQuYzozNDMwOgorICAgIGFTaWduID0gZXh0cmFjdEZsb2F0MzJTaWduKCBh
-ICk7CgpFUlJPUjogc3BhY2UgcHJvaGliaXRlZCBiZWZvcmUgdGhhdCBjbG9zZSBwYXJlbnRoZXNp
-cyAnKScKIzc0ODogRklMRTogZnB1L3NvZnRmbG9hdC5jOjM0MzA6CisgICAgYVNpZ24gPSBleHRy
-YWN0RmxvYXQzMlNpZ24oIGEgKTsKCkVSUk9SOiBzcGFjZSBwcm9oaWJpdGVkIGFmdGVyIHRoYXQg
-b3BlbiBwYXJlbnRoZXNpcyAnKCcKIzc0OTogRklMRTogZnB1L3NvZnRmbG9hdC5jOjM0MzE6Cisg
-ICAgYlNpZ24gPSBleHRyYWN0RmxvYXQzMlNpZ24oIGIgKTsKCkVSUk9SOiBzcGFjZSBwcm9oaWJp
-dGVkIGJlZm9yZSB0aGF0IGNsb3NlIHBhcmVudGhlc2lzICcpJwojNzQ5OiBGSUxFOiBmcHUvc29m
-dGZsb2F0LmM6MzQzMToKKyAgICBiU2lnbiA9IGV4dHJhY3RGbG9hdDMyU2lnbiggYiApOwoKV0FS
-TklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzc1MjogRklMRTogZnB1L3NvZnRmbG9hdC5j
-OjM0MzQ6CisgICAgaWYgKCBhU2lnbiAhPSBiU2lnbiApIHJldHVybiBhU2lnbiAmJiAoICh1aW50
-MzJfdCkgKCAoIGF2IHwgYnYgKTw8MSApICE9IDAgKTsKCkVSUk9SOiBzcGFjZXMgcmVxdWlyZWQg
-YXJvdW5kIHRoYXQgJzw8JyAoY3R4OlZ4VikKIzc1MjogRklMRTogZnB1L3NvZnRmbG9hdC5jOjM0
-MzQ6CisgICAgaWYgKCBhU2lnbiAhPSBiU2lnbiApIHJldHVybiBhU2lnbiAmJiAoICh1aW50MzJf
-dCkgKCAoIGF2IHwgYnYgKTw8MSApICE9IDAgKTsKICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXgoKRVJST1I6IHNwYWNl
-IHByb2hpYml0ZWQgYWZ0ZXIgdGhhdCBvcGVuIHBhcmVudGhlc2lzICcoJwojNzUyOiBGSUxFOiBm
-cHUvc29mdGZsb2F0LmM6MzQzNDoKKyAgICBpZiAoIGFTaWduICE9IGJTaWduICkgcmV0dXJuIGFT
-aWduICYmICggKHVpbnQzMl90KSAoICggYXYgfCBidiApPDwxICkgIT0gMCApOwoKRVJST1I6IHNw
-YWNlIHByb2hpYml0ZWQgYmVmb3JlIHRoYXQgY2xvc2UgcGFyZW50aGVzaXMgJyknCiM3NTI6IEZJ
-TEU6IGZwdS9zb2Z0ZmxvYXQuYzozNDM0OgorICAgIGlmICggYVNpZ24gIT0gYlNpZ24gKSByZXR1
-cm4gYVNpZ24gJiYgKCAodWludDMyX3QpICggKCBhdiB8IGJ2ICk8PDEgKSAhPSAwICk7CgpFUlJP
-UjogdHJhaWxpbmcgc3RhdGVtZW50cyBzaG91bGQgYmUgb24gbmV4dCBsaW5lCiM3NTI6IEZJTEU6
-IGZwdS9zb2Z0ZmxvYXQuYzozNDM0OgorICAgIGlmICggYVNpZ24gIT0gYlNpZ24gKSByZXR1cm4g
-YVNpZ24gJiYgKCAodWludDMyX3QpICggKCBhdiB8IGJ2ICk8PDEgKSAhPSAwICk7CgpFUlJPUjog
-YnJhY2VzIHt9IGFyZSBuZWNlc3NhcnkgZm9yIGFsbCBhcm1zIG9mIHRoaXMgc3RhdGVtZW50CiM3
-NTI6IEZJTEU6IGZwdS9zb2Z0ZmxvYXQuYzozNDM0OgorICAgIGlmICggYVNpZ24gIT0gYlNpZ24g
-KSByZXR1cm4gYVNpZ24gJiYgKCAodWludDMyX3QpICggKCBhdiB8IGJ2ICk8PDEgKSAhPSAwICk7
-ClsuLi5dCgpFUlJPUjogc3BhY2UgcHJvaGliaXRlZCBhZnRlciB0aGF0IG9wZW4gcGFyZW50aGVz
-aXMgJygnCiM3NTM6IEZJTEU6IGZwdS9zb2Z0ZmxvYXQuYzozNDM1OgorICAgIHJldHVybiAoIGF2
-ICE9IGJ2ICkgJiYgKCBhU2lnbiBeICggYXYgPCBidiApICk7CgpFUlJPUjogc3BhY2UgcHJvaGli
-aXRlZCBiZWZvcmUgdGhhdCBjbG9zZSBwYXJlbnRoZXNpcyAnKScKIzc1MzogRklMRTogZnB1L3Nv
-ZnRmbG9hdC5jOjM0MzU6CisgICAgcmV0dXJuICggYXYgIT0gYnYgKSAmJiAoIGFTaWduIF4gKCBh
-diA8IGJ2ICkgKTsKCkVSUk9SOiBzcGFjZSBwcm9oaWJpdGVkIGFmdGVyIHRoYXQgb3BlbiBwYXJl
-bnRoZXNpcyAnKCcKIzgxMzogRklMRTogZnB1L3NvZnRmbG9hdC5jOjM0NTE6CisgICAgaWYgKCAg
-ICAoICggZXh0cmFjdEZsb2F0MzJFeHAoIGEgKSA9PSAweEZGICkgJiYgZXh0cmFjdEZsb2F0MzJG
-cmFjKCBhICkgKQoKRVJST1I6IHNwYWNlIHByb2hpYml0ZWQgYmVmb3JlIHRoYXQgY2xvc2UgcGFy
-ZW50aGVzaXMgJyknCiM4MTM6IEZJTEU6IGZwdS9zb2Z0ZmxvYXQuYzozNDUxOgorICAgIGlmICgg
-ICAgKCAoIGV4dHJhY3RGbG9hdDMyRXhwKCBhICkgPT0gMHhGRiApICYmIGV4dHJhY3RGbG9hdDMy
-RnJhYyggYSApICkKCkVSUk9SOiBzcGFjZSBwcm9oaWJpdGVkIGFmdGVyIHRoYXQgb3BlbiBwYXJl
-bnRoZXNpcyAnKCcKIzgxNDogRklMRTogZnB1L3NvZnRmbG9hdC5jOjM0NTI6CisgICAgICAgICB8
-fCAoICggZXh0cmFjdEZsb2F0MzJFeHAoIGIgKSA9PSAweEZGICkgJiYgZXh0cmFjdEZsb2F0MzJG
-cmFjKCBiICkgKQoKRVJST1I6IHNwYWNlIHByb2hpYml0ZWQgYmVmb3JlIHRoYXQgY2xvc2UgcGFy
-ZW50aGVzaXMgJyknCiM4MTQ6IEZJTEU6IGZwdS9zb2Z0ZmxvYXQuYzozNDUyOgorICAgICAgICAg
-fHwgKCAoIGV4dHJhY3RGbG9hdDMyRXhwKCBiICkgPT0gMHhGRiApICYmIGV4dHJhY3RGbG9hdDMy
-RnJhYyggYiApICkKCnRvdGFsOiAyMCBlcnJvcnMsIDMgd2FybmluZ3MsIDEwNzYgbGluZXMgY2hl
-Y2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBh
-bnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhl
-IG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKQ2hlY2tpbmcgUEFU
-Q0ggMTcvMjA6IGZwdS9zb2Z0ZmxvYXQ6IHJlLWZhY3RvciBpbnQvdWludCB0byBmbG9hdC4uLgpD
-aGVja2luZyBQQVRDSCAxOC8yMDogZnB1L3NvZnRmbG9hdDogcmUtZmFjdG9yIHNjYWxibi4uLgpD
-aGVja2luZyBQQVRDSCAxOS8yMDogZnB1L3NvZnRmbG9hdDogcmUtZmFjdG9yIG1pbm1heC4uLgpX
-QVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojMTIwOiBGSUxFOiBmcHUvc29mdGZsb2F0
-LmM6MTc2MjoKK2Zsb2F0ICMjIHN6IGZsb2F0ICMjIHN6ICMjIF8gIyMgbmFtZShmbG9hdCAjIyBz
-eiBhLCBmbG9hdCAjIyBzeiBiLCBmbG9hdF9zdGF0dXMgKnMpIFwKCnRvdGFsOiAwIGVycm9ycywg
-MSB3YXJuaW5ncywgMjYzIGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2Js
-ZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9z
-aXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBN
-QUlOVEFJTkVSUy4KQ2hlY2tpbmcgUEFUQ0ggMjAvMjA6IGZwdS9zb2Z0ZmxvYXQ6IHJlLWZhY3Rv
-ciBjb21wYXJlLi4uCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiM5MTogRklMRTog
-ZnB1L3NvZnRmbG9hdC5jOjE4NjE6CitpbnQgZmxvYXQgIyMgc3ogIyMgX2NvbXBhcmVfcXVpZXQo
-ZmxvYXQgIyMgc3ogYSwgZmxvYXQgIyMgc3ogYiwgZmxvYXRfc3RhdHVzICpzKSBcCgp0b3RhbDog
-MCBlcnJvcnMsIDEgd2FybmluZ3MsIDE1NCBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBz
-dHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJl
-IGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNL
-UEFUQ0ggaW4gTUFJTlRBSU5FUlMuCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4
-aXRlZCB3aXRoIGNvZGU6IDEKCgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkg
-UGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sg
-dG8gcGF0Y2hldy1kZXZlbEBmcmVlbGlzdHMub3Jn
+"Pavel Dovgalyuk" <dovgaluk@ispras.ru> wrote:
+>> From: Juan Quintela [mailto:quintela@redhat.com]
+
+>> >>      return 0;
+>> >>  }
+>> >>
+>> >> @@ -252,7 +257,10 @@ static int hpet_post_load(void *opaque, int version_id)
+>> >>      HPETState *s = opaque;
+>> >>
+>> >>      /* Recalculate the offset between the main counter and guest time */
+>> >> -    s->hpet_offset = ticks_to_ns(s->hpet_counter) - qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
+>> >> +    if (!s->hpet_offset_loaded) {
+>> >> +        s->hpet_offset = ticks_to_ns(s->hpet_counter)
+>> >> +                        - qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
+>> >> +    }
+>> 
+>> So, at this point it is going to always be false.
+>
+> No, because post load (below) sets it to true.
+>
+>> >> +static int hpet_offset_post_load(void *opaque, int version_id)
+>> >> +{
+>> >> +    HPETState *s = opaque;
+>> >> +
+>> >> +    s->hpet_offset_loaded = true;
+>> >> +    return 0;
+>> >> +}
+>> >> +
+>> >>  static bool hpet_rtc_irq_level_needed(void *opaque)
+>> >>  {
+>> >>      HPETState *s = opaque;
+>> >> @@ -285,6 +301,17 @@ static const VMStateDescription vmstate_hpet_rtc_irq_level = {
+>> >>      }
+>> >>  };
+>> >>
+>> >> +static const VMStateDescription vmstate_hpet_offset = {
+>> >> +    .name = "hpet/offset",
+>> >> +    .version_id = 1,
+>> >> +    .minimum_version_id = 1,
+>> >> +    .post_load = hpet_offset_post_load,
+>> 
+>> You are missing here a .needed function.  Se how
+>
+> Because .needed is optional.
+
+If you *don't* use a needed function then please just increase the
+version.  You are just breaking compatibility anyways.  The whole point
+of subsections is that they are optional.  If they are mandatory (this
+case), then they bring no advantage at all.
+
+>
+>> - You want to transport hpet_offset just in the cases that hpet_is_enabled()?
+>
+> No, we want to preserve backwards compatibility.
+
+So, let me understand this again.
+
+old qemu -> new qemu
+
+   what do you want to do here. i.e.
+   new->hpet_counter = .... old->hpet_counter...
+   new->hpet_offset = ... old->hpet_offset...
+
+   You can use whatever you want.
+
+new qemu -> old qemu
+   right now, you break it always
+
+   we *always* sent the subsection.  Is there any case where it makes
+   sense to migrate to the old version.
+
+
+>> I think that the following patch does what you want, no?  And it is a
+>> bit simpler.
+>
+> It is simpler, but won't work for migrations from old version to the new one.
+> hpet_counter becomes invalid in such case.
+
+What value do you want hpet_offset to have when migrating from old
+versions?
+
+My version does:
+
+new -> new (hpet_enabled)
+   dst->hpet_counter = src->hpet_counter
+   dst->hpet_offset = src->hpet_offset
+
+new -> new ( ! hpet_enabled)
+   dst->hpet_counter = src->hpet_counter
+   dst->hpet_offset = <undefined really>
+
+new -> old (hpet_enabled)
+   breaks migration
+
+new -> old ( ! hpet_enabled)
+   dst->hpet_counter = src->hpet_counter
+   dst->hpet_offset = <undefined really>
+
+old -> old
+   dst->hpet_counter= src->hpet_get_tick();
+   dst->hpet_offset = ticks_to_ns(s->hpet_counter) - qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
+
+
+Your version does:
+
+new -> new (hpet_enabled)
+   dst->hpet_counter = hpet_get_ticks(s) /* on source */
+   dst->hpet_offset = src->hpet_offset
+
+new -> new ( ! hpet_enabled)
+   dst->hpet_counter = src->hpet_counter
+   dst->hpet_offset = ticks_to_ns(s->hpet_counter) - qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
+
+new -> old
+   breaks always migration independently of hpet_enabled
+
+old -> old
+   dst->hpet_counter= src->hpet_get_tick();
+   dst->hpet_offset = ticks_to_ns(s->hpet_counter) - qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
+
+So, what are the values that we want to have here really?
+
+What dave is asked for your previous version is that you disable the
+section for old machine types.  Look at how to use DEFINE_PROP_* for
+this use case. 
+
+Later, Juan.
+
+>> Head:     master Merge remote-tracking branch 'remotes/elmarco/tags/dump-pull-request' into
+>> staging
+>> Merge:    qemu/master Merge remote-tracking branch 'remotes/elmarco/tags/dump-pull-request'
+>> into staging
+>> Tag:      v2.11.0 (454)
+>> 
+>> Unstaged changes (1)
+>> modified   hw/timer/hpet.c
+>> @@ -216,16 +216,6 @@ static void update_irq(struct HPETTimer *timer, int set)
+>>      }
+>>  }
+>> 
+>> -static int hpet_pre_save(void *opaque)
+>> -{
+>> -    HPETState *s = opaque;
+>> -
+>> -    /* save current counter value */
+>> -    s->hpet_counter = hpet_get_ticks(s);
+>> -
+>> -    return 0;
+>> -}
+>> -
+>>  static int hpet_pre_load(void *opaque)
+>>  {
+>>      HPETState *s = opaque;
+>> @@ -251,9 +241,6 @@ static int hpet_post_load(void *opaque, int version_id)
+>>  {
+>>      HPETState *s = opaque;
+>> 
+>> -    /* Recalculate the offset between the main counter and guest time */
+>> -    s->hpet_offset = ticks_to_ns(s->hpet_counter) - qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
+>> -
+>>      /* Push number of timers into capability returned via HPET_ID */
+>>      s->capability &= ~HPET_ID_NUM_TIM_MASK;
+>>      s->capability |= (s->num_timers - 1) << HPET_ID_NUM_TIM_SHIFT;
+>> @@ -285,6 +272,24 @@ static const VMStateDescription vmstate_hpet_rtc_irq_level = {
+>>      }
+>>  };
+>> 
+>> +static bool hpet_offset_needed(void *opaque)
+>> +{
+>> +    HPETState *s = opaque;
+>> +
+>> +    return hpet_enabled(s);
+>> +}
+>> +
+>> +static const VMStateDescription vmstate_hpet_offset = {
+>> +    .name = "hpet/offset",
+>> +    .version_id = 1,
+>> +    .minimum_version_id = 1,
+>> +    .needed = hpet_offset_needed,
+>> +    .fields = (VMStateField[]) {
+>> +        VMSTATE_UINT64(hpet_offset, HPETState),
+>> +        VMSTATE_END_OF_LIST()
+>> +    }
+>> +};
+>> +
+>>  static const VMStateDescription vmstate_hpet_timer = {
+>>      .name = "hpet_timer",
+>>      .version_id = 1,
+>> @@ -320,6 +325,7 @@ static const VMStateDescription vmstate_hpet = {
+>>      },
+>>      .subsections = (const VMStateDescription*[]) {
+>>          &vmstate_hpet_rtc_irq_level,
+>> +        &vmstate_hpet_offset,
+>>          NULL
+>>      }
+>>  };
+>> 
+>
+>
+> Pavel Dovgalyuk
