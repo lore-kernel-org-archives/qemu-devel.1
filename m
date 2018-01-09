@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44250)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46678)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <drjones@redhat.com>) id 1eYyyo-0003Lw-Lz
-	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 13:50:41 -0500
+	(envelope-from <alistai@xilinx.com>) id 1eYz3Z-0005Pf-Dv
+	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 13:55:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <drjones@redhat.com>) id 1eYyyY-00056q-Dd
-	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 13:50:34 -0500
-Date: Tue, 9 Jan 2018 19:48:45 +0100
-From: Andrew Jones <drjones@redhat.com>
-Message-ID: <20180109184845.e2ma4po2sibogkua@kamzik.brq.redhat.com>
-References: <1513183941-24300-1-git-send-email-peter.maydell@linaro.org>
-	<CAFEAcA8NbL7ROZs99hWhpAF2Rdi2qEiWLNo3hr_9W7gmgXyw4A@mail.gmail.com>
-	<6d20557d-5722-706f-ca4f-489ab85358c0@redhat.com>
-	<CAFEAcA-Nn4VmSnxT7Of8Nh+p5QgF9cMzkqZ-VBCC=2zRgk-Xdw@mail.gmail.com>
-	<e40cc107-2fe9-d8a5-b4fd-385c0d22c564@redhat.com>
-	<CAFEAcA8QqEna4u92bk88++Y1JrpCJD=KDpSfbJ8DhfSiTRm+=w@mail.gmail.com>
+	(envelope-from <alistai@xilinx.com>) id 1eYz3V-0000km-3O
+	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 13:55:29 -0500
+Received: from mail-sn1nam01on0040.outbound.protection.outlook.com
+	([104.47.32.40]:38793
+	helo=NAM01-SN1-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <alistai@xilinx.com>) id 1eYz3U-0000jh-Ij
+	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 13:55:24 -0500
+From: Alistair Francis <alistair.francis@xilinx.com>
+Date: Tue, 9 Jan 2018 10:50:57 -0800
+Message-ID: <0ecd5644773477442fbaa0f4bcadb58bbe488c78.1515523657.git.alistair.francis@xilinx.com>
+In-Reply-To: <b799d9d21170a492c54fb2c4eaf8326b06e0bdf6.1515523657.git.alistair.francis@xilinx.com>
+References: <b799d9d21170a492c54fb2c4eaf8326b06e0bdf6.1515523657.git.alistair.francis@xilinx.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAFEAcA8QqEna4u92bk88++Y1JrpCJD=KDpSfbJ8DhfSiTRm+=w@mail.gmail.com>
-Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH 0/2] GICv2 & GICv3: RAZ/WI
- reserved addresses rather than aborting
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH v1 3/3] xlnx-zynqmp: Connect the RTC device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,43 +27,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Laszlo Ersek <lersek@redhat.com>, Wei Huang <wei@redhat.com>, "patches@linaro.org" <patches@linaro.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, Auger Eric <eric.auger@redhat.com>, qemu-arm <qemu-arm@nongnu.org>, cdall@linaro.org
+To: qemu-devel@nongnu.org, peter.maydell@linaro.org
+Cc: alistair.francis@xilinx.com, alistair23@gmail.com, edgar.iglesias@xilinx.com, edgar.iglesias@gmail.com
 
-On Tue, Jan 09, 2018 at 04:35:30PM +0000, Peter Maydell wrote:
-> On 9 January 2018 at 16:29, Laszlo Ersek <lersek@redhat.com> wrote:
-> > On 01/09/18 17:12, Peter Maydell wrote:
-> >> On 9 January 2018 at 15:58, Laszlo Ersek <lersek@redhat.com> wrote:
-> >>> Sorry, no clue about any of this -- where should I read up?
-> >>
-> >> I cc'd you mostly as a heads-up since the QEMU bug is UEFI affecting,
-> >> not because I wanted to make you read the GIC specs :-)
-> >
-> > Thanks (and, thanks :) ) -- from patch #2, looks like GICv2 is affected
-> > too, and the patch seems to be fixing commit a9d853533cc1
-> > ("hw/intc/arm_gic: Switch to read/write callbacks with tx attributes",
-> > 2015-05-12).
-> >
-> > Is that right? That commit was released with v2.4.0. Should I have
-> > experienced the error? Is it KVM / hardware specific? What are the symptoms?
-> 
-> Happens under TCG emulation only. The bug got introduced with
-> commit c79c0a314c43b78f6, which changed the effect of a device
-> returning MEMTX_ERROR/MEMTX_DECODE_ERROR from "RAZ/WI" to
-> "guest data abort". That's in general the right thing to do,
-> but in the case of these device models we were returning those
-> values for cases which aren't supposed to provoke aborts.
-> 
-> The symptom is that if your guest code is poorly behaved and
-> tries to read or write offsets that don't correspond to documented
-> GIC registers, it will take an abort that it didn't before.
-> Linux is fine; this UEFI image I have lying around stopped working.
+Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
+---
 
-Thanks for pointing this out. I had just recently noticed that the
-'gicv3-active' kvm-unit-tests test had stopped passing on TCG, getting
-DABTs when attempting to write GICD_ICACTIVER. I was just about to
-complain in this thread that that register is indeed documented, but
-now I see the implementation of the test was always wrong. It was using
-the wrong register base, RD vs. SGI...
+ hw/arm/xlnx-zynqmp.c         | 14 ++++++++++++++
+ include/hw/arm/xlnx-zynqmp.h |  2 ++
+ 2 files changed, 16 insertions(+)
 
-drew
+diff --git a/hw/arm/xlnx-zynqmp.c b/hw/arm/xlnx-zynqmp.c
+index 325642058b..deef583c2a 100644
+--- a/hw/arm/xlnx-zynqmp.c
++++ b/hw/arm/xlnx-zynqmp.c
+@@ -50,6 +50,9 @@
+ #define DPDMA_ADDR          0xfd4c0000
+ #define DPDMA_IRQ           116
+ 
++#define RTC_ADDR            0xffa60000
++#define RTC_IRQ             26
++
+ static const uint64_t gem_addr[XLNX_ZYNQMP_NUM_GEMS] = {
+     0xFF0B0000, 0xFF0C0000, 0xFF0D0000, 0xFF0E0000,
+ };
+@@ -183,6 +186,9 @@ static void xlnx_zynqmp_init(Object *obj)
+ 
+     object_initialize(&s->dpdma, sizeof(s->dpdma), TYPE_XLNX_DPDMA);
+     qdev_set_parent_bus(DEVICE(&s->dpdma), sysbus_get_default());
++
++    object_initialize(&s->rtc, sizeof(s->rtc), TYPE_XLNX_ZYNQMP_RTC);
++    qdev_set_parent_bus(DEVICE(&s->rtc), sysbus_get_default());
+ }
+ 
+ static void xlnx_zynqmp_realize(DeviceState *dev, Error **errp)
+@@ -454,6 +460,14 @@ static void xlnx_zynqmp_realize(DeviceState *dev, Error **errp)
+                              &error_abort);
+     sysbus_mmio_map(SYS_BUS_DEVICE(&s->dpdma), 0, DPDMA_ADDR);
+     sysbus_connect_irq(SYS_BUS_DEVICE(&s->dpdma), 0, gic_spi[DPDMA_IRQ]);
++
++    object_property_set_bool(OBJECT(&s->rtc), true, "realized", &err);
++    if (err) {
++        error_propagate(errp, err);
++        return;
++    }
++    sysbus_mmio_map(SYS_BUS_DEVICE(&s->rtc), 0, RTC_ADDR);
++    sysbus_connect_irq(SYS_BUS_DEVICE(&s->rtc), 0, gic_spi[RTC_IRQ]);
+ }
+ 
+ static Property xlnx_zynqmp_props[] = {
+diff --git a/include/hw/arm/xlnx-zynqmp.h b/include/hw/arm/xlnx-zynqmp.h
+index 3e6fb9b7bd..9e8c9e18dd 100644
+--- a/include/hw/arm/xlnx-zynqmp.h
++++ b/include/hw/arm/xlnx-zynqmp.h
+@@ -28,6 +28,7 @@
+ #include "hw/ssi/xilinx_spips.h"
+ #include "hw/dma/xlnx_dpdma.h"
+ #include "hw/display/xlnx_dp.h"
++#include "hw/timer/xlnx-zynqmp-rtc.h"
+ 
+ #define TYPE_XLNX_ZYNQMP "xlnx,zynqmp"
+ #define XLNX_ZYNQMP(obj) OBJECT_CHECK(XlnxZynqMPState, (obj), \
+@@ -90,6 +91,7 @@ typedef struct XlnxZynqMPState {
+     XlnxZynqMPQSPIPS qspi;
+     XlnxDPState dp;
+     XlnxDPDMAState dpdma;
++    XlnxZynqMPRTC rtc;
+ 
+     char *boot_cpu;
+     ARMCPU *boot_cpu_ptr;
+-- 
+2.14.1
