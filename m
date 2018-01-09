@@ -1,29 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50536)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51875)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1eYtzm-0007XA-5q
-	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 08:31:15 -0500
+	(envelope-from <lersek@redhat.com>) id 1eYu2Z-0000mN-0i
+	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 08:34:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1eYtzh-0006h1-8C
-	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 08:31:14 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:53284)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1eYtzg-0006eQ-Vt
-	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 08:31:09 -0500
-Date: Tue, 9 Jan 2018 13:30:59 +0000
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20180109133059.GC31400@stefanha-x1.localdomain>
-References: <20171219084557.9801-1-peterx@redhat.com>
-	<20171219084557.9801-19-peterx@redhat.com>
-	<20171221114246.GO10812@lemon> <20171225051856.GF2443@xz-mi>
-	<20171225055556.GC9418@lemon> <20171225061825.GJ2443@xz-mi>
-	<20171225071349.GD9418@lemon> <20171225072224.GM2443@xz-mi>
+	(envelope-from <lersek@redhat.com>) id 1eYu2U-0002eA-2J
+	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 08:34:07 -0500
+References: <20180108215007.46471-1-marcel@redhat.com>
+	<3ea6176b-01a4-8f5a-81fc-3e9a8c846dc7@redhat.com>
+	<cc65bb42-df0c-227f-5708-8a17b1ae0b22@redhat.com>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <2b536f93-4f84-c09d-2a65-a6c653999be3@redhat.com>
+Date: Tue, 9 Jan 2018 14:33:51 +0100
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="L6iaP+gRLNZHKoI4"
-Content-Disposition: inline
-In-Reply-To: <20171225072224.GM2443@xz-mi>
-Subject: Re: [Qemu-devel] [RFC v6 18/27] monitor: send event when command
- queue full
+In-Reply-To: <cc65bb42-df0c-227f-5708-8a17b1ae0b22@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] fw_cfg: fix memory corruption when all
+ fw_cfg slots are used
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,131 +26,135 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: Fam Zheng <famz@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Juan Quintela <quintela@redhat.com>, Markus Armbruster <armbru@redhat.com>, mdroth@linux.vnet.ibm.com, qemu-devel@nongnu.org, Stefan Hajnoczi <shajnocz@redhat.com>, marcandre.lureau@redhat.com, Paolo Bonzini <pbonzini@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: Marcel Apfelbaum <marcel@redhat.com>, qemu-devel@nongnu.org
+Cc: ehabkost@redhat.com, mst@redhat.com, qemu-stable@nongnu.org, kraxel@redhat.com
 
-
---L6iaP+gRLNZHKoI4
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Mon, Dec 25, 2017 at 03:22:24PM +0800, Peter Xu wrote:
-> On Mon, Dec 25, 2017 at 03:13:49PM +0800, Fam Zheng wrote:
-> > On Mon, 12/25 14:18, Peter Xu wrote:
-> > > On Mon, Dec 25, 2017 at 01:55:56PM +0800, Fam Zheng wrote:
-> > > > On Mon, 12/25 13:18, Peter Xu wrote:
-> > > > > On Thu, Dec 21, 2017 at 07:42:46PM +0800, Fam Zheng wrote:
-> > > > > > On Tue, 12/19 16:45, Peter Xu wrote:
-> > > > > > > Set maximum QMP command queue length to 8.  If queue full, in=
-stead of
-> > > > > > > queue the command, we directly return a "command-dropped" eve=
-nt, telling
-> > > > > > > client that specific command is dropped.
-> > > > > > >=20
-> > > > > > > Note that this flow control mechanism is only valid if OOB is=
- enabled.
-> > > > > > > If it's not, the effective queue length will always be 1, whi=
-ch strictly
-> > > > > > > follows original behavior of QMP command handling (which neve=
-r drop
-> > > > > > > messages).
-> > > > > > >=20
-> > > > > > > Signed-off-by: Peter Xu <peterx@redhat.com>
-> > > > > > > ---
-> > > > > > >  monitor.c | 17 ++++++++++++++++-
-> > > > > > >  1 file changed, 16 insertions(+), 1 deletion(-)
-> > > > > > >=20
-> > > > > > > diff --git a/monitor.c b/monitor.c
-> > > > > > > index ed9a741d06..b571866659 100644
-> > > > > > > --- a/monitor.c
-> > > > > > > +++ b/monitor.c
-> > > > > > > @@ -4038,6 +4038,8 @@ static void monitor_qmp_bh_dispatcher(v=
-oid *data)
-> > > > > > >      }
-> > > > > > >  }
-> > > > > > > =20
-> > > > > > > +#define  QMP_REQ_QUEUE_LEN_MAX  (8)
-> > > > > >=20
-> > > > > > Is this limit introspectable on QMP?
-> > > > >=20
-> > > > > Not yet.  IMHO it's really QMP internal stuff, and I see no benef=
-it so
-> > > > > far for a client to know about this...
-> > > >=20
-> > > > A client may need this number to batch (non-oob) commands without w=
-orrying about
-> > > > getting command-dropped event.
-> > >=20
-> > > IMHO QMP batching will only be useful when performance matters, but
-> > > for now IMHO we don't need to worry much about QMP performance?  When
-> > > we do, I suspect we need to do more things to make sure of it, and
-> > > exposing this single parameter may not really help much, say, for now
-> > > even the client batches the stuff, they still need to wait for the
-> > > completion of commands.
-> >=20
-> > I think when we declare that commands can be dropped when the queue is =
-full, we
-> > should be clear about in what condition a queue is full, and don't make=
- users
-> > guess. If we want is this incompleteness, and I'm the only one who does=
-n't like
-> > it, that may be fine. It's just that, like you said, this seems a bit u=
-seless.
+On 01/09/18 14:18, Marcel Apfelbaum wrote:
+> On 09/01/2018 15:09, Laszlo Ersek wrote:
 >=20
-> Just to clarify that this maximum queue length is still useful to us
-> (not the clients) in the sense that we'll have limited memory usage
-> for QMP command queues.  Otherwise we have risk on using up all the
-> memory of the host or reach the limitation of existing QEMU process,
-> either of which is bad.
+> Hi Laszlo,
+>=20
+> I'll respond first to this mail' I'll take my time with the rest :)
+>=20
+>> On 01/08/18 22:50, Marcel Apfelbaum wrote:
+>>> When all the fw_cfg slots are used, a write is made outside the
+>>> bounds of the fw_cfg files array as part of the sort algorithm.
+>>>
+>>> Fix it by avoiding an unnecessary array element move.
+>>> Fix also an assert while at it.
+>>>
+>>> Signed-off-by: Marcel Apfelbaum <marcel@redhat.com>
+>>> ---
+>>> =C2=A0 hw/nvram/fw_cfg.c | 6 ++++--
+>>> =C2=A0 1 file changed, 4 insertions(+), 2 deletions(-)
+>>>
+>>> diff --git a/hw/nvram/fw_cfg.c b/hw/nvram/fw_cfg.c
+>>> index 753ac0e4ea..4313484b21 100644
+>>> --- a/hw/nvram/fw_cfg.c
+>>> +++ b/hw/nvram/fw_cfg.c
+>>> @@ -784,7 +784,7 @@ void fw_cfg_add_file_callback(FWCfgState *s,=C2=A0
+>>> const char *filename,
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * index and "i - 1" is the one b=
+eing copied from, thus the
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * unusual start and end in the f=
+or statement.
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 */
+>>> -=C2=A0=C2=A0=C2=A0 for (i =3D count + 1; i > index; i--) {
+>>> +=C2=A0=C2=A0=C2=A0 for (i =3D count; i > index; i--) {
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 s->files->f[i]=
+ =3D s->files->f[i - 1];
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 s->files->f[i]=
+.select =3D cpu_to_be16(FW_CFG_FILE_FIRST + i);
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 s->entries[0][=
+FW_CFG_FILE_FIRST + i] =3D
+>>
+>> This hunk looks correct to me.
+>=20
+> After my change or before?
 
-I think batching doesn't make much sense when "oob" is enabled.  There
-are only very narrow use cases where it's reasonable to batch:
+Well, the source code doesn't have "hunks", patches have hunks. :)
 
-Batched commands must be independent of each other because any batched
-command can be dropped:
+So, I meant, this part of your patch was correct, IMO.
 
-  A B C
+>=20
+> I think I am right.
+> At this point we have "count" elements in the array.
+> That means the last element in the array is at arr[count - 1].
+> We want to make room for the new element at index, so we move
+> all the elements from index to index + 1.
+>=20
+> The first element we should move is arr[count - 1] to arr[count].
+> But the code moved arr[count] to arr [count + 1].
+> This move is not needed.
+>=20
+>=20
+> =C2=A0We currently have count elements in the
+>> array, so we cannot normally access the element *at* count. However, w=
+e
+>> are extending the array right now, therefore we can assign (store) the
+>> element at count (and then we'll increment count later). But accessing
+>> an element at (count+1) is wrong.
+>>
+>>> @@ -833,7 +833,6 @@ void *fw_cfg_modify_file(FWCfgState *s, const
+>>> char *filename,
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 assert(s->files);
+>>> =C2=A0 =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 index =3D be32_to_cpu(s->files-=
+>count);
+>>> -=C2=A0=C2=A0=C2=A0 assert(index < fw_cfg_file_slots(s));
+>>> =C2=A0 =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 for (i =3D 0; i < index; i++) {
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (strcmp(fil=
+ename, s->files->f[i].name) =3D=3D 0) {
+>>> @@ -843,6 +842,9 @@ void *fw_cfg_modify_file(FWCfgState *s, const
+>>> char *filename,
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0 return ptr;
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
+>>> +
+>>> +=C2=A0=C2=A0=C2=A0 assert(index < fw_cfg_file_slots(s));
+>>> +
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 /* add new one */
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 fw_cfg_add_file_callback(s, filename, =
+NULL, NULL, NULL, data,
+>>> len, true);
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return NULL;
+>>>
+>>
+>> I think I agree with Marc-Andr=C3=A9 here, when I say, replace the ass=
+ert
+>> with a comment instead? (About the fact that fw_cfg_add_file_callback(=
+)
+>> will assert(), *if* we reach that far.)
+>=20
+> Hmm, what should we add to the comment? "We lost, brace for impact :)"
+>=20
+> My point, if we are going to abort, let's abort as early as we can.
+> But if is a consensus, I'll get rid of it.
 
-A can be dropped if there are already one or more commands pending.  If
-this happens then B or C might run or be dropped too, depending on
-timing.
+No, it's going to be another assert, just later. Assume that at this
+point we have (index =3D=3D fw_cfg_file_slots(s)), because the function
+didn't find the element to modify, so it decides to add a new one, but
+also we do not have room for the new one. So, with the suggested removal
+of the assert, we call fw_cfg_add_file_callback().
 
-Possible combinations are:
+Then, fw_cfg_add_file_callback() does:
 
-  <none>
-  A
-  A B
-  A C
-  A B C
-  B
-  B C
-  C
+    if (!s->files) {
+        dsize =3D sizeof(uint32_t) + sizeof(FWCfgFile) * fw_cfg_file_slot=
+s(s);
+        s->files =3D g_malloc0(dsize);
+        fw_cfg_add_bytes(s, FW_CFG_FILE_DIR, s->files, dsize);
+    }
 
-The client has very little control and needs to implement retry logic if
-commands are dropped.  I bet this is going to be very error prone for
-client developers...
+    count =3D be32_to_cpu(s->files->count);
+    assert(count < fw_cfg_file_slots(s));
 
-One reasonable use case is batching query-* commands.  I can't think of
-many other use cases where it makes sense.
+The (!s->files) condition is expected to eval to false (our table is
+full, so we do have a table).
 
-I'd be perfectly happy if QEMU did no batching at all when "oob" is
-enabled (i.e. hardcoded 1 command lookahead).
+And then, the assert() below the "if" will fire.
 
-Stefan
+Am I missing something?
 
---L6iaP+gRLNZHKoI4
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJaVMQTAAoJEJykq7OBq3PIZtsH/RD7La4uvxM79hCvoi7pHCYM
-MsmMZuRgaeUFzmalzzvMWuOjiOZhJSFLXZ1jNwD41uWxnrsROMd0AIjdSCyvdXl3
-A6a8sxfSsHtFulv8I4mbCy2FG5qvCbfqlScy/bx8EH5a4JnsMtTL8FjdalHXnjf5
-Bps8DWN5gdla4xBnO1x0A1W7V1HCr8KCxsGTbZ5ww4V6d2/wT8E5cbideycQ7efb
-wfUQAZhe2P79H8s+TKihnKugEowdljPY5T3hrzYZ3gIGsvLbNilG4hTyyjhwVHf8
-W5DVK1PlgdhU5uCkdAMBoJ0la1wtt6QMCtw5653LXqJQ8FXp3nvpzrOv5a+EbXw=
-=naoG
------END PGP SIGNATURE-----
-
---L6iaP+gRLNZHKoI4--
+Thanks!
+Laszlo
