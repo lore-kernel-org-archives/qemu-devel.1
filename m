@@ -1,26 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55719)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56657)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1eYuAb-0004xw-GF
-	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 08:42:26 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1eYuCe-0006Oq-69
+	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 08:44:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1eYuAW-0001an-Kt
-	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 08:42:25 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:33262)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1eYuAW-0001aM-E2
-	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 08:42:20 -0500
-Date: Tue, 9 Jan 2018 13:42:08 +0000
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20180109134208.GD31400@stefanha-x1.localdomain>
-References: <20171219084557.9801-1-peterx@redhat.com>
-	<20171219084557.9801-19-peterx@redhat.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1eYuCd-0003UQ-CC
+	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 08:44:32 -0500
+Received: from mail-ot0-x244.google.com ([2607:f8b0:4003:c0f::244]:34043)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1eYuCd-0003Tv-73
+	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 08:44:31 -0500
+Received: by mail-ot0-x244.google.com with SMTP id p16so8709163otf.1
+	for <qemu-devel@nongnu.org>; Tue, 09 Jan 2018 05:44:31 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="KdquIMZPjGJQvRdI"
-Content-Disposition: inline
-In-Reply-To: <20171219084557.9801-19-peterx@redhat.com>
-Subject: Re: [Qemu-devel] [RFC v6 18/27] monitor: send event when command
- queue full
+In-Reply-To: <004401d3894c$b3fc90f0$1bf5b2d0$@ru>
+References: <20171116115926.16627-1-pbonzini@redhat.com>
+	<20171116115926.16627-8-pbonzini@redhat.com>
+	<CAFEAcA-06-VmH7Pvymo-o-HmiQ-uQ67Hs0KhWZfxswBxsfD2-g@mail.gmail.com>
+	<bf4bedd9-0ef8-cff3-6153-531fba597237@redhat.com>
+	<CAFEAcA9Rnd3gtrHb389e6fOEAae4aLhJnQWU-vKyzTM4o-riOQ@mail.gmail.com>
+	<001b01d361e9$d46ace40$7d406ac0$@ru>
+	<CAFEAcA8NGnmG_8SipvPN5_dPhokH2zZAXykN2KiW10XhB-9xXQ@mail.gmail.com>
+	<CAFEAcA9PUOyK_vEnMKJkZV5s7o4zHDRedUY7z0ZH0i5ULEGzwg@mail.gmail.com>
+	<004401d3894c$b3fc90f0$1bf5b2d0$@ru>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 9 Jan 2018 13:44:09 +0000
+Message-ID: <CAFEAcA8GiMDyFU4j3OvZ7F=fXk93B4447RQnpp+9cHWUGMp7Ag@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL 07/11] cpu-exec: don't overwrite
+ exception_index
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,59 +37,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, Stefan Hajnoczi <shajnocz@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <famz@redhat.com>, Juan Quintela <quintela@redhat.com>, mdroth@linux.vnet.ibm.com, Eric Blake <eblake@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Markus Armbruster <armbru@redhat.com>, marcandre.lureau@redhat.com, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: Pavel Dovgalyuk <dovgaluk@ispras.ru>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
 
+On 9 January 2018 at 13:21, Pavel Dovgalyuk <dovgaluk@ispras.ru> wrote:
+> I tried to get some logs with the following code.
+> It prints that there was an exception 5 and it was overwritten by the standard code.
+> Fixed code prevents this overwrite.
+>
+> I guess that one of the following is true:
+>  - unfixed version misses some exceptions
+>  - fixed version processes some exceptions twice (e.g., when there is no clear exception)
+>
+> diff --git a/accel/tcg/cpu-exec.c b/accel/tcg/cpu-exec.c
+> index 280200f..fa810f7 100644
+> --- a/accel/tcg/cpu-exec.c
+> +++ b/accel/tcg/cpu-exec.c
+> @@ -605,6 +605,8 @@ static inline bool cpu_handle_interrupt(CPUState *cpu,
+>      /* Finally, check if we need to exit to the main loop.  */
+>      if (unlikely(atomic_read(&cpu->exit_request)
+>          || (use_icount && cpu->icount_decr.u16.low + cpu->icount_extra == 0)))
+> +        if (cpu->exception_index != -1 && cpu->exception_index != EXCP_INTERRUP
+> +            qemu_log("overwriting excp_index %x\n", cpu->exception_index);
+>          atomic_set(&cpu->exit_request, 0);
+>          cpu->exception_index = EXCP_INTERRUPT;
+>          return true;
 
---KdquIMZPjGJQvRdI
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+This looks like it's just working around whatever is going on
+(why should EXCP_INTERRUPT be special?). What we need to do is
+find out what's actually happening here...
 
-On Tue, Dec 19, 2017 at 04:45:48PM +0800, Peter Xu wrote:
-> @@ -4071,6 +4073,9 @@ static void handle_qmp_command(JSONMessageParser *p=
-arser, GQueue *tokens)
->      req_obj->req =3D req;
->      req_obj->need_resume =3D false;
-> =20
-> +    /* Protect qmp_requests and fetching its length. */
-> +    qemu_mutex_lock(&mon->qmp.qmp_queue_lock);
-> +
->      /*
->       * If OOB is not enabled on current monitor, we'll emulate the old
->       * behavior that we won't process current monitor any more until
-> @@ -4080,6 +4085,17 @@ static void handle_qmp_command(JSONMessageParser *=
-parser, GQueue *tokens)
->      if (!qmp_oob_enabled(mon)) {
->          monitor_suspend(mon);
->          req_obj->need_resume =3D true;
-> +    } else {
-> +        /* Drop the request if queue is full. */
-> +        if (mon->qmp.qmp_requests->length >=3D QMP_REQ_QUEUE_LEN_MAX) {
-> +            qapi_event_send_command_dropped(id,
-> +                                            COMMAND_DROP_REASON_QUEUE_FU=
-LL,
-> +                                            NULL);
-> +            qobject_decref(id);
-> +            qobject_decref(req);
-> +            g_free(req_obj);
-> +            return;
-
-qmp_queue_lock is still locked!  I suggest releasing the lock before
-calling qapi_event_send_command_dropped().
-
---KdquIMZPjGJQvRdI
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJaVMawAAoJEJykq7OBq3PIeugIALAtxZFqCmwJaWui6k68Pein
-o0jbIcX+TkAKwlQjUmiiuJ9XNPPos8sm38kOrozHpHy07f7sW1E8zwUOzRuIFpxv
-QkmNxM5C/QL9Ph9fVvndHXZ382DuePljliC/BGQViD8VsEBdtxPqHNbyq1LgCv85
-vFmgieRrIR2dSlt8h6wom0Ept24j2wEltxCS4Qv60IcE2Ape7TTbeADCDkNuel/s
-A18VG000Cr8TSbZzLrh9Z7DEl+HABLhOkY85sd/npDPOBUjY/JZ0AKdvOptqKjdT
-ihswrHCAIjc6MJdUknzBnO8q7Xn2v2oiHZloiXR4uuyCMDAzGpMhJFNToH4a6NU=
-=M9P8
------END PGP SIGNATURE-----
-
---KdquIMZPjGJQvRdI--
+thanks
+-- PMM
