@@ -1,25 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53622)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55165)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcmvbkbc@gmail.com>) id 1eYyNn-00040n-PA
-	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 13:12:20 -0500
+	(envelope-from <eblake@redhat.com>) id 1eYyQ5-00052r-UQ
+	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 13:14:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcmvbkbc@gmail.com>) id 1eYyNm-0000V2-V3
-	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 13:12:19 -0500
-Received: from mail-yb0-x244.google.com ([2607:f8b0:4002:c09::244]:40292)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <jcmvbkbc@gmail.com>) id 1eYyNm-0000Un-Qk
-	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 13:12:18 -0500
-Received: by mail-yb0-x244.google.com with SMTP id s10so6332034ybl.7
-	for <qemu-devel@nongnu.org>; Tue, 09 Jan 2018 10:12:18 -0800 (PST)
+	(envelope-from <eblake@redhat.com>) id 1eYyQ4-0002e5-Tg
+	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 13:14:41 -0500
+References: <20180108030946.14991-1-famz@redhat.com>
+	<8c75f873-421d-4e26-d555-ad30b350ea1d@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <76ded786-48fb-de4d-5513-c6ec30a8a2a8@redhat.com>
+Date: Tue, 9 Jan 2018 12:14:27 -0600
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA92ceiqpHgnVQrxx2M452FxdA4v2kaTT-cQyf5x3Rsr0A@mail.gmail.com>
-References: <1515433749-5839-1-git-send-email-jcmvbkbc@gmail.com>
-	<CAFEAcA92ceiqpHgnVQrxx2M452FxdA4v2kaTT-cQyf5x3Rsr0A@mail.gmail.com>
-From: Max Filippov <jcmvbkbc@gmail.com>
-Date: Tue, 9 Jan 2018 10:12:17 -0800
-Message-ID: <CAMo8BfJsLchdZu6X=D=RsYXHDbHxsf-EWJ=mZF8_8eYh6WcEVA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL v2 00/16] target/xtensa updates
+In-Reply-To: <8c75f873-421d-4e26-d555-ad30b350ea1d@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="Dg7akIU3npv86di8aojq9HW1zbcS1YbLW"
+Subject: Re: [Qemu-devel] [PATCH] scsi: Don't check uninitialized local
+ variable
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,21 +25,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
+Cc: Peter Lieven <pl@kamp.de>, qemu-block@nongnu.org
 
-On Tue, Jan 9, 2018 at 9:44 AM, Peter Maydell <peter.maydell@linaro.org> wrote:
-> /Users/pm215/src/qemu-for-merges/target/xtensa/helper.c:63:26: error:
-> implicit declaration of function 'g_malloc_n' is invalid in C99
-> [-Werror,-Wimplicit-function-declaration]
->     config->opcode_ops = g_malloc_n(opcodes, sizeof(XtensaOpcodeOps *));
->                          ^
->
-> g_malloc_n() only came in in glib 2.24, so this doesn't build on
-> glib 2.22 (our minimum required version).
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--Dg7akIU3npv86di8aojq9HW1zbcS1YbLW
+From: Eric Blake <eblake@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <famz@redhat.com>,
+ qemu-devel@nongnu.org
+Cc: Peter Lieven <pl@kamp.de>, qemu-block@nongnu.org
+Message-ID: <76ded786-48fb-de4d-5513-c6ec30a8a2a8@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] scsi: Don't check uninitialized local
+ variable
+References: <20180108030946.14991-1-famz@redhat.com>
+ <8c75f873-421d-4e26-d555-ad30b350ea1d@redhat.com>
+In-Reply-To: <8c75f873-421d-4e26-d555-ad30b350ea1d@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Sorry about that, fixed.
+On 01/09/2018 12:05 PM, Paolo Bonzini wrote:
+> On 08/01/2018 04:09, Fam Zheng wrote:
+>> After the out label there is a check on iTask.task but it is not
+>> initialized yet.
+>>
+>> Fixes: e38bc23454ef763deb4405ebdee6a1081aa00bc8
+>> Signed-off-by: Fam Zheng <famz@redhat.com>
+>> ---
+>>  block/iscsi.c | 3 +--
+>>  1 file changed, 1 insertion(+), 2 deletions(-)
+>>
+>> diff --git a/block/iscsi.c b/block/iscsi.c
+>> index 5c0a9e55b6..1cb8cc93c5 100644
+>> --- a/block/iscsi.c
+>> +++ b/block/iscsi.c
+>> @@ -659,8 +659,7 @@ static int64_t coroutine_fn iscsi_co_get_block_sta=
+tus(BlockDriverState *bs,
+>>      int64_t ret;
+>> =20
+>>      if (!is_sector_request_lun_aligned(sector_num, nb_sectors, iscsil=
+un)) {
+>> -        ret =3D -EINVAL;
+>> -        goto out;
+>> +        return -EINVAL;
+>>      }
+>> =20
+>>      /* default to all sectors allocated */
+>>
+>=20
+> Queued, thanks.
 
--- 
-Thanks.
--- Max
+I thought we wanted Peter's version, not Fam's.
+https://lists.gnu.org/archive/html/qemu-devel/2018-01/msg01237.html
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--Dg7akIU3npv86di8aojq9HW1zbcS1YbLW
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlpVBoMACgkQp6FrSiUn
+Q2qRFwf+IKZdCkzaoOUatLagVII1JCVFzsM/B5zHTL1QQdvPHllDuL34LZus9uzu
+94dhV/+DcDdvPBG+aS6wZMJjNvwrYaZeiH1/cgiNqS9e5jKEK/oy3pJff2S3r5GZ
+IXom1ThpKYgVklv03LcehAxnFzDQbfN9KVeXhAKjpArnlP9/6rVe2URt7UfbsTNY
+9MPlWPsO+N2HA8o16szPH2lD87Sy1yXPmo/4T4Due4uKctuoJnd7BEmrURBPottD
+uvgMTstwNvB14e/2WacVITWQBcQPMQkd3mbymlsOQvHMQ8lqEJkkyg3eN2Lv5kOH
+CiSGSjlJVOocvJ0g39GsUygGbI+PAQ==
+=WGUh
+-----END PGP SIGNATURE-----
+
+--Dg7akIU3npv86di8aojq9HW1zbcS1YbLW--
