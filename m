@@ -1,21 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43367)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46371)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1eYw6U-0003HP-Qr
-	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 10:46:20 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1eYwEL-0000Sq-44
+	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 10:54:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1eYw6O-00042g-PJ
-	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 10:46:18 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:44940)
+	(envelope-from <dgilbert@redhat.com>) id 1eYwEI-0001OU-2x
+	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 10:54:25 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:56216)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1eYw6O-000428-Gz
-	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 10:46:12 -0500
-From: Eduardo Habkost <ehabkost@redhat.com>
-Date: Tue,  9 Jan 2018 13:45:19 -0200
-Message-Id: <20180109154519.25634-8-ehabkost@redhat.com>
-In-Reply-To: <20180109154519.25634-1-ehabkost@redhat.com>
-References: <20180109154519.25634-1-ehabkost@redhat.com>
-Subject: [Qemu-devel] [PATCH 7/7] [RFC] i386: Add PCID to {Westmere,
- SandyBridge, IvyBridge}-IBRS
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1eYwEH-0001Np-Sa
+	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 10:54:21 -0500
+Date: Tue, 9 Jan 2018 15:54:16 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20180109155415.GD2709@work-vm>
+References: <20171218201340.27583-1-dgilbert@redhat.com>
+	<20171218201340.27583-7-dgilbert@redhat.com>
+	<20171222201439.139e4010@igors-macbook-pro.local>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20171222201439.139e4010@igors-macbook-pro.local>
+Subject: Re: [Qemu-devel] [PATCH v5 6/7] vhost: Clean out old
+ vhost_set_memory and friends
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,94 +29,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Vincent Bernat <vincent@bernat.im>, Jiri Denemark <jdenemar@redhat.com>
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: qemu-devel@nongnu.org, pbonzini@redhat.com, maxime.coquelin@redhat.com, mst@redhat.com, groug@kaod.org
 
-RFC NOTE: we need to confirm if all
-Westmere/SandyBridge/IvyBridge CPUs out there support PCID,
-before applying this patch.
+* Igor Mammedov (imammedo@redhat.com) wrote:
+> On Mon, 18 Dec 2017 20:13:39 +0000
+> "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com> wrote:
+> 
+> > From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+> > 
+> > Remove the old update mechanism, vhost_set_memory, and the functions
+> > and flags it used.
+> > 
+> > Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> > ---
+> [...]
+> 
+> > -
+> > -static void vhost_set_memory(MemoryListener *listener,
+> > -                             MemoryRegionSection *section,
+> > -                             bool add)
+> > -{
+> [...]
+> 
+> > -    used_memslots = dev->mem->nregions;
+> lost sheep?
 
-RFC NOTE 2: in parallel, we are evaluating the possibility of
-enabling PCID on the existing Westmere/SandyBridge/IvyBridge CPU
-models, see
-https://patchew.org/QEMU/20180108205052.24385-1-vincent@bernat.im/
-and
-https://patchew.org/QEMU/20180109070112.30806-1-vincent@bernat.im/
+Yes, I've moved that into the previous patch, ( vhost: Regenerate region
+list from changed sections list ) so it now has:
 
-PCID was already available on Westmere, SandyBridge and
-IvyBridge, but we can't easily add it to the existing CPU models
-without breaking libvirt expectations about CPU model runnability
-(a runnable CPU model shouldn't become runnable just because of a
-machine-type or QEMU upgrade).
+...
+    dev->mem = g_realloc(dev->mem, regions_size);
+    dev->mem->nregions = dev->n_mem_sections;
+    used_memslots = dev->mem->nregions;
+    for (i = 0; i < dev->n_mem_sections; i++) {
+...
 
-However, Westmere-IBRS, SandyBridge-IBRS and IvyBridge-IBRS are
-new CPU models, so we can safely add PCID to them.
+> pls,
+> see "[PATCH v2 0/2] vhost: two fixes" to get vague idea how used_memslots is used
 
-Note that PCID is not necessary to mitigate Meltdown and/or
-Spectre, but it is really helpful to make performance not suffer
-when enabling KPTI on guest kernels.
+Yes, that series does make it better because what confused me about the
+current use of used_memslots is it seems obviously unsafe for multiple
+devices.
 
-Cc: Jiri Denemark <jdenemar@redhat.com>
-Suggested-by: Vincent Bernat <vincent@bernat.im>
-Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
----
- target/i386/cpu.c | 9 ++++++---
- 1 file changed, 6 insertions(+), 3 deletions(-)
+Dave
 
-diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index 9c36f9bd44..ad79fbb111 100644
---- a/target/i386/cpu.c
-+++ b/target/i386/cpu.c
-@@ -1119,6 +1119,7 @@ static X86CPUDefinition builtin_x86_defs[] = {
-             CPUID_PGE | CPUID_MTRR | CPUID_SEP | CPUID_APIC | CPUID_CX8 |
-             CPUID_MCE | CPUID_PAE | CPUID_MSR | CPUID_TSC | CPUID_PSE |
-             CPUID_DE | CPUID_FP87,
-+        /* Missing: CPUID_EXT_PCID */
-         .features[FEAT_1_ECX] =
-             CPUID_EXT_AES | CPUID_EXT_POPCNT | CPUID_EXT_SSE42 |
-             CPUID_EXT_SSE41 | CPUID_EXT_CX16 | CPUID_EXT_SSSE3 |
-@@ -1148,7 +1149,7 @@ static X86CPUDefinition builtin_x86_defs[] = {
-         .features[FEAT_1_ECX] =
-             CPUID_EXT_AES | CPUID_EXT_POPCNT | CPUID_EXT_SSE42 |
-             CPUID_EXT_SSE41 | CPUID_EXT_CX16 | CPUID_EXT_SSSE3 |
--            CPUID_EXT_PCLMULQDQ | CPUID_EXT_SSE3,
-+            CPUID_EXT_PCLMULQDQ | CPUID_EXT_SSE3 | CPUID_EXT_PCID,
-         .features[FEAT_8000_0001_EDX] =
-             CPUID_EXT2_LM | CPUID_EXT2_SYSCALL | CPUID_EXT2_NX,
-         .features[FEAT_8000_0001_ECX] =
-@@ -1173,6 +1174,7 @@ static X86CPUDefinition builtin_x86_defs[] = {
-             CPUID_PGE | CPUID_MTRR | CPUID_SEP | CPUID_APIC | CPUID_CX8 |
-             CPUID_MCE | CPUID_PAE | CPUID_MSR | CPUID_TSC | CPUID_PSE |
-             CPUID_DE | CPUID_FP87,
-+        /* Missing: CPUID_EXT_PCID */
-         .features[FEAT_1_ECX] =
-             CPUID_EXT_AVX | CPUID_EXT_XSAVE | CPUID_EXT_AES |
-             CPUID_EXT_TSC_DEADLINE_TIMER | CPUID_EXT_POPCNT |
-@@ -1209,7 +1211,7 @@ static X86CPUDefinition builtin_x86_defs[] = {
-             CPUID_EXT_TSC_DEADLINE_TIMER | CPUID_EXT_POPCNT |
-             CPUID_EXT_X2APIC | CPUID_EXT_SSE42 | CPUID_EXT_SSE41 |
-             CPUID_EXT_CX16 | CPUID_EXT_SSSE3 | CPUID_EXT_PCLMULQDQ |
--            CPUID_EXT_SSE3,
-+            CPUID_EXT_SSE3 | CPUID_EXT_PCID,
-         .features[FEAT_8000_0001_EDX] =
-             CPUID_EXT2_LM | CPUID_EXT2_RDTSCP | CPUID_EXT2_NX |
-             CPUID_EXT2_SYSCALL,
-@@ -1237,6 +1239,7 @@ static X86CPUDefinition builtin_x86_defs[] = {
-             CPUID_PGE | CPUID_MTRR | CPUID_SEP | CPUID_APIC | CPUID_CX8 |
-             CPUID_MCE | CPUID_PAE | CPUID_MSR | CPUID_TSC | CPUID_PSE |
-             CPUID_DE | CPUID_FP87,
-+        /* Missing: CPUID_EXT_PCID */
-         .features[FEAT_1_ECX] =
-             CPUID_EXT_AVX | CPUID_EXT_XSAVE | CPUID_EXT_AES |
-             CPUID_EXT_TSC_DEADLINE_TIMER | CPUID_EXT_POPCNT |
-@@ -1276,7 +1279,7 @@ static X86CPUDefinition builtin_x86_defs[] = {
-             CPUID_EXT_TSC_DEADLINE_TIMER | CPUID_EXT_POPCNT |
-             CPUID_EXT_X2APIC | CPUID_EXT_SSE42 | CPUID_EXT_SSE41 |
-             CPUID_EXT_CX16 | CPUID_EXT_SSSE3 | CPUID_EXT_PCLMULQDQ |
--            CPUID_EXT_SSE3 | CPUID_EXT_F16C | CPUID_EXT_RDRAND,
-+            CPUID_EXT_SSE3 | CPUID_EXT_F16C | CPUID_EXT_RDRAND | CPUID_EXT_PCID,
-         .features[FEAT_7_0_EBX] =
-             CPUID_7_0_EBX_FSGSBASE | CPUID_7_0_EBX_SMEP |
-             CPUID_7_0_EBX_ERMS,
--- 
-2.14.3
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
