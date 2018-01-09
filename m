@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58081)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33249)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcel@redhat.com>) id 1eYuGw-0001Ga-7X
-	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 08:48:59 -0500
+	(envelope-from <mst@redhat.com>) id 1eYuQ2-0005DR-G2
+	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 08:58:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcel@redhat.com>) id 1eYuGu-0000Ag-Be
-	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 08:48:58 -0500
-References: <20180108215007.46471-1-marcel@redhat.com>
-	<5367c8a4-91bd-7712-525d-0a1ed6e6acab@redhat.com>
-From: Marcel Apfelbaum <marcel@redhat.com>
-Message-ID: <3dc0ea78-1512-0146-3ac6-9804e49fe5dc@redhat.com>
-Date: Tue, 9 Jan 2018 15:48:32 +0200
+	(envelope-from <mst@redhat.com>) id 1eYuPy-0007W1-JV
+	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 08:58:22 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:58934)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1eYuPy-0007VW-E0
+	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 08:58:18 -0500
+Date: Tue, 9 Jan 2018 15:58:11 +0200
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <1515506288-32291-1-git-send-email-mst@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <5367c8a4-91bd-7712-525d-0a1ed6e6acab@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] fw_cfg: fix memory corruption when all
- fw_cfg slots are used
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Subject: [Qemu-devel] [PATCH] acpi: switch to a dummy SSDT
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,119 +24,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laszlo Ersek <lersek@redhat.com>, qemu-devel@nongnu.org
-Cc: ehabkost@redhat.com, mst@redhat.com, qemu-stable@nongnu.org, kraxel@redhat.com, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>
 
+We prefer not changing table sizes depending on parameters,
+that's why we create a dummy table rather than just drop
+the MCFG table.
 
-Hi Laszlo,
+However, a table named "QEMU" could be put to a better
+use than just a stub, e.g. we could use it to pass
+some QEMU specific info to guests.
 
-On 09/01/2018 14:51, Laszlo Ersek wrote:
-> On 01/08/18 22:50, Marcel Apfelbaum wrote:
->> When all the fw_cfg slots are used, a write is made outside the
->> bounds of the fw_cfg files array as part of the sort algorithm.
->>
->> Fix it by avoiding an unnecessary array element move.
->> Fix also an assert while at it.
->>
->> Signed-off-by: Marcel Apfelbaum <marcel@redhat.com>
->> ---
->>   hw/nvram/fw_cfg.c | 6 ++++--
->>   1 file changed, 4 insertions(+), 2 deletions(-)
->>
->> diff --git a/hw/nvram/fw_cfg.c b/hw/nvram/fw_cfg.c
->> index 753ac0e4ea..4313484b21 100644
->> --- a/hw/nvram/fw_cfg.c
->> +++ b/hw/nvram/fw_cfg.c
->> @@ -784,7 +784,7 @@ void fw_cfg_add_file_callback(FWCfgState *s,  const char *filename,
->>        * index and "i - 1" is the one being copied from, thus the
->>        * unusual start and end in the for statement.
->>        */
->> -    for (i = count + 1; i > index; i--) {
->> +    for (i = count; i > index; i--) {
->>           s->files->f[i] = s->files->f[i - 1];
->>           s->files->f[i].select = cpu_to_be16(FW_CFG_FILE_FIRST + i);
->>           s->entries[0][FW_CFG_FILE_FIRST + i] =
->> @@ -833,7 +833,6 @@ void *fw_cfg_modify_file(FWCfgState *s, const char *filename,
->>       assert(s->files);
->>   
->>       index = be32_to_cpu(s->files->count);
->> -    assert(index < fw_cfg_file_slots(s));
->>   
->>       for (i = 0; i < index; i++) {
->>           if (strcmp(filename, s->files->f[i].name) == 0) {
->> @@ -843,6 +842,9 @@ void *fw_cfg_modify_file(FWCfgState *s, const char *filename,
->>               return ptr;
->>           }
->>       }
->> +
->> +    assert(index < fw_cfg_file_slots(s));
->> +
->>       /* add new one */
->>       fw_cfg_add_file_callback(s, filename, NULL, NULL, NULL, data, len, true);
->>       return NULL;
->>
-> 
-> Given that I was CC'd... 
+Replace with an SSDT and pad with the Nop opcode
+to preserve the length.
 
-Its not me! get_maintainers found you...
+Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+---
+ hw/i386/acpi-build.c | 17 ++++++++++++-----
+ 1 file changed, 12 insertions(+), 5 deletions(-)
 
->I don't understand the purpose of the sorting.
-> I've read commit bab47d9a75a3 ("Sort the fw_cfg file list", 2016-04-07),
-> yes. It does not spell out the goal.
-> 
-> I assume the idea is migration compatibility for the same machine type
-> between QEMU releases. Is that correct?
-
-I think the commit intended only to avoid fw_cfg files order to change
-for the same machine between QEMU versions since is guest visible.
-
-> A new release might assign a
-> different selector key to the same fw_cfg file, and a guest that is
-> migrated while reading fw_cfg could end up with half-half of different
-> blobs.
-> 
-> Wasn't this somehow addressed by keeping fw_cfg blobs in RAM blocks or
-> some such?
->
-
-Adding Dave, maybe he can answer to that.
-
-> Also, assuming the problem is real (i.e., we need to stick with the same
-> numeric values regardless of moving around the insertion points in the
-> source code), then why is it safe for "non-legacy" machine types to do
-> ... er... "something else" than keep the same numeric values? The commit
-> says,
-> 
->      This will avoid any future issues of moving the file creation
->      around, it doesn't matter what order they are created now,
->      the will always be in filename order.
-> 
-> Which is true, but if a new file is introduced (with a pathname in the
-> middle), then that will shift up everything behind. Or... is the idea
-> that the same machine type on a new QEMU release may only reorder the
-> additions of the preexistent fw_cfg files across the source code, but
-> must not expose *new* fw_cfg files?
-> 
-
-I think this is the reason, and the machine should not have new fw_cfg files.
-
-
-> If this is the idea, then keeping the list sorted would indeed ensure
-> the same numeric values too -- however, I don't think the assumption is
-> safe. Certain devices may expose dedicated, standalone fw_cfg blobs, and
-> such devices, when they are implemented, are generally enabled for older
-> machine types too, retroactively. ... Hm, in that case, is the argument
-> that the device can never be present on the *source* (old version) QEMU,
-> so for migration to be even considered, it can also not be present on
-> the target (new version) QEMU?
-> 
-> Wow, complex. 
-
-For sure. Let's see what Dave can add.
-
-Thanks,
-Marcel
-
- >
-> Laszlo
-> 
+diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+index 73519ab..d0afb31e 100644
+--- a/hw/i386/acpi-build.c
++++ b/hw/i386/acpi-build.c
+@@ -2419,6 +2419,8 @@ build_mcfg_q35(GArray *table_data, BIOSLinker *linker, AcpiMcfgInfo *info)
+ {
+     AcpiTableMcfg *mcfg;
+     const char *sig;
++    const char *oem;
++    const char *oem_id;
+     int len = sizeof(*mcfg) + 1 * sizeof(mcfg->allocation[0]);
+ 
+     mcfg = acpi_data_push(table_data, len);
+@@ -2431,16 +2433,21 @@ build_mcfg_q35(GArray *table_data, BIOSLinker *linker, AcpiMcfgInfo *info)
+     /* MCFG is used for ECAM which can be enabled or disabled by guest.
+      * To avoid table size changes (which create migration issues),
+      * always create the table even if there are no allocations,
+-     * but set the signature to a reserved value in this case.
+-     * ACPI spec requires OSPMs to ignore such tables.
++     * but fill it with Noop values.
++     * OSPMs ignore such tables.
+      */
+     if (info->mcfg_base == PCIE_BASE_ADDR_UNMAPPED) {
+-        /* Reserved signature: ignored by OSPM */
+-        sig = "QEMU";
++        sig = "SSDT";
++        oem = "QEMU ";
++        oem_id = "NOOP";
++        /* 0xa3 - NoopOp */
++        memset(&mcfg->reserved, 0xa3, len - offsetof(AcpiTableMcfg, reserved));
+     } else {
+         sig = "MCFG";
++        oem = NULL;
++        oem_id = NULL;
+     }
+-    build_header(linker, table_data, (void *)mcfg, sig, len, 1, NULL, NULL);
++    build_header(linker, table_data, (void *)mcfg, sig, len, 1, oem, oem_id);
+ }
+ 
+ /*
+-- 
+MST
