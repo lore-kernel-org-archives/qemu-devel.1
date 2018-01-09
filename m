@@ -1,26 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57039)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58081)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1eYuE6-0007MJ-RV
-	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 08:46:04 -0500
+	(envelope-from <marcel@redhat.com>) id 1eYuGw-0001Ga-7X
+	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 08:48:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1eYuE2-0004YF-RE
-	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 08:46:02 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:39920)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1eYuDn-0004Nm-2f
-	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 08:45:58 -0500
-Date: Tue, 9 Jan 2018 13:45:28 +0000
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20180109134528.GE31400@stefanha-x1.localdomain>
-References: <20171219084557.9801-1-peterx@redhat.com>
-	<20171219084557.9801-21-peterx@redhat.com>
+	(envelope-from <marcel@redhat.com>) id 1eYuGu-0000Ag-Be
+	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 08:48:58 -0500
+References: <20180108215007.46471-1-marcel@redhat.com>
+	<5367c8a4-91bd-7712-525d-0a1ed6e6acab@redhat.com>
+From: Marcel Apfelbaum <marcel@redhat.com>
+Message-ID: <3dc0ea78-1512-0146-3ac6-9804e49fe5dc@redhat.com>
+Date: Tue, 9 Jan 2018 15:48:32 +0200
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="ZInfyf7laFu/Kiw7"
-Content-Disposition: inline
-In-Reply-To: <20171219084557.9801-21-peterx@redhat.com>
-Subject: Re: [Qemu-devel] [RFC v6 20/27] qmp: export qmp_dispatch_check_obj
- and allow "id"
+In-Reply-To: <5367c8a4-91bd-7712-525d-0a1ed6e6acab@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] fw_cfg: fix memory corruption when all
+ fw_cfg slots are used
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,83 +25,119 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, Stefan Hajnoczi <shajnocz@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <famz@redhat.com>, Juan Quintela <quintela@redhat.com>, mdroth@linux.vnet.ibm.com, Eric Blake <eblake@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Markus Armbruster <armbru@redhat.com>, marcandre.lureau@redhat.com, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: Laszlo Ersek <lersek@redhat.com>, qemu-devel@nongnu.org
+Cc: ehabkost@redhat.com, mst@redhat.com, qemu-stable@nongnu.org, kraxel@redhat.com, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
 
---ZInfyf7laFu/Kiw7
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Hi Laszlo,
 
-On Tue, Dec 19, 2017 at 04:45:50PM +0800, Peter Xu wrote:
-> We need this for earlier check for OOB, before reaching
-> do_qmp_dispatch().  Meanwhile, a small touch-up to allow "id" field,
-> after all we allow that for sure in the spec (in any form).
+On 09/01/2018 14:51, Laszlo Ersek wrote:
+> On 01/08/18 22:50, Marcel Apfelbaum wrote:
+>> When all the fw_cfg slots are used, a write is made outside the
+>> bounds of the fw_cfg files array as part of the sort algorithm.
+>>
+>> Fix it by avoiding an unnecessary array element move.
+>> Fix also an assert while at it.
+>>
+>> Signed-off-by: Marcel Apfelbaum <marcel@redhat.com>
+>> ---
+>>   hw/nvram/fw_cfg.c | 6 ++++--
+>>   1 file changed, 4 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/hw/nvram/fw_cfg.c b/hw/nvram/fw_cfg.c
+>> index 753ac0e4ea..4313484b21 100644
+>> --- a/hw/nvram/fw_cfg.c
+>> +++ b/hw/nvram/fw_cfg.c
+>> @@ -784,7 +784,7 @@ void fw_cfg_add_file_callback(FWCfgState *s,  const char *filename,
+>>        * index and "i - 1" is the one being copied from, thus the
+>>        * unusual start and end in the for statement.
+>>        */
+>> -    for (i = count + 1; i > index; i--) {
+>> +    for (i = count; i > index; i--) {
+>>           s->files->f[i] = s->files->f[i - 1];
+>>           s->files->f[i].select = cpu_to_be16(FW_CFG_FILE_FIRST + i);
+>>           s->entries[0][FW_CFG_FILE_FIRST + i] =
+>> @@ -833,7 +833,6 @@ void *fw_cfg_modify_file(FWCfgState *s, const char *filename,
+>>       assert(s->files);
+>>   
+>>       index = be32_to_cpu(s->files->count);
+>> -    assert(index < fw_cfg_file_slots(s));
+>>   
+>>       for (i = 0; i < index; i++) {
+>>           if (strcmp(filename, s->files->f[i].name) == 0) {
+>> @@ -843,6 +842,9 @@ void *fw_cfg_modify_file(FWCfgState *s, const char *filename,
+>>               return ptr;
+>>           }
+>>       }
+>> +
+>> +    assert(index < fw_cfg_file_slots(s));
+>> +
+>>       /* add new one */
+>>       fw_cfg_add_file_callback(s, filename, NULL, NULL, NULL, data, len, true);
+>>       return NULL;
+>>
+> 
+> Given that I was CC'd... 
 
-This change would be better as part of the patch that needs it.  I don't
-understand the commit description and there is no context in this patch
-showing how this change is used.
+Its not me! get_maintainers found you...
 
-> Signed-off-by: Peter Xu <peterx@redhat.com>
-> ---
->  include/qapi/qmp/dispatch.h | 1 +
->  qapi/qmp-dispatch.c         | 4 +++-
->  2 files changed, 4 insertions(+), 1 deletion(-)
->=20
-> diff --git a/include/qapi/qmp/dispatch.h b/include/qapi/qmp/dispatch.h
-> index b76798800c..cf2657b5c9 100644
-> --- a/include/qapi/qmp/dispatch.h
-> +++ b/include/qapi/qmp/dispatch.h
-> @@ -49,6 +49,7 @@ bool qmp_command_is_enabled(const QmpCommand *cmd);
->  const char *qmp_command_name(const QmpCommand *cmd);
->  bool qmp_has_success_response(const QmpCommand *cmd);
->  QObject *qmp_build_error_object(Error *err);
-> +QDict *qmp_dispatch_check_obj(const QObject *request, Error **errp);
-> =20
->  typedef void (*qmp_cmd_callback_fn)(QmpCommand *cmd, void *opaque);
-> =20
-> diff --git a/qapi/qmp-dispatch.c b/qapi/qmp-dispatch.c
-> index b41fa174fe..b16f2f1d3f 100644
-> --- a/qapi/qmp-dispatch.c
-> +++ b/qapi/qmp-dispatch.c
-> @@ -20,7 +20,7 @@
->  #include "qapi-types.h"
->  #include "qapi/qmp/qerror.h"
-> =20
-> -static QDict *qmp_dispatch_check_obj(const QObject *request, Error **err=
-p)
-> +QDict *qmp_dispatch_check_obj(const QObject *request, Error **errp)
->  {
->      const QDictEntry *ent;
->      const char *arg_name;
-> @@ -52,6 +52,8 @@ static QDict *qmp_dispatch_check_obj(const QObject *req=
-uest, Error **errp)
->                             "QMP input member 'arguments' must be an obje=
-ct");
->                  return NULL;
->              }
-> +        } else if (!strcmp(arg_name, "id")) {
-> +            continue;
->          } else {
->              error_setg(errp, "QMP input member '%s' is unexpected",
->                         arg_name);
-> --=20
-> 2.14.3
->=20
+>I don't understand the purpose of the sorting.
+> I've read commit bab47d9a75a3 ("Sort the fw_cfg file list", 2016-04-07),
+> yes. It does not spell out the goal.
+> 
+> I assume the idea is migration compatibility for the same machine type
+> between QEMU releases. Is that correct?
 
---ZInfyf7laFu/Kiw7
-Content-Type: application/pgp-signature; name="signature.asc"
+I think the commit intended only to avoid fw_cfg files order to change
+for the same machine between QEMU versions since is guest visible.
 
------BEGIN PGP SIGNATURE-----
+> A new release might assign a
+> different selector key to the same fw_cfg file, and a guest that is
+> migrated while reading fw_cfg could end up with half-half of different
+> blobs.
+> 
+> Wasn't this somehow addressed by keeping fw_cfg blobs in RAM blocks or
+> some such?
+>
 
-iQEcBAEBAgAGBQJaVMd4AAoJEJykq7OBq3PIi9IIAMjCt5XTNEzsOr4erRTBaps2
-ZxmTYgicmhZqa7ipfrkKZX2+8vcmBRsnaRK0bwCfkxEMoO97/4UiYQT/Y80fswqS
-VpOaZ1fc8NJu7fFevTfVziyxCirTfHVoJ4wd+24LFzJi9znfxPKNv1pJ3kPvJB5X
-Wxl7EGju9HKw+A7RZ7ZFiLo8WjkD0VgKwyJnQ94wQQR4Kjx6acw/9/QQJhYezpUv
-qW+zmYoahHHqzAP0GwnU9NSMKpgBCUDL+UQs+XBg1v8J6CN/pXxBblaA8K9RCrd9
-ajrLfPvscwsnPDpbZ47jx4AAV1iJWEPvkzBJVSiKc603zhQXE3Zq7AMuNhFCQ/Y=
-=ND8B
------END PGP SIGNATURE-----
+Adding Dave, maybe he can answer to that.
 
---ZInfyf7laFu/Kiw7--
+> Also, assuming the problem is real (i.e., we need to stick with the same
+> numeric values regardless of moving around the insertion points in the
+> source code), then why is it safe for "non-legacy" machine types to do
+> ... er... "something else" than keep the same numeric values? The commit
+> says,
+> 
+>      This will avoid any future issues of moving the file creation
+>      around, it doesn't matter what order they are created now,
+>      the will always be in filename order.
+> 
+> Which is true, but if a new file is introduced (with a pathname in the
+> middle), then that will shift up everything behind. Or... is the idea
+> that the same machine type on a new QEMU release may only reorder the
+> additions of the preexistent fw_cfg files across the source code, but
+> must not expose *new* fw_cfg files?
+> 
+
+I think this is the reason, and the machine should not have new fw_cfg files.
+
+
+> If this is the idea, then keeping the list sorted would indeed ensure
+> the same numeric values too -- however, I don't think the assumption is
+> safe. Certain devices may expose dedicated, standalone fw_cfg blobs, and
+> such devices, when they are implemented, are generally enabled for older
+> machine types too, retroactively. ... Hm, in that case, is the argument
+> that the device can never be present on the *source* (old version) QEMU,
+> so for migration to be even considered, it can also not be present on
+> the target (new version) QEMU?
+> 
+> Wow, complex. 
+
+For sure. Let's see what Dave can add.
+
+Thanks,
+Marcel
+
+ >
+> Laszlo
+> 
