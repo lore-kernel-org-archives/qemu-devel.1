@@ -1,26 +1,40 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42473)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43981)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1eYsSP-00051X-Aa
-	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 06:52:42 -0500
+	(envelope-from <thuth@redhat.com>) id 1eYsXl-0007Kk-Kq
+	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 06:58:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1eYsSK-0005eU-Dd
-	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 06:52:41 -0500
-Received: from mail.ispras.ru ([83.149.199.45]:60604)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1eYsSK-0005d6-1C
-	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 06:52:36 -0500
-From: "Pavel Dovgalyuk" <dovgaluk@ispras.ru>
-References: <20171220100205.16625.84632.stgit@pasha-VirtualBox>	<003c01d38923$1c5157f0$54f407d0$@ru>
-	<87efmz1ddp.fsf@secure.laptop>
-In-Reply-To: <87efmz1ddp.fsf@secure.laptop>
-Date: Tue, 9 Jan 2018 14:52:33 +0300
-Message-ID: <004301d38940$56013bb0$0203b310$@ru>
+	(envelope-from <thuth@redhat.com>) id 1eYsXg-0001rT-PM
+	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 06:58:13 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:46700)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1eYsXg-0001qh-Gl
+	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 06:58:08 -0500
+References: <1515071752-22961-1-git-send-email-thuth@redhat.com>
+	<20180104140930.7hbtnen3lw7epmrh@var.youpi.perso.aquilenet.fr>
+	<a78b6f7a-3eb2-6749-ccba-ad1ba4d525ae@redhat.com>
+	<20180104141524.m5xy66jsn2hiajwl@var.youpi.perso.aquilenet.fr>
+	<20180104142101.rivje5qn5dasb6jw@var.youpi.perso.aquilenet.fr>
+	<aea97804-c6a9-d903-13d8-23bc6b46af86@redhat.com>
+	<20180104152402.fv52umjmlb2g22wc@var.youpi.perso.aquilenet.fr>
+	<b1a86fed-8a98-cc1d-46ca-5462f8be3fc7@redhat.com>
+	<20180104153219.wsxtkzuznu2iwra7@var.youpi.perso.aquilenet.fr>
+	<bb6eae87-85b2-4bf2-ad36-26fa95816315@redhat.com>
+	<9b392599-a318-90c5-daa8-89ade40c64e5@redhat.com>
+	<eba50062-de89-2091-8799-b6de3c88acaf@redhat.com>
+	<64a364f0-3dc0-87c4-f0b0-a79365032a8e@redhat.com>
+	<351493cf-fa56-491c-c646-49727e6611ed@redhat.com>
+	<6900aa32-7774-366f-32a5-9e75b70350db@redhat.com>
+	<b6a25497-5353-fe1f-6550-1479b5c4c1f4@redhat.com>
+	<ff5a872c-9438-3fa9-6a65-9792c846b151@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <536d4bc3-8ad6-367e-5011-5e6fb9af1dec@redhat.com>
+Date: Tue, 9 Jan 2018 12:57:58 +0100
 MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="us-ascii"
+In-Reply-To: <ff5a872c-9438-3fa9-6a65-9792c846b151@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Content-Language: ru
-Subject: Re: [Qemu-devel] [PATCH v2] hpet: recover timer offset correctly
+Subject: Re: [Qemu-devel] [PATCH v2] usb: Remove legacy -usbdevice option
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,179 +43,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: quintela@redhat.com
-Cc: 'Pavel Dovgalyuk' <Pavel.Dovgaluk@ispras.ru>, qemu-devel@nongnu.org, mst@redhat.com, dgilbert@redhat.com, maria.klimushenkova@ispras.ru, pbonzini@redhat.com
+To: Paolo Bonzini <pbonzini@redhat.com>, Samuel Thibault <samuel.thibault@gnu.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>, kraxel@redhat.com, qemu-devel@nongnu.org
 
-> From: Juan Quintela [mailto:quintela@redhat.com]
-> >> Signed-off-by: Maria Klimushenkova <maria.klimushenkova@ispras.ru>
-> >> Signed-off-by: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
-> >> ---
-> >>  hw/timer/hpet.c |   32 ++++++++++++++++++++++++++++++--
-> >>  1 file changed, 30 insertions(+), 2 deletions(-)
-> >>
-> >> diff --git a/hw/timer/hpet.c b/hw/timer/hpet.c
-> >> index 577371b..4904a60 100644
-> >> --- a/hw/timer/hpet.c
-> >> +++ b/hw/timer/hpet.c
-> >> @@ -70,6 +70,7 @@ typedef struct HPETState {
-> >>
-> >>      MemoryRegion iomem;
-> >>      uint64_t hpet_offset;
-> >> +    bool hpet_offset_loaded;
-> >>      qemu_irq irqs[HPET_NUM_IRQ_ROUTES];
-> >>      uint32_t flags;
-> >>      uint8_t rtc_irq_level;
-> >> @@ -221,7 +222,9 @@ static int hpet_pre_save(void *opaque)
-> >>      HPETState *s = opaque;
-> >>
-> >>      /* save current counter value */
-> >> -    s->hpet_counter = hpet_get_ticks(s);
-> >> +    if (hpet_enabled(s)) {
-> >> +        s->hpet_counter = hpet_get_ticks(s);
+On 09.01.2018 12:17, Paolo Bonzini wrote:
+> On 09/01/2018 12:00, Thomas Huth wrote:
+>> On 09.01.2018 10:58, Paolo Bonzini wrote:
+>>> On 08/01/2018 08:23, Thomas Huth wrote:
+>>>>>> But instead of introducing a new "-braille" parameter, maybe we should
+>>>>>> rather keep some of the convenience "-usbdevice" possibilities around?
+>>>>>> E.g. keep "-usbdevice braille", "-usbdevice mouse", etc. but remove
+>>>>>> things like "-usbdevice serial" and "-usbdevice host" where the code is
+>>>>>> rather ugly and the user do not gain much in comparison to "-device" ?
+>>>>> That would work too.  But I'm not sure why keep all the usbdevice
+>>>>> infrastructure when we can do the same (at the price of a small cmdline
+>>>>> incompatibility) with only 50 lines of code.
+>>>> I'm just afraid that we will end up with more new parameters in the end
+>>>> than just "-braille" - or do we feel confident enough that "-usbdevice
+>>>> braille" is the only one that would need a sugared replacement?
+>>>
+>>> I agree that we should plan for suboptions, so it could be "-braille
+>>> [serial|usb]" for now.
+>>
+>> I'm rather afraid that someone else will also complain about the removal
+>> of the other usbdevice options, so that we'll finally end up with new
+>> -usbhost, -usbbt and -usbyounameit convenience options... in that case
+>> it might be better to keep "-usbdevice" instead?
 > 
-> Why do we want to save it only when hpet is enabled?  We used to save it always.
-
-Because it may be read by the guest.
-Therefore hpet_counter should not be affected by the events not caused by the guest.
-
+> We can and should say no.  Sometimes we can also say yes though. :)
 > 
-> >> +    }
-> >>
-> >>      return 0;
-> >>  }
-> >> @@ -232,6 +235,8 @@ static int hpet_pre_load(void *opaque)
-> >>
-> >>      /* version 1 only supports 3, later versions will load the actual value */
-> >>      s->num_timers = HPET_MIN_TIMERS;
-> >> +    /* for checking whether the hpet_offset section is loaded */
-> >> +    s->hpet_offset_loaded = false;
-> 
-> This is made false everytime that we start incoming migration.
+> I just think that Braille is worth a special case because a subset of
+> our user base (blind people) will use it 100% of the time, plus it is
+> not supported by libvirt and hence virt-manager.
 
-Right.
+OK, then let's go forward and use your "-braille serial|usb" patch, and
+nuke the -usbdevice option completely (assuming Gerd agrees, being the
+USB maintainer).
 
-> 
-> >>      return 0;
-> >>  }
-> >>
-> >> @@ -252,7 +257,10 @@ static int hpet_post_load(void *opaque, int version_id)
-> >>      HPETState *s = opaque;
-> >>
-> >>      /* Recalculate the offset between the main counter and guest time */
-> >> -    s->hpet_offset = ticks_to_ns(s->hpet_counter) - qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
-> >> +    if (!s->hpet_offset_loaded) {
-> >> +        s->hpet_offset = ticks_to_ns(s->hpet_counter)
-> >> +                        - qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
-> >> +    }
-> 
-> So, at this point it is going to always be false.
-
-No, because post load (below) sets it to true.
-
-> >> +static int hpet_offset_post_load(void *opaque, int version_id)
-> >> +{
-> >> +    HPETState *s = opaque;
-> >> +
-> >> +    s->hpet_offset_loaded = true;
-> >> +    return 0;
-> >> +}
-> >> +
-> >>  static bool hpet_rtc_irq_level_needed(void *opaque)
-> >>  {
-> >>      HPETState *s = opaque;
-> >> @@ -285,6 +301,17 @@ static const VMStateDescription vmstate_hpet_rtc_irq_level = {
-> >>      }
-> >>  };
-> >>
-> >> +static const VMStateDescription vmstate_hpet_offset = {
-> >> +    .name = "hpet/offset",
-> >> +    .version_id = 1,
-> >> +    .minimum_version_id = 1,
-> >> +    .post_load = hpet_offset_post_load,
-> 
-> You are missing here a .needed function.  Se how
-
-Because .needed is optional.
-
-> - You want to transport hpet_offset just in the cases that hpet_is_enabled()?
-
-No, we want to preserve backwards compatibility.
-
-> I think that the following patch does what you want, no?  And it is a
-> bit simpler.
-
-It is simpler, but won't work for migrations from old version to the new one.
-hpet_counter becomes invalid in such case.
-
-> Head:     master Merge remote-tracking branch 'remotes/elmarco/tags/dump-pull-request' into
-> staging
-> Merge:    qemu/master Merge remote-tracking branch 'remotes/elmarco/tags/dump-pull-request'
-> into staging
-> Tag:      v2.11.0 (454)
-> 
-> Unstaged changes (1)
-> modified   hw/timer/hpet.c
-> @@ -216,16 +216,6 @@ static void update_irq(struct HPETTimer *timer, int set)
->      }
->  }
-> 
-> -static int hpet_pre_save(void *opaque)
-> -{
-> -    HPETState *s = opaque;
-> -
-> -    /* save current counter value */
-> -    s->hpet_counter = hpet_get_ticks(s);
-> -
-> -    return 0;
-> -}
-> -
->  static int hpet_pre_load(void *opaque)
->  {
->      HPETState *s = opaque;
-> @@ -251,9 +241,6 @@ static int hpet_post_load(void *opaque, int version_id)
->  {
->      HPETState *s = opaque;
-> 
-> -    /* Recalculate the offset between the main counter and guest time */
-> -    s->hpet_offset = ticks_to_ns(s->hpet_counter) - qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
-> -
->      /* Push number of timers into capability returned via HPET_ID */
->      s->capability &= ~HPET_ID_NUM_TIM_MASK;
->      s->capability |= (s->num_timers - 1) << HPET_ID_NUM_TIM_SHIFT;
-> @@ -285,6 +272,24 @@ static const VMStateDescription vmstate_hpet_rtc_irq_level = {
->      }
->  };
-> 
-> +static bool hpet_offset_needed(void *opaque)
-> +{
-> +    HPETState *s = opaque;
-> +
-> +    return hpet_enabled(s);
-> +}
-> +
-> +static const VMStateDescription vmstate_hpet_offset = {
-> +    .name = "hpet/offset",
-> +    .version_id = 1,
-> +    .minimum_version_id = 1,
-> +    .needed = hpet_offset_needed,
-> +    .fields = (VMStateField[]) {
-> +        VMSTATE_UINT64(hpet_offset, HPETState),
-> +        VMSTATE_END_OF_LIST()
-> +    }
-> +};
-> +
->  static const VMStateDescription vmstate_hpet_timer = {
->      .name = "hpet_timer",
->      .version_id = 1,
-> @@ -320,6 +325,7 @@ static const VMStateDescription vmstate_hpet = {
->      },
->      .subsections = (const VMStateDescription*[]) {
->          &vmstate_hpet_rtc_irq_level,
-> +        &vmstate_hpet_offset,
->          NULL
->      }
->  };
-> 
-
-
-Pavel Dovgalyuk
+ Thomas
