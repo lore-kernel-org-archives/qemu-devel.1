@@ -1,23 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36286)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38320)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1eYtQI-0006vG-QK
-	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 07:54:35 -0500
+	(envelope-from <wei.w.wang@intel.com>) id 1eYtVJ-0000Ya-IS
+	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 07:59:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1eYtQF-0006zl-MI
-	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 07:54:34 -0500
-References: <20180108215007.46471-1-marcel@redhat.com>
-	<CAJ+F1CLGi6bSMuafc7J1kzxAPHGErWfdKDmjbDX=H5WtK8YL0Q@mail.gmail.com>
-	<dcbbc162-1dd3-8efb-a41e-22bb2f2a823d@redhat.com>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <1157dd72-3e9d-f16e-0eb2-c27377f3e01f@redhat.com>
-Date: Tue, 9 Jan 2018 13:54:07 +0100
-MIME-Version: 1.0
-In-Reply-To: <dcbbc162-1dd3-8efb-a41e-22bb2f2a823d@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] fw_cfg: fix memory corruption when all
- fw_cfg slots are used
+	(envelope-from <wei.w.wang@intel.com>) id 1eYtVG-0001Og-C4
+	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 07:59:45 -0500
+Received: from mga04.intel.com ([192.55.52.120]:44580)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
+	id 1eYtVF-0001OD-Vg
+	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 07:59:42 -0500
+From: Wei Wang <wei.w.wang@intel.com>
+Date: Tue,  9 Jan 2018 20:41:27 +0800
+Message-Id: <1515501687-7874-1-git-send-email-wei.w.wang@intel.com>
+Subject: [Qemu-devel] [PATCH v21 2/5 RESEND] virtio-balloon:
+ VIRTIO_BALLOON_F_SG
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,126 +23,410 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Marcel Apfelbaum <marcel@redhat.com>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@gmail.com>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, qemu-stable <qemu-stable@nongnu.org>, QEMU <qemu-devel@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>
+To: virtio-dev@lists.oasis-open.org, linux-kernel@vger.kernel.org, qemu-devel@nongnu.org, virtualization@lists.linux-foundation.org, kvm@vger.kernel.org, linux-mm@kvack.org, mst@redhat.com, mhocko@kernel.org, akpm@linux-foundation.org, mawilcox@microsoft.com
+Cc: david@redhat.com, penguin-kernel@I-love.SAKURA.ne.jp, cornelia.huck@de.ibm.com, mgorman@techsingularity.net, aarcange@redhat.com, amit.shah@redhat.com, pbonzini@redhat.com, willy@infradead.org, wei.w.wang@intel.com, liliang.opensource@gmail.com, yang.zhang.wz@gmail.com, quan.xu0@gmail.com, nilal@redhat.com, riel@redhat.com
 
-On 01/09/18 13:36, Marcel Apfelbaum wrote:
-> On 09/01/2018 13:15, Marc-Andr=C3=A9 Lureau wrote:
->> Hi
->>
->=20
-> Hi Marc-Andr=C3=A9,
->=20
->> On Mon, Jan 8, 2018 at 10:50 PM, Marcel Apfelbaum <marcel@redhat.com>
->> wrote:
->>> When all the fw_cfg slots are used, a write is made outside the
->>> bounds of the fw_cfg files array as part of the sort algorithm.
->>>
->>> Fix it by avoiding an unnecessary array element move.
->>> Fix also an assert while at it.
->>>
->>> Signed-off-by: Marcel Apfelbaum <marcel@redhat.com>
->>> ---
->>> =C2=A0 hw/nvram/fw_cfg.c | 6 ++++--
->>> =C2=A0 1 file changed, 4 insertions(+), 2 deletions(-)
->>>
->>> diff --git a/hw/nvram/fw_cfg.c b/hw/nvram/fw_cfg.c
->>> index 753ac0e4ea..4313484b21 100644
->>> --- a/hw/nvram/fw_cfg.c
->>> +++ b/hw/nvram/fw_cfg.c
->>> @@ -784,7 +784,7 @@ void fw_cfg_add_file_callback(FWCfgState *s,=C2=A0
->>> const char *filename,
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * index and "i - 1" is the one b=
-eing copied from, thus the
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * unusual start and end in the f=
-or statement.
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 */
->>> -=C2=A0=C2=A0=C2=A0 for (i =3D count + 1; i > index; i--) {
->>> +=C2=A0=C2=A0=C2=A0 for (i =3D count; i > index; i--) {
->>
->> Good catch (could be worth a test in fw_cfg-test.c for ASAN check?)
->>
->> Just some thought, I wonder if the sorting should be done once after
->> all entries are added, with some higher function like g_array_sort().
->>
->=20
-> I personally have nothing against this kind of insertion sort.
->=20
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 s->files->f[i]=
- =3D s->files->f[i - 1];
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 s->files->f[i]=
-.select =3D cpu_to_be16(FW_CFG_FILE_FIRST + i);
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 s->entries[0][=
-FW_CFG_FILE_FIRST + i] =3D
->>> @@ -833,7 +833,6 @@ void *fw_cfg_modify_file(FWCfgState *s, const
->>> char *filename,
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 assert(s->files);
->>>
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 index =3D be32_to_cpu(s->files->count)=
-;
->>> -=C2=A0=C2=A0=C2=A0 assert(index < fw_cfg_file_slots(s));
->>>
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 for (i =3D 0; i < index; i++) {
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (strcmp(fil=
-ename, s->files->f[i].name) =3D=3D 0) {
->>> @@ -843,6 +842,9 @@ void *fw_cfg_modify_file(FWCfgState *s, const
->>> char *filename,
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0 return ptr;
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
->>> +
->>> +=C2=A0=C2=A0=C2=A0 assert(index < fw_cfg_file_slots(s));
->>> +
->>
->> Well, the assert is redundant with the one in
->> fw_cfg_add_file_callback() at this point. I think the original assert
->> is there for sanity check only, before iterating over files.
->=20
-> Is not in fw_cfg_add_file_callback(), is in fw_cfg_modify_file()
-> which strangely can decide to add a file if is not there already.
->=20
-> The previous place of the assert was not good since it checked to see
-> if there is enough room to add a file, but most of the times,
-> as the function name suggests, we only modify one.
->=20
-> Let's say we have all the slots full and we want to modify an existing
-> file.
-> The assert triggers abort even if is not needed.
-> However, if the file is not there the assert checks we have room before
-> it adds
-> the file.
+Add a new feature, VIRTIO_BALLOON_F_SG, which enables the transfer of
+balloon (i.e. inflated/deflated) pages using scatter-gather lists to the
+host.
 
-I think Marc-Andr=C3=A9 agrees, but his point seems to be that you could
-simply remove the assert from the top of fw_cfg_modify_file() --
-because, if we reach the fw_cfg_add_file_callback() call at the end of
-the function, then fw_cfg_add_file_callback() will verify the same
-assert almost immediately.
+The implementation of the previous virtio-balloon is not very efficient,
+because the balloon pages are transferred to the host by one array each
+time. Here is the breakdown of the time in percentage spent on each step
+of the balloon inflating process (inflating 7GB of an 8GB idle guest).
 
-I'm still staring at the other half of the patch.
+1) allocating pages (6.5%)
+2) sending PFNs to host (68.3%)
+3) address translation (6.1%)
+4) madvise (19%)
 
-Thanks
-Laszlo
+It takes about 4126ms for the inflating process to complete. The above
+profiling shows that the bottlenecks are stage 2) and stage 4).
 
->=20
-> Thanks for reviewing the patch!
-> Marcel
->=20
->=20
->>
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 /* add new one */
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 fw_cfg_add_file_callback(s, filename, =
-NULL, NULL, NULL, data,
->>> len, true);
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return NULL;
->>> --=20
->>> 2.13.5
->>>
->>>
->>
->>
->>
->>
->>
->=20
->=20
+This patch optimizes step 2) by transferring pages to host in sgs. An sg
+describes a chunk of guest physically continuous pages. With this
+mechanism, step 4) can also be optimized by doing address translation and
+madvise() in chunks rather than page by page.
+
+With this new feature, the above ballooning process takes ~460ms resulting
+in an improvement of ~89%.
+
+TODO:
+- optimize stage 1) by allocating/freeing a chunk of pages instead of a
+single page each time.
+- sort the internal balloon page queue.
+- enable OOM to free inflated pages maintained in the local temporary
+  list.
+
+Signed-off-by: Wei Wang <wei.w.wang@intel.com>
+Signed-off-by: Liang Li <liang.z.li@intel.com>
+Suggested-by: Michael S. Tsirkin <mst@redhat.com>
+Cc: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+---
+ drivers/virtio/virtio_balloon.c     | 233 +++++++++++++++++++++++++++++++++---
+ include/uapi/linux/virtio_balloon.h |   1 +
+ 2 files changed, 216 insertions(+), 18 deletions(-)
+
+RESEND ChangeLog:
+- fill_balloon(): move xb_set_page before balloon_page_enqueue
+
+diff --git a/drivers/virtio/virtio_balloon.c b/drivers/virtio/virtio_balloon.c
+index a1fb52c..d0b8ea0 100644
+--- a/drivers/virtio/virtio_balloon.c
++++ b/drivers/virtio/virtio_balloon.c
+@@ -32,6 +32,8 @@
+ #include <linux/mm.h>
+ #include <linux/mount.h>
+ #include <linux/magic.h>
++#include <linux/xbitmap.h>
++#include <asm/page.h>
+ 
+ /*
+  * Balloon device works in 4K page units.  So each page is pointed to by
+@@ -79,6 +81,9 @@ struct virtio_balloon {
+ 	/* Synchronize access/update to this struct virtio_balloon elements */
+ 	struct mutex balloon_lock;
+ 
++	/* The xbitmap used to record balloon pages */
++	struct xb page_xb;
++
+ 	/* The array of pfns we tell the Host about. */
+ 	unsigned int num_pfns;
+ 	__virtio32 pfns[VIRTIO_BALLOON_ARRAY_PFNS_MAX];
+@@ -141,15 +146,128 @@ static void set_page_pfns(struct virtio_balloon *vb,
+ 					  page_to_balloon_pfn(page) + i);
+ }
+ 
++static void kick_and_wait(struct virtqueue *vq, wait_queue_head_t wq_head)
++{
++	unsigned int len;
++
++	virtqueue_kick(vq);
++	wait_event(wq_head, virtqueue_get_buf(vq, &len));
++}
++
++static void add_one_sg(struct virtqueue *vq, unsigned long pfn, uint32_t len)
++{
++	struct scatterlist sg;
++	unsigned int unused;
++	int err;
++
++	sg_init_table(&sg, 1);
++	sg_set_page(&sg, pfn_to_page(pfn), len, 0);
++
++	/* Detach all the used buffers from the vq */
++	while (virtqueue_get_buf(vq, &unused))
++		;
++
++	err = virtqueue_add_inbuf(vq, &sg, 1, vq, GFP_KERNEL);
++	/*
++	 * This is expected to never fail: there is always at least 1 entry
++	 * available on the vq, because when the vq is full the worker thread
++	 * that adds the sg will be put into sleep until at least 1 entry is
++	 * available to use.
++	 */
++	BUG_ON(err);
++}
++
++static void batch_balloon_page_sg(struct virtio_balloon *vb,
++				  struct virtqueue *vq,
++				  unsigned long pfn,
++				  uint32_t len)
++{
++	add_one_sg(vq, pfn, len);
++
++	/* Batch till the vq is full */
++	if (!vq->num_free)
++		kick_and_wait(vq, vb->acked);
++}
++
++/*
++ * Send balloon pages in sgs to host. The balloon pages are recorded in the
++ * page xbitmap. Each bit in the bitmap corresponds to a page of PAGE_SIZE.
++ * The page xbitmap is searched for continuous "1" bits, which correspond
++ * to continuous pages, to chunk into sgs.
++ *
++ * @page_xb_start and @page_xb_end form the range of bits in the xbitmap that
++ * need to be searched.
++ */
++static void tell_host_sgs(struct virtio_balloon *vb,
++			  struct virtqueue *vq,
++			  unsigned long page_xb_start,
++			  unsigned long page_xb_end)
++{
++	unsigned long pfn_start, pfn_end;
++	uint32_t max_len = round_down(UINT_MAX, PAGE_SIZE);
++	uint64_t len;
++
++	pfn_start = page_xb_start;
++	while (pfn_start < page_xb_end) {
++		if (!xb_find_set(&vb->page_xb, page_xb_end, &pfn_start))
++			break;
++		pfn_end = pfn_start + 1;
++		if (!xb_find_zero(&vb->page_xb, page_xb_end, &pfn_end))
++			pfn_end = page_xb_end + 1;
++		len = (pfn_end - pfn_start) << PAGE_SHIFT;
++		while (len > max_len) {
++			batch_balloon_page_sg(vb, vq, pfn_start, max_len);
++			pfn_start += max_len >> PAGE_SHIFT;
++			len -= max_len;
++		}
++		batch_balloon_page_sg(vb, vq, pfn_start, (uint32_t)len);
++		pfn_start = pfn_end + 1;
++	}
++
++	/*
++	 * The last few sgs may not reach the batch size, but need a kick to
++	 * notify the device to handle them.
++	 */
++	if (vq->num_free != virtqueue_get_vring_size(vq))
++		kick_and_wait(vq, vb->acked);
++
++	xb_zero(&vb->page_xb, page_xb_start, page_xb_end);
++}
++
++static inline int xb_set_page(struct virtio_balloon *vb,
++			       struct page *page,
++			       unsigned long *pfn_min,
++			       unsigned long *pfn_max)
++{
++	unsigned long pfn = page_to_pfn(page);
++	int ret;
++
++	*pfn_min = min(pfn, *pfn_min);
++	*pfn_max = max(pfn, *pfn_max);
++
++	do {
++		if (xb_preload(GFP_NOWAIT | __GFP_NOWARN) < 0)
++			return -ENOMEM;
++
++		ret = xb_set_bit(&vb->page_xb, pfn);
++		xb_preload_end();
++	} while (unlikely(ret == -EAGAIN));
++
++	return ret;
++}
++
+ static unsigned fill_balloon(struct virtio_balloon *vb, size_t num)
+ {
+ 	unsigned num_allocated_pages;
+ 	unsigned num_pfns;
+ 	struct page *page;
+ 	LIST_HEAD(pages);
++	bool use_sg = virtio_has_feature(vb->vdev, VIRTIO_BALLOON_F_SG);
++	unsigned long pfn_max = 0, pfn_min = ULONG_MAX;
+ 
+ 	/* We can only do one array worth at a time. */
+-	num = min(num, ARRAY_SIZE(vb->pfns));
++	if (!use_sg)
++		num = min(num, ARRAY_SIZE(vb->pfns));
+ 
+ 	for (num_pfns = 0; num_pfns < num;
+ 	     num_pfns += VIRTIO_BALLOON_PAGES_PER_PAGE) {
+@@ -172,9 +290,16 @@ static unsigned fill_balloon(struct virtio_balloon *vb, size_t num)
+ 	vb->num_pfns = 0;
+ 
+ 	while ((page = balloon_page_pop(&pages))) {
++		if (use_sg) {
++			if (xb_set_page(vb, page, &pfn_min, &pfn_max) < 0) {
++				__free_page(page);
++				continue;
++			}
++		} else {
++			set_page_pfns(vb, vb->pfns + vb->num_pfns, page);
++		}
+ 		balloon_page_enqueue(&vb->vb_dev_info, page);
+ 
+-		set_page_pfns(vb, vb->pfns + vb->num_pfns, page);
+ 		vb->num_pages += VIRTIO_BALLOON_PAGES_PER_PAGE;
+ 		if (!virtio_has_feature(vb->vdev,
+ 					VIRTIO_BALLOON_F_DEFLATE_ON_OOM))
+@@ -184,8 +309,12 @@ static unsigned fill_balloon(struct virtio_balloon *vb, size_t num)
+ 
+ 	num_allocated_pages = vb->num_pfns;
+ 	/* Did we get any? */
+-	if (vb->num_pfns != 0)
+-		tell_host(vb, vb->inflate_vq);
++	if (vb->num_pfns) {
++		if (use_sg)
++			tell_host_sgs(vb, vb->inflate_vq, pfn_min, pfn_max);
++		else
++			tell_host(vb, vb->inflate_vq);
++	}
+ 	mutex_unlock(&vb->balloon_lock);
+ 
+ 	return num_allocated_pages;
+@@ -211,9 +340,12 @@ static unsigned leak_balloon(struct virtio_balloon *vb, size_t num)
+ 	struct page *page;
+ 	struct balloon_dev_info *vb_dev_info = &vb->vb_dev_info;
+ 	LIST_HEAD(pages);
++	bool use_sg = virtio_has_feature(vb->vdev, VIRTIO_BALLOON_F_SG);
++	unsigned long pfn_max = 0, pfn_min = ULONG_MAX;
+ 
+-	/* We can only do one array worth at a time. */
+-	num = min(num, ARRAY_SIZE(vb->pfns));
++	/* Traditionally, we can only do one array worth at a time. */
++	if (!use_sg)
++		num = min(num, ARRAY_SIZE(vb->pfns));
+ 
+ 	mutex_lock(&vb->balloon_lock);
+ 	/* We can't release more pages than taken */
+@@ -223,7 +355,14 @@ static unsigned leak_balloon(struct virtio_balloon *vb, size_t num)
+ 		page = balloon_page_dequeue(vb_dev_info);
+ 		if (!page)
+ 			break;
+-		set_page_pfns(vb, vb->pfns + vb->num_pfns, page);
++		if (use_sg) {
++			if (xb_set_page(vb, page, &pfn_min, &pfn_max) < 0) {
++				balloon_page_enqueue(&vb->vb_dev_info, page);
++				break;
++			}
++		} else {
++			set_page_pfns(vb, vb->pfns + vb->num_pfns, page);
++		}
+ 		list_add(&page->lru, &pages);
+ 		vb->num_pages -= VIRTIO_BALLOON_PAGES_PER_PAGE;
+ 	}
+@@ -234,13 +373,55 @@ static unsigned leak_balloon(struct virtio_balloon *vb, size_t num)
+ 	 * virtio_has_feature(vdev, VIRTIO_BALLOON_F_MUST_TELL_HOST);
+ 	 * is true, we *have* to do it in this order
+ 	 */
+-	if (vb->num_pfns != 0)
+-		tell_host(vb, vb->deflate_vq);
++	if (vb->num_pfns) {
++		if (use_sg)
++			tell_host_sgs(vb, vb->deflate_vq, pfn_min, pfn_max);
++		else
++			tell_host(vb, vb->deflate_vq);
++	}
+ 	release_pages_balloon(vb, &pages);
+ 	mutex_unlock(&vb->balloon_lock);
+ 	return num_freed_pages;
+ }
+ 
++/*
++ * The regular leak_balloon() with VIRTIO_BALLOON_F_SG needs memory allocation
++ * for xbitmap, which is not suitable for the oom case. This function does not
++ * use xbitmap to chunk pages, so it can be used by oom notifier to deflate
++ * pages when VIRTIO_BALLOON_F_SG is negotiated.
++ */
++static unsigned int leak_balloon_sg_oom(struct virtio_balloon *vb)
++{
++	unsigned int n;
++	struct page *page;
++	struct balloon_dev_info *vb_dev_info = &vb->vb_dev_info;
++	struct virtqueue *vq = vb->deflate_vq;
++	LIST_HEAD(pages);
++
++	mutex_lock(&vb->balloon_lock);
++	for (n = 0; n < oom_pages; n++) {
++		page = balloon_page_dequeue(vb_dev_info);
++		if (!page)
++			break;
++
++		list_add(&page->lru, &pages);
++		vb->num_pages -= VIRTIO_BALLOON_PAGES_PER_PAGE;
++		batch_balloon_page_sg(vb, vb->deflate_vq, page_to_pfn(page),
++				      PAGE_SIZE);
++		release_pages_balloon(vb, &pages);
++	}
++
++	/*
++	 * The last few sgs may not reach the batch size, but need a kick to
++	 * notify the device to handle them.
++	 */
++	if (vq->num_free != virtqueue_get_vring_size(vq))
++		kick_and_wait(vq, vb->acked);
++	mutex_unlock(&vb->balloon_lock);
++
++	return n;
++}
++
+ static inline void update_stat(struct virtio_balloon *vb, int idx,
+ 			       u16 tag, u64 val)
+ {
+@@ -380,7 +561,10 @@ static int virtballoon_oom_notify(struct notifier_block *self,
+ 		return NOTIFY_OK;
+ 
+ 	freed = parm;
+-	num_freed_pages = leak_balloon(vb, oom_pages);
++	if (virtio_has_feature(vb->vdev, VIRTIO_BALLOON_F_SG))
++		num_freed_pages = leak_balloon_sg_oom(vb);
++	else
++		num_freed_pages = leak_balloon(vb, oom_pages);
+ 	update_balloon_size(vb);
+ 	*freed += num_freed_pages;
+ 
+@@ -477,6 +661,7 @@ static int virtballoon_migratepage(struct balloon_dev_info *vb_dev_info,
+ {
+ 	struct virtio_balloon *vb = container_of(vb_dev_info,
+ 			struct virtio_balloon, vb_dev_info);
++	bool use_sg = virtio_has_feature(vb->vdev, VIRTIO_BALLOON_F_SG);
+ 	unsigned long flags;
+ 
+ 	/*
+@@ -498,16 +683,24 @@ static int virtballoon_migratepage(struct balloon_dev_info *vb_dev_info,
+ 	vb_dev_info->isolated_pages--;
+ 	__count_vm_event(BALLOON_MIGRATE);
+ 	spin_unlock_irqrestore(&vb_dev_info->pages_lock, flags);
+-	vb->num_pfns = VIRTIO_BALLOON_PAGES_PER_PAGE;
+-	set_page_pfns(vb, vb->pfns, newpage);
+-	tell_host(vb, vb->inflate_vq);
+-
++	if (use_sg) {
++		add_one_sg(vb->inflate_vq, page_to_pfn(newpage), PAGE_SIZE);
++		kick_and_wait(vb->inflate_vq, vb->acked);
++	} else {
++		vb->num_pfns = VIRTIO_BALLOON_PAGES_PER_PAGE;
++		set_page_pfns(vb, vb->pfns, newpage);
++		tell_host(vb, vb->inflate_vq);
++	}
+ 	/* balloon's page migration 2nd step -- deflate "page" */
+ 	balloon_page_delete(page);
+-	vb->num_pfns = VIRTIO_BALLOON_PAGES_PER_PAGE;
+-	set_page_pfns(vb, vb->pfns, page);
+-	tell_host(vb, vb->deflate_vq);
+-
++	if (use_sg) {
++		add_one_sg(vb->deflate_vq, page_to_pfn(page), PAGE_SIZE);
++		kick_and_wait(vb->deflate_vq, vb->acked);
++	} else {
++		vb->num_pfns = VIRTIO_BALLOON_PAGES_PER_PAGE;
++		set_page_pfns(vb, vb->pfns, page);
++		tell_host(vb, vb->deflate_vq);
++	}
+ 	mutex_unlock(&vb->balloon_lock);
+ 
+ 	put_page(page); /* balloon reference */
+@@ -566,6 +759,9 @@ static int virtballoon_probe(struct virtio_device *vdev)
+ 	if (err)
+ 		goto out_free_vb;
+ 
++	if (virtio_has_feature(vdev, VIRTIO_BALLOON_F_SG))
++		xb_init(&vb->page_xb);
++
+ 	vb->nb.notifier_call = virtballoon_oom_notify;
+ 	vb->nb.priority = VIRTBALLOON_OOM_NOTIFY_PRIORITY;
+ 	err = register_oom_notifier(&vb->nb);
+@@ -682,6 +878,7 @@ static unsigned int features[] = {
+ 	VIRTIO_BALLOON_F_MUST_TELL_HOST,
+ 	VIRTIO_BALLOON_F_STATS_VQ,
+ 	VIRTIO_BALLOON_F_DEFLATE_ON_OOM,
++	VIRTIO_BALLOON_F_SG,
+ };
+ 
+ static struct virtio_driver virtio_balloon_driver = {
+diff --git a/include/uapi/linux/virtio_balloon.h b/include/uapi/linux/virtio_balloon.h
+index 343d7dd..37780a7 100644
+--- a/include/uapi/linux/virtio_balloon.h
++++ b/include/uapi/linux/virtio_balloon.h
+@@ -34,6 +34,7 @@
+ #define VIRTIO_BALLOON_F_MUST_TELL_HOST	0 /* Tell before reclaiming pages */
+ #define VIRTIO_BALLOON_F_STATS_VQ	1 /* Memory Stats virtqueue */
+ #define VIRTIO_BALLOON_F_DEFLATE_ON_OOM	2 /* Deflate balloon on OOM */
++#define VIRTIO_BALLOON_F_SG		3 /* Use sg instead of PFN lists */
+ 
+ /* Size of a PFN in the balloon interface. */
+ #define VIRTIO_BALLOON_PFN_SHIFT 12
+-- 
+2.7.4
