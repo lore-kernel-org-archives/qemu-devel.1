@@ -1,26 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50903)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55328)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1eZ1iK-0000S6-P9
-	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 16:45:45 -0500
+	(envelope-from <alistair23@gmail.com>) id 1eZ1qP-00047v-Re
+	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 16:54:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1eZ1iJ-0004EL-Sn
-	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 16:45:44 -0500
-Received: from mail-wm0-x230.google.com ([2a00:1450:400c:c09::230]:44063)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
-	id 1eZ1iJ-0004DR-M9
-	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 16:45:43 -0500
-Received: by mail-wm0-x230.google.com with SMTP id t8so23022419wmc.3
-	for <qemu-devel@nongnu.org>; Tue, 09 Jan 2018 13:45:43 -0800 (PST)
+	(envelope-from <alistair23@gmail.com>) id 1eZ1qO-0006gi-Cd
+	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 16:54:05 -0500
 MIME-Version: 1.0
-In-Reply-To: <CAJSP0QUMA7v=-qX-CNCi30aoH-HzXC9i75EpLWP_TmFuDzpTQQ@mail.gmail.com>
-References: <CAJSP0QUMA7v=-qX-CNCi30aoH-HzXC9i75EpLWP_TmFuDzpTQQ@mail.gmail.com>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Tue, 9 Jan 2018 13:45:12 -0800
-Message-ID: <CAKmqyKPk69_d-iYGekoS9WBM1fnzav1iFAQEXQq_jLOW9_Dt3w@mail.gmail.com>
+Sender: alistair23@gmail.com
+In-Reply-To: <20180108154303.6522-6-f4bug@amsat.org>
+References: <20180108154303.6522-1-f4bug@amsat.org>
+	<20180108154303.6522-6-f4bug@amsat.org>
+From: Alistair Francis <alistair.francis@xilinx.com>
+Date: Tue, 9 Jan 2018 13:53:32 -0800
+Message-ID: <CAKmqyKNaq=kZiKygGnz9gEwcfeoFfo0K6d5JL2r=69Cv703Rig@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] Call for GSoC & Outreachy 2018 mentors & project
- ideas
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v5 05/31] sdhci: add DMA and 64-bit
+ capabilities (Spec v2)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,53 +25,206 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@gmail.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, kvm <kvm@vger.kernel.org>, Jailhouse <jailhouse-dev@googlegroups.com>
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Cc: Alistair Francis <alistair.francis@xilinx.com>, Peter Maydell <peter.maydell@linaro.org>, Andrey Smirnov <andrew.smirnov@gmail.com>, Igor Mitsyanko <i.mitsyanko@gmail.com>, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, Prasad J Pandit <pjp@fedoraproject.org>, =?UTF-8?Q?Gr=C3=A9gory_Estrade?= <gregory.estrade@gmail.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Krzysztof Kozlowski <krzk@kernel.org>, Jean-Christophe Dubois <jcd@tribudubois.net>, Sai Pavan Boddu <saipava@xilinx.com>, qemu-arm <qemu-arm@nongnu.org>, Clement Deschamps <clement.deschamps@antfield.fr>, Andrew Baumann <Andrew.Baumann@microsoft.com>, Eduardo Habkost <ehabkost@redhat.com>
 
-On Tue, Jan 2, 2018 at 12:23 PM, Stefan Hajnoczi <stefanha@gmail.com> wrote:
-> QEMU will apply to the Google Summer of Code
-> (https://summerofcode.withgoogle.com/) and Outreachy
-> (https://www.outreachy.org/) open source internship programs again
-> this year.
+On Mon, Jan 8, 2018 at 7:42 AM, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.or=
+g> wrote:
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+> ---
+>  hw/sd/sdhci-internal.h | 14 +++++++-------
+>  include/hw/sd/sdhci.h  |  4 ++++
+>  hw/sd/sdhci.c          | 40 ++++++++++++++++++----------------------
+>  3 files changed, 29 insertions(+), 29 deletions(-)
 >
-> Do you want to mentor newcomers beginning open source development in
-> our community?
+> diff --git a/hw/sd/sdhci-internal.h b/hw/sd/sdhci-internal.h
+> index 0561e6eaf7..affbe4015c 100644
+> --- a/hw/sd/sdhci-internal.h
+> +++ b/hw/sd/sdhci-internal.h
+> @@ -89,12 +89,12 @@ FIELD(SDHC_PRNSTS, WRITE_PROTECT,      19, 1);
+>  FIELD(SDHC_HOSTCTL, LED_CTRL,          0, 1);
+>  FIELD(SDHC_HOSTCTL, DATATRANSFERWIDTH, 1, 1); /* SD mode only */
+>  FIELD(SDHC_HOSTCTL, HIGH_SPEED,        2, 1);
+> -#define SDHC_CTRL_DMA_CHECK_MASK       0x18
+> +FIELD(SDHC_HOSTCTL, DMA,               3, 2);
+>  #define SDHC_CTRL_SDMA                 0x00
+> -#define SDHC_CTRL_ADMA1_32             0x08
+> +#define SDHC_CTRL_ADMA1_32             0x08 /* NOT ALLOWED since v2 */
+>  #define SDHC_CTRL_ADMA2_32             0x10
+> -#define SDHC_CTRL_ADMA2_64             0x18
+> -#define SDHC_DMA_TYPE(x)               ((x) & SDHC_CTRL_DMA_CHECK_MASK)
+> +#define SDHC_CTRL_ADMA2_64             0x18 /* only v1 & v2 (v3 optional=
+) */
+> +#define SDHC_DMA_TYPE(x)               ((x) & R_SDHC_HOSTCTL_DMA_MASK)
 >
-> Please post your project ideas on the wiki by January 23rd:
-> https://wiki.qemu.org/Google_Summer_of_Code_2018
+>  /* R/W Power Control Register 0x0 */
+>  #define SDHC_PWRCON                    0x29
+> @@ -185,19 +185,19 @@ FIELD(SDHC_ACMD12ERRSTS, INDEX_ERR,    4, 1);
 >
-> Project ideas must:
->  * Be doable in 12 weeks by someone fluent in C programming but not
-> familiar with the codebase.
->  * Have a clear scope and few dependencies.
->  * Have a high chance of being merged.
->  * Consist of smaller steps that can be merged incrementally.
+>  /* HWInit Capabilities Register 0x05E80080 */
+>  #define SDHC_CAPAB                     0x40
+> -#define SDHC_CAN_DO_ADMA2              0x00080000
+> -#define SDHC_CAN_DO_ADMA1              0x00100000
+> -#define SDHC_64_BIT_BUS_SUPPORT        (1 << 28)
+>  FIELD(SDHC_CAPAB, TOCLKFREQ,           0, 6);
+>  FIELD(SDHC_CAPAB, TOUNIT,              7, 1);
+>  FIELD(SDHC_CAPAB, BASECLKFREQ,         8, 8);
+>  FIELD(SDHC_CAPAB, MAXBLOCKLENGTH,     16, 2);
+> +FIELD(SDHC_CAPAB, ADMA2,              19, 1); /* since v2 */
+> +FIELD(SDHC_CAPAB, ADMA1,              20, 1); /* v1 only? */
+>  FIELD(SDHC_CAPAB, HIGHSPEED,          21, 1);
+>  FIELD(SDHC_CAPAB, SDMA,               22, 1);
+>  FIELD(SDHC_CAPAB, SUSPRESUME,         23, 1);
+>  FIELD(SDHC_CAPAB, V33,                24, 1);
+>  FIELD(SDHC_CAPAB, V30,                25, 1);
+>  FIELD(SDHC_CAPAB, V18,                26, 1);
+> +FIELD(SDHC_CAPAB, BUS64BIT,           28, 1); /* since v2 */
 >
-> Active QEMU, KVM, and Jailhouse contributors are invited to become
-> mentors.  Mentoring is a volunteer activity that requires around 5
-> hours per week to interact with your intern, review code, etc.  GSoC
-> and Outreachy internships run from May through August.
+>  /* HWInit Maximum Current Capabilities Register 0x0 */
+>  #define SDHC_MAXCURR                   0x48
+> diff --git a/include/hw/sd/sdhci.h b/include/hw/sd/sdhci.h
+> index c1602becd2..4a9c3e9175 100644
+> --- a/include/hw/sd/sdhci.h
+> +++ b/include/hw/sd/sdhci.h
+> @@ -103,6 +103,7 @@ typedef struct SDHCIState {
+>      bool pending_insert_quirk; /* Quirk for Raspberry Pi card insert int=
+ */
+>      uint8_t spec_version;
+>      struct {
+> +        /* v1 */
+>          uint8_t timeout_clk_freq, base_clk_freq_mhz;
+>          bool timeout_clk_in_mhz;
+>          uint16_t max_blk_len;
+> @@ -110,6 +111,9 @@ typedef struct SDHCIState {
+>          bool high_speed;
+>          bool sdma;
+>          bool v33, v30, v18;
+> +        /* v2 */
+> +        bool adma1, adma2;
+> +        bool bus64;
+>      } cap;
+>  } SDHCIState;
 >
-> For background on why QEMU participates in open source internship
-> programs and how it works, check out my KVM Forum presentation:
-> https://www.youtube.com/watch?v=xNVCX7YMUL8
-> https://vmsplice.net/~stefan/stefanha-kvm-forum-2016.pdf
+> diff --git a/hw/sd/sdhci.c b/hw/sd/sdhci.c
+> index 05681c86d6..56466e0427 100644
+> --- a/hw/sd/sdhci.c
+> +++ b/hw/sd/sdhci.c
+> @@ -38,24 +38,6 @@
+>  #define TYPE_SDHCI_BUS "sdhci-bus"
+>  #define SDHCI_BUS(obj) OBJECT_CHECK(SDBus, (obj), TYPE_SDHCI_BUS)
 >
-> KVM and Jailhouse are invited to participate under the QEMU GSoC
-> umbrella organization.
+> -/* Default SD/MMC host controller features information, which will be
+> - * presented in CAPABILITIES register of generic SD host controller at r=
+eset.
+> - * If not stated otherwise:
+> - * 0 - not supported, 1 - supported, other - prohibited.
+> - */
+> -#define SDHC_CAPAB_64BITBUS       0ul        /* 64-bit System Bus Suppor=
+t */
+> -#define SDHC_CAPAB_ADMA1          1ul        /* ADMA1 support */
+> -#define SDHC_CAPAB_ADMA2          1ul        /* ADMA2 support */
+> -
+> -/* Now check all parameters and calculate CAPABILITIES REGISTER value */
+> -#if SDHC_CAPAB_64BITBUS > 1 || SDHC_CAPAB_ADMA2 > 1 || SDHC_CAPAB_ADMA1 =
+> 1
+> -#error Capabilities features can have value 0 or 1 only!
+> -#endif
+> -
+> -#define SDHC_CAPAB_REG_DEFAULT                                 \
+> -   ((SDHC_CAPAB_64BITBUS << 28) | (SDHC_CAPAB_ADMA1 << 20) |   \
+> -    (SDHC_CAPAB_ADMA2 << 19))
+> -
+>  #define MASKED_WRITE(reg, mask, val)  (reg =3D (reg & (mask)) | (val))
 >
-> Please let me know if you have any questions!
+>  static void sdhci_check_capab_freq_range(SDHCIState *s, const char *desc=
+,
+> @@ -71,12 +53,22 @@ static void sdhci_check_capab_freq_range(SDHCIState *=
+s, const char *desc,
+>      }
+>  }
+>
+> +/* Default SD/MMC host controller features information, which will be
+> + * presented in CAPABILITIES register of generic SD host controller at r=
+eset. */
+>  static void sdhci_init_capareg(SDHCIState *s, Error **errp)
+>  {
+>      uint64_t capareg =3D 0;
+>      uint32_t val;
+>
+>      switch (s->spec_version) {
+> +    /* fallback */
 
-Hey,
+This isn't really a fall through here.
 
-Can anyone who has done this before chime in.
+> +    case 2:
+> +        capareg =3D FIELD_DP64(capareg, SDHC_CAPAB, ADMA1, s->cap.adma1)=
+;
+> +        capareg =3D FIELD_DP64(capareg, SDHC_CAPAB, ADMA2, s->cap.adma2)=
+;
+> +        /* 64-bit System Bus Support */
+> +        capareg =3D FIELD_DP64(capareg, SDHC_CAPAB, BUS64BIT, s->cap.bus=
+64);
+> +
+> +    /* fallback */
+>      case 1:
+>          sdhci_check_capab_freq_range(s, "Timeout", s->cap.timeout_clk_fr=
+eq,
+>                                       errp);
+> @@ -794,7 +786,7 @@ static void sdhci_data_transfer(void *opaque)
+>
+>              break;
+>          case SDHC_CTRL_ADMA1_32:
+> -            if (!(s->capareg & SDHC_CAN_DO_ADMA1)) {
+> +            if (!(s->capareg & R_SDHC_CAPAB_ADMA1_MASK)) {
+>                  trace_sdhci_error("ADMA1 not supported");
+>                  break;
+>              }
+> @@ -802,7 +794,7 @@ static void sdhci_data_transfer(void *opaque)
+>              sdhci_do_adma(s);
+>              break;
+>          case SDHC_CTRL_ADMA2_32:
+> -            if (!(s->capareg & SDHC_CAN_DO_ADMA2)) {
+> +            if (!(s->capareg & R_SDHC_CAPAB_ADMA2_MASK)) {
+>                  trace_sdhci_error("ADMA2 not supported");
+>                  break;
+>              }
+> @@ -810,8 +802,8 @@ static void sdhci_data_transfer(void *opaque)
+>              sdhci_do_adma(s);
+>              break;
+>          case SDHC_CTRL_ADMA2_64:
+> -            if (!(s->capareg & SDHC_CAN_DO_ADMA2) ||
+> -                    !(s->capareg & SDHC_64_BIT_BUS_SUPPORT)) {
+> +            if (!(s->capareg & R_SDHC_CAPAB_ADMA2_MASK) ||
+> +                    !(s->capareg & R_SDHC_CAPAB_BUS64BIT_MASK)) {
+>                  trace_sdhci_error("64 bit ADMA not supported");
+>                  break;
+>              }
+> @@ -1321,6 +1313,8 @@ static Property sdhci_properties[] =3D {
+>      DEFINE_PROP_UINT16("max-block-length", SDHCIState, cap.max_blk_len, =
+512),
+>      /* DMA */
+>      DEFINE_PROP_BOOL("sdma", SDHCIState, cap.sdma, true),
+> +    DEFINE_PROP_BOOL("adma1", SDHCIState, cap.adma1, false),
 
-What do you think about getting someone to cleanup and improve the GDB
-support in QEMU? Would that be the right difficulty of task for a GSoC
-project?
+This looks like a change from what we previously had. It at lease
+deserves a commit message.
 
 Alistair
 
+> +    DEFINE_PROP_BOOL("adma2", SDHCIState, cap.adma2, true),
+>      /* Suspend/resume support */
+>      DEFINE_PROP_BOOL("suspend", SDHCIState, cap.suspend, false),
+>      /* High speed support */
+> @@ -1330,6 +1324,8 @@ static Property sdhci_properties[] =3D {
+>      DEFINE_PROP_BOOL("3v0", SDHCIState, cap.v30, false),
+>      DEFINE_PROP_BOOL("1v8", SDHCIState, cap.v18, false),
 >
-> Stefan
+> +    DEFINE_PROP_BOOL("64bit", SDHCIState, cap.bus64, false),
+> +
+>      /* capareg: deprecated */
+>      DEFINE_PROP_UINT64("capareg", SDHCIState, capareg, UINT64_MAX),
+>
+> --
+> 2.15.1
+>
 >
