@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56873)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59814)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eYqVF-0000Ba-73
-	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 04:47:30 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1eYqZW-00020h-Lg
+	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 04:51:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eYqVE-0000Ew-BA
-	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 04:47:29 -0500
-Received: from mail-oi0-x22d.google.com ([2607:f8b0:4003:c06::22d]:41440)
+	(envelope-from <peter.maydell@linaro.org>) id 1eYqZV-0002i9-F3
+	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 04:51:54 -0500
+Received: from mail-ot0-x241.google.com ([2607:f8b0:4003:c0f::241]:41606)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1eYqVE-0000En-4l
-	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 04:47:28 -0500
-Received: by mail-oi0-x22d.google.com with SMTP id n81so6353782oig.8
-	for <qemu-devel@nongnu.org>; Tue, 09 Jan 2018 01:47:28 -0800 (PST)
+	id 1eYqZV-0002gY-8J
+	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 04:51:53 -0500
+Received: by mail-ot0-x241.google.com with SMTP id 5so2878212oth.8
+	for <qemu-devel@nongnu.org>; Tue, 09 Jan 2018 01:51:53 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20180108142831.6638-1-groug@kaod.org>
-References: <20180108142831.6638-1-groug@kaod.org>
+In-Reply-To: <20180109020054.32553-10-f4bug@amsat.org>
+References: <20180109020054.32553-1-f4bug@amsat.org>
+	<20180109020054.32553-10-f4bug@amsat.org>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 9 Jan 2018 09:47:06 +0000
-Message-ID: <CAFEAcA9vtVJi=HYEp5aiFuLsHUTqioNW=veC9o7zKfcLSJMjgw@mail.gmail.com>
+Date: Tue, 9 Jan 2018 09:51:32 +0000
+Message-ID: <CAFEAcA-v8ZgCLmd2NB=6P2r-ZwsozsDsuFDuAC7DrJxp=ADRCw@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 00/14] 9p patches for 2.12 20180108
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [RFC PATCH v2 9/9] hw/arm/xlnx-zynqmp: use Linux
+ FDT names
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,34 +31,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Cc: Alistair Francis <alistair.francis@xilinx.com>, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, =?UTF-8?Q?Andreas_F=C3=A4rber?= <afaerber@suse.de>, Igor Mammedov <imammedo@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
 
-On 8 January 2018 at 14:28, Greg Kurz <groug@kaod.org> wrote:
-> The following changes since commit 8671016261cd5dfba1042aef0a632a77b0d387a2:
+On 9 January 2018 at 02:00, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> w=
+rote:
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+> ---
+>  hw/arm/xlnx-zynqmp.c | 14 ++++++++++----
+>  1 file changed, 10 insertions(+), 4 deletions(-)
 >
->   Merge remote-tracking branch 'remotes/jasowang/tags/net-pull-request' into staging (2018-01-08 09:15:42 +0000)
+> diff --git a/hw/arm/xlnx-zynqmp.c b/hw/arm/xlnx-zynqmp.c
+> index 325642058b..fdcd6801b6 100644
+> --- a/hw/arm/xlnx-zynqmp.c
+> +++ b/hw/arm/xlnx-zynqmp.c
+> @@ -24,6 +24,7 @@
+>  #include "exec/address-spaces.h"
+>  #include "sysemu/kvm.h"
+>  #include "kvm_arm.h"
+> +#include "hw/sysbus-fdt.h"
 >
-> are available in the git repository at:
+>  #define GIC_NUM_SPI_INTR 160
 >
->   https://github.com/gkurz/qemu.git tags/for-upstream
+> @@ -138,6 +139,7 @@ static void xlnx_zynqmp_init(Object *obj)
+>      XlnxZynqMPState *s =3D XLNX_ZYNQMP(obj);
+>      int i;
+>      int num_apus =3D MIN(smp_cpus, XLNX_ZYNQMP_NUM_APU_CPUS);
+> +    const char *type_name;
 >
-> for you to fetch changes up to ffcfb446db1776198a3fe02b75bfecfa1d0b7ab3:
+>      for (i =3D 0; i < num_apus; i++) {
+>          object_initialize(&s->apu_cpu[i], sizeof(s->apu_cpu[i]),
+> @@ -150,12 +152,14 @@ static void xlnx_zynqmp_init(Object *obj)
+>      qdev_set_parent_bus(DEVICE(&s->gic), sysbus_get_default());
 >
->   MAINTAINERS: Drop Aneesh as 9pfs maintainer (2018-01-08 11:18:23 +0100)
->
-> ----------------------------------------------------------------
-> - Aneesh no longer listed in MAINTAINERS,
-> - deprecation of the handle backend,
-> - improved error reporting, especially when the local backend fails to
->   open the VirtFS root,
-> - virtio-9p-test to behave more like a real virtio guest driver: set
->   DRIVER_OK when ready to use the device and process the used ring
->   for completed requests,
-> - cosmetic fixes (mostly coding style related).
->
-> ----------------------------------------------------------------
+>      for (i =3D 0; i < XLNX_ZYNQMP_NUM_GEMS; i++) {
+> -        object_initialize(&s->gem[i], sizeof(s->gem[i]), TYPE_CADENCE_GE=
+M);
+> +        type_name =3D type_resolve_fdt_alias("cdns,zynqmp-gem");
+> +        object_initialize(&s->gem[i], sizeof(s->gem[i]), type_name);
+>          qdev_set_parent_bus(DEVICE(&s->gem[i]), sysbus_get_default());
+>      }
 
-Applied, thanks.
+I'm having difficulty seeing the benefits of this series. We spend
+patches 1-8 adding code to devices to add alias names to them,
+and this means that in patch 9 we can replace a single
+object_initialize() with ... two lines of code including
+a runtime lookup of an alias name. Can you explain why this
+is better than what we have currently?
 
+thanks
 -- PMM
