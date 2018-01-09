@@ -1,32 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56855)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57039)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1eYuDT-0006uV-P1
-	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 08:45:24 -0500
+	(envelope-from <stefanha@redhat.com>) id 1eYuE6-0007MJ-RV
+	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 08:46:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1eYuDP-00045D-Ri
-	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 08:45:23 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:54336)
+	(envelope-from <stefanha@redhat.com>) id 1eYuE2-0004YF-RE
+	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 08:46:02 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:39920)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1eYuDP-000449-Kq
-	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 08:45:19 -0500
-Date: Tue, 9 Jan 2018 14:45:16 +0100
-From: Gerd Hoffmann <kraxel@redhat.com>
-Message-ID: <20180109134516.vom4czb23tfd4ic4@sirius.home.kraxel.org>
-References: <20180104153219.wsxtkzuznu2iwra7@var.youpi.perso.aquilenet.fr>
-	<bb6eae87-85b2-4bf2-ad36-26fa95816315@redhat.com>
-	<9b392599-a318-90c5-daa8-89ade40c64e5@redhat.com>
-	<eba50062-de89-2091-8799-b6de3c88acaf@redhat.com>
-	<64a364f0-3dc0-87c4-f0b0-a79365032a8e@redhat.com>
-	<351493cf-fa56-491c-c646-49727e6611ed@redhat.com>
-	<6900aa32-7774-366f-32a5-9e75b70350db@redhat.com>
-	<b6a25497-5353-fe1f-6550-1479b5c4c1f4@redhat.com>
-	<ff5a872c-9438-3fa9-6a65-9792c846b151@redhat.com>
-	<536d4bc3-8ad6-367e-5011-5e6fb9af1dec@redhat.com>
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1eYuDn-0004Nm-2f
+	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 08:45:58 -0500
+Date: Tue, 9 Jan 2018 13:45:28 +0000
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20180109134528.GE31400@stefanha-x1.localdomain>
+References: <20171219084557.9801-1-peterx@redhat.com>
+	<20171219084557.9801-21-peterx@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="ZInfyf7laFu/Kiw7"
 Content-Disposition: inline
-In-Reply-To: <536d4bc3-8ad6-367e-5011-5e6fb9af1dec@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2] usb: Remove legacy -usbdevice option
+In-Reply-To: <20171219084557.9801-21-peterx@redhat.com>
+Subject: Re: [Qemu-devel] [RFC v6 20/27] qmp: export qmp_dispatch_check_obj
+ and allow "id"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,44 +29,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Samuel Thibault <samuel.thibault@gnu.org>, Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, Stefan Hajnoczi <shajnocz@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <famz@redhat.com>, Juan Quintela <quintela@redhat.com>, mdroth@linux.vnet.ibm.com, Eric Blake <eblake@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Markus Armbruster <armbru@redhat.com>, marcandre.lureau@redhat.com, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 
-  Hi,
 
-> > We can and should say no.  Sometimes we can also say yes though. :)
-> > 
-> > I just think that Braille is worth a special case because a subset of
-> > our user base (blind people) will use it 100% of the time, plus it is
-> > not supported by libvirt and hence virt-manager.
-> 
-> OK, then let's go forward and use your "-braille serial|usb" patch, and
-> nuke the -usbdevice option completely (assuming Gerd agrees, being the
-> USB maintainer).
+--ZInfyf7laFu/Kiw7
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Hmm.  I'm not sure it is a good idea to rush new convinience shortcuts.
+On Tue, Dec 19, 2017 at 04:45:50PM +0800, Peter Xu wrote:
+> We need this for earlier check for OOB, before reaching
+> do_qmp_dispatch().  Meanwhile, a small touch-up to allow "id" field,
+> after all we allow that for sure in the spec (in any form).
 
-In the discussion I've seen a bunch of different possible approaches ...
+This change would be better as part of the patch that needs it.  I don't
+understand the commit description and there is no context in this patch
+showing how this change is used.
 
-  (1) new -braille option, hardcoded.
-  (2) new -braille option, with some "replace shortcuts with long
-      versions" mechanism we could use for other shortcuts too.
-  (3) magically create chardev in usb-braille realize.
-  (4) allow chardev properties have a default.
-  (5) stick with -usbdevice.
+> Signed-off-by: Peter Xu <peterx@redhat.com>
+> ---
+>  include/qapi/qmp/dispatch.h | 1 +
+>  qapi/qmp-dispatch.c         | 4 +++-
+>  2 files changed, 4 insertions(+), 1 deletion(-)
+>=20
+> diff --git a/include/qapi/qmp/dispatch.h b/include/qapi/qmp/dispatch.h
+> index b76798800c..cf2657b5c9 100644
+> --- a/include/qapi/qmp/dispatch.h
+> +++ b/include/qapi/qmp/dispatch.h
+> @@ -49,6 +49,7 @@ bool qmp_command_is_enabled(const QmpCommand *cmd);
+>  const char *qmp_command_name(const QmpCommand *cmd);
+>  bool qmp_has_success_response(const QmpCommand *cmd);
+>  QObject *qmp_build_error_object(Error *err);
+> +QDict *qmp_dispatch_check_obj(const QObject *request, Error **errp);
+> =20
+>  typedef void (*qmp_cmd_callback_fn)(QmpCommand *cmd, void *opaque);
+> =20
+> diff --git a/qapi/qmp-dispatch.c b/qapi/qmp-dispatch.c
+> index b41fa174fe..b16f2f1d3f 100644
+> --- a/qapi/qmp-dispatch.c
+> +++ b/qapi/qmp-dispatch.c
+> @@ -20,7 +20,7 @@
+>  #include "qapi-types.h"
+>  #include "qapi/qmp/qerror.h"
+> =20
+> -static QDict *qmp_dispatch_check_obj(const QObject *request, Error **err=
+p)
+> +QDict *qmp_dispatch_check_obj(const QObject *request, Error **errp)
+>  {
+>      const QDictEntry *ent;
+>      const char *arg_name;
+> @@ -52,6 +52,8 @@ static QDict *qmp_dispatch_check_obj(const QObject *req=
+uest, Error **errp)
+>                             "QMP input member 'arguments' must be an obje=
+ct");
+>                  return NULL;
+>              }
+> +        } else if (!strcmp(arg_name, "id")) {
+> +            continue;
+>          } else {
+>              error_setg(errp, "QMP input member '%s' is unexpected",
+>                         arg_name);
+> --=20
+> 2.14.3
+>=20
 
-... with no clear winnner.
+--ZInfyf7laFu/Kiw7
+Content-Type: application/pgp-signature; name="signature.asc"
 
-I think nobody wants (5), but I think it is the best short-term option
-while we are busy hashing out which of options 1 ... 4 (or possibly
-something else) works best long-term.
+-----BEGIN PGP SIGNATURE-----
 
-Also it's not clear what is supposed to happen for "-braille serial".
-Will that effectively transform from one shortcut to another (-serial
-...)?
+iQEcBAEBAgAGBQJaVMd4AAoJEJykq7OBq3PIi9IIAMjCt5XTNEzsOr4erRTBaps2
+ZxmTYgicmhZqa7ipfrkKZX2+8vcmBRsnaRK0bwCfkxEMoO97/4UiYQT/Y80fswqS
+VpOaZ1fc8NJu7fFevTfVziyxCirTfHVoJ4wd+24LFzJi9znfxPKNv1pJ3kPvJB5X
+Wxl7EGju9HKw+A7RZ7ZFiLo8WjkD0VgKwyJnQ94wQQR4Kjx6acw/9/QQJhYezpUv
+qW+zmYoahHHqzAP0GwnU9NSMKpgBCUDL+UQs+XBg1v8J6CN/pXxBblaA8K9RCrd9
+ajrLfPvscwsnPDpbZ47jx4AAV1iJWEPvkzBJVSiKc603zhQXE3Zq7AMuNhFCQ/Y=
+=ND8B
+-----END PGP SIGNATURE-----
 
-So I'd suggest to simply drop the usb_legacy_register() calls +
-registered functions from most (all but braille?) devices.
-
-cheers,
-  Gerd
+--ZInfyf7laFu/Kiw7--
