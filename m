@@ -1,22 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35212)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40453)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1eYs6A-0004ih-2B
-	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 06:29:45 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1eYsN2-00035x-Nu
+	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 06:47:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1eYs66-0003Bf-SD
-	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 06:29:42 -0500
-Received: from mga09.intel.com ([134.134.136.24]:54587)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
-	id 1eYs66-0002zJ-Ja
-	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 06:29:38 -0500
-From: Wei Wang <wei.w.wang@intel.com>
-Date: Tue,  9 Jan 2018 19:11:02 +0800
-Message-Id: <1515496262-7533-6-git-send-email-wei.w.wang@intel.com>
-In-Reply-To: <1515496262-7533-1-git-send-email-wei.w.wang@intel.com>
-References: <1515496262-7533-1-git-send-email-wei.w.wang@intel.com>
-Subject: [Qemu-devel] [PATCH v21 5/5] virtio-balloon: don't report free
- pages when page poisoning is enabled
+	(envelope-from <peter.maydell@linaro.org>) id 1eYsMw-0001rE-Pg
+	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 06:47:08 -0500
+Received: from mail-ot0-x22d.google.com ([2607:f8b0:4003:c0f::22d]:43351)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1eYsMw-0001qk-Jb
+	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 06:47:02 -0500
+Received: by mail-ot0-x22d.google.com with SMTP id t28so948369oti.10
+	for <qemu-devel@nongnu.org>; Tue, 09 Jan 2018 03:47:02 -0800 (PST)
+MIME-Version: 1.0
+In-Reply-To: <20180108055348.20444-1-david@gibson.dropbear.id.au>
+References: <20180108055348.20444-1-david@gibson.dropbear.id.au>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 9 Jan 2018 11:46:41 +0000
+Message-ID: <CAFEAcA_vmTqHdjL6QfKtn-Khg2RHBA7Vs3QxreXwe2J_7mhGAQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL 00/12] ppc-for-2.12 queue 20180108
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,66 +28,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: virtio-dev@lists.oasis-open.org, linux-kernel@vger.kernel.org, qemu-devel@nongnu.org, virtualization@lists.linux-foundation.org, kvm@vger.kernel.org, linux-mm@kvack.org, mst@redhat.com, mhocko@kernel.org, akpm@linux-foundation.org, mawilcox@microsoft.com
-Cc: david@redhat.com, penguin-kernel@I-love.SAKURA.ne.jp, cornelia.huck@de.ibm.com, mgorman@techsingularity.net, aarcange@redhat.com, amit.shah@redhat.com, pbonzini@redhat.com, willy@infradead.org, wei.w.wang@intel.com, liliang.opensource@gmail.com, yang.zhang.wz@gmail.com, quan.xu0@gmail.com, nilal@redhat.com, riel@redhat.com
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: surajjs@au1.ibm.com, Greg Kurz <groug@kaod.org>, Michael Roth <mdroth@linux.vnet.ibm.com>, qemu-ppc@nongnu.org, QEMU Developers <qemu-devel@nongnu.org>
 
-The guest free pages should not be discarded by the live migration thread
-when page poisoning is enabled with PAGE_POISONING_NO_SANITY=n, because
-skipping the transfer of such poisoned free pages will trigger false
-positive when new pages are allocated and checked on the destination.
-This patch adds a config field, poison_val. Guest writes to the config
-field to tell the host about the poisoning value. The value will be 0 in
-the following cases:
-1) PAGE_POISONING_NO_SANITY is enabled;
-2) page poisoning is disabled; or
-3) PAGE_POISONING_ZERO is enabled.
+On 8 January 2018 at 05:53, David Gibson <david@gibson.dropbear.id.au> wrote:
+> The following changes since commit 281f327487c9c9b1599f93c589a408bbf4a651b8:
+>
+>   Merge remote-tracking branch 'remotes/vivier/tags/m68k-for-2.12-pull-request' into staging (2017-12-22 00:11:36 +0000)
+>
+> are available in the Git repository at:
+>
+>   git://github.com/dgibson/qemu.git tags/ppc-for-2.12-20180108
+>
+> for you to fetch changes up to 9f173585d3f35345b2facce50620ce2cdda05f2f:
+>
+>   spapr: Correct compatibility mode setting for hotplugged CPUs (2018-01-08 13:33:17 +1100)
+>
+> ----------------------------------------------------------------
+> ppc patch queue 2018-01-08
+>
+> This pull requests supersedes both ppc-for-2.12-20180103 and
+> ppc-for-2.12-20171219.  We've discovered that some substantial
+> extensions to the proposed capabilities infrastructure will be
+> valuable, amongst other things for managing/advertising workarounds
+> for the dreaded Meltdown/Spectre bugs.
+>
+> Although that could be done as follow on changes, since the caps
+> infrastructure hasn't been merged yet, we might as well pull it out
+> while we rework, and just merge the unrelated bugfixes.
+>
+> The last two pull requests apparently had problems on some arm32
+> systems.  I haven't been able to reproduce those, so I have no idea
+> which patch is causing them.  If we get lucky and it was one of the
+> patches I've removed from this series, this may also serve to unjam
+> the other fixes.
 
-Signed-off-by: Wei Wang <wei.w.wang@intel.com>
-Suggested-by: Michael S. Tsirkin <mst@redhat.com>
-Cc: Michal Hocko <mhocko@suse.com>
----
- drivers/virtio/virtio_balloon.c     | 8 ++++++++
- include/uapi/linux/virtio_balloon.h | 2 ++
- 2 files changed, 10 insertions(+)
+This still hangs on my arm32 setup in the migration test. I'll see
+if I can identify what is going wrong.
 
-diff --git a/drivers/virtio/virtio_balloon.c b/drivers/virtio/virtio_balloon.c
-index f7e8830..7429894 100644
---- a/drivers/virtio/virtio_balloon.c
-+++ b/drivers/virtio/virtio_balloon.c
-@@ -859,6 +859,7 @@ static struct file_system_type balloon_fs = {
- static int virtballoon_probe(struct virtio_device *vdev)
- {
- 	struct virtio_balloon *vb;
-+	__u32 poison_val;
- 	int err;
- 
- 	if (!vdev->config->get) {
-@@ -896,6 +897,13 @@ static int virtballoon_probe(struct virtio_device *vdev)
- 					WQ_FREEZABLE | WQ_CPU_INTENSIVE, 0);
- 		INIT_WORK(&vb->report_free_page_work, report_free_page);
- 		vb->stop_cmd_id = VIRTIO_BALLOON_FREE_PAGE_REPORT_STOP_ID;
-+		if (IS_ENABLED(CONFIG_PAGE_POISONING_NO_SANITY) ||
-+		    !page_poisoning_enabled())
-+			poison_val = 0;
-+		else
-+			poison_val = PAGE_POISON;
-+		virtio_cwrite(vb->vdev, struct virtio_balloon_config,
-+			      poison_val, &poison_val);
- 	}
- 
- 	vb->nb.notifier_call = virtballoon_oom_notify;
-diff --git a/include/uapi/linux/virtio_balloon.h b/include/uapi/linux/virtio_balloon.h
-index 58f1274..f270e9e 100644
---- a/include/uapi/linux/virtio_balloon.h
-+++ b/include/uapi/linux/virtio_balloon.h
-@@ -48,6 +48,8 @@ struct virtio_balloon_config {
- 	__u32 actual;
- 	/* Free page report command id, readonly by guest */
- 	__u32 free_page_report_cmd_id;
-+	/* Stores PAGE_POISON if page poisoning with sanity check is in use */
-+	__u32 poison_val;
- };
- 
- #define VIRTIO_BALLOON_S_SWAP_IN  0   /* Amount of memory swapped in */
--- 
-2.7.4
+thanks
+-- PMM
