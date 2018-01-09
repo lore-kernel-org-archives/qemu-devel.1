@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41204)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41881)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1eZ1O1-0005aD-DR
-	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 16:24:46 -0500
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1eZ1PN-0006cC-D4
+	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 16:26:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1eZ1O0-0004yt-OC
-	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 16:24:45 -0500
-Received: from hera.aquilenet.fr ([2a0c:e300::1]:43948)
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1eZ1PM-0006OV-LX
+	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 16:26:09 -0500
+Received: from hera.aquilenet.fr ([2a0c:e300::1]:43968)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <samuel.thibault@ens-lyon.org>)
-	id 1eZ1O0-0004yA-FB
-	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 16:24:44 -0500
-Date: Tue, 9 Jan 2018 22:24:41 +0100
+	id 1eZ1PM-0006Nl-DL
+	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 16:26:08 -0500
+Date: Tue, 9 Jan 2018 22:26:05 +0100
 From: Samuel Thibault <samuel.thibault@gnu.org>
-Message-ID: <20180109212441.vrellvv2raxk2yve@var.youpi.perso.aquilenet.fr>
+Message-ID: <20180109212605.xoiix534skxtr5ib@var.youpi.perso.aquilenet.fr>
 References: <20180108172904.8772-1-f4bug@amsat.org>
-	<20180108172904.8772-9-f4bug@amsat.org>
-	<52654e3d-15cb-4225-d52a-a529c975c1a4@redhat.com>
+	<20180108172904.8772-10-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <52654e3d-15cb-4225-d52a-a529c975c1a4@redhat.com>
+In-Reply-To: <20180108172904.8772-10-f4bug@amsat.org>
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 08/12] slirp: removed unused code
+Subject: Re: [Qemu-devel] [PATCH 09/12] slirp: add in6_dhcp_multicast()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,43 +29,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Jan Kiszka <jan.kiszka@siemens.com>, "Michael S . Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Cc: Jan Kiszka <jan.kiszka@siemens.com>, "Michael S . Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Eric Blake <eblake@redhat.com>, Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
 
-Thomas Huth, on lun. 08 janv. 2018 20:02:14 +0100, wrote:
-> On 08.01.2018 18:29, Philippe Mathieu-Daud=C3=A9 wrote:
-> > Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-> > ---
-> >  slirp/ip.h | 13 -------------
-> >  1 file changed, 13 deletions(-)
-> >=20
-> > diff --git a/slirp/ip.h b/slirp/ip.h
-> > index e29ccd3c9f..71c3642cfe 100644
-> > --- a/slirp/ip.h
-> > +++ b/slirp/ip.h
-> > @@ -233,17 +233,4 @@ struct	ipasfrag {
-> >  #define ipf_next     ipf_link.next
-> >  #define ipf_prev     ipf_link.prev
-> > =20
-> > -/*
-> > - * Structure stored in mbuf in inpcb.ip_options
-> > - * and passed to ip_output when ip options are in use.
-> > - * The actual length of the options (including ipopt_dst)
-> > - * is in m_len.
-> > - */
-> > -#define MAX_IPOPTLEN	40
-> > -
-> > -struct ipoption {
-> > -	struct	in_addr ipopt_dst;	/* first-hop dst if source routed */
-> > -	int8_t	ipopt_list[MAX_IPOPTLEN];	/* options proper */
-> > -} QEMU_PACKED;
-> > -
-> >  #endif
-> >=20
->=20
-> Reviewed-by: Thomas Huth <thuth@redhat.com>
+Philippe Mathieu-Daud=C3=A9, on lun. 08 janv. 2018 14:29:01 -0300, wrote:
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 
 Applied to my tree.
 
 Thanks,
 Samuel
+
+> ---
+>  slirp/dhcpv6.h | 3 +++
+>  slirp/udp6.c   | 2 +-
+>  2 files changed, 4 insertions(+), 1 deletion(-)
+>=20
+> diff --git a/slirp/dhcpv6.h b/slirp/dhcpv6.h
+> index 9189cd3f2d..3373f6cb89 100644
+> --- a/slirp/dhcpv6.h
+> +++ b/slirp/dhcpv6.h
+> @@ -17,6 +17,9 @@
+>                              0x00, 0x00, 0x00, 0x00,\
+>                              0x00, 0x01, 0x00, 0x02 } }
+> =20
+> +#define in6_dhcp_multicast(a)\
+> +    in6_equal(a, &(struct in6_addr)ALLDHCP_MULTICAST)
+> +
+>  void dhcpv6_input(struct sockaddr_in6 *srcsas, struct mbuf *m);
+> =20
+>  #endif
+> diff --git a/slirp/udp6.c b/slirp/udp6.c
+> index 9fa314bc2d..7c4a6b003a 100644
+> --- a/slirp/udp6.c
+> +++ b/slirp/udp6.c
+> @@ -65,7 +65,7 @@ void udp6_input(struct mbuf *m)
+>      /* handle DHCPv6 */
+>      if (ntohs(uh->uh_dport) =3D=3D DHCPV6_SERVER_PORT &&
+>          (in6_equal(&ip->ip_dst, &slirp->vhost_addr6) ||
+> -         in6_equal(&ip->ip_dst, &(struct in6_addr)ALLDHCP_MULTICAST)))=
+ {
+> +         in6_dhcp_multicast(&ip->ip_dst))) {
+>          m->m_data +=3D iphlen;
+>          m->m_len -=3D iphlen;
+>          dhcpv6_input(&lhost, m);
+> --=20
+> 2.15.1
+>=20
+
+--=20
+Samuel
+ Cr=C3=A9er une hi=C3=A9rarchie supplementaire pour remedier =C3=A0 un pr=
+obl=C3=A8me (?) de
+ dispersion est d'une logique digne des Shadocks.
+ * BT in: Guide du Cabaliste Usenet - La Cabale vote oui (les Shadocks au=
+ssi) *
