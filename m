@@ -1,28 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33619)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35025)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1eYtKU-0002OC-2t
-	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 07:48:35 -0500
+	(envelope-from <cohuck@redhat.com>) id 1eYtNT-0004fx-0B
+	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 07:51:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1eYtKQ-0001d7-To
-	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 07:48:34 -0500
-Received: from 3.mo5.mail-out.ovh.net ([46.105.40.108]:46610)
+	(envelope-from <cohuck@redhat.com>) id 1eYtNP-0004ak-Se
+	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 07:51:39 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:60057)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1eYtKQ-0001Vw-Jq
-	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 07:48:30 -0500
-Received: from player760.ha.ovh.net (b6.ovh.net [213.186.33.56])
-	by mo5.mail-out.ovh.net (Postfix) with ESMTP id 2EC89164FA2
-	for <qemu-devel@nongnu.org>; Tue,  9 Jan 2018 13:48:21 +0100 (CET)
-Date: Tue, 9 Jan 2018 13:48:13 +0100
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20180109134813.01283a04@bahia.lan>
-In-Reply-To: <20180106004722.1152-2-joserz@linux.vnet.ibm.com>
-References: <20180106004722.1152-1-joserz@linux.vnet.ibm.com>
-	<20180106004722.1152-2-joserz@linux.vnet.ibm.com>
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1eYtNP-0004Zl-JS
+	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 07:51:35 -0500
+Date: Tue, 9 Jan 2018 13:51:25 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20180109135125.2b3a511e.cohuck@redhat.com>
+In-Reply-To: <20180109110833.GA5975@yuvallap>
+References: <20180107123224.100877-1-marcel@redhat.com>
+	<20180107123224.100877-5-marcel@redhat.com>
+	<20180109113911.1746995b.cohuck@redhat.com>
+	<20180109110833.GA5975@yuvallap>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH 1/1] spapr: Check SMT based on
- KVM_CAP_PPC_SMT_POSSIBLE
+Subject: Re: [Qemu-devel] [PATCH V6 4/5] pvrdma: initial implementation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,172 +29,165 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jose Ricardo Ziviani <joserz@linux.vnet.ibm.com>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, david@gibson.dropbear.id.au
+To: Yuval Shaia <yuval.shaia@oracle.com>
+Cc: Marcel Apfelbaum <marcel@redhat.com>, qemu-devel@nongnu.org, ehabkost@redhat.com, imammedo@redhat.com, pbonzini@redhat.com, mst@redhat.com, borntraeger@de.ibm.com
 
-On Fri,  5 Jan 2018 22:47:22 -0200
-Jose Ricardo Ziviani <joserz@linux.vnet.ibm.com> wrote:
+On Tue, 9 Jan 2018 13:08:33 +0200
+Yuval Shaia <yuval.shaia@oracle.com> wrote:
 
-> Power9 supports 4 HW threads/core but it's possible to emulate
-> doorbells to implement virtual SMT. KVM has the KVM_CAP_PPC_SMT_POSSIBLE
-> which returns a bitmap with all SMT modes supported by the host.
+> On Tue, Jan 09, 2018 at 11:39:11AM +0100, Cornelia Huck wrote:
+> > On Sun,  7 Jan 2018 14:32:23 +0200
+> > Marcel Apfelbaum <marcel@redhat.com> wrote:
+
+> > > diff --git a/hw/rdma/vmw/pvrdma_dev_api.h b/hw/rdma/vmw/pvrdma_dev_api.h
+> > > new file mode 100644
+> > > index 0000000000..bf1986a976
+> > > --- /dev/null
+> > > +++ b/hw/rdma/vmw/pvrdma_dev_api.h
+> > > @@ -0,0 +1,602 @@
+> > > +/*
+> > > + * QEMU VMWARE paravirtual RDMA device definitions
+> > > + *
+> > > + * Copyright (C) 2018 Oracle
+> > > + * Copyright (C) 2018 Red Hat Inc
+> > > + *
+> > > + * Authors:
+> > > + *     Yuval Shaia <yuval.shaia@oracle.com>
+> > > + *     Marcel Apfelbaum <marcel@redhat.com>
+> > > + *
+> > > + * This work is licensed under the terms of the GNU GPL, version 2.
+> > > + * See the COPYING file in the top-level directory.
+> > > + *
+> > > + */
+> > > +
+> > > +#ifndef PVRDMA_DEV_API_H
+> > > +#define PVRDMA_DEV_API_H
+> > > +
+> > > +/*
+> > > + * Following is an interface definition for PVRDMA device as provided by
+> > > + * VMWARE.
+> > > + * See original copyright from Linux kernel v4.14.5 header file
+> > > + * drivers/infiniband/hw/vmw_pvrdma/pvrdma_dev_api.h  
+> > 
+> > Could that file be exported as UAPI in the kernel and added to the
+> > linux-headers script?  
 > 
-> Today, QEMU forces the SMT mode based on PVR compat table, this is
-> silently done in spapr_fixup_cpu_dt. Then, if user passes thread=8 the
-> guest will end up with 4 threads/core without any feedback to the user.
-> It is confusing and will crash QEMU if a cpu is hotplugged in that
-> guest.
+> We took this approach as apposed to kernel-headers with the following on
+> our mind:
+> (1) This is the convention used in vmxnet3.
+> (2) vmw_pvrdma was introduced only lately, taking the kernel-headers
+> approach will force specific kernel on a host in order to compile QEMU.
+
+qemu will get the kernel headers once from the upstream kernel and then
+will be able to be built everywhere.
+
+> (3) To support VMWare's pvrdma device we took a snapshot of existing
+> driver/device settings and breezed there. This is driver/device API and we
+> can't allow our self to chase VMWare's tail whenever they are changing the
+> API. Just consider a case where they will change for example the ARM bit.
+
+But as want to enable the existing device driver, you'll want to be
+able to produce a compatible device anyway, don't you? Also, wouldn't
+VMWare break older kernels if they suddenly changed the api?
+
+[Also, is there a canonical reference for this API?]
+
 > 
-> This patch makes use of KVM_CAP_PPC_SMT_POSSIBLE to check if the host
-> supports the SMT mode so it allows Power9 guests to have 8 threads/core
-> if desired.
+> Just IMHO.
 > 
-> Reported-by: Satheesh Rajendran <satheera@in.ibm.com>
-> Signed-off-by: Jose Ricardo Ziviani <joserz@linux.vnet.ibm.com>
-> ---
-
-Hi,
-
-I agree with the general idea but I have a few questions.
-
-The MIN(smp_threads, ppc_compat_max_threads(cpu)) computation is
-performed in spapr_fixup_cpu_dt() at CAS, but it is also performed
-in spapr_populate_cpu_dt() at machine reset or when a CPU is added.
-
-Shouldn't your patch address the latter as well ?
-
->  hw/ppc/spapr.c       | 14 +++++++++++++-
->  hw/ppc/trace-events  |  1 +
->  target/ppc/kvm.c     |  5 +++++
->  target/ppc/kvm_ppc.h |  6 ++++++
->  4 files changed, 25 insertions(+), 1 deletion(-)
+> > 
+> > (...)
+> >   
+> > > diff --git a/hw/rdma/vmw/pvrdma_ib_verbs.h b/hw/rdma/vmw/pvrdma_ib_verbs.h
+> > > new file mode 100644
+> > > index 0000000000..cf1430024b
+> > > --- /dev/null
+> > > +++ b/hw/rdma/vmw/pvrdma_ib_verbs.h
+> > > @@ -0,0 +1,433 @@
+> > > +/*
+> > > + * QEMU VMWARE paravirtual RDMA device definitions
+> > > + *
+> > > + * Copyright (C) 2018 Oracle
+> > > + * Copyright (C) 2018 Red Hat Inc
+> > > + *
+> > > + * Authors:
+> > > + *     Yuval Shaia <yuval.shaia@oracle.com>
+> > > + *     Marcel Apfelbaum <marcel@redhat.com>
+> > > + *
+> > > + * This work is licensed under the terms of the GNU GPL, version 2.
+> > > + * See the COPYING file in the top-level directory.
+> > > + *
+> > > + */
+> > > +
+> > > +#ifndef PVRDMA_IB_VERBS_H
+> > > +#define PVRDMA_IB_VERBS_H
+> > > +
+> > > +/*
+> > > + * VMWARE headers we got from Linux kernel do not fully comply QEMU coding
+> > > + * standards in sense of types and defines used.
+> > > + * Since we didn't want to change VMWARE code, following set of typedefs
+> > > + * and defines needed to compile these headers with QEMU introduced.
+> > > + */
+> > > +
+> > > +#define u8     uint8_t
+> > > +#define u16    unsigned short
+> > > +#define u32    uint32_t
+> > > +#define u64    uint64_t  
+> > 
+> > I think the headers update already takes care of some conversions.
+> > Otherwise, same comment as for the header above.  
 > 
-> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> index d1acfe8858..ea2503cd2f 100644
-> --- a/hw/ppc/spapr.c
-> +++ b/hw/ppc/spapr.c
-> @@ -345,7 +345,19 @@ static int spapr_fixup_cpu_dt(void *fdt, sPAPRMachineState *spapr)
->          PowerPCCPU *cpu = POWERPC_CPU(cs);
->          DeviceClass *dc = DEVICE_GET_CLASS(cs);
->          int index = spapr_vcpu_id(cpu);
-> -        int compat_smt = MIN(smp_threads, ppc_compat_max_threads(cpu));
+> Sorry, i'm not following, can you elaborate on that?
 
-Considering that we have:
+There's some post processing done by the headers update. But I think
+you'd need to use __u8 and friends for an exported header anyway.
 
-int ppc_compat_max_threads(PowerPCCPU *cpu)
-{
-    const CompatInfo *compat = compat_by_pvr(cpu->compat_pvr);
-    int n_threads = CPU(cpu)->nr_threads;
+> 
+> >   
+> > > +
+> > > +/*
+> > > + * Following is an interface definition for PVRDMA device as provided by
+> > > + * VMWARE.
+> > > + * See original copyright from Linux kernel v4.14.5 header file
+> > > + * drivers/infiniband/hw/vmw_pvrdma/pvrdma_verbs.h
+> > > + */  
+> > 
+> > (...)
+> >   
+> > > diff --git a/hw/rdma/vmw/vmw_pvrdma-abi.h b/hw/rdma/vmw/vmw_pvrdma-abi.h
+> > > new file mode 100644
+> > > index 0000000000..8cfb9d7745
+> > > --- /dev/null
+> > > +++ b/hw/rdma/vmw/vmw_pvrdma-abi.h
+> > > @@ -0,0 +1,311 @@
+> > > +/*
+> > > + * QEMU VMWARE paravirtual RDMA device definitions
+> > > + *
+> > > + * Copyright (C) 2018 Oracle
+> > > + * Copyright (C) 2018 Red Hat Inc
+> > > + *
+> > > + * Authors:
+> > > + *     Yuval Shaia <yuval.shaia@oracle.com>
+> > > + *     Marcel Apfelbaum <marcel@redhat.com>
+> > > + *
+> > > + * This work is licensed under the terms of the GNU GPL, version 2.
+> > > + * See the COPYING file in the top-level directory.
+> > > + *
+> > > + */
+> > > +
+> > > +#ifndef VMW_PVRDMA_ABI_H
+> > > +#define VMW_PVRDMA_ABI_H
+> > > +
+> > > +/*
+> > > + * Following is an interface definition for PVRDMA device as provided by
+> > > + * VMWARE.
+> > > + * See original copyright from Linux kernel v4.14.5 header file
+> > > + * include/uapi/rdma/vmw_pvrdma-abi.h
+> > > + */  
+> > 
+> > This one is already exported.  
+> 
+> Same argument as above.
 
-    if (cpu->compat_pvr) {
-        g_assert(compat);
-        n_threads = MIN(n_threads, compat->max_threads);
-    }
-
-    return n_threads;
-}
-
-and
-
-void qemu_init_vcpu(CPUState *cpu)
-{
-    cpu->nr_cores = smp_cores;
-    cpu->nr_threads = smp_threads;
-...
-}
-
-ppc_compat_max_threads() already returns the smaller value of
-smp_threads and the maximum number of HW threads for the PVR.
-
-I don't quite understand why we had this compat_smt calculation
-in the first place...
-
-> +
-> +        /* set smt to maximum for this current pvr if the number
-> +         * passed is higher than defined by PVR compat mode AND
-> +         * if KVM cannot emulate it.*/
-> +        int compat_smt = smp_threads;
-> +        if ((kvmppc_cap_smt_possible() & smp_threads) != smp_threads &&
-> +                smp_threads > ppc_compat_max_threads(cpu)) {
-> +            compat_smt = ppc_compat_max_threads(cpu);
-> +
-> +            trace_spapr_fixup_cpu_smt(index, smp_threads,
-> +                    kvmppc_cap_smt_possible(),
-> +                    ppc_compat_max_threads(cpu));
-> +        }
-
-... so I'm wondering if the above shouldn't be performed in
-ppc_compat_max_threads() directly ? 
-
->  
->          if ((index % smt) != 0) {
->              continue;
-> diff --git a/hw/ppc/trace-events b/hw/ppc/trace-events
-> index b7c3e64b5e..a8e29d7ab1 100644
-> --- a/hw/ppc/trace-events
-> +++ b/hw/ppc/trace-events
-> @@ -16,6 +16,7 @@ spapr_irq_alloc(int irq) "irq %d"
->  spapr_irq_alloc_block(int first, int num, bool lsi, int align) "first irq %d, %d irqs, lsi=%d, alignnum %d"
->  spapr_irq_free(int src, int irq, int num) "Source#%d, first irq %d, %d irqs"
->  spapr_irq_free_warn(int src, int irq) "Source#%d, irq %d is already free"
-> +spapr_fixup_cpu_smt(int idx, int smpt, int kvmt, int pvrt) "CPU(%d): expected smt %d, kvm support %d, max smt pvr %d"
->  
->  # hw/ppc/spapr_hcall.c
->  spapr_cas_pvr_try(uint32_t pvr) "0x%x"
-> diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
-> index 518dd06e98..aac5667bf4 100644
-> --- a/target/ppc/kvm.c
-> +++ b/target/ppc/kvm.c
-> @@ -2456,6 +2456,11 @@ bool kvmppc_has_cap_mmu_hash_v3(void)
->      return cap_mmu_hash_v3;
->  }
->  
-> +int kvmppc_cap_smt_possible(void)
-> +{
-> +    return cap_ppc_smt_possible;
-> +}
-> +
->  PowerPCCPUClass *kvm_ppc_get_host_cpu_class(void)
->  {
->      uint32_t host_pvr = mfpvr();
-> diff --git a/target/ppc/kvm_ppc.h b/target/ppc/kvm_ppc.h
-> index ecb55493cc..6ac33d2b4a 100644
-> --- a/target/ppc/kvm_ppc.h
-> +++ b/target/ppc/kvm_ppc.h
-> @@ -59,6 +59,7 @@ bool kvmppc_has_cap_fixup_hcalls(void);
->  bool kvmppc_has_cap_htm(void);
->  bool kvmppc_has_cap_mmu_radix(void);
->  bool kvmppc_has_cap_mmu_hash_v3(void);
-> +int kvmppc_cap_smt_possible(void);
->  int kvmppc_enable_hwrng(void);
->  int kvmppc_put_books_sregs(PowerPCCPU *cpu);
->  PowerPCCPUClass *kvm_ppc_get_host_cpu_class(void);
-> @@ -290,6 +291,11 @@ static inline bool kvmppc_has_cap_mmu_hash_v3(void)
->      return false;
->  }
->  
-> +static inline int kvmppc_cap_smt_possible(void)
-> +{
-> +    return -1;
-
-When CONFIG_KVM is set, the semantics of kvmppc_cap_smt_possible() is:
-- a bitmap with supported SMT modes if KVM has KVM_CAP_PPC_SMT_POSSIBLE
-- 0 if KVM doesn't have KVM_CAP_PPC_SMT_POSSIBLE or we're running in
-  TCG mode
-
-so it looks a bit weird to return -1 when CONFIG_KVM isn't set (when
-running in TCG mode, we would get different values depending on how
-the QEMU binary was compiled).
-
-Shouldn't this stub return 0 instead ?
-
-Cheers,
-
---
-Greg
-
-> +}
-> +
->  static inline int kvmppc_enable_hwrng(void)
->  {
->      return -1;
+Well, I sure hope VMWare is not planning to change an exported ABI in
+an incompatible way...
