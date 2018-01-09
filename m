@@ -1,22 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55165)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55916)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eYyQ5-00052r-UQ
-	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 13:14:43 -0500
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1eYySL-0006FS-FB
+	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 13:17:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eYyQ4-0002e5-Tg
-	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 13:14:41 -0500
-References: <20180108030946.14991-1-famz@redhat.com>
-	<8c75f873-421d-4e26-d555-ad30b350ea1d@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <76ded786-48fb-de4d-5513-c6ec30a8a2a8@redhat.com>
-Date: Tue, 9 Jan 2018 12:14:27 -0600
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1eYySK-0004YP-G5
+	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 13:17:01 -0500
 MIME-Version: 1.0
-In-Reply-To: <8c75f873-421d-4e26-d555-ad30b350ea1d@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="Dg7akIU3npv86di8aojq9HW1zbcS1YbLW"
-Subject: Re: [Qemu-devel] [PATCH] scsi: Don't check uninitialized local
- variable
+Sender: philippe.mathieu.daude@gmail.com
+In-Reply-To: <60c89dbec86c14e2f0883d121872d0f6@walle.cc>
+References: <20180103162400.10396-1-f4bug@amsat.org>
+	<20180103162400.10396-3-f4bug@amsat.org>
+	<60c89dbec86c14e2f0883d121872d0f6@walle.cc>
+From: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Date: Tue, 9 Jan 2018 15:16:58 -0300
+Message-ID: <CAAdtpL7bno=1yrRYK6zt4pgDsa8N-8d291pzX0rhNBVqgkKi4g@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 2/6] hw/sd/milkymist-memcard: split
+ realize() out of SysBusDevice init()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,81 +28,146 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
-Cc: Peter Lieven <pl@kamp.de>, qemu-block@nongnu.org
+To: Michael Walle <michael@walle.cc>
+Cc: Alistair Francis <alistair.francis@xilinx.com>, Peter Maydell <peter.maydell@linaro.org>, Xiaoqiang Zhao <zxq_yx_007@163.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, qemu-arm <qemu-arm@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---Dg7akIU3npv86di8aojq9HW1zbcS1YbLW
-From: Eric Blake <eblake@redhat.com>
-To: Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <famz@redhat.com>,
- qemu-devel@nongnu.org
-Cc: Peter Lieven <pl@kamp.de>, qemu-block@nongnu.org
-Message-ID: <76ded786-48fb-de4d-5513-c6ec30a8a2a8@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] scsi: Don't check uninitialized local
- variable
-References: <20180108030946.14991-1-famz@redhat.com>
- <8c75f873-421d-4e26-d555-ad30b350ea1d@redhat.com>
-In-Reply-To: <8c75f873-421d-4e26-d555-ad30b350ea1d@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Hi Michael,
 
-On 01/09/2018 12:05 PM, Paolo Bonzini wrote:
-> On 08/01/2018 04:09, Fam Zheng wrote:
->> After the out label there is a check on iTask.task but it is not
->> initialized yet.
+> Am 2018-01-03 17:23, schrieb Philippe Mathieu-Daud=C3=A9:
 >>
->> Fixes: e38bc23454ef763deb4405ebdee6a1081aa00bc8
->> Signed-off-by: Fam Zheng <famz@redhat.com>
+>> Create the SDCard in the realize() function.
+>>
+>> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 >> ---
->>  block/iscsi.c | 3 +--
->>  1 file changed, 1 insertion(+), 2 deletions(-)
+>>  hw/sd/milkymist-memcard.c | 24 +++++++++++++++---------
+>>  1 file changed, 15 insertions(+), 9 deletions(-)
 >>
->> diff --git a/block/iscsi.c b/block/iscsi.c
->> index 5c0a9e55b6..1cb8cc93c5 100644
->> --- a/block/iscsi.c
->> +++ b/block/iscsi.c
->> @@ -659,8 +659,7 @@ static int64_t coroutine_fn iscsi_co_get_block_sta=
-tus(BlockDriverState *bs,
->>      int64_t ret;
->> =20
->>      if (!is_sector_request_lun_aligned(sector_num, nb_sectors, iscsil=
-un)) {
->> -        ret =3D -EINVAL;
->> -        goto out;
->> +        return -EINVAL;
+>> diff --git a/hw/sd/milkymist-memcard.c b/hw/sd/milkymist-memcard.c
+>> index 5de3e00e2f..5df3a0f815 100644
+>> --- a/hw/sd/milkymist-memcard.c
+>> +++ b/hw/sd/milkymist-memcard.c
+>> @@ -255,24 +255,29 @@ static void milkymist_memcard_reset(DeviceState *d=
+)
+>>  static int milkymist_memcard_init(SysBusDevice *dev)
+>>  {
+>>      MilkymistMemcardState *s =3D MILKYMIST_MEMCARD(dev);
+>> -    DriveInfo *dinfo;
+>> +
+>> +    memory_region_init_io(&s->regs_region, OBJECT(s), &memcard_mmio_ops=
+,
+>> s,
+>> +            "milkymist-memcard", R_MAX * 4);
+>> +    sysbus_init_mmio(dev, &s->regs_region);
+>> +
+>> +    return 0;
+>> +}
+>
+>
+> Creating the device (milkymist_memcard_create()) fails with an assertion:
+>   sysbus_mmio_map_common: Assertion `n >=3D 0 && n < dev->num_mmio' faile=
+d.
+
+Thanks for trying this.
+
+Odd 'make check-qtest-lm32' didn't catch this...
+
+> because dev->num_mmio is still 0. Seems that sysbus_init_mmio() hasn't be=
+en
+> called yet. Do we have to move the milkymist_memcard_init() to
+> .instance_init?
+
+Your patch seems correct :)
+
+Do you have some milky one prebuilt image that I can use for testing?
+
+Regards,
+
+Phil.
+
+>
+> Eg.
+>
+> diff --git a/hw/sd/milkymist-memcard.c b/hw/sd/milkymist-memcard.c
+> index 5df3a0f815..21c0e91926 100644
+> --- a/hw/sd/milkymist-memcard.c
+> +++ b/hw/sd/milkymist-memcard.c
+> @@ -252,15 +252,14 @@ static void milkymist_memcard_reset(DeviceState *d)
+>      }
+>  }
+>
+> -static int milkymist_memcard_init(SysBusDevice *dev)
+> +static void milkymist_memcard_init(Object *obj)
+>  {
+> -    MilkymistMemcardState *s =3D MILKYMIST_MEMCARD(dev);
+> +    MilkymistMemcardState *s =3D MILKYMIST_MEMCARD(obj);
+> +    SysBusDevice *dev =3D SYS_BUS_DEVICE(obj);
+>
+>      memory_region_init_io(&s->regs_region, OBJECT(s), &memcard_mmio_ops,=
+ s,
+>              "milkymist-memcard", R_MAX * 4);
+>      sysbus_init_mmio(dev, &s->regs_region);
+> -
+> -    return 0;
+>  }
+>
+>  static void milkymist_memcard_realize(DeviceState *dev, Error **errp)
+> @@ -300,9 +299,7 @@ static const VMStateDescription
+> vmstate_milkymist_memcard =3D {
+>  static void milkymist_memcard_class_init(ObjectClass *klass, void *data)
+>  {
+>      DeviceClass *dc =3D DEVICE_CLASS(klass);
+> -    SysBusDeviceClass *k =3D SYS_BUS_DEVICE_CLASS(klass);
+>
+> -    k->init =3D milkymist_memcard_init;
+>      dc->realize =3D milkymist_memcard_realize;
+>      dc->reset =3D milkymist_memcard_reset;
+>      dc->vmsd =3D &vmstate_milkymist_memcard;
+> @@ -314,6 +311,7 @@ static const TypeInfo milkymist_memcard_info =3D {
+>      .name          =3D TYPE_MILKYMIST_MEMCARD,
+>      .parent        =3D TYPE_SYS_BUS_DEVICE,
+>      .instance_size =3D sizeof(MilkymistMemcardState),
+> +    .instance_init =3D milkymist_memcard_init,
+>      .class_init    =3D milkymist_memcard_class_init,
+>  };
+>
+> -michael
+>
+>
+>> +
+>> +static void milkymist_memcard_realize(DeviceState *dev, Error **errp)
+>> +{
+>> +    MilkymistMemcardState *s =3D MILKYMIST_MEMCARD(dev);
+>>      BlockBackend *blk;
+>> +    DriveInfo *dinfo;
+>>
+>>      /* FIXME use a qdev drive property instead of drive_get_next() */
+>>      dinfo =3D drive_get_next(IF_SD);
+>>      blk =3D dinfo ? blk_by_legacy_dinfo(dinfo) : NULL;
+>>      s->card =3D sd_init(blk, false);
+>>      if (s->card =3D=3D NULL) {
+>> -        return -1;
+>> +        error_setg(errp, "failed to init SD card");
+>> +        return;
 >>      }
->> =20
->>      /* default to all sectors allocated */
+>> -
+>>      s->enabled =3D blk && blk_is_inserted(blk);
+>> -
+>> -    memory_region_init_io(&s->regs_region, OBJECT(s), &memcard_mmio_ops=
+,
+>> s,
+>> -            "milkymist-memcard", R_MAX * 4);
+>> -    sysbus_init_mmio(dev, &s->regs_region);
+>> -
+>> -    return 0;
+>>  }
 >>
->=20
-> Queued, thanks.
-
-I thought we wanted Peter's version, not Fam's.
-https://lists.gnu.org/archive/html/qemu-devel/2018-01/msg01237.html
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---Dg7akIU3npv86di8aojq9HW1zbcS1YbLW
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlpVBoMACgkQp6FrSiUn
-Q2qRFwf+IKZdCkzaoOUatLagVII1JCVFzsM/B5zHTL1QQdvPHllDuL34LZus9uzu
-94dhV/+DcDdvPBG+aS6wZMJjNvwrYaZeiH1/cgiNqS9e5jKEK/oy3pJff2S3r5GZ
-IXom1ThpKYgVklv03LcehAxnFzDQbfN9KVeXhAKjpArnlP9/6rVe2URt7UfbsTNY
-9MPlWPsO+N2HA8o16szPH2lD87Sy1yXPmo/4T4Due4uKctuoJnd7BEmrURBPottD
-uvgMTstwNvB14e/2WacVITWQBcQPMQkd3mbymlsOQvHMQ8lqEJkkyg3eN2Lv5kOH
-CiSGSjlJVOocvJ0g39GsUygGbI+PAQ==
-=WGUh
------END PGP SIGNATURE-----
-
---Dg7akIU3npv86di8aojq9HW1zbcS1YbLW--
+>>  static const VMStateDescription vmstate_milkymist_memcard =3D {
+>> @@ -298,6 +303,7 @@ static void
+>> milkymist_memcard_class_init(ObjectClass *klass, void *data)
+>>      SysBusDeviceClass *k =3D SYS_BUS_DEVICE_CLASS(klass);
+>>
+>>      k->init =3D milkymist_memcard_init;
+>> +    dc->realize =3D milkymist_memcard_realize;
+>>      dc->reset =3D milkymist_memcard_reset;
+>>      dc->vmsd =3D &vmstate_milkymist_memcard;
+>>      /* Reason: init() method uses drive_get_next() */
