@@ -1,22 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55755)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59239)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1eYvMv-0001HC-S0
-	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 09:59:14 -0500
+	(envelope-from <stefanha@gmail.com>) id 1eYvY2-0005jE-9E
+	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 10:10:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1eYvMs-0007Fy-QG
-	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 09:59:13 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:43356)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1eYvMs-0007FT-JV
-	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 09:59:10 -0500
-Date: Tue, 9 Jan 2018 16:59:03 +0200
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <1515509463-2675-1-git-send-email-mst@redhat.com>
+	(envelope-from <stefanha@gmail.com>) id 1eYvXz-0006tJ-5Y
+	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 10:10:42 -0500
+Received: from mail-wm0-x22a.google.com ([2a00:1450:400c:c09::22a]:33442)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1eYvXy-0006sI-Uf
+	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 10:10:39 -0500
+Received: by mail-wm0-x22a.google.com with SMTP id 123so1355918wme.0
+	for <qemu-devel@nongnu.org>; Tue, 09 Jan 2018 07:10:38 -0800 (PST)
+Date: Tue, 9 Jan 2018 15:10:35 +0000
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20180109151035.GA1197@stefanha-x1.localdomain>
+References: <1515433816-5700-1-git-send-email-mst@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="AhhlLboLdkugWU4S"
 Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v2] isa/piix: move to mips malta
+In-Reply-To: <1515433816-5700-1-git-send-email-mst@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 1/2] vhost-user: factor out msg head and
+ payload
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,42 +30,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Aurelien Jarno <aurelien@aurel32.net>, Yongbok Kim <yongbok.kim@mips.com>, =?utf-8?B?SGVydsOp?= Poussineau <hpoussin@reactos.org>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Michael Tokarev <mjt@tls.msk.ru>, Thomas Huth <thuth@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Markus Armbruster <armbru@redhat.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-This device is only used on mips malta, move it to the maintainer
-that's actually testing it.
 
-Cc: Aurelien Jarno <aurelien@aurel32.net>
-Cc: Yongbok Kim <yongbok.kim@mips.com>
-Cc: Herv=C3=A9 Poussineau <hpoussin@reactos.org>
-Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
----
+--AhhlLboLdkugWU4S
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-Aurelien, pls feel free to merge this or v1.
+On Mon, Jan 08, 2018 at 07:50:38PM +0200, Michael S. Tsirkin wrote:
+>  static VhostUserMsg m __attribute__ ((unused));
 
- MAINTAINERS | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Can m be dropped now?
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 0255113..0b8a5e7 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -641,6 +641,7 @@ Malta
- M: Aurelien Jarno <aurelien@aurel32.net>
- S: Maintained
- F: hw/mips/mips_malta.c
-+F: hw/isa/piix4.c
-=20
- Mipssim
- M: Yongbok Kim <yongbok.kim@mips.com>
-@@ -849,7 +850,6 @@ F: hw/pci-host/q35.c
- F: hw/pci-host/pam.c
- F: include/hw/pci-host/q35.h
- F: include/hw/pci-host/pam.h
--F: hw/isa/piix4.c
- F: hw/isa/lpc_ich9.c
- F: hw/i2c/smbus_ich9.c
- F: hw/acpi/piix4.c
---=20
-MST
+--AhhlLboLdkugWU4S
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJaVNtrAAoJEJykq7OBq3PIG9wH/R6QPzGR6fSLlKQ04M73HHtH
+INr518ifkUo+y9Fmxz0Kvn7lgOvwnM0feNlbL+CxuNNaE9iihO7Mu5sTIbmzBV62
+9EdHq2OVdVKd71nWdcyMJYf8yDZrx97YLPelrQ6QeD0hFcSy5QzMInzl0jojuiiT
+U9mUX2vzqwgM2dhuG2OA252W1RXhgGhaZHTJYIz/pmIkTIe58RTb0grjxTJZeg0n
+blz9/y9shKbOc58NtNItTKxuU08QNTl9m/ukJSkLA2c3BQenWDTQeAEHiMFEaTdE
+ru/f/b3JFuBfuRld0BdL1ziuLu2Jcm/OHr9cpOICnL30g3cVEJ0ipnJoTBFg3/g=
+=SXGA
+-----END PGP SIGNATURE-----
+
+--AhhlLboLdkugWU4S--
