@@ -1,26 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41911)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42005)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1eYteB-0004kK-V9
-	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 08:08:57 -0500
+	(envelope-from <lersek@redhat.com>) id 1eYteW-00051L-0U
+	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 08:09:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1eYte8-0007xy-Nm
-	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 08:08:55 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:35688)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1eYte8-0007xW-Ec
-	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 08:08:52 -0500
-From: Juan Quintela <quintela@redhat.com>
-In-Reply-To: <004301d38940$56013bb0$0203b310$@ru> (Pavel Dovgalyuk's message
-	of "Tue, 9 Jan 2018 14:52:33 +0300")
-References: <20171220100205.16625.84632.stgit@pasha-VirtualBox>
-	<003c01d38923$1c5157f0$54f407d0$@ru> <87efmz1ddp.fsf@secure.laptop>
-	<004301d38940$56013bb0$0203b310$@ru>
-Reply-To: quintela@redhat.com
-Date: Tue, 09 Jan 2018 14:08:46 +0100
-Message-ID: <87zi5nyyap.fsf@secure.laptop>
+	(envelope-from <lersek@redhat.com>) id 1eYteS-000873-O2
+	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 08:09:15 -0500
+References: <20180108215007.46471-1-marcel@redhat.com>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <3ea6176b-01a4-8f5a-81fc-3e9a8c846dc7@redhat.com>
+Date: Tue, 9 Jan 2018 14:09:00 +0100
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v2] hpet: recover timer offset correctly
+In-Reply-To: <20180108215007.46471-1-marcel@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] fw_cfg: fix memory corruption when all
+ fw_cfg slots are used
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,206 +24,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pavel Dovgalyuk <dovgaluk@ispras.ru>
-Cc: 'Pavel Dovgalyuk' <Pavel.Dovgaluk@ispras.ru>, qemu-devel@nongnu.org, mst@redhat.com, dgilbert@redhat.com, maria.klimushenkova@ispras.ru, pbonzini@redhat.com
+To: Marcel Apfelbaum <marcel@redhat.com>, qemu-devel@nongnu.org
+Cc: ehabkost@redhat.com, mst@redhat.com, qemu-stable@nongnu.org, kraxel@redhat.com
 
-"Pavel Dovgalyuk" <dovgaluk@ispras.ru> wrote:
->> From: Juan Quintela [mailto:quintela@redhat.com]
+On 01/08/18 22:50, Marcel Apfelbaum wrote:
+> When all the fw_cfg slots are used, a write is made outside the
+> bounds of the fw_cfg files array as part of the sort algorithm.
+>=20
+> Fix it by avoiding an unnecessary array element move.
+> Fix also an assert while at it.
+>=20
+> Signed-off-by: Marcel Apfelbaum <marcel@redhat.com>
+> ---
+>  hw/nvram/fw_cfg.c | 6 ++++--
+>  1 file changed, 4 insertions(+), 2 deletions(-)
+>=20
+> diff --git a/hw/nvram/fw_cfg.c b/hw/nvram/fw_cfg.c
+> index 753ac0e4ea..4313484b21 100644
+> --- a/hw/nvram/fw_cfg.c
+> +++ b/hw/nvram/fw_cfg.c
+> @@ -784,7 +784,7 @@ void fw_cfg_add_file_callback(FWCfgState *s,  const=
+ char *filename,
+>       * index and "i - 1" is the one being copied from, thus the
+>       * unusual start and end in the for statement.
+>       */
+> -    for (i =3D count + 1; i > index; i--) {
+> +    for (i =3D count; i > index; i--) {
+>          s->files->f[i] =3D s->files->f[i - 1];
+>          s->files->f[i].select =3D cpu_to_be16(FW_CFG_FILE_FIRST + i);
+>          s->entries[0][FW_CFG_FILE_FIRST + i] =3D
 
->> >>      return 0;
->> >>  }
->> >>
->> >> @@ -252,7 +257,10 @@ static int hpet_post_load(void *opaque, int version_id)
->> >>      HPETState *s = opaque;
->> >>
->> >>      /* Recalculate the offset between the main counter and guest time */
->> >> -    s->hpet_offset = ticks_to_ns(s->hpet_counter) - qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
->> >> +    if (!s->hpet_offset_loaded) {
->> >> +        s->hpet_offset = ticks_to_ns(s->hpet_counter)
->> >> +                        - qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
->> >> +    }
->> 
->> So, at this point it is going to always be false.
->
-> No, because post load (below) sets it to true.
->
->> >> +static int hpet_offset_post_load(void *opaque, int version_id)
->> >> +{
->> >> +    HPETState *s = opaque;
->> >> +
->> >> +    s->hpet_offset_loaded = true;
->> >> +    return 0;
->> >> +}
->> >> +
->> >>  static bool hpet_rtc_irq_level_needed(void *opaque)
->> >>  {
->> >>      HPETState *s = opaque;
->> >> @@ -285,6 +301,17 @@ static const VMStateDescription vmstate_hpet_rtc_irq_level = {
->> >>      }
->> >>  };
->> >>
->> >> +static const VMStateDescription vmstate_hpet_offset = {
->> >> +    .name = "hpet/offset",
->> >> +    .version_id = 1,
->> >> +    .minimum_version_id = 1,
->> >> +    .post_load = hpet_offset_post_load,
->> 
->> You are missing here a .needed function.  Se how
->
-> Because .needed is optional.
+This hunk looks correct to me. We currently have count elements in the
+array, so we cannot normally access the element *at* count. However, we
+are extending the array right now, therefore we can assign (store) the
+element at count (and then we'll increment count later). But accessing
+an element at (count+1) is wrong.
 
-If you *don't* use a needed function then please just increase the
-version.  You are just breaking compatibility anyways.  The whole point
-of subsections is that they are optional.  If they are mandatory (this
-case), then they bring no advantage at all.
+> @@ -833,7 +833,6 @@ void *fw_cfg_modify_file(FWCfgState *s, const char =
+*filename,
+>      assert(s->files);
+> =20
+>      index =3D be32_to_cpu(s->files->count);
+> -    assert(index < fw_cfg_file_slots(s));
+> =20
+>      for (i =3D 0; i < index; i++) {
+>          if (strcmp(filename, s->files->f[i].name) =3D=3D 0) {
+> @@ -843,6 +842,9 @@ void *fw_cfg_modify_file(FWCfgState *s, const char =
+*filename,
+>              return ptr;
+>          }
+>      }
+> +
+> +    assert(index < fw_cfg_file_slots(s));
+> +
+>      /* add new one */
+>      fw_cfg_add_file_callback(s, filename, NULL, NULL, NULL, data, len,=
+ true);
+>      return NULL;
+>=20
 
->
->> - You want to transport hpet_offset just in the cases that hpet_is_enabled()?
->
-> No, we want to preserve backwards compatibility.
+I think I agree with Marc-Andr=C3=A9 here, when I say, replace the assert
+with a comment instead? (About the fact that fw_cfg_add_file_callback()
+will assert(), *if* we reach that far.)
 
-So, let me understand this again.
-
-old qemu -> new qemu
-
-   what do you want to do here. i.e.
-   new->hpet_counter = .... old->hpet_counter...
-   new->hpet_offset = ... old->hpet_offset...
-
-   You can use whatever you want.
-
-new qemu -> old qemu
-   right now, you break it always
-
-   we *always* sent the subsection.  Is there any case where it makes
-   sense to migrate to the old version.
-
-
->> I think that the following patch does what you want, no?  And it is a
->> bit simpler.
->
-> It is simpler, but won't work for migrations from old version to the new one.
-> hpet_counter becomes invalid in such case.
-
-What value do you want hpet_offset to have when migrating from old
-versions?
-
-My version does:
-
-new -> new (hpet_enabled)
-   dst->hpet_counter = src->hpet_counter
-   dst->hpet_offset = src->hpet_offset
-
-new -> new ( ! hpet_enabled)
-   dst->hpet_counter = src->hpet_counter
-   dst->hpet_offset = <undefined really>
-
-new -> old (hpet_enabled)
-   breaks migration
-
-new -> old ( ! hpet_enabled)
-   dst->hpet_counter = src->hpet_counter
-   dst->hpet_offset = <undefined really>
-
-old -> old
-   dst->hpet_counter= src->hpet_get_tick();
-   dst->hpet_offset = ticks_to_ns(s->hpet_counter) - qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
-
-
-Your version does:
-
-new -> new (hpet_enabled)
-   dst->hpet_counter = hpet_get_ticks(s) /* on source */
-   dst->hpet_offset = src->hpet_offset
-
-new -> new ( ! hpet_enabled)
-   dst->hpet_counter = src->hpet_counter
-   dst->hpet_offset = ticks_to_ns(s->hpet_counter) - qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
-
-new -> old
-   breaks always migration independently of hpet_enabled
-
-old -> old
-   dst->hpet_counter= src->hpet_get_tick();
-   dst->hpet_offset = ticks_to_ns(s->hpet_counter) - qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
-
-So, what are the values that we want to have here really?
-
-What dave is asked for your previous version is that you disable the
-section for old machine types.  Look at how to use DEFINE_PROP_* for
-this use case. 
-
-Later, Juan.
-
->> Head:     master Merge remote-tracking branch 'remotes/elmarco/tags/dump-pull-request' into
->> staging
->> Merge:    qemu/master Merge remote-tracking branch 'remotes/elmarco/tags/dump-pull-request'
->> into staging
->> Tag:      v2.11.0 (454)
->> 
->> Unstaged changes (1)
->> modified   hw/timer/hpet.c
->> @@ -216,16 +216,6 @@ static void update_irq(struct HPETTimer *timer, int set)
->>      }
->>  }
->> 
->> -static int hpet_pre_save(void *opaque)
->> -{
->> -    HPETState *s = opaque;
->> -
->> -    /* save current counter value */
->> -    s->hpet_counter = hpet_get_ticks(s);
->> -
->> -    return 0;
->> -}
->> -
->>  static int hpet_pre_load(void *opaque)
->>  {
->>      HPETState *s = opaque;
->> @@ -251,9 +241,6 @@ static int hpet_post_load(void *opaque, int version_id)
->>  {
->>      HPETState *s = opaque;
->> 
->> -    /* Recalculate the offset between the main counter and guest time */
->> -    s->hpet_offset = ticks_to_ns(s->hpet_counter) - qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
->> -
->>      /* Push number of timers into capability returned via HPET_ID */
->>      s->capability &= ~HPET_ID_NUM_TIM_MASK;
->>      s->capability |= (s->num_timers - 1) << HPET_ID_NUM_TIM_SHIFT;
->> @@ -285,6 +272,24 @@ static const VMStateDescription vmstate_hpet_rtc_irq_level = {
->>      }
->>  };
->> 
->> +static bool hpet_offset_needed(void *opaque)
->> +{
->> +    HPETState *s = opaque;
->> +
->> +    return hpet_enabled(s);
->> +}
->> +
->> +static const VMStateDescription vmstate_hpet_offset = {
->> +    .name = "hpet/offset",
->> +    .version_id = 1,
->> +    .minimum_version_id = 1,
->> +    .needed = hpet_offset_needed,
->> +    .fields = (VMStateField[]) {
->> +        VMSTATE_UINT64(hpet_offset, HPETState),
->> +        VMSTATE_END_OF_LIST()
->> +    }
->> +};
->> +
->>  static const VMStateDescription vmstate_hpet_timer = {
->>      .name = "hpet_timer",
->>      .version_id = 1,
->> @@ -320,6 +325,7 @@ static const VMStateDescription vmstate_hpet = {
->>      },
->>      .subsections = (const VMStateDescription*[]) {
->>          &vmstate_hpet_rtc_irq_level,
->> +        &vmstate_hpet_offset,
->>          NULL
->>      }
->>  };
->> 
->
->
-> Pavel Dovgalyuk
+Thanks
+Laszlo
