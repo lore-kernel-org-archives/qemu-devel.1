@@ -1,22 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51709)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51953)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vincent@bernat.im>) id 1eYnaM-0003uy-Bv
-	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 01:40:35 -0500
+	(envelope-from <vincent@bernat.im>) id 1eYnbZ-0004cl-TI
+	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 01:41:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vincent@bernat.im>) id 1eYnaI-0006nX-Pb
-	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 01:40:34 -0500
-Received: from bart.luffy.cx ([78.47.78.131]:50954)
+	(envelope-from <vincent@bernat.im>) id 1eYnbW-0007ZM-RG
+	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 01:41:49 -0500
+Received: from bart.luffy.cx ([78.47.78.131]:50960)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <vincent@bernat.im>) id 1eYnaI-0006nE-6f
-	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 01:40:30 -0500
+	(Exim 4.71) (envelope-from <vincent@bernat.im>) id 1eYnbW-0007Yq-KN
+	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 01:41:46 -0500
 From: Vincent Bernat <vincent@bernat.im>
 References: <20180108205052.24385-1-vincent@bernat.im>
 	<20180108211623.GJ6646@localhost.localdomain>
 	<242287261.31733448.1515451036017.JavaMail.zimbra@redhat.com>
-Date: Tue, 09 Jan 2018 07:40:26 +0100
-In-Reply-To: <242287261.31733448.1515451036017.JavaMail.zimbra@redhat.com>
-	(Paolo Bonzini's message of "Mon, 8 Jan 2018 17:37:16 -0500 (EST)")
-Message-ID: <m34lnva61x.fsf@luffy.cx>
+	<20180108225625.GP6646@localhost.localdomain>
+Date: Tue, 09 Jan 2018 07:41:45 +0100
+In-Reply-To: <20180108225625.GP6646@localhost.localdomain> (Eduardo Habkost's
+	message of "Mon, 8 Jan 2018 20:56:25 -0200")
+Message-ID: <m3zi5n8rfa.fsf@luffy.cx>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
@@ -30,23 +31,18 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, Richard Henderson <rth@twiddle.net>, qemu-devel@nongnu.org
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, qemu-devel@nongnu.org
 
- =E2=9D=A6  8 janvier 2018 17:37 -0500, Paolo Bonzini <pbonzini@redhat.com>=
-=C2=A0:
+ =E2=9D=A6  8 janvier 2018 20:56 -0200, Eduardo Habkost <ehabkost@redhat.co=
+m>=C2=A0:
 
->> One possible way to work around this problem is to declare that
->> QEMU 2.12 with KVM will require Linux v3.6 and newer (because we
->> need Linux kernel commit ad756a1603c5 "KVM: VMX: Implement
->> PCID/INVPCID for guests with EPT").
->
-> Note that PCID is still not supported for guests without EPT, so
-> this would break ept=3D0 with recent "-cpu" models.  I'm not sure of
-> a way to fix it; probably it just has to be documented.
 
->From the above patch, it seems only INVPCID needs EPT. KVM exposes PCID
-whenever it is present on the host.
+> (BTW, is PCID useful for KPTI performance without INVPCID?)
+
+It seems it is:
+
+https://mail-archive.com/linux-kernel@vger.kernel.org/msg1576774.html
 --=20
-When you are about to die, a wombat is better than no company at all.
-		-- Roger Zelazny, "Doorways in the Sand"
+Don't use conditional branches as a substitute for a logical expression.
+            - The Elements of Programming Style (Kernighan & Plauger)
