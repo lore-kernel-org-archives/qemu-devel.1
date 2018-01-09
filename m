@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39932)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41490)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1eZ36y-00076w-EA
-	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 18:15:20 -0500
+	(envelope-from <alistair23@gmail.com>) id 1eZ3AP-0008MW-Ql
+	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 18:18:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1eZ36s-0007M9-Kq
-	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 18:15:16 -0500
+	(envelope-from <alistair23@gmail.com>) id 1eZ3AO-0001H3-Rh
+	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 18:18:49 -0500
 MIME-Version: 1.0
 Sender: alistair23@gmail.com
-In-Reply-To: <20180108154303.6522-11-f4bug@amsat.org>
+In-Reply-To: <20180108154303.6522-12-f4bug@amsat.org>
 References: <20180108154303.6522-1-f4bug@amsat.org>
-	<20180108154303.6522-11-f4bug@amsat.org>
+	<20180108154303.6522-12-f4bug@amsat.org>
 From: Alistair Francis <alistair.francis@xilinx.com>
-Date: Tue, 9 Jan 2018 15:14:38 -0800
-Message-ID: <CAKmqyKOb7S1ff9uwQ8eYHxgvZRYMPCNr3wbgy-m5FZumHj3cSw@mail.gmail.com>
+Date: Tue, 9 Jan 2018 15:18:17 -0800
+Message-ID: <CAKmqyKOOnwp6ExPCy+ZxcjrLUUMmfyaWex6CuyQJ6Urt97xBWw@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v5 10/31] sdhci: add a Designware/Samsung
- host controller
+Subject: Re: [Qemu-devel] [PATCH v5 11/31] hw/arm/exynos4210: use the
+ "samsung, exynos4210-dw-mshc" device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,100 +32,49 @@ On Mon, Jan 8, 2018 at 7:42 AM, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.or=
 g> wrote:
 > Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 > ---
->  hw/sd/dw-mshc.c     | 64 +++++++++++++++++++++++++++++++++++++++++++++++=
-++++++
->  hw/sd/Makefile.objs |  1 +
->  2 files changed, 65 insertions(+)
->  create mode 100644 hw/sd/dw-mshc.c
+>  hw/arm/exynos4210.c | 12 ++++--------
+>  1 file changed, 4 insertions(+), 8 deletions(-)
 >
-> diff --git a/hw/sd/dw-mshc.c b/hw/sd/dw-mshc.c
-> new file mode 100644
-> index 0000000000..c2869cd569
-> --- /dev/null
-> +++ b/hw/sd/dw-mshc.c
-> @@ -0,0 +1,64 @@
-> +/*
-> + * Synopsys Designware Mobile Storage Host Controller emulation
-> + * (and Samsung Exynos specific extensions)
-> + *
-> + * Copyright (C) 2018 Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-> + *
-> + * This work is licensed under the terms of the GNU GPL, version 2 or
-> + * (at your option) any later version.  See the COPYING file in the
-> + * top-level directory.
-> + */
-> +#include "qemu/osdep.h"
-> +#include "hw/sd/sdhci.h"
-> +#include "qapi/error.h"
-> +
-> +/* Compatible with:
-> + * - SD Host Controller Specification Version 2.0
-> + * - SDIO Specification Version 2.0
-> + * - MMC Specification Version 4.3
-> + *
-> + * - SDMA
-> + * - ADMA
-> + */
-> +static void exynos4210_dw_mshc_realize(DeviceState *dev, Error **errp)
-> +{
-> +    SDHCICommonClass *cc =3D SYSBUS_SDHCI_COMMON_GET_CLASS(dev);
-> +    Object *obj =3D OBJECT(dev);
-> +    Error *local_err =3D NULL;
-> +
-> +    object_property_set_uint(obj, 2, "sd-spec-version", &local_err);
-> +    object_property_set_bool(obj, true, "suspend", &local_err);
-> +    object_property_set_bool(obj, true, "1v8", &local_err);
-> +    if (local_err) {
-> +        error_propagate(errp, local_err);
-> +        return;
-> +    }
-> +
-> +    cc->parent_realize(dev, &local_err);
-> +    if (local_err) {
-> +        error_propagate(errp, local_err);
-> +        return;
-> +    }
-> +}
-> +
-> +static void exynos4210_dw_mshc_class_init(ObjectClass *klass, void *data=
-)
-> +{
-> +    DeviceClass *dc =3D DEVICE_CLASS(klass);
-> +    SDHCICommonClass *cc =3D SYSBUS_SDHCI_COMMON_CLASS(klass);
-> +
-> +    cc->parent_realize =3D dc->realize;
+> diff --git a/hw/arm/exynos4210.c b/hw/arm/exynos4210.c
+> index e8e1d81e62..eb95131221 100644
+> --- a/hw/arm/exynos4210.c
+> +++ b/hw/arm/exynos4210.c
+> @@ -75,7 +75,6 @@
+>  #define EXYNOS4210_INT_COMBINER_BASE_ADDR   0x10448000
+>
+>  /* SD/MMC host controllers */
+> -#define EXYNOS4210_SDHCI_CAPABILITIES       0x05E80080
+>  #define EXYNOS4210_SDHCI_BASE_ADDR          0x12510000
+>  #define EXYNOS4210_SDHCI_ADDR(n)            (EXYNOS4210_SDHCI_BASE_ADDR =
++ \
+>                                                  0x00010000 * (n))
+> @@ -377,13 +376,10 @@ Exynos4210State *exynos4210_init(MemoryRegion *syst=
+em_mem)
+>          BlockBackend *blk;
+>          DriveInfo *di;
+>
+> -        dev =3D qdev_create(NULL, TYPE_SYSBUS_SDHCI);
+> -        qdev_prop_set_uint32(dev, "capareg", EXYNOS4210_SDHCI_CAPABILITI=
+ES);
+> -        qdev_init_nofail(dev);
+> -
+> -        busdev =3D SYS_BUS_DEVICE(dev);
+> -        sysbus_mmio_map(busdev, 0, EXYNOS4210_SDHCI_ADDR(n));
+> -        sysbus_connect_irq(busdev, 0, s->irq_table[exynos4210_get_irq(29=
+, n)]);
+> +        dev =3D sysbus_create_varargs("samsung,exynos4210-dw-mshc",
 
-This need an explanation, why are we doing this weird realise logic?
+Isn't this a legacy function, shouldn't we be moving away from it?
 
 Alistair
 
-> +    dc->realize =3D exynos4210_dw_mshc_realize;
-> +}
-> +
-> +static const TypeInfo exynos4210_dw_mshc_info =3D {
-> +    .name =3D "samsung,exynos4210-dw-mshc",
-> +    .parent =3D TYPE_SYSBUS_SDHCI,
-> +    .class_init =3D exynos4210_dw_mshc_class_init,
-> +};
-> +
-> +static void dw_mshc_sdhc_register_types(void)
-> +{
-> +    type_register_static(&exynos4210_dw_mshc_info);
-> +}
-> +
-> +type_init(dw_mshc_sdhc_register_types)
-> diff --git a/hw/sd/Makefile.objs b/hw/sd/Makefile.objs
-> index 0fe2501017..fd866d7f94 100644
-> --- a/hw/sd/Makefile.objs
-> +++ b/hw/sd/Makefile.objs
-> @@ -3,6 +3,7 @@ common-obj-$(CONFIG_SD) +=3D core.o
+> +                                    EXYNOS4210_SDHCI_ADDR(n),
+> +                                    s->irq_table[exynos4210_get_irq(29, =
+n)],
+> +                                    NULL);
 >
->  # SD/MMC host adapters
->  common-obj-$(CONFIG_PL181) +=3D pl181.o
-> +common-obj-$(CONFIG_EXYNOS4) +=3D dw-mshc.o
->  common-obj-$(CONFIG_SSI_SD) +=3D ssi-sd.o
->  common-obj-$(CONFIG_SDHCI) +=3D sdhci.o
->  obj-$(CONFIG_MILKYMIST) +=3D milkymist-memcard.o
+>          di =3D drive_get(IF_SD, 0, n);
+>          blk =3D di ? blk_by_legacy_dinfo(di) : NULL;
 > --
 > 2.15.1
 >
