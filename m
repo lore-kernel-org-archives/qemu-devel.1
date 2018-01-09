@@ -1,30 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35994)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39462)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1eYxnb-00084p-K1
-	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 12:34:56 -0500
+	(envelope-from <mst@redhat.com>) id 1eYxtz-0004NO-Ci
+	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 12:41:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1eYxnY-0007UM-Hr
-	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 12:34:55 -0500
-Received: from mail-wm0-f65.google.com ([74.125.82.65]:39541)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1eYxnY-0007TP-BB
-	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 12:34:52 -0500
-Received: by mail-wm0-f65.google.com with SMTP id i11so22117880wmf.4
-	for <qemu-devel@nongnu.org>; Tue, 09 Jan 2018 09:34:51 -0800 (PST)
-References: <20180108055348.20444-1-david@gibson.dropbear.id.au>
-	<CAFEAcA_vmTqHdjL6QfKtn-Khg2RHBA7Vs3QxreXwe2J_7mhGAQ@mail.gmail.com>
-	<20180109121653.GN2131@umbus.fritz.box>
-	<CAFEAcA-Mzyf2S3yW04LNVy7pAZ6gmzXo3aiFdPxrbWAAAX7N0Q@mail.gmail.com>
-	<151551377581.2579.2269090053428846143@sif>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <25942882-8dfd-87f4-7822-3d46ee303370@redhat.com>
-Date: Tue, 9 Jan 2018 18:34:48 +0100
+	(envelope-from <mst@redhat.com>) id 1eYxtw-0003uj-BQ
+	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 12:41:31 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:57634)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1eYxtw-0003td-3e
+	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 12:41:28 -0500
+Date: Tue, 9 Jan 2018 19:41:13 +0200
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20180109193800-mutt-send-email-mst@kernel.org>
+References: <1514626559-162312-1-git-send-email-longpeng2@huawei.com>
+	<1514626559-162312-2-git-send-email-longpeng2@huawei.com>
+	<fcb63fc3-22eb-7f6c-2014-744ee75784eb@linux.vnet.ibm.com>
 MIME-Version: 1.0
-In-Reply-To: <151551377581.2579.2269090053428846143@sif>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PULL 00/12] ppc-for-2.12 queue 20180108
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <fcb63fc3-22eb-7f6c-2014-744ee75784eb@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [v23 1/2] virtio-crypto: Add virtio crypto device
+ specification
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,23 +29,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Michael Roth <mdroth@linux.vnet.ibm.com>, David Gibson <david@gibson.dropbear.id.au>, Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-ppc@nongnu.org, Greg Kurz <groug@kaod.org>, surajjs@au1.ibm.com
+To: Halil Pasic <pasic@linux.vnet.ibm.com>
+Cc: "Longpeng(Mike)" <longpeng2@huawei.com>, qemu-devel@nongnu.org, virtio-dev@lists.oasis-open.org, luonengjun@huawei.com, cornelia.huck@de.ibm.com, stefanha@redhat.com, denglingli@chinamobile.com, Jani.Kokkonen@huawei.com, Ola.Liljedahl@arm.com, Varun.Sethi@freescale.com, xin.zeng@intel.com, brian.a.keating@intel.com, liang.j.ma@intel.com, john.griffin@intel.com, weidong.huang@huawei.com, agraf@suse.de, jasowang@redhat.com, vincent.jardin@6wind.com, arei.gonglei@huawei.com, wangxinxin.wang@huawei.com, jianjay.zhou@huawei.com
 
-On 09/01/2018 17:02, Michael Roth wrote:
->> so you can see it's already diverged because it prints out
->> a different value for the name of the pci node and the
->> SCSI line has 8200000000000000 vs 00000000.
-> FYI I actually see this with a raspberry pi 3 too
-
-Is this an arm32 or aarch64 install?  From Peter's report, I am tempted
-to blame the ARM backend (I tested 32-bit x86 and it works).  But a bug
-in both 32-bit ARM and aarch64 would be less likely.
-
-Paolo
-
-> , with repeating spaces
-> as well. I didn't notice it before since in my case the
-> ufd_version_check() in test-migration.c was failing so the migration tests
-> were reporting success but were actually just getting skipped.
+On Tue, Jan 09, 2018 at 06:05:41PM +0100, Halil Pasic wrote:
+> > +\drivernormative{\subsubsection}{Device configuration layout}{Device Types / Crypto Device / Device configuration layout}
+> > +
+> > +\begin{itemize*}
+> > +\item The driver MUST read the \field{status} from the bottom bit of status to check whether the
+> > +    VIRTIO_CRYPTO_S_HW_READY is set, and the driver MUST reread it after device reset.
+> > +\item The driver MUST NOT transmit any requests to the device if the VIRTIO_CRYPTO_S_HW_READY is not set.
+> > +\item The driver MUST read \field{max_dataqueues} field to discover the number of data queues the device supports.
+> > +\item The driver MUST read \field{crypto_services} field to discover which services the device is able to offer.
+> > +\item The driver SHOULD ignore the not defined algorithms bits.
+> > +\item The driver MUST read the detailed algorithms fields based on \field{crypto_services} field.
+> > +\item The driver SHOULD read \field{max_size} to discover the maximum size of crypto request the device supports.
+> > +\item The driver SHOULD read \field{max_cipher_key_len} to discover the maximum length of cipher key
+> > +    the device supports.
+> > +\item The driver SHOULD read \field{max_auth_key_len} to discover the maximum length of authenticated
+> > +    key the device supports.
+> > +\end{itemize*}
 > 
+> Seems to like a common practice in the virtio spec to say SHOULD read some
+> config space parameter in a driver normative but then having no driver normative
+> about the operational implications of the parameter.
+> 
+> While I do think that the reader is usually fully capable of inferring
+> the operational requirement, I find it a bit strange: having the operational
+> stuff explicit (and possibly needs to be read from the config space implicit)
+> seems more straight forward to me.
+> 
+> Anyway, you are consistent with the rest of the spec, so prefer keeping it
+> like this.
+
+The reason for this in virtio generally is that driver is really
+only required to be consistent with the device.
+Something like reading the value once and storing in e.g.
+registry, then using the stored value from registry on
+following values seems to also be ok.
+
+Restricting values below the limits allowed by the device
+also seems to be ok.
