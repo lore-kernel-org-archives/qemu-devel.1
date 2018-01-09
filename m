@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59542)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46759)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1eYlIK-0006Tz-LL
-	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 23:13:49 -0500
+	(envelope-from <famz@redhat.com>) id 1eYnKt-00083S-KT
+	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 01:24:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1eYlIH-0005rf-FK
-	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 23:13:48 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:37324)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1eYlIH-0005qw-4U
-	for qemu-devel@nongnu.org; Mon, 08 Jan 2018 23:13:45 -0500
-Date: Tue, 9 Jan 2018 06:13:40 +0200
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20180109061322-mutt-send-email-mst@kernel.org>
-References: <20171225024704.19540-1-linzhecheng@huawei.com>
+	(envelope-from <famz@redhat.com>) id 1eYnKs-0006sD-Td
+	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 01:24:35 -0500
+Date: Tue, 9 Jan 2018 14:24:25 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20180109062425.GA18346@lemon.usersys.redhat.com>
+References: <20180105065538.13375-1-famz@redhat.com>
+	<20180108144136.GF8052@localhost.localdomain>
+	<CAMr-obsaegU2HDaH3EFoD+2EYUnPKuqsvQPk4GZ7hTdqXmpoWA@mail.gmail.com>
+	<20180108175729.GI8052@localhost.localdomain>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20171225024704.19540-1-linzhecheng@huawei.com>
-Subject: Re: [Qemu-devel] [PATCH] irq: fix memory leak
+In-Reply-To: <20180108175729.GI8052@localhost.localdomain>
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 0/2] qemu-img: Let "info" warn
+ and go ahead without -U
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,31 +26,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: linzhecheng <linzhecheng@huawei.com>
-Cc: qemu-devel@nongnu.org, arei.gonglei@huawei.com, peterx@redhat.com, pbonzini@redhat.com
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: Nir Soffer <nirsof@gmail.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Ala Hino <ahino@redhat.com>
 
-On Mon, Dec 25, 2017 at 10:47:04AM +0800, linzhecheng wrote:
-> entry is moved from list but is not freed.
+On Mon, 01/08 18:57, Kevin Wolf wrote:
+> I'm not sure if going back to the old behaviour for a while now would be
+> helpful, you'd just end up with an even more confusing set of qemu
+> versions, for example:
 > 
-> Signed-off-by: linzhecheng <linzhecheng@huawei.com>
+>     <= 2.9          - works without a warning
+>     2.10 and 2.11   - errors out
+>     2.12            - prints a warning, but works
+>     >= 2.13         - errors out again
 
+What I had in mind is settle on warning for good. QEMU (including qemu-img) is a
+low level tool that can be used in many ways that it isn't supposed to, this one
+is not more harmful than others (e.g. "qemu-img snapshot ..." on iscsi:// qcow2
+image) we allow siliently.
 
-Makes sense.
+I know this is debatable but I think the #1 purpose of image locking is to
+prevent data corruption; #2 IMO is to reduce confusion and misinformation.
+While inconsistent output of "qemu-img info" is misinformation, it not working
+as before is actually confusion. Though the current behavior is indeed ideal,
+the proposed patch is a bit more pragmatical.
 
-Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
-
-> diff --git a/target/i386/kvm.c b/target/i386/kvm.c
-> index 351b64f77c..3c920db79a 100644
-> --- a/target/i386/kvm.c
-> +++ b/target/i386/kvm.c
-> @@ -3494,6 +3494,7 @@ int kvm_arch_release_virq_post(int virq)
->          if (entry->virq == virq) {
->              trace_kvm_x86_remove_msi_route(virq);
->              QLIST_REMOVE(entry, list);
-> +            g_free(entry);
->              break;
->          }
->      }
-> -- 
-> 2.12.2.windows.2
-> 
+Fam
