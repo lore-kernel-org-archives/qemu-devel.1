@@ -1,30 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39191)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40471)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eYug9-00053A-Sk
-	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 09:15:06 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1eYukI-0006UO-46
+	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 09:19:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eYug8-00024O-Tf
-	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 09:15:01 -0500
-Received: from mail-ot0-x22c.google.com ([2607:f8b0:4003:c0f::22c]:40209)
+	(envelope-from <peter.maydell@linaro.org>) id 1eYukH-000514-5O
+	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 09:19:18 -0500
+Received: from mail-ot0-x241.google.com ([2607:f8b0:4003:c0f::241]:43004)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1eYug8-000247-N6
-	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 09:15:00 -0500
-Received: by mail-ot0-x22c.google.com with SMTP id d10so11410229oti.7
-	for <qemu-devel@nongnu.org>; Tue, 09 Jan 2018 06:15:00 -0800 (PST)
+	id 1eYukH-00050g-04
+	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 09:19:17 -0500
+Received: by mail-ot0-x241.google.com with SMTP id a7so1291073otd.9
+	for <qemu-devel@nongnu.org>; Tue, 09 Jan 2018 06:19:16 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20180109141224.axcsed4o2fbgmqhc@aurel32.net>
-References: <20180109122252.17670-1-alex.bennee@linaro.org>
-	<20180109122252.17670-3-alex.bennee@linaro.org>
-	<034ef359-05f9-41e3-61b6-8b351ac9d452@vivier.eu>
-	<20180109141224.axcsed4o2fbgmqhc@aurel32.net>
+In-Reply-To: <1c99d190-5154-556f-caaf-5abcf4341f96@linaro.org>
+References: <1511890447-13601-1-git-send-email-peter.maydell@linaro.org>
+	<1c99d190-5154-556f-caaf-5abcf4341f96@linaro.org>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 9 Jan 2018 14:14:39 +0000
-Message-ID: <CAFEAcA-TOD3HhvWEV3pzbJ=udHGQTqW1NQBicYypk9_AMHyj2g@mail.gmail.com>
+Date: Tue, 9 Jan 2018 14:18:55 +0000
+Message-ID: <CAFEAcA-UKGsy=xQKyd8kBCUj06sAcPXdy2H2mU-ukzNoh_Tk6g@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 02/20] include/fpu/softfloat: remove
- USE_SOFTFLOAT_STRUCT_TYPES
+Subject: Re: [Qemu-devel] [PATCH] linux-user/arm/nwfpe: Check coprocessor
+ number for FPA emulation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,31 +30,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Aurelien Jarno <aurelien@aurel32.net>
-Cc: Laurent Vivier <laurent@vivier.eu>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, Richard Henderson <richard.henderson@linaro.org>, bharata@linux.vnet.ibm.com, Andrew Dutcher <andrew@andrewdutcher.com>, QEMU Developers <qemu-devel@nongnu.org>
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, "patches@linaro.org" <patches@linaro.org>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>
 
-On 9 January 2018 at 14:12, Aurelien Jarno <aurelien@aurel32.net> wrote:
-> On 2018-01-09 13:27, Laurent Vivier wrote:
->> Le 09/01/2018 =C3=A0 13:22, Alex Benn=C3=A9e a =C3=A9crit :
->> > It's not actively built and when enabled things fail to compile. I'm
->> > not sure the type-checking is really helping here. Seeing as we "own"
->> > our softfloat now lets remove the cruft.
+On 29 November 2017 at 09:30, Richard Henderson
+<richard.henderson@linaro.org> wrote:
+> On 11/28/2017 05:34 PM, Peter Maydell wrote:
+>> Our copy of the nwfpe code for emulating of the old FPA11 floating
+>> point unit doesn't check the coprocessor number in the instruction
+>> when it emulates it.  This means that we might treat some
+>> instructions which should really UNDEF as being FPA11 instructions by
+>> accident.
 >>
->> I think it would be better to fix the build break than to remove the
->> type-checking tool.
+>> The kernel's copy of the nwfpe code doesn't make this error; I suspect
+>> the bug was noticed and fixed as part of the process of mainlining
+>> the nwfpe code more than a decade ago.
 >>
->> but that's only my opinion...
+>> Add a check that the coprocessor number (which is always in bits
+>> [11:8] of the instruction) is either 1 or 2, which is where the
+>> FPA11 lives.
+>>
+>> Reported-by: Richard Henderson <richard.henderson@linaro.org>
+>> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+>> ---
+>> Tested with a chroot of arm debian lenny, which is the last one that
+>> still used the calling convention that mandated use of the old FPA11 FPU
+>> and thus needs nwfpe emulation.
+>> ---
+>>  linux-user/arm/nwfpe/fpa11.c | 9 +++++++++
+>>  1 file changed, 9 insertions(+)
 >
-> I agree with that. Those checks are useful for targets which call host
-> floating point functions for some instructions. This is ugly, but that's
-> what is still done for at least x86 for the trigonometrical functions.
-> The check prevents assigning a float or double value to a softfloat type
-> without calling the conversion function.
+> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
-Is gcc's codegen still bad enough that we have to default to not
-using the type-checking versions? If so, maybe we could at least
-enable the type-checking on an --enable-debug build, so it doesn't
-bitrot all the time.
+Thanks; applied to target-arm.next (since it's as much an arm patch
+as a linux-user one).
 
-thanks
 -- PMM
