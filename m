@@ -1,23 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51883)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36855)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eYzEH-0002bD-I3
-	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 14:06:34 -0500
+	(envelope-from <eblake@redhat.com>) id 1eYzZB-0001Zo-T6
+	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 14:28:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eYzEG-0002ix-JF
-	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 14:06:33 -0500
-References: <20171207155102.66622-1-vsementsov@virtuozzo.com>
-	<20171207155102.66622-3-vsementsov@virtuozzo.com>
-	<20171208173321.GR2403@work-vm>
+	(envelope-from <eblake@redhat.com>) id 1eYzZ9-0005z9-BD
+	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 14:28:09 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:52072)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1eYzZ9-0005xe-4Z
+	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 14:28:07 -0500
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <8711ff94-3d7a-446e-6da1-2e6e2b82899a@redhat.com>
-Date: Tue, 9 Jan 2018 13:06:22 -0600
-MIME-Version: 1.0
+Date: Tue,  9 Jan 2018 13:28:02 -0600
+Message-Id: <20180109192802.17167-1-eblake@redhat.com>
 In-Reply-To: <20171208173321.GR2403@work-vm>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="thW2h3DLUR28UejUR2UGYVyixBW9t9f0P"
-Subject: Re: [Qemu-devel] [PATCH v2 2/6] qapi: add name parameter to
- nbd-server-add
+References: <20171208173321.GR2403@work-vm>
+Subject: [Qemu-devel] [PATCH v2 2.5/6] hmp: Add name parameter to
+ nbd_server_add
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,67 +24,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, armbru@redhat.com, pbonzini@redhat.com, mreitz@redhat.com, kwolf@redhat.com, den@openvz.org
+To: qemu-devel@nongnu.org
+Cc: dgilbert@redhat.com, vsementsov@virtuozzo.com
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---thW2h3DLUR28UejUR2UGYVyixBW9t9f0P
-From: Eric Blake <eblake@redhat.com>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, armbru@redhat.com,
- pbonzini@redhat.com, mreitz@redhat.com, kwolf@redhat.com, den@openvz.org
-Message-ID: <8711ff94-3d7a-446e-6da1-2e6e2b82899a@redhat.com>
-Subject: Re: [PATCH v2 2/6] qapi: add name parameter to nbd-server-add
-References: <20171207155102.66622-1-vsementsov@virtuozzo.com>
- <20171207155102.66622-3-vsementsov@virtuozzo.com>
- <20171208173321.GR2403@work-vm>
-In-Reply-To: <20171208173321.GR2403@work-vm>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Extend the flexibility of the previous QMP patch to also work
+in HMP.
 
-On 12/08/2017 11:33 AM, Dr. David Alan Gilbert wrote:
+Signed-off-by: Eric Blake <eblake@redhat.com>
+---
 
->> @@ -2223,7 +2224,7 @@ void hmp_nbd_server_add(Monitor *mon, const QDic=
-t *qdict)
->>      bool writable =3D qdict_get_try_bool(qdict, "writable", false);
->>      Error *local_err =3D NULL;
->> =20
->> -    qmp_nbd_server_add(device, true, writable, &local_err);
->> +    qmp_nbd_server_add(device, false, NULL, true, writable, &local_er=
-r);
->=20
-> I wont insist, but it would be nice if you wired up an optional
-> parameter on HMP as well.
+In response to Dave's request.
+I could also squash this into Vladimir's 2/6 if desired.
 
-Can be done as a followup patch; I'm not sure how many people are
-setting up NBD exports via HMP, and I'm also okay with just stating that
-the full power requires use of QMP.  But I'll give such a followup patch
-a quick try, to see whether it is easy after all.
+ hmp.c           | 3 ++-
+ hmp-commands.hx | 9 +++++----
+ 2 files changed, 7 insertions(+), 5 deletions(-)
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+diff --git a/hmp.c b/hmp.c
+index 80c5b01540..c9fcdc8593 100644
+--- a/hmp.c
++++ b/hmp.c
+@@ -2221,10 +2221,11 @@ exit:
+ void hmp_nbd_server_add(Monitor *mon, const QDict *qdict)
+ {
+     const char *device = qdict_get_str(qdict, "device");
++    const char *name = qdict_get_try_str(qdict, "name");
+     bool writable = qdict_get_try_bool(qdict, "writable", false);
+     Error *local_err = NULL;
 
+-    qmp_nbd_server_add(device, false, NULL, true, writable, &local_err);
++    qmp_nbd_server_add(device, !!name, name, true, writable, &local_err);
 
---thW2h3DLUR28UejUR2UGYVyixBW9t9f0P
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+     if (local_err != NULL) {
+         hmp_handle_error(mon, &local_err);
+diff --git a/hmp-commands.hx b/hmp-commands.hx
+index 6d5ebdf6ab..b8b6fb9184 100644
+--- a/hmp-commands.hx
++++ b/hmp-commands.hx
+@@ -1553,17 +1553,18 @@ ETEXI
 
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+     {
+         .name       = "nbd_server_add",
+-        .args_type  = "writable:-w,device:B",
+-        .params     = "nbd_server_add [-w] device",
++        .args_type  = "writable:-w,device:B,name:s?",
++        .params     = "nbd_server_add [-w] device [name]",
+         .help       = "export a block device via NBD",
+         .cmd        = hmp_nbd_server_add,
+     },
+ STEXI
+-@item nbd_server_add @var{device}
++@item nbd_server_add @var{device} [ @var{name} ]
+ @findex nbd_server_add
+ Export a block device through QEMU's NBD server, which must be started
+ beforehand with @command{nbd_server_start}.  The @option{-w} option makes the
+-exported device writable too.
++exported device writable too.  The export name is controlled by @var{name},
++defaulting to @var{device}.
+ ETEXI
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlpVEq4ACgkQp6FrSiUn
-Q2r2cQf/ecppxC53Rc6LbZBIgABZ7ylHfQOYgoW/k/RPmrkBCMJi3Fv2Ia59SmJv
-6gOWP+d+mptQskzyhEUgOrSItL5TxEojWSmgejPUxzEk1EPr6WR6CqIt4JZj4xNs
-o5YlwYIXz8kIyWe6GxvyUIEkvAY4Y24iQtvzFL5+wznRQ4ya9AImCzYRTebCvkWw
-/0SvCPcgdaZ8hMnCei5axWo/MPtjA9C467x77SRp4KygpMqx5vBv4QZbqEELIvJH
-QQU/iczy994zx2aqsXe1SmWsCLLRWL3PW2AlFaUxErVJebkJSGKDB1KzBumy+Owb
-A1lDbuXEuuL63prUVS+sqDuN/0x++w==
-=qTU7
------END PGP SIGNATURE-----
-
---thW2h3DLUR28UejUR2UGYVyixBW9t9f0P--
+     {
+-- 
+2.14.3
