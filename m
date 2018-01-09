@@ -1,40 +1,39 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58286)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59160)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <muriloo@linux.vnet.ibm.com>) id 1eYrsd-0006ld-Rj
-	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 06:15:44 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1eYruq-0008JT-Kk
+	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 06:18:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <muriloo@linux.vnet.ibm.com>) id 1eYrsY-0006eF-SL
-	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 06:15:43 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:38894)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <muriloo@linux.vnet.ibm.com>)
-	id 1eYrsY-0006c5-E2
-	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 06:15:38 -0500
-Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w09BEqge055321
-	for <qemu-devel@nongnu.org>; Tue, 9 Jan 2018 06:15:37 -0500
-Received: from e16.ny.us.ibm.com (e16.ny.us.ibm.com [129.33.205.206])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2fcu1pw80f-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 09 Jan 2018 06:15:37 -0500
-Received: from localhost
-	by e16.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <muriloo@linux.vnet.ibm.com>;
-	Tue, 9 Jan 2018 06:15:35 -0500
-References: <20180109092103.18458-1-sjitindarsingh@gmail.com>
-	<20180109092103.18458-3-sjitindarsingh@gmail.com>
-From: =?UTF-8?Q?Murilo_Opsfelder_Ara=c3=bajo?= <muriloo@linux.vnet.ibm.com>
-Date: Tue, 9 Jan 2018 09:15:31 -0200
+	(envelope-from <pbonzini@redhat.com>) id 1eYrul-0001EM-M5
+	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 06:18:00 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:53416)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1eYrul-0001D3-GN
+	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 06:17:55 -0500
+References: <1515071752-22961-1-git-send-email-thuth@redhat.com>
+	<20180104140930.7hbtnen3lw7epmrh@var.youpi.perso.aquilenet.fr>
+	<a78b6f7a-3eb2-6749-ccba-ad1ba4d525ae@redhat.com>
+	<20180104141524.m5xy66jsn2hiajwl@var.youpi.perso.aquilenet.fr>
+	<20180104142101.rivje5qn5dasb6jw@var.youpi.perso.aquilenet.fr>
+	<aea97804-c6a9-d903-13d8-23bc6b46af86@redhat.com>
+	<20180104152402.fv52umjmlb2g22wc@var.youpi.perso.aquilenet.fr>
+	<b1a86fed-8a98-cc1d-46ca-5462f8be3fc7@redhat.com>
+	<20180104153219.wsxtkzuznu2iwra7@var.youpi.perso.aquilenet.fr>
+	<bb6eae87-85b2-4bf2-ad36-26fa95816315@redhat.com>
+	<9b392599-a318-90c5-daa8-89ade40c64e5@redhat.com>
+	<eba50062-de89-2091-8799-b6de3c88acaf@redhat.com>
+	<64a364f0-3dc0-87c4-f0b0-a79365032a8e@redhat.com>
+	<351493cf-fa56-491c-c646-49727e6611ed@redhat.com>
+	<6900aa32-7774-366f-32a5-9e75b70350db@redhat.com>
+	<b6a25497-5353-fe1f-6550-1479b5c4c1f4@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <ff5a872c-9438-3fa9-6a65-9792c846b151@redhat.com>
+Date: Tue, 9 Jan 2018 12:17:46 +0100
 MIME-Version: 1.0
-In-Reply-To: <20180109092103.18458-3-sjitindarsingh@gmail.com>
+In-Reply-To: <b6a25497-5353-fe1f-6550-1479b5c4c1f4@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Message-Id: <1316befd-f593-8082-bec5-a1635e866f61@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [Qemu-ppc] [QEMU-PPC] [RFC 2/3]
- hw/spapr/spapr_caps: Add new caps safe_[cache/bounds_check/indirect_branch]
+Subject: Re: [Qemu-devel] [PATCH v2] usb: Remove legacy -usbdevice option
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -43,32 +42,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Suraj Jitindar Singh <sjitindarsingh@gmail.com>, qemu-ppc@nongnu.org
-Cc: paulus@ozlabs.org, qemu-devel@nongnu.org, david@gibson.dropbear.id.au
+To: Thomas Huth <thuth@redhat.com>, Samuel Thibault <samuel.thibault@gnu.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>, kraxel@redhat.com, qemu-devel@nongnu.org
 
-On 01/09/2018 07:21 AM, Suraj Jitindar Singh wrote:
-> This patch adds three new capabilities:
-> cap-cfpc -> safe_cache
-> cap-sbbc -> safe_bounds_check
-> cap-ibs  -> safe_indirect_branch
-
-Hi, Suraj.
-
-What about splitting this into smaller patches, one per capability?
-
-> Each capability is tristate with the possible values "broken",
-> "workaround" or "fixed". Add generic getter and setter functions for
-> this new capability type. Add these new capabilities to the capabilities
-> list. The maximum value for the capabilities is queried from kvm through
-> new kvm capabilities. The requested values are considered to be
-> compatible if kvm can support an equal or higher value for each
-> capability.
+On 09/01/2018 12:00, Thomas Huth wrote:
+> On 09.01.2018 10:58, Paolo Bonzini wrote:
+>> On 08/01/2018 08:23, Thomas Huth wrote:
+>>>>> But instead of introducing a new "-braille" parameter, maybe we should
+>>>>> rather keep some of the convenience "-usbdevice" possibilities around?
+>>>>> E.g. keep "-usbdevice braille", "-usbdevice mouse", etc. but remove
+>>>>> things like "-usbdevice serial" and "-usbdevice host" where the code is
+>>>>> rather ugly and the user do not gain much in comparison to "-device" ?
+>>>> That would work too.  But I'm not sure why keep all the usbdevice
+>>>> infrastructure when we can do the same (at the price of a small cmdline
+>>>> incompatibility) with only 50 lines of code.
+>>> I'm just afraid that we will end up with more new parameters in the end
+>>> than just "-braille" - or do we feel confident enough that "-usbdevice
+>>> braille" is the only one that would need a sugared replacement?
+>>
+>> I agree that we should plan for suboptions, so it could be "-braille
+>> [serial|usb]" for now.
 > 
-> Discussion:
-> Currently these new capabilities default to broken to allow for
-> backwards compatibility, is this the best option?
+> I'm rather afraid that someone else will also complain about the removal
+> of the other usbdevice options, so that we'll finally end up with new
+> -usbhost, -usbbt and -usbyounameit convenience options... in that case
+> it might be better to keep "-usbdevice" instead?
 
-This could be placed in the cover letter, not in the commit message.
+We can and should say no.  Sometimes we can also say yes though. :)
 
-Cheers
-Murilo
+I just think that Braille is worth a special case because a subset of
+our user base (blind people) will use it 100% of the time, plus it is
+not supported by libvirt and hence virt-manager.
+
+Paolo
