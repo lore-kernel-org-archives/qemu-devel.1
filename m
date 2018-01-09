@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46680)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50879)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistai@xilinx.com>) id 1eYz3Z-0005Pm-RF
-	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 13:55:31 -0500
+	(envelope-from <eblake@redhat.com>) id 1eYzDD-0001fR-Ku
+	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 14:05:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistai@xilinx.com>) id 1eYz3V-0000lE-OX
-	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 13:55:29 -0500
-Received: from mail-by2nam01on0046.outbound.protection.outlook.com
-	([104.47.34.46]:44896
-	helo=NAM01-BY2-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <alistai@xilinx.com>) id 1eYz3V-0000ju-B4
-	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 13:55:25 -0500
-From: Alistair Francis <alistair.francis@xilinx.com>
-Date: Tue, 9 Jan 2018 10:50:52 -0800
-Message-ID: <b799d9d21170a492c54fb2c4eaf8326b06e0bdf6.1515523657.git.alistair.francis@xilinx.com>
+	(envelope-from <eblake@redhat.com>) id 1eYzDC-00011s-G8
+	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 14:05:27 -0500
+References: <20171207155102.66622-1-vsementsov@virtuozzo.com>
+	<20171207155102.66622-3-vsementsov@virtuozzo.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <9c3d475e-ba19-90d3-263d-a7378d648da5@redhat.com>
+Date: Tue, 9 Jan 2018 13:05:10 -0600
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v1 1/3] xlnx-zynqmp-rtc: Initial commit
+In-Reply-To: <20171207155102.66622-3-vsementsov@virtuozzo.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="9qrzpsVA6tOTZjVGKLP8B3DjYfg28h8uI"
+Subject: Re: [Qemu-devel] [PATCH v2 2/6] qapi: add name parameter to
+ nbd-server-add
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,360 +25,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, peter.maydell@linaro.org
-Cc: alistair.francis@xilinx.com, alistair23@gmail.com, edgar.iglesias@xilinx.com, edgar.iglesias@gmail.com
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: armbru@redhat.com, dgilbert@redhat.com, pbonzini@redhat.com, mreitz@redhat.com, kwolf@redhat.com, den@openvz.org
 
-Initial commit of the ZynqMP RTC device.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--9qrzpsVA6tOTZjVGKLP8B3DjYfg28h8uI
+From: Eric Blake <eblake@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: armbru@redhat.com, dgilbert@redhat.com, pbonzini@redhat.com,
+ mreitz@redhat.com, kwolf@redhat.com, den@openvz.org
+Message-ID: <9c3d475e-ba19-90d3-263d-a7378d648da5@redhat.com>
+Subject: Re: [PATCH v2 2/6] qapi: add name parameter to nbd-server-add
+References: <20171207155102.66622-1-vsementsov@virtuozzo.com>
+ <20171207155102.66622-3-vsementsov@virtuozzo.com>
+In-Reply-To: <20171207155102.66622-3-vsementsov@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
----
+On 12/07/2017 09:50 AM, Vladimir Sementsov-Ogievskiy wrote:
+> Allow user to specify name for new export, to not reuse internal
+> node name and to not show it to clients.
+>=20
+> This also allows creating several exports per device.
+>=20
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> ---
+>  qapi/block.json |  9 +++++++--
+>  blockdev-nbd.c  | 14 +++++++++-----
+>  hmp.c           |  5 +++--
+>  3 files changed, 19 insertions(+), 9 deletions(-)
+>=20
+> diff --git a/qapi/block.json b/qapi/block.json
+> index f093fa3f27..503d4b287b 100644
+> --- a/qapi/block.json
+> +++ b/qapi/block.json
+> @@ -213,14 +213,19 @@
+>  #
+>  # @device: The device name or node name of the node to be exported
+>  #
+> +# @name: Export name. If unspecified @device parameter used as export =
+name.
 
- hw/timer/Makefile.objs             |   1 +
- hw/timer/xlnx-zynqmp-rtc.c         | 232 +++++++++++++++++++++++++++++++++++++
- include/hw/timer/xlnx-zynqmp-rtc.h |  84 ++++++++++++++
- 3 files changed, 317 insertions(+)
- create mode 100644 hw/timer/xlnx-zynqmp-rtc.c
- create mode 100644 include/hw/timer/xlnx-zynqmp-rtc.h
+s/unspecified/unspecified, the/
+s/used as/is used as the/
 
-diff --git a/hw/timer/Makefile.objs b/hw/timer/Makefile.objs
-index 8c19eac3b6..8b27a4b7ef 100644
---- a/hw/timer/Makefile.objs
-+++ b/hw/timer/Makefile.objs
-@@ -21,6 +21,7 @@ common-obj-$(CONFIG_IMX) += imx_epit.o
- common-obj-$(CONFIG_IMX) += imx_gpt.o
- common-obj-$(CONFIG_LM32) += lm32_timer.o
- common-obj-$(CONFIG_MILKYMIST) += milkymist-sysctl.o
-+common-obj-$(CONFIG_XLNX_ZYNQMP) += xlnx-zynqmp-rtc.o
- 
- obj-$(CONFIG_ALTERA_TIMER) += altera_timer.o
- obj-$(CONFIG_EXYNOS4) += exynos4210_mct.o
-diff --git a/hw/timer/xlnx-zynqmp-rtc.c b/hw/timer/xlnx-zynqmp-rtc.c
-new file mode 100644
-index 0000000000..40533220fc
---- /dev/null
-+++ b/hw/timer/xlnx-zynqmp-rtc.c
-@@ -0,0 +1,232 @@
-+/*
-+ * QEMU model of the Xilinx ZynqMP Real Time Clock (RTC).
-+ *
-+ * Copyright (c) 2017 Xilinx Inc.
-+ *
-+ * Written-by: Alistair Francis <alistair.francis@xilinx.com>
-+ *
-+ * Permission is hereby granted, free of charge, to any person obtaining a copy
-+ * of this software and associated documentation files (the "Software"), to deal
-+ * in the Software without restriction, including without limitation the rights
-+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-+ * copies of the Software, and to permit persons to whom the Software is
-+ * furnished to do so, subject to the following conditions:
-+ *
-+ * The above copyright notice and this permission notice shall be included in
-+ * all copies or substantial portions of the Software.
-+ *
-+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-+ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-+ * THE SOFTWARE.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "hw/sysbus.h"
-+#include "hw/register.h"
-+#include "qemu/bitops.h"
-+#include "qemu/log.h"
-+#include "hw/timer/xlnx-zynqmp-rtc.h"
-+
-+#ifndef XLNX_ZYNQMP_RTC_ERR_DEBUG
-+#define XLNX_ZYNQMP_RTC_ERR_DEBUG 0
-+#endif
-+
-+#define DB_PRINT_L(lvl, fmt, args...) do { \
-+    if (XLNX_ZYNQMP_RTC_ERR_DEBUG >= lvl) { \
-+        qemu_log("%s: " fmt, __func__, ## args); \
-+    } \
-+} while (0);
-+
-+#define DB_PRINT(fmt, args...) DB_PRINT_L(1, fmt, ## args)
-+
-+static void rtc_int_update_irq(XlnxZynqMPRTC *s)
-+{
-+    bool pending = s->regs[R_RTC_INT_STATUS] & ~s->regs[R_RTC_INT_MASK];
-+    qemu_set_irq(s->irq_rtc_int, pending);
-+}
-+
-+static void addr_error_int_update_irq(XlnxZynqMPRTC *s)
-+{
-+    bool pending = s->regs[R_ADDR_ERROR] & ~s->regs[R_ADDR_ERROR_INT_MASK];
-+    qemu_set_irq(s->irq_addr_error_int, pending);
-+}
-+
-+static void rtc_int_status_postw(RegisterInfo *reg, uint64_t val64)
-+{
-+    XlnxZynqMPRTC *s = XLNX_ZYNQMP_RTC(reg->opaque);
-+    rtc_int_update_irq(s);
-+}
-+
-+static uint64_t rtc_int_en_prew(RegisterInfo *reg, uint64_t val64)
-+{
-+    XlnxZynqMPRTC *s = XLNX_ZYNQMP_RTC(reg->opaque);
-+    uint32_t val = val64;
-+
-+    s->regs[R_RTC_INT_MASK] &= ~val;
-+    rtc_int_update_irq(s);
-+    return 0;
-+}
-+
-+static uint64_t rtc_int_dis_prew(RegisterInfo *reg, uint64_t val64)
-+{
-+    XlnxZynqMPRTC *s = XLNX_ZYNQMP_RTC(reg->opaque);
-+    uint32_t val = val64;
-+
-+    s->regs[R_RTC_INT_MASK] |= val;
-+    rtc_int_update_irq(s);
-+    return 0;
-+}
-+
-+static void addr_error_postw(RegisterInfo *reg, uint64_t val64)
-+{
-+    XlnxZynqMPRTC *s = XLNX_ZYNQMP_RTC(reg->opaque);
-+    addr_error_int_update_irq(s);
-+}
-+
-+static uint64_t addr_error_int_en_prew(RegisterInfo *reg, uint64_t val64)
-+{
-+    XlnxZynqMPRTC *s = XLNX_ZYNQMP_RTC(reg->opaque);
-+    uint32_t val = val64;
-+
-+    s->regs[R_ADDR_ERROR_INT_MASK] &= ~val;
-+    addr_error_int_update_irq(s);
-+    return 0;
-+}
-+
-+static uint64_t addr_error_int_dis_prew(RegisterInfo *reg, uint64_t val64)
-+{
-+    XlnxZynqMPRTC *s = XLNX_ZYNQMP_RTC(reg->opaque);
-+    uint32_t val = val64;
-+
-+    s->regs[R_ADDR_ERROR_INT_MASK] |= val;
-+    addr_error_int_update_irq(s);
-+    return 0;
-+}
-+
-+static const RegisterAccessInfo rtc_regs_info[] = {
-+    {   .name = "SET_TIME_WRITE",  .addr = A_SET_TIME_WRITE,
-+    },{ .name = "SET_TIME_READ",  .addr = A_SET_TIME_READ,
-+        .ro = 0xffffffff,
-+    },{ .name = "CALIB_WRITE",  .addr = A_CALIB_WRITE,
-+    },{ .name = "CALIB_READ",  .addr = A_CALIB_READ,
-+        .ro = 0x1fffff,
-+    },{ .name = "CURRENT_TIME",  .addr = A_CURRENT_TIME,
-+        .ro = 0xffffffff,
-+    },{ .name = "CURRENT_TICK",  .addr = A_CURRENT_TICK,
-+        .ro = 0xffff,
-+    },{ .name = "ALARM",  .addr = A_ALARM,
-+    },{ .name = "RTC_INT_STATUS",  .addr = A_RTC_INT_STATUS,
-+        .w1c = 0x3,
-+        .post_write = rtc_int_status_postw,
-+    },{ .name = "RTC_INT_MASK",  .addr = A_RTC_INT_MASK,
-+        .reset = 0x3,
-+        .ro = 0x3,
-+    },{ .name = "RTC_INT_EN",  .addr = A_RTC_INT_EN,
-+        .pre_write = rtc_int_en_prew,
-+    },{ .name = "RTC_INT_DIS",  .addr = A_RTC_INT_DIS,
-+        .pre_write = rtc_int_dis_prew,
-+    },{ .name = "ADDR_ERROR",  .addr = A_ADDR_ERROR,
-+        .w1c = 0x1,
-+        .post_write = addr_error_postw,
-+    },{ .name = "ADDR_ERROR_INT_MASK",  .addr = A_ADDR_ERROR_INT_MASK,
-+        .reset = 0x1,
-+        .ro = 0x1,
-+    },{ .name = "ADDR_ERROR_INT_EN",  .addr = A_ADDR_ERROR_INT_EN,
-+        .pre_write = addr_error_int_en_prew,
-+    },{ .name = "ADDR_ERROR_INT_DIS",  .addr = A_ADDR_ERROR_INT_DIS,
-+        .pre_write = addr_error_int_dis_prew,
-+    },{ .name = "CONTROL",  .addr = A_CONTROL,
-+        .reset = 0x1000000,
-+        .rsvd = 0x70fffffe,
-+    },{ .name = "SAFETY_CHK",  .addr = A_SAFETY_CHK,
-+    }
-+};
-+
-+static void rtc_reset(DeviceState *dev)
-+{
-+    XlnxZynqMPRTC *s = XLNX_ZYNQMP_RTC(dev);
-+    unsigned int i;
-+
-+    for (i = 0; i < ARRAY_SIZE(s->regs_info); ++i) {
-+        register_reset(&s->regs_info[i]);
-+    }
-+
-+    rtc_int_update_irq(s);
-+    addr_error_int_update_irq(s);
-+}
-+
-+static const MemoryRegionOps rtc_ops = {
-+    .read = register_read_memory,
-+    .write = register_write_memory,
-+    .endianness = DEVICE_LITTLE_ENDIAN,
-+    .valid = {
-+        .min_access_size = 4,
-+        .max_access_size = 4,
-+    },
-+};
-+
-+static void rtc_realize(DeviceState *dev, Error **errp)
-+{
-+    /* Delete this if you don't need it */
-+}
-+
-+static void rtc_init(Object *obj)
-+{
-+    XlnxZynqMPRTC *s = XLNX_ZYNQMP_RTC(obj);
-+    SysBusDevice *sbd = SYS_BUS_DEVICE(obj);
-+    RegisterInfoArray *reg_array;
-+
-+    memory_region_init(&s->iomem, obj, TYPE_XLNX_ZYNQMP_RTC,
-+                       XLNX_ZYNQMP_RTC_R_MAX * 4);
-+    reg_array =
-+        register_init_block32(DEVICE(obj), rtc_regs_info,
-+                              ARRAY_SIZE(rtc_regs_info),
-+                              s->regs_info, s->regs,
-+                              &rtc_ops,
-+                              XLNX_ZYNQMP_RTC_ERR_DEBUG,
-+                              XLNX_ZYNQMP_RTC_R_MAX * 4);
-+    memory_region_add_subregion(&s->iomem,
-+                                0x0,
-+                                &reg_array->mem);
-+    sysbus_init_mmio(sbd, &s->iomem);
-+    sysbus_init_irq(sbd, &s->irq_rtc_int);
-+    sysbus_init_irq(sbd, &s->irq_addr_error_int);
-+}
-+
-+static const VMStateDescription vmstate_rtc = {
-+    .name = TYPE_XLNX_ZYNQMP_RTC,
-+    .version_id = 1,
-+    .minimum_version_id = 1,
-+    .fields = (VMStateField[]) {
-+        VMSTATE_UINT32_ARRAY(regs, XlnxZynqMPRTC, XLNX_ZYNQMP_RTC_R_MAX),
-+        VMSTATE_END_OF_LIST(),
-+    }
-+};
-+
-+static void rtc_class_init(ObjectClass *klass, void *data)
-+{
-+    DeviceClass *dc = DEVICE_CLASS(klass);
-+
-+    dc->reset = rtc_reset;
-+    dc->realize = rtc_realize;
-+    dc->vmsd = &vmstate_rtc;
-+}
-+
-+static const TypeInfo rtc_info = {
-+    .name          = TYPE_XLNX_ZYNQMP_RTC,
-+    .parent        = TYPE_SYS_BUS_DEVICE,
-+    .instance_size = sizeof(XlnxZynqMPRTC),
-+    .class_init    = rtc_class_init,
-+    .instance_init = rtc_init,
-+};
-+
-+static void rtc_register_types(void)
-+{
-+    type_register_static(&rtc_info);
-+}
-+
-+type_init(rtc_register_types)
-diff --git a/include/hw/timer/xlnx-zynqmp-rtc.h b/include/hw/timer/xlnx-zynqmp-rtc.h
-new file mode 100644
-index 0000000000..87649836cc
---- /dev/null
-+++ b/include/hw/timer/xlnx-zynqmp-rtc.h
-@@ -0,0 +1,84 @@
-+/*
-+ * QEMU model of the Xilinx ZynqMP Real Time Clock (RTC).
-+ *
-+ * Copyright (c) 2017 Xilinx Inc.
-+ *
-+ * Written-by: Alistair Francis <alistair.francis@xilinx.com>
-+ *
-+ * Permission is hereby granted, free of charge, to any person obtaining a copy
-+ * of this software and associated documentation files (the "Software"), to deal
-+ * in the Software without restriction, including without limitation the rights
-+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-+ * copies of the Software, and to permit persons to whom the Software is
-+ * furnished to do so, subject to the following conditions:
-+ *
-+ * The above copyright notice and this permission notice shall be included in
-+ * all copies or substantial portions of the Software.
-+ *
-+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-+ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-+ * THE SOFTWARE.
-+ */
-+
-+#include "hw/register.h"
-+
-+#define TYPE_XLNX_ZYNQMP_RTC "xlnx-zynmp.rtc"
-+
-+#define XLNX_ZYNQMP_RTC(obj) \
-+     OBJECT_CHECK(XlnxZynqMPRTC, (obj), TYPE_XLNX_ZYNQMP_RTC)
-+
-+REG32(SET_TIME_WRITE, 0x0)
-+REG32(SET_TIME_READ, 0x4)
-+REG32(CALIB_WRITE, 0x8)
-+    FIELD(CALIB_WRITE, FRACTION_EN, 20, 1)
-+    FIELD(CALIB_WRITE, FRACTION_DATA, 16, 4)
-+    FIELD(CALIB_WRITE, MAX_TICK, 0, 16)
-+REG32(CALIB_READ, 0xc)
-+    FIELD(CALIB_READ, FRACTION_EN, 20, 1)
-+    FIELD(CALIB_READ, FRACTION_DATA, 16, 4)
-+    FIELD(CALIB_READ, MAX_TICK, 0, 16)
-+REG32(CURRENT_TIME, 0x10)
-+REG32(CURRENT_TICK, 0x14)
-+    FIELD(CURRENT_TICK, VALUE, 0, 16)
-+REG32(ALARM, 0x18)
-+REG32(RTC_INT_STATUS, 0x20)
-+    FIELD(RTC_INT_STATUS, ALARM, 1, 1)
-+    FIELD(RTC_INT_STATUS, SECONDS, 0, 1)
-+REG32(RTC_INT_MASK, 0x24)
-+    FIELD(RTC_INT_MASK, ALARM, 1, 1)
-+    FIELD(RTC_INT_MASK, SECONDS, 0, 1)
-+REG32(RTC_INT_EN, 0x28)
-+    FIELD(RTC_INT_EN, ALARM, 1, 1)
-+    FIELD(RTC_INT_EN, SECONDS, 0, 1)
-+REG32(RTC_INT_DIS, 0x2c)
-+    FIELD(RTC_INT_DIS, ALARM, 1, 1)
-+    FIELD(RTC_INT_DIS, SECONDS, 0, 1)
-+REG32(ADDR_ERROR, 0x30)
-+    FIELD(ADDR_ERROR, STATUS, 0, 1)
-+REG32(ADDR_ERROR_INT_MASK, 0x34)
-+    FIELD(ADDR_ERROR_INT_MASK, MASK, 0, 1)
-+REG32(ADDR_ERROR_INT_EN, 0x38)
-+    FIELD(ADDR_ERROR_INT_EN, MASK, 0, 1)
-+REG32(ADDR_ERROR_INT_DIS, 0x3c)
-+    FIELD(ADDR_ERROR_INT_DIS, MASK, 0, 1)
-+REG32(CONTROL, 0x40)
-+    FIELD(CONTROL, BATTERY_DISABLE, 31, 1)
-+    FIELD(CONTROL, OSC_CNTRL, 24, 4)
-+    FIELD(CONTROL, SLVERR_ENABLE, 0, 1)
-+REG32(SAFETY_CHK, 0x50)
-+
-+#define XLNX_ZYNQMP_RTC_R_MAX (R_SAFETY_CHK + 1)
-+
-+typedef struct XlnxZynqMPRTC {
-+    SysBusDevice parent_obj;
-+    MemoryRegion iomem;
-+    qemu_irq irq_rtc_int;
-+    qemu_irq irq_addr_error_int;
-+
-+    uint32_t regs[XLNX_ZYNQMP_RTC_R_MAX];
-+    RegisterInfo regs_info[XLNX_ZYNQMP_RTC_R_MAX];
-+} XlnxZynqMPRTC;
--- 
-2.14.1
+Will tweak as part of applying to my NBD queue.
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--9qrzpsVA6tOTZjVGKLP8B3DjYfg28h8uI
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlpVEmYACgkQp6FrSiUn
+Q2rmKgf/dWeQGiuTjYmRYPtoVWXTlSKTMq7AI8vAOAR29Om/L1N9fNJKvAe1u5sI
+sohwdQ8xA5AuChi04KXxhCvqEGxG9yUaWbhxDzA4IbSFGVfm4+FBnYeI+diRS30x
+kd7bFE2H31QoQm5TrzPD4LaoI23uYzVlFFElUYcobq5qrPLnNI5R0zDKx6i8/jDS
+8Z3JYfMgL8GXasXGi/x89X4ys5yK4kxcEXIGXVqz/1nNGsfxs68vz4CUK24T2UnP
+LOcVGdfQLHw5ZACQhGAlOYB1wdfxkmlICAaZHCVieTUqlxsihPzTzbWMXyvU7Ra0
+lZSn3TXMPVBJL4oxTaFvp/Y2w3UcAw==
+=/JXn
+-----END PGP SIGNATURE-----
+
+--9qrzpsVA6tOTZjVGKLP8B3DjYfg28h8uI--
