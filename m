@@ -1,30 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52339)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59861)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ahino@redhat.com>) id 1eZ033-0004kS-Un
-	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 14:59:03 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1eZ0DF-0000x4-WD
+	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 15:09:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ahino@redhat.com>) id 1eZ030-0002uN-Da
-	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 14:59:02 -0500
-Received: from mail-vk0-f41.google.com ([209.85.213.41]:33120)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <ahino@redhat.com>) id 1eZ030-0002sz-8e
-	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 14:58:58 -0500
-Received: by mail-vk0-f41.google.com with SMTP id w22so1725681vkw.0
-	for <qemu-devel@nongnu.org>; Tue, 09 Jan 2018 11:58:57 -0800 (PST)
+	(envelope-from <ehabkost@redhat.com>) id 1eZ0DD-0004YQ-7h
+	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 15:09:33 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:51696)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1eZ0DD-0004Xi-25
+	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 15:09:31 -0500
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 32D89C049D42
+	for <qemu-devel@nongnu.org>; Tue,  9 Jan 2018 20:09:30 +0000 (UTC)
+Date: Tue, 9 Jan 2018 18:09:26 -0200
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20180109200926.GC18022@localhost.localdomain>
+References: <1509617407-21191-1-git-send-email-thuth@redhat.com>
+	<c70ea44b-8eb8-2336-7263-77967056265d@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20180109095825.GB6063@localhost.localdomain>
-References: <20180105065538.13375-1-famz@redhat.com>
-	<20180108144136.GF8052@localhost.localdomain>
-	<CAMr-obsaegU2HDaH3EFoD+2EYUnPKuqsvQPk4GZ7hTdqXmpoWA@mail.gmail.com>
-	<20180108175729.GI8052@localhost.localdomain>
-	<20180109062425.GA18346@lemon.usersys.redhat.com>
-	<20180109095825.GB6063@localhost.localdomain>
-From: Ala Hino <ahino@redhat.com>
-Date: Tue, 9 Jan 2018 21:58:55 +0200
-Message-ID: <CAPuOgO35suw3LN4H0PZoE3ap+xZvK3tERvCHSUfHDMKc7-5XfQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 0/2] qemu-img: Let "info" warn
- and go ahead without -U
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <c70ea44b-8eb8-2336-7263-77967056265d@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH for-2.11 v3 0/2] Check for the availability
+ of a hotplug controller before adding a device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,74 +34,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: Fam Zheng <famz@redhat.com>, Nir Soffer <nirsof@gmail.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+To: Thomas Huth <thuth@redhat.com>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>, david@redhat.com, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Markus Armbruster <armbru@redhat.com>
 
-On Tue, Jan 9, 2018 at 11:58 AM, Kevin Wolf <kwolf@redhat.com> wrote:
+On Mon, Dec 18, 2017 at 12:59:50PM +0100, Thomas Huth wrote:
+> On 02.11.2017 11:10, Thomas Huth wrote:
+> > First patch is a small clean up to the error handling code in
+> > qdev_device_add(), and the second patch adds a proper check for
+> > the availability of a hotplug controller to prevent the possibility
+> > of a crash with device_del.
+> > 
+> > The crash can currently be triggered for example like this:
+> > 
+> > $ s390x-softmmu/qemu-system-s390x -M none -nographic 
+> > QEMU 2.10.50 monitor - type 'help' for more information
+> > (qemu) device_add qemu-s390x-cpu,id=x
+> > (qemu) device_del x
+> > **
+> > ERROR:qemu/qdev-monitor.c:872:qdev_unplug: assertion failed: (hotplug_ctrl)
+> > Aborted (core dumped)
+> > 
+> > v3:
+> >  - Invert the logic of the second error check in the first patch
+> >    as suggested by Igor
+> >  - Updated the patch description of the second patch with the current
+> >    way to crash QEMU
+> > 
+> > v2:
+> >  - Do the check for the availability of the hotplug controller earlier
+> >    in qdev_device_add
+> >  - Use common new err_dev_del handler in case of failure
+> > 
+> > Thomas Huth (2):
+> >   qdev_monitor: Simplify error handling in qdev_device_add()
+> >   qdev: Check for the availability of a hotplug controller before adding
+> >     a device
+> > 
+> >  hw/core/qdev.c         | 28 ++++++++++++++++++++--------
+> >  include/hw/qdev-core.h |  1 +
+> >  qdev-monitor.c         | 21 +++++++++++++--------
+> >  3 files changed, 34 insertions(+), 16 deletions(-)
+> 
+> Ping!
+> 
+> Paolo or Eduardo, could one of you please pick up the two patches?
 
-> Am 09.01.2018 um 07:24 hat Fam Zheng geschrieben:
-> > On Mon, 01/08 18:57, Kevin Wolf wrote:
-> > > I'm not sure if going back to the old behaviour for a while now would
-> be
-> > > helpful, you'd just end up with an even more confusing set of qemu
-> > > versions, for example:
-> > >
-> > >     <= 2.9          - works without a warning
-> > >     2.10 and 2.11   - errors out
-> > >     2.12            - prints a warning, but works
-> > >     >= 2.13         - errors out again
-> >
-> > What I had in mind is settle on warning for good. QEMU (including
-> qemu-img) is a
-> > low level tool that can be used in many ways that it isn't supposed to,
-> this one
-> > is not more harmful than others (e.g. "qemu-img snapshot ..." on
-> iscsi:// qcow2
-> > image) we allow siliently.
-> >
-> > I know this is debatable but I think the #1 purpose of image locking is
-> to
-> > prevent data corruption;
->
-> Isn't potentially wrong output of 'qemu-img info' a form of data
-> corruption? Not data as in disk content, but metadata is data, too.
->
-> > #2 IMO is to reduce confusion and misinformation.
-> > While inconsistent output of "qemu-img info" is misinformation, it not
-> working
-> > as before is actually confusion. Though the current behavior is indeed
-> ideal,
-> > the proposed patch is a bit more pragmatical.
->
-> To be clear: If we want to minimise confusing by change, we have to
-> disable locking by default, not only here but everywhere else. And
-> therefore make it completely useless.
->
-> The whole point of locking is to change something in order to make
-> things safer. Yes, this may inconvenience users who want to do something
-> unsafe. Tough luck. The only other option is not making things safer.
->
+Very sorry for the long delay.  I just queued it on machine-next.
+Thanks!
 
-Safer is better for sure.
-It is not about doing something unsafe, it is about breaking a released
-version -
-RHV 4.1 is already out and when customers upgrade to RHEL 7.5, they will not
-be able to create snapshots.
-I see two options:
-1. As mentioned by Fam, settle on warning for good
-2. Conflict qemu with vdsm < 4.2
-
->
-> We already successfully made a point that tools (libvirt with shared
-> images, or libguestfs) need to update their qemu invocation for qemu
-> proper. They didn't like it, but they could see the point, and it has
-> been this way for two releases already. So I don't see a compelling
-> reason why now we should give up again some of the safety we achieved
-> long-term.
->
-> If we were designing qemu-img from scratch, it would be an error. So
-> that's what it should be in the long term. Tools should preferably use
-> 'query-block' and friends rather 'qemu-img info' if the image is in use.
->
-> Kevin
->
+-- 
+Eduardo
