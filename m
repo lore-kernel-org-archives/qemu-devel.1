@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41793)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42414)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eYund-0000Cz-Cj
-	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 09:22:46 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1eYupY-0001yX-LJ
+	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 09:24:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eYunc-0007GZ-Cr
-	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 09:22:45 -0500
-Received: from mail-ot0-x243.google.com ([2607:f8b0:4003:c0f::243]:38402)
+	(envelope-from <peter.maydell@linaro.org>) id 1eYupX-0008Tx-IY
+	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 09:24:44 -0500
+Received: from mail-ot0-x242.google.com ([2607:f8b0:4003:c0f::242]:33639)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1eYunc-0007FA-8t
-	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 09:22:44 -0500
-Received: by mail-ot0-x243.google.com with SMTP id h2so11448741oti.5
-	for <qemu-devel@nongnu.org>; Tue, 09 Jan 2018 06:22:44 -0800 (PST)
+	id 1eYupX-0008Tm-DK
+	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 09:24:43 -0500
+Received: by mail-ot0-x242.google.com with SMTP id x15so11456627ote.0
+	for <qemu-devel@nongnu.org>; Tue, 09 Jan 2018 06:24:43 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <52515faf-f889-93ee-c0d0-4a895cfb6b13@linaro.org>
-References: <1513080506-17703-1-git-send-email-peter.maydell@linaro.org>
-	<52515faf-f889-93ee-c0d0-4a895cfb6b13@linaro.org>
+In-Reply-To: <1513183941-24300-1-git-send-email-peter.maydell@linaro.org>
+References: <1513183941-24300-1-git-send-email-peter.maydell@linaro.org>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 9 Jan 2018 14:22:23 +0000
-Message-ID: <CAFEAcA-J4MwnyusPgB7V3LK2c4G-OCJx3ReVO27riM761mv9jg@mail.gmail.com>
+Date: Tue, 9 Jan 2018 14:24:22 +0000
+Message-ID: <CAFEAcA8NbL7ROZs99hWhpAF2Rdi2qEiWLNo3hr_9W7gmgXyw4A@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH] target/arm: Make disas_thumb2_insn()
- generate its own UNDEF exceptions
+Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH 0/2] GICv2 & GICv3: RAZ/WI
+ reserved addresses rather than aborting
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,28 +29,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, "patches@linaro.org" <patches@linaro.org>
+To: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>, Laszlo Ersek <lersek@redhat.com>, "patches@linaro.org" <patches@linaro.org>
 
-On 12 December 2017 at 17:39, Richard Henderson
-<richard.henderson@linaro.org> wrote:
-> On 12/12/2017 04:08 AM, Peter Maydell wrote:
->> Refactor disas_thumb2_insn() so that it generates the code for raising
->> an UNDEF exception for invalid insns, rather than returning a flag
->> which the caller must check to see if it needs to generate the UNDEF
->> code. This brings the function in to line with the behaviour of
->> disas_thumb_insn() and disas_arm_insn().
->>
->> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
->> ---
->> This fixes the odd asymmetry of API that caused the bug fixed
->> in commit 7472e2efb...
->> ---
->>  target/arm/translate.c | 23 ++++++++++-------------
->>  1 file changed, 10 insertions(+), 13 deletions(-)
->
-> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Ping for code review?
 
-Thanks; applied to target-arm.next.
-
+thanks
 -- PMM
+
+On 13 December 2017 at 16:52, Peter Maydell <peter.maydell@linaro.org> wrote:
+> The GICv2 and GICv3 specifications say that reserved register
+> addresses should RAZ/WI.  This means we need to return MEMTX_OK, not
+> MEMTX_ERROR, because now that we support generating external aborts
+> the latter will cause an abort on new board models.
+>
+> In particular, at least some versions of UEFI try to
+> access a reserved address in the GICv3 redistributor
+> (at SGI_base + 0x184) and fail to boot on the virt board
+> without this.
+>
+> thanks
+> -- PMM
+>
+> Peter Maydell (2):
+>   hw/intc/arm_gicv3: Make reserved register addresses RAZ/WI
+>   hw/intc/arm_gic: reserved register addresses are RAZ/WI
+>
+>  hw/intc/arm_gic.c              |  5 +++--
+>  hw/intc/arm_gicv3_dist.c       | 13 +++++++++++++
+>  hw/intc/arm_gicv3_its_common.c |  8 +++-----
+>  hw/intc/arm_gicv3_redist.c     | 13 +++++++++++++
+>  4 files changed, 32 insertions(+), 7 deletions(-)
