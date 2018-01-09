@@ -1,15 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33932)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34098)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1eYqfO-0004YH-7t
-	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 04:57:59 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1eYqfq-0004po-2M
+	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 04:58:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1eYqfJ-0005OJ-BO
-	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 04:57:58 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:48136)
+	(envelope-from <pbonzini@redhat.com>) id 1eYqfl-0005cJ-5x
+	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 04:58:26 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:39674)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1eYqfJ-0005Nr-3Q
-	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 04:57:53 -0500
-References: <20180104141524.m5xy66jsn2hiajwl@var.youpi.perso.aquilenet.fr>
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1eYqfk-0005bj-Ui
+	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 04:58:21 -0500
+References: <1515071752-22961-1-git-send-email-thuth@redhat.com>
+	<20180104140930.7hbtnen3lw7epmrh@var.youpi.perso.aquilenet.fr>
+	<a78b6f7a-3eb2-6749-ccba-ad1ba4d525ae@redhat.com>
+	<20180104141524.m5xy66jsn2hiajwl@var.youpi.perso.aquilenet.fr>
 	<20180104142101.rivje5qn5dasb6jw@var.youpi.perso.aquilenet.fr>
 	<aea97804-c6a9-d903-13d8-23bc6b46af86@redhat.com>
 	<20180104152402.fv52umjmlb2g22wc@var.youpi.perso.aquilenet.fr>
@@ -17,16 +20,14 @@ References: <20180104141524.m5xy66jsn2hiajwl@var.youpi.perso.aquilenet.fr>
 	<20180104153219.wsxtkzuznu2iwra7@var.youpi.perso.aquilenet.fr>
 	<bb6eae87-85b2-4bf2-ad36-26fa95816315@redhat.com>
 	<9b392599-a318-90c5-daa8-89ade40c64e5@redhat.com>
-	<20180104155640.6rznzu4koy354pyn@var.youpi.perso.aquilenet.fr>
-	<4055e106-b24f-09b5-29cd-a4927ecad433@redhat.com>
-	<20180104174545.5p2aaypp2asbdoxx@var.youpi.perso.aquilenet.fr>
-	<d6e1a2a2-5246-c160-eb20-450d0598247c@redhat.com>
-	<1984712a-3077-71e1-4ff9-d8d9a91bf164@redhat.com>
+	<eba50062-de89-2091-8799-b6de3c88acaf@redhat.com>
+	<64a364f0-3dc0-87c4-f0b0-a79365032a8e@redhat.com>
+	<351493cf-fa56-491c-c646-49727e6611ed@redhat.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <19539542-7b3c-9251-866a-34531ed266c0@redhat.com>
-Date: Tue, 9 Jan 2018 10:57:47 +0100
+Message-ID: <6900aa32-7774-366f-32a5-9e75b70350db@redhat.com>
+Date: Tue, 9 Jan 2018 10:58:15 +0100
 MIME-Version: 1.0
-In-Reply-To: <1984712a-3077-71e1-4ff9-d8d9a91bf164@redhat.com>
+In-Reply-To: <351493cf-fa56-491c-c646-49727e6611ed@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -42,55 +43,20 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Thomas Huth <thuth@redhat.com>, Samuel Thibault <samuel.thibault@gnu.org>
 Cc: Peter Maydell <peter.maydell@linaro.org>, kraxel@redhat.com, qemu-devel@nongnu.org
 
-On 08/01/2018 08:43, Thomas Huth wrote:
-> On 04.01.2018 18:57, Paolo Bonzini wrote:
->> On 04/01/2018 18:45, Samuel Thibault wrote:
->>> Paolo Bonzini, on jeu. 04 janv. 2018 18:11:00 +0100, wrote:
->>>> On 04/01/2018 16:56, Samuel Thibault wrote:
->>>>>> However, adding magic to "-device usb-braille" that creates both a
->>>>>> front-end and a back-end is completely the opposite of sane...
->>>>> Well, this is also what happens with -device usb-mouse, usb-kbd etc.:
->>>>> they also plug with keyboard & mouse pipes of the qemu graphical
->>>>> frontend. braille is just the same vein for the user.
->>>>
->>>> No, they don't create a new UI object magically that wasn't there
->>>> before.  They just let you add a device, e.g. a USB tablet, that listens
->>>> on an _existing_ UI (GTK+ or SDL or similar).
->>>
->>> Technically for the qemu developper, yes.
->>>
->>> But for the user, no.
->>
->> That's not true.   With or without "-usbdevice tablet", you use the same
->> mouse or keyboard device as the input source.
-> 
-> But from a users point of view: Why are the mouse and keyboard input
-> sources available out of the box, while braille has to be specified
-> manually? I think Samuel has a point here...
+On 08/01/2018 08:23, Thomas Huth wrote:
+>>> But instead of introducing a new "-braille" parameter, maybe we should
+>>> rather keep some of the convenience "-usbdevice" possibilities around?
+>>> E.g. keep "-usbdevice braille", "-usbdevice mouse", etc. but remove
+>>> things like "-usbdevice serial" and "-usbdevice host" where the code is
+>>> rather ugly and the user do not gain much in comparison to "-device" ?
+>> That would work too.  But I'm not sure why keep all the usbdevice
+>> infrastructure when we can do the same (at the price of a small cmdline
+>> incompatibility) with only 50 lines of code.
+> I'm just afraid that we will end up with more new parameters in the end
+> than just "-braille" - or do we feel confident enough that "-usbdevice
+> braille" is the only one that would need a sugared replacement?
 
-There are two aspects of this:
-
-1) You have specified the mouse and keyboard backends, actually---via
-"-display vnc" or "-display gtk" or "-display none".
-
-2) The model for input backends is one-to-many (all guest
-mice/tablets/keyboards share the same backends), while the model for
-chardev backends is one-to-one.
-
-> So just another idea: Instead of adding the magic sugar code to the
-> usb-braille device, we could also add some code to vl.c or somewhere
-> else that checks whether a braille guest device is available and then
-> wires it up automatically with a braille host device (unless
-> -no-defaults has been specified, or the user already set chardev=...
-> there). Would that make more sense in your eyes than to put this code
-> into the usb-braille device directly?
-
-I'm not sure how that would work.  Also, if you use "-device" (or
-"-netdev", or "-blockdev", or "-chardev", or "-mon", or "-fsdev" or
-"-object") you are explicitly saying you don't want any magic.
-
-Magic on the other hand is fully within the scope of legacy options
-("-net", "-drive" especially without "if=none", "-usbdevice", "-serial",
-"-virtfs", etc.).
+I agree that we should plan for suboptions, so it could be "-braille
+[serial|usb]" for now.
 
 Paolo
