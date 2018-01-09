@@ -1,23 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46759)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51709)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1eYnKt-00083S-KT
-	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 01:24:36 -0500
+	(envelope-from <vincent@bernat.im>) id 1eYnaM-0003uy-Bv
+	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 01:40:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1eYnKs-0006sD-Td
-	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 01:24:35 -0500
-Date: Tue, 9 Jan 2018 14:24:25 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20180109062425.GA18346@lemon.usersys.redhat.com>
-References: <20180105065538.13375-1-famz@redhat.com>
-	<20180108144136.GF8052@localhost.localdomain>
-	<CAMr-obsaegU2HDaH3EFoD+2EYUnPKuqsvQPk4GZ7hTdqXmpoWA@mail.gmail.com>
-	<20180108175729.GI8052@localhost.localdomain>
+	(envelope-from <vincent@bernat.im>) id 1eYnaI-0006nX-Pb
+	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 01:40:34 -0500
+Received: from bart.luffy.cx ([78.47.78.131]:50954)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <vincent@bernat.im>) id 1eYnaI-0006nE-6f
+	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 01:40:30 -0500
+From: Vincent Bernat <vincent@bernat.im>
+References: <20180108205052.24385-1-vincent@bernat.im>
+	<20180108211623.GJ6646@localhost.localdomain>
+	<242287261.31733448.1515451036017.JavaMail.zimbra@redhat.com>
+Date: Tue, 09 Jan 2018 07:40:26 +0100
+In-Reply-To: <242287261.31733448.1515451036017.JavaMail.zimbra@redhat.com>
+	(Paolo Bonzini's message of "Mon, 8 Jan 2018 17:37:16 -0500 (EST)")
+Message-ID: <m34lnva61x.fsf@luffy.cx>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180108175729.GI8052@localhost.localdomain>
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 0/2] qemu-img: Let "info" warn
- and go ahead without -U
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] target-i386: add pcid to both Sandy Bridge
+ and Ivy Bridge
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,28 +30,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: Nir Soffer <nirsof@gmail.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Ala Hino <ahino@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Eduardo Habkost <ehabkost@redhat.com>, Richard Henderson <rth@twiddle.net>, qemu-devel@nongnu.org
 
-On Mon, 01/08 18:57, Kevin Wolf wrote:
-> I'm not sure if going back to the old behaviour for a while now would be
-> helpful, you'd just end up with an even more confusing set of qemu
-> versions, for example:
-> 
->     <= 2.9          - works without a warning
->     2.10 and 2.11   - errors out
->     2.12            - prints a warning, but works
->     >= 2.13         - errors out again
+ =E2=9D=A6  8 janvier 2018 17:37 -0500, Paolo Bonzini <pbonzini@redhat.com>=
+=C2=A0:
 
-What I had in mind is settle on warning for good. QEMU (including qemu-img) is a
-low level tool that can be used in many ways that it isn't supposed to, this one
-is not more harmful than others (e.g. "qemu-img snapshot ..." on iscsi:// qcow2
-image) we allow siliently.
+>> One possible way to work around this problem is to declare that
+>> QEMU 2.12 with KVM will require Linux v3.6 and newer (because we
+>> need Linux kernel commit ad756a1603c5 "KVM: VMX: Implement
+>> PCID/INVPCID for guests with EPT").
+>
+> Note that PCID is still not supported for guests without EPT, so
+> this would break ept=3D0 with recent "-cpu" models.  I'm not sure of
+> a way to fix it; probably it just has to be documented.
 
-I know this is debatable but I think the #1 purpose of image locking is to
-prevent data corruption; #2 IMO is to reduce confusion and misinformation.
-While inconsistent output of "qemu-img info" is misinformation, it not working
-as before is actually confusion. Though the current behavior is indeed ideal,
-the proposed patch is a bit more pragmatical.
-
-Fam
+>From the above patch, it seems only INVPCID needs EPT. KVM exposes PCID
+whenever it is present on the host.
+--=20
+When you are about to die, a wombat is better than no company at all.
+		-- Roger Zelazny, "Doorways in the Sand"
