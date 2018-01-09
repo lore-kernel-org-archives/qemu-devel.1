@@ -1,25 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55916)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56034)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eYySL-0006FS-FB
-	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 13:17:02 -0500
+	(envelope-from <jcmvbkbc@gmail.com>) id 1eYySi-0006V3-7B
+	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 13:17:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eYySK-0004YP-G5
-	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 13:17:01 -0500
-MIME-Version: 1.0
-Sender: philippe.mathieu.daude@gmail.com
-In-Reply-To: <60c89dbec86c14e2f0883d121872d0f6@walle.cc>
-References: <20180103162400.10396-1-f4bug@amsat.org>
-	<20180103162400.10396-3-f4bug@amsat.org>
-	<60c89dbec86c14e2f0883d121872d0f6@walle.cc>
-From: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Date: Tue, 9 Jan 2018 15:16:58 -0300
-Message-ID: <CAAdtpL7bno=1yrRYK6zt4pgDsa8N-8d291pzX0rhNBVqgkKi4g@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 2/6] hw/sd/milkymist-memcard: split
- realize() out of SysBusDevice init()
+	(envelope-from <jcmvbkbc@gmail.com>) id 1eYySh-00052G-5s
+	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 13:17:24 -0500
+Received: from mail-lf0-x229.google.com ([2a00:1450:4010:c07::229]:42725)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <jcmvbkbc@gmail.com>) id 1eYySg-000518-T7
+	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 13:17:23 -0500
+Received: by mail-lf0-x229.google.com with SMTP id e27so16933950lfb.9
+	for <qemu-devel@nongnu.org>; Tue, 09 Jan 2018 10:17:22 -0800 (PST)
+From: Max Filippov <jcmvbkbc@gmail.com>
+Date: Tue,  9 Jan 2018 10:17:03 -0800
+Message-Id: <1515521823-4292-1-git-send-email-jcmvbkbc@gmail.com>
+Subject: [Qemu-devel] [PULL v3] target/xtensa updates
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,146 +23,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Michael Walle <michael@walle.cc>
-Cc: Alistair Francis <alistair.francis@xilinx.com>, Peter Maydell <peter.maydell@linaro.org>, Xiaoqiang Zhao <zxq_yx_007@163.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, qemu-arm <qemu-arm@nongnu.org>
+To: qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, Max Filippov <jcmvbkbc@gmail.com>
 
-Hi Michael,
+Hi Peter,
 
-> Am 2018-01-03 17:23, schrieb Philippe Mathieu-Daud=C3=A9:
->>
->> Create the SDCard in the realize() function.
->>
->> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
->> ---
->>  hw/sd/milkymist-memcard.c | 24 +++++++++++++++---------
->>  1 file changed, 15 insertions(+), 9 deletions(-)
->>
->> diff --git a/hw/sd/milkymist-memcard.c b/hw/sd/milkymist-memcard.c
->> index 5de3e00e2f..5df3a0f815 100644
->> --- a/hw/sd/milkymist-memcard.c
->> +++ b/hw/sd/milkymist-memcard.c
->> @@ -255,24 +255,29 @@ static void milkymist_memcard_reset(DeviceState *d=
-)
->>  static int milkymist_memcard_init(SysBusDevice *dev)
->>  {
->>      MilkymistMemcardState *s =3D MILKYMIST_MEMCARD(dev);
->> -    DriveInfo *dinfo;
->> +
->> +    memory_region_init_io(&s->regs_region, OBJECT(s), &memcard_mmio_ops=
-,
->> s,
->> +            "milkymist-memcard", R_MAX * 4);
->> +    sysbus_init_mmio(dev, &s->regs_region);
->> +
->> +    return 0;
->> +}
->
->
-> Creating the device (milkymist_memcard_create()) fails with an assertion:
->   sysbus_mmio_map_common: Assertion `n >=3D 0 && n < dev->num_mmio' faile=
-d.
+please pull the following batch of updates for the target/xtensa.
+Changes v2->v3:
+- Don't use g_malloc_n, use g_new instead.
+Changes v1->v2:
+- Drop no longer used function option_bits_enabled.
 
-Thanks for trying this.
+The following changes since commit 0a0dc59d27527b78a195c2d838d28b7b49e5a639:
 
-Odd 'make check-qtest-lm32' didn't catch this...
+  Update version for v2.11.0 release (2017-12-13 14:31:09 +0000)
 
-> because dev->num_mmio is still 0. Seems that sysbus_init_mmio() hasn't be=
-en
-> called yet. Do we have to move the milkymist_memcard_init() to
-> .instance_init?
+are available in the git repository at:
 
-Your patch seems correct :)
+  git://github.com/OSLL/qemu-xtensa.git tags/20180109-xtensa
 
-Do you have some milky one prebuilt image that I can use for testing?
+for you to fetch changes up to 5a6539e627faf9251e1db78238b9f9b870610518:
 
-Regards,
+  target/xtensa: implement disassembler (2018-01-09 09:55:39 -0800)
 
-Phil.
+----------------------------------------------------------------
+target/xtensa updates:
 
->
-> Eg.
->
-> diff --git a/hw/sd/milkymist-memcard.c b/hw/sd/milkymist-memcard.c
-> index 5df3a0f815..21c0e91926 100644
-> --- a/hw/sd/milkymist-memcard.c
-> +++ b/hw/sd/milkymist-memcard.c
-> @@ -252,15 +252,14 @@ static void milkymist_memcard_reset(DeviceState *d)
->      }
->  }
->
-> -static int milkymist_memcard_init(SysBusDevice *dev)
-> +static void milkymist_memcard_init(Object *obj)
->  {
-> -    MilkymistMemcardState *s =3D MILKYMIST_MEMCARD(dev);
-> +    MilkymistMemcardState *s =3D MILKYMIST_MEMCARD(obj);
-> +    SysBusDevice *dev =3D SYS_BUS_DEVICE(obj);
->
->      memory_region_init_io(&s->regs_region, OBJECT(s), &memcard_mmio_ops,=
- s,
->              "milkymist-memcard", R_MAX * 4);
->      sysbus_init_mmio(dev, &s->regs_region);
-> -
-> -    return 0;
->  }
->
->  static void milkymist_memcard_realize(DeviceState *dev, Error **errp)
-> @@ -300,9 +299,7 @@ static const VMStateDescription
-> vmstate_milkymist_memcard =3D {
->  static void milkymist_memcard_class_init(ObjectClass *klass, void *data)
->  {
->      DeviceClass *dc =3D DEVICE_CLASS(klass);
-> -    SysBusDeviceClass *k =3D SYS_BUS_DEVICE_CLASS(klass);
->
-> -    k->init =3D milkymist_memcard_init;
->      dc->realize =3D milkymist_memcard_realize;
->      dc->reset =3D milkymist_memcard_reset;
->      dc->vmsd =3D &vmstate_milkymist_memcard;
-> @@ -314,6 +311,7 @@ static const TypeInfo milkymist_memcard_info =3D {
->      .name          =3D TYPE_MILKYMIST_MEMCARD,
->      .parent        =3D TYPE_SYS_BUS_DEVICE,
->      .instance_size =3D sizeof(MilkymistMemcardState),
-> +    .instance_init =3D milkymist_memcard_init,
->      .class_init    =3D milkymist_memcard_class_init,
->  };
->
-> -michael
->
->
->> +
->> +static void milkymist_memcard_realize(DeviceState *dev, Error **errp)
->> +{
->> +    MilkymistMemcardState *s =3D MILKYMIST_MEMCARD(dev);
->>      BlockBackend *blk;
->> +    DriveInfo *dinfo;
->>
->>      /* FIXME use a qdev drive property instead of drive_get_next() */
->>      dinfo =3D drive_get_next(IF_SD);
->>      blk =3D dinfo ? blk_by_legacy_dinfo(dinfo) : NULL;
->>      s->card =3D sd_init(blk, false);
->>      if (s->card =3D=3D NULL) {
->> -        return -1;
->> +        error_setg(errp, "failed to init SD card");
->> +        return;
->>      }
->> -
->>      s->enabled =3D blk && blk_is_inserted(blk);
->> -
->> -    memory_region_init_io(&s->regs_region, OBJECT(s), &memcard_mmio_ops=
-,
->> s,
->> -            "milkymist-memcard", R_MAX * 4);
->> -    sysbus_init_mmio(dev, &s->regs_region);
->> -
->> -    return 0;
->>  }
->>
->>  static const VMStateDescription vmstate_milkymist_memcard =3D {
->> @@ -298,6 +303,7 @@ static void
->> milkymist_memcard_class_init(ObjectClass *klass, void *data)
->>      SysBusDeviceClass *k =3D SYS_BUS_DEVICE_CLASS(klass);
->>
->>      k->init =3D milkymist_memcard_init;
->> +    dc->realize =3D milkymist_memcard_realize;
->>      dc->reset =3D milkymist_memcard_reset;
->>      dc->vmsd =3D &vmstate_milkymist_memcard;
->>      /* Reason: init() method uses drive_get_next() */
+- add libisa to the xtensa target;
+- change xtensa instruction translator to use it;
+- switch existing xtensa cores to use it;
+- add support for a number of instructions: salt/saltu, const16,
+  GPIO32 group, debug mode and MMU-related;
+- add disassembler for Xtensa.
+
+----------------------------------------------------------------
+Max Filippov (16):
+      target/xtensa: pass actual frame size to the entry helper
+      target/xtensa: import libisa source
+      target/xtensa: extract core opcode translators
+      target/xtensa: extract FPU2000 opcode translators
+      target/xtensa: update import_core.sh script for libisa
+      target/xtensa: switch dc232b to libisa
+      target/xtensa: switch dc233c to libisa
+      target/xtensa: switch fsf to libisa
+      target/xtensa: use libisa for instruction decoding
+      target/xtensa: tests: fix memctl SR test
+      target/xtensa: drop DisasContext::litbase
+      target/xtensa: add internal/noop SRs and opcodes
+      target/xtensa: implement salt/saltu
+      target/xtensa: implement GPIO32
+      target/xtensa: implement const16
+      target/xtensa: implement disassembler
+
+ MAINTAINERS                                |     1 +
+ disas/Makefile.objs                        |     1 +
+ disas/xtensa.c                             |   133 +
+ include/disas/bfd.h                        |     1 +
+ include/hw/xtensa/xtensa-isa.h             |   838 ++
+ target/xtensa/Makefile.objs                |     1 +
+ target/xtensa/core-dc232b.c                |     4 +
+ target/xtensa/core-dc232b/xtensa-modules.c | 14105 +++++++++++++++++++++++++
+ target/xtensa/core-dc233c.c                |     4 +
+ target/xtensa/core-dc233c/xtensa-modules.c | 15232 +++++++++++++++++++++++++++
+ target/xtensa/core-fsf.c                   |     5 +
+ target/xtensa/core-fsf/xtensa-modules.c    |  9841 +++++++++++++++++
+ target/xtensa/cpu.c                        |     9 +
+ target/xtensa/cpu.h                        |    31 +
+ target/xtensa/helper.c                     |    37 +
+ target/xtensa/import_core.sh               |    15 +
+ target/xtensa/op_helper.c                  |     2 +-
+ target/xtensa/translate.c                  |  5900 +++++++----
+ target/xtensa/xtensa-isa-internal.h        |   231 +
+ target/xtensa/xtensa-isa.c                 |  1745 +++
+ target/xtensa/xtensa-isa.h                 |     1 +
+ tests/tcg/xtensa/test_sr.S                 |     2 +-
+ 22 files changed, 45955 insertions(+), 2184 deletions(-)
+ create mode 100644 disas/xtensa.c
+ create mode 100644 include/hw/xtensa/xtensa-isa.h
+ create mode 100644 target/xtensa/core-dc232b/xtensa-modules.c
+ create mode 100644 target/xtensa/core-dc233c/xtensa-modules.c
+ create mode 100644 target/xtensa/core-fsf/xtensa-modules.c
+ create mode 100644 target/xtensa/xtensa-isa-internal.h
+ create mode 100644 target/xtensa/xtensa-isa.c
+ create mode 100644 target/xtensa/xtensa-isa.h
+
+-- 
+Thanks.
+-- Max
