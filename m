@@ -1,26 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45855)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49227)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1eZ1XB-00036E-R4
-	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 16:34:14 -0500
+	(envelope-from <alistair23@gmail.com>) id 1eZ1eY-0006B9-PB
+	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 16:41:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1eZ1XB-0006P2-6y
-	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 16:34:13 -0500
-Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:43783)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
-	id 1eZ1XB-0006OC-0i
-	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 16:34:13 -0500
-Received: by mail-wm0-x242.google.com with SMTP id g1so5217923wmg.2
-	for <qemu-devel@nongnu.org>; Tue, 09 Jan 2018 13:34:12 -0800 (PST)
+	(envelope-from <alistair23@gmail.com>) id 1eZ1eY-0008Df-5N
+	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 16:41:50 -0500
 MIME-Version: 1.0
-In-Reply-To: <1514940265-18093-3-git-send-email-mjc@sifive.com>
-References: <1514940265-18093-1-git-send-email-mjc@sifive.com>
-	<1514940265-18093-3-git-send-email-mjc@sifive.com>
+In-Reply-To: <1513183941-24300-3-git-send-email-peter.maydell@linaro.org>
+References: <1513183941-24300-1-git-send-email-peter.maydell@linaro.org>
+	<1513183941-24300-3-git-send-email-peter.maydell@linaro.org>
 From: Alistair Francis <alistair23@gmail.com>
-Date: Tue, 9 Jan 2018 13:33:41 -0800
-Message-ID: <CAKmqyKMeBU7WWRz23HJn7N_PRzK2+QNAdZNPAwP6zku2qFrmEA@mail.gmail.com>
+Date: Tue, 9 Jan 2018 13:41:16 -0800
+Message-ID: <CAKmqyKNjCtKYOP5cnOE5ZiZ_d6_Gg7Vb9ey7=OE-icgK-FdJ=g@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v1 02/21] RISC-V ELF Machine Definition
+Subject: Re: [Qemu-devel] [PATCH 2/2] hw/intc/arm_gic: reserved register
+ addresses are RAZ/WI
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,36 +23,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Michael Clark <mjc@sifive.com>
-Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Sagar Karandikar <sagark@eecs.berkeley.edu>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-arm <qemu-arm@nongnu.org>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Laszlo Ersek <lersek@redhat.com>, Patch Tracking <patches@linaro.org>
 
-On Tue, Jan 2, 2018 at 4:44 PM, Michael Clark <mjc@sifive.com> wrote:
-> Define RISC-V ELF machine EM_RISCV 243
+On Wed, Dec 13, 2017 at 8:52 AM, Peter Maydell <peter.maydell@linaro.org> wrote:
+> The GICv2 specification says that reserved register addresses
+> must RAZ/WI; now that we implement external abort handling
+> for Arm CPUs this means we must return MEMTX_OK rather than
+> MEMTX_ERROR, to avoid generating a spurious guest data abort.
 >
-> Signed-off-by: Michael Clark <mjc@sifive.com>
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+
+Looks good to me.
 
 Reviewed-by: Alistair Francis <alistair.francis@xilinx.com>
 
 Alistair
 
+
 > ---
->  include/elf.h | 2 ++
->  1 file changed, 2 insertions(+)
+>  hw/intc/arm_gic.c | 5 +++--
+>  1 file changed, 3 insertions(+), 2 deletions(-)
 >
-> diff --git a/include/elf.h b/include/elf.h
-> index e8a515c..8e457fc 100644
-> --- a/include/elf.h
-> +++ b/include/elf.h
-> @@ -112,6 +112,8 @@ typedef int64_t  Elf64_Sxword;
->
->  #define EM_UNICORE32    110     /* UniCore32 */
->
-> +#define EM_RISCV        243     /* RISC-V */
-> +
->  /*
->   * This is an interim value that we will use until the committee comes
->   * up with a final number.
+> diff --git a/hw/intc/arm_gic.c b/hw/intc/arm_gic.c
+> index 5a0e2a3..d701e49 100644
+> --- a/hw/intc/arm_gic.c
+> +++ b/hw/intc/arm_gic.c
+> @@ -1261,7 +1261,8 @@ static MemTxResult gic_cpu_read(GICState *s, int cpu, int offset,
+>      default:
+>          qemu_log_mask(LOG_GUEST_ERROR,
+>                        "gic_cpu_read: Bad offset %x\n", (int)offset);
+> -        return MEMTX_ERROR;
+> +        *data = 0;
+> +        break;
+>      }
+>      return MEMTX_OK;
+>  }
+> @@ -1329,7 +1330,7 @@ static MemTxResult gic_cpu_write(GICState *s, int cpu, int offset,
+>      default:
+>          qemu_log_mask(LOG_GUEST_ERROR,
+>                        "gic_cpu_write: Bad offset %x\n", (int)offset);
+> -        return MEMTX_ERROR;
+> +        return MEMTX_OK;
+>      }
+>      gic_update(s);
+>      return MEMTX_OK;
 > --
-> 2.7.0
+> 2.7.4
 >
 >
