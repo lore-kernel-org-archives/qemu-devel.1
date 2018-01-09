@@ -1,37 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34098)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34173)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1eYqfq-0004po-2M
-	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 04:58:27 -0500
+	(envelope-from <kwolf@redhat.com>) id 1eYqg6-0004zI-8H
+	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 04:58:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1eYqfl-0005cJ-5x
-	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 04:58:26 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:39674)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1eYqfk-0005bj-Ui
-	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 04:58:21 -0500
-References: <1515071752-22961-1-git-send-email-thuth@redhat.com>
-	<20180104140930.7hbtnen3lw7epmrh@var.youpi.perso.aquilenet.fr>
-	<a78b6f7a-3eb2-6749-ccba-ad1ba4d525ae@redhat.com>
-	<20180104141524.m5xy66jsn2hiajwl@var.youpi.perso.aquilenet.fr>
-	<20180104142101.rivje5qn5dasb6jw@var.youpi.perso.aquilenet.fr>
-	<aea97804-c6a9-d903-13d8-23bc6b46af86@redhat.com>
-	<20180104152402.fv52umjmlb2g22wc@var.youpi.perso.aquilenet.fr>
-	<b1a86fed-8a98-cc1d-46ca-5462f8be3fc7@redhat.com>
-	<20180104153219.wsxtkzuznu2iwra7@var.youpi.perso.aquilenet.fr>
-	<bb6eae87-85b2-4bf2-ad36-26fa95816315@redhat.com>
-	<9b392599-a318-90c5-daa8-89ade40c64e5@redhat.com>
-	<eba50062-de89-2091-8799-b6de3c88acaf@redhat.com>
-	<64a364f0-3dc0-87c4-f0b0-a79365032a8e@redhat.com>
-	<351493cf-fa56-491c-c646-49727e6611ed@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <6900aa32-7774-366f-32a5-9e75b70350db@redhat.com>
-Date: Tue, 9 Jan 2018 10:58:15 +0100
+	(envelope-from <kwolf@redhat.com>) id 1eYqg5-0005ny-7Z
+	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 04:58:42 -0500
+Date: Tue, 9 Jan 2018 10:58:25 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20180109095825.GB6063@localhost.localdomain>
+References: <20180105065538.13375-1-famz@redhat.com>
+	<20180108144136.GF8052@localhost.localdomain>
+	<CAMr-obsaegU2HDaH3EFoD+2EYUnPKuqsvQPk4GZ7hTdqXmpoWA@mail.gmail.com>
+	<20180108175729.GI8052@localhost.localdomain>
+	<20180109062425.GA18346@lemon.usersys.redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <351493cf-fa56-491c-c646-49727e6611ed@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2] usb: Remove legacy -usbdevice option
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180109062425.GA18346@lemon.usersys.redhat.com>
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 0/2] qemu-img: Let "info" warn
+ and go ahead without -U
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -40,23 +27,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, Samuel Thibault <samuel.thibault@gnu.org>
-Cc: Peter Maydell <peter.maydell@linaro.org>, kraxel@redhat.com, qemu-devel@nongnu.org
+To: Fam Zheng <famz@redhat.com>
+Cc: Nir Soffer <nirsof@gmail.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Ala Hino <ahino@redhat.com>
 
-On 08/01/2018 08:23, Thomas Huth wrote:
->>> But instead of introducing a new "-braille" parameter, maybe we should
->>> rather keep some of the convenience "-usbdevice" possibilities around?
->>> E.g. keep "-usbdevice braille", "-usbdevice mouse", etc. but remove
->>> things like "-usbdevice serial" and "-usbdevice host" where the code is
->>> rather ugly and the user do not gain much in comparison to "-device" ?
->> That would work too.  But I'm not sure why keep all the usbdevice
->> infrastructure when we can do the same (at the price of a small cmdline
->> incompatibility) with only 50 lines of code.
-> I'm just afraid that we will end up with more new parameters in the end
-> than just "-braille" - or do we feel confident enough that "-usbdevice
-> braille" is the only one that would need a sugared replacement?
+Am 09.01.2018 um 07:24 hat Fam Zheng geschrieben:
+> On Mon, 01/08 18:57, Kevin Wolf wrote:
+> > I'm not sure if going back to the old behaviour for a while now would be
+> > helpful, you'd just end up with an even more confusing set of qemu
+> > versions, for example:
+> > 
+> >     <= 2.9          - works without a warning
+> >     2.10 and 2.11   - errors out
+> >     2.12            - prints a warning, but works
+> >     >= 2.13         - errors out again
+> 
+> What I had in mind is settle on warning for good. QEMU (including qemu-img) is a
+> low level tool that can be used in many ways that it isn't supposed to, this one
+> is not more harmful than others (e.g. "qemu-img snapshot ..." on iscsi:// qcow2
+> image) we allow siliently.
+> 
+> I know this is debatable but I think the #1 purpose of image locking is to
+> prevent data corruption;
 
-I agree that we should plan for suboptions, so it could be "-braille
-[serial|usb]" for now.
+Isn't potentially wrong output of 'qemu-img info' a form of data
+corruption? Not data as in disk content, but metadata is data, too.
 
-Paolo
+> #2 IMO is to reduce confusion and misinformation.
+> While inconsistent output of "qemu-img info" is misinformation, it not working
+> as before is actually confusion. Though the current behavior is indeed ideal,
+> the proposed patch is a bit more pragmatical.
+
+To be clear: If we want to minimise confusing by change, we have to
+disable locking by default, not only here but everywhere else. And
+therefore make it completely useless.
+
+The whole point of locking is to change something in order to make
+things safer. Yes, this may inconvenience users who want to do something
+unsafe. Tough luck. The only other option is not making things safer.
+
+We already successfully made a point that tools (libvirt with shared
+images, or libguestfs) need to update their qemu invocation for qemu
+proper. They didn't like it, but they could see the point, and it has
+been this way for two releases already. So I don't see a compelling
+reason why now we should give up again some of the safety we achieved
+long-term.
+
+If we were designing qemu-img from scratch, it would be an error. So
+that's what it should be in the long term. Tools should preferably use
+'query-block' and friends rather 'qemu-img info' if the image is in use.
+
+Kevin
