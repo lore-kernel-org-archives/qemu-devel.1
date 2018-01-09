@@ -1,26 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46371)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47970)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1eYwEL-0000Sq-44
-	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 10:54:26 -0500
+	(envelope-from <lersek@redhat.com>) id 1eYwJ2-000213-V0
+	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 10:59:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1eYwEI-0001OU-2x
-	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 10:54:25 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:56216)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1eYwEH-0001Np-Sa
-	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 10:54:21 -0500
-Date: Tue, 9 Jan 2018 15:54:16 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180109155415.GD2709@work-vm>
-References: <20171218201340.27583-1-dgilbert@redhat.com>
-	<20171218201340.27583-7-dgilbert@redhat.com>
-	<20171222201439.139e4010@igors-macbook-pro.local>
+	(envelope-from <lersek@redhat.com>) id 1eYwJ1-00046G-St
+	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 10:59:17 -0500
+References: <1513183941-24300-1-git-send-email-peter.maydell@linaro.org>
+	<CAFEAcA8NbL7ROZs99hWhpAF2Rdi2qEiWLNo3hr_9W7gmgXyw4A@mail.gmail.com>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <6d20557d-5722-706f-ca4f-489ab85358c0@redhat.com>
+Date: Tue, 9 Jan 2018 16:58:56 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20171222201439.139e4010@igors-macbook-pro.local>
-Subject: Re: [Qemu-devel] [PATCH v5 6/7] vhost: Clean out old
- vhost_set_memory and friends
+In-Reply-To: <CAFEAcA8NbL7ROZs99hWhpAF2Rdi2qEiWLNo3hr_9W7gmgXyw4A@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH 0/2] GICv2 & GICv3: RAZ/WI
+ reserved addresses rather than aborting
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,50 +25,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: qemu-devel@nongnu.org, pbonzini@redhat.com, maxime.coquelin@redhat.com, mst@redhat.com, groug@kaod.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, "patches@linaro.org" <patches@linaro.org>, Drew Jones <drjones@redhat.com>, Auger Eric <eric.auger@redhat.com>, Wei Huang <wei@redhat.com>
 
-* Igor Mammedov (imammedo@redhat.com) wrote:
-> On Mon, 18 Dec 2017 20:13:39 +0000
-> "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com> wrote:
+On 01/09/18 15:24, Peter Maydell wrote:
+> Ping for code review?
 > 
-> > From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-> > 
-> > Remove the old update mechanism, vhost_set_memory, and the functions
-> > and flags it used.
-> > 
-> > Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> > ---
-> [...]
+> thanks
+> -- PMM
 > 
-> > -
-> > -static void vhost_set_memory(MemoryListener *listener,
-> > -                             MemoryRegionSection *section,
-> > -                             bool add)
-> > -{
-> [...]
-> 
-> > -    used_memslots = dev->mem->nregions;
-> lost sheep?
+> On 13 December 2017 at 16:52, Peter Maydell <peter.maydell@linaro.org> wrote:
+>> The GICv2 and GICv3 specifications
 
-Yes, I've moved that into the previous patch, ( vhost: Regenerate region
-list from changed sections list ) so it now has:
+here's where I had started running from your patch...
 
-...
-    dev->mem = g_realloc(dev->mem, regions_size);
-    dev->mem->nregions = dev->n_mem_sections;
-    used_memslots = dev->mem->nregions;
-    for (i = 0; i < dev->n_mem_sections; i++) {
-...
+>> say that reserved register
+>> addresses should RAZ/WI.
 
-> pls,
-> see "[PATCH v2 0/2] vhost: two fixes" to get vague idea how used_memslots is used
+...and I remarked only looking over my shoulder that "RAZ/WI" is not a
+verb :)
 
-Yes, that series does make it better because what confused me about the
-current use of used_memslots is it seems obviously unsafe for multiple
-devices.
+Sorry, no clue about any of this -- where should I read up?	
 
-Dave
+Ard did ask a question though:
 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+https://www.mail-archive.com/qemu-devel@nongnu.org/msg500055.html
+
+CC'ing Drew, Eric and Wei. In particular (IIUC) Eric has been looking
+into a weird "why do we have so many (and so slow) aborts with GICv4
+emulation" issue, at launching UEFI.
+
+Thanks
+Laszlo
+
+>> This means we need to return MEMTX_OK, not
+>> MEMTX_ERROR, because now that we support generating external aborts
+>> the latter will cause an abort on new board models.
+>>
+>> In particular, at least some versions of UEFI try to
+>> access a reserved address in the GICv3 redistributor
+>> (at SGI_base + 0x184) and fail to boot on the virt board
+>> without this.
+>>
+>> thanks
+>> -- PMM
+>>
+>> Peter Maydell (2):
+>>   hw/intc/arm_gicv3: Make reserved register addresses RAZ/WI
+>>   hw/intc/arm_gic: reserved register addresses are RAZ/WI
+>>
+>>  hw/intc/arm_gic.c              |  5 +++--
+>>  hw/intc/arm_gicv3_dist.c       | 13 +++++++++++++
+>>  hw/intc/arm_gicv3_its_common.c |  8 +++-----
+>>  hw/intc/arm_gicv3_redist.c     | 13 +++++++++++++
+>>  4 files changed, 32 insertions(+), 7 deletions(-)
