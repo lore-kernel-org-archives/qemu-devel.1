@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43027)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43087)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1eYw5o-0002ih-S8
-	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 10:45:38 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1eYw5z-0002qL-BE
+	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 10:45:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1eYw5l-0003ah-P2
-	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 10:45:36 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:45736)
+	(envelope-from <ehabkost@redhat.com>) id 1eYw5w-0003gy-8z
+	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 10:45:47 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:57286)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1eYw5l-0003aK-J5
-	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 10:45:33 -0500
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1eYw5w-0003gT-33
+	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 10:45:44 -0500
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 9EEEFD6576
-	for <qemu-devel@nongnu.org>; Tue,  9 Jan 2018 15:45:32 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 3BADCC057F87
+	for <qemu-devel@nongnu.org>; Tue,  9 Jan 2018 15:45:43 +0000 (UTC)
 From: Eduardo Habkost <ehabkost@redhat.com>
-Date: Tue,  9 Jan 2018 13:45:12 -0200
-Message-Id: <20180109154519.25634-1-ehabkost@redhat.com>
-Subject: [Qemu-devel] [PATCH 0/7] CPU model updates for CVE-2017-5715
- (Spectre variant #2)
+Date: Tue,  9 Jan 2018 13:45:13 -0200
+Message-Id: <20180109154519.25634-2-ehabkost@redhat.com>
+In-Reply-To: <20180109154519.25634-1-ehabkost@redhat.com>
+References: <20180109154519.25634-1-ehabkost@redhat.com>
+Subject: [Qemu-devel] [PATCH 1/7] i386: Change X86CPUDefinition::model_id to
+ const char*
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,54 +31,52 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-This series adds support for the new IA32_SPEC_CTRL MSR on Intel
-CPU models.  The new MSR and the spec-ctrl CPUID bit
-(CPUID[EAX=7,ECX=0].EDX[bit 26]) were introduced by a recent
-Intel microcode updated and can be used by OSes to mitigate
-CVE-2017-5715.
+It is valid to have a 48-character model ID on CPUID, however the
+definition of X86CPUDefinition::model_id is char[48], which can
+make the compiler drop the null terminator from the string.
 
-It also adds a new EPYC-IBPB CPU model that includes
-CPUID[0x80000008].EBX[bit 12] (IBPB).  That patch is a RFC
-because I couldn't find any detailed info on the new CPUID bit
-and the IA32_PRED_CMD MSR.
+If a CPU model happens to have 48 bytes on model_id, "-cpu help"
+will print garbage and the object_property_set_str() call at
+x86_cpu_load_def() will read data outside the model_id array.
 
-Additionally, the last patch on this series changes the new
-Westmere-IBRS, SandyBridge-IBRS and IvyBridge-IBRS to include the
-PCID feature, because PCID helps to reduce the performance impact
-of KPTI on the guest.  The patch is also a RFC because we need to
-confirm if all Westmere (and newer) CPUs out there have PCID
-available.
+We could increase the array size to 49, but this would mean the
+compiler would not issue a warning if a 49-char string is used by
+mistake for model_id.
 
-References:
-* https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2017-5715
-* Google Security Blog on Meltdown/Spectre mitigations:
-  https://security.googleblog.com/2018/01/more-details-about-mitigations-for-cpu_4.html
-* Kernel patches to make use of the new MSRs:
-  https://www.mail-archive.com/linux-kernel@vger.kernel.org/msg1578798.html
-* KVM kernel patches for the new CPUID bits and MSRs:
-  https://www.mail-archive.com/linux-kernel@vger.kernel.org/msg1580363.html
-* Patches adding PCID to the existing CPU models:
-  https://patchew.org/QEMU/20180108205052.24385-1-vincent@bernat.im
-  https://patchew.org/QEMU/20180109070112.30806-1-vincent@bernat.im
+To make things simpler, simply change model_id to be const char*,
+and validate the string length using an assert() on
+x86_cpu_cpudef_class_init.
 
-Eduardo Habkost (6):
-  i386: Change X86CPUDefinition::model_id to const char*
-  i386: Add spec-ctrl CPUID bit
-  i386: Add FEAT_8000_0008_EBX CPUID feature word
-  i386: Add new -IBRS versions of Intel CPU models
-  [RFC] i386: Add EPYC-IBPB CPU model
-  [RFC] i386: Add PCID to {Westmere,SandyBridge,IvyBridge}-IBRS
+Reported-by: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+---
+ target/i386/cpu.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
-Paolo Bonzini (1):
-  i386: Add support for SPEC_CTRL MSR
-
- target/i386/cpu.h     |   7 +
- target/i386/cpu.c     | 454 +++++++++++++++++++++++++++++++++++++++++++++++++-
- target/i386/kvm.c     |  14 ++
- target/i386/machine.c |  20 +++
- 4 files changed, 491 insertions(+), 4 deletions(-)
-
+diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+index 3818d72831..9f4f949899 100644
+--- a/target/i386/cpu.c
++++ b/target/i386/cpu.c
+@@ -754,7 +754,7 @@ struct X86CPUDefinition {
+     int model;
+     int stepping;
+     FeatureWordArray features;
+-    char model_id[48];
++    const char *model_id;
+ };
+ 
+ static X86CPUDefinition builtin_x86_defs[] = {
+@@ -2718,6 +2718,9 @@ static void x86_cpu_cpudef_class_init(ObjectClass *oc, void *data)
+     X86CPUDefinition *cpudef = data;
+     X86CPUClass *xcc = X86_CPU_CLASS(oc);
+ 
++    /* catch mistakes instead of silently truncating model_id when too long */
++    assert(!cpudef->model_id || strlen(cpudef->model_id) <= 48);
++
+     xcc->cpu_def = cpudef;
+     xcc->migration_safe = true;
+ }
 -- 
 2.14.3
