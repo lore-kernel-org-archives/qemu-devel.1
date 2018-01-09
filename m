@@ -1,34 +1,42 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46891)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47229)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eYy9W-00043J-0X
-	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 12:57:35 -0500
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1eYyA6-0004UX-2Z
+	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 12:58:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eYy9R-0006fg-IH
-	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 12:57:34 -0500
-Received: from indium.canonical.com ([91.189.90.7]:57936)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1eYy9R-0006ea-9M
-	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 12:57:29 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1eYy9N-0001Ng-1o
-	for <qemu-devel@nongnu.org>; Tue, 09 Jan 2018 17:57:25 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 57BDC2E826D
-	for <qemu-devel@nongnu.org>; Tue,  9 Jan 2018 17:57:00 +0000 (UTC)
-MIME-Version: 1.0
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1eYyA1-0007Cm-Nq
+	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 12:58:10 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:40780)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
+	id 1eYyA1-0007CI-GV
+	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 12:58:05 -0500
+Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w09Htpij024801
+	for <qemu-devel@nongnu.org>; Tue, 9 Jan 2018 12:58:04 -0500
+Received: from e31.co.us.ibm.com (e31.co.us.ibm.com [32.97.110.149])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2fd0x854f6-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Tue, 09 Jan 2018 12:58:03 -0500
+Received: from localhost
+	by e31.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <mdroth@linux.vnet.ibm.com>;
+	Tue, 9 Jan 2018 10:58:02 -0700
 Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Date: Tue, 09 Jan 2018 17:48:01 -0000
-From: =?utf-8?q?Murilo_Opsfelder_Ara=C3=BAjo?= <1727250@bugs.launchpad.net>
-Reply-To: Bug 1727250 <1727250@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <150892252192.18283.8177817026945520523.malonedeb@chaenomeles.canonical.com>
-Message-Id: <151552008206.3476.12725086150241717553.malone@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1727250] Re: qemu-io-test 147 segfaults when
- configured with gcov
+From: Michael Roth <mdroth@linux.vnet.ibm.com>
+In-Reply-To: <25942882-8dfd-87f4-7822-3d46ee303370@redhat.com>
+References: <20180108055348.20444-1-david@gibson.dropbear.id.au>
+	<CAFEAcA_vmTqHdjL6QfKtn-Khg2RHBA7Vs3QxreXwe2J_7mhGAQ@mail.gmail.com>
+	<20180109121653.GN2131@umbus.fritz.box>
+	<CAFEAcA-Mzyf2S3yW04LNVy7pAZ6gmzXo3aiFdPxrbWAAAX7N0Q@mail.gmail.com>
+	<151551377581.2579.2269090053428846143@sif>
+	<25942882-8dfd-87f4-7822-3d46ee303370@redhat.com>
+Date: Tue, 09 Jan 2018 11:57:44 -0600
+Message-Id: <151552066431.27287.14137170642148809559@sif>
+Subject: Re: [Qemu-devel] [PULL 00/12] ppc-for-2.12 queue 20180108
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,241 +45,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: David Gibson <david@gibson.dropbear.id.au>, Paolo Bonzini <pbonzini@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-ppc@nongnu.org, Greg Kurz <groug@kaod.org>, surajjs@au1.ibm.com
 
-The fix was committed:
+Quoting Paolo Bonzini (2018-01-09 11:34:48)
+> On 09/01/2018 17:02, Michael Roth wrote:
+> >> so you can see it's already diverged because it prints out
+> >> a different value for the name of the pci node and the
+> >> SCSI line has 8200000000000000 vs 00000000.
+> > FYI I actually see this with a raspberry pi 3 too
+> =
 
-https://git.qemu.org/?p=3Dqemu.git;a=3Dcommitdiff;h=3Dc4365735a7d38f4355c6f=
-77e6670d3972315f7c2
+> Is this an arm32 or aarch64 install?  From Peter's report, I am tempted
+> to blame the ARM backend (I tested 32-bit x86 and it works).  But a bug
+> in both 32-bit ARM and aarch64 would be less likely.
 
-commit c4365735a7d38f4355c6f77e6670d3972315f7c2
-Author: Murilo Opsfelder Araujo <muriloo@linux.vnet.ibm.com>
-Date:   Fri Jan 5 11:32:41 2018 -0200
+In my case it's a 32-bit kernel/userspace:
 
-    block/nbd: fix segmentation fault when .desc is not null-terminated
+pi@rpi-office:~/dev/qemu-build $ uname -a
+Linux rpi-office 4.4.38-v7+ #938 SMP Thu Dec 15 15:22:21 GMT 2016 armv7l
+GNU/Linux
+pi@rpi-office:~/dev/qemu-build $ file ppc64-softmmu/qemu-system-ppc64 =
 
-** Changed in: qemu
-       Status: In Progress =3D> Fix Committed
+ppc64-softmmu/qemu-system-ppc64: ELF 32-bit LSB executable, ARM, EABI5
+version 1 (GNU/Linux), dynamically linked, interpreter
+/lib/ld-linux-armhf.so.3, for GNU/Linux 2.6.32,
+BuildID[sha1]=3D4e3e0c8ddbab91a672e4c29b5bfcee9d22459cf7, not stripped
 
--- =
+> =
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1727250
+> Paolo
+> =
 
-Title:
-  qemu-io-test 147 segfaults when configured with gcov
+> > , with repeating spaces
+> > as well. I didn't notice it before since in my case the
+> > ufd_version_check() in test-migration.c was failing so the migration te=
+sts
+> > were reporting success but were actually just getting skipped.
+> > =
 
-Status in QEMU:
-  Fix Committed
-
-Bug description:
-  Head is at 3d7196d43bfe12efe98568cb60057e273652b99b
-
-  Steps to re-produce:
-  1. git clone
-  ./configure --enable-gcov --target-list=3Dppc64-softmmu
-  make
-  cd tests/qemu-iotests
-
-  2. export qemu binary, in my environment
-  export QEMU_PROG=3D/home/nasastry/qemu_gcov/ppc64-softmmu/qemu-system-ppc=
-64
-
-  3. Run test 147 with format qcow2
-  ./check -qcow2 147
-
-  QEMU          -- "/home/nasastry/qemu_gcov/ppc64-softmmu/qemu-system-ppc6=
-4" -nodefaults -machine accel=3Dqtest
-  QEMU_IMG      -- "/home/nasastry/qemu/qemu-img"
-  QEMU_IO       -- "/home/nasastry/qemu/qemu-io"  --cache writeback -f qcow2
-  QEMU_NBD      -- "/home/nasastry/qemu/qemu-nbd"
-  IMGFMT        -- qcow2 (compat=3D1.1)
-  IMGPROTO      -- file
-  PLATFORM      -- Linux/ppc64le zzfp365-lp1 4.13.0-4.rel.git49564cb.el7.ce=
-ntos.ppc64le
-  TEST_DIR      -- /home/nasastry/qemu/tests/qemu-iotests/scratch
-  SOCKET_SCM_HELPER -- /home/nasastry/qemu/tests/qemu-iotests/socket_scm_he=
-lper
-
-  147 0s ... [failed, exit status 1] - output mismatch (see 147.out.bad)
-  --- /home/nasastry/qemu/tests/qemu-iotests/147.out	2017-10-25 14:04:54.97=
-8600753 +0530
-  +++ /home/nasastry/qemu/tests/qemu-iotests/147.out.bad	2017-10-25 14:09:5=
-3.769783770 +0530
-  @@ -1,5 +1,95 @@
-  -......
-  +WARNING:qemu:qemu received signal -11: /home/nasastry/qemu_gcov/ppc64-so=
-ftmmu/qemu-system-ppc64 -chardev socket,id=3Dmon,path=3D/home/nasastry/qemu=
-/tests/qemu-iotests/scratch/qemu-28636-monitor.sock -mon chardev=3Dmon,mode=
-=3Dcontrol -display none -vga none -qtest unix:path=3D/home/nasastry/qemu/t=
-ests/qemu-iotests/scratch/qemu-28636-qtest.sock -machine accel=3Dqtest -nod=
-efaults -machine accel=3Dqtest
-  +WARNING:qemu:qemu received signal -11: /home/nasastry/qemu_gcov/ppc64-so=
-ftmmu/qemu-system-ppc64 -chardev socket,id=3Dmon,path=3D/home/nasastry/qemu=
-/tests/qemu-iotests/scratch/qemu-28636-monitor.sock -mon chardev=3Dmon,mode=
-=3Dcontrol -display none -vga none -qtest unix:path=3D/home/nasastry/qemu/t=
-ests/qemu-iotests/scratch/qemu-28636-qtest.sock -machine accel=3Dqtest -nod=
-efaults -machine accel=3Dqtest
-  +WARNING:qemu:qemu received signal -11: /home/nasastry/qemu_gcov/ppc64-so=
-ftmmu/qemu-system-ppc64 -chardev socket,id=3Dmon,path=3D/home/nasastry/qemu=
-/tests/qemu-iotests/scratch/qemu-28636-monitor.sock -mon chardev=3Dmon,mode=
-=3Dcontrol -display none -vga none -qtest unix:path=3D/home/nasastry/qemu/t=
-ests/qemu-iotests/scratch/qemu-28636-qtest.sock -machine accel=3Dqtest -nod=
-efaults -machine accel=3Dqtest
-  +WARNING:qemu:qemu received signal -11: /home/nasastry/qemu_gcov/ppc64-so=
-ftmmu/qemu-system-ppc64 -chardev socket,id=3Dmon,path=3D/home/nasastry/qemu=
-/tests/qemu-iotests/scratch/qemu-28636-monitor.sock -mon chardev=3Dmon,mode=
-=3Dcontrol -display none -vga none -qtest unix:path=3D/home/nasastry/qemu/t=
-ests/qemu-iotests/scratch/qemu-28636-qtest.sock -machine accel=3Dqtest -nod=
-efaults -machine accel=3Dqtest
-  +WARNING:qemu:qemu received signal -11: /home/nasastry/qemu_gcov/ppc64-so=
-ftmmu/qemu-system-ppc64 -chardev socket,id=3Dmon,path=3D/home/nasastry/qemu=
-/tests/qemu-iotests/scratch/qemu-28636-monitor.sock -mon chardev=3Dmon,mode=
-=3Dcontrol -display none -vga none -qtest unix:path=3D/home/nasastry/qemu/t=
-ests/qemu-iotests/scratch/qemu-28636-qtest.sock -machine accel=3Dqtest -nod=
-efaults -machine accel=3Dqtest
-  +WARNING:qemu:qemu received signal -11: /home/nasastry/qemu_gcov/ppc64-so=
-ftmmu/qemu-system-ppc64 -chardev socket,id=3Dmon,path=3D/home/nasastry/qemu=
-/tests/qemu-iotests/scratch/qemu-28636-monitor.sock -mon chardev=3Dmon,mode=
-=3Dcontrol -display none -vga none -qtest unix:path=3D/home/nasastry/qemu/t=
-ests/qemu-iotests/scratch/qemu-28636-qtest.sock -machine accel=3Dqtest -nod=
-efaults -machine accel=3Dqtest
-  +FFFFFF
-  +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-  +FAIL: test_fd (__main__.BuiltinNBD)
-  +----------------------------------------------------------------------
-  +Traceback (most recent call last):
-  +  File "147", line 203, in test_fd
-  +    self.client_test(filename, flatten_sock_addr(address), 'nbd-export')
-  +  File "147", line 55, in client_test
-  +    self.assert_qmp(result, 'return', {})
-  +  File "/home/nasastry/qemu/tests/qemu-iotests/iotests.py", line 315, in=
- assert_qmp
-  +    result =3D self.dictpath(d, path)
-  +  File "/home/nasastry/qemu/tests/qemu-iotests/iotests.py", line 274, in=
- dictpath
-  +    self.fail('failed path traversal for "%s" in "%s"' % (path, str(d)))
-  +AssertionError: failed path traversal for "return" in "None"
-  +
-  +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-  +FAIL: test_inet (__main__.BuiltinNBD)
-  +----------------------------------------------------------------------
-  +Traceback (most recent call last):
-  +  File "147", line 146, in test_inet
-  +    flatten_sock_addr(address), 'nbd-export')
-  +  File "147", line 55, in client_test
-  +    self.assert_qmp(result, 'return', {})
-  +  File "/home/nasastry/qemu/tests/qemu-iotests/iotests.py", line 315, in=
- assert_qmp
-  +    result =3D self.dictpath(d, path)
-  +  File "/home/nasastry/qemu/tests/qemu-iotests/iotests.py", line 274, in=
- dictpath
-  +    self.fail('failed path traversal for "%s" in "%s"' % (path, str(d)))
-  +AssertionError: failed path traversal for "return" in "None"
-  +
-  +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-  +FAIL: test_inet6 (__main__.BuiltinNBD)
-  +----------------------------------------------------------------------
-  +Traceback (most recent call last):
-  +  File "147", line 171, in test_inet6
-  +    self.client_test(filename, flatten_sock_addr(address), 'nbd-export')
-  +  File "147", line 55, in client_test
-  +    self.assert_qmp(result, 'return', {})
-  +  File "/home/nasastry/qemu/tests/qemu-iotests/iotests.py", line 315, in=
- assert_qmp
-  +    result =3D self.dictpath(d, path)
-  +  File "/home/nasastry/qemu/tests/qemu-iotests/iotests.py", line 274, in=
- dictpath
-  +    self.fail('failed path traversal for "%s" in "%s"' % (path, str(d)))
-  +AssertionError: failed path traversal for "return" in "None"
-  +
-  +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-  +FAIL: test_unix (__main__.BuiltinNBD)
-  +----------------------------------------------------------------------
-  +Traceback (most recent call last):
-  +  File "147", line 179, in test_unix
-  +    flatten_sock_addr(address), 'nbd-export')
-  +  File "147", line 55, in client_test
-  +    self.assert_qmp(result, 'return', {})
-  +  File "/home/nasastry/qemu/tests/qemu-iotests/iotests.py", line 315, in=
- assert_qmp
-  +    result =3D self.dictpath(d, path)
-  +  File "/home/nasastry/qemu/tests/qemu-iotests/iotests.py", line 274, in=
- dictpath
-  +    self.fail('failed path traversal for "%s" in "%s"' % (path, str(d)))
-  +AssertionError: failed path traversal for "return" in "None"
-  +
-  +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-  +FAIL: test_inet (__main__.QemuNBD)
-  +----------------------------------------------------------------------
-  +Traceback (most recent call last):
-  +  File "147", line 96, in test_inet
-  +    flatten_sock_addr(address))
-  +  File "147", line 55, in client_test
-  +    self.assert_qmp(result, 'return', {})
-  +  File "/home/nasastry/qemu/tests/qemu-iotests/iotests.py", line 315, in=
- assert_qmp
-  +    result =3D self.dictpath(d, path)
-  +  File "/home/nasastry/qemu/tests/qemu-iotests/iotests.py", line 274, in=
- dictpath
-  +    self.fail('failed path traversal for "%s" in "%s"' % (path, str(d)))
-  +AssertionError: failed path traversal for "return" in "None"
-  +
-  +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-  +FAIL: test_unix (__main__.QemuNBD)
-  +----------------------------------------------------------------------
-  +Traceback (most recent call last):
-  +  File "147", line 103, in test_unix
-  +    flatten_sock_addr(address))
-  +  File "147", line 55, in client_test
-  +    self.assert_qmp(result, 'return', {})
-  +  File "/home/nasastry/qemu/tests/qemu-iotests/iotests.py", line 315, in=
- assert_qmp
-  +    result =3D self.dictpath(d, path)
-  +  File "/home/nasastry/qemu/tests/qemu-iotests/iotests.py", line 274, in=
- dictpath
-  +    self.fail('failed path traversal for "%s" in "%s"' % (path, str(d)))
-  +AssertionError: failed path traversal for "return" in "None"
-  +
-   ----------------------------------------------------------------------
-   Ran 6 tests
-
-  -OK
-  +FAILED (failures=3D6)
-  Failures: 147
-  Failed 1 of 1 tests
-
-  With out gcov configured, the above test get pass.
-  export QEMU_PROG=3D/home/nasastry/qemu/ppc64-softmmu/qemu-system-ppc64
-  ./check -qcow2 147
-  QEMU          -- "/home/nasastry/qemu/ppc64-softmmu/qemu-system-ppc64" -n=
-odefaults -machine accel=3Dqtest
-  QEMU_IMG      -- "/home/nasastry/qemu/qemu-img"
-  QEMU_IO       -- "/home/nasastry/qemu/qemu-io"  --cache writeback -f qcow2
-  QEMU_NBD      -- "/home/nasastry/qemu/qemu-nbd"
-  IMGFMT        -- qcow2 (compat=3D1.1)
-  IMGPROTO      -- file
-  PLATFORM      -- Linux/ppc64le zzfp365-lp1 4.13.0-4.rel.git49564cb.el7.ce=
-ntos.ppc64le
-  TEST_DIR      -- /home/nasastry/qemu/tests/qemu-iotests/scratch
-  SOCKET_SCM_HELPER -- /home/nasastry/qemu/tests/qemu-iotests/socket_scm_he=
-lper
-
-  147
-  Passed all 1 tests
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1727250/+subscriptions
+>=20
