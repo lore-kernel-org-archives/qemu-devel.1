@@ -1,20 +1,40 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58053)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58286)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1eYrs9-0006Sj-7V
-	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 06:15:18 -0500
+	(envelope-from <muriloo@linux.vnet.ibm.com>) id 1eYrsd-0006ld-Rj
+	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 06:15:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1eYrs8-00067F-6c
-	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 06:15:13 -0500
+	(envelope-from <muriloo@linux.vnet.ibm.com>) id 1eYrsY-0006eF-SL
+	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 06:15:43 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:38894)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <muriloo@linux.vnet.ibm.com>)
+	id 1eYrsY-0006c5-E2
+	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 06:15:38 -0500
+Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w09BEqge055321
+	for <qemu-devel@nongnu.org>; Tue, 9 Jan 2018 06:15:37 -0500
+Received: from e16.ny.us.ibm.com (e16.ny.us.ibm.com [129.33.205.206])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2fcu1pw80f-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Tue, 09 Jan 2018 06:15:37 -0500
+Received: from localhost
+	by e16.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <muriloo@linux.vnet.ibm.com>;
+	Tue, 9 Jan 2018 06:15:35 -0500
+References: <20180109092103.18458-1-sjitindarsingh@gmail.com>
+	<20180109092103.18458-3-sjitindarsingh@gmail.com>
+From: =?UTF-8?Q?Murilo_Opsfelder_Ara=c3=bajo?= <muriloo@linux.vnet.ibm.com>
+Date: Tue, 9 Jan 2018 09:15:31 -0200
 MIME-Version: 1.0
-In-Reply-To: <20180108215007.46471-1-marcel@redhat.com>
-References: <20180108215007.46471-1-marcel@redhat.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Tue, 9 Jan 2018 12:15:09 +0100
-Message-ID: <CAJ+F1CLGi6bSMuafc7J1kzxAPHGErWfdKDmjbDX=H5WtK8YL0Q@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] fw_cfg: fix memory corruption when all
- fw_cfg slots are used
+In-Reply-To: <20180109092103.18458-3-sjitindarsingh@gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Message-Id: <1316befd-f593-8082-bec5-a1635e866f61@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [Qemu-ppc] [QEMU-PPC] [RFC 2/3]
+ hw/spapr/spapr_caps: Add new caps safe_[cache/bounds_check/indirect_branch]
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,78 +43,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Marcel Apfelbaum <marcel@redhat.com>
-Cc: QEMU <qemu-devel@nongnu.org>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, qemu-stable <qemu-stable@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>, Laszlo Ersek <lersek@redhat.com>
+To: Suraj Jitindar Singh <sjitindarsingh@gmail.com>, qemu-ppc@nongnu.org
+Cc: paulus@ozlabs.org, qemu-devel@nongnu.org, david@gibson.dropbear.id.au
 
-Hi
+On 01/09/2018 07:21 AM, Suraj Jitindar Singh wrote:
+> This patch adds three new capabilities:
+> cap-cfpc -> safe_cache
+> cap-sbbc -> safe_bounds_check
+> cap-ibs  -> safe_indirect_branch
 
-On Mon, Jan 8, 2018 at 10:50 PM, Marcel Apfelbaum <marcel@redhat.com> wrote=
-:
-> When all the fw_cfg slots are used, a write is made outside the
-> bounds of the fw_cfg files array as part of the sort algorithm.
->
-> Fix it by avoiding an unnecessary array element move.
-> Fix also an assert while at it.
->
-> Signed-off-by: Marcel Apfelbaum <marcel@redhat.com>
-> ---
->  hw/nvram/fw_cfg.c | 6 ++++--
->  1 file changed, 4 insertions(+), 2 deletions(-)
->
-> diff --git a/hw/nvram/fw_cfg.c b/hw/nvram/fw_cfg.c
-> index 753ac0e4ea..4313484b21 100644
-> --- a/hw/nvram/fw_cfg.c
-> +++ b/hw/nvram/fw_cfg.c
-> @@ -784,7 +784,7 @@ void fw_cfg_add_file_callback(FWCfgState *s,  const c=
-har *filename,
->       * index and "i - 1" is the one being copied from, thus the
->       * unusual start and end in the for statement.
->       */
-> -    for (i =3D count + 1; i > index; i--) {
-> +    for (i =3D count; i > index; i--) {
+Hi, Suraj.
 
-Good catch (could be worth a test in fw_cfg-test.c for ASAN check?)
+What about splitting this into smaller patches, one per capability?
 
-Just some thought, I wonder if the sorting should be done once after
-all entries are added, with some higher function like g_array_sort().
+> Each capability is tristate with the possible values "broken",
+> "workaround" or "fixed". Add generic getter and setter functions for
+> this new capability type. Add these new capabilities to the capabilities
+> list. The maximum value for the capabilities is queried from kvm through
+> new kvm capabilities. The requested values are considered to be
+> compatible if kvm can support an equal or higher value for each
+> capability.
+> 
+> Discussion:
+> Currently these new capabilities default to broken to allow for
+> backwards compatibility, is this the best option?
 
->          s->files->f[i] =3D s->files->f[i - 1];
->          s->files->f[i].select =3D cpu_to_be16(FW_CFG_FILE_FIRST + i);
->          s->entries[0][FW_CFG_FILE_FIRST + i] =3D
-> @@ -833,7 +833,6 @@ void *fw_cfg_modify_file(FWCfgState *s, const char *f=
-ilename,
->      assert(s->files);
->
->      index =3D be32_to_cpu(s->files->count);
-> -    assert(index < fw_cfg_file_slots(s));
->
->      for (i =3D 0; i < index; i++) {
->          if (strcmp(filename, s->files->f[i].name) =3D=3D 0) {
-> @@ -843,6 +842,9 @@ void *fw_cfg_modify_file(FWCfgState *s, const char *f=
-ilename,
->              return ptr;
->          }
->      }
-> +
-> +    assert(index < fw_cfg_file_slots(s));
-> +
+This could be placed in the cover letter, not in the commit message.
 
-Well, the assert is redundant with the one in
-fw_cfg_add_file_callback() at this point. I think the original assert
-is there for sanity check only, before iterating over files.
-
->      /* add new one */
->      fw_cfg_add_file_callback(s, filename, NULL, NULL, NULL, data, len, t=
-rue);
->      return NULL;
-> --
-> 2.13.5
->
->
-
-
-
-
-
---=20
-Marc-Andr=C3=A9 Lureau
+Cheers
+Murilo
