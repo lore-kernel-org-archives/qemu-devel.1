@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48197)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48212)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sjitindarsingh@gmail.com>) id 1eYq66-0006SH-01
-	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 04:21:31 -0500
+	(envelope-from <sjitindarsingh@gmail.com>) id 1eYq67-0006Ty-TY
+	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 04:21:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sjitindarsingh@gmail.com>) id 1eYq60-0001Dg-Fe
-	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 04:21:29 -0500
+	(envelope-from <sjitindarsingh@gmail.com>) id 1eYq60-0001DU-8v
+	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 04:21:31 -0500
 From: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
-Date: Tue,  9 Jan 2018 20:21:02 +1100
-Message-Id: <20180109092103.18458-3-sjitindarsingh@gmail.com>
+Date: Tue,  9 Jan 2018 20:21:01 +1100
+Message-Id: <20180109092103.18458-2-sjitindarsingh@gmail.com>
 In-Reply-To: <20180109092103.18458-1-sjitindarsingh@gmail.com>
 References: <20180109092103.18458-1-sjitindarsingh@gmail.com>
-Subject: [Qemu-devel] [QEMU-PPC] [RFC 2/3] hw/spapr/spapr_caps: Add new caps
- safe_[cache/bounds_check/indirect_branch]
+Subject: [Qemu-devel] [QEMU-PPC] [RFC 1/3] hw/ppc/spapr_caps: Rework
+ spapr_caps to use uint8 internal representation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,454 +23,668 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-ppc@nongnu.org
 Cc: qemu-devel@nongnu.org, david@gibson.dropbear.id.au, paulus@ozlabs.org, Suraj Jitindar Singh <sjitindarsingh@gmail.com>
 
-This patch adds three new capabilities:
-cap-cfpc -> safe_cache
-cap-sbbc -> safe_bounds_check
-cap-ibs  -> safe_indirect_branch
+Currently spapr_caps are tied to boolean values (on or off). This patch
+reworks the caps so that they can have any value between 0 and 127,
+inclusive. This allows more capabilities with various values to be
+represented in the same way internally. Capabilities are numbered in
+ascending order. The internal representation of capability values is an
+array of uint8s in the sPAPRMachineState, indexed by capability number.
+Note: The MSB (0x80) of a capability is reserved to track whether the
+      capability was set from the command line.
 
-Each capability is tristate with the possible values "broken",
-"workaround" or "fixed". Add generic getter and setter functions for
-this new capability type. Add these new capabilities to the capabilities
-list. The maximum value for the capabilities is queried from kvm through
-new kvm capabilities. The requested values are considered to be
-compatible if kvm can support an equal or higher value for each
-capability.
+Capabilities can have their own name, description, options, getter and
+setter functions, type and allow functions. They also each have their own
+section in the migration stream. Capabilities are only migrated if they
+were explictly set on the command line, with the assumption that
+otherwise the default will match.
 
-Discussion:
-Currently these new capabilities default to broken to allow for
-backwards compatibility, is this the best option?
+On migration we ensure that the capability value on the destination
+is greater than or equal to the capability value from the source. So
+long at this remains the case then the migration is considered
+compatible and allowed to continue.
+
+This patch implements generic getter and setter functions for boolean
+capabilities. It also converts the existings cap-htm, cap-vsx and
+cap-dfp capabilities to this new format.
 ---
- hw/ppc/spapr.c            |   6 ++
- hw/ppc/spapr_caps.c       | 224 ++++++++++++++++++++++++++++++++++++++++++++++
- include/hw/ppc/spapr.h    |  15 +++-
- linux-headers/linux/kvm.h |   3 +
- target/ppc/kvm.c          |  28 ++++++
- target/ppc/kvm_ppc.h      |  18 ++++
- 6 files changed, 293 insertions(+), 1 deletion(-)
+ hw/ppc/spapr.c         |  19 +--
+ hw/ppc/spapr_caps.c    | 335 ++++++++++++++++++++++++++++---------------------
+ include/hw/ppc/spapr.h |  41 +++---
+ 3 files changed, 222 insertions(+), 173 deletions(-)
 
 diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index 7fa45729ba..d9700b0254 100644
+index d1acfe8858..7fa45729ba 100644
 --- a/hw/ppc/spapr.c
 +++ b/hw/ppc/spapr.c
-@@ -1765,6 +1765,9 @@ static const VMStateDescription vmstate_spapr = {
-         &vmstate_spapr_cap_htm,
-         &vmstate_spapr_cap_vsx,
-         &vmstate_spapr_cap_dfp,
-+        &vmstate_spapr_cap_cfpc,
-+        &vmstate_spapr_cap_sbbc,
-+        &vmstate_spapr_cap_ibs,
+@@ -320,7 +320,7 @@ static void spapr_populate_pa_features(sPAPRMachineState *spapr,
+          */
+         pa_features[3] |= 0x20;
+     }
+-    if (spapr_has_cap(spapr, SPAPR_CAP_HTM) && pa_size > 24) {
++    if (spapr_get_cap(spapr, SPAPR_CAP_HTM) && pa_size > 24) {
+         pa_features[24] |= 0x80;    /* Transactional memory support */
+     }
+     if (legacy_guest && pa_size > 40) {
+@@ -563,7 +563,7 @@ static void spapr_populate_cpu_dt(CPUState *cs, void *fdt, int offset,
+      *
+      * Only CPUs for which we create core types in spapr_cpu_core.c
+      * are possible, and all of those have VMX */
+-    if (spapr_has_cap(spapr, SPAPR_CAP_VSX)) {
++    if (spapr_get_cap(spapr, SPAPR_CAP_VSX)) {
+         _FDT((fdt_setprop_cell(fdt, offset, "ibm,vmx", 2)));
+     } else {
+         _FDT((fdt_setprop_cell(fdt, offset, "ibm,vmx", 1)));
+@@ -572,7 +572,7 @@ static void spapr_populate_cpu_dt(CPUState *cs, void *fdt, int offset,
+     /* Advertise DFP (Decimal Floating Point) if available
+      *   0 / no property == no DFP
+      *   1               == DFP available */
+-    if (spapr_has_cap(spapr, SPAPR_CAP_DFP)) {
++    if (spapr_get_cap(spapr, SPAPR_CAP_DFP)) {
+         _FDT((fdt_setprop_cell(fdt, offset, "ibm,dfp", 1)));
+     }
+ 
+@@ -1762,7 +1762,9 @@ static const VMStateDescription vmstate_spapr = {
+         &vmstate_spapr_ov5_cas,
+         &vmstate_spapr_patb_entry,
+         &vmstate_spapr_pending_events,
+-        &vmstate_spapr_caps,
++        &vmstate_spapr_cap_htm,
++        &vmstate_spapr_cap_vsx,
++        &vmstate_spapr_cap_dfp,
          NULL
      }
  };
-@@ -3837,6 +3840,9 @@ static void spapr_machine_class_init(ObjectClass *oc, void *data)
-     smc->default_caps.caps[SPAPR_CAP_HTM] = SPAPR_CAP_OFF;
-     smc->default_caps.caps[SPAPR_CAP_VSX] = SPAPR_CAP_ON;
-     smc->default_caps.caps[SPAPR_CAP_DFP] = SPAPR_CAP_ON;
-+    smc->default_caps.caps[SPAPR_CAP_CFPC] = SPAPR_CAP_BROKEN;
-+    smc->default_caps.caps[SPAPR_CAP_SBBC] = SPAPR_CAP_BROKEN;
-+    smc->default_caps.caps[SPAPR_CAP_IBS] = SPAPR_CAP_BROKEN;
+@@ -2323,8 +2325,6 @@ static void spapr_machine_init(MachineState *machine)
+     char *filename;
+     Error *resize_hpt_err = NULL;
+ 
+-    spapr_caps_validate(spapr, &error_fatal);
+-
+     msi_nonbroken = true;
+ 
+     QLIST_INIT(&spapr->phbs);
+@@ -3834,7 +3834,9 @@ static void spapr_machine_class_init(ObjectClass *oc, void *data)
+      */
+     mc->numa_mem_align_shift = 28;
+ 
+-    smc->default_caps = spapr_caps(SPAPR_CAP_VSX | SPAPR_CAP_DFP);
++    smc->default_caps.caps[SPAPR_CAP_HTM] = SPAPR_CAP_OFF;
++    smc->default_caps.caps[SPAPR_CAP_VSX] = SPAPR_CAP_ON;
++    smc->default_caps.caps[SPAPR_CAP_DFP] = SPAPR_CAP_ON;
      spapr_caps_add_properties(smc, &error_abort);
  }
  
-diff --git a/hw/ppc/spapr_caps.c b/hw/ppc/spapr_caps.c
-index af40f2e469..e6910aa191 100644
---- a/hw/ppc/spapr_caps.c
-+++ b/hw/ppc/spapr_caps.c
-@@ -75,6 +75,64 @@ static void spapr_cap_set_bool(Object *obj, Visitor *v, const char *name,
-                                              SPAPR_CAP_CMD_LINE;
+@@ -3916,8 +3918,7 @@ static void spapr_machine_2_11_class_options(MachineClass *mc)
+     sPAPRMachineClass *smc = SPAPR_MACHINE_CLASS(mc);
+ 
+     spapr_machine_2_12_class_options(mc);
+-    smc->default_caps = spapr_caps(SPAPR_CAP_HTM | SPAPR_CAP_VSX
+-                                   | SPAPR_CAP_DFP);
++    smc->default_caps.caps[SPAPR_CAP_HTM] = SPAPR_CAP_ON;
+     SET_MACHINE_COMPAT(mc, SPAPR_COMPAT_2_11);
  }
  
-+static void spapr_cap_get_tristate(Object *obj, Visitor *v, const char *name,
-+                                   void *opaque, Error **errp)
+diff --git a/hw/ppc/spapr_caps.c b/hw/ppc/spapr_caps.c
+index 9d070a306c..af40f2e469 100644
+--- a/hw/ppc/spapr_caps.c
++++ b/hw/ppc/spapr_caps.c
+@@ -35,33 +35,71 @@
+ typedef struct sPAPRCapabilityInfo {
+     const char *name;
+     const char *description;
+-    uint64_t flag;
++    const char *options;
++    int index;
+ 
++    /* Getter and Setter Function Pointers */
++    ObjectPropertyAccessor *get;
++    ObjectPropertyAccessor *set;
++    const char *type;
+     /* Make sure the virtual hardware can support this capability */
+-    void (*allow)(sPAPRMachineState *spapr, Error **errp);
+-
+-    /* If possible, tell the virtual hardware not to allow the cap to
+-     * be used at all */
+-    void (*disallow)(sPAPRMachineState *spapr, Error **errp);
++    void (*allow)(sPAPRMachineState *spapr, uint8_t val, Error **errp);
+ } sPAPRCapabilityInfo;
+ 
+-static void cap_htm_allow(sPAPRMachineState *spapr, Error **errp)
++static void spapr_cap_get_bool(Object *obj, Visitor *v, const char *name,
++                               void *opaque, Error **errp)
 +{
 +    sPAPRCapabilityInfo *cap = opaque;
 +    sPAPRMachineState *spapr = SPAPR_MACHINE(obj);
-+    char *val = NULL;
-+    uint8_t value = spapr_get_cap(spapr, cap->index);
++    bool value = spapr_get_cap(spapr, cap->index) == SPAPR_CAP_ON;
 +
-+    switch (value) {
-+    case SPAPR_CAP_BROKEN:
-+        val = g_strdup("broken");
-+        break;
-+    case SPAPR_CAP_WORKAROUND:
-+        val = g_strdup("workaround");
-+        break;
-+    case SPAPR_CAP_FIXED:
-+        val = g_strdup("fixed");
-+        break;
-+    default:
-+        break;
-+    }
-+
-+    visit_type_str(v, name, &val, errp);
-+    g_free(val);
++    visit_type_bool(v, name, &value, errp);
 +}
 +
-+static void spapr_cap_set_tristate(Object *obj, Visitor *v, const char *name,
-+                                   void *opaque, Error **errp)
-+{
++static void spapr_cap_set_bool(Object *obj, Visitor *v, const char *name,
++                               void *opaque, Error **errp)
+ {
 +    sPAPRCapabilityInfo *cap = opaque;
 +    sPAPRMachineState *spapr = SPAPR_MACHINE(obj);
-+    char *val;
++    bool value;
 +    Error *local_err = NULL;
-+    uint8_t value;
 +
-+    visit_type_str(v, name, &val, &local_err);
++    visit_type_bool(v, name, &value, &local_err);
 +    if (local_err) {
 +        error_propagate(errp, local_err);
 +        return;
 +    }
 +
-+    if (!strcasecmp(val, "broken")) {
-+        value = SPAPR_CAP_BROKEN;
-+    } else if (!strcasecmp(val, "workaround")) {
-+        value = SPAPR_CAP_WORKAROUND;
-+    } else if (!strcasecmp(val, "fixed")) {
-+        value = SPAPR_CAP_FIXED;
-+    } else {
-+        error_setg(errp, "Invalid capability mode \"%s\" for cap-%s", val,
-+                   cap->name);
-+        goto out;
-+    }
-+
-+    spapr->cmd_line_caps.caps[cap->index] = value | SPAPR_CAP_CMD_LINE;
-+out:
-+    g_free(val);
++    spapr->cmd_line_caps.caps[cap->index] = (value ? SPAPR_CAP_ON :
++                                                     SPAPR_CAP_OFF) |
++                                             SPAPR_CAP_CMD_LINE;
 +}
 +
- static void cap_htm_allow(sPAPRMachineState *spapr, uint8_t val, Error **errp)
- {
-     if (!val) {
-@@ -122,6 +180,31 @@ static void cap_dfp_allow(sPAPRMachineState *spapr, uint8_t val, Error **errp)
++static void cap_htm_allow(sPAPRMachineState *spapr, uint8_t val, Error **errp)
++{
++    if (!val) {
++        /* TODO: We don't support disabling htm yet */
++        return;
++    }
+     if (tcg_enabled()) {
+         error_setg(errp,
+-                   "No Transactional Memory support in TCG, try cap-htm=off");
++                   "No Transactional Memory support in TCG, try cap-htm=0");
+     } else if (kvm_enabled() && !kvmppc_has_cap_htm()) {
+         error_setg(errp,
+-"KVM implementation does not support Transactional Memory, try cap-htm=off"
++"KVM implementation does not support Transactional Memory, try cap-htm=0"
+             );
      }
  }
  
-+static void cap_safe_cache_allow(sPAPRMachineState *spapr, uint8_t val,
-+                                 Error **errp)
-+{
-+    if (kvm_enabled() && (val > kvmppc_get_cap_safe_cache())) {
-+        error_setg(errp, "Requested safe cache capability level not supported by kvm, try a different value for cap-cfpc");
-+    }
-+}
-+
-+static void cap_safe_bounds_check_allow(sPAPRMachineState *spapr, uint8_t val,
-+                                        Error **errp)
-+{
-+    if (kvm_enabled() && (val > kvmppc_get_cap_safe_bounds_check())) {
-+        error_setg(errp, "Requested safe bounds check capability level not supported by kvm, try a different value for cap-sbbc");
-+    }
-+}
-+
-+static void cap_safe_indirect_branch_allow(sPAPRMachineState *spapr,
-+                                           uint8_t val, Error **errp)
-+{
-+    if (kvm_enabled() && (val > kvmppc_get_cap_safe_indirect_branch())) {
-+        error_setg(errp, "Requested safe indirect branch capability level not supported by kvm, try a different value for cap-ibs");
-+    }
-+}
-+
-+#define VALUE_DESC_TRISTATE     " (broken, workaround, fixed)"
- 
- sPAPRCapabilityInfo capability_table[SPAPR_CAP_NUM] = {
-     [SPAPR_CAP_HTM] = {
-@@ -154,6 +237,36 @@ sPAPRCapabilityInfo capability_table[SPAPR_CAP_NUM] = {
-         .type = "bool",
-         .allow = cap_dfp_allow,
-     },
-+    [SPAPR_CAP_CFPC] = {
-+        .name = "cfpc",
-+        .description = "Cache Flush on Privilege Change",
-+        .options = VALUE_DESC_TRISTATE,
-+        .index = SPAPR_CAP_CFPC,
-+        .get = spapr_cap_get_tristate,
-+        .set = spapr_cap_set_tristate,
-+        .type = "string",
-+        .allow = cap_safe_cache_allow,
-+    },
-+    [SPAPR_CAP_SBBC] = {
-+        .name = "sbbc",
-+        .description = "Speculation Barrier Bounds Checking",
-+        .options = VALUE_DESC_TRISTATE,
-+        .index = SPAPR_CAP_SBBC,
-+        .get = spapr_cap_get_tristate,
-+        .set = spapr_cap_set_tristate,
-+        .type = "string",
-+        .allow = cap_safe_bounds_check_allow,
-+    },
-+    [SPAPR_CAP_IBS] = {
-+        .name = "ibs",
-+        .description = "Indirect Branch Serialisation",
-+        .options = VALUE_DESC_TRISTATE,
-+        .index = SPAPR_CAP_IBS,
-+        .get = spapr_cap_get_tristate,
-+        .set = spapr_cap_set_tristate,
-+        .type = "string",
-+        .allow = cap_safe_indirect_branch_allow,
-+    },
- };
- 
- static sPAPRCapabilities default_caps_with_cpu(sPAPRMachineState *spapr,
-@@ -326,6 +439,117 @@ const VMStateDescription vmstate_spapr_cap_dfp = {
-     },
- };
- 
-+static bool spapr_cap_safe_cache_needed(void *opaque)
-+{
-+    sPAPRMachineState *spapr = opaque;
-+
-+    return !!(spapr->cmd_line_caps.caps[SPAPR_CAP_CFPC] & SPAPR_CAP_CMD_LINE);
-+}
-+
-+static int spapr_cap_safe_cache_pre_save(void *opaque)
-+{
-+    sPAPRMachineState *spapr = opaque;
-+
-+    spapr->mig_caps.caps[SPAPR_CAP_CFPC] =
-+        spapr->cmd_line_caps.caps[SPAPR_CAP_CFPC];
-+    return 0;
-+}
-+
-+static int spapr_cap_safe_cache_pre_load(void *opaque)
-+{
-+    sPAPRMachineState *spapr = opaque;
-+
-+    spapr->mig_caps.caps[SPAPR_CAP_CFPC] = 0;
-+    return 0;
-+}
-+
-+const VMStateDescription vmstate_spapr_cap_cfpc = {
-+    .name = "spapr/cap_cfpc",
-+    .version_id = 1,
-+    .minimum_version_id = 1,
-+    .needed = spapr_cap_safe_cache_needed,
-+    .pre_save = spapr_cap_safe_cache_pre_save,
-+    .pre_load = spapr_cap_safe_cache_pre_load,
-+    .fields = (VMStateField[]) {
-+        VMSTATE_UINT8(mig_caps.caps[SPAPR_CAP_CFPC], sPAPRMachineState),
-+        VMSTATE_END_OF_LIST()
-+    },
-+};
-+
-+static bool spapr_cap_safe_bounds_check_needed(void *opaque)
-+{
-+    sPAPRMachineState *spapr = opaque;
-+
-+    return !!(spapr->cmd_line_caps.caps[SPAPR_CAP_SBBC] & SPAPR_CAP_CMD_LINE);
-+}
-+
-+static int spapr_cap_safe_bounds_check_pre_save(void *opaque)
-+{
-+    sPAPRMachineState *spapr = opaque;
-+
-+    spapr->mig_caps.caps[SPAPR_CAP_SBBC] =
-+        spapr->cmd_line_caps.caps[SPAPR_CAP_SBBC];
-+    return 0;
-+}
-+
-+static int spapr_cap_safe_bounds_check_pre_load(void *opaque)
-+{
-+    sPAPRMachineState *spapr = opaque;
-+
-+    spapr->mig_caps.caps[SPAPR_CAP_SBBC] = 0;
-+    return 0;
-+}
-+
-+const VMStateDescription vmstate_spapr_cap_sbbc = {
-+    .name = "spapr/cap_sbbc",
-+    .version_id = 1,
-+    .minimum_version_id = 1,
-+    .needed = spapr_cap_safe_bounds_check_needed,
-+    .pre_save = spapr_cap_safe_bounds_check_pre_save,
-+    .pre_load = spapr_cap_safe_bounds_check_pre_load,
-+    .fields = (VMStateField[]) {
-+        VMSTATE_UINT8(mig_caps.caps[SPAPR_CAP_SBBC], sPAPRMachineState),
-+        VMSTATE_END_OF_LIST()
-+    },
-+};
-+
-+static bool spapr_cap_safe_indirect_branch_needed(void *opaque)
-+{
-+    sPAPRMachineState *spapr = opaque;
-+
-+    return !!(spapr->cmd_line_caps.caps[SPAPR_CAP_IBS] & SPAPR_CAP_CMD_LINE);
-+}
-+
-+static int spapr_cap_safe_indirect_branch_pre_save(void *opaque)
-+{
-+    sPAPRMachineState *spapr = opaque;
-+
-+    spapr->mig_caps.caps[SPAPR_CAP_IBS] =
-+        spapr->cmd_line_caps.caps[SPAPR_CAP_IBS];
-+    return 0;
-+}
-+
-+static int spapr_cap_safe_indirect_branch_pre_load(void *opaque)
-+{
-+    sPAPRMachineState *spapr = opaque;
-+
-+    spapr->mig_caps.caps[SPAPR_CAP_IBS] = 0;
-+    return 0;
-+}
-+
-+const VMStateDescription vmstate_spapr_cap_ibs = {
-+    .name = "spapr/cap_ibs",
-+    .version_id = 1,
-+    .minimum_version_id = 1,
-+    .needed = spapr_cap_safe_indirect_branch_needed,
-+    .pre_save = spapr_cap_safe_indirect_branch_pre_save,
-+    .pre_load = spapr_cap_safe_indirect_branch_pre_load,
-+    .fields = (VMStateField[]) {
-+        VMSTATE_UINT8(mig_caps.caps[SPAPR_CAP_IBS], sPAPRMachineState),
-+        VMSTATE_END_OF_LIST()
-+    },
-+};
-+
- void spapr_caps_reset(sPAPRMachineState *spapr)
+-static void cap_vsx_allow(sPAPRMachineState *spapr, Error **errp)
++static void cap_vsx_allow(sPAPRMachineState *spapr, uint8_t val, Error **errp)
  {
-     sPAPRCapabilities caps;
+     PowerPCCPU *cpu = POWERPC_CPU(first_cpu);
+     CPUPPCState *env = &cpu->env;
+ 
++    if (!val) {
++        /* TODO: We don't support disabling vsx yet */
++        return;
++    }
+     /* Allowable CPUs in spapr_cpu_core.c should already have gotten
+      * rid of anything that doesn't do VMX */
+     g_assert(env->insns_flags & PPC_ALTIVEC);
+@@ -70,37 +108,51 @@ static void cap_vsx_allow(sPAPRMachineState *spapr, Error **errp)
+     }
+ }
+ 
+-static void cap_dfp_allow(sPAPRMachineState *spapr, Error **errp)
++static void cap_dfp_allow(sPAPRMachineState *spapr, uint8_t val, Error **errp)
+ {
+     PowerPCCPU *cpu = POWERPC_CPU(first_cpu);
+     CPUPPCState *env = &cpu->env;
+ 
++    if (!val) {
++        /* TODO: We don't support disabling dfp yet */
++        return;
++    }
+     if (!(env->insns_flags2 & PPC2_DFP)) {
+         error_setg(errp, "DFP support not available, try cap-dfp=off");
+     }
+ }
+ 
+-static sPAPRCapabilityInfo capability_table[] = {
+-    {
++
++sPAPRCapabilityInfo capability_table[SPAPR_CAP_NUM] = {
++    [SPAPR_CAP_HTM] = {
+         .name = "htm",
+         .description = "Allow Hardware Transactional Memory (HTM)",
+-        .flag = SPAPR_CAP_HTM,
++        .options = "",
++        .index = SPAPR_CAP_HTM,
++        .get = spapr_cap_get_bool,
++        .set = spapr_cap_set_bool,
++        .type = "bool",
+         .allow = cap_htm_allow,
+-        /* TODO: add cap_htm_disallow */
+     },
+-    {
++    [SPAPR_CAP_VSX] = {
+         .name = "vsx",
+         .description = "Allow Vector Scalar Extensions (VSX)",
+-        .flag = SPAPR_CAP_VSX,
++        .options = "",
++        .index = SPAPR_CAP_VSX,
++        .get = spapr_cap_get_bool,
++        .set = spapr_cap_set_bool,
++        .type = "bool",
+         .allow = cap_vsx_allow,
+-        /* TODO: add cap_vsx_disallow */
+     },
+-    {
++    [SPAPR_CAP_DFP] = {
+         .name = "dfp",
+         .description = "Allow Decimal Floating Point (DFP)",
+-        .flag = SPAPR_CAP_DFP,
++        .options = "",
++        .index = SPAPR_CAP_DFP,
++        .get = spapr_cap_get_bool,
++        .set = spapr_cap_set_bool,
++        .type = "bool",
+         .allow = cap_dfp_allow,
+-        /* TODO: add cap_dfp_disallow */
+     },
+ };
+ 
+@@ -115,201 +167,192 @@ static sPAPRCapabilities default_caps_with_cpu(sPAPRMachineState *spapr,
+ 
+     if (!ppc_check_compat(cpu, CPU_POWERPC_LOGICAL_2_07,
+                           0, spapr->max_compat_pvr)) {
+-        caps.mask &= ~SPAPR_CAP_HTM;
++        caps.caps[SPAPR_CAP_HTM] = SPAPR_CAP_OFF;
+     }
+ 
+     if (!ppc_check_compat(cpu, CPU_POWERPC_LOGICAL_2_06,
+                           0, spapr->max_compat_pvr)) {
+-        caps.mask &= ~SPAPR_CAP_VSX;
+-        caps.mask &= ~SPAPR_CAP_DFP;
++        caps.caps[SPAPR_CAP_VSX] = SPAPR_CAP_OFF;
++        caps.caps[SPAPR_CAP_DFP] = SPAPR_CAP_OFF;
+     }
+ 
+     return caps;
+ }
+ 
+-static bool spapr_caps_needed(void *opaque)
+-{
+-    sPAPRMachineState *spapr = opaque;
+-
+-    return (spapr->forced_caps.mask != 0) || (spapr->forbidden_caps.mask != 0);
+-}
+-
+ /* This has to be called from the top-level spapr post_load, not the
+  * caps specific one.  Otherwise it wouldn't be called when the source
+  * caps are all defaults, which could still conflict with overridden
+  * caps on the destination */
+ int spapr_caps_post_migration(sPAPRMachineState *spapr)
+ {
+-    uint64_t allcaps = 0;
+     int i;
+     bool ok = true;
+     sPAPRCapabilities dstcaps = spapr->effective_caps;
+     sPAPRCapabilities srccaps;
+ 
+     srccaps = default_caps_with_cpu(spapr, first_cpu);
+-    srccaps.mask |= spapr->mig_forced_caps.mask;
+-    srccaps.mask &= ~spapr->mig_forbidden_caps.mask;
++    for (i = 0; i < SPAPR_CAP_NUM; i++) {
++        if (spapr->mig_caps.caps[i] & SPAPR_CAP_CMD_LINE) {
++            srccaps.caps[i] = spapr->mig_caps.caps[i] & ~SPAPR_CAP_CMD_LINE;
++        }
++    }
+ 
+-    for (i = 0; i < ARRAY_SIZE(capability_table); i++) {
++    for (i = 0; i < SPAPR_CAP_NUM; i++) {
+         sPAPRCapabilityInfo *info = &capability_table[i];
+ 
+-        allcaps |= info->flag;
+-
+-        if ((srccaps.mask & info->flag) && !(dstcaps.mask & info->flag)) {
+-            error_report("cap-%s=on in incoming stream, but off in destination",
+-                         info->name);
++        if (srccaps.caps[i] > dstcaps.caps[i]) {
++            error_report("cap-%s higher level (%d) in incoming stream than on destination (%d)",
++                         info->name, srccaps.caps[i], dstcaps.caps[i]);
+             ok = false;
+         }
+ 
+-        if (!(srccaps.mask & info->flag) && (dstcaps.mask & info->flag)) {
+-            warn_report("cap-%s=off in incoming stream, but on in destination",
+-                         info->name);
++        if (srccaps.caps[i] < dstcaps.caps[i]) {
++            warn_report("cap-%s lower level (%d) in incoming stream than on destination (%d)",
++                         info->name, srccaps.caps[i], dstcaps.caps[i]);
+         }
+     }
+ 
+-    if (spapr->mig_forced_caps.mask & ~allcaps) {
+-        error_report(
+-            "Unknown capabilities 0x%"PRIx64" enabled in incoming stream",
+-            spapr->mig_forced_caps.mask & ~allcaps);
+-        ok = false;
+-    }
+-    if (spapr->mig_forbidden_caps.mask & ~allcaps) {
+-        warn_report(
+-            "Unknown capabilities 0x%"PRIx64" disabled in incoming stream",
+-            spapr->mig_forbidden_caps.mask & ~allcaps);
+-    }
+-
+     return ok ? 0 : -EINVAL;
+ }
+ 
+-static int spapr_caps_pre_save(void *opaque)
++static bool spapr_cap_htm_needed(void *opaque)
+ {
+     sPAPRMachineState *spapr = opaque;
+ 
+-    spapr->mig_forced_caps = spapr->forced_caps;
+-    spapr->mig_forbidden_caps = spapr->forbidden_caps;
++    return !!(spapr->cmd_line_caps.caps[SPAPR_CAP_HTM] & SPAPR_CAP_CMD_LINE);
++}
++
++static int spapr_cap_htm_pre_save(void *opaque)
++{
++    sPAPRMachineState *spapr = opaque;
++
++    spapr->mig_caps.caps[SPAPR_CAP_HTM] =
++        spapr->cmd_line_caps.caps[SPAPR_CAP_HTM];
+     return 0;
+ }
+ 
+-static int spapr_caps_pre_load(void *opaque)
++static int spapr_cap_htm_pre_load(void *opaque)
+ {
+     sPAPRMachineState *spapr = opaque;
+ 
+-    spapr->mig_forced_caps = spapr_caps(0);
+-    spapr->mig_forbidden_caps = spapr_caps(0);
++    spapr->mig_caps.caps[SPAPR_CAP_HTM] = 0;
+     return 0;
+ }
+ 
+-const VMStateDescription vmstate_spapr_caps = {
+-    .name = "spapr/caps",
++const VMStateDescription vmstate_spapr_cap_htm = {
++    .name = "spapr/cap_htm",
+     .version_id = 1,
+     .minimum_version_id = 1,
+-    .needed = spapr_caps_needed,
+-    .pre_save = spapr_caps_pre_save,
+-    .pre_load = spapr_caps_pre_load,
++    .needed = spapr_cap_htm_needed,
++    .pre_save = spapr_cap_htm_pre_save,
++    .pre_load = spapr_cap_htm_pre_load,
+     .fields = (VMStateField[]) {
+-        VMSTATE_UINT64(mig_forced_caps.mask, sPAPRMachineState),
+-        VMSTATE_UINT64(mig_forbidden_caps.mask, sPAPRMachineState),
++        VMSTATE_UINT8(mig_caps.caps[SPAPR_CAP_HTM], sPAPRMachineState),
+         VMSTATE_END_OF_LIST()
+     },
+ };
+ 
+-void spapr_caps_reset(sPAPRMachineState *spapr)
++static bool spapr_cap_vsx_needed(void *opaque)
+ {
+-    Error *local_err = NULL;
+-    sPAPRCapabilities caps;
+-    int i;
++    sPAPRMachineState *spapr = opaque;
+ 
+-    /* First compute the actual set of caps we're running with.. */
+-    caps = default_caps_with_cpu(spapr, first_cpu);
++    return !!(spapr->cmd_line_caps.caps[SPAPR_CAP_VSX] & SPAPR_CAP_CMD_LINE);
++}
+ 
+-    /* Remove unnecessary forced/forbidden bits (this will help us
+-     * with migration) */
+-    spapr->forced_caps.mask &= ~caps.mask;
+-    spapr->forbidden_caps.mask &= caps.mask;
++static int spapr_cap_vsx_pre_save(void *opaque)
++{
++    sPAPRMachineState *spapr = opaque;
++
++    spapr->mig_caps.caps[SPAPR_CAP_VSX] =
++        spapr->cmd_line_caps.caps[SPAPR_CAP_VSX];
++    return 0;
++}
+ 
+-    caps.mask |= spapr->forced_caps.mask;
+-    caps.mask &= ~spapr->forbidden_caps.mask;
++static int spapr_cap_vsx_pre_load(void *opaque)
++{
++    sPAPRMachineState *spapr = opaque;
+ 
+-    spapr->effective_caps = caps;
++    spapr->mig_caps.caps[SPAPR_CAP_VSX] = 0;
++    return 0;
++}
+ 
+-    /* .. then apply those caps to the virtual hardware */
++const VMStateDescription vmstate_spapr_cap_vsx = {
++    .name = "spapr/cap_vsx",
++    .version_id = 1,
++    .minimum_version_id = 1,
++    .needed = spapr_cap_vsx_needed,
++    .pre_save = spapr_cap_vsx_pre_save,
++    .pre_load = spapr_cap_vsx_pre_load,
++    .fields = (VMStateField[]) {
++        VMSTATE_UINT8(mig_caps.caps[SPAPR_CAP_VSX], sPAPRMachineState),
++        VMSTATE_END_OF_LIST()
++    },
++};
+ 
+-    for (i = 0; i < ARRAY_SIZE(capability_table); i++) {
+-        sPAPRCapabilityInfo *info = &capability_table[i];
++static bool spapr_cap_dfp_needed(void *opaque)
++{
++    sPAPRMachineState *spapr = opaque;
+ 
+-        if (spapr->effective_caps.mask & info->flag) {
+-            /* Failure to allow a cap is fatal - if the guest doesn't
+-             * have it, we'll be supplying an incorrect environment */
+-            if (info->allow) {
+-                info->allow(spapr, &error_fatal);
+-            }
+-        } else {
+-            /* Failure to enforce a cap is only a warning.  The guest
+-             * shouldn't be using it, since it's not advertised, so it
+-             * doesn't get to complain about weird behaviour if it
+-             * goes ahead anyway */
+-            if (info->disallow) {
+-                info->disallow(spapr, &local_err);
+-            }
+-            if (local_err) {
+-                warn_report_err(local_err);
+-                local_err = NULL;
+-            }
+-        }
+-    }
++    return !!(spapr->cmd_line_caps.caps[SPAPR_CAP_DFP] & SPAPR_CAP_CMD_LINE);
+ }
+ 
+-static void spapr_cap_get(Object *obj, Visitor *v, const char *name,
+-                          void *opaque, Error **errp)
++static int spapr_cap_dfp_pre_save(void *opaque)
+ {
+-    sPAPRCapabilityInfo *cap = opaque;
+-    sPAPRMachineState *spapr = SPAPR_MACHINE(obj);
+-    bool value = spapr_has_cap(spapr, cap->flag);
+-
+-    /* TODO: Could this get called before effective_caps is finalized
+-     * in spapr_caps_reset()? */
++    sPAPRMachineState *spapr = opaque;
+ 
+-    visit_type_bool(v, name, &value, errp);
++    spapr->mig_caps.caps[SPAPR_CAP_DFP] =
++        spapr->cmd_line_caps.caps[SPAPR_CAP_DFP];
++    return 0;
+ }
+ 
+-static void spapr_cap_set(Object *obj, Visitor *v, const char *name,
+-                          void *opaque, Error **errp)
++static int spapr_cap_dfp_pre_load(void *opaque)
+ {
+-    sPAPRCapabilityInfo *cap = opaque;
+-    sPAPRMachineState *spapr = SPAPR_MACHINE(obj);
+-    bool value;
+-    Error *local_err = NULL;
+-
+-    visit_type_bool(v, name, &value, &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
+-        return;
+-    }
++    sPAPRMachineState *spapr = opaque;
+ 
+-    if (value) {
+-        spapr->forced_caps.mask |= cap->flag;
+-    } else {
+-        spapr->forbidden_caps.mask |= cap->flag;
+-    }
++    spapr->mig_caps.caps[SPAPR_CAP_DFP] = 0;
++    return 0;
+ }
+ 
+-void spapr_caps_validate(sPAPRMachineState *spapr, Error **errp)
++const VMStateDescription vmstate_spapr_cap_dfp = {
++    .name = "spapr/cap_dfp",
++    .version_id = 1,
++    .minimum_version_id = 1,
++    .needed = spapr_cap_dfp_needed,
++    .pre_save = spapr_cap_dfp_pre_save,
++    .pre_load = spapr_cap_dfp_pre_load,
++    .fields = (VMStateField[]) {
++        VMSTATE_UINT8(mig_caps.caps[SPAPR_CAP_DFP], sPAPRMachineState),
++        VMSTATE_END_OF_LIST()
++    },
++};
++
++void spapr_caps_reset(sPAPRMachineState *spapr)
+ {
+-    uint64_t allcaps = 0;
++    sPAPRCapabilities caps;
+     int i;
+ 
+-    for (i = 0; i < ARRAY_SIZE(capability_table); i++) {
+-        g_assert((allcaps & capability_table[i].flag) == 0);
+-        allcaps |= capability_table[i].flag;
++    /* First compute the actual set of caps we're running with.. */
++    caps = default_caps_with_cpu(spapr, first_cpu);
++
++    for (i = 0; i < SPAPR_CAP_NUM; i++) {
++        /* Check if set from command line and override default if so */
++        if (spapr->cmd_line_caps.caps[i] & SPAPR_CAP_CMD_LINE) {
++            caps.caps[i] = spapr->cmd_line_caps.caps[i] & ~SPAPR_CAP_CMD_LINE;
++        }
+     }
+ 
+-    g_assert((spapr->forced_caps.mask & ~allcaps) == 0);
+-    g_assert((spapr->forbidden_caps.mask & ~allcaps) == 0);
++    spapr->effective_caps = caps;
+ 
+-    if (spapr->forced_caps.mask & spapr->forbidden_caps.mask) {
+-        error_setg(errp, "Some sPAPR capabilities set both on and off");
+-        return;
++    /* .. then apply those caps to the virtual hardware */
++
++    for (i = 0; i < SPAPR_CAP_NUM; i++) {
++        sPAPRCapabilityInfo *info = &capability_table[i];
++
++        /*
++         * If the allow function can't set the desired level and think's it's
++         * fatal, it should cause that.
++         */
++        info->allow(spapr, spapr->effective_caps.caps[i], &error_fatal);
+     }
+ }
+ 
+@@ -322,17 +365,19 @@ void spapr_caps_add_properties(sPAPRMachineClass *smc, Error **errp)
+     for (i = 0; i < ARRAY_SIZE(capability_table); i++) {
+         sPAPRCapabilityInfo *cap = &capability_table[i];
+         const char *name = g_strdup_printf("cap-%s", cap->name);
++        char *desc;
+ 
+-        object_class_property_add(klass, name, "bool",
+-                                  spapr_cap_get, spapr_cap_set, NULL,
+-                                  cap, &local_err);
++        object_class_property_add(klass, name, cap->type,
++                                  cap->get, cap->set,
++                                  NULL, cap, &local_err);
+         if (local_err) {
+             error_propagate(errp, local_err);
+             return;
+         }
+ 
+-        object_class_property_set_description(klass, name, cap->description,
+-                                              &local_err);
++        desc = g_strdup_printf("%s%s", cap->description, cap->options);
++        object_class_property_set_description(klass, name, desc, &local_err);
++        g_free(desc);
+         if (local_err) {
+             error_propagate(errp, local_err);
+             return;
 diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-index 2804fbbf12..2db2f3e2e2 100644
+index 26ac17e641..2804fbbf12 100644
 --- a/include/hw/ppc/spapr.h
 +++ b/include/hw/ppc/spapr.h
-@@ -62,8 +62,14 @@ typedef enum {
- #define SPAPR_CAP_VSX                   0x01
- /* Decimal Floating Point */
- #define SPAPR_CAP_DFP                   0x02
-+/* Cache Flush on Privilege Change */
-+#define SPAPR_CAP_CFPC                  0x03
-+/* Speculation Barrier Bounds Checking */
-+#define SPAPR_CAP_SBBC                  0x04
-+/* Indirect Branch Serialisation */
-+#define SPAPR_CAP_IBS                   0x05
- /* Num Caps */
--#define SPAPR_CAP_NUM                   (SPAPR_CAP_DFP + 1)
-+#define SPAPR_CAP_NUM                   (SPAPR_CAP_IBS + 1)
+@@ -57,17 +57,26 @@ typedef enum {
+ /* These bits go in the migration stream, so they can't be reassigned */
  
- /*
-  * Capability Values
-@@ -73,6 +79,10 @@ typedef enum {
- /* Bool Caps */
- #define SPAPR_CAP_OFF                   0x00
- #define SPAPR_CAP_ON                    0x01
-+/* Broken | Workaround | Fixed Caps */
-+#define SPAPR_CAP_BROKEN                0x00
-+#define SPAPR_CAP_WORKAROUND            0x01
-+#define SPAPR_CAP_FIXED                 0x02
+ /* Hardware Transactional Memory */
+-#define SPAPR_CAP_HTM               0x0000000000000001ULL
+-
++#define SPAPR_CAP_HTM                   0x00
+ /* Vector Scalar Extensions */
+-#define SPAPR_CAP_VSX               0x0000000000000002ULL
+-
++#define SPAPR_CAP_VSX                   0x01
+ /* Decimal Floating Point */
+-#define SPAPR_CAP_DFP               0x0000000000000004ULL
++#define SPAPR_CAP_DFP                   0x02
++/* Num Caps */
++#define SPAPR_CAP_NUM                   (SPAPR_CAP_DFP + 1)
++
++/*
++ * Capability Values
++ * NOTE: All execpt the immediately following MUST be less than 128 (0x80)
++ */
++#define SPAPR_CAP_CMD_LINE              0x80
++/* Bool Caps */
++#define SPAPR_CAP_OFF                   0x00
++#define SPAPR_CAP_ON                    0x01
  
  typedef struct sPAPRCapabilities sPAPRCapabilities;
  struct sPAPRCapabilities {
-@@ -763,6 +773,9 @@ qemu_irq spapr_qirq(sPAPRMachineState *spapr, int irq);
- extern const VMStateDescription vmstate_spapr_cap_htm;
- extern const VMStateDescription vmstate_spapr_cap_vsx;
- extern const VMStateDescription vmstate_spapr_cap_dfp;
-+extern const VMStateDescription vmstate_spapr_cap_cfpc;
-+extern const VMStateDescription vmstate_spapr_cap_sbbc;
-+extern const VMStateDescription vmstate_spapr_cap_ibs;
+-    uint64_t mask;
++    uint8_t caps[SPAPR_CAP_NUM];
+ };
  
- static inline uint8_t spapr_get_cap(sPAPRMachineState *spapr, int cap)
+ /**
+@@ -149,9 +158,8 @@ struct sPAPRMachineState {
+ 
+     const char *icp_type;
+ 
+-    sPAPRCapabilities forced_caps, forbidden_caps;
+-    sPAPRCapabilities mig_forced_caps, mig_forbidden_caps;
+-    sPAPRCapabilities effective_caps;
++    sPAPRCapabilities cmd_line_caps, effective_caps;
++    sPAPRCapabilities mig_caps;
+ };
+ 
+ #define H_SUCCESS         0
+@@ -752,21 +760,16 @@ qemu_irq spapr_qirq(sPAPRMachineState *spapr, int irq);
+ /*
+  * Handling of optional capabilities
+  */
+-extern const VMStateDescription vmstate_spapr_caps;
+-
+-static inline sPAPRCapabilities spapr_caps(uint64_t mask)
+-{
+-    sPAPRCapabilities caps = { mask };
+-    return caps;
+-}
++extern const VMStateDescription vmstate_spapr_cap_htm;
++extern const VMStateDescription vmstate_spapr_cap_vsx;
++extern const VMStateDescription vmstate_spapr_cap_dfp;
+ 
+-static inline bool spapr_has_cap(sPAPRMachineState *spapr, uint64_t cap)
++static inline uint8_t spapr_get_cap(sPAPRMachineState *spapr, int cap)
  {
-diff --git a/linux-headers/linux/kvm.h b/linux-headers/linux/kvm.h
-index ce6c2f11f4..0abe0a0abb 100644
---- a/linux-headers/linux/kvm.h
-+++ b/linux-headers/linux/kvm.h
-@@ -932,6 +932,9 @@ struct kvm_ppc_resize_hpt {
- #define KVM_CAP_HYPERV_SYNIC2 148
- #define KVM_CAP_HYPERV_VP_INDEX 149
- #define KVM_CAP_S390_AIS_MIGRATION 150
-+#define KVM_CAP_PPC_SAFE_CACHE 151
-+#define KVM_CAP_PPC_SAFE_BOUNDS_CHECK 152
-+#define KVM_CAP_PPC_SAFE_INDIRECT_BRANCH 153
- 
- #ifdef KVM_CAP_IRQ_ROUTING
- 
-diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
-index 518dd06e98..818499237c 100644
---- a/target/ppc/kvm.c
-+++ b/target/ppc/kvm.c
-@@ -89,6 +89,9 @@ static int cap_mmu_radix;
- static int cap_mmu_hash_v3;
- static int cap_resize_hpt;
- static int cap_ppc_pvr_compat;
-+static int cap_ppc_safe_cache;
-+static int cap_ppc_safe_bounds_check;
-+static int cap_ppc_safe_indirect_branch;
- 
- static uint32_t debug_inst_opcode;
- 
-@@ -147,6 +150,16 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
-     cap_mmu_radix = kvm_vm_check_extension(s, KVM_CAP_PPC_MMU_RADIX);
-     cap_mmu_hash_v3 = kvm_vm_check_extension(s, KVM_CAP_PPC_MMU_HASH_V3);
-     cap_resize_hpt = kvm_vm_check_extension(s, KVM_CAP_SPAPR_RESIZE_HPT);
-+    cap_ppc_safe_cache = kvm_vm_check_extension(s, KVM_CAP_PPC_SAFE_CACHE);
-+    cap_ppc_safe_cache = cap_ppc_safe_cache > 0 ? cap_ppc_safe_cache : 0;
-+    cap_ppc_safe_bounds_check = kvm_vm_check_extension(s,
-+                                KVM_CAP_PPC_SAFE_BOUNDS_CHECK);
-+    cap_ppc_safe_bounds_check = cap_ppc_safe_bounds_check > 0 ?
-+                                cap_ppc_safe_bounds_check : 0;
-+    cap_ppc_safe_indirect_branch = kvm_vm_check_extension(s,
-+                                   KVM_CAP_PPC_SAFE_INDIRECT_BRANCH);
-+    cap_ppc_safe_indirect_branch = cap_ppc_safe_indirect_branch > 0 ?
-+                                   cap_ppc_safe_indirect_branch : 0;
-     /*
-      * Note: setting it to false because there is not such capability
-      * in KVM at this moment.
-@@ -2456,6 +2469,21 @@ bool kvmppc_has_cap_mmu_hash_v3(void)
-     return cap_mmu_hash_v3;
+-    return !!(spapr->effective_caps.mask & cap);
++    return spapr->effective_caps.caps[cap];
  }
  
-+int kvmppc_get_cap_safe_cache(void)
-+{
-+    return cap_ppc_safe_cache;
-+}
-+
-+int kvmppc_get_cap_safe_bounds_check(void)
-+{
-+    return cap_ppc_safe_bounds_check;
-+}
-+
-+int kvmppc_get_cap_safe_indirect_branch(void)
-+{
-+    return cap_ppc_safe_indirect_branch;
-+}
-+
- PowerPCCPUClass *kvm_ppc_get_host_cpu_class(void)
- {
-     uint32_t host_pvr = mfpvr();
-diff --git a/target/ppc/kvm_ppc.h b/target/ppc/kvm_ppc.h
-index ecb55493cc..39830baa77 100644
---- a/target/ppc/kvm_ppc.h
-+++ b/target/ppc/kvm_ppc.h
-@@ -59,6 +59,9 @@ bool kvmppc_has_cap_fixup_hcalls(void);
- bool kvmppc_has_cap_htm(void);
- bool kvmppc_has_cap_mmu_radix(void);
- bool kvmppc_has_cap_mmu_hash_v3(void);
-+int kvmppc_get_cap_safe_cache(void);
-+int kvmppc_get_cap_safe_bounds_check(void);
-+int kvmppc_get_cap_safe_indirect_branch(void);
- int kvmppc_enable_hwrng(void);
- int kvmppc_put_books_sregs(PowerPCCPU *cpu);
- PowerPCCPUClass *kvm_ppc_get_host_cpu_class(void);
-@@ -290,6 +293,21 @@ static inline bool kvmppc_has_cap_mmu_hash_v3(void)
-     return false;
- }
+ void spapr_caps_reset(sPAPRMachineState *spapr);
+-void spapr_caps_validate(sPAPRMachineState *spapr, Error **errp);
+ void spapr_caps_add_properties(sPAPRMachineClass *smc, Error **errp);
+ int spapr_caps_post_migration(sPAPRMachineState *spapr);
  
-+static inline int kvmppc_get_cap_safe_cache(void)
-+{
-+    return 0;
-+}
-+
-+static inline int kvmppc_get_cap_safe_bounds_check(void)
-+{
-+    return 0;
-+}
-+
-+static inline int kvmppc_get_cap_safe_indirect_branch(void)
-+{
-+    return 0;
-+}
-+
- static inline int kvmppc_enable_hwrng(void)
- {
-     return -1;
 -- 
 2.13.6
