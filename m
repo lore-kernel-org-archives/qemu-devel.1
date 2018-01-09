@@ -1,21 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33664)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34252)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1eYwou-00026M-Do
-	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 11:32:13 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1eYwq7-00034Q-Kq
+	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 11:33:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1eYwop-0005Ce-Gx
-	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 11:32:12 -0500
-Date: Tue, 9 Jan 2018 17:31:37 +0100
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20180109173137.5b8bd15f.cohuck@redhat.com>
-In-Reply-To: <20171211134740.8235-6-david@redhat.com>
-References: <20171211134740.8235-1-david@redhat.com>
-	<20171211134740.8235-6-david@redhat.com>
+	(envelope-from <richard.henderson@linaro.org>) id 1eYwq6-00063a-Pd
+	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 11:33:27 -0500
+Received: from mail-pf0-x243.google.com ([2607:f8b0:400e:c00::243]:38019)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1eYwq6-00062k-KR
+	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 11:33:26 -0500
+Received: by mail-pf0-x243.google.com with SMTP id k19so1857830pfj.5
+	for <qemu-devel@nongnu.org>; Tue, 09 Jan 2018 08:33:26 -0800 (PST)
+References: <20180108172904.8772-1-f4bug@amsat.org>
+	<20180108172904.8772-5-f4bug@amsat.org>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <5d8097eb-3300-56b5-adc4-94fb8de9c0ba@linaro.org>
+Date: Tue, 9 Jan 2018 08:33:22 -0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v1 for-2-12 05/15] s390x/tcg: simplify
- machine check handling
+In-Reply-To: <20180108172904.8772-5-f4bug@amsat.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 04/12] slirp: add in6_multicast() and use
+ it instead of IN6_IS_ADDR_MULTICAST()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,36 +32,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>
-Cc: qemu-s390x@nongnu.org, qemu-devel@nongnu.org, Christian Borntraeger <borntraeger@de.ibm.com>, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Thomas Huth <thuth@redhat.com>
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Samuel Thibault <samuel.thibault@ens-lyon.org>, Jan Kiszka <jan.kiszka@siemens.com>, "Michael S . Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Eric Blake <eblake@redhat.com>, Thomas Huth <thuth@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-On Mon, 11 Dec 2017 14:47:30 +0100
-David Hildenbrand <david@redhat.com> wrote:
+On 01/08/2018 09:28 AM, Philippe Mathieu-Daudé wrote:
+> Host: Mac OS 10.12.5
+> Compiler: Apple LLVM version 8.1.0 (clang-802.0.42)
+> 
+>   slirp/ip6_icmp.c:79:32: warning: taking address of packed member 'ip_src' of class or
+>         structure 'ip6' may result in an unaligned pointer value
+>         [-Waddress-of-packed-member]
+>       if (IN6_IS_ADDR_MULTICAST(&ip->ip_src) ||
+>                                  ^~~~~~~~~~
+>   /usr/include/netinet6/in6.h:299:36: note: expanded from macro 'IN6_IS_ADDR_MULTICAST'
+>   #define IN6_IS_ADDR_MULTICAST(a)        ((a)->s6_addr[0] == 0xff)
 
-> We currently only support CRW machine checks. This is a preparation for
-> real floating interrupt support.
-> 
-> Get rid of the queue and handle it via the bit INTERRUPT_MCHK. We don't
-> rename it for now, as it will be soon gone (when moving crw machine checks
-> into the flic).
-> 
-> Please note that this is the same way also KVM handles it: only one
-> instance of a machine check can be pending at a time. So no need for a
-> queue.
+The fact that you replace a macro with a function of exactly the same code in
+order to avoid a diagnostic sure looks like a compiler bug to me.
 
-That's basically architecture (IIRC, it's been a while). More pending
-machine checks are handled by merging into the mcic.
 
-> 
-> While at it, make sure we try to deliver only if env->cregs[14]
-> actually indicates that CRWs are accepted.
-> 
-> Drop two unused defines on the way (we already have PSW_MASK_...).
-> 
-> Signed-off-by: David Hildenbrand <david@redhat.com>
-> ---
->  target/s390x/cpu.c         |  2 --
->  target/s390x/cpu.h         | 10 ----------
->  target/s390x/excp_helper.c | 29 +++++------------------------
->  target/s390x/interrupt.c   | 18 +++++++-----------
->  4 files changed, 12 insertions(+), 47 deletions(-)
+r~
