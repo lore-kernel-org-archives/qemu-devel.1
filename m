@@ -1,21 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60115)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33619)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1eYtGE-0007P7-Dg
-	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 07:44:11 -0500
+	(envelope-from <groug@kaod.org>) id 1eYtKU-0002OC-2t
+	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 07:48:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1eYtGB-0006IT-9N
-	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 07:44:10 -0500
-Date: Tue, 9 Jan 2018 23:16:53 +1100
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20180109121653.GN2131@umbus.fritz.box>
-References: <20180108055348.20444-1-david@gibson.dropbear.id.au>
-	<CAFEAcA_vmTqHdjL6QfKtn-Khg2RHBA7Vs3QxreXwe2J_7mhGAQ@mail.gmail.com>
+	(envelope-from <groug@kaod.org>) id 1eYtKQ-0001d7-To
+	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 07:48:34 -0500
+Received: from 3.mo5.mail-out.ovh.net ([46.105.40.108]:46610)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1eYtKQ-0001Vw-Jq
+	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 07:48:30 -0500
+Received: from player760.ha.ovh.net (b6.ovh.net [213.186.33.56])
+	by mo5.mail-out.ovh.net (Postfix) with ESMTP id 2EC89164FA2
+	for <qemu-devel@nongnu.org>; Tue,  9 Jan 2018 13:48:21 +0100 (CET)
+Date: Tue, 9 Jan 2018 13:48:13 +0100
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20180109134813.01283a04@bahia.lan>
+In-Reply-To: <20180106004722.1152-2-joserz@linux.vnet.ibm.com>
+References: <20180106004722.1152-1-joserz@linux.vnet.ibm.com>
+	<20180106004722.1152-2-joserz@linux.vnet.ibm.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="XLsjFikA86nwwlhe"
-Content-Disposition: inline
-In-Reply-To: <CAFEAcA_vmTqHdjL6QfKtn-Khg2RHBA7Vs3QxreXwe2J_7mhGAQ@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PULL 00/12] ppc-for-2.12 queue 20180108
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH 1/1] spapr: Check SMT based on
+ KVM_CAP_PPC_SMT_POSSIBLE
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,82 +31,172 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: surajjs@au1.ibm.com, Greg Kurz <groug@kaod.org>, Michael Roth <mdroth@linux.vnet.ibm.com>, qemu-ppc@nongnu.org, QEMU Developers <qemu-devel@nongnu.org>
+To: Jose Ricardo Ziviani <joserz@linux.vnet.ibm.com>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, david@gibson.dropbear.id.au
 
+On Fri,  5 Jan 2018 22:47:22 -0200
+Jose Ricardo Ziviani <joserz@linux.vnet.ibm.com> wrote:
 
---XLsjFikA86nwwlhe
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+> Power9 supports 4 HW threads/core but it's possible to emulate
+> doorbells to implement virtual SMT. KVM has the KVM_CAP_PPC_SMT_POSSIBLE
+> which returns a bitmap with all SMT modes supported by the host.
+> 
+> Today, QEMU forces the SMT mode based on PVR compat table, this is
+> silently done in spapr_fixup_cpu_dt. Then, if user passes thread=8 the
+> guest will end up with 4 threads/core without any feedback to the user.
+> It is confusing and will crash QEMU if a cpu is hotplugged in that
+> guest.
+> 
+> This patch makes use of KVM_CAP_PPC_SMT_POSSIBLE to check if the host
+> supports the SMT mode so it allows Power9 guests to have 8 threads/core
+> if desired.
+> 
+> Reported-by: Satheesh Rajendran <satheera@in.ibm.com>
+> Signed-off-by: Jose Ricardo Ziviani <joserz@linux.vnet.ibm.com>
+> ---
 
-On Tue, Jan 09, 2018 at 11:46:41AM +0000, Peter Maydell wrote:
-> On 8 January 2018 at 05:53, David Gibson <david@gibson.dropbear.id.au> wr=
-ote:
-> > The following changes since commit 281f327487c9c9b1599f93c589a408bbf4a6=
-51b8:
-> >
-> >   Merge remote-tracking branch 'remotes/vivier/tags/m68k-for-2.12-pull-=
-request' into staging (2017-12-22 00:11:36 +0000)
-> >
-> > are available in the Git repository at:
-> >
-> >   git://github.com/dgibson/qemu.git tags/ppc-for-2.12-20180108
-> >
-> > for you to fetch changes up to 9f173585d3f35345b2facce50620ce2cdda05f2f:
-> >
-> >   spapr: Correct compatibility mode setting for hotplugged CPUs (2018-0=
-1-08 13:33:17 +1100)
-> >
-> > ----------------------------------------------------------------
-> > ppc patch queue 2018-01-08
-> >
-> > This pull requests supersedes both ppc-for-2.12-20180103 and
-> > ppc-for-2.12-20171219.  We've discovered that some substantial
-> > extensions to the proposed capabilities infrastructure will be
-> > valuable, amongst other things for managing/advertising workarounds
-> > for the dreaded Meltdown/Spectre bugs.
-> >
-> > Although that could be done as follow on changes, since the caps
-> > infrastructure hasn't been merged yet, we might as well pull it out
-> > while we rework, and just merge the unrelated bugfixes.
-> >
-> > The last two pull requests apparently had problems on some arm32
-> > systems.  I haven't been able to reproduce those, so I have no idea
-> > which patch is causing them.  If we get lucky and it was one of the
-> > patches I've removed from this series, this may also serve to unjam
-> > the other fixes.
->=20
-> This still hangs on my arm32 setup in the migration test. I'll see
-> if I can identify what is going wrong.
+Hi,
 
-Thanks.  Even if you can identify which patch it is and we can
-postpone that one would be a bug help.
+I agree with the general idea but I have a few questions.
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
+The MIN(smp_threads, ppc_compat_max_threads(cpu)) computation is
+performed in spapr_fixup_cpu_dt() at CAS, but it is also performed
+in spapr_populate_cpu_dt() at machine reset or when a CPU is added.
 
---XLsjFikA86nwwlhe
-Content-Type: application/pgp-signature; name="signature.asc"
+Shouldn't your patch address the latter as well ?
 
------BEGIN PGP SIGNATURE-----
+>  hw/ppc/spapr.c       | 14 +++++++++++++-
+>  hw/ppc/trace-events  |  1 +
+>  target/ppc/kvm.c     |  5 +++++
+>  target/ppc/kvm_ppc.h |  6 ++++++
+>  4 files changed, 25 insertions(+), 1 deletion(-)
+> 
+> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> index d1acfe8858..ea2503cd2f 100644
+> --- a/hw/ppc/spapr.c
+> +++ b/hw/ppc/spapr.c
+> @@ -345,7 +345,19 @@ static int spapr_fixup_cpu_dt(void *fdt, sPAPRMachineState *spapr)
+>          PowerPCCPU *cpu = POWERPC_CPU(cs);
+>          DeviceClass *dc = DEVICE_GET_CLASS(cs);
+>          int index = spapr_vcpu_id(cpu);
+> -        int compat_smt = MIN(smp_threads, ppc_compat_max_threads(cpu));
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlpUsrIACgkQbDjKyiDZ
-s5KaNxAAlBm/FBqwGPK2zuD7MJHNEP9C3JdFzXsq2VWp3qm+F6eqQsHKyXAS+anw
-crMmiFQQFlklPzv8o1z4LL17c70ycofxAm4kwC2/zURbrJyxThN4Gc6o4zmp0SBv
-3LugW1xvxJnxIMhPil2xgZQ1D3ouxIcc+KxYvSxgIgsoK2PyU5Y0EJJfg3VVrjEO
-DP9UGrwpZFzHJXMvdsG/LKC7X36EuiUgkq0zzUUb8ZoxOjQkIIAxcfLOSHlaR5a7
-t6T6HuB0NkW7NRey5iAjzZfZdMYWd28eqp3V10JE2JQVK/2cdbvu4AWZvs0uvMnC
-tQM5oRhLPLUvu1wjbaYc/sqsNqS2WlrlQBzLLHiLdIqL4LUp4Fjd+8r71UU/EY5Z
-el+ztBk3qWjyKY9uFHBa9gyHQHAiR8MdztgkCfQdnmruOzqzdQw1xL92PxJFzdOV
-uB8QIM3qWP052McdzD6Yr6z8keGU+EWQfTiX0VQkZrQufDfOxl+hxAOzna4YtHGt
-jcsa1GJyzc1peD8QPvc7Vo4dne2w9obyEYbjF9RD83hn1GWMQ01nmWMZWCAMnId8
-zwMEb0Q0RvNnJ5NZHyxBKTwApZ/YXm41f3evgP2MJ3WUDuWUlZOHFRiSbQJ1YSqz
-Tav4Ta5KM8m7p0wz0awYr1qbZiXlzVU2p/stuGURJTzgu4aDi3c=
-=Xa6t
------END PGP SIGNATURE-----
+Considering that we have:
 
---XLsjFikA86nwwlhe--
+int ppc_compat_max_threads(PowerPCCPU *cpu)
+{
+    const CompatInfo *compat = compat_by_pvr(cpu->compat_pvr);
+    int n_threads = CPU(cpu)->nr_threads;
+
+    if (cpu->compat_pvr) {
+        g_assert(compat);
+        n_threads = MIN(n_threads, compat->max_threads);
+    }
+
+    return n_threads;
+}
+
+and
+
+void qemu_init_vcpu(CPUState *cpu)
+{
+    cpu->nr_cores = smp_cores;
+    cpu->nr_threads = smp_threads;
+...
+}
+
+ppc_compat_max_threads() already returns the smaller value of
+smp_threads and the maximum number of HW threads for the PVR.
+
+I don't quite understand why we had this compat_smt calculation
+in the first place...
+
+> +
+> +        /* set smt to maximum for this current pvr if the number
+> +         * passed is higher than defined by PVR compat mode AND
+> +         * if KVM cannot emulate it.*/
+> +        int compat_smt = smp_threads;
+> +        if ((kvmppc_cap_smt_possible() & smp_threads) != smp_threads &&
+> +                smp_threads > ppc_compat_max_threads(cpu)) {
+> +            compat_smt = ppc_compat_max_threads(cpu);
+> +
+> +            trace_spapr_fixup_cpu_smt(index, smp_threads,
+> +                    kvmppc_cap_smt_possible(),
+> +                    ppc_compat_max_threads(cpu));
+> +        }
+
+... so I'm wondering if the above shouldn't be performed in
+ppc_compat_max_threads() directly ? 
+
+>  
+>          if ((index % smt) != 0) {
+>              continue;
+> diff --git a/hw/ppc/trace-events b/hw/ppc/trace-events
+> index b7c3e64b5e..a8e29d7ab1 100644
+> --- a/hw/ppc/trace-events
+> +++ b/hw/ppc/trace-events
+> @@ -16,6 +16,7 @@ spapr_irq_alloc(int irq) "irq %d"
+>  spapr_irq_alloc_block(int first, int num, bool lsi, int align) "first irq %d, %d irqs, lsi=%d, alignnum %d"
+>  spapr_irq_free(int src, int irq, int num) "Source#%d, first irq %d, %d irqs"
+>  spapr_irq_free_warn(int src, int irq) "Source#%d, irq %d is already free"
+> +spapr_fixup_cpu_smt(int idx, int smpt, int kvmt, int pvrt) "CPU(%d): expected smt %d, kvm support %d, max smt pvr %d"
+>  
+>  # hw/ppc/spapr_hcall.c
+>  spapr_cas_pvr_try(uint32_t pvr) "0x%x"
+> diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
+> index 518dd06e98..aac5667bf4 100644
+> --- a/target/ppc/kvm.c
+> +++ b/target/ppc/kvm.c
+> @@ -2456,6 +2456,11 @@ bool kvmppc_has_cap_mmu_hash_v3(void)
+>      return cap_mmu_hash_v3;
+>  }
+>  
+> +int kvmppc_cap_smt_possible(void)
+> +{
+> +    return cap_ppc_smt_possible;
+> +}
+> +
+>  PowerPCCPUClass *kvm_ppc_get_host_cpu_class(void)
+>  {
+>      uint32_t host_pvr = mfpvr();
+> diff --git a/target/ppc/kvm_ppc.h b/target/ppc/kvm_ppc.h
+> index ecb55493cc..6ac33d2b4a 100644
+> --- a/target/ppc/kvm_ppc.h
+> +++ b/target/ppc/kvm_ppc.h
+> @@ -59,6 +59,7 @@ bool kvmppc_has_cap_fixup_hcalls(void);
+>  bool kvmppc_has_cap_htm(void);
+>  bool kvmppc_has_cap_mmu_radix(void);
+>  bool kvmppc_has_cap_mmu_hash_v3(void);
+> +int kvmppc_cap_smt_possible(void);
+>  int kvmppc_enable_hwrng(void);
+>  int kvmppc_put_books_sregs(PowerPCCPU *cpu);
+>  PowerPCCPUClass *kvm_ppc_get_host_cpu_class(void);
+> @@ -290,6 +291,11 @@ static inline bool kvmppc_has_cap_mmu_hash_v3(void)
+>      return false;
+>  }
+>  
+> +static inline int kvmppc_cap_smt_possible(void)
+> +{
+> +    return -1;
+
+When CONFIG_KVM is set, the semantics of kvmppc_cap_smt_possible() is:
+- a bitmap with supported SMT modes if KVM has KVM_CAP_PPC_SMT_POSSIBLE
+- 0 if KVM doesn't have KVM_CAP_PPC_SMT_POSSIBLE or we're running in
+  TCG mode
+
+so it looks a bit weird to return -1 when CONFIG_KVM isn't set (when
+running in TCG mode, we would get different values depending on how
+the QEMU binary was compiled).
+
+Shouldn't this stub return 0 instead ?
+
+Cheers,
+
+--
+Greg
+
+> +}
+> +
+>  static inline int kvmppc_enable_hwrng(void)
+>  {
+>      return -1;
