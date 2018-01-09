@@ -1,37 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45104)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45358)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <fziglio@redhat.com>) id 1eZ0bI-0006tp-UV
-	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 15:34:25 -0500
+	(envelope-from <eblake@redhat.com>) id 1eZ0c0-0007Ph-RF
+	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 15:35:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <fziglio@redhat.com>) id 1eZ0bF-00012O-I5
-	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 15:34:24 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:45786)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <fziglio@redhat.com>) id 1eZ0bF-00010g-BB
-	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 15:34:21 -0500
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 51A30C047B7C
-	for <qemu-devel@nongnu.org>; Tue,  9 Jan 2018 20:34:19 +0000 (UTC)
-Received: from colo-mx.corp.redhat.com
-	(colo-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.20])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 277E7600C9
-	for <qemu-devel@nongnu.org>; Tue,  9 Jan 2018 20:34:19 +0000 (UTC)
-Date: Tue, 9 Jan 2018 15:34:18 -0500 (EST)
-From: Frediano Ziglio <fziglio@redhat.com>
-Message-ID: <1376736409.4111616.1515530058721.JavaMail.zimbra@redhat.com>
-In-Reply-To: <20180108105138.smhnlhpfzswacspm@sirius.home.kraxel.org>
-References: <20171122135625.16625-1-fziglio@redhat.com>
-	<2083994092.34289761.1512637514012.JavaMail.zimbra@redhat.com>
-	<911826618.967890.1513682427088.JavaMail.zimbra@redhat.com>
-	<1014182222.2350600.1514715463787.JavaMail.zimbra@redhat.com>
-	<20180108105138.smhnlhpfzswacspm@sirius.home.kraxel.org>
+	(envelope-from <eblake@redhat.com>) id 1eZ0bz-0001bA-Nv
+	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 15:35:08 -0500
+References: <20171207155102.66622-1-vsementsov@virtuozzo.com>
+	<20171207155102.66622-6-vsementsov@virtuozzo.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <dd58d0a5-3838-5ef7-cb8b-0b74e5e22d27@redhat.com>
+Date: Tue, 9 Jan 2018 14:34:59 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 1/4] spice: remove QXLWorker interface field
+In-Reply-To: <20171207155102.66622-6-vsementsov@virtuozzo.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="cCDbWhFIOcY6KMnMJDbPTkxvRWFpLjSQA"
+Subject: Re: [Qemu-devel] [PATCH v2 5/6] iotests: implement
+ QemuIoInteractive class
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -40,31 +25,104 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: armbru@redhat.com, dgilbert@redhat.com, pbonzini@redhat.com, mreitz@redhat.com, kwolf@redhat.com, den@openvz.org
 
-Thanks.
-How is your hand?
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--cCDbWhFIOcY6KMnMJDbPTkxvRWFpLjSQA
+From: Eric Blake <eblake@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: armbru@redhat.com, dgilbert@redhat.com, pbonzini@redhat.com,
+ mreitz@redhat.com, kwolf@redhat.com, den@openvz.org
+Message-ID: <dd58d0a5-3838-5ef7-cb8b-0b74e5e22d27@redhat.com>
+Subject: Re: [PATCH v2 5/6] iotests: implement QemuIoInteractive class
+References: <20171207155102.66622-1-vsementsov@virtuozzo.com>
+ <20171207155102.66622-6-vsementsov@virtuozzo.com>
+In-Reply-To: <20171207155102.66622-6-vsementsov@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Frediano
+On 12/07/2017 09:51 AM, Vladimir Sementsov-Ogievskiy wrote:
 
------ Original Message -----
-> 
-> On Sun, Dec 31, 2017 at 05:17:43AM -0500, Frediano Ziglio wrote:
-> > ping
-> > 
-> > > 
-> > > ping
-> > > 
-> > > > 
-> > > > ping the series
-> > > > 
-> 
-> Was on sick leave for a few weeks, back now, will process asap but will
-> probably take a while nevertheless due to the big backlog I have now.
-> 
-> cheers,
->   Gerd
-> 
-> 
-> 
+The subject says what, but there is no commit body that says why.
+
+Presumably this makes writing the test in the next patch easier, but
+some details in the commit message would make this obvious.
+
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> ---
+>  tests/qemu-iotests/iotests.py | 38 +++++++++++++++++++++++++++++++++++=
++++
+>  1 file changed, 38 insertions(+)
+>=20
+
+My python is not strong; it looks good overall, although I have a few
+questions that may warrant a v3 before I give R-b.
+
+> +class QemuIoInteractive:
+> +    def __init__(self, *args):
+> +        self.args =3D qemu_io_args + list(args)
+> +        self._p =3D subprocess.Popen(self.args, stdin=3Dsubprocess.PIP=
+E,
+> +                                   stdout=3Dsubprocess.PIPE,
+> +                                   stderr=3Dsubprocess.STDOUT)
+
+Why STDOUT instead of STDERR?  Is the redirection intentional?
+
+
+> +    def _read_output(self):
+> +        pattern =3D 'qemu-io> '
+> +        n =3D len(pattern)
+> +        pos =3D 0
+> +        s =3D []
+> +        while pos !=3D n:
+> +            c =3D self._p.stdout.read(1)
+> +            #check unexpected EOF
+
+pep8 doesn't like this comment style (it wants space after #).  The file
+is already unclean under pep8, but you shouldn't make it worse.
+
+> +            assert c !=3D ''
+
+Is assert really the nicest control flow when early EOF is present? Or
+is it because we are only using this in tests, where we don't expect
+early EOF, so asserting is just fine for our usage?
+
+> +            s.append(c)
+> +            if c =3D=3D pattern[pos]:
+> +                pos +=3D 1
+> +            else:
+> +                pos =3D 0
+> +
+> +        return ''.join(s[:-n])
+
+Is it necessary to use join() on the empty string here, compared to just
+returning the array slice directly?
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--cCDbWhFIOcY6KMnMJDbPTkxvRWFpLjSQA
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlpVJ3MACgkQp6FrSiUn
+Q2o9OQf+Irthf516fofyO7qJx/QieLlXTB9aP2cPCEY6Wh46Iub9rs4X32UxL1j3
+0D9MMGhaM3y+v4wIXZr0Yoa1sh4FjOz2hxreKJ6pZYonztgi3ElsFMs94axKZuwF
+YmvxpRPtxix4ROZvpQzq0//MMLPVr8j1Ce0zklXEQGqW7w/8XZpyBcFXrYxK2Nl1
+nqQd3hCKo9V6aS6VDlKK/EDS9C0PrE0YVg9ng7YI9+djWC+i52XdKom8wtwUlh0Q
+plkM7rvaOAM0HIELIfNnR1Uh4+CZMm096rT1WnxKqukJlhtE0CcuHqA9FDHmfqfN
+Zt9xCmgZZrYyIPjorP/7ErsiZMo0dQ==
+=q2YJ
+-----END PGP SIGNATURE-----
+
+--cCDbWhFIOcY6KMnMJDbPTkxvRWFpLjSQA--
