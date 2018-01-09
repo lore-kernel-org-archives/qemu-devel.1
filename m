@@ -1,21 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48768)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49950)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eYzwj-0001qr-1o
-	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 14:52:30 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1eYzzd-0003EZ-Q9
+	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 14:55:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eYzwi-0005WA-5E
-	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 14:52:29 -0500
-References: <20171207155102.66622-1-vsementsov@virtuozzo.com>
-	<20171207155102.66622-4-vsementsov@virtuozzo.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <74fa9031-25d8-df0f-0690-c03ff377c0d9@redhat.com>
-Date: Tue, 9 Jan 2018 13:52:17 -0600
+	(envelope-from <dgilbert@redhat.com>) id 1eYzza-0008LF-GO
+	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 14:55:29 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:37820)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1eYzza-0008Ko-8B
+	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 14:55:26 -0500
+Date: Tue, 9 Jan 2018 19:55:18 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20180109195517.GD2708@work-vm>
+References: <EC8A4E314CF1574AB62C80421BD9833933FEE069@SHSMSX104.ccr.corp.intel.com>
+	<20180109153538.GC1197@stefanha-x1.localdomain>
 MIME-Version: 1.0
-In-Reply-To: <20171207155102.66622-4-vsementsov@virtuozzo.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="2BhM6DrxfGFe0n8ZOhB29DQYaegDU5ey6"
-Subject: Re: [Qemu-devel] [PATCH v2 3/6] qapi: add nbd-server-remove
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <20180109153538.GC1197@stefanha-x1.localdomain>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] Some question about savem/qcow2 incremental
+ snapshot
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,107 +29,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: armbru@redhat.com, dgilbert@redhat.com, pbonzini@redhat.com, mreitz@redhat.com, kwolf@redhat.com, den@openvz.org
+To: Stefan Hajnoczi <stefanha@gmail.com>
+Cc: "He, Junyan" <junyan.he@intel.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Juan Quintela <quintela@redhat.com>, John Snow <jsnow@redhat.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---2BhM6DrxfGFe0n8ZOhB29DQYaegDU5ey6
-From: Eric Blake <eblake@redhat.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: armbru@redhat.com, dgilbert@redhat.com, pbonzini@redhat.com,
- mreitz@redhat.com, kwolf@redhat.com, den@openvz.org
-Message-ID: <74fa9031-25d8-df0f-0690-c03ff377c0d9@redhat.com>
-Subject: Re: [PATCH v2 3/6] qapi: add nbd-server-remove
-References: <20171207155102.66622-1-vsementsov@virtuozzo.com>
- <20171207155102.66622-4-vsementsov@virtuozzo.com>
-In-Reply-To: <20171207155102.66622-4-vsementsov@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 12/07/2017 09:50 AM, Vladimir Sementsov-Ogievskiy wrote:
-> Add command for export removing. It is needed for cases when we
-> don't want to keep export after the operation on it was completed.
-> The other example is temporary node, created with blockdev-add.
-> If we want to delete it we should firstly remove corresponding
-> NBD export.
+* Stefan Hajnoczi (stefanha@gmail.com) wrote:
+> On Mon, Dec 25, 2017 at 07:54:00AM +0000, He, Junyan wrote:
+> > I am now focusing on snapshot optimization for Intel NVDimm kind memo=
+ry. Different from the normal memory, the NVDimm may be 128G, 256G or eve=
+n more for just one guest, and its speed is slower than the normal memory=
+. So sometimes it may take several minutes to complete just one snapshot =
+saving. Even with compression enabled, the=A0snapshot point may consume m=
+ore than 30G disk space. We decide to add incremental kind snapshot savin=
+g to resolve this. Just store difference between snapshot points to save =
+time and disk space.
+> > But the current snapshot/save_vm framework seems not to support this.
+> > We need to add snapshot dependency and extra operations when we LOAD =
+and DELETE the snapshot point.
+> > Is that possible to modify the savevm framework and add some incremen=
+tal snapshot support to QCOW2 format?
 >=20
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> ---
->  qapi/block.json     | 18 ++++++++++++++++++
->  include/block/nbd.h |  3 ++-
->  blockdev-nbd.c      | 29 ++++++++++++++++++++++++++++-
->  nbd/server.c        | 25 ++++++++++++++++++++++---
->  4 files changed, 70 insertions(+), 5 deletions(-)
+> It sounds like you'd like to save incremental guest RAM snapshots based
+> on the contents of earlier snapshots.  QEMU has no way of doing this at
+> the moment.
 >=20
-> diff --git a/qapi/block.json b/qapi/block.json
-> index 503d4b287b..f83485c325 100644
-> --- a/qapi/block.json
-> +++ b/qapi/block.json
-> @@ -228,6 +228,24 @@
->    'data': {'device': 'str', '*name': 'str', '*writable': 'bool'} }
-> =20
->  ##
-> +# @nbd-server-remove:
-> +#
-> +# Remove NBD export by name.
-> +#
-> +# @name: Export name.
-> +#
-> +# @force: Whether active connections to the export should be closed. I=
-f this
-> +#         parameter is false the export only becomes hidden from clien=
-ts (new
-> +#         connections are impossible), and would be automatically free=
-d after
-> +#         all clients are disconnected (default false).
+> In order to do this QEMU needs to keep dirty memory logging enabled at
+> all times so it knows which pages have been written since the last
+> snapshot.  This will affect guest performance.
 
-Unstated, but if the parameter is true, existing clients are forcefully
-disconnected, possibly losing pending transactions.
+Keeping the dirty logging going is something that COLO does, to send
+incremental snapshots to the secondary.   As you say, it does slow
+things down and you have to be able to keep the state between the
+migration runs.
 
-Do we want a third mode in the middle, where the server starts replying
-to all existing clients with ESHUTDOWN errors for all new requests
-rather than abruptly disconnecting (no new I/O, but no forced disconnect
-and pending in-flight transactions can still complete gracefully)?
+> Certain guest operations like rebooting or zeroing memory will defeat
+> the incremental guest RAM snapshot feature.  It's worth thinking about
+> these cases to make sure this feature would be worth it in real use
+> cases.
 
-> +#
-> +# Returns: error if the server is not running or export is not found.
-> +#
-> +# Since: 2.12
-> +##
-> +{ 'command': 'nbd-server-remove', 'data': {'name': 'str', '*force': 'b=
-ool'} }
-> +
+But those probably wouldn't upset an NVDimm?
 
-If we're okay with just the bool parameter, then this patch looks good;
-but if we want a third mode, then we want '*force' to be an enum type.
-So tentative:
+> What you're proposing isn't specific to NVDIMM.  Regular RAM use cases
+> also benefit from incremental snapshots because less disk space is
+> required for the savevm data.
+>=20
+> Some questions about your use case:
+>=20
+> 1. Does the guest have -device nvdimm?
+>=20
+> 2. Is the qcow2 file on NVDIMM?
+>=20
+> Stefan
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---2BhM6DrxfGFe0n8ZOhB29DQYaegDU5ey6
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlpVHXEACgkQp6FrSiUn
-Q2pbvgf/aB+u4mL1rtI7AAE56NG8UVokJzK3duAQShBB4qJEyHzARJO/mL9GLhjF
-vz18MgCYaMoC+TFLbiyKX5WJ7+biDA30mnnQhK4zv8I+uSPMfj5lO4w/JxraqWD0
-O/l8UIQ1i1y2PfU8QGuiL9jrenUL51banVbm8OVfxPaoELOpxJyyxfiYXkDhOg22
-YyJKnM088zEbi1Mvn7tbx3NMyiX53B4eXwkURGmGgfH0XoMbprRf5ze1VbeP8FHp
-EVCmU5bxS34Jb9zrjzq63faglxxbedJ7YgijFspokaRQF3qM9qyYvOHjI+KR0oaF
-k0TYPg/0YBVkdVxaIt/LiNPOxiiPFg==
-=46QW
------END PGP SIGNATURE-----
-
---2BhM6DrxfGFe0n8ZOhB29DQYaegDU5ey6--
+Dave
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
