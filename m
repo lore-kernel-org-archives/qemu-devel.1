@@ -1,28 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60894)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60999)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1eYvcd-00083w-Cl
-	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 10:15:28 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1eYvcx-0008G8-MM
+	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 10:15:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1eYvcZ-0002FJ-Fy
-	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 10:15:27 -0500
-Received: from mail-wr0-x244.google.com ([2a00:1450:400c:c0c::244]:44936)
+	(envelope-from <peter.maydell@linaro.org>) id 1eYvcw-0002X1-Kw
+	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 10:15:47 -0500
+Received: from mail-ot0-x235.google.com ([2607:f8b0:4003:c0f::235]:44789)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1eYvcZ-0002Ea-6f
-	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 10:15:23 -0500
-Received: by mail-wr0-x244.google.com with SMTP id w50so5251132wrc.11
-	for <qemu-devel@nongnu.org>; Tue, 09 Jan 2018 07:15:23 -0800 (PST)
-Date: Tue, 9 Jan 2018 15:15:20 +0000
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20180109151520.GB1197@stefanha-x1.localdomain>
-References: <1515433816-5700-1-git-send-email-mst@redhat.com>
-	<1515433816-5700-2-git-send-email-mst@redhat.com>
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1eYvcw-0002WO-FT
+	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 10:15:46 -0500
+Received: by mail-ot0-x235.google.com with SMTP id g59so11596758otg.11
+	for <qemu-devel@nongnu.org>; Tue, 09 Jan 2018 07:15:46 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="2B/JsCI69OhZNC5r"
-Content-Disposition: inline
-In-Reply-To: <1515433816-5700-2-git-send-email-mst@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 2/2] vhost-user: fix misaligned access to
- payload
+In-Reply-To: <20180109121653.GN2131@umbus.fritz.box>
+References: <20180108055348.20444-1-david@gibson.dropbear.id.au>
+	<CAFEAcA_vmTqHdjL6QfKtn-Khg2RHBA7Vs3QxreXwe2J_7mhGAQ@mail.gmail.com>
+	<20180109121653.GN2131@umbus.fritz.box>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 9 Jan 2018 15:15:25 +0000
+Message-ID: <CAFEAcA-Mzyf2S3yW04LNVy7pAZ6gmzXo3aiFdPxrbWAAAX7N0Q@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL 00/12] ppc-for-2.12 queue 20180108
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,40 +30,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: surajjs@au1.ibm.com, Greg Kurz <groug@kaod.org>, Michael Roth <mdroth@linux.vnet.ibm.com>, qemu-ppc@nongnu.org, QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>
+
+On 9 January 2018 at 12:16, David Gibson <david@gibson.dropbear.id.au> wrote:
+> Thanks.  Even if you can identify which patch it is and we can
+> postpone that one would be a bug help.
+
+Bisection blames this one:
+
+pbonzini@redhat.com (1):
+      target-ppc: optimize cmp translation
+
+A plain boot doesn't work either:
+./build/ppc/ppc64-softmmu/qemu-system-ppc64 -display none -serial stdio
 
 
---2B/JsCI69OhZNC5r
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+SLOF **********************************************************************
+QEMU Starting
+ Build Date = Jul 24 2017 15:15:46
+ FW Version = git-89f519f09bf85091
+ Press "s" to enter Open Firmware.
 
-On Mon, Jan 08, 2018 at 07:50:44PM +0200, Michael S. Tsirkin wrote:
-> We currently take a pointer to a misaligned field of a packed structure.
-> clang reports this as a build warning.
-> A fix is to keep payload in a separate structure, and access is it
-> from there using a vectored write.
->=20
-> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-> ---
->  hw/virtio/vhost-user.c | 39 ++++++++++++++++++++++++---------------
->  1 file changed, 24 insertions(+), 15 deletions(-)
+Populating /vdevice methods
+Populating /vdevice/vty@71000000
+Populating /vdevice/nvram@71000001
+Populating /vdevice/l-lan@71000002
+Populating /vdevice/v-scsi@71000003
+       SCSI: Looking for devices
+          00000000 CD-ROM   : "QEMU     QEMU CD-ROM      2.5+"
 
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+Populating /pci@0000000
+                     00 0000 (D) : 1234 1111    qemu vga
+                     00 0800 (D) : 1033 0194    serial bus [ usb-xhci ]
+No NVRAM common partition, re-initializing...
+E
 
---2B/JsCI69OhZNC5r
-Content-Type: application/pgp-signature; name="signature.asc"
+and then keeps printing out spaces for ever as far as I can see.
 
------BEGIN PGP SIGNATURE-----
+A working build does
 
-iQEcBAEBAgAGBQJaVNyIAAoJEJykq7OBq3PIPpYIAKyylY3K4mgoZDQdnE7o4LTH
-fKixjQD1qTn7NXYoVsJXtbFwWRcxc8o4l0U+ScRcnYfyJYjcZj/fGU1ocEgbZNEk
-8wZW+ttRTHqdN8EpKebjmOwaECPTWyLadgSqrnD75TkfOKXgBw60viV89ueBnmKx
-Xk+n2JsdzvB6nXeAqzJVD6TyXdFz+3gZwpa0AzWHLrK1ReDO4daSA1pQotBuiQen
-KG29nMRm7ff/EBeCn2/isgJR61Go1NkeDPmk9UfLG683jIMS/c7xcKNfMgQAX2jm
-H8Hm/Or0AK2aKeOebCJ+U5XV8ealyXuAK2q5esA/7ZlAp11VNTTdVi7ayaBda3k=
-=2lc/
------END PGP SIGNATURE-----
 
---2B/JsCI69OhZNC5r--
+SLOF **********************************************************************
+QEMU Starting
+ Build Date = Jul 24 2017 15:15:46
+ FW Version = git-89f519f09bf85091
+ Press "s" to enter Open Firmware.
+
+Populating /vdevice methods
+Populating /vdevice/vty@71000000
+Populating /vdevice/nvram@71000001
+Populating /vdevice/l-lan@71000002
+Populating /vdevice/v-scsi@71000003
+       SCSI: Looking for devices
+          8200000000000000 CD-ROM   : "QEMU     QEMU CD-ROM      2.5+"
+Populating /pci@800000020000000
+                     00 0000 (D) : 1234 1111    qemu vga
+                     00 0800 (D) : 1033 0194    serial bus [ usb-xhci ]
+No NVRAM common partition, re-initializing...
+Installing QEMU fb
+
+
+
+Scanning USB
+  XHCI: Initializing
+    USB Keyboard
+    USB mouse
+No console specified using screen & keyboard
+
+[etc etc]
+
+so you can see it's already diverged because it prints out
+a different value for the name of the pci node and the
+SCSI line has 8200000000000000 vs 00000000.
+
+(This is a build for arm32, running in a chroot on an aarch64
+box, non-debug build.)
+
+thanks
+-- PMM
