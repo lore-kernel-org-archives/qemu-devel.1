@@ -1,20 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54750)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55705)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eZ0tD-0007Ik-O3
-	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 15:52:56 -0500
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1eZ0vD-0000Bz-Lu
+	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 15:55:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eZ0tA-0005mF-W5
-	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 15:52:55 -0500
-References: <20171201232433.25193-1-eblake@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <3323b23f-ad82-fff5-26cb-bf4c9622c36d@redhat.com>
-Date: Tue, 9 Jan 2018 14:52:44 -0600
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1eZ0vC-0007Uq-RY
+	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 15:54:59 -0500
+Received: from hera.aquilenet.fr ([2a0c:e300::1]:43368)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <samuel.thibault@ens-lyon.org>)
+	id 1eZ0vC-0007TN-JU
+	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 15:54:58 -0500
+Date: Tue, 9 Jan 2018 21:54:54 +0100
+From: Samuel Thibault <samuel.thibault@gnu.org>
+Message-ID: <20180109205454.pjthr5nuowgxzgxe@var.youpi.perso.aquilenet.fr>
+References: <20180108172904.8772-1-f4bug@amsat.org>
+	<20180108172904.8772-2-f4bug@amsat.org>
 MIME-Version: 1.0
-In-Reply-To: <20171201232433.25193-1-eblake@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="64hBCI1K9HMN0RpgvyYCUsQLYjFTNpNSe"
-Subject: Re: [Qemu-devel] [PATCH v2 0/7] macro do/while (0) cleanup
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20180108172904.8772-2-f4bug@amsat.org>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 01/12] slirp: remove QEMU_PACKED from
+ structures with don't require it
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,116 +30,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-trivial@nongnu.org, pbonzini@redhat.com, armbru@redhat.com
+To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Cc: Jan Kiszka <jan.kiszka@siemens.com>, "Michael S . Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Eric Blake <eblake@redhat.com>, Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---64hBCI1K9HMN0RpgvyYCUsQLYjFTNpNSe
-From: Eric Blake <eblake@redhat.com>
-To: qemu-devel@nongnu.org
-Cc: qemu-trivial@nongnu.org, pbonzini@redhat.com, armbru@redhat.com
-Message-ID: <3323b23f-ad82-fff5-26cb-bf4c9622c36d@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 0/7] macro do/while (0) cleanup
-References: <20171201232433.25193-1-eblake@redhat.com>
-In-Reply-To: <20171201232433.25193-1-eblake@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Hello,
 
-ping
+Philippe Mathieu-Daud=C3=A9, on lun. 08 janv. 2018 14:28:53 -0300, wrote:
+>  struct mbuf_ptr {
+>  	struct mbuf *mptr;
+>  	uint32_t dummy;
+> -} QEMU_PACKED;
+> +};
+>  #else
+>  struct mbuf_ptr {
+>  	struct mbuf *mptr;
+> -} QEMU_PACKED;
+> +};
 
-On 12/01/2017 05:24 PM, Eric Blake wrote:
-> Noticed this by chance in the tests/ directory, so I broadened
-> it to a grep of the entire code base.  I suspect^wKNOW many of
-> the bad macros were the victims of copy-and-paste from some
-> other bad location (particularly given how many bit-rotten
-> debug print macros were involved).
->=20
-> https://wiki.qemu.org/BiteSizedTasks#Bitrot_prevention is still
-> left for someone else, for another day.
->=20
-> In v2:
-> - add review tags
-> - audit that the maint patch has no semantic change (all callers
-> were indeed supplying ';' at the macro call-sites)
-> - improved commit messages
-> - more patches for some additional cleanups
-> - tighten the checkpatch rule to also flag 'while (false);'
->=20
-> Eric Blake (7):
->   net: Drop unusual use of do { } while (0);
->   mips: Tweak location of ';' in macros
->   chardev: Use goto/label instead of do/break/while(0)
->   chardev: Clean up previous patch indentation
->   tests: Avoid 'do/while(false);' in vhost-user-bridge
->   maint: Fix macros with broken 'do/while(0);' usage
->   checkpatch: Enforce proper do/while (0) style
->=20
->  tests/acpi-utils.h         |  8 ++---
->  ui/sdl_zoom_template.h     |  8 ++---
->  audio/paaudio.c            |  4 +--
->  chardev/char-serial.c      | 75 ++++++++++++++++++++++++--------------=
---------
->  hw/adc/stm32f2xx_adc.c     |  2 +-
->  hw/block/m25p80.c          |  2 +-
->  hw/char/cadence_uart.c     |  2 +-
->  hw/char/stm32f2xx_usart.c  |  2 +-
->  hw/display/cg3.c           |  2 +-
->  hw/display/dpcd.c          |  2 +-
->  hw/display/xlnx_dp.c       |  2 +-
->  hw/dma/pl330.c             |  2 +-
->  hw/dma/xlnx-zynq-devcfg.c  |  2 +-
->  hw/dma/xlnx_dpdma.c        |  2 +-
->  hw/i2c/i2c-ddc.c           |  2 +-
->  hw/misc/auxbus.c           |  2 +-
->  hw/misc/macio/mac_dbdma.c  |  4 +--
->  hw/misc/mmio_interface.c   |  2 +-
->  hw/misc/stm32f2xx_syscfg.c |  2 +-
->  hw/misc/zynq_slcr.c        |  2 +-
->  hw/net/cadence_gem.c       |  2 +-
->  hw/net/pcnet.c             | 20 ++++++-------
->  hw/ssi/mss-spi.c           |  2 +-
->  hw/ssi/stm32f2xx_spi.c     |  2 +-
->  hw/ssi/xilinx_spi.c        |  2 +-
->  hw/ssi/xilinx_spips.c      |  2 +-
->  hw/timer/a9gtimer.c        |  2 +-
->  hw/timer/cadence_ttc.c     |  2 +-
->  hw/timer/mss-timer.c       |  2 +-
->  hw/timer/stm32f2xx_timer.c |  2 +-
->  hw/tpm/tpm_passthrough.c   |  2 +-
->  hw/tpm/tpm_tis.c           |  2 +-
->  migration/rdma.c           |  2 +-
->  target/arm/translate-a64.c |  2 +-
->  target/mips/msa_helper.c   | 34 +++++++++++----------
->  target/s390x/kvm.c         |  2 +-
->  tests/tcg/test-mmap.c      |  2 +-
->  tests/vhost-user-bridge.c  |  6 ++--
->  scripts/checkpatch.pl      |  5 ++++
->  39 files changed, 119 insertions(+), 105 deletions(-)
->=20
+> @@ -199,7 +199,7 @@ struct ipovly {
+>  	uint16_t	ih_len;			/* protocol length */
+>  	struct	in_addr ih_src;		/* source internet address */
+>  	struct	in_addr ih_dst;		/* destination internet address */
+> -} QEMU_PACKED;
+> +};
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+Did you actually try to change these structures?  The presence of the
+"dummy" field should have hinted that it's not a trivial structure :)
 
+mbuf_ptr is used in struct ipovly which is to have the same size as the
+ipv4 header.  One would have to untangle that before removing the packed
+attribute.
 
---64hBCI1K9HMN0RpgvyYCUsQLYjFTNpNSe
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+> @@ -215,7 +215,7 @@ struct ipq {
+>  	uint8_t	ipq_p;			/* protocol of this fragment */
+>  	uint16_t	ipq_id;			/* sequence id for reassembly */
+>  	struct	in_addr ipq_src,ipq_dst;
+> -} QEMU_PACKED;
+> +};
 
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+This one seems safe to me. I'd still rather see an actual test with
+added holes in the structure to be sure :)
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlpVK5wACgkQp6FrSiUn
-Q2oi1QgAgHGfkA0BBrrr6tim11chBKKJmsfdwTfwW4ND6CB2w7kKzvnS/DsB2yy9
-TdOA0T3VgTsSSDZYVoviAJF6AjoS0WxbH1PydAI7SD9gR4tBdXHvsQemjxz97/ZA
-J7yPIlGNegc7WKkx8Pdcf4N5UnhTz+y/dczpHRbXwPICzmw/GDuQHg1A6x2OFZrt
-r1/YvBFk5IomzZdYLoxLOzMcgSUMfCe9JivgrJwrflaB2/4LabxD1MJ6z1Eb1O+U
-b3z7k8KiJAI5nY0ghd3I8LKh7fmfGhXyUyAampmqY2ZP/8pgkdF01ZjcicR4jBev
-MxtUHvdidedpaFTyFdJqyqnW2pPT8g==
-=6uQH
------END PGP SIGNATURE-----
+> @@ -225,7 +225,7 @@ struct ipq {
+>  struct	ipasfrag {
+>  	struct qlink ipf_link;
+>  	struct ip ipf_ip;
+> -} QEMU_PACKED;
+> +};
 
---64hBCI1K9HMN0RpgvyYCUsQLYjFTNpNSe--
+Please see iptofrag and fragtoip in ip_input.c, they assume that ipf_ip
+immediately follows ipf_link.  I guess using offsetof there should avoid
+the issue.  Note however that slirp assumes that in a 32bit-aligned
+ethernet frame it has enough room before the IP header to stuff the
+ipf_link things.  We could add a build-time check that offsetof(ipf_ip)
+<=3D 2 + ETH_HLEN
+
+> @@ -136,7 +136,7 @@ bool arp_table_search(Slirp *slirp, uint32_t ip_add=
+r,
+>  struct ndpentry {
+>      unsigned char   eth_addr[ETH_ALEN];     /* sender hardware address=
+ */
+>      struct in6_addr ip_addr;                /* sender IP address      =
+ */
+> -} QEMU_PACKED;
+> +};
+
+This one should be safe.
+
+Samuel
