@@ -1,26 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49950)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52339)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1eYzzd-0003EZ-Q9
-	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 14:55:30 -0500
+	(envelope-from <ahino@redhat.com>) id 1eZ033-0004kS-Un
+	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 14:59:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1eYzza-0008LF-GO
-	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 14:55:29 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:37820)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1eYzza-0008Ko-8B
-	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 14:55:26 -0500
-Date: Tue, 9 Jan 2018 19:55:18 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180109195517.GD2708@work-vm>
-References: <EC8A4E314CF1574AB62C80421BD9833933FEE069@SHSMSX104.ccr.corp.intel.com>
-	<20180109153538.GC1197@stefanha-x1.localdomain>
+	(envelope-from <ahino@redhat.com>) id 1eZ030-0002uN-Da
+	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 14:59:02 -0500
+Received: from mail-vk0-f41.google.com ([209.85.213.41]:33120)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <ahino@redhat.com>) id 1eZ030-0002sz-8e
+	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 14:58:58 -0500
+Received: by mail-vk0-f41.google.com with SMTP id w22so1725681vkw.0
+	for <qemu-devel@nongnu.org>; Tue, 09 Jan 2018 11:58:57 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <20180109153538.GC1197@stefanha-x1.localdomain>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] Some question about savem/qcow2 incremental
- snapshot
+In-Reply-To: <20180109095825.GB6063@localhost.localdomain>
+References: <20180105065538.13375-1-famz@redhat.com>
+	<20180108144136.GF8052@localhost.localdomain>
+	<CAMr-obsaegU2HDaH3EFoD+2EYUnPKuqsvQPk4GZ7hTdqXmpoWA@mail.gmail.com>
+	<20180108175729.GI8052@localhost.localdomain>
+	<20180109062425.GA18346@lemon.usersys.redhat.com>
+	<20180109095825.GB6063@localhost.localdomain>
+From: Ala Hino <ahino@redhat.com>
+Date: Tue, 9 Jan 2018 21:58:55 +0200
+Message-ID: <CAPuOgO35suw3LN4H0PZoE3ap+xZvK3tERvCHSUfHDMKc7-5XfQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 0/2] qemu-img: Let "info" warn
+ and go ahead without -U
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,57 +33,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@gmail.com>
-Cc: "He, Junyan" <junyan.he@intel.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Juan Quintela <quintela@redhat.com>, John Snow <jsnow@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: Fam Zheng <famz@redhat.com>, Nir Soffer <nirsof@gmail.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 
-* Stefan Hajnoczi (stefanha@gmail.com) wrote:
-> On Mon, Dec 25, 2017 at 07:54:00AM +0000, He, Junyan wrote:
-> > I am now focusing on snapshot optimization for Intel NVDimm kind memo=
-ry. Different from the normal memory, the NVDimm may be 128G, 256G or eve=
-n more for just one guest, and its speed is slower than the normal memory=
-. So sometimes it may take several minutes to complete just one snapshot =
-saving. Even with compression enabled, the=A0snapshot point may consume m=
-ore than 30G disk space. We decide to add incremental kind snapshot savin=
-g to resolve this. Just store difference between snapshot points to save =
-time and disk space.
-> > But the current snapshot/save_vm framework seems not to support this.
-> > We need to add snapshot dependency and extra operations when we LOAD =
-and DELETE the snapshot point.
-> > Is that possible to modify the savevm framework and add some incremen=
-tal snapshot support to QCOW2 format?
->=20
-> It sounds like you'd like to save incremental guest RAM snapshots based
-> on the contents of earlier snapshots.  QEMU has no way of doing this at
-> the moment.
->=20
-> In order to do this QEMU needs to keep dirty memory logging enabled at
-> all times so it knows which pages have been written since the last
-> snapshot.  This will affect guest performance.
+On Tue, Jan 9, 2018 at 11:58 AM, Kevin Wolf <kwolf@redhat.com> wrote:
 
-Keeping the dirty logging going is something that COLO does, to send
-incremental snapshots to the secondary.   As you say, it does slow
-things down and you have to be able to keep the state between the
-migration runs.
+> Am 09.01.2018 um 07:24 hat Fam Zheng geschrieben:
+> > On Mon, 01/08 18:57, Kevin Wolf wrote:
+> > > I'm not sure if going back to the old behaviour for a while now would
+> be
+> > > helpful, you'd just end up with an even more confusing set of qemu
+> > > versions, for example:
+> > >
+> > >     <= 2.9          - works without a warning
+> > >     2.10 and 2.11   - errors out
+> > >     2.12            - prints a warning, but works
+> > >     >= 2.13         - errors out again
+> >
+> > What I had in mind is settle on warning for good. QEMU (including
+> qemu-img) is a
+> > low level tool that can be used in many ways that it isn't supposed to,
+> this one
+> > is not more harmful than others (e.g. "qemu-img snapshot ..." on
+> iscsi:// qcow2
+> > image) we allow siliently.
+> >
+> > I know this is debatable but I think the #1 purpose of image locking is
+> to
+> > prevent data corruption;
+>
+> Isn't potentially wrong output of 'qemu-img info' a form of data
+> corruption? Not data as in disk content, but metadata is data, too.
+>
+> > #2 IMO is to reduce confusion and misinformation.
+> > While inconsistent output of "qemu-img info" is misinformation, it not
+> working
+> > as before is actually confusion. Though the current behavior is indeed
+> ideal,
+> > the proposed patch is a bit more pragmatical.
+>
+> To be clear: If we want to minimise confusing by change, we have to
+> disable locking by default, not only here but everywhere else. And
+> therefore make it completely useless.
+>
+> The whole point of locking is to change something in order to make
+> things safer. Yes, this may inconvenience users who want to do something
+> unsafe. Tough luck. The only other option is not making things safer.
+>
 
-> Certain guest operations like rebooting or zeroing memory will defeat
-> the incremental guest RAM snapshot feature.  It's worth thinking about
-> these cases to make sure this feature would be worth it in real use
-> cases.
+Safer is better for sure.
+It is not about doing something unsafe, it is about breaking a released
+version -
+RHV 4.1 is already out and when customers upgrade to RHEL 7.5, they will not
+be able to create snapshots.
+I see two options:
+1. As mentioned by Fam, settle on warning for good
+2. Conflict qemu with vdsm < 4.2
 
-But those probably wouldn't upset an NVDimm?
-
-> What you're proposing isn't specific to NVDIMM.  Regular RAM use cases
-> also benefit from incremental snapshots because less disk space is
-> required for the savevm data.
->=20
-> Some questions about your use case:
->=20
-> 1. Does the guest have -device nvdimm?
->=20
-> 2. Is the qcow2 file on NVDIMM?
->=20
-> Stefan
-
-Dave
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+>
+> We already successfully made a point that tools (libvirt with shared
+> images, or libguestfs) need to update their qemu invocation for qemu
+> proper. They didn't like it, but they could see the point, and it has
+> been this way for two releases already. So I don't see a compelling
+> reason why now we should give up again some of the safety we achieved
+> long-term.
+>
+> If we were designing qemu-img from scratch, it would be an error. So
+> that's what it should be in the long term. Tools should preferably use
+> 'query-block' and friends rather 'qemu-img info' if the image is in use.
+>
+> Kevin
+>
