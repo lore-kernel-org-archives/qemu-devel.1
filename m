@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47416)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47891)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eZDiS-0004Ei-P2
-	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 05:34:41 -0500
+	(envelope-from <sorear2@gmail.com>) id 1eZDjf-00054p-C4
+	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 05:35:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eZDiR-0007l8-QF
-	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 05:34:40 -0500
-Received: from mail-oi0-x236.google.com ([2607:f8b0:4003:c06::236]:39087)
+	(envelope-from <sorear2@gmail.com>) id 1eZDje-0000L2-Ht
+	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 05:35:55 -0500
+Received: from mail-lf0-x241.google.com ([2a00:1450:4010:c07::241]:36065)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1eZDiR-0007ke-Kq
-	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 05:34:39 -0500
-Received: by mail-oi0-x236.google.com with SMTP id t8so267115oie.6
-	for <qemu-devel@nongnu.org>; Wed, 10 Jan 2018 02:34:39 -0800 (PST)
+	(Exim 4.71) (envelope-from <sorear2@gmail.com>) id 1eZDje-0000K7-AN
+	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 05:35:54 -0500
+Received: by mail-lf0-x241.google.com with SMTP id e203so4458656lfg.3
+	for <qemu-devel@nongnu.org>; Wed, 10 Jan 2018 02:35:53 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <3719059.PceeUxPRNs@wirbelwind>
-References: <16658597.jA1MYeglPg@wirbelwind>
-	<CAFEAcA_V9LRUCk+nq_kz8jC8yCQSgNbV0gdGFu+CFLWsbxh=xA@mail.gmail.com>
-	<3719059.PceeUxPRNs@wirbelwind>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Wed, 10 Jan 2018 10:34:18 +0000
-Message-ID: <CAFEAcA-8WufG_RSvra9v-Y_3qem0aDPQBg1KAMr6x6kMJgCHtA@mail.gmail.com>
+In-Reply-To: <7b4c9965-d0c4-1b10-aa6d-553a3923d598@linaro.org>
+References: <1514940265-18093-1-git-send-email-mjc@sifive.com>
+	<1514940265-18093-6-git-send-email-mjc@sifive.com>
+	<7b4c9965-d0c4-1b10-aa6d-553a3923d598@linaro.org>
+From: "Stefan O'Rear" <sorear2@gmail.com>
+Date: Wed, 10 Jan 2018 02:35:52 -0800
+Message-ID: <CADJ6UvPdmyk8ewh6AN-mzici9DB3bLwb6ta0EMK6dDk4QhL+6w@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [Qemu-discuss] ppc and icount
+Subject: Re: [Qemu-devel] [PATCH v1 05/21] RISC-V CPU Helpers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,53 +29,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: steven.seeger@flightsystems.net
-Cc: qemu-discuss <qemu-discuss@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Alexander Graf <agraf@suse.de>, Richard Purdie <richard.purdie@linuxfoundation.org>, Richard Henderson <rth@twiddle.net>
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: Michael Clark <mjc@sifive.com>, QEMU Developers <qemu-devel@nongnu.org>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Sagar Karandikar <sagark@eecs.berkeley.edu>
 
-On 10 January 2018 at 08:57, Steven Seeger
-<steven.seeger@flightsystems.net> wrote:
-> Sorry for another post. I did a bisect and found what is the bad commit for
-> me:
+On Tue, Jan 2, 2018 at 11:12 PM, Richard Henderson
+<richard.henderson@linaro.org> wrote:
+>> +    case CSR_MISA: {
+>> +        if (!(val_to_write & (1L << ('F' - 'A')))) {
+>> +            val_to_write &= ~(1L << ('D' - 'A'));
+>> +        }
+>> +
+>> +        /* allow MAFDC bits in MISA to be modified */
+>> +        target_ulong mask = 0;
+>> +        mask |= 1L << ('M' - 'A');
+>> +        mask |= 1L << ('A' - 'A');
+>> +        mask |= 1L << ('F' - 'A');
+>> +        mask |= 1L << ('D' - 'A');
+>> +        mask |= 1L << ('C' - 'A');
+>> +        mask &= env->misa_mask;
+>> +
+>> +        env->misa = (val_to_write & mask) | (env->misa & ~mask);
 >
-> 044897ef4a22af89aecb8df509477beba0a2e0ce is the first bad commit
-> commit 044897ef4a22af89aecb8df509477beba0a2e0ce
-> Author: Richard Purdie <richard.purdie@linuxfoundation.org>
-> Date:   Mon Dec 4 22:25:43 2017 +0000
+> Does this not affect the set of instructions that are allowable?  If so, you'd
+> want something like
 >
->     target/ppc: Fix system lockups caused by interrupt_request state
-> corruption
+>     new_misa = (val_to_write & mask) | (env->misa & ~mask);
+>     if (env->misa != new_misa) {
+>         env->misa = new_misa;
+>         tb_flush(CPU(riscv_env_get_cpu(env)));
+>     }
+>
+> so that we start with all new translations, which would then check the new
+> value of misa, and would then raise INST_ADDR_MIS (or not).
 
-Great -- thanks for the bisect. Let's take this to the -devel list;
-I've cc'd the PPC maintainers.
+This does not seem quite right.  misa can legally differ between
+cores/threads, but tb_flush is a global operation.  The way this is
+supposed to work is that the relevant misa bits are extracted into
+tb_flags:
 
-Context: Steven reports that we broke -icount for PPC guests with
-this commit:
+static inline void cpu_riscv_set_tb_flags(CPURISCVState *env)
+{
+    env->tb_flags = 0;
+    if (env->misa & MISA_A) {
+       env->tb_flags |= RISCV_TF_MISA_A;
+    }
 
-$ ./build/all/ppc-softmmu/qemu-system-ppc  -icount auto
-qemu: fatal: Raised interrupt while not in I/O function
-NIP fff08978   LR fff08904 CTR 00000000 XER 00000000 CPU#0
-MSR 00000000 HID0 00000000  HF 00000000 iidx 3 didx 3
-Bad icount read
+    if (env->misa & MISA_D) {
+       env->tb_flags |= RISCV_TF_MISA_D;
+    }
 
-The backtrace from the assert is:
+    if (env->misa & MISA_F) {
+        env->tb_flags |= RISCV_TF_MISA_F;
+    }
 
-#0  tcg_handle_interrupt (cpu=0x7ffff7fc2010, mask=4) at qemu/accel/tcg/tcg-
-all.c:58
-#1  0x0000555555962aa4 in cpu_interrupt (cpu=0x7ffff7fc2010, mask=4) at qemu/
-include/qom/cpu.h:859
-#2  0x0000555555962e55 in cpu_interrupt_exittb (cs=0x7ffff7fc2010) at qemu/
-target/ppc/helper_regs.h:105
-#3  0x0000555555964505 in do_rfi (env=0x7ffff7fca2b0, nip=197460, msr=4096)
-    at qemu/target/ppc/excp_helper.c:998
-#4  0x0000555555964555 in helper_rfi (env=0x7ffff7fca2b0) at qemu/target/ppc/
-excp_helper.c:1008
-#5  0x00007fffe7c124b9 in code_gen_buffer ()
+    if (env->misa & MISA_M) {
+        env->tb_flags |= RISCV_TF_MISA_M;
+    }
 
-The problem is that icount was relying on the previous
-handling of do_rfi() as "just set state as we know we're
-going to be last insn in the TB".
+    if (env->misa & MISA_C) {
+        env->tb_flags |= RISCV_TF_MISA_C;
+    }
 
-Not sure how best to fix this (mark the insn as IO ok?)
+    env->tb_flags |= cpu_mmu_index(env, true) << RISCV_TF_IAT_SHIFT;
+    env->tb_flags |= cpu_mmu_index(env, false) << RISCV_TF_DAT_SHIFT;
+}
 
-thanks
--- PMM
+static inline void cpu_get_tb_cpu_state(CPURISCVState *env, target_ulong *pc,
+                                        target_ulong *cs_base, uint32_t *flags)
+{
+    *pc = env->pc;
+    *cs_base = 0;
+    *flags = env->tb_flags;
+}
+
+but this code appears to be missing in the tree submitted for upstreaming?
+
+-s
