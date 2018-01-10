@@ -1,33 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53222)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53262)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eZOpG-0006Ul-Gb
-	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 17:26:28 -0500
+	(envelope-from <bounces@canonical.com>) id 1eZOpJ-0006W5-RF
+	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 17:26:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eZOpC-0003uP-Ao
-	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 17:26:26 -0500
-Received: from indium.canonical.com ([91.189.90.7]:50714)
+	(envelope-from <bounces@canonical.com>) id 1eZOpI-000432-CK
+	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 17:26:29 -0500
+Received: from indium.canonical.com ([91.189.90.7]:51122)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1eZOpC-0003sq-3i
-	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 17:26:22 -0500
+	id 1eZOpI-00042P-6m
+	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 17:26:28 -0500
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1eZOpA-0002kW-2C
-	for <qemu-devel@nongnu.org>; Wed, 10 Jan 2018 22:26:20 +0000
+	id 1eZOpG-0002l6-08
+	for <qemu-devel@nongnu.org>; Wed, 10 Jan 2018 22:26:26 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id AB06F2E85A9
+	by loganberry.canonical.com (Postfix) with ESMTP id 486102E8597
 	for <qemu-devel@nongnu.org>; Wed, 10 Jan 2018 22:19:35 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Wed, 10 Jan 2018 22:03:41 -0000
-From: Thomas Huth <1163474@bugs.launchpad.net>
-Reply-To: Bug 1163474 <1163474@bugs.launchpad.net>
+Date: Wed, 10 Jan 2018 22:06:03 -0000
+From: Thomas Huth <1173490@bugs.launchpad.net>
+Reply-To: Bug 1173490 <1173490@bugs.launchpad.net>
 Sender: bounces@canonical.com
-References: <20130402172849.8870.11981.malonedeb@gac.canonical.com>
-Message-Id: <151562182202.2836.18217306233719136750.malone@soybean.canonical.com>
+References: <20130427071354.27973.42206.malonedeb@chaenomeles.canonical.com>
+Message-Id: <151562196362.23838.12609820113827243329.malone@chaenomeles.canonical.com>
 Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1163474] Re: qemu mount usb permission denied
+Subject: [Qemu-devel] [Bug 1173490] Re: virtio net adapter driver with kvm
+ slow on winxp
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,45 +39,47 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Triaging old bug tickets ... Sounds like this was rather a problem with
-your distro / udev than with qemu. In case you still have the problem,
-please report it to the Debian bug tracker first.
+Triaging old bug tickets... can you still reproduce this issue with the
+latest version of QEMU? Or could we close this ticket nowadays?
 
 ** Changed in: qemu
-       Status: New =3D> Invalid
+       Status: New =3D> Incomplete
 
 -- =
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1163474
+https://bugs.launchpad.net/bugs/1173490
 
 Title:
-  qemu mount usb permission denied
+  virtio net adapter driver with kvm slow on winxp
 
 Status in QEMU:
-  Invalid
+  Incomplete
 
 Bug description:
-  I use debian with kde and the new Qemu 14.0 . I use this Qemu start
-  arguments:
+  # lsb_release -a
+  No LSB modules are available.
+  Distributor ID: Ubuntu
+  Description:    Ubuntu 12.04.1 LTS
+  Release:        12.04
+  Codename:       precise
 
-  /usr/bin/qemu-system-x86_64 -monitor stdio -smp 2 -soundhw es1370,ac97
-  -k de -enable-kvm -m 4096 -localtime -cdrom /dev/sr0 -hda
-  /home/....../.aqemu/Windows_7_x64_HDA.img -boot once=3Dd,menu=3Doff -net
-  nic,vlan=3D0 -net user,vlan=3D0 -usb -usbdevice tablet -device usb-
-  host,hostbus=3D1,hostaddr=3D2 -device usb-host,hostbus=3D2,hostaddr=3D2 -=
-name
-  "Windows 7 x64"
+  #virsh version =
 
-  Then I get this error: /dev/bus/usb/000/001: Permission denied
+  Compiled against library: libvirt 1.0.4
+  Using library: libvirt 1.0.4
+  Using API: QEMU 1.0.4
+  Running hypervisor: QEMU 1.2.0
 
-  Some says I must change the permissions /dev/bus/usb to 777 but I
-  think that can't be the solution and when I restart the changes are
-  lost. I think there is also a problem with the automount in KDE.
+  windows xp clean install with spice-guest-tools-0.52.exe from
+    http://spice-space.org/download/windows/spice-guest-tools/spice-guest-t=
+ools-0.52.exe
 
-  The user user who starts Qemu has also full access to usb device
-  (member of the group plugdev)
+  it comes very slow , and the Interrupts process got very high cpu usage(a=
+bove 60%).
+  when i switch the net adapter from virtio to default(rtl8139) ,it works w=
+ell.
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1163474/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1173490/+subscriptions
