@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57607)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60905)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1eZKbU-0007ZZ-9K
-	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 12:55:57 -0500
+	(envelope-from <lepton@google.com>) id 1eZKkk-0002Hn-IE
+	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 13:05:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1eZKbQ-0004PF-A6
-	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 12:55:56 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:38756)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1eZKbQ-0004Or-38
-	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 12:55:52 -0500
-Date: Wed, 10 Jan 2018 17:55:45 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180110175544.GD2451@work-vm>
-References: <20180110134846.12940.99993.stgit@pasha-VirtualBox>
-	<029858e0-c6e5-939d-d79e-c7ad7e5069a1@linaro.org>
+	(envelope-from <lepton@google.com>) id 1eZKkj-0003In-K1
+	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 13:05:30 -0500
+Received: from mail-wr0-x241.google.com ([2a00:1450:400c:c0c::241]:44572)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <lepton@google.com>) id 1eZKkj-0003I8-7W
+	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 13:05:29 -0500
+Received: by mail-wr0-x241.google.com with SMTP id w50so9017688wrc.11
+	for <qemu-devel@nongnu.org>; Wed, 10 Jan 2018 10:05:29 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <029858e0-c6e5-939d-d79e-c7ad7e5069a1@linaro.org>
-Subject: Re: [Qemu-devel] [PATCH] cpu: flush TB cache when loading VMState
+In-Reply-To: <ec848ee7-85e7-de79-bb58-60ad12d33256@redhat.com>
+References: <20180110064706.49777-1-lepton@google.com>
+	<ec848ee7-85e7-de79-bb58-60ad12d33256@redhat.com>
+From: =?UTF-8?B?VGFvIFd1KOWQtOa2m0BFbmcp?= <lepton@google.com>
+Date: Wed, 10 Jan 2018 10:05:26 -0800
+Message-ID: <CAOvqHj5Q6Rv-OGc9B7-QMZw4BpOXkpkxK_r4HjQndtEy2zHiqg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH] target/i386: hax: Move
+ hax_setup_qemu_emulator.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,45 +29,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>, qemu-devel@nongnu.org, quintela@redhat.com, maria.klimushenkova@ispras.ru, dovgaluk@ispras.ru, pbonzini@redhat.com
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: QEMU <qemu-devel@nongnu.org>, rth@twiddle.net, ehabkost@redhat.com
 
-* Richard Henderson (richard.henderson@linaro.org) wrote:
-> On 01/10/2018 05:48 AM, Pavel Dovgalyuk wrote:
-> > Flushing TB cache is required because TBs key in the cache may match
-> > different code which existed in the previous state.
-> > 
-> > Signed-off-by: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
-> > Signed-off-by: Maria Klimushenkova <maria.klimushenkova@ispras.ru>
-> > ---
-> >  exec.c |    1 +
-> >  1 file changed, 1 insertion(+)
-> > 
-> > diff --git a/exec.c b/exec.c
-> > index 4722e52..ff31e71 100644
-> > --- a/exec.c
-> > +++ b/exec.c
-> > @@ -622,6 +622,7 @@ static int cpu_common_post_load(void *opaque, int version_id)
-> >         version_id is increased. */
-> >      cpu->interrupt_request &= ~0x01;
-> >      tlb_flush(cpu);
-> > +    tb_flush(cpu);
-> 
-> I'm not necessarily objecting, but what do you mean by "may match different code"?
-> 
-> What this patch suggests is that the inputs to the computation of TB->FLAGS are
-> different for some unspecified reason.  Without further explanation, to me this
-> suggests a bug in vmstate save/restore.
-> 
-> What is the observed problem here?
+Thanks. Then it seems I should put this piece of code in a common
+function first and then update this CL.
 
-Is this a case where you're repeatedly running 'loadvm' to revert to a
-previous snapshot (or I guess the debug stuff); so you've been running
-and translating code and then reload state ?
-
-Dave
-
-> 
-> r~
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+On Wed, Jan 10, 2018 at 5:27 AM, Paolo Bonzini <pbonzini@redhat.com> wrote:
+> On 10/01/2018 07:47, Tao Wu wrote:
+>> hax_setup_qemu_emulator reference env->efer which is updated in
+>> hax_get_msrs, so it has to be called after hax_get_msrs. This fix
+>> the bug that sometimes dump_state show 32 bits regs even in 64 bits
+>> mode.
+>>
+>> Signed-off-by: Tao Wu <lepton@google.com>
+>> ---
+>>  target/i386/hax-all.c | 4 +---
+>>  1 file changed, 1 insertion(+), 3 deletions(-)
+>>
+>> diff --git a/target/i386/hax-all.c b/target/i386/hax-all.c
+>> index 3ce6950296..a933bd462d 100644
+>> --- a/target/i386/hax-all.c
+>> +++ b/target/i386/hax-all.c
+>> @@ -887,9 +887,6 @@ static int hax_sync_vcpu_register(CPUArchState *env, int set)
+>>              return -1;
+>>          }
+>>      }
+>> -    if (!set) {
+>> -        hax_setup_qemu_emulator(env);
+>> -    }
+>>      return 0;
+>>  }
+>>
+>> @@ -1070,6 +1067,7 @@ static int hax_arch_get_registers(CPUArchState *env)
+>>          return ret;
+>>      }
+>>
+>> +    hax_setup_qemu_emulator(env);
+>>      return 0;
+>>  }
+>>
+>>
+>
+> Queued, thanks.
+>
+> Please look into sharing the similar code in target/i386/kvm.c
+> (kvm_get_sregs), since the HAX code has some bugs (for example,
+> HF_CPL_MASK should be SS.DPL, not CS.DPL).
+>
+> Paolo
