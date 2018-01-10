@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44953)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45028)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mjc@sifive.com>) id 1eZQ7L-0006Ns-JL
-	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 18:49:32 -0500
+	(envelope-from <mjc@sifive.com>) id 1eZQ7P-0006PK-LG
+	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 18:49:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mjc@sifive.com>) id 1eZQ78-0000Oc-SO
-	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 18:49:11 -0500
-Received: from mail-pg0-x234.google.com ([2607:f8b0:400e:c05::234]:38943)
+	(envelope-from <mjc@sifive.com>) id 1eZQ7F-0000WJ-QH
+	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 18:49:15 -0500
+Received: from mail-pg0-x242.google.com ([2607:f8b0:400e:c05::242]:43837)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mjc@sifive.com>) id 1eZQ77-0000Mw-Ut
-	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 18:48:58 -0500
-Received: by mail-pg0-x234.google.com with SMTP id z20so1106305pgv.6
-	for <qemu-devel@nongnu.org>; Wed, 10 Jan 2018 15:48:57 -0800 (PST)
+	(Exim 4.71) (envelope-from <mjc@sifive.com>) id 1eZQ7F-0000Ut-4x
+	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 18:49:05 -0500
+Received: by mail-pg0-x242.google.com with SMTP id f14so1092392pga.10
+	for <qemu-devel@nongnu.org>; Wed, 10 Jan 2018 15:49:04 -0800 (PST)
 From: Michael Clark <mjc@sifive.com>
-Date: Wed, 10 Jan 2018 15:46:23 -0800
-Message-Id: <1515628000-93285-5-git-send-email-mjc@sifive.com>
+Date: Wed, 10 Jan 2018 15:46:29 -0800
+Message-Id: <1515628000-93285-11-git-send-email-mjc@sifive.com>
 In-Reply-To: <1515628000-93285-1-git-send-email-mjc@sifive.com>
 References: <1515628000-93285-1-git-send-email-mjc@sifive.com>
-Subject: [Qemu-devel] [PATCH v2 04/21] RISC-V Disassembler
+Subject: [Qemu-devel] [PATCH v2 10/21] RISC-V Linux User Emulation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,3074 +28,1510 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Michael Clark <mjc@sifive.com>, Palmer Dabbelt <palmer@sifive.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, RISC-V Patches <patches+subscribe@groups.riscv.org>
 
-The RISC-V disassembler has no dependencies outside of the 'disas'
-directory so it can be applied independently. The majority of the
-disassembler is machine-generated from instruction set metadata:
+Implementation of linux user emulation for RISC-V.
 
-- https://github.com/michaeljclark/riscv-meta
-
-Expected checkpatch errors for consistency and brevity reasons:
-
-ERROR: line over 90 characters
-ERROR: trailing statements should be on next line
-ERROR: space prohibited between function name and open parenthesis '('
 Signed-off-by: Michael Clark <mjc@sifive.com>
 ---
- disas.c             |    2 +
- disas/Makefile.objs |    1 +
- disas/riscv.c       | 3005 +++++++++++++++++++++++++++++++++++++++++++++++++++
- include/disas/bfd.h |    2 +
- 4 files changed, 3010 insertions(+)
- create mode 100644 disas/riscv.c
+ linux-user/elfload.c              |  22 +++
+ linux-user/main.c                 | 114 +++++++++++++++
+ linux-user/riscv/syscall_nr.h     | 275 +++++++++++++++++++++++++++++++++++
+ linux-user/riscv/target_cpu.h     |  18 +++
+ linux-user/riscv/target_signal.h  |  23 +++
+ linux-user/riscv/target_structs.h |  46 ++++++
+ linux-user/riscv/target_syscall.h |  56 ++++++++
+ linux-user/riscv/termbits.h       | 220 ++++++++++++++++++++++++++++
+ linux-user/signal.c               | 203 +++++++++++++++++++++++++-
+ linux-user/syscall.c              |   2 +
+ linux-user/syscall_defs.h         |  13 +-
+ target/riscv/cpu_user.h           |  26 ++++
+ target/riscv/user_atomic.c        | 291 ++++++++++++++++++++++++++++++++++++++
+ 13 files changed, 1303 insertions(+), 6 deletions(-)
+ create mode 100644 linux-user/riscv/syscall_nr.h
+ create mode 100644 linux-user/riscv/target_cpu.h
+ create mode 100644 linux-user/riscv/target_signal.h
+ create mode 100644 linux-user/riscv/target_structs.h
+ create mode 100644 linux-user/riscv/target_syscall.h
+ create mode 100644 linux-user/riscv/termbits.h
+ create mode 100644 target/riscv/cpu_user.h
+ create mode 100644 target/riscv/user_atomic.c
 
-diff --git a/disas.c b/disas.c
-index d4ad108..5325b7e 100644
---- a/disas.c
-+++ b/disas.c
-@@ -522,6 +522,8 @@ void disas(FILE *out, void *code, unsigned long size)
- # ifdef _ARCH_PPC64
-     s.info.cap_mode = CS_MODE_64;
- # endif
-+#elif defined(__riscv__)
-+    print_insn = print_insn_riscv;
- #elif defined(__aarch64__) && defined(CONFIG_ARM_A64_DIS)
-     print_insn = print_insn_arm_a64;
-     s.info.cap_arch = CS_ARCH_ARM64;
-diff --git a/disas/Makefile.objs b/disas/Makefile.objs
-index 194648f..95c64cf 100644
---- a/disas/Makefile.objs
-+++ b/disas/Makefile.objs
-@@ -17,6 +17,7 @@ common-obj-$(CONFIG_MIPS_DIS) += mips.o
- common-obj-$(CONFIG_NIOS2_DIS) += nios2.o
- common-obj-$(CONFIG_MOXIE_DIS) += moxie.o
- common-obj-$(CONFIG_PPC_DIS) += ppc.o
-+common-obj-$(CONFIG_RISCV_DIS) += riscv.o
- common-obj-$(CONFIG_S390_DIS) += s390.o
- common-obj-$(CONFIG_SH4_DIS) += sh4.o
- common-obj-$(CONFIG_SPARC_DIS) += sparc.o
-diff --git a/disas/riscv.c b/disas/riscv.c
+diff --git a/linux-user/elfload.c b/linux-user/elfload.c
+index 20f3d8c..178af56 100644
+--- a/linux-user/elfload.c
++++ b/linux-user/elfload.c
+@@ -1272,6 +1272,28 @@ static inline void init_thread(struct target_pt_regs *regs,
+ 
+ #endif /* TARGET_TILEGX */
+ 
++#ifdef TARGET_RISCV
++
++#define ELF_START_MMAP 0x80000000
++#define ELF_ARCH  EM_RISCV
++
++#ifdef TARGET_RISCV32
++#define ELF_CLASS ELFCLASS32
++#else
++#define ELF_CLASS ELFCLASS64
++#endif
++
++static inline void init_thread(struct target_pt_regs *regs,
++                               struct image_info *infop)
++{
++    regs->sepc = infop->entry;
++    regs->sp = infop->start_stack;
++}
++
++#define ELF_EXEC_PAGESIZE 4096
++
++#endif /* TARGET_RISCV */
++
+ #ifdef TARGET_HPPA
+ 
+ #define ELF_START_MMAP  0x80000000
+diff --git a/linux-user/main.c b/linux-user/main.c
+index 99a551b..2b8fcc2 100644
+--- a/linux-user/main.c
++++ b/linux-user/main.c
+@@ -3647,6 +3647,115 @@ void cpu_loop(CPUTLGState *env)
+ 
+ #endif
+ 
++#ifdef TARGET_RISCV
++
++void cpu_loop(CPURISCVState *env)
++{
++    CPUState *cs = CPU(riscv_env_get_cpu(env));
++    int trapnr, signum, sigcode;
++    target_ulong sigaddr;
++    target_ulong ret;
++
++    for (;;) {
++        cpu_exec_start(cs);
++        trapnr = cpu_exec(cs);
++        cpu_exec_end(cs);
++
++        signum = 0;
++        sigcode = 0;
++        sigaddr = 0;
++
++        switch (trapnr) {
++        case EXCP_INTERRUPT:
++            /* just indicate that signals should be handled asap */
++            break;
++        case RISCV_EXCP_U_ECALL:
++            env->pc += 4;
++            if (env->gpr[xA7] == TARGET_NR_arch_specific_syscall + 15) {
++                /* riscv_flush_icache_syscall is a no-op in QEMU as
++                   self-modifying code is automatically detected */
++                ret = 0;
++            } else {
++                ret = do_syscall(env,
++                                 env->gpr[xA7],
++                                 env->gpr[xA0],
++                                 env->gpr[xA1],
++                                 env->gpr[xA2],
++                                 env->gpr[xA3],
++                                 env->gpr[xA4],
++                                 env->gpr[xA5],
++                                 0, 0);
++            }
++            if (ret == -TARGET_ERESTARTSYS) {
++                env->pc -= 4;
++            } else if (ret != -TARGET_QEMU_ESIGRETURN) {
++                env->gpr[xA0] = ret;
++            }
++            if (cs->singlestep_enabled) {
++                goto gdbstep;
++            }
++            break;
++        case QEMU_USER_EXCP_ATOMIC:
++            start_exclusive();
++            switch (riscv_cpu_do_usermode_amo(cs)) {
++            case RISCV_AMO_OK:
++                env->pc += 4;
++                break;
++            case RISCV_AMO_BADADDR:
++                signum = TARGET_SIGSEGV;
++                sigcode = TARGET_SEGV_MAPERR;
++                sigaddr = env->badaddr;
++                break;
++            case RISCV_AMO_BADINSN:
++            default:
++                signum = TARGET_SIGILL;
++                sigcode = TARGET_ILL_ILLOPC;
++            }
++            end_exclusive();
++            if (cs->singlestep_enabled) {
++                goto gdbstep;
++            }
++            break;
++        case RISCV_EXCP_ILLEGAL_INST:
++            signum = TARGET_SIGILL;
++            sigcode = TARGET_ILL_ILLOPC;
++            break;
++        case RISCV_EXCP_BREAKPOINT:
++            signum = TARGET_SIGTRAP;
++            sigcode = TARGET_TRAP_BRKPT;
++            sigaddr = env->pc;
++            break;
++        case QEMU_USER_EXCP_FAULT:
++            signum = TARGET_SIGSEGV;
++            sigcode = TARGET_SEGV_MAPERR;
++            break;
++        case EXCP_DEBUG:
++        gdbstep:
++            signum = gdb_handlesig(cs, TARGET_SIGTRAP);
++            sigcode = TARGET_TRAP_BRKPT;
++            break;
++        default:
++            EXCP_DUMP(env, "\nqemu: unhandled CPU exception %#x - aborting\n",
++                     trapnr);
++            exit(EXIT_FAILURE);
++        }
++
++        if (signum) {
++            target_siginfo_t info = {
++                .si_signo = signum,
++                .si_errno = 0,
++                .si_code = sigcode,
++                ._sifields._sigfault._addr = sigaddr
++            };
++            queue_signal(env, info.si_signo, QEMU_SI_KILL, &info);
++        }
++
++        process_pending_signals(env);
++    }
++}
++
++#endif /* TARGET_RISCV */
++
+ #ifdef TARGET_HPPA
+ 
+ static abi_ulong hppa_lws(CPUHPPAState *env)
+@@ -4809,6 +4918,11 @@ int main(int argc, char **argv, char **envp)
+         env->pc = regs->pc;
+         cpu_set_sr(env, regs->sr);
+     }
++#elif defined(TARGET_RISCV)
++    {
++        env->pc = regs->sepc;
++        env->gpr[xSP] = regs->sp;
++    }
+ #elif defined(TARGET_SH4)
+     {
+         int i;
+diff --git a/linux-user/riscv/syscall_nr.h b/linux-user/riscv/syscall_nr.h
 new file mode 100644
-index 0000000..9e86476
+index 0000000..bd164ef
 --- /dev/null
-+++ b/disas/riscv.c
-@@ -0,0 +1,3005 @@
++++ b/linux-user/riscv/syscall_nr.h
+@@ -0,0 +1,275 @@
 +/*
-+ * QEMU RISC-V Disassembler
++ * Syscall numbers from asm-generic, common for most
++ * of recently-added arches including RISC-V.
++ */
++
++#define TARGET_NR_io_setup 0
++#define TARGET_NR_io_destroy 1
++#define TARGET_NR_io_submit 2
++#define TARGET_NR_io_cancel 3
++#define TARGET_NR_io_getevents 4
++#define TARGET_NR_setxattr 5
++#define TARGET_NR_lsetxattr 6
++#define TARGET_NR_fsetxattr 7
++#define TARGET_NR_getxattr 8
++#define TARGET_NR_lgetxattr 9
++#define TARGET_NR_fgetxattr 10
++#define TARGET_NR_listxattr 11
++#define TARGET_NR_llistxattr 12
++#define TARGET_NR_flistxattr 13
++#define TARGET_NR_removexattr 14
++#define TARGET_NR_lremovexattr 15
++#define TARGET_NR_fremovexattr 16
++#define TARGET_NR_getcwd 17
++#define TARGET_NR_lookup_dcookie 18
++#define TARGET_NR_eventfd2 19
++#define TARGET_NR_epoll_create1 20
++#define TARGET_NR_epoll_ctl 21
++#define TARGET_NR_epoll_pwait 22
++#define TARGET_NR_dup 23
++#define TARGET_NR_dup3 24
++#ifdef TARGET_RISCV32
++#define TARGET_NR_fcntl64 25
++#else
++#define TARGET_NR_fcntl 25
++#endif
++#define TARGET_NR_inotify_init1 26
++#define TARGET_NR_inotify_add_watch 27
++#define TARGET_NR_inotify_rm_watch 28
++#define TARGET_NR_ioctl 29
++#define TARGET_NR_ioprio_set 30
++#define TARGET_NR_ioprio_get 31
++#define TARGET_NR_flock 32
++#define TARGET_NR_mknodat 33
++#define TARGET_NR_mkdirat 34
++#define TARGET_NR_unlinkat 35
++#define TARGET_NR_symlinkat 36
++#define TARGET_NR_linkat 37
++#define TARGET_NR_renameat 38
++#define TARGET_NR_umount2 39
++#define TARGET_NR_mount 40
++#define TARGET_NR_pivot_root 41
++#define TARGET_NR_nfsservctl 42
++#define TARGET_NR_statfs 43
++#define TARGET_NR_fstatfs 44
++#define TARGET_NR_truncate 45
++#define TARGET_NR_ftruncate 46
++#define TARGET_NR_fallocate 47
++#define TARGET_NR_faccessat 48
++#define TARGET_NR_chdir 49
++#define TARGET_NR_fchdir 50
++#define TARGET_NR_chroot 51
++#define TARGET_NR_fchmod 52
++#define TARGET_NR_fchmodat 53
++#define TARGET_NR_fchownat 54
++#define TARGET_NR_fchown 55
++#define TARGET_NR_openat 56
++#define TARGET_NR_close 57
++#define TARGET_NR_vhangup 58
++#define TARGET_NR_pipe2 59
++#define TARGET_NR_quotactl 60
++#define TARGET_NR_getdents64 61
++#define TARGET_NR_lseek 62
++#define TARGET_NR_read 63
++#define TARGET_NR_write 64
++#define TARGET_NR_readv 65
++#define TARGET_NR_writev 66
++#define TARGET_NR_pread64 67
++#define TARGET_NR_pwrite64 68
++#define TARGET_NR_preadv 69
++#define TARGET_NR_pwritev 70
++#define TARGET_NR_sendfile 71
++#define TARGET_NR_pselect6 72
++#define TARGET_NR_ppoll 73
++#define TARGET_NR_signalfd4 74
++#define TARGET_NR_vmsplice 75
++#define TARGET_NR_splice 76
++#define TARGET_NR_tee 77
++#define TARGET_NR_readlinkat 78
++#define TARGET_NR_newfstatat 79
++#define TARGET_NR_fstat 80
++#define TARGET_NR_sync 81
++#define TARGET_NR_fsync 82
++#define TARGET_NR_fdatasync 83
++#define TARGET_NR_sync_file_range 84
++#define TARGET_NR_timerfd_create 85
++#define TARGET_NR_timerfd_settime 86
++#define TARGET_NR_timerfd_gettime 87
++#define TARGET_NR_utimensat 88
++#define TARGET_NR_acct 89
++#define TARGET_NR_capget 90
++#define TARGET_NR_capset 91
++#define TARGET_NR_personality 92
++#define TARGET_NR_exit 93
++#define TARGET_NR_exit_group 94
++#define TARGET_NR_waitid 95
++#define TARGET_NR_set_tid_address 96
++#define TARGET_NR_unshare 97
++#define TARGET_NR_futex 98
++#define TARGET_NR_set_robust_list 99
++#define TARGET_NR_get_robust_list 100
++#define TARGET_NR_nanosleep 101
++#define TARGET_NR_getitimer 102
++#define TARGET_NR_setitimer 103
++#define TARGET_NR_kexec_load 104
++#define TARGET_NR_init_module 105
++#define TARGET_NR_delete_module 106
++#define TARGET_NR_timer_create 107
++#define TARGET_NR_timer_gettime 108
++#define TARGET_NR_timer_getoverrun 109
++#define TARGET_NR_timer_settime 110
++#define TARGET_NR_timer_delete 111
++#define TARGET_NR_clock_settime 112
++#define TARGET_NR_clock_gettime 113
++#define TARGET_NR_clock_getres 114
++#define TARGET_NR_clock_nanosleep 115
++#define TARGET_NR_syslog 116
++#define TARGET_NR_ptrace 117
++#define TARGET_NR_sched_setparam 118
++#define TARGET_NR_sched_setscheduler 119
++#define TARGET_NR_sched_getscheduler 120
++#define TARGET_NR_sched_getparam 121
++#define TARGET_NR_sched_setaffinity 122
++#define TARGET_NR_sched_getaffinity 123
++#define TARGET_NR_sched_yield 124
++#define TARGET_NR_sched_get_priority_max 125
++#define TARGET_NR_sched_get_priority_min 126
++#define TARGET_NR_sched_rr_get_interval 127
++#define TARGET_NR_restart_syscall 128
++#define TARGET_NR_kill 129
++#define TARGET_NR_tkill 130
++#define TARGET_NR_tgkill 131
++#define TARGET_NR_sigaltstack 132
++#define TARGET_NR_rt_sigsuspend 133
++#define TARGET_NR_rt_sigaction 134
++#define TARGET_NR_rt_sigprocmask 135
++#define TARGET_NR_rt_sigpending 136
++#define TARGET_NR_rt_sigtimedwait 137
++#define TARGET_NR_rt_sigqueueinfo 138
++#define TARGET_NR_rt_sigreturn 139
++#define TARGET_NR_setpriority 140
++#define TARGET_NR_getpriority 141
++#define TARGET_NR_reboot 142
++#define TARGET_NR_setregid 143
++#define TARGET_NR_setgid 144
++#define TARGET_NR_setreuid 145
++#define TARGET_NR_setuid 146
++#define TARGET_NR_setresuid 147
++#define TARGET_NR_getresuid 148
++#define TARGET_NR_setresgid 149
++#define TARGET_NR_getresgid 150
++#define TARGET_NR_setfsuid 151
++#define TARGET_NR_setfsgid 152
++#define TARGET_NR_times 153
++#define TARGET_NR_setpgid 154
++#define TARGET_NR_getpgid 155
++#define TARGET_NR_getsid 156
++#define TARGET_NR_setsid 157
++#define TARGET_NR_getgroups 158
++#define TARGET_NR_setgroups 159
++#define TARGET_NR_uname 160
++#define TARGET_NR_sethostname 161
++#define TARGET_NR_setdomainname 162
++#define TARGET_NR_getrlimit 163
++#define TARGET_NR_setrlimit 164
++#define TARGET_NR_getrusage 165
++#define TARGET_NR_umask 166
++#define TARGET_NR_prctl 167
++#define TARGET_NR_getcpu 168
++#define TARGET_NR_gettimeofday 169
++#define TARGET_NR_settimeofday 170
++#define TARGET_NR_adjtimex 171
++#define TARGET_NR_getpid 172
++#define TARGET_NR_getppid 173
++#define TARGET_NR_getuid 174
++#define TARGET_NR_geteuid 175
++#define TARGET_NR_getgid 176
++#define TARGET_NR_getegid 177
++#define TARGET_NR_gettid 178
++#define TARGET_NR_sysinfo 179
++#define TARGET_NR_mq_open 180
++#define TARGET_NR_mq_unlink 181
++#define TARGET_NR_mq_timedsend 182
++#define TARGET_NR_mq_timedreceive 183
++#define TARGET_NR_mq_notify 184
++#define TARGET_NR_mq_getsetattr 185
++#define TARGET_NR_msgget 186
++#define TARGET_NR_msgctl 187
++#define TARGET_NR_msgrcv 188
++#define TARGET_NR_msgsnd 189
++#define TARGET_NR_semget 190
++#define TARGET_NR_semctl 191
++#define TARGET_NR_semtimedop 192
++#define TARGET_NR_semop 193
++#define TARGET_NR_shmget 194
++#define TARGET_NR_shmctl 195
++#define TARGET_NR_shmat 196
++#define TARGET_NR_shmdt 197
++#define TARGET_NR_socket 198
++#define TARGET_NR_socketpair 199
++#define TARGET_NR_bind 200
++#define TARGET_NR_listen 201
++#define TARGET_NR_accept 202
++#define TARGET_NR_connect 203
++#define TARGET_NR_getsockname 204
++#define TARGET_NR_getpeername 205
++#define TARGET_NR_sendto 206
++#define TARGET_NR_recvfrom 207
++#define TARGET_NR_setsockopt 208
++#define TARGET_NR_getsockopt 209
++#define TARGET_NR_shutdown 210
++#define TARGET_NR_sendmsg 211
++#define TARGET_NR_recvmsg 212
++#define TARGET_NR_readahead 213
++#define TARGET_NR_brk 214
++#define TARGET_NR_munmap 215
++#define TARGET_NR_mremap 216
++#define TARGET_NR_add_key 217
++#define TARGET_NR_request_key 218
++#define TARGET_NR_keyctl 219
++#define TARGET_NR_clone 220
++#define TARGET_NR_execve 221
++#ifdef TARGET_RISCV32
++#define TARGET_NR_mmap2 222
++#define TARGET_NR_fadvise64_64 223
++#else
++#define TARGET_NR_mmap 222
++#define TARGET_NR_fadvise64 223
++#endif
++#define TARGET_NR_swapon 224
++#define TARGET_NR_swapoff 225
++#define TARGET_NR_mprotect 226
++#define TARGET_NR_msync 227
++#define TARGET_NR_mlock 228
++#define TARGET_NR_munlock 229
++#define TARGET_NR_mlockall 230
++#define TARGET_NR_munlockall 231
++#define TARGET_NR_mincore 232
++#define TARGET_NR_madvise 233
++#define TARGET_NR_remap_file_pages 234
++#define TARGET_NR_mbind 235
++#define TARGET_NR_get_mempolicy 236
++#define TARGET_NR_set_mempolicy 237
++#define TARGET_NR_migrate_pages 238
++#define TARGET_NR_move_pages 239
++#define TARGET_NR_rt_tgsigqueueinfo 240
++#define TARGET_NR_perf_event_open 241
++#define TARGET_NR_accept4 242
++#define TARGET_NR_recvmmsg 243
++#define TARGET_NR_arch_specific_syscall 244
++#define TARGET_NR_wait4 260
++#define TARGET_NR_prlimit64 261
++#define TARGET_NR_fanotify_init 262
++#define TARGET_NR_fanotify_mark 263
++#define TARGET_NR_name_to_handle_at 264
++#define TARGET_NR_open_by_handle_at 265
++#define TARGET_NR_clock_adjtime 266
++#define TARGET_NR_syncfs 267
++#define TARGET_NR_setns 268
++#define TARGET_NR_sendmmsg 269
++#define TARGET_NR_process_vm_readv 270
++#define TARGET_NR_process_vm_writev 271
++#define TARGET_NR_kcmp 272
++#define TARGET_NR_finit_module 273
++
++#define TARGET_NR_syscalls (__NR_finit_module + 1)
+diff --git a/linux-user/riscv/target_cpu.h b/linux-user/riscv/target_cpu.h
+new file mode 100644
+index 0000000..c5549b1
+--- /dev/null
++++ b/linux-user/riscv/target_cpu.h
+@@ -0,0 +1,18 @@
++#ifndef TARGET_CPU_H
++#define TARGET_CPU_H
++
++static inline void cpu_clone_regs(CPURISCVState *env, target_ulong newsp)
++{
++    if (newsp) {
++        env->gpr[xSP] = newsp;
++    }
++
++    env->gpr[xA0] = 0;
++}
++
++static inline void cpu_set_tls(CPURISCVState *env, target_ulong newtls)
++{
++    env->gpr[xTP] = newtls;
++}
++
++#endif
+diff --git a/linux-user/riscv/target_signal.h b/linux-user/riscv/target_signal.h
+new file mode 100644
+index 0000000..ce77f75
+--- /dev/null
++++ b/linux-user/riscv/target_signal.h
+@@ -0,0 +1,23 @@
++#ifndef TARGET_SIGNAL_H
++#define TARGET_SIGNAL_H
++
++#include "cpu.h"
++
++typedef struct target_sigaltstack {
++    abi_ulong ss_sp;
++    abi_int ss_flags;
++    abi_ulong ss_size;
++} target_stack_t;
++
++#define TARGET_SS_ONSTACK 1
++#define TARGET_SS_DISABLE 2
++
++#define TARGET_MINSIGSTKSZ 2048
++#define TARGET_SIGSTKSZ 8192
++
++static inline abi_ulong get_sp_from_cpustate(CPURISCVState *state)
++{
++   return state->gpr[xSP];
++}
++
++#endif /* TARGET_SIGNAL_H */
+diff --git a/linux-user/riscv/target_structs.h b/linux-user/riscv/target_structs.h
+new file mode 100644
+index 0000000..4f0462c
+--- /dev/null
++++ b/linux-user/riscv/target_structs.h
+@@ -0,0 +1,46 @@
++/*
++ * RISC-V specific structures for linux-user
 + *
-+ * Copyright (c) 2016-2017 Michael Clark <michaeljclark@mac.com>
-+ * Copyright (c) 2017-2018 SiFive, Inc.
++ * This is a copy of ../aarch64/target_structs.h atm.
 + *
-+ * Permission is hereby granted, free of charge, to any person obtaining a copy
-+ * of this software and associated documentation files (the "Software"), to deal
-+ * in the Software without restriction, including without limitation the rights
-+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-+ * copies of the Software, and to permit persons to whom the Software is
-+ * furnished to do so, subject to the following conditions:
++ */
++#ifndef TARGET_STRUCTS_H
++#define TARGET_STRUCTS_H
++
++struct target_ipc_perm {
++    abi_int __key;                      /* Key.  */
++    abi_uint uid;                       /* Owner's user ID.  */
++    abi_uint gid;                       /* Owner's group ID.  */
++    abi_uint cuid;                      /* Creator's user ID.  */
++    abi_uint cgid;                      /* Creator's group ID.  */
++    abi_ushort mode;                    /* Read/write permission.  */
++    abi_ushort __pad1;
++    abi_ushort __seq;                   /* Sequence number.  */
++    abi_ushort __pad2;
++    abi_ulong __unused1;
++    abi_ulong __unused2;
++};
++
++struct target_shmid_ds {
++    struct target_ipc_perm shm_perm;    /* operation permission struct */
++    abi_long shm_segsz;                 /* size of segment in bytes */
++    abi_ulong shm_atime;                /* time of last shmat() */
++#if TARGET_ABI_BITS == 32
++    abi_ulong __unused1;
++#endif
++    abi_ulong shm_dtime;                /* time of last shmdt() */
++#if TARGET_ABI_BITS == 32
++    abi_ulong __unused2;
++#endif
++    abi_ulong shm_ctime;                /* time of last change by shmctl() */
++#if TARGET_ABI_BITS == 32
++    abi_ulong __unused3;
++#endif
++    abi_int shm_cpid;                   /* pid of creator */
++    abi_int shm_lpid;                   /* pid of last shmop */
++    abi_ulong shm_nattch;               /* number of current attaches */
++    abi_ulong __unused4;
++    abi_ulong __unused5;
++};
++
++#endif
+diff --git a/linux-user/riscv/target_syscall.h b/linux-user/riscv/target_syscall.h
+new file mode 100644
+index 0000000..d4e109a
+--- /dev/null
++++ b/linux-user/riscv/target_syscall.h
+@@ -0,0 +1,56 @@
++/*
++ * This struct defines the way the registers are stored on the
++ *  stack during a system call.
 + *
-+ * The above copyright notice and this permission notice shall be included in
-+ * all copies or substantial portions of the Software.
++ * Reference: linux/arch/riscv/include/uapi/asm/ptrace.h
++ */
++
++struct target_pt_regs {
++    abi_long sepc;
++    abi_long ra;
++    abi_long sp;
++    abi_long gp;
++    abi_long tp;
++    abi_long t0;
++    abi_long t1;
++    abi_long t2;
++    abi_long s0;
++    abi_long s1;
++    abi_long a0;
++    abi_long a1;
++    abi_long a2;
++    abi_long a3;
++    abi_long a4;
++    abi_long a5;
++    abi_long a6;
++    abi_long a7;
++    abi_long s2;
++    abi_long s3;
++    abi_long s4;
++    abi_long s5;
++    abi_long s6;
++    abi_long s7;
++    abi_long s8;
++    abi_long s9;
++    abi_long s10;
++    abi_long s11;
++    abi_long t3;
++    abi_long t4;
++    abi_long t5;
++    abi_long t6;
++};
++
++#ifdef TARGET_RISCV32
++#define UNAME_MACHINE "riscv32"
++#else
++#define UNAME_MACHINE "riscv64"
++#endif
++#define UNAME_MINIMUM_RELEASE "3.8.0"
++
++#define TARGET_MINSIGSTKSZ 2048
++#define TARGET_MLOCKALL_MCL_CURRENT 1
++#define TARGET_MLOCKALL_MCL_FUTURE  2
++
++/* clone(flags, newsp, ptidptr, tls, ctidptr) for RISC-V */
++/* This comes from linux/kernel/fork.c, CONFIG_CLONE_BACKWARDS */
++#define TARGET_CLONE_BACKWARDS
+diff --git a/linux-user/riscv/termbits.h b/linux-user/riscv/termbits.h
+new file mode 100644
+index 0000000..ec49dbf
+--- /dev/null
++++ b/linux-user/riscv/termbits.h
+@@ -0,0 +1,220 @@
++/* from asm/termbits.h */
++/* NOTE: exactly the same as i386 */
++
++#define TARGET_NCCS 19
++
++struct target_termios {
++    unsigned int c_iflag;               /* input mode flags */
++    unsigned int c_oflag;               /* output mode flags */
++    unsigned int c_cflag;               /* control mode flags */
++    unsigned int c_lflag;               /* local mode flags */
++    unsigned char c_line;               /* line discipline */
++    unsigned char c_cc[TARGET_NCCS];    /* control characters */
++};
++
++/* c_iflag bits */
++#define TARGET_IGNBRK  0000001
++#define TARGET_BRKINT  0000002
++#define TARGET_IGNPAR  0000004
++#define TARGET_PARMRK  0000010
++#define TARGET_INPCK   0000020
++#define TARGET_ISTRIP  0000040
++#define TARGET_INLCR   0000100
++#define TARGET_IGNCR   0000200
++#define TARGET_ICRNL   0000400
++#define TARGET_IUCLC   0001000
++#define TARGET_IXON    0002000
++#define TARGET_IXANY   0004000
++#define TARGET_IXOFF   0010000
++#define TARGET_IMAXBEL 0020000
++#define TARGET_IUTF8   0040000
++
++/* c_oflag bits */
++#define TARGET_OPOST   0000001
++#define TARGET_OLCUC   0000002
++#define TARGET_ONLCR   0000004
++#define TARGET_OCRNL   0000010
++#define TARGET_ONOCR   0000020
++#define TARGET_ONLRET  0000040
++#define TARGET_OFILL   0000100
++#define TARGET_OFDEL   0000200
++#define TARGET_NLDLY   0000400
++#define   TARGET_NL0   0000000
++#define   TARGET_NL1   0000400
++#define TARGET_CRDLY   0003000
++#define   TARGET_CR0   0000000
++#define   TARGET_CR1   0001000
++#define   TARGET_CR2   0002000
++#define   TARGET_CR3   0003000
++#define TARGET_TABDLY  0014000
++#define   TARGET_TAB0  0000000
++#define   TARGET_TAB1  0004000
++#define   TARGET_TAB2  0010000
++#define   TARGET_TAB3  0014000
++#define   TARGET_XTABS 0014000
++#define TARGET_BSDLY   0020000
++#define   TARGET_BS0   0000000
++#define   TARGET_BS1   0020000
++#define TARGET_VTDLY   0040000
++#define   TARGET_VT0   0000000
++#define   TARGET_VT1   0040000
++#define TARGET_FFDLY   0100000
++#define   TARGET_FF0   0000000
++#define   TARGET_FF1   0100000
++
++/* c_cflag bit meaning */
++#define TARGET_CBAUD   0010017
++#define  TARGET_B0     0000000         /* hang up */
++#define  TARGET_B50    0000001
++#define  TARGET_B75    0000002
++#define  TARGET_B110   0000003
++#define  TARGET_B134   0000004
++#define  TARGET_B150   0000005
++#define  TARGET_B200   0000006
++#define  TARGET_B300   0000007
++#define  TARGET_B600   0000010
++#define  TARGET_B1200  0000011
++#define  TARGET_B1800  0000012
++#define  TARGET_B2400  0000013
++#define  TARGET_B4800  0000014
++#define  TARGET_B9600  0000015
++#define  TARGET_B19200 0000016
++#define  TARGET_B38400 0000017
++#define TARGET_EXTA B19200
++#define TARGET_EXTB B38400
++#define TARGET_CSIZE   0000060
++#define   TARGET_CS5   0000000
++#define   TARGET_CS6   0000020
++#define   TARGET_CS7   0000040
++#define   TARGET_CS8   0000060
++#define TARGET_CSTOPB  0000100
++#define TARGET_CREAD   0000200
++#define TARGET_PARENB  0000400
++#define TARGET_PARODD  0001000
++#define TARGET_HUPCL   0002000
++#define TARGET_CLOCAL  0004000
++#define TARGET_CBAUDEX 0010000
++#define  TARGET_B57600  0010001
++#define  TARGET_B115200 0010002
++#define  TARGET_B230400 0010003
++#define  TARGET_B460800 0010004
++#define TARGET_CIBAUD    002003600000  /* input baud rate (not used) */
++#define TARGET_CMSPAR    010000000000  /* mark or space (stick) parity */
++#define TARGET_CRTSCTS   020000000000  /* flow control */
++
++/* c_lflag bits */
++#define TARGET_ISIG    0000001
++#define TARGET_ICANON  0000002
++#define TARGET_XCASE   0000004
++#define TARGET_ECHO    0000010
++#define TARGET_ECHOE   0000020
++#define TARGET_ECHOK   0000040
++#define TARGET_ECHONL  0000100
++#define TARGET_NOFLSH  0000200
++#define TARGET_TOSTOP  0000400
++#define TARGET_ECHOCTL 0001000
++#define TARGET_ECHOPRT 0002000
++#define TARGET_ECHOKE  0004000
++#define TARGET_FLUSHO  0010000
++#define TARGET_PENDIN  0040000
++#define TARGET_IEXTEN  0100000
++
++/* c_cc character offsets */
++#define TARGET_VINTR    0
++#define TARGET_VQUIT    1
++#define TARGET_VERASE   2
++#define TARGET_VKILL    3
++#define TARGET_VEOF     4
++#define TARGET_VTIME    5
++#define TARGET_VMIN     6
++#define TARGET_VSWTC    7
++#define TARGET_VSTART   8
++#define TARGET_VSTOP    9
++#define TARGET_VSUSP    10
++#define TARGET_VEOL     11
++#define TARGET_VREPRINT 12
++#define TARGET_VDISCARD 13
++#define TARGET_VWERASE  14
++#define TARGET_VLNEXT   15
++#define TARGET_VEOL2    16
++
++/* ioctls */
++
++#define TARGET_TCGETS           0x5401
++#define TARGET_TCSETS           0x5402
++#define TARGET_TCSETSW          0x5403
++#define TARGET_TCSETSF          0x5404
++#define TARGET_TCGETA           0x5405
++#define TARGET_TCSETA           0x5406
++#define TARGET_TCSETAW          0x5407
++#define TARGET_TCSETAF          0x5408
++#define TARGET_TCSBRK           0x5409
++#define TARGET_TCXONC           0x540A
++#define TARGET_TCFLSH           0x540B
++
++#define TARGET_TIOCEXCL         0x540C
++#define TARGET_TIOCNXCL         0x540D
++#define TARGET_TIOCSCTTY        0x540E
++#define TARGET_TIOCGPGRP        0x540F
++#define TARGET_TIOCSPGRP        0x5410
++#define TARGET_TIOCOUTQ         0x5411
++#define TARGET_TIOCSTI          0x5412
++#define TARGET_TIOCGWINSZ       0x5413
++#define TARGET_TIOCSWINSZ       0x5414
++#define TARGET_TIOCMGET         0x5415
++#define TARGET_TIOCMBIS         0x5416
++#define TARGET_TIOCMBIC         0x5417
++#define TARGET_TIOCMSET         0x5418
++#define TARGET_TIOCGSOFTCAR     0x5419
++#define TARGET_TIOCSSOFTCAR     0x541A
++#define TARGET_FIONREAD         0x541B
++#define TARGET_TIOCINQ          TARGET_FIONREAD
++#define TARGET_TIOCLINUX        0x541C
++#define TARGET_TIOCCONS         0x541D
++#define TARGET_TIOCGSERIAL      0x541E
++#define TARGET_TIOCSSERIAL      0x541F
++#define TARGET_TIOCPKT          0x5420
++#define TARGET_FIONBIO          0x5421
++#define TARGET_TIOCNOTTY        0x5422
++#define TARGET_TIOCSETD         0x5423
++#define TARGET_TIOCGETD         0x5424
++#define TARGET_TCSBRKP          0x5425 /* Needed for POSIX tcsendbreak() */
++#define TARGET_TIOCTTYGSTRUCT   0x5426 /* For debugging only */
++#define TARGET_TIOCSBRK         0x5427 /* BSD compatibility */
++#define TARGET_TIOCCBRK         0x5428 /* BSD compatibility */
++#define TARGET_TIOCGSID         0x5429 /* Return the session ID of FD */
++#define TARGET_TIOCGPTN         TARGET_IOR('T', 0x30, unsigned int)
++        /* Get Pty Number (of pty-mux device) */
++#define TARGET_TIOCSPTLCK       TARGET_IOW('T', 0x31, int)
++        /* Lock/unlock Pty */
++
++#define TARGET_FIONCLEX         0x5450  /* these numbers need to be adjusted. */
++#define TARGET_FIOCLEX          0x5451
++#define TARGET_FIOASYNC         0x5452
++#define TARGET_TIOCSERCONFIG    0x5453
++#define TARGET_TIOCSERGWILD     0x5454
++#define TARGET_TIOCSERSWILD     0x5455
++#define TARGET_TIOCGLCKTRMIOS   0x5456
++#define TARGET_TIOCSLCKTRMIOS   0x5457
++#define TARGET_TIOCSERGSTRUCT   0x5458 /* For debugging only */
++#define TARGET_TIOCSERGETLSR    0x5459 /* Get line status register */
++#define TARGET_TIOCSERGETMULTI  0x545A /* Get multiport config  */
++#define TARGET_TIOCSERSETMULTI  0x545B /* Set multiport config */
++
++#define TARGET_TIOCMIWAIT      0x545C
++        /* wait for a change on serial input line(s) */
++#define TARGET_TIOCGICOUNT     0x545D
++        /* read serial port inline interrupt counts */
++#define TARGET_TIOCGHAYESESP   0x545E  /* Get Hayes ESP configuration */
++#define TARGET_TIOCSHAYESESP   0x545F  /* Set Hayes ESP configuration */
++
++/* Used for packet mode */
++#define TARGET_TIOCPKT_DATA              0
++#define TARGET_TIOCPKT_FLUSHREAD         1
++#define TARGET_TIOCPKT_FLUSHWRITE        2
++#define TARGET_TIOCPKT_STOP              4
++#define TARGET_TIOCPKT_START             8
++#define TARGET_TIOCPKT_NOSTOP           16
++#define TARGET_TIOCPKT_DOSTOP           32
++
++#define TARGET_TIOCSER_TEMT    0x01 /* Transmitter physically empty */
+diff --git a/linux-user/signal.c b/linux-user/signal.c
+index 74fa03f..f4668f0 100644
+--- a/linux-user/signal.c
++++ b/linux-user/signal.c
+@@ -535,6 +535,7 @@ static void force_sig(int sig)
+  * up the signal frame. oldsig is the signal we were trying to handle
+  * at the point of failure.
+  */
++#if !defined(TARGET_RISCV)
+ static void force_sigsegv(int oldsig)
+ {
+     if (oldsig == SIGSEGV) {
+@@ -547,6 +548,8 @@ static void force_sigsegv(int oldsig)
+ }
+ #endif
+ 
++#endif
++
+ /* abort execution with signal */
+ static void QEMU_NORETURN dump_core_and_abort(int target_sig)
+ {
+@@ -6379,6 +6382,203 @@ long do_rt_sigreturn(CPUTLGState *env)
+     return -TARGET_QEMU_ESIGRETURN;
+ }
+ 
++#elif defined(TARGET_RISCV)
++
++/* Signal handler invocation must be transparent for the code being
++   interrupted. Complete CPU (hart) state is saved on entry and restored
++   before returning from the handler. Process sigmask is also saved to block
++   signals while the handler is running. The handler gets its own stack,
++   which also doubles as storage for the CPU state and sigmask.
++
++   The code below is qemu re-implementation of arch/riscv/kernel/signal.c */
++
++struct target_sigcontext {
++    abi_long pc;
++    abi_long gpr[31]; /* x0 is not present, so all offsets must be -1 */
++    uint64_t fpr[32];
++    uint32_t fcsr;
++}; /* cf. riscv-linux:arch/riscv/include/uapi/asm/ptrace.h */
++
++struct target_ucontext {
++    unsigned long uc_flags;
++    struct target_ucontext *uc_link;
++    target_stack_t uc_stack;
++    struct target_sigcontext uc_mcontext;
++    target_sigset_t uc_sigmask;
++};
++
++struct target_rt_sigframe {
++    uint32_t tramp[2]; /* not in kernel, which uses VDSO instead */
++    struct target_siginfo info;
++    struct target_ucontext uc;
++};
++
++static abi_ulong get_sigframe(struct target_sigaction *ka,
++                              CPURISCVState *regs, size_t framesize)
++{
++    abi_ulong sp = regs->gpr[xSP];
++    int onsigstack = on_sig_stack(sp);
++
++    /* redzone */
++    /* This is the X/Open sanctioned signal stack switching.  */
++    if ((ka->sa_flags & TARGET_SA_ONSTACK) != 0 && !onsigstack) {
++        sp = target_sigaltstack_used.ss_sp + target_sigaltstack_used.ss_size;
++    }
++
++    sp -= framesize;
++    sp &= ~3UL; /* align sp on 4-byte boundary */
++
++    /* If we are on the alternate signal stack and would overflow it, don't.
++       Return an always-bogus address instead so we will die with SIGSEGV. */
++    if (onsigstack && !likely(on_sig_stack(sp))) {
++        return -1L;
++    }
++
++    return sp;
++}
++
++static void setup_sigcontext(struct target_sigcontext *sc, CPURISCVState *env)
++{
++    int i;
++
++    __put_user(env->pc, &sc->pc);
++
++    for (i = 1; i < 32; i++) {
++        __put_user(env->gpr[i], &sc->gpr[i - 1]);
++    }
++    for (i = 0; i < 32; i++) {
++        __put_user(env->fpr[i], &sc->fpr[i]);
++    }
++
++    uint32_t fcsr = csr_read_helper(env, CSR_FCSR); /*riscv_get_fcsr(env);*/
++    __put_user(fcsr, &sc->fcsr);
++}
++
++static void setup_ucontext(struct target_ucontext *uc,
++                           CPURISCVState *env, target_sigset_t *set)
++{
++    abi_ulong ss_sp = (target_ulong)target_sigaltstack_used.ss_sp;
++    abi_ulong ss_flags = sas_ss_flags(env->gpr[xSP]);
++    abi_ulong ss_size = target_sigaltstack_used.ss_size;
++
++    __put_user(0,    &(uc->uc_flags));
++    __put_user(0,    &(uc->uc_link));
++
++    __put_user(ss_sp,    &(uc->uc_stack.ss_sp));
++    __put_user(ss_flags, &(uc->uc_stack.ss_flags));
++    __put_user(ss_size,  &(uc->uc_stack.ss_size));
++
++    int i;
++    for (i = 0; i < TARGET_NSIG_WORDS; i++) {
++        __put_user(set->sig[i], &(uc->uc_sigmask.sig[i]));
++    }
++
++    setup_sigcontext(&uc->uc_mcontext, env);
++}
++
++static inline void install_sigtramp(uint32_t *tramp)
++{
++    __put_user(0x08b00893, tramp + 0);  /* li a7, 139 = __NR_rt_sigreturn */
++    __put_user(0x00000073, tramp + 1);  /* ecall */
++}
++
++static void setup_rt_frame(int sig, struct target_sigaction *ka,
++                           target_siginfo_t *info,
++                           target_sigset_t *set, CPURISCVState *env)
++{
++    abi_ulong frame_addr;
++    struct target_rt_sigframe *frame;
++
++    frame_addr = get_sigframe(ka, env, sizeof(*frame));
++    trace_user_setup_rt_frame(env, frame_addr);
++
++    if (!lock_user_struct(VERIFY_WRITE, frame, frame_addr, 0)) {
++        goto badframe;
++    }
++
++    setup_ucontext(&frame->uc, env, set);
++    tswap_siginfo(&frame->info, info);
++    install_sigtramp(frame->tramp);
++
++    env->pc = ka->_sa_handler;
++    env->gpr[xSP] = frame_addr;
++    env->gpr[xA0] = sig;
++    env->gpr[xA1] = frame_addr + offsetof(struct target_rt_sigframe, info);
++    env->gpr[xA2] = frame_addr + offsetof(struct target_rt_sigframe, uc);
++    env->gpr[xRA] = frame_addr + offsetof(struct target_rt_sigframe, tramp);
++
++    return;
++
++badframe:
++    unlock_user_struct(frame, frame_addr, 1);
++    if (sig == TARGET_SIGSEGV) {
++        ka->_sa_handler = TARGET_SIG_DFL;
++    }
++    force_sig(TARGET_SIGSEGV);
++}
++
++static void restore_sigcontext(CPURISCVState *env, struct target_sigcontext *sc)
++{
++    int i;
++
++    __get_user(env->pc, &sc->pc);
++
++    for (i = 1; i < 32; ++i) {
++        __get_user(env->gpr[i], &sc->gpr[i - 1]);
++    }
++    for (i = 0; i < 32; ++i) {
++        __get_user(env->fpr[i], &sc->fpr[i]);
++    }
++
++    uint32_t fcsr;
++    __get_user(fcsr, &sc->fcsr);
++    csr_write_helper(env, fcsr, CSR_FCSR);
++}
++
++static void restore_ucontext(CPURISCVState *env, struct target_ucontext *uc)
++{
++    sigset_t blocked;
++    target_sigset_t target_set;
++    int i;
++
++    target_sigemptyset(&target_set);
++    for (i = 0; i < TARGET_NSIG_WORDS; i++) {
++        __get_user(target_set.sig[i], &(uc->uc_sigmask.sig[i]));
++    }
++
++    target_to_host_sigset_internal(&blocked, &target_set);
++    set_sigmask(&blocked);
++
++    restore_sigcontext(env, &uc->uc_mcontext);
++}
++
++long do_rt_sigreturn(CPURISCVState *env)
++{
++    struct target_rt_sigframe *frame;
++    abi_ulong frame_addr;
++
++    frame_addr = env->gpr[xSP];
++    trace_user_do_sigreturn(env, frame_addr);
++    if (!lock_user_struct(VERIFY_READ, frame, frame_addr, 1)) {
++        goto badframe;
++    }
++
++    restore_ucontext(env, &frame->uc);
++
++    if (do_sigaltstack(frame_addr + offsetof(struct target_rt_sigframe,
++            uc.uc_stack), 0, get_sp_from_cpustate(env)) == -EFAULT) {
++        goto badframe;
++    }
++
++    unlock_user_struct(frame, frame_addr, 0);
++    return -TARGET_QEMU_ESIGRETURN;
++
++badframe:
++    unlock_user_struct(frame, frame_addr, 0);
++    force_sig(TARGET_SIGSEGV);
++    return 0;
++}
++
+ #elif defined(TARGET_HPPA)
+ 
+ struct target_sigcontext {
+@@ -6670,7 +6870,8 @@ static void handle_pending_signal(CPUArchState *cpu_env, int sig,
+ #if defined(TARGET_ABI_MIPSN32) || defined(TARGET_ABI_MIPSN64) \
+         || defined(TARGET_OPENRISC) || defined(TARGET_TILEGX) \
+         || defined(TARGET_PPC64) || defined(TARGET_HPPA) \
+-        || defined(TARGET_NIOS2) || defined(TARGET_X86_64)
++        || defined(TARGET_NIOS2) || defined(TARGET_X86_64) \
++        || defined(TARGET_RISCV)
+         /* These targets do not have traditional signals.  */
+         setup_rt_frame(sig, sa, &k->info, &target_old_set, cpu_env);
+ #else
+diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+index 11c9116..5e54889 100644
+--- a/linux-user/syscall.c
++++ b/linux-user/syscall.c
+@@ -8434,9 +8434,11 @@ abi_long do_syscall(void *cpu_env, int num, abi_long arg1,
+     case TARGET_NR_ioctl:
+         ret = do_ioctl(arg1, arg2, arg3);
+         break;
++#ifdef TARGET_NR_fcntl
+     case TARGET_NR_fcntl:
+         ret = do_fcntl(arg1, arg2, arg3);
+         break;
++#endif
+ #ifdef TARGET_NR_mpx
+     case TARGET_NR_mpx:
+         goto unimplemented;
+diff --git a/linux-user/syscall_defs.h b/linux-user/syscall_defs.h
+index bec3680..e62112a 100644
+--- a/linux-user/syscall_defs.h
++++ b/linux-user/syscall_defs.h
+@@ -71,7 +71,7 @@
+     || defined(TARGET_M68K) || defined(TARGET_CRIS) \
+     || defined(TARGET_UNICORE32) || defined(TARGET_S390X) \
+     || defined(TARGET_OPENRISC) || defined(TARGET_TILEGX) \
+-    || defined(TARGET_NIOS2)
++    || defined(TARGET_NIOS2) || defined(TARGET_RISCV)
+ 
+ #define TARGET_IOC_SIZEBITS	14
+ #define TARGET_IOC_DIRBITS	2
+@@ -435,7 +435,8 @@ int do_sigaction(int sig, const struct target_sigaction *act,
+     || defined(TARGET_M68K) || defined(TARGET_ALPHA) || defined(TARGET_CRIS) \
+     || defined(TARGET_MICROBLAZE) || defined(TARGET_UNICORE32) \
+     || defined(TARGET_S390X) || defined(TARGET_OPENRISC) \
+-    || defined(TARGET_TILEGX) || defined(TARGET_HPPA) || defined(TARGET_NIOS2)
++    || defined(TARGET_TILEGX) || defined(TARGET_HPPA) || defined(TARGET_NIOS2) \
++    || defined(TARGET_RISCV)
+ 
+ #if defined(TARGET_SPARC)
+ #define TARGET_SA_NOCLDSTOP    8u
+@@ -2093,7 +2094,7 @@ struct target_stat {
+     unsigned int __unused[2];
+ };
+ #elif defined(TARGET_OPENRISC) || defined(TARGET_TILEGX) || \
+-      defined(TARGET_NIOS2)
++      defined(TARGET_NIOS2) || defined(TARGET_RISCV)
+ 
+ /* These are the asm-generic versions of the stat and stat64 structures */
+ 
+@@ -2120,6 +2121,7 @@ struct target_stat {
+     unsigned int __unused5;
+ };
+ 
++#if !defined(TARGET_RISCV64)
+ #define TARGET_HAS_STRUCT_STAT64
+ struct target_stat64 {
+     uint64_t st_dev;
+@@ -2143,6 +2145,7 @@ struct target_stat64 {
+     unsigned int __unused4;
+     unsigned int __unused5;
+ };
++#endif
+ 
+ #elif defined(TARGET_HPPA)
+ 
+@@ -2258,8 +2261,8 @@ struct target_statfs64 {
+ 	uint32_t	f_spare[6];
+ };
+ #elif (defined(TARGET_PPC64) || defined(TARGET_X86_64) || \
+-       defined(TARGET_SPARC64) || defined(TARGET_AARCH64)) && \
+-       !defined(TARGET_ABI32)
++       defined(TARGET_SPARC64) || defined(TARGET_AARCH64) || \
++       defined(TARGET_RISCV)) && !defined(TARGET_ABI32)
+ struct target_statfs {
+ 	abi_long f_type;
+ 	abi_long f_bsize;
+diff --git a/target/riscv/cpu_user.h b/target/riscv/cpu_user.h
+new file mode 100644
+index 0000000..c6e89bd
+--- /dev/null
++++ b/target/riscv/cpu_user.h
+@@ -0,0 +1,26 @@
++/* Return codes for riscv_cpu_do_userspace_amo */
++#define RISCV_AMO_OK      0
++#define RISCV_AMO_BADINSN 1
++#define RISCV_AMO_BADADDR 2
++
++/* not RISC-V exception codes - this is for qemu user-mode */
++#define QEMU_USER_EXCP_ATOMIC              0xc
++#define QEMU_USER_EXCP_FAULT               0xd
++
++#define xRA 1   /* return address (aka link register) */
++#define xSP 2   /* stack pointer */
++#define xGP 3   /* global pointer */
++#define xTP 4   /* thread pointer */
++
++#define xA0 10  /* gpr[10-17] are syscall arguments */
++#define xA1 11
++#define xA2 12
++#define xA3 13
++#define xA4 14
++#define xA5 15
++#define xA6 16
++#define xA7 17  /* syscall number goes here */
++
++#ifdef CONFIG_USER_ONLY
++int riscv_cpu_do_usermode_amo(CPUState *cs);
++#endif
+diff --git a/target/riscv/user_atomic.c b/target/riscv/user_atomic.c
+new file mode 100644
+index 0000000..b1646d7
+--- /dev/null
++++ b/target/riscv/user_atomic.c
+@@ -0,0 +1,291 @@
++/*
++ * RISC-V user-mode atomic memory ops
 + *
-+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-+ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-+ * THE SOFTWARE.
++ * Copyright (c) 2016 Alex Suykov <alex.suykov@gmail.com>
++ *
++ * This library is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU Lesser General Public
++ * License as published by the Free Software Foundation; either
++ * version 2 of the License, or (at your option) any later version.
++ *
++ * This library is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * Lesser General Public License for more details.
++ *
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with this library; if not, see <http://www.gnu.org/licenses/>.
 + */
 +
 +#include "qemu/osdep.h"
-+#include "disas/bfd.h"
++#include "cpu.h"
 +
++#ifdef CONFIG_USER_ONLY
 +
-+/* types */
++#include "qemu.h"
 +
-+typedef uint64_t rv_inst;
-+typedef uint16_t rv_opcode;
++/* The code in this file runs outside of cpu_loop and may not raise
++   any exceptions. Instead, it should return one of RISCV_AMO_* consts.
 +
-+/* enums */
++   See comments around cpu_list_mutex in linux-user/main.c
++   on why exclusive memory ops are done this way.
 +
-+typedef enum {
-+    rv32,
-+    rv64,
-+    rv128
-+} rv_isa;
++   Some other arches put AMO handling right into main.c,
++   but for RISC-V there's just too many ops to handle and too much code,
++   so it's all here instead. */
 +
-+typedef enum {
-+    rv_rm_rne = 0,
-+    rv_rm_rtz = 1,
-+    rv_rm_rdn = 2,
-+    rv_rm_rup = 3,
-+    rv_rm_rmm = 4,
-+    rv_rm_dyn = 7,
-+} rv_rm;
++#define BITFIELD(src, end, start) \
++            (((src) >> start) & ((1 << (end - start + 1)) - 1))
 +
-+typedef enum {
-+    rv_fence_i = 8,
-+    rv_fence_o = 4,
-+    rv_fence_r = 2,
-+    rv_fence_w = 1,
-+} rv_fence;
++#define ENV CPURISCVState *env
 +
-+typedef enum {
-+    rv_ireg_zero,
-+    rv_ireg_ra,
-+    rv_ireg_sp,
-+    rv_ireg_gp,
-+    rv_ireg_tp,
-+    rv_ireg_t0,
-+    rv_ireg_t1,
-+    rv_ireg_t2,
-+    rv_ireg_s0,
-+    rv_ireg_s1,
-+    rv_ireg_a0,
-+    rv_ireg_a1,
-+    rv_ireg_a2,
-+    rv_ireg_a3,
-+    rv_ireg_a4,
-+    rv_ireg_a5,
-+    rv_ireg_a6,
-+    rv_ireg_a7,
-+    rv_ireg_s2,
-+    rv_ireg_s3,
-+    rv_ireg_s4,
-+    rv_ireg_s5,
-+    rv_ireg_s6,
-+    rv_ireg_s7,
-+    rv_ireg_s8,
-+    rv_ireg_s9,
-+    rv_ireg_s10,
-+    rv_ireg_s11,
-+    rv_ireg_t3,
-+    rv_ireg_t4,
-+    rv_ireg_t5,
-+    rv_ireg_t6,
-+} rv_ireg;
++/* Load-Reserve: rd = [rs1], creating reservation for [rs1]. */
 +
-+typedef enum {
-+    rvc_end,
-+    rvc_simm_6,
-+    rvc_imm_6,
-+    rvc_imm_7,
-+    rvc_imm_8,
-+    rvc_imm_9,
-+    rvc_imm_10,
-+    rvc_imm_12,
-+    rvc_imm_18,
-+    rvc_imm_nz,
-+    rvc_imm_x2,
-+    rvc_imm_x4,
-+    rvc_imm_x8,
-+    rvc_imm_x16,
-+    rvc_rd_b3,
-+    rvc_rs1_b3,
-+    rvc_rs2_b3,
-+    rvc_rd_eq_rs1,
-+    rvc_rd_eq_ra,
-+    rvc_rd_eq_sp,
-+    rvc_rd_eq_x0,
-+    rvc_rs1_eq_sp,
-+    rvc_rs1_eq_x0,
-+    rvc_rs2_eq_x0,
-+    rvc_rd_ne_x0_x2,
-+    rvc_rd_ne_x0,
-+    rvc_rs1_ne_x0,
-+    rvc_rs2_ne_x0,
-+    rvc_rs2_eq_rs1,
-+    rvc_rs1_eq_ra,
-+    rvc_imm_eq_zero,
-+    rvc_imm_eq_n1,
-+    rvc_imm_eq_p1,
-+    rvc_csr_eq_0x001,
-+    rvc_csr_eq_0x002,
-+    rvc_csr_eq_0x003,
-+    rvc_csr_eq_0xc00,
-+    rvc_csr_eq_0xc01,
-+    rvc_csr_eq_0xc02,
-+    rvc_csr_eq_0xc80,
-+    rvc_csr_eq_0xc81,
-+    rvc_csr_eq_0xc82,
-+} rvc_constraint;
-+
-+typedef enum {
-+    rv_codec_illegal,
-+    rv_codec_none,
-+    rv_codec_u,
-+    rv_codec_uj,
-+    rv_codec_i,
-+    rv_codec_i_sh5,
-+    rv_codec_i_sh6,
-+    rv_codec_i_sh7,
-+    rv_codec_i_csr,
-+    rv_codec_s,
-+    rv_codec_sb,
-+    rv_codec_r,
-+    rv_codec_r_m,
-+    rv_codec_r4_m,
-+    rv_codec_r_a,
-+    rv_codec_r_l,
-+    rv_codec_r_f,
-+    rv_codec_cb,
-+    rv_codec_cb_imm,
-+    rv_codec_cb_sh5,
-+    rv_codec_cb_sh6,
-+    rv_codec_ci,
-+    rv_codec_ci_sh5,
-+    rv_codec_ci_sh6,
-+    rv_codec_ci_16sp,
-+    rv_codec_ci_lwsp,
-+    rv_codec_ci_ldsp,
-+    rv_codec_ci_lqsp,
-+    rv_codec_ci_li,
-+    rv_codec_ci_lui,
-+    rv_codec_ci_none,
-+    rv_codec_ciw_4spn,
-+    rv_codec_cj,
-+    rv_codec_cj_jal,
-+    rv_codec_cl_lw,
-+    rv_codec_cl_ld,
-+    rv_codec_cl_lq,
-+    rv_codec_cr,
-+    rv_codec_cr_mv,
-+    rv_codec_cr_jalr,
-+    rv_codec_cr_jr,
-+    rv_codec_cs,
-+    rv_codec_cs_sw,
-+    rv_codec_cs_sd,
-+    rv_codec_cs_sq,
-+    rv_codec_css_swsp,
-+    rv_codec_css_sdsp,
-+    rv_codec_css_sqsp,
-+} rv_codec;
-+
-+typedef enum {
-+    rv_op_illegal = 0,
-+    rv_op_lui = 1,
-+    rv_op_auipc = 2,
-+    rv_op_jal = 3,
-+    rv_op_jalr = 4,
-+    rv_op_beq = 5,
-+    rv_op_bne = 6,
-+    rv_op_blt = 7,
-+    rv_op_bge = 8,
-+    rv_op_bltu = 9,
-+    rv_op_bgeu = 10,
-+    rv_op_lb = 11,
-+    rv_op_lh = 12,
-+    rv_op_lw = 13,
-+    rv_op_lbu = 14,
-+    rv_op_lhu = 15,
-+    rv_op_sb = 16,
-+    rv_op_sh = 17,
-+    rv_op_sw = 18,
-+    rv_op_addi = 19,
-+    rv_op_slti = 20,
-+    rv_op_sltiu = 21,
-+    rv_op_xori = 22,
-+    rv_op_ori = 23,
-+    rv_op_andi = 24,
-+    rv_op_slli = 25,
-+    rv_op_srli = 26,
-+    rv_op_srai = 27,
-+    rv_op_add = 28,
-+    rv_op_sub = 29,
-+    rv_op_sll = 30,
-+    rv_op_slt = 31,
-+    rv_op_sltu = 32,
-+    rv_op_xor = 33,
-+    rv_op_srl = 34,
-+    rv_op_sra = 35,
-+    rv_op_or = 36,
-+    rv_op_and = 37,
-+    rv_op_fence = 38,
-+    rv_op_fence_i = 39,
-+    rv_op_lwu = 40,
-+    rv_op_ld = 41,
-+    rv_op_sd = 42,
-+    rv_op_addiw = 43,
-+    rv_op_slliw = 44,
-+    rv_op_srliw = 45,
-+    rv_op_sraiw = 46,
-+    rv_op_addw = 47,
-+    rv_op_subw = 48,
-+    rv_op_sllw = 49,
-+    rv_op_srlw = 50,
-+    rv_op_sraw = 51,
-+    rv_op_ldu = 52,
-+    rv_op_lq = 53,
-+    rv_op_sq = 54,
-+    rv_op_addid = 55,
-+    rv_op_sllid = 56,
-+    rv_op_srlid = 57,
-+    rv_op_sraid = 58,
-+    rv_op_addd = 59,
-+    rv_op_subd = 60,
-+    rv_op_slld = 61,
-+    rv_op_srld = 62,
-+    rv_op_srad = 63,
-+    rv_op_mul = 64,
-+    rv_op_mulh = 65,
-+    rv_op_mulhsu = 66,
-+    rv_op_mulhu = 67,
-+    rv_op_div = 68,
-+    rv_op_divu = 69,
-+    rv_op_rem = 70,
-+    rv_op_remu = 71,
-+    rv_op_mulw = 72,
-+    rv_op_divw = 73,
-+    rv_op_divuw = 74,
-+    rv_op_remw = 75,
-+    rv_op_remuw = 76,
-+    rv_op_muld = 77,
-+    rv_op_divd = 78,
-+    rv_op_divud = 79,
-+    rv_op_remd = 80,
-+    rv_op_remud = 81,
-+    rv_op_lr_w = 82,
-+    rv_op_sc_w = 83,
-+    rv_op_amoswap_w = 84,
-+    rv_op_amoadd_w = 85,
-+    rv_op_amoxor_w = 86,
-+    rv_op_amoor_w = 87,
-+    rv_op_amoand_w = 88,
-+    rv_op_amomin_w = 89,
-+    rv_op_amomax_w = 90,
-+    rv_op_amominu_w = 91,
-+    rv_op_amomaxu_w = 92,
-+    rv_op_lr_d = 93,
-+    rv_op_sc_d = 94,
-+    rv_op_amoswap_d = 95,
-+    rv_op_amoadd_d = 96,
-+    rv_op_amoxor_d = 97,
-+    rv_op_amoor_d = 98,
-+    rv_op_amoand_d = 99,
-+    rv_op_amomin_d = 100,
-+    rv_op_amomax_d = 101,
-+    rv_op_amominu_d = 102,
-+    rv_op_amomaxu_d = 103,
-+    rv_op_lr_q = 104,
-+    rv_op_sc_q = 105,
-+    rv_op_amoswap_q = 106,
-+    rv_op_amoadd_q = 107,
-+    rv_op_amoxor_q = 108,
-+    rv_op_amoor_q = 109,
-+    rv_op_amoand_q = 110,
-+    rv_op_amomin_q = 111,
-+    rv_op_amomax_q = 112,
-+    rv_op_amominu_q = 113,
-+    rv_op_amomaxu_q = 114,
-+    rv_op_ecall = 115,
-+    rv_op_ebreak = 116,
-+    rv_op_uret = 117,
-+    rv_op_sret = 118,
-+    rv_op_hret = 119,
-+    rv_op_mret = 120,
-+    rv_op_dret = 121,
-+    rv_op_sfence_vm = 122,
-+    rv_op_sfence_vma = 123,
-+    rv_op_wfi = 124,
-+    rv_op_csrrw = 125,
-+    rv_op_csrrs = 126,
-+    rv_op_csrrc = 127,
-+    rv_op_csrrwi = 128,
-+    rv_op_csrrsi = 129,
-+    rv_op_csrrci = 130,
-+    rv_op_flw = 131,
-+    rv_op_fsw = 132,
-+    rv_op_fmadd_s = 133,
-+    rv_op_fmsub_s = 134,
-+    rv_op_fnmsub_s = 135,
-+    rv_op_fnmadd_s = 136,
-+    rv_op_fadd_s = 137,
-+    rv_op_fsub_s = 138,
-+    rv_op_fmul_s = 139,
-+    rv_op_fdiv_s = 140,
-+    rv_op_fsgnj_s = 141,
-+    rv_op_fsgnjn_s = 142,
-+    rv_op_fsgnjx_s = 143,
-+    rv_op_fmin_s = 144,
-+    rv_op_fmax_s = 145,
-+    rv_op_fsqrt_s = 146,
-+    rv_op_fle_s = 147,
-+    rv_op_flt_s = 148,
-+    rv_op_feq_s = 149,
-+    rv_op_fcvt_w_s = 150,
-+    rv_op_fcvt_wu_s = 151,
-+    rv_op_fcvt_s_w = 152,
-+    rv_op_fcvt_s_wu = 153,
-+    rv_op_fmv_x_s = 154,
-+    rv_op_fclass_s = 155,
-+    rv_op_fmv_s_x = 156,
-+    rv_op_fcvt_l_s = 157,
-+    rv_op_fcvt_lu_s = 158,
-+    rv_op_fcvt_s_l = 159,
-+    rv_op_fcvt_s_lu = 160,
-+    rv_op_fld = 161,
-+    rv_op_fsd = 162,
-+    rv_op_fmadd_d = 163,
-+    rv_op_fmsub_d = 164,
-+    rv_op_fnmsub_d = 165,
-+    rv_op_fnmadd_d = 166,
-+    rv_op_fadd_d = 167,
-+    rv_op_fsub_d = 168,
-+    rv_op_fmul_d = 169,
-+    rv_op_fdiv_d = 170,
-+    rv_op_fsgnj_d = 171,
-+    rv_op_fsgnjn_d = 172,
-+    rv_op_fsgnjx_d = 173,
-+    rv_op_fmin_d = 174,
-+    rv_op_fmax_d = 175,
-+    rv_op_fcvt_s_d = 176,
-+    rv_op_fcvt_d_s = 177,
-+    rv_op_fsqrt_d = 178,
-+    rv_op_fle_d = 179,
-+    rv_op_flt_d = 180,
-+    rv_op_feq_d = 181,
-+    rv_op_fcvt_w_d = 182,
-+    rv_op_fcvt_wu_d = 183,
-+    rv_op_fcvt_d_w = 184,
-+    rv_op_fcvt_d_wu = 185,
-+    rv_op_fclass_d = 186,
-+    rv_op_fcvt_l_d = 187,
-+    rv_op_fcvt_lu_d = 188,
-+    rv_op_fmv_x_d = 189,
-+    rv_op_fcvt_d_l = 190,
-+    rv_op_fcvt_d_lu = 191,
-+    rv_op_fmv_d_x = 192,
-+    rv_op_flq = 193,
-+    rv_op_fsq = 194,
-+    rv_op_fmadd_q = 195,
-+    rv_op_fmsub_q = 196,
-+    rv_op_fnmsub_q = 197,
-+    rv_op_fnmadd_q = 198,
-+    rv_op_fadd_q = 199,
-+    rv_op_fsub_q = 200,
-+    rv_op_fmul_q = 201,
-+    rv_op_fdiv_q = 202,
-+    rv_op_fsgnj_q = 203,
-+    rv_op_fsgnjn_q = 204,
-+    rv_op_fsgnjx_q = 205,
-+    rv_op_fmin_q = 206,
-+    rv_op_fmax_q = 207,
-+    rv_op_fcvt_s_q = 208,
-+    rv_op_fcvt_q_s = 209,
-+    rv_op_fcvt_d_q = 210,
-+    rv_op_fcvt_q_d = 211,
-+    rv_op_fsqrt_q = 212,
-+    rv_op_fle_q = 213,
-+    rv_op_flt_q = 214,
-+    rv_op_feq_q = 215,
-+    rv_op_fcvt_w_q = 216,
-+    rv_op_fcvt_wu_q = 217,
-+    rv_op_fcvt_q_w = 218,
-+    rv_op_fcvt_q_wu = 219,
-+    rv_op_fclass_q = 220,
-+    rv_op_fcvt_l_q = 221,
-+    rv_op_fcvt_lu_q = 222,
-+    rv_op_fcvt_q_l = 223,
-+    rv_op_fcvt_q_lu = 224,
-+    rv_op_fmv_x_q = 225,
-+    rv_op_fmv_q_x = 226,
-+    rv_op_c_addi4spn = 227,
-+    rv_op_c_fld = 228,
-+    rv_op_c_lw = 229,
-+    rv_op_c_flw = 230,
-+    rv_op_c_fsd = 231,
-+    rv_op_c_sw = 232,
-+    rv_op_c_fsw = 233,
-+    rv_op_c_nop = 234,
-+    rv_op_c_addi = 235,
-+    rv_op_c_jal = 236,
-+    rv_op_c_li = 237,
-+    rv_op_c_addi16sp = 238,
-+    rv_op_c_lui = 239,
-+    rv_op_c_srli = 240,
-+    rv_op_c_srai = 241,
-+    rv_op_c_andi = 242,
-+    rv_op_c_sub = 243,
-+    rv_op_c_xor = 244,
-+    rv_op_c_or = 245,
-+    rv_op_c_and = 246,
-+    rv_op_c_subw = 247,
-+    rv_op_c_addw = 248,
-+    rv_op_c_j = 249,
-+    rv_op_c_beqz = 250,
-+    rv_op_c_bnez = 251,
-+    rv_op_c_slli = 252,
-+    rv_op_c_fldsp = 253,
-+    rv_op_c_lwsp = 254,
-+    rv_op_c_flwsp = 255,
-+    rv_op_c_jr = 256,
-+    rv_op_c_mv = 257,
-+    rv_op_c_ebreak = 258,
-+    rv_op_c_jalr = 259,
-+    rv_op_c_add = 260,
-+    rv_op_c_fsdsp = 261,
-+    rv_op_c_swsp = 262,
-+    rv_op_c_fswsp = 263,
-+    rv_op_c_ld = 264,
-+    rv_op_c_sd = 265,
-+    rv_op_c_addiw = 266,
-+    rv_op_c_ldsp = 267,
-+    rv_op_c_sdsp = 268,
-+    rv_op_c_lq = 269,
-+    rv_op_c_sq = 270,
-+    rv_op_c_lqsp = 271,
-+    rv_op_c_sqsp = 272,
-+    rv_op_nop = 273,
-+    rv_op_mv = 274,
-+    rv_op_not = 275,
-+    rv_op_neg = 276,
-+    rv_op_negw = 277,
-+    rv_op_sext_w = 278,
-+    rv_op_seqz = 279,
-+    rv_op_snez = 280,
-+    rv_op_sltz = 281,
-+    rv_op_sgtz = 282,
-+    rv_op_fmv_s = 283,
-+    rv_op_fabs_s = 284,
-+    rv_op_fneg_s = 285,
-+    rv_op_fmv_d = 286,
-+    rv_op_fabs_d = 287,
-+    rv_op_fneg_d = 288,
-+    rv_op_fmv_q = 289,
-+    rv_op_fabs_q = 290,
-+    rv_op_fneg_q = 291,
-+    rv_op_beqz = 292,
-+    rv_op_bnez = 293,
-+    rv_op_blez = 294,
-+    rv_op_bgez = 295,
-+    rv_op_bltz = 296,
-+    rv_op_bgtz = 297,
-+    rv_op_ble = 298,
-+    rv_op_bleu = 299,
-+    rv_op_bgt = 300,
-+    rv_op_bgtu = 301,
-+    rv_op_j = 302,
-+    rv_op_ret = 303,
-+    rv_op_jr = 304,
-+    rv_op_rdcycle = 305,
-+    rv_op_rdtime = 306,
-+    rv_op_rdinstret = 307,
-+    rv_op_rdcycleh = 308,
-+    rv_op_rdtimeh = 309,
-+    rv_op_rdinstreth = 310,
-+    rv_op_frcsr = 311,
-+    rv_op_frrm = 312,
-+    rv_op_frflags = 313,
-+    rv_op_fscsr = 314,
-+    rv_op_fsrm = 315,
-+    rv_op_fsflags = 316,
-+    rv_op_fsrmi = 317,
-+    rv_op_fsflagsi = 318,
-+} rv_op;
-+
-+/* structures */
-+
-+typedef struct {
-+    uint64_t  pc;
-+    uint64_t  inst;
-+    int32_t   imm;
-+    uint16_t  op;
-+    uint8_t   codec;
-+    uint8_t   rd;
-+    uint8_t   rs1;
-+    uint8_t   rs2;
-+    uint8_t   rs3;
-+    uint8_t   rm;
-+    uint8_t   pred;
-+    uint8_t   succ;
-+    uint8_t   aq;
-+    uint8_t   rl;
-+} rv_decode;
-+
-+typedef struct {
-+    const int op;
-+    const rvc_constraint *constraints;
-+} rv_comp_data;
-+
-+typedef struct {
-+    const char * const name;
-+    const rv_codec codec;
-+    const char * const format;
-+    const rv_comp_data *pseudo;
-+    const int decomp_rv32;
-+    const int decomp_rv64;
-+    const int decomp_rv128;
-+} rv_opcode_data;
-+
-+/* register names */
-+
-+static const char rv_ireg_name_sym[32][5] = {
-+    "zero", "ra",   "sp",   "gp",   "tp",   "t0",   "t1",   "t2",
-+    "s0",   "s1",   "a0",   "a1",   "a2",   "a3",   "a4",   "a5",
-+    "a6",   "a7",   "s2",   "s3",   "s4",   "s5",   "s6",   "s7",
-+    "s8",   "s9",   "s10",  "s11",  "t3",   "t4",   "t5",   "t6",
-+};
-+
-+static const char rv_freg_name_sym[32][5] = {
-+    "ft0",  "ft1",  "ft2",  "ft3",  "ft4",  "ft5",  "ft6",  "ft7",
-+    "fs0",  "fs1",  "fa0",  "fa1",  "fa2",  "fa3",  "fa4",  "fa5",
-+    "fa6",  "fa7",  "fs2",  "fs3",  "fs4",  "fs5",  "fs6",  "fs7",
-+    "fs8",  "fs9",  "fs10", "fs11", "ft8",  "ft9",  "ft10", "ft11",
-+};
-+
-+/* instruction formats */
-+
-+#define rv_fmt_none                   "O\t"
-+#define rv_fmt_rs1                    "O\t1"
-+#define rv_fmt_offset                 "O\to"
-+#define rv_fmt_pred_succ              "O\tp,s"
-+#define rv_fmt_rs1_rs2                "O\t1,2"
-+#define rv_fmt_rd_imm                 "O\t0,i"
-+#define rv_fmt_rd_offset              "O\t0,o"
-+#define rv_fmt_rd_rs1_rs2             "O\t0,1,2"
-+#define rv_fmt_frd_rs1                "O\t3,1"
-+#define rv_fmt_rd_frs1                "O\t0,4"
-+#define rv_fmt_rd_frs1_frs2           "O\t0,4,5"
-+#define rv_fmt_frd_frs1_frs2          "O\t3,4,5"
-+#define rv_fmt_rm_frd_frs1            "O\tr,3,4"
-+#define rv_fmt_rm_frd_rs1             "O\tr,3,1"
-+#define rv_fmt_rm_rd_frs1             "O\tr,0,4"
-+#define rv_fmt_rm_frd_frs1_frs2       "O\tr,3,4,5"
-+#define rv_fmt_rm_frd_frs1_frs2_frs3  "O\tr,3,4,5,6"
-+#define rv_fmt_rd_rs1_imm             "O\t0,1,i"
-+#define rv_fmt_rd_rs1_offset          "O\t0,1,i"
-+#define rv_fmt_rd_offset_rs1          "O\t0,i(1)"
-+#define rv_fmt_frd_offset_rs1         "O\t3,i(1)"
-+#define rv_fmt_rd_csr_rs1             "O\t0,c,1"
-+#define rv_fmt_rd_csr_zimm            "O\t0,c,7"
-+#define rv_fmt_rs2_offset_rs1         "O\t2,i(1)"
-+#define rv_fmt_frs2_offset_rs1        "O\t5,i(1)"
-+#define rv_fmt_rs1_rs2_offset         "O\t1,2,o"
-+#define rv_fmt_rs2_rs1_offset         "O\t2,1,o"
-+#define rv_fmt_aqrl_rd_rs2_rs1        "OAR\t0,2,(1)"
-+#define rv_fmt_aqrl_rd_rs1            "OAR\t0,(1)"
-+#define rv_fmt_rd                     "O\t0"
-+#define rv_fmt_rd_zimm                "O\t0,7"
-+#define rv_fmt_rd_rs1                 "O\t0,1"
-+#define rv_fmt_rd_rs2                 "O\t0,2"
-+#define rv_fmt_rs1_offset             "O\t1,o"
-+#define rv_fmt_rs2_offset             "O\t2,o"
-+
-+/* pseudo-instruction constraints */
-+
-+static const rvc_constraint rvcc_jal[] = { rvc_rd_eq_ra, rvc_end };
-+static const rvc_constraint rvcc_jalr[] = { rvc_rd_eq_ra, rvc_imm_eq_zero, rvc_end };
-+static const rvc_constraint rvcc_nop[] = { rvc_rd_eq_x0, rvc_rs1_eq_x0, rvc_imm_eq_zero, rvc_end };
-+static const rvc_constraint rvcc_mv[] = { rvc_imm_eq_zero, rvc_end };
-+static const rvc_constraint rvcc_not[] = { rvc_imm_eq_n1, rvc_end };
-+static const rvc_constraint rvcc_neg[] = { rvc_rs1_eq_x0, rvc_end };
-+static const rvc_constraint rvcc_negw[] = { rvc_rs1_eq_x0, rvc_end };
-+static const rvc_constraint rvcc_sext_w[] = { rvc_rs2_eq_x0, rvc_end };
-+static const rvc_constraint rvcc_seqz[] = { rvc_imm_eq_p1, rvc_end };
-+static const rvc_constraint rvcc_snez[] = { rvc_rs1_eq_x0, rvc_end };
-+static const rvc_constraint rvcc_sltz[] = { rvc_rs2_eq_x0, rvc_end };
-+static const rvc_constraint rvcc_sgtz[] = { rvc_rs1_eq_x0, rvc_end };
-+static const rvc_constraint rvcc_fmv_s[] = { rvc_rs2_eq_rs1, rvc_end };
-+static const rvc_constraint rvcc_fabs_s[] = { rvc_rs2_eq_rs1, rvc_end };
-+static const rvc_constraint rvcc_fneg_s[] = { rvc_rs2_eq_rs1, rvc_end };
-+static const rvc_constraint rvcc_fmv_d[] = { rvc_rs2_eq_rs1, rvc_end };
-+static const rvc_constraint rvcc_fabs_d[] = { rvc_rs2_eq_rs1, rvc_end };
-+static const rvc_constraint rvcc_fneg_d[] = { rvc_rs2_eq_rs1, rvc_end };
-+static const rvc_constraint rvcc_fmv_q[] = { rvc_rs2_eq_rs1, rvc_end };
-+static const rvc_constraint rvcc_fabs_q[] = { rvc_rs2_eq_rs1, rvc_end };
-+static const rvc_constraint rvcc_fneg_q[] = { rvc_rs2_eq_rs1, rvc_end };
-+static const rvc_constraint rvcc_beqz[] = { rvc_rs2_eq_x0, rvc_end };
-+static const rvc_constraint rvcc_bnez[] = { rvc_rs2_eq_x0, rvc_end };
-+static const rvc_constraint rvcc_blez[] = { rvc_rs1_eq_x0, rvc_end };
-+static const rvc_constraint rvcc_bgez[] = { rvc_rs2_eq_x0, rvc_end };
-+static const rvc_constraint rvcc_bltz[] = { rvc_rs2_eq_x0, rvc_end };
-+static const rvc_constraint rvcc_bgtz[] = { rvc_rs1_eq_x0, rvc_end };
-+static const rvc_constraint rvcc_ble[] = { rvc_end };
-+static const rvc_constraint rvcc_bleu[] = { rvc_end };
-+static const rvc_constraint rvcc_bgt[] = { rvc_end };
-+static const rvc_constraint rvcc_bgtu[] = { rvc_end };
-+static const rvc_constraint rvcc_j[] = { rvc_rd_eq_x0, rvc_end };
-+static const rvc_constraint rvcc_ret[] = { rvc_rd_eq_x0, rvc_rs1_eq_ra, rvc_end };
-+static const rvc_constraint rvcc_jr[] = { rvc_rd_eq_x0, rvc_imm_eq_zero, rvc_end };
-+static const rvc_constraint rvcc_rdcycle[] = { rvc_rs1_eq_x0, rvc_csr_eq_0xc00, rvc_end };
-+static const rvc_constraint rvcc_rdtime[] = { rvc_rs1_eq_x0, rvc_csr_eq_0xc01, rvc_end };
-+static const rvc_constraint rvcc_rdinstret[] = { rvc_rs1_eq_x0, rvc_csr_eq_0xc02, rvc_end };
-+static const rvc_constraint rvcc_rdcycleh[] = { rvc_rs1_eq_x0, rvc_csr_eq_0xc80, rvc_end };
-+static const rvc_constraint rvcc_rdtimeh[] = { rvc_rs1_eq_x0, rvc_csr_eq_0xc81, rvc_end };
-+static const rvc_constraint rvcc_rdinstreth[] = { rvc_rs1_eq_x0, rvc_csr_eq_0xc80, rvc_end };
-+static const rvc_constraint rvcc_frcsr[] = { rvc_rs1_eq_x0, rvc_csr_eq_0x003, rvc_end };
-+static const rvc_constraint rvcc_frrm[] = { rvc_rs1_eq_x0, rvc_csr_eq_0x002, rvc_end };
-+static const rvc_constraint rvcc_frflags[] = { rvc_rs1_eq_x0, rvc_csr_eq_0x001, rvc_end };
-+static const rvc_constraint rvcc_fscsr[] = { rvc_csr_eq_0x003, rvc_end };
-+static const rvc_constraint rvcc_fsrm[] = { rvc_csr_eq_0x002, rvc_end };
-+static const rvc_constraint rvcc_fsflags[] = { rvc_csr_eq_0x001, rvc_end };
-+static const rvc_constraint rvcc_fsrmi[] = { rvc_csr_eq_0x002, rvc_end };
-+static const rvc_constraint rvcc_fsflagsi[] = { rvc_csr_eq_0x001, rvc_end };
-+
-+/* pseudo-instruction metadata */
-+
-+static const rv_comp_data rvcp_jal[] = {
-+    { rv_op_j, rvcc_j },
-+    { rv_op_jal, rvcc_jal },
-+    { rv_op_illegal, NULL }
-+};
-+
-+static const rv_comp_data rvcp_jalr[] = {
-+    { rv_op_ret, rvcc_ret },
-+    { rv_op_jr, rvcc_jr },
-+    { rv_op_jalr, rvcc_jalr },
-+    { rv_op_illegal, NULL }
-+};
-+
-+static const rv_comp_data rvcp_beq[] = {
-+    { rv_op_beqz, rvcc_beqz },
-+    { rv_op_illegal, NULL }
-+};
-+
-+static const rv_comp_data rvcp_bne[] = {
-+    { rv_op_bnez, rvcc_bnez },
-+    { rv_op_illegal, NULL }
-+};
-+
-+static const rv_comp_data rvcp_blt[] = {
-+    { rv_op_bltz, rvcc_bltz },
-+    { rv_op_bgtz, rvcc_bgtz },
-+    { rv_op_bgt, rvcc_bgt },
-+    { rv_op_illegal, NULL }
-+};
-+
-+static const rv_comp_data rvcp_bge[] = {
-+    { rv_op_blez, rvcc_blez },
-+    { rv_op_bgez, rvcc_bgez },
-+    { rv_op_ble, rvcc_ble },
-+    { rv_op_illegal, NULL }
-+};
-+
-+static const rv_comp_data rvcp_bltu[] = {
-+    { rv_op_bgtu, rvcc_bgtu },
-+    { rv_op_illegal, NULL }
-+};
-+
-+static const rv_comp_data rvcp_bgeu[] = {
-+    { rv_op_bleu, rvcc_bleu },
-+    { rv_op_illegal, NULL }
-+};
-+
-+static const rv_comp_data rvcp_addi[] = {
-+    { rv_op_nop, rvcc_nop },
-+    { rv_op_mv, rvcc_mv },
-+    { rv_op_illegal, NULL }
-+};
-+
-+static const rv_comp_data rvcp_sltiu[] = {
-+    { rv_op_seqz, rvcc_seqz },
-+    { rv_op_illegal, NULL }
-+};
-+
-+static const rv_comp_data rvcp_xori[] = {
-+    { rv_op_not, rvcc_not },
-+    { rv_op_illegal, NULL }
-+};
-+
-+static const rv_comp_data rvcp_sub[] = {
-+    { rv_op_neg, rvcc_neg },
-+    { rv_op_illegal, NULL }
-+};
-+
-+static const rv_comp_data rvcp_slt[] = {
-+    { rv_op_sltz, rvcc_sltz },
-+    { rv_op_sgtz, rvcc_sgtz },
-+    { rv_op_illegal, NULL }
-+};
-+
-+static const rv_comp_data rvcp_sltu[] = {
-+    { rv_op_snez, rvcc_snez },
-+    { rv_op_illegal, NULL }
-+};
-+
-+static const rv_comp_data rvcp_addiw[] = {
-+    { rv_op_sext_w, rvcc_sext_w },
-+    { rv_op_illegal, NULL }
-+};
-+
-+static const rv_comp_data rvcp_subw[] = {
-+    { rv_op_negw, rvcc_negw },
-+    { rv_op_illegal, NULL }
-+};
-+
-+static const rv_comp_data rvcp_csrrw[] = {
-+    { rv_op_fscsr, rvcc_fscsr },
-+    { rv_op_fsrm, rvcc_fsrm },
-+    { rv_op_fsflags, rvcc_fsflags },
-+    { rv_op_illegal, NULL }
-+};
-+
-+static const rv_comp_data rvcp_csrrs[] = {
-+    { rv_op_rdcycle, rvcc_rdcycle },
-+    { rv_op_rdtime, rvcc_rdtime },
-+    { rv_op_rdinstret, rvcc_rdinstret },
-+    { rv_op_rdcycleh, rvcc_rdcycleh },
-+    { rv_op_rdtimeh, rvcc_rdtimeh },
-+    { rv_op_rdinstreth, rvcc_rdinstreth },
-+    { rv_op_frcsr, rvcc_frcsr },
-+    { rv_op_frrm, rvcc_frrm },
-+    { rv_op_frflags, rvcc_frflags },
-+    { rv_op_illegal, NULL }
-+};
-+
-+static const rv_comp_data rvcp_csrrwi[] = {
-+    { rv_op_fsrmi, rvcc_fsrmi },
-+    { rv_op_fsflagsi, rvcc_fsflagsi },
-+    { rv_op_illegal, NULL }
-+};
-+
-+static const rv_comp_data rvcp_fsgnj_s[] = {
-+    { rv_op_fmv_s, rvcc_fmv_s },
-+    { rv_op_illegal, NULL }
-+};
-+
-+static const rv_comp_data rvcp_fsgnjn_s[] = {
-+    { rv_op_fneg_s, rvcc_fneg_s },
-+    { rv_op_illegal, NULL }
-+};
-+
-+static const rv_comp_data rvcp_fsgnjx_s[] = {
-+    { rv_op_fabs_s, rvcc_fabs_s },
-+    { rv_op_illegal, NULL }
-+};
-+
-+static const rv_comp_data rvcp_fsgnj_d[] = {
-+    { rv_op_fmv_d, rvcc_fmv_d },
-+    { rv_op_illegal, NULL }
-+};
-+
-+static const rv_comp_data rvcp_fsgnjn_d[] = {
-+    { rv_op_fneg_d, rvcc_fneg_d },
-+    { rv_op_illegal, NULL }
-+};
-+
-+static const rv_comp_data rvcp_fsgnjx_d[] = {
-+    { rv_op_fabs_d, rvcc_fabs_d },
-+    { rv_op_illegal, NULL }
-+};
-+
-+static const rv_comp_data rvcp_fsgnj_q[] = {
-+    { rv_op_fmv_q, rvcc_fmv_q },
-+    { rv_op_illegal, NULL }
-+};
-+
-+static const rv_comp_data rvcp_fsgnjn_q[] = {
-+    { rv_op_fneg_q, rvcc_fneg_q },
-+    { rv_op_illegal, NULL }
-+};
-+
-+static const rv_comp_data rvcp_fsgnjx_q[] = {
-+    { rv_op_fabs_q, rvcc_fabs_q },
-+    { rv_op_illegal, NULL }
-+};
-+
-+/* instruction metadata */
-+
-+const rv_opcode_data opcode_data[] = {
-+    { "illegal", rv_codec_illegal, rv_fmt_none, NULL, 0, 0, 0 },
-+    { "lui", rv_codec_u, rv_fmt_rd_imm, NULL, 0, 0, 0 },
-+    { "auipc", rv_codec_u, rv_fmt_rd_offset, NULL, 0, 0, 0 },
-+    { "jal", rv_codec_uj, rv_fmt_rd_offset, rvcp_jal, 0, 0, 0 },
-+    { "jalr", rv_codec_i, rv_fmt_rd_rs1_offset, rvcp_jalr, 0, 0, 0 },
-+    { "beq", rv_codec_sb, rv_fmt_rs1_rs2_offset, rvcp_beq, 0, 0, 0 },
-+    { "bne", rv_codec_sb, rv_fmt_rs1_rs2_offset, rvcp_bne, 0, 0, 0 },
-+    { "blt", rv_codec_sb, rv_fmt_rs1_rs2_offset, rvcp_blt, 0, 0, 0 },
-+    { "bge", rv_codec_sb, rv_fmt_rs1_rs2_offset, rvcp_bge, 0, 0, 0 },
-+    { "bltu", rv_codec_sb, rv_fmt_rs1_rs2_offset, rvcp_bltu, 0, 0, 0 },
-+    { "bgeu", rv_codec_sb, rv_fmt_rs1_rs2_offset, rvcp_bgeu, 0, 0, 0 },
-+    { "lb", rv_codec_i, rv_fmt_rd_offset_rs1, NULL, 0, 0, 0 },
-+    { "lh", rv_codec_i, rv_fmt_rd_offset_rs1, NULL, 0, 0, 0 },
-+    { "lw", rv_codec_i, rv_fmt_rd_offset_rs1, NULL, 0, 0, 0 },
-+    { "lbu", rv_codec_i, rv_fmt_rd_offset_rs1, NULL, 0, 0, 0 },
-+    { "lhu", rv_codec_i, rv_fmt_rd_offset_rs1, NULL, 0, 0, 0 },
-+    { "sb", rv_codec_s, rv_fmt_rs2_offset_rs1, NULL, 0, 0, 0 },
-+    { "sh", rv_codec_s, rv_fmt_rs2_offset_rs1, NULL, 0, 0, 0 },
-+    { "sw", rv_codec_s, rv_fmt_rs2_offset_rs1, NULL, 0, 0, 0 },
-+    { "addi", rv_codec_i, rv_fmt_rd_rs1_imm, rvcp_addi, 0, 0, 0 },
-+    { "slti", rv_codec_i, rv_fmt_rd_rs1_imm, NULL, 0, 0, 0 },
-+    { "sltiu", rv_codec_i, rv_fmt_rd_rs1_imm, rvcp_sltiu, 0, 0, 0 },
-+    { "xori", rv_codec_i, rv_fmt_rd_rs1_imm, rvcp_xori, 0, 0, 0 },
-+    { "ori", rv_codec_i, rv_fmt_rd_rs1_imm, NULL, 0, 0, 0 },
-+    { "andi", rv_codec_i, rv_fmt_rd_rs1_imm, NULL, 0, 0, 0 },
-+    { "slli", rv_codec_i_sh7, rv_fmt_rd_rs1_imm, NULL, 0, 0, 0 },
-+    { "srli", rv_codec_i_sh7, rv_fmt_rd_rs1_imm, NULL, 0, 0, 0 },
-+    { "srai", rv_codec_i_sh7, rv_fmt_rd_rs1_imm, NULL, 0, 0, 0 },
-+    { "add", rv_codec_r, rv_fmt_rd_rs1_rs2, NULL, 0, 0, 0 },
-+    { "sub", rv_codec_r, rv_fmt_rd_rs1_rs2, rvcp_sub, 0, 0, 0 },
-+    { "sll", rv_codec_r, rv_fmt_rd_rs1_rs2, NULL, 0, 0, 0 },
-+    { "slt", rv_codec_r, rv_fmt_rd_rs1_rs2, rvcp_slt, 0, 0, 0 },
-+    { "sltu", rv_codec_r, rv_fmt_rd_rs1_rs2, rvcp_sltu, 0, 0, 0 },
-+    { "xor", rv_codec_r, rv_fmt_rd_rs1_rs2, NULL, 0, 0, 0 },
-+    { "srl", rv_codec_r, rv_fmt_rd_rs1_rs2, NULL, 0, 0, 0 },
-+    { "sra", rv_codec_r, rv_fmt_rd_rs1_rs2, NULL, 0, 0, 0 },
-+    { "or", rv_codec_r, rv_fmt_rd_rs1_rs2, NULL, 0, 0, 0 },
-+    { "and", rv_codec_r, rv_fmt_rd_rs1_rs2, NULL, 0, 0, 0 },
-+    { "fence", rv_codec_r_f, rv_fmt_pred_succ, NULL, 0, 0, 0 },
-+    { "fence.i", rv_codec_none, rv_fmt_none, NULL, 0, 0, 0 },
-+    { "lwu", rv_codec_i, rv_fmt_rd_offset_rs1, NULL, 0, 0, 0 },
-+    { "ld", rv_codec_i, rv_fmt_rd_offset_rs1, NULL, 0, 0, 0 },
-+    { "sd", rv_codec_s, rv_fmt_rs2_offset_rs1, NULL, 0, 0, 0 },
-+    { "addiw", rv_codec_i, rv_fmt_rd_rs1_imm, rvcp_addiw, 0, 0, 0 },
-+    { "slliw", rv_codec_i_sh5, rv_fmt_rd_rs1_imm, NULL, 0, 0, 0 },
-+    { "srliw", rv_codec_i_sh5, rv_fmt_rd_rs1_imm, NULL, 0, 0, 0 },
-+    { "sraiw", rv_codec_i_sh5, rv_fmt_rd_rs1_imm, NULL, 0, 0, 0 },
-+    { "addw", rv_codec_r, rv_fmt_rd_rs1_rs2, NULL, 0, 0, 0 },
-+    { "subw", rv_codec_r, rv_fmt_rd_rs1_rs2, rvcp_subw, 0, 0, 0 },
-+    { "sllw", rv_codec_r, rv_fmt_rd_rs1_rs2, NULL, 0, 0, 0 },
-+    { "srlw", rv_codec_r, rv_fmt_rd_rs1_rs2, NULL, 0, 0, 0 },
-+    { "sraw", rv_codec_r, rv_fmt_rd_rs1_rs2, NULL, 0, 0, 0 },
-+    { "ldu", rv_codec_i, rv_fmt_rd_offset_rs1, NULL, 0, 0, 0 },
-+    { "lq", rv_codec_i, rv_fmt_rd_offset_rs1, NULL, 0, 0, 0 },
-+    { "sq", rv_codec_s, rv_fmt_rs2_offset_rs1, NULL, 0, 0, 0 },
-+    { "addid", rv_codec_i, rv_fmt_rd_rs1_imm, NULL, 0, 0, 0 },
-+    { "sllid", rv_codec_i_sh6, rv_fmt_rd_rs1_imm, NULL, 0, 0, 0 },
-+    { "srlid", rv_codec_i_sh6, rv_fmt_rd_rs1_imm, NULL, 0, 0, 0 },
-+    { "sraid", rv_codec_i_sh6, rv_fmt_rd_rs1_imm, NULL, 0, 0, 0 },
-+    { "addd", rv_codec_r, rv_fmt_rd_rs1_rs2, NULL, 0, 0, 0 },
-+    { "subd", rv_codec_r, rv_fmt_rd_rs1_rs2, NULL, 0, 0, 0 },
-+    { "slld", rv_codec_r, rv_fmt_rd_rs1_rs2, NULL, 0, 0, 0 },
-+    { "srld", rv_codec_r, rv_fmt_rd_rs1_rs2, NULL, 0, 0, 0 },
-+    { "srad", rv_codec_r, rv_fmt_rd_rs1_rs2, NULL, 0, 0, 0 },
-+    { "mul", rv_codec_r, rv_fmt_rd_rs1_rs2, NULL, 0, 0, 0 },
-+    { "mulh", rv_codec_r, rv_fmt_rd_rs1_rs2, NULL, 0, 0, 0 },
-+    { "mulhsu", rv_codec_r, rv_fmt_rd_rs1_rs2, NULL, 0, 0, 0 },
-+    { "mulhu", rv_codec_r, rv_fmt_rd_rs1_rs2, NULL, 0, 0, 0 },
-+    { "div", rv_codec_r, rv_fmt_rd_rs1_rs2, NULL, 0, 0, 0 },
-+    { "divu", rv_codec_r, rv_fmt_rd_rs1_rs2, NULL, 0, 0, 0 },
-+    { "rem", rv_codec_r, rv_fmt_rd_rs1_rs2, NULL, 0, 0, 0 },
-+    { "remu", rv_codec_r, rv_fmt_rd_rs1_rs2, NULL, 0, 0, 0 },
-+    { "mulw", rv_codec_r, rv_fmt_rd_rs1_rs2, NULL, 0, 0, 0 },
-+    { "divw", rv_codec_r, rv_fmt_rd_rs1_rs2, NULL, 0, 0, 0 },
-+    { "divuw", rv_codec_r, rv_fmt_rd_rs1_rs2, NULL, 0, 0, 0 },
-+    { "remw", rv_codec_r, rv_fmt_rd_rs1_rs2, NULL, 0, 0, 0 },
-+    { "remuw", rv_codec_r, rv_fmt_rd_rs1_rs2, NULL, 0, 0, 0 },
-+    { "muld", rv_codec_r, rv_fmt_rd_rs1_rs2, NULL, 0, 0, 0 },
-+    { "divd", rv_codec_r, rv_fmt_rd_rs1_rs2, NULL, 0, 0, 0 },
-+    { "divud", rv_codec_r, rv_fmt_rd_rs1_rs2, NULL, 0, 0, 0 },
-+    { "remd", rv_codec_r, rv_fmt_rd_rs1_rs2, NULL, 0, 0, 0 },
-+    { "remud", rv_codec_r, rv_fmt_rd_rs1_rs2, NULL, 0, 0, 0 },
-+    { "lr.w", rv_codec_r_l, rv_fmt_aqrl_rd_rs1, NULL, 0, 0, 0 },
-+    { "sc.w", rv_codec_r_a, rv_fmt_aqrl_rd_rs2_rs1, NULL, 0, 0, 0 },
-+    { "amoswap.w", rv_codec_r_a, rv_fmt_aqrl_rd_rs2_rs1, NULL, 0, 0, 0 },
-+    { "amoadd.w", rv_codec_r_a, rv_fmt_aqrl_rd_rs2_rs1, NULL, 0, 0, 0 },
-+    { "amoxor.w", rv_codec_r_a, rv_fmt_aqrl_rd_rs2_rs1, NULL, 0, 0, 0 },
-+    { "amoor.w", rv_codec_r_a, rv_fmt_aqrl_rd_rs2_rs1, NULL, 0, 0, 0 },
-+    { "amoand.w", rv_codec_r_a, rv_fmt_aqrl_rd_rs2_rs1, NULL, 0, 0, 0 },
-+    { "amomin.w", rv_codec_r_a, rv_fmt_aqrl_rd_rs2_rs1, NULL, 0, 0, 0 },
-+    { "amomax.w", rv_codec_r_a, rv_fmt_aqrl_rd_rs2_rs1, NULL, 0, 0, 0 },
-+    { "amominu.w", rv_codec_r_a, rv_fmt_aqrl_rd_rs2_rs1, NULL, 0, 0, 0 },
-+    { "amomaxu.w", rv_codec_r_a, rv_fmt_aqrl_rd_rs2_rs1, NULL, 0, 0, 0 },
-+    { "lr.d", rv_codec_r_l, rv_fmt_aqrl_rd_rs1, NULL, 0, 0, 0 },
-+    { "sc.d", rv_codec_r_a, rv_fmt_aqrl_rd_rs2_rs1, NULL, 0, 0, 0 },
-+    { "amoswap.d", rv_codec_r_a, rv_fmt_aqrl_rd_rs2_rs1, NULL, 0, 0, 0 },
-+    { "amoadd.d", rv_codec_r_a, rv_fmt_aqrl_rd_rs2_rs1, NULL, 0, 0, 0 },
-+    { "amoxor.d", rv_codec_r_a, rv_fmt_aqrl_rd_rs2_rs1, NULL, 0, 0, 0 },
-+    { "amoor.d", rv_codec_r_a, rv_fmt_aqrl_rd_rs2_rs1, NULL, 0, 0, 0 },
-+    { "amoand.d", rv_codec_r_a, rv_fmt_aqrl_rd_rs2_rs1, NULL, 0, 0, 0 },
-+    { "amomin.d", rv_codec_r_a, rv_fmt_aqrl_rd_rs2_rs1, NULL, 0, 0, 0 },
-+    { "amomax.d", rv_codec_r_a, rv_fmt_aqrl_rd_rs2_rs1, NULL, 0, 0, 0 },
-+    { "amominu.d", rv_codec_r_a, rv_fmt_aqrl_rd_rs2_rs1, NULL, 0, 0, 0 },
-+    { "amomaxu.d", rv_codec_r_a, rv_fmt_aqrl_rd_rs2_rs1, NULL, 0, 0, 0 },
-+    { "lr.q", rv_codec_r_l, rv_fmt_aqrl_rd_rs1, NULL, 0, 0, 0 },
-+    { "sc.q", rv_codec_r_a, rv_fmt_aqrl_rd_rs2_rs1, NULL, 0, 0, 0 },
-+    { "amoswap.q", rv_codec_r_a, rv_fmt_aqrl_rd_rs2_rs1, NULL, 0, 0, 0 },
-+    { "amoadd.q", rv_codec_r_a, rv_fmt_aqrl_rd_rs2_rs1, NULL, 0, 0, 0 },
-+    { "amoxor.q", rv_codec_r_a, rv_fmt_aqrl_rd_rs2_rs1, NULL, 0, 0, 0 },
-+    { "amoor.q", rv_codec_r_a, rv_fmt_aqrl_rd_rs2_rs1, NULL, 0, 0, 0 },
-+    { "amoand.q", rv_codec_r_a, rv_fmt_aqrl_rd_rs2_rs1, NULL, 0, 0, 0 },
-+    { "amomin.q", rv_codec_r_a, rv_fmt_aqrl_rd_rs2_rs1, NULL, 0, 0, 0 },
-+    { "amomax.q", rv_codec_r_a, rv_fmt_aqrl_rd_rs2_rs1, NULL, 0, 0, 0 },
-+    { "amominu.q", rv_codec_r_a, rv_fmt_aqrl_rd_rs2_rs1, NULL, 0, 0, 0 },
-+    { "amomaxu.q", rv_codec_r_a, rv_fmt_aqrl_rd_rs2_rs1, NULL, 0, 0, 0 },
-+    { "ecall", rv_codec_none, rv_fmt_none, NULL, 0, 0, 0 },
-+    { "ebreak", rv_codec_none, rv_fmt_none, NULL, 0, 0, 0 },
-+    { "uret", rv_codec_none, rv_fmt_none, NULL, 0, 0, 0 },
-+    { "sret", rv_codec_none, rv_fmt_none, NULL, 0, 0, 0 },
-+    { "hret", rv_codec_none, rv_fmt_none, NULL, 0, 0, 0 },
-+    { "mret", rv_codec_none, rv_fmt_none, NULL, 0, 0, 0 },
-+    { "dret", rv_codec_none, rv_fmt_none, NULL, 0, 0, 0 },
-+    { "sfence.vm", rv_codec_r, rv_fmt_rs1, NULL, 0, 0, 0 },
-+    { "sfence.vma", rv_codec_r, rv_fmt_rs1_rs2, NULL, 0, 0, 0 },
-+    { "wfi", rv_codec_none, rv_fmt_none, NULL, 0, 0, 0 },
-+    { "csrrw", rv_codec_i_csr, rv_fmt_rd_csr_rs1, rvcp_csrrw, 0, 0, 0 },
-+    { "csrrs", rv_codec_i_csr, rv_fmt_rd_csr_rs1, rvcp_csrrs, 0, 0, 0 },
-+    { "csrrc", rv_codec_i_csr, rv_fmt_rd_csr_rs1, NULL, 0, 0, 0 },
-+    { "csrrwi", rv_codec_i_csr, rv_fmt_rd_csr_zimm, rvcp_csrrwi, 0, 0, 0 },
-+    { "csrrsi", rv_codec_i_csr, rv_fmt_rd_csr_zimm, NULL, 0, 0, 0 },
-+    { "csrrci", rv_codec_i_csr, rv_fmt_rd_csr_zimm, NULL, 0, 0, 0 },
-+    { "flw", rv_codec_i, rv_fmt_frd_offset_rs1, NULL, 0, 0, 0 },
-+    { "fsw", rv_codec_s, rv_fmt_frs2_offset_rs1, NULL, 0, 0, 0 },
-+    { "fmadd.s", rv_codec_r4_m, rv_fmt_rm_frd_frs1_frs2_frs3, NULL, 0, 0, 0 },
-+    { "fmsub.s", rv_codec_r4_m, rv_fmt_rm_frd_frs1_frs2_frs3, NULL, 0, 0, 0 },
-+    { "fnmsub.s", rv_codec_r4_m, rv_fmt_rm_frd_frs1_frs2_frs3, NULL, 0, 0, 0 },
-+    { "fnmadd.s", rv_codec_r4_m, rv_fmt_rm_frd_frs1_frs2_frs3, NULL, 0, 0, 0 },
-+    { "fadd.s", rv_codec_r_m, rv_fmt_rm_frd_frs1_frs2, NULL, 0, 0, 0 },
-+    { "fsub.s", rv_codec_r_m, rv_fmt_rm_frd_frs1_frs2, NULL, 0, 0, 0 },
-+    { "fmul.s", rv_codec_r_m, rv_fmt_rm_frd_frs1_frs2, NULL, 0, 0, 0 },
-+    { "fdiv.s", rv_codec_r_m, rv_fmt_rm_frd_frs1_frs2, NULL, 0, 0, 0 },
-+    { "fsgnj.s", rv_codec_r, rv_fmt_frd_frs1_frs2, rvcp_fsgnj_s, 0, 0, 0 },
-+    { "fsgnjn.s", rv_codec_r, rv_fmt_frd_frs1_frs2, rvcp_fsgnjn_s, 0, 0, 0 },
-+    { "fsgnjx.s", rv_codec_r, rv_fmt_frd_frs1_frs2, rvcp_fsgnjx_s, 0, 0, 0 },
-+    { "fmin.s", rv_codec_r, rv_fmt_frd_frs1_frs2, NULL, 0, 0, 0 },
-+    { "fmax.s", rv_codec_r, rv_fmt_frd_frs1_frs2, NULL, 0, 0, 0 },
-+    { "fsqrt.s", rv_codec_r_m, rv_fmt_rm_frd_frs1, NULL, 0, 0, 0 },
-+    { "fle.s", rv_codec_r, rv_fmt_rd_frs1_frs2, NULL, 0, 0, 0 },
-+    { "flt.s", rv_codec_r, rv_fmt_rd_frs1_frs2, NULL, 0, 0, 0 },
-+    { "feq.s", rv_codec_r, rv_fmt_rd_frs1_frs2, NULL, 0, 0, 0 },
-+    { "fcvt.w.s", rv_codec_r_m, rv_fmt_rm_rd_frs1, NULL, 0, 0, 0 },
-+    { "fcvt.wu.s", rv_codec_r_m, rv_fmt_rm_rd_frs1, NULL, 0, 0, 0 },
-+    { "fcvt.s.w", rv_codec_r_m, rv_fmt_rm_frd_rs1, NULL, 0, 0, 0 },
-+    { "fcvt.s.wu", rv_codec_r_m, rv_fmt_rm_frd_rs1, NULL, 0, 0, 0 },
-+    { "fmv.x.s", rv_codec_r, rv_fmt_rd_frs1, NULL, 0, 0, 0 },
-+    { "fclass.s", rv_codec_r, rv_fmt_rd_frs1, NULL, 0, 0, 0 },
-+    { "fmv.s.x", rv_codec_r, rv_fmt_frd_rs1, NULL, 0, 0, 0 },
-+    { "fcvt.l.s", rv_codec_r_m, rv_fmt_rm_rd_frs1, NULL, 0, 0, 0 },
-+    { "fcvt.lu.s", rv_codec_r_m, rv_fmt_rm_rd_frs1, NULL, 0, 0, 0 },
-+    { "fcvt.s.l", rv_codec_r_m, rv_fmt_rm_frd_rs1, NULL, 0, 0, 0 },
-+    { "fcvt.s.lu", rv_codec_r_m, rv_fmt_rm_frd_rs1, NULL, 0, 0, 0 },
-+    { "fld", rv_codec_i, rv_fmt_frd_offset_rs1, NULL, 0, 0, 0 },
-+    { "fsd", rv_codec_s, rv_fmt_frs2_offset_rs1, NULL, 0, 0, 0 },
-+    { "fmadd.d", rv_codec_r4_m, rv_fmt_rm_frd_frs1_frs2_frs3, NULL, 0, 0, 0 },
-+    { "fmsub.d", rv_codec_r4_m, rv_fmt_rm_frd_frs1_frs2_frs3, NULL, 0, 0, 0 },
-+    { "fnmsub.d", rv_codec_r4_m, rv_fmt_rm_frd_frs1_frs2_frs3, NULL, 0, 0, 0 },
-+    { "fnmadd.d", rv_codec_r4_m, rv_fmt_rm_frd_frs1_frs2_frs3, NULL, 0, 0, 0 },
-+    { "fadd.d", rv_codec_r_m, rv_fmt_rm_frd_frs1_frs2, NULL, 0, 0, 0 },
-+    { "fsub.d", rv_codec_r_m, rv_fmt_rm_frd_frs1_frs2, NULL, 0, 0, 0 },
-+    { "fmul.d", rv_codec_r_m, rv_fmt_rm_frd_frs1_frs2, NULL, 0, 0, 0 },
-+    { "fdiv.d", rv_codec_r_m, rv_fmt_rm_frd_frs1_frs2, NULL, 0, 0, 0 },
-+    { "fsgnj.d", rv_codec_r, rv_fmt_frd_frs1_frs2, rvcp_fsgnj_d, 0, 0, 0 },
-+    { "fsgnjn.d", rv_codec_r, rv_fmt_frd_frs1_frs2, rvcp_fsgnjn_d, 0, 0, 0 },
-+    { "fsgnjx.d", rv_codec_r, rv_fmt_frd_frs1_frs2, rvcp_fsgnjx_d, 0, 0, 0 },
-+    { "fmin.d", rv_codec_r, rv_fmt_frd_frs1_frs2, NULL, 0, 0, 0 },
-+    { "fmax.d", rv_codec_r, rv_fmt_frd_frs1_frs2, NULL, 0, 0, 0 },
-+    { "fcvt.s.d", rv_codec_r_m, rv_fmt_rm_frd_frs1, NULL, 0, 0, 0 },
-+    { "fcvt.d.s", rv_codec_r_m, rv_fmt_rm_frd_frs1, NULL, 0, 0, 0 },
-+    { "fsqrt.d", rv_codec_r_m, rv_fmt_rm_frd_frs1, NULL, 0, 0, 0 },
-+    { "fle.d", rv_codec_r, rv_fmt_rd_frs1_frs2, NULL, 0, 0, 0 },
-+    { "flt.d", rv_codec_r, rv_fmt_rd_frs1_frs2, NULL, 0, 0, 0 },
-+    { "feq.d", rv_codec_r, rv_fmt_rd_frs1_frs2, NULL, 0, 0, 0 },
-+    { "fcvt.w.d", rv_codec_r_m, rv_fmt_rm_rd_frs1, NULL, 0, 0, 0 },
-+    { "fcvt.wu.d", rv_codec_r_m, rv_fmt_rm_rd_frs1, NULL, 0, 0, 0 },
-+    { "fcvt.d.w", rv_codec_r_m, rv_fmt_rm_frd_rs1, NULL, 0, 0, 0 },
-+    { "fcvt.d.wu", rv_codec_r_m, rv_fmt_rm_frd_rs1, NULL, 0, 0, 0 },
-+    { "fclass.d", rv_codec_r, rv_fmt_rd_frs1, NULL, 0, 0, 0 },
-+    { "fcvt.l.d", rv_codec_r_m, rv_fmt_rm_rd_frs1, NULL, 0, 0, 0 },
-+    { "fcvt.lu.d", rv_codec_r_m, rv_fmt_rm_rd_frs1, NULL, 0, 0, 0 },
-+    { "fmv.x.d", rv_codec_r, rv_fmt_rd_frs1, NULL, 0, 0, 0 },
-+    { "fcvt.d.l", rv_codec_r_m, rv_fmt_rm_frd_rs1, NULL, 0, 0, 0 },
-+    { "fcvt.d.lu", rv_codec_r_m, rv_fmt_rm_frd_rs1, NULL, 0, 0, 0 },
-+    { "fmv.d.x", rv_codec_r, rv_fmt_frd_rs1, NULL, 0, 0, 0 },
-+    { "flq", rv_codec_i, rv_fmt_frd_offset_rs1, NULL, 0, 0, 0 },
-+    { "fsq", rv_codec_s, rv_fmt_frs2_offset_rs1, NULL, 0, 0, 0 },
-+    { "fmadd.q", rv_codec_r4_m, rv_fmt_rm_frd_frs1_frs2_frs3, NULL, 0, 0, 0 },
-+    { "fmsub.q", rv_codec_r4_m, rv_fmt_rm_frd_frs1_frs2_frs3, NULL, 0, 0, 0 },
-+    { "fnmsub.q", rv_codec_r4_m, rv_fmt_rm_frd_frs1_frs2_frs3, NULL, 0, 0, 0 },
-+    { "fnmadd.q", rv_codec_r4_m, rv_fmt_rm_frd_frs1_frs2_frs3, NULL, 0, 0, 0 },
-+    { "fadd.q", rv_codec_r_m, rv_fmt_rm_frd_frs1_frs2, NULL, 0, 0, 0 },
-+    { "fsub.q", rv_codec_r_m, rv_fmt_rm_frd_frs1_frs2, NULL, 0, 0, 0 },
-+    { "fmul.q", rv_codec_r_m, rv_fmt_rm_frd_frs1_frs2, NULL, 0, 0, 0 },
-+    { "fdiv.q", rv_codec_r_m, rv_fmt_rm_frd_frs1_frs2, NULL, 0, 0, 0 },
-+    { "fsgnj.q", rv_codec_r, rv_fmt_frd_frs1_frs2, rvcp_fsgnj_q, 0, 0, 0 },
-+    { "fsgnjn.q", rv_codec_r, rv_fmt_frd_frs1_frs2, rvcp_fsgnjn_q, 0, 0, 0 },
-+    { "fsgnjx.q", rv_codec_r, rv_fmt_frd_frs1_frs2, rvcp_fsgnjx_q, 0, 0, 0 },
-+    { "fmin.q", rv_codec_r, rv_fmt_frd_frs1_frs2, NULL, 0, 0, 0 },
-+    { "fmax.q", rv_codec_r, rv_fmt_frd_frs1_frs2, NULL, 0, 0, 0 },
-+    { "fcvt.s.q", rv_codec_r_m, rv_fmt_rm_frd_frs1, NULL, 0, 0, 0 },
-+    { "fcvt.q.s", rv_codec_r_m, rv_fmt_rm_frd_frs1, NULL, 0, 0, 0 },
-+    { "fcvt.d.q", rv_codec_r_m, rv_fmt_rm_frd_frs1, NULL, 0, 0, 0 },
-+    { "fcvt.q.d", rv_codec_r_m, rv_fmt_rm_frd_frs1, NULL, 0, 0, 0 },
-+    { "fsqrt.q", rv_codec_r_m, rv_fmt_rm_frd_frs1, NULL, 0, 0, 0 },
-+    { "fle.q", rv_codec_r, rv_fmt_rd_frs1_frs2, NULL, 0, 0, 0 },
-+    { "flt.q", rv_codec_r, rv_fmt_rd_frs1_frs2, NULL, 0, 0, 0 },
-+    { "feq.q", rv_codec_r, rv_fmt_rd_frs1_frs2, NULL, 0, 0, 0 },
-+    { "fcvt.w.q", rv_codec_r_m, rv_fmt_rm_rd_frs1, NULL, 0, 0, 0 },
-+    { "fcvt.wu.q", rv_codec_r_m, rv_fmt_rm_rd_frs1, NULL, 0, 0, 0 },
-+    { "fcvt.q.w", rv_codec_r_m, rv_fmt_rm_frd_rs1, NULL, 0, 0, 0 },
-+    { "fcvt.q.wu", rv_codec_r_m, rv_fmt_rm_frd_rs1, NULL, 0, 0, 0 },
-+    { "fclass.q", rv_codec_r, rv_fmt_rd_frs1, NULL, 0, 0, 0 },
-+    { "fcvt.l.q", rv_codec_r_m, rv_fmt_rm_rd_frs1, NULL, 0, 0, 0 },
-+    { "fcvt.lu.q", rv_codec_r_m, rv_fmt_rm_rd_frs1, NULL, 0, 0, 0 },
-+    { "fcvt.q.l", rv_codec_r_m, rv_fmt_rm_frd_rs1, NULL, 0, 0, 0 },
-+    { "fcvt.q.lu", rv_codec_r_m, rv_fmt_rm_frd_rs1, NULL, 0, 0, 0 },
-+    { "fmv.x.q", rv_codec_r, rv_fmt_rd_frs1, NULL, 0, 0, 0 },
-+    { "fmv.q.x", rv_codec_r, rv_fmt_frd_rs1, NULL, 0, 0, 0 },
-+    { "c.addi4spn", rv_codec_ciw_4spn, rv_fmt_rd_rs1_imm, NULL, rv_op_addi, rv_op_addi, rv_op_addi },
-+    { "c.fld", rv_codec_cl_ld, rv_fmt_frd_offset_rs1, NULL, rv_op_fld, rv_op_fld, 0 },
-+    { "c.lw", rv_codec_cl_lw, rv_fmt_rd_offset_rs1, NULL, rv_op_lw, rv_op_lw, rv_op_lw },
-+    { "c.flw", rv_codec_cl_lw, rv_fmt_frd_offset_rs1, NULL, rv_op_flw, 0, 0 },
-+    { "c.fsd", rv_codec_cs_sd, rv_fmt_frs2_offset_rs1, NULL, rv_op_fsd, rv_op_fsd, 0 },
-+    { "c.sw", rv_codec_cs_sw, rv_fmt_rs2_offset_rs1, NULL, rv_op_sw, rv_op_sw, rv_op_sw },
-+    { "c.fsw", rv_codec_cs_sw, rv_fmt_frs2_offset_rs1, NULL, rv_op_fsw, 0, 0 },
-+    { "c.nop", rv_codec_ci_none, rv_fmt_none, NULL, rv_op_addi, rv_op_addi, rv_op_addi },
-+    { "c.addi", rv_codec_ci, rv_fmt_rd_rs1_imm, NULL, rv_op_addi, rv_op_addi, rv_op_addi },
-+    { "c.jal", rv_codec_cj_jal, rv_fmt_rd_offset, NULL, rv_op_jal, 0, 0 },
-+    { "c.li", rv_codec_ci_li, rv_fmt_rd_rs1_imm, NULL, rv_op_addi, rv_op_addi, rv_op_addi },
-+    { "c.addi16sp", rv_codec_ci_16sp, rv_fmt_rd_rs1_imm, NULL, rv_op_addi, rv_op_addi, rv_op_addi },
-+    { "c.lui", rv_codec_ci_lui, rv_fmt_rd_imm, NULL, rv_op_lui, rv_op_lui, rv_op_lui },
-+    { "c.srli", rv_codec_cb_sh6, rv_fmt_rd_rs1_imm, NULL, rv_op_srli, rv_op_srli, rv_op_srli },
-+    { "c.srai", rv_codec_cb_sh6, rv_fmt_rd_rs1_imm, NULL, rv_op_srai, rv_op_srai, rv_op_srai },
-+    { "c.andi", rv_codec_cb_imm, rv_fmt_rd_rs1_imm, NULL, rv_op_andi, rv_op_andi, rv_op_andi },
-+    { "c.sub", rv_codec_cs, rv_fmt_rd_rs1_rs2, NULL, rv_op_sub, rv_op_sub, rv_op_sub },
-+    { "c.xor", rv_codec_cs, rv_fmt_rd_rs1_rs2, NULL, rv_op_xor, rv_op_xor, rv_op_xor },
-+    { "c.or", rv_codec_cs, rv_fmt_rd_rs1_rs2, NULL, rv_op_or, rv_op_or, rv_op_or },
-+    { "c.and", rv_codec_cs, rv_fmt_rd_rs1_rs2, NULL, rv_op_and, rv_op_and, rv_op_and },
-+    { "c.subw", rv_codec_cs, rv_fmt_rd_rs1_rs2, NULL, rv_op_subw, rv_op_subw, rv_op_subw },
-+    { "c.addw", rv_codec_cs, rv_fmt_rd_rs1_rs2, NULL, rv_op_addw, rv_op_addw, rv_op_addw },
-+    { "c.j", rv_codec_cj, rv_fmt_rd_offset, NULL, rv_op_jal, rv_op_jal, rv_op_jal },
-+    { "c.beqz", rv_codec_cb, rv_fmt_rs1_rs2_offset, NULL, rv_op_beq, rv_op_beq, rv_op_beq },
-+    { "c.bnez", rv_codec_cb, rv_fmt_rs1_rs2_offset, NULL, rv_op_bne, rv_op_bne, rv_op_bne },
-+    { "c.slli", rv_codec_ci_sh6, rv_fmt_rd_rs1_imm, NULL, rv_op_slli, rv_op_slli, rv_op_slli },
-+    { "c.fldsp", rv_codec_ci_ldsp, rv_fmt_frd_offset_rs1, NULL, rv_op_fld, rv_op_fld, rv_op_fld },
-+    { "c.lwsp", rv_codec_ci_lwsp, rv_fmt_rd_offset_rs1, NULL, rv_op_lw, rv_op_lw, rv_op_lw },
-+    { "c.flwsp", rv_codec_ci_lwsp, rv_fmt_frd_offset_rs1, NULL, rv_op_flw, 0, 0 },
-+    { "c.jr", rv_codec_cr_jr, rv_fmt_rd_rs1_offset, NULL, rv_op_jalr, rv_op_jalr, rv_op_jalr },
-+    { "c.mv", rv_codec_cr_mv, rv_fmt_rd_rs1_rs2, NULL, rv_op_addi, rv_op_addi, rv_op_addi },
-+    { "c.ebreak", rv_codec_ci_none, rv_fmt_none, NULL, rv_op_ebreak, rv_op_ebreak, rv_op_ebreak },
-+    { "c.jalr", rv_codec_cr_jalr, rv_fmt_rd_rs1_offset, NULL, rv_op_jalr, rv_op_jalr, rv_op_jalr },
-+    { "c.add", rv_codec_cr, rv_fmt_rd_rs1_rs2, NULL, rv_op_add, rv_op_add, rv_op_add },
-+    { "c.fsdsp", rv_codec_css_sdsp, rv_fmt_frs2_offset_rs1, NULL, rv_op_fsd, rv_op_fsd, rv_op_fsd },
-+    { "c.swsp", rv_codec_css_swsp, rv_fmt_rs2_offset_rs1, NULL, rv_op_sw, rv_op_sw, rv_op_sw },
-+    { "c.fswsp", rv_codec_css_swsp, rv_fmt_frs2_offset_rs1, NULL, rv_op_fsw, 0, 0 },
-+    { "c.ld", rv_codec_cl_ld, rv_fmt_rd_offset_rs1, NULL, 0, rv_op_ld, rv_op_ld },
-+    { "c.sd", rv_codec_cs_sd, rv_fmt_rs2_offset_rs1, NULL, 0, rv_op_sd, rv_op_sd },
-+    { "c.addiw", rv_codec_ci, rv_fmt_rd_rs1_imm, NULL, 0, rv_op_addiw, rv_op_addiw },
-+    { "c.ldsp", rv_codec_ci_ldsp, rv_fmt_rd_offset_rs1, NULL, 0, rv_op_ld, rv_op_ld },
-+    { "c.sdsp", rv_codec_css_sdsp, rv_fmt_rs2_offset_rs1, NULL, 0, rv_op_sd, rv_op_sd },
-+    { "c.lq", rv_codec_cl_lq, rv_fmt_rd_offset_rs1, NULL, 0, 0, rv_op_lq },
-+    { "c.sq", rv_codec_cs_sq, rv_fmt_rs2_offset_rs1, NULL, 0, 0, rv_op_sq },
-+    { "c.lqsp", rv_codec_ci_lqsp, rv_fmt_rd_offset_rs1, NULL, 0, 0, rv_op_lq },
-+    { "c.sqsp", rv_codec_css_sqsp, rv_fmt_rs2_offset_rs1, NULL, 0, 0, rv_op_sq },
-+    { "nop", rv_codec_i, rv_fmt_none, NULL, 0, 0, 0 },
-+    { "mv", rv_codec_i, rv_fmt_rd_rs1, NULL, 0, 0, 0 },
-+    { "not", rv_codec_i, rv_fmt_rd_rs1, NULL, 0, 0, 0 },
-+    { "neg", rv_codec_r, rv_fmt_rd_rs2, NULL, 0, 0, 0 },
-+    { "negw", rv_codec_r, rv_fmt_rd_rs2, NULL, 0, 0, 0 },
-+    { "sext.w", rv_codec_i, rv_fmt_rd_rs1, NULL, 0, 0, 0 },
-+    { "seqz", rv_codec_i, rv_fmt_rd_rs1, NULL, 0, 0, 0 },
-+    { "snez", rv_codec_r, rv_fmt_rd_rs2, NULL, 0, 0, 0 },
-+    { "sltz", rv_codec_r, rv_fmt_rd_rs1, NULL, 0, 0, 0 },
-+    { "sgtz", rv_codec_r, rv_fmt_rd_rs2, NULL, 0, 0, 0 },
-+    { "fmv.s", rv_codec_r, rv_fmt_rd_rs1, NULL, 0, 0, 0 },
-+    { "fabs.s", rv_codec_r, rv_fmt_rd_rs1, NULL, 0, 0, 0 },
-+    { "fneg.s", rv_codec_r, rv_fmt_rd_rs1, NULL, 0, 0, 0 },
-+    { "fmv.d", rv_codec_r, rv_fmt_rd_rs1, NULL, 0, 0, 0 },
-+    { "fabs.d", rv_codec_r, rv_fmt_rd_rs1, NULL, 0, 0, 0 },
-+    { "fneg.d", rv_codec_r, rv_fmt_rd_rs1, NULL, 0, 0, 0 },
-+    { "fmv.q", rv_codec_r, rv_fmt_rd_rs1, NULL, 0, 0, 0 },
-+    { "fabs.q", rv_codec_r, rv_fmt_rd_rs1, NULL, 0, 0, 0 },
-+    { "fneg.q", rv_codec_r, rv_fmt_rd_rs1, NULL, 0, 0, 0 },
-+    { "beqz", rv_codec_sb, rv_fmt_rs1_offset, NULL, 0, 0, 0 },
-+    { "bnez", rv_codec_sb, rv_fmt_rs1_offset, NULL, 0, 0, 0 },
-+    { "blez", rv_codec_sb, rv_fmt_rs2_offset, NULL, 0, 0, 0 },
-+    { "bgez", rv_codec_sb, rv_fmt_rs1_offset, NULL, 0, 0, 0 },
-+    { "bltz", rv_codec_sb, rv_fmt_rs1_offset, NULL, 0, 0, 0 },
-+    { "bgtz", rv_codec_sb, rv_fmt_rs2_offset, NULL, 0, 0, 0 },
-+    { "ble", rv_codec_sb, rv_fmt_rs2_rs1_offset, NULL, 0, 0, 0 },
-+    { "bleu", rv_codec_sb, rv_fmt_rs2_rs1_offset, NULL, 0, 0, 0 },
-+    { "bgt", rv_codec_sb, rv_fmt_rs2_rs1_offset, NULL, 0, 0, 0 },
-+    { "bgtu", rv_codec_sb, rv_fmt_rs2_rs1_offset, NULL, 0, 0, 0 },
-+    { "j", rv_codec_uj, rv_fmt_offset, NULL, 0, 0, 0 },
-+    { "ret", rv_codec_i, rv_fmt_none, NULL, 0, 0, 0 },
-+    { "jr", rv_codec_i, rv_fmt_rs1, NULL, 0, 0, 0 },
-+    { "rdcycle", rv_codec_i_csr, rv_fmt_rd, NULL, 0, 0, 0 },
-+    { "rdtime", rv_codec_i_csr, rv_fmt_rd, NULL, 0, 0, 0 },
-+    { "rdinstret", rv_codec_i_csr, rv_fmt_rd, NULL, 0, 0, 0 },
-+    { "rdcycleh", rv_codec_i_csr, rv_fmt_rd, NULL, 0, 0, 0 },
-+    { "rdtimeh", rv_codec_i_csr, rv_fmt_rd, NULL, 0, 0, 0 },
-+    { "rdinstreth", rv_codec_i_csr, rv_fmt_rd, NULL, 0, 0, 0 },
-+    { "frcsr", rv_codec_i_csr, rv_fmt_rd, NULL, 0, 0, 0 },
-+    { "frrm", rv_codec_i_csr, rv_fmt_rd, NULL, 0, 0, 0 },
-+    { "frflags", rv_codec_i_csr, rv_fmt_rd, NULL, 0, 0, 0 },
-+    { "fscsr", rv_codec_i_csr, rv_fmt_rd_rs1, NULL, 0, 0, 0 },
-+    { "fsrm", rv_codec_i_csr, rv_fmt_rd_rs1, NULL, 0, 0, 0 },
-+    { "fsflags", rv_codec_i_csr, rv_fmt_rd_rs1, NULL, 0, 0, 0 },
-+    { "fsrmi", rv_codec_i_csr, rv_fmt_rd_zimm, NULL, 0, 0, 0 },
-+    { "fsflagsi", rv_codec_i_csr, rv_fmt_rd_zimm, NULL, 0, 0, 0 },
-+};
-+
-+/* CSR names */
-+
-+static const char *csr_name(int csrno)
++static int rv_do_lr(ENV, int rd, int rs1, int rs2, int width)
 +{
-+    switch (csrno) {
-+    case 0x0000: return "ustatus";
-+    case 0x0001: return "fflags";
-+    case 0x0002: return "frm";
-+    case 0x0003: return "fcsr";
-+    case 0x0004: return "uie";
-+    case 0x0005: return "utvec";
-+    case 0x0040: return "uscratch";
-+    case 0x0041: return "uepc";
-+    case 0x0042: return "ucause";
-+    case 0x0043: return "utval";
-+    case 0x0044: return "uip";
-+    case 0x0100: return "sstatus";
-+    case 0x0102: return "sedeleg";
-+    case 0x0103: return "sideleg";
-+    case 0x0104: return "sie";
-+    case 0x0105: return "stvec";
-+    case 0x0106: return "scounteren";
-+    case 0x0140: return "sscratch";
-+    case 0x0141: return "sepc";
-+    case 0x0142: return "scause";
-+    case 0x0143: return "stval";
-+    case 0x0144: return "sip";
-+    case 0x0180: return "satp";
-+    case 0x0200: return "hstatus";
-+    case 0x0202: return "hedeleg";
-+    case 0x0203: return "hideleg";
-+    case 0x0204: return "hie";
-+    case 0x0205: return "htvec";
-+    case 0x0240: return "hscratch";
-+    case 0x0241: return "hepc";
-+    case 0x0242: return "hcause";
-+    case 0x0243: return "hbadaddr";
-+    case 0x0244: return "hip";
-+    case 0x0300: return "mstatus";
-+    case 0x0301: return "misa";
-+    case 0x0302: return "medeleg";
-+    case 0x0303: return "mideleg";
-+    case 0x0304: return "mie";
-+    case 0x0305: return "mtvec";
-+    case 0x0306: return "mcounteren";
-+    case 0x0320: return "mucounteren";
-+    case 0x0321: return "mscounteren";
-+    case 0x0322: return "mhcounteren";
-+    case 0x0323: return "mhpmevent3";
-+    case 0x0324: return "mhpmevent4";
-+    case 0x0325: return "mhpmevent5";
-+    case 0x0326: return "mhpmevent6";
-+    case 0x0327: return "mhpmevent7";
-+    case 0x0328: return "mhpmevent8";
-+    case 0x0329: return "mhpmevent9";
-+    case 0x032a: return "mhpmevent10";
-+    case 0x032b: return "mhpmevent11";
-+    case 0x032c: return "mhpmevent12";
-+    case 0x032d: return "mhpmevent13";
-+    case 0x032e: return "mhpmevent14";
-+    case 0x032f: return "mhpmevent15";
-+    case 0x0330: return "mhpmevent16";
-+    case 0x0331: return "mhpmevent17";
-+    case 0x0332: return "mhpmevent18";
-+    case 0x0333: return "mhpmevent19";
-+    case 0x0334: return "mhpmevent20";
-+    case 0x0335: return "mhpmevent21";
-+    case 0x0336: return "mhpmevent22";
-+    case 0x0337: return "mhpmevent23";
-+    case 0x0338: return "mhpmevent24";
-+    case 0x0339: return "mhpmevent25";
-+    case 0x033a: return "mhpmevent26";
-+    case 0x033b: return "mhpmevent27";
-+    case 0x033c: return "mhpmevent28";
-+    case 0x033d: return "mhpmevent29";
-+    case 0x033e: return "mhpmevent30";
-+    case 0x033f: return "mhpmevent31";
-+    case 0x0340: return "mscratch";
-+    case 0x0341: return "mepc";
-+    case 0x0342: return "mcause";
-+    case 0x0343: return "mtval";
-+    case 0x0344: return "mip";
-+    case 0x0380: return "mbase";
-+    case 0x0381: return "mbound";
-+    case 0x0382: return "mibase";
-+    case 0x0383: return "mibound";
-+    case 0x0384: return "mdbase";
-+    case 0x0385: return "mdbound";
-+    case 0x03a0: return "pmpcfg3";
-+    case 0x03b0: return "pmpaddr0";
-+    case 0x03b1: return "pmpaddr1";
-+    case 0x03b2: return "pmpaddr2";
-+    case 0x03b3: return "pmpaddr3";
-+    case 0x03b4: return "pmpaddr4";
-+    case 0x03b5: return "pmpaddr5";
-+    case 0x03b6: return "pmpaddr6";
-+    case 0x03b7: return "pmpaddr7";
-+    case 0x03b8: return "pmpaddr8";
-+    case 0x03b9: return "pmpaddr9";
-+    case 0x03ba: return "pmpaddr10";
-+    case 0x03bb: return "pmpaddr11";
-+    case 0x03bc: return "pmpaddr12";
-+    case 0x03bd: return "pmpaddr14";
-+    case 0x03be: return "pmpaddr13";
-+    case 0x03bf: return "pmpaddr15";
-+    case 0x0780: return "mtohost";
-+    case 0x0781: return "mfromhost";
-+    case 0x0782: return "mreset";
-+    case 0x0783: return "mipi";
-+    case 0x0784: return "miobase";
-+    case 0x07a0: return "tselect";
-+    case 0x07a1: return "tdata1";
-+    case 0x07a2: return "tdata2";
-+    case 0x07a3: return "tdata3";
-+    case 0x07b0: return "dcsr";
-+    case 0x07b1: return "dpc";
-+    case 0x07b2: return "dscratch";
-+    case 0x0b00: return "mcycle";
-+    case 0x0b01: return "mtime";
-+    case 0x0b02: return "minstret";
-+    case 0x0b03: return "mhpmcounter3";
-+    case 0x0b04: return "mhpmcounter4";
-+    case 0x0b05: return "mhpmcounter5";
-+    case 0x0b06: return "mhpmcounter6";
-+    case 0x0b07: return "mhpmcounter7";
-+    case 0x0b08: return "mhpmcounter8";
-+    case 0x0b09: return "mhpmcounter9";
-+    case 0x0b0a: return "mhpmcounter10";
-+    case 0x0b0b: return "mhpmcounter11";
-+    case 0x0b0c: return "mhpmcounter12";
-+    case 0x0b0d: return "mhpmcounter13";
-+    case 0x0b0e: return "mhpmcounter14";
-+    case 0x0b0f: return "mhpmcounter15";
-+    case 0x0b10: return "mhpmcounter16";
-+    case 0x0b11: return "mhpmcounter17";
-+    case 0x0b12: return "mhpmcounter18";
-+    case 0x0b13: return "mhpmcounter19";
-+    case 0x0b14: return "mhpmcounter20";
-+    case 0x0b15: return "mhpmcounter21";
-+    case 0x0b16: return "mhpmcounter22";
-+    case 0x0b17: return "mhpmcounter23";
-+    case 0x0b18: return "mhpmcounter24";
-+    case 0x0b19: return "mhpmcounter25";
-+    case 0x0b1a: return "mhpmcounter26";
-+    case 0x0b1b: return "mhpmcounter27";
-+    case 0x0b1c: return "mhpmcounter28";
-+    case 0x0b1d: return "mhpmcounter29";
-+    case 0x0b1e: return "mhpmcounter30";
-+    case 0x0b1f: return "mhpmcounter31";
-+    case 0x0b80: return "mcycleh";
-+    case 0x0b81: return "mtimeh";
-+    case 0x0b82: return "minstreth";
-+    case 0x0b83: return "mhpmcounter3h";
-+    case 0x0b84: return "mhpmcounter4h";
-+    case 0x0b85: return "mhpmcounter5h";
-+    case 0x0b86: return "mhpmcounter6h";
-+    case 0x0b87: return "mhpmcounter7h";
-+    case 0x0b88: return "mhpmcounter8h";
-+    case 0x0b89: return "mhpmcounter9h";
-+    case 0x0b8a: return "mhpmcounter10h";
-+    case 0x0b8b: return "mhpmcounter11h";
-+    case 0x0b8c: return "mhpmcounter12h";
-+    case 0x0b8d: return "mhpmcounter13h";
-+    case 0x0b8e: return "mhpmcounter14h";
-+    case 0x0b8f: return "mhpmcounter15h";
-+    case 0x0b90: return "mhpmcounter16h";
-+    case 0x0b91: return "mhpmcounter17h";
-+    case 0x0b92: return "mhpmcounter18h";
-+    case 0x0b93: return "mhpmcounter19h";
-+    case 0x0b94: return "mhpmcounter20h";
-+    case 0x0b95: return "mhpmcounter21h";
-+    case 0x0b96: return "mhpmcounter22h";
-+    case 0x0b97: return "mhpmcounter23h";
-+    case 0x0b98: return "mhpmcounter24h";
-+    case 0x0b99: return "mhpmcounter25h";
-+    case 0x0b9a: return "mhpmcounter26h";
-+    case 0x0b9b: return "mhpmcounter27h";
-+    case 0x0b9c: return "mhpmcounter28h";
-+    case 0x0b9d: return "mhpmcounter29h";
-+    case 0x0b9e: return "mhpmcounter30h";
-+    case 0x0b9f: return "mhpmcounter31h";
-+    case 0x0c00: return "cycle";
-+    case 0x0c01: return "time";
-+    case 0x0c02: return "instret";
-+    case 0x0c80: return "cycleh";
-+    case 0x0c81: return "timeh";
-+    case 0x0c82: return "instreth";
-+    case 0x0d00: return "scycle";
-+    case 0x0d01: return "stime";
-+    case 0x0d02: return "sinstret";
-+    case 0x0d80: return "scycleh";
-+    case 0x0d81: return "stimeh";
-+    case 0x0d82: return "sinstreth";
-+    case 0x0e00: return "hcycle";
-+    case 0x0e01: return "htime";
-+    case 0x0e02: return "hinstret";
-+    case 0x0e80: return "hcycleh";
-+    case 0x0e81: return "htimeh";
-+    case 0x0e82: return "hinstreth";
-+    case 0x0f11: return "mvendorid";
-+    case 0x0f12: return "marchid";
-+    case 0x0f13: return "mimpid";
-+    case 0x0f14: return "mhartid";
-+    default: return NULL;
-+    }
-+}
++    int64_t val64;
++    int32_t val32;
++    target_long val;
++    int fault;
 +
-+/* decode opcode */
++    target_long addr = env->gpr[rs1];
 +
-+static void decode_inst_opcode(rv_decode *dec, rv_isa isa)
-+{
-+    rv_inst inst = dec->inst;
-+    rv_opcode op = rv_op_illegal;
-+    switch (((inst >> 0) & 0b11)) {
-+    case 0:
-+        switch (((inst >> 13) & 0b111)) {
-+        case 0: op = rv_op_c_addi4spn; break;
-+        case 1:
-+            if (isa == rv128) {
-+                op = rv_op_c_lq;
-+            } else {
-+                op = rv_op_c_fld;
-+            }
-+            break;
-+        case 2: op = rv_op_c_lw; break;
-+        case 3:
-+            if (isa == rv32) {
-+                op = rv_op_c_flw;
-+            } else {
-+                op = rv_op_c_ld;
-+            }
-+            break;
-+        case 5:
-+            if (isa == rv128) {
-+                op = rv_op_c_sq;
-+            } else {
-+                op = rv_op_c_fsd;
-+            }
-+            break;
-+        case 6: op = rv_op_c_sw; break;
-+        case 7:
-+            if (isa == rv32) {
-+                op = rv_op_c_fsw;
-+            } else {
-+                op = rv_op_c_sd;
-+            }
-+            break;
-+        }
-+        break;
-+    case 1:
-+        switch (((inst >> 13) & 0b111)) {
-+        case 0:
-+            switch (((inst >> 2) & 0b11111111111)) {
-+            case 0: op = rv_op_c_nop; break;
-+            default: op = rv_op_c_addi; break;
-+            }
-+            break;
-+        case 1:
-+            if (isa == rv32) {
-+                op = rv_op_c_jal;
-+            } else {
-+                op = rv_op_c_addiw;
-+            }
-+            break;
-+        case 2: op = rv_op_c_li; break;
-+        case 3:
-+            switch (((inst >> 7) & 0b11111)) {
-+            case 2: op = rv_op_c_addi16sp; break;
-+            default: op = rv_op_c_lui; break;
-+            }
-+            break;
-+        case 4:
-+            switch (((inst >> 10) & 0b11)) {
-+            case 0:
-+                op = rv_op_c_srli;
-+                break;
-+            case 1:
-+                op = rv_op_c_srai;
-+                break;
-+            case 2: op = rv_op_c_andi; break;
-+            case 3:
-+                switch (((inst >> 10) & 0b100) | ((inst >> 5) & 0b011)) {
-+                case 0: op = rv_op_c_sub; break;
-+                case 1: op = rv_op_c_xor; break;
-+                case 2: op = rv_op_c_or; break;
-+                case 3: op = rv_op_c_and; break;
-+                case 4: op = rv_op_c_subw; break;
-+                case 5: op = rv_op_c_addw; break;
-+                }
-+                break;
-+            }
-+            break;
-+        case 5: op = rv_op_c_j; break;
-+        case 6: op = rv_op_c_beqz; break;
-+        case 7: op = rv_op_c_bnez; break;
-+        }
-+        break;
-+    case 2:
-+        switch (((inst >> 13) & 0b111)) {
-+        case 0:
-+            op = rv_op_c_slli;
-+            break;
-+        case 1:
-+            if (isa == rv128) {
-+                op = rv_op_c_lqsp;
-+            } else {
-+                op = rv_op_c_fldsp;
-+            }
-+            break;
-+        case 2: op = rv_op_c_lwsp; break;
-+        case 3:
-+            if (isa == rv32) {
-+                op = rv_op_c_flwsp;
-+            } else {
-+                op = rv_op_c_ldsp;
-+            }
-+            break;
-+        case 4:
-+            switch (((inst >> 12) & 0b1)) {
-+            case 0:
-+                switch (((inst >> 2) & 0b11111)) {
-+                case 0: op = rv_op_c_jr; break;
-+                default: op = rv_op_c_mv; break;
-+                }
-+                break;
-+            case 1:
-+                switch (((inst >> 2) & 0b11111)) {
-+                case 0:
-+                    switch (((inst >> 7) & 0b11111)) {
-+                    case 0: op = rv_op_c_ebreak; break;
-+                    default: op = rv_op_c_jalr; break;
-+                    }
-+                    break;
-+                default: op = rv_op_c_add; break;
-+                }
-+                break;
-+            }
-+            break;
-+        case 5:
-+            if (isa == rv128) {
-+                op = rv_op_c_sqsp;
-+            } else {
-+                op = rv_op_c_fsdsp; break;
-+            }
-+        case 6: op = rv_op_c_swsp; break;
-+        case 7:
-+            if (isa == rv32) {
-+                op = rv_op_c_fswsp;
-+            } else {
-+                op = rv_op_c_sdsp;
-+            }
-+            break;
-+        }
-+        break;
-+    case 3:
-+        switch (((inst >> 2) & 0b11111)) {
-+        case 0:
-+            switch (((inst >> 12) & 0b111)) {
-+            case 0: op = rv_op_lb; break;
-+            case 1: op = rv_op_lh; break;
-+            case 2: op = rv_op_lw; break;
-+            case 3: op = rv_op_ld; break;
-+            case 4: op = rv_op_lbu; break;
-+            case 5: op = rv_op_lhu; break;
-+            case 6: op = rv_op_lwu; break;
-+            case 7: op = rv_op_ldu; break;
-+            }
-+            break;
-+        case 1:
-+            switch (((inst >> 12) & 0b111)) {
-+            case 2: op = rv_op_flw; break;
-+            case 3: op = rv_op_fld; break;
-+            case 4: op = rv_op_flq; break;
-+            }
-+            break;
-+        case 3:
-+            switch (((inst >> 12) & 0b111)) {
-+            case 0: op = rv_op_fence; break;
-+            case 1: op = rv_op_fence_i; break;
-+            case 2: op = rv_op_lq; break;
-+            }
-+            break;
-+        case 4:
-+            switch (((inst >> 12) & 0b111)) {
-+            case 0: op = rv_op_addi; break;
-+            case 1:
-+                switch (((inst >> 27) & 0b11111)) {
-+                case 0: op = rv_op_slli; break;
-+                }
-+                break;
-+            case 2: op = rv_op_slti; break;
-+            case 3: op = rv_op_sltiu; break;
-+            case 4: op = rv_op_xori; break;
-+            case 5:
-+                switch (((inst >> 27) & 0b11111)) {
-+                case 0: op = rv_op_srli; break;
-+                case 8: op = rv_op_srai; break;
-+                }
-+                break;
-+            case 6: op = rv_op_ori; break;
-+            case 7: op = rv_op_andi; break;
-+            }
-+            break;
-+        case 5: op = rv_op_auipc; break;
-+        case 6:
-+            switch (((inst >> 12) & 0b111)) {
-+            case 0: op = rv_op_addiw; break;
-+            case 1:
-+                switch (((inst >> 25) & 0b1111111)) {
-+                case 0: op = rv_op_slliw; break;
-+                }
-+                break;
-+            case 5:
-+                switch (((inst >> 25) & 0b1111111)) {
-+                case 0: op = rv_op_srliw; break;
-+                case 32: op = rv_op_sraiw; break;
-+                }
-+                break;
-+            }
-+            break;
-+        case 8:
-+            switch (((inst >> 12) & 0b111)) {
-+            case 0: op = rv_op_sb; break;
-+            case 1: op = rv_op_sh; break;
-+            case 2: op = rv_op_sw; break;
-+            case 3: op = rv_op_sd; break;
-+            case 4: op = rv_op_sq; break;
-+            }
-+            break;
-+        case 9:
-+            switch (((inst >> 12) & 0b111)) {
-+            case 2: op = rv_op_fsw; break;
-+            case 3: op = rv_op_fsd; break;
-+            case 4: op = rv_op_fsq; break;
-+            }
-+            break;
-+        case 11:
-+            switch (((inst >> 24) & 0b11111000) | ((inst >> 12) & 0b00000111)) {
-+            case 2: op = rv_op_amoadd_w; break;
-+            case 3: op = rv_op_amoadd_d; break;
-+            case 4: op = rv_op_amoadd_q; break;
-+            case 10: op = rv_op_amoswap_w; break;
-+            case 11: op = rv_op_amoswap_d; break;
-+            case 12: op = rv_op_amoswap_q; break;
-+            case 18:
-+                switch (((inst >> 20) & 0b11111)) {
-+                case 0: op = rv_op_lr_w; break;
-+                }
-+                break;
-+            case 19:
-+                switch (((inst >> 20) & 0b11111)) {
-+                case 0: op = rv_op_lr_d; break;
-+                }
-+                break;
-+            case 20:
-+                switch (((inst >> 20) & 0b11111)) {
-+                case 0: op = rv_op_lr_q; break;
-+                }
-+                break;
-+            case 26: op = rv_op_sc_w; break;
-+            case 27: op = rv_op_sc_d; break;
-+            case 28: op = rv_op_sc_q; break;
-+            case 34: op = rv_op_amoxor_w; break;
-+            case 35: op = rv_op_amoxor_d; break;
-+            case 36: op = rv_op_amoxor_q; break;
-+            case 66: op = rv_op_amoor_w; break;
-+            case 67: op = rv_op_amoor_d; break;
-+            case 68: op = rv_op_amoor_q; break;
-+            case 98: op = rv_op_amoand_w; break;
-+            case 99: op = rv_op_amoand_d; break;
-+            case 100: op = rv_op_amoand_q; break;
-+            case 130: op = rv_op_amomin_w; break;
-+            case 131: op = rv_op_amomin_d; break;
-+            case 132: op = rv_op_amomin_q; break;
-+            case 162: op = rv_op_amomax_w; break;
-+            case 163: op = rv_op_amomax_d; break;
-+            case 164: op = rv_op_amomax_q; break;
-+            case 194: op = rv_op_amominu_w; break;
-+            case 195: op = rv_op_amominu_d; break;
-+            case 196: op = rv_op_amominu_q; break;
-+            case 226: op = rv_op_amomaxu_w; break;
-+            case 227: op = rv_op_amomaxu_d; break;
-+            case 228: op = rv_op_amomaxu_q; break;
-+            }
-+            break;
-+        case 12:
-+            switch (((inst >> 22) & 0b1111111000) | ((inst >> 12) & 0b0000000111)) {
-+            case 0: op = rv_op_add; break;
-+            case 1: op = rv_op_sll; break;
-+            case 2: op = rv_op_slt; break;
-+            case 3: op = rv_op_sltu; break;
-+            case 4: op = rv_op_xor; break;
-+            case 5: op = rv_op_srl; break;
-+            case 6: op = rv_op_or; break;
-+            case 7: op = rv_op_and; break;
-+            case 8: op = rv_op_mul; break;
-+            case 9: op = rv_op_mulh; break;
-+            case 10: op = rv_op_mulhsu; break;
-+            case 11: op = rv_op_mulhu; break;
-+            case 12: op = rv_op_div; break;
-+            case 13: op = rv_op_divu; break;
-+            case 14: op = rv_op_rem; break;
-+            case 15: op = rv_op_remu; break;
-+            case 256: op = rv_op_sub; break;
-+            case 261: op = rv_op_sra; break;
-+            }
-+            break;
-+        case 13: op = rv_op_lui; break;
-+        case 14:
-+            switch (((inst >> 22) & 0b1111111000) | ((inst >> 12) & 0b0000000111)) {
-+            case 0: op = rv_op_addw; break;
-+            case 1: op = rv_op_sllw; break;
-+            case 5: op = rv_op_srlw; break;
-+            case 8: op = rv_op_mulw; break;
-+            case 12: op = rv_op_divw; break;
-+            case 13: op = rv_op_divuw; break;
-+            case 14: op = rv_op_remw; break;
-+            case 15: op = rv_op_remuw; break;
-+            case 256: op = rv_op_subw; break;
-+            case 261: op = rv_op_sraw; break;
-+            }
-+            break;
-+        case 16:
-+            switch (((inst >> 25) & 0b11)) {
-+            case 0: op = rv_op_fmadd_s; break;
-+            case 1: op = rv_op_fmadd_d; break;
-+            case 3: op = rv_op_fmadd_q; break;
-+            }
-+            break;
-+        case 17:
-+            switch (((inst >> 25) & 0b11)) {
-+            case 0: op = rv_op_fmsub_s; break;
-+            case 1: op = rv_op_fmsub_d; break;
-+            case 3: op = rv_op_fmsub_q; break;
-+            }
-+            break;
-+        case 18:
-+            switch (((inst >> 25) & 0b11)) {
-+            case 0: op = rv_op_fnmsub_s; break;
-+            case 1: op = rv_op_fnmsub_d; break;
-+            case 3: op = rv_op_fnmsub_q; break;
-+            }
-+            break;
-+        case 19:
-+            switch (((inst >> 25) & 0b11)) {
-+            case 0: op = rv_op_fnmadd_s; break;
-+            case 1: op = rv_op_fnmadd_d; break;
-+            case 3: op = rv_op_fnmadd_q; break;
-+            }
-+            break;
-+        case 20:
-+            switch (((inst >> 25) & 0b1111111)) {
-+            case 0: op = rv_op_fadd_s; break;
-+            case 1: op = rv_op_fadd_d; break;
-+            case 3: op = rv_op_fadd_q; break;
-+            case 4: op = rv_op_fsub_s; break;
-+            case 5: op = rv_op_fsub_d; break;
-+            case 7: op = rv_op_fsub_q; break;
-+            case 8: op = rv_op_fmul_s; break;
-+            case 9: op = rv_op_fmul_d; break;
-+            case 11: op = rv_op_fmul_q; break;
-+            case 12: op = rv_op_fdiv_s; break;
-+            case 13: op = rv_op_fdiv_d; break;
-+            case 15: op = rv_op_fdiv_q; break;
-+            case 16:
-+                switch (((inst >> 12) & 0b111)) {
-+                case 0: op = rv_op_fsgnj_s; break;
-+                case 1: op = rv_op_fsgnjn_s; break;
-+                case 2: op = rv_op_fsgnjx_s; break;
-+                }
-+                break;
-+            case 17:
-+                switch (((inst >> 12) & 0b111)) {
-+                case 0: op = rv_op_fsgnj_d; break;
-+                case 1: op = rv_op_fsgnjn_d; break;
-+                case 2: op = rv_op_fsgnjx_d; break;
-+                }
-+                break;
-+            case 19:
-+                switch (((inst >> 12) & 0b111)) {
-+                case 0: op = rv_op_fsgnj_q; break;
-+                case 1: op = rv_op_fsgnjn_q; break;
-+                case 2: op = rv_op_fsgnjx_q; break;
-+                }
-+                break;
-+            case 20:
-+                switch (((inst >> 12) & 0b111)) {
-+                case 0: op = rv_op_fmin_s; break;
-+                case 1: op = rv_op_fmax_s; break;
-+                }
-+                break;
-+            case 21:
-+                switch (((inst >> 12) & 0b111)) {
-+                case 0: op = rv_op_fmin_d; break;
-+                case 1: op = rv_op_fmax_d; break;
-+                }
-+                break;
-+            case 23:
-+                switch (((inst >> 12) & 0b111)) {
-+                case 0: op = rv_op_fmin_q; break;
-+                case 1: op = rv_op_fmax_q; break;
-+                }
-+                break;
-+            case 32:
-+                switch (((inst >> 20) & 0b11111)) {
-+                case 1: op = rv_op_fcvt_s_d; break;
-+                case 3: op = rv_op_fcvt_s_q; break;
-+                }
-+                break;
-+            case 33:
-+                switch (((inst >> 20) & 0b11111)) {
-+                case 0: op = rv_op_fcvt_d_s; break;
-+                case 3: op = rv_op_fcvt_d_q; break;
-+                }
-+                break;
-+            case 35:
-+                switch (((inst >> 20) & 0b11111)) {
-+                case 0: op = rv_op_fcvt_q_s; break;
-+                case 1: op = rv_op_fcvt_q_d; break;
-+                }
-+                break;
-+            case 44:
-+                switch (((inst >> 20) & 0b11111)) {
-+                case 0: op = rv_op_fsqrt_s; break;
-+                }
-+                break;
-+            case 45:
-+                switch (((inst >> 20) & 0b11111)) {
-+                case 0: op = rv_op_fsqrt_d; break;
-+                }
-+                break;
-+            case 47:
-+                switch (((inst >> 20) & 0b11111)) {
-+                case 0: op = rv_op_fsqrt_q; break;
-+                }
-+                break;
-+            case 80:
-+                switch (((inst >> 12) & 0b111)) {
-+                case 0: op = rv_op_fle_s; break;
-+                case 1: op = rv_op_flt_s; break;
-+                case 2: op = rv_op_feq_s; break;
-+                }
-+                break;
-+            case 81:
-+                switch (((inst >> 12) & 0b111)) {
-+                case 0: op = rv_op_fle_d; break;
-+                case 1: op = rv_op_flt_d; break;
-+                case 2: op = rv_op_feq_d; break;
-+                }
-+                break;
-+            case 83:
-+                switch (((inst >> 12) & 0b111)) {
-+                case 0: op = rv_op_fle_q; break;
-+                case 1: op = rv_op_flt_q; break;
-+                case 2: op = rv_op_feq_q; break;
-+                }
-+                break;
-+            case 96:
-+                switch (((inst >> 20) & 0b11111)) {
-+                case 0: op = rv_op_fcvt_w_s; break;
-+                case 1: op = rv_op_fcvt_wu_s; break;
-+                case 2: op = rv_op_fcvt_l_s; break;
-+                case 3: op = rv_op_fcvt_lu_s; break;
-+                }
-+                break;
-+            case 97:
-+                switch (((inst >> 20) & 0b11111)) {
-+                case 0: op = rv_op_fcvt_w_d; break;
-+                case 1: op = rv_op_fcvt_wu_d; break;
-+                case 2: op = rv_op_fcvt_l_d; break;
-+                case 3: op = rv_op_fcvt_lu_d; break;
-+                }
-+                break;
-+            case 99:
-+                switch (((inst >> 20) & 0b11111)) {
-+                case 0: op = rv_op_fcvt_w_q; break;
-+                case 1: op = rv_op_fcvt_wu_q; break;
-+                case 2: op = rv_op_fcvt_l_q; break;
-+                case 3: op = rv_op_fcvt_lu_q; break;
-+                }
-+                break;
-+            case 104:
-+                switch (((inst >> 20) & 0b11111)) {
-+                case 0: op = rv_op_fcvt_s_w; break;
-+                case 1: op = rv_op_fcvt_s_wu; break;
-+                case 2: op = rv_op_fcvt_s_l; break;
-+                case 3: op = rv_op_fcvt_s_lu; break;
-+                }
-+                break;
-+            case 105:
-+                switch (((inst >> 20) & 0b11111)) {
-+                case 0: op = rv_op_fcvt_d_w; break;
-+                case 1: op = rv_op_fcvt_d_wu; break;
-+                case 2: op = rv_op_fcvt_d_l; break;
-+                case 3: op = rv_op_fcvt_d_lu; break;
-+                }
-+                break;
-+            case 107:
-+                switch (((inst >> 20) & 0b11111)) {
-+                case 0: op = rv_op_fcvt_q_w; break;
-+                case 1: op = rv_op_fcvt_q_wu; break;
-+                case 2: op = rv_op_fcvt_q_l; break;
-+                case 3: op = rv_op_fcvt_q_lu; break;
-+                }
-+                break;
-+            case 112:
-+                switch (((inst >> 17) & 0b11111000) | ((inst >> 12) & 0b00000111)) {
-+                case 0: op = rv_op_fmv_x_s; break;
-+                case 1: op = rv_op_fclass_s; break;
-+                }
-+                break;
-+            case 113:
-+                switch (((inst >> 17) & 0b11111000) | ((inst >> 12) & 0b00000111)) {
-+                case 0: op = rv_op_fmv_x_d; break;
-+                case 1: op = rv_op_fclass_d; break;
-+                }
-+                break;
-+            case 115:
-+                switch (((inst >> 17) & 0b11111000) | ((inst >> 12) & 0b00000111)) {
-+                case 0: op = rv_op_fmv_x_q; break;
-+                case 1: op = rv_op_fclass_q; break;
-+                }
-+                break;
-+            case 120:
-+                switch (((inst >> 17) & 0b11111000) | ((inst >> 12) & 0b00000111)) {
-+                case 0: op = rv_op_fmv_s_x; break;
-+                }
-+                break;
-+            case 121:
-+                switch (((inst >> 17) & 0b11111000) | ((inst >> 12) & 0b00000111)) {
-+                case 0: op = rv_op_fmv_d_x; break;
-+                }
-+                break;
-+            case 123:
-+                switch (((inst >> 17) & 0b11111000) | ((inst >> 12) & 0b00000111)) {
-+                case 0: op = rv_op_fmv_q_x; break;
-+                }
-+                break;
-+            }
-+            break;
-+        case 22:
-+            switch (((inst >> 12) & 0b111)) {
-+            case 0: op = rv_op_addid; break;
-+            case 1:
-+                switch (((inst >> 26) & 0b111111)) {
-+                case 0: op = rv_op_sllid; break;
-+                }
-+                break;
-+            case 5:
-+                switch (((inst >> 26) & 0b111111)) {
-+                case 0: op = rv_op_srlid; break;
-+                case 16: op = rv_op_sraid; break;
-+                }
-+                break;
-+            }
-+            break;
-+        case 24:
-+            switch (((inst >> 12) & 0b111)) {
-+            case 0: op = rv_op_beq; break;
-+            case 1: op = rv_op_bne; break;
-+            case 4: op = rv_op_blt; break;
-+            case 5: op = rv_op_bge; break;
-+            case 6: op = rv_op_bltu; break;
-+            case 7: op = rv_op_bgeu; break;
-+            }
-+            break;
-+        case 25:
-+            switch (((inst >> 12) & 0b111)) {
-+            case 0: op = rv_op_jalr; break;
-+            }
-+            break;
-+        case 27: op = rv_op_jal; break;
-+        case 28:
-+            switch (((inst >> 12) & 0b111)) {
-+            case 0:
-+                switch (((inst >> 20) & 0b111111100000) | ((inst >> 7) & 0b000000011111)) {
-+                case 0:
-+                    switch (((inst >> 15) & 0b1111111111)) {
-+                    case 0: op = rv_op_ecall; break;
-+                    case 32: op = rv_op_ebreak; break;
-+                    case 64: op = rv_op_uret; break;
-+                    }
-+                    break;
-+                case 256:
-+                    switch (((inst >> 20) & 0b11111)) {
-+                    case 2:
-+                        switch (((inst >> 15) & 0b11111)) {
-+                        case 0: op = rv_op_sret; break;
-+                        }
-+                        break;
-+                    case 4: op = rv_op_sfence_vm; break;
-+                    case 5:
-+                        switch (((inst >> 15) & 0b11111)) {
-+                        case 0: op = rv_op_wfi; break;
-+                        }
-+                        break;
-+                    }
-+                    break;
-+                case 288: op = rv_op_sfence_vma; break;
-+                case 512:
-+                    switch (((inst >> 15) & 0b1111111111)) {
-+                    case 64: op = rv_op_hret; break;
-+                    }
-+                    break;
-+                case 768:
-+                    switch (((inst >> 15) & 0b1111111111)) {
-+                    case 64: op = rv_op_mret; break;
-+                    }
-+                    break;
-+                case 1952:
-+                    switch (((inst >> 15) & 0b1111111111)) {
-+                    case 576: op = rv_op_dret; break;
-+                    }
-+                    break;
-+                }
-+                break;
-+            case 1: op = rv_op_csrrw; break;
-+            case 2: op = rv_op_csrrs; break;
-+            case 3: op = rv_op_csrrc; break;
-+            case 5: op = rv_op_csrrwi; break;
-+            case 6: op = rv_op_csrrsi; break;
-+            case 7: op = rv_op_csrrci; break;
-+            }
-+            break;
-+        case 30:
-+            switch (((inst >> 22) & 0b1111111000) | ((inst >> 12) & 0b0000000111)) {
-+            case 0: op = rv_op_addd; break;
-+            case 1: op = rv_op_slld; break;
-+            case 5: op = rv_op_srld; break;
-+            case 8: op = rv_op_muld; break;
-+            case 12: op = rv_op_divd; break;
-+            case 13: op = rv_op_divud; break;
-+            case 14: op = rv_op_remd; break;
-+            case 15: op = rv_op_remud; break;
-+            case 256: op = rv_op_subd; break;
-+            case 261: op = rv_op_srad; break;
-+            }
-+            break;
-+        }
-+        break;
-+    }
-+    dec->op = op;
-+}
-+
-+/* operand extractors */
-+
-+static uint32_t operand_rd(rv_inst inst) {
-+    return (inst << 52) >> 59;
-+}
-+
-+static uint32_t operand_rs1(rv_inst inst) {
-+    return (inst << 44) >> 59;
-+}
-+
-+static uint32_t operand_rs2(rv_inst inst) {
-+    return (inst << 39) >> 59;
-+}
-+
-+static uint32_t operand_rs3(rv_inst inst) {
-+    return (inst << 32) >> 59;
-+}
-+
-+static uint32_t operand_aq(rv_inst inst) {
-+    return (inst << 37) >> 63;
-+}
-+
-+static uint32_t operand_rl(rv_inst inst) {
-+    return (inst << 38) >> 63;
-+}
-+
-+static uint32_t operand_pred(rv_inst inst) {
-+    return (inst << 36) >> 60;
-+}
-+
-+static uint32_t operand_succ(rv_inst inst) {
-+    return (inst << 40) >> 60;
-+}
-+
-+static uint32_t operand_rm(rv_inst inst) {
-+    return (inst << 49) >> 61;
-+}
-+
-+static uint32_t operand_shamt5(rv_inst inst) {
-+    return (inst << 39) >> 59;
-+}
-+
-+static uint32_t operand_shamt6(rv_inst inst) {
-+    return (inst << 38) >> 58;
-+}
-+
-+static uint32_t operand_shamt7(rv_inst inst) {
-+    return (inst << 37) >> 57;
-+}
-+
-+static uint32_t operand_crdq(rv_inst inst) {
-+    return (inst << 59) >> 61;
-+}
-+
-+static uint32_t operand_crs1q(rv_inst inst) {
-+    return (inst << 54) >> 61;
-+}
-+
-+static uint32_t operand_crs1rdq(rv_inst inst) {
-+    return (inst << 54) >> 61;
-+}
-+
-+static uint32_t operand_crs2q(rv_inst inst) {
-+    return (inst << 59) >> 61;
-+}
-+
-+static uint32_t operand_crd(rv_inst inst) {
-+    return (inst << 52) >> 59;
-+}
-+
-+static uint32_t operand_crs1(rv_inst inst) {
-+    return (inst << 52) >> 59;
-+}
-+
-+static uint32_t operand_crs1rd(rv_inst inst) {
-+    return (inst << 52) >> 59;
-+}
-+
-+static uint32_t operand_crs2(rv_inst inst) {
-+    return (inst << 57) >> 59;
-+}
-+
-+static uint32_t operand_cimmsh5(rv_inst inst) {
-+    return (inst << 57) >> 59;
-+}
-+
-+static uint32_t operand_csr12(rv_inst inst) {
-+    return (inst << 32) >> 52;
-+}
-+
-+static int32_t operand_imm12(rv_inst inst) {
-+    return ((int64_t)inst << 32) >> 52;
-+}
-+
-+static int32_t operand_imm20(rv_inst inst) {
-+    return (((int64_t)inst << 32) >> 44) << 12;
-+}
-+
-+static int32_t operand_jimm20(rv_inst inst) {
-+    return (((int64_t)inst << 32) >> 63) << 20 |
-+        ((inst << 33) >> 54) << 1 |
-+        ((inst << 43) >> 63) << 11 |
-+        ((inst << 44) >> 56) << 12;
-+}
-+
-+static int32_t operand_simm12(rv_inst inst) {
-+    return (((int64_t)inst << 32) >> 57) << 5 |
-+        (inst << 52) >> 59;
-+}
-+
-+static int32_t operand_sbimm12(rv_inst inst) {
-+    return (((int64_t)inst << 32) >> 63) << 12 |
-+        ((inst << 33) >> 58) << 5 |
-+        ((inst << 52) >> 60) << 1 |
-+        ((inst << 56) >> 63) << 11;
-+}
-+
-+static uint32_t operand_cimmsh6(rv_inst inst) {
-+    return ((inst << 51) >> 63) << 5 |
-+        (inst << 57) >> 59;
-+}
-+
-+static int32_t operand_cimmi(rv_inst inst) {
-+    return (((int64_t)inst << 51) >> 63) << 5 |
-+        (inst << 57) >> 59;
-+}
-+
-+static int32_t operand_cimmui(rv_inst inst) {
-+    return (((int64_t)inst << 51) >> 63) << 17 |
-+        ((inst << 57) >> 59) << 12;
-+}
-+
-+static uint32_t operand_cimmlwsp(rv_inst inst) {
-+    return ((inst << 51) >> 63) << 5 |
-+        ((inst << 57) >> 61) << 2 |
-+        ((inst << 60) >> 62) << 6;
-+}
-+
-+static uint32_t operand_cimmldsp(rv_inst inst) {
-+    return ((inst << 51) >> 63) << 5 |
-+        ((inst << 57) >> 62) << 3 |
-+        ((inst << 59) >> 61) << 6;
-+}
-+
-+static uint32_t operand_cimmlqsp(rv_inst inst) {
-+    return ((inst << 51) >> 63) << 5 |
-+        ((inst << 57) >> 63) << 4 |
-+        ((inst << 58) >> 60) << 6;
-+}
-+
-+static int32_t operand_cimm16sp(rv_inst inst) {
-+    return (((int64_t)inst << 51) >> 63) << 9 |
-+        ((inst << 57) >> 63) << 4 |
-+        ((inst << 58) >> 63) << 6 |
-+        ((inst << 59) >> 62) << 7 |
-+        ((inst << 61) >> 63) << 5;
-+}
-+
-+static int32_t operand_cimmj(rv_inst inst) {
-+    return (((int64_t)inst << 51) >> 63) << 11 |
-+        ((inst << 52) >> 63) << 4 |
-+        ((inst << 53) >> 62) << 8 |
-+        ((inst << 55) >> 63) << 10 |
-+        ((inst << 56) >> 63) << 6 |
-+        ((inst << 57) >> 63) << 7 |
-+        ((inst << 58) >> 61) << 1 |
-+        ((inst << 61) >> 63) << 5;
-+}
-+
-+static int32_t operand_cimmb(rv_inst inst) {
-+    return (((int64_t)inst << 51) >> 63) << 8 |
-+        ((inst << 52) >> 62) << 3 |
-+        ((inst << 57) >> 62) << 6 |
-+        ((inst << 59) >> 62) << 1 |
-+        ((inst << 61) >> 63) << 5;
-+}
-+
-+static uint32_t operand_cimmswsp(rv_inst inst) {
-+    return ((inst << 51) >> 60) << 2 |
-+        ((inst << 55) >> 62) << 6;
-+}
-+
-+static uint32_t operand_cimmsdsp(rv_inst inst) {
-+    return ((inst << 51) >> 61) << 3 |
-+        ((inst << 54) >> 61) << 6;
-+}
-+
-+static uint32_t operand_cimmsqsp(rv_inst inst) {
-+    return ((inst << 51) >> 62) << 4 |
-+        ((inst << 53) >> 60) << 6;
-+}
-+
-+static uint32_t operand_cimm4spn(rv_inst inst) {
-+    return ((inst << 51) >> 62) << 4 |
-+        ((inst << 53) >> 60) << 6 |
-+        ((inst << 57) >> 63) << 2 |
-+        ((inst << 58) >> 63) << 3;
-+}
-+
-+static uint32_t operand_cimmw(rv_inst inst) {
-+    return ((inst << 51) >> 61) << 3 |
-+        ((inst << 57) >> 63) << 2 |
-+        ((inst << 58) >> 63) << 6;
-+}
-+
-+static uint32_t operand_cimmd(rv_inst inst) {
-+    return ((inst << 51) >> 61) << 3 |
-+        ((inst << 57) >> 62) << 6;
-+}
-+
-+static uint32_t operand_cimmq(rv_inst inst) {
-+    return ((inst << 51) >> 62) << 4 |
-+        ((inst << 53) >> 63) << 8 |
-+        ((inst << 57) >> 62) << 6;
-+}
-+
-+/* decode operands */
-+
-+static void decode_inst_operands(rv_decode *dec)
-+{
-+    rv_inst inst = dec->inst;
-+    dec->codec = opcode_data[dec->op].codec;
-+    switch (dec->codec) {
-+    case rv_codec_none:
-+        dec->rd = dec->rs1 = dec->rs2 = rv_ireg_zero;
-+        dec->imm = 0;
-+        break;
-+    case rv_codec_u:
-+        dec->rd = operand_rd(inst);
-+        dec->rs1 = dec->rs2 = rv_ireg_zero;
-+        dec->imm = operand_imm20(inst);
-+        break;
-+    case rv_codec_uj:
-+        dec->rd = operand_rd(inst);
-+        dec->rs1 = dec->rs2 = rv_ireg_zero;
-+        dec->imm = operand_jimm20(inst);
-+        break;
-+    case rv_codec_i:
-+        dec->rd = operand_rd(inst);
-+        dec->rs1 = operand_rs1(inst);
-+        dec->rs2 = rv_ireg_zero;
-+        dec->imm = operand_imm12(inst);
-+        break;
-+    case rv_codec_i_sh5:
-+        dec->rd = operand_rd(inst);
-+        dec->rs1 = operand_rs1(inst);
-+        dec->rs2 = rv_ireg_zero;
-+        dec->imm = operand_shamt5(inst);
-+        break;
-+    case rv_codec_i_sh6:
-+        dec->rd = operand_rd(inst);
-+        dec->rs1 = operand_rs1(inst);
-+        dec->rs2 = rv_ireg_zero;
-+        dec->imm = operand_shamt6(inst);
-+        break;
-+    case rv_codec_i_sh7:
-+        dec->rd = operand_rd(inst);
-+        dec->rs1 = operand_rs1(inst);
-+        dec->rs2 = rv_ireg_zero;
-+        dec->imm = operand_shamt7(inst);
-+        break;
-+    case rv_codec_i_csr:
-+        dec->rd = operand_rd(inst);
-+        dec->rs1 = operand_rs1(inst);
-+        dec->rs2 = rv_ireg_zero;
-+        dec->imm = operand_csr12(inst);
-+        break;
-+    case rv_codec_s:
-+        dec->rd = rv_ireg_zero;
-+        dec->rs1 = operand_rs1(inst);
-+        dec->rs2 = operand_rs2(inst);
-+        dec->imm = operand_simm12(inst);
-+        break;
-+    case rv_codec_sb:
-+        dec->rd = rv_ireg_zero;
-+        dec->rs1 = operand_rs1(inst);
-+        dec->rs2 = operand_rs2(inst);
-+        dec->imm = operand_sbimm12(inst);
-+        break;
-+    case rv_codec_r:
-+        dec->rd = operand_rd(inst);
-+        dec->rs1 = operand_rs1(inst);
-+        dec->rs2 = operand_rs2(inst);
-+        dec->imm = 0;
-+        break;
-+    case rv_codec_r_m:
-+        dec->rd = operand_rd(inst);
-+        dec->rs1 = operand_rs1(inst);
-+        dec->rs2 = operand_rs2(inst);
-+        dec->imm = 0;
-+        dec->rm = operand_rm(inst);
-+        break;
-+    case rv_codec_r4_m:
-+        dec->rd = operand_rd(inst);
-+        dec->rs1 = operand_rs1(inst);
-+        dec->rs2 = operand_rs2(inst);
-+        dec->rs3 = operand_rs3(inst);
-+        dec->imm = 0;
-+        dec->rm = operand_rm(inst);
-+        break;
-+    case rv_codec_r_a:
-+        dec->rd = operand_rd(inst);
-+        dec->rs1 = operand_rs1(inst);
-+        dec->rs2 = operand_rs2(inst);
-+        dec->imm = 0;
-+        dec->aq = operand_aq(inst);
-+        dec->rl = operand_rl(inst);
-+        break;
-+    case rv_codec_r_l:
-+        dec->rd = operand_rd(inst);
-+        dec->rs1 = operand_rs1(inst);
-+        dec->rs2 = rv_ireg_zero;
-+        dec->imm = 0;
-+        dec->aq = operand_aq(inst);
-+        dec->rl = operand_rl(inst);
-+        break;
-+    case rv_codec_r_f:
-+        dec->rd = dec->rs1 = dec->rs2 = rv_ireg_zero;
-+        dec->pred = operand_pred(inst);
-+        dec->succ = operand_succ(inst);
-+        dec->imm = 0;
-+        break;
-+    case rv_codec_cb:
-+        dec->rd = rv_ireg_zero;
-+        dec->rs1 = operand_crs1q(inst) + 8;
-+        dec->rs2 = rv_ireg_zero;
-+        dec->imm = operand_cimmb(inst);
-+        break;
-+    case rv_codec_cb_imm:
-+        dec->rd = dec->rs1 = operand_crs1rdq(inst) + 8;
-+        dec->rs2 = rv_ireg_zero;
-+        dec->imm = operand_cimmi(inst);
-+        break;
-+    case rv_codec_cb_sh5:
-+        dec->rd = dec->rs1 = operand_crs1rdq(inst) + 8;
-+        dec->rs2 = rv_ireg_zero;
-+        dec->imm = operand_cimmsh5(inst);
-+        break;
-+    case rv_codec_cb_sh6:
-+        dec->rd = dec->rs1 = operand_crs1rdq(inst) + 8;
-+        dec->rs2 = rv_ireg_zero;
-+        dec->imm = operand_cimmsh6(inst);
-+        break;
-+    case rv_codec_ci:
-+        dec->rd = dec->rs1 = operand_crs1rd(inst);
-+        dec->rs2 = rv_ireg_zero;
-+        dec->imm = operand_cimmi(inst);
-+        break;
-+    case rv_codec_ci_sh5:
-+        dec->rd = dec->rs1 = operand_crs1rd(inst);
-+        dec->rs2 = rv_ireg_zero;
-+        dec->imm = operand_cimmsh5(inst);
-+        break;
-+    case rv_codec_ci_sh6:
-+        dec->rd = dec->rs1 = operand_crs1rd(inst);
-+        dec->rs2 = rv_ireg_zero;
-+        dec->imm = operand_cimmsh6(inst);
-+        break;
-+    case rv_codec_ci_16sp:
-+        dec->rd = rv_ireg_sp;
-+        dec->rs1 = rv_ireg_sp;
-+        dec->rs2 = rv_ireg_zero;
-+        dec->imm = operand_cimm16sp(inst);
-+        break;
-+    case rv_codec_ci_lwsp:
-+        dec->rd = operand_crd(inst);
-+        dec->rs1 = rv_ireg_sp;
-+        dec->rs2 = rv_ireg_zero;
-+        dec->imm = operand_cimmlwsp(inst);
-+        break;
-+    case rv_codec_ci_ldsp:
-+        dec->rd = operand_crd(inst);
-+        dec->rs1 = rv_ireg_sp;
-+        dec->rs2 = rv_ireg_zero;
-+        dec->imm = operand_cimmldsp(inst);
-+        break;
-+    case rv_codec_ci_lqsp:
-+        dec->rd = operand_crd(inst);
-+        dec->rs1 = rv_ireg_sp;
-+        dec->rs2 = rv_ireg_zero;
-+        dec->imm = operand_cimmlqsp(inst);
-+        break;
-+    case rv_codec_ci_li:
-+        dec->rd = operand_crd(inst);
-+        dec->rs1 = rv_ireg_zero;
-+        dec->rs2 = rv_ireg_zero;
-+        dec->imm = operand_cimmi(inst);
-+        break;
-+    case rv_codec_ci_lui:
-+        dec->rd = operand_crd(inst);
-+        dec->rs1 = rv_ireg_zero;
-+        dec->rs2 = rv_ireg_zero;
-+        dec->imm = operand_cimmui(inst);
-+        break;
-+    case rv_codec_ci_none:
-+        dec->rd = dec->rs1 = dec->rs2 = rv_ireg_zero;
-+        dec->imm = 0;
-+        break;
-+    case rv_codec_ciw_4spn:
-+        dec->rd = operand_crdq(inst) + 8;
-+        dec->rs1 = rv_ireg_sp;
-+        dec->rs2 = rv_ireg_zero;
-+        dec->imm = operand_cimm4spn(inst);
-+        break;
-+    case rv_codec_cj:
-+        dec->rd = dec->rs1 = dec->rs2 = rv_ireg_zero;
-+        dec->imm = operand_cimmj(inst);
-+        break;
-+    case rv_codec_cj_jal:
-+        dec->rd = rv_ireg_ra;
-+        dec->rs1 = dec->rs2 = rv_ireg_zero;
-+        dec->imm = operand_cimmj(inst);
-+        break;
-+    case rv_codec_cl_lw:
-+        dec->rd = operand_crdq(inst) + 8;
-+        dec->rs1 = operand_crs1q(inst) + 8;
-+        dec->rs2 = rv_ireg_zero;
-+        dec->imm = operand_cimmw(inst);
-+        break;
-+    case rv_codec_cl_ld:
-+        dec->rd = operand_crdq(inst) + 8;
-+        dec->rs1 = operand_crs1q(inst) + 8;
-+        dec->rs2 = rv_ireg_zero;
-+        dec->imm = operand_cimmd(inst);
-+        break;
-+    case rv_codec_cl_lq:
-+        dec->rd = operand_crdq(inst) + 8;
-+        dec->rs1 = operand_crs1q(inst) + 8;
-+        dec->rs2 = rv_ireg_zero;
-+        dec->imm = operand_cimmq(inst);
-+        break;
-+    case rv_codec_cr:
-+        dec->rd = dec->rs1 = operand_crs1rd(inst);
-+        dec->rs2 = operand_crs2(inst);
-+        dec->imm = 0;
-+        break;
-+    case rv_codec_cr_mv:
-+        dec->rd = operand_crd(inst);
-+        dec->rs1 = operand_crs2(inst);
-+        dec->rs2 = rv_ireg_zero;
-+        dec->imm = 0;
-+        break;
-+    case rv_codec_cr_jalr:
-+        dec->rd = rv_ireg_ra;
-+        dec->rs1 = operand_crs1(inst);
-+        dec->rs2 = rv_ireg_zero;
-+        dec->imm = 0;
-+        break;
-+    case rv_codec_cr_jr:
-+        dec->rd = rv_ireg_zero;
-+        dec->rs1 = operand_crs1(inst);
-+        dec->rs2 = rv_ireg_zero;
-+        dec->imm = 0;
-+        break;
-+    case rv_codec_cs:
-+        dec->rd = dec->rs1 = operand_crs1rdq(inst) + 8;
-+        dec->rs2 = operand_crs2q(inst) + 8;
-+        dec->imm = 0;
-+        break;
-+    case rv_codec_cs_sw:
-+        dec->rd = rv_ireg_zero;
-+        dec->rs1 = operand_crs1q(inst) + 8;
-+        dec->rs2 = operand_crs2q(inst) + 8;
-+        dec->imm = operand_cimmw(inst);
-+        break;
-+    case rv_codec_cs_sd:
-+        dec->rd = rv_ireg_zero;
-+        dec->rs1 = operand_crs1q(inst) + 8;
-+        dec->rs2 = operand_crs2q(inst) + 8;
-+        dec->imm = operand_cimmd(inst);
-+        break;
-+    case rv_codec_cs_sq:
-+        dec->rd = rv_ireg_zero;
-+        dec->rs1 = operand_crs1q(inst) + 8;
-+        dec->rs2 = operand_crs2q(inst) + 8;
-+        dec->imm = operand_cimmq(inst);
-+        break;
-+    case rv_codec_css_swsp:
-+        dec->rd = rv_ireg_zero;
-+        dec->rs1 = rv_ireg_sp;
-+        dec->rs2 = operand_crs2(inst);
-+        dec->imm = operand_cimmswsp(inst);
-+        break;
-+    case rv_codec_css_sdsp:
-+        dec->rd = rv_ireg_zero;
-+        dec->rs1 = rv_ireg_sp;
-+        dec->rs2 = operand_crs2(inst);
-+        dec->imm = operand_cimmsdsp(inst);
-+        break;
-+    case rv_codec_css_sqsp:
-+        dec->rd = rv_ireg_zero;
-+        dec->rs1 = rv_ireg_sp;
-+        dec->rs2 = operand_crs2(inst);
-+        dec->imm = operand_cimmsqsp(inst);
-+        break;
-+    };
-+}
-+
-+/* check constraint */
-+
-+static bool check_constraints(rv_decode *dec, const rvc_constraint *c)
-+{
-+    int32_t imm = dec->imm;
-+    uint8_t rd = dec->rd, rs1 = dec->rs1, rs2 = dec->rs2;
-+    while (*c != rvc_end) {
-+        switch (*c) {
-+        case rvc_simm_6:
-+            if (!(imm >= -32 && imm < 32)) {
-+                return false;
-+            }
-+            break;
-+        case rvc_imm_6:
-+            if (!(imm <= 63)) {
-+                return false;
-+            }
-+            break;
-+        case rvc_imm_7:
-+            if (!(imm <= 127)) {
-+                return false;
-+            }
-+            break;
-+        case rvc_imm_8:
-+            if (!(imm <= 255)) {
-+                return false;
-+            }
-+            break;
-+        case rvc_imm_9:
-+            if (!(imm <= 511)) {
-+                return false;
-+            }
-+            break;
-+        case rvc_imm_10:
-+            if (!(imm <= 1023)) {
-+                return false;
-+            }
-+            break;
-+        case rvc_imm_12:
-+            if (!(imm <= 4095)) {
-+                return false;
-+            }
-+            break;
-+        case rvc_imm_18:
-+            if (!(imm <= 262143)) {
-+                return false;
-+            }
-+            break;
-+        case rvc_imm_nz:
-+            if (!(imm != 0)) {
-+                return false;
-+            }
-+            break;
-+        case rvc_imm_x2:
-+            if (!((imm & 0b1) == 0)) {
-+                return false;
-+            }
-+            break;
-+        case rvc_imm_x4:
-+            if (!((imm & 0b11) == 0)) {
-+                return false;
-+            }
-+            break;
-+        case rvc_imm_x8:
-+            if (!((imm & 0b111) == 0)) {
-+                return false;
-+            }
-+            break;
-+        case rvc_imm_x16:
-+            if (!((imm & 0b1111) == 0)) {
-+                return false;
-+            }
-+            break;
-+        case rvc_rd_b3:
-+            if (!(rd  >= 8 && rd  <= 15)) {
-+                return false;
-+            }
-+            break;
-+        case rvc_rs1_b3:
-+            if (!(rs1 >= 8 && rs1 <= 15)) {
-+                return false;
-+            }
-+            break;
-+        case rvc_rs2_b3:
-+            if (!(rs2 >= 8 && rs2 <= 15)) {
-+                return false;
-+            }
-+            break;
-+        case rvc_rd_eq_rs1:
-+            if (!(rd == rs1)) {
-+                return false;
-+            }
-+            break;
-+        case rvc_rd_eq_ra:
-+            if (!(rd == 1)) {
-+                return false;
-+            }
-+            break;
-+        case rvc_rd_eq_sp:
-+            if (!(rd == 2)) {
-+                return false;
-+            }
-+            break;
-+        case rvc_rd_eq_x0:
-+            if (!(rd == 0)) {
-+                return false;
-+            }
-+            break;
-+        case rvc_rs1_eq_sp:
-+            if (!(rs1 == 2)) {
-+                return false;
-+            }
-+            break;
-+        case rvc_rs1_eq_x0:
-+            if (!(rs1 == 0)) {
-+                return false;
-+            }
-+            break;
-+        case rvc_rs2_eq_x0:
-+            if (!(rs2 == 0)) {
-+                return false;
-+            }
-+            break;
-+        case rvc_rd_ne_x0_x2:
-+            if (!(rd != 0 && rd != 2)) {
-+                return false;
-+            }
-+            break;
-+        case rvc_rd_ne_x0:
-+            if (!(rd != 0)) {
-+                return false;
-+            }
-+            break;
-+        case rvc_rs1_ne_x0:
-+            if (!(rs1 != 0)) {
-+                return false;
-+            }
-+            break;
-+        case rvc_rs2_ne_x0:
-+            if (!(rs2 != 0)) {
-+                return false;
-+            }
-+            break;
-+        case rvc_rs2_eq_rs1:
-+            if (!(rs2 == rs1)) {
-+                return false;
-+            }
-+            break;
-+        case rvc_rs1_eq_ra:
-+            if (!(rs1 == 1)) {
-+                return false;
-+            }
-+            break;
-+        case rvc_imm_eq_zero:
-+            if (!(imm == 0)) {
-+                return false;
-+            }
-+            break;
-+        case rvc_imm_eq_n1:
-+            if (!(imm == -1)) {
-+                return false;
-+            }
-+            break;
-+        case rvc_imm_eq_p1:
-+            if (!(imm == 1)) {
-+                return false;
-+            }
-+            break;
-+        case rvc_csr_eq_0x001:
-+            if (!(imm == 0x001)) {
-+                return false;
-+            }
-+            break;
-+        case rvc_csr_eq_0x002:
-+            if (!(imm == 0x002)) {
-+                return false;
-+            }
-+            break;
-+        case rvc_csr_eq_0x003:
-+            if (!(imm == 0x003)) {
-+                return false;
-+            }
-+            break;
-+        case rvc_csr_eq_0xc00:
-+            if (!(imm == 0xc00)) {
-+                return false;
-+            }
-+            break;
-+        case rvc_csr_eq_0xc01:
-+            if (!(imm == 0xc01)) {
-+                return false;
-+            }
-+            break;
-+        case rvc_csr_eq_0xc02:
-+            if (!(imm == 0xc02)) {
-+                return false;
-+            }
-+            break;
-+        case rvc_csr_eq_0xc80:
-+            if (!(imm == 0xc80)) {
-+                return false;
-+            }
-+            break;
-+        case rvc_csr_eq_0xc81:
-+            if (!(imm == 0xc81)) {
-+                return false;
-+            }
-+            break;
-+        case rvc_csr_eq_0xc82:
-+            if (!(imm == 0xc82)) {
-+                return false;
-+            }
-+            break;
-+        default: break;
-+        }
-+        c++;
-+    }
-+    return true;
-+}
-+
-+/* instruction length */
-+
-+static size_t inst_length(rv_inst inst)
-+{
-+    /* NOTE: supports maximum instruction size of 64-bits */
-+
-+    /* instruction length coding
-+     *
-+     *      aa - 16 bit aa != 11
-+     *   bbb11 - 32 bit bbb != 111
-+     *  011111 - 48 bit
-+     * 0111111 - 64 bit
-+     */
-+
-+    return (inst &      0b11) != 0b11      ? 2
-+         : (inst &   0b11100) != 0b11100   ? 4
-+         : (inst &  0b111111) == 0b011111  ? 6
-+         : (inst & 0b1111111) == 0b0111111 ? 8
-+         : 0;
-+}
-+
-+/* format instruction */
-+
-+static void append(char *s1, const char *s2, size_t n)
-+{
-+    size_t l1 = strlen(s1);
-+    if (n - l1 - 1 > 0) {
-+        strncat(s1, s2, n - l1);
-+    }
-+}
-+
-+static void format_inst(char *buf, size_t buflen, size_t tab, rv_decode *dec)
-+{
-+    char tmp[64];
-+    const char *fmt;
-+
-+    if (dec->op == rv_op_illegal) {
-+        size_t len = inst_length(dec->inst);
-+        switch (len) {
-+        case 2:
-+            snprintf(buf, buflen, "(0x%04" PRIx64 ")", dec->inst);
-+            break;
-+        case 4:
-+            snprintf(buf, buflen, "(0x%08" PRIx64 ")", dec->inst);
-+            break;
-+        case 6:
-+            snprintf(buf, buflen, "(0x%012" PRIx64 ")", dec->inst);
-+            break;
-+        default:
-+            snprintf(buf, buflen, "(0x%016" PRIx64 ")", dec->inst);
-+            break;
-+        }
-+        return;
++    if (rs2) {
++        return RISCV_AMO_BADINSN;
 +    }
 +
-+    fmt = opcode_data[dec->op].format;
-+    while (*fmt) {
-+        switch (*fmt) {
-+        case 'O':
-+            append(buf, opcode_data[dec->op].name, buflen);
-+            break;
-+        case '(':
-+            append(buf, "(", buflen);
-+            break;
-+        case ',':
-+            append(buf, ",", buflen);
-+            break;
-+        case ')':
-+            append(buf, ")", buflen);
-+            break;
-+        case '0':
-+            append(buf, rv_ireg_name_sym[dec->rd], buflen);
-+            break;
-+        case '1':
-+            append(buf, rv_ireg_name_sym[dec->rs1], buflen);
-+            break;
-+        case '2':
-+            append(buf, rv_ireg_name_sym[dec->rs2], buflen);
-+            break;
-+        case '3':
-+            append(buf, rv_freg_name_sym[dec->rd], buflen);
-+            break;
-+        case '4':
-+            append(buf, rv_freg_name_sym[dec->rs1], buflen);
-+            break;
-+        case '5':
-+            append(buf, rv_freg_name_sym[dec->rs2], buflen);
-+            break;
-+        case '6':
-+            append(buf, rv_freg_name_sym[dec->rs3], buflen);
-+            break;
-+        case '7':
-+            snprintf(tmp, sizeof(tmp), "%d", dec->rs1);
-+            append(buf, tmp, buflen);
-+            break;
-+        case 'i':
-+            snprintf(tmp, sizeof(tmp), "%d", dec->imm);
-+            append(buf, tmp, buflen);
-+            break;
-+        case 'o':
-+            snprintf(tmp, sizeof(tmp), "%d", dec->imm);
-+            append(buf, tmp, buflen);
-+            while (strlen(buf) < tab * 2) {
-+                append(buf, " ", buflen);
-+            }
-+            snprintf(tmp, sizeof(tmp), "# 0x%" PRIx64,
-+                dec->pc + dec->imm);
-+            append(buf, tmp, buflen);
-+            break;
-+        case 'c': {
-+            const char *name = csr_name(dec->imm & 0xfff);
-+            if (name) {
-+                append(buf, name, buflen);
-+            } else {
-+                snprintf(tmp, sizeof(tmp), "0x%03x", dec->imm & 0xfff);
-+                append(buf, tmp, buflen);
-+            }
-+            break;
-+        }
-+        case 'r':
-+            switch (dec->rm) {
-+            case rv_rm_rne:
-+                append(buf, "rne", buflen);
-+                break;
-+            case rv_rm_rtz:
-+                append(buf, "rtz", buflen);
-+                break;
-+            case rv_rm_rdn:
-+                append(buf, "rdn", buflen);
-+                break;
-+            case rv_rm_rup:
-+                append(buf, "rup", buflen);
-+                break;
-+            case rv_rm_rmm:
-+                append(buf, "rmm", buflen);
-+                break;
-+            case rv_rm_dyn:
-+                append(buf, "dyn", buflen);
-+                break;
-+            default:
-+                append(buf, "inv", buflen);
-+                break;
-+            }
-+            break;
-+        case 'p':
-+            if (dec->pred & rv_fence_i) {
-+                append(buf, "i", buflen);
-+            }
-+            if (dec->pred & rv_fence_o) {
-+                append(buf, "o", buflen);
-+            }
-+            if (dec->pred & rv_fence_r) {
-+                append(buf, "r", buflen);
-+            }
-+            if (dec->pred & rv_fence_w) {
-+                append(buf, "w", buflen);
-+            }
-+            break;
-+        case 's':
-+            if (dec->succ & rv_fence_i) {
-+                append(buf, "i", buflen);
-+            }
-+            if (dec->succ & rv_fence_o) {
-+                append(buf, "o", buflen);
-+            }
-+            if (dec->succ & rv_fence_r) {
-+                append(buf, "r", buflen);
-+            }
-+            if (dec->succ & rv_fence_w) {
-+                append(buf, "w", buflen);
-+            }
-+            break;
-+        case '\t':
-+            while (strlen(buf) < tab) {
-+                append(buf, " ", buflen);
-+            }
-+            break;
-+        case 'A':
-+            if (dec->aq) {
-+                append(buf, ".aq", buflen);
-+            }
-+            break;
-+        case 'R':
-+            if (dec->rl) {
-+                append(buf, ".rl", buflen);
-+            }
-+            break;
-+        default:
-+            break;
-+        }
-+        fmt++;
-+    }
-+}
-+
-+/* lift instruction to pseudo-instruction */
-+
-+static void decode_inst_lift_pseudo(rv_decode *dec)
-+{
-+    const rv_comp_data *comp_data = opcode_data[dec->op].pseudo;
-+    if (!comp_data) {
-+        return;
-+    }
-+    while (comp_data->constraints) {
-+        if (check_constraints(dec, comp_data->constraints)) {
-+            dec->op = comp_data->op;
-+            dec->codec = opcode_data[dec->op].codec;
-+            return;
-+        }
-+        comp_data++;
-+    }
-+}
-+
-+/* decompress instruction */
-+
-+static void decode_inst_decompress_rv32(rv_decode *dec)
-+{
-+    int decomp_op = opcode_data[dec->op].decomp_rv32;
-+    if (decomp_op != rv_op_illegal) {
-+        dec->op = decomp_op;
-+        dec->codec = opcode_data[decomp_op].codec;
-+    }
-+}
-+
-+static void decode_inst_decompress_rv64(rv_decode *dec)
-+{
-+    int decomp_op = opcode_data[dec->op].decomp_rv64;
-+    if (decomp_op != rv_op_illegal) {
-+        dec->op = decomp_op;
-+        dec->codec = opcode_data[decomp_op].codec;
-+    }
-+}
-+
-+static void decode_inst_decompress_rv128(rv_decode *dec)
-+{
-+    int decomp_op = opcode_data[dec->op].decomp_rv128;
-+    if (decomp_op != rv_op_illegal) {
-+        dec->op = decomp_op;
-+        dec->codec = opcode_data[decomp_op].codec;
-+    }
-+}
-+
-+static void decode_inst_decompress(rv_decode *dec, rv_isa isa)
-+{
-+    switch (isa) {
-+    case rv32: decode_inst_decompress_rv32(dec); break;
-+    case rv64: decode_inst_decompress_rv64(dec); break;
-+    case rv128: decode_inst_decompress_rv128(dec); break;
-+    }
-+}
-+
-+/* disassemble instruction */
-+
-+static void
-+disasm_inst(char *buf, size_t buflen, rv_isa isa, uint64_t pc, rv_inst inst)
-+{
-+    rv_decode dec = { 0 };
-+    dec.pc = pc;
-+    dec.inst = inst;
-+    decode_inst_opcode(&dec, isa);
-+    decode_inst_operands(&dec);
-+    decode_inst_decompress(&dec, isa);
-+    decode_inst_lift_pseudo(&dec);
-+    format_inst(buf, buflen, 16, &dec);
-+}
-+
-+static int
-+print_insn_riscv(bfd_vma memaddr, struct disassemble_info *info, rv_isa isa)
-+{
-+    char buf[128] = { 0 };
-+    bfd_byte packet[2];
-+    rv_inst inst = 0;
-+    size_t len = 2;
-+    bfd_vma n;
-+    int status;
-+
-+    /* Instructions are made of 2-byte packets in little-endian order */
-+    for (n = 0; n < len; n += 2) {
-+        status = (*info->read_memory_func)(memaddr + n, packet, 2, info);
-+        if (status != 0) {
-+            /* Don't fail just because we fell off the end.  */
-+            if (n > 0) {
-+                break;
-+            }
-+            (*info->memory_error_func)(status, memaddr, info);
-+            return status;
-+        }
-+        inst |= ((rv_inst) bfd_getl16(packet)) << (8 * n);
-+        if (n == 0) {
-+            len = inst_length(inst);
-+        }
++    switch (width) {
++    case /* 010 */ 2:
++        fault = get_user_s32(val32, addr);
++        val = val32;
++        break;
++    case /* 011 */ 3:
++        fault = get_user_s64(val64, addr);
++        val = val64;
++        break;
++    default:
++        return RISCV_AMO_BADINSN;
 +    }
 +
-+    disasm_inst(buf, sizeof(buf), isa, memaddr, inst);
-+    (*info->fprintf_func)(info->stream, "%s", buf);
++    if (fault) {
++        return RISCV_AMO_BADADDR;
++    }
 +
-+    return len;
++    if (rd) {
++        env->gpr[rd] = val;
++    }
++
++    env->amoaddr = addr;
++    env->amotest = val;
++
++    return RISCV_AMO_OK;
 +}
 +
-+int print_insn_riscv32(bfd_vma memaddr, struct disassemble_info *info)
++/* Store-Conditional: [rs1] = rs2, rd = 0 if reservation is intact,
++   otherwise rd = 1. */
++
++static int rv_do_sc(ENV, int rd, int rs1, int rs2, int width)
 +{
-+    return print_insn_riscv(memaddr, info, rv32);
++    int64_t val64;
++    int32_t val32;
++    target_long val;
++    int fault;
++
++    target_long addr = env->gpr[rs1];
++    target_long resaddr = env->amoaddr;
++    target_long restest = env->amotest;
++
++    if (addr != resaddr) {
++        goto fail; /* no reservation for this address */
++    }
++
++    /* Load and test */
++    switch (width) {
++    case /* 010 */ 2:
++        fault = get_user_s32(val32, addr);
++        val = val32;
++        break;
++    case /* 011 */ 3:
++        fault = get_user_s64(val64, addr);
++        val = val64;
++        break;
++    default:
++        return RISCV_AMO_BADINSN;
++    }
++
++    if (fault) {
++        return RISCV_AMO_BADADDR;
++    }
++    if (val != restest) {
++        goto fail;
++    }
++
++    /* Store */
++    val = env->gpr[rs2];
++    switch (width) {
++    case /* 010 */ 2:
++        val32 = val;
++        fault = put_user_s32(val32, addr);
++        break;
++    case /* 011 */ 3:
++        val64 = val;
++        fault = put_user_s64(val64, addr);
++        break;
++    default:
++        return RISCV_AMO_BADINSN; /* should not happen */
++    }
++
++    if (fault) {
++        return RISCV_AMO_BADADDR;
++    }
++
++    if (rd) {
++        env->gpr[rd] = 0;
++    }
++    return RISCV_AMO_OK;
++
++fail:
++    if (rd) {
++        env->gpr[rd] = 1;
++    }
++    return RISCV_AMO_OK;
 +}
 +
-+int print_insn_riscv64(bfd_vma memaddr, struct disassemble_info *info)
++/* Tricky signed-unsigned minmaxes */
++#define DEFMINMAX(type, name, ret) \
++    static inline type name(type a, type b) { return ret; }
++DEFMINMAX(target_long, rv_min, a < b ? a : b);
++DEFMINMAX(target_long, rv_max, a > b ? a : b);
++DEFMINMAX(target_ulong, rv_minu, a < b ? a : b);
++DEFMINMAX(target_ulong, rv_maxu, a > b ? a : b);
++
++/* Atomic memory ops: [rs1] = rd = [rs1] op rs2;
++   amoswap, amoadd, amoxor, amoor, amomin, amomax, amominu, amomaxu. */
++
++static int rv_do_amo(ENV, int func, int rd, int rs1, int rs2, int width)
 +{
-+    return print_insn_riscv(memaddr, info, rv64);
++    int64_t val64;
++    int32_t val32;
++    int fault = 0;
++    target_long addr = env->gpr[rs1];
++    target_long arg = env->gpr[rs2];
++
++    target_long val;    /* read/written */
++
++    /* Load, but do not report BADADDR yet */
++    switch (width) {
++    case /* 010 */ 2:
++        fault = get_user_s32(val32, addr);
++        val = val32;
++        break;
++    case /* 011 */ 3:
++        fault = get_user_s64(val64, addr);
++        val = val64;
++        break;
++    default:
++        return RISCV_AMO_BADINSN;
++    }
++
++    target_long vrd = val;
++
++    switch (func) {
++    case /* 00001 */ 0x01:
++        val = arg;
++        break;
++    case /* 00000 */ 0x00:
++        val += arg;
++        break;
++    case /* 00100 */ 0x04:
++        val ^= arg;
++        break;
++    case /* 01100 */ 0x0C:
++        val &= arg;
++        break;
++    case /* 01000 */ 0x08:
++        val |= arg;
++        break;
++    case /* 10000 */ 0x10:
++        val = rv_min(val, arg);
++        break;
++    case /* 10100 */ 0x14:
++        val = rv_max(val, arg);
++        break;
++    case /* 11000 */ 0x18:
++        val = rv_minu(val, arg);
++        break;
++    case /* 11100 */ 0x1C:
++        val = rv_maxu(val, arg);
++        break;
++    default:
++        return RISCV_AMO_BADINSN;
++    }
++
++    /* No BADINSN during decoding, ok to report BADADDR */
++    if (fault) {
++        return RISCV_AMO_BADADDR;
++    }
++    /* No BADINSN on decoding and no BADADDR on read, ok to write rd */
++    if (rd) {
++        env->gpr[rd] = vrd;
++    }
++
++    switch (width) {
++    case /* 010 */ 2:
++        val32 = val;
++        fault = put_user_s32(val32, addr);
++        break;
++    case /* 011 */ 3:
++        val64 = val;
++        fault = put_user_s64(val64, addr);
++        break;
++    default:
++        return RISCV_AMO_BADINSN; /* should not happen */
++    }
++
++    if (fault) {
++        return RISCV_AMO_BADADDR;
++    }
++
++    return RISCV_AMO_OK;
 +}
-diff --git a/include/disas/bfd.h b/include/disas/bfd.h
-index 46c7ec3..ea3714a 100644
---- a/include/disas/bfd.h
-+++ b/include/disas/bfd.h
-@@ -428,6 +428,8 @@ int print_insn_ia64             (bfd_vma, disassemble_info*);
- int print_insn_lm32             (bfd_vma, disassemble_info*);
- int print_insn_big_nios2        (bfd_vma, disassemble_info*);
- int print_insn_little_nios2     (bfd_vma, disassemble_info*);
-+int print_insn_riscv32          (bfd_vma, disassemble_info*);
-+int print_insn_riscv64          (bfd_vma, disassemble_info*);
- 
- #if 0
- /* Fetch the disassembler for a given BFD, if that support is available.  */
++
++int riscv_cpu_do_usermode_amo(CPUState *cs)
++{
++    RISCVCPU *cpu = RISCV_CPU(cs);
++    CPURISCVState *env = &cpu->env;
++
++    uint64_t insn = env->amoinsn;
++    /* Major opcode must always be 0101111 AMO here */
++    if (BITFIELD(insn, 6, 0) != /* 0101111 */ 0x2F) {
++        return RISCV_AMO_BADINSN;
++    }
++    env->amoinsn = 0; /* clear amo request, just in case */
++
++    int func = BITFIELD(insn, 31, 27);
++    int rd = BITFIELD(insn, 11, 7);
++    int width = BITFIELD(insn, 14, 12);
++    int rs1 = BITFIELD(insn, 19, 15);
++    int rs2 = BITFIELD(insn, 24, 20);
++
++    int ret;
++
++    switch (func) {
++    case /* 00010 */ 2:
++        ret = rv_do_lr(env, rd, rs1, rs2, width);
++        break;
++    case /* 00011 */ 3:
++        ret = rv_do_sc(env, rd, rs1, rs2, width);
++        break;
++    default:
++        ret = rv_do_amo(env, func, rd, rs1, rs2, width);
++        break;
++    }
++
++    if (ret == RISCV_AMO_BADADDR) {
++        env->badaddr = rs1;
++    }
++
++    return ret;
++}
++
++#endif
 -- 
 2.7.0
