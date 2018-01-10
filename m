@@ -1,22 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35334)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40144)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1eZFcq-0002rY-Je
-	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 07:37:02 -0500
+	(envelope-from <quintela@redhat.com>) id 1eZFn5-00063n-L7
+	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 07:47:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1eZFcm-0008GM-HE
-	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 07:37:00 -0500
-Date: Wed, 10 Jan 2018 12:36:51 +0000
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20180110123651.GJ3205@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <1514907465-14530-1-git-send-email-thuth@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <1514907465-14530-1-git-send-email-thuth@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] crypto/ivgen-essiv: Fix problem with
- address sanitizer of Clang
+	(envelope-from <quintela@redhat.com>) id 1eZFn2-0004JV-W2
+	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 07:47:35 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:45582)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1eZFn2-0004IT-QE
+	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 07:47:32 -0500
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id DEF8BC049D42
+	for <qemu-devel@nongnu.org>; Wed, 10 Jan 2018 12:47:31 +0000 (UTC)
+From: Juan Quintela <quintela@redhat.com>
+Date: Wed, 10 Jan 2018 13:47:11 +0100
+Message-Id: <20180110124723.11879-3-quintela@redhat.com>
+In-Reply-To: <20180110124723.11879-1-quintela@redhat.com>
+References: <20180110124723.11879-1-quintela@redhat.com>
+Subject: [Qemu-devel] [PATCH v10 02/14] migration: Rename initial_bytes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,57 +29,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-trivial@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: dgilbert@redhat.com, lvivier@redhat.com, peterx@redhat.com
 
-On Tue, Jan 02, 2018 at 04:37:45PM +0100, Thomas Huth wrote:
-> When compiling QEMU with clang and -fsanitize=3Daddress, I get the
-> following error:
->=20
-> =3D=3D9185=3D=3DERROR: AddressSanitizer: stack-buffer-overflow on addre=
-ss 0x7ffc7e9adf2f at pc 0x564cba001d88 bp 0x7ffc7e9adeb0 sp 0x7ffc7e9adea=
-8
-> READ of size 16 at 0x7ffc7e9adf2f thread T0
->     #0 0x564cba001d87 in qcrypto_ivgen_essiv_calculate .../crypto/ivgen=
--essiv.c:83
->     #1 0x564cba001367 in qcrypto_ivgen_calculate .../crypto/ivgen.c:72
->     #2 0x564cb9fec630 in test_ivgen .../tests/test-crypto-ivgen.c:148
->     #3 0x7f98f4224b39 (/lib64/libglib-2.0.so.0+0x6fb39)
->     #4 0x7f98f4224d02 (/lib64/libglib-2.0.so.0+0x6fd02)
->     #5 0x7f98f4224d02 (/lib64/libglib-2.0.so.0+0x6fd02)
->     #6 0x7f98f4224d02 (/lib64/libglib-2.0.so.0+0x6fd02)
->     #7 0x7f98f4224f0d (/lib64/libglib-2.0.so.0+0x6ff0d)
->     #8 0x7f98f4224f30 (/lib64/libglib-2.0.so.0+0x6ff30)
->     #9 0x564cb9fec446 in main .../tests/test-crypto-ivgen.c:173
->     #10 0x7f98f294fc04 in __libc_start_main (/lib64/libc.so.6+0x21c04)
->     #11 0x564cb9fec1ac in _start (.../tests/test-crypto-ivgen+0xdb1ac)
->=20
-> Address 0x7ffc7e9adf2f is located in stack of thread T0 at offset 47 in=
- frame
->     #0 0x564cba00192f in qcrypto_ivgen_essiv_calculate .../crypto/ivgen=
--essiv.c:76
->=20
-> And indeed, the code is doing a "memcpy(data, (uint8_t *)&sector, ndata=
-)"
-> here with "sector" being a uint64_t variable and ndata =3D 16.
->=20
-> Fix it by limiting the size of the memcpy correctly.
->=20
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
-> ---
->  crypto/ivgen-essiv.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+Now it is called qemu_file_bytes that reflects better what it does,
+and we create qemu_file_bytes_now to not have to call qemu_ftell() twice.
 
-FYI, this is a dupe of the same fix posted  Marc-Andr=C3=A9 Lureau last
-year with subject "crypto: fix stack-buffer-overflow error", which I
-already have queued.
+Signed-off-by: Juan Quintela <quintela@redhat.com>
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+---
+ migration/migration.c | 9 +++++----
+ 1 file changed, 5 insertions(+), 4 deletions(-)
 
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+diff --git a/migration/migration.c b/migration/migration.c
+index 085e88c625..e506b9c2c6 100644
+--- a/migration/migration.c
++++ b/migration/migration.c
+@@ -2217,13 +2217,13 @@ static void *migration_thread(void *opaque)
+     /* Used by the bandwidth calcs, updated later */
+     int64_t initial_time = qemu_clock_get_ms(QEMU_CLOCK_REALTIME);
+     int64_t setup_start = qemu_clock_get_ms(QEMU_CLOCK_HOST);
+-    int64_t initial_bytes = 0;
+     /*
+      * The final stage happens when the remaining data is smaller than
+      * this threshold; it's calculated from the requested downtime and
+      * measured bandwidth
+      */
+     int64_t threshold_size = 0;
++    int64_t qemu_file_bytes = 0;
+     int64_t start_time = initial_time;
+     int64_t end_time;
+     bool old_vm_running = false;
+@@ -2311,8 +2311,9 @@ static void *migration_thread(void *opaque)
+         }
+         current_time = qemu_clock_get_ms(QEMU_CLOCK_REALTIME);
+         if (current_time >= initial_time + BUFFER_DELAY) {
+-            uint64_t transferred_bytes = qemu_ftell(s->to_dst_file) -
+-                                         initial_bytes;
++            uint64_t qemu_file_bytes_now = qemu_ftell(s->to_dst_file);
++            uint64_t transferred_bytes =
++                qemu_file_bytes_now - qemu_file_bytes;
+             uint64_t time_spent = current_time - initial_time;
+             double bandwidth = (double)transferred_bytes / time_spent;
+             threshold_size = bandwidth * s->parameters.downtime_limit;
+@@ -2331,7 +2332,7 @@ static void *migration_thread(void *opaque)
+ 
+             qemu_file_reset_rate_limit(s->to_dst_file);
+             initial_time = current_time;
+-            initial_bytes = qemu_ftell(s->to_dst_file);
++            qemu_file_bytes = qemu_file_bytes_now;
+         }
+         if (qemu_file_rate_limit(s->to_dst_file)) {
+             /* usleep expects microseconds */
+-- 
+2.14.3
