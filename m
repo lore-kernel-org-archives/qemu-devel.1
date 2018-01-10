@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33766)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34084)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eZHbl-0005YQ-0g
-	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 09:44:02 -0500
+	(envelope-from <eblake@redhat.com>) id 1eZHce-00065W-Gb
+	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 09:44:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eZHbk-0006DG-2b
-	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 09:44:01 -0500
+	(envelope-from <eblake@redhat.com>) id 1eZHcd-0006qA-LK
+	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 09:44:56 -0500
 References: <20180110091846.10699-1-famz@redhat.com>
 	<20180110091846.10699-4-famz@redhat.com>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <6a99fa98-5e81-ffa6-22c1-240d41ecac96@redhat.com>
-Date: Wed, 10 Jan 2018 08:43:35 -0600
+Message-ID: <51927002-e1b5-6bd0-2ebd-5270d6153339@redhat.com>
+Date: Wed, 10 Jan 2018 08:44:36 -0600
 MIME-Version: 1.0
 In-Reply-To: <20180110091846.10699-4-famz@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="pBMiFsgYmr10EY4XWy7acE0y63lXfjzXG"
+	boundary="OrI9yZ9ru5ia53lpWoMSTdYXC2bYRNw1E"
 Subject: Re: [Qemu-devel] [PATCH v4 3/9] block: Add VFIO based NVMe driver
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -28,14 +28,14 @@ To: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
 Cc: Paolo Bonzini <pbonzini@redhat.com>, Keith Busch <keith.busch@intel.com>, qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Markus Armbruster <armbru@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Karl Rister <krister@redhat.com>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---pBMiFsgYmr10EY4XWy7acE0y63lXfjzXG
+--OrI9yZ9ru5ia53lpWoMSTdYXC2bYRNw1E
 From: Eric Blake <eblake@redhat.com>
 To: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
 Cc: Paolo Bonzini <pbonzini@redhat.com>, Keith Busch <keith.busch@intel.com>,
  qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>,
  Max Reitz <mreitz@redhat.com>, Markus Armbruster <armbru@redhat.com>,
  Stefan Hajnoczi <stefanha@redhat.com>, Karl Rister <krister@redhat.com>
-Message-ID: <6a99fa98-5e81-ffa6-22c1-240d41ecac96@redhat.com>
+Message-ID: <51927002-e1b5-6bd0-2ebd-5270d6153339@redhat.com>
 Subject: Re: [PATCH v4 3/9] block: Add VFIO based NVMe driver
 References: <20180110091846.10699-1-famz@redhat.com>
  <20180110091846.10699-4-famz@redhat.com>
@@ -48,25 +48,26 @@ On 01/10/2018 03:18 AM, Fam Zheng wrote:
 > controller through VFIO. It achieves better latency than linux-aio by
 > completely bypassing host kernel vfs/block layer.
 >=20
->     $rw-$bs-$iodepth  linux-aio     nvme://
->     ----------------------------------------
->     randread-4k-1     10.5k         21.6k
->     randread-512k-1   745           1591
->     randwrite-4k-1    30.7k         37.0k
->     randwrite-512k-1  1945          1980
->=20
->     (unit: IOPS)
->=20
-> The driver also integrates with the polling mechanism of iothread.
->=20
-> This patch is co-authored by Paolo and me.
 
-Then shouldn't you include Paolo's S-o-b?
+> +static BlockDriver bdrv_nvme =3D {
+> +    .format_name              =3D "nvme",
+> +    .protocol_name            =3D "nvme",
+> +    .instance_size            =3D sizeof(BDRVNVMeState),
+> +
+> +    .bdrv_parse_filename      =3D nvme_parse_filename,
+> +    .bdrv_file_open           =3D nvme_file_open,
+> +    .bdrv_close               =3D nvme_close,
+> +    .bdrv_getlength           =3D nvme_getlength,
+> +
+> +    .bdrv_co_preadv           =3D nvme_co_preadv,
+> +    .bdrv_co_pwritev          =3D nvme_co_pwritev,
+> +    .bdrv_co_flush_to_disk    =3D nvme_co_flush,
+> +    .bdrv_reopen_prepare      =3D nvme_reopen_prepare,
+> +
+> +    .bdrv_co_get_block_status =3D nvme_co_get_block_status,
 
->=20
-> Signed-off-by: Fam Zheng <famz@redhat.com>
-> ---
-
+Semantic conflict with my pending patches to switch to byte-based block
+status in the drivers.
 
 --=20
 Eric Blake, Principal Software Engineer
@@ -74,7 +75,7 @@ Red Hat, Inc.           +1-919-301-3266
 Virtualization:  qemu.org | libvirt.org
 
 
---pBMiFsgYmr10EY4XWy7acE0y63lXfjzXG
+--OrI9yZ9ru5ia53lpWoMSTdYXC2bYRNw1E
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
@@ -83,14 +84,14 @@ Content-Disposition: attachment; filename="signature.asc"
 Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
 Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlpWJpcACgkQp6FrSiUn
-Q2rKkAf+IDEIZSI3LblN07rq32s9ivBpVtLLnsxKvjIEvD23eulFguwR4jqngSqx
-yxQrQJkOIhHY/297mW5VwcxQAPHLLar7OL+YMquggRufIzOIaiZPi54qSV4tPD+d
-8+dcNekxAtXi0mS/BlB/Y4KmGU9grkFs34b/5Ud+Ln9fKDNy6vvO+XmgJoTnPIu1
-WggQyUNGz2KTl8J0GpR2+wD8QVu+5t+5wdqzZmFQZXQeTHtKA6YlSJLuddaFmkYz
-YPW1Zr+1ubOcjf0CzEEM75J8BgvX9Gf42eYFaa49CIbdOpj/SiLlD7F+E4RmYO+b
-7f7Ga4dnbVKl7BsW4uV9gsyNHUeHgg==
-=68KR
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlpWJtQACgkQp6FrSiUn
+Q2qOoQf8DUO9fGyNgWOqPgS34W65063LBXaf0pT6mOhKlvZNZn9mhIOLKNQbVd/L
+kzGkYK9ywStK5Z5VyNFCOsWDdziYuH7mjBh82Z9KZPcIV1H9aM6/dJdYBG2/JcCT
+XcgrfEtHg2fLDDxWm8i+TPveAhAyxEazl5bW+CIa3/zLupzKFikQnQSQtcZSKBLW
+aeip6YTMme0LcpXHRw2ycImYhiiejsWqNrBEPWMaDDOESwWggGgFfNrldryP8NI/
+jvSWRIb2mCnRGmKqGqydfgEQLX9HqfTlXNUYTsoeeI6ElphfWjgfngPAq1ERFJEh
+TeX2UN6c4/l3gZscrCxk0per8M3o/Q==
+=qn8y
 -----END PGP SIGNATURE-----
 
---pBMiFsgYmr10EY4XWy7acE0y63lXfjzXG--
+--OrI9yZ9ru5ia53lpWoMSTdYXC2bYRNw1E--
