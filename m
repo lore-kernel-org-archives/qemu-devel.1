@@ -1,30 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43615)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45222)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1eZCIS-0007As-6t
-	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 04:03:45 -0500
+	(envelope-from <marcel@redhat.com>) id 1eZCLa-0000Mm-8d
+	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 04:07:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1eZCIP-00034u-IL
-	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 04:03:44 -0500
-Date: Wed, 10 Jan 2018 19:59:58 +1100
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20180110085958.GJ19773@umbus.fritz.box>
-References: <20171016093641.GH2776@umbus.fritz.box>
-	<e419ca8a-6e0b-70eb-14da-03a843fa8b92@ozlabs.ru>
-	<20171019062440.GY2776@umbus.fritz.box>
-	<699e58bf-de22-5341-ecc6-458df7ccbe65@ozlabs.ru>
-	<9227196b-789c-e4b2-c9c5-4fd95ed42b4e@ozlabs.ru>
-	<20171109063822.GD7732@umbus.fritz.box>
-	<d6f4ad92-bd83-b990-4e86-ac89638c44d0@ozlabs.ru>
-	<9fabc6c4-9a95-d44e-dc4c-33d91c00fb0c@ozlabs.ru>
-	<20180103000947.GE24581@umbus.fritz.box>
-	<9188ab4a-f3d6-3cfb-ae26-a24f7781fad1@ozlabs.ru>
+	(envelope-from <marcel@redhat.com>) id 1eZCL8-0005QR-1z
+	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 04:06:58 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:48626)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <marcel@redhat.com>) id 1eZCL7-0005Mq-Kx
+	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 04:06:29 -0500
+References: <20180107123224.100877-1-marcel@redhat.com>
+	<20180107123224.100877-5-marcel@redhat.com>
+	<20180109113911.1746995b.cohuck@redhat.com>
+From: Marcel Apfelbaum <marcel@redhat.com>
+Message-ID: <49cb6227-5ab0-bf04-2353-589f9d0ce513@redhat.com>
+Date: Wed, 10 Jan 2018 11:06:14 +0200
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="Ah9ph+G2cWRpKogL"
-Content-Disposition: inline
-In-Reply-To: <9188ab4a-f3d6-3cfb-ae26-a24f7781fad1@ozlabs.ru>
-Subject: Re: [Qemu-devel] [PATCH qemu v3] RFC: ppc/spapr: Receive and store
- device tree blob from SLOF
+In-Reply-To: <20180109113911.1746995b.cohuck@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH V6 4/5] pvrdma: initial implementation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,104 +29,129 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alexey Kardashevskiy <aik@ozlabs.ru>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Balbir Singh <bsingharora@gmail.com>, Greg Kurz <groug@kaod.org>, slof@lists.ozlabs.org, Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>, Thomas Huth <thuth@redhat.com>
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: qemu-devel@nongnu.org, ehabkost@redhat.com, imammedo@redhat.com, yuval.shaia@oracle.com, pbonzini@redhat.com, mst@redhat.com, borntraeger@de.ibm.com
 
+Hi Cornelia,
 
---Ah9ph+G2cWRpKogL
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+On 09/01/2018 12:39, Cornelia Huck wrote:
+> On Sun,  7 Jan 2018 14:32:23 +0200
+> Marcel Apfelbaum <marcel@redhat.com> wrote:
+> 
+>> From: Yuval Shaia <yuval.shaia@oracle.com>
+>>
+>> PVRDMA is the QEMU implementation of VMware's paravirtualized RDMA device.
+>> It works with its Linux Kernel driver AS IS, no need for any special guest
+>> modifications.
+>>
+>> While it complies with the VMware device, it can also communicate with bare
+>> metal RDMA-enabled machines and does not require an RDMA HCA in the host, it
+>> can work with Soft-RoCE (rxe).
+>>
+>> It does not require the whole guest RAM to be pinned allowing memory
+>> over-commit and, even if not implemented yet, migration support will be
+>> possible with some HW assistance.
+>>
+>> Signed-off-by: Yuval Shaia <yuval.shaia@oracle.com>
+>> Signed-off-by: Marcel Apfelbaum <marcel@redhat.com>
+>> ---
+>>   Makefile.objs                      |   2 +
+>>   configure                          |   9 +-
+>>   default-configs/arm-softmmu.mak    |   1 +
+>>   default-configs/i386-softmmu.mak   |   1 +
+>>   default-configs/x86_64-softmmu.mak |   1 +
+>>   hw/Makefile.objs                   |   1 +
+>>   hw/rdma/Makefile.objs              |   6 +
+>>   hw/rdma/rdma_backend.c             | 815 +++++++++++++++++++++++++++++++++++++
+>>   hw/rdma/rdma_backend.h             |  92 +++++
+>>   hw/rdma/rdma_backend_defs.h        |  62 +++
+>>   hw/rdma/rdma_rm.c                  | 619 ++++++++++++++++++++++++++++
+>>   hw/rdma/rdma_rm.h                  |  69 ++++
+>>   hw/rdma/rdma_rm_defs.h             | 106 +++++
+>>   hw/rdma/rdma_utils.c               |  52 +++
+>>   hw/rdma/rdma_utils.h               |  43 ++
+>>   hw/rdma/trace-events               |   5 +
+>>   hw/rdma/vmw/pvrdma.h               | 122 ++++++
+>>   hw/rdma/vmw/pvrdma_cmd.c           | 679 ++++++++++++++++++++++++++++++
+>>   hw/rdma/vmw/pvrdma_dev_api.h       | 602 +++++++++++++++++++++++++++
+>>   hw/rdma/vmw/pvrdma_dev_ring.c      | 139 +++++++
+>>   hw/rdma/vmw/pvrdma_dev_ring.h      |  42 ++
+>>   hw/rdma/vmw/pvrdma_ib_verbs.h      | 433 ++++++++++++++++++++
+>>   hw/rdma/vmw/pvrdma_main.c          | 644 +++++++++++++++++++++++++++++
+>>   hw/rdma/vmw/pvrdma_qp_ops.c        | 212 ++++++++++
+>>   hw/rdma/vmw/pvrdma_qp_ops.h        |  27 ++
+>>   hw/rdma/vmw/pvrdma_ring.h          | 134 ++++++
+>>   hw/rdma/vmw/trace-events           |   5 +
+>>   hw/rdma/vmw/vmw_pvrdma-abi.h       | 311 ++++++++++++++
+>>   include/hw/pci/pci_ids.h           |   3 +
+>>   29 files changed, 5233 insertions(+), 4 deletions(-)
+>>   create mode 100644 hw/rdma/Makefile.objs
+>>   create mode 100644 hw/rdma/rdma_backend.c
+>>   create mode 100644 hw/rdma/rdma_backend.h
+>>   create mode 100644 hw/rdma/rdma_backend_defs.h
+>>   create mode 100644 hw/rdma/rdma_rm.c
+>>   create mode 100644 hw/rdma/rdma_rm.h
+>>   create mode 100644 hw/rdma/rdma_rm_defs.h
+>>   create mode 100644 hw/rdma/rdma_utils.c
+>>   create mode 100644 hw/rdma/rdma_utils.h
+>>   create mode 100644 hw/rdma/trace-events
+>>   create mode 100644 hw/rdma/vmw/pvrdma.h
+>>   create mode 100644 hw/rdma/vmw/pvrdma_cmd.c
+>>   create mode 100644 hw/rdma/vmw/pvrdma_dev_api.h
+>>   create mode 100644 hw/rdma/vmw/pvrdma_dev_ring.c
+>>   create mode 100644 hw/rdma/vmw/pvrdma_dev_ring.h
+>>   create mode 100644 hw/rdma/vmw/pvrdma_ib_verbs.h
+>>   create mode 100644 hw/rdma/vmw/pvrdma_main.c
+>>   create mode 100644 hw/rdma/vmw/pvrdma_qp_ops.c
+>>   create mode 100644 hw/rdma/vmw/pvrdma_qp_ops.h
+>>   create mode 100644 hw/rdma/vmw/pvrdma_ring.h
+>>   create mode 100644 hw/rdma/vmw/trace-events
+>>   create mode 100644 hw/rdma/vmw/vmw_pvrdma-abi.h
+> 
+> (...)
+> 
+>> diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-softmmu.mak
+>> index b0d6e65038..0e7a3c1700 100644
+>> --- a/default-configs/arm-softmmu.mak
+>> +++ b/default-configs/arm-softmmu.mak
+>> @@ -132,3 +132,4 @@ CONFIG_GPIO_KEY=y
+>>   CONFIG_MSF2=y
+>>   CONFIG_FW_CFG_DMA=y
+>>   CONFIG_XILINX_AXI=y
+>> +CONFIG_PVRDMA=y
+>> diff --git a/default-configs/i386-softmmu.mak b/default-configs/i386-softmmu.mak
+>> index 95ac4b464a..88298e4ef5 100644
+>> --- a/default-configs/i386-softmmu.mak
+>> +++ b/default-configs/i386-softmmu.mak
+>> @@ -61,3 +61,4 @@ CONFIG_HYPERV_TESTDEV=$(CONFIG_KVM)
+>>   CONFIG_PXB=y
+>>   CONFIG_ACPI_VMGENID=y
+>>   CONFIG_FW_CFG_DMA=y
+>> +CONFIG_PVRDMA=y
+>> diff --git a/default-configs/x86_64-softmmu.mak b/default-configs/x86_64-softmmu.mak
+>> index 0221236825..f571da36eb 100644
+>> --- a/default-configs/x86_64-softmmu.mak
+>> +++ b/default-configs/x86_64-softmmu.mak
+>> @@ -61,3 +61,4 @@ CONFIG_HYPERV_TESTDEV=$(CONFIG_KVM)
+>>   CONFIG_PXB=y
+>>   CONFIG_ACPI_VMGENID=y
+>>   CONFIG_FW_CFG_DMA=y
+>> +CONFIG_PVRDMA=y
+> 
+> Any reason you did not add this to other architectures?
+>
 
-On Mon, Jan 08, 2018 at 07:35:43PM +1100, Alexey Kardashevskiy wrote:
-> On 03/01/18 11:09, David Gibson wrote:
-> > On Tue, Jan 02, 2018 at 05:13:09PM +1100, Alexey Kardashevskiy wrote:
-> >> On 11/12/17 17:20, Alexey Kardashevskiy wrote:
-> >>> On 09/11/17 17:38, David Gibson wrote:
-> >>>> On Tue, Nov 07, 2017 at 06:14:04PM +1100, Alexey Kardashevskiy wrote:
-> >>>>> On 20/10/17 11:46, Alexey Kardashevskiy wrote:
-> >>>>>> On 19/10/17 17:24, David Gibson wrote:
-> >>>>>>> On Tue, Oct 17, 2017 at 04:55:03PM +1100, Alexey Kardashevskiy wr=
-ote:
-> >>>>>>>> On 16/10/17 20:36, David Gibson wrote:
-> >>>>>>>>> On Mon, Oct 16, 2017 at 04:20:04PM +1100, Alexey Kardashevskiy
-> >>>>>>>> wrote:
-> >>>>>>> [snip]
-> >>>>>>>>> ||
-> >>>>>>>>>
-> >>>>>>>>> Yeah.. this is all a bit complicated, I'm really thinking about=
- a
-> >>>>>>>>> fdt_fsck() function for libfdt.
-> >>>>>>>>
-> >>>>>>>>
-> >>>>>>>> Oh. So what now? Do as below or wait for libdtc update?
-> >>>>>>>
-> >>>>>>> So I started hacking on this.  It's a bit fiddlier to get right t=
-han I
-> >>>>>>> anticipated.  How about you make a placeholder function to "test"=
- the
-> >>>>>>> tree for now, with a comment that it will be updated once the lib=
-fdt
-> >>>>>>> extensions are there.
-> >>>>>>
-> >>>>>> What would the placeholder do? Nothing or my proposed "FDT_CHK" th=
-ingy?
-> >>>>>>
-> >>>>>> Are we in a hurry with this one at all, or I can wait till libfdt =
-gets this
-> >>>>>> fsck()?
-> >>>>>
-> >>>>>
-> >>>>> Ping?
-> >>>>>
-> >>>>> This is not v2.11 material, is it?
-> >>>>
-> >>>> Not at this stage, no.
-> >>>>
-> >>>> I've started looking at writing the fdt_fsck() thing, but got
-> >>>> sidetracked by a bunch of related fixes to safety of handling
-> >>>> corrupted blobs in libfdt.
-> >>>
-> >>> Please let me know when I can repost the "
-> >>> ppc/spapr: Receive and store device tree blob from SLOF" again. Thank=
-s.
-> >>
-> >>
-> >> Still to early to repost?
-> >=20
-> > No.
->=20
->=20
-> I looked at the recent libfdt (from qemu tree, sha1  e543880, v1.4.6) and
-> could not find fdt_fsck() or similar, and I was waiting for this really,
-> have I missed something?
+We simply didn't test other architectures, but it could work.
 
-Oh, right, yeah, I haven't had time to look at that again.
+> I added "CONFIG_PVRDMA=$(CONFIG_PCI)" to s390x-softmmu.mak, and it at
+> least builds (did not try to actually get it to work, although I don't
+> see any immediate blocker for that).
+> 
+We will add it to s390, sure.
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
+Thanks,
+Marcel
 
---Ah9ph+G2cWRpKogL
-Content-Type: application/pgp-signature; name="signature.asc"
+> (...)
 
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlpV1g4ACgkQbDjKyiDZ
-s5LRzBAAoT9QvllIDTYivM9cIAQk+mh5sRnOXvMH0Kvh/sgdEGs4RxIjhP/D2PSx
-O+vy8ck9H5RsaRCpAYFIpRmho531YYeR62AxFxk91Gmlk9Rjv09Sg5N1PVKjqwZP
-XAb4M9anPoG/sTkYw5WggzObx5kmIhclJsBi4PGpQ0kyIiR/lu0B8DSyQobOYaUB
-P5yIDmbfdEsitax6tp9YCuycZm0UqwfDY2dzbRVfYPJ4Vfz/NAoS3rHZABZZA2kv
-5zAF2KIz8MmRgfYYIeHBIxjrqRYU5sT/qToYNPOGsffIbE/MUsPlQ+/BWvYgH7tu
-eLezPPkuIHTxX3OVmktpRu225aPoYrvbBwIXiJKv1/OmpOjhYF+THX6E9NhqOFIS
-rxv92NuP8PNb1zwEQTcjnHyMjZEgIB9JxVDKaMWaVbIDs44zvPWlypNd7fODWPZZ
-nI44Ve5dtKExqAgOop9sInlCrW8TP7xiUy+AFdisV1INTUt+LnkgiutWe+DfVm01
-2oKqqvPG0sQTibzYptOV09ZU4GGmEhkws82FHv322GtNPLraIfbQCqH5hSZYaKqM
-8seOoNoyJJyS7nOqUmWF3eTLkjY//UEB/hGhP5V+B4fU7EcbjBvfDX6pbofWirpf
-IawuFGB33Q0bkYQXYWtVV62MyjcW6eBddu/gIoGWGgZx5Jhz9qI=
-=Zt4q
------END PGP SIGNATURE-----
-
---Ah9ph+G2cWRpKogL--
+[...]
