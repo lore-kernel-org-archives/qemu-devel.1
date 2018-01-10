@@ -1,33 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36236)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37588)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1eZBzK-00063y-EI
-	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 03:43:59 -0500
+	(envelope-from <quintela@redhat.com>) id 1eZC2H-0007xo-GI
+	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 03:47:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1eZBzG-0006zQ-E9
-	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 03:43:58 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:39382)
+	(envelope-from <quintela@redhat.com>) id 1eZC2E-000216-7f
+	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 03:47:01 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:60766)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1eZBzG-0006yX-5b
-	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 03:43:54 -0500
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1eZC2D-00020C-VP
+	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 03:46:58 -0500
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 4D50BC0587DF
-	for <qemu-devel@nongnu.org>; Wed, 10 Jan 2018 08:43:53 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 03840356CA
+	for <qemu-devel@nongnu.org>; Wed, 10 Jan 2018 08:46:57 +0000 (UTC)
 From: Juan Quintela <quintela@redhat.com>
-In-Reply-To: <20180110063022.GC5984@xz-mi> (Peter Xu's message of "Wed, 10 Jan
-	2018 14:30:22 +0800")
+In-Reply-To: <20180110063707.GD5984@xz-mi> (Peter Xu's message of "Wed, 10 Jan
+	2018 14:37:07 +0800")
 References: <20180105215246.908-1-quintela@redhat.com>
-	<20180105215246.908-5-quintela@redhat.com>
-	<20180110063022.GC5984@xz-mi>
+	<20180105215246.908-6-quintela@redhat.com>
+	<20180110063707.GD5984@xz-mi>
 Reply-To: quintela@redhat.com
-Date: Wed, 10 Jan 2018 09:43:48 +0100
-Message-ID: <87r2qyyugr.fsf@secure.laptop>
+Date: Wed, 10 Jan 2018 09:46:49 +0100
+Message-ID: <87mv1myubq.fsf@secure.laptop>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v4 04/11] tests: Use consistent names and
- sizes for migration
+Subject: Re: [Qemu-devel] [PATCH v4 05/11] tests: Add deprecated commands
+ migration test
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -40,64 +40,90 @@ To: Peter Xu <peterx@redhat.com>
 Cc: qemu-devel@nongnu.org, dgilbert@redhat.com, lvivier@redhat.com
 
 Peter Xu <peterx@redhat.com> wrote:
-> On Fri, Jan 05, 2018 at 10:52:39PM +0100, Juan Quintela wrote:
+> On Fri, Jan 05, 2018 at 10:52:40PM +0100, Juan Quintela wrote:
+>> We add deprecated commands on a new test, so we don't have to add it
+>> on normal tests.
+>> 
 >> Signed-off-by: Juan Quintela <quintela@redhat.com>
 >> ---
->>  tests/migration-test.c | 12 ++++++------
->>  1 file changed, 6 insertions(+), 6 deletions(-)
+>>  tests/migration-test.c | 59 ++++++++++++++++++++++++++++++++++++++++++++++++++
+>>  1 file changed, 59 insertions(+)
 >> 
 >> diff --git a/tests/migration-test.c b/tests/migration-test.c
->> index d81f22118b..f469235d0b 100644
+>> index f469235d0b..bcb0a82d42 100644
 >> --- a/tests/migration-test.c
 >> +++ b/tests/migration-test.c
->> @@ -440,13 +440,13 @@ static void test_migrate_start(QTestState **from, QTestState **to,
+>> @@ -513,6 +513,64 @@ static void test_migrate_end(QTestState *from, QTestState *to)
+>>      cleanup("dest_serial");
+>>  }
 >>  
->>      if (strcmp(arch, "i386") == 0 || strcmp(arch, "x86_64") == 0) {
->>          init_bootfile_x86(bootpath);
->> -        cmd_src = g_strdup_printf("-machine accel=%s -m 150M"
->> -                                  " -name pcsource,debug-threads=on"
->> +        cmd_src = g_strdup_printf("-machine accel=%s -m 256M"
->> +                                  " -name source,debug-threads=on"
+>> +static void deprecated_set_downtime(QTestState *who, const double value)
+>> +{
+>> +    QDict *rsp;
+>> +    gchar *cmd;
+>> +    char *expected;
+>> +    int64_t result_int;
+>> +
+>> +    cmd = g_strdup_printf("{ 'execute': 'migrate_set_downtime',"
+>> +                          "'arguments': { 'value': %g } }", value);
+>> +    rsp = qtest_qmp(who, cmd);
+>> +    g_free(cmd);
+>> +    g_assert(qdict_haskey(rsp, "return"));
+>> +    QDECREF(rsp);
+>> +    result_int = value * 1000L;
+>> +    expected = g_strdup_printf("%" PRId64, result_int);
+>> +    migrate_check_parameter(who, "downtime-limit", expected);
+>> +    g_free(expected);
+>> +}
+>> +
+>> +static void deprecated_set_speed(QTestState *who, const char *value)
+>> +{
+>> +    QDict *rsp;
+>> +    gchar *cmd;
+>> +
+>> +    cmd = g_strdup_printf("{ 'execute': 'migrate_set_speed',"
+>> +                          "'arguments': { 'value': %s } }", value);
+>> +    rsp = qtest_qmp(who, cmd);
+>> +    g_free(cmd);
+>> +    g_assert(qdict_haskey(rsp, "return"));
+>> +    QDECREF(rsp);
+>> +    migrate_check_parameter(who, "max-bandwidth", value);
+>> +}
+>> +
+>> +static void test_deprecated(void)
+>> +{
+>> +    char *uri = g_strdup_printf("unix:%s/migsocket", tmpfs);
+>> +    QTestState *from, *to;
+>> +
+>> +    /* Create source and destination guests.  This way we can reuse
+>> +     * test_migrate_start */
+>> +    test_migrate_start(&from, &to, uri);
+>> +
+>> +    deprecated_set_downtime(from, 0.12345);
+>> +    deprecated_set_downtime(to, 0.12345);
+>> +    deprecated_set_speed(from, "12345");
+>> +    deprecated_set_speed(to, "12345");
+>> +
+>> +    g_free(uri);
+>> +
+>> +    qtest_quit(from);
+>> +    qtest_quit(to);
+>> +
+>> +    cleanup("bootsect");
+>> +    cleanup("migsocket");
+>> +    cleanup("src_serial");
+>> +    cleanup("dest_serial");
 >
-> A pure question: when will the name matter?
+> I thought calling qtest_start() with a single VM would be even
+> simpler, but this is good enough for me... Thanks for that.  :-)
 
-It don't matter, but ARM didn't want to use the pcname, and decided for
-yet a different command line.  I would like to have the same command
-line for all architectures.  At least the less gratuitous differences.
+I had two options:
+- reuse the test_migrate_start function, and create two guests
+- create a function that only creates one guest, but repeat the
+  architecture dependent part.
 
-As you can guess, name don't matter at all., but telling ARNM people to
-be consistent with things that are not consistent .... O:-)
+Take your poison.
 
+> Reviewed-by: Peter Xu <peterx@redhat.com>
 
-Later, Juan.
-
-
->
->>                                    " -serial file:%s/src_serial"
->>                                    " -drive file=%s,format=raw",
->>                                    accel, tmpfs, bootpath);
->> -        cmd_dst = g_strdup_printf("-machine accel=%s -m 150M"
->> -                                  " -name pcdest,debug-threads=on"
->> +        cmd_dst = g_strdup_printf("-machine accel=%s -m 256M"
->> +                                  " -name target,debug-threads=on"
->>                                    " -serial file:%s/dest_serial"
->>                                    " -drive file=%s,format=raw"
->>                                    " -incoming %s",
->> @@ -459,12 +459,12 @@ static void test_migrate_start(QTestState **from, QTestState **to,
->>          }
->>          init_bootfile_ppc(bootpath);
->>          cmd_src = g_strdup_printf("-machine accel=%s -m 256M"
->> -                                  " -name pcsource,debug-threads=on"
->> +                                  " -name source,debug-threads=on"
->>                                    " -serial file:%s/src_serial"
->>                                    " -drive file=%s,if=pflash,format=raw",
->>                                    accel, tmpfs, bootpath);
->>          cmd_dst = g_strdup_printf("-machine accel=%s -m 256M"
->> -                                  " -name pcdest,debug-threads=on"
->> +                                  " -name target,debug-threads=on"
->>                                    " -serial file:%s/dest_serial"
->>                                    " -drive file=%s,if=pflash,format=raw"
->>                                    " -incoming %s",
->> -- 
->> 2.14.3
->> 
+Thanks, Juan.
