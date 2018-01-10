@@ -1,23 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33018)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34168)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1eZIa6-0005Pf-JL
-	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 10:46:23 -0500
+	(envelope-from <berrange@redhat.com>) id 1eZIcv-0006cv-14
+	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 10:49:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1eZIa5-0003dG-Rw
-	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 10:46:22 -0500
-References: <CACaajQsL3e+XWR0hBDLThmG_fd=ih-n+HJVz++XcnwLhhVstgg@mail.gmail.com>
-	<56c5bcbb-02c0-a3f7-4363-e3141476b2f8@redhat.com>
-	<CACaajQvYee3-=859D8t-QLiYdTE8SL-M5zztP4QsjRm5xCnvBQ@mail.gmail.com>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <36ebb0bc-363f-5cc6-5274-ce8de7044990@redhat.com>
-Date: Wed, 10 Jan 2018 10:46:09 -0500
+	(envelope-from <berrange@redhat.com>) id 1eZIcu-0005zp-4v
+	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 10:49:17 -0500
+Date: Wed, 10 Jan 2018 15:49:01 +0000
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20180110154901.GK3205@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <1513595351-5899-1-git-send-email-den@openvz.org>
+	<1513595351-5899-3-git-send-email-den@openvz.org>
+	<20171222123802.GB2347@rkaganb.sw.ru>
 MIME-Version: 1.0
-In-Reply-To: <CACaajQvYee3-=859D8t-QLiYdTE8SL-M5zztP4QsjRm5xCnvBQ@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] qemu 2.9.0 qcow2 file failed to open after hard
- server reset
+Content-Disposition: inline
+In-Reply-To: <20171222123802.GB2347@rkaganb.sw.ru>
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 2/5] configure: add dependency
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,45 +25,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vasiliy Tolstov <v.tolstov@selfip.ru>
-Cc: qemu-devel <qemu-devel@nongnu.org>, Qemu-block <qemu-block@nongnu.org>
+To: Roman Kagan <rkagan@virtuozzo.com>, "Denis V. Lunev" <den@openvz.org>, qemu-block@nongnu.org, qemu-devel@nongnu.org, Klim Kireev <klim.kireev@virtuozzo.com>, Edgar Kaziakhmedov <edgar.kaziakhmedov@virtuozzo.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
-
-
-On 12/27/2017 04:47 PM, Vasiliy Tolstov wrote:
-> 2017-12-22 1:58 GMT+03:00 John Snow <jsnow@redhat.com>:
->>
->>
->> On 12/21/2017 05:13 PM, Vasiliy Tolstov wrote:
->>> Hi! Today my server have forced reboot and one of my vm can't start
->>> with message:
->>> qcow2: Marking image as corrupt: L2 table offset 0x3f786d6c207600
->>> unaligned (L1 index: 0); further corruption events will be suppressed
->>>
->>> i'm use debian jessie with hand builded qemu 2.9.0, i'm try to
->>> qemu-img check but it not helps. How can i recover data inside qcow2
->>> file? (i'm not use compression or encryption inside it).
->>>
->>
->> Not looking good if you're missing the very first L2 table in its entirety.
->>
->> You might be able to go through this thing by hand and learn for
->> yourself where the L2 table is (it will be a 64KiB region, aligned to a
->> 64KiB boundary, that all contain 64bit, 64KiB aligned pointers that will
->> be less than the size of the file. the offset of this missing region is
->> not likely to be referenced elsewhere in your file.)
->>
->> and then, once you've found it, you can update the pointer that's wrong.
->> However, where there's smoke there's often fire, so...
->>
->> best of luck.
->>
->> --js
+On Fri, Dec 22, 2017 at 03:38:02PM +0300, Roman Kagan wrote:
+> On Mon, Dec 18, 2017 at 02:09:08PM +0300, Denis V. Lunev wrote:
+> > From: Klim Kireev <klim.kireev@virtuozzo.com>
+> > 
+> > This dependency is required for adequate Parallels images support.
+> > Typically the disk consists of several images which are glued by
+> > XML disk descriptor. Also XML hides inside several important parameters
+> > which are not available in the image header.
+> > 
+> > The patch also adds clause to checkpatch.pl to understand libxml2 types.
 > 
-> If i use raw image as i understand this corruption can't happening in raw?
+> Can't you get by with glib's GMarkup, to avoid extra dependencies?
 > 
+> https://developer.gnome.org/glib/stable/glib-Simple-XML-Subset-Parser.html
 
-Not this exact type of corruption, anyway. Backups are important for a
-reason!
+I don't think the extra dep is a real problem, given that a full QEMU
+build already links to 150+ libraries and libxml is widely available
+across platforms and certainly everywhere on Linux. If you  build QEMU
+with modular block drivers, then the libxml dep only gets added to the
+parallels block driver so file and thus only loaded when needed.
 
---js
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
