@@ -1,37 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50543)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52097)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1eZDr3-0000Oi-Pd
-	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 05:43:34 -0500
+	(envelope-from <quintela@redhat.com>) id 1eZDuj-0002bz-QT
+	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 05:47:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1eZDqz-0006wG-Pc
-	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 05:43:33 -0500
-Received: from mail.ispras.ru ([83.149.199.45]:41236)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1eZDqz-0006vE-HC
-	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 05:43:29 -0500
-From: "Pavel Dovgalyuk" <dovgaluk@ispras.ru>
-References: <20171116115926.16627-1-pbonzini@redhat.com>
-	<20171116115926.16627-8-pbonzini@redhat.com>
-	<CAFEAcA-06-VmH7Pvymo-o-HmiQ-uQ67Hs0KhWZfxswBxsfD2-g@mail.gmail.com>
-	<bf4bedd9-0ef8-cff3-6153-531fba597237@redhat.com>
-	<CAFEAcA9Rnd3gtrHb389e6fOEAae4aLhJnQWU-vKyzTM4o-riOQ@mail.gmail.com>
-	<001b01d361e9$d46ace40$7d406ac0$@ru>
-	<CAFEAcA8NGnmG_8SipvPN5_dPhokH2zZAXykN2KiW10XhB-9xXQ@mail.gmail.com>
-	<CAFEAcA9PUOyK_vEnMKJkZV5s7o4zHDRedUY7z0ZH0i5ULEGzwg@mail.gmail.com>
-	<004401d3894c$b3fc90f0$1bf5b2d0$@ru>
-	<CAFEAcA8GiMDyFU4j3OvZ7F=fXk93B4447RQnpp+9cHWUGMp7Ag@mail.gmail.com>
-	<001401d389e1$495ffa30$dc1fee90$@ru>
-	<CAFEAcA_RCunjurjJt3rrOp+0hHXCZgK2X9mM857fKtF8v=Kb+Q@mail.gmail.com>
-In-Reply-To: <CAFEAcA_RCunjurjJt3rrOp+0hHXCZgK2X9mM857fKtF8v=Kb+Q@mail.gmail.com>
-Date: Wed, 10 Jan 2018 13:43:28 +0300
-Message-ID: <001b01d389ff$da0765a0$8e1630e0$@ru>
+	(envelope-from <quintela@redhat.com>) id 1eZDug-0001X7-J8
+	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 05:47:21 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:54902)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1eZDug-0001WS-Cq
+	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 05:47:18 -0500
+From: Juan Quintela <quintela@redhat.com>
+In-Reply-To: <20180110100929.15986.71777.stgit@pasha-VirtualBox> (Pavel
+	Dovgalyuk's message of "Wed, 10 Jan 2018 13:09:30 +0300")
+References: <20180110100929.15986.71777.stgit@pasha-VirtualBox>
+Reply-To: quintela@redhat.com
+Date: Wed, 10 Jan 2018 11:47:13 +0100
+Message-ID: <874lnuyor2.fsf@secure.laptop>
 MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-Content-Language: ru
-Subject: Re: [Qemu-devel] [PULL 07/11] cpu-exec: don't overwrite
- exception_index
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v3] hpet: recover timer offset correctly
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -40,59 +27,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: 'Peter Maydell' <peter.maydell@linaro.org>
-Cc: 'Paolo Bonzini' <pbonzini@redhat.com>, 'QEMU Developers' <qemu-devel@nongnu.org>, 'Pavel Dovgalyuk' <pavel.dovgaluk@ispras.ru>
+To: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
+Cc: qemu-devel@nongnu.org, mst@redhat.com, dgilbert@redhat.com, maria.klimushenkova@ispras.ru, dovgaluk@ispras.ru, pbonzini@redhat.com
 
-> From: Peter Maydell [mailto:peter.maydell@linaro.org]
-> On 10 January 2018 at 07:04, Pavel Dovgalyuk <dovgaluk@ispras.ru> wrote:
-> > The failure cause is in incorrect interrupt processing.
-> > When ARM processes hardware interrupt in arm_cpu_exec_interrupt(),
-> > it executes cs->exception_index = excp_idx;
-> >
-> > This assumes, that the exception will be processed later.
-> > But it is processed immediately by calling cc->do_interrupt(cs);
-> > instead of leaving this job to cpu_exec.
-> 
-> That seems fine to me. The code knows it needs to take
-> an interrupt, it has all the information it needs to do
-> it, it can just go ahead and call the code that takes
-> the interrupt. The comment in accel/tcg/cpu-exec.c says:
-> 
->         /* The target hook has 3 exit conditions:
->            False when the interrupt isn't processed,
->            True when it is, and we should restart on a new TB,
->            and via longjmp via cpu_loop_exit.  */
-> 
-> and here we have processed the interrupt and returned true.
-> We set exception_index because that's how you tell the
-> do_interrupt hook which interrupt to deal with.
-> 
-> That is, the pattern that the arm target code assumes for
-> cs->exception_index is "you don't set this unless you're
-> about to call do_interrupt; if you do set it then definitely
-> call do_interrupt and don't do anything much in between".
-> In that view of the world there's no need to reset it or
-> check it because nothing is permitted to happen between
-> "set value" and "call do_interrupt". This is in line with
-> the way we handle other arm-specific bits of information
-> associated with the exception, like env->exception.target_el.
-> Having a long gap between "set value" and "do_interrupt"
-> is worrying because it means that maybe we might end
-> up doing something else in that gap that corrupts the
-> various bits of information associated with the exception,
-> or something that's not architecturally permitted to
-> happen at that point.
+Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru> wrote:
+> HPET saves its state by calculating the current time and recovers timer
+> offset using this calculated value. But these calculations include
+> divisions and multiplications. Therefore the timer state cannot be recovered
+> precise enough.
+> This patch introduces saving of the original value of the offset to
+> preserve the determinism of the timer.
+>
+> Signed-off-by: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
+> Signed-off-by: Maria Klimushenkova <maria.klimushenkova@ispras.ru>
+> Reviewed-by: Juan Quintela <quintela@redhat.com>
+>
+> --
+> v3: Added compat property for correct migration.
 
-I see.
-I found the same pattern in other targets.
-But only MIPS resets exception_index after processing
-the interrupt. Others do not bother.
-Then the following change of cpu_exec should be correct?
+Yeap, Much better.
 
-            if (cc->cpu_exec_interrupt(cpu, interrupt_request)) {
-                replay_interrupt();
-+               cpu->exception_index = -1;
-                *last_tb = NULL;
-            }
+> @@ -762,6 +787,7 @@ static Property hpet_device_properties[] = {
+>      DEFINE_PROP_UINT8("timers", HPETState, num_timers, HPET_MIN_TIMERS),
+>      DEFINE_PROP_BIT("msi", HPETState, flags, HPET_MSI_SUPPORT, false),
+>      DEFINE_PROP_UINT32(HPET_INTCAP, HPETState, intcap, 0),
+> +    DEFINE_PROP_BOOL("hpet-offset-saved", HPETState, hpet_offset_saved, true),
+>      DEFINE_PROP_END_OF_LIST(),
+>  };
 
-Pavel Dovgalyuk
+I am thinking about the name, but I can't suggest anything else that is
+short and descriptive, so ....
+
+Later, Juan.
