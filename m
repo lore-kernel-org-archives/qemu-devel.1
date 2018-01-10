@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43073)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43579)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1eZFsW-0002Cc-Vs
-	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 07:53:14 -0500
+	(envelope-from <eblake@redhat.com>) id 1eZFuC-0003gI-TL
+	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 07:54:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1eZFsV-0000rL-PF
-	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 07:53:13 -0500
-References: <20171212160450.17510-1-vsementsov@virtuozzo.com>
-	<20171212160450.17510-3-vsementsov@virtuozzo.com>
-	<20171222133911.GG3763@localhost.localdomain>
-	<25bbf12b-e6e8-29be-c28e-1bd10a9dd473@virtuozzo.com>
-	<20171222154318.GK3763@localhost.localdomain>
-	<087696f5-a12b-7e45-7259-886bb1295dda@virtuozzo.com>
-	<20171222162836.GL3763@localhost.localdomain>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <b849f637-fee4-e6c7-62db-f812d2e93a82@virtuozzo.com>
-Date: Wed, 10 Jan 2018 15:52:58 +0300
+	(envelope-from <eblake@redhat.com>) id 1eZFuB-000262-JS
+	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 07:54:56 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:49592)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1eZFuB-00025U-8a
+	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 07:54:55 -0500
+References: <20171219084557.9801-1-peterx@redhat.com>
+	<20171219084557.9801-8-peterx@redhat.com>
+	<ab1775ac-be60-31cb-3c7c-c698c2adb1e8@redhat.com>
+	<20180110082639.GH5984@xz-mi>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <a2de0d5c-924d-6de8-4bb9-92991801fb3c@redhat.com>
+Date: Wed, 10 Jan 2018 06:54:45 -0600
 MIME-Version: 1.0
-In-Reply-To: <20171222162836.GL3763@localhost.localdomain>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH v2 2/3] qcow2: handle reopening bitmaps on
- bdrv_invalidate_cache
+In-Reply-To: <20180110082639.GH5984@xz-mi>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="HNePfuP90OprTSjhJk9IPX1QH99ssUhGq"
+Subject: Re: [Qemu-devel] [RFC v6 07/27] monitor: unify global init
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,132 +30,121 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, mreitz@redhat.com, crosa@redhat.com, ehabkost@redhat.com, den@openvz.org, jsnow@redhat.com
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, Stefan Hajnoczi <shajnocz@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <famz@redhat.com>, Juan Quintela <quintela@redhat.com>, mdroth@linux.vnet.ibm.com, Laurent Vivier <lvivier@redhat.com>, Markus Armbruster <armbru@redhat.com>, marcandre.lureau@redhat.com, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 
-22.12.2017 19:28, Kevin Wolf wrote:
-> Am 22.12.2017 um 17:12 hat Vladimir Sementsov-Ogievskiy geschrieben:
->> 22.12.2017 18:43, Kevin Wolf wrote:
->>> Am 22.12.2017 um 15:25 hat Vladimir Sementsov-Ogievskiy geschrieben:
->>>> 22.12.2017 16:39, Kevin Wolf wrote:
->>>>> Am 12.12.2017 um 17:04 hat Vladimir Sementsov-Ogievskiy geschrieben:
->>>>>> Consider migration with shared storage. Persistent bitmaps are store=
-d
->>>>>> on bdrv_inactivate. Then, on destination
->>>>>> process_incoming_migration_bh() calls bdrv_invalidate_cache_all() wh=
-ich
->>>>>> leads to qcow2_load_autoloading_dirty_bitmaps() which fails if bitma=
-ps
->>>>>> are already loaded on destination start. In this case we should call
->>>>>> qcow2_reopen_bitmaps_rw instead.
->>>>>>
->>>>>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.co=
-m>
->>>>>> Reviewed-by: John Snow <jsnow@redhat.com>
->>>>> qcow2_invalidate_cache() calls qcow2_close() first, so why are there
->>>>> still any bitmaps loaded? Isn't this a bug? Do we leak bitmaps when a
->>>>> qcow2 image is closed?
->>>>>
->>>>> Kevin
->>>> Interesting point.
->>>>
->>>> Now persistent dirty bitmaps are released at the end of
->>>> bdrv_inactivate_recurse,
->>>> which is not called here. It was a separate patch
->>>>
->>>> commit 615b5dcf2decbc5f0abb512d13d7e5db2385fa23
->>>> Author: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
->>>> Date:=C2=A0=C2=A0 Wed Jun 28 15:05:30 2017 +0300
->>>>
->>>>   =C2=A0=C2=A0=C2=A0 block: release persistent bitmaps on inactivate
->>>>
->>>> May be it is more correct to release them immediately after storing, i=
-n
->>>> qcow2_inactivete.
->>> I chose the question form because I'm really not deep enough into the
->>> bitmap code to have a solid opinion, but I have a feeling that releasin=
-g
->>> the bitmaps from the block driver that provided them would be cleaner
->>> indeed. I suppose the same is true for .bdrv_close.
->>>
->>>> But it will not fix the issue, because qcow2_close will
->>>> call qcow2_inactivate only if (!(s->flags & BDRV_O_INACTIVE)), but it =
-is
->>>> not the case.
->>> Yes, good point.
->>>
->>> Is there a reason why bitmaps are already loaded in qcow2_do_open() eve=
-n
->>> if the image is inactive? Can bitmaps be meaningfully used on inactive
->>> images?
->>>
->>> Otherwise, we could just make qcow2_load_autoloading_dirty_bitmaps()
->>> conditional on cleared BDRV_O_INACTIVE.
->>>
->>>> or we can do like this, it fixes the new test:
->>>>   =C2=A0 static void qcow2_close(BlockDriverState *bs)
->>>> {
->>>>   =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 BDRVQcow2State *s =3D bs->opaque;
->>>> qemu_vfree(s->l1_table);
->>>>   =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 /* else pre-write overlap checks in c=
-ache_destroy may crash */
->>>>   =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 s->l1_table =3D NULL;
->>>>
->>>>   =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (!(s->flags & BDRV_O_INACTIVE)) {
->>>> qcow2_inactivate(bs);
->>>> }
->>>> +=C2=A0=C2=A0=C2=A0=C2=A0 bdrv_release_persistent_dirty_bitmaps(bs);
->>>>
->>>> What do you think?
->>> Hm, I think I don't like this much.
->>>
->>> We just need to decide what the status of inactive images is supposed t=
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--HNePfuP90OprTSjhJk9IPX1QH99ssUhGq
+From: Eric Blake <eblake@redhat.com>
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, Stefan Hajnoczi <shajnocz@redhat.com>,
+ "Daniel P . Berrange" <berrange@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <famz@redhat.com>,
+ Juan Quintela <quintela@redhat.com>, mdroth@linux.vnet.ibm.com,
+ Laurent Vivier <lvivier@redhat.com>, Markus Armbruster <armbru@redhat.com>,
+ marcandre.lureau@redhat.com, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <a2de0d5c-924d-6de8-4bb9-92991801fb3c@redhat.com>
+Subject: Re: [RFC v6 07/27] monitor: unify global init
+References: <20171219084557.9801-1-peterx@redhat.com>
+ <20171219084557.9801-8-peterx@redhat.com>
+ <ab1775ac-be60-31cb-3c7c-c698c2adb1e8@redhat.com>
+ <20180110082639.GH5984@xz-mi>
+In-Reply-To: <20180110082639.GH5984@xz-mi>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 01/10/2018 02:26 AM, Peter Xu wrote:
+
+>> The later initialization of the monitor_lock mutex is a potential
+>> semantic change.  Please beef up the commit message to document why it=
+
+>> is safe.  In fact, I requested this back on my review of v1, but it
+>> still hasn't been done. :(
+>>
+>> https://lists.gnu.org/archive/html/qemu-devel/2017-09/msg05421.html
+>=20
+> Sorry for that! I thought you helped proved that somehow (which I
+> really appreciate)...
+>=20
+>>
+>> If my read of history is correct, I think it is sufficient to point to=
+
+>> commit 05875687 as a place where we no longer care about constructor
+>> semantics because we are no longer dealing with module_call_init().  B=
+ut
+>> you may find a better place to point to.  You already found that
+>> d622cb587 was what introduced the constructor in the first place, but =
+I
+>> didn't spend time today auditing the state of qemu back at that time t=
 o
->>> be. If they should have bitmaps, then your patch is probably right. But
->>> if inactive images shouldn't have any, we need to change qcow2_do_open(=
-)
->>> and qcow2_inactivate().
->>>
->>> Kevin
->> Does Qemu start in inactive mode when and only when it is incoming
->> migration? In this case I don't see any reason of early-load the
->> bitmaps. Backup in inactive mode should not be allowed too, yes?
-> Yes, inactive images are only for incoming migration at the moment.
->
-> I would like to change that into opening all images as inactive and then
-> immediately activate them (just to unify two code paths, one of which
-> isn't tested as much as it should be), but that wouldn't be visible
-> externally, so it should be fine, too.
+>> see if the constructor was really necessary back then or just a
+>> convenience for lack of a better initialization point.
+>>
+>> Alternatively, if you can't find a good commit message to point to, at=
 
-similar approach led to a problem for us:
+>> least document how you (and I) tested things, using gdb watchpoints, t=
+o
+>> prove it is a safe delay.
+>=20
+> I did that by observing all users of the lock in current repository:
 
-To make it possible to modify drives through nbd before start (a kind of=20
-external reatore), I've added simple
-@@ -4727,6 +4727,8 @@ int main(int argc, char **argv, char **envp)
- =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
- =C2=A0=C2=A0=C2=A0=C2=A0 } else if (autostart) {
- =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 vm_start();
-+=C2=A0=C2=A0=C2=A0 } else {
-+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 bdrv_inactivate_all();
- =C2=A0=C2=A0=C2=A0=C2=A0 }
 
-and now, we have no dirty bitmaps between paused start and cont. And it=20
-is not comfortable, we can't query, can't
-do something with these bitmaps before vm start.
+> AFAIK all of them are called even after monitor_init(), in other
+> words, they are all after global init too.
+>=20
+> As a conclusion, we should be safe here.  Again, I may be wrong
+> somewhere, please correct me if so.
 
->
->> So, it looks like it's ok to just do not autoload bitmaps if we are in
->> inactive mode. The difference would be that user will not see these
->> bitmaps during migration. And he even may create bitmaps with same
->> names, which will lead to fault. But it don't look like real problem.
-> You can't create persistent bitmaps on an inactive image anyway, because
-> that would involve writes.
->
-> Conflicts with temporary bitmaps might be possible, though.
->
-> Kevin
+My gdb testing and your analysis match; we're safe.  So all that's
+needed is the paragraph documenting that we thought about the issue:
 
+>=20
+>>
+>> Only if you improve the commit message, you may add:
+>> Reviewed-by: Eric Blake <eblake@redhat.com>
+>=20
+> Besides the English fix, how about I add one more paragraph to talk
+> about monitor_lock in commit message:
+>=20
+>   monitor_lock won't be used before monitor_init().  So as long as we
+>   initialize the monitor globals before the first call to
+>   monitor_init(), we will be safe.
+
+Or even:
+
+monitor_lock is not used before monitor_init() (as confirmed by code
+analysis and gdb watchpoints); so we are safe delaying what was a
+constructor-time initialization of the mutex into the later first call
+to monitor_init().
+
+>=20
+> With that, could I take your r-b?
+
+Yes.
 
 --=20
-Best regards,
-Vladimir
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--HNePfuP90OprTSjhJk9IPX1QH99ssUhGq
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlpWDRUACgkQp6FrSiUn
+Q2qz6wf7BoR95l7lUk+J236LtjUbFKC4SclCbpkFRFJamtAYjKFFCpSIcfNuo2je
+VQvUAkGAjLy0y3l4l0j9YN8Peh27p/qd3uXevYzHzZcbC3DtaDOe8i1ugYyyZbFk
+l5OAvOMPnuHivRP5VrpqAP3GK5Fqzk6blWgjkMh8H58Rfx4Te34KWBwxxm3M5087
+P08MLFTKF1KLYltKklM+eDNFlUby+rGj2lyHdq0fU29L3fC4WH8llSzc6TMWuz70
+yNKKeZX+6X36YyXn0Ca+zDe0dVKgHXEehoCHhJJU8sXtBfHi43NibthT2pUfJqpN
+b/b00N0tSt9Ry5f7MSWrPGlCVh+5Ww==
+=I8p6
+-----END PGP SIGNATURE-----
+
+--HNePfuP90OprTSjhJk9IPX1QH99ssUhGq--
