@@ -1,28 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49860)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50417)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eZDpI-0007iY-9u
-	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 05:41:45 -0500
+	(envelope-from <quintela@redhat.com>) id 1eZDqo-0000GK-HP
+	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 05:43:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eZDpH-0005NV-5x
-	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 05:41:44 -0500
-Received: from mail-ot0-x232.google.com ([2607:f8b0:4003:c0f::232]:36462)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1eZDpH-0005Kq-1U
-	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 05:41:43 -0500
-Received: by mail-ot0-x232.google.com with SMTP id w4so13885011otg.3
-	for <qemu-devel@nongnu.org>; Wed, 10 Jan 2018 02:41:42 -0800 (PST)
+	(envelope-from <quintela@redhat.com>) id 1eZDqk-0006kx-IF
+	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 05:43:18 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:44418)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1eZDqk-0006kK-Bb
+	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 05:43:14 -0500
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 5AB5B5FD76
+	for <qemu-devel@nongnu.org>; Wed, 10 Jan 2018 10:43:13 +0000 (UTC)
+From: Juan Quintela <quintela@redhat.com>
+In-Reply-To: <a037b7b8-2e5c-c800-da49-e0edfcb6eed0@redhat.com> (Laurent
+	Vivier's message of "Wed, 10 Jan 2018 11:12:14 +0100")
+References: <20180105215246.908-1-quintela@redhat.com>
+	<20180105215246.908-3-quintela@redhat.com>
+	<20180110062545.GB5984@xz-mi> <87incayua8.fsf@secure.laptop>
+	<82a94975-e040-298d-7d10-7448a4a0af48@redhat.com>
+	<a037b7b8-2e5c-c800-da49-e0edfcb6eed0@redhat.com>
+Reply-To: quintela@redhat.com
+Date: Wed, 10 Jan 2018 11:43:06 +0100
+Message-ID: <878td6yoxx.fsf@secure.laptop>
 MIME-Version: 1.0
-In-Reply-To: <AM5P194MB0132AB1A7F3CE7E09346CDC4C8110@AM5P194MB0132.EURP194.PROD.OUTLOOK.COM>
-References: <20180108055348.20444-1-david@gibson.dropbear.id.au>
-	<CAFEAcA_vmTqHdjL6QfKtn-Khg2RHBA7Vs3QxreXwe2J_7mhGAQ@mail.gmail.com>
-	<20180109121653.GN2131@umbus.fritz.box>
-	<AM5P194MB0132AB1A7F3CE7E09346CDC4C8110@AM5P194MB0132.EURP194.PROD.OUTLOOK.COM>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Wed, 10 Jan 2018 10:41:21 +0000
-Message-ID: <CAFEAcA8u0b_+W7GBwy6knV3_zvZLc00fbbSjDT42CkS83Gb29w@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PULL 00/12] ppc-for-2.12 queue 20180108
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v4 02/11] tests: Migration ppc test was
+ missing arguments
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,39 +38,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: luigi burdo <intermediadc@hotmail.com>
-Cc: David Gibson <david@gibson.dropbear.id.au>, Michael Roth <mdroth@linux.vnet.ibm.com>, QEMU Developers <qemu-devel@nongnu.org>, "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>, Greg Kurz <groug@kaod.org>, "surajjs@au1.ibm.com" <surajjs@au1.ibm.com>
+To: Laurent Vivier <lvivier@redhat.com>
+Cc: Peter Xu <peterx@redhat.com>, qemu-devel@nongnu.org, dgilbert@redhat.com
 
-On 10 January 2018 at 10:37, luigi burdo <intermediadc@hotmail.com> wrote:
-> Hi devs sorry if i enter in the discussion about.
+Laurent Vivier <lvivier@redhat.com> wrote:
+> On 10/01/2018 10:21, Laurent Vivier wrote:
+>> On 10/01/2018 09:47, Juan Quintela wrote:
+>>> Peter Xu <peterx@redhat.com> wrote:
+>>>> On Fri, Jan 05, 2018 at 10:52:37PM +0100, Juan Quintela wrote:
+>>>>> Argument file is also needed there.
+>>>>>
+>>>>> Signed-off-by: Juan Quintela <quintela@redhat.com>
+>>>>
+>>>> Reviewed-by: Peter Xu <peterx@redhat.com>
+>>>>
+>>>> Does it also mean this?
+>>>>
+>>>> Fixes: aaf89c8a49a8c ("test: port postcopy test to ppc64")
+>>>
+>>> Dunno.  I was trying to consolidate the command line options for ppc and
+>>> x86 when I found this problem.  I haven't tested of ppc.
+>> 
+>> I don't think it is needed. I think the content of the nvram is migrated
+>> (otherwise the test wouldn't work at all).
+>> 
+>> The nvram is created by default, we need the command line parameter only
+>> to populate it from a file.
 >
-> gcc gave errors in building this queue.
->
-> here i paste my build log.
->
-> https://pastebin.com/fXw2Whrq
+> A better change would be to use "-prom-env" instead of "-driver
+> if=pflash". I can send the patch if you want to add it in your series.
 
-Thanks. This is the relevant bit of the log:
+Told the command line and I will add to the line.
 
-/home/amigaone/src/new/tags/ppc-for-2.12-20180108/target/s390x/mem_helper.c:2567:1:
-internal compiler error: Segmentation fault
- }
- ^
-Please submit a full bug report,
-with preprocessed source if appropriate.
-See <file:///usr/share/doc/gcc-7/README.Bugs> for instructions.
+And using the same command in both sides makes easier to see that it is
+correct.
 
-This means that gcc crashed. This is either:
- (a) a hardware problem with your machine (eg bad memory)
-or
- (b) a bug in gcc (which you can report to the gcc team
-as they suggest in the error message)
-
-You should check whether gcc reliably crashes in the
-same way every time you try to build that source file.
-If it does, that suggests a gcc bug is more likely. If
-it sometimes works and sometimes doesn't, I would suspect
-hardware problems.
-
-thanks
--- PMM
+Later, Juan.
