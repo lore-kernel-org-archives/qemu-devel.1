@@ -1,25 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56472)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58319)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1eZGQ0-0006MF-2H
-	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 08:27:48 -0500
+	(envelope-from <edgard.kaziakhmedov@virtuozzo.com>)
+	id 1eZGTb-0007eN-N1
+	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 08:31:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1eZGPv-0004nz-5q
-	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 08:27:48 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:37410)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1eZGPv-0004m4-05
-	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 08:27:43 -0500
-References: <20180110064706.49777-1-lepton@google.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <ec848ee7-85e7-de79-bb58-60ad12d33256@redhat.com>
-Date: Wed, 10 Jan 2018 14:27:39 +0100
+	(envelope-from <edgard.kaziakhmedov@virtuozzo.com>)
+	id 1eZGTX-0001wg-Nr
+	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 08:31:31 -0500
+Received: from mail-ve1eur01on0128.outbound.protection.outlook.com
+	([104.47.1.128]:13568
+	helo=EUR01-VE1-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <edgard.kaziakhmedov@virtuozzo.com>)
+	id 1eZGTX-0001u3-7c
+	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 08:31:27 -0500
+References: <1514453778-5363-1-git-send-email-den@openvz.org>
+	<20180110123354.GI3205@redhat.com>
+From: Edgar Kaziakhmedov <edgar.kaziakhmedov@virtuozzo.com>
+Message-ID: <8dd96abc-474f-6ea6-f2fc-d712db4be3ab@virtuozzo.com>
+Date: Wed, 10 Jan 2018 16:31:21 +0300
 MIME-Version: 1.0
-In-Reply-To: <20180110064706.49777-1-lepton@google.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+In-Reply-To: <20180110123354.GI3205@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] target/i386: hax: Move
- hax_setup_qemu_emulator.
+Content-Language: en-US
+Subject: Re: [Qemu-devel] [PATCH 1/1] io/channel-websock: handle continuous
+ reads without any data
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,48 +34,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Tao Wu <lepton@google.com>, qemu-devel@nongnu.org
-Cc: rth@twiddle.net, ehabkost@redhat.com
+To: "Daniel P. Berrange" <berrange@redhat.com>, "Denis V. Lunev" <den@openvz.org>
+Cc: qemu-devel@nongnu.org
 
-On 10/01/2018 07:47, Tao Wu wrote:
-> hax_setup_qemu_emulator reference env->efer which is updated in
-> hax_get_msrs, so it has to be called after hax_get_msrs. This fix
-> the bug that sometimes dump_state show 32 bits regs even in 64 bits
-> mode.
-> 
-> Signed-off-by: Tao Wu <lepton@google.com>
-> ---
->  target/i386/hax-all.c | 4 +---
->  1 file changed, 1 insertion(+), 3 deletions(-)
-> 
-> diff --git a/target/i386/hax-all.c b/target/i386/hax-all.c
-> index 3ce6950296..a933bd462d 100644
-> --- a/target/i386/hax-all.c
-> +++ b/target/i386/hax-all.c
-> @@ -887,9 +887,6 @@ static int hax_sync_vcpu_register(CPUArchState *env, int set)
->              return -1;
->          }
->      }
-> -    if (!set) {
-> -        hax_setup_qemu_emulator(env);
-> -    }
->      return 0;
->  }
->  
-> @@ -1070,6 +1067,7 @@ static int hax_arch_get_registers(CPUArchState *env)
->          return ret;
->      }
->  
-> +    hax_setup_qemu_emulator(env);
->      return 0;
->  }
->  
-> 
 
-Queued, thanks.
 
-Please look into sharing the similar code in target/i386/kvm.c
-(kvm_get_sregs), since the HAX code has some bugs (for example,
-HF_CPL_MASK should be SS.DPL, not CS.DPL).
-
-Paolo
+On 01/10/2018 03:33 PM, Daniel P. Berrange wrote:
+> On Thu, Dec 28, 2017 at 12:36:18PM +0300, Denis V. Lunev wrote:
+>> From: Edgar Kaziakhmedov <edgar.kaziakhmedov@virtuozzo.com>
+>>
+>> According to the current implementation of websocket protocol in QEMU,
+>> qio_channel_websock_handshake_io tries to read handshake from the
+>> channel to start communication over tcp socket. But this subroutine
+>> doesn't cover scenario when socket was closed while handshaking. Therefore,
+>> if G_IO_IN is caught and qio_channel_websock_handshake_read returns
+>> zero, error has to be set and connection has to be done.
+>>
+>> Such behaviour causes 100% CPU load in main QEMU loop, because main loop
+>> poll continues to receive and handle G_IO_IN events from websocket.
+>>
+>> Step to reproduce 100% CPU load:
+>> - start qemu with the simplest configuration
+>>      $ qemu -vnc [::1]:1,websocket=7500
+>> 2) open any vnc listener (which doesn't follow websocket protocol)
+>>      $ vncviewer :7500
+>> 3) kill listener
+>> 4) qemu main thread eats 100% CPU usage
+>>
+>> Signed-off-by: Edgar Kaziakhmedov <edgar.kaziakhmedov@virtuozzo.com>
+>> Signed-off-by: Denis V. Lunev <den@openvz.org>
+>> CC: Daniel P. Berrange <berrange@redhat.com>
+>> ---
+>>   io/channel-websock.c | 8 +++++---
+>>   1 file changed, 5 insertions(+), 3 deletions(-)
+>>
+>> diff --git a/io/channel-websock.c b/io/channel-websock.c
+>> index 87ebdeb..71f046a 100644
+>> --- a/io/channel-websock.c
+>> +++ b/io/channel-websock.c
+>> @@ -581,9 +581,11 @@ static gboolean qio_channel_websock_handshake_io(QIOChannel *ioc,
+>>           return FALSE;
+>>       }
+>>       if (ret == 0) {
+>> -        trace_qio_channel_websock_handshake_pending(ioc, G_IO_IN);
+>> -        /* need more data still */
+>> -        return TRUE;
+>> +        /* If G_IN_IO happened and there is no data to read, close connection */
+>> +        error_setg(&err, "connection was closed");
+>> +        qio_task_set_error(task, err);
+>> +        qio_task_complete(task);
+>> +        return FALSE;
+> This is bogus - 'ret == 0' from  qio_channel_websock_handshake_read()
+> does *not* imply end of file.
+>
+> It says we have read some data, but not yet seen the end of the HTTP
+> headers.
+Yes, good catch.
+>
+> If you want to detect EOF, you need to check the qio_channel_read()
+> function return value directly in that method.
+Directly in qio_channel_websock_handshake_read method suppose called in 
+qio_channel_websock_handshake_read routine.
+>
+> Regards,
+> Daniel
