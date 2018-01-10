@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57242)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57281)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1eZHR8-00010q-Sm
-	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 09:33:04 -0500
+	(envelope-from <no-reply@patchew.org>) id 1eZHRD-00013w-Kw
+	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 09:33:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1eZHR5-0006pR-Oz
-	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 09:33:02 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:48100)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1eZHR5-0006ej-GI
-	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 09:32:59 -0500
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 9F08CC059753
-	for <qemu-devel@nongnu.org>; Wed, 10 Jan 2018 14:32:42 +0000 (UTC)
-From: Thomas Huth <thuth@redhat.com>
-Date: Wed, 10 Jan 2018 15:32:35 +0100
-Message-Id: <1515594755-12138-1-git-send-email-thuth@redhat.com>
-Subject: [Qemu-devel] [PATCH] net: Allow hubports to connect to other netdevs
+	(envelope-from <no-reply@patchew.org>) id 1eZHRA-0006sD-Bx
+	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 09:33:07 -0500
+Resent-Message-Id: <E1eZHRA-0006sD-Bx@eggs.gnu.org>
+Received: from sender-of-o52.zoho.com ([135.84.80.217]:21421)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1eZHRA-0006rk-4t
+	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 09:33:04 -0500
+In-Reply-To: <20180110142515.13242-1-pbonzini@redhat.com>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <151559474766.396.14059259263895645625@5adcb62bf0d6>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Wed, 10 Jan 2018 06:32:28 -0800 (PST)
+Subject: Re: [Qemu-devel] [PATCH v2 0/2] find_ram_offset cleanups and
+ alignment
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,150 +29,201 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, Jason Wang <jasowang@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
-Cc: Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>
+To: pbonzini@redhat.com
+Cc: famz@redhat.com, qemu-devel@nongnu.org, dgilbert@redhat.com, quintela@redhat.com
 
-QEMU can emulate hubs to connect NICs and netdevs. This is currently
-primarily used for the mis-named 'vlan' feature of the networking
-subsystem. Now the 'vlan' feature has been marked as deprecated, since
-its name is rather confusing and the users often rather mis-configure
-their network when trying to use it. But while the 'vlan' parameter
-should be removed at one point in time, the basic idea of emulating
-a hub in QEMU is still good: It's useful for bundling up the output of
-multiple NICs into one single l2tp netdev for example.
-
-Now to be able to use the hubport feature without 'vlan's, there is one
-missing piece: The possibility to connect a hubport to a netdev, too.
-This patch adds this possibility by introducing a new "netdev=..."
-parameter to the hubports.
-
-To bundle up the output of multiple NICs into one socket netdev, you can
-now run QEMU with these parameters for example:
-
-qemu-system-ppc64 ... -netdev socket,id=s1,connect=:11122 \
-    -netdev hubport,hubid=1,id=h1,netdev=s1 \
-    -netdev hubport,hubid=1,id=h2 -device e1000,netdev=h2 \
-    -netdev hubport,hubid=1,id=h3 -device virtio-net-pci,netdev=h3
-
-For using the socket netdev, you have got to start another QEMU as the
-receiving side first, for example with network dumping enabled:
-
-qemu-system-x86_64 -M isapc -netdev socket,id=s0,listen=:11122 \
-    -device ne2k_isa,netdev=s0 \
-    -object filter-dump,id=f1,netdev=s0,file=/tmp/dump.dat
-
-After the ppc64 guest tried to boot from both NICs, you can see in the
-dump file (using Wireshark, for example), that the output of both NICs
-(the e1000 and the virtio-net-pci) has been successfully transfered
-via the socket netdev in this case.
-
-Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
-Signed-off-by: Thomas Huth <thuth@redhat.com>
----
- See also the original discussion here for some more information:
- https://lists.gnu.org/archive/html/qemu-devel/2017-09/msg05650.html
-
- net/hub.c       | 23 ++++++++++++++++++++++-
- qapi/net.json   |  4 +++-
- qemu-options.hx |  8 +++++---
- 3 files changed, 30 insertions(+), 5 deletions(-)
-
-diff --git a/net/hub.c b/net/hub.c
-index 14b4eec..0638729 100644
---- a/net/hub.c
-+++ b/net/hub.c
-@@ -13,6 +13,7 @@
-  */
- 
- #include "qemu/osdep.h"
-+#include "qapi/error.h"
- #include "monitor/monitor.h"
- #include "net/net.h"
- #include "clients.h"
-@@ -286,12 +287,32 @@ int net_init_hubport(const Netdev *netdev, const char *name,
-                      NetClientState *peer, Error **errp)
- {
-     const NetdevHubPortOptions *hubport;
-+    NetClientState *hubncs;
- 
-     assert(netdev->type == NET_CLIENT_DRIVER_HUBPORT);
-     assert(!peer);
-     hubport = &netdev->u.hubport;
- 
--    net_hub_add_port(hubport->hubid, name);
-+    hubncs = net_hub_add_port(hubport->hubid, name);
-+    if (!hubncs) {
-+        error_setg(errp, "failed to add port to hub %i with id '%s'",
-+                   hubport->hubid, name);
-+        return -1;
-+    }
-+
-+    if (hubport->has_netdev) {
-+        NetClientState *hubpeer;
-+
-+        hubpeer = qemu_find_netdev(hubport->netdev);
-+        if (!hubpeer) {
-+            error_setg(errp, "netdev '%s' not found", hubport->netdev);
-+            return -1;
-+        }
-+        assert(!hubncs->peer && !hubpeer->peer);
-+        hubncs->peer = hubpeer;
-+        hubpeer->peer = hubncs;
-+    }
-+
-     return 0;
- }
- 
-diff --git a/qapi/net.json b/qapi/net.json
-index 4beff5d..e41e046 100644
---- a/qapi/net.json
-+++ b/qapi/net.json
-@@ -410,12 +410,14 @@
- # Connect two or more net clients through a software hub.
- #
- # @hubid: hub identifier number
-+# @netdev: used to connect hub to a netdev instead of a device (since 2.12)
- #
- # Since: 1.2
- ##
- { 'struct': 'NetdevHubPortOptions',
-   'data': {
--    'hubid':     'int32' } }
-+    'hubid':     'int32',
-+    '*netdev':    'str' } }
- 
- ##
- # @NetdevNetmapOptions:
-diff --git a/qemu-options.hx b/qemu-options.hx
-index 678181c..9ec4af7 100644
---- a/qemu-options.hx
-+++ b/qemu-options.hx
-@@ -2017,7 +2017,7 @@ DEF("netdev", HAS_ARG, QEMU_OPTION_netdev,
- #endif
-     "-netdev vhost-user,id=str,chardev=dev[,vhostforce=on|off]\n"
-     "                configure a vhost-user network, backed by a chardev 'dev'\n"
--    "-netdev hubport,id=str,hubid=n\n"
-+    "-netdev hubport,id=str,hubid=n[,netdev=nd]\n"
-     "                configure a hub port on QEMU VLAN 'n'\n", QEMU_ARCH_ALL)
- DEF("net", HAS_ARG, QEMU_OPTION_net,
-     "-net nic[,vlan=n][,netdev=nd][,macaddr=mac][,model=type][,name=str][,addr=str][,vectors=v]\n"
-@@ -2445,13 +2445,15 @@ vde_switch -F -sock /tmp/myswitch
- qemu-system-i386 linux.img -net nic -net vde,sock=/tmp/myswitch
- @end example
- 
--@item -netdev hubport,id=@var{id},hubid=@var{hubid}
-+@item -netdev hubport,id=@var{id},hubid=@var{hubid}[,netdev=@var{nd}]
- 
- Create a hub port on QEMU "vlan" @var{hubid}.
- 
- The hubport netdev lets you connect a NIC to a QEMU "vlan" instead of a single
- netdev.  @code{-net} and @code{-device} with parameter @option{vlan} create the
--required hub automatically.
-+required hub automatically. Alternatively, you can also connect the hubport
-+to another netdev with ID @var{nd} by using the @option{netdev=@var{nd}}
-+option.
- 
- @item -netdev vhost-user,chardev=@var{id}[,vhostforce=on|off][,queues=n]
- 
--- 
-1.8.3.1
+SGksCgpUaGlzIHNlcmllcyBmYWlsZWQgYXV0b21hdGljIGJ1aWxkIHRlc3QuIFBsZWFzZSBmaW5k
+IHRoZSB0ZXN0aW5nIGNvbW1hbmRzIGFuZAp0aGVpciBvdXRwdXQgYmVsb3cuIElmIHlvdSBoYXZl
+IGRvY2tlciBpbnN0YWxsZWQsIHlvdSBjYW4gcHJvYmFibHkgcmVwcm9kdWNlIGl0CmxvY2FsbHku
+CgpUeXBlOiBzZXJpZXMKTWVzc2FnZS1pZDogMjAxODAxMTAxNDI1MTUuMTMyNDItMS1wYm9uemlu
+aUByZWRoYXQuY29tClN1YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0ggdjIgMC8yXSBmaW5kX3Jh
+bV9vZmZzZXQgY2xlYW51cHMgYW5kIGFsaWdubWVudAoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09
+PQojIS9iaW4vYmFzaApzZXQgLWUKZ2l0IHN1Ym1vZHVsZSB1cGRhdGUgLS1pbml0IGR0YwojIExl
+dCBkb2NrZXIgdGVzdHMgZHVtcCBlbnZpcm9ubWVudCBpbmZvCmV4cG9ydCBTSE9XX0VOVj0xCmV4
+cG9ydCBKPTgKdGltZSBtYWtlIGRvY2tlci10ZXN0LXF1aWNrQGNlbnRvczYKdGltZSBtYWtlIGRv
+Y2tlci10ZXN0LWJ1aWxkQG1pbi1nbGliCnRpbWUgbWFrZSBkb2NrZXItdGVzdC1taW5nd0BmZWRv
+cmEKIyBpb3Rlc3RzIGlzIGJyb2tlbiBub3csIHNraXAKIyB0aW1lIG1ha2UgZG9ja2VyLXRlc3Qt
+YmxvY2tAZmVkb3JhCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMy
+MWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0CkZyb20gaHR0cHM6Ly9naXRodWIuY29tL3Bh
+dGNoZXctcHJvamVjdC9xZW11CiAqIFtuZXcgdGFnXSAgICAgICAgICAgICAgIHBhdGNoZXcvMjAx
+ODAxMTAxNDI1MTUuMTMyNDItMS1wYm9uemluaUByZWRoYXQuY29tIC0+IHBhdGNoZXcvMjAxODAx
+MTAxNDI1MTUuMTMyNDItMS1wYm9uemluaUByZWRoYXQuY29tClN3aXRjaGVkIHRvIGEgbmV3IGJy
+YW5jaCAndGVzdCcKZTI5ZGE0Mzk4NCBmaW5kX3JhbV9vZmZzZXQ6IEFsaWduIHJhbV9hZGRyX3Qg
+YWxsb2NhdGlvbiBvbiBsb25nIGJvdW5kYXJpZXMKZjQ3YWJjYmFkOSBmaW5kX3JhbV9vZmZzZXQ6
+IEFkZCBjb21tZW50cyBhbmQgdHJhY2luZwoKPT09IE9VVFBVVCBCRUdJTiA9PT0KU3VibW9kdWxl
+ICdkdGMnIChnaXQ6Ly9naXQucWVtdS1wcm9qZWN0Lm9yZy9kdGMuZ2l0KSByZWdpc3RlcmVkIGZv
+ciBwYXRoICdkdGMnCkNsb25pbmcgaW50byAnL3Zhci90bXAvcGF0Y2hldy10ZXN0ZXItdG1wLXE2
+bGFzenVoL3NyYy9kdGMnLi4uClN1Ym1vZHVsZSBwYXRoICdkdGMnOiBjaGVja2VkIG91dCAnNTU4
+Y2Q4MWJkZDQzMjc2OWI1OWJmZjAxMjQwYzQ0ZjgyY2ZiMWE5ZCcKICBCVUlMRCAgIGNlbnRvczYK
+bWFrZVsxXTogRW50ZXJpbmcgZGlyZWN0b3J5ICcvdmFyL3RtcC9wYXRjaGV3LXRlc3Rlci10bXAt
+cTZsYXN6dWgvc3JjJwogIEdFTiAgICAgL3Zhci90bXAvcGF0Y2hldy10ZXN0ZXItdG1wLXE2bGFz
+enVoL3NyYy9kb2NrZXItc3JjLjIwMTgtMDEtMTAtMDkuMzEuMjcuNjAzNy9xZW11LnRhcgpDbG9u
+aW5nIGludG8gJy92YXIvdG1wL3BhdGNoZXctdGVzdGVyLXRtcC1xNmxhc3p1aC9zcmMvZG9ja2Vy
+LXNyYy4yMDE4LTAxLTEwLTA5LjMxLjI3LjYwMzcvcWVtdS50YXIudnJvb3QnLi4uCmRvbmUuCllv
+dXIgYnJhbmNoIGlzIHVwLXRvLWRhdGUgd2l0aCAnb3JpZ2luL3Rlc3QnLgpTdWJtb2R1bGUgJ2R0
+YycgKGdpdDovL2dpdC5xZW11LXByb2plY3Qub3JnL2R0Yy5naXQpIHJlZ2lzdGVyZWQgZm9yIHBh
+dGggJ2R0YycKQ2xvbmluZyBpbnRvICcvdmFyL3RtcC9wYXRjaGV3LXRlc3Rlci10bXAtcTZsYXN6
+dWgvc3JjL2RvY2tlci1zcmMuMjAxOC0wMS0xMC0wOS4zMS4yNy42MDM3L3FlbXUudGFyLnZyb290
+L2R0YycuLi4KU3VibW9kdWxlIHBhdGggJ2R0Yyc6IGNoZWNrZWQgb3V0ICc1NThjZDgxYmRkNDMy
+NzY5YjU5YmZmMDEyNDBjNDRmODJjZmIxYTlkJwpTdWJtb2R1bGUgJ3VpL2tleWNvZGVtYXBkYicg
+KGdpdDovL2dpdC5xZW11Lm9yZy9rZXljb2RlbWFwZGIuZ2l0KSByZWdpc3RlcmVkIGZvciBwYXRo
+ICd1aS9rZXljb2RlbWFwZGInCkNsb25pbmcgaW50byAnL3Zhci90bXAvcGF0Y2hldy10ZXN0ZXIt
+dG1wLXE2bGFzenVoL3NyYy9kb2NrZXItc3JjLjIwMTgtMDEtMTAtMDkuMzEuMjcuNjAzNy9xZW11
+LnRhci52cm9vdC91aS9rZXljb2RlbWFwZGInLi4uClN1Ym1vZHVsZSBwYXRoICd1aS9rZXljb2Rl
+bWFwZGInOiBjaGVja2VkIG91dCAnMTA3MzlhYTI2MDUxYTVkNDlkODgxMzI2MDQ1MzlkM2VkMDg1
+ZTcyZScKICBDT1BZICAgIFJVTk5FUgogICAgUlVOIHRlc3QtcXVpY2sgaW4gcWVtdTpjZW50b3M2
+IApQYWNrYWdlcyBpbnN0YWxsZWQ6ClNETC1kZXZlbC0xLjIuMTQtNy5lbDZfNy4xLng4Nl82NApi
+aXNvbi0yLjQuMS01LmVsNi54ODZfNjQKYnppcDItZGV2ZWwtMS4wLjUtNy5lbDZfMC54ODZfNjQK
+Y2NhY2hlLTMuMS42LTIuZWw2Lng4Nl82NApjc25hcHB5LWRldmVsLTAtNi4yMDE1MDcyOWdpdGQ3
+YmM2ODMuZWw2Lng4Nl82NApmbGV4LTIuNS4zNS05LmVsNi54ODZfNjQKZ2NjLTQuNC43LTE4LmVs
+Ni54ODZfNjQKZ2V0dGV4dC0wLjE3LTE4LmVsNi54ODZfNjQKZ2l0LTEuNy4xLTkuZWw2XzkueDg2
+XzY0CmdsaWIyLWRldmVsLTIuMjguOC05LmVsNi54ODZfNjQKbGliZXBveHktZGV2ZWwtMS4yLTMu
+ZWw2Lng4Nl82NApsaWJmZHQtZGV2ZWwtMS40LjAtMS5lbDYueDg2XzY0CmxpYnJkbWFjbS1kZXZl
+bC0xLjAuMjEtMC5lbDYueDg2XzY0Cmx6by1kZXZlbC0yLjAzLTMuMS5lbDZfNS4xLng4Nl82NApt
+YWtlLTMuODEtMjMuZWw2Lng4Nl82NAptZXNhLWxpYkVHTC1kZXZlbC0xMS4wLjctNC5lbDYueDg2
+XzY0Cm1lc2EtbGliZ2JtLWRldmVsLTExLjAuNy00LmVsNi54ODZfNjQKcGFja2FnZSBnKysgaXMg
+bm90IGluc3RhbGxlZApwaXhtYW4tZGV2ZWwtMC4zMi44LTEuZWw2Lng4Nl82NApzcGljZS1nbGli
+LWRldmVsLTAuMjYtOC5lbDYueDg2XzY0CnNwaWNlLXNlcnZlci1kZXZlbC0wLjEyLjQtMTYuZWw2
+Lng4Nl82NAp0YXItMS4yMy0xNS5lbDZfOC54ODZfNjQKdnRlLWRldmVsLTAuMjUuMS05LmVsNi54
+ODZfNjQKeGVuLWRldmVsLTQuNi42LTIuZWw2Lng4Nl82NAp6bGliLWRldmVsLTEuMi4zLTI5LmVs
+Ni54ODZfNjQKCkVudmlyb25tZW50IHZhcmlhYmxlczoKUEFDS0FHRVM9Ymlzb24gICAgIGJ6aXAy
+LWRldmVsICAgICBjY2FjaGUgICAgIGNzbmFwcHktZGV2ZWwgICAgIGZsZXggICAgIGcrKyAgICAg
+Z2NjICAgICBnZXR0ZXh0ICAgICBnaXQgICAgIGdsaWIyLWRldmVsICAgICBsaWJlcG94eS1kZXZl
+bCAgICAgbGliZmR0LWRldmVsICAgICBsaWJyZG1hY20tZGV2ZWwgICAgIGx6by1kZXZlbCAgICAg
+bWFrZSAgICAgbWVzYS1saWJFR0wtZGV2ZWwgICAgIG1lc2EtbGliZ2JtLWRldmVsICAgICBwaXht
+YW4tZGV2ZWwgICAgIFNETC1kZXZlbCAgICAgc3BpY2UtZ2xpYi1kZXZlbCAgICAgc3BpY2Utc2Vy
+dmVyLWRldmVsICAgICB0YXIgICAgIHZ0ZS1kZXZlbCAgICAgeGVuLWRldmVsICAgICB6bGliLWRl
+dmVsCkhPU1ROQU1FPWNmZjRmNGU5ODI3MwpNQUtFRkxBR1M9IC1qOApKPTgKQ0NBQ0hFX0RJUj0v
+dmFyL3RtcC9jY2FjaGUKRVhUUkFfQ09ORklHVVJFX09QVFM9ClY9ClNIT1dfRU5WPTEKUEFUSD0v
+dXNyL2xpYi9jY2FjaGU6L3Vzci9saWI2NC9jY2FjaGU6L3Vzci9sb2NhbC9zYmluOi91c3IvbG9j
+YWwvYmluOi91c3Ivc2JpbjovdXNyL2Jpbjovc2JpbjovYmluClBXRD0vClRBUkdFVF9MSVNUPQpT
+SExWTD0xCkhPTUU9L3Jvb3QKVEVTVF9ESVI9L3RtcC9xZW11LXRlc3QKRkVBVFVSRVM9IGR0YwpE
+RUJVRz0KXz0vdXNyL2Jpbi9lbnYKCkNvbmZpZ3VyZSBvcHRpb25zOgotLWVuYWJsZS13ZXJyb3Ig
+LS10YXJnZXQtbGlzdD14ODZfNjQtc29mdG1tdSxhYXJjaDY0LXNvZnRtbXUgLS1wcmVmaXg9L3Rt
+cC9xZW11LXRlc3QvaW5zdGFsbApObyBDKysgY29tcGlsZXIgYXZhaWxhYmxlOyBkaXNhYmxpbmcg
+QysrIHNwZWNpZmljIG9wdGlvbmFsIGNvZGUKSW5zdGFsbCBwcmVmaXggICAgL3RtcC9xZW11LXRl
+c3QvaW5zdGFsbApCSU9TIGRpcmVjdG9yeSAgICAvdG1wL3FlbXUtdGVzdC9pbnN0YWxsL3NoYXJl
+L3FlbXUKZmlybXdhcmUgcGF0aCAgICAgL3RtcC9xZW11LXRlc3QvaW5zdGFsbC9zaGFyZS9xZW11
+LWZpcm13YXJlCmJpbmFyeSBkaXJlY3RvcnkgIC90bXAvcWVtdS10ZXN0L2luc3RhbGwvYmluCmxp
+YnJhcnkgZGlyZWN0b3J5IC90bXAvcWVtdS10ZXN0L2luc3RhbGwvbGliCm1vZHVsZSBkaXJlY3Rv
+cnkgIC90bXAvcWVtdS10ZXN0L2luc3RhbGwvbGliL3FlbXUKbGliZXhlYyBkaXJlY3RvcnkgL3Rt
+cC9xZW11LXRlc3QvaW5zdGFsbC9saWJleGVjCmluY2x1ZGUgZGlyZWN0b3J5IC90bXAvcWVtdS10
+ZXN0L2luc3RhbGwvaW5jbHVkZQpjb25maWcgZGlyZWN0b3J5ICAvdG1wL3FlbXUtdGVzdC9pbnN0
+YWxsL2V0Ywpsb2NhbCBzdGF0ZSBkaXJlY3RvcnkgICAvdG1wL3FlbXUtdGVzdC9pbnN0YWxsL3Zh
+cgpNYW51YWwgZGlyZWN0b3J5ICAvdG1wL3FlbXUtdGVzdC9pbnN0YWxsL3NoYXJlL21hbgpFTEYg
+aW50ZXJwIHByZWZpeCAvdXNyL2duZW11bC9xZW11LSVNClNvdXJjZSBwYXRoICAgICAgIC90bXAv
+cWVtdS10ZXN0L3NyYwpHSVQgYmluYXJ5ICAgICAgICBnaXQKR0lUIHN1Ym1vZHVsZXMgICAgCkMg
+Y29tcGlsZXIgICAgICAgIGNjCkhvc3QgQyBjb21waWxlciAgIGNjCkMrKyBjb21waWxlciAgICAg
+IApPYmplY3RpdmUtQyBjb21waWxlciBjYwpBUkZMQUdTICAgICAgICAgICBydgpDRkxBR1MgICAg
+ICAgICAgICAtTzIgLVVfRk9SVElGWV9TT1VSQ0UgLURfRk9SVElGWV9TT1VSQ0U9MiAtZyAKUUVN
+VV9DRkxBR1MgICAgICAgLUkvdXNyL2luY2x1ZGUvcGl4bWFuLTEgICAtSSQoU1JDX1BBVEgpL2R0
+Yy9saWJmZHQgLXB0aHJlYWQgLUkvdXNyL2luY2x1ZGUvZ2xpYi0yLjAgLUkvdXNyL2xpYjY0L2ds
+aWItMi4wL2luY2x1ZGUgICAtRE5DVVJTRVNfV0lERUNIQVIgICAtZlBJRSAtRFBJRSAtbTY0IC1t
+Y3gxNiAtRF9HTlVfU09VUkNFIC1EX0ZJTEVfT0ZGU0VUX0JJVFM9NjQgLURfTEFSR0VGSUxFX1NP
+VVJDRSAtV3N0cmljdC1wcm90b3R5cGVzIC1XcmVkdW5kYW50LWRlY2xzIC1XYWxsIC1XdW5kZWYg
+LVd3cml0ZS1zdHJpbmdzIC1XbWlzc2luZy1wcm90b3R5cGVzIC1mbm8tc3RyaWN0LWFsaWFzaW5n
+IC1mbm8tY29tbW9uIC1md3JhcHYgIC1XZW5kaWYtbGFiZWxzIC1Xbm8tbWlzc2luZy1pbmNsdWRl
+LWRpcnMgLVdlbXB0eS1ib2R5IC1XbmVzdGVkLWV4dGVybnMgLVdmb3JtYXQtc2VjdXJpdHkgLVdm
+b3JtYXQteTJrIC1XaW5pdC1zZWxmIC1XaWdub3JlZC1xdWFsaWZpZXJzIC1Xb2xkLXN0eWxlLWRl
+Y2xhcmF0aW9uIC1Xb2xkLXN0eWxlLWRlZmluaXRpb24gLVd0eXBlLWxpbWl0cyAtZnN0YWNrLXBy
+b3RlY3Rvci1hbGwgLVduby1taXNzaW5nLWJyYWNlcyAgLUkvdXNyL2luY2x1ZGUvbGlicG5nMTIg
+ICAtSS91c3IvaW5jbHVkZS9saWJkcm0gICAgIC1JL3Vzci9pbmNsdWRlL3NwaWNlLXNlcnZlciAt
+SS91c3IvaW5jbHVkZS9jYWNhcmQgLUkvdXNyL2luY2x1ZGUvZ2xpYi0yLjAgLUkvdXNyL2xpYjY0
+L2dsaWItMi4wL2luY2x1ZGUgLUkvdXNyL2luY2x1ZGUvcGl4bWFuLTEgLUkvdXNyL2luY2x1ZGUv
+bnNzMyAtSS91c3IvaW5jbHVkZS9uc3ByNCAtSS91c3IvaW5jbHVkZS9zcGljZS0xICAKTERGTEFH
+UyAgICAgICAgICAgLVdsLC0td2Fybi1jb21tb24gLVdsLC16LHJlbHJvIC1XbCwteixub3cgLXBp
+ZSAtbTY0IC1nIAptYWtlICAgICAgICAgICAgICBtYWtlCmluc3RhbGwgICAgICAgICAgIGluc3Rh
+bGwKcHl0aG9uICAgICAgICAgICAgcHl0aG9uIC1CCnNtYmQgICAgICAgICAgICAgIC91c3Ivc2Jp
+bi9zbWJkCm1vZHVsZSBzdXBwb3J0ICAgIG5vCmhvc3QgQ1BVICAgICAgICAgIHg4Nl82NApob3N0
+IGJpZyBlbmRpYW4gICBubwp0YXJnZXQgbGlzdCAgICAgICB4ODZfNjQtc29mdG1tdSBhYXJjaDY0
+LXNvZnRtbXUKZ3Byb2YgZW5hYmxlZCAgICAgbm8Kc3BhcnNlIGVuYWJsZWQgICAgbm8Kc3RyaXAg
+YmluYXJpZXMgICAgeWVzCnByb2ZpbGVyICAgICAgICAgIG5vCnN0YXRpYyBidWlsZCAgICAgIG5v
+ClNETCBzdXBwb3J0ICAgICAgIHllcyAoMS4yLjE0KQpHVEsgc3VwcG9ydCAgICAgICB5ZXMgKDIu
+MjQuMjMpCkdUSyBHTCBzdXBwb3J0ICAgIG5vClZURSBzdXBwb3J0ICAgICAgIHllcyAoMC4yNS4x
+KQpUTFMgcHJpb3JpdHkgICAgICBOT1JNQUwKR05VVExTIHN1cHBvcnQgICAgbm8KR05VVExTIHJu
+ZCAgICAgICAgbm8KbGliZ2NyeXB0ICAgICAgICAgbm8KbGliZ2NyeXB0IGtkZiAgICAgbm8KbmV0
+dGxlICAgICAgICAgICAgbm8gCm5ldHRsZSBrZGYgICAgICAgIG5vCmxpYnRhc24xICAgICAgICAg
+IG5vCmN1cnNlcyBzdXBwb3J0ICAgIHllcwp2aXJnbCBzdXBwb3J0ICAgICBubwpjdXJsIHN1cHBv
+cnQgICAgICBubwptaW5ndzMyIHN1cHBvcnQgICBubwpBdWRpbyBkcml2ZXJzICAgICBvc3MKQmxv
+Y2sgd2hpdGVsaXN0IChydykgCkJsb2NrIHdoaXRlbGlzdCAocm8pIApWaXJ0RlMgc3VwcG9ydCAg
+ICBubwpNdWx0aXBhdGggc3VwcG9ydCBubwpWTkMgc3VwcG9ydCAgICAgICB5ZXMKVk5DIFNBU0wg
+c3VwcG9ydCAgbm8KVk5DIEpQRUcgc3VwcG9ydCAgeWVzClZOQyBQTkcgc3VwcG9ydCAgIHllcwp4
+ZW4gc3VwcG9ydCAgICAgICB5ZXMKeGVuIGN0cmwgdmVyc2lvbiAgNDA2MDAKcHYgZG9tIGJ1aWxk
+ICAgICAgbm8KYnJsYXBpIHN1cHBvcnQgICAgbm8KYmx1ZXogIHN1cHBvcnQgICAgbm8KRG9jdW1l
+bnRhdGlvbiAgICAgbm8KUElFICAgICAgICAgICAgICAgeWVzCnZkZSBzdXBwb3J0ICAgICAgIG5v
+Cm5ldG1hcCBzdXBwb3J0ICAgIG5vCkxpbnV4IEFJTyBzdXBwb3J0IG5vCkFUVFIvWEFUVFIgc3Vw
+cG9ydCB5ZXMKSW5zdGFsbCBibG9icyAgICAgeWVzCktWTSBzdXBwb3J0ICAgICAgIHllcwpIQVgg
+c3VwcG9ydCAgICAgICBubwpIVkYgc3VwcG9ydCAgICAgICBubwpUQ0cgc3VwcG9ydCAgICAgICB5
+ZXMKVENHIGRlYnVnIGVuYWJsZWQgbm8KVENHIGludGVycHJldGVyICAgbm8KbWFsbG9jIHRyaW0g
+c3VwcG9ydCB5ZXMKUkRNQSBzdXBwb3J0ICAgICAgeWVzCmZkdCBzdXBwb3J0ICAgICAgIHllcwpw
+cmVhZHYgc3VwcG9ydCAgICB5ZXMKZmRhdGFzeW5jICAgICAgICAgeWVzCm1hZHZpc2UgICAgICAg
+ICAgIHllcwpwb3NpeF9tYWR2aXNlICAgICB5ZXMKbGliY2FwLW5nIHN1cHBvcnQgbm8Kdmhvc3Qt
+bmV0IHN1cHBvcnQgeWVzCnZob3N0LXNjc2kgc3VwcG9ydCB5ZXMKdmhvc3QtdnNvY2sgc3VwcG9y
+dCB5ZXMKdmhvc3QtdXNlciBzdXBwb3J0IHllcwpUcmFjZSBiYWNrZW5kcyAgICBsb2cKc3BpY2Ug
+c3VwcG9ydCAgICAgeWVzICgwLjEyLjYvMC4xMi40KQpyYmQgc3VwcG9ydCAgICAgICBubwp4ZnNj
+dGwgc3VwcG9ydCAgICBubwpzbWFydGNhcmQgc3VwcG9ydCB5ZXMKbGlidXNiICAgICAgICAgICAg
+bm8KdXNiIG5ldCByZWRpciAgICAgbm8KT3BlbkdMIHN1cHBvcnQgICAgeWVzCk9wZW5HTCBkbWFi
+dWZzICAgIG5vCmxpYmlzY3NpIHN1cHBvcnQgIG5vCmxpYm5mcyBzdXBwb3J0ICAgIG5vCmJ1aWxk
+IGd1ZXN0IGFnZW50IHllcwpRR0EgVlNTIHN1cHBvcnQgICBubwpRR0EgdzMyIGRpc2sgaW5mbyBu
+bwpRR0EgTVNJIHN1cHBvcnQgICBubwpzZWNjb21wIHN1cHBvcnQgICBubwpjb3JvdXRpbmUgYmFj
+a2VuZCB1Y29udGV4dApjb3JvdXRpbmUgcG9vbCAgICB5ZXMKZGVidWcgc3RhY2sgdXNhZ2Ugbm8K
+Y3J5cHRvIGFmYWxnICAgICAgbm8KR2x1c3RlckZTIHN1cHBvcnQgbm8KZ2NvdiAgICAgICAgICAg
+ICAgZ2NvdgpnY292IGVuYWJsZWQgICAgICBubwpUUE0gc3VwcG9ydCAgICAgICB5ZXMKbGlic3No
+MiBzdXBwb3J0ICAgbm8KVFBNIHBhc3N0aHJvdWdoICAgeWVzClRQTSBlbXVsYXRvciAgICAgIHll
+cwpRT00gZGVidWdnaW5nICAgICB5ZXMKTGl2ZSBibG9jayBtaWdyYXRpb24geWVzCmx6byBzdXBw
+b3J0ICAgICAgIHllcwpzbmFwcHkgc3VwcG9ydCAgICBubwpiemlwMiBzdXBwb3J0ICAgICB5ZXMK
+TlVNQSBob3N0IHN1cHBvcnQgbm8KdGNtYWxsb2Mgc3VwcG9ydCAgbm8KamVtYWxsb2Mgc3VwcG9y
+dCAgbm8KYXZ4MiBvcHRpbWl6YXRpb24gbm8KcmVwbGljYXRpb24gc3VwcG9ydCB5ZXMKVnhIUyBi
+bG9jayBkZXZpY2Ugbm8KY2Fwc3RvbmUgICAgICAgICAgbm8KbWtkaXIgLXAgZHRjL2xpYmZkdApt
+a2RpciAtcCBkdGMvdGVzdHMKICBHRU4gICAgIHg4Nl82NC1zb2Z0bW11L2NvbmZpZy1kZXZpY2Vz
+Lm1hay50bXAKICBHRU4gICAgIGFhcmNoNjQtc29mdG1tdS9jb25maWctZGV2aWNlcy5tYWsudG1w
+CiAgR0VOICAgICBxZW11LW9wdGlvbnMuZGVmCiAgR0VOICAgICBjb25maWctaG9zdC5oCiAgR0VO
+ICAgICBxYXBpLXZpc2l0LmgKICBHRU4gICAgIHFtcC1jb21tYW5kcy5oCiAgR0VOICAgICBxYXBp
+LXR5cGVzLmgKICBHRU4gICAgIHFhcGktZXZlbnQuaAogIEdFTiAgICAgeDg2XzY0LXNvZnRtbXUv
+Y29uZmlnLWRldmljZXMubWFrCiAgR0VOICAgICBxbXAtbWFyc2hhbC5jCiAgR0VOICAgICBhYXJj
+aDY0LXNvZnRtbXUvY29uZmlnLWRldmljZXMubWFrCiAgR0VOICAgICBxYXBpLXR5cGVzLmMKICBH
+RU4gICAgIHFhcGktdmlzaXQuYwogIEdFTiAgICAgcWFwaS1ldmVudC5jCiAgR0VOICAgICBxbXAt
+aW50cm9zcGVjdC5oCiAgR0VOICAgICBxbXAtaW50cm9zcGVjdC5jCiAgR0VOICAgICB0cmFjZS9n
+ZW5lcmF0ZWQtdGNnLXRyYWNlcnMuaApUcmFjZWJhY2sgKG1vc3QgcmVjZW50IGNhbGwgbGFzdCk6
+CiAgRmlsZSAiL3RtcC9xZW11LXRlc3Qvc3JjL3NjcmlwdHMvdHJhY2V0b29sLnB5IiwgbGluZSAx
+NTQsIGluIDxtb2R1bGU+CiAgICBtYWluKHN5cy5hcmd2KQogIEZpbGUgIi90bXAvcWVtdS10ZXN0
+L3NyYy9zY3JpcHRzL3RyYWNldG9vbC5weSIsIGxpbmUgMTQ1LCBpbiBtYWluCiAgICBldmVudHMu
+ZXh0ZW5kKHRyYWNldG9vbC5yZWFkX2V2ZW50cyhmaCkpCiAgRmlsZSAiL3RtcC9xZW11LXRlc3Qv
+c3JjL3NjcmlwdHMvdHJhY2V0b29sL19faW5pdF9fLnB5IiwgbGluZSAzMDksIGluIHJlYWRfZXZl
+bnRzCiAgICBldmVudCA9IEV2ZW50LmJ1aWxkKGxpbmUpCiAgRmlsZSAiL3RtcC9xZW11LXRlc3Qv
+c3JjL3NjcmlwdHMvdHJhY2V0b29sL19faW5pdF9fLnB5IiwgbGluZSAyNDAsIGluIGJ1aWxkCiAg
+ICByYWlzZSBWYWx1ZUVycm9yKCJPbmx5IGV2ZW50cyB3aXRoICd0Y2cnIHByb3BlcnR5IGNhbiBo
+YXZlIHR3byBmb3JtYXRzIikKVmFsdWVFcnJvcjogT25seSBldmVudHMgd2l0aCAndGNnJyBwcm9w
+ZXJ0eSBjYW4gaGF2ZSB0d28gZm9ybWF0cwptYWtlOiAqKiogW3RyYWNlL2dlbmVyYXRlZC10Y2ct
+dHJhY2Vycy5oLXRpbWVzdGFtcF0gRXJyb3IgMQptYWtlOiAqKiogRGVsZXRpbmcgZmlsZSBgdHJh
+Y2UvZ2VuZXJhdGVkLXRjZy10cmFjZXJzLmgtdGltZXN0YW1wJwptYWtlOiAqKiogV2FpdGluZyBm
+b3IgdW5maW5pc2hlZCBqb2JzLi4uLgpUcmFjZWJhY2sgKG1vc3QgcmVjZW50IGNhbGwgbGFzdCk6
+CiAgRmlsZSAiLi90ZXN0cy9kb2NrZXIvZG9ja2VyLnB5IiwgbGluZSA0MDcsIGluIDxtb2R1bGU+
+CiAgICBzeXMuZXhpdChtYWluKCkpCiAgRmlsZSAiLi90ZXN0cy9kb2NrZXIvZG9ja2VyLnB5Iiwg
+bGluZSA0MDQsIGluIG1haW4KICAgIHJldHVybiBhcmdzLmNtZG9iai5ydW4oYXJncywgYXJndikK
+ICBGaWxlICIuL3Rlc3RzL2RvY2tlci9kb2NrZXIucHkiLCBsaW5lIDI2MSwgaW4gcnVuCiAgICBy
+ZXR1cm4gRG9ja2VyKCkucnVuKGFyZ3YsIGFyZ3Mua2VlcCwgcXVpZXQ9YXJncy5xdWlldCkKICBG
+aWxlICIuL3Rlc3RzL2RvY2tlci9kb2NrZXIucHkiLCBsaW5lIDIyOSwgaW4gcnVuCiAgICBxdWll
+dD1xdWlldCkKICBGaWxlICIuL3Rlc3RzL2RvY2tlci9kb2NrZXIucHkiLCBsaW5lIDE0NywgaW4g
+X2RvX2NoZWNrCiAgICByZXR1cm4gc3VicHJvY2Vzcy5jaGVja19jYWxsKHNlbGYuX2NvbW1hbmQg
+KyBjbWQsICoqa3dhcmdzKQogIEZpbGUgIi91c3IvbGliNjQvcHl0aG9uMi43L3N1YnByb2Nlc3Mu
+cHkiLCBsaW5lIDE4NiwgaW4gY2hlY2tfY2FsbAogICAgcmFpc2UgQ2FsbGVkUHJvY2Vzc0Vycm9y
+KHJldGNvZGUsIGNtZCkKc3VicHJvY2Vzcy5DYWxsZWRQcm9jZXNzRXJyb3I6IENvbW1hbmQgJ1sn
+ZG9ja2VyJywgJ3J1bicsICctLWxhYmVsJywgJ2NvbS5xZW11Lmluc3RhbmNlLnV1aWQ9Zjg2M2Vm
+ODBmNjEyMTFlN2I1Mzc1MjU0MDA2OWM4MzAnLCAnLXUnLCAnMCcsICctLXNlY3VyaXR5LW9wdCcs
+ICdzZWNjb21wPXVuY29uZmluZWQnLCAnLS1ybScsICctLW5ldD1ub25lJywgJy1lJywgJ1RBUkdF
+VF9MSVNUPScsICctZScsICdFWFRSQV9DT05GSUdVUkVfT1BUUz0nLCAnLWUnLCAnVj0nLCAnLWUn
+LCAnSj04JywgJy1lJywgJ0RFQlVHPScsICctZScsICdTSE9XX0VOVj0xJywgJy1lJywgJ0NDQUNI
+RV9ESVI9L3Zhci90bXAvY2NhY2hlJywgJy12JywgJy9yb290Ly5jYWNoZS9xZW11LWRvY2tlci1j
+Y2FjaGU6L3Zhci90bXAvY2NhY2hlOnonLCAnLXYnLCAnL3Zhci90bXAvcGF0Y2hldy10ZXN0ZXIt
+dG1wLXE2bGFzenVoL3NyYy9kb2NrZXItc3JjLjIwMTgtMDEtMTAtMDkuMzEuMjcuNjAzNzovdmFy
+L3RtcC9xZW11Onoscm8nLCAncWVtdTpjZW50b3M2JywgJy92YXIvdG1wL3FlbXUvcnVuJywgJ3Rl
+c3QtcXVpY2snXScgcmV0dXJuZWQgbm9uLXplcm8gZXhpdCBzdGF0dXMgMgptYWtlWzFdOiAqKiog
+W3Rlc3RzL2RvY2tlci9NYWtlZmlsZS5pbmNsdWRlOjEyOTogZG9ja2VyLXJ1bl0gRXJyb3IgMQpt
+YWtlWzFdOiBMZWF2aW5nIGRpcmVjdG9yeSAnL3Zhci90bXAvcGF0Y2hldy10ZXN0ZXItdG1wLXE2
+bGFzenVoL3NyYycKbWFrZTogKioqIFt0ZXN0cy9kb2NrZXIvTWFrZWZpbGUuaW5jbHVkZToxNjM6
+IGRvY2tlci1ydW4tdGVzdC1xdWlja0BjZW50b3M2XSBFcnJvciAyCgpyZWFsCTFtMS4wNzZzCnVz
+ZXIJMG0zLjkwNHMKc3lzCTBtMi43OTdzCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5k
+IGV4aXRlZCB3aXRoIGNvZGU6IDIKCgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkg
+YnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJh
+Y2sgdG8gcGF0Y2hldy1kZXZlbEBmcmVlbGlzdHMub3Jn
