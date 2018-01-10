@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43064)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43710)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sjitindarsingh@gmail.com>) id 1eZ4D0-0004LR-3e
-	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 19:25:35 -0500
+	(envelope-from <sjitindarsingh@gmail.com>) id 1eZ4Du-0004yt-Kl
+	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 19:26:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sjitindarsingh@gmail.com>) id 1eZ4Cz-0006X2-2W
-	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 19:25:33 -0500
-Message-ID: <1515543921.1993.14.camel@gmail.com>
+	(envelope-from <sjitindarsingh@gmail.com>) id 1eZ4Dt-0007h6-PG
+	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 19:26:30 -0500
+Message-ID: <1515543979.1993.15.camel@gmail.com>
 From: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
-Date: Wed, 10 Jan 2018 11:25:21 +1100
-In-Reply-To: <1316befd-f593-8082-bec5-a1635e866f61@linux.vnet.ibm.com>
+Date: Wed, 10 Jan 2018 11:26:19 +1100
+In-Reply-To: <ec42a7c1-47f9-ff57-8bdc-bd8d26d9a522@linux.vnet.ibm.com>
 References: <20180109092103.18458-1-sjitindarsingh@gmail.com>
-	<20180109092103.18458-3-sjitindarsingh@gmail.com>
-	<1316befd-f593-8082-bec5-a1635e866f61@linux.vnet.ibm.com>
+	<20180109092103.18458-4-sjitindarsingh@gmail.com>
+	<ec42a7c1-47f9-ff57-8bdc-bd8d26d9a522@linux.vnet.ibm.com>
 Content-Type: text/plain; charset="UTF-8"
 Mime-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [Qemu-ppc] [QEMU-PPC] [RFC 2/3]
- hw/spapr/spapr_caps: Add new caps safe_[cache/bounds_check/indirect_branch]
+Subject: Re: [Qemu-devel] [Qemu-ppc] [QEMU-PPC] [RFC 3/3] target/ppc: Add
+ H-Call H_GET_CPU_CHARACTERISTICS
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,38 +28,65 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Murilo Opsfelder =?ISO-8859-1?Q?Ara=FAjo?= <muriloo@linux.vnet.ibm.com>, qemu-ppc@nongnu.org
 Cc: paulus@ozlabs.org, qemu-devel@nongnu.org, david@gibson.dropbear.id.au
 
-On Tue, 2018-01-09 at 09:15 -0200, Murilo Opsfelder Araújo wrote:
+On Tue, 2018-01-09 at 09:19 -0200, Murilo Opsfelder Araújo wrote:
 > On 01/09/2018 07:21 AM, Suraj Jitindar Singh wrote:
-> > This patch adds three new capabilities:
-> > cap-cfpc -> safe_cache
-> > cap-sbbc -> safe_bounds_check
-> > cap-ibs  -> safe_indirect_branch
+> > The new H-Call H_GET_CPU_CHARACTERISTICS is used by the guest to
+> > query
+> > behaviours and available characteristics of the cpu.
+> > 
+> > Implement the handler for this new H-Call which formulates its
+> > response
+> > based on the setting of the new capabilities added in the previous
+> > patch.
+> > 
+> > Note: Currently we return H_FUNCTION under TCG which will direct
+> > the
+> >       guest to fall back to doing a displacement flush
+> > 
+> > Discussion:
+> > Is TCG affected?
+> > Is there any point in telling the guest to do these workarounds on
+> > TCG
+> > given they're unlikely to translate to host instructions which have
+> > the
+> > desired effect?
 > 
 > Hi, Suraj.
 > 
-> What about splitting this into smaller patches, one per capability?
+> What if this is left to the cover letter?
 
-Yep
+Again, only because this is RFC.
 
 > 
-> > Each capability is tristate with the possible values "broken",
-> > "workaround" or "fixed". Add generic getter and setter functions
-> > for
-> > this new capability type. Add these new capabilities to the
-> > capabilities
-> > list. The maximum value for the capabilities is queried from kvm
-> > through
-> > new kvm capabilities. The requested values are considered to be
-> > compatible if kvm can support an equal or higher value for each
-> > capability.
+> > ---
+> >  hw/ppc/spapr_hcall.c   | 81
+> > ++++++++++++++++++++++++++++++++++++++++++++++++++
+> >  include/hw/ppc/spapr.h |  1 +
+> >  2 files changed, 82 insertions(+)
 > > 
-> > Discussion:
-> > Currently these new capabilities default to broken to allow for
-> > backwards compatibility, is this the best option?
+> > diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
+> > index 51eba52e86..b62b47c8d9 100644
+> > --- a/hw/ppc/spapr_hcall.c
+> > +++ b/hw/ppc/spapr_hcall.c
+> > @@ -1654,6 +1654,84 @@ static target_ulong
+> > h_client_architecture_support(PowerPCCPU *cpu,
+> >      return H_SUCCESS;
+> >  }
+> > 
+> > +#define CPU_CHARACTERISTIC_SPEC_BARRIER         (1ULL << (63 - 0))
+> > +#define CPU_CHARACTERISTIC_BCCTR_SERIAL         (1ULL << (63 - 1))
+> > +#define CPU_CHARACTERISTIC_ORI_L1_CACHE         (1ULL << (63 - 2))
+> > +#define CPU_CHARACTERISTIC_MTTRIG_L1_CACHE      (1ULL << (63 - 3))
+> > +#define CPU_CHARACTERISTIC_L1_CACHE_PRIV        (1ULL << (63 - 4))
+> > +#define CPU_CHARACTERISTIC_BRANCH_HINTS         (1ULL << (63 - 5))
+> > +#define CPU_CHARACTERISTIC_MTTRIG_THR_RECONF    (1ULL << (63 - 6))
+> > +#define CPU_BEHAVIOUR_FAVOUR_SECURITY           (1ULL << (63 - 0))
+> > +#define CPU_BEHAVIOUR_L1_CACHE_FLUSH            (1ULL << (63 - 1))
+> > +#define CPU_BEHAVIOUR_SPEC_BARRIER              (1ULL << (63 - 2))
 > 
-> This could be placed in the cover letter, not in the commit 
+> Can PPC_BIT be used here?
 
-Only here because this is an RFC
+Yep, will do
 
 > 
 > Cheers
