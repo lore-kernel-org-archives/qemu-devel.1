@@ -1,21 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34226)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38632)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1eZMx5-0001Uz-Nu
-	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 15:26:24 -0500
+	(envelope-from <jcd@tribudubois.net>) id 1eZN95-00082m-90
+	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 15:38:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1eZMx2-0001cc-0Y
-	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 15:26:23 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:57086)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1eZMx1-0001aN-Rn
-	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 15:26:19 -0500
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Date: Wed, 10 Jan 2018 20:25:52 +0000
-Message-Id: <20180110202553.31889-3-stefanha@redhat.com>
-In-Reply-To: <20180110202553.31889-1-stefanha@redhat.com>
-References: <20180110202553.31889-1-stefanha@redhat.com>
-Subject: [Qemu-devel] [PATCH 2/3] tracetool: clarify that "formats" means
- "format strings"
+	(envelope-from <jcd@tribudubois.net>) id 1eZN94-00054b-BO
+	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 15:38:47 -0500
+From: Jean-Christophe Dubois <jcd@tribudubois.net>
+Date: Wed, 10 Jan 2018 21:38:23 +0100
+Message-Id: <20180110203823.22292-1-jcd@tribudubois.net>
+Subject: [Qemu-devel] [PATCH] i.MX: Fix FEC/ENET receive funtions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,56 +17,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Eric Blake <eblake@redhat.com>, =?UTF-8?q?Llu=C3=ADs=20Vilanova?= <vilanova@ac.upc.edu>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
+To: peter.maydell@linaro.org
+Cc: Jean-Christophe Dubois <jcd@tribudubois.net>, qemu-devel@nongnu.org, fyleo45@gmail.com, qemu-arm@nongnu.org, Peter Chubb <peter.chubb@nicta.com.au>, Jason Wang <jasowang@redhat.com>
 
-The terminology used by tracetool is not consistent with C sprintf or
-docs/devel/tracing.txt.  The word "formats" is sometimes used to mean
-"format strings".
+The actual imx_eth_enable_rx() function is buggy.
 
-This patch clarifies comments and error messages that contain this word.
+It updates s->regs[ENET_RDAR] after calling qemu_flush_queued_packets().
 
-Note that the error message lines are longer than 80 characters but I
-have not wrapped them to aid grepping.
+qemu_flush_queued_packets() is going to call imx_XXX_receive() which itself
+is going to call imx_eth_enable_rx().
 
-Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+By updating s->regs[ENET_RDAR] after calling qemu_flush_queued_packets()
+we end up updating the register with an outdated value which might
+lead to disabling the receive function in the i.MX FEC/ENET device.
+
+This patch change the place where the register update is done so that the
+register value stays up to date and the receive function can keep
+running.
+
+Reported-by: Fyleo <fyleo45@gmail.com>
+Tested-by: Fyleo <fyleo45@gmail.com>
+Signed-off-by: Jean-Christophe Dubois <jcd@tribudubois.net>
 ---
- scripts/tracetool/__init__.py | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+ hw/net/imx_fec.c | 10 +++-------
+ 1 file changed, 3 insertions(+), 7 deletions(-)
 
-diff --git a/scripts/tracetool/__init__.py b/scripts/tracetool/__init__.py
-index fbccaaa0cf..5db1f5c395 100644
---- a/scripts/tracetool/__init__.py
-+++ b/scripts/tracetool/__init__.py
-@@ -173,7 +173,7 @@ class Event(object):
-         props : list of str
-             Property names.
-         fmt : str, list of str
--            Event printing format (or formats).
-+            Event printing format string(s).
-         args : Arguments
-             Event arguments.
-         orig : Event or None
-@@ -237,9 +237,9 @@ class Event(object):
-         if "tcg-exec" in props:
-             raise ValueError("Invalid property 'tcg-exec'")
-         if "tcg" not in props and not isinstance(fmt, str):
--            raise ValueError("Only events with 'tcg' property can have two formats")
-+            raise ValueError("Only events with 'tcg' property can have two format strings")
-         if "tcg" in props and isinstance(fmt, str):
--            raise ValueError("Events with 'tcg' property must have two formats")
-+            raise ValueError("Events with 'tcg' property must have two format strings")
+diff --git a/hw/net/imx_fec.c b/hw/net/imx_fec.c
+index 90e6ee35ba..04a5cf12f1 100644
+--- a/hw/net/imx_fec.c
++++ b/hw/net/imx_fec.c
+@@ -536,19 +536,16 @@ static void imx_eth_do_tx(IMXFECState *s)
+ static void imx_eth_enable_rx(IMXFECState *s)
+ {
+     IMXFECBufDesc bd;
+-    bool tmp;
  
-         event = Event(name, props, fmt, args)
+     imx_fec_read_bd(&bd, s->rx_descriptor);
  
-@@ -263,7 +263,7 @@ class Event(object):
-     _FMT = re.compile("(%[\d\.]*\w+|%.*PRI\S+)")
+-    tmp = ((bd.flags & ENET_BD_E) != 0);
++    s->regs[ENET_RDAR] = (bd.flags & ENET_BD_E) ? ENET_RDAR_RDAR : 0;
  
-     def formats(self):
--        """List of argument print formats."""
-+        """List conversion specifiers in the argument print format string."""
-         assert not isinstance(self.fmt, list)
-         return self._FMT.findall(self.fmt)
+-    if (!tmp) {
++    if (!s->regs[ENET_RDAR]) {
+         FEC_PRINTF("RX buffer full\n");
+-    } else if (!s->regs[ENET_RDAR]) {
++    } else {
+         qemu_flush_queued_packets(qemu_get_queue(s->nic));
+     }
+-
+-    s->regs[ENET_RDAR] = tmp ? ENET_RDAR_RDAR : 0;
+ }
  
+ static void imx_eth_reset(DeviceState *d)
+@@ -806,7 +803,6 @@ static void imx_eth_write(void *opaque, hwaddr offset, uint64_t value,
+     case ENET_RDAR:
+         if (s->regs[ENET_ECR] & ENET_ECR_ETHEREN) {
+             if (!s->regs[index]) {
+-                s->regs[index] = ENET_RDAR_RDAR;
+                 imx_eth_enable_rx(s);
+             }
+         } else {
 -- 
-2.14.3
+2.14.1
