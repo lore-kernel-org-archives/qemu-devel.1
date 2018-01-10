@@ -1,22 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56898)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57812)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1eZLhr-0007pJ-CH
-	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 14:06:36 -0500
+	(envelope-from <marcel@redhat.com>) id 1eZLkk-00020e-CP
+	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 14:09:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1eZLhq-0006z8-Kd
-	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 14:06:35 -0500
-Date: Wed, 10 Jan 2018 19:06:19 +0000
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20180110190619.GK24212@stefanha-x1.localdomain>
-References: <20180110091846.10699-1-famz@redhat.com>
-	<20180110091846.10699-10-famz@redhat.com>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="M0YLxmUXciMpOLPE"
-Content-Disposition: inline
-In-Reply-To: <20180110091846.10699-10-famz@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v4 9/9] qapi: Add NVMe driver options to
- the schema
+	(envelope-from <marcel@redhat.com>) id 1eZLkf-0000zc-ER
+	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 14:09:34 -0500
+From: Marcel Apfelbaum <marcel@redhat.com>
+Date: Wed, 10 Jan 2018 21:09:09 +0200
+Message-Id: <20180110190909.20652-1-marcel@redhat.com>
+Subject: [Qemu-devel] [PATCH] hw/pci-bridge: fix QEMU crash because of
+ pcie-root-port
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,34 +18,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Keith Busch <keith.busch@intel.com>, qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, Karl Rister <krister@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: marcel@redhat.com, mst@redhat.com, zuban32s@gmail.com, qemu-stable@nongnu.org
 
+If we try to use more pcie_root_ports then available slots
+and an IO hint is passed to the port, QEMU crashes because
+we try to init the "IO hint" capability even if the device
+is not created.
+Fix it by checking for error before adding the capability,
+so QEMU can fail gracefully.
 
---M0YLxmUXciMpOLPE
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Signed-off-by: Marcel Apfelbaum <marcel@redhat.com>
+---
+ hw/pci-bridge/gen_pcie_root_port.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
 
-On Wed, Jan 10, 2018 at 05:18:46PM +0800, Fam Zheng wrote:
-> Signed-off-by: Fam Zheng <famz@redhat.com>
-> ---
->  qapi/block-core.json | 16 +++++++++++++++-
->  1 file changed, 15 insertions(+), 1 deletion(-)
-
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-
---M0YLxmUXciMpOLPE
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJaVmQrAAoJEJykq7OBq3PIghkIAINbco2lnVTKJQbY1Ut3nkgK
-GwNYMoiFnDRlDDHUuZWIPu0gqolq2h76mF1ChFl1wGKcrPe4h0kFPARNj/Seo0J+
-ylrvIFGMHUEIAuW/tBGwXz4tEZV4mLTDxF9ALi7zLNlRO6OTUHj1lf1sly6m76su
-2fEmXA/HuTIGJTHYX6ACJ1wFtX4s7W+wnvXAImIQ3vUUiApSqUAFgkyrwvSFc90u
-cf/dO8fMN3WeXLGLULTcRCXIJlnzj5RhsV4YVpd1EQiDauenHrNjrjWe84SFnZcZ
-ZF1ifT2wSXQgoKwXPLONnEBptMtmXzgEAj/u25/B+urWrLjiK0JKi1VQzuvKUXk=
-=HtlP
------END PGP SIGNATURE-----
-
---M0YLxmUXciMpOLPE--
+diff --git a/hw/pci-bridge/gen_pcie_root_port.c b/hw/pci-bridge/gen_pcie_root_port.c
+index ad4e6aa7ff..0e2f2e8bf1 100644
+--- a/hw/pci-bridge/gen_pcie_root_port.c
++++ b/hw/pci-bridge/gen_pcie_root_port.c
+@@ -74,8 +74,13 @@ static void gen_rp_realize(DeviceState *dev, Error **errp)
+     PCIDevice *d = PCI_DEVICE(dev);
+     GenPCIERootPort *grp = GEN_PCIE_ROOT_PORT(d);
+     PCIERootPortClass *rpc = PCIE_ROOT_PORT_GET_CLASS(d);
++    Error *local_err = NULL;
+ 
+-    rpc->parent_realize(dev, errp);
++    rpc->parent_realize(dev, &local_err);
++    if (local_err) {
++        error_propagate(errp, local_err);
++        return;
++    }
+ 
+     int rc = pci_bridge_qemu_reserve_cap_init(d, 0, grp->bus_reserve,
+             grp->io_reserve, grp->mem_reserve, grp->pref32_reserve,
+-- 
+2.13.5
