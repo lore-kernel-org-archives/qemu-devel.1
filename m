@@ -1,15 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57812)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33362)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcel@redhat.com>) id 1eZLkk-00020e-CP
-	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 14:09:35 -0500
+	(envelope-from <stefanha@gmail.com>) id 1eZLrX-0006lb-7F
+	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 14:16:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcel@redhat.com>) id 1eZLkf-0000zc-ER
-	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 14:09:34 -0500
-From: Marcel Apfelbaum <marcel@redhat.com>
-Date: Wed, 10 Jan 2018 21:09:09 +0200
-Message-Id: <20180110190909.20652-1-marcel@redhat.com>
-Subject: [Qemu-devel] [PATCH] hw/pci-bridge: fix QEMU crash because of
- pcie-root-port
+	(envelope-from <stefanha@gmail.com>) id 1eZLrW-00073H-6O
+	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 14:16:35 -0500
+Received: from mail-wm0-x231.google.com ([2a00:1450:400c:c09::231]:37471)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1eZLrW-00072h-0O
+	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 14:16:34 -0500
+Received: by mail-wm0-x231.google.com with SMTP id f140so1026328wmd.2
+	for <qemu-devel@nongnu.org>; Wed, 10 Jan 2018 11:16:33 -0800 (PST)
+MIME-Version: 1.0
+In-Reply-To: <20180109195517.GD2708@work-vm>
+References: <EC8A4E314CF1574AB62C80421BD9833933FEE069@SHSMSX104.ccr.corp.intel.com>
+	<20180109153538.GC1197@stefanha-x1.localdomain>
+	<20180109195517.GD2708@work-vm>
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Date: Wed, 10 Jan 2018 19:16:32 +0000
+Message-ID: <CAJSP0QVm+AoRoFNYx-r1k0WTPPopm60dmD7OhGZozm9ARfMwRQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] Some question about savem/qcow2 incremental
+ snapshot
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,39 +30,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: marcel@redhat.com, mst@redhat.com, zuban32s@gmail.com, qemu-stable@nongnu.org
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: "He, Junyan" <junyan.he@intel.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Juan Quintela <quintela@redhat.com>, John Snow <jsnow@redhat.com>
 
-If we try to use more pcie_root_ports then available slots
-and an IO hint is passed to the port, QEMU crashes because
-we try to init the "IO hint" capability even if the device
-is not created.
-Fix it by checking for error before adding the capability,
-so QEMU can fail gracefully.
+On Tue, Jan 9, 2018 at 7:55 PM, Dr. David Alan Gilbert
+<dgilbert@redhat.com> wrote:
+>> Certain guest operations like rebooting or zeroing memory will defeat
+>> the incremental guest RAM snapshot feature.  It's worth thinking about
+>> these cases to make sure this feature would be worth it in real use
+>> cases.
+>
+> But those probably wouldn't upset an NVDimm?
 
-Signed-off-by: Marcel Apfelbaum <marcel@redhat.com>
----
- hw/pci-bridge/gen_pcie_root_port.c | 7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
+If the guest dirties all RAM then the incremental snapshot feature
+degrades to a full snapshot.  I'm asking if there are common
+operations where that happens.
 
-diff --git a/hw/pci-bridge/gen_pcie_root_port.c b/hw/pci-bridge/gen_pcie_root_port.c
-index ad4e6aa7ff..0e2f2e8bf1 100644
---- a/hw/pci-bridge/gen_pcie_root_port.c
-+++ b/hw/pci-bridge/gen_pcie_root_port.c
-@@ -74,8 +74,13 @@ static void gen_rp_realize(DeviceState *dev, Error **errp)
-     PCIDevice *d = PCI_DEVICE(dev);
-     GenPCIERootPort *grp = GEN_PCIE_ROOT_PORT(d);
-     PCIERootPortClass *rpc = PCIE_ROOT_PORT_GET_CLASS(d);
-+    Error *local_err = NULL;
- 
--    rpc->parent_realize(dev, errp);
-+    rpc->parent_realize(dev, &local_err);
-+    if (local_err) {
-+        error_propagate(errp, local_err);
-+        return;
-+    }
- 
-     int rc = pci_bridge_qemu_reserve_cap_init(d, 0, grp->bus_reserve,
-             grp->io_reserve, grp->mem_reserve, grp->pref32_reserve,
--- 
-2.13.5
+I seem to remember Windows guests zero all pages on cold boot.  Maybe
+that's not the case anymore.
+
+Worth checking before embarking on this feature because it could be a
+waste of effort if it turns out real-world guests dirty all memory in
+common cases.
