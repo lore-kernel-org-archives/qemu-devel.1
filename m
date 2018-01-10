@@ -1,22 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47967)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48062)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1eZJ1c-0005Zq-L5
-	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 11:14:49 -0500
+	(envelope-from <berrange@redhat.com>) id 1eZJ1v-0005pc-6h
+	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 11:15:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1eZJ1X-00034Q-GM
-	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 11:14:48 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:45714)
+	(envelope-from <berrange@redhat.com>) id 1eZJ1r-0003MB-1t
+	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 11:15:07 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:59670)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1eZJ1X-00031q-8i
-	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 11:14:43 -0500
-Date: Wed, 10 Jan 2018 16:14:38 +0000
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20180110161438.GA28096@stefanha-x1.localdomain>
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1eZJ1q-0003LP-P5
+	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 11:15:02 -0500
+Date: Wed, 10 Jan 2018 16:14:53 +0000
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20180110161453.GM3205@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <20171227011428.40996-1-programmingkidx@gmail.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="MGYHOYXEY6WxJCY8"
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-Subject: [Qemu-devel] vhost-pci and virtio-vhost-user
+In-Reply-To: <20171227011428.40996-1-programmingkidx@gmail.com>
+Subject: Re: [Qemu-devel] [PATCH v4] Add ability for user to specify mouse
+ ungrab key
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,86 +28,267 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: wei.w.wang@intel.com
-Cc: qemu-devel@nongnu.org
+To: John Arbuckle <programmingkidx@gmail.com>
+Cc: peter.maydell@linaro.org, kraxel@redhat.com, qemu-devel@nongnu.org
 
+On Tue, Dec 26, 2017 at 08:14:28PM -0500, John Arbuckle wrote:
+> Currently the ungrab keys for the Cocoa and GTK interface are Control-Alt-g.
+> This combination may not be very fun for the user to have to enter, so we
+> now enable the user to specify their own key(s) as the ungrab key(s). The
+> list of keys that can be used is found in the file qapi/ui.json under QKeyCode.
+> The max number of keys that can be used is three. The original ungrab keys
+> still remain usable because there is a real risk of the user forgetting 
+> the keys he or she specified as the ungrab keys. They remain as a plan B
+> if plan A is forgotten.
 
---MGYHOYXEY6WxJCY8
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+This is a bad idea. A key reason to give a custom ungrab sequence, is because
+the user wants to be able to use the default ungrab sequence inside the
+guest. Always having the default ungrab sequence active prevents this.
 
-Hi Wei,
-I wanted to summarize the differences between the vhost-pci and
-virtio-vhost-user approaches because previous discussions may have been
-confusing.
+> Syntax: -ungrab <key-key-key>
+> 
+> Example usage:  -ungrab home
+> 	        -ungrab shift-ctrl
+> 		-ungrab ctrl-x
+> 		-ungrab pgup-pgdn
+> 		-ungrab kp_5-kp_6
+> 		-ungrab kp_4-kp_5-kp_6
 
-vhost-pci defines a new virtio device type for each vhost device type
-(net, scsi, blk).  It therefore requires a virtio device driver for each
-device type inside the slave VM.
+I'm in two minds about using '-' as a separator.  Perhaps '+' is a better
+choice ?
 
-Adding a new device type requires:
-1. Defining a new virtio device type in the VIRTIO specification.
-3. Implementing a new QEMU device model.
-2. Implementing a new virtio driver.
+> 
+> Signed-off-by: John Arbuckle <programmingkidx@gmail.com>
+> ---
+> v4 changes:
+> - Removed initialization code for key_value_array.
+> - Added void keyword to console_ungrab_key_sequence(),
+>   and console_ungrab_key_string() functions.
+> 
+> v3 changes:
+> - Added the ability for any "sendkey supported" key to be used.
+> - Added ability for one to three key sequences to be used.
+> 
+> v2 changes:
+> - Removed the "int i" code from the for loops. 
+> 
+>  include/ui/console.h |  6 ++++++
+>  qemu-options.hx      |  2 ++
+>  ui/cocoa.m           | 48 +++++++++++++++++++++++++++++++++++++++--
+>  ui/console.c         | 60 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+>  vl.c                 |  3 +++
+>  5 files changed, 117 insertions(+), 2 deletions(-)
+> 
+> diff --git a/include/ui/console.h b/include/ui/console.h
+> index 580dfc57ee..37dc150268 100644
+> --- a/include/ui/console.h
+> +++ b/include/ui/console.h
+> @@ -534,4 +534,10 @@ static inline void early_gtk_display_init(int opengl)
+>  /* egl-headless.c */
+>  void egl_headless_init(void);
+>  
+> +/* console.c */
+> +void set_ungrab_seq(const char *new_seq);
+> +int *console_ungrab_key_sequence(void);
+> +const char *console_ungrab_key_string(void);
+> +int console_ungrab_sequence_length(void);
 
-virtio-vhost-user is a single virtio device that acts as a vhost-user
-protocol transport for any vhost device type.  It requires one virtio
-driver inside the slave VM and device types are implemented using
-existing vhost-user slave libraries (librte_vhost in DPDK and
-libvhost-user in QEMU).
+We don't need to have a console_ungrab_sequence_length() method if
+we make the array returned by console_ungrab_key_sequence() be a
+zero terminated array.
 
-Adding a new device type to virtio-vhost-user involves:
-1. Adding any new vhost-user protocol messages to the QEMU
-   virtio-vhost-user device model.
-2. Adding any new vhost-user protocol messages to the vhost-user slave
-   library.
-3. Implementing the new device slave.
+> diff --git a/ui/cocoa.m b/ui/cocoa.m
+> index 330ccebf90..412a5fc02d 100644
+> --- a/ui/cocoa.m
+> +++ b/ui/cocoa.m
+> @@ -303,6 +303,7 @@ - (float) cdx;
+>  - (float) cdy;
+>  - (QEMUScreen) gscreen;
+>  - (void) raiseAllKeys;
+> +- (bool) user_ungrab_seq;
+>  @end
+>  
+>  QemuCocoaView *cocoaView;
+> @@ -674,9 +675,24 @@ - (void) handleEvent:(NSEvent *)event
+>                  }
+>              }
+>  
+> +            /*
+> +             * This code has to be here because the user might use a modifier
+> +             * key like shift as an ungrab key.
+> +             */
+> +            if ([self user_ungrab_seq] == true) {
+> +                [self ungrabMouse];
+> +                return;
+> +            }
+>              break;
+>          case NSEventTypeKeyDown:
+>              keycode = cocoa_keycode_to_qemu([event keyCode]);
+> +            [self toggleModifier: keycode];
+> +
+> +            // If the user is issuing the custom ungrab key sequence
+> +            if ([self user_ungrab_seq] == true) {
+> +                [self ungrabMouse];
+> +                return;
+> +            }
 
-The simplest case is when no new vhost-user protocol messages are
-required for the new device.  Then all that's needed for
-virtio-vhost-user is a device slave implementation (#3).  That slave
-implementation will also work with AF_UNIX because the vhost-user slave
-library hides the transport (AF_UNIX vs virtio-vhost-user).  Even
-better, if another person has already implemented that device slave to
-use with AF_UNIX then no new code is needed for virtio-vhost-user
-support at all!
+There's a small benefit to only processing the grab sequence in the
+Up event, rather than Down event if we are clever with tracking
+the key sequence.
 
-If you compare this to vhost-pci, it would be necessary to design a new
-virtio device, implement it in QEMU, and implement the virtio driver.
-Much of virtio driver is more or less the same thing as the vhost-user
-device slave but it cannot be reused because the vhost-user protocol
-isn't being used by the virtio device.  The result is a lot of
-duplication in DPDK and other codebases that implement vhost-user
-slaves.
+Check if each press as it comes in. If it is part of the ungrab
+sequence, then record that is is pressed. If is is not part of
+the ungrab sequence, the clear out all previously pressed keys.
+Only trigger ungrab upon key release
 
-The way that vhost-pci is designed means that anyone wishing to support
-a new device type has to become a virtio device designer.  They need to
-map vhost-user protocol concepts to a new virtio device type.  This will
-be time-consuming for everyone involved (e.g. the developer, the VIRTIO
-community, etc).
+This means that you can use Ctrl+Alt  as your ungrab sequence
+and still be able to press Ctrl+Alt+F1 and have it go to the
+guest without triggering the grab sequence.
 
-The virtio-vhost-user approach stays at the vhost-user protocol level as
-much as possible.  This way there are fewer concepts that need to be
-mapped by people adding new device types.  As a result, it will allow
-virtio-vhost-user to keep up with AF_UNIX vhost-user and grow because
-it's easier to work with.
+ie, in your patch we get
 
-What do you think?
+ down(ctrl)
+ down(alt)
+ ..ungrab activates..
 
-Stefan
+with my suggest we would get
 
---MGYHOYXEY6WxJCY8
-Content-Type: application/pgp-signature; name="signature.asc"
+ down(ctrl)
+ down(alt)
+ up(ctrl)
+ up(alt)
+ ..ungrab activates..
 
------BEGIN PGP SIGNATURE-----
+ down(ctrl)
+ down(alt)
+ down(f1)
+ up(ctrl)
+ up(alt)
+ up(f1)
+ ..no ungrab activates..
 
-iQEcBAEBAgAGBQJaVjvuAAoJEJykq7OBq3PI4QoIAId5xdT5YLAtdFG8FPO34l/v
-fODiM9GWt9Vygx7PV099WMoFE4GICMeJBPTz88iBdtvtNdFJJbRy27JMBAdMOvEE
-H1lqZAXZW/+v50AV45jY5FlZhYeUQA5+PNPWk5GGTbhYB6gkY3961mmbly0A/zb4
-gKy5IZN61+RKQSs/uQ9nXcby/VBS34sAbCB3X91Lb4lQWU5QPUzgVZT563hc2Xln
-bRsSp92kiYEQ6qTAiKYfM7KT7UlyVs90V41BVAicj3BcQT27zSdZuw4gh08cxOX9
-Jah+uAhjWFMe6wkSxM4egqD2L+bUOeP6piKdKxnJaF6gH7caGAU9Kgk6q+D0oNs=
-=QGca
------END PGP SIGNATURE-----
+to do this I think you need a separate array for tracking the grab
+instead of reusing the  toggleModifier() tracking.
 
---MGYHOYXEY6WxJCY8--
+>  
+>              // forward command key combos to the host UI unless the mouse is grabbed
+>              if (!isMouseGrabbed && ([event modifierFlags] & NSEventModifierFlagCommand)) {
+> @@ -714,6 +730,7 @@ - (void) handleEvent:(NSEvent *)event
+>              break;
+>          case NSEventTypeKeyUp:
+>              keycode = cocoa_keycode_to_qemu([event keyCode]);
+> +            [self toggleModifier: keycode];
+>  
+>              // don't pass the guest a spurious key-up if we treated this
+>              // command-key combo as a host UI action
+> @@ -842,10 +859,18 @@ - (void) grabMouse
+>      COCOA_DEBUG("QemuCocoaView: grabMouse\n");
+>  
+>      if (!isFullscreen) {
+> +        NSString * message_string;
+> +        if (console_ungrab_sequence_length() == 0) {
+> +            message_string = [NSString stringWithFormat: @"- (Press ctrl + alt + g to release Mouse"];
+> +        } else {
+> +            message_string = [NSString stringWithFormat: @"- (Press ctrl + alt + g or %s to release Mouse", console_ungrab_key_string()];
+> +        }
+> +
+> +
+>          if (qemu_name)
+> -            [normalWindow setTitle:[NSString stringWithFormat:@"QEMU %s - (Press ctrl + alt + g to release Mouse)", qemu_name]];
+> +            [normalWindow setTitle:[NSString stringWithFormat: @"QEMU %s %@", qemu_name, message_string]];
+>          else
+> -            [normalWindow setTitle:@"QEMU - (Press ctrl + alt + g to release Mouse)"];
+> +            [normalWindow setTitle:[NSString stringWithFormat: @"QEMU %@", message_string]];
+>      }
+>      [self hideCursor];
+>      if (!isAbsoluteEnabled) {
+> @@ -898,6 +923,25 @@ - (void) raiseAllKeys
+>         }
+>     }
+>  }
+> +
+> +/* Determines if the user specified ungrab sequence is being used */
+> +- (bool) user_ungrab_seq
+> +{
+> +    int *ungrab_seq, index, length;
+> +    bool return_value = true;
+> +
+> +    ungrab_seq = console_ungrab_key_sequence();
+> +    length = console_ungrab_sequence_length();
+> +
+> +    for (index = 0; index < length; index++) {
+> +        if (modifiers_state[ungrab_seq[index]] == NO) {
+> +            return_value = false;
+> +            break;
+> +        }
+> +    }
+> +    return return_value;
+> +}
+> +
+>  @end
+>  
+>  
+> diff --git a/ui/console.c b/ui/console.c
+> index c4c95abed7..895bc3fb17 100644
+> --- a/ui/console.c
+> +++ b/ui/console.c
+> @@ -63,6 +63,18 @@ typedef struct QEMUFIFO {
+>      int count, wptr, rptr;
+>  } QEMUFIFO;
+>  
+> +/* max number of user specified keys that can be used as the ungrab keys*/
+> +static const int max_keys = 3;
+> +
+> +/* stores the ungrab keys' values */
+> +static int key_value_array[max_keys + 1];
+> +
+> +/* stores the length the user's ungrab sequence */
+> +int ungrab_seq_length;
+> +
+> +/* stores the string that is returned by console_ungrab_key_string */
+> +static char *ungrab_key_string;
+> +
+>  static int qemu_fifo_write(QEMUFIFO *f, const uint8_t *buf, int len1)
+>  {
+>      int l, len;
+> @@ -2239,4 +2251,52 @@ static void register_types(void)
+>      type_register_static(&qemu_console_info);
+>  }
+>  
+> +/* Sets the mouse ungrab key sequence to what the user wants */
+> +void set_ungrab_seq(const char *new_seq)
+> +{
+> +    char *buffer1 = (char *) malloc(strlen(new_seq) * sizeof(char));
+> +    char *buffer2 = (char *) malloc(strlen(new_seq) * sizeof(char));
+> +    int count = 0;
+> +    int key_value;
+> +    char *token;
+> +    const char *separator = "-";  /* What the user places between keys */
+> +
+> +    sprintf(buffer1, "%s", new_seq); /* edited by strtok */
+> +    sprintf(buffer2, "%s", new_seq); /* used for ungrab_key_string */
+> +    ungrab_key_string = buffer2;
+> +
+> +    token = strtok(buffer1, separator);
+> +    while (token != NULL && count < max_keys) {
+> +        /* Translate the names into Q_KEY_CODE values */
+> +        key_value = index_from_key(token, strlen(token));
+> +        if (key_value == Q_KEY_CODE__MAX) {
+> +            printf("-ungrab: unknown key: %s\n", token);
+> +            exit(EXIT_FAILURE);
+> +        }
+> +        key_value_array[count] = key_value;
+> +
+> +        count++;
+> +        token = strtok(NULL, separator);
+> +    }
+
+Rather than this malloc+sprintf+strtok mix, you can just use the
+glib function  g_strsplit() to break it into tokens.
+
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
