@@ -1,34 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40117)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40429)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1eZHqM-0005bG-Pv
-	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 09:59:07 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1eZHrH-0006AM-HH
+	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 10:00:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1eZHqH-0000y8-8W
-	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 09:59:06 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:57136)
+	(envelope-from <pbonzini@redhat.com>) id 1eZHrC-0001fz-O6
+	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 10:00:03 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:43064)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1eZHqH-0000xR-24
-	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 09:59:01 -0500
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1eZHrC-0001f0-H6
+	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 09:59:58 -0500
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 0EC355BEB8
-	for <qemu-devel@nongnu.org>; Wed, 10 Jan 2018 14:59:00 +0000 (UTC)
-From: Juan Quintela <quintela@redhat.com>
-In-Reply-To: <20180110114953.GB2450@work-vm> (David Alan Gilbert's message of
-	"Wed, 10 Jan 2018 11:49:53 +0000")
-References: <20180105215246.908-1-quintela@redhat.com>
-	<20180105215246.908-5-quintela@redhat.com>
-	<20180110063022.GC5984@xz-mi> <87r2qyyugr.fsf@secure.laptop>
-	<20180110085452.GJ5984@xz-mi> <20180110114953.GB2450@work-vm>
-Reply-To: quintela@redhat.com
-Date: Wed, 10 Jan 2018 15:58:55 +0100
-Message-ID: <87zi5lyd3k.fsf@secure.laptop>
+	by mx1.redhat.com (Postfix) with ESMTPS id 73C4A81DE3
+	for <qemu-devel@nongnu.org>; Wed, 10 Jan 2018 14:59:57 +0000 (UTC)
+References: <20180109193745.GA18506@amt.cnet>
+	<20180109201616.dsrhwi5xzmrqbgnq@hz-desktop>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <c3558c89-d0ae-929a-51c7-b27562ac2853@redhat.com>
+Date: Wed, 10 Jan 2018 15:59:55 +0100
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v4 04/11] tests: Use consistent names and
- sizes for migration
+In-Reply-To: <20180109201616.dsrhwi5xzmrqbgnq@hz-desktop>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] qemu: improve hugepage allocation failure
+ message
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,51 +35,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: Peter Xu <peterx@redhat.com>, qemu-devel@nongnu.org, lvivier@redhat.com
+To: Marcelo Tosatti <mtosatti@redhat.com>, qemu-devel <qemu-devel@nongnu.org>
 
-"Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
-> * Peter Xu (peterx@redhat.com) wrote:
->> On Wed, Jan 10, 2018 at 09:43:48AM +0100, Juan Quintela wrote:
->> > Peter Xu <peterx@redhat.com> wrote:
->> > > On Fri, Jan 05, 2018 at 10:52:39PM +0100, Juan Quintela wrote:
->> > >> Signed-off-by: Juan Quintela <quintela@redhat.com>
->> > >> ---
->> > >>  tests/migration-test.c | 12 ++++++------
->> > >>  1 file changed, 6 insertions(+), 6 deletions(-)
->> > >> 
->> > >> diff --git a/tests/migration-test.c b/tests/migration-test.c
->> > >> index d81f22118b..f469235d0b 100644
->> > >> --- a/tests/migration-test.c
->> > >> +++ b/tests/migration-test.c
->> > >> @@ -440,13 +440,13 @@ static void test_migrate_start(QTestState **from, QTestState **to,
->> > >>  
->> > >>      if (strcmp(arch, "i386") == 0 || strcmp(arch, "x86_64") == 0) {
->> > >>          init_bootfile_x86(bootpath);
->> > >> -        cmd_src = g_strdup_printf("-machine accel=%s -m 150M"
->> > >> -                                  " -name pcsource,debug-threads=on"
->> > >> +        cmd_src = g_strdup_printf("-machine accel=%s -m 256M"
->> > >> +                                  " -name source,debug-threads=on"
->> > >
->> > > A pure question: when will the name matter?
->> > 
->> > It don't matter, but ARM didn't want to use the pcname, and decided for
->> > yet a different command line.  I would like to have the same command
->> > line for all architectures.  At least the less gratuitous differences.
->> > 
->> > As you can guess, name don't matter at all., but telling ARNM people to
->> > be consistent with things that are not consistent .... O:-)
->> 
->> Ah, fine. :)
->> 
->> This test only support x86 and ppc for now, right?
->> 
->> (Btw, AFAIK debug-threads=on is only useful if any of us wants to
->>  glance at thread names.  In other words, would it be even simpler to
->>  just remove that "-name" line? :-)
->
-> It makes debugging hangs/crashes easier sometimes, so keep it.
+On 09/01/2018 21:16, Haozhong Zhang wrote:
+> On 01/09/18 17:37 -0200, Marcelo Tosatti wrote:
+>>
+>> Improve hugepage allocation failure message, indicating
+>> whats happening to the user.
+>>
+>> Signed-off-by: Marcelo Tosatti <mtosatti@redhat.com>
+>>
+>> diff --git a/exec.c b/exec.c
+>> index 4722e521d4..439abedb98 100644
+>> --- a/exec.c
+>> +++ b/exec.c
+>> @@ -1643,7 +1643,8 @@ static void *file_ram_alloc(RAMBlock *block,
+>>                           block->flags & RAM_SHARED);
+>>      if (area == MAP_FAILED) {
+>>          error_setg_errno(errp, errno,
+>> -                         "unable to map backing store for guest RAM");
+>> +                         "unable to map backing store for guest RAM, "
+>> +                         "falling back to malloc based RAM allocation");
+>>          return NULL;
+>>      }
+>>  
+> 
+> The backing store here is not always hugetlbfs, e.g., it can be NVDIMM
+> and even regular files. In those cases, the failure of file_ram_alloc()
+> does not fall back to malloc.
 
-Agreed.  I think that this should be default on qemu O:-)
+It's also not happending if !mem_prealloc.  Let's instead add an
+error_report in allocate_system_memory_nonnuma (and it's probably better
+to use MAP_ANON instead of malloc in the message).
 
-Later, Juan.
+Paolo
