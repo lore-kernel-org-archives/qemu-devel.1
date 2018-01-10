@@ -1,32 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38291)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39388)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1eZOEG-00060i-LF
-	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 16:48:14 -0500
+	(envelope-from <bounces@canonical.com>) id 1eZOGh-0007L6-W5
+	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 16:50:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1eZOED-0000oD-ER
-	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 16:48:12 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:60776)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1eZOEC-0000nb-Up
-	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 16:48:09 -0500
-Date: Wed, 10 Jan 2018 19:48:00 -0200
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20180110214800.GU6646@localhost.localdomain>
-References: <cover.1513729519.git.alistair.francis@xilinx.com>
-	<CAFEAcA-dvs-E83ZCEk6VAyyQkpghX9oF-d-D62vOKs7kfjPzaw@mail.gmail.com>
-	<CAKmqyKPHHQcQ3HYs4r7f4uUDfdMqSq=-mUJn6becXw8WXNAwNQ@mail.gmail.com>
-	<CAKmqyKMKL_BGSbaetubaPv8gkmF9XFFdDwkXAPsUZdV1qkOyqA@mail.gmail.com>
-	<20171220220608.GH24025@localhost.localdomain>
-	<CAKmqyKO+UvsEuK3fuEP7jmK3i5hb=rzp8DWye6-P7-BZ2CVXuQ@mail.gmail.com>
-	<CAKmqyKP4ewwxLgQ0+fBbMzpSOA1rh23XaER-yoJQuBQOiXFPzg@mail.gmail.com>
-	<20171228143931.516b9e60@igors-macbook-pro.local>
-	<20171228145904.GJ24856@localhost.localdomain>
-	<CAKmqyKMH9b3+DT6z0VOC9kXyiBrc9VHK-ZqGb1JwpB6Y=J2Qjg@mail.gmail.com>
+	(envelope-from <bounces@canonical.com>) id 1eZOGe-0002Hg-8q
+	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 16:50:43 -0500
+Received: from indium.canonical.com ([91.189.90.7]:55494)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1eZOGd-0002Gg-ER
+	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 16:50:39 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1eZOGc-0007kQ-DA
+	for <qemu-devel@nongnu.org>; Wed, 10 Jan 2018 21:50:38 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 4F7F62E80CC
+	for <qemu-devel@nongnu.org>; Wed, 10 Jan 2018 21:50:38 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAKmqyKMH9b3+DT6z0VOC9kXyiBrc9VHK-ZqGb1JwpB6Y=J2Qjg@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PATCH v4 0/5] Add a valid_cpu_types property
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 10 Jan 2018 21:38:08 -0000
+From: Thomas Huth <1090726@bugs.launchpad.net>
+Reply-To: Bug 1090726 <1090726@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20121215143506.25420.15556.malonedeb@chaenomeles.canonical.com>
+Message-Id: <151562028860.3599.14293034737451584449.malone@soybean.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1090726] Re: qemu does not generate guest cpu
+ topology properly
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,113 +37,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alistair Francis <alistair.francis@xilinx.com>
-Cc: Igor Mammedov <imammedo@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>, QEMU Developers <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
 
-On Wed, Jan 10, 2018 at 01:30:29PM -0800, Alistair Francis wrote:
-> On Thu, Dec 28, 2017 at 6:59 AM, Eduardo Habkost <ehabkost@redhat.com> wrote:
-> > On Thu, Dec 28, 2017 at 02:39:31PM +0100, Igor Mammedov wrote:
-> >> On Fri, 22 Dec 2017 11:47:00 -0800
-> >> Alistair Francis <alistair.francis@xilinx.com> wrote:
-> >>
-> >> > On Fri, Dec 22, 2017 at 10:45 AM, Alistair Francis
-> >> > <alistair.francis@xilinx.com> wrote:
-> >> > > On Wed, Dec 20, 2017 at 2:06 PM, Eduardo Habkost <ehabkost@redhat.com> wrote:
-> >> > >> On Tue, Dec 19, 2017 at 05:03:59PM -0800, Alistair Francis wrote:
-> >> > >>> On Tue, Dec 19, 2017 at 4:55 PM, Alistair Francis
-> >> > >>> <alistair.francis@xilinx.com> wrote:
-> >> > >>> > On Tue, Dec 19, 2017 at 4:43 PM, Peter Maydell <peter.maydell@linaro.org> wrote:
-> >> > >>> >> On 20 December 2017 at 00:27, Alistair Francis
-> >> > >>> >> <alistair.francis@xilinx.com> wrote:
-> >> > >>> >>> There are numorous QEMU machines that only have a single or a handful of
-> >> > >>> >>> valid CPU options. To simplyfy the management of specificying which CPU
-> >> > >>> >>> is/isn't valid let's create a property that can be set in the machine
-> >> > >>> >>> init. We can then check to see if the user supplied CPU is in that list
-> >> > >>> >>> or not.
-> >> > >>> >>>
-> >> > >>> >>> I have added the valid_cpu_types for some ARM machines only at the
-> >> > >>> >>> moment.
-> >> > >>> >>>
-> >> > >>> >>> Here is what specifying the CPUs looks like now:
-> >> > >>> >>>
-> >> > >>> >>> $ aarch64-softmmu/qemu-system-aarch64 -M netduino2 -kernel ./u-boot.elf -nographic -cpu "cortex-m3" -S
-> >> > >>> >>> QEMU 2.10.50 monitor - type 'help' for more information
-> >> > >>> >>> (qemu) info cpus
-> >> > >>> >>> * CPU #0: thread_id=24175
-> >> > >>> >>> (qemu) q
-> >> > >>> >>>
-> >> > >>> >>> $ aarch64-softmmu/qemu-system-aarch64 -M netduino2 -kernel ./u-boot.elf -nographic -cpu "cortex-m4" -S
-> >> > >>> >>> QEMU 2.10.50 monitor - type 'help' for more information
-> >> > >>> >>> (qemu) q
-> >> > >>> >>>
-> >> > >>> >>> $ aarch64-softmmu/qemu-system-aarch64 -M netduino2 -kernel ./u-boot.elf -nographic -cpu "cortex-m5" -S
-> >> > >>> >>> qemu-system-aarch64: unable to find CPU model 'cortex-m5'
-> >> > >>> >>>
-> >> > >>> >>> $ aarch64-softmmu/qemu-system-aarch64 -M netduino2 -kernel ./u-boot.elf -nographic -cpu "cortex-a9" -S
-> >> > >>> >>> qemu-system-aarch64: Invalid CPU type: cortex-a9-arm-cpu
-> >> > >>> >>> The valid types are: cortex-m3-arm-cpu, cortex-m4-arm-cpu
-> >> > >>> >>
-> >> > >>> >> Thanks for this; we really should be more strict about
-> >> > >>> >> forbidding "won't work" combinations than we have
-> >> > >>> >> been in the past.
-> >> > >>> >>
-> >> > >>> >> In the last of these cases, I think that when we
-> >> > >>> >> list the invalid CPU type and the valid types
-> >> > >>> >> we should use the same names we want the user to
-> >> > >>> >> use on the command line, without the "-arm-cpu"
-> >> > >>> >> suffixes.
-> >> > >>> >
-> >> > >>> > Hmm... That is a good point, it is confusing that they don't line up.
-> >> > >>
-> >> > >> Agreed.
-> >> > >>
-> >> > >>> >
-> >> > >>> > The problem is that we are just doing a simple
-> >> > >>> > object_class_dynamic_cast() in hw/core/machine.c which I think
-> >> > >>> > (untested) requires us to have the full name in the valid cpu array.
-> >> > >> [...]
-> >> > >>>
-> >> > >>> I think an earlier version of my previous series adding the support to
-> >> > >>> machine.c did string comparison, but it was decided to utilise objects
-> >> > >>> instead. One option is to make the array 2 wide and have the second
-> >> > >>> string be user friendly?
-> >> > >>
-> >> > >> Making the array 2-column will duplicate information that we can
-> >> > >> already find out using other methods, and it won't solve the
-> >> > >> problem if an entry has a parent class with multiple subclasses
-> >> > >> (the original reason I suggested object_class_dynamic_cast()).
-> >> > >>
-> >> > >> The main obstacle to fix this easily is that we do have a common
-> >> > >>   ObjectClass *cpu_class_by_name(const char *cpu_model)
-> >> > >> function, but not a common method to get the model name from a
-> >> > >> CPUClass.  Implementing this is possible, but probably better to
-> >> > >> do it after moving the existing arch-specific CPU model
-> >> > >> enumeration hooks to common code (currently we duplicate lots of
-> >> > >> CPU enumeration/lookup boilerplate code that we shouldn't have
-> >> > >> to).
-> >> > >>
-> >> > >> Listing only the human-friendly names in the array like in the
-> >> > >> original patch could be a reasonable temporary solution.  It
-> >> > >> won't allow us to use a single entry for all subclasses of a
-> >> > >> given type by now (e.g. listing only TYPE_X86_CPU on PC), but at
-> >> > >> least we can address this issue without waiting for a refactor of
-> >> > >> the CPU model enumeration code.
-> >> >
-> >> > Ah, I just re-read this. Do you mean go back to the original RFC and
-> >> > just use strcmp() to compare the human readable cpu_model?
-> >> It's sort of going backwards but I won't object to this as far as you
-> >> won't use machine->cpu_model (which is in process of being removed)
-> 
-> Wait, machine->cpu_model is the human readable name. Without using
-> that we can't use just human readable strings for the valid cpu types.
+Triaging old bug tickets... can you still reproduce this issue with the
+latest version of QEMU? Or could we close this ticket nowadays?
 
-Well, if we want to deprecate machine->cpu_model we need to offer
-an alternative first, otherwise we can't prevent people from
-using it.
+** Changed in: qemu
+       Status: New =3D> Incomplete
 
-Igor, do you see an (existing) alternative to machine->cpu_model
-that would allow us to avoid using it in
-machine_run_board_init()?
+-- =
 
--- 
-Eduardo
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1090726
+
+Title:
+  qemu does not generate guest cpu topology properly
+
+Status in QEMU:
+  Incomplete
+
+Bug description:
+  Adding the option
+
+  -smp 12,sockets=3D2,cores=3D6,threads=3D1
+
+  exposes
+
+  =
+
+  Machine (12GB)
+    Socket #0
+          L2 L#0 (512KB) + L1 L#0 (64KB) + Core L#0 + PU L#0 (P#0)
+          L2 L#1 (512KB) + L1 L#1 (64KB) + Core L#1 + PU L#1 (P#1)
+          L2 L#2 (512KB) + L1 L#2 (64KB) + Core L#2 + PU L#2 (P#2)
+          L2 L#3 (512KB) + L1 L#3 (64KB) + Core L#3 + PU L#3 (P#3)
+          L2 L#4 (512KB) + L1 L#4 (64KB) + Core L#4 + PU L#4 (P#4)
+          L2 L#5 (512KB) + L1 L#5 (64KB) + Core L#5 + PU L#5 (P#5)
+          L2 L#6 (512KB) + L1 L#6 (64KB) + Core L#6 + PU L#6 (P#6)
+          L2 L#7 (512KB) + L1 L#7 (64KB) + Core L#7 + PU L#7 (P#7)
+    Socket #1
+        L2 L#8 (512KB) + L1 L#8 (64KB) + Core L#8 + PU L#8 (P#8)
+        L2 L#9 (512KB) + L1 L#9 (64KB) + Core L#9 + PU L#9 (P#9)
+        L2 L#10 (512KB) + L1 L#10 (64KB) + Core L#10 + PU L#10 (P#10)
+        L2 L#11 (512KB) + L1 L#11 (64KB) + Core L#11 + PU L#11 (P#11)
+
+  =
+
+  Rather than:
+
+  Machine (12GB)
+    Socket #0
+          L2 L#0 (512KB) + L1 L#0 (64KB) + Core L#0 + PU L#0 (P#0)
+          L2 L#1 (512KB) + L1 L#1 (64KB) + Core L#1 + PU L#1 (P#1)
+          L2 L#2 (512KB) + L1 L#2 (64KB) + Core L#2 + PU L#2 (P#2)
+          L2 L#3 (512KB) + L1 L#3 (64KB) + Core L#3 + PU L#3 (P#3)
+          L2 L#4 (512KB) + L1 L#4 (64KB) + Core L#4 + PU L#4 (P#4)
+          L2 L#5 (512KB) + L1 L#5 (64KB) + Core L#5 + PU L#5 (P#5)
+    Socket #1
+          L2 L#6 (512KB) + L1 L#6 (64KB) + Core L#6 + PU L#6 (P#6)
+          L2 L#7 (512KB) + L1 L#7 (64KB) + Core L#7 + PU L#7 (P#7)
+          L2 L#8 (512KB) + L1 L#8 (64KB) + Core L#8 + PU L#8 (P#8)
+          L2 L#9 (512KB) + L1 L#9 (64KB) + Core L#9 + PU L#9 (P#9)
+          L2 L#10 (512KB) + L1 L#10 (64KB) + Core L#10 + PU L#10 (P#10)
+          L2 L#11 (512KB) + L1 L#11 (64KB) + Core L#11 + PU L#11 (P#11)
+
+  =
+
+  Here is a cpuid dump from inside the guest and dump from more recent vers=
+ion of cpuid, in which you can see a bit more detail. The later contains da=
+ta for a single CPU, because the others are the same.
+
+  Reproducible on qemu 1.0 and 1.2. with guest os Fedora 17, Debian 6,
+  Debian Squeeze and Windows 2008 R2.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1090726/+subscriptions
