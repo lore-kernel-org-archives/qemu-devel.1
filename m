@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41317)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42472)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sjitindarsingh@gmail.com>) id 1eZ496-00027D-Ka
-	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 19:21:33 -0500
+	(envelope-from <sjitindarsingh@gmail.com>) id 1eZ4BP-0003LK-St
+	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 19:23:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sjitindarsingh@gmail.com>) id 1eZ495-0001YQ-OV
-	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 19:21:32 -0500
-Message-ID: <1515543680.1993.12.camel@gmail.com>
+	(envelope-from <sjitindarsingh@gmail.com>) id 1eZ4BO-0004fi-0u
+	for qemu-devel@nongnu.org; Tue, 09 Jan 2018 19:23:55 -0500
+Message-ID: <1515543821.1993.13.camel@gmail.com>
 From: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
-Date: Wed, 10 Jan 2018 11:21:20 +1100
-In-Reply-To: <b8e59719-0b88-3cab-9d65-491cb35d5e03@linux.vnet.ibm.com>
+Date: Wed, 10 Jan 2018 11:23:41 +1100
+In-Reply-To: <20180109120249.5cjli5545vlnj6uq@pacoca>
 References: <20180109092103.18458-1-sjitindarsingh@gmail.com>
-	<20180109092103.18458-2-sjitindarsingh@gmail.com>
-	<b8e59719-0b88-3cab-9d65-491cb35d5e03@linux.vnet.ibm.com>
+	<20180109092103.18458-3-sjitindarsingh@gmail.com>
+	<20180109120249.5cjli5545vlnj6uq@pacoca>
 Content-Type: text/plain; charset="UTF-8"
 Mime-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [Qemu-ppc] [QEMU-PPC] [RFC 1/3] hw/ppc/spapr_caps:
- Rework spapr_caps to use uint8 internal representation
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [QEMU-PPC] [RFC 2/3] hw/spapr/spapr_caps: Add new
+ caps safe_[cache/bounds_check/indirect_branch]
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,64 +25,523 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Murilo Opsfelder =?ISO-8859-1?Q?Ara=FAjo?= <muriloo@linux.vnet.ibm.com>, qemu-ppc@nongnu.org
-Cc: paulus@ozlabs.org, qemu-devel@nongnu.org, david@gibson.dropbear.id.au
+To: joserz@linux.vnet.ibm.com
+Cc: qemu-ppc@nongnu.org, paulus@ozlabs.org, qemu-devel@nongnu.org, david@gibson.dropbear.id.au
 
-On Tue, 2018-01-09 at 09:13 -0200, Murilo Opsfelder Araújo wrote:
-> On 01/09/2018 07:21 AM, Suraj Jitindar Singh wrote:
-> > Currently spapr_caps are tied to boolean values (on or off). This
-> > patch
-> > reworks the caps so that they can have any value between 0 and 127,
-> > inclusive. This allows more capabilities with various values to be
-> > represented in the same way internally. Capabilities are numbered
-> > in
-> > ascending order. The internal representation of capability values
-> > is an
-> > array of uint8s in the sPAPRMachineState, indexed by capability
-> > number.
-> > Note: The MSB (0x80) of a capability is reserved to track whether
-> > the
-> >       capability was set from the command line.
+On Tue, 2018-01-09 at 10:02 -0200, joserz@linux.vnet.ibm.com wrote:
+> On Tue, Jan 09, 2018 at 08:21:02PM +1100, Suraj Jitindar Singh wrote:
+> > This patch adds three new capabilities:
+> > cap-cfpc -> safe_cache
+> > cap-sbbc -> safe_bounds_check
+> > cap-ibs  -> safe_indirect_branch
 > > 
-> > Capabilities can have their own name, description, options, getter
-> > and
-> > setter functions, type and allow functions. They also each have
-> > their own
-> > section in the migration stream. Capabilities are only migrated if
-> > they
-> > were explictly set on the command line, with the assumption that
-> > otherwise the default will match.
+> > Each capability is tristate with the possible values "broken",
+> > "workaround" or "fixed". Add generic getter and setter functions
+> > for
+> > this new capability type. Add these new capabilities to the
+> > capabilities
+> > list. The maximum value for the capabilities is queried from kvm
+> > through
+> > new kvm capabilities. The requested values are considered to be
+> > compatible if kvm can support an equal or higher value for each
+> > capability.
 > > 
-> > On migration we ensure that the capability value on the destination
-> > is greater than or equal to the capability value from the source.
-> > So
-> > long at this remains the case then the migration is considered
-> > compatible and allowed to continue.
+> > Discussion:
+> > Currently these new capabilities default to broken to allow for
+> > backwards compatibility, is this the best option?
+> > ---
+> >  hw/ppc/spapr.c            |   6 ++
+> >  hw/ppc/spapr_caps.c       | 224
+> > ++++++++++++++++++++++++++++++++++++++++++++++
+> >  include/hw/ppc/spapr.h    |  15 +++-
+> >  linux-headers/linux/kvm.h |   3 +
+> >  target/ppc/kvm.c          |  28 ++++++
+> >  target/ppc/kvm_ppc.h      |  18 ++++
+> >  6 files changed, 293 insertions(+), 1 deletion(-)
 > > 
-> > This patch implements generic getter and setter functions for
-> > boolean
-> > capabilities. It also converts the existings cap-htm, cap-vsx and
-> > cap-dfp capabilities to this new format.
+> > diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> > index 7fa45729ba..d9700b0254 100644
+> > --- a/hw/ppc/spapr.c
+> > +++ b/hw/ppc/spapr.c
+> > @@ -1765,6 +1765,9 @@ static const VMStateDescription vmstate_spapr
+> > = {
+> >          &vmstate_spapr_cap_htm,
+> >          &vmstate_spapr_cap_vsx,
+> >          &vmstate_spapr_cap_dfp,
+> > +        &vmstate_spapr_cap_cfpc,
+> > +        &vmstate_spapr_cap_sbbc,
+> > +        &vmstate_spapr_cap_ibs,
+> >          NULL
+> >      }
+> >  };
+> > @@ -3837,6 +3840,9 @@ static void
+> > spapr_machine_class_init(ObjectClass *oc, void *data)
+> >      smc->default_caps.caps[SPAPR_CAP_HTM] = SPAPR_CAP_OFF;
+> >      smc->default_caps.caps[SPAPR_CAP_VSX] = SPAPR_CAP_ON;
+> >      smc->default_caps.caps[SPAPR_CAP_DFP] = SPAPR_CAP_ON;
+> > +    smc->default_caps.caps[SPAPR_CAP_CFPC] = SPAPR_CAP_BROKEN;
+> > +    smc->default_caps.caps[SPAPR_CAP_SBBC] = SPAPR_CAP_BROKEN;
+> > +    smc->default_caps.caps[SPAPR_CAP_IBS] = SPAPR_CAP_BROKEN;
+> >      spapr_caps_add_properties(smc, &error_abort);
+> >  }
+> > 
+> > diff --git a/hw/ppc/spapr_caps.c b/hw/ppc/spapr_caps.c
+> > index af40f2e469..e6910aa191 100644
+> > --- a/hw/ppc/spapr_caps.c
+> > +++ b/hw/ppc/spapr_caps.c
+> > @@ -75,6 +75,64 @@ static void spapr_cap_set_bool(Object *obj,
+> > Visitor *v, const char *name,
+> >                                               SPAPR_CAP_CMD_LINE;
+> >  }
+> > 
+> > +static void spapr_cap_get_tristate(Object *obj, Visitor *v, const
+> > char *name,
+> > +                                   void *opaque, Error **errp)
+> > +{
+> > +    sPAPRCapabilityInfo *cap = opaque;
+> > +    sPAPRMachineState *spapr = SPAPR_MACHINE(obj);
+> > +    char *val = NULL;
+> > +    uint8_t value = spapr_get_cap(spapr, cap->index);
+> > +
+> > +    switch (value) {
+> > +    case SPAPR_CAP_BROKEN:
+> > +        val = g_strdup("broken");
+> > +        break;
+> > +    case SPAPR_CAP_WORKAROUND:
+> > +        val = g_strdup("workaround");
+> > +        break;
+> > +    case SPAPR_CAP_FIXED:
+> > +        val = g_strdup("fixed");
+> > +        break;
+> > +    default:
+> > +        break;
 > 
-> Hi, Suraj.
+> Hello Suraj
 > 
-> I've got the impression that this patch does a lot of things. What
-> about
-> splitting this patch into the following?
-> 
-> - rename spapr_has_cap() -> spapr_get_cap()
-> - introduce each spapr_cap_[gs]et_bool() in separate patches
-> - make use of spapr_cap[gs]et_bool()
-> - convert capabilities internal representation to uint8
-> - add each new capability separately
+> Is default a possible case? If so, will val be handled correctly by
+> visit_type_str and g_free?
 
-Absolutely. This was an RFC to get the code out there for comment.
-I'll try to split it up further as suggested for the actual patch
-series :)
+The default case would represent an internal error somehow and should
+throw an error. Will change that.
+
+Thanks :)
 
 > 
-> Perhaps it can be broken into even smaller changes.
+> if not, maybe a throwing an error like you did in
+> spapr_cap_set_tristate could be better.
 > 
-> Cheers
-> Murilo
+> > +    }
+> > +
+> > +    visit_type_str(v, name, &val, errp);
+> > +    g_free(val);
+> > +}
+> > +
+> > +static void spapr_cap_set_tristate(Object *obj, Visitor *v, const
+> > char *name,
+> > +                                   void *opaque, Error **errp)
+> > +{
+> > +    sPAPRCapabilityInfo *cap = opaque;
+> > +    sPAPRMachineState *spapr = SPAPR_MACHINE(obj);
+> > +    char *val;
+> > +    Error *local_err = NULL;
+> > +    uint8_t value;
+> > +
+> > +    visit_type_str(v, name, &val, &local_err);
+> > +    if (local_err) {
+> > +        error_propagate(errp, local_err);
+> > +        return;
+> > +    }
+> > +
+> > +    if (!strcasecmp(val, "broken")) {
+> > +        value = SPAPR_CAP_BROKEN;
+> > +    } else if (!strcasecmp(val, "workaround")) {
+> > +        value = SPAPR_CAP_WORKAROUND;
+> > +    } else if (!strcasecmp(val, "fixed")) {
+> > +        value = SPAPR_CAP_FIXED;
+> > +    } else {
+> > +        error_setg(errp, "Invalid capability mode \"%s\" for cap-
+> > %s", val,
+> > +                   cap->name);
+> > +        goto out;
+> > +    }
+> > +
+> > +    spapr->cmd_line_caps.caps[cap->index] = value |
+> > SPAPR_CAP_CMD_LINE;
+> > +out:
+> > +    g_free(val);
+> > +}
+> > +
+> >  static void cap_htm_allow(sPAPRMachineState *spapr, uint8_t val,
+> > Error **errp)
+> >  {
+> >      if (!val) {
+> > @@ -122,6 +180,31 @@ static void cap_dfp_allow(sPAPRMachineState
+> > *spapr, uint8_t val, Error **errp)
+> >      }
+> >  }
+> > 
+> > +static void cap_safe_cache_allow(sPAPRMachineState *spapr, uint8_t
+> > val,
+> > +                                 Error **errp)
+> > +{
+> > +    if (kvm_enabled() && (val > kvmppc_get_cap_safe_cache())) {
+> > +        error_setg(errp, "Requested safe cache capability level
+> > not supported by kvm, try a different value for cap-cfpc");
+> > +    }
+> > +}
+> > +
+> > +static void cap_safe_bounds_check_allow(sPAPRMachineState *spapr,
+> > uint8_t val,
+> > +                                        Error **errp)
+> > +{
+> > +    if (kvm_enabled() && (val >
+> > kvmppc_get_cap_safe_bounds_check())) {
+> > +        error_setg(errp, "Requested safe bounds check capability
+> > level not supported by kvm, try a different value for cap-sbbc");
+> > +    }
+> > +}
+> > +
+> > +static void cap_safe_indirect_branch_allow(sPAPRMachineState
+> > *spapr,
+> > +                                           uint8_t val, Error
+> > **errp)
+> > +{
+> > +    if (kvm_enabled() && (val >
+> > kvmppc_get_cap_safe_indirect_branch())) {
+> > +        error_setg(errp, "Requested safe indirect branch
+> > capability level not supported by kvm, try a different value for
+> > cap-ibs");
+> > +    }
+> > +}
+> > +
+> > +#define VALUE_DESC_TRISTATE     " (broken, workaround, fixed)"
+> > 
+> >  sPAPRCapabilityInfo capability_table[SPAPR_CAP_NUM] = {
+> >      [SPAPR_CAP_HTM] = {
+> > @@ -154,6 +237,36 @@ sPAPRCapabilityInfo
+> > capability_table[SPAPR_CAP_NUM] = {
+> >          .type = "bool",
+> >          .allow = cap_dfp_allow,
+> >      },
+> > +    [SPAPR_CAP_CFPC] = {
+> > +        .name = "cfpc",
+> > +        .description = "Cache Flush on Privilege Change",
+> > +        .options = VALUE_DESC_TRISTATE,
+> > +        .index = SPAPR_CAP_CFPC,
+> > +        .get = spapr_cap_get_tristate,
+> > +        .set = spapr_cap_set_tristate,
+> > +        .type = "string",
+> > +        .allow = cap_safe_cache_allow,
+> > +    },
+> > +    [SPAPR_CAP_SBBC] = {
+> > +        .name = "sbbc",
+> > +        .description = "Speculation Barrier Bounds Checking",
+> > +        .options = VALUE_DESC_TRISTATE,
+> > +        .index = SPAPR_CAP_SBBC,
+> > +        .get = spapr_cap_get_tristate,
+> > +        .set = spapr_cap_set_tristate,
+> > +        .type = "string",
+> > +        .allow = cap_safe_bounds_check_allow,
+> > +    },
+> > +    [SPAPR_CAP_IBS] = {
+> > +        .name = "ibs",
+> > +        .description = "Indirect Branch Serialisation",
+> > +        .options = VALUE_DESC_TRISTATE,
+> > +        .index = SPAPR_CAP_IBS,
+> > +        .get = spapr_cap_get_tristate,
+> > +        .set = spapr_cap_set_tristate,
+> > +        .type = "string",
+> > +        .allow = cap_safe_indirect_branch_allow,
+> > +    },
+> >  };
+> > 
+> >  static sPAPRCapabilities default_caps_with_cpu(sPAPRMachineState
+> > *spapr,
+> > @@ -326,6 +439,117 @@ const VMStateDescription
+> > vmstate_spapr_cap_dfp = {
+> >      },
+> >  };
+> > 
+> > +static bool spapr_cap_safe_cache_needed(void *opaque)
+> > +{
+> > +    sPAPRMachineState *spapr = opaque;
+> > +
+> > +    return !!(spapr->cmd_line_caps.caps[SPAPR_CAP_CFPC] &
+> > SPAPR_CAP_CMD_LINE);
+> > +}
+> > +
+> > +static int spapr_cap_safe_cache_pre_save(void *opaque)
+> > +{
+> > +    sPAPRMachineState *spapr = opaque;
+> > +
+> > +    spapr->mig_caps.caps[SPAPR_CAP_CFPC] =
+> > +        spapr->cmd_line_caps.caps[SPAPR_CAP_CFPC];
+> > +    return 0;
+> > +}
+> > +
+> > +static int spapr_cap_safe_cache_pre_load(void *opaque)
+> > +{
+> > +    sPAPRMachineState *spapr = opaque;
+> > +
+> > +    spapr->mig_caps.caps[SPAPR_CAP_CFPC] = 0;
+> > +    return 0;
+> > +}
+> > +
+> > +const VMStateDescription vmstate_spapr_cap_cfpc = {
+> > +    .name = "spapr/cap_cfpc",
+> > +    .version_id = 1,
+> > +    .minimum_version_id = 1,
+> > +    .needed = spapr_cap_safe_cache_needed,
+> > +    .pre_save = spapr_cap_safe_cache_pre_save,
+> > +    .pre_load = spapr_cap_safe_cache_pre_load,
+> > +    .fields = (VMStateField[]) {
+> > +        VMSTATE_UINT8(mig_caps.caps[SPAPR_CAP_CFPC],
+> > sPAPRMachineState),
+> > +        VMSTATE_END_OF_LIST()
+> > +    },
+> > +};
+> > +
+> > +static bool spapr_cap_safe_bounds_check_needed(void *opaque)
+> > +{
+> > +    sPAPRMachineState *spapr = opaque;
+> > +
+> > +    return !!(spapr->cmd_line_caps.caps[SPAPR_CAP_SBBC] &
+> > SPAPR_CAP_CMD_LINE);
+> > +}
+> > +
+> > +static int spapr_cap_safe_bounds_check_pre_save(void *opaque)
+> > +{
+> > +    sPAPRMachineState *spapr = opaque;
+> > +
+> > +    spapr->mig_caps.caps[SPAPR_CAP_SBBC] =
+> > +        spapr->cmd_line_caps.caps[SPAPR_CAP_SBBC];
+> > +    return 0;
+> > +}
+> > +
+> > +static int spapr_cap_safe_bounds_check_pre_load(void *opaque)
+> > +{
+> > +    sPAPRMachineState *spapr = opaque;
+> > +
+> > +    spapr->mig_caps.caps[SPAPR_CAP_SBBC] = 0;
+> > +    return 0;
+> > +}
+> > +
+> > +const VMStateDescription vmstate_spapr_cap_sbbc = {
+> > +    .name = "spapr/cap_sbbc",
+> > +    .version_id = 1,
+> > +    .minimum_version_id = 1,
+> > +    .needed = spapr_cap_safe_bounds_check_needed,
+> > +    .pre_save = spapr_cap_safe_bounds_check_pre_save,
+> > +    .pre_load = spapr_cap_safe_bounds_check_pre_load,
+> > +    .fields = (VMStateField[]) {
+> > +        VMSTATE_UINT8(mig_caps.caps[SPAPR_CAP_SBBC],
+> > sPAPRMachineState),
+> > +        VMSTATE_END_OF_LIST()
+> > +    },
+> > +};
+> > +
+> > +static bool spapr_cap_safe_indirect_branch_needed(void *opaque)
+> > +{
+> > +    sPAPRMachineState *spapr = opaque;
+> > +
+> > +    return !!(spapr->cmd_line_caps.caps[SPAPR_CAP_IBS] &
+> > SPAPR_CAP_CMD_LINE);
+> > +}
+> > +
+> > +static int spapr_cap_safe_indirect_branch_pre_save(void *opaque)
+> > +{
+> > +    sPAPRMachineState *spapr = opaque;
+> > +
+> > +    spapr->mig_caps.caps[SPAPR_CAP_IBS] =
+> > +        spapr->cmd_line_caps.caps[SPAPR_CAP_IBS];
+> > +    return 0;
+> > +}
+> > +
+> > +static int spapr_cap_safe_indirect_branch_pre_load(void *opaque)
+> > +{
+> > +    sPAPRMachineState *spapr = opaque;
+> > +
+> > +    spapr->mig_caps.caps[SPAPR_CAP_IBS] = 0;
+> > +    return 0;
+> > +}
+> > +
+> > +const VMStateDescription vmstate_spapr_cap_ibs = {
+> > +    .name = "spapr/cap_ibs",
+> > +    .version_id = 1,
+> > +    .minimum_version_id = 1,
+> > +    .needed = spapr_cap_safe_indirect_branch_needed,
+> > +    .pre_save = spapr_cap_safe_indirect_branch_pre_save,
+> > +    .pre_load = spapr_cap_safe_indirect_branch_pre_load,
+> > +    .fields = (VMStateField[]) {
+> > +        VMSTATE_UINT8(mig_caps.caps[SPAPR_CAP_IBS],
+> > sPAPRMachineState),
+> > +        VMSTATE_END_OF_LIST()
+> > +    },
+> > +};
+> > +
+> >  void spapr_caps_reset(sPAPRMachineState *spapr)
+> >  {
+> >      sPAPRCapabilities caps;
+> > diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
+> > index 2804fbbf12..2db2f3e2e2 100644
+> > --- a/include/hw/ppc/spapr.h
+> > +++ b/include/hw/ppc/spapr.h
+> > @@ -62,8 +62,14 @@ typedef enum {
+> >  #define SPAPR_CAP_VSX                   0x01
+> >  /* Decimal Floating Point */
+> >  #define SPAPR_CAP_DFP                   0x02
+> > +/* Cache Flush on Privilege Change */
+> > +#define SPAPR_CAP_CFPC                  0x03
+> > +/* Speculation Barrier Bounds Checking */
+> > +#define SPAPR_CAP_SBBC                  0x04
+> > +/* Indirect Branch Serialisation */
+> > +#define SPAPR_CAP_IBS                   0x05
+> >  /* Num Caps */
+> > -#define SPAPR_CAP_NUM                   (SPAPR_CAP_DFP + 1)
+> > +#define SPAPR_CAP_NUM                   (SPAPR_CAP_IBS + 1)
+> > 
+> >  /*
+> >   * Capability Values
+> > @@ -73,6 +79,10 @@ typedef enum {
+> >  /* Bool Caps */
+> >  #define SPAPR_CAP_OFF                   0x00
+> >  #define SPAPR_CAP_ON                    0x01
+> > +/* Broken | Workaround | Fixed Caps */
+> > +#define SPAPR_CAP_BROKEN                0x00
+> > +#define SPAPR_CAP_WORKAROUND            0x01
+> > +#define SPAPR_CAP_FIXED                 0x02
+> > 
+> >  typedef struct sPAPRCapabilities sPAPRCapabilities;
+> >  struct sPAPRCapabilities {
+> > @@ -763,6 +773,9 @@ qemu_irq spapr_qirq(sPAPRMachineState *spapr,
+> > int irq);
+> >  extern const VMStateDescription vmstate_spapr_cap_htm;
+> >  extern const VMStateDescription vmstate_spapr_cap_vsx;
+> >  extern const VMStateDescription vmstate_spapr_cap_dfp;
+> > +extern const VMStateDescription vmstate_spapr_cap_cfpc;
+> > +extern const VMStateDescription vmstate_spapr_cap_sbbc;
+> > +extern const VMStateDescription vmstate_spapr_cap_ibs;
+> > 
+> >  static inline uint8_t spapr_get_cap(sPAPRMachineState *spapr, int
+> > cap)
+> >  {
+> > diff --git a/linux-headers/linux/kvm.h b/linux-headers/linux/kvm.h
+> > index ce6c2f11f4..0abe0a0abb 100644
+> > --- a/linux-headers/linux/kvm.h
+> > +++ b/linux-headers/linux/kvm.h
+> > @@ -932,6 +932,9 @@ struct kvm_ppc_resize_hpt {
+> >  #define KVM_CAP_HYPERV_SYNIC2 148
+> >  #define KVM_CAP_HYPERV_VP_INDEX 149
+> >  #define KVM_CAP_S390_AIS_MIGRATION 150
+> > +#define KVM_CAP_PPC_SAFE_CACHE 151
+> > +#define KVM_CAP_PPC_SAFE_BOUNDS_CHECK 152
+> > +#define KVM_CAP_PPC_SAFE_INDIRECT_BRANCH 153
+> > 
+> >  #ifdef KVM_CAP_IRQ_ROUTING
+> > 
+> > diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
+> > index 518dd06e98..818499237c 100644
+> > --- a/target/ppc/kvm.c
+> > +++ b/target/ppc/kvm.c
+> > @@ -89,6 +89,9 @@ static int cap_mmu_radix;
+> >  static int cap_mmu_hash_v3;
+> >  static int cap_resize_hpt;
+> >  static int cap_ppc_pvr_compat;
+> > +static int cap_ppc_safe_cache;
+> > +static int cap_ppc_safe_bounds_check;
+> > +static int cap_ppc_safe_indirect_branch;
+> > 
+> >  static uint32_t debug_inst_opcode;
+> > 
+> > @@ -147,6 +150,16 @@ int kvm_arch_init(MachineState *ms, KVMState
+> > *s)
+> >      cap_mmu_radix = kvm_vm_check_extension(s,
+> > KVM_CAP_PPC_MMU_RADIX);
+> >      cap_mmu_hash_v3 = kvm_vm_check_extension(s,
+> > KVM_CAP_PPC_MMU_HASH_V3);
+> >      cap_resize_hpt = kvm_vm_check_extension(s,
+> > KVM_CAP_SPAPR_RESIZE_HPT);
+> > +    cap_ppc_safe_cache = kvm_vm_check_extension(s,
+> > KVM_CAP_PPC_SAFE_CACHE);
+> > +    cap_ppc_safe_cache = cap_ppc_safe_cache > 0 ?
+> > cap_ppc_safe_cache : 0;
+> > +    cap_ppc_safe_bounds_check = kvm_vm_check_extension(s,
+> > +                                KVM_CAP_PPC_SAFE_BOUNDS_CHECK);
+> > +    cap_ppc_safe_bounds_check = cap_ppc_safe_bounds_check > 0 ?
+> > +                                cap_ppc_safe_bounds_check : 0;
+> > +    cap_ppc_safe_indirect_branch = kvm_vm_check_extension(s,
+> > +                                   KVM_CAP_PPC_SAFE_INDIRECT_BRANC
+> > H);
+> > +    cap_ppc_safe_indirect_branch = cap_ppc_safe_indirect_branch >
+> > 0 ?
+> > +                                   cap_ppc_safe_indirect_branch :
+> > 0;
+> >      /*
+> >       * Note: setting it to false because there is not such
+> > capability
+> >       * in KVM at this moment.
+> > @@ -2456,6 +2469,21 @@ bool kvmppc_has_cap_mmu_hash_v3(void)
+> >      return cap_mmu_hash_v3;
+> >  }
+> > 
+> > +int kvmppc_get_cap_safe_cache(void)
+> > +{
+> > +    return cap_ppc_safe_cache;
+> > +}
+> > +
+> > +int kvmppc_get_cap_safe_bounds_check(void)
+> > +{
+> > +    return cap_ppc_safe_bounds_check;
+> > +}
+> > +
+> > +int kvmppc_get_cap_safe_indirect_branch(void)
+> > +{
+> > +    return cap_ppc_safe_indirect_branch;
+> > +}
+> > +
+> >  PowerPCCPUClass *kvm_ppc_get_host_cpu_class(void)
+> >  {
+> >      uint32_t host_pvr = mfpvr();
+> > diff --git a/target/ppc/kvm_ppc.h b/target/ppc/kvm_ppc.h
+> > index ecb55493cc..39830baa77 100644
+> > --- a/target/ppc/kvm_ppc.h
+> > +++ b/target/ppc/kvm_ppc.h
+> > @@ -59,6 +59,9 @@ bool kvmppc_has_cap_fixup_hcalls(void);
+> >  bool kvmppc_has_cap_htm(void);
+> >  bool kvmppc_has_cap_mmu_radix(void);
+> >  bool kvmppc_has_cap_mmu_hash_v3(void);
+> > +int kvmppc_get_cap_safe_cache(void);
+> > +int kvmppc_get_cap_safe_bounds_check(void);
+> > +int kvmppc_get_cap_safe_indirect_branch(void);
+> >  int kvmppc_enable_hwrng(void);
+> >  int kvmppc_put_books_sregs(PowerPCCPU *cpu);
+> >  PowerPCCPUClass *kvm_ppc_get_host_cpu_class(void);
+> > @@ -290,6 +293,21 @@ static inline bool
+> > kvmppc_has_cap_mmu_hash_v3(void)
+> >      return false;
+> >  }
+> > 
+> > +static inline int kvmppc_get_cap_safe_cache(void)
+> > +{
+> > +    return 0;
+> > +}
+> > +
+> > +static inline int kvmppc_get_cap_safe_bounds_check(void)
+> > +{
+> > +    return 0;
+> > +}
+> > +
+> > +static inline int kvmppc_get_cap_safe_indirect_branch(void)
+> > +{
+> > +    return 0;
+> > +}
+> > +
+> >  static inline int kvmppc_enable_hwrng(void)
+> >  {
+> >      return -1;
+> > -- 
+> > 2.13.6
+> > 
+> > 
+> 
 > 
