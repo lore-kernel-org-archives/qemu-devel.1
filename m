@@ -1,22 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34168)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36347)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1eZIcv-0006cv-14
-	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 10:49:18 -0500
+	(envelope-from <laurent@vivier.eu>) id 1eZIhY-0000FO-GO
+	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 10:54:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1eZIcu-0005zp-4v
-	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 10:49:17 -0500
-Date: Wed, 10 Jan 2018 15:49:01 +0000
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20180110154901.GK3205@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <1513595351-5899-1-git-send-email-den@openvz.org>
-	<1513595351-5899-3-git-send-email-den@openvz.org>
-	<20171222123802.GB2347@rkaganb.sw.ru>
+	(envelope-from <laurent@vivier.eu>) id 1eZIhV-0001Uw-FI
+	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 10:54:04 -0500
+Received: from mout.kundenserver.de ([212.227.126.131]:55059)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1eZIhV-0001UO-5W
+	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 10:54:01 -0500
+From: Laurent Vivier <laurent@vivier.eu>
+References: <20171228150038.16450-1-samuel.thibault@ens-lyon.org>
+	<ae60a724-48bc-b39e-8082-c1ee618ed5da@vivier.eu>
+Message-ID: <a125dd5e-e1a4-348b-63fc-55ce34f4a944@vivier.eu>
+Date: Wed, 10 Jan 2018 16:53:47 +0100
 MIME-Version: 1.0
+In-Reply-To: <ae60a724-48bc-b39e-8082-c1ee618ed5da@vivier.eu>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20171222123802.GB2347@rkaganb.sw.ru>
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 2/5] configure: add dependency
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH] linux-user: Add getcpu() support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,32 +28,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Roman Kagan <rkagan@virtuozzo.com>, "Denis V. Lunev" <den@openvz.org>, qemu-block@nongnu.org, qemu-devel@nongnu.org, Klim Kireev <klim.kireev@virtuozzo.com>, Edgar Kaziakhmedov <edgar.kaziakhmedov@virtuozzo.com>, Stefan Hajnoczi <stefanha@redhat.com>
+To: Samuel Thibault <samuel.thibault@ens-lyon.org>, qemu-devel@nongnu.org, Riku Voipio <riku.voipio@iki.fi>
 
-On Fri, Dec 22, 2017 at 03:38:02PM +0300, Roman Kagan wrote:
-> On Mon, Dec 18, 2017 at 02:09:08PM +0300, Denis V. Lunev wrote:
-> > From: Klim Kireev <klim.kireev@virtuozzo.com>
-> > 
-> > This dependency is required for adequate Parallels images support.
-> > Typically the disk consists of several images which are glued by
-> > XML disk descriptor. Also XML hides inside several important parameters
-> > which are not available in the image header.
-> > 
-> > The patch also adds clause to checkpatch.pl to understand libxml2 types.
+Le 28/12/2017 à 18:39, Laurent Vivier a écrit :
+> Le 28/12/2017 à 16:00, Samuel Thibault a écrit :
+>> Signed-off-by: Samuel Thibault <samuel.thibault@ens-lyon.org>
+>> ---
+>>  linux-user/syscall.c | 16 ++++++++++++++++
+>>  1 file changed, 16 insertions(+)
+>>
+>> diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+>> index 8ec7de96ce..bb8cb726f5 100644
+>> --- a/linux-user/syscall.c
+>> +++ b/linux-user/syscall.c
+>> @@ -296,6 +296,8 @@ _syscall3(int, sys_sched_getaffinity, pid_t, pid, unsigned int, len,
+>>  #define __NR_sys_sched_setaffinity __NR_sched_setaffinity
+>>  _syscall3(int, sys_sched_setaffinity, pid_t, pid, unsigned int, len,
+>>            unsigned long *, user_mask_ptr);
+>> +#define __NR_sys_getcpu __NR_getcpu
+>> +_syscall3(int, sys_getcpu, unsigned *, cpu, unsigned *, node, void *, tcache);
+>>  _syscall4(int, reboot, int, magic1, int, magic2, unsigned int, cmd,
+>>            void *, arg);
+>>  _syscall2(int, capget, struct __user_cap_header_struct *, header,
+>> @@ -10443,6 +10445,20 @@ abi_long do_syscall(void *cpu_env, int num, abi_long arg1,
+>>              ret = get_errno(sys_sched_setaffinity(arg1, mask_size, mask));
+>>          }
+>>          break> +    case TARGET_NR_getcpu:
+>> +        {
+>> +            unsigned cpu, node;
+>> +            ret = get_errno(sys_getcpu(arg1 ? &cpu : NULL,
+>> +                                       arg2 ? &node : NULL,
+>> +                                       NULL));
+>> +            if (arg1) {
+>> +                put_user(cpu, arg1, abi_uint);
+>> +            }
+>> +            if (arg2) {
+>> +                put_user(node, arg2, abi_uint);
+>> +            }
 > 
-> Can't you get by with glib's GMarkup, to avoid extra dependencies?
+> You must check for EFAULT.
 > 
-> https://developer.gnome.org/glib/stable/glib-Simple-XML-Subset-Parser.html
+>     if (arg1 && put_user_u32(cpu, arg1)) {
+>         goto efault;
+>     }
+> ...
+> 
+> I don't think you need to use the abi_uint type as we are using
+> put_user_u32() for all the other syscalls for unsigned int.
 
-I don't think the extra dep is a real problem, given that a full QEMU
-build already links to 150+ libraries and libxml is widely available
-across platforms and certainly everywhere on Linux. If you  build QEMU
-with modular block drivers, then the libxml dep only gets added to the
-parallels block driver so file and thus only loaded when needed.
+Samuel,
 
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+could you send an updated version of your patch?
+
+Thanks,
+Laurent
