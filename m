@@ -1,32 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43524)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45788)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eZHzO-00026i-DH
-	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 10:08:27 -0500
+	(envelope-from <edgard.kaziakhmedov@virtuozzo.com>)
+	id 1eZI4S-0004BA-Pi
+	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 10:13:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eZHzK-0003G6-Cf
-	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 10:08:26 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:34758)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1eZHzK-0003F4-4F
-	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 10:08:22 -0500
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 4FDDEC059755
-	for <qemu-devel@nongnu.org>; Wed, 10 Jan 2018 15:08:21 +0000 (UTC)
-References: <20180110142515.13242-1-pbonzini@redhat.com>
-	<20180110143742.GD2450@work-vm> <20180110150413.GE2450@work-vm>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <0e741e13-1922-17ff-ec18-d3efa39805d7@redhat.com>
-Date: Wed, 10 Jan 2018 09:08:16 -0600
+	(envelope-from <edgard.kaziakhmedov@virtuozzo.com>)
+	id 1eZI4M-0000XD-F5
+	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 10:13:40 -0500
+Received: from mail-eopbgr30124.outbound.protection.outlook.com
+	([40.107.3.124]:6055
+	helo=EUR03-AM5-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <edgard.kaziakhmedov@virtuozzo.com>)
+	id 1eZI4L-0000W0-PA
+	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 10:13:34 -0500
+From: Edgar Kaziakhmedov <edgar.kaziakhmedov@virtuozzo.com>
+Date: Wed, 10 Jan 2018 18:13:22 +0300
+Message-Id: <20180110151322.16119-1-edgar.kaziakhmedov@virtuozzo.com>
 MIME-Version: 1.0
-In-Reply-To: <20180110150413.GE2450@work-vm>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="XP5hK8EccDpCohvVKZK3lr9uFEKJYaQo0"
-Subject: Re: [Qemu-devel] [PATCH v2 0/2] find_ram_offset cleanups and
- alignment
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH v2 1/1] io/channel-websock: handle continuous
+ reads without any data
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,66 +29,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-devel@nongnu.org, quintela@redhat.com
+To: qemu-devel@nongnu.org
+Cc: berrange@redhat.com, den@openvz.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---XP5hK8EccDpCohvVKZK3lr9uFEKJYaQo0
-From: Eric Blake <eblake@redhat.com>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-devel@nongnu.org, quintela@redhat.com
-Message-ID: <0e741e13-1922-17ff-ec18-d3efa39805d7@redhat.com>
-Subject: Re: [PATCH v2 0/2] find_ram_offset cleanups and alignment
-References: <20180110142515.13242-1-pbonzini@redhat.com>
- <20180110143742.GD2450@work-vm> <20180110150413.GE2450@work-vm>
-In-Reply-To: <20180110150413.GE2450@work-vm>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+According to the current implementation of websocket protocol in QEMU,
+qio_channel_websock_handshake_io tries to read handshake from the
+channel to start communication over socket. But this approach
+doesn't cover scenario when socket was closed while handshaking.
+Therefore, if G_IO_IN is caught and qio_channel_read returns zero,
+error has to be set and connection has to be done.
 
-On 01/10/2018 09:04 AM, Dr. David Alan Gilbert wrote:
-> * Dr. David Alan Gilbert (dgilbert@redhat.com) wrote:
->> * Paolo Bonzini (pbonzini@redhat.com) wrote:
->>> These are basically David's patches, with a couple changes for clarit=
-y
->>> and robustness.
->>
->> Yes, those look fine to me.
->> (Patchew seems to be annoyed at the Tracing - I can't see why)
->=20
-> Stefan has explained this to me; we need to remove the spaces after the=
+Such behaviour causes 100% CPU load in main QEMU loop, because main loop
+poll continues to receive and handle G_IO_IN events from websocket.
 
-> PRIx64 macro calls in the first patch.
+Step to reproduce 100% CPU load:
+1) start qemu with the simplest configuration
+$ qemu -vnc [::1]:1,websocket=7500
+2) open any vnc listener (which doesn't follow websocket protocol)
+$ vncviewer :7500
+3) kill listener
+4) qemu main thread eats 100% CPU
 
-> +find_ram_offset_loop(uint64_t size, uint64_t candidate, uint64_t offse=
-t, uint64_t next, uint64_t mingap) "trying size: 0x%"PRIx64 " @ 0x%"PRIx6=
-4 ," offset: 0x%"PRIx64" next: 0x%"PRIx64 " mingap: 0x%"PRIx64
+Signed-off-by: Edgar Kaziakhmedov <edgar.kaziakhmedov@virtuozzo.com>
+---
+ io/channel-websock.c | 14 ++++++++++++--
+ 1 file changed, 12 insertions(+), 2 deletions(-)
 
-You have a misplaced ','; s/," offset/", offset/
+diff --git a/io/channel-websock.c b/io/channel-websock.c
+index 87ebdebfc0..384c34b390 100644
+--- a/io/channel-websock.c
++++ b/io/channel-websock.c
+@@ -81,6 +81,11 @@
+     QIO_CHANNEL_WEBSOCK_HANDSHAKE_RES_COMMON         \
+     "Connection: close\r\n"                          \
+     "\r\n"
++#define QIO_CHANNEL_WEBSOCK_HANDSHAKE_RES_EOF        \
++    "HTTP/1.1 403 Request Entity End Of File\r\n"    \
++    QIO_CHANNEL_WEBSOCK_HANDSHAKE_RES_COMMON         \
++    "Connection: close\r\n"                          \
++    "\r\n"
+ #define QIO_CHANNEL_WEBSOCK_HANDSHAKE_DELIM "\r\n"
+ #define QIO_CHANNEL_WEBSOCK_HANDSHAKE_END "\r\n\r\n"
+ #define QIO_CHANNEL_WEBSOCK_SUPPORTED_VERSION "13"
+@@ -502,9 +507,14 @@ static int qio_channel_websock_handshake_read(QIOChannelWebsock *ioc,
+             error_setg(errp,
+                        "End of headers not found in first 4096 bytes");
+             return 1;
+-        } else {
+-            return 0;
++        } else if (ret == 0) {
++            qio_channel_websock_handshake_send_res_err(
++                ioc, QIO_CHANNEL_WEBSOCK_HANDSHAKE_RES_EOF);
++            error_setg(errp,
++                       "End of headers not found before connection closed");
++            return -1;
+         }
++        return 0;
+     }
+     *handshake_end = '\0';
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---XP5hK8EccDpCohvVKZK3lr9uFEKJYaQo0
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlpWLGAACgkQp6FrSiUn
-Q2r4bgf/SZj/dvh7UfgDUSS9aptbA8PsuJWRGm3AjoR8U3lGSXH4h2ZREQFBt0bH
-nlKa00vh30IuaQNhj+rxhMcP7VtaS10HNzjnNAPyaJbzccn3xJqN95AchXcPHTW9
-xX+psZXdwXmPLsRVEFgvp77Fri8hWwg5zgldTaPCzfWqbchWuixu5W7b3ZnlKpWI
-76lrH5mUxYQN5I85N2MJZC3vgMwi9k9ELfe0O4Z6UZIDcJmgk+1TLGDC6hmxVEB/
-bn6muhCuzqpb59CUlsfm22p1YPGjE1FoiyRGC3EPDSo/ZQGx9CnF/P6csFgxDzyD
-vSXG0GQ3cj31soZTnMIajG7M9u0PxA==
-=JDnt
------END PGP SIGNATURE-----
-
---XP5hK8EccDpCohvVKZK3lr9uFEKJYaQo0--
+--
+2.11.0
