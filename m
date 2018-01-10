@@ -1,25 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48062)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51250)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1eZJ1v-0005pc-6h
-	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 11:15:08 -0500
+	(envelope-from <klim.kireev@virtuozzo.com>) id 1eZJAH-0001kz-Lf
+	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 11:23:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1eZJ1r-0003MB-1t
-	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 11:15:07 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:59670)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1eZJ1q-0003LP-P5
-	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 11:15:02 -0500
-Date: Wed, 10 Jan 2018 16:14:53 +0000
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20180110161453.GM3205@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <20171227011428.40996-1-programmingkidx@gmail.com>
+	(envelope-from <klim.kireev@virtuozzo.com>) id 1eZJAE-0003j8-Ea
+	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 11:23:45 -0500
+References: <1513595351-5899-1-git-send-email-den@openvz.org>
+	<1513595351-5899-2-git-send-email-den@openvz.org>
+	<20180104113435.GD10106@stefanha-x1.localdomain>
+From: klim <klim.kireev@virtuozzo.com>
+Message-ID: <34dc4551-7aaf-ce61-2385-2c6ab7780cdd@virtuozzo.com>
+Date: Wed, 10 Jan 2018 19:23:29 +0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20171227011428.40996-1-programmingkidx@gmail.com>
-Subject: Re: [Qemu-devel] [PATCH v4] Add ability for user to specify mouse
- ungrab key
+In-Reply-To: <20180104113435.GD10106@stefanha-x1.localdomain>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+Subject: Re: [Qemu-devel] [PATCH 1/5] docs/interop/prl-xml: description of
+ Parallels Disk format
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,267 +26,258 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Arbuckle <programmingkidx@gmail.com>
-Cc: peter.maydell@linaro.org, kraxel@redhat.com, qemu-devel@nongnu.org
+To: Stefan Hajnoczi <stefanha@redhat.com>, "Denis V. Lunev" <den@openvz.org>
+Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, Edgar Kaziakhmedov <edgar.kaziakhmedov@virtuozzo.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
-On Tue, Dec 26, 2017 at 08:14:28PM -0500, John Arbuckle wrote:
-> Currently the ungrab keys for the Cocoa and GTK interface are Control-Alt-g.
-> This combination may not be very fun for the user to have to enter, so we
-> now enable the user to specify their own key(s) as the ungrab key(s). The
-> list of keys that can be used is found in the file qapi/ui.json under QKeyCode.
-> The max number of keys that can be used is three. The original ungrab keys
-> still remain usable because there is a real risk of the user forgetting 
-> the keys he or she specified as the ungrab keys. They remain as a plan B
-> if plan A is forgotten.
-
-This is a bad idea. A key reason to give a custom ungrab sequence, is because
-the user wants to be able to use the default ungrab sequence inside the
-guest. Always having the default ungrab sequence active prevents this.
-
-> Syntax: -ungrab <key-key-key>
-> 
-> Example usage:  -ungrab home
-> 	        -ungrab shift-ctrl
-> 		-ungrab ctrl-x
-> 		-ungrab pgup-pgdn
-> 		-ungrab kp_5-kp_6
-> 		-ungrab kp_4-kp_5-kp_6
-
-I'm in two minds about using '-' as a separator.  Perhaps '+' is a better
-choice ?
-
-> 
-> Signed-off-by: John Arbuckle <programmingkidx@gmail.com>
-> ---
-> v4 changes:
-> - Removed initialization code for key_value_array.
-> - Added void keyword to console_ungrab_key_sequence(),
->   and console_ungrab_key_string() functions.
-> 
-> v3 changes:
-> - Added the ability for any "sendkey supported" key to be used.
-> - Added ability for one to three key sequences to be used.
-> 
-> v2 changes:
-> - Removed the "int i" code from the for loops. 
-> 
->  include/ui/console.h |  6 ++++++
->  qemu-options.hx      |  2 ++
->  ui/cocoa.m           | 48 +++++++++++++++++++++++++++++++++++++++--
->  ui/console.c         | 60 ++++++++++++++++++++++++++++++++++++++++++++++++++++
->  vl.c                 |  3 +++
->  5 files changed, 117 insertions(+), 2 deletions(-)
-> 
-> diff --git a/include/ui/console.h b/include/ui/console.h
-> index 580dfc57ee..37dc150268 100644
-> --- a/include/ui/console.h
-> +++ b/include/ui/console.h
-> @@ -534,4 +534,10 @@ static inline void early_gtk_display_init(int opengl)
->  /* egl-headless.c */
->  void egl_headless_init(void);
->  
-> +/* console.c */
-> +void set_ungrab_seq(const char *new_seq);
-> +int *console_ungrab_key_sequence(void);
-> +const char *console_ungrab_key_string(void);
-> +int console_ungrab_sequence_length(void);
-
-We don't need to have a console_ungrab_sequence_length() method if
-we make the array returned by console_ungrab_key_sequence() be a
-zero terminated array.
-
-> diff --git a/ui/cocoa.m b/ui/cocoa.m
-> index 330ccebf90..412a5fc02d 100644
-> --- a/ui/cocoa.m
-> +++ b/ui/cocoa.m
-> @@ -303,6 +303,7 @@ - (float) cdx;
->  - (float) cdy;
->  - (QEMUScreen) gscreen;
->  - (void) raiseAllKeys;
-> +- (bool) user_ungrab_seq;
->  @end
->  
->  QemuCocoaView *cocoaView;
-> @@ -674,9 +675,24 @@ - (void) handleEvent:(NSEvent *)event
->                  }
->              }
->  
-> +            /*
-> +             * This code has to be here because the user might use a modifier
-> +             * key like shift as an ungrab key.
-> +             */
-> +            if ([self user_ungrab_seq] == true) {
-> +                [self ungrabMouse];
-> +                return;
-> +            }
->              break;
->          case NSEventTypeKeyDown:
->              keycode = cocoa_keycode_to_qemu([event keyCode]);
-> +            [self toggleModifier: keycode];
-> +
-> +            // If the user is issuing the custom ungrab key sequence
-> +            if ([self user_ungrab_seq] == true) {
-> +                [self ungrabMouse];
-> +                return;
-> +            }
-
-There's a small benefit to only processing the grab sequence in the
-Up event, rather than Down event if we are clever with tracking
-the key sequence.
-
-Check if each press as it comes in. If it is part of the ungrab
-sequence, then record that is is pressed. If is is not part of
-the ungrab sequence, the clear out all previously pressed keys.
-Only trigger ungrab upon key release
-
-This means that you can use Ctrl+Alt  as your ungrab sequence
-and still be able to press Ctrl+Alt+F1 and have it go to the
-guest without triggering the grab sequence.
-
-ie, in your patch we get
-
- down(ctrl)
- down(alt)
- ..ungrab activates..
-
-with my suggest we would get
-
- down(ctrl)
- down(alt)
- up(ctrl)
- up(alt)
- ..ungrab activates..
-
- down(ctrl)
- down(alt)
- down(f1)
- up(ctrl)
- up(alt)
- up(f1)
- ..no ungrab activates..
-
-to do this I think you need a separate array for tracking the grab
-instead of reusing the  toggleModifier() tracking.
-
->  
->              // forward command key combos to the host UI unless the mouse is grabbed
->              if (!isMouseGrabbed && ([event modifierFlags] & NSEventModifierFlagCommand)) {
-> @@ -714,6 +730,7 @@ - (void) handleEvent:(NSEvent *)event
->              break;
->          case NSEventTypeKeyUp:
->              keycode = cocoa_keycode_to_qemu([event keyCode]);
-> +            [self toggleModifier: keycode];
->  
->              // don't pass the guest a spurious key-up if we treated this
->              // command-key combo as a host UI action
-> @@ -842,10 +859,18 @@ - (void) grabMouse
->      COCOA_DEBUG("QemuCocoaView: grabMouse\n");
->  
->      if (!isFullscreen) {
-> +        NSString * message_string;
-> +        if (console_ungrab_sequence_length() == 0) {
-> +            message_string = [NSString stringWithFormat: @"- (Press ctrl + alt + g to release Mouse"];
-> +        } else {
-> +            message_string = [NSString stringWithFormat: @"- (Press ctrl + alt + g or %s to release Mouse", console_ungrab_key_string()];
-> +        }
-> +
-> +
->          if (qemu_name)
-> -            [normalWindow setTitle:[NSString stringWithFormat:@"QEMU %s - (Press ctrl + alt + g to release Mouse)", qemu_name]];
-> +            [normalWindow setTitle:[NSString stringWithFormat: @"QEMU %s %@", qemu_name, message_string]];
->          else
-> -            [normalWindow setTitle:@"QEMU - (Press ctrl + alt + g to release Mouse)"];
-> +            [normalWindow setTitle:[NSString stringWithFormat: @"QEMU %@", message_string]];
->      }
->      [self hideCursor];
->      if (!isAbsoluteEnabled) {
-> @@ -898,6 +923,25 @@ - (void) raiseAllKeys
->         }
->     }
->  }
-> +
-> +/* Determines if the user specified ungrab sequence is being used */
-> +- (bool) user_ungrab_seq
-> +{
-> +    int *ungrab_seq, index, length;
-> +    bool return_value = true;
-> +
-> +    ungrab_seq = console_ungrab_key_sequence();
-> +    length = console_ungrab_sequence_length();
-> +
-> +    for (index = 0; index < length; index++) {
-> +        if (modifiers_state[ungrab_seq[index]] == NO) {
-> +            return_value = false;
-> +            break;
-> +        }
-> +    }
-> +    return return_value;
-> +}
-> +
->  @end
->  
->  
-> diff --git a/ui/console.c b/ui/console.c
-> index c4c95abed7..895bc3fb17 100644
-> --- a/ui/console.c
-> +++ b/ui/console.c
-> @@ -63,6 +63,18 @@ typedef struct QEMUFIFO {
->      int count, wptr, rptr;
->  } QEMUFIFO;
->  
-> +/* max number of user specified keys that can be used as the ungrab keys*/
-> +static const int max_keys = 3;
-> +
-> +/* stores the ungrab keys' values */
-> +static int key_value_array[max_keys + 1];
-> +
-> +/* stores the length the user's ungrab sequence */
-> +int ungrab_seq_length;
-> +
-> +/* stores the string that is returned by console_ungrab_key_string */
-> +static char *ungrab_key_string;
-> +
->  static int qemu_fifo_write(QEMUFIFO *f, const uint8_t *buf, int len1)
->  {
->      int l, len;
-> @@ -2239,4 +2251,52 @@ static void register_types(void)
->      type_register_static(&qemu_console_info);
->  }
->  
-> +/* Sets the mouse ungrab key sequence to what the user wants */
-> +void set_ungrab_seq(const char *new_seq)
-> +{
-> +    char *buffer1 = (char *) malloc(strlen(new_seq) * sizeof(char));
-> +    char *buffer2 = (char *) malloc(strlen(new_seq) * sizeof(char));
-> +    int count = 0;
-> +    int key_value;
-> +    char *token;
-> +    const char *separator = "-";  /* What the user places between keys */
-> +
-> +    sprintf(buffer1, "%s", new_seq); /* edited by strtok */
-> +    sprintf(buffer2, "%s", new_seq); /* used for ungrab_key_string */
-> +    ungrab_key_string = buffer2;
-> +
-> +    token = strtok(buffer1, separator);
-> +    while (token != NULL && count < max_keys) {
-> +        /* Translate the names into Q_KEY_CODE values */
-> +        key_value = index_from_key(token, strlen(token));
-> +        if (key_value == Q_KEY_CODE__MAX) {
-> +            printf("-ungrab: unknown key: %s\n", token);
-> +            exit(EXIT_FAILURE);
-> +        }
-> +        key_value_array[count] = key_value;
-> +
-> +        count++;
-> +        token = strtok(NULL, separator);
-> +    }
-
-Rather than this malloc+sprintf+strtok mix, you can just use the
-glib function  g_strsplit() to break it into tokens.
-
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+On 01/04/2018 02:34 PM, Stefan Hajnoczi wrote:
+> On Mon, Dec 18, 2017 at 02:09:07PM +0300, Denis V. Lunev wrote:
+>> From: Klim Kireev <klim.kireev@virtuozzo.com>
+>>
+>> This patch adds main information about Parallels Disk
+>> format, which consists of DiskDescriptor.xml and other files.
+>>
+>> Signed-off-by: Edgar Kaziakhmedov <edgar.kaziakhmedov@virtuozzo.com>
+>> Signed-off-by: Klim Kireev <klim.kireev@virtuozzo.com>
+>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+>> Signed-off-by: Denis V. Lunev <den@openvz.org>
+>> CC: Stefan Hajnoczi <stefanha@redhat.com>
+>> ---
+>>   docs/interop/prl-xml.txt | 155 +++++++++++++++++++++++++++++++++++++++++++++++
+>>   1 file changed, 155 insertions(+)
+>>   create mode 100644 docs/interop/prl-xml.txt
+>>
+>> diff --git a/docs/interop/prl-xml.txt b/docs/interop/prl-xml.txt
+>> new file mode 100644
+>> index 0000000..8ccb91a
+>> --- /dev/null
+>> +++ b/docs/interop/prl-xml.txt
+>> @@ -0,0 +1,155 @@
+>> += License =
+>> +
+>> +Copyright (c) 2015 Denis Lunev
+>> +Copyright (c) 2015 Vladimir Sementsov-Ogievskiy
+>> +Copyright (c) 2016-2017 Klim Kireev
+>> +Copyright (c) 2016-2017 Edgar Kaziakhmedov
+>> +
+>> +This work is licensed under the terms of the GNU GPL, version 2 or later.
+>> +See the COPYING file in the top-level directory.
+>> +
+>> +This specification contains minimal information about Parallels Disk Format,
+>> +which is enough to proper work with QEMU. Nevertheless, Parallels Cloud Server
+>> +and Parallels Desktop are able to add some unspecified nodes to xml and use
+>> +them, but they are for internal work and don't affect functionality. Also it
+>> +uses auxiliary xml "Snapshot.xml", which allows to store optional snapshot
+>> +information, but it doesn't influence open/read/write functionality. QEMU and
+>> +other software should not use unspecified here fields and Snapshot.xml file
+> s/unspecified here fields/fields not covered in this document/
+>
+>> +and must leave them as is.
+>> +
+>> += Parallels Disk Format =
+>> +
+>> +Parallels disk consists of two parts: the set of snapshots and the disk
+>> +descriptor file, which stores information about all files and snapshots.
+>> +
+>> +== Definitions ==
+>> +    Snapshot       a record of the contents captured at a particular time,
+>> +                   capable of storing current state. A snapshot has UUID and
+>> +                   parent UUID.
+>> +
+>> + Snapshot image    an overlay representing the difference between this
+>> +                   snapshot and some earlier snapshot
+>> +
+>> +    Overlay        an image storing the different sectors between two captured
+>> +                   states.
+>> +
+>> +   Root image      snapshot image without parent, the root of snapshot tree.
+> s/without parent/with no parent/
+>
+>> +
+>> +    Storage        a special conception of data, which consists of disk
+>> +                   parameters and a list of images. One of this image is root,
+>> +                   others are overlays. Images must be expandable (parallels
+>> +                   image file), however root image could be expandable or
+>> +                   plain. There may be more then one storage in the Parallels
+> s/then/than/
+>
+>> +                   disk and it is defined as a split image.
+> I was having trouble understanding this paragraph.  At this point I can
+> begin to see that split images consist of multiple storages.  That makes
+> the concept of storage clearer.
+>
+> Perhaps rephrase this paragraph as:
+>
+> the backing storage for a subset of the virtual disk.  When there is
+> more than one storage in a Parallels disk then that is referred to as a
+> split image.  Each storage consists of disk parameters and a list of
+> images.  The list of images always contains a root image and may also
+> contain overlays.  The root image can be an expandable Parallels image
+> file or plain.  Overlays must be expandable.
+>
+>> +                   In this case every storage covers specific address
+>> +                   space area of the disk and has its particular root image.
+>> +                   Split images are not considered here and isn't supported
+> s/isn't/aren't/
+>
+>> +                   in QEMU.
+>> +
+>> +  Description      DiskDescriptor.xml stores information about disk parameters,
+>> +     file          snapshots, storages.
+>> +
+>> +     Top           The overlay between actual state and some previous snapshot.
+>> +   Snapshot        It is not a snapshot in classical meaning.
+> To make this clearer the last line could be:
+>
+>    It is not a snapshot in the classical sense because it serves as the
+>    active image that the guest writes to.
+>
+>> +
+>> +    Sector         a 512-byte data chunk.
+>> +
+>> +== Description file ==
+>> +All information is placed in single XML section Parallels_disk_image.
+>> +The section has only one attribute "Version", that must be 1.0.
+>> +General structure of DiskDescriptor.xml:
+>> +
+>> +<Parallels_disk_image Version="1.0">
+>> +    <Disk_Parameters>
+>> +        ...
+>> +    </Disk_Parameters>
+>> +    <StorageData>
+>> +        ...
+>> +    </StorageData>
+>> +    <Snapshots>
+>> +        ...
+>> +    </Snapshots>
+>> +</Parallels_disk_image>
+>> +
+>> +== Disk_Parameters section ==
+>> +The Disk_Parameters section describes the physical layout of the virtual disk
+>> +and some general settings.
+>> +
+>> +The Disk_Parameters section MUST contain the following subsections:
+>> +    * Disk_size - number of sectors in the disk,
+>> +                  desired size of the disk
+>> +    * Cylinders - number of the disk cylinders
+>> +    * Heads     - number of the disk heads
+>> +    * Sectors   - number of the disk sectors per cylinder
+>> +                  (sector size is 512 bytes)
+>> +                  Limitation: Product of the Heads, Sectors and Cylinders
+>> +                  values MUST be equal to the value of the Disk_size parameter.
+>> +    * Padding   - must be 0. Parallels Cloud Server and Parallels Desktop may
+>> +                  use padding set to 1, however this case is not covered
+>> +                  by this spec, QEMU and other software should not open
+>> +                  such disks and should not create them.
+>> +                  Attention: this field affects the read/write functionality.
+> What does "Attention: this field affects the read/write functionality" mean?
+>
+>> +
+>> +== StorageData section ==
+>> +This section of the file describes root image and all snapshot images.
+> s/root image/the root image/
+>
+>> +
+>> +The StorageData section consists of the Storage subsection, as shown below:
+>> +<StorageData>
+>> +    <Storage>
+>> +        ...
+>> +    </Storage>
+>> +</StorageData>
+>> +
+>> +A Storage descriptor consists of the following subsections:
+>> +    * Start     - start sector of the storage, equals to 0.
+>> +    * End       - number of sectors in storage, equals to Disk_size.
+> Just to be clear, if Start > 0 then End is still Disk_size and not Start
+> + Disk_size?  Please tweak the wording to make this clear.
+>
+>> +    * Blocksize - storage cluster size, number of sectors per one cluster.
+>> +                  Cluster size for each "Compressed" (see below) image in
+>> +                  parallels disk must be equal to this field. Note: cluster
+>> +                  size for Parallels Expandable Image is in 'tracks' field of
+>> +                  its header (see docs/interop/parallels.txt).
+> What is the purpose of this field if the Parallels Expandable Image
+> header also has the same value?
+I suppose that it is needed for creating snapshots over an raw root image.
+>> +    * Several Image subsections.
+>> +
+>> +Each Image section consists of the following subsections:
+> I'm confused by the use of "section" and "subsections" here.  This spec
+> is ambiguous and does not describe the XML clearly.  Is a "section"
+> always an XML tag and a "subsection" is a child XML tag?
+>
+> In other words, are we talking about:
+>
+>    <Image>
+>        <GUID>{12345678-9abc-def1-2345-6789abcdef12}</GUID>
+>        <Type>Plain</Type>
+>        <File>my_file</File>
+>    </Image>
+>
+> Or could it be:
+>
+>    <Image GUID="{12345678-9abc-def1-2345-6789abcdef12}"
+>           Type="Plain"
+> 	 File="my_file" />
+>
+> ?
+>
+> Please use XML terminology ("tag", "attribute", etc) instead of
+> "section"/"subsection".
+>
+>> +    * GUID - image identifier, UUID in curly brackets.
+>> +             For instance, {12345678-9abc-def1-2345-6789abcdef12}.
+> How is the GUID used?  Does it need to be validated against the GUID in
+> the image file?
+Parallels images don't contain GUID, what do you mean?
+>
+>> +    * Type - image type of the element. It can be:
+>> +             "Plain" for plain disks.
+> What is a plain disk?  Is this a raw file or a Parallels Expandable
+> Image file?
+>
+>> +             "Compressed" for expanding disks.
+>> +    * File - path to image file. Path can be relative to DiskDecriptor.xml or
+>> +             absolute.
+>> +
+>> +== Snapshots section ==
+>> +The Snapshots section describes the snapshot relations with the snapshot tree.
+>> +
+>> +The section contains the set of Shot subsections, as shown below:
+>> +<Snapshots>
+>> +    <TopGUID> ... </TopGUID> //Optional subsection
+>> +    <Shot>
+>> +        ...
+>> +    </Shot>
+>> +    <Shot>
+>> +        ...
+>> +    </Shot>
+>> +    ...
+>> +</Snapshots>
+>> +
+>> +Each Shot section contains the following subsections:
+>> +    * GUID       - an image GUID.
+>> +    * ParentGUID - GUID of the image of the parent snapshot.
+>> +
+>> +The software may traverse snapshots from child to parent using <ParentGUID>
+>> +field as reference. ParentGUID of root snapshot is
+>> +{00000000-0000-0000-0000-000000000000}. There should be only one one root
+>> +snapshot. Top snapshot could be described via two ways: via TopGUID subsection
+>> +in the Snapshots section or via predefined GUID
+>> +{5fbaabe3-6958-40ff-92a7-860e329aab41} If TopGUID is defined, predefined GUID is
+>> +interpreted as usual GUID. All snapshot images (except Top Snapshot) sould be
+> s/sould/should/
+>
+>> +opened read-only.
+>> +There is another predefined GIUD,
+> s/GIUD/GUID/
+>
+>> +BackupID = {704718e1-2314-44c8-9087-d78ed36b0f4e}, which is used by original and
+>> +some third-party software for backup, QEMU and other software may operate with
+>> +images with GUID = BackupID as usual, however, it is not recommended to use this
+>> +GUID for new disks. Top snapshot cannot have this GUID.
+>> +NOTE: To address top snapshot QEMU supports only predefined GUID mode.
+> This sounds like an implementation limitation and a spec violation
+> (since the spec says <TopGUID> may be used).  Please implement <TopGUID>
+> support unless it's really hard to do, or drop <TopGUID> from this spec
+> so that it's clear this feature doesn't need to be supported by QEMU and
+> other open source software.
