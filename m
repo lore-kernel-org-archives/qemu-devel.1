@@ -1,27 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44043)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47967)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1eZIt1-0000nj-5x
-	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 11:05:56 -0500
+	(envelope-from <stefanha@redhat.com>) id 1eZJ1c-0005Zq-L5
+	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 11:14:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1eZIsw-0003H9-2r
-	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 11:05:55 -0500
-Received: from mail3-relais-sop.national.inria.fr ([192.134.164.104]:36137)
+	(envelope-from <stefanha@redhat.com>) id 1eZJ1X-00034Q-GM
+	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 11:14:48 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:45714)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <samuel.thibault@ens-lyon.org>)
-	id 1eZIsv-0003FR-O8
-	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 11:05:50 -0500
-Date: Wed, 10 Jan 2018 17:05:33 +0100
-From: Samuel Thibault <samuel.thibault@gnu.org>
-Message-ID: <20180110160533.vev76nkox3wkqaqv@var.youpi.perso.aquilenet.fr>
-References: <20171228150038.16450-1-samuel.thibault@ens-lyon.org>
-	<ae60a724-48bc-b39e-8082-c1ee618ed5da@vivier.eu>
-	<a125dd5e-e1a4-348b-63fc-55ce34f4a944@vivier.eu>
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1eZJ1X-00031q-8i
+	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 11:14:43 -0500
+Date: Wed, 10 Jan 2018 16:14:38 +0000
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20180110161438.GA28096@stefanha-x1.localdomain>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="MGYHOYXEY6WxJCY8"
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <a125dd5e-e1a4-348b-63fc-55ce34f4a944@vivier.eu>
-Subject: Re: [Qemu-devel] [PATCH] linux-user: Add getcpu() support
+Subject: [Qemu-devel] vhost-pci and virtio-vhost-user
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,58 +25,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Vivier <laurent@vivier.eu>
-Cc: qemu-devel@nongnu.org, Riku Voipio <riku.voipio@iki.fi>
+To: wei.w.wang@intel.com
+Cc: qemu-devel@nongnu.org
 
-Laurent Vivier, on mer. 10 janv. 2018 16:53:47 +0100, wrote:
-> Le 28/12/2017 à 18:39, Laurent Vivier a écrit :
-> > Le 28/12/2017 à 16:00, Samuel Thibault a écrit :
-> >> Signed-off-by: Samuel Thibault <samuel.thibault@ens-lyon.org>
-> >> ---
-> >>  linux-user/syscall.c | 16 ++++++++++++++++
-> >>  1 file changed, 16 insertions(+)
-> >>
-> >> diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-> >> index 8ec7de96ce..bb8cb726f5 100644
-> >> --- a/linux-user/syscall.c
-> >> +++ b/linux-user/syscall.c
-> >> @@ -296,6 +296,8 @@ _syscall3(int, sys_sched_getaffinity, pid_t, pid, unsigned int, len,
-> >>  #define __NR_sys_sched_setaffinity __NR_sched_setaffinity
-> >>  _syscall3(int, sys_sched_setaffinity, pid_t, pid, unsigned int, len,
-> >>            unsigned long *, user_mask_ptr);
-> >> +#define __NR_sys_getcpu __NR_getcpu
-> >> +_syscall3(int, sys_getcpu, unsigned *, cpu, unsigned *, node, void *, tcache);
-> >>  _syscall4(int, reboot, int, magic1, int, magic2, unsigned int, cmd,
-> >>            void *, arg);
-> >>  _syscall2(int, capget, struct __user_cap_header_struct *, header,
-> >> @@ -10443,6 +10445,20 @@ abi_long do_syscall(void *cpu_env, int num, abi_long arg1,
-> >>              ret = get_errno(sys_sched_setaffinity(arg1, mask_size, mask));
-> >>          }
-> >>          break> +    case TARGET_NR_getcpu:
-> >> +        {
-> >> +            unsigned cpu, node;
-> >> +            ret = get_errno(sys_getcpu(arg1 ? &cpu : NULL,
-> >> +                                       arg2 ? &node : NULL,
-> >> +                                       NULL));
-> >> +            if (arg1) {
-> >> +                put_user(cpu, arg1, abi_uint);
-> >> +            }
-> >> +            if (arg2) {
-> >> +                put_user(node, arg2, abi_uint);
-> >> +            }
-> > 
-> > You must check for EFAULT.
-> > 
-> >     if (arg1 && put_user_u32(cpu, arg1)) {
-> >         goto efault;
-> >     }
-> > ...
-> > 
-> > I don't think you need to use the abi_uint type as we are using
-> > put_user_u32() for all the other syscalls for unsigned int.
-> 
-> could you send an updated version of your patch?
 
-Oops, I had missed that mail. Will work on it.
+--MGYHOYXEY6WxJCY8
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-Samuel
+Hi Wei,
+I wanted to summarize the differences between the vhost-pci and
+virtio-vhost-user approaches because previous discussions may have been
+confusing.
+
+vhost-pci defines a new virtio device type for each vhost device type
+(net, scsi, blk).  It therefore requires a virtio device driver for each
+device type inside the slave VM.
+
+Adding a new device type requires:
+1. Defining a new virtio device type in the VIRTIO specification.
+3. Implementing a new QEMU device model.
+2. Implementing a new virtio driver.
+
+virtio-vhost-user is a single virtio device that acts as a vhost-user
+protocol transport for any vhost device type.  It requires one virtio
+driver inside the slave VM and device types are implemented using
+existing vhost-user slave libraries (librte_vhost in DPDK and
+libvhost-user in QEMU).
+
+Adding a new device type to virtio-vhost-user involves:
+1. Adding any new vhost-user protocol messages to the QEMU
+   virtio-vhost-user device model.
+2. Adding any new vhost-user protocol messages to the vhost-user slave
+   library.
+3. Implementing the new device slave.
+
+The simplest case is when no new vhost-user protocol messages are
+required for the new device.  Then all that's needed for
+virtio-vhost-user is a device slave implementation (#3).  That slave
+implementation will also work with AF_UNIX because the vhost-user slave
+library hides the transport (AF_UNIX vs virtio-vhost-user).  Even
+better, if another person has already implemented that device slave to
+use with AF_UNIX then no new code is needed for virtio-vhost-user
+support at all!
+
+If you compare this to vhost-pci, it would be necessary to design a new
+virtio device, implement it in QEMU, and implement the virtio driver.
+Much of virtio driver is more or less the same thing as the vhost-user
+device slave but it cannot be reused because the vhost-user protocol
+isn't being used by the virtio device.  The result is a lot of
+duplication in DPDK and other codebases that implement vhost-user
+slaves.
+
+The way that vhost-pci is designed means that anyone wishing to support
+a new device type has to become a virtio device designer.  They need to
+map vhost-user protocol concepts to a new virtio device type.  This will
+be time-consuming for everyone involved (e.g. the developer, the VIRTIO
+community, etc).
+
+The virtio-vhost-user approach stays at the vhost-user protocol level as
+much as possible.  This way there are fewer concepts that need to be
+mapped by people adding new device types.  As a result, it will allow
+virtio-vhost-user to keep up with AF_UNIX vhost-user and grow because
+it's easier to work with.
+
+What do you think?
+
+Stefan
+
+--MGYHOYXEY6WxJCY8
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJaVjvuAAoJEJykq7OBq3PI4QoIAId5xdT5YLAtdFG8FPO34l/v
+fODiM9GWt9Vygx7PV099WMoFE4GICMeJBPTz88iBdtvtNdFJJbRy27JMBAdMOvEE
+H1lqZAXZW/+v50AV45jY5FlZhYeUQA5+PNPWk5GGTbhYB6gkY3961mmbly0A/zb4
+gKy5IZN61+RKQSs/uQ9nXcby/VBS34sAbCB3X91Lb4lQWU5QPUzgVZT563hc2Xln
+bRsSp92kiYEQ6qTAiKYfM7KT7UlyVs90V41BVAicj3BcQT27zSdZuw4gh08cxOX9
+Jah+uAhjWFMe6wkSxM4egqD2L+bUOeP6piKdKxnJaF6gH7caGAU9Kgk6q+D0oNs=
+=QGca
+-----END PGP SIGNATURE-----
+
+--MGYHOYXEY6WxJCY8--
