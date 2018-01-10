@@ -1,27 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53815)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54742)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1eZHJs-0003kh-Mx
-	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 09:25:33 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1eZHKt-0004aS-Tf
+	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 09:26:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1eZHJr-0000cV-IO
-	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 09:25:32 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:58935)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1eZHJq-0000bk-Vh
-	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 09:25:31 -0500
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 0917E50F58
-	for <qemu-devel@nongnu.org>; Wed, 10 Jan 2018 14:25:30 +0000 (UTC)
+	(envelope-from <pbonzini@redhat.com>) id 1eZHKt-0001dM-0W
+	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 09:26:35 -0500
+References: <1515425247-21730-1-git-send-email-pl@kamp.de>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Wed, 10 Jan 2018 15:25:15 +0100
-Message-Id: <20180110142515.13242-3-pbonzini@redhat.com>
-In-Reply-To: <20180110142515.13242-1-pbonzini@redhat.com>
-References: <20180110142515.13242-1-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PATCH 2/2] find_ram_offset: Align ram_addr_t
- allocation on long boundaries
+Message-ID: <bc20ba7f-49e7-97a2-60b5-7394664c6cd1@redhat.com>
+Date: Wed, 10 Jan 2018 15:26:04 +0100
+MIME-Version: 1.0
+In-Reply-To: <1515425247-21730-1-git-send-email-pl@kamp.de>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] block/iscsi: fix initialization of iTask
+ in iscsi_co_get_block_status
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,61 +24,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: dgilbert@redhat.com, quintela@redhat.com, eblake@redhat.com
+To: Peter Lieven <pl@kamp.de>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: mreitz@redhat.com, kwolf@redhat.com, ronniesahlberg@gmail.com, famz@redhat.com, eblake@redhat.com, qemu-stable@nongnu.org
 
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+On 08/01/2018 16:27, Peter Lieven wrote:
+> in case of unaligned requests or on a target that does not support
+> block provisioning we leave iTask uninitialized and check iTask.task
+> for NULL later.
+> 
+> Fixes: e38bc23454ef763deb4405ebdee6a1081aa00bc8
+> Cc: qemu-stable@nongnu.org
+> Signed-off-by: Peter Lieven <pl@kamp.de>
+> Reviewed-by: Eric Blake <eblake@redhat.com>
+> ---
+>  block/iscsi.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
+> 
+> diff --git a/block/iscsi.c b/block/iscsi.c
+> index 5c0a9e5..6a1c537 100644
+> --- a/block/iscsi.c
+> +++ b/block/iscsi.c
+> @@ -658,6 +658,8 @@ static int64_t coroutine_fn iscsi_co_get_block_status(BlockDriverState *bs,
+>      uint64_t lba;
+>      int64_t ret;
+>  
+> +    iscsi_co_init_iscsitask(iscsilun, &iTask);
+> +
+>      if (!is_sector_request_lun_aligned(sector_num, nb_sectors, iscsilun)) {
+>          ret = -EINVAL;
+>          goto out;
+> @@ -675,7 +677,6 @@ static int64_t coroutine_fn iscsi_co_get_block_status(BlockDriverState *bs,
+>  
+>      lba = sector_qemu2lun(sector_num, iscsilun);
+>  
+> -    iscsi_co_init_iscsitask(iscsilun, &iTask);
+>      qemu_mutex_lock(&iscsilun->mutex);
+>  retry:
+>      if (iscsi_get_lba_status_task(iscsilun->iscsi, iscsilun->lun,
+> 
 
-The dirty bitmaps are built from 'long's and there is fast-path code
-for synchronising the case where the RAMBlock is aligned to the start
-of a long boundary.  Align the allocation to this boundary
-to cause the fast path to be used.
+Queued (removing Cc qemu-stable), thanks.
 
-Offsets before change:
-11398@1515169675.018566:find_ram_offset size: 0x1e0000 @ 0x8000000
-11398@1515169675.020064:find_ram_offset size: 0x20000 @ 0x81e0000
-11398@1515169675.020244:find_ram_offset size: 0x20000 @ 0x8200000
-11398@1515169675.024343:find_ram_offset size: 0x1000000 @ 0x8220000
-11398@1515169675.025154:find_ram_offset size: 0x10000 @ 0x9220000
-11398@1515169675.027682:find_ram_offset size: 0x40000 @ 0x9230000
-11398@1515169675.032921:find_ram_offset size: 0x200000 @ 0x9270000
-11398@1515169675.033307:find_ram_offset size: 0x1000 @ 0x9470000
-11398@1515169675.033601:find_ram_offset size: 0x1000 @ 0x9471000
-
-after change:
-10923@1515169108.818245:find_ram_offset size: 0x1e0000 @ 0x8000000
-10923@1515169108.819410:find_ram_offset size: 0x20000 @ 0x8200000
-10923@1515169108.819587:find_ram_offset size: 0x20000 @ 0x8240000
-10923@1515169108.823708:find_ram_offset size: 0x1000000 @ 0x8280000
-10923@1515169108.824503:find_ram_offset size: 0x10000 @ 0x9280000
-10923@1515169108.827093:find_ram_offset size: 0x40000 @ 0x92c0000
-10923@1515169108.833045:find_ram_offset size: 0x200000 @ 0x9300000
-10923@1515169108.833504:find_ram_offset size: 0x1000 @ 0x9500000
-10923@1515169108.833787:find_ram_offset size: 0x1000 @ 0x9540000
-
-Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
-Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-Message-Id: <20180105170138.23357-3-dgilbert@redhat.com>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- exec.c | 4 ++++
- 1 file changed, 4 insertions(+)
-
-diff --git a/exec.c b/exec.c
-index 829f9d8d1a..c543b54094 100644
---- a/exec.c
-+++ b/exec.c
-@@ -1679,7 +1679,11 @@ static ram_addr_t find_ram_offset(ram_addr_t size)
-     RAMBLOCK_FOREACH(block) {
-         ram_addr_t candidate, next = RAM_ADDR_MAX;
- 
-+        /* Align blocks to start on a 'long' in the bitmap
-+         * which makes the bitmap sync'ing take the fast path.
-+         */
-         candidate = block->offset + block->max_length;
-+        candidate = ROUND_UP(candidate, BITS_PER_LONG << TARGET_PAGE_BITS);
- 
-         /* Search for the closest following block
-          * and find the gap.
--- 
-2.14.3
+Paolo
