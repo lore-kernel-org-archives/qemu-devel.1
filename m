@@ -1,34 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42812)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46446)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eZOQc-0002pC-43
-	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 17:00:59 -0500
+	(envelope-from <bounces@canonical.com>) id 1eZOa2-0008Ok-3n
+	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 17:10:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eZOQY-0001GT-TY
-	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 17:00:58 -0500
-Received: from indium.canonical.com ([91.189.90.7]:39054)
+	(envelope-from <bounces@canonical.com>) id 1eZOZw-0008H5-Rv
+	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 17:10:41 -0500
+Received: from indium.canonical.com ([91.189.90.7]:43788)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1eZOQY-0001Fh-N0
-	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 17:00:54 -0500
+	id 1eZOZw-0008Fq-9X
+	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 17:10:36 -0500
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1eZOQX-0004TI-Fk
-	for <qemu-devel@nongnu.org>; Wed, 10 Jan 2018 22:00:53 +0000
+	id 1eZOZv-0006lM-6A
+	for <qemu-devel@nongnu.org>; Wed, 10 Jan 2018 22:10:35 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 704672E80C9
-	for <qemu-devel@nongnu.org>; Wed, 10 Jan 2018 22:00:53 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 2CB772E80C3
+	for <qemu-devel@nongnu.org>; Wed, 10 Jan 2018 22:10:35 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Wed, 10 Jan 2018 21:48:53 -0000
-From: Thomas Huth <1129957@bugs.launchpad.net>
-Reply-To: Bug 1129957 <1129957@bugs.launchpad.net>
+Date: Wed, 10 Jan 2018 21:56:20 -0000
+From: Thomas Huth <1162644@bugs.launchpad.net>
+Reply-To: Bug 1162644 <1162644@bugs.launchpad.net>
 Sender: bounces@canonical.com
-References: <20130219090314.18849.88631.malonedeb@soybean.canonical.com>
-Message-Id: <151562093385.3150.17555512794739012536.malone@soybean.canonical.com>
+References: <20130401031929.8788.58878.malonedeb@gac.canonical.com>
+Message-Id: <151562138103.25919.3439468939861378777.malone@gac.canonical.com>
 Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1129957] Re: Performance issue running quest
- image on qemu compiled for Win32 platform
+Subject: [Qemu-devel] [Bug 1162644] Re: qemu-system-x86_64 crashed with
+ SIGABRT in __assert_fail_base()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -40,9 +40,7 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 
 Triaging old bug tickets... can you still reproduce this issue with the
-latest version of QEMU and the latest version of MinGW? Do you also see
-the problem with the builds from https://qemu.weilnetz.de/ ? Or could we
-close this ticket nowadays?
+latest version of QEMU? Or could we close this ticket nowadays?
 
 ** Changed in: qemu
        Status: New =3D> Incomplete
@@ -51,42 +49,115 @@ close this ticket nowadays?
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1129957
+https://bugs.launchpad.net/bugs/1162644
 
 Title:
-  Performance issue running quest image on qemu compiled for Win32
-  platform
+  qemu-system-x86_64 crashed with SIGABRT in __assert_fail_base()
 
 Status in QEMU:
   Incomplete
+Status in qemu package in Ubuntu:
+  Confirmed
 
 Bug description:
-  I'm seeing performance issues when booting a guest image on qemu 1.4.0 co=
-mpiled for the Win32 platform.
-  The same image boots a lot faster on the same computer running qemu/linux=
- on Fedora via VmWare, and even running the Win32 exectuable via Wine perfo=
-rms better than running qemu natively on Win32.
+  Description:
+  When QEMU tries to boot with a usb 3.0 tablet (xhci) on a Raring ringtail=
+ box (QEMU package1.4.0+dfsg-1expubuntu4)  it will crash soon afterwards:
 
-  Although I'm not the author of the image, it is located here:
-  http://people.freebsd.org/~wpaul/qemu/vxworks.img
+  qemu-system-x86_64: /build/buildd/qemu-1.4.0+dfsg/hw/usb/core.c:552:
+  usb_packet_setup: Assertion `p->iov.iov !=3D ((void *)0)' failed.
 
-  All testing has been done on QEMU 1.4.0.
+  Component:
+  qemu-system -> 1.4.0+dfsg-1expubuntu4
 
-  I'm also attaching a couple of gprof logs. For these I have disabled
-  ssp in qemu by removing "-fstack-protector-all" and
-  "-D_FORTIFY_SOURCE=3D2" from the qemu configure script.
+  Ubuntu Version:
 
-  qemu-perf-linux.txt
-  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-  Machine - Windows XP - VmWare - Fedora - QEMU
+  Description:	Ubuntu Raring Ringtail (development branch)
+  Release:	13.04
 
-  qemu-perf-win32.txt
-  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-  Machine - Windows XP - QEMU
+  Steps to reproduce it:
 
-  qemu-perf-wine.txt
-  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-  Machine - Windows XP - VmWare - Fedora - Wine - QEMU
+  I met this bug while running the virt-test suite
+
+  https://github.com/autotest/virt-test
+
+  Instructions to install and run it can be seen on the README file
+
+  https://github.com/autotest/virt-test#readme
+
+  After the suite is set, it can be reproduced on a raring (13.04)
+  simply by running:
+
+  ./run -t qemu --tests usb.usb_reboot.usb_tablet.xhci
+
+  Command line:
+
+  23:52:42 INFO | Running qemu command (reformatted):
+  /usr/bin/kvm \
+      -S \
+      -name 'virt-tests-vm1' \
+      -nodefaults \
+      -chardev socket,id=3Dhmp_id_hmp1,path=3D/tmp/monitor-hmp1-20130331-23=
+3911-ndvUEvrV,server,nowait \
+      -mon chardev=3Dhmp_id_hmp1,mode=3Dreadline \
+      -chardev socket,id=3Dserial_id_serial1,path=3D/tmp/serial-serial1-201=
+30331-233911-ndvUEvrV,server,nowait \
+      -device isa-serial,chardev=3Dserial_id_serial1 \
+      -chardev socket,id=3Dseabioslog_id_20130331-233911-ndvUEvrV,path=3D/t=
+mp/seabios-20130331-233911-ndvUEvrV,server,nowait \
+      -device isa-debugcon,chardev=3Dseabioslog_id_20130331-233911-ndvUEvrV=
+,iobase=3D0x402 \
+      -device ich9-usb-uhci1,id=3Dusb1 \
+      -device nec-usb-xhci,id=3Dusbtest \
+      -drive file=3D'/home/lmr/Code/virt-test.git/shared/data/images/jeos-1=
+7-64.qcow2',if=3Dnone,id=3Dvirtio0 \
+      -device virtio-blk-pci,drive=3Dvirtio0,bootindex=3D1 \
+      -device virtio-net-pci,netdev=3DidumV1TE,mac=3D'9a:c0:c1:c2:c3:c4',id=
+=3D'idmN7iHv' \
+      -netdev user,id=3DidumV1TE,hostfwd=3Dtcp::5000-:22 \
+      -m 1024 \
+      -smp 2,maxcpus=3D2,cores=3D1,threads=3D1,sockets=3D2 \
+      -cpu 'SandyBridge' \
+      -M pc \
+      -device usb-tablet,id=3Dusb-tablet1,bus=3Dusb1.0,port=3D1 \
+      -device usb-tablet,id=3Dusb-testdev,bus=3Dusbtest.0,port=3D1 \
+      -vnc :0 \
+      -vga std \
+      -rtc base=3Dutc,clock=3Dhost,driftfix=3Dnone  \
+      -boot order=3Dcdn,once=3Dc,menu=3Doff  \
+      -enable-kvm
+
+  ProblemType: Crash
+  DistroRelease: Ubuntu 13.04
+  Package: qemu-system-x86 1.4.0+dfsg-1expubuntu4
+  ProcVersionSignature: Ubuntu 3.8.0-15.25-generic 3.8.4
+  Uname: Linux 3.8.0-15-generic x86_64
+  ApportVersion: 2.9.2-0ubuntu5
+  Architecture: amd64
+  Date: Sun Mar 31 23:52:46 2013
+  EcryptfsInUse: Yes
+  ExecutablePath: /usr/bin/qemu-system-x86_64
+  InstallationDate: Installed on 2013-03-31 (0 days ago)
+  InstallationMedia: Ubuntu 12.10 "Quantal Quetzal" - Release amd64 (201210=
+17.5)
+  MarkForUpload: True
+  ProcEnviron:
+   TERM=3Ddumb
+   PATH=3D(custom, no user)
+   XDG_RUNTIME_DIR=3D<set>
+   LANG=3Den_US.UTF-8
+   SHELL=3D/bin/bash
+  Signal: 6
+  SourcePackage: qemu
+  StacktraceTop:
+   raise () from /lib/x86_64-linux-gnu/libc.so.6
+   abort () from /lib/x86_64-linux-gnu/libc.so.6
+   ?? () from /lib/x86_64-linux-gnu/libc.so.6
+   __assert_fail () from /lib/x86_64-linux-gnu/libc.so.6
+   ?? ()
+  Title: qemu-system-x86_64 crashed with SIGABRT in raise()
+  UpgradeStatus: Upgraded to raring on 2013-03-31 (0 days ago)
+  UserGroups: adm cdrom dip libvirtd lpadmin plugdev sambashare sudo
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1129957/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1162644/+subscriptions
