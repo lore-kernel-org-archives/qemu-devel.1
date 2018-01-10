@@ -1,33 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53355)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44784)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eZOpX-0006gv-2e
-	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 17:26:44 -0500
+	(envelope-from <eblake@redhat.com>) id 1eZPLb-0001Zk-Vf
+	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 17:59:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eZOpT-0004CV-0G
-	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 17:26:43 -0500
-Received: from indium.canonical.com ([91.189.90.7]:51674)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1eZOpS-0004AH-Jb
-	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 17:26:38 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1eZOpO-0002kZ-9B
-	for <qemu-devel@nongnu.org>; Wed, 10 Jan 2018 22:26:34 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 108462E858D
-	for <qemu-devel@nongnu.org>; Wed, 10 Jan 2018 22:19:35 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 10 Jan 2018 22:06:47 -0000
-From: Thomas Huth <1175089@bugs.launchpad.net>
-Reply-To: Bug 1175089 <1175089@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20130501082935.389.58262.malonedeb@soybean.canonical.com>
-Message-Id: <151562200789.32264.14967227175556538438.malone@wampee.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1175089] Re: Crash why dragon fly 3.4.1
+	(envelope-from <eblake@redhat.com>) id 1eZPLY-0004Wn-Rf
+	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 17:59:52 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:37598)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1eZPLY-0004Ux-Ja
+	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 17:59:48 -0500
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 00D488762D
+	for <qemu-devel@nongnu.org>; Wed, 10 Jan 2018 22:59:47 +0000 (UTC)
+Received: from red.redhat.com (ovpn-124-124.rdu2.redhat.com [10.10.124.124])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 7F19418954
+	for <qemu-devel@nongnu.org>; Wed, 10 Jan 2018 22:59:46 +0000 (UTC)
+From: Eric Blake <eblake@redhat.com>
+Date: Wed, 10 Jan 2018 16:59:42 -0600
+Message-Id: <20180110225944.17920-1-eblake@redhat.com>
+Subject: [Qemu-devel] [PULL 0/2] nbd patches for 10 Jan
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,55 +32,38 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Triaging old bug tickets... can you still reproduce this issue with the
-latest version of QEMU? Or could we close this ticket nowadays?
+The following changes since commit 3cee4db661ab9c0fce7937b3bbfa188a1845f31f:
 
-** Changed in: qemu
-       Status: New =3D> Incomplete
+  Merge remote-tracking branch 'remotes/ericb/tags/pull-nbd-2018-01-08' into staging (2018-01-09 15:22:47 +0000)
 
--- =
+are available in the Git repository at:
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1175089
+  git://repo.or.cz/qemu/ericb.git tags/pull-nbd-2018-01-10
 
-Title:
-  Crash why dragon fly 3.4.1
+for you to fetch changes up to 420a4e955909788263a33d11600839e93480dfd3:
 
-Status in QEMU:
-  Incomplete
+  nbd: rename nbd_option and nbd_opt_reply (2018-01-10 12:11:23 -0600)
 
-Bug description:
-  Hello, all is here (kernel 3.8, qemu 1.2.2-r3):
-  /usr/bin/qemu-system-x86_64 -k fr -alt-grab -m 2048 -vga vmware -net nic,=
-vlan=3D0,model=3Dvirtio -net user -rtc base=3Dlocaltime -smp 4,cores=3D4,so=
-ckets=3D1 -boot once=3Dd -cdrom dfly-x86_64-gui-3.4.1_REL.iso =
+Not much time elapsed since my last pull request, but my last request
+was delayed due the holiday break, and I've now got other patches that
+will be easier to post if I can do a Based-on: against this pull request,
+rather than the larger in-progress series they were extracted from.
 
-  KVM internal error. Suberror: 1
-  emulation failure
-  EAX=3D00000010 EBX=3D00009338 ECX=3D00000000 EDX=3D00000000
-  ESI=3D000017fc EDI=3D000017c8 EBP=3D000364a0 ESP=3D000017b8
-  EIP=3D00009318 EFL=3D00003002 [-------] CPL=3D0 II=3D0 A20=3D1 SMM=3D0 HL=
-T=3D0
-  ES =3D0010 00000000 ffffffff 00c09300
-  CS =3D0018 00000000 0000ffff 00009b00
-  SS =3D0010 00000000 ffffffff 00c09300
-  DS =3D0010 00000000 ffffffff 00c09300
-  FS =3D0033 0000a000 ffffffff 00c0f300
-  GS =3D0033 0000a000 ffffffff 00c0f300
-  LDT=3D0000 00000000 0000ffff 00008200
-  TR =3D0038 00005f98 00002067 00008b00
-  GDT=3D     00009590 0000003f
-  IDT=3D     00005e00 00000197
-  CR0=3D00000010 CR2=3D00000000 CR3=3D00000000 CR4=3D00000000
-  DR0=3D0000000000000000 DR1=3D0000000000000000 DR2=3D0000000000000000 DR3=
-=3D0000000000000000 =
+----------------------------------------------------------------
+nbd patches for 2018-01-10
 
-  DR6=3D00000000ffff0ff0 DR7=3D0000000000000400
-  EFER=3D0000000000000000
-  Code=3D00 a3 ea 5d 00 00 66 ea 10 93 18 00 0f 20 c0 fe c8 0f 22 c0 <ea> 1=
-d 93 00 00 31 c0 8e d8 8e d0 0f 01 1e dc 95 66 07 66 1f 66 0f a1 66 0f a9 6=
-6 61 bc ea
+- Vladimir Sementsov-Ogievskiy: nbd: rename nbd_option and nbd_opt_reply
+- Vladimir Sementsov-Ogievskiy: nbd/server: add additional assert to nbd_export_put
 
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1175089/+subscriptions
+----------------------------------------------------------------
+Vladimir Sementsov-Ogievskiy (2):
+      nbd/server: add additional assert to nbd_export_put
+      nbd: rename nbd_option and nbd_opt_reply
+
+ include/block/nbd.h |  8 ++++----
+ nbd/client.c        | 12 ++++++------
+ nbd/server.c        |  6 ++++++
+ 3 files changed, 16 insertions(+), 10 deletions(-)
+
+-- 
+2.14.3
