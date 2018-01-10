@@ -1,25 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58689)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59705)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jack.schwartz@oracle.com>) id 1eZNvO-0004Hr-3v
-	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 16:28:43 -0500
+	(envelope-from <alistair23@gmail.com>) id 1eZNxf-0006HC-86
+	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 16:31:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jack.schwartz@oracle.com>) id 1eZNvM-0004P1-R2
-	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 16:28:42 -0500
-References: <1513901496-13538-1-git-send-email-jack.schwartz@oracle.com>
-	<1513901496-13538-2-git-send-email-jack.schwartz@oracle.com>
-	<20171222135208.GI3763@localhost.localdomain>
-	<edf5c1d0-c899-be0c-f4f2-b4e6eec0193b@oracle.com>
-	<20180109102448.GC6063@localhost.localdomain>
-From: Jack Schwartz <jack.schwartz@oracle.com>
-Message-ID: <8d4280f6-fbd4-dba0-94ab-ede75f5bf773@oracle.com>
-Date: Wed, 10 Jan 2018 13:28:43 -0800
+	(envelope-from <alistair23@gmail.com>) id 1eZNxd-000653-H7
+	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 16:31:03 -0500
+Received: from mail-wr0-x234.google.com ([2a00:1450:400c:c0c::234]:35749)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
+	id 1eZNxd-00064K-5f
+	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 16:31:01 -0500
+Received: by mail-wr0-x234.google.com with SMTP id n9so398898wrg.2
+	for <qemu-devel@nongnu.org>; Wed, 10 Jan 2018 13:31:01 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20180109102448.GC6063@localhost.localdomain>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v1 1/1] block: Add numeric errno field to
- BLOCK_IO_ERROR events
+Sender: alistair23@gmail.com
+In-Reply-To: <20171228145904.GJ24856@localhost.localdomain>
+References: <cover.1513729519.git.alistair.francis@xilinx.com>
+	<CAFEAcA-dvs-E83ZCEk6VAyyQkpghX9oF-d-D62vOKs7kfjPzaw@mail.gmail.com>
+	<CAKmqyKPHHQcQ3HYs4r7f4uUDfdMqSq=-mUJn6becXw8WXNAwNQ@mail.gmail.com>
+	<CAKmqyKMKL_BGSbaetubaPv8gkmF9XFFdDwkXAPsUZdV1qkOyqA@mail.gmail.com>
+	<20171220220608.GH24025@localhost.localdomain>
+	<CAKmqyKO+UvsEuK3fuEP7jmK3i5hb=rzp8DWye6-P7-BZ2CVXuQ@mail.gmail.com>
+	<CAKmqyKP4ewwxLgQ0+fBbMzpSOA1rh23XaER-yoJQuBQOiXFPzg@mail.gmail.com>
+	<20171228143931.516b9e60@igors-macbook-pro.local>
+	<20171228145904.GJ24856@localhost.localdomain>
+From: Alistair Francis <alistair.francis@xilinx.com>
+Date: Wed, 10 Jan 2018 13:30:29 -0800
+Message-ID: <CAKmqyKMH9b3+DT6z0VOC9kXyiBrc9VHK-ZqGb1JwpB6Y=J2Qjg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v4 0/5] Add a valid_cpu_types property
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,96 +37,118 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: qemu-block@nongnu.org, Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>, armbru@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com, Karl Heubaum <karl.heubaum@oracle.com>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: Igor Mammedov <imammedo@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, QEMU Developers <qemu-devel@nongnu.org>, Alistair Francis <alistair.francis@xilinx.com>
 
-Hi Kevin.
-
-Thanks for your feedback.
-
-Looks like my team's project plans have changed, and there is no need to=20
-pursue this further.=C2=A0 We can work with the existing reason string.
-
- =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Thanks,
- =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Jack
-
-On 01/09/18 02:24, Kevin Wolf wrote:
-> Am 08.01.2018 um 20:57 hat Jack Schwartz geschrieben:
->> Hi Kevin.
+On Thu, Dec 28, 2017 at 6:59 AM, Eduardo Habkost <ehabkost@redhat.com> wrote:
+> On Thu, Dec 28, 2017 at 02:39:31PM +0100, Igor Mammedov wrote:
+>> On Fri, 22 Dec 2017 11:47:00 -0800
+>> Alistair Francis <alistair.francis@xilinx.com> wrote:
 >>
->> On 2017-12-22 05:52, Kevin Wolf wrote:
->>> Am 22.12.2017 um 01:11 hat Jack Schwartz geschrieben:
->>>> BLOCK_IO_ERROR events currently contain a "reason" string which is
->>>> strerror(errno) of the error.  This enhancement provides those event=
-s with
->>>> the numeric errno value as well, since it is easier to parse for err=
-or type
->>>> than a string.
->>>>
->>>> Signed-off-by: Jack Schwartz<jack.schwartz@oracle.com>
->>>> Reviewed-by: Konrad Rzeszutek Wilk<konrad.wilk@oracle.com>
->>>> Reviewed-by: Karl Heubaum<karl.heubaum@oracle.com>
->>> Apart from the technical details that Eric mentioed, I wonder what is
->>> your use case for this?
->> We have thousands of servers in our cloud, and would like to closely m=
-onitor
->> for different kinds of disk errors without parsing the non-machine-rea=
-dable
->> error string.
-> So do you actually care about the semantical difference between, say,
-> EINVAL and EIO, and treat them differently in the monitoring? To be
-> honest, I can't see anything useful you could do with this information
-> because there are so many possible causes for each of the error codes.
->
-> Because if the only thing you want to do with them is to log them in
-> different categories, you can use the error strings without parsing
-> them.
->
->>> Exposing errors in a machine readable form was discussed earlier,
->> OK, found it.=C2=A0 April of 2010.
+>> > On Fri, Dec 22, 2017 at 10:45 AM, Alistair Francis
+>> > <alistair.francis@xilinx.com> wrote:
+>> > > On Wed, Dec 20, 2017 at 2:06 PM, Eduardo Habkost <ehabkost@redhat.com> wrote:
+>> > >> On Tue, Dec 19, 2017 at 05:03:59PM -0800, Alistair Francis wrote:
+>> > >>> On Tue, Dec 19, 2017 at 4:55 PM, Alistair Francis
+>> > >>> <alistair.francis@xilinx.com> wrote:
+>> > >>> > On Tue, Dec 19, 2017 at 4:43 PM, Peter Maydell <peter.maydell@linaro.org> wrote:
+>> > >>> >> On 20 December 2017 at 00:27, Alistair Francis
+>> > >>> >> <alistair.francis@xilinx.com> wrote:
+>> > >>> >>> There are numorous QEMU machines that only have a single or a handful of
+>> > >>> >>> valid CPU options. To simplyfy the management of specificying which CPU
+>> > >>> >>> is/isn't valid let's create a property that can be set in the machine
+>> > >>> >>> init. We can then check to see if the user supplied CPU is in that list
+>> > >>> >>> or not.
+>> > >>> >>>
+>> > >>> >>> I have added the valid_cpu_types for some ARM machines only at the
+>> > >>> >>> moment.
+>> > >>> >>>
+>> > >>> >>> Here is what specifying the CPUs looks like now:
+>> > >>> >>>
+>> > >>> >>> $ aarch64-softmmu/qemu-system-aarch64 -M netduino2 -kernel ./u-boot.elf -nographic -cpu "cortex-m3" -S
+>> > >>> >>> QEMU 2.10.50 monitor - type 'help' for more information
+>> > >>> >>> (qemu) info cpus
+>> > >>> >>> * CPU #0: thread_id=24175
+>> > >>> >>> (qemu) q
+>> > >>> >>>
+>> > >>> >>> $ aarch64-softmmu/qemu-system-aarch64 -M netduino2 -kernel ./u-boot.elf -nographic -cpu "cortex-m4" -S
+>> > >>> >>> QEMU 2.10.50 monitor - type 'help' for more information
+>> > >>> >>> (qemu) q
+>> > >>> >>>
+>> > >>> >>> $ aarch64-softmmu/qemu-system-aarch64 -M netduino2 -kernel ./u-boot.elf -nographic -cpu "cortex-m5" -S
+>> > >>> >>> qemu-system-aarch64: unable to find CPU model 'cortex-m5'
+>> > >>> >>>
+>> > >>> >>> $ aarch64-softmmu/qemu-system-aarch64 -M netduino2 -kernel ./u-boot.elf -nographic -cpu "cortex-a9" -S
+>> > >>> >>> qemu-system-aarch64: Invalid CPU type: cortex-a9-arm-cpu
+>> > >>> >>> The valid types are: cortex-m3-arm-cpu, cortex-m4-arm-cpu
+>> > >>> >>
+>> > >>> >> Thanks for this; we really should be more strict about
+>> > >>> >> forbidding "won't work" combinations than we have
+>> > >>> >> been in the past.
+>> > >>> >>
+>> > >>> >> In the last of these cases, I think that when we
+>> > >>> >> list the invalid CPU type and the valid types
+>> > >>> >> we should use the same names we want the user to
+>> > >>> >> use on the command line, without the "-arm-cpu"
+>> > >>> >> suffixes.
+>> > >>> >
+>> > >>> > Hmm... That is a good point, it is confusing that they don't line up.
+>> > >>
+>> > >> Agreed.
+>> > >>
+>> > >>> >
+>> > >>> > The problem is that we are just doing a simple
+>> > >>> > object_class_dynamic_cast() in hw/core/machine.c which I think
+>> > >>> > (untested) requires us to have the full name in the valid cpu array.
+>> > >> [...]
+>> > >>>
+>> > >>> I think an earlier version of my previous series adding the support to
+>> > >>> machine.c did string comparison, but it was decided to utilise objects
+>> > >>> instead. One option is to make the array 2 wide and have the second
+>> > >>> string be user friendly?
+>> > >>
+>> > >> Making the array 2-column will duplicate information that we can
+>> > >> already find out using other methods, and it won't solve the
+>> > >> problem if an entry has a parent class with multiple subclasses
+>> > >> (the original reason I suggested object_class_dynamic_cast()).
+>> > >>
+>> > >> The main obstacle to fix this easily is that we do have a common
+>> > >>   ObjectClass *cpu_class_by_name(const char *cpu_model)
+>> > >> function, but not a common method to get the model name from a
+>> > >> CPUClass.  Implementing this is possible, but probably better to
+>> > >> do it after moving the existing arch-specific CPU model
+>> > >> enumeration hooks to common code (currently we duplicate lots of
+>> > >> CPU enumeration/lookup boilerplate code that we shouldn't have
+>> > >> to).
+>> > >>
+>> > >> Listing only the human-friendly names in the array like in the
+>> > >> original patch could be a reasonable temporary solution.  It
+>> > >> won't allow us to use a single entry for all subclasses of a
+>> > >> given type by now (e.g. listing only TYPE_X86_CPU on PC), but at
+>> > >> least we can address this issue without waiting for a refactor of
+>> > >> the CPU model enumeration code.
+>> >
+>> > Ah, I just re-read this. Do you mean go back to the original RFC and
+>> > just use strcmp() to compare the human readable cpu_model?
+>> It's sort of going backwards but I won't object to this as far as you
+>> won't use machine->cpu_model (which is in process of being removed)
+
+Wait, machine->cpu_model is the human readable name. Without using
+that we can't use just human readable strings for the valid cpu types.
+
+Alistair
+
 >>
->> Upshot of discussion: exposing naked errnos are platform dependent.
-> Right, that's what Eric mentioned.
->
->>>    and
->>> the result was that nobody had an actual use for error codes other th=
-an
->>> presenting the right error message to the user - which the error stri=
-ng
->>> already achieves.
->> Given the platform independence requirement, exposing errors to client=
-s is
->> not that simple given that different OSs use different errno values.=C2=
-=A0 Other
->> options/considerations than exposing naked errno values:
 >>
->> - Having a platform-independent enumeration of errors, as Eric suggest=
-ed.
->> This would have to explicitly set an enumerated value for each individ=
-ual
->> errno we are interested in.=C2=A0 It would be returned in a field that=
- ~parallels
->> the "reason" string.=C2=A0 This should be OK since for BLOCK_IO_ERROR =
-events we
->> could limit values to just storage device errors plus a default "other=
-";
->> otherwise this could be hard to maintain.
-> But what are "storage device errors"? Can't we get more or less any
-> error while processing an I/O request?
+>> BTW:
+>> how hard is it, to add  cpu_type2cpu_name function?
 >
->> - The strerror strings cannot be used because they can change with loc=
-ale.
->> (This also assumes the strings are identical for given errnos
->> cross-platform, and that there are no typos - which are not automatica=
-lly
->> checked-for.)
-> You mean when you aggregate errors from multiple different hosts runnin=
-g
-> on different platforms and where you don't control the locale?
+> It shouldn't be hard, but I would like to avoid adding yet
+> another arch-specific hook just for that.  Probably we would need
+> to clean up the existing CPU model enumeration/lookup code if we
+> want to avoid increase duplication of code on arch-specific
+> hooks.
 >
-> But cross-platform, even the exact numeric error codes you get may
-> differ, so they become even less meaningful than they already are on a
-> single platform.
->
-> Kevin
+> --
+> Eduardo
 >
