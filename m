@@ -1,35 +1,37 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50417)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50543)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1eZDqo-0000GK-HP
-	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 05:43:22 -0500
+	(envelope-from <dovgaluk@ispras.ru>) id 1eZDr3-0000Oi-Pd
+	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 05:43:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1eZDqk-0006kx-IF
-	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 05:43:18 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:44418)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1eZDqk-0006kK-Bb
-	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 05:43:14 -0500
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 5AB5B5FD76
-	for <qemu-devel@nongnu.org>; Wed, 10 Jan 2018 10:43:13 +0000 (UTC)
-From: Juan Quintela <quintela@redhat.com>
-In-Reply-To: <a037b7b8-2e5c-c800-da49-e0edfcb6eed0@redhat.com> (Laurent
-	Vivier's message of "Wed, 10 Jan 2018 11:12:14 +0100")
-References: <20180105215246.908-1-quintela@redhat.com>
-	<20180105215246.908-3-quintela@redhat.com>
-	<20180110062545.GB5984@xz-mi> <87incayua8.fsf@secure.laptop>
-	<82a94975-e040-298d-7d10-7448a4a0af48@redhat.com>
-	<a037b7b8-2e5c-c800-da49-e0edfcb6eed0@redhat.com>
-Reply-To: quintela@redhat.com
-Date: Wed, 10 Jan 2018 11:43:06 +0100
-Message-ID: <878td6yoxx.fsf@secure.laptop>
+	(envelope-from <dovgaluk@ispras.ru>) id 1eZDqz-0006wG-Pc
+	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 05:43:33 -0500
+Received: from mail.ispras.ru ([83.149.199.45]:41236)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <dovgaluk@ispras.ru>) id 1eZDqz-0006vE-HC
+	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 05:43:29 -0500
+From: "Pavel Dovgalyuk" <dovgaluk@ispras.ru>
+References: <20171116115926.16627-1-pbonzini@redhat.com>
+	<20171116115926.16627-8-pbonzini@redhat.com>
+	<CAFEAcA-06-VmH7Pvymo-o-HmiQ-uQ67Hs0KhWZfxswBxsfD2-g@mail.gmail.com>
+	<bf4bedd9-0ef8-cff3-6153-531fba597237@redhat.com>
+	<CAFEAcA9Rnd3gtrHb389e6fOEAae4aLhJnQWU-vKyzTM4o-riOQ@mail.gmail.com>
+	<001b01d361e9$d46ace40$7d406ac0$@ru>
+	<CAFEAcA8NGnmG_8SipvPN5_dPhokH2zZAXykN2KiW10XhB-9xXQ@mail.gmail.com>
+	<CAFEAcA9PUOyK_vEnMKJkZV5s7o4zHDRedUY7z0ZH0i5ULEGzwg@mail.gmail.com>
+	<004401d3894c$b3fc90f0$1bf5b2d0$@ru>
+	<CAFEAcA8GiMDyFU4j3OvZ7F=fXk93B4447RQnpp+9cHWUGMp7Ag@mail.gmail.com>
+	<001401d389e1$495ffa30$dc1fee90$@ru>
+	<CAFEAcA_RCunjurjJt3rrOp+0hHXCZgK2X9mM857fKtF8v=Kb+Q@mail.gmail.com>
+In-Reply-To: <CAFEAcA_RCunjurjJt3rrOp+0hHXCZgK2X9mM857fKtF8v=Kb+Q@mail.gmail.com>
+Date: Wed, 10 Jan 2018 13:43:28 +0300
+Message-ID: <001b01d389ff$da0765a0$8e1630e0$@ru>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v4 02/11] tests: Migration ppc test was
- missing arguments
+Content-Type: text/plain;
+	charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+Content-Language: ru
+Subject: Re: [Qemu-devel] [PULL 07/11] cpu-exec: don't overwrite
+ exception_index
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,39 +40,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Vivier <lvivier@redhat.com>
-Cc: Peter Xu <peterx@redhat.com>, qemu-devel@nongnu.org, dgilbert@redhat.com
+To: 'Peter Maydell' <peter.maydell@linaro.org>
+Cc: 'Paolo Bonzini' <pbonzini@redhat.com>, 'QEMU Developers' <qemu-devel@nongnu.org>, 'Pavel Dovgalyuk' <pavel.dovgaluk@ispras.ru>
 
-Laurent Vivier <lvivier@redhat.com> wrote:
-> On 10/01/2018 10:21, Laurent Vivier wrote:
->> On 10/01/2018 09:47, Juan Quintela wrote:
->>> Peter Xu <peterx@redhat.com> wrote:
->>>> On Fri, Jan 05, 2018 at 10:52:37PM +0100, Juan Quintela wrote:
->>>>> Argument file is also needed there.
->>>>>
->>>>> Signed-off-by: Juan Quintela <quintela@redhat.com>
->>>>
->>>> Reviewed-by: Peter Xu <peterx@redhat.com>
->>>>
->>>> Does it also mean this?
->>>>
->>>> Fixes: aaf89c8a49a8c ("test: port postcopy test to ppc64")
->>>
->>> Dunno.  I was trying to consolidate the command line options for ppc and
->>> x86 when I found this problem.  I haven't tested of ppc.
->> 
->> I don't think it is needed. I think the content of the nvram is migrated
->> (otherwise the test wouldn't work at all).
->> 
->> The nvram is created by default, we need the command line parameter only
->> to populate it from a file.
->
-> A better change would be to use "-prom-env" instead of "-driver
-> if=pflash". I can send the patch if you want to add it in your series.
+> From: Peter Maydell [mailto:peter.maydell@linaro.org]
+> On 10 January 2018 at 07:04, Pavel Dovgalyuk <dovgaluk@ispras.ru> wrote:
+> > The failure cause is in incorrect interrupt processing.
+> > When ARM processes hardware interrupt in arm_cpu_exec_interrupt(),
+> > it executes cs->exception_index = excp_idx;
+> >
+> > This assumes, that the exception will be processed later.
+> > But it is processed immediately by calling cc->do_interrupt(cs);
+> > instead of leaving this job to cpu_exec.
+> 
+> That seems fine to me. The code knows it needs to take
+> an interrupt, it has all the information it needs to do
+> it, it can just go ahead and call the code that takes
+> the interrupt. The comment in accel/tcg/cpu-exec.c says:
+> 
+>         /* The target hook has 3 exit conditions:
+>            False when the interrupt isn't processed,
+>            True when it is, and we should restart on a new TB,
+>            and via longjmp via cpu_loop_exit.  */
+> 
+> and here we have processed the interrupt and returned true.
+> We set exception_index because that's how you tell the
+> do_interrupt hook which interrupt to deal with.
+> 
+> That is, the pattern that the arm target code assumes for
+> cs->exception_index is "you don't set this unless you're
+> about to call do_interrupt; if you do set it then definitely
+> call do_interrupt and don't do anything much in between".
+> In that view of the world there's no need to reset it or
+> check it because nothing is permitted to happen between
+> "set value" and "call do_interrupt". This is in line with
+> the way we handle other arm-specific bits of information
+> associated with the exception, like env->exception.target_el.
+> Having a long gap between "set value" and "do_interrupt"
+> is worrying because it means that maybe we might end
+> up doing something else in that gap that corrupts the
+> various bits of information associated with the exception,
+> or something that's not architecturally permitted to
+> happen at that point.
 
-Told the command line and I will add to the line.
+I see.
+I found the same pattern in other targets.
+But only MIPS resets exception_index after processing
+the interrupt. Others do not bother.
+Then the following change of cpu_exec should be correct?
 
-And using the same command in both sides makes easier to see that it is
-correct.
+            if (cc->cpu_exec_interrupt(cpu, interrupt_request)) {
+                replay_interrupt();
++               cpu->exception_index = -1;
+                *last_tb = NULL;
+            }
 
-Later, Juan.
+Pavel Dovgalyuk
