@@ -1,24 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56632)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60187)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <michael@walle.cc>) id 1eZCt3-0001fT-EF
-	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 04:41:34 -0500
+	(envelope-from <quintela@redhat.com>) id 1eZD2L-0004Xn-6B
+	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 04:51:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <michael@walle.cc>) id 1eZCt2-0007cN-IF
-	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 04:41:33 -0500
+	(envelope-from <quintela@redhat.com>) id 1eZD2H-0000Ub-9n
+	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 04:51:09 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:52264)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1eZD2H-0000Td-2l
+	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 04:51:05 -0500
+From: Juan Quintela <quintela@redhat.com>
+In-Reply-To: <001601d389f6$0816d2f0$184478d0$@ru> (Pavel Dovgalyuk's message
+	of "Wed, 10 Jan 2018 12:33:11 +0300")
+References: <20171220100205.16625.84632.stgit@pasha-VirtualBox>
+	<003c01d38923$1c5157f0$54f407d0$@ru> <87efmz1ddp.fsf@secure.laptop>
+	<004301d38940$56013bb0$0203b310$@ru> <87zi5nyyap.fsf@secure.laptop>
+	<001601d389f6$0816d2f0$184478d0$@ru>
+Reply-To: quintela@redhat.com
+Date: Wed, 10 Jan 2018 10:50:58 +0100
+Message-ID: <87d12iyrct.fsf@secure.laptop>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8;
- format=flowed
-Date: Wed, 10 Jan 2018 10:41:24 +0100
-From: Michael Walle <michael@walle.cc>
-In-Reply-To: <CAAdtpL7bno=1yrRYK6zt4pgDsa8N-8d291pzX0rhNBVqgkKi4g@mail.gmail.com>
-References: <20180103162400.10396-1-f4bug@amsat.org>
-	<20180103162400.10396-3-f4bug@amsat.org>
-	<60c89dbec86c14e2f0883d121872d0f6@walle.cc>
-	<CAAdtpL7bno=1yrRYK6zt4pgDsa8N-8d291pzX0rhNBVqgkKi4g@mail.gmail.com>
-Message-ID: <a06fcf38a03e63ffda2baa50f01e0769@walle.cc>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 2/6] hw/sd/milkymist-memcard: split
- realize() out of SysBusDevice init()
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v2] hpet: recover timer offset correctly
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,68 +30,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Cc: Alistair Francis <alistair.francis@xilinx.com>, Peter Maydell <peter.maydell@linaro.org>, Xiaoqiang Zhao <zxq_yx_007@163.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, "Edgar E .
-	Iglesias" <edgar.iglesias@xilinx.com>, qemu-arm <qemu-arm@nongnu.org>, philippe.mathieu.daude@gmail.com
+To: Pavel Dovgalyuk <dovgaluk@ispras.ru>
+Cc: 'Pavel Dovgalyuk' <Pavel.Dovgaluk@ispras.ru>, qemu-devel@nongnu.org, mst@redhat.com, dgilbert@redhat.com, maria.klimushenkova@ispras.ru, pbonzini@redhat.com
 
-Hi Philippe,
+"Pavel Dovgalyuk" <dovgaluk@ispras.ru> wrote:
+>> From: Juan Quintela [mailto:quintela@redhat.com]
+>> "Pavel Dovgalyuk" <dovgaluk@ispras.ru> wrote:
+>> >> From: Juan Quintela [mailto:quintela@redhat.com]
+>> If you *don't* use a needed function then please just increase the
+>> version.  You are just breaking compatibility anyways.  The whole point
+>> of subsections is that they are optional.  If they are mandatory (this
+>> case), then they bring no advantage at all.
+>
+> Thanks, I thought that the sections are skipped automatically when
+> there is no code for loading
+> them.
+>
+>> What dave is asked for your previous version is that you disable the
+>> section for old machine types.  Look at how to use DEFINE_PROP_* for
+>> this use case.
+>
+> How do you like this one?
 
-Am 2018-01-09 19:16, schrieb Philippe Mathieu-Daud=C3=A9:
-> Hi Michael,
->=20
->> Am 2018-01-03 17:23, schrieb Philippe Mathieu-Daud=C3=A9:
->>>=20
->>> Create the SDCard in the realize() function.
->>>=20
->>> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
->>> ---
->>>  hw/sd/milkymist-memcard.c | 24 +++++++++++++++---------
->>>  1 file changed, 15 insertions(+), 9 deletions(-)
->>>=20
->>> diff --git a/hw/sd/milkymist-memcard.c b/hw/sd/milkymist-memcard.c
->>> index 5de3e00e2f..5df3a0f815 100644
->>> --- a/hw/sd/milkymist-memcard.c
->>> +++ b/hw/sd/milkymist-memcard.c
->>> @@ -255,24 +255,29 @@ static void milkymist_memcard_reset(DeviceState=
-=20
->>> *d)
->>>  static int milkymist_memcard_init(SysBusDevice *dev)
->>>  {
->>>      MilkymistMemcardState *s =3D MILKYMIST_MEMCARD(dev);
->>> -    DriveInfo *dinfo;
->>> +
->>> +    memory_region_init_io(&s->regs_region, OBJECT(s),=20
->>> &memcard_mmio_ops,
->>> s,
->>> +            "milkymist-memcard", R_MAX * 4);
->>> +    sysbus_init_mmio(dev, &s->regs_region);
->>> +
->>> +    return 0;
->>> +}
->>=20
->>=20
->> Creating the device (milkymist_memcard_create()) fails with an=20
->> assertion:
->>   sysbus_mmio_map_common: Assertion `n >=3D 0 && n < dev->num_mmio'=20
->> failed.
->=20
-> Thanks for trying this.
->=20
-> Odd 'make check-qtest-lm32' didn't catch this...
->=20
->> because dev->num_mmio is still 0. Seems that sysbus_init_mmio() hasn't=
-=20
->> been
->> called yet. Do we have to move the milkymist_memcard_init() to
->> .instance_init?
->=20
-> Your patch seems correct :)
->=20
-> Do you have some milky one prebuilt image that I can use for testing?
+Much better, thanks.
 
-You can use this one:
-   http://milkymist.walle.cc/updates/2012-03-01/flickernoise
+> +static bool hpet_offset_needed(void *opaque)
+> +{
+> +    HPETState *s = opaque;
+> +
+> +    return s->hpet_offset_saved;
+> +}
+> +
 
-http://milkymist.walle.cc/README.qemu
+If this is only one optimization, this test is ok.  If it makes things
+go worse, you can add something there like && hpet_enabled() or
+whatever.  Remember that I don't understand HPET.
 
--michael
+
+> diff --git a/include/hw/compat.h b/include/hw/compat.h
+> index 263de97..8897302 100644
+> --- a/include/hw/compat.h
+> +++ b/include/hw/compat.h
+> @@ -13,6 +13,10 @@
+>          .driver   = "virtio-tablet-device",\
+>          .property = "wheel-axis",\
+>          .value    = "false",\
+> +    },{\
+> +        .driver   = "hpet",\
+> +        .property = "hpet-offset-saved",\
+> +        .value    = "off",\
+>      },
+>  
+>  #define HW_COMPAT_2_9 \
+
+This should be on 2_11 not 2_10 O:-)
+
+But for the vmstate bits:
+
+Reviewed-by: Juan Quintela <quintela@redhat.com>
