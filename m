@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45173)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45130)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mjc@sifive.com>) id 1eZQ7Y-0006Vi-6h
-	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 18:49:28 -0500
+	(envelope-from <mjc@sifive.com>) id 1eZQ7U-0006Uo-Ox
+	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 18:49:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mjc@sifive.com>) id 1eZQ7R-0000g4-Du
-	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 18:49:22 -0500
-Received: from mail-pg0-x241.google.com ([2607:f8b0:400e:c05::241]:40448)
+	(envelope-from <mjc@sifive.com>) id 1eZQ7P-0000eb-Kq
+	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 18:49:20 -0500
+Received: from mail-pg0-x244.google.com ([2607:f8b0:400e:c05::244]:43840)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mjc@sifive.com>) id 1eZQ7Q-0000fK-UI
-	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 18:49:17 -0500
-Received: by mail-pg0-x241.google.com with SMTP id q12so1109480pgt.7
-	for <qemu-devel@nongnu.org>; Wed, 10 Jan 2018 15:49:16 -0800 (PST)
+	(Exim 4.71) (envelope-from <mjc@sifive.com>) id 1eZQ7O-0000dj-Tu
+	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 18:49:15 -0500
+Received: by mail-pg0-x244.google.com with SMTP id f14so1092985pga.10
+	for <qemu-devel@nongnu.org>; Wed, 10 Jan 2018 15:49:14 -0800 (PST)
 From: Michael Clark <mjc@sifive.com>
-Date: Wed, 10 Jan 2018 15:46:40 -0800
-Message-Id: <1515628000-93285-22-git-send-email-mjc@sifive.com>
+Date: Wed, 10 Jan 2018 15:46:38 -0800
+Message-Id: <1515628000-93285-20-git-send-email-mjc@sifive.com>
 In-Reply-To: <1515628000-93285-1-git-send-email-mjc@sifive.com>
 References: <1515628000-93285-1-git-send-email-mjc@sifive.com>
-Subject: [Qemu-devel] [PATCH v2 21/21] RISC-V Build Infrastructure
+Subject: [Qemu-devel] [PATCH v2 19/21] SiFive Freedom E300 RISC-V Machine
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,279 +28,341 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Michael Clark <mjc@sifive.com>, Palmer Dabbelt <palmer@sifive.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, RISC-V Patches <patches+subscribe@groups.riscv.org>
 
-This adds RISC-V into the build system enabling the following targets:
+This provides a RISC-V Board compatible with the the SiFive E300 SDK.
+The following machine is implemented:
 
-- riscv32-softmmu
-- riscv64-softmmu
-- riscv32-linux-user
-- riscv64-linux-user
+- 'sifive_e300'; CLINT, PLIC, UART, AON, GPIO, QSPI, PWM
 
-This adds defaults configs for RISC-V, enables the build for the RISC-V
-CPU core, hardware, and Linux User Emulation. The 'qemu-binfmt-conf.sh'
-script is updated to add the RISC-V ELF magic.
-
-Expected checkpatch errors for consistency reasons:
-
-ERROR: line over 90 characters
-FILE: scripts/qemu-binfmt-conf.sh
 Signed-off-by: Michael Clark <mjc@sifive.com>
 ---
- Makefile.objs                          |  1 +
- arch_init.c                            |  2 ++
- configure                              | 11 +++++++++++
- cpus.c                                 |  6 ++++++
- default-configs/riscv32-linux-user.mak |  1 +
- default-configs/riscv32-softmmu.mak    |  4 ++++
- default-configs/riscv64-linux-user.mak |  1 +
- default-configs/riscv64-softmmu.mak    |  4 ++++
- hw/riscv/Makefile.objs                 | 12 ++++++++++++
- include/sysemu/arch_init.h             |  1 +
- qapi-schema.json                       | 14 +++++++++++++-
- scripts/qemu-binfmt-conf.sh            | 13 ++++++++++++-
- target/riscv/Makefile.objs             |  2 ++
- target/riscv/trace-events              |  1 +
- 14 files changed, 71 insertions(+), 2 deletions(-)
- create mode 100644 default-configs/riscv32-linux-user.mak
- create mode 100644 default-configs/riscv32-softmmu.mak
- create mode 100644 default-configs/riscv64-linux-user.mak
- create mode 100644 default-configs/riscv64-softmmu.mak
- create mode 100644 hw/riscv/Makefile.objs
- create mode 100644 target/riscv/Makefile.objs
- create mode 100644 target/riscv/trace-events
+ hw/riscv/sifive_e300.c         | 232 +++++++++++++++++++++++++++++++++++++++++
+ include/hw/riscv/sifive_e300.h |  79 ++++++++++++++
+ 2 files changed, 311 insertions(+)
+ create mode 100644 hw/riscv/sifive_e300.c
+ create mode 100644 include/hw/riscv/sifive_e300.h
 
-diff --git a/Makefile.objs b/Makefile.objs
-index 285c6f3..ae8658e 100644
---- a/Makefile.objs
-+++ b/Makefile.objs
-@@ -164,6 +164,7 @@ trace-events-subdirs += target/mips
- trace-events-subdirs += target/sparc
- trace-events-subdirs += target/s390x
- trace-events-subdirs += target/ppc
-+trace-events-subdirs += target/riscv
- trace-events-subdirs += qom
- trace-events-subdirs += linux-user
- trace-events-subdirs += qapi
-diff --git a/arch_init.c b/arch_init.c
-index a0b8ed6..dcf356b 100644
---- a/arch_init.c
-+++ b/arch_init.c
-@@ -69,6 +69,8 @@ int graphic_depth = 32;
- #define QEMU_ARCH QEMU_ARCH_OPENRISC
- #elif defined(TARGET_PPC)
- #define QEMU_ARCH QEMU_ARCH_PPC
-+#elif defined(TARGET_RISCV)
-+#define QEMU_ARCH QEMU_ARCH_RISCV
- #elif defined(TARGET_S390X)
- #define QEMU_ARCH QEMU_ARCH_S390X
- #elif defined(TARGET_SH4)
-diff --git a/configure b/configure
-index 6a04082..a8151f9 100755
---- a/configure
-+++ b/configure
-@@ -6565,6 +6565,14 @@ case "$target_name" in
-     echo "TARGET_ABI32=y" >> $config_target_mak
-     gdb_xml_files="power64-core.xml power-fpu.xml power-altivec.xml power-spe.xml power-vsx.xml"
-   ;;
-+  riscv32)
-+    TARGET_BASE_ARCH=riscv
-+    TARGET_ABI_DIR=riscv
-+  ;;
-+  riscv64)
-+    TARGET_BASE_ARCH=riscv
-+    TARGET_ABI_DIR=riscv
-+  ;;
-   sh4|sh4eb)
-     TARGET_ARCH=sh4
-     bflt="yes"
-@@ -6730,6 +6738,9 @@ for i in $ARCH $TARGET_BASE_ARCH ; do
-   ppc*)
-     disas_config "PPC"
-   ;;
-+  riscv)
-+    disas_config "RISCV"
-+  ;;
-   s390*)
-     disas_config "S390"
-   ;;
-diff --git a/cpus.c b/cpus.c
-index e8139de..499be10 100644
---- a/cpus.c
-+++ b/cpus.c
-@@ -1995,6 +1995,9 @@ CpuInfoList *qmp_query_cpus(Error **errp)
- #elif defined(TARGET_SPARC)
-         SPARCCPU *sparc_cpu = SPARC_CPU(cpu);
-         CPUSPARCState *env = &sparc_cpu->env;
-+#elif defined(TARGET_RISCV)
-+        RISCVCPU *riscv_cpu = RISCV_CPU(cpu);
-+        CPURISCVState *env = &riscv_cpu->env;
- #elif defined(TARGET_MIPS)
-         MIPSCPU *mips_cpu = MIPS_CPU(cpu);
-         CPUMIPSState *env = &mips_cpu->env;
-@@ -2028,6 +2031,9 @@ CpuInfoList *qmp_query_cpus(Error **errp)
- #elif defined(TARGET_TRICORE)
-         info->value->arch = CPU_INFO_ARCH_TRICORE;
-         info->value->u.tricore.PC = env->PC;
-+#elif defined(TARGET_RISCV)
-+        info->value->arch = CPU_INFO_ARCH_RISCV;
-+        info->value->u.riscv.pc = env->pc;
- #else
-         info->value->arch = CPU_INFO_ARCH_OTHER;
- #endif
-diff --git a/default-configs/riscv32-linux-user.mak b/default-configs/riscv32-linux-user.mak
+diff --git a/hw/riscv/sifive_e300.c b/hw/riscv/sifive_e300.c
 new file mode 100644
-index 0000000..865b362
+index 0000000..bbea55a
 --- /dev/null
-+++ b/default-configs/riscv32-linux-user.mak
-@@ -0,0 +1 @@
-+# Default configuration for riscv-linux-user
-diff --git a/default-configs/riscv32-softmmu.mak b/default-configs/riscv32-softmmu.mak
-new file mode 100644
-index 0000000..f9e7421
---- /dev/null
-+++ b/default-configs/riscv32-softmmu.mak
-@@ -0,0 +1,4 @@
-+# Default configuration for riscv-softmmu
++++ b/hw/riscv/sifive_e300.c
+@@ -0,0 +1,232 @@
++/*
++ * QEMU RISC-V Board Compatible with SiFive E300 SDK
++ *
++ * Copyright (c) 2017 SiFive, Inc.
++ *
++ * Provides a board compatible with the bsp in the SiFive E300 SDK:
++ *
++ * 0) UART
++ * 1) CLINT (Core Level Interruptor)
++ * 2) PLIC (Platform Level Interrupt Controller)
++ * 3) PRCI (Power, Reset, Clock, Interrupt)
++ * 4) Registers emulated as RAM: AON, GPIO, QSPI, PWM
++ * 5) Flash memory emulated as RAM
++ *
++ * The Mask ROM reset vector jumps to the flash payload at 0x2040_0000.
++ * The OTP ROM and Flash boot code will be emulated in a future version.
++ *
++ * Permission is hereby granted, free of charge, to any person obtaining a copy
++ * of this software and associated documentation files (the "Software"), to deal
++ * in the Software without restriction, including without limitation the rights
++ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
++ * copies of the Software, and to permit persons to whom the Software is
++ * furnished to do so, subject to the following conditions:
++ *
++ * The above copyright notice and this permission notice shall be included in
++ * all copies or substantial portions of the Software.
++ *
++ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
++ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
++ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
++ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
++ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
++ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
++ * THE SOFTWARE.
++ */
 +
-+CONFIG_SERIAL=y
-+CONFIG_VIRTIO=y
-diff --git a/default-configs/riscv64-linux-user.mak b/default-configs/riscv64-linux-user.mak
-new file mode 100644
-index 0000000..865b362
---- /dev/null
-+++ b/default-configs/riscv64-linux-user.mak
-@@ -0,0 +1 @@
-+# Default configuration for riscv-linux-user
-diff --git a/default-configs/riscv64-softmmu.mak b/default-configs/riscv64-softmmu.mak
-new file mode 100644
-index 0000000..f9e7421
---- /dev/null
-+++ b/default-configs/riscv64-softmmu.mak
-@@ -0,0 +1,4 @@
-+# Default configuration for riscv-softmmu
++#include "qemu/osdep.h"
++#include "qemu/log.h"
++#include "qemu/error-report.h"
++#include "hw/hw.h"
++#include "hw/boards.h"
++#include "hw/loader.h"
++#include "hw/sysbus.h"
++#include "hw/char/serial.h"
++#include "target/riscv/cpu.h"
++#include "hw/riscv/riscv_hart.h"
++#include "hw/riscv/sifive_plic.h"
++#include "hw/riscv/sifive_clint.h"
++#include "hw/riscv/sifive_prci.h"
++#include "hw/riscv/sifive_uart.h"
++#include "hw/riscv/sifive_e300.h"
++#include "chardev/char.h"
++#include "sysemu/arch_init.h"
++#include "exec/address-spaces.h"
++#include "elf.h"
 +
-+CONFIG_SERIAL=y
-+CONFIG_VIRTIO=y
-diff --git a/hw/riscv/Makefile.objs b/hw/riscv/Makefile.objs
-new file mode 100644
-index 0000000..a0c31ae
---- /dev/null
-+++ b/hw/riscv/Makefile.objs
-@@ -0,0 +1,12 @@
-+obj-y += riscv_elf.o
-+obj-y += riscv_htif.o
-+obj-y += riscv_hart.o
-+obj-y += sifive_e300.o
-+obj-y += sifive_clint.o
-+obj-y += sifive_prci.o
-+obj-y += sifive_plic.o
-+obj-y += sifive_u500.o
-+obj-y += sifive_uart.o
-+obj-y += spike_v1_09.o
-+obj-y += spike_v1_10.o
-+obj-y += virt.o
-diff --git a/include/sysemu/arch_init.h b/include/sysemu/arch_init.h
-index 8751c46..63c6152 100644
---- a/include/sysemu/arch_init.h
-+++ b/include/sysemu/arch_init.h
-@@ -24,6 +24,7 @@ enum {
-     QEMU_ARCH_MOXIE = (1 << 15),
-     QEMU_ARCH_TRICORE = (1 << 16),
-     QEMU_ARCH_NIOS2 = (1 << 17),
-+    QEMU_ARCH_RISCV = (1 << 18),
- };
- 
- extern const uint32_t arch_type;
-diff --git a/qapi-schema.json b/qapi-schema.json
-index 5c06745..42d91f3 100644
---- a/qapi-schema.json
-+++ b/qapi-schema.json
-@@ -413,7 +413,7 @@
- # Since: 2.6
- ##
- { 'enum': 'CpuInfoArch',
--  'data': ['x86', 'sparc', 'ppc', 'mips', 'tricore', 'other' ] }
-+  'data': ['x86', 'sparc', 'ppc', 'mips', 'tricore', 'riscv', 'other' ] }
- 
- ##
- # @CpuInfo:
-@@ -452,6 +452,7 @@
-             'ppc': 'CpuInfoPPC',
-             'mips': 'CpuInfoMIPS',
-             'tricore': 'CpuInfoTricore',
-+            'riscv': 'CpuInfoRISCV',
-             'other': 'CpuInfoOther' } }
- 
- ##
-@@ -512,6 +513,17 @@
- { 'struct': 'CpuInfoTricore', 'data': { 'PC': 'int' } }
- 
- ##
-+# @CpuInfoRISCV:
-+#
-+# Additional information about a virtual RISCV CPU
-+#
-+# @pc: the instruction pointer
-+#
-+# Since 2.12
-+##
-+{ 'struct': 'CpuInfoRISCV', 'data': { 'pc': 'int' } }
++static const struct MemmapEntry {
++    hwaddr base;
++    hwaddr size;
++} sifive_e300_memmap[] = {
++    [SIFIVE_E300_DEBUG] =    {        0x0,      0x100 },
++    [SIFIVE_E300_MROM] =     {     0x1000,     0x2000 },
++    [SIFIVE_E300_OTP] =      {    0x20000,     0x2000 },
++    [SIFIVE_E300_CLINT] =    {  0x2000000,    0x10000 },
++    [SIFIVE_E300_PLIC] =     {  0xc000000,  0x4000000 },
++    [SIFIVE_E300_AON] =      { 0x10000000,     0x8000 },
++    [SIFIVE_E300_PRCI] =     { 0x10008000,     0x8000 },
++    [SIFIVE_E300_OTP_CTRL] = { 0x10010000,     0x1000 },
++    [SIFIVE_E300_GPIO0] =    { 0x10012000,     0x1000 },
++    [SIFIVE_E300_UART0] =    { 0x10013000,     0x1000 },
++    [SIFIVE_E300_QSPI0] =    { 0x10014000,     0x1000 },
++    [SIFIVE_E300_PWM0] =     { 0x10015000,     0x1000 },
++    [SIFIVE_E300_UART1] =    { 0x10023000,     0x1000 },
++    [SIFIVE_E300_QSPI1] =    { 0x10024000,     0x1000 },
++    [SIFIVE_E300_PWM1] =     { 0x10025000,     0x1000 },
++    [SIFIVE_E300_QSPI2] =    { 0x10034000,     0x1000 },
++    [SIFIVE_E300_PWM2] =     { 0x10035000,     0x1000 },
++    [SIFIVE_E300_XIP] =      { 0x20000000, 0x20000000 },
++    [SIFIVE_E300_DTIM] =     { 0x80000000,     0x4000 }
++};
 +
-+##
- # @CpuInfoOther:
- #
- # No additional information is available about the virtual CPU
-diff --git a/scripts/qemu-binfmt-conf.sh b/scripts/qemu-binfmt-conf.sh
-index 8afc3eb..c5ac660 100755
---- a/scripts/qemu-binfmt-conf.sh
-+++ b/scripts/qemu-binfmt-conf.sh
-@@ -4,7 +4,7 @@
- 
- qemu_target_list="i386 i486 alpha arm sparc32plus ppc ppc64 ppc64le m68k \
- mips mipsel mipsn32 mipsn32el mips64 mips64el \
--sh4 sh4eb s390x aarch64 hppa"
-+sh4 sh4eb s390x aarch64 hppa riscv32 riscv64"
- 
- i386_magic='\x7fELF\x01\x01\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02\x00\x03\x00'
- i386_mask='\xff\xff\xff\xff\xff\xfe\xfe\xff\xff\xff\xff\xff\xff\xff\xff\xff\xfe\xff\xff\xff'
-@@ -96,6 +96,14 @@ hppa_magic='\x7f\x45\x4c\x46\x01\x02\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00
- hppa_mask='\xff\xff\xff\xff\xff\xff\xff\x00\xff\xff\xff\xff\xff\xff\xff\xff\xff\xfe\xff\xff'
- hppa_family=hppa
- 
-+riscv32_magic='\x7fELF\x01\x01\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02\x00\xf3\x00'
-+riscv32_mask='\xff\xff\xff\xff\xff\xff\xff\x00\xff\xff\xff\xff\xff\xff\xff\xff\xfe\xff\xff\xff'
-+riscv32_family=riscv
++static uint64_t identity_translate(void *opaque, uint64_t addr)
++{
++    return addr;
++}
 +
-+riscv64_magic='\x7fELF\x02\x01\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02\x00\xf3\x00'
-+riscv64_mask='\xff\xff\xff\xff\xff\xff\xff\x00\xff\xff\xff\xff\xff\xff\xff\xff\xfe\xff\xff\xff'
-+riscv64_family=riscv
++static uint64_t load_kernel(const char *kernel_filename)
++{
++    uint64_t kernel_entry, kernel_high;
 +
- qemu_get_family() {
-     cpu=${HOST_ARCH:-$(uname -m)}
-     case "$cpu" in
-@@ -117,6 +125,9 @@ qemu_get_family() {
-     sparc*)
-         echo "sparc"
-         ;;
-+    riscv*)
-+        echo "riscv"
-+        ;;
-     *)
-         echo "$cpu"
-         ;;
-diff --git a/target/riscv/Makefile.objs b/target/riscv/Makefile.objs
++    if (load_elf(kernel_filename, identity_translate, NULL,
++                 &kernel_entry, NULL, &kernel_high,
++                 /* little_endian = */ 0, ELF_MACHINE, 1, 0) < 0) {
++        error_report("qemu: could not load kernel '%s'", kernel_filename);
++        exit(1);
++    }
++    return kernel_entry;
++}
++
++static void sifive_mmio_emulate(MemoryRegion *parent, const char *name,
++                             uintptr_t offset, uintptr_t length)
++{
++    MemoryRegion *mock_mmio = g_new(MemoryRegion, 1);
++    memory_region_init_ram(mock_mmio, NULL, name, length, &error_fatal);
++    memory_region_add_subregion(parent, offset, mock_mmio);
++}
++
++static void riscv_sifive_e300_init(MachineState *machine)
++{
++    const struct MemmapEntry *memmap = sifive_e300_memmap;
++
++    SiFiveE300State *s = g_new0(SiFiveE300State, 1);
++    MemoryRegion *sys_mem = get_system_memory();
++    MemoryRegion *main_mem = g_new(MemoryRegion, 1);
++    MemoryRegion *mask_rom = g_new(MemoryRegion, 1);
++    MemoryRegion *xip_mem = g_new(MemoryRegion, 1);
++
++    /* Initialize SOC */
++    object_initialize(&s->soc, sizeof(s->soc), TYPE_RISCV_HART_ARRAY);
++    object_property_add_child(OBJECT(machine), "soc", OBJECT(&s->soc),
++                              &error_abort);
++    object_property_set_str(OBJECT(&s->soc), TYPE_RISCV_CPU_IMAC_PRIV_1_10,
++                            "cpu-model", &error_abort);
++    object_property_set_int(OBJECT(&s->soc), smp_cpus, "num-harts",
++                            &error_abort);
++    object_property_set_bool(OBJECT(&s->soc), true, "realized",
++                            &error_abort);
++
++    /* Data Tightly Integrated Memory */
++    memory_region_init_ram(main_mem, NULL, "riscv.sifive.e300.ram",
++        memmap[SIFIVE_E300_DTIM].size, &error_fatal);
++    memory_region_add_subregion(sys_mem,
++        memmap[SIFIVE_E300_DTIM].base, main_mem);
++
++    /* Mask ROM */
++    memory_region_init_ram(mask_rom, NULL, "riscv.sifive.e300.mrom",
++        memmap[SIFIVE_E300_MROM].size, &error_fatal);
++    memory_region_add_subregion(sys_mem,
++        memmap[SIFIVE_E300_MROM].base, mask_rom);
++
++    /* MMIO */
++    s->plic = sifive_plic_create(memmap[SIFIVE_E300_PLIC].base,
++        (char *)SIFIVE_E300_PLIC_HART_CONFIG,
++        SIFIVE_E300_PLIC_NUM_SOURCES,
++        SIFIVE_E300_PLIC_NUM_PRIORITIES,
++        SIFIVE_E300_PLIC_PRIORITY_BASE,
++        SIFIVE_E300_PLIC_PENDING_BASE,
++        SIFIVE_E300_PLIC_ENABLE_BASE,
++        SIFIVE_E300_PLIC_ENABLE_STRIDE,
++        SIFIVE_E300_PLIC_CONTEXT_BASE,
++        SIFIVE_E300_PLIC_CONTEXT_STRIDE,
++        memmap[SIFIVE_E300_PLIC].size);
++    sifive_clint_create(memmap[SIFIVE_E300_CLINT].base,
++        memmap[SIFIVE_E300_CLINT].size, smp_cpus,
++        SIFIVE_SIP_BASE, SIFIVE_TIMECMP_BASE, SIFIVE_TIME_BASE);
++    sifive_mmio_emulate(sys_mem, "riscv.sifive.e300.aon",
++        memmap[SIFIVE_E300_AON].base, memmap[SIFIVE_E300_AON].size);
++    sifive_prci_create(memmap[SIFIVE_E300_PRCI].base);
++    sifive_mmio_emulate(sys_mem, "riscv.sifive.e300.gpio0",
++        memmap[SIFIVE_E300_GPIO0].base, memmap[SIFIVE_E300_GPIO0].size);
++    sifive_uart_create(sys_mem, memmap[SIFIVE_E300_UART0].base,
++        serial_hds[0], SIFIVE_PLIC(s->plic)->irqs[SIFIVE_E300_UART0_IRQ]);
++    sifive_mmio_emulate(sys_mem, "riscv.sifive.e300.qspi0",
++        memmap[SIFIVE_E300_QSPI0].base, memmap[SIFIVE_E300_QSPI0].size);
++    sifive_mmio_emulate(sys_mem, "riscv.sifive.e300.pwm0",
++        memmap[SIFIVE_E300_PWM0].base, memmap[SIFIVE_E300_PWM0].size);
++    /* sifive_uart_create(sys_mem, memmap[SIFIVE_E300_UART1].base,
++        serial_hds[1], SIFIVE_PLIC(s->plic)->irqs[SIFIVE_E300_UART1_IRQ]); */
++    sifive_mmio_emulate(sys_mem, "riscv.sifive.e300.qspi1",
++        memmap[SIFIVE_E300_QSPI1].base, memmap[SIFIVE_E300_QSPI1].size);
++    sifive_mmio_emulate(sys_mem, "riscv.sifive.e300.pwm1",
++        memmap[SIFIVE_E300_PWM1].base, memmap[SIFIVE_E300_PWM1].size);
++    sifive_mmio_emulate(sys_mem, "riscv.sifive.e300.qspi2",
++        memmap[SIFIVE_E300_QSPI2].base, memmap[SIFIVE_E300_QSPI2].size);
++    sifive_mmio_emulate(sys_mem, "riscv.sifive.e300.pwm2",
++        memmap[SIFIVE_E300_PWM2].base, memmap[SIFIVE_E300_PWM2].size);
++
++    /* Flash memory */
++    memory_region_init_ram(xip_mem, NULL, "riscv.sifive.e300.xip",
++        memmap[SIFIVE_E300_XIP].size, &error_fatal);
++    memory_region_set_readonly(xip_mem, true);
++    memory_region_add_subregion(sys_mem,
++        memmap[SIFIVE_E300_XIP].base, xip_mem);
++
++    /* Mask ROM reset vector */
++    uint32_t reset_vec[2] = {
++        0x204002b7,        /* 0x1000: lui     t0,0x20400 */
++        0x00028067,        /* 0x1004: jr      t0 */
++    };
++
++    /* copy in the reset vector */
++    cpu_physical_memory_write(0x1000, reset_vec, sizeof(reset_vec));
++    memory_region_set_readonly(mask_rom, true);
++
++    if (machine->kernel_filename) {
++        load_kernel(machine->kernel_filename);
++    }
++}
++
++static int riscv_sifive_e300_sysbus_device_init(SysBusDevice *sysbusdev)
++{
++    return 0;
++}
++
++static void riscv_sifive_e300_class_init(ObjectClass *klass, void *data)
++{
++    SysBusDeviceClass *k = SYS_BUS_DEVICE_CLASS(klass);
++    k->init = riscv_sifive_e300_sysbus_device_init;
++}
++
++static const TypeInfo riscv_sifive_e300_device = {
++    .name          = TYPE_SIFIVE_E300,
++    .parent        = TYPE_SYS_BUS_DEVICE,
++    .instance_size = sizeof(SiFiveE300State),
++    .class_init    = riscv_sifive_e300_class_init,
++};
++
++static void riscv_sifive_e300_machine_init(MachineClass *mc)
++{
++    mc->desc = "RISC-V Board compatible with SiFive E300 SDK";
++    mc->init = riscv_sifive_e300_init;
++    mc->max_cpus = 1;
++}
++
++DEFINE_MACHINE("sifive_e300", riscv_sifive_e300_machine_init)
++
++static void riscv_sifive_e300_register_types(void)
++{
++    type_register_static(&riscv_sifive_e300_device);
++}
++
++type_init(riscv_sifive_e300_register_types);
+diff --git a/include/hw/riscv/sifive_e300.h b/include/hw/riscv/sifive_e300.h
 new file mode 100644
-index 0000000..b9e9877
+index 0000000..453c43b
 --- /dev/null
-+++ b/target/riscv/Makefile.objs
-@@ -0,0 +1,2 @@
-+obj-y += translate.o op_helper.o helper.o cpu.o fpu_helper.o \
-+	user_atomic.o gdbstub.o pmp.o
-diff --git a/target/riscv/trace-events b/target/riscv/trace-events
-new file mode 100644
-index 0000000..9284b1f
---- /dev/null
-+++ b/target/riscv/trace-events
-@@ -0,0 +1 @@
-+# See docs/devel/tracing.txt for syntax documentation.
++++ b/include/hw/riscv/sifive_e300.h
+@@ -0,0 +1,79 @@
++/*
++ * SiFive E300 series machine interface
++ *
++ * Copyright (c) 2017 SiFive, Inc.
++ *
++ * Permission is hereby granted, free of charge, to any person obtaining a copy
++ * of this software and associated documentation files (the "Software"), to deal
++ * in the Software without restriction, including without limitation the rights
++ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
++ * copies of the Software, and to permit persons to whom the Software is
++ * furnished to do so, subject to the following conditions:
++ *
++ * The above copyright notice and this permission notice shall be included in
++ * all copies or substantial portions of the Software.
++ *
++ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
++ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
++ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
++ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
++ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
++ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
++ * THE SOFTWARE.
++ */
++
++#ifndef HW_SIFIVE_E300_H
++#define HW_SIFIVE_E300_H
++
++#define TYPE_SIFIVE_E300 "riscv.sifive.e300"
++
++#define SIFIVE_E300(obj) \
++    OBJECT_CHECK(SiFiveE300State, (obj), TYPE_SIFIVE_E300)
++
++typedef struct SiFiveE300State {
++    /*< private >*/
++    SysBusDevice parent_obj;
++
++    /*< public >*/
++    RISCVHartArrayState soc;
++    DeviceState *plic;
++} SiFiveE300State;
++
++enum {
++    SIFIVE_E300_DEBUG,
++    SIFIVE_E300_MROM,
++    SIFIVE_E300_OTP,
++    SIFIVE_E300_CLINT,
++    SIFIVE_E300_PLIC,
++    SIFIVE_E300_AON,
++    SIFIVE_E300_PRCI,
++    SIFIVE_E300_OTP_CTRL,
++    SIFIVE_E300_GPIO0,
++    SIFIVE_E300_UART0,
++    SIFIVE_E300_QSPI0,
++    SIFIVE_E300_PWM0,
++    SIFIVE_E300_UART1,
++    SIFIVE_E300_QSPI1,
++    SIFIVE_E300_PWM1,
++    SIFIVE_E300_QSPI2,
++    SIFIVE_E300_PWM2,
++    SIFIVE_E300_XIP,
++    SIFIVE_E300_DTIM
++};
++
++enum {
++    SIFIVE_E300_UART0_IRQ = 3,
++    SIFIVE_E300_UART1_IRQ = 4
++};
++
++#define SIFIVE_E300_PLIC_HART_CONFIG "M"
++#define SIFIVE_E300_PLIC_NUM_SOURCES 127
++#define SIFIVE_E300_PLIC_NUM_PRIORITIES 7
++#define SIFIVE_E300_PLIC_PRIORITY_BASE 0x0
++#define SIFIVE_E300_PLIC_PENDING_BASE 0x1000
++#define SIFIVE_E300_PLIC_ENABLE_BASE 0x2000
++#define SIFIVE_E300_PLIC_ENABLE_STRIDE 0x80
++#define SIFIVE_E300_PLIC_CONTEXT_BASE 0x200000
++#define SIFIVE_E300_PLIC_CONTEXT_STRIDE 0x1000
++
++#endif
 -- 
 2.7.0
