@@ -1,32 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41504)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43615)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1eZCDr-0004eS-Lw
-	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 03:59:00 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1eZCIS-0007As-6t
+	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 04:03:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1eZCDo-0005ML-Gm
-	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 03:58:59 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:31902)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1eZCDo-0005LI-7Q
-	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 03:58:56 -0500
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 28CB23DE3D
-	for <qemu-devel@nongnu.org>; Wed, 10 Jan 2018 08:58:55 +0000 (UTC)
-Date: Wed, 10 Jan 2018 16:58:51 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20180110085851.GK5984@xz-mi>
-References: <20180105215246.908-1-quintela@redhat.com>
-	<20180105215246.908-6-quintela@redhat.com>
-	<20180110063707.GD5984@xz-mi> <87mv1myubq.fsf@secure.laptop>
+	(envelope-from <dgibson@ozlabs.org>) id 1eZCIP-00034u-IL
+	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 04:03:44 -0500
+Date: Wed, 10 Jan 2018 19:59:58 +1100
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20180110085958.GJ19773@umbus.fritz.box>
+References: <20171016093641.GH2776@umbus.fritz.box>
+	<e419ca8a-6e0b-70eb-14da-03a843fa8b92@ozlabs.ru>
+	<20171019062440.GY2776@umbus.fritz.box>
+	<699e58bf-de22-5341-ecc6-458df7ccbe65@ozlabs.ru>
+	<9227196b-789c-e4b2-c9c5-4fd95ed42b4e@ozlabs.ru>
+	<20171109063822.GD7732@umbus.fritz.box>
+	<d6f4ad92-bd83-b990-4e86-ac89638c44d0@ozlabs.ru>
+	<9fabc6c4-9a95-d44e-dc4c-33d91c00fb0c@ozlabs.ru>
+	<20180103000947.GE24581@umbus.fritz.box>
+	<9188ab4a-f3d6-3cfb-ae26-a24f7781fad1@ozlabs.ru>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="Ah9ph+G2cWRpKogL"
 Content-Disposition: inline
-In-Reply-To: <87mv1myubq.fsf@secure.laptop>
-Subject: Re: [Qemu-devel] [PATCH v4 05/11] tests: Add deprecated commands
- migration test
+In-Reply-To: <9188ab4a-f3d6-3cfb-ae26-a24f7781fad1@ozlabs.ru>
+Subject: Re: [Qemu-devel] [PATCH qemu v3] RFC: ppc/spapr: Receive and store
+ device tree blob from SLOF
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,105 +33,104 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Juan Quintela <quintela@redhat.com>
-Cc: qemu-devel@nongnu.org, dgilbert@redhat.com, lvivier@redhat.com
+To: Alexey Kardashevskiy <aik@ozlabs.ru>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Balbir Singh <bsingharora@gmail.com>, Greg Kurz <groug@kaod.org>, slof@lists.ozlabs.org, Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>, Thomas Huth <thuth@redhat.com>
 
-On Wed, Jan 10, 2018 at 09:46:49AM +0100, Juan Quintela wrote:
-> Peter Xu <peterx@redhat.com> wrote:
-> > On Fri, Jan 05, 2018 at 10:52:40PM +0100, Juan Quintela wrote:
-> >> We add deprecated commands on a new test, so we don't have to add it
-> >> on normal tests.
-> >> 
-> >> Signed-off-by: Juan Quintela <quintela@redhat.com>
-> >> ---
-> >>  tests/migration-test.c | 59 ++++++++++++++++++++++++++++++++++++++++++++++++++
-> >>  1 file changed, 59 insertions(+)
-> >> 
-> >> diff --git a/tests/migration-test.c b/tests/migration-test.c
-> >> index f469235d0b..bcb0a82d42 100644
-> >> --- a/tests/migration-test.c
-> >> +++ b/tests/migration-test.c
-> >> @@ -513,6 +513,64 @@ static void test_migrate_end(QTestState *from, QTestState *to)
-> >>      cleanup("dest_serial");
-> >>  }
-> >>  
-> >> +static void deprecated_set_downtime(QTestState *who, const double value)
-> >> +{
-> >> +    QDict *rsp;
-> >> +    gchar *cmd;
-> >> +    char *expected;
-> >> +    int64_t result_int;
-> >> +
-> >> +    cmd = g_strdup_printf("{ 'execute': 'migrate_set_downtime',"
-> >> +                          "'arguments': { 'value': %g } }", value);
-> >> +    rsp = qtest_qmp(who, cmd);
-> >> +    g_free(cmd);
-> >> +    g_assert(qdict_haskey(rsp, "return"));
-> >> +    QDECREF(rsp);
-> >> +    result_int = value * 1000L;
-> >> +    expected = g_strdup_printf("%" PRId64, result_int);
-> >> +    migrate_check_parameter(who, "downtime-limit", expected);
-> >> +    g_free(expected);
-> >> +}
-> >> +
-> >> +static void deprecated_set_speed(QTestState *who, const char *value)
-> >> +{
-> >> +    QDict *rsp;
-> >> +    gchar *cmd;
-> >> +
-> >> +    cmd = g_strdup_printf("{ 'execute': 'migrate_set_speed',"
-> >> +                          "'arguments': { 'value': %s } }", value);
-> >> +    rsp = qtest_qmp(who, cmd);
-> >> +    g_free(cmd);
-> >> +    g_assert(qdict_haskey(rsp, "return"));
-> >> +    QDECREF(rsp);
-> >> +    migrate_check_parameter(who, "max-bandwidth", value);
-> >> +}
-> >> +
-> >> +static void test_deprecated(void)
-> >> +{
-> >> +    char *uri = g_strdup_printf("unix:%s/migsocket", tmpfs);
-> >> +    QTestState *from, *to;
-> >> +
-> >> +    /* Create source and destination guests.  This way we can reuse
-> >> +     * test_migrate_start */
-> >> +    test_migrate_start(&from, &to, uri);
-> >> +
-> >> +    deprecated_set_downtime(from, 0.12345);
-> >> +    deprecated_set_downtime(to, 0.12345);
-> >> +    deprecated_set_speed(from, "12345");
-> >> +    deprecated_set_speed(to, "12345");
-> >> +
-> >> +    g_free(uri);
-> >> +
-> >> +    qtest_quit(from);
-> >> +    qtest_quit(to);
-> >> +
-> >> +    cleanup("bootsect");
-> >> +    cleanup("migsocket");
-> >> +    cleanup("src_serial");
-> >> +    cleanup("dest_serial");
-> >
-> > I thought calling qtest_start() with a single VM would be even
-> > simpler, but this is good enough for me... Thanks for that.  :-)
-> 
-> I had two options:
-> - reuse the test_migrate_start function, and create two guests
-> - create a function that only creates one guest, but repeat the
->   architecture dependent part.
-> 
-> Take your poison.
 
-Ah I see your point.  However, do we need those arch-dependent thing
-for this QMP-only test?  Would a simplest qtest_start("") suffice?
+--Ah9ph+G2cWRpKogL
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-(I mean, we just start a QEMU without extra QEMU parameters, as long
- as it has QMP)
+On Mon, Jan 08, 2018 at 07:35:43PM +1100, Alexey Kardashevskiy wrote:
+> On 03/01/18 11:09, David Gibson wrote:
+> > On Tue, Jan 02, 2018 at 05:13:09PM +1100, Alexey Kardashevskiy wrote:
+> >> On 11/12/17 17:20, Alexey Kardashevskiy wrote:
+> >>> On 09/11/17 17:38, David Gibson wrote:
+> >>>> On Tue, Nov 07, 2017 at 06:14:04PM +1100, Alexey Kardashevskiy wrote:
+> >>>>> On 20/10/17 11:46, Alexey Kardashevskiy wrote:
+> >>>>>> On 19/10/17 17:24, David Gibson wrote:
+> >>>>>>> On Tue, Oct 17, 2017 at 04:55:03PM +1100, Alexey Kardashevskiy wr=
+ote:
+> >>>>>>>> On 16/10/17 20:36, David Gibson wrote:
+> >>>>>>>>> On Mon, Oct 16, 2017 at 04:20:04PM +1100, Alexey Kardashevskiy
+> >>>>>>>> wrote:
+> >>>>>>> [snip]
+> >>>>>>>>> ||
+> >>>>>>>>>
+> >>>>>>>>> Yeah.. this is all a bit complicated, I'm really thinking about=
+ a
+> >>>>>>>>> fdt_fsck() function for libfdt.
+> >>>>>>>>
+> >>>>>>>>
+> >>>>>>>> Oh. So what now? Do as below or wait for libdtc update?
+> >>>>>>>
+> >>>>>>> So I started hacking on this.  It's a bit fiddlier to get right t=
+han I
+> >>>>>>> anticipated.  How about you make a placeholder function to "test"=
+ the
+> >>>>>>> tree for now, with a comment that it will be updated once the lib=
+fdt
+> >>>>>>> extensions are there.
+> >>>>>>
+> >>>>>> What would the placeholder do? Nothing or my proposed "FDT_CHK" th=
+ingy?
+> >>>>>>
+> >>>>>> Are we in a hurry with this one at all, or I can wait till libfdt =
+gets this
+> >>>>>> fsck()?
+> >>>>>
+> >>>>>
+> >>>>> Ping?
+> >>>>>
+> >>>>> This is not v2.11 material, is it?
+> >>>>
+> >>>> Not at this stage, no.
+> >>>>
+> >>>> I've started looking at writing the fdt_fsck() thing, but got
+> >>>> sidetracked by a bunch of related fixes to safety of handling
+> >>>> corrupted blobs in libfdt.
+> >>>
+> >>> Please let me know when I can repost the "
+> >>> ppc/spapr: Receive and store device tree blob from SLOF" again. Thank=
+s.
+> >>
+> >>
+> >> Still to early to repost?
+> >=20
+> > No.
+>=20
+>=20
+> I looked at the recent libfdt (from qemu tree, sha1  e543880, v1.4.6) and
+> could not find fdt_fsck() or similar, and I was waiting for this really,
+> have I missed something?
 
-> 
-> > Reviewed-by: Peter Xu <peterx@redhat.com>
-> 
-> Thanks, Juan.
+Oh, right, yeah, I haven't had time to look at that again.
 
--- 
-Peter Xu
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--Ah9ph+G2cWRpKogL
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlpV1g4ACgkQbDjKyiDZ
+s5LRzBAAoT9QvllIDTYivM9cIAQk+mh5sRnOXvMH0Kvh/sgdEGs4RxIjhP/D2PSx
+O+vy8ck9H5RsaRCpAYFIpRmho531YYeR62AxFxk91Gmlk9Rjv09Sg5N1PVKjqwZP
+XAb4M9anPoG/sTkYw5WggzObx5kmIhclJsBi4PGpQ0kyIiR/lu0B8DSyQobOYaUB
+P5yIDmbfdEsitax6tp9YCuycZm0UqwfDY2dzbRVfYPJ4Vfz/NAoS3rHZABZZA2kv
+5zAF2KIz8MmRgfYYIeHBIxjrqRYU5sT/qToYNPOGsffIbE/MUsPlQ+/BWvYgH7tu
+eLezPPkuIHTxX3OVmktpRu225aPoYrvbBwIXiJKv1/OmpOjhYF+THX6E9NhqOFIS
+rxv92NuP8PNb1zwEQTcjnHyMjZEgIB9JxVDKaMWaVbIDs44zvPWlypNd7fODWPZZ
+nI44Ve5dtKExqAgOop9sInlCrW8TP7xiUy+AFdisV1INTUt+LnkgiutWe+DfVm01
+2oKqqvPG0sQTibzYptOV09ZU4GGmEhkws82FHv322GtNPLraIfbQCqH5hSZYaKqM
+8seOoNoyJJyS7nOqUmWF3eTLkjY//UEB/hGhP5V+B4fU7EcbjBvfDX6pbofWirpf
+IawuFGB33Q0bkYQXYWtVV62MyjcW6eBddu/gIoGWGgZx5Jhz9qI=
+=Zt4q
+-----END PGP SIGNATURE-----
+
+--Ah9ph+G2cWRpKogL--
