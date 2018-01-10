@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54611)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55582)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1eZCl3-0007Vm-U7
-	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 04:33:20 -0500
+	(envelope-from <cohuck@redhat.com>) id 1eZCpU-0000QX-Ny
+	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 04:37:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1eZCkz-00067d-1Y
-	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 04:33:17 -0500
-Received: from mail.ispras.ru ([83.149.199.45]:32794)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1eZCky-00064g-LF
-	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 04:33:12 -0500
-From: "Pavel Dovgalyuk" <dovgaluk@ispras.ru>
-References: <20171220100205.16625.84632.stgit@pasha-VirtualBox>	<003c01d38923$1c5157f0$54f407d0$@ru>
-	<87efmz1ddp.fsf@secure.laptop>	<004301d38940$56013bb0$0203b310$@ru>
-	<87zi5nyyap.fsf@secure.laptop>
-In-Reply-To: <87zi5nyyap.fsf@secure.laptop>
-Date: Wed, 10 Jan 2018 12:33:11 +0300
-Message-ID: <001601d389f6$0816d2f0$184478d0$@ru>
+	(envelope-from <cohuck@redhat.com>) id 1eZCpT-0003qa-FD
+	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 04:37:52 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:62222)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1eZCpT-0003pn-6K
+	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 04:37:51 -0500
+Date: Wed, 10 Jan 2018 10:37:37 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20180110103737.0feef92b.cohuck@redhat.com>
+In-Reply-To: <4b9f28b1-f3a4-ba84-3b34-232bfd12947c@redhat.com>
+References: <20180107123224.100877-1-marcel@redhat.com>
+	<20180107123224.100877-5-marcel@redhat.com>
+	<20180109113911.1746995b.cohuck@redhat.com>
+	<20180109110833.GA5975@yuvallap>
+	<20180109135125.2b3a511e.cohuck@redhat.com>
+	<4b9f28b1-f3a4-ba84-3b34-232bfd12947c@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="us-ascii"
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Content-Language: ru
-Subject: Re: [Qemu-devel] [PATCH v2] hpet: recover timer offset correctly
+Subject: Re: [Qemu-devel] [PATCH V6 4/5] pvrdma: initial implementation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,123 +31,125 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: quintela@redhat.com
-Cc: 'Pavel Dovgalyuk' <Pavel.Dovgaluk@ispras.ru>, qemu-devel@nongnu.org, mst@redhat.com, dgilbert@redhat.com, maria.klimushenkova@ispras.ru, pbonzini@redhat.com
+To: Marcel Apfelbaum <marcel@redhat.com>
+Cc: Yuval Shaia <yuval.shaia@oracle.com>, qemu-devel@nongnu.org, ehabkost@redhat.com, imammedo@redhat.com, pbonzini@redhat.com, mst@redhat.com, borntraeger@de.ibm.com
 
-> From: Juan Quintela [mailto:quintela@redhat.com]
-> "Pavel Dovgalyuk" <dovgaluk@ispras.ru> wrote:
-> >> From: Juan Quintela [mailto:quintela@redhat.com]
-> If you *don't* use a needed function then please just increase the
-> version.  You are just breaking compatibility anyways.  The whole point
-> of subsections is that they are optional.  If they are mandatory (this
-> case), then they bring no advantage at all.
+On Wed, 10 Jan 2018 11:28:59 +0200
+Marcel Apfelbaum <marcel@redhat.com> wrote:
 
-Thanks, I thought that the sections are skipped automatically when there is no code for loading
-them.
+> On 09/01/2018 14:51, Cornelia Huck wrote:
+> > On Tue, 9 Jan 2018 13:08:33 +0200
+> > Yuval Shaia <yuval.shaia@oracle.com> wrote:
+> >   
+> >> On Tue, Jan 09, 2018 at 11:39:11AM +0100, Cornelia Huck wrote:  
+> >>> On Sun,  7 Jan 2018 14:32:23 +0200
+> >>> Marcel Apfelbaum <marcel@redhat.com> wrote:  
+> >   
+> >>>> diff --git a/hw/rdma/vmw/pvrdma_dev_api.h b/hw/rdma/vmw/pvrdma_dev_api.h
+> >>>> new file mode 100644
+> >>>> index 0000000000..bf1986a976
+> >>>> --- /dev/null
+> >>>> +++ b/hw/rdma/vmw/pvrdma_dev_api.h
+> >>>> @@ -0,0 +1,602 @@
+> >>>> +/*
+> >>>> + * QEMU VMWARE paravirtual RDMA device definitions
+> >>>> + *
+> >>>> + * Copyright (C) 2018 Oracle
+> >>>> + * Copyright (C) 2018 Red Hat Inc
+> >>>> + *
+> >>>> + * Authors:
+> >>>> + *     Yuval Shaia <yuval.shaia@oracle.com>
+> >>>> + *     Marcel Apfelbaum <marcel@redhat.com>
+> >>>> + *
+> >>>> + * This work is licensed under the terms of the GNU GPL, version 2.
+> >>>> + * See the COPYING file in the top-level directory.
+> >>>> + *
+> >>>> + */
+> >>>> +
+> >>>> +#ifndef PVRDMA_DEV_API_H
+> >>>> +#define PVRDMA_DEV_API_H
+> >>>> +
+> >>>> +/*
+> >>>> + * Following is an interface definition for PVRDMA device as provided by
+> >>>> + * VMWARE.
+> >>>> + * See original copyright from Linux kernel v4.14.5 header file
+> >>>> + * drivers/infiniband/hw/vmw_pvrdma/pvrdma_dev_api.h  
+> >>>
+> >>> Could that file be exported as UAPI in the kernel and added to the
+> >>> linux-headers script?  
+> >>
+> >> We took this approach as apposed to kernel-headers with the following on
+> >> our mind:
+> >> (1) This is the convention used in vmxnet3.
+> >> (2) vmw_pvrdma was introduced only lately, taking the kernel-headers
+> >> approach will force specific kernel on a host in order to compile QEMU.  
+> > 
+> > qemu will get the kernel headers once from the upstream kernel and then
+> > will be able to be built everywhere.
+> >   
+> >> (3) To support VMWare's pvrdma device we took a snapshot of existing
+> >> driver/device settings and breezed there. This is driver/device API and we
+> >> can't allow our self to chase VMWare's tail whenever they are changing the
+> >> API. Just consider a case where they will change for example the ARM bit.  
+> > 
+> > But as want to enable the existing device driver, you'll want to be
+> > able to produce a compatible device anyway, don't you? Also, wouldn't
+> > VMWare break older kernels if they suddenly changed the api?
+> >   
+> 
+> I think it was a missunderstanding here :)
+> 
+> We don't actually need the VMware headers here in order to compile the device.
+> Requesting the pvrdma headers to be present really limits the hosts we could
+> compile QEMU without an actual benefit.
+> 
+> The headers describe the data structures passed by the Guest driver to the PVRDMA device.
+> Having them on the host should not be a requirement, we could simply define our own
+> structs but it would be harder to maintain. (diffing with linux headers to see what's new)
+> 
+> Note we don't care about ABI changes, we emulate a PCI device, not
+> a para-virt one, the driver has the contract to pass the same data definitions always.
+> If the data changes, there are 2 options:
+> 1. Pass another "version nr" on the command channel (DSR) and we declare as not supported
+>     by this device and fail gracefully.
+> 2. Use another device id.
 
-> What dave is asked for your previous version is that you disable the
-> section for old machine types.  Look at how to use DEFINE_PROP_* for
-> this use case.
+OK, thanks for the clarification, that makes sense.
 
-How do you like this one?
+> 
+> We looked for what are the options for *not requiring* the headers to be present
+> and we saw two in QEMU:
+> 1.  Adding it to include/standard-headers/linux/
+> But it seemed to much, only our device need them.
+> 2. Adding it to the hw/rdma/vwm directory
+> Please look at: (hw/net/vmxnet3.h)
+> 
+> The second option seemed better, but we could go with "1."
+> if I got it right and you think is cleaner.
+> But again, the first option kind of requires updating the
+> linux headers always, but we want quite the opposite, to not
+> be connected to the changes.
+> I hope is more clear now.
 
-diff --git a/hw/timer/hpet.c b/hw/timer/hpet.c
-index 577371b..539586f 100644
---- a/hw/timer/hpet.c
-+++ b/hw/timer/hpet.c
-@@ -70,6 +70,7 @@ typedef struct HPETState {
- 
-     MemoryRegion iomem;
-     uint64_t hpet_offset;
-+    bool hpet_offset_saved;
-     qemu_irq irqs[HPET_NUM_IRQ_ROUTES];
-     uint32_t flags;
-     uint8_t rtc_irq_level;
-@@ -221,7 +222,9 @@ static int hpet_pre_save(void *opaque)
-     HPETState *s = opaque;
- 
-     /* save current counter value */
--    s->hpet_counter = hpet_get_ticks(s);
-+    if (hpet_enabled(s)) {
-+        s->hpet_counter = hpet_get_ticks(s);
-+    }
- 
-     return 0;
- }
-@@ -252,7 +255,10 @@ static int hpet_post_load(void *opaque, int version_id)
-     HPETState *s = opaque;
- 
-     /* Recalculate the offset between the main counter and guest time */
--    s->hpet_offset = ticks_to_ns(s->hpet_counter) - qemu_clock_get_ns(QEMU_CLOC
-+    if (!s->hpet_offset_saved) {
-+        s->hpet_offset = ticks_to_ns(s->hpet_counter)
-+                        - qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
-+    }
- 
-     /* Push number of timers into capability returned via HPET_ID */
-     s->capability &= ~HPET_ID_NUM_TIM_MASK;
-@@ -267,6 +273,13 @@ static int hpet_post_load(void *opaque, int version_id)
-     return 0;
- }
- 
-+static bool hpet_offset_needed(void *opaque)
-+{
-+    HPETState *s = opaque;
-+
-+    return s->hpet_offset_saved;
-+}
-+
- static bool hpet_rtc_irq_level_needed(void *opaque)
- {
-     HPETState *s = opaque;
-@@ -285,6 +298,17 @@ static const VMStateDescription vmstate_hpet_rtc_irq_level 
-     }
- };
- 
-+static const VMStateDescription vmstate_hpet_offset = {
-+    .name = "hpet/offset",
-+    .version_id = 1,
-+    .minimum_version_id = 1,
-+    .needed = hpet_offset_needed,
-+    .fields = (VMStateField[]) {
-+        VMSTATE_UINT64(hpet_offset, HPETState),
-+        VMSTATE_END_OF_LIST()
-+    }
-+};
-+
- static const VMStateDescription vmstate_hpet_timer = {
-     .name = "hpet_timer",
-     .version_id = 1,
-@@ -320,6 +344,7 @@ static const VMStateDescription vmstate_hpet = {
-     },
-     .subsections = (const VMStateDescription*[]) {
-         &vmstate_hpet_rtc_irq_level,
-+        &vmstate_hpet_offset,
-         NULL
-     }
- };
-@@ -762,6 +787,7 @@ static Property hpet_device_properties[] = {
-     DEFINE_PROP_UINT8("timers", HPETState, num_timers, HPET_MIN_TIMERS),
-     DEFINE_PROP_BIT("msi", HPETState, flags, HPET_MSI_SUPPORT, false),
-     DEFINE_PROP_UINT32(HPET_INTCAP, HPETState, intcap, 0),
-+    DEFINE_PROP_BOOL("hpet-offset-saved", HPETState, hpet_offset_saved, true),
-     DEFINE_PROP_END_OF_LIST(),
- };
- 
-diff --git a/include/hw/compat.h b/include/hw/compat.h
-index 263de97..8897302 100644
---- a/include/hw/compat.h
-+++ b/include/hw/compat.h
-@@ -13,6 +13,10 @@
-         .driver   = "virtio-tablet-device",\
-         .property = "wheel-axis",\
-         .value    = "false",\
-+    },{\
-+        .driver   = "hpet",\
-+        .property = "hpet-offset-saved",\
-+        .value    = "off",\
-     },
- 
- #define HW_COMPAT_2_9 \
+OK, that makes sense as well, if you intend this to be a one-time
+effort. "Copy a header from the Linux kernel" just raised kind of a
+flag for me.
 
-Pavel Dovgalyuk
+> 
+> 
+> > [Also, is there a canonical reference for this API?]
+> >   
+> 
+> Linux Kernel PVRDMA driver implementation...
+
+:)
+
+> 
+> >>
+> >> Just IMHO.
+> >>  
+> 
+> Thanks a lot for your inputs, much appreciated!
+
+NP. I'd like to do more, as this is interesting stuff, but you know how
+it goes...
