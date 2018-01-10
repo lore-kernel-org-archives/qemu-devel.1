@@ -1,17 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49233)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49616)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1eZCYK-000681-Ts
-	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 04:20:12 -0500
+	(envelope-from <lvivier@redhat.com>) id 1eZCZO-00077x-5x
+	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 04:21:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1eZCYH-0000Wi-4d
-	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 04:20:08 -0500
-From: Fam Zheng <famz@redhat.com>
-Date: Wed, 10 Jan 2018 17:18:46 +0800
-Message-Id: <20180110091846.10699-10-famz@redhat.com>
-In-Reply-To: <20180110091846.10699-1-famz@redhat.com>
-References: <20180110091846.10699-1-famz@redhat.com>
-Subject: [Qemu-devel] [PATCH v4 9/9] qapi: Add NVMe driver options to the
- schema
+	(envelope-from <lvivier@redhat.com>) id 1eZCZN-0001XY-Bn
+	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 04:21:14 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:59508)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <lvivier@redhat.com>) id 1eZCZN-0001Vh-5C
+	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 04:21:13 -0500
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id A2287C119CA8
+	for <qemu-devel@nongnu.org>; Wed, 10 Jan 2018 09:21:11 +0000 (UTC)
+References: <20180105215246.908-1-quintela@redhat.com>
+	<20180105215246.908-3-quintela@redhat.com>
+	<20180110062545.GB5984@xz-mi> <87incayua8.fsf@secure.laptop>
+From: Laurent Vivier <lvivier@redhat.com>
+Message-ID: <82a94975-e040-298d-7d10-7448a4a0af48@redhat.com>
+Date: Wed, 10 Jan 2018 10:21:05 +0100
+MIME-Version: 1.0
+In-Reply-To: <87incayua8.fsf@secure.laptop>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v4 02/11] tests: Migration ppc test was
+ missing arguments
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,54 +36,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Keith Busch <keith.busch@intel.com>, qemu-block@nongnu.org, Fam Zheng <famz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Karl Rister <krister@redhat.com>
+To: quintela@redhat.com, Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, dgilbert@redhat.com
 
-Signed-off-by: Fam Zheng <famz@redhat.com>
----
- qapi/block-core.json | 16 +++++++++++++++-
- 1 file changed, 15 insertions(+), 1 deletion(-)
+On 10/01/2018 09:47, Juan Quintela wrote:
+> Peter Xu <peterx@redhat.com> wrote:
+>> On Fri, Jan 05, 2018 at 10:52:37PM +0100, Juan Quintela wrote:
+>>> Argument file is also needed there.
+>>>
+>>> Signed-off-by: Juan Quintela <quintela@redhat.com>
+>>
+>> Reviewed-by: Peter Xu <peterx@redhat.com>
+>>
+>> Does it also mean this?
+>>
+>> Fixes: aaf89c8a49a8c ("test: port postcopy test to ppc64")
+> 
+> Dunno.  I was trying to consolidate the command line options for ppc and
+> x86 when I found this problem.  I haven't tested of ppc.
 
-diff --git a/qapi/block-core.json b/qapi/block-core.json
-index e94a6881b2..fd6c94454d 100644
---- a/qapi/block-core.json
-+++ b/qapi/block-core.json
-@@ -2237,7 +2237,7 @@
-   'data': [ 'blkdebug', 'blkverify', 'bochs', 'cloop',
-             'dmg', 'file', 'ftp', 'ftps', 'gluster', 'host_cdrom',
-             'host_device', 'http', 'https', 'iscsi', 'luks', 'nbd', 'nfs',
--            'null-aio', 'null-co', 'parallels', 'qcow', 'qcow2', 'qed',
-+            'null-aio', 'null-co', 'nvme', 'parallels', 'qcow', 'qcow2', 'qed',
-             'quorum', 'raw', 'rbd', 'replication', 'sheepdog', 'ssh',
-             'throttle', 'vdi', 'vhdx', 'vmdk', 'vpc', 'vvfat', 'vxhs' ] }
- 
-@@ -2278,6 +2278,19 @@
- { 'struct': 'BlockdevOptionsNull',
-   'data': { '*size': 'int', '*latency-ns': 'uint64' } }
- 
-+##
-+# @BlockdevOptionsNVMe:
-+#
-+# Driver specific block device options for the NVMe backend.
-+#
-+# @device:    controller address of the NVMe device.
-+# @namespace: namespace number of the device, starting from 1.
-+#
-+# Since: 2.12
-+##
-+{ 'struct': 'BlockdevOptionsNVMe',
-+  'data': { 'device': 'str', 'namespace': 'int' } }
-+
- ##
- # @BlockdevOptionsVVFAT:
- #
-@@ -3183,6 +3196,7 @@
-       'nfs':        'BlockdevOptionsNfs',
-       'null-aio':   'BlockdevOptionsNull',
-       'null-co':    'BlockdevOptionsNull',
-+      'nvme':       'BlockdevOptionsNVMe',
-       'parallels':  'BlockdevOptionsGenericFormat',
-       'qcow2':      'BlockdevOptionsQcow2',
-       'qcow':       'BlockdevOptionsQcow',
--- 
-2.14.3
+I don't think it is needed. I think the content of the nvram is migrated
+(otherwise the test wouldn't work at all).
+
+The nvram is created by default, we need the command line parameter only
+to populate it from a file.
+
+Thanks,
+Laurent
