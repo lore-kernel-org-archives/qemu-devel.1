@@ -1,33 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41321)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43636)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1eZEtO-0003dj-H7
-	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 06:50:07 -0500
+	(envelope-from <mst@redhat.com>) id 1eZEyv-00064L-6D
+	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 06:55:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1eZEtM-0000kV-N6
-	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 06:50:02 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:51536)
+	(envelope-from <mst@redhat.com>) id 1eZEyr-0004UN-UH
+	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 06:55:45 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:49618)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1eZEtM-0000jm-GD
-	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 06:50:00 -0500
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 91D8481DEA
-	for <qemu-devel@nongnu.org>; Wed, 10 Jan 2018 11:49:59 +0000 (UTC)
-Date: Wed, 10 Jan 2018 11:49:53 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180110114953.GB2450@work-vm>
-References: <20180105215246.908-1-quintela@redhat.com>
-	<20180105215246.908-5-quintela@redhat.com>
-	<20180110063022.GC5984@xz-mi> <87r2qyyugr.fsf@secure.laptop>
-	<20180110085452.GJ5984@xz-mi>
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1eZEyr-0004SQ-HI
+	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 06:55:41 -0500
+Date: Wed, 10 Jan 2018 13:55:37 +0200
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20180110135246-mutt-send-email-mst@kernel.org>
+References: <1515506288-32291-1-git-send-email-mst@redhat.com>
+	<20180110122535.3cc0d223@igors-macbook-pro.local>
+	<20180110132751-mutt-send-email-mst@kernel.org>
+	<20180110124152.10896011@igors-macbook-pro.local>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20180110085452.GJ5984@xz-mi>
-Subject: Re: [Qemu-devel] [PATCH v4 04/11] tests: Use consistent names and
- sizes for migration
+In-Reply-To: <20180110124152.10896011@igors-macbook-pro.local>
+Subject: Re: [Qemu-devel] [PATCH] acpi: switch to a dummy SSDT
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,53 +29,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org, lvivier@redhat.com
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, stefanb@linux.vnet.ibm.com
 
-* Peter Xu (peterx@redhat.com) wrote:
-> On Wed, Jan 10, 2018 at 09:43:48AM +0100, Juan Quintela wrote:
-> > Peter Xu <peterx@redhat.com> wrote:
-> > > On Fri, Jan 05, 2018 at 10:52:39PM +0100, Juan Quintela wrote:
-> > >> Signed-off-by: Juan Quintela <quintela@redhat.com>
-> > >> ---
-> > >>  tests/migration-test.c | 12 ++++++------
-> > >>  1 file changed, 6 insertions(+), 6 deletions(-)
-> > >> 
-> > >> diff --git a/tests/migration-test.c b/tests/migration-test.c
-> > >> index d81f22118b..f469235d0b 100644
-> > >> --- a/tests/migration-test.c
-> > >> +++ b/tests/migration-test.c
-> > >> @@ -440,13 +440,13 @@ static void test_migrate_start(QTestState **from, QTestState **to,
-> > >>  
-> > >>      if (strcmp(arch, "i386") == 0 || strcmp(arch, "x86_64") == 0) {
-> > >>          init_bootfile_x86(bootpath);
-> > >> -        cmd_src = g_strdup_printf("-machine accel=%s -m 150M"
-> > >> -                                  " -name pcsource,debug-threads=on"
-> > >> +        cmd_src = g_strdup_printf("-machine accel=%s -m 256M"
-> > >> +                                  " -name source,debug-threads=on"
-> > >
-> > > A pure question: when will the name matter?
+On Wed, Jan 10, 2018 at 12:41:52PM +0100, Igor Mammedov wrote:
+> On Wed, 10 Jan 2018 13:29:09 +0200
+> "Michael S. Tsirkin" <mst@redhat.com> wrote:
+> 
+> > On Wed, Jan 10, 2018 at 12:25:34PM +0100, Igor Mammedov wrote:
+> > > On Tue, 9 Jan 2018 15:58:11 +0200
+> > > "Michael S. Tsirkin" <mst@redhat.com> wrote:
+> > > 
+> > > > We prefer not changing table sizes depending on parameters,
+> > > > that's why we create a dummy table rather than just drop
+> > > > the MCFG table.
+> > > > 
+> > > > However, a table named "QEMU" could be put to a better
+> > > > use than just a stub, e.g. we could use it to pass
+> > > > some QEMU specific info to guests.
+> > > > 
+> > > > Replace with an SSDT and pad with the Nop opcode
+> > > > to preserve the length.
+> > > Not sure it's useful, do you have patches on top of that, which will use this?
 > > 
-> > It don't matter, but ARM didn't want to use the pcname, and decided for
-> > yet a different command line.  I would like to have the same command
-> > line for all architectures.  At least the less gratuitous differences.
-> > 
-> > As you can guess, name don't matter at all., but telling ARNM people to
-> > be consistent with things that are not consistent .... O:-)
-> 
-> Ah, fine. :)
-> 
-> This test only support x86 and ppc for now, right?
-> 
-> (Btw, AFAIK debug-threads=on is only useful if any of us wants to
->  glance at thread names.  In other words, would it be even simpler to
->  just remove that "-name" line? :-)
+> > Yes but not me - Stefan (Cc'd) wants to add a custom table.
+> Re-purposing dummy table that might become not dummy doesn't look like good approach.
+> What if later the guest enables MCFG and reboots, DUMMY SSDT would be replaced by MCFG? 
 
-It makes debugging hangs/crashes easier sometimes, so keep it.
+So what's the issue?  Why is this worse than a dummy QEMU table?
+There's actually no re-purposing here at all. Either we create
+an MCFG or an SSDT. We never re-purpose.
 
-Dave
+> It'd be cleaner if Stefan would just use his own dedicated SSDT.
 
-> -- 
-> Peter Xu
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+SSDT doesn't always work. A data table is needed so e.g. seabios
+can process it easily.
+
+> > > 
+> > > > Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+> > > > ---
+> > > >  hw/i386/acpi-build.c | 17 ++++++++++++-----
+> > > >  1 file changed, 12 insertions(+), 5 deletions(-)
+> > > > 
+> > > > diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+> > > > index 73519ab..d0afb31e 100644
+> > > > --- a/hw/i386/acpi-build.c
+> > > > +++ b/hw/i386/acpi-build.c
+> > > > @@ -2419,6 +2419,8 @@ build_mcfg_q35(GArray *table_data, BIOSLinker *linker, AcpiMcfgInfo *info)
+> > > >  {
+> > > >      AcpiTableMcfg *mcfg;
+> > > >      const char *sig;
+> > > > +    const char *oem;
+> > > > +    const char *oem_id;
+> > > >      int len = sizeof(*mcfg) + 1 * sizeof(mcfg->allocation[0]);
+> > > >  
+> > > >      mcfg = acpi_data_push(table_data, len);
+> > > > @@ -2431,16 +2433,21 @@ build_mcfg_q35(GArray *table_data, BIOSLinker *linker, AcpiMcfgInfo *info)
+> > > >      /* MCFG is used for ECAM which can be enabled or disabled by guest.
+> > > >       * To avoid table size changes (which create migration issues),
+> > > >       * always create the table even if there are no allocations,
+> > > > -     * but set the signature to a reserved value in this case.
+> > > > -     * ACPI spec requires OSPMs to ignore such tables.
+> > > > +     * but fill it with Noop values.
+> > > > +     * OSPMs ignore such tables.
+> > > >       */
+> > > >      if (info->mcfg_base == PCIE_BASE_ADDR_UNMAPPED) {
+> > > > -        /* Reserved signature: ignored by OSPM */
+> > > > -        sig = "QEMU";
+> > > > +        sig = "SSDT";
+> > > > +        oem = "QEMU ";
+> > > > +        oem_id = "NOOP";
+> > > > +        /* 0xa3 - NoopOp */
+> > > > +        memset(&mcfg->reserved, 0xa3, len - offsetof(AcpiTableMcfg, reserved));
+> > > >      } else {
+> > > >          sig = "MCFG";
+> > > > +        oem = NULL;
+> > > > +        oem_id = NULL;
+> > > >      }
+> > > > -    build_header(linker, table_data, (void *)mcfg, sig, len, 1, NULL, NULL);
+> > > > +    build_header(linker, table_data, (void *)mcfg, sig, len, 1, oem, oem_id);
+> > > >  }
+> > > >  
+> > > >  /*
