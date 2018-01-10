@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42457)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42928)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1eZFr3-0000we-6M
-	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 07:51:42 -0500
+	(envelope-from <stefanha@gmail.com>) id 1eZFsB-0001wO-Qt
+	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 07:52:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1eZFr2-00087e-2F
-	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 07:51:41 -0500
-Date: Wed, 10 Jan 2018 12:51:25 +0000
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20180110125125.GL3205@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <20180105065538.13375-1-famz@redhat.com>
-	<20180108144136.GF8052@localhost.localdomain>
-	<CAMr-obsaegU2HDaH3EFoD+2EYUnPKuqsvQPk4GZ7hTdqXmpoWA@mail.gmail.com>
-	<20180108175729.GI8052@localhost.localdomain>
+	(envelope-from <stefanha@gmail.com>) id 1eZFsA-0000cS-PP
+	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 07:52:51 -0500
+Received: from mail-wr0-x231.google.com ([2a00:1450:400c:c0c::231]:36999)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1eZFsA-0000bp-Ig
+	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 07:52:50 -0500
+Received: by mail-wr0-x231.google.com with SMTP id f8so17237643wre.4
+	for <qemu-devel@nongnu.org>; Wed, 10 Jan 2018 04:52:50 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20180108175729.GI8052@localhost.localdomain>
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 0/2] qemu-img: Let "info" warn
- and go ahead without -U
+In-Reply-To: <CAKmqyKPk69_d-iYGekoS9WBM1fnzav1iFAQEXQq_jLOW9_Dt3w@mail.gmail.com>
+References: <CAJSP0QUMA7v=-qX-CNCi30aoH-HzXC9i75EpLWP_TmFuDzpTQQ@mail.gmail.com>
+	<CAKmqyKPk69_d-iYGekoS9WBM1fnzav1iFAQEXQq_jLOW9_Dt3w@mail.gmail.com>
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Date: Wed, 10 Jan 2018 12:52:48 +0000
+Message-ID: <CAJSP0QVd70uAiG3vyOjO-qOdt1YbEccYydJvz4igg7_bBiW+5A@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] Call for GSoC & Outreachy 2018 mentors & project
+ ideas
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,75 +29,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: Nir Soffer <nirsof@gmail.com>, Ala Hino <ahino@redhat.com>, Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+To: Alistair Francis <alistair23@gmail.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, kvm <kvm@vger.kernel.org>, Jailhouse <jailhouse-dev@googlegroups.com>
 
-On Mon, Jan 08, 2018 at 06:57:29PM +0100, Kevin Wolf wrote:
-> Am 08.01.2018 um 18:07 hat Nir Soffer geschrieben:
-> > On Mon, Jan 8, 2018 at 4:48 PM Kevin Wolf <kwolf@redhat.com> wrote:
-> > 
-> > > Am 05.01.2018 um 07:55 hat Fam Zheng geschrieben:
-> > > > Management and users are accustomed to "qemu-img info" to query status of
-> > > > images even when they are used by guests. Since image locking was added,
-> > > the -U
-> > > > (--force-share) option is needed for that to work. The reason has been
-> > > that due
-> > > > to possible race with image header update, the output can be misleading.
-> > > >
-> > > > But what are likely to happen after we emit the error are that, for
-> > > interactive
-> > > > users, '-U' will be used and the command retried; for management (nova,
-> > > RHV,
-> > > > etc.), the operation is broken with no knob to workaround this.
-> > > >
-> > > > This series changes that error to a warning so that it doesn't get in
-> > > the way.
-> > >
-> > > Are management tools actually doing this? There is no good reason to
-> > > call 'qemu-img info' for an image that is in use by a VM.
-> > >
-> > 
-> > Yes, ovirt/RHV is using this to get the qcow2 compat of an image since 4.1.
-> > 
-> > We asked about this here and in private mail, and there was an
-> > agreement that using qemu-img info on an image is safe for this
-> > purpose. We know that accessing image header when a guest is using is
-> > may be racy, but we control both the guest and the image. Nobody is
-> > modifying the image properties behind our back.
-> 
-> Yes, it's probably safe enough, though it's clearly a case for -U rather
-> than allowing it unconditionally.
-> 
-> > In 4.2 we will use the new flags[1], but  we cannot fix released code.
-> > Introducing this locking in qemu-img info will break existing
-> > installations.
-> 
-> We should have the proper deprecation process and printed a warning for
-> two releases. Anyway, it's too late for this and now we've already had
-> two releases where this was a hard error.
-> 
-> I'm not sure if going back to the old behaviour for a while now would be
-> helpful, you'd just end up with an even more confusing set of qemu
-> versions, for example:
-> 
->     <= 2.9          - works without a warning
->     2.10 and 2.11   - errors out
->     2.12            - prints a warning, but works
->     >= 2.13         - errors out again
+On Tue, Jan 9, 2018 at 9:45 PM, Alistair Francis <alistair23@gmail.com> wrote:
+> Can anyone who has done this before chime in.
+>
+> What do you think about getting someone to cleanup and improve the GDB
+> support in QEMU? Would that be the right difficulty of task for a GSoC
+> project?
 
-I think this is really undesirable to have 2.12 suddenly behave diferently
-after 2 releases of having this change. Apps are pretty much forced to
-take the change to use -U regardless because 2.10 & 2.11 are already in
-the wild. Printing a warning would only be useful if we had done it in
-2.10.  Now it is too late to be useful and will just confuse life even
-more.
+There is not enough information to give feedback on whether this
+project idea is suitable.  What are the specific tasks you'd like the
+student to work on?
 
-So IMHO just drop this patch.
+In general, I'm sure there are well-defined 12-week project ideas
+around the GDB stub.  New features are easy to propose and are usually
+well-defined (e.g. implement these commands that are documented in the
+GDB protocol documentation).  Cleaning up code is less clear and it
+would depend on exactly what needs to be done.  Interns will not have
+a background in the QEMU codebase and may not be able to make
+judgements about how to structure things, so I would be more careful
+about refactoring/cleanup projects.
 
+Please see my talk about QEMU GSoC for guidelines on project ideas:
+https://www.youtube.com/watch?v=xNVCX7YMUL8&t=19m11s
+http://vmsplice.net/~stefan/stefanha-kvm-forum-2016.pdf
 
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+Hope this helps,
+Stefan
