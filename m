@@ -1,25 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36347)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42449)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1eZIhY-0000FO-GO
-	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 10:54:05 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1eZIoz-00068W-Qf
+	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 11:01:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1eZIhV-0001Uw-FI
-	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 10:54:04 -0500
-Received: from mout.kundenserver.de ([212.227.126.131]:55059)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1eZIhV-0001UO-5W
-	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 10:54:01 -0500
-From: Laurent Vivier <laurent@vivier.eu>
-References: <20171228150038.16450-1-samuel.thibault@ens-lyon.org>
-	<ae60a724-48bc-b39e-8082-c1ee618ed5da@vivier.eu>
-Message-ID: <a125dd5e-e1a4-348b-63fc-55ce34f4a944@vivier.eu>
-Date: Wed, 10 Jan 2018 16:53:47 +0100
+	(envelope-from <dgilbert@redhat.com>) id 1eZIoz-0000Uj-2f
+	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 11:01:45 -0500
+Date: Wed, 10 Jan 2018 16:01:24 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20180110160124.GC2451@work-vm>
+References: <20171207155102.66622-1-vsementsov@virtuozzo.com>
+	<20171207155102.66622-3-vsementsov@virtuozzo.com>
+	<20171208173321.GR2403@work-vm>
+	<8711ff94-3d7a-446e-6da1-2e6e2b82899a@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <ae60a724-48bc-b39e-8082-c1ee618ed5da@vivier.eu>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] linux-user: Add getcpu() support
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <8711ff94-3d7a-446e-6da1-2e6e2b82899a@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 2/6] qapi: add name parameter to
+ nbd-server-add
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,57 +26,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Samuel Thibault <samuel.thibault@ens-lyon.org>, qemu-devel@nongnu.org, Riku Voipio <riku.voipio@iki.fi>
+To: Eric Blake <eblake@redhat.com>
+Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org, armbru@redhat.com, pbonzini@redhat.com, mreitz@redhat.com, kwolf@redhat.com, den@openvz.org
 
-Le 28/12/2017 à 18:39, Laurent Vivier a écrit :
-> Le 28/12/2017 à 16:00, Samuel Thibault a écrit :
->> Signed-off-by: Samuel Thibault <samuel.thibault@ens-lyon.org>
->> ---
->>  linux-user/syscall.c | 16 ++++++++++++++++
->>  1 file changed, 16 insertions(+)
->>
->> diff --git a/linux-user/syscall.c b/linux-user/syscall.c
->> index 8ec7de96ce..bb8cb726f5 100644
->> --- a/linux-user/syscall.c
->> +++ b/linux-user/syscall.c
->> @@ -296,6 +296,8 @@ _syscall3(int, sys_sched_getaffinity, pid_t, pid, unsigned int, len,
->>  #define __NR_sys_sched_setaffinity __NR_sched_setaffinity
->>  _syscall3(int, sys_sched_setaffinity, pid_t, pid, unsigned int, len,
->>            unsigned long *, user_mask_ptr);
->> +#define __NR_sys_getcpu __NR_getcpu
->> +_syscall3(int, sys_getcpu, unsigned *, cpu, unsigned *, node, void *, tcache);
->>  _syscall4(int, reboot, int, magic1, int, magic2, unsigned int, cmd,
->>            void *, arg);
->>  _syscall2(int, capget, struct __user_cap_header_struct *, header,
->> @@ -10443,6 +10445,20 @@ abi_long do_syscall(void *cpu_env, int num, abi_long arg1,
->>              ret = get_errno(sys_sched_setaffinity(arg1, mask_size, mask));
->>          }
->>          break> +    case TARGET_NR_getcpu:
->> +        {
->> +            unsigned cpu, node;
->> +            ret = get_errno(sys_getcpu(arg1 ? &cpu : NULL,
->> +                                       arg2 ? &node : NULL,
->> +                                       NULL));
->> +            if (arg1) {
->> +                put_user(cpu, arg1, abi_uint);
->> +            }
->> +            if (arg2) {
->> +                put_user(node, arg2, abi_uint);
->> +            }
+* Eric Blake (eblake@redhat.com) wrote:
+> On 12/08/2017 11:33 AM, Dr. David Alan Gilbert wrote:
 > 
-> You must check for EFAULT.
+> >> @@ -2223,7 +2224,7 @@ void hmp_nbd_server_add(Monitor *mon, const QDict *qdict)
+> >>      bool writable = qdict_get_try_bool(qdict, "writable", false);
+> >>      Error *local_err = NULL;
+> >>  
+> >> -    qmp_nbd_server_add(device, true, writable, &local_err);
+> >> +    qmp_nbd_server_add(device, false, NULL, true, writable, &local_err);
+> > 
+> > I wont insist, but it would be nice if you wired up an optional
+> > parameter on HMP as well.
 > 
->     if (arg1 && put_user_u32(cpu, arg1)) {
->         goto efault;
->     }
-> ...
+> Can be done as a followup patch
+
+Yes, agreed.
+
+> I'm not sure how many people are
+> setting up NBD exports via HMP, and I'm also okay with just stating that
+> the full power requires use of QMP.  But I'll give such a followup patch
+> a quick try, to see whether it is easy after all.
+
+Thanks; I have set up NBD exports up via HMP a few times.
+
+Dave
+
+> -- 
+> Eric Blake, Principal Software Engineer
+> Red Hat, Inc.           +1-919-301-3266
+> Virtualization:  qemu.org | libvirt.org
 > 
-> I don't think you need to use the abi_uint type as we are using
-> put_user_u32() for all the other syscalls for unsigned int.
 
-Samuel,
 
-could you send an updated version of your patch?
 
-Thanks,
-Laurent
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
