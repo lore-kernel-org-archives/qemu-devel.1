@@ -1,21 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38443)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38554)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1eZDKB-00018t-3u
-	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 05:09:36 -0500
+	(envelope-from <dovgaluk@ispras.ru>) id 1eZDKi-0001Qr-C3
+	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 05:10:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1eZDK7-0000hW-Si
-	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 05:09:35 -0500
-Received: from mail.ispras.ru ([83.149.199.45]:37142)
+	(envelope-from <dovgaluk@ispras.ru>) id 1eZDKe-00017r-8Q
+	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 05:10:08 -0500
+Received: from mail.ispras.ru ([83.149.199.45]:37216)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1eZDK7-0000g3-FV
-	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 05:09:31 -0500
-From: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
-Date: Wed, 10 Jan 2018 13:09:30 +0300
-Message-ID: <20180110100929.15986.71777.stgit@pasha-VirtualBox>
+	(envelope-from <dovgaluk@ispras.ru>) id 1eZDKe-00017W-0t
+	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 05:10:04 -0500
+From: "Pavel Dovgalyuk" <dovgaluk@ispras.ru>
+References: <20171220100205.16625.84632.stgit@pasha-VirtualBox>	<003c01d38923$1c5157f0$54f407d0$@ru>
+	<87efmz1ddp.fsf@secure.laptop>	<004301d38940$56013bb0$0203b310$@ru>
+	<87zi5nyyap.fsf@secure.laptop>	<001601d389f6$0816d2f0$184478d0$@ru>
+	<87d12iyrct.fsf@secure.laptop>
+In-Reply-To: <87d12iyrct.fsf@secure.laptop>
+Date: Wed, 10 Jan 2018 13:10:04 +0300
+Message-ID: <001a01d389fb$2f33b1f0$8d9b15d0$@ru>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain;
+	charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [PATCH v3] hpet: recover timer offset correctly
+Content-Language: ru
+Subject: Re: [Qemu-devel] [PATCH v2] hpet: recover timer offset correctly
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,124 +31,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: quintela@redhat.com, mst@redhat.com, dgilbert@redhat.com, maria.klimushenkova@ispras.ru, dovgaluk@ispras.ru, pavel.dovgaluk@ispras.ru, pbonzini@redhat.com
+To: quintela@redhat.com
+Cc: 'Pavel Dovgalyuk' <Pavel.Dovgaluk@ispras.ru>, qemu-devel@nongnu.org, mst@redhat.com, dgilbert@redhat.com, maria.klimushenkova@ispras.ru, pbonzini@redhat.com
 
-HPET saves its state by calculating the current time and recovers timer
-offset using this calculated value. But these calculations include
-divisions and multiplications. Therefore the timer state cannot be recovered
-precise enough.
-This patch introduces saving of the original value of the offset to
-preserve the determinism of the timer.
 
-Signed-off-by: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
-Signed-off-by: Maria Klimushenkova <maria.klimushenkova@ispras.ru>
-Reviewed-by: Juan Quintela <quintela@redhat.com>
 
---
-v3: Added compat property for correct migration.
----
- hw/timer/hpet.c     |   30 ++++++++++++++++++++++++++++--
- include/hw/compat.h |    6 +++++-
- 2 files changed, 33 insertions(+), 3 deletions(-)
+> -----Original Message-----
+> From: Juan Quintela [mailto:quintela@redhat.com]
+> Sent: Wednesday, January 10, 2018 12:51 PM
+> To: Pavel Dovgalyuk
+> Cc: 'Pavel Dovgalyuk'; qemu-devel@nongnu.org; mst@redhat.com; dgilbert@redhat.com;
+> maria.klimushenkova@ispras.ru; pbonzini@redhat.com
+> Subject: Re: [PATCH v2] hpet: recover timer offset correctly
+> 
+> "Pavel Dovgalyuk" <dovgaluk@ispras.ru> wrote:
+> >> From: Juan Quintela [mailto:quintela@redhat.com]
+> >> "Pavel Dovgalyuk" <dovgaluk@ispras.ru> wrote:
+> >> >> From: Juan Quintela [mailto:quintela@redhat.com]
+> >> If you *don't* use a needed function then please just increase the
+> >> version.  You are just breaking compatibility anyways.  The whole point
+> >> of subsections is that they are optional.  If they are mandatory (this
+> >> case), then they bring no advantage at all.
+> >
+> > Thanks, I thought that the sections are skipped automatically when
+> > there is no code for loading
+> > them.
+> >
+> >> What dave is asked for your previous version is that you disable the
+> >> section for old machine types.  Look at how to use DEFINE_PROP_* for
+> >> this use case.
+> >
+> > How do you like this one?
+> 
+> Much better, thanks.
+> 
+> > +static bool hpet_offset_needed(void *opaque)
+> > +{
+> > +    HPETState *s = opaque;
+> > +
+> > +    return s->hpet_offset_saved;
+> > +}
+> > +
+> 
+> If this is only one optimization, this test is ok.  If it makes things
+> go worse, you can add something there like && hpet_enabled() or
+> whatever.  Remember that I don't understand HPET.
 
-diff --git a/hw/timer/hpet.c b/hw/timer/hpet.c
-index 577371b..d97436b 100644
---- a/hw/timer/hpet.c
-+++ b/hw/timer/hpet.c
-@@ -70,6 +70,7 @@ typedef struct HPETState {
- 
-     MemoryRegion iomem;
-     uint64_t hpet_offset;
-+    bool hpet_offset_saved;
-     qemu_irq irqs[HPET_NUM_IRQ_ROUTES];
-     uint32_t flags;
-     uint8_t rtc_irq_level;
-@@ -221,7 +222,9 @@ static int hpet_pre_save(void *opaque)
-     HPETState *s = opaque;
- 
-     /* save current counter value */
--    s->hpet_counter = hpet_get_ticks(s);
-+    if (hpet_enabled(s)) {
-+        s->hpet_counter = hpet_get_ticks(s);
-+    }
- 
-     return 0;
- }
-@@ -252,7 +255,10 @@ static int hpet_post_load(void *opaque, int version_id)
-     HPETState *s = opaque;
- 
-     /* Recalculate the offset between the main counter and guest time */
--    s->hpet_offset = ticks_to_ns(s->hpet_counter) - qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
-+    if (!s->hpet_offset_saved) {
-+        s->hpet_offset = ticks_to_ns(s->hpet_counter)
-+                        - qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
-+    }
- 
-     /* Push number of timers into capability returned via HPET_ID */
-     s->capability &= ~HPET_ID_NUM_TIM_MASK;
-@@ -267,6 +273,13 @@ static int hpet_post_load(void *opaque, int version_id)
-     return 0;
- }
- 
-+static bool hpet_offset_needed(void *opaque)
-+{
-+    HPETState *s = opaque;
-+
-+    return hpet_enabled(s) && s->hpet_offset_saved;
-+}
-+
- static bool hpet_rtc_irq_level_needed(void *opaque)
- {
-     HPETState *s = opaque;
-@@ -285,6 +298,17 @@ static const VMStateDescription vmstate_hpet_rtc_irq_level = {
-     }
- };
- 
-+static const VMStateDescription vmstate_hpet_offset = {
-+    .name = "hpet/offset",
-+    .version_id = 1,
-+    .minimum_version_id = 1,
-+    .needed = hpet_offset_needed,
-+    .fields = (VMStateField[]) {
-+        VMSTATE_UINT64(hpet_offset, HPETState),
-+        VMSTATE_END_OF_LIST()
-+    }
-+};
-+
- static const VMStateDescription vmstate_hpet_timer = {
-     .name = "hpet_timer",
-     .version_id = 1,
-@@ -320,6 +344,7 @@ static const VMStateDescription vmstate_hpet = {
-     },
-     .subsections = (const VMStateDescription*[]) {
-         &vmstate_hpet_rtc_irq_level,
-+        &vmstate_hpet_offset,
-         NULL
-     }
- };
-@@ -762,6 +787,7 @@ static Property hpet_device_properties[] = {
-     DEFINE_PROP_UINT8("timers", HPETState, num_timers, HPET_MIN_TIMERS),
-     DEFINE_PROP_BIT("msi", HPETState, flags, HPET_MSI_SUPPORT, false),
-     DEFINE_PROP_UINT32(HPET_INTCAP, HPETState, intcap, 0),
-+    DEFINE_PROP_BOOL("hpet-offset-saved", HPETState, hpet_offset_saved, true),
-     DEFINE_PROP_END_OF_LIST(),
- };
- 
-diff --git a/include/hw/compat.h b/include/hw/compat.h
-index 263de97..7f31850 100644
---- a/include/hw/compat.h
-+++ b/include/hw/compat.h
-@@ -2,7 +2,11 @@
- #define HW_COMPAT_H
- 
- #define HW_COMPAT_2_11 \
--    /* empty */
-+    {\
-+        .driver   = "hpet",\
-+        .property = "hpet-offset-saved",\
-+        .value    = "false",\
-+    },
- 
- #define HW_COMPAT_2_10 \
-     {\
+Right. Please check the new version of the patch.
+
+> > diff --git a/include/hw/compat.h b/include/hw/compat.h
+> > index 263de97..8897302 100644
+> > --- a/include/hw/compat.h
+> > +++ b/include/hw/compat.h
+> > @@ -13,6 +13,10 @@
+> >          .driver   = "virtio-tablet-device",\
+> >          .property = "wheel-axis",\
+> >          .value    = "false",\
+> > +    },{\
+> > +        .driver   = "hpet",\
+> > +        .property = "hpet-offset-saved",\
+> > +        .value    = "off",\
+> >      },
+> >
+> >  #define HW_COMPAT_2_9 \
+> 
+> This should be on 2_11 not 2_10 O:-)
+> 
+> But for the vmstate bits:
+> 
+> Reviewed-by: Juan Quintela <quintela@redhat.com>
+
+Thanks.
+
+Pavel Dovgalyuk
