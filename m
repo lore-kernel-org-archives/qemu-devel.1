@@ -1,25 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48406)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48841)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1eZNab-0002Ox-1t
-	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 16:07:14 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1eZNcL-0003a2-5z
+	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 16:09:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1eZNaX-0000ju-MG
-	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 16:07:12 -0500
-Resent-Message-Id: <E1eZNaX-0000ju-MG@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21359)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1eZNaX-0000iG-4x
-	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 16:07:09 -0500
-In-Reply-To: <20180110202553.31889-1-stefanha@redhat.com>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <151561838220.405.12384261789015892111@5adcb62bf0d6>
+	(envelope-from <richard.henderson@linaro.org>) id 1eZNcH-0002wJ-U4
+	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 16:09:01 -0500
+Received: from mail-pg0-x242.google.com ([2607:f8b0:400e:c05::242]:33569)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1eZNcH-0002vY-Lv
+	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 16:08:57 -0500
+Received: by mail-pg0-x242.google.com with SMTP id i196so527467pgd.0
+	for <qemu-devel@nongnu.org>; Wed, 10 Jan 2018 13:08:57 -0800 (PST)
+References: <20180108231048.23966-1-laurent@vivier.eu>
+	<20180108231048.23966-4-laurent@vivier.eu>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <dcf0ffed-6746-3927-986b-c747f172d6fd@linaro.org>
+Date: Wed, 10 Jan 2018 13:08:53 -0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Wed, 10 Jan 2018 13:06:23 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH 0/3] tracetool: improve error messages
+In-Reply-To: <20180108231048.23966-4-laurent@vivier.eu>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 3/6] target/m68k: add Transparent
+ Translation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,48 +32,20 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: stefanha@redhat.com
-Cc: famz@redhat.com, qemu-devel@nongnu.org, vilanova@ac.upc.edu, dgilbert@redhat.com
+To: Laurent Vivier <laurent@vivier.eu>, qemu-devel@nongnu.org
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
-c3NhZ2UtaWQ6IDIwMTgwMTEwMjAyNTUzLjMxODg5LTEtc3RlZmFuaGFAcmVkaGF0LmNvbQpTdWJq
-ZWN0OiBbUWVtdS1kZXZlbF0gW1BBVENIIDAvM10gdHJhY2V0b29sOiBpbXByb3ZlIGVycm9yIG1l
-c3NhZ2VzCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCgpCQVNFPWJhc2UK
-bj0xCnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJBU0UuLiB8IHdjIC1sKQpmYWlsZWQ9MAoK
-Z2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwg
-ZGlmZi5yZW5hbWVzIFRydWUKCmNvbW1pdHM9IiQoZ2l0IGxvZyAtLWZvcm1hdD0lSCAtLXJldmVy
-c2UgJEJBU0UuLikiCmZvciBjIGluICRjb21taXRzOyBkbwogICAgZWNobyAiQ2hlY2tpbmcgUEFU
-Q0ggJG4vJHRvdGFsOiAkKGdpdCBsb2cgLW4gMSAtLWZvcm1hdD0lcyAkYykuLi4iCiAgICBpZiAh
-IGdpdCBzaG93ICRjIC0tZm9ybWF0PWVtYWlsIHwgLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1t
-YWlsYmFjayAtOyB0aGVuCiAgICAgICAgZmFpbGVkPTEKICAgICAgICBlY2hvCiAgICBmaQogICAg
-bj0kKChuKzEpKQpkb25lCgpleGl0ICRmYWlsZWQKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVw
-ZGF0aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKU3dpdGNoZWQg
-dG8gYSBuZXcgYnJhbmNoICd0ZXN0JwowOGIxNTZkZTY5IHRyYWNldG9vbDogcmVwb3J0IGVycm9y
-IG9uIGZvbygpIGluc3RlYWQgb2YgZm9vKHZvaWQpCjdjNDU3OWY4Y2UgdHJhY2V0b29sOiBjbGFy
-aWZ5IHRoYXQgImZvcm1hdHMiIG1lYW5zICJmb3JtYXQgc3RyaW5ncyIKMzg0MmMwODgxNyB0cmFj
-ZXRvb2w6IHByZWZpeCBwYXJzZSBlcnJvcnMgd2l0aCBsaW5lIG51bWJlcnMKCj09PSBPVVRQVVQg
-QkVHSU4gPT09CkNoZWNraW5nIFBBVENIIDEvMzogdHJhY2V0b29sOiBwcmVmaXggcGFyc2UgZXJy
-b3JzIHdpdGggbGluZSBudW1iZXJzLi4uCkNoZWNraW5nIFBBVENIIDIvMzogdHJhY2V0b29sOiBj
-bGFyaWZ5IHRoYXQgImZvcm1hdHMiIG1lYW5zICJmb3JtYXQgc3RyaW5ncyIuLi4KRVJST1I6IGxp
-bmUgb3ZlciA5MCBjaGFyYWN0ZXJzCiMzNzogRklMRTogc2NyaXB0cy90cmFjZXRvb2wvX19pbml0
-X18ucHk6MjQwOgorICAgICAgICAgICAgcmFpc2UgVmFsdWVFcnJvcigiT25seSBldmVudHMgd2l0
-aCAndGNnJyBwcm9wZXJ0eSBjYW4gaGF2ZSB0d28gZm9ybWF0IHN0cmluZ3MiKQoKV0FSTklORzog
-bGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzQwOiBGSUxFOiBzY3JpcHRzL3RyYWNldG9vbC9fX2lu
-aXRfXy5weToyNDI6CisgICAgICAgICAgICByYWlzZSBWYWx1ZUVycm9yKCJFdmVudHMgd2l0aCAn
-dGNnJyBwcm9wZXJ0eSBtdXN0IGhhdmUgdHdvIGZvcm1hdCBzdHJpbmdzIikKCnRvdGFsOiAxIGVy
-cm9ycywgMSB3YXJuaW5ncywgMjcgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUg
-cHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxz
-ZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENI
-IGluIE1BSU5UQUlORVJTLgoKQ2hlY2tpbmcgUEFUQ0ggMy8zOiB0cmFjZXRvb2w6IHJlcG9ydCBl
-cnJvciBvbiBmb28oKSBpbnN0ZWFkIG9mIGZvbyh2b2lkKS4uLgpXQVJOSU5HOiBsaW5lIG92ZXIg
-ODAgY2hhcmFjdGVycwojMjQ6IEZJTEU6IHNjcmlwdHMvdHJhY2V0b29sL19faW5pdF9fLnB5Ojc5
-OgorICAgICAgICAgICAgICAgIHJhaXNlIFZhbHVlRXJyb3IoIkVtcHR5IGFyZ3VtZW50IChkaWQg
-eW91IGZvcmdldCB0byB1c2UgJ3ZvaWQnPykiKQoKdG90YWw6IDAgZXJyb3JzLCAxIHdhcm5pbmdz
-LCA4IGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2Ug
-cmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9y
-dCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4K
-PT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKCi0t
-LQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hl
-dy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQGZyZWVs
-aXN0cy5vcmc=
+On 01/08/2018 03:10 PM, Laurent Vivier wrote:
+> Add ittr0, ittr1, dttr0, dttr1 and manage Transparent Translations
+> 
+> Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+> ---
+>  target/m68k/cpu.h       | 18 +++++++++++
+>  target/m68k/helper.c    | 79 +++++++++++++++++++++++++++++++++++++++++++++++++
+>  target/m68k/monitor.c   |  4 +++
+>  target/m68k/translate.c |  3 ++
+>  4 files changed, 104 insertions(+)
+
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+
+
+r~
