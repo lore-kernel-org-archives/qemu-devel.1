@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42449)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42661)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1eZIoz-00068W-Qf
-	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 11:01:49 -0500
+	(envelope-from <intermediadc@hotmail.com>) id 1eZIpZ-0006bI-Qu
+	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 11:02:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1eZIoz-0000Uj-2f
-	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 11:01:45 -0500
-Date: Wed, 10 Jan 2018 16:01:24 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180110160124.GC2451@work-vm>
-References: <20171207155102.66622-1-vsementsov@virtuozzo.com>
-	<20171207155102.66622-3-vsementsov@virtuozzo.com>
-	<20171208173321.GR2403@work-vm>
-	<8711ff94-3d7a-446e-6da1-2e6e2b82899a@redhat.com>
+	(envelope-from <intermediadc@hotmail.com>) id 1eZIpQ-00011A-7E
+	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 11:02:21 -0500
+From: luigi burdo <intermediadc@hotmail.com>
+Date: Wed, 10 Jan 2018 16:02:08 +0000
+Message-ID: <AM5P194MB01328FAFC2F2E25ECCDB23E1C8110@AM5P194MB0132.EURP194.PROD.OUTLOOK.COM>
+References: <20180108055348.20444-1-david@gibson.dropbear.id.au>
+	<CAFEAcA_vmTqHdjL6QfKtn-Khg2RHBA7Vs3QxreXwe2J_7mhGAQ@mail.gmail.com>
+	<20180109121653.GN2131@umbus.fritz.box>
+	<AM5P194MB0132AB1A7F3CE7E09346CDC4C8110@AM5P194MB0132.EURP194.PROD.OUTLOOK.COM>,
+	<CAFEAcA8u0b_+W7GBwy6knV3_zvZLc00fbbSjDT42CkS83Gb29w@mail.gmail.com>
+In-Reply-To: <CAFEAcA8u0b_+W7GBwy6knV3_zvZLc00fbbSjDT42CkS83Gb29w@mail.gmail.com>
+Content-Language: it-IT
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <8711ff94-3d7a-446e-6da1-2e6e2b82899a@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 2/6] qapi: add name parameter to
- nbd-server-add
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PULL 00/12] ppc-for-2.12 queue 20180108
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,42 +27,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org, armbru@redhat.com, pbonzini@redhat.com, mreitz@redhat.com, kwolf@redhat.com, den@openvz.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: David Gibson <david@gibson.dropbear.id.au>, Michael Roth <mdroth@linux.vnet.ibm.com>, QEMU Developers <qemu-devel@nongnu.org>, "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>, Greg Kurz <groug@kaod.org>, "surajjs@au1.ibm.com" <surajjs@au1.ibm.com>
 
-* Eric Blake (eblake@redhat.com) wrote:
-> On 12/08/2017 11:33 AM, Dr. David Alan Gilbert wrote:
-> 
-> >> @@ -2223,7 +2224,7 @@ void hmp_nbd_server_add(Monitor *mon, const QDict *qdict)
-> >>      bool writable = qdict_get_try_bool(qdict, "writable", false);
-> >>      Error *local_err = NULL;
-> >>  
-> >> -    qmp_nbd_server_add(device, true, writable, &local_err);
-> >> +    qmp_nbd_server_add(device, false, NULL, true, writable, &local_err);
-> > 
-> > I wont insist, but it would be nice if you wired up an optional
-> > parameter on HMP as well.
-> 
-> Can be done as a followup patch
+Hi Peter,
 
-Yes, agreed.
+thanks for reply.
 
-> I'm not sure how many people are
-> setting up NBD exports via HMP, and I'm also okay with just stating that
-> the full power requires use of QMP.  But I'll give such a followup patch
-> a quick try, to see whether it is easy after all.
+I will check the ram banks and will try again to build it .
 
-Thanks; I have set up NBD exports up via HMP a few times.
-
-Dave
-
-> -- 
-> Eric Blake, Principal Software Engineer
-> Red Hat, Inc.           +1-919-301-3266
-> Virtualization:  qemu.org | libvirt.org
-> 
+but i have more fear about gcc now because the issue come exactly in the sa=
+me point every time i try to rebuild everyting.
 
 
+Thankyou
 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Luigi
+
+
+________________________________________
+
+This means that gcc crashed. This is either:
+ (a) a hardware problem with your machine (eg bad memory)
+or
+ (b) a bug in gcc (which you can report to the gcc team
+as they suggest in the error message)
+
+You should check whether gcc reliably crashes in the
+same way every time you try to build that source file.
+If it does, that suggests a gcc bug is more likely. If
+it sometimes works and sometimes doesn't, I would suspect
+hardware problems.
+
+thanks
+-- PMM
