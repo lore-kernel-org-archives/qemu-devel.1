@@ -1,25 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60622)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33018)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1eZIYN-0004GJ-HG
-	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 10:44:36 -0500
+	(envelope-from <jsnow@redhat.com>) id 1eZIa6-0005Pf-JL
+	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 10:46:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1eZIYK-0002M3-FK
-	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 10:44:35 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:39834)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1eZIYK-0002LZ-8y
-	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 10:44:32 -0500
-Date: Wed, 10 Jan 2018 15:44:26 +0000
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20180110154426.GJ3205@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <20180110153924.17391-1-edgar.kaziakhmedov@virtuozzo.com>
+	(envelope-from <jsnow@redhat.com>) id 1eZIa5-0003dG-Rw
+	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 10:46:22 -0500
+References: <CACaajQsL3e+XWR0hBDLThmG_fd=ih-n+HJVz++XcnwLhhVstgg@mail.gmail.com>
+	<56c5bcbb-02c0-a3f7-4363-e3141476b2f8@redhat.com>
+	<CACaajQvYee3-=859D8t-QLiYdTE8SL-M5zztP4QsjRm5xCnvBQ@mail.gmail.com>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <36ebb0bc-363f-5cc6-5274-ce8de7044990@redhat.com>
+Date: Wed, 10 Jan 2018 10:46:09 -0500
 MIME-Version: 1.0
+In-Reply-To: <CACaajQvYee3-=859D8t-QLiYdTE8SL-M5zztP4QsjRm5xCnvBQ@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20180110153924.17391-1-edgar.kaziakhmedov@virtuozzo.com>
-Subject: Re: [Qemu-devel] [PATCH v3 1/1] io/channel-websock: handle
- continuous reads without any data
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] qemu 2.9.0 qcow2 file failed to open after hard
+ server reset
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,40 +26,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Edgar Kaziakhmedov <edgar.kaziakhmedov@virtuozzo.com>
-Cc: qemu-devel@nongnu.org, den@openvz.org
+To: Vasiliy Tolstov <v.tolstov@selfip.ru>
+Cc: qemu-devel <qemu-devel@nongnu.org>, Qemu-block <qemu-block@nongnu.org>
 
-On Wed, Jan 10, 2018 at 06:39:24PM +0300, Edgar Kaziakhmedov wrote:
-> According to the current implementation of websocket protocol in QEMU,
-> qio_channel_websock_handshake_io tries to read handshake from the
-> channel to start communication over socket. But this approach
-> doesn't cover scenario when socket was closed while handshaking.
-> Therefore, if G_IO_IN is caught and qio_channel_read returns zero,
-> error has to be set and connection has to be done.
+
+
+On 12/27/2017 04:47 PM, Vasiliy Tolstov wrote:
+> 2017-12-22 1:58 GMT+03:00 John Snow <jsnow@redhat.com>:
+>>
+>>
+>> On 12/21/2017 05:13 PM, Vasiliy Tolstov wrote:
+>>> Hi! Today my server have forced reboot and one of my vm can't start
+>>> with message:
+>>> qcow2: Marking image as corrupt: L2 table offset 0x3f786d6c207600
+>>> unaligned (L1 index: 0); further corruption events will be suppressed
+>>>
+>>> i'm use debian jessie with hand builded qemu 2.9.0, i'm try to
+>>> qemu-img check but it not helps. How can i recover data inside qcow2
+>>> file? (i'm not use compression or encryption inside it).
+>>>
+>>
+>> Not looking good if you're missing the very first L2 table in its entirety.
+>>
+>> You might be able to go through this thing by hand and learn for
+>> yourself where the L2 table is (it will be a 64KiB region, aligned to a
+>> 64KiB boundary, that all contain 64bit, 64KiB aligned pointers that will
+>> be less than the size of the file. the offset of this missing region is
+>> not likely to be referenced elsewhere in your file.)
+>>
+>> and then, once you've found it, you can update the pointer that's wrong.
+>> However, where there's smoke there's often fire, so...
+>>
+>> best of luck.
+>>
+>> --js
 > 
-> Such behaviour causes 100% CPU load in main QEMU loop, because main loop
-> poll continues to receive and handle G_IO_IN events from websocket.
+> If i use raw image as i understand this corruption can't happening in raw?
 > 
-> Step to reproduce 100% CPU load:
-> 1) start qemu with the simplest configuration
-> $ qemu -vnc [::1]:1,websocket=7500
-> 2) open any vnc listener (which doesn't follow websocket
-> protocol)
-> $ vncviewer :7500
-> 3) kill listener
-> 4) qemu main thread eats 100% CPU
-> 
-> Signed-off-by: Edgar Kaziakhmedov <edgar.kaziakhmedov@virtuozzo.com>
-> ---
->  io/channel-websock.c | 7 +++++--
->  1 file changed, 5 insertions(+), 2 deletions(-)
 
-Thanks, I have queued this patch.
+Not this exact type of corruption, anyway. Backups are important for a
+reason!
 
-
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+--js
