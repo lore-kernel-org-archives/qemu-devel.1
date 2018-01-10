@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42132)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48406)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eZNIT-0005Bt-8b
-	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 15:48:30 -0500
+	(envelope-from <no-reply@patchew.org>) id 1eZNab-0002Ox-1t
+	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 16:07:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eZNIQ-000727-2a
-	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 15:48:29 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:54256)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1eZNIP-00071F-Pk
-	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 15:48:25 -0500
-References: <20180110202553.31889-1-stefanha@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <cb5cf329-50b6-845b-ff74-cd0001778611@redhat.com>
-Date: Wed, 10 Jan 2018 14:48:16 -0600
-MIME-Version: 1.0
+	(envelope-from <no-reply@patchew.org>) id 1eZNaX-0000ju-MG
+	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 16:07:12 -0500
+Resent-Message-Id: <E1eZNaX-0000ju-MG@eggs.gnu.org>
+Received: from sender-of-o52.zoho.com ([135.84.80.217]:21359)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1eZNaX-0000iG-4x
+	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 16:07:09 -0500
 In-Reply-To: <20180110202553.31889-1-stefanha@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="wXh0PLPahUUibbZF7Juceiobrplo4Qtx7"
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <151561838220.405.12384261789015892111@5adcb62bf0d6>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Wed, 10 Jan 2018 13:06:23 -0800 (PST)
 Subject: Re: [Qemu-devel] [PATCH 0/3] tracetool: improve error messages
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -27,64 +28,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
-Cc: =?UTF-8?Q?Llu=c3=ads_Vilanova?= <vilanova@ac.upc.edu>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: stefanha@redhat.com
+Cc: famz@redhat.com, qemu-devel@nongnu.org, vilanova@ac.upc.edu, dgilbert@redhat.com
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---wXh0PLPahUUibbZF7Juceiobrplo4Qtx7
-From: Eric Blake <eblake@redhat.com>
-To: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
-Cc: =?UTF-8?Q?Llu=c3=ads_Vilanova?= <vilanova@ac.upc.edu>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <cb5cf329-50b6-845b-ff74-cd0001778611@redhat.com>
-Subject: Re: [PATCH 0/3] tracetool: improve error messages
-References: <20180110202553.31889-1-stefanha@redhat.com>
-In-Reply-To: <20180110202553.31889-1-stefanha@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 01/10/2018 02:25 PM, Stefan Hajnoczi wrote:
-> This series improves the tracetool error messages to make them more
-> user-friendly.
->=20
-> Stefan Hajnoczi (3):
->   tracetool: prefix parse errors with line numbers
->   tracetool: clarify that "formats" means "format strings"
->   tracetool: report error on foo() instead of foo(void)
-
-Series:
-Reviewed-by: Eric Blake <eblake@redhat.com>
-
-but see nit on patch 1
-
->=20
->  scripts/tracetool/__init__.py | 19 +++++++++++++------
->  1 file changed, 13 insertions(+), 6 deletions(-)
->=20
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---wXh0PLPahUUibbZF7Juceiobrplo4Qtx7
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlpWfBAACgkQp6FrSiUn
-Q2ru7ggAmIhPmuTdpp9nuLEe9KGJ3Ti1YSme9lK/I8C04Q92T8mVuEgsYT859Vz6
-pStGw5BKjCc0Jzcg6CmgWYto0CcRqTf+bdqqthjGa0QXXO6PpIbXETbZp7pN7+g1
-x1StWrf8Slxba1H6vb8L/iywlTWV+u41ZeO1X+ho4aiiPAVmK8Ew5g54zM9Bn2We
-iZOG0M7bHnodrBtNJwO+tAYv0gQk1HctmkaSbW8Ag0rCO0FSvo8zYQkv5WDxyQWu
-ZVyoB2kd9FLpiutmVPi26UJiJEkrctFEFhd6vYPinnoNq/KqpK8rXIrKO64Hfkje
-Cy2mBju24yFowccju5D39u077HT4Lw==
-=NjaW
------END PGP SIGNATURE-----
-
---wXh0PLPahUUibbZF7Juceiobrplo4Qtx7--
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IDIwMTgwMTEwMjAyNTUzLjMxODg5LTEtc3RlZmFuaGFAcmVkaGF0LmNvbQpTdWJq
+ZWN0OiBbUWVtdS1kZXZlbF0gW1BBVENIIDAvM10gdHJhY2V0b29sOiBpbXByb3ZlIGVycm9yIG1l
+c3NhZ2VzCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCgpCQVNFPWJhc2UK
+bj0xCnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJBU0UuLiB8IHdjIC1sKQpmYWlsZWQ9MAoK
+Z2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwg
+ZGlmZi5yZW5hbWVzIFRydWUKCmNvbW1pdHM9IiQoZ2l0IGxvZyAtLWZvcm1hdD0lSCAtLXJldmVy
+c2UgJEJBU0UuLikiCmZvciBjIGluICRjb21taXRzOyBkbwogICAgZWNobyAiQ2hlY2tpbmcgUEFU
+Q0ggJG4vJHRvdGFsOiAkKGdpdCBsb2cgLW4gMSAtLWZvcm1hdD0lcyAkYykuLi4iCiAgICBpZiAh
+IGdpdCBzaG93ICRjIC0tZm9ybWF0PWVtYWlsIHwgLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1t
+YWlsYmFjayAtOyB0aGVuCiAgICAgICAgZmFpbGVkPTEKICAgICAgICBlY2hvCiAgICBmaQogICAg
+bj0kKChuKzEpKQpkb25lCgpleGl0ICRmYWlsZWQKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVw
+ZGF0aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKU3dpdGNoZWQg
+dG8gYSBuZXcgYnJhbmNoICd0ZXN0JwowOGIxNTZkZTY5IHRyYWNldG9vbDogcmVwb3J0IGVycm9y
+IG9uIGZvbygpIGluc3RlYWQgb2YgZm9vKHZvaWQpCjdjNDU3OWY4Y2UgdHJhY2V0b29sOiBjbGFy
+aWZ5IHRoYXQgImZvcm1hdHMiIG1lYW5zICJmb3JtYXQgc3RyaW5ncyIKMzg0MmMwODgxNyB0cmFj
+ZXRvb2w6IHByZWZpeCBwYXJzZSBlcnJvcnMgd2l0aCBsaW5lIG51bWJlcnMKCj09PSBPVVRQVVQg
+QkVHSU4gPT09CkNoZWNraW5nIFBBVENIIDEvMzogdHJhY2V0b29sOiBwcmVmaXggcGFyc2UgZXJy
+b3JzIHdpdGggbGluZSBudW1iZXJzLi4uCkNoZWNraW5nIFBBVENIIDIvMzogdHJhY2V0b29sOiBj
+bGFyaWZ5IHRoYXQgImZvcm1hdHMiIG1lYW5zICJmb3JtYXQgc3RyaW5ncyIuLi4KRVJST1I6IGxp
+bmUgb3ZlciA5MCBjaGFyYWN0ZXJzCiMzNzogRklMRTogc2NyaXB0cy90cmFjZXRvb2wvX19pbml0
+X18ucHk6MjQwOgorICAgICAgICAgICAgcmFpc2UgVmFsdWVFcnJvcigiT25seSBldmVudHMgd2l0
+aCAndGNnJyBwcm9wZXJ0eSBjYW4gaGF2ZSB0d28gZm9ybWF0IHN0cmluZ3MiKQoKV0FSTklORzog
+bGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzQwOiBGSUxFOiBzY3JpcHRzL3RyYWNldG9vbC9fX2lu
+aXRfXy5weToyNDI6CisgICAgICAgICAgICByYWlzZSBWYWx1ZUVycm9yKCJFdmVudHMgd2l0aCAn
+dGNnJyBwcm9wZXJ0eSBtdXN0IGhhdmUgdHdvIGZvcm1hdCBzdHJpbmdzIikKCnRvdGFsOiAxIGVy
+cm9ycywgMSB3YXJuaW5ncywgMjcgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUg
+cHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxz
+ZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENI
+IGluIE1BSU5UQUlORVJTLgoKQ2hlY2tpbmcgUEFUQ0ggMy8zOiB0cmFjZXRvb2w6IHJlcG9ydCBl
+cnJvciBvbiBmb28oKSBpbnN0ZWFkIG9mIGZvbyh2b2lkKS4uLgpXQVJOSU5HOiBsaW5lIG92ZXIg
+ODAgY2hhcmFjdGVycwojMjQ6IEZJTEU6IHNjcmlwdHMvdHJhY2V0b29sL19faW5pdF9fLnB5Ojc5
+OgorICAgICAgICAgICAgICAgIHJhaXNlIFZhbHVlRXJyb3IoIkVtcHR5IGFyZ3VtZW50IChkaWQg
+eW91IGZvcmdldCB0byB1c2UgJ3ZvaWQnPykiKQoKdG90YWw6IDAgZXJyb3JzLCAxIHdhcm5pbmdz
+LCA4IGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2Ug
+cmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9y
+dCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4K
+PT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKCi0t
+LQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hl
+dy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQGZyZWVs
+aXN0cy5vcmc=
