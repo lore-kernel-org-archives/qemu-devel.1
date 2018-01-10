@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33965)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34225)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1eZMws-0001J6-Ni
-	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 15:26:11 -0500
+	(envelope-from <stefanha@redhat.com>) id 1eZMx5-0001Ux-Nh
+	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 15:26:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1eZMwr-0001Jo-On
-	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 15:26:10 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:44750)
+	(envelope-from <stefanha@redhat.com>) id 1eZMx1-0001c9-PQ
+	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 15:26:23 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:52722)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1eZMwr-0001I7-9W
-	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 15:26:09 -0500
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1eZMx1-0001ZW-I9
+	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 15:26:19 -0500
 From: Stefan Hajnoczi <stefanha@redhat.com>
-Date: Wed, 10 Jan 2018 20:25:51 +0000
-Message-Id: <20180110202553.31889-2-stefanha@redhat.com>
+Date: Wed, 10 Jan 2018 20:25:53 +0000
+Message-Id: <20180110202553.31889-4-stefanha@redhat.com>
 In-Reply-To: <20180110202553.31889-1-stefanha@redhat.com>
 References: <20180110202553.31889-1-stefanha@redhat.com>
-Subject: [Qemu-devel] [PATCH 1/3] tracetool: prefix parse errors with line
- numbers
+Subject: [Qemu-devel] [PATCH 3/3] tracetool: report error on foo() instead
+ of foo(void)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,39 +27,28 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Eric Blake <eblake@redhat.com>, =?UTF-8?q?Llu=C3=ADs=20Vilanova?= <vilanova@ac.upc.edu>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
-Include the file line number in the message that is printed when
-trace-events parse errors are raised.
+C functions with no arguments must be declared foo(void) instead of
+foo().  The tracetool argument list parser has never accepted an empty
+argument list.  This patch adds a clear error message for this error
+case.
 
-Suggested-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
 ---
- scripts/tracetool/__init__.py | 9 +++++++--
- 1 file changed, 7 insertions(+), 2 deletions(-)
+ scripts/tracetool/__init__.py | 2 ++
+ 1 file changed, 2 insertions(+)
 
 diff --git a/scripts/tracetool/__init__.py b/scripts/tracetool/__init__.py
-index 0670ec17d5..fbccaaa0cf 100644
+index 5db1f5c395..8e9efba78f 100644
 --- a/scripts/tracetool/__init__.py
 +++ b/scripts/tracetool/__init__.py
-@@ -300,13 +300,18 @@ def read_events(fobj):
-     """
+@@ -75,6 +75,8 @@ class Arguments:
+         res = []
+         for arg in arg_str.split(","):
+             arg = arg.strip()
++            if not arg:
++                raise ValueError("Empty argument (did you forget to use 'void'?)")
+             if arg == 'void':
+                 continue
  
-     events = []
--    for line in fobj:
-+    for lineno, line in enumerate(fobj):
-         if not line.strip():
-             continue
-         if line.lstrip().startswith('#'):
-             continue
- 
--        event = Event.build(line)
-+        try:
-+            event = Event.build(line)
-+        except ValueError as e:
-+            arg0 = 'Error on line %d: %s' % (lineno + 1, e.args[0])
-+            e.args = (arg0,) + e.args[1:]
-+            raise
- 
-         # transform TCG-enabled events
-         if "tcg" not in event.properties:
 -- 
 2.14.3
