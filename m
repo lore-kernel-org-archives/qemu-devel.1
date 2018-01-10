@@ -1,23 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56449)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60755)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <gengdongjiu@huawei.com>) id 1eZFPb-0006cT-Cc
-	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 07:23:20 -0500
+	(envelope-from <imammedo@redhat.com>) id 1eZFXQ-0000N0-3m
+	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 07:31:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <gengdongjiu@huawei.com>) id 1eZFPa-0003wL-H7
-	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 07:23:19 -0500
-References: <1514440458-10515-1-git-send-email-gengdongjiu@huawei.com>
-	<1514440458-10515-5-git-send-email-gengdongjiu@huawei.com>
-	<CAFEAcA-sZrr71e0KtTYXao7WQzDoAGtdDqVL1Swjqqs2jUWtWw@mail.gmail.com>
-From: gengdongjiu <gengdongjiu@huawei.com>
-Message-ID: <fc41a8ab-3e94-8c8d-6c46-219f1dff82d3@huawei.com>
-Date: Wed, 10 Jan 2018 20:20:45 +0800
+	(envelope-from <imammedo@redhat.com>) id 1eZFXJ-0003lT-WB
+	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 07:31:24 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:49484)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1eZFXJ-0003kn-NV
+	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 07:31:17 -0500
+Date: Wed, 10 Jan 2018 13:31:09 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20180110133109.3f8d9965@redhat.com>
+In-Reply-To: <20180110135246-mutt-send-email-mst@kernel.org>
+References: <1515506288-32291-1-git-send-email-mst@redhat.com>
+	<20180110122535.3cc0d223@igors-macbook-pro.local>
+	<20180110132751-mutt-send-email-mst@kernel.org>
+	<20180110124152.10896011@igors-macbook-pro.local>
+	<20180110135246-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA-sZrr71e0KtTYXao7WQzDoAGtdDqVL1Swjqqs2jUWtWw@mail.gmail.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v14 4/9] ACPI: enable APEI GHES in the
- configure file
+Subject: Re: [Qemu-devel] [PATCH] acpi: switch to a dummy SSDT
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,51 +30,98 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Shannon Zhao <zhaoshenglong@huawei.com>, Marcelo Tosatti <mtosatti@redhat.com>, Richard
-	Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, James
-	Morse <james.morse@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, kvm-devel <kvm@vger.kernel.org>, QEMU
-	Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Huangshaoyu <huangshaoyu@huawei.com>, "Zhengqiang (turing)" <zhengqiang10@huawei.com>, Xu Wei <xuwei5@hisilicon.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, stefanb@linux.vnet.ibm.com
 
-On 2018/1/10 1:16, Peter Maydell wrote:
-> On 28 December 2017 at 05:54, Dongjiu Geng <gengdongjiu@huawei.com> wrote:
->> Add CONFIG_ACPI_APEI configuration in the arm-softmmu.mak
->> and add build choice in the Makefile.objs.
->>
->> Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
->> ---
->>  default-configs/arm-softmmu.mak | 1 +
->>  hw/acpi/Makefile.objs           | 1 +
->>  2 files changed, 2 insertions(+)
->>
->> diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-softmmu.mak
->> index bbdd3c1..c362113 100644
->> --- a/default-configs/arm-softmmu.mak
->> +++ b/default-configs/arm-softmmu.mak
->> @@ -129,3 +129,4 @@ CONFIG_ACPI=y
->>  CONFIG_SMBIOS=y
->>  CONFIG_ASPEED_SOC=y
->>  CONFIG_GPIO_KEY=y
->> +CONFIG_ACPI_APEI=y
->> diff --git a/hw/acpi/Makefile.objs b/hw/acpi/Makefile.objs
->> index 11c35bc..bafb148 100644
->> --- a/hw/acpi/Makefile.objs
->> +++ b/hw/acpi/Makefile.objs
->> @@ -6,6 +6,7 @@ common-obj-$(CONFIG_ACPI_MEMORY_HOTPLUG) += memory_hotplug.o
->>  common-obj-$(CONFIG_ACPI_CPU_HOTPLUG) += cpu.o
->>  common-obj-$(CONFIG_ACPI_NVDIMM) += nvdimm.o
->>  common-obj-$(CONFIG_ACPI_VMGENID) += vmgenid.o
->> +common-obj-$(CONFIG_ACPI_APEI) += hest_ghes.o
->>  common-obj-$(call lnot,$(CONFIG_ACPI_X86)) += acpi-stub.o
-> 
-> You should include this in the patch which first adds the
-> new host_ghes.c file. Otherwise that patch won't compile.
+On Wed, 10 Jan 2018 13:55:37 +0200
+"Michael S. Tsirkin" <mst@redhat.com> wrote:
 
-sure, will modify it.
+> On Wed, Jan 10, 2018 at 12:41:52PM +0100, Igor Mammedov wrote:
+> > On Wed, 10 Jan 2018 13:29:09 +0200
+> > "Michael S. Tsirkin" <mst@redhat.com> wrote:
+> >   
+> > > On Wed, Jan 10, 2018 at 12:25:34PM +0100, Igor Mammedov wrote:  
+> > > > On Tue, 9 Jan 2018 15:58:11 +0200
+> > > > "Michael S. Tsirkin" <mst@redhat.com> wrote:
+> > > >   
+> > > > > We prefer not changing table sizes depending on parameters,
+> > > > > that's why we create a dummy table rather than just drop
+> > > > > the MCFG table.
+> > > > > 
+> > > > > However, a table named "QEMU" could be put to a better
+> > > > > use than just a stub, e.g. we could use it to pass
+> > > > > some QEMU specific info to guests.
+> > > > > 
+> > > > > Replace with an SSDT and pad with the Nop opcode
+> > > > > to preserve the length.  
+> > > > Not sure it's useful, do you have patches on top of that, which will use this?  
+> > > 
+> > > Yes but not me - Stefan (Cc'd) wants to add a custom table.  
+> > Re-purposing dummy table that might become not dummy doesn't look like good approach.
+> > What if later the guest enables MCFG and reboots, DUMMY SSDT would be replaced by MCFG?   
+> 
+> So what's the issue?  Why is this worse than a dummy QEMU table?
+> There's actually no re-purposing here at all. Either we create
+> an MCFG or an SSDT. We never re-purpose.
+I think, I've misread commit message, so it's table name 'QEMU'
+that's going to be reused.
 
+Having several tables with name QEMU shouldn't be an issue,
+adding oem/oem_id should be sufficient to distinguish them
+for parsing side (if there is any).
+
+As for change from ignored table to always parsed SSDT table,
+having ignored one seems better.
+So I'd drop SSDT+memset and keep oem[id] parts in this patch.
+ 
+> > It'd be cleaner if Stefan would just use his own dedicated SSDT.  
 > 
-> thanks
-> -- PMM
+> SSDT doesn't always work. A data table is needed so e.g. seabios
+> can process it easily.
 > 
-> .
-> 
+> > > >   
+> > > > > Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+> > > > > ---
+> > > > >  hw/i386/acpi-build.c | 17 ++++++++++++-----
+> > > > >  1 file changed, 12 insertions(+), 5 deletions(-)
+> > > > > 
+> > > > > diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+> > > > > index 73519ab..d0afb31e 100644
+> > > > > --- a/hw/i386/acpi-build.c
+> > > > > +++ b/hw/i386/acpi-build.c
+> > > > > @@ -2419,6 +2419,8 @@ build_mcfg_q35(GArray *table_data, BIOSLinker *linker, AcpiMcfgInfo *info)
+> > > > >  {
+> > > > >      AcpiTableMcfg *mcfg;
+> > > > >      const char *sig;
+> > > > > +    const char *oem;
+> > > > > +    const char *oem_id;
+> > > > >      int len = sizeof(*mcfg) + 1 * sizeof(mcfg->allocation[0]);
+> > > > >  
+> > > > >      mcfg = acpi_data_push(table_data, len);
+> > > > > @@ -2431,16 +2433,21 @@ build_mcfg_q35(GArray *table_data, BIOSLinker *linker, AcpiMcfgInfo *info)
+> > > > >      /* MCFG is used for ECAM which can be enabled or disabled by guest.
+> > > > >       * To avoid table size changes (which create migration issues),
+> > > > >       * always create the table even if there are no allocations,
+> > > > > -     * but set the signature to a reserved value in this case.
+> > > > > -     * ACPI spec requires OSPMs to ignore such tables.
+> > > > > +     * but fill it with Noop values.
+> > > > > +     * OSPMs ignore such tables.
+> > > > >       */
+> > > > >      if (info->mcfg_base == PCIE_BASE_ADDR_UNMAPPED) {
+> > > > > -        /* Reserved signature: ignored by OSPM */
+> > > > > -        sig = "QEMU";
+> > > > > +        sig = "SSDT";
+> > > > > +        oem = "QEMU ";
+> > > > > +        oem_id = "NOOP";
+> > > > > +        /* 0xa3 - NoopOp */
+> > > > > +        memset(&mcfg->reserved, 0xa3, len - offsetof(AcpiTableMcfg, reserved));
+> > > > >      } else {
+> > > > >          sig = "MCFG";
+> > > > > +        oem = NULL;
+> > > > > +        oem_id = NULL;
+> > > > >      }
+> > > > > -    build_header(linker, table_data, (void *)mcfg, sig, len, 1, NULL, NULL);
+> > > > > +    build_header(linker, table_data, (void *)mcfg, sig, len, 1, oem, oem_id);
+> > > > >  }
+> > > > >  
+> > > > >  /*  
