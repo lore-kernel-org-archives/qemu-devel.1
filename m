@@ -1,35 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43481)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43524)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1eZLDs-0005I5-Bz
-	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 13:35:38 -0500
+	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1eZLDu-0005Ih-4k
+	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 13:35:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1eZLDn-0000rp-AD
-	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 13:35:36 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:44300)
+	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1eZLDp-0000t9-0C
+	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 13:35:38 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:57474
+	helo=mx0a-001b2d01.pphosted.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <stefanb@linux.vnet.ibm.com>)
-	id 1eZLDm-0000r4-VU
-	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 13:35:31 -0500
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w0AIYKnr060882
-	for <qemu-devel@nongnu.org>; Wed, 10 Jan 2018 13:35:29 -0500
-Received: from e31.co.us.ibm.com (e31.co.us.ibm.com [32.97.110.149])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2fdkucnjkr-1
+	id 1eZLDo-0000sf-KB
+	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 13:35:32 -0500
+Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w0AIYJsd036124
+	for <qemu-devel@nongnu.org>; Wed, 10 Jan 2018 13:35:31 -0500
+Received: from e33.co.us.ibm.com (e33.co.us.ibm.com [32.97.110.151])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2fdnxm7dr3-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 10 Jan 2018 13:35:29 -0500
+	for <qemu-devel@nongnu.org>; Wed, 10 Jan 2018 13:35:31 -0500
 Received: from localhost
-	by e31.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	by e33.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
 	Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <stefanb@linux.vnet.ibm.com>;
-	Wed, 10 Jan 2018 11:35:27 -0700
+	Wed, 10 Jan 2018 11:35:30 -0700
 From: Stefan Berger <stefanb@linux.vnet.ibm.com>
-Date: Wed, 10 Jan 2018 13:35:16 -0500
+Date: Wed, 10 Jan 2018 13:35:17 -0500
 In-Reply-To: <1515609318-1897-1-git-send-email-stefanb@linux.vnet.ibm.com>
 References: <1515609318-1897-1-git-send-email-stefanb@linux.vnet.ibm.com>
-Message-Id: <1515609318-1897-2-git-send-email-stefanb@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [RFC PATCH 1/3] tpm: Implement virtual memory device
- for TPM PPI
+Message-Id: <1515609318-1897-3-git-send-email-stefanb@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [RFC PATCH 2/3] acpi: implement aml_lless_equal
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -41,194 +41,46 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: mst@redhat.com, stefanb@linux.vnet.ibm.com, kevin@koconnor.net, marcandre.lureau@redhat.com
 
-Implement a virtual memory device for the TPM physical
-presence interface. The memory is located at 0xffff0000
-and used by ACPI to send messages to the firmware (BIOS).
-
-This device should be used by all TPM interfaces on x86 and
-can be added through by calling tpm_ppi_init_io().
+LLessEqualOp = LNotOp LGreaterOp
 
 Signed-off-by: Stefan Berger <stefanb@linux.vnet.ibm.com>
 ---
- hw/tpm/Makefile.objs  |  2 +-
- hw/tpm/tpm_ppi.c      | 79 +++++++++++++++++++++++++++++++++++++++++++++++++++
- hw/tpm/tpm_ppi.h      | 25 ++++++++++++++++
- hw/tpm/tpm_tis.c      |  5 ++++
- include/hw/acpi/tpm.h |  6 ++++
- 5 files changed, 116 insertions(+), 1 deletion(-)
- create mode 100644 hw/tpm/tpm_ppi.c
- create mode 100644 hw/tpm/tpm_ppi.h
+ hw/acpi/aml-build.c         | 10 ++++++++++
+ include/hw/acpi/aml-build.h |  1 +
+ 2 files changed, 11 insertions(+)
 
-diff --git a/hw/tpm/Makefile.objs b/hw/tpm/Makefile.objs
-index 7a93b24..3eb0558 100644
---- a/hw/tpm/Makefile.objs
-+++ b/hw/tpm/Makefile.objs
-@@ -1,4 +1,4 @@
--common-obj-y += tpm_util.o
-+common-obj-y += tpm_util.o tpm_ppi.o
- common-obj-$(CONFIG_TPM_TIS) += tpm_tis.o
- common-obj-$(CONFIG_TPM_PASSTHROUGH) += tpm_passthrough.o
- common-obj-$(CONFIG_TPM_EMULATOR) += tpm_emulator.o
-diff --git a/hw/tpm/tpm_ppi.c b/hw/tpm/tpm_ppi.c
-new file mode 100644
-index 0000000..fa8c3c3
---- /dev/null
-+++ b/hw/tpm/tpm_ppi.c
-@@ -0,0 +1,79 @@
-+/*
-+ * tpm_ppi.c - TPM Physical Presence Interface
-+ *
-+ * Copyright (C) 2018 IBM Corporation
-+ *
-+ * Authors:
-+ *  Stefan Berger <stefanb@us.ibm.com>
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or later.
-+ * See the COPYING file in the top-level directory.
-+ *
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "exec/memory.h"
-+#include "exec/address-spaces.h"
-+
-+#include "tpm_ppi.h"
-+
-+#define DEBUG_PPI 1
-+
-+#define DPRINTF(fmt, ...) do { \
-+    if (DEBUG_PPI) { \
-+        printf(fmt, ## __VA_ARGS__); \
-+    } \
-+} while (0);
-+
-+static uint64_t tpm_ppi_mmio_read(void *opaque, hwaddr addr,
-+                                  unsigned size)
-+{
-+    TPMPPI *s = opaque;
-+    uint32_t val = 0;
-+    int c;
-+
-+    for (c = size - 1; c >= 0; c--) {
-+        val <<= 8;
-+        val |= s->ram[addr + c];
-+    }
-+
-+    DPRINTF("tpm_ppi: read.%u(%08x) = %08x\n", size,
-+            (unsigned int)addr, (unsigned int)val);
-+
-+    return val;
-+}
-+
-+static void tpm_ppi_mmio_write(void *opaque, hwaddr addr,
-+                               uint64_t val, unsigned size)
-+{
-+    TPMPPI *s = opaque;
-+    int c;
-+
-+    DPRINTF("tpm_ppi: write.%u(%08x) = %08x\n", size,
-+            (unsigned int)addr, (unsigned int)val);
-+
-+    for (c = 0; c <= size - 1; c++) {
-+        s->ram[addr + c] = val;
-+        val >>= 8;
-+    }
-+}
-+
-+static const MemoryRegionOps tpm_ppi_memory_ops = {
-+    .read = tpm_ppi_mmio_read,
-+    .write = tpm_ppi_mmio_write,
-+    .endianness = DEVICE_LITTLE_ENDIAN,
-+    .valid = {
-+        .min_access_size = 1,
-+        .max_access_size = 4,
-+    },
-+};
-+
-+void tpm_ppi_init_io(TPMPPI *tpmppi, Object *obj)
-+{
-+    memory_region_init_io(&tpmppi->mmio, obj, &tpm_ppi_memory_ops,
-+                          tpmppi, "tpm-ppi-mmio",
-+                          TPM_PPI_ADDR_SIZE);
-+
-+    memory_region_add_subregion(get_system_memory(),
-+                                TPM_PPI_ADDR_BASE, &tpmppi->mmio);
-+}
-diff --git a/hw/tpm/tpm_ppi.h b/hw/tpm/tpm_ppi.h
-new file mode 100644
-index 0000000..8959912
---- /dev/null
-+++ b/hw/tpm/tpm_ppi.h
-@@ -0,0 +1,25 @@
-+/*
-+ * TPM Physical Presence Interface
-+ *
-+ * Copyright (C) 2018 IBM Corporation
-+ *
-+ * Authors:
-+ *  Stefan Berger    <stefanb@us.ibm.com>
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or later.
-+ * See the COPYING file in the top-level directory.
-+ */
-+#ifndef TPM_TPM_PPI_H
-+#define TPM_TPM_PPI_H
-+
-+#include "hw/acpi/tpm.h"
-+
-+typedef struct TPMPPI {
-+    MemoryRegion mmio;
-+
-+    uint8_t ram[TPM_PPI_ADDR_SIZE];
-+} TPMPPI;
-+
-+void tpm_ppi_init_io(TPMPPI *tpmppi, Object *obj);
-+
-+#endif /* TPM_TPM_PPI_H */
-diff --git a/hw/tpm/tpm_tis.c b/hw/tpm/tpm_tis.c
-index 561384c..f980972 100644
---- a/hw/tpm/tpm_tis.c
-+++ b/hw/tpm/tpm_tis.c
-@@ -31,6 +31,7 @@
- #include "sysemu/tpm_backend.h"
- #include "tpm_int.h"
- #include "tpm_util.h"
-+#include "tpm_ppi.h"
- 
- #define TPM_TIS_NUM_LOCALITIES      5     /* per spec */
- #define TPM_TIS_LOCALITY_SHIFT      12
-@@ -80,6 +81,8 @@ typedef struct TPMState {
-     TPMVersion be_tpm_version;
- 
-     size_t be_buffer_size;
-+
-+    TPMPPI ppi;
- } TPMState;
- 
- #define TPM(obj) OBJECT_CHECK(TPMState, (obj), TYPE_TPM_TIS)
-@@ -1050,6 +1053,8 @@ static void tpm_tis_initfn(Object *obj)
-     memory_region_init_io(&s->mmio, OBJECT(s), &tpm_tis_memory_ops,
-                           s, "tpm-tis-mmio",
-                           TPM_TIS_NUM_LOCALITIES << TPM_TIS_LOCALITY_SHIFT);
-+
-+    tpm_ppi_init_io(&s->ppi, obj);
+diff --git a/hw/acpi/aml-build.c b/hw/acpi/aml-build.c
+index 36a6cc4..597a58d 100644
+--- a/hw/acpi/aml-build.c
++++ b/hw/acpi/aml-build.c
+@@ -568,6 +568,16 @@ Aml *aml_lless(Aml *arg1, Aml *arg2)
+     return var;
  }
  
- static void tpm_tis_class_init(ObjectClass *klass, void *data)
-diff --git a/include/hw/acpi/tpm.h b/include/hw/acpi/tpm.h
-index 6d516c6..d9b7452 100644
---- a/include/hw/acpi/tpm.h
-+++ b/include/hw/acpi/tpm.h
-@@ -31,4 +31,10 @@
- 
- #define TPM2_START_METHOD_MMIO      6
- 
-+/*
-+ * Physical Presence Interface
-+ */
-+#define TPM_PPI_ADDR_SIZE           0x100
-+#define TPM_PPI_ADDR_BASE           0xffff0000
++Aml *aml_lless_equal(Aml *arg1, Aml *arg2)
++{
++    /* LLessEqualOp := LNotOp LGreaterOp */
++    Aml *var = aml_opcode(0x92 /* LNotOp */);
++    build_append_byte(var->buf, 0x94 /* LGreaterOp */);
++    aml_append(var, arg1);
++    aml_append(var, arg2);
++    return var;
++}
 +
- #endif /* HW_ACPI_TPM_H */
+ /* ACPI 1.0b: 16.2.5.4 Type 2 Opcodes Encoding: DefAdd */
+ Aml *aml_add(Aml *arg1, Aml *arg2, Aml *dst)
+ {
+diff --git a/include/hw/acpi/aml-build.h b/include/hw/acpi/aml-build.h
+index 88d0738..c4398cc 100644
+--- a/include/hw/acpi/aml-build.h
++++ b/include/hw/acpi/aml-build.h
+@@ -267,6 +267,7 @@ Aml *aml_lor(Aml *arg1, Aml *arg2);
+ Aml *aml_shiftleft(Aml *arg1, Aml *count);
+ Aml *aml_shiftright(Aml *arg1, Aml *count, Aml *dst);
+ Aml *aml_lless(Aml *arg1, Aml *arg2);
++Aml *aml_lless_equal(Aml *arg1, Aml *arg2);
+ Aml *aml_add(Aml *arg1, Aml *arg2, Aml *dst);
+ Aml *aml_subtract(Aml *arg1, Aml *arg2, Aml *dst);
+ Aml *aml_increment(Aml *arg);
 -- 
 2.5.5
