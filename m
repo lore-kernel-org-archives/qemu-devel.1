@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44908)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44986)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mjc@sifive.com>) id 1eZQ7J-0006Lp-8y
-	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 18:49:13 -0500
+	(envelope-from <mjc@sifive.com>) id 1eZQ7N-0006OX-BC
+	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 18:49:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mjc@sifive.com>) id 1eZQ7E-0000Tz-1U
-	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 18:49:08 -0500
-Received: from mail-pg0-x242.google.com ([2607:f8b0:400e:c05::242]:46162)
+	(envelope-from <mjc@sifive.com>) id 1eZQ7J-0000Z1-BY
+	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 18:49:13 -0500
+Received: from mail-pg0-x242.google.com ([2607:f8b0:400e:c05::242]:40447)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mjc@sifive.com>) id 1eZQ7D-0000TU-EQ
-	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 18:49:03 -0500
-Received: by mail-pg0-x242.google.com with SMTP id r2so1083048pgq.13
-	for <qemu-devel@nongnu.org>; Wed, 10 Jan 2018 15:49:03 -0800 (PST)
+	(Exim 4.71) (envelope-from <mjc@sifive.com>) id 1eZQ7I-0000YY-Ni
+	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 18:49:09 -0500
+Received: by mail-pg0-x242.google.com with SMTP id q12so1109007pgt.7
+	for <qemu-devel@nongnu.org>; Wed, 10 Jan 2018 15:49:08 -0800 (PST)
 From: Michael Clark <mjc@sifive.com>
-Date: Wed, 10 Jan 2018 15:46:28 -0800
-Message-Id: <1515628000-93285-10-git-send-email-mjc@sifive.com>
+Date: Wed, 10 Jan 2018 15:46:32 -0800
+Message-Id: <1515628000-93285-14-git-send-email-mjc@sifive.com>
 In-Reply-To: <1515628000-93285-1-git-send-email-mjc@sifive.com>
 References: <1515628000-93285-1-git-send-email-mjc@sifive.com>
-Subject: [Qemu-devel] [PATCH v2 09/21] RISC-V Physical Memory Protection
+Subject: [Qemu-devel] [PATCH v2 13/21] SiFive RISC-V CLINT Block
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,36 +28,30 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Michael Clark <mjc@sifive.com>, Palmer Dabbelt <palmer@sifive.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, RISC-V Patches <patches+subscribe@groups.riscv.org>
 
-Implements the physical memory protection extension as specified in
-Privileged ISA Version 1.10.
-
-PMP (Physical Memory Protection) is as-of-yet unused and needs testing.
-The SiFive verification team have PMP test cases that will be run.
-
-Nothing currently depends on PMP support. It would be preferable to keep
-the code in-tree for folk that are interested in RISC-V PMP support.
+The CLINT (Core Local Interruptor) device provides real-time clock, timer
+and interprocessor interrupts based on SiFive's CLINT specification.
 
 Signed-off-by: Michael Clark <mjc@sifive.com>
 ---
- target/riscv/pmp.c | 386 +++++++++++++++++++++++++++++++++++++++++++++++++++++
- target/riscv/pmp.h |  70 ++++++++++
- 2 files changed, 456 insertions(+)
- create mode 100644 target/riscv/pmp.c
- create mode 100644 target/riscv/pmp.h
+ hw/riscv/sifive_clint.c         | 312 ++++++++++++++++++++++++++++++++++++++++
+ include/hw/riscv/sifive_clint.h |  56 ++++++++
+ 2 files changed, 368 insertions(+)
+ create mode 100644 hw/riscv/sifive_clint.c
+ create mode 100644 include/hw/riscv/sifive_clint.h
 
-diff --git a/target/riscv/pmp.c b/target/riscv/pmp.c
+diff --git a/hw/riscv/sifive_clint.c b/hw/riscv/sifive_clint.c
 new file mode 100644
-index 0000000..cdd6bf8
+index 0000000..50d2a09
 --- /dev/null
-+++ b/target/riscv/pmp.c
-@@ -0,0 +1,386 @@
++++ b/hw/riscv/sifive_clint.c
+@@ -0,0 +1,312 @@
 +/*
-+ * QEMU RISC-V PMP (Physical Memory Protection)
++ * SiFive CLINT (Core Local Interruptor)
 + *
-+ * Author: Daire McNamara, daire.mcnamara@emdalo.com
-+ *         Ivan Griffin, ivan.griffin@emdalo.com
++ * Copyright (c) 2016-2017 Sagar Karandikar, sagark@eecs.berkeley.edu
++ * Copyright (c) 2017 SiFive, Inc.
 + *
-+ * This provides a RISC-V Physical Memory Protection implementation
++ * This provides real-time clock, timer and interprocessor interrupts.
 + *
 + * Permission is hereby granted, free of charge, to any person obtaining a copy
 + * of this software and associated documentation files (the "Software"), to deal
@@ -76,380 +70,304 @@ index 0000000..cdd6bf8
 + * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 + * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 + * THE SOFTWARE.
-+ */
-+
-+/*
-+ * PMP (Physical Memory Protection) is as-of-yet unused and needs testing.
 + */
 +
 +#include "qemu/osdep.h"
-+#include "qemu/log.h"
-+#include "qapi/error.h"
-+#include "cpu.h"
-+#include "qemu-common.h"
++#include "qemu/error-report.h"
++#include "hw/sysbus.h"
++#include "target/riscv/cpu.h"
++#include "hw/riscv/sifive_clint.h"
++#include "qemu/timer.h"
 +
-+#ifndef CONFIG_USER_ONLY
++/* See: riscv-pk/machine/sbi_entry.S and arch/riscv/kernel/time.c */
++#define TIMER_FREQ (10 * 1000 * 1000)
 +
-+#define RISCV_DEBUG_PMP 0
-+#define PMP_DEBUG(fmt, ...)                                          \
-+  do {                                                               \
-+    if (RISCV_DEBUG_PMP) {                                           \
-+      qemu_log_mask(LOG_TRACE, "%s: " fmt, __func__, ##__VA_ARGS__); \
-+    }                                                                \
-+  } while (0)
-+
-+static void pmp_write_cfg(CPURISCVState *env, uint32_t addr_index,
-+    uint8_t val);
-+static uint8_t pmp_read_cfg(CPURISCVState *env, uint32_t addr_index);
-+static void pmp_update_rule(CPURISCVState *env, uint32_t pmp_index);
-+
-+/*
-+ * Accessor method to extract address matching type 'a field' from cfg reg
-+ */
-+static inline uint8_t pmp_get_a_field(uint8_t cfg)
++uint64_t cpu_riscv_read_instret(CPURISCVState *env)
 +{
-+    uint8_t a = cfg >> 3;
-+    return a & 0x3;
++    return muldiv64(qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL), TIMER_FREQ,
++                    NANOSECONDS_PER_SECOND);
 +}
 +
-+/*
-+ * Check whether a PMP is locked or not.
-+ */
-+static inline int pmp_is_locked(CPURISCVState *env, uint32_t pmp_index)
++uint64_t cpu_riscv_read_rtc(void)
 +{
-+
-+    if (env->pmp_state.pmp[pmp_index].cfg_reg & PMP_LOCK) {
-+        return 1;
-+    }
-+
-+    /* Top PMP has no 'next' to check */
-+    if ((pmp_index + 1u) >= MAX_RISCV_PMPS) {
-+        return 0;
-+    }
-+
-+    /* In TOR mode, need to check the lock bit of the next pmp
-+     * (if there is a next)
-+     */
-+    const uint8_t a_field =
-+        pmp_get_a_field(env->pmp_state.pmp[pmp_index + 1].cfg_reg);
-+    if ((env->pmp_state.pmp[pmp_index + 1u].cfg_reg & PMP_LOCK) &&
-+         (PMP_AMATCH_TOR == a_field)) {
-+        return 1;
-+    }
-+
-+    return 0;
++    return muldiv64(qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL), TIMER_FREQ,
++                    NANOSECONDS_PER_SECOND);
 +}
 +
-+/*
-+ * Count the number of active rules.
-+ */
-+static inline uint32_t pmp_get_num_rules(CPURISCVState *env)
++static void sifive_clint_irq_request(void *opaque, int irq, int level)
 +{
-+     return env->pmp_state.num_rules;
-+}
++    /* These are not the same irq numbers visible to the emulated processor. */
++    RISCVCPU *cpu = opaque;
++    CPURISCVState *env = &cpu->env;
++    CPUState *cs = CPU(cpu);
 +
-+/*
-+ * Accessor to get the cfg reg for a specific PMP/HART
-+ */
-+static inline uint8_t pmp_read_cfg(CPURISCVState *env, uint32_t pmp_index)
-+{
-+    if (pmp_index < MAX_RISCV_PMPS) {
-+        return env->pmp_state.pmp[pmp_index].cfg_reg;
-+    }
++    /* The CLINT currently uses irq 0 */
 +
-+    return 0;
-+}
-+
-+
-+/*
-+ * Accessor to set the cfg reg for a specific PMP/HART
-+ * Bounds checks and relevant lock bit.
-+ */
-+static void pmp_write_cfg(CPURISCVState *env, uint32_t pmp_index, uint8_t val)
-+{
-+    if (pmp_index < MAX_RISCV_PMPS) {
-+        if (!pmp_is_locked(env, pmp_index)) {
-+            env->pmp_state.pmp[pmp_index].cfg_reg = val;
-+            pmp_update_rule(env, pmp_index);
-+        } else {
-+            PMP_DEBUG("ignoring write - locked");
-+        }
++    if (level) {
++        cpu_interrupt(cs, CPU_INTERRUPT_HARD);
 +    } else {
-+        PMP_DEBUG("ignoring write - out of bounds");
++        if (!env->mip && !env->mfromhost) {
++            /* no interrupts pending, no host interrupt for HTIF, reset */
++            cpu_reset_interrupt(cs, CPU_INTERRUPT_HARD);
++        }
 +    }
 +}
 +
-+static void pmp_decode_napot(target_ulong a, target_ulong *sa, target_ulong *ea)
++/*
++ * Called when timecmp is written to update the QEMU timer or immediately
++ * trigger timer interrupt if mtimecmp <= current timer value.
++ */
++static void sifive_clint_timer_update(CPURISCVState *env)
 +{
-+    /*
-+       aaaa...aaa0   8-byte NAPOT range
-+       aaaa...aa01   16-byte NAPOT range
-+       aaaa...a011   32-byte NAPOT range
-+       ...
-+       aa01...1111   2^XLEN-byte NAPOT range
-+       a011...1111   2^(XLEN+1)-byte NAPOT range
-+       0111...1111   2^(XLEN+2)-byte NAPOT range
-+       1111...1111   Reserved
-+    */
-+    if (a == -1) {
-+        *sa = 0u;
-+        *ea = -1;
++    uint64_t next;
++    uint64_t diff;
++
++    uint64_t rtc_r = cpu_riscv_read_rtc();
++
++    if (env->timecmp <= rtc_r) {
++        /* if we're setting an MTIMECMP value in the "past",
++           immediately raise the timer interrupt */
++        env->mip |= MIP_MTIP;
++        qemu_irq_raise(env->irq[3]);
 +        return;
-+    } else {
-+        target_ulong t1 = ctz64(~a);
-+        target_ulong base = (a & ~(((target_ulong)1 << t1) - 1)) << 3;
-+        target_ulong range = ((target_ulong)1 << (t1 + 3)) - 1;
-+        *sa = base;
-+        *ea = base + range;
 +    }
++
++    /* otherwise, set up the future timer interrupt */
++    diff = env->timecmp - rtc_r;
++    /* back to ns (note args switched in muldiv64) */
++    next = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) +
++        muldiv64(diff, NANOSECONDS_PER_SECOND, TIMER_FREQ);
++    timer_mod(env->timer, next);
 +}
-+
-+
-+/* Convert cfg/addr reg values here into simple 'sa' --> start address and 'ea'
-+ *   end address values.
-+ *   This function is called relatively infrequently whereas the check that
-+ *   an address is within a pmp rule is called often, so optimise that one
-+ */
-+static void pmp_update_rule(CPURISCVState *env, uint32_t pmp_index)
-+{
-+    int i;
-+
-+    env->pmp_state.num_rules = 0;
-+
-+    uint8_t this_cfg = env->pmp_state.pmp[pmp_index].cfg_reg;
-+    target_ulong this_addr = env->pmp_state.pmp[pmp_index].addr_reg;
-+    target_ulong prev_addr = 0u;
-+    target_ulong sa = 0u;
-+    target_ulong ea = 0u;
-+
-+    if (pmp_index >= 1u) {
-+        prev_addr = env->pmp_state.pmp[pmp_index - 1].addr_reg;
-+    }
-+
-+    switch (pmp_get_a_field(this_cfg)) {
-+    case PMP_AMATCH_OFF:
-+        sa = 0u;
-+        ea = -1;
-+        break;
-+
-+    case PMP_AMATCH_TOR:
-+        sa = prev_addr << 2; /* shift up from [xx:0] to [xx+2:2] */
-+        ea = (this_addr << 2) - 1u;
-+        break;
-+
-+    case PMP_AMATCH_NA4:
-+        sa = this_addr << 2; /* shift up from [xx:0] to [xx+2:2] */
-+        ea = (this_addr + 4u) - 1u;
-+        break;
-+
-+    case PMP_AMATCH_NAPOT:
-+        pmp_decode_napot(this_addr, &sa, &ea);
-+        break;
-+
-+    default:
-+        sa = 0u;
-+        ea = 0u;
-+        break;
-+    }
-+
-+    env->pmp_state.addr[pmp_index].sa = sa;
-+    env->pmp_state.addr[pmp_index].ea = ea;
-+
-+    for (i = 0; i < MAX_RISCV_PMPS; i++) {
-+        const uint8_t a_field =
-+            pmp_get_a_field(env->pmp_state.pmp[i].cfg_reg);
-+        if (PMP_AMATCH_OFF != a_field) {
-+            env->pmp_state.num_rules++;
-+        }
-+    }
-+}
-+
-+static int pmp_is_in_range(CPURISCVState *env, int pmp_index, target_ulong addr)
-+{
-+    int result = 0;
-+
-+    if ((addr >= env->pmp_state.addr[pmp_index].sa)
-+        && (addr <= env->pmp_state.addr[pmp_index].ea)) {
-+        result = 1;
-+    } else {
-+        result = 0;
-+    }
-+
-+    return result;
-+}
-+
 +
 +/*
-+ * Public Interface
++ * Called by the callback used when the timer set using timer_mod expires.
++ * Should raise the timer interrupt line
 + */
++static void sifive_clint_timer_expire(CPURISCVState *env)
++{
++    /* do not call update here */
++    env->mip |= MIP_MTIP;
++    qemu_irq_raise(env->irq[3]);
++}
++
++static void sifive_clint_write_timecmp(CPURISCVState *env, uint64_t value)
++{
++    env->timecmp = value;
++    env->mip &= ~MIP_MTIP;
++    sifive_clint_timer_update(env);
++}
 +
 +/*
-+ * Check if the address has required RWX privs to complete desired operation
++ * Callback used when the timer set using timer_mod expires.
 + */
-+bool pmp_hart_has_privs(CPURISCVState *env, target_ulong addr,
-+    target_ulong size, pmp_priv_t privs)
++static void sifive_clint_timer_cb(void *opaque)
 +{
-+    int i = 0;
-+    int ret = -1;
-+    target_ulong s = 0;
-+    target_ulong e = 0;
-+    pmp_priv_t allowed_privs = 0;
++    CPURISCVState *env;
++    env = opaque;
++    sifive_clint_timer_expire(env);
++}
 +
-+    /* Short cut if no rules */
-+    if (0 == pmp_get_num_rules(env)) {
-+        return true;
++/* CPU wants to read rtc or timecmp register */
++static uint64_t sifive_clint_read(void *opaque, hwaddr addr, unsigned size)
++{
++    SiFiveCLINTState *clint = opaque;
++    if (addr >= clint->sip_base &&
++        addr < clint->sip_base + (clint->num_harts << 2)) {
++        size_t hartid = (addr - clint->sip_base) >> 2;
++        CPUState *cpu = qemu_get_cpu(hartid);
++        CPURISCVState *env = cpu ? cpu->env_ptr : NULL;
++        if (!env) {
++            error_report("clint: invalid timecmp hartid: %zu", hartid);
++        } else if ((addr & 0x3) == 0) {
++            return (env->mip & MIP_MSIP) > 0;
++        } else {
++            error_report("clint: invalid read: %08x", (uint32_t)addr);
++            return 0;
++        }
++    } else if (addr >= clint->timecmp_base &&
++        addr < clint->timecmp_base + (clint->num_harts << 3)) {
++        size_t hartid = (addr - clint->timecmp_base) >> 3;
++        CPUState *cpu = qemu_get_cpu(hartid);
++        CPURISCVState *env = cpu ? cpu->env_ptr : NULL;
++        if (!env) {
++            error_report("clint: invalid timecmp hartid: %zu", hartid);
++        } else if ((addr & 0x7) == 0) {
++            /* timecmp_lo */
++            uint64_t timecmp = env->timecmp;
++            return timecmp & 0xFFFFFFFF;
++        } else if ((addr & 0x7) == 4) {
++            /* timecmp_hi */
++            uint64_t timecmp = env->timecmp;
++            return (timecmp >> 32) & 0xFFFFFFFF;
++        } else {
++            error_report("clint: invalid read: %08x", (uint32_t)addr);
++            return 0;
++        }
++    } else if (addr == clint->time_base) {
++        /* time_lo */
++        return cpu_riscv_read_rtc() & 0xFFFFFFFF;
++    } else if (addr == clint->time_base + 4) {
++        /* time_hi */
++        return (cpu_riscv_read_rtc() >> 32) & 0xFFFFFFFF;
 +    }
 +
-+    /* 1.10 draft priv spec states there is an implicit order
-+         from low to high */
-+    for (i = 0; i < MAX_RISCV_PMPS; i++) {
-+        s = pmp_is_in_range(env, i, addr);
-+        e = pmp_is_in_range(env, i, addr + size);
++    error_report("clint: invalid read: %08x", (uint32_t)addr);
++    return 0;
++}
 +
-+        /* partially inside */
-+        if ((s + e) == 1) {
-+            PMP_DEBUG("pmp violation - access is partially inside");
-+            ret = 0;
-+            break;
-+        }
++/* CPU wrote to rtc or timecmp register */
++static void sifive_clint_write(void *opaque, hwaddr addr, uint64_t value,
++        unsigned size)
++{
++    SiFiveCLINTState *clint = opaque;
 +
-+        /* fully inside */
-+        const uint8_t a_field =
-+            pmp_get_a_field(env->pmp_state.pmp[i].cfg_reg);
-+        if ((s + e) == 2) {
-+            if (PMP_AMATCH_OFF == a_field) {
-+                return 1;
-+            }
-+
-+            allowed_privs = PMP_READ | PMP_WRITE | PMP_EXEC;
-+            if ((env->priv != PRV_M) || pmp_is_locked(env, i)) {
-+                allowed_privs &= env->pmp_state.pmp[i].cfg_reg;
-+            }
-+
-+            if ((privs & allowed_privs) == privs) {
-+                ret = 1;
-+                break;
++    if (addr >= clint->sip_base &&
++        addr < clint->sip_base + (clint->num_harts << 2)) {
++        size_t hartid = (addr - clint->sip_base) >> 2;
++        CPUState *cpu = qemu_get_cpu(hartid);
++        CPURISCVState *env = cpu ? cpu->env_ptr : NULL;
++        if (!env) {
++            error_report("clint: invalid timecmp hartid: %zu", hartid);
++        } else if ((addr & 0x3) == 0) {
++            if (value) {
++                env->mip |= MIP_MSIP;
++                qemu_irq_raise(env->irq[2]);
 +            } else {
-+                ret = 0;
-+                break;
++                env->mip &= ~MIP_MSIP;
++                qemu_irq_lower(env->irq[2]);
 +            }
-+        }
-+    }
-+
-+    /* No rule matched */
-+    if (ret == -1) {
-+        if (env->priv == PRV_M) {
-+            ret = 1; /* Privileged spec v1.10 states if no PMP entry matches an
-+                      * M-Mode access, the access succeeds */
 +        } else {
-+            ret = 0; /* Other modes are not allowed to succeed if they don't
-+                      * match a rule, but there are rules.  We've checked for
-+                      * no rule earlier in this function. */
++            error_report("clint: invalid sip write: %08x", (uint32_t)addr);
 +        }
-+    }
-+
-+    return ret == 1 ? true : false;
-+}
-+
-+
-+/*
-+ * Handle a write to a pmpcfg CSP
-+ */
-+void pmpcfg_csr_write(CPURISCVState *env, uint32_t reg_index,
-+    target_ulong val)
-+{
-+    int i;
-+    uint8_t cfg_val;
-+
-+    PMP_DEBUG("hart " TARGET_FMT_ld ": reg%d, val: 0x" TARGET_FMT_lx,
-+        env->mhartid, reg_index, val);
-+
-+    if ((reg_index & 1) && (sizeof(target_ulong) == 8)) {
-+        PMP_DEBUG("ignoring write - incorrect address");
++        return;
++    } else if (addr >= clint->timecmp_base &&
++        addr < clint->timecmp_base + (clint->num_harts << 3)) {
++        size_t hartid = (addr - clint->timecmp_base) >> 3;
++        CPUState *cpu = qemu_get_cpu(hartid);
++        CPURISCVState *env = cpu ? cpu->env_ptr : NULL;
++        if (!env) {
++            error_report("clint: invalid timecmp hartid: %zu", hartid);
++        } else if ((addr & 0x7) == 0) {
++            /* timecmp_lo */
++            uint64_t timecmp = env->timecmp;
++            sifive_clint_write_timecmp(env,
++                timecmp << 32 | (value & 0xFFFFFFFF));
++            return;
++        } else if ((addr & 0x7) == 4) {
++            /* timecmp_hi */
++            uint64_t timecmp = env->timecmp;
++            sifive_clint_write_timecmp(env,
++                value << 32 | (timecmp & 0xFFFFFFFF));
++        } else {
++            error_report("clint: invalid timecmp write: %08x", (uint32_t)addr);
++        }
++        return;
++    } else if (addr == clint->time_base) {
++        /* time_lo */
++        error_report("clint: time_lo write not implemented");
++        return;
++    } else if (addr == clint->time_base + 4) {
++        /* time_hi */
++        error_report("clint: time_hi write not implemented");
 +        return;
 +    }
 +
-+    for (i = 0; i < sizeof(target_ulong); i++) {
-+        cfg_val = (val >> 8 * i)  & 0xff;
-+        pmp_write_cfg(env, (reg_index * sizeof(target_ulong)) + i,
-+            cfg_val);
-+    }
++    error_report("clint: invalid write: %08x", (uint32_t)addr);
 +}
++
++static const MemoryRegionOps sifive_clint_ops = {
++    .read = sifive_clint_read,
++    .write = sifive_clint_write,
++    .endianness = DEVICE_LITTLE_ENDIAN,
++    .valid = {
++        .min_access_size = 4,
++        .max_access_size = 4
++    }
++};
++
++static Property sifive_clint_properties[] = {
++    DEFINE_PROP_UINT32("num-harts", SiFiveCLINTState, num_harts, 0),
++    DEFINE_PROP_UINT32("sip-base", SiFiveCLINTState, sip_base, 0),
++    DEFINE_PROP_UINT32("timecmp-base", SiFiveCLINTState, timecmp_base, 0),
++    DEFINE_PROP_UINT32("time-base", SiFiveCLINTState, time_base, 0),
++    DEFINE_PROP_UINT32("aperture-size", SiFiveCLINTState, aperture_size, 0),
++    DEFINE_PROP_END_OF_LIST(),
++};
++
++static void sifive_clint_realize(DeviceState *dev, Error **errp)
++{
++    SiFiveCLINTState *s = SIFIVE_CLINT(dev);
++    memory_region_init_io(&s->mmio, OBJECT(dev), &sifive_clint_ops, s,
++                          TYPE_SIFIVE_CLINT, s->aperture_size);
++    sysbus_init_mmio(SYS_BUS_DEVICE(dev), &s->mmio);
++}
++
++static void sifive_clint_class_init(ObjectClass *klass, void *data)
++{
++    DeviceClass *dc = DEVICE_CLASS(klass);
++    dc->realize = sifive_clint_realize;
++    dc->props = sifive_clint_properties;
++}
++
++static const TypeInfo sifive_clint_info = {
++    .name          = TYPE_SIFIVE_CLINT,
++    .parent        = TYPE_SYS_BUS_DEVICE,
++    .instance_size = sizeof(SiFiveCLINTState),
++    .class_init    = sifive_clint_class_init,
++};
++
++static void sifive_clint_register_types(void)
++{
++    type_register_static(&sifive_clint_info);
++}
++
++type_init(sifive_clint_register_types)
 +
 +
 +/*
-+ * Handle a read from a pmpcfg CSP
++ * Create CLINT device.
 + */
-+target_ulong pmpcfg_csr_read(CPURISCVState *env, uint32_t reg_index)
++DeviceState *sifive_clint_create(hwaddr addr, hwaddr size, uint32_t num_harts,
++    uint32_t sip_base, uint32_t timecmp_base, uint32_t time_base)
 +{
-+    int i;
-+    target_ulong cfg_val = 0;
-+    uint8_t val = 0;
-+
-+    for (i = 0; i < sizeof(target_ulong); i++) {
-+        val = pmp_read_cfg(env, (reg_index * sizeof(target_ulong)) + i);
-+        cfg_val |= (val << (i * 8));
-+    }
-+
-+    PMP_DEBUG("hart " TARGET_FMT_ld ": reg%d, val: 0x" TARGET_FMT_lx,
-+        env->mhartid, reg_index, cfg_val);
-+
-+    return cfg_val;
-+}
-+
-+
-+/*
-+ * Handle a write to a pmpaddr CSP
-+ */
-+void pmpaddr_csr_write(CPURISCVState *env, uint32_t addr_index,
-+    target_ulong val)
-+{
-+    PMP_DEBUG("hart " TARGET_FMT_ld ": addr%d, val: 0x" TARGET_FMT_lx,
-+        env->mhartid, addr_index, val);
-+
-+    if (addr_index < MAX_RISCV_PMPS) {
-+        if (!pmp_is_locked(env, addr_index)) {
-+            env->pmp_state.pmp[addr_index].addr_reg = val;
-+            pmp_update_rule(env, addr_index);
-+        } else {
-+            PMP_DEBUG("ignoring write - locked");
++    int i, j;
++    for (i = 0; i < num_harts; i++) {
++        CPUState *cpu = qemu_get_cpu(i);
++        CPURISCVState *env = cpu ? cpu->env_ptr : NULL;
++        if (!env) {
++            continue;
 +        }
-+    } else {
-+        PMP_DEBUG("ignoring write - out of bounds");
++        for (j = 0; j < MAX_RISCV_IRQ; j++) {
++            env->irq[j] = qemu_allocate_irq(sifive_clint_irq_request,
++                riscv_env_get_cpu(env), 0 /* irq 0 */);
++        }
++        env->timer = timer_new_ns(QEMU_CLOCK_VIRTUAL,
++                                  &sifive_clint_timer_cb, env);
++        env->timecmp = 0;
 +    }
++
++    DeviceState *dev = qdev_create(NULL, TYPE_SIFIVE_CLINT);
++    qdev_prop_set_uint32(dev, "num-harts", num_harts);
++    qdev_prop_set_uint32(dev, "sip-base", sip_base);
++    qdev_prop_set_uint32(dev, "timecmp-base", timecmp_base);
++    qdev_prop_set_uint32(dev, "time-base", time_base);
++    qdev_prop_set_uint32(dev, "aperture-size", size);
++    qdev_init_nofail(dev);
++    sysbus_mmio_map(SYS_BUS_DEVICE(dev), 0, addr);
++    return dev;
 +}
-+
-+
-+/*
-+ * Handle a read from a pmpaddr CSP
-+ */
-+target_ulong pmpaddr_csr_read(CPURISCVState *env, uint32_t addr_index)
-+{
-+    PMP_DEBUG("hart " TARGET_FMT_ld ": addr%d, val: 0x" TARGET_FMT_lx,
-+        env->mhartid, addr_index,
-+        env->pmp_state.pmp[addr_index].addr_reg);
-+    if (addr_index < MAX_RISCV_PMPS) {
-+        return env->pmp_state.pmp[addr_index].addr_reg;
-+    } else {
-+        PMP_DEBUG("ignoring read - out of bounds");
-+        return 0;
-+    }
-+}
-+
-+#endif
-diff --git a/target/riscv/pmp.h b/target/riscv/pmp.h
+diff --git a/include/hw/riscv/sifive_clint.h b/include/hw/riscv/sifive_clint.h
 new file mode 100644
-index 0000000..9f2c32d
+index 0000000..cec3fbd
 --- /dev/null
-+++ b/target/riscv/pmp.h
-@@ -0,0 +1,70 @@
++++ b/include/hw/riscv/sifive_clint.h
+@@ -0,0 +1,56 @@
 +/*
-+ * QEMU RISC-V PMP (Physical Memory Protection)
++ * SiFive CLINT (Core Local Interruptor) interface
 + *
-+ * Author: Daire McNamara, daire.mcnamara@emdalo.com
-+ *         Ivan Griffin, ivan.griffin@emdalo.com
-+ *
-+ * This provides a RISC-V Physical Memory Protection interface
++ * Copyright (c) 2016-2017 Sagar Karandikar, sagark@eecs.berkeley.edu
++ * Copyright (c) 2017 SiFive, Inc.
 + *
 + * Permission is hereby granted, free of charge, to any person obtaining a copy
 + * of this software and associated documentation files (the "Software"), to deal
@@ -470,47 +388,35 @@ index 0000000..9f2c32d
 + * THE SOFTWARE.
 + */
 +
-+#ifndef _RISCV_PMP_H_
-+#define _RISCV_PMP_H_
++#ifndef HW_SIFIVE_CLINT_H
++#define HW_SIFIVE_CLINT_H
 +
-+typedef enum {
-+    PMP_READ  = 1 << 0,
-+    PMP_WRITE = 1 << 1,
-+    PMP_EXEC  = 1 << 2,
-+    PMP_LOCK  = 1 << 7
-+} pmp_priv_t;
++#define TYPE_SIFIVE_CLINT "riscv.sifive.clint"
 +
-+typedef enum {
-+    PMP_AMATCH_OFF,  /* Null (off)                            */
-+    PMP_AMATCH_TOR,  /* Top of Range                          */
-+    PMP_AMATCH_NA4,  /* Naturally aligned four-byte region    */
-+    PMP_AMATCH_NAPOT /* Naturally aligned power-of-two region */
-+} pmp_am_t;
++#define SIFIVE_CLINT(obj) \
++    OBJECT_CHECK(SiFiveCLINTState, (obj), TYPE_SIFIVE_CLINT)
 +
-+typedef struct {
-+    target_ulong addr_reg;
-+    uint8_t  cfg_reg;
-+} pmp_entry_t;
++typedef struct SiFiveCLINTState {
++    /*< private >*/
++    SysBusDevice parent_obj;
 +
-+typedef struct {
-+    target_ulong sa;
-+    target_ulong ea;
-+} pmp_addr_t;
++    /*< public >*/
++    MemoryRegion mmio;
++    uint32_t num_harts;
++    uint32_t sip_base;
++    uint32_t timecmp_base;
++    uint32_t time_base;
++    uint32_t aperture_size;
++} SiFiveCLINTState;
 +
-+typedef struct {
-+    pmp_entry_t pmp[MAX_RISCV_PMPS];
-+    pmp_addr_t  addr[MAX_RISCV_PMPS];
-+    uint32_t num_rules;
-+} pmp_table_t;
++DeviceState *sifive_clint_create(hwaddr addr, hwaddr size, uint32_t num_harts,
++    uint32_t sip_base, uint32_t timecmp_base, uint32_t time_base);
 +
-+void pmpcfg_csr_write(CPURISCVState *env, uint32_t reg_index,
-+    target_ulong val);
-+target_ulong pmpcfg_csr_read(CPURISCVState *env, uint32_t reg_index);
-+void pmpaddr_csr_write(CPURISCVState *env, uint32_t addr_index,
-+    target_ulong val);
-+target_ulong pmpaddr_csr_read(CPURISCVState *env, uint32_t addr_index);
-+bool pmp_hart_has_privs(CPURISCVState *env, target_ulong addr,
-+    target_ulong size, pmp_priv_t priv);
++enum {
++    SIFIVE_SIP_BASE     = 0x0,
++    SIFIVE_TIMECMP_BASE = 0x4000,
++    SIFIVE_TIME_BASE    = 0xBFF8
++};
 +
 +#endif
 -- 
