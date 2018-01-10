@@ -1,27 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43579)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44362)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eZFuC-0003gI-TL
-	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 07:54:57 -0500
+	(envelope-from <berrange@redhat.com>) id 1eZFvR-0004nr-76
+	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 07:56:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eZFuB-000262-JS
-	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 07:54:56 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:49592)
+	(envelope-from <berrange@redhat.com>) id 1eZFvO-0003Ds-2H
+	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 07:56:13 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:58012)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1eZFuB-00025U-8a
-	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 07:54:55 -0500
-References: <20171219084557.9801-1-peterx@redhat.com>
-	<20171219084557.9801-8-peterx@redhat.com>
-	<ab1775ac-be60-31cb-3c7c-c698c2adb1e8@redhat.com>
-	<20180110082639.GH5984@xz-mi>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <a2de0d5c-924d-6de8-4bb9-92991801fb3c@redhat.com>
-Date: Wed, 10 Jan 2018 06:54:45 -0600
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1eZFvN-0003CI-On
+	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 07:56:09 -0500
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id DCC0787629
+	for <qemu-devel@nongnu.org>; Wed, 10 Jan 2018 12:56:08 +0000 (UTC)
+Date: Wed, 10 Jan 2018 12:56:03 +0000
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20180110125603.GM3205@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <20180105205109.683-1-quintela@redhat.com>
+	<20180105205109.683-2-quintela@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20180110082639.GH5984@xz-mi>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="HNePfuP90OprTSjhJk9IPX1QH99ssUhGq"
-Subject: Re: [Qemu-devel] [RFC v6 07/27] monitor: unify global init
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20180105205109.683-2-quintela@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v4 1/2] migration: Create tcp_port parameter
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,121 +34,176 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, Stefan Hajnoczi <shajnocz@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <famz@redhat.com>, Juan Quintela <quintela@redhat.com>, mdroth@linux.vnet.ibm.com, Laurent Vivier <lvivier@redhat.com>, Markus Armbruster <armbru@redhat.com>, marcandre.lureau@redhat.com, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: Juan Quintela <quintela@redhat.com>
+Cc: qemu-devel@nongnu.org, lvivier@redhat.com, dgilbert@redhat.com, peterx@redhat.com
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---HNePfuP90OprTSjhJk9IPX1QH99ssUhGq
-From: Eric Blake <eblake@redhat.com>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, Stefan Hajnoczi <shajnocz@redhat.com>,
- "Daniel P . Berrange" <berrange@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <famz@redhat.com>,
- Juan Quintela <quintela@redhat.com>, mdroth@linux.vnet.ibm.com,
- Laurent Vivier <lvivier@redhat.com>, Markus Armbruster <armbru@redhat.com>,
- marcandre.lureau@redhat.com, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <a2de0d5c-924d-6de8-4bb9-92991801fb3c@redhat.com>
-Subject: Re: [RFC v6 07/27] monitor: unify global init
-References: <20171219084557.9801-1-peterx@redhat.com>
- <20171219084557.9801-8-peterx@redhat.com>
- <ab1775ac-be60-31cb-3c7c-c698c2adb1e8@redhat.com>
- <20180110082639.GH5984@xz-mi>
-In-Reply-To: <20180110082639.GH5984@xz-mi>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Fri, Jan 05, 2018 at 09:51:08PM +0100, Juan Quintela wrote:
+> It will be used to store the uri tcp_port parameter.  This is the only
+> parameter than can change and we can need to be able to connect to it.
+> 
+> Signed-off-by: Juan Quintela <quintela@redhat.com>
+> 
+> --
+> 
+> This used to be uri parameter, but it has so many troubles to
+> reproduce that it don't just make sense.
+> ---
+>  hmp.c                 |  7 +++++++
+>  migration/migration.c | 10 ++++++++++
+>  qapi/migration.json   | 19 ++++++++++++++++---
+>  3 files changed, 33 insertions(+), 3 deletions(-)
+> 
+> diff --git a/hmp.c b/hmp.c
+> index 354baaa6b6..1bb9d5d8f8 100644
+> --- a/hmp.c
+> +++ b/hmp.c
+> @@ -360,6 +360,9 @@ void hmp_info_migrate_parameters(Monitor *mon, const QDict *qdict)
+>          monitor_printf(mon, "%s: %" PRIu64 "\n",
+>              MigrationParameter_str(MIGRATION_PARAMETER_XBZRLE_CACHE_SIZE),
+>              params->xbzrle_cache_size);
+> +        monitor_printf(mon, "%s: %d\n",
+> +            MigrationParameter_str(MIGRATION_PARAMETER_TCP_PORT),
+> +            params->tcp_port);
+>      }
+>  
+>      qapi_free_MigrationParameters(params);
+> @@ -1674,6 +1677,10 @@ void hmp_migrate_set_parameter(Monitor *mon, const QDict *qdict)
+>          }
+>          p->xbzrle_cache_size = cache_size;
+>          break;
+> +    case MIGRATION_PARAMETER_TCP_PORT:
+> +        p->has_tcp_port = true;
+> +        visit_type_uint16(v, param, &p->tcp_port, &err);
+> +        break;
+>      default:
+>          assert(0);
+>      }
+> diff --git a/migration/migration.c b/migration/migration.c
+> index 7a77b193c1..4cdd8ee31b 100644
+> --- a/migration/migration.c
+> +++ b/migration/migration.c
+> @@ -522,6 +522,8 @@ MigrationParameters *qmp_query_migrate_parameters(Error **errp)
+>      params->x_multifd_page_count = s->parameters.x_multifd_page_count;
+>      params->has_xbzrle_cache_size = true;
+>      params->xbzrle_cache_size = s->parameters.xbzrle_cache_size;
+> +    params->has_tcp_port = true;
+> +    params->tcp_port = s->parameters.tcp_port;
+>  
+>      return params;
+>  }
+> @@ -923,6 +925,9 @@ static void migrate_params_test_apply(MigrateSetParameters *params,
+>      if (params->has_xbzrle_cache_size) {
+>          dest->xbzrle_cache_size = params->xbzrle_cache_size;
+>      }
+> +    if (params->has_tcp_port) {
+> +        dest->tcp_port = params->tcp_port;
+> +    }
+>  }
+>  
+>  static void migrate_params_apply(MigrateSetParameters *params, Error **errp)
+> @@ -995,6 +1000,9 @@ static void migrate_params_apply(MigrateSetParameters *params, Error **errp)
+>          s->parameters.xbzrle_cache_size = params->xbzrle_cache_size;
+>          xbzrle_cache_resize(params->xbzrle_cache_size, errp);
+>      }
+> +    if (params->has_tcp_port) {
+> +        s->parameters.tcp_port = params->tcp_port;
+> +    }
+>  }
+>  
+>  void qmp_migrate_set_parameters(MigrateSetParameters *params, Error **errp)
+> @@ -2470,6 +2478,8 @@ static Property migration_properties[] = {
+>      DEFINE_PROP_SIZE("xbzrle-cache-size", MigrationState,
+>                        parameters.xbzrle_cache_size,
+>                        DEFAULT_MIGRATE_XBZRLE_CACHE_SIZE),
+> +    DEFINE_PROP_UINT16("tcp-port", MigrationState,
+> +                       parameters.tcp_port, 0),
+>  
+>      /* Migration capabilities */
+>      DEFINE_PROP_MIG_CAP("x-xbzrle", MIGRATION_CAPABILITY_XBZRLE),
+> diff --git a/qapi/migration.json b/qapi/migration.json
+> index 70e7b677ef..2be1400249 100644
+> --- a/qapi/migration.json
+> +++ b/qapi/migration.json
+> @@ -501,6 +501,9 @@
+>  #                     and a power of 2
+>  #                     (Since 2.11)
+>  #
+> +# @tcp-port: Only used for tcp, to know what the real port is
+> +#                     (Since 2.12)
+> +#
+>  # Since: 2.4
+>  ##
+>  { 'enum': 'MigrationParameter',
+> @@ -509,7 +512,7 @@
+>             'tls-creds', 'tls-hostname', 'max-bandwidth',
+>             'downtime-limit', 'x-checkpoint-delay', 'block-incremental',
+>             'x-multifd-channels', 'x-multifd-page-count',
+> -           'xbzrle-cache-size' ] }
+> +           'xbzrle-cache-size', 'tcp-port' ] }
+>  
+>  ##
+>  # @MigrateSetParameters:
+> @@ -577,6 +580,10 @@
+>  #                     needs to be a multiple of the target page size
+>  #                     and a power of 2
+>  #                     (Since 2.11)
+> +#
+> +# @tcp-port: Only used for tcp, to know what the real port is
+> +#                     (Since 2.12)
+> +#
+>  # Since: 2.4
+>  ##
+>  # TODO either fuse back into MigrationParameters, or make
+> @@ -595,7 +602,8 @@
+>              '*block-incremental': 'bool',
+>              '*x-multifd-channels': 'int',
+>              '*x-multifd-page-count': 'int',
+> -            '*xbzrle-cache-size': 'size' } }
+> +            '*xbzrle-cache-size': 'size',
+> +            '*tcp-port': 'uint16'} }
+>  
+>  ##
+>  # @migrate-set-parameters:
+> @@ -678,6 +686,10 @@
+>  #                     needs to be a multiple of the target page size
+>  #                     and a power of 2
+>  #                     (Since 2.11)
+> +#
+> +# @tcp-port: Only used for tcp, to know what the real port is
+> +#                     (Since 2.12)
+> +#
+>  # Since: 2.4
+>  ##
+>  { 'struct': 'MigrationParameters',
+> @@ -694,7 +706,8 @@
+>              '*block-incremental': 'bool' ,
+>              '*x-multifd-channels': 'uint8',
+>              '*x-multifd-page-count': 'uint32',
+> -            '*xbzrle-cache-size': 'size' } }
+> +            '*xbzrle-cache-size': 'size',
+> +            '*tcp-port': 'uint16'} }
 
-On 01/10/2018 02:26 AM, Peter Xu wrote:
+I think we should have an array of SocketAddress structs here, not merely
+the port.
 
->> The later initialization of the monitor_lock mutex is a potential
->> semantic change.  Please beef up the commit message to document why it=
+In the near future I'll be sending patches to allow migration code to listen
+on multiple sockets concurrently, which is neccessary to correctly support
+IPv4+IPv6 dual stack.  This will also make QEMU correctly honour DNS names
+which resolve to multiple IP address when a host has mutiple NICs.
 
->> is safe.  In fact, I requested this back on my review of v1, but it
->> still hasn't been done. :(
->>
->> https://lists.gnu.org/archive/html/qemu-devel/2017-09/msg05421.html
->=20
-> Sorry for that! I thought you helped proved that somehow (which I
-> really appreciate)...
->=20
->>
->> If my read of history is correct, I think it is sufficient to point to=
+eg when you listen on  "foobar.example.com" you might end up having 1, 2,
+3, 4, or more IP addresses being listened on. It would be useful to know
+exactly which IPv4 and IPv6 addresses were actually listened on, for a
+given hostname passed in the original URI.
 
->> commit 05875687 as a place where we no longer care about constructor
->> semantics because we are no longer dealing with module_call_init().  B=
-ut
->> you may find a better place to point to.  You already found that
->> d622cb587 was what introduced the constructor in the first place, but =
-I
->> didn't spend time today auditing the state of qemu back at that time t=
-o
->> see if the constructor was really necessary back then or just a
->> convenience for lack of a better initialization point.
->>
->> Alternatively, if you can't find a good commit message to point to, at=
-
->> least document how you (and I) tested things, using gdb watchpoints, t=
-o
->> prove it is a safe delay.
->=20
-> I did that by observing all users of the lock in current repository:
+If we report an array of SocketAddress structs, then we'll solve both your
+problem of reporting the port number, and the more general problem of
+reporting IP addresses at the same time in a general manner.
 
 
-> AFAIK all of them are called even after monitor_init(), in other
-> words, they are all after global init too.
->=20
-> As a conclusion, we should be safe here.  Again, I may be wrong
-> somewhere, please correct me if so.
-
-My gdb testing and your analysis match; we're safe.  So all that's
-needed is the paragraph documenting that we thought about the issue:
-
->=20
->>
->> Only if you improve the commit message, you may add:
->> Reviewed-by: Eric Blake <eblake@redhat.com>
->=20
-> Besides the English fix, how about I add one more paragraph to talk
-> about monitor_lock in commit message:
->=20
->   monitor_lock won't be used before monitor_init().  So as long as we
->   initialize the monitor globals before the first call to
->   monitor_init(), we will be safe.
-
-Or even:
-
-monitor_lock is not used before monitor_init() (as confirmed by code
-analysis and gdb watchpoints); so we are safe delaying what was a
-constructor-time initialization of the mutex into the later first call
-to monitor_init().
-
->=20
-> With that, could I take your r-b?
-
-Yes.
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---HNePfuP90OprTSjhJk9IPX1QH99ssUhGq
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlpWDRUACgkQp6FrSiUn
-Q2qz6wf7BoR95l7lUk+J236LtjUbFKC4SclCbpkFRFJamtAYjKFFCpSIcfNuo2je
-VQvUAkGAjLy0y3l4l0j9YN8Peh27p/qd3uXevYzHzZcbC3DtaDOe8i1ugYyyZbFk
-l5OAvOMPnuHivRP5VrpqAP3GK5Fqzk6blWgjkMh8H58Rfx4Te34KWBwxxm3M5087
-P08MLFTKF1KLYltKklM+eDNFlUby+rGj2lyHdq0fU29L3fC4WH8llSzc6TMWuz70
-yNKKeZX+6X36YyXn0Ca+zDe0dVKgHXEehoCHhJJU8sXtBfHi43NibthT2pUfJqpN
-b/b00N0tSt9Ry5f7MSWrPGlCVh+5Ww==
-=I8p6
------END PGP SIGNATURE-----
-
---HNePfuP90OprTSjhJk9IPX1QH99ssUhGq--
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
