@@ -1,23 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37331)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39112)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1eZGfD-00085U-66
-	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 08:43:32 -0500
+	(envelope-from <mst@redhat.com>) id 1eZGiV-0001c0-NF
+	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 08:46:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1eZGfC-0000fI-82
-	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 08:43:31 -0500
-References: <20180108231048.23966-1-laurent@vivier.eu>
-	<20180108231048.23966-2-laurent@vivier.eu>
-	<66de9088-f8ed-2be4-c71a-5d149c63587b@redhat.com>
-From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <525f7d10-54c5-eca9-0b45-62771afe9c59@vivier.eu>
-Date: Wed, 10 Jan 2018 14:42:42 +0100
+	(envelope-from <mst@redhat.com>) id 1eZGiR-0003WM-Et
+	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 08:46:55 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:46696)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1eZGiO-0003Rf-Gr
+	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 08:46:51 -0500
+Date: Wed, 10 Jan 2018 15:46:45 +0200
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20180110154507-mutt-send-email-mst@kernel.org>
+References: <1515506288-32291-1-git-send-email-mst@redhat.com>
+	<20180110122535.3cc0d223@igors-macbook-pro.local>
+	<20180110132751-mutt-send-email-mst@kernel.org>
+	<20180110124152.10896011@igors-macbook-pro.local>
+	<20180110135246-mutt-send-email-mst@kernel.org>
+	<20180110133109.3f8d9965@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <66de9088-f8ed-2be4-c71a-5d149c63587b@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH 1/6] accel/tcg: add size
- paremeter in tlb_fill()
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180110133109.3f8d9965@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] acpi: switch to a dummy SSDT
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,59 +31,106 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Eduardo Habkost <ehabkost@redhat.com>, qemu-s390x@nongnu.org, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Anthony Green <green@moxielogic.com>, Chris Wulff <crwulff@gmail.com>, Richard Henderson <richard.henderson@linaro.org>, Alexander Graf <agraf@suse.de>, Max Filippov <jcmvbkbc@gmail.com>, Michael Walle <michael@walle.cc>, qemu-arm@nongnu.org, qemu-ppc@nongnu.org, Artyom Tarasenko <atar4qemu@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, "Edgar E . Iglesias" <edgar.iglesias@gmail.com>, Stafford Horne <shorne@gmail.com>, Guan Xuetao <gxt@mprc.pku.edu.cn>, Aurelien Jarno <aurelien@aurel32.net>
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, stefanb@linux.vnet.ibm.com
 
-Le 10/01/2018 à 09:43, David Hildenbrand a écrit :
-> On 09.01.2018 00:10, Laurent Vivier wrote:
->> The MC68040 MMU provides the size of the access that
->> triggers the page fault.
->>
->> This size is set in the Special Status Word which
->> is written in the stack frame of the access fault
->> exception.
->>
->> So we need the size in m68k_cpu_unassigned_access() and
->> m68k_cpu_handle_mmu_fault().
->>
->> To be able to do that, this patch modifies the prototype of
->> handle_mmu_fault handler, tlb_fill() and probe_write().
->> do_unassigned_access() already includes a size parameter.
->>
->> This patch also updates handle_mmu_fault handlers and
->> tlb_fill() of all targets (only parameter, no code change).
->>
+On Wed, Jan 10, 2018 at 01:31:09PM +0100, Igor Mammedov wrote:
+> On Wed, 10 Jan 2018 13:55:37 +0200
+> "Michael S. Tsirkin" <mst@redhat.com> wrote:
 > 
-> There are a couple of places where you use "1" (when no other size is
-> available). e.g. in get_page_addr_code().
+> > On Wed, Jan 10, 2018 at 12:41:52PM +0100, Igor Mammedov wrote:
+> > > On Wed, 10 Jan 2018 13:29:09 +0200
+> > > "Michael S. Tsirkin" <mst@redhat.com> wrote:
+> > >   
+> > > > On Wed, Jan 10, 2018 at 12:25:34PM +0100, Igor Mammedov wrote:  
+> > > > > On Tue, 9 Jan 2018 15:58:11 +0200
+> > > > > "Michael S. Tsirkin" <mst@redhat.com> wrote:
+> > > > >   
+> > > > > > We prefer not changing table sizes depending on parameters,
+> > > > > > that's why we create a dummy table rather than just drop
+> > > > > > the MCFG table.
+> > > > > > 
+> > > > > > However, a table named "QEMU" could be put to a better
+> > > > > > use than just a stub, e.g. we could use it to pass
+> > > > > > some QEMU specific info to guests.
+> > > > > > 
+> > > > > > Replace with an SSDT and pad with the Nop opcode
+> > > > > > to preserve the length.  
+> > > > > Not sure it's useful, do you have patches on top of that, which will use this?  
+> > > > 
+> > > > Yes but not me - Stefan (Cc'd) wants to add a custom table.  
+> > > Re-purposing dummy table that might become not dummy doesn't look like good approach.
+> > > What if later the guest enables MCFG and reboots, DUMMY SSDT would be replaced by MCFG?   
+> > 
+> > So what's the issue?  Why is this worse than a dummy QEMU table?
+> > There's actually no re-purposing here at all. Either we create
+> > an MCFG or an SSDT. We never re-purpose.
+> I think, I've misread commit message, so it's table name 'QEMU'
+> that's going to be reused.
 > 
-> Wonder if that's the right thing to do - are there any architectures
-> that e.g. always fetch at least 2 bytes in these conditions?
-> 
+> Having several tables with name QEMU shouldn't be an issue,
+> adding oem/oem_id should be sufficient to distinguish them
+> for parsing side (if there is any).
 
-It's a good question.
+It seems more work for bios to scan all such
+tables and not just the first one. I might be wrong here.
 
-"1" is passed to probe_write() and tlb_fill() and handle_mmu_fault().
-probe_write() calls tlb_fill(), and tlb_fill() calls machine
-handle_mmu_fault handler.
+> As for change from ignored table to always parsed SSDT table,
+> having ignored one seems better.
+> So I'd drop SSDT+memset and keep oem[id] parts in this patch.
 
-As no existing handle_mmu_fault takes care of the access size, I think
-passing 1 and ignoring it doesn't change the existing behavior.
+I'll wait until Stefan posts his patches using this, then we
+can see what does look better.
 
-probe_write() is used to check if a page is writable, and none of the
-callers is guessing the write can cross a page boundary, so 1 is the
-good value in this case.
 
-get_page_addr_code() is the only user of tlb_fill() with 1. and callers
-of get_page_addr_code() never guess the code address can run across a
-page boundary. Some of them calls get_page_addr_code() a second time to
-check this case. So I think using 1 is good solution, but perhaps the
-code could be improved by adding the size parameter to get_page_addr_code().
-
-My purpose was not to change the functions behavior, only to add the new
-parameter. So using "1" when the size is not obvious is a good solution
-to me.
-
-Thank you for your comment!
-
-Laurent
+> > > It'd be cleaner if Stefan would just use his own dedicated SSDT.  
+> > 
+> > SSDT doesn't always work. A data table is needed so e.g. seabios
+> > can process it easily.
+> > 
+> > > > >   
+> > > > > > Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+> > > > > > ---
+> > > > > >  hw/i386/acpi-build.c | 17 ++++++++++++-----
+> > > > > >  1 file changed, 12 insertions(+), 5 deletions(-)
+> > > > > > 
+> > > > > > diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+> > > > > > index 73519ab..d0afb31e 100644
+> > > > > > --- a/hw/i386/acpi-build.c
+> > > > > > +++ b/hw/i386/acpi-build.c
+> > > > > > @@ -2419,6 +2419,8 @@ build_mcfg_q35(GArray *table_data, BIOSLinker *linker, AcpiMcfgInfo *info)
+> > > > > >  {
+> > > > > >      AcpiTableMcfg *mcfg;
+> > > > > >      const char *sig;
+> > > > > > +    const char *oem;
+> > > > > > +    const char *oem_id;
+> > > > > >      int len = sizeof(*mcfg) + 1 * sizeof(mcfg->allocation[0]);
+> > > > > >  
+> > > > > >      mcfg = acpi_data_push(table_data, len);
+> > > > > > @@ -2431,16 +2433,21 @@ build_mcfg_q35(GArray *table_data, BIOSLinker *linker, AcpiMcfgInfo *info)
+> > > > > >      /* MCFG is used for ECAM which can be enabled or disabled by guest.
+> > > > > >       * To avoid table size changes (which create migration issues),
+> > > > > >       * always create the table even if there are no allocations,
+> > > > > > -     * but set the signature to a reserved value in this case.
+> > > > > > -     * ACPI spec requires OSPMs to ignore such tables.
+> > > > > > +     * but fill it with Noop values.
+> > > > > > +     * OSPMs ignore such tables.
+> > > > > >       */
+> > > > > >      if (info->mcfg_base == PCIE_BASE_ADDR_UNMAPPED) {
+> > > > > > -        /* Reserved signature: ignored by OSPM */
+> > > > > > -        sig = "QEMU";
+> > > > > > +        sig = "SSDT";
+> > > > > > +        oem = "QEMU ";
+> > > > > > +        oem_id = "NOOP";
+> > > > > > +        /* 0xa3 - NoopOp */
+> > > > > > +        memset(&mcfg->reserved, 0xa3, len - offsetof(AcpiTableMcfg, reserved));
+> > > > > >      } else {
+> > > > > >          sig = "MCFG";
+> > > > > > +        oem = NULL;
+> > > > > > +        oem_id = NULL;
+> > > > > >      }
+> > > > > > -    build_header(linker, table_data, (void *)mcfg, sig, len, 1, NULL, NULL);
+> > > > > > +    build_header(linker, table_data, (void *)mcfg, sig, len, 1, oem, oem_id);
+> > > > > >  }
+> > > > > >  
+> > > > > >  /*  
