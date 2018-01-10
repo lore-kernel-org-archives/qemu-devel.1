@@ -1,21 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34088)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38883)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1eZJca-0006P2-J5
-	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 11:53:01 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1eZJng-0005dt-Bw
+	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 12:04:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1eZJcZ-0002vo-Or
-	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 11:53:00 -0500
-Date: Wed, 10 Jan 2018 16:52:48 +0000
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20180110165248.GD24212@stefanha-x1.localdomain>
-References: <20180110091846.10699-1-famz@redhat.com>
-	<20180110091846.10699-2-famz@redhat.com>
+	(envelope-from <richard.henderson@linaro.org>) id 1eZJnc-0003rP-D6
+	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 12:04:28 -0500
+Received: from mail-pg0-x241.google.com ([2607:f8b0:400e:c05::241]:41233)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1eZJnc-0003qi-6w
+	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 12:04:24 -0500
+Received: by mail-pg0-x241.google.com with SMTP id m17so8927125pgd.8
+	for <qemu-devel@nongnu.org>; Wed, 10 Jan 2018 09:04:24 -0800 (PST)
+References: <1514940265-18093-1-git-send-email-mjc@sifive.com>
+	<1514940265-18093-6-git-send-email-mjc@sifive.com>
+	<7b4c9965-d0c4-1b10-aa6d-553a3923d598@linaro.org>
+	<CADJ6UvPdmyk8ewh6AN-mzici9DB3bLwb6ta0EMK6dDk4QhL+6w@mail.gmail.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <a76929f5-925f-87c3-aa9d-6067210d6db5@linaro.org>
+Date: Wed, 10 Jan 2018 09:04:19 -0800
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="DiL7RhKs8rK9YGuF"
-Content-Disposition: inline
-In-Reply-To: <20180110091846.10699-2-famz@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v4 1/9] stubs: Add stubs for ram block API
+In-Reply-To: <CADJ6UvPdmyk8ewh6AN-mzici9DB3bLwb6ta0EMK6dDk4QhL+6w@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v1 05/21] RISC-V CPU Helpers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,41 +33,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Keith Busch <keith.busch@intel.com>, qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, Karl Rister <krister@redhat.com>
+To: Stefan O'Rear <sorear2@gmail.com>
+Cc: Michael Clark <mjc@sifive.com>, QEMU Developers <qemu-devel@nongnu.org>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Sagar Karandikar <sagark@eecs.berkeley.edu>
+
+On 01/10/2018 02:35 AM, Stefan O'Rear wrote:
+> On Tue, Jan 2, 2018 at 11:12 PM, Richard Henderson
+> <richard.henderson@linaro.org> wrote:
+>>> +    case CSR_MISA: {
+>>> +        if (!(val_to_write & (1L << ('F' - 'A')))) {
+>>> +            val_to_write &= ~(1L << ('D' - 'A'));
+>>> +        }
+>>> +
+>>> +        /* allow MAFDC bits in MISA to be modified */
+>>> +        target_ulong mask = 0;
+>>> +        mask |= 1L << ('M' - 'A');
+>>> +        mask |= 1L << ('A' - 'A');
+>>> +        mask |= 1L << ('F' - 'A');
+>>> +        mask |= 1L << ('D' - 'A');
+>>> +        mask |= 1L << ('C' - 'A');
+>>> +        mask &= env->misa_mask;
+>>> +
+>>> +        env->misa = (val_to_write & mask) | (env->misa & ~mask);
+>>
+>> Does this not affect the set of instructions that are allowable?  If so, you'd
+>> want something like
+>>
+>>     new_misa = (val_to_write & mask) | (env->misa & ~mask);
+>>     if (env->misa != new_misa) {
+>>         env->misa = new_misa;
+>>         tb_flush(CPU(riscv_env_get_cpu(env)));
+>>     }
+>>
+>> so that we start with all new translations, which would then check the new
+>> value of misa, and would then raise INST_ADDR_MIS (or not).
+> 
+> This does not seem quite right.  misa can legally differ between
+> cores/threads, but tb_flush is a global operation.  The way this is
+> supposed to work is that the relevant misa bits are extracted into
+> tb_flags:
+> 
+> static inline void cpu_riscv_set_tb_flags(CPURISCVState *env)
+> {
+>     env->tb_flags = 0;
+>     if (env->misa & MISA_A) {
+>        env->tb_flags |= RISCV_TF_MISA_A;
+>     }
+> 
+>     if (env->misa & MISA_D) {
+>        env->tb_flags |= RISCV_TF_MISA_D;
+>     }
+> 
+>     if (env->misa & MISA_F) {
+>         env->tb_flags |= RISCV_TF_MISA_F;
+>     }
+> 
+>     if (env->misa & MISA_M) {
+>         env->tb_flags |= RISCV_TF_MISA_M;
+>     }
+> 
+>     if (env->misa & MISA_C) {
+>         env->tb_flags |= RISCV_TF_MISA_C;
+>     }
+> 
+>     env->tb_flags |= cpu_mmu_index(env, true) << RISCV_TF_IAT_SHIFT;
+>     env->tb_flags |= cpu_mmu_index(env, false) << RISCV_TF_DAT_SHIFT;
+> }
+> 
+> static inline void cpu_get_tb_cpu_state(CPURISCVState *env, target_ulong *pc,
+>                                         target_ulong *cs_base, uint32_t *flags)
+> {
+>     *pc = env->pc;
+>     *cs_base = 0;
+>     *flags = env->tb_flags;
+> }
+> 
+> but this code appears to be missing in the tree submitted for upstreaming?
+
+Ah hah.  Yes, this is another completely valid way to accomplish this.
+
+I am also glad that you are thinking about the computational overhead of
+cpu_get_tb_cpu_state.  With lookup_and_goto_ptr, it is in the hot path of
+indirect branching.
 
 
---DiL7RhKs8rK9YGuF
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Wed, Jan 10, 2018 at 05:18:38PM +0800, Fam Zheng wrote:
-> These functions will be wanted by block-obj-y but the actual definition
-> is in obj-y, so stub them to keep the linker happy.
->=20
-> Signed-off-by: Fam Zheng <famz@redhat.com>
-> Acked-by: Paolo Bonzini <pbonzini@redhat.com>
-> ---
->  stubs/Makefile.objs |  1 +
->  stubs/ram-block.c   | 16 ++++++++++++++++
->  2 files changed, 17 insertions(+)
->  create mode 100644 stubs/ram-block.c
-
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-
---DiL7RhKs8rK9YGuF
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJaVkTgAAoJEJykq7OBq3PI2PsIALk7AIBY/02AJGX1rdrgm+nQ
-zXPGUpBcEMZOomzZIQm3Y2anrashy/O7BU39O2l8F0KOg3RI/hG8Z8Rod72BwqEV
-4wJbGhNjZdRcgnk5B34Ya4Zug1ViwNlpNEb5UjjU71V4Hq6PnPvXSK9Wjq2ZRiSR
-iTZ3p2s2Me4F9yE2yhMTSaCpc4LUxcieOomjc4SJ1tsczEMws2iyJT01AdT6Mvaa
-HTVivBXi3qKmvVD/3CjI1+XKobBfsY+snImGWmgDNhpcjtakyk/bwdeS4BxKSWvF
-stEqvw+4GOdDKPuBlsF7XzSPG/oBWitMIaD4eg2FxDHFIKaXsW1JX8s/FK9HAA8=
-=yrFZ
------END PGP SIGNATURE-----
-
---DiL7RhKs8rK9YGuF--
+r~
