@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50585)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50593)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1eZkVb-0006mp-Uj
-	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 16:35:37 -0500
+	(envelope-from <marcandre.lureau@redhat.com>) id 1eZkVc-0006nd-Vp
+	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 16:35:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1eZkVX-0002mr-Us
-	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 16:35:35 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:47276)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1eZkVa-0002rv-Og
+	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 16:35:37 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:52436)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1eZkVX-0002mE-MJ
-	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 16:35:31 -0500
+	id 1eZkVa-0002qI-Fk
+	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 16:35:34 -0500
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Thu, 11 Jan 2018 22:32:17 +0100
-Message-Id: <20180111213250.16511-19-marcandre.lureau@redhat.com>
+Date: Thu, 11 Jan 2018 22:32:19 +0100
+Message-Id: <20180111213250.16511-21-marcandre.lureau@redhat.com>
 In-Reply-To: <20180111213250.16511-1-marcandre.lureau@redhat.com>
 References: <20180111213250.16511-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v4 18/51] qapi: rename
- QAPISchemaEnumType.values to .members
+Subject: [Qemu-devel] [PATCH v4 20/51] tests: modify visit_enum_type() in
+ test-qapi to print members
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,209 +29,414 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: eblake@redhat.com, armbru@redhat.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, Eduardo Habkost <ehabkost@redhat.com>, Cleber Rosa <crosa@redhat.com>
+Cc: eblake@redhat.com, armbru@redhat.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>
 
-Rename QAPISchemaEnumType.values and related variables to members.
-Makes sense ever since commit 93bda4dd4 changed .values from list of
-string to list of QAPISchemaMember. Obvious no-op.
+Use a common self._print_members() to print enum members details.
 
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 ---
- scripts/qapi.py                | 36 ++++++++++++++++++------------------
- scripts/qapi-introspect.py     |  4 ++--
- scripts/qapi-types.py          | 10 +++++-----
- scripts/qapi-visit.py          |  2 +-
- scripts/qapi2texi.py           |  2 +-
- tests/qapi-schema/test-qapi.py |  4 ++--
- 6 files changed, 29 insertions(+), 29 deletions(-)
+ tests/qapi-schema/comments.out           | 14 +++++++--
+ tests/qapi-schema/doc-bad-section.out    | 13 +++++++--
+ tests/qapi-schema/doc-good.out           | 17 +++++++++--
+ tests/qapi-schema/empty.out              |  9 +++++-
+ tests/qapi-schema/event-case.out         |  9 +++++-
+ tests/qapi-schema/ident-with-escape.out  |  9 +++++-
+ tests/qapi-schema/include-relpath.out    | 14 +++++++--
+ tests/qapi-schema/include-repetition.out | 14 +++++++--
+ tests/qapi-schema/include-simple.out     | 14 +++++++--
+ tests/qapi-schema/indented-expr.out      |  9 +++++-
+ tests/qapi-schema/qapi-schema-test.out   | 49 ++++++++++++++++++++++++++=
+------
+ tests/qapi-schema/test-qapi.py           | 15 +++++++---
+ 12 files changed, 156 insertions(+), 30 deletions(-)
 
-diff --git a/scripts/qapi.py b/scripts/qapi.py
-index ee759489cb..c7cd98a890 100644
---- a/scripts/qapi.py
-+++ b/scripts/qapi.py
-@@ -1046,7 +1046,7 @@ class QAPISchemaVisitor(object):
-     def visit_builtin_type(self, name, info, json_type):
-         pass
-=20
--    def visit_enum_type(self, name, info, ifcond, values, prefix):
-+    def visit_enum_type(self, name, info, ifcond, members, prefix):
-         pass
-=20
-     def visit_array_type(self, name, info, ifcond, element_type):
-@@ -1134,22 +1134,22 @@ class QAPISchemaBuiltinType(QAPISchemaType):
-=20
-=20
- class QAPISchemaEnumType(QAPISchemaType):
--    def __init__(self, name, info, doc, ifcond, values, prefix):
-+    def __init__(self, name, info, doc, ifcond, members, prefix):
-         QAPISchemaType.__init__(self, name, info, doc, ifcond)
--        for v in values:
--            assert isinstance(v, QAPISchemaMember)
--            v.set_owner(name)
-+        for m in members:
-+            assert isinstance(m, QAPISchemaMember)
-+            m.set_owner(name)
-         assert prefix is None or isinstance(prefix, str)
--        self.values =3D values
-+        self.members =3D members
-         self.prefix =3D prefix
-=20
-     def check(self, schema):
-         QAPISchemaType.check(self, schema)
-         seen =3D {}
--        for v in self.values:
--            v.check_clash(self.info, seen)
-+        for m in self.members:
-+            m.check_clash(self.info, seen)
-             if self.doc:
--                self.doc.connect_member(v)
-+                self.doc.connect_member(m)
-=20
-     def is_implicit(self):
-         # See QAPISchema._make_implicit_enum_type() and ._def_predefined=
-s()
-@@ -1159,7 +1159,7 @@ class QAPISchemaEnumType(QAPISchemaType):
-         return c_name(self.name)
-=20
-     def member_names(self):
--        return [v.name for v in self.values]
-+        return [m.name for m in self.members]
-=20
-     def json_type(self):
-         return 'string'
-@@ -1958,19 +1958,19 @@ def ifcond_decorator(func):
-     return func_wrapper
-=20
-=20
--def gen_enum_lookup(name, values, prefix=3DNone):
-+def gen_enum_lookup(name, members, prefix=3DNone):
-     ret =3D mcgen('''
-=20
- const QEnumLookup %(c_name)s_lookup =3D {
-     .array =3D (const char *const[]) {
- ''',
-                 c_name=3Dc_name(name))
--    for value in values:
--        index =3D c_enum_const(name, value, prefix)
-+    for m in members:
-+        index =3D c_enum_const(name, m, prefix)
-         ret +=3D mcgen('''
-         [%(index)s] =3D "%(value)s",
- ''',
--                     index=3Dindex, value=3Dvalue)
-+                     index=3Dindex, value=3Dm)
-=20
-     ret +=3D mcgen('''
-     },
-@@ -1981,9 +1981,9 @@ const QEnumLookup %(c_name)s_lookup =3D {
-     return ret
-=20
-=20
--def gen_enum(name, values, prefix=3DNone):
-+def gen_enum(name, members, prefix=3DNone):
-     # append automatically generated _MAX value
--    enum_values =3D values + ['_MAX']
-+    enum_members =3D members + ['_MAX']
-=20
-     ret =3D mcgen('''
-=20
-@@ -1991,11 +1991,11 @@ typedef enum %(c_name)s {
- ''',
-                 c_name=3Dc_name(name))
-=20
--    for value in enum_values:
-+    for m in enum_members:
-         ret +=3D mcgen('''
-     %(c_enum)s,
- ''',
--                     c_enum=3Dc_enum_const(name, value, prefix))
-+                     c_enum=3Dc_enum_const(name, m, prefix))
-=20
-     ret +=3D mcgen('''
- } %(c_name)s;
-diff --git a/scripts/qapi-introspect.py b/scripts/qapi-introspect.py
-index 7d3a5c37fd..9fcb342c91 100644
---- a/scripts/qapi-introspect.py
-+++ b/scripts/qapi-introspect.py
-@@ -153,8 +153,8 @@ const QLitObject %(c_name)s =3D %(c_string)s;
-     def visit_builtin_type(self, name, info, json_type):
-         self._gen_qlit(name, 'builtin', {'json-type': json_type}, [])
-=20
--    def visit_enum_type(self, name, info, ifcond, values, prefix):
--        self._gen_qlit(name, 'enum', {'values': values}, ifcond)
-+    def visit_enum_type(self, name, info, ifcond, members, prefix):
-+        self._gen_qlit(name, 'enum', {'values': members}, ifcond)
-=20
-     def visit_array_type(self, name, info, ifcond, element_type):
-         element =3D self._use_type(element_type)
-diff --git a/scripts/qapi-types.py b/scripts/qapi-types.py
-index 789e89ff59..75c1823e44 100644
---- a/scripts/qapi-types.py
-+++ b/scripts/qapi-types.py
-@@ -203,16 +203,16 @@ class QAPISchemaGenTypeVisitor(QAPISchemaVisitor):
-         self.defn +=3D gen_type_cleanup(name)
-=20
-     @ifcond_decorator
--    def visit_enum_type(self, name, info, ifcond, values, prefix):
-+    def visit_enum_type(self, name, info, ifcond, members, prefix):
-         # Special case for our lone builtin enum type
-         # TODO use something cleaner than existence of info
-         if not info:
--            self._btin +=3D gen_enum(name, values, prefix)
-+            self._btin +=3D gen_enum(name, members, prefix)
-             if do_builtins:
--                self.defn +=3D gen_enum_lookup(name, values, prefix)
-+                self.defn +=3D gen_enum_lookup(name, members, prefix)
-         else:
--            self._fwdecl +=3D gen_enum(name, values, prefix)
--            self.defn +=3D gen_enum_lookup(name, values, prefix)
-+            self._fwdecl +=3D gen_enum(name, members, prefix)
-+            self.defn +=3D gen_enum_lookup(name, members, prefix)
-=20
-     @ifcond_decorator
-     def visit_array_type(self, name, info, ifcond, element_type):
-diff --git a/scripts/qapi-visit.py b/scripts/qapi-visit.py
-index 4b0e005437..7e816ae98e 100644
---- a/scripts/qapi-visit.py
-+++ b/scripts/qapi-visit.py
-@@ -284,7 +284,7 @@ class QAPISchemaGenVisitVisitor(QAPISchemaVisitor):
-         self._btin =3D None
-=20
-     @ifcond_decorator
--    def visit_enum_type(self, name, info, ifcond, values, prefix):
-+    def visit_enum_type(self, name, info, ifcond, members, prefix):
-         # Special case for our lone builtin enum type
-         # TODO use something cleaner than existence of info
-         if not info:
-diff --git a/scripts/qapi2texi.py b/scripts/qapi2texi.py
-index f24fb89bd5..755bd2f15d 100755
---- a/scripts/qapi2texi.py
-+++ b/scripts/qapi2texi.py
-@@ -203,7 +203,7 @@ class QAPISchemaGenDocVisitor(qapi.QAPISchemaVisitor)=
-:
-     def visit_begin(self, schema):
-         self.out =3D ''
-=20
--    def visit_enum_type(self, name, info, ifcond, values, prefix):
-+    def visit_enum_type(self, name, info, ifcond, members, prefix):
-         doc =3D self.cur_doc
-         self.out +=3D TYPE_FMT(type=3D'Enum',
-                              name=3Ddoc.symbol,
+diff --git a/tests/qapi-schema/comments.out b/tests/qapi-schema/comments.=
+out
+index 17e652535c..7c243b246b 100644
+--- a/tests/qapi-schema/comments.out
++++ b/tests/qapi-schema/comments.out
+@@ -1,4 +1,14 @@
+-enum QType ['none', 'qnull', 'qnum', 'qstring', 'qdict', 'qlist', 'qbool=
+']
++enum QType
+     prefix QTYPE
+-enum Status ['good', 'bad', 'ugly']
++    member none
++    member qnull
++    member qnum
++    member qstring
++    member qdict
++    member qlist
++    member qbool
++enum Status
++    member good
++    member bad
++    member ugly
+ object q_empty
+diff --git a/tests/qapi-schema/doc-bad-section.out b/tests/qapi-schema/do=
+c-bad-section.out
+index 089bde1381..77e223ba41 100644
+--- a/tests/qapi-schema/doc-bad-section.out
++++ b/tests/qapi-schema/doc-bad-section.out
+@@ -1,6 +1,15 @@
+-enum Enum ['one', 'two']
+-enum QType ['none', 'qnull', 'qnum', 'qstring', 'qdict', 'qlist', 'qbool=
+']
++enum Enum
++    member one
++    member two
++enum QType
+     prefix QTYPE
++    member none
++    member qnull
++    member qnum
++    member qstring
++    member qdict
++    member qlist
++    member qbool
+ object q_empty
+ doc symbol=3DEnum
+     body=3D
+diff --git a/tests/qapi-schema/doc-good.out b/tests/qapi-schema/doc-good.=
+out
+index 1d2c250527..e615b04281 100644
+--- a/tests/qapi-schema/doc-good.out
++++ b/tests/qapi-schema/doc-good.out
+@@ -1,19 +1,30 @@
+ object Base
+     member base1: Enum optional=3DFalse
+-enum Enum ['one', 'two']
++enum Enum
++    member one
++    member two
+ object Object
+     base Base
+     tag base1
+     case one: Variant1
+     case two: Variant2
+-enum QType ['none', 'qnull', 'qnum', 'qstring', 'qdict', 'qlist', 'qbool=
+']
++enum QType
+     prefix QTYPE
++    member none
++    member qnull
++    member qnum
++    member qstring
++    member qdict
++    member qlist
++    member qbool
+ object SugaredUnion
+     member type: SugaredUnionKind optional=3DFalse
+     tag type
+     case one: q_obj_Variant1-wrapper
+     case two: q_obj_Variant2-wrapper
+-enum SugaredUnionKind ['one', 'two']
++enum SugaredUnionKind
++    member one
++    member two
+ object Variant1
+     member var1: str optional=3DFalse
+ object Variant2
+diff --git a/tests/qapi-schema/empty.out b/tests/qapi-schema/empty.out
+index 40b886ddae..0bd6d1421d 100644
+--- a/tests/qapi-schema/empty.out
++++ b/tests/qapi-schema/empty.out
+@@ -1,3 +1,10 @@
+-enum QType ['none', 'qnull', 'qnum', 'qstring', 'qdict', 'qlist', 'qbool=
+']
++enum QType
+     prefix QTYPE
++    member none
++    member qnull
++    member qnum
++    member qstring
++    member qdict
++    member qlist
++    member qbool
+ object q_empty
+diff --git a/tests/qapi-schema/event-case.out b/tests/qapi-schema/event-c=
+ase.out
+index 313c0fe7be..fc64383edb 100644
+--- a/tests/qapi-schema/event-case.out
++++ b/tests/qapi-schema/event-case.out
+@@ -1,5 +1,12 @@
+-enum QType ['none', 'qnull', 'qnum', 'qstring', 'qdict', 'qlist', 'qbool=
+']
++enum QType
+     prefix QTYPE
++    member none
++    member qnull
++    member qnum
++    member qstring
++    member qdict
++    member qlist
++    member qbool
+ event oops None
+    boxed=3DFalse
+ object q_empty
+diff --git a/tests/qapi-schema/ident-with-escape.out b/tests/qapi-schema/=
+ident-with-escape.out
+index b5637cb2e0..6458ffb28c 100644
+--- a/tests/qapi-schema/ident-with-escape.out
++++ b/tests/qapi-schema/ident-with-escape.out
+@@ -1,5 +1,12 @@
+-enum QType ['none', 'qnull', 'qnum', 'qstring', 'qdict', 'qlist', 'qbool=
+']
++enum QType
+     prefix QTYPE
++    member none
++    member qnull
++    member qnum
++    member qstring
++    member qdict
++    member qlist
++    member qbool
+ command fooA q_obj_fooA-arg -> None
+    gen=3DTrue success_response=3DTrue boxed=3DFalse
+ object q_empty
+diff --git a/tests/qapi-schema/include-relpath.out b/tests/qapi-schema/in=
+clude-relpath.out
+index 17e652535c..7c243b246b 100644
+--- a/tests/qapi-schema/include-relpath.out
++++ b/tests/qapi-schema/include-relpath.out
+@@ -1,4 +1,14 @@
+-enum QType ['none', 'qnull', 'qnum', 'qstring', 'qdict', 'qlist', 'qbool=
+']
++enum QType
+     prefix QTYPE
+-enum Status ['good', 'bad', 'ugly']
++    member none
++    member qnull
++    member qnum
++    member qstring
++    member qdict
++    member qlist
++    member qbool
++enum Status
++    member good
++    member bad
++    member ugly
+ object q_empty
+diff --git a/tests/qapi-schema/include-repetition.out b/tests/qapi-schema=
+/include-repetition.out
+index 17e652535c..7c243b246b 100644
+--- a/tests/qapi-schema/include-repetition.out
++++ b/tests/qapi-schema/include-repetition.out
+@@ -1,4 +1,14 @@
+-enum QType ['none', 'qnull', 'qnum', 'qstring', 'qdict', 'qlist', 'qbool=
+']
++enum QType
+     prefix QTYPE
+-enum Status ['good', 'bad', 'ugly']
++    member none
++    member qnull
++    member qnum
++    member qstring
++    member qdict
++    member qlist
++    member qbool
++enum Status
++    member good
++    member bad
++    member ugly
+ object q_empty
+diff --git a/tests/qapi-schema/include-simple.out b/tests/qapi-schema/inc=
+lude-simple.out
+index 17e652535c..7c243b246b 100644
+--- a/tests/qapi-schema/include-simple.out
++++ b/tests/qapi-schema/include-simple.out
+@@ -1,4 +1,14 @@
+-enum QType ['none', 'qnull', 'qnum', 'qstring', 'qdict', 'qlist', 'qbool=
+']
++enum QType
+     prefix QTYPE
+-enum Status ['good', 'bad', 'ugly']
++    member none
++    member qnull
++    member qnum
++    member qstring
++    member qdict
++    member qlist
++    member qbool
++enum Status
++    member good
++    member bad
++    member ugly
+ object q_empty
+diff --git a/tests/qapi-schema/indented-expr.out b/tests/qapi-schema/inde=
+nted-expr.out
+index 586795f44d..7b066235fa 100644
+--- a/tests/qapi-schema/indented-expr.out
++++ b/tests/qapi-schema/indented-expr.out
+@@ -1,5 +1,12 @@
+-enum QType ['none', 'qnull', 'qnum', 'qstring', 'qdict', 'qlist', 'qbool=
+']
++enum QType
+     prefix QTYPE
++    member none
++    member qnull
++    member qnum
++    member qstring
++    member qdict
++    member qlist
++    member qbool
+ command eins None -> None
+    gen=3DTrue success_response=3DTrue boxed=3DFalse
+ object q_empty
+diff --git a/tests/qapi-schema/qapi-schema-test.out b/tests/qapi-schema/q=
+api-schema-test.out
+index 0804c3af84..33afa965e8 100644
+--- a/tests/qapi-schema/qapi-schema-test.out
++++ b/tests/qapi-schema/qapi-schema-test.out
+@@ -33,7 +33,10 @@ event EVENT_F UserDefAlternate
+ object Empty1
+ object Empty2
+     base Empty1
+-enum EnumOne ['value1', 'value2', 'value3']
++enum EnumOne
++    member value1
++    member value2
++    member value3
+ object EventStructOne
+     member struct1: UserDefOne optional=3DFalse
+     member string: str optional=3DFalse
+@@ -42,16 +45,25 @@ object ForceArrays
+     member unused1: UserDefOneList optional=3DFalse
+     member unused2: UserDefTwoList optional=3DFalse
+     member unused3: TestStructList optional=3DFalse
+-enum MyEnum []
++enum MyEnum
+ object NestedEnumsOne
+     member enum1: EnumOne optional=3DFalse
+     member enum2: EnumOne optional=3DTrue
+     member enum3: EnumOne optional=3DFalse
+     member enum4: EnumOne optional=3DTrue
+-enum QEnumTwo ['value1', 'value2']
++enum QEnumTwo
+     prefix QENUM_TWO
+-enum QType ['none', 'qnull', 'qnum', 'qstring', 'qdict', 'qlist', 'qbool=
+']
++    member value1
++    member value2
++enum QType
+     prefix QTYPE
++    member none
++    member qnull
++    member qnum
++    member qstring
++    member qdict
++    member qlist
++    member qbool
+ alternate TestIfAlternate
+     tag type
+     case foo: int
+@@ -60,7 +72,9 @@ alternate TestIfAlternate
+ command TestIfCmd q_obj_TestIfCmd-arg -> None
+    gen=3DTrue success_response=3DTrue boxed=3DFalse
+     if ['defined(TEST_IF_CMD)', 'defined(TEST_IF_STRUCT)']
+-enum TestIfEnum ['foo', 'bar']
++enum TestIfEnum
++    member foo
++    member bar
+     if ['defined(TEST_IF_ENUM)']
+ event TestIfEvent q_obj_TestIfEvent-arg
+    boxed=3DFalse
+@@ -73,7 +87,8 @@ object TestIfUnion
+     tag type
+     case foo: q_obj_TestStruct-wrapper
+     if ['defined(TEST_IF_UNION) && defined(TEST_IF_STRUCT)']
+-enum TestIfUnionKind ['foo']
++enum TestIfUnionKind
++    member foo
+     if ['defined(TEST_IF_UNION) && defined(TEST_IF_STRUCT)']
+ object TestStruct
+     member integer: int optional=3DFalse
+@@ -122,7 +137,21 @@ object UserDefNativeListUnion
+     case string: q_obj_strList-wrapper
+     case sizes: q_obj_sizeList-wrapper
+     case any: q_obj_anyList-wrapper
+-enum UserDefNativeListUnionKind ['integer', 's8', 's16', 's32', 's64', '=
+u8', 'u16', 'u32', 'u64', 'number', 'boolean', 'string', 'sizes', 'any']
++enum UserDefNativeListUnionKind
++    member integer
++    member s8
++    member s16
++    member s32
++    member s64
++    member u8
++    member u16
++    member u32
++    member u64
++    member number
++    member boolean
++    member string
++    member sizes
++    member any
+ object UserDefOne
+     base UserDefZero
+     member string: str optional=3DFalse
+@@ -159,7 +188,8 @@ alternate __org.qemu_x-Alt
+     case b: __org.qemu_x-Base
+ object __org.qemu_x-Base
+     member __org.qemu_x-member1: __org.qemu_x-Enum optional=3DFalse
+-enum __org.qemu_x-Enum ['__org.qemu_x-value']
++enum __org.qemu_x-Enum
++    member __org.qemu_x-value
+ object __org.qemu_x-Struct
+     base __org.qemu_x-Base
+     member __org.qemu_x-member2: str optional=3DFalse
+@@ -170,7 +200,8 @@ object __org.qemu_x-Union1
+     member type: __org.qemu_x-Union1Kind optional=3DFalse
+     tag type
+     case __org.qemu_x-branch: q_obj_str-wrapper
+-enum __org.qemu_x-Union1Kind ['__org.qemu_x-branch']
++enum __org.qemu_x-Union1Kind
++    member __org.qemu_x-branch
+ object __org.qemu_x-Union2
+     base __org.qemu_x-Base
+     tag __org.qemu_x-member1
 diff --git a/tests/qapi-schema/test-qapi.py b/tests/qapi-schema/test-qapi=
 .py
-index a4b3a00bbd..1c4f9e0dac 100644
+index 2ab79230c2..aadc8452b4 100644
 --- a/tests/qapi-schema/test-qapi.py
 +++ b/tests/qapi-schema/test-qapi.py
-@@ -17,8 +17,8 @@ import sys
-=20
+@@ -18,18 +18,17 @@ import sys
 =20
  class QAPISchemaTestVisitor(QAPISchemaVisitor):
--    def visit_enum_type(self, name, info, ifcond, values, prefix):
--        print 'enum %s %s' % (name, values)
-+    def visit_enum_type(self, name, info, ifcond, members, prefix):
-+        print 'enum %s %s' % (name, members)
+     def visit_enum_type(self, name, info, ifcond, members, prefix):
+-        print 'enum %s %s' % (name, [m.name for m in members])
++        print 'enum %s' % name
          if prefix:
              print '    prefix %s' % prefix
++        self._print_members(members)
          self._print_if(ifcond)
+=20
+     def visit_object_type(self, name, info, ifcond, base, members, varia=
+nts):
+         print 'object %s' % name
+         if base:
+             print '    base %s' % base.name
+-        for m in members:
+-            print '    member %s: %s optional=3D%s' % \
+-                (m.name, m.type.name, m.optional)
++        self._print_members(members)
+         self._print_variants(variants)
+         self._print_if(ifcond)
+=20
+@@ -51,6 +50,14 @@ class QAPISchemaTestVisitor(QAPISchemaVisitor):
+         print '   boxed=3D%s' % boxed
+         self._print_if(ifcond)
+=20
++    @staticmethod
++    def _print_members(members):
++        for m in members:
++            print '    member %s%s' % (
++                m.name,
++                ': %s optional=3D%s' % (m.type.name, m.optional)
++                if isinstance(m, QAPISchemaObjectTypeMember) else '')
++
+     @staticmethod
+     def _print_variants(variants):
+         if variants:
 --=20
 2.16.0.rc1.1.gef27df75a1
