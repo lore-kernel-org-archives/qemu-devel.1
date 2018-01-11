@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39810)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43043)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mjc@sifive.com>) id 1eZhHu-0003bu-MW
-	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 13:09:16 -0500
+	(envelope-from <mjc@sifive.com>) id 1eZhOL-0006pH-Pq
+	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 13:15:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mjc@sifive.com>) id 1eZhHt-0003UX-JZ
-	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 13:09:14 -0500
-Received: from mail-oi0-x242.google.com ([2607:f8b0:4003:c06::242]:45363)
+	(envelope-from <mjc@sifive.com>) id 1eZhOK-0003z7-E3
+	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 13:15:53 -0500
+Received: from mail-ot0-x244.google.com ([2607:f8b0:4003:c0f::244]:39177)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mjc@sifive.com>) id 1eZhHt-0003UC-DM
-	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 13:09:13 -0500
-Received: by mail-oi0-x242.google.com with SMTP id j129so2203420oib.12
-	for <qemu-devel@nongnu.org>; Thu, 11 Jan 2018 10:09:13 -0800 (PST)
+	(Exim 4.71) (envelope-from <mjc@sifive.com>) id 1eZhOK-0003xw-7a
+	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 13:15:52 -0500
+Received: by mail-ot0-x244.google.com with SMTP id 37so2859516otv.6
+	for <qemu-devel@nongnu.org>; Thu, 11 Jan 2018 10:15:52 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <a490bac7-e88b-cd4c-9922-f50461c591bc@linaro.org>
+In-Reply-To: <8b8162d6-f20e-270c-2aad-9c34eb00759d@linaro.org>
 References: <1515637324-96034-1-git-send-email-mjc@sifive.com>
-	<1515637324-96034-7-git-send-email-mjc@sifive.com>
-	<a490bac7-e88b-cd4c-9922-f50461c591bc@linaro.org>
+	<1515637324-96034-9-git-send-email-mjc@sifive.com>
+	<8b8162d6-f20e-270c-2aad-9c34eb00759d@linaro.org>
 From: Michael Clark <mjc@sifive.com>
-Date: Fri, 12 Jan 2018 07:09:12 +1300
-Message-ID: <CAHNT7Ns5GKU0g9V2DwbQWO0ahjE67+OO0gYnEyU+88BjXghKJg@mail.gmail.com>
+Date: Fri, 12 Jan 2018 07:15:50 +1300
+Message-ID: <CAHNT7NvBViMnOu1LsxvZn3n2c_2mY-ionLdyJgmheOYhXhYAfg@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v3 06/21] RISC-V FPU Support
+Subject: Re: [Qemu-devel] [PATCH v3 08/21] RISC-V TCG Code Generation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,39 +32,50 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Richard Henderson <richard.henderson@linaro.org>
 Cc: qemu-devel@nongnu.org, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Palmer Dabbelt <palmer@sifive.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>, RISC-V Patches <patches@groups.riscv.org>
 
-On Fri, Jan 12, 2018 at 4:31 AM, Richard Henderson <
+On Fri, Jan 12, 2018 at 4:47 AM, Richard Henderson <
 richard.henderson@linaro.org> wrote:
 
 > On 01/10/2018 06:21 PM, Michael Clark wrote:
-> > Helper routines for FPU instructions and NaN definitions.
+> > TCG code generation for the RV32IMAFDC and RV64IMAFDC. The QEMU
+> > RISC-V code generator has complete coverage for the Base ISA v2.2,
+> > Privileged ISA v1.9.1 and Privileged ISA v1.10:
+> >
+> > - RISC-V Instruction Set Manual Volume I: User-Level ISA Version 2.2
+> > - RISC-V Instruction Set Manual Volume II: Privileged ISA Version 1.9.1
+> > - RISC-V Instruction Set Manual Volume II: Privileged ISA Version 1.10
 > >
 > > Signed-off-by: Michael Clark <mjc@sifive.com>
 > > ---
-> >  fpu/softfloat-specialize.h |   7 +-
-> >  target/riscv/fpu_helper.c  | 591 ++++++++++++++++++++++++++++++
-> +++++++++++++++
-> >  2 files changed, 595 insertions(+), 3 deletions(-)
-> >  create mode 100644 target/riscv/fpu_helper.c
+> >  target/riscv/instmap.h   |  377 +++++++++
+> >  target/riscv/translate.c | 1982 ++++++++++++++++++++++++++++++
+> ++++++++++++++++
+> >  2 files changed, 2359 insertions(+)
+> >  create mode 100644 target/riscv/instmap.h
+> >  create mode 100644 target/riscv/translate.c
 >
-> It doesn't look like you have addressed any of my comments against v1 here.
+> While there is forward progress within translate.c, it would seem that
+> quite a
+> lot of my v1 comments are not yet addressed.
+>
+> Also,
+>
+> > +        if (!riscv_has_ext(env, RVC)) {
+>
+> You may not access env in this way.  Any code generation differences must
+> be
+> computable from either unchanging values on the cpu or tb->flags.  MISA is
+> not
+> unchanging -- you allow runtime modification.
+>
+> Again, the partial patch I saw from Stefan would fix this.
 
 
-No I haven't sorry. I'll go back through your feedback.
+We'll definately address this in the next spin...
 
-I'm going to have to defer looking at this until the weekend as i've used
-all of my QEMU "background time" this week.
+Could you pleease forward me the patch or send me a pointer to where i
+might find it?
 
-I don't know if tininess is one of the comments. i.e. setting underflow
-before of after rounding. RISC-V sets underflow after rounding and we need
-to figure out how to do that.
+Assuming we can use flags and misa is stored in the lower 26-bits then we
+change riscv_has_ext to take an int. e.g.
 
-The RISC-V QEMU port is presently quite usable, and we have fedora and
-debian folk both working on packacking for RISC-V. The general sentiment is
-does our port need to be perfect to be accepted in-tree? or can we work on
-clean-ups and bug fixes in tree? We're pretty committed to transforming it
-into a high quality port and we will have plently of time going forward to
-address any issues. We have to balance cleanups and bug fixes for corner
-cases with adding and improve device emulation support. So far all of the
-recent effort has gone into the former, i.e. clean-ups and bug fixes, so
-you can be sure we will attend to any remaining issues in the comitted
-blocks of time we have available to work on the port.
+riscv_has_ext(tb->flags, RVC))
