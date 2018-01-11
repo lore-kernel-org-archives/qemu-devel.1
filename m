@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35275)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35326)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcmvbkbc@gmail.com>) id 1eZk3O-0005jF-Pw
-	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 16:06:54 -0500
+	(envelope-from <jcmvbkbc@gmail.com>) id 1eZk3S-0005lF-Jq
+	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 16:07:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcmvbkbc@gmail.com>) id 1eZk2x-0000QY-0J
-	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 16:06:26 -0500
-Received: from mail-lf0-x230.google.com ([2a00:1450:4010:c07::230]:44808)
+	(envelope-from <jcmvbkbc@gmail.com>) id 1eZk2r-0000KN-6R
+	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 16:06:30 -0500
+Received: from mail-lf0-x244.google.com ([2a00:1450:4010:c07::244]:34103)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <jcmvbkbc@gmail.com>) id 1eZk2v-0000P7-SX
-	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 16:05:58 -0500
-Received: by mail-lf0-x230.google.com with SMTP id w23so3974668lfd.11
-	for <qemu-devel@nongnu.org>; Thu, 11 Jan 2018 13:05:57 -0800 (PST)
+	(Exim 4.71) (envelope-from <jcmvbkbc@gmail.com>) id 1eZk2p-0000HW-Sl
+	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 16:05:53 -0500
+Received: by mail-lf0-x244.google.com with SMTP id h140so4017835lfg.1
+	for <qemu-devel@nongnu.org>; Thu, 11 Jan 2018 13:05:51 -0800 (PST)
 From: Max Filippov <jcmvbkbc@gmail.com>
-Date: Thu, 11 Jan 2018 13:05:03 -0800
-Message-Id: <1515704703-10347-10-git-send-email-jcmvbkbc@gmail.com>
+Date: Thu, 11 Jan 2018 13:05:01 -0800
+Message-Id: <1515704703-10347-8-git-send-email-jcmvbkbc@gmail.com>
 In-Reply-To: <1515704703-10347-1-git-send-email-jcmvbkbc@gmail.com>
 References: <1515704703-10347-1-git-send-email-jcmvbkbc@gmail.com>
-Subject: [Qemu-devel] [PATCH 9/9] target/xtensa: add sample_controller core
+Subject: [Qemu-devel] [PATCH 7/9] target/xtensa: add de212 core
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,40 +28,39 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Max Filippov <jcmvbkbc@gmail.com>
 
-The sample_controller core is a simple noMMU general purpose core, modern
-analog of de212. It is used as a default core in the xtensa port of
-Zephyr.
+DE212 is a noMMU core supported in linux. Import this core to provide
+true noMMU configuration for xtensa linux to run on QEMU.
 
 Signed-off-by: Max Filippov <jcmvbkbc@gmail.com>
 ---
- target/xtensa/Makefile.objs                        |     1 +
- target/xtensa/core-sample_controller.c             |    53 +
- target/xtensa/core-sample_controller/core-isa.h    |   644 ++
- target/xtensa/core-sample_controller/gdb-config.c  |   141 +
- .../xtensa/core-sample_controller/xtensa-modules.c | 11377 +++++++++++++++++++
- 5 files changed, 12216 insertions(+)
- create mode 100644 target/xtensa/core-sample_controller.c
- create mode 100644 target/xtensa/core-sample_controller/core-isa.h
- create mode 100644 target/xtensa/core-sample_controller/gdb-config.c
- create mode 100644 target/xtensa/core-sample_controller/xtensa-modules.c
+ target/xtensa/Makefile.objs               |     1 +
+ target/xtensa/core-de212.c                |    53 +
+ target/xtensa/core-de212/core-isa.h       |   622 ++
+ target/xtensa/core-de212/gdb-config.c     |   198 +
+ target/xtensa/core-de212/xtensa-modules.c | 14566 ++++++++++++++++++++++++++++
+ 5 files changed, 15440 insertions(+)
+ create mode 100644 target/xtensa/core-de212.c
+ create mode 100644 target/xtensa/core-de212/core-isa.h
+ create mode 100644 target/xtensa/core-de212/gdb-config.c
+ create mode 100644 target/xtensa/core-de212/xtensa-modules.c
 
 diff --git a/target/xtensa/Makefile.objs b/target/xtensa/Makefile.objs
-index 9e295526e22e..e15851521f6d 100644
+index 042970668023..9e295526e22e 100644
 --- a/target/xtensa/Makefile.objs
 +++ b/target/xtensa/Makefile.objs
-@@ -3,6 +3,7 @@ obj-y += core-dc232b.o
+@@ -1,6 +1,7 @@
+ obj-y += xtensa-semi.o
+ obj-y += core-dc232b.o
  obj-y += core-dc233c.o
- obj-y += core-de212.o
++obj-y += core-de212.o
  obj-y += core-fsf.o
-+obj-y += core-sample_controller.o
  obj-$(CONFIG_SOFTMMU) += monitor.o
  obj-y += xtensa-isa.o
- obj-y += translate.o op_helper.o helper.o cpu.o
-diff --git a/target/xtensa/core-sample_controller.c b/target/xtensa/core-sample_controller.c
+diff --git a/target/xtensa/core-de212.c b/target/xtensa/core-de212.c
 new file mode 100644
-index 000000000000..879e853a9224
+index 000000000000..466a467f7fa0
 --- /dev/null
-+++ b/target/xtensa/core-sample_controller.c
++++ b/target/xtensa/core-de212.c
 @@ -0,0 +1,53 @@
 +/*
 + * Copyright (c) 2018, Max Filippov, Open Source and Linux Lab.
@@ -97,31 +96,31 @@ index 000000000000..879e853a9224
 +#include "qemu-common.h"
 +#include "qemu/host-utils.h"
 +
-+#include "core-sample_controller/core-isa.h"
++#include "core-de212/core-isa.h"
 +#include "overlay_tool.h"
 +
-+#define xtensa_modules xtensa_modules_sample_controller
-+#include "core-sample_controller/xtensa-modules.c"
++#define xtensa_modules xtensa_modules_de212
++#include "core-de212/xtensa-modules.c"
 +
-+static XtensaConfig sample_controller __attribute__((unused)) = {
-+    .name = "sample_controller",
++static XtensaConfig de212 __attribute__((unused)) = {
++    .name = "de212",
 +    .gdb_regmap = {
 +        .reg = {
-+#include "core-sample_controller/gdb-config.c"
++#include "core-de212/gdb-config.c"
 +        }
 +    },
 +    .isa_internal = &xtensa_modules,
-+    .clock_freq_khz = 10000,
++    .clock_freq_khz = 40000,
 +    DEFAULT_SECTIONS
 +};
 +
-+REGISTER_CORE(sample_controller)
-diff --git a/target/xtensa/core-sample_controller/core-isa.h b/target/xtensa/core-sample_controller/core-isa.h
++REGISTER_CORE(de212)
+diff --git a/target/xtensa/core-de212/core-isa.h b/target/xtensa/core-de212/core-isa.h
 new file mode 100644
-index 000000000000..e681e4320960
+index 000000000000..78e7f383102e
 --- /dev/null
-+++ b/target/xtensa/core-sample_controller/core-isa.h
-@@ -0,0 +1,644 @@
++++ b/target/xtensa/core-de212/core-isa.h
+@@ -0,0 +1,622 @@
 +/* 
 + * xtensa/config/core-isa.h -- HAL definitions that are dependent on Xtensa
 + *				processor CORE configuration
@@ -131,7 +130,7 @@ index 000000000000..e681e4320960
 +
 +/* Xtensa processor core configuration information.
 +
-+   Copyright (c) 1999-2016 Tensilica Inc.
++   Copyright (c) 1999-2015 Tensilica Inc.
 +
 +   Permission is hereby granted, free of charge, to any person obtaining
 +   a copy of this software and associated documentation files (the
@@ -177,13 +176,13 @@ index 000000000000..e681e4320960
 +#define XCHAL_MAX_INSTRUCTION_SIZE	3	/* max instr bytes (3..8) */
 +#define XCHAL_HAVE_DEBUG		1	/* debug option */
 +#define XCHAL_HAVE_DENSITY		1	/* 16-bit instructions */
-+#define XCHAL_HAVE_LOOPS		0	/* zero-overhead loops */
++#define XCHAL_HAVE_LOOPS		1	/* zero-overhead loops */
 +#define XCHAL_LOOP_BUFFER_SIZE		0	/* zero-ov. loop instr buffer size */
 +#define XCHAL_HAVE_NSA			1	/* NSA/NSAU instructions */
 +#define XCHAL_HAVE_MINMAX		1	/* MIN/MAX instructions */
 +#define XCHAL_HAVE_SEXT			1	/* SEXT instruction */
 +#define XCHAL_HAVE_DEPBITS		0	/* DEPBITS instruction */
-+#define XCHAL_HAVE_CLAMPS		0	/* CLAMPS instruction */
++#define XCHAL_HAVE_CLAMPS		1	/* CLAMPS instruction */
 +#define XCHAL_HAVE_MUL16		1	/* MUL16S/MUL16U instructions */
 +#define XCHAL_HAVE_MUL32		1	/* MULL instruction */
 +#define XCHAL_HAVE_MUL32_HIGH		0	/* MULUH/MULSH instructions */
@@ -218,7 +217,7 @@ index 000000000000..e681e4320960
 +#define XCHAL_HAVE_BOOLEANS		0	/* boolean registers */
 +#define XCHAL_HAVE_CP			0	/* CPENABLE reg (coprocessor) */
 +#define XCHAL_CP_MAXCFG			0	/* max allowed cp id plus one */
-+#define XCHAL_HAVE_MAC16		0	/* MAC16 package */
++#define XCHAL_HAVE_MAC16		1	/* MAC16 package */
 +
 +#define XCHAL_HAVE_FUSION		0	/* Fusion*/
 +#define XCHAL_HAVE_FUSION_FP		0	/* Fusion FP option */
@@ -229,8 +228,6 @@ index 000000000000..e681e4320960
 +#define XCHAL_HAVE_FUSION_BITOPS	0	/* Fusion Bit Operations Support option */
 +#define XCHAL_HAVE_FUSION_AVS		0	/* Fusion AVS option */
 +#define XCHAL_HAVE_FUSION_16BIT_BASEBAND 0	/* Fusion 16-bit Baseband option */
-+#define XCHAL_HAVE_FUSION_VITERBI	0	/* Fusion Viterbi option */
-+#define XCHAL_HAVE_FUSION_SOFTDEMAP	0	/* Fusion Soft Bit Demap option */
 +#define XCHAL_HAVE_HIFIPRO		0	/* HiFiPro Audio Engine pkg */
 +#define XCHAL_HAVE_HIFI4		0	/* HiFi4 Audio Engine pkg */
 +#define XCHAL_HAVE_HIFI4_VFPU		0	/* HiFi4 Audio Engine VFPU option */
@@ -262,19 +259,9 @@ index 000000000000..e681e4320960
 +#define XCHAL_HAVE_DFPU_SINGLE_DOUBLE	0	/* DFPU Coprocessor, single and double precision */
 +#define XCHAL_HAVE_VECTRA1		0	/* Vectra I  pkg */
 +#define XCHAL_HAVE_VECTRALX		0	/* Vectra LX pkg */
-+
-+#define XCHAL_HAVE_FUSIONG		0	/* FusionG */
-+#define XCHAL_HAVE_FUSIONG3		0	/* FusionG3 */
-+#define XCHAL_HAVE_FUSIONG_SP_VFPU	0      /* sp_vfpu option on FusionG */
-+#define XCHAL_HAVE_FUSIONG_DP_VFPU	0      /* dp_vfpu option on FusionG */
-+#define XCHAL_FUSIONG_SIMD32		0     /* simd32 for FusionG */
-+
-+#define XCHAL_HAVE_PDX			0	/* PDX */
-+#define XCHAL_PDX_SIMD32		0     /* simd32 for PDX */
-+#define XCHAL_HAVE_PDX4			0	/* PDX4 */
-+#define XCHAL_HAVE_PDX8			0	/* PDX8 */
++#define XCHAL_HAVE_PDX4		        0	/* PDX4 */
++#define XCHAL_HAVE_PDX8		        0	/* PDX8 */
 +#define XCHAL_HAVE_PDX16		0	/* PDX16 */
-+
 +#define XCHAL_HAVE_CONNXD2		0	/* ConnX D2 pkg */
 +#define XCHAL_HAVE_CONNXD2_DUALLSFLIX   0	/* ConnX D2 & Dual LoadStore Flix */
 +#define XCHAL_HAVE_BBE16		0	/* ConnX BBE16 pkg */
@@ -282,7 +269,6 @@ index 000000000000..e681e4320960
 +#define XCHAL_HAVE_BBE16_VECDIV		0	/* BBE16 & vector divide */
 +#define XCHAL_HAVE_BBE16_DESPREAD	0	/* BBE16 & despread */
 +#define XCHAL_HAVE_BBENEP		0	/* ConnX BBENEP pkgs */
-+#define XCHAL_HAVE_BBENEP_SP_VFPU	0      /* sp_vfpu option on BBE-EP */
 +#define XCHAL_HAVE_BSP3			0	/* ConnX BSP3 pkg */
 +#define XCHAL_HAVE_BSP3_TRANSPOSE	0	/* BSP3 & transpose32x32 */
 +#define XCHAL_HAVE_SSP16		0	/* ConnX SSP16 pkg */
@@ -293,75 +279,74 @@ index 000000000000..e681e4320960
 +#define XCHAL_HAVE_GRIVPEP		0	/* General Release of IVPEP */
 +#define XCHAL_HAVE_GRIVPEP_HISTOGRAM	0       /* Histogram option on GRIVPEP */
 +
-+#define XCHAL_HAVE_VISION	        0     /* Vision P5/P6 */
-+#define XCHAL_VISION_SIMD16             0     /* simd16 for Vision P5/P6 */
-+#define XCHAL_VISION_TYPE               0     /* Vision P5, P6, or P3 */
-+#define XCHAL_VISION_QUAD_MAC_TYPE      0     /* quad_mac option on Vision P6 */
-+#define XCHAL_HAVE_VISION_HISTOGRAM     0     /* histogram option on Vision P5/P6 */
-+#define XCHAL_HAVE_VISION_SP_VFPU       0     /* sp_vfpu option on Vision P5/P6 */
-+#define XCHAL_HAVE_VISION_HP_VFPU       0     /* hp_vfpu option on Vision P6 */
++#define XCHAL_HAVE_VISION	        0                                                 /* Vision */
++#define XCHAL_VISION_TYPE               0    /* Vision P5 or P3 */
++#define XCHAL_VISION_SIMD16             0           /* Vision simd16 */
++#define XCHAL_HAVE_VISION_HISTOGRAM     0      /* histogram option on Vision */
++#define XCHAL_HAVE_VISION_SP_VFPU       0      /* sp_vfpu option on Vision */
++
 +
 +/*----------------------------------------------------------------------
 +				MISC
 +  ----------------------------------------------------------------------*/
 +
 +#define XCHAL_NUM_LOADSTORE_UNITS	1	/* load/store units */
-+#define XCHAL_NUM_WRITEBUFFER_ENTRIES	4	/* size of write buffer */
++#define XCHAL_NUM_WRITEBUFFER_ENTRIES	8	/* size of write buffer */
 +#define XCHAL_INST_FETCH_WIDTH		4	/* instr-fetch width in bytes */
 +#define XCHAL_DATA_WIDTH		4	/* data width in bytes */
 +#define XCHAL_DATA_PIPE_DELAY		1	/* d-side pipeline delay
 +						   (1 = 5-stage, 2 = 7-stage) */
-+#define XCHAL_CLOCK_GATING_GLOBAL	1	/* global clock gating */
-+#define XCHAL_CLOCK_GATING_FUNCUNIT	1	/* funct. unit clock gating */
++#define XCHAL_CLOCK_GATING_GLOBAL	0	/* global clock gating */
++#define XCHAL_CLOCK_GATING_FUNCUNIT	0	/* funct. unit clock gating */
 +/*  In T1050, applies to selected core load and store instructions (see ISA): */
 +#define XCHAL_UNALIGNED_LOAD_EXCEPTION	1	/* unaligned loads cause exc. */
 +#define XCHAL_UNALIGNED_STORE_EXCEPTION	1	/* unaligned stores cause exc.*/
 +#define XCHAL_UNALIGNED_LOAD_HW		0	/* unaligned loads work in hw */
 +#define XCHAL_UNALIGNED_STORE_HW	0	/* unaligned stores work in hw*/
 +
-+#define XCHAL_SW_VERSION		1200004	/* sw version of this header */
++#define XCHAL_SW_VERSION		1200000	/* sw version of this header */
 +
-+#define XCHAL_CORE_ID			"sample_controller"	/* alphanum core name
++#define XCHAL_CORE_ID			"de212_371077"	/* alphanum core name
 +						   (CoreID) set in the Xtensa
 +						   Processor Generator */
 +
-+#define XCHAL_BUILD_UNIQUE_ID		0x00064D47	/* 22-bit sw build ID */
++#define XCHAL_BUILD_UNIQUE_ID		0x0005A9EB	/* 22-bit sw build ID */
 +
 +/*
 + *  These definitions describe the hardware targeted by this software.
 + */
-+#define XCHAL_HW_CONFIGID0		0xC280DAFE	/* ConfigID hi 32 bits*/
-+#define XCHAL_HW_CONFIGID1		0x21064D47	/* ConfigID lo 32 bits*/
-+#define XCHAL_HW_VERSION_NAME		"LX7.0.4"	/* full version name */
-+#define XCHAL_HW_VERSION_MAJOR		2700	/* major ver# of targeted hw */
-+#define XCHAL_HW_VERSION_MINOR		4	/* minor ver# of targeted hw */
-+#define XCHAL_HW_VERSION		270004	/* major*100+minor */
-+#define XCHAL_HW_REL_LX7		1
-+#define XCHAL_HW_REL_LX7_0		1
-+#define XCHAL_HW_REL_LX7_0_4		1
++#define XCHAL_HW_CONFIGID0		0xC283DFFE	/* ConfigID hi 32 bits*/
++#define XCHAL_HW_CONFIGID1		0x1C85A985	/* ConfigID lo 32 bits*/
++#define XCHAL_HW_VERSION_NAME		"LX6.0.2"	/* full version name */
++#define XCHAL_HW_VERSION_MAJOR		2600	/* major ver# of targeted hw */
++#define XCHAL_HW_VERSION_MINOR		2	/* minor ver# of targeted hw */
++#define XCHAL_HW_VERSION		260002	/* major*100+minor */
++#define XCHAL_HW_REL_LX6		1
++#define XCHAL_HW_REL_LX6_0		1
++#define XCHAL_HW_REL_LX6_0_2		1
 +#define XCHAL_HW_CONFIGID_RELIABLE	1
 +/*  If software targets a *range* of hardware versions, these are the bounds: */
-+#define XCHAL_HW_MIN_VERSION_MAJOR	2700	/* major v of earliest tgt hw */
-+#define XCHAL_HW_MIN_VERSION_MINOR	4	/* minor v of earliest tgt hw */
-+#define XCHAL_HW_MIN_VERSION		270004	/* earliest targeted hw */
-+#define XCHAL_HW_MAX_VERSION_MAJOR	2700	/* major v of latest tgt hw */
-+#define XCHAL_HW_MAX_VERSION_MINOR	4	/* minor v of latest tgt hw */
-+#define XCHAL_HW_MAX_VERSION		270004	/* latest targeted hw */
++#define XCHAL_HW_MIN_VERSION_MAJOR	2600	/* major v of earliest tgt hw */
++#define XCHAL_HW_MIN_VERSION_MINOR	2	/* minor v of earliest tgt hw */
++#define XCHAL_HW_MIN_VERSION		260002	/* earliest targeted hw */
++#define XCHAL_HW_MAX_VERSION_MAJOR	2600	/* major v of latest tgt hw */
++#define XCHAL_HW_MAX_VERSION_MINOR	2	/* minor v of latest tgt hw */
++#define XCHAL_HW_MAX_VERSION		260002	/* latest targeted hw */
 +
 +
 +/*----------------------------------------------------------------------
 +				CACHE
 +  ----------------------------------------------------------------------*/
 +
-+#define XCHAL_ICACHE_LINESIZE		4	/* I-cache line size in bytes */
-+#define XCHAL_DCACHE_LINESIZE		4	/* D-cache line size in bytes */
-+#define XCHAL_ICACHE_LINEWIDTH		2	/* log2(I line size in bytes) */
-+#define XCHAL_DCACHE_LINEWIDTH		2	/* log2(D line size in bytes) */
++#define XCHAL_ICACHE_LINESIZE		32	/* I-cache line size in bytes */
++#define XCHAL_DCACHE_LINESIZE		32	/* D-cache line size in bytes */
++#define XCHAL_ICACHE_LINEWIDTH		5	/* log2(I line size in bytes) */
++#define XCHAL_DCACHE_LINEWIDTH		5	/* log2(D line size in bytes) */
 +
-+#define XCHAL_ICACHE_SIZE		0	/* I-cache size in bytes or 0 */
-+#define XCHAL_DCACHE_SIZE		0	/* D-cache size in bytes or 0 */
++#define XCHAL_ICACHE_SIZE		8192	/* I-cache size in bytes or 0 */
++#define XCHAL_DCACHE_SIZE		8192	/* D-cache size in bytes or 0 */
 +
-+#define XCHAL_DCACHE_IS_WRITEBACK	0	/* writeback feature */
++#define XCHAL_DCACHE_IS_WRITEBACK	1	/* writeback feature */
 +#define XCHAL_DCACHE_IS_COHERENT	0	/* MP coherence feature */
 +
 +#define XCHAL_HAVE_PREFETCH		0	/* PREFCTL register */
@@ -370,8 +355,8 @@ index 000000000000..e681e4320960
 +#define XCHAL_PREFETCH_ENTRIES		0	/* cache prefetch entries */
 +#define XCHAL_PREFETCH_BLOCK_ENTRIES	0	/* prefetch block streams */
 +#define XCHAL_HAVE_CACHE_BLOCKOPS	0	/* block prefetch for caches */
-+#define XCHAL_HAVE_ICACHE_TEST		0	/* Icache test instructions */
-+#define XCHAL_HAVE_DCACHE_TEST		0	/* Dcache test instructions */
++#define XCHAL_HAVE_ICACHE_TEST		1	/* Icache test instructions */
++#define XCHAL_HAVE_DCACHE_TEST		1	/* Dcache test instructions */
 +#define XCHAL_HAVE_ICACHE_DYN_WAYS	0	/* Icache dynamic way support */
 +#define XCHAL_HAVE_DCACHE_DYN_WAYS	0	/* Dcache dynamic way support */
 +
@@ -390,35 +375,31 @@ index 000000000000..e681e4320960
 +  ----------------------------------------------------------------------*/
 +
 +#define XCHAL_HAVE_PIF			1	/* any outbound bus present */
-+
 +#define XCHAL_HAVE_AXI			0	/* AXI bus */
 +#define XCHAL_HAVE_AXI_ECC		0	/* ECC on AXI bus */
 +#define XCHAL_HAVE_ACELITE		0	/* ACELite bus */
 +
-+#define XCHAL_HAVE_PIF_WR_RESP			0	/* pif write response */
-+#define XCHAL_HAVE_PIF_REQ_ATTR			0	/* pif attribute */
-+
 +/*  If present, cache size in bytes == (ways * 2^(linewidth + setwidth)).  */
 +
 +/*  Number of cache sets in log2(lines per way):  */
-+#define XCHAL_ICACHE_SETWIDTH		0
-+#define XCHAL_DCACHE_SETWIDTH		0
++#define XCHAL_ICACHE_SETWIDTH		7
++#define XCHAL_DCACHE_SETWIDTH		7
 +
 +/*  Cache set associativity (number of ways):  */
-+#define XCHAL_ICACHE_WAYS		1
-+#define XCHAL_DCACHE_WAYS		1
++#define XCHAL_ICACHE_WAYS		2
++#define XCHAL_DCACHE_WAYS		2
 +
 +/*  Cache features:  */
-+#define XCHAL_ICACHE_LINE_LOCKABLE	0
-+#define XCHAL_DCACHE_LINE_LOCKABLE	0
++#define XCHAL_ICACHE_LINE_LOCKABLE	1
++#define XCHAL_DCACHE_LINE_LOCKABLE	1
 +#define XCHAL_ICACHE_ECC_PARITY		0
 +#define XCHAL_DCACHE_ECC_PARITY		0
 +
 +/*  Cache access size in bytes (affects operation of SICW instruction):  */
-+#define XCHAL_ICACHE_ACCESS_SIZE	1
-+#define XCHAL_DCACHE_ACCESS_SIZE	1
++#define XCHAL_ICACHE_ACCESS_SIZE	4
++#define XCHAL_DCACHE_ACCESS_SIZE	4
 +
-+#define XCHAL_DCACHE_BANKS		0	/* number of banks */
++#define XCHAL_DCACHE_BANKS		1	/* number of banks */
 +
 +/*  Number of encoded cache attr bits (see <xtensa/hal.h> for decoded bits):  */
 +#define XCHAL_CA_BITS			4
@@ -430,9 +411,9 @@ index 000000000000..e681e4320960
 +#define XCHAL_NUM_INSTROM		0	/* number of core instr. ROMs */
 +#define XCHAL_NUM_INSTRAM		1	/* number of core instr. RAMs */
 +#define XCHAL_NUM_DATAROM		0	/* number of core data ROMs */
-+#define XCHAL_NUM_DATARAM		2	/* number of core data RAMs */
++#define XCHAL_NUM_DATARAM		1	/* number of core data RAMs */
 +#define XCHAL_NUM_URAM			0	/* number of core unified RAMs*/
-+#define XCHAL_NUM_XLMI			0	/* number of core XLMI ports */
++#define XCHAL_NUM_XLMI			1	/* number of core XLMI ports */
 +
 +/*  Instruction RAM 0:  */
 +#define XCHAL_INSTRAM0_VADDR		0x40000000	/* virtual address */
@@ -451,14 +432,11 @@ index 000000000000..e681e4320960
 +#define XCHAL_HAVE_DATARAM0
 +#define XCHAL_DATARAM0_HAVE_IDMA	0	/* idma supported by this local memory */
 +
-+/*  Data RAM 1:  */
-+#define XCHAL_DATARAM1_VADDR		0x3FFC0000	/* virtual address */
-+#define XCHAL_DATARAM1_PADDR		0x3FFC0000	/* physical address */
-+#define XCHAL_DATARAM1_SIZE		131072	/* size in bytes */
-+#define XCHAL_DATARAM1_ECC_PARITY	0	/* ECC/parity type, 0=none */
-+#define XCHAL_DATARAM1_BANKS		1	/* number of banks */
-+#define XCHAL_HAVE_DATARAM1
-+#define XCHAL_DATARAM1_HAVE_IDMA	0	/* idma supported by this local memory */
++/*  XLMI Port 0:  */
++#define XCHAL_XLMI0_VADDR		0x3FFC0000	/* virtual address */
++#define XCHAL_XLMI0_PADDR		0x3FFC0000	/* physical address */
++#define XCHAL_XLMI0_SIZE		131072	/* size in bytes */
++#define XCHAL_XLMI0_ECC_PARITY	0	/* ECC/parity type, 0=none */
 +
 +#define XCHAL_HAVE_IDMA			0
 +#define XCHAL_HAVE_IDMA_TRANSPOSE	0
@@ -564,7 +542,7 @@ index 000000000000..e681e4320960
 +#define XCHAL_INTTYPE_MASK_PROFILING	0x00000000
 +#define XCHAL_INTTYPE_MASK_IDMA_DONE	0x00000000
 +#define XCHAL_INTTYPE_MASK_IDMA_ERR	0x00000000
-+#define XCHAL_INTTYPE_MASK_GS_ERR	0x00000000
++#define XCHAL_INTTYPE_MASK_SG_ERR	0x00000000
 +
 +/*  Interrupt numbers assigned to specific interrupt sources:  */
 +#define XCHAL_TIMER0_INTERRUPT		6	/* CCOMPARE0 */
@@ -645,8 +623,8 @@ index 000000000000..e681e4320960
 +#define XCHAL_HAVE_MEM_ECC_PARITY	0	/* local memory ECC/parity */
 +#define XCHAL_HAVE_VECTOR_SELECT	1	/* relocatable vectors */
 +#define XCHAL_HAVE_VECBASE		1	/* relocatable vectors */
-+#define XCHAL_VECBASE_RESET_VADDR	0x40000000  /* VECBASE reset value */
-+#define XCHAL_VECBASE_RESET_PADDR	0x40000000
++#define XCHAL_VECBASE_RESET_VADDR	0x60000000  /* VECBASE reset value */
++#define XCHAL_VECBASE_RESET_PADDR	0x60000000
 +#define XCHAL_RESET_VECBASE_OVERLAP	0
 +
 +#define XCHAL_RESET_VECTOR0_VADDR	0x50000000
@@ -656,43 +634,43 @@ index 000000000000..e681e4320960
 +#define XCHAL_RESET_VECTOR_VADDR	0x50000000
 +#define XCHAL_RESET_VECTOR_PADDR	0x50000000
 +#define XCHAL_USER_VECOFS		0x00000340
-+#define XCHAL_USER_VECTOR_VADDR		0x40000340
-+#define XCHAL_USER_VECTOR_PADDR		0x40000340
++#define XCHAL_USER_VECTOR_VADDR		0x60000340
++#define XCHAL_USER_VECTOR_PADDR		0x60000340
 +#define XCHAL_KERNEL_VECOFS		0x00000300
-+#define XCHAL_KERNEL_VECTOR_VADDR	0x40000300
-+#define XCHAL_KERNEL_VECTOR_PADDR	0x40000300
++#define XCHAL_KERNEL_VECTOR_VADDR	0x60000300
++#define XCHAL_KERNEL_VECTOR_PADDR	0x60000300
 +#define XCHAL_DOUBLEEXC_VECOFS		0x000003C0
-+#define XCHAL_DOUBLEEXC_VECTOR_VADDR	0x400003C0
-+#define XCHAL_DOUBLEEXC_VECTOR_PADDR	0x400003C0
++#define XCHAL_DOUBLEEXC_VECTOR_VADDR	0x600003C0
++#define XCHAL_DOUBLEEXC_VECTOR_PADDR	0x600003C0
 +#define XCHAL_WINDOW_OF4_VECOFS		0x00000000
 +#define XCHAL_WINDOW_UF4_VECOFS		0x00000040
 +#define XCHAL_WINDOW_OF8_VECOFS		0x00000080
 +#define XCHAL_WINDOW_UF8_VECOFS		0x000000C0
 +#define XCHAL_WINDOW_OF12_VECOFS	0x00000100
 +#define XCHAL_WINDOW_UF12_VECOFS	0x00000140
-+#define XCHAL_WINDOW_VECTORS_VADDR	0x40000000
-+#define XCHAL_WINDOW_VECTORS_PADDR	0x40000000
++#define XCHAL_WINDOW_VECTORS_VADDR	0x60000000
++#define XCHAL_WINDOW_VECTORS_PADDR	0x60000000
 +#define XCHAL_INTLEVEL2_VECOFS		0x00000180
-+#define XCHAL_INTLEVEL2_VECTOR_VADDR	0x40000180
-+#define XCHAL_INTLEVEL2_VECTOR_PADDR	0x40000180
++#define XCHAL_INTLEVEL2_VECTOR_VADDR	0x60000180
++#define XCHAL_INTLEVEL2_VECTOR_PADDR	0x60000180
 +#define XCHAL_INTLEVEL3_VECOFS		0x000001C0
-+#define XCHAL_INTLEVEL3_VECTOR_VADDR	0x400001C0
-+#define XCHAL_INTLEVEL3_VECTOR_PADDR	0x400001C0
++#define XCHAL_INTLEVEL3_VECTOR_VADDR	0x600001C0
++#define XCHAL_INTLEVEL3_VECTOR_PADDR	0x600001C0
 +#define XCHAL_INTLEVEL4_VECOFS		0x00000200
-+#define XCHAL_INTLEVEL4_VECTOR_VADDR	0x40000200
-+#define XCHAL_INTLEVEL4_VECTOR_PADDR	0x40000200
++#define XCHAL_INTLEVEL4_VECTOR_VADDR	0x60000200
++#define XCHAL_INTLEVEL4_VECTOR_PADDR	0x60000200
 +#define XCHAL_INTLEVEL5_VECOFS		0x00000240
-+#define XCHAL_INTLEVEL5_VECTOR_VADDR	0x40000240
-+#define XCHAL_INTLEVEL5_VECTOR_PADDR	0x40000240
++#define XCHAL_INTLEVEL5_VECTOR_VADDR	0x60000240
++#define XCHAL_INTLEVEL5_VECTOR_PADDR	0x60000240
 +#define XCHAL_INTLEVEL6_VECOFS		0x00000280
-+#define XCHAL_INTLEVEL6_VECTOR_VADDR	0x40000280
-+#define XCHAL_INTLEVEL6_VECTOR_PADDR	0x40000280
++#define XCHAL_INTLEVEL6_VECTOR_VADDR	0x60000280
++#define XCHAL_INTLEVEL6_VECTOR_PADDR	0x60000280
 +#define XCHAL_DEBUG_VECOFS		XCHAL_INTLEVEL6_VECOFS
 +#define XCHAL_DEBUG_VECTOR_VADDR	XCHAL_INTLEVEL6_VECTOR_VADDR
 +#define XCHAL_DEBUG_VECTOR_PADDR	XCHAL_INTLEVEL6_VECTOR_PADDR
 +#define XCHAL_NMI_VECOFS		0x000002C0
-+#define XCHAL_NMI_VECTOR_VADDR		0x400002C0
-+#define XCHAL_NMI_VECTOR_PADDR		0x400002C0
++#define XCHAL_NMI_VECTOR_VADDR		0x600002C0
++#define XCHAL_NMI_VECTOR_PADDR		0x600002C0
 +#define XCHAL_INTLEVEL7_VECOFS		XCHAL_NMI_VECOFS
 +#define XCHAL_INTLEVEL7_VECTOR_VADDR	XCHAL_NMI_VECTOR_VADDR
 +#define XCHAL_INTLEVEL7_VECTOR_PADDR	XCHAL_NMI_VECTOR_PADDR
@@ -703,7 +681,7 @@ index 000000000000..e681e4320960
 +  ----------------------------------------------------------------------*/
 +
 +/*  Misc  */
-+#define XCHAL_HAVE_DEBUG_ERI		0	/* ERI to debug module */
++#define XCHAL_HAVE_DEBUG_ERI		1	/* ERI to debug module */
 +#define XCHAL_HAVE_DEBUG_APB		0	/* APB to debug module */
 +#define XCHAL_HAVE_DEBUG_JTAG		1	/* JTAG to debug module */
 +
@@ -715,8 +693,8 @@ index 000000000000..e681e4320960
 +#define XCHAL_HAVE_OCD_LS32DDR		1	/* L32DDR/S32DDR (faster OCD) */
 +
 +/*  TRAX (in core)  */
-+#define XCHAL_HAVE_TRAX			0	/* TRAX in debug module */
-+#define XCHAL_TRAX_MEM_SIZE		0	/* TRAX memory size in bytes */
++#define XCHAL_HAVE_TRAX			1	/* TRAX in debug module */
++#define XCHAL_TRAX_MEM_SIZE		262144	/* TRAX memory size in bytes */
 +#define XCHAL_TRAX_MEM_SHAREABLE	0	/* start/end regs; ready sig. */
 +#define XCHAL_TRAX_ATB_WIDTH		0	/* ATB width (bits), 0=no ATB */
 +#define XCHAL_TRAX_TIME_WIDTH		0	/* timestamp bitwidth, 0=none */
@@ -755,8 +733,7 @@ index 000000000000..e681e4320960
 +#define XCHAL_MPU_ENTRIES		0
 +
 +#define XCHAL_MPU_ALIGN_REQ		1	/* MPU requires alignment of entries to background map */
-+#define XCHAL_MPU_BACKGROUND_ENTRIES	0	/* number of entries in bg map*/
-+#define XCHAL_MPU_BG_CACHEADRDIS	0	/* default CACHEADRDIS for bg */
++#define XCHAL_MPU_BACKGROUND_ENTRIES	0	/* number of entries in background map */
 + 
 +#define XCHAL_MPU_ALIGN_BITS		0
 +#define XCHAL_MPU_ALIGN			0
@@ -766,15 +743,15 @@ index 000000000000..e681e4320960
 +
 +#endif /* _XTENSA_CORE_CONFIGURATION_H */
 +
-diff --git a/target/xtensa/core-sample_controller/gdb-config.c b/target/xtensa/core-sample_controller/gdb-config.c
+diff --git a/target/xtensa/core-de212/gdb-config.c b/target/xtensa/core-de212/gdb-config.c
 new file mode 100644
-index 000000000000..99e172d81951
+index 000000000000..25510fc34c73
 --- /dev/null
-+++ b/target/xtensa/core-sample_controller/gdb-config.c
-@@ -0,0 +1,141 @@
++++ b/target/xtensa/core-de212/gdb-config.c
+@@ -0,0 +1,198 @@
 +/* Configuration for the Xtensa architecture for GDB, the GNU debugger.
 +
-+   Copyright (c) 2003-2016 Tensilica Inc.
++   Copyright (c) 2003-2015 Tensilica Inc.
 +
 +   Permission is hereby granted, free of charge, to any person obtaining
 +   a copy of this software and associated documentation files (the
@@ -828,100 +805,157 @@ index 000000000000..99e172d81951
 +  XTREG( 30,120,32, 4, 4,0x011d,0x0006,-2, 1,0x0002,ar29,        0,0,0,0,0,0)
 +  XTREG( 31,124,32, 4, 4,0x011e,0x0006,-2, 1,0x0002,ar30,        0,0,0,0,0,0)
 +  XTREG( 32,128,32, 4, 4,0x011f,0x0006,-2, 1,0x0002,ar31,        0,0,0,0,0,0)
-+  XTREG( 33,132, 6, 4, 4,0x0203,0x0006,-2, 2,0x1100,sar,         0,0,0,0,0,0)
-+  XTREG( 34,136, 3, 4, 4,0x0248,0x0006,-2, 2,0x1002,windowbase,  0,0,0,0,0,0)
-+  XTREG( 35,140, 8, 4, 4,0x0249,0x0006,-2, 2,0x1002,windowstart, 0,0,0,0,0,0)
-+  XTREG( 36,144,32, 4, 4,0x02b0,0x0002,-2, 2,0x1000,configid0,   0,0,0,0,0,0)
-+  XTREG( 37,148,32, 4, 4,0x02d0,0x0002,-2, 2,0x1000,configid1,   0,0,0,0,0,0)
-+  XTREG( 38,152,19, 4, 4,0x02e6,0x0006,-2, 2,0x1100,ps,          0,0,0,0,0,0)
-+  XTREG( 39,156,32, 4, 4,0x020c,0x0006,-1, 2,0x1100,scompare1,   0,0,0,0,0,0)
-+  XTREG( 40,160,32, 4, 4,0x03e6,0x000e,-1, 3,0x0110,expstate,    0,0,0,0,0,0)
-+  XTREG( 41,164,32, 4, 4,0x0259,0x000d,-2, 2,0x1000,mmid,        0,0,0,0,0,0)
-+  XTREG( 42,168, 2, 4, 4,0x0260,0x0007,-2, 2,0x1000,ibreakenable,0,0,0,0,0,0)
-+  XTREG( 43,172, 6, 4, 4,0x0263,0x0007,-2, 2,0x1000,atomctl,     0,0,0,0,0,0)
-+  XTREG( 44,176,32, 4, 4,0x0268,0x0007,-2, 2,0x1000,ddr,         0,0,0,0,0,0)
-+  XTREG( 45,180,32, 4, 4,0x0280,0x0007,-2, 2,0x1000,ibreaka0,    0,0,0,0,0,0)
-+  XTREG( 46,184,32, 4, 4,0x0281,0x0007,-2, 2,0x1000,ibreaka1,    0,0,0,0,0,0)
-+  XTREG( 47,188,32, 4, 4,0x0290,0x0007,-2, 2,0x1000,dbreaka0,    0,0,0,0,0,0)
-+  XTREG( 48,192,32, 4, 4,0x0291,0x0007,-2, 2,0x1000,dbreaka1,    0,0,0,0,0,0)
-+  XTREG( 49,196,32, 4, 4,0x02a0,0x0007,-2, 2,0x1000,dbreakc0,    0,0,0,0,0,0)
-+  XTREG( 50,200,32, 4, 4,0x02a1,0x0007,-2, 2,0x1000,dbreakc1,    0,0,0,0,0,0)
-+  XTREG( 51,204,32, 4, 4,0x02b1,0x0007,-2, 2,0x1000,epc1,        0,0,0,0,0,0)
-+  XTREG( 52,208,32, 4, 4,0x02b2,0x0007,-2, 2,0x1000,epc2,        0,0,0,0,0,0)
-+  XTREG( 53,212,32, 4, 4,0x02b3,0x0007,-2, 2,0x1000,epc3,        0,0,0,0,0,0)
-+  XTREG( 54,216,32, 4, 4,0x02b4,0x0007,-2, 2,0x1000,epc4,        0,0,0,0,0,0)
-+  XTREG( 55,220,32, 4, 4,0x02b5,0x0007,-2, 2,0x1000,epc5,        0,0,0,0,0,0)
-+  XTREG( 56,224,32, 4, 4,0x02b6,0x0007,-2, 2,0x1000,epc6,        0,0,0,0,0,0)
-+  XTREG( 57,228,32, 4, 4,0x02b7,0x0007,-2, 2,0x1000,epc7,        0,0,0,0,0,0)
-+  XTREG( 58,232,32, 4, 4,0x02c0,0x0007,-2, 2,0x1000,depc,        0,0,0,0,0,0)
-+  XTREG( 59,236,19, 4, 4,0x02c2,0x0007,-2, 2,0x1000,eps2,        0,0,0,0,0,0)
-+  XTREG( 60,240,19, 4, 4,0x02c3,0x0007,-2, 2,0x1000,eps3,        0,0,0,0,0,0)
-+  XTREG( 61,244,19, 4, 4,0x02c4,0x0007,-2, 2,0x1000,eps4,        0,0,0,0,0,0)
-+  XTREG( 62,248,19, 4, 4,0x02c5,0x0007,-2, 2,0x1000,eps5,        0,0,0,0,0,0)
-+  XTREG( 63,252,19, 4, 4,0x02c6,0x0007,-2, 2,0x1000,eps6,        0,0,0,0,0,0)
-+  XTREG( 64,256,19, 4, 4,0x02c7,0x0007,-2, 2,0x1000,eps7,        0,0,0,0,0,0)
-+  XTREG( 65,260,32, 4, 4,0x02d1,0x0007,-2, 2,0x1000,excsave1,    0,0,0,0,0,0)
-+  XTREG( 66,264,32, 4, 4,0x02d2,0x0007,-2, 2,0x1000,excsave2,    0,0,0,0,0,0)
-+  XTREG( 67,268,32, 4, 4,0x02d3,0x0007,-2, 2,0x1000,excsave3,    0,0,0,0,0,0)
-+  XTREG( 68,272,32, 4, 4,0x02d4,0x0007,-2, 2,0x1000,excsave4,    0,0,0,0,0,0)
-+  XTREG( 69,276,32, 4, 4,0x02d5,0x0007,-2, 2,0x1000,excsave5,    0,0,0,0,0,0)
-+  XTREG( 70,280,32, 4, 4,0x02d6,0x0007,-2, 2,0x1000,excsave6,    0,0,0,0,0,0)
-+  XTREG( 71,284,32, 4, 4,0x02d7,0x0007,-2, 2,0x1000,excsave7,    0,0,0,0,0,0)
-+  XTREG( 72,288,22, 4, 4,0x02e2,0x000b,-2, 2,0x1000,interrupt,   0,0,0,0,0,0)
-+  XTREG( 73,292,22, 4, 4,0x02e2,0x000d,-2, 2,0x1000,intset,      0,0,0,0,0,0)
-+  XTREG( 74,296,22, 4, 4,0x02e3,0x000d,-2, 2,0x1000,intclear,    0,0,0,0,0,0)
-+  XTREG( 75,300,22, 4, 4,0x02e4,0x0007,-2, 2,0x1000,intenable,   0,0,0,0,0,0)
-+  XTREG( 76,304,32, 4, 4,0x02e7,0x0007,-2, 2,0x1000,vecbase,     0,0,0,0,0,0)
-+  XTREG( 77,308, 6, 4, 4,0x02e8,0x0007,-2, 2,0x1000,exccause,    0,0,0,0,0,0)
-+  XTREG( 78,312,12, 4, 4,0x02e9,0x0003,-2, 2,0x1000,debugcause,  0,0,0,0,0,0)
-+  XTREG( 79,316,32, 4, 4,0x02ea,0x000f,-2, 2,0x1000,ccount,      0,0,0,0,0,0)
-+  XTREG( 80,320,32, 4, 4,0x02eb,0x0003,-2, 2,0x1000,prid,        0,0,0,0,0,0)
-+  XTREG( 81,324,32, 4, 4,0x02ec,0x000f,-2, 2,0x1000,icount,      0,0,0,0,0,0)
-+  XTREG( 82,328, 4, 4, 4,0x02ed,0x0007,-2, 2,0x1000,icountlevel, 0,0,0,0,0,0)
-+  XTREG( 83,332,32, 4, 4,0x02ee,0x0007,-2, 2,0x1000,excvaddr,    0,0,0,0,0,0)
-+  XTREG( 84,336,32, 4, 4,0x02f0,0x000f,-2, 2,0x1000,ccompare0,   0,0,0,0,0,0)
-+  XTREG( 85,340,32, 4, 4,0x02f1,0x000f,-2, 2,0x1000,ccompare1,   0,0,0,0,0,0)
-+  XTREG( 86,344,32, 4, 4,0x02f2,0x000f,-2, 2,0x1000,ccompare2,   0,0,0,0,0,0)
-+  XTREG( 87,348,32, 4, 4,0x02f4,0x0007,-2, 2,0x1000,misc0,       0,0,0,0,0,0)
-+  XTREG( 88,352,32, 4, 4,0x02f5,0x0007,-2, 2,0x1000,misc1,       0,0,0,0,0,0)
-+  XTREG( 89,356,32, 4, 4,0x0000,0x0006,-2, 8,0x0100,a0,          0,0,0,0,0,0)
-+  XTREG( 90,360,32, 4, 4,0x0001,0x0006,-2, 8,0x0100,a1,          0,0,0,0,0,0)
-+  XTREG( 91,364,32, 4, 4,0x0002,0x0006,-2, 8,0x0100,a2,          0,0,0,0,0,0)
-+  XTREG( 92,368,32, 4, 4,0x0003,0x0006,-2, 8,0x0100,a3,          0,0,0,0,0,0)
-+  XTREG( 93,372,32, 4, 4,0x0004,0x0006,-2, 8,0x0100,a4,          0,0,0,0,0,0)
-+  XTREG( 94,376,32, 4, 4,0x0005,0x0006,-2, 8,0x0100,a5,          0,0,0,0,0,0)
-+  XTREG( 95,380,32, 4, 4,0x0006,0x0006,-2, 8,0x0100,a6,          0,0,0,0,0,0)
-+  XTREG( 96,384,32, 4, 4,0x0007,0x0006,-2, 8,0x0100,a7,          0,0,0,0,0,0)
-+  XTREG( 97,388,32, 4, 4,0x0008,0x0006,-2, 8,0x0100,a8,          0,0,0,0,0,0)
-+  XTREG( 98,392,32, 4, 4,0x0009,0x0006,-2, 8,0x0100,a9,          0,0,0,0,0,0)
-+  XTREG( 99,396,32, 4, 4,0x000a,0x0006,-2, 8,0x0100,a10,         0,0,0,0,0,0)
-+  XTREG(100,400,32, 4, 4,0x000b,0x0006,-2, 8,0x0100,a11,         0,0,0,0,0,0)
-+  XTREG(101,404,32, 4, 4,0x000c,0x0006,-2, 8,0x0100,a12,         0,0,0,0,0,0)
-+  XTREG(102,408,32, 4, 4,0x000d,0x0006,-2, 8,0x0100,a13,         0,0,0,0,0,0)
-+  XTREG(103,412,32, 4, 4,0x000e,0x0006,-2, 8,0x0100,a14,         0,0,0,0,0,0)
-+  XTREG(104,416,32, 4, 4,0x000f,0x0006,-2, 8,0x0100,a15,         0,0,0,0,0,0)
-+  XTREG(105,420, 4, 4, 4,0x2008,0x0006,-2, 6,0x1010,psintlevel,
++  XTREG( 33,132,32, 4, 4,0x0200,0x0006,-2, 2,0x1100,lbeg,        0,0,0,0,0,0)
++  XTREG( 34,136,32, 4, 4,0x0201,0x0006,-2, 2,0x1100,lend,        0,0,0,0,0,0)
++  XTREG( 35,140,32, 4, 4,0x0202,0x0006,-2, 2,0x1100,lcount,      0,0,0,0,0,0)
++  XTREG( 36,144, 6, 4, 4,0x0203,0x0006,-2, 2,0x1100,sar,         0,0,0,0,0,0)
++  XTREG( 37,148, 3, 4, 4,0x0248,0x0006,-2, 2,0x1002,windowbase,  0,0,0,0,0,0)
++  XTREG( 38,152, 8, 4, 4,0x0249,0x0006,-2, 2,0x1002,windowstart, 0,0,0,0,0,0)
++  XTREG( 39,156,32, 4, 4,0x02b0,0x0002,-2, 2,0x1000,configid0,   0,0,0,0,0,0)
++  XTREG( 40,160,32, 4, 4,0x02d0,0x0002,-2, 2,0x1000,configid1,   0,0,0,0,0,0)
++  XTREG( 41,164,19, 4, 4,0x02e6,0x0006,-2, 2,0x1100,ps,          0,0,0,0,0,0)
++  XTREG( 42,168,32, 4, 4,0x020c,0x0006,-1, 2,0x1100,scompare1,   0,0,0,0,0,0)
++  XTREG( 43,172,32, 4, 4,0x0210,0x0006,-1, 2,0x1100,acclo,       0,0,0,0,0,0)
++  XTREG( 44,176, 8, 4, 4,0x0211,0x0006,-1, 2,0x1100,acchi,       0,0,0,0,0,0)
++  XTREG( 45,180,32, 4, 4,0x0220,0x0006,-1, 2,0x1100,m0,          0,0,0,0,0,0)
++  XTREG( 46,184,32, 4, 4,0x0221,0x0006,-1, 2,0x1100,m1,          0,0,0,0,0,0)
++  XTREG( 47,188,32, 4, 4,0x0222,0x0006,-1, 2,0x1100,m2,          0,0,0,0,0,0)
++  XTREG( 48,192,32, 4, 4,0x0223,0x0006,-1, 2,0x1100,m3,          0,0,0,0,0,0)
++  XTREG( 49,196,32, 4, 4,0x03e6,0x000e,-1, 3,0x0110,expstate,    0,0,0,0,0,0)
++  XTREG( 50,200,32, 4, 4,0x0259,0x000d,-2, 2,0x1000,mmid,        0,0,0,0,0,0)
++  XTREG( 51,204, 2, 4, 4,0x0260,0x0007,-2, 2,0x1000,ibreakenable,0,0,0,0,0,0)
++  XTREG( 52,208, 6, 4, 4,0x0263,0x0007,-2, 2,0x1000,atomctl,     0,0,0,0,0,0)
++  XTREG( 53,212,32, 4, 4,0x0268,0x0007,-2, 2,0x1000,ddr,         0,0,0,0,0,0)
++  XTREG( 54,216,32, 4, 4,0x0280,0x0007,-2, 2,0x1000,ibreaka0,    0,0,0,0,0,0)
++  XTREG( 55,220,32, 4, 4,0x0281,0x0007,-2, 2,0x1000,ibreaka1,    0,0,0,0,0,0)
++  XTREG( 56,224,32, 4, 4,0x0290,0x0007,-2, 2,0x1000,dbreaka0,    0,0,0,0,0,0)
++  XTREG( 57,228,32, 4, 4,0x0291,0x0007,-2, 2,0x1000,dbreaka1,    0,0,0,0,0,0)
++  XTREG( 58,232,32, 4, 4,0x02a0,0x0007,-2, 2,0x1000,dbreakc0,    0,0,0,0,0,0)
++  XTREG( 59,236,32, 4, 4,0x02a1,0x0007,-2, 2,0x1000,dbreakc1,    0,0,0,0,0,0)
++  XTREG( 60,240,32, 4, 4,0x02b1,0x0007,-2, 2,0x1000,epc1,        0,0,0,0,0,0)
++  XTREG( 61,244,32, 4, 4,0x02b2,0x0007,-2, 2,0x1000,epc2,        0,0,0,0,0,0)
++  XTREG( 62,248,32, 4, 4,0x02b3,0x0007,-2, 2,0x1000,epc3,        0,0,0,0,0,0)
++  XTREG( 63,252,32, 4, 4,0x02b4,0x0007,-2, 2,0x1000,epc4,        0,0,0,0,0,0)
++  XTREG( 64,256,32, 4, 4,0x02b5,0x0007,-2, 2,0x1000,epc5,        0,0,0,0,0,0)
++  XTREG( 65,260,32, 4, 4,0x02b6,0x0007,-2, 2,0x1000,epc6,        0,0,0,0,0,0)
++  XTREG( 66,264,32, 4, 4,0x02b7,0x0007,-2, 2,0x1000,epc7,        0,0,0,0,0,0)
++  XTREG( 67,268,32, 4, 4,0x02c0,0x0007,-2, 2,0x1000,depc,        0,0,0,0,0,0)
++  XTREG( 68,272,19, 4, 4,0x02c2,0x0007,-2, 2,0x1000,eps2,        0,0,0,0,0,0)
++  XTREG( 69,276,19, 4, 4,0x02c3,0x0007,-2, 2,0x1000,eps3,        0,0,0,0,0,0)
++  XTREG( 70,280,19, 4, 4,0x02c4,0x0007,-2, 2,0x1000,eps4,        0,0,0,0,0,0)
++  XTREG( 71,284,19, 4, 4,0x02c5,0x0007,-2, 2,0x1000,eps5,        0,0,0,0,0,0)
++  XTREG( 72,288,19, 4, 4,0x02c6,0x0007,-2, 2,0x1000,eps6,        0,0,0,0,0,0)
++  XTREG( 73,292,19, 4, 4,0x02c7,0x0007,-2, 2,0x1000,eps7,        0,0,0,0,0,0)
++  XTREG( 74,296,32, 4, 4,0x02d1,0x0007,-2, 2,0x1000,excsave1,    0,0,0,0,0,0)
++  XTREG( 75,300,32, 4, 4,0x02d2,0x0007,-2, 2,0x1000,excsave2,    0,0,0,0,0,0)
++  XTREG( 76,304,32, 4, 4,0x02d3,0x0007,-2, 2,0x1000,excsave3,    0,0,0,0,0,0)
++  XTREG( 77,308,32, 4, 4,0x02d4,0x0007,-2, 2,0x1000,excsave4,    0,0,0,0,0,0)
++  XTREG( 78,312,32, 4, 4,0x02d5,0x0007,-2, 2,0x1000,excsave5,    0,0,0,0,0,0)
++  XTREG( 79,316,32, 4, 4,0x02d6,0x0007,-2, 2,0x1000,excsave6,    0,0,0,0,0,0)
++  XTREG( 80,320,32, 4, 4,0x02d7,0x0007,-2, 2,0x1000,excsave7,    0,0,0,0,0,0)
++  XTREG( 81,324,22, 4, 4,0x02e2,0x000b,-2, 2,0x1000,interrupt,   0,0,0,0,0,0)
++  XTREG( 82,328,22, 4, 4,0x02e2,0x000d,-2, 2,0x1000,intset,      0,0,0,0,0,0)
++  XTREG( 83,332,22, 4, 4,0x02e3,0x000d,-2, 2,0x1000,intclear,    0,0,0,0,0,0)
++  XTREG( 84,336,22, 4, 4,0x02e4,0x0007,-2, 2,0x1000,intenable,   0,0,0,0,0,0)
++  XTREG( 85,340,32, 4, 4,0x02e7,0x0007,-2, 2,0x1000,vecbase,     0,0,0,0,0,0)
++  XTREG( 86,344, 6, 4, 4,0x02e8,0x0007,-2, 2,0x1000,exccause,    0,0,0,0,0,0)
++  XTREG( 87,348,12, 4, 4,0x02e9,0x0003,-2, 2,0x1000,debugcause,  0,0,0,0,0,0)
++  XTREG( 88,352,32, 4, 4,0x02ea,0x000f,-2, 2,0x1000,ccount,      0,0,0,0,0,0)
++  XTREG( 89,356,32, 4, 4,0x02eb,0x0003,-2, 2,0x1000,prid,        0,0,0,0,0,0)
++  XTREG( 90,360,32, 4, 4,0x02ec,0x000f,-2, 2,0x1000,icount,      0,0,0,0,0,0)
++  XTREG( 91,364, 4, 4, 4,0x02ed,0x0007,-2, 2,0x1000,icountlevel, 0,0,0,0,0,0)
++  XTREG( 92,368,32, 4, 4,0x02ee,0x0007,-2, 2,0x1000,excvaddr,    0,0,0,0,0,0)
++  XTREG( 93,372,32, 4, 4,0x02f0,0x000f,-2, 2,0x1000,ccompare0,   0,0,0,0,0,0)
++  XTREG( 94,376,32, 4, 4,0x02f1,0x000f,-2, 2,0x1000,ccompare1,   0,0,0,0,0,0)
++  XTREG( 95,380,32, 4, 4,0x02f2,0x000f,-2, 2,0x1000,ccompare2,   0,0,0,0,0,0)
++  XTREG( 96,384,32, 4, 4,0x02f4,0x0007,-2, 2,0x1000,misc0,       0,0,0,0,0,0)
++  XTREG( 97,388,32, 4, 4,0x02f5,0x0007,-2, 2,0x1000,misc1,       0,0,0,0,0,0)
++  XTREG( 98,392,32, 8, 4,0x2015,0x000f,-2, 4,0x0101,pwrctl,
++            "03:52:64:01:03:62:64:02:03:52:a4:0c:03:60:55:11:03:52:c5:20:03:60:65:40:03:62:64:00:03:52:24:01:03:62:24:02","03:52:64:01:03:62:64:02:03:52:a4:0c:03:60:55:11:03:52:c5:20:03:62:24:00:03:60:75:40:03:52:24:01:03:62:24:02",0,0,0,0)
++  XTREG( 99,400,32, 8, 4,0x2016,0x000f,-2, 4,0x0101,pwrstat,
++            "03:52:64:01:03:62:64:02:03:52:a4:0c:03:60:55:11:03:52:c5:24:03:60:65:40:03:62:64:00:03:52:24:01:03:62:24:02","03:52:64:01:03:62:64:02:03:52:a4:0c:03:60:55:11:03:52:c5:24:03:62:24:00:03:60:75:40:03:52:24:01:03:62:24:02",0,0,0,0)
++  XTREG(100,408, 1, 8, 4,0x2017,0x000f,-2, 4,0x0101,eristat,
++            "03:52:64:01:03:62:64:02:03:52:a4:0c:03:60:55:11:03:52:c5:28:03:60:65:40:03:62:64:00:03:52:24:01:03:62:24:02","03:52:64:01:03:62:64:02:03:52:a4:0c:03:60:55:11:03:52:c5:28:03:62:24:00:03:60:75:40:03:52:24:01:03:62:24:02",0,0,0,0)
++  XTREG(101,416,32, 8, 4,0x2018,0x000f,-2, 4,0x0101,cs_itctrl,
++            "03:52:64:01:03:62:64:02:03:52:a4:0f:03:60:55:11:03:52:d5:03:03:60:65:40:03:62:64:00:03:52:24:01:03:62:24:02","03:52:64:01:03:62:64:02:03:52:a4:0f:03:60:55:11:03:52:d5:03:03:62:24:00:03:60:75:40:03:52:24:01:03:62:24:02",0,0,0,0)
++  XTREG(102,424,16, 8, 4,0x2019,0x000f,-2, 4,0x0101,cs_claimset,
++            "03:52:64:01:03:62:64:02:03:52:a4:0f:03:60:55:11:03:52:c5:a0:03:52:d5:04:03:60:65:40:03:62:64:00:03:52:24:01:03:62:24:02","03:52:64:01:03:62:64:02:03:52:a4:0f:03:60:55:11:03:52:c5:a0:03:52:d5:04:03:62:24:00:03:60:75:40:03:52:24:01:03:62:24:02",0,0,0,0)
++  XTREG(103,432,16, 8, 4,0x201a,0x000f,-2, 4,0x0101,cs_claimclr,
++            "03:52:64:01:03:62:64:02:03:52:a4:0f:03:60:55:11:03:52:c5:a4:03:52:d5:04:03:60:65:40:03:62:64:00:03:52:24:01:03:62:24:02","03:52:64:01:03:62:64:02:03:52:a4:0f:03:60:55:11:03:52:c5:a4:03:52:d5:04:03:62:24:00:03:60:75:40:03:52:24:01:03:62:24:02",0,0,0,0)
++  XTREG(104,440,32, 8, 4,0x201b,0x000f,-2, 4,0x0101,cs_lockaccess,
++            "03:52:64:01:03:62:64:02:03:52:a4:0f:03:60:55:11:03:52:c5:b0:03:52:d5:04:03:60:65:40:03:62:64:00:03:52:24:01:03:62:24:02","03:52:64:01:03:62:64:02:03:52:a4:0f:03:60:55:11:03:52:c5:b0:03:52:d5:04:03:62:24:00:03:60:75:40:03:52:24:01:03:62:24:02",0,0,0,0)
++  XTREG(105,448,32, 8, 4,0x201c,0x000f,-2, 4,0x0101,cs_lockstatus,
++            "03:52:64:01:03:62:64:02:03:52:a4:0f:03:60:55:11:03:52:c5:b4:03:52:d5:04:03:60:65:40:03:62:64:00:03:52:24:01:03:62:24:02","03:52:64:01:03:62:64:02:03:52:a4:0f:03:60:55:11:03:52:c5:b4:03:52:d5:04:03:62:24:00:03:60:75:40:03:52:24:01:03:62:24:02",0,0,0,0)
++  XTREG(106,456, 1, 8, 4,0x201d,0x000f,-2, 4,0x0101,cs_authstatus,
++            "03:52:64:01:03:62:64:02:03:52:a4:0f:03:60:55:11:03:52:c5:b8:03:52:d5:04:03:60:65:40:03:62:64:00:03:52:24:01:03:62:24:02","03:52:64:01:03:62:64:02:03:52:a4:0f:03:60:55:11:03:52:c5:b8:03:52:d5:04:03:62:24:00:03:60:75:40:03:52:24:01:03:62:24:02",0,0,0,0)
++  XTREG(107,464,32, 8, 4,0x202c,0x0007,-2, 4,0x0101,trax_id,
++            "03:52:64:01:03:62:64:02:03:52:a4:00:03:60:55:11:03:60:65:40:03:62:64:00:03:52:24:01:03:62:24:02","03:52:64:01:03:62:64:02:03:52:a4:00:03:60:55:11:03:62:24:00:03:60:75:40:03:52:24:01:03:62:24:02",0,0,0,0)
++  XTREG(108,472,32, 8, 4,0x202d,0x000f,-2, 4,0x0101,trax_control,
++            "03:52:64:01:03:62:64:02:03:52:a4:00:03:60:55:11:03:52:c5:04:03:60:65:40:03:62:64:00:03:52:24:01:03:62:24:02","03:52:64:01:03:62:64:02:03:52:a4:00:03:60:55:11:03:52:c5:04:03:62:24:00:03:60:75:40:03:52:24:01:03:62:24:02",0,0,0,0)
++  XTREG(109,480,32, 8, 4,0x202e,0x000f,-2, 4,0x0101,trax_status,
++            "03:52:64:01:03:62:64:02:03:52:a4:00:03:60:55:11:03:52:c5:08:03:60:65:40:03:62:64:00:03:52:24:01:03:62:24:02","03:52:64:01:03:62:64:02:03:52:a4:00:03:60:55:11:03:52:c5:08:03:62:24:00:03:60:75:40:03:52:24:01:03:62:24:02",0,0,0,0)
++  XTREG(110,488,32, 8, 4,0x202f,0x000f,-2, 4,0x0101,trax_data,
++            "03:52:64:01:03:62:64:02:03:52:a4:00:03:60:55:11:03:52:c5:0c:03:60:65:40:03:62:64:00:03:52:24:01:03:62:24:02","03:52:64:01:03:62:64:02:03:52:a4:00:03:60:55:11:03:52:c5:0c:03:62:24:00:03:60:75:40:03:52:24:01:03:62:24:02",0,0,0,0)
++  XTREG(111,496,32, 8, 4,0x2030,0x000f,-2, 4,0x0101,trax_address,
++            "03:52:64:01:03:62:64:02:03:52:a4:00:03:60:55:11:03:52:c5:10:03:60:65:40:03:62:64:00:03:52:24:01:03:62:24:02","03:52:64:01:03:62:64:02:03:52:a4:00:03:60:55:11:03:52:c5:10:03:62:24:00:03:60:75:40:03:52:24:01:03:62:24:02",0,0,0,0)
++  XTREG(112,504,32, 8, 4,0x2031,0x000f,-2, 4,0x0101,trax_pctrigger,
++            "03:52:64:01:03:62:64:02:03:52:a4:00:03:60:55:11:03:52:c5:14:03:60:65:40:03:62:64:00:03:52:24:01:03:62:24:02","03:52:64:01:03:62:64:02:03:52:a4:00:03:60:55:11:03:52:c5:14:03:62:24:00:03:60:75:40:03:52:24:01:03:62:24:02",0,0,0,0)
++  XTREG(113,512,32, 8, 4,0x2032,0x000f,-2, 4,0x0101,trax_pcmatch,
++            "03:52:64:01:03:62:64:02:03:52:a4:00:03:60:55:11:03:52:c5:18:03:60:65:40:03:62:64:00:03:52:24:01:03:62:24:02","03:52:64:01:03:62:64:02:03:52:a4:00:03:60:55:11:03:52:c5:18:03:62:24:00:03:60:75:40:03:52:24:01:03:62:24:02",0,0,0,0)
++  XTREG(114,520,32, 8, 4,0x2033,0x000f,-2, 4,0x0101,trax_delay,
++            "03:52:64:01:03:62:64:02:03:52:a4:00:03:60:55:11:03:52:c5:1c:03:60:65:40:03:62:64:00:03:52:24:01:03:62:24:02","03:52:64:01:03:62:64:02:03:52:a4:00:03:60:55:11:03:52:c5:1c:03:62:24:00:03:60:75:40:03:52:24:01:03:62:24:02",0,0,0,0)
++  XTREG(115,528,32, 8, 4,0x2034,0x000f,-2, 4,0x0101,trax_memstart,
++            "03:52:64:01:03:62:64:02:03:52:a4:00:03:60:55:11:03:52:c5:20:03:60:65:40:03:62:64:00:03:52:24:01:03:62:24:02","03:52:64:01:03:62:64:02:03:52:a4:00:03:60:55:11:03:52:c5:20:03:62:24:00:03:60:75:40:03:52:24:01:03:62:24:02",0,0,0,0)
++  XTREG(116,536,32, 8, 4,0x2035,0x000f,-2, 4,0x0101,trax_memend,
++            "03:52:64:01:03:62:64:02:03:52:a4:00:03:60:55:11:03:52:c5:24:03:60:65:40:03:62:64:00:03:52:24:01:03:62:24:02","03:52:64:01:03:62:64:02:03:52:a4:00:03:60:55:11:03:52:c5:24:03:62:24:00:03:60:75:40:03:52:24:01:03:62:24:02",0,0,0,0)
++  XTREG(117,544,32, 8, 4,0x2043,0x0007,-2, 4,0x0101,ocdid,
++            "03:52:64:01:03:62:64:02:03:52:a4:08:03:60:55:11:03:60:65:40:03:62:64:00:03:52:24:01:03:62:24:02","03:52:64:01:03:62:64:02:03:52:a4:08:03:60:55:11:03:62:24:00:03:60:75:40:03:52:24:01:03:62:24:02",0,0,0,0)
++  XTREG(118,552,32, 8, 4,0x2044,0x000f,-2, 4,0x0101,ocd_dcrclr,
++            "03:52:64:01:03:62:64:02:03:52:a4:08:03:60:55:11:03:52:c5:08:03:60:65:40:03:62:64:00:03:52:24:01:03:62:24:02","03:52:64:01:03:62:64:02:03:52:a4:08:03:60:55:11:03:52:c5:08:03:62:24:00:03:60:75:40:03:52:24:01:03:62:24:02",0,0,0,0)
++  XTREG(119,560,32, 8, 4,0x2045,0x000f,-2, 4,0x0101,ocd_dcrset,
++            "03:52:64:01:03:62:64:02:03:52:a4:08:03:60:55:11:03:52:c5:0c:03:60:65:40:03:62:64:00:03:52:24:01:03:62:24:02","03:52:64:01:03:62:64:02:03:52:a4:08:03:60:55:11:03:52:c5:0c:03:62:24:00:03:60:75:40:03:52:24:01:03:62:24:02",0,0,0,0)
++  XTREG(120,568,32, 8, 4,0x2046,0x000f,-2, 4,0x0101,ocd_dsr,
++            "03:52:64:01:03:62:64:02:03:52:a4:08:03:60:55:11:03:52:c5:10:03:60:65:40:03:62:64:00:03:52:24:01:03:62:24:02","03:52:64:01:03:62:64:02:03:52:a4:08:03:60:55:11:03:52:c5:10:03:62:24:00:03:60:75:40:03:52:24:01:03:62:24:02",0,0,0,0)
++  XTREG(121,576,32, 4, 4,0x0000,0x0006,-2, 8,0x0100,a0,          0,0,0,0,0,0)
++  XTREG(122,580,32, 4, 4,0x0001,0x0006,-2, 8,0x0100,a1,          0,0,0,0,0,0)
++  XTREG(123,584,32, 4, 4,0x0002,0x0006,-2, 8,0x0100,a2,          0,0,0,0,0,0)
++  XTREG(124,588,32, 4, 4,0x0003,0x0006,-2, 8,0x0100,a3,          0,0,0,0,0,0)
++  XTREG(125,592,32, 4, 4,0x0004,0x0006,-2, 8,0x0100,a4,          0,0,0,0,0,0)
++  XTREG(126,596,32, 4, 4,0x0005,0x0006,-2, 8,0x0100,a5,          0,0,0,0,0,0)
++  XTREG(127,600,32, 4, 4,0x0006,0x0006,-2, 8,0x0100,a6,          0,0,0,0,0,0)
++  XTREG(128,604,32, 4, 4,0x0007,0x0006,-2, 8,0x0100,a7,          0,0,0,0,0,0)
++  XTREG(129,608,32, 4, 4,0x0008,0x0006,-2, 8,0x0100,a8,          0,0,0,0,0,0)
++  XTREG(130,612,32, 4, 4,0x0009,0x0006,-2, 8,0x0100,a9,          0,0,0,0,0,0)
++  XTREG(131,616,32, 4, 4,0x000a,0x0006,-2, 8,0x0100,a10,         0,0,0,0,0,0)
++  XTREG(132,620,32, 4, 4,0x000b,0x0006,-2, 8,0x0100,a11,         0,0,0,0,0,0)
++  XTREG(133,624,32, 4, 4,0x000c,0x0006,-2, 8,0x0100,a12,         0,0,0,0,0,0)
++  XTREG(134,628,32, 4, 4,0x000d,0x0006,-2, 8,0x0100,a13,         0,0,0,0,0,0)
++  XTREG(135,632,32, 4, 4,0x000e,0x0006,-2, 8,0x0100,a14,         0,0,0,0,0,0)
++  XTREG(136,636,32, 4, 4,0x000f,0x0006,-2, 8,0x0100,a15,         0,0,0,0,0,0)
++  XTREG(137,640, 4, 4, 4,0x2008,0x0006,-2, 6,0x1010,psintlevel,
 +            0,0,&xtensa_mask0,0,0,0)
-+  XTREG(106,424, 1, 4, 4,0x2009,0x0006,-2, 6,0x1010,psum,
++  XTREG(138,644, 1, 4, 4,0x2009,0x0006,-2, 6,0x1010,psum,
 +            0,0,&xtensa_mask1,0,0,0)
-+  XTREG(107,428, 1, 4, 4,0x200a,0x0006,-2, 6,0x1010,pswoe,
++  XTREG(139,648, 1, 4, 4,0x200a,0x0006,-2, 6,0x1010,pswoe,
 +            0,0,&xtensa_mask2,0,0,0)
-+  XTREG(108,432, 1, 4, 4,0x200b,0x0006,-2, 6,0x1010,psexcm,
++  XTREG(140,652, 1, 4, 4,0x200b,0x0006,-2, 6,0x1010,psexcm,
 +            0,0,&xtensa_mask3,0,0,0)
-+  XTREG(109,436, 2, 4, 4,0x200c,0x0006,-2, 6,0x1010,pscallinc,
++  XTREG(141,656, 2, 4, 4,0x200c,0x0006,-2, 6,0x1010,pscallinc,
 +            0,0,&xtensa_mask4,0,0,0)
-+  XTREG(110,440, 4, 4, 4,0x200d,0x0006,-2, 6,0x1010,psowb,
++  XTREG(142,660, 4, 4, 4,0x200d,0x0006,-2, 6,0x1010,psowb,
 +            0,0,&xtensa_mask5,0,0,0)
++  XTREG(143,664,40, 8, 4,0x200e,0x0006,-2, 6,0x1010,acc,
++            0,0,&xtensa_mask6,0,0,0)
 +  XTREG_END
-diff --git a/target/xtensa/core-sample_controller/xtensa-modules.c b/target/xtensa/core-sample_controller/xtensa-modules.c
+diff --git a/target/xtensa/core-de212/xtensa-modules.c b/target/xtensa/core-de212/xtensa-modules.c
 new file mode 100644
-index 000000000000..2f000199b8cd
+index 000000000000..4a8735889e19
 --- /dev/null
-+++ b/target/xtensa/core-sample_controller/xtensa-modules.c
-@@ -0,0 +1,11377 @@
++++ b/target/xtensa/core-de212/xtensa-modules.c
+@@ -0,0 +1,14566 @@
 +/* Xtensa configuration-specific ISA information.
 +
-+   Copyright (c) 2003-2016 Tensilica Inc.
++   Copyright (c) 2003-2015 Tensilica Inc.
 +
 +   Permission is hereby granted, free of charge, to any person obtaining
 +   a copy of this software and associated documentation files (the
@@ -950,6 +984,15 @@ index 000000000000..2f000199b8cd
 +/* Sysregs.  */
 +
 +static xtensa_sysreg_internal sysregs[] = {
++  { "LBEG", 0, 0 },
++  { "LEND", 1, 0 },
++  { "LCOUNT", 2, 0 },
++  { "ACCLO", 16, 0 },
++  { "ACCHI", 17, 0 },
++  { "M0", 32, 0 },
++  { "M1", 33, 0 },
++  { "M2", 34, 0 },
++  { "M3", 35, 0 },
 +  { "MMID", 89, 0 },
 +  { "DDR", 104, 0 },
 +  { "CONFIGID0", 176, 0 },
@@ -1007,7 +1050,7 @@ index 000000000000..2f000199b8cd
 +  { "EXPSTATE", 230, 1 }
 +};
 +
-+#define NUM_SYSREGS 55
++#define NUM_SYSREGS 64
 +#define MAX_SPECIAL_REG 245
 +#define MAX_USER_REG 230
 +
@@ -1016,6 +1059,7 @@ index 000000000000..2f000199b8cd
 +/* Processor states.  */
 +
 +static xtensa_state_internal states[] = {
++  { "LCOUNT", 32, 0 },
 +  { "PC", 32, 0 },
 +  { "ICOUNT", 32, 0 },
 +  { "DDR", 32, 0 },
@@ -1054,9 +1098,12 @@ index 000000000000..2f000199b8cd
 +  { "WindowStart", 8, 0 },
 +  { "PSCALLINC", 2, 0 },
 +  { "PSOWB", 4, 0 },
++  { "LBEG", 32, 0 },
++  { "LEND", 32, 0 },
 +  { "SAR", 6, 0 },
 +  { "MISC0", 32, 0 },
 +  { "MISC1", 32, 0 },
++  { "ACC", 40, 0 },
 +  { "InOCDMode", 1, 0 },
 +  { "INTENABLE", 22, 0 },
 +  { "DBREAKA0", 32, 0 },
@@ -1074,12 +1121,14 @@ index 000000000000..2f000199b8cd
 +  { "CCOMPARE2", 32, 0 },
 +  { "SCOMPARE1", 32, 0 },
 +  { "ATOMCTL", 6, 0 },
++  { "ERI_RAW_INTERLOCK", 1, 0 },
 +  { "EXPSTATE", 32, XTENSA_STATE_IS_EXPORTED }
 +};
 +
-+#define NUM_STATES 59
++#define NUM_STATES 64
 +
 +enum xtensa_state_id {
++  STATE_LCOUNT,
 +  STATE_PC,
 +  STATE_ICOUNT,
 +  STATE_DDR,
@@ -1118,9 +1167,12 @@ index 000000000000..2f000199b8cd
 +  STATE_WindowStart,
 +  STATE_PSCALLINC,
 +  STATE_PSOWB,
++  STATE_LBEG,
++  STATE_LEND,
 +  STATE_SAR,
 +  STATE_MISC0,
 +  STATE_MISC1,
++  STATE_ACC,
 +  STATE_InOCDMode,
 +  STATE_INTENABLE,
 +  STATE_DBREAKA0,
@@ -1138,6 +1190,7 @@ index 000000000000..2f000199b8cd
 +  STATE_CCOMPARE2,
 +  STATE_SCOMPARE1,
 +  STATE_ATOMCTL,
++  STATE_ERI_RAW_INTERLOCK,
 +  STATE_EXPSTATE
 +};
 +
@@ -1306,6 +1359,86 @@ index 000000000000..2f000199b8cd
 +  uint32 tie_t;
 +  tie_t = (val << 29) >> 29;
 +  insn[0] = (insn[0] & ~0xe0) | (tie_t << 5);
++}
++
++static unsigned
++Field_t3_Slot_inst_get (const xtensa_insnbuf insn)
++{
++  unsigned tie_t = 0;
++  tie_t = (tie_t << 1) | ((insn[0] << 24) >> 31);
++  return tie_t;
++}
++
++static void
++Field_t3_Slot_inst_set (xtensa_insnbuf insn, uint32 val)
++{
++  uint32 tie_t;
++  tie_t = (val << 31) >> 31;
++  insn[0] = (insn[0] & ~0x80) | (tie_t << 7);
++}
++
++static unsigned
++Field_tlo_Slot_inst_get (const xtensa_insnbuf insn)
++{
++  unsigned tie_t = 0;
++  tie_t = (tie_t << 2) | ((insn[0] << 26) >> 30);
++  return tie_t;
++}
++
++static void
++Field_tlo_Slot_inst_set (xtensa_insnbuf insn, uint32 val)
++{
++  uint32 tie_t;
++  tie_t = (val << 30) >> 30;
++  insn[0] = (insn[0] & ~0x30) | (tie_t << 4);
++}
++
++static unsigned
++Field_w_Slot_inst_get (const xtensa_insnbuf insn)
++{
++  unsigned tie_t = 0;
++  tie_t = (tie_t << 2) | ((insn[0] << 18) >> 30);
++  return tie_t;
++}
++
++static void
++Field_w_Slot_inst_set (xtensa_insnbuf insn, uint32 val)
++{
++  uint32 tie_t;
++  tie_t = (val << 30) >> 30;
++  insn[0] = (insn[0] & ~0x3000) | (tie_t << 12);
++}
++
++static unsigned
++Field_r3_Slot_inst_get (const xtensa_insnbuf insn)
++{
++  unsigned tie_t = 0;
++  tie_t = (tie_t << 1) | ((insn[0] << 16) >> 31);
++  return tie_t;
++}
++
++static void
++Field_r3_Slot_inst_set (xtensa_insnbuf insn, uint32 val)
++{
++  uint32 tie_t;
++  tie_t = (val << 31) >> 31;
++  insn[0] = (insn[0] & ~0x8000) | (tie_t << 15);
++}
++
++static unsigned
++Field_rhi_Slot_inst_get (const xtensa_insnbuf insn)
++{
++  unsigned tie_t = 0;
++  tie_t = (tie_t << 2) | ((insn[0] << 16) >> 30);
++  return tie_t;
++}
++
++static void
++Field_rhi_Slot_inst_set (xtensa_insnbuf insn, uint32 val)
++{
++  uint32 tie_t;
++  tie_t = (val << 30) >> 30;
++  insn[0] = (insn[0] & ~0xc000) | (tie_t << 14);
 +}
 +
 +static unsigned
@@ -2125,6 +2258,70 @@ index 000000000000..2f000199b8cd
 +}
 +
 +static unsigned
++Field_rbit2_Slot_inst_get (const xtensa_insnbuf insn)
++{
++  unsigned tie_t = 0;
++  tie_t = (tie_t << 1) | ((insn[0] << 17) >> 31);
++  return tie_t;
++}
++
++static void
++Field_rbit2_Slot_inst_set (xtensa_insnbuf insn, uint32 val)
++{
++  uint32 tie_t;
++  tie_t = (val << 31) >> 31;
++  insn[0] = (insn[0] & ~0x4000) | (tie_t << 14);
++}
++
++static unsigned
++Field_tbit2_Slot_inst_get (const xtensa_insnbuf insn)
++{
++  unsigned tie_t = 0;
++  tie_t = (tie_t << 1) | ((insn[0] << 25) >> 31);
++  return tie_t;
++}
++
++static void
++Field_tbit2_Slot_inst_set (xtensa_insnbuf insn, uint32 val)
++{
++  uint32 tie_t;
++  tie_t = (val << 31) >> 31;
++  insn[0] = (insn[0] & ~0x40) | (tie_t << 6);
++}
++
++static unsigned
++Field_y_Slot_inst_get (const xtensa_insnbuf insn)
++{
++  unsigned tie_t = 0;
++  tie_t = (tie_t << 1) | ((insn[0] << 25) >> 31);
++  return tie_t;
++}
++
++static void
++Field_y_Slot_inst_set (xtensa_insnbuf insn, uint32 val)
++{
++  uint32 tie_t;
++  tie_t = (val << 31) >> 31;
++  insn[0] = (insn[0] & ~0x40) | (tie_t << 6);
++}
++
++static unsigned
++Field_x_Slot_inst_get (const xtensa_insnbuf insn)
++{
++  unsigned tie_t = 0;
++  tie_t = (tie_t << 1) | ((insn[0] << 17) >> 31);
++  return tie_t;
++}
++
++static void
++Field_x_Slot_inst_set (xtensa_insnbuf insn, uint32 val)
++{
++  uint32 tie_t;
++  tie_t = (val << 31) >> 31;
++  insn[0] = (insn[0] & ~0x4000) | (tie_t << 14);
++}
++
++static unsigned
 +Field_xt_wbr15_imm_Slot_inst_get (const xtensa_insnbuf insn)
 +{
 +  unsigned tie_t = 0;
@@ -2276,6 +2473,30 @@ index 000000000000..2f000199b8cd
 +  return 12;
 +}
 +
++static unsigned
++Implicit_Field_mr0_get (const xtensa_insnbuf insn ATTRIBUTE_UNUSED)
++{
++  return 0;
++}
++
++static unsigned
++Implicit_Field_mr1_get (const xtensa_insnbuf insn ATTRIBUTE_UNUSED)
++{
++  return 1;
++}
++
++static unsigned
++Implicit_Field_mr2_get (const xtensa_insnbuf insn ATTRIBUTE_UNUSED)
++{
++  return 2;
++}
++
++static unsigned
++Implicit_Field_mr3_get (const xtensa_insnbuf insn ATTRIBUTE_UNUSED)
++{
++  return 3;
++}
++
 +enum xtensa_field_id {
 +  FIELD_t,
 +  FIELD_bbi4,
@@ -2312,6 +2533,15 @@ index 000000000000..2f000199b8cd
 +  FIELD_z,
 +  FIELD_imm6,
 +  FIELD_imm7,
++  FIELD_r3,
++  FIELD_rbit2,
++  FIELD_rhi,
++  FIELD_t3,
++  FIELD_tbit2,
++  FIELD_tlo,
++  FIELD_w,
++  FIELD_y,
++  FIELD_x,
 +  FIELD_xt_wbr15_imm,
 +  FIELD_xt_wbr18_imm,
 +  FIELD_bitindex,
@@ -2319,7 +2549,11 @@ index 000000000000..2f000199b8cd
 +  FIELD__ar0,
 +  FIELD__ar4,
 +  FIELD__ar8,
-+  FIELD__ar12
++  FIELD__ar12,
++  FIELD__mr0,
++  FIELD__mr1,
++  FIELD__mr2,
++  FIELD__mr3
 +};
 +
 +
@@ -2333,11 +2567,13 @@ index 000000000000..2f000199b8cd
 +/* Register files.  */
 +
 +enum xtensa_regfile_id {
-+  REGFILE_AR
++  REGFILE_AR,
++  REGFILE_MR
 +};
 +
 +static xtensa_regfile_internal regfiles[] = {
-+  { "AR", "a", REGFILE_AR, 32, 32 }
++  { "AR", "a", REGFILE_AR, 32, 32 },
++  { "MR", "m", REGFILE_MR, 32, 4 }
 +};
 +
 +
@@ -2345,10 +2581,20 @@ index 000000000000..2f000199b8cd
 +/* Interfaces.  */
 +
 +static xtensa_interface_internal interfaces[] = {
-+  { "IMPWIRE", 32, 0, 0, 'i' }
++  { "ERI_RD_Out", 14, 0, 0, 'o' },
++  { "ERI_RD_In", 32, 0, 1, 'i' },
++  { "ERI_RD_Rdy", 1, 0, 0, 'i' },
++  { "ERI_WR_Out", 46, 0, 2, 'o' },
++  { "ERI_WR_In", 1, 0, 3, 'i' },
++  { "IMPWIRE", 32, 0, 4, 'i' }
 +};
 +
 +enum xtensa_interface_id {
++  INTERFACE_ERI_RD_Out,
++  INTERFACE_ERI_RD_In,
++  INTERFACE_ERI_RD_Rdy,
++  INTERFACE_ERI_WR_Out,
++  INTERFACE_ERI_WR_In,
 +  INTERFACE_IMPWIRE
 +};
 +
@@ -2421,6 +2667,22 @@ index 000000000000..2f000199b8cd
 +
 
 +/* Instruction operands.  */
++
++static int
++OperandSem_opnd_sem_MR_0_decode (uint32 *valp)
++{
++  *valp += 2;
++  return 0;
++}
++
++static int
++OperandSem_opnd_sem_MR_0_encode (uint32 *valp)
++{
++  int error;
++  error = ((*valp & ~0x3) != 0) || ((*valp & 0x2) == 0);
++  *valp = *valp & 1;
++  return error;
++}
 +
 +static int
 +OperandSem_opnd_sem_soffsetx4_decode (uint32 *valp)
@@ -3023,6 +3285,28 @@ index 000000000000..2f000199b8cd
 +}
 +
 +static int
++OperandSem_opnd_sem_ulabel8_decode (uint32 *valp)
++{
++  unsigned ulabel8_out_0;
++  unsigned ulabel8_in_0;
++  ulabel8_in_0 = *valp & 0xff;
++  ulabel8_out_0 = 0x4 + (((0) << 8) | ulabel8_in_0);
++  *valp = ulabel8_out_0;
++  return 0;
++}
++
++static int
++OperandSem_opnd_sem_ulabel8_encode (uint32 *valp)
++{
++  unsigned ulabel8_in_0;
++  unsigned ulabel8_out_0;
++  ulabel8_out_0 = *valp;
++  ulabel8_in_0 = (ulabel8_out_0 - 0x4) & 0xff;
++  *valp = ulabel8_in_0;
++  return 0;
++}
++
++static int
 +OperandSem_opnd_sem_label12_decode (uint32 *valp)
 +{
 +  unsigned label12_out_0;
@@ -3130,6 +3414,90 @@ index 000000000000..2f000199b8cd
 +  s_in_0 = (s_out_0 & 0xf);
 +  *valp = s_in_0;
 +  return 0;
++}
++
++static int
++OperandSem_opnd_sem_MR_decode (uint32 *valp ATTRIBUTE_UNUSED)
++{
++  return 0;
++}
++
++static int
++OperandSem_opnd_sem_MR_encode (uint32 *valp)
++{
++  int error;
++  error = (*valp >= 4);
++  return error;
++}
++
++static int
++OperandSem_opnd_sem_MR_1_decode (uint32 *valp ATTRIBUTE_UNUSED)
++{
++  return 0;
++}
++
++static int
++OperandSem_opnd_sem_MR_1_encode (uint32 *valp)
++{
++  int error;
++  error = (*valp >= 4);
++  return error;
++}
++
++static int
++OperandSem_opnd_sem_MR_2_decode (uint32 *valp ATTRIBUTE_UNUSED)
++{
++  return 0;
++}
++
++static int
++OperandSem_opnd_sem_MR_2_encode (uint32 *valp)
++{
++  int error;
++  error = (*valp >= 4);
++  return error;
++}
++
++static int
++OperandSem_opnd_sem_MR_3_decode (uint32 *valp ATTRIBUTE_UNUSED)
++{
++  return 0;
++}
++
++static int
++OperandSem_opnd_sem_MR_3_encode (uint32 *valp)
++{
++  int error;
++  error = (*valp >= 4);
++  return error;
++}
++
++static int
++OperandSem_opnd_sem_MR_4_decode (uint32 *valp ATTRIBUTE_UNUSED)
++{
++  return 0;
++}
++
++static int
++OperandSem_opnd_sem_MR_4_encode (uint32 *valp)
++{
++  int error;
++  error = (*valp >= 4);
++  return error;
++}
++
++static int
++OperandSem_opnd_sem_MR_5_decode (uint32 *valp ATTRIBUTE_UNUSED)
++{
++  return 0;
++}
++
++static int
++OperandSem_opnd_sem_MR_5_encode (uint32 *valp)
++{
++  int error;
++  error = (*valp >= 4);
++  return error;
 +}
 +
 +static int
@@ -3279,6 +3647,20 @@ index 000000000000..2f000199b8cd
 +
 +static int
 +Operand_label8_rtoa (uint32 *valp, uint32 pc)
++{
++  *valp += pc;
++  return 0;
++}
++
++static int
++Operand_ulabel8_ator (uint32 *valp, uint32 pc)
++{
++  *valp -= pc;
++  return 0;
++}
++
++static int
++Operand_ulabel8_rtoa (uint32 *valp, uint32 pc)
 +{
 +  *valp += pc;
 +  return 0;
@@ -3475,6 +3857,10 @@ index 000000000000..2f000199b8cd
 +    XTENSA_OPERAND_IS_PCRELATIVE,
 +    OperandSem_opnd_sem_label8_encode, OperandSem_opnd_sem_label8_decode,
 +    Operand_label8_ator, Operand_label8_rtoa },
++  { "ulabel8", FIELD_imm8, -1, 0,
++    XTENSA_OPERAND_IS_PCRELATIVE,
++    OperandSem_opnd_sem_ulabel8_encode, OperandSem_opnd_sem_ulabel8_decode,
++    Operand_ulabel8_ator, Operand_ulabel8_rtoa },
 +  { "label12", FIELD_imm12, -1, 0,
 +    XTENSA_OPERAND_IS_PCRELATIVE,
 +    OperandSem_opnd_sem_label12_encode, OperandSem_opnd_sem_label12_decode,
@@ -3506,6 +3892,34 @@ index 000000000000..2f000199b8cd
 +  { "s", FIELD_s, -1, 0,
 +    0,
 +    OperandSem_opnd_sem_s_encode, OperandSem_opnd_sem_s_decode,
++    0, 0 },
++  { "mx", FIELD_x, REGFILE_MR, 1,
++    XTENSA_OPERAND_IS_REGISTER | XTENSA_OPERAND_IS_UNKNOWN,
++    OperandSem_opnd_sem_MR_encode, OperandSem_opnd_sem_MR_decode,
++    0, 0 },
++  { "my", FIELD_y, REGFILE_MR, 1,
++    XTENSA_OPERAND_IS_REGISTER | XTENSA_OPERAND_IS_UNKNOWN,
++    OperandSem_opnd_sem_MR_0_encode, OperandSem_opnd_sem_MR_0_decode,
++    0, 0 },
++  { "mw", FIELD_w, REGFILE_MR, 1,
++    XTENSA_OPERAND_IS_REGISTER,
++    OperandSem_opnd_sem_MR_1_encode, OperandSem_opnd_sem_MR_1_decode,
++    0, 0 },
++  { "mr0", FIELD__mr0, REGFILE_MR, 1,
++    XTENSA_OPERAND_IS_REGISTER | XTENSA_OPERAND_IS_INVISIBLE,
++    OperandSem_opnd_sem_MR_2_encode, OperandSem_opnd_sem_MR_2_decode,
++    0, 0 },
++  { "mr1", FIELD__mr1, REGFILE_MR, 1,
++    XTENSA_OPERAND_IS_REGISTER | XTENSA_OPERAND_IS_INVISIBLE,
++    OperandSem_opnd_sem_MR_3_encode, OperandSem_opnd_sem_MR_3_decode,
++    0, 0 },
++  { "mr2", FIELD__mr2, REGFILE_MR, 1,
++    XTENSA_OPERAND_IS_REGISTER | XTENSA_OPERAND_IS_INVISIBLE,
++    OperandSem_opnd_sem_MR_4_encode, OperandSem_opnd_sem_MR_4_decode,
++    0, 0 },
++  { "mr3", FIELD__mr3, REGFILE_MR, 1,
++    XTENSA_OPERAND_IS_REGISTER | XTENSA_OPERAND_IS_INVISIBLE,
++    OperandSem_opnd_sem_MR_5_encode, OperandSem_opnd_sem_MR_5_decode,
 +    0, 0 },
 +  { "immt", FIELD_t, -1, 0,
 +    0,
@@ -3561,6 +3975,15 @@ index 000000000000..2f000199b8cd
 +  { "z", FIELD_z, -1, 0, 0, 0, 0, 0, 0 },
 +  { "imm6", FIELD_imm6, -1, 0, 0, 0, 0, 0, 0 },
 +  { "imm7", FIELD_imm7, -1, 0, 0, 0, 0, 0, 0 },
++  { "r3", FIELD_r3, -1, 0, 0, 0, 0, 0, 0 },
++  { "rbit2", FIELD_rbit2, -1, 0, 0, 0, 0, 0, 0 },
++  { "rhi", FIELD_rhi, -1, 0, 0, 0, 0, 0, 0 },
++  { "t3", FIELD_t3, -1, 0, 0, 0, 0, 0, 0 },
++  { "tbit2", FIELD_tbit2, -1, 0, 0, 0, 0, 0, 0 },
++  { "tlo", FIELD_tlo, -1, 0, 0, 0, 0, 0, 0 },
++  { "w", FIELD_w, -1, 0, 0, 0, 0, 0, 0 },
++  { "y", FIELD_y, -1, 0, 0, 0, 0, 0, 0 },
++  { "x", FIELD_x, -1, 0, 0, 0, 0, 0, 0 },
 +  { "xt_wbr15_imm", FIELD_xt_wbr15_imm, -1, 0, 0, 0, 0, 0, 0 },
 +  { "xt_wbr18_imm", FIELD_xt_wbr18_imm, -1, 0, 0, 0, 0, 0, 0 },
 +  { "s3to1", FIELD_s3to1, -1, 0, 0, 0, 0, 0, 0 }
@@ -3597,6 +4020,7 @@ index 000000000000..2f000199b8cd
 +  OPERAND_msalp32,
 +  OPERAND_op2p1,
 +  OPERAND_label8,
++  OPERAND_ulabel8,
 +  OPERAND_label12,
 +  OPERAND_soffset,
 +  OPERAND_uimm16x4,
@@ -3605,6 +4029,13 @@ index 000000000000..2f000199b8cd
 +  OPERAND_sas,
 +  OPERAND_sargt,
 +  OPERAND_s,
++  OPERAND_mx,
++  OPERAND_my,
++  OPERAND_mw,
++  OPERAND_mr0,
++  OPERAND_mr1,
++  OPERAND_mr2,
++  OPERAND_mr3,
 +  OPERAND_immt,
 +  OPERAND_imms,
 +  OPERAND_tp7,
@@ -3641,6 +4072,15 @@ index 000000000000..2f000199b8cd
 +  OPERAND_z,
 +  OPERAND_imm6,
 +  OPERAND_imm7,
++  OPERAND_r3,
++  OPERAND_rbit2,
++  OPERAND_rhi,
++  OPERAND_t3,
++  OPERAND_tbit2,
++  OPERAND_tlo,
++  OPERAND_w,
++  OPERAND_y,
++  OPERAND_x,
 +  OPERAND_xt_wbr15_imm,
 +  OPERAND_xt_wbr18_imm,
 +  OPERAND_s3to1
@@ -3975,6 +4415,28 @@ index 000000000000..2f000199b8cd
 +  { { OPERAND_uimm8 }, 'i' }
 +};
 +
++static xtensa_arg_internal Iclass_xt_iclass_loop_args[] = {
++  { { OPERAND_ars }, 'i' },
++  { { OPERAND_ulabel8 }, 'i' }
++};
++
++static xtensa_arg_internal Iclass_xt_iclass_loop_stateArgs[] = {
++  { { STATE_LBEG }, 'o' },
++  { { STATE_LEND }, 'o' },
++  { { STATE_LCOUNT }, 'o' }
++};
++
++static xtensa_arg_internal Iclass_xt_iclass_loopz_args[] = {
++  { { OPERAND_ars }, 'i' },
++  { { OPERAND_ulabel8 }, 'i' }
++};
++
++static xtensa_arg_internal Iclass_xt_iclass_loopz_stateArgs[] = {
++  { { STATE_LBEG }, 'o' },
++  { { STATE_LEND }, 'o' },
++  { { STATE_LCOUNT }, 'o' }
++};
++
 +static xtensa_arg_internal Iclass_xt_iclass_movi_args[] = {
 +  { { OPERAND_art }, 'o' },
 +  { { OPERAND_simm12b }, 'i' }
@@ -4097,6 +4559,80 @@ index 000000000000..2f000199b8cd
 +  { { STATE_PSUM }, 'i' },
 +  { { STATE_PSEXCM }, 'i' },
 +  { { STATE_PSINTLEVEL }, 'm' }
++};
++
++static xtensa_arg_internal Iclass_xt_iclass_rsr_lend_args[] = {
++  { { OPERAND_art }, 'o' }
++};
++
++static xtensa_arg_internal Iclass_xt_iclass_rsr_lend_stateArgs[] = {
++  { { STATE_LEND }, 'i' }
++};
++
++static xtensa_arg_internal Iclass_xt_iclass_wsr_lend_args[] = {
++  { { OPERAND_art }, 'i' }
++};
++
++static xtensa_arg_internal Iclass_xt_iclass_wsr_lend_stateArgs[] = {
++  { { STATE_LEND }, 'o' }
++};
++
++static xtensa_arg_internal Iclass_xt_iclass_xsr_lend_args[] = {
++  { { OPERAND_art }, 'm' }
++};
++
++static xtensa_arg_internal Iclass_xt_iclass_xsr_lend_stateArgs[] = {
++  { { STATE_LEND }, 'm' }
++};
++
++static xtensa_arg_internal Iclass_xt_iclass_rsr_lcount_args[] = {
++  { { OPERAND_art }, 'o' }
++};
++
++static xtensa_arg_internal Iclass_xt_iclass_rsr_lcount_stateArgs[] = {
++  { { STATE_LCOUNT }, 'i' }
++};
++
++static xtensa_arg_internal Iclass_xt_iclass_wsr_lcount_args[] = {
++  { { OPERAND_art }, 'i' }
++};
++
++static xtensa_arg_internal Iclass_xt_iclass_wsr_lcount_stateArgs[] = {
++  { { STATE_XTSYNC }, 'o' },
++  { { STATE_LCOUNT }, 'o' }
++};
++
++static xtensa_arg_internal Iclass_xt_iclass_xsr_lcount_args[] = {
++  { { OPERAND_art }, 'm' }
++};
++
++static xtensa_arg_internal Iclass_xt_iclass_xsr_lcount_stateArgs[] = {
++  { { STATE_XTSYNC }, 'o' },
++  { { STATE_LCOUNT }, 'm' }
++};
++
++static xtensa_arg_internal Iclass_xt_iclass_rsr_lbeg_args[] = {
++  { { OPERAND_art }, 'o' }
++};
++
++static xtensa_arg_internal Iclass_xt_iclass_rsr_lbeg_stateArgs[] = {
++  { { STATE_LBEG }, 'i' }
++};
++
++static xtensa_arg_internal Iclass_xt_iclass_wsr_lbeg_args[] = {
++  { { OPERAND_art }, 'i' }
++};
++
++static xtensa_arg_internal Iclass_xt_iclass_wsr_lbeg_stateArgs[] = {
++  { { STATE_LBEG }, 'o' }
++};
++
++static xtensa_arg_internal Iclass_xt_iclass_xsr_lbeg_args[] = {
++  { { OPERAND_art }, 'm' }
++};
++
++static xtensa_arg_internal Iclass_xt_iclass_xsr_lbeg_stateArgs[] = {
++  { { STATE_LBEG }, 'm' }
 +};
 +
 +static xtensa_arg_internal Iclass_xt_iclass_rsr_sar_args[] = {
@@ -4828,12 +5364,6 @@ index 000000000000..2f000199b8cd
 +  { { STATE_VECBASE }, 'm' }
 +};
 +
-+static xtensa_arg_internal Iclass_xt_iclass_salt_args[] = {
-+  { { OPERAND_arr }, 'o' },
-+  { { OPERAND_ars }, 'i' },
-+  { { OPERAND_art }, 'i' }
-+};
-+
 +static xtensa_arg_internal Iclass_xt_mul16_args[] = {
 +  { { OPERAND_arr }, 'o' },
 +  { { OPERAND_ars }, 'i' },
@@ -4844,6 +5374,213 @@ index 000000000000..2f000199b8cd
 +  { { OPERAND_arr }, 'o' },
 +  { { OPERAND_ars }, 'i' },
 +  { { OPERAND_art }, 'i' }
++};
++
++static xtensa_arg_internal Iclass_xt_iclass_mac16_aa_args[] = {
++  { { OPERAND_ars }, 'i' },
++  { { OPERAND_art }, 'i' }
++};
++
++static xtensa_arg_internal Iclass_xt_iclass_mac16_aa_stateArgs[] = {
++  { { STATE_ACC }, 'o' }
++};
++
++static xtensa_arg_internal Iclass_xt_iclass_mac16_ad_args[] = {
++  { { OPERAND_ars }, 'i' },
++  { { OPERAND_my }, 'i' }
++};
++
++static xtensa_arg_internal Iclass_xt_iclass_mac16_ad_stateArgs[] = {
++  { { STATE_ACC }, 'o' }
++};
++
++static xtensa_arg_internal Iclass_xt_iclass_mac16_da_args[] = {
++  { { OPERAND_mx }, 'i' },
++  { { OPERAND_art }, 'i' }
++};
++
++static xtensa_arg_internal Iclass_xt_iclass_mac16_da_stateArgs[] = {
++  { { STATE_ACC }, 'o' }
++};
++
++static xtensa_arg_internal Iclass_xt_iclass_mac16_dd_args[] = {
++  { { OPERAND_mx }, 'i' },
++  { { OPERAND_my }, 'i' }
++};
++
++static xtensa_arg_internal Iclass_xt_iclass_mac16_dd_stateArgs[] = {
++  { { STATE_ACC }, 'o' }
++};
++
++static xtensa_arg_internal Iclass_xt_iclass_mac16a_aa_args[] = {
++  { { OPERAND_ars }, 'i' },
++  { { OPERAND_art }, 'i' }
++};
++
++static xtensa_arg_internal Iclass_xt_iclass_mac16a_aa_stateArgs[] = {
++  { { STATE_ACC }, 'm' }
++};
++
++static xtensa_arg_internal Iclass_xt_iclass_mac16a_ad_args[] = {
++  { { OPERAND_ars }, 'i' },
++  { { OPERAND_my }, 'i' }
++};
++
++static xtensa_arg_internal Iclass_xt_iclass_mac16a_ad_stateArgs[] = {
++  { { STATE_ACC }, 'm' }
++};
++
++static xtensa_arg_internal Iclass_xt_iclass_mac16a_da_args[] = {
++  { { OPERAND_mx }, 'i' },
++  { { OPERAND_art }, 'i' }
++};
++
++static xtensa_arg_internal Iclass_xt_iclass_mac16a_da_stateArgs[] = {
++  { { STATE_ACC }, 'm' }
++};
++
++static xtensa_arg_internal Iclass_xt_iclass_mac16a_dd_args[] = {
++  { { OPERAND_mx }, 'i' },
++  { { OPERAND_my }, 'i' }
++};
++
++static xtensa_arg_internal Iclass_xt_iclass_mac16a_dd_stateArgs[] = {
++  { { STATE_ACC }, 'm' }
++};
++
++static xtensa_arg_internal Iclass_xt_iclass_mac16al_da_args[] = {
++  { { OPERAND_mw }, 'o' },
++  { { OPERAND_ars }, 'm' },
++  { { OPERAND_mx }, 'i' },
++  { { OPERAND_art }, 'i' }
++};
++
++static xtensa_arg_internal Iclass_xt_iclass_mac16al_da_stateArgs[] = {
++  { { STATE_ACC }, 'm' }
++};
++
++static xtensa_arg_internal Iclass_xt_iclass_mac16al_dd_args[] = {
++  { { OPERAND_mw }, 'o' },
++  { { OPERAND_ars }, 'm' },
++  { { OPERAND_mx }, 'i' },
++  { { OPERAND_my }, 'i' }
++};
++
++static xtensa_arg_internal Iclass_xt_iclass_mac16al_dd_stateArgs[] = {
++  { { STATE_ACC }, 'm' }
++};
++
++static xtensa_arg_internal Iclass_xt_iclass_mac16_l_args[] = {
++  { { OPERAND_mw }, 'o' },
++  { { OPERAND_ars }, 'm' }
++};
++
++static xtensa_arg_internal Iclass_xt_iclass_rsr_m0_args[] = {
++  { { OPERAND_art }, 'o' },
++  { { OPERAND_mr0 }, 'i' }
++};
++
++static xtensa_arg_internal Iclass_xt_iclass_wsr_m0_args[] = {
++  { { OPERAND_art }, 'i' },
++  { { OPERAND_mr0 }, 'o' }
++};
++
++static xtensa_arg_internal Iclass_xt_iclass_xsr_m0_args[] = {
++  { { OPERAND_art }, 'm' },
++  { { OPERAND_mr0 }, 'm' }
++};
++
++static xtensa_arg_internal Iclass_xt_iclass_rsr_m1_args[] = {
++  { { OPERAND_art }, 'o' },
++  { { OPERAND_mr1 }, 'i' }
++};
++
++static xtensa_arg_internal Iclass_xt_iclass_wsr_m1_args[] = {
++  { { OPERAND_art }, 'i' },
++  { { OPERAND_mr1 }, 'o' }
++};
++
++static xtensa_arg_internal Iclass_xt_iclass_xsr_m1_args[] = {
++  { { OPERAND_art }, 'm' },
++  { { OPERAND_mr1 }, 'm' }
++};
++
++static xtensa_arg_internal Iclass_xt_iclass_rsr_m2_args[] = {
++  { { OPERAND_art }, 'o' },
++  { { OPERAND_mr2 }, 'i' }
++};
++
++static xtensa_arg_internal Iclass_xt_iclass_wsr_m2_args[] = {
++  { { OPERAND_art }, 'i' },
++  { { OPERAND_mr2 }, 'o' }
++};
++
++static xtensa_arg_internal Iclass_xt_iclass_xsr_m2_args[] = {
++  { { OPERAND_art }, 'm' },
++  { { OPERAND_mr2 }, 'm' }
++};
++
++static xtensa_arg_internal Iclass_xt_iclass_rsr_m3_args[] = {
++  { { OPERAND_art }, 'o' },
++  { { OPERAND_mr3 }, 'i' }
++};
++
++static xtensa_arg_internal Iclass_xt_iclass_wsr_m3_args[] = {
++  { { OPERAND_art }, 'i' },
++  { { OPERAND_mr3 }, 'o' }
++};
++
++static xtensa_arg_internal Iclass_xt_iclass_xsr_m3_args[] = {
++  { { OPERAND_art }, 'm' },
++  { { OPERAND_mr3 }, 'm' }
++};
++
++static xtensa_arg_internal Iclass_xt_iclass_rsr_acclo_args[] = {
++  { { OPERAND_art }, 'o' }
++};
++
++static xtensa_arg_internal Iclass_xt_iclass_rsr_acclo_stateArgs[] = {
++  { { STATE_ACC }, 'i' }
++};
++
++static xtensa_arg_internal Iclass_xt_iclass_wsr_acclo_args[] = {
++  { { OPERAND_art }, 'i' }
++};
++
++static xtensa_arg_internal Iclass_xt_iclass_wsr_acclo_stateArgs[] = {
++  { { STATE_ACC }, 'm' }
++};
++
++static xtensa_arg_internal Iclass_xt_iclass_xsr_acclo_args[] = {
++  { { OPERAND_art }, 'm' }
++};
++
++static xtensa_arg_internal Iclass_xt_iclass_xsr_acclo_stateArgs[] = {
++  { { STATE_ACC }, 'm' }
++};
++
++static xtensa_arg_internal Iclass_xt_iclass_rsr_acchi_args[] = {
++  { { OPERAND_art }, 'o' }
++};
++
++static xtensa_arg_internal Iclass_xt_iclass_rsr_acchi_stateArgs[] = {
++  { { STATE_ACC }, 'i' }
++};
++
++static xtensa_arg_internal Iclass_xt_iclass_wsr_acchi_args[] = {
++  { { OPERAND_art }, 'i' }
++};
++
++static xtensa_arg_internal Iclass_xt_iclass_wsr_acchi_stateArgs[] = {
++  { { STATE_ACC }, 'm' }
++};
++
++static xtensa_arg_internal Iclass_xt_iclass_xsr_acchi_args[] = {
++  { { OPERAND_art }, 'm' }
++};
++
++static xtensa_arg_internal Iclass_xt_iclass_xsr_acchi_stateArgs[] = {
++  { { STATE_ACC }, 'm' }
 +};
 +
 +static xtensa_arg_internal Iclass_xt_iclass_rfi_args[] = {
@@ -5380,6 +6117,70 @@ index 000000000000..2f000199b8cd
 +  { { STATE_INTERRUPT }, 'm' }
 +};
 +
++static xtensa_arg_internal Iclass_xt_iclass_icache_args[] = {
++  { { OPERAND_ars }, 'i' },
++  { { OPERAND_uimm8x4 }, 'i' }
++};
++
++static xtensa_arg_internal Iclass_xt_iclass_icache_lock_args[] = {
++  { { OPERAND_ars }, 'i' },
++  { { OPERAND_uimm4x16 }, 'i' }
++};
++
++static xtensa_arg_internal Iclass_xt_iclass_icache_inv_args[] = {
++  { { OPERAND_ars }, 'i' },
++  { { OPERAND_uimm8x4 }, 'i' }
++};
++
++static xtensa_arg_internal Iclass_xt_iclass_licx_args[] = {
++  { { OPERAND_art }, 'o' },
++  { { OPERAND_ars }, 'i' }
++};
++
++static xtensa_arg_internal Iclass_xt_iclass_sicx_args[] = {
++  { { OPERAND_art }, 'i' },
++  { { OPERAND_ars }, 'i' }
++};
++
++static xtensa_arg_internal Iclass_xt_iclass_dcache_args[] = {
++  { { OPERAND_ars }, 'i' },
++  { { OPERAND_uimm8x4 }, 'i' }
++};
++
++static xtensa_arg_internal Iclass_xt_iclass_dcache_dyn_args[] = {
++  { { OPERAND_ars }, 'm' }
++};
++
++static xtensa_arg_internal Iclass_xt_iclass_dcache_ind_args[] = {
++  { { OPERAND_ars }, 'i' },
++  { { OPERAND_uimm4x16 }, 'i' }
++};
++
++static xtensa_arg_internal Iclass_xt_iclass_dcache_inv_args[] = {
++  { { OPERAND_ars }, 'i' },
++  { { OPERAND_uimm8x4 }, 'i' }
++};
++
++static xtensa_arg_internal Iclass_xt_iclass_dpf_args[] = {
++  { { OPERAND_ars }, 'i' },
++  { { OPERAND_uimm8x4 }, 'i' }
++};
++
++static xtensa_arg_internal Iclass_xt_iclass_dcache_lock_args[] = {
++  { { OPERAND_ars }, 'i' },
++  { { OPERAND_uimm4x16 }, 'i' }
++};
++
++static xtensa_arg_internal Iclass_xt_iclass_sdct_args[] = {
++  { { OPERAND_art }, 'i' },
++  { { OPERAND_ars }, 'i' }
++};
++
++static xtensa_arg_internal Iclass_xt_iclass_ldct_args[] = {
++  { { OPERAND_art }, 'o' },
++  { { OPERAND_ars }, 'i' }
++};
++
 +static xtensa_arg_internal Iclass_xt_iclass_idtlb_args[] = {
 +  { { OPERAND_ars }, 'i' }
 +};
@@ -5414,6 +6215,12 @@ index 000000000000..2f000199b8cd
 +static xtensa_arg_internal Iclass_xt_iclass_witlb_args[] = {
 +  { { OPERAND_art }, 'i' },
 +  { { OPERAND_ars }, 'i' }
++};
++
++static xtensa_arg_internal Iclass_xt_iclass_clamp_args[] = {
++  { { OPERAND_arr }, 'o' },
++  { { OPERAND_ars }, 'i' },
++  { { OPERAND_tp7 }, 'i' }
 +};
 +
 +static xtensa_arg_internal Iclass_xt_iclass_minmax_args[] = {
@@ -5513,26 +6320,32 @@ index 000000000000..2f000199b8cd
 +  { { OPERAND_art }, 'i' }
 +};
 +
-+static xtensa_arg_internal Iclass_xt_iclass_rsr_eraccess_args[] = {
-+  { { OPERAND_art }, 'o' }
-+};
-+
-+static xtensa_arg_internal Iclass_xt_iclass_wsr_eraccess_args[] = {
-+  { { OPERAND_art }, 'i' }
-+};
-+
-+static xtensa_arg_internal Iclass_xt_iclass_xsr_eraccess_args[] = {
-+  { { OPERAND_art }, 'm' }
-+};
-+
 +static xtensa_arg_internal Iclass_xt_iclass_rer_args[] = {
 +  { { OPERAND_art }, 'o' },
 +  { { OPERAND_ars }, 'i' }
 +};
 +
++static xtensa_arg_internal Iclass_xt_iclass_rer_stateArgs[] = {
++  { { STATE_ERI_RAW_INTERLOCK }, 'i' }
++};
++
++static xtensa_interface Iclass_xt_iclass_rer_intfArgs[] = {
++  INTERFACE_ERI_RD_In,
++  INTERFACE_ERI_RD_Out
++};
++
 +static xtensa_arg_internal Iclass_xt_iclass_wer_args[] = {
 +  { { OPERAND_art }, 'i' },
 +  { { OPERAND_ars }, 'i' }
++};
++
++static xtensa_arg_internal Iclass_xt_iclass_wer_stateArgs[] = {
++  { { STATE_ERI_RAW_INTERLOCK }, 'o' }
++};
++
++static xtensa_interface Iclass_xt_iclass_wer_intfArgs[] = {
++  INTERFACE_ERI_WR_In,
++  INTERFACE_ERI_WR_Out
 +};
 +
 +static xtensa_arg_internal Iclass_rur_expstate_args[] = {
@@ -5691,6 +6504,10 @@ index 000000000000..2f000199b8cd
 +    0, 0, 0, 0 },
 +  { 3, Iclass_xt_iclass_l8i_args,
 +    0, 0, 0, 0 },
++  { 2, Iclass_xt_iclass_loop_args,
++    3, Iclass_xt_iclass_loop_stateArgs, 0, 0 },
++  { 2, Iclass_xt_iclass_loopz_args,
++    3, Iclass_xt_iclass_loopz_stateArgs, 0, 0 },
 +  { 2, Iclass_xt_iclass_movi_args,
 +    0, 0, 0, 0 },
 +  { 3, Iclass_xt_iclass_movz_args,
@@ -5737,6 +6554,24 @@ index 000000000000..2f000199b8cd
 +    1, Iclass_xt_iclass_sync_stateArgs, 0, 0 },
 +  { 2, Iclass_xt_iclass_rsil_args,
 +    6, Iclass_xt_iclass_rsil_stateArgs, 0, 0 },
++  { 1, Iclass_xt_iclass_rsr_lend_args,
++    1, Iclass_xt_iclass_rsr_lend_stateArgs, 0, 0 },
++  { 1, Iclass_xt_iclass_wsr_lend_args,
++    1, Iclass_xt_iclass_wsr_lend_stateArgs, 0, 0 },
++  { 1, Iclass_xt_iclass_xsr_lend_args,
++    1, Iclass_xt_iclass_xsr_lend_stateArgs, 0, 0 },
++  { 1, Iclass_xt_iclass_rsr_lcount_args,
++    1, Iclass_xt_iclass_rsr_lcount_stateArgs, 0, 0 },
++  { 1, Iclass_xt_iclass_wsr_lcount_args,
++    2, Iclass_xt_iclass_wsr_lcount_stateArgs, 0, 0 },
++  { 1, Iclass_xt_iclass_xsr_lcount_args,
++    2, Iclass_xt_iclass_xsr_lcount_stateArgs, 0, 0 },
++  { 1, Iclass_xt_iclass_rsr_lbeg_args,
++    1, Iclass_xt_iclass_rsr_lbeg_stateArgs, 0, 0 },
++  { 1, Iclass_xt_iclass_wsr_lbeg_args,
++    1, Iclass_xt_iclass_wsr_lbeg_stateArgs, 0, 0 },
++  { 1, Iclass_xt_iclass_xsr_lbeg_args,
++    1, Iclass_xt_iclass_xsr_lbeg_stateArgs, 0, 0 },
 +  { 1, Iclass_xt_iclass_rsr_sar_args,
 +    1, Iclass_xt_iclass_rsr_sar_stateArgs, 0, 0 },
 +  { 1, Iclass_xt_iclass_wsr_sar_args,
@@ -5925,12 +6760,68 @@ index 000000000000..2f000199b8cd
 +    1, Iclass_xt_iclass_wsr_vecbase_stateArgs, 0, 0 },
 +  { 1, Iclass_xt_iclass_xsr_vecbase_args,
 +    1, Iclass_xt_iclass_xsr_vecbase_stateArgs, 0, 0 },
-+  { 3, Iclass_xt_iclass_salt_args,
-+    0, 0, 0, 0 },
 +  { 3, Iclass_xt_mul16_args,
 +    0, 0, 0, 0 },
 +  { 3, Iclass_xt_mul32_args,
 +    0, 0, 0, 0 },
++  { 2, Iclass_xt_iclass_mac16_aa_args,
++    1, Iclass_xt_iclass_mac16_aa_stateArgs, 0, 0 },
++  { 2, Iclass_xt_iclass_mac16_ad_args,
++    1, Iclass_xt_iclass_mac16_ad_stateArgs, 0, 0 },
++  { 2, Iclass_xt_iclass_mac16_da_args,
++    1, Iclass_xt_iclass_mac16_da_stateArgs, 0, 0 },
++  { 2, Iclass_xt_iclass_mac16_dd_args,
++    1, Iclass_xt_iclass_mac16_dd_stateArgs, 0, 0 },
++  { 2, Iclass_xt_iclass_mac16a_aa_args,
++    1, Iclass_xt_iclass_mac16a_aa_stateArgs, 0, 0 },
++  { 2, Iclass_xt_iclass_mac16a_ad_args,
++    1, Iclass_xt_iclass_mac16a_ad_stateArgs, 0, 0 },
++  { 2, Iclass_xt_iclass_mac16a_da_args,
++    1, Iclass_xt_iclass_mac16a_da_stateArgs, 0, 0 },
++  { 2, Iclass_xt_iclass_mac16a_dd_args,
++    1, Iclass_xt_iclass_mac16a_dd_stateArgs, 0, 0 },
++  { 4, Iclass_xt_iclass_mac16al_da_args,
++    1, Iclass_xt_iclass_mac16al_da_stateArgs, 0, 0 },
++  { 4, Iclass_xt_iclass_mac16al_dd_args,
++    1, Iclass_xt_iclass_mac16al_dd_stateArgs, 0, 0 },
++  { 2, Iclass_xt_iclass_mac16_l_args,
++    0, 0, 0, 0 },
++  { 2, Iclass_xt_iclass_rsr_m0_args,
++    0, 0, 0, 0 },
++  { 2, Iclass_xt_iclass_wsr_m0_args,
++    0, 0, 0, 0 },
++  { 2, Iclass_xt_iclass_xsr_m0_args,
++    0, 0, 0, 0 },
++  { 2, Iclass_xt_iclass_rsr_m1_args,
++    0, 0, 0, 0 },
++  { 2, Iclass_xt_iclass_wsr_m1_args,
++    0, 0, 0, 0 },
++  { 2, Iclass_xt_iclass_xsr_m1_args,
++    0, 0, 0, 0 },
++  { 2, Iclass_xt_iclass_rsr_m2_args,
++    0, 0, 0, 0 },
++  { 2, Iclass_xt_iclass_wsr_m2_args,
++    0, 0, 0, 0 },
++  { 2, Iclass_xt_iclass_xsr_m2_args,
++    0, 0, 0, 0 },
++  { 2, Iclass_xt_iclass_rsr_m3_args,
++    0, 0, 0, 0 },
++  { 2, Iclass_xt_iclass_wsr_m3_args,
++    0, 0, 0, 0 },
++  { 2, Iclass_xt_iclass_xsr_m3_args,
++    0, 0, 0, 0 },
++  { 1, Iclass_xt_iclass_rsr_acclo_args,
++    1, Iclass_xt_iclass_rsr_acclo_stateArgs, 0, 0 },
++  { 1, Iclass_xt_iclass_wsr_acclo_args,
++    1, Iclass_xt_iclass_wsr_acclo_stateArgs, 0, 0 },
++  { 1, Iclass_xt_iclass_xsr_acclo_args,
++    1, Iclass_xt_iclass_xsr_acclo_stateArgs, 0, 0 },
++  { 1, Iclass_xt_iclass_rsr_acchi_args,
++    1, Iclass_xt_iclass_rsr_acchi_stateArgs, 0, 0 },
++  { 1, Iclass_xt_iclass_wsr_acchi_args,
++    1, Iclass_xt_iclass_wsr_acchi_stateArgs, 0, 0 },
++  { 1, Iclass_xt_iclass_xsr_acchi_args,
++    1, Iclass_xt_iclass_xsr_acchi_stateArgs, 0, 0 },
 +  { 1, Iclass_xt_iclass_rfi_args,
 +    20, Iclass_xt_iclass_rfi_stateArgs, 0, 0 },
 +  { 1, Iclass_xt_iclass_wait_args,
@@ -6051,6 +6942,32 @@ index 000000000000..2f000199b8cd
 +    2, Iclass_xt_iclass_wsr_ccompare2_stateArgs, 0, 0 },
 +  { 1, Iclass_xt_iclass_xsr_ccompare2_args,
 +    2, Iclass_xt_iclass_xsr_ccompare2_stateArgs, 0, 0 },
++  { 2, Iclass_xt_iclass_icache_args,
++    0, 0, 0, 0 },
++  { 2, Iclass_xt_iclass_icache_lock_args,
++    0, 0, 0, 0 },
++  { 2, Iclass_xt_iclass_icache_inv_args,
++    0, 0, 0, 0 },
++  { 2, Iclass_xt_iclass_licx_args,
++    0, 0, 0, 0 },
++  { 2, Iclass_xt_iclass_sicx_args,
++    0, 0, 0, 0 },
++  { 2, Iclass_xt_iclass_dcache_args,
++    0, 0, 0, 0 },
++  { 1, Iclass_xt_iclass_dcache_dyn_args,
++    0, 0, 0, 0 },
++  { 2, Iclass_xt_iclass_dcache_ind_args,
++    0, 0, 0, 0 },
++  { 2, Iclass_xt_iclass_dcache_inv_args,
++    0, 0, 0, 0 },
++  { 2, Iclass_xt_iclass_dpf_args,
++    0, 0, 0, 0 },
++  { 2, Iclass_xt_iclass_dcache_lock_args,
++    0, 0, 0, 0 },
++  { 2, Iclass_xt_iclass_sdct_args,
++    0, 0, 0, 0 },
++  { 2, Iclass_xt_iclass_ldct_args,
++    0, 0, 0, 0 },
 +  { 1, Iclass_xt_iclass_idtlb_args,
 +    1, Iclass_xt_iclass_idtlb_stateArgs, 0, 0 },
 +  { 2, Iclass_xt_iclass_rdtlb_args,
@@ -6062,6 +6979,8 @@ index 000000000000..2f000199b8cd
 +  { 2, Iclass_xt_iclass_ritlb_args,
 +    0, 0, 0, 0 },
 +  { 2, Iclass_xt_iclass_witlb_args,
++    0, 0, 0, 0 },
++  { 3, Iclass_xt_iclass_clamp_args,
 +    0, 0, 0, 0 },
 +  { 3, Iclass_xt_iclass_minmax_args,
 +    0, 0, 0, 0 },
@@ -6089,16 +7008,10 @@ index 000000000000..2f000199b8cd
 +    2, Iclass_xt_iclass_xsr_atomctl_stateArgs, 0, 0 },
 +  { 3, Iclass_xt_iclass_div_args,
 +    0, 0, 0, 0 },
-+  { 1, Iclass_xt_iclass_rsr_eraccess_args,
-+    0, 0, 0, 0 },
-+  { 1, Iclass_xt_iclass_wsr_eraccess_args,
-+    0, 0, 0, 0 },
-+  { 1, Iclass_xt_iclass_xsr_eraccess_args,
-+    0, 0, 0, 0 },
 +  { 2, Iclass_xt_iclass_rer_args,
-+    0, 0, 0, 0 },
++    1, Iclass_xt_iclass_rer_stateArgs, 2, Iclass_xt_iclass_rer_intfArgs },
 +  { 2, Iclass_xt_iclass_wer_args,
-+    0, 0, 0, 0 },
++    1, Iclass_xt_iclass_wer_stateArgs, 2, Iclass_xt_iclass_wer_intfArgs },
 +  { 1, Iclass_rur_expstate_args,
 +    1, Iclass_rur_expstate_stateArgs, 0, 0 },
 +  { 1, Iclass_wur_expstate_args,
@@ -6167,6 +7080,8 @@ index 000000000000..2f000199b8cd
 +  ICLASS_xt_iclass_l32i,
 +  ICLASS_xt_iclass_l32r,
 +  ICLASS_xt_iclass_l8i,
++  ICLASS_xt_iclass_loop,
++  ICLASS_xt_iclass_loopz,
 +  ICLASS_xt_iclass_movi,
 +  ICLASS_xt_iclass_movz,
 +  ICLASS_xt_iclass_neg,
@@ -6190,6 +7105,15 @@ index 000000000000..2f000199b8cd
 +  ICLASS_xt_iclass_isync,
 +  ICLASS_xt_iclass_sync,
 +  ICLASS_xt_iclass_rsil,
++  ICLASS_xt_iclass_rsr_lend,
++  ICLASS_xt_iclass_wsr_lend,
++  ICLASS_xt_iclass_xsr_lend,
++  ICLASS_xt_iclass_rsr_lcount,
++  ICLASS_xt_iclass_wsr_lcount,
++  ICLASS_xt_iclass_xsr_lcount,
++  ICLASS_xt_iclass_rsr_lbeg,
++  ICLASS_xt_iclass_wsr_lbeg,
++  ICLASS_xt_iclass_xsr_lbeg,
 +  ICLASS_xt_iclass_rsr_sar,
 +  ICLASS_xt_iclass_wsr_sar,
 +  ICLASS_xt_iclass_xsr_sar,
@@ -6284,9 +7208,37 @@ index 000000000000..2f000199b8cd
 +  ICLASS_xt_iclass_rsr_vecbase,
 +  ICLASS_xt_iclass_wsr_vecbase,
 +  ICLASS_xt_iclass_xsr_vecbase,
-+  ICLASS_xt_iclass_salt,
 +  ICLASS_xt_mul16,
 +  ICLASS_xt_mul32,
++  ICLASS_xt_iclass_mac16_aa,
++  ICLASS_xt_iclass_mac16_ad,
++  ICLASS_xt_iclass_mac16_da,
++  ICLASS_xt_iclass_mac16_dd,
++  ICLASS_xt_iclass_mac16a_aa,
++  ICLASS_xt_iclass_mac16a_ad,
++  ICLASS_xt_iclass_mac16a_da,
++  ICLASS_xt_iclass_mac16a_dd,
++  ICLASS_xt_iclass_mac16al_da,
++  ICLASS_xt_iclass_mac16al_dd,
++  ICLASS_xt_iclass_mac16_l,
++  ICLASS_xt_iclass_rsr_m0,
++  ICLASS_xt_iclass_wsr_m0,
++  ICLASS_xt_iclass_xsr_m0,
++  ICLASS_xt_iclass_rsr_m1,
++  ICLASS_xt_iclass_wsr_m1,
++  ICLASS_xt_iclass_xsr_m1,
++  ICLASS_xt_iclass_rsr_m2,
++  ICLASS_xt_iclass_wsr_m2,
++  ICLASS_xt_iclass_xsr_m2,
++  ICLASS_xt_iclass_rsr_m3,
++  ICLASS_xt_iclass_wsr_m3,
++  ICLASS_xt_iclass_xsr_m3,
++  ICLASS_xt_iclass_rsr_acclo,
++  ICLASS_xt_iclass_wsr_acclo,
++  ICLASS_xt_iclass_xsr_acclo,
++  ICLASS_xt_iclass_rsr_acchi,
++  ICLASS_xt_iclass_wsr_acchi,
++  ICLASS_xt_iclass_xsr_acchi,
 +  ICLASS_xt_iclass_rfi,
 +  ICLASS_xt_iclass_wait,
 +  ICLASS_xt_iclass_rsr_interrupt,
@@ -6347,12 +7299,26 @@ index 000000000000..2f000199b8cd
 +  ICLASS_xt_iclass_rsr_ccompare2,
 +  ICLASS_xt_iclass_wsr_ccompare2,
 +  ICLASS_xt_iclass_xsr_ccompare2,
++  ICLASS_xt_iclass_icache,
++  ICLASS_xt_iclass_icache_lock,
++  ICLASS_xt_iclass_icache_inv,
++  ICLASS_xt_iclass_licx,
++  ICLASS_xt_iclass_sicx,
++  ICLASS_xt_iclass_dcache,
++  ICLASS_xt_iclass_dcache_dyn,
++  ICLASS_xt_iclass_dcache_ind,
++  ICLASS_xt_iclass_dcache_inv,
++  ICLASS_xt_iclass_dpf,
++  ICLASS_xt_iclass_dcache_lock,
++  ICLASS_xt_iclass_sdct,
++  ICLASS_xt_iclass_ldct,
 +  ICLASS_xt_iclass_idtlb,
 +  ICLASS_xt_iclass_rdtlb,
 +  ICLASS_xt_iclass_wdtlb,
 +  ICLASS_xt_iclass_iitlb,
 +  ICLASS_xt_iclass_ritlb,
 +  ICLASS_xt_iclass_witlb,
++  ICLASS_xt_iclass_clamp,
 +  ICLASS_xt_iclass_minmax,
 +  ICLASS_xt_iclass_nsa,
 +  ICLASS_xt_iclass_sx,
@@ -6366,9 +7332,6 @@ index 000000000000..2f000199b8cd
 +  ICLASS_xt_iclass_wsr_atomctl,
 +  ICLASS_xt_iclass_xsr_atomctl,
 +  ICLASS_xt_iclass_div,
-+  ICLASS_xt_iclass_rsr_eraccess,
-+  ICLASS_xt_iclass_wsr_eraccess,
-+  ICLASS_xt_iclass_xsr_eraccess,
 +  ICLASS_xt_iclass_rer,
 +  ICLASS_xt_iclass_wer,
 +  ICLASS_rur_expstate,
@@ -6888,6 +7851,24 @@ index 000000000000..2f000199b8cd
 +}
 +
 +static void
++Opcode_loop_Slot_inst_encode (xtensa_insnbuf slotbuf)
++{
++  slotbuf[0] = 0x8076;
++}
++
++static void
++Opcode_loopnez_Slot_inst_encode (xtensa_insnbuf slotbuf)
++{
++  slotbuf[0] = 0x9076;
++}
++
++static void
++Opcode_loopgtz_Slot_inst_encode (xtensa_insnbuf slotbuf)
++{
++  slotbuf[0] = 0xa076;
++}
++
++static void
 +Opcode_movi_Slot_inst_encode (xtensa_insnbuf slotbuf)
 +{
 +  slotbuf[0] = 0xa002;
@@ -7083,6 +8064,60 @@ index 000000000000..2f000199b8cd
 +Opcode_rsil_Slot_inst_encode (xtensa_insnbuf slotbuf)
 +{
 +  slotbuf[0] = 0x6000;
++}
++
++static void
++Opcode_rsr_lend_Slot_inst_encode (xtensa_insnbuf slotbuf)
++{
++  slotbuf[0] = 0x30100;
++}
++
++static void
++Opcode_wsr_lend_Slot_inst_encode (xtensa_insnbuf slotbuf)
++{
++  slotbuf[0] = 0x130100;
++}
++
++static void
++Opcode_xsr_lend_Slot_inst_encode (xtensa_insnbuf slotbuf)
++{
++  slotbuf[0] = 0x610100;
++}
++
++static void
++Opcode_rsr_lcount_Slot_inst_encode (xtensa_insnbuf slotbuf)
++{
++  slotbuf[0] = 0x30200;
++}
++
++static void
++Opcode_wsr_lcount_Slot_inst_encode (xtensa_insnbuf slotbuf)
++{
++  slotbuf[0] = 0x130200;
++}
++
++static void
++Opcode_xsr_lcount_Slot_inst_encode (xtensa_insnbuf slotbuf)
++{
++  slotbuf[0] = 0x610200;
++}
++
++static void
++Opcode_rsr_lbeg_Slot_inst_encode (xtensa_insnbuf slotbuf)
++{
++  slotbuf[0] = 0x30000;
++}
++
++static void
++Opcode_wsr_lbeg_Slot_inst_encode (xtensa_insnbuf slotbuf)
++{
++  slotbuf[0] = 0x130000;
++}
++
++static void
++Opcode_xsr_lbeg_Slot_inst_encode (xtensa_insnbuf slotbuf)
++{
++  slotbuf[0] = 0x610000;
 +}
 +
 +static void
@@ -7650,18 +8685,6 @@ index 000000000000..2f000199b8cd
 +}
 +
 +static void
-+Opcode_salt_Slot_inst_encode (xtensa_insnbuf slotbuf)
-+{
-+  slotbuf[0] = 0x720000;
-+}
-+
-+static void
-+Opcode_saltu_Slot_inst_encode (xtensa_insnbuf slotbuf)
-+{
-+  slotbuf[0] = 0x620000;
-+}
-+
-+static void
 +Opcode_mul16u_Slot_inst_encode (xtensa_insnbuf slotbuf)
 +{
 +  slotbuf[0] = 0xc10000;
@@ -7677,6 +8700,534 @@ index 000000000000..2f000199b8cd
 +Opcode_mull_Slot_inst_encode (xtensa_insnbuf slotbuf)
 +{
 +  slotbuf[0] = 0x820000;
++}
++
++static void
++Opcode_mul_aa_ll_Slot_inst_encode (xtensa_insnbuf slotbuf)
++{
++  slotbuf[0] = 0x740004;
++}
++
++static void
++Opcode_mul_aa_hl_Slot_inst_encode (xtensa_insnbuf slotbuf)
++{
++  slotbuf[0] = 0x750004;
++}
++
++static void
++Opcode_mul_aa_lh_Slot_inst_encode (xtensa_insnbuf slotbuf)
++{
++  slotbuf[0] = 0x760004;
++}
++
++static void
++Opcode_mul_aa_hh_Slot_inst_encode (xtensa_insnbuf slotbuf)
++{
++  slotbuf[0] = 0x770004;
++}
++
++static void
++Opcode_umul_aa_ll_Slot_inst_encode (xtensa_insnbuf slotbuf)
++{
++  slotbuf[0] = 0x700004;
++}
++
++static void
++Opcode_umul_aa_hl_Slot_inst_encode (xtensa_insnbuf slotbuf)
++{
++  slotbuf[0] = 0x710004;
++}
++
++static void
++Opcode_umul_aa_lh_Slot_inst_encode (xtensa_insnbuf slotbuf)
++{
++  slotbuf[0] = 0x720004;
++}
++
++static void
++Opcode_umul_aa_hh_Slot_inst_encode (xtensa_insnbuf slotbuf)
++{
++  slotbuf[0] = 0x730004;
++}
++
++static void
++Opcode_mul_ad_ll_Slot_inst_encode (xtensa_insnbuf slotbuf)
++{
++  slotbuf[0] = 0x340004;
++}
++
++static void
++Opcode_mul_ad_hl_Slot_inst_encode (xtensa_insnbuf slotbuf)
++{
++  slotbuf[0] = 0x350004;
++}
++
++static void
++Opcode_mul_ad_lh_Slot_inst_encode (xtensa_insnbuf slotbuf)
++{
++  slotbuf[0] = 0x360004;
++}
++
++static void
++Opcode_mul_ad_hh_Slot_inst_encode (xtensa_insnbuf slotbuf)
++{
++  slotbuf[0] = 0x370004;
++}
++
++static void
++Opcode_mul_da_ll_Slot_inst_encode (xtensa_insnbuf slotbuf)
++{
++  slotbuf[0] = 0x640004;
++}
++
++static void
++Opcode_mul_da_hl_Slot_inst_encode (xtensa_insnbuf slotbuf)
++{
++  slotbuf[0] = 0x650004;
++}
++
++static void
++Opcode_mul_da_lh_Slot_inst_encode (xtensa_insnbuf slotbuf)
++{
++  slotbuf[0] = 0x660004;
++}
++
++static void
++Opcode_mul_da_hh_Slot_inst_encode (xtensa_insnbuf slotbuf)
++{
++  slotbuf[0] = 0x670004;
++}
++
++static void
++Opcode_mul_dd_ll_Slot_inst_encode (xtensa_insnbuf slotbuf)
++{
++  slotbuf[0] = 0x240004;
++}
++
++static void
++Opcode_mul_dd_hl_Slot_inst_encode (xtensa_insnbuf slotbuf)
++{
++  slotbuf[0] = 0x250004;
++}
++
++static void
++Opcode_mul_dd_lh_Slot_inst_encode (xtensa_insnbuf slotbuf)
++{
++  slotbuf[0] = 0x260004;
++}
++
++static void
++Opcode_mul_dd_hh_Slot_inst_encode (xtensa_insnbuf slotbuf)
++{
++  slotbuf[0] = 0x270004;
++}
++
++static void
++Opcode_mula_aa_ll_Slot_inst_encode (xtensa_insnbuf slotbuf)
++{
++  slotbuf[0] = 0x780004;
++}
++
++static void
++Opcode_mula_aa_hl_Slot_inst_encode (xtensa_insnbuf slotbuf)
++{
++  slotbuf[0] = 0x790004;
++}
++
++static void
++Opcode_mula_aa_lh_Slot_inst_encode (xtensa_insnbuf slotbuf)
++{
++  slotbuf[0] = 0x7a0004;
++}
++
++static void
++Opcode_mula_aa_hh_Slot_inst_encode (xtensa_insnbuf slotbuf)
++{
++  slotbuf[0] = 0x7b0004;
++}
++
++static void
++Opcode_muls_aa_ll_Slot_inst_encode (xtensa_insnbuf slotbuf)
++{
++  slotbuf[0] = 0x7c0004;
++}
++
++static void
++Opcode_muls_aa_hl_Slot_inst_encode (xtensa_insnbuf slotbuf)
++{
++  slotbuf[0] = 0x7d0004;
++}
++
++static void
++Opcode_muls_aa_lh_Slot_inst_encode (xtensa_insnbuf slotbuf)
++{
++  slotbuf[0] = 0x7e0004;
++}
++
++static void
++Opcode_muls_aa_hh_Slot_inst_encode (xtensa_insnbuf slotbuf)
++{
++  slotbuf[0] = 0x7f0004;
++}
++
++static void
++Opcode_mula_ad_ll_Slot_inst_encode (xtensa_insnbuf slotbuf)
++{
++  slotbuf[0] = 0x380004;
++}
++
++static void
++Opcode_mula_ad_hl_Slot_inst_encode (xtensa_insnbuf slotbuf)
++{
++  slotbuf[0] = 0x390004;
++}
++
++static void
++Opcode_mula_ad_lh_Slot_inst_encode (xtensa_insnbuf slotbuf)
++{
++  slotbuf[0] = 0x3a0004;
++}
++
++static void
++Opcode_mula_ad_hh_Slot_inst_encode (xtensa_insnbuf slotbuf)
++{
++  slotbuf[0] = 0x3b0004;
++}
++
++static void
++Opcode_muls_ad_ll_Slot_inst_encode (xtensa_insnbuf slotbuf)
++{
++  slotbuf[0] = 0x3c0004;
++}
++
++static void
++Opcode_muls_ad_hl_Slot_inst_encode (xtensa_insnbuf slotbuf)
++{
++  slotbuf[0] = 0x3d0004;
++}
++
++static void
++Opcode_muls_ad_lh_Slot_inst_encode (xtensa_insnbuf slotbuf)
++{
++  slotbuf[0] = 0x3e0004;
++}
++
++static void
++Opcode_muls_ad_hh_Slot_inst_encode (xtensa_insnbuf slotbuf)
++{
++  slotbuf[0] = 0x3f0004;
++}
++
++static void
++Opcode_mula_da_ll_Slot_inst_encode (xtensa_insnbuf slotbuf)
++{
++  slotbuf[0] = 0x680004;
++}
++
++static void
++Opcode_mula_da_hl_Slot_inst_encode (xtensa_insnbuf slotbuf)
++{
++  slotbuf[0] = 0x690004;
++}
++
++static void
++Opcode_mula_da_lh_Slot_inst_encode (xtensa_insnbuf slotbuf)
++{
++  slotbuf[0] = 0x6a0004;
++}
++
++static void
++Opcode_mula_da_hh_Slot_inst_encode (xtensa_insnbuf slotbuf)
++{
++  slotbuf[0] = 0x6b0004;
++}
++
++static void
++Opcode_muls_da_ll_Slot_inst_encode (xtensa_insnbuf slotbuf)
++{
++  slotbuf[0] = 0x6c0004;
++}
++
++static void
++Opcode_muls_da_hl_Slot_inst_encode (xtensa_insnbuf slotbuf)
++{
++  slotbuf[0] = 0x6d0004;
++}
++
++static void
++Opcode_muls_da_lh_Slot_inst_encode (xtensa_insnbuf slotbuf)
++{
++  slotbuf[0] = 0x6e0004;
++}
++
++static void
++Opcode_muls_da_hh_Slot_inst_encode (xtensa_insnbuf slotbuf)
++{
++  slotbuf[0] = 0x6f0004;
++}
++
++static void
++Opcode_mula_dd_ll_Slot_inst_encode (xtensa_insnbuf slotbuf)
++{
++  slotbuf[0] = 0x280004;
++}
++
++static void
++Opcode_mula_dd_hl_Slot_inst_encode (xtensa_insnbuf slotbuf)
++{
++  slotbuf[0] = 0x290004;
++}
++
++static void
++Opcode_mula_dd_lh_Slot_inst_encode (xtensa_insnbuf slotbuf)
++{
++  slotbuf[0] = 0x2a0004;
++}
++
++static void
++Opcode_mula_dd_hh_Slot_inst_encode (xtensa_insnbuf slotbuf)
++{
++  slotbuf[0] = 0x2b0004;
++}
++
++static void
++Opcode_muls_dd_ll_Slot_inst_encode (xtensa_insnbuf slotbuf)
++{
++  slotbuf[0] = 0x2c0004;
++}
++
++static void
++Opcode_muls_dd_hl_Slot_inst_encode (xtensa_insnbuf slotbuf)
++{
++  slotbuf[0] = 0x2d0004;
++}
++
++static void
++Opcode_muls_dd_lh_Slot_inst_encode (xtensa_insnbuf slotbuf)
++{
++  slotbuf[0] = 0x2e0004;
++}
++
++static void
++Opcode_muls_dd_hh_Slot_inst_encode (xtensa_insnbuf slotbuf)
++{
++  slotbuf[0] = 0x2f0004;
++}
++
++static void
++Opcode_mula_da_ll_lddec_Slot_inst_encode (xtensa_insnbuf slotbuf)
++{
++  slotbuf[0] = 0x580004;
++}
++
++static void
++Opcode_mula_da_ll_ldinc_Slot_inst_encode (xtensa_insnbuf slotbuf)
++{
++  slotbuf[0] = 0x480004;
++}
++
++static void
++Opcode_mula_da_hl_lddec_Slot_inst_encode (xtensa_insnbuf slotbuf)
++{
++  slotbuf[0] = 0x590004;
++}
++
++static void
++Opcode_mula_da_hl_ldinc_Slot_inst_encode (xtensa_insnbuf slotbuf)
++{
++  slotbuf[0] = 0x490004;
++}
++
++static void
++Opcode_mula_da_lh_lddec_Slot_inst_encode (xtensa_insnbuf slotbuf)
++{
++  slotbuf[0] = 0x5a0004;
++}
++
++static void
++Opcode_mula_da_lh_ldinc_Slot_inst_encode (xtensa_insnbuf slotbuf)
++{
++  slotbuf[0] = 0x4a0004;
++}
++
++static void
++Opcode_mula_da_hh_lddec_Slot_inst_encode (xtensa_insnbuf slotbuf)
++{
++  slotbuf[0] = 0x5b0004;
++}
++
++static void
++Opcode_mula_da_hh_ldinc_Slot_inst_encode (xtensa_insnbuf slotbuf)
++{
++  slotbuf[0] = 0x4b0004;
++}
++
++static void
++Opcode_mula_dd_ll_lddec_Slot_inst_encode (xtensa_insnbuf slotbuf)
++{
++  slotbuf[0] = 0x180004;
++}
++
++static void
++Opcode_mula_dd_ll_ldinc_Slot_inst_encode (xtensa_insnbuf slotbuf)
++{
++  slotbuf[0] = 0x80004;
++}
++
++static void
++Opcode_mula_dd_hl_lddec_Slot_inst_encode (xtensa_insnbuf slotbuf)
++{
++  slotbuf[0] = 0x190004;
++}
++
++static void
++Opcode_mula_dd_hl_ldinc_Slot_inst_encode (xtensa_insnbuf slotbuf)
++{
++  slotbuf[0] = 0x90004;
++}
++
++static void
++Opcode_mula_dd_lh_lddec_Slot_inst_encode (xtensa_insnbuf slotbuf)
++{
++  slotbuf[0] = 0x1a0004;
++}
++
++static void
++Opcode_mula_dd_lh_ldinc_Slot_inst_encode (xtensa_insnbuf slotbuf)
++{
++  slotbuf[0] = 0xa0004;
++}
++
++static void
++Opcode_mula_dd_hh_lddec_Slot_inst_encode (xtensa_insnbuf slotbuf)
++{
++  slotbuf[0] = 0x1b0004;
++}
++
++static void
++Opcode_mula_dd_hh_ldinc_Slot_inst_encode (xtensa_insnbuf slotbuf)
++{
++  slotbuf[0] = 0xb0004;
++}
++
++static void
++Opcode_lddec_Slot_inst_encode (xtensa_insnbuf slotbuf)
++{
++  slotbuf[0] = 0x900004;
++}
++
++static void
++Opcode_ldinc_Slot_inst_encode (xtensa_insnbuf slotbuf)
++{
++  slotbuf[0] = 0x800004;
++}
++
++static void
++Opcode_rsr_m0_Slot_inst_encode (xtensa_insnbuf slotbuf)
++{
++  slotbuf[0] = 0x32000;
++}
++
++static void
++Opcode_wsr_m0_Slot_inst_encode (xtensa_insnbuf slotbuf)
++{
++  slotbuf[0] = 0x132000;
++}
++
++static void
++Opcode_xsr_m0_Slot_inst_encode (xtensa_insnbuf slotbuf)
++{
++  slotbuf[0] = 0x612000;
++}
++
++static void
++Opcode_rsr_m1_Slot_inst_encode (xtensa_insnbuf slotbuf)
++{
++  slotbuf[0] = 0x32100;
++}
++
++static void
++Opcode_wsr_m1_Slot_inst_encode (xtensa_insnbuf slotbuf)
++{
++  slotbuf[0] = 0x132100;
++}
++
++static void
++Opcode_xsr_m1_Slot_inst_encode (xtensa_insnbuf slotbuf)
++{
++  slotbuf[0] = 0x612100;
++}
++
++static void
++Opcode_rsr_m2_Slot_inst_encode (xtensa_insnbuf slotbuf)
++{
++  slotbuf[0] = 0x32200;
++}
++
++static void
++Opcode_wsr_m2_Slot_inst_encode (xtensa_insnbuf slotbuf)
++{
++  slotbuf[0] = 0x132200;
++}
++
++static void
++Opcode_xsr_m2_Slot_inst_encode (xtensa_insnbuf slotbuf)
++{
++  slotbuf[0] = 0x612200;
++}
++
++static void
++Opcode_rsr_m3_Slot_inst_encode (xtensa_insnbuf slotbuf)
++{
++  slotbuf[0] = 0x32300;
++}
++
++static void
++Opcode_wsr_m3_Slot_inst_encode (xtensa_insnbuf slotbuf)
++{
++  slotbuf[0] = 0x132300;
++}
++
++static void
++Opcode_xsr_m3_Slot_inst_encode (xtensa_insnbuf slotbuf)
++{
++  slotbuf[0] = 0x612300;
++}
++
++static void
++Opcode_rsr_acclo_Slot_inst_encode (xtensa_insnbuf slotbuf)
++{
++  slotbuf[0] = 0x31000;
++}
++
++static void
++Opcode_wsr_acclo_Slot_inst_encode (xtensa_insnbuf slotbuf)
++{
++  slotbuf[0] = 0x131000;
++}
++
++static void
++Opcode_xsr_acclo_Slot_inst_encode (xtensa_insnbuf slotbuf)
++{
++  slotbuf[0] = 0x611000;
++}
++
++static void
++Opcode_rsr_acchi_Slot_inst_encode (xtensa_insnbuf slotbuf)
++{
++  slotbuf[0] = 0x31100;
++}
++
++static void
++Opcode_wsr_acchi_Slot_inst_encode (xtensa_insnbuf slotbuf)
++{
++  slotbuf[0] = 0x131100;
++}
++
++static void
++Opcode_xsr_acchi_Slot_inst_encode (xtensa_insnbuf slotbuf)
++{
++  slotbuf[0] = 0x611100;
 +}
 +
 +static void
@@ -8040,6 +9591,162 @@ index 000000000000..2f000199b8cd
 +}
 +
 +static void
++Opcode_ipf_Slot_inst_encode (xtensa_insnbuf slotbuf)
++{
++  slotbuf[0] = 0x70c2;
++}
++
++static void
++Opcode_ihi_Slot_inst_encode (xtensa_insnbuf slotbuf)
++{
++  slotbuf[0] = 0x70e2;
++}
++
++static void
++Opcode_ipfl_Slot_inst_encode (xtensa_insnbuf slotbuf)
++{
++  slotbuf[0] = 0x70d2;
++}
++
++static void
++Opcode_ihu_Slot_inst_encode (xtensa_insnbuf slotbuf)
++{
++  slotbuf[0] = 0x270d2;
++}
++
++static void
++Opcode_iiu_Slot_inst_encode (xtensa_insnbuf slotbuf)
++{
++  slotbuf[0] = 0x370d2;
++}
++
++static void
++Opcode_iii_Slot_inst_encode (xtensa_insnbuf slotbuf)
++{
++  slotbuf[0] = 0x70f2;
++}
++
++static void
++Opcode_lict_Slot_inst_encode (xtensa_insnbuf slotbuf)
++{
++  slotbuf[0] = 0xf10000;
++}
++
++static void
++Opcode_licw_Slot_inst_encode (xtensa_insnbuf slotbuf)
++{
++  slotbuf[0] = 0xf12000;
++}
++
++static void
++Opcode_sict_Slot_inst_encode (xtensa_insnbuf slotbuf)
++{
++  slotbuf[0] = 0xf11000;
++}
++
++static void
++Opcode_sicw_Slot_inst_encode (xtensa_insnbuf slotbuf)
++{
++  slotbuf[0] = 0xf13000;
++}
++
++static void
++Opcode_dhwb_Slot_inst_encode (xtensa_insnbuf slotbuf)
++{
++  slotbuf[0] = 0x7042;
++}
++
++static void
++Opcode_dhwbi_Slot_inst_encode (xtensa_insnbuf slotbuf)
++{
++  slotbuf[0] = 0x7052;
++}
++
++static void
++Opcode_diwbui_p_Slot_inst_encode (xtensa_insnbuf slotbuf)
++{
++  slotbuf[0] = 0xf7082;
++}
++
++static void
++Opcode_diwb_Slot_inst_encode (xtensa_insnbuf slotbuf)
++{
++  slotbuf[0] = 0x47082;
++}
++
++static void
++Opcode_diwbi_Slot_inst_encode (xtensa_insnbuf slotbuf)
++{
++  slotbuf[0] = 0x57082;
++}
++
++static void
++Opcode_dhi_Slot_inst_encode (xtensa_insnbuf slotbuf)
++{
++  slotbuf[0] = 0x7062;
++}
++
++static void
++Opcode_dii_Slot_inst_encode (xtensa_insnbuf slotbuf)
++{
++  slotbuf[0] = 0x7072;
++}
++
++static void
++Opcode_dpfr_Slot_inst_encode (xtensa_insnbuf slotbuf)
++{
++  slotbuf[0] = 0x7002;
++}
++
++static void
++Opcode_dpfw_Slot_inst_encode (xtensa_insnbuf slotbuf)
++{
++  slotbuf[0] = 0x7012;
++}
++
++static void
++Opcode_dpfro_Slot_inst_encode (xtensa_insnbuf slotbuf)
++{
++  slotbuf[0] = 0x7022;
++}
++
++static void
++Opcode_dpfwo_Slot_inst_encode (xtensa_insnbuf slotbuf)
++{
++  slotbuf[0] = 0x7032;
++}
++
++static void
++Opcode_dpfl_Slot_inst_encode (xtensa_insnbuf slotbuf)
++{
++  slotbuf[0] = 0x7082;
++}
++
++static void
++Opcode_dhu_Slot_inst_encode (xtensa_insnbuf slotbuf)
++{
++  slotbuf[0] = 0x27082;
++}
++
++static void
++Opcode_diu_Slot_inst_encode (xtensa_insnbuf slotbuf)
++{
++  slotbuf[0] = 0x37082;
++}
++
++static void
++Opcode_sdct_Slot_inst_encode (xtensa_insnbuf slotbuf)
++{
++  slotbuf[0] = 0xf19000;
++}
++
++static void
++Opcode_ldct_Slot_inst_encode (xtensa_insnbuf slotbuf)
++{
++  slotbuf[0] = 0xf18000;
++}
++
++static void
 +Opcode_idtlb_Slot_inst_encode (xtensa_insnbuf slotbuf)
 +{
 +  slotbuf[0] = 0x50c000;
@@ -8097,6 +9804,12 @@ index 000000000000..2f000199b8cd
 +Opcode_witlb_Slot_inst_encode (xtensa_insnbuf slotbuf)
 +{
 +  slotbuf[0] = 0x506000;
++}
++
++static void
++Opcode_clamps_Slot_inst_encode (xtensa_insnbuf slotbuf)
++{
++  slotbuf[0] = 0x330000;
 +}
 +
 +static void
@@ -8217,24 +9930,6 @@ index 000000000000..2f000199b8cd
 +Opcode_rems_Slot_inst_encode (xtensa_insnbuf slotbuf)
 +{
 +  slotbuf[0] = 0xf20000;
-+}
-+
-+static void
-+Opcode_rsr_eraccess_Slot_inst_encode (xtensa_insnbuf slotbuf)
-+{
-+  slotbuf[0] = 0x35f00;
-+}
-+
-+static void
-+Opcode_wsr_eraccess_Slot_inst_encode (xtensa_insnbuf slotbuf)
-+{
-+  slotbuf[0] = 0x135f00;
-+}
-+
-+static void
-+Opcode_xsr_eraccess_Slot_inst_encode (xtensa_insnbuf slotbuf)
-+{
-+  slotbuf[0] = 0x615f00;
 +}
 +
 +static void
@@ -8621,6 +10316,18 @@ index 000000000000..2f000199b8cd
 +  Opcode_l8ui_Slot_inst_encode, 0, 0
 +};
 +
++static xtensa_opcode_encode_fn Opcode_loop_encode_fns[] = {
++  Opcode_loop_Slot_inst_encode, 0, 0
++};
++
++static xtensa_opcode_encode_fn Opcode_loopnez_encode_fns[] = {
++  Opcode_loopnez_Slot_inst_encode, 0, 0
++};
++
++static xtensa_opcode_encode_fn Opcode_loopgtz_encode_fns[] = {
++  Opcode_loopgtz_Slot_inst_encode, 0, 0
++};
++
 +static xtensa_opcode_encode_fn Opcode_movi_encode_fns[] = {
 +  Opcode_movi_Slot_inst_encode, 0, 0
 +};
@@ -8751,6 +10458,42 @@ index 000000000000..2f000199b8cd
 +
 +static xtensa_opcode_encode_fn Opcode_rsil_encode_fns[] = {
 +  Opcode_rsil_Slot_inst_encode, 0, 0
++};
++
++static xtensa_opcode_encode_fn Opcode_rsr_lend_encode_fns[] = {
++  Opcode_rsr_lend_Slot_inst_encode, 0, 0
++};
++
++static xtensa_opcode_encode_fn Opcode_wsr_lend_encode_fns[] = {
++  Opcode_wsr_lend_Slot_inst_encode, 0, 0
++};
++
++static xtensa_opcode_encode_fn Opcode_xsr_lend_encode_fns[] = {
++  Opcode_xsr_lend_Slot_inst_encode, 0, 0
++};
++
++static xtensa_opcode_encode_fn Opcode_rsr_lcount_encode_fns[] = {
++  Opcode_rsr_lcount_Slot_inst_encode, 0, 0
++};
++
++static xtensa_opcode_encode_fn Opcode_wsr_lcount_encode_fns[] = {
++  Opcode_wsr_lcount_Slot_inst_encode, 0, 0
++};
++
++static xtensa_opcode_encode_fn Opcode_xsr_lcount_encode_fns[] = {
++  Opcode_xsr_lcount_Slot_inst_encode, 0, 0
++};
++
++static xtensa_opcode_encode_fn Opcode_rsr_lbeg_encode_fns[] = {
++  Opcode_rsr_lbeg_Slot_inst_encode, 0, 0
++};
++
++static xtensa_opcode_encode_fn Opcode_wsr_lbeg_encode_fns[] = {
++  Opcode_wsr_lbeg_Slot_inst_encode, 0, 0
++};
++
++static xtensa_opcode_encode_fn Opcode_xsr_lbeg_encode_fns[] = {
++  Opcode_xsr_lbeg_Slot_inst_encode, 0, 0
 +};
 +
 +static xtensa_opcode_encode_fn Opcode_rsr_sar_encode_fns[] = {
@@ -9129,14 +10872,6 @@ index 000000000000..2f000199b8cd
 +  Opcode_xsr_vecbase_Slot_inst_encode, 0, 0
 +};
 +
-+static xtensa_opcode_encode_fn Opcode_salt_encode_fns[] = {
-+  Opcode_salt_Slot_inst_encode, 0, 0
-+};
-+
-+static xtensa_opcode_encode_fn Opcode_saltu_encode_fns[] = {
-+  Opcode_saltu_Slot_inst_encode, 0, 0
-+};
-+
 +static xtensa_opcode_encode_fn Opcode_mul16u_encode_fns[] = {
 +  Opcode_mul16u_Slot_inst_encode, 0, 0
 +};
@@ -9147,6 +10882,358 @@ index 000000000000..2f000199b8cd
 +
 +static xtensa_opcode_encode_fn Opcode_mull_encode_fns[] = {
 +  Opcode_mull_Slot_inst_encode, 0, 0
++};
++
++static xtensa_opcode_encode_fn Opcode_mul_aa_ll_encode_fns[] = {
++  Opcode_mul_aa_ll_Slot_inst_encode, 0, 0
++};
++
++static xtensa_opcode_encode_fn Opcode_mul_aa_hl_encode_fns[] = {
++  Opcode_mul_aa_hl_Slot_inst_encode, 0, 0
++};
++
++static xtensa_opcode_encode_fn Opcode_mul_aa_lh_encode_fns[] = {
++  Opcode_mul_aa_lh_Slot_inst_encode, 0, 0
++};
++
++static xtensa_opcode_encode_fn Opcode_mul_aa_hh_encode_fns[] = {
++  Opcode_mul_aa_hh_Slot_inst_encode, 0, 0
++};
++
++static xtensa_opcode_encode_fn Opcode_umul_aa_ll_encode_fns[] = {
++  Opcode_umul_aa_ll_Slot_inst_encode, 0, 0
++};
++
++static xtensa_opcode_encode_fn Opcode_umul_aa_hl_encode_fns[] = {
++  Opcode_umul_aa_hl_Slot_inst_encode, 0, 0
++};
++
++static xtensa_opcode_encode_fn Opcode_umul_aa_lh_encode_fns[] = {
++  Opcode_umul_aa_lh_Slot_inst_encode, 0, 0
++};
++
++static xtensa_opcode_encode_fn Opcode_umul_aa_hh_encode_fns[] = {
++  Opcode_umul_aa_hh_Slot_inst_encode, 0, 0
++};
++
++static xtensa_opcode_encode_fn Opcode_mul_ad_ll_encode_fns[] = {
++  Opcode_mul_ad_ll_Slot_inst_encode, 0, 0
++};
++
++static xtensa_opcode_encode_fn Opcode_mul_ad_hl_encode_fns[] = {
++  Opcode_mul_ad_hl_Slot_inst_encode, 0, 0
++};
++
++static xtensa_opcode_encode_fn Opcode_mul_ad_lh_encode_fns[] = {
++  Opcode_mul_ad_lh_Slot_inst_encode, 0, 0
++};
++
++static xtensa_opcode_encode_fn Opcode_mul_ad_hh_encode_fns[] = {
++  Opcode_mul_ad_hh_Slot_inst_encode, 0, 0
++};
++
++static xtensa_opcode_encode_fn Opcode_mul_da_ll_encode_fns[] = {
++  Opcode_mul_da_ll_Slot_inst_encode, 0, 0
++};
++
++static xtensa_opcode_encode_fn Opcode_mul_da_hl_encode_fns[] = {
++  Opcode_mul_da_hl_Slot_inst_encode, 0, 0
++};
++
++static xtensa_opcode_encode_fn Opcode_mul_da_lh_encode_fns[] = {
++  Opcode_mul_da_lh_Slot_inst_encode, 0, 0
++};
++
++static xtensa_opcode_encode_fn Opcode_mul_da_hh_encode_fns[] = {
++  Opcode_mul_da_hh_Slot_inst_encode, 0, 0
++};
++
++static xtensa_opcode_encode_fn Opcode_mul_dd_ll_encode_fns[] = {
++  Opcode_mul_dd_ll_Slot_inst_encode, 0, 0
++};
++
++static xtensa_opcode_encode_fn Opcode_mul_dd_hl_encode_fns[] = {
++  Opcode_mul_dd_hl_Slot_inst_encode, 0, 0
++};
++
++static xtensa_opcode_encode_fn Opcode_mul_dd_lh_encode_fns[] = {
++  Opcode_mul_dd_lh_Slot_inst_encode, 0, 0
++};
++
++static xtensa_opcode_encode_fn Opcode_mul_dd_hh_encode_fns[] = {
++  Opcode_mul_dd_hh_Slot_inst_encode, 0, 0
++};
++
++static xtensa_opcode_encode_fn Opcode_mula_aa_ll_encode_fns[] = {
++  Opcode_mula_aa_ll_Slot_inst_encode, 0, 0
++};
++
++static xtensa_opcode_encode_fn Opcode_mula_aa_hl_encode_fns[] = {
++  Opcode_mula_aa_hl_Slot_inst_encode, 0, 0
++};
++
++static xtensa_opcode_encode_fn Opcode_mula_aa_lh_encode_fns[] = {
++  Opcode_mula_aa_lh_Slot_inst_encode, 0, 0
++};
++
++static xtensa_opcode_encode_fn Opcode_mula_aa_hh_encode_fns[] = {
++  Opcode_mula_aa_hh_Slot_inst_encode, 0, 0
++};
++
++static xtensa_opcode_encode_fn Opcode_muls_aa_ll_encode_fns[] = {
++  Opcode_muls_aa_ll_Slot_inst_encode, 0, 0
++};
++
++static xtensa_opcode_encode_fn Opcode_muls_aa_hl_encode_fns[] = {
++  Opcode_muls_aa_hl_Slot_inst_encode, 0, 0
++};
++
++static xtensa_opcode_encode_fn Opcode_muls_aa_lh_encode_fns[] = {
++  Opcode_muls_aa_lh_Slot_inst_encode, 0, 0
++};
++
++static xtensa_opcode_encode_fn Opcode_muls_aa_hh_encode_fns[] = {
++  Opcode_muls_aa_hh_Slot_inst_encode, 0, 0
++};
++
++static xtensa_opcode_encode_fn Opcode_mula_ad_ll_encode_fns[] = {
++  Opcode_mula_ad_ll_Slot_inst_encode, 0, 0
++};
++
++static xtensa_opcode_encode_fn Opcode_mula_ad_hl_encode_fns[] = {
++  Opcode_mula_ad_hl_Slot_inst_encode, 0, 0
++};
++
++static xtensa_opcode_encode_fn Opcode_mula_ad_lh_encode_fns[] = {
++  Opcode_mula_ad_lh_Slot_inst_encode, 0, 0
++};
++
++static xtensa_opcode_encode_fn Opcode_mula_ad_hh_encode_fns[] = {
++  Opcode_mula_ad_hh_Slot_inst_encode, 0, 0
++};
++
++static xtensa_opcode_encode_fn Opcode_muls_ad_ll_encode_fns[] = {
++  Opcode_muls_ad_ll_Slot_inst_encode, 0, 0
++};
++
++static xtensa_opcode_encode_fn Opcode_muls_ad_hl_encode_fns[] = {
++  Opcode_muls_ad_hl_Slot_inst_encode, 0, 0
++};
++
++static xtensa_opcode_encode_fn Opcode_muls_ad_lh_encode_fns[] = {
++  Opcode_muls_ad_lh_Slot_inst_encode, 0, 0
++};
++
++static xtensa_opcode_encode_fn Opcode_muls_ad_hh_encode_fns[] = {
++  Opcode_muls_ad_hh_Slot_inst_encode, 0, 0
++};
++
++static xtensa_opcode_encode_fn Opcode_mula_da_ll_encode_fns[] = {
++  Opcode_mula_da_ll_Slot_inst_encode, 0, 0
++};
++
++static xtensa_opcode_encode_fn Opcode_mula_da_hl_encode_fns[] = {
++  Opcode_mula_da_hl_Slot_inst_encode, 0, 0
++};
++
++static xtensa_opcode_encode_fn Opcode_mula_da_lh_encode_fns[] = {
++  Opcode_mula_da_lh_Slot_inst_encode, 0, 0
++};
++
++static xtensa_opcode_encode_fn Opcode_mula_da_hh_encode_fns[] = {
++  Opcode_mula_da_hh_Slot_inst_encode, 0, 0
++};
++
++static xtensa_opcode_encode_fn Opcode_muls_da_ll_encode_fns[] = {
++  Opcode_muls_da_ll_Slot_inst_encode, 0, 0
++};
++
++static xtensa_opcode_encode_fn Opcode_muls_da_hl_encode_fns[] = {
++  Opcode_muls_da_hl_Slot_inst_encode, 0, 0
++};
++
++static xtensa_opcode_encode_fn Opcode_muls_da_lh_encode_fns[] = {
++  Opcode_muls_da_lh_Slot_inst_encode, 0, 0
++};
++
++static xtensa_opcode_encode_fn Opcode_muls_da_hh_encode_fns[] = {
++  Opcode_muls_da_hh_Slot_inst_encode, 0, 0
++};
++
++static xtensa_opcode_encode_fn Opcode_mula_dd_ll_encode_fns[] = {
++  Opcode_mula_dd_ll_Slot_inst_encode, 0, 0
++};
++
++static xtensa_opcode_encode_fn Opcode_mula_dd_hl_encode_fns[] = {
++  Opcode_mula_dd_hl_Slot_inst_encode, 0, 0
++};
++
++static xtensa_opcode_encode_fn Opcode_mula_dd_lh_encode_fns[] = {
++  Opcode_mula_dd_lh_Slot_inst_encode, 0, 0
++};
++
++static xtensa_opcode_encode_fn Opcode_mula_dd_hh_encode_fns[] = {
++  Opcode_mula_dd_hh_Slot_inst_encode, 0, 0
++};
++
++static xtensa_opcode_encode_fn Opcode_muls_dd_ll_encode_fns[] = {
++  Opcode_muls_dd_ll_Slot_inst_encode, 0, 0
++};
++
++static xtensa_opcode_encode_fn Opcode_muls_dd_hl_encode_fns[] = {
++  Opcode_muls_dd_hl_Slot_inst_encode, 0, 0
++};
++
++static xtensa_opcode_encode_fn Opcode_muls_dd_lh_encode_fns[] = {
++  Opcode_muls_dd_lh_Slot_inst_encode, 0, 0
++};
++
++static xtensa_opcode_encode_fn Opcode_muls_dd_hh_encode_fns[] = {
++  Opcode_muls_dd_hh_Slot_inst_encode, 0, 0
++};
++
++static xtensa_opcode_encode_fn Opcode_mula_da_ll_lddec_encode_fns[] = {
++  Opcode_mula_da_ll_lddec_Slot_inst_encode, 0, 0
++};
++
++static xtensa_opcode_encode_fn Opcode_mula_da_ll_ldinc_encode_fns[] = {
++  Opcode_mula_da_ll_ldinc_Slot_inst_encode, 0, 0
++};
++
++static xtensa_opcode_encode_fn Opcode_mula_da_hl_lddec_encode_fns[] = {
++  Opcode_mula_da_hl_lddec_Slot_inst_encode, 0, 0
++};
++
++static xtensa_opcode_encode_fn Opcode_mula_da_hl_ldinc_encode_fns[] = {
++  Opcode_mula_da_hl_ldinc_Slot_inst_encode, 0, 0
++};
++
++static xtensa_opcode_encode_fn Opcode_mula_da_lh_lddec_encode_fns[] = {
++  Opcode_mula_da_lh_lddec_Slot_inst_encode, 0, 0
++};
++
++static xtensa_opcode_encode_fn Opcode_mula_da_lh_ldinc_encode_fns[] = {
++  Opcode_mula_da_lh_ldinc_Slot_inst_encode, 0, 0
++};
++
++static xtensa_opcode_encode_fn Opcode_mula_da_hh_lddec_encode_fns[] = {
++  Opcode_mula_da_hh_lddec_Slot_inst_encode, 0, 0
++};
++
++static xtensa_opcode_encode_fn Opcode_mula_da_hh_ldinc_encode_fns[] = {
++  Opcode_mula_da_hh_ldinc_Slot_inst_encode, 0, 0
++};
++
++static xtensa_opcode_encode_fn Opcode_mula_dd_ll_lddec_encode_fns[] = {
++  Opcode_mula_dd_ll_lddec_Slot_inst_encode, 0, 0
++};
++
++static xtensa_opcode_encode_fn Opcode_mula_dd_ll_ldinc_encode_fns[] = {
++  Opcode_mula_dd_ll_ldinc_Slot_inst_encode, 0, 0
++};
++
++static xtensa_opcode_encode_fn Opcode_mula_dd_hl_lddec_encode_fns[] = {
++  Opcode_mula_dd_hl_lddec_Slot_inst_encode, 0, 0
++};
++
++static xtensa_opcode_encode_fn Opcode_mula_dd_hl_ldinc_encode_fns[] = {
++  Opcode_mula_dd_hl_ldinc_Slot_inst_encode, 0, 0
++};
++
++static xtensa_opcode_encode_fn Opcode_mula_dd_lh_lddec_encode_fns[] = {
++  Opcode_mula_dd_lh_lddec_Slot_inst_encode, 0, 0
++};
++
++static xtensa_opcode_encode_fn Opcode_mula_dd_lh_ldinc_encode_fns[] = {
++  Opcode_mula_dd_lh_ldinc_Slot_inst_encode, 0, 0
++};
++
++static xtensa_opcode_encode_fn Opcode_mula_dd_hh_lddec_encode_fns[] = {
++  Opcode_mula_dd_hh_lddec_Slot_inst_encode, 0, 0
++};
++
++static xtensa_opcode_encode_fn Opcode_mula_dd_hh_ldinc_encode_fns[] = {
++  Opcode_mula_dd_hh_ldinc_Slot_inst_encode, 0, 0
++};
++
++static xtensa_opcode_encode_fn Opcode_lddec_encode_fns[] = {
++  Opcode_lddec_Slot_inst_encode, 0, 0
++};
++
++static xtensa_opcode_encode_fn Opcode_ldinc_encode_fns[] = {
++  Opcode_ldinc_Slot_inst_encode, 0, 0
++};
++
++static xtensa_opcode_encode_fn Opcode_rsr_m0_encode_fns[] = {
++  Opcode_rsr_m0_Slot_inst_encode, 0, 0
++};
++
++static xtensa_opcode_encode_fn Opcode_wsr_m0_encode_fns[] = {
++  Opcode_wsr_m0_Slot_inst_encode, 0, 0
++};
++
++static xtensa_opcode_encode_fn Opcode_xsr_m0_encode_fns[] = {
++  Opcode_xsr_m0_Slot_inst_encode, 0, 0
++};
++
++static xtensa_opcode_encode_fn Opcode_rsr_m1_encode_fns[] = {
++  Opcode_rsr_m1_Slot_inst_encode, 0, 0
++};
++
++static xtensa_opcode_encode_fn Opcode_wsr_m1_encode_fns[] = {
++  Opcode_wsr_m1_Slot_inst_encode, 0, 0
++};
++
++static xtensa_opcode_encode_fn Opcode_xsr_m1_encode_fns[] = {
++  Opcode_xsr_m1_Slot_inst_encode, 0, 0
++};
++
++static xtensa_opcode_encode_fn Opcode_rsr_m2_encode_fns[] = {
++  Opcode_rsr_m2_Slot_inst_encode, 0, 0
++};
++
++static xtensa_opcode_encode_fn Opcode_wsr_m2_encode_fns[] = {
++  Opcode_wsr_m2_Slot_inst_encode, 0, 0
++};
++
++static xtensa_opcode_encode_fn Opcode_xsr_m2_encode_fns[] = {
++  Opcode_xsr_m2_Slot_inst_encode, 0, 0
++};
++
++static xtensa_opcode_encode_fn Opcode_rsr_m3_encode_fns[] = {
++  Opcode_rsr_m3_Slot_inst_encode, 0, 0
++};
++
++static xtensa_opcode_encode_fn Opcode_wsr_m3_encode_fns[] = {
++  Opcode_wsr_m3_Slot_inst_encode, 0, 0
++};
++
++static xtensa_opcode_encode_fn Opcode_xsr_m3_encode_fns[] = {
++  Opcode_xsr_m3_Slot_inst_encode, 0, 0
++};
++
++static xtensa_opcode_encode_fn Opcode_rsr_acclo_encode_fns[] = {
++  Opcode_rsr_acclo_Slot_inst_encode, 0, 0
++};
++
++static xtensa_opcode_encode_fn Opcode_wsr_acclo_encode_fns[] = {
++  Opcode_wsr_acclo_Slot_inst_encode, 0, 0
++};
++
++static xtensa_opcode_encode_fn Opcode_xsr_acclo_encode_fns[] = {
++  Opcode_xsr_acclo_Slot_inst_encode, 0, 0
++};
++
++static xtensa_opcode_encode_fn Opcode_rsr_acchi_encode_fns[] = {
++  Opcode_rsr_acchi_Slot_inst_encode, 0, 0
++};
++
++static xtensa_opcode_encode_fn Opcode_wsr_acchi_encode_fns[] = {
++  Opcode_wsr_acchi_Slot_inst_encode, 0, 0
++};
++
++static xtensa_opcode_encode_fn Opcode_xsr_acchi_encode_fns[] = {
++  Opcode_xsr_acchi_Slot_inst_encode, 0, 0
 +};
 +
 +static xtensa_opcode_encode_fn Opcode_rfi_encode_fns[] = {
@@ -9389,6 +11476,110 @@ index 000000000000..2f000199b8cd
 +  Opcode_xsr_ccompare2_Slot_inst_encode, 0, 0
 +};
 +
++static xtensa_opcode_encode_fn Opcode_ipf_encode_fns[] = {
++  Opcode_ipf_Slot_inst_encode, 0, 0
++};
++
++static xtensa_opcode_encode_fn Opcode_ihi_encode_fns[] = {
++  Opcode_ihi_Slot_inst_encode, 0, 0
++};
++
++static xtensa_opcode_encode_fn Opcode_ipfl_encode_fns[] = {
++  Opcode_ipfl_Slot_inst_encode, 0, 0
++};
++
++static xtensa_opcode_encode_fn Opcode_ihu_encode_fns[] = {
++  Opcode_ihu_Slot_inst_encode, 0, 0
++};
++
++static xtensa_opcode_encode_fn Opcode_iiu_encode_fns[] = {
++  Opcode_iiu_Slot_inst_encode, 0, 0
++};
++
++static xtensa_opcode_encode_fn Opcode_iii_encode_fns[] = {
++  Opcode_iii_Slot_inst_encode, 0, 0
++};
++
++static xtensa_opcode_encode_fn Opcode_lict_encode_fns[] = {
++  Opcode_lict_Slot_inst_encode, 0, 0
++};
++
++static xtensa_opcode_encode_fn Opcode_licw_encode_fns[] = {
++  Opcode_licw_Slot_inst_encode, 0, 0
++};
++
++static xtensa_opcode_encode_fn Opcode_sict_encode_fns[] = {
++  Opcode_sict_Slot_inst_encode, 0, 0
++};
++
++static xtensa_opcode_encode_fn Opcode_sicw_encode_fns[] = {
++  Opcode_sicw_Slot_inst_encode, 0, 0
++};
++
++static xtensa_opcode_encode_fn Opcode_dhwb_encode_fns[] = {
++  Opcode_dhwb_Slot_inst_encode, 0, 0
++};
++
++static xtensa_opcode_encode_fn Opcode_dhwbi_encode_fns[] = {
++  Opcode_dhwbi_Slot_inst_encode, 0, 0
++};
++
++static xtensa_opcode_encode_fn Opcode_diwbui_p_encode_fns[] = {
++  Opcode_diwbui_p_Slot_inst_encode, 0, 0
++};
++
++static xtensa_opcode_encode_fn Opcode_diwb_encode_fns[] = {
++  Opcode_diwb_Slot_inst_encode, 0, 0
++};
++
++static xtensa_opcode_encode_fn Opcode_diwbi_encode_fns[] = {
++  Opcode_diwbi_Slot_inst_encode, 0, 0
++};
++
++static xtensa_opcode_encode_fn Opcode_dhi_encode_fns[] = {
++  Opcode_dhi_Slot_inst_encode, 0, 0
++};
++
++static xtensa_opcode_encode_fn Opcode_dii_encode_fns[] = {
++  Opcode_dii_Slot_inst_encode, 0, 0
++};
++
++static xtensa_opcode_encode_fn Opcode_dpfr_encode_fns[] = {
++  Opcode_dpfr_Slot_inst_encode, 0, 0
++};
++
++static xtensa_opcode_encode_fn Opcode_dpfw_encode_fns[] = {
++  Opcode_dpfw_Slot_inst_encode, 0, 0
++};
++
++static xtensa_opcode_encode_fn Opcode_dpfro_encode_fns[] = {
++  Opcode_dpfro_Slot_inst_encode, 0, 0
++};
++
++static xtensa_opcode_encode_fn Opcode_dpfwo_encode_fns[] = {
++  Opcode_dpfwo_Slot_inst_encode, 0, 0
++};
++
++static xtensa_opcode_encode_fn Opcode_dpfl_encode_fns[] = {
++  Opcode_dpfl_Slot_inst_encode, 0, 0
++};
++
++static xtensa_opcode_encode_fn Opcode_dhu_encode_fns[] = {
++  Opcode_dhu_Slot_inst_encode, 0, 0
++};
++
++static xtensa_opcode_encode_fn Opcode_diu_encode_fns[] = {
++  Opcode_diu_Slot_inst_encode, 0, 0
++};
++
++static xtensa_opcode_encode_fn Opcode_sdct_encode_fns[] = {
++  Opcode_sdct_Slot_inst_encode, 0, 0
++};
++
++static xtensa_opcode_encode_fn Opcode_ldct_encode_fns[] = {
++  Opcode_ldct_Slot_inst_encode, 0, 0
++};
++
 +static xtensa_opcode_encode_fn Opcode_idtlb_encode_fns[] = {
 +  Opcode_idtlb_Slot_inst_encode, 0, 0
 +};
@@ -9427,6 +11618,10 @@ index 000000000000..2f000199b8cd
 +
 +static xtensa_opcode_encode_fn Opcode_witlb_encode_fns[] = {
 +  Opcode_witlb_Slot_inst_encode, 0, 0
++};
++
++static xtensa_opcode_encode_fn Opcode_clamps_encode_fns[] = {
++  Opcode_clamps_Slot_inst_encode, 0, 0
 +};
 +
 +static xtensa_opcode_encode_fn Opcode_min_encode_fns[] = {
@@ -9507,18 +11702,6 @@ index 000000000000..2f000199b8cd
 +
 +static xtensa_opcode_encode_fn Opcode_rems_encode_fns[] = {
 +  Opcode_rems_Slot_inst_encode, 0, 0
-+};
-+
-+static xtensa_opcode_encode_fn Opcode_rsr_eraccess_encode_fns[] = {
-+  Opcode_rsr_eraccess_Slot_inst_encode, 0, 0
-+};
-+
-+static xtensa_opcode_encode_fn Opcode_wsr_eraccess_encode_fns[] = {
-+  Opcode_wsr_eraccess_Slot_inst_encode, 0, 0
-+};
-+
-+static xtensa_opcode_encode_fn Opcode_xsr_eraccess_encode_fns[] = {
-+  Opcode_xsr_eraccess_Slot_inst_encode, 0, 0
 +};
 +
 +static xtensa_opcode_encode_fn Opcode_rer_encode_fns[] = {
@@ -9813,6 +11996,15 @@ index 000000000000..2f000199b8cd
 +  { "l8ui", ICLASS_xt_iclass_l8i,
 +    0,
 +    Opcode_l8ui_encode_fns, 0, 0 },
++  { "loop", ICLASS_xt_iclass_loop,
++    XTENSA_OPCODE_IS_LOOP,
++    Opcode_loop_encode_fns, 0, 0 },
++  { "loopnez", ICLASS_xt_iclass_loopz,
++    XTENSA_OPCODE_IS_LOOP,
++    Opcode_loopnez_encode_fns, 0, 0 },
++  { "loopgtz", ICLASS_xt_iclass_loopz,
++    XTENSA_OPCODE_IS_LOOP,
++    Opcode_loopgtz_encode_fns, 0, 0 },
 +  { "movi", ICLASS_xt_iclass_movi,
 +    0,
 +    Opcode_movi_encode_fns, 0, 0 },
@@ -9912,6 +12104,33 @@ index 000000000000..2f000199b8cd
 +  { "rsil", ICLASS_xt_iclass_rsil,
 +    0,
 +    Opcode_rsil_encode_fns, 0, 0 },
++  { "rsr.lend", ICLASS_xt_iclass_rsr_lend,
++    0,
++    Opcode_rsr_lend_encode_fns, 0, 0 },
++  { "wsr.lend", ICLASS_xt_iclass_wsr_lend,
++    0,
++    Opcode_wsr_lend_encode_fns, 0, 0 },
++  { "xsr.lend", ICLASS_xt_iclass_xsr_lend,
++    0,
++    Opcode_xsr_lend_encode_fns, 0, 0 },
++  { "rsr.lcount", ICLASS_xt_iclass_rsr_lcount,
++    0,
++    Opcode_rsr_lcount_encode_fns, 0, 0 },
++  { "wsr.lcount", ICLASS_xt_iclass_wsr_lcount,
++    0,
++    Opcode_wsr_lcount_encode_fns, 0, 0 },
++  { "xsr.lcount", ICLASS_xt_iclass_xsr_lcount,
++    0,
++    Opcode_xsr_lcount_encode_fns, 0, 0 },
++  { "rsr.lbeg", ICLASS_xt_iclass_rsr_lbeg,
++    0,
++    Opcode_rsr_lbeg_encode_fns, 0, 0 },
++  { "wsr.lbeg", ICLASS_xt_iclass_wsr_lbeg,
++    0,
++    Opcode_wsr_lbeg_encode_fns, 0, 0 },
++  { "xsr.lbeg", ICLASS_xt_iclass_xsr_lbeg,
++    0,
++    Opcode_xsr_lbeg_encode_fns, 0, 0 },
 +  { "rsr.sar", ICLASS_xt_iclass_rsr_sar,
 +    0,
 +    Opcode_rsr_sar_encode_fns, 0, 0 },
@@ -10194,12 +12413,6 @@ index 000000000000..2f000199b8cd
 +  { "xsr.vecbase", ICLASS_xt_iclass_xsr_vecbase,
 +    0,
 +    Opcode_xsr_vecbase_encode_fns, 0, 0 },
-+  { "salt", ICLASS_xt_iclass_salt,
-+    0,
-+    Opcode_salt_encode_fns, 0, 0 },
-+  { "saltu", ICLASS_xt_iclass_salt,
-+    0,
-+    Opcode_saltu_encode_fns, 0, 0 },
 +  { "mul16u", ICLASS_xt_mul16,
 +    0,
 +    Opcode_mul16u_encode_fns, 0, 0 },
@@ -10209,6 +12422,270 @@ index 000000000000..2f000199b8cd
 +  { "mull", ICLASS_xt_mul32,
 +    0,
 +    Opcode_mull_encode_fns, 0, 0 },
++  { "mul.aa.ll", ICLASS_xt_iclass_mac16_aa,
++    0,
++    Opcode_mul_aa_ll_encode_fns, 0, 0 },
++  { "mul.aa.hl", ICLASS_xt_iclass_mac16_aa,
++    0,
++    Opcode_mul_aa_hl_encode_fns, 0, 0 },
++  { "mul.aa.lh", ICLASS_xt_iclass_mac16_aa,
++    0,
++    Opcode_mul_aa_lh_encode_fns, 0, 0 },
++  { "mul.aa.hh", ICLASS_xt_iclass_mac16_aa,
++    0,
++    Opcode_mul_aa_hh_encode_fns, 0, 0 },
++  { "umul.aa.ll", ICLASS_xt_iclass_mac16_aa,
++    0,
++    Opcode_umul_aa_ll_encode_fns, 0, 0 },
++  { "umul.aa.hl", ICLASS_xt_iclass_mac16_aa,
++    0,
++    Opcode_umul_aa_hl_encode_fns, 0, 0 },
++  { "umul.aa.lh", ICLASS_xt_iclass_mac16_aa,
++    0,
++    Opcode_umul_aa_lh_encode_fns, 0, 0 },
++  { "umul.aa.hh", ICLASS_xt_iclass_mac16_aa,
++    0,
++    Opcode_umul_aa_hh_encode_fns, 0, 0 },
++  { "mul.ad.ll", ICLASS_xt_iclass_mac16_ad,
++    0,
++    Opcode_mul_ad_ll_encode_fns, 0, 0 },
++  { "mul.ad.hl", ICLASS_xt_iclass_mac16_ad,
++    0,
++    Opcode_mul_ad_hl_encode_fns, 0, 0 },
++  { "mul.ad.lh", ICLASS_xt_iclass_mac16_ad,
++    0,
++    Opcode_mul_ad_lh_encode_fns, 0, 0 },
++  { "mul.ad.hh", ICLASS_xt_iclass_mac16_ad,
++    0,
++    Opcode_mul_ad_hh_encode_fns, 0, 0 },
++  { "mul.da.ll", ICLASS_xt_iclass_mac16_da,
++    0,
++    Opcode_mul_da_ll_encode_fns, 0, 0 },
++  { "mul.da.hl", ICLASS_xt_iclass_mac16_da,
++    0,
++    Opcode_mul_da_hl_encode_fns, 0, 0 },
++  { "mul.da.lh", ICLASS_xt_iclass_mac16_da,
++    0,
++    Opcode_mul_da_lh_encode_fns, 0, 0 },
++  { "mul.da.hh", ICLASS_xt_iclass_mac16_da,
++    0,
++    Opcode_mul_da_hh_encode_fns, 0, 0 },
++  { "mul.dd.ll", ICLASS_xt_iclass_mac16_dd,
++    0,
++    Opcode_mul_dd_ll_encode_fns, 0, 0 },
++  { "mul.dd.hl", ICLASS_xt_iclass_mac16_dd,
++    0,
++    Opcode_mul_dd_hl_encode_fns, 0, 0 },
++  { "mul.dd.lh", ICLASS_xt_iclass_mac16_dd,
++    0,
++    Opcode_mul_dd_lh_encode_fns, 0, 0 },
++  { "mul.dd.hh", ICLASS_xt_iclass_mac16_dd,
++    0,
++    Opcode_mul_dd_hh_encode_fns, 0, 0 },
++  { "mula.aa.ll", ICLASS_xt_iclass_mac16a_aa,
++    0,
++    Opcode_mula_aa_ll_encode_fns, 0, 0 },
++  { "mula.aa.hl", ICLASS_xt_iclass_mac16a_aa,
++    0,
++    Opcode_mula_aa_hl_encode_fns, 0, 0 },
++  { "mula.aa.lh", ICLASS_xt_iclass_mac16a_aa,
++    0,
++    Opcode_mula_aa_lh_encode_fns, 0, 0 },
++  { "mula.aa.hh", ICLASS_xt_iclass_mac16a_aa,
++    0,
++    Opcode_mula_aa_hh_encode_fns, 0, 0 },
++  { "muls.aa.ll", ICLASS_xt_iclass_mac16a_aa,
++    0,
++    Opcode_muls_aa_ll_encode_fns, 0, 0 },
++  { "muls.aa.hl", ICLASS_xt_iclass_mac16a_aa,
++    0,
++    Opcode_muls_aa_hl_encode_fns, 0, 0 },
++  { "muls.aa.lh", ICLASS_xt_iclass_mac16a_aa,
++    0,
++    Opcode_muls_aa_lh_encode_fns, 0, 0 },
++  { "muls.aa.hh", ICLASS_xt_iclass_mac16a_aa,
++    0,
++    Opcode_muls_aa_hh_encode_fns, 0, 0 },
++  { "mula.ad.ll", ICLASS_xt_iclass_mac16a_ad,
++    0,
++    Opcode_mula_ad_ll_encode_fns, 0, 0 },
++  { "mula.ad.hl", ICLASS_xt_iclass_mac16a_ad,
++    0,
++    Opcode_mula_ad_hl_encode_fns, 0, 0 },
++  { "mula.ad.lh", ICLASS_xt_iclass_mac16a_ad,
++    0,
++    Opcode_mula_ad_lh_encode_fns, 0, 0 },
++  { "mula.ad.hh", ICLASS_xt_iclass_mac16a_ad,
++    0,
++    Opcode_mula_ad_hh_encode_fns, 0, 0 },
++  { "muls.ad.ll", ICLASS_xt_iclass_mac16a_ad,
++    0,
++    Opcode_muls_ad_ll_encode_fns, 0, 0 },
++  { "muls.ad.hl", ICLASS_xt_iclass_mac16a_ad,
++    0,
++    Opcode_muls_ad_hl_encode_fns, 0, 0 },
++  { "muls.ad.lh", ICLASS_xt_iclass_mac16a_ad,
++    0,
++    Opcode_muls_ad_lh_encode_fns, 0, 0 },
++  { "muls.ad.hh", ICLASS_xt_iclass_mac16a_ad,
++    0,
++    Opcode_muls_ad_hh_encode_fns, 0, 0 },
++  { "mula.da.ll", ICLASS_xt_iclass_mac16a_da,
++    0,
++    Opcode_mula_da_ll_encode_fns, 0, 0 },
++  { "mula.da.hl", ICLASS_xt_iclass_mac16a_da,
++    0,
++    Opcode_mula_da_hl_encode_fns, 0, 0 },
++  { "mula.da.lh", ICLASS_xt_iclass_mac16a_da,
++    0,
++    Opcode_mula_da_lh_encode_fns, 0, 0 },
++  { "mula.da.hh", ICLASS_xt_iclass_mac16a_da,
++    0,
++    Opcode_mula_da_hh_encode_fns, 0, 0 },
++  { "muls.da.ll", ICLASS_xt_iclass_mac16a_da,
++    0,
++    Opcode_muls_da_ll_encode_fns, 0, 0 },
++  { "muls.da.hl", ICLASS_xt_iclass_mac16a_da,
++    0,
++    Opcode_muls_da_hl_encode_fns, 0, 0 },
++  { "muls.da.lh", ICLASS_xt_iclass_mac16a_da,
++    0,
++    Opcode_muls_da_lh_encode_fns, 0, 0 },
++  { "muls.da.hh", ICLASS_xt_iclass_mac16a_da,
++    0,
++    Opcode_muls_da_hh_encode_fns, 0, 0 },
++  { "mula.dd.ll", ICLASS_xt_iclass_mac16a_dd,
++    0,
++    Opcode_mula_dd_ll_encode_fns, 0, 0 },
++  { "mula.dd.hl", ICLASS_xt_iclass_mac16a_dd,
++    0,
++    Opcode_mula_dd_hl_encode_fns, 0, 0 },
++  { "mula.dd.lh", ICLASS_xt_iclass_mac16a_dd,
++    0,
++    Opcode_mula_dd_lh_encode_fns, 0, 0 },
++  { "mula.dd.hh", ICLASS_xt_iclass_mac16a_dd,
++    0,
++    Opcode_mula_dd_hh_encode_fns, 0, 0 },
++  { "muls.dd.ll", ICLASS_xt_iclass_mac16a_dd,
++    0,
++    Opcode_muls_dd_ll_encode_fns, 0, 0 },
++  { "muls.dd.hl", ICLASS_xt_iclass_mac16a_dd,
++    0,
++    Opcode_muls_dd_hl_encode_fns, 0, 0 },
++  { "muls.dd.lh", ICLASS_xt_iclass_mac16a_dd,
++    0,
++    Opcode_muls_dd_lh_encode_fns, 0, 0 },
++  { "muls.dd.hh", ICLASS_xt_iclass_mac16a_dd,
++    0,
++    Opcode_muls_dd_hh_encode_fns, 0, 0 },
++  { "mula.da.ll.lddec", ICLASS_xt_iclass_mac16al_da,
++    0,
++    Opcode_mula_da_ll_lddec_encode_fns, 0, 0 },
++  { "mula.da.ll.ldinc", ICLASS_xt_iclass_mac16al_da,
++    0,
++    Opcode_mula_da_ll_ldinc_encode_fns, 0, 0 },
++  { "mula.da.hl.lddec", ICLASS_xt_iclass_mac16al_da,
++    0,
++    Opcode_mula_da_hl_lddec_encode_fns, 0, 0 },
++  { "mula.da.hl.ldinc", ICLASS_xt_iclass_mac16al_da,
++    0,
++    Opcode_mula_da_hl_ldinc_encode_fns, 0, 0 },
++  { "mula.da.lh.lddec", ICLASS_xt_iclass_mac16al_da,
++    0,
++    Opcode_mula_da_lh_lddec_encode_fns, 0, 0 },
++  { "mula.da.lh.ldinc", ICLASS_xt_iclass_mac16al_da,
++    0,
++    Opcode_mula_da_lh_ldinc_encode_fns, 0, 0 },
++  { "mula.da.hh.lddec", ICLASS_xt_iclass_mac16al_da,
++    0,
++    Opcode_mula_da_hh_lddec_encode_fns, 0, 0 },
++  { "mula.da.hh.ldinc", ICLASS_xt_iclass_mac16al_da,
++    0,
++    Opcode_mula_da_hh_ldinc_encode_fns, 0, 0 },
++  { "mula.dd.ll.lddec", ICLASS_xt_iclass_mac16al_dd,
++    0,
++    Opcode_mula_dd_ll_lddec_encode_fns, 0, 0 },
++  { "mula.dd.ll.ldinc", ICLASS_xt_iclass_mac16al_dd,
++    0,
++    Opcode_mula_dd_ll_ldinc_encode_fns, 0, 0 },
++  { "mula.dd.hl.lddec", ICLASS_xt_iclass_mac16al_dd,
++    0,
++    Opcode_mula_dd_hl_lddec_encode_fns, 0, 0 },
++  { "mula.dd.hl.ldinc", ICLASS_xt_iclass_mac16al_dd,
++    0,
++    Opcode_mula_dd_hl_ldinc_encode_fns, 0, 0 },
++  { "mula.dd.lh.lddec", ICLASS_xt_iclass_mac16al_dd,
++    0,
++    Opcode_mula_dd_lh_lddec_encode_fns, 0, 0 },
++  { "mula.dd.lh.ldinc", ICLASS_xt_iclass_mac16al_dd,
++    0,
++    Opcode_mula_dd_lh_ldinc_encode_fns, 0, 0 },
++  { "mula.dd.hh.lddec", ICLASS_xt_iclass_mac16al_dd,
++    0,
++    Opcode_mula_dd_hh_lddec_encode_fns, 0, 0 },
++  { "mula.dd.hh.ldinc", ICLASS_xt_iclass_mac16al_dd,
++    0,
++    Opcode_mula_dd_hh_ldinc_encode_fns, 0, 0 },
++  { "lddec", ICLASS_xt_iclass_mac16_l,
++    0,
++    Opcode_lddec_encode_fns, 0, 0 },
++  { "ldinc", ICLASS_xt_iclass_mac16_l,
++    0,
++    Opcode_ldinc_encode_fns, 0, 0 },
++  { "rsr.m0", ICLASS_xt_iclass_rsr_m0,
++    0,
++    Opcode_rsr_m0_encode_fns, 0, 0 },
++  { "wsr.m0", ICLASS_xt_iclass_wsr_m0,
++    0,
++    Opcode_wsr_m0_encode_fns, 0, 0 },
++  { "xsr.m0", ICLASS_xt_iclass_xsr_m0,
++    0,
++    Opcode_xsr_m0_encode_fns, 0, 0 },
++  { "rsr.m1", ICLASS_xt_iclass_rsr_m1,
++    0,
++    Opcode_rsr_m1_encode_fns, 0, 0 },
++  { "wsr.m1", ICLASS_xt_iclass_wsr_m1,
++    0,
++    Opcode_wsr_m1_encode_fns, 0, 0 },
++  { "xsr.m1", ICLASS_xt_iclass_xsr_m1,
++    0,
++    Opcode_xsr_m1_encode_fns, 0, 0 },
++  { "rsr.m2", ICLASS_xt_iclass_rsr_m2,
++    0,
++    Opcode_rsr_m2_encode_fns, 0, 0 },
++  { "wsr.m2", ICLASS_xt_iclass_wsr_m2,
++    0,
++    Opcode_wsr_m2_encode_fns, 0, 0 },
++  { "xsr.m2", ICLASS_xt_iclass_xsr_m2,
++    0,
++    Opcode_xsr_m2_encode_fns, 0, 0 },
++  { "rsr.m3", ICLASS_xt_iclass_rsr_m3,
++    0,
++    Opcode_rsr_m3_encode_fns, 0, 0 },
++  { "wsr.m3", ICLASS_xt_iclass_wsr_m3,
++    0,
++    Opcode_wsr_m3_encode_fns, 0, 0 },
++  { "xsr.m3", ICLASS_xt_iclass_xsr_m3,
++    0,
++    Opcode_xsr_m3_encode_fns, 0, 0 },
++  { "rsr.acclo", ICLASS_xt_iclass_rsr_acclo,
++    0,
++    Opcode_rsr_acclo_encode_fns, 0, 0 },
++  { "wsr.acclo", ICLASS_xt_iclass_wsr_acclo,
++    0,
++    Opcode_wsr_acclo_encode_fns, 0, 0 },
++  { "xsr.acclo", ICLASS_xt_iclass_xsr_acclo,
++    0,
++    Opcode_xsr_acclo_encode_fns, 0, 0 },
++  { "rsr.acchi", ICLASS_xt_iclass_rsr_acchi,
++    0,
++    Opcode_rsr_acchi_encode_fns, 0, 0 },
++  { "wsr.acchi", ICLASS_xt_iclass_wsr_acchi,
++    0,
++    Opcode_wsr_acchi_encode_fns, 0, 0 },
++  { "xsr.acchi", ICLASS_xt_iclass_xsr_acchi,
++    0,
++    Opcode_xsr_acchi_encode_fns, 0, 0 },
 +  { "rfi", ICLASS_xt_iclass_rfi,
 +    XTENSA_OPCODE_IS_JUMP,
 +    Opcode_rfi_encode_fns, 0, 0 },
@@ -10389,6 +12866,84 @@ index 000000000000..2f000199b8cd
 +  { "xsr.ccompare2", ICLASS_xt_iclass_xsr_ccompare2,
 +    0,
 +    Opcode_xsr_ccompare2_encode_fns, 0, 0 },
++  { "ipf", ICLASS_xt_iclass_icache,
++    0,
++    Opcode_ipf_encode_fns, 0, 0 },
++  { "ihi", ICLASS_xt_iclass_icache,
++    0,
++    Opcode_ihi_encode_fns, 0, 0 },
++  { "ipfl", ICLASS_xt_iclass_icache_lock,
++    0,
++    Opcode_ipfl_encode_fns, 0, 0 },
++  { "ihu", ICLASS_xt_iclass_icache_lock,
++    0,
++    Opcode_ihu_encode_fns, 0, 0 },
++  { "iiu", ICLASS_xt_iclass_icache_lock,
++    0,
++    Opcode_iiu_encode_fns, 0, 0 },
++  { "iii", ICLASS_xt_iclass_icache_inv,
++    0,
++    Opcode_iii_encode_fns, 0, 0 },
++  { "lict", ICLASS_xt_iclass_licx,
++    0,
++    Opcode_lict_encode_fns, 0, 0 },
++  { "licw", ICLASS_xt_iclass_licx,
++    0,
++    Opcode_licw_encode_fns, 0, 0 },
++  { "sict", ICLASS_xt_iclass_sicx,
++    0,
++    Opcode_sict_encode_fns, 0, 0 },
++  { "sicw", ICLASS_xt_iclass_sicx,
++    0,
++    Opcode_sicw_encode_fns, 0, 0 },
++  { "dhwb", ICLASS_xt_iclass_dcache,
++    0,
++    Opcode_dhwb_encode_fns, 0, 0 },
++  { "dhwbi", ICLASS_xt_iclass_dcache,
++    0,
++    Opcode_dhwbi_encode_fns, 0, 0 },
++  { "diwbui.p", ICLASS_xt_iclass_dcache_dyn,
++    0,
++    Opcode_diwbui_p_encode_fns, 0, 0 },
++  { "diwb", ICLASS_xt_iclass_dcache_ind,
++    0,
++    Opcode_diwb_encode_fns, 0, 0 },
++  { "diwbi", ICLASS_xt_iclass_dcache_ind,
++    0,
++    Opcode_diwbi_encode_fns, 0, 0 },
++  { "dhi", ICLASS_xt_iclass_dcache_inv,
++    0,
++    Opcode_dhi_encode_fns, 0, 0 },
++  { "dii", ICLASS_xt_iclass_dcache_inv,
++    0,
++    Opcode_dii_encode_fns, 0, 0 },
++  { "dpfr", ICLASS_xt_iclass_dpf,
++    0,
++    Opcode_dpfr_encode_fns, 0, 0 },
++  { "dpfw", ICLASS_xt_iclass_dpf,
++    0,
++    Opcode_dpfw_encode_fns, 0, 0 },
++  { "dpfro", ICLASS_xt_iclass_dpf,
++    0,
++    Opcode_dpfro_encode_fns, 0, 0 },
++  { "dpfwo", ICLASS_xt_iclass_dpf,
++    0,
++    Opcode_dpfwo_encode_fns, 0, 0 },
++  { "dpfl", ICLASS_xt_iclass_dcache_lock,
++    0,
++    Opcode_dpfl_encode_fns, 0, 0 },
++  { "dhu", ICLASS_xt_iclass_dcache_lock,
++    0,
++    Opcode_dhu_encode_fns, 0, 0 },
++  { "diu", ICLASS_xt_iclass_dcache_lock,
++    0,
++    Opcode_diu_encode_fns, 0, 0 },
++  { "sdct", ICLASS_xt_iclass_sdct,
++    0,
++    Opcode_sdct_encode_fns, 0, 0 },
++  { "ldct", ICLASS_xt_iclass_ldct,
++    0,
++    Opcode_ldct_encode_fns, 0, 0 },
 +  { "idtlb", ICLASS_xt_iclass_idtlb,
 +    0,
 +    Opcode_idtlb_encode_fns, 0, 0 },
@@ -10419,6 +12974,9 @@ index 000000000000..2f000199b8cd
 +  { "witlb", ICLASS_xt_iclass_witlb,
 +    0,
 +    Opcode_witlb_encode_fns, 0, 0 },
++  { "clamps", ICLASS_xt_iclass_clamp,
++    0,
++    Opcode_clamps_encode_fns, 0, 0 },
 +  { "min", ICLASS_xt_iclass_minmax,
 +    0,
 +    Opcode_min_encode_fns, 0, 0 },
@@ -10479,15 +13037,6 @@ index 000000000000..2f000199b8cd
 +  { "rems", ICLASS_xt_iclass_div,
 +    0,
 +    Opcode_rems_encode_fns, 0, 0 },
-+  { "rsr.eraccess", ICLASS_xt_iclass_rsr_eraccess,
-+    0,
-+    Opcode_rsr_eraccess_encode_fns, 0, 0 },
-+  { "wsr.eraccess", ICLASS_xt_iclass_wsr_eraccess,
-+    0,
-+    Opcode_wsr_eraccess_encode_fns, 0, 0 },
-+  { "xsr.eraccess", ICLASS_xt_iclass_xsr_eraccess,
-+    0,
-+    Opcode_xsr_eraccess_encode_fns, 0, 0 },
 +  { "rer", ICLASS_xt_iclass_rer,
 +    0,
 +    Opcode_rer_encode_fns, 0, 0 },
@@ -10599,6 +13148,9 @@ index 000000000000..2f000199b8cd
 +  OPCODE_L32I,
 +  OPCODE_L32R,
 +  OPCODE_L8UI,
++  OPCODE_LOOP,
++  OPCODE_LOOPNEZ,
++  OPCODE_LOOPGTZ,
 +  OPCODE_MOVI,
 +  OPCODE_MOVEQZ,
 +  OPCODE_MOVNEZ,
@@ -10632,6 +13184,15 @@ index 000000000000..2f000199b8cd
 +  OPCODE_ESYNC,
 +  OPCODE_DSYNC,
 +  OPCODE_RSIL,
++  OPCODE_RSR_LEND,
++  OPCODE_WSR_LEND,
++  OPCODE_XSR_LEND,
++  OPCODE_RSR_LCOUNT,
++  OPCODE_WSR_LCOUNT,
++  OPCODE_XSR_LCOUNT,
++  OPCODE_RSR_LBEG,
++  OPCODE_WSR_LBEG,
++  OPCODE_XSR_LBEG,
 +  OPCODE_RSR_SAR,
 +  OPCODE_WSR_SAR,
 +  OPCODE_XSR_SAR,
@@ -10726,11 +13287,97 @@ index 000000000000..2f000199b8cd
 +  OPCODE_RSR_VECBASE,
 +  OPCODE_WSR_VECBASE,
 +  OPCODE_XSR_VECBASE,
-+  OPCODE_SALT,
-+  OPCODE_SALTU,
 +  OPCODE_MUL16U,
 +  OPCODE_MUL16S,
 +  OPCODE_MULL,
++  OPCODE_MUL_AA_LL,
++  OPCODE_MUL_AA_HL,
++  OPCODE_MUL_AA_LH,
++  OPCODE_MUL_AA_HH,
++  OPCODE_UMUL_AA_LL,
++  OPCODE_UMUL_AA_HL,
++  OPCODE_UMUL_AA_LH,
++  OPCODE_UMUL_AA_HH,
++  OPCODE_MUL_AD_LL,
++  OPCODE_MUL_AD_HL,
++  OPCODE_MUL_AD_LH,
++  OPCODE_MUL_AD_HH,
++  OPCODE_MUL_DA_LL,
++  OPCODE_MUL_DA_HL,
++  OPCODE_MUL_DA_LH,
++  OPCODE_MUL_DA_HH,
++  OPCODE_MUL_DD_LL,
++  OPCODE_MUL_DD_HL,
++  OPCODE_MUL_DD_LH,
++  OPCODE_MUL_DD_HH,
++  OPCODE_MULA_AA_LL,
++  OPCODE_MULA_AA_HL,
++  OPCODE_MULA_AA_LH,
++  OPCODE_MULA_AA_HH,
++  OPCODE_MULS_AA_LL,
++  OPCODE_MULS_AA_HL,
++  OPCODE_MULS_AA_LH,
++  OPCODE_MULS_AA_HH,
++  OPCODE_MULA_AD_LL,
++  OPCODE_MULA_AD_HL,
++  OPCODE_MULA_AD_LH,
++  OPCODE_MULA_AD_HH,
++  OPCODE_MULS_AD_LL,
++  OPCODE_MULS_AD_HL,
++  OPCODE_MULS_AD_LH,
++  OPCODE_MULS_AD_HH,
++  OPCODE_MULA_DA_LL,
++  OPCODE_MULA_DA_HL,
++  OPCODE_MULA_DA_LH,
++  OPCODE_MULA_DA_HH,
++  OPCODE_MULS_DA_LL,
++  OPCODE_MULS_DA_HL,
++  OPCODE_MULS_DA_LH,
++  OPCODE_MULS_DA_HH,
++  OPCODE_MULA_DD_LL,
++  OPCODE_MULA_DD_HL,
++  OPCODE_MULA_DD_LH,
++  OPCODE_MULA_DD_HH,
++  OPCODE_MULS_DD_LL,
++  OPCODE_MULS_DD_HL,
++  OPCODE_MULS_DD_LH,
++  OPCODE_MULS_DD_HH,
++  OPCODE_MULA_DA_LL_LDDEC,
++  OPCODE_MULA_DA_LL_LDINC,
++  OPCODE_MULA_DA_HL_LDDEC,
++  OPCODE_MULA_DA_HL_LDINC,
++  OPCODE_MULA_DA_LH_LDDEC,
++  OPCODE_MULA_DA_LH_LDINC,
++  OPCODE_MULA_DA_HH_LDDEC,
++  OPCODE_MULA_DA_HH_LDINC,
++  OPCODE_MULA_DD_LL_LDDEC,
++  OPCODE_MULA_DD_LL_LDINC,
++  OPCODE_MULA_DD_HL_LDDEC,
++  OPCODE_MULA_DD_HL_LDINC,
++  OPCODE_MULA_DD_LH_LDDEC,
++  OPCODE_MULA_DD_LH_LDINC,
++  OPCODE_MULA_DD_HH_LDDEC,
++  OPCODE_MULA_DD_HH_LDINC,
++  OPCODE_LDDEC,
++  OPCODE_LDINC,
++  OPCODE_RSR_M0,
++  OPCODE_WSR_M0,
++  OPCODE_XSR_M0,
++  OPCODE_RSR_M1,
++  OPCODE_WSR_M1,
++  OPCODE_XSR_M1,
++  OPCODE_RSR_M2,
++  OPCODE_WSR_M2,
++  OPCODE_XSR_M2,
++  OPCODE_RSR_M3,
++  OPCODE_WSR_M3,
++  OPCODE_XSR_M3,
++  OPCODE_RSR_ACCLO,
++  OPCODE_WSR_ACCLO,
++  OPCODE_XSR_ACCLO,
++  OPCODE_RSR_ACCHI,
++  OPCODE_WSR_ACCHI,
++  OPCODE_XSR_ACCHI,
 +  OPCODE_RFI,
 +  OPCODE_WAITI,
 +  OPCODE_RSR_INTERRUPT,
@@ -10791,6 +13438,32 @@ index 000000000000..2f000199b8cd
 +  OPCODE_RSR_CCOMPARE2,
 +  OPCODE_WSR_CCOMPARE2,
 +  OPCODE_XSR_CCOMPARE2,
++  OPCODE_IPF,
++  OPCODE_IHI,
++  OPCODE_IPFL,
++  OPCODE_IHU,
++  OPCODE_IIU,
++  OPCODE_III,
++  OPCODE_LICT,
++  OPCODE_LICW,
++  OPCODE_SICT,
++  OPCODE_SICW,
++  OPCODE_DHWB,
++  OPCODE_DHWBI,
++  OPCODE_DIWBUI_P,
++  OPCODE_DIWB,
++  OPCODE_DIWBI,
++  OPCODE_DHI,
++  OPCODE_DII,
++  OPCODE_DPFR,
++  OPCODE_DPFW,
++  OPCODE_DPFRO,
++  OPCODE_DPFWO,
++  OPCODE_DPFL,
++  OPCODE_DHU,
++  OPCODE_DIU,
++  OPCODE_SDCT,
++  OPCODE_LDCT,
 +  OPCODE_IDTLB,
 +  OPCODE_PDTLB,
 +  OPCODE_RDTLB0,
@@ -10801,6 +13474,7 @@ index 000000000000..2f000199b8cd
 +  OPCODE_RITLB0,
 +  OPCODE_RITLB1,
 +  OPCODE_WITLB,
++  OPCODE_CLAMPS,
 +  OPCODE_MIN,
 +  OPCODE_MAX,
 +  OPCODE_MINU,
@@ -10821,9 +13495,6 @@ index 000000000000..2f000199b8cd
 +  OPCODE_QUOS,
 +  OPCODE_REMU,
 +  OPCODE_REMS,
-+  OPCODE_RSR_ERACCESS,
-+  OPCODE_WSR_ERACCESS,
-+  OPCODE_XSR_ERACCESS,
 +  OPCODE_RER,
 +  OPCODE_WER,
 +  OPCODE_RUR_EXPSTATE,
@@ -11034,18 +13705,34 @@ index 000000000000..2f000199b8cd
 +	    return OPCODE_SRLI;
 +	  if (Field_op2_Slot_inst_get (insn) == 6)
 +	    {
++	      if (Field_sr_Slot_inst_get (insn) == 0)
++		return OPCODE_XSR_LBEG;
++	      if (Field_sr_Slot_inst_get (insn) == 1)
++		return OPCODE_XSR_LEND;
++	      if (Field_sr_Slot_inst_get (insn) == 2)
++		return OPCODE_XSR_LCOUNT;
 +	      if (Field_sr_Slot_inst_get (insn) == 3)
 +		return OPCODE_XSR_SAR;
 +	      if (Field_sr_Slot_inst_get (insn) == 5)
 +		return OPCODE_XSR_LITBASE;
 +	      if (Field_sr_Slot_inst_get (insn) == 12)
 +		return OPCODE_XSR_SCOMPARE1;
++	      if (Field_sr_Slot_inst_get (insn) == 16)
++		return OPCODE_XSR_ACCLO;
++	      if (Field_sr_Slot_inst_get (insn) == 17)
++		return OPCODE_XSR_ACCHI;
++	      if (Field_sr_Slot_inst_get (insn) == 32)
++		return OPCODE_XSR_M0;
++	      if (Field_sr_Slot_inst_get (insn) == 33)
++		return OPCODE_XSR_M1;
++	      if (Field_sr_Slot_inst_get (insn) == 34)
++		return OPCODE_XSR_M2;
++	      if (Field_sr_Slot_inst_get (insn) == 35)
++		return OPCODE_XSR_M3;
 +	      if (Field_sr_Slot_inst_get (insn) == 72)
 +		return OPCODE_XSR_WINDOWBASE;
 +	      if (Field_sr_Slot_inst_get (insn) == 73)
 +		return OPCODE_XSR_WINDOWSTART;
-+	      if (Field_sr_Slot_inst_get (insn) == 95)
-+		return OPCODE_XSR_ERACCESS;
 +	      if (Field_sr_Slot_inst_get (insn) == 96)
 +		return OPCODE_XSR_IBREAKENABLE;
 +	      if (Field_sr_Slot_inst_get (insn) == 97)
@@ -11154,6 +13841,18 @@ index 000000000000..2f000199b8cd
 +	    return OPCODE_MUL16S;
 +	  if (Field_op2_Slot_inst_get (insn) == 15)
 +	    {
++	      if (Field_r_Slot_inst_get (insn) == 0)
++		return OPCODE_LICT;
++	      if (Field_r_Slot_inst_get (insn) == 1)
++		return OPCODE_SICT;
++	      if (Field_r_Slot_inst_get (insn) == 2)
++		return OPCODE_LICW;
++	      if (Field_r_Slot_inst_get (insn) == 3)
++		return OPCODE_SICW;
++	      if (Field_r_Slot_inst_get (insn) == 8)
++		return OPCODE_LDCT;
++	      if (Field_r_Slot_inst_get (insn) == 9)
++		return OPCODE_SDCT;
 +	      if (Field_r_Slot_inst_get (insn) == 14 &&
 +		  Field_t_Slot_inst_get (insn) == 0)
 +		return OPCODE_RFDO;
@@ -11164,10 +13863,6 @@ index 000000000000..2f000199b8cd
 +	}
 +      if (Field_op1_Slot_inst_get (insn) == 2)
 +	{
-+	  if (Field_op2_Slot_inst_get (insn) == 6)
-+	    return OPCODE_SALTU;
-+	  if (Field_op2_Slot_inst_get (insn) == 7)
-+	    return OPCODE_SALT;
 +	  if (Field_op2_Slot_inst_get (insn) == 8)
 +	    return OPCODE_MULL;
 +	  if (Field_op2_Slot_inst_get (insn) == 12)
@@ -11183,18 +13878,34 @@ index 000000000000..2f000199b8cd
 +	{
 +	  if (Field_op2_Slot_inst_get (insn) == 0)
 +	    {
++	      if (Field_sr_Slot_inst_get (insn) == 0)
++		return OPCODE_RSR_LBEG;
++	      if (Field_sr_Slot_inst_get (insn) == 1)
++		return OPCODE_RSR_LEND;
++	      if (Field_sr_Slot_inst_get (insn) == 2)
++		return OPCODE_RSR_LCOUNT;
 +	      if (Field_sr_Slot_inst_get (insn) == 3)
 +		return OPCODE_RSR_SAR;
 +	      if (Field_sr_Slot_inst_get (insn) == 5)
 +		return OPCODE_RSR_LITBASE;
 +	      if (Field_sr_Slot_inst_get (insn) == 12)
 +		return OPCODE_RSR_SCOMPARE1;
++	      if (Field_sr_Slot_inst_get (insn) == 16)
++		return OPCODE_RSR_ACCLO;
++	      if (Field_sr_Slot_inst_get (insn) == 17)
++		return OPCODE_RSR_ACCHI;
++	      if (Field_sr_Slot_inst_get (insn) == 32)
++		return OPCODE_RSR_M0;
++	      if (Field_sr_Slot_inst_get (insn) == 33)
++		return OPCODE_RSR_M1;
++	      if (Field_sr_Slot_inst_get (insn) == 34)
++		return OPCODE_RSR_M2;
++	      if (Field_sr_Slot_inst_get (insn) == 35)
++		return OPCODE_RSR_M3;
 +	      if (Field_sr_Slot_inst_get (insn) == 72)
 +		return OPCODE_RSR_WINDOWBASE;
 +	      if (Field_sr_Slot_inst_get (insn) == 73)
 +		return OPCODE_RSR_WINDOWSTART;
-+	      if (Field_sr_Slot_inst_get (insn) == 95)
-+		return OPCODE_RSR_ERACCESS;
 +	      if (Field_sr_Slot_inst_get (insn) == 96)
 +		return OPCODE_RSR_IBREAKENABLE;
 +	      if (Field_sr_Slot_inst_get (insn) == 97)
@@ -11296,20 +14007,36 @@ index 000000000000..2f000199b8cd
 +	    }
 +	  if (Field_op2_Slot_inst_get (insn) == 1)
 +	    {
++	      if (Field_sr_Slot_inst_get (insn) == 0)
++		return OPCODE_WSR_LBEG;
++	      if (Field_sr_Slot_inst_get (insn) == 1)
++		return OPCODE_WSR_LEND;
++	      if (Field_sr_Slot_inst_get (insn) == 2)
++		return OPCODE_WSR_LCOUNT;
 +	      if (Field_sr_Slot_inst_get (insn) == 3)
 +		return OPCODE_WSR_SAR;
 +	      if (Field_sr_Slot_inst_get (insn) == 5)
 +		return OPCODE_WSR_LITBASE;
 +	      if (Field_sr_Slot_inst_get (insn) == 12)
 +		return OPCODE_WSR_SCOMPARE1;
++	      if (Field_sr_Slot_inst_get (insn) == 16)
++		return OPCODE_WSR_ACCLO;
++	      if (Field_sr_Slot_inst_get (insn) == 17)
++		return OPCODE_WSR_ACCHI;
++	      if (Field_sr_Slot_inst_get (insn) == 32)
++		return OPCODE_WSR_M0;
++	      if (Field_sr_Slot_inst_get (insn) == 33)
++		return OPCODE_WSR_M1;
++	      if (Field_sr_Slot_inst_get (insn) == 34)
++		return OPCODE_WSR_M2;
++	      if (Field_sr_Slot_inst_get (insn) == 35)
++		return OPCODE_WSR_M3;
 +	      if (Field_sr_Slot_inst_get (insn) == 72)
 +		return OPCODE_WSR_WINDOWBASE;
 +	      if (Field_sr_Slot_inst_get (insn) == 73)
 +		return OPCODE_WSR_WINDOWSTART;
 +	      if (Field_sr_Slot_inst_get (insn) == 89)
 +		return OPCODE_WSR_MMID;
-+	      if (Field_sr_Slot_inst_get (insn) == 95)
-+		return OPCODE_WSR_ERACCESS;
 +	      if (Field_sr_Slot_inst_get (insn) == 96)
 +		return OPCODE_WSR_IBREAKENABLE;
 +	      if (Field_sr_Slot_inst_get (insn) == 97)
@@ -11409,6 +14136,8 @@ index 000000000000..2f000199b8cd
 +	    }
 +	  if (Field_op2_Slot_inst_get (insn) == 2)
 +	    return OPCODE_SEXT;
++	  if (Field_op2_Slot_inst_get (insn) == 3)
++	    return OPCODE_CLAMPS;
 +	  if (Field_op2_Slot_inst_get (insn) == 4)
 +	    return OPCODE_MIN;
 +	  if (Field_op2_Slot_inst_get (insn) == 5)
@@ -11484,6 +14213,56 @@ index 000000000000..2f000199b8cd
 +	return OPCODE_S16I;
 +      if (Field_r_Slot_inst_get (insn) == 6)
 +	return OPCODE_S32I;
++      if (Field_r_Slot_inst_get (insn) == 7)
++	{
++	  if (Field_t_Slot_inst_get (insn) == 0)
++	    return OPCODE_DPFR;
++	  if (Field_t_Slot_inst_get (insn) == 1)
++	    return OPCODE_DPFW;
++	  if (Field_t_Slot_inst_get (insn) == 2)
++	    return OPCODE_DPFRO;
++	  if (Field_t_Slot_inst_get (insn) == 3)
++	    return OPCODE_DPFWO;
++	  if (Field_t_Slot_inst_get (insn) == 4)
++	    return OPCODE_DHWB;
++	  if (Field_t_Slot_inst_get (insn) == 5)
++	    return OPCODE_DHWBI;
++	  if (Field_t_Slot_inst_get (insn) == 6)
++	    return OPCODE_DHI;
++	  if (Field_t_Slot_inst_get (insn) == 7)
++	    return OPCODE_DII;
++	  if (Field_t_Slot_inst_get (insn) == 8)
++	    {
++	      if (Field_op1_Slot_inst_get (insn) == 0)
++		return OPCODE_DPFL;
++	      if (Field_op1_Slot_inst_get (insn) == 2)
++		return OPCODE_DHU;
++	      if (Field_op1_Slot_inst_get (insn) == 3)
++		return OPCODE_DIU;
++	      if (Field_op1_Slot_inst_get (insn) == 4)
++		return OPCODE_DIWB;
++	      if (Field_op1_Slot_inst_get (insn) == 5)
++		return OPCODE_DIWBI;
++	      if (Field_op1_Slot_inst_get (insn) == 15 &&
++		  Field_op2_Slot_inst_get (insn) == 0)
++		return OPCODE_DIWBUI_P;
++	    }
++	  if (Field_t_Slot_inst_get (insn) == 12)
++	    return OPCODE_IPF;
++	  if (Field_t_Slot_inst_get (insn) == 13)
++	    {
++	      if (Field_op1_Slot_inst_get (insn) == 0)
++		return OPCODE_IPFL;
++	      if (Field_op1_Slot_inst_get (insn) == 2)
++		return OPCODE_IHU;
++	      if (Field_op1_Slot_inst_get (insn) == 3)
++		return OPCODE_IIU;
++	    }
++	  if (Field_t_Slot_inst_get (insn) == 14)
++	    return OPCODE_IHI;
++	  if (Field_t_Slot_inst_get (insn) == 15)
++	    return OPCODE_III;
++	}
 +      if (Field_r_Slot_inst_get (insn) == 9)
 +	return OPCODE_L16SI;
 +      if (Field_r_Slot_inst_get (insn) == 10)
@@ -11498,6 +14277,363 @@ index 000000000000..2f000199b8cd
 +	return OPCODE_S32C1I;
 +      if (Field_r_Slot_inst_get (insn) == 15)
 +	return OPCODE_S32RI;
++    }
++  if (Field_op0_Slot_inst_get (insn) == 4)
++    {
++      if (Field_op2_Slot_inst_get (insn) == 0)
++	{
++	  if (Field_op1_Slot_inst_get (insn) == 8 &&
++	      Field_t3_Slot_inst_get (insn) == 0 &&
++	      Field_tlo_Slot_inst_get (insn) == 0 &&
++	      Field_r3_Slot_inst_get (insn) == 0)
++	    return OPCODE_MULA_DD_LL_LDINC;
++	  if (Field_op1_Slot_inst_get (insn) == 9 &&
++	      Field_t3_Slot_inst_get (insn) == 0 &&
++	      Field_tlo_Slot_inst_get (insn) == 0 &&
++	      Field_r3_Slot_inst_get (insn) == 0)
++	    return OPCODE_MULA_DD_HL_LDINC;
++	  if (Field_op1_Slot_inst_get (insn) == 10 &&
++	      Field_t3_Slot_inst_get (insn) == 0 &&
++	      Field_tlo_Slot_inst_get (insn) == 0 &&
++	      Field_r3_Slot_inst_get (insn) == 0)
++	    return OPCODE_MULA_DD_LH_LDINC;
++	  if (Field_op1_Slot_inst_get (insn) == 11 &&
++	      Field_t3_Slot_inst_get (insn) == 0 &&
++	      Field_tlo_Slot_inst_get (insn) == 0 &&
++	      Field_r3_Slot_inst_get (insn) == 0)
++	    return OPCODE_MULA_DD_HH_LDINC;
++	}
++      if (Field_op2_Slot_inst_get (insn) == 1)
++	{
++	  if (Field_op1_Slot_inst_get (insn) == 8 &&
++	      Field_t3_Slot_inst_get (insn) == 0 &&
++	      Field_tlo_Slot_inst_get (insn) == 0 &&
++	      Field_r3_Slot_inst_get (insn) == 0)
++	    return OPCODE_MULA_DD_LL_LDDEC;
++	  if (Field_op1_Slot_inst_get (insn) == 9 &&
++	      Field_t3_Slot_inst_get (insn) == 0 &&
++	      Field_tlo_Slot_inst_get (insn) == 0 &&
++	      Field_r3_Slot_inst_get (insn) == 0)
++	    return OPCODE_MULA_DD_HL_LDDEC;
++	  if (Field_op1_Slot_inst_get (insn) == 10 &&
++	      Field_t3_Slot_inst_get (insn) == 0 &&
++	      Field_tlo_Slot_inst_get (insn) == 0 &&
++	      Field_r3_Slot_inst_get (insn) == 0)
++	    return OPCODE_MULA_DD_LH_LDDEC;
++	  if (Field_op1_Slot_inst_get (insn) == 11 &&
++	      Field_t3_Slot_inst_get (insn) == 0 &&
++	      Field_tlo_Slot_inst_get (insn) == 0 &&
++	      Field_r3_Slot_inst_get (insn) == 0)
++	    return OPCODE_MULA_DD_HH_LDDEC;
++	}
++      if (Field_op2_Slot_inst_get (insn) == 2)
++	{
++	  if (Field_op1_Slot_inst_get (insn) == 4 &&
++	      Field_s_Slot_inst_get (insn) == 0 &&
++	      Field_w_Slot_inst_get (insn) == 0 &&
++	      Field_r3_Slot_inst_get (insn) == 0 &&
++	      Field_t3_Slot_inst_get (insn) == 0 &&
++	      Field_tlo_Slot_inst_get (insn) == 0)
++	    return OPCODE_MUL_DD_LL;
++	  if (Field_op1_Slot_inst_get (insn) == 5 &&
++	      Field_s_Slot_inst_get (insn) == 0 &&
++	      Field_w_Slot_inst_get (insn) == 0 &&
++	      Field_r3_Slot_inst_get (insn) == 0 &&
++	      Field_t3_Slot_inst_get (insn) == 0 &&
++	      Field_tlo_Slot_inst_get (insn) == 0)
++	    return OPCODE_MUL_DD_HL;
++	  if (Field_op1_Slot_inst_get (insn) == 6 &&
++	      Field_s_Slot_inst_get (insn) == 0 &&
++	      Field_w_Slot_inst_get (insn) == 0 &&
++	      Field_r3_Slot_inst_get (insn) == 0 &&
++	      Field_t3_Slot_inst_get (insn) == 0 &&
++	      Field_tlo_Slot_inst_get (insn) == 0)
++	    return OPCODE_MUL_DD_LH;
++	  if (Field_op1_Slot_inst_get (insn) == 7 &&
++	      Field_s_Slot_inst_get (insn) == 0 &&
++	      Field_w_Slot_inst_get (insn) == 0 &&
++	      Field_r3_Slot_inst_get (insn) == 0 &&
++	      Field_t3_Slot_inst_get (insn) == 0 &&
++	      Field_tlo_Slot_inst_get (insn) == 0)
++	    return OPCODE_MUL_DD_HH;
++	  if (Field_op1_Slot_inst_get (insn) == 8 &&
++	      Field_s_Slot_inst_get (insn) == 0 &&
++	      Field_w_Slot_inst_get (insn) == 0 &&
++	      Field_r3_Slot_inst_get (insn) == 0 &&
++	      Field_t3_Slot_inst_get (insn) == 0 &&
++	      Field_tlo_Slot_inst_get (insn) == 0)
++	    return OPCODE_MULA_DD_LL;
++	  if (Field_op1_Slot_inst_get (insn) == 9 &&
++	      Field_s_Slot_inst_get (insn) == 0 &&
++	      Field_w_Slot_inst_get (insn) == 0 &&
++	      Field_r3_Slot_inst_get (insn) == 0 &&
++	      Field_t3_Slot_inst_get (insn) == 0 &&
++	      Field_tlo_Slot_inst_get (insn) == 0)
++	    return OPCODE_MULA_DD_HL;
++	  if (Field_op1_Slot_inst_get (insn) == 10 &&
++	      Field_s_Slot_inst_get (insn) == 0 &&
++	      Field_w_Slot_inst_get (insn) == 0 &&
++	      Field_r3_Slot_inst_get (insn) == 0 &&
++	      Field_t3_Slot_inst_get (insn) == 0 &&
++	      Field_tlo_Slot_inst_get (insn) == 0)
++	    return OPCODE_MULA_DD_LH;
++	  if (Field_op1_Slot_inst_get (insn) == 11 &&
++	      Field_s_Slot_inst_get (insn) == 0 &&
++	      Field_w_Slot_inst_get (insn) == 0 &&
++	      Field_r3_Slot_inst_get (insn) == 0 &&
++	      Field_t3_Slot_inst_get (insn) == 0 &&
++	      Field_tlo_Slot_inst_get (insn) == 0)
++	    return OPCODE_MULA_DD_HH;
++	  if (Field_op1_Slot_inst_get (insn) == 12 &&
++	      Field_s_Slot_inst_get (insn) == 0 &&
++	      Field_w_Slot_inst_get (insn) == 0 &&
++	      Field_r3_Slot_inst_get (insn) == 0 &&
++	      Field_t3_Slot_inst_get (insn) == 0 &&
++	      Field_tlo_Slot_inst_get (insn) == 0)
++	    return OPCODE_MULS_DD_LL;
++	  if (Field_op1_Slot_inst_get (insn) == 13 &&
++	      Field_s_Slot_inst_get (insn) == 0 &&
++	      Field_w_Slot_inst_get (insn) == 0 &&
++	      Field_r3_Slot_inst_get (insn) == 0 &&
++	      Field_t3_Slot_inst_get (insn) == 0 &&
++	      Field_tlo_Slot_inst_get (insn) == 0)
++	    return OPCODE_MULS_DD_HL;
++	  if (Field_op1_Slot_inst_get (insn) == 14 &&
++	      Field_s_Slot_inst_get (insn) == 0 &&
++	      Field_w_Slot_inst_get (insn) == 0 &&
++	      Field_r3_Slot_inst_get (insn) == 0 &&
++	      Field_t3_Slot_inst_get (insn) == 0 &&
++	      Field_tlo_Slot_inst_get (insn) == 0)
++	    return OPCODE_MULS_DD_LH;
++	  if (Field_op1_Slot_inst_get (insn) == 15 &&
++	      Field_s_Slot_inst_get (insn) == 0 &&
++	      Field_w_Slot_inst_get (insn) == 0 &&
++	      Field_r3_Slot_inst_get (insn) == 0 &&
++	      Field_t3_Slot_inst_get (insn) == 0 &&
++	      Field_tlo_Slot_inst_get (insn) == 0)
++	    return OPCODE_MULS_DD_HH;
++	}
++      if (Field_op2_Slot_inst_get (insn) == 3)
++	{
++	  if (Field_op1_Slot_inst_get (insn) == 4 &&
++	      Field_r_Slot_inst_get (insn) == 0 &&
++	      Field_t3_Slot_inst_get (insn) == 0 &&
++	      Field_tlo_Slot_inst_get (insn) == 0)
++	    return OPCODE_MUL_AD_LL;
++	  if (Field_op1_Slot_inst_get (insn) == 5 &&
++	      Field_r_Slot_inst_get (insn) == 0 &&
++	      Field_t3_Slot_inst_get (insn) == 0 &&
++	      Field_tlo_Slot_inst_get (insn) == 0)
++	    return OPCODE_MUL_AD_HL;
++	  if (Field_op1_Slot_inst_get (insn) == 6 &&
++	      Field_r_Slot_inst_get (insn) == 0 &&
++	      Field_t3_Slot_inst_get (insn) == 0 &&
++	      Field_tlo_Slot_inst_get (insn) == 0)
++	    return OPCODE_MUL_AD_LH;
++	  if (Field_op1_Slot_inst_get (insn) == 7 &&
++	      Field_r_Slot_inst_get (insn) == 0 &&
++	      Field_t3_Slot_inst_get (insn) == 0 &&
++	      Field_tlo_Slot_inst_get (insn) == 0)
++	    return OPCODE_MUL_AD_HH;
++	  if (Field_op1_Slot_inst_get (insn) == 8 &&
++	      Field_r_Slot_inst_get (insn) == 0 &&
++	      Field_t3_Slot_inst_get (insn) == 0 &&
++	      Field_tlo_Slot_inst_get (insn) == 0)
++	    return OPCODE_MULA_AD_LL;
++	  if (Field_op1_Slot_inst_get (insn) == 9 &&
++	      Field_r_Slot_inst_get (insn) == 0 &&
++	      Field_t3_Slot_inst_get (insn) == 0 &&
++	      Field_tlo_Slot_inst_get (insn) == 0)
++	    return OPCODE_MULA_AD_HL;
++	  if (Field_op1_Slot_inst_get (insn) == 10 &&
++	      Field_r_Slot_inst_get (insn) == 0 &&
++	      Field_t3_Slot_inst_get (insn) == 0 &&
++	      Field_tlo_Slot_inst_get (insn) == 0)
++	    return OPCODE_MULA_AD_LH;
++	  if (Field_op1_Slot_inst_get (insn) == 11 &&
++	      Field_r_Slot_inst_get (insn) == 0 &&
++	      Field_t3_Slot_inst_get (insn) == 0 &&
++	      Field_tlo_Slot_inst_get (insn) == 0)
++	    return OPCODE_MULA_AD_HH;
++	  if (Field_op1_Slot_inst_get (insn) == 12 &&
++	      Field_r_Slot_inst_get (insn) == 0 &&
++	      Field_t3_Slot_inst_get (insn) == 0 &&
++	      Field_tlo_Slot_inst_get (insn) == 0)
++	    return OPCODE_MULS_AD_LL;
++	  if (Field_op1_Slot_inst_get (insn) == 13 &&
++	      Field_r_Slot_inst_get (insn) == 0 &&
++	      Field_t3_Slot_inst_get (insn) == 0 &&
++	      Field_tlo_Slot_inst_get (insn) == 0)
++	    return OPCODE_MULS_AD_HL;
++	  if (Field_op1_Slot_inst_get (insn) == 14 &&
++	      Field_r_Slot_inst_get (insn) == 0 &&
++	      Field_t3_Slot_inst_get (insn) == 0 &&
++	      Field_tlo_Slot_inst_get (insn) == 0)
++	    return OPCODE_MULS_AD_LH;
++	  if (Field_op1_Slot_inst_get (insn) == 15 &&
++	      Field_r_Slot_inst_get (insn) == 0 &&
++	      Field_t3_Slot_inst_get (insn) == 0 &&
++	      Field_tlo_Slot_inst_get (insn) == 0)
++	    return OPCODE_MULS_AD_HH;
++	}
++      if (Field_op2_Slot_inst_get (insn) == 4)
++	{
++	  if (Field_op1_Slot_inst_get (insn) == 8 &&
++	      Field_r3_Slot_inst_get (insn) == 0)
++	    return OPCODE_MULA_DA_LL_LDINC;
++	  if (Field_op1_Slot_inst_get (insn) == 9 &&
++	      Field_r3_Slot_inst_get (insn) == 0)
++	    return OPCODE_MULA_DA_HL_LDINC;
++	  if (Field_op1_Slot_inst_get (insn) == 10 &&
++	      Field_r3_Slot_inst_get (insn) == 0)
++	    return OPCODE_MULA_DA_LH_LDINC;
++	  if (Field_op1_Slot_inst_get (insn) == 11 &&
++	      Field_r3_Slot_inst_get (insn) == 0)
++	    return OPCODE_MULA_DA_HH_LDINC;
++	}
++      if (Field_op2_Slot_inst_get (insn) == 5)
++	{
++	  if (Field_op1_Slot_inst_get (insn) == 8 &&
++	      Field_r3_Slot_inst_get (insn) == 0)
++	    return OPCODE_MULA_DA_LL_LDDEC;
++	  if (Field_op1_Slot_inst_get (insn) == 9 &&
++	      Field_r3_Slot_inst_get (insn) == 0)
++	    return OPCODE_MULA_DA_HL_LDDEC;
++	  if (Field_op1_Slot_inst_get (insn) == 10 &&
++	      Field_r3_Slot_inst_get (insn) == 0)
++	    return OPCODE_MULA_DA_LH_LDDEC;
++	  if (Field_op1_Slot_inst_get (insn) == 11 &&
++	      Field_r3_Slot_inst_get (insn) == 0)
++	    return OPCODE_MULA_DA_HH_LDDEC;
++	}
++      if (Field_op2_Slot_inst_get (insn) == 6)
++	{
++	  if (Field_op1_Slot_inst_get (insn) == 4 &&
++	      Field_s_Slot_inst_get (insn) == 0 &&
++	      Field_w_Slot_inst_get (insn) == 0 &&
++	      Field_r3_Slot_inst_get (insn) == 0)
++	    return OPCODE_MUL_DA_LL;
++	  if (Field_op1_Slot_inst_get (insn) == 5 &&
++	      Field_s_Slot_inst_get (insn) == 0 &&
++	      Field_w_Slot_inst_get (insn) == 0 &&
++	      Field_r3_Slot_inst_get (insn) == 0)
++	    return OPCODE_MUL_DA_HL;
++	  if (Field_op1_Slot_inst_get (insn) == 6 &&
++	      Field_s_Slot_inst_get (insn) == 0 &&
++	      Field_w_Slot_inst_get (insn) == 0 &&
++	      Field_r3_Slot_inst_get (insn) == 0)
++	    return OPCODE_MUL_DA_LH;
++	  if (Field_op1_Slot_inst_get (insn) == 7 &&
++	      Field_s_Slot_inst_get (insn) == 0 &&
++	      Field_w_Slot_inst_get (insn) == 0 &&
++	      Field_r3_Slot_inst_get (insn) == 0)
++	    return OPCODE_MUL_DA_HH;
++	  if (Field_op1_Slot_inst_get (insn) == 8 &&
++	      Field_s_Slot_inst_get (insn) == 0 &&
++	      Field_w_Slot_inst_get (insn) == 0 &&
++	      Field_r3_Slot_inst_get (insn) == 0)
++	    return OPCODE_MULA_DA_LL;
++	  if (Field_op1_Slot_inst_get (insn) == 9 &&
++	      Field_s_Slot_inst_get (insn) == 0 &&
++	      Field_w_Slot_inst_get (insn) == 0 &&
++	      Field_r3_Slot_inst_get (insn) == 0)
++	    return OPCODE_MULA_DA_HL;
++	  if (Field_op1_Slot_inst_get (insn) == 10 &&
++	      Field_s_Slot_inst_get (insn) == 0 &&
++	      Field_w_Slot_inst_get (insn) == 0 &&
++	      Field_r3_Slot_inst_get (insn) == 0)
++	    return OPCODE_MULA_DA_LH;
++	  if (Field_op1_Slot_inst_get (insn) == 11 &&
++	      Field_s_Slot_inst_get (insn) == 0 &&
++	      Field_w_Slot_inst_get (insn) == 0 &&
++	      Field_r3_Slot_inst_get (insn) == 0)
++	    return OPCODE_MULA_DA_HH;
++	  if (Field_op1_Slot_inst_get (insn) == 12 &&
++	      Field_s_Slot_inst_get (insn) == 0 &&
++	      Field_w_Slot_inst_get (insn) == 0 &&
++	      Field_r3_Slot_inst_get (insn) == 0)
++	    return OPCODE_MULS_DA_LL;
++	  if (Field_op1_Slot_inst_get (insn) == 13 &&
++	      Field_s_Slot_inst_get (insn) == 0 &&
++	      Field_w_Slot_inst_get (insn) == 0 &&
++	      Field_r3_Slot_inst_get (insn) == 0)
++	    return OPCODE_MULS_DA_HL;
++	  if (Field_op1_Slot_inst_get (insn) == 14 &&
++	      Field_s_Slot_inst_get (insn) == 0 &&
++	      Field_w_Slot_inst_get (insn) == 0 &&
++	      Field_r3_Slot_inst_get (insn) == 0)
++	    return OPCODE_MULS_DA_LH;
++	  if (Field_op1_Slot_inst_get (insn) == 15 &&
++	      Field_s_Slot_inst_get (insn) == 0 &&
++	      Field_w_Slot_inst_get (insn) == 0 &&
++	      Field_r3_Slot_inst_get (insn) == 0)
++	    return OPCODE_MULS_DA_HH;
++	}
++      if (Field_op2_Slot_inst_get (insn) == 7)
++	{
++	  if (Field_op1_Slot_inst_get (insn) == 0 &&
++	      Field_r_Slot_inst_get (insn) == 0)
++	    return OPCODE_UMUL_AA_LL;
++	  if (Field_op1_Slot_inst_get (insn) == 1 &&
++	      Field_r_Slot_inst_get (insn) == 0)
++	    return OPCODE_UMUL_AA_HL;
++	  if (Field_op1_Slot_inst_get (insn) == 2 &&
++	      Field_r_Slot_inst_get (insn) == 0)
++	    return OPCODE_UMUL_AA_LH;
++	  if (Field_op1_Slot_inst_get (insn) == 3 &&
++	      Field_r_Slot_inst_get (insn) == 0)
++	    return OPCODE_UMUL_AA_HH;
++	  if (Field_op1_Slot_inst_get (insn) == 4 &&
++	      Field_r_Slot_inst_get (insn) == 0)
++	    return OPCODE_MUL_AA_LL;
++	  if (Field_op1_Slot_inst_get (insn) == 5 &&
++	      Field_r_Slot_inst_get (insn) == 0)
++	    return OPCODE_MUL_AA_HL;
++	  if (Field_op1_Slot_inst_get (insn) == 6 &&
++	      Field_r_Slot_inst_get (insn) == 0)
++	    return OPCODE_MUL_AA_LH;
++	  if (Field_op1_Slot_inst_get (insn) == 7 &&
++	      Field_r_Slot_inst_get (insn) == 0)
++	    return OPCODE_MUL_AA_HH;
++	  if (Field_op1_Slot_inst_get (insn) == 8 &&
++	      Field_r_Slot_inst_get (insn) == 0)
++	    return OPCODE_MULA_AA_LL;
++	  if (Field_op1_Slot_inst_get (insn) == 9 &&
++	      Field_r_Slot_inst_get (insn) == 0)
++	    return OPCODE_MULA_AA_HL;
++	  if (Field_op1_Slot_inst_get (insn) == 10 &&
++	      Field_r_Slot_inst_get (insn) == 0)
++	    return OPCODE_MULA_AA_LH;
++	  if (Field_op1_Slot_inst_get (insn) == 11 &&
++	      Field_r_Slot_inst_get (insn) == 0)
++	    return OPCODE_MULA_AA_HH;
++	  if (Field_op1_Slot_inst_get (insn) == 12 &&
++	      Field_r_Slot_inst_get (insn) == 0)
++	    return OPCODE_MULS_AA_LL;
++	  if (Field_op1_Slot_inst_get (insn) == 13 &&
++	      Field_r_Slot_inst_get (insn) == 0)
++	    return OPCODE_MULS_AA_HL;
++	  if (Field_op1_Slot_inst_get (insn) == 14 &&
++	      Field_r_Slot_inst_get (insn) == 0)
++	    return OPCODE_MULS_AA_LH;
++	  if (Field_op1_Slot_inst_get (insn) == 15 &&
++	      Field_r_Slot_inst_get (insn) == 0)
++	    return OPCODE_MULS_AA_HH;
++	}
++      if (Field_op2_Slot_inst_get (insn) == 8)
++	{
++	  if (Field_op1_Slot_inst_get (insn) == 0 &&
++	      Field_t_Slot_inst_get (insn) == 0 &&
++	      Field_rhi_Slot_inst_get (insn) == 0)
++	    return OPCODE_LDINC;
++	}
++      if (Field_op2_Slot_inst_get (insn) == 9)
++	{
++	  if (Field_op1_Slot_inst_get (insn) == 0 &&
++	      Field_t_Slot_inst_get (insn) == 0 &&
++	      Field_rhi_Slot_inst_get (insn) == 0)
++	    return OPCODE_LDDEC;
++	}
 +    }
 +  if (Field_op0_Slot_inst_get (insn) == 5)
 +    {
@@ -11540,6 +14676,15 @@ index 000000000000..2f000199b8cd
 +	{
 +	  if (Field_m_Slot_inst_get (insn) == 0)
 +	    return OPCODE_ENTRY;
++	  if (Field_m_Slot_inst_get (insn) == 1)
++	    {
++	      if (Field_r_Slot_inst_get (insn) == 8)
++		return OPCODE_LOOP;
++	      if (Field_r_Slot_inst_get (insn) == 9)
++		return OPCODE_LOOPNEZ;
++	      if (Field_r_Slot_inst_get (insn) == 10)
++		return OPCODE_LOOPGTZ;
++	    }
 +	  if (Field_m_Slot_inst_get (insn) == 2)
 +	    return OPCODE_BLTUI;
 +	  if (Field_m_Slot_inst_get (insn) == 3)
@@ -11717,6 +14862,15 @@ index 000000000000..2f000199b8cd
 +  0,
 +  0,
 +  0,
++  Field_r3_Slot_inst_get,
++  Field_rbit2_Slot_inst_get,
++  Field_rhi_Slot_inst_get,
++  Field_t3_Slot_inst_get,
++  Field_tbit2_Slot_inst_get,
++  Field_tlo_Slot_inst_get,
++  Field_w_Slot_inst_get,
++  Field_y_Slot_inst_get,
++  Field_x_Slot_inst_get,
 +  Field_xt_wbr15_imm_Slot_inst_get,
 +  Field_xt_wbr18_imm_Slot_inst_get,
 +  Field_bitindex_Slot_inst_get,
@@ -11724,7 +14878,11 @@ index 000000000000..2f000199b8cd
 +  Implicit_Field_ar0_get,
 +  Implicit_Field_ar4_get,
 +  Implicit_Field_ar8_get,
-+  Implicit_Field_ar12_get
++  Implicit_Field_ar12_get,
++  Implicit_Field_mr0_get,
++  Implicit_Field_mr1_get,
++  Implicit_Field_mr2_get,
++  Implicit_Field_mr3_get
 +};
 +
 +static xtensa_set_field_fn
@@ -11764,10 +14922,23 @@ index 000000000000..2f000199b8cd
 +  0,
 +  0,
 +  0,
++  Field_r3_Slot_inst_set,
++  Field_rbit2_Slot_inst_set,
++  Field_rhi_Slot_inst_set,
++  Field_t3_Slot_inst_set,
++  Field_tbit2_Slot_inst_set,
++  Field_tlo_Slot_inst_set,
++  Field_w_Slot_inst_set,
++  Field_y_Slot_inst_set,
++  Field_x_Slot_inst_set,
 +  Field_xt_wbr15_imm_Slot_inst_set,
 +  Field_xt_wbr18_imm_Slot_inst_set,
 +  Field_bitindex_Slot_inst_set,
 +  Field_s3to1_Slot_inst_set,
++  Implicit_Field_set,
++  Implicit_Field_set,
++  Implicit_Field_set,
++  Implicit_Field_set,
 +  Implicit_Field_set,
 +  Implicit_Field_set,
 +  Implicit_Field_set,
@@ -11813,12 +14984,25 @@ index 000000000000..2f000199b8cd
 +  Field_imm7_Slot_inst16a_get,
 +  0,
 +  0,
++  0,
++  0,
++  0,
++  0,
++  0,
++  0,
++  0,
++  0,
++  0,
 +  Field_bitindex_Slot_inst16a_get,
 +  Field_s3to1_Slot_inst16a_get,
 +  Implicit_Field_ar0_get,
 +  Implicit_Field_ar4_get,
 +  Implicit_Field_ar8_get,
-+  Implicit_Field_ar12_get
++  Implicit_Field_ar12_get,
++  Implicit_Field_mr0_get,
++  Implicit_Field_mr1_get,
++  Implicit_Field_mr2_get,
++  Implicit_Field_mr3_get
 +};
 +
 +static xtensa_set_field_fn
@@ -11860,8 +15044,21 @@ index 000000000000..2f000199b8cd
 +  Field_imm7_Slot_inst16a_set,
 +  0,
 +  0,
++  0,
++  0,
++  0,
++  0,
++  0,
++  0,
++  0,
++  0,
++  0,
 +  Field_bitindex_Slot_inst16a_set,
 +  Field_s3to1_Slot_inst16a_set,
++  Implicit_Field_set,
++  Implicit_Field_set,
++  Implicit_Field_set,
++  Implicit_Field_set,
 +  Implicit_Field_set,
 +  Implicit_Field_set,
 +  Implicit_Field_set,
@@ -11907,12 +15104,25 @@ index 000000000000..2f000199b8cd
 +  Field_imm7_Slot_inst16b_get,
 +  0,
 +  0,
++  0,
++  0,
++  0,
++  0,
++  0,
++  0,
++  0,
++  0,
++  0,
 +  Field_bitindex_Slot_inst16b_get,
 +  Field_s3to1_Slot_inst16b_get,
 +  Implicit_Field_ar0_get,
 +  Implicit_Field_ar4_get,
 +  Implicit_Field_ar8_get,
-+  Implicit_Field_ar12_get
++  Implicit_Field_ar12_get,
++  Implicit_Field_mr0_get,
++  Implicit_Field_mr1_get,
++  Implicit_Field_mr2_get,
++  Implicit_Field_mr3_get
 +};
 +
 +static xtensa_set_field_fn
@@ -11954,8 +15164,21 @@ index 000000000000..2f000199b8cd
 +  Field_imm7_Slot_inst16b_set,
 +  0,
 +  0,
++  0,
++  0,
++  0,
++  0,
++  0,
++  0,
++  0,
++  0,
++  0,
 +  Field_bitindex_Slot_inst16b_set,
 +  Field_s3to1_Slot_inst16b_set,
++  Implicit_Field_set,
++  Implicit_Field_set,
++  Implicit_Field_set,
++  Implicit_Field_set,
 +  Implicit_Field_set,
 +  Implicit_Field_set,
 +  Implicit_Field_set,
@@ -12299,15 +15522,15 @@ index 000000000000..2f000199b8cd
 +  3 /* insn_size */, 0,
 +  3, formats, format_decoder, length_decoder,
 +  3, slots,
-+  43 /* num_fields */,
-+  77, operands,
-+  263, iclasses,
-+  317, opcodes, 0,
-+  1, regfiles,
++  56 /* num_fields */,
++  94, operands,
++  313, iclasses,
++  439, opcodes, 0,
++  2, regfiles,
 +  NUM_STATES, states, 0,
 +  NUM_SYSREGS, sysregs, 0,
 +  { MAX_SPECIAL_REG, MAX_USER_REG }, { 0, 0 },
-+  1, interfaces, 0,
++  6, interfaces, 0,
 +  0, funcUnits, 0
 +};
 -- 
