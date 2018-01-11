@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58741)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60390)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eZdwN-0002YG-Ro
-	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 09:34:48 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1eZdzU-0005Aj-5Q
+	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 09:38:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eZdwM-0004Tp-UH
-	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 09:34:47 -0500
-Received: from mail-ot0-x22f.google.com ([2607:f8b0:4003:c0f::22f]:35152)
+	(envelope-from <richard.henderson@linaro.org>) id 1eZdzO-0007Fn-Jn
+	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 09:38:00 -0500
+Received: from mail-pg0-x241.google.com ([2607:f8b0:400e:c05::241]:32781)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1eZdwM-0004TA-Pu
-	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 09:34:46 -0500
-Received: by mail-ot0-x22f.google.com with SMTP id 53so2252880otj.2
-	for <qemu-devel@nongnu.org>; Thu, 11 Jan 2018 06:34:46 -0800 (PST)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1eZdzO-0007FU-Dm
+	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 09:37:54 -0500
+Received: by mail-pg0-x241.google.com with SMTP id i196so2310727pgd.0
+	for <qemu-devel@nongnu.org>; Thu, 11 Jan 2018 06:37:54 -0800 (PST)
+References: <1515637324-96034-1-git-send-email-mjc@sifive.com>
+	<1515637324-96034-4-git-send-email-mjc@sifive.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <d78fb981-83a5-9398-f878-095d41fc3dff@linaro.org>
+Date: Thu, 11 Jan 2018 06:37:50 -0800
 MIME-Version: 1.0
-In-Reply-To: <20180111045937.2119-1-david@gibson.dropbear.id.au>
-References: <20180111045937.2119-1-david@gibson.dropbear.id.au>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 11 Jan 2018 14:34:25 +0000
-Message-ID: <CAFEAcA-+WnbQXn1y+BV8_B6Jq_SjTQ7ogBdYObfgMqKA_3m3FA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 00/11] ppc-for-2.12 queue 20180111
+In-Reply-To: <1515637324-96034-4-git-send-email-mjc@sifive.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3 03/21] RISC-V CPU Core Definition
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,36 +31,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-ppc@nongnu.org, Alexander Graf <agraf@suse.de>, QEMU Developers <qemu-devel@nongnu.org>, Greg Kurz <groug@kaod.org>, Michael Roth <mdroth@linux.vnet.ibm.com>, surajjs@au1.ibm.com
+To: Michael Clark <mjc@sifive.com>, qemu-devel@nongnu.org
+Cc: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Palmer Dabbelt <palmer@sifive.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>, RISC-V Patches <patches@groups.riscv.org>
 
-On 11 January 2018 at 04:59, David Gibson <david@gibson.dropbear.id.au> wrote:
-> The following changes since commit 3cee4db661ab9c0fce7937b3bbfa188a1845f31f:
->
->   Merge remote-tracking branch 'remotes/ericb/tags/pull-nbd-2018-01-08' into staging (2018-01-09 15:22:47 +0000)
->
-> are available in the Git repository at:
->
->   git://github.com/dgibson/qemu.git tags/ppc-for-2.12-20180111
->
-> for you to fetch changes up to 51f84465dd985fc21589b2eac1f18658fc9783e9:
->
->   spapr: Correct compatibility mode setting for hotplugged CPUs (2018-01-10 12:53:00 +1100)
->
-> ----------------------------------------------------------------
-> ppc patch queue 2018-01-11
->
-> This pull request supersedes ppc-for-2.12-20180108 and several before
-> it.  The earlier pull request included a patch which exposed a bug in
-> the ARM TCG backend.  I've pulled that out and will repost once the
-> ARM bug is fixed (a patch has been posted by Richard Henderson).
->
-> Higlights from this series:
->   * SLOF update
->   * Several new devices for embedded platforms
->   * Fix to correctly set compatiblity mode for hotplugged CPUs
->   * dtc compile fix for older MacOS versions
+On 01/10/2018 06:21 PM, Michael Clark wrote:
+> +static inline void cpu_get_tb_cpu_state(CPURISCVState *env, target_ulong *pc,
+> +                                        target_ulong *cs_base, uint32_t *flags)
+> +{
+> +    *pc = env->pc;
+> +    *cs_base = 0;
+> +    *flags = 0; /* necessary to avoid compiler warning */
+> +}
 
-Applied, thanks.
+Actually, at minimum you have to put enough into flags to differentiate machine
+vs supervisor vs user mode.  Otherwise you can wind up running a previously
+translated block with the wrong permissions.
 
--- PMM
+The patch I saw from Stefan O'Rear would do nicely.
+
+
+r~
