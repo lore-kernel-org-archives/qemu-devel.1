@@ -1,26 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54071)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58892)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1eZjfQ-00068s-EZ
-	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 15:41:41 -0500
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1eZju7-0005AG-0F
+	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 15:56:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1eZjfN-0002iA-Aw
-	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 15:41:40 -0500
-Resent-Message-Id: <E1eZjfN-0002iA-Aw@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21441)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1eZjfN-0002hF-45
-	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 15:41:37 -0500
-In-Reply-To: <1515700960-26388-1-git-send-email-thuth@redhat.com>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <151570326218.441.13378298987831799927@5adcb62bf0d6>
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1eZju5-0002Af-Qu
+	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 15:56:51 -0500
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Date: Thu, 11 Jan 2018 17:56:06 -0300
+Message-Id: <20180111205626.23291-2-f4bug@amsat.org>
+In-Reply-To: <20180111205626.23291-1-f4bug@amsat.org>
+References: <20180111205626.23291-1-f4bug@amsat.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Thu, 11 Jan 2018 12:41:03 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH] net: Allow netdevs to be used with
- 'hostfwd_add' and 'hostfwd_remove'
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH v6 01/21] sdhci: add a 'spec_version property'
+ (default to v2)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,58 +27,110 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: thuth@redhat.com
-Cc: famz@redhat.com, qemu-devel@nongnu.org, jasowang@redhat.com, samuel.thibault@ens-lyon.org, dgilbert@redhat.com
+To: Alistair Francis <alistair.francis@xilinx.com>, Peter Maydell <peter.maydell@linaro.org>, Andrey Smirnov <andrew.smirnov@gmail.com>, Igor Mitsyanko <i.mitsyanko@gmail.com>
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, Sai Pavan Boddu <saipava@xilinx.com>, Clement Deschamps <clement.deschamps@antfield.fr>, Jean-Christophe Dubois <jcd@tribudubois.net>, =?UTF-8?q?Gr=C3=A9gory=20Estrade?= <gregory.estrade@gmail.com>, Krzysztof Kozlowski <krzk@kernel.org>, Andrew Baumann <Andrew.Baumann@microsoft.com>, Prasad J Pandit <pjp@fedoraproject.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, qemu-arm@nongnu.org
 
-SGksCgpUaGlzIHNlcmllcyBmYWlsZWQgYnVpbGQgdGVzdCBvbiBwcGMgaG9zdC4gUGxlYXNlIGZp
-bmQgdGhlIGRldGFpbHMgYmVsb3cuCgpNZXNzYWdlLWlkOiAxNTE1NzAwOTYwLTI2Mzg4LTEtZ2l0
-LXNlbmQtZW1haWwtdGh1dGhAcmVkaGF0LmNvbQpTdWJqZWN0OiBbUWVtdS1kZXZlbF0gW1BBVENI
-XSBuZXQ6IEFsbG93IG5ldGRldnMgdG8gYmUgdXNlZCB3aXRoICdob3N0ZndkX2FkZCcgYW5kICdo
-b3N0ZndkX3JlbW92ZScKVHlwZTogc2VyaWVzCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMh
-L2Jpbi9iYXNoCiMgVGVzdGluZyBzY3JpcHQgd2lsbCBiZSBpbnZva2VkIHVuZGVyIHRoZSBnaXQg
-Y2hlY2tvdXQgd2l0aAojIEhFQUQgcG9pbnRpbmcgdG8gYSBjb21taXQgdGhhdCBoYXMgdGhlIHBh
-dGNoZXMgYXBwbGllZCBvbiB0b3Agb2YgImJhc2UiCiMgYnJhbmNoCnNldCAtZQplY2hvICI9PT0g
-RU5WID09PSIKZW52CmVjaG8gIj09PSBQQUNLQUdFUyA9PT0iCnJwbSAtcWEKZWNobyAiPT09IFRF
-U1QgQkVHSU4gPT09IgpJTlNUQUxMPSRQV0QvaW5zdGFsbApCVUlMRD0kUFdEL2J1aWxkCm1rZGly
-IC1wICRCVUlMRCAkSU5TVEFMTApTUkM9JFBXRApjZCAkQlVJTEQKJFNSQy9jb25maWd1cmUgLS1w
-cmVmaXg9JElOU1RBTEwKbWFrZSAtajEwMAojIFhYWDogd2UgbmVlZCByZWxpYWJsZSBjbGVhbiB1
-cAojIG1ha2UgY2hlY2sgLWoxMDAgVj0xCm1ha2UgaW5zdGFsbAo9PT0gVEVTVCBTQ1JJUFQgRU5E
-ID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApT
-dWJtb2R1bGUgJ2R0YycgKGdpdDovL2dpdC5xZW11LXByb2plY3Qub3JnL2R0Yy5naXQpIHJlZ2lz
-dGVyZWQgZm9yIHBhdGggJ2R0YycKU3VibW9kdWxlICdwaXhtYW4nIChnaXQ6Ly9hbm9uZ2l0LmZy
-ZWVkZXNrdG9wLm9yZy9waXhtYW4pIHJlZ2lzdGVyZWQgZm9yIHBhdGggJ3BpeG1hbicKU3VibW9k
-dWxlICdyb21zL1NMT0YnIChnaXQ6Ly9naXQucWVtdS1wcm9qZWN0Lm9yZy9TTE9GLmdpdCkgcmVn
-aXN0ZXJlZCBmb3IgcGF0aCAncm9tcy9TTE9GJwpTdWJtb2R1bGUgJ3JvbXMvaXB4ZScgKGdpdDov
-L2dpdC5xZW11LXByb2plY3Qub3JnL2lweGUuZ2l0KSByZWdpc3RlcmVkIGZvciBwYXRoICdyb21z
-L2lweGUnClN1Ym1vZHVsZSAncm9tcy9vcGVuYmlvcycgKGdpdDovL2dpdC5xZW11LXByb2plY3Qu
-b3JnL29wZW5iaW9zLmdpdCkgcmVnaXN0ZXJlZCBmb3IgcGF0aCAncm9tcy9vcGVuYmlvcycKU3Vi
-bW9kdWxlICdyb21zL29wZW5oYWNrd2FyZScgKGdpdDovL2dpdC5xZW11LXByb2plY3Qub3JnL29w
-ZW5oYWNrd2FyZS5naXQpIHJlZ2lzdGVyZWQgZm9yIHBhdGggJ3JvbXMvb3BlbmhhY2t3YXJlJwpT
-dWJtb2R1bGUgJ3JvbXMvcWVtdS1wYWxjb2RlJyAoZ2l0Oi8vZ2l0aHViLmNvbS9ydGg3NjgwL3Fl
-bXUtcGFsY29kZS5naXQpIHJlZ2lzdGVyZWQgZm9yIHBhdGggJ3JvbXMvcWVtdS1wYWxjb2RlJwpT
-dWJtb2R1bGUgJ3JvbXMvc2VhYmlvcycgKGdpdDovL2dpdC5xZW11LXByb2plY3Qub3JnL3NlYWJp
-b3MuZ2l0LykgcmVnaXN0ZXJlZCBmb3IgcGF0aCAncm9tcy9zZWFiaW9zJwpTdWJtb2R1bGUgJ3Jv
-bXMvc2dhYmlvcycgKGdpdDovL2dpdC5xZW11LXByb2plY3Qub3JnL3NnYWJpb3MuZ2l0KSByZWdp
-c3RlcmVkIGZvciBwYXRoICdyb21zL3NnYWJpb3MnClN1Ym1vZHVsZSAncm9tcy91LWJvb3QnIChn
-aXQ6Ly9naXQucWVtdS1wcm9qZWN0Lm9yZy91LWJvb3QuZ2l0KSByZWdpc3RlcmVkIGZvciBwYXRo
-ICdyb21zL3UtYm9vdCcKU3VibW9kdWxlICdyb21zL3ZnYWJpb3MnIChnaXQ6Ly9naXQucWVtdS1w
-cm9qZWN0Lm9yZy92Z2FiaW9zLmdpdC8pIHJlZ2lzdGVyZWQgZm9yIHBhdGggJ3JvbXMvdmdhYmlv
-cycKQ2xvbmluZyBpbnRvICdkdGMnLi4uClN1Ym1vZHVsZSBwYXRoICdkdGMnOiBjaGVja2VkIG91
-dCAnNjVjYzRkMjc0OGEyYzJlNmYyN2YxY2YzOWUwN2E1ZGJhYmQ4MGViZicKZmF0YWw6IHJlbW90
-ZSBlcnJvcjogYWNjZXNzIGRlbmllZCBvciByZXBvc2l0b3J5IG5vdCBleHBvcnRlZDogL3BpeG1h
-bgpDbG9uaW5nIGludG8gJ3BpeG1hbicuLi4KQ2xvbmUgb2YgJ2dpdDovL2Fub25naXQuZnJlZWRl
-c2t0b3Aub3JnL3BpeG1hbicgaW50byBzdWJtb2R1bGUgcGF0aCAncGl4bWFuJyBmYWlsZWQKVHJh
-Y2ViYWNrIChtb3N0IHJlY2VudCBjYWxsIGxhc3QpOgogIEZpbGUgIi9ob21lL3BhdGNoZXcvcGF0
-Y2hldy9wYXRjaGV3LWNsaSIsIGxpbmUgNTA0LCBpbiB0ZXN0X29uZQogICAgZ2l0X2Nsb25lX3Jl
-cG8oY2xvbmUsIHJbInJlcG8iXSwgclsiaGVhZCJdLCBsb2dmKQogIEZpbGUgIi9ob21lL3BhdGNo
-ZXcvcGF0Y2hldy9wYXRjaGV3LWNsaSIsIGxpbmUgNTAsIGluIGdpdF9jbG9uZV9yZXBvCiAgICBz
-dGRlcnI9bG9nZiwgc3Rkb3V0PWxvZ2YpCiAgRmlsZSAiL3Vzci9saWI2NC9weXRob24zLjQvc3Vi
-cHJvY2Vzcy5weSIsIGxpbmUgNTU4LCBpbiBjaGVja19jYWxsCiAgICByYWlzZSBDYWxsZWRQcm9j
-ZXNzRXJyb3IocmV0Y29kZSwgY21kKQpzdWJwcm9jZXNzLkNhbGxlZFByb2Nlc3NFcnJvcjogQ29t
-bWFuZCAnWydnaXQnLCAnY2xvbmUnLCAnLXEnLCAnLS1yZWN1cnNpdmUnLCAnL2hvbWUvcGF0Y2hl
-dy8uY2FjaGUvcGF0Y2hldy1naXQtY2FjaGUvaHR0cHNnaXRodWJjb21wYXRjaGV3cHJvamVjdHFl
-bXUtM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NCcsICcvdmFyL3RtcC9w
-YXRjaGV3LXRlc3Rlci10bXAtb2J1azB4aDcvc3JjJ10nIHJldHVybmVkIG5vbi16ZXJvIGV4aXQg
-c3RhdHVzIDEKCgoKLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcg
-W2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNo
-ZXctZGV2ZWxAZnJlZWxpc3RzLm9yZw==
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Reviewed-by: Alistair Francis <alistair.francis@xilinx.com>
+---
+ hw/sd/sdhci-internal.h |  4 ++--
+ include/hw/sd/sdhci.h  |  2 ++
+ hw/sd/sdhci.c          | 19 +++++++++++++++++--
+ 3 files changed, 21 insertions(+), 4 deletions(-)
+
+diff --git a/hw/sd/sdhci-internal.h b/hw/sd/sdhci-internal.h
+index fc807f08f3..b7751c815f 100644
+--- a/hw/sd/sdhci-internal.h
++++ b/hw/sd/sdhci-internal.h
+@@ -210,9 +210,9 @@
+ /* Slot interrupt status */
+ #define SDHC_SLOT_INT_STATUS            0xFC
+ 
+-/* HWInit Host Controller Version Register 0x0401 */
++/* HWInit Host Controller Version Register */
+ #define SDHC_HCVER                      0xFE
+-#define SD_HOST_SPECv2_VERS             0x2401
++#define SDHC_HCVER_VENDOR               0x24
+ 
+ #define SDHC_REGISTERS_MAP_SIZE         0x100
+ #define SDHC_INSERTION_DELAY            (NANOSECONDS_PER_SECOND)
+diff --git a/include/hw/sd/sdhci.h b/include/hw/sd/sdhci.h
+index 6117004949..8786676ac8 100644
+--- a/include/hw/sd/sdhci.h
++++ b/include/hw/sd/sdhci.h
+@@ -76,6 +76,7 @@ typedef struct SDHCIState {
+     /* Read-only registers */
+     uint64_t capareg;      /* Capabilities Register */
+     uint64_t maxcurr;      /* Maximum Current Capabilities Register */
++    uint16_t version;      /* Host Controller Version Register */
+ 
+     uint8_t  *fifo_buffer; /* SD host i/o FIFO buffer */
+     uint32_t buf_maxsz;
+@@ -90,6 +91,7 @@ typedef struct SDHCIState {
+ 
+     /* Configurable properties */
+     bool pending_insert_quirk; /* Quirk for Raspberry Pi card insert int */
++    uint8_t spec_version;
+ } SDHCIState;
+ 
+ #define TYPE_PCI_SDHCI "sdhci-pci"
+diff --git a/hw/sd/sdhci.c b/hw/sd/sdhci.c
+index 7a2901ae4a..c8f750451e 100644
+--- a/hw/sd/sdhci.c
++++ b/hw/sd/sdhci.c
+@@ -173,7 +173,8 @@ static void sdhci_reset(SDHCIState *s)
+ 
+     timer_del(s->insert_timer);
+     timer_del(s->transfer_timer);
+-    /* Set all registers to 0. Capabilities registers are not cleared
++
++    /* Set all registers to 0. Capabilities/Version registers are not cleared
+      * and assumed to always preserve their value, given to them during
+      * initialization */
+     memset(&s->sdmasysad, 0, (uintptr_t)&s->capareg - (uintptr_t)&s->sdmasysad);
+@@ -917,7 +918,7 @@ static uint64_t sdhci_read(void *opaque, hwaddr offset, unsigned size)
+         ret = (uint32_t)(s->admasysaddr >> 32);
+         break;
+     case SDHC_SLOT_INT_STATUS:
+-        ret = (SD_HOST_SPECv2_VERS << 16) | sdhci_slotint(s);
++        ret = (s->version << 16) | sdhci_slotint(s);
+         break;
+     default:
+         qemu_log_mask(LOG_UNIMP, "SDHC rd_%ub @0x%02" HWADDR_PRIx " "
+@@ -1173,6 +1174,15 @@ static inline unsigned int sdhci_get_fifolen(SDHCIState *s)
+     }
+ }
+ 
++static void sdhci_init_readonly_registers(SDHCIState *s, Error **errp)
++{
++    if (s->spec_version != 2) {
++        error_setg(errp, "Only Spec v2 is supported");
++        return;
++    }
++    s->version = (SDHC_HCVER_VENDOR << 8) | (s->spec_version - 1);
++}
++
+ static void sdhci_initfn(SDHCIState *s)
+ {
+     qbus_create_inplace(&s->sdbus, sizeof(s->sdbus),
+@@ -1184,6 +1194,10 @@ static void sdhci_initfn(SDHCIState *s)
+ 
+ static void sdhci_common_realize(SDHCIState *s, Error **errp)
+ {
++    sdhci_init_readonly_registers(s, errp);
++    if (errp && *errp) {
++        return;
++    }
+     s->buf_maxsz = sdhci_get_fifolen(s);
+     s->fifo_buffer = g_malloc0(s->buf_maxsz);
+ 
+@@ -1282,6 +1296,7 @@ const VMStateDescription sdhci_vmstate = {
+ /* Capabilities registers provide information on supported features of this
+  * specific host controller implementation */
+ static Property sdhci_properties[] = {
++    DEFINE_PROP_UINT8("sd-spec-version", SDHCIState, spec_version, 2),
+     DEFINE_PROP_UINT64("capareg", SDHCIState, capareg,
+             SDHC_CAPAB_REG_DEFAULT),
+     DEFINE_PROP_UINT64("maxcurr", SDHCIState, maxcurr, 0),
+-- 
+2.15.1
