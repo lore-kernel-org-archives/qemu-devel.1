@@ -1,20 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34413)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34440)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcmvbkbc@gmail.com>) id 1eZk2U-0004pc-D1
-	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 16:05:31 -0500
+	(envelope-from <jcmvbkbc@gmail.com>) id 1eZk2W-0004rv-T9
+	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 16:05:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcmvbkbc@gmail.com>) id 1eZk2T-0008RR-6a
-	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 16:05:30 -0500
-Received: from mail-lf0-x244.google.com ([2a00:1450:4010:c07::244]:43217)
+	(envelope-from <jcmvbkbc@gmail.com>) id 1eZk2V-0008Sc-BI
+	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 16:05:32 -0500
+Received: from mail-lf0-x242.google.com ([2a00:1450:4010:c07::242]:36885)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <jcmvbkbc@gmail.com>) id 1eZk2S-0008Qb-Il
-	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 16:05:28 -0500
-Received: by mail-lf0-x244.google.com with SMTP id a17so629765lfk.10
-	for <qemu-devel@nongnu.org>; Thu, 11 Jan 2018 13:05:28 -0800 (PST)
+	(Exim 4.71) (envelope-from <jcmvbkbc@gmail.com>) id 1eZk2U-0008Rj-LJ
+	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 16:05:30 -0500
+Received: by mail-lf0-x242.google.com with SMTP id f3so3999741lfe.4
+	for <qemu-devel@nongnu.org>; Thu, 11 Jan 2018 13:05:30 -0800 (PST)
 From: Max Filippov <jcmvbkbc@gmail.com>
-Date: Thu, 11 Jan 2018 13:04:54 -0800
-Message-Id: <1515704703-10347-1-git-send-email-jcmvbkbc@gmail.com>
-Subject: [Qemu-devel] [PATCH 0/9] target/xtensa: add noMMU support to XTFPGA
+Date: Thu, 11 Jan 2018 13:04:55 -0800
+Message-Id: <1515704703-10347-2-git-send-email-jcmvbkbc@gmail.com>
+In-Reply-To: <1515704703-10347-1-git-send-email-jcmvbkbc@gmail.com>
+References: <1515704703-10347-1-git-send-email-jcmvbkbc@gmail.com>
+Subject: [Qemu-devel] [PATCH 1/9] hw/xtensa/xtfpga: rewrite mini bootloader
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,58 +28,58 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Max Filippov <jcmvbkbc@gmail.com>
 
-Hello,
+Don't load jump target into the CPU config, instead put it and initial
+a2 as literals into the mini bootloader and use l32r to load them
+natively. With these changes it should be possible to do warm reboot of
+the guest.
 
-this series cleans up XTFPGA xtensa boards: reworks built-in mini
-bootloader so that it supports warm reboots and makes function/structure
-naming consistent in the hw/xtensa/xtfpga.c.
-It extracts common local memory instantiation function into a separate
-source file.
-It adds noMMU variant for each XTFPGA board. noMMU XTFPGA variants have
-different physical memory layout: the RAM size is limited to 256M and
-it starts at physical address 0x60000000 and MMIO is visible through two
-ranges of physical addresses starting at 0x70000000 and 0x90000000.
-The series imports two noMMU cores: de212 (noMMU default core for xtensa
-linux) and sample_controller (default core for xtensa Zephyr OS).
+Signed-off-by: Max Filippov <jcmvbkbc@gmail.com>
+---
+ hw/xtensa/xtfpga.c | 28 +++++++++++++++++++++++-----
+ 1 file changed, 23 insertions(+), 5 deletions(-)
 
-Max Filippov (9):
-  hw/xtensa/xtfpga: rewrite mini bootloader
-  hw/xtensa/xtfpga: clean up function/structure names
-  target/xtensa: fix default sysrom/sysram addresses
-  hw/xtensa: extract xtensa_create_memory_regions
-  hw/xtensa/xtfpga: extract flash configuration
-  hw/xtensa/xtfpga: support noMMU cores
-  target/xtensa: add de212 core
-  target/xtensa: use different default CPU for MMU/noMMU
-  target/xtensa: add sample_controller core
-
- hw/xtensa/Makefile.objs                            |     1 +
- hw/xtensa/sim.c                                    |    38 +-
- hw/xtensa/xtensa_memory.c                          |    55 +
- hw/xtensa/xtensa_memory.h                          |    40 +
- hw/xtensa/xtfpga.c                                 |   414 +-
- target/xtensa/Makefile.objs                        |     2 +
- target/xtensa/core-de212.c                         |    53 +
- target/xtensa/core-de212/core-isa.h                |   622 +
- target/xtensa/core-de212/gdb-config.c              |   198 +
- target/xtensa/core-de212/xtensa-modules.c          | 14566 +++++++++++++++++++
- target/xtensa/core-sample_controller.c             |    53 +
- target/xtensa/core-sample_controller/core-isa.h    |   644 +
- target/xtensa/core-sample_controller/gdb-config.c  |   141 +
- .../xtensa/core-sample_controller/xtensa-modules.c | 11377 +++++++++++++++
- target/xtensa/cpu.h                                |     7 +-
- target/xtensa/overlay_tool.h                       |     8 +-
- 16 files changed, 28077 insertions(+), 142 deletions(-)
- create mode 100644 hw/xtensa/xtensa_memory.c
- create mode 100644 hw/xtensa/xtensa_memory.h
- create mode 100644 target/xtensa/core-de212.c
- create mode 100644 target/xtensa/core-de212/core-isa.h
- create mode 100644 target/xtensa/core-de212/gdb-config.c
- create mode 100644 target/xtensa/core-de212/xtensa-modules.c
- create mode 100644 target/xtensa/core-sample_controller.c
- create mode 100644 target/xtensa/core-sample_controller/core-isa.h
- create mode 100644 target/xtensa/core-sample_controller/gdb-config.c
- create mode 100644 target/xtensa/core-sample_controller/xtensa-modules.c
-
+diff --git a/hw/xtensa/xtfpga.c b/hw/xtensa/xtfpga.c
+index 1971ecfdc5a3..ba681683d608 100644
+--- a/hw/xtensa/xtfpga.c
++++ b/hw/xtensa/xtfpga.c
+@@ -372,15 +372,33 @@ static void lx_init(const LxBoardDesc *board, MachineState *machine)
+             }
+         }
+         if (entry_point != env->pc) {
+-            static const uint8_t jx_a0[] = {
++            uint8_t boot[] = {
+ #ifdef TARGET_WORDS_BIGENDIAN
+-                0x0a, 0, 0,
++                0x60, 0x00, 0x08,       /* j    1f */
++                0x00,                   /* .literal_position */
++                0x00, 0x00, 0x00, 0x00, /* .literal entry_pc */
++                0x00, 0x00, 0x00, 0x00, /* .literal entry_a2 */
++                                        /* 1: */
++                0x10, 0xff, 0xfe,       /* l32r a0, entry_pc */
++                0x12, 0xff, 0xfe,       /* l32r a2, entry_a2 */
++                0x0a, 0x00, 0x00,       /* jx   a0 */
+ #else
+-                0xa0, 0, 0,
++                0x06, 0x02, 0x00,       /* j    1f */
++                0x00,                   /* .literal_position */
++                0x00, 0x00, 0x00, 0x00, /* .literal entry_pc */
++                0x00, 0x00, 0x00, 0x00, /* .literal entry_a2 */
++                                        /* 1: */
++                0x01, 0xfe, 0xff,       /* l32r a0, entry_pc */
++                0x21, 0xfe, 0xff,       /* l32r a2, entry_a2 */
++                0xa0, 0x00, 0x00,       /* jx   a0 */
+ #endif
+             };
+-            env->regs[0] = entry_point;
+-            cpu_physical_memory_write(env->pc, jx_a0, sizeof(jx_a0));
++            uint32_t entry_pc = tswap32(entry_point);
++            uint32_t entry_a2 = tswap32(tagptr);
++
++            memcpy(boot + 4, &entry_pc, sizeof(entry_pc));
++            memcpy(boot + 8, &entry_a2, sizeof(entry_a2));
++            cpu_physical_memory_write(env->pc, boot, sizeof(boot));
+         }
+     } else {
+         if (flash) {
 -- 
 2.1.4
