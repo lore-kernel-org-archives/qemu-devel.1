@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58073)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58177)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1eZiuz-0005fW-Rs
-	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 14:53:42 -0500
+	(envelope-from <kwolf@redhat.com>) id 1eZiv2-0005jA-CE
+	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 14:53:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1eZiuw-0000nN-0O
-	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 14:53:41 -0500
+	(envelope-from <kwolf@redhat.com>) id 1eZiv1-0000tb-EE
+	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 14:53:44 -0500
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Thu, 11 Jan 2018 20:52:22 +0100
-Message-Id: <20180111195225.4226-8-kwolf@redhat.com>
+Date: Thu, 11 Jan 2018 20:52:23 +0100
+Message-Id: <20180111195225.4226-9-kwolf@redhat.com>
 In-Reply-To: <20180111195225.4226-1-kwolf@redhat.com>
 References: <20180111195225.4226-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [RFC PATCH 07/10] qcow2: Handle full/falloc
- preallocation in qcow2_create2()
+Subject: [Qemu-devel] [RFC PATCH 08/10] util: Add
+ qemu_opts_to_qdict_filtered()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,61 +23,81 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, mreitz@redhat.com, pkrempa@redhat.com, eblake@redhat.com, qemu-devel@nongnu.org
 
-Once qcow2_create2() can be called directly on an already existing node,
-we must provide the 'full' and 'falloc' preallocation modes outside of
-creating the image on the protocol layer. Fortunately, we have
-preallocated truncate now which can provide this functionality.
+This allows, given a QemuOpts for a QemuOptsList that was merged from
+multiple QemuOptsList, to only consider those options that exist in one
+specific list. Block drivers need this to separate format-layer create
+options from protocol-level options.
 
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- block/qcow2.c | 28 +++++++++++++++++++---------
- 1 file changed, 19 insertions(+), 9 deletions(-)
+ include/qemu/option.h |  2 ++
+ util/qemu-option.c    | 28 +++++++++++++++++++++++++---
+ 2 files changed, 27 insertions(+), 3 deletions(-)
 
-diff --git a/block/qcow2.c b/block/qcow2.c
-index 686b765c06..868e0e8a62 100644
---- a/block/qcow2.c
-+++ b/block/qcow2.c
-@@ -2832,6 +2832,25 @@ static int qcow2_create2(BlockdevCreateOptions *create_options, Error **errp)
+diff --git a/include/qemu/option.h b/include/qemu/option.h
+index a88c5f02b1..197f80e79d 100644
+--- a/include/qemu/option.h
++++ b/include/qemu/option.h
+@@ -125,6 +125,8 @@ void qemu_opts_set_defaults(QemuOptsList *list, const char *params,
+                             int permit_abbrev);
+ QemuOpts *qemu_opts_from_qdict(QemuOptsList *list, const QDict *qdict,
+                                Error **errp);
++QDict *qemu_opts_to_qdict_filtered(QemuOpts *opts, QDict *qdict,
++                                   QemuOptsList *list, bool del);
+ QDict *qemu_opts_to_qdict(QemuOpts *opts, QDict *qdict);
+ void qemu_opts_absorb_qdict(QemuOpts *opts, QDict *qdict, Error **errp);
+ 
+diff --git a/util/qemu-option.c b/util/qemu-option.c
+index 553d3dc552..76dc5bedf8 100644
+--- a/util/qemu-option.c
++++ b/util/qemu-option.c
+@@ -1009,9 +1009,10 @@ void qemu_opts_absorb_qdict(QemuOpts *opts, QDict *qdict, Error **errp)
+  * TODO We'll want to use types appropriate for opt->desc->type, but
+  * this is enough for now.
+  */
+-QDict *qemu_opts_to_qdict(QemuOpts *opts, QDict *qdict)
++QDict *qemu_opts_to_qdict_filtered(QemuOpts *opts, QDict *qdict,
++                                   QemuOptsList *list, bool del)
+ {
+-    QemuOpt *opt;
++    QemuOpt *opt, *next;
+ 
+     if (!qdict) {
+         qdict = qdict_new();
+@@ -1019,12 +1020,33 @@ QDict *qemu_opts_to_qdict(QemuOpts *opts, QDict *qdict)
+     if (opts->id) {
+         qdict_put_str(qdict, "id", opts->id);
      }
-     blk_set_allow_write_beyond_eof(blk, true);
- 
-+    /* Clear the protocol layer and preallocate it if necessary */
-+    ret = blk_truncate(blk, 0, PREALLOC_MODE_OFF, errp);
-+    if (ret < 0) {
-+        goto out;
-+    }
-+
-+    if (qcow2_opts->preallocation == PREALLOC_MODE_FULL ||
-+        qcow2_opts->preallocation == PREALLOC_MODE_FALLOC)
-+    {
-+        int64_t prealloc_size =
-+            qcow2_calc_prealloc_size(qcow2_opts->size, cluster_size,
-+                                     refcount_order);
-+
-+        ret = blk_truncate(blk, prealloc_size, qcow2_opts->preallocation, errp);
-+        if (ret < 0) {
-+            goto out;
+-    QTAILQ_FOREACH(opt, &opts->head, next) {
++    QTAILQ_FOREACH_SAFE(opt, &opts->head, next, next) {
++        if (list) {
++            QemuOptDesc *desc;
++            bool found = false;
++            for (desc = list->desc; desc->name; desc++) {
++                if (!strcmp(desc->name, opt->name)) {
++                    found = true;
++                    break;
++                }
++            }
++            if (!found) {
++                continue;
++            }
 +        }
-+    }
+         qdict_put_str(qdict, opt->name, opt->str);
++        if (del) {
++            qemu_opt_del_all(opts, opt->name);
++        }
+     }
+     return qdict;
+ }
+ 
++QDict *qemu_opts_to_qdict(QemuOpts *opts, QDict *qdict)
++{
++    return qemu_opts_to_qdict_filtered(opts, qdict, NULL, false);
++}
 +
-     /* Write the header */
-     QEMU_BUILD_BUG_ON((1 << MIN_CLUSTER_BITS) < sizeof(*header));
-     header = g_malloc0(cluster_size);
-@@ -3068,15 +3087,6 @@ static int qcow2_create(const char *filename, QemuOpts *opts, Error **errp)
- 
- 
-     /* Create and open the file (protocol layer */
--    if (prealloc == PREALLOC_MODE_FULL || prealloc == PREALLOC_MODE_FALLOC) {
--        int refcount_order = ctz32(refcount_bits);
--        int64_t prealloc_size =
--            qcow2_calc_prealloc_size(size, cluster_size, refcount_order);
--        qemu_opt_set_number(opts, BLOCK_OPT_SIZE, prealloc_size, &error_abort);
--        qemu_opt_set(opts, BLOCK_OPT_PREALLOC, PreallocMode_str(prealloc),
--                     &error_abort);
--    }
--
-     ret = bdrv_create_file(filename, opts, errp);
-     if (ret < 0) {
-         goto finish;
+ /* Validate parsed opts against descriptions where no
+  * descriptions were provided in the QemuOptsList.
+  */
 -- 
 2.13.6
