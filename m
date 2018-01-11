@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46858)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47008)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1eZYC5-0000mI-SY
-	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 03:26:38 -0500
+	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1eZYCE-0000tV-Qh
+	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 03:26:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1eZYC5-0001ZW-2Z
-	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 03:26:37 -0500
-Received: from mail.ispras.ru ([83.149.199.45]:41836)
+	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1eZYCA-0001gv-Os
+	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 03:26:46 -0500
+Received: from mail.ispras.ru ([83.149.199.45]:41854)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1eZYC4-0001ZB-RM
-	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 03:26:37 -0500
+	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1eZYCA-0001fr-CF
+	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 03:26:42 -0500
 From: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
-Date: Thu, 11 Jan 2018 11:26:37 +0300
-Message-ID: <20180111082637.27295.78763.stgit@pasha-VirtualBox>
+Date: Thu, 11 Jan 2018 11:26:43 +0300
+Message-ID: <20180111082643.27295.68605.stgit@pasha-VirtualBox>
 In-Reply-To: <20180111082452.27295.85707.stgit@pasha-VirtualBox>
 References: <20180111082452.27295.85707.stgit@pasha-VirtualBox>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [RFC PATCH v3 18/30] replay/replay-internal.c: track
- holding of replay_lock
+Subject: [Qemu-devel] [RFC PATCH v3 19/30] replay: make locking visible
+ outside replay code
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,42 +32,125 @@ Cc: kwolf@redhat.com, peter.maydell@linaro.org, boost.lists@gmail.com, quintela@
 
 From: Alex Benn=C3=A9e <alex.bennee@linaro.org>
 
-This is modelled after the iothread mutex lock. We keep a TLS flag to
-indicate when that thread has acquired the lock and assert we don't
-double-lock or release when we shouldn't have.
+The replay_mutex_lock/unlock/locked functions are now going to be used
+for ensuring lock-step behaviour between the two threads. Make them
+public API functions and also provide stubs for non-QEMU builds on
+common paths.
 
 Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
 Tested-by: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
 ---
- replay/replay-internal.c |   11 +++++++++++
- 1 file changed, 11 insertions(+)
+ include/sysemu/replay.h  |   14 ++++++++++++++
+ replay/replay-internal.c |    9 ++++-----
+ replay/replay-internal.h |    5 ++---
+ stubs/replay.c           |   15 +++++++++++++++
+ 4 files changed, 35 insertions(+), 8 deletions(-)
 
+diff --git a/include/sysemu/replay.h b/include/sysemu/replay.h
+index b86d6bb..9973849 100644
+--- a/include/sysemu/replay.h
++++ b/include/sysemu/replay.h
+@@ -47,6 +47,20 @@ extern ReplayMode replay_mode;
+ /* Name of the initial VM snapshot */
+ extern char *replay_snapshot;
+=20
++/* Replay locking
++ *
++ * The locks are needed to protect the shared structures and log file
++ * when doing record/replay. They also are the main sync-point between
++ * the main-loop thread and the vCPU thread. This was a role
++ * previously filled by the BQL which has been busy trying to reduce
++ * its impact across the code. This ensures blocks of events stay
++ * sequential and reproducible.
++ */
++
++void replay_mutex_lock(void);
++void replay_mutex_unlock(void);
++bool replay_mutex_locked(void);
++
+ /* Replay process control functions */
+=20
+ /*! Enables recording or saving event log with specified parameters */
 diff --git a/replay/replay-internal.c b/replay/replay-internal.c
-index fca8514..157c863 100644
+index 157c863..a9a6a64 100644
 --- a/replay/replay-internal.c
 +++ b/replay/replay-internal.c
-@@ -179,13 +179,24 @@ void replay_mutex_destroy(void)
-     qemu_mutex_destroy(&lock);
+@@ -169,6 +169,8 @@ void replay_finish_event(void)
+     replay_fetch_data_kind();
  }
 =20
 +static __thread bool replay_locked;
 +
-+static bool replay_mutex_locked(void)
+ void replay_mutex_init(void)
+ {
+     qemu_mutex_init(&lock);
+@@ -179,9 +181,7 @@ void replay_mutex_destroy(void)
+     qemu_mutex_destroy(&lock);
+ }
+=20
+-static __thread bool replay_locked;
+-
+-static bool replay_mutex_locked(void)
++bool replay_mutex_locked(void)
+ {
+     return replay_locked;
+ }
+@@ -204,7 +204,7 @@ void replay_mutex_unlock(void)
+ void replay_save_instructions(void)
+ {
+     if (replay_file && replay_mode =3D=3D REPLAY_MODE_RECORD) {
+-        replay_mutex_lock();
++        g_assert(replay_mutex_locked());
+         int diff =3D (int)(replay_get_current_step() - replay_state.curr=
+ent_step);
+=20
+         /* Time can only go forward */
+@@ -215,6 +215,5 @@ void replay_save_instructions(void)
+             replay_put_dword(diff);
+             replay_state.current_step +=3D diff;
+         }
+-        replay_mutex_unlock();
+     }
+ }
+diff --git a/replay/replay-internal.h b/replay/replay-internal.h
+index 8e4c701..f5f8e96 100644
+--- a/replay/replay-internal.h
++++ b/replay/replay-internal.h
+@@ -100,12 +100,11 @@ int64_t replay_get_qword(void);
+ void replay_get_array(uint8_t *buf, size_t *size);
+ void replay_get_array_alloc(uint8_t **buf, size_t *size);
+=20
+-/* Mutex functions for protecting replay log file */
++/* Mutex functions for protecting replay log file and ensuring
++ * synchronisation between vCPU and main-loop threads. */
+=20
+ void replay_mutex_init(void);
+ void replay_mutex_destroy(void);
+-void replay_mutex_lock(void);
+-void replay_mutex_unlock(void);
+=20
+ /*! Checks error status of the file. */
+ void replay_check_error(void);
+diff --git a/stubs/replay.c b/stubs/replay.c
+index 9991ee5..cb050ef 100644
+--- a/stubs/replay.c
++++ b/stubs/replay.c
+@@ -73,3 +73,18 @@ uint64_t blkreplay_next_id(void)
+ {
+     return 0;
+ }
++
++void replay_mutex_lock(void)
 +{
-+    return replay_locked;
++    abort();
 +}
 +
- void replay_mutex_lock(void)
- {
-+    g_assert(!replay_mutex_locked());
-     qemu_mutex_lock(&lock);
-+    replay_locked =3D true;
- }
-=20
- void replay_mutex_unlock(void)
- {
-+    g_assert(replay_mutex_locked());
-+    replay_locked =3D false;
-     qemu_mutex_unlock(&lock);
- }
-=20
++void replay_mutex_unlock(void)
++{
++    abort();
++}
++
++bool replay_mutex_locked(void)
++{
++    return false;
++}
