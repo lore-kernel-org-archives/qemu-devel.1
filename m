@@ -1,26 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55503)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55584)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mjc@sifive.com>) id 1eZhox-0003dT-Gz
-	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 13:43:24 -0500
+	(envelope-from <malbarbo@gmail.com>) id 1eZhpP-0003x9-Ob
+	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 13:43:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mjc@sifive.com>) id 1eZhow-0005ZV-77
-	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 13:43:23 -0500
-Received: from mail-oi0-x235.google.com ([2607:f8b0:4003:c06::235]:38173)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mjc@sifive.com>) id 1eZhov-0005YT-Vr
-	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 13:43:22 -0500
-Received: by mail-oi0-x235.google.com with SMTP id m65so2291008oig.5
-	for <qemu-devel@nongnu.org>; Thu, 11 Jan 2018 10:43:21 -0800 (PST)
+	(envelope-from <malbarbo@gmail.com>) id 1eZhpO-0005xW-Lm
+	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 13:43:51 -0500
 MIME-Version: 1.0
-In-Reply-To: <e78a8a10-b46b-a9da-8c81-7dd48eb47b10@redhat.com>
-References: <1515637324-96034-1-git-send-email-mjc@sifive.com>
-	<1515637324-96034-22-git-send-email-mjc@sifive.com>
-	<e78a8a10-b46b-a9da-8c81-7dd48eb47b10@redhat.com>
-From: Michael Clark <mjc@sifive.com>
-Date: Fri, 12 Jan 2018 07:43:20 +1300
-Message-ID: <CAHNT7NuoL8b6EQdcku8Ex41_AHD8BVoA8504EBGFwNZqXyf1tw@mail.gmail.com>
+In-Reply-To: <20180111183714.22834-2-malbarbo@gmail.com>
+References: <20180111183714.22834-2-malbarbo@gmail.com>
+From: Marco A L Barbosa <malbarbo@gmail.com>
+Date: Thu, 11 Jan 2018 16:43:46 -0200
+Message-ID: <CAHpsRN8fYDbVgRSZUSyjb39uHLJCQurt5=N3BXtPd6gB2bQsTg@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v3 21/21] RISC-V Build Infrastructure
+Subject: Re: [Qemu-devel] [PATCH v2] linux-user: Add AT_SECURE auxval
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,64 +21,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Palmer Dabbelt <palmer@sifive.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>, RISC-V Patches <patches@groups.riscv.org>
+To: qemu-trivial@nongnu.org, qemu-devel@nongnu.org
 
-On Fri, Jan 12, 2018 at 3:05 AM, Eric Blake <eblake@redhat.com> wrote:
+For some reason send-email didn't include my comments, sorry.
 
-> On 01/10/2018 08:22 PM, Michael Clark wrote:
-> > This adds RISC-V into the build system enabling the following targets:
-> >
-> > - riscv32-softmmu
-> > - riscv64-softmmu
-> > - riscv32-linux-user
-> > - riscv64-linux-user
-> >
-> > This adds defaults configs for RISC-V, enables the build for the RISC-V
-> > CPU core, hardware, and Linux User Emulation. The 'qemu-binfmt-conf.sh'
-> > script is updated to add the RISC-V ELF magic.
-> >
-> > +++ b/qapi-schema.json
-> > @@ -413,7 +413,7 @@
-> >  # Since: 2.6
-> >  ##
-> >  { 'enum': 'CpuInfoArch',
-> > -  'data': ['x86', 'sparc', 'ppc', 'mips', 'tricore', 'other' ] }
-> > +  'data': ['x86', 'sparc', 'ppc', 'mips', 'tricore', 'riscv', 'other' ]
-> }
+Following the Peter Maydell advice we just pass through the host AT_SECURE.
+
+This fixes https://bugs.launchpad.net/qemu/+bug/1738771
+
+Version 1 for reference:
+https://lists.gnu.org/archive/html/qemu-devel/2017-10/msg03667.html
+https://lists.gnu.org/archive/html/qemu-devel/2018-01/msg01298.html
+
+On Thu, Jan 11, 2018 at 4:37 PM, Marco A L Barbosa <malbarbo@gmail.com>
+wrote:
+
+> ---
+>  linux-user/elfload.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
 >
-> Still missing documentation that riscv was added in 2.12 (see my
-> comments on v1).
-
-
-My apologies. I had a look at QKeyCode and it was not clear to me how to
-specify since on an enum value vs a field.
-
---- a/qapi-schema.json
-+++ b/qapi-schema.json
-@@ -411,6 +411,9 @@
- # @query-cpus.
-
-why is this @query-cpus and not @CpuInfoArch: as is the case for @QKeyCode?
-
- #
- # Since: 2.6
-+#
-+# @riscv: since 2.12
-+#
- ##
- { 'enum': 'CpuInfoArch',
-   'data': ['x86', 'sparc', 'ppc', 'mips', 'tricore', 'riscv', 'other' ] }
-
- Is this correct?
-
-> --- /dev/null
-> > +++ b/target/riscv/trace-events
-> > @@ -0,0 +1 @@
-> > +# See docs/devel/tracing.txt for syntax documentation.
-> >
+> diff --git a/linux-user/elfload.c b/linux-user/elfload.c
+> index 20f3d8c2c3..32a47674e6 100644
+> --- a/linux-user/elfload.c
+> +++ b/linux-user/elfload.c
+> @@ -1354,7 +1354,7 @@ struct exec
+>                                   ~(abi_ulong)(TARGET_ELF_EXEC_
+> PAGESIZE-1))
+>  #define TARGET_ELF_PAGEOFFSET(_v) ((_v) & (TARGET_ELF_EXEC_PAGESIZE-1))
 >
-> Do we really need this file if you don't have any traces yet?
+> -#define DLINFO_ITEMS 14
+> +#define DLINFO_ITEMS 15
+>
+>  static inline void memcpy_fromfs(void * to, const void * from, unsigned
+> long n)
+>  {
+> @@ -1786,6 +1786,7 @@ static abi_ulong create_elf_tables(abi_ulong p, int
+> argc, int envc,
+>      NEW_AUX_ENT(AT_HWCAP, (abi_ulong) ELF_HWCAP);
+>      NEW_AUX_ENT(AT_CLKTCK, (abi_ulong) sysconf(_SC_CLK_TCK));
+>      NEW_AUX_ENT(AT_RANDOM, (abi_ulong) u_rand_bytes);
+> +    NEW_AUX_ENT(AT_SECURE, (abi_ulong) qemu_getauxval(AT_SECURE));
+>
+>  #ifdef ELF_HWCAP2
+>      NEW_AUX_ENT(AT_HWCAP2, (abi_ulong) ELF_HWCAP2);
+> --
+> 2.11.0
+>
 >
 
-I'll remove the file or add some tracing in the next spin.
+
+-- 
+Marco A L Barbosa
+http://malbarbo.pro.br
+--
