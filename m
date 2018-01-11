@@ -1,21 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36044)
-	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1eZXsj-0000WW-KI
-	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 03:06:38 -0500
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37243)
+	by lists.gnu.org with esmtp (Exim 4.71) (envelope-from <hch@lst.de>)
+	id 1eZXum-0001XU-SW
+	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 03:08:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1eZXsi-0002jo-LA
-	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 03:06:37 -0500
-References: <20180111040832.28383-1-aik@ozlabs.ru>
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Message-ID: <b56b4e0b-0cb0-e45d-6821-6291414bee8e@ilande.co.uk>
-Date: Thu, 11 Jan 2018 08:06:13 +0000
+	(envelope-from <hch@lst.de>) id 1eZXuh-0004Sf-Oy
+	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 03:08:44 -0500
+Received: from verein.lst.de ([213.95.11.211]:47962 helo=newverein.lst.de)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <hch@lst.de>) id 1eZXuh-0004Qr-HF
+	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 03:08:39 -0500
+Date: Thu, 11 Jan 2018 09:08:38 +0100
+From: Christoph Hellwig <hch@lst.de>
+Message-ID: <20180111080838.GB32651@lst.de>
+References: <1515628000-93285-1-git-send-email-mjc@sifive.com>
+	<1515628000-93285-6-git-send-email-mjc@sifive.com>
 MIME-Version: 1.0
-In-Reply-To: <20180111040832.28383-1-aik@ozlabs.ru>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-GB
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH qemu] target/ppc: Yet another fix for
- KVM-HV HPTE accessors
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1515628000-93285-6-git-send-email-mjc@sifive.com>
+Subject: Re: [Qemu-devel] [PATCH v2 05/21] RISC-V CPU Helpers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,95 +27,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alexey Kardashevskiy <aik@ozlabs.ru>, qemu-devel@nongnu.org
-Cc: qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
+To: Michael Clark <mjc@sifive.com>
+Cc: qemu-devel@nongnu.org, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, RISC-V Patches <patches+subscribe@groups.riscv.org>, Palmer Dabbelt <palmer@sifive.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>
 
-On 11/01/18 04:08, Alexey Kardashevskiy wrote:
+#ifdef CONFIG_USER_ONLY
+int riscv_cpu_mmu_index(CPURISCVState *env, bool ifetch)
+{
+    return 0;
+}
 
-> As stated in the 1ad9f0a464fe commit log, the returned entries are not
-> a while PTEG. It was not a problem before 1ad9f0a464fe as it would read
+bool riscv_cpu_exec_interrupt(CPUState *cs, int interrupt_request)
+{
+    return false;
+}
 
-s/while/whole/?
+int riscv_cpu_handle_mmu_fault(CPUState *cs, vaddr address,
+        int access_type, int mmu_idx)
+{
+    cs->exception_index = QEMU_USER_EXCP_FAULT;
+    return TRANSLATE_FAIL;
+}
 
-> a single record assuming it contains a whole PTEG but now the code tries
-> reading the entire PTEG and "if ((n - i) < invalid)" produces negative
-> values which then are converted to size_t for memset() and that throws
-> seg fault.
-> 
-> This fixes the math.
-> 
-> While here, fix the last @i increment as well.
-> 
-> Fixes: 1ad9f0a464fe "target/ppc: Fix KVM-HV HPTE accessors"
-> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
-> ---
-> 
-> Record #0:
-> (gdb) p *hdr
-> $13 = {
->    index = <ptr>,
->    n_valid = 0x1,
->    n_invalid = 0x6
-> }
-> 
-> Record #1:
-> (gdb) p *hdr
-> $18 = {
->    index = <ptr>,
->    n_valid = 0x2,
->    n_invalid = 0x6
-> }
-> 
-> 
-> i.e. in the second iteration of the loop right before
-> "if ((n - i) < invalid)":
-> (gdb) p n
-> $16 = 0x8
-> (gdb) p i
-> $17 = 0x9
-> 
-> and @invalid becomes -1.
-> 
-> ---
->   target/ppc/kvm.c | 11 +++++++----
->   1 file changed, 7 insertions(+), 4 deletions(-)
-> 
-> diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
-> index 0566af7..c2dea81 100644
-> --- a/target/ppc/kvm.c
-> +++ b/target/ppc/kvm.c
-> @@ -2657,21 +2657,24 @@ void kvmppc_read_hptes(ppc_hash_pte64_t *hptes, hwaddr ptex, int n)
->   
->           hdr = (struct kvm_get_htab_header *)buf;
->           while ((i < n) && ((char *)hdr < (buf + rc))) {
-> -            int invalid = hdr->n_invalid;
-> +            int invalid = hdr->n_invalid, valid = hdr->n_valid;
->   
->               if (hdr->index != (ptex + i)) {
->                   hw_error("kvmppc_read_hptes: Unexpected HPTE index %"PRIu32
->                            " != (%"HWADDR_PRIu" + %d", hdr->index, ptex, i);
->               }
->   
-> -            memcpy(hptes + i, hdr + 1, HASH_PTE_SIZE_64 * hdr->n_valid);
-> -            i += hdr->n_valid;
-> +            if (n - i < valid) {
-> +                valid = n - i;
-> +            }
-> +            memcpy(hptes + i, hdr + 1, HASH_PTE_SIZE_64 * valid);
-> +            i += valid;
->   
->               if ((n - i) < invalid) {
->                   invalid = n - i;
->               }
->               memset(hptes + i, 0, invalid * HASH_PTE_SIZE_64);
-> -            i += hdr->n_invalid;
-> +            i += invalid;
->   
->               hdr = (struct kvm_get_htab_header *)
->                   ((char *)(hdr + 1) + HASH_PTE_SIZE_64 * hdr->n_valid);
-> 
+void riscv_cpu_do_interrupt(CPUState *cs)
+{
+    cs->exception_index = EXCP_NONE; /* mark handled to qemu */
+}
+#else
+... real implementation here ...
+#endif
 
+To keep the code flow straight?
 
-ATB,
+> +int riscv_cpu_mmu_index(CPURISCVState *env, bool ifetch)
+> +{
+> +#ifdef CONFIG_USER_ONLY
+> +    return 0;
+> +#else
 
-Mark.
+Can you do a large section of USER ONLY stubs instead of sprinkling
+the ifdefs?  E.g.
+
+> +static int get_physical_address(CPURISCVState *env, hwaddr *physical,
+> +                                int *prot, target_ulong address,
+> +                                int access_type, int mmu_idx)
+> +{
+> +    /* NOTE: the env->pc value visible here will not be
+> +     * correct, but the value visible to the exception handler
+> +     * (riscv_cpu_do_interrupt) is correct */
+> +
+> +    const int mode = mmu_idx;
+
+Why don't you just name the actual argument mode and mark it const
+if really needed?
+
+> +
+> +    *prot = 0;
+> +    CPUState *cs = CPU(riscv_env_get_cpu(env));
+
+Clearing out prot just before declaring cs looks a little odd.  Especially
+the prot clearing can easily be moved past the next branch.
+
+> +    if (access_type == MMU_INST_FETCH) { /* inst access */
+> +        exception = page_fault_exceptions ?
+> +            RISCV_EXCP_INST_PAGE_FAULT : RISCV_EXCP_INST_ACCESS_FAULT;
+> +        env->badaddr = address;
+> +    } else if (access_type == MMU_DATA_STORE) { /* store access */
+> +        exception = page_fault_exceptions ?
+> +            RISCV_EXCP_STORE_PAGE_FAULT : RISCV_EXCP_STORE_AMO_ACCESS_FAULT;
+> +        env->badaddr = address;
+> +    } else if (access_type == MMU_DATA_LOAD) { /* load access */
+> +        exception = page_fault_exceptions ?
+> +            RISCV_EXCP_LOAD_PAGE_FAULT : RISCV_EXCP_LOAD_ACCESS_FAULT;
+> +        env->badaddr = address;
+> +    } else {
+> +        g_assert_not_reached();
+
+Why isn't this a switch statement?
+
+> +    if (access_type == MMU_INST_FETCH) {
+> +        cs->exception_index = RISCV_EXCP_INST_ADDR_MIS;
+> +        env->badaddr = addr;
+> +    } else if (access_type == MMU_DATA_STORE) {
+> +        cs->exception_index = RISCV_EXCP_STORE_AMO_ADDR_MIS;
+> +        env->badaddr = addr;
+> +    } else if (access_type == MMU_DATA_LOAD) {
+> +        cs->exception_index = RISCV_EXCP_LOAD_ADDR_MIS;
+> +        env->badaddr = addr;
+> +    } else {
+> +        g_assert_not_reached();
+> +    }
+
+Same here.
+
+> +    case CSR_SPTBR:
+
+And just as comment on V2:  please don't use CSR_SPTBR here, but
+CSR_SAPT, and don't even define the CSR_SPTBR cpp symbol.
