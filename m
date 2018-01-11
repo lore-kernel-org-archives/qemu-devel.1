@@ -1,29 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37592)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38423)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1eZiFM-0001bl-S0
-	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 14:10:41 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1eZiHb-0002eK-BH
+	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 14:13:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1eZiFH-0003fm-Tr
-	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 14:10:40 -0500
-Received: from mail-pf0-x233.google.com ([2607:f8b0:400e:c00::233]:37412)
+	(envelope-from <richard.henderson@linaro.org>) id 1eZiHW-0005EF-Bz
+	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 14:12:59 -0500
+Received: from mail-pg0-x241.google.com ([2607:f8b0:400e:c05::241]:45525)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1eZiFH-0003f1-Nr
-	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 14:10:35 -0500
-Received: by mail-pf0-x233.google.com with SMTP id p1so2377868pfh.4
-	for <qemu-devel@nongnu.org>; Thu, 11 Jan 2018 11:10:35 -0800 (PST)
+	id 1eZiHW-0005DM-66
+	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 14:12:54 -0500
+Received: by mail-pg0-x241.google.com with SMTP id c194so2792188pga.12
+	for <qemu-devel@nongnu.org>; Thu, 11 Jan 2018 11:12:54 -0800 (PST)
 References: <20171218174552.18871-1-richard.henderson@linaro.org>
-	<20171218174552.18871-2-richard.henderson@linaro.org>
-	<CAFEAcA_zoqWwAhg5PhuUG=xkRuC3uwT0MF7D3NOvEFg0Z3yKMQ@mail.gmail.com>
+	<20171218174552.18871-3-richard.henderson@linaro.org>
+	<CAFEAcA9igMy9u0WdTBvJWms1G4Cd2m0QXUucJeXCJ1Uo=7OAMw@mail.gmail.com>
 From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <3ffa6112-d2bf-df10-c8ee-e96ead760359@linaro.org>
-Date: Thu, 11 Jan 2018 11:10:31 -0800
+Message-ID: <300b87dc-7a0c-dda9-058d-674b115d06a1@linaro.org>
+Date: Thu, 11 Jan 2018 11:12:50 -0800
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA_zoqWwAhg5PhuUG=xkRuC3uwT0MF7D3NOvEFg0Z3yKMQ@mail.gmail.com>
+In-Reply-To: <CAFEAcA9igMy9u0WdTBvJWms1G4Cd2m0QXUucJeXCJ1Uo=7OAMw@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 01/23] scripts: Add decodetree.py
+Subject: Re: [Qemu-devel] [PATCH 02/23] target/arm: Add SVE decode skeleton
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,52 +35,47 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Peter Maydell <peter.maydell@linaro.org>
 Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>
 
-On 01/11/2018 10:06 AM, Peter Maydell wrote:
+On 01/11/2018 10:20 AM, Peter Maydell wrote:
 > On 18 December 2017 at 17:45, Richard Henderson
 > <richard.henderson@linaro.org> wrote:
->> To be used to decode ARM SVE, but could be used for any 32-bit RISC.
->> It would need additional work to extend to insn sizes other than 32-bit.
-> 
-> I guess we could make that extension without requiring all
-> existing pattern files to be updated, right?
-
-Sure.  I would expect that to be a command-line option for the script.
-
-> 
+>> Including only 4, as-yet unimplemented, instruction patterns
+>> so that the whole thing compiles.
+>>
 >> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 >> ---
->>  scripts/decodetree.py | 984 ++++++++++++++++++++++++++++++++++++++++++++++++++
->>  1 file changed, 984 insertions(+)
->>  create mode 100755 scripts/decodetree.py
+>>  target/arm/translate-a64.h | 111 +++++++++++++++++++++++++++++++++++++++++++++
+>>  target/arm/translate-a64.c |  91 +++++++------------------------------
+>>  target/arm/translate-sve.c |  48 ++++++++++++++++++++
+>>  .gitignore                 |   1 +
+>>  target/arm/Makefile.objs   |  11 +++++
+>>  target/arm/sve.def         |  45 ++++++++++++++++++
+>>  6 files changed, 233 insertions(+), 74 deletions(-)
+>>  create mode 100644 target/arm/translate-a64.h
+>>  create mode 100644 target/arm/translate-sve.c
+>>  create mode 100644 target/arm/sve.def
 > 
-> This is rather large for a single patch...
+> This will be easier to review if you split the stuff that's
+> purely code motion from the .c file to the .h into its own
+> patch.
 
-Ok, but... what bits of it are functional without the whole?
+Ok.
 
+>> +target/arm/decode-sve.inc.c: $(SRC_PATH)/target/arm/sve.def $(DECODETREE)
+>> +       $(call quiet-command,\
+>> +         $(PYTHON) $(DECODETREE) -o $@ --decode disas_sve \
+>> +               $(SRC_PATH)/target/arm/sve.def || rm -f $@, \
+>> +               "GEN", $@)
+>> +
+>> +target/arm/translate-sve.o: target/arm/decode-sve.inc.c
+>> +obj-$(TARGET_AARCH64) += translate-sve.o
 > 
->> +# Pattern examples:
->> +#
->> +#   addl_r   010000 ..... ..... .... 0000000 ..... @opr
->> +#   addl_i   010000 ..... ..... .... 0000000 ..... @opi
->> +#
-> 
-> I think we should insist that a pattern defines all the
-> bits (either as constant values or as fields that get
-> passed to the decode function). That will help prevent
-> accidental under-decoding.
+> If we're serious about the idea that this decoder script is
+> general purpose, we should have a rules.mak rune for
+> generally invoking it to create a decode-foo.inc.c from a foo.def.
 
-Hmm.  What do you suggest then for bits that the cpu does not decode at all?
-This doesn't happen with ARM (I don't think) but it does happen with HPPA, and
-probably others.
-
-I suppose I could either wrap it in a field that the translator ignores, or
-choose another character besides ".", e.g.
-
-mfia            000000 xxxxx 00000 xxx 10100101 t:5
-
-where bits [21-25] and bits [13-15] really are ignored by hardware.
-
-Thoughts?
+I didn't want to attempt to generalize this until we have two users.
+Particularly if we wind up with extra options to the script to change other
+behavior.
 
 
 r~
