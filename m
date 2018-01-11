@@ -1,31 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34252)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37592)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1eZi5v-0007Fr-T9
-	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 14:00:57 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1eZiFM-0001bl-S0
+	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 14:10:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1eZi5s-0003gZ-T2
-	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 14:00:55 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:37752)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1eZi5s-0003fa-Md
-	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 14:00:52 -0500
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 96030C04BD57
-	for <qemu-devel@nongnu.org>; Thu, 11 Jan 2018 19:00:46 +0000 (UTC)
-Date: Thu, 11 Jan 2018 19:00:36 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180111190036.GF13384@work-vm>
-References: <20180105215246.908-1-quintela@redhat.com>
-	<20180105215246.908-4-quintela@redhat.com>
+	(envelope-from <richard.henderson@linaro.org>) id 1eZiFH-0003fm-Tr
+	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 14:10:40 -0500
+Received: from mail-pf0-x233.google.com ([2607:f8b0:400e:c00::233]:37412)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1eZiFH-0003f1-Nr
+	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 14:10:35 -0500
+Received: by mail-pf0-x233.google.com with SMTP id p1so2377868pfh.4
+	for <qemu-devel@nongnu.org>; Thu, 11 Jan 2018 11:10:35 -0800 (PST)
+References: <20171218174552.18871-1-richard.henderson@linaro.org>
+	<20171218174552.18871-2-richard.henderson@linaro.org>
+	<CAFEAcA_zoqWwAhg5PhuUG=xkRuC3uwT0MF7D3NOvEFg0Z3yKMQ@mail.gmail.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <3ffa6112-d2bf-df10-c8ee-e96ead760359@linaro.org>
+Date: Thu, 11 Jan 2018 11:10:31 -0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180105215246.908-4-quintela@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v4 03/11] tests: Consolidate accelerators
- declaration
+In-Reply-To: <CAFEAcA_zoqWwAhg5PhuUG=xkRuC3uwT0MF7D3NOvEFg0Z3yKMQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 01/23] scripts: Add decodetree.py
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,60 +32,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Juan Quintela <quintela@redhat.com>
-Cc: qemu-devel@nongnu.org, lvivier@redhat.com, peterx@redhat.com
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>
 
-* Juan Quintela (quintela@redhat.com) wrote:
-> Signed-off-by: Juan Quintela <quintela@redhat.com>
-
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-
-> ---
->  tests/migration-test.c | 14 ++++++++------
->  1 file changed, 8 insertions(+), 6 deletions(-)
+On 01/11/2018 10:06 AM, Peter Maydell wrote:
+> On 18 December 2017 at 17:45, Richard Henderson
+> <richard.henderson@linaro.org> wrote:
+>> To be used to decode ARM SVE, but could be used for any 32-bit RISC.
+>> It would need additional work to extend to insn sizes other than 32-bit.
 > 
-> diff --git a/tests/migration-test.c b/tests/migration-test.c
-> index 32f3bb86a8..d81f22118b 100644
-> --- a/tests/migration-test.c
-> +++ b/tests/migration-test.c
-> @@ -434,27 +434,29 @@ static void test_migrate_start(QTestState **from, QTestState **to,
->      gchar *cmd_src, *cmd_dst;
->      char *bootpath = g_strdup_printf("%s/bootsect", tmpfs);
->      const char *arch = qtest_get_arch();
-> +    const char *accel = "kvm:tcg";
->  
->      got_stop = false;
->  
->      if (strcmp(arch, "i386") == 0 || strcmp(arch, "x86_64") == 0) {
->          init_bootfile_x86(bootpath);
-> -        cmd_src = g_strdup_printf("-machine accel=kvm:tcg -m 150M"
-> +        cmd_src = g_strdup_printf("-machine accel=%s -m 150M"
->                                    " -name pcsource,debug-threads=on"
->                                    " -serial file:%s/src_serial"
->                                    " -drive file=%s,format=raw",
-> -                                  tmpfs, bootpath);
-> -        cmd_dst = g_strdup_printf("-machine accel=kvm:tcg -m 150M"
-> +                                  accel, tmpfs, bootpath);
-> +        cmd_dst = g_strdup_printf("-machine accel=%s -m 150M"
->                                    " -name pcdest,debug-threads=on"
->                                    " -serial file:%s/dest_serial"
->                                    " -drive file=%s,format=raw"
->                                    " -incoming %s",
-> -                                  tmpfs, bootpath, uri);
-> +                                  accel, tmpfs, bootpath, uri);
->      } else if (strcmp(arch, "ppc64") == 0) {
-> -        const char *accel;
->  
->          /* On ppc64, the test only works with kvm-hv, but not with kvm-pr */
-> -        accel = access("/sys/module/kvm_hv", F_OK) ? "tcg" : "kvm:tcg";
-> +        if (access("/sys/module/kvm_hv", F_OK)) {
-> +            accel = "tcg";
-> +        }
->          init_bootfile_ppc(bootpath);
->          cmd_src = g_strdup_printf("-machine accel=%s -m 256M"
->                                    " -name pcsource,debug-threads=on"
-> -- 
-> 2.14.3
+> I guess we could make that extension without requiring all
+> existing pattern files to be updated, right?
+
+Sure.  I would expect that to be a command-line option for the script.
+
 > 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+>> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+>> ---
+>>  scripts/decodetree.py | 984 ++++++++++++++++++++++++++++++++++++++++++++++++++
+>>  1 file changed, 984 insertions(+)
+>>  create mode 100755 scripts/decodetree.py
+> 
+> This is rather large for a single patch...
+
+Ok, but... what bits of it are functional without the whole?
+
+> 
+>> +# Pattern examples:
+>> +#
+>> +#   addl_r   010000 ..... ..... .... 0000000 ..... @opr
+>> +#   addl_i   010000 ..... ..... .... 0000000 ..... @opi
+>> +#
+> 
+> I think we should insist that a pattern defines all the
+> bits (either as constant values or as fields that get
+> passed to the decode function). That will help prevent
+> accidental under-decoding.
+
+Hmm.  What do you suggest then for bits that the cpu does not decode at all?
+This doesn't happen with ARM (I don't think) but it does happen with HPPA, and
+probably others.
+
+I suppose I could either wrap it in a field that the translator ignores, or
+choose another character besides ".", e.g.
+
+mfia            000000 xxxxx 00000 xxx 10100101 t:5
+
+where bits [21-25] and bits [13-15] really are ignored by hardware.
+
+Thoughts?
+
+
+r~
