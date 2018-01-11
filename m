@@ -1,23 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56863)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35842)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kchamart@redhat.com>) id 1eZZ8D-00011j-67
-	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 04:26:41 -0500
+	(envelope-from <kraxel@redhat.com>) id 1eZZJS-0004t6-Gy
+	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 04:38:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kchamart@redhat.com>) id 1eZZ8C-0004Zi-Bg
-	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 04:26:41 -0500
-Date: Thu, 11 Jan 2018 10:26:27 +0100
-From: Kashyap Chamarthy <kchamart@redhat.com>
-Message-ID: <20180111092627.2frgbxf4yyijfcsu@eukaryote>
-References: <20180105065538.13375-1-famz@redhat.com>
-	<20180108144136.GF8052@localhost.localdomain>
-	<20180110140349.6ehnffp6hlkyncss@eukaryote>
-	<CAMr-obup=EPn2tS1HGUZvFwzMgxgKQMqsAs4bnBp0Y_pvOYhAg@mail.gmail.com>
+	(envelope-from <kraxel@redhat.com>) id 1eZZJP-0006pa-T4
+	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 04:38:18 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:59960)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1eZZJP-0006ml-MG
+	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 04:38:15 -0500
+Date: Thu, 11 Jan 2018 10:38:11 +0100
+From: Gerd Hoffmann <kraxel@redhat.com>
+Message-ID: <20180111093811.kkoqx2zj6fwd7jms@sirius.home.kraxel.org>
+References: <20180107221455.25504-1-patricktsen@gmail.com>
+	<20180110163003.GO3205@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAMr-obup=EPn2tS1HGUZvFwzMgxgKQMqsAs4bnBp0Y_pvOYhAg@mail.gmail.com>
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 0/2] qemu-img: Let "info" warn
- and go ahead without -U
+In-Reply-To: <20180110163003.GO3205@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 0/1] input-linux: provide hotkeys for
+ evdev toggle
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,30 +28,19 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Nir Soffer <nirsof@gmail.com>
-Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: byxk <patricktsen@gmail.com>, qemu-devel@nongnu.org
 
-On Wed, Jan 10, 2018 at 04:43:22PM +0000, Nir Soffer wrote:
-> On Wed, Jan 10, 2018 at 4:04 PM Kashyap Chamarthy <kchamart@redhat.com>
-> wrote:
+  Hi,
 
-[...]
+> I wonder if it is reasonable for ui/input-linux.c to honour the same
+> global '-ungrab' configuration option ?
 
-> > Yes, for completness' sake, Nova upstream is already patched to use the
-> > `qemu-img` '--force-share' flag that comes with QEMU >= 2.10.
-> >
-> 
-> What abut users running released Nova, upgrading to 2.10?
+No.  Problem here is that input-linux is basically sniffing keyboard
+input when the host owns the keyboard, so it can't prevent the hotkey
+being seen by the host.  Therefore I picked something which (a) has no
+side effects (modifier keys only) and (b) is highly unlikely to be used
+in normal operation.
 
-There are three stable Nova branches at any time, in various phases.  
-
-It is already backported to the current newest stable Nova branch (where
-all bug fixes that meet certain criteria are accepted).
-
-Then there are two other stable releases.  One is in "Only critical
-bugfixes and security patches" phase; the other is in "Only security
-patches" phase.  So this change wasn't backported there, and users would
-be using QEMU 2.9 or below with those two versions of Nova.
-
--- 
-/kashyap
+cheers,
+  Gerd
