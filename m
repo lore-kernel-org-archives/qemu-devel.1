@@ -1,22 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43814)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44067)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <linzhecheng@huawei.com>) id 1eZcod-0007TL-OG
-	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 08:22:44 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1eZcpG-0007rD-BL
+	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 08:23:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <linzhecheng@huawei.com>) id 1eZcoa-0003JV-Kc
-	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 08:22:43 -0500
-Received: from szxga05-in.huawei.com ([45.249.212.191]:2066 helo=huawei.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <linzhecheng@huawei.com>)
-	id 1eZcoa-00038v-7Y
-	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 08:22:40 -0500
-From: linzhecheng <linzhecheng@huawei.com>
-Date: Thu, 11 Jan 2018 21:21:40 +0800
-Message-ID: <20180111132140.34668-1-linzhecheng@huawei.com>
+	(envelope-from <dgilbert@redhat.com>) id 1eZcpE-0003xk-So
+	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 08:23:22 -0500
+Date: Thu, 11 Jan 2018 13:23:05 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20180111132304.GD2669@work-vm>
+References: <20180107122336.29333-1-richiejp@f-m.fm>
+	<fd5f5f12-e081-6f19-54af-3b560139bb78@redhat.com>
+	<5cf19623-72ac-fb8b-2054-a60d42419ec6@redhat.com>
+	<20180111130427.GG8326@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v2] vga: check the validation of memory addr
- when draw text
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180111130427.GG8326@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 1/2] Add save-snapshot,
+ load-snapshot and delete-snapshot to QAPI
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,55 +26,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: ppandit@redhat.com, qemu-devel@nongnu.org
-Cc: kraxel@redhat.com, fabrice@bellard.org, wangxinxin.wang@huawei.com, arei.gonglei@huawei.com, fangying <fangying1@huawei.com>, linzhecheng <linzhecheng@huawei.com>
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: Max Reitz <mreitz@redhat.com>, Eric Blake <eblake@redhat.com>, Richard Palethorpe <richiejp@f-m.fm>, qemu-devel@nongnu.org, Qemu-block <qemu-block@nongnu.org>, quintela@redhat.com, armbru@redhat.com, rpalethorpe@suse.com
 
-From: fangying <fangying1@huawei.com>
+* Daniel P. Berrange (berrange@redhat.com) wrote:
+> On Thu, Jan 11, 2018 at 01:46:38PM +0100, Max Reitz wrote:
+> > On 2018-01-08 14:52, Eric Blake wrote:
+> > > On 01/07/2018 06:23 AM, Richard Palethorpe wrote:
+> > >> Add QAPI wrapper functions for the existing snapshot functionality. These
+> > >> functions behave the same way as the HMP savevm, loadvm and delvm
+> > >> commands. This will allow applications, such as OpenQA, to programmatically
+> > >> revert the VM to a previous state with no dependence on HMP or qemu-img.
+> > > 
+> > > That's already possible; libvirt uses QMP's human-monitor-command to
+> > > access these HMP commands programmatically.
+> > > 
+> > > We've had discussions in the past about what it would take to have
+> > > specific QMP commands for these operations; the biggest problem is that
+> > > these commands promote the use of internal snapshots, and there are
+> > > enough performance and other issues with internal snapshots that we are
+> > > not yet ready to commit to a long-term interface for making their use
+> > > easier.  At this point, our recommendation is to prefer external snapshots.
+> > 
+> > We already have QMP commands for internal snapshots, though.  Isn't the
+> > biggest issue that savevm takes too much time to be a synchronous QMP
+> > command?
+> 
+> Ultimately savevm/loadvm are using much of the migration code internally,
+> but are not exposed as URI schemes. Could we perhaps take advantage of
+> the internal common layer and define a migration URI scheme
+> 
+>    snapshot:<name>
+> 
+> where '<name>' is the name of the internal snapshot in the qcow2 file.
 
-Start a vm with qemu-kvm -enable-kvm -vnc :66 -smp 1 -m 1024 -hda
-redhat_5.11.qcow2  -device pcnet -vga cirrus,
-then use VNC client to connect to VM, and excute the code below in guest
-OS will lead to qemu crash:
+I had wondered about that; I'd just thought of doing the migration
+saving to a block device rather than the rest of the snapshot activity around it; 
+but I guess that's possible.
 
-int main()
- {
-    iopl(3);
-    srand(time(NULL));
-    int a,b;
-    while(1){
-	a = rand()%0x100;
-	b = 0x3c0 + (rand()%0x20);
-        outb(a,b);
-    }
-    return 0;
-}
+> Then you could just use the regular migrate QMP commands for loading
+> and saving snapshots.  Might need a little extra work on the incoming
+> side, since we need to be able to load snapshots, despite QEMU not
+> being started with '-incoming defer', but might still be doable ?
+> This would theoretically give us progress monitoring, cancellation,
+> etc for free.
 
-The above code is writing the registers of VGA randomly.
-We can write VGA CRT controller registers index 0x0C or 0x0D
-(which is the start address register) to modify the
-the display memory address of the upper left pixel
-or character of the screen. The address may be out of the
-range of vga ram. So we should check the validation of memory address
-when reading or writing it to avoid segfault.
+What actually stops this working other than the sanity check in
+migrate_incoming ?
 
-Signed-off-by: linzhecheng <linzhecheng@huawei.com>
----
- hw/display/vga.c | 3 +++
- 1 file changed, 3 insertions(+)
+Dave
 
-diff --git a/hw/display/vga.c b/hw/display/vga.c
-index a041200..6e78a4e 100644
---- a/hw/display/vga.c
-+++ b/hw/display/vga.c
-@@ -1279,6 +1279,9 @@ static void vga_draw_text(VGACommonState *s, int full_update)
-         cx_min = width;
-         cx_max = -1;
-         for(cx = 0; cx < width; cx++) {
-+            if (src + sizeof(uint16_t) > s->vram_ptr + s->vram_size) {
-+                break;
-+            }
-             ch_attr = *(uint16_t *)src;
-             if (full_update || ch_attr != *ch_attr_ptr || src == cursor_ptr) {
-                 if (cx < cx_min)
--- 
-1.8.3.1
+> 
+> 
+> Regards,
+> Daniel
+> -- 
+> |: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+> |: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+> |: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
