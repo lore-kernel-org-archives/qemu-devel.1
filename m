@@ -1,17 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57195)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57191)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1eZiuG-0004sh-7O
+	(envelope-from <kwolf@redhat.com>) id 1eZiuG-0004sO-0n
 	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 14:53:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1eZiuF-00005L-Bm
+	(envelope-from <kwolf@redhat.com>) id 1eZiuF-000056-2m
 	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 14:52:56 -0500
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Thu, 11 Jan 2018 20:52:16 +0100
-Message-Id: <20180111195225.4226-2-kwolf@redhat.com>
-In-Reply-To: <20180111195225.4226-1-kwolf@redhat.com>
-References: <20180111195225.4226-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [RFC PATCH 01/10] block/qapi: Introduce
- BlockdevCreateOptions
+Date: Thu, 11 Jan 2018 20:52:15 +0100
+Message-Id: <20180111195225.4226-1-kwolf@redhat.com>
+Subject: [Qemu-devel] [RFC PATCH 00/10] x-blockdev-create for qcow2
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,89 +20,45 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, mreitz@redhat.com, pkrempa@redhat.com, eblake@redhat.com, qemu-devel@nongnu.org
 
-This creates a BlockdevCreateOptions union type that will contain all of
-the options for image creation. We'll start out with an empty struct
-type BlockdevCreateDummy for all drivers.
+This series implements a minimal QMP command that allows to create an
+image format on a given block node. The interface is still going to
+change to some kind of an async command (possibly a block job), so I
+prefixed x- for now.
 
-Signed-off-by: Kevin Wolf <kwolf@redhat.com>
----
- qapi/block-core.json | 64 ++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 64 insertions(+)
+At this point, I'm mostly interested in comments about
+BlockdevCreateOptions in the schema, the .bdrv_co_create callback and
+the way that legacy .bdrv_create is implemented in qcow2 now.
 
-diff --git a/qapi/block-core.json b/qapi/block-core.json
-index e94a6881b2..1749376c61 100644
---- a/qapi/block-core.json
-+++ b/qapi/block-core.json
-@@ -3320,6 +3320,70 @@
- { 'command': 'blockdev-del', 'data': { 'node-name': 'str' } }
- 
- ##
-+# @BlockdevCreateDummy:
-+#
-+# FIXME To be removed. Only there to make the QAPI generator happy while we're
-+# adding driver by driver. Leaving out union branches is not allowed.
-+#
-+# Since: 2.12
-+##
-+{ 'struct': 'BlockdevCreateDummy', 'data': {}}
-+
-+##
-+# @BlockdevCreateOptions:
-+#
-+# Options for creating an image format on a given node.
-+#
-+# @driver           block driver to create the image format
-+# @node             node to create the image format on
-+#
-+# Since: 2.12
-+##
-+{ 'union': 'BlockdevCreateOptions',
-+  'base': {
-+      'driver':         'BlockdevDriver',
-+      'node':           'BlockdevRef' },
-+  'discriminator': 'driver',
-+  'data': {
-+      'blkdebug':       'BlockdevCreateDummy',
-+      'blkverify':      'BlockdevCreateDummy',
-+      'bochs':          'BlockdevCreateDummy',
-+      'cloop':          'BlockdevCreateDummy',
-+      'dmg':            'BlockdevCreateDummy',
-+      'file':           'BlockdevCreateDummy',
-+      'ftp':            'BlockdevCreateDummy',
-+      'ftps':           'BlockdevCreateDummy',
-+      'gluster':        'BlockdevCreateDummy',
-+      'host_cdrom':     'BlockdevCreateDummy',
-+      'host_device':    'BlockdevCreateDummy',
-+      'http':           'BlockdevCreateDummy',
-+      'https':          'BlockdevCreateDummy',
-+      'iscsi':          'BlockdevCreateDummy',
-+      'luks':           'BlockdevCreateDummy',
-+      'nbd':            'BlockdevCreateDummy',
-+      'nfs':            'BlockdevCreateDummy',
-+      'null-aio':       'BlockdevCreateDummy',
-+      'null-co':        'BlockdevCreateDummy',
-+      'parallels':      'BlockdevCreateDummy',
-+      'qcow2':          'BlockdevCreateDummy',
-+      'qcow':           'BlockdevCreateDummy',
-+      'qed':            'BlockdevCreateDummy',
-+      'quorum':         'BlockdevCreateDummy',
-+      'raw':            'BlockdevCreateDummy',
-+      'rbd':            'BlockdevCreateDummy',
-+      'replication':    'BlockdevCreateDummy',
-+      'sheepdog':       'BlockdevCreateDummy',
-+      'ssh':            'BlockdevCreateDummy',
-+      'throttle':       'BlockdevCreateDummy',
-+      'vdi':            'BlockdevCreateDummy',
-+      'vhdx':           'BlockdevCreateDummy',
-+      'vmdk':           'BlockdevCreateDummy',
-+      'vpc':            'BlockdevCreateDummy',
-+      'vvfat':          'BlockdevCreateDummy',
-+      'vxhs':           'BlockdevCreateDummy'
-+  } }
-+
-+##
- # @blockdev-open-tray:
- #
- # Opens a block device's tray. If there is a block driver state tree inserted as
+It looks to me as if we will have to keep .bdrv_create in addition to
+the new .bdrv_co_create for a while in all drivers, where the
+implementation of .bdrv_create would call .bdrv_co_create like this
+series does it for qcow2. We'll only be able to drop the old interface
+after deprecating and eventually removing all of the driver-specific
+compatibility work that remains. The example of qcow2 shows that the
+"translation" from old to new is managable, but there are a few
+differences.
+
+Kevin Wolf (10):
+  block/qapi: Introduce BlockdevCreateOptions
+  block/qapi: Add qcow2 create options to schema
+  qcow2: Let qcow2_create() handle protocol layer
+  qcow2: Pass BlockdevCreateOptions to qcow2_create2()
+  qcow2: Use BlockdevRef in qcow2_create2()
+  qcow2: Use QCryptoBlockCreateOptions in qcow2_create2()
+  qcow2: Handle full/falloc preallocation in qcow2_create2()
+  util: Add qemu_opts_to_qdict_filtered()
+  qcow2: Use visitor for options in qcow2_create()
+  block: x-blockdev-create QMP command
+
+ qapi/block-core.json       | 107 ++++++++++++
+ include/block/block.h      |   1 +
+ include/block/block_int.h  |   2 +
+ include/qemu/option.h      |   2 +
+ block.c                    |  87 ++++++++++
+ block/qcow2.c              | 395 +++++++++++++++++++++++++++++----------------
+ util/qemu-option.c         |  28 +++-
+ tests/qemu-iotests/049.out |  10 +-
+ 8 files changed, 486 insertions(+), 146 deletions(-)
+
 -- 
 2.13.6
