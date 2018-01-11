@@ -1,28 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57727)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58401)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1eZcPI-0001cz-4R
-	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 07:56:33 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1eZcR1-0002nG-Dj
+	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 07:58:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1eZcPE-0000v7-Vy
-	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 07:56:32 -0500
-Received: from mail-wm0-x22d.google.com ([2a00:1450:400c:c09::22d]:43846)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1eZcPE-0000td-Lr
-	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 07:56:28 -0500
-Received: by mail-wm0-x22d.google.com with SMTP id g1so5324621wmg.2
-	for <qemu-devel@nongnu.org>; Thu, 11 Jan 2018 04:56:28 -0800 (PST)
-Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
-References: <20180111082452.27295.85707.stgit@pasha-VirtualBox>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <ecc919de-5193-a83c-0e29-4b8d9bc8d7d7@redhat.com>
-Date: Thu, 11 Jan 2018 13:56:24 +0100
+	(envelope-from <ehabkost@redhat.com>) id 1eZcQy-0002x0-AB
+	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 07:58:19 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:58958)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1eZcQy-0002vt-0n
+	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 07:58:16 -0500
+Date: Thu, 11 Jan 2018 10:58:08 -0200
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20180111125808.GW6646@localhost.localdomain>
+References: <CAKmqyKPHHQcQ3HYs4r7f4uUDfdMqSq=-mUJn6becXw8WXNAwNQ@mail.gmail.com>
+	<CAKmqyKMKL_BGSbaetubaPv8gkmF9XFFdDwkXAPsUZdV1qkOyqA@mail.gmail.com>
+	<20171220220608.GH24025@localhost.localdomain>
+	<CAKmqyKO+UvsEuK3fuEP7jmK3i5hb=rzp8DWye6-P7-BZ2CVXuQ@mail.gmail.com>
+	<CAKmqyKP4ewwxLgQ0+fBbMzpSOA1rh23XaER-yoJQuBQOiXFPzg@mail.gmail.com>
+	<20171228143931.516b9e60@igors-macbook-pro.local>
+	<20171228145904.GJ24856@localhost.localdomain>
+	<CAKmqyKMH9b3+DT6z0VOC9kXyiBrc9VHK-ZqGb1JwpB6Y=J2Qjg@mail.gmail.com>
+	<20180110214800.GU6646@localhost.localdomain>
+	<20180111112508.46410b61@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20180111082452.27295.85707.stgit@pasha-VirtualBox>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [RFC PATCH v3 00/30] replay additions
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180111112508.46410b61@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v4 0/5] Add a valid_cpu_types property
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,115 +35,147 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, peter.maydell@linaro.org, boost.lists@gmail.com, quintela@redhat.com, jasowang@redhat.com, mst@redhat.com, zuban32s@gmail.com, maria.klimushenkova@ispras.ru, dovgaluk@ispras.ru, kraxel@redhat.com, alex.bennee@linaro.org
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: Alistair Francis <alistair.francis@xilinx.com>, Marcel Apfelbaum <marcel@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-On 11/01/2018 09:24, Pavel Dovgalyuk wrote:
-> Accidentally sent draft version of patches to the mailing list.
-> Please consider this one as the correct one.
+On Thu, Jan 11, 2018 at 11:25:08AM +0100, Igor Mammedov wrote:
+> On Wed, 10 Jan 2018 19:48:00 -0200
+> Eduardo Habkost <ehabkost@redhat.com> wrote:
 > 
-> This set of patches includex fixes from Alex Bennée for fixing
-> BQL and replay locks after inventing the MTTCG. It also includes some
-> additional replay patches that makes this set of fixes working.
-> It is also fixes some vmstate creation (and loading) issues
-> in record/replay modes:
->  - VM start/stop fixes in replay mode
->  - overlay creation for blkreplay filter
->  - fixes for vmstate save/load in record/replay mode
->  - fixes for host clock vmstate
->  - fixes for icount timers vmstate
+> > On Wed, Jan 10, 2018 at 01:30:29PM -0800, Alistair Francis wrote:
+> > > On Thu, Dec 28, 2017 at 6:59 AM, Eduardo Habkost <ehabkost@redhat.com> wrote:  
+> > > > On Thu, Dec 28, 2017 at 02:39:31PM +0100, Igor Mammedov wrote:  
+> > > >> On Fri, 22 Dec 2017 11:47:00 -0800
+> > > >> Alistair Francis <alistair.francis@xilinx.com> wrote:
+> > > >>  
+> > > >> > On Fri, Dec 22, 2017 at 10:45 AM, Alistair Francis
+> > > >> > <alistair.francis@xilinx.com> wrote:  
+> > > >> > > On Wed, Dec 20, 2017 at 2:06 PM, Eduardo Habkost <ehabkost@redhat.com> wrote:  
+> > > >> > >> On Tue, Dec 19, 2017 at 05:03:59PM -0800, Alistair Francis wrote:  
+> > > >> > >>> On Tue, Dec 19, 2017 at 4:55 PM, Alistair Francis
+> > > >> > >>> <alistair.francis@xilinx.com> wrote:  
+> > > >> > >>> > On Tue, Dec 19, 2017 at 4:43 PM, Peter Maydell <peter.maydell@linaro.org> wrote:  
+> > > >> > >>> >> On 20 December 2017 at 00:27, Alistair Francis
+> > > >> > >>> >> <alistair.francis@xilinx.com> wrote:  
+> > > >> > >>> >>> There are numorous QEMU machines that only have a single or a handful of
+> > > >> > >>> >>> valid CPU options. To simplyfy the management of specificying which CPU
+> > > >> > >>> >>> is/isn't valid let's create a property that can be set in the machine
+> > > >> > >>> >>> init. We can then check to see if the user supplied CPU is in that list
+> > > >> > >>> >>> or not.
+> > > >> > >>> >>>
+> > > >> > >>> >>> I have added the valid_cpu_types for some ARM machines only at the
+> > > >> > >>> >>> moment.
+> > > >> > >>> >>>
+> > > >> > >>> >>> Here is what specifying the CPUs looks like now:
+> > > >> > >>> >>>
+> > > >> > >>> >>> $ aarch64-softmmu/qemu-system-aarch64 -M netduino2 -kernel ./u-boot.elf -nographic -cpu "cortex-m3" -S
+> > > >> > >>> >>> QEMU 2.10.50 monitor - type 'help' for more information
+> > > >> > >>> >>> (qemu) info cpus
+> > > >> > >>> >>> * CPU #0: thread_id=24175
+> > > >> > >>> >>> (qemu) q
+> > > >> > >>> >>>
+> > > >> > >>> >>> $ aarch64-softmmu/qemu-system-aarch64 -M netduino2 -kernel ./u-boot.elf -nographic -cpu "cortex-m4" -S
+> > > >> > >>> >>> QEMU 2.10.50 monitor - type 'help' for more information
+> > > >> > >>> >>> (qemu) q
+> > > >> > >>> >>>
+> > > >> > >>> >>> $ aarch64-softmmu/qemu-system-aarch64 -M netduino2 -kernel ./u-boot.elf -nographic -cpu "cortex-m5" -S
+> > > >> > >>> >>> qemu-system-aarch64: unable to find CPU model 'cortex-m5'
+> > > >> > >>> >>>
+> > > >> > >>> >>> $ aarch64-softmmu/qemu-system-aarch64 -M netduino2 -kernel ./u-boot.elf -nographic -cpu "cortex-a9" -S
+> > > >> > >>> >>> qemu-system-aarch64: Invalid CPU type: cortex-a9-arm-cpu
+> > > >> > >>> >>> The valid types are: cortex-m3-arm-cpu, cortex-m4-arm-cpu  
+> > > >> > >>> >>
+> > > >> > >>> >> Thanks for this; we really should be more strict about
+> > > >> > >>> >> forbidding "won't work" combinations than we have
+> > > >> > >>> >> been in the past.
+> > > >> > >>> >>
+> > > >> > >>> >> In the last of these cases, I think that when we
+> > > >> > >>> >> list the invalid CPU type and the valid types
+> > > >> > >>> >> we should use the same names we want the user to
+> > > >> > >>> >> use on the command line, without the "-arm-cpu"
+> > > >> > >>> >> suffixes.  
+> > > >> > >>> >
+> > > >> > >>> > Hmm... That is a good point, it is confusing that they don't line up.  
+> > > >> > >>
+> > > >> > >> Agreed.
+> > > >> > >>  
+> > > >> > >>> >
+> > > >> > >>> > The problem is that we are just doing a simple
+> > > >> > >>> > object_class_dynamic_cast() in hw/core/machine.c which I think
+> > > >> > >>> > (untested) requires us to have the full name in the valid cpu array.  
+> > > >> > >> [...]  
+> > > >> > >>>
+> > > >> > >>> I think an earlier version of my previous series adding the support to
+> > > >> > >>> machine.c did string comparison, but it was decided to utilise objects
+> > > >> > >>> instead. One option is to make the array 2 wide and have the second
+> > > >> > >>> string be user friendly?  
+> > > >> > >>
+> > > >> > >> Making the array 2-column will duplicate information that we can
+> > > >> > >> already find out using other methods, and it won't solve the
+> > > >> > >> problem if an entry has a parent class with multiple subclasses
+> > > >> > >> (the original reason I suggested object_class_dynamic_cast()).
+> > > >> > >>
+> > > >> > >> The main obstacle to fix this easily is that we do have a common
+> > > >> > >>   ObjectClass *cpu_class_by_name(const char *cpu_model)
+> > > >> > >> function, but not a common method to get the model name from a
+> > > >> > >> CPUClass.  Implementing this is possible, but probably better to
+> > > >> > >> do it after moving the existing arch-specific CPU model
+> > > >> > >> enumeration hooks to common code (currently we duplicate lots of
+> > > >> > >> CPU enumeration/lookup boilerplate code that we shouldn't have
+> > > >> > >> to).
+> > > >> > >>
+> > > >> > >> Listing only the human-friendly names in the array like in the
+> > > >> > >> original patch could be a reasonable temporary solution.  It
+> > > >> > >> won't allow us to use a single entry for all subclasses of a
+> > > >> > >> given type by now (e.g. listing only TYPE_X86_CPU on PC), but at
+> > > >> > >> least we can address this issue without waiting for a refactor of
+> > > >> > >> the CPU model enumeration code.  
+> > > >> >
+> > > >> > Ah, I just re-read this. Do you mean go back to the original RFC and
+> > > >> > just use strcmp() to compare the human readable cpu_model?  
+> > > >> It's sort of going backwards but I won't object to this as far as you
+> > > >> won't use machine->cpu_model (which is in process of being removed)  
+> > > 
+> > > Wait, machine->cpu_model is the human readable name. Without using
+> > > that we can't use just human readable strings for the valid cpu types.  
+> > 
+> > Well, if we want to deprecate machine->cpu_model we need to offer
+> > an alternative first, otherwise we can't prevent people from
+> > using it.
+> > 
+> > Igor, do you see an (existing) alternative to machine->cpu_model
+> > that would allow us to avoid using it in
+> > machine_run_board_init()?
+> In recently merged refactoring machine->cpu_model is being replaced
+> by machine->cpu_type. So currently we don't need machine->cpu_model
+> anywhere except machine('none'), and once I refactor that it could
+> be dropped completely and after some work on *-user targets we can
+> practically get rid of cpu_model notion completely
+> (excluding of -cpu option parser). 
 > 
-> There is also a set of helper scripts written by Alex Bennée
-> for debugging the record/replay code.
+> My dislike of idea is that it's adding back cpumodel strings
+> in boards code again (which I've just got rid of).
+> 
+> I hate to say that but it looks like we need more refactoring
+> for this series to print cpumodels back to user.
+> 
+> We already have FOO_cpu_list()/FOO_query_cpu_definitions()
+> which already do cpu type => cpumodel conversion (and even
+> have some code duplication within a target), I'd suggest
+> generalizing that across targets and then using generic
+> helper for printing back to user converted cpu types from
+> mc->valid_cpu_types which this series introduces.
 
-For now, I'm applying patches 13, 24-26 and 28.
+I agree with the long term goal of making cpu type => cpu model
+conversion generic.  But until we refactor the arch-specific code
+and implement that, we have 2 options:
 
-Paolo
+1) Keep printing a confusing error message until we implement cpu
+   type => cpu model conversion;
+2) Keep the MachineState::cpu_model field until we implement cpu
+   type => cpu model conversion.
 
-> 
-> v3 changes:
->  - removed upstreamed patches
->  - fixed bug with recursive checkpoints
->  - fixed bug with icount warp checkpoint
-> 
-> v2 changes:
->  - updated lock/unlock logic (as suggested by Paolo Bonzini)
->  - updated cpu execution loop to avoid races in setting/resetting exit request (as suggested by Paolo Bonzini)
->  - minor changes
-> 
-> ---
-> 
-> Alex Bennée (12):
->       target/arm/arm-powertctl: drop BQL assertions
->       cpus: push BQL lock to qemu_*_wait_io_event
->       cpus: only take BQL for sleeping threads
->       replay/replay.c: bump REPLAY_VERSION again
->       replay/replay-internal.c: track holding of replay_lock
->       replay: make locking visible outside replay code
->       replay: push replay_mutex_lock up the call tree
->       scripts/qemu-gdb: add simple tcg lock status helper
->       util/qemu-thread-*: add qemu_lock, locked and unlock trace events
->       scripts/analyse-locks-simpletrace.py: script to analyse lock times
->       scripts/replay-dump.py: replay log dumper
->       scripts/qemu-gdb/timers.py: new helper to dump timer state
-> 
-> Pavel Dovgalyuk (18):
->       hpet: recover timer offset correctly
->       cpu: flush TB cache when loading VMState
->       This patch adds a condition before overwriting exception_index fields.
->       block: implement bdrv_snapshot_goto for blkreplay
->       blkreplay: create temporary overlay for underlaying devices
->       replay: disable default snapshot for record/replay
->       replay: fix processing async events
->       replay: fixed replay_enable_events
->       replay: fix save/load vm for non-empty queue
->       replay: added replay log format description
->       replay: make safe vmstop at record/replay
->       replay: save prior value of the host clock
->       icount: fixed saving/restoring of icount warp timers
->       replay: don't destroy mutex at exit
->       replay: check return values of fwrite
->       replay: avoid recursive call of checkpoints
->       replay: improve replay performance
->       replay: don't process async events when warping the clock
-> 
-> 
->  accel/kvm/kvm-all.c                  |    4 
->  accel/tcg/cpu-exec.c                 |    5 -
->  block/blkreplay.c                    |   73 ++++++++
->  cpus-common.c                        |   13 +
->  cpus.c                               |  184 +++++++++++++++-----
->  docs/replay.txt                      |   91 ++++++++++
->  exec.c                               |    1 
->  hw/timer/hpet.c                      |   30 +++
->  include/hw/compat.h                  |    6 +
->  include/qemu/thread.h                |   19 ++
->  include/qemu/timer.h                 |   14 ++
->  include/sysemu/replay.h              |   22 ++
->  migration/savevm.c                   |   13 +
->  replay/replay-char.c                 |   21 +-
->  replay/replay-events.c               |   30 +--
->  replay/replay-internal.c             |   48 +++++
->  replay/replay-internal.h             |    9 +
->  replay/replay-snapshot.c             |    9 +
->  replay/replay-time.c                 |   10 +
->  replay/replay.c                      |   75 ++++++--
->  scripts/analyse-locks-simpletrace.py |   99 +++++++++++
->  scripts/qemu-gdb.py                  |    4 
->  scripts/qemugdb/tcg.py               |   46 +++++
->  scripts/qemugdb/timers.py            |   54 ++++++
->  scripts/replay-dump.py               |  308 ++++++++++++++++++++++++++++++++++
->  stubs/replay.c                       |   16 ++
->  target/arm/arm-powerctl.c            |    8 -
->  target/i386/hax-all.c                |    2 
->  util/main-loop.c                     |   17 +-
->  util/qemu-thread-posix.c             |   21 +-
->  util/qemu-timer.c                    |   12 +
->  util/trace-events                    |    7 -
->  vl.c                                 |   12 +
->  33 files changed, 1112 insertions(+), 171 deletions(-)
->  create mode 100755 scripts/analyse-locks-simpletrace.py
->  create mode 100644 scripts/qemugdb/tcg.py
->  create mode 100644 scripts/qemugdb/timers.py
->  create mode 100755 scripts/replay-dump.py
-> 
+I don't see any reason to pick (1) instead of (2).
+
+-- 
+Eduardo
