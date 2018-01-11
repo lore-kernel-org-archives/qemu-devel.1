@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57121)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59326)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eZhsc-0006gu-Ce
-	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 13:47:11 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1eZhy7-0002H2-Di
+	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 13:52:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eZhsb-0008Bj-GR
-	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 13:47:10 -0500
-Received: from mail-oi0-x241.google.com ([2607:f8b0:4003:c06::241]:46099)
+	(envelope-from <peter.maydell@linaro.org>) id 1eZhy6-0004Tv-MA
+	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 13:52:51 -0500
+Received: from mail-oi0-x244.google.com ([2607:f8b0:4003:c06::244]:33569)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1eZhsb-0008BN-C9
-	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 13:47:09 -0500
-Received: by mail-oi0-x241.google.com with SMTP id d124so2278499oib.13
-	for <qemu-devel@nongnu.org>; Thu, 11 Jan 2018 10:47:09 -0800 (PST)
+	id 1eZhy6-0004TX-Go
+	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 13:52:50 -0500
+Received: by mail-oi0-x244.google.com with SMTP id y141so2319163oia.0
+	for <qemu-devel@nongnu.org>; Thu, 11 Jan 2018 10:52:50 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20171218173022.18418-7-richard.henderson@linaro.org>
-References: <20171218173022.18418-1-richard.henderson@linaro.org>
-	<20171218173022.18418-7-richard.henderson@linaro.org>
+In-Reply-To: <20180111183714.22834-2-malbarbo@gmail.com>
+References: <20180111183714.22834-2-malbarbo@gmail.com>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 11 Jan 2018 18:46:48 +0000
-Message-ID: <CAFEAcA_rut+BFAi1Cppz97wajkb3zLCvvarZ=2j0tE3HxD01Lw@mail.gmail.com>
+Date: Thu, 11 Jan 2018 18:52:29 +0000
+Message-ID: <CAFEAcA9Qo8uQ10FHP7XfuC+sgb4i8e_fxo7EvZGtVVWddqpxVA@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH 6/9] vmstate: Add VMSTATE_UINT64_SUB_ARRAY
+Subject: Re: [Qemu-devel] [PATCH v2] linux-user: Add AT_SECURE auxval
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,57 +28,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>
+To: Marco A L Barbosa <malbarbo@gmail.com>
+Cc: QEMU Trivial <qemu-trivial@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <Laurent@vivier.eu>
 
-On 18 December 2017 at 17:30, Richard Henderson
-<richard.henderson@linaro.org> wrote:
-> At the same time, move VMSTATE_UINT32_SUB_ARRAY
-> beside the other UINT32 definitions.
->
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+On 11 January 2018 at 18:37, Marco A L Barbosa <malbarbo@gmail.com> wrote:
 > ---
->  include/migration/vmstate.h | 9 ++++++---
->  1 file changed, 6 insertions(+), 3 deletions(-)
->
-> diff --git a/include/migration/vmstate.h b/include/migration/vmstate.h
-> index 88b55df5ae..8c3889433c 100644
-> --- a/include/migration/vmstate.h
-> +++ b/include/migration/vmstate.h
-> @@ -905,6 +905,9 @@ extern const VMStateInfo vmstate_info_qtailq;
->  #define VMSTATE_UINT32_ARRAY(_f, _s, _n)                              \
->      VMSTATE_UINT32_ARRAY_V(_f, _s, _n, 0)
->
-> +#define VMSTATE_UINT32_SUB_ARRAY(_f, _s, _start, _num)                \
-> +    VMSTATE_SUB_ARRAY(_f, _s, _start, _num, 0, vmstate_info_uint32, uint32_t)
-> +
->  #define VMSTATE_UINT32_2DARRAY(_f, _s, _n1, _n2)                      \
->      VMSTATE_UINT32_2DARRAY_V(_f, _s, _n1, _n2, 0)
->
-> @@ -914,6 +917,9 @@ extern const VMStateInfo vmstate_info_qtailq;
->  #define VMSTATE_UINT64_ARRAY(_f, _s, _n)                              \
->      VMSTATE_UINT64_ARRAY_V(_f, _s, _n, 0)
->
-> +#define VMSTATE_UINT64_SUB_ARRAY(_f, _s, _start, _num)                \
-> +    VMSTATE_SUB_ARRAY(_f, _s, _start, _num, 0, vmstate_info_uint64, uint64_t)
-> +
->  #define VMSTATE_UINT64_2DARRAY(_f, _s, _n1, _n2)                      \
->      VMSTATE_UINT64_2DARRAY_V(_f, _s, _n1, _n2, 0)
->
-> @@ -932,9 +938,6 @@ extern const VMStateInfo vmstate_info_qtailq;
->  #define VMSTATE_INT32_ARRAY(_f, _s, _n)                               \
->      VMSTATE_INT32_ARRAY_V(_f, _s, _n, 0)
->
-> -#define VMSTATE_UINT32_SUB_ARRAY(_f, _s, _start, _num)                \
-> -    VMSTATE_SUB_ARRAY(_f, _s, _start, _num, 0, vmstate_info_uint32, uint32_t)
-> -
->  #define VMSTATE_INT64_ARRAY_V(_f, _s, _n, _v)                         \
->      VMSTATE_ARRAY(_f, _s, _n, _v, vmstate_info_int64, int64_t)
->
-> --
-> 2.14.3
+>  linux-user/elfload.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
 
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+This is missing your Signed-off-by: line, which we need to be
+able to accept the patch.
+
+(I've also cc'd the linux-user maintainers.)
+
+> diff --git a/linux-user/elfload.c b/linux-user/elfload.c
+> index 20f3d8c2c3..32a47674e6 100644
+> --- a/linux-user/elfload.c
+> +++ b/linux-user/elfload.c
+> @@ -1354,7 +1354,7 @@ struct exec
+>                                   ~(abi_ulong)(TARGET_ELF_EXEC_PAGESIZE-1))
+>  #define TARGET_ELF_PAGEOFFSET(_v) ((_v) & (TARGET_ELF_EXEC_PAGESIZE-1))
+>
+> -#define DLINFO_ITEMS 14
+> +#define DLINFO_ITEMS 15
+>
+>  static inline void memcpy_fromfs(void * to, const void * from, unsigned long n)
+>  {
+> @@ -1786,6 +1786,7 @@ static abi_ulong create_elf_tables(abi_ulong p, int argc, int envc,
+>      NEW_AUX_ENT(AT_HWCAP, (abi_ulong) ELF_HWCAP);
+>      NEW_AUX_ENT(AT_CLKTCK, (abi_ulong) sysconf(_SC_CLK_TCK));
+>      NEW_AUX_ENT(AT_RANDOM, (abi_ulong) u_rand_bytes);
+> +    NEW_AUX_ENT(AT_SECURE, (abi_ulong) qemu_getauxval(AT_SECURE));
+>
+>  #ifdef ELF_HWCAP2
+>      NEW_AUX_ENT(AT_HWCAP2, (abi_ulong) ELF_HWCAP2);
+> --
+
+For the content, Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 
 thanks
 -- PMM
