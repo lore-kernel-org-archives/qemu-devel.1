@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44697)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44784)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eZiYn-0002jf-Or
-	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 14:30:47 -0500
+	id 1eZiYt-0002r0-8p
+	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 14:30:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eZiYm-0005RS-NB
-	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 14:30:45 -0500
-Received: from mail-qk0-x241.google.com ([2607:f8b0:400d:c09::241]:36119)
+	id 1eZiYp-0005WI-Fj
+	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 14:30:51 -0500
+Received: from mail-qk0-x243.google.com ([2607:f8b0:400d:c09::243]:40387)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eZiYm-0005Qr-Iv
-	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 14:30:44 -0500
-Received: by mail-qk0-x241.google.com with SMTP id d21so5778363qkj.3
-	for <qemu-devel@nongnu.org>; Thu, 11 Jan 2018 11:30:44 -0800 (PST)
+	id 1eZiYp-0005Va-C6
+	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 14:30:47 -0500
+Received: by mail-qk0-x243.google.com with SMTP id d18so5749417qke.7
+	for <qemu-devel@nongnu.org>; Thu, 11 Jan 2018 11:30:47 -0800 (PST)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Thu, 11 Jan 2018 16:30:13 -0300
-Message-Id: <20180111193021.17466-6-f4bug@amsat.org>
+Date: Thu, 11 Jan 2018 16:30:14 -0300
+Message-Id: <20180111193021.17466-7-f4bug@amsat.org>
 In-Reply-To: <20180111193021.17466-1-f4bug@amsat.org>
 References: <20180111193021.17466-1-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v6 05/13] sdhci: refactor common sysbus/pci
- realize() into sdhci_common_realize()
+Subject: [Qemu-devel] [PATCH v6 06/13] sdhci: refactor common sysbus/pci
+ unrealize() into sdhci_common_unrealize()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -40,67 +40,76 @@ Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nong
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 Reviewed-by: Alistair Francis <alistair.francis@xilinx.com>
 ---
- hw/sd/sdhci.c | 30 +++++++++++++++++++++---------
- 1 file changed, 21 insertions(+), 9 deletions(-)
+ hw/sd/sdhci.c | 25 ++++++++++++++++++++++---
+ 1 file changed, 22 insertions(+), 3 deletions(-)
 
 diff --git a/hw/sd/sdhci.c b/hw/sd/sdhci.c
-index 68bcf75478..b3dbd994fd 100644
+index b3dbd994fd..089961bd66 100644
 --- a/hw/sd/sdhci.c
 +++ b/hw/sd/sdhci.c
-@@ -1194,6 +1194,15 @@ static void sdhci_initfn(SDHCIState *s)
-     s->transfer_timer = timer_new_ns(QEMU_CLOCK_VIRTUAL, sdhci_data_transfer, s);
+@@ -31,6 +31,7 @@
+ #include "qemu/bitops.h"
+ #include "hw/sd/sdhci.h"
+ #include "sdhci-internal.h"
++#include "qapi/error.h"
+ #include "qemu/log.h"
+ 
+ /* host controller debug messages */
+@@ -1203,15 +1204,23 @@ static void sdhci_common_realize(SDHCIState *s, Error **errp)
+                           SDHC_REGISTERS_MAP_SIZE);
  }
  
-+static void sdhci_common_realize(SDHCIState *s, Error **errp)
++static void sdhci_common_unrealize(SDHCIState *s, Error **errp)
 +{
-+    s->buf_maxsz = sdhci_get_fifolen(s);
-+    s->fifo_buffer = g_malloc0(s->buf_maxsz);
-+
-+    memory_region_init_io(&s->iomem, OBJECT(s), &sdhci_mmio_ops, s, "sdhci",
-+                          SDHC_REGISTERS_MAP_SIZE);
++    /* This function is expected to be called only once for each class:
++     * - SysBus:    via DeviceClass->unrealize(),
++     * - PCI:       via PCIDeviceClass->exit().
++     * However to avoid double-free and/or use-after-free we still nullify
++     * this variable (better safe than sorry!). */
++    g_free(s->fifo_buffer);
++    s->fifo_buffer = NULL;
 +}
 +
  static void sdhci_uninitfn(SDHCIState *s)
  {
      timer_del(s->insert_timer);
-@@ -1290,14 +1299,16 @@ static void sdhci_common_class_init(ObjectClass *klass, void *data)
- static void sdhci_pci_realize(PCIDevice *dev, Error **errp)
+     timer_free(s->insert_timer);
+     timer_del(s->transfer_timer);
+     timer_free(s->transfer_timer);
+-
+-    g_free(s->fifo_buffer);
+-    s->fifo_buffer = NULL;
+ }
+ 
+ static bool sdhci_pending_insert_vmstate_needed(void *opaque)
+@@ -1315,6 +1324,8 @@ static void sdhci_pci_realize(PCIDevice *dev, Error **errp)
+ static void sdhci_pci_exit(PCIDevice *dev)
  {
      SDHCIState *s = PCI_SDHCI(dev);
 +
-+    sdhci_initfn(s);
-+    sdhci_common_realize(s, errp);
-+    if (errp && *errp) {
-+        return;
-+    }
-+
-     dev->config[PCI_CLASS_PROG] = 0x01; /* Standard Host supported DMA */
-     dev->config[PCI_INTERRUPT_PIN] = 0x01; /* interrupt pin A */
--    sdhci_initfn(s);
--    s->buf_maxsz = sdhci_get_fifolen(s);
--    s->fifo_buffer = g_malloc0(s->buf_maxsz);
-     s->irq = pci_allocate_irq(dev);
--    memory_region_init_io(&s->iomem, OBJECT(s), &sdhci_mmio_ops, s, "sdhci",
--            SDHC_REGISTERS_MAP_SIZE);
-     pci_register_bar(dev, 0, 0, &s->iomem);
++    sdhci_common_unrealize(s, &error_abort);
+     sdhci_uninitfn(s);
  }
  
-@@ -1351,11 +1362,12 @@ static void sdhci_sysbus_realize(DeviceState *dev, Error ** errp)
-     SDHCIState *s = SYSBUS_SDHCI(dev);
-     SysBusDevice *sbd = SYS_BUS_DEVICE(dev);
- 
--    s->buf_maxsz = sdhci_get_fifolen(s);
--    s->fifo_buffer = g_malloc0(s->buf_maxsz);
-+    sdhci_common_realize(s, errp);
-+    if (errp && *errp) {
-+        return;
-+    }
-+
-     sysbus_init_irq(sbd, &s->irq);
--    memory_region_init_io(&s->iomem, OBJECT(s), &sdhci_mmio_ops, s, "sdhci",
--            SDHC_REGISTERS_MAP_SIZE);
+@@ -1371,11 +1382,19 @@ static void sdhci_sysbus_realize(DeviceState *dev, Error ** errp)
      sysbus_init_mmio(sbd, &s->iomem);
  }
  
++static void sdhci_sysbus_unrealize(DeviceState *dev, Error **errp)
++{
++    SDHCIState *s = SYSBUS_SDHCI(dev);
++
++    sdhci_common_unrealize(s, &error_abort);
++}
++
+ static void sdhci_sysbus_class_init(ObjectClass *klass, void *data)
+ {
+     DeviceClass *dc = DEVICE_CLASS(klass);
+ 
+     dc->realize = sdhci_sysbus_realize;
++    dc->unrealize = sdhci_sysbus_unrealize;
+ 
+     sdhci_common_class_init(klass, data);
+ }
 -- 
 2.15.1
