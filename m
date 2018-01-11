@@ -1,30 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48806)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53384)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1eZc6y-0002vV-MG
-	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 07:37:37 -0500
+	(envelope-from <mreitz@redhat.com>) id 1eZcG0-0005nN-I6
+	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 07:46:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1eZc6v-0001RK-Gt
-	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 07:37:36 -0500
-Received: from mail-lf0-x242.google.com ([2a00:1450:4010:c07::242]:36193)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1eZc6v-0001QD-88
-	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 07:37:33 -0500
-Received: by mail-lf0-x242.google.com with SMTP id e203so2622806lfg.3
-	for <qemu-devel@nongnu.org>; Thu, 11 Jan 2018 04:37:32 -0800 (PST)
-Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
-References: <20180111082452.27295.85707.stgit@pasha-VirtualBox>
-	<20180111082744.27295.25934.stgit@pasha-VirtualBox>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <621213e6-91cc-908e-225f-efb898bb6747@redhat.com>
-Date: Thu, 11 Jan 2018 13:37:27 +0100
+	(envelope-from <mreitz@redhat.com>) id 1eZcFz-0001Ew-Ou
+	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 07:46:56 -0500
+References: <20180107122336.29333-1-richiejp@f-m.fm>
+	<fd5f5f12-e081-6f19-54af-3b560139bb78@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <5cf19623-72ac-fb8b-2054-a60d42419ec6@redhat.com>
+Date: Thu, 11 Jan 2018 13:46:38 +0100
 MIME-Version: 1.0
-In-Reply-To: <20180111082744.27295.25934.stgit@pasha-VirtualBox>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC PATCH v3 30/30] replay: don't process async
- events when warping the clock
+In-Reply-To: <fd5f5f12-e081-6f19-54af-3b560139bb78@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="MdrWBPrsY4VugZSdSSNI5gBH2lS6ZA33h"
+Subject: Re: [Qemu-devel] [PATCH 1/2] Add save-snapshot,
+ load-snapshot and delete-snapshot to QAPI
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,45 +25,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, peter.maydell@linaro.org, boost.lists@gmail.com, quintela@redhat.com, jasowang@redhat.com, mst@redhat.com, zuban32s@gmail.com, maria.klimushenkova@ispras.ru, dovgaluk@ispras.ru, kraxel@redhat.com, alex.bennee@linaro.org
+To: Eric Blake <eblake@redhat.com>, Richard Palethorpe <richiejp@f-m.fm>, qemu-devel@nongnu.org
+Cc: armbru@redhat.com, dgilbert@redhat.com, rpalethorpe@suse.com, quintela@redhat.com, Qemu-block <qemu-block@nongnu.org>
 
-On 11/01/2018 09:27, Pavel Dovgalyuk wrote:
-> Virtual clock is wapred from iothread and vcpu thread. When the hardware
-> events associated with warp checkpoint, then interrupt delivering may be
-> non-deterministic if checkpoint is processed in different threads in record
-> and replay.
-> This patch disables event processing for clock warp checkpoint and leaves
-> all hardware events to other checkpoints (e.g., virtual clock).
-> 
-> Signed-off-by: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
-> ---
->  replay/replay.c |    7 ++++++-
->  1 file changed, 6 insertions(+), 1 deletion(-)
-> 
-> diff --git a/replay/replay.c b/replay/replay.c
-> index b9c496a..cc43c38 100644
-> --- a/replay/replay.c
-> +++ b/replay/replay.c
-> @@ -211,7 +211,12 @@ bool replay_checkpoint(ReplayCheckpoint checkpoint)
->      } else if (replay_mode == REPLAY_MODE_RECORD) {
->          g_assert(replay_mutex_locked());
->          replay_put_event(EVENT_CHECKPOINT + checkpoint);
-> -        replay_save_events(checkpoint);
-> +        /* This checkpoint belongs to several threads.
-> +           Processing events from different threads is
-> +           non-deterministic */
-> +        if (checkpoint != CHECKPOINT_CLOCK_WARP_START) {
-> +            replay_save_events(checkpoint);
-> +        }
->          res = true;
->      }
->  out:
-> 
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--MdrWBPrsY4VugZSdSSNI5gBH2lS6ZA33h
+From: Max Reitz <mreitz@redhat.com>
+To: Eric Blake <eblake@redhat.com>, Richard Palethorpe <richiejp@f-m.fm>,
+ qemu-devel@nongnu.org
+Cc: armbru@redhat.com, dgilbert@redhat.com, rpalethorpe@suse.com,
+ quintela@redhat.com, Qemu-block <qemu-block@nongnu.org>
+Message-ID: <5cf19623-72ac-fb8b-2054-a60d42419ec6@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 1/2] Add save-snapshot, load-snapshot and
+ delete-snapshot to QAPI
+References: <20180107122336.29333-1-richiejp@f-m.fm>
+ <fd5f5f12-e081-6f19-54af-3b560139bb78@redhat.com>
+In-Reply-To: <fd5f5f12-e081-6f19-54af-3b560139bb78@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Please add an assertion in replay_read_event that the read_checkpoint is
-never CHECKPOINT_CLOCK_WARP_START.  Why is the checkpoint still needed?
+On 2018-01-08 14:52, Eric Blake wrote:
+> On 01/07/2018 06:23 AM, Richard Palethorpe wrote:
+>> Add QAPI wrapper functions for the existing snapshot functionality. Th=
+ese
+>> functions behave the same way as the HMP savevm, loadvm and delvm
+>> commands. This will allow applications, such as OpenQA, to programmati=
+cally
+>> revert the VM to a previous state with no dependence on HMP or qemu-im=
+g.
+>=20
+> That's already possible; libvirt uses QMP's human-monitor-command to
+> access these HMP commands programmatically.
+>=20
+> We've had discussions in the past about what it would take to have
+> specific QMP commands for these operations; the biggest problem is that=
 
-Thanks,
+> these commands promote the use of internal snapshots, and there are
+> enough performance and other issues with internal snapshots that we are=
 
-Paolo
+> not yet ready to commit to a long-term interface for making their use
+> easier.  At this point, our recommendation is to prefer external snapsh=
+ots.
+
+We already have QMP commands for internal snapshots, though.  Isn't the
+biggest issue that savevm takes too much time to be a synchronous QMP
+command?
+
+Max
+
+
+--MdrWBPrsY4VugZSdSSNI5gBH2lS6ZA33h
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlpXXK4SHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9AdMIIALDzSfTBtWvmTEMGNJGeqNX6WHH/7o/r
+PW0lERPwdnIPjcDgyyN0BF84S1WNDfordzXOqA7uPwTwY7KNgBDaQhb3OMk//lD4
+h6QVx56QRHQ99sSICYQLZUe6c0NbmDMWXwanLl6VqBTFuFxUT2WWbdnEjM2tP0YO
+5fUdxC/LOvcbpS2SwTlNM3GmAPvM9yhTyQ/If2KAltwL2qDX1B+YiH1jXxT6mrPv
+g67alAv9wZr1k2CPugm3VcGZ8DqdnA7+m/25peOvpga4axrsQTm23HmRsb/WTVSR
+y602p8wwt5ViY+2ap9/j16ie0k1mn1S0QAMRACnWYU787CU/SRhnA2w=
+=e0Nj
+-----END PGP SIGNATURE-----
+
+--MdrWBPrsY4VugZSdSSNI5gBH2lS6ZA33h--
