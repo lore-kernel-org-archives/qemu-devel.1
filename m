@@ -1,29 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43873)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44597)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1eZkIX-0002ez-Rw
-	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 16:22:06 -0500
+	(envelope-from <marcandre.lureau@gmail.com>) id 1eZkKU-0004OX-78
+	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 16:24:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1eZkIW-0008Cp-Oy
-	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 16:22:05 -0500
-Received: from mail-wr0-x232.google.com ([2a00:1450:400c:c0c::232]:43632)
+	(envelope-from <marcandre.lureau@gmail.com>) id 1eZkKT-0000w4-5n
+	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 16:24:06 -0500
+Received: from mail-wr0-x231.google.com ([2a00:1450:400c:c0c::231]:37551)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1eZkIW-0008CL-Ei
-	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 16:22:04 -0500
-Received: by mail-wr0-x232.google.com with SMTP id s13so3519894wra.10
-	for <qemu-devel@nongnu.org>; Thu, 11 Jan 2018 13:22:04 -0800 (PST)
+	id 1eZkKS-0000vN-Vh
+	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 16:24:05 -0500
+Received: by mail-wr0-x231.google.com with SMTP id f8so3542179wre.4
+	for <qemu-devel@nongnu.org>; Thu, 11 Jan 2018 13:24:04 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <87h8t2o7i3.fsf@dusky.pond.sub.org>
+In-Reply-To: <87zi6tirpa.fsf@dusky.pond.sub.org>
 References: <20170911110623.24981-1-marcandre.lureau@redhat.com>
-	<20170911110623.24981-16-marcandre.lureau@redhat.com>
-	<87h8t2o7i3.fsf@dusky.pond.sub.org>
+	<20170911110623.24981-18-marcandre.lureau@redhat.com>
+	<87d13qo6c6.fsf@dusky.pond.sub.org>
+	<CAJ+F1CJt5U9y1O2coL0Lb7-cF9Oe69Wwn_94Jv4g8emJ5ArQdg@mail.gmail.com>
+	<87zi6tirpa.fsf@dusky.pond.sub.org>
 From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Thu, 11 Jan 2018 22:22:02 +0100
-Message-ID: <CAJ+F1CKvQv_eQ4YmCnHi-SMKHOD+FU50xwNNWmd9XEWzAdPA0g@mail.gmail.com>
+Date: Thu, 11 Jan 2018 22:24:03 +0100
+Message-ID: <CAJ+F1C+y5ZLgGpa28bWGGopycpxnejNSsacfo5XFK_gDV4LwGA@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3 15/50] qapi-types: refactor variants
- handling
+Subject: Re: [Qemu-devel] [PATCH v3 17/50] qapi: do not define enumeration
+ value explicitely
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,120 +39,104 @@ Cc: QEMU <qemu-devel@nongnu.org>, Michael Roth <mdroth@linux.vnet.ibm.com>
 
 Hi
 
-On Thu, Dec 7, 2017 at 4:57 PM, Markus Armbruster <armbru@redhat.com> wrote=
+On Fri, Dec 8, 2017 at 8:50 AM, Markus Armbruster <armbru@redhat.com> wrote=
 :
-> Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
+> Marc-Andr=C3=A9 Lureau <marcandre.lureau@gmail.com> writes:
 >
->> Generate variants objects outside gen_object(). This will allow to
->> easily wrap gen_object() with ifcond_decorator in the following patch.
+>> On Thu, Dec 7, 2017 at 5:23 PM, Markus Armbruster <armbru@redhat.com> wr=
+ote:
+>>> Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
+>>>
+>>>> The C standard has the initial value at 0 and the subsequent values
+>>>> incremented by 1. No need to set this explicitely.
+>>>>
+>>>> This will prevent from artificial "gaps" when compiling out some enum
+>>>> values and having unnecessarily large MAX values & enums arrays.
+>>>>
+>>>> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+>>>> ---
+>>>>  scripts/qapi.py | 7 ++-----
+>>>>  1 file changed, 2 insertions(+), 5 deletions(-)
+>>>>
+>>>> diff --git a/scripts/qapi.py b/scripts/qapi.py
+>>>> index 94b735d8d6..074ee221a1 100644
+>>>> --- a/scripts/qapi.py
+>>>> +++ b/scripts/qapi.py
+>>>> @@ -1985,14 +1985,11 @@ typedef enum %(c_name)s {
+>>>>  ''',
+>>>>                  c_name=3Dc_name(name))
+>>>>
+>>>> -    i =3D 0
+>>>>      for value in enum_values:
+>>>>          ret +=3D mcgen('''
+>>>> -    %(c_enum)s =3D %(i)d,
+>>>> +    %(c_enum)s,
+>>>>  ''',
+>>>> -                     c_enum=3Dc_enum_const(name, value, prefix),
+>>>> -                     i=3Di)
+>>>> -        i +=3D 1
+>>>> +                     c_enum=3Dc_enum_const(name, value, prefix))
+>>>>
+>>>>      ret +=3D mcgen('''
+>>>>  } %(c_name)s;
+>>>
+>>> Recapitulate review of v2: this risks entertaining mishaps like
+>>> compiling this one
+>>>
+>>>     typedef enum Color {
+>>>         COLOR_WHITE,
+>>> #if defined(NEED_CPU_H)
+>>> #if defined(TARGET_S390X)
+>>>         COLOR_BLUE,
+>>> #endif /* defined(TARGET_S390X) */
+>>> #endif /* defined(NEED_CPU_H) */
+>>>         COLOR_BLACK,
+>>>     } Color;
+>>>
+>>> in s390x-code (COLOR_BLACK =3D 2) and in target-independent code
+>>> (COLOR_BLACK =3D 1), then linking the two together.
+>>>
+>>> Same issue for struct members and such (previous patch).
+>>>
+>>> What's our story on preventing disaster here?
+>>>
+>>> In the long run, we want to split the generated code so that
+>>> target-specific and target-independent code are separate, and each part
+>>> is always compiled with consistent preprocessor symbols.  But I'm afrai=
+d
+>>> that's not in the card right now.
 >>
->> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
->> ---
->>  scripts/qapi-types.py | 37 +++++++++++++++++++++++--------------
->>  1 file changed, 23 insertions(+), 14 deletions(-)
+>> Eh, I need to refresh my memories about that series, but I think
+>> that's what I did in v3
 >>
->> diff --git a/scripts/qapi-types.py b/scripts/qapi-types.py
->> index 915786c463..2b3588267b 100644
->> --- a/scripts/qapi-types.py
->> +++ b/scripts/qapi-types.py
->> @@ -53,23 +53,27 @@ def gen_struct_members(members):
->>      return ret
->>
->>
->> -def gen_object(name, base, members, variants):
->> -    if name in objects_seen:
->> -        return ''
->> -    objects_seen.add(name)
->> -
->> +def gen_variants_objects(variants):
->>      ret =3D ''
->>      if variants:
->>          for v in variants.variants:
->>              if isinstance(v.type, QAPISchemaObjectType):
->> +                ret +=3D gen_variants_objects(v.type.variants)
->>                  ret +=3D gen_object(v.type.name, v.type.base,
->>                                    v.type.local_members, v.type.variants=
-)
->> +    return ret
->>
->> -    ret +=3D mcgen('''
->> +
->> +def gen_object(name, base, members, variants):
->> +    if name in objects_seen:
->> +        return ''
->> +    objects_seen.add(name)
->> +
->> +    ret =3D mcgen('''
->>
->>  struct %(c_name)s {
->>  ''',
->> -                 c_name=3Dc_name(name))
->> +                c_name=3Dc_name(name))
->>
->>      if base:
->>          if not base.is_implicit():
->> @@ -218,11 +222,7 @@ class QAPISchemaGenTypeVisitor(QAPISchemaVisitor):
->>              self.decl +=3D gen_array(name, element_type)
->>              self._gen_type_cleanup(name)
->>
->> -    def visit_object_type(self, name, info, ifcond, base, members, vari=
-ants):
->> -        # Nothing to do for the special empty builtin
->> -        if name =3D=3D 'q_empty':
->> -            return
->> -        self._fwdecl +=3D gen_fwd_object_or_array(name)
->> +    def _gen_object(self, name, info, ifcond, base, members, variants):
->>          self.decl +=3D gen_object(name, base, members, variants)
->>          if base and not base.is_implicit():
->>              self.decl +=3D gen_upcast(name, base)
->> @@ -232,10 +232,19 @@ class QAPISchemaGenTypeVisitor(QAPISchemaVisitor):
->>              # implicit types won't be directly allocated/freed
->>              self._gen_type_cleanup(name)
->>
->> +    def visit_object_type(self, name, info, ifcond, base, members, vari=
-ants):
->> +        # Nothing to do for the special empty builtin
->> +        if name =3D=3D 'q_empty':
->> +            return
->> +        self._fwdecl +=3D gen_fwd_object_or_array(name)
->> +        self.decl +=3D gen_variants_objects(variants)
->> +        self._gen_object(name, info, None, base, members, variants)
->> +
->>      def visit_alternate_type(self, name, info, ifcond, variants):
->>          self._fwdecl +=3D gen_fwd_object_or_array(name)
->> -        self.decl +=3D gen_object(name, None, [variants.tag_member], va=
-riants)
->> -        self._gen_type_cleanup(name)
->> +        self.decl +=3D gen_variants_objects(variants)
->> +        self._gen_object(name, info, None, None,
->> +                         [variants.tag_member], variants)
+>> It doesn't use the NEED_CPU_H trick. It has a seperate per-target target=
+.json
 >
-> Where did self._gen_type_cleanup(name) go?  Hmm, I guess it's now in
-> _gen_object().  Confusing.
+> Looking... aha!  target.json appears in PATCH 44 (which I haven't even
+> glanced at, yet).  The problem appears in PATCH 16, though.  Perhaps a
+> bit of patch reshuffling would do.
 
-This factors out common code that must be wrap by the same ifcond, in
-the following patch.
+What problem appears in patch 16? Some code could be introduced using
+NEED_CPU_H and link arch & independent code together? It is still true
+after patch 44. If necessary, I can work on a split-qapi series before
+the conditionals are added. But the real benefit is only apparent
+after the conditional are introduced, so I am not motivated to
+reorder.
 
+>
+>>> I therefore proposed the stupidest temporary stopgap that could possibl=
+y
+>>> work: apply conditionals *only* to qmp-introspect.c, leave everything
+>>> unconditional elsewhere.
 >>
->>  # If you link code generated from multiple schemata, you want only one
->>  # instance of the code for built-in types.  Generate it only when
+>> I don't like that idea much and I don't think we need that
+>> restriction, but I need to get back to that series on some point
+>> (probably after you finish the review).
 >
-> If I read this patch correctly, you move code from the beginning of
-> gen_object() to new gen_variants_objects(), then arrange to have
-> gen_variants_objects() called right before gen_object().  Correct?
->
-> In old gen_object(), the code is guarded by
->
->        if name in objects_seen:
->            return ''
->        objects_seen.add(name)
->
-> In new gen_variants_objects(), it isn't.  Why?
+> It's a beefy series, and it's probably best to let me review the largest
+> prefix I can before we dive into discussion.
 
-gen_variants_objects() calls gen_object() for each variants, so it
-remains guarded.
-
-
+thanks
 
 --=20
 Marc-Andr=C3=A9 Lureau
