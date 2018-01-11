@@ -1,28 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34051)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34274)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1eZeov-0002T2-U1
-	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 10:31:13 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1eZepH-0002dZ-Ef
+	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 10:31:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1eZeoq-0004tA-Cd
-	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 10:31:09 -0500
-Received: from mail-pf0-x244.google.com ([2607:f8b0:400e:c00::244]:43656)
+	(envelope-from <peter.maydell@linaro.org>) id 1eZepG-0005On-MA
+	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 10:31:31 -0500
+Received: from mail-ot0-x230.google.com ([2607:f8b0:4003:c0f::230]:34172)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1eZeoq-0004sV-7K
-	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 10:31:04 -0500
-Received: by mail-pf0-x244.google.com with SMTP id e3so1889053pfi.10
-	for <qemu-devel@nongnu.org>; Thu, 11 Jan 2018 07:31:04 -0800 (PST)
-References: <1515637324-96034-1-git-send-email-mjc@sifive.com>
-	<1515637324-96034-7-git-send-email-mjc@sifive.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <a490bac7-e88b-cd4c-9922-f50461c591bc@linaro.org>
-Date: Thu, 11 Jan 2018 07:31:00 -0800
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1eZepG-0005OG-GG
+	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 10:31:30 -0500
+Received: by mail-ot0-x230.google.com with SMTP id p16so2411523otf.1
+	for <qemu-devel@nongnu.org>; Thu, 11 Jan 2018 07:31:30 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <1515637324-96034-7-git-send-email-mjc@sifive.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 06/21] RISC-V FPU Support
+In-Reply-To: <20180109060920-mutt-send-email-mst@kernel.org>
+References: <1513866427-27125-1-git-send-email-mst@redhat.com>
+	<CAFEAcA_pt7XhXOhL2jSxwH9ooL7xjShmp6eBAYpRLc=dY-=TXQ@mail.gmail.com>
+	<20171221223704-mutt-send-email-mst@kernel.org>
+	<CAAdtpL74ZyVsLwgBjpbsdSHbWdY_Uq6ouRAvgo00UdVevTKq8A@mail.gmail.com>
+	<20171222014258-mutt-send-email-mst@kernel.org>
+	<CAFEAcA8eKTEh3zSOPNm1WgUujNOU+zcNSgBAE5G68QcObQd8sA@mail.gmail.com>
+	<20180109060920-mutt-send-email-mst@kernel.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 11 Jan 2018 15:31:08 +0000
+Message-ID: <CAFEAcA_Xhm45N5U8aWZv=geVQMShv13FOEodS7HvPTz3fa9-+A@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL 00/25] pc, pci, virtio: features, fixes,
+ cleanups
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,20 +35,18 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Michael Clark <mjc@sifive.com>, qemu-devel@nongnu.org
-Cc: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Palmer Dabbelt <palmer@sifive.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>, RISC-V Patches <patches@groups.riscv.org>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philippe@mathieu-daude.net>, QEMU Developers <qemu-devel@nongnu.org>
 
-On 01/10/2018 06:21 PM, Michael Clark wrote:
-> Helper routines for FPU instructions and NaN definitions.
-> 
-> Signed-off-by: Michael Clark <mjc@sifive.com>
-> ---
->  fpu/softfloat-specialize.h |   7 +-
->  target/riscv/fpu_helper.c  | 591 +++++++++++++++++++++++++++++++++++++++++++++
->  2 files changed, 595 insertions(+), 3 deletions(-)
->  create mode 100644 target/riscv/fpu_helper.c
+On 9 January 2018 at 04:11, Michael S. Tsirkin <mst@redhat.com> wrote:
+> So it's an existing bug exposed by the test.
+> I've reverted the test for now but I didn't rebase
+> as there are downstream trees based on this pull req.
 
-It doesn't look like you have addressed any of my comments against v1 here.
+Hi -- I'm afraid this seems to have conflicts with the sparc
+pullreq. I tried the simple textual merge resolution for
+hw/pci-host/apb.c, but that then fails to compile.
+Can you fix up and resend, please?
 
-
-r~
+thanks
+-- PMM
