@@ -1,22 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60941)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33183)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1eZh4r-0004iM-T5
-	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 12:55:46 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1eZh5s-0005QN-9w
+	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 12:56:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1eZh4r-0003Lg-6x
-	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 12:55:45 -0500
-References: <20180110230825.18321-1-eblake@redhat.com>
-	<20180110230825.18321-3-eblake@redhat.com>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <b95cd0c3-0581-b763-07f2-8f90ef5e2e25@virtuozzo.com>
-Date: Thu, 11 Jan 2018 20:55:31 +0300
+	(envelope-from <peter.maydell@linaro.org>) id 1eZh5r-0003xB-9W
+	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 12:56:48 -0500
+Received: from mail-ot0-x234.google.com ([2607:f8b0:4003:c0f::234]:46963)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1eZh5r-0003vv-4K
+	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 12:56:47 -0500
+Received: by mail-ot0-x234.google.com with SMTP id f6so2792821oti.13
+	for <qemu-devel@nongnu.org>; Thu, 11 Jan 2018 09:56:46 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20180110230825.18321-3-eblake@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH v2 2/6] nbd/server: refactor negotiation
- functions parameters
+In-Reply-To: <20171218174552.18871-1-richard.henderson@linaro.org>
+References: <20171218174552.18871-1-richard.henderson@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 11 Jan 2018 17:56:25 +0000
+Message-ID: <CAFEAcA9Qnj0G03x72BFLAYmodeBMDB=t3pz4JxUj0HvrbhkuGA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [RFC 00/23] target/arm: decode generator and
+ initial sve patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,54 +29,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>
 
-11.01.2018 02:08, Eric Blake wrote:
-> From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+On 18 December 2017 at 17:45, Richard Henderson
+<richard.henderson@linaro.org> wrote:
+> The most important part here, for review, is the first patch.
 >
-> Instead of passing currently negotiating option and its length to
-> many of negotiation functions let's just store them on NBDClient
-> struct to be state-variables of negotiation phase.
+> I add a code generator, writen in python, which takes an input file
+> that describes the opcode bits and field bits of the instructions,
+> and outputs a function that does all of the decoding.
 >
-> This unifies semantics of negotiation functions and allows
-> tracking changes of remaining option length in future patches.
->
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> Reviewed-by: Eric Blake <eblake@redhat.com>
-> Message-Id: <20171122101958.17065-2-vsementsov@virtuozzo.com>
-> [eblake: rebase, commit message tweak, assert !optlen after
-> negotiation completes]
-> Signed-off-by: Eric Blake <eblake@redhat.com>
-> ---
->   nbd/server.c | 168 +++++++++++++++++++++++++++++------------------------------
->   1 file changed, 84 insertions(+), 84 deletions(-)
+> The subsequent patches begin to add SVE support and also demonstrate
+> how I envision how both the decoder and the tcg host vector support
+> are to be used.  Thus, review of the direction would be appreciated
+> before there are another 100 patches along the same style.
 
-[..]
+This doesn't apply to master -- do you have an example of
+what the generated code comes out like?
 
-> @@ -818,7 +817,7 @@ static int nbd_negotiate_options(NBDClient *client, uint16_t myflags,
->                */
->               switch (option) {
->               case NBD_OPT_EXPORT_NAME:
-> -                return nbd_negotiate_handle_export_name(client, length,
-> +                return nbd_negotiate_handle_export_name(client,
->                                                           myflags, no_zeroes,
->                                                           errp);
->
-> @@ -1707,6 +1706,7 @@ static coroutine_fn void nbd_co_client_start(void *opaque)
->           return;
->       }
->
-> +    assert(!client->optlen);
-
-
-hmm, should not it be at the end of nbd_negotiate() ? Looks OK anyway.
-
->       nbd_client_receive_next_request(client);
->   }
->
-
-
--- 
-Best regards,
-Vladimir
+thanks
+-- PMM
