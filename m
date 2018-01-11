@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46684)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46816)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1eZYBv-0000ck-5s
-	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 03:26:28 -0500
+	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1eZYC3-0000kK-JP
+	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 03:26:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1eZYBu-0001Po-4G
-	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 03:26:27 -0500
-Received: from mail.ispras.ru ([83.149.199.45]:41792)
+	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1eZYBz-0001VG-IR
+	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 03:26:35 -0500
+Received: from mail.ispras.ru ([83.149.199.45]:41810)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1eZYBt-0001Ow-Nf
-	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 03:26:26 -0500
+	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1eZYBz-0001Ub-9u
+	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 03:26:31 -0500
 From: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
-Date: Thu, 11 Jan 2018 11:26:26 +0300
-Message-ID: <20180111082626.27295.52919.stgit@pasha-VirtualBox>
+Date: Thu, 11 Jan 2018 11:26:32 +0300
+Message-ID: <20180111082632.27295.18985.stgit@pasha-VirtualBox>
 In-Reply-To: <20180111082452.27295.85707.stgit@pasha-VirtualBox>
 References: <20180111082452.27295.85707.stgit@pasha-VirtualBox>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [RFC PATCH v3 16/30] cpus: only take BQL for sleeping
- threads
+Subject: [Qemu-devel] [RFC PATCH v3 17/30] replay/replay.c: bump
+ REPLAY_VERSION again
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,99 +32,43 @@ Cc: kwolf@redhat.com, peter.maydell@linaro.org, boost.lists@gmail.com, quintela@
 
 From: Alex Benn=C3=A9e <alex.bennee@linaro.org>
 
-Now the only real need to hold the BQL is for when we sleep on the
-cpu->halt conditional. The lock is actually dropped while the thread
-sleeps so the actual window for contention is pretty small. This also
-means we can remove the special case hack for exclusive work and
-simply declare that work no longer has an implicit BQL held. This
-isn't a major problem async work is generally only changing things in
-the context of its own vCPU. If it needs to work across vCPUs it
-should be using the exclusive mechanism or possibly taking the lock
-itself.
+This time commit 802f045a5f61b781df55e4492d896b4d20503ba7 broke the
+replay file format. Also add a comment about this to
+replay-internal.h.
 
 Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-Tested-by: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
+Reviewed-off-by: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
+Acked-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- cpus-common.c |   13 +++++--------
- cpus.c        |   10 ++++------
- 2 files changed, 9 insertions(+), 14 deletions(-)
+ replay/replay-internal.h |    2 +-
+ replay/replay.c          |    2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/cpus-common.c b/cpus-common.c
-index 59f751e..64661c3 100644
---- a/cpus-common.c
-+++ b/cpus-common.c
-@@ -310,6 +310,11 @@ void async_safe_run_on_cpu(CPUState *cpu, run_on_cpu=
-_func func,
-     queue_work_on_cpu(cpu, wi);
- }
+diff --git a/replay/replay-internal.h b/replay/replay-internal.h
+index be96d7e..8e4c701 100644
+--- a/replay/replay-internal.h
++++ b/replay/replay-internal.h
+@@ -12,7 +12,7 @@
+  *
+  */
 =20
-+/* Work items run outside of the BQL. This is essential for avoiding a
-+ * deadlock for exclusive work but also applies to non-exclusive work.
-+ * If the work requires cross-vCPU changes then it should use the
-+ * exclusive mechanism.
-+ */
- void process_queued_cpu_work(CPUState *cpu)
- {
-     struct qemu_work_item *wi;
-@@ -327,17 +332,9 @@ void process_queued_cpu_work(CPUState *cpu)
-         }
-         qemu_mutex_unlock(&cpu->work_mutex);
-         if (wi->exclusive) {
--            /* Running work items outside the BQL avoids the following d=
-eadlock:
--             * 1) start_exclusive() is called with the BQL taken while a=
-nother
--             * CPU is running; 2) cpu_exec in the other CPU tries to tak=
-es the
--             * BQL, so it goes to sleep; start_exclusive() is sleeping t=
-oo, so
--             * neither CPU can proceed.
--             */
--            qemu_mutex_unlock_iothread();
-             start_exclusive();
-             wi->func(cpu, wi->data);
-             end_exclusive();
--            qemu_mutex_lock_iothread();
-         } else {
-             wi->func(cpu, wi->data);
-         }
-diff --git a/cpus.c b/cpus.c
-index 82dcbf8..79dda49 100644
---- a/cpus.c
-+++ b/cpus.c
-@@ -1149,31 +1149,29 @@ static bool qemu_tcg_should_sleep(CPUState *cpu)
-=20
- static void qemu_tcg_wait_io_event(CPUState *cpu)
- {
--    qemu_mutex_lock_iothread();
-=20
-     while (qemu_tcg_should_sleep(cpu)) {
-+        qemu_mutex_lock_iothread();
-         stop_tcg_kick_timer();
-         qemu_cond_wait(cpu->halt_cond, &qemu_global_mutex);
-+        qemu_mutex_unlock_iothread();
-     }
-=20
-     start_tcg_kick_timer();
-=20
-     qemu_wait_io_event_common(cpu);
 -
--    qemu_mutex_unlock_iothread();
- }
++/* Any changes to order/number of events will need to bump REPLAY_VERSIO=
+N */
+ enum ReplayEvents {
+     /* for instruction event */
+     EVENT_INSTRUCTION,
+diff --git a/replay/replay.c b/replay/replay.c
+index ff58a5a..4f24498 100644
+--- a/replay/replay.c
++++ b/replay/replay.c
+@@ -22,7 +22,7 @@
 =20
- static void qemu_kvm_wait_io_event(CPUState *cpu)
- {
--    qemu_mutex_lock_iothread();
+ /* Current version of the replay mechanism.
+    Increase it when file format changes. */
+-#define REPLAY_VERSION              0xe02006
++#define REPLAY_VERSION              0xe02007
+ /* Size of replay log header */
+ #define HEADER_SIZE                 (sizeof(uint32_t) + sizeof(uint64_t)=
+)
 =20
-     while (cpu_thread_is_idle(cpu)) {
-+        qemu_mutex_lock_iothread();
-         qemu_cond_wait(cpu->halt_cond, &qemu_global_mutex);
-+        qemu_mutex_unlock_iothread();
-     }
-=20
-     qemu_wait_io_event_common(cpu);
--
--    qemu_mutex_unlock_iothread();
- }
-=20
- static void qemu_hvf_wait_io_event(CPUState *cpu)
