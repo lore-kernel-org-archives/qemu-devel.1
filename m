@@ -1,27 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54570)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57128)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eZisS-0003Ne-SH
-	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 14:51:05 -0500
+	(envelope-from <mst@redhat.com>) id 1eZiuB-0004pr-9d
+	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 14:52:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eZisP-0006NI-0u
-	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 14:51:04 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:47688)
+	(envelope-from <mst@redhat.com>) id 1eZiuA-0008Sx-ER
+	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 14:52:51 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:43034)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1eZisO-0006Mh-O7
-	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 14:51:00 -0500
-References: <20171208173321.GR2403@work-vm>
-	<20180109192802.17167-1-eblake@redhat.com>
-	<20180111175934.GB13384@work-vm>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <b198a35a-b69e-37f9-8024-bc98b2e80e3c@redhat.com>
-Date: Thu, 11 Jan 2018 13:50:55 -0600
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1eZiuA-0008OP-7t
+	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 14:52:50 -0500
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 9C0F468A9
+	for <qemu-devel@nongnu.org>; Thu, 11 Jan 2018 19:52:43 +0000 (UTC)
+Date: Thu, 11 Jan 2018 21:52:39 +0200
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20180111215210-mutt-send-email-mst@kernel.org>
+References: <1515665816-10313-1-git-send-email-ghammer@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20180111175934.GB13384@work-vm>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="saTPwvPqM5V3y7s9dwGO1UIKWJoFcU7d7"
-Subject: Re: [Qemu-devel] [PATCH v2 2.5/6] hmp: Add name parameter to
- nbd_server_add
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1515665816-10313-1-git-send-email-ghammer@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] virtio: improve virtio devices
+ initialization time
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,73 +33,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: qemu-devel@nongnu.org, vsementsov@virtuozzo.com
+To: Gal Hammer <ghammer@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---saTPwvPqM5V3y7s9dwGO1UIKWJoFcU7d7
-From: Eric Blake <eblake@redhat.com>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: qemu-devel@nongnu.org, vsementsov@virtuozzo.com
-Message-ID: <b198a35a-b69e-37f9-8024-bc98b2e80e3c@redhat.com>
-Subject: Re: [PATCH v2 2.5/6] hmp: Add name parameter to nbd_server_add
-References: <20171208173321.GR2403@work-vm>
- <20180109192802.17167-1-eblake@redhat.com> <20180111175934.GB13384@work-vm>
-In-Reply-To: <20180111175934.GB13384@work-vm>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Thu, Jan 11, 2018 at 12:16:56PM +0200, Gal Hammer wrote:
+> The loading time of a VM is quite significant when its virtio
+> devices uses a large amount of virt-queues (e.g. a virtio-serial
+> device with max_ports=511). Most of the time is spend in the
+> creation of all the required event notifiers (ioeventfd and memory
+> regions).
+> 
+> This patch pack all the changes to the memory regions in a
+> single memory transaction.
+> 
+> Reported-by: Sitong Liu <siliu@redhat.com>
+> Reported-by: Xiaoling Gao <xiagao@redhat.com>
+> Signed-off-by: Gal Hammer <ghammer@redhat.com>
 
-On 01/11/2018 11:59 AM, Dr. David Alan Gilbert wrote:
-> * Eric Blake (eblake@redhat.com) wrote:
->> Extend the flexibility of the previous QMP patch to also work
->> in HMP.
->>
->> Signed-off-by: Eric Blake <eblake@redhat.com>
->=20
-> Thanks, that looks good to me from the HMP side; let me
-> know which way you want to take it; I can take it via
-> HMP once the code that uses it is in; whichever is easiest.
->=20
->=20
-> Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Nice patch! Any timing numbers to share before/after?
 
-I'll take it through the NBD tree, along with the rest of the series,
-once I get more answers on my open questions on the second half of the
-series.
-
->=20
->> ---
->>
->> In response to Dave's request.
->> I could also squash this into Vladimir's 2/6 if desired.
-
-At this point, I'm thinking it's better to leave it separate from
-Vladimir's QMP patch, since you've only reviewed this one.
-
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---saTPwvPqM5V3y7s9dwGO1UIKWJoFcU7d7
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlpXwB8ACgkQp6FrSiUn
-Q2pf5gf+MsCw8ML8804frfEyV35/oUzMXifo5YAqx/a6L8fmDl69tD0/aMcINIIy
-EgnvwxCHdPkL7PMMVmDcmyI5qFpq+WZTlUS7XHxGzzBkJ2rve8kTD6xceELEASy6
-qfauXiUj9WNqomwr7M0DXbOd0pZDbzvkM3N45euJz1uFIhMc2iy/TUUVM1x/9UOr
-H6mDRiZ2W1BA1VxrKnizOOHRWvWB+DT0lKvl+e1klK0pawREQo911leONU3tmYSE
-45tK1HhqwBtCLyKV9pSop+ajY3N7Qq7VjRt+RBsvY+ccv7IURnK42+Q8tjQ8xNEO
-aPGKLCzA7sjRqCwXx+DweNljt7PhRg==
-=lczL
------END PGP SIGNATURE-----
-
---saTPwvPqM5V3y7s9dwGO1UIKWJoFcU7d7--
+> ---
+>  hw/virtio/virtio.c | 11 +++++++++++
+>  1 file changed, 11 insertions(+)
+> 
+> diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
+> index ad564b0..8d8d93d 100644
+> --- a/hw/virtio/virtio.c
+> +++ b/hw/virtio/virtio.c
+> @@ -2574,6 +2574,7 @@ static int virtio_device_start_ioeventfd_impl(VirtIODevice *vdev)
+>      VirtioBusState *qbus = VIRTIO_BUS(qdev_get_parent_bus(DEVICE(vdev)));
+>      int n, r, err;
+>  
+> +    memory_region_transaction_begin();
+>      for (n = 0; n < VIRTIO_QUEUE_MAX; n++) {
+>          VirtQueue *vq = &vdev->vq[n];
+>          if (!virtio_queue_get_num(vdev, n)) {
+> @@ -2596,6 +2597,7 @@ static int virtio_device_start_ioeventfd_impl(VirtIODevice *vdev)
+>          }
+>          event_notifier_set(&vq->host_notifier);
+>      }
+> +    memory_region_transaction_commit();
+>      return 0;
+>  
+>  assign_error:
+> @@ -2609,6 +2611,7 @@ assign_error:
+>          r = virtio_bus_set_host_notifier(qbus, n, false);
+>          assert(r >= 0);
+>      }
+> +    memory_region_transaction_commit();
+>      return err;
+>  }
+>  
+> @@ -2625,6 +2628,7 @@ static void virtio_device_stop_ioeventfd_impl(VirtIODevice *vdev)
+>      VirtioBusState *qbus = VIRTIO_BUS(qdev_get_parent_bus(DEVICE(vdev)));
+>      int n, r;
+>  
+> +    memory_region_transaction_begin();
+>      for (n = 0; n < VIRTIO_QUEUE_MAX; n++) {
+>          VirtQueue *vq = &vdev->vq[n];
+>  
+> @@ -2632,6 +2636,13 @@ static void virtio_device_stop_ioeventfd_impl(VirtIODevice *vdev)
+>              continue;
+>          }
+>          event_notifier_set_handler(&vq->host_notifier, NULL);
+> +    }
+> +    memory_region_transaction_commit();
+> +
+> +    for (n = 0; n < VIRTIO_QUEUE_MAX; n++) {
+> +        if (!virtio_queue_get_num(vdev, n)) {
+> +            continue;
+> +        }
+>          r = virtio_bus_set_host_notifier(qbus, n, false);
+>          assert(r >= 0);
+>      }
+> -- 
+> 2.7.5
