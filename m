@@ -1,23 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44067)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44402)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1eZcpG-0007rD-BL
-	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 08:23:23 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1eZcq4-0008Kl-QZ
+	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 08:24:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1eZcpE-0003xk-So
-	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 08:23:22 -0500
-Date: Thu, 11 Jan 2018 13:23:05 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180111132304.GD2669@work-vm>
-References: <20180107122336.29333-1-richiejp@f-m.fm>
-	<fd5f5f12-e081-6f19-54af-3b560139bb78@redhat.com>
-	<5cf19623-72ac-fb8b-2054-a60d42419ec6@redhat.com>
-	<20180111130427.GG8326@redhat.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1eZcq0-0004kb-OJ
+	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 08:24:12 -0500
+Received: from mail-ot0-x22d.google.com ([2607:f8b0:4003:c0f::22d]:40315)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1eZcq0-0004kB-HY
+	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 08:24:08 -0500
+Received: by mail-ot0-x22d.google.com with SMTP id d10so2058355oti.7
+	for <qemu-devel@nongnu.org>; Thu, 11 Jan 2018 05:24:08 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180111130427.GG8326@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 1/2] Add save-snapshot,
- load-snapshot and delete-snapshot to QAPI
+In-Reply-To: <20180110225944.17920-1-eblake@redhat.com>
+References: <20180110225944.17920-1-eblake@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 11 Jan 2018 13:23:47 +0000
+Message-ID: <CAFEAcA9yJg7eQJiFpCO2ObGjv3hLJx+34H6edcM2H9A-9nj=Bw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL 0/2] nbd patches for 10 Jan
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,63 +28,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>
-Cc: Max Reitz <mreitz@redhat.com>, Eric Blake <eblake@redhat.com>, Richard Palethorpe <richiejp@f-m.fm>, qemu-devel@nongnu.org, Qemu-block <qemu-block@nongnu.org>, quintela@redhat.com, armbru@redhat.com, rpalethorpe@suse.com
+To: Eric Blake <eblake@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-* Daniel P. Berrange (berrange@redhat.com) wrote:
-> On Thu, Jan 11, 2018 at 01:46:38PM +0100, Max Reitz wrote:
-> > On 2018-01-08 14:52, Eric Blake wrote:
-> > > On 01/07/2018 06:23 AM, Richard Palethorpe wrote:
-> > >> Add QAPI wrapper functions for the existing snapshot functionality. These
-> > >> functions behave the same way as the HMP savevm, loadvm and delvm
-> > >> commands. This will allow applications, such as OpenQA, to programmatically
-> > >> revert the VM to a previous state with no dependence on HMP or qemu-img.
-> > > 
-> > > That's already possible; libvirt uses QMP's human-monitor-command to
-> > > access these HMP commands programmatically.
-> > > 
-> > > We've had discussions in the past about what it would take to have
-> > > specific QMP commands for these operations; the biggest problem is that
-> > > these commands promote the use of internal snapshots, and there are
-> > > enough performance and other issues with internal snapshots that we are
-> > > not yet ready to commit to a long-term interface for making their use
-> > > easier.  At this point, our recommendation is to prefer external snapshots.
-> > 
-> > We already have QMP commands for internal snapshots, though.  Isn't the
-> > biggest issue that savevm takes too much time to be a synchronous QMP
-> > command?
-> 
-> Ultimately savevm/loadvm are using much of the migration code internally,
-> but are not exposed as URI schemes. Could we perhaps take advantage of
-> the internal common layer and define a migration URI scheme
-> 
->    snapshot:<name>
-> 
-> where '<name>' is the name of the internal snapshot in the qcow2 file.
+On 10 January 2018 at 22:59, Eric Blake <eblake@redhat.com> wrote:
+> The following changes since commit 3cee4db661ab9c0fce7937b3bbfa188a1845f31f:
+>
+>   Merge remote-tracking branch 'remotes/ericb/tags/pull-nbd-2018-01-08' into staging (2018-01-09 15:22:47 +0000)
+>
+> are available in the Git repository at:
+>
+>   git://repo.or.cz/qemu/ericb.git tags/pull-nbd-2018-01-10
+>
+> for you to fetch changes up to 420a4e955909788263a33d11600839e93480dfd3:
+>
+>   nbd: rename nbd_option and nbd_opt_reply (2018-01-10 12:11:23 -0600)
+>
+> Not much time elapsed since my last pull request, but my last request
+> was delayed due the holiday break, and I've now got other patches that
+> will be easier to post if I can do a Based-on: against this pull request,
+> rather than the larger in-progress series they were extracted from.
+>
+> ----------------------------------------------------------------
+> nbd patches for 2018-01-10
+>
+> - Vladimir Sementsov-Ogievskiy: nbd: rename nbd_option and nbd_opt_reply
+> - Vladimir Sementsov-Ogievskiy: nbd/server: add additional assert to nbd_export_put
+>
+> ----------------------------------------------------------------
 
-I had wondered about that; I'd just thought of doing the migration
-saving to a block device rather than the rest of the snapshot activity around it; 
-but I guess that's possible.
+Applied, thanks.
 
-> Then you could just use the regular migrate QMP commands for loading
-> and saving snapshots.  Might need a little extra work on the incoming
-> side, since we need to be able to load snapshots, despite QEMU not
-> being started with '-incoming defer', but might still be doable ?
-> This would theoretically give us progress monitoring, cancellation,
-> etc for free.
-
-What actually stops this working other than the sanity check in
-migrate_incoming ?
-
-Dave
-
-> 
-> 
-> Regards,
-> Daniel
-> -- 
-> |: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-> |: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-> |: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+-- PMM
