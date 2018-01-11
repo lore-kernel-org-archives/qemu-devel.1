@@ -1,19 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32907)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33525)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <malbarbo@gmail.com>) id 1eZi2B-0004t9-Fx
-	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 13:57:04 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1eZi41-00067v-CQ
+	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 13:58:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <malbarbo@gmail.com>) id 1eZi2A-0000OO-Em
-	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 13:57:03 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1eZi40-00020c-Ci
+	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 13:58:57 -0500
+Date: Thu, 11 Jan 2018 18:58:41 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20180111185840.GE13384@work-vm>
+References: <20171218173022.18418-1-richard.henderson@linaro.org>
+	<20171218173022.18418-8-richard.henderson@linaro.org>
+	<CAFEAcA9EZ0jY6tR2E7ZzfWnAfSJ3hjGNT7za+RZC-SGuBY6Hfg@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA9Qo8uQ10FHP7XfuC+sgb4i8e_fxo7EvZGtVVWddqpxVA@mail.gmail.com>
-References: <20180111183714.22834-2-malbarbo@gmail.com>
-	<CAFEAcA9Qo8uQ10FHP7XfuC+sgb4i8e_fxo7EvZGtVVWddqpxVA@mail.gmail.com>
-From: Marco A L Barbosa <malbarbo@gmail.com>
-Date: Thu, 11 Jan 2018 16:56:58 -0200
-Message-ID: <CAHpsRN8rkMpcNmwwjpDFD3LDogZzCUqbitH-fHHWomc+GupLKw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v2] linux-user: Add AT_SECURE auxval
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAFEAcA9EZ0jY6tR2E7ZzfWnAfSJ3hjGNT7za+RZC-SGuBY6Hfg@mail.gmail.com>
+Subject: Re: [Qemu-devel] [PATCH 7/9] target/arm: Expand vector registers
+ for SVE
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,60 +26,54 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Trivial <qemu-trivial@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <Laurent@vivier.eu>
+Cc: Richard Henderson <richard.henderson@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>
 
-Thanks Peter,
-
-Signed-off-by: Marco A L Barbosa <malbarbo@gmail.com>
-
-On Thu, Jan 11, 2018 at 4:52 PM, Peter Maydell <peter.maydell@linaro.org>
-wrote:
-
-> On 11 January 2018 at 18:37, Marco A L Barbosa <malbarbo@gmail.com> wrote:
-> > ---
-> >  linux-user/elfload.c | 3 ++-
-> >  1 file changed, 2 insertions(+), 1 deletion(-)
->
-> This is missing your Signed-off-by: line, which we need to be
-> able to accept the patch.
->
-> (I've also cc'd the linux-user maintainers.)
->
-> > diff --git a/linux-user/elfload.c b/linux-user/elfload.c
-> > index 20f3d8c2c3..32a47674e6 100644
-> > --- a/linux-user/elfload.c
-> > +++ b/linux-user/elfload.c
-> > @@ -1354,7 +1354,7 @@ struct exec
-> >                                   ~(abi_ulong)(TARGET_ELF_EXEC_
-> PAGESIZE-1))
-> >  #define TARGET_ELF_PAGEOFFSET(_v) ((_v) & (TARGET_ELF_EXEC_PAGESIZE-1))
+* Peter Maydell (peter.maydell@linaro.org) wrote:
+> On 18 December 2017 at 17:30, Richard Henderson
+> <richard.henderson@linaro.org> wrote:
+> > Change vfp.regs as a uint64_t to vfp.zregs as an ARMVectorReg.
+> > The previous patches have made the change in representation
+> > relatively painless.
 > >
-> > -#define DLINFO_ITEMS 14
-> > +#define DLINFO_ITEMS 15
-> >
-> >  static inline void memcpy_fromfs(void * to, const void * from, unsigned
-> long n)
-> >  {
-> > @@ -1786,6 +1786,7 @@ static abi_ulong create_elf_tables(abi_ulong p,
-> int argc, int envc,
-> >      NEW_AUX_ENT(AT_HWCAP, (abi_ulong) ELF_HWCAP);
-> >      NEW_AUX_ENT(AT_CLKTCK, (abi_ulong) sysconf(_SC_CLK_TCK));
-> >      NEW_AUX_ENT(AT_RANDOM, (abi_ulong) u_rand_bytes);
-> > +    NEW_AUX_ENT(AT_SECURE, (abi_ulong) qemu_getauxval(AT_SECURE));
-> >
-> >  #ifdef ELF_HWCAP2
-> >      NEW_AUX_ENT(AT_HWCAP2, (abi_ulong) ELF_HWCAP2);
-> > --
->
-> For the content, Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
->
+> > Add vfp.pregs as an ARMPredicateReg.  Let FFR be P16 to make
+> > it easier to treat it as for any other predicate.
+> 
+> > diff --git a/target/arm/machine.c b/target/arm/machine.c
+> > index a85c2430d3..39f3123b10 100644
+> > --- a/target/arm/machine.c
+> > +++ b/target/arm/machine.c
+> > @@ -50,7 +50,42 @@ static const VMStateDescription vmstate_vfp = {
+> >      .minimum_version_id = 3,
+> >      .needed = vfp_needed,
+> >      .fields = (VMStateField[]) {
+> > -        VMSTATE_UINT64_ARRAY(env.vfp.regs, ARMCPU, 64),
+> > +        /* For compatibility, store Qn out of Zn here.  */
+> > +        /* TODO: store the other quadwords in another subsection,
+> > +           along with predicate registers and ZCR_EL[1-3].  */
+> 
+> I think we should get the migration state stuff right at the point
+> where we change the data structure in cpu.h.
+> 
+> 
+> > +        VMSTATE_UINT64_SUB_ARRAY(env.vfp.zregs[0].d, ARMCPU, 0, 2),
+> > +        VMSTATE_UINT64_SUB_ARRAY(env.vfp.zregs[1].d, ARMCPU, 0, 2),
+> > +        VMSTATE_UINT64_SUB_ARRAY(env.vfp.zregs[2].d, ARMCPU, 0, 2),
+> 
+> David: does the migration code guarantee that we can split an
+> old VMSTATE_UINT64_ARRAY into being a sequence of SUB_ARRAYs
+> like this and retain the same on-the-wire format (ie and
+> keep migration compat) ?
+
+There's no on-the-wire protocol for this - it's just the array elements,
+so as long as the total adds up the same and it's still uint64's
+it should work.
+
+Dave
+
+> I suspect we've used this clever trick before elsewhere, but thought
+> it better to check...
+> 
 > thanks
 > -- PMM
->
-
-
-
--- 
-Marco A L Barbosa
-http://malbarbo.pro.br
 --
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
