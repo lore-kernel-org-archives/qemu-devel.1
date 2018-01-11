@@ -1,34 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43956)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44032)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1eZTAQ-0004F2-S7
-	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 22:04:36 -0500
+	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1eZTAW-0004IB-FG
+	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 22:04:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1eZTAM-0002Bp-EN
-	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 22:04:34 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:44642
-	helo=mx0a-001b2d01.pphosted.com)
+	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1eZTAR-0002Gs-Gf
+	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 22:04:40 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:34346)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <bjsdjshi@linux.vnet.ibm.com>)
-	id 1eZTAM-0002A9-9O
-	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 22:04:30 -0500
-Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w0B34HRe000575
-	for <qemu-devel@nongnu.org>; Wed, 10 Jan 2018 22:04:28 -0500
-Received: from e32.co.us.ibm.com (e32.co.us.ibm.com [32.97.110.150])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2fdx0pc31v-1
+	id 1eZTAR-0002Fu-8p
+	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 22:04:35 -0500
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w0B34KtX040365
+	for <qemu-devel@nongnu.org>; Wed, 10 Jan 2018 22:04:32 -0500
+Received: from e35.co.us.ibm.com (e35.co.us.ibm.com [32.97.110.153])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2fdxxqskk1-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 10 Jan 2018 22:04:28 -0500
+	for <qemu-devel@nongnu.org>; Wed, 10 Jan 2018 22:04:31 -0500
 Received: from localhost
-	by e32.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	by e35.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
 	Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <bjsdjshi@linux.vnet.ibm.com>;
-	Wed, 10 Jan 2018 20:04:27 -0700
+	Wed, 10 Jan 2018 20:04:31 -0700
 From: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
-Date: Thu, 11 Jan 2018 04:04:18 +0100
-Message-Id: <20180111030421.31418-1-bjsdjshi@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [RFC PATCH 0/3] vfio: ccw: basic channel path event
- handling
+Date: Thu, 11 Jan 2018 04:04:19 +0100
+In-Reply-To: <20180111030421.31418-1-bjsdjshi@linux.vnet.ibm.com>
+References: <20180111030421.31418-1-bjsdjshi@linux.vnet.ibm.com>
+Message-Id: <20180111030421.31418-2-bjsdjshi@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [RFC PATCH 1/3] vfio: ccw: introduce schib region
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -40,168 +40,251 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org, kvm@vger.kernel.org, qemu-devel@nongnu.org, qemu-s390x@nongnu.org
 Cc: cohuck@redhat.com, borntraeger@de.ibm.com, bjsdjshi@linux.vnet.ibm.com, pasic@linux.vnet.ibm.com, pmorel@linux.vnet.ibm.com
 
-Hi Folks,
+This introduces a new region for vfio-ccw to provide subchannel
+information for user space.
 
-Background
-==========
+Signed-off-by: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
+---
+ drivers/s390/cio/vfio_ccw_fsm.c     | 21 ++++++++++
+ drivers/s390/cio/vfio_ccw_ops.c     | 79 +++++++++++++++++++++++++++----------
+ drivers/s390/cio/vfio_ccw_private.h |  3 ++
+ include/uapi/linux/vfio.h           |  1 +
+ include/uapi/linux/vfio_ccw.h       |  6 +++
+ 5 files changed, 90 insertions(+), 20 deletions(-)
 
-Some days ago, we had a discussion on the topic of channel path virtualization.
-Ref:
-Subject: [PATCH 0/3] Channel Path realted CRW generation
-Message-Id: <20170727015418.85407-1-bjsdjshi@linux.vnet.ibm.com>
-URL: https://lists.nongnu.org/archive/html/qemu-devel/2017-07/msg08414.html
-
-Indeed that thread is not short and discussed many aspects in a
-non-concentrated manner. The parts those are most valuable to me are:
-1. a re-modelling for channel path is surely the best offer, but is not
-   possible to have in the near future.
-2. to enhance the path related functionalities, using PNO and PNOM might
-   be something we can do for now. This may be something that I could improve
-   without model related arguments.
-
-So here I have this series targeting to add basic channel path event handling
-for vfio-ccw -- no touch of the channel path modelling in both the kernel and
-the QEMU side, but find a way to sync path status change to guest lazily using
-SCSW_FLAGS_MASK_PNO and pmcw->pnom.  In short, I want to enhance path related
-stuff (to be more specific: sync up path status to the guest) on a best effort
-basis, which means in a way that won't get us invloed to do channel path
-re-modelling.
-
-What benifit can we get from this? The administrator of a virtual machine can
-get uptodate (in some extent) status of the current using channel paths, so
-he/she can monitor paths status and get path problem noticed timely (see the
-example below).
-
-I think we can start a new round discussion based on this series. So reviewers
-can give their comments based on some code, and then we can decide if this is
-we want or not.
-
-As flagged with RFC, the intention of this series is to show what I have for
-now, and what could the code look like in general. Thus I can get some early
-feedbacks. I would expect to see opinions on:
-- is the target (mentioned above) of this series welcomed or not.
-- is the approach of this series good or bad.
-So I can either move on with this (or with other suggested approach) or leave
-it alone.
-
-Basic Introduction of The Patches
-=================================
-
-This is the kernel counterpart, which mainly does:
-1. add a schib vfio region for userland to _store_ subchannel information.
-2. add a channel path vfio irq to notify userland with chp status change event.
-3. add .chp_event handler for vfio-ccw driver, so the driver handles chp event,
-   and signals userland about the event.
-
-With the above work, userland can be signaled with chp related event, and then
-it can read out uptodate SCHIB from the new region, and sync up path related
-information to the corresponding virtual subchannel. So a guest can sense the
-path update in some extent.
-
-For the QEMU counterpart, please ref:
-[RFC PATCH 0/5] vfio/ccw: basic channel path event handling
-
-The QEMU counterpart mainly does:
-1. add handling of the schib region, so that it can read out the newest schib
-   information.
-2. add handling of the chp irq, so that it can get notification of channel path
-   status change.
-3. once there is a chp status event, synchronize related information from the
-   newest schib information to guest lazily.
-
-What are still missing, thus need to be offered in the next version are:
-- I/O termination and FSM state handling if currently we have I/O on the status
-  switched path.
-- Vary on/off event is not sensible to a guest.
-
-Example
-=======
-
-With both the kernel and Qemu parts applied, we can notice some new behaviors
-of a channel path when we have a guest with a passed through vfio-ccw device
-using it. The guest can reflect the chp status change of the host side lazily,
-and synchronize the updated information.
-
-For example:
-0. Prepare a vfio subchannel on the host:
-[root@host ~]# lscss --vfio 013f
-MDEV                                  Subchan.  PIM PAM POM  CHPIDs
-------------------------------------------------------------------------------
-6dfd3ec5-e8b3-4e18-a6fe-57bc9eceb920  0.0.013f  f0  f0  ff   42434445 00000000
-
-1. Pass-through subchannel 0.0.013f to a guest:
--device vfio-ccw,sysfsdev="$MDEV_FILE_PATH",devno=0.0.3f3f
-
-2. Start the guest and check the device and path information:
-[root@guest ~]# lscss 0002
-Device   Subchan.  DevType CU Type Use  PIM PAM POM  CHPIDs
-----------------------------------------------------------------------
-0.0.3f3f 0.0.0002  3390/0c 3990/e9      f0  f0  ff   42434445 00000000 
-[root@guest ~]# lschp 
-CHPID  Vary  Cfg.  Type  Cmg  Shared  PCHID
-============================================
-0.00   1     -     32    -    -       -    
-0.42   1     3     1b    -    -       -    
-0.43   1     3     1b    -    -       -    
-0.44   1     3     1b    -    -       -    
-0.45   1     3     1b    -    -       -
-
-3. On the host, configure off one path.
-[root@host ~]# chchp -c 0 42
-
-4. On the guest, check the status:
-[root@guest ~]# lscss 0002
-Device   Subchan.  DevType CU Type Use  PIM PAM POM  CHPIDs
-----------------------------------------------------------------------
-0.0.3f3f 0.0.0002  3390/0c 3990/e9      f0  f0  ff   42434445 00000000 
-#Notice: No change!
-
-[root@localhost ~]# chccwdev -e 3f3f
-Setting device 0.0.3f3f online
-dasd-eckd 0.0.3f3f: A channel path to the device has become operational
-dasd-eckd 0.0.3f3f: New DASD 3390/0C (CU 3990/01) with 30051 cylinders, 15 heads, 224 sectors
-dasd-eckd 0.0.3f3f: DASD with 4 KB/block, 21636720 KB total size, 48 KB/track, compatible disk layout
- dasda:VOL1/  0X3F3F: dasda1
-Done
-
-[root@guest ~]# lscss 0002
-Device   Subchan.  DevType CU Type Use  PIM PAM POM  CHPIDs
-----------------------------------------------------------------------
-0.0.3f3f 0.0.0002  3390/0c 3990/e9      f0  70  ff   42434445 00000000 
-#Notice: PAM value of path 0.42 changed.
-
-5. On the host, configure on one path.
-[root@host ~]# chchp -c 1 42
-
-6. On the guest, check the status again:
-[root@guest ~]# lscss 0002
-Device   Subchan.  DevType CU Type Use  PIM PAM POM  CHPIDs
-----------------------------------------------------------------------
-0.0.3f3f 0.0.0002  3390/0c 3990/e9      f0  70  ff   42434445 00000000 
-#Notice: No change!
-
-[root@localhost ~]# chccwdev -d 3f3f
-Setting device 0.0.3f3f offline
-Done
-
-[root@guest ~]# lscss 0002
-Device   Subchan.  DevType CU Type Use  PIM PAM POM  CHPIDs
-----------------------------------------------------------------------
-0.0.3f3f 0.0.0002  3390/0c 3990/e9      f0  f0  ff   42434445 00000000 
-#Notice: PAM changed again.
-
-Dong Jia Shi (3):
-  vfio: ccw: introduce schib region
-  vfio: ccw: introduce channel path irq
-  vfio: ccw: handle chp event
-
- drivers/s390/cio/vfio_ccw_drv.c     |  51 +++++++++++++++++
- drivers/s390/cio/vfio_ccw_fsm.c     |  43 ++++++++++++++
- drivers/s390/cio/vfio_ccw_ops.c     | 108 ++++++++++++++++++++++++++----------
- drivers/s390/cio/vfio_ccw_private.h |   8 +++
- include/uapi/linux/vfio.h           |   2 +
- include/uapi/linux/vfio_ccw.h       |   6 ++
- 6 files changed, 190 insertions(+), 28 deletions(-)
-
+diff --git a/drivers/s390/cio/vfio_ccw_fsm.c b/drivers/s390/cio/vfio_ccw_fsm.c
+index c30420c517b1..be081ccabea3 100644
+--- a/drivers/s390/cio/vfio_ccw_fsm.c
++++ b/drivers/s390/cio/vfio_ccw_fsm.c
+@@ -172,6 +172,22 @@ static void fsm_irq(struct vfio_ccw_private *private,
+ 		complete(private->completion);
+ }
+ 
++static void fsm_update_subch(struct vfio_ccw_private *private,
++			     enum vfio_ccw_event event)
++{
++	struct subchannel *sch;
++
++	sch = private->sch;
++	if (cio_update_schib(sch)) {
++		private->schib_region.cc = 3;
++		return;
++	}
++
++	private->schib_region.cc = 0;
++	memcpy(private->schib_region.schib_area, &sch->schib,
++	       sizeof(sch->schib));
++}
++
+ /*
+  * Device statemachine
+  */
+@@ -180,25 +196,30 @@ fsm_func_t *vfio_ccw_jumptable[NR_VFIO_CCW_STATES][NR_VFIO_CCW_EVENTS] = {
+ 		[VFIO_CCW_EVENT_NOT_OPER]	= fsm_nop,
+ 		[VFIO_CCW_EVENT_IO_REQ]		= fsm_io_error,
+ 		[VFIO_CCW_EVENT_INTERRUPT]	= fsm_disabled_irq,
++		[VFIO_CCW_EVENT_UPDATE_SUBCH]	= fsm_update_subch,
+ 	},
+ 	[VFIO_CCW_STATE_STANDBY] = {
+ 		[VFIO_CCW_EVENT_NOT_OPER]	= fsm_notoper,
+ 		[VFIO_CCW_EVENT_IO_REQ]		= fsm_io_error,
+ 		[VFIO_CCW_EVENT_INTERRUPT]	= fsm_irq,
++		[VFIO_CCW_EVENT_UPDATE_SUBCH]	= fsm_update_subch,
+ 	},
+ 	[VFIO_CCW_STATE_IDLE] = {
+ 		[VFIO_CCW_EVENT_NOT_OPER]	= fsm_notoper,
+ 		[VFIO_CCW_EVENT_IO_REQ]		= fsm_io_request,
+ 		[VFIO_CCW_EVENT_INTERRUPT]	= fsm_irq,
++		[VFIO_CCW_EVENT_UPDATE_SUBCH]	= fsm_update_subch,
+ 	},
+ 	[VFIO_CCW_STATE_BOXED] = {
+ 		[VFIO_CCW_EVENT_NOT_OPER]	= fsm_notoper,
+ 		[VFIO_CCW_EVENT_IO_REQ]		= fsm_io_busy,
+ 		[VFIO_CCW_EVENT_INTERRUPT]	= fsm_irq,
++		[VFIO_CCW_EVENT_UPDATE_SUBCH]	= fsm_update_subch,
+ 	},
+ 	[VFIO_CCW_STATE_BUSY] = {
+ 		[VFIO_CCW_EVENT_NOT_OPER]	= fsm_notoper,
+ 		[VFIO_CCW_EVENT_IO_REQ]		= fsm_io_busy,
+ 		[VFIO_CCW_EVENT_INTERRUPT]	= fsm_irq,
++		[VFIO_CCW_EVENT_UPDATE_SUBCH]	= fsm_update_subch,
+ 	},
+ };
+diff --git a/drivers/s390/cio/vfio_ccw_ops.c b/drivers/s390/cio/vfio_ccw_ops.c
+index 41eeb57d68a3..9528fce2e7d9 100644
+--- a/drivers/s390/cio/vfio_ccw_ops.c
++++ b/drivers/s390/cio/vfio_ccw_ops.c
+@@ -13,6 +13,11 @@
+ 
+ #include "vfio_ccw_private.h"
+ 
++#define VFIO_CCW_OFFSET_SHIFT   40
++#define VFIO_CCW_OFFSET_TO_INDEX(off)	(off >> VFIO_CCW_OFFSET_SHIFT)
++#define VFIO_CCW_INDEX_TO_OFFSET(index)	((u64)(index) << VFIO_CCW_OFFSET_SHIFT)
++#define VFIO_CCW_OFFSET_MASK	(((u64)(1) << VFIO_CCW_OFFSET_SHIFT) - 1)
++
+ static int vfio_ccw_mdev_reset(struct mdev_device *mdev)
+ {
+ 	struct vfio_ccw_private *private;
+@@ -168,14 +173,31 @@ static ssize_t vfio_ccw_mdev_read(struct mdev_device *mdev,
+ 				  loff_t *ppos)
+ {
+ 	struct vfio_ccw_private *private;
+-	struct ccw_io_region *region;
++	void *region;
++	u32 index;
++	loff_t pos;
++
++	index = VFIO_CCW_OFFSET_TO_INDEX(*ppos);
++	pos = (*ppos) & VFIO_CCW_OFFSET_MASK;
++	private = dev_get_drvdata(mdev_parent_dev(mdev));
+ 
+-	if (*ppos + count > sizeof(*region))
++	switch (index) {
++	case VFIO_CCW_CONFIG_REGION_INDEX:
++		if (pos + count > sizeof(struct ccw_io_region))
++			return -EINVAL;
++		region = &private->io_region;
++		break;
++	case VFIO_CCW_SCHIB_REGION_INDEX:
++		if (pos + count > sizeof(struct ccw_schib_region))
++			return -EINVAL;
++		region = &private->schib_region;
++		vfio_ccw_fsm_event(private, VFIO_CCW_EVENT_UPDATE_SUBCH);
++		break;
++	default:
+ 		return -EINVAL;
++	}
+ 
+-	private = dev_get_drvdata(mdev_parent_dev(mdev));
+-	region = &private->io_region;
+-	if (copy_to_user(buf, (void *)region + *ppos, count))
++	if (copy_to_user(buf, region + pos, count))
+ 		return -EFAULT;
+ 
+ 	return count;
+@@ -187,23 +209,35 @@ static ssize_t vfio_ccw_mdev_write(struct mdev_device *mdev,
+ 				   loff_t *ppos)
+ {
+ 	struct vfio_ccw_private *private;
+-	struct ccw_io_region *region;
+-
+-	if (*ppos + count > sizeof(*region))
+-		return -EINVAL;
++	u32 index;
++	loff_t pos;
+ 
++	index = VFIO_CCW_OFFSET_TO_INDEX(*ppos);
++	pos = (*ppos) & VFIO_CCW_OFFSET_MASK;
+ 	private = dev_get_drvdata(mdev_parent_dev(mdev));
+-	if (private->state != VFIO_CCW_STATE_IDLE)
+-		return -EACCES;
+ 
+-	region = &private->io_region;
+-	if (copy_from_user((void *)region + *ppos, buf, count))
+-		return -EFAULT;
+-
+-	vfio_ccw_fsm_event(private, VFIO_CCW_EVENT_IO_REQ);
+-	if (region->ret_code != 0) {
+-		private->state = VFIO_CCW_STATE_IDLE;
+-		return region->ret_code;
++	switch (index) {
++	case VFIO_CCW_CONFIG_REGION_INDEX:
++	{
++		struct ccw_io_region *region;
++		if (pos + count > sizeof(*region))
++			return -EINVAL;
++		if (private->state != VFIO_CCW_STATE_IDLE)
++			return -EACCES;
++		region = &private->io_region;
++		if (copy_from_user((void *)region + *ppos, buf, count))
++			return -EFAULT;
++		vfio_ccw_fsm_event(private, VFIO_CCW_EVENT_IO_REQ);
++		if (region->ret_code != 0) {
++			private->state = VFIO_CCW_STATE_IDLE;
++			return region->ret_code;
++		}
++		break;
++	}
++	case VFIO_CCW_SCHIB_REGION_INDEX:
++		return -EOPNOTSUPP;
++	default:
++		return -EINVAL;
+ 	}
+ 
+ 	return count;
+@@ -224,11 +258,16 @@ static int vfio_ccw_mdev_get_region_info(struct vfio_region_info *info,
+ {
+ 	switch (info->index) {
+ 	case VFIO_CCW_CONFIG_REGION_INDEX:
+-		info->offset = 0;
++		info->offset = VFIO_CCW_INDEX_TO_OFFSET(info->index);
+ 		info->size = sizeof(struct ccw_io_region);
+ 		info->flags = VFIO_REGION_INFO_FLAG_READ
+ 			      | VFIO_REGION_INFO_FLAG_WRITE;
+ 		return 0;
++	case VFIO_CCW_SCHIB_REGION_INDEX:
++		info->offset = VFIO_CCW_INDEX_TO_OFFSET(info->index);
++		info->size = sizeof(struct ccw_schib_region);
++		info->flags = VFIO_REGION_INFO_FLAG_READ;
++		return 0;
+ 	default:
+ 		return -EINVAL;
+ 	}
+diff --git a/drivers/s390/cio/vfio_ccw_private.h b/drivers/s390/cio/vfio_ccw_private.h
+index 78a66d96756b..460c8b90d834 100644
+--- a/drivers/s390/cio/vfio_ccw_private.h
++++ b/drivers/s390/cio/vfio_ccw_private.h
+@@ -28,6 +28,7 @@
+  * @mdev: pointer to the mediated device
+  * @nb: notifier for vfio events
+  * @io_region: MMIO region to input/output I/O arguments/results
++ * @schib_region: MMIO region of subchannel information
+  * @cp: channel program for the current I/O operation
+  * @irb: irb info received from interrupt
+  * @scsw: scsw info
+@@ -42,6 +43,7 @@ struct vfio_ccw_private {
+ 	struct mdev_device	*mdev;
+ 	struct notifier_block	nb;
+ 	struct ccw_io_region	io_region;
++	struct ccw_schib_region	schib_region;
+ 
+ 	struct channel_program	cp;
+ 	struct irb		irb;
+@@ -76,6 +78,7 @@ enum vfio_ccw_event {
+ 	VFIO_CCW_EVENT_NOT_OPER,
+ 	VFIO_CCW_EVENT_IO_REQ,
+ 	VFIO_CCW_EVENT_INTERRUPT,
++	VFIO_CCW_EVENT_UPDATE_SUBCH,
+ 	/* last element! */
+ 	NR_VFIO_CCW_EVENTS
+ };
+diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
+index e3301dbd27d4..c60244debf71 100644
+--- a/include/uapi/linux/vfio.h
++++ b/include/uapi/linux/vfio.h
+@@ -457,6 +457,7 @@ enum {
+ 
+ enum {
+ 	VFIO_CCW_CONFIG_REGION_INDEX,
++	VFIO_CCW_SCHIB_REGION_INDEX,
+ 	VFIO_CCW_NUM_REGIONS
+ };
+ 
+diff --git a/include/uapi/linux/vfio_ccw.h b/include/uapi/linux/vfio_ccw.h
+index 2ec5f367ff78..12508ef6e6fc 100644
+--- a/include/uapi/linux/vfio_ccw.h
++++ b/include/uapi/linux/vfio_ccw.h
+@@ -22,4 +22,10 @@ struct ccw_io_region {
+ 	__u32	ret_code;
+ } __packed;
+ 
++struct ccw_schib_region {
++	__u8	cc;
++#define SCHIB_AREA_SIZE 52
++	__u8	schib_area[SCHIB_AREA_SIZE];
++} __packed;
++
+ #endif
 -- 
 2.13.5
