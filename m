@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48597)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34838)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sochin.jiang@huawei.com>) id 1eZSXU-00043t-Vv
-	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 21:24:21 -0500
+	(envelope-from <yi.l.liu@intel.com>) id 1eZStT-0004yl-BK
+	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 21:47:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sochin.jiang@huawei.com>) id 1eZSXR-0000eN-PD
-	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 21:24:20 -0500
-Received: from szxga04-in.huawei.com ([45.249.212.190]:2147 helo=huawei.com)
+	(envelope-from <yi.l.liu@intel.com>) id 1eZStQ-0003as-7P
+	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 21:47:03 -0500
+Received: from mga02.intel.com ([134.134.136.20]:59567)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <sochin.jiang@huawei.com>)
-	id 1eZSXR-0000W2-C9
-	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 21:24:17 -0500
-References: <b74a4929-26ed-711a-6d90-c6c06b492fd8@huawei.com>
-	<20180108111039.2ec3cefd@bahia.lan>
-From: sochin.jiang <sochin.jiang@huawei.com>
-Message-ID: <e23601f9-0562-92f1-2db8-cbb9305da9e0@huawei.com>
-Date: Thu, 11 Jan 2018 10:23:32 +0800
+	(Exim 4.71) (envelope-from <yi.l.liu@intel.com>) id 1eZStP-0003Yn-RF
+	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 21:47:00 -0500
+From: "Liu, Yi L" <yi.l.liu@intel.com>
+Date: Thu, 11 Jan 2018 02:46:54 +0000
+Message-ID: <A2975661238FB949B60364EF0F2C257439B3FF82@SHSMSX104.ccr.corp.intel.com>
+References: <20171114231350.286025-1-prasad.singamsetty@oracle.com>
+	<20171114231350.286025-3-prasad.singamsetty@oracle.com>
+	<20171201112952.GC31366@sky-dev>
+	<11a95513-73af-7a80-48bf-f78fa8740439@oracle.com>
+In-Reply-To: <11a95513-73af-7a80-48bf-f78fa8740439@oracle.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-In-Reply-To: <20180108111039.2ec3cefd@bahia.lan>
-Content-Type: text/plain; charset="windows-1252"
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] virtio-9p: hot-plug/unplug about virtio-9p device
+Subject: Re: [Qemu-devel] [PATCH v1 2/2] intel-iommu: Extend address width
+ to 48 bits
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,73 +31,97 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>
-Cc: "Fangyi (C)" <eric.fangyi@huawei.com>, joinpub@163.com, Jiangyiwen <jiangyiwen@huawei.com>, qemu-devel@nongnu.org
+To: Prasad Singamsetty <prasad.singamsetty@oracle.com>, "Liu, Yi L" <yi.l.liu@linux.intel.com>
+Cc: "ehabkost@redhat.com" <ehabkost@redhat.com>, "mst@redhat.com" <mst@redhat.com>, "konrad.wilk@oracle.com" <konrad.wilk@oracle.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "peterx@redhat.com" <peterx@redhat.com>, "imammedo@redhat.com" <imammedo@redhat.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "rth@twiddle.net" <rth@twiddle.net>
 
-
-
-On 2018/1/8 18:10, Greg Kurz wrote:
-> On Tue, 19 Dec 2017 13:41:12 +0800
-> sochin.jiang <sochin.jiang@huawei.com> wrote:
->
->>      Hi, guys.
->>
->>     I'm looking for the hot-plug/unplug features of virtio-9p device recently, and found there's a lack of support.
->>
->>     I am wondering why ? Is there a reason. Actually, I write a qmp command to support fsdev_add, then a device_add qmp will    
->>
->>     successfully add a virtio-9p device(just like virtio-blk).
->>
->>    Whether there is some concerns that we haven't support this ? hope for a reply, thanks.
->>
->>
->> sochin.
->>
-> Hi Sochin,
->
-> I've just discovered this mail by chance. Please note I'm the only active
-> maintainer for virtio-9p. You really should check the content of MAINTAINERS
-> and Cc the appropriate people. :)
->
-> Now, back to your question. Yes, there's only some partial support for
-> hot-plug/unplug. Mostly because nobody cared to work on it I guess.
->
-> So, indeed, we don't have fsdev_add/fsdev_del, ie, we can only rely on
-> shared directories specified on the QEMU command line.
->
-> On the virtio-9p device side, hotplug is supported, ie, device_add virtio-9p
-> works as expected.
->
-> Hot-unplug is different as it requires some coordination with the guest. The
-> current status is that it requires the 9p shared directory to be unmounted
-> in the guest: if you do device_del while the directory is mounted in a linux
-> guest, you'll get these messages in the guest syslog:
->
-> kernel:9pnet_virtio virtio2: p9_virtio_remove: waiting for device in use.
->
-> If the 9p directory is unmounted at some point, then the hot unplug
-> sequence will eventually succeed.
->
-> But this shouldn't be done like this: the guest should cancel inflight
-> requests and cause any new I/O requests in the guest to fail right away.
-> I have a tentative patch for the linux driver I can share if you want.
->
-> Cheers,
->
-> --
-> Greg
->
-> .
->
-
-
-Thanks, Greg.
-
-Indeed, I got those error messages while trying to do device_del with
-shared directory mounted in the guest. I really would like to see you patch for linux driver.
-
-About virtio-9p, we are actually considering to use it for hypervisor-based container, 
-a support of hotplug/unplug will be better, also I believe there will be more people to work on it.
-
-
-Sochin.
+PiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBRZW11LWRldmVsIFttYWlsdG86
+cWVtdS1kZXZlbC1ib3VuY2VzK3lpLmwubGl1PWludGVsLmNvbUBub25nbnUub3JnXSBPbg0KPiBC
+ZWhhbGYgT2YgUHJhc2FkIFNpbmdhbXNldHR5DQo+IFNlbnQ6IFRodXJzZGF5LCBKYW51YXJ5IDEx
+LCAyMDE4IDg6MDYgQU0NCj4gVG86IExpdSwgWWkgTCA8eWkubC5saXVAbGludXguaW50ZWwuY29t
+Pg0KPiBDYzogZWhhYmtvc3RAcmVkaGF0LmNvbTsgbXN0QHJlZGhhdC5jb207IGtvbnJhZC53aWxr
+QG9yYWNsZS5jb207IHFlbXUtDQo+IGRldmVsQG5vbmdudS5vcmc7IHBldGVyeEByZWRoYXQuY29t
+OyBpbWFtbWVkb0ByZWRoYXQuY29tOw0KPiBwYm9uemluaUByZWRoYXQuY29tOyBydGhAdHdpZGRs
+ZS5uZXQNCj4gU3ViamVjdDogUmU6IFtRZW11LWRldmVsXSBbUEFUQ0ggdjEgMi8yXSBpbnRlbC1p
+b21tdTogRXh0ZW5kIGFkZHJlc3Mgd2lkdGggdG8gNDgNCj4gYml0cw0KPiANCj4gDQo+IEhpIFlp
+IEwsDQo+IA0KPiBPbiAxMi8xLzIwMTcgMzoyOSBBTSwgTGl1LCBZaSBMIHdyb3RlOg0KPiA+IE9u
+IFR1ZSwgTm92IDE0LCAyMDE3IGF0IDA2OjEzOjUwUE0gLTA1MDAsIHByYXNhZC5zaW5nYW1zZXR0
+eUBvcmFjbGUuY29tDQo+IHdyb3RlOg0KPiA+PiBGcm9tOiBQcmFzYWQgU2luZ2Ftc2V0dHkgPHBy
+YXNhZC5zaW5nYW1zZXR0eUBvcmFjbGUuY29tPg0KPiA+Pg0KPiA+PiBUaGUgY3VycmVudCBpbXBs
+ZW1lbnRhdGlvbiBvZiBJbnRlbCBJT01NVSBjb2RlIG9ubHkgc3VwcG9ydHMgMzkgYml0cw0KPiA+
+PiBpb3ZhIGFkZHJlc3Mgd2lkdGguIFRoaXMgcGF0Y2ggcHJvdmlkZXMgYSBuZXcgcGFyYW1ldGVy
+ICh4LWF3LWJpdHMpDQo+ID4+IGZvciBpbnRlbC1pb21tdSB0byBleHRlbmQgaXRzIGFkZHJlc3Mg
+d2lkdGggdG8gNDggYml0cyBidXQga2VlcGluZw0KPiA+PiB0aGUgZGVmYXVsdCB0aGUgc2FtZSAo
+MzkgYml0cykuIFRoZSByZWFzb24gZm9yIG5vdCBjaGFuZ2luZyB0aGUNCj4gPj4gZGVmYXVsdCBp
+cyB0byBhdm9pZCBwb3RlbnRpYWwgY29tcGF0aWJpbGl0eSBwcm9ibGVtcyB3aXRoIGxpdmUNCj4g
+Pj4gbWlncmF0aW9uIG9mIGludGVsLWlvbW11IGVuYWJsZWQgUUVNVSBndWVzdC4gVGhlIG9ubHkg
+dmFsaWQgdmFsdWVzIGZvciAneC1hdy0NCj4gYml0cycNCj4gPj4gcGFyYW1ldGVyIGFyZSAzOSBh
+bmQgNDguDQo+ID4+DQo+ID4+IEFmdGVyIGVuYWJsaW5nIGxhcmdlciBhZGRyZXNzIHdpZHRoICg0
+OCksIHdlIHNob3VsZCBiZSBhYmxlIHRvIG1hcA0KPiA+PiBsYXJnZXIgaW92YSBhZGRyZXNzZXMg
+aW4gdGhlIGd1ZXN0LiBGb3IgZXhhbXBsZSwgYSBRRU1VIGd1ZXN0IHRoYXQgaXMNCj4gPj4gY29u
+ZmlndXJlZCB3aXRoIGxhcmdlIG1lbW9yeSAoID49MVRCICkuIFRvIGNoZWNrIHdoZXRoZXIgNDgg
+Yml0cyBhdw0KPiA+PiBpcyBlbmFibGVkLCB3ZSBjYW4gZ3JlcCBpbiB0aGUgZ3Vlc3QgZG1lc2cg
+b3V0cHV0IHdpdGggbGluZToNCj4gPj4gIkRNQVI6IEhvc3QgYWRkcmVzcyB3aWR0aCA0OCIuDQo+
+ID4+DQo+ID4+IFNpZ25lZC1vZmYtYnk6IFByYXNhZCBTaW5nYW1zZXR0eSA8cHJhc2FkLnNpbmdh
+bXNldHlAb3JhY2xlLmNvbT4NCj4gPg0KPiA+IFByYXNhZCwNCj4gPg0KPiA+IEhhdmUgeW91IHRl
+c3RlZCB0aGUgc2NlbmFyaW8gd2l0aCBwaHlzaWNhbCBkZXZpY2UgYXNzaWduZWQgdG8gYSBndWVz
+dD8NCj4gDQo+IFNvcnJ5IGZvciB0aGUgbG9uZyBkZWxheSBpbiBmb2xsb3dpbmcgdXAgb24gdGhp
+cy4NCj4gDQo+IEkgZGlkIHNvbWUgdGVzdGluZyB3aXRoIHZmaW8tcGNpIGRldmljZXMgYXNzaWdu
+ZWQgdG8gdGhlIGd1ZXN0Lg0KPiBUaGlzIGlzIGRvbmUgb24gdGhlIGxhdGVzdCBxZW11IGNvZGUg
+YmFzZSAoMi4xMS41MCkuDQo+IA0KPiBIZXJlIGFyZSB0aGUgdGVzdCBjYXNlcy9yZXN1bHRzOg0K
+PiANCj4gMS4gQm9vdGluZyBWTSB3aXRoIG9uZSBvciB0d28gdmZpby1wY2kgKG5ldHdvcmspIGRl
+dmljZXMNCj4gICAgIGFuZCBtdWx0aXBsZSBtZW1vcnkgc2l6ZSBjb25maWdzICh1cCB0byAyNTZH
+KS4gQXNzaWduZWQgcGNpDQo+ICAgICBkZXZpY2VzIChuZXR3b3JrIGludGVyZmFjZXMpIHdvcmtl
+ZCBmaW5lIGFuZCBubyBpc3N1ZXMNCj4gICAgIGluIHVzaW5nIHRoZXNlIGRldmljZXMuIFRoaXMg
+dGVzdCBpcyBydW4gZm9yIGJvdGggYWRkcmVzcw0KPiAgICAgd2lkdGhzICgzOSBhbmQgNDgpLg0K
+PiAyLiBJZiB0aGUgZ3Vlc3QgVk0gaXMgY29uZmlndXJlZCB0byB1c2UgNTEyRyBhbmQgYWRkcmVz
+cw0KPiAgICAgd2lkdGggaXMgdGhlIGRlZmF1bHQgMzkgYml0cyB0aGVuIGd1ZXN0IE9TIGZhaWxz
+IHRvDQo+ICAgICBib290IGR1ZSB0byBETUEgZmFpbHVyZXMuIFRoZSBzYW1lIGlzIG9ic2VydmVk
+IHdpdGhvdXQNCj4gICAgIGFwcGx5aW5nIHRoZSBwYXRjaCBzZXQuIFRoZSBndWVzdCBPUyBlbmRz
+IHVwIGJvb3RpbmcgaW50bw0KPiAgICAgZHJhY3V0IHNoZWxsLiBUaGlzIHByb2JsZW0gaXMgbm90
+IHNlZW4gaWYgd2Ugc2V0IHRoZSBhZGRyZXNzDQo+ICAgICB3aWR0aCB0byA0OCBiaXRzLiBTbywg
+dGhlIHBhdGNoIHNldCBhZGRyZXNzZXMgYSBsYXRlbnQgYnVnDQo+ICAgICB3aXRoIGxhcmdlIG1l
+bW9yeSBjb25maWcuDQo+IA0KPiBJU1NVRSAtIFZNIGNvdWxkIHRha2UgbG9uZyB0aW1lIHRvIGJv
+b3Qgd2l0aCB2ZmlvLXBjaSBkZXZpY2VzDQo+IA0KPiBRZW11IHByb2Nlc3MgY291bGQgdGFrZSBh
+IGxvbmcgdGltZSB0byBpbml0aWFsaXplIHRoZSBWTSB3aGVuIHZmaW8tcGNpIGRldmljZSBpcw0K
+PiBjb25maWd1cmVkIGRlcGVuZGluZyBvbiB0aGUgbWVtb3J5IHNpemUuIEZvciBzbWFsbCBtZW1v
+cnkgc2l6ZXMgKGxlc3MgdGhhbiAzMkcpIGl0DQo+IGlzIG5vdCBub3RpY2VhYmxlICg8MzBzKS4g
+Rm9yIGxhcmdlciBtZW1vcnkgc2l6ZXMsIHRoZSBkZWxheSByYW5nZXMgZnJvbSBzZXZlcmFsDQo+
+IG1pbnV0ZXMgYW5kIGxvbmdlciAoMi00MG1pbikuIEZvciBtb3JlIHRoYW4gNTEyRywgcWVtdSBw
+cm9jZXNzIGFwcGVhcnMgdG8gaGFuZw0KPiBidXQgY2FuIGJlIGludGVycnVwdGVkLiBUaGlzIGJl
+aGF2aW9yIGlzIG9ic2VydmVkIHdpdGhvdXQgcGF0Y2ggc2V0IGFwcGxpZWQgYWxzby4gVGhlDQo+
+IHNsb3duZXNzIGlzIGR1ZSB0byBWRklPX0lPTU1VX01BUF9ETUEgaW9jdGwgdGFraW5nIGxvbmcg
+dGltZSB0byBtYXAgdGhlDQo+IHN5c3RlbSByYW0gYXNzaWduZWQgdG8gdGhlIGd1ZXN0LiBUaGlz
+IGlzIHdoZW4gcWVtdSBwcm9jZXNzIGlzIGluaXRpYWxpemluZyB0aGUgdmZpbw0KPiBkZXZpY2Ug
+d2hlcmUgaXQgbWFwcyBhbGwgdGhlIGFzc2lnbmVkIHJhbSBtZW1vcnkgcmVnaW9ucy4gSGVyZSBp
+cyB0aGUgc3RhY2sgdHJhY2UNCj4gZnJvbSBnZGI6DQo+IA0KPiAjMCAgdmZpb19kbWFfbWFwIChj
+b250YWluZXI9MHg1NTU1NTgyNzA5ZDAsIGlvdmE9NDI5NDk2NzI5NiwNCj4gICAgICAgICAgICAg
+ICAgICAgIHNpemU9NTQ3NjA4MzMwMjQwLCB2YWRkcj0weDdmN2ZkM2UwMDAwMCwNCj4gICAgICAg
+ICAgICAgICAgICAgIHJlYWRvbmx5PWZhbHNlKQ0KPiAgICAgIGF0IC9ob21lL3BzaW5nYW1zL3Fl
+bXUtdXBzdHJlYW0tdjIvaHcvdmZpby9jb21tb24uYzoyNTANCj4gIzEgIDB4MDAwMDU1NTU1NTg0
+ZjQ3MSBpbiB2ZmlvX2xpc3RlbmVyX3JlZ2lvbl9hZGQoDQo+ICAgICAgICAgICAgICAgICAgICBs
+aXN0ZW5lcj0weDU1NTU1ODI3MDllMCwNCj4gICAgICAgICAgICAgICAgICAgIHNlY3Rpb249MHg3
+ZmZmZmZmZmM3ZjApDQo+ICAgICAgYXQgL2hvbWUvcHNpbmdhbXMvcWVtdS11cHN0cmVhbS12Mi9o
+dy92ZmlvL2NvbW1vbi5jOjUyMQ0KPiAjMiAgMHgwMDAwNTU1NTU1N2YwOGZjIGluIGxpc3RlbmVy
+X2FkZF9hZGRyZXNzX3NwYWNlICgNCj4gICAgICAgICAgICAgICAgICAgIGxpc3RlbmVyPTB4NTU1
+NTU4MjcwOWUwLCBhcz0weDU1NTU1ODEzYjc5MCkNCj4gICAgICBhdCAvaG9tZS9wc2luZ2Ftcy9x
+ZW11LXVwc3RyZWFtLXYyL21lbW9yeS5jOjI2MDANCj4gIzMgIDB4MDAwMDU1NTU1NTdmMGJiZSBp
+biBtZW1vcnlfbGlzdGVuZXJfcmVnaXN0ZXIgKA0KPiAgICAgICAgICAgICAgICAgICAgbGlzdGVu
+ZXI9MHg1NTU1NTgyNzA5ZTAsIGFzPTB4NTU1NTU4MTNiNzkwKQ0KPiAgICAgIGF0IC9ob21lL3Bz
+aW5nYW1zL3FlbXUtdXBzdHJlYW0tdjIvbWVtb3J5LmM6MjY0Mw0KPiAjNCAgMHgwMDAwNTU1NTU1
+ODUxMWVmIGluIHZmaW9fY29ubmVjdF9jb250YWluZXIgKGdyb3VwPTB4NTU1NTU4MjcwOTYwLA0K
+PiAgICAgICAgICAgICAgICAgICAgYXM9MHg1NTU1NTgxM2I3OTAsIGVycnA9MHg3ZmZmZmZmZmRh
+ZTgpDQo+ICAgICAgYXQgL2hvbWUvcHNpbmdhbXMvcWVtdS11cHN0cmVhbS12Mi9ody92ZmlvL2Nv
+bW1vbi5jOjExMzANCj4gKioqKg0KPiAoZ2RiKSBwcmludC94IHNpemUNCj4gJDIgPSAweDdmODAw
+MDAwMDANCj4gDQo+IFRoaXMgaXMgYmVmb3JlIGd1ZXN0IE9TIGdldHMgdG8gYm9vdC4gVGhlIGhv
+c3QgaXMgcnVubmluZyA0LjE1LjAtcmM2IGtlcm5lbCB3aXRoIHFlbXUNCj4gdmVyc2lvbiAyLjEx
+LjUwLg0KPiANCj4gSSBhbSBub3Qgc3VyZSBpZiB0aGlzIGlzIGEga25vd24gaXNzdWUgYW5kIHNv
+bWVvbmUgaXMgYWxyZWFkeSB3b3JraW5nIG9uIGZpeGluZyB0aGUNCj4gaW1wbGVtZW50YXRpb24g
+b2YgVkZJT19JT01NVV9NQVBfRE1BIGlvY3RsLg0KDQpJdCBzZWVtcyB0byBiZSBzYW1lIGlzc3Vl
+IHdpdGggdGhlIG9uZSByZXBvcnRlZCBieSBCb2IuDQpodHRwczovL2xpc3RzLmdudS5vcmcvYXJj
+aGl2ZS9odG1sL3FlbXUtZGV2ZWwvMjAxNy0xMi9tc2cwNTA5OC5odG1sDQoNClBlciBjaGF0dGVk
+IHdpdGggdGhlbSwgdGhlIHJlYXNvbiBsb29rcyB0byBiZSBubyBlbm91Z2ggbWVtb3J5IGluIGhv
+c3QuIGhvdyBhYm91dA0KdGhlIG1lbW9yeSBzaXplIGluIHlvdXIgaG9zdD8NCg0KPiBUaGlzIGlz
+c3VlIGlzIG5vdCByZWxhdGVkIHRvIHRoaXMgcGF0Y2ggc2V0IGFuZCBuZWVkIHRvIGJlIGludmVz
+dGlnYXRlZCBzZXBhcmF0ZWx5Lg0KPiANCj4gUGxlYXNlIGxldCBtZSBrbm93IGlmIHRoZXJlIGFy
+ZSBvdGhlciBjb21tZW50cyBvbiB0aGlzIHBhdGNoIHNldC4NCj4gDQoNClJlZ2FyZHMsDQpZaSBM
+DQo=
