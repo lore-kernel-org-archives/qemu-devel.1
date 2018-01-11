@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41837)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51211)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eZdTm-0004wg-Ms
-	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 09:05:22 -0500
+	(envelope-from <o.rempel@pengutronix.de>) id 1eZbIM-00023R-02
+	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 06:45:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eZdTi-0002zQ-Lk
-	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 09:05:14 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:55964)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1eZdTi-0002yE-C7
-	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 09:05:10 -0500
-References: <1515637324-96034-1-git-send-email-mjc@sifive.com>
-	<1515637324-96034-22-git-send-email-mjc@sifive.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <e78a8a10-b46b-a9da-8c81-7dd48eb47b10@redhat.com>
-Date: Thu, 11 Jan 2018 08:05:05 -0600
+	(envelope-from <o.rempel@pengutronix.de>) id 1eZbIF-0005Zv-Sx
+	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 06:45:18 -0500
+Received: from metis.ext.pengutronix.de
+	([2001:67c:670:201:290:27ff:fe1d:cc33]:51147)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <o.rempel@pengutronix.de>)
+	id 1eZbIF-0005XE-IT
+	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 06:45:11 -0500
+References: <cover.1515260163.git.pisa@cmp.felk.cvut.cz>
+From: Oleksij Rempel <o.rempel@pengutronix.de>
+Message-ID: <bdad2e79-23b6-081d-f45e-f2b6775c5a0f@pengutronix.de>
+Date: Thu, 11 Jan 2018 12:45:03 +0100
 MIME-Version: 1.0
-In-Reply-To: <1515637324-96034-22-git-send-email-mjc@sifive.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="GS4KJOcNwlP5swg1WHAl94Vf7GSWW19il"
-Subject: Re: [Qemu-devel] [PATCH v3 21/21] RISC-V Build Infrastructure
+In-Reply-To: <cover.1515260163.git.pisa@cmp.felk.cvut.cz>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 0/7] CAN bus support for QEMU (SJA1000 PCI
+ so far)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,83 +30,144 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Michael Clark <mjc@sifive.com>, qemu-devel@nongnu.org
-Cc: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Palmer Dabbelt <palmer@sifive.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>, RISC-V Patches <patches@groups.riscv.org>
+To: pisa@cmp.felk.cvut.cz, qemu-devel@nongnu.org
+Cc: Stefan Hajnoczi <stefanha@gmail.com>, Konrad Frederic <frederic.konrad@adacore.com>, Deniz Eren <deniz.eren@icloud.com>, Oliver Hartkopp <socketcan@hartkopp.net>, Marek Vasut <marex@denx.de>, Jan Kiszka <jan.kiszka@siemens.com>, Marc Kleine-Budde <mkl@pengutronix.de>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---GS4KJOcNwlP5swg1WHAl94Vf7GSWW19il
-From: Eric Blake <eblake@redhat.com>
-To: Michael Clark <mjc@sifive.com>, qemu-devel@nongnu.org
-Cc: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
- Palmer Dabbelt <palmer@sifive.com>,
- Sagar Karandikar <sagark@eecs.berkeley.edu>,
- RISC-V Patches <patches@groups.riscv.org>
-Message-ID: <e78a8a10-b46b-a9da-8c81-7dd48eb47b10@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v3 21/21] RISC-V Build Infrastructure
-References: <1515637324-96034-1-git-send-email-mjc@sifive.com>
- <1515637324-96034-22-git-send-email-mjc@sifive.com>
-In-Reply-To: <1515637324-96034-22-git-send-email-mjc@sifive.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Hi,
 
-On 01/10/2018 08:22 PM, Michael Clark wrote:
-> This adds RISC-V into the build system enabling the following targets:
->=20
-> - riscv32-softmmu
-> - riscv64-softmmu
-> - riscv32-linux-user
-> - riscv64-linux-user
->=20
-> This adds defaults configs for RISC-V, enables the build for the RISC-V=
+thank you for your work!
 
-> CPU core, hardware, and Linux User Emulation. The 'qemu-binfmt-conf.sh'=
+we integrated your patches in our OSALES BSP [1] and did some basic tests:
+- communication between host and guest
+- communication between real CAN/J1939 device over the host to guest.
 
-> script is updated to add the RISC-V ELF magic.
->=20
-> +++ b/qapi-schema.json
-> @@ -413,7 +413,7 @@
->  # Since: 2.6
->  ##
->  { 'enum': 'CpuInfoArch',
-> -  'data': ['x86', 'sparc', 'ppc', 'mips', 'tricore', 'other' ] }
-> +  'data': ['x86', 'sparc', 'ppc', 'mips', 'tricore', 'riscv', 'other' =
-] }
+J1939(real device) -> candleLight v1.1 -> host (kernel v4.13) -> QEMU
+(with your CAN patches) -> kernel (with experimental J1939 support) ->
+J1939 App
+So far it works without noticeable issues.
 
-Still missing documentation that riscv was added in 2.12 (see my
-comments on v1).
+We are working on a CAN/J1939/ISObus protocol development for linux
+kernel and create some regression testing infrastructure to reduce
+possible problems before our patches will go to kernel mainline.
+In this case QEMU is really helpful.
 
+I hope your patches will go QEMU mainline soon :)
 
-> --- /dev/null
-> +++ b/target/riscv/trace-events
-> @@ -0,0 +1 @@
-> +# See docs/devel/tracing.txt for syntax documentation.
->=20
+[1]
+https://git.pengutronix.de/cgit/OSELAS.BSP-Pengutronix-J1939/?h=bst/x86-wip
 
-Do we really need this file if you don't have any traces yet?
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---GS4KJOcNwlP5swg1WHAl94Vf7GSWW19il
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlpXbxEACgkQp6FrSiUn
-Q2r1aQf/Rr21KcgJDVFl20FAt4qZ5Gc/9wvUJHo0eY75cjEt3nfmfWmeyp2NUFAu
-MlL79/IDBtWrIYjpHXXWodKXJtf8UwW7OlHSZ96jjqSTGZgx3EDpgCUvqUHyptCS
-CkrPpw3FdEjUGRvwfeWCOzQ/kGQFmLc9h9j+sZG0nSWqBEhHA0loFwVajDqpjGaq
-/x9Fq5NsU42Q/SYXe3NRTDRLHgYK7WQ3O//Ur+XceVlAr3+dzksNnnF1KetGn6z8
-ovo3i6ExkQAeoXaNjhze8uN5Pz+G+53Gq8UTneUCzOgxQmCDKy09bPIRwJEiG8yu
-Hi1PEypD9eolxgTD5URqAdjaEFm+7g==
-=O9tr
------END PGP SIGNATURE-----
-
---GS4KJOcNwlP5swg1WHAl94Vf7GSWW19il--
+On 06.01.2018 21:47, pisa@cmp.felk.cvut.cz wrote:
+> From: Pavel Pisa <pisa@cmp.felk.cvut.cz>
+> 
+> Basic emulation of CAN bus controller and interconnection for QEMU.
+> 
+> Patches version 3:
+> Support to connect to host SocketCAN interface has been
+> separated from the core bus implementation. Only simple
+> statically initialize pointer to the connection function
+> is used, no QOM concept for now.
+> SJA1000 message filters redone and code unified where
+> possible.
+> Basic documentation added.
+> QEMU_ALIGNED used in definition of CAN frame structure,
+> structure and defines still separated from Linux/SocketCAN
+> API defined ones to allow to keep QEMU message format
+> independed from host system one. Check for correspondence
+> to socketcan one added.
+> 
+> Patches version 2:
+> The bus emulation and the SJA1000 chip emulation introduced
+> by individual patches as suggested by Frederic Konrad.
+> Simple example board to test SJA1000 as single memory-mapped BAR
+> has been omitted in a new series because emulation of real
+> existing boards can provide same functions now.
+> Conditionalized debug printfs changed to be exposed to compiler
+> syntax check as suggested in review.
+> 
+> The work has been started by Jin Yang in the frame of GSoC 2013 slot
+> contributed by RTEMS project which has been looking for environment
+> to allow develop and test CAN drivers for multiple CPU architectures.
+> 
+> I have menthored the project and then done substantial code cleanup
+> and update to QOM. Deniz Eren then used emulation for SJA1000 base card
+> driver development for other operating system and contributed
+> PCM-3680I and MIOe-3680 support.
+> 
+> Some page about the project
+> 
+>   https://gitlab.fel.cvut.cz/canbus/qemu-canbus/wikis/home
+> 
+> FEE CTU GitLab repository with can-pci branch for 2.3, 2.4, 2.7, 2.8, 2.10 and 2.11
+> version if QEMU is available there
+> 
+>   https://gitlab.fel.cvut.cz/canbus/qemu-canbus/tree/can-pci
+> 
+> mirror at GitHub
+> 
+>   https://github.com/CTU-IIG/qemu
+> 
+> There are many areas for improvement and extension of the code still
+> (for example freeze and migration is not implemented. CAN controllers
+> use proper QOM model but bus/interconnection emulation uses simple broadcast
+> connection which is required for CAN, but it is not based on QEMU bus model).
+> I have tried to look into QEMU VLANs implementation but it
+> does not map straightforward to CAN and I would need some help/opinion
+> from more advanced developers to decide what is their right
+> mapping to CAN.
+> 
+> CAN-FD support would be interesting requires other developers/
+> companies contributions or setup of some project to allow invite
+> some students and colleagues from my university into project.
+> 
+> But I believe that (even in its actual state) provided solution
+> is great help for embedded systems developers when they can connect
+> SocketCAN from one or more embedded systems running in virtual
+> environment together or with Linux host SocketCAN virtual
+> or real bus interfaces.
+> 
+> We have even tested our generic CANopen device configured
+> for CANopen 401 profile for generic I/O running in the virtual
+> system which can control GPIO inputs/outputs through virtual
+> industrial I/O card.
+> 
+> Generally QEMU can be interesting setup which allows
+> to test complete industrial and automotive applications
+> in virtual environment even before real hardware is availabe.
+> 
+> Deniz Eren (2):
+>   CAN bus PCM-3680I PCI (dual SJA1000 channel) emulation added.
+>   CAN bus MIOe-3680 PCI (dual SJA1000 channel) emulation added.
+> 
+> Pavel Pisa (5):
+>   CAN bus simple messages transport implementation for QEMU
+>   CAN bus support to connect bust to Linux host SocketCAN interface.
+>   CAN bus SJA1000 chip register level emulation for QEMU
+>   CAN bus Kvaser PCI CAN-S (single SJA1000 channel) emulation added.
+>   QEMU CAN bus emulation documentation
+> 
+>  default-configs/pci.mak   |   3 +
+>  docs/can.txt              |  78 ++++
+>  hw/Makefile.objs          |   1 +
+>  hw/can/Makefile.objs      |  14 +
+>  hw/can/can_core.c         | 129 ++++++
+>  hw/can/can_host_stub.c    |  36 ++
+>  hw/can/can_kvaser_pci.c   | 375 +++++++++++++++++
+>  hw/can/can_mioe3680_pci.c | 335 ++++++++++++++++
+>  hw/can/can_pcm3680_pci.c  | 335 ++++++++++++++++
+>  hw/can/can_sja1000.c      | 996 ++++++++++++++++++++++++++++++++++++++++++++++
+>  hw/can/can_sja1000.h      | 176 ++++++++
+>  hw/can/can_socketcan.c    | 294 ++++++++++++++
+>  include/can/can_emu.h     | 143 +++++++
+>  13 files changed, 2915 insertions(+)
+>  create mode 100644 docs/can.txt
+>  create mode 100644 hw/can/Makefile.objs
+>  create mode 100644 hw/can/can_core.c
+>  create mode 100644 hw/can/can_host_stub.c
+>  create mode 100644 hw/can/can_kvaser_pci.c
+>  create mode 100644 hw/can/can_mioe3680_pci.c
+>  create mode 100644 hw/can/can_pcm3680_pci.c
+>  create mode 100644 hw/can/can_sja1000.c
+>  create mode 100644 hw/can/can_sja1000.h
+>  create mode 100644 hw/can/can_socketcan.c
+>  create mode 100644 include/can/can_emu.h
+> 
