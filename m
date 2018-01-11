@@ -1,23 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35308)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35458)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eZj0A-0002iB-2f
-	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 14:59:03 -0500
+	(envelope-from <mst@redhat.com>) id 1eZj0P-0002wH-DA
+	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 14:59:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eZj08-0006ar-RE
-	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 14:59:02 -0500
-References: <20180110230825.18321-1-eblake@redhat.com>
-	<20180110230825.18321-5-eblake@redhat.com>
-	<d9f7043e-450a-6cd3-dc66-8799cf018027@virtuozzo.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <7381e42b-2a92-63f7-3acf-b0f41b662a41@redhat.com>
-Date: Thu, 11 Jan 2018 13:58:51 -0600
+	(envelope-from <mst@redhat.com>) id 1eZj0L-0006iP-Hk
+	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 14:59:17 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:49528)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1eZj0L-0006hy-CG
+	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 14:59:13 -0500
+Date: Thu, 11 Jan 2018 21:59:11 +0200
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20180111215839-mutt-send-email-mst@kernel.org>
+References: <1513866427-27125-1-git-send-email-mst@redhat.com>
+	<CAFEAcA_pt7XhXOhL2jSxwH9ooL7xjShmp6eBAYpRLc=dY-=TXQ@mail.gmail.com>
+	<20171221223704-mutt-send-email-mst@kernel.org>
+	<CAAdtpL74ZyVsLwgBjpbsdSHbWdY_Uq6ouRAvgo00UdVevTKq8A@mail.gmail.com>
+	<20171222014258-mutt-send-email-mst@kernel.org>
+	<CAFEAcA8eKTEh3zSOPNm1WgUujNOU+zcNSgBAE5G68QcObQd8sA@mail.gmail.com>
+	<20180109060920-mutt-send-email-mst@kernel.org>
+	<CAFEAcA_Xhm45N5U8aWZv=geVQMShv13FOEodS7HvPTz3fa9-+A@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <d9f7043e-450a-6cd3-dc66-8799cf018027@virtuozzo.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="Xok5HUy2nbSTi4rMMRx0EdLkb90xM7s5v"
-Subject: Re: [Qemu-devel] [PATCH v2 4/6] nbd/server: Add va_list form of
- nbd_negotiate_send_rep_err()
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAFEAcA_Xhm45N5U8aWZv=geVQMShv13FOEodS7HvPTz3fa9-+A@mail.gmail.com>
+Subject: Re: [Qemu-devel] [PULL 00/25] pc, pci, virtio: features, fixes,
+ cleanups
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,91 +34,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philippe@mathieu-daude.net>, QEMU Developers <qemu-devel@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---Xok5HUy2nbSTi4rMMRx0EdLkb90xM7s5v
-From: Eric Blake <eblake@redhat.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <7381e42b-2a92-63f7-3acf-b0f41b662a41@redhat.com>
-Subject: Re: [PATCH v2 4/6] nbd/server: Add va_list form of
- nbd_negotiate_send_rep_err()
-References: <20180110230825.18321-1-eblake@redhat.com>
- <20180110230825.18321-5-eblake@redhat.com>
- <d9f7043e-450a-6cd3-dc66-8799cf018027@virtuozzo.com>
-In-Reply-To: <d9f7043e-450a-6cd3-dc66-8799cf018027@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Thu, Jan 11, 2018 at 03:31:08PM +0000, Peter Maydell wrote:
+> On 9 January 2018 at 04:11, Michael S. Tsirkin <mst@redhat.com> wrote:
+> > So it's an existing bug exposed by the test.
+> > I've reverted the test for now but I didn't rebase
+> > as there are downstream trees based on this pull req.
+> 
+> Hi -- I'm afraid this seems to have conflicts with the sparc
+> pullreq. I tried the simple textual merge resolution for
+> hw/pci-host/apb.c, but that then fails to compile.
+> Can you fix up and resend, please?
+> 
+> thanks
+> -- PMM
 
-On 01/11/2018 12:05 PM, Vladimir Sementsov-Ogievskiy wrote:
-> 11.01.2018 02:08, Eric Blake wrote:
->> This will be useful for the next patch.
->>
->> Based on a patch by Vladimir Sementsov-Ogievskiy
->>
->> Signed-off-by: Eric Blake <eblake@redhat.com>
->> ---
->> =C2=A0 nbd/server.c | 24 ++++++++++++++++++------
->> =C2=A0 1 file changed, 18 insertions(+), 6 deletions(-)
->>
+It should be pretty simple - all we did on pci tree
+is change register bus to register root bus.
+I'll do the merge.
 
->> -static int GCC_FMT_ATTR(4, 5)
->> -nbd_negotiate_send_rep_err(NBDClient *client, uint32_t type,
->> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0 Error **errp, const char *fmt, ...)
->> +static int GCC_FMT_ATTR(4, 0)
->> +nbd_negotiate_send_rep_verr(NBDClient *client, uint32_t type,
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0 Error **errp, const char *fmt, va_list va)
->=20
-> Hmm you placed fmt and va after errp. Previously we discussed one
-> exclusion from "errp should be last" -
-> "...", variable number of arguments. So, it is new exclusion (or I
-> missed something?).. Looks good for me,
-> anyway, as it corresponds to "errp, fmt, ..." notation.
-
-Indeed, it is precisely because I value consistency between 'fmt, ...'
-and 'fmt, va_list' higher than 'errp last' that I rearranged things from
-your patch into the form I used.  Or worded another way, even though
-va_list is only one argument in name, I treat it the same as the
-variable number of arguments that warrants the exception to the errp
-last rule of thumb.
-
->=20
-> Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
->=20
-
-Thanks; I think this series is now ready for staging on my NBD queue;
-although my next pull request won't be until after the weekend.
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---Xok5HUy2nbSTi4rMMRx0EdLkb90xM7s5v
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlpXwfsACgkQp6FrSiUn
-Q2rrewf/Y1/E94nQcDcjYoMQeOalZB6eqfq4dYLkpMqvnMs/ZMALP3EkUJu4Rdou
-/2nPALFPTWDAM1E2c18qZ472KMoPV5DLKwJ779/dRJYDsZOw2rYf0byG8MPko0pz
-T5O46kRX62KCrQxIOgs4gcMvK0zzNGuI8WHKaearkKd5kZMdZ0mnWlDno73e9Kee
-vAceabK7Oa0n5A7iic+jOJXezcAEfEOZB/gkZd0gvYViJHYZFAz6YOF/HiaFZZW3
-X6C/kkqAaAmAniNHxWInB13FV0vL+VT/cYD+N4VLYuBCVEJPI2BRhG4KXqd1wLJs
-9Kx6ZzJiC1m60q1lmSvQgta6jg6Wyg==
-=OkN8
------END PGP SIGNATURE-----
-
---Xok5HUy2nbSTi4rMMRx0EdLkb90xM7s5v--
+-- 
+MST
