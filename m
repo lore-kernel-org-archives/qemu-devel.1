@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43043)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45647)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mjc@sifive.com>) id 1eZhOL-0006pH-Pq
-	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 13:15:54 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1eZhTB-0000XP-Lb
+	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 13:20:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mjc@sifive.com>) id 1eZhOK-0003z7-E3
-	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 13:15:53 -0500
-Received: from mail-ot0-x244.google.com ([2607:f8b0:4003:c0f::244]:39177)
+	(envelope-from <peter.maydell@linaro.org>) id 1eZhTA-00033q-RA
+	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 13:20:53 -0500
+Received: from mail-oi0-x242.google.com ([2607:f8b0:4003:c06::242]:44809)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mjc@sifive.com>) id 1eZhOK-0003xw-7a
-	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 13:15:52 -0500
-Received: by mail-ot0-x244.google.com with SMTP id 37so2859516otv.6
-	for <qemu-devel@nongnu.org>; Thu, 11 Jan 2018 10:15:52 -0800 (PST)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1eZhTA-00033S-La
+	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 13:20:52 -0500
+Received: by mail-oi0-x242.google.com with SMTP id g128so2232780oib.11
+	for <qemu-devel@nongnu.org>; Thu, 11 Jan 2018 10:20:52 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <8b8162d6-f20e-270c-2aad-9c34eb00759d@linaro.org>
-References: <1515637324-96034-1-git-send-email-mjc@sifive.com>
-	<1515637324-96034-9-git-send-email-mjc@sifive.com>
-	<8b8162d6-f20e-270c-2aad-9c34eb00759d@linaro.org>
-From: Michael Clark <mjc@sifive.com>
-Date: Fri, 12 Jan 2018 07:15:50 +1300
-Message-ID: <CAHNT7NvBViMnOu1LsxvZn3n2c_2mY-ionLdyJgmheOYhXhYAfg@mail.gmail.com>
+In-Reply-To: <20171218174552.18871-3-richard.henderson@linaro.org>
+References: <20171218174552.18871-1-richard.henderson@linaro.org>
+	<20171218174552.18871-3-richard.henderson@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 11 Jan 2018 18:20:31 +0000
+Message-ID: <CAFEAcA9igMy9u0WdTBvJWms1G4Cd2m0QXUucJeXCJ1Uo=7OAMw@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v3 08/21] RISC-V TCG Code Generation
+Subject: Re: [Qemu-devel] [PATCH 02/23] target/arm: Add SVE decode skeleton
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,52 +30,54 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Richard Henderson <richard.henderson@linaro.org>
-Cc: qemu-devel@nongnu.org, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Palmer Dabbelt <palmer@sifive.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>, RISC-V Patches <patches@groups.riscv.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>
 
-On Fri, Jan 12, 2018 at 4:47 AM, Richard Henderson <
-richard.henderson@linaro.org> wrote:
-
-> On 01/10/2018 06:21 PM, Michael Clark wrote:
-> > TCG code generation for the RV32IMAFDC and RV64IMAFDC. The QEMU
-> > RISC-V code generator has complete coverage for the Base ISA v2.2,
-> > Privileged ISA v1.9.1 and Privileged ISA v1.10:
-> >
-> > - RISC-V Instruction Set Manual Volume I: User-Level ISA Version 2.2
-> > - RISC-V Instruction Set Manual Volume II: Privileged ISA Version 1.9.1
-> > - RISC-V Instruction Set Manual Volume II: Privileged ISA Version 1.10
-> >
-> > Signed-off-by: Michael Clark <mjc@sifive.com>
-> > ---
-> >  target/riscv/instmap.h   |  377 +++++++++
-> >  target/riscv/translate.c | 1982 ++++++++++++++++++++++++++++++
-> ++++++++++++++++
-> >  2 files changed, 2359 insertions(+)
-> >  create mode 100644 target/riscv/instmap.h
-> >  create mode 100644 target/riscv/translate.c
+On 18 December 2017 at 17:45, Richard Henderson
+<richard.henderson@linaro.org> wrote:
+> Including only 4, as-yet unimplemented, instruction patterns
+> so that the whole thing compiles.
 >
-> While there is forward progress within translate.c, it would seem that
-> quite a
-> lot of my v1 comments are not yet addressed.
->
-> Also,
->
-> > +        if (!riscv_has_ext(env, RVC)) {
->
-> You may not access env in this way.  Any code generation differences must
-> be
-> computable from either unchanging values on the cpu or tb->flags.  MISA is
-> not
-> unchanging -- you allow runtime modification.
->
-> Again, the partial patch I saw from Stefan would fix this.
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> ---
+>  target/arm/translate-a64.h | 111 +++++++++++++++++++++++++++++++++++++++++++++
+>  target/arm/translate-a64.c |  91 +++++++------------------------------
+>  target/arm/translate-sve.c |  48 ++++++++++++++++++++
+>  .gitignore                 |   1 +
+>  target/arm/Makefile.objs   |  11 +++++
+>  target/arm/sve.def         |  45 ++++++++++++++++++
+>  6 files changed, 233 insertions(+), 74 deletions(-)
+>  create mode 100644 target/arm/translate-a64.h
+>  create mode 100644 target/arm/translate-sve.c
+>  create mode 100644 target/arm/sve.def
+
+This will be easier to review if you split the stuff that's
+purely code motion from the .c file to the .h into its own
+patch.
 
 
-We'll definately address this in the next spin...
+> diff --git a/target/arm/Makefile.objs b/target/arm/Makefile.objs
+> index c2d32988f9..d1ca1f799b 100644
+> --- a/target/arm/Makefile.objs
+> +++ b/target/arm/Makefile.objs
+> @@ -10,3 +10,14 @@ obj-y += gdbstub.o
+>  obj-$(TARGET_AARCH64) += cpu64.o translate-a64.o helper-a64.o gdbstub64.o
+>  obj-y += crypto_helper.o
+>  obj-$(CONFIG_SOFTMMU) += arm-powerctl.o
+> +
+> +DECODETREE = $(SRC_PATH)/scripts/decodetree.py
+> +
+> +target/arm/decode-sve.inc.c: $(SRC_PATH)/target/arm/sve.def $(DECODETREE)
+> +       $(call quiet-command,\
+> +         $(PYTHON) $(DECODETREE) -o $@ --decode disas_sve \
+> +               $(SRC_PATH)/target/arm/sve.def || rm -f $@, \
+> +               "GEN", $@)
+> +
+> +target/arm/translate-sve.o: target/arm/decode-sve.inc.c
+> +obj-$(TARGET_AARCH64) += translate-sve.o
 
-Could you pleease forward me the patch or send me a pointer to where i
-might find it?
+If we're serious about the idea that this decoder script is
+general purpose, we should have a rules.mak rune for
+generally invoking it to create a decode-foo.inc.c from a foo.def.
 
-Assuming we can use flags and misa is stored in the lower 26-bits then we
-change riscv_has_ext to take an int. e.g.
-
-riscv_has_ext(tb->flags, RVC))
+thanks
+-- PMM
