@@ -1,23 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47907)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48007)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mjc@sifive.com>) id 1eZSWX-000349-GH
-	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 21:23:23 -0500
+	(envelope-from <mjc@sifive.com>) id 1eZSWe-0003Au-Aj
+	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 21:23:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mjc@sifive.com>) id 1eZSWU-00086u-5r
-	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 21:23:21 -0500
-Received: from mail-pg0-x242.google.com ([2607:f8b0:400e:c05::242]:34026)
+	(envelope-from <mjc@sifive.com>) id 1eZSWb-0008Fc-Hy
+	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 21:23:28 -0500
+Received: from mail-pg0-x241.google.com ([2607:f8b0:400e:c05::241]:33257)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mjc@sifive.com>) id 1eZSWT-00085z-Rm
-	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 21:23:18 -0500
-Received: by mail-pg0-x242.google.com with SMTP id j4so1683231pgp.1
-	for <qemu-devel@nongnu.org>; Wed, 10 Jan 2018 18:23:17 -0800 (PST)
+	(Exim 4.71) (envelope-from <mjc@sifive.com>) id 1eZSWb-0008F7-95
+	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 21:23:25 -0500
+Received: by mail-pg0-x241.google.com with SMTP id i196so1682324pgd.0
+	for <qemu-devel@nongnu.org>; Wed, 10 Jan 2018 18:23:25 -0800 (PST)
 From: Michael Clark <mjc@sifive.com>
-Date: Wed, 10 Jan 2018 18:21:43 -0800
-Message-Id: <1515637324-96034-1-git-send-email-mjc@sifive.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v3 00/21] RISC-V QEMU Port Submission v3
+Date: Wed, 10 Jan 2018 18:21:49 -0800
+Message-Id: <1515637324-96034-7-git-send-email-mjc@sifive.com>
+In-Reply-To: <1515637324-96034-1-git-send-email-mjc@sifive.com>
+References: <1515637324-96034-1-git-send-email-mjc@sifive.com>
+Subject: [Qemu-devel] [PATCH v3 06/21] RISC-V FPU Support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,362 +28,643 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Michael Clark <mjc@sifive.com>, Palmer Dabbelt <palmer@sifive.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, RISC-V Patches <patches@groups.riscv.org>
 
-QEMU RISC-V Emulation Support (RV64GC, RV32GC)
+Helper routines for FPU instructions and NaN definitions.
 
-This patch series has major clean ups to target/riscv. There may be
-some feedback that has been missed however the changelog is growing
-quite large so we have decided to respin the patch series. No new
-features have been added however a number of bugs have been fixed.
-
-The git tree for this v3 patch series (squashed and rebased):
-
-- https://github.com/riscv/riscv-qemu/tree/qemu-upstream-v3
-
-The git tree for the v2 patch series with full review commit history:
-
-- https://github.com/riscv/riscv-qemu/tree/qemu-upstream-v2
-
-The git tree for the v1 patch series with full review commit history:
-
-- https://github.com/riscv/riscv-qemu/tree/qemu-upstream-v1
-
-We're adding Palmer Dabbelt as a maintainer so that we have at least
-two full-time RISC-V developers available to work on the port.
-
-*** Known Issues ***
-
-- Disassembler has some checkpatch warnings for the sake of code brevity
-- scripts/qemu-binfmt-conf.sh has checkpatch warnings due to line length
-- PMP (Physical Memory Protection) is as-of-yet unused and needs testing
-
-*** Changelog ***
-
-v3
-
-- Fix indentation in PMP and HTIF debug macros
-- Fix disassembler checkpatch open brace '{' on next line errors
-- NOTE: the other checkpatch issues have been reviewed previously
-
-v2
-
-- Remove redundant NULL terminators from disassembler register arrays
-- Change disassembler register name arrays to const
-- Refine disassembler internal function names
-- Update dates in disassembler copyright message
-- Remove #ifdef CONFIG_USER_ONLY version of cpu_has_work
-- Use ULL suffix on 64-bit constants
-- Move riscv_cpu_mmu_index from cpu.h to helper.c
-- Move riscv_cpu_hw_interrupts_pending from cpu.h to helper.c
-- Remove redundant TARGET_HAS_ICE from cpu.h
-- Use qemu_irq instead of void* for irq definition in cpu.h
-- Remove duplicate typedef from struct CPURISCVState
-- Remove redundant g_strdup from cpu_register
-- Remove redundant tlb_flush from riscv_cpu_reset
-- Remove redundant mode calculation from get_physical_address
-- Remove redundant debug mode printf and dcsr comment
-- Remove redundant clearing of MSB for bare physical addresses
-- Use g_assert_not_reached for invalid mode in get_physical_address
-- Use g_assert_not_reached for unreachable checks in get_physical_address
-- Use g_assert_not_reached for unreachable type in raise_mmu_exception
-- Return exception instead of aborting for misaligned fetches
-- Move exception defines from cpu.h to cpu_bits.h
-- Remove redundant breakpoint control definitions from cpu_bits.h
-- Implement riscv_cpu_unassigned_access exception handling
-- Log and raise exceptions for unimplemented CSRs
-- Match Spike HTIF exit behavior - don’t print TEST-PASSED
-- Make frm,fflags,fcsr writes trap when mstatus.FS is clear
-- Use g_assert_not_reached for unreachable invalid mode
-- Make hret,uret,dret generate illegal instructions
-- Move riscv_cpu_dump_state and int/fpr regnames to cpu.c
-- Lift interrupt flag and mask into constants in cpu_bits.h
-- Change trap debugging to use qemu_log_mask LOG_TRACE 
-- Change CSR debugging to use qemu_log_mask LOG_TRACE
-- Change PMP debugging to use qemu_log_mask LOG_TRACE
-- Remove commented code from pmp.c
-- Change CpuInfoRISCV qapi schema docs to Since 2.12
-- Change RV feature macro to use target_ulong cast
-- Remove riscv_feature and instead use misa extension flags
-- Make riscv_flush_icache_syscall a no-op
-- Undo checkpatch whitespace fixes in unrelated linux-user code
-- Remove redudant constants and tidy up cpu_bits.h
-- Make helper_fence_i a no-op
-- Move include "exec/cpu-all" to end of cpu.h
-- Rename set_privilege to riscv_set_mode
-- Move redundant forward declaration for cpu_riscv_translate_address
-- Remove TCGV_UNUSED from riscv_translate_init
-- Add comment to pmp.c stating the code is untested and currently unused
-- Use ctz to simplify decoding of PMP NAPOT address ranges
-- Change pmp_is_in_range to use than equal for end addresses
-- Fix off by one error in pmp_update_rule
-- Rearrange PMP_DEBUG so that formatting is compile-time checked
-- Rearrange trap debugging so that formatting is compile-time checked
-- Rearrange PLIC debugging so that formatting is compile-time checked
-- Use qemu_log/qemu_log_mask for HTIF logging and debugging
-- Move exception and interrupt names into cpu.c
-- Add Palmer Dabbelt as a RISC-V Maintainer
-- Rebase against current qemu master branch
-
-v1
-
-- initial version based on forward port from riscv-qemu repository
-
-*** Background ***
-
-"RISC-V is an open, free ISA enabling a new era of processor innovation
-through open standard collaboration. Born in academia and research,
-RISC-V ISA delivers a new level of free, extensible software and
-hardware freedom on architecture, paving the way for the next 50 years
-of computing design and innovation."
-
-The QEMU RISC-V port has been developed and maintained out-of-tree for
-several years by Sagar Karandikar and Bastian Koppelmann. The RISC-V
-Privileged specification has evolved substantially over this period but
-has recently been solidifying. The RISC-V Base ISA has been frozon for
-some time and the Privileged ISA, GCC toolchain and Linux ABI are now
-quite stable. I have recently joined Sagar and Bastian as a RISC-V QEMU
-Maintainer and hope to support upstreaming the port. 
-
-There are multiple vendors taping out, preparing to ship, or shipping
-silicon that implements the RISC-V Privileged ISA Version 1.10. There
-are also several RISC-V Soft-IP cores implementing Privileged ISA
-Version 1.10 that run on FPGA such as SiFive's Freedom U500 Platform
-and the U54‑MC RISC-V Core IP, among many more implementations from a
-variety of vendors. See https://riscv.org/ for more details.
-
-RISC-V support was upstreamed in binutils 2.28 and GCC 7.1 in the first
-half of 2016. RISC-V support is now available in LLVM top-of-tree and
-the RISC-V Linux port was accepted into Linux 4.15-rc1 late last year
-and will be available in the upcoming Linux 4.15 release. RISC-V GLIBC
-patches are currently under review and it is hoped that RISC-V support
-will be added in the GLIBC 2.27 release.  We believe it is timely to
-submit the RISC-V QEMU port for upstream review with the goal of
-incorporating RISC-V support into the upcoming QEMU 2.12 release.
-
-The RISC-V QEMU port is still under active development, mostly with
-respect to device emulation, the addition of Hypervisor support as
-specified in the RISC-V Draft Privileged ISA Version 1.11, and Vector
-support once the first draft is finalized later this year. We believe
-now is the appropriate time for RISC-V QEMU development to be carried
-out in the main QEMU repository as the code will benefit from more
-rigorous review. The RISC-V QEMU port currently supports all the ISA
-extensions that have been finalized and frozen in the Base ISA.
-
-Blog post about recent additions to RISC-V QEMU: https://goo.gl/fJ4zgk
-
-The RISC-V QEMU wiki: https://github.com/riscv/riscv-qemu/wiki
-
-Instructions for building a busybox+dropbear root image, BBL (Berkeley
-Boot Loader) and linux kernel image for use with the RISC-V QEMU
-'virt' machine: https://github.com/michaeljclark/busybear-linux
-
-*** Overview ***
-
-The RISC-V QEMU port implements the following specifications:
-
-- RISC-V Instruction Set Manual Volume I: User-Level ISA Version 2.2
-- RISC-V Instruction Set Manual Volume II: Privileged ISA Version 1.9.1
-- RISC-V Instruction Set Manual Volume II: Privileged ISA Version 1.10
-
-The RISC-V QEMU port supports the following instruction set extensions:
-
-- RV32GC with Supervisor-mode and User-mode (RV32IMAFDCSU)
-- RV64GC with Supervisor-mode and User-mode (RV64IMAFDCSU)
-
-The RISC-V QEMU port adds the following targets to QEMU:
-
-- riscv32-softmmu
-- riscv64-softmmu
-- riscv32-linux-user
-- riscv64-linux-user
-
-The RISC-V QEMU port supports the following hardware:
-
-- HTIF Console (Host Target Interface)
-- SiFive CLINT (Core Local Interruptor) for Timer interrupts and IPIs
-- SiFive PLIC (Platform Level Interrupt Controller)
-- SiFive UART, PRCI, AON, PWM, QSPI support is partially implemented
-- VirtIO MMIO (GPEX PCI support will be added in a future patch)
-- Generic 16550A UART emulation using 'hw/char/serial.c'
-- Experimental SMP support (PLIC and CLINT) on the 'virt' machine
-
-The RISC-V QEMU full system emulator supports 5 machines:
-
-- 'spike_v1.9';  CLINT, PLIC, HTIF console, config-string, Priv v1.9.1
-- 'spike_v1.10'; CLINT, PLIC, HTIF console, device-tree, Priv v1.10
-- 'virt'; CLINT, PLIC, 16550A UART, VirtIO, device-tree, Priv v1.10
-- 'sifive_e300'; CLINT, PLIC, SiFive UART, HiFive1 compat, Priv v1.10
-- 'sifive_u500'; CLINT, PLIC, SiFive UART, device-tree, Priv v1.10
-
-This is a list of RISC-V QEMU Port Contributors:
-
-- Alex Suykov
-- Antony Pavlov
-- Bastian Koppelmann
-- Bruce Hoult
-- Chih-Min Chao
-- Daire McNamara
-- David Abdurachmanov
-- Ivan Griffin
-- Kito Cheng
-- Michael Clark
-- Palmer Dabbelt
-- Sagar Karandikar
-- Stefan O'Rear
-
-Notes:
-
-- contributor email addresses available off-list on request.
-- checkpatch has been run on all 21 patches.
-- checkpatch exceptions are noted in 2 patches that have errors.
-- tested linux on 'spike_v1.9', 'spike_v1.10' and 'virt' machines
-- passes "make check" on full build for all targets
-
-This patch series includes the following patches:
-
-Michael Clark (21):
-  RISC-V Maintainers
-  RISC-V ELF Machine Definition
-  RISC-V CPU Core Definition
-  RISC-V Disassembler
-  RISC-V CPU Helpers
-  RISC-V FPU Support
-  RISC-V GDB Stub
-  RISC-V TCG Code Generation
-  RISC-V Physical Memory Protection
-  RISC-V Linux User Emulation
-  RISC-V HTIF Console
-  RISC-V HART Array
-  SiFive RISC-V CLINT Block
-  SiFive RISC-V PLIC Block
-  RISC-V Spike Machines
-  RISC-V VirtIO Machine
-  SiFive RISC-V UART Device
-  SiFive RISC-V PRCI Block
-  SiFive Freedom E300 RISC-V Machine
-  SiFive Freedom U500 RISC-V Machine
-  RISC-V Build Infrastructure
-
- MAINTAINERS                            |   11 +
- Makefile.objs                          |    1 +
- arch_init.c                            |    2 +
- configure                              |   11 +
- cpus.c                                 |    6 +
- default-configs/riscv32-linux-user.mak |    1 +
- default-configs/riscv32-softmmu.mak    |    4 +
- default-configs/riscv64-linux-user.mak |    1 +
- default-configs/riscv64-softmmu.mak    |    4 +
- disas.c                                |    2 +
- disas/Makefile.objs                    |    1 +
- disas/riscv.c                          | 3054 ++++++++++++++++++++++++++++++++
- fpu/softfloat-specialize.h             |    7 +-
- hw/riscv/Makefile.objs                 |   12 +
- hw/riscv/riscv_elf.c                   |  244 +++
- hw/riscv/riscv_hart.c                  |   95 +
- hw/riscv/riscv_htif.c                  |  373 ++++
- hw/riscv/sifive_clint.c                |  312 ++++
- hw/riscv/sifive_e300.c                 |  232 +++
- hw/riscv/sifive_plic.c                 |  554 ++++++
- hw/riscv/sifive_prci.c                 |  107 ++
- hw/riscv/sifive_u500.c                 |  338 ++++
- hw/riscv/sifive_uart.c                 |  182 ++
- hw/riscv/spike_v1_09.c                 |  207 +++
- hw/riscv/spike_v1_10.c                 |  281 +++
- hw/riscv/virt.c                        |  364 ++++
- include/disas/bfd.h                    |    2 +
- include/elf.h                          |    2 +
- include/hw/riscv/riscv_elf.h           |   69 +
- include/hw/riscv/riscv_hart.h          |   45 +
- include/hw/riscv/riscv_htif.h          |   62 +
- include/hw/riscv/sifive_clint.h        |   56 +
- include/hw/riscv/sifive_e300.h         |   79 +
- include/hw/riscv/sifive_plic.h         |   91 +
- include/hw/riscv/sifive_prci.h         |   43 +
- include/hw/riscv/sifive_u500.h         |   69 +
- include/hw/riscv/sifive_uart.h         |   76 +
- include/hw/riscv/spike.h               |   51 +
- include/hw/riscv/virt.h                |   73 +
- include/sysemu/arch_init.h             |    1 +
- linux-user/elfload.c                   |   22 +
- linux-user/main.c                      |  114 ++
- linux-user/riscv/syscall_nr.h          |  275 +++
- linux-user/riscv/target_cpu.h          |   18 +
- linux-user/riscv/target_signal.h       |   23 +
- linux-user/riscv/target_structs.h      |   46 +
- linux-user/riscv/target_syscall.h      |   56 +
- linux-user/riscv/termbits.h            |  220 +++
- linux-user/signal.c                    |  203 ++-
- linux-user/syscall.c                   |    2 +
- linux-user/syscall_defs.h              |   13 +-
- qapi-schema.json                       |   14 +-
- scripts/qemu-binfmt-conf.sh            |   13 +-
- target/riscv/Makefile.objs             |    2 +
- target/riscv/cpu.c                     |  391 ++++
- target/riscv/cpu.h                     |  271 +++
- target/riscv/cpu_bits.h                |  417 +++++
- target/riscv/cpu_user.h                |   26 +
- target/riscv/fpu_helper.c              |  591 ++++++
- target/riscv/gdbstub.c                 |   59 +
- target/riscv/helper.c                  |  499 ++++++
- target/riscv/helper.h                  |   78 +
- target/riscv/instmap.h                 |  377 ++++
- target/riscv/op_helper.c               |  682 +++++++
- target/riscv/pmp.c                     |  386 ++++
- target/riscv/pmp.h                     |   70 +
- target/riscv/trace-events              |    1 +
- target/riscv/translate.c               | 1982 +++++++++++++++++++++
- target/riscv/user_atomic.c             |  291 +++
- 69 files changed, 14256 insertions(+), 11 deletions(-)
- create mode 100644 default-configs/riscv32-linux-user.mak
- create mode 100644 default-configs/riscv32-softmmu.mak
- create mode 100644 default-configs/riscv64-linux-user.mak
- create mode 100644 default-configs/riscv64-softmmu.mak
- create mode 100644 disas/riscv.c
- create mode 100644 hw/riscv/Makefile.objs
- create mode 100644 hw/riscv/riscv_elf.c
- create mode 100644 hw/riscv/riscv_hart.c
- create mode 100644 hw/riscv/riscv_htif.c
- create mode 100644 hw/riscv/sifive_clint.c
- create mode 100644 hw/riscv/sifive_e300.c
- create mode 100644 hw/riscv/sifive_plic.c
- create mode 100644 hw/riscv/sifive_prci.c
- create mode 100644 hw/riscv/sifive_u500.c
- create mode 100644 hw/riscv/sifive_uart.c
- create mode 100644 hw/riscv/spike_v1_09.c
- create mode 100644 hw/riscv/spike_v1_10.c
- create mode 100644 hw/riscv/virt.c
- create mode 100644 include/hw/riscv/riscv_elf.h
- create mode 100644 include/hw/riscv/riscv_hart.h
- create mode 100644 include/hw/riscv/riscv_htif.h
- create mode 100644 include/hw/riscv/sifive_clint.h
- create mode 100644 include/hw/riscv/sifive_e300.h
- create mode 100644 include/hw/riscv/sifive_plic.h
- create mode 100644 include/hw/riscv/sifive_prci.h
- create mode 100644 include/hw/riscv/sifive_u500.h
- create mode 100644 include/hw/riscv/sifive_uart.h
- create mode 100644 include/hw/riscv/spike.h
- create mode 100644 include/hw/riscv/virt.h
- create mode 100644 linux-user/riscv/syscall_nr.h
- create mode 100644 linux-user/riscv/target_cpu.h
- create mode 100644 linux-user/riscv/target_signal.h
- create mode 100644 linux-user/riscv/target_structs.h
- create mode 100644 linux-user/riscv/target_syscall.h
- create mode 100644 linux-user/riscv/termbits.h
- create mode 100644 target/riscv/Makefile.objs
- create mode 100644 target/riscv/cpu.c
- create mode 100644 target/riscv/cpu.h
- create mode 100644 target/riscv/cpu_bits.h
- create mode 100644 target/riscv/cpu_user.h
+Signed-off-by: Michael Clark <mjc@sifive.com>
+---
+ fpu/softfloat-specialize.h |   7 +-
+ target/riscv/fpu_helper.c  | 591 +++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 595 insertions(+), 3 deletions(-)
  create mode 100644 target/riscv/fpu_helper.c
- create mode 100644 target/riscv/gdbstub.c
- create mode 100644 target/riscv/helper.c
- create mode 100644 target/riscv/helper.h
- create mode 100644 target/riscv/instmap.h
- create mode 100644 target/riscv/op_helper.c
- create mode 100644 target/riscv/pmp.c
- create mode 100644 target/riscv/pmp.h
- create mode 100644 target/riscv/trace-events
- create mode 100644 target/riscv/translate.c
- create mode 100644 target/riscv/user_atomic.c
 
+diff --git a/fpu/softfloat-specialize.h b/fpu/softfloat-specialize.h
+index de2c5d5..49ee578 100644
+--- a/fpu/softfloat-specialize.h
++++ b/fpu/softfloat-specialize.h
+@@ -114,7 +114,8 @@ float32 float32_default_nan(float_status *status)
+ #if defined(TARGET_SPARC) || defined(TARGET_M68K)
+     return const_float32(0x7FFFFFFF);
+ #elif defined(TARGET_PPC) || defined(TARGET_ARM) || defined(TARGET_ALPHA) || \
+-      defined(TARGET_XTENSA) || defined(TARGET_S390X) || defined(TARGET_TRICORE)
++      defined(TARGET_XTENSA) || defined(TARGET_S390X) || \
++      defined(TARGET_TRICORE) || defined(TARGET_RISCV)
+     return const_float32(0x7FC00000);
+ #elif defined(TARGET_HPPA)
+     return const_float32(0x7FA00000);
+@@ -139,7 +140,7 @@ float64 float64_default_nan(float_status *status)
+ #if defined(TARGET_SPARC) || defined(TARGET_M68K)
+     return const_float64(LIT64(0x7FFFFFFFFFFFFFFF));
+ #elif defined(TARGET_PPC) || defined(TARGET_ARM) || defined(TARGET_ALPHA) || \
+-      defined(TARGET_S390X)
++      defined(TARGET_S390X) || defined(TARGET_RISCV)
+     return const_float64(LIT64(0x7FF8000000000000));
+ #elif defined(TARGET_HPPA)
+     return const_float64(LIT64(0x7FF4000000000000));
+@@ -189,7 +190,7 @@ float128 float128_default_nan(float_status *status)
+         r.high = LIT64(0x7FFF7FFFFFFFFFFF);
+     } else {
+         r.low = LIT64(0x0000000000000000);
+-#if defined(TARGET_S390X) || defined(TARGET_PPC)
++#if defined(TARGET_S390X) || defined(TARGET_PPC) || defined(TARGET_RISCV)
+         r.high = LIT64(0x7FFF800000000000);
+ #else
+         r.high = LIT64(0xFFFF800000000000);
+diff --git a/target/riscv/fpu_helper.c b/target/riscv/fpu_helper.c
+new file mode 100644
+index 0000000..ada985f
+--- /dev/null
++++ b/target/riscv/fpu_helper.c
+@@ -0,0 +1,591 @@
++/*
++ * RISC-V FPU Emulation Helpers for QEMU.
++ *
++ * Author: Sagar Karandikar, sagark@eecs.berkeley.edu
++ *
++ *
++ * This library is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU Lesser General Public
++ * License as published by the Free Software Foundation; either
++ * version 2 of the License, or (at your option) any later version.
++ *
++ * This library is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * Lesser General Public License for more details.
++ *
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with this library; if not, see <http://www.gnu.org/licenses/>.
++ */
++
++#include "qemu/osdep.h"
++#include <stdlib.h>
++#include "cpu.h"
++#include "qemu/host-utils.h"
++#include "exec/helper-proto.h"
++
++/* convert RISC-V rounding mode to IEEE library numbers */
++unsigned int ieee_rm[] = {
++    float_round_nearest_even,
++    float_round_to_zero,
++    float_round_down,
++    float_round_up,
++    float_round_ties_away
++};
++
++/* obtain rm value to use in computation
++ * as the last step, convert rm codes to what the softfloat library expects
++ * Adapted from Spike's decode.h:RM
++ */
++#define RM ({                                             \
++if (rm == 7) {                                            \
++    rm = env->frm;                               \
++}                                                         \
++if (rm > 4) {                                             \
++    helper_raise_exception(env, RISCV_EXCP_ILLEGAL_INST); \
++}                                                         \
++ieee_rm[rm]; })
++
++#ifndef CONFIG_USER_ONLY
++#define require_fp if (!(env->mstatus & MSTATUS_FS)) { \
++    helper_raise_exception(env, RISCV_EXCP_ILLEGAL_INST); \
++}
++#else
++#define require_fp /* nop */
++#endif
++
++/* convert softfloat library flag numbers to RISC-V */
++unsigned int softfloat_flags_to_riscv(unsigned int flags)
++{
++    int rv_flags = 0;
++    rv_flags |= (flags & float_flag_inexact) ? 1 : 0;
++    rv_flags |= (flags & float_flag_underflow) ? 2 : 0;
++    rv_flags |= (flags & float_flag_overflow) ? 4 : 0;
++    rv_flags |= (flags & float_flag_divbyzero) ? 8 : 0;
++    rv_flags |= (flags & float_flag_invalid) ? 16 : 0;
++    return rv_flags;
++}
++
++/* adapted from Spike's decode.h:set_fp_exceptions */
++#define set_fp_exceptions() do { \
++    env->fflags |= softfloat_flags_to_riscv(get_float_exception_flags(\
++                            &env->fp_status)); \
++    set_float_exception_flags(0, &env->fp_status); \
++} while (0)
++
++uint64_t helper_fmadd_s(CPURISCVState *env, uint64_t frs1, uint64_t frs2,
++                        uint64_t frs3, uint64_t rm)
++{
++    require_fp;
++    set_float_rounding_mode(RM, &env->fp_status);
++    frs1 = float32_muladd(frs1, frs2, frs3, 0, &env->fp_status);
++    set_fp_exceptions();
++    return frs1;
++}
++
++uint64_t helper_fmadd_d(CPURISCVState *env, uint64_t frs1, uint64_t frs2,
++                        uint64_t frs3, uint64_t rm)
++{
++    require_fp;
++    set_float_rounding_mode(RM, &env->fp_status);
++    frs1 = float64_muladd(frs1, frs2, frs3, 0, &env->fp_status);
++    set_fp_exceptions();
++    return frs1;
++}
++
++uint64_t helper_fmsub_s(CPURISCVState *env, uint64_t frs1, uint64_t frs2,
++                        uint64_t frs3, uint64_t rm)
++{
++    require_fp;
++    set_float_rounding_mode(RM, &env->fp_status);
++    frs1 = float32_muladd(frs1, frs2, frs3 ^ (uint32_t)INT32_MIN, 0,
++                          &env->fp_status);
++    set_fp_exceptions();
++    return frs1;
++}
++
++uint64_t helper_fmsub_d(CPURISCVState *env, uint64_t frs1, uint64_t frs2,
++                        uint64_t frs3, uint64_t rm)
++{
++    require_fp;
++    set_float_rounding_mode(RM, &env->fp_status);
++    frs1 = float64_muladd(frs1, frs2, frs3 ^ (uint64_t)INT64_MIN, 0,
++                          &env->fp_status);
++    set_fp_exceptions();
++    return frs1;
++}
++
++uint64_t helper_fnmsub_s(CPURISCVState *env, uint64_t frs1, uint64_t frs2,
++                         uint64_t frs3, uint64_t rm)
++{
++    require_fp;
++    set_float_rounding_mode(RM, &env->fp_status);
++    frs1 = float32_muladd(frs1 ^ (uint32_t)INT32_MIN, frs2, frs3, 0,
++                          &env->fp_status);
++    set_fp_exceptions();
++    return frs1;
++}
++
++uint64_t helper_fnmsub_d(CPURISCVState *env, uint64_t frs1, uint64_t frs2,
++                         uint64_t frs3, uint64_t rm)
++{
++    require_fp;
++    set_float_rounding_mode(RM, &env->fp_status);
++    frs1 = float64_muladd(frs1 ^ (uint64_t)INT64_MIN, frs2, frs3, 0,
++                          &env->fp_status);
++    set_fp_exceptions();
++    return frs1;
++}
++
++uint64_t helper_fnmadd_s(CPURISCVState *env, uint64_t frs1, uint64_t frs2,
++                         uint64_t frs3, uint64_t rm)
++{
++    require_fp;
++    set_float_rounding_mode(RM, &env->fp_status);
++    frs1 = float32_muladd(frs1 ^ (uint32_t)INT32_MIN, frs2,
++                          frs3 ^ (uint32_t)INT32_MIN, 0, &env->fp_status);
++    set_fp_exceptions();
++    return frs1;
++}
++
++uint64_t helper_fnmadd_d(CPURISCVState *env, uint64_t frs1, uint64_t frs2,
++                         uint64_t frs3, uint64_t rm)
++{
++    require_fp;
++    set_float_rounding_mode(RM, &env->fp_status);
++    frs1 = float64_muladd(frs1 ^ (uint64_t)INT64_MIN, frs2,
++                          frs3 ^ (uint64_t)INT64_MIN, 0, &env->fp_status);
++    set_fp_exceptions();
++    return frs1;
++}
++
++uint64_t helper_fadd_s(CPURISCVState *env, uint64_t frs1, uint64_t frs2,
++                       uint64_t rm)
++{
++    require_fp;
++    set_float_rounding_mode(RM, &env->fp_status);
++    frs1 = float32_add(frs1, frs2, &env->fp_status);
++    set_fp_exceptions();
++    return frs1;
++}
++
++uint64_t helper_fsub_s(CPURISCVState *env, uint64_t frs1, uint64_t frs2,
++                       uint64_t rm)
++{
++    require_fp;
++    set_float_rounding_mode(RM, &env->fp_status);
++    frs1 = float32_sub(frs1, frs2, &env->fp_status);
++    set_fp_exceptions();
++    return frs1;
++}
++
++uint64_t helper_fmul_s(CPURISCVState *env, uint64_t frs1, uint64_t frs2,
++                       uint64_t rm)
++{
++    require_fp;
++    set_float_rounding_mode(RM, &env->fp_status);
++    frs1 = float32_mul(frs1, frs2, &env->fp_status);
++    set_fp_exceptions();
++    return frs1;
++}
++
++uint64_t helper_fdiv_s(CPURISCVState *env, uint64_t frs1, uint64_t frs2,
++                       uint64_t rm)
++{
++    require_fp;
++    set_float_rounding_mode(RM, &env->fp_status);
++    frs1 = float32_div(frs1, frs2, &env->fp_status);
++    set_fp_exceptions();
++    return frs1;
++}
++
++uint64_t helper_fmin_s(CPURISCVState *env, uint64_t frs1, uint64_t frs2)
++{
++    require_fp;
++    frs1 = float32_minnum(frs1, frs2, &env->fp_status);
++    set_fp_exceptions();
++    return frs1;
++}
++
++uint64_t helper_fmax_s(CPURISCVState *env, uint64_t frs1, uint64_t frs2)
++{
++    require_fp;
++    frs1 = float32_maxnum(frs1, frs2, &env->fp_status);
++    set_fp_exceptions();
++    return frs1;
++}
++
++uint64_t helper_fsqrt_s(CPURISCVState *env, uint64_t frs1, uint64_t rm)
++{
++    require_fp;
++    set_float_rounding_mode(RM, &env->fp_status);
++    frs1 = float32_sqrt(frs1, &env->fp_status);
++    set_fp_exceptions();
++    return frs1;
++}
++
++target_ulong helper_fle_s(CPURISCVState *env, uint64_t frs1, uint64_t frs2)
++{
++    require_fp;
++    frs1 = float32_le(frs1, frs2, &env->fp_status);
++    set_fp_exceptions();
++    return frs1;
++}
++
++target_ulong helper_flt_s(CPURISCVState *env, uint64_t frs1, uint64_t frs2)
++{
++    require_fp;
++    frs1 = float32_lt(frs1, frs2, &env->fp_status);
++    set_fp_exceptions();
++    return frs1;
++}
++
++target_ulong helper_feq_s(CPURISCVState *env, uint64_t frs1, uint64_t frs2)
++{
++    require_fp;
++    frs1 = float32_eq_quiet(frs1, frs2, &env->fp_status);
++    set_fp_exceptions();
++    return frs1;
++}
++
++target_ulong helper_fcvt_w_s(CPURISCVState *env, uint64_t frs1, uint64_t rm)
++{
++    require_fp;
++    set_float_rounding_mode(RM, &env->fp_status);
++    frs1 = float32_to_int32(frs1, &env->fp_status);
++    set_fp_exceptions();
++    return frs1;
++}
++
++target_ulong helper_fcvt_wu_s(CPURISCVState *env, uint64_t frs1, uint64_t rm)
++{
++    require_fp;
++    set_float_rounding_mode(RM, &env->fp_status);
++    frs1 = (int32_t)float32_to_uint32(frs1, &env->fp_status);
++    set_fp_exceptions();
++    return frs1;
++}
++
++#if defined(TARGET_RISCV64)
++uint64_t helper_fcvt_l_s(CPURISCVState *env, uint64_t frs1, uint64_t rm)
++{
++    require_fp;
++    set_float_rounding_mode(RM, &env->fp_status);
++    frs1 = float32_to_int64(frs1, &env->fp_status);
++    set_fp_exceptions();
++    return frs1;
++}
++
++uint64_t helper_fcvt_lu_s(CPURISCVState *env, uint64_t frs1, uint64_t rm)
++{
++    require_fp;
++    set_float_rounding_mode(RM, &env->fp_status);
++    frs1 = float32_to_uint64(frs1, &env->fp_status);
++    set_fp_exceptions();
++    return frs1;
++}
++#endif
++
++uint64_t helper_fcvt_s_w(CPURISCVState *env, target_ulong rs1, uint64_t rm)
++{
++    require_fp;
++    set_float_rounding_mode(RM, &env->fp_status);
++    rs1 = int32_to_float32((int32_t)rs1, &env->fp_status);
++    set_fp_exceptions();
++    return rs1;
++}
++
++uint64_t helper_fcvt_s_wu(CPURISCVState *env, target_ulong rs1, uint64_t rm)
++{
++    require_fp;
++    set_float_rounding_mode(RM, &env->fp_status);
++    rs1 = uint32_to_float32((uint32_t)rs1, &env->fp_status);
++    set_fp_exceptions();
++    return rs1;
++}
++
++#if defined(TARGET_RISCV64)
++uint64_t helper_fcvt_s_l(CPURISCVState *env, uint64_t rs1, uint64_t rm)
++{
++    require_fp;
++    set_float_rounding_mode(RM, &env->fp_status);
++    rs1 = int64_to_float32(rs1, &env->fp_status);
++    set_fp_exceptions();
++    return rs1;
++}
++
++uint64_t helper_fcvt_s_lu(CPURISCVState *env, uint64_t rs1, uint64_t rm)
++{
++    require_fp;
++    set_float_rounding_mode(RM, &env->fp_status);
++    rs1 = uint64_to_float32(rs1, &env->fp_status);
++    set_fp_exceptions();
++    return rs1;
++}
++#endif
++
++/* adapted from spike */
++#define isNaNF32UI(ui) (0xFF000000 < (uint32_t)((uint_fast32_t)ui << 1))
++#define signF32UI(a) ((bool)((uint32_t)a >> 31))
++#define expF32UI(a) ((int_fast16_t)(a >> 23) & 0xFF)
++#define fracF32UI(a) (a & 0x007FFFFF)
++
++union ui32_f32 { uint32_t ui; uint32_t f; };
++
++uint_fast16_t float32_classify(uint32_t a, float_status *status)
++{
++    union ui32_f32 uA;
++    uint_fast32_t uiA;
++
++    uA.f = a;
++    uiA = uA.ui;
++
++    uint_fast16_t infOrNaN = expF32UI(uiA) == 0xFF;
++    uint_fast16_t subnormalOrZero = expF32UI(uiA) == 0;
++    bool sign = signF32UI(uiA);
++
++    return
++        (sign && infOrNaN && fracF32UI(uiA) == 0)           << 0 |
++        (sign && !infOrNaN && !subnormalOrZero)             << 1 |
++        (sign && subnormalOrZero && fracF32UI(uiA))         << 2 |
++        (sign && subnormalOrZero && fracF32UI(uiA) == 0)    << 3 |
++        (!sign && infOrNaN && fracF32UI(uiA) == 0)          << 7 |
++        (!sign && !infOrNaN && !subnormalOrZero)            << 6 |
++        (!sign && subnormalOrZero && fracF32UI(uiA))        << 5 |
++        (!sign && subnormalOrZero && fracF32UI(uiA) == 0)   << 4 |
++        (isNaNF32UI(uiA) &&  float32_is_signaling_nan(uiA, status)) << 8 |
++        (isNaNF32UI(uiA) && !float32_is_signaling_nan(uiA, status)) << 9;
++}
++
++target_ulong helper_fclass_s(CPURISCVState *env, uint64_t frs1)
++{
++    require_fp;
++    frs1 = float32_classify(frs1, &env->fp_status);
++    return frs1;
++}
++
++uint64_t helper_fadd_d(CPURISCVState *env, uint64_t frs1, uint64_t frs2,
++                       uint64_t rm)
++{
++    require_fp;
++    set_float_rounding_mode(RM, &env->fp_status);
++    frs1 = float64_add(frs1, frs2, &env->fp_status);
++    set_fp_exceptions();
++    return frs1;
++}
++
++uint64_t helper_fsub_d(CPURISCVState *env, uint64_t frs1, uint64_t frs2,
++                       uint64_t rm)
++{
++    require_fp;
++    set_float_rounding_mode(RM, &env->fp_status);
++    frs1 = float64_sub(frs1, frs2, &env->fp_status);
++    set_fp_exceptions();
++    return frs1;
++}
++
++uint64_t helper_fmul_d(CPURISCVState *env, uint64_t frs1, uint64_t frs2,
++                       uint64_t rm)
++{
++    require_fp;
++    set_float_rounding_mode(RM, &env->fp_status);
++    frs1 = float64_mul(frs1, frs2, &env->fp_status);
++    set_fp_exceptions();
++    return frs1;
++}
++
++uint64_t helper_fdiv_d(CPURISCVState *env, uint64_t frs1, uint64_t frs2,
++                       uint64_t rm)
++{
++    require_fp;
++    set_float_rounding_mode(RM, &env->fp_status);
++    frs1 = float64_div(frs1, frs2, &env->fp_status);
++    set_fp_exceptions();
++    return frs1;
++}
++
++uint64_t helper_fmin_d(CPURISCVState *env, uint64_t frs1, uint64_t frs2)
++{
++    require_fp;
++    frs1 = float64_minnum(frs1, frs2, &env->fp_status);
++    set_fp_exceptions();
++    return frs1;
++}
++
++uint64_t helper_fmax_d(CPURISCVState *env, uint64_t frs1, uint64_t frs2)
++{
++    require_fp;
++    frs1 = float64_maxnum(frs1, frs2, &env->fp_status);
++    set_fp_exceptions();
++    return frs1;
++}
++
++uint64_t helper_fcvt_s_d(CPURISCVState *env, uint64_t rs1, uint64_t rm)
++{
++    require_fp;
++    set_float_rounding_mode(RM, &env->fp_status);
++    rs1 = float64_to_float32(rs1, &env->fp_status);
++    set_fp_exceptions();
++    return rs1;
++}
++
++uint64_t helper_fcvt_d_s(CPURISCVState *env, uint64_t rs1, uint64_t rm)
++{
++    require_fp;
++    set_float_rounding_mode(RM, &env->fp_status);
++    rs1 = float32_to_float64(rs1, &env->fp_status);
++    set_fp_exceptions();
++    return rs1;
++}
++
++uint64_t helper_fsqrt_d(CPURISCVState *env, uint64_t frs1, uint64_t rm)
++{
++    require_fp;
++    set_float_rounding_mode(RM, &env->fp_status);
++    frs1 = float64_sqrt(frs1, &env->fp_status);
++    set_fp_exceptions();
++    return frs1;
++}
++
++target_ulong helper_fle_d(CPURISCVState *env, uint64_t frs1, uint64_t frs2)
++{
++    require_fp;
++    frs1 = float64_le(frs1, frs2, &env->fp_status);
++    set_fp_exceptions();
++    return frs1;
++}
++
++target_ulong helper_flt_d(CPURISCVState *env, uint64_t frs1, uint64_t frs2)
++{
++    require_fp;
++    frs1 = float64_lt(frs1, frs2, &env->fp_status);
++    set_fp_exceptions();
++    return frs1;
++}
++
++target_ulong helper_feq_d(CPURISCVState *env, uint64_t frs1, uint64_t frs2)
++{
++    require_fp;
++    frs1 = float64_eq_quiet(frs1, frs2, &env->fp_status);
++    set_fp_exceptions();
++    return frs1;
++}
++
++target_ulong helper_fcvt_w_d(CPURISCVState *env, uint64_t frs1, uint64_t rm)
++{
++    require_fp;
++    set_float_rounding_mode(RM, &env->fp_status);
++    frs1 = (int64_t)((int32_t)float64_to_int32(frs1, &env->fp_status));
++    set_fp_exceptions();
++    return frs1;
++}
++
++target_ulong helper_fcvt_wu_d(CPURISCVState *env, uint64_t frs1, uint64_t rm)
++{
++    require_fp;
++    set_float_rounding_mode(RM, &env->fp_status);
++    frs1 = (int64_t)((int32_t)float64_to_uint32(frs1, &env->fp_status));
++    set_fp_exceptions();
++    return frs1;
++}
++
++#if defined(TARGET_RISCV64)
++uint64_t helper_fcvt_l_d(CPURISCVState *env, uint64_t frs1, uint64_t rm)
++{
++    require_fp;
++    set_float_rounding_mode(RM, &env->fp_status);
++    frs1 = float64_to_int64(frs1, &env->fp_status);
++    set_fp_exceptions();
++    return frs1;
++}
++
++uint64_t helper_fcvt_lu_d(CPURISCVState *env, uint64_t frs1, uint64_t rm)
++{
++    require_fp;
++    set_float_rounding_mode(RM, &env->fp_status);
++    frs1 = float64_to_uint64(frs1, &env->fp_status);
++    set_fp_exceptions();
++    return frs1;
++}
++#endif
++
++uint64_t helper_fcvt_d_w(CPURISCVState *env, target_ulong rs1, uint64_t rm)
++{
++    require_fp;
++    uint64_t res;
++    set_float_rounding_mode(RM, &env->fp_status);
++    res = int32_to_float64((int32_t)rs1, &env->fp_status);
++    set_fp_exceptions();
++    return res;
++}
++
++uint64_t helper_fcvt_d_wu(CPURISCVState *env, target_ulong rs1, uint64_t rm)
++{
++    require_fp;
++    uint64_t res;
++    set_float_rounding_mode(RM, &env->fp_status);
++    res = uint32_to_float64((uint32_t)rs1, &env->fp_status);
++    set_fp_exceptions();
++    return res;
++}
++
++#if defined(TARGET_RISCV64)
++uint64_t helper_fcvt_d_l(CPURISCVState *env, uint64_t rs1, uint64_t rm)
++{
++    require_fp;
++    set_float_rounding_mode(RM, &env->fp_status);
++    rs1 = int64_to_float64(rs1, &env->fp_status);
++    set_fp_exceptions();
++    return rs1;
++}
++
++uint64_t helper_fcvt_d_lu(CPURISCVState *env, uint64_t rs1, uint64_t rm)
++{
++    require_fp;
++    set_float_rounding_mode(RM, &env->fp_status);
++    rs1 = uint64_to_float64(rs1, &env->fp_status);
++    set_fp_exceptions();
++    return rs1;
++}
++#endif
++
++/* adapted from spike */
++#define isNaNF64UI(ui) (UINT64_C(0xFFE0000000000000) \
++                       < (uint64_t)((uint_fast64_t)ui << 1))
++#define signF64UI(a) ((bool)((uint64_t) a >> 63))
++#define expF64UI(a) ((int_fast16_t)(a >> 52) & 0x7FF)
++#define fracF64UI(a) (a & UINT64_C(0x000FFFFFFFFFFFFF))
++
++union ui64_f64 { uint64_t ui; uint64_t f; };
++
++uint_fast16_t float64_classify(uint64_t a, float_status *status)
++{
++    union ui64_f64 uA;
++    uint_fast64_t uiA;
++
++    uA.f = a;
++    uiA = uA.ui;
++
++    uint_fast16_t infOrNaN = expF64UI(uiA) == 0x7FF;
++    uint_fast16_t subnormalOrZero = expF64UI(uiA) == 0;
++    bool sign = signF64UI(uiA);
++
++    return
++        (sign && infOrNaN && fracF64UI(uiA) == 0)        << 0 |
++        (sign && !infOrNaN && !subnormalOrZero)            << 1 |
++        (sign && subnormalOrZero && fracF64UI(uiA))        << 2 |
++        (sign && subnormalOrZero && fracF64UI(uiA) == 0)   << 3 |
++        (!sign && infOrNaN && fracF64UI(uiA) == 0)         << 7 |
++        (!sign && !infOrNaN && !subnormalOrZero)           << 6 |
++        (!sign && subnormalOrZero && fracF64UI(uiA))       << 5 |
++        (!sign && subnormalOrZero && fracF64UI(uiA) == 0)  << 4 |
++        (isNaNF64UI(uiA) &&  float64_is_signaling_nan(uiA, status)) << 8 |
++        (isNaNF64UI(uiA) && !float64_is_signaling_nan(uiA, status)) << 9;
++}
++
++target_ulong helper_fclass_d(CPURISCVState *env, uint64_t frs1)
++{
++    require_fp;
++    frs1 = float64_classify(frs1, &env->fp_status);
++    return frs1;
++}
 -- 
 2.7.0
