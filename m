@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44402)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44700)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eZcq4-0008Kl-QZ
-	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 08:24:13 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1eZcqi-0000ND-Nv
+	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 08:24:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eZcq0-0004kb-OJ
-	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 08:24:12 -0500
-Received: from mail-ot0-x22d.google.com ([2607:f8b0:4003:c0f::22d]:40315)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1eZcq0-0004kB-HY
-	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 08:24:08 -0500
-Received: by mail-ot0-x22d.google.com with SMTP id d10so2058355oti.7
-	for <qemu-devel@nongnu.org>; Thu, 11 Jan 2018 05:24:08 -0800 (PST)
+	(envelope-from <pbonzini@redhat.com>) id 1eZcqh-0005aU-V4
+	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 08:24:52 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:29105)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1eZcqh-0005Zi-Oq
+	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 08:24:51 -0500
+References: <20180110134846.12940.99993.stgit@pasha-VirtualBox>
+	<029858e0-c6e5-939d-d79e-c7ad7e5069a1@linaro.org>
+	<CAFEAcA9ZMZyhV_MLvdpKD74895rXJ4cw3sX1sMHYJASe2h3LMw@mail.gmail.com>
+	<b5273c61-3db0-c171-4b92-c273def5feb7@redhat.com>
+	<CAFEAcA9c7=g68jE6zXJBxkKvvKG9m1u9aFxbf87AnvfuqQo3bw@mail.gmail.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <7823c962-6940-9e8a-9d2c-784505db9bda@redhat.com>
+Date: Thu, 11 Jan 2018 14:24:45 +0100
 MIME-Version: 1.0
-In-Reply-To: <20180110225944.17920-1-eblake@redhat.com>
-References: <20180110225944.17920-1-eblake@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 11 Jan 2018 13:23:47 +0000
-Message-ID: <CAFEAcA9yJg7eQJiFpCO2ObGjv3hLJx+34H6edcM2H9A-9nj=Bw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 0/2] nbd patches for 10 Jan
+In-Reply-To: <CAFEAcA9c7=g68jE6zXJBxkKvvKG9m1u9aFxbf87AnvfuqQo3bw@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] cpu: flush TB cache when loading VMState
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,35 +31,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Richard Henderson <richard.henderson@linaro.org>, Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>, QEMU Developers <qemu-devel@nongnu.org>, maria.klimushenkova@ispras.ru, Pavel Dovgalyuk <dovgaluk@ispras.ru>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Juan Quintela <quintela@redhat.com>
 
-On 10 January 2018 at 22:59, Eric Blake <eblake@redhat.com> wrote:
-> The following changes since commit 3cee4db661ab9c0fce7937b3bbfa188a1845f31f:
->
->   Merge remote-tracking branch 'remotes/ericb/tags/pull-nbd-2018-01-08' into staging (2018-01-09 15:22:47 +0000)
->
-> are available in the Git repository at:
->
->   git://repo.or.cz/qemu/ericb.git tags/pull-nbd-2018-01-10
->
-> for you to fetch changes up to 420a4e955909788263a33d11600839e93480dfd3:
->
->   nbd: rename nbd_option and nbd_opt_reply (2018-01-10 12:11:23 -0600)
->
-> Not much time elapsed since my last pull request, but my last request
-> was delayed due the holiday break, and I've now got other patches that
-> will be easier to post if I can do a Based-on: against this pull request,
-> rather than the larger in-progress series they were extracted from.
->
-> ----------------------------------------------------------------
-> nbd patches for 2018-01-10
->
-> - Vladimir Sementsov-Ogievskiy: nbd: rename nbd_option and nbd_opt_reply
-> - Vladimir Sementsov-Ogievskiy: nbd/server: add additional assert to nbd_export_put
->
-> ----------------------------------------------------------------
+On 11/01/2018 11:20, Peter Maydell wrote:
+> On 11 January 2018 at 10:15, Paolo Bonzini <pbonzini@redhat.com> wrote:
+>> RAM contents are memcpy'd blindly during loadvm.  I think that's what
+>> requires a tb_flush.
+> 
+> Ah, that makes sense. Could we have a comment documenting the
+> rationale, please? Something like:
+> 
+> /* vmload has just updated the content of RAM, bypassing the
+>  * usual mechanisms that ensure we flush TBs for writes to
+>  * memory we've translated code from. So we must flush all TBs,
+>  * which will now be stale.
+>  */
+> 
+> thanks
+> -- PMM
+> 
 
-Applied, thanks.
+Sure, will add it.
 
--- PMM
+Paolo
