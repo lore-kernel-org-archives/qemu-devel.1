@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60723)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38988)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eZlwV-0005hD-ON
-	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 18:07:28 -0500
+	(envelope-from <alistair23@gmail.com>) id 1eZmEu-0001vq-Va
+	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 18:26:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eZlwS-0007N7-JR
-	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 18:07:27 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:33086)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1eZlwS-0007KR-9y
-	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 18:07:24 -0500
-References: <20171219084557.9801-1-peterx@redhat.com>
-	<20171219084557.9801-12-peterx@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <f545e9b6-621b-e2e6-505b-f520625c173d@redhat.com>
-Date: Thu, 11 Jan 2018 17:07:11 -0600
+	(envelope-from <alistair23@gmail.com>) id 1eZmEt-0001HP-Sr
+	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 18:26:28 -0500
+Received: from mail-wr0-x234.google.com ([2a00:1450:400c:c0c::234]:41182)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
+	id 1eZmEt-0001GI-MF
+	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 18:26:27 -0500
+Received: by mail-wr0-x234.google.com with SMTP id o7so3766808wro.8
+	for <qemu-devel@nongnu.org>; Thu, 11 Jan 2018 15:26:27 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20171219084557.9801-12-peterx@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="WhKXMPn2RDMJJLI0oUTHDt1kC1U5QUJj9"
-Subject: Re: [Qemu-devel] [RFC v6 11/27] qmp: introduce QMPCapability
+In-Reply-To: <CAJSP0QVd70uAiG3vyOjO-qOdt1YbEccYydJvz4igg7_bBiW+5A@mail.gmail.com>
+References: <CAJSP0QUMA7v=-qX-CNCi30aoH-HzXC9i75EpLWP_TmFuDzpTQQ@mail.gmail.com>
+	<CAKmqyKPk69_d-iYGekoS9WBM1fnzav1iFAQEXQq_jLOW9_Dt3w@mail.gmail.com>
+	<CAJSP0QVd70uAiG3vyOjO-qOdt1YbEccYydJvz4igg7_bBiW+5A@mail.gmail.com>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Thu, 11 Jan 2018 15:25:56 -0800
+Message-ID: <CAKmqyKP2cQGXSmPvaGt3AwDz6zewJ6HH=vVTSnk6GVAQAhW5uA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] Call for GSoC & Outreachy 2018 mentors & project
+ ideas
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,109 +31,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>, qemu-devel@nongnu.org
-Cc: Stefan Hajnoczi <shajnocz@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <famz@redhat.com>, Juan Quintela <quintela@redhat.com>, mdroth@linux.vnet.ibm.com, Laurent Vivier <lvivier@redhat.com>, Markus Armbruster <armbru@redhat.com>, marcandre.lureau@redhat.com, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: Stefan Hajnoczi <stefanha@gmail.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, kvm <kvm@vger.kernel.org>, Jailhouse <jailhouse-dev@googlegroups.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---WhKXMPn2RDMJJLI0oUTHDt1kC1U5QUJj9
-From: Eric Blake <eblake@redhat.com>
-To: Peter Xu <peterx@redhat.com>, qemu-devel@nongnu.org
-Cc: Stefan Hajnoczi <shajnocz@redhat.com>,
- "Daniel P . Berrange" <berrange@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <famz@redhat.com>,
- Juan Quintela <quintela@redhat.com>, mdroth@linux.vnet.ibm.com,
- Laurent Vivier <lvivier@redhat.com>, Markus Armbruster <armbru@redhat.com>,
- marcandre.lureau@redhat.com, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <f545e9b6-621b-e2e6-505b-f520625c173d@redhat.com>
-Subject: Re: [RFC v6 11/27] qmp: introduce QMPCapability
-References: <20171219084557.9801-1-peterx@redhat.com>
- <20171219084557.9801-12-peterx@redhat.com>
-In-Reply-To: <20171219084557.9801-12-peterx@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Wed, Jan 10, 2018 at 4:52 AM, Stefan Hajnoczi <stefanha@gmail.com> wrote:
+> On Tue, Jan 9, 2018 at 9:45 PM, Alistair Francis <alistair23@gmail.com> wrote:
+>> Can anyone who has done this before chime in.
+>>
+>> What do you think about getting someone to cleanup and improve the GDB
+>> support in QEMU? Would that be the right difficulty of task for a GSoC
+>> project?
+>
+> There is not enough information to give feedback on whether this
+> project idea is suitable.  What are the specific tasks you'd like the
+> student to work on?
+>
+> In general, I'm sure there are well-defined 12-week project ideas
+> around the GDB stub.  New features are easy to propose and are usually
+> well-defined (e.g. implement these commands that are documented in the
+> GDB protocol documentation).  Cleaning up code is less clear and it
+> would depend on exactly what needs to be done.  Interns will not have
+> a background in the QEMU codebase and may not be able to make
+> judgements about how to structure things, so I would be more careful
+> about refactoring/cleanup projects.
+>
+> Please see my talk about QEMU GSoC for guidelines on project ideas:
+> https://www.youtube.com/watch?v=xNVCX7YMUL8&t=19m11s
+> http://vmsplice.net/~stefan/stefanha-kvm-forum-2016.pdf
 
-On 12/19/2017 02:45 AM, Peter Xu wrote:
-> There was no QMP capabilities defined.  Define the first "oob" as
+That helps a lot, thanks for that.
 
-s/was/were/
+So for a more concrete solution, how would adding support for multi
+CPU support to the GDB server sound?
 
-> capability to allow out-of-band messages.
->=20
-> Also, touch up qmp-test.c to test the new bits.
->=20
-> Signed-off-by: Peter Xu <peterx@redhat.com>
-> ---
->  monitor.c        | 10 ++++++++--
->  qapi-schema.json | 13 +++++++++++++
->  tests/qmp-test.c | 10 +++++++++-
->  3 files changed, 30 insertions(+), 3 deletions(-)
+This would allow GDB debugging for the A53 and the R5 on the Xilinx
+ZynqMP for example. This is something we have in the Xilinx tree, but
+it is in no state to go upstream and really needs to be re-write to be
+upstreamable and more generic.
 
-I'm assuming later patches will document this?
+Alistair
 
-I'm somewhat a fan of documentation alongside or before implementation,
-as getting the general overview right and then checking that the code
-matches is a bit nicer than random coding then documenting what we ended
-up with.  But I don't know if reordering patches in your series is
-necessary, as long as the end product is properly documented.
-
-> +++ b/qapi-schema.json
-> @@ -118,6 +118,19 @@
->  ##
->  { 'command': 'qmp_capabilities' }
-
-The client can't request a particular feature alongside the command?  Or
-is that in later patches?  With just this patch, the enum QMPCapability
-is not introspected, because it is not referenced by any command
-(although introspection is a bit moot, since the client will learn what
-the host advertises from the initial handshake before the client can
-even request introspection).
-
-> =20
-> +##
-> +# @QMPCapability:
-> +#
-> +# QMP supported capabilities to be broadcasted to the clients.
-
-'broadcast' is one of those weird verbs that doesn't change spelling
-when constructing its past tense (there is no 'broadcasted').  However,
-I think this description is a bit nicer (and avoids the problematic word
-altogether):
-
-Enumeration of capabilities to be advertised during initial client
-connection, used for agreeing on particular QMP extension behaviors.
-
-> +#
-> +# @oob:   QMP ability to support Out-Of-Band requests.
-
-Rather terse (it doesn't say what Out-Of-Band requests are); even a
-pointer to the QMP spec (where OOB is more fully documented) might be
-nice (of course, that means we need a patch to docs/interop/qmp-spec.txt
-somewhere in the series, especially since this patch renders 2.2.1 in
-that document obsolete...)
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---WhKXMPn2RDMJJLI0oUTHDt1kC1U5QUJj9
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlpX7h8ACgkQp6FrSiUn
-Q2oK3gf/dUuM5aTyj1KXhXppWO5+wS1NNUhuyP0AFbR2y5RhAY4Sf/im4pOT9hkS
-hKHjYMr0TswtB8LWbVYF1BsaK0qCqYLoiRWD/V/1pEhT7Ibqu4j3HTbk4IimBUdC
-C6zSBxD15tyMatiTpb8tcyxorut2m2gRxcICzBdC9G5YviXQREeiVlUSux6X+ukk
-m82UyjiZY7+TaQS4fVtRdsxSkcIzTvl5ZXI21FT0lcAMXwH5oF8tZVLbfmnE5Y5f
-DWwXGOX7oT9jLHeqjSrNF5jLSAEo+uvKxNaBlYv+IDZ9UEbSjR9piIJ7jq7WikKy
-OAK+bP2D+Er5QduuZmbaL68isrqE1A==
-=/Vkb
------END PGP SIGNATURE-----
-
---WhKXMPn2RDMJJLI0oUTHDt1kC1U5QUJj9--
+>
+> Hope this helps,
+> Stefan
