@@ -1,20 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53530)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55743)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <haozhong.zhang@intel.com>) id 1eZdkX-0001uP-D4
-	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 09:22:35 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1eZdoy-0005wQ-EW
+	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 09:27:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <haozhong.zhang@intel.com>) id 1eZdkR-0004F9-FD
-	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 09:22:33 -0500
-Received: from mga03.intel.com ([134.134.136.65]:53608)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <haozhong.zhang@intel.com>)
-	id 1eZdkR-0004Bw-4d
-	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 09:22:27 -0500
-From: Haozhong Zhang <haozhong.zhang@intel.com>
-Date: Thu, 11 Jan 2018 22:22:06 +0800
-Message-Id: <20180111142208.17617-1-haozhong.zhang@intel.com>
-Subject: [Qemu-devel] [PATCH v2 0/2] nvdimm: support MAP_SYNC for
- memory-backend-file
+	(envelope-from <vsementsov@virtuozzo.com>) id 1eZdox-0001Nx-D7
+	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 09:27:08 -0500
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <76a29a1e-7fdb-37a8-9f79-df618d385b05@virtuozzo.com>
+Date: Thu, 11 Jan 2018 17:26:52 +0300
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
+Content-Language: en-US
+Subject: [Qemu-devel] qcow2 autoloading bitmaps
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,52 +21,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Eduardo Habkost <ehabkost@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, mst@redhat.com, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, Stefan Hajnoczi <stefanha@redhat.com>, Dan Williams <dan.j.williams@intel.com>, Haozhong Zhang <haozhong.zhang@intel.com>
+To: qemu-devel <qemu-devel@nongnu.org>, qemu block <qemu-block@nongnu.org>
+Cc: "Denis V. Lunev" <den@openvz.org>, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, John Snow <jsnow@redhat.com>, Fam Zheng <famz@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Nikolay Shirokovskiy <nshirokovskiy@virtuozzo.com>
 
-v2 is based on Eduardo's machine-next tree. Changes of
-memory-backend-file are based on my previous patches in that tree.
+Hi all!
+
+I've just noted that there is an unfortunate contradiction between qcow2=20
+spec and qapi.
+
+In qcow2 we have:
+1: auto
+ =C2=A0The bitmap must reflect all changes of the virtual
+ =C2=A0disk by any application that would write to this qcow2
+ =C2=A0file (including writes, snapshot switching, etc.). The
+ =C2=A0type of this bitmap must be 'dirty tracking bitmap'.
 
 
-Linux 4.15 introduces a new mmap flag MAP_SYNC, which can be used to
-guarantee the write persistence to mmap'ed files supporting DAX (e.g.,
-files on ext4/xfs file system mounted with '-o dax').
+so auto means enabled bitmaps, which must track dirtiness. It's logical=20
+to auto-load them
+on Qemu start and make them enabled dirty bitmaps.
 
-This patchset enables QEMU to use MAP_SYNC flag for memory-backend-file,
-in order to guarantee the guest write persistence to backend files
-supporting DAX.
+In Qapi we have:
 
-A new auto on/off option 'sync' is added to memory-backend-file:
- - on:  try to pass MAP_SYNC to mmap(2); if MAP_SYNC is not supported or
-        'share=off', QEMU will abort
- - off: never pass MAP_SYNC to mmap(2)
- - auto (default): if MAP_SYNC is supported and 'share=on', work as if
-        'sync=on'; otherwise, work as if 'sync=off'
+# @autoload: the bitmap will be automatically loaded when the image it=20
+is stored
+#=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 in is o=
+pened. This flag may only be specified for persistent
+#=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 bitmaps=
+. Default is false for block-dirty-bitmap-add.=20
+(Since: 2.10)
 
-Changes in v2:
- * Add 'sync' option to control the use of MAP_SYNC. (Eduardo Habkost)
- * Remove the unnecessary set of MAP_SHARED_VALIDATE in some cases and
-   the retry mechanism in qemu_ram_mmap(). (Michael S. Tsirkin)
- * Move OS dependent definitions of MAP_SYNC and MAP_SHARED_VALIDATE
-   to osdep.h. (Michael S. Tsirkin)
+so, if we consider only enabled bitmaps it is ok to direct map autoload=20
+<=3D> auto.
 
-Haozhong Zhang (2):
-  util/mmap-alloc: support MAP_SYNC in qemu_ram_mmap()
-  hostmem-file: add 'sync' option
+But now we've faced into necessity of load/store disabled bitmaps.
 
- backends/hostmem-file.c   | 39 ++++++++++++++++++++++++++++++++++++++-
- docs/nvdimm.txt           | 15 ++++++++++++++-
- exec.c                    | 13 ++++++++-----
- include/exec/memory.h     |  4 ++++
- include/exec/ram_addr.h   |  6 +++---
- include/qemu/mmap-alloc.h |  3 ++-
- include/qemu/osdep.h      | 16 ++++++++++++++++
- memory.c                  |  6 ++++--
- numa.c                    |  2 +-
- qemu-options.hx           | 21 ++++++++++++++++++++-
- util/mmap-alloc.c         | 24 ++++++++++++++++++++++--
- util/oslib-posix.c        |  2 +-
- 12 files changed, 133 insertions(+), 18 deletions(-)
+Current behavior is definitely wrong: user sets autoload flag for=20
+disabled bitmap, but on next
+Qemu start the bitmap will be autoloaded and enabled.
 
--- 
-2.15.1
+
+Proposed solution:
+ =C2=A0- deprecate @autoload flag for bitmap creation, ignore it
+ =C2=A0- save persistent enabled bitmaps with "auto" flag
+ =C2=A0- save persistent disabled bitmaps without "auto" flag
+ =C2=A0- on Qemu start load all bitmaps, mapping "auto" flag state to=20
+"enabled" state.
+
+
+Note: we may store a lot of disabled bitmaps in qcow2 image, but loading=20
+them all into RAM may be
+inefficient. Actually such bitmap will be needed only on demand (for=20
+export through nbd or
+making some kind of backup). So in future it may be optimized by "lazy=20
+load" of disabled bitmaps,
+postponing their actual load up to first read or enabling. This=20
+optimization doesn't need changing
+of qapi or qcow2 format (at first sight).
+
+
+Note2: now there is no way to disable/enable bitmaps, but there is a
+ =C2=A0 [PATCH for-2.12 0/4] qmp dirty bitmap API
+with big conversation, but I hope, I'll post a new version with a small=20
+fix soon and it will be merged.
+
+--=20
+Best regards,
+Vladimir
