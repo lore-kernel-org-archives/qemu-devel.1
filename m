@@ -1,30 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45202)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54892)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jianjay.zhou@huawei.com>) id 1eZTxS-0001ii-6U
-	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 22:55:15 -0500
+	(envelope-from <aik@ozlabs.ru>) id 1eZUAS-0006nH-S7
+	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 23:08:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jianjay.zhou@huawei.com>) id 1eZTxO-0008S7-AJ
-	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 22:55:14 -0500
-Received: from szxga01-in.huawei.com ([45.249.212.187]:2368 helo=huawei.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jianjay.zhou@huawei.com>)
-	id 1eZTxN-0008P9-LA
-	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 22:55:10 -0500
-From: "Zhoujian (jay)" <jianjay.zhou@huawei.com>
-Date: Thu, 11 Jan 2018 03:54:27 +0000
-Message-ID: <B2D15215269B544CADD246097EACE7473AB36FE2@DGGEMM505-MBS.china.huawei.com>
-References: <1515516013-16604-1-git-send-email-jianjay.zhou@huawei.com>
-	<B2D15215269B544CADD246097EACE7473AB32AAB@DGGEMM505-MBS.china.huawei.com>
-	<48f2d18b-b58c-dd08-29ff-34b5f8c2d780@redhat.com>
-	<B2D15215269B544CADD246097EACE7473AB32F8F@DGGEMM505-MBS.china.huawei.com>
-	<a3072d45-f628-418a-e293-83dff4d73f54@redhat.com>
-In-Reply-To: <a3072d45-f628-418a-e293-83dff4d73f54@redhat.com>
-Content-Language: zh-CN
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v5 2/4][RFC] tap: do not close fd if only
- vhost failed to initialize
+	(envelope-from <aik@ozlabs.ru>) id 1eZUAP-0005Gr-ND
+	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 23:08:40 -0500
+From: Alexey Kardashevskiy <aik@ozlabs.ru>
+Date: Thu, 11 Jan 2018 15:08:32 +1100
+Message-Id: <20180111040832.28383-1-aik@ozlabs.ru>
+Subject: [Qemu-devel] [PATCH qemu] target/ppc: Yet another fix for KVM-HV
+ HPTE accessors
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,91 +18,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jason Wang <jasowang@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "Huangweidong (C)" <weidong.huang@huawei.com>, "mst@redhat.com" <mst@redhat.com>, "wangxin (U)" <wangxinxin.wang@huawei.com>, "Gonglei
-	(Arei)" <arei.gonglei@huawei.com>, "imammedo@redhat.com" <imammedo@redhat.com>, "Liuzhe (Ahriy, Euler)" <liuzhe13@huawei.com>
+To: qemu-devel@nongnu.org
+Cc: Alexey Kardashevskiy <aik@ozlabs.ru>, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
 
-SGkgSmFzb24sDQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogSmFzb24g
-V2FuZyBbbWFpbHRvOmphc293YW5nQHJlZGhhdC5jb21dDQo+IFNlbnQ6IFRodXJzZGF5LCBKYW51
-YXJ5IDExLCAyMDE4IDExOjM1IEFNDQo+IFRvOiBaaG91amlhbiAoamF5KSA8amlhbmpheS56aG91
-QGh1YXdlaS5jb20+OyBxZW11LWRldmVsQG5vbmdudS5vcmcNCj4gQ2M6IEh1YW5nd2VpZG9uZyAo
-QykgPHdlaWRvbmcuaHVhbmdAaHVhd2VpLmNvbT47IG1zdEByZWRoYXQuY29tOyB3YW5neGluIChV
-KQ0KPiA8d2FuZ3hpbnhpbi53YW5nQGh1YXdlaS5jb20+OyBHb25nbGVpIChBcmVpKSA8YXJlaS5n
-b25nbGVpQGh1YXdlaS5jb20+Ow0KPiBpbWFtbWVkb0ByZWRoYXQuY29tOyBMaXV6aGUgKEFocml5
-LCBFdWxlcikgPGxpdXpoZTEzQGh1YXdlaS5jb20+DQo+IFN1YmplY3Q6IFJlOiBbUWVtdS1kZXZl
-bF0gW1BBVENIIHY1IDIvNF1bUkZDXSB0YXA6IGRvIG5vdCBjbG9zZSBmZCBpZiBvbmx5DQo+IHZo
-b3N0IGZhaWxlZCB0byBpbml0aWFsaXplDQo+IA0KPiANCj4gDQo+IE9uIDIwMTjlubQwMeaciDEw
-5pelIDE1OjM5LCBaaG91amlhbiAoamF5KSB3cm90ZToNCj4gPj4+PiArICAgICAgICAgICAgKnZo
-b3N0X2luaXRfZmFpbGVkID0gdHJ1ZTsNCj4gPj4gV2h5IG5vdCBzaW1wbHkgY2hlY2sgcy0+dmhv
-c3RfbmV0IGFmdGVyIGNhbGwgbmV0X2luaXRfdGFwX29uZSgpPw0KPiA+IHMtPnZob3N0X25ldCBp
-cyBhbHdheXMgTlVMTCBpZiBuZXRfaW5pdF90YXBfb25lKCkgZmFpbGVkLCBpdCBjYW4ndA0KPiBk
-aXN0aW5ndWlzaA0KPiA+IGZhaWx1cmUgcmVhc29ucy4NCj4gDQo+IE9uIHdoaWNoIGNvbmRpdGlv
-biBuZXRfaW5pdF90YXBfb25lKCkgZmFpbCBidXQgcy0+dmhvc3RfbmV0IGlzIHNldD8NCg0KTm8s
-IGl0IGRvZXMgbm90IGV4aXN0LCBzbyB3ZSBjb3VsZCBub3QgdXNlIHMtPnZob3N0X25ldCB0byBk
-ZWNpZGUNCndoZXRoZXIgY2xvc2UgdGhlIGZkIG9mIHRhcCB3aGVuIGVycm9yIG9jY3VycmVkLg0K
-DQoNCk1heWJlIHRoZSBwYXRjaCBiZWxvdyB3aWxsIGJlIG11Y2ggYmV0dGVyIHRvIHVuZGVyc3Rh
-bmQsIHBsZWFzZSBoYXZlIGEgbG9vay4NCg0KZGlmZiAtLWdpdCBhL25ldC90YXAuYyBiL25ldC90
-YXAuYw0KaW5kZXggOTc5ZTYyMi4uYTVjNTExMSAxMDA2NDQNCi0tLSBhL25ldC90YXAuYw0KKysr
-IGIvbmV0L3RhcC5jDQpAQCAtNjQyLDcgKzY0Miw4IEBAIHN0YXRpYyB2b2lkIG5ldF9pbml0X3Rh
-cF9vbmUoY29uc3QgTmV0ZGV2VGFwT3B0aW9ucyAqdGFwLCBOZXRDbGllbnRTdGF0ZSAqcGVlciwN
-CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIGNvbnN0IGNoYXIgKm1vZGVsLCBjb25zdCBj
-aGFyICpuYW1lLA0KICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgY29uc3QgY2hhciAqaWZu
-YW1lLCBjb25zdCBjaGFyICpzY3JpcHQsDQogICAgICAgICAgICAgICAgICAgICAgICAgICAgICBj
-b25zdCBjaGFyICpkb3duc2NyaXB0LCBjb25zdCBjaGFyICp2aG9zdGZkbmFtZSwNCi0gICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgIGludCB2bmV0X2hkciwgaW50IGZkLCBFcnJvciAqKmVycnAp
-DQorICAgICAgICAgICAgICAgICAgICAgICAgICAgICBpbnQgdm5ldF9oZHIsIGludCBmZCwgRXJy
-b3IgKiplcnJwLA0KKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgYm9vbCAqZXJyb3JfaXNf
-c2V0X3NuZGJ1ZikNCiB7DQogICAgIEVycm9yICplcnIgPSBOVUxMOw0KICAgICBUQVBTdGF0ZSAq
-cyA9IG5ldF90YXBfZmRfaW5pdChwZWVyLCBtb2RlbCwgbmFtZSwgZmQsIHZuZXRfaGRyKTsNCkBA
-IC02NTEsNiArNjUyLDkgQEAgc3RhdGljIHZvaWQgbmV0X2luaXRfdGFwX29uZShjb25zdCBOZXRk
-ZXZUYXBPcHRpb25zICp0YXAsIE5ldENsaWVudFN0YXRlICpwZWVyLA0KICAgICB0YXBfc2V0X3Nu
-ZGJ1ZihzLT5mZCwgdGFwLCAmZXJyKTsNCiAgICAgaWYgKGVycikgew0KICAgICAgICAgZXJyb3Jf
-cHJvcGFnYXRlKGVycnAsIGVycik7DQorICAgICAgICBpZiAoZXJyb3JfaXNfc2V0X3NuZGJ1Zikg
-ew0KKyAgICAgICAgICAgICplcnJvcl9pc19zZXRfc25kYnVmID0gdHJ1ZTsNCisgICAgICAgIH0N
-CiAgICAgICAgIHJldHVybjsNCiAgICAgfQ0KIA0KQEAgLTc0OCw2ICs3NTIsNyBAQCBpbnQgbmV0
-X2luaXRfdGFwKGNvbnN0IE5ldGRldiAqbmV0ZGV2LCBjb25zdCBjaGFyICpuYW1lLA0KICAgICBF
-cnJvciAqZXJyID0gTlVMTDsNCiAgICAgY29uc3QgY2hhciAqdmhvc3RmZG5hbWU7DQogICAgIGNo
-YXIgaWZuYW1lWzEyOF07DQorICAgIGJvb2wgZXJyb3JfaXNfc2V0X3NuZGJ1ZiA9IGZhbHNlOw0K
-IA0KICAgICBhc3NlcnQobmV0ZGV2LT50eXBlID09IE5FVF9DTElFTlRfRFJJVkVSX1RBUCk7DQog
-ICAgIHRhcCA9ICZuZXRkZXYtPnUudGFwOw0KQEAgLTc4Myw3ICs3ODgsNyBAQCBpbnQgbmV0X2lu
-aXRfdGFwKGNvbnN0IE5ldGRldiAqbmV0ZGV2LCBjb25zdCBjaGFyICpuYW1lLA0KIA0KICAgICAg
-ICAgbmV0X2luaXRfdGFwX29uZSh0YXAsIHBlZXIsICJ0YXAiLCBuYW1lLCBOVUxMLA0KICAgICAg
-ICAgICAgICAgICAgICAgICAgICBzY3JpcHQsIGRvd25zY3JpcHQsDQotICAgICAgICAgICAgICAg
-ICAgICAgICAgIHZob3N0ZmRuYW1lLCB2bmV0X2hkciwgZmQsICZlcnIpOw0KKyAgICAgICAgICAg
-ICAgICAgICAgICAgICB2aG9zdGZkbmFtZSwgdm5ldF9oZHIsIGZkLCAmZXJyLCBOVUxMKTsNCiAg
-ICAgICAgIGlmIChlcnIpIHsNCiAgICAgICAgICAgICBlcnJvcl9wcm9wYWdhdGUoZXJycCwgZXJy
-KTsNCiAgICAgICAgICAgICByZXR1cm4gLTE7DQpAQCAtODM1LDcgKzg0MCw3IEBAIGludCBuZXRf
-aW5pdF90YXAoY29uc3QgTmV0ZGV2ICpuZXRkZXYsIGNvbnN0IGNoYXIgKm5hbWUsDQogICAgICAg
-ICAgICAgbmV0X2luaXRfdGFwX29uZSh0YXAsIHBlZXIsICJ0YXAiLCBuYW1lLCBpZm5hbWUsDQog
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICBzY3JpcHQsIGRvd25zY3JpcHQsDQogICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICB0YXAtPmhhc192aG9zdGZkcyA/IHZob3N0X2Zkc1tpXSA6
-IE5VTEwsDQotICAgICAgICAgICAgICAgICAgICAgICAgICAgICB2bmV0X2hkciwgZmQsICZlcnIp
-Ow0KKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgdm5ldF9oZHIsIGZkLCAmZXJyLCBOVUxM
-KTsNCiAgICAgICAgICAgICBpZiAoZXJyKSB7DQogICAgICAgICAgICAgICAgIGVycm9yX3Byb3Bh
-Z2F0ZShlcnJwLCBlcnIpOw0KICAgICAgICAgICAgICAgICBnb3RvIGZyZWVfZmFpbDsNCkBAIC04
-NzQsMTAgKzg3OSwxMyBAQCBmcmVlX2ZhaWw6DQogDQogICAgICAgICBuZXRfaW5pdF90YXBfb25l
-KHRhcCwgcGVlciwgImJyaWRnZSIsIG5hbWUsIGlmbmFtZSwNCiAgICAgICAgICAgICAgICAgICAg
-ICAgICAgc2NyaXB0LCBkb3duc2NyaXB0LCB2aG9zdGZkbmFtZSwNCi0gICAgICAgICAgICAgICAg
-ICAgICAgICAgdm5ldF9oZHIsIGZkLCAmZXJyKTsNCisgICAgICAgICAgICAgICAgICAgICAgICAg
-dm5ldF9oZHIsIGZkLCAmZXJyLCAmZXJyb3JfaXNfc2V0X3NuZGJ1Zik7DQogICAgICAgICBpZiAo
-ZXJyKSB7DQogICAgICAgICAgICAgZXJyb3JfcHJvcGFnYXRlKGVycnAsIGVycik7DQotICAgICAg
-ICAgICAgY2xvc2UoZmQpOw0KKyAgICAgICAgICAgIGlmIChlcnJvcl9pc19zZXRfc25kYnVmIHx8
-ICh0YXAtPmhhc192aG9zdGZvcmNlICYmDQorICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgIHRhcC0+dmhvc3Rmb3JjZSkpIHsNCisgICAgICAgICAgICAgICAgY2xvc2UoZmQp
-Ow0KKyAgICAgICAgICAgIH0NCiAgICAgICAgICAgICByZXR1cm4gLTE7DQogICAgICAgICB9DQog
-ICAgIH0gZWxzZSB7DQpAQCAtOTEzLDEwICs5MjEsMTQgQEAgZnJlZV9mYWlsOg0KICAgICAgICAg
-ICAgIG5ldF9pbml0X3RhcF9vbmUodGFwLCBwZWVyLCAidGFwIiwgbmFtZSwgaWZuYW1lLA0KICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgaSA+PSAxID8gIm5vIiA6IHNjcmlwdCwNCiAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgIGkgPj0gMSA/ICJubyIgOiBkb3duc2NyaXB0LA0KLSAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgdmhvc3RmZG5hbWUsIHZuZXRfaGRyLCBmZCwgJmVy
-cik7DQorICAgICAgICAgICAgICAgICAgICAgICAgICAgICB2aG9zdGZkbmFtZSwgdm5ldF9oZHIs
-IGZkLCAmZXJyLA0KKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgJmVycm9yX2lzX3NldF9z
-bmRidWYpOw0KICAgICAgICAgICAgIGlmIChlcnIpIHsNCiAgICAgICAgICAgICAgICAgZXJyb3Jf
-cHJvcGFnYXRlKGVycnAsIGVycik7DQotICAgICAgICAgICAgICAgIGNsb3NlKGZkKTsNCisgICAg
-ICAgICAgICAgICAgaWYgKGVycm9yX2lzX3NldF9zbmRidWYgfHwgKHRhcC0+aGFzX3Zob3N0Zm9y
-Y2UgJiYNCisgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHRhcC0+
-dmhvc3Rmb3JjZSkpIHsNCisgICAgICAgICAgICAgICAgICAgIGNsb3NlKGZkKTsNCisgICAgICAg
-ICAgICAgICAgfQ0KICAgICAgICAgICAgICAgICByZXR1cm4gLTE7DQogICAgICAgICAgICAgfQ0K
-ICAgICAgICAgfQ0KDQoNCg0KUFM6IEkgdGhpbmsgSSBkbyBub3QgZXhwcmVzcyB0aGUgbWVhbmlu
-ZyBjbGVhcmx5Li4uIEkgY2FuIGV4cHJlc3MgaXQgaW4NCkNoaW5lc2UgaW4gcHJpdmF0ZSBpZiBu
-ZWNlc3NhcnkNCg0KUmVnYXJkcywNCkpheQ0K
+As stated in the 1ad9f0a464fe commit log, the returned entries are not
+a while PTEG. It was not a problem before 1ad9f0a464fe as it would read
+a single record assuming it contains a whole PTEG but now the code tries
+reading the entire PTEG and "if ((n - i) < invalid)" produces negative
+values which then are converted to size_t for memset() and that throws
+seg fault.
+
+This fixes the math.
+
+While here, fix the last @i increment as well.
+
+Fixes: 1ad9f0a464fe "target/ppc: Fix KVM-HV HPTE accessors"
+Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+---
+
+Record #0:
+(gdb) p *hdr
+$13 = {
+  index = <ptr>,
+  n_valid = 0x1,
+  n_invalid = 0x6
+}
+
+Record #1:
+(gdb) p *hdr
+$18 = {
+  index = <ptr>,
+  n_valid = 0x2,
+  n_invalid = 0x6
+}
+
+
+i.e. in the second iteration of the loop right before
+"if ((n - i) < invalid)":
+(gdb) p n
+$16 = 0x8
+(gdb) p i
+$17 = 0x9
+
+and @invalid becomes -1.
+
+---
+ target/ppc/kvm.c | 11 +++++++----
+ 1 file changed, 7 insertions(+), 4 deletions(-)
+
+diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
+index 0566af7..c2dea81 100644
+--- a/target/ppc/kvm.c
++++ b/target/ppc/kvm.c
+@@ -2657,21 +2657,24 @@ void kvmppc_read_hptes(ppc_hash_pte64_t *hptes, hwaddr ptex, int n)
+ 
+         hdr = (struct kvm_get_htab_header *)buf;
+         while ((i < n) && ((char *)hdr < (buf + rc))) {
+-            int invalid = hdr->n_invalid;
++            int invalid = hdr->n_invalid, valid = hdr->n_valid;
+ 
+             if (hdr->index != (ptex + i)) {
+                 hw_error("kvmppc_read_hptes: Unexpected HPTE index %"PRIu32
+                          " != (%"HWADDR_PRIu" + %d", hdr->index, ptex, i);
+             }
+ 
+-            memcpy(hptes + i, hdr + 1, HASH_PTE_SIZE_64 * hdr->n_valid);
+-            i += hdr->n_valid;
++            if (n - i < valid) {
++                valid = n - i;
++            }
++            memcpy(hptes + i, hdr + 1, HASH_PTE_SIZE_64 * valid);
++            i += valid;
+ 
+             if ((n - i) < invalid) {
+                 invalid = n - i;
+             }
+             memset(hptes + i, 0, invalid * HASH_PTE_SIZE_64);
+-            i += hdr->n_invalid;
++            i += invalid;
+ 
+             hdr = (struct kvm_get_htab_header *)
+                 ((char *)(hdr + 1) + HASH_PTE_SIZE_64 * hdr->n_valid);
+-- 
+2.11.0
