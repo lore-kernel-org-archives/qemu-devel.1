@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42181)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42582)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1eZY4K-0004D2-BK
-	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 03:18:37 -0500
+	(envelope-from <laurent@vivier.eu>) id 1eZY5A-0004ec-Vv
+	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 03:19:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1eZY4F-000423-8v
-	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 03:18:36 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:33280)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1eZY4F-00041W-0C
-	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 03:18:31 -0500
-Date: Thu, 11 Jan 2018 16:18:18 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20180111081818.GB2551@xz-mi>
-References: <20171219084557.9801-1-peterx@redhat.com>
-	<20171219084557.9801-8-peterx@redhat.com>
-	<ab1775ac-be60-31cb-3c7c-c698c2adb1e8@redhat.com>
-	<20180110082639.GH5984@xz-mi>
-	<a2de0d5c-924d-6de8-4bb9-92991801fb3c@redhat.com>
+	(envelope-from <laurent@vivier.eu>) id 1eZY56-0004aK-Th
+	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 03:19:28 -0500
+Received: from mout.kundenserver.de ([212.227.126.131]:59693)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1eZY56-0004ZZ-Jq
+	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 03:19:24 -0500
+References: <20180111001720.16035-1-samuel.thibault@ens-lyon.org>
+From: Laurent Vivier <laurent@vivier.eu>
+Message-ID: <e2ef7466-a201-16d6-94aa-762cb12a1750@vivier.eu>
+Date: Thu, 11 Jan 2018 09:19:14 +0100
 MIME-Version: 1.0
+In-Reply-To: <20180111001720.16035-1-samuel.thibault@ens-lyon.org>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <a2de0d5c-924d-6de8-4bb9-92991801fb3c@redhat.com>
-Subject: Re: [Qemu-devel] [RFC v6 07/27] monitor: unify global init
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCHv2] linux-user: Add getcpu() support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,76 +27,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org, Stefan Hajnoczi <shajnocz@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <famz@redhat.com>, Juan Quintela <quintela@redhat.com>, mdroth@linux.vnet.ibm.com, Laurent Vivier <lvivier@redhat.com>, Markus Armbruster <armbru@redhat.com>, marcandre.lureau@redhat.com, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: Samuel Thibault <samuel.thibault@ens-lyon.org>, qemu-devel@nongnu.org, Riku Voipio <riku.voipio@iki.fi>
 
-On Wed, Jan 10, 2018 at 06:54:45AM -0600, Eric Blake wrote:
-> On 01/10/2018 02:26 AM, Peter Xu wrote:
+Le 11/01/2018 à 01:17, Samuel Thibault a écrit :
+> Signed-off-by: Samuel Thibault <samuel.thibault@ens-lyon.org>
 > 
-> >> The later initialization of the monitor_lock mutex is a potential
-> >> semantic change.  Please beef up the commit message to document why it
-> >> is safe.  In fact, I requested this back on my review of v1, but it
-> >> still hasn't been done. :(
-> >>
-> >> https://lists.gnu.org/archive/html/qemu-devel/2017-09/msg05421.html
-> > 
-> > Sorry for that! I thought you helped proved that somehow (which I
-> > really appreciate)...
-> > 
-> >>
-> >> If my read of history is correct, I think it is sufficient to point to
-> >> commit 05875687 as a place where we no longer care about constructor
-> >> semantics because we are no longer dealing with module_call_init().  But
-> >> you may find a better place to point to.  You already found that
-> >> d622cb587 was what introduced the constructor in the first place, but I
-> >> didn't spend time today auditing the state of qemu back at that time to
-> >> see if the constructor was really necessary back then or just a
-> >> convenience for lack of a better initialization point.
-> >>
-> >> Alternatively, if you can't find a good commit message to point to, at
-> >> least document how you (and I) tested things, using gdb watchpoints, to
-> >> prove it is a safe delay.
-> > 
-> > I did that by observing all users of the lock in current repository:
+> ---
+> Difference from v1: handle failure of put_user_u32 with goto efault;
+> ---
+>  linux-user/syscall.c | 16 ++++++++++++++++
+>  1 file changed, 16 insertions(+)
 > 
-> 
-> > AFAIK all of them are called even after monitor_init(), in other
-> > words, they are all after global init too.
-> > 
-> > As a conclusion, we should be safe here.  Again, I may be wrong
-> > somewhere, please correct me if so.
-> 
-> My gdb testing and your analysis match; we're safe.  So all that's
-> needed is the paragraph documenting that we thought about the issue:
-> 
-> > 
-> >>
-> >> Only if you improve the commit message, you may add:
-> >> Reviewed-by: Eric Blake <eblake@redhat.com>
-> > 
-> > Besides the English fix, how about I add one more paragraph to talk
-> > about monitor_lock in commit message:
-> > 
-> >   monitor_lock won't be used before monitor_init().  So as long as we
-> >   initialize the monitor globals before the first call to
-> >   monitor_init(), we will be safe.
-> 
-> Or even:
-> 
-> monitor_lock is not used before monitor_init() (as confirmed by code
-> analysis and gdb watchpoints); so we are safe delaying what was a
-> constructor-time initialization of the mutex into the later first call
-> to monitor_init().
+> diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+> index 11c9116c4a..89d78b7b48 100644
+> --- a/linux-user/syscall.c
+> +++ b/linux-user/syscall.c
+> @@ -296,6 +296,8 @@ _syscall3(int, sys_sched_getaffinity, pid_t, pid, unsigned int, len,
+>  #define __NR_sys_sched_setaffinity __NR_sched_setaffinity
+>  _syscall3(int, sys_sched_setaffinity, pid_t, pid, unsigned int, len,
+>            unsigned long *, user_mask_ptr);
+> +#define __NR_sys_getcpu __NR_getcpu
+> +_syscall3(int, sys_getcpu, unsigned *, cpu, unsigned *, node, void *, tcache);
+>  _syscall4(int, reboot, int, magic1, int, magic2, unsigned int, cmd,
+>            void *, arg);
+>  _syscall2(int, capget, struct __user_cap_header_struct *, header,
+> @@ -10403,6 +10405,20 @@ abi_long do_syscall(void *cpu_env, int num, abi_long arg1,
+>              ret = get_errno(sys_sched_setaffinity(arg1, mask_size, mask));
+>          }
+>          break;
+> +    case TARGET_NR_getcpu:
+> +        {
+> +            unsigned cpu, node;
+> +            ret = get_errno(sys_getcpu(arg1 ? &cpu : NULL,
+> +                                       arg2 ? &node : NULL,
+> +                                       NULL));
 
-Will take away this.
+you must check for return status to avoid setting the values if there is
+an error:
 
+           if (!is_error(ret)) {
+
+> +            if (arg1 && put_user_u32(cpu, arg1)) {
+> +                goto efault;
+> +            }
+> +            if (arg2 && put_user_u32(node, arg2)) {
+> +                goto efault;
+> +            }
+
+           }
+
+> +        }
+> +        break;
+>      case TARGET_NR_sched_setparam:
+>          {
+>              struct sched_param *target_schp;
 > 
-> > 
-> > With that, could I take your r-b?
-> 
-> Yes.
 
-Thank you.
-
--- 
-Peter Xu
+Thanks,
+Laurent
