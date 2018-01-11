@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58055)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44103)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <gengdongjiu@huawei.com>) id 1eZVug-0000ZI-Bx
-	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 01:00:31 -0500
+	(envelope-from <wei.w.wang@intel.com>) id 1eZWME-0007ui-AL
+	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 01:28:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <gengdongjiu@huawei.com>) id 1eZVue-0002Ql-Mw
-	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 01:00:30 -0500
-References: <1514440458-10515-1-git-send-email-gengdongjiu@huawei.com>
-	<1514440458-10515-6-git-send-email-gengdongjiu@huawei.com>
-	<CAFEAcA-RC6hUMR5jPrgOB7nkWjXaPxo6dYEXO=kgC=59k7EVrw@mail.gmail.com>
-From: gengdongjiu <gengdongjiu@huawei.com>
-Message-ID: <558dc576-6d05-50d4-9f7c-73738e28ad26@huawei.com>
-Date: Thu, 11 Jan 2018 13:59:47 +0800
+	(envelope-from <wei.w.wang@intel.com>) id 1eZWMB-0006nA-6f
+	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 01:28:58 -0500
+Received: from mga05.intel.com ([192.55.52.43]:7652)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
+	id 1eZWMA-0006lw-TH
+	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 01:28:55 -0500
+Message-ID: <5A5704B4.5090502@intel.com>
+Date: Thu, 11 Jan 2018 14:31:16 +0800
+From: Wei Wang <wei.w.wang@intel.com>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA-RC6hUMR5jPrgOB7nkWjXaPxo6dYEXO=kgC=59k7EVrw@mail.gmail.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
+References: <20180110161438.GA28096@stefanha-x1.localdomain>
+In-Reply-To: <20180110161438.GA28096@stefanha-x1.localdomain>
+Content-Type: text/plain; charset=windows-1252; format=flowed
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v14 5/9] target-arm: kvm64: inject
- synchronous External Abort
+Subject: Re: [Qemu-devel] vhost-pci and virtio-vhost-user
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,195 +27,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Shannon Zhao <zhaoshenglong@huawei.com>, Marcelo Tosatti <mtosatti@redhat.com>, Richard
-	Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, James
-	Morse <james.morse@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, kvm-devel <kvm@vger.kernel.org>, QEMU
-	Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Huangshaoyu <huangshaoyu@huawei.com>, "Zhengqiang (turing)" <zhengqiang10@huawei.com>, Xu Wei <xuwei5@hisilicon.com>
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-Hi Peter.
+On 01/11/2018 12:14 AM, Stefan Hajnoczi wrote:
+> Hi Wei,
+> I wanted to summarize the differences between the vhost-pci and
+> virtio-vhost-user approaches because previous discussions may have been
+> confusing.
+>
+> vhost-pci defines a new virtio device type for each vhost device type
+> (net, scsi, blk).  It therefore requires a virtio device driver for each
+> device type inside the slave VM.
+>
+> Adding a new device type requires:
+> 1. Defining a new virtio device type in the VIRTIO specification.
+> 3. Implementing a new QEMU device model.
+> 2. Implementing a new virtio driver.
+>
+> virtio-vhost-user is a single virtio device that acts as a vhost-user
+> protocol transport for any vhost device type.  It requires one virtio
+> driver inside the slave VM and device types are implemented using
+> existing vhost-user slave libraries (librte_vhost in DPDK and
+> libvhost-user in QEMU).
+>
+> Adding a new device type to virtio-vhost-user involves:
+> 1. Adding any new vhost-user protocol messages to the QEMU
+>     virtio-vhost-user device model.
+> 2. Adding any new vhost-user protocol messages to the vhost-user slave
+>     library.
+> 3. Implementing the new device slave.
+>
+> The simplest case is when no new vhost-user protocol messages are
+> required for the new device.  Then all that's needed for
+> virtio-vhost-user is a device slave implementation (#3).  That slave
+> implementation will also work with AF_UNIX because the vhost-user slave
+> library hides the transport (AF_UNIX vs virtio-vhost-user).  Even
+> better, if another person has already implemented that device slave to
+> use with AF_UNIX then no new code is needed for virtio-vhost-user
+> support at all!
+>
+> If you compare this to vhost-pci, it would be necessary to design a new
+> virtio device, implement it in QEMU, and implement the virtio driver.
+> Much of virtio driver is more or less the same thing as the vhost-user
+> device slave but it cannot be reused because the vhost-user protocol
+> isn't being used by the virtio device.  The result is a lot of
+> duplication in DPDK and other codebases that implement vhost-user
+> slaves.
+>
+> The way that vhost-pci is designed means that anyone wishing to support
+> a new device type has to become a virtio device designer.  They need to
+> map vhost-user protocol concepts to a new virtio device type.  This will
+> be time-consuming for everyone involved (e.g. the developer, the VIRTIO
+> community, etc).
+>
+> The virtio-vhost-user approach stays at the vhost-user protocol level as
+> much as possible.  This way there are fewer concepts that need to be
+> mapped by people adding new device types.  As a result, it will allow
+> virtio-vhost-user to keep up with AF_UNIX vhost-user and grow because
+> it's easier to work with.
+>
+> What do you think?
+>
 
-On 2018/1/10 1:30, Peter Maydell wrote:
-> On 28 December 2017 at 05:54, Dongjiu Geng <gengdongjiu@huawei.com> wrote:
->> Add synchronous external abort injection logic, setup
->> exception type and syndrome value. When switch to guest,
->> guest will jump to the synchronous external abort vector
->> table entry.
->>
->> The ESR_ELx.DFSC is set to synchronous external abort(0x10),
->> and ESR_ELx.FnV is set to not valid(0x1), which will tell
->> guest that FAR is not valid and holds an UNKNOWN value.
->> These value will be set to KVM register structures through
->> KVM_SET_ONE_REG IOCTL.
->>
->> Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
->> ---
->> Marc is against that KVM inject the synchronous external abort(SEA) in [1],
->> so user space how to inject it. The test result that injection SEA to guest by Qemu
->> is shown in [2].
->>
->> [1]: https://lkml.org/lkml/2017/3/2/110
->> [2]:
->> Taking exception 4 [Data Abort]
->> ...from EL0 to EL1
->> ...with ESR 0x24/0x92000410
->> ...with FAR 0x0
->> ...with ELR 0x40cf04
->> ...to EL1 PC 0xffffffc000084c00 PSTATE 0x3c5
->> after kvm_inject_arm_sea
->> Unhandled fault: synchronous external abort (0x92000410) at 0x0000007fa234c12c
->> CPU: 0 PID: 536 Comm: devmem Not tainted 4.1.0+ #20
->> Hardware name: linux,dummy-virt (DT)
->> task: ffffffc019ab2b00 ti: ffffffc008134000 task.ti: ffffffc008134000
->> PC is at 0x40cf04
->> LR is at 0x40cdec
->> pc : [<000000000040cf04>] lr : [<000000000040cdec>] pstate: 60000000
->> sp : 0000007ff7b24130
->> x29: 0000007ff7b24260 x28: 0000000000000000
->> x27: 00000000000000ad x26: 000000000049c000
->> x25: 000000000048904b x24: 000000000049c000
->> x23: 0000000040600000 x22: 0000007ff7b243a0
->> x21: 0000000000000002 x20: 0000000000000000
->> x19: 0000000000000020 x18: 0000000000000000
->> x17: 000000000049c6d0 x16: 0000007fa22c85c0
->> x15: 0000000000005798 x14: 0000007fa2205f1c
->> x13: 0000007fa241ccb0 x12: 0000000000000137
->> x11: 0000000000000000 x10: 0000000000000000
->> x9 : 0000000000000000 x8 : 00000000000000de
->> x7 : 0000000000000000 x6 : 0000000000002000
->> x5 : 0000000040600000 x4 : 0000000000000003
->> x3 : 0000000000000001 x2 : 0000000000000000
->> x1 : 0000000000000000 x0 : 0000007fa2418000
->> ---
->>  target/arm/kvm64.c | 65 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
->>  1 file changed, 65 insertions(+)
->>
->> diff --git a/target/arm/kvm64.c b/target/arm/kvm64.c
->> index a16abc8..c00450d 100644
->> --- a/target/arm/kvm64.c
->> +++ b/target/arm/kvm64.c
->> @@ -582,6 +582,71 @@ int kvm_arm_cpreg_level(uint64_t regidx)
->>      return KVM_PUT_RUNTIME_STATE;
->>  }
->>
->> +static int kvm_arm_cpreg_value(ARMCPU *cpu, ptrdiff_t fieldoffset)
->> +{
->> +    int i;
->> +
->> +    for (i = 0; i < cpu->cpreg_array_len; i++) {
-> 
-> This is still absolutely the wrong thing to do. Nothing should
-> need to scan this array like this.
-I will confirm that whether KVM mode will need this code, if not, I will remove this function.
+Thanks Stefan for the clarification.
 
-> 
->> +        uint32_t regidx = kvm_to_cpreg_id(cpu->cpreg_indexes[i]);
->> +        const ARMCPRegInfo *ri;
->> +        ri = get_arm_cp_reginfo(cpu->cp_regs, regidx);
->> +        if (!ri) {
->> +            continue;
->> +        }
->> +
->> +        if (ri->type & ARM_CP_NO_RAW) {
->> +            continue;
->> +        }
->> +
->> +        if (ri->fieldoffset == fieldoffset) {
->> +            cpu->cpreg_values[i] = read_raw_cp_reg(&cpu->env, ri);
->> +            return 0;
->> +        }
->> +    }
->> +    return -EINVAL;
->> +}
->> +
->> +/* Inject synchronous external abort */
->> +static void kvm_inject_arm_sea(CPUState *c)
->> +{
->> +    ARMCPU *cpu = ARM_CPU(c);
->> +    CPUARMState *env = &cpu->env;
->> +    unsigned long cpsr = pstate_read(env);
->> +    uint32_t esr, ret;
->> +
->> +    /* This exception is synchronous data abort*/
-> 
-> Missing space before */
-will fix it.
+I agree with idea of making one single device for all device types. 
+Would you think it is also possible with vhost-pci? (Fundamentally, the 
+duty of the device is to use a bar to expose the master guest memory, 
+and passes the master vring address info and memory region info, which 
+has no dependency on device types)
 
-> 
->> +    c->exception_index = EXCP_DATA_ABORT;
->> +    /* Inject the exception to guest El1 */
-> 
-> "EL1", all caps.
-will fix it.
+If you agree with the above, I think the main difference is what to pass 
+to the driver. I think vhost-pci is simpler because it only passes the 
+above mentioned info, which is sufficient.
 
-> 
->> +    env->exception.target_el = 1;
->> +    CPUClass *cc = CPU_GET_CLASS(c);
-> 
-> Don't declare variables in the middle of the code -- check QEMU's
-> CODING_STYLE doc for more info.
-will fix it.
+Relaying needs to
+1) pass all the vhost-user messages to the driver, and
+2) requires the driver to join the vhost-user negotiation.
+Without above two, the solution already works well, so I'm not sure why 
+would we need the above two from functionality point of view.
 
-> 
->> +
->> +    /* Set the DFSC to synchronous external abort and set FnV to not valid,
->> +     * this will tell guest the FAR_ELx is UNKNOWN for this abort.
->> +     */
->> +    esr = (0x10 | (1 << 10));
->> +
->> +    /* This exception comes from lower or current exception level. */
->> +    if ((cpsr & 0xf) == PSTATE_MODE_EL0t) {
-> 
-> This looks like it'll be wrong for AArch32 guests (which you can
-> still have with KVM with a 64-bit host), and even for AArch32
-> userspace in a 64-bit guest. The correct way to find out what the
-> current EL is is to use arm_current_el().
- sorry, in the OS(include guest OS), for software error recovery, we only support AArch64 kernel, not support AArch32
- kernel or AArch32 user space.
+Finally, either we choose vhost-pci or virtio-vhost-user, future 
+developers will need to study vhost-user protocol and virtio spec (one 
+device). This wouldn't make much difference, right?
 
-> 
->> +        esr |= (EC_DATAABORT << ARM_EL_EC_SHIFT);
->> +    } else {
->> +        esr |= (EC_DATAABORT_SAME_EL << ARM_EL_EC_SHIFT);
->> +    }
-> 
-> I'm pretty sure in a previous round of review I said you shouldn't
-> be manually constructing ESR values. We have helper functions for
-> those (syn_data_abort_*).
-sorry, it is my mistake. I will use syn_data_abort_*.
-
-> 
->> +
->> +    /* For the AArch64, instruction length is 32-bit */
->> +    esr |= ARM_EL_IL;
->> +    env->exception.syndrome = esr;
->> +
->> +    cc->do_interrupt(c);
->> +
->> +    /* set ESR_EL1 */
->> +    ret = kvm_arm_cpreg_value(cpu, offsetof(CPUARMState, cp15.esr_el[1]));
-> 
-> Breakpoint injection doesn't need to do this. Neither should this code.
-Good point.
-After I confirmed, in the TCG mode, it does not need this code. I am not sure whether KVM mode will need it.
-I will test it in the KVM mode. If KVM mode also does not need it, I will remove this code.
-
-
-> 
->> +    if (ret) {
->> +        fprintf(stderr, "<%s> failed to set esr_el1\n", __func__);
->> +        abort();
->> +    }
->> +}
->> +
->>  #define AARCH64_CORE_REG(x)   (KVM_REG_ARM64 | KVM_REG_SIZE_U64 | \
->>                   KVM_REG_ARM_CORE | KVM_REG_ARM_CORE_REG(x))
->>
->> --
->> 1.8.3.1
-> 
-> thanks
-> -- PMM
-> 
-> .
-> 
+Best,
+Wei
