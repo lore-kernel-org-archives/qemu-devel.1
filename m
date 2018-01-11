@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43346)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53707)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1eZjEB-0000Ag-P4
-	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 15:13:32 -0500
+	(envelope-from <no-reply@patchew.org>) id 1eZjei-0005fL-Pr
+	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 15:40:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1eZjE8-0004yG-Ik
-	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 15:13:31 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:55441)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1eZjE8-0004vv-DR
-	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 15:13:28 -0500
-Date: Thu, 11 Jan 2018 22:13:25 +0200
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20180111221307-mutt-send-email-mst@kernel.org>
-References: <1515515942-33692-1-git-send-email-jianjay.zhou@huawei.com>
-	<20180111140057.61f36a8f@redhat.com>
+	(envelope-from <no-reply@patchew.org>) id 1eZjef-00024H-LH
+	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 15:40:56 -0500
+Resent-Message-Id: <E1eZjef-00024H-LH@eggs.gnu.org>
+Received: from sender-of-o52.zoho.com ([135.84.80.217]:21364)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1eZjef-0001xU-Cz
+	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 15:40:53 -0500
+In-Reply-To: <1515700960-26388-1-git-send-email-thuth@redhat.com>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <151570319146.441.4052747471037245256@5adcb62bf0d6>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180111140057.61f36a8f@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v5 0/4] vhost: two fixes and used_memslots
- refactoring
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Thu, 11 Jan 2018 12:39:52 -0800 (PST)
+Subject: Re: [Qemu-devel] [PATCH] net: Allow netdevs to be used with
+ 'hostfwd_add' and 'hostfwd_remove'
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,40 +29,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: Jay Zhou <jianjay.zhou@huawei.com>, qemu-devel@nongnu.org, weidong.huang@huawei.com, wangxinxin.wang@huawei.com, arei.gonglei@huawei.com, liuzhe13@huawei.com
+To: thuth@redhat.com
+Cc: famz@redhat.com, qemu-devel@nongnu.org, jasowang@redhat.com, samuel.thibault@ens-lyon.org, dgilbert@redhat.com
 
-On Thu, Jan 11, 2018 at 02:05:20PM +0100, Igor Mammedov wrote:
-> On Wed, 10 Jan 2018 00:39:02 +0800
-> Jay Zhou <jianjay.zhou@huawei.com> wrote:
-> 
-> Jay,
-> considering how non trivial touched code is, would you mind
-> first adding 'make check' testcases for success/failure paths
-> that you are touching?
-> It would help with merging and ensure that future changes to
-> vhost won't break memslots handling.
-
-Which tests would you like this to be added to?
-
-> > v4 -> v5:
-> >   Making the followed up device_add to fall back to userspace
-> >   virtio when netdev_add fails if vhost force flag does not set.
-> > 
-> > Jay Zhou (4):
-> >   vhost: remove assertion to prevent crash
-> >   tap: do not close fd if only vhost failed to initialize
-> >   vhost: fix memslot limit check
-> >   vhost: used_memslots refactoring
-> > 
-> >  hw/virtio/vhost-backend.c         | 15 +++++++-
-> >  hw/virtio/vhost-user.c            | 74 +++++++++++++++++++++++++++------------
-> >  hw/virtio/vhost.c                 | 30 +++++++++-------
-> >  include/hw/virtio/vhost-backend.h |  6 ++--
-> >  net/tap.c                         | 25 +++++++++----
-> >  5 files changed, 104 insertions(+), 46 deletions(-)
-> > 
-> > --
-> > 1.8.3.1
-> > 
-> > 
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IDE1MTU3MDA5NjAtMjYzODgtMS1naXQtc2VuZC1lbWFpbC10aHV0aEByZWRoYXQu
+Y29tClN1YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0hdIG5ldDogQWxsb3cgbmV0ZGV2cyB0byBi
+ZSB1c2VkIHdpdGggJ2hvc3Rmd2RfYWRkJyBhbmQgJ2hvc3Rmd2RfcmVtb3ZlJwoKPT09IFRFU1Qg
+U0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaAoKQkFTRT1iYXNlCm49MQp0b3RhbD0kKGdpdCBs
+b2cgLS1vbmVsaW5lICRCQVNFLi4gfCB3YyAtbCkKZmFpbGVkPTAKCmdpdCBjb25maWcgLS1sb2Nh
+bCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVl
+Cgpjb21taXRzPSIkKGdpdCBsb2cgLS1mb3JtYXQ9JUggLS1yZXZlcnNlICRCQVNFLi4pIgpmb3Ig
+YyBpbiAkY29tbWl0czsgZG8KICAgIGVjaG8gIkNoZWNraW5nIFBBVENIICRuLyR0b3RhbDogJChn
+aXQgbG9nIC1uIDEgLS1mb3JtYXQ9JXMgJGMpLi4uIgogICAgaWYgISBnaXQgc2hvdyAkYyAtLWZv
+cm1hdD1lbWFpbCB8IC4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgLTsgdGhlbgog
+ICAgICAgIGZhaWxlZD0xCiAgICAgICAgZWNobwogICAgZmkKICAgIG49JCgobisxKSkKZG9uZQoK
+ZXhpdCAkZmFpbGVkCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMy
+MWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0ClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAn
+dGVzdCcKY2M1OWM3ZDUxMCBuZXQ6IEFsbG93IG5ldGRldnMgdG8gYmUgdXNlZCB3aXRoICdob3N0
+ZndkX2FkZCcgYW5kICdob3N0ZndkX3JlbW92ZScKCj09PSBPVVRQVVQgQkVHSU4gPT09CkNoZWNr
+aW5nIFBBVENIIDEvMTogbmV0OiBBbGxvdyBuZXRkZXZzIHRvIGJlIHVzZWQgd2l0aCAnaG9zdGZ3
+ZF9hZGQnIGFuZCAnaG9zdGZ3ZF9yZW1vdmUnLi4uCkVSUk9SOiBjb25zaWRlciB1c2luZyBxZW11
+X3N0cnRvbCBpbiBwcmVmZXJlbmNlIHRvIHN0cnRvbAojNzE6IEZJTEU6IG5ldC9zbGlycC5jOjQx
+NDoKKyAgICAgICAgICAgIG5jID0gbmV0X2h1Yl9maW5kX2NsaWVudF9ieV9uYW1lKHN0cnRvbCho
+dWJfaWQsIE5VTEwsIDApLCBuYW1lKTsKCnRvdGFsOiAxIGVycm9ycywgMCB3YXJuaW5ncywgNzMg
+bGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZp
+ZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRo
+ZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKPT09
+IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKCi0tLQpF
+bWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5v
+cmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQGZyZWVsaXN0
+cy5vcmc=
