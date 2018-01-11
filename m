@@ -1,30 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40460)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50826)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1eZeLe-0007LO-N1
-	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 10:00:56 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1eZeZe-0003p1-Sa
+	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 10:15:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1eZeLb-0003PK-LE
-	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 10:00:54 -0500
-Received: from 3.mo179.mail-out.ovh.net ([178.33.251.175]:47331)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1eZeLb-0003NE-AO
-	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 10:00:51 -0500
-Received: from player755.ha.ovh.net (b9.ovh.net [213.186.33.59])
-	by mo179.mail-out.ovh.net (Postfix) with ESMTP id 9C7B190D53
-	for <qemu-devel@nongnu.org>; Thu, 11 Jan 2018 16:00:48 +0100 (CET)
-Date: Thu, 11 Jan 2018 16:00:42 +0100
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20180111160042.4aabf0fe@bahia.lan>
-In-Reply-To: <20180111001437.qvorx45tyu57s2pm@pacoca>
-References: <20180106004722.1152-1-joserz@linux.vnet.ibm.com>
-	<20180106004722.1152-2-joserz@linux.vnet.ibm.com>
-	<20180109134813.01283a04@bahia.lan>
-	<20180111001437.qvorx45tyu57s2pm@pacoca>
+	(envelope-from <vsementsov@virtuozzo.com>) id 1eZeZd-0005Z5-0C
+	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 10:15:22 -0500
+References: <76a29a1e-7fdb-37a8-9f79-df618d385b05@virtuozzo.com>
+	<9e11cf33-cbe1-9fd5-f265-180e4e14dfa7@redhat.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <6a2d73cc-5042-54c8-364d-18d273547f27@virtuozzo.com>
+Date: Thu, 11 Jan 2018 18:15:04 +0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH 1/1] spapr: Check SMT based on
- KVM_CAP_PPC_SMT_POSSIBLE
+In-Reply-To: <9e11cf33-cbe1-9fd5-f265-180e4e14dfa7@redhat.com>
+Content-Language: en-US
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] qcow2 autoloading bitmaps
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,265 +24,107 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: joserz@linux.vnet.ibm.com
-Cc: david@gibson.dropbear.id.au, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+To: Eric Blake <eblake@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, qemu block <qemu-block@nongnu.org>
+Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <famz@redhat.com>, Max Reitz <mreitz@redhat.com>, Nikolay Shirokovskiy <nshirokovskiy@virtuozzo.com>, Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, "Denis V. Lunev" <den@openvz.org>, John Snow <jsnow@redhat.com>
 
-On Wed, 10 Jan 2018 22:14:37 -0200
-joserz@linux.vnet.ibm.com wrote:
+11.01.2018 17:43, Eric Blake wrote:
+> On 01/11/2018 08:26 AM, Vladimir Sementsov-Ogievskiy wrote:
+>
+>> # @autoload: the bitmap will be automatically loaded when the image it
+>> is stored
+>> #            in is opened. This flag may only be specified for persistent
+>> #            bitmaps. Default is false for block-dirty-bitmap-add.
+>> (Since: 2.10)
+>>
+>> so, if we consider only enabled bitmaps it is ok to direct map autoload
+>> <=> auto.
+>>
+>> But now we've faced into necessity of load/store disabled bitmaps.
+>>
+>> Current behavior is definitely wrong: user sets autoload flag for
+>> disabled bitmap, but on next
+>> Qemu start the bitmap will be autoloaded and enabled.
+> Can we make it an error to set autoload to true when requesting a
+> disabled bitmap? Or can we not even request a disabled bitmap?
 
-> On Tue, Jan 09, 2018 at 01:48:13PM +0100, Greg Kurz wrote:
-> > On Fri,  5 Jan 2018 22:47:22 -0200
-> > Jose Ricardo Ziviani <joserz@linux.vnet.ibm.com> wrote:
-> >   
-> > > Power9 supports 4 HW threads/core but it's possible to emulate
-> > > doorbells to implement virtual SMT. KVM has the KVM_CAP_PPC_SMT_POSSIBLE
-> > > which returns a bitmap with all SMT modes supported by the host.
-> > > 
-> > > Today, QEMU forces the SMT mode based on PVR compat table, this is
-> > > silently done in spapr_fixup_cpu_dt. Then, if user passes thread=8 the
-> > > guest will end up with 4 threads/core without any feedback to the user.
-> > > It is confusing and will crash QEMU if a cpu is hotplugged in that
-> > > guest.
-> > > 
-> > > This patch makes use of KVM_CAP_PPC_SMT_POSSIBLE to check if the host
-> > > supports the SMT mode so it allows Power9 guests to have 8 threads/core
-> > > if desired.
-> > > 
-> > > Reported-by: Satheesh Rajendran <satheera@in.ibm.com>
-> > > Signed-off-by: Jose Ricardo Ziviani <joserz@linux.vnet.ibm.com>
-> > > ---  
-> > 
-> > Hi,
-> > 
-> > I agree with the general idea but I have a few questions.  
-> 
-> Hello!!!! Thank you for your detailed review. :)
-> 
-> I'm copying David too because I've seen other bugs related with (v)smt
-> topic (specially migration) that it could address.
-> 
+currently, autoload is set on bitmap creation, so it is always enabled 
+at this time.
 
-David was already in the Cc list, as expected for all ppc patches :)
+>
+>>
+>> Proposed solution:
+>>   - deprecate @autoload flag for bitmap creation, ignore it
+> Is there ever a case where you'd create an enabled persistent
+> dirty-tracking bitmap, but not want it to be re-enabled the next time
+> the image is created?
 
-> > 
-> > The MIN(smp_threads, ppc_compat_max_threads(cpu)) computation is
-> > performed in spapr_fixup_cpu_dt() at CAS, but it is also performed
-> > in spapr_populate_cpu_dt() at machine reset or when a CPU is added.
-> > 
-> > Shouldn't your patch address the latter as well ?  
-> 
-> As far as I investigated, I found out that ppc_compat_max_threads() is
-> called several times, but it always returns the number of threads from
-> the argument line. Only in spapr_fixup_cpu_dt(), that happens during
-> the guest kernel initialization when it's realizing the CPUS, is that
+looks like we do not. For now we use only persistent+autoload.
 
-I guess you mean 'onlining the CPUS' ?
+> Your argument for ignoring/deleting the parameter
+> is that you can decide whether to set the "auto" flag solely based on
+> whether the bitmap is both persistent and enabled, without needing any
+> additional user input?
 
-> ppc_compat_max_threads() will return that MIN(n_threads, compat->max_threads).
-> 
-> Until them, if(cpu->compat_pvr) is zeroed and QEMU doesn't know the
-> max_threads yet.
-> 
+The main point is that, when we want to load/store disabled bitmaps this
+parameter is confusing: In user's point of view it's ok to have autoloading
+disabled bitmap, which he wants to be autoloaded and disabled on next Qemu
+start. So, to maintain this flag (autoload) for disabled bitmaps, we 
+will need
+to add some additional flag "disabled" to Qcow2 spec, to make it possible to
+have "auto" but "disabled" bitmaps. And we will have to change qcow2 "auto"
+specification, to consider "disabled" bit set in parallel. But all this 
+looks
+superfluous for now. We already have type "dirty tracking bitmaps" in qcow2
+spec for dirty bitmaps. So, for now, "auto" flag set on "dirty tracking
+bitmaps" means that it is enabled. It is logical to assume that all other
+"dirty tracking bitmaps" are disabled.
 
-Indeed, compat mode is negotiated during CAS which happens before secondary
-cpus onlining... but ppc_compat_max_threads() is also called when we hot-plug
-cpus, at a time QEMU should know about compat->max_threads.
+On the other hand, "autoloading" is a bad property for disabled bitmap 
+at all.
+Disabled bitmap is simpler than enabled (or "auto") bitmap, it doesn't 
+require
+any care like "auto" bitmap. So, it is more natural to let Qemu decide 
+to load
+or not any disabled bitmaps.
 
-Speaking of that, it looks like we have another bug in this case: hot-plugged
-cpus are exposed with a real PVR in the DT...
 
-[root@localhost ~]# dtc -f -I fs -O dts /proc/device-tree | grep cpu-version
-                        cpu-version = <0x4e1200>;
-                        cpu-version = <0xf000005>;
-                        cpu-version = <0xf000005>;
 
-Should ppc_set_compat() should be called before we populate the FDT nodes of
-hot-plugged cpus, instead of of calling it from rtas_start_cpu() ?
+>
+>>   - save persistent enabled bitmaps with "auto" flag
+>>   - save persistent disabled bitmaps without "auto" flag
+>>   - on Qemu start load all bitmaps, mapping "auto" flag state to
+>> "enabled" state.
+> So if I follow the argument, the state of the 'auto' flag stored into
+> the file on BDS close (often at qemu exit) is based on whether the
+> bitmap was currently enabled, and the user can then control whether to
+> enable/disable the bitmap on the fly to control whether the 'auto' flag
+> is stored; thus, having the flag at creation time is redundant.
 
-> That's the reason that I added the code only in spapr_fixup_cpu_dt()
-> because this is where the change really happens.
-> 
-> >   
-> > >  hw/ppc/spapr.c       | 14 +++++++++++++-
-> > >  hw/ppc/trace-events  |  1 +
-> > >  target/ppc/kvm.c     |  5 +++++
-> > >  target/ppc/kvm_ppc.h |  6 ++++++
-> > >  4 files changed, 25 insertions(+), 1 deletion(-)
-> > > 
-> > > diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> > > index d1acfe8858..ea2503cd2f 100644
-> > > --- a/hw/ppc/spapr.c
-> > > +++ b/hw/ppc/spapr.c
-> > > @@ -345,7 +345,19 @@ static int spapr_fixup_cpu_dt(void *fdt, sPAPRMachineState *spapr)
-> > >          PowerPCCPU *cpu = POWERPC_CPU(cs);
-> > >          DeviceClass *dc = DEVICE_GET_CLASS(cs);
-> > >          int index = spapr_vcpu_id(cpu);
-> > > -        int compat_smt = MIN(smp_threads, ppc_compat_max_threads(cpu));  
-> > 
-> > Considering that we have:
-> > 
-> > int ppc_compat_max_threads(PowerPCCPU *cpu)
-> > {
-> >     const CompatInfo *compat = compat_by_pvr(cpu->compat_pvr);
-> >     int n_threads = CPU(cpu)->nr_threads;
-> > 
-> >     if (cpu->compat_pvr) {
-> >         g_assert(compat);
-> >         n_threads = MIN(n_threads, compat->max_threads);
-> >     }
-> > 
-> >     return n_threads;
-> > }
-> > 
-> > and
-> > 
-> > void qemu_init_vcpu(CPUState *cpu)
-> > {
-> >     cpu->nr_cores = smp_cores;
-> >     cpu->nr_threads = smp_threads;
-> > ...
-> > }
-> > 
-> > ppc_compat_max_threads() already returns the smaller value of
-> > smp_threads and the maximum number of HW threads for the PVR.
-> > 
-> > I don't quite understand why we had this compat_smt calculation
-> > in the first place...  
-> 
-> Mostly it only returns "n_threads = CPU(cpu)->nr_threads" because until
-> the guest kernel initialization cpu->compat_pvr is false so that
-> MIN() macro is not executed.
-> 
+Yes.
 
-I'm referring to the computation in spapr_fixup_cpu_dt(), which basically
-does:
+>
+>>
+>> Note: we may store a lot of disabled bitmaps in qcow2 image, but loading
+>> them all into RAM may be
+>> inefficient. Actually such bitmap will be needed only on demand (for
+>> export through nbd or
+>> making some kind of backup). So in future it may be optimized by "lazy
+>> load" of disabled bitmaps,
+>> postponing their actual load up to first read or enabling. This
+>> optimization doesn't need changing
+>> of qapi or qcow2 format (at first sight).
+>>
+>>
+>> Note2: now there is no way to disable/enable bitmaps, but there is a
+>>    [PATCH for-2.12 0/4] qmp dirty bitmap API
+>> with big conversation, but I hope, I'll post a new version with a small
+>> fix soon and it will be merged.
+> In other words, you can incorporate your QAPI tweaks proposed here into
+> your respin of that series.
+>
 
-compat_smt = MIN(smp_threads, MIN(smp_threads, compat->max_threads));
+right idea, I'll do so, just wait a bit for others to comment here.
 
-> So, until late, QEMU thinks its guest will have 8 threads/core. During
-> the guest kernel init., that fixup code calls ppc_compat_max_threads
-> that will now have cpu->compat_pvr true and will change the number
-> of threads to 4. Example:
-> 
-> qemu-system-ppc64 -smp sockets=1,cores=1,threads=8
->  +-> qemu_init_vcpu, spapr_populate_cpu_dt: 8 threads/core
->  +-> guest kernel is running and asks about CPUs, spapr_fixup_cpu_dt()
->      runs, sets threads to 4, set ibm,ppc-interrupt-server#s and done.
->  +-> guest now believes it only has 4 threads.
-> 
-> >   
-> > > +
-> > > +        /* set smt to maximum for this current pvr if the number
-> > > +         * passed is higher than defined by PVR compat mode AND
-> > > +         * if KVM cannot emulate it.*/
-> > > +        int compat_smt = smp_threads;
-> > > +        if ((kvmppc_cap_smt_possible() & smp_threads) != smp_threads &&
-> > > +                smp_threads > ppc_compat_max_threads(cpu)) {
-> > > +            compat_smt = ppc_compat_max_threads(cpu);
-> > > +
-> > > +            trace_spapr_fixup_cpu_smt(index, smp_threads,
-> > > +                    kvmppc_cap_smt_possible(),
-> > > +                    ppc_compat_max_threads(cpu));
-> > > +        }  
-> > 
-> > ... so I'm wondering if the above shouldn't be performed in
-> > ppc_compat_max_threads() directly ?   
-> 
-> Hmm, now I'm believe that the whole code could rely on that
-> kvmppc_cap_smt_possible() since it will always return the number of
-> threads supported by the underlying HW. We could have a check in the
-
-Not always, it may return 0 with older KVM or TCG...
-
-> very beginning:
-> 
-> if ((kvmppc_cap_smt_possible() & smp_threads) != smp_threads) {
-
-... in which case, the check ^^ would be wrong.
-
->     // explain the user that such setup is wrong and quit.
-> }
-> 
-> and that part in fixup code could be unecessary.
-> 
-> >   
-> > >  
-> > >          if ((index % smt) != 0) {
-> > >              continue;
-> > > diff --git a/hw/ppc/trace-events b/hw/ppc/trace-events
-> > > index b7c3e64b5e..a8e29d7ab1 100644
-> > > --- a/hw/ppc/trace-events
-> > > +++ b/hw/ppc/trace-events
-> > > @@ -16,6 +16,7 @@ spapr_irq_alloc(int irq) "irq %d"
-> > >  spapr_irq_alloc_block(int first, int num, bool lsi, int align) "first irq %d, %d irqs, lsi=%d, alignnum %d"
-> > >  spapr_irq_free(int src, int irq, int num) "Source#%d, first irq %d, %d irqs"
-> > >  spapr_irq_free_warn(int src, int irq) "Source#%d, irq %d is already free"
-> > > +spapr_fixup_cpu_smt(int idx, int smpt, int kvmt, int pvrt) "CPU(%d): expected smt %d, kvm support %d, max smt pvr %d"
-> > >  
-> > >  # hw/ppc/spapr_hcall.c
-> > >  spapr_cas_pvr_try(uint32_t pvr) "0x%x"
-> > > diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
-> > > index 518dd06e98..aac5667bf4 100644
-> > > --- a/target/ppc/kvm.c
-> > > +++ b/target/ppc/kvm.c
-> > > @@ -2456,6 +2456,11 @@ bool kvmppc_has_cap_mmu_hash_v3(void)
-> > >      return cap_mmu_hash_v3;
-> > >  }
-> > >  
-> > > +int kvmppc_cap_smt_possible(void)
-> > > +{
-> > > +    return cap_ppc_smt_possible;
-> > > +}
-> > > +
-> > >  PowerPCCPUClass *kvm_ppc_get_host_cpu_class(void)
-> > >  {
-> > >      uint32_t host_pvr = mfpvr();
-> > > diff --git a/target/ppc/kvm_ppc.h b/target/ppc/kvm_ppc.h
-> > > index ecb55493cc..6ac33d2b4a 100644
-> > > --- a/target/ppc/kvm_ppc.h
-> > > +++ b/target/ppc/kvm_ppc.h
-> > > @@ -59,6 +59,7 @@ bool kvmppc_has_cap_fixup_hcalls(void);
-> > >  bool kvmppc_has_cap_htm(void);
-> > >  bool kvmppc_has_cap_mmu_radix(void);
-> > >  bool kvmppc_has_cap_mmu_hash_v3(void);
-> > > +int kvmppc_cap_smt_possible(void);
-> > >  int kvmppc_enable_hwrng(void);
-> > >  int kvmppc_put_books_sregs(PowerPCCPU *cpu);
-> > >  PowerPCCPUClass *kvm_ppc_get_host_cpu_class(void);
-> > > @@ -290,6 +291,11 @@ static inline bool kvmppc_has_cap_mmu_hash_v3(void)
-> > >      return false;
-> > >  }
-> > >  
-> > > +static inline int kvmppc_cap_smt_possible(void)
-> > > +{
-> > > +    return -1;  
-> > 
-> > When CONFIG_KVM is set, the semantics of kvmppc_cap_smt_possible() is:
-> > - a bitmap with supported SMT modes if KVM has KVM_CAP_PPC_SMT_POSSIBLE
-> > - 0 if KVM doesn't have KVM_CAP_PPC_SMT_POSSIBLE or we're running in
-> >   TCG mode
-> > 
-> > so it looks a bit weird to return -1 when CONFIG_KVM isn't set (when
-> > running in TCG mode, we would get different values depending on how
-> > the QEMU binary was compiled).
-> > 
-> > Shouldn't this stub return 0 instead ?  
-> 
-> YES! it *must* be otherwise TCG would accept any smt mode,
-> I'll change it.
-> 
-> Thanks :-)
-> 
-> > 
-> > Cheers,
-> > 
-> > --
-> > Greg
-> >   
-> > > +}
-> > > +
-> > >  static inline int kvmppc_enable_hwrng(void)
-> > >  {
-> > >      return -1;  
-> >   
-> 
+-- 
+Best regards,
+Vladimir
