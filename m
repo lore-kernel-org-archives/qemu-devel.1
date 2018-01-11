@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47999)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48055)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mjc@sifive.com>) id 1eZSWd-00039t-Q0
-	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 21:23:33 -0500
+	(envelope-from <mjc@sifive.com>) id 1eZSWi-0003Du-6C
+	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 21:23:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mjc@sifive.com>) id 1eZSWc-0008GZ-NQ
-	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 21:23:27 -0500
-Received: from mail-pf0-x242.google.com ([2607:f8b0:400e:c00::242]:40829)
+	(envelope-from <mjc@sifive.com>) id 1eZSWf-0008IY-KL
+	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 21:23:31 -0500
+Received: from mail-pg0-x241.google.com ([2607:f8b0:400e:c05::241]:40765)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mjc@sifive.com>) id 1eZSWc-0008Fw-I1
-	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 21:23:26 -0500
-Received: by mail-pf0-x242.google.com with SMTP id i66so16313pfd.7
-	for <qemu-devel@nongnu.org>; Wed, 10 Jan 2018 18:23:26 -0800 (PST)
+	(Exim 4.71) (envelope-from <mjc@sifive.com>) id 1eZSWf-0008I5-Bs
+	for qemu-devel@nongnu.org; Wed, 10 Jan 2018 21:23:29 -0500
+Received: by mail-pg0-x241.google.com with SMTP id q12so1663985pgt.7
+	for <qemu-devel@nongnu.org>; Wed, 10 Jan 2018 18:23:29 -0800 (PST)
 From: Michael Clark <mjc@sifive.com>
-Date: Wed, 10 Jan 2018 18:21:50 -0800
-Message-Id: <1515637324-96034-8-git-send-email-mjc@sifive.com>
+Date: Wed, 10 Jan 2018 18:21:52 -0800
+Message-Id: <1515637324-96034-10-git-send-email-mjc@sifive.com>
 In-Reply-To: <1515637324-96034-1-git-send-email-mjc@sifive.com>
 References: <1515637324-96034-1-git-send-email-mjc@sifive.com>
-Subject: [Qemu-devel] [PATCH v3 07/21] RISC-V GDB Stub
+Subject: [Qemu-devel] [PATCH v3 09/21] RISC-V Physical Memory Protection
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,78 +28,490 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Michael Clark <mjc@sifive.com>, Palmer Dabbelt <palmer@sifive.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, RISC-V Patches <patches@groups.riscv.org>
 
-GDB Register read and write routines.
+Implements the physical memory protection extension as specified in
+Privileged ISA Version 1.10.
+
+PMP (Physical Memory Protection) is as-of-yet unused and needs testing.
+The SiFive verification team have PMP test cases that will be run.
+
+Nothing currently depends on PMP support. It would be preferable to keep
+the code in-tree for folk that are interested in RISC-V PMP support.
 
 Signed-off-by: Michael Clark <mjc@sifive.com>
 ---
- target/riscv/gdbstub.c | 59 ++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 59 insertions(+)
- create mode 100644 target/riscv/gdbstub.c
+ target/riscv/pmp.c | 386 +++++++++++++++++++++++++++++++++++++++++++++++++++++
+ target/riscv/pmp.h |  70 ++++++++++
+ 2 files changed, 456 insertions(+)
+ create mode 100644 target/riscv/pmp.c
+ create mode 100644 target/riscv/pmp.h
 
-diff --git a/target/riscv/gdbstub.c b/target/riscv/gdbstub.c
+diff --git a/target/riscv/pmp.c b/target/riscv/pmp.c
 new file mode 100644
-index 0000000..12d1d9f
+index 0000000..f57a420
 --- /dev/null
-+++ b/target/riscv/gdbstub.c
-@@ -0,0 +1,59 @@
++++ b/target/riscv/pmp.c
+@@ -0,0 +1,386 @@
 +/*
-+ * RISC-V GDB Server Stub
++ * QEMU RISC-V PMP (Physical Memory Protection)
 + *
-+ * Author: Sagar Karandikar, sagark@eecs.berkeley.edu
++ * Author: Daire McNamara, daire.mcnamara@emdalo.com
++ *         Ivan Griffin, ivan.griffin@emdalo.com
 + *
++ * This provides a RISC-V Physical Memory Protection implementation
 + *
-+ * This library is free software; you can redistribute it and/or
-+ * modify it under the terms of the GNU Lesser General Public
-+ * License as published by the Free Software Foundation; either
-+ * version 2 of the License, or (at your option) any later version.
++ * Permission is hereby granted, free of charge, to any person obtaining a copy
++ * of this software and associated documentation files (the "Software"), to deal
++ * in the Software without restriction, including without limitation the rights
++ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
++ * copies of the Software, and to permit persons to whom the Software is
++ * furnished to do so, subject to the following conditions:
 + *
-+ * This library is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ * Lesser General Public License for more details.
++ * The above copyright notice and this permission notice shall be included in
++ * all copies or substantial portions of the Software.
 + *
-+ * You should have received a copy of the GNU Lesser General Public
-+ * License along with this library; if not, see <http://www.gnu.org/licenses/>.
++ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
++ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
++ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
++ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
++ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
++ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
++ * THE SOFTWARE.
++ */
++
++/*
++ * PMP (Physical Memory Protection) is as-of-yet unused and needs testing.
 + */
 +
 +#include "qemu/osdep.h"
-+#include "qemu-common.h"
-+#include "exec/gdbstub.h"
++#include "qemu/log.h"
++#include "qapi/error.h"
 +#include "cpu.h"
++#include "qemu-common.h"
 +
-+int riscv_cpu_gdb_read_register(CPUState *cs, uint8_t *mem_buf, int n)
++#ifndef CONFIG_USER_ONLY
++
++#define RISCV_DEBUG_PMP 0
++#define PMP_DEBUG(fmt, ...)                                                \
++    do {                                                                   \
++        if (RISCV_DEBUG_PMP) {                                             \
++            qemu_log_mask(LOG_TRACE, "%s: " fmt, __func__, ##__VA_ARGS__); \
++        }                                                                  \
++    } while (0)
++
++static void pmp_write_cfg(CPURISCVState *env, uint32_t addr_index,
++    uint8_t val);
++static uint8_t pmp_read_cfg(CPURISCVState *env, uint32_t addr_index);
++static void pmp_update_rule(CPURISCVState *env, uint32_t pmp_index);
++
++/*
++ * Accessor method to extract address matching type 'a field' from cfg reg
++ */
++static inline uint8_t pmp_get_a_field(uint8_t cfg)
 +{
-+    /* TODO proper x0 handling */
-+    RISCVCPU *cpu = RISCV_CPU(cs);
-+    CPURISCVState *env = &cpu->env;
++    uint8_t a = cfg >> 3;
++    return a & 0x3;
++}
 +
-+    if (n < 32) {
-+        return gdb_get_regl(mem_buf, env->gpr[n]);
-+    } else if (n == 32) {
-+        return gdb_get_regl(mem_buf, env->pc);
-+    } else if (n < 65) {
-+        return gdb_get_reg64(mem_buf, env->fpr[n - 33]);
++/*
++ * Check whether a PMP is locked or not.
++ */
++static inline int pmp_is_locked(CPURISCVState *env, uint32_t pmp_index)
++{
++
++    if (env->pmp_state.pmp[pmp_index].cfg_reg & PMP_LOCK) {
++        return 1;
 +    }
++
++    /* Top PMP has no 'next' to check */
++    if ((pmp_index + 1u) >= MAX_RISCV_PMPS) {
++        return 0;
++    }
++
++    /* In TOR mode, need to check the lock bit of the next pmp
++     * (if there is a next)
++     */
++    const uint8_t a_field =
++        pmp_get_a_field(env->pmp_state.pmp[pmp_index + 1].cfg_reg);
++    if ((env->pmp_state.pmp[pmp_index + 1u].cfg_reg & PMP_LOCK) &&
++         (PMP_AMATCH_TOR == a_field)) {
++        return 1;
++    }
++
 +    return 0;
 +}
 +
-+int riscv_cpu_gdb_write_register(CPUState *cs, uint8_t *mem_buf, int n)
++/*
++ * Count the number of active rules.
++ */
++static inline uint32_t pmp_get_num_rules(CPURISCVState *env)
 +{
-+    /* TODO proper x0 handling */
-+    RISCVCPU *cpu = RISCV_CPU(cs);
-+    CPURISCVState *env = &cpu->env;
++     return env->pmp_state.num_rules;
++}
 +
-+    if (n < 32) {
-+        env->gpr[n] = ldtul_p(mem_buf);
-+        return sizeof(target_ulong);
-+    } else if (n == 32) {
-+        env->pc = ldtul_p(mem_buf);
-+        return sizeof(target_ulong);
-+    } else if (n < 65) {
-+        env->fpr[n - 33] = ldq_p(mem_buf); /* always 64-bit */
-+        return sizeof(uint64_t);
++/*
++ * Accessor to get the cfg reg for a specific PMP/HART
++ */
++static inline uint8_t pmp_read_cfg(CPURISCVState *env, uint32_t pmp_index)
++{
++    if (pmp_index < MAX_RISCV_PMPS) {
++        return env->pmp_state.pmp[pmp_index].cfg_reg;
 +    }
++
 +    return 0;
 +}
++
++
++/*
++ * Accessor to set the cfg reg for a specific PMP/HART
++ * Bounds checks and relevant lock bit.
++ */
++static void pmp_write_cfg(CPURISCVState *env, uint32_t pmp_index, uint8_t val)
++{
++    if (pmp_index < MAX_RISCV_PMPS) {
++        if (!pmp_is_locked(env, pmp_index)) {
++            env->pmp_state.pmp[pmp_index].cfg_reg = val;
++            pmp_update_rule(env, pmp_index);
++        } else {
++            PMP_DEBUG("ignoring write - locked");
++        }
++    } else {
++        PMP_DEBUG("ignoring write - out of bounds");
++    }
++}
++
++static void pmp_decode_napot(target_ulong a, target_ulong *sa, target_ulong *ea)
++{
++    /*
++       aaaa...aaa0   8-byte NAPOT range
++       aaaa...aa01   16-byte NAPOT range
++       aaaa...a011   32-byte NAPOT range
++       ...
++       aa01...1111   2^XLEN-byte NAPOT range
++       a011...1111   2^(XLEN+1)-byte NAPOT range
++       0111...1111   2^(XLEN+2)-byte NAPOT range
++       1111...1111   Reserved
++    */
++    if (a == -1) {
++        *sa = 0u;
++        *ea = -1;
++        return;
++    } else {
++        target_ulong t1 = ctz64(~a);
++        target_ulong base = (a & ~(((target_ulong)1 << t1) - 1)) << 3;
++        target_ulong range = ((target_ulong)1 << (t1 + 3)) - 1;
++        *sa = base;
++        *ea = base + range;
++    }
++}
++
++
++/* Convert cfg/addr reg values here into simple 'sa' --> start address and 'ea'
++ *   end address values.
++ *   This function is called relatively infrequently whereas the check that
++ *   an address is within a pmp rule is called often, so optimise that one
++ */
++static void pmp_update_rule(CPURISCVState *env, uint32_t pmp_index)
++{
++    int i;
++
++    env->pmp_state.num_rules = 0;
++
++    uint8_t this_cfg = env->pmp_state.pmp[pmp_index].cfg_reg;
++    target_ulong this_addr = env->pmp_state.pmp[pmp_index].addr_reg;
++    target_ulong prev_addr = 0u;
++    target_ulong sa = 0u;
++    target_ulong ea = 0u;
++
++    if (pmp_index >= 1u) {
++        prev_addr = env->pmp_state.pmp[pmp_index - 1].addr_reg;
++    }
++
++    switch (pmp_get_a_field(this_cfg)) {
++    case PMP_AMATCH_OFF:
++        sa = 0u;
++        ea = -1;
++        break;
++
++    case PMP_AMATCH_TOR:
++        sa = prev_addr << 2; /* shift up from [xx:0] to [xx+2:2] */
++        ea = (this_addr << 2) - 1u;
++        break;
++
++    case PMP_AMATCH_NA4:
++        sa = this_addr << 2; /* shift up from [xx:0] to [xx+2:2] */
++        ea = (this_addr + 4u) - 1u;
++        break;
++
++    case PMP_AMATCH_NAPOT:
++        pmp_decode_napot(this_addr, &sa, &ea);
++        break;
++
++    default:
++        sa = 0u;
++        ea = 0u;
++        break;
++    }
++
++    env->pmp_state.addr[pmp_index].sa = sa;
++    env->pmp_state.addr[pmp_index].ea = ea;
++
++    for (i = 0; i < MAX_RISCV_PMPS; i++) {
++        const uint8_t a_field =
++            pmp_get_a_field(env->pmp_state.pmp[i].cfg_reg);
++        if (PMP_AMATCH_OFF != a_field) {
++            env->pmp_state.num_rules++;
++        }
++    }
++}
++
++static int pmp_is_in_range(CPURISCVState *env, int pmp_index, target_ulong addr)
++{
++    int result = 0;
++
++    if ((addr >= env->pmp_state.addr[pmp_index].sa)
++        && (addr <= env->pmp_state.addr[pmp_index].ea)) {
++        result = 1;
++    } else {
++        result = 0;
++    }
++
++    return result;
++}
++
++
++/*
++ * Public Interface
++ */
++
++/*
++ * Check if the address has required RWX privs to complete desired operation
++ */
++bool pmp_hart_has_privs(CPURISCVState *env, target_ulong addr,
++    target_ulong size, pmp_priv_t privs)
++{
++    int i = 0;
++    int ret = -1;
++    target_ulong s = 0;
++    target_ulong e = 0;
++    pmp_priv_t allowed_privs = 0;
++
++    /* Short cut if no rules */
++    if (0 == pmp_get_num_rules(env)) {
++        return true;
++    }
++
++    /* 1.10 draft priv spec states there is an implicit order
++         from low to high */
++    for (i = 0; i < MAX_RISCV_PMPS; i++) {
++        s = pmp_is_in_range(env, i, addr);
++        e = pmp_is_in_range(env, i, addr + size);
++
++        /* partially inside */
++        if ((s + e) == 1) {
++            PMP_DEBUG("pmp violation - access is partially inside");
++            ret = 0;
++            break;
++        }
++
++        /* fully inside */
++        const uint8_t a_field =
++            pmp_get_a_field(env->pmp_state.pmp[i].cfg_reg);
++        if ((s + e) == 2) {
++            if (PMP_AMATCH_OFF == a_field) {
++                return 1;
++            }
++
++            allowed_privs = PMP_READ | PMP_WRITE | PMP_EXEC;
++            if ((env->priv != PRV_M) || pmp_is_locked(env, i)) {
++                allowed_privs &= env->pmp_state.pmp[i].cfg_reg;
++            }
++
++            if ((privs & allowed_privs) == privs) {
++                ret = 1;
++                break;
++            } else {
++                ret = 0;
++                break;
++            }
++        }
++    }
++
++    /* No rule matched */
++    if (ret == -1) {
++        if (env->priv == PRV_M) {
++            ret = 1; /* Privileged spec v1.10 states if no PMP entry matches an
++                      * M-Mode access, the access succeeds */
++        } else {
++            ret = 0; /* Other modes are not allowed to succeed if they don't
++                      * match a rule, but there are rules.  We've checked for
++                      * no rule earlier in this function. */
++        }
++    }
++
++    return ret == 1 ? true : false;
++}
++
++
++/*
++ * Handle a write to a pmpcfg CSP
++ */
++void pmpcfg_csr_write(CPURISCVState *env, uint32_t reg_index,
++    target_ulong val)
++{
++    int i;
++    uint8_t cfg_val;
++
++    PMP_DEBUG("hart " TARGET_FMT_ld ": reg%d, val: 0x" TARGET_FMT_lx,
++        env->mhartid, reg_index, val);
++
++    if ((reg_index & 1) && (sizeof(target_ulong) == 8)) {
++        PMP_DEBUG("ignoring write - incorrect address");
++        return;
++    }
++
++    for (i = 0; i < sizeof(target_ulong); i++) {
++        cfg_val = (val >> 8 * i)  & 0xff;
++        pmp_write_cfg(env, (reg_index * sizeof(target_ulong)) + i,
++            cfg_val);
++    }
++}
++
++
++/*
++ * Handle a read from a pmpcfg CSP
++ */
++target_ulong pmpcfg_csr_read(CPURISCVState *env, uint32_t reg_index)
++{
++    int i;
++    target_ulong cfg_val = 0;
++    uint8_t val = 0;
++
++    for (i = 0; i < sizeof(target_ulong); i++) {
++        val = pmp_read_cfg(env, (reg_index * sizeof(target_ulong)) + i);
++        cfg_val |= (val << (i * 8));
++    }
++
++    PMP_DEBUG("hart " TARGET_FMT_ld ": reg%d, val: 0x" TARGET_FMT_lx,
++        env->mhartid, reg_index, cfg_val);
++
++    return cfg_val;
++}
++
++
++/*
++ * Handle a write to a pmpaddr CSP
++ */
++void pmpaddr_csr_write(CPURISCVState *env, uint32_t addr_index,
++    target_ulong val)
++{
++    PMP_DEBUG("hart " TARGET_FMT_ld ": addr%d, val: 0x" TARGET_FMT_lx,
++        env->mhartid, addr_index, val);
++
++    if (addr_index < MAX_RISCV_PMPS) {
++        if (!pmp_is_locked(env, addr_index)) {
++            env->pmp_state.pmp[addr_index].addr_reg = val;
++            pmp_update_rule(env, addr_index);
++        } else {
++            PMP_DEBUG("ignoring write - locked");
++        }
++    } else {
++        PMP_DEBUG("ignoring write - out of bounds");
++    }
++}
++
++
++/*
++ * Handle a read from a pmpaddr CSP
++ */
++target_ulong pmpaddr_csr_read(CPURISCVState *env, uint32_t addr_index)
++{
++    PMP_DEBUG("hart " TARGET_FMT_ld ": addr%d, val: 0x" TARGET_FMT_lx,
++        env->mhartid, addr_index,
++        env->pmp_state.pmp[addr_index].addr_reg);
++    if (addr_index < MAX_RISCV_PMPS) {
++        return env->pmp_state.pmp[addr_index].addr_reg;
++    } else {
++        PMP_DEBUG("ignoring read - out of bounds");
++        return 0;
++    }
++}
++
++#endif
+diff --git a/target/riscv/pmp.h b/target/riscv/pmp.h
+new file mode 100644
+index 0000000..9f2c32d
+--- /dev/null
++++ b/target/riscv/pmp.h
+@@ -0,0 +1,70 @@
++/*
++ * QEMU RISC-V PMP (Physical Memory Protection)
++ *
++ * Author: Daire McNamara, daire.mcnamara@emdalo.com
++ *         Ivan Griffin, ivan.griffin@emdalo.com
++ *
++ * This provides a RISC-V Physical Memory Protection interface
++ *
++ * Permission is hereby granted, free of charge, to any person obtaining a copy
++ * of this software and associated documentation files (the "Software"), to deal
++ * in the Software without restriction, including without limitation the rights
++ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
++ * copies of the Software, and to permit persons to whom the Software is
++ * furnished to do so, subject to the following conditions:
++ *
++ * The above copyright notice and this permission notice shall be included in
++ * all copies or substantial portions of the Software.
++ *
++ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
++ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
++ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
++ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
++ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
++ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
++ * THE SOFTWARE.
++ */
++
++#ifndef _RISCV_PMP_H_
++#define _RISCV_PMP_H_
++
++typedef enum {
++    PMP_READ  = 1 << 0,
++    PMP_WRITE = 1 << 1,
++    PMP_EXEC  = 1 << 2,
++    PMP_LOCK  = 1 << 7
++} pmp_priv_t;
++
++typedef enum {
++    PMP_AMATCH_OFF,  /* Null (off)                            */
++    PMP_AMATCH_TOR,  /* Top of Range                          */
++    PMP_AMATCH_NA4,  /* Naturally aligned four-byte region    */
++    PMP_AMATCH_NAPOT /* Naturally aligned power-of-two region */
++} pmp_am_t;
++
++typedef struct {
++    target_ulong addr_reg;
++    uint8_t  cfg_reg;
++} pmp_entry_t;
++
++typedef struct {
++    target_ulong sa;
++    target_ulong ea;
++} pmp_addr_t;
++
++typedef struct {
++    pmp_entry_t pmp[MAX_RISCV_PMPS];
++    pmp_addr_t  addr[MAX_RISCV_PMPS];
++    uint32_t num_rules;
++} pmp_table_t;
++
++void pmpcfg_csr_write(CPURISCVState *env, uint32_t reg_index,
++    target_ulong val);
++target_ulong pmpcfg_csr_read(CPURISCVState *env, uint32_t reg_index);
++void pmpaddr_csr_write(CPURISCVState *env, uint32_t addr_index,
++    target_ulong val);
++target_ulong pmpaddr_csr_read(CPURISCVState *env, uint32_t addr_index);
++bool pmp_hart_has_privs(CPURISCVState *env, target_ulong addr,
++    target_ulong size, pmp_priv_t priv);
++
++#endif
 -- 
 2.7.0
