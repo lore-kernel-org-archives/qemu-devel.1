@@ -1,24 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39698)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41306)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <palmer@sifive.com>) id 1eZiLW-0004AL-S0
-	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 14:17:03 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1eZiQ9-00067l-JC
+	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 14:21:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <palmer@sifive.com>) id 1eZiLS-0000Uq-RW
-	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 14:17:02 -0500
-Received: from mail-pg0-x243.google.com ([2607:f8b0:400e:c05::243]:41419)
+	(envelope-from <peter.maydell@linaro.org>) id 1eZiQ8-00046T-Nq
+	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 14:21:49 -0500
+Received: from mail-oi0-x232.google.com ([2607:f8b0:4003:c06::232]:35531)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <palmer@sifive.com>) id 1eZiLS-0000UU-Kg
-	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 14:16:58 -0500
-Received: by mail-pg0-x243.google.com with SMTP id 136so2273749pgd.8
-	for <qemu-devel@nongnu.org>; Thu, 11 Jan 2018 11:16:58 -0800 (PST)
-Date: Thu, 11 Jan 2018 11:16:56 -0800 (PST)
-In-Reply-To: <20180111075812.GA32651@lst.de>
-From: Palmer Dabbelt <palmer@sifive.com>
-Message-ID: <mhng-24816c3a-ac9d-4537-8b58-6717618946e8@palmer-si-x1c4>
-Mime-Version: 1.0 (MHng)
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v2 00/21] RISC-V QEMU Port Submission v2
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1eZiQ8-00045l-Gp
+	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 14:21:48 -0500
+Received: by mail-oi0-x232.google.com with SMTP id 184so2376191oii.2
+	for <qemu-devel@nongnu.org>; Thu, 11 Jan 2018 11:21:48 -0800 (PST)
+MIME-Version: 1.0
+In-Reply-To: <3ffa6112-d2bf-df10-c8ee-e96ead760359@linaro.org>
+References: <20171218174552.18871-1-richard.henderson@linaro.org>
+	<20171218174552.18871-2-richard.henderson@linaro.org>
+	<CAFEAcA_zoqWwAhg5PhuUG=xkRuC3uwT0MF7D3NOvEFg0Z3yKMQ@mail.gmail.com>
+	<3ffa6112-d2bf-df10-c8ee-e96ead760359@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 11 Jan 2018 19:21:27 +0000
+Message-ID: <CAFEAcA8QxgaaLNc_+-5M9D8LQCp3mkUBmfZpt4Gq58DtKgtGCw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH 01/23] scripts: Add decodetree.py
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,23 +31,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: hch@lst.de
-Cc: Michael Clark <mjc@sifive.com>, qemu-devel@nongnu.org, kbastian@mail.uni-paderborn.de, patches+subscribe@groups.riscv.org, sagark@eecs.berkeley.edu
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>
 
-On Wed, 10 Jan 2018 23:58:12 PST (-0800), hch@lst.de wrote:
-> On Wed, Jan 10, 2018 at 03:46:19PM -0800, Michael Clark wrote:
->> - RISC-V Instruction Set Manual Volume I: User-Level ISA Version 2.2
->> - RISC-V Instruction Set Manual Volume II: Privileged ISA Version 1.9.1
->> - RISC-V Instruction Set Manual Volume II: Privileged ISA Version 1.10
+On 11 January 2018 at 19:10, Richard Henderson
+<richard.henderson@linaro.org> wrote:
+> On 01/11/2018 10:06 AM, Peter Maydell wrote:
+>> On 18 December 2017 at 17:45, Richard Henderson
+>> <richard.henderson@linaro.org> wrote:
+
+>>> +# Pattern examples:
+>>> +#
+>>> +#   addl_r   010000 ..... ..... .... 0000000 ..... @opr
+>>> +#   addl_i   010000 ..... ..... .... 0000000 ..... @opi
+>>> +#
+>>
+>> I think we should insist that a pattern defines all the
+>> bits (either as constant values or as fields that get
+>> passed to the decode function). That will help prevent
+>> accidental under-decoding.
 >
-> Same question as for V2:  Why do you want to add code for an obsolete
-> version of the privileged ISA spec? (which as far as I can tell
-> can't even be found online).
+> Hmm.  What do you suggest then for bits that the cpu does not decode at all?
+> This doesn't happen with ARM (I don't think) but it does happen with HPPA, and
+> probably others.
 
-We have a 1.9.1 chip, and that currently constitutes the vast majority of the 
-RISC-V silicon in the wild.  The (somewhat lofty) goal is to eventually be able 
-to emulate every RISC-V system in the world.
+Arm does have undecoded bits (they're in brackets in encoding diagrams),
+but they're UNPREDICTABLE if you don't set them right, so ideally we
+check them all and UNDEF. Our current aarch32 decoder doesn't always
+do this, and it's non-obvious when that happens.
 
-The spec is still available online
+> I suppose I could either wrap it in a field that the translator ignores, or
+> choose another character besides ".", e.g.
+>
+> mfia            000000 xxxxx 00000 xxx 10100101 t:5
+>
+> where bits [21-25] and bits [13-15] really are ignored by hardware.
 
-  https://github.com/riscv/riscv-isa-manual/blob/master/release/riscv-privileged-v1.9.1.pdf
+Yes, I'd like to see something so that if you want the translator
+to ignore a bit you have to explicitly mark it as to be ignored.
+
+Something I noticed the doc comment doesn't mention: what's the
+semantics for if the patterns you declare overlap? Is this a
+purely declarative language where you have to make sure an
+insn can only match one pattern (or get an error, presumably),
+or is there an implicit "match starting from the top, so put
+looser patterns last" process?
+
+thanks
+-- PMM
