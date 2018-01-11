@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59304)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59336)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eZjuy-00065Y-4H
-	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 15:57:45 -0500
+	id 1eZjv1-00069H-Gw
+	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 15:57:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eZjuv-0002nj-EB
-	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 15:57:44 -0500
+	id 1eZjv0-0002sJ-MM
+	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 15:57:47 -0500
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Thu, 11 Jan 2018 17:56:16 -0300
-Message-Id: <20180111205626.23291-12-f4bug@amsat.org>
+Date: Thu, 11 Jan 2018 17:56:17 -0300
+Message-Id: <20180111205626.23291-13-f4bug@amsat.org>
 In-Reply-To: <20180111205626.23291-1-f4bug@amsat.org>
 References: <20180111205626.23291-1-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v6 11/21] hw/arm/xilinx_zynq: implement SDHCI
- Spec v2
+Subject: [Qemu-devel] [PATCH v6 12/21] hw/arm/bcm2835_peripherals: implement
+ SDHCI Spec v3
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,95 +28,62 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Alistair Francis <alistair.francis@xilinx.com>, Peter Maydell <peter.maydell@linaro.org>, Andrey Smirnov <andrew.smirnov@gmail.com>, Igor Mitsyanko <i.mitsyanko@gmail.com>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, Sai Pavan Boddu <saipava@xilinx.com>, Clement Deschamps <clement.deschamps@antfield.fr>, Jean-Christophe Dubois <jcd@tribudubois.net>, =?UTF-8?q?Gr=C3=A9gory=20Estrade?= <gregory.estrade@gmail.com>, Krzysztof Kozlowski <krzk@kernel.org>, Andrew Baumann <Andrew.Baumann@microsoft.com>, Prasad J Pandit <pjp@fedoraproject.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, qemu-arm@nongnu.org, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, Sai Pavan Boddu <saipava@xilinx.com>, Clement Deschamps <clement.deschamps@antfield.fr>, Jean-Christophe Dubois <jcd@tribudubois.net>, =?UTF-8?q?Gr=C3=A9gory=20Estrade?= <gregory.estrade@gmail.com>, Krzysztof Kozlowski <krzk@kernel.org>, Andrew Baumann <Andrew.Baumann@microsoft.com>, Prasad J Pandit <pjp@fedoraproject.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, qemu-arm@nongnu.org
 
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- hw/arm/xilinx_zynq.c | 64 ++++++++++++++++++++++++++++++++--------------------
- 1 file changed, 40 insertions(+), 24 deletions(-)
+ hw/arm/bcm2835_peripherals.c | 32 +++++++++++++++++++++-----------
+ 1 file changed, 21 insertions(+), 11 deletions(-)
 
-diff --git a/hw/arm/xilinx_zynq.c b/hw/arm/xilinx_zynq.c
-index 1836a4ed45..9a106db7b7 100644
---- a/hw/arm/xilinx_zynq.c
-+++ b/hw/arm/xilinx_zynq.c
-@@ -165,10 +165,8 @@ static void zynq_init(MachineState *machine)
-     MemoryRegion *address_space_mem = get_system_memory();
-     MemoryRegion *ext_ram = g_new(MemoryRegion, 1);
-     MemoryRegion *ocm_ram = g_new(MemoryRegion, 1);
--    DeviceState *dev, *carddev;
-+    DeviceState *dev;
-     SysBusDevice *busdev;
--    DriveInfo *di;
--    BlockBackend *blk;
-     qemu_irq pic[64];
-     int n;
+diff --git a/hw/arm/bcm2835_peripherals.c b/hw/arm/bcm2835_peripherals.c
+index 12e0dd11af..79d680cb1b 100644
+--- a/hw/arm/bcm2835_peripherals.c
++++ b/hw/arm/bcm2835_peripherals.c
+@@ -18,9 +18,6 @@
+ /* Peripheral base address on the VC (GPU) system bus */
+ #define BCM2835_VC_PERI_BASE 0x7e000000
  
-@@ -247,27 +245,45 @@ static void zynq_init(MachineState *machine)
-     gem_init(&nd_table[0], 0xE000B000, pic[54-IRQ_OFFSET]);
-     gem_init(&nd_table[1], 0xE000C000, pic[77-IRQ_OFFSET]);
+-/* Capabilities for SD controller: no DMA, high-speed, default clocks etc. */
+-#define BCM2835_SDHC_CAPAREG 0x52034b4
+-
+ static void bcm2835_peripherals_init(Object *obj)
+ {
+     BCM2835PeripheralState *s = BCM2835_PERIPHERALS(obj);
+@@ -254,14 +251,27 @@ static void bcm2835_peripherals_realize(DeviceState *dev, Error **errp)
+     memory_region_add_subregion(&s->peri_mr, RNG_OFFSET,
+                 sysbus_mmio_get_region(SYS_BUS_DEVICE(&s->rng), 0));
  
--    dev = qdev_create(NULL, TYPE_SYSBUS_SDHCI);
--    qdev_init_nofail(dev);
--    sysbus_mmio_map(SYS_BUS_DEVICE(dev), 0, 0xE0100000);
--    sysbus_connect_irq(SYS_BUS_DEVICE(dev), 0, pic[56-IRQ_OFFSET]);
+-    /* Extended Mass Media Controller */
+-    object_property_set_int(OBJECT(&s->sdhci), BCM2835_SDHC_CAPAREG, "capareg",
+-                            &err);
+-    if (err) {
+-        error_propagate(errp, err);
+-        return;
+-    }
 -
--    di = drive_get_next(IF_SD);
--    blk = di ? blk_by_legacy_dinfo(di) : NULL;
--    carddev = qdev_create(qdev_get_child_bus(dev, "sd-bus"), TYPE_SD_CARD);
--    qdev_prop_set_drive(carddev, "drive", blk, &error_fatal);
--    object_property_set_bool(OBJECT(carddev), true, "realized", &error_fatal);
--
--    dev = qdev_create(NULL, TYPE_SYSBUS_SDHCI);
--    qdev_init_nofail(dev);
--    sysbus_mmio_map(SYS_BUS_DEVICE(dev), 0, 0xE0101000);
--    sysbus_connect_irq(SYS_BUS_DEVICE(dev), 0, pic[79-IRQ_OFFSET]);
--
--    di = drive_get_next(IF_SD);
--    blk = di ? blk_by_legacy_dinfo(di) : NULL;
--    carddev = qdev_create(qdev_get_child_bus(dev, "sd-bus"), TYPE_SD_CARD);
--    qdev_prop_set_drive(carddev, "drive", blk, &error_fatal);
--    object_property_set_bool(OBJECT(carddev), true, "realized", &error_fatal);
-+    for (n = 0; n < 2; n++) {
-+        int hci_irq = n ? 79 : 56;
-+        hwaddr hci_addr = n ? 0xE0101000 : 0xE0100000;
-+        DriveInfo *di;
-+        BlockBackend *blk;
-+        DeviceState *carddev;
-+
-+        /* Compatible with:
-+         * - SD Host Controller Specification Version 2.0 Part A2
-+         * - SDIO Specification Version 2.0
-+         * - MMC Specification Version 3.31
-+         *
-+         * - SDMA (single operation DMA)
-+         * - ADMA1 (4 KB boundary limited DMA)
-+         * - ADMA2
-+         *
-+         * - up to seven functions in SD1, SD4, but does not support SPI mode
-+         * - SD high-speed (SDHS) card
-+         * - SD High Capacity (SDHC) card
-+         *
-+         * - Low-speed, 1 KHz to 400 KHz
-+         * - Full-speed, 1 MHz to 50 MHz (25 MB/sec)
-+         */
-+        dev = qdev_create(NULL, TYPE_SYSBUS_SDHCI);
-+        qdev_prop_set_uint8(dev, "sd-spec-version", 2);
-+        qdev_prop_set_bit(dev, "adma1", true);
-+        qdev_prop_set_bit(dev, "high-speed", true);
-+        qdev_prop_set_uint16(dev, "max-block-length", 1024);
-+        qdev_init_nofail(dev);
-+        sysbus_mmio_map(SYS_BUS_DEVICE(dev), 0, hci_addr);
-+        sysbus_connect_irq(SYS_BUS_DEVICE(dev), 0, pic[hci_irq - IRQ_OFFSET]);
-+
-+        di = drive_get_next(IF_SD);
-+        blk = di ? blk_by_legacy_dinfo(di) : NULL;
-+        carddev = qdev_create(qdev_get_child_bus(dev, "sd-bus"), TYPE_SD_CARD);
-+        qdev_prop_set_drive(carddev, "drive", blk, &error_fatal);
-+        object_property_set_bool(OBJECT(carddev), true, "realized",
-+                                 &error_fatal);
-+    }
- 
-     dev = qdev_create(NULL, TYPE_ZYNQ_XADC);
-     qdev_init_nofail(dev);
++    /* Extended Mass Media Controller
++     *
++     * Compatible with:
++     * - SD Host Controller Specification Version 3.0 Draft 1.0
++     * - SDIO Specification Version 3.0
++     * - MMC Specification Version 4.4
++     *
++     * - 32-bit access only
++     * - default clocks
++     * - no DMA
++     * - SD high-speed (SDHS) card
++     * - maximum block size: 1kB
++     *
++     * For the exact details please refer to the Arasan documentation:
++     *   SD3.0_Host_AHB_eMMC4.4_Usersguide_ver5.9_jan11_10.pdf   ¯\_(ツ)_/¯
++     */
++    object_property_set_uint(OBJECT(&s->sdhci), 3, "sd-spec-version", &err);
++    object_property_set_uint(OBJECT(&s->sdhci), 52, "timeout-freq", &err);
++    object_property_set_uint(OBJECT(&s->sdhci), 52, "max-frequency", &err);
++    object_property_set_bool(OBJECT(&s->sdhci), false, "adma1", &err);
++    object_property_set_bool(OBJECT(&s->sdhci), true, "1v8", &err);
+     object_property_set_bool(OBJECT(&s->sdhci), true, "pending-insert-quirk",
+                              &err);
+     if (err) {
 -- 
 2.15.1
