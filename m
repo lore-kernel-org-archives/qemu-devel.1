@@ -1,23 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33002)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33965)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eZiwZ-0007VC-8M
-	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 14:55:31 -0500
+	(envelope-from <mst@redhat.com>) id 1eZixD-00088e-Gk
+	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 14:56:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eZiwN-0003Ap-5W
-	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 14:55:19 -0500
-References: <20180110230825.18321-1-eblake@redhat.com>
-	<20180110230825.18321-3-eblake@redhat.com>
-	<b95cd0c3-0581-b763-07f2-8f90ef5e2e25@virtuozzo.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <b711b9dc-559a-9381-4fd4-f3c5b0907c18@redhat.com>
-Date: Thu, 11 Jan 2018 13:54:46 -0600
+	(envelope-from <mst@redhat.com>) id 1eZix9-0004Gx-KP
+	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 14:55:59 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:47338)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1eZix9-0004GB-DR
+	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 14:55:55 -0500
+Date: Thu, 11 Jan 2018 21:55:52 +0200
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20180111215411-mutt-send-email-mst@kernel.org>
+References: <1515515942-33692-1-git-send-email-jianjay.zhou@huawei.com>
+	<20180111140057.61f36a8f@redhat.com>
+	<B2D15215269B544CADD246097EACE7473AB386CE@DGGEMM505-MBS.china.huawei.com>
 MIME-Version: 1.0
-In-Reply-To: <b95cd0c3-0581-b763-07f2-8f90ef5e2e25@virtuozzo.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="RpNFVsA6OqVbwY3Ibvsf7bG5WBayJmJo6"
-Subject: Re: [Qemu-devel] [PATCH v2 2/6] nbd/server: refactor negotiation
- functions parameters
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <B2D15215269B544CADD246097EACE7473AB386CE@DGGEMM505-MBS.china.huawei.com>
+Subject: Re: [Qemu-devel] [PATCH v5 0/4] vhost: two fixes and used_memslots
+ refactoring
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,108 +29,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
+To: "Zhoujian (jay)" <jianjay.zhou@huawei.com>
+Cc: Igor Mammedov <imammedo@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "Huangweidong (C)" <weidong.huang@huawei.com>, "wangxin (U)" <wangxinxin.wang@huawei.com>, "Gonglei (Arei)" <arei.gonglei@huawei.com>, "Liuzhe (Ahriy, Euler)" <liuzhe13@huawei.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---RpNFVsA6OqVbwY3Ibvsf7bG5WBayJmJo6
-From: Eric Blake <eblake@redhat.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <b711b9dc-559a-9381-4fd4-f3c5b0907c18@redhat.com>
-Subject: Re: [PATCH v2 2/6] nbd/server: refactor negotiation functions
- parameters
-References: <20180110230825.18321-1-eblake@redhat.com>
- <20180110230825.18321-3-eblake@redhat.com>
- <b95cd0c3-0581-b763-07f2-8f90ef5e2e25@virtuozzo.com>
-In-Reply-To: <b95cd0c3-0581-b763-07f2-8f90ef5e2e25@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 01/11/2018 11:55 AM, Vladimir Sementsov-Ogievskiy wrote:
-> 11.01.2018 02:08, Eric Blake wrote:
->> From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
->>
->> Instead of passing currently negotiating option and its length to
->> many of negotiation functions let's just store them on NBDClient
->> struct to be state-variables of negotiation phase.
->>
->> This unifies semantics of negotiation functions and allows
->> tracking changes of remaining option length in future patches.
->>
->> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>=
-
->> Reviewed-by: Eric Blake <eblake@redhat.com>
->> Message-Id: <20171122101958.17065-2-vsementsov@virtuozzo.com>
->> [eblake: rebase, commit message tweak, assert !optlen after
->> negotiation completes]
->> Signed-off-by: Eric Blake <eblake@redhat.com>
->> ---
->> =C2=A0 nbd/server.c | 168
->> +++++++++++++++++++++++++++++------------------------------
->> =C2=A0 1 file changed, 84 insertions(+), 84 deletions(-)
->=20
-
->> @@ -1707,6 +1706,7 @@ static coroutine_fn void
->> nbd_co_client_start(void *opaque)
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return;
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
->>
->> +=C2=A0=C2=A0=C2=A0 assert(!client->optlen);
->=20
->=20
-> hmm, should not it be at the end of nbd_negotiate() ? Looks OK anyway.
-
-Sure, I'll squash this in, for no real change in behavior:
-
-diff --git i/nbd/server.c w/nbd/server.c
-index c22d5e6ecf..3fd145592e 100644
---- i/nbd/server.c
-+++ w/nbd/server.c
-@@ -902,6 +902,7 @@ static coroutine_fn int nbd_negotiate(NBDClient
-*client, Error **errp)
-         }
-     }
-
-+    assert(!client->optlen);
-     trace_nbd_negotiate_success();
-
-     return 0;
-@@ -1726,7 +1727,6 @@ static coroutine_fn void nbd_co_client_start(void
-*opaque)
-         return;
-     }
-
--    assert(!client->optlen);
-     nbd_client_receive_next_request(client);
- }
+On Thu, Jan 11, 2018 at 01:55:38PM +0000, Zhoujian (jay) wrote:
+> Hi Igor,
+> 
+> > -----Original Message-----
+> > From: Igor Mammedov [mailto:imammedo@redhat.com]
+> > Sent: Thursday, January 11, 2018 9:05 PM
+> > To: Zhoujian (jay) <jianjay.zhou@huawei.com>
+> > Cc: qemu-devel@nongnu.org; mst@redhat.com; Huangweidong (C)
+> > <weidong.huang@huawei.com>; wangxin (U) <wangxinxin.wang@huawei.com>; Gonglei
+> > (Arei) <arei.gonglei@huawei.com>; Liuzhe (Ahriy, Euler) <liuzhe13@huawei.com>
+> > Subject: Re: [PATCH v5 0/4] vhost: two fixes and used_memslots refactoring
+> > 
+> > On Wed, 10 Jan 2018 00:39:02 +0800
+> > Jay Zhou <jianjay.zhou@huawei.com> wrote:
+> > 
+> > Jay,
+> > considering how non trivial touched code is, would you mind first adding
+> > 'make check' testcases for success/failure paths that you are touching?
+> > It would help with merging and ensure that future changes to vhost won't
+> > break memslots handling.
+> 
+> Will look into the testcases. Maybe it would take some time since I'm not
+> very familiar with them.
+> 
+> Regards,
+> Jay
 
 
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+ok can you repost whatever's ready please? And please use proper
+threading (e.g. generated with git format-patch --thread=shallow).
 
 
---RpNFVsA6OqVbwY3Ibvsf7bG5WBayJmJo6
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlpXwQYACgkQp6FrSiUn
-Q2oGmgf/VbjCff9M/AfuX2GGViLVjw4XfWNK/Ku2+a5q8JmOo5wNAJAumiqAluDm
-Ks0JeBt00xFJQzYgdGH8GJg21m3V1J2GCVCGn0ipenoQbKNa1BngHIGXjmpmRNZu
-eFyuUaRW+Z8KdPFgb5MqWaV/xa8U3ySXsYSoL2udFr2T7jC6rT35Mh25wzwZPJlK
-Ex1ankb5J2GonZYDoFu1ECUJYnMBJvbtQ7vtR/rUy8PH38n514LXnoFEIhukiV2B
-kUxBa3/reaY0tfnaGm2CECBtn8wYV2n8nBOkpsUqmNMCEPtuL2ZeVnjG7jqyisv+
-jzNUTDjxhJ8NHeoxD2ra1EjFF2z3gA==
-=ddgS
------END PGP SIGNATURE-----
-
---RpNFVsA6OqVbwY3Ibvsf7bG5WBayJmJo6--
+> > 
+> > > v4 -> v5:
+> > >   Making the followed up device_add to fall back to userspace
+> > >   virtio when netdev_add fails if vhost force flag does not set.
+> > >
+> > > Jay Zhou (4):
+> > >   vhost: remove assertion to prevent crash
+> > >   tap: do not close fd if only vhost failed to initialize
+> > >   vhost: fix memslot limit check
+> > >   vhost: used_memslots refactoring
+> > >
+> > >  hw/virtio/vhost-backend.c         | 15 +++++++-
+> > >  hw/virtio/vhost-user.c            | 74 +++++++++++++++++++++++++++--------
+> > ----
+> > >  hw/virtio/vhost.c                 | 30 +++++++++-------
+> > >  include/hw/virtio/vhost-backend.h |  6 ++--
+> > >  net/tap.c                         | 25 +++++++++----
+> > >  5 files changed, 104 insertions(+), 46 deletions(-)
+> > >
+> > > --
+> > > 1.8.3.1
+> > >
+> > >
