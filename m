@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52135)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52321)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1eZd40-0007R0-Ly
-	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 08:38:37 -0500
+	(envelope-from <pm215@archaic.org.uk>) id 1eZd47-0007Yc-1T
+	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 08:38:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1eZd3z-00005U-NI
-	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 08:38:36 -0500
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:45844)
+	(envelope-from <pm215@archaic.org.uk>) id 1eZd46-0000D4-7P
+	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 08:38:43 -0500
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:45856)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1eZd3z-0008UD-ES
-	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 08:38:35 -0500
+	id 1eZd46-0000Bt-06
+	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 08:38:42 -0500
 Received: from pm215 by orth.archaic.org.uk with local (Exim 4.89)
-	(envelope-from <pm215@archaic.org.uk>) id 1eZd3t-0005dU-It
-	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 13:38:29 +0000
+	(envelope-from <pm215@archaic.org.uk>) id 1eZd44-0005kW-VT
+	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 13:38:40 +0000
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 11 Jan 2018 13:38:02 +0000
-Message-Id: <1515677902-23436-7-git-send-email-peter.maydell@linaro.org>
+Date: Thu, 11 Jan 2018 13:38:17 +0000
+Message-Id: <1515677902-23436-22-git-send-email-peter.maydell@linaro.org>
 In-Reply-To: <1515677902-23436-1-git-send-email-peter.maydell@linaro.org>
 References: <1515677902-23436-1-git-send-email-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PULL 06/26] linux-user: Separate binfmt arm CPU
- families
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PULL 21/26] hw/timer/pxa2xx_timer: replace hw_error()
+ -> qemu_log_mask()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,57 +33,59 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-From: Michael Weiser <michael.weiser@gmx.de>
+From: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-Give big-endian arm and aarch64 CPUs their own family in
-qemu-binfmt-conf.sh to make sure we register qemu-user for binaries of
-the opposite endianness on arm and aarch64. Apart from the family
-assignments of the magic values, qemu_get_family() needs to be able to
-distinguish the two and recognise aarch64{,_be} as well.
-
-Signed-off-by: Michael Weiser <michael.weiser@gmx.de>
-Reviewed-by: Laurent Vivier <laurent@vivier.eu>
-Message-id: 20171220212308.12614-7-michael.weiser@gmx.de
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Reviewed-by: Alistair Francis <alistair.francis@xilinx.com>
+Message-id: 20180103224208.30291-2-f4bug@amsat.org
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- scripts/qemu-binfmt-conf.sh | 9 ++++++---
- 1 file changed, 6 insertions(+), 3 deletions(-)
+ hw/timer/pxa2xx_timer.c | 17 +++++++++++++++--
+ 1 file changed, 15 insertions(+), 2 deletions(-)
 
-diff --git a/scripts/qemu-binfmt-conf.sh b/scripts/qemu-binfmt-conf.sh
-index d699535..597efdb 100755
---- a/scripts/qemu-binfmt-conf.sh
-+++ b/scripts/qemu-binfmt-conf.sh
-@@ -24,7 +24,7 @@ arm_family=arm
+diff --git a/hw/timer/pxa2xx_timer.c b/hw/timer/pxa2xx_timer.c
+index 68ba5a7..a489bf5 100644
+--- a/hw/timer/pxa2xx_timer.c
++++ b/hw/timer/pxa2xx_timer.c
+@@ -13,6 +13,7 @@
+ #include "sysemu/sysemu.h"
+ #include "hw/arm/pxa.h"
+ #include "hw/sysbus.h"
++#include "qemu/log.h"
  
- armeb_magic='\x7fELF\x01\x02\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02\x00\x28'
- armeb_mask='\xff\xff\xff\xff\xff\xff\xff\x00\xff\xff\xff\xff\xff\xff\xff\xff\xff\xfe\xff\xff'
--armeb_family=arm
-+armeb_family=armeb
+ #define OSMR0	0x00
+ #define OSMR1	0x04
+@@ -252,8 +253,14 @@ static uint64_t pxa2xx_timer_read(void *opaque, hwaddr offset,
+     case OSNR:
+         return s->snapshot;
+     default:
++        qemu_log_mask(LOG_UNIMP,
++                      "%s: unknown register 0x%02" HWADDR_PRIx "\n",
++                      __func__, offset);
++        break;
+     badreg:
+-        hw_error("pxa2xx_timer_read: Bad offset " REG_FMT "\n", offset);
++        qemu_log_mask(LOG_GUEST_ERROR,
++                      "%s: incorrect register 0x%02" HWADDR_PRIx "\n",
++                      __func__, offset);
+     }
  
- sparc_magic='\x7fELF\x01\x02\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02\x00\x02'
- sparc_mask='\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xfe\xff\xff'
-@@ -94,7 +94,7 @@ aarch64_family=arm
+     return 0;
+@@ -377,8 +384,14 @@ static void pxa2xx_timer_write(void *opaque, hwaddr offset,
+         }
+         break;
+     default:
++        qemu_log_mask(LOG_UNIMP,
++                      "%s: unknown register 0x%02" HWADDR_PRIx " "
++                      "(value 0x%08" PRIx64 ")\n",  __func__, offset, value);
++        break;
+     badreg:
+-        hw_error("pxa2xx_timer_write: Bad offset " REG_FMT "\n", offset);
++        qemu_log_mask(LOG_GUEST_ERROR,
++                      "%s: incorrect register 0x%02" HWADDR_PRIx " "
++                      "(value 0x%08" PRIx64 ")\n", __func__, offset, value);
+     }
+ }
  
- aarch64_be_magic='\x7fELF\x02\x02\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02\x00\xb7'
- aarch64_be_mask='\xff\xff\xff\xff\xff\xff\xff\x00\xff\xff\xff\xff\xff\xff\xff\xff\xff\xfe\xff\xff'
--aarch64_be_family=arm
-+aarch64_be_family=armeb
- 
- hppa_magic='\x7f\x45\x4c\x46\x01\x02\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02\x00\x0f'
- hppa_mask='\xff\xff\xff\xff\xff\xff\xff\x00\xff\xff\xff\xff\xff\xff\xff\xff\xff\xfe\xff\xff'
-@@ -115,9 +115,12 @@ qemu_get_family() {
-     ppc64el|ppc64le)
-         echo "ppcle"
-         ;;
--    arm|armel|armhf|arm64|armv[4-9]*)
-+    arm|armel|armhf|arm64|armv[4-9]*l|aarch64)
-         echo "arm"
-         ;;
-+    armeb|armv[4-9]*b|aarch64_be)
-+        echo "armeb"
-+        ;;
-     sparc*)
-         echo "sparc"
-         ;;
 -- 
 2.7.4
