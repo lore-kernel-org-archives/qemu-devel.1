@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40576)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40610)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eZcj3-0002OY-M1
-	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 08:16:58 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1eZcj8-0002T4-7g
+	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 08:17:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eZcj2-00041e-LT
-	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 08:16:57 -0500
-Received: from mail-ot0-x243.google.com ([2607:f8b0:4003:c0f::243]:42826)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1eZcj2-00040P-GL
-	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 08:16:56 -0500
-Received: by mail-ot0-x243.google.com with SMTP id s3so2037389otc.9
-	for <qemu-devel@nongnu.org>; Thu, 11 Jan 2018 05:16:56 -0800 (PST)
+	(envelope-from <pbonzini@redhat.com>) id 1eZcj5-00045P-1m
+	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 08:17:02 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:39735)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1eZcj4-00043d-Ne
+	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 08:16:58 -0500
+References: <20180110064706.49777-1-lepton@google.com>
+	<20180110195056.85403-1-lepton@google.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <b3398cf9-9985-1895-0c33-e309e2cc52ca@redhat.com>
+Date: Thu, 11 Jan 2018 14:16:52 +0100
 MIME-Version: 1.0
-In-Reply-To: <20171126231634.9531-8-frasse.iglesias@gmail.com>
-References: <20171126231634.9531-1-frasse.iglesias@gmail.com>
-	<20171126231634.9531-8-frasse.iglesias@gmail.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 11 Jan 2018 13:16:34 +0000
-Message-ID: <CAFEAcA-Z2-M88JS7n+zW1AgA99gmeT-cj90BjbEzYEN95c6Zuw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v9 07/13] xilinx_spips: Add support for RX
- discard and RX drain
+In-Reply-To: <20180110195056.85403-1-lepton@google.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 1/3] target/i386: move hflags update
+ code to a function
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,83 +29,177 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Francisco Iglesias <frasse.iglesias@gmail.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Edgar Iglesias <edgari@xilinx.com>, alistai@xilinx.com, francisco.iglesias@feimtech.se, =?UTF-8?Q?Marcin_Krzemi=C5=84ski?= <mar.krzeminski@gmail.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+To: Tao Wu <lepton@google.com>, qemu-devel@nongnu.org
+Cc: rth@twiddle.net, ehabkost@redhat.com
 
-On 26 November 2017 at 23:16, Francisco Iglesias
-<frasse.iglesias@gmail.com> wrote:
-> Add support for the RX discard and RX drain functionality. Also transmit
-> one byte per dummy cycle (to the flash memories) with commands that require
-> these.
->
-> Signed-off-by: Francisco Iglesias <frasse.iglesias@gmail.com>
-> Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
-> Tested-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
+On 10/01/2018 20:50, Tao Wu wrote:
+> We will share the same code for hax/kvm.
+> 
+> Signed-off-by: Tao Wu <lepton@google.com>
 
-Hi. Coverity (CID 1383841) complains that this change introduces
-a use of an uninitialized local variable:
+Merged, thanks.
 
+Paolo
 
->  static void xilinx_spips_flush_txfifo(XilinxSPIPS *s)
->  {
->      int debug_level = 0;
-> +    XilinxQSPIPS *q = (XilinxQSPIPS *) object_dynamic_cast(OBJECT(s),
-> +                                                           TYPE_XILINX_QSPIPS);
->
->      for (;;) {
->          int i;
->          uint8_t tx = 0;
->          uint8_t tx_rx[num_effective_busses(s)];
-
-tx_rx[] is the variable in question.
-
-> +        uint8_t dummy_cycles = 0;
-> +        uint8_t addr_length;
->
->          if (fifo8_is_empty(&s->tx_fifo)) {
->              if (!(s->regs[R_LQSPI_CFG] & LQSPI_CFG_LQ_MODE)) {
-> @@ -258,54 +336,102 @@ static void xilinx_spips_flush_txfifo(XilinxSPIPS *s)
->                  tx_rx[i] = fifo8_pop(&s->tx_fifo);
->              }
->              stripe8(tx_rx, num_effective_busses(s), false);
-> -        } else {
-> +        } else if (s->snoop_state >= SNOOP_ADDR) {
->              tx = fifo8_pop(&s->tx_fifo);
->              for (i = 0; i < num_effective_busses(s); ++i) {
->                  tx_rx[i] = tx;
->              }
+> ---
+>  target/i386/Makefile.objs |  2 +-
+>  target/i386/common_i386.c | 50 +++++++++++++++++++++++++++++++++++++++++++++++
+>  target/i386/common_i386.h | 14 +++++++++++++
+>  target/i386/kvm.c         | 41 ++------------------------------------
+>  4 files changed, 67 insertions(+), 40 deletions(-)
+>  create mode 100644 target/i386/common_i386.c
+>  create mode 100644 target/i386/common_i386.h
+> 
+> diff --git a/target/i386/Makefile.objs b/target/i386/Makefile.objs
+> index 44103a693b..072d502954 100644
+> --- a/target/i386/Makefile.objs
+> +++ b/target/i386/Makefile.objs
+> @@ -1,4 +1,4 @@
+> -obj-y += helper.o cpu.o gdbstub.o xsave_helper.o
+> +obj-y += helper.o cpu.o gdbstub.o xsave_helper.o common_i386.o
+>  obj-$(CONFIG_TCG) += translate.o
+>  obj-$(CONFIG_TCG) += bpt_helper.o cc_helper.o excp_helper.o fpu_helper.o
+>  obj-$(CONFIG_TCG) += int_helper.o mem_helper.o misc_helper.o mpx_helper.o
+> diff --git a/target/i386/common_i386.c b/target/i386/common_i386.c
+> new file mode 100644
+> index 0000000000..285d8bfa48
+> --- /dev/null
+> +++ b/target/i386/common_i386.c
+> @@ -0,0 +1,50 @@
+> +/*
+> + * This work is licensed under the terms of the GNU GPL, version 2 or later.
+> + * See the COPYING file in the top-level directory.
+> + */
+> +
+> +#include "common_i386.h"
+> +
+> +void x86_update_hflags(CPUX86State *env)
+> +{
+> +   uint32_t hflags;
+> +#define HFLAG_COPY_MASK \
+> +    ~( HF_CPL_MASK | HF_PE_MASK | HF_MP_MASK | HF_EM_MASK | \
+> +       HF_TS_MASK | HF_TF_MASK | HF_VM_MASK | HF_IOPL_MASK | \
+> +       HF_OSFXSR_MASK | HF_LMA_MASK | HF_CS32_MASK | \
+> +       HF_SS32_MASK | HF_CS64_MASK | HF_ADDSEG_MASK)
+> +
+> +    hflags = env->hflags & HFLAG_COPY_MASK;
+> +    hflags |= (env->segs[R_SS].flags >> DESC_DPL_SHIFT) & HF_CPL_MASK;
+> +    hflags |= (env->cr[0] & CR0_PE_MASK) << (HF_PE_SHIFT - CR0_PE_SHIFT);
+> +    hflags |= (env->cr[0] << (HF_MP_SHIFT - CR0_MP_SHIFT)) &
+> +                (HF_MP_MASK | HF_EM_MASK | HF_TS_MASK);
+> +    hflags |= (env->eflags & (HF_TF_MASK | HF_VM_MASK | HF_IOPL_MASK));
+> +
+> +    if (env->cr[4] & CR4_OSFXSR_MASK) {
+> +        hflags |= HF_OSFXSR_MASK;
+> +    }
+> +
+> +    if (env->efer & MSR_EFER_LMA) {
+> +        hflags |= HF_LMA_MASK;
+> +    }
+> +
+> +    if ((hflags & HF_LMA_MASK) && (env->segs[R_CS].flags & DESC_L_MASK)) {
+> +        hflags |= HF_CS32_MASK | HF_SS32_MASK | HF_CS64_MASK;
+> +    } else {
+> +        hflags |= (env->segs[R_CS].flags & DESC_B_MASK) >>
+> +                    (DESC_B_SHIFT - HF_CS32_SHIFT);
+> +        hflags |= (env->segs[R_SS].flags & DESC_B_MASK) >>
+> +                    (DESC_B_SHIFT - HF_SS32_SHIFT);
+> +        if (!(env->cr[0] & CR0_PE_MASK) || (env->eflags & VM_MASK) ||
+> +            !(hflags & HF_CS32_MASK)) {
+> +            hflags |= HF_ADDSEG_MASK;
 > +        } else {
-> +            /* Extract a dummy byte and generate dummy cycles according to the
-> +             * link state */
-> +            tx = fifo8_pop(&s->tx_fifo);
-> +            dummy_cycles = 8 / s->link_state;
->          }
-
-Before this if...else ladder was changed, each branch of it
-filled in the whole tx_rx[] array. But the new else {} case
-does not do that...
-
->          for (i = 0; i < num_effective_busses(s); ++i) {
->              int bus = num_effective_busses(s) - 1 - i;
-> -            DB_PRINT_L(debug_level, "tx = %02x\n", tx_rx[i]);
-> -            tx_rx[i] = ssi_transfer(s->spi[bus], (uint32_t)tx_rx[i]);
-> -            DB_PRINT_L(debug_level, "rx = %02x\n", tx_rx[i]);
-> +            if (dummy_cycles) {
-> +                int d;
-> +                for (d = 0; d < dummy_cycles; ++d) {
-> +                    tx_rx[0] = ssi_transfer(s->spi[bus], (uint32_t)tx_rx[0]);
-> +                }
-> +            } else {
-> +                DB_PRINT_L(debug_level, "tx = %02x\n", tx_rx[i]);
-> +                tx_rx[i] = ssi_transfer(s->spi[bus], (uint32_t)tx_rx[i]);
-> +                DB_PRINT_L(debug_level, "rx = %02x\n", tx_rx[i]);
-> +            }
-
-...and subsequent code, both introduced in this patch and code
-already present, will read the tx_rx[] array.
-
-Could one of you have a look at this and determine what the right
-fix is, please?
-
-thanks
--- PMM
+> +            hflags |= ((env->segs[R_DS].base | env->segs[R_ES].base |
+> +                        env->segs[R_SS].base) != 0) << HF_ADDSEG_SHIFT;
+> +        }
+> +    }
+> +    env->hflags = hflags;
+> +
+> +    return;
+> +}
+> diff --git a/target/i386/common_i386.h b/target/i386/common_i386.h
+> new file mode 100644
+> index 0000000000..ed2471de62
+> --- /dev/null
+> +++ b/target/i386/common_i386.h
+> @@ -0,0 +1,14 @@
+> +/* 
+> + * This work is licensed under the terms of the GNU GPL, version 2 or later.
+> + * See the COPYING file in the top-level directory.
+> + */
+> +
+> +#ifndef TARGET_I386_COMMON_I386_H
+> +#define TARGET_I386_COMMON_I386_H
+> +
+> +#include "qemu/osdep.h"
+> +#include "cpu.h"
+> +
+> +void x86_update_hflags(CPUX86State* env);
+> +
+> +#endif
+> diff --git a/target/i386/kvm.c b/target/i386/kvm.c
+> index 6f69e2fcfd..f197eaf5c6 100644
+> --- a/target/i386/kvm.c
+> +++ b/target/i386/kvm.c
+> @@ -25,6 +25,7 @@
+>  #include "sysemu/sysemu.h"
+>  #include "sysemu/hw_accel.h"
+>  #include "sysemu/kvm_int.h"
+> +#include "common_i386.h"
+>  #include "kvm_i386.h"
+>  #include "hyperv.h"
+>  #include "hyperv-proto.h"
+> @@ -1877,7 +1878,6 @@ static int kvm_get_sregs(X86CPU *cpu)
+>  {
+>      CPUX86State *env = &cpu->env;
+>      struct kvm_sregs sregs;
+> -    uint32_t hflags;
+>      int bit, i, ret;
+>  
+>      ret = kvm_vcpu_ioctl(CPU(cpu), KVM_GET_SREGS, &sregs);
+> @@ -1919,44 +1919,7 @@ static int kvm_get_sregs(X86CPU *cpu)
+>      env->efer = sregs.efer;
+>  
+>      /* changes to apic base and cr8/tpr are read back via kvm_arch_post_run */
+> -
+> -#define HFLAG_COPY_MASK \
+> -    ~( HF_CPL_MASK | HF_PE_MASK | HF_MP_MASK | HF_EM_MASK | \
+> -       HF_TS_MASK | HF_TF_MASK | HF_VM_MASK | HF_IOPL_MASK | \
+> -       HF_OSFXSR_MASK | HF_LMA_MASK | HF_CS32_MASK | \
+> -       HF_SS32_MASK | HF_CS64_MASK | HF_ADDSEG_MASK)
+> -
+> -    hflags = env->hflags & HFLAG_COPY_MASK;
+> -    hflags |= (env->segs[R_SS].flags >> DESC_DPL_SHIFT) & HF_CPL_MASK;
+> -    hflags |= (env->cr[0] & CR0_PE_MASK) << (HF_PE_SHIFT - CR0_PE_SHIFT);
+> -    hflags |= (env->cr[0] << (HF_MP_SHIFT - CR0_MP_SHIFT)) &
+> -                (HF_MP_MASK | HF_EM_MASK | HF_TS_MASK);
+> -    hflags |= (env->eflags & (HF_TF_MASK | HF_VM_MASK | HF_IOPL_MASK));
+> -
+> -    if (env->cr[4] & CR4_OSFXSR_MASK) {
+> -        hflags |= HF_OSFXSR_MASK;
+> -    }
+> -
+> -    if (env->efer & MSR_EFER_LMA) {
+> -        hflags |= HF_LMA_MASK;
+> -    }
+> -
+> -    if ((hflags & HF_LMA_MASK) && (env->segs[R_CS].flags & DESC_L_MASK)) {
+> -        hflags |= HF_CS32_MASK | HF_SS32_MASK | HF_CS64_MASK;
+> -    } else {
+> -        hflags |= (env->segs[R_CS].flags & DESC_B_MASK) >>
+> -                    (DESC_B_SHIFT - HF_CS32_SHIFT);
+> -        hflags |= (env->segs[R_SS].flags & DESC_B_MASK) >>
+> -                    (DESC_B_SHIFT - HF_SS32_SHIFT);
+> -        if (!(env->cr[0] & CR0_PE_MASK) || (env->eflags & VM_MASK) ||
+> -            !(hflags & HF_CS32_MASK)) {
+> -            hflags |= HF_ADDSEG_MASK;
+> -        } else {
+> -            hflags |= ((env->segs[R_DS].base | env->segs[R_ES].base |
+> -                        env->segs[R_SS].base) != 0) << HF_ADDSEG_SHIFT;
+> -        }
+> -    }
+> -    env->hflags = hflags;
+> +    x86_update_hflags(env);
+>  
+>      return 0;
+>  }
+> 
