@@ -1,31 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49018)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49653)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1eZaXB-0001lU-QA
-	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 05:56:35 -0500
+	(envelope-from <jasowang@redhat.com>) id 1eZaXx-0002OW-4L
+	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 05:57:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1eZaX6-0000gy-RM
-	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 05:56:33 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:59566)
+	(envelope-from <jasowang@redhat.com>) id 1eZaXs-0001Pd-6j
+	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 05:57:21 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:54558)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1eZaX6-0000gA-Id
-	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 05:56:28 -0500
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id A495CBDC1
-	for <qemu-devel@nongnu.org>; Thu, 11 Jan 2018 10:56:27 +0000 (UTC)
-Date: Thu, 11 Jan 2018 10:56:21 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180111105621.GB2669@work-vm>
-References: <20180105215246.908-1-quintela@redhat.com>
-	<20180105215246.908-11-quintela@redhat.com>
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1eZaXr-0001P0-Ts
+	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 05:57:16 -0500
+References: <20180110161438.GA28096@stefanha-x1.localdomain>
+From: Jason Wang <jasowang@redhat.com>
+Message-ID: <dcb849d4-82fb-de8a-5e81-23d47026c9eb@redhat.com>
+Date: Thu, 11 Jan 2018 18:57:03 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180105215246.908-11-quintela@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v4 10/11] tests: Adjust sleeps for
- migration test
+In-Reply-To: <20180110161438.GA28096@stefanha-x1.localdomain>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] vhost-pci and virtio-vhost-user
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,105 +27,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Juan Quintela <quintela@redhat.com>
-Cc: qemu-devel@nongnu.org, lvivier@redhat.com, peterx@redhat.com
-
-* Juan Quintela (quintela@redhat.com) wrote:
-> Also reorder code to not sleep when event already happened.
-> 
-> Signed-off-by: Juan Quintela <quintela@redhat.com>
-> ---
->  tests/migration-test.c | 29 ++++++++++++++---------------
->  1 file changed, 14 insertions(+), 15 deletions(-)
-> 
-> diff --git a/tests/migration-test.c b/tests/migration-test.c
-> index 70b3c0870b..8914829006 100644
-> --- a/tests/migration-test.c
-> +++ b/tests/migration-test.c
-> @@ -280,10 +280,9 @@ static void read_blocktime(QTestState *who)
->  
->  static void wait_for_migration_complete(QTestState *who)
->  {
-> -    QDict *rsp, *rsp_return;
-> -    bool completed;
-> -
-> -    do {
-> +    while (true) {
-> +        QDict *rsp, *rsp_return;
-> +        bool completed;
->          const char *status;
->  
->          rsp = wait_command(who, "{ 'execute': 'query-migrate' }");
-> @@ -292,8 +291,11 @@ static void wait_for_migration_complete(QTestState *who)
->          completed = strcmp(status, "completed") == 0;
->          g_assert_cmpstr(status, !=,  "failed");
->          QDECREF(rsp);
-> -        usleep(1000 * 100);
-> -    } while (!completed);
-> +        if (completed) {
-> +            return;
-> +        }
-> +        usleep(1000);
-> +    }
-
-OK, so that's mostly about avoiding a sleep in the exit from the normal
-path.
-
->  }
->  
->  static void wait_for_migration_pass(QTestState *who)
-> @@ -302,16 +304,13 @@ static void wait_for_migration_pass(QTestState *who)
->      uint64_t pass;
->  
->      /* Wait for the 1st sync */
-> -    do {
-> +    while (!got_stop && !initial_pass) {
-> +        usleep(1000);
->          initial_pass = get_migration_pass(who);
-> -        if (got_stop || initial_pass) {
-> -            break;
-> -        }
-> -        usleep(1000 * 100);
-> -    } while (true);
-> +    }
->  
->      do {
-> -        usleep(1000 * 100);
-> +        usleep(1000);
->          pass = get_migration_pass(who);
->      } while (pass == initial_pass && !got_stop);
->  }
-
-OK
-
-> @@ -510,13 +509,13 @@ static void test_migrate_end(QTestState *from, QTestState *to)
->      /* Destination still running, wait for a byte to change */
->      do {
->          qtest_memread(to, start_address, &dest_byte_b, 1);
-> -        usleep(10 * 1000);
-> +        usleep(1000 * 10);
-
-Profound :-)
-
->      } while (dest_byte_a == dest_byte_b);
->  
->      qtest_qmp_discard_response(to, "{ 'execute' : 'stop'}");
->      /* With it stopped, check nothing changes */
->      qtest_memread(to, start_address, &dest_byte_c, 1);
-> -    sleep(1);
-> +    usleep(1000 * 200);
-
-OK
-
->      qtest_memread(to, start_address, &dest_byte_d, 1);
->      g_assert_cmpint(dest_byte_c, ==, dest_byte_d);
+To: Stefan Hajnoczi <stefanha@redhat.com>, wei.w.wang@intel.com
+Cc: qemu-devel@nongnu.org
 
 
 
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+On 2018=E5=B9=B401=E6=9C=8811=E6=97=A5 00:14, Stefan Hajnoczi wrote:
+> Hi Wei,
+> I wanted to summarize the differences between the vhost-pci and
+> virtio-vhost-user approaches because previous discussions may have been
+> confusing.
+>
+> vhost-pci defines a new virtio device type for each vhost device type
+> (net, scsi, blk).  It therefore requires a virtio device driver for eac=
+h
+> device type inside the slave VM.
+>
+> Adding a new device type requires:
+> 1. Defining a new virtio device type in the VIRTIO specification.
+> 3. Implementing a new QEMU device model.
+> 2. Implementing a new virtio driver.
+>
+> virtio-vhost-user is a single virtio device that acts as a vhost-user
+> protocol transport for any vhost device type.  It requires one virtio
+> driver inside the slave VM and device types are implemented using
+> existing vhost-user slave libraries (librte_vhost in DPDK and
+> libvhost-user in QEMU).
+>
+> Adding a new device type to virtio-vhost-user involves:
+> 1. Adding any new vhost-user protocol messages to the QEMU
+>     virtio-vhost-user device model.
+> 2. Adding any new vhost-user protocol messages to the vhost-user slave
+>     library.
+> 3. Implementing the new device slave.
+>
+> The simplest case is when no new vhost-user protocol messages are
+> required for the new device.  Then all that's needed for
+> virtio-vhost-user is a device slave implementation (#3).  That slave
+> implementation will also work with AF_UNIX because the vhost-user slave
+> library hides the transport (AF_UNIX vs virtio-vhost-user).  Even
+> better, if another person has already implemented that device slave to
+> use with AF_UNIX then no new code is needed for virtio-vhost-user
+> support at all!
+>
+> If you compare this to vhost-pci, it would be necessary to design a new
+> virtio device, implement it in QEMU, and implement the virtio driver.
+> Much of virtio driver is more or less the same thing as the vhost-user
+> device slave but it cannot be reused because the vhost-user protocol
+> isn't being used by the virtio device.  The result is a lot of
+> duplication in DPDK and other codebases that implement vhost-user
+> slaves.
+>
+> The way that vhost-pci is designed means that anyone wishing to support
+> a new device type has to become a virtio device designer.  They need to
+> map vhost-user protocol concepts to a new virtio device type.  This wil=
+l
+> be time-consuming for everyone involved (e.g. the developer, the VIRTIO
+> community, etc).
+>
+> The virtio-vhost-user approach stays at the vhost-user protocol level a=
+s
+> much as possible.  This way there are fewer concepts that need to be
+> mapped by people adding new device types.  As a result, it will allow
+> virtio-vhost-user to keep up with AF_UNIX vhost-user and grow because
+> it's easier to work with.
+>
+> What do you think?
+>
+> Stefan
 
-> -- 
-> 2.14.3
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+So a question is what's the motivation here?
+
+Form what I'm understanding, vhost-pci tries to build a scalable V2V=20
+private datapath. But according to what you describe here,=20
+virito-vhost-user tries to make it possible to implement the device=20
+inside another VM. I understand the goal of vhost-pci could be done on=20
+top, but it looks to me it would then rather similar to the design of=20
+Xen driver domain. So I can not figure out how it can be done in a high=20
+performance way.
+
+Thanks
