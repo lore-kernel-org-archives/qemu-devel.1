@@ -1,24 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55514)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56880)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1ea03o-000261-UL
-	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 09:11:59 -0500
+	(envelope-from <stefanha@redhat.com>) id 1ea08a-0004io-I8
+	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 09:16:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1ea03j-0007zb-4C
-	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 09:11:56 -0500
-Date: Fri, 12 Jan 2018 12:11:19 -0200
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20180112141119.GF6646@localhost.localdomain>
-References: <20180104144046.30793-1-f4bug@amsat.org>
-	<20180104192203.GD3407@localhost.localdomain>
-	<20180108135122.637e478a@redhat.com>
-	<395b6cff-e4be-1aa9-48f6-82cdbd9633b9@amsat.org>
+	(envelope-from <stefanha@redhat.com>) id 1ea08X-0006q0-Sv
+	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 09:16:52 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:47548)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1ea08X-0006o8-JZ
+	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 09:16:49 -0500
+Date: Fri, 12 Jan 2018 14:16:36 +0000
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20180112141636.GA11423@stefanha-x1.localdomain>
+References: <20171219084557.9801-1-peterx@redhat.com>
+	<20171219084557.9801-23-peterx@redhat.com>
+	<20180109142435.GG31400@stefanha-x1.localdomain>
+	<20180112064455.GN2551@xz-mi>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="a8Wt8u1KmwUX3Y2C"
 Content-Disposition: inline
-In-Reply-To: <395b6cff-e4be-1aa9-48f6-82cdbd9633b9@amsat.org>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC PATCH 0/6] qom: introduce TypeInfo name
- aliases
+In-Reply-To: <20180112064455.GN2551@xz-mi>
+Subject: Re: [Qemu-devel] [RFC v6 22/27] qmp: isolate responses into io
+ thread
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,63 +31,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
-Cc: Igor Mammedov <imammedo@redhat.com>, Alistair Francis <alistair.francis@xilinx.com>, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, Andreas =?iso-8859-1?Q?F=E4rber?= <afaerber@suse.de>, Markus Armbruster <armbru@redhat.com>, Sascha Silbe <silbe@linux.vnet.ibm.com>, Alexander Graf <agraf@suse.de>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, qemu-devel@nongnu.org, qemu-arm@nongnu.org, Fam Zheng <famz@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>, Juan Quintela <quintela@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, Stefan Hajnoczi <shajnocz@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <famz@redhat.com>, Juan Quintela <quintela@redhat.com>, mdroth@linux.vnet.ibm.com, Eric Blake <eblake@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Markus Armbruster <armbru@redhat.com>, marcandre.lureau@redhat.com, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 
-On Mon, Jan 08, 2018 at 11:10:37AM -0300, Philippe Mathieu-Daud=E9 wrote:
-> Hi Igor,
->=20
-> On 01/08/2018 09:51 AM, Igor Mammedov wrote:
-> [...]
-> > Though it seems easy and trivial, I'm a bit concerned about using
-> > QOM types for the task though.
-> > Also see commit 6acbe4c6f which labels aliases as a bad idea
-> > and says that they are there only for compatibility and shouldn't
-> > be used.
-> > So far I agree with that statement, because it introduces
-> > ambiguity in code used internally and more worrying is that
-> > this ambiguity will increase user visible ABI (think of '-device_add =
-FOO_ALIAS')
-> > that we would need to maintain afterwards.
-> > It would be nice to have unified alias API, but I think it should
-> > be separate one and limited to the same scope (i.e. compat stuff),
-> > and even that won't be easy as different alias impl. we have now
-> > have a different needs.
+
+--a8Wt8u1KmwUX3Y2C
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Fri, Jan 12, 2018 at 02:44:55PM +0800, Peter Xu wrote:
+> On Tue, Jan 09, 2018 at 02:24:35PM +0000, Stefan Hajnoczi wrote:
+> > On Tue, Dec 19, 2017 at 04:45:52PM +0800, Peter Xu wrote:
+> > > +static void monitor_qmp_bh_responder(void *opaque)
+> > > +{
+> > > +    QMPResponse response;
+> > > +
+> > > +    while (true) {
+> > > +        response =3D monitor_qmp_response_pop_one();
+> > > +        if (!response.data) {
+> > > +            break;
+> > > +        }
+> > > +        monitor_json_emitter_raw(response.mon, response.data);
 > >=20
-> > wrt this series targeted usage, I'd prefer that object_new/initialize
-> > would use real type names when creating devices as it does currently
+> > Have you audited all mon->out_lock users to ensure that guest memory is
+> > never touched while the lock is held?
 > >=20
-> > FDT linux guest specific names wouldn't seep into device model
-> > itself. Firmware (FDT or ACPI) should be separate from device
-> > implementation.
+> > If guest memory is touched then the main loop could be blocked due to
+> > postcopy and when the IOThread executes monitor_qmp_bh_responder() ->
+> > monitor_json_emitter_raw() -> monitor_puts() it will also hang!
 >=20
-> Good point.
+> Yes, I am mostly certain that it never touches guest memory.  IMHO
+> it's a pure lock for monitor's output buffer since day one of its
+> occurence in 6cff3e8594c.
 >=20
-> > If really there is need to dynamically scan present devices
-> > and build FDT from result, then probably we should introduce
-> > interface that devices could implement if necessary.
-> > (I was thinking about such possibility for ACPI). But so far
-> > it looked to me as too much overhead for what we do now.
+> An extreme case I can think of is when someone wants to dump some data
+> from guest memory in QMP (I suspect who will use it though...).  In
+> that case we will still be safe, since the guest memory access should
+> be happening in g_strdup_vprintf() rather than monitor_puts(), so even
+> if it happens we will hang at g_strdup_vprintf() without the lock taken.
 >=20
-> I see, I thought about something similar but TypeInfo.aliases was way
-> too simple to not try this series first.
+> >=20
+> > Please add a comment above the out_lock declaration letting users know
+> > that they must not touch guest memory while holding the lock.
 >=20
-> What about adding a INTERFACE_FDT_DEVICE type (InterfaceInfo) and let
-> the FDT devices implement something such:
->=20
-> typedef struct {
->     /*< private >*/
->     InterfaceClass parent_class;
->     DeviceClass parent_class;
->     /*< public >*/
->     bool (*is_alias)(FDTDeviceIf *dev, const char *name);
->     bool (*set_prop...)(FDTDeviceIf *dev, const char *property, ...);
->     const void *(*get_prop)(FDTDeviceIf *dev, const char *property);
+> I'm not sure whether adding a comment like this for the lock would be
+> a bit strange, but I agree it should be better than nothing.  Thanks,
 
-An interface common to FDT devices probably make sense, but I
-don't know if the one you suggest above makes sense or not (a
-description of each method would be useful to understand what
-exactly they would do).
+This is a case where out-of-band code depends on a mutex that non-OOB
+code is used.  According to the documentation added in this patch series
+all critical sections must also follow the OOB code rules.
 
---=20
-Eduardo
+Adding this comment informs people working with the code to follow OOB
+code rules.  It certainly is safer than leaving this assumption
+undocumented.
+
+Stefan
+
+--a8Wt8u1KmwUX3Y2C
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJaWMNEAAoJEJykq7OBq3PIZisIAL6C9TVoUiv4KSRROLqfPT3K
+stvu/QsLURr+QotkNYcG7jiMasn/iAFXnQNrJ9/pAZ6xDf5002d2+r1wairqzbSj
+jPsas/6X+2RfC6ZrhZCg20Pq9LEk05GlxhcaJM0l6BA0Z2QOQ8UA6hcx/+va9Aex
+NlFXaeQR3hiuRl3+BDmuF0xHfb7UkkDmzrsqTQDAikdzWNU2wFFzGYLiLEUYNdf8
+hrYFy9RbNFTQBB+P2Y5R+joJvTlPhdAQcjJbNRdEycSQ5Cuf5wc0rZf+Nke6nTXE
+uzMLCYzgolxEgSTKqZNBwxKOdXQJ81JS5dMIIuZ/rnRvQxmenBa4rIcD8KB/ZBo=
+=wjdm
+-----END PGP SIGNATURE-----
+
+--a8Wt8u1KmwUX3Y2C--
