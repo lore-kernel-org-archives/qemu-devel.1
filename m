@@ -1,26 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37560)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38112)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eZzQt-00031c-DG
-	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 08:31:44 -0500
+	(envelope-from <kraxel@redhat.com>) id 1eZzTI-0003vp-Ak
+	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 08:34:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eZzQs-0000ss-Ea
-	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 08:31:43 -0500
-Received: from mail-oi0-x229.google.com ([2607:f8b0:4003:c06::229]:32994)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1eZzQs-0000s1-9i
-	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 08:31:42 -0500
-Received: by mail-oi0-x229.google.com with SMTP id y141so3939151oia.0
-	for <qemu-devel@nongnu.org>; Fri, 12 Jan 2018 05:31:42 -0800 (PST)
+	(envelope-from <kraxel@redhat.com>) id 1eZzTD-00049j-AT
+	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 08:34:12 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:56652)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1eZzTD-000489-4q
+	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 08:34:07 -0500
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 3574870D7D
+	for <qemu-devel@nongnu.org>; Fri, 12 Jan 2018 13:34:06 +0000 (UTC)
+Date: Fri, 12 Jan 2018 14:34:03 +0100
+From: Gerd Hoffmann <kraxel@redhat.com>
+Message-ID: <20180112133403.kypz4zkeubaqgb4n@sirius.home.kraxel.org>
+References: <20171212113440.16483-1-berrange@redhat.com>
+	<20180110164303.GQ3205@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <1515759853-20360-1-git-send-email-pbonzini@redhat.com>
-References: <1515759853-20360-1-git-send-email-pbonzini@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 12 Jan 2018 13:31:21 +0000
-Message-ID: <CAFEAcA_0uFXKY8Xg-FN+AgqVGoL+SJa-FPC8vyw-wLHazu6JEA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PULL v2 00/52] Misc patches for 2017-01-12
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180110164303.GQ3205@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] ui: deprecate use of GTK 2.x in favour of
+ 3.x series
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,75 +34,17 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-On 12 January 2018 at 12:24, Paolo Bonzini <pbonzini@redhat.com> wrote:
-> The following changes since commit 997eba28a3ed5400a80f754bf3a1c8044b75b9=
-ff:
->
->   Merge remote-tracking branch 'remotes/pmaydell/tags/pull-target-arm-201=
-80111' into staging (2018-01-11 14:34:41 +0000)
->
-> are available in the git repository at:
->
->
->   git://github.com/bonzini/qemu.git tags/for-upstream
->
-> for you to fetch changes up to a88ae3be7bf0550adf877f5422c837dbf4bf4a39:
->
->   scripts/analyse-locks-simpletrace.py: script to analyse lock times (201=
-8-01-12 13:22:05 +0100)
->
-> ----------------------------------------------------------------
-> * QemuMutex tracing improvements (Alex)
-> * ram_addr_t optimization (David)
-> * SCSI fixes (Fam, Stefan, me)
-> * do {} while (0) fixes (Eric)
-> * KVM fix for PMU (Jan)
-> * memory leak fixes from ASAN (Marc-Andr=C3=A9)
-> * migration fix for HPET, icount, loadvm (Maria, Pavel)
-> * hflags fixes (me, Tao)
-> * block/iscsi uninitialized variable (Peter L.)
-> * full support for GMainContexts in character devices (Peter Xu)
-> * more boot-serial-test (Thomas)
-> * Memory leak fix (Zhecheng)
->
-> ----------------------------------------------------------------
+On Wed, Jan 10, 2018 at 04:43:03PM +0000, Daniel P. Berrange wrote:
+> ping.
+> 
+> Gerd, do you have any opinions on this, and also deprecating SDL-1 ?
 
-This fails to build on x86-64 Linux, with an --enable-debug build, using
-gcc (Ubuntu 5.4.0-6ubuntu1~16.04.5) 5.4.0 20160609
+Patch added to queue.
 
-  CC      util/coroutine-ucontext.o
-/home/petmay01/linaro/qemu-for-merges/util/coroutine-ucontext.c: In
-function =E2=80=98finish_switch_fiber=E2=80=99:
-/home/petmay01/linaro/qemu-for-merges/util/coroutine-ucontext.c:75:5:
-error: implicit declaration of function
-=E2=80=98__sanitizer_finish_switch_fiber=E2=80=99
-[-Werror=3Dimplicit-function-declaration]
-     __sanitizer_finish_switch_fiber(fake_stack_save, &bottom_old, &size_ol=
-d);
-     ^
-/home/petmay01/linaro/qemu-for-merges/util/coroutine-ucontext.c:75:5:
-error: nested extern declaration of =E2=80=98__sanitizer_finish_switch_fibe=
-r=E2=80=99
-[-Werror=3Dnested-externs]
-/home/petmay01/linaro/qemu-for-merges/util/coroutine-ucontext.c: In
-function =E2=80=98start_switch_fiber=E2=80=99:
-/home/petmay01/linaro/qemu-for-merges/util/coroutine-ucontext.c:88:5:
-error: implicit declaration of function
-=E2=80=98__sanitizer_start_switch_fiber=E2=80=99
-[-Werror=3Dimplicit-function-declaration]
-     __sanitizer_start_switch_fiber(fake_stack_save, bottom, size);
-     ^
-/home/petmay01/linaro/qemu-for-merges/util/coroutine-ucontext.c:88:5:
-error: nested extern declaration of =E2=80=98__sanitizer_start_switch_fiber=
-=E2=80=99
-[-Werror=3Dnested-externs]
+Yes, I'll take a SDL-1 deprecation patch too.
 
-
-It looks like older versions of gcc and the sanitizer don't
-provide those switch_fiber functions.
-
-thanks
--- PMM
+cheers,
+  Gerd
