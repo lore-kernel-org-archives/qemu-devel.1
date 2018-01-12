@@ -1,35 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45293)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46330)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ea4KN-00063x-Ej
-	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 13:45:20 -0500
+	(envelope-from <laurent@vivier.eu>) id 1ea4Ld-00070Z-QW
+	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 13:46:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ea4KJ-0006om-4e
-	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 13:45:19 -0500
-Received: from mail-qt0-x241.google.com ([2607:f8b0:400d:c0d::241]:37382)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ea4KI-0006oK-WF
-	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 13:45:15 -0500
-Received: by mail-qt0-x241.google.com with SMTP id f2so7183939qtj.4
-	for <qemu-devel@nongnu.org>; Fri, 12 Jan 2018 10:45:14 -0800 (PST)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-References: <20180111193021.17466-1-f4bug@amsat.org>
-	<20180111193021.17466-4-f4bug@amsat.org>
-	<CAFEAcA8UvqmtzxcQrDWF24OQsBek0s2uYPOsoCs5YqH80MpXnw@mail.gmail.com>
-	<CAAdtpL7Dz3kQyVYZy9iUvy-iFRZMD-+3o0Gsfb=HOzpMgDTkhw@mail.gmail.com>
-Message-ID: <f544092b-9214-32a1-4aa2-faac004618d4@amsat.org>
-Date: Fri, 12 Jan 2018 15:45:10 -0300
+	(envelope-from <laurent@vivier.eu>) id 1ea4LY-0008LV-U4
+	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 13:46:37 -0500
+Received: from mout.kundenserver.de ([212.227.17.10]:57476)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1ea4LY-0008K9-JM
+	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 13:46:32 -0500
+References: <20180108231048.23966-1-laurent@vivier.eu>
+	<20180108231048.23966-3-laurent@vivier.eu>
+	<755a005d-600e-7f39-bd90-314bd970ef8e@linaro.org>
+From: Laurent Vivier <laurent@vivier.eu>
+Message-ID: <881a5160-2803-5418-9b68-7acdf69c778f@vivier.eu>
+Date: Fri, 12 Jan 2018 19:46:29 +0100
 MIME-Version: 1.0
-In-Reply-To: <CAAdtpL7Dz3kQyVYZy9iUvy-iFRZMD-+3o0Gsfb=HOzpMgDTkhw@mail.gmail.com>
+In-Reply-To: <755a005d-600e-7f39-bd90-314bd970ef8e@linaro.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v6 03/13] sdhci: refactor same sysbus/pci
- properties into a common one
+Subject: Re: [Qemu-devel] [PATCH 2/6] target/m68k: add MC68040 MMU
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,63 +29,104 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, Alistair Francis <alistair.francis@xilinx.com>
-Cc: "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, Andrey Smirnov <andrew.smirnov@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>
+To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
 
-Hi Peter,
+Le 10/01/2018 à 21:12, Richard Henderson a écrit :
+> On 01/08/2018 03:10 PM, Laurent Vivier wrote:
+>> +static int get_physical_address(CPUM68KState *env, hwaddr *physical,
+>> +                                int *prot, target_ulong address,
+>> +                                int access_type, target_ulong *page_size)
+...
+>> +    if (env->mmu.tcr & M68K_TCR_PAGE_8K) {
+>> +        *page_size = 8192;
+>> +        page_offset = address & 0x1fff;
+>> +        *physical = (next & ~0x1fff) + page_offset;
+>> +    } else {
+>> +        *page_size = 4096;
+>> +        page_offset = address & 0x0fff;
+>> +        *physical = (next & ~0x0fff) + page_offset;
+>> +    }
+> 
+> So...
+> 
+>> +    if (ret == 0) {
+>> +        tlb_set_page(cs, address & TARGET_PAGE_MASK,
+>> +                     physical & TARGET_PAGE_MASK,
+>> +                     prot, mmu_idx, page_size);
+> 
+> ... this is going to go through the tlb_add_large_page path every time, since
+> both 4K and 8K are larger than the default 1K page size.
+> 
+> Using the large page path by default means that any single-page tlb flush will
+> quickly devolve to flushing the entire tlb.
+> 
+> Also, using page_size and TARGET_PAGE_MASK looks wrong.  I think you would have
+> needed address & -page_size.
+> 
+> That said, you may want to compare the performance of passing page_size vs
+> TARGET_PAGE_SIZE to tlb_set_page.
 
-On 01/12/2018 02:20 PM, Philippe Mathieu-Daudé wrote:
-> On Fri, Jan 12, 2018 at 2:05 PM, Peter Maydell <peter.maydell@linaro.org> wrote:
->> On 11 January 2018 at 19:30, Philippe Mathieu-Daudé <f4bug@amsat.org> wrote:
->>> Now both sysbus/pci classes inherit of the 'pending-insert-quirk' property,
->>> which is a HCI dependent property (regardless if accessed through a MMIO
->>> sysbus or a PCI bus).
->>> So far only the BCM implementation has to use it.
->>>
->>> Add sysbus/pci/sdbus comments to have clearer code blocks separation.
->>>
->>> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
->>> Reviewed-by: Alistair Francis <alistair.francis@xilinx.com>
->>
->> I'm not sure about this patch, because it means that we now have
->> no mechanism for having a property which exists on the sysbus
->> device but not on the PCI device (and as per my comments on the
->> last patch in this set, we do need to be able to do that).
+I've found several examples using TARGET_PAGE_MASK and page_size [1], so
+I think we can use the mix of them, but I'm going to update
+TARGET_PAGE_BITS to 12 to avoid to go through the tlb_add_large_page()
+function (kernel uses 13 for coldfire or SUN3, and 12 for others).
 
-Does this look OK to you?
+Thanks,
+Laurent
 
-static Property sdhci_sysbus_pending_insert_quirk_property =
-     DEFINE_PROP_BOOL("pending-insert-quirk",
-           SDHCIState, pending_insert_quirk, false);
+[1]
 
-static Property sdhci_sysbus_dma_mr_property =
-     DEFINE_PROP_LINK("dma",
-         SDHCIState, dma_mr, TYPE_MEMORY_REGION, MemoryRegion *);
+target/sparc/mmu_helper.c
+    211 int sparc_cpu_handle_mmu_fault(CPUState *cs, vaddr address, int
+size, int rw,
+    212                                int mmu_idx)
+    213 {
+...
+    221     address &= TARGET_PAGE_MASK;
+    222     error_code = get_physical_address(env, &paddr, &prot,
+&access_index,
+    223                                       address, rw, mmu_idx,
+&page_size);
+    224     vaddr = address;
+    225     if (error_code == 0) {
+...
+    229         tlb_set_page(cs, vaddr, paddr, prot, mmu_idx, page_size);
+    230         return 0;
+    231     }
 
-static void sdhci_sysbus_post_init(Object *obj)
-{
-    SDHCIState *s = SYSBUS_SDHCI(obj);
+or
 
-    sdhci_common_post_init(obj); /* add common properties */
-    qdev_property_add_static(DEVICE(obj),
-        &sdhci_sysbus_pending_insert_quirk_property, &error_abort);
-    qdev_property_add_static(DEVICE(obj),
-        &sdhci_sysbus_dma_mr_property, &error_abort);
-}
+target/unicore32/softmmu.c
+    218 int uc32_cpu_handle_mmu_fault(CPUState *cs, vaddr address, int size,
+    219                               int access_type, int mmu_idx)
+...
+    255     if (ret == 0) {
+    256         /* Map a single page.  */
+    257         phys_addr &= TARGET_PAGE_MASK;
+    258         address &= TARGET_PAGE_MASK;
+    259         tlb_set_page(cs, address, phys_addr, prot, mmu_idx,
+page_size);
+    260         return 0;
+    261     }
 
-static const TypeInfo sdhci_sysbus_info = {
-    .name = TYPE_SYSBUS_SDHCI,
-    .parent = TYPE_SYS_BUS_DEVICE,
-    .instance_size = sizeof(SDHCIState),
-    .instance_init = sdhci_sysbus_init,
-    .instance_post_init = sdhci_sysbus_post_init,
-    ...
-};
+or
 
-This way we can have a property which exists on the sysbus
-device but not on the PCI device, and keep the common one in the same
-piece of code (I later add a few common properties).
+target/xtensa/op_helper.c
+     53 void tlb_fill(CPUState *cs, target_ulong vaddr, int size,
+     54               MMUAccessType access_type, int mmu_idx, uintptr_t
+retaddr)
+...
+     68         tlb_set_page(cs,
+     69                      vaddr & TARGET_PAGE_MASK,
+     70                      paddr & TARGET_PAGE_MASK,
+     71                      access, mmu_idx, page_size);
 
-Regards,
+or
 
-Phil.
+target/ppc/mmu-hash64.c
+    694 int ppc_hash64_handle_mmu_fault(PowerPCCPU *cpu, vaddr eaddr,
+    695                                 int rwx, int mmu_idx)
+...
+    866     tlb_set_page(cs, eaddr & TARGET_PAGE_MASK, raddr &
+TARGET_PAGE_MASK,
+    867                  prot, mmu_idx, 1ULL << apshift);
