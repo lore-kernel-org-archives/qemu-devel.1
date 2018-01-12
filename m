@@ -1,42 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52426)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53765)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <joserz@linux.vnet.ibm.com>) id 1eZvZV-0008Og-I0
-	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 04:24:22 -0500
+	(envelope-from <peterx@redhat.com>) id 1eZvci-0001W9-De
+	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 04:27:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <joserz@linux.vnet.ibm.com>) id 1eZvZS-0000FM-Cd
-	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 04:24:21 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:39272
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <joserz@linux.vnet.ibm.com>)
-	id 1eZvZS-0000EZ-70
-	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 04:24:18 -0500
-Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w0C9NhRl084566
-	for <qemu-devel@nongnu.org>; Fri, 12 Jan 2018 04:24:17 -0500
-Received: from e11.ny.us.ibm.com (e11.ny.us.ibm.com [129.33.205.201])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2feqs6ecmw-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 12 Jan 2018 04:24:16 -0500
-Received: from localhost
-	by e11.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <joserz@linux.vnet.ibm.com>;
-	Fri, 12 Jan 2018 04:24:15 -0500
-Date: Fri, 12 Jan 2018 07:24:09 -0200
-From: joserz@linux.vnet.ibm.com
-References: <20180106004722.1152-1-joserz@linux.vnet.ibm.com>
-	<20180106004722.1152-2-joserz@linux.vnet.ibm.com>
-	<20180111141622.GI24770@umbus.fritz.box>
-	<20180112034619.GK24770@umbus.fritz.box>
+	(envelope-from <peterx@redhat.com>) id 1eZvcf-0003DI-2p
+	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 04:27:40 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:47208)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1eZvce-0003BU-Mg
+	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 04:27:36 -0500
+Date: Fri, 12 Jan 2018 17:27:28 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20180112092728.GP2551@xz-mi>
+References: <20171205065307.21853-1-peterx@redhat.com>
+	<20180111165930.GE2669@work-vm>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20180112034619.GK24770@umbus.fritz.box>
-Message-Id: <20180112092409.ajlelwt5grwyqe6s@pacoca>
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH 1/1] spapr: Check SMT based on
- KVM_CAP_PPC_SMT_POSSIBLE
+In-Reply-To: <20180111165930.GE2669@work-vm>
+Subject: Re: [Qemu-devel] [PATCH v5 00/28] Migration: postcopy failure
+ recovery
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -45,100 +28,187 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: qemu-devel@nongnu.org, Andrea Arcangeli <aarcange@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Juan Quintela <quintela@redhat.com>, Alexey Perevalov <a.perevalov@samsung.com>
 
-On Fri, Jan 12, 2018 at 02:46:19PM +1100, David Gibson wrote:
-> On Fri, Jan 12, 2018 at 01:16:22AM +1100, David Gibson wrote:
-> > On Fri, Jan 05, 2018 at 10:47:22PM -0200, Jose Ricardo Ziviani wrote:
-> > > Power9 supports 4 HW threads/core but it's possible to emulate
-> > > doorbells to implement virtual SMT. KVM has the KVM_CAP_PPC_SMT_POSSIBLE
-> > > which returns a bitmap with all SMT modes supported by the host.
-> > > 
-> > > Today, QEMU forces the SMT mode based on PVR compat table, this is
-> > > silently done in spapr_fixup_cpu_dt. Then, if user passes thread=8 the
-> > > guest will end up with 4 threads/core without any feedback to the user.
-> > > It is confusing and will crash QEMU if a cpu is hotplugged in that
-> > > guest.
-> > > 
-> > > This patch makes use of KVM_CAP_PPC_SMT_POSSIBLE to check if the host
-> > > supports the SMT mode so it allows Power9 guests to have 8 threads/core
-> > > if desired.
-> > > 
-> > > Reported-by: Satheesh Rajendran <satheera@in.ibm.com>
-> > > Signed-off-by: Jose Ricardo Ziviani <joserz@linux.vnet.ibm.com>
-> > > ---
-> > >  hw/ppc/spapr.c       | 14 +++++++++++++-
-> > >  hw/ppc/trace-events  |  1 +
-> > >  target/ppc/kvm.c     |  5 +++++
-> > >  target/ppc/kvm_ppc.h |  6 ++++++
-> > >  4 files changed, 25 insertions(+), 1 deletion(-)
-> > > 
-> > > diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> > > index d1acfe8858..ea2503cd2f 100644
-> > > --- a/hw/ppc/spapr.c
-> > > +++ b/hw/ppc/spapr.c
-> > > @@ -345,7 +345,19 @@ static int spapr_fixup_cpu_dt(void *fdt, sPAPRMachineState *spapr)
-> > >          PowerPCCPU *cpu = POWERPC_CPU(cs);
-> > >          DeviceClass *dc = DEVICE_GET_CLASS(cs);
-> > >          int index = spapr_vcpu_id(cpu);
-> > > -        int compat_smt = MIN(smp_threads, ppc_compat_max_threads(cpu));
-> > > +
-> > > +        /* set smt to maximum for this current pvr if the number
-> > > +         * passed is higher than defined by PVR compat mode AND
-> > > +         * if KVM cannot emulate it.*/
-> > > +        int compat_smt = smp_threads;
-> > > +        if ((kvmppc_cap_smt_possible() & smp_threads) != smp_threads &&
-> > > +                smp_threads > ppc_compat_max_threads(cpu)) {
-> > > +            compat_smt = ppc_compat_max_threads(cpu);
+On Thu, Jan 11, 2018 at 04:59:32PM +0000, Dr. David Alan Gilbert wrote:
+> * Peter Xu (peterx@redhat.com) wrote:
+> > Tree is pushed here for better reference and testing (online tree
+> > includes monitor OOB series):
 > > 
-> > I don't think this is the right approach.  We've been trying to remove
-> > places where host properties (such as those read from KVM
-> > capabilities) affect guest visible properties of the VM - like vsmt.
-> > Places like that break migration and often libvirt expectations as
-> > well.
+> >   https://github.com/xzpeter/qemu/tree/postcopy-recover-all
 > > 
-> > This is putting one back in, and so a step in the wrong direction.
+> > This version removed quite a few patches related to migrate-incoming,
+> > instead I introduced a new command "migrate-recover" to trigger the
+> > recovery channel on destination side to simplify the code.
 > 
-> Following on from this with some more investigation.
+> I've got this setup on a couple of my test hosts, and I'm using
+> iptables to try breaking the connection.
 > 
-> I think the discussion is going off the rails because the reason for
-> this compat threads limit has been forgotten.
+> See below for where I got stuck.
 > 
-> *It has nothing to do with the host*.  It's been recoded a bunch, but
-> the logic was originally introduced by 2a48d993 "spapr: Limit threads
-> per core according to current compatibility mode".  It states that it
-> was to avoid confusing the *guest* by presenting more threads than it
-> expects on an compatible-with-old CPU.
+> > To test this two series altogether, please checkout above tree and
+> > build.  Note: to test on small and single host, one need to disable
+> > full bandwidth postcopy migration otherwise it'll complete very fast.
+> > Basically a simple patch like this would help:
+> > 
+> > diff --git a/migration/migration.c b/migration/migration.c
+> > index 4de3b551fe..c0206023d7 100644
+> > --- a/migration/migration.c
+> > +++ b/migration/migration.c
+> > @@ -1904,7 +1904,7 @@ static int postcopy_start(MigrationState *ms, bool *old_vm_running)
+> >       * will notice we're in POSTCOPY_ACTIVE and not actually
+> >       * wrap their state up here
+> >       */
+> > -    qemu_file_set_rate_limit(ms->to_dst_file, INT64_MAX);
+> > +    // qemu_file_set_rate_limit(ms->to_dst_file, INT64_MAX);
+> >      if (migrate_postcopy_ram()) {
+> >          /* Ping just for debugging, helps line traces up */
+> >          qemu_savevm_send_ping(ms->to_dst_file, 2);
+> > 
+> > This patch is included already in above github tree.  Please feel free
+> > to drop this patch when want to test on big machines and between real
+> > hosts.
+> > 
+> > Detailed Test Procedures (QMP only)
+> > ===================================
+> > 
+> > 1. start source QEMU.
+> > 
+> > $qemu -M q35,kernel-irqchip=split -enable-kvm -snapshot \
+> >      -smp 4 -m 1G -qmp stdio \
+> >      -name peter-vm,debug-threads=on \
+> >      -netdev user,id=net0 \
+> >      -device e1000,netdev=net0 \
+> >      -global migration.x-max-bandwidth=4096 \
+> >      -global migration.x-postcopy-ram=on \
+> >      /images/fedora-25.qcow2
+> >
+> > 2. start destination QEMU.
+> > 
+> > $qemu -M q35,kernel-irqchip=split -enable-kvm -snapshot \
+> >      -smp 4 -m 1G -qmp stdio \
+> >      -name peter-vm,debug-threads=on \
+> >      -netdev user,id=net0 \
+> >      -device e1000,netdev=net0 \
+> >      -global migration.x-max-bandwidth=4096 \
+> >      -global migration.x-postcopy-ram=on \
+> >      -incoming tcp:0.0.0.0:5555 \
+> >      /images/fedora-25.qcow2
 > 
-> This also explains why it's done in this otherwise weird way - just
-> truncating the presented threads in the device tree, while the other
-> threads still "exist" in the qemu and KVM model:
+> I'm using:
+> ./x86_64-softmmu/qemu-system-x86_64 -nographic -M pc,accel=kvm -smp 4 -m 16G -drive file=/home/vms/rhel71.qcow2,id=d,cache=none,if=none -device virtio-blk,drive=d -vnc 0:0 -incoming tcp:0:8888 -chardev socket,port=4000,host=0,id=mon,server,nowait,telnet -mon chardev=mon,id=mon,mode=control -nographic -chardev stdio,mux=on,id=monh -mon chardev=monh,mode=readline --device isa-serial,chardev=monh
+> and I've got both the HMP on the stdio, and the QMP via a telnet
 > 
-> It's because this happens at CAS time, for the benefit of guests which
-> don't understand newer CPUs, at which point it's really too late to
-> report an error to the user or renumber the CPUs.
+> > 
+> > 3. On source, do QMP handshake as normal:
+> > 
+> >   {"execute": "qmp_capabilities"}
+> >   {"return": {}}
+> > 
+> > 4. On destination, do QMP handshake to enable OOB:
+> > 
+> >   {"execute": "qmp_capabilities", "arguments": { "enable": [ "oob" ] } }
+> >   {"return": {}}
+> > 
+> > 5. On source, trigger initial migrate command, switch to postcopy:
+> > 
+> >   {"execute": "migrate", "arguments": { "uri": "tcp:localhost:5555" } }
+> >   {"return": {}}
+> >   {"execute": "query-migrate"}
+> >   {"return": {"expected-downtime": 300, "status": "active", ...}}
+> >   {"execute": "migrate-start-postcopy"}
+> >   {"return": {}}
+> >   {"timestamp": {"seconds": 1512454728, "microseconds": 768096}, "event": "STOP"}
+> >   {"execute": "query-migrate"}
+> >   {"return": {"expected-downtime": 44472, "status": "postcopy-active", ...}}
+> > 
+> > 6. On source, manually trigger a "fake network down" using
+> >    "migrate-cancel" command:
+> > 
+> >   {"execute": "migrate_cancel"}
+> >   {"return": {}}
 > 
-> So I think what we actually want to do here is just *remove* the
-> compat limit for POWER9 cpus.  Strictly it's to do with the host
-> kernel rather than the cpu, but in practice we can count on POWER9
-> guests not being confused by >4 threads (since they POWER8 compat
-> guests running on POWER9 have to anyway).
-> 
-> 
-> As a separate matter, we need to validate guest threads-per-core
-> against what the host's capable of, but that doesn't belong here.
+> Before I do that, I'm breaking the network connection by running on the
+> source:
+> iptables -A INPUT -p tcp --source-port 8888 -j DROP
+> iptables -A INPUT -p tcp --destination-port 8888 -j DROP
 
-Awesome explanation
-
-I'm going to make these changes, perform a lot of more tests and send
-the patches.
-
-Thank you
+This is tricky... I think tcp keepalive may help, but for sure I
+think we do need a way to cancel the migration on both side.  Please
+see below comment.
 
 > 
-> -- 
-> David Gibson			| I'll have my music baroque, and my code
-> david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-> 				| _way_ _around_!
-> http://www.ozlabs.org/~dgibson
+> >   During postcopy, it'll not really cancel the migration, but pause
+> >   it.  On both sides, we should see this on stderr:
+> > 
+> >   qemu-system-x86_64: Detected IO failure for postcopy. Migration paused.
+> > 
+> >   It means now both sides are in postcopy-pause state.
+> 
+> Now, here we start to have a problem; I do the migrate-cancel on the
+> source, that works and goes into pause; but remember the network is
+> broken, so the destination hasn't received the news.
+> 
+> > 7. (Optional) On destination side, let's try to hang the main thread
+> >    using the new x-oob-test command, providing a "lock=true" param:
+> > 
+> >    {"execute": "x-oob-test", "id": "lock-dispatcher-cmd",
+> >     "arguments": { "lock": true } }
+> > 
+> >    After sending this command, we should not see any "return", because
+> >    main thread is blocked already.  But we can still use the monitor
+> >    since the monitor now has dedicated IOThread.
+> > 
+> > 8. On destination side, provide a new incoming port using the new
+> >    command "migrate-recover" (note that if step 7 is carried out, we
+> >    _must_ use OOB form, otherwise the command will hang.  With OOB,
+> >    this command will return immediately):
+> > 
+> >   {"execute": "migrate-recover", "id": "recover-cmd",
+> >    "arguments": { "uri": "tcp:localhost:5556" },
+> >    "control": { "run-oob": true } }
+> >   {"timestamp": {"seconds": 1512454976, "microseconds": 186053},
+> >    "event": "MIGRATION", "data": {"status": "setup"}}
+> >   {"return": {}, "id": "recover-cmd"}
+> > 
+> >    We can see that the command will success even if main thread is
+> >    locked up.
+> 
+> Because the destination didn't get the news of the pause, I get:
+> {"id": "recover-cmd", "error": {"class": "GenericError", "desc": "Migrate recover can only be run when postcopy is paused."}}
+
+This is normal since we didn't fail on destination, while...
+
+> 
+> and I can't explicitly cause a cancel on the destination:
+> {"id": "cancel-cmd", "error": {"class": "GenericError", "desc": "The command migrate_cancel does not support OOB"}}
+
+... this is not normal.  I have two questions:
+
+1. Have you provided
+
+  "control": {"run-oob": true}
+
+  field when sending command "migrate_cancel"?  Just to mention that
+  we shouldn't do it in oob way for migrate_cancel.  Or it can be a
+  monitor-oob bug.
+
+2. Do we need to support "migrate_cancel" on destination?
+
+For (2), I think we need it, but for now it only works on source for
+sure.  So I think maybe I should add that support.
+
+> 
+> So I think we need a way out of this on the destination.
+
+So that's my 2nd question.  How about we do this: migrate_cancel will
+cancel incoming migration if:
+
+        a. there is one incoming migration in progress, and
+        b. postcopy is enabled
+
+Thanks,
+
+-- 
+Peter Xu
