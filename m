@@ -1,28 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33194)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34140)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1ea2n5-0002C7-1S
-	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 12:06:52 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1ea2pH-00040F-LC
+	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 12:09:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1ea2n4-0000Hx-5S
-	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 12:06:51 -0500
-Received: from mail-wm0-x244.google.com ([2a00:1450:400c:c09::244]:43435)
+	(envelope-from <peter.maydell@linaro.org>) id 1ea2pG-0002a7-El
+	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 12:09:07 -0500
+Received: from mail-ot0-x22a.google.com ([2607:f8b0:4003:c0f::22a]:44360)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1ea2n4-0000HJ-05
-	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 12:06:50 -0500
-Received: by mail-wm0-x244.google.com with SMTP id g1so13437489wmg.2
-	for <qemu-devel@nongnu.org>; Fri, 12 Jan 2018 09:06:49 -0800 (PST)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1ea2pG-0002ZA-9W
+	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 12:09:06 -0500
+Received: by mail-ot0-x22a.google.com with SMTP id g59so5584462otg.11
+	for <qemu-devel@nongnu.org>; Fri, 12 Jan 2018 09:09:06 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <1512682213-4354-7-git-send-email-minyard@acm.org>
-References: <1512682213-4354-1-git-send-email-minyard@acm.org>
-	<1512682213-4354-7-git-send-email-minyard@acm.org>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Fri, 12 Jan 2018 18:06:48 +0100
-Message-ID: <CAJ+F1CKUK_uRa9imNcOLzvNZyNaC7ciNqLppzGWVZjKGJ8ggRQ@mail.gmail.com>
+In-Reply-To: <20180110203823.22292-1-jcd@tribudubois.net>
+References: <20180110203823.22292-1-jcd@tribudubois.net>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 12 Jan 2018 17:08:45 +0000
+Message-ID: <CAFEAcA9q9tKedxXxMDS3e2jWA8geL2q2pe=Oo3-E8RQ=cD7LFg@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 6/8] vl.c: disallow command line fw cfg
- without opt/
+Subject: Re: [Qemu-devel] [PATCH] i.MX: Fix FEC/ENET receive funtions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,56 +28,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Corey Minyard <minyard@acm.org>
-Cc: QEMU <qemu-devel@nongnu.org>, Corey Minyard <cminyard@mvista.com>, "Michael S. Tsirkin" <mst@redhat.com>
+To: Jean-Christophe Dubois <jcd@tribudubois.net>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, fyleo45@gmail.com, qemu-arm <qemu-arm@nongnu.org>, Peter Chubb <peter.chubb@nicta.com.au>, Jason Wang <jasowang@redhat.com>
 
-Hi
-
-On Thu, Dec 7, 2017 at 10:30 PM,  <minyard@acm.org> wrote:
-> From: "Michael S. Tsirkin" <mst@redhat.com>
+On 10 January 2018 at 20:38, Jean-Christophe Dubois <jcd@tribudubois.net> wrote:
+> The actual imx_eth_enable_rx() function is buggy.
 >
-> Allowing arbitary file names on command line is setting us up for
-> failure: future guests will look for a specific QEMU-specified name and
-> will get confused finding a user file there.
+> It updates s->regs[ENET_RDAR] after calling qemu_flush_queued_packets().
 >
+> qemu_flush_queued_packets() is going to call imx_XXX_receive() which itself
+> is going to call imx_eth_enable_rx().
+>
+> By updating s->regs[ENET_RDAR] after calling qemu_flush_queued_packets()
+> we end up updating the register with an outdated value which might
+> lead to disabling the receive function in the i.MX FEC/ENET device.
+>
+> This patch change the place where the register update is done so that the
+> register value stays up to date and the receive function can keep
+> running.
+>
+> Reported-by: Fyleo <fyleo45@gmail.com>
+> Tested-by: Fyleo <fyleo45@gmail.com>
+> Signed-off-by: Jean-Christophe Dubois <jcd@tribudubois.net>
 
-Why is this part of a IPMI series?
-There was a lengthy discussion on this patch earlier, could you
-summarize the conclusion?
+Could you have a look at current QEMU master, please? I think that
+commit b2b012afdd9c has probably fixed this bug. (At any rate it
+has changed that code so that your patch won't apply.)
 
 thanks
-
-> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-> [Change "warning" to "error" in the error report.]
-> Signed-off-by: Corey Minyard <cminyard@mvista.com>
-> ---
->  vl.c | 5 +++--
->  1 file changed, 3 insertions(+), 2 deletions(-)
->
-> diff --git a/vl.c b/vl.c
-> index 1ad1c04..fae9300 100644
-> --- a/vl.c
-> +++ b/vl.c
-> @@ -2400,8 +2400,9 @@ static int parse_fw_cfg(void *opaque, QemuOpts *opt=
-s, Error **errp)
->          return -1;
->      }
->      if (strncmp(name, "opt/", 4) !=3D 0) {
-> -        warn_report("externally provided fw_cfg item names "
-> -                    "should be prefixed with \"opt/\"");
-> +        error_report("error: externally provided fw_cfg item names "
-> +                     "should be prefixed with \"opt/\"");
-> +        return -1;
->      }
->      if (nonempty_str(str)) {
->          size =3D strlen(str); /* NUL terminator NOT included in fw_cfg b=
-lob */
-> --
-> 2.7.4
->
->
-
-
-
---=20
-Marc-Andr=C3=A9 Lureau
+-- PMM
