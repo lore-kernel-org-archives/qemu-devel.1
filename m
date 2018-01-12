@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42128)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42210)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1eZzcb-0000p7-3i
-	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 08:43:50 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1eZzco-0001Fr-Ig
+	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 08:44:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1eZzca-00069n-7K
-	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 08:43:49 -0500
-Received: from mail-wr0-x231.google.com ([2a00:1450:400c:c0c::231]:44586)
+	(envelope-from <peter.maydell@linaro.org>) id 1eZzcn-0006XB-IR
+	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 08:44:02 -0500
+Received: from mail-oi0-x243.google.com ([2607:f8b0:4003:c06::243]:40825)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1eZzca-00067n-11
-	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 08:43:48 -0500
-Received: by mail-wr0-x231.google.com with SMTP id w50so5323141wrc.11
-	for <qemu-devel@nongnu.org>; Fri, 12 Jan 2018 05:43:47 -0800 (PST)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1eZzcn-0006W3-Dg
+	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 08:44:01 -0500
+Received: by mail-oi0-x243.google.com with SMTP id u83so3935723oie.7
+	for <qemu-devel@nongnu.org>; Fri, 12 Jan 2018 05:44:01 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <eb24b3ef-40ff-6565-ddd7-15103a06d1aa@redhat.com>
-References: <1515759853-20360-1-git-send-email-pbonzini@redhat.com>
-	<CAFEAcA_0uFXKY8Xg-FN+AgqVGoL+SJa-FPC8vyw-wLHazu6JEA@mail.gmail.com>
-	<eb24b3ef-40ff-6565-ddd7-15103a06d1aa@redhat.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Fri, 12 Jan 2018 14:43:46 +0100
-Message-ID: <CAJ+F1CLWfykNN7bbr0Zx1PZre5fbui4W2VUM6tiw9bTHjhfRTA@mail.gmail.com>
+In-Reply-To: <20180109122252.17670-6-alex.bennee@linaro.org>
+References: <20180109122252.17670-1-alex.bennee@linaro.org>
+	<20180109122252.17670-6-alex.bennee@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 12 Jan 2018 13:43:40 +0000
+Message-ID: <CAFEAcA88JBtRC2B5nUuqYdpuWVYd-nAHYvXwmGp4ZCmmq7W=+A@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PULL v2 00/52] Misc patches for 2017-01-12
+Subject: Re: [Qemu-devel] [PATCH v2 05/20] include/fpu/softfloat: implement
+ float16_set_sign helper
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,88 +31,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>
+To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+Cc: Richard Henderson <richard.henderson@linaro.org>, Laurent Vivier <laurent@vivier.eu>, bharata@linux.vnet.ibm.com, Andrew Dutcher <andrew@andrewdutcher.com>, QEMU Developers <qemu-devel@nongnu.org>, Aurelien Jarno <aurelien@aurel32.net>
 
-Hi
-
-On Fri, Jan 12, 2018 at 2:42 PM, Paolo Bonzini <pbonzini@redhat.com> wrote:
-> On 12/01/2018 14:31, Peter Maydell wrote:
->> On 12 January 2018 at 12:24, Paolo Bonzini <pbonzini@redhat.com> wrote:
->>> The following changes since commit 997eba28a3ed5400a80f754bf3a1c8044b75=
-b9ff:
->>>
->>>   Merge remote-tracking branch 'remotes/pmaydell/tags/pull-target-arm-2=
-0180111' into staging (2018-01-11 14:34:41 +0000)
->>>
->>> are available in the git repository at:
->>>
->>>
->>>   git://github.com/bonzini/qemu.git tags/for-upstream
->>>
->>> for you to fetch changes up to a88ae3be7bf0550adf877f5422c837dbf4bf4a39=
+On 9 January 2018 at 12:22, Alex Benn=C3=A9e <alex.bennee@linaro.org> wrote=
 :
->>>
->>>   scripts/analyse-locks-simpletrace.py: script to analyse lock times (2=
-018-01-12 13:22:05 +0100)
->>>
->>> ----------------------------------------------------------------
->>> * QemuMutex tracing improvements (Alex)
->>> * ram_addr_t optimization (David)
->>> * SCSI fixes (Fam, Stefan, me)
->>> * do {} while (0) fixes (Eric)
->>> * KVM fix for PMU (Jan)
->>> * memory leak fixes from ASAN (Marc-Andr=C3=A9)
->>> * migration fix for HPET, icount, loadvm (Maria, Pavel)
->>> * hflags fixes (me, Tao)
->>> * block/iscsi uninitialized variable (Peter L.)
->>> * full support for GMainContexts in character devices (Peter Xu)
->>> * more boot-serial-test (Thomas)
->>> * Memory leak fix (Zhecheng)
->>>
->>> ----------------------------------------------------------------
->>
->> This fails to build on x86-64 Linux, with an --enable-debug build, using
->> gcc (Ubuntu 5.4.0-6ubuntu1~16.04.5) 5.4.0 20160609
->>
->>   CC      util/coroutine-ucontext.o
->> /home/petmay01/linaro/qemu-for-merges/util/coroutine-ucontext.c: In
->> function =E2=80=98finish_switch_fiber=E2=80=99:
->> /home/petmay01/linaro/qemu-for-merges/util/coroutine-ucontext.c:75:5:
->> error: implicit declaration of function
->> =E2=80=98__sanitizer_finish_switch_fiber=E2=80=99
->> [-Werror=3Dimplicit-function-declaration]
->>      __sanitizer_finish_switch_fiber(fake_stack_save, &bottom_old, &size=
-_old);
->>      ^
->> /home/petmay01/linaro/qemu-for-merges/util/coroutine-ucontext.c:75:5:
->> error: nested extern declaration of =E2=80=98__sanitizer_finish_switch_f=
-iber=E2=80=99
->> [-Werror=3Dnested-externs]
->> /home/petmay01/linaro/qemu-for-merges/util/coroutine-ucontext.c: In
->> function =E2=80=98start_switch_fiber=E2=80=99:
->> /home/petmay01/linaro/qemu-for-merges/util/coroutine-ucontext.c:88:5:
->> error: implicit declaration of function
->> =E2=80=98__sanitizer_start_switch_fiber=E2=80=99
->> [-Werror=3Dimplicit-function-declaration]
->>      __sanitizer_start_switch_fiber(fake_stack_save, bottom, size);
->>      ^
->> /home/petmay01/linaro/qemu-for-merges/util/coroutine-ucontext.c:88:5:
->> error: nested extern declaration of =E2=80=98__sanitizer_start_switch_fi=
-ber=E2=80=99
->> [-Werror=3Dnested-externs]
->>
->>
->> It looks like older versions of gcc and the sanitizer don't
->> provide those switch_fiber functions.
+> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+> ---
+>  include/fpu/softfloat.h | 5 +++++
+>  1 file changed, 5 insertions(+)
 >
-> I'll drop that patch.  Marc-Andr=C3=A9, can you refine the configure test=
-?
+> diff --git a/include/fpu/softfloat.h b/include/fpu/softfloat.h
+> index dc71b01dba..8ab5d0df47 100644
+> --- a/include/fpu/softfloat.h
+> +++ b/include/fpu/softfloat.h
+> @@ -363,6 +363,11 @@ static inline float16 float16_chs(float16 a)
+>      return make_float16(float16_val(a) ^ 0x8000);
+>  }
 >
+> +static inline float16 float16_set_sign(float16 a, int sign)
+> +{
+> +    return make_float16((float16_val(a) & 0x7fff) | (sign << 15));
+> +}
+> +
+>  /*----------------------------------------------------------------------=
+------
+>  | The pattern for a default generated half-precision NaN.
+>  *-----------------------------------------------------------------------=
+-----*/
+> --
 
-working on it, thanks
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 
-
-
---=20
-Marc-Andr=C3=A9 Lureau
+thanks
+-- PMM
