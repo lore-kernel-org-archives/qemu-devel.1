@@ -1,22 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57266)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57500)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1eZwxo-00053a-DF
-	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 05:53:33 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1eZwya-0005hq-GV
+	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 05:54:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1eZwxm-0003IQ-U3
-	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 05:53:32 -0500
-Date: Fri, 12 Jan 2018 10:53:20 +0000
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20180112105320.GB17392@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <20180111195225.4226-1-kwolf@redhat.com>
-	<20180111195225.4226-3-kwolf@redhat.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1eZwyZ-0004FT-Pm
+	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 05:54:20 -0500
+Received: from mail-ot0-x233.google.com ([2607:f8b0:4003:c0f::233]:46221)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1eZwyZ-0004Eb-LU
+	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 05:54:19 -0500
+Received: by mail-ot0-x233.google.com with SMTP id f6so4708768oti.13
+	for <qemu-devel@nongnu.org>; Fri, 12 Jan 2018 02:54:19 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20180111195225.4226-3-kwolf@redhat.com>
-Subject: Re: [Qemu-devel] [RFC PATCH 02/10] block/qapi: Add qcow2 create
- options to schema
+In-Reply-To: <3ffa6112-d2bf-df10-c8ee-e96ead760359@linaro.org>
+References: <20171218174552.18871-1-richard.henderson@linaro.org>
+	<20171218174552.18871-2-richard.henderson@linaro.org>
+	<CAFEAcA_zoqWwAhg5PhuUG=xkRuC3uwT0MF7D3NOvEFg0Z3yKMQ@mail.gmail.com>
+	<3ffa6112-d2bf-df10-c8ee-e96ead760359@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 12 Jan 2018 10:53:58 +0000
+Message-ID: <CAFEAcA8L4q83NZOg8P8QveOOfR+Y4RUEM_BdgOZ3pdBmDjsnEg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH 01/23] scripts: Add decodetree.py
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,61 +31,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: qemu-block@nongnu.org, pkrempa@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>
 
-On Thu, Jan 11, 2018 at 08:52:17PM +0100, Kevin Wolf wrote:
-> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-> ---
->  qapi/block-core.json | 33 ++++++++++++++++++++++++++++++++-
->  1 file changed, 32 insertions(+), 1 deletion(-)
-> 
-> diff --git a/qapi/block-core.json b/qapi/block-core.json
-> index 1749376c61..9341f6708d 100644
-> --- a/qapi/block-core.json
-> +++ b/qapi/block-core.json
-> @@ -3320,6 +3320,37 @@
->  { 'command': 'blockdev-del', 'data': { 'node-name': 'str' } }
->  
->  ##
-> +# @BlockdevQcow2CompatLevel:
-> +# @0_10:    The original QCOW2 format as introduced in qemu 0.10 (version 2)
-> +# @1_1:     The extended QCOW2 format as introduced in qemu 1.1 (version 3)
-> +#
-> +# Since: 2.10
-> +##
-> +{ 'enum': 'BlockdevQcow2CompatLevel',
-> +  'data': [ '0_10', '1_1' ] }
-> +
-> +
-> +##
-> +# @BlockdevCreateOptionsQcow2:
-> +#
-> +# Driver specific image creation options for qcow2.
-> +#
-> +# TODO Describe fields
-> +#
-> +# Since: 2.12
-> +##
-> +{ 'struct': 'BlockdevCreateOptionsQcow2',
-> +  'data': { 'size':             'size',
-> +            '*compat':          'BlockdevQcow2CompatLevel',
-> +            '*backing-file':    'str',
-> +            '*backing-fmt':     'BlockdevDriver',
+On 11 January 2018 at 19:10, Richard Henderson
+<richard.henderson@linaro.org> wrote:
+> On 01/11/2018 10:06 AM, Peter Maydell wrote:
+>> On 18 December 2017 at 17:45, Richard Henderson
+>> <richard.henderson@linaro.org> wrote:
+>>> To be used to decode ARM SVE, but could be used for any 32-bit RISC.
+>>> It would need additional work to extend to insn sizes other than 32-bit.
+>>
+>> I guess we could make that extension without requiring all
+>> existing pattern files to be updated, right?
+>
+> Sure.  I would expect that to be a command-line option for the script.
 
-For anything non-trivial, the caller is going to have to stuff a
-JSON string into 'backing-file' value. It feels like we should
-be referencing 'BlockdevOptions' here in some manner.
+It occurs to me that we could just make it silently DTRT --
+we want to check the bit count in patterns and so on to
+detect typos, but it would be a weird typo that was wrong
+by 8 bits, so as long as the patterns are all a multiple
+of 8 bits long we could accept them (and handle them in
+whatever way we find we need to handle mixed-length
+instruction sets). So we might not even need a command
+line option.
 
-> +            '*encrypt':         'QCryptoBlockCreateOptions',
-> +            '*cluster-size':    'size',
-> +            '*preallocation':   'PreallocMode',
-> +            '*lazy-refcounts':  'bool',
-> +            '*refcount-bits':   'int' } }
-
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+thanks
+-- PMM
