@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42032)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42051)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1eZxZE-0007uD-Tb
-	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 06:32:14 -0500
+	(envelope-from <paolo.bonzini@gmail.com>) id 1eZxZH-0007w8-8d
+	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 06:32:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1eZxZD-0005w2-Lp
-	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 06:32:12 -0500
-Received: from mail-wr0-x241.google.com ([2a00:1450:400c:c0c::241]:33809)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1eZxZG-00060J-HD
+	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 06:32:15 -0500
+Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:42373)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1eZxZD-0005vD-FV
-	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 06:32:11 -0500
-Received: by mail-wr0-x241.google.com with SMTP id 36so5058561wrh.1
-	for <qemu-devel@nongnu.org>; Fri, 12 Jan 2018 03:32:11 -0800 (PST)
+	id 1eZxZG-0005z8-BH
+	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 06:32:14 -0500
+Received: by mail-wm0-x242.google.com with SMTP id b141so11528484wme.1
+	for <qemu-devel@nongnu.org>; Fri, 12 Jan 2018 03:32:14 -0800 (PST)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Fri, 12 Jan 2018 12:31:08 +0100
-Message-Id: <1515756676-3860-45-git-send-email-pbonzini@redhat.com>
+Date: Fri, 12 Jan 2018 12:31:10 +0100
+Message-Id: <1515756676-3860-47-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1515756676-3860-1-git-send-email-pbonzini@redhat.com>
 References: <1515756676-3860-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 44/52] tests: Avoid 'do/while(false);
- ' in vhost-user-bridge
+Subject: [Qemu-devel] [PULL 46/52] checkpatch: Enforce proper do/while (0)
+ style
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,51 +32,45 @@ To: qemu-devel@nongnu.org
 
 From: Eric Blake <eblake@redhat.com>
 
-Use of a do/while(0) loop as a way to allow break statements in
-the middle of execute-once code is unusual.  More typical is
-the use of goto for early exits, with a label at the end of
-the execute-once code, rather than nesting code in a scope;
-however, the comment at the end of the existing code makes this
-alternative a bit unpractical.
+Use of a loop construct for code that is not intended to repeat
+does not make much idiomatic sense, except in one place: it is a
+common usage in macros in order to wrap arbitrary code with
+single-statement semantics.  But when used in a macro, it is more
+typical for the caller to supply the trailing ';' when calling
+the macro.
 
-So, to avoid false positives from a future syntax check about
-'while (false);', and to keep the loop form (in case someone
-ever does add DONTWAIT support, where they can just as easily
-manipulate the initial loop condition or add an if around the
-final 'break'), I opted to use the form of a while(1) loop (the
-break as an early exit is more idiomatic there), coupled with
-a final break preserving the original comment.
+Although qemu coding style frowns on bare:
+  if (cond)
+    statement1;
+  else
+    statement2;
+where extra semicolons actually cause syntax errors, we still
+want our macro styles to be easily copied to other projects.
+Thus, declare it an error if we encounter any form of 'while (0)'
+with a semicolon in the same line.
 
 Signed-off-by: Eric Blake <eblake@redhat.com>
-Message-Id: <20171201232433.25193-6-eblake@redhat.com>
+Message-Id: <20171201232433.25193-8-eblake@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- tests/vhost-user-bridge.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+ scripts/checkpatch.pl | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-diff --git a/tests/vhost-user-bridge.c b/tests/vhost-user-bridge.c
-index d820033..e0605a5 100644
---- a/tests/vhost-user-bridge.c
-+++ b/tests/vhost-user-bridge.c
-@@ -283,7 +283,7 @@ vubr_backend_recv_cb(int sock, void *ctx)
-         return;
-     }
+diff --git a/scripts/checkpatch.pl b/scripts/checkpatch.pl
+index 3dc27d9..accba24 100755
+--- a/scripts/checkpatch.pl
++++ b/scripts/checkpatch.pl
+@@ -1622,6 +1622,11 @@ sub process {
+ 			}
+ 		}
  
--    do {
-+    while (1) {
-         struct iovec *sg;
-         ssize_t ret, total = 0;
-         unsigned int num;
-@@ -343,7 +343,9 @@ vubr_backend_recv_cb(int sock, void *ctx)
- 
-         free(elem);
-         elem = NULL;
--    } while (false); /* could loop if DONTWAIT worked? */
++# 'do ... while (0/false)' only makes sense in macros, without trailing ';'
++		if ($line =~ /while\s*\((0|false)\);/) {
++			ERROR("suspicious ; after while (0)\n" . $herecurr);
++		}
 +
-+        break;        /* could loop if DONTWAIT worked? */
-+    }
- 
-     if (mhdr_cnt) {
-         mhdr.num_buffers = i;
+ # Check relative indent for conditionals and blocks.
+ 		if ($line =~ /\b(?:(?:if|while|for)\s*\(|do\b)/ && $line !~ /^.\s*#/ && $line !~ /\}\s*while\s*/) {
+ 			my ($s, $c) = ($stat, $cond);
 -- 
 1.8.3.1
