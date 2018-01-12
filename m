@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45590)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45779)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <slopezpa@redhat.com>) id 1ea2FQ-0002hf-Vh
-	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 11:32:09 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1ea2Fb-0002o7-K5
+	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 11:32:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <slopezpa@redhat.com>) id 1ea2FN-0003nm-Sn
-	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 11:32:04 -0500
-Received: from mail-io0-f180.google.com ([209.85.223.180]:40801)
+	(envelope-from <peter.maydell@linaro.org>) id 1ea2FZ-00044K-Fv
+	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 11:32:15 -0500
+Received: from mail-ot0-x241.google.com ([2607:f8b0:4003:c0f::241]:34583)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <slopezpa@redhat.com>) id 1ea2FN-0003lo-OR
-	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 11:32:01 -0500
-Received: by mail-io0-f180.google.com with SMTP id v30so6439497iov.7
-	for <qemu-devel@nongnu.org>; Fri, 12 Jan 2018 08:31:59 -0800 (PST)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1ea2FZ-00043R-AI
+	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 11:32:13 -0500
+Received: by mail-ot0-x241.google.com with SMTP id p16so5507248otf.1
+	for <qemu-devel@nongnu.org>; Fri, 12 Jan 2018 08:32:13 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20171229094206.14512-1-slp@redhat.com>
-References: <20171229094206.14512-1-slp@redhat.com>
-From: Sergio Lopez <slp@redhat.com>
-Date: Fri, 12 Jan 2018 17:31:58 +0100
-Message-ID: <CAAiTLFXrMF1pw-rk9UNCcgLYGB48YkMS+2Ft29dzpifw3K-msw@mail.gmail.com>
+In-Reply-To: <20180109122252.17670-19-alex.bennee@linaro.org>
+References: <20180109122252.17670-1-alex.bennee@linaro.org>
+	<20180109122252.17670-19-alex.bennee@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 12 Jan 2018 16:31:52 +0000
+Message-ID: <CAFEAcA_ZE1wZRrNquGdN1kVimmB-+p=5eSrcXUnJbBw+aL36dw@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH 0/2] pvpanic: implement abort_on_panic
- option
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 18/20] fpu/softfloat: re-factor scalbn
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,22 +30,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: f4bug@amsat.org, mjt@tls.msk.ru, Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
-Cc: Sergio Lopez <slp@redhat.com>
+To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+Cc: Richard Henderson <richard.henderson@linaro.org>, Laurent Vivier <laurent@vivier.eu>, bharata@linux.vnet.ibm.com, Andrew Dutcher <andrew@andrewdutcher.com>, QEMU Developers <qemu-devel@nongnu.org>, Aurelien Jarno <aurelien@aurel32.net>
 
-On Fri, Dec 29, 2017 at 10:42 AM, Sergio Lopez <slp@redhat.com> wrote:
-> Extend pvpanic and qemu_system_guest_panicked so it's possible to
-> configure the first to induce an abort() when the Guest panics.
+On 9 January 2018 at 12:22, Alex Benn=C3=A9e <alex.bennee@linaro.org> wrote=
+:
+> This is one of the simpler manipulations you could make to a floating
+> point number.
 >
-> This is specially useful (and mainly intended to be enabled only) when
-> debugging soft/hard lockups on the Guest OS.
+> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+> ---
+>  fpu/softfloat.c         | 104 +++++++++++++++---------------------------=
+------
+>  include/fpu/softfloat.h |   1 +
+>  2 files changed, 32 insertions(+), 73 deletions(-)
 >
-> Sergio Lopez (2):
->   vl: extend qemu_system_guest_panicked with abort_on_panic
->   pvpanic: add PVPANIC_ABORT_PROP
+> diff --git a/fpu/softfloat.c b/fpu/softfloat.c
+> index bb68d77f72..3647f6ca03 100644
+> --- a/fpu/softfloat.c
+> +++ b/fpu/softfloat.c
+> @@ -1663,6 +1663,37 @@ float64 uint16_to_float64(uint16_t a, float_status=
+ *status)
+>      return uint64_to_float64(a, status);
+>  }
+>
+> +/* Multiply A by 2 raised to the power N.  */
+> +static decomposed_parts scalbn_decomposed(decomposed_parts a, int n,
+> +                                          float_status *s)
+> +{
+> +    if (a.cls =3D=3D float_class_normal) {
+> +        a.exp +=3D n;
+> +    }
+> +    return a;
+> +}
+> +
+> +float16 float16_scalbn(float16 a, int n, float_status *status)
+> +{
+> +    decomposed_parts pa =3D float16_unpack_canonical(a, status);
+> +    decomposed_parts pr =3D scalbn_decomposed(pa, n, status);
+> +    return float16_round_pack_canonical(pr, status);
+> +}
+> +
+> +float32 float32_scalbn(float32 a, int n, float_status *status)
+> +{
+> +    decomposed_parts pa =3D float32_unpack_canonical(a, status);
+> +    decomposed_parts pr =3D scalbn_decomposed(pa, n, status);
+> +    return float32_round_pack_canonical(pr, status);
+> +}
+> +
+> +float64 float64_scalbn(float64 a, int n, float_status *status)
+> +{
+> +    decomposed_parts pa =3D float64_unpack_canonical(a, status);
+> +    decomposed_parts pr =3D scalbn_decomposed(pa, n, status);
+> +    return float64_round_pack_canonical(pr, status);
+> +}
 
-If someone has a minute, please consider taking a look at this (small)
-patch series.
+The old code used propagateFloat32NaN(a, a, status) if the
+input was a NaN, to cause us to raise the invalid flag,
+maybe return a default NaN, maybe silence the NaN. I can't
+see where the new code is doing this?
 
-Thanks,
-Sergio.
+thanks
+-- PMM
