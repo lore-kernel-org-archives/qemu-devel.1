@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51812)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52124)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1eZt4K-000112-8u
-	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 01:44:01 -0500
+	(envelope-from <peterx@redhat.com>) id 1eZt5j-0001yt-E1
+	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 01:45:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1eZt4H-0001B7-6V
-	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 01:44:00 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:33714)
+	(envelope-from <peterx@redhat.com>) id 1eZt5i-0002EJ-Je
+	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 01:45:27 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:33112)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1eZt4G-0001AM-Vc
-	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 01:43:57 -0500
-Date: Fri, 12 Jan 2018 14:43:54 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20180112064354.GF29151@lemon.usersys.redhat.com>
-References: <151570326218.441.13378298987831799927@5adcb62bf0d6>
-	<ba4c016b-703f-906d-ad16-22ae1aa05b25@redhat.com>
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1eZt5i-0002Dw-9y
+	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 01:45:26 -0500
+Date: Fri, 12 Jan 2018 14:44:55 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20180112064455.GN2551@xz-mi>
+References: <20171219084557.9801-1-peterx@redhat.com>
+	<20171219084557.9801-23-peterx@redhat.com>
+	<20180109142435.GG31400@stefanha-x1.localdomain>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <ba4c016b-703f-906d-ad16-22ae1aa05b25@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] net: Allow netdevs to be used with
- 'hostfwd_add' and 'hostfwd_remove'
+In-Reply-To: <20180109142435.GG31400@stefanha-x1.localdomain>
+Subject: Re: [Qemu-devel] [RFC v6 22/27] qmp: isolate responses into io
+ thread
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,39 +29,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: qemu-devel@nongnu.org, jasowang@redhat.com, samuel.thibault@ens-lyon.org, dgilbert@redhat.com
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Cc: qemu-devel@nongnu.org, Stefan Hajnoczi <shajnocz@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <famz@redhat.com>, Juan Quintela <quintela@redhat.com>, mdroth@linux.vnet.ibm.com, Eric Blake <eblake@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Markus Armbruster <armbru@redhat.com>, marcandre.lureau@redhat.com, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 
-On Fri, 01/12 07:23, Thomas Huth wrote:
-> On 11.01.2018 21:41, no-reply@patchew.org wrote:
-> > Hi,
-> > 
-> > This series failed build test on ppc host. Please find the details below.
-> [...]
-> > Updating 3c8cf5a9c21ff8782164d1def7f44bd888713384
-> > Submodule 'dtc' (git://git.qemu-project.org/dtc.git) registered for path 'dtc'
-> > Submodule 'pixman' (git://anongit.freedesktop.org/pixman) registered for path 'pixman'
-> > Submodule 'roms/SLOF' (git://git.qemu-project.org/SLOF.git) registered for path 'roms/SLOF'
-> > Submodule 'roms/ipxe' (git://git.qemu-project.org/ipxe.git) registered for path 'roms/ipxe'
-> > Submodule 'roms/openbios' (git://git.qemu-project.org/openbios.git) registered for path 'roms/openbios'
-> > Submodule 'roms/openhackware' (git://git.qemu-project.org/openhackware.git) registered for path 'roms/openhackware'
-> > Submodule 'roms/qemu-palcode' (git://github.com/rth7680/qemu-palcode.git) registered for path 'roms/qemu-palcode'
-> > Submodule 'roms/seabios' (git://git.qemu-project.org/seabios.git/) registered for path 'roms/seabios'
-> > Submodule 'roms/sgabios' (git://git.qemu-project.org/sgabios.git) registered for path 'roms/sgabios'
-> > Submodule 'roms/u-boot' (git://git.qemu-project.org/u-boot.git) registered for path 'roms/u-boot'
-> > Submodule 'roms/vgabios' (git://git.qemu-project.org/vgabios.git/) registered for path 'roms/vgabios'
-> > Cloning into 'dtc'...
-> > Submodule path 'dtc': checked out '65cc4d2748a2c2e6f27f1cf39e07a5dbabd80ebf'
-> > fatal: remote error: access denied or repository not exported: /pixman
-> > Cloning into 'pixman'...
-> > Clone of 'git://anongit.freedesktop.org/pixman' into submodule path 'pixman' failed
+On Tue, Jan 09, 2018 at 02:24:35PM +0000, Stefan Hajnoczi wrote:
+> On Tue, Dec 19, 2017 at 04:45:52PM +0800, Peter Xu wrote:
+> > +static void monitor_qmp_bh_responder(void *opaque)
+> > +{
+> > +    QMPResponse response;
+> > +
+> > +    while (true) {
+> > +        response = monitor_qmp_response_pop_one();
+> > +        if (!response.data) {
+> > +            break;
+> > +        }
+> > +        monitor_json_emitter_raw(response.mon, response.data);
 > 
->  Hi Fam,
+> Have you audited all mon->out_lock users to ensure that guest memory is
+> never touched while the lock is held?
 > 
-> why is patchew still trying to clone pixman? I thought we only use the
-> system pixman library nowadays?
+> If guest memory is touched then the main loop could be blocked due to
+> postcopy and when the IOThread executes monitor_qmp_bh_responder() ->
+> monitor_json_emitter_raw() -> monitor_puts() it will also hang!
 
-There is a bug in patchew tester that the git cache repo is not updated, so
-every time it starts from a very old commit. Will fix it soon.
+Yes, I am mostly certain that it never touches guest memory.  IMHO
+it's a pure lock for monitor's output buffer since day one of its
+occurence in 6cff3e8594c.
 
-Fam
+An extreme case I can think of is when someone wants to dump some data
+from guest memory in QMP (I suspect who will use it though...).  In
+that case we will still be safe, since the guest memory access should
+be happening in g_strdup_vprintf() rather than monitor_puts(), so even
+if it happens we will hang at g_strdup_vprintf() without the lock taken.
+
+> 
+> Please add a comment above the out_lock declaration letting users know
+> that they must not touch guest memory while holding the lock.
+
+I'm not sure whether adding a comment like this for the lock would be
+a bit strange, but I agree it should be better than nothing.  Thanks,
+
+-- 
+Peter Xu
