@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60763)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33194)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ea2mE-0001Wv-Oy
-	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 12:06:02 -0500
+	(envelope-from <marcandre.lureau@gmail.com>) id 1ea2n5-0002C7-1S
+	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 12:06:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ea2m8-0007p2-1N
-	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 12:05:58 -0500
-Received: from mail-ot0-x234.google.com ([2607:f8b0:4003:c0f::234]:46881)
+	(envelope-from <marcandre.lureau@gmail.com>) id 1ea2n4-0000Hx-5S
+	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 12:06:51 -0500
+Received: from mail-wm0-x244.google.com ([2a00:1450:400c:c09::244]:43435)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1ea2m7-0007oa-Pz
-	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 12:05:51 -0500
-Received: by mail-ot0-x234.google.com with SMTP id f6so5578444oti.13
-	for <qemu-devel@nongnu.org>; Fri, 12 Jan 2018 09:05:51 -0800 (PST)
+	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+	id 1ea2n4-0000HJ-05
+	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 12:06:50 -0500
+Received: by mail-wm0-x244.google.com with SMTP id g1so13437489wmg.2
+	for <qemu-devel@nongnu.org>; Fri, 12 Jan 2018 09:06:49 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20180111193021.17466-4-f4bug@amsat.org>
-References: <20180111193021.17466-1-f4bug@amsat.org>
-	<20180111193021.17466-4-f4bug@amsat.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 12 Jan 2018 17:05:30 +0000
-Message-ID: <CAFEAcA8UvqmtzxcQrDWF24OQsBek0s2uYPOsoCs5YqH80MpXnw@mail.gmail.com>
+In-Reply-To: <1512682213-4354-7-git-send-email-minyard@acm.org>
+References: <1512682213-4354-1-git-send-email-minyard@acm.org>
+	<1512682213-4354-7-git-send-email-minyard@acm.org>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Fri, 12 Jan 2018 18:06:48 +0100
+Message-ID: <CAJ+F1CKUK_uRa9imNcOLzvNZyNaC7ciNqLppzGWVZjKGJ8ggRQ@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v6 03/13] sdhci: refactor same sysbus/pci
- properties into a common one
+Subject: Re: [Qemu-devel] [PATCH 6/8] vl.c: disallow command line fw cfg
+ without opt/
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,26 +31,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Cc: Alistair Francis <alistair.francis@xilinx.com>, QEMU Developers <qemu-devel@nongnu.org>, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, Andrey Smirnov <andrew.smirnov@gmail.com>
+To: Corey Minyard <minyard@acm.org>
+Cc: QEMU <qemu-devel@nongnu.org>, Corey Minyard <cminyard@mvista.com>, "Michael S. Tsirkin" <mst@redhat.com>
 
-On 11 January 2018 at 19:30, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> =
-wrote:
-> Now both sysbus/pci classes inherit of the 'pending-insert-quirk' propert=
-y,
-> which is a HCI dependent property (regardless if accessed through a MMIO
-> sysbus or a PCI bus).
-> So far only the BCM implementation has to use it.
->
-> Add sysbus/pci/sdbus comments to have clearer code blocks separation.
->
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-> Reviewed-by: Alistair Francis <alistair.francis@xilinx.com>
+Hi
 
-I'm not sure about this patch, because it means that we now have
-no mechanism for having a property which exists on the sysbus
-device but not on the PCI device (and as per my comments on the
-last patch in this set, we do need to be able to do that).
+On Thu, Dec 7, 2017 at 10:30 PM,  <minyard@acm.org> wrote:
+> From: "Michael S. Tsirkin" <mst@redhat.com>
+>
+> Allowing arbitary file names on command line is setting us up for
+> failure: future guests will look for a specific QEMU-specified name and
+> will get confused finding a user file there.
+>
+
+Why is this part of a IPMI series?
+There was a lengthy discussion on this patch earlier, could you
+summarize the conclusion?
 
 thanks
--- PMM
+
+> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+> [Change "warning" to "error" in the error report.]
+> Signed-off-by: Corey Minyard <cminyard@mvista.com>
+> ---
+>  vl.c | 5 +++--
+>  1 file changed, 3 insertions(+), 2 deletions(-)
+>
+> diff --git a/vl.c b/vl.c
+> index 1ad1c04..fae9300 100644
+> --- a/vl.c
+> +++ b/vl.c
+> @@ -2400,8 +2400,9 @@ static int parse_fw_cfg(void *opaque, QemuOpts *opt=
+s, Error **errp)
+>          return -1;
+>      }
+>      if (strncmp(name, "opt/", 4) !=3D 0) {
+> -        warn_report("externally provided fw_cfg item names "
+> -                    "should be prefixed with \"opt/\"");
+> +        error_report("error: externally provided fw_cfg item names "
+> +                     "should be prefixed with \"opt/\"");
+> +        return -1;
+>      }
+>      if (nonempty_str(str)) {
+>          size =3D strlen(str); /* NUL terminator NOT included in fw_cfg b=
+lob */
+> --
+> 2.7.4
+>
+>
+
+
+
+--=20
+Marc-Andr=C3=A9 Lureau
