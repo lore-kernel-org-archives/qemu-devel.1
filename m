@@ -1,26 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47601)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47947)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1eZxo4-0004ec-4p
-	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 06:47:33 -0500
+	(envelope-from <kraxel@redhat.com>) id 1eZxpZ-0006Iq-KU
+	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 06:49:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1eZxnz-0001Sv-Vk
-	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 06:47:32 -0500
-Received: from mail.ispras.ru ([83.149.199.45]:35320)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1eZxnz-0001RH-Jn
-	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 06:47:27 -0500
-From: "Pavel Dovgalyuk" <dovgaluk@ispras.ru>
-References: <1515756676-3860-1-git-send-email-pbonzini@redhat.com>
-	<1515756676-3860-5-git-send-email-pbonzini@redhat.com>
-In-Reply-To: <1515756676-3860-5-git-send-email-pbonzini@redhat.com>
-Date: Fri, 12 Jan 2018 14:47:28 +0300
-Message-ID: <002101d38b9b$1f730620$5e591260$@ru>
+	(envelope-from <kraxel@redhat.com>) id 1eZxpV-0002T7-Lr
+	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 06:49:05 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:39228)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1eZxpV-0002Ho-Fm
+	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 06:49:01 -0500
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 7AE9681DF3
+	for <qemu-devel@nongnu.org>; Fri, 12 Jan 2018 11:48:49 +0000 (UTC)
+Date: Fri, 12 Jan 2018 12:48:44 +0100
+From: Gerd Hoffmann <kraxel@redhat.com>
+Message-ID: <20180112114844.zjlwxqxrzvrjotrd@sirius.home.kraxel.org>
+References: <20171218191228.31018-1-berrange@redhat.com>
+	<20171218191228.31018-2-berrange@redhat.com>
+	<20180108110849.325psbrk6g7bstsc@sirius.home.kraxel.org>
+	<20180110135513.GV3205@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Content-Language: ru
-Subject: Re: [Qemu-devel] [PULL 04/52] hpet: recover timer offset correctly
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <20180110135513.GV3205@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v1 01/13] ui: remove 'sync' parametr from
+ vnc_update_client
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,124 +37,18 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: 'Paolo Bonzini' <pbonzini@redhat.com>, qemu-devel@nongnu.org
-Cc: 'Maria Klimushenkova' <maria.klimushenkova@ispras.ru>, 'Pavel Dovgalyuk' <pavel.dovgaluk@ispras.ru>
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: qemu-devel@nongnu.org, =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>, P J P <ppandit@redhat.com>
 
-This revision is incorrect.
-Here is the latest one: https://lists.gnu.org/archive/html/qemu-devel/2018-01/msg01751.html
+> > What is the state of this series btw (/me busy wading through my
+> > email backlog ...) ?
+>=20
+> Marc-Andr=E9 reviewed it, but I was assuming you would want to review a=
+nd
+> (if acceptable) queue it, since you're the designated VNC maintainer.
+> There's just one nit-pick in the Subject of this mail so far.
 
-Pavel Dovgalyuk
+Ok, queued, fixed $subject tyops, test builds running ...
 
-
-> -----Original Message-----
-> From: Paolo Bonzini [mailto:paolo.bonzini@gmail.com] On Behalf Of Paolo Bonzini
-> Sent: Friday, January 12, 2018 2:30 PM
-> To: qemu-devel@nongnu.org
-> Cc: Maria Klimushenkova; Pavel Dovgalyuk
-> Subject: [PULL 04/52] hpet: recover timer offset correctly
-> 
-> From: Maria Klimushenkova <maria.klimushenkova@ispras.ru>
-> 
-> HPET saves its state by calculating the current time and recovers timer
-> offset using this calculated value. But these calculations include
-> divisions and multiplications. Therefore the timer state cannot be recovered
-> precise enough.
-> This patch introduces saving of the original value of the offset to
-> preserve the determinism of the timer.
-> 
-> Signed-off-by: Maria Klimushenkova <maria.klimushenkova@ispras.ru>
-> Signed-off-by: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
-> Message-Id: <20171220100205.16625.84632.stgit@pasha-VirtualBox>
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> ---
->  hw/timer/hpet.c | 32 ++++++++++++++++++++++++++++++--
->  1 file changed, 30 insertions(+), 2 deletions(-)
-> 
-> diff --git a/hw/timer/hpet.c b/hw/timer/hpet.c
-> index 577371b..4904a60 100644
-> --- a/hw/timer/hpet.c
-> +++ b/hw/timer/hpet.c
-> @@ -70,6 +70,7 @@ typedef struct HPETState {
-> 
->      MemoryRegion iomem;
->      uint64_t hpet_offset;
-> +    bool hpet_offset_loaded;
->      qemu_irq irqs[HPET_NUM_IRQ_ROUTES];
->      uint32_t flags;
->      uint8_t rtc_irq_level;
-> @@ -221,7 +222,9 @@ static int hpet_pre_save(void *opaque)
->      HPETState *s = opaque;
-> 
->      /* save current counter value */
-> -    s->hpet_counter = hpet_get_ticks(s);
-> +    if (hpet_enabled(s)) {
-> +        s->hpet_counter = hpet_get_ticks(s);
-> +    }
-> 
->      return 0;
->  }
-> @@ -232,6 +235,8 @@ static int hpet_pre_load(void *opaque)
-> 
->      /* version 1 only supports 3, later versions will load the actual value */
->      s->num_timers = HPET_MIN_TIMERS;
-> +    /* for checking whether the hpet_offset section is loaded */
-> +    s->hpet_offset_loaded = false;
->      return 0;
->  }
-> 
-> @@ -252,7 +257,10 @@ static int hpet_post_load(void *opaque, int version_id)
->      HPETState *s = opaque;
-> 
->      /* Recalculate the offset between the main counter and guest time */
-> -    s->hpet_offset = ticks_to_ns(s->hpet_counter) - qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
-> +    if (!s->hpet_offset_loaded) {
-> +        s->hpet_offset = ticks_to_ns(s->hpet_counter)
-> +                        - qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
-> +    }
-> 
->      /* Push number of timers into capability returned via HPET_ID */
->      s->capability &= ~HPET_ID_NUM_TIM_MASK;
-> @@ -267,6 +275,14 @@ static int hpet_post_load(void *opaque, int version_id)
->      return 0;
->  }
-> 
-> +static int hpet_offset_post_load(void *opaque, int version_id)
-> +{
-> +    HPETState *s = opaque;
-> +
-> +    s->hpet_offset_loaded = true;
-> +    return 0;
-> +}
-> +
->  static bool hpet_rtc_irq_level_needed(void *opaque)
->  {
->      HPETState *s = opaque;
-> @@ -285,6 +301,17 @@ static const VMStateDescription vmstate_hpet_rtc_irq_level = {
->      }
->  };
-> 
-> +static const VMStateDescription vmstate_hpet_offset = {
-> +    .name = "hpet/offset",
-> +    .version_id = 1,
-> +    .minimum_version_id = 1,
-> +    .post_load = hpet_offset_post_load,
-> +    .fields = (VMStateField[]) {
-> +        VMSTATE_UINT64(hpet_offset, HPETState),
-> +        VMSTATE_END_OF_LIST()
-> +    }
-> +};
-> +
->  static const VMStateDescription vmstate_hpet_timer = {
->      .name = "hpet_timer",
->      .version_id = 1,
-> @@ -320,6 +347,7 @@ static const VMStateDescription vmstate_hpet = {
->      },
->      .subsections = (const VMStateDescription*[]) {
->          &vmstate_hpet_rtc_irq_level,
-> +        &vmstate_hpet_offset,
->          NULL
->      }
->  };
-> --
-> 1.8.3.1
-> 
+thanks,
+  Gerd
