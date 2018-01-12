@@ -1,28 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38988)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54814)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1eZmEu-0001vq-Va
-	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 18:26:30 -0500
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1eZn0P-0000Nl-PM
+	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 19:15:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1eZmEt-0001HP-Sr
-	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 18:26:28 -0500
-Received: from mail-wr0-x234.google.com ([2a00:1450:400c:c0c::234]:41182)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
-	id 1eZmEt-0001GI-MF
-	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 18:26:27 -0500
-Received: by mail-wr0-x234.google.com with SMTP id o7so3766808wro.8
-	for <qemu-devel@nongnu.org>; Thu, 11 Jan 2018 15:26:27 -0800 (PST)
-MIME-Version: 1.0
-In-Reply-To: <CAJSP0QVd70uAiG3vyOjO-qOdt1YbEccYydJvz4igg7_bBiW+5A@mail.gmail.com>
-References: <CAJSP0QUMA7v=-qX-CNCi30aoH-HzXC9i75EpLWP_TmFuDzpTQQ@mail.gmail.com>
-	<CAKmqyKPk69_d-iYGekoS9WBM1fnzav1iFAQEXQq_jLOW9_Dt3w@mail.gmail.com>
-	<CAJSP0QVd70uAiG3vyOjO-qOdt1YbEccYydJvz4igg7_bBiW+5A@mail.gmail.com>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Thu, 11 Jan 2018 15:25:56 -0800
-Message-ID: <CAKmqyKP2cQGXSmPvaGt3AwDz6zewJ6HH=vVTSnk6GVAQAhW5uA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] Call for GSoC & Outreachy 2018 mentors & project
- ideas
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1eZn0O-0006BI-NU
+	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 19:15:33 -0500
+Received: from hera.aquilenet.fr ([2a0c:e300::1]:34022)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <samuel.thibault@ens-lyon.org>)
+	id 1eZn0O-0006Ae-Ay
+	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 19:15:32 -0500
+From: Samuel Thibault <samuel.thibault@ens-lyon.org>
+Date: Fri, 12 Jan 2018 01:15:28 +0100
+Message-Id: <20180112001528.14420-1-samuel.thibault@ens-lyon.org>
+Subject: [Qemu-devel] [PATCHv3] linux-user: Add getcpu() support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,46 +22,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@gmail.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, kvm <kvm@vger.kernel.org>, Jailhouse <jailhouse-dev@googlegroups.com>
+To: qemu-devel@nongnu.org
+Cc: Samuel Thibault <samuel.thibault@ens-lyon.org>, Laurent Vivier <laurent@vivier.eu>, Riku Voipio <riku.voipio@iki.fi>
 
-On Wed, Jan 10, 2018 at 4:52 AM, Stefan Hajnoczi <stefanha@gmail.com> wrote:
-> On Tue, Jan 9, 2018 at 9:45 PM, Alistair Francis <alistair23@gmail.com> wrote:
->> Can anyone who has done this before chime in.
->>
->> What do you think about getting someone to cleanup and improve the GDB
->> support in QEMU? Would that be the right difficulty of task for a GSoC
->> project?
->
-> There is not enough information to give feedback on whether this
-> project idea is suitable.  What are the specific tasks you'd like the
-> student to work on?
->
-> In general, I'm sure there are well-defined 12-week project ideas
-> around the GDB stub.  New features are easy to propose and are usually
-> well-defined (e.g. implement these commands that are documented in the
-> GDB protocol documentation).  Cleaning up code is less clear and it
-> would depend on exactly what needs to be done.  Interns will not have
-> a background in the QEMU codebase and may not be able to make
-> judgements about how to structure things, so I would be more careful
-> about refactoring/cleanup projects.
->
-> Please see my talk about QEMU GSoC for guidelines on project ideas:
-> https://www.youtube.com/watch?v=xNVCX7YMUL8&t=19m11s
-> http://vmsplice.net/~stefan/stefanha-kvm-forum-2016.pdf
+Signed-off-by: Samuel Thibault <samuel.thibault@ens-lyon.org>
 
-That helps a lot, thanks for that.
+---
+Difference between v1 and v2: handle failure of put_user_u32 with goto efault;
+Difference between v2 and v3: handle failure of sys_getcpu system call
+---
+ linux-user/syscall.c | 19 +++++++++++++++++++
+ 1 file changed, 19 insertions(+)
 
-So for a more concrete solution, how would adding support for multi
-CPU support to the GDB server sound?
-
-This would allow GDB debugging for the A53 and the R5 on the Xilinx
-ZynqMP for example. This is something we have in the Xilinx tree, but
-it is in no state to go upstream and really needs to be re-write to be
-upstreamable and more generic.
-
-Alistair
-
->
-> Hope this helps,
-> Stefan
+diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+index 11c9116c4a..f8cfaf043a 100644
+--- a/linux-user/syscall.c
++++ b/linux-user/syscall.c
+@@ -296,6 +296,8 @@ _syscall3(int, sys_sched_getaffinity, pid_t, pid, unsigned int, len,
+ #define __NR_sys_sched_setaffinity __NR_sched_setaffinity
+ _syscall3(int, sys_sched_setaffinity, pid_t, pid, unsigned int, len,
+           unsigned long *, user_mask_ptr);
++#define __NR_sys_getcpu __NR_getcpu
++_syscall3(int, sys_getcpu, unsigned *, cpu, unsigned *, node, void *, tcache);
+ _syscall4(int, reboot, int, magic1, int, magic2, unsigned int, cmd,
+           void *, arg);
+ _syscall2(int, capget, struct __user_cap_header_struct *, header,
+@@ -10403,6 +10405,23 @@ abi_long do_syscall(void *cpu_env, int num, abi_long arg1,
+             ret = get_errno(sys_sched_setaffinity(arg1, mask_size, mask));
+         }
+         break;
++    case TARGET_NR_getcpu:
++        {
++            unsigned cpu, node;
++            ret = get_errno(sys_getcpu(arg1 ? &cpu : NULL,
++                                       arg2 ? &node : NULL,
++                                       NULL));
++            if (ret < 0) {
++                goto fail;
++            }
++            if (arg1 && put_user_u32(cpu, arg1)) {
++                goto efault;
++            }
++            if (arg2 && put_user_u32(node, arg2)) {
++                goto efault;
++            }
++        }
++        break;
+     case TARGET_NR_sched_setparam:
+         {
+             struct sched_param *target_schp;
+-- 
+2.15.1
