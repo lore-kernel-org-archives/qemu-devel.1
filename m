@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41652)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41576)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1eZxYi-0007KQ-PQ
+	(envelope-from <paolo.bonzini@gmail.com>) id 1eZxYf-0007Jo-L0
 	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 06:31:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1eZxYh-0004tJ-Na
-	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 06:31:40 -0500
-Received: from mail-wr0-x22c.google.com ([2a00:1450:400c:c0c::22c]:33737)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1eZxYd-0004k6-Sz
+	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 06:31:37 -0500
+Received: from mail-wm0-x241.google.com ([2a00:1450:400c:c09::241]:38872)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1eZxYh-0004qw-Hw
-	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 06:31:39 -0500
-Received: by mail-wr0-x22c.google.com with SMTP id p6so5052667wrd.0
-	for <qemu-devel@nongnu.org>; Fri, 12 Jan 2018 03:31:39 -0800 (PST)
+	id 1eZxYd-0004iM-MJ
+	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 06:31:35 -0500
+Received: by mail-wm0-x241.google.com with SMTP id 141so11109268wme.3
+	for <qemu-devel@nongnu.org>; Fri, 12 Jan 2018 03:31:35 -0800 (PST)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Fri, 12 Jan 2018 12:30:40 +0100
-Message-Id: <1515756676-3860-17-git-send-email-pbonzini@redhat.com>
+Date: Fri, 12 Jan 2018 12:30:37 +0100
+Message-Id: <1515756676-3860-14-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1515756676-3860-1-git-send-email-pbonzini@redhat.com>
 References: <1515756676-3860-1-git-send-email-pbonzini@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 16/52] tests: fix check-qobject leak
+Subject: [Qemu-devel] [PULL 13/52] tests/docker: add some sanitizers to
+ fedora dockerfile
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,46 +36,35 @@ Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
 From: Marc-André Lureau <marcandre.lureau@redhat.com>
 
-/public/qobject_is_equal_conversion: OK
-
-=================================================================
-==14396==ERROR: LeakSanitizer: detected memory leaks
-
-Direct leak of 56 byte(s) in 1 object(s) allocated from:
-    #0 0x7f07682c5850 in malloc (/lib64/libasan.so.4+0xde850)
-    #1 0x7f0767d12f0c in g_malloc ../glib/gmem.c:94
-    #2 0x7f0767d131cf in g_malloc_n ../glib/gmem.c:331
-    #3 0x562bd767371f in do_test_equality /home/elmarco/src/qq/tests/check-qobject.c:49
-    #4 0x562bd7674a35 in qobject_is_equal_dict_test /home/elmarco/src/qq/tests/check-qobject.c:267
-    #5 0x7f0767d37b04 in test_case_run ../glib/gtestutils.c:2237
-    #6 0x7f0767d37ec4 in g_test_run_suite_internal ../glib/gtestutils.c:2321
-    #7 0x7f0767d37f6d in g_test_run_suite_internal ../glib/gtestutils.c:2333
-    #8 0x7f0767d38184 in g_test_run_suite ../glib/gtestutils.c:2408
-    #9 0x7f0767d36e0d in g_test_run ../glib/gtestutils.c:1674
-    #10 0x562bd7674e75 in main /home/elmarco/src/qq/tests/check-qobject.c:327
-    #11 0x7f0766009039 in __libc_start_main (/lib64/libc.so.6+0x21039)
+Build fedora image with ASAN/UBSan support.
 
 Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
+Message-Id: <20180104160523.22995-6-marcandre.lureau@redhat.com>
+Tested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Message-Id: <20180104160523.22995-9-marcandre.lureau@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- tests/check-qobject.c | 2 ++
- 1 file changed, 2 insertions(+)
+ tests/docker/dockerfiles/fedora.docker | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/tests/check-qobject.c b/tests/check-qobject.c
-index 03e9175..710f9e6 100644
---- a/tests/check-qobject.c
-+++ b/tests/check-qobject.c
-@@ -59,6 +59,8 @@ static void do_test_equality(bool expected, int _, ...)
-             g_assert(qobject_is_equal(args[i], args[j]) == expected);
-         }
-     }
-+
-+    g_free(args);
- }
+diff --git a/tests/docker/dockerfiles/fedora.docker b/tests/docker/dockerfiles/fedora.docker
+index 4b26c3a..32de731 100644
+--- a/tests/docker/dockerfiles/fedora.docker
++++ b/tests/docker/dockerfiles/fedora.docker
+@@ -3,7 +3,7 @@ ENV PACKAGES \
+     ccache gettext git tar PyYAML sparse flex bison python2 bzip2 hostname \
+     glib2-devel pixman-devel zlib-devel SDL-devel libfdt-devel \
+     gcc gcc-c++ clang make perl which bc findutils libaio-devel \
+-    nettle-devel \
++    nettle-devel libasan libubsan \
+     mingw32-pixman mingw32-glib2 mingw32-gmp mingw32-SDL mingw32-pkg-config \
+     mingw32-gtk2 mingw32-gtk3 mingw32-gnutls mingw32-nettle mingw32-libtasn1 \
+     mingw32-libjpeg-turbo mingw32-libpng mingw32-curl mingw32-libssh2 \
+@@ -15,4 +15,4 @@ ENV PACKAGES \
  
- #define check_equal(...) \
+ RUN dnf install -y $PACKAGES
+ RUN rpm -q $PACKAGES | sort > /packages.txt
+-ENV FEATURES mingw clang pyyaml
++ENV FEATURES mingw clang pyyaml asan
 -- 
 1.8.3.1
