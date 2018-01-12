@@ -1,34 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42356)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51922)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eZqyX-0005cI-Ag
-	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 23:29:54 -0500
+	(envelope-from <peterx@redhat.com>) id 1eZrK2-0002K3-4u
+	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 23:52:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eZqyU-0005JQ-7R
-	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 23:29:53 -0500
-Received: from indium.canonical.com ([91.189.90.7]:37304)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1eZqyU-0005Hv-12
-	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 23:29:50 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1eZqyR-0001II-QM
-	for <qemu-devel@nongnu.org>; Fri, 12 Jan 2018 04:29:47 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id C69B22E80CD
-	for <qemu-devel@nongnu.org>; Fri, 12 Jan 2018 04:29:47 +0000 (UTC)
+	(envelope-from <peterx@redhat.com>) id 1eZrJz-00075X-4r
+	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 23:52:06 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:46188)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1eZrJy-00075C-Ti
+	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 23:52:03 -0500
+Date: Fri, 12 Jan 2018 12:51:49 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20180112045149.GH2551@xz-mi>
+References: <20171219084557.9801-1-peterx@redhat.com>
+	<20171219084557.9801-16-peterx@redhat.com>
+	<20171221112738.GL10812@lemon> <20171225032613.GD2443@xz-mi>
+	<20180108164936.GG11758@stefanha-x1.localdomain>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 12 Jan 2018 04:17:19 -0000
-From: Launchpad Bug Tracker <1086782@bugs.launchpad.net>
-Reply-To: Bug 1086782 <1086782@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20121205125603.6348.62070.malonedeb@gac.canonical.com>
-Message-Id: <151573064000.6414.3315948849626010293.malone@loganberry.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1086782] Re: HPET time drift windows 7 64bits
- guest
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20180108164936.GG11758@stefanha-x1.localdomain>
+Subject: Re: [Qemu-devel] [RFC v6 15/27] monitor: let suspend/resume work
+ even with QMPs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,124 +30,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Cc: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org, Stefan Hajnoczi <shajnocz@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Juan Quintela <quintela@redhat.com>, mdroth@linux.vnet.ibm.com, Eric Blake <eblake@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Markus Armbruster <armbru@redhat.com>, marcandre.lureau@redhat.com, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 
-[Expired for QEMU because there has been no activity for 60 days.]
+On Mon, Jan 08, 2018 at 04:49:36PM +0000, Stefan Hajnoczi wrote:
+> On Mon, Dec 25, 2017 at 11:26:13AM +0800, Peter Xu wrote:
+> > On Thu, Dec 21, 2017 at 07:27:38PM +0800, Fam Zheng wrote:
+> > > On Tue, 12/19 16:45, Peter Xu wrote:
+> > > > One thing to mention is that for QMPs that are using IOThreads, we need
+> > > > an explicit kick for the IOThread in case it is sleeping.
+> > > > 
+> > > > Since at it, add traces for the operations.
+> > > > 
+> > > > Signed-off-by: Peter Xu <peterx@redhat.com>
+> > > > ---
+> > > >  monitor.c    | 26 +++++++++++++++++++++-----
+> > > >  trace-events |  1 +
+> > > >  2 files changed, 22 insertions(+), 5 deletions(-)
+> > > > 
+> > > > diff --git a/monitor.c b/monitor.c
+> > > > index 844508d134..5f05f2e9da 100644
+> > > > --- a/monitor.c
+> > > > +++ b/monitor.c
+> > > > @@ -3992,19 +3992,35 @@ static void monitor_command_cb(void *opaque, const char *cmdline,
+> > > >  
+> > > >  int monitor_suspend(Monitor *mon)
+> > > >  {
+> > > > -    if (!mon->rs)
+> > > > -        return -ENOTTY;
+> > > 
+> > > Please add to the commit message why the mon->rs check is dropped, for this and
+> > > the other one.
+> > 
+> > I thought it would be clear enough since mon->rs is only used by HMP
+> > and the subject tells us that this patch is adding support for QMP.
+> > But... sure I can add one more sentence for that!
+> 
+> This change breaks hmp.c:hmp_migrate():
+> 
+>   if (monitor_suspend(mon) < 0) {
+>       monitor_printf(mon, "terminal does not allow synchronous "
+>                      "migration, continuing detached\n");
+>       return;
+>   }
+> 
+> mon->rs is used by HMP code to determine whether this is an interactive
+> terminal.  Both live migration and password prompting rely on this
+> because they must be forbidden when doing so would be impossible (e.g.
+> GDB stub tunneling HMP commands).
+> 
+> Suspending the QMP monitor is useful, but please don't break the HMP
+> code.
 
-** Changed in: qemu
-       Status: Incomplete =3D> Expired
+Could you elaborate a bit on how this patch breaks anything?
 
--- =
+IMHO HMP monitors always have Monitor.rs setup, so here in
+hmp_migrate() I don't really understand why we need this check, since
+IIUC monitor_suspend() for a HMP monitor will never fail before.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1086782
+Thanks,
 
-Title:
-  HPET time drift windows 7 64bits guest
-
-Status in QEMU:
-  Expired
-
-Bug description:
-  Using latest qemu-kvm (1.2.0), time drift (clock slow in guest) in Window=
-s 7 64 bits guest when HPET is enabled (default).
-  Disabling HPET (-no-hpet) solves the time drift.
-
-  UsePlatformClock enable/disable doesn't make a difference in the guest.
-  bcdedit /set useplatformclock true
-
-  Using driftfix slew doesn't make a difference too.
-
-  =
-
-  # qemu-system-x86_64 --version
-  QEMU emulator version 1.2.0 (qemu-kvm-1.2.0), Copyright (c) 2003-2008 Fab=
-rice Bellard
-
-  Kernel is 3.6.8:
-  # uname -a
-  Linux pulsar 3.6.8 #1 SMP Sat Dec 1 16:26:10 CET 2012 x86_64 x86_64 x86_6=
-4 GNU/Linux
-
-  TSC is stable in the host:
-  =3D=3D=3D
-  # cat /sys/devices/system/clocksource/clocksource0/current_clocksource
-  tsc
-
-  Dmesg:
-  [    0.000000] hpet clockevent registered
-  [    0.000000] tsc: Fast TSC calibration using PIT
-  [    0.000000] tsc: Detected 2660.096 MHz processor
-  [    0.001002] Calibrating delay loop (skipped), value calculated using t=
-imer frequency.. 5320.19 BogoMIPS (lpj=3D2660096)
-  [    0.001138] pid_max: default: 32768 minimum: 301
-  ...
-  [    1.492019] tsc: Refined TSC clocksource calibration: 2659.973 MHz
-  [    1.492093] Switching to clocksource tsc
-
-  =
-
-  CPUinfo, constant_tsc:
-  vendor_id       : GenuineIntel
-  cpu family      : 6
-  model           : 23
-  model name      : Intel(R) Core(TM)2 Quad CPU    Q8400  @ 2.66GHz
-  stepping        : 10
-  microcode       : 0xa0b
-  cpu MHz         : 2667.000
-  cache size      : 2048 KB
-  flags           : fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mc=
-a cmov pat pse36 clflush dts acpi mmx fxsr sse sse2 ss ht tm pbe syscall nx=
- lm constant_tsc arch_perfmon pebs bts rep_good nopl aperfmperf pni dtes64 =
-monitor ds_cpl vmx est tm2 ssse3 cx16 xtpr pdcm sse4_1 xsave lahf_lm dtherm=
- tpr_shadow vnmi flexpriority
-  bogomips        : 5320.19
-
-  # grep -i hpet .config
-  CONFIG_HPET_TIMER=3Dy
-  CONFIG_HPET_EMULATE_RTC=3Dy
-  CONFIG_HPET=3Dy
-  # CONFIG_HPET_MMAP is not set
-  =3D=3D=3D
-
-  Qemu command line:
-  /usr/bin/qemu-system-x86_64 -drive file=3D/dev/vol0/KVMORION01,cache=3Dno=
-ne,aio=3Dnative,if=3Dvirtio \
-    -drive file=3D/dev/vol0/KVMORION02,cache=3Dnone,aio=3Dnative,if=3Dvirti=
-o \
-    -cpu host \
-    -m 2048 \
-    -smp 4,maxcpus=3D4,cores=3D4,threads=3D1,sockets=3D1 \
-    -rtc base=3Dlocaltime,driftfix=3Dslew \
-    -vnc 10.124.241.211:0,password -k es \
-    -monitor telnet:localhost:37200,server,nowait \
-    -netdev tap,id=3Dkvmorion,ifname=3Dkvmorion,script=3D/etc/qemu-ifup-br0=
-,downscript=3D/etc/qemu-ifdown-br0 \
-    -device virtio-net-pci,netdev=3Dkvmorion,id=3Dvirtio-nic0,mac=3D02:85:6=
-4:02:c2:aa \
-    -device virtio-balloon-pci,id=3Dballoon0 \
-    -boot menu=3Don \
-    -pidfile /var/run/kvmorion.pid \
-    -daemonize
-
-  Using 1 CPU doesn't make a difference.
-  Only workaround is disabling hpet (-no-hpet)
-
-  Sample time drift in guest:
-  >ntpdate -q 10.124.241.211
-   5 Dec 13:36:06 ntpdate[3464]: Raised to realtime priority class
-  server 10.124.241.211, stratum 2, offset 3.694184, delay 0.02551
-   5 Dec 13:36:12 ntpdate[3464]: step time server 10.124.241.211 offset 3.6=
-94184 s
-  ec
-
-  >ntpdate -q 10.124.241.211
-   5 Dec 13:52:02 ntpdate[1964]: Raised to realtime priority class
-  server 10.124.241.211, stratum 2, offset 4.719968, delay 0.02554
-   5 Dec 13:52:08 ntpdate[1964]: step time server 10.124.241.211 offset 4.7=
-19968 s
-  ec
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1086782/+subscriptions
+-- 
+Peter Xu
