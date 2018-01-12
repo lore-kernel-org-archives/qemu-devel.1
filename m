@@ -1,19 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42168)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45848)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yu.ning@linux.intel.com>) id 1eZwH5-00028R-Kg
-	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 05:09:25 -0500
+	(envelope-from <stefanha@redhat.com>) id 1eZwPj-0004TQ-8G
+	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 05:18:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yu.ning@linux.intel.com>) id 1eZwH2-0000it-DL
-	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 05:09:23 -0500
-Received: from mga11.intel.com ([192.55.52.93]:7899)
+	(envelope-from <stefanha@redhat.com>) id 1eZwPf-0001Sn-Us
+	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 05:18:19 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:52954)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <yu.ning@linux.intel.com>)
-	id 1eZwH2-0000eh-16
-	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 05:09:20 -0500
-From: Yu Ning <yu.ning@linux.intel.com>
-Date: Fri, 12 Jan 2018 18:22:35 +0800
-Message-Id: <1515752555-12784-1-git-send-email-yu.ning@linux.intel.com>
-Subject: [Qemu-devel] [PATCH] hax: Support guest RAM sizes of 4GB or more
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1eZwPf-0001Rd-LC
+	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 05:18:15 -0500
+Date: Fri, 12 Jan 2018 10:18:07 +0000
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20180112101807.GE7356@stefanha-x1.localdomain>
+References: <20180110161438.GA28096@stefanha-x1.localdomain>
+	<dcb849d4-82fb-de8a-5e81-23d47026c9eb@redhat.com>
+	<20180111152345.GA7353@stefanha-x1.localdomain>
+	<86106573-422b-fe4c-ec15-dad0edf05880@redhat.com>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="tVmo9FyGdCe4F4YN"
+Content-Disposition: inline
+In-Reply-To: <86106573-422b-fe4c-ec15-dad0edf05880@redhat.com>
+Subject: Re: [Qemu-devel] vhost-pci and virtio-vhost-user
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,297 +30,218 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Yu Ning <yu.ning@linux.intel.com>, Yu Ning <yu.ning@intel.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>
+To: Jason Wang <jasowang@redhat.com>
+Cc: wei.w.wang@intel.com, qemu-devel@nongnu.org
 
-From: Yu Ning <yu.ning@intel.com>
 
-Since HAX_VM_IOCTL_ALLOC_RAM takes a 32-bit size, it cannot handle
-RAM blocks of 4GB or larger, which is why HAXM can only run guests
-with less than 4GB of RAM. Solve this problem by utilizing the new
-HAXM API, HAX_VM_IOCTL_ADD_RAMBLOCK, which takes a 64-bit size, to
-register RAM blocks with the HAXM kernel module. The new API is
-first added in HAXM 7.0.0, and its availablility and be confirmed
-by the presence of the HAX_CAP_64BIT_RAMBLOCK capability flag.
+--tVmo9FyGdCe4F4YN
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-When the guest RAM size reaches 7GB, QEMU will ask HAXM to set up a
-memory mapping that covers a 4GB region, which will fail, because
-HAX_VM_IOCTL_SET_RAM also takes a 32-bit size. Work around this
-limitation by splitting the large mapping into small ones and
-calling HAX_VM_IOCTL_SET_RAM multiple times.
+On Fri, Jan 12, 2018 at 11:32:56AM +0800, Jason Wang wrote:
+>=20
+>=20
+> On 2018=E5=B9=B401=E6=9C=8811=E6=97=A5 23:23, Stefan Hajnoczi wrote:
+> > On Thu, Jan 11, 2018 at 06:57:03PM +0800, Jason Wang wrote:
+> > >=20
+> > > On 2018=E5=B9=B401=E6=9C=8811=E6=97=A5 00:14, Stefan Hajnoczi wrote:
+> > > > Hi Wei,
+> > > > I wanted to summarize the differences between the vhost-pci and
+> > > > virtio-vhost-user approaches because previous discussions may have =
+been
+> > > > confusing.
+> > > >=20
+> > > > vhost-pci defines a new virtio device type for each vhost device ty=
+pe
+> > > > (net, scsi, blk).  It therefore requires a virtio device driver for=
+ each
+> > > > device type inside the slave VM.
+> > > >=20
+> > > > Adding a new device type requires:
+> > > > 1. Defining a new virtio device type in the VIRTIO specification.
+> > > > 3. Implementing a new QEMU device model.
+> > > > 2. Implementing a new virtio driver.
+> > > >=20
+> > > > virtio-vhost-user is a single virtio device that acts as a vhost-us=
+er
+> > > > protocol transport for any vhost device type.  It requires one virt=
+io
+> > > > driver inside the slave VM and device types are implemented using
+> > > > existing vhost-user slave libraries (librte_vhost in DPDK and
+> > > > libvhost-user in QEMU).
+> > > >=20
+> > > > Adding a new device type to virtio-vhost-user involves:
+> > > > 1. Adding any new vhost-user protocol messages to the QEMU
+> > > >      virtio-vhost-user device model.
+> > > > 2. Adding any new vhost-user protocol messages to the vhost-user sl=
+ave
+> > > >      library.
+> > > > 3. Implementing the new device slave.
+> > > >=20
+> > > > The simplest case is when no new vhost-user protocol messages are
+> > > > required for the new device.  Then all that's needed for
+> > > > virtio-vhost-user is a device slave implementation (#3).  That slave
+> > > > implementation will also work with AF_UNIX because the vhost-user s=
+lave
+> > > > library hides the transport (AF_UNIX vs virtio-vhost-user).  Even
+> > > > better, if another person has already implemented that device slave=
+ to
+> > > > use with AF_UNIX then no new code is needed for virtio-vhost-user
+> > > > support at all!
+> > > >=20
+> > > > If you compare this to vhost-pci, it would be necessary to design a=
+ new
+> > > > virtio device, implement it in QEMU, and implement the virtio drive=
+r.
+> > > > Much of virtio driver is more or less the same thing as the vhost-u=
+ser
+> > > > device slave but it cannot be reused because the vhost-user protocol
+> > > > isn't being used by the virtio device.  The result is a lot of
+> > > > duplication in DPDK and other codebases that implement vhost-user
+> > > > slaves.
+> > > >=20
+> > > > The way that vhost-pci is designed means that anyone wishing to sup=
+port
+> > > > a new device type has to become a virtio device designer.  They nee=
+d to
+> > > > map vhost-user protocol concepts to a new virtio device type.  This=
+ will
+> > > > be time-consuming for everyone involved (e.g. the developer, the VI=
+RTIO
+> > > > community, etc).
+> > > >=20
+> > > > The virtio-vhost-user approach stays at the vhost-user protocol lev=
+el as
+> > > > much as possible.  This way there are fewer concepts that need to be
+> > > > mapped by people adding new device types.  As a result, it will all=
+ow
+> > > > virtio-vhost-user to keep up with AF_UNIX vhost-user and grow becau=
+se
+> > > > it's easier to work with.
+> > > >=20
+> > > > What do you think?
+> > > >=20
+> > > > Stefan
+> > > So a question is what's the motivation here?
+> > >=20
+> > > Form what I'm understanding, vhost-pci tries to build a scalable V2V =
+private
+> > > datapath. But according to what you describe here, virito-vhost-user =
+tries
+> > > to make it possible to implement the device inside another VM. I unde=
+rstand
+> > > the goal of vhost-pci could be done on top, but it looks to me it wou=
+ld then
+> > > rather similar to the design of Xen driver domain. So I can not figur=
+e out
+> > > how it can be done in a high performance way.
+> > vhost-pci and virtio-vhost-user both have the same goal.  They allow
+> > a VM to implement a vhost device (net, scsi, blk, etc).
+>=20
+> Looks not, if I read the code correctly, vhost-pci has a device
+> implementation in qemu, and in slave VM it only have a vhost-pci-net driv=
+er.
 
-Bug: https://bugs.launchpad.net/qemu/+bug/1735576
+You are right that the current "[PATCH v3 0/7] Vhost-pci for inter-VM
+communication" does not reach this goal yet.  The patch series focusses
+on a subset of vhost-user-net for poll mode drivers.
 
-Signed-off-by: Yu Ning <yu.ning@intel.com>
----
- include/sysemu/hax.h        |  2 +-
- target/i386/hax-all.c       |  2 ++
- target/i386/hax-darwin.c    | 27 +++++++++++++++++++++------
- target/i386/hax-darwin.h    |  1 +
- target/i386/hax-i386.h      |  1 +
- target/i386/hax-interface.h |  8 ++++++++
- target/i386/hax-mem.c       | 34 ++++++++++++++++++++++++++--------
- target/i386/hax-windows.c   | 38 +++++++++++++++++++++++++++-----------
- target/i386/hax-windows.h   |  2 ++
- 9 files changed, 89 insertions(+), 26 deletions(-)
+But the goal is to eventually let VMs implement any vhost device type.
+Even if Wei, you, or I don't implement scsi, for example, someone else
+should be able to do it based on vhost-pci or virtio-vhost-user.
 
-diff --git a/include/sysemu/hax.h b/include/sysemu/hax.h
-index f252399..1f6c461 100644
---- a/include/sysemu/hax.h
-+++ b/include/sysemu/hax.h
-@@ -27,7 +27,7 @@
- int hax_sync_vcpus(void);
- int hax_init_vcpu(CPUState *cpu);
- int hax_smp_cpu_exec(CPUState *cpu);
--int hax_populate_ram(uint64_t va, uint32_t size);
-+int hax_populate_ram(uint64_t va, uint64_t size);
- 
- void hax_cpu_synchronize_state(CPUState *cpu);
- void hax_cpu_synchronize_post_reset(CPUState *cpu);
-diff --git a/target/i386/hax-all.c b/target/i386/hax-all.c
-index 3ce6950..57921e7 100644
---- a/target/i386/hax-all.c
-+++ b/target/i386/hax-all.c
-@@ -104,6 +104,8 @@ static int hax_get_capability(struct hax_state *hax)
-         return -ENOTSUP;
-     }
- 
-+    hax->supports_64bit_ramblock = !!(cap->winfo & HAX_CAP_64BIT_RAMBLOCK);
-+
-     if (cap->wstatus & HAX_CAP_MEMQUOTA) {
-         if (cap->mem_quota < hax->mem_quota) {
-             fprintf(stderr, "The VM memory needed exceeds the driver limit.\n");
-diff --git a/target/i386/hax-darwin.c b/target/i386/hax-darwin.c
-index ee94174..acdde47 100644
---- a/target/i386/hax-darwin.c
-+++ b/target/i386/hax-darwin.c
-@@ -28,21 +28,36 @@ hax_fd hax_mod_open(void)
-     return fd;
- }
- 
--int hax_populate_ram(uint64_t va, uint32_t size)
-+int hax_populate_ram(uint64_t va, uint64_t size)
- {
-     int ret;
--    struct hax_alloc_ram_info info;
- 
-     if (!hax_global.vm || !hax_global.vm->fd) {
-         fprintf(stderr, "Allocate memory before vm create?\n");
-         return -EINVAL;
-     }
- 
--    info.size = size;
--    info.va = va;
--    ret = ioctl(hax_global.vm->fd, HAX_VM_IOCTL_ALLOC_RAM, &info);
-+    if (hax_global.supports_64bit_ramblock) {
-+        struct hax_ramblock_info ramblock = {
-+            .start_va = va,
-+            .size = size,
-+            .reserved = 0
-+        };
-+
-+        ret = ioctl(hax_global.vm->fd, HAX_VM_IOCTL_ADD_RAMBLOCK, &ramblock);
-+    } else {
-+        struct hax_alloc_ram_info info = {
-+            .size = (uint32_t)size,
-+            .pad = 0,
-+            .va = va
-+        };
-+
-+        ret = ioctl(hax_global.vm->fd, HAX_VM_IOCTL_ALLOC_RAM, &info);
-+    }
-     if (ret < 0) {
--        fprintf(stderr, "Failed to allocate %x memory\n", size);
-+        fprintf(stderr, "Failed to register RAM block: ret=%d, va=0x%" PRIx64
-+                ", size=0x%" PRIx64 ", method=%s\n", ret, va, size,
-+                hax_global.supports_64bit_ramblock ? "new" : "legacy");
-         return ret;
-     }
-     return 0;
-diff --git a/target/i386/hax-darwin.h b/target/i386/hax-darwin.h
-index fb8e25a..51af0e8 100644
---- a/target/i386/hax-darwin.h
-+++ b/target/i386/hax-darwin.h
-@@ -44,6 +44,7 @@ static inline void hax_close_fd(hax_fd fd)
- #define HAX_VM_IOCTL_SET_RAM _IOWR(0, 0x82, struct hax_set_ram_info)
- #define HAX_VM_IOCTL_VCPU_DESTROY _IOW(0, 0x83, uint32_t)
- #define HAX_VM_IOCTL_NOTIFY_QEMU_VERSION _IOW(0, 0x84, struct hax_qemu_version)
-+#define HAX_VM_IOCTL_ADD_RAMBLOCK _IOW(0, 0x85, struct hax_ramblock_info)
- 
- #define HAX_VCPU_IOCTL_RUN  _IO(0, 0xc0)
- #define HAX_VCPU_IOCTL_SET_MSRS _IOWR(0, 0xc1, struct hax_msr_data)
-diff --git a/target/i386/hax-i386.h b/target/i386/hax-i386.h
-index 8ffe91f..6abc156 100644
---- a/target/i386/hax-i386.h
-+++ b/target/i386/hax-i386.h
-@@ -37,6 +37,7 @@ struct hax_state {
-     uint32_t version;
-     struct hax_vm *vm;
-     uint64_t mem_quota;
-+    bool supports_64bit_ramblock;
- };
- 
- #define HAX_MAX_VCPU 0x10
-diff --git a/target/i386/hax-interface.h b/target/i386/hax-interface.h
-index d141308..93d5fcb 100644
---- a/target/i386/hax-interface.h
-+++ b/target/i386/hax-interface.h
-@@ -308,6 +308,13 @@ struct hax_alloc_ram_info {
-     uint32_t pad;
-     uint64_t va;
- } __attribute__ ((__packed__));
-+
-+struct hax_ramblock_info {
-+    uint64_t start_va;
-+    uint64_t size;
-+    uint64_t reserved;
-+} __attribute__ ((__packed__));
-+
- #define HAX_RAM_INFO_ROM     0x01 /* Read-Only */
- #define HAX_RAM_INFO_INVALID 0x80 /* Unmapped, usually used for MMIO */
- struct hax_set_ram_info {
-@@ -327,6 +334,7 @@ struct hax_set_ram_info {
- 
- #define HAX_CAP_MEMQUOTA           0x2
- #define HAX_CAP_UG                 0x4
-+#define HAX_CAP_64BIT_RAMBLOCK     0x8
- 
- struct hax_capabilityinfo {
-     /* bit 0: 1 - working
-diff --git a/target/i386/hax-mem.c b/target/i386/hax-mem.c
-index 27a0d21..f46e855 100644
---- a/target/i386/hax-mem.c
-+++ b/target/i386/hax-mem.c
-@@ -174,6 +174,7 @@ static void hax_process_section(MemoryRegionSection *section, uint8_t flags)
-     ram_addr_t size = int128_get64(section->size);
-     unsigned int delta;
-     uint64_t host_va;
-+    uint32_t max_mapping_size;
- 
-     /* We only care about RAM and ROM regions */
-     if (!memory_region_is_ram(mr)) {
-@@ -206,10 +207,23 @@ static void hax_process_section(MemoryRegionSection *section, uint8_t flags)
-         flags |= HAX_RAM_INFO_ROM;
-     }
- 
--    /* the kernel module interface uses 32-bit sizes (but we could split...) */
--    g_assert(size <= UINT32_MAX);
--
--    hax_update_mapping(start_pa, size, host_va, flags);
-+    /*
-+     * The kernel module interface uses 32-bit sizes:
-+     * https://github.com/intel/haxm/blob/master/API.md#hax_vm_ioctl_set_ram
-+     *
-+     * If the mapping size is longer than 32 bits, we can't process it in one
-+     * call into the kernel. Instead, we split the mapping into smaller ones,
-+     * and call hax_update_mapping() on each.
-+     */
-+    max_mapping_size = UINT32_MAX & qemu_real_host_page_mask;
-+    while (size > max_mapping_size) {
-+        hax_update_mapping(start_pa, max_mapping_size, host_va, flags);
-+        start_pa += max_mapping_size;
-+        size -= max_mapping_size;
-+        host_va += max_mapping_size;
-+    }
-+    /* Now size <= max_mapping_size */
-+    hax_update_mapping(start_pa, (uint32_t)size, host_va, flags);
- }
- 
- static void hax_region_add(MemoryListener *listener,
-@@ -283,12 +297,16 @@ static MemoryListener hax_memory_listener = {
- static void hax_ram_block_added(RAMBlockNotifier *n, void *host, size_t size)
- {
-     /*
--     * In HAX, QEMU allocates the virtual address, and HAX kernel
--     * populates the memory with physical memory. Currently we have no
--     * paging, so user should make sure enough free memory in advance.
-+     * We must register each RAM block with the HAXM kernel module, or
-+     * hax_set_ram() will fail for any mapping into the RAM block:
-+     * https://github.com/intel/haxm/blob/master/API.md#hax_vm_ioctl_alloc_ram
-+     *
-+     * Old versions of the HAXM kernel module (< 6.2.0) used to preallocate all
-+     * host physical pages for the RAM block as part of this registration
-+     * process, hence the name hax_populate_ram().
-      */
-     if (hax_populate_ram((uint64_t)(uintptr_t)host, size) < 0) {
--        fprintf(stderr, "HAX failed to populate RAM");
-+        fprintf(stderr, "HAX failed to populate RAM\n");
-         abort();
-     }
- }
-diff --git a/target/i386/hax-windows.c b/target/i386/hax-windows.c
-index 15a180b..b1ac737 100644
---- a/target/i386/hax-windows.c
-+++ b/target/i386/hax-windows.c
-@@ -58,10 +58,9 @@ static int hax_open_device(hax_fd *fd)
-     return fd;
- }
- 
--int hax_populate_ram(uint64_t va, uint32_t size)
-+int hax_populate_ram(uint64_t va, uint64_t size)
- {
-     int ret;
--    struct hax_alloc_ram_info info;
-     HANDLE hDeviceVM;
-     DWORD dSize = 0;
- 
-@@ -70,18 +69,35 @@ int hax_populate_ram(uint64_t va, uint32_t size)
-         return -EINVAL;
-     }
- 
--    info.size = size;
--    info.va = va;
--
-     hDeviceVM = hax_global.vm->fd;
--
--    ret = DeviceIoControl(hDeviceVM,
--                          HAX_VM_IOCTL_ALLOC_RAM,
--                          &info, sizeof(info), NULL, 0, &dSize,
--                          (LPOVERLAPPED) NULL);
-+    if (hax_global.supports_64bit_ramblock) {
-+        struct hax_ramblock_info ramblock = {
-+            .start_va = va,
-+            .size = size,
-+            .reserved = 0
-+        };
-+
-+        ret = DeviceIoControl(hDeviceVM,
-+                              HAX_VM_IOCTL_ADD_RAMBLOCK,
-+                              &ramblock, sizeof(ramblock), NULL, 0, &dSize,
-+                              (LPOVERLAPPED) NULL);
-+    } else {
-+        struct hax_alloc_ram_info info = {
-+            .size = (uint32_t) size,
-+            .pad = 0,
-+            .va = va
-+        };
-+
-+        ret = DeviceIoControl(hDeviceVM,
-+                              HAX_VM_IOCTL_ALLOC_RAM,
-+                              &info, sizeof(info), NULL, 0, &dSize,
-+                              (LPOVERLAPPED) NULL);
-+    }
- 
-     if (!ret) {
--        fprintf(stderr, "Failed to allocate %x memory\n", size);
-+        fprintf(stderr, "Failed to register RAM block: va=0x%" PRIx64
-+                ", size=0x%" PRIx64 ", method=%s\n", va, size,
-+                hax_global.supports_64bit_ramblock ? "new" : "legacy");
-         return ret;
-     }
- 
-diff --git a/target/i386/hax-windows.h b/target/i386/hax-windows.h
-index 004f867..8491417 100644
---- a/target/i386/hax-windows.h
-+++ b/target/i386/hax-windows.h
-@@ -59,6 +59,8 @@ static inline int hax_invalid_fd(hax_fd fd)
-                                             METHOD_BUFFERED, FILE_ANY_ACCESS)
- #define HAX_VM_IOCTL_VCPU_DESTROY  CTL_CODE(HAX_DEVICE_TYPE, 0x905, \
-                                             METHOD_BUFFERED, FILE_ANY_ACCESS)
-+#define HAX_VM_IOCTL_ADD_RAMBLOCK  CTL_CODE(HAX_DEVICE_TYPE, 0x913, \
-+                                            METHOD_BUFFERED, FILE_ANY_ACCESS)
- 
- #define HAX_VCPU_IOCTL_RUN      CTL_CODE(HAX_DEVICE_TYPE, 0x906, \
-                                          METHOD_BUFFERED, FILE_ANY_ACCESS)
--- 
-2.7.4
+Wei: Do you agree?
+
+> > This allows
+> > software defined network or storage appliances running inside a VM to
+> > provide I/O services to other VMs.
+>=20
+> Well, I think we can do it even with the existed virtio or whatever other
+> emulated device which should not be bounded to any specific kind of devic=
+e.=C2=A0
+
+Please explain the approach you have in mind.
+
+> And what's more important, according to the kvm 2016 slides of vhost-pci,
+> the motivation of vhost-pci is not building SDN but a chain of VNFs. So
+> bypassing the central vswitch through a private VM2VM path does make sens=
+e.
+> (Though whether or not vhost-pci is the best choice is still questionable=
+).
+
+This is probably my fault.  Maybe my networking terminology is wrong.  I
+consider "virtual network functions" to be part of "software-defined
+networking" use cases.  I'm not implying there must be a central virtual
+switch.
+
+To rephrase: vhost-pci enables exitless VM2VM communication.
+
+> >   To the other VMs the devices look
+> > like regular virtio devices.
+> >=20
+> > I'm not sure I understand your reference to the Xen driver domain or
+> > performance.
+>=20
+> So what proposed here is basically memory sharing and event notification
+> through eventfd, this model have been used by Xen for many years through
+> grant table and event channel. Xen use this to move the backend
+> implementation from dom0 to a driver domain which has direct access to so=
+me
+> hardwares. Consider the case of network, it can then implement xen netback
+> inside driver domain which can access hardware NIC directly.
+>
+> This makes sense for Xen and for performance since driver domain (backend)
+> can access hardware directly and event was triggered through lower overhe=
+ad
+> hypercall (or it can do busypolling). But for virtio-vhost-user, unless y=
+ou
+> want SRIOV based solutions inside the slave VM, I believe we won't want to
+> go back to Xen since the hardware virtualization can bring extra overhead=
+s.
+
+Okay, this point is about the NFV use case.  I can't answer that because
+I'm not familiar with it.
+
+Even if the NFV use case is not ideal for VMs, there are many other use
+cases for VMs implementing vhost devices.  In the cloud the VM is the
+first-class object that users can manage.  They do not have the ability
+to run vhost-user processes on the host.  Therefore I/O appliances need
+to be able to run as VMs and vhost-pci (or virtio-vhost-user) solve that
+problem.
+
+> >   Both vhost-pci and virtio-vhost-user work using shared
+> > memory access to the guest RAM of the other VM.  Therefore they can poll
+> > virtqueues and avoid vmexit.  They do also support cross-VM interrupts,
+> > thanks to QEMU setting up irqfd/ioeventfd appropriately on the host.
+> >=20
+> > Stefan
+>=20
+> So in conclusion, consider the complexity, I would suggest to figure out
+> whether or not this (either vhost-pci or virito-vhost-user) is really
+> required before moving ahead. E.g, for VM2VM direct network path, this lo=
+oks
+> simply an issue of network topology instead of the problem of device, so
+> there's a lot of trick, for vhost-user one can easily image to write an
+> application (or use testpmd) to build a zerocopied VM2VM datapath, isn't
+> this not sufficient for the case?
+
+See above, I described the general cloud I/O appliance use case.
+
+Stefan
+
+--tVmo9FyGdCe4F4YN
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJaWItfAAoJEJykq7OBq3PIvo4H/11EF3+VfvHPa5YH3yaMMNe4
+LeL+DZFRTCQ7ALsZaTkONjYrU2P0ryXvvnCaCHSRvakYgrnpHuilwYKUF/xYzZ7v
+hnt3klNkzUQiiluESs6knZneA0YawsAxA2BSefdtSxL2TdG33Bt5ALQT8oHBzDDk
+EU5S0WCgH6KehChAKdaJBYyJRk8MDg9kNHuLShkWXntEcs8ue4S2+7bZQwukk/1u
+888inHUSj1F3iSaX18N/YYBRE9XPGi3L23IRBpvAv1My2m+NMK/DtcjHU5ETGkW4
+q32zfNT0Z88kZay9cYKhEY5wWemXtCFw8ImUb4BDuFIU2Tl5h++rqCNC9fqDGGE=
+=+WHL
+-----END PGP SIGNATURE-----
+
+--tVmo9FyGdCe4F4YN--
