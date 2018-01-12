@@ -1,26 +1,42 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50813)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52426)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1eZvVv-0006rW-7A
-	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 04:20:40 -0500
+	(envelope-from <joserz@linux.vnet.ibm.com>) id 1eZvZV-0008Og-I0
+	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 04:24:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1eZvVr-0003IQ-0U
-	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 04:20:39 -0500
-Received: from mail-wm0-f65.google.com ([74.125.82.65]:37860)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1eZvVq-0003Hj-QG
-	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 04:20:34 -0500
-Received: by mail-wm0-f65.google.com with SMTP id f140so10359224wmd.2
-	for <qemu-devel@nongnu.org>; Fri, 12 Jan 2018 01:20:34 -0800 (PST)
-References: <1515521823-4292-1-git-send-email-jcmvbkbc@gmail.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <27e44c5d-b04c-df08-bd7f-fc4089d91dcd@redhat.com>
-Date: Fri, 12 Jan 2018 10:20:31 +0100
+	(envelope-from <joserz@linux.vnet.ibm.com>) id 1eZvZS-0000FM-Cd
+	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 04:24:21 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:39272
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <joserz@linux.vnet.ibm.com>)
+	id 1eZvZS-0000EZ-70
+	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 04:24:18 -0500
+Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w0C9NhRl084566
+	for <qemu-devel@nongnu.org>; Fri, 12 Jan 2018 04:24:17 -0500
+Received: from e11.ny.us.ibm.com (e11.ny.us.ibm.com [129.33.205.201])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2feqs6ecmw-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Fri, 12 Jan 2018 04:24:16 -0500
+Received: from localhost
+	by e11.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <joserz@linux.vnet.ibm.com>;
+	Fri, 12 Jan 2018 04:24:15 -0500
+Date: Fri, 12 Jan 2018 07:24:09 -0200
+From: joserz@linux.vnet.ibm.com
+References: <20180106004722.1152-1-joserz@linux.vnet.ibm.com>
+	<20180106004722.1152-2-joserz@linux.vnet.ibm.com>
+	<20180111141622.GI24770@umbus.fritz.box>
+	<20180112034619.GK24770@umbus.fritz.box>
 MIME-Version: 1.0
-In-Reply-To: <1515521823-4292-1-git-send-email-jcmvbkbc@gmail.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PULL v3] target/xtensa updates
+Content-Disposition: inline
+In-Reply-To: <20180112034619.GK24770@umbus.fritz.box>
+Message-Id: <20180112092409.ajlelwt5grwyqe6s@pacoca>
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH 1/1] spapr: Check SMT based on
+ KVM_CAP_PPC_SMT_POSSIBLE
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,97 +45,100 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Filippov <jcmvbkbc@gmail.com>, qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 
-On 09/01/2018 19:17, Max Filippov wrote:
-> Hi Peter,
+On Fri, Jan 12, 2018 at 02:46:19PM +1100, David Gibson wrote:
+> On Fri, Jan 12, 2018 at 01:16:22AM +1100, David Gibson wrote:
+> > On Fri, Jan 05, 2018 at 10:47:22PM -0200, Jose Ricardo Ziviani wrote:
+> > > Power9 supports 4 HW threads/core but it's possible to emulate
+> > > doorbells to implement virtual SMT. KVM has the KVM_CAP_PPC_SMT_POSSIBLE
+> > > which returns a bitmap with all SMT modes supported by the host.
+> > > 
+> > > Today, QEMU forces the SMT mode based on PVR compat table, this is
+> > > silently done in spapr_fixup_cpu_dt. Then, if user passes thread=8 the
+> > > guest will end up with 4 threads/core without any feedback to the user.
+> > > It is confusing and will crash QEMU if a cpu is hotplugged in that
+> > > guest.
+> > > 
+> > > This patch makes use of KVM_CAP_PPC_SMT_POSSIBLE to check if the host
+> > > supports the SMT mode so it allows Power9 guests to have 8 threads/core
+> > > if desired.
+> > > 
+> > > Reported-by: Satheesh Rajendran <satheera@in.ibm.com>
+> > > Signed-off-by: Jose Ricardo Ziviani <joserz@linux.vnet.ibm.com>
+> > > ---
+> > >  hw/ppc/spapr.c       | 14 +++++++++++++-
+> > >  hw/ppc/trace-events  |  1 +
+> > >  target/ppc/kvm.c     |  5 +++++
+> > >  target/ppc/kvm_ppc.h |  6 ++++++
+> > >  4 files changed, 25 insertions(+), 1 deletion(-)
+> > > 
+> > > diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> > > index d1acfe8858..ea2503cd2f 100644
+> > > --- a/hw/ppc/spapr.c
+> > > +++ b/hw/ppc/spapr.c
+> > > @@ -345,7 +345,19 @@ static int spapr_fixup_cpu_dt(void *fdt, sPAPRMachineState *spapr)
+> > >          PowerPCCPU *cpu = POWERPC_CPU(cs);
+> > >          DeviceClass *dc = DEVICE_GET_CLASS(cs);
+> > >          int index = spapr_vcpu_id(cpu);
+> > > -        int compat_smt = MIN(smp_threads, ppc_compat_max_threads(cpu));
+> > > +
+> > > +        /* set smt to maximum for this current pvr if the number
+> > > +         * passed is higher than defined by PVR compat mode AND
+> > > +         * if KVM cannot emulate it.*/
+> > > +        int compat_smt = smp_threads;
+> > > +        if ((kvmppc_cap_smt_possible() & smp_threads) != smp_threads &&
+> > > +                smp_threads > ppc_compat_max_threads(cpu)) {
+> > > +            compat_smt = ppc_compat_max_threads(cpu);
+> > 
+> > I don't think this is the right approach.  We've been trying to remove
+> > places where host properties (such as those read from KVM
+> > capabilities) affect guest visible properties of the VM - like vsmt.
+> > Places like that break migration and often libvirt expectations as
+> > well.
+> > 
+> > This is putting one back in, and so a step in the wrong direction.
 > 
-> please pull the following batch of updates for the target/xtensa.
-> Changes v2->v3:
-> - Don't use g_malloc_n, use g_new instead.
-> Changes v1->v2:
-> - Drop no longer used function option_bits_enabled.
+> Following on from this with some more investigation.
 > 
-> The following changes since commit 0a0dc59d27527b78a195c2d838d28b7b49e5a639:
+> I think the discussion is going off the rails because the reason for
+> this compat threads limit has been forgotten.
 > 
->   Update version for v2.11.0 release (2017-12-13 14:31:09 +0000)
+> *It has nothing to do with the host*.  It's been recoded a bunch, but
+> the logic was originally introduced by 2a48d993 "spapr: Limit threads
+> per core according to current compatibility mode".  It states that it
+> was to avoid confusing the *guest* by presenting more threads than it
+> expects on an compatible-with-old CPU.
 > 
-> are available in the git repository at:
+> This also explains why it's done in this otherwise weird way - just
+> truncating the presented threads in the device tree, while the other
+> threads still "exist" in the qemu and KVM model:
 > 
->   git://github.com/OSLL/qemu-xtensa.git tags/20180109-xtensa
+> It's because this happens at CAS time, for the benefit of guests which
+> don't understand newer CPUs, at which point it's really too late to
+> report an error to the user or renumber the CPUs.
 > 
-> for you to fetch changes up to 5a6539e627faf9251e1db78238b9f9b870610518:
+> So I think what we actually want to do here is just *remove* the
+> compat limit for POWER9 cpus.  Strictly it's to do with the host
+> kernel rather than the cpu, but in practice we can count on POWER9
+> guests not being confused by >4 threads (since they POWER8 compat
+> guests running on POWER9 have to anyway).
 > 
->   target/xtensa: implement disassembler (2018-01-09 09:55:39 -0800)
+> 
+> As a separate matter, we need to validate guest threads-per-core
+> against what the host's capable of, but that doesn't belong here.
 
-This fails compilation on CentOS 6:
+Awesome explanation
 
-/tmp/qemu-test/src/target/xtensa/translate.c:81: error: redefinition of typedef 'DisasContext'
-/tmp/qemu-test/src/target/xtensa/cpu.h:339: note: previous declaration of 'DisasContext' was here
-make[1]: *** [target/xtensa/translate.o] Error 1
-make[1]: *** Waiting for unfinished jobs....
+I'm going to make these changes, perform a lot of more tests and send
+the patches.
 
-Paolo
+Thank you
 
-> ----------------------------------------------------------------
-> target/xtensa updates:
 > 
-> - add libisa to the xtensa target;
-> - change xtensa instruction translator to use it;
-> - switch existing xtensa cores to use it;
-> - add support for a number of instructions: salt/saltu, const16,
->   GPIO32 group, debug mode and MMU-related;
-> - add disassembler for Xtensa.
-> 
-> ----------------------------------------------------------------
-> Max Filippov (16):
->       target/xtensa: pass actual frame size to the entry helper
->       target/xtensa: import libisa source
->       target/xtensa: extract core opcode translators
->       target/xtensa: extract FPU2000 opcode translators
->       target/xtensa: update import_core.sh script for libisa
->       target/xtensa: switch dc232b to libisa
->       target/xtensa: switch dc233c to libisa
->       target/xtensa: switch fsf to libisa
->       target/xtensa: use libisa for instruction decoding
->       target/xtensa: tests: fix memctl SR test
->       target/xtensa: drop DisasContext::litbase
->       target/xtensa: add internal/noop SRs and opcodes
->       target/xtensa: implement salt/saltu
->       target/xtensa: implement GPIO32
->       target/xtensa: implement const16
->       target/xtensa: implement disassembler
-> 
->  MAINTAINERS                                |     1 +
->  disas/Makefile.objs                        |     1 +
->  disas/xtensa.c                             |   133 +
->  include/disas/bfd.h                        |     1 +
->  include/hw/xtensa/xtensa-isa.h             |   838 ++
->  target/xtensa/Makefile.objs                |     1 +
->  target/xtensa/core-dc232b.c                |     4 +
->  target/xtensa/core-dc232b/xtensa-modules.c | 14105 +++++++++++++++++++++++++
->  target/xtensa/core-dc233c.c                |     4 +
->  target/xtensa/core-dc233c/xtensa-modules.c | 15232 +++++++++++++++++++++++++++
->  target/xtensa/core-fsf.c                   |     5 +
->  target/xtensa/core-fsf/xtensa-modules.c    |  9841 +++++++++++++++++
->  target/xtensa/cpu.c                        |     9 +
->  target/xtensa/cpu.h                        |    31 +
->  target/xtensa/helper.c                     |    37 +
->  target/xtensa/import_core.sh               |    15 +
->  target/xtensa/op_helper.c                  |     2 +-
->  target/xtensa/translate.c                  |  5900 +++++++----
->  target/xtensa/xtensa-isa-internal.h        |   231 +
->  target/xtensa/xtensa-isa.c                 |  1745 +++
->  target/xtensa/xtensa-isa.h                 |     1 +
->  tests/tcg/xtensa/test_sr.S                 |     2 +-
->  22 files changed, 45955 insertions(+), 2184 deletions(-)
->  create mode 100644 disas/xtensa.c
->  create mode 100644 include/hw/xtensa/xtensa-isa.h
->  create mode 100644 target/xtensa/core-dc232b/xtensa-modules.c
->  create mode 100644 target/xtensa/core-dc233c/xtensa-modules.c
->  create mode 100644 target/xtensa/core-fsf/xtensa-modules.c
->  create mode 100644 target/xtensa/xtensa-isa-internal.h
->  create mode 100644 target/xtensa/xtensa-isa.c
->  create mode 100644 target/xtensa/xtensa-isa.h
-> 
+> -- 
+> David Gibson			| I'll have my music baroque, and my code
+> david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+> 				| _way_ _around_!
+> http://www.ozlabs.org/~dgibson
