@@ -1,28 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44898)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45151)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eZzgp-0004mU-Ed
-	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 08:48:12 -0500
+	(envelope-from <kraxel@redhat.com>) id 1eZzhj-0005U4-RO
+	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 08:49:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eZzgo-0002io-Nr
-	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 08:48:11 -0500
-Received: from mail-ot0-x244.google.com ([2607:f8b0:4003:c0f::244]:37120)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1eZzgo-0002iA-Is
-	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 08:48:10 -0500
-Received: by mail-ot0-x244.google.com with SMTP id a24so5073504otd.4
-	for <qemu-devel@nongnu.org>; Fri, 12 Jan 2018 05:48:10 -0800 (PST)
+	(envelope-from <kraxel@redhat.com>) id 1eZzhf-0003hT-T6
+	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 08:49:07 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:46312)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1eZzha-0003ZY-Fy
+	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 08:49:03 -0500
+Date: Fri, 12 Jan 2018 14:48:52 +0100
+From: Gerd Hoffmann <kraxel@redhat.com>
+Message-ID: <20180112134852.ai2ush44bvlnrb3f@sirius.home.kraxel.org>
+References: <20171117112258.5888-1-makovick@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20180109122252.17670-7-alex.bennee@linaro.org>
-References: <20180109122252.17670-1-alex.bennee@linaro.org>
-	<20180109122252.17670-7-alex.bennee@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 12 Jan 2018 13:47:49 +0000
-Message-ID: <CAFEAcA_nMQOwLk4BFhtc8xEqc27BbW3zyUfVtnjRevC1yQpxRA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 06/20] include/fpu/softfloat: add some
- float16 constants
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20171117112258.5888-1-makovick@gmail.com>
+Subject: Re: [Qemu-devel] [PATCH v4] SDL2 various fixes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,19 +26,19 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
-Cc: Richard Henderson <richard.henderson@linaro.org>, Laurent Vivier <laurent@vivier.eu>, bharata@linux.vnet.ibm.com, Andrew Dutcher <andrew@andrewdutcher.com>, QEMU Developers <qemu-devel@nongnu.org>, Aurelien Jarno <aurelien@aurel32.net>
+To: Jindrich Makovicka <makovick@gmail.com>
+Cc: qemu-devel@nongnu.org
 
-On 9 January 2018 at 12:22, Alex Benn=C3=A9e <alex.bennee@linaro.org> wrote=
-:
-> This defines the same set of common constants for float 16 as defined
-> for 32 and 64 bit floats. These are often used by target helper
-> functions. I've also removed constants that are not used by anybody.
->
-> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+On Fri, Nov 17, 2017 at 12:22:55PM +0100, Jindrich Makovicka wrote:
+> Hi,
+> 
+> here is a respin of the three remaining patches, with checkpatch errors
+> corrected.
+> 
+> Also added the Fixes: line for "sdl2 uses surface relative coordinates",
+> and an explaining comment to "sdl2: Ignore UI hotkeys".
 
-With the fix to the value for float16_one that Philippe suggests:
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Series queued up now.
 
-thanks
--- PMM
+thanks,
+  Gerd
