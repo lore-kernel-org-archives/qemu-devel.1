@@ -1,20 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41083)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41029)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1ea0hf-0003mP-Qv
-	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 09:53:08 -0500
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1ea0hd-0005g2-0E
+	(envelope-from <kraxel@redhat.com>) id 1ea0he-0003le-EK
 	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 09:53:07 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:57516)
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <kraxel@redhat.com>) id 1ea0hd-0005gE-3E
+	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 09:53:06 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:33562)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1ea0hc-0005fE-QD
-	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 09:53:04 -0500
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1ea0hc-0005fX-Sc
+	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 09:53:05 -0500
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id F0B2712E4E9
+	for <qemu-devel@nongnu.org>; Fri, 12 Jan 2018 14:53:03 +0000 (UTC)
 From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Fri, 12 Jan 2018 15:52:57 +0100
-Message-Id: <20180112145258.10578-9-kraxel@redhat.com>
+Date: Fri, 12 Jan 2018 15:52:54 +0100
+Message-Id: <20180112145258.10578-6-kraxel@redhat.com>
 In-Reply-To: <20180112145258.10578-1-kraxel@redhat.com>
 References: <20180112145258.10578-1-kraxel@redhat.com>
-Subject: [Qemu-devel] [PULL 8/9] sdl2 uses surface relative coordinates
+Subject: [Qemu-devel] [PULL 5/9] spice: remove only written event_mask field
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,61 +30,42 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Jindrich Makovicka <makovick@gmail.com>, Gerd Hoffmann <kraxel@redhat.com>
+Cc: Frediano Ziglio <fziglio@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
 
-From: Jindrich Makovicka <makovick@gmail.com>
+From: Frediano Ziglio <fziglio@redhat.com>
 
-This patch fixes mouse positioning with -device usb-tablet and fullscreen
-or resized window.
-
-Fixes: 46522a82236ea0cf9011b89896d2d8f8ddaf2443
-Signed-off-by: Jindrich Makovicka <makovick@gmail.com>
-Message-Id: <20171117112258.5888-3-makovick@gmail.com>
+Signed-off-by: Frediano Ziglio <fziglio@redhat.com>
+Message-id: 20171122135625.16625-3-fziglio@redhat.com
 Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 ---
- ui/sdl2.c | 30 ++++--------------------------
- 1 file changed, 4 insertions(+), 26 deletions(-)
+ ui/spice-core.c | 6 ++----
+ 1 file changed, 2 insertions(+), 4 deletions(-)
 
-diff --git a/ui/sdl2.c b/ui/sdl2.c
-index 62a75318dd..8a0bd9149b 100644
---- a/ui/sdl2.c
-+++ b/ui/sdl2.c
-@@ -276,32 +276,10 @@ static void sdl_send_mouse_event(struct sdl2_console *scon, int dx, int dy,
-     }
+diff --git a/ui/spice-core.c b/ui/spice-core.c
+index 85b9ea2127..6d579faaae 100644
+--- a/ui/spice-core.c
++++ b/ui/spice-core.c
+@@ -89,7 +89,6 @@ static void timer_remove(SpiceTimer *timer)
  
-     if (qemu_input_is_absolute()) {
--        int scr_w, scr_h;
--        int max_w = 0, max_h = 0;
--        int off_x = 0, off_y = 0;
--        int cur_off_x = 0, cur_off_y = 0;
--        int i;
--
--        for (i = 0; i < sdl2_num_outputs; i++) {
--            struct sdl2_console *thiscon = &sdl2_console[i];
--            if (thiscon->real_window && thiscon->surface) {
--                SDL_GetWindowSize(thiscon->real_window, &scr_w, &scr_h);
--                cur_off_x = thiscon->x;
--                cur_off_y = thiscon->y;
--                if (scr_w + cur_off_x > max_w) {
--                    max_w = scr_w + cur_off_x;
--                }
--                if (scr_h + cur_off_y > max_h) {
--                    max_h = scr_h + cur_off_y;
--                }
--                if (i == scon->idx) {
--                    off_x = cur_off_x;
--                    off_y = cur_off_y;
--                }
--            }
--        }
--        qemu_input_queue_abs(scon->dcl.con, INPUT_AXIS_X, off_x + x, 0, max_w);
--        qemu_input_queue_abs(scon->dcl.con, INPUT_AXIS_Y, off_y + y, 0, max_h);
-+        qemu_input_queue_abs(scon->dcl.con, INPUT_AXIS_X,
-+                             x, 0, surface_width(scon->surface));
-+        qemu_input_queue_abs(scon->dcl.con, INPUT_AXIS_Y,
-+                             y, 0, surface_height(scon->surface));
-     } else {
-         if (guest_cursor) {
-             x -= guest_x;
+ struct SpiceWatch {
+     int fd;
+-    int event_mask;
+     SpiceWatchFunc func;
+     void *opaque;
+ };
+@@ -111,11 +110,10 @@ static void watch_update_mask(SpiceWatch *watch, int event_mask)
+     IOHandler *on_read = NULL;
+     IOHandler *on_write = NULL;
+ 
+-    watch->event_mask = event_mask;
+-    if (watch->event_mask & SPICE_WATCH_EVENT_READ) {
++    if (event_mask & SPICE_WATCH_EVENT_READ) {
+         on_read = watch_read;
+     }
+-    if (watch->event_mask & SPICE_WATCH_EVENT_WRITE) {
++    if (event_mask & SPICE_WATCH_EVENT_WRITE) {
+         on_write = watch_write;
+     }
+     qemu_set_fd_handler(watch->fd, on_read, on_write, watch);
 -- 
 2.9.3
