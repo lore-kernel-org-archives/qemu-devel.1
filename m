@@ -1,24 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41955)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42262)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <palmer@sifive.com>) id 1ea5LN-0000nH-0Y
-	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 14:50:25 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1ea5Ls-00015y-RX
+	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 14:50:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <palmer@sifive.com>) id 1ea5LI-0003yY-FL
-	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 14:50:25 -0500
-Received: from mail-pg0-x243.google.com ([2607:f8b0:400e:c05::243]:40515)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <palmer@sifive.com>) id 1ea5LI-0003yG-8c
-	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 14:50:20 -0500
-Received: by mail-pg0-x243.google.com with SMTP id q12so5215200pgt.7
-	for <qemu-devel@nongnu.org>; Fri, 12 Jan 2018 11:50:19 -0800 (PST)
-Date: Fri, 12 Jan 2018 11:50:18 -0800 (PST)
-In-Reply-To: <20180112080916.GA23324@lst.de>
-From: Palmer Dabbelt <palmer@sifive.com>
-Message-ID: <mhng-3ec1b94c-0c03-44b5-9223-a4ef67a957ef@palmer-si-x1c4>
-Mime-Version: 1.0 (MHng)
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v2 00/21] RISC-V QEMU Port Submission v2
+	(envelope-from <ehabkost@redhat.com>) id 1ea5Lp-0004SS-2V
+	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 14:50:56 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:39652)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1ea5Lo-0004Rc-Rn
+	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 14:50:52 -0500
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 035DD61B19
+	for <qemu-devel@nongnu.org>; Fri, 12 Jan 2018 19:50:52 +0000 (UTC)
+Date: Fri, 12 Jan 2018 17:50:50 -0200
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20180112195050.GR18022@localhost.localdomain>
+References: <20180109154519.25634-1-ehabkost@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180109154519.25634-1-ehabkost@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 0/7] CPU model updates for CVE-2017-5715
+ (Spectre variant #2)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,29 +33,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Michael Clark <mjc@sifive.com>, hch@lst.de, kbastian@mail.uni-paderborn.de, patches+subscribe@groups.riscv.org, qemu-devel@nongnu.org, sagark@eecs.berkeley.edu
+To: qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>
 
-On Fri, 12 Jan 2018 00:09:16 PST (-0800), hch@lst.de wrote:
-> On Fri, Jan 12, 2018 at 07:24:54AM +1300, Michael Clark wrote:
->> I'm going to be restoring branches for bbl and riscv-linux that work again
->> priv 1.9.1. There are still other emulators and RTL that support priv1.9.1.
->> Folk will have silicon against different versions of spec going forward.
->> Likewise going forward we are still going to need to support v1.10 behavior
->> when v1.11 is published. i.e. priv v1.10 mode is going to have to hide any
->> additions made in priv v1.11. I use priv v1.9.1 during my QEMU testing.
->> Hopefully, future changes are additive vs breaking...
->
-> That was the plan for 1.10+.  And I thought that was because 1.10
-> is what people actually started implementing for real, but based on
-> the comment from Palmer that is not actually true.  Sigh..
->
-> I guess at least for Linux we'd then want to make sure 1.9.1 support
-> is in mainline as well, probably based off a config option.
+I'm queueing patches 1-5 on x86-next.
 
-I suppose in theory yes, but as far as I know there's no 1.9.1 chips with MMUs
+On Tue, Jan 09, 2018 at 01:45:12PM -0200, Eduardo Habkost wrote:
+> This series adds support for the new IA32_SPEC_CTRL MSR on Intel
+> CPU models.  The new MSR and the spec-ctrl CPUID bit
+> (CPUID[EAX=7,ECX=0].EDX[bit 26]) were introduced by a recent
+> Intel microcode updated and can be used by OSes to mitigate
+> CVE-2017-5715.
+> 
+> It also adds a new EPYC-IBPB CPU model that includes
+> CPUID[0x80000008].EBX[bit 12] (IBPB).  That patch is a RFC
+> because I couldn't find any detailed info on the new CPUID bit
+> and the IA32_PRED_CMD MSR.
+> 
+> Additionally, the last patch on this series changes the new
+> Westmere-IBRS, SandyBridge-IBRS and IvyBridge-IBRS to include the
+> PCID feature, because PCID helps to reduce the performance impact
+> of KPTI on the guest.  The patch is also a RFC because we need to
+> confirm if all Westmere (and newer) CPUs out there have PCID
+> available.
+> 
+> References:
+> * https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2017-5715
+> * Google Security Blog on Meltdown/Spectre mitigations:
+>   https://security.googleblog.com/2018/01/more-details-about-mitigations-for-cpu_4.html
+> * Kernel patches to make use of the new MSRs:
+>   https://www.mail-archive.com/linux-kernel@vger.kernel.org/msg1578798.html
+> * KVM kernel patches for the new CPUID bits and MSRs:
+>   https://www.mail-archive.com/linux-kernel@vger.kernel.org/msg1580363.html
+> * Patches adding PCID to the existing CPU models:
+>   https://patchew.org/QEMU/20180108205052.24385-1-vincent@bernat.im
+>   https://patchew.org/QEMU/20180109070112.30806-1-vincent@bernat.im
+> 
+> Eduardo Habkost (6):
+>   i386: Change X86CPUDefinition::model_id to const char*
+>   i386: Add spec-ctrl CPUID bit
+>   i386: Add FEAT_8000_0008_EBX CPUID feature word
+>   i386: Add new -IBRS versions of Intel CPU models
+>   [RFC] i386: Add EPYC-IBPB CPU model
+>   [RFC] i386: Add PCID to {Westmere,SandyBridge,IvyBridge}-IBRS
+> 
+> Paolo Bonzini (1):
+>   i386: Add support for SPEC_CTRL MSR
+> 
+>  target/i386/cpu.h     |   7 +
+>  target/i386/cpu.c     | 454 +++++++++++++++++++++++++++++++++++++++++++++++++-
+>  target/i386/kvm.c     |  14 ++
+>  target/i386/machine.c |  20 +++
+>  4 files changed, 491 insertions(+), 4 deletions(-)
+> 
+> -- 
+> 2.14.3
+> 
+> 
 
-> And if someone has a a good contact to the RISC-V website admins
-> it would be very helpful to restore a link to the specification as well
-> so that things other than the direct link work.
-
-I sent an email.
+-- 
+Eduardo
