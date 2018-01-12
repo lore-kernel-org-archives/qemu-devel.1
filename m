@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41983)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42127)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1eZxZC-0007rt-3k
-	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 06:32:16 -0500
+	(envelope-from <paolo.bonzini@gmail.com>) id 1eZxZN-00082u-Lt
+	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 06:32:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1eZxZ9-0005rF-70
-	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 06:32:10 -0500
-Received: from mail-wr0-x242.google.com ([2a00:1450:400c:c0c::242]:42801)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1eZxZI-00062p-Ny
+	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 06:32:21 -0500
+Received: from mail-wm0-x241.google.com ([2a00:1450:400c:c09::241]:43338)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1eZxZ9-0005qr-02
-	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 06:32:07 -0500
-Received: by mail-wr0-x242.google.com with SMTP id e41so4698395wre.9
-	for <qemu-devel@nongnu.org>; Fri, 12 Jan 2018 03:32:06 -0800 (PST)
+	id 1eZxZI-00061q-IS
+	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 06:32:16 -0500
+Received: by mail-wm0-x241.google.com with SMTP id g1so11401468wmg.2
+	for <qemu-devel@nongnu.org>; Fri, 12 Jan 2018 03:32:16 -0800 (PST)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Fri, 12 Jan 2018 12:31:04 +0100
-Message-Id: <1515756676-3860-41-git-send-email-pbonzini@redhat.com>
+Date: Fri, 12 Jan 2018 12:31:12 +0100
+Message-Id: <1515756676-3860-49-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1515756676-3860-1-git-send-email-pbonzini@redhat.com>
 References: <1515756676-3860-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 40/52] net: Drop unusual use of do { } while (0); 
+Subject: [Qemu-devel] [PULL 48/52] find_ram_offset: Align ram_addr_t
+ allocation on long boundaries
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,92 +29,60 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-From: Eric Blake <eblake@redhat.com>
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-For a couple of macros in pcnet.c, we have to provide a new scope
-to avoid compiler warnings about declarations in the middle of a
-switch statement that aren't in a sub-scope.  But use of
-'do { ... } while (0);' merely to provide that new scope is arcane
-overkill, compared to just using '{ ... }'.
+The dirty bitmaps are built from 'long's and there is fast-path code
+for synchronising the case where the RAMBlock is aligned to the start
+of a long boundary.  Align the allocation to this boundary
+to cause the fast path to be used.
 
-Signed-off-by: Eric Blake <eblake@redhat.com>
-Reviewed-by: Thomas Huth <thuth@redhat.com>
-Message-Id: <20171201232433.25193-2-eblake@redhat.com>
+Offsets before change:
+11398@1515169675.018566:find_ram_offset size: 0x1e0000 @ 0x8000000
+11398@1515169675.020064:find_ram_offset size: 0x20000 @ 0x81e0000
+11398@1515169675.020244:find_ram_offset size: 0x20000 @ 0x8200000
+11398@1515169675.024343:find_ram_offset size: 0x1000000 @ 0x8220000
+11398@1515169675.025154:find_ram_offset size: 0x10000 @ 0x9220000
+11398@1515169675.027682:find_ram_offset size: 0x40000 @ 0x9230000
+11398@1515169675.032921:find_ram_offset size: 0x200000 @ 0x9270000
+11398@1515169675.033307:find_ram_offset size: 0x1000 @ 0x9470000
+11398@1515169675.033601:find_ram_offset size: 0x1000 @ 0x9471000
+
+after change:
+10923@1515169108.818245:find_ram_offset size: 0x1e0000 @ 0x8000000
+10923@1515169108.819410:find_ram_offset size: 0x20000 @ 0x8200000
+10923@1515169108.819587:find_ram_offset size: 0x20000 @ 0x8240000
+10923@1515169108.823708:find_ram_offset size: 0x1000000 @ 0x8280000
+10923@1515169108.824503:find_ram_offset size: 0x10000 @ 0x9280000
+10923@1515169108.827093:find_ram_offset size: 0x40000 @ 0x92c0000
+10923@1515169108.833045:find_ram_offset size: 0x200000 @ 0x9300000
+10923@1515169108.833504:find_ram_offset size: 0x1000 @ 0x9500000
+10923@1515169108.833787:find_ram_offset size: 0x1000 @ 0x9540000
+
+Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
+Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Message-Id: <20180105170138.23357-3-dgilbert@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- hw/net/pcnet.c | 20 ++++++++++----------
- 1 file changed, 10 insertions(+), 10 deletions(-)
+ exec.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/hw/net/pcnet.c b/hw/net/pcnet.c
-index 39d5d93..606b05c 100644
---- a/hw/net/pcnet.c
-+++ b/hw/net/pcnet.c
-@@ -456,32 +456,32 @@ static inline void pcnet_rmd_store(PCNetState *s, struct pcnet_RMD *rmd,
- #define CHECK_RMD(ADDR,RES) do {                \
-     switch (BCR_SWSTYLE(s)) {                   \
-     case 0x00:                                  \
--        do {                                    \
-+        {                                       \
-             uint16_t rda[4];                    \
-             s->phys_mem_read(s->dma_opaque, (ADDR), \
-                 (void *)&rda[0], sizeof(rda), 0); \
-             (RES) |= (rda[2] & 0xf000)!=0xf000; \
-             (RES) |= (rda[3] & 0xf000)!=0x0000; \
--        } while (0);                            \
-+        }                                       \
-         break;                                  \
-     case 0x01:                                  \
-     case 0x02:                                  \
--        do {                                    \
-+        {                                       \
-             uint32_t rda[4];                    \
-             s->phys_mem_read(s->dma_opaque, (ADDR), \
-                 (void *)&rda[0], sizeof(rda), 0); \
-             (RES) |= (rda[1] & 0x0000f000L)!=0x0000f000L; \
-             (RES) |= (rda[2] & 0x0000f000L)!=0x00000000L; \
--        } while (0);                            \
-+        }                                       \
-         break;                                  \
-     case 0x03:                                  \
--        do {                                    \
-+        {                                       \
-             uint32_t rda[4];                    \
-             s->phys_mem_read(s->dma_opaque, (ADDR), \
-                 (void *)&rda[0], sizeof(rda), 0); \
-             (RES) |= (rda[0] & 0x0000f000L)!=0x00000000L; \
-             (RES) |= (rda[1] & 0x0000f000L)!=0x0000f000L; \
--        } while (0);                            \
-+        }                                       \
-         break;                                  \
-     }                                           \
- } while (0)
-@@ -489,22 +489,22 @@ static inline void pcnet_rmd_store(PCNetState *s, struct pcnet_RMD *rmd,
- #define CHECK_TMD(ADDR,RES) do {                \
-     switch (BCR_SWSTYLE(s)) {                   \
-     case 0x00:                                  \
--        do {                                    \
-+        {                                       \
-             uint16_t xda[4];                    \
-             s->phys_mem_read(s->dma_opaque, (ADDR), \
-                 (void *)&xda[0], sizeof(xda), 0); \
-             (RES) |= (xda[2] & 0xf000)!=0xf000; \
--        } while (0);                            \
-+        }                                       \
-         break;                                  \
-     case 0x01:                                  \
-     case 0x02:                                  \
-     case 0x03:                                  \
--        do {                                    \
-+        {                                       \
-             uint32_t xda[4];                    \
-             s->phys_mem_read(s->dma_opaque, (ADDR), \
-                 (void *)&xda[0], sizeof(xda), 0); \
-             (RES) |= (xda[1] & 0x0000f000L)!=0x0000f000L; \
--        } while (0);                            \
-+        }                                       \
-         break;                                  \
-     }                                           \
- } while (0)
+diff --git a/exec.c b/exec.c
+index 5e2fb55..9f4f450 100644
+--- a/exec.c
++++ b/exec.c
+@@ -1678,7 +1678,11 @@ static ram_addr_t find_ram_offset(ram_addr_t size)
+     RAMBLOCK_FOREACH(block) {
+         ram_addr_t candidate, next = RAM_ADDR_MAX;
+ 
++        /* Align blocks to start on a 'long' in the bitmap
++         * which makes the bitmap sync'ing take the fast path.
++         */
+         candidate = block->offset + block->max_length;
++        candidate = ROUND_UP(candidate, BITS_PER_LONG << TARGET_PAGE_BITS);
+ 
+         /* Search for the closest following block
+          * and find the gap.
 -- 
 1.8.3.1
