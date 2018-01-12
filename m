@@ -1,28 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44918)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45160)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1ea4JS-0005MF-0g
-	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 13:44:23 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1ea4K2-0005lR-OI
+	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 13:44:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1ea4JM-0005mp-Uq
-	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 13:44:22 -0500
-Received: from mail-pg0-x22c.google.com ([2607:f8b0:400e:c05::22c]:38901)
+	(envelope-from <peter.maydell@linaro.org>) id 1ea4K2-0006Wr-0T
+	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 13:44:58 -0500
+Received: from mail-ot0-x244.google.com ([2607:f8b0:4003:c0f::244]:40919)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1ea4JM-0005lq-P7
-	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 13:44:16 -0500
-Received: by mail-pg0-x22c.google.com with SMTP id t67so5111547pgc.5
-	for <qemu-devel@nongnu.org>; Fri, 12 Jan 2018 10:44:16 -0800 (PST)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1ea4K1-0006W4-Rm
+	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 13:44:57 -0500
+Received: by mail-ot0-x244.google.com with SMTP id d10so5835670oti.7
+	for <qemu-devel@nongnu.org>; Fri, 12 Jan 2018 10:44:57 -0800 (PST)
+MIME-Version: 1.0
+In-Reply-To: <20171218173022.18418-6-richard.henderson@linaro.org>
 References: <20171218173022.18418-1-richard.henderson@linaro.org>
 	<20171218173022.18418-6-richard.henderson@linaro.org>
-	<CAFEAcA_NXsPZYJHhYZShroXFUS_5SwpJCi8ehBL+o4OxpNqYmA@mail.gmail.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <436817d9-3377-3828-b513-42934cbaa949@linaro.org>
-Date: Fri, 12 Jan 2018 10:44:12 -0800
-MIME-Version: 1.0
-In-Reply-To: <CAFEAcA_NXsPZYJHhYZShroXFUS_5SwpJCi8ehBL+o4OxpNqYmA@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 12 Jan 2018 18:44:36 +0000
+Message-ID: <CAFEAcA-e0unT9rx9L0mqCbOwCREDg+-FifKL-mwusNZSRv_Vpg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Subject: Re: [Qemu-devel] [PATCH 5/9] target/arm: Add
  aa32_vfp_dreg/aa64_vfp_qreg helpers
 List-Id: <qemu-devel.nongnu.org>
@@ -33,85 +30,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
+To: Richard Henderson <richard.henderson@linaro.org>
 Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>
 
-On 01/12/2018 10:24 AM, Peter Maydell wrote:
->> +/**
->> + * aa32_vfp_dreg:
->> + * Return a pointer to the Dn register within env in 32-bit mode.
->> + */
->> +static inline uint64_t *aa32_vfp_dreg(CPUARMState *env, unsigned regno)
->> +{
->> +    return &env->vfp.regs[regno];
->> +}
->> +
->> +/**
->> + * aa64_vfp_dreg:
->> + * Return a pointer to the Qn register within env in 64-bit mode.
->> + */
->> +static inline uint64_t *aa64_vfp_qreg(CPUARMState *env, unsigned regno)
-> 
-> Comment and code disagree about the name of the function...
+On 18 December 2017 at 17:30, Richard Henderson
+<richard.henderson@linaro.org> wrote:
+> Helpers that return a pointer into env->vfp.regs so that we isolate
+> the logic of how to index the regs array for different cpu modes.
+>
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 
-Oops.
+> --- a/target/arm/helper.c
+> +++ b/target/arm/helper.c
+> @@ -64,15 +64,16 @@ static int vfp_gdb_get_reg(CPUARMState *env, uint8_t *buf, int reg)
+>      /* VFP data registers are always little-endian.  */
+>      nregs = arm_feature(env, ARM_FEATURE_VFP3) ? 32 : 16;
+>      if (reg < nregs) {
+> -        stfq_le_p(buf, env->vfp.regs[reg]);
+> +        stfq_le_p(buf, *aa32_vfp_dreg(env, reg));
+>          return 8;
+>      }
+>      if (arm_feature(env, ARM_FEATURE_NEON)) {
+>          /* Aliases for Q regs.  */
+>          nregs += 16;
+>          if (reg < nregs) {
+> -            stfq_le_p(buf, env->vfp.regs[(reg - 32) * 2]);
+> -            stfq_le_p(buf + 8, env->vfp.regs[(reg - 32) * 2 + 1]);
+> +            uint64_t *q = aa32_vfp_dreg(env, (reg - 32) * 2);
+> +            stfq_le_p(buf, q[0]);
+> +            stfq_le_p(buf + 8, q[1]);
+>              return 16;
+>          }
+>      }
+> @@ -90,14 +91,15 @@ static int vfp_gdb_set_reg(CPUARMState *env, uint8_t *buf, int reg)
+>
+>      nregs = arm_feature(env, ARM_FEATURE_VFP3) ? 32 : 16;
+>      if (reg < nregs) {
+> -        env->vfp.regs[reg] = ldfq_le_p(buf);
+> +        *aa32_vfp_dreg(env, reg) = ldfq_le_p(buf);
+>          return 8;
+>      }
+>      if (arm_feature(env, ARM_FEATURE_NEON)) {
+>          nregs += 16;
+>          if (reg < nregs) {
+> -            env->vfp.regs[(reg - 32) * 2] = ldfq_le_p(buf);
+> -            env->vfp.regs[(reg - 32) * 2 + 1] = ldfq_le_p(buf + 8);
+> +            uint64_t *q = aa32_vfp_dreg(env, (reg - 32) * 2);
+> +            q[0] = ldfq_le_p(buf);
+> +            q[1] = ldfq_le_p(buf + 8);
+>              return 16;
+>          }
+>      }
 
->> @@ -99,8 +99,10 @@ static int aarch64_write_elf64_prfpreg(WriteCoreDumpFunction f,
->>
->>      aarch64_note_init(&note, s, "CORE", 5, NT_PRFPREG, sizeof(note.vfp));
->>
->> -    for (i = 0; i < 64; ++i) {
->> -        note.vfp.vregs[i] = cpu_to_dump64(s, float64_val(env->vfp.regs[i]));
->> +    for (i = 0; i < 32; ++i) {
->> +        uint64_t *q = aa64_vfp_qreg(env, i);
->> +        note.vfp.vregs[2*i + 0] = cpu_to_dump64(s, q[0]);
->> +        note.vfp.vregs[2*i + 1] = cpu_to_dump64(s, q[1]);
-> 
-> This doesn't change the behaviour but I suspect it's wrong for big-endian...
+After reading patch 7 I came back to this one. I wonder if these two
+(which I think are the only ones) justify an aa32_vfp_qreg() ?
 
-Perhaps.  Since this doesn't change behaviour I'll leave this patch as-is.
-That said, how does one go about testing aarch64-big-endian?  I don't think
-I've seen a distro for that...
-
->> -            int elt = (rn * 2 + (index >> 3)) % 64;
->> -            int bitidx = (index & 7) * 8;
->> -            uint64_t val = extract64(env->vfp.regs[elt], bitidx, 8);
->> +            unsigned elt = (rn * 2 + (index >> 3)) % 64;
->> +            unsigned bitidx = (index & 7) * 8;
->> +            uint64_t *q = aa64_vfp_qreg(env, elt >> 1);
->> +            uint64_t val = extract64(q[elt & 1], bitidx, 8);
-> 
-> 
-> Any particular reason for changing all these ints to unsigned ?
-
-*shrug* unsigned division by power-of-two is simpler than signed.  And of
-course we know these values must be positive.  I can drop that change if you want.
-
->>  vfp_reg_offset (int dp, int reg)
->>  {
->> -    if (dp)
->> +    if (dp) {
->>          return offsetof(CPUARMState, vfp.regs[reg]);
->> -    else if (reg & 1) {
->> -        return offsetof(CPUARMState, vfp.regs[reg >> 1])
->> -          + offsetof(CPU_DoubleU, l.upper);
->>      } else {
->> -        return offsetof(CPUARMState, vfp.regs[reg >> 1])
->> -          + offsetof(CPU_DoubleU, l.lower);
->> +        long ofs = offsetof(CPUARMState, vfp.regs[reg >> 1]);
->> +        if (reg & 1) {
->> +            ofs += offsetof(CPU_DoubleU, l.upper);
->> +        } else {
->> +            ofs += offsetof(CPU_DoubleU, l.lower);
->> +        }
->> +        return ofs;
->>      }
-> 
-> This hunk seems to just be rearranging the if-logic without
-> doing anything else, right?
-
-There is a name change in there.  But otherwise it's a re-factor to avoid
-over-long lines and reduce duplication.
-
-
-r~
+thanks
+-- PMM
