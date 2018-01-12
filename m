@@ -1,23 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41557)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41833)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jianjay.zhou@huawei.com>) id 1eZpPR-00089G-4F
-	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 21:49:35 -0500
+	(envelope-from <chen_han_xiao@126.com>) id 1eZpQA-0000Pd-2S
+	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 21:50:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jianjay.zhou@huawei.com>) id 1eZpPN-0001bb-U7
-	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 21:49:33 -0500
-Received: from szxga04-in.huawei.com ([45.249.212.190]:2148 helo=huawei.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jianjay.zhou@huawei.com>)
-	id 1eZpPN-0001WH-HF
-	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 21:49:29 -0500
-From: Jay Zhou <jianjay.zhou@huawei.com>
-Date: Fri, 12 Jan 2018 10:47:58 +0800
-Message-ID: <1d2f863942f0ee289a6d4999d52202b89deea317.1515724314.git.jianjay.zhou@huawei.com>
-In-Reply-To: <cover.1515724314.git.jianjay.zhou@huawei.com>
-References: <cover.1515724314.git.jianjay.zhou@huawei.com>
-MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v6 2/3] vhost: fix memslot limit check
+	(envelope-from <chen_han_xiao@126.com>) id 1eZpQ6-0002sv-TY
+	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 21:50:18 -0500
+Received: from m15-114.126.com ([220.181.15.114]:56065)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <chen_han_xiao@126.com>) id 1eZpQ6-0002oJ-8y
+	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 21:50:14 -0500
+From: Chen Hanxiao <chen_han_xiao@126.com>
+Date: Fri, 12 Jan 2018 10:47:45 +0800
+Message-Id: <20180112024745.7609-1-chen_han_xiao@126.com>
+Subject: [Qemu-devel] [resend][PATCH] qga: unset frozen state if no mount
+ points are frozen
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,54 +23,39 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: mst@redhat.com, imammedo@redhat.com, weidong.huang@huawei.com, wangxinxin.wang@huawei.com, arei.gonglei@huawei.com, jianjay.zhou@huawei.com, liuzhe13@huawei.com
+Cc: Chen Hanxiao <chen_han_xiao@126.com>, Michael Roth <mdroth@linux.vnet.ibm.com>
 
-Since used_memslots will be updated to the actual value after
-registering memory listener for the first time, move the
-memslots limit checking to the right place.
+From: Chen Hanxiao <chenhanxiao@gmail.com>
 
-Reviewed-by: Igor Mammedov <imammedo@redhat.com>
-Signed-off-by: Jay Zhou <jianjay.zhou@huawei.com>
+If we set mountpoints to qmp_guest_fsfreeze_freeze_list,
+we may got nothing to freeze as all mountpoints are
+not valid.
+Call ga_unset_frozen in this senario.
+
+Cc: Michael Roth <mdroth@linux.vnet.ibm.com>
+Signed-off-by: Chen Hanxiao <chenhanxiao@gmail.com>
 ---
- hw/virtio/vhost.c | 19 ++++++++++++-------
- 1 file changed, 12 insertions(+), 7 deletions(-)
+Rebase on master
 
-diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
-index e4290ce..69b3599 100644
---- a/hw/virtio/vhost.c
-+++ b/hw/virtio/vhost.c
-@@ -1251,13 +1251,6 @@ int vhost_dev_init(struct vhost_dev *hdev, void *opaque,
-         goto fail;
+ qga/commands-posix.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/qga/commands-posix.c b/qga/commands-posix.c
+index e809e382eb..9fd51f1d7a 100644
+--- a/qga/commands-posix.c
++++ b/qga/commands-posix.c
+@@ -1273,6 +1273,12 @@ int64_t qmp_guest_fsfreeze_freeze_list(bool has_mountpoints,
      }
  
--    if (used_memslots > hdev->vhost_ops->vhost_backend_memslots_limit(hdev)) {
--        error_report("vhost backend memory slots limit is less"
--                " than current number of present memory slots");
--        r = -1;
--        goto fail;
--    }
--
-     r = hdev->vhost_ops->vhost_set_owner(hdev);
-     if (r < 0) {
-         VHOST_OPS_DEBUG("vhost_set_owner failed");
-@@ -1339,6 +1332,18 @@ int vhost_dev_init(struct vhost_dev *hdev, void *opaque,
-     hdev->memory_changed = false;
-     memory_listener_register(&hdev->memory_listener, &address_space_memory);
-     QLIST_INSERT_HEAD(&vhost_devices, hdev, entry);
-+
-+    if (used_memslots > hdev->vhost_ops->vhost_backend_memslots_limit(hdev)) {
-+        error_report("vhost backend memory slots limit is less"
-+                " than current number of present memory slots");
-+        r = -1;
-+        if (busyloop_timeout) {
-+            goto fail_busyloop;
-+        } else {
-+            goto fail;
-+        }
+     free_fs_mount_list(&mounts);
++    /* We may not issue any FIFREEZE here when had mountpoints.
++     * Just unset ga_state here and ready for the next call.
++     */
++    if (has_mountpoints && i == 0) {
++        ga_unset_frozen(ga_state);
 +    }
-+
-     return 0;
+     return i;
  
- fail_busyloop:
+ error:
 -- 
-1.8.3.1
+2.14.3
