@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43191)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43189)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <klim.kireev@virtuozzo.com>) id 1eZvDd-0003Dq-FT
+	(envelope-from <klim.kireev@virtuozzo.com>) id 1eZvDd-0003Dn-Eq
 	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 04:01:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <klim.kireev@virtuozzo.com>) id 1eZvDZ-0000I7-3x
+	(envelope-from <klim.kireev@virtuozzo.com>) id 1eZvDZ-0000Ij-OM
 	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 04:01:45 -0500
 From: Klim Kireev <klim.kireev@virtuozzo.com>
-Date: Fri, 12 Jan 2018 12:01:18 +0300
-Message-Id: <20180112090122.1702-2-klim.kireev@virtuozzo.com>
+Date: Fri, 12 Jan 2018 12:01:20 +0300
+Message-Id: <20180112090122.1702-4-klim.kireev@virtuozzo.com>
 In-Reply-To: <20180112090122.1702-1-klim.kireev@virtuozzo.com>
 References: <20180112090122.1702-1-klim.kireev@virtuozzo.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH 1/5] docs/interop/prl-xml: description of
- Parallels Disk format
+Subject: [Qemu-devel] [PATCH 3/5] block/parallels: move some structures into
+ header
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,182 +25,188 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: kwolf@redhat.com, den@openvz.org, qemu-block@nongnu.org, stefanha@redhat.com, mreitz@redhat.com
 
-This patch adds main information about Parallels Disk
-format, which consists of DiskDescriptor.xml and other files.
+To implement xml format, some defines and structures
+from parallels.c are required.
 
-Signed-off-by: Edgar Kaziakhmedov <edgar.kaziakhmedov@virtuozzo.com>
 Signed-off-by: Klim Kireev <klim.kireev@virtuozzo.com>
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 Signed-off-by: Denis V. Lunev <den@openvz.org>
 CC: Stefan Hajnoczi <stefanha@redhat.com>
 ---
- docs/interop/prl-xml.txt | 158 +++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 158 insertions(+)
- create mode 100644 docs/interop/prl-xml.txt
+ block/parallels.c | 53 +---------------------------------
+ block/parallels.h | 86 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 87 insertions(+), 52 deletions(-)
+ create mode 100644 block/parallels.h
 
-diff --git a/docs/interop/prl-xml.txt b/docs/interop/prl-xml.txt
+diff --git a/block/parallels.c b/block/parallels.c
+index 9545761f49..f9a3b999ea 100644
+--- a/block/parallels.c
++++ b/block/parallels.c
+@@ -36,6 +36,7 @@
+ #include "qemu/bswap.h"
+ #include "qemu/bitmap.h"
+ #include "migration/blocker.h"
++#include "parallels.h"
+ 
+ /**************************************************************/
+ 
+@@ -45,30 +46,6 @@
+ #define HEADER_INUSE_MAGIC  (0x746F6E59)
+ #define MAX_PARALLELS_IMAGE_FACTOR (1ull << 32)
+ 
+-#define DEFAULT_CLUSTER_SIZE 1048576        /* 1 MiB */
+-
+-
+-// always little-endian
+-typedef struct ParallelsHeader {
+-    char magic[16]; // "WithoutFreeSpace"
+-    uint32_t version;
+-    uint32_t heads;
+-    uint32_t cylinders;
+-    uint32_t tracks;
+-    uint32_t bat_entries;
+-    uint64_t nb_sectors;
+-    uint32_t inuse;
+-    uint32_t data_off;
+-    char padding[12];
+-} QEMU_PACKED ParallelsHeader;
+-
+-
+-typedef enum ParallelsPreallocMode {
+-    PRL_PREALLOC_MODE_FALLOCATE = 0,
+-    PRL_PREALLOC_MODE_TRUNCATE = 1,
+-    PRL_PREALLOC_MODE__MAX = 2,
+-} ParallelsPreallocMode;
+-
+ static QEnumLookup prealloc_mode_lookup = {
+     .array = (const char *const[]) {
+         "falloc",
+@@ -77,34 +54,6 @@ static QEnumLookup prealloc_mode_lookup = {
+     .size = PRL_PREALLOC_MODE__MAX
+ };
+ 
+-typedef struct BDRVParallelsState {
+-    /** Locking is conservative, the lock protects
+-     *   - image file extending (truncate, fallocate)
+-     *   - any access to block allocation table
+-     */
+-    CoMutex lock;
+-
+-    ParallelsHeader *header;
+-    uint32_t header_size;
+-    bool header_unclean;
+-
+-    unsigned long *bat_dirty_bmap;
+-    unsigned int  bat_dirty_block;
+-
+-    uint32_t *bat_bitmap;
+-    unsigned int bat_size;
+-
+-    int64_t  data_end;
+-    uint64_t prealloc_size;
+-    ParallelsPreallocMode prealloc_mode;
+-
+-    unsigned int tracks;
+-
+-    unsigned int off_multiplier;
+-    Error *migration_blocker;
+-} BDRVParallelsState;
+-
+-
+ #define PARALLELS_OPT_PREALLOC_MODE     "prealloc-mode"
+ #define PARALLELS_OPT_PREALLOC_SIZE     "prealloc-size"
+ 
+diff --git a/block/parallels.h b/block/parallels.h
 new file mode 100644
-index 0000000000..7031f8752c
+index 0000000000..71183c0c8e
 --- /dev/null
-+++ b/docs/interop/prl-xml.txt
-@@ -0,0 +1,158 @@
-+= License =
++++ b/block/parallels.h
+@@ -0,0 +1,86 @@
++/*
++* Block driver for Parallels disk image format
++*
++* Copyright (c) 2015-2017 Virtuozzo, Inc.
++* Authors:
++*         2016-2017 Klim S. Kireev <klim.kireev@virtuozzo.com>
++*         2015 Denis V. Lunev <den@openvz.org>
++*
++* This code was originally based on comparing different disk images created
++* by Parallels. Currently it is based on opened OpenVZ sources
++* available at
++*     https://github.com/OpenVZ/ploop
++*
++* Permission is hereby granted, free of charge, to any person obtaining a copy
++* of this software and associated documentation files (the "Software"), to deal
++* in the Software without restriction, including without limitation the rights
++* to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
++* copies of the Software, and to permit persons to whom the Software is
++* furnished to do so, subject to the following conditions:
++*
++* The above copyright notice and this permission notice shall be included in
++* all copies or substantial portions of the Software.
++*
++* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
++* IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
++* FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
++* THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
++* LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
++* OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
++* THE SOFTWARE.
++*/
++#ifndef BLOCK_PARALLELS_H
++#define BLOCK_PARALLELS_H
++#include "qemu/coroutine.h"
++#include "qemu/typedefs.h"
 +
-+Copyright (c) 2015-2017, Virtuozzo, Inc.
-+Authors:
-+        2015 Denis Lunev <den@openvz.org>
-+        2015 Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-+        2016-2017 Klim Kireev <klim.kireev@virtuozzo.com>
-+        2016-2017 Edgar Kaziakhmedov <edgar.kaziakhmedov@virtuozzo.com>
++#define DEFAULT_CLUSTER_SIZE 1048576        /* 1 MiB */
 +
-+This work is licensed under the terms of the GNU GPL, version 2 or later.
-+See the COPYING file in the top-level directory.
++/* always little-endian */
++typedef struct ParallelsHeader {
++    char magic[16]; /* "WithoutFreeSpace" */
++    uint32_t version;
++    uint32_t heads;
++    uint32_t cylinders;
++    uint32_t tracks;
++    uint32_t bat_entries;
++    uint64_t nb_sectors;
++    uint32_t inuse;
++    uint32_t data_off;
++    char padding[12];
++} QEMU_PACKED ParallelsHeader;
 +
-+This specification contains minimal information about Parallels Disk Format,
-+which is enough to proper work with QEMU. Nevertheless, Parallels Cloud Server
-+and Parallels Desktop are able to add some unspecified nodes to xml and use
-+them, but they are for internal work and don't affect functionality. Also it
-+uses auxiliary xml "Snapshot.xml", which allows to store optional snapshot
-+information, but it doesn't influence open/read/write functionality. QEMU and
-+other software should not use fields not covered in this document and
-+Snapshot.xml file and must leave them as is.
++typedef enum ParallelsPreallocMode {
++    PRL_PREALLOC_MODE_FALLOCATE = 0,
++    PRL_PREALLOC_MODE_TRUNCATE = 1,
++    PRL_PREALLOC_MODE__MAX = 2,
++} ParallelsPreallocMode;
 +
-+= Parallels Disk Format =
++typedef struct BDRVParallelsState {
++    /** Locking is conservative, the lock protects
++     *   - image file extending (truncate, fallocate)
++     *   - any access to block allocation table
++     */
++    CoMutex lock;
 +
-+Parallels disk consists of two parts: the set of snapshots and the disk
-+descriptor file, which stores information about all files and snapshots.
++    ParallelsHeader *header;
++    uint32_t header_size;
++    bool header_unclean;
 +
-+== Definitions ==
-+    Snapshot       a record of the contents captured at a particular time,
-+                   capable of storing current state. A snapshot has UUID and
-+                   parent UUID.
++    unsigned long *bat_dirty_bmap;
++    unsigned int  bat_dirty_block;
 +
-+ Snapshot image    an overlay representing the difference between this
-+                   snapshot and some earlier snapshot.
++    uint32_t *bat_bitmap;
++    unsigned int bat_size;
 +
-+    Overlay        an image storing the different sectors between two captured
-+                   states.
++    int64_t  data_end;
++    uint64_t prealloc_size;
++    ParallelsPreallocMode prealloc_mode;
 +
-+   Root image      snapshot image with no parent, the root of snapshot tree.
++    unsigned int tracks;
 +
-+    Storage        the backing storage for a subset of the virtual disk. When
-+                   there is more than one storage in a Parallels disk then that
-+                   is referred to as a split image. In this case every storage
-+                   covers specific address space area of the disk and has its
-+                   particular root image. Split images are not considered here
-+                   and are not supported. Each storage consists of disk
-+                   parameters and a list of images. The list of images always
-+                   contains a root image and may also contain overlays. The
-+                   root image can be an expandable Parallels image file or
-+                   plain. Overlays must be expandable.
++    unsigned int off_multiplier;
++    Error *migration_blocker;
++} BDRVParallelsState;
 +
-+  Description      DiskDescriptor.xml stores information about disk parameters,
-+     file          snapshots, storages.
-+
-+     Top           The overlay between actual state and some previous snapshot.
-+   Snapshot        It is not a snapshot in the classical sense because it
-+                   serves as the active image that the guest writes to.
-+
-+    Sector         a 512-byte data chunk.
-+
-+== Description file ==
-+All information is placed in a single XML element Parallels_disk_image.
-+The element has only one attribute "Version", that must be 1.0.
-+Schema of DiskDescriptor.xml:
-+
-+<Parallels_disk_image Version="1.0">
-+    <Disk_Parameters>
-+        ...
-+    </Disk_Parameters>
-+    <StorageData>
-+        ...
-+    </StorageData>
-+    <Snapshots>
-+        ...
-+    </Snapshots>
-+</Parallels_disk_image>
-+
-+== Disk_Parameters element ==
-+The Disk_Parameters element describes the physical layout of the virtual disk
-+and some general settings.
-+
-+The Disk_Parameters element MUST contain the following child elements:
-+    * Disk_size - number of sectors in the disk,
-+                  desired size of the disk.
-+    * Cylinders - number of the disk cylinders.
-+    * Heads     - number of the disk heads.
-+    * Sectors   - number of the disk sectors per cylinder
-+                  (sector size is 512 bytes)
-+                  Limitation: Product of the Heads, Sectors and Cylinders
-+                  values MUST be equal to the value of the Disk_size parameter.
-+    * Padding   - must be 0. Parallels Cloud Server and Parallels Desktop may
-+                  use padding set to 1, however this case is not covered
-+                  by this spec, QEMU and other software should not open
-+                  such disks and should not create them.
-+
-+== StorageData element ==
-+This element of the file describes the root image and all snapshot images.
-+
-+The StorageData element consists of the Storage child element, as shown below:
-+<StorageData>
-+    <Storage>
-+        ...
-+    </Storage>
-+</StorageData>
-+
-+A Storage element has following child elements:
-+    * Start     - start sector of the storage, in case of non split storage
-+                  equals to 0.
-+    * End       - number of sector following the last sector, in case of non
-+                  split storage equals to Disk_size.
-+    * Blocksize - storage cluster size, number of sectors per one cluster.
-+                  Cluster size for each "Compressed" (see below) image in
-+                  parallels disk must be equal to this field. Note: cluster
-+                  size for Parallels Expandable Image is in 'tracks' field of
-+                  its header (see docs/interop/parallels.txt).
-+    * Several Image child elements.
-+
-+Each Image element has following child elements:
-+    * GUID - image identifier, UUID in curly brackets.
-+             For instance, {12345678-9abc-def1-2345-6789abcdef12}.
-+             The GUID is used by the Snapshots element to reference images
-+             (see below)
-+    * Type - image type of the element. It can be:
-+             "Plain" for raw files.
-+             "Compressed" for expanding disks.
-+    * File - path to image file. Path can be relative to DiskDecriptor.xml or
-+             absolute.
-+
-+== Snapshots element ==
-+The Snapshots element describes the snapshot relations with the snapshot tree.
-+
-+The element contains the set of Shot child elements, as shown below:
-+<Snapshots>
-+    <TopGUID> ... </TopGUID> /* Optional child element */
-+    <Shot>
-+        ...
-+    </Shot>
-+    <Shot>
-+        ...
-+    </Shot>
-+    ...
-+</Snapshots>
-+
-+Each Shot element contains the following child elements:
-+    * GUID       - an image GUID.
-+    * ParentGUID - GUID of the image of the parent snapshot.
-+
-+The software may traverse snapshots from child to parent using <ParentGUID>
-+field as reference. ParentGUID of root snapshot is
-+{00000000-0000-0000-0000-000000000000}. There should be only one root
-+snapshot. Top snapshot could be described via two ways: via TopGUID child
-+element of the Snapshots element or via predefined GUID
-+{5fbaabe3-6958-40ff-92a7-860e329aab41}. If TopGUID is defined, predefined GUID is
-+interpreted as usual GUID. All snapshot images (except Top Snapshot) should be
-+opened read-only. There is another predefined GUID,
-+BackupID = {704718e1-2314-44c8-9087-d78ed36b0f4e}, which is used by original and
-+some third-party software for backup, QEMU and other software may operate with
-+images with GUID = BackupID as usual, however, it is not recommended to use this
-+GUID for new disks. Top snapshot cannot have this GUID.
++#endif
 -- 
 2.14.3
