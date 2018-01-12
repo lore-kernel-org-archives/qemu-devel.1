@@ -1,30 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55766)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56540)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1eZyAF-0000KI-Sa
-	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 07:10:28 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1eZyBh-0002Ph-OV
+	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 07:11:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1eZyAA-00081X-1M
-	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 07:10:27 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:47654)
+	(envelope-from <pbonzini@redhat.com>) id 1eZyBf-0001bd-3Q
+	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 07:11:57 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:47568)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1eZyA9-00080g-PM
-	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 07:10:21 -0500
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1eZyBe-0001an-Up
+	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 07:11:55 -0500
 References: <20180111082452.27295.85707.stgit@pasha-VirtualBox>
-	<20180111082738.27295.80055.stgit@pasha-VirtualBox>
-	<0e223aaa-c3c9-1cdf-5548-5a532d3a7361@redhat.com>
-	<000901d38add$ddb4b750$991e25f0$@ru>
-	<17a6b61c-e151-a5e1-978a-b54da71dbe55@redhat.com>
-	<001301d38b6c$83c6d090$8b5471b0$@ru>
+	<ecc919de-5193-a83c-0e29-4b8d9bc8d7d7@redhat.com>
+	<e0cbd675-7872-05c3-8c3e-214ef93e4552@redhat.com>
+	<002201d38b9d$f0a248d0$d1e6da70$@ru>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <1fa94259-35a3-01ce-ebbb-94163508e5a8@redhat.com>
-Date: Fri, 12 Jan 2018 13:10:03 +0100
+Message-ID: <357a23a7-2cac-a14d-f4b9-7f883b101ea7@redhat.com>
+Date: Fri, 12 Jan 2018 13:11:40 +0100
 MIME-Version: 1.0
-In-Reply-To: <001301d38b6c$83c6d090$8b5471b0$@ru>
+In-Reply-To: <002201d38b9d$f0a248d0$d1e6da70$@ru>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC PATCH v3 29/30] replay: improve replay
- performance
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [RFC PATCH v3 00/30] replay additions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,28 +31,52 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Pavel Dovgalyuk <dovgaluk@ispras.ru>, 'Pavel Dovgalyuk' <Pavel.Dovgaluk@ispras.ru>, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, peter.maydell@linaro.org, boost.lists@gmail.com, quintela@redhat.com, jasowang@redhat.com, mst@redhat.com, zuban32s@gmail.com, maria.klimushenkova@ispras.ru, kraxel@redhat.com, alex.bennee@linaro.org
+Cc: kwolf@redhat.com, peter.maydell@linaro.org, mst@redhat.com, jasowang@redhat.com, quintela@redhat.com, zuban32s@gmail.com, maria.klimushenkova@ispras.ru, kraxel@redhat.com, boost.lists@gmail.com, alex.bennee@linaro.org
 
-On 12/01/2018 07:13, Pavel Dovgalyuk wrote:
+On 12/01/2018 13:07, Pavel Dovgalyuk wrote:
+>=20
+>=20
+>> -----Original Message-----
 >> From: Paolo Bonzini [mailto:pbonzini@redhat.com]
->> On 11/01/2018 14:12, Pavel Dovgalyuk wrote:
->>>> From: Paolo Bonzini [mailto:paolo.bonzini@gmail.com] On Behalf Of Paolo Bonzini
->>>> On 11/01/2018 09:27, Pavel Dovgalyuk wrote:
->>>>> +        } else {
->>>>> +            qemu_notify_event();
->>>>> +        }
->>>>
->>>> Before this patch, what would do the qemu_notify_event?
->>>
->>> We tried using qemu_notify_event to wake up the iothread and speedup the replay,
->>> when there is no work for vcpu thread to do.
+>> Sent: Friday, January 12, 2018 12:33 PM
+>> To: Pavel Dovgalyuk; qemu-devel@nongnu.org
+>> Cc: kwolf@redhat.com; peter.maydell@linaro.org; mst@redhat.com; jasowa=
+ng@redhat.com;
+>> quintela@redhat.com; zuban32s@gmail.com; maria.klimushenkova@ispras.ru=
+; dovgaluk@ispras.ru;
+>> kraxel@redhat.com; boost.lists@gmail.com; alex.bennee@linaro.org
+>> Subject: Re: [Qemu-devel] [RFC PATCH v3 00/30] replay additions
 >>
->> But why doesn't the iothread wake up on its own?
-> 
-> It will wake up by timeout. But with this change this happens sooner and replay goes faster.
+>> On 11/01/2018 13:56, Paolo Bonzini wrote:
+>>> On 11/01/2018 09:24, Pavel Dovgalyuk wrote:
+>>>> Accidentally sent draft version of patches to the mailing list.
+>>>> Please consider this one as the correct one.
+>>>>
+>>>> This set of patches includex fixes from Alex Benn=C3=A9e for fixing
+>>>> BQL and replay locks after inventing the MTTCG. It also includes som=
+e
+>>>> additional replay patches that makes this set of fixes working.
+>>>> It is also fixes some vmstate creation (and loading) issues
+>>>> in record/replay modes:
+>>>>  - VM start/stop fixes in replay mode
+>>>>  - overlay creation for blkreplay filter
+>>>>  - fixes for vmstate save/load in record/replay mode
+>>>>  - fixes for host clock vmstate
+>>>>  - fixes for icount timers vmstate
+>>>>
+>>>> There is also a set of helper scripts written by Alex Benn=C3=A9e
+>>>> for debugging the record/replay code.
+>>>
+>>> For now, I'm applying patches 13, 24-26 and 28.
+>>
+>> Which don't compile on Windows.
+>=20
+> I can't build current version of qemu on Windows.
+> For the first time this happened when capstone was included into the bu=
+ild.
 
-If you want replays to ignore timeouts, that should be done by ensuring
-that qemu-timer.c passes a zero timeout to main-loop.c.  (It probably
-should be optional, too, maybe via -icount sleep).
+I've fixed it now.  But please do not submit patches that obviously need
+a Windows version without testing them (on Linux you can use "make
+docker-test-mingw@fedora" for example if you have a Docker setup).
 
 Paolo
