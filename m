@@ -1,34 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59209)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59303)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eZx47-0000ZB-Gu
-	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 06:00:07 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1eZx4S-0000n4-M1
+	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 06:00:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eZx43-0001L9-JL
-	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 06:00:03 -0500
-Received: from indium.canonical.com ([91.189.90.7]:55216)
+	(envelope-from <pbonzini@redhat.com>) id 1eZx4O-0001i9-Pj
+	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 06:00:24 -0500
+Received: from mail-wm0-f66.google.com ([74.125.82.66]:44739)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1eZx43-0001KM-7b
-	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 05:59:59 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1eZx42-0000M7-6S
-	for <qemu-devel@nongnu.org>; Fri, 12 Jan 2018 10:59:58 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 0E4B12E80D2
-	for <qemu-devel@nongnu.org>; Fri, 12 Jan 2018 10:59:58 +0000 (UTC)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1eZx4O-0001Z9-HI
+	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 06:00:20 -0500
+Received: by mail-wm0-f66.google.com with SMTP id t8so11206965wmc.3
+	for <qemu-devel@nongnu.org>; Fri, 12 Jan 2018 03:00:14 -0800 (PST)
+References: <20180112085555.14447-1-famz@redhat.com>
+	<20180112085555.14447-4-famz@redhat.com>
+	<20180112094429.GA7356@stefanha-x1.localdomain>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <65840314-770e-df2b-a6a7-7508b4600d49@redhat.com>
+Date: Fri, 12 Jan 2018 12:00:10 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 12 Jan 2018 10:50:07 -0000
-From: Thomas Huth <939027@bugs.launchpad.net>
-Reply-To: Bug 939027 <939027@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20120222214959.20738.46143.malonedeb@soybean.canonical.com>
-Message-Id: <151575420823.25347.2143462359440586196.launchpad@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 939027] Re: Combining direct_io and non-direct_io
- leads to hang
+In-Reply-To: <20180112094429.GA7356@stefanha-x1.localdomain>
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v5 3/9] block: Add VFIO based
+ NVMe driver
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,722 +32,263 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Stefan Hajnoczi <stefanha@redhat.com>, Fam Zheng <famz@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Keith Busch <keith.busch@intel.com>, alex.williamson@redhat.com, Karl Rister <krister@redhat.com>
 
-** Changed in: qemu
-       Status: Incomplete =3D> Won't Fix
+On 12/01/2018 10:44, Stefan Hajnoczi wrote:
+>> +    if (progress) {
+>> +        /* Notify the device so it can post more completions. */
+>> +        smp_mb_release();
+>> +        *q->cq.doorbell = cpu_to_le32(q->cq.head);
+>> +        if (!qemu_co_queue_empty(&q->free_req_queue)) {
+>> +            aio_bh_schedule_oneshot(s->aio_context, nvme_free_req_queue_cb, q);
+>> +        }
+> This is not thread-safe because the queue producer does:
+> 
+> 1   qemu_mutex_unlock(&q->lock);
+> 2   qemu_co_queue_wait(&q->free_req_queue, NULL);
+> 3   qemu_mutex_lock(&q->lock);
+> 
+> We fail to call nvme_free_req_queue_cb() when if
+> (!qemu_co_queue_empty(&q->free_req_queue)) runs after 1 but before 2.
 
--- =
+Yes, it can happen.  The right solution would be to do like block/curl.c 
+(which has more or less the same scenario):
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/939027
+    next = QSIMPLEQ_FIRST(&s->s->free_state_waitq);
+    if (next) {
+        QSIMPLEQ_REMOVE_HEAD(&s->s->free_state_waitq, next);
+        qemu_mutex_unlock(&s->s->mutex);
+        aio_co_wake(next->co);
+        qemu_mutex_lock(&s->s->mutex);
+    }
 
-Title:
-  Combining direct_io and non-direct_io leads to hang
+(where the "if" would be here, and the QSIMPLEQ_REMOVE_HEAD in 
+nvme_free_req_queue_cb; by the way, nvme_free_req_queue_cb also needs to 
+take q->lock).
 
-Status in QEMU:
-  Won't Fix
+I think we should have a variant of CoQueue that uses a QemuMutex.  Of 
+course in C you have to choose between code duplication, lack of 
+type-safety, or ugly code, while in C++ it would be an easy application 
+of templates.  But maybe something like this (with QemuTypedMutex moved 
+to another header file) is acceptable:
 
-Bug description:
-  Version 0.12.2 - I know this isn't the latest but I looked through the
-  changelogs and couldn't find any references to this being fixed.
+diff --git a/block/curl.c b/block/curl.c
+index 35cf417..cd578d3 100644
+--- a/block/curl.c
++++ b/block/curl.c
+@@ -101,8 +101,6 @@ typedef struct CURLAIOCB {
+ 
+     size_t start;
+     size_t end;
+-
+-    QSIMPLEQ_ENTRY(CURLAIOCB) next;
+ } CURLAIOCB;
+ 
+ typedef struct CURLSocket {
+@@ -138,7 +136,7 @@ typedef struct BDRVCURLState {
+     bool accept_range;
+     AioContext *aio_context;
+     QemuMutex mutex;
+-    QSIMPLEQ_HEAD(, CURLAIOCB) free_state_waitq;
++    CoQueue free_state_waitq;
+     char *username;
+     char *password;
+     char *proxyusername;
+@@ -538,7 +536,6 @@ static int curl_init_state(BDRVCURLState *s, CURLState *state)
+ /* Called with s->mutex held.  */
+ static void curl_clean_state(CURLState *s)
+ {
+-    CURLAIOCB *next;
+     int j;
+     for (j = 0; j < CURL_NUM_ACB; j++) {
+         assert(!s->acb[j]);
+@@ -556,13 +553,7 @@ static void curl_clean_state(CURLState *s)
+ 
+     s->in_use = 0;
+ 
+-    next = QSIMPLEQ_FIRST(&s->s->free_state_waitq);
+-    if (next) {
+-        QSIMPLEQ_REMOVE_HEAD(&s->s->free_state_waitq, next);
+-        qemu_mutex_unlock(&s->s->mutex);
+-        aio_co_wake(next->co);
+-        qemu_mutex_lock(&s->s->mutex);
+-    }
++    qemu_co_enter_next(&s->s->free_state_waitq, &s->s->mutex);
+ }
+ 
+ static void curl_parse_filename(const char *filename, QDict *options,
+@@ -784,7 +775,7 @@ static int curl_open(BlockDriverState *bs, QDict *options, int flags,
+     }
+ 
+     DPRINTF("CURL: Opening %s\n", file);
+-    QSIMPLEQ_INIT(&s->free_state_waitq);
++    qemu_co_queue_init(&s->free_state_waitq);
+     s->aio_context = bdrv_get_aio_context(bs);
+     s->url = g_strdup(file);
+     qemu_mutex_lock(&s->mutex);
+@@ -888,10 +879,7 @@ static void curl_setup_preadv(BlockDriverState *bs, CURLAIOCB *acb)
+         if (state) {
+             break;
+         }
+-        QSIMPLEQ_INSERT_TAIL(&s->free_state_waitq, acb, next);
+-        qemu_mutex_unlock(&s->mutex);
+-        qemu_coroutine_yield();
+-        qemu_mutex_lock(&s->mutex);
++        qemu_co_queue_wait(&s->free_state_waitq, &s->mutex);
+     }
+ 
+     if (curl_init_state(s, state) < 0) {
+diff --git a/fsdev/qemu-fsdev-throttle.c b/fsdev/qemu-fsdev-throttle.c
+index 49eebb5..1dc07fb 100644
+--- a/fsdev/qemu-fsdev-throttle.c
++++ b/fsdev/qemu-fsdev-throttle.c
+@@ -20,13 +20,13 @@
+ static void fsdev_throttle_read_timer_cb(void *opaque)
+ {
+     FsThrottle *fst = opaque;
+-    qemu_co_enter_next(&fst->throttled_reqs[false]);
++    qemu_co_enter_next(&fst->throttled_reqs[false], NULL);
+ }
+ 
+ static void fsdev_throttle_write_timer_cb(void *opaque)
+ {
+     FsThrottle *fst = opaque;
+-    qemu_co_enter_next(&fst->throttled_reqs[true]);
++    qemu_co_enter_next(&fst->throttled_reqs[true], NULL);
+ }
+ 
+ void fsdev_throttle_parse_opts(QemuOpts *opts, FsThrottle *fst, Error **errp)
+diff --git a/include/qemu/coroutine.h b/include/qemu/coroutine.h
+index ce2eb73..ec2831a 100644
+--- a/include/qemu/coroutine.h
++++ b/include/qemu/coroutine.h
+@@ -178,15 +178,46 @@ typedef struct CoQueue {
+  */
+ void qemu_co_queue_init(CoQueue *queue);
+ 
++typedef struct QemuTypedMutex {
++    void *mutex;
++    void (*lock)(void *);
++    void (*unlock)(void *);
++} QemuTypedMutex;
++
++extern void *qemu_unknown_mutex_type(void *);
++#define QEMU_LOCK_FUNC(mutex)                                                       \
++   ((void (*)(void *))                                                              \
++     __builtin_choose_expr(                                                         \
++        __builtin_types_compatible_p(typeof(mutex), QemuMutex *), qemu_mutex_lock,  \
++     __builtin_choose_expr(                                                         \
++        __builtin_types_compatible_p(typeof(mutex), CoMutex *), qemu_co_mutex_lock, \
++        (mutex) ? qemu_unknown_mutex_type : NULL)))
++
++#define QEMU_UNLOCK_FUNC(mutex)                                                       \
++   ((void (*)(void *))                                                                \
++     __builtin_choose_expr(                                                           \
++        __builtin_types_compatible_p(typeof(mutex), QemuMutex *), qemu_mutex_unlock,  \
++     __builtin_choose_expr(                                                           \
++        __builtin_types_compatible_p(typeof(mutex), CoMutex *), qemu_co_mutex_unlock, \
++        (mutex) ? qemu_unknown_mutex_type : NULL)))
++
++#define QEMU_TYPED_MUTEX(mutex)                                                     \
++    ((QemuTypedMutex) { mutex, QEMU_LOCK_FUNC(mutex), QEMU_UNLOCK_FUNC(mutex) })
++
++
+ /**
+  * Adds the current coroutine to the CoQueue and transfers control to the
+  * caller of the coroutine.  The mutex is unlocked during the wait and
+  * locked again afterwards.
+  */
+-void coroutine_fn qemu_co_queue_wait(CoQueue *queue, CoMutex *mutex);
++void coroutine_fn qemu_co_queue_wait_impl(CoQueue *queue, QemuTypedMutex mutex);
++
++#define qemu_co_queue_wait(queue, mutex)                                            \
++	qemu_co_queue_wait_impl(queue, QEMU_TYPED_MUTEX(mutex))
+ 
+ /**
+  * Restarts the next coroutine in the CoQueue and removes it from the queue.
++ * The mutex passed to qemu_co_queue_wait must be taken.
+  *
+  * Returns true if a coroutine was restarted, false if the queue is empty.
+  */
+@@ -198,9 +229,15 @@ bool coroutine_fn qemu_co_queue_next(CoQueue *queue);
+ void coroutine_fn qemu_co_queue_restart_all(CoQueue *queue);
+ 
+ /**
+- * Enter the next coroutine in the queue
++ * Enter the next coroutine in the queue.
++ * The mutex passed to qemu_co_queue_wait must be taken.
++ *
++ * Returns true if a coroutine was restarted, false if the queue is empty.
+  */
+-bool qemu_co_enter_next(CoQueue *queue);
++bool qemu_co_enter_next_impl(CoQueue *queue, QemuTypedMutex mutex);
++
++#define qemu_co_enter_next(queue, mutex)                                            \
++	qemu_co_enter_next_impl(queue, QEMU_TYPED_MUTEX(mutex))
+ 
+ /**
+  * Checks if the CoQueue is empty.
+diff --git a/util/qemu-coroutine-lock.c b/util/qemu-coroutine-lock.c
+index 846ff91..f6bf952 100644
+--- a/util/qemu-coroutine-lock.c
++++ b/util/qemu-coroutine-lock.c
+@@ -40,13 +40,13 @@ void qemu_co_queue_init(CoQueue *queue)
+     QSIMPLEQ_INIT(&queue->entries);
+ }
+ 
+-void coroutine_fn qemu_co_queue_wait(CoQueue *queue, CoMutex *mutex)
++void coroutine_fn qemu_co_queue_wait_impl(CoQueue *queue, QemuTypedMutex mutex)
+ {
+     Coroutine *self = qemu_coroutine_self();
+     QSIMPLEQ_INSERT_TAIL(&queue->entries, self, co_queue_next);
+ 
+-    if (mutex) {
+-        qemu_co_mutex_unlock(mutex);
++    if (mutex.mutex) {
++        mutex.unlock(mutex.mutex);
+     }
+ 
+     /* There is no race condition here.  Other threads will call
+@@ -61,8 +61,8 @@ void coroutine_fn qemu_co_queue_wait(CoQueue *queue, CoMutex *mutex)
+      * primitive automatically places the woken coroutine on the
+      * mutex's queue.  This avoids the thundering herd effect.
+      */
+-    if (mutex) {
+-        qemu_co_mutex_lock(mutex);
++    if (mutex.mutex) {
++        mutex.lock(mutex.mutex);
+     }
+ }
+ 
+@@ -130,7 +130,7 @@ void coroutine_fn qemu_co_queue_restart_all(CoQueue *queue)
+     qemu_co_queue_do_restart(queue, false);
+ }
+ 
+-bool qemu_co_enter_next(CoQueue *queue)
++bool qemu_co_enter_next_impl(CoQueue *queue, QemuTypedMutex mutex)
+ {
+     Coroutine *next;
+ 
+@@ -140,7 +140,16 @@ bool qemu_co_enter_next(CoQueue *queue)
+     }
+ 
+     QSIMPLEQ_REMOVE_HEAD(&queue->entries, co_queue_next);
+-    qemu_coroutine_enter(next);
++    /* The coroutine will need the mutex: release it to
++     * avoid a deadlock.
++     */
++    if (mutex.mutex) {
++        mutex.unlock(mutex.mutex);
++    }
++    aio_co_wake(next);
++    if (mutex.mutex) {
++        mutex.lock(mutex.mutex);
++    }
+     return true;
+ }
+ 
 
-  This is related to issues that many apps have, and is described in more d=
-etail here:
-      http://oss.sgi.com/archives/xfs/2010-07/msg00163.html
-  and:
-      https://bugs.launchpad.net/percona-xtrabackup/+bug/606981
+If that's okay, I can prepare a proper series for Fam next week.
 
-  When using both direct io and buffered io on the same file, you can cause=
- corruption on the filesystem and other issues.
-  XFS out right hangs, but the problem exists on ext3 and other filesystems=
- which silently carry on.
-
-  **this is a data corruption issue**.
-
-  This is the full stack trace we got from a recent hang:
-
-  Feb 22 19:55:14 virt11 kernel: INFO: task qemu-kvm:18360 blocked for more=
- than 120 seconds.
-  Feb 22 19:55:14 virt11 kernel: "echo 0 > /proc/sys/kernel/hung_task_timeo=
-ut_secs" disables this message.
-  Feb 22 19:55:14 virt11 kernel: qemu-kvm      D 0000000000000002     0 183=
-60      1 0x00000080
-  Feb 22 19:55:14 virt11 kernel: ffff8808614457e8 0000000000000086 ffff8800=
-282d5f80 ffff8800282d5f80
-  Feb 22 19:55:14 virt11 kernel: ffff880861445768 ffffffff810573ce ffff8808=
-61445768 0000000000000086
-  Feb 22 19:55:14 virt11 kernel: ffff8808f15bba78 ffff880861445fd8 00000000=
-0000f598 ffff8808f15bba78
-  Feb 22 19:55:14 virt11 kernel: Call Trace:
-  Feb 22 19:55:14 virt11 kernel: [<ffffffff810573ce>] ? activate_task+0x2e/=
-0x40
-  Feb 22 19:55:14 virt11 kernel: [<ffffffff814dd755>] rwsem_down_failed_com=
-mon+0x95/0x1d0
-  Feb 22 19:55:14 virt11 kernel: [<ffffffff814dd8b3>] rwsem_down_write_fail=
-ed+0x23/0x30
-  Feb 22 19:55:14 virt11 kernel: [<ffffffff8126e573>] call_rwsem_down_write=
-_failed+0x13/0x20
-  Feb 22 19:55:14 virt11 kernel: [<ffffffff814dcdb2>] ? down_write+0x32/0x40
-  Feb 22 19:55:14 virt11 kernel: [<ffffffffa0332d6e>] xfs_ilock+0x7e/0xd0 [=
-xfs]
-  Feb 22 19:55:14 virt11 kernel: [<ffffffffa033ab02>] xfs_iomap+0x2e2/0x440=
- [xfs]
-  Feb 22 19:55:14 virt11 kernel: [<ffffffffa0354116>] __xfs_get_blocks+0x86=
-/0x200 [xfs]
-  Feb 22 19:55:14 virt11 kernel: [<ffffffffa03542aa>] xfs_get_blocks_direct=
-+0x1a/0x20 [xfs]
-  Feb 22 19:55:14 virt11 kernel: [<ffffffff811ac132>] __blockdev_direct_IO+=
-0x872/0xc40
-  Feb 22 19:55:14 virt11 kernel: [<ffffffffa0353f50>] xfs_vm_direct_IO+0xb0=
-/0xf0 [xfs]
-  Feb 22 19:55:14 virt11 kernel: [<ffffffffa0354290>] ? xfs_get_blocks_dire=
-ct+0x0/0x20 [xfs]
-  Feb 22 19:55:14 virt11 kernel: [<ffffffffa0353cc0>] ? xfs_end_io_direct+0=
-x0/0xe0 [xfs]
-  Feb 22 19:55:14 virt11 kernel: [<ffffffff8106dd57>] ? current_fs_time+0x2=
-7/0x30
-  Feb 22 19:55:14 virt11 kernel: [<ffffffff8110df22>] generic_file_direct_w=
-rite+0xc2/0x190
-  Feb 22 19:55:14 virt11 kernel: [<ffffffffa034bfcf>] ? xfs_trans_unlocked_=
-item+0x4f/0x60 [xfs]
-  Feb 22 19:55:14 virt11 kernel: [<ffffffffa035dd1d>] xfs_write+0x4fd/0xb70=
- [xfs]
-  Feb 22 19:55:14 virt11 kernel: [<ffffffff8105dc72>] ? default_wake_functi=
-on+0x12/0x20
-  Feb 22 19:55:14 virt11 kernel: [<ffffffffa03599a1>] xfs_file_aio_write+0x=
-61/0x70 [xfs]
-  Feb 22 19:55:14 virt11 kernel: [<ffffffff8117241a>] do_sync_write+0xfa/0x=
-140
-  Feb 22 19:55:14 virt11 kernel: [<ffffffff8107fbc2>] ? send_signal+0x42/0x=
-80
-  Feb 22 19:55:14 virt11 kernel: [<ffffffff8108e160>] ? autoremove_wake_fun=
-ction+0x0/0x40
-  Feb 22 19:55:14 virt11 kernel: [<ffffffff8107ff96>] ? group_send_sig_info=
-+0x56/0x70
-  Feb 22 19:55:14 virt11 kernel: [<ffffffff81211d3b>] ? selinux_file_permis=
-sion+0xfb/0x150
-  Feb 22 19:55:14 virt11 kernel: [<ffffffff812051a6>] ? security_file_permi=
-ssion+0x16/0x20
-  Feb 22 19:55:14 virt11 kernel: [<ffffffff81172718>] vfs_write+0xb8/0x1a0
-  Feb 22 19:55:14 virt11 kernel: [<ffffffff810d1b62>] ? audit_syscall_entry=
-+0x272/0x2a0
-  Feb 22 19:55:14 virt11 kernel: [<ffffffff81173212>] sys_pwrite64+0x82/0xa0
-  Feb 22 19:55:14 virt11 kernel: [<ffffffff8100b172>] system_call_fastpath+=
-0x16/0x1b
-  Feb 22 19:57:14 virt11 kernel: INFO: task qemu-kvm:18360 blocked for more=
- than 120 seconds.
-  Feb 22 19:57:14 virt11 kernel: "echo 0 > /proc/sys/kernel/hung_task_timeo=
-ut_secs" disables this message.
-  Feb 22 19:57:14 virt11 kernel: qemu-kvm      D 0000000000000002     0 183=
-60      1 0x00000080
-  Feb 22 19:57:14 virt11 kernel: ffff8808614457e8 0000000000000086 ffff8800=
-282d5f80 ffff8800282d5f80
-  Feb 22 19:57:14 virt11 kernel: ffff880861445768 ffffffff810573ce ffff8808=
-61445768 0000000000000086
-  Feb 22 19:57:14 virt11 kernel: ffff8808f15bba78 ffff880861445fd8 00000000=
-0000f598 ffff8808f15bba78
-  Feb 22 19:57:14 virt11 kernel: Call Trace:
-  Feb 22 19:57:14 virt11 kernel: [<ffffffff810573ce>] ? activate_task+0x2e/=
-0x40
-  Feb 22 19:57:14 virt11 kernel: [<ffffffff814dd755>] rwsem_down_failed_com=
-mon+0x95/0x1d0
-  Feb 22 19:57:14 virt11 kernel: [<ffffffff814dd8b3>] rwsem_down_write_fail=
-ed+0x23/0x30
-  Feb 22 19:57:14 virt11 kernel: [<ffffffff8126e573>] call_rwsem_down_write=
-_failed+0x13/0x20
-  Feb 22 19:57:14 virt11 kernel: [<ffffffff814dcdb2>] ? down_write+0x32/0x40
-  Feb 22 19:57:14 virt11 kernel: [<ffffffffa0332d6e>] xfs_ilock+0x7e/0xd0 [=
-xfs]
-  Feb 22 19:57:14 virt11 kernel: [<ffffffffa033ab02>] xfs_iomap+0x2e2/0x440=
- [xfs]
-  Feb 22 19:57:14 virt11 kernel: [<ffffffffa0354116>] __xfs_get_blocks+0x86=
-/0x200 [xfs]
-  Feb 22 19:57:14 virt11 kernel: [<ffffffffa03542aa>] xfs_get_blocks_direct=
-+0x1a/0x20 [xfs]
-  Feb 22 19:57:14 virt11 kernel: [<ffffffff811ac132>] __blockdev_direct_IO+=
-0x872/0xc40
-  Feb 22 19:57:14 virt11 kernel: [<ffffffffa0353f50>] xfs_vm_direct_IO+0xb0=
-/0xf0 [xfs]
-  Feb 22 19:57:14 virt11 kernel: [<ffffffffa0354290>] ? xfs_get_blocks_dire=
-ct+0x0/0x20 [xfs]
-  Feb 22 19:57:14 virt11 kernel: [<ffffffffa0353cc0>] ? xfs_end_io_direct+0=
-x0/0xe0 [xfs]
-  Feb 22 19:57:14 virt11 kernel: [<ffffffff8106dd57>] ? current_fs_time+0x2=
-7/0x30
-  Feb 22 19:57:14 virt11 kernel: [<ffffffff8110df22>] generic_file_direct_w=
-rite+0xc2/0x190
-  Feb 22 19:57:14 virt11 kernel: [<ffffffffa034bfcf>] ? xfs_trans_unlocked_=
-item+0x4f/0x60 [xfs]
-  Feb 22 19:57:14 virt11 kernel: [<ffffffffa035dd1d>] xfs_write+0x4fd/0xb70=
- [xfs]
-  Feb 22 19:57:14 virt11 kernel: [<ffffffff8105dc72>] ? default_wake_functi=
-on+0x12/0x20
-  Feb 22 19:57:14 virt11 kernel: [<ffffffffa03599a1>] xfs_file_aio_write+0x=
-61/0x70 [xfs]
-  Feb 22 19:57:14 virt11 kernel: [<ffffffff8117241a>] do_sync_write+0xfa/0x=
-140
-  Feb 22 19:57:14 virt11 kernel: [<ffffffff8107fbc2>] ? send_signal+0x42/0x=
-80
-  Feb 22 19:57:14 virt11 kernel: [<ffffffff8108e160>] ? autoremove_wake_fun=
-ction+0x0/0x40
-  Feb 22 19:57:14 virt11 kernel: [<ffffffff8107ff96>] ? group_send_sig_info=
-+0x56/0x70
-  Feb 22 19:57:14 virt11 kernel: [<ffffffff81211d3b>] ? selinux_file_permis=
-sion+0xfb/0x150
-  Feb 22 19:57:14 virt11 kernel: [<ffffffff812051a6>] ? security_file_permi=
-ssion+0x16/0x20
-  Feb 22 19:57:14 virt11 kernel: [<ffffffff81172718>] vfs_write+0xb8/0x1a0
-  Feb 22 19:57:14 virt11 kernel: [<ffffffff810d1b62>] ? audit_syscall_entry=
-+0x272/0x2a0
-  Feb 22 19:57:14 virt11 kernel: [<ffffffff81173212>] sys_pwrite64+0x82/0xa0
-  Feb 22 19:57:14 virt11 kernel: [<ffffffff8100b172>] system_call_fastpath+=
-0x16/0x1b
-  Feb 22 19:59:14 virt11 kernel: INFO: task qemu-kvm:18360 blocked for more=
- than 120 seconds.
-  Feb 22 19:59:14 virt11 kernel: "echo 0 > /proc/sys/kernel/hung_task_timeo=
-ut_secs" disables this message.
-  Feb 22 19:59:14 virt11 kernel: qemu-kvm      D 0000000000000002     0 183=
-60      1 0x00000080
-  Feb 22 19:59:14 virt11 kernel: ffff8808614457e8 0000000000000086 ffff8800=
-282d5f80 ffff8800282d5f80
-  Feb 22 19:59:14 virt11 kernel: ffff880861445768 ffffffff810573ce ffff8808=
-61445768 0000000000000086
-  Feb 22 19:59:14 virt11 kernel: ffff8808f15bba78 ffff880861445fd8 00000000=
-0000f598 ffff8808f15bba78
-  Feb 22 19:59:14 virt11 kernel: Call Trace:
-  Feb 22 19:59:14 virt11 kernel: [<ffffffff810573ce>] ? activate_task+0x2e/=
-0x40
-  Feb 22 19:59:14 virt11 kernel: [<ffffffff814dd755>] rwsem_down_failed_com=
-mon+0x95/0x1d0
-  Feb 22 19:59:14 virt11 kernel: [<ffffffff814dd8b3>] rwsem_down_write_fail=
-ed+0x23/0x30
-  Feb 22 19:59:14 virt11 kernel: [<ffffffff8126e573>] call_rwsem_down_write=
-_failed+0x13/0x20
-  Feb 22 19:59:14 virt11 kernel: [<ffffffff814dcdb2>] ? down_write+0x32/0x40
-  Feb 22 19:59:14 virt11 kernel: [<ffffffffa0332d6e>] xfs_ilock+0x7e/0xd0 [=
-xfs]
-  Feb 22 19:59:14 virt11 kernel: [<ffffffffa033ab02>] xfs_iomap+0x2e2/0x440=
- [xfs]
-  Feb 22 19:59:14 virt11 kernel: [<ffffffffa0354116>] __xfs_get_blocks+0x86=
-/0x200 [xfs]
-  Feb 22 19:59:14 virt11 kernel: [<ffffffffa03542aa>] xfs_get_blocks_direct=
-+0x1a/0x20 [xfs]
-  Feb 22 19:59:14 virt11 kernel: [<ffffffff811ac132>] __blockdev_direct_IO+=
-0x872/0xc40
-  Feb 22 19:59:14 virt11 kernel: [<ffffffffa0353f50>] xfs_vm_direct_IO+0xb0=
-/0xf0 [xfs]
-  Feb 22 19:59:14 virt11 kernel: [<ffffffffa0354290>] ? xfs_get_blocks_dire=
-ct+0x0/0x20 [xfs]
-  Feb 22 19:59:14 virt11 kernel: [<ffffffffa0353cc0>] ? xfs_end_io_direct+0=
-x0/0xe0 [xfs]
-  Feb 22 19:59:14 virt11 kernel: [<ffffffff8106dd57>] ? current_fs_time+0x2=
-7/0x30
-  Feb 22 19:59:14 virt11 kernel: [<ffffffff8110df22>] generic_file_direct_w=
-rite+0xc2/0x190
-  Feb 22 19:59:14 virt11 kernel: [<ffffffffa034bfcf>] ? xfs_trans_unlocked_=
-item+0x4f/0x60 [xfs]
-  Feb 22 19:59:14 virt11 kernel: [<ffffffffa035dd1d>] xfs_write+0x4fd/0xb70=
- [xfs]
-  Feb 22 19:59:14 virt11 kernel: [<ffffffff8105dc72>] ? default_wake_functi=
-on+0x12/0x20
-  Feb 22 19:59:14 virt11 kernel: [<ffffffffa03599a1>] xfs_file_aio_write+0x=
-61/0x70 [xfs]
-  Feb 22 19:59:14 virt11 kernel: [<ffffffff8117241a>] do_sync_write+0xfa/0x=
-140
-  Feb 22 19:59:14 virt11 kernel: [<ffffffff8107fbc2>] ? send_signal+0x42/0x=
-80
-  Feb 22 19:59:14 virt11 kernel: [<ffffffff8108e160>] ? autoremove_wake_fun=
-ction+0x0/0x40
-  Feb 22 19:59:14 virt11 kernel: [<ffffffff8107ff96>] ? group_send_sig_info=
-+0x56/0x70
-  Feb 22 19:59:14 virt11 kernel: [<ffffffff81211d3b>] ? selinux_file_permis=
-sion+0xfb/0x150
-  Feb 22 19:59:14 virt11 kernel: [<ffffffff812051a6>] ? security_file_permi=
-ssion+0x16/0x20
-  Feb 22 19:59:14 virt11 kernel: [<ffffffff81172718>] vfs_write+0xb8/0x1a0
-  Feb 22 19:59:14 virt11 kernel: [<ffffffff810d1b62>] ? audit_syscall_entry=
-+0x272/0x2a0
-  Feb 22 19:59:14 virt11 kernel: [<ffffffff81173212>] sys_pwrite64+0x82/0xa0
-  Feb 22 19:59:14 virt11 kernel: [<ffffffff8100b172>] system_call_fastpath+=
-0x16/0x1b
-  Feb 22 20:01:14 virt11 kernel: INFO: task qemu-kvm:18360 blocked for more=
- than 120 seconds.
-  Feb 22 20:01:14 virt11 kernel: "echo 0 > /proc/sys/kernel/hung_task_timeo=
-ut_secs" disables this message.
-  Feb 22 20:01:14 virt11 kernel: qemu-kvm      D 0000000000000002     0 183=
-60      1 0x00000080
-  Feb 22 20:01:14 virt11 kernel: ffff8808614457e8 0000000000000086 ffff8800=
-282d5f80 ffff8800282d5f80
-  Feb 22 20:01:14 virt11 kernel: ffff880861445768 ffffffff810573ce ffff8808=
-61445768 0000000000000086
-  Feb 22 20:01:14 virt11 kernel: ffff8808f15bba78 ffff880861445fd8 00000000=
-0000f598 ffff8808f15bba78
-  Feb 22 20:01:14 virt11 kernel: Call Trace:
-  Feb 22 20:01:14 virt11 kernel: [<ffffffff810573ce>] ? activate_task+0x2e/=
-0x40
-  Feb 22 20:01:14 virt11 kernel: [<ffffffff814dd755>] rwsem_down_failed_com=
-mon+0x95/0x1d0
-  Feb 22 20:01:14 virt11 kernel: [<ffffffff814dd8b3>] rwsem_down_write_fail=
-ed+0x23/0x30
-  Feb 22 20:01:14 virt11 kernel: [<ffffffff8126e573>] call_rwsem_down_write=
-_failed+0x13/0x20
-  Feb 22 20:01:14 virt11 kernel: [<ffffffff814dcdb2>] ? down_write+0x32/0x40
-  Feb 22 20:01:14 virt11 kernel: [<ffffffffa0332d6e>] xfs_ilock+0x7e/0xd0 [=
-xfs]
-  Feb 22 20:01:14 virt11 kernel: [<ffffffffa033ab02>] xfs_iomap+0x2e2/0x440=
- [xfs]
-  Feb 22 20:01:14 virt11 kernel: [<ffffffffa0354116>] __xfs_get_blocks+0x86=
-/0x200 [xfs]
-  Feb 22 20:01:14 virt11 kernel: [<ffffffffa03542aa>] xfs_get_blocks_direct=
-+0x1a/0x20 [xfs]
-  Feb 22 20:01:14 virt11 kernel: [<ffffffff811ac132>] __blockdev_direct_IO+=
-0x872/0xc40
-  Feb 22 20:01:14 virt11 kernel: [<ffffffffa0353f50>] xfs_vm_direct_IO+0xb0=
-/0xf0 [xfs]
-  Feb 22 20:01:14 virt11 kernel: [<ffffffffa0354290>] ? xfs_get_blocks_dire=
-ct+0x0/0x20 [xfs]
-  Feb 22 20:01:14 virt11 kernel: [<ffffffffa0353cc0>] ? xfs_end_io_direct+0=
-x0/0xe0 [xfs]
-  Feb 22 20:01:14 virt11 kernel: [<ffffffff8106dd57>] ? current_fs_time+0x2=
-7/0x30
-  Feb 22 20:01:14 virt11 kernel: [<ffffffff8110df22>] generic_file_direct_w=
-rite+0xc2/0x190
-  Feb 22 20:01:14 virt11 kernel: [<ffffffffa034bfcf>] ? xfs_trans_unlocked_=
-item+0x4f/0x60 [xfs]
-  Feb 22 20:01:14 virt11 kernel: [<ffffffffa035dd1d>] xfs_write+0x4fd/0xb70=
- [xfs]
-  Feb 22 20:01:14 virt11 kernel: [<ffffffff8105dc72>] ? default_wake_functi=
-on+0x12/0x20
-  Feb 22 20:01:14 virt11 kernel: [<ffffffffa03599a1>] xfs_file_aio_write+0x=
-61/0x70 [xfs]
-  Feb 22 20:01:14 virt11 kernel: [<ffffffff8117241a>] do_sync_write+0xfa/0x=
-140
-  Feb 22 20:01:14 virt11 kernel: [<ffffffff8107fbc2>] ? send_signal+0x42/0x=
-80
-  Feb 22 20:01:14 virt11 kernel: [<ffffffff8108e160>] ? autoremove_wake_fun=
-ction+0x0/0x40
-  Feb 22 20:01:14 virt11 kernel: [<ffffffff8107ff96>] ? group_send_sig_info=
-+0x56/0x70
-  Feb 22 20:01:14 virt11 kernel: [<ffffffff81211d3b>] ? selinux_file_permis=
-sion+0xfb/0x150
-  Feb 22 20:01:14 virt11 kernel: [<ffffffff812051a6>] ? security_file_permi=
-ssion+0x16/0x20
-  Feb 22 20:01:14 virt11 kernel: [<ffffffff81172718>] vfs_write+0xb8/0x1a0
-  Feb 22 20:01:14 virt11 kernel: [<ffffffff810d1b62>] ? audit_syscall_entry=
-+0x272/0x2a0
-  Feb 22 20:01:14 virt11 kernel: [<ffffffff81173212>] sys_pwrite64+0x82/0xa0
-  Feb 22 20:01:14 virt11 kernel: [<ffffffff8100b172>] system_call_fastpath+=
-0x16/0x1b
-  Feb 22 20:03:14 virt11 kernel: INFO: task qemu-kvm:18360 blocked for more=
- than 120 seconds.
-  Feb 22 20:03:14 virt11 kernel: "echo 0 > /proc/sys/kernel/hung_task_timeo=
-ut_secs" disables this message.
-  Feb 22 20:03:14 virt11 kernel: qemu-kvm      D 0000000000000002     0 183=
-60      1 0x00000080
-  Feb 22 20:03:14 virt11 kernel: ffff8808614457e8 0000000000000086 ffff8800=
-282d5f80 ffff8800282d5f80
-  Feb 22 20:03:14 virt11 kernel: ffff880861445768 ffffffff810573ce ffff8808=
-61445768 0000000000000086
-  Feb 22 20:03:14 virt11 kernel: ffff8808f15bba78 ffff880861445fd8 00000000=
-0000f598 ffff8808f15bba78
-  Feb 22 20:03:14 virt11 kernel: Call Trace:
-  Feb 22 20:03:14 virt11 kernel: [<ffffffff810573ce>] ? activate_task+0x2e/=
-0x40
-  Feb 22 20:03:14 virt11 kernel: [<ffffffff814dd755>] rwsem_down_failed_com=
-mon+0x95/0x1d0
-  Feb 22 20:03:14 virt11 kernel: [<ffffffff814dd8b3>] rwsem_down_write_fail=
-ed+0x23/0x30
-  Feb 22 20:03:14 virt11 kernel: [<ffffffff8126e573>] call_rwsem_down_write=
-_failed+0x13/0x20
-  Feb 22 20:03:14 virt11 kernel: [<ffffffff814dcdb2>] ? down_write+0x32/0x40
-  Feb 22 20:03:14 virt11 kernel: [<ffffffffa0332d6e>] xfs_ilock+0x7e/0xd0 [=
-xfs]
-  Feb 22 20:03:14 virt11 kernel: [<ffffffffa033ab02>] xfs_iomap+0x2e2/0x440=
- [xfs]
-  Feb 22 20:03:14 virt11 kernel: [<ffffffffa0354116>] __xfs_get_blocks+0x86=
-/0x200 [xfs]
-  Feb 22 20:03:14 virt11 kernel: [<ffffffffa03542aa>] xfs_get_blocks_direct=
-+0x1a/0x20 [xfs]
-  Feb 22 20:03:14 virt11 kernel: [<ffffffff811ac132>] __blockdev_direct_IO+=
-0x872/0xc40
-  Feb 22 20:03:14 virt11 kernel: [<ffffffffa0353f50>] xfs_vm_direct_IO+0xb0=
-/0xf0 [xfs]
-  Feb 22 20:03:14 virt11 kernel: [<ffffffffa0354290>] ? xfs_get_blocks_dire=
-ct+0x0/0x20 [xfs]
-  Feb 22 20:03:14 virt11 kernel: [<ffffffffa0353cc0>] ? xfs_end_io_direct+0=
-x0/0xe0 [xfs]
-  Feb 22 20:03:14 virt11 kernel: [<ffffffff8106dd57>] ? current_fs_time+0x2=
-7/0x30
-  Feb 22 20:03:14 virt11 kernel: [<ffffffff8110df22>] generic_file_direct_w=
-rite+0xc2/0x190
-  Feb 22 20:03:14 virt11 kernel: [<ffffffffa034bfcf>] ? xfs_trans_unlocked_=
-item+0x4f/0x60 [xfs]
-  Feb 22 20:03:14 virt11 kernel: [<ffffffffa035dd1d>] xfs_write+0x4fd/0xb70=
- [xfs]
-  Feb 22 20:03:14 virt11 kernel: [<ffffffff8105dc72>] ? default_wake_functi=
-on+0x12/0x20
-  Feb 22 20:03:14 virt11 kernel: [<ffffffffa03599a1>] xfs_file_aio_write+0x=
-61/0x70 [xfs]
-  Feb 22 20:03:14 virt11 kernel: [<ffffffff8117241a>] do_sync_write+0xfa/0x=
-140
-  Feb 22 20:03:14 virt11 kernel: [<ffffffff8107fbc2>] ? send_signal+0x42/0x=
-80
-  Feb 22 20:03:14 virt11 kernel: [<ffffffff8108e160>] ? autoremove_wake_fun=
-ction+0x0/0x40
-  Feb 22 20:03:14 virt11 kernel: [<ffffffff8107ff96>] ? group_send_sig_info=
-+0x56/0x70
-  Feb 22 20:03:14 virt11 kernel: [<ffffffff81211d3b>] ? selinux_file_permis=
-sion+0xfb/0x150
-  Feb 22 20:03:14 virt11 kernel: [<ffffffff812051a6>] ? security_file_permi=
-ssion+0x16/0x20
-  Feb 22 20:03:14 virt11 kernel: [<ffffffff81172718>] vfs_write+0xb8/0x1a0
-  Feb 22 20:03:14 virt11 kernel: [<ffffffff810d1b62>] ? audit_syscall_entry=
-+0x272/0x2a0
-  Feb 22 20:03:14 virt11 kernel: [<ffffffff81173212>] sys_pwrite64+0x82/0xa0
-  Feb 22 20:03:14 virt11 kernel: [<ffffffff8100b172>] system_call_fastpath+=
-0x16/0x1b
-  Feb 22 20:05:14 virt11 kernel: INFO: task qemu-kvm:18360 blocked for more=
- than 120 seconds.
-  Feb 22 20:05:14 virt11 kernel: "echo 0 > /proc/sys/kernel/hung_task_timeo=
-ut_secs" disables this message.
-  Feb 22 20:05:14 virt11 kernel: qemu-kvm      D 0000000000000002     0 183=
-60      1 0x00000080
-  Feb 22 20:05:14 virt11 kernel: ffff8808614457e8 0000000000000086 ffff8800=
-282d5f80 ffff8800282d5f80
-  Feb 22 20:05:14 virt11 kernel: ffff880861445768 ffffffff810573ce ffff8808=
-61445768 0000000000000086
-  Feb 22 20:05:14 virt11 kernel: ffff8808f15bba78 ffff880861445fd8 00000000=
-0000f598 ffff8808f15bba78
-  Feb 22 20:05:14 virt11 kernel: Call Trace:
-  Feb 22 20:05:14 virt11 kernel: [<ffffffff810573ce>] ? activate_task+0x2e/=
-0x40
-  Feb 22 20:05:14 virt11 kernel: [<ffffffff814dd755>] rwsem_down_failed_com=
-mon+0x95/0x1d0
-  Feb 22 20:05:14 virt11 kernel: [<ffffffff814dd8b3>] rwsem_down_write_fail=
-ed+0x23/0x30
-  Feb 22 20:05:14 virt11 kernel: [<ffffffff8126e573>] call_rwsem_down_write=
-_failed+0x13/0x20
-  Feb 22 20:05:14 virt11 kernel: [<ffffffff814dcdb2>] ? down_write+0x32/0x40
-  Feb 22 20:05:14 virt11 kernel: [<ffffffffa0332d6e>] xfs_ilock+0x7e/0xd0 [=
-xfs]
-  Feb 22 20:05:14 virt11 kernel: [<ffffffffa033ab02>] xfs_iomap+0x2e2/0x440=
- [xfs]
-  Feb 22 20:05:14 virt11 kernel: [<ffffffffa0354116>] __xfs_get_blocks+0x86=
-/0x200 [xfs]
-  Feb 22 20:05:14 virt11 kernel: [<ffffffffa03542aa>] xfs_get_blocks_direct=
-+0x1a/0x20 [xfs]
-  Feb 22 20:05:14 virt11 kernel: [<ffffffff811ac132>] __blockdev_direct_IO+=
-0x872/0xc40
-  Feb 22 20:05:14 virt11 kernel: [<ffffffffa0353f50>] xfs_vm_direct_IO+0xb0=
-/0xf0 [xfs]
-  Feb 22 20:05:14 virt11 kernel: [<ffffffffa0354290>] ? xfs_get_blocks_dire=
-ct+0x0/0x20 [xfs]
-  Feb 22 20:05:14 virt11 kernel: [<ffffffffa0353cc0>] ? xfs_end_io_direct+0=
-x0/0xe0 [xfs]
-  Feb 22 20:05:14 virt11 kernel: [<ffffffff8106dd57>] ? current_fs_time+0x2=
-7/0x30
-  Feb 22 20:05:14 virt11 kernel: [<ffffffff8110df22>] generic_file_direct_w=
-rite+0xc2/0x190
-  Feb 22 20:05:14 virt11 kernel: [<ffffffffa034bfcf>] ? xfs_trans_unlocked_=
-item+0x4f/0x60 [xfs]
-  Feb 22 20:05:14 virt11 kernel: [<ffffffffa035dd1d>] xfs_write+0x4fd/0xb70=
- [xfs]
-  Feb 22 20:05:14 virt11 kernel: [<ffffffff8105dc72>] ? default_wake_functi=
-on+0x12/0x20
-  Feb 22 20:05:14 virt11 kernel: [<ffffffffa03599a1>] xfs_file_aio_write+0x=
-61/0x70 [xfs]
-  Feb 22 20:05:14 virt11 kernel: [<ffffffff8117241a>] do_sync_write+0xfa/0x=
-140
-  Feb 22 20:05:14 virt11 kernel: [<ffffffff8107fbc2>] ? send_signal+0x42/0x=
-80
-  Feb 22 20:05:14 virt11 kernel: [<ffffffff8108e160>] ? autoremove_wake_fun=
-ction+0x0/0x40
-  Feb 22 20:05:14 virt11 kernel: [<ffffffff8107ff96>] ? group_send_sig_info=
-+0x56/0x70
-  Feb 22 20:05:14 virt11 kernel: [<ffffffff81211d3b>] ? selinux_file_permis=
-sion+0xfb/0x150
-  Feb 22 20:05:14 virt11 kernel: [<ffffffff812051a6>] ? security_file_permi=
-ssion+0x16/0x20
-  Feb 22 20:05:14 virt11 kernel: [<ffffffff81172718>] vfs_write+0xb8/0x1a0
-  Feb 22 20:05:14 virt11 kernel: [<ffffffff810d1b62>] ? audit_syscall_entry=
-+0x272/0x2a0
-  Feb 22 20:05:14 virt11 kernel: [<ffffffff81173212>] sys_pwrite64+0x82/0xa0
-  Feb 22 20:05:14 virt11 kernel: [<ffffffff8100b172>] system_call_fastpath+=
-0x16/0x1b
-  Feb 22 20:07:14 virt11 kernel: INFO: task qemu-kvm:18360 blocked for more=
- than 120 seconds.
-  Feb 22 20:07:14 virt11 kernel: "echo 0 > /proc/sys/kernel/hung_task_timeo=
-ut_secs" disables this message.
-  Feb 22 20:07:14 virt11 kernel: qemu-kvm      D 0000000000000002     0 183=
-60      1 0x00000080
-  Feb 22 20:07:14 virt11 kernel: ffff8808614457e8 0000000000000086 ffff8800=
-282d5f80 ffff8800282d5f80
-  Feb 22 20:07:14 virt11 kernel: ffff880861445768 ffffffff810573ce ffff8808=
-61445768 0000000000000086
-  Feb 22 20:07:14 virt11 kernel: ffff8808f15bba78 ffff880861445fd8 00000000=
-0000f598 ffff8808f15bba78
-  Feb 22 20:07:14 virt11 kernel: Call Trace:
-  Feb 22 20:07:14 virt11 kernel: [<ffffffff810573ce>] ? activate_task+0x2e/=
-0x40
-  Feb 22 20:07:14 virt11 kernel: [<ffffffff814dd755>] rwsem_down_failed_com=
-mon+0x95/0x1d0
-  Feb 22 20:07:14 virt11 kernel: [<ffffffff814dd8b3>] rwsem_down_write_fail=
-ed+0x23/0x30
-  Feb 22 20:07:14 virt11 kernel: [<ffffffff8126e573>] call_rwsem_down_write=
-_failed+0x13/0x20
-  Feb 22 20:07:14 virt11 kernel: [<ffffffff814dcdb2>] ? down_write+0x32/0x40
-  Feb 22 20:07:14 virt11 kernel: [<ffffffffa0332d6e>] xfs_ilock+0x7e/0xd0 [=
-xfs]
-  Feb 22 20:07:14 virt11 kernel: [<ffffffffa033ab02>] xfs_iomap+0x2e2/0x440=
- [xfs]
-  Feb 22 20:07:14 virt11 kernel: [<ffffffffa0354116>] __xfs_get_blocks+0x86=
-/0x200 [xfs]
-  Feb 22 20:07:14 virt11 kernel: [<ffffffffa03542aa>] xfs_get_blocks_direct=
-+0x1a/0x20 [xfs]
-  Feb 22 20:07:14 virt11 kernel: [<ffffffff811ac132>] __blockdev_direct_IO+=
-0x872/0xc40
-  Feb 22 20:07:14 virt11 kernel: [<ffffffffa0353f50>] xfs_vm_direct_IO+0xb0=
-/0xf0 [xfs]
-  Feb 22 20:07:14 virt11 kernel: [<ffffffffa0354290>] ? xfs_get_blocks_dire=
-ct+0x0/0x20 [xfs]
-  Feb 22 20:07:14 virt11 kernel: [<ffffffffa0353cc0>] ? xfs_end_io_direct+0=
-x0/0xe0 [xfs]
-  Feb 22 20:07:14 virt11 kernel: [<ffffffff8106dd57>] ? current_fs_time+0x2=
-7/0x30
-  Feb 22 20:07:14 virt11 kernel: [<ffffffff8110df22>] generic_file_direct_w=
-rite+0xc2/0x190
-  Feb 22 20:07:14 virt11 kernel: [<ffffffffa034bfcf>] ? xfs_trans_unlocked_=
-item+0x4f/0x60 [xfs]
-  Feb 22 20:07:14 virt11 kernel: [<ffffffffa035dd1d>] xfs_write+0x4fd/0xb70=
- [xfs]
-  Feb 22 20:07:14 virt11 kernel: [<ffffffff8105dc72>] ? default_wake_functi=
-on+0x12/0x20
-  Feb 22 20:07:14 virt11 kernel: [<ffffffffa03599a1>] xfs_file_aio_write+0x=
-61/0x70 [xfs]
-  Feb 22 20:07:14 virt11 kernel: [<ffffffff8117241a>] do_sync_write+0xfa/0x=
-140
-  Feb 22 20:07:14 virt11 kernel: [<ffffffff8107fbc2>] ? send_signal+0x42/0x=
-80
-  Feb 22 20:07:14 virt11 kernel: [<ffffffff8108e160>] ? autoremove_wake_fun=
-ction+0x0/0x40
-  Feb 22 20:07:14 virt11 kernel: [<ffffffff8107ff96>] ? group_send_sig_info=
-+0x56/0x70
-  Feb 22 20:07:14 virt11 kernel: [<ffffffff81211d3b>] ? selinux_file_permis=
-sion+0xfb/0x150
-  Feb 22 20:07:14 virt11 kernel: [<ffffffff812051a6>] ? security_file_permi=
-ssion+0x16/0x20
-  Feb 22 20:07:14 virt11 kernel: [<ffffffff81172718>] vfs_write+0xb8/0x1a0
-  Feb 22 20:07:14 virt11 kernel: [<ffffffff810d1b62>] ? audit_syscall_entry=
-+0x272/0x2a0
-  Feb 22 20:07:14 virt11 kernel: [<ffffffff81173212>] sys_pwrite64+0x82/0xa0
-  Feb 22 20:07:14 virt11 kernel: [<ffffffff8100b172>] system_call_fastpath+=
-0x16/0x1b
-  Feb 22 20:09:14 virt11 kernel: INFO: task qemu-kvm:18360 blocked for more=
- than 120 seconds.
-  Feb 22 20:09:14 virt11 kernel: "echo 0 > /proc/sys/kernel/hung_task_timeo=
-ut_secs" disables this message.
-  Feb 22 20:09:14 virt11 kernel: qemu-kvm      D 0000000000000002     0 183=
-60      1 0x00000080
-  Feb 22 20:09:14 virt11 kernel: ffff8808614457e8 0000000000000086 ffff8800=
-282d5f80 ffff8800282d5f80
-  Feb 22 20:09:14 virt11 kernel: ffff880861445768 ffffffff810573ce ffff8808=
-61445768 0000000000000086
-  Feb 22 20:09:14 virt11 kernel: ffff8808f15bba78 ffff880861445fd8 00000000=
-0000f598 ffff8808f15bba78
-  Feb 22 20:09:14 virt11 kernel: Call Trace:
-  Feb 22 20:09:14 virt11 kernel: [<ffffffff810573ce>] ? activate_task+0x2e/=
-0x40
-  Feb 22 20:09:14 virt11 kernel: [<ffffffff814dd755>] rwsem_down_failed_com=
-mon+0x95/0x1d0
-  Feb 22 20:09:14 virt11 kernel: [<ffffffff814dd8b3>] rwsem_down_write_fail=
-ed+0x23/0x30
-  Feb 22 20:09:14 virt11 kernel: [<ffffffff8126e573>] call_rwsem_down_write=
-_failed+0x13/0x20
-  Feb 22 20:09:14 virt11 kernel: [<ffffffff814dcdb2>] ? down_write+0x32/0x40
-  Feb 22 20:09:14 virt11 kernel: [<ffffffffa0332d6e>] xfs_ilock+0x7e/0xd0 [=
-xfs]
-  Feb 22 20:09:14 virt11 kernel: [<ffffffffa033ab02>] xfs_iomap+0x2e2/0x440=
- [xfs]
-  Feb 22 20:09:14 virt11 kernel: [<ffffffffa0354116>] __xfs_get_blocks+0x86=
-/0x200 [xfs]
-  Feb 22 20:09:14 virt11 kernel: [<ffffffffa03542aa>] xfs_get_blocks_direct=
-+0x1a/0x20 [xfs]
-  Feb 22 20:09:14 virt11 kernel: [<ffffffff811ac132>] __blockdev_direct_IO+=
-0x872/0xc40
-  Feb 22 20:09:14 virt11 kernel: [<ffffffffa0353f50>] xfs_vm_direct_IO+0xb0=
-/0xf0 [xfs]
-  Feb 22 20:09:14 virt11 kernel: [<ffffffffa0354290>] ? xfs_get_blocks_dire=
-ct+0x0/0x20 [xfs]
-  Feb 22 20:09:14 virt11 kernel: [<ffffffffa0353cc0>] ? xfs_end_io_direct+0=
-x0/0xe0 [xfs]
-  Feb 22 20:09:14 virt11 kernel: [<ffffffff8106dd57>] ? current_fs_time+0x2=
-7/0x30
-  Feb 22 20:09:14 virt11 kernel: [<ffffffff8110df22>] generic_file_direct_w=
-rite+0xc2/0x190
-  Feb 22 20:09:14 virt11 kernel: [<ffffffffa034bfcf>] ? xfs_trans_unlocked_=
-item+0x4f/0x60 [xfs]
-  Feb 22 20:09:14 virt11 kernel: [<ffffffffa035dd1d>] xfs_write+0x4fd/0xb70=
- [xfs]
-  Feb 22 20:09:14 virt11 kernel: [<ffffffff8105dc72>] ? default_wake_functi=
-on+0x12/0x20
-  Feb 22 20:09:14 virt11 kernel: [<ffffffffa03599a1>] xfs_file_aio_write+0x=
-61/0x70 [xfs]
-  Feb 22 20:09:14 virt11 kernel: [<ffffffff8117241a>] do_sync_write+0xfa/0x=
-140
-  Feb 22 20:09:14 virt11 kernel: [<ffffffff8107fbc2>] ? send_signal+0x42/0x=
-80
-  Feb 22 20:09:14 virt11 kernel: [<ffffffff8108e160>] ? autoremove_wake_fun=
-ction+0x0/0x40
-  Feb 22 20:09:14 virt11 kernel: [<ffffffff8107ff96>] ? group_send_sig_info=
-+0x56/0x70
-  Feb 22 20:09:14 virt11 kernel: [<ffffffff81211d3b>] ? selinux_file_permis=
-sion+0xfb/0x150
-  Feb 22 20:09:14 virt11 kernel: [<ffffffff812051a6>] ? security_file_permi=
-ssion+0x16/0x20
-  Feb 22 20:09:14 virt11 kernel: [<ffffffff81172718>] vfs_write+0xb8/0x1a0
-  Feb 22 20:09:14 virt11 kernel: [<ffffffff810d1b62>] ? audit_syscall_entry=
-+0x272/0x2a0
-  Feb 22 20:09:14 virt11 kernel: [<ffffffff81173212>] sys_pwrite64+0x82/0xa0
-  Feb 22 20:09:14 virt11 kernel: [<ffffffff8100b172>] system_call_fastpath+=
-0x16/0x1b
-  Feb 22 20:11:14 virt11 kernel: INFO: task qemu-kvm:18360 blocked for more=
- than 120 seconds.
-  Feb 22 20:11:14 virt11 kernel: "echo 0 > /proc/sys/kernel/hung_task_timeo=
-ut_secs" disables this message.
-  Feb 22 20:11:14 virt11 kernel: qemu-kvm      D 0000000000000002     0 183=
-60      1 0x00000080
-  Feb 22 20:11:14 virt11 kernel: ffff8808614457e8 0000000000000086 ffff8800=
-282d5f80 ffff8800282d5f80
-  Feb 22 20:11:14 virt11 kernel: ffff880861445768 ffffffff810573ce ffff8808=
-61445768 0000000000000086
-  Feb 22 20:11:14 virt11 kernel: ffff8808f15bba78 ffff880861445fd8 00000000=
-0000f598 ffff8808f15bba78
-  Feb 22 20:11:14 virt11 kernel: Call Trace:
-  Feb 22 20:11:14 virt11 kernel: [<ffffffff810573ce>] ? activate_task+0x2e/=
-0x40
-  Feb 22 20:11:14 virt11 kernel: [<ffffffff814dd755>] rwsem_down_failed_com=
-mon+0x95/0x1d0
-  Feb 22 20:11:14 virt11 kernel: [<ffffffff814dd8b3>] rwsem_down_write_fail=
-ed+0x23/0x30
-  Feb 22 20:11:14 virt11 kernel: [<ffffffff8126e573>] call_rwsem_down_write=
-_failed+0x13/0x20
-  Feb 22 20:11:14 virt11 kernel: [<ffffffff814dcdb2>] ? down_write+0x32/0x40
-  Feb 22 20:11:14 virt11 kernel: [<ffffffffa0332d6e>] xfs_ilock+0x7e/0xd0 [=
-xfs]
-  Feb 22 20:11:14 virt11 kernel: [<ffffffffa033ab02>] xfs_iomap+0x2e2/0x440=
- [xfs]
-  Feb 22 20:11:14 virt11 kernel: [<ffffffffa0354116>] __xfs_get_blocks+0x86=
-/0x200 [xfs]
-  Feb 22 20:11:14 virt11 kernel: [<ffffffffa03542aa>] xfs_get_blocks_direct=
-+0x1a/0x20 [xfs]
-  Feb 22 20:11:14 virt11 kernel: [<ffffffff811ac132>] __blockdev_direct_IO+=
-0x872/0xc40
-  Feb 22 20:11:14 virt11 kernel: [<ffffffffa0353f50>] xfs_vm_direct_IO+0xb0=
-/0xf0 [xfs]
-  Feb 22 20:11:14 virt11 kernel: [<ffffffffa0354290>] ? xfs_get_blocks_dire=
-ct+0x0/0x20 [xfs]
-  Feb 22 20:11:14 virt11 kernel: [<ffffffffa0353cc0>] ? xfs_end_io_direct+0=
-x0/0xe0 [xfs]
-  Feb 22 20:11:14 virt11 kernel: [<ffffffff8106dd57>] ? current_fs_time+0x2=
-7/0x30
-  Feb 22 20:11:14 virt11 kernel: [<ffffffff8110df22>] generic_file_direct_w=
-rite+0xc2/0x190
-  Feb 22 20:11:14 virt11 kernel: [<ffffffffa034bfcf>] ? xfs_trans_unlocked_=
-item+0x4f/0x60 [xfs]
-  Feb 22 20:11:14 virt11 kernel: [<ffffffffa035dd1d>] xfs_write+0x4fd/0xb70=
- [xfs]
-  Feb 22 20:11:14 virt11 kernel: [<ffffffff8105dc72>] ? default_wake_functi=
-on+0x12/0x20
-  Feb 22 20:11:14 virt11 kernel: [<ffffffffa03599a1>] xfs_file_aio_write+0x=
-61/0x70 [xfs]
-  Feb 22 20:11:14 virt11 kernel: [<ffffffff8117241a>] do_sync_write+0xfa/0x=
-140
-  Feb 22 20:11:14 virt11 kernel: [<ffffffff8107fbc2>] ? send_signal+0x42/0x=
-80
-  Feb 22 20:11:14 virt11 kernel: [<ffffffff8108e160>] ? autoremove_wake_fun=
-ction+0x0/0x40
-  Feb 22 20:11:14 virt11 kernel: [<ffffffff8107ff96>] ? group_send_sig_info=
-+0x56/0x70
-  Feb 22 20:11:14 virt11 kernel: [<ffffffff81211d3b>] ? selinux_file_permis=
-sion+0xfb/0x150
-  Feb 22 20:11:14 virt11 kernel: [<ffffffff812051a6>] ? security_file_permi=
-ssion+0x16/0x20
-  Feb 22 20:11:14 virt11 kernel: [<ffffffff81172718>] vfs_write+0xb8/0x1a0
-  Feb 22 20:11:14 virt11 kernel: [<ffffffff810d1b62>] ? audit_syscall_entry=
-+0x272/0x2a0
-  Feb 22 20:11:14 virt11 kernel: [<ffffffff81173212>] sys_pwrite64+0x82/0xa0
-  Feb 22 20:11:14 virt11 kernel: [<ffffffff8100b172>] system_call_fastpath+=
-0x16/0x1b
-  Feb 22 20:13:14 virt11 kernel: INFO: task qemu-kvm:18360 blocked for more=
- than 120 seconds.
-  Feb 22 20:13:14 virt11 kernel: "echo 0 > /proc/sys/kernel/hung_task_timeo=
-ut_secs" disables this message.
-  Feb 22 20:13:14 virt11 kernel: qemu-kvm      D 0000000000000002     0 183=
-60      1 0x00000080
-  Feb 22 20:13:14 virt11 kernel: ffff8808614457e8 0000000000000086 ffff8800=
-282d5f80 ffff8800282d5f80
-  Feb 22 20:13:14 virt11 kernel: ffff880861445768 ffffffff810573ce ffff8808=
-61445768 0000000000000086
-  Feb 22 20:13:14 virt11 kernel: ffff8808f15bba78 ffff880861445fd8 00000000=
-0000f598 ffff8808f15bba78
-  Feb 22 20:13:14 virt11 kernel: Call Trace:
-  Feb 22 20:13:14 virt11 kernel: [<ffffffff810573ce>] ? activate_task+0x2e/=
-0x40
-  Feb 22 20:13:14 virt11 kernel: [<ffffffff814dd755>] rwsem_down_failed_com=
-mon+0x95/0x1d0
-  Feb 22 20:13:14 virt11 kernel: [<ffffffff814dd8b3>] rwsem_down_write_fail=
-ed+0x23/0x30
-  Feb 22 20:13:14 virt11 kernel: [<ffffffff8126e573>] call_rwsem_down_write=
-_failed+0x13/0x20
-  Feb 22 20:13:14 virt11 kernel: [<ffffffff814dcdb2>] ? down_write+0x32/0x40
-  Feb 22 20:13:14 virt11 kernel: [<ffffffffa0332d6e>] xfs_ilock+0x7e/0xd0 [=
-xfs]
-  Feb 22 20:13:14 virt11 kernel: [<ffffffffa033ab02>] xfs_iomap+0x2e2/0x440=
- [xfs]
-  Feb 22 20:13:14 virt11 kernel: [<ffffffffa0354116>] __xfs_get_blocks+0x86=
-/0x200 [xfs]
-  Feb 22 20:13:14 virt11 kernel: [<ffffffffa03542aa>] xfs_get_blocks_direct=
-+0x1a/0x20 [xfs]
-  Feb 22 20:13:14 virt11 kernel: [<ffffffff811ac132>] __blockdev_direct_IO+=
-0x872/0xc40
-  Feb 22 20:13:14 virt11 kernel: [<ffffffffa0353f50>] xfs_vm_direct_IO+0xb0=
-/0xf0 [xfs]
-  Feb 22 20:13:14 virt11 kernel: [<ffffffffa0354290>] ? xfs_get_blocks_dire=
-ct+0x0/0x20 [xfs]
-  Feb 22 20:13:14 virt11 kernel: [<ffffffffa0353cc0>] ? xfs_end_io_direct+0=
-x0/0xe0 [xfs]
-  Feb 22 20:13:14 virt11 kernel: [<ffffffff8106dd57>] ? current_fs_time+0x2=
-7/0x30
-  Feb 22 20:13:14 virt11 kernel: [<ffffffff8110df22>] generic_file_direct_w=
-rite+0xc2/0x190
-  Feb 22 20:13:14 virt11 kernel: [<ffffffffa034bfcf>] ? xfs_trans_unlocked_=
-item+0x4f/0x60 [xfs]
-  Feb 22 20:13:14 virt11 kernel: [<ffffffffa035dd1d>] xfs_write+0x4fd/0xb70=
- [xfs]
-  Feb 22 20:13:14 virt11 kernel: [<ffffffff8105dc72>] ? default_wake_functi=
-on+0x12/0x20
-  Feb 22 20:13:14 virt11 kernel: [<ffffffffa03599a1>] xfs_file_aio_write+0x=
-61/0x70 [xfs]
-  Feb 22 20:13:14 virt11 kernel: [<ffffffff8117241a>] do_sync_write+0xfa/0x=
-140
-  Feb 22 20:13:14 virt11 kernel: [<ffffffff8107fbc2>] ? send_signal+0x42/0x=
-80
-  Feb 22 20:13:14 virt11 kernel: [<ffffffff8108e160>] ? autoremove_wake_fun=
-ction+0x0/0x40
-  Feb 22 20:13:14 virt11 kernel: [<ffffffff8107ff96>] ? group_send_sig_info=
-+0x56/0x70
-  Feb 22 20:13:14 virt11 kernel: [<ffffffff81211d3b>] ? selinux_file_permis=
-sion+0xfb/0x150
-  Feb 22 20:13:14 virt11 kernel: [<ffffffff812051a6>] ? security_file_permi=
-ssion+0x16/0x20
-  Feb 22 20:13:14 virt11 kernel: [<ffffffff81172718>] vfs_write+0xb8/0x1a0
-  Feb 22 20:13:14 virt11 kernel: [<ffffffff810d1b62>] ? audit_syscall_entry=
-+0x272/0x2a0
-  Feb 22 20:13:14 virt11 kernel: [<ffffffff81173212>] sys_pwrite64+0x82/0xa0
-  Feb 22 20:13:14 virt11 kernel: [<ffffffff8100b172>] system_call_fastpath+=
-0x16/0x1b
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/939027/+subscriptions
+Paolo
