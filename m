@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44124)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44386)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <maxime.coquelin@redhat.com>) id 1ea0nN-0000l7-4i
-	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 09:59:02 -0500
+	(envelope-from <maxime.coquelin@redhat.com>) id 1ea0o3-0001Mg-CU
+	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 09:59:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <maxime.coquelin@redhat.com>) id 1ea0nK-0002AQ-1Z
-	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 09:59:01 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:56914)
+	(envelope-from <maxime.coquelin@redhat.com>) id 1ea0nz-0002ls-Hm
+	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 09:59:43 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:38608)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <maxime.coquelin@redhat.com>)
-	id 1ea0nJ-00029X-PL
-	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 09:58:57 -0500
+	id 1ea0nz-0002l0-BX
+	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 09:59:39 -0500
 From: Maxime Coquelin <maxime.coquelin@redhat.com>
-Date: Fri, 12 Jan 2018 15:56:56 +0100
-Message-Id: <20180112145658.17121-3-maxime.coquelin@redhat.com>
+Date: Fri, 12 Jan 2018 15:56:57 +0100
+Message-Id: <20180112145658.17121-4-maxime.coquelin@redhat.com>
 In-Reply-To: <20180112145658.17121-1-maxime.coquelin@redhat.com>
 References: <20180112145658.17121-1-maxime.coquelin@redhat.com>
-Subject: [Qemu-devel] [PATCH 2/4] vhost-user: specify and implement
- VHOST_USER_SET_QUEUE_NUM request
+Subject: [Qemu-devel] [PATCH 3/4] vhost-net: add vhost_net_set_queue_num
+ helper
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,135 +28,61 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: mst@redhat.com, mlureau@redhat.com, zhengxiang9@huawei.com, lersek@redhat.com, pbonzini@redhat.com, Maxime Coquelin <maxime.coquelin@redhat.com>
 
-When the slave cannot add queues dynamically, it needs to know for
-how many queues to wait to be initialized.
-
-This patch introduce new vhost-user protocol feature & request for
-the master to send the number of queue pairs allocated by the
-driver.
+This patch adds a new help to notify the backend with
+the number of queue pairs setup by the guest driver.
 
 Signed-off-by: Maxime Coquelin <maxime.coquelin@redhat.com>
 ---
- docs/interop/vhost-user.txt       | 16 ++++++++++++++++
- hw/virtio/vhost-user.c            | 24 ++++++++++++++++++++++++
- include/hw/virtio/vhost-backend.h |  3 +++
- 3 files changed, 43 insertions(+)
+ hw/net/vhost_net.c      | 17 +++++++++++++++++
+ include/net/vhost_net.h |  1 +
+ 2 files changed, 18 insertions(+)
 
-diff --git a/docs/interop/vhost-user.txt b/docs/interop/vhost-user.txt
-index 8a14191a1e..85c0e03a95 100644
---- a/docs/interop/vhost-user.txt
-+++ b/docs/interop/vhost-user.txt
-@@ -218,6 +218,9 @@ The max number of queue pairs the slave supports can be queried with message
- VHOST_USER_GET_QUEUE_NUM. Master should stop when the number of
- requested queues is bigger than that.
- 
-+When VHOST_USER_PROTOCOL_F_SET_QUEUE_NUM is negotiated, the master must send
-+the number of queue pairs initialized with message VHOST_USER_SET_QUEUE_NUM.
-+
- As all queues share one connection, the master uses a unique index for each
- queue in the sent message to identify a specified queue. One queue pair
- is enabled initially. More queues are enabled dynamically, by sending
-@@ -354,6 +357,7 @@ Protocol features
- #define VHOST_USER_PROTOCOL_F_MTU            4
- #define VHOST_USER_PROTOCOL_F_SLAVE_REQ      5
- #define VHOST_USER_PROTOCOL_F_CROSS_ENDIAN   6
-+#define VHOST_USER_PROTOCOL_F_SET_QUEUE_NUM  7
- 
- Master message types
- --------------------
-@@ -623,6 +627,18 @@ Master message types
-       and expect this message once (per VQ) during device configuration
-       (ie. before the master starts the VQ).
- 
-+ * VHOST_USER_SET_QUEUE_NUM
-+
-+      Id: 24
-+      Equivalent ioctl: N/A
-+      Master payload: u64
-+
-+      Set the number of queue pairs initialized.
-+      Master sends such request to notify the slave the number of queue pairs
-+      that have been initialized.
-+      This request should only be sent if VHOST_USER_PROTOCOL_F_SET_QUEUE_NUM
-+      feature has been successfully negotiated.
-+
- Slave message types
- -------------------
- 
-diff --git a/hw/virtio/vhost-user.c b/hw/virtio/vhost-user.c
-index 093675ed98..9e7728d2da 100644
---- a/hw/virtio/vhost-user.c
-+++ b/hw/virtio/vhost-user.c
-@@ -34,6 +34,7 @@ enum VhostUserProtocolFeature {
-     VHOST_USER_PROTOCOL_F_NET_MTU = 4,
-     VHOST_USER_PROTOCOL_F_SLAVE_REQ = 5,
-     VHOST_USER_PROTOCOL_F_CROSS_ENDIAN = 6,
-+    VHOST_USER_PROTOCOL_F_SET_QUEUE_NUM = 7,
- 
-     VHOST_USER_PROTOCOL_F_MAX
- };
-@@ -65,6 +66,7 @@ typedef enum VhostUserRequest {
-     VHOST_USER_SET_SLAVE_REQ_FD = 21,
-     VHOST_USER_IOTLB_MSG = 22,
-     VHOST_USER_SET_VRING_ENDIAN = 23,
-+    VHOST_USER_SET_QUEUE_NUM = 24,
-     VHOST_USER_MAX
- } VhostUserRequest;
- 
-@@ -922,6 +924,27 @@ static void vhost_user_set_iotlb_callback(struct vhost_dev *dev, int enabled)
-     /* No-op as the receive channel is not dedicated to IOTLB messages. */
+diff --git a/hw/net/vhost_net.c b/hw/net/vhost_net.c
+index e037db63a3..d60e237a34 100644
+--- a/hw/net/vhost_net.c
++++ b/hw/net/vhost_net.c
+@@ -124,6 +124,18 @@ uint64_t vhost_net_get_max_queues(VHostNetState *net)
+     return net->dev.max_queues;
  }
  
-+static int vhost_user_set_queue_num(struct vhost_dev *dev, uint64_t queues)
++int vhost_net_set_queue_num(NetClientState *nc, uint64_t queues)
 +{
-+    VhostUserMsg msg = {
-+        .request = VHOST_USER_SET_QUEUE_NUM,
-+        .size = sizeof(msg.payload.u64),
-+        .flags = VHOST_USER_VERSION,
-+        .payload.u64 = queues,
-+    };
++    VHostNetState *net = get_vhost_net(nc);
++    const VhostOps *vhost_ops = net->dev.vhost_ops;
 +
-+    if (!(dev->protocol_features &
-+                (1ULL << VHOST_USER_PROTOCOL_F_SET_QUEUE_NUM))) {
-+        return 0;
-+    }
-+
-+    if (vhost_user_write(dev, &msg, NULL, 0) < 0) {
-+        return -1;
++    if (vhost_ops->vhost_set_queue_num) {
++        return vhost_ops->vhost_set_queue_num(&net->dev, queues);
 +    }
 +
 +    return 0;
 +}
 +
- const VhostOps user_ops = {
-         .backend_type = VHOST_BACKEND_TYPE_USER,
-         .vhost_backend_init = vhost_user_init,
-@@ -948,4 +971,5 @@ const VhostOps user_ops = {
-         .vhost_net_set_mtu = vhost_user_net_set_mtu,
-         .vhost_set_iotlb_callback = vhost_user_set_iotlb_callback,
-         .vhost_send_device_iotlb_msg = vhost_user_send_device_iotlb_msg,
-+        .vhost_set_queue_num = vhost_user_set_queue_num,
- };
-diff --git a/include/hw/virtio/vhost-backend.h b/include/hw/virtio/vhost-backend.h
-index a7a5f22bc6..1dd3e4bbf3 100644
---- a/include/hw/virtio/vhost-backend.h
-+++ b/include/hw/virtio/vhost-backend.h
-@@ -84,6 +84,8 @@ typedef void (*vhost_set_iotlb_callback_op)(struct vhost_dev *dev,
-                                            int enabled);
- typedef int (*vhost_send_device_iotlb_msg_op)(struct vhost_dev *dev,
-                                               struct vhost_iotlb_msg *imsg);
-+typedef int (*vhost_set_queue_num_op)(struct vhost_dev *dev,
-+                                      uint64_t queues);
+ uint64_t vhost_net_get_acked_features(VHostNetState *net)
+ {
+     return net->dev.acked_features;
+@@ -456,6 +468,11 @@ uint64_t vhost_net_get_max_queues(VHostNetState *net)
+     return 1;
+ }
  
- typedef struct VhostOps {
-     VhostBackendType backend_type;
-@@ -118,6 +120,7 @@ typedef struct VhostOps {
-     vhost_vsock_set_running_op vhost_vsock_set_running;
-     vhost_set_iotlb_callback_op vhost_set_iotlb_callback;
-     vhost_send_device_iotlb_msg_op vhost_send_device_iotlb_msg;
-+    vhost_set_queue_num_op vhost_set_queue_num;
- } VhostOps;
++int vhost_net_set_queue_num(NetClientState *nc, uint64_t queues)
++{
++    return 0;
++}
++
+ struct vhost_net *vhost_net_init(VhostNetOptions *options)
+ {
+     error_report("vhost-net support is not compiled in");
+diff --git a/include/net/vhost_net.h b/include/net/vhost_net.h
+index afc1499eb9..39e639d014 100644
+--- a/include/net/vhost_net.h
++++ b/include/net/vhost_net.h
+@@ -15,6 +15,7 @@ typedef struct VhostNetOptions {
+ } VhostNetOptions;
  
- extern const VhostOps user_ops;
+ uint64_t vhost_net_get_max_queues(VHostNetState *net);
++int vhost_net_set_queue_num(NetClientState *nc, uint64_t queues);
+ struct vhost_net *vhost_net_init(VhostNetOptions *options);
+ 
+ int vhost_net_start(VirtIODevice *dev, NetClientState *ncs, int total_queues);
 -- 
 2.14.3
