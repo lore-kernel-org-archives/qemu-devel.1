@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60658)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60909)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1eZvuQ-00012u-RG
-	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 04:45:59 -0500
+	(envelope-from <stefanha@redhat.com>) id 1eZvvI-0001cb-Ru
+	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 04:46:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1eZvuP-00016T-TR
-	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 04:45:58 -0500
-Date: Fri, 12 Jan 2018 09:45:44 +0000
+	(envelope-from <stefanha@redhat.com>) id 1eZvvH-0001db-WD
+	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 04:46:52 -0500
+Date: Fri, 12 Jan 2018 09:46:19 +0000
 From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20180112094544.GB7356@stefanha-x1.localdomain>
+Message-ID: <20180112094619.GC7356@stefanha-x1.localdomain>
 References: <20180112085555.14447-1-famz@redhat.com>
-	<20180112085555.14447-9-famz@redhat.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="mojUlQ0s9EVzWg2t"
+	protocol="application/pgp-signature"; boundary="eHhjakXzOLJAF9wJ"
 Content-Disposition: inline
-In-Reply-To: <20180112085555.14447-9-famz@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v5 8/9] docs: Add section for NVMe VFIO
- driver
+In-Reply-To: <20180112085555.14447-1-famz@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v5 0/9] block: Add VFIO based driver for
+ NVMe device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,31 +28,40 @@ To: Fam Zheng <famz@redhat.com>
 Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Keith Busch <keith.busch@intel.com>, qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Eric Blake <eblake@redhat.com>, alex.williamson@redhat.com, Markus Armbruster <armbru@redhat.com>, Karl Rister <krister@redhat.com>
 
 
---mojUlQ0s9EVzWg2t
+--eHhjakXzOLJAF9wJ
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 
-On Fri, Jan 12, 2018 at 04:55:54PM +0800, Fam Zheng wrote:
-> Signed-off-by: Fam Zheng <famz@redhat.com>
-> Message-Id: <20180110091846.10699-9-famz@redhat.com>
-> ---
->  docs/qemu-block-drivers.texi | 37 +++++++++++++++++++++++++++++++++++++
->  1 file changed, 37 insertions(+)
+On Fri, Jan 12, 2018 at 04:55:46PM +0800, Fam Zheng wrote:
+> v5: Add Stefan's rev-bys.
+>     Add Paolo's sob line.
+>     Address Stefan's, Alex's and Eric's comments, including:
+>     - Add PCI Bar MMIO offset/size parameter to VFIO utility API. [Alex]
+>     - Fix various lock and memory leakings. [Stefan]
+>     - Improve documentation. [Stefan]
+>     - Add one missing "Since 2.12" in QAPI schema. [Eric]
+>     - Fix locking of BDRVNVMeState->inflight. [Stefan]
+>     - Add one missing endianness conversion for cmd.nsid. [Stefan]
+>     - Use bdrv_get_aio_context() instead of qemu_get_current_aio_context().
+>     - When init, issue "Set Features" command to enable/disable volatile write
+>       cache according to "flags & BDRV_O_NOCACHE".
 
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+I left comments on the main patch.  The rest looks good.
 
---mojUlQ0s9EVzWg2t
+Stefan
+
+--eHhjakXzOLJAF9wJ
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEcBAEBAgAGBQJaWIPIAAoJEJykq7OBq3PIsQgH/0Ps493e7yfsPKC03Sa9aUR6
-bZ2IGJ05SvpJ/Z5b95bT8NoS36c13o3YAxsBM+GgAt0tmSG/BINBFCXBFNGCTgqN
-PJ58mVaWCBae3BW9nWpVJPMV8KFy9O4z3cS22uzxRBWf8xB+hAE7//C0Z7tbXY+d
-88A/aa6OPjFLZ/nof/z7S43/DM8a4v5fUwVPHNOo9cIjv1GAYoP7bU2kLgLdk5uq
-EpTS1xz7xsvNwieKEjKfiNQraUeHoDPgpe8fTQsWxAWIEUzhFwd5uPGZRWI3DlkM
-Rg6pDA63RcAXHL2ADcbHt+2gdSpQL45A5Hi++l12AB+mn7u7/otvNNod9Kvx6q8=
-=W4fv
+iQEcBAEBAgAGBQJaWIPrAAoJEJykq7OBq3PIcLMIAKi0LwScx12wIlab/1em720o
+GO/PjS97g1pxMhtMnNCvjQdZ85ePfl9F9h1Q4gL3O8oLRky0x2sM/7pqlwrkAnYT
+qWQRuB/yNZ3wet1NDAIDCAZbyJIX63aiuVhwY8th0q+au/0vTrkrx2SOF85vY7+b
+kGvNbuMmfp1gr1huVNokGlDCT/mSk6SuEjS5u8NP6VhR2JGFuK8M7B5GWUDYpjGU
+WYFSeGRotStfpRV9zoLOfrp/zifLfXsK05PddTrVeQkdWDY5XIFUnqKplkDjVfU8
+nTaJdu8+JmMgXl1a+jG1946Pa2MTsY0Db4ag9pi7zcaHUFYkBy/joW3FrA/ODLc=
+=HdB5
 -----END PGP SIGNATURE-----
 
---mojUlQ0s9EVzWg2t--
+--eHhjakXzOLJAF9wJ--
