@@ -1,30 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44687)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45527)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1eZsbB-0000hl-N5
-	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 01:13:54 -0500
+	(envelope-from <peterx@redhat.com>) id 1eZsdg-0001mK-WB
+	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 01:16:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1eZsb6-0000yp-Mg
-	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 01:13:53 -0500
-Received: from mail.ispras.ru ([83.149.199.45]:56546)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1eZsb6-0000ye-EC
-	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 01:13:48 -0500
-From: "Pavel Dovgalyuk" <dovgaluk@ispras.ru>
-References: <20180111082452.27295.85707.stgit@pasha-VirtualBox>
-	<20180111082738.27295.80055.stgit@pasha-VirtualBox>
-	<0e223aaa-c3c9-1cdf-5548-5a532d3a7361@redhat.com>
-	<000901d38add$ddb4b750$991e25f0$@ru>
-	<17a6b61c-e151-a5e1-978a-b54da71dbe55@redhat.com>
-In-Reply-To: <17a6b61c-e151-a5e1-978a-b54da71dbe55@redhat.com>
-Date: Fri, 12 Jan 2018 09:13:50 +0300
-Message-ID: <001301d38b6c$83c6d090$8b5471b0$@ru>
+	(envelope-from <peterx@redhat.com>) id 1eZsdc-0002Fj-25
+	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 01:16:28 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:39674)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1eZsdb-0002EK-S7
+	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 01:16:23 -0500
+Date: Fri, 12 Jan 2018 14:16:10 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20180112061610.GL2551@xz-mi>
+References: <20171219084557.9801-1-peterx@redhat.com>
+	<20171219084557.9801-21-peterx@redhat.com>
+	<20180109134528.GE31400@stefanha-x1.localdomain>
 MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-Content-Language: ru
-Subject: Re: [Qemu-devel] [RFC PATCH v3 29/30] replay: improve replay
- performance
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20180109134528.GE31400@stefanha-x1.localdomain>
+Subject: Re: [Qemu-devel] [RFC v6 20/27] qmp: export qmp_dispatch_check_obj
+ and allow "id"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,24 +29,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: 'Paolo Bonzini' <pbonzini@redhat.com>, 'Pavel Dovgalyuk' <Pavel.Dovgaluk@ispras.ru>, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, peter.maydell@linaro.org, boost.lists@gmail.com, quintela@redhat.com, jasowang@redhat.com, mst@redhat.com, zuban32s@gmail.com, maria.klimushenkova@ispras.ru, kraxel@redhat.com, alex.bennee@linaro.org
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Cc: qemu-devel@nongnu.org, Stefan Hajnoczi <shajnocz@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <famz@redhat.com>, Juan Quintela <quintela@redhat.com>, mdroth@linux.vnet.ibm.com, Eric Blake <eblake@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Markus Armbruster <armbru@redhat.com>, marcandre.lureau@redhat.com, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 
-> From: Paolo Bonzini [mailto:pbonzini@redhat.com]
-> On 11/01/2018 14:12, Pavel Dovgalyuk wrote:
-> >> From: Paolo Bonzini [mailto:paolo.bonzini@gmail.com] On Behalf Of Paolo Bonzini
-> >> On 11/01/2018 09:27, Pavel Dovgalyuk wrote:
-> >>> +        } else {
-> >>> +            qemu_notify_event();
-> >>> +        }
-> >>
-> >> Before this patch, what would do the qemu_notify_event?
-> >
-> > We tried using qemu_notify_event to wake up the iothread and speedup the replay,
-> > when there is no work for vcpu thread to do.
+On Tue, Jan 09, 2018 at 01:45:28PM +0000, Stefan Hajnoczi wrote:
+> On Tue, Dec 19, 2017 at 04:45:50PM +0800, Peter Xu wrote:
+> > We need this for earlier check for OOB, before reaching
+> > do_qmp_dispatch().  Meanwhile, a small touch-up to allow "id" field,
+> > after all we allow that for sure in the spec (in any form).
 > 
-> But why doesn't the iothread wake up on its own?
+> This change would be better as part of the patch that needs it.  I don't
+> understand the commit description and there is no context in this patch
+> showing how this change is used.
 
-It will wake up by timeout. But with this change this happens sooner and replay goes faster.
+Maybe I should mention it explicitly that "it'll be used in the
+following up patch".
 
-Pavel Dovgalyuk
+Logically I think this has nothing to do with OOB so I splitted it
+out.  I would prefer it to be a separate patch (though I can enrich
+the commit message).  Or, I'm also fine if you think squashing this
+into next would be nicer.  Thanks,
+
+-- 
+Peter Xu
