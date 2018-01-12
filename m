@@ -1,24 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55549)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57906)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ea2bp-00016y-GL
-	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 11:55:17 -0500
+	(envelope-from <marcandre.lureau@gmail.com>) id 1ea2gg-0005AX-33
+	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 12:00:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ea2bo-0008Fk-AR
-	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 11:55:13 -0500
-References: <20171207155102.66622-1-vsementsov@virtuozzo.com>
-	<20171207155102.66622-7-vsementsov@virtuozzo.com>
-	<a0096cf0-8bec-dedb-e637-f29c71e46fbb@redhat.com>
-	<624f9181-d57c-4029-e3e8-7f6f4fea3963@virtuozzo.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <fedadb51-af71-82b1-ee73-135a7ce689eb@redhat.com>
-Date: Fri, 12 Jan 2018 10:54:56 -0600
+	(envelope-from <marcandre.lureau@gmail.com>) id 1ea2gf-0003vJ-Cp
+	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 12:00:14 -0500
+Received: from mail-wm0-x244.google.com ([2a00:1450:400c:c09::244]:40461)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+	id 1ea2ge-0003tm-M1
+	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 12:00:12 -0500
+Received: by mail-wm0-x244.google.com with SMTP id v123so3963938wmd.5
+	for <qemu-devel@nongnu.org>; Fri, 12 Jan 2018 09:00:12 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <624f9181-d57c-4029-e3e8-7f6f4fea3963@virtuozzo.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="Fdta46sxIvQszgJwnIbVeUqfiXim1XUjX"
-Subject: Re: [Qemu-devel] [PATCH v2 6/6] iotest 201: new test for qmp
- nbd-server-remove
+In-Reply-To: <1512682213-4354-6-git-send-email-minyard@acm.org>
+References: <1512682213-4354-1-git-send-email-minyard@acm.org>
+	<1512682213-4354-6-git-send-email-minyard@acm.org>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Fri, 12 Jan 2018 18:00:10 +0100
+Message-ID: <CAJ+F1CK1XWuxQFAYpXgLFTq+99Cjmn7F1aZoX04uGgNKxVzTUQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 5/8] ipmi: disable IRQ and ATN on an
+ external disconnect
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,92 +31,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: armbru@redhat.com, dgilbert@redhat.com, pbonzini@redhat.com, mreitz@redhat.com, kwolf@redhat.com, den@openvz.org
+To: Corey Minyard <minyard@acm.org>
+Cc: QEMU <qemu-devel@nongnu.org>, Corey Minyard <cminyard@mvista.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---Fdta46sxIvQszgJwnIbVeUqfiXim1XUjX
-From: Eric Blake <eblake@redhat.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: armbru@redhat.com, dgilbert@redhat.com, pbonzini@redhat.com,
- mreitz@redhat.com, kwolf@redhat.com, den@openvz.org
-Message-ID: <fedadb51-af71-82b1-ee73-135a7ce689eb@redhat.com>
-Subject: Re: [PATCH v2 6/6] iotest 201: new test for qmp nbd-server-remove
-References: <20171207155102.66622-1-vsementsov@virtuozzo.com>
- <20171207155102.66622-7-vsementsov@virtuozzo.com>
- <a0096cf0-8bec-dedb-e637-f29c71e46fbb@redhat.com>
- <624f9181-d57c-4029-e3e8-7f6f4fea3963@virtuozzo.com>
-In-Reply-To: <624f9181-d57c-4029-e3e8-7f6f4fea3963@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Hi
 
-On 01/12/2018 05:43 AM, Vladimir Sementsov-Ogievskiy wrote:
+On Thu, Dec 7, 2017 at 10:30 PM,  <minyard@acm.org> wrote:
+> From: Corey Minyard <cminyard@mvista.com>
+>
+> Otherwise there's no way to clear them without an external command,
+> and it could lock the OS in the VM if they were stuck.
+>
+> Signed-off-by: Corey Minyard <cminyard@mvista.com>
 
->>> +++ b/tests/qemu-iotests/201.out
->>> @@ -0,0 +1,5 @@
->>> +.......
->>> +--------------------------------------------------------------------=
---
->>> +Ran 7 tests
->> I'm not a fan of python tests that are difficult to debug.=C2=A0 Your
->> additions to 147 in patch 4/6 are okay (hard to debug, but an
->> incremental addition); but is it possible to rewrite this test in a bi=
-t
->> more verbose manner?=C2=A0 See test 194 and this message for more deta=
-ils:
->> https://lists.gnu.org/archive/html/qemu-devel/2017-12/msg00234.html
->=20
-> hmm, what do you mean by "difficult to debug"? This is a usual python
-> unittest based test.
+I don't know if anyone knows the specifics better than you. Why aren't
+you the maintainer of hw/ipmi? (in MAINTAINERS)
 
-And the list archives show several threads of people complaining that
-=2E/check failing with a diff that merely shows:
+> ---
+>  hw/ipmi/ipmi_bmc_extern.c | 5 +++++
+>  1 file changed, 5 insertions(+)
+>
+> diff --git a/hw/ipmi/ipmi_bmc_extern.c b/hw/ipmi/ipmi_bmc_extern.c
+> index abab3bb..58ade79 100644
+> --- a/hw/ipmi/ipmi_bmc_extern.c
+> +++ b/hw/ipmi/ipmi_bmc_extern.c
+> @@ -424,6 +424,11 @@ static void chr_event(void *opaque, int event)
+>              return;
+>          }
+>          ibe->connected =3D false;
+> +        /*
+> +         * Don't hang the OS trying to handle the ATN bit, other end wil=
+l
+> +         * resend on a reconnect.
+> +         */
+> +        k->set_atn(s, 0, 0);
+>          if (ibe->waiting_rsp) {
+>              ibe->waiting_rsp =3D false;
+>              ibe->inbuf[1] =3D ibe->outbuf[1] | 0x04;
+> --
+> 2.7.4
+>
+>
 
--.....
-+..E..
 
-makes it rather hard to see WHAT test 2 was doing that caused an error
-instead of a pass, let alone set up a reproduction scenario on JUST the
-failing test.  Yes, a lot of existing iotests use this unittest layout,
-and on that grounds, I'm not opposed to adding another one; but test 194
-really IS easier to debug when something goes wrong.
-
-> And there 3 test cases, sharing same setUp. Do not you say that unittes=
-t
-> becomes
-> deprecated in qemu? I think, if we have only one testcase, we may use
-> 194-like approach,
-> but if we have more, it's better to use unittest.
-
-Yes, I think a nice goal for improved testing is to write more
-python-based iotests in the style that uses actual output, and not just
-the unittest framework, in the test log.  It's not a hard requirement as
-long as no one has converted existing tests, but is food for thought.
 
 --=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---Fdta46sxIvQszgJwnIbVeUqfiXim1XUjX
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlpY6GAACgkQp6FrSiUn
-Q2oFWwf/aqvbpmYEywUIIqyXPs1uH0N9Hic230bCH04c8aqjDynDiJK3touaZniL
-BdLnQJX4liayBCwBn2nRd9Rzn8d3kCf4ga7uYKULRGcLL66qZZV1jJlFJ/IWSKUk
-cxWypMmAgRiLJvsCWiB1ErA1YXro57CPTOWXqyCetz9EVz5nmdpCT9SoRshHW0Y6
-dxt/qhlHG4I1lWHixcIjVGlrq3t9J9rtqOYKP2FMI9lQTEA3rzuWnlbYo0zXPTdt
-SiKdGU7TYL3uDOooY79GuGjRozWCo9WzpF+PQj/FiTWHUbC0Qb5LCB+2sgqRtTMd
-2ffz9rd3lxq3OVLvlCa6sdep6aFOvQ==
-=lc44
------END PGP SIGNATURE-----
-
---Fdta46sxIvQszgJwnIbVeUqfiXim1XUjX--
+Marc-Andr=C3=A9 Lureau
