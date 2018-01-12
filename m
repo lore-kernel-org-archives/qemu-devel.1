@@ -1,30 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42262)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44602)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1ea5Ls-00015y-RX
-	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 14:50:58 -0500
+	(envelope-from <alistair23@gmail.com>) id 1ea5U3-0003n8-7u
+	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 14:59:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1ea5Lp-0004SS-2V
-	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 14:50:56 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:39652)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1ea5Lo-0004Rc-Rn
-	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 14:50:52 -0500
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 035DD61B19
-	for <qemu-devel@nongnu.org>; Fri, 12 Jan 2018 19:50:52 +0000 (UTC)
-Date: Fri, 12 Jan 2018 17:50:50 -0200
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20180112195050.GR18022@localhost.localdomain>
-References: <20180109154519.25634-1-ehabkost@redhat.com>
+	(envelope-from <alistair23@gmail.com>) id 1ea5U2-0004JG-7w
+	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 14:59:23 -0500
+Received: from mail-wm0-x241.google.com ([2a00:1450:400c:c09::241]:41497)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
+	id 1ea5U2-0004HT-12
+	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 14:59:22 -0500
+Received: by mail-wm0-x241.google.com with SMTP id g75so14410507wme.0
+	for <qemu-devel@nongnu.org>; Fri, 12 Jan 2018 11:59:21 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180109154519.25634-1-ehabkost@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 0/7] CPU model updates for CVE-2017-5715
- (Spectre variant #2)
+Sender: alistair23@gmail.com
+In-Reply-To: <656bb912-94ac-9eda-a664-ad23db3564c3@amsat.org>
+References: <b799d9d21170a492c54fb2c4eaf8326b06e0bdf6.1515523657.git.alistair.francis@xilinx.com>
+	<0ecd5644773477442fbaa0f4bcadb58bbe488c78.1515523657.git.alistair.francis@xilinx.com>
+	<656bb912-94ac-9eda-a664-ad23db3564c3@amsat.org>
+From: Alistair Francis <alistair.francis@xilinx.com>
+Date: Fri, 12 Jan 2018 11:58:50 -0800
+Message-ID: <CAKmqyKNKRFeeN_RDwWwzif=4gS1OUujmWHkwcJu7MhTi5Gig3Q@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v1 3/3] xlnx-zynqmp: Connect the RTC device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,63 +32,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Cc: Alistair Francis <alistair.francis@xilinx.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, Edgar Iglesias <edgar.iglesias@xilinx.com>, Edgar Iglesias <edgar.iglesias@gmail.com>
 
-I'm queueing patches 1-5 on x86-next.
+On Thu, Jan 11, 2018 at 10:36 AM, Philippe Mathieu-Daud=C3=A9
+<f4bug@amsat.org> wrote:
+> On 01/09/2018 03:50 PM, Alistair Francis wrote:
+>> Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
+>> ---
+>>
+>>  hw/arm/xlnx-zynqmp.c         | 14 ++++++++++++++
+>>  include/hw/arm/xlnx-zynqmp.h |  2 ++
+>>  2 files changed, 16 insertions(+)
+>>
+>> diff --git a/hw/arm/xlnx-zynqmp.c b/hw/arm/xlnx-zynqmp.c
+>> index 325642058b..deef583c2a 100644
+>> --- a/hw/arm/xlnx-zynqmp.c
+>> +++ b/hw/arm/xlnx-zynqmp.c
+>> @@ -50,6 +50,9 @@
+>>  #define DPDMA_ADDR          0xfd4c0000
+>>  #define DPDMA_IRQ           116
+>>
+>> +#define RTC_ADDR            0xffa60000
+>> +#define RTC_IRQ             26
+>> +
+>>  static const uint64_t gem_addr[XLNX_ZYNQMP_NUM_GEMS] =3D {
+>>      0xFF0B0000, 0xFF0C0000, 0xFF0D0000, 0xFF0E0000,
+>>  };
+>> @@ -183,6 +186,9 @@ static void xlnx_zynqmp_init(Object *obj)
+>>
+>>      object_initialize(&s->dpdma, sizeof(s->dpdma), TYPE_XLNX_DPDMA);
+>>      qdev_set_parent_bus(DEVICE(&s->dpdma), sysbus_get_default());
+>> +
+>> +    object_initialize(&s->rtc, sizeof(s->rtc), TYPE_XLNX_ZYNQMP_RTC);
+>
+> While here:
+>
+>     object_property_add_child(obj, "rtc", OBJECT(&s->rtc), NULL);
 
-On Tue, Jan 09, 2018 at 01:45:12PM -0200, Eduardo Habkost wrote:
-> This series adds support for the new IA32_SPEC_CTRL MSR on Intel
-> CPU models.  The new MSR and the spec-ctrl CPUID bit
-> (CPUID[EAX=7,ECX=0].EDX[bit 26]) were introduced by a recent
-> Intel microcode updated and can be used by OSes to mitigate
-> CVE-2017-5715.
-> 
-> It also adds a new EPYC-IBPB CPU model that includes
-> CPUID[0x80000008].EBX[bit 12] (IBPB).  That patch is a RFC
-> because I couldn't find any detailed info on the new CPUID bit
-> and the IA32_PRED_CMD MSR.
-> 
-> Additionally, the last patch on this series changes the new
-> Westmere-IBRS, SandyBridge-IBRS and IvyBridge-IBRS to include the
-> PCID feature, because PCID helps to reduce the performance impact
-> of KPTI on the guest.  The patch is also a RFC because we need to
-> confirm if all Westmere (and newer) CPUs out there have PCID
-> available.
-> 
-> References:
-> * https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2017-5715
-> * Google Security Blog on Meltdown/Spectre mitigations:
->   https://security.googleblog.com/2018/01/more-details-about-mitigations-for-cpu_4.html
-> * Kernel patches to make use of the new MSRs:
->   https://www.mail-archive.com/linux-kernel@vger.kernel.org/msg1578798.html
-> * KVM kernel patches for the new CPUID bits and MSRs:
->   https://www.mail-archive.com/linux-kernel@vger.kernel.org/msg1580363.html
-> * Patches adding PCID to the existing CPU models:
->   https://patchew.org/QEMU/20180108205052.24385-1-vincent@bernat.im
->   https://patchew.org/QEMU/20180109070112.30806-1-vincent@bernat.im
-> 
-> Eduardo Habkost (6):
->   i386: Change X86CPUDefinition::model_id to const char*
->   i386: Add spec-ctrl CPUID bit
->   i386: Add FEAT_8000_0008_EBX CPUID feature word
->   i386: Add new -IBRS versions of Intel CPU models
->   [RFC] i386: Add EPYC-IBPB CPU model
->   [RFC] i386: Add PCID to {Westmere,SandyBridge,IvyBridge}-IBRS
-> 
-> Paolo Bonzini (1):
->   i386: Add support for SPEC_CTRL MSR
-> 
->  target/i386/cpu.h     |   7 +
->  target/i386/cpu.c     | 454 +++++++++++++++++++++++++++++++++++++++++++++++++-
->  target/i386/kvm.c     |  14 ++
->  target/i386/machine.c |  20 +++
->  4 files changed, 491 insertions(+), 4 deletions(-)
-> 
-> -- 
-> 2.14.3
-> 
-> 
+I don't understand why this is needed?
 
--- 
-Eduardo
+Alistair
+
+>
+> Anyway:
+> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+>
+>> +    qdev_set_parent_bus(DEVICE(&s->rtc), sysbus_get_default());
+>>  }
+>>
+>>  static void xlnx_zynqmp_realize(DeviceState *dev, Error **errp)
+>> @@ -454,6 +460,14 @@ static void xlnx_zynqmp_realize(DeviceState *dev, E=
+rror **errp)
+>>                               &error_abort);
+>>      sysbus_mmio_map(SYS_BUS_DEVICE(&s->dpdma), 0, DPDMA_ADDR);
+>>      sysbus_connect_irq(SYS_BUS_DEVICE(&s->dpdma), 0, gic_spi[DPDMA_IRQ]=
+);
+>> +
+>> +    object_property_set_bool(OBJECT(&s->rtc), true, "realized", &err);
+>> +    if (err) {
+>> +        error_propagate(errp, err);
+>> +        return;
+>> +    }
+>> +    sysbus_mmio_map(SYS_BUS_DEVICE(&s->rtc), 0, RTC_ADDR);
+>> +    sysbus_connect_irq(SYS_BUS_DEVICE(&s->rtc), 0, gic_spi[RTC_IRQ]);
+>>  }
+>>
+>>  static Property xlnx_zynqmp_props[] =3D {
+>> diff --git a/include/hw/arm/xlnx-zynqmp.h b/include/hw/arm/xlnx-zynqmp.h
+>> index 3e6fb9b7bd..9e8c9e18dd 100644
+>> --- a/include/hw/arm/xlnx-zynqmp.h
+>> +++ b/include/hw/arm/xlnx-zynqmp.h
+>> @@ -28,6 +28,7 @@
+>>  #include "hw/ssi/xilinx_spips.h"
+>>  #include "hw/dma/xlnx_dpdma.h"
+>>  #include "hw/display/xlnx_dp.h"
+>> +#include "hw/timer/xlnx-zynqmp-rtc.h"
+>>
+>>  #define TYPE_XLNX_ZYNQMP "xlnx,zynqmp"
+>>  #define XLNX_ZYNQMP(obj) OBJECT_CHECK(XlnxZynqMPState, (obj), \
+>> @@ -90,6 +91,7 @@ typedef struct XlnxZynqMPState {
+>>      XlnxZynqMPQSPIPS qspi;
+>>      XlnxDPState dp;
+>>      XlnxDPDMAState dpdma;
+>> +    XlnxZynqMPRTC rtc;
+>>
+>>      char *boot_cpu;
+>>      ARMCPU *boot_cpu_ptr;
+>>
