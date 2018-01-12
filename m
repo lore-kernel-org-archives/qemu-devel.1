@@ -1,42 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48800)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53216)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1ea5kn-00018C-SG
-	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 15:16:43 -0500
+	(envelope-from <alistair23@gmail.com>) id 1ea655-0006ub-NX
+	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 15:37:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1ea5kk-0004sH-II
-	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 15:16:41 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:42230
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanb@linux.vnet.ibm.com>)
-	id 1ea5kk-0004rz-Ac
-	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 15:16:38 -0500
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w0CKENDx116390
-	for <qemu-devel@nongnu.org>; Fri, 12 Jan 2018 15:16:37 -0500
-Received: from e15.ny.us.ibm.com (e15.ny.us.ibm.com [129.33.205.205])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2feyqm4e2t-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 12 Jan 2018 15:16:36 -0500
-Received: from localhost
-	by e15.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <stefanb@linux.vnet.ibm.com>;
-	Fri, 12 Jan 2018 15:16:36 -0500
-References: <1515609318-1897-1-git-send-email-stefanb@linux.vnet.ibm.com>
-	<1515609318-1897-4-git-send-email-stefanb@linux.vnet.ibm.com>
-	<1bc0d808-a29e-03de-2a37-e2585c54385f@linux.vnet.ibm.com>
-	<CAJ+F1CK4umAVmPvPLunjXf10UcL_gVqENgu94eO17h82BPQzRA@mail.gmail.com>
-From: Stefan Berger <stefanb@linux.vnet.ibm.com>
-Date: Fri, 12 Jan 2018 15:16:32 -0500
+	(envelope-from <alistair23@gmail.com>) id 1ea654-00057k-I7
+	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 15:37:39 -0500
+Received: from mail-wm0-x243.google.com ([2a00:1450:400c:c09::243]:39571)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
+	id 1ea654-00057a-8N
+	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 15:37:38 -0500
+Received: by mail-wm0-x243.google.com with SMTP id i11so14087423wmf.4
+	for <qemu-devel@nongnu.org>; Fri, 12 Jan 2018 12:37:38 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <CAJ+F1CK4umAVmPvPLunjXf10UcL_gVqENgu94eO17h82BPQzRA@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Message-Id: <adb2b9e0-43b6-85fa-9832-f29b9d7b391d@linux.vnet.ibm.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC PATCH 3/3] acpi: Build TPM Physical Presence
- interface
+In-Reply-To: <20171005143601.21584-4-richard.henderson@linaro.org>
+References: <20171005143601.21584-1-richard.henderson@linaro.org>
+	<20171005143601.21584-4-richard.henderson@linaro.org>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Fri, 12 Jan 2018 12:37:06 -0800
+Message-ID: <CAKmqyKPTE7B=zw_M+PABmywo6hR=N6GEbgJpf=2pK3viS6cSfw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v2 3/4] linux-user: Tidy and enforce
+ reserved_va initialization
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -45,523 +30,169 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@gmail.com>
-Cc: QEMU <qemu-devel@nongnu.org>, kevin@koconnor.net, "Michael S. Tsirkin" <mst@redhat.com>, Laszlo Ersek <lersek@redhat.com>, Igor Mammedov <imammedo@redhat.com>
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, riku.voipio@iki.fi, Richard Henderson <rth@twiddle.net>
 
-On 01/12/2018 11:07 AM, Marc-Andr=C3=A9 Lureau wrote:
-> Hi
+On Thu, Oct 5, 2017 at 7:36 AM, Richard Henderson
+<richard.henderson@linaro.org> wrote:
+> From: Richard Henderson <rth@twiddle.net>
 >
-> On Wed, Jan 10, 2018 at 7:49 PM, Stefan Berger
-> <stefanb@linux.vnet.ibm.com> wrote:
->> On 01/10/2018 01:35 PM, Stefan Berger wrote:
->>> The TPM Physical Presence interface consists of an ACPI part, a share=
-d
->>> memory part, and code in the firmware. Users can send messages to the
->>> firmware by writing a code into the shared memory through invoking th=
-e
->>> ACPI code. When a reboot happens, the firmware looks for the code and
->>> acts on it by sending sequences of commands to the TPM.
->>>
->>> This patch adds the ACPI code. It is similar to the one in EDK2 but
->>> doesn't
->>> assume that SMIs are necessary to use. Besides that it tests the code
->>> entered by the user and checks whether it is supported. The range of =
-codes
->>> supported matches the range of codes supported in SeaBIOS. It uses th=
-e
->>> same
->>> datastructure for the shared memory as EDK2 does so that EDK2 and Sea=
-BIOS
->>> could both make use of the shared memory.
->>>
->>> The underlying TCG specification is accessible from the following pag=
-e.
->>>
->>>
->>> https://trustedcomputinggroup.org/tcg-physical-presence-interface-spe=
-cification/
->>>
->>> This patch implements version 1.20.
->>
->> The below ACPI code is partly a translation to C from a previous poste=
-d
->> patch:
->>
->> https://lists.gnu.org/archive/html/qemu-devel/2015-05/msg05353.html
->>
->>
-> And fwiw, this is the acpi dump disassembled:
+> We had a check using TARGET_VIRT_ADDR_SPACE_BITS to make sure
+> that the allocation coming in from the command-line option was
+> not too large, but that didn't include target-specific knowledge
+> about other restrictions on user-space.
 >
->              Device (ISA.TPM)
->              {
->                  Name (_HID, EisaId ("PNP0C31"))  // _HID: Hardware ID
->                  Name (_STA, 0x0F)  // _STA: Status
->                  Name (_CRS, ResourceTemplate ()  // _CRS: Current
-> Resource Settings
->                  {
->                      Memory32Fixed (ReadWrite,
->                          0xFED40000,         // Address Base
->                          0x00005000,         // Address Length
->                          )
->                  })
->                  OperationRegion (TPPI, SystemMemory, 0xFFFF0000, 0x31)
->                  Field (TPPI, AnyAcc, NoLock, Preserve)
->                  {
->                      PPIN,   8,
->                      PPIP,   32,
->                      PPRP,   32,
->                      PPRQ,   32,
->                      PPRM,   32,
->                      LPPR,   32,
->                      FRET,   32,
->                      RES1,   8,
->                      RES2,   128,
->                      FAIL,   32
->                  }
+> Remove several target-specific hacks in linux-user/main.c.
 >
->                  Method (WRAM, 2, Serialized)
->                  {
->                      PPRQ =3D Arg0
->                      PPRM =3D Arg1
->                      Return (Zero)
->                  }
+> For MIPS and Nios, we can replace them with proper adjustments
+> to the respective target's TARGET_VIRT_ADDR_SPACE_BITS definition.
 >
->                  Method (CKOP, 1, NotSerialized)
->                  {
->                      If ((Arg0 =3D=3D Zero))
->                      {
->                          Return (One)
->                      }
+> For ARM, we had no existing ifdef but I suspect that the current
+> default value of 0xf7000000 was chosen with this in mind.  Define
+> a workable value in linux-user/arm/, and also document why the
+> special case is required.
 >
->                      Return (Zero)
->                  }
->
->                  Method (_DSM, 4, Serialized)  // _DSM: Device-Specific=
- Method
->                  {
->                      If ((Arg0 =3D=3D ToUUID
-> ("3dddfaa6-361b-4eb4-a424-8d10089d1653") /* Physical Presence
-> Interface */))
->                      {
->                          Local0 =3D ToInteger (Arg2)
->                          If ((Local0 =3D=3D Zero))
->                          {
->                              Return (Buffer (0x02)
->                              {
->                                   0xFF, 0x01
->             // ..
->                              })
->                          }
->
->                          If ((Local0 =3D=3D One))
->                          {
->                              Return ("1.2")
->                          }
->
->                          If ((Local0 =3D=3D 0x02))
->                          {
->                              Local0 =3D DerefOf (Arg3 [Zero])
->                              If (CKOP (Local0))
->                              {
->                                  Return (WRAM (Local0, Zero))
->                              }
->
->                              Return (One)
->                          }
->
->                          If ((Local0 =3D=3D 0x03))
->                          {
->                              Return (Package (0x02)
->                              {
->                                  Zero,
->                                  PPRQ
->                              })
->                          }
->
->                          If ((Local0 =3D=3D 0x04))
->                          {
->                              Return (0x02)
->                          }
->
->                          If ((Local0 =3D=3D 0x05))
->                          {
->                              Return (Package (0x03)
->                              {
->                                  FAIL,
->                                  LPPR,
->                                  PPRP
->                              })
->                          }
->
->                          If ((Local0 =3D=3D 0x06))
->                          {
->                              Return (0x03)
->                          }
->
->                          If ((Local0 =3D=3D 0x07))
->                          {
->                              Local0 =3D DerefOf (Arg3 [Zero])
->                              If (CKOP (Local0))
->                              {
->                                  Local1 =3D WRAM (Local0, Zero)
->                                  Return (Local1)
->                              }
->
->                              Return (One)
->                          }
->
->                          If ((Local0 =3D=3D 0x08))
->                          {
->                              Local0 =3D DerefOf (Arg3 [Zero])
->                              If (CKOP (Local0))
->                              {
->                                  Return (0x04)
->                              }
->
->                              Return (Zero)
->                          }
->
->                          Return (Buffer (One)
->                          {
->                               0x00
->         // .
->                          })
->                      }
->                  }
->
-> Linux PPI driver seems to be happy about it, looking at
-> /sys/devices/pnp0/00\:06/tpm/tpm0/ppi/.
->
-> I haven't done further testing. Is there anything using this on Linux?
-> tpm2-tools doesn't seem to use it. I suppose I should be able to write
-> something to /sys/devices/pnp0/00\:06/tpm/tpm0/ppi/request.
->
-> Any help appreciated :)
->
->>     Stefan
->>
->>> Signed-off-by: Stefan Berger <stefanb@linux.vnet.ibm.com>
->>> ---
->>>    hw/i386/acpi-build.c  | 227
->>> ++++++++++++++++++++++++++++++++++++++++++++++++++
->>>    include/hw/acpi/tpm.h |  15 ++++
->>>    2 files changed, 242 insertions(+)
->>>
->>> diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
->>> index 18b939e..e3905a3 100644
->>> --- a/hw/i386/acpi-build.c
->>> +++ b/hw/i386/acpi-build.c
->>> @@ -42,6 +42,7 @@
->>>    #include "hw/acpi/memory_hotplug.h"
->>>    #include "sysemu/tpm.h"
->>>    #include "hw/acpi/tpm.h"
->>> +#include "hw/tpm/tpm_ppi.h"
->>>    #include "hw/acpi/vmgenid.h"
->>>    #include "sysemu/tpm_backend.h"
->>>    #include "hw/timer/mc146818rtc_regs.h"
->>> @@ -1860,6 +1861,231 @@ static Aml *build_q35_osc_method(void)
->>>    }
->>>
->>>    static void
->>> +build_tpm_ppi(Aml *dev, TPMVersion tpm_version)
->>> +{
->>> +    Aml *method, *field, *ifctx, *ifctx2, *ifctx3, *pak;
->>> +
->>> +    aml_append(dev,
->>> +               aml_operation_region("TPPI", AML_SYSTEM_MEMORY,
->>> +                                    aml_int(TPM_PPI_ADDR_BASE),
->>> +                                    TPM_PPI_STRUCT_SIZE));
->>> +
->>> +    field =3D aml_field("TPPI", AML_ANY_ACC, AML_NOLOCK, AML_PRESERV=
-E);
->>> +    aml_append(field, aml_named_field("PPIN",
->>> +               sizeof(uint8_t) * BITS_PER_BYTE));
->>> +    aml_append(field, aml_named_field("PPIP",
->>> +               sizeof(uint32_t) * BITS_PER_BYTE));
->>> +    aml_append(field, aml_named_field("PPRP",
->>> +               sizeof(uint32_t) * BITS_PER_BYTE));
->>> +    aml_append(field, aml_named_field("PPRQ",
->>> +               sizeof(uint32_t) * BITS_PER_BYTE));
->>> +    aml_append(field, aml_named_field("PPRM",
->>> +               sizeof(uint32_t) * BITS_PER_BYTE));
->>> +    aml_append(field, aml_named_field("LPPR",
->>> +               sizeof(uint32_t) * BITS_PER_BYTE));
->>> +    aml_append(field, aml_named_field("FRET",
->>> +               sizeof(uint32_t) * BITS_PER_BYTE));
->>> +    aml_append(field, aml_named_field("RES1",
->>> +               sizeof(uint8_t) * BITS_PER_BYTE));
->>> +    aml_append(field, aml_named_field("RES2",
->>> +               sizeof(uint32_t) * BITS_PER_BYTE * 4));
->>> +    aml_append(field, aml_named_field("FAIL",
->>> +               sizeof(uint32_t) * BITS_PER_BYTE));
->>> +    aml_append(dev, field);
->>> +
->>> +    /*
->>> +     * Write the given operations code into 'PPRQ'.
->>> +     */
->>> +    method =3D aml_method("WRAM", 2, AML_SERIALIZED);
->>> +    {
->>> +        aml_append(method, aml_store(aml_arg(0), aml_name("PPRQ")));
->>> +        aml_append(method, aml_store(aml_arg(1), aml_name("PPRM")));
->>> +        /* 0 =3D Success */
->>> +        aml_append(method, aml_return(aml_int(0)));
->>> +    }
->>> +    aml_append(dev, method);
->>> +
->>> +    /*
->>> +     * CKOP: Check whether the opcode is valid
->>> +     */
->>> +    if (tpm_version =3D=3D TPM_VERSION_1_2) {
->>> +        method =3D aml_method("CKOP", 1, AML_NOTSERIALIZED);
->>> +        {
->>> +            ifctx =3D aml_if(
->>> +                      aml_or(
->>> +                        aml_or(
->>> +                          aml_and(
->>> +                            aml_lgreater_equal(aml_arg(0), aml_int(0=
-)),
->>> +                            aml_lless_equal(aml_arg(0), aml_int(11))=
-,
->>> +                            NULL
->>> +                          ),
->>> +                          aml_equal(aml_arg(0), aml_int(14)),
->>> +                          NULL
->>> +                        ),
->>> +                        aml_and(
->>> +                          aml_lgreater_equal(aml_arg(0), aml_int(21)=
-),
->>> +                          aml_lless_equal(aml_arg(0), aml_int(22)),
->>> +                          NULL
->>> +                       ),
->>> +                       NULL
->>> +                      )
->>> +                    );
->>> +            {
->>> +                aml_append(ifctx, aml_return(aml_int(1)));
->>> +            }
->>> +            aml_append(method, ifctx);
->>> +
->>> +            aml_append(method, aml_return(aml_int(0)));
->>> +        }
->>> +    } else {
->>> +        method =3D aml_method("CKOP", 1, AML_NOTSERIALIZED);
->>> +        {
->>> +            ifctx =3D aml_if(
->>> +                      aml_equal(aml_arg(0), aml_int(0))
->>> +                    );
->>> +            {
->>> +                aml_append(ifctx, aml_return(aml_int(1)));
->>> +            }
->>> +            aml_append(method, ifctx);
->>> +
->>> +            aml_append(method, aml_return(aml_int(0)));
->>> +        }
->>> +    }
->>> +    aml_append(dev, method);
->>> +
+> Signed-off-by: Richard Henderson <rth@twiddle.net>
+> Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+> Message-Id: <20170708025030.15845-3-rth@twiddle.net>
 
+Hey,
 
-CKOP checks whether the firmware implements a certain code. Function 8=20
-returns a number 0 - 4 for a certain code, 0 meaning 'Not implemented'.=20
-Maybe the firmware should fill an array and put the numbers in that=20
-function 8 expects and CKOP can use that also to see whether functions=20
-are supported. That may 'loosen' the ACPI a bit from the firmware.
+I just had the arduous task of bisecting QEMU 2.10 and 2.11 to figure
+out that somehow this patch causes the Yocto webkitgtk build for x86
+to hang.
 
-Comments? Is that better than hard coding in the ACPI what the firmware=20
-supports?
+Any ideas?
 
-specs:=20
-https://trustedcomputinggroup.org/wp-content/uploads/Physical_Presence_In=
-terface_1-20_0-100.pdf
+My host is 64-bit x86 and I'm building for 32-bit x86. I'm going to
+test now to see if I see the same hang building for 64-bit. I am not
+sure yet where QEMU usermode is used, but apparently it is.
 
+Thanks,
+Alistair
 
->>> +    method =3D aml_method("_DSM", 4, AML_SERIALIZED);
->>> +    {
->>> +        uint8_t zerobyte[1] =3D { 0 };
->>> +
->>> +        ifctx =3D aml_if(
->>> +                  aml_equal(aml_arg(0),
->>> +
->>> aml_touuid("3DDDFAA6-361B-4EB4-A424-8D10089D1653"))
->>> +                );
->>> +        {
->>> +            aml_append(ifctx,
->>> +                       aml_store(aml_to_integer(aml_arg(2)),
->>> aml_local(0)));
->>> +
->>> +            /* standard DSM query function */
->>> +            ifctx2 =3D aml_if(aml_equal(aml_local(0), aml_int(0)));
->>> +            {
->>> +                uint8_t byte_list[2] =3D { 0xff, 0x01 };
->>> +                aml_append(ifctx2, aml_return(aml_buffer(2, byte_lis=
-t)));
->>> +            }
->>> +            aml_append(ifctx, ifctx2);
->>> +
->>> +            /* interface version: 1.2 */
->>> +            ifctx2 =3D aml_if(aml_equal(aml_local(0), aml_int(1)));
->>> +            {
->>> +                aml_append(ifctx2, aml_return(aml_string("1.2")));
->>> +            }
->>> +            aml_append(ifctx, ifctx2);
->>> +
->>> +            /* submit TPM operation */
->>> +            ifctx2 =3D aml_if(aml_equal(aml_local(0), aml_int(2)));
->>> +            {
->>> +                aml_append(ifctx2,
->>> +                           aml_store(aml_derefof(aml_index(aml_arg(3=
-),
->>> +                                                           aml_int(0=
-))),
->>> +                                     aml_local(0)));
->>> +                ifctx3 =3D aml_if(aml_call1("CKOP", aml_local(0)));
->>> +                {
->>> +                    aml_append(ifctx3,
->>> +                               aml_return(aml_call2("WRAM",
->>> +                                                    aml_local(0),
->>> +                                                    aml_int(0))));
->>> +                }
->>> +                aml_append(ifctx2, ifctx3);
->>> +                aml_append(ifctx2, aml_return(aml_int(1)));
->>> +            }
->>> +            aml_append(ifctx, ifctx2);
->>> +
->>> +            /* get pending TPM operation */
->>> +            ifctx2 =3D aml_if(aml_equal(aml_local(0), aml_int(3)));
->>> +            {
->>> +                pak =3D aml_package(2);
->>> +                aml_append(pak, aml_int(0));
->>> +                aml_append(pak, aml_name("PPRQ"));
->>> +                aml_append(ifctx2, aml_return(pak));
->>> +            }
->>> +            aml_append(ifctx, ifctx2);
->>> +
->>> +            /* get platform-specific action to transition to pre-OS =
-env.
->>> */
->>> +            ifctx2 =3D aml_if(aml_equal(aml_local(0), aml_int(4)));
->>> +            {
->>> +                /* 2 =3D reboot */
->>> +                aml_append(ifctx2, aml_return(aml_int(2)));
->>> +            }
->>> +            aml_append(ifctx, ifctx2);
->>> +
->>> +            /* get TPM operation response */
->>> +            ifctx2 =3D aml_if(aml_equal(aml_local(0), aml_int(5)));
->>> +            {
->>> +                pak =3D aml_package(3);
->>> +
->>> +                aml_append(pak, aml_name("FAIL"));
->>> +                aml_append(pak, aml_name("LPPR"));
->>> +                aml_append(pak, aml_name("PPRP"));
->>> +
->>> +                aml_append(ifctx2, aml_return(pak));
->>> +            }
->>> +            aml_append(ifctx, ifctx2);
->>> +
->>> +            /* submit preferred user language */
->>> +            ifctx2 =3D aml_if(aml_equal(aml_local(0), aml_int(6)));
->>> +            {
->>> +                /* 3 =3D not implemented */
->>> +                aml_append(ifctx2, aml_return(aml_int(3)));
->>> +            }
->>> +            aml_append(ifctx, ifctx2);
->>> +
->>> +            /* submit TPM operation v2 */
->>> +            ifctx2 =3D aml_if(aml_equal(aml_local(0), aml_int(7)));
->>> +            {
->>> +                aml_append(ifctx2,
->>> +                           aml_store(aml_derefof(aml_index(aml_arg(3=
-),
->>> +                                                           aml_int(0=
-))),
->>> +                                     aml_local(0)));
->>> +                ifctx3 =3D aml_if(aml_call1("CKOP", aml_local(0)));
->>> +                {
->>> +                    aml_append(ifctx3,
->>> +                               aml_store(aml_call2("WRAM",
->>> +                                                   aml_local(0),
->>> +                                                   aml_int(0)),
->>> +                                         aml_local(1)));
->>> +                    aml_append(ifctx3, aml_return(aml_local(1)));
->>> +                }
->>> +                aml_append(ifctx2, ifctx3);
->>> +                /* 1 =3D requested operation not implemented */
->>> +                aml_append(ifctx2, aml_return(aml_int(1)));
->>> +            }
->>> +            aml_append(ifctx, ifctx2);
->>> +
->>> +            /* get user confirmation status for operation */
->>> +            ifctx2 =3D aml_if(aml_equal(aml_local(0), aml_int(8)));
->>> +            {
->>> +                aml_append(ifctx2,
->>> +                           aml_store(aml_derefof(aml_index(aml_arg(3=
-),
->>> +                                                           aml_int(0=
-))),
->>> +                                     aml_local(0)));
->>> +                ifctx3 =3D aml_if(aml_call1("CKOP", aml_local(0)));
->>> +                {
->>> +                    /* 4 =3D Allowed and physically present user not
->>> required */
->>> +                    aml_append(ifctx3, aml_return(aml_int(4)));
->>> +                }
->>> +                aml_append(ifctx2, ifctx3);
->>> +                /* 0 =3D requested operation not implemented */
->>> +                aml_append(ifctx2, aml_return(aml_int(0)));
->>> +            }
->>> +            aml_append(ifctx, ifctx2);
->>> +
->>> +            aml_append(ifctx, aml_return(aml_buffer(1, zerobyte)));
->>> +        }
->>> +        aml_append(method, ifctx);
->>> +    }
->>> +    aml_append(dev, method);
->>> +}
->>> +
->>> +static void
->>>    build_dsdt(GArray *table_data, BIOSLinker *linker,
->>>               AcpiPmInfo *pm, AcpiMiscInfo *misc,
->>>               Range *pci_hole, Range *pci_hole64, MachineState *machi=
-ne)
->>> @@ -2218,6 +2444,7 @@ build_dsdt(GArray *table_data, BIOSLinker *link=
-er,
->>>                     */
->>>                    /* aml_append(crs, aml_irq_no_flags(TPM_TIS_IRQ));=
- */
->>>                    aml_append(dev, aml_name_decl("_CRS", crs));
->>> +                build_tpm_ppi(dev, misc->tpm_version);
->>>                    aml_append(scope, dev);
->>>                }
->>>
->>> diff --git a/include/hw/acpi/tpm.h b/include/hw/acpi/tpm.h
->>> index d9b7452..23f5da1 100644
->>> --- a/include/hw/acpi/tpm.h
->>> +++ b/include/hw/acpi/tpm.h
->>> @@ -37,4 +37,19 @@
->>>    #define TPM_PPI_ADDR_SIZE           0x100
->>>    #define TPM_PPI_ADDR_BASE           0xffff0000
->>>
->>> +struct tpm_ppi {
->>> +    uint8_t ppin;            /* set by BIOS; currently initializatio=
-n
->>> flag */
->>> +    uint32_t ppip;           /* set by ACPI; not used */
->>> +    uint32_t pprp;           /* response from TPM; set by BIOS */
->>> +    uint32_t pprq;           /* opcode; set by ACPI */
->>> +    uint32_t pprm;           /* parameter for opcode; set by ACPI */
->>> +    uint32_t lppr;           /* last opcode; set by BIOS */
->>> +    uint32_t fret;           /* set by ACPI; not used*/
->>> +    uint32_t res1;           /* reserved */
->>> +    uint32_t res2[4];        /* reserved */
->>> +    uint32_t fail;           /* set by BIOS (0 =3D success) */
->>> +} QEMU_PACKED;
->>> +
->>> +#define TPM_PPI_STRUCT_SIZE  sizeof(struct tpm_ppi)
->>> +
->>>    #endif /* HW_ACPI_TPM_H */
->>
->>
->>
-> otherwise, patch looks good.
+> ---
+>  linux-user/arm/target_cpu.h |  4 ++++
+>  target/mips/mips-defs.h     |  6 +++++-
+>  target/nios2/cpu.h          |  6 +++++-
+>  linux-user/main.c           | 38 +++++++++++++++++++++++++-------------
+>  4 files changed, 39 insertions(+), 15 deletions(-)
+>
+> diff --git a/linux-user/arm/target_cpu.h b/linux-user/arm/target_cpu.h
+> index d888219150..c3eb4b243d 100644
+> --- a/linux-user/arm/target_cpu.h
+> +++ b/linux-user/arm/target_cpu.h
+> @@ -19,6 +19,10 @@
+>  #ifndef ARM_TARGET_CPU_H
+>  #define ARM_TARGET_CPU_H
+>
+> +/* We need to be able to map the commpage.
+> +   See validate_guest_space in linux-user/elfload.c.  */
+> +#define MAX_RESERVED_VA  0xffff0000ul
+> +
+>  static inline void cpu_clone_regs(CPUARMState *env, target_ulong newsp)
+>  {
+>      if (newsp) {
+> diff --git a/target/mips/mips-defs.h b/target/mips/mips-defs.h
+> index 047554ee45..d239069975 100644
+> --- a/target/mips/mips-defs.h
+> +++ b/target/mips/mips-defs.h
+> @@ -15,7 +15,11 @@
+>  #else
+>  #define TARGET_LONG_BITS 32
+>  #define TARGET_PHYS_ADDR_SPACE_BITS 40
+> -#define TARGET_VIRT_ADDR_SPACE_BITS 32
+> +# ifdef CONFIG_USER_ONLY
+> +#  define TARGET_VIRT_ADDR_SPACE_BITS 31
+> +# else
+> +#  define TARGET_VIRT_ADDR_SPACE_BITS 32
+> +#endif
+>  #endif
+>
+>  /* Masks used to mark instructions to indicate which ISA level they
+> diff --git a/target/nios2/cpu.h b/target/nios2/cpu.h
+> index 50d803a217..9119eee587 100644
+> --- a/target/nios2/cpu.h
+> +++ b/target/nios2/cpu.h
+> @@ -226,7 +226,11 @@ qemu_irq *nios2_cpu_pic_init(Nios2CPU *cpu);
+>  void nios2_check_interrupts(CPUNios2State *env);
+>
+>  #define TARGET_PHYS_ADDR_SPACE_BITS 32
+> -#define TARGET_VIRT_ADDR_SPACE_BITS 32
+> +#ifdef CONFIG_USER_ONLY
+> +# define TARGET_VIRT_ADDR_SPACE_BITS 31
+> +#else
+> +# define TARGET_VIRT_ADDR_SPACE_BITS 32
+> +#endif
+>
+>  #define cpu_init(cpu_model) cpu_generic_init(TYPE_NIOS2_CPU, cpu_model)
+>
+> diff --git a/linux-user/main.c b/linux-user/main.c
+> index 829f974662..fd54d344bb 100644
+> --- a/linux-user/main.c
+> +++ b/linux-user/main.c
+> @@ -60,23 +60,38 @@ do {                                                                    \
+>      }                                                                   \
+>  } while (0)
+>
+> -#if (TARGET_LONG_BITS == 32) && (HOST_LONG_BITS == 64)
+>  /*
+>   * When running 32-on-64 we should make sure we can fit all of the possible
+>   * guest address space into a contiguous chunk of virtual host memory.
+>   *
+>   * This way we will never overlap with our own libraries or binaries or stack
+>   * or anything else that QEMU maps.
+> + *
+> + * Many cpus reserve the high bit (or more than one for some 64-bit cpus)
+> + * of the address for the kernel.  Some cpus rely on this and user space
+> + * uses the high bit(s) for pointer tagging and the like.  For them, we
+> + * must preserve the expected address space.
+>   */
+> -# if defined(TARGET_MIPS) || defined(TARGET_NIOS2)
+> -/*
+> - * MIPS only supports 31 bits of virtual address space for user space.
+> - * Nios2 also only supports 31 bits.
+> - */
+> -unsigned long reserved_va = 0x77000000;
+> +#ifndef MAX_RESERVED_VA
+> +# if HOST_LONG_BITS > TARGET_VIRT_ADDR_SPACE_BITS
+> +#  if TARGET_VIRT_ADDR_SPACE_BITS == 32 && \
+> +      (TARGET_LONG_BITS == 32 || defined(TARGET_ABI32))
+> +/* There are a number of places where we assign reserved_va to a variable
+> +   of type abi_ulong and expect it to fit.  Avoid the last page.  */
+> +#   define MAX_RESERVED_VA  (0xfffffffful & TARGET_PAGE_MASK)
+> +#  else
+> +#   define MAX_RESERVED_VA  (1ul << TARGET_VIRT_ADDR_SPACE_BITS)
+> +#  endif
+>  # else
+> -unsigned long reserved_va = 0xf7000000;
+> +#  define MAX_RESERVED_VA  0
+>  # endif
+> +#endif
+> +
+> +/* That said, reserving *too* much vm space via mmap can run into problems
+> +   with rlimits, oom due to page table creation, etc.  We will still try it,
+> +   if directed by the command-line option, but not by default.  */
+> +#if HOST_LONG_BITS == 64 && TARGET_VIRT_ADDR_SPACE_BITS <= 32
+> +unsigned long reserved_va = MAX_RESERVED_VA;
+>  #else
+>  unsigned long reserved_va;
+>  #endif
+> @@ -3978,11 +3993,8 @@ static void handle_arg_reserved_va(const char *arg)
+>          unsigned long unshifted = reserved_va;
+>          p++;
+>          reserved_va <<= shift;
+> -        if (((reserved_va >> shift) != unshifted)
+> -#if HOST_LONG_BITS > TARGET_VIRT_ADDR_SPACE_BITS
+> -            || (reserved_va > (1ul << TARGET_VIRT_ADDR_SPACE_BITS))
+> -#endif
+> -            ) {
+> +        if (reserved_va >> shift != unshifted
+> +            || (MAX_RESERVED_VA && reserved_va > MAX_RESERVED_VA)) {
+>              fprintf(stderr, "Reserved virtual address too big\n");
+>              exit(EXIT_FAILURE);
+>          }
+> --
+> 2.13.6
+>
 >
