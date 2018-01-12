@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53765)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55598)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1eZvci-0001W9-De
-	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 04:27:43 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1eZvhq-0003eZ-6b
+	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 04:32:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1eZvcf-0003DI-2p
-	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 04:27:40 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:47208)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1eZvce-0003BU-Mg
-	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 04:27:36 -0500
-Date: Fri, 12 Jan 2018 17:27:28 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20180112092728.GP2551@xz-mi>
-References: <20171205065307.21853-1-peterx@redhat.com>
-	<20180111165930.GE2669@work-vm>
+	(envelope-from <pbonzini@redhat.com>) id 1eZvhn-0006nd-1O
+	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 04:32:58 -0500
+Received: from mail-wm0-f42.google.com ([74.125.82.42]:39208)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1eZvhm-0006n9-OA
+	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 04:32:54 -0500
+Received: by mail-wm0-f42.google.com with SMTP id i11so10426470wmf.4
+	for <qemu-devel@nongnu.org>; Fri, 12 Jan 2018 01:32:54 -0800 (PST)
+From: Paolo Bonzini <pbonzini@redhat.com>
+References: <20180111082452.27295.85707.stgit@pasha-VirtualBox>
+	<ecc919de-5193-a83c-0e29-4b8d9bc8d7d7@redhat.com>
+Message-ID: <e0cbd675-7872-05c3-8c3e-214ef93e4552@redhat.com>
+Date: Fri, 12 Jan 2018 10:32:50 +0100
 MIME-Version: 1.0
+In-Reply-To: <ecc919de-5193-a83c-0e29-4b8d9bc8d7d7@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20180111165930.GE2669@work-vm>
-Subject: Re: [Qemu-devel] [PATCH v5 00/28] Migration: postcopy failure
- recovery
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [RFC PATCH v3 00/30] replay additions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,187 +30,126 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: qemu-devel@nongnu.org, Andrea Arcangeli <aarcange@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Juan Quintela <quintela@redhat.com>, Alexey Perevalov <a.perevalov@samsung.com>
+To: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, peter.maydell@linaro.org, mst@redhat.com, jasowang@redhat.com, quintela@redhat.com, zuban32s@gmail.com, maria.klimushenkova@ispras.ru, dovgaluk@ispras.ru, kraxel@redhat.com, boost.lists@gmail.com, alex.bennee@linaro.org
 
-On Thu, Jan 11, 2018 at 04:59:32PM +0000, Dr. David Alan Gilbert wrote:
-> * Peter Xu (peterx@redhat.com) wrote:
-> > Tree is pushed here for better reference and testing (online tree
-> > includes monitor OOB series):
-> > 
-> >   https://github.com/xzpeter/qemu/tree/postcopy-recover-all
-> > 
-> > This version removed quite a few patches related to migrate-incoming,
-> > instead I introduced a new command "migrate-recover" to trigger the
-> > recovery channel on destination side to simplify the code.
+On 11/01/2018 13:56, Paolo Bonzini wrote:
+> On 11/01/2018 09:24, Pavel Dovgalyuk wrote:
+>> Accidentally sent draft version of patches to the mailing list.
+>> Please consider this one as the correct one.
+>>
+>> This set of patches includex fixes from Alex Bennée for fixing
+>> BQL and replay locks after inventing the MTTCG. It also includes some
+>> additional replay patches that makes this set of fixes working.
+>> It is also fixes some vmstate creation (and loading) issues
+>> in record/replay modes:
+>>  - VM start/stop fixes in replay mode
+>>  - overlay creation for blkreplay filter
+>>  - fixes for vmstate save/load in record/replay mode
+>>  - fixes for host clock vmstate
+>>  - fixes for icount timers vmstate
+>>
+>> There is also a set of helper scripts written by Alex Bennée
+>> for debugging the record/replay code.
 > 
-> I've got this setup on a couple of my test hosts, and I'm using
-> iptables to try breaking the connection.
-> 
-> See below for where I got stuck.
-> 
-> > To test this two series altogether, please checkout above tree and
-> > build.  Note: to test on small and single host, one need to disable
-> > full bandwidth postcopy migration otherwise it'll complete very fast.
-> > Basically a simple patch like this would help:
-> > 
-> > diff --git a/migration/migration.c b/migration/migration.c
-> > index 4de3b551fe..c0206023d7 100644
-> > --- a/migration/migration.c
-> > +++ b/migration/migration.c
-> > @@ -1904,7 +1904,7 @@ static int postcopy_start(MigrationState *ms, bool *old_vm_running)
-> >       * will notice we're in POSTCOPY_ACTIVE and not actually
-> >       * wrap their state up here
-> >       */
-> > -    qemu_file_set_rate_limit(ms->to_dst_file, INT64_MAX);
-> > +    // qemu_file_set_rate_limit(ms->to_dst_file, INT64_MAX);
-> >      if (migrate_postcopy_ram()) {
-> >          /* Ping just for debugging, helps line traces up */
-> >          qemu_savevm_send_ping(ms->to_dst_file, 2);
-> > 
-> > This patch is included already in above github tree.  Please feel free
-> > to drop this patch when want to test on big machines and between real
-> > hosts.
-> > 
-> > Detailed Test Procedures (QMP only)
-> > ===================================
-> > 
-> > 1. start source QEMU.
-> > 
-> > $qemu -M q35,kernel-irqchip=split -enable-kvm -snapshot \
-> >      -smp 4 -m 1G -qmp stdio \
-> >      -name peter-vm,debug-threads=on \
-> >      -netdev user,id=net0 \
-> >      -device e1000,netdev=net0 \
-> >      -global migration.x-max-bandwidth=4096 \
-> >      -global migration.x-postcopy-ram=on \
-> >      /images/fedora-25.qcow2
-> >
-> > 2. start destination QEMU.
-> > 
-> > $qemu -M q35,kernel-irqchip=split -enable-kvm -snapshot \
-> >      -smp 4 -m 1G -qmp stdio \
-> >      -name peter-vm,debug-threads=on \
-> >      -netdev user,id=net0 \
-> >      -device e1000,netdev=net0 \
-> >      -global migration.x-max-bandwidth=4096 \
-> >      -global migration.x-postcopy-ram=on \
-> >      -incoming tcp:0.0.0.0:5555 \
-> >      /images/fedora-25.qcow2
-> 
-> I'm using:
-> ./x86_64-softmmu/qemu-system-x86_64 -nographic -M pc,accel=kvm -smp 4 -m 16G -drive file=/home/vms/rhel71.qcow2,id=d,cache=none,if=none -device virtio-blk,drive=d -vnc 0:0 -incoming tcp:0:8888 -chardev socket,port=4000,host=0,id=mon,server,nowait,telnet -mon chardev=mon,id=mon,mode=control -nographic -chardev stdio,mux=on,id=monh -mon chardev=monh,mode=readline --device isa-serial,chardev=monh
-> and I've got both the HMP on the stdio, and the QMP via a telnet
-> 
-> > 
-> > 3. On source, do QMP handshake as normal:
-> > 
-> >   {"execute": "qmp_capabilities"}
-> >   {"return": {}}
-> > 
-> > 4. On destination, do QMP handshake to enable OOB:
-> > 
-> >   {"execute": "qmp_capabilities", "arguments": { "enable": [ "oob" ] } }
-> >   {"return": {}}
-> > 
-> > 5. On source, trigger initial migrate command, switch to postcopy:
-> > 
-> >   {"execute": "migrate", "arguments": { "uri": "tcp:localhost:5555" } }
-> >   {"return": {}}
-> >   {"execute": "query-migrate"}
-> >   {"return": {"expected-downtime": 300, "status": "active", ...}}
-> >   {"execute": "migrate-start-postcopy"}
-> >   {"return": {}}
-> >   {"timestamp": {"seconds": 1512454728, "microseconds": 768096}, "event": "STOP"}
-> >   {"execute": "query-migrate"}
-> >   {"return": {"expected-downtime": 44472, "status": "postcopy-active", ...}}
-> > 
-> > 6. On source, manually trigger a "fake network down" using
-> >    "migrate-cancel" command:
-> > 
-> >   {"execute": "migrate_cancel"}
-> >   {"return": {}}
-> 
-> Before I do that, I'm breaking the network connection by running on the
-> source:
-> iptables -A INPUT -p tcp --source-port 8888 -j DROP
-> iptables -A INPUT -p tcp --destination-port 8888 -j DROP
+> For now, I'm applying patches 13, 24-26 and 28.
 
-This is tricky... I think tcp keepalive may help, but for sure I
-think we do need a way to cancel the migration on both side.  Please
-see below comment.
+Which don't compile on Windows.
+
+This is the second series I've applied from you this morning that
+doesn't compile at all.  Please be more careful.
+
+Paolo
 
 > 
-> >   During postcopy, it'll not really cancel the migration, but pause
-> >   it.  On both sides, we should see this on stderr:
-> > 
-> >   qemu-system-x86_64: Detected IO failure for postcopy. Migration paused.
-> > 
-> >   It means now both sides are in postcopy-pause state.
+> Paolo
 > 
-> Now, here we start to have a problem; I do the migrate-cancel on the
-> source, that works and goes into pause; but remember the network is
-> broken, so the destination hasn't received the news.
+>>
+>> v3 changes:
+>>  - removed upstreamed patches
+>>  - fixed bug with recursive checkpoints
+>>  - fixed bug with icount warp checkpoint
+>>
+>> v2 changes:
+>>  - updated lock/unlock logic (as suggested by Paolo Bonzini)
+>>  - updated cpu execution loop to avoid races in setting/resetting exit request (as suggested by Paolo Bonzini)
+>>  - minor changes
+>>
+>> ---
+>>
+>> Alex Bennée (12):
+>>       target/arm/arm-powertctl: drop BQL assertions
+>>       cpus: push BQL lock to qemu_*_wait_io_event
+>>       cpus: only take BQL for sleeping threads
+>>       replay/replay.c: bump REPLAY_VERSION again
+>>       replay/replay-internal.c: track holding of replay_lock
+>>       replay: make locking visible outside replay code
+>>       replay: push replay_mutex_lock up the call tree
+>>       scripts/qemu-gdb: add simple tcg lock status helper
+>>       util/qemu-thread-*: add qemu_lock, locked and unlock trace events
+>>       scripts/analyse-locks-simpletrace.py: script to analyse lock times
+>>       scripts/replay-dump.py: replay log dumper
+>>       scripts/qemu-gdb/timers.py: new helper to dump timer state
+>>
+>> Pavel Dovgalyuk (18):
+>>       hpet: recover timer offset correctly
+>>       cpu: flush TB cache when loading VMState
+>>       This patch adds a condition before overwriting exception_index fields.
+>>       block: implement bdrv_snapshot_goto for blkreplay
+>>       blkreplay: create temporary overlay for underlaying devices
+>>       replay: disable default snapshot for record/replay
+>>       replay: fix processing async events
+>>       replay: fixed replay_enable_events
+>>       replay: fix save/load vm for non-empty queue
+>>       replay: added replay log format description
+>>       replay: make safe vmstop at record/replay
+>>       replay: save prior value of the host clock
+>>       icount: fixed saving/restoring of icount warp timers
+>>       replay: don't destroy mutex at exit
+>>       replay: check return values of fwrite
+>>       replay: avoid recursive call of checkpoints
+>>       replay: improve replay performance
+>>       replay: don't process async events when warping the clock
+>>
+>>
+>>  accel/kvm/kvm-all.c                  |    4 
+>>  accel/tcg/cpu-exec.c                 |    5 -
+>>  block/blkreplay.c                    |   73 ++++++++
+>>  cpus-common.c                        |   13 +
+>>  cpus.c                               |  184 +++++++++++++++-----
+>>  docs/replay.txt                      |   91 ++++++++++
+>>  exec.c                               |    1 
+>>  hw/timer/hpet.c                      |   30 +++
+>>  include/hw/compat.h                  |    6 +
+>>  include/qemu/thread.h                |   19 ++
+>>  include/qemu/timer.h                 |   14 ++
+>>  include/sysemu/replay.h              |   22 ++
+>>  migration/savevm.c                   |   13 +
+>>  replay/replay-char.c                 |   21 +-
+>>  replay/replay-events.c               |   30 +--
+>>  replay/replay-internal.c             |   48 +++++
+>>  replay/replay-internal.h             |    9 +
+>>  replay/replay-snapshot.c             |    9 +
+>>  replay/replay-time.c                 |   10 +
+>>  replay/replay.c                      |   75 ++++++--
+>>  scripts/analyse-locks-simpletrace.py |   99 +++++++++++
+>>  scripts/qemu-gdb.py                  |    4 
+>>  scripts/qemugdb/tcg.py               |   46 +++++
+>>  scripts/qemugdb/timers.py            |   54 ++++++
+>>  scripts/replay-dump.py               |  308 ++++++++++++++++++++++++++++++++++
+>>  stubs/replay.c                       |   16 ++
+>>  target/arm/arm-powerctl.c            |    8 -
+>>  target/i386/hax-all.c                |    2 
+>>  util/main-loop.c                     |   17 +-
+>>  util/qemu-thread-posix.c             |   21 +-
+>>  util/qemu-timer.c                    |   12 +
+>>  util/trace-events                    |    7 -
+>>  vl.c                                 |   12 +
+>>  33 files changed, 1112 insertions(+), 171 deletions(-)
+>>  create mode 100755 scripts/analyse-locks-simpletrace.py
+>>  create mode 100644 scripts/qemugdb/tcg.py
+>>  create mode 100644 scripts/qemugdb/timers.py
+>>  create mode 100755 scripts/replay-dump.py
+>>
 > 
-> > 7. (Optional) On destination side, let's try to hang the main thread
-> >    using the new x-oob-test command, providing a "lock=true" param:
-> > 
-> >    {"execute": "x-oob-test", "id": "lock-dispatcher-cmd",
-> >     "arguments": { "lock": true } }
-> > 
-> >    After sending this command, we should not see any "return", because
-> >    main thread is blocked already.  But we can still use the monitor
-> >    since the monitor now has dedicated IOThread.
-> > 
-> > 8. On destination side, provide a new incoming port using the new
-> >    command "migrate-recover" (note that if step 7 is carried out, we
-> >    _must_ use OOB form, otherwise the command will hang.  With OOB,
-> >    this command will return immediately):
-> > 
-> >   {"execute": "migrate-recover", "id": "recover-cmd",
-> >    "arguments": { "uri": "tcp:localhost:5556" },
-> >    "control": { "run-oob": true } }
-> >   {"timestamp": {"seconds": 1512454976, "microseconds": 186053},
-> >    "event": "MIGRATION", "data": {"status": "setup"}}
-> >   {"return": {}, "id": "recover-cmd"}
-> > 
-> >    We can see that the command will success even if main thread is
-> >    locked up.
 > 
-> Because the destination didn't get the news of the pause, I get:
-> {"id": "recover-cmd", "error": {"class": "GenericError", "desc": "Migrate recover can only be run when postcopy is paused."}}
-
-This is normal since we didn't fail on destination, while...
-
-> 
-> and I can't explicitly cause a cancel on the destination:
-> {"id": "cancel-cmd", "error": {"class": "GenericError", "desc": "The command migrate_cancel does not support OOB"}}
-
-... this is not normal.  I have two questions:
-
-1. Have you provided
-
-  "control": {"run-oob": true}
-
-  field when sending command "migrate_cancel"?  Just to mention that
-  we shouldn't do it in oob way for migrate_cancel.  Or it can be a
-  monitor-oob bug.
-
-2. Do we need to support "migrate_cancel" on destination?
-
-For (2), I think we need it, but for now it only works on source for
-sure.  So I think maybe I should add that support.
-
-> 
-> So I think we need a way out of this on the destination.
-
-So that's my 2nd question.  How about we do this: migrate_cancel will
-cancel incoming migration if:
-
-        a. there is one incoming migration in progress, and
-        b. postcopy is enabled
-
-Thanks,
-
--- 
-Peter Xu
