@@ -1,24 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58838)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58878)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1ea0Ec-0000T8-39
-	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 09:23:07 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1ea0Eo-0000c8-Ov
+	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 09:23:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1ea0EY-00045W-0O
-	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 09:23:06 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:60516)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1ea0EX-00044v-MK
-	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 09:23:01 -0500
-Date: Fri, 12 Jan 2018 12:22:52 -0200
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20180112142252.GG6646@localhost.localdomain>
-References: <1515443797-10837-1-git-send-email-luwei.kang@intel.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1ea0En-0004Hk-KH
+	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 09:23:18 -0500
+Received: from mail-ot0-x242.google.com ([2607:f8b0:4003:c0f::242]:37386)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1ea0En-0004HK-Do
+	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 09:23:17 -0500
+Received: by mail-ot0-x242.google.com with SMTP id a24so5157426otd.4
+	for <qemu-devel@nongnu.org>; Fri, 12 Jan 2018 06:23:17 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1515443797-10837-1-git-send-email-luwei.kang@intel.com>
-Subject: Re: [Qemu-devel] [PATCH RESEND v1 1/2] i386: Add Intel Processor
- Trace feature support
+In-Reply-To: <20180109122252.17670-11-alex.bennee@linaro.org>
+References: <20180109122252.17670-1-alex.bennee@linaro.org>
+	<20180109122252.17670-11-alex.bennee@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 12 Jan 2018 14:22:56 +0000
+Message-ID: <CAFEAcA_7BXf3=8iY52gjL3uz8Uqa5f-QwE1R_rPNr+06moEe8Q@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 10/20] fpu/softfloat: define decompose
+ structures
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,114 +31,124 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Luwei Kang <luwei.kang@intel.com>
-Cc: qemu-devel@nongnu.org, kvm@vger.kernel.org, pbonzini@redhat.com, rth@twiddle.net, mtosatti@redhat.com, Chao Peng <chao.p.peng@linux.intel.com>
+To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+Cc: Richard Henderson <richard.henderson@linaro.org>, Laurent Vivier <laurent@vivier.eu>, bharata@linux.vnet.ibm.com, Andrew Dutcher <andrew@andrewdutcher.com>, QEMU Developers <qemu-devel@nongnu.org>, Aurelien Jarno <aurelien@aurel32.net>
 
-On Tue, Jan 09, 2018 at 04:36:36AM +0800, Luwei Kang wrote:
-> From: Chao Peng <chao.p.peng@linux.intel.com>
-> 
-> Expose Intel Processor Trace feature to guest.
-> 
-> Signed-off-by: Chao Peng <chao.p.peng@linux.intel.com>
-> Signed-off-by: Luwei Kang <luwei.kang@intel.com>
+On 9 January 2018 at 12:22, Alex Benn=C3=A9e <alex.bennee@linaro.org> wrote=
+:
+> These structures pave the way for generic softfloat helper routines
+> that will operate on fully decomposed numbers.
+>
+> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 > ---
->  target/i386/cpu.c | 19 ++++++++++++++++++-
->  target/i386/cpu.h |  1 +
->  target/i386/kvm.c | 23 +++++++++++++++++++++++
->  3 files changed, 42 insertions(+), 1 deletion(-)
-> 
-> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-> index 3818d72..57f8370 100644
-> --- a/target/i386/cpu.c
-> +++ b/target/i386/cpu.c
-> @@ -427,7 +427,7 @@ static FeatureWordInfo feature_word_info[FEATURE_WORDS] = {
->              NULL, NULL, "mpx", NULL,
->              "avx512f", "avx512dq", "rdseed", "adx",
->              "smap", "avx512ifma", "pcommit", "clflushopt",
-> -            "clwb", NULL, "avx512pf", "avx512er",
-> +            "clwb", "intel-pt", "avx512pf", "avx512er",
->              "avx512cd", "sha-ni", "avx512bw", "avx512vl",
->          },
->          .cpuid_eax = 7,
-> @@ -3006,6 +3006,23 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
->          }
->          break;
->      }
-> +    case 0x14: {
-> +        if ((env->features[FEAT_7_0_EBX] & CPUID_7_0_EBX_INTEL_PT) &&
-> +             kvm_enabled()) {
-> +            KVMState *s = cs->kvm_state;
+>  fpu/softfloat.c | 70 +++++++++++++++++++++++++++++++++++++++++++++++++++=
++++++-
+>  1 file changed, 69 insertions(+), 1 deletion(-)
+>
+> diff --git a/fpu/softfloat.c b/fpu/softfloat.c
+> index 59afe81d06..fcba28d3f8 100644
+> --- a/fpu/softfloat.c
+> +++ b/fpu/softfloat.c
+> @@ -83,7 +83,7 @@ this code that are retained.
+>   * target-dependent and needs the TARGET_* macros.
+>   */
+>  #include "qemu/osdep.h"
+> -
+> +#include "qemu/bitops.h"
+>  #include "fpu/softfloat.h"
+>
+>  /* We only need stdlib for abort() */
+> @@ -186,6 +186,74 @@ static inline flag extractFloat64Sign(float64 a)
+>      return float64_val(a) >> 63;
+>  }
+>
+> +/*----------------------------------------------------------------------=
+------
+> +| Classify a floating point number.
+> +*-----------------------------------------------------------------------=
+-----*/
 > +
-> +            *eax = kvm_arch_get_supported_cpuid(s, 0x14, count, R_EAX);
-> +            *ebx = kvm_arch_get_supported_cpuid(s, 0x14, count, R_EBX);
-> +            *ecx = kvm_arch_get_supported_cpuid(s, 0x14, count, R_ECX);
-> +            *edx = kvm_arch_get_supported_cpuid(s, 0x14, count, R_EDX);
-
-If you are forwarding host info directly to the guest, the
-feature is not migration-safe.  The new feature needs to be added
-to feature_word_info[FEAT_7_0_EBX].unmigratable_flags.
-
-
-> +        } else {
-> +            *eax = 0;
-> +            *ebx = 0;
-> +            *ecx = 0;
-> +            *edx = 0;
-> +        }
-> +        break;
-> +    }
->      case 0x40000000:
->          /*
->           * CPUID code in kvm_arch_init_vcpu() ignores stuff
-> diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-> index 62c4742..58a4b6c 100644
-> --- a/target/i386/cpu.h
-> +++ b/target/i386/cpu.h
-> @@ -642,6 +642,7 @@ typedef uint32_t FeatureWordArray[FEATURE_WORDS];
->  #define CPUID_7_0_EBX_PCOMMIT  (1U << 22) /* Persistent Commit */
->  #define CPUID_7_0_EBX_CLFLUSHOPT (1U << 23) /* Flush a Cache Line Optimized */
->  #define CPUID_7_0_EBX_CLWB     (1U << 24) /* Cache Line Write Back */
-> +#define CPUID_7_0_EBX_INTEL_PT (1U << 25) /* Intel Processor Trace */
->  #define CPUID_7_0_EBX_AVX512PF (1U << 26) /* AVX-512 Prefetch */
->  #define CPUID_7_0_EBX_AVX512ER (1U << 27) /* AVX-512 Exponential and Reciprocal */
->  #define CPUID_7_0_EBX_AVX512CD (1U << 28) /* AVX-512 Conflict Detection */
-> diff --git a/target/i386/kvm.c b/target/i386/kvm.c
-> index 6f69e2f..e13ab58 100644
-> --- a/target/i386/kvm.c
-> +++ b/target/i386/kvm.c
-> @@ -863,6 +863,29 @@ int kvm_arch_init_vcpu(CPUState *cs)
->                  c = &cpuid_data.entries[cpuid_i++];
->              }
->              break;
-> +        case 0x14: {
-> +            uint32_t times;
+> +typedef enum {
+> +    float_class_unclassified,
+> +    float_class_zero,
+> +    float_class_normal,
+> +    float_class_inf,
+> +    float_class_qnan,
+> +    float_class_snan,
+> +    float_class_dnan,
+> +    float_class_msnan, /* maybe silenced */
+> +} float_class;
 > +
-> +            c->function = i;
-> +            c->index = 0;
-> +            c->flags = KVM_CPUID_FLAG_SIGNIFCANT_INDEX;
-> +            cpu_x86_cpuid(env, i, 0, &c->eax, &c->ebx, &c->ecx, &c->edx);
-> +            times = c->eax;
+> +/*----------------------------------------------------------------------=
+------
+> +| Structure holding all of the decomposed parts of a float.
+> +| The exponent is unbiased and the fraction is normalized.
+> +*-----------------------------------------------------------------------=
+-----*/
 > +
-> +            for (j = 1; j <= times; ++j) {
-> +                if (cpuid_i == KVM_MAX_CPUID_ENTRIES) {
-> +                    fprintf(stderr, "cpuid_data is full, no space for "
-> +                                "cpuid(eax:0x14,ecx:0x%x)\n", j);
-> +                    abort();
-> +                }
-> +                c = &cpuid_data.entries[cpuid_i++];
-> +                c->function = i;
-> +                c->index = j;
-> +                c->flags = KVM_CPUID_FLAG_SIGNIFCANT_INDEX;
-> +                cpu_x86_cpuid(env, i, j, &c->eax, &c->ebx, &c->ecx, &c->edx);
-> +            }
-> +            break;
-> +        }
->          default:
->              c->function = i;
->              c->flags = 0;
-> -- 
-> 1.8.3.1
-> 
+> +typedef struct {
+> +    uint64_t frac   : 64;
+> +    int exp         : 32;
+> +    float_class cls : 8;
+> +    int             : 23;
 
--- 
-Eduardo
+What is this unnamed 23 bit field for?
+
+> +    bool sign       : 1;
+
+Why are we using a bitfield struct here anyway? uint64_t is 64 bits,
+int is 32 bits, we don't care how big the float_class enum is
+represented as, and we're not trying to pack together lots of bools
+so it doesn't matter much if we have a whole byte for the sign.
+
+> +} decomposed_parts;
+> +
+> +#define DECOMPOSED_BINARY_POINT    (64 - 2)
+> +#define DECOMPOSED_IMPLICIT_BIT    (1ull << DECOMPOSED_BINARY_POINT)
+> +#define DECOMPOSED_OVERFLOW_BIT    (DECOMPOSED_IMPLICIT_BIT << 1)
+> +
+> +/* Structure holding all of the relevant parameters for a format.  */
+> +typedef struct {
+> +    int exp_bias;
+> +    int exp_max;
+> +    int frac_shift;
+> +    uint64_t frac_lsb;
+> +    uint64_t frac_lsbm1;
+
+Why the '1' in the field name? Overall I think some brief
+comments about what the fields mean would be helpful.
+
+> +    uint64_t round_mask;
+> +    uint64_t roundeven_mask;
+> +} decomposed_params;
+> +
+> +#define FRAC_PARAMS(F)                     \
+> +    .frac_shift     =3D F,                   \
+> +    .frac_lsb       =3D 1ull << (F),         \
+> +    .frac_lsbm1     =3D 1ull << ((F) - 1),   \
+> +    .round_mask     =3D (1ull << (F)) - 1,   \
+> +    .roundeven_mask =3D (2ull << (F)) - 1
+> +
+> +static const decomposed_params float16_params =3D {
+> +    .exp_bias       =3D 0x0f,
+> +    .exp_max        =3D 0x1f,
+> +    FRAC_PARAMS(DECOMPOSED_BINARY_POINT - 10)
+> +};
+> +
+> +static const decomposed_params float32_params =3D {
+> +    .exp_bias       =3D 0x7f,
+> +    .exp_max        =3D 0xff,
+> +    FRAC_PARAMS(DECOMPOSED_BINARY_POINT - 23)
+> +};
+> +
+> +static const decomposed_params float64_params =3D {
+> +    .exp_bias       =3D 0x3ff,
+> +    .exp_max        =3D 0x7ff,
+> +    FRAC_PARAMS(DECOMPOSED_BINARY_POINT - 52)
+
+Maybe we should hide the DECOMPOSED_BINARY_POINT bit inside the macro?
+Then the 10/23/52 are just the number of fraction bits in the format.
+
+thanks
+-- PMM
