@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35512)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35841)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1ea2ra-0005wq-Us
-	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 12:11:32 -0500
+	(envelope-from <steven.seeger@flightsystems.net>) id 1ea2sG-0006QS-TY
+	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 12:12:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1ea2rZ-0004ur-W9
-	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 12:11:30 -0500
-Received: from mail-wr0-x241.google.com ([2a00:1450:400c:c0c::241]:40568)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1ea2rZ-0004ta-PO
-	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 12:11:29 -0500
-Received: by mail-wr0-x241.google.com with SMTP id 100so5894364wrb.7
-	for <qemu-devel@nongnu.org>; Fri, 12 Jan 2018 09:11:29 -0800 (PST)
+	(envelope-from <steven.seeger@flightsystems.net>) id 1ea2sD-0005bv-Mw
+	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 12:12:12 -0500
+Received: from p3plsmtpa12-06.prod.phx3.secureserver.net
+	([68.178.252.235]:54722)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <steven.seeger@flightsystems.net>)
+	id 1ea2sD-0005aF-GH
+	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 12:12:09 -0500
+From: Steven Seeger <steven.seeger@flightsystems.net>
+Reply-To: steven.seeger@flightsystems.net
+Date: Fri, 12 Jan 2018 12:12:04 -0500
+Message-ID: <3481129.GfW4dsff78@wirbelwind>
+In-Reply-To: <2177d773-9d69-f432-9353-4553e098cf1f@redhat.com>
+References: <2465248.BadtJazF69@wirbelwind>
+	<2177d773-9d69-f432-9353-4553e098cf1f@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <1512682213-4354-9-git-send-email-minyard@acm.org>
-References: <1512682213-4354-1-git-send-email-minyard@acm.org>
-	<1512682213-4354-9-git-send-email-minyard@acm.org>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Fri, 12 Jan 2018 18:11:28 +0100
-Message-ID: <CAJ+F1CK90yHrtcv2RtDUEHYiKybi38th2UGqkQ4RhMcNCJ7uVw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 8/8] Add maintainer for the IPMI code
+Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset="utf-8"
+Subject: Re: [Qemu-devel] ppc icount questions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,50 +30,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Corey Minyard <minyard@acm.org>
-Cc: QEMU <qemu-devel@nongnu.org>, Corey Minyard <cminyard@mvista.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-On Thu, Dec 7, 2017 at 10:30 PM,  <minyard@acm.org> wrote:
-> From: Corey Minyard <cminyard@mvista.com>
->
-> Signed-off-by: Corey Minyard <cminyard@mvista.com>
+On Friday, January 12, 2018 11:52:57 AM EST Paolo Bonzini wrote:
+> What is the guest doing in the meanwhile?
 
-Could be the first patch of the series!
+The guest is running vxWorks with several threads. The CPU does idle at times. 
 
-Acked-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> virtual time increases only when instructions are executed, or when the
+> CPUs are idle (in the latter case, behavior depends on "-icount sleep":
+> if on, it increases at the same pace as real time, if off, it jumps
+> immediately to the next deadline).
 
-Thanks!
+If we jump to the next available deadline, won't that run faster than 
+realtime? The preferred goal here is to run realtime (sleep as appropriate) 
+but slow down if the guest or model world requires too many host resources. 
+But, the desire would be to maintain proportionality between number of 
+instructions executed and increase in virtual time. 
 
-> ---
->  MAINTAINERS | 9 +++++++++
->  1 file changed, 9 insertions(+)
->
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index 0255113..6483f79 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -924,6 +924,15 @@ F: tests/ahci-test.c
->  F: tests/libqos/ahci*
->  T: git git://github.com/jnsnow/qemu.git ide
->
-> +IPMI
-> +M: Corey Minyard <minyard@acm.org>
-> +S: Maintained
-> +F: include/hw/ipmi/*
-> +F: hw/ipmi/*
-> +F: hw/smbios/smbios_type_38.c
-> +F: tests/ipmi*
-> +T: git git://github.com/cminyard/qemu.git master-ipmi-rebase
-> +
->  Floppy
->  M: John Snow <jsnow@redhat.com>
->  L: qemu-block@nongnu.org
-> --
-> 2.7.4
->
->
+One of the things happening in the guest code is there is a once-per-second 
+interrupt and a once-per-10ms interrupt that the software expects to see in-
+phase with each other. If not, then errors occur. I am seeing errors when I do 
+more work in the device model. However, even with this extra work disabled I 
+still do not see the timer granularity I expect.
 
+Sorry for all the questions.
 
-
---=20
-Marc-Andr=C3=A9 Lureau
+Steven
