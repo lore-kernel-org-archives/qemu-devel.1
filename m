@@ -1,26 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54476)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33446)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1eZtEc-0005Li-9J
-	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 01:54:39 -0500
+	(envelope-from <dovgaluk@ispras.ru>) id 1eZtdQ-0003TG-7U
+	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 02:20:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1eZtEX-0003yx-Bf
-	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 01:54:38 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:51006)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1eZtEX-0003xT-4N
-	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 01:54:33 -0500
-Date: Fri, 12 Jan 2018 14:54:17 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20180112065417.GO2551@xz-mi>
-References: <20171219084557.9801-1-peterx@redhat.com>
-	<20171219084557.9801-26-peterx@redhat.com>
-	<20180109145225.GI31400@stefanha-x1.localdomain>
+	(envelope-from <dovgaluk@ispras.ru>) id 1eZtdN-00052l-3d
+	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 02:20:16 -0500
+Received: from mail.ispras.ru ([83.149.199.45]:34278)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <dovgaluk@ispras.ru>) id 1eZtdM-0004wu-QV
+	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 02:20:13 -0500
+From: "Pavel Dovgalyuk" <dovgaluk@ispras.ru>
+References: <20180111082452.27295.85707.stgit@pasha-VirtualBox>
+	<20180111082744.27295.25934.stgit@pasha-VirtualBox>
+	<621213e6-91cc-908e-225f-efb898bb6747@redhat.com>
+In-Reply-To: <621213e6-91cc-908e-225f-efb898bb6747@redhat.com>
+Date: Fri, 12 Jan 2018 10:20:11 +0300
+Message-ID: <001701d38b75$c8e80640$5ab812c0$@ru>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20180109145225.GI31400@stefanha-x1.localdomain>
-Subject: Re: [Qemu-devel] [RFC v6 25/27] docs: update QMP documents for OOB
- commands
+Content-Type: text/plain;
+	charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+Content-Language: ru
+Subject: Re: [Qemu-devel] [RFC PATCH v3 30/30] replay: don't process async
+ events when warping the clock
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,43 +31,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: qemu-devel@nongnu.org, Stefan Hajnoczi <shajnocz@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <famz@redhat.com>, Juan Quintela <quintela@redhat.com>, mdroth@linux.vnet.ibm.com, Eric Blake <eblake@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Markus Armbruster <armbru@redhat.com>, marcandre.lureau@redhat.com, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: 'Paolo Bonzini' <pbonzini@redhat.com>, 'Pavel Dovgalyuk' <Pavel.Dovgaluk@ispras.ru>, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, peter.maydell@linaro.org, boost.lists@gmail.com, quintela@redhat.com, jasowang@redhat.com, mst@redhat.com, zuban32s@gmail.com, maria.klimushenkova@ispras.ru, kraxel@redhat.com, alex.bennee@linaro.org
 
-On Tue, Jan 09, 2018 at 02:52:25PM +0000, Stefan Hajnoczi wrote:
-> On Tue, Dec 19, 2017 at 04:45:55PM +0800, Peter Xu wrote:
-> > +To add OOB execution support for a command, we need to make sure the
-> > +command handler satisfies at least the following:
+> From: Paolo Bonzini [mailto:paolo.bonzini@gmail.com] On Behalf Of Paolo Bonzini
+> On 11/01/2018 09:27, Pavel Dovgalyuk wrote:
+> > Virtual clock is wapred from iothread and vcpu thread. When the hardware
+> > events associated with warp checkpoint, then interrupt delivering may be
+> > non-deterministic if checkpoint is processed in different threads in record
+> > and replay.
+> > This patch disables event processing for clock warp checkpoint and leaves
+> > all hardware events to other checkpoints (e.g., virtual clock).
+> >
+> > Signed-off-by: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
+> > ---
+> >  replay/replay.c |    7 ++++++-
+> >  1 file changed, 6 insertions(+), 1 deletion(-)
+> >
+> > diff --git a/replay/replay.c b/replay/replay.c
+> > index b9c496a..cc43c38 100644
+> > --- a/replay/replay.c
+> > +++ b/replay/replay.c
+> > @@ -211,7 +211,12 @@ bool replay_checkpoint(ReplayCheckpoint checkpoint)
+> >      } else if (replay_mode == REPLAY_MODE_RECORD) {
+> >          g_assert(replay_mutex_locked());
+> >          replay_put_event(EVENT_CHECKPOINT + checkpoint);
+> > -        replay_save_events(checkpoint);
+> > +        /* This checkpoint belongs to several threads.
+> > +           Processing events from different threads is
+> > +           non-deterministic */
+> > +        if (checkpoint != CHECKPOINT_CLOCK_WARP_START) {
+> > +            replay_save_events(checkpoint);
+> > +        }
+> >          res = true;
+> >      }
+> >  out:
+> >
 > 
-> It would help to rephrase this in the imperative mood (telling the
-> reader what to do rather than describing what would need to be done):
-> 
-> "OOB command handlers must satisfy the following conditions:"
-> 
-> That way it's shorter and easier to read, and it communicates that these
-> conditions are absolutely necessary.
-> 
-> > +
-> > +- It executes extremely fast,
-> > +- It does not take any lock (or, it can take very small locks, but in
-> > +  very predictable ways),
-> 
-> "it can take very small locks, but in very predictable ways" does not
-> explain what is allowed and what isn't.
-> 
-> I suggest: "it can take very small locks if all critical regions also
-> follow the rules for OOB command handler code".
-> 
-> > +- It does not invoke system calls that may block,
-> > +- It does not access guest RAM that may block when userfaultfd is
-> > +  enabled for postcopy live migration.
-> > +
-> > +If someone is unsure about whether a command handler can be run in OOB
-> > +way, then it possibly means that it does not suite for OOB execution.
-> 
-> "If in doubt, do not implement OOB execution support."
+> Please add an assertion in replay_read_event that the read_checkpoint is
+> never CHECKPOINT_CLOCK_WARP_START. 
 
-All fixed.  Thanks,
+Ok.
+ 
+> Why is the checkpoint still needed?
 
--- 
-Peter Xu
+Because it synchronizes the warp itself.
+
+Pavel Dovgalyuk
