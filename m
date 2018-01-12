@@ -1,42 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58227)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58187)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1ea2hK-0005ft-05
+	(envelope-from <groug@kaod.org>) id 1ea2hF-0005bN-Od
 	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 12:00:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1ea2hG-0004L7-0p
-	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 12:00:54 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:41076
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanb@linux.vnet.ibm.com>)
-	id 1ea2hF-0004Jy-Rv
+	(envelope-from <groug@kaod.org>) id 1ea2hB-0004Fz-Jw
 	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 12:00:49 -0500
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w0CGww2N100963
-	for <qemu-devel@nongnu.org>; Fri, 12 Jan 2018 12:00:48 -0500
-Received: from e34.co.us.ibm.com (e34.co.us.ibm.com [32.97.110.152])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2ff0exa3fh-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 12 Jan 2018 12:00:47 -0500
-Received: from localhost
-	by e34.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <stefanb@linux.vnet.ibm.com>;
-	Fri, 12 Jan 2018 10:00:46 -0700
-References: <1515609318-1897-1-git-send-email-stefanb@linux.vnet.ibm.com>
-	<1515609318-1897-4-git-send-email-stefanb@linux.vnet.ibm.com>
-	<1bc0d808-a29e-03de-2a37-e2585c54385f@linux.vnet.ibm.com>
-	<CAJ+F1CK4umAVmPvPLunjXf10UcL_gVqENgu94eO17h82BPQzRA@mail.gmail.com>
-From: Stefan Berger <stefanb@linux.vnet.ibm.com>
-Date: Fri, 12 Jan 2018 12:00:42 -0500
+Received: from 9.mo177.mail-out.ovh.net ([46.105.72.238]:39389)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1ea2hB-0004Eo-AU
+	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 12:00:45 -0500
+Received: from player714.ha.ovh.net (b6.ovh.net [213.186.33.56])
+	by mo177.mail-out.ovh.net (Postfix) with ESMTP id 7574696202
+	for <qemu-devel@nongnu.org>; Fri, 12 Jan 2018 18:00:43 +0100 (CET)
+Date: Fri, 12 Jan 2018 18:00:32 +0100
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20180112180032.4dd3dc89@bahia.lan>
+In-Reply-To: <C161AD53546ABF4DBF9240B4479814F577E17A1B@lhreml502-mbb>
+References: <081955e1-84ec-4877-72d4-f4e8b46be350@huawei.com>
+	<20180112142722.GG17392@redhat.com>
+	<C161AD53546ABF4DBF9240B4479814F577E17A1B@lhreml502-mbb>
 MIME-Version: 1.0
-In-Reply-To: <CAJ+F1CK4umAVmPvPLunjXf10UcL_gVqENgu94eO17h82BPQzRA@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Message-Id: <48d6a75f-ece3-1fa4-10b1-466a500de4b4@linux.vnet.ibm.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC PATCH 3/3] acpi: Build TPM Physical Presence
- interface
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC] qid path collision issues in 9pfs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -45,540 +31,140 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@gmail.com>
-Cc: QEMU <qemu-devel@nongnu.org>, kevin@koconnor.net, "Michael S. Tsirkin" <mst@redhat.com>
+To: Veaceslav Falico <veaceslav.falico@huawei.com>
+Cc: "Daniel P. Berrange" <berrange@redhat.com>, "Antonios Motakis (Tony)" <Antonios.Motakis@huawei.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "zhangwei (CR)" <zhangwei555@huawei.com>, Eduard Shishkin <Eduard.Shishkin@huawei.com>, "Wangguoli (Andy)" <andy.wangguoli@huawei.com>, Jiangyiwen <jiangyiwen@huawei.com>, "vfalico@gmail.com" <vfalico@gmail.com>, Jani Kokkonen <Jani.Kokkonen@huawei.com>, "v9fs-developer@lists.sourceforge.net" <v9fs-developer@lists.sourceforge.net>
 
-On 01/12/2018 11:07 AM, Marc-Andr=C3=A9 Lureau wrote:
-> Hi
->
-> On Wed, Jan 10, 2018 at 7:49 PM, Stefan Berger
-> <stefanb@linux.vnet.ibm.com> wrote:
->> On 01/10/2018 01:35 PM, Stefan Berger wrote:
->>> The TPM Physical Presence interface consists of an ACPI part, a share=
-d
->>> memory part, and code in the firmware. Users can send messages to the
->>> firmware by writing a code into the shared memory through invoking th=
-e
->>> ACPI code. When a reboot happens, the firmware looks for the code and
->>> acts on it by sending sequences of commands to the TPM.
->>>
->>> This patch adds the ACPI code. It is similar to the one in EDK2 but
->>> doesn't
->>> assume that SMIs are necessary to use. Besides that it tests the code
->>> entered by the user and checks whether it is supported. The range of =
-codes
->>> supported matches the range of codes supported in SeaBIOS. It uses th=
-e
->>> same
->>> datastructure for the shared memory as EDK2 does so that EDK2 and Sea=
-BIOS
->>> could both make use of the shared memory.
->>>
->>> The underlying TCG specification is accessible from the following pag=
-e.
->>>
->>>
->>> https://trustedcomputinggroup.org/tcg-physical-presence-interface-spe=
-cification/
->>>
->>> This patch implements version 1.20.
->>
->> The below ACPI code is partly a translation to C from a previous poste=
-d
->> patch:
->>
->> https://lists.gnu.org/archive/html/qemu-devel/2015-05/msg05353.html
->>
->>
-> And fwiw, this is the acpi dump disassembled:
->
->              Device (ISA.TPM)
->              {
->                  Name (_HID, EisaId ("PNP0C31"))  // _HID: Hardware ID
->                  Name (_STA, 0x0F)  // _STA: Status
->                  Name (_CRS, ResourceTemplate ()  // _CRS: Current
-> Resource Settings
->                  {
->                      Memory32Fixed (ReadWrite,
->                          0xFED40000,         // Address Base
->                          0x00005000,         // Address Length
->                          )
->                  })
->                  OperationRegion (TPPI, SystemMemory, 0xFFFF0000, 0x31)
->                  Field (TPPI, AnyAcc, NoLock, Preserve)
->                  {
->                      PPIN,   8,
->                      PPIP,   32,
->                      PPRP,   32,
->                      PPRQ,   32,
->                      PPRM,   32,
->                      LPPR,   32,
->                      FRET,   32,
->                      RES1,   8,
->                      RES2,   128,
->                      FAIL,   32
->                  }
->
->                  Method (WRAM, 2, Serialized)
->                  {
->                      PPRQ =3D Arg0
->                      PPRM =3D Arg1
->                      Return (Zero)
->                  }
->
->                  Method (CKOP, 1, NotSerialized)
->                  {
->                      If ((Arg0 =3D=3D Zero))
->                      {
->                          Return (One)
->                      }
->
->                      Return (Zero)
->                  }
->
->                  Method (_DSM, 4, Serialized)  // _DSM: Device-Specific=
- Method
->                  {
->                      If ((Arg0 =3D=3D ToUUID
-> ("3dddfaa6-361b-4eb4-a424-8d10089d1653") /* Physical Presence
-> Interface */))
->                      {
->                          Local0 =3D ToInteger (Arg2)
->                          If ((Local0 =3D=3D Zero))
->                          {
->                              Return (Buffer (0x02)
->                              {
->                                   0xFF, 0x01
->             // ..
->                              })
->                          }
->
->                          If ((Local0 =3D=3D One))
->                          {
->                              Return ("1.2")
->                          }
->
->                          If ((Local0 =3D=3D 0x02))
->                          {
->                              Local0 =3D DerefOf (Arg3 [Zero])
->                              If (CKOP (Local0))
->                              {
->                                  Return (WRAM (Local0, Zero))
->                              }
->
->                              Return (One)
->                          }
->
->                          If ((Local0 =3D=3D 0x03))
->                          {
->                              Return (Package (0x02)
->                              {
->                                  Zero,
->                                  PPRQ
->                              })
->                          }
->
->                          If ((Local0 =3D=3D 0x04))
->                          {
->                              Return (0x02)
->                          }
->
->                          If ((Local0 =3D=3D 0x05))
->                          {
->                              Return (Package (0x03)
->                              {
->                                  FAIL,
->                                  LPPR,
->                                  PPRP
->                              })
->                          }
->
->                          If ((Local0 =3D=3D 0x06))
->                          {
->                              Return (0x03)
->                          }
->
->                          If ((Local0 =3D=3D 0x07))
->                          {
->                              Local0 =3D DerefOf (Arg3 [Zero])
->                              If (CKOP (Local0))
->                              {
->                                  Local1 =3D WRAM (Local0, Zero)
->                                  Return (Local1)
->                              }
->
->                              Return (One)
->                          }
->
->                          If ((Local0 =3D=3D 0x08))
->                          {
->                              Local0 =3D DerefOf (Arg3 [Zero])
->                              If (CKOP (Local0))
->                              {
->                                  Return (0x04)
->                              }
->
->                              Return (Zero)
->                          }
->
->                          Return (Buffer (One)
->                          {
->                               0x00
->         // .
->                          })
->                      }
->                  }
->
-> Linux PPI driver seems to be happy about it, looking at
-> /sys/devices/pnp0/00\:06/tpm/tpm0/ppi/.
->
-> I haven't done further testing. Is there anything using this on Linux?
-> tpm2-tools doesn't seem to use it. I suppose I should be able to write
-> something to /sys/devices/pnp0/00\:06/tpm/tpm0/ppi/request.
->
-> Any help appreciated :)
+On Fri, 12 Jan 2018 15:05:24 +0000
+Veaceslav Falico <veaceslav.falico@huawei.com> wrote:
 
-To deacativate and disable the TPM 1.2 (!) write a '7' into the request.
+> (sorry for top posting and outlook, sigh...)
 
-echo 7 > request
-cat ../enabled ../active # should show two 1s indicating that it's=20
-currently enabled and active
-cat request # should show 7 now
+Well, as long as you're not sending a patch, we can cope with it... but
+maybe you could use your gmail account for subsequent posts ;)
 
-Do a reboot. Linux may complain that it cannot extend a PCR. This is=20
-expected when the TPM is deactivated and disabled.
+> (adding v9fs-developer list to the loop)
+> 
 
-To enable and activate it after reboot do:
-echo 6 > request
-cat request # should show 6 now
-cat response # should show that 7 succeeded
-cat ../enable ../active # should show two zeros
+Good idea since the issue affects the protocol.
 
-reboot
+> The crucial part here is fscache, which stores inodes guest-side by key/aux
+> from qid (key = path, aux = version).
+> 
+> Without fscache, there would always be a directory traversal and we're safe
+> from *this kind* of situation.
+> 
 
-Now the TPM 1.2 is enabled and active again, no more error message from=20
-Linux should occur.
+I'm not familiar with fscache, but the problem described by Antonios is a
+protocol violation anyway. The 9p server shouldn't generate colliding
+qid paths...
 
-cat ../enabled ../active # should show two 1s
-cat response # should show that 6 succeeded
+> With fscache, first inode to get in cache will always respond to inode number
+> and version pair, even with different device ids.
+> 
 
-PPI isn't used much probably. I mainly want the device for suspending=20
-the state of it along with the TIS state. I suppose that once we do that=20
-it 'nails the coffin' on the device state we write out and future=20
-extensions of fields to write out only cause issues later. So better=20
-have it now.
+Are you saying that even if the 9p server provides unique qid paths,
+no matter how it is achieved, the linux client would still be confused ?
 
-     Stefan
+It looks like a client side issue to me...
 
->
->>     Stefan
->>
->>> Signed-off-by: Stefan Berger <stefanb@linux.vnet.ibm.com>
->>> ---
->>>    hw/i386/acpi-build.c  | 227
->>> ++++++++++++++++++++++++++++++++++++++++++++++++++
->>>    include/hw/acpi/tpm.h |  15 ++++
->>>    2 files changed, 242 insertions(+)
->>>
->>> diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
->>> index 18b939e..e3905a3 100644
->>> --- a/hw/i386/acpi-build.c
->>> +++ b/hw/i386/acpi-build.c
->>> @@ -42,6 +42,7 @@
->>>    #include "hw/acpi/memory_hotplug.h"
->>>    #include "sysemu/tpm.h"
->>>    #include "hw/acpi/tpm.h"
->>> +#include "hw/tpm/tpm_ppi.h"
->>>    #include "hw/acpi/vmgenid.h"
->>>    #include "sysemu/tpm_backend.h"
->>>    #include "hw/timer/mc146818rtc_regs.h"
->>> @@ -1860,6 +1861,231 @@ static Aml *build_q35_osc_method(void)
->>>    }
->>>
->>>    static void
->>> +build_tpm_ppi(Aml *dev, TPMVersion tpm_version)
->>> +{
->>> +    Aml *method, *field, *ifctx, *ifctx2, *ifctx3, *pak;
->>> +
->>> +    aml_append(dev,
->>> +               aml_operation_region("TPPI", AML_SYSTEM_MEMORY,
->>> +                                    aml_int(TPM_PPI_ADDR_BASE),
->>> +                                    TPM_PPI_STRUCT_SIZE));
->>> +
->>> +    field =3D aml_field("TPPI", AML_ANY_ACC, AML_NOLOCK, AML_PRESERV=
-E);
->>> +    aml_append(field, aml_named_field("PPIN",
->>> +               sizeof(uint8_t) * BITS_PER_BYTE));
->>> +    aml_append(field, aml_named_field("PPIP",
->>> +               sizeof(uint32_t) * BITS_PER_BYTE));
->>> +    aml_append(field, aml_named_field("PPRP",
->>> +               sizeof(uint32_t) * BITS_PER_BYTE));
->>> +    aml_append(field, aml_named_field("PPRQ",
->>> +               sizeof(uint32_t) * BITS_PER_BYTE));
->>> +    aml_append(field, aml_named_field("PPRM",
->>> +               sizeof(uint32_t) * BITS_PER_BYTE));
->>> +    aml_append(field, aml_named_field("LPPR",
->>> +               sizeof(uint32_t) * BITS_PER_BYTE));
->>> +    aml_append(field, aml_named_field("FRET",
->>> +               sizeof(uint32_t) * BITS_PER_BYTE));
->>> +    aml_append(field, aml_named_field("RES1",
->>> +               sizeof(uint8_t) * BITS_PER_BYTE));
->>> +    aml_append(field, aml_named_field("RES2",
->>> +               sizeof(uint32_t) * BITS_PER_BYTE * 4));
->>> +    aml_append(field, aml_named_field("FAIL",
->>> +               sizeof(uint32_t) * BITS_PER_BYTE));
->>> +    aml_append(dev, field);
->>> +
->>> +    /*
->>> +     * Write the given operations code into 'PPRQ'.
->>> +     */
->>> +    method =3D aml_method("WRAM", 2, AML_SERIALIZED);
->>> +    {
->>> +        aml_append(method, aml_store(aml_arg(0), aml_name("PPRQ")));
->>> +        aml_append(method, aml_store(aml_arg(1), aml_name("PPRM")));
->>> +        /* 0 =3D Success */
->>> +        aml_append(method, aml_return(aml_int(0)));
->>> +    }
->>> +    aml_append(dev, method);
->>> +
->>> +    /*
->>> +     * CKOP: Check whether the opcode is valid
->>> +     */
->>> +    if (tpm_version =3D=3D TPM_VERSION_1_2) {
->>> +        method =3D aml_method("CKOP", 1, AML_NOTSERIALIZED);
->>> +        {
->>> +            ifctx =3D aml_if(
->>> +                      aml_or(
->>> +                        aml_or(
->>> +                          aml_and(
->>> +                            aml_lgreater_equal(aml_arg(0), aml_int(0=
-)),
->>> +                            aml_lless_equal(aml_arg(0), aml_int(11))=
-,
->>> +                            NULL
->>> +                          ),
->>> +                          aml_equal(aml_arg(0), aml_int(14)),
->>> +                          NULL
->>> +                        ),
->>> +                        aml_and(
->>> +                          aml_lgreater_equal(aml_arg(0), aml_int(21)=
-),
->>> +                          aml_lless_equal(aml_arg(0), aml_int(22)),
->>> +                          NULL
->>> +                       ),
->>> +                       NULL
->>> +                      )
->>> +                    );
->>> +            {
->>> +                aml_append(ifctx, aml_return(aml_int(1)));
->>> +            }
->>> +            aml_append(method, ifctx);
->>> +
->>> +            aml_append(method, aml_return(aml_int(0)));
->>> +        }
->>> +    } else {
->>> +        method =3D aml_method("CKOP", 1, AML_NOTSERIALIZED);
->>> +        {
->>> +            ifctx =3D aml_if(
->>> +                      aml_equal(aml_arg(0), aml_int(0))
->>> +                    );
->>> +            {
->>> +                aml_append(ifctx, aml_return(aml_int(1)));
->>> +            }
->>> +            aml_append(method, ifctx);
->>> +
->>> +            aml_append(method, aml_return(aml_int(0)));
->>> +        }
->>> +    }
->>> +    aml_append(dev, method);
->>> +
->>> +    method =3D aml_method("_DSM", 4, AML_SERIALIZED);
->>> +    {
->>> +        uint8_t zerobyte[1] =3D { 0 };
->>> +
->>> +        ifctx =3D aml_if(
->>> +                  aml_equal(aml_arg(0),
->>> +
->>> aml_touuid("3DDDFAA6-361B-4EB4-A424-8D10089D1653"))
->>> +                );
->>> +        {
->>> +            aml_append(ifctx,
->>> +                       aml_store(aml_to_integer(aml_arg(2)),
->>> aml_local(0)));
->>> +
->>> +            /* standard DSM query function */
->>> +            ifctx2 =3D aml_if(aml_equal(aml_local(0), aml_int(0)));
->>> +            {
->>> +                uint8_t byte_list[2] =3D { 0xff, 0x01 };
->>> +                aml_append(ifctx2, aml_return(aml_buffer(2, byte_lis=
-t)));
->>> +            }
->>> +            aml_append(ifctx, ifctx2);
->>> +
->>> +            /* interface version: 1.2 */
->>> +            ifctx2 =3D aml_if(aml_equal(aml_local(0), aml_int(1)));
->>> +            {
->>> +                aml_append(ifctx2, aml_return(aml_string("1.2")));
->>> +            }
->>> +            aml_append(ifctx, ifctx2);
->>> +
->>> +            /* submit TPM operation */
->>> +            ifctx2 =3D aml_if(aml_equal(aml_local(0), aml_int(2)));
->>> +            {
->>> +                aml_append(ifctx2,
->>> +                           aml_store(aml_derefof(aml_index(aml_arg(3=
-),
->>> +                                                           aml_int(0=
-))),
->>> +                                     aml_local(0)));
->>> +                ifctx3 =3D aml_if(aml_call1("CKOP", aml_local(0)));
->>> +                {
->>> +                    aml_append(ifctx3,
->>> +                               aml_return(aml_call2("WRAM",
->>> +                                                    aml_local(0),
->>> +                                                    aml_int(0))));
->>> +                }
->>> +                aml_append(ifctx2, ifctx3);
->>> +                aml_append(ifctx2, aml_return(aml_int(1)));
->>> +            }
->>> +            aml_append(ifctx, ifctx2);
->>> +
->>> +            /* get pending TPM operation */
->>> +            ifctx2 =3D aml_if(aml_equal(aml_local(0), aml_int(3)));
->>> +            {
->>> +                pak =3D aml_package(2);
->>> +                aml_append(pak, aml_int(0));
->>> +                aml_append(pak, aml_name("PPRQ"));
->>> +                aml_append(ifctx2, aml_return(pak));
->>> +            }
->>> +            aml_append(ifctx, ifctx2);
->>> +
->>> +            /* get platform-specific action to transition to pre-OS =
-env.
->>> */
->>> +            ifctx2 =3D aml_if(aml_equal(aml_local(0), aml_int(4)));
->>> +            {
->>> +                /* 2 =3D reboot */
->>> +                aml_append(ifctx2, aml_return(aml_int(2)));
->>> +            }
->>> +            aml_append(ifctx, ifctx2);
->>> +
->>> +            /* get TPM operation response */
->>> +            ifctx2 =3D aml_if(aml_equal(aml_local(0), aml_int(5)));
->>> +            {
->>> +                pak =3D aml_package(3);
->>> +
->>> +                aml_append(pak, aml_name("FAIL"));
->>> +                aml_append(pak, aml_name("LPPR"));
->>> +                aml_append(pak, aml_name("PPRP"));
->>> +
->>> +                aml_append(ifctx2, aml_return(pak));
->>> +            }
->>> +            aml_append(ifctx, ifctx2);
->>> +
->>> +            /* submit preferred user language */
->>> +            ifctx2 =3D aml_if(aml_equal(aml_local(0), aml_int(6)));
->>> +            {
->>> +                /* 3 =3D not implemented */
->>> +                aml_append(ifctx2, aml_return(aml_int(3)));
->>> +            }
->>> +            aml_append(ifctx, ifctx2);
->>> +
->>> +            /* submit TPM operation v2 */
->>> +            ifctx2 =3D aml_if(aml_equal(aml_local(0), aml_int(7)));
->>> +            {
->>> +                aml_append(ifctx2,
->>> +                           aml_store(aml_derefof(aml_index(aml_arg(3=
-),
->>> +                                                           aml_int(0=
-))),
->>> +                                     aml_local(0)));
->>> +                ifctx3 =3D aml_if(aml_call1("CKOP", aml_local(0)));
->>> +                {
->>> +                    aml_append(ifctx3,
->>> +                               aml_store(aml_call2("WRAM",
->>> +                                                   aml_local(0),
->>> +                                                   aml_int(0)),
->>> +                                         aml_local(1)));
->>> +                    aml_append(ifctx3, aml_return(aml_local(1)));
->>> +                }
->>> +                aml_append(ifctx2, ifctx3);
->>> +                /* 1 =3D requested operation not implemented */
->>> +                aml_append(ifctx2, aml_return(aml_int(1)));
->>> +            }
->>> +            aml_append(ifctx, ifctx2);
->>> +
->>> +            /* get user confirmation status for operation */
->>> +            ifctx2 =3D aml_if(aml_equal(aml_local(0), aml_int(8)));
->>> +            {
->>> +                aml_append(ifctx2,
->>> +                           aml_store(aml_derefof(aml_index(aml_arg(3=
-),
->>> +                                                           aml_int(0=
-))),
->>> +                                     aml_local(0)));
->>> +                ifctx3 =3D aml_if(aml_call1("CKOP", aml_local(0)));
->>> +                {
->>> +                    /* 4 =3D Allowed and physically present user not
->>> required */
->>> +                    aml_append(ifctx3, aml_return(aml_int(4)));
->>> +                }
->>> +                aml_append(ifctx2, ifctx3);
->>> +                /* 0 =3D requested operation not implemented */
->>> +                aml_append(ifctx2, aml_return(aml_int(0)));
->>> +            }
->>> +            aml_append(ifctx, ifctx2);
->>> +
->>> +            aml_append(ifctx, aml_return(aml_buffer(1, zerobyte)));
->>> +        }
->>> +        aml_append(method, ifctx);
->>> +    }
->>> +    aml_append(dev, method);
->>> +}
->>> +
->>> +static void
->>>    build_dsdt(GArray *table_data, BIOSLinker *linker,
->>>               AcpiPmInfo *pm, AcpiMiscInfo *misc,
->>>               Range *pci_hole, Range *pci_hole64, MachineState *machi=
-ne)
->>> @@ -2218,6 +2444,7 @@ build_dsdt(GArray *table_data, BIOSLinker *link=
-er,
->>>                     */
->>>                    /* aml_append(crs, aml_irq_no_flags(TPM_TIS_IRQ));=
- */
->>>                    aml_append(dev, aml_name_decl("_CRS", crs));
->>> +                build_tpm_ppi(dev, misc->tpm_version);
->>>                    aml_append(scope, dev);
->>>                }
->>>
->>> diff --git a/include/hw/acpi/tpm.h b/include/hw/acpi/tpm.h
->>> index d9b7452..23f5da1 100644
->>> --- a/include/hw/acpi/tpm.h
->>> +++ b/include/hw/acpi/tpm.h
->>> @@ -37,4 +37,19 @@
->>>    #define TPM_PPI_ADDR_SIZE           0x100
->>>    #define TPM_PPI_ADDR_BASE           0xffff0000
->>>
->>> +struct tpm_ppi {
->>> +    uint8_t ppin;            /* set by BIOS; currently initializatio=
-n
->>> flag */
->>> +    uint32_t ppip;           /* set by ACPI; not used */
->>> +    uint32_t pprp;           /* response from TPM; set by BIOS */
->>> +    uint32_t pprq;           /* opcode; set by ACPI */
->>> +    uint32_t pprm;           /* parameter for opcode; set by ACPI */
->>> +    uint32_t lppr;           /* last opcode; set by BIOS */
->>> +    uint32_t fret;           /* set by ACPI; not used*/
->>> +    uint32_t res1;           /* reserved */
->>> +    uint32_t res2[4];        /* reserved */
->>> +    uint32_t fail;           /* set by BIOS (0 =3D success) */
->>> +} QEMU_PACKED;
->>> +
->>> +#define TPM_PPI_STRUCT_SIZE  sizeof(struct tpm_ppi)
->>> +
->>>    #endif /* HW_ACPI_TPM_H */
->>
->>
->>
-> otherwise, patch looks good.
->
+> If we would be able to somehow get/provide device id from host to guest,
+> a simple modification of fscache aux verification handling would suffice.
+> 
+> However, I can't currently come up with an idea on how exactly could we get
+> that information guest-side. Maybe use dentry's qid->version (not used
+> currently) to transmit this, and populate v9fs inodes' caches during 
+> walk/readdir/etc.?
+> 
+
+I'm a bit lost here :)
+
+
+Cheers,
+
+--
+Greg
+
+> -----Original Message-----
+> From: Daniel P. Berrange [mailto:berrange@redhat.com] 
+> Sent: Friday, January 12, 2018 3:27 PM
+> To: Antonios Motakis (Tony)
+> Cc: qemu-devel@nongnu.org; Greg Kurz; zhangwei (CR); Veaceslav Falico; Eduard Shishkin; Wangguoli (Andy); Jiangyiwen; vfalico@gmail.com; Jani Kokkonen
+> Subject: Re: [Qemu-devel] [RFC] qid path collision issues in 9pfs
+> 
+> On Fri, Jan 12, 2018 at 07:32:10PM +0800, Antonios Motakis wrote:
+> > Hello all,
+> > 
+> > We have found an issue in the 9p implementation of QEMU, with how qid paths
+> > are generated, which can cause qid path collisions and several issues caused
+> > by them. In our use case (running containers under VMs) these have proven to
+> > be critical.
+> > 
+> > In particular, stat_to_qid in hw/9pfs/9p.c generates a qid path using the
+> > inode number of the file as input. According to the 9p spec the path should
+> > be able to uniquely identify a file, distinct files should not share a path
+> > value.
+> > 
+> > The current implementation that defines qid.path = inode nr works fine as long as there are not files from multiple partitions visible under the 9p share. In that case, distinct files from different devices are allowed to have the same inode number. So with multiple partitions, we have a very high probability of qid path collisions.
+> > 
+> > How to demonstrate the issue:
+> > 1) Prepare a problematic share:
+> >  - mount one partition under share/p1/ with some files inside
+> >  - mount another one *with identical contents* under share/p2/
+> >  - confirm that both partitions have files with same inode nr, size, etc
+> > 2) Demonstrate breakage:
+> >  - start a VM with a virtio-9p pointing to the share
+> >  - mount 9p share with FSCACHE on
+> >  - keep open share/p1/file
+> >  - open and write to share/p2/file
+> > 
+> > What should happen is, the guest will consider share/p1/file and
+> > share/p2/file to be the same file, and since we are using the cache it will
+> > not reopen it. We intended to write to partition 2, but we just wrote to
+> > partition 1. This is just one example on how the guest may rely on qid paths
+> > being unique.  
+> 
+> Ouch, this is a serious security bug. The guest user who has p1/file open may
+> have different privilege level to the guest user who tried to access p2/file.
+> So this flaw can be used for privilege escalation and/or confinement escape
+> by a malicious guest user.
+> 
+> > We have thought of a few approaches, but we would definitely like to hear
+> > what the upstream maintainers and community think:
+> > 
+> > * Full fix: Change the 9p protocol
+> > 
+> > We would need to support a longer qid path, based on a virtio feature flag.
+> > This would take reworking of host and guest parts of virtio-9p, so both QEMU
+> > and Linux for most users.  
+> 
+> Requiring updated guest feels unpleasant because of the co-ordination required
+> to get the security fix applied. So even if we do that, IMHO, we must also
+> have a fix in QEMU that does not require guest update.
+> 
+> > 
+> > * Fallback and/or interim solutions
+> > 
+> > A virtio feature flag may be refused by the guest, so we think we still need
+> > to make collisions less likely even with 64 bit paths. E.g.
+> > 1. XOR the device id with inode nr to produce the qid path (we attach a proof
+> > of concept patch)  
+> 
+> That just makes collision less likely, but doesnt guarantee its eliminated
+> and its probably practical for guests to bruteforce collisions depending on
+> how many different FS are passed through & number of files that can be
+> opened concurrently
+> 
+> > 2. 64 bit hash of device id and inode nr  
+> 
+> This is probably better than (1), but a 64-bit hash algorithm is fairly weak
+> wrt collision resistance when you have a large number of files.
+> 
+> > 3. other ideas, such as allocating new qid paths and keep a look up table of
+> > some sorts (possibly too expensive)  
+> 
+> I think QEMU will have to maintain a lookup table of files that are currently
+> open, and their associated qids, in order to provide a real guarantee that
+> the security flaw is addressed.
+> 
+> Regards,
+> Daniel
