@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43310)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43326)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ea4E1-0002hG-Eg
-	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 13:38:46 -0500
+	(envelope-from <eblake@redhat.com>) id 1ea4E5-0002lg-Cu
+	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 13:38:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ea4E0-0000u6-DR
+	(envelope-from <eblake@redhat.com>) id 1ea4E1-0000wV-AB
+	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 13:38:49 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:42658)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1ea4E1-0000to-1A
 	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 13:38:45 -0500
-Received: from mail-ot0-x241.google.com ([2607:f8b0:4003:c0f::241]:34853)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1ea4E0-0000tT-8m
-	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 13:38:44 -0500
-Received: by mail-ot0-x241.google.com with SMTP id 53so5828760otj.2
-	for <qemu-devel@nongnu.org>; Fri, 12 Jan 2018 10:38:44 -0800 (PST)
+References: <1515756676-3860-1-git-send-email-pbonzini@redhat.com>
+	<1515756676-3860-53-git-send-email-pbonzini@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <b8e975b0-638d-d603-85af-cb9a7b091bfa@redhat.com>
+Date: Fri, 12 Jan 2018 12:38:37 -0600
 MIME-Version: 1.0
-In-Reply-To: <20171218173022.18418-8-richard.henderson@linaro.org>
-References: <20171218173022.18418-1-richard.henderson@linaro.org>
-	<20171218173022.18418-8-richard.henderson@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 12 Jan 2018 18:38:23 +0000
-Message-ID: <CAFEAcA-kbZRaGoERUG7iZGsO3hswC=ityDWf4n2fwXsSwO7jCw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH 7/9] target/arm: Expand vector registers
- for SVE
+In-Reply-To: <1515756676-3860-53-git-send-email-pbonzini@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="fAc9WxweWKa8SpJ62YenmEDPQyKhLGVVU"
+Subject: Re: [Qemu-devel] [PULL 52/52] scripts/analyse-locks-simpletrace.py:
+ script to analyse lock times
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,114 +29,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+Cc: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
 
-On 18 December 2017 at 17:30, Richard Henderson
-<richard.henderson@linaro.org> wrote:
-> Change vfp.regs as a uint64_t to vfp.zregs as an ARMVectorReg.
-> The previous patches have made the change in representation
-> relatively painless.
->
-> Add vfp.pregs as an ARMPredicateReg.  Let FFR be P16 to make
-> it easier to treat it as for any other predicate.
->
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--fAc9WxweWKa8SpJ62YenmEDPQyKhLGVVU
+From: Eric Blake <eblake@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+Cc: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+Message-ID: <b8e975b0-638d-d603-85af-cb9a7b091bfa@redhat.com>
+Subject: Re: [Qemu-devel] [PULL 52/52] scripts/analyse-locks-simpletrace.py:
+ script to analyse lock times
+References: <1515756676-3860-1-git-send-email-pbonzini@redhat.com>
+ <1515756676-3860-53-git-send-email-pbonzini@redhat.com>
+In-Reply-To: <1515756676-3860-53-git-send-email-pbonzini@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 01/12/2018 05:31 AM, Paolo Bonzini wrote:
+> From: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+>=20
+> This script allows analysis of mutex acquisition and hold times based
+> on a trace file. Given a trace control file of:
+>=20
+>   qemu_mutex_lock
+>   qemu_mutex_locked
+>   qemu_mutex_unlock
+>=20
+> And running with:
+>=20
+>   $QEMU $QEMU_ARGS -trace events=3D./lock-trace
+>=20
+> You can analyse the results with:
+>=20
+>   ./scripts/analyse-locks-simpletrace.py trace-events-all ./trace-21812=
+
+>=20
+> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 > ---
->  target/arm/cpu.h           | 64 ++++++++++++++++++++++++++++++++--------------
->  target/arm/machine.c       | 37 ++++++++++++++++++++++++++-
->  target/arm/translate-a64.c |  8 +++---
->  target/arm/translate.c     | 12 ++++-----
->  4 files changed, 90 insertions(+), 31 deletions(-)
->
-> diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-> index e1a8e2880d..150b0d9d84 100644
-> --- a/target/arm/cpu.h
-> +++ b/target/arm/cpu.h
-> @@ -153,6 +153,47 @@ typedef struct {
->      uint32_t base_mask;
->  } TCR;
->
-> +/* Define a maximum sized vector register.
-> + * For 32-bit, this is a 128-bit NEON/AdvSIMD register.
-> + * For 64-bit, this is a 2048-bit SVE register.
-> + *
-> + * Note that the mapping between S, D, and Q views of the register bank
-> + * differs between AArch64 and AArch32.
-> + * In AArch32:
-> + *  Qn = regs[n].d[1]:regs[n].d[0]
-> + *  Dn = regs[n / 2].d[n & 1]
-> + *  Sn = regs[n / 4].d[n % 4 / 2],
-> + *       bits 31..0 for even n, and bits 63..32 for odd n
-> + *       (and regs[16] to regs[31] are inaccessible)
-> + * In AArch64:
-> + *  Zn = regs[n].d[*]
-> + *  Qn = regs[n].d[1]:regs[n].d[0]
-> + *  Dn = regs[n].d[0]
-> + *  Sn = regs[n].d[0] bits 31..0
-> + *
-> + * This corresponds to the architecturally defined mapping between
-> + * the two execution states, and means we do not need to explicitly
-> + * map these registers when changing states.
-> + */
+>  scripts/analyse-locks-simpletrace.py | 99 ++++++++++++++++++++++++++++=
+++++++++
+>  1 file changed, 99 insertions(+)
+>  create mode 100755 scripts/analyse-locks-simpletrace.py
+>=20
+> diff --git a/scripts/analyse-locks-simpletrace.py b/scripts/analyse-loc=
+ks-simpletrace.py
+> new file mode 100755
+> index 0000000..a69ed5c
+> --- /dev/null
+> +++ b/scripts/analyse-locks-simpletrace.py
+> @@ -0,0 +1,99 @@
+> +#!/usr/bin/env python
+> +# -*- coding: utf-8 -*-
+> +#
+> +# Analyse lock events and
+> +#
 
-The transformations on the data structures (ie the meat of this patch
-looks good).
+Truncated sentence?
 
-> +
-> +#ifdef TARGET_AARCH64
-> +# define ARM_MAX_VQ    16
-> +#else
-> +# define ARM_MAX_VQ    1
-> +#endif
-> +
-> +typedef struct ARMVectorReg {
-> +    uint64_t d[2 * ARM_MAX_VQ] QEMU_ALIGNED(16);
-> +} ARMVectorReg;
-> +
-> +typedef struct ARMPredicateReg {
-> +#ifdef TARGET_AARCH64
-> +    uint64_t p[2 * ARM_MAX_VQ / 8] QEMU_ALIGNED(16);
-> +#else
-> +    uint64_t p[0];
-> +#endif
-> +} ARMPredicateReg;
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
 
-I think introducing the predicate registers should go in a separate
-patch.
 
-> --- a/target/arm/translate.c
-> +++ b/target/arm/translate.c
-> @@ -1513,19 +1513,17 @@ static inline void gen_vfp_st(DisasContext *s, int dp, TCGv_i32 addr)
->      }
->  }
->
-> -static inline long
-> -vfp_reg_offset (int dp, int reg)
-> +static inline long vfp_reg_offset(bool dp, unsigned reg)
->  {
->      if (dp) {
-> -        return offsetof(CPUARMState, vfp.regs[reg]);
-> +        return offsetof(CPUARMState, vfp.zregs[reg >> 1].d[reg & 1]);
->      } else {
-> -        long ofs = offsetof(CPUARMState, vfp.regs[reg >> 1]);
-> +        long r = offsetof(CPUARMState, vfp.zregs[reg >> 2].d[(reg >> 1) & 1]);
->          if (reg & 1) {
-> -            ofs += offsetof(CPU_DoubleU, l.upper);
-> +            return r + offsetof(CPU_DoubleU, l.upper);
->          } else {
-> -            ofs += offsetof(CPU_DoubleU, l.lower);
-> +            return r + offsetof(CPU_DoubleU, l.lower);
->          }
-> -        return ofs;
+--fAc9WxweWKa8SpJ62YenmEDPQyKhLGVVU
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-...I see we're tweaking the logic on this code again. I was
-expecting that the changes in the previous patch would have turned
-out to be in support of just having to do a one-line change in this
-one, but apparently not ?
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
->      }
->  }
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlpZAK0ACgkQp6FrSiUn
+Q2pzUgf/b2wVpchBpvDnu9mwsV/iaN/K28Wcf/61a/+aAfDhlrinV5NgSFUyCGu3
+kNGklf95CooaWhkxNp978PlMm5FHOkS4SMiLu5pdyftbveRa2wtVzzsElhu7Ag9i
+Z/spXjcTm/9uNfzWNXCCmEyjm9e6FHwR3+1i2ONcNBLd/8zOs46y6KEeVPt9EtvC
+0+gyiw2j9r41KZ3mdqByKTWBrn6F1xK9m70Ldeq3NmBVFKMexk28d4JkxIuaqmsU
+S9AceS7dHiT92Yh+hNVnZpu+TnXDMZyOIjyu0PNpvPmq6MCzd5ErWJ2SiuDBCXe5
+7XDuwMIFa+kTmnMA60g5a2fHqCt7NA==
+=gLqP
+-----END PGP SIGNATURE-----
 
-thanks
--- PMM
+--fAc9WxweWKa8SpJ62YenmEDPQyKhLGVVU--
