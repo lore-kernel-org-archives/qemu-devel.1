@@ -1,23 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46337)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47601)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1eZxkv-0001jd-Aj
-	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 06:44:18 -0500
+	(envelope-from <dovgaluk@ispras.ru>) id 1eZxo4-0004ec-4p
+	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 06:47:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1eZxkr-00075p-7o
-	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 06:44:17 -0500
-References: <20171207155102.66622-1-vsementsov@virtuozzo.com>
-	<20171207155102.66622-7-vsementsov@virtuozzo.com>
-	<a0096cf0-8bec-dedb-e637-f29c71e46fbb@redhat.com>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <624f9181-d57c-4029-e3e8-7f6f4fea3963@virtuozzo.com>
-Date: Fri, 12 Jan 2018 14:43:52 +0300
+	(envelope-from <dovgaluk@ispras.ru>) id 1eZxnz-0001Sv-Vk
+	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 06:47:32 -0500
+Received: from mail.ispras.ru ([83.149.199.45]:35320)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <dovgaluk@ispras.ru>) id 1eZxnz-0001RH-Jn
+	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 06:47:27 -0500
+From: "Pavel Dovgalyuk" <dovgaluk@ispras.ru>
+References: <1515756676-3860-1-git-send-email-pbonzini@redhat.com>
+	<1515756676-3860-5-git-send-email-pbonzini@redhat.com>
+In-Reply-To: <1515756676-3860-5-git-send-email-pbonzini@redhat.com>
+Date: Fri, 12 Jan 2018 14:47:28 +0300
+Message-ID: <002101d38b9b$1f730620$5e591260$@ru>
 MIME-Version: 1.0
-In-Reply-To: <a0096cf0-8bec-dedb-e637-f29c71e46fbb@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain;
+	charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH v2 6/6] iotest 201: new test for qmp
- nbd-server-remove
+Content-Language: ru
+Subject: Re: [Qemu-devel] [PULL 04/52] hpet: recover timer offset correctly
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,126 +29,124 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: armbru@redhat.com, dgilbert@redhat.com, pbonzini@redhat.com, mreitz@redhat.com, kwolf@redhat.com, den@openvz.org
+To: 'Paolo Bonzini' <pbonzini@redhat.com>, qemu-devel@nongnu.org
+Cc: 'Maria Klimushenkova' <maria.klimushenkova@ispras.ru>, 'Pavel Dovgalyuk' <pavel.dovgaluk@ispras.ru>
 
-09.01.2018 23:49, Eric Blake wrote:
-> On 12/07/2017 09:51 AM, Vladimir Sementsov-Ogievskiy wrote:
->> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
->> ---
->>   tests/qemu-iotests/201     | 130 +++++++++++++++++++++++++++++++++++++++++++++
->>   tests/qemu-iotests/201.out |   5 ++
->>   tests/qemu-iotests/group   |   1 +
->>   3 files changed, 136 insertions(+)
->>   create mode 100644 tests/qemu-iotests/201
->>   create mode 100644 tests/qemu-iotests/201.out
->>
-> pep8 complains:
->
-> $ pep8 tests/qemu-iotests/201
-> tests/qemu-iotests/201:31:1: E302 expected 2 blank lines, found 1
-> tests/qemu-iotests/201:68:17: E128 continuation line under-indented for
-> visual indent
-> tests/qemu-iotests/201:69:17: E128 continuation line under-indented for
-> visual indent
->
-> I don't mind cleaning those up (if you don't have to respin because of
-> my comments on 5/6).
->
->> +import os
->> +import sys
->> +import iotests
->> +import time
->> +from iotests import qemu_img, qemu_io, filter_qemu_io, QemuIoInteractive
->> +
->> +nbd_port = '10900'
->> +nbd_uri = 'nbd+tcp://localhost:' + nbd_port + '/exp'
-> Is this still going to be safe when we improve the testsuite to run
-> multiple tests in parallel?  Wouldn't it be safer to dynamically choose
-> the port, instead of hard-coding one?
->
->> +disk = os.path.join(iotests.test_dir, 'disk')
->> +
->> +class TestNbdServerRemove(iotests.QMPTestCase):
->> +    def setUp(self):
->> +        qemu_img('create', '-f', iotests.imgfmt, disk, '1M')
->> +
->> +        self.vm = iotests.VM().add_drive(disk)
->> +        self.vm.launch()
->> +
->> +        address = {
->> +            'type': 'inet',
->> +            'data': {
->> +                'host': 'localhost',
->> +                'port': nbd_port
-> Again, for a one-shot test, this works; but it doesn't lend itself to
-> parallel testing.  Maybe do a loop with incrementing port numbers until
-> one succeeds, if we can reliably detect when a port is already in use?
->
->> +    def assertConnectFailed(self, qemu_io_output):
->> +        self.assertEqual(filter_qemu_io(qemu_io_output).strip(),
->> +                         "can't open device nbd+tcp://localhost:10900/exp: " +
-> Worth parameterizing or filtering this assertion to match the rest of
-> the parameterization of nbd_port?
->
->> +                         "Requested export not available\nserver reported: " +
->> +                         "export 'exp' not present")
->> +
->> +    def do_test_connect_after_remove(self, force=None):
->> +        args = ('-r', '-f', 'raw', '-c', 'read 0 512', nbd_uri)
->> +        self.assertReadOk(qemu_io(*args))
->> +        self.remove_export('exp', force)
->> +        self.assertExportNotFound('exp')
->> +        self.assertConnectFailed(qemu_io(*args))
->> +
->> +    def test_connect_after_remove_default(self):
->> +        self.do_test_connect_after_remove()
->> +
->> +    def test_connect_after_remove_safe(self):
->> +        self.do_test_connect_after_remove(False)
->> +
->> +    def test_connect_after_remove_force(self):
->> +        self.do_test_connect_after_remove(True)
-> May need updates if my comments on 3/6 result in us having three states
-> rather than just 2 (the difference being whether there is a knob for
-> choosing to let existing clients gracefully disconnect with all pending
-> I/O completed, and/or failing the nbd-server-remove if a client is still
-> connected).
->
->> +++ b/tests/qemu-iotests/201.out
->> @@ -0,0 +1,5 @@
->> +.......
->> +----------------------------------------------------------------------
->> +Ran 7 tests
-> I'm not a fan of python tests that are difficult to debug.  Your
-> additions to 147 in patch 4/6 are okay (hard to debug, but an
-> incremental addition); but is it possible to rewrite this test in a bit
-> more verbose manner?  See test 194 and this message for more details:
-> https://lists.gnu.org/archive/html/qemu-devel/2017-12/msg00234.html
+This revision is incorrect.
+Here is the latest one: https://lists.gnu.org/archive/html/qemu-devel/2018-01/msg01751.html
 
-hmm, what do you mean by "difficult to debug"? This is a usual python 
-unittest based test.
-And there 3 test cases, sharing same setUp. Do not you say that unittest 
-becomes
-deprecated in qemu? I think, if we have only one testcase, we may use 
-194-like approach,
-but if we have more, it's better to use unittest.
-
->
->> +
->> +OK
->> diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
->> index 3e688678dd..15df7678b3 100644
->> --- a/tests/qemu-iotests/group
->> +++ b/tests/qemu-iotests/group
->> @@ -197,3 +197,4 @@
->>   197 rw auto quick
->>   198 rw auto
->>   200 rw auto
->> +201 rw auto quick
->>
+Pavel Dovgalyuk
 
 
--- 
-Best regards,
-Vladimir
+> -----Original Message-----
+> From: Paolo Bonzini [mailto:paolo.bonzini@gmail.com] On Behalf Of Paolo Bonzini
+> Sent: Friday, January 12, 2018 2:30 PM
+> To: qemu-devel@nongnu.org
+> Cc: Maria Klimushenkova; Pavel Dovgalyuk
+> Subject: [PULL 04/52] hpet: recover timer offset correctly
+> 
+> From: Maria Klimushenkova <maria.klimushenkova@ispras.ru>
+> 
+> HPET saves its state by calculating the current time and recovers timer
+> offset using this calculated value. But these calculations include
+> divisions and multiplications. Therefore the timer state cannot be recovered
+> precise enough.
+> This patch introduces saving of the original value of the offset to
+> preserve the determinism of the timer.
+> 
+> Signed-off-by: Maria Klimushenkova <maria.klimushenkova@ispras.ru>
+> Signed-off-by: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
+> Message-Id: <20171220100205.16625.84632.stgit@pasha-VirtualBox>
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+>  hw/timer/hpet.c | 32 ++++++++++++++++++++++++++++++--
+>  1 file changed, 30 insertions(+), 2 deletions(-)
+> 
+> diff --git a/hw/timer/hpet.c b/hw/timer/hpet.c
+> index 577371b..4904a60 100644
+> --- a/hw/timer/hpet.c
+> +++ b/hw/timer/hpet.c
+> @@ -70,6 +70,7 @@ typedef struct HPETState {
+> 
+>      MemoryRegion iomem;
+>      uint64_t hpet_offset;
+> +    bool hpet_offset_loaded;
+>      qemu_irq irqs[HPET_NUM_IRQ_ROUTES];
+>      uint32_t flags;
+>      uint8_t rtc_irq_level;
+> @@ -221,7 +222,9 @@ static int hpet_pre_save(void *opaque)
+>      HPETState *s = opaque;
+> 
+>      /* save current counter value */
+> -    s->hpet_counter = hpet_get_ticks(s);
+> +    if (hpet_enabled(s)) {
+> +        s->hpet_counter = hpet_get_ticks(s);
+> +    }
+> 
+>      return 0;
+>  }
+> @@ -232,6 +235,8 @@ static int hpet_pre_load(void *opaque)
+> 
+>      /* version 1 only supports 3, later versions will load the actual value */
+>      s->num_timers = HPET_MIN_TIMERS;
+> +    /* for checking whether the hpet_offset section is loaded */
+> +    s->hpet_offset_loaded = false;
+>      return 0;
+>  }
+> 
+> @@ -252,7 +257,10 @@ static int hpet_post_load(void *opaque, int version_id)
+>      HPETState *s = opaque;
+> 
+>      /* Recalculate the offset between the main counter and guest time */
+> -    s->hpet_offset = ticks_to_ns(s->hpet_counter) - qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
+> +    if (!s->hpet_offset_loaded) {
+> +        s->hpet_offset = ticks_to_ns(s->hpet_counter)
+> +                        - qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
+> +    }
+> 
+>      /* Push number of timers into capability returned via HPET_ID */
+>      s->capability &= ~HPET_ID_NUM_TIM_MASK;
+> @@ -267,6 +275,14 @@ static int hpet_post_load(void *opaque, int version_id)
+>      return 0;
+>  }
+> 
+> +static int hpet_offset_post_load(void *opaque, int version_id)
+> +{
+> +    HPETState *s = opaque;
+> +
+> +    s->hpet_offset_loaded = true;
+> +    return 0;
+> +}
+> +
+>  static bool hpet_rtc_irq_level_needed(void *opaque)
+>  {
+>      HPETState *s = opaque;
+> @@ -285,6 +301,17 @@ static const VMStateDescription vmstate_hpet_rtc_irq_level = {
+>      }
+>  };
+> 
+> +static const VMStateDescription vmstate_hpet_offset = {
+> +    .name = "hpet/offset",
+> +    .version_id = 1,
+> +    .minimum_version_id = 1,
+> +    .post_load = hpet_offset_post_load,
+> +    .fields = (VMStateField[]) {
+> +        VMSTATE_UINT64(hpet_offset, HPETState),
+> +        VMSTATE_END_OF_LIST()
+> +    }
+> +};
+> +
+>  static const VMStateDescription vmstate_hpet_timer = {
+>      .name = "hpet_timer",
+>      .version_id = 1,
+> @@ -320,6 +347,7 @@ static const VMStateDescription vmstate_hpet = {
+>      },
+>      .subsections = (const VMStateDescription*[]) {
+>          &vmstate_hpet_rtc_irq_level,
+> +        &vmstate_hpet_offset,
+>          NULL
+>      }
+>  };
+> --
+> 1.8.3.1
+> 
