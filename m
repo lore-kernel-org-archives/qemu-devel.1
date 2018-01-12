@@ -1,27 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50031)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57902)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1ea15P-0004mZ-Eq
-	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 10:17:40 -0500
+	(envelope-from <mst@redhat.com>) id 1ea1Wp-0005XA-4A
+	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 10:46:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1ea15O-0001c3-GY
-	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 10:17:39 -0500
-Received: from mail-wr0-x243.google.com ([2a00:1450:400c:c0c::243]:39061)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1ea15N-0001Zr-TZ
-	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 10:17:38 -0500
-Received: by mail-wr0-x243.google.com with SMTP id z48so5590070wrz.6
-	for <qemu-devel@nongnu.org>; Fri, 12 Jan 2018 07:17:37 -0800 (PST)
+	(envelope-from <mst@redhat.com>) id 1ea1Wk-0001Hc-8x
+	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 10:45:59 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:65455)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1ea1Wk-0001HQ-20
+	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 10:45:54 -0500
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 1EF1D2FDC
+	for <qemu-devel@nongnu.org>; Fri, 12 Jan 2018 15:45:53 +0000 (UTC)
+Date: Fri, 12 Jan 2018 17:45:50 +0200
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20180112174431-mutt-send-email-mst@kernel.org>
+References: <1515665816-10313-1-git-send-email-ghammer@redhat.com>
+	<20180111215210-mutt-send-email-mst@kernel.org>
+	<CAA2ifQycadzATfW4w0icnskOgLTB1MUT2cMxVOt4=ZMWwgL=TQ@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <1515609318-1897-3-git-send-email-stefanb@linux.vnet.ibm.com>
-References: <1515609318-1897-1-git-send-email-stefanb@linux.vnet.ibm.com>
-	<1515609318-1897-3-git-send-email-stefanb@linux.vnet.ibm.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Fri, 12 Jan 2018 16:17:36 +0100
-Message-ID: <CAJ+F1CJwt+txMjY1AtCRF0_FzkgAm_qv8_itHUwnWD9s_Oucqg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <CAA2ifQycadzATfW4w0icnskOgLTB1MUT2cMxVOt4=ZMWwgL=TQ@mail.gmail.com>
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC PATCH 2/3] acpi: implement aml_lless_equal
+Subject: Re: [Qemu-devel] [PATCH] virtio: improve virtio devices
+ initialization time
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,61 +36,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Berger <stefanb@linux.vnet.ibm.com>
-Cc: QEMU <qemu-devel@nongnu.org>, kevin@koconnor.net, "Michael S. Tsirkin" <mst@redhat.com>
+To: Gal Hammer <ghammer@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-2018-01-10 19:35 GMT+01:00 Stefan Berger <stefanb@linux.vnet.ibm.com>:
-> LLessEqualOp =3D LNotOp LGreaterOp
->
-> Signed-off-by: Stefan Berger <stefanb@linux.vnet.ibm.com>
+On Fri, Jan 12, 2018 at 10:48:21AM +0200, Gal Hammer wrote:
+>=20
+> On Thu, Jan 11, 2018 at 9:52 PM, Michael S. Tsirkin <mst@redhat.com> wr=
+ote:
+>=20
+>     On Thu, Jan 11, 2018 at 12:16:56PM +0200, Gal Hammer wrote:
+>     > The loading time of a VM is quite significant when its virtio
+>     > devices uses a large amount of virt-queues (e.g. a virtio-serial
+>     > device with
+>     =E2=80=8B=E2=80=8B
+>     max_ports=3D511). Most of the time is spend in the
+>     > creation of all the required event notifiers (ioeventfd and memor=
+y
+>     > regions).
+>     >
+>     > This patch pack all the changes to the memory regions in a
+>     > single memory transaction.
+>     >
+>     > Reported-by: Sitong Liu <siliu@redhat.com>
+>     > Reported-by: Xiaoling Gao <xiagao@redhat.com>
+>     > Signed-off-by: Gal Hammer <ghammer@redhat.com>
+>=20
+>     Nice patch! Any timing numbers to share before/after?
+>=20
+>=20
+> Thanks. Unfortunately I made a mistake in the shutdown code (the transa=
+ction
+> is wrapping the code which doesn't modify the memory regions), so a V2 =
+is on
+> its way.
+>=20
+> As for the timing. Running a VM with 25 virtio-serial devices,=E2=80=8B=
+ each one with
+> max_ports=3D511, results in a boot time of around 30 minutes. With this=
+ patch
+> (and a another patch to kvm) reduce it to approximately 3 minutes.
 
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-
-
-> ---
->  hw/acpi/aml-build.c         | 10 ++++++++++
->  include/hw/acpi/aml-build.h |  1 +
->  2 files changed, 11 insertions(+)
->
-> diff --git a/hw/acpi/aml-build.c b/hw/acpi/aml-build.c
-> index 36a6cc4..597a58d 100644
-> --- a/hw/acpi/aml-build.c
-> +++ b/hw/acpi/aml-build.c
-> @@ -568,6 +568,16 @@ Aml *aml_lless(Aml *arg1, Aml *arg2)
->      return var;
->  }
->
-> +Aml *aml_lless_equal(Aml *arg1, Aml *arg2)
-> +{
-> +    /* LLessEqualOp :=3D LNotOp LGreaterOp */
-> +    Aml *var =3D aml_opcode(0x92 /* LNotOp */);
-> +    build_append_byte(var->buf, 0x94 /* LGreaterOp */);
-> +    aml_append(var, arg1);
-> +    aml_append(var, arg2);
-> +    return var;
-> +}
-> +
->  /* ACPI 1.0b: 16.2.5.4 Type 2 Opcodes Encoding: DefAdd */
->  Aml *aml_add(Aml *arg1, Aml *arg2, Aml *dst)
->  {
-> diff --git a/include/hw/acpi/aml-build.h b/include/hw/acpi/aml-build.h
-> index 88d0738..c4398cc 100644
-> --- a/include/hw/acpi/aml-build.h
-> +++ b/include/hw/acpi/aml-build.h
-> @@ -267,6 +267,7 @@ Aml *aml_lor(Aml *arg1, Aml *arg2);
->  Aml *aml_shiftleft(Aml *arg1, Aml *count);
->  Aml *aml_shiftright(Aml *arg1, Aml *count, Aml *dst);
->  Aml *aml_lless(Aml *arg1, Aml *arg2);
-> +Aml *aml_lless_equal(Aml *arg1, Aml *arg2);
->  Aml *aml_add(Aml *arg1, Aml *arg2, Aml *dst);
->  Aml *aml_subtract(Aml *arg1, Aml *arg2, Aml *dst);
->  Aml *aml_increment(Aml *arg);
-> --
-> 2.5.5
->
->
+Good to know, sounds like an important fix to have.
+Since you plan to do v2 anyway, please add this info
+in the commit log.
 
 
-
---=20
-Marc-Andr=C3=A9 Lureau
+> This was reported and tracked here: https://bugzilla.redhat.com/show_bu=
+g.cgi?id
+> =3D1528588
+>=20
+> =C2=A0=C2=A0=C2=A0 Gal.
