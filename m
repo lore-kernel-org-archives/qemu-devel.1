@@ -1,34 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42901)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43737)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eZxcO-0002T5-Lo
-	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 06:35:30 -0500
+	(envelope-from <no-reply@patchew.org>) id 1eZxdt-0003mi-5N
+	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 06:37:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eZxcJ-0008L4-M7
-	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 06:35:28 -0500
-Received: from mail-qk0-x22a.google.com ([2607:f8b0:400d:c09::22a]:34489)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eZxcJ-0008Km-GN
-	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 06:35:23 -0500
-Received: by mail-qk0-x22a.google.com with SMTP id b76so8269162qkc.1
-	for <qemu-devel@nongnu.org>; Fri, 12 Jan 2018 03:35:23 -0800 (PST)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <1515755504-21341-1-git-send-email-pbonzini@redhat.com>
-	<9da34f89-3866-bbae-636e-bf26a74cc4ff@amsat.org>
-	<8ab39ffe-57a3-5b7e-39f8-d6e062f027bf@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <cd78ffcb-6bee-000f-eaae-7982ef897f65@amsat.org>
-Date: Fri, 12 Jan 2018 08:35:17 -0300
+	(envelope-from <no-reply@patchew.org>) id 1eZxdo-0000t5-MH
+	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 06:37:01 -0500
+Resent-Message-Id: <E1eZxdo-0000t5-MH@eggs.gnu.org>
+Received: from sender-of-o51.zoho.com ([135.84.80.216]:21111)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1eZxdo-0000sO-Db
+	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 06:36:56 -0500
+In-Reply-To: <20180112101356.27044-1-zhengxiang9@huawei.com>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <151575698010.530.10584433403846190388@5adcb62bf0d6>
 MIME-Version: 1.0
-In-Reply-To: <8ab39ffe-57a3-5b7e-39f8-d6e062f027bf@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature";
-	boundary="2NLqke8MfhJeuQ9fgGpACHJ6d1Ioeq2Eb"
-Subject: Re: [Qemu-devel] [PATCH] docker: change Fedora base image to
- fedora:27
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Fri, 12 Jan 2018 03:36:21 -0800 (PST)
+Subject: Re: [Qemu-devel] [PATCH] vhost: fix corrupting GPA 0 when using
+ uninitialized queues
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,69 +29,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-devel@nongnu.org, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, Fam Zheng <famz@redhat.com>
+To: zhengxiang9@huawei.com
+Cc: famz@redhat.com, qemu-devel@nongnu.org, mst@redhat.com, maxime.coquelin@redhat.com, zhaoshenglong@huawei.com, pbonzini@redhat.com, lersek@redhat.com, christoffer.dall@linaro.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---2NLqke8MfhJeuQ9fgGpACHJ6d1Ioeq2Eb
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-devel@nongnu.org, =?UTF-8?Q?Alex_Benn=c3=a9e?=
- <alex.bennee@linaro.org>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?=
- <marcandre.lureau@redhat.com>, Fam Zheng <famz@redhat.com>
-Message-ID: <cd78ffcb-6bee-000f-eaae-7982ef897f65@amsat.org>
-Subject: Re: [Qemu-devel] [PATCH] docker: change Fedora base image to
- fedora:27
-References: <1515755504-21341-1-git-send-email-pbonzini@redhat.com>
- <9da34f89-3866-bbae-636e-bf26a74cc4ff@amsat.org>
- <8ab39ffe-57a3-5b7e-39f8-d6e062f027bf@redhat.com>
-In-Reply-To: <8ab39ffe-57a3-5b7e-39f8-d6e062f027bf@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
->>> --- a/tests/docker/dockerfiles/fedora.docker
->>> +++ b/tests/docker/dockerfiles/fedora.docker
->>> @@ -1,4 +1,4 @@
->>> -FROM fedora:latest
->>> +FROM fedora:27
->>
->> I'd rather use the deprecation approach like we use for Debian,
->> see tests/docker/dockerfiles/debian.docker.
->>
->> That said, you remind me of a series doing the same for Ubuntu I forgo=
-t
->> to send, if you want I can add fedora25 and fedora27 before sending.
->=20
-> That's fine by me (but use "fedora" instead of fedora25).
-
-Plan is:
-
-rename fedora -> fedora25
-add fedora27
-fedora: display a warning and use fedora25 for backward compatibility
-
-
-
---2NLqke8MfhJeuQ9fgGpACHJ6d1Ioeq2Eb
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCgAdFiEE+qvnXhKRciHc/Wuy4+MsLN6twN4FAlpYnXUACgkQ4+MsLN6t
-wN6OEQ//faNiccfd42XMWy6yvzFD5RzbasUvFjrxKe6DUJhKgwBFhyO0frqdoXv6
-9PJuRagG/ZH7dknibCQvjDYEE3C108OFBoKssSq1VjQnWGHoqHO/XK7Bvozo+O6X
-di9RUGWBoHCFtYrzHWhtLXgmd4iPPBk2zA7Qlr64/CB8d0CDIMMoDqXQ/5VqxxpM
-mc/b72sKdyBsDcXDPqOCu4Lbw/gISvfhVYtESArZVhATQVUiGSDLAKnSIvDkgQrC
-JI3pvPm3pf7nbGY7CP1408G4sexEVD2w+C2uFsuJ8VOV1vAPesxyi4e6+ahA3Txw
-c39KgDjT8Nog1XZZTLkHzOs2VflcBwgWMTSwiSSfCERZAXVsTdMbcDdvCAivbvtl
-bVer5DEb/Ig6pMY3d4ULEcuItl/hAItM0IGp3GD9EeXl5QTyYatOu8JIg26YOEAo
-j44aRg//Ti6SfRsqII/HJR06cYhopaRoWuAwDatAtZY8zmrLDGf4uQd2gFbmCGDv
-E1/43E4mnl/LgMKSTSkA3W/CNcZflkEDW6OUBJMoCF1YOc9FELeyFQUR4OQ8WkkC
-wx2qPrEmU6U9mOlJ5kNy8pY2yK6OkCjmuZQ638USnm2CjHoFjlvpoqchCaMWfWg2
-HbZa6T99HSglF2IWr967aLkcycOTp6GZbLqDcLecM9ejEStZ92g=
-=rU9e
------END PGP SIGNATURE-----
-
---2NLqke8MfhJeuQ9fgGpACHJ6d1Ioeq2Eb--
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IDIwMTgwMTEyMTAxMzU2LjI3MDQ0LTEtemhlbmd4aWFuZzlAaHVhd2VpLmNvbQpT
+dWJqZWN0OiBbUWVtdS1kZXZlbF0gW1BBVENIXSB2aG9zdDogZml4IGNvcnJ1cHRpbmcgR1BBIDAg
+d2hlbiB1c2luZyB1bmluaXRpYWxpemVkIHF1ZXVlcwoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09
+PQojIS9iaW4vYmFzaAoKQkFTRT1iYXNlCm49MQp0b3RhbD0kKGdpdCBsb2cgLS1vbmVsaW5lICRC
+QVNFLi4gfCB3YyAtbCkKZmFpbGVkPTAKCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxp
+bWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCgpjb21taXRzPSIkKGdp
+dCBsb2cgLS1mb3JtYXQ9JUggLS1yZXZlcnNlICRCQVNFLi4pIgpmb3IgYyBpbiAkY29tbWl0czsg
+ZG8KICAgIGVjaG8gIkNoZWNraW5nIFBBVENIICRuLyR0b3RhbDogJChnaXQgbG9nIC1uIDEgLS1m
+b3JtYXQ9JXMgJGMpLi4uIgogICAgaWYgISBnaXQgc2hvdyAkYyAtLWZvcm1hdD1lbWFpbCB8IC4v
+c2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgLTsgdGhlbgogICAgICAgIGZhaWxlZD0x
+CiAgICAgICAgZWNobwogICAgZmkKICAgIG49JCgobisxKSkKZG9uZQoKZXhpdCAkZmFpbGVkCj09
+PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVm
+N2Y0NGJkODg4NzEzMzg0ClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKZmI2NmYxODRh
+ZSB2aG9zdDogZml4IGNvcnJ1cHRpbmcgR1BBIDAgd2hlbiB1c2luZyB1bmluaXRpYWxpemVkIHF1
+ZXVlcwoKPT09IE9VVFBVVCBCRUdJTiA9PT0KQ2hlY2tpbmcgUEFUQ0ggMS8xOiB2aG9zdDogZml4
+IGNvcnJ1cHRpbmcgR1BBIDAgd2hlbiB1c2luZyB1bmluaXRpYWxpemVkIHF1ZXVlcy4uLgpFUlJP
+UjogdHJhaWxpbmcgd2hpdGVzcGFjZQojMzI6IEZJTEU6IGh3L3ZpcnRpby92aG9zdC5jOjE1MzU6
+CisgICAgICAgIGlmICh2aXJ0aW9fcXVldWVfZ2V0X2Rlc2NfYWRkcih2ZGV2LCBoZGV2LT52cV9p
+bmRleCArIGkpID09IDApICQKCnRvdGFsOiAxIGVycm9ycywgMCB3YXJuaW5ncywgOCBsaW5lcyBj
+aGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElm
+IGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0
+aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgo9PT0gT1VUUFVU
+IEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKLS0tCkVtYWlsIGdl
+bmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQ
+bGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAZnJlZWxpc3RzLm9yZw==
