@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56540)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59124)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1eZyBh-0002Ph-OV
-	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 07:11:58 -0500
+	(envelope-from <dovgaluk@ispras.ru>) id 1eZyHu-00081S-Ne
+	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 07:18:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1eZyBf-0001bd-3Q
-	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 07:11:57 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:47568)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1eZyBe-0001an-Up
-	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 07:11:55 -0500
-References: <20180111082452.27295.85707.stgit@pasha-VirtualBox>
-	<ecc919de-5193-a83c-0e29-4b8d9bc8d7d7@redhat.com>
-	<e0cbd675-7872-05c3-8c3e-214ef93e4552@redhat.com>
-	<002201d38b9d$f0a248d0$d1e6da70$@ru>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <357a23a7-2cac-a14d-f4b9-7f883b101ea7@redhat.com>
-Date: Fri, 12 Jan 2018 13:11:40 +0100
+	(envelope-from <dovgaluk@ispras.ru>) id 1eZyHt-00015U-Rd
+	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 07:18:22 -0500
+Received: from mail.ispras.ru ([83.149.199.45]:39104)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <dovgaluk@ispras.ru>) id 1eZyHt-00013z-Kf
+	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 07:18:21 -0500
+From: "Pavel Dovgalyuk" <dovgaluk@ispras.ru>
+References: <1515756676-3860-1-git-send-email-pbonzini@redhat.com>
+	<1515756676-3860-5-git-send-email-pbonzini@redhat.com>
+	<002101d38b9b$1f730620$5e591260$@ru>
+	<80ed7db1-e4b4-923f-5da5-a839d0995ced@redhat.com>
+In-Reply-To: <80ed7db1-e4b4-923f-5da5-a839d0995ced@redhat.com>
+Date: Fri, 12 Jan 2018 15:18:23 +0300
+Message-ID: <002301d38b9f$710329d0$53097d70$@ru>
 MIME-Version: 1.0
-In-Reply-To: <002201d38b9d$f0a248d0$d1e6da70$@ru>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC PATCH v3 00/30] replay additions
+Content-Type: text/plain;
+	charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+Content-Language: ru
+Subject: Re: [Qemu-devel] [PULL 04/52] hpet: recover timer offset correctly
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,53 +31,20 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pavel Dovgalyuk <dovgaluk@ispras.ru>, 'Pavel Dovgalyuk' <Pavel.Dovgaluk@ispras.ru>, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, peter.maydell@linaro.org, mst@redhat.com, jasowang@redhat.com, quintela@redhat.com, zuban32s@gmail.com, maria.klimushenkova@ispras.ru, kraxel@redhat.com, boost.lists@gmail.com, alex.bennee@linaro.org
+To: 'Paolo Bonzini' <pbonzini@redhat.com>, qemu-devel@nongnu.org
+Cc: 'Maria Klimushenkova' <maria.klimushenkova@ispras.ru>, 'Pavel Dovgalyuk' <pavel.dovgaluk@ispras.ru>
 
-On 12/01/2018 13:07, Pavel Dovgalyuk wrote:
->=20
->=20
->> -----Original Message-----
->> From: Paolo Bonzini [mailto:pbonzini@redhat.com]
->> Sent: Friday, January 12, 2018 12:33 PM
->> To: Pavel Dovgalyuk; qemu-devel@nongnu.org
->> Cc: kwolf@redhat.com; peter.maydell@linaro.org; mst@redhat.com; jasowa=
-ng@redhat.com;
->> quintela@redhat.com; zuban32s@gmail.com; maria.klimushenkova@ispras.ru=
-; dovgaluk@ispras.ru;
->> kraxel@redhat.com; boost.lists@gmail.com; alex.bennee@linaro.org
->> Subject: Re: [Qemu-devel] [RFC PATCH v3 00/30] replay additions
->>
->> On 11/01/2018 13:56, Paolo Bonzini wrote:
->>> On 11/01/2018 09:24, Pavel Dovgalyuk wrote:
->>>> Accidentally sent draft version of patches to the mailing list.
->>>> Please consider this one as the correct one.
->>>>
->>>> This set of patches includex fixes from Alex Benn=C3=A9e for fixing
->>>> BQL and replay locks after inventing the MTTCG. It also includes som=
-e
->>>> additional replay patches that makes this set of fixes working.
->>>> It is also fixes some vmstate creation (and loading) issues
->>>> in record/replay modes:
->>>>  - VM start/stop fixes in replay mode
->>>>  - overlay creation for blkreplay filter
->>>>  - fixes for vmstate save/load in record/replay mode
->>>>  - fixes for host clock vmstate
->>>>  - fixes for icount timers vmstate
->>>>
->>>> There is also a set of helper scripts written by Alex Benn=C3=A9e
->>>> for debugging the record/replay code.
->>>
->>> For now, I'm applying patches 13, 24-26 and 28.
->>
->> Which don't compile on Windows.
->=20
-> I can't build current version of qemu on Windows.
-> For the first time this happened when capstone was included into the bu=
-ild.
+> From: Paolo Bonzini [mailto:pbonzini@redhat.com]
+> On 12/01/2018 12:47, Pavel Dovgalyuk wrote:
+> > This revision is incorrect.
+> > Here is the latest one: https://lists.gnu.org/archive/html/qemu-devel/2018-01/msg01751.html
+> 
+> _That_ version was posted on 10 Jan.
+> 
+> _This_ version was posted on 11 Jan.  So this one is the latest one; the
+> latest one is wrong too.
 
-I've fixed it now.  But please do not submit patches that obviously need
-a Windows version without testing them (on Linux you can use "make
-docker-test-mingw@fedora" for example if you have a Docker setup).
+That's strange.
+I posted this version on 20 Dec: https://lists.gnu.org/archive/html/qemu-devel/2017-12/msg04172.html
 
-Paolo
+Pavel Dovgalyuk
