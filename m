@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47313)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51318)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1eZsl6-0003zT-Vp
-	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 01:24:10 -0500
+	(envelope-from <wei.w.wang@intel.com>) id 1eZt27-0008J3-IY
+	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 01:41:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1eZsl3-0000C0-0j
-	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 01:24:09 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:53360)
+	(envelope-from <wei.w.wang@intel.com>) id 1eZt24-00081S-H0
+	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 01:41:43 -0500
+Received: from mga02.intel.com ([134.134.136.20]:31857)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1eZsl2-0000AK-No
-	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 01:24:04 -0500
-Date: Fri, 12 Jan 2018 14:23:51 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20180112062351.GM2551@xz-mi>
-References: <20171219084557.9801-1-peterx@redhat.com>
-	<20171219084557.9801-22-peterx@redhat.com>
-	<20180109140810.GF31400@stefanha-x1.localdomain>
+	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
+	id 1eZt24-0007z4-7q
+	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 01:41:40 -0500
+Message-ID: <5A585930.1030009@intel.com>
+Date: Fri, 12 Jan 2018 14:44:00 +0800
+From: Wei Wang <wei.w.wang@intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20180109140810.GF31400@stefanha-x1.localdomain>
-Subject: Re: [Qemu-devel] [RFC v6 21/27] qmp: support out-of-band (oob)
- execution
+References: <20180110161438.GA28096@stefanha-x1.localdomain>
+	<5A5704B4.5090502@intel.com>
+	<CAJSP0QWyaE8qUGMgcpzB460Y=kpX4VDfqFWm-CWmmX4X3nmRMQ@mail.gmail.com>
+In-Reply-To: <CAJSP0QWyaE8qUGMgcpzB460Y=kpX4VDfqFWm-CWmmX4X3nmRMQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] vhost-pci and virtio-vhost-user
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,134 +29,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: qemu-devel@nongnu.org, Stefan Hajnoczi <shajnocz@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <famz@redhat.com>, Juan Quintela <quintela@redhat.com>, mdroth@linux.vnet.ibm.com, Eric Blake <eblake@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Markus Armbruster <armbru@redhat.com>, marcandre.lureau@redhat.com, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: Stefan Hajnoczi <stefanha@gmail.com>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel <qemu-devel@nongnu.org>
 
-On Tue, Jan 09, 2018 at 02:08:10PM +0000, Stefan Hajnoczi wrote:
-> On Tue, Dec 19, 2017 at 04:45:51PM +0800, Peter Xu wrote:
-> > diff --git a/monitor.c b/monitor.c
-> > index b571866659..505db439d8 100644
-> > --- a/monitor.c
-> > +++ b/monitor.c
-> > @@ -1090,6 +1090,44 @@ static void qmp_caps_apply(Monitor *mon, QMPCapabilityList *list)
-> >      }
-> >  }
-> >  
-> > +/*
-> > + * Return true if check successful, or false otherwise.  When false is
-> > + * returned, detailed error will be in errp if provided.
-> > + */
-> > +static bool qmp_cmd_oob_check(Monitor *mon, QDict *req, Error **errp)
-> > +{
-> > +    const char *command;
-> > +    QmpCommand *cmd;
-> > +
-> > +    command = qdict_get_try_str(req, "execute");
-> > +    if (!command) {
-> > +        error_setg(errp, "Command field 'execute' missing");
-> > +        return false;
-> > +    }
-> > +
-> > +    cmd = qmp_find_command(mon->qmp.commands, command);
-> > +    if (!cmd) {
-> > +        error_set(errp, ERROR_CLASS_COMMAND_NOT_FOUND,
-> > +                  "The command %s has not been found", command);
-> > +        return false;
-> > +    }
-> > +
-> > +    if (qmp_is_oob(req)) {
-> > +        if (!qmp_oob_enabled(mon)) {
-> > +            error_setg(errp, "Please enable Out-Of-Band first "
-> > +                       "for the session during handshake");
-> 
-> The qmp-spec.txt document calls it "capabilities negotiation".  I don't
-> see "handshake" mentioned.  Please use the terminology from the QMP spec
-> so it's clear what this error message means.
-> 
-> > +            return false;
-> > +        }
-> > +        if (!(cmd->options & QCO_ALLOW_OOB)) {
-> > +            error_setg(errp, "The command %s does not support OOB",
-> > +                       command);
-> > +            return false;
-> > +        }
-> > +    }
-> > +
-> > +    return true;
-> > +}
-> > +
-> >  void qmp_qmp_capabilities(bool has_enable, QMPCapabilityList *enable,
-> >                            Error **errp)
-> >  {
-> > @@ -4032,6 +4070,7 @@ static void monitor_qmp_bh_dispatcher(void *data)
-> >      QMPRequest *req_obj = monitor_qmp_requests_pop_one();
-> >  
-> >      if (req_obj) {
-> > +        trace_monitor_qmp_cmd_in_band(qobject_get_try_str(req_obj->id));
-> 
-> Not all tracers on all platforms support NULL string pointers.  Please
-> use qobject_get_try_str(req_obj->id) ?: "".
-> 
-> >          monitor_qmp_dispatch_one(req_obj);
-> >          /* Reschedule instead of looping so the main loop stays responsive */
-> >          qemu_bh_schedule(mon_global.qmp_dispatcher_bh);
-> > @@ -4055,17 +4094,31 @@ static void handle_qmp_command(JSONMessageParser *parser, GQueue *tokens)
-> >          error_setg(&err, QERR_JSON_PARSING);
-> >      }
-> >      if (err) {
-> > -        monitor_qmp_respond(mon, NULL, err, NULL);
-> > -        qobject_decref(req);
-> > -        return;
-> > +        goto err;
-> > +    }
-> > +
-> > +    /* Check against the request in general layout */
-> > +    qdict = qmp_dispatch_check_obj(req, &err);
-> > +    if (!qdict) {
-> > +        goto err;
-> >      }
-> >  
-> > -    qdict = qobject_to_qdict(req);
-> > -    if (qdict) {
-> > -        id = qdict_get(qdict, "id");
-> > -        qobject_incref(id);
-> > -        qdict_del(qdict, "id");
-> > -    } /* else will fail qmp_dispatch() */
-> > +    /* Check against OOB specific */
-> > +    if (!qmp_cmd_oob_check(mon, qdict, &err)) {
-> > +        goto err;
-> > +    }
-> > +
-> > +    id = qdict_get(qdict, "id");
-> > +
-> > +    /* When OOB is enabled, the "id" field is mandatory. */
-> > +    if (qmp_oob_enabled(mon) && !id) {
-> > +        error_setg(&err, "Out-Of-Band capability requires that "
-> > +                   "every command contains an 'id' field.");
-> 
-> error_setg() messages shouldn't end with a period ('.').
-> 
-> > +        goto err;
-> > +    }
-> > +
-> > +    qobject_incref(id);
-> > +    qdict_del(qdict, "id");
-> >  
-> >      req_obj = g_new0(QMPRequest, 1);
-> >      req_obj->mon = mon;
-> > @@ -4073,6 +4126,13 @@ static void handle_qmp_command(JSONMessageParser *parser, GQueue *tokens)
-> >      req_obj->req = req;
-> >      req_obj->need_resume = false;
-> >  
-> > +    if (qmp_is_oob(qdict)) {
-> > +        /* Out-Of-Band (OOB) requests are executed directly in parser. */
-> > +        trace_monitor_qmp_cmd_out_of_band(qobject_get_try_str(req_obj->id));
-> 
-> Same NULL "%s" issue here.
+On 01/11/2018 05:56 PM, Stefan Hajnoczi wrote:
+> On Thu, Jan 11, 2018 at 6:31 AM, Wei Wang <wei.w.wang@intel.com> wrote:
+>> On 01/11/2018 12:14 AM, Stefan Hajnoczi wrote:
+>>
+>> 2) requires the driver to join the vhost-user negotiation.
+> The driver must participate in vhost-user negotiation.  The vhost-pci
+> patches try to avoid this by taking features bits on the QEMU
+> command-line and hardcoding the number of supported virtqueues.  That
+> doesn't work in production environments because:
+> 1. What if the driver inside the VM has been updated and now supports
+> different features?
+> 2. What if the user isn't allowed to modify the VM configuration?
+> 3. What if the management software doesn't expose the feature bits
+> command-line parameter?
+> 4. What if the number of virtqueues must be different from QEMU's
+> default value to limit resource consumption?
+>
+> Users will find it incovenient to manually enter feature bits for the
+> driver they are using.  The driver needs to be part of negotiation so
+> it can indicate which features are supported, how many virtqueues,
+> etc.
+>
 
-Fixing them all.
+OK, the advantages of letting the guest join the vhost-user negotiation 
+sounds convincing to me. Thanks.
 
-Good to know the "?:" syntax...  Thanks,
 
--- 
-Peter Xu
+
+>> Without above two, the solution already works well, so I'm not sure why would we need the above two from functionality point of view.
+> The "[PATCH v3 0/7] Vhost-pci for inter-VM communication" series is
+> incomplete.  It is a subset of vhost-user-net and it works only for
+> poll-mode drivers.  It's the requirements that haven't been covered by
+> the vhost-pci patch series yet that make me prefer the
+> virtio-vhost-user approach.
+>
+> The virtio device design needs to be capable of supporting the rest of
+> vhost-user functionality in the future.  Once the code is merged in
+> QEMU and DPDK it will be very difficult to make changes to the virtio
+> device.
+
+This is how virtio works. A new feature with a new feature bit. Now, we 
+let the guest driver join the vhost-user negotiation (including feature 
+negotiation), the default device/driver feature negotiation is free to use.
+I'm thinking if it is worthwhile to do some kind of mediated 
+passthrough, which passes the selected messages only. Because many 
+messages are not necessary to be passed down (e.g. VHOST_USER_SEND_RARP 
+is not needed for simple VM-to-VM communication), though might be safe 
+to do. I plan to see your full passthrough code first, and see if 
+changing to mediated passthrough would be simpler.
+
+Best,
+Wei
