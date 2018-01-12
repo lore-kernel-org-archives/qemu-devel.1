@@ -1,23 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38110)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39260)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kbastian@mail.uni-paderborn.de>) id 1ea1zN-0001JQ-KJ
-	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 11:15:30 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1ea21b-0002vs-7q
+	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 11:17:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kbastian@mail.uni-paderborn.de>) id 1ea1zK-0003PX-7V
-	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 11:15:29 -0500
-References: <20171218174552.18871-1-richard.henderson@linaro.org>
-	<20171218174552.18871-3-richard.henderson@linaro.org>
-	<CAFEAcA9igMy9u0WdTBvJWms1G4Cd2m0QXUucJeXCJ1Uo=7OAMw@mail.gmail.com>
-	<300b87dc-7a0c-dda9-058d-674b115d06a1@linaro.org>
-From: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
-Message-ID: <7bec8c5f-3454-374f-b2e9-f01890e1996b@mail.uni-paderborn.de>
-Date: Fri, 12 Jan 2018 17:12:54 +0100
+	(envelope-from <peter.maydell@linaro.org>) id 1ea21a-00064W-4a
+	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 11:17:47 -0500
+Received: from mail-oi0-x243.google.com ([2607:f8b0:4003:c06::243]:36355)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1ea21Z-00063Y-Ux
+	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 11:17:46 -0500
+Received: by mail-oi0-x243.google.com with SMTP id w135so4262472oie.3
+	for <qemu-devel@nongnu.org>; Fri, 12 Jan 2018 08:17:45 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <300b87dc-7a0c-dda9-058d-674b115d06a1@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 02/23] target/arm: Add SVE decode skeleton
+In-Reply-To: <20180109122252.17670-13-alex.bennee@linaro.org>
+References: <20180109122252.17670-1-alex.bennee@linaro.org>
+	<20180109122252.17670-13-alex.bennee@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 12 Jan 2018 16:17:24 +0000
+Message-ID: <CAFEAcA_DiOa8jkpRcm5yytR+L=UL7xR74nRwWvPNt6dkMdWh+g@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 12/20] fpu/softfloat: re-factor mul
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,24 +30,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>, Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+Cc: Richard Henderson <richard.henderson@linaro.org>, Laurent Vivier <laurent@vivier.eu>, bharata@linux.vnet.ibm.com, Andrew Dutcher <andrew@andrewdutcher.com>, QEMU Developers <qemu-devel@nongnu.org>, Aurelien Jarno <aurelien@aurel32.net>
 
-On 01/11/2018 08:12 PM, Richard Henderson wrote:
-> On 01/11/2018 10:20 AM, Peter Maydell wrote:
->> On 18 December 2017 at 17:45, Richard Henderson
->> <richard.henderson@linaro.org> wrote:
-> 
-> I didn't want to attempt to generalize this until we have two users.
-> Particularly if we wind up with extra options to the script to change other
-> behavior.
+On 9 January 2018 at 12:22, Alex Benn=C3=A9e <alex.bennee@linaro.org> wrote=
+:
+> We can now add float16_mul and use the common decompose and
+> canonicalize functions to have a single implementation for
+> float16/32/64 versions.
+>
+> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> ---
+>  fpu/softfloat.c         | 207 ++++++++++++++++++------------------------=
+------
+>  include/fpu/softfloat.h |   1 +
+>  2 files changed, 80 insertions(+), 128 deletions(-)
+>
+> diff --git a/fpu/softfloat.c b/fpu/softfloat.c
+> index f89e47e3ef..6e9d4c172c 100644
+> --- a/fpu/softfloat.c
+> +++ b/fpu/softfloat.c
+> @@ -730,6 +730,85 @@ float64 float64_sub(float64 a, float64 b, float_stat=
+us *status)
+>      return float64_round_pack_canonical(pr, status);
+>  }
+>
+> +/*
+> + * Returns the result of multiplying the floating-point values `a' and
+> + * `b'. The operation is performed according to the IEC/IEEE Standard
+> + * for Binary Floating-Point Arithmetic.
+> + */
+> +
+> +static decomposed_parts mul_decomposed(decomposed_parts a, decomposed_pa=
+rts b,
+> +                                       float_status *s)
+> +{
+> +    bool sign =3D a.sign ^ b.sign;
+> +
+> +    if (a.cls =3D=3D float_class_normal && b.cls =3D=3D float_class_norm=
+al) {
+> +        uint64_t hi, lo;
+> +        int exp =3D a.exp + b.exp;
+> +
+> +        mul64To128(a.frac, b.frac, &hi, &lo);
+> +        shift128RightJamming(hi, lo, DECOMPOSED_BINARY_POINT, &hi, &lo);
+> +        if (lo & DECOMPOSED_OVERFLOW_BIT) {
+> +            shift64RightJamming(lo, 1, &lo);
+> +            exp +=3D 1;
+> +        }
+> +
+> +        /* Re-use a */
+> +        a.exp =3D exp;
+> +        a.sign =3D sign;
+> +        a.frac =3D lo;
+> +        return a;
+> +    }
+> +    /* handle all the NaN cases */
+> +    if (a.cls >=3D float_class_qnan || b.cls >=3D float_class_qnan) {
+> +        return pick_nan_parts(a, b, s);
+> +    }
+> +    /* Inf * Zero =3D=3D NaN */
+> +    if (((1 << a.cls) | (1 << b.cls)) =3D=3D
+> +        ((1 << float_class_inf) | (1 << float_class_zero))) {
 
-I might be exactly the second user. I think there is little sense having
-two generator scripts (one for ARM, and one for RISCV). Unfortunately I
-missed the original mail of Richard and can't find it anywhere in my
-mailbox. What is the best way to leave some review comment's for
-Richards patch containing scripts/decodetree.py, since I cannot inline
-it in a mail?
+This is kinda confusing...
 
-Cheers,
-Bastian
+> +        s->float_exception_flags |=3D float_flag_invalid;
+> +        a.cls =3D float_class_dnan;
+> +        a.sign =3D sign;
+> +        return a;
+> +    }
+> +    /* Multiply by 0 or Inf */
+> +    if (a.cls =3D=3D float_class_inf || a.cls =3D=3D float_class_zero) {
+> +        a.sign =3D sign;
+> +        return a;
+> +    }
+> +    if (b.cls =3D=3D float_class_inf || b.cls =3D=3D float_class_zero) {
+> +        b.sign =3D sign;
+> +        return b;
+> +    }
+> +    g_assert_not_reached();
+> +}
+
+thanks
+-- PMM
