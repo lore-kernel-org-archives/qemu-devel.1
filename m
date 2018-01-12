@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39260)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40074)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ea21b-0002vs-7q
-	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 11:17:48 -0500
+	(envelope-from <steven.seeger@flightsystems.net>) id 1ea23C-0004DA-N7
+	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 11:19:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ea21a-00064W-4a
-	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 11:17:47 -0500
-Received: from mail-oi0-x243.google.com ([2607:f8b0:4003:c06::243]:36355)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1ea21Z-00063Y-Ux
-	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 11:17:46 -0500
-Received: by mail-oi0-x243.google.com with SMTP id w135so4262472oie.3
-	for <qemu-devel@nongnu.org>; Fri, 12 Jan 2018 08:17:45 -0800 (PST)
+	(envelope-from <steven.seeger@flightsystems.net>) id 1ea239-0000G2-Gj
+	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 11:19:26 -0500
+Received: from p3plsmtpa11-03.prod.phx3.secureserver.net
+	([68.178.252.104]:57730)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <steven.seeger@flightsystems.net>)
+	id 1ea239-0000DA-B8
+	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 11:19:23 -0500
+From: Steven Seeger <steven.seeger@flightsystems.net>
+Reply-To: steven.seeger@flightsystems.net
+Date: Fri, 12 Jan 2018 11:19:19 -0500
+Message-ID: <2465248.BadtJazF69@wirbelwind>
 MIME-Version: 1.0
-In-Reply-To: <20180109122252.17670-13-alex.bennee@linaro.org>
-References: <20180109122252.17670-1-alex.bennee@linaro.org>
-	<20180109122252.17670-13-alex.bennee@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 12 Jan 2018 16:17:24 +0000
-Message-ID: <CAFEAcA_DiOa8jkpRcm5yytR+L=UL7xR74nRwWvPNt6dkMdWh+g@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 12/20] fpu/softfloat: re-factor mul
+Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset="us-ascii"
+Subject: [Qemu-devel] ppc icount questions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,89 +27,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
-Cc: Richard Henderson <richard.henderson@linaro.org>, Laurent Vivier <laurent@vivier.eu>, bharata@linux.vnet.ibm.com, Andrew Dutcher <andrew@andrewdutcher.com>, QEMU Developers <qemu-devel@nongnu.org>, Aurelien Jarno <aurelien@aurel32.net>
+To: qemu-devel@nongnu.org
 
-On 9 January 2018 at 12:22, Alex Benn=C3=A9e <alex.bennee@linaro.org> wrote=
-:
-> We can now add float16_mul and use the common decompose and
-> canonicalize functions to have a single implementation for
-> float16/32/64 versions.
->
-> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-> ---
->  fpu/softfloat.c         | 207 ++++++++++++++++++------------------------=
-------
->  include/fpu/softfloat.h |   1 +
->  2 files changed, 80 insertions(+), 128 deletions(-)
->
-> diff --git a/fpu/softfloat.c b/fpu/softfloat.c
-> index f89e47e3ef..6e9d4c172c 100644
-> --- a/fpu/softfloat.c
-> +++ b/fpu/softfloat.c
-> @@ -730,6 +730,85 @@ float64 float64_sub(float64 a, float64 b, float_stat=
-us *status)
->      return float64_round_pack_canonical(pr, status);
->  }
->
-> +/*
-> + * Returns the result of multiplying the floating-point values `a' and
-> + * `b'. The operation is performed according to the IEC/IEEE Standard
-> + * for Binary Floating-Point Arithmetic.
-> + */
-> +
-> +static decomposed_parts mul_decomposed(decomposed_parts a, decomposed_pa=
-rts b,
-> +                                       float_status *s)
-> +{
-> +    bool sign =3D a.sign ^ b.sign;
-> +
-> +    if (a.cls =3D=3D float_class_normal && b.cls =3D=3D float_class_norm=
-al) {
-> +        uint64_t hi, lo;
-> +        int exp =3D a.exp + b.exp;
-> +
-> +        mul64To128(a.frac, b.frac, &hi, &lo);
-> +        shift128RightJamming(hi, lo, DECOMPOSED_BINARY_POINT, &hi, &lo);
-> +        if (lo & DECOMPOSED_OVERFLOW_BIT) {
-> +            shift64RightJamming(lo, 1, &lo);
-> +            exp +=3D 1;
-> +        }
-> +
-> +        /* Re-use a */
-> +        a.exp =3D exp;
-> +        a.sign =3D sign;
-> +        a.frac =3D lo;
-> +        return a;
-> +    }
-> +    /* handle all the NaN cases */
-> +    if (a.cls >=3D float_class_qnan || b.cls >=3D float_class_qnan) {
-> +        return pick_nan_parts(a, b, s);
-> +    }
-> +    /* Inf * Zero =3D=3D NaN */
-> +    if (((1 << a.cls) | (1 << b.cls)) =3D=3D
-> +        ((1 << float_class_inf) | (1 << float_class_zero))) {
+Hi guys. I'm the poster on the qemu-discuss list about some technical icount 
+questions and was told to come over here to qemu-devel.
 
-This is kinda confusing...
+My scenario: x86-64 host running qemu/ppc-softmmu with an unmodfied ppc750 cpu 
+and a custom board target with chipset I implemented.
 
-> +        s->float_exception_flags |=3D float_flag_invalid;
-> +        a.cls =3D float_class_dnan;
-> +        a.sign =3D sign;
-> +        return a;
-> +    }
-> +    /* Multiply by 0 or Inf */
-> +    if (a.cls =3D=3D float_class_inf || a.cls =3D=3D float_class_zero) {
-> +        a.sign =3D sign;
-> +        return a;
-> +    }
-> +    if (b.cls =3D=3D float_class_inf || b.cls =3D=3D float_class_zero) {
-> +        b.sign =3D sign;
-> +        return b;
-> +    }
-> +    g_assert_not_reached();
-> +}
+I am trying to use icount to get virtual time to increase based on CPU 
+instructions executed and not host time. So, if I have a register in a device 
+model that is implemented with sleep(1); I would expect virtual time to think 
+only a single instruction (or small group of instructions) passed with the 
+register access even though real time has stalled a whole second.
 
-thanks
--- PMM
+When using icount shift=auto, I see behavior where my UART character TX 
+interrupt (I had to add a character tx timer to serial.c because WindRiver's 
+UART code stops at 11 characters and waits for an interrupt that never comes 
+in qemu's impossibly-fast UART) fires every 40ms of virtual time instead of 
+every 87 microseconds of virtual time. After the bootup characters fly by, 
+more interrupts are turned on and the behavior changes. (I tend to see a 
+character come every 120-155 microseconds of virtual time.) 
+
+With icount sleep=off, I see the UART interrupts happen must faster on bootup, 
+but their timing is still imprecise.
+
+My goal is to have QEMU respond deterministically to timer events and also 
+execute instructions wtih time increasing as a proportion of those executed 
+instructions.
+
+A good example of this would be that say I have an interrupt that occurs every 
+second. If I were to print out the virtual time that interrupt occurs in the 
+device model, I should see a time of:
+
+1.000000
+2.000000
+3.000000
+4.000000
+
+etc
+
+Instead, I see:
+
+1.000000
+2.000013
+3.000074
+4.000022
+
+When the timer function is called in the device model, I arm the timer again 
+with qemu_get_clock_ns(QEMU_CLOCK_VIRTUAL + 1000000000ULL) and expect this 
+time to be exaclty 1 second of virtual time later.
+
+Either the virtual time is increasing without instructions executing or the 
+granularity of when the timer is serviced relative to virtual time is not 
+exact. I think the latter is happening. Is this because a tcg codeblock must 
+execute completely and this causes increases in virtual time based on the 
+number of instructions in that block, and the number of instructions varies?
+
+I looked at Aaron Larson's post at > http://lists.nongnu.org/archive/html/
+qemu-discuss/2017-01/msg00022.html and this did not work for me. In fact, I 
+never see warp_start be anything other than -1 during the length of time I 
+tested it.
+
+Thanks for your help or any feedback.
+
+Steven
