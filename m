@@ -1,25 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41961)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42356)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1eZqx6-0004pK-E0
-	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 23:28:25 -0500
+	(envelope-from <bounces@canonical.com>) id 1eZqyX-0005cI-Ag
+	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 23:29:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1eZqx3-0003Tb-Az
-	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 23:28:24 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:38964)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1eZqx3-0003Sr-2b
-	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 23:28:21 -0500
-Date: Fri, 12 Jan 2018 12:28:09 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20180112042809.GG2551@xz-mi>
-References: <20171219084557.9801-1-peterx@redhat.com>
-	<20171219084557.9801-12-peterx@redhat.com>
-	<f545e9b6-621b-e2e6-505b-f520625c173d@redhat.com>
+	(envelope-from <bounces@canonical.com>) id 1eZqyU-0005JQ-7R
+	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 23:29:53 -0500
+Received: from indium.canonical.com ([91.189.90.7]:37304)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1eZqyU-0005Hv-12
+	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 23:29:50 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1eZqyR-0001II-QM
+	for <qemu-devel@nongnu.org>; Fri, 12 Jan 2018 04:29:47 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id C69B22E80CD
+	for <qemu-devel@nongnu.org>; Fri, 12 Jan 2018 04:29:47 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <f545e9b6-621b-e2e6-505b-f520625c173d@redhat.com>
-Subject: Re: [Qemu-devel] [RFC v6 11/27] qmp: introduce QMPCapability
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 12 Jan 2018 04:17:19 -0000
+From: Launchpad Bug Tracker <1086782@bugs.launchpad.net>
+Reply-To: Bug 1086782 <1086782@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20121205125603.6348.62070.malonedeb@gac.canonical.com>
+Message-Id: <151573064000.6414.3315948849626010293.malone@loganberry.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1086782] Re: HPET time drift windows 7 64bits
+ guest
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,93 +37,124 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org, Stefan Hajnoczi <shajnocz@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <famz@redhat.com>, Juan Quintela <quintela@redhat.com>, mdroth@linux.vnet.ibm.com, Laurent Vivier <lvivier@redhat.com>, Markus Armbruster <armbru@redhat.com>, marcandre.lureau@redhat.com, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: qemu-devel@nongnu.org
 
-On Thu, Jan 11, 2018 at 05:07:11PM -0600, Eric Blake wrote:
-> On 12/19/2017 02:45 AM, Peter Xu wrote:
-> > There was no QMP capabilities defined.  Define the first "oob" as
-> 
-> s/was/were/
+[Expired for QEMU because there has been no activity for 60 days.]
 
-Fixed.
+** Changed in: qemu
+       Status: Incomplete =3D> Expired
 
-Just to confirm: is "There was no QMP capability" also correct?
+-- =
 
-> 
-> > capability to allow out-of-band messages.
-> > 
-> > Also, touch up qmp-test.c to test the new bits.
-> > 
-> > Signed-off-by: Peter Xu <peterx@redhat.com>
-> > ---
-> >  monitor.c        | 10 ++++++++--
-> >  qapi-schema.json | 13 +++++++++++++
-> >  tests/qmp-test.c | 10 +++++++++-
-> >  3 files changed, 30 insertions(+), 3 deletions(-)
-> 
-> I'm assuming later patches will document this?
-> 
-> I'm somewhat a fan of documentation alongside or before implementation,
-> as getting the general overview right and then checking that the code
-> matches is a bit nicer than random coding then documenting what we ended
-> up with.  But I don't know if reordering patches in your series is
-> necessary, as long as the end product is properly documented.
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1086782
 
-Yes, I put the whole document at the end of the series.  I can put it
-as the first patch too.
+Title:
+  HPET time drift windows 7 64bits guest
 
-> 
-> > +++ b/qapi-schema.json
-> > @@ -118,6 +118,19 @@
-> >  ##
-> >  { 'command': 'qmp_capabilities' }
-> 
-> The client can't request a particular feature alongside the command?  Or
-> is that in later patches?  With just this patch, the enum QMPCapability
-> is not introspected, because it is not referenced by any command
-> (although introspection is a bit moot, since the client will learn what
-> the host advertises from the initial handshake before the client can
-> even request introspection).
+Status in QEMU:
+  Expired
 
-Yes, client can't if without further patches.
+Bug description:
+  Using latest qemu-kvm (1.2.0), time drift (clock slow in guest) in Window=
+s 7 64 bits guest when HPET is enabled (default).
+  Disabling HPET (-no-hpet) solves the time drift.
 
-> 
-> >  
-> > +##
-> > +# @QMPCapability:
-> > +#
-> > +# QMP supported capabilities to be broadcasted to the clients.
-> 
-> 'broadcast' is one of those weird verbs that doesn't change spelling
-> when constructing its past tense (there is no 'broadcasted').  However,
-> I think this description is a bit nicer (and avoids the problematic word
-> altogether):
-> 
-> Enumeration of capabilities to be advertised during initial client
-> connection, used for agreeing on particular QMP extension behaviors.
+  UsePlatformClock enable/disable doesn't make a difference in the guest.
+  bcdedit /set useplatformclock true
 
-I'll take your advise.
+  Using driftfix slew doesn't make a difference too.
 
-> 
-> > +#
-> > +# @oob:   QMP ability to support Out-Of-Band requests.
-> 
-> Rather terse (it doesn't say what Out-Of-Band requests are); even a
-> pointer to the QMP spec (where OOB is more fully documented) might be
-> nice (of course, that means we need a patch to docs/interop/qmp-spec.txt
-> somewhere in the series, especially since this patch renders 2.2.1 in
-> that document obsolete...)
+  =
 
-Sorry for the inconvenience.  Please refer to the last doc patch for
-details.
+  # qemu-system-x86_64 --version
+  QEMU emulator version 1.2.0 (qemu-kvm-1.2.0), Copyright (c) 2003-2008 Fab=
+rice Bellard
 
-I thought the doc patch would explain itself but obviously I should be
-more careful on the ordering next time to ease reviewers.  I'll move
-the doc patch to front when repost, and I'll note here to refer to
-qmp-spec.txt for more information.
+  Kernel is 3.6.8:
+  # uname -a
+  Linux pulsar 3.6.8 #1 SMP Sat Dec 1 16:26:10 CET 2012 x86_64 x86_64 x86_6=
+4 GNU/Linux
 
-Thanks,
+  TSC is stable in the host:
+  =3D=3D=3D
+  # cat /sys/devices/system/clocksource/clocksource0/current_clocksource
+  tsc
 
--- 
-Peter Xu
+  Dmesg:
+  [    0.000000] hpet clockevent registered
+  [    0.000000] tsc: Fast TSC calibration using PIT
+  [    0.000000] tsc: Detected 2660.096 MHz processor
+  [    0.001002] Calibrating delay loop (skipped), value calculated using t=
+imer frequency.. 5320.19 BogoMIPS (lpj=3D2660096)
+  [    0.001138] pid_max: default: 32768 minimum: 301
+  ...
+  [    1.492019] tsc: Refined TSC clocksource calibration: 2659.973 MHz
+  [    1.492093] Switching to clocksource tsc
+
+  =
+
+  CPUinfo, constant_tsc:
+  vendor_id       : GenuineIntel
+  cpu family      : 6
+  model           : 23
+  model name      : Intel(R) Core(TM)2 Quad CPU    Q8400  @ 2.66GHz
+  stepping        : 10
+  microcode       : 0xa0b
+  cpu MHz         : 2667.000
+  cache size      : 2048 KB
+  flags           : fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mc=
+a cmov pat pse36 clflush dts acpi mmx fxsr sse sse2 ss ht tm pbe syscall nx=
+ lm constant_tsc arch_perfmon pebs bts rep_good nopl aperfmperf pni dtes64 =
+monitor ds_cpl vmx est tm2 ssse3 cx16 xtpr pdcm sse4_1 xsave lahf_lm dtherm=
+ tpr_shadow vnmi flexpriority
+  bogomips        : 5320.19
+
+  # grep -i hpet .config
+  CONFIG_HPET_TIMER=3Dy
+  CONFIG_HPET_EMULATE_RTC=3Dy
+  CONFIG_HPET=3Dy
+  # CONFIG_HPET_MMAP is not set
+  =3D=3D=3D
+
+  Qemu command line:
+  /usr/bin/qemu-system-x86_64 -drive file=3D/dev/vol0/KVMORION01,cache=3Dno=
+ne,aio=3Dnative,if=3Dvirtio \
+    -drive file=3D/dev/vol0/KVMORION02,cache=3Dnone,aio=3Dnative,if=3Dvirti=
+o \
+    -cpu host \
+    -m 2048 \
+    -smp 4,maxcpus=3D4,cores=3D4,threads=3D1,sockets=3D1 \
+    -rtc base=3Dlocaltime,driftfix=3Dslew \
+    -vnc 10.124.241.211:0,password -k es \
+    -monitor telnet:localhost:37200,server,nowait \
+    -netdev tap,id=3Dkvmorion,ifname=3Dkvmorion,script=3D/etc/qemu-ifup-br0=
+,downscript=3D/etc/qemu-ifdown-br0 \
+    -device virtio-net-pci,netdev=3Dkvmorion,id=3Dvirtio-nic0,mac=3D02:85:6=
+4:02:c2:aa \
+    -device virtio-balloon-pci,id=3Dballoon0 \
+    -boot menu=3Don \
+    -pidfile /var/run/kvmorion.pid \
+    -daemonize
+
+  Using 1 CPU doesn't make a difference.
+  Only workaround is disabling hpet (-no-hpet)
+
+  Sample time drift in guest:
+  >ntpdate -q 10.124.241.211
+   5 Dec 13:36:06 ntpdate[3464]: Raised to realtime priority class
+  server 10.124.241.211, stratum 2, offset 3.694184, delay 0.02551
+   5 Dec 13:36:12 ntpdate[3464]: step time server 10.124.241.211 offset 3.6=
+94184 s
+  ec
+
+  >ntpdate -q 10.124.241.211
+   5 Dec 13:52:02 ntpdate[1964]: Raised to realtime priority class
+  server 10.124.241.211, stratum 2, offset 4.719968, delay 0.02554
+   5 Dec 13:52:08 ntpdate[1964]: step time server 10.124.241.211 offset 4.7=
+19968 s
+  ec
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1086782/+subscriptions
