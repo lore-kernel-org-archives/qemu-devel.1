@@ -1,32 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41375)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41652)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1eZyek-0001LU-B3
-	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 07:41:59 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1eZyfc-0001uJ-BY
+	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 07:42:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1eZyef-0006nC-FK
-	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 07:41:58 -0500
-Received: from mail.ispras.ru ([83.149.199.45]:41924)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1eZyef-0006iD-6p
-	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 07:41:53 -0500
-From: "Pavel Dovgalyuk" <dovgaluk@ispras.ru>
-References: <20180111082452.27295.85707.stgit@pasha-VirtualBox>
-	<20180111082738.27295.80055.stgit@pasha-VirtualBox>
-	<0e223aaa-c3c9-1cdf-5548-5a532d3a7361@redhat.com>
-	<000901d38add$ddb4b750$991e25f0$@ru>
-	<17a6b61c-e151-a5e1-978a-b54da71dbe55@redhat.com>
-	<001301d38b6c$83c6d090$8b5471b0$@ru>
-	<1fa94259-35a3-01ce-ebbb-94163508e5a8@redhat.com>
-In-Reply-To: <1fa94259-35a3-01ce-ebbb-94163508e5a8@redhat.com>
-Date: Fri, 12 Jan 2018 15:41:53 +0300
-Message-ID: <002401d38ba2$b9b3fda0$2d1bf8e0$@ru>
+	(envelope-from <peter.maydell@linaro.org>) id 1eZyfb-00008p-Fw
+	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 07:42:52 -0500
+Received: from mail-ot0-x230.google.com ([2607:f8b0:4003:c0f::230]:44162)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1eZyfb-00007Q-A3
+	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 07:42:51 -0500
+Received: by mail-ot0-x230.google.com with SMTP id g59so4914441otg.11
+	for <qemu-devel@nongnu.org>; Fri, 12 Jan 2018 04:42:51 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-Content-Language: ru
-Subject: Re: [Qemu-devel] [RFC PATCH v3 29/30] replay: improve replay
- performance
+In-Reply-To: <833c4229-7a78-849f-c17a-bfbef4506458@linaro.org>
+References: <20171218174552.18871-1-richard.henderson@linaro.org>
+	<CAFEAcA9Qnj0G03x72BFLAYmodeBMDB=t3pz4JxUj0HvrbhkuGA@mail.gmail.com>
+	<f82e02e3-40dd-8e74-6fe5-3205cdd42758@linaro.org>
+	<CAFEAcA9eNzA9Yar4SC5UKWzMij0ypyXKATRqU1pVx8UTf33u7Q@mail.gmail.com>
+	<833c4229-7a78-849f-c17a-bfbef4506458@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 12 Jan 2018 12:42:30 +0000
+Message-ID: <CAFEAcA-Hr0DAJi7rggmRudDc0L+g35MZ_1doOjSJe4TiThb23A@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [RFC 00/23] target/arm: decode generator and
+ initial sve patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,33 +33,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: 'Paolo Bonzini' <pbonzini@redhat.com>, 'Pavel Dovgalyuk' <Pavel.Dovgaluk@ispras.ru>, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, peter.maydell@linaro.org, boost.lists@gmail.com, quintela@redhat.com, jasowang@redhat.com, mst@redhat.com, zuban32s@gmail.com, maria.klimushenkova@ispras.ru, kraxel@redhat.com, alex.bennee@linaro.org
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>
 
-> From: Paolo Bonzini [mailto:pbonzini@redhat.com]
-> On 12/01/2018 07:13, Pavel Dovgalyuk wrote:
-> >> From: Paolo Bonzini [mailto:pbonzini@redhat.com]
-> >> On 11/01/2018 14:12, Pavel Dovgalyuk wrote:
-> >>>> From: Paolo Bonzini [mailto:paolo.bonzini@gmail.com] On Behalf Of Paolo Bonzini
-> >>>> On 11/01/2018 09:27, Pavel Dovgalyuk wrote:
-> >>>>> +        } else {
-> >>>>> +            qemu_notify_event();
-> >>>>> +        }
-> >>>>
-> >>>> Before this patch, what would do the qemu_notify_event?
-> >>>
-> >>> We tried using qemu_notify_event to wake up the iothread and speedup the replay,
-> >>> when there is no work for vcpu thread to do.
-> >>
-> >> But why doesn't the iothread wake up on its own?
-> >
-> > It will wake up by timeout. But with this change this happens sooner and replay goes faster.
-> 
-> If you want replays to ignore timeouts, that should be done by ensuring
-> that qemu-timer.c passes a zero timeout to main-loop.c.  (It probably
-> should be optional, too, maybe via -icount sleep).
+On 11 January 2018 at 19:34, Richard Henderson
+<richard.henderson@linaro.org> wrote:
+> On 01/11/2018 11:27 AM, Peter Maydell wrote:
+>> tgt-arm-cplx ? I had a look at that but it seemed to be a different
+>> set of patches to this lot.
+>
+> No, tgt-arm-sve-{1,2,3}.  All of them should build.
 
-Making it optional is a good one.
-I'll exclude this patch from the series for working on it later.
+Thank you. I've now had a look at the generated code and
+reviewed patch 1. I had a quick look through some of the
+later patches, mostly to check how the use of the script
+looks, but I don't intend to review them properly at this
+point (unless you think I should).
 
-Pavel Dovgalyuk
+PS: a quote which kept coming to mind while I was reading
+this patchset:
+
+  'Er, what does the Z mean?' said Zaphod.
+  'Which one?'
+  'Any one.'
+
+thanks
+-- PMM
