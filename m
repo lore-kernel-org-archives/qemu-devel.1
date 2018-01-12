@@ -1,26 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43326)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44918)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ea4E5-0002lg-Cu
-	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 13:38:50 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1ea4JS-0005MF-0g
+	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 13:44:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ea4E1-0000wV-AB
-	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 13:38:49 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:42658)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1ea4E1-0000to-1A
-	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 13:38:45 -0500
-References: <1515756676-3860-1-git-send-email-pbonzini@redhat.com>
-	<1515756676-3860-53-git-send-email-pbonzini@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <b8e975b0-638d-d603-85af-cb9a7b091bfa@redhat.com>
-Date: Fri, 12 Jan 2018 12:38:37 -0600
+	(envelope-from <richard.henderson@linaro.org>) id 1ea4JM-0005mp-Uq
+	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 13:44:22 -0500
+Received: from mail-pg0-x22c.google.com ([2607:f8b0:400e:c05::22c]:38901)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1ea4JM-0005lq-P7
+	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 13:44:16 -0500
+Received: by mail-pg0-x22c.google.com with SMTP id t67so5111547pgc.5
+	for <qemu-devel@nongnu.org>; Fri, 12 Jan 2018 10:44:16 -0800 (PST)
+References: <20171218173022.18418-1-richard.henderson@linaro.org>
+	<20171218173022.18418-6-richard.henderson@linaro.org>
+	<CAFEAcA_NXsPZYJHhYZShroXFUS_5SwpJCi8ehBL+o4OxpNqYmA@mail.gmail.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <436817d9-3377-3828-b513-42934cbaa949@linaro.org>
+Date: Fri, 12 Jan 2018 10:44:12 -0800
 MIME-Version: 1.0
-In-Reply-To: <1515756676-3860-53-git-send-email-pbonzini@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="fAc9WxweWKa8SpJ62YenmEDPQyKhLGVVU"
-Subject: Re: [Qemu-devel] [PULL 52/52] scripts/analyse-locks-simpletrace.py:
- script to analyse lock times
+In-Reply-To: <CAFEAcA_NXsPZYJHhYZShroXFUS_5SwpJCi8ehBL+o4OxpNqYmA@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 5/9] target/arm: Add
+ aa32_vfp_dreg/aa64_vfp_qreg helpers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,88 +33,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
-Cc: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---fAc9WxweWKa8SpJ62YenmEDPQyKhLGVVU
-From: Eric Blake <eblake@redhat.com>
-To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
-Cc: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
-Message-ID: <b8e975b0-638d-d603-85af-cb9a7b091bfa@redhat.com>
-Subject: Re: [Qemu-devel] [PULL 52/52] scripts/analyse-locks-simpletrace.py:
- script to analyse lock times
-References: <1515756676-3860-1-git-send-email-pbonzini@redhat.com>
- <1515756676-3860-53-git-send-email-pbonzini@redhat.com>
-In-Reply-To: <1515756676-3860-53-git-send-email-pbonzini@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On 01/12/2018 10:24 AM, Peter Maydell wrote:
+>> +/**
+>> + * aa32_vfp_dreg:
+>> + * Return a pointer to the Dn register within env in 32-bit mode.
+>> + */
+>> +static inline uint64_t *aa32_vfp_dreg(CPUARMState *env, unsigned regno)
+>> +{
+>> +    return &env->vfp.regs[regno];
+>> +}
+>> +
+>> +/**
+>> + * aa64_vfp_dreg:
+>> + * Return a pointer to the Qn register within env in 64-bit mode.
+>> + */
+>> +static inline uint64_t *aa64_vfp_qreg(CPUARMState *env, unsigned regno)
+> 
+> Comment and code disagree about the name of the function...
 
-On 01/12/2018 05:31 AM, Paolo Bonzini wrote:
-> From: Alex Benn=C3=A9e <alex.bennee@linaro.org>
->=20
-> This script allows analysis of mutex acquisition and hold times based
-> on a trace file. Given a trace control file of:
->=20
->   qemu_mutex_lock
->   qemu_mutex_locked
->   qemu_mutex_unlock
->=20
-> And running with:
->=20
->   $QEMU $QEMU_ARGS -trace events=3D./lock-trace
->=20
-> You can analyse the results with:
->=20
->   ./scripts/analyse-locks-simpletrace.py trace-events-all ./trace-21812=
+Oops.
 
->=20
-> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> ---
->  scripts/analyse-locks-simpletrace.py | 99 ++++++++++++++++++++++++++++=
-++++++++
->  1 file changed, 99 insertions(+)
->  create mode 100755 scripts/analyse-locks-simpletrace.py
->=20
-> diff --git a/scripts/analyse-locks-simpletrace.py b/scripts/analyse-loc=
-ks-simpletrace.py
-> new file mode 100755
-> index 0000000..a69ed5c
-> --- /dev/null
-> +++ b/scripts/analyse-locks-simpletrace.py
-> @@ -0,0 +1,99 @@
-> +#!/usr/bin/env python
-> +# -*- coding: utf-8 -*-
-> +#
-> +# Analyse lock events and
-> +#
+>> @@ -99,8 +99,10 @@ static int aarch64_write_elf64_prfpreg(WriteCoreDumpFunction f,
+>>
+>>      aarch64_note_init(&note, s, "CORE", 5, NT_PRFPREG, sizeof(note.vfp));
+>>
+>> -    for (i = 0; i < 64; ++i) {
+>> -        note.vfp.vregs[i] = cpu_to_dump64(s, float64_val(env->vfp.regs[i]));
+>> +    for (i = 0; i < 32; ++i) {
+>> +        uint64_t *q = aa64_vfp_qreg(env, i);
+>> +        note.vfp.vregs[2*i + 0] = cpu_to_dump64(s, q[0]);
+>> +        note.vfp.vregs[2*i + 1] = cpu_to_dump64(s, q[1]);
+> 
+> This doesn't change the behaviour but I suspect it's wrong for big-endian...
 
-Truncated sentence?
+Perhaps.  Since this doesn't change behaviour I'll leave this patch as-is.
+That said, how does one go about testing aarch64-big-endian?  I don't think
+I've seen a distro for that...
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+>> -            int elt = (rn * 2 + (index >> 3)) % 64;
+>> -            int bitidx = (index & 7) * 8;
+>> -            uint64_t val = extract64(env->vfp.regs[elt], bitidx, 8);
+>> +            unsigned elt = (rn * 2 + (index >> 3)) % 64;
+>> +            unsigned bitidx = (index & 7) * 8;
+>> +            uint64_t *q = aa64_vfp_qreg(env, elt >> 1);
+>> +            uint64_t val = extract64(q[elt & 1], bitidx, 8);
+> 
+> 
+> Any particular reason for changing all these ints to unsigned ?
+
+*shrug* unsigned division by power-of-two is simpler than signed.  And of
+course we know these values must be positive.  I can drop that change if you want.
+
+>>  vfp_reg_offset (int dp, int reg)
+>>  {
+>> -    if (dp)
+>> +    if (dp) {
+>>          return offsetof(CPUARMState, vfp.regs[reg]);
+>> -    else if (reg & 1) {
+>> -        return offsetof(CPUARMState, vfp.regs[reg >> 1])
+>> -          + offsetof(CPU_DoubleU, l.upper);
+>>      } else {
+>> -        return offsetof(CPUARMState, vfp.regs[reg >> 1])
+>> -          + offsetof(CPU_DoubleU, l.lower);
+>> +        long ofs = offsetof(CPUARMState, vfp.regs[reg >> 1]);
+>> +        if (reg & 1) {
+>> +            ofs += offsetof(CPU_DoubleU, l.upper);
+>> +        } else {
+>> +            ofs += offsetof(CPU_DoubleU, l.lower);
+>> +        }
+>> +        return ofs;
+>>      }
+> 
+> This hunk seems to just be rearranging the if-logic without
+> doing anything else, right?
+
+There is a name change in there.  But otherwise it's a re-factor to avoid
+over-long lines and reduce duplication.
 
 
---fAc9WxweWKa8SpJ62YenmEDPQyKhLGVVU
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlpZAK0ACgkQp6FrSiUn
-Q2pzUgf/b2wVpchBpvDnu9mwsV/iaN/K28Wcf/61a/+aAfDhlrinV5NgSFUyCGu3
-kNGklf95CooaWhkxNp978PlMm5FHOkS4SMiLu5pdyftbveRa2wtVzzsElhu7Ag9i
-Z/spXjcTm/9uNfzWNXCCmEyjm9e6FHwR3+1i2ONcNBLd/8zOs46y6KEeVPt9EtvC
-0+gyiw2j9r41KZ3mdqByKTWBrn6F1xK9m70Ldeq3NmBVFKMexk28d4JkxIuaqmsU
-S9AceS7dHiT92Yh+hNVnZpu+TnXDMZyOIjyu0PNpvPmq6MCzd5ErWJ2SiuDBCXe5
-7XDuwMIFa+kTmnMA60g5a2fHqCt7NA==
-=gLqP
------END PGP SIGNATURE-----
-
---fAc9WxweWKa8SpJ62YenmEDPQyKhLGVVU--
+r~
