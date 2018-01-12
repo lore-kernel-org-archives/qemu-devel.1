@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32886)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50311)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1ea6Wv-0008Og-3f
-	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 16:06:26 -0500
+	(envelope-from <juterry@microsoft.com>) id 1ea5qx-00034S-CA
+	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 15:23:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1ea6Wu-0002oP-1b
-	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 16:06:25 -0500
-Received: from mail-pg0-x242.google.com ([2607:f8b0:400e:c05::242]:45435)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1ea6Wt-0002nu-Rj
-	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 16:06:23 -0500
-Received: by mail-pg0-x242.google.com with SMTP id c194so5319043pga.12
-	for <qemu-devel@nongnu.org>; Fri, 12 Jan 2018 13:06:23 -0800 (PST)
-From: Richard Henderson <richard.henderson@linaro.org>
-Date: Fri, 12 Jan 2018 13:06:13 -0800
-Message-Id: <20180112210613.14124-5-richard.henderson@linaro.org>
-In-Reply-To: <20180112210613.14124-1-richard.henderson@linaro.org>
-References: <20180112210613.14124-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PULL 4/4] tcg/ppc: Allow a 32-bit offset to the
- constant pool
+	(envelope-from <juterry@microsoft.com>) id 1ea5qv-0001jW-S6
+	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 15:23:03 -0500
+Received: from mail-dm3nam03on0726.outbound.protection.outlook.com
+	([2a01:111:f400:fe49::726]:3340
+	helo=NAM03-DM3-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <juterry@microsoft.com>)
+	id 1ea5qv-0001gV-LP
+	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 15:23:01 -0500
+From: "Justin Terry (VM)" <juterry@microsoft.com>
+Date: Fri, 12 Jan 2018 12:22:25 -0800
+Message-Id: <1515788548-3570-2-git-send-email-juterry@microsoft.com>
+In-Reply-To: <1515788548-3570-1-git-send-email-juterry@microsoft.com>
+References: <1515788548-3570-1-git-send-email-juterry@microsoft.com>
+MIME-Version: 1.0
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH 1/4] Add the Windows Hypervisor Platform
+ accelerator.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,108 +30,170 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, aurelien@aurel32.net
+Cc: pbonzini@redhat.com, crosthwaite.peter@gmail.com, rth@twiddle.net, ehabkost@redhat.com, "Justin Terry (VM)" <juterry@microsoft.com>
 
-We recently relaxed the limit of the number of opcodes that can
-appear in a TranslationBlock.  In certain cases this has resulted
-in relocation overflow.
+Introduces the configure support for the new Windows Hypervisor Platform that
+allows for hypervisor acceleration from usermode components on the Windows
+platform.
 
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+Signed-off-by: Justin Terry (VM) <juterry@microsoft.com>
 ---
- tcg/ppc/tcg-target.inc.c | 67 ++++++++++++++++++++++++++++--------------------
- 1 file changed, 39 insertions(+), 28 deletions(-)
+ configure       | 48 +++++++++++++++++++++++++++++++++++++++++++++++-
+ qemu-options.hx |  8 ++++----
+ 2 files changed, 51 insertions(+), 5 deletions(-)
 
-diff --git a/tcg/ppc/tcg-target.inc.c b/tcg/ppc/tcg-target.inc.c
-index 74f9b4aa34..86f7de5f7e 100644
---- a/tcg/ppc/tcg-target.inc.c
-+++ b/tcg/ppc/tcg-target.inc.c
-@@ -222,33 +222,6 @@ static inline void tcg_out_bc_noaddr(TCGContext *s, int insn)
-     tcg_out32(s, insn | retrans);
+diff --git a/configure b/configure
+index 89bd662..8d5a065 100755
+--- a/configure
++++ b/configure
+@@ -222,6 +222,17 @@ supported_hvf_target() {
+     return 1
  }
  
--static void patch_reloc(tcg_insn_unit *code_ptr, int type,
--                        intptr_t value, intptr_t addend)
--{
--    tcg_insn_unit *target;
--    tcg_insn_unit old;
--
--    value += addend;
--    target = (tcg_insn_unit *)value;
--
--    switch (type) {
--    case R_PPC_REL14:
--        reloc_pc14(code_ptr, target);
--        break;
--    case R_PPC_REL24:
--        reloc_pc24(code_ptr, target);
--        break;
--    case R_PPC_ADDR16:
--        assert(value == (int16_t)value);
--        old = *code_ptr;
--        old = deposit32(old, 0, 16, value);
--        *code_ptr = old;
--        break;
--    default:
--        tcg_abort();
--    }
--}
--
- /* parse target specific constraints */
- static const char *target_parse_constraint(TCGArgConstraint *ct,
-                                            const char *ct_str, TCGType type)
-@@ -552,6 +525,43 @@ static const uint32_t tcg_to_isel[] = {
-     [TCG_COND_GTU] = ISEL | BC_(7, CR_GT),
- };
- 
-+static void patch_reloc(tcg_insn_unit *code_ptr, int type,
-+                        intptr_t value, intptr_t addend)
-+{
-+    tcg_insn_unit *target;
-+    tcg_insn_unit old;
-+
-+    value += addend;
-+    target = (tcg_insn_unit *)value;
-+
-+    switch (type) {
-+    case R_PPC_REL14:
-+        reloc_pc14(code_ptr, target);
-+        break;
-+    case R_PPC_REL24:
-+        reloc_pc24(code_ptr, target);
-+        break;
-+    case R_PPC_ADDR16:
-+        /* We are abusing this relocation type.  This points to a pair
-+           of insns, addis + load.  If the displacement is small, we
-+           can nop out the addis.  */
-+        if (value == (int16_t)value) {
-+            code_ptr[0] = NOP;
-+            old = deposit32(code_ptr[1], 0, 16, value);
-+            code_ptr[1] = deposit32(old, 16, 5, TCG_REG_TB);
-+        } else {
-+            int16_t lo = value;
-+            int hi = value - lo;
-+            assert(hi + lo == value);
-+            code_ptr[0] = deposit32(code_ptr[0], 0, 16, hi >> 16);
-+            code_ptr[1] = deposit32(code_ptr[1], 0, 16, lo);
-+        }
-+        break;
-+    default:
-+        g_assert_not_reached();
-+    }
++supported_whpx_target() {
++    test "$whpx" = "yes" || return 1
++    glob "$1" "*-softmmu" || return 1
++    case "${1%-softmmu}" in
++        i386|x86_64)
++            return 0
++        ;;
++    esac
++    return 1
 +}
 +
- static void tcg_out_mem_long(TCGContext *s, int opi, int opx, TCGReg rt,
-                              TCGReg base, tcg_target_long offset);
+ supported_target() {
+     case "$1" in
+         *-softmmu)
+@@ -248,6 +259,7 @@ supported_target() {
+     supported_xen_target "$1" && return 0
+     supported_hax_target "$1" && return 0
+     supported_hvf_target "$1" && return 0
++    supported_whpx_target "$1" && return 0
+     print_error "TCG disabled, but hardware accelerator not available for '$target'"
+     return 1
+ }
+@@ -338,6 +350,7 @@ vhost_user=""
+ kvm="no"
+ hax="no"
+ hvf="no"
++whpx="no"
+ rdma=""
+ gprof="no"
+ debug_tcg="no"
+@@ -1054,6 +1067,10 @@ for opt do
+   ;;
+   --enable-hvf) hvf="yes"
+   ;;
++  --disable-whpx) whpx="no"
++  ;;
++  --enable-whpx) whpx="yes"
++  ;;
+   --disable-tcg-interpreter) tcg_interpreter="no"
+   ;;
+   --enable-tcg-interpreter) tcg_interpreter="yes"
+@@ -1548,6 +1565,7 @@ disabled with --disable-FEATURE, default is enabled if available:
+   kvm             KVM acceleration support
+   hax             HAX acceleration support
+   hvf             Hypervisor.framework acceleration support
++  whpx            Windows Hypervisor Platform acceleration support
+   rdma            RDMA-based migration support
+   vde             support for vde network
+   netmap          support for netmap network
+@@ -2446,6 +2464,30 @@ if test "$xen_pv_domain_build" = "yes" &&
+ fi
  
-@@ -690,7 +700,8 @@ static void tcg_out_movi_int(TCGContext *s, TCGType type, TCGReg ret,
-     if (!in_prologue && USE_REG_TB) {
-         new_pool_label(s, arg, R_PPC_ADDR16, s->code_ptr,
-                        -(intptr_t)s->code_gen_ptr);
--        tcg_out32(s, LD | TAI(ret, TCG_REG_TB, 0));
-+        tcg_out32(s, ADDIS | TAI(ret, TCG_REG_TB, 0));
-+        tcg_out32(s, LD | TAI(ret, ret, 0));
-         return;
-     }
+ ##########################################
++# Windows Hypervisor Platform accelerator (WHPX) check
++if test "$whpx" != "no" ; then
++    cat > $TMPC << EOF
++#include <windows.h>
++#include <winhvplatform.h>
++#include <winhvemulation.h>
++int main(void) {
++    WHV_CAPABILITY whpx_cap;
++    WHvGetCapability(WHvCapabilityCodeFeatures, &whpx_cap, sizeof(whpx_cap));
++    return 0;
++}
++EOF
++    if compile_prog "" "-lwinhvplatform -lwinhvemulation" ; then
++        libs_softmmu="$libs_softmmu -lwinhvplatform -lwinhvemulation"
++        whpx="yes"
++    else
++        if test "$whpx" = "yes"; then
++            feature_not_found "winhvplatform" "winhvemulation is not installed"
++        fi
++        whpx="no"
++    fi
++fi
++
++##########################################
+ # Sparse probe
+ if test "$sparse" != "no" ; then
+   if has cgcc; then
+@@ -5565,6 +5607,7 @@ echo "Install blobs     $blobs"
+ echo "KVM support       $kvm"
+ echo "HAX support       $hax"
+ echo "HVF support       $hvf"
++echo "WHPX support      $whpx"
+ echo "TCG support       $tcg"
+ if test "$tcg" = "yes" ; then
+     echo "TCG debug enabled $debug_tcg"
+@@ -5719,7 +5762,7 @@ if test "$mingw32" = "yes" ; then
+     echo "CONFIG_QGA_NTDDDISK=y" >> $config_host_mak
+   fi
+   if test "$guest_agent_msi" = "yes"; then
+-    echo "QEMU_GA_MSI_ENABLED=yes" >> $config_host_mak  
++    echo "QEMU_GA_MSI_ENABLED=yes" >> $config_host_mak
+     echo "QEMU_GA_MSI_MINGW_DLL_PATH=${QEMU_GA_MSI_MINGW_DLL_PATH}" >> $config_host_mak
+     echo "QEMU_GA_MSI_WITH_VSS=${QEMU_GA_MSI_WITH_VSS}" >> $config_host_mak
+     echo "QEMU_GA_MSI_ARCH=${QEMU_GA_MSI_ARCH}" >> $config_host_mak
+@@ -6641,6 +6684,9 @@ fi
+ if supported_hvf_target $target; then
+     echo "CONFIG_HVF=y" >> $config_target_mak
+ fi
++if supported_whpx_target $target; then
++    echo "CONFIG_WHPX=y" >> $config_target_mak
++fi
+ if test "$target_bigendian" = "yes" ; then
+   echo "TARGET_WORDS_BIGENDIAN=y" >> $config_target_mak
+ fi
+diff --git a/qemu-options.hx b/qemu-options.hx
+index 678181c..8c8f132 100644
+--- a/qemu-options.hx
++++ b/qemu-options.hx
+@@ -31,7 +31,7 @@ DEF("machine", HAS_ARG, QEMU_OPTION_machine, \
+     "-machine [type=]name[,prop[=value][,...]]\n"
+     "                selects emulated machine ('-machine help' for list)\n"
+     "                property accel=accel1[:accel2[:...]] selects accelerator\n"
+-    "                supported accelerators are kvm, xen, hax, hvf or tcg (default: tcg)\n"
++    "                supported accelerators are kvm, xen, hax, hvf, whpx or tcg (default: tcg)\n"
+     "                kernel_irqchip=on|off|split controls accelerated irqchip support (default=off)\n"
+     "                vmport=on|off|auto controls emulation of vmport (default: auto)\n"
+     "                kvm_shadow_mem=size of KVM shadow MMU in bytes\n"
+@@ -66,7 +66,7 @@ Supported machine properties are:
+ @table @option
+ @item accel=@var{accels1}[:@var{accels2}[:...]]
+ This is used to enable an accelerator. Depending on the target architecture,
+-kvm, xen, hax, hvf or tcg can be available. By default, tcg is used. If there is
++kvm, xen, hax, hvf, whpx or tcg can be available. By default, tcg is used. If there is
+ more than one accelerator specified, the next one is used if the previous one
+ fails to initialize.
+ @item kernel_irqchip=on|off
+@@ -126,13 +126,13 @@ ETEXI
  
+ DEF("accel", HAS_ARG, QEMU_OPTION_accel,
+     "-accel [accel=]accelerator[,thread=single|multi]\n"
+-    "                select accelerator (kvm, xen, hax, hvf or tcg; use 'help' for a list)\n"
++    "                select accelerator (kvm, xen, hax, hvf, whpx or tcg; use 'help' for a list)\n"
+     "                thread=single|multi (enable multi-threaded TCG)", QEMU_ARCH_ALL)
+ STEXI
+ @item -accel @var{name}[,prop=@var{value}[,...]]
+ @findex -accel
+ This is used to enable an accelerator. Depending on the target architecture,
+-kvm, xen, hax, hvf or tcg can be available. By default, tcg is used. If there is
++kvm, xen, hax, hvf, whpx or tcg can be available. By default, tcg is used. If there is
+ more than one accelerator specified, the next one is used if the previous one
+ fails to initialize.
+ @table @option
 -- 
-2.14.3
+2.7.4
