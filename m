@@ -1,29 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44024)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44028)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eZymj-0005Gy-PA
+	id 1eZymj-0005HG-U6
 	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 07:50:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eZyme-0007BP-D9
+	id 1eZymj-0007I4-53
 	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 07:50:13 -0500
-Received: from mail-qk0-x244.google.com ([2607:f8b0:400d:c09::244]:34228)
+Received: from mail-qt0-x242.google.com ([2607:f8b0:400d:c0d::242]:42334)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eZyme-0007B3-8C
-	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 07:50:08 -0500
-Received: by mail-qk0-x244.google.com with SMTP id b76so8508380qkc.1
-	for <qemu-devel@nongnu.org>; Fri, 12 Jan 2018 04:50:08 -0800 (PST)
+	id 1eZymj-0007Hc-0W
+	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 07:50:13 -0500
+Received: by mail-qt0-x242.google.com with SMTP id c2so5854024qtn.9
+	for <qemu-devel@nongnu.org>; Fri, 12 Jan 2018 04:50:12 -0800 (PST)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Fri, 12 Jan 2018 09:49:53 -0300
-Message-Id: <20180112125000.27256-1-f4bug@amsat.org>
+Date: Fri, 12 Jan 2018 09:49:55 -0300
+Message-Id: <20180112125000.27256-3-f4bug@amsat.org>
+In-Reply-To: <20180112125000.27256-1-f4bug@amsat.org>
+References: <20180112125000.27256-1-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH 0/7] docker: update Ubuntu and Fedora images,
- deprecate old ones
+Subject: [Qemu-devel] [PATCH 2/7] docker: do not display deprecated images
+ in 'make docker' help
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,43 +37,26 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Fam Zheng <famz@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org
 
-Hi,
+the 'debian' base image is deprecated since 3e11974988d8
 
-This series is to be clearer about which upstream version we are using.
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+---
+ tests/docker/Makefile.include | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-All "FROM distrib:latest" entries have now been removed and replaced by
-explicit "FROM distrib:version" ones.
-
-To keep backward compatibility, a warning is displayed to the user,
-suggesting which correct base image to use.
-
-To be consistent, we remove the deprecated images of the "make docker" output.
-
-Regards,
-
-Phil.
-
-Philippe Mathieu-Daudé (7):
-  docker: sort images list displayed by 'make docker'
-  docker: do not display deprecated images in 'make docker' help
-  docker: add the Ubuntu Trusty base image
-  docker: do not use Trusty APT source in Xenial
-  docker: warn users to use ubuntu16.04 for the LTS Xenial image
-  docker: add the Fedora 27 base image
-  docker: warn users to use newer fedora25/fedora27 base image
-
- tests/docker/Makefile.include               |  5 ++++-
- tests/docker/dockerfiles/fedora.docker      | 29 ++++++++++++-----------------
- tests/docker/dockerfiles/fedora25.docker    | 18 ++++++++++++++++++
- tests/docker/dockerfiles/fedora27.docker    | 18 ++++++++++++++++++
- tests/docker/dockerfiles/ubuntu.docker      | 28 ++++++++++------------------
- tests/docker/dockerfiles/ubuntu14.04.docker | 17 +++++++++++++++++
- tests/docker/dockerfiles/ubuntu16.04.docker | 16 ++++++++++++++++
- 7 files changed, 95 insertions(+), 36 deletions(-)
- create mode 100644 tests/docker/dockerfiles/fedora25.docker
- create mode 100644 tests/docker/dockerfiles/fedora27.docker
- create mode 100644 tests/docker/dockerfiles/ubuntu14.04.docker
- create mode 100644 tests/docker/dockerfiles/ubuntu16.04.docker
-
+diff --git a/tests/docker/Makefile.include b/tests/docker/Makefile.include
+index ef95703cef..f0cd26c2b6 100644
+--- a/tests/docker/Makefile.include
++++ b/tests/docker/Makefile.include
+@@ -4,7 +4,8 @@
+ 
+ DOCKER_SUFFIX := .docker
+ DOCKER_FILES_DIR := $(SRC_PATH)/tests/docker/dockerfiles
+-DOCKER_IMAGES := $(sort $(notdir $(basename $(wildcard $(DOCKER_FILES_DIR)/*.docker))))
++DOCKER_DEPRECATED_IMAGES := debian
++DOCKER_IMAGES := $(filter-out $(DOCKER_DEPRECATED_IMAGES),$(sort $(notdir $(basename $(wildcard $(DOCKER_FILES_DIR)/*.docker)))))
+ DOCKER_TARGETS := $(patsubst %,docker-image-%,$(DOCKER_IMAGES))
+ # Use a global constant ccache directory to speed up repetitive builds
+ DOCKER_CCACHE_DIR := $$HOME/.cache/qemu-docker-ccache
 -- 
 2.15.1
