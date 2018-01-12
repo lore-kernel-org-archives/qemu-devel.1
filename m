@@ -1,21 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36704)
-	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jianjay.zhou@huawei.com>) id 1eZto5-0007KW-HW
-	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 02:31:18 -0500
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48977)
+	by lists.gnu.org with esmtp (Exim 4.71) (envelope-from <hch@lst.de>)
+	id 1eZuOy-0002d5-Ee
+	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 03:09:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jianjay.zhou@huawei.com>) id 1eZto2-00022v-EJ
-	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 02:31:17 -0500
-Received: from szxga04-in.huawei.com ([45.249.212.190]:2149 helo=huawei.com)
+	(envelope-from <hch@lst.de>) id 1eZuOt-0002Su-Gg
+	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 03:09:24 -0500
+Received: from verein.lst.de ([213.95.11.211]:52902 helo=newverein.lst.de)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jianjay.zhou@huawei.com>)
-	id 1eZto2-00021E-2K
-	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 02:31:14 -0500
-From: Jay Zhou <jianjay.zhou@huawei.com>
-Date: Fri, 12 Jan 2018 15:30:32 +0800
-Message-ID: <1515742232-49096-1-git-send-email-jianjay.zhou@huawei.com>
+	(Exim 4.71) (envelope-from <hch@lst.de>) id 1eZuOt-0002Pf-AC
+	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 03:09:19 -0500
+Date: Fri, 12 Jan 2018 09:09:16 +0100
+From: Christoph Hellwig <hch@lst.de>
+Message-ID: <20180112080916.GA23324@lst.de>
+References: <1515628000-93285-1-git-send-email-mjc@sifive.com>
+	<20180111075812.GA32651@lst.de>
+	<CAHNT7Ns+ye2djyqKqr2VmHkjgTLxqkkr6=JKL2B7HvnQm3xRGQ@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH] tap: close fd conditionally when error occured
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAHNT7Ns+ye2djyqKqr2VmHkjgTLxqkkr6=JKL2B7HvnQm3xRGQ@mail.gmail.com>
+Subject: Re: [Qemu-devel] [PATCH v2 00/21] RISC-V QEMU Port Submission v2
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,101 +28,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: jasowang@redhat.com, mst@redhat.com, imammedo@redhat.com, weidong.huang@huawei.com, wangxinxin.wang@huawei.com, arei.gonglei@huawei.com, jianjay.zhou@huawei.com
+To: Michael Clark <mjc@sifive.com>
+Cc: Christoph Hellwig <hch@lst.de>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Palmer Dabbelt <palmer@sifive.com>, RISC-V Patches <patches+subscribe@groups.riscv.org>, qemu-devel@nongnu.org, Sagar Karandikar <sagark@eecs.berkeley.edu>
 
-If netdev_add tap,id=net0,vhost=on failed in net_init_tap_one(),
-the followed up device_add virtio-net-pci,netdev=net0 will fail
-too, prints:
+On Fri, Jan 12, 2018 at 07:24:54AM +1300, Michael Clark wrote:
+> I'm going to be restoring branches for bbl and riscv-linux that work again
+> priv 1.9.1. There are still other emulators and RTL that support priv1.9.1.
+> Folk will have silicon against different versions of spec going forward.
+> Likewise going forward we are still going to need to support v1.10 behavior
+> when v1.11 is published. i.e. priv v1.10 mode is going to have to hide any
+> additions made in priv v1.11. I use priv v1.9.1 during my QEMU testing.
+> Hopefully, future changes are additive vs breaking...
 
-  TUNSETOFFLOAD ioctl() failed: Bad file descriptor TUNSETOFFLOAD
-  ioctl() failed: Bad file descriptor
+That was the plan for 1.10+.  And I thought that was because 1.10
+is what people actually started implementing for real, but based on
+the comment from Palmer that is not actually true.  Sigh..
 
-The reason is that the fd of tap is closed when error occured after
-calling net_init_tap_one().
+I guess at least for Linux we'd then want to make sure 1.9.1 support
+is in mainline as well, probably based off a config option.
 
-I think the fd should be closed in these two case:
-  1.tap_set_sndbuf() failed
-  2.tap_set_sndbuf() succeeded but vhost failed to initialize with
-    vhostforce flag on
-Meanwhile, the fd should not be closed just because vhost failed to
-initialize but without vhostforce flag. So the followed up device_add
-can fall back to userspace virtio successfully.
-
-Suggested-by: Michael S. Tsirkin <mst@redhat.com>
-Suggested-by: Igor Mammedov <imammedo@redhat.com>
-Suggested-by: Jason Wang <jasowang@redhat.com>
-Signed-off-by: Jay Zhou <jianjay.zhou@huawei.com>
----
- net/tap.c | 18 +++++++++++++-----
- 1 file changed, 13 insertions(+), 5 deletions(-)
-
-diff --git a/net/tap.c b/net/tap.c
-index 979e622..3ed72eb 100644
---- a/net/tap.c
-+++ b/net/tap.c
-@@ -651,6 +651,9 @@ static void net_init_tap_one(const NetdevTapOptions *tap, NetClientState *peer,
-     tap_set_sndbuf(s->fd, tap, &err);
-     if (err) {
-         error_propagate(errp, err);
-+        if (!tap->has_fd && !tap->has_fds) {
-+            close(fd);
-+        }
-         return;
-     }
- 
-@@ -687,14 +690,14 @@ static void net_init_tap_one(const NetdevTapOptions *tap, NetClientState *peer,
-             vhostfd = monitor_fd_param(cur_mon, vhostfdname, &err);
-             if (vhostfd == -1) {
-                 error_propagate(errp, err);
--                return;
-+                goto cleanup;
-             }
-         } else {
-             vhostfd = open("/dev/vhost-net", O_RDWR);
-             if (vhostfd < 0) {
-                 error_setg_errno(errp, errno,
-                                  "tap: open vhost char device failed");
--                return;
-+                goto cleanup;
-             }
-             fcntl(vhostfd, F_SETFL, O_NONBLOCK);
-         }
-@@ -704,11 +707,18 @@ static void net_init_tap_one(const NetdevTapOptions *tap, NetClientState *peer,
-         if (!s->vhost_net) {
-             error_setg(errp,
-                        "vhost-net requested but could not be initialized");
--            return;
-+            goto cleanup;
-         }
-     } else if (vhostfdname) {
-         error_setg(errp, "vhostfd(s)= is not valid without vhost");
-     }
-+
-+cleanup:
-+    if (!tap->has_fd && !tap->has_fds && tap->has_vhostforce &&
-+        tap->vhostforce) {
-+        close(fd);
-+    }
-+    return;
- }
- 
- static int get_fds(char *str, char *fds[], int max)
-@@ -877,7 +887,6 @@ free_fail:
-                          vnet_hdr, fd, &err);
-         if (err) {
-             error_propagate(errp, err);
--            close(fd);
-             return -1;
-         }
-     } else {
-@@ -916,7 +925,6 @@ free_fail:
-                              vhostfdname, vnet_hdr, fd, &err);
-             if (err) {
-                 error_propagate(errp, err);
--                close(fd);
-                 return -1;
-             }
-         }
--- 
-1.8.3.1
+And if someone has a a good contact to the RISC-V website admins
+it would be very helpful to restore a link to the specification as well
+so that things other than the direct link work.
