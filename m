@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41441)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41471)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1eZxYW-0007Ad-Nr
-	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 06:31:30 -0500
+	(envelope-from <paolo.bonzini@gmail.com>) id 1eZxYY-0007Bo-AK
+	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 06:31:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1eZxYV-0004Nt-EU
-	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 06:31:28 -0500
-Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:33738)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1eZxYX-0004T5-Cg
+	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 06:31:30 -0500
+Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:34094)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1eZxYV-0004Lk-3x
-	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 06:31:27 -0500
-Received: by mail-wm0-x242.google.com with SMTP id x4so1968733wmc.0
-	for <qemu-devel@nongnu.org>; Fri, 12 Jan 2018 03:31:27 -0800 (PST)
+	id 1eZxYX-0004Qx-6X
+	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 06:31:29 -0500
+Received: by mail-wm0-x242.google.com with SMTP id 81so1969289wmb.1
+	for <qemu-devel@nongnu.org>; Fri, 12 Jan 2018 03:31:29 -0800 (PST)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Fri, 12 Jan 2018 12:30:29 +0100
-Message-Id: <1515756676-3860-6-git-send-email-pbonzini@redhat.com>
+Date: Fri, 12 Jan 2018 12:30:31 +0100
+Message-Id: <1515756676-3860-8-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1515756676-3860-1-git-send-email-pbonzini@redhat.com>
 References: <1515756676-3860-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 05/52] i386/cpu/kvm: look at PMU's CPUID before
- setting MSRs
+Subject: [Qemu-devel] [PULL 07/52] chardev: let g_idle_add() be with chardev
+ gcontext
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,159 +29,83 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Jan Dakinevich <jan.dakinevich@virtuozzo.com>
+Cc: Peter Xu <peterx@redhat.com>
 
-From: Jan Dakinevich <jan.dakinevich@virtuozzo.com>
+From: Peter Xu <peterx@redhat.com>
 
-Certain PMU-related MSRs are not supported for CPUs with PMU
-architecture below version 2. KVM rejects any access to them (see
-intel_is_valid_msr_idx routine in KVM), and QEMU fails on the following
-assertion:
+The idle task will be attached to main gcontext even if the chardev
+backend is running in another gcontext.  Fix the only caller by
+extending the g_idle_add() logic into the more powerful
+g_source_attach().  It's basically g_idle_add_full() implementation, but
+with the chardev's gcontext passed in.
 
-  kvm_put_msrs: Assertion `ret == cpu->kvm_msr_buf->nmsrs' failed.
-
-QEMU also could fail if KVM exposes less fixed counters then 3. It could
-happen if host system run inside another hypervisor, which is tweaking
-PMU-related CPUID. To prevent possible fail, number of fixed counters now is
-obtained in the same way as number of GP counters.
-
-Reviewed-by: Roman Kagan <rkagan@virtuozzo.com>
-Signed-off-by: Jan Dakinevich <jan.dakinevich@virtuozzo.com>
-Message-Id: <1514383466-7257-1-git-send-email-jan.dakinevich@virtuozzo.com>
+Signed-off-by: Peter Xu <peterx@redhat.com>
+Message-Id: <20180104141835.17987-3-peterx@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- target/i386/kvm.c | 80 +++++++++++++++++++++++++++++++++----------------------
- 1 file changed, 48 insertions(+), 32 deletions(-)
+ chardev/char-pty.c | 21 +++++++++++++--------
+ 1 file changed, 13 insertions(+), 8 deletions(-)
 
-diff --git a/target/i386/kvm.c b/target/i386/kvm.c
-index 6f69e2f..d23127c 100644
---- a/target/i386/kvm.c
-+++ b/target/i386/kvm.c
-@@ -92,8 +92,9 @@ static bool has_msr_hv_stimer;
- static bool has_msr_hv_frequencies;
- static bool has_msr_xss;
+diff --git a/chardev/char-pty.c b/chardev/char-pty.c
+index 761ae6d..8248e36 100644
+--- a/chardev/char-pty.c
++++ b/chardev/char-pty.c
+@@ -43,7 +43,7 @@ typedef struct {
+     /* Protected by the Chardev chr_write_lock.  */
+     int connected;
+     guint timer_tag;
+-    guint open_tag;
++    GSource *open_source;
+ } PtyChardev;
  
--static bool has_msr_architectural_pmu;
--static uint32_t num_architectural_pmu_counters;
-+static uint32_t has_architectural_pmu_version;
-+static uint32_t num_architectural_pmu_gp_counters;
-+static uint32_t num_architectural_pmu_fixed_counters;
+ #define PTY_CHARDEV(obj) OBJECT_CHECK(PtyChardev, (obj), TYPE_CHARDEV_PTY)
+@@ -58,7 +58,7 @@ static gboolean pty_chr_timer(gpointer opaque)
  
- static int has_xsave;
- static int has_xcrs;
-@@ -872,19 +873,28 @@ int kvm_arch_init_vcpu(CPUState *cs)
-     }
+     qemu_mutex_lock(&chr->chr_write_lock);
+     s->timer_tag = 0;
+-    s->open_tag = 0;
++    s->open_source = NULL;
+     if (!s->connected) {
+         /* Next poll ... */
+         pty_chr_update_read_handler_locked(chr);
+@@ -183,7 +183,7 @@ static gboolean qemu_chr_be_generic_open_func(gpointer opaque)
+     Chardev *chr = CHARDEV(opaque);
+     PtyChardev *s = PTY_CHARDEV(opaque);
  
-     if (limit >= 0x0a) {
--        uint32_t ver;
-+        uint32_t eax, edx;
+-    s->open_tag = 0;
++    s->open_source = NULL;
+     qemu_chr_be_event(chr, CHR_EVENT_OPENED);
+     return FALSE;
+ }
+@@ -194,9 +194,10 @@ static void pty_chr_state(Chardev *chr, int connected)
+     PtyChardev *s = PTY_CHARDEV(chr);
  
--        cpu_x86_cpuid(env, 0x0a, 0, &ver, &unused, &unused, &unused);
--        if ((ver & 0xff) > 0) {
--            has_msr_architectural_pmu = true;
--            num_architectural_pmu_counters = (ver & 0xff00) >> 8;
-+        cpu_x86_cpuid(env, 0x0a, 0, &eax, &unused, &unused, &edx);
-+
-+        has_architectural_pmu_version = eax & 0xff;
-+        if (has_architectural_pmu_version > 0) {
-+            num_architectural_pmu_gp_counters = (eax & 0xff00) >> 8;
- 
-             /* Shouldn't be more than 32, since that's the number of bits
-              * available in EBX to tell us _which_ counters are available.
-              * Play it safe.
-              */
--            if (num_architectural_pmu_counters > MAX_GP_COUNTERS) {
--                num_architectural_pmu_counters = MAX_GP_COUNTERS;
-+            if (num_architectural_pmu_gp_counters > MAX_GP_COUNTERS) {
-+                num_architectural_pmu_gp_counters = MAX_GP_COUNTERS;
-+            }
-+
-+            if (has_architectural_pmu_version > 1) {
-+                num_architectural_pmu_fixed_counters = edx & 0x1f;
-+
-+                if (num_architectural_pmu_fixed_counters > MAX_FIXED_COUNTERS) {
-+                    num_architectural_pmu_fixed_counters = MAX_FIXED_COUNTERS;
-+                }
-             }
+     if (!connected) {
+-        if (s->open_tag) {
+-            g_source_remove(s->open_tag);
+-            s->open_tag = 0;
++        if (s->open_source) {
++            g_source_destroy(s->open_source);
++            g_source_unref(s->open_source);
++            s->open_source = NULL;
          }
-     }
-@@ -1650,32 +1660,36 @@ static int kvm_put_msrs(X86CPU *cpu, int level)
-         if (env->features[FEAT_KVM] & (1 << KVM_FEATURE_STEAL_TIME)) {
-             kvm_msr_entry_add(cpu, MSR_KVM_STEAL_TIME, env->steal_time_msr);
+         remove_fd_in_watch(chr);
+         s->connected = 0;
+@@ -210,9 +211,13 @@ static void pty_chr_state(Chardev *chr, int connected)
+             s->timer_tag = 0;
          }
--        if (has_msr_architectural_pmu) {
--            /* Stop the counter.  */
--            kvm_msr_entry_add(cpu, MSR_CORE_PERF_FIXED_CTR_CTRL, 0);
--            kvm_msr_entry_add(cpu, MSR_CORE_PERF_GLOBAL_CTRL, 0);
-+        if (has_architectural_pmu_version > 0) {
-+            if (has_architectural_pmu_version > 1) {
-+                /* Stop the counter.  */
-+                kvm_msr_entry_add(cpu, MSR_CORE_PERF_FIXED_CTR_CTRL, 0);
-+                kvm_msr_entry_add(cpu, MSR_CORE_PERF_GLOBAL_CTRL, 0);
-+            }
- 
-             /* Set the counter values.  */
--            for (i = 0; i < MAX_FIXED_COUNTERS; i++) {
-+            for (i = 0; i < num_architectural_pmu_fixed_counters; i++) {
-                 kvm_msr_entry_add(cpu, MSR_CORE_PERF_FIXED_CTR0 + i,
-                                   env->msr_fixed_counters[i]);
-             }
--            for (i = 0; i < num_architectural_pmu_counters; i++) {
-+            for (i = 0; i < num_architectural_pmu_gp_counters; i++) {
-                 kvm_msr_entry_add(cpu, MSR_P6_PERFCTR0 + i,
-                                   env->msr_gp_counters[i]);
-                 kvm_msr_entry_add(cpu, MSR_P6_EVNTSEL0 + i,
-                                   env->msr_gp_evtsel[i]);
-             }
--            kvm_msr_entry_add(cpu, MSR_CORE_PERF_GLOBAL_STATUS,
--                              env->msr_global_status);
--            kvm_msr_entry_add(cpu, MSR_CORE_PERF_GLOBAL_OVF_CTRL,
--                              env->msr_global_ovf_ctrl);
--
--            /* Now start the PMU.  */
--            kvm_msr_entry_add(cpu, MSR_CORE_PERF_FIXED_CTR_CTRL,
--                              env->msr_fixed_ctr_ctrl);
--            kvm_msr_entry_add(cpu, MSR_CORE_PERF_GLOBAL_CTRL,
--                              env->msr_global_ctrl);
-+            if (has_architectural_pmu_version > 1) {
-+                kvm_msr_entry_add(cpu, MSR_CORE_PERF_GLOBAL_STATUS,
-+                                  env->msr_global_status);
-+                kvm_msr_entry_add(cpu, MSR_CORE_PERF_GLOBAL_OVF_CTRL,
-+                                  env->msr_global_ovf_ctrl);
-+
-+                /* Now start the PMU.  */
-+                kvm_msr_entry_add(cpu, MSR_CORE_PERF_FIXED_CTR_CTRL,
-+                                  env->msr_fixed_ctr_ctrl);
-+                kvm_msr_entry_add(cpu, MSR_CORE_PERF_GLOBAL_CTRL,
-+                                  env->msr_global_ctrl);
-+            }
+         if (!s->connected) {
+-            g_assert(s->open_tag == 0);
++            g_assert(s->open_source == NULL);
++            s->open_source = g_idle_source_new();
+             s->connected = 1;
+-            s->open_tag = g_idle_add(qemu_chr_be_generic_open_func, chr);
++            g_source_set_callback(s->open_source,
++                                  qemu_chr_be_generic_open_func,
++                                  chr, NULL);
++            g_source_attach(s->open_source, chr->gcontext);
          }
-         /*
-          * Hyper-V partition-wide MSRs: to avoid clearing them on cpu hot-add,
-@@ -2030,15 +2044,17 @@ static int kvm_get_msrs(X86CPU *cpu)
-     if (env->features[FEAT_KVM] & (1 << KVM_FEATURE_STEAL_TIME)) {
-         kvm_msr_entry_add(cpu, MSR_KVM_STEAL_TIME, 0);
-     }
--    if (has_msr_architectural_pmu) {
--        kvm_msr_entry_add(cpu, MSR_CORE_PERF_FIXED_CTR_CTRL, 0);
--        kvm_msr_entry_add(cpu, MSR_CORE_PERF_GLOBAL_CTRL, 0);
--        kvm_msr_entry_add(cpu, MSR_CORE_PERF_GLOBAL_STATUS, 0);
--        kvm_msr_entry_add(cpu, MSR_CORE_PERF_GLOBAL_OVF_CTRL, 0);
--        for (i = 0; i < MAX_FIXED_COUNTERS; i++) {
-+    if (has_architectural_pmu_version > 0) {
-+        if (has_architectural_pmu_version > 1) {
-+            kvm_msr_entry_add(cpu, MSR_CORE_PERF_FIXED_CTR_CTRL, 0);
-+            kvm_msr_entry_add(cpu, MSR_CORE_PERF_GLOBAL_CTRL, 0);
-+            kvm_msr_entry_add(cpu, MSR_CORE_PERF_GLOBAL_STATUS, 0);
-+            kvm_msr_entry_add(cpu, MSR_CORE_PERF_GLOBAL_OVF_CTRL, 0);
-+        }
-+        for (i = 0; i < num_architectural_pmu_fixed_counters; i++) {
-             kvm_msr_entry_add(cpu, MSR_CORE_PERF_FIXED_CTR0 + i, 0);
-         }
--        for (i = 0; i < num_architectural_pmu_counters; i++) {
-+        for (i = 0; i < num_architectural_pmu_gp_counters; i++) {
-             kvm_msr_entry_add(cpu, MSR_P6_PERFCTR0 + i, 0);
-             kvm_msr_entry_add(cpu, MSR_P6_EVNTSEL0 + i, 0);
-         }
+         if (!chr->gsource) {
+             chr->gsource = io_add_watch_poll(chr, s->ioc,
 -- 
 1.8.3.1
