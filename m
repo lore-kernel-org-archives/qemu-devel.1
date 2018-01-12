@@ -1,33 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47881)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48026)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1eZzns-0000j2-MI
-	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 08:55:29 -0500
+	(envelope-from <bounces@canonical.com>) id 1eZzo9-0000sS-Qo
+	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 08:55:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1eZznp-00021Y-Ct
-	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 08:55:28 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:58256)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1eZznp-00020S-1i
-	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 08:55:25 -0500
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id E43C1D5525
-	for <qemu-devel@nongnu.org>; Fri, 12 Jan 2018 13:55:23 +0000 (UTC)
-Date: Fri, 12 Jan 2018 14:55:09 +0100
-From: Gerd Hoffmann <kraxel@redhat.com>
-Message-ID: <20180112135509.uvtx6yzhs4pacno3@sirius.home.kraxel.org>
-References: <20180111213250.16511-1-marcandre.lureau@redhat.com>
-	<20180111213250.16511-38-marcandre.lureau@redhat.com>
-	<20180112130416.rsdydqy4popkugrm@sirius.home.kraxel.org>
-	<1027552109.5988061.1515763378153.JavaMail.zimbra@redhat.com>
+	(envelope-from <bounces@canonical.com>) id 1eZzo6-0002G7-Md
+	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 08:55:45 -0500
+Received: from indium.canonical.com ([91.189.90.7]:38772)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1eZzo6-0002Eo-H8
+	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 08:55:42 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1eZzo5-00032S-7O
+	for <qemu-devel@nongnu.org>; Fri, 12 Jan 2018 13:55:41 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 28DCA2E80CD
+	for <qemu-devel@nongnu.org>; Fri, 12 Jan 2018 13:55:41 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1027552109.5988061.1515763378153.JavaMail.zimbra@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v4 37/51] qapi: add conditions to VNC
- type/commands/events on the schema
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 12 Jan 2018 13:38:58 -0000
+From: Thomas Huth <1449687@bugs.launchpad.net>
+Reply-To: Bug 1449687 <1449687@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20150428180718.24323.78355.malonedeb@wampee.canonical.com>
+Message-Id: <151576433828.19143.14371398646047279851.launchpad@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1449687] Re: block migration of qcow2 VMs copies
+ all empty space
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,23 +37,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>
-Cc: qemu-devel@nongnu.org, eblake@redhat.com, armbru@redhat.com, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: qemu-devel@nongnu.org
 
-  Hi,
+** Bug watch removed: Red Hat Bugzilla #1219541
+   https://bugzilla.redhat.com/show_bug.cgi?id=3D1219541
 
-> > Move to ui/vnc.c, so we don't need #ifdef here?
-> 
-> Not so simple either. hmp-commands-info.h (needed for the function
-> declaration) is built per target, but not ui/vnc.c.
+-- =
 
-Ok, thanks for checking.
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1449687
 
-> Again, some future cleanup?
+Title:
+  block migration of qcow2 VMs copies all empty space
 
-Fine with me.
+Status in QEMU:
+  Incomplete
 
-Reviewed-by: Gerd Hoffmann <kraxel@redhat.com>
+Bug description:
+  I'm running openstack 2012.1 'icehouse' which, ultimately, calls down
+  into qemu-system-x86 2.0.0+dfsg-2ubuntu1.10.
 
-cheers,
-  Gerd
+  I primed the process by copying all necessary base images onto the
+  destination host.  Nonetheless, post-migration instances are much
+  larger than the original image; the copy duplicated all the empty
+  space that ought to have remained copy-on-write.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1449687/+subscriptions
