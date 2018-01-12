@@ -1,34 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39987)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41168)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eZzYk-0006Ni-BM
-	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 08:39:51 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1eZzaJ-0007P1-9D
+	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 08:41:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eZzYg-0001CX-AO
-	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 08:39:50 -0500
-Received: from indium.canonical.com ([91.189.90.7]:35144)
+	(envelope-from <peter.maydell@linaro.org>) id 1eZzaI-00035e-Ff
+	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 08:41:27 -0500
+Received: from mail-ot0-x243.google.com ([2607:f8b0:4003:c0f::243]:42262)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1eZzYg-0001Bm-3v
-	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 08:39:46 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1eZzYe-0008H3-80
-	for <qemu-devel@nongnu.org>; Fri, 12 Jan 2018 13:39:44 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 13F822E8042
-	for <qemu-devel@nongnu.org>; Fri, 12 Jan 2018 13:39:44 +0000 (UTC)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1eZzaI-00034p-A6
+	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 08:41:26 -0500
+Received: by mail-ot0-x243.google.com with SMTP id s3so5050368otc.9
+	for <qemu-devel@nongnu.org>; Fri, 12 Jan 2018 05:41:26 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <20180109122252.17670-2-alex.bennee@linaro.org>
+References: <20180109122252.17670-1-alex.bennee@linaro.org>
+	<20180109122252.17670-2-alex.bennee@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 12 Jan 2018 13:41:05 +0000
+Message-ID: <CAFEAcA-Z5ASNMPsy2q6aDzJ0xBSMGD6qUaU=iTjDfZzR8pTacg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Fri, 12 Jan 2018 13:28:28 -0000
-From: Thomas Huth <685096@bugs.launchpad.net>
-Reply-To: Bug 685096 <685096@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20101204070046.21747.93608.malonedeb@gandwana.canonical.com>
-Message-Id: <151576370812.25128.185021604406891222.malone@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 685096] Re: USB Passthrough not working for
- Windows 7 guest
+Subject: Re: [Qemu-devel] [PATCH v2 01/20] fpu/softfloat: implement
+ float16_squash_input_denormal
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,53 +31,18 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+Cc: Richard Henderson <richard.henderson@linaro.org>, Laurent Vivier <laurent@vivier.eu>, bharata@linux.vnet.ibm.com, Andrew Dutcher <andrew@andrewdutcher.com>, QEMU Developers <qemu-devel@nongnu.org>, Aurelien Jarno <aurelien@aurel32.net>
 
-Closing this bug for QEMU, since there haven't been any replies within
-the last 7 months.
+On 9 January 2018 at 12:22, Alex Benn=C3=A9e <alex.bennee@linaro.org> wrote=
+:
+> This will be required when expanding the MINMAX() macro for 16
+> bit/half-precision operations.
+>
+> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
-** Changed in: qemu
-       Status: Incomplete =3D> Won't Fix
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/685096
-
-Title:
-  USB Passthrough not working for Windows 7 guest
-
-Status in QEMU:
-  Won't Fix
-Status in qemu package in Ubuntu:
-  Confirmed
-Status in qemu package in Debian:
-  New
-
-Bug description:
-  USB Passthrough from host to guest is not working for a 32-bit Windows
-  7 guest, while it works perfectly for a 32-bit Windows XP guest.
-
-  The device appears in the device manager of Windows 7, but with "Error
-  code 10: device cannot start". I have tried this with numerous USB
-  thumbdrives and a USB wireless NIC, all with the same result. The
-  device name and functionality is recognized, so at least some USB
-  negotiation is taking place.
-
-  I am trying this with the latest git-pull of QEMU-KVM.
-
-  The command line to launch qemu-kvm for win7 is:
-  sudo /home/user/local_install/bin/qemu-system-x86_64 -cpu core2duo -m 102=
-4 -smp 2 -vga std -hda ./disk_images/win7.qcow -vnc :1 -boot c -usb -usbdev=
-ice tablet -usbdevice host:0781:5150
-
-  The command line to launch qemu-kvm for winxp is:
-  sudo /home/user/local_install/bin/qemu-system-x86_64 -cpu core2duo -m 102=
-4 -smp 2 -usb -vga std -hda ./winxpsp3.qcow -vnc :0 -boot c -usbdevice tabl=
-et -usbdevice host:0781:5150
-
-  Any help is appreciated.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/685096/+subscriptions
+thanks
+-- PMM
