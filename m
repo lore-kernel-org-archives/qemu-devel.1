@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41575)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41666)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1eZxYf-0007Jl-Kf
-	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 06:31:41 -0500
+	(envelope-from <paolo.bonzini@gmail.com>) id 1eZxYj-0007LM-Kg
+	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 06:31:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1eZxYb-0004e7-TZ
-	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 06:31:37 -0500
-Received: from mail-wm0-x231.google.com ([2a00:1450:400c:c09::231]:40320)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1eZxYi-0004vT-Ot
+	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 06:31:41 -0500
+Received: from mail-wr0-x242.google.com ([2a00:1450:400c:c0c::242]:41217)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1eZxYb-0004bg-M3
-	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 06:31:33 -0500
-Received: by mail-wm0-x231.google.com with SMTP id v123so2002244wmd.5
-	for <qemu-devel@nongnu.org>; Fri, 12 Jan 2018 03:31:33 -0800 (PST)
+	id 1eZxYi-0004u6-Ir
+	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 06:31:40 -0500
+Received: by mail-wr0-x242.google.com with SMTP id o7so5029124wro.8
+	for <qemu-devel@nongnu.org>; Fri, 12 Jan 2018 03:31:40 -0800 (PST)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Fri, 12 Jan 2018 12:30:35 +0100
-Message-Id: <1515756676-3860-12-git-send-email-pbonzini@redhat.com>
+Date: Fri, 12 Jan 2018 12:30:41 +0100
+Message-Id: <1515756676-3860-18-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1515756676-3860-1-git-send-email-pbonzini@redhat.com>
 References: <1515756676-3860-1-git-send-email-pbonzini@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 11/52] build-sys: add a rule to print a variable
+Subject: [Qemu-devel] [PULL 17/52] vl: fix direct firmware directories leak
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,62 +35,60 @@ Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
 From: Marc-André Lureau <marcandre.lureau@redhat.com>
 
-$ make print-CFLAGS
-CFLAGS=-fsanitize=address -Og -g
+Note that data_dir[] will now point to allocated strings.
 
-Trick from various sources:
-https://stackoverflow.com/questions/16467718/how-to-print-out-a-variable-in-makefile
-https://www.cmcrossroads.com/article/printing-value-makefile-variable
+Fixes:
+Direct leak of 16 byte(s) in 1 object(s) allocated from:
+    #0 0x7f1448181850 in malloc (/lib64/libasan.so.4+0xde850)
+    #1 0x7f1446ed8f0c in g_malloc ../glib/gmem.c:94
+    #2 0x7f1446ed91cf in g_malloc_n ../glib/gmem.c:331
+    #3 0x7f1446ef739a in g_strsplit ../glib/gstrfuncs.c:2364
+    #4 0x55cf276439d7 in main /home/elmarco/src/qq/vl.c:4311
+    #5 0x7f143dfad039 in __libc_start_main (/lib64/libc.so.6+0x21039)
 
 Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
-Message-Id: <20180104160523.22995-4-marcandre.lureau@redhat.com>
-Tested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Message-Id: <20180104160523.22995-10-marcandre.lureau@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- Makefile                    |  5 ++++-
- docs/devel/build-system.txt | 13 +++++++++++++
- 2 files changed, 17 insertions(+), 1 deletion(-)
+ vl.c | 9 ++++++---
+ 1 file changed, 6 insertions(+), 3 deletions(-)
 
-diff --git a/Makefile b/Makefile
-index 1671db3..f26ef1b 100644
---- a/Makefile
-+++ b/Makefile
-@@ -8,9 +8,12 @@ SRC_PATH=.
+diff --git a/vl.c b/vl.c
+index 444b750..3599485 100644
+--- a/vl.c
++++ b/vl.c
+@@ -2318,7 +2318,7 @@ static void qemu_add_data_dir(const char *path)
+             return; /* duplicate */
+         }
+     }
+-    data_dir[data_dir_idx++] = path;
++    data_dir[data_dir_idx++] = g_strdup(path);
+ }
  
- UNCHECKED_GOALS := %clean TAGS cscope ctags dist \
-     html info pdf txt \
--    help check-help \
-+    help check-help print-% \
-     docker docker-% vm-test vm-build-%
+ static inline bool nonempty_str(const char *str)
+@@ -3078,7 +3078,7 @@ int main(int argc, char **argv, char **envp)
+     Error *main_loop_err = NULL;
+     Error *err = NULL;
+     bool list_data_dirs = false;
+-    char **dirs;
++    char *dir, **dirs;
+     typedef struct BlockdevOptions_queue {
+         BlockdevOptions *bdo;
+         Location loc;
+@@ -4181,9 +4181,12 @@ int main(int argc, char **argv, char **envp)
+     for (i = 0; dirs[i] != NULL; i++) {
+         qemu_add_data_dir(dirs[i]);
+     }
++    g_strfreev(dirs);
  
-+print-%:
-+	@echo '$*=$($*)'
-+
- # All following code might depend on configuration variables
- ifneq ($(wildcard config-host.mak),)
- # Put the all: rule here so that config-host.mak can contain dependencies.
-diff --git a/docs/devel/build-system.txt b/docs/devel/build-system.txt
-index 386ef36..52501f2 100644
---- a/docs/devel/build-system.txt
-+++ b/docs/devel/build-system.txt
-@@ -510,3 +510,16 @@ default-configs/$TARGET-NAME file as input.
- This is the entrypoint used when make recurses to build a single system
- or userspace emulator target. It is merely a symlink back to the
- Makefile.target in the top level.
-+
-+
-+Useful make targets
-+===================
-+
-+- help
-+
-+  Print a help message for the most common build targets.
-+
-+- print-VAR
-+
-+  Print the value of the variable VAR. Useful for debugging the build
-+  system.
+     /* try to find datadir relative to the executable path */
+-    qemu_add_data_dir(os_find_datadir());
++    dir = os_find_datadir();
++    qemu_add_data_dir(dir);
++    g_free(dir);
+ 
+     /* add the datadir specified when building */
+     qemu_add_data_dir(CONFIG_QEMU_DATADIR);
 -- 
 1.8.3.1
