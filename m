@@ -1,19 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43189)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43190)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <klim.kireev@virtuozzo.com>) id 1eZvDd-0003Dn-Eq
-	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 04:01:47 -0500
+	(envelope-from <klim.kireev@virtuozzo.com>) id 1eZvDd-0003Dp-FM
+	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 04:01:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <klim.kireev@virtuozzo.com>) id 1eZvDZ-0000Ij-OM
+	(envelope-from <klim.kireev@virtuozzo.com>) id 1eZvDZ-0000IX-Ed
 	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 04:01:45 -0500
 From: Klim Kireev <klim.kireev@virtuozzo.com>
-Date: Fri, 12 Jan 2018 12:01:20 +0300
-Message-Id: <20180112090122.1702-4-klim.kireev@virtuozzo.com>
+Date: Fri, 12 Jan 2018 12:01:19 +0300
+Message-Id: <20180112090122.1702-3-klim.kireev@virtuozzo.com>
 In-Reply-To: <20180112090122.1702-1-klim.kireev@virtuozzo.com>
 References: <20180112090122.1702-1-klim.kireev@virtuozzo.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH 3/5] block/parallels: move some structures into
- header
+Subject: [Qemu-devel] [PATCH 2/5] configure: add dependency
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,188 +24,117 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: kwolf@redhat.com, den@openvz.org, qemu-block@nongnu.org, stefanha@redhat.com, mreitz@redhat.com
 
-To implement xml format, some defines and structures
-from parallels.c are required.
+This dependency is required for adequate Parallels images support.
+Typically the disk consists of several images which are glued by
+XML disk descriptor. Also XML hides inside several important parameters
+which are not available in the image header.
 
-Signed-off-by: Klim Kireev <klim.kireev@virtuozzo.com>
-Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+The patch also adds clause to checkpatch.pl to understand libxml2 types.
+
 Signed-off-by: Denis V. Lunev <den@openvz.org>
+Signed-off-by: Klim Kireev <klim.kireev@virtuozzo.com>
+Signed-off-by: Edgar Kaziakhmedov <edgar.kaziakhmedov@virtuozzo.com>
 CC: Stefan Hajnoczi <stefanha@redhat.com>
 ---
- block/parallels.c | 53 +---------------------------------
- block/parallels.h | 86 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 87 insertions(+), 52 deletions(-)
- create mode 100644 block/parallels.h
+ block/Makefile.objs   |  2 ++
+ configure             | 27 +++++++++++++++++++++++++++
+ scripts/checkpatch.pl |  1 +
+ 3 files changed, 30 insertions(+)
 
-diff --git a/block/parallels.c b/block/parallels.c
-index 9545761f49..f9a3b999ea 100644
---- a/block/parallels.c
-+++ b/block/parallels.c
-@@ -36,6 +36,7 @@
- #include "qemu/bswap.h"
- #include "qemu/bitmap.h"
- #include "migration/blocker.h"
-+#include "parallels.h"
+diff --git a/block/Makefile.objs b/block/Makefile.objs
+index 6eaf78a046..a73387f1bf 100644
+--- a/block/Makefile.objs
++++ b/block/Makefile.objs
+@@ -47,3 +47,5 @@ block-obj-$(if $(CONFIG_BZIP2),m,n) += dmg-bz2.o
+ dmg-bz2.o-libs     := $(BZIP2_LIBS)
+ qcow.o-libs        := -lz
+ linux-aio.o-libs   := -laio
++parallels.o-cflags := $(LIBXML2_CFLAGS)
++parallels.o-libs   := $(LIBXML2_LIBS)
+diff --git a/configure b/configure
+index 6a040821c6..790fa635d1 100755
+--- a/configure
++++ b/configure
+@@ -435,6 +435,7 @@ tcmalloc="no"
+ jemalloc="no"
+ replication="yes"
+ vxhs=""
++libxml2=""
  
- /**************************************************************/
+ supported_cpu="no"
+ supported_os="no"
+@@ -1298,6 +1299,10 @@ for opt do
+   ;;
+   --enable-numa) numa="yes"
+   ;;
++  --disable-libxml2) libxml2="no"
++  ;;
++  --enable-libxml2) libxml2="yes"
++  ;;
+   --disable-tcmalloc) tcmalloc="no"
+   ;;
+   --enable-tcmalloc) tcmalloc="yes"
+@@ -1573,6 +1578,7 @@ disabled with --disable-FEATURE, default is enabled if available:
+   tpm             TPM support
+   libssh2         ssh block device support
+   numa            libnuma support
++  libxml2         for Parallels image format
+   tcmalloc        tcmalloc support
+   jemalloc        jemalloc support
+   replication     replication support
+@@ -3747,6 +3753,20 @@ EOF
+   fi
+ fi
  
-@@ -45,30 +46,6 @@
- #define HEADER_INUSE_MAGIC  (0x746F6E59)
- #define MAX_PARALLELS_IMAGE_FACTOR (1ull << 32)
++##########################################
++# libxml2 probe
++if test "$libxml2" != "no" ; then
++    if $pkg_config --exists libxml-2.0; then
++        libxml2="yes"
++        libxml2_cflags=$($pkg_config --cflags libxml-2.0)
++        libxml2_libs=$($pkg_config --libs libxml-2.0)
++    else
++        if test "$libxml2" = "yes"; then
++            feature_not_found "libxml2" "Install libxml2 devel"
++        fi
++        libxml2="no"
++    fi
++fi
  
--#define DEFAULT_CLUSTER_SIZE 1048576        /* 1 MiB */
--
--
--// always little-endian
--typedef struct ParallelsHeader {
--    char magic[16]; // "WithoutFreeSpace"
--    uint32_t version;
--    uint32_t heads;
--    uint32_t cylinders;
--    uint32_t tracks;
--    uint32_t bat_entries;
--    uint64_t nb_sectors;
--    uint32_t inuse;
--    uint32_t data_off;
--    char padding[12];
--} QEMU_PACKED ParallelsHeader;
--
--
--typedef enum ParallelsPreallocMode {
--    PRL_PREALLOC_MODE_FALLOCATE = 0,
--    PRL_PREALLOC_MODE_TRUNCATE = 1,
--    PRL_PREALLOC_MODE__MAX = 2,
--} ParallelsPreallocMode;
--
- static QEnumLookup prealloc_mode_lookup = {
-     .array = (const char *const[]) {
-         "falloc",
-@@ -77,34 +54,6 @@ static QEnumLookup prealloc_mode_lookup = {
-     .size = PRL_PREALLOC_MODE__MAX
- };
+ ##########################################
+ # glusterfs probe
+@@ -5618,6 +5638,7 @@ echo "lzo support       $lzo"
+ echo "snappy support    $snappy"
+ echo "bzip2 support     $bzip2"
+ echo "NUMA host support $numa"
++echo "libxml2           $libxml2"
+ echo "tcmalloc support  $tcmalloc"
+ echo "jemalloc support  $jemalloc"
+ echo "avx2 optimization $avx2_opt"
+@@ -6281,6 +6302,12 @@ if test "$have_rtnetlink" = "yes" ; then
+   echo "CONFIG_RTNETLINK=y" >> $config_host_mak
+ fi
  
--typedef struct BDRVParallelsState {
--    /** Locking is conservative, the lock protects
--     *   - image file extending (truncate, fallocate)
--     *   - any access to block allocation table
--     */
--    CoMutex lock;
--
--    ParallelsHeader *header;
--    uint32_t header_size;
--    bool header_unclean;
--
--    unsigned long *bat_dirty_bmap;
--    unsigned int  bat_dirty_block;
--
--    uint32_t *bat_bitmap;
--    unsigned int bat_size;
--
--    int64_t  data_end;
--    uint64_t prealloc_size;
--    ParallelsPreallocMode prealloc_mode;
--
--    unsigned int tracks;
--
--    unsigned int off_multiplier;
--    Error *migration_blocker;
--} BDRVParallelsState;
--
--
- #define PARALLELS_OPT_PREALLOC_MODE     "prealloc-mode"
- #define PARALLELS_OPT_PREALLOC_SIZE     "prealloc-size"
++if test "$libxml2" = "yes" ; then
++  echo "CONFIG_LIBXML2=y" >> $config_host_mak
++  echo "LIBXML2_CFLAGS=$libxml2_cflags" >> $config_host_mak
++  echo "LIBXML2_LIBS=$libxml2_libs" >> $config_host_mak
++fi
++
+ if test "$replication" = "yes" ; then
+   echo "CONFIG_REPLICATION=y" >> $config_host_mak
+ fi
+diff --git a/scripts/checkpatch.pl b/scripts/checkpatch.pl
+index 3dc27d9656..9bfe2b58e1 100755
+--- a/scripts/checkpatch.pl
++++ b/scripts/checkpatch.pl
+@@ -265,6 +265,7 @@ our @typeList = (
+ 	qr{${Ident}_handler_fn},
+ 	qr{target_(?:u)?long},
+ 	qr{hwaddr},
++	qr{xml${Ident}},
+ );
  
-diff --git a/block/parallels.h b/block/parallels.h
-new file mode 100644
-index 0000000000..71183c0c8e
---- /dev/null
-+++ b/block/parallels.h
-@@ -0,0 +1,86 @@
-+/*
-+* Block driver for Parallels disk image format
-+*
-+* Copyright (c) 2015-2017 Virtuozzo, Inc.
-+* Authors:
-+*         2016-2017 Klim S. Kireev <klim.kireev@virtuozzo.com>
-+*         2015 Denis V. Lunev <den@openvz.org>
-+*
-+* This code was originally based on comparing different disk images created
-+* by Parallels. Currently it is based on opened OpenVZ sources
-+* available at
-+*     https://github.com/OpenVZ/ploop
-+*
-+* Permission is hereby granted, free of charge, to any person obtaining a copy
-+* of this software and associated documentation files (the "Software"), to deal
-+* in the Software without restriction, including without limitation the rights
-+* to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-+* copies of the Software, and to permit persons to whom the Software is
-+* furnished to do so, subject to the following conditions:
-+*
-+* The above copyright notice and this permission notice shall be included in
-+* all copies or substantial portions of the Software.
-+*
-+* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-+* IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-+* FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-+* THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-+* LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-+* OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-+* THE SOFTWARE.
-+*/
-+#ifndef BLOCK_PARALLELS_H
-+#define BLOCK_PARALLELS_H
-+#include "qemu/coroutine.h"
-+#include "qemu/typedefs.h"
-+
-+#define DEFAULT_CLUSTER_SIZE 1048576        /* 1 MiB */
-+
-+/* always little-endian */
-+typedef struct ParallelsHeader {
-+    char magic[16]; /* "WithoutFreeSpace" */
-+    uint32_t version;
-+    uint32_t heads;
-+    uint32_t cylinders;
-+    uint32_t tracks;
-+    uint32_t bat_entries;
-+    uint64_t nb_sectors;
-+    uint32_t inuse;
-+    uint32_t data_off;
-+    char padding[12];
-+} QEMU_PACKED ParallelsHeader;
-+
-+typedef enum ParallelsPreallocMode {
-+    PRL_PREALLOC_MODE_FALLOCATE = 0,
-+    PRL_PREALLOC_MODE_TRUNCATE = 1,
-+    PRL_PREALLOC_MODE__MAX = 2,
-+} ParallelsPreallocMode;
-+
-+typedef struct BDRVParallelsState {
-+    /** Locking is conservative, the lock protects
-+     *   - image file extending (truncate, fallocate)
-+     *   - any access to block allocation table
-+     */
-+    CoMutex lock;
-+
-+    ParallelsHeader *header;
-+    uint32_t header_size;
-+    bool header_unclean;
-+
-+    unsigned long *bat_dirty_bmap;
-+    unsigned int  bat_dirty_block;
-+
-+    uint32_t *bat_bitmap;
-+    unsigned int bat_size;
-+
-+    int64_t  data_end;
-+    uint64_t prealloc_size;
-+    ParallelsPreallocMode prealloc_mode;
-+
-+    unsigned int tracks;
-+
-+    unsigned int off_multiplier;
-+    Error *migration_blocker;
-+} BDRVParallelsState;
-+
-+#endif
+ # This can be modified by sub possible.  Since it can be empty, be careful
 -- 
 2.14.3
