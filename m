@@ -1,29 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50436)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53236)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jianjay.zhou@huawei.com>) id 1eZoLg-0006eD-4C
-	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 20:41:37 -0500
+	(envelope-from <famz@redhat.com>) id 1eZoVl-0001EY-Ay
+	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 20:52:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jianjay.zhou@huawei.com>) id 1eZoLc-0000ND-7l
-	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 20:41:36 -0500
-Received: from szxga02-in.huawei.com ([45.249.212.188]:2307 helo=huawei.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jianjay.zhou@huawei.com>)
-	id 1eZoLb-0000EA-SC
-	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 20:41:32 -0500
-From: "Zhoujian (jay)" <jianjay.zhou@huawei.com>
-Date: Fri, 12 Jan 2018 01:41:19 +0000
-Message-ID: <B2D15215269B544CADD246097EACE7473AB3A5E1@DGGEMM505-MBS.china.huawei.com>
-References: <1515515942-33692-1-git-send-email-jianjay.zhou@huawei.com>
-	<20180111140057.61f36a8f@redhat.com>
-	<B2D15215269B544CADD246097EACE7473AB386CE@DGGEMM505-MBS.china.huawei.com>
-	<20180111215411-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20180111215411-mutt-send-email-mst@kernel.org>
-Content-Language: zh-CN
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	(envelope-from <famz@redhat.com>) id 1eZoVk-0000N5-Dp
+	for qemu-devel@nongnu.org; Thu, 11 Jan 2018 20:52:01 -0500
+Date: Fri, 12 Jan 2018 09:51:48 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20180112015148.GB29151@lemon.usersys.redhat.com>
+References: <20180110091846.10699-1-famz@redhat.com>
+	<20180110091846.10699-3-famz@redhat.com>
+	<20180110130956.06baae69@t450s.home>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v5 0/4] vhost: two fixes and used_memslots
- refactoring
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180110130956.06baae69@t450s.home>
+Subject: Re: [Qemu-devel] [PATCH v4 2/9] util: Introduce vfio helpers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,91 +24,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Igor Mammedov <imammedo@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "Huangweidong (C)" <weidong.huang@huawei.com>, "wangxin (U)" <wangxinxin.wang@huawei.com>, "Gonglei (Arei)" <arei.gonglei@huawei.com>, "Liuzhe (Ahriy, Euler)" <liuzhe13@huawei.com>, Jason Wang <jasowang@redhat.com>
+To: Alex Williamson <alex.williamson@redhat.com>
+Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, Markus Armbruster <armbru@redhat.com>, Max Reitz <mreitz@redhat.com>, Keith Busch <keith.busch@intel.com>, Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Karl Rister <krister@redhat.com>
 
+On Wed, 01/10 13:09, Alex Williamson wrote:
+> On Wed, 10 Jan 2018 17:18:39 +0800
+> Fam Zheng <famz@redhat.com> wrote:
+> 
+> > This is a library to manage the host vfio interface, which could be used
+> > to implement userspace device driver code in QEMU such as NVMe or net
+> > controllers.
+> > 
+> > Signed-off-by: Fam Zheng <famz@redhat.com>
+> > ---
+> >  include/qemu/vfio-helpers.h |  30 ++
+> >  util/Makefile.objs          |   1 +
+> >  util/trace-events           |  11 +
+> >  util/vfio-helpers.c         | 723 ++++++++++++++++++++++++++++++++++++++++++++
+> >  4 files changed, 765 insertions(+)
+> >  create mode 100644 include/qemu/vfio-helpers.h
+> >  create mode 100644 util/vfio-helpers.c
+> > 
+> > diff --git a/include/qemu/vfio-helpers.h b/include/qemu/vfio-helpers.h
+> > new file mode 100644
+> > index 0000000000..6bdba3b66e
+> > --- /dev/null
+> > +++ b/include/qemu/vfio-helpers.h
+> ...
+> > +/**
+> > + * Map a PCI bar area.
+> > + */
+> > +void *qemu_vfio_pci_map_bar(QEMUVFIOState *s, int index, Error **errp)
+> > +{
+> > +    void *p;
+> > +    assert_bar_index_valid(s, index);
+> > +    p = mmap(NULL, MIN(8192, s->bar_region_info[index].size),
+> > +             PROT_READ | PROT_WRITE, MAP_SHARED,
+> > +             s->device, s->bar_region_info[index].offset);
+> > +    if (p == MAP_FAILED) {
+> > +        error_setg_errno(errp, errno, "Failed to map BAR region");
+> > +        p = NULL;
+> > +    }
+> > +    return p;
+> > +}
+> > +
+> > +/**
+> > + * Unmap a PCI bar area.
+> > + */
+> > +void qemu_vfio_pci_unmap_bar(QEMUVFIOState *s, int index, void *bar)
+> > +{
+> > +    if (bar) {
+> > +        munmap(bar, MIN(8192, s->bar_region_info[index].size));
+> > +    }
+> > +}
+> 
+> What's up with this 8KB thing?  Is it perhaps a hack to avoid
+> un-mmap'able MSI-X sections of the BAR, which would make this general
+> purpose library very specific to devices which only operate in the lower
+> 8KB of their MMIO space.  Maybe the interface should have an offset and
+> size so that the NVMe driver could implement that dependency.  We could
+> also be testing if the region supports mmap, but I suppose trying and
+> failing is just as good.  Thanks,
 
+Sounds good, will add the offset and size parameters.
 
-> -----Original Message-----
-> From: Michael S. Tsirkin [mailto:mst@redhat.com]
-> Sent: Friday, January 12, 2018 3:56 AM
-> To: Zhoujian (jay) <jianjay.zhou@huawei.com>
-> Cc: Igor Mammedov <imammedo@redhat.com>; qemu-devel@nongnu.org; Huangweid=
-ong
-> (C) <weidong.huang@huawei.com>; wangxin (U) <wangxinxin.wang@huawei.com>;
-> Gonglei (Arei) <arei.gonglei@huawei.com>; Liuzhe (Ahriy, Euler)
-> <liuzhe13@huawei.com>
-> Subject: Re: [PATCH v5 0/4] vhost: two fixes and used_memslots refactorin=
-g
->=20
-> On Thu, Jan 11, 2018 at 01:55:38PM +0000, Zhoujian (jay) wrote:
-> > Hi Igor,
-> >
-> > > -----Original Message-----
-> > > From: Igor Mammedov [mailto:imammedo@redhat.com]
-> > > Sent: Thursday, January 11, 2018 9:05 PM
-> > > To: Zhoujian (jay) <jianjay.zhou@huawei.com>
-> > > Cc: qemu-devel@nongnu.org; mst@redhat.com; Huangweidong (C)
-> > > <weidong.huang@huawei.com>; wangxin (U)
-> > > <wangxinxin.wang@huawei.com>; Gonglei
-> > > (Arei) <arei.gonglei@huawei.com>; Liuzhe (Ahriy, Euler)
-> > > <liuzhe13@huawei.com>
-> > > Subject: Re: [PATCH v5 0/4] vhost: two fixes and used_memslots
-> > > refactoring
-> > >
-> > > On Wed, 10 Jan 2018 00:39:02 +0800
-> > > Jay Zhou <jianjay.zhou@huawei.com> wrote:
-> > >
-> > > Jay,
-> > > considering how non trivial touched code is, would you mind first
-> > > adding 'make check' testcases for success/failure paths that you are
-> touching?
-> > > It would help with merging and ensure that future changes to vhost
-> > > won't break memslots handling.
-> >
-> > Will look into the testcases. Maybe it would take some time since I'm
-> > not very familiar with them.
-> >
-> > Regards,
-> > Jay
->=20
->=20
-> ok can you repost whatever's ready please? And please use proper threadin=
-g
-> (e.g. generated with git format-patch --thread=3Dshallow).
->=20
-
-Will send a v6 version soon.
-
-PS: Considering vhost memslots series and the patch "tap: do not close fd
-if only vhost failed to initialize" are two separate issues, will send
-them separately.
-
-Regards,
-Jay
-
-> > >
-> > > > v4 -> v5:
-> > > >   Making the followed up device_add to fall back to userspace
-> > > >   virtio when netdev_add fails if vhost force flag does not set.
-> > > >
-> > > > Jay Zhou (4):
-> > > >   vhost: remove assertion to prevent crash
-> > > >   tap: do not close fd if only vhost failed to initialize
-> > > >   vhost: fix memslot limit check
-> > > >   vhost: used_memslots refactoring
-> > > >
-> > > >  hw/virtio/vhost-backend.c         | 15 +++++++-
-> > > >  hw/virtio/vhost-user.c            | 74 +++++++++++++++++++++++++++=
-----
-> ----
-> > > ----
-> > > >  hw/virtio/vhost.c                 | 30 +++++++++-------
-> > > >  include/hw/virtio/vhost-backend.h |  6 ++--
-> > > >  net/tap.c                         | 25 +++++++++----
-> > > >  5 files changed, 104 insertions(+), 46 deletions(-)
-> > > >
-> > > > --
-> > > > 1.8.3.1
-> > > >
-> > > >
+Fam
