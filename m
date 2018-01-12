@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41376)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41426)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1eZxYU-00079Q-OD
-	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 06:31:28 -0500
+	(envelope-from <paolo.bonzini@gmail.com>) id 1eZxYW-00079y-1y
+	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 06:31:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1eZxYS-0004Gp-Q7
-	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 06:31:26 -0500
-Received: from mail-wm0-x241.google.com ([2a00:1450:400c:c09::241]:42352)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1eZxYU-0004K1-2R
+	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 06:31:28 -0500
+Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:39723)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1eZxYS-0004F2-Je
-	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 06:31:24 -0500
-Received: by mail-wm0-x241.google.com with SMTP id b141so11523629wme.1
-	for <qemu-devel@nongnu.org>; Fri, 12 Jan 2018 03:31:24 -0800 (PST)
+	id 1eZxYT-0004Hj-T8
+	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 06:31:26 -0500
+Received: by mail-wm0-x242.google.com with SMTP id i11so11126408wmf.4
+	for <qemu-devel@nongnu.org>; Fri, 12 Jan 2018 03:31:25 -0800 (PST)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Fri, 12 Jan 2018 12:30:27 +0100
-Message-Id: <1515756676-3860-4-git-send-email-pbonzini@redhat.com>
+Date: Fri, 12 Jan 2018 12:30:28 +0100
+Message-Id: <1515756676-3860-5-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1515756676-3860-1-git-send-email-pbonzini@redhat.com>
 References: <1515756676-3860-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 03/52] pc: fail memory hot-plug/unplug with
- -no-acpi and Q35 machine type
+Subject: [Qemu-devel] [PULL 04/52] hpet: recover timer offset correctly
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,61 +28,109 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Haozhong Zhang <haozhong.zhang@intel.com>
+Cc: Maria Klimushenkova <maria.klimushenkova@ispras.ru>, Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
 
-From: Haozhong Zhang <haozhong.zhang@intel.com>
+From: Maria Klimushenkova <maria.klimushenkova@ispras.ru>
 
-When -no-acpi option is used with Q35 machine type, no guest ACPI is
-built, but the ACPI device is still created, so only checking the
-presence of ACPI device before memory plug/unplug is not enough in
-such cases. Check whether ACPI is disabled globally in addition and
-fail memory plug/unplug if it's disabled.
+HPET saves its state by calculating the current time and recovers timer
+offset using this calculated value. But these calculations include
+divisions and multiplications. Therefore the timer state cannot be recovered
+precise enough.
+This patch introduces saving of the original value of the offset to
+preserve the determinism of the timer.
 
-Signed-off-by: Haozhong Zhang <haozhong.zhang@intel.com>
-Message-Id: <20171222015120.31730-1-haozhong.zhang@intel.com>
-Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+Signed-off-by: Maria Klimushenkova <maria.klimushenkova@ispras.ru>
+Signed-off-by: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
+Message-Id: <20171220100205.16625.84632.stgit@pasha-VirtualBox>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- hw/i386/pc.c | 18 ++++++++++++++----
- 1 file changed, 14 insertions(+), 4 deletions(-)
+ hw/timer/hpet.c | 32 ++++++++++++++++++++++++++++++--
+ 1 file changed, 30 insertions(+), 2 deletions(-)
 
-diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-index 3fcf318..55686bf 100644
---- a/hw/i386/pc.c
-+++ b/hw/i386/pc.c
-@@ -1695,9 +1695,14 @@ static void pc_dimm_plug(HotplugHandler *hotplug_dev,
-         align = memory_region_get_alignment(mr);
+diff --git a/hw/timer/hpet.c b/hw/timer/hpet.c
+index 577371b..4904a60 100644
+--- a/hw/timer/hpet.c
++++ b/hw/timer/hpet.c
+@@ -70,6 +70,7 @@ typedef struct HPETState {
+ 
+     MemoryRegion iomem;
+     uint64_t hpet_offset;
++    bool hpet_offset_loaded;
+     qemu_irq irqs[HPET_NUM_IRQ_ROUTES];
+     uint32_t flags;
+     uint8_t rtc_irq_level;
+@@ -221,7 +222,9 @@ static int hpet_pre_save(void *opaque)
+     HPETState *s = opaque;
+ 
+     /* save current counter value */
+-    s->hpet_counter = hpet_get_ticks(s);
++    if (hpet_enabled(s)) {
++        s->hpet_counter = hpet_get_ticks(s);
++    }
+ 
+     return 0;
+ }
+@@ -232,6 +235,8 @@ static int hpet_pre_load(void *opaque)
+ 
+     /* version 1 only supports 3, later versions will load the actual value */
+     s->num_timers = HPET_MIN_TIMERS;
++    /* for checking whether the hpet_offset section is loaded */
++    s->hpet_offset_loaded = false;
+     return 0;
+ }
+ 
+@@ -252,7 +257,10 @@ static int hpet_post_load(void *opaque, int version_id)
+     HPETState *s = opaque;
+ 
+     /* Recalculate the offset between the main counter and guest time */
+-    s->hpet_offset = ticks_to_ns(s->hpet_counter) - qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
++    if (!s->hpet_offset_loaded) {
++        s->hpet_offset = ticks_to_ns(s->hpet_counter)
++                        - qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
++    }
+ 
+     /* Push number of timers into capability returned via HPET_ID */
+     s->capability &= ~HPET_ID_NUM_TIM_MASK;
+@@ -267,6 +275,14 @@ static int hpet_post_load(void *opaque, int version_id)
+     return 0;
+ }
+ 
++static int hpet_offset_post_load(void *opaque, int version_id)
++{
++    HPETState *s = opaque;
++
++    s->hpet_offset_loaded = true;
++    return 0;
++}
++
+ static bool hpet_rtc_irq_level_needed(void *opaque)
+ {
+     HPETState *s = opaque;
+@@ -285,6 +301,17 @@ static const VMStateDescription vmstate_hpet_rtc_irq_level = {
      }
+ };
  
--    if (!pcms->acpi_dev) {
-+    /*
-+     * When -no-acpi is used with Q35 machine type, no ACPI is built,
-+     * but pcms->acpi_dev is still created. Check !acpi_enabled in
-+     * addition to cover this case.
-+     */
-+    if (!pcms->acpi_dev || !acpi_enabled) {
-         error_setg(&local_err,
--                   "memory hotplug is not enabled: missing acpi device");
-+                   "memory hotplug is not enabled: missing acpi device or acpi disabled");
-         goto out;
++static const VMStateDescription vmstate_hpet_offset = {
++    .name = "hpet/offset",
++    .version_id = 1,
++    .minimum_version_id = 1,
++    .post_load = hpet_offset_post_load,
++    .fields = (VMStateField[]) {
++        VMSTATE_UINT64(hpet_offset, HPETState),
++        VMSTATE_END_OF_LIST()
++    }
++};
++
+ static const VMStateDescription vmstate_hpet_timer = {
+     .name = "hpet_timer",
+     .version_id = 1,
+@@ -320,6 +347,7 @@ static const VMStateDescription vmstate_hpet = {
+     },
+     .subsections = (const VMStateDescription*[]) {
+         &vmstate_hpet_rtc_irq_level,
++        &vmstate_hpet_offset,
+         NULL
      }
- 
-@@ -1729,9 +1734,14 @@ static void pc_dimm_unplug_request(HotplugHandler *hotplug_dev,
-     Error *local_err = NULL;
-     PCMachineState *pcms = PC_MACHINE(hotplug_dev);
- 
--    if (!pcms->acpi_dev) {
-+    /*
-+     * When -no-acpi is used with Q35 machine type, no ACPI is built,
-+     * but pcms->acpi_dev is still created. Check !acpi_enabled in
-+     * addition to cover this case.
-+     */
-+    if (!pcms->acpi_dev || !acpi_enabled) {
-         error_setg(&local_err,
--                   "memory hotplug is not enabled: missing acpi device");
-+                   "memory hotplug is not enabled: missing acpi device or acpi disabled");
-         goto out;
-     }
- 
+ };
 -- 
 1.8.3.1
