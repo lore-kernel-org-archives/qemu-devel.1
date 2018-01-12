@@ -1,28 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58627)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58838)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1ea0Dw-0008Ny-Dq
-	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 09:22:25 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1ea0Ec-0000T8-39
+	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 09:23:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1ea0Dq-0003LM-B5
-	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 09:22:24 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:45616)
+	(envelope-from <ehabkost@redhat.com>) id 1ea0EY-00045W-0O
+	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 09:23:06 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:60516)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1ea0Dq-0003Ks-4A
-	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 09:22:18 -0500
-Date: Fri, 12 Jan 2018 14:20:36 +0000
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20180112142036.GC11423@stefanha-x1.localdomain>
-References: <20171219084557.9801-1-peterx@redhat.com>
-	<20171219084557.9801-21-peterx@redhat.com>
-	<20180109134528.GE31400@stefanha-x1.localdomain>
-	<20180112061610.GL2551@xz-mi>
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1ea0EX-00044v-MK
+	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 09:23:01 -0500
+Date: Fri, 12 Jan 2018 12:22:52 -0200
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20180112142252.GG6646@localhost.localdomain>
+References: <1515443797-10837-1-git-send-email-luwei.kang@intel.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="ncSAzJYg3Aa9+CRW"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20180112061610.GL2551@xz-mi>
-Subject: Re: [Qemu-devel] [RFC v6 20/27] qmp: export qmp_dispatch_check_obj
- and allow "id"
+In-Reply-To: <1515443797-10837-1-git-send-email-luwei.kang@intel.com>
+Subject: Re: [Qemu-devel] [PATCH RESEND v1 1/2] i386: Add Intel Processor
+ Trace feature support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,53 +27,114 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, Stefan Hajnoczi <shajnocz@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <famz@redhat.com>, Juan Quintela <quintela@redhat.com>, mdroth@linux.vnet.ibm.com, Eric Blake <eblake@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Markus Armbruster <armbru@redhat.com>, marcandre.lureau@redhat.com, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: Luwei Kang <luwei.kang@intel.com>
+Cc: qemu-devel@nongnu.org, kvm@vger.kernel.org, pbonzini@redhat.com, rth@twiddle.net, mtosatti@redhat.com, Chao Peng <chao.p.peng@linux.intel.com>
+
+On Tue, Jan 09, 2018 at 04:36:36AM +0800, Luwei Kang wrote:
+> From: Chao Peng <chao.p.peng@linux.intel.com>
+> 
+> Expose Intel Processor Trace feature to guest.
+> 
+> Signed-off-by: Chao Peng <chao.p.peng@linux.intel.com>
+> Signed-off-by: Luwei Kang <luwei.kang@intel.com>
+> ---
+>  target/i386/cpu.c | 19 ++++++++++++++++++-
+>  target/i386/cpu.h |  1 +
+>  target/i386/kvm.c | 23 +++++++++++++++++++++++
+>  3 files changed, 42 insertions(+), 1 deletion(-)
+> 
+> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+> index 3818d72..57f8370 100644
+> --- a/target/i386/cpu.c
+> +++ b/target/i386/cpu.c
+> @@ -427,7 +427,7 @@ static FeatureWordInfo feature_word_info[FEATURE_WORDS] = {
+>              NULL, NULL, "mpx", NULL,
+>              "avx512f", "avx512dq", "rdseed", "adx",
+>              "smap", "avx512ifma", "pcommit", "clflushopt",
+> -            "clwb", NULL, "avx512pf", "avx512er",
+> +            "clwb", "intel-pt", "avx512pf", "avx512er",
+>              "avx512cd", "sha-ni", "avx512bw", "avx512vl",
+>          },
+>          .cpuid_eax = 7,
+> @@ -3006,6 +3006,23 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
+>          }
+>          break;
+>      }
+> +    case 0x14: {
+> +        if ((env->features[FEAT_7_0_EBX] & CPUID_7_0_EBX_INTEL_PT) &&
+> +             kvm_enabled()) {
+> +            KVMState *s = cs->kvm_state;
+> +
+> +            *eax = kvm_arch_get_supported_cpuid(s, 0x14, count, R_EAX);
+> +            *ebx = kvm_arch_get_supported_cpuid(s, 0x14, count, R_EBX);
+> +            *ecx = kvm_arch_get_supported_cpuid(s, 0x14, count, R_ECX);
+> +            *edx = kvm_arch_get_supported_cpuid(s, 0x14, count, R_EDX);
+
+If you are forwarding host info directly to the guest, the
+feature is not migration-safe.  The new feature needs to be added
+to feature_word_info[FEAT_7_0_EBX].unmigratable_flags.
 
 
---ncSAzJYg3Aa9+CRW
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+> +        } else {
+> +            *eax = 0;
+> +            *ebx = 0;
+> +            *ecx = 0;
+> +            *edx = 0;
+> +        }
+> +        break;
+> +    }
+>      case 0x40000000:
+>          /*
+>           * CPUID code in kvm_arch_init_vcpu() ignores stuff
+> diff --git a/target/i386/cpu.h b/target/i386/cpu.h
+> index 62c4742..58a4b6c 100644
+> --- a/target/i386/cpu.h
+> +++ b/target/i386/cpu.h
+> @@ -642,6 +642,7 @@ typedef uint32_t FeatureWordArray[FEATURE_WORDS];
+>  #define CPUID_7_0_EBX_PCOMMIT  (1U << 22) /* Persistent Commit */
+>  #define CPUID_7_0_EBX_CLFLUSHOPT (1U << 23) /* Flush a Cache Line Optimized */
+>  #define CPUID_7_0_EBX_CLWB     (1U << 24) /* Cache Line Write Back */
+> +#define CPUID_7_0_EBX_INTEL_PT (1U << 25) /* Intel Processor Trace */
+>  #define CPUID_7_0_EBX_AVX512PF (1U << 26) /* AVX-512 Prefetch */
+>  #define CPUID_7_0_EBX_AVX512ER (1U << 27) /* AVX-512 Exponential and Reciprocal */
+>  #define CPUID_7_0_EBX_AVX512CD (1U << 28) /* AVX-512 Conflict Detection */
+> diff --git a/target/i386/kvm.c b/target/i386/kvm.c
+> index 6f69e2f..e13ab58 100644
+> --- a/target/i386/kvm.c
+> +++ b/target/i386/kvm.c
+> @@ -863,6 +863,29 @@ int kvm_arch_init_vcpu(CPUState *cs)
+>                  c = &cpuid_data.entries[cpuid_i++];
+>              }
+>              break;
+> +        case 0x14: {
+> +            uint32_t times;
+> +
+> +            c->function = i;
+> +            c->index = 0;
+> +            c->flags = KVM_CPUID_FLAG_SIGNIFCANT_INDEX;
+> +            cpu_x86_cpuid(env, i, 0, &c->eax, &c->ebx, &c->ecx, &c->edx);
+> +            times = c->eax;
+> +
+> +            for (j = 1; j <= times; ++j) {
+> +                if (cpuid_i == KVM_MAX_CPUID_ENTRIES) {
+> +                    fprintf(stderr, "cpuid_data is full, no space for "
+> +                                "cpuid(eax:0x14,ecx:0x%x)\n", j);
+> +                    abort();
+> +                }
+> +                c = &cpuid_data.entries[cpuid_i++];
+> +                c->function = i;
+> +                c->index = j;
+> +                c->flags = KVM_CPUID_FLAG_SIGNIFCANT_INDEX;
+> +                cpu_x86_cpuid(env, i, j, &c->eax, &c->ebx, &c->ecx, &c->edx);
+> +            }
+> +            break;
+> +        }
+>          default:
+>              c->function = i;
+>              c->flags = 0;
+> -- 
+> 1.8.3.1
+> 
 
-On Fri, Jan 12, 2018 at 02:16:10PM +0800, Peter Xu wrote:
-> On Tue, Jan 09, 2018 at 01:45:28PM +0000, Stefan Hajnoczi wrote:
-> > On Tue, Dec 19, 2017 at 04:45:50PM +0800, Peter Xu wrote:
-> > > We need this for earlier check for OOB, before reaching
-> > > do_qmp_dispatch().  Meanwhile, a small touch-up to allow "id" field,
-> > > after all we allow that for sure in the spec (in any form).
-> >=20
-> > This change would be better as part of the patch that needs it.  I don't
-> > understand the commit description and there is no context in this patch
-> > showing how this change is used.
->=20
-> Maybe I should mention it explicitly that "it'll be used in the
-> following up patch".
->=20
-> Logically I think this has nothing to do with OOB so I splitted it
-> out.  I would prefer it to be a separate patch (though I can enrich
-> the commit message).  Or, I'm also fine if you think squashing this
-> into next would be nicer.  Thanks,
-
-I didn't understand the patch in isolation.  Maybe rephrasing the commit
-description would help.  My suggestion to squash it means there will be
-more context to review this change and hopefully it will become
-self-explanatory.
-
-Stefan
-
---ncSAzJYg3Aa9+CRW
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJaWMQ0AAoJEJykq7OBq3PI9j8H/j/zmxl/o2b4sJOBPO+bI34F
-fIEWUp8eT/rz5XeckXduv2gugLUUlG8rkOxKP924D364b8v49PHCm3VlZ/t5p4eu
-LrNRT8GtzOCqWhim8ki0TKmjhyuHzXlSyfvS5Ky7iWwsukG/NUPVm//Sxg2IJFBZ
-Nft7i0JTU0ZNTR2TgzVpWkaoOUs8ld5heSqLWnpEnGu/isqTDZi7VYPg2F6sgQ+i
-N8iWkh178JoT+VsOjlRgCmQjEYEOZny5HNI+T3X2eXdumsbQD6+VbZnlSDrHFsxJ
-oebuiJD0bUZGAEFaWXk0cBptp9gfMFB0JJO0d4nTLp456bj1IuBtPOPi04ypEdM=
-=D/iT
------END PGP SIGNATURE-----
-
---ncSAzJYg3Aa9+CRW--
+-- 
+Eduardo
