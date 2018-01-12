@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50293)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44452)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <juterry@microsoft.com>) id 1ea5qw-00034L-K8
-	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 15:23:03 -0500
+	(envelope-from <aurelien@aurel32.net>) id 1ea76Q-0008BZ-8H
+	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 16:43:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <juterry@microsoft.com>) id 1ea5qv-0001j6-Ih
-	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 15:23:02 -0500
-Received: from mail-dm3nam03on0726.outbound.protection.outlook.com
-	([2a01:111:f400:fe49::726]:3340
-	helo=NAM03-DM3-obe.outbound.protection.outlook.com)
+	(envelope-from <aurelien@aurel32.net>) id 1ea76P-0001rj-EN
+	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 16:43:06 -0500
+Received: from hall.aurel32.net ([2001:bc8:30d7:100::1]:59066)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <juterry@microsoft.com>)
-	id 1ea5qv-0001gV-9B
-	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 15:23:01 -0500
-From: "Justin Terry (VM)" <juterry@microsoft.com>
-Date: Fri, 12 Jan 2018 12:22:24 -0800
-Message-Id: <1515788548-3570-1-git-send-email-juterry@microsoft.com>
+	(Exim 4.71) (envelope-from <aurelien@aurel32.net>)
+	id 1ea76P-0001o9-7j
+	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 16:43:05 -0500
+Date: Fri, 12 Jan 2018 22:42:54 +0100
+From: Aurelien Jarno <aurelien@aurel32.net>
+Message-ID: <20180112214254.x6k76ht7zomn24vs@aurel32.net>
+References: <20180112210613.14124-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH 0/4] Implements the Windows Hypervisor Platform
- accelerator
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180112210613.14124-1-richard.henderson@linaro.org>
+Sender: Aurelien Jarno <aurelien@aurel32.net>
+Subject: Re: [Qemu-devel] [PULL 0/4] TCG queued patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,53 +28,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: pbonzini@redhat.com, crosthwaite.peter@gmail.com, rth@twiddle.net, ehabkost@redhat.com, "Justin Terry (VM)" <juterry@microsoft.com>
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: qemu-devel@nongnu.org
 
-Hello QEMU Community!
+On 2018-01-12 13:06, Richard Henderson wrote:
+> This includes a fix for the tcg/arm bug exposed by the ppc64 code change
+> for comparisons.
+> 
+> It also includes improvements to tcg/arm and tcg/ppc to allow for larger
+> CPUFooState structures, as exposed by expanding CPUARMState for 2048-bit
+> vector registers.
+> 
+> Note that tcg/mips has the exact same problem.  However, the mips isa
+> makes it more difficult to fix up.  I'd like someone with hardware to
+> make this change.
 
-Over the past few months the Hyper-V team at Microsoft has been working hard on
-a new user-mode API for our hypervisor that will be released as part of the
-upcoming SDK. This new API adds user-mode capabilities to create and manage
-partitions at the hypervisor level, configure memory mappings for the
-partition, and create and control execution of virtual processors.
-
-With this new API we are now able to bring our hypervisor to the QEMU
-community! The following patches implement the Windows Hypervisor Platform
-accelerator (WHPX) for QEMU on Windows 10 hosts.
-
-When compiling QEMU for x86_64 passing the --enable-whpx flag will compile the
-accelerator for use. At runtime using the '-accel whpx' should see a
-significant performance improvement over emulation, much like when using 'hax'
-on Windows.
-
-Over the next few days the pre-release version of the documentation for this new
-API will be visible at https://docs.microsoft.com/en-us/virtualization under
-the 'Windows Hypervisor Platform' section. Here you will see the requirements,
-API, and examples.
-
-Thank you for your feedback. 
-
-Justin Terry (VM) (4):
-  Add the Windows Hypervisor Platform accelerator.
-  Add the WHPX vcpu API
-  Introduce the WHPX impl
-  Add the WHPX acceleration enlightenments
-
- accel/stubs/Makefile.objs |    9 +-
- accel/stubs/whpx-stub.c   |   48 ++
- configure                 |   48 +-
- cpus.c                    |   66 ++-
- include/sysemu/hw_accel.h |   13 +
- include/sysemu/whpx.h     |   40 ++
- qemu-options.hx           |    8 +-
- target/i386/Makefile.objs |    1 +
- target/i386/helper.c      |    2 +-
- target/i386/whpx-all.c    | 1395 +++++++++++++++++++++++++++++++++++++++++++++
- 10 files changed, 1619 insertions(+), 11 deletions(-)
- create mode 100644 accel/stubs/whpx-stub.c
- create mode 100644 include/sysemu/whpx.h
- create mode 100644 target/i386/whpx-all.c
-
+Ok, I'll try to have a look at that.
+ 
 -- 
-2.7.4
+Aurelien Jarno                          GPG: 4096R/1DDD8C9B
+aurelien@aurel32.net                 http://www.aurel32.net
