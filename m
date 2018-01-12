@@ -1,28 +1,42 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45536)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48800)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1ea5Wi-0004vy-Sj
-	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 15:02:10 -0500
+	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1ea5kn-00018C-SG
+	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 15:16:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1ea5Wg-0007Fv-KE
-	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 15:02:08 -0500
-Received: from mail-wm0-x243.google.com ([2a00:1450:400c:c09::243]:40046)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
-	id 1ea5Wg-0007FQ-9D
-	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 15:02:06 -0500
-Received: by mail-wm0-x243.google.com with SMTP id v123so4834446wmd.5
-	for <qemu-devel@nongnu.org>; Fri, 12 Jan 2018 12:02:06 -0800 (PST)
+	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1ea5kk-0004sH-II
+	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 15:16:41 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:42230
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <stefanb@linux.vnet.ibm.com>)
+	id 1ea5kk-0004rz-Ac
+	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 15:16:38 -0500
+Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w0CKENDx116390
+	for <qemu-devel@nongnu.org>; Fri, 12 Jan 2018 15:16:37 -0500
+Received: from e15.ny.us.ibm.com (e15.ny.us.ibm.com [129.33.205.205])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2feyqm4e2t-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Fri, 12 Jan 2018 15:16:36 -0500
+Received: from localhost
+	by e15.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <stefanb@linux.vnet.ibm.com>;
+	Fri, 12 Jan 2018 15:16:36 -0500
+References: <1515609318-1897-1-git-send-email-stefanb@linux.vnet.ibm.com>
+	<1515609318-1897-4-git-send-email-stefanb@linux.vnet.ibm.com>
+	<1bc0d808-a29e-03de-2a37-e2585c54385f@linux.vnet.ibm.com>
+	<CAJ+F1CK4umAVmPvPLunjXf10UcL_gVqENgu94eO17h82BPQzRA@mail.gmail.com>
+From: Stefan Berger <stefanb@linux.vnet.ibm.com>
+Date: Fri, 12 Jan 2018 15:16:32 -0500
 MIME-Version: 1.0
-Sender: alistair23@gmail.com
-In-Reply-To: <CAAdtpL44b_CJn2-57EKNPZA+21vFar41pC_6BZTbDry-9VtpTw@mail.gmail.com>
-References: <b799d9d21170a492c54fb2c4eaf8326b06e0bdf6.1515523657.git.alistair.francis@xilinx.com>
-	<CAAdtpL44b_CJn2-57EKNPZA+21vFar41pC_6BZTbDry-9VtpTw@mail.gmail.com>
-From: Alistair Francis <alistair.francis@xilinx.com>
-Date: Fri, 12 Jan 2018 12:01:34 -0800
-Message-ID: <CAKmqyKPx+Bv8iHfYaCpqus3KvAS8BDOfskBcWymMREyznPS69A@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <CAJ+F1CK4umAVmPvPLunjXf10UcL_gVqENgu94eO17h82BPQzRA@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Message-Id: <adb2b9e0-43b6-85fa-9832-f29b9d7b391d@linux.vnet.ibm.com>
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v1 1/3] xlnx-zynqmp-rtc: Initial commit
+Subject: Re: [Qemu-devel] [RFC PATCH 3/3] acpi: Build TPM Physical Presence
+ interface
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,422 +45,523 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philippe@mathieu-daude.net>
-Cc: Alistair Francis <alistair.francis@xilinx.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
+To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@gmail.com>
+Cc: QEMU <qemu-devel@nongnu.org>, kevin@koconnor.net, "Michael S. Tsirkin" <mst@redhat.com>, Laszlo Ersek <lersek@redhat.com>, Igor Mammedov <imammedo@redhat.com>
 
-On Thu, Jan 11, 2018 at 10:29 AM, Philippe Mathieu-Daud=C3=A9
-<philippe@mathieu-daude.net> wrote:
-> On Tue, Jan 9, 2018 at 3:50 PM, Alistair Francis
-> <alistair.francis@xilinx.com> wrote:
->> Initial commit of the ZynqMP RTC device.
->>
->> Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
->> ---
->>
->>  hw/timer/Makefile.objs             |   1 +
->>  hw/timer/xlnx-zynqmp-rtc.c         | 232 ++++++++++++++++++++++++++++++=
-+++++++
->>  include/hw/timer/xlnx-zynqmp-rtc.h |  84 ++++++++++++++
->>  3 files changed, 317 insertions(+)
->>  create mode 100644 hw/timer/xlnx-zynqmp-rtc.c
->>  create mode 100644 include/hw/timer/xlnx-zynqmp-rtc.h
->>
->> diff --git a/hw/timer/Makefile.objs b/hw/timer/Makefile.objs
->> index 8c19eac3b6..8b27a4b7ef 100644
->> --- a/hw/timer/Makefile.objs
->> +++ b/hw/timer/Makefile.objs
->> @@ -21,6 +21,7 @@ common-obj-$(CONFIG_IMX) +=3D imx_epit.o
->>  common-obj-$(CONFIG_IMX) +=3D imx_gpt.o
->>  common-obj-$(CONFIG_LM32) +=3D lm32_timer.o
->>  common-obj-$(CONFIG_MILKYMIST) +=3D milkymist-sysctl.o
->> +common-obj-$(CONFIG_XLNX_ZYNQMP) +=3D xlnx-zynqmp-rtc.o
->>
->>  obj-$(CONFIG_ALTERA_TIMER) +=3D altera_timer.o
->>  obj-$(CONFIG_EXYNOS4) +=3D exynos4210_mct.o
->> diff --git a/hw/timer/xlnx-zynqmp-rtc.c b/hw/timer/xlnx-zynqmp-rtc.c
->> new file mode 100644
->> index 0000000000..40533220fc
->> --- /dev/null
->> +++ b/hw/timer/xlnx-zynqmp-rtc.c
->> @@ -0,0 +1,232 @@
->> +/*
->> + * QEMU model of the Xilinx ZynqMP Real Time Clock (RTC).
->> + *
->> + * Copyright (c) 2017 Xilinx Inc.
+On 01/12/2018 11:07 AM, Marc-Andr=C3=A9 Lureau wrote:
+> Hi
 >
-> 18
-
-It was actually written last year though, so I think it stays as 17.
-
+> On Wed, Jan 10, 2018 at 7:49 PM, Stefan Berger
+> <stefanb@linux.vnet.ibm.com> wrote:
+>> On 01/10/2018 01:35 PM, Stefan Berger wrote:
+>>> The TPM Physical Presence interface consists of an ACPI part, a share=
+d
+>>> memory part, and code in the firmware. Users can send messages to the
+>>> firmware by writing a code into the shared memory through invoking th=
+e
+>>> ACPI code. When a reboot happens, the firmware looks for the code and
+>>> acts on it by sending sequences of commands to the TPM.
+>>>
+>>> This patch adds the ACPI code. It is similar to the one in EDK2 but
+>>> doesn't
+>>> assume that SMIs are necessary to use. Besides that it tests the code
+>>> entered by the user and checks whether it is supported. The range of =
+codes
+>>> supported matches the range of codes supported in SeaBIOS. It uses th=
+e
+>>> same
+>>> datastructure for the shared memory as EDK2 does so that EDK2 and Sea=
+BIOS
+>>> could both make use of the shared memory.
+>>>
+>>> The underlying TCG specification is accessible from the following pag=
+e.
+>>>
+>>>
+>>> https://trustedcomputinggroup.org/tcg-physical-presence-interface-spe=
+cification/
+>>>
+>>> This patch implements version 1.20.
+>>
+>> The below ACPI code is partly a translation to C from a previous poste=
+d
+>> patch:
+>>
+>> https://lists.gnu.org/archive/html/qemu-devel/2015-05/msg05353.html
+>>
+>>
+> And fwiw, this is the acpi dump disassembled:
 >
->> + *
->> + * Written-by: Alistair Francis <alistair.francis@xilinx.com>
->> + *
->> + * Permission is hereby granted, free of charge, to any person obtainin=
-g a copy
->> + * of this software and associated documentation files (the "Software")=
-, to deal
->> + * in the Software without restriction, including without limitation th=
-e rights
->> + * to use, copy, modify, merge, publish, distribute, sublicense, and/or=
- sell
->> + * copies of the Software, and to permit persons to whom the Software i=
-s
->> + * furnished to do so, subject to the following conditions:
->> + *
->> + * The above copyright notice and this permission notice shall be inclu=
-ded in
->> + * all copies or substantial portions of the Software.
->> + *
->> + * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPR=
-ESS OR
->> + * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABIL=
-ITY,
->> + * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SH=
-ALL
->> + * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR=
- OTHER
->> + * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARIS=
-ING FROM,
->> + * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALIN=
-GS IN
->> + * THE SOFTWARE.
->> + */
->> +
->> +#include "qemu/osdep.h"
->> +#include "hw/sysbus.h"
->> +#include "hw/register.h"
->> +#include "qemu/bitops.h"
->> +#include "qemu/log.h"
->> +#include "hw/timer/xlnx-zynqmp-rtc.h"
->> +
->> +#ifndef XLNX_ZYNQMP_RTC_ERR_DEBUG
->> +#define XLNX_ZYNQMP_RTC_ERR_DEBUG 0
->> +#endif
->> +
->> +#define DB_PRINT_L(lvl, fmt, args...) do { \
->> +    if (XLNX_ZYNQMP_RTC_ERR_DEBUG >=3D lvl) { \
->> +        qemu_log("%s: " fmt, __func__, ## args); \
->> +    } \
->> +} while (0);
->> +
->> +#define DB_PRINT(fmt, args...) DB_PRINT_L(1, fmt, ## args)
+>              Device (ISA.TPM)
+>              {
+>                  Name (_HID, EisaId ("PNP0C31"))  // _HID: Hardware ID
+>                  Name (_STA, 0x0F)  // _STA: Status
+>                  Name (_CRS, ResourceTemplate ()  // _CRS: Current
+> Resource Settings
+>                  {
+>                      Memory32Fixed (ReadWrite,
+>                          0xFED40000,         // Address Base
+>                          0x00005000,         // Address Length
+>                          )
+>                  })
+>                  OperationRegion (TPPI, SystemMemory, 0xFFFF0000, 0x31)
+>                  Field (TPPI, AnyAcc, NoLock, Preserve)
+>                  {
+>                      PPIN,   8,
+>                      PPIP,   32,
+>                      PPRP,   32,
+>                      PPRQ,   32,
+>                      PPRM,   32,
+>                      LPPR,   32,
+>                      FRET,   32,
+>                      RES1,   8,
+>                      RES2,   128,
+>                      FAIL,   32
+>                  }
 >
-> not used.
-
-Yeah, it's used in the next patch. I figured it made sense to go in
-with the initial commit though.
-
-I'll look at converting to trace.
-
+>                  Method (WRAM, 2, Serialized)
+>                  {
+>                      PPRQ =3D Arg0
+>                      PPRM =3D Arg1
+>                      Return (Zero)
+>                  }
 >
->> +
->> +static void rtc_int_update_irq(XlnxZynqMPRTC *s)
->> +{
->> +    bool pending =3D s->regs[R_RTC_INT_STATUS] & ~s->regs[R_RTC_INT_MAS=
-K];
->> +    qemu_set_irq(s->irq_rtc_int, pending);
->> +}
->> +
->> +static void addr_error_int_update_irq(XlnxZynqMPRTC *s)
->> +{
->> +    bool pending =3D s->regs[R_ADDR_ERROR] & ~s->regs[R_ADDR_ERROR_INT_=
-MASK];
->> +    qemu_set_irq(s->irq_addr_error_int, pending);
->> +}
->> +
->> +static void rtc_int_status_postw(RegisterInfo *reg, uint64_t val64)
->> +{
->> +    XlnxZynqMPRTC *s =3D XLNX_ZYNQMP_RTC(reg->opaque);
->> +    rtc_int_update_irq(s);
->> +}
->> +
->> +static uint64_t rtc_int_en_prew(RegisterInfo *reg, uint64_t val64)
->> +{
->> +    XlnxZynqMPRTC *s =3D XLNX_ZYNQMP_RTC(reg->opaque);
->> +    uint32_t val =3D val64;
->> +
->> +    s->regs[R_RTC_INT_MASK] &=3D ~val;
->> +    rtc_int_update_irq(s);
->> +    return 0;
->> +}
->> +
->> +static uint64_t rtc_int_dis_prew(RegisterInfo *reg, uint64_t val64)
->> +{
->> +    XlnxZynqMPRTC *s =3D XLNX_ZYNQMP_RTC(reg->opaque);
->> +    uint32_t val =3D val64;
->> +
->> +    s->regs[R_RTC_INT_MASK] |=3D val;
->> +    rtc_int_update_irq(s);
->> +    return 0;
->> +}
->> +
->> +static void addr_error_postw(RegisterInfo *reg, uint64_t val64)
->> +{
->> +    XlnxZynqMPRTC *s =3D XLNX_ZYNQMP_RTC(reg->opaque);
->> +    addr_error_int_update_irq(s);
->> +}
->> +
->> +static uint64_t addr_error_int_en_prew(RegisterInfo *reg, uint64_t val6=
-4)
->> +{
->> +    XlnxZynqMPRTC *s =3D XLNX_ZYNQMP_RTC(reg->opaque);
->> +    uint32_t val =3D val64;
->> +
->> +    s->regs[R_ADDR_ERROR_INT_MASK] &=3D ~val;
->> +    addr_error_int_update_irq(s);
->> +    return 0;
->> +}
->> +
->> +static uint64_t addr_error_int_dis_prew(RegisterInfo *reg, uint64_t val=
-64)
->> +{
->> +    XlnxZynqMPRTC *s =3D XLNX_ZYNQMP_RTC(reg->opaque);
->> +    uint32_t val =3D val64;
->> +
->> +    s->regs[R_ADDR_ERROR_INT_MASK] |=3D val;
->> +    addr_error_int_update_irq(s);
->> +    return 0;
->> +}
->> +
->> +static const RegisterAccessInfo rtc_regs_info[] =3D {
->> +    {   .name =3D "SET_TIME_WRITE",  .addr =3D A_SET_TIME_WRITE,
->> +    },{ .name =3D "SET_TIME_READ",  .addr =3D A_SET_TIME_READ,
->> +        .ro =3D 0xffffffff,
->> +    },{ .name =3D "CALIB_WRITE",  .addr =3D A_CALIB_WRITE,
->> +    },{ .name =3D "CALIB_READ",  .addr =3D A_CALIB_READ,
->> +        .ro =3D 0x1fffff,
->> +    },{ .name =3D "CURRENT_TIME",  .addr =3D A_CURRENT_TIME,
->> +        .ro =3D 0xffffffff,
->> +    },{ .name =3D "CURRENT_TICK",  .addr =3D A_CURRENT_TICK,
->> +        .ro =3D 0xffff,
->> +    },{ .name =3D "ALARM",  .addr =3D A_ALARM,
->> +    },{ .name =3D "RTC_INT_STATUS",  .addr =3D A_RTC_INT_STATUS,
->> +        .w1c =3D 0x3,
->> +        .post_write =3D rtc_int_status_postw,
->> +    },{ .name =3D "RTC_INT_MASK",  .addr =3D A_RTC_INT_MASK,
->> +        .reset =3D 0x3,
->> +        .ro =3D 0x3,
->> +    },{ .name =3D "RTC_INT_EN",  .addr =3D A_RTC_INT_EN,
->> +        .pre_write =3D rtc_int_en_prew,
->> +    },{ .name =3D "RTC_INT_DIS",  .addr =3D A_RTC_INT_DIS,
->> +        .pre_write =3D rtc_int_dis_prew,
->> +    },{ .name =3D "ADDR_ERROR",  .addr =3D A_ADDR_ERROR,
->> +        .w1c =3D 0x1,
->> +        .post_write =3D addr_error_postw,
->> +    },{ .name =3D "ADDR_ERROR_INT_MASK",  .addr =3D A_ADDR_ERROR_INT_MA=
-SK,
->> +        .reset =3D 0x1,
->> +        .ro =3D 0x1,
->> +    },{ .name =3D "ADDR_ERROR_INT_EN",  .addr =3D A_ADDR_ERROR_INT_EN,
->> +        .pre_write =3D addr_error_int_en_prew,
->> +    },{ .name =3D "ADDR_ERROR_INT_DIS",  .addr =3D A_ADDR_ERROR_INT_DIS=
+>                  Method (CKOP, 1, NotSerialized)
+>                  {
+>                      If ((Arg0 =3D=3D Zero))
+>                      {
+>                          Return (One)
+>                      }
+>
+>                      Return (Zero)
+>                  }
+>
+>                  Method (_DSM, 4, Serialized)  // _DSM: Device-Specific=
+ Method
+>                  {
+>                      If ((Arg0 =3D=3D ToUUID
+> ("3dddfaa6-361b-4eb4-a424-8d10089d1653") /* Physical Presence
+> Interface */))
+>                      {
+>                          Local0 =3D ToInteger (Arg2)
+>                          If ((Local0 =3D=3D Zero))
+>                          {
+>                              Return (Buffer (0x02)
+>                              {
+>                                   0xFF, 0x01
+>             // ..
+>                              })
+>                          }
+>
+>                          If ((Local0 =3D=3D One))
+>                          {
+>                              Return ("1.2")
+>                          }
+>
+>                          If ((Local0 =3D=3D 0x02))
+>                          {
+>                              Local0 =3D DerefOf (Arg3 [Zero])
+>                              If (CKOP (Local0))
+>                              {
+>                                  Return (WRAM (Local0, Zero))
+>                              }
+>
+>                              Return (One)
+>                          }
+>
+>                          If ((Local0 =3D=3D 0x03))
+>                          {
+>                              Return (Package (0x02)
+>                              {
+>                                  Zero,
+>                                  PPRQ
+>                              })
+>                          }
+>
+>                          If ((Local0 =3D=3D 0x04))
+>                          {
+>                              Return (0x02)
+>                          }
+>
+>                          If ((Local0 =3D=3D 0x05))
+>                          {
+>                              Return (Package (0x03)
+>                              {
+>                                  FAIL,
+>                                  LPPR,
+>                                  PPRP
+>                              })
+>                          }
+>
+>                          If ((Local0 =3D=3D 0x06))
+>                          {
+>                              Return (0x03)
+>                          }
+>
+>                          If ((Local0 =3D=3D 0x07))
+>                          {
+>                              Local0 =3D DerefOf (Arg3 [Zero])
+>                              If (CKOP (Local0))
+>                              {
+>                                  Local1 =3D WRAM (Local0, Zero)
+>                                  Return (Local1)
+>                              }
+>
+>                              Return (One)
+>                          }
+>
+>                          If ((Local0 =3D=3D 0x08))
+>                          {
+>                              Local0 =3D DerefOf (Arg3 [Zero])
+>                              If (CKOP (Local0))
+>                              {
+>                                  Return (0x04)
+>                              }
+>
+>                              Return (Zero)
+>                          }
+>
+>                          Return (Buffer (One)
+>                          {
+>                               0x00
+>         // .
+>                          })
+>                      }
+>                  }
+>
+> Linux PPI driver seems to be happy about it, looking at
+> /sys/devices/pnp0/00\:06/tpm/tpm0/ppi/.
+>
+> I haven't done further testing. Is there anything using this on Linux?
+> tpm2-tools doesn't seem to use it. I suppose I should be able to write
+> something to /sys/devices/pnp0/00\:06/tpm/tpm0/ppi/request.
+>
+> Any help appreciated :)
+>
+>>     Stefan
+>>
+>>> Signed-off-by: Stefan Berger <stefanb@linux.vnet.ibm.com>
+>>> ---
+>>>    hw/i386/acpi-build.c  | 227
+>>> ++++++++++++++++++++++++++++++++++++++++++++++++++
+>>>    include/hw/acpi/tpm.h |  15 ++++
+>>>    2 files changed, 242 insertions(+)
+>>>
+>>> diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+>>> index 18b939e..e3905a3 100644
+>>> --- a/hw/i386/acpi-build.c
+>>> +++ b/hw/i386/acpi-build.c
+>>> @@ -42,6 +42,7 @@
+>>>    #include "hw/acpi/memory_hotplug.h"
+>>>    #include "sysemu/tpm.h"
+>>>    #include "hw/acpi/tpm.h"
+>>> +#include "hw/tpm/tpm_ppi.h"
+>>>    #include "hw/acpi/vmgenid.h"
+>>>    #include "sysemu/tpm_backend.h"
+>>>    #include "hw/timer/mc146818rtc_regs.h"
+>>> @@ -1860,6 +1861,231 @@ static Aml *build_q35_osc_method(void)
+>>>    }
+>>>
+>>>    static void
+>>> +build_tpm_ppi(Aml *dev, TPMVersion tpm_version)
+>>> +{
+>>> +    Aml *method, *field, *ifctx, *ifctx2, *ifctx3, *pak;
+>>> +
+>>> +    aml_append(dev,
+>>> +               aml_operation_region("TPPI", AML_SYSTEM_MEMORY,
+>>> +                                    aml_int(TPM_PPI_ADDR_BASE),
+>>> +                                    TPM_PPI_STRUCT_SIZE));
+>>> +
+>>> +    field =3D aml_field("TPPI", AML_ANY_ACC, AML_NOLOCK, AML_PRESERV=
+E);
+>>> +    aml_append(field, aml_named_field("PPIN",
+>>> +               sizeof(uint8_t) * BITS_PER_BYTE));
+>>> +    aml_append(field, aml_named_field("PPIP",
+>>> +               sizeof(uint32_t) * BITS_PER_BYTE));
+>>> +    aml_append(field, aml_named_field("PPRP",
+>>> +               sizeof(uint32_t) * BITS_PER_BYTE));
+>>> +    aml_append(field, aml_named_field("PPRQ",
+>>> +               sizeof(uint32_t) * BITS_PER_BYTE));
+>>> +    aml_append(field, aml_named_field("PPRM",
+>>> +               sizeof(uint32_t) * BITS_PER_BYTE));
+>>> +    aml_append(field, aml_named_field("LPPR",
+>>> +               sizeof(uint32_t) * BITS_PER_BYTE));
+>>> +    aml_append(field, aml_named_field("FRET",
+>>> +               sizeof(uint32_t) * BITS_PER_BYTE));
+>>> +    aml_append(field, aml_named_field("RES1",
+>>> +               sizeof(uint8_t) * BITS_PER_BYTE));
+>>> +    aml_append(field, aml_named_field("RES2",
+>>> +               sizeof(uint32_t) * BITS_PER_BYTE * 4));
+>>> +    aml_append(field, aml_named_field("FAIL",
+>>> +               sizeof(uint32_t) * BITS_PER_BYTE));
+>>> +    aml_append(dev, field);
+>>> +
+>>> +    /*
+>>> +     * Write the given operations code into 'PPRQ'.
+>>> +     */
+>>> +    method =3D aml_method("WRAM", 2, AML_SERIALIZED);
+>>> +    {
+>>> +        aml_append(method, aml_store(aml_arg(0), aml_name("PPRQ")));
+>>> +        aml_append(method, aml_store(aml_arg(1), aml_name("PPRM")));
+>>> +        /* 0 =3D Success */
+>>> +        aml_append(method, aml_return(aml_int(0)));
+>>> +    }
+>>> +    aml_append(dev, method);
+>>> +
+>>> +    /*
+>>> +     * CKOP: Check whether the opcode is valid
+>>> +     */
+>>> +    if (tpm_version =3D=3D TPM_VERSION_1_2) {
+>>> +        method =3D aml_method("CKOP", 1, AML_NOTSERIALIZED);
+>>> +        {
+>>> +            ifctx =3D aml_if(
+>>> +                      aml_or(
+>>> +                        aml_or(
+>>> +                          aml_and(
+>>> +                            aml_lgreater_equal(aml_arg(0), aml_int(0=
+)),
+>>> +                            aml_lless_equal(aml_arg(0), aml_int(11))=
 ,
->> +        .pre_write =3D addr_error_int_dis_prew,
->> +    },{ .name =3D "CONTROL",  .addr =3D A_CONTROL,
->> +        .reset =3D 0x1000000,
->> +        .rsvd =3D 0x70fffffe,
->> +    },{ .name =3D "SAFETY_CHK",  .addr =3D A_SAFETY_CHK,
->> +    }
->> +};
->> +
->> +static void rtc_reset(DeviceState *dev)
->> +{
->> +    XlnxZynqMPRTC *s =3D XLNX_ZYNQMP_RTC(dev);
->> +    unsigned int i;
->> +
->> +    for (i =3D 0; i < ARRAY_SIZE(s->regs_info); ++i) {
->> +        register_reset(&s->regs_info[i]);
->> +    }
->> +
->> +    rtc_int_update_irq(s);
->> +    addr_error_int_update_irq(s);
->> +}
->> +
->> +static const MemoryRegionOps rtc_ops =3D {
->> +    .read =3D register_read_memory,
->> +    .write =3D register_write_memory,
->> +    .endianness =3D DEVICE_LITTLE_ENDIAN,
->> +    .valid =3D {
->> +        .min_access_size =3D 4,
->> +        .max_access_size =3D 4,
->> +    },
->> +};
->> +
->> +static void rtc_realize(DeviceState *dev, Error **errp)
->> +{
->> +    /* Delete this if you don't need it */
->
-> delete? :)
-
-Yep :)
-
-Alistair
-
->
->> +}
->> +
->> +static void rtc_init(Object *obj)
->> +{
->> +    XlnxZynqMPRTC *s =3D XLNX_ZYNQMP_RTC(obj);
->> +    SysBusDevice *sbd =3D SYS_BUS_DEVICE(obj);
->> +    RegisterInfoArray *reg_array;
->> +
->> +    memory_region_init(&s->iomem, obj, TYPE_XLNX_ZYNQMP_RTC,
->> +                       XLNX_ZYNQMP_RTC_R_MAX * 4);
->> +    reg_array =3D
->> +        register_init_block32(DEVICE(obj), rtc_regs_info,
->> +                              ARRAY_SIZE(rtc_regs_info),
->> +                              s->regs_info, s->regs,
->> +                              &rtc_ops,
->> +                              XLNX_ZYNQMP_RTC_ERR_DEBUG,
->> +                              XLNX_ZYNQMP_RTC_R_MAX * 4);
->> +    memory_region_add_subregion(&s->iomem,
->> +                                0x0,
->> +                                &reg_array->mem);
->> +    sysbus_init_mmio(sbd, &s->iomem);
->> +    sysbus_init_irq(sbd, &s->irq_rtc_int);
->> +    sysbus_init_irq(sbd, &s->irq_addr_error_int);
->> +}
->> +
->> +static const VMStateDescription vmstate_rtc =3D {
->> +    .name =3D TYPE_XLNX_ZYNQMP_RTC,
->> +    .version_id =3D 1,
->> +    .minimum_version_id =3D 1,
->> +    .fields =3D (VMStateField[]) {
->> +        VMSTATE_UINT32_ARRAY(regs, XlnxZynqMPRTC, XLNX_ZYNQMP_RTC_R_MAX=
+>>> +                            NULL
+>>> +                          ),
+>>> +                          aml_equal(aml_arg(0), aml_int(14)),
+>>> +                          NULL
+>>> +                        ),
+>>> +                        aml_and(
+>>> +                          aml_lgreater_equal(aml_arg(0), aml_int(21)=
 ),
->> +        VMSTATE_END_OF_LIST(),
->> +    }
->> +};
->> +
->> +static void rtc_class_init(ObjectClass *klass, void *data)
->> +{
->> +    DeviceClass *dc =3D DEVICE_CLASS(klass);
->> +
->> +    dc->reset =3D rtc_reset;
->> +    dc->realize =3D rtc_realize;
->> +    dc->vmsd =3D &vmstate_rtc;
->> +}
->> +
->> +static const TypeInfo rtc_info =3D {
->> +    .name          =3D TYPE_XLNX_ZYNQMP_RTC,
->> +    .parent        =3D TYPE_SYS_BUS_DEVICE,
->> +    .instance_size =3D sizeof(XlnxZynqMPRTC),
->> +    .class_init    =3D rtc_class_init,
->> +    .instance_init =3D rtc_init,
->> +};
->> +
->> +static void rtc_register_types(void)
->> +{
->> +    type_register_static(&rtc_info);
->> +}
->> +
->> +type_init(rtc_register_types)
->> diff --git a/include/hw/timer/xlnx-zynqmp-rtc.h b/include/hw/timer/xlnx-=
-zynqmp-rtc.h
->> new file mode 100644
->> index 0000000000..87649836cc
->> --- /dev/null
->> +++ b/include/hw/timer/xlnx-zynqmp-rtc.h
->> @@ -0,0 +1,84 @@
->> +/*
->> + * QEMU model of the Xilinx ZynqMP Real Time Clock (RTC).
->> + *
->> + * Copyright (c) 2017 Xilinx Inc.
->> + *
->> + * Written-by: Alistair Francis <alistair.francis@xilinx.com>
->> + *
->> + * Permission is hereby granted, free of charge, to any person obtainin=
-g a copy
->> + * of this software and associated documentation files (the "Software")=
-, to deal
->> + * in the Software without restriction, including without limitation th=
-e rights
->> + * to use, copy, modify, merge, publish, distribute, sublicense, and/or=
- sell
->> + * copies of the Software, and to permit persons to whom the Software i=
-s
->> + * furnished to do so, subject to the following conditions:
->> + *
->> + * The above copyright notice and this permission notice shall be inclu=
-ded in
->> + * all copies or substantial portions of the Software.
->> + *
->> + * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPR=
-ESS OR
->> + * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABIL=
-ITY,
->> + * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SH=
-ALL
->> + * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR=
- OTHER
->> + * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARIS=
-ING FROM,
->> + * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALIN=
-GS IN
->> + * THE SOFTWARE.
->> + */
->> +
->> +#include "hw/register.h"
->> +
->> +#define TYPE_XLNX_ZYNQMP_RTC "xlnx-zynmp.rtc"
->> +
->> +#define XLNX_ZYNQMP_RTC(obj) \
->> +     OBJECT_CHECK(XlnxZynqMPRTC, (obj), TYPE_XLNX_ZYNQMP_RTC)
->> +
->> +REG32(SET_TIME_WRITE, 0x0)
->> +REG32(SET_TIME_READ, 0x4)
->> +REG32(CALIB_WRITE, 0x8)
->> +    FIELD(CALIB_WRITE, FRACTION_EN, 20, 1)
->> +    FIELD(CALIB_WRITE, FRACTION_DATA, 16, 4)
->> +    FIELD(CALIB_WRITE, MAX_TICK, 0, 16)
->> +REG32(CALIB_READ, 0xc)
->> +    FIELD(CALIB_READ, FRACTION_EN, 20, 1)
->> +    FIELD(CALIB_READ, FRACTION_DATA, 16, 4)
->> +    FIELD(CALIB_READ, MAX_TICK, 0, 16)
->> +REG32(CURRENT_TIME, 0x10)
->> +REG32(CURRENT_TICK, 0x14)
->> +    FIELD(CURRENT_TICK, VALUE, 0, 16)
->> +REG32(ALARM, 0x18)
->> +REG32(RTC_INT_STATUS, 0x20)
->> +    FIELD(RTC_INT_STATUS, ALARM, 1, 1)
->> +    FIELD(RTC_INT_STATUS, SECONDS, 0, 1)
->> +REG32(RTC_INT_MASK, 0x24)
->> +    FIELD(RTC_INT_MASK, ALARM, 1, 1)
->> +    FIELD(RTC_INT_MASK, SECONDS, 0, 1)
->> +REG32(RTC_INT_EN, 0x28)
->> +    FIELD(RTC_INT_EN, ALARM, 1, 1)
->> +    FIELD(RTC_INT_EN, SECONDS, 0, 1)
->> +REG32(RTC_INT_DIS, 0x2c)
->> +    FIELD(RTC_INT_DIS, ALARM, 1, 1)
->> +    FIELD(RTC_INT_DIS, SECONDS, 0, 1)
->> +REG32(ADDR_ERROR, 0x30)
->> +    FIELD(ADDR_ERROR, STATUS, 0, 1)
->> +REG32(ADDR_ERROR_INT_MASK, 0x34)
->> +    FIELD(ADDR_ERROR_INT_MASK, MASK, 0, 1)
->> +REG32(ADDR_ERROR_INT_EN, 0x38)
->> +    FIELD(ADDR_ERROR_INT_EN, MASK, 0, 1)
->> +REG32(ADDR_ERROR_INT_DIS, 0x3c)
->> +    FIELD(ADDR_ERROR_INT_DIS, MASK, 0, 1)
->> +REG32(CONTROL, 0x40)
->> +    FIELD(CONTROL, BATTERY_DISABLE, 31, 1)
->> +    FIELD(CONTROL, OSC_CNTRL, 24, 4)
->> +    FIELD(CONTROL, SLVERR_ENABLE, 0, 1)
->> +REG32(SAFETY_CHK, 0x50)
->> +
->> +#define XLNX_ZYNQMP_RTC_R_MAX (R_SAFETY_CHK + 1)
->> +
->> +typedef struct XlnxZynqMPRTC {
->> +    SysBusDevice parent_obj;
->> +    MemoryRegion iomem;
->> +    qemu_irq irq_rtc_int;
->> +    qemu_irq irq_addr_error_int;
->> +
->> +    uint32_t regs[XLNX_ZYNQMP_RTC_R_MAX];
->> +    RegisterInfo regs_info[XLNX_ZYNQMP_RTC_R_MAX];
->> +} XlnxZynqMPRTC;
->> --
->> 2.14.1
+>>> +                          aml_lless_equal(aml_arg(0), aml_int(22)),
+>>> +                          NULL
+>>> +                       ),
+>>> +                       NULL
+>>> +                      )
+>>> +                    );
+>>> +            {
+>>> +                aml_append(ifctx, aml_return(aml_int(1)));
+>>> +            }
+>>> +            aml_append(method, ifctx);
+>>> +
+>>> +            aml_append(method, aml_return(aml_int(0)));
+>>> +        }
+>>> +    } else {
+>>> +        method =3D aml_method("CKOP", 1, AML_NOTSERIALIZED);
+>>> +        {
+>>> +            ifctx =3D aml_if(
+>>> +                      aml_equal(aml_arg(0), aml_int(0))
+>>> +                    );
+>>> +            {
+>>> +                aml_append(ifctx, aml_return(aml_int(1)));
+>>> +            }
+>>> +            aml_append(method, ifctx);
+>>> +
+>>> +            aml_append(method, aml_return(aml_int(0)));
+>>> +        }
+>>> +    }
+>>> +    aml_append(dev, method);
+>>> +
+
+
+CKOP checks whether the firmware implements a certain code. Function 8=20
+returns a number 0 - 4 for a certain code, 0 meaning 'Not implemented'.=20
+Maybe the firmware should fill an array and put the numbers in that=20
+function 8 expects and CKOP can use that also to see whether functions=20
+are supported. That may 'loosen' the ACPI a bit from the firmware.
+
+Comments? Is that better than hard coding in the ACPI what the firmware=20
+supports?
+
+specs:=20
+https://trustedcomputinggroup.org/wp-content/uploads/Physical_Presence_In=
+terface_1-20_0-100.pdf
+
+
+>>> +    method =3D aml_method("_DSM", 4, AML_SERIALIZED);
+>>> +    {
+>>> +        uint8_t zerobyte[1] =3D { 0 };
+>>> +
+>>> +        ifctx =3D aml_if(
+>>> +                  aml_equal(aml_arg(0),
+>>> +
+>>> aml_touuid("3DDDFAA6-361B-4EB4-A424-8D10089D1653"))
+>>> +                );
+>>> +        {
+>>> +            aml_append(ifctx,
+>>> +                       aml_store(aml_to_integer(aml_arg(2)),
+>>> aml_local(0)));
+>>> +
+>>> +            /* standard DSM query function */
+>>> +            ifctx2 =3D aml_if(aml_equal(aml_local(0), aml_int(0)));
+>>> +            {
+>>> +                uint8_t byte_list[2] =3D { 0xff, 0x01 };
+>>> +                aml_append(ifctx2, aml_return(aml_buffer(2, byte_lis=
+t)));
+>>> +            }
+>>> +            aml_append(ifctx, ifctx2);
+>>> +
+>>> +            /* interface version: 1.2 */
+>>> +            ifctx2 =3D aml_if(aml_equal(aml_local(0), aml_int(1)));
+>>> +            {
+>>> +                aml_append(ifctx2, aml_return(aml_string("1.2")));
+>>> +            }
+>>> +            aml_append(ifctx, ifctx2);
+>>> +
+>>> +            /* submit TPM operation */
+>>> +            ifctx2 =3D aml_if(aml_equal(aml_local(0), aml_int(2)));
+>>> +            {
+>>> +                aml_append(ifctx2,
+>>> +                           aml_store(aml_derefof(aml_index(aml_arg(3=
+),
+>>> +                                                           aml_int(0=
+))),
+>>> +                                     aml_local(0)));
+>>> +                ifctx3 =3D aml_if(aml_call1("CKOP", aml_local(0)));
+>>> +                {
+>>> +                    aml_append(ifctx3,
+>>> +                               aml_return(aml_call2("WRAM",
+>>> +                                                    aml_local(0),
+>>> +                                                    aml_int(0))));
+>>> +                }
+>>> +                aml_append(ifctx2, ifctx3);
+>>> +                aml_append(ifctx2, aml_return(aml_int(1)));
+>>> +            }
+>>> +            aml_append(ifctx, ifctx2);
+>>> +
+>>> +            /* get pending TPM operation */
+>>> +            ifctx2 =3D aml_if(aml_equal(aml_local(0), aml_int(3)));
+>>> +            {
+>>> +                pak =3D aml_package(2);
+>>> +                aml_append(pak, aml_int(0));
+>>> +                aml_append(pak, aml_name("PPRQ"));
+>>> +                aml_append(ifctx2, aml_return(pak));
+>>> +            }
+>>> +            aml_append(ifctx, ifctx2);
+>>> +
+>>> +            /* get platform-specific action to transition to pre-OS =
+env.
+>>> */
+>>> +            ifctx2 =3D aml_if(aml_equal(aml_local(0), aml_int(4)));
+>>> +            {
+>>> +                /* 2 =3D reboot */
+>>> +                aml_append(ifctx2, aml_return(aml_int(2)));
+>>> +            }
+>>> +            aml_append(ifctx, ifctx2);
+>>> +
+>>> +            /* get TPM operation response */
+>>> +            ifctx2 =3D aml_if(aml_equal(aml_local(0), aml_int(5)));
+>>> +            {
+>>> +                pak =3D aml_package(3);
+>>> +
+>>> +                aml_append(pak, aml_name("FAIL"));
+>>> +                aml_append(pak, aml_name("LPPR"));
+>>> +                aml_append(pak, aml_name("PPRP"));
+>>> +
+>>> +                aml_append(ifctx2, aml_return(pak));
+>>> +            }
+>>> +            aml_append(ifctx, ifctx2);
+>>> +
+>>> +            /* submit preferred user language */
+>>> +            ifctx2 =3D aml_if(aml_equal(aml_local(0), aml_int(6)));
+>>> +            {
+>>> +                /* 3 =3D not implemented */
+>>> +                aml_append(ifctx2, aml_return(aml_int(3)));
+>>> +            }
+>>> +            aml_append(ifctx, ifctx2);
+>>> +
+>>> +            /* submit TPM operation v2 */
+>>> +            ifctx2 =3D aml_if(aml_equal(aml_local(0), aml_int(7)));
+>>> +            {
+>>> +                aml_append(ifctx2,
+>>> +                           aml_store(aml_derefof(aml_index(aml_arg(3=
+),
+>>> +                                                           aml_int(0=
+))),
+>>> +                                     aml_local(0)));
+>>> +                ifctx3 =3D aml_if(aml_call1("CKOP", aml_local(0)));
+>>> +                {
+>>> +                    aml_append(ifctx3,
+>>> +                               aml_store(aml_call2("WRAM",
+>>> +                                                   aml_local(0),
+>>> +                                                   aml_int(0)),
+>>> +                                         aml_local(1)));
+>>> +                    aml_append(ifctx3, aml_return(aml_local(1)));
+>>> +                }
+>>> +                aml_append(ifctx2, ifctx3);
+>>> +                /* 1 =3D requested operation not implemented */
+>>> +                aml_append(ifctx2, aml_return(aml_int(1)));
+>>> +            }
+>>> +            aml_append(ifctx, ifctx2);
+>>> +
+>>> +            /* get user confirmation status for operation */
+>>> +            ifctx2 =3D aml_if(aml_equal(aml_local(0), aml_int(8)));
+>>> +            {
+>>> +                aml_append(ifctx2,
+>>> +                           aml_store(aml_derefof(aml_index(aml_arg(3=
+),
+>>> +                                                           aml_int(0=
+))),
+>>> +                                     aml_local(0)));
+>>> +                ifctx3 =3D aml_if(aml_call1("CKOP", aml_local(0)));
+>>> +                {
+>>> +                    /* 4 =3D Allowed and physically present user not
+>>> required */
+>>> +                    aml_append(ifctx3, aml_return(aml_int(4)));
+>>> +                }
+>>> +                aml_append(ifctx2, ifctx3);
+>>> +                /* 0 =3D requested operation not implemented */
+>>> +                aml_append(ifctx2, aml_return(aml_int(0)));
+>>> +            }
+>>> +            aml_append(ifctx, ifctx2);
+>>> +
+>>> +            aml_append(ifctx, aml_return(aml_buffer(1, zerobyte)));
+>>> +        }
+>>> +        aml_append(method, ifctx);
+>>> +    }
+>>> +    aml_append(dev, method);
+>>> +}
+>>> +
+>>> +static void
+>>>    build_dsdt(GArray *table_data, BIOSLinker *linker,
+>>>               AcpiPmInfo *pm, AcpiMiscInfo *misc,
+>>>               Range *pci_hole, Range *pci_hole64, MachineState *machi=
+ne)
+>>> @@ -2218,6 +2444,7 @@ build_dsdt(GArray *table_data, BIOSLinker *link=
+er,
+>>>                     */
+>>>                    /* aml_append(crs, aml_irq_no_flags(TPM_TIS_IRQ));=
+ */
+>>>                    aml_append(dev, aml_name_decl("_CRS", crs));
+>>> +                build_tpm_ppi(dev, misc->tpm_version);
+>>>                    aml_append(scope, dev);
+>>>                }
+>>>
+>>> diff --git a/include/hw/acpi/tpm.h b/include/hw/acpi/tpm.h
+>>> index d9b7452..23f5da1 100644
+>>> --- a/include/hw/acpi/tpm.h
+>>> +++ b/include/hw/acpi/tpm.h
+>>> @@ -37,4 +37,19 @@
+>>>    #define TPM_PPI_ADDR_SIZE           0x100
+>>>    #define TPM_PPI_ADDR_BASE           0xffff0000
+>>>
+>>> +struct tpm_ppi {
+>>> +    uint8_t ppin;            /* set by BIOS; currently initializatio=
+n
+>>> flag */
+>>> +    uint32_t ppip;           /* set by ACPI; not used */
+>>> +    uint32_t pprp;           /* response from TPM; set by BIOS */
+>>> +    uint32_t pprq;           /* opcode; set by ACPI */
+>>> +    uint32_t pprm;           /* parameter for opcode; set by ACPI */
+>>> +    uint32_t lppr;           /* last opcode; set by BIOS */
+>>> +    uint32_t fret;           /* set by ACPI; not used*/
+>>> +    uint32_t res1;           /* reserved */
+>>> +    uint32_t res2[4];        /* reserved */
+>>> +    uint32_t fail;           /* set by BIOS (0 =3D success) */
+>>> +} QEMU_PACKED;
+>>> +
+>>> +#define TPM_PPI_STRUCT_SIZE  sizeof(struct tpm_ppi)
+>>> +
+>>>    #endif /* HW_ACPI_TPM_H */
 >>
 >>
+>>
+> otherwise, patch looks good.
+>
