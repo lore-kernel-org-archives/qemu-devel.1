@@ -1,30 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44076)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44092)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eZymu-0005Le-Gg
-	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 07:50:25 -0500
+	id 1eZymw-0005NK-JH
+	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 07:50:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eZymt-0007QZ-2Y
-	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 07:50:24 -0500
-Received: from mail-qk0-x242.google.com ([2607:f8b0:400d:c09::242]:46715)
+	id 1eZymv-0007SV-Af
+	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 07:50:26 -0500
+Received: from mail-qk0-x242.google.com ([2607:f8b0:400d:c09::242]:33134)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eZyms-0007Q7-RG
-	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 07:50:22 -0500
-Received: by mail-qk0-x242.google.com with SMTP id l64so8413363qke.13
-	for <qemu-devel@nongnu.org>; Fri, 12 Jan 2018 04:50:22 -0800 (PST)
+	id 1eZymv-0007Rz-50
+	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 07:50:25 -0500
+Received: by mail-qk0-x242.google.com with SMTP id i141so8496137qke.0
+	for <qemu-devel@nongnu.org>; Fri, 12 Jan 2018 04:50:25 -0800 (PST)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Fri, 12 Jan 2018 09:49:59 -0300
-Message-Id: <20180112125000.27256-7-f4bug@amsat.org>
+Date: Fri, 12 Jan 2018 09:50:00 -0300
+Message-Id: <20180112125000.27256-8-f4bug@amsat.org>
 In-Reply-To: <20180112125000.27256-1-f4bug@amsat.org>
 References: <20180112125000.27256-1-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH 6/7] docker: add the Fedora 27 base image
+Subject: [Qemu-devel] [PATCH 7/7] docker: warn users to use newer
+ fedora25/fedora27 base image
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,22 +37,79 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Fam Zheng <famz@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org
 
-straight copy on Fedora 25 base.
+deprecate the generic 'fedora' image, but stay backward incompatible
 
-Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- tests/docker/dockerfiles/fedora27.docker | 18 ++++++++++++++++++
- 1 file changed, 18 insertions(+)
- create mode 100644 tests/docker/dockerfiles/fedora27.docker
+ tests/docker/Makefile.include            |  3 ++-
+ tests/docker/dockerfiles/fedora.docker   | 29 ++++++++++++-----------------
+ tests/docker/dockerfiles/fedora25.docker | 18 ++++++++++++++++++
+ 3 files changed, 32 insertions(+), 18 deletions(-)
+ create mode 100644 tests/docker/dockerfiles/fedora25.docker
 
-diff --git a/tests/docker/dockerfiles/fedora27.docker b/tests/docker/dockerfiles/fedora27.docker
+diff --git a/tests/docker/Makefile.include b/tests/docker/Makefile.include
+index b9b862654c..a530342aee 100644
+--- a/tests/docker/Makefile.include
++++ b/tests/docker/Makefile.include
+@@ -4,7 +4,7 @@
+ 
+ DOCKER_SUFFIX := .docker
+ DOCKER_FILES_DIR := $(SRC_PATH)/tests/docker/dockerfiles
+-DOCKER_DEPRECATED_IMAGES := debian ubuntu
++DOCKER_DEPRECATED_IMAGES := debian fedora ubuntu
+ DOCKER_IMAGES := $(filter-out $(DOCKER_DEPRECATED_IMAGES),$(sort $(notdir $(basename $(wildcard $(DOCKER_FILES_DIR)/*.docker)))))
+ DOCKER_TARGETS := $(patsubst %,docker-image-%,$(DOCKER_IMAGES))
+ # Use a global constant ccache directory to speed up repetitive builds
+@@ -61,6 +61,7 @@ docker-image-debian-ppc64el-cross: docker-image-debian9
+ docker-image-debian-s390x-cross: docker-image-debian9
+ docker-image-debian-win32-cross: docker-image-debian8-mxe
+ docker-image-debian-win64-cross: docker-image-debian8-mxe
++docker-image-fedora: docker-image-fedora25
+ docker-image-ubuntu: docker-image-ubuntu16.04
+ docker-image-travis: NOUSER=1
+ 
+diff --git a/tests/docker/dockerfiles/fedora.docker b/tests/docker/dockerfiles/fedora.docker
+index 4b26c3aded..961534275f 100644
+--- a/tests/docker/dockerfiles/fedora.docker
++++ b/tests/docker/dockerfiles/fedora.docker
+@@ -1,18 +1,13 @@
+-FROM fedora:latest
+-ENV PACKAGES \
+-    ccache gettext git tar PyYAML sparse flex bison python2 bzip2 hostname \
+-    glib2-devel pixman-devel zlib-devel SDL-devel libfdt-devel \
+-    gcc gcc-c++ clang make perl which bc findutils libaio-devel \
+-    nettle-devel \
+-    mingw32-pixman mingw32-glib2 mingw32-gmp mingw32-SDL mingw32-pkg-config \
+-    mingw32-gtk2 mingw32-gtk3 mingw32-gnutls mingw32-nettle mingw32-libtasn1 \
+-    mingw32-libjpeg-turbo mingw32-libpng mingw32-curl mingw32-libssh2 \
+-    mingw32-bzip2 \
+-    mingw64-pixman mingw64-glib2 mingw64-gmp mingw64-SDL mingw64-pkg-config \
+-    mingw64-gtk2 mingw64-gtk3 mingw64-gnutls mingw64-nettle mingw64-libtasn1 \
+-    mingw64-libjpeg-turbo mingw64-libpng mingw64-curl mingw64-libssh2 \
+-    mingw64-bzip2
++# SPDX-License-Identifier: GPL-2.0-or-later
++#
++# This template is deprecated, it was previously based on Fedora 25 on QEMU 2.9.
++# Now than more recent releases are out, please use qemu:fedora25 as base for
++# Fedora 25.
++#
++FROM qemu:fedora25
+ 
+-RUN dnf install -y $PACKAGES
+-RUN rpm -q $PACKAGES | sort > /packages.txt
+-ENV FEATURES mingw clang pyyaml
++RUN for n in $(seq 8); do echo; done && \
++    echo "\n\t\tThis image is deprecated." && echo && \
++    echo "\tUse 'FROM qemu:fedora27' to use the Fedora 27 image" && \
++    echo "\tor 'FROM qemu:fedora25' to use the old Fedora 25." && \
++    for n in $(seq 8); do echo; done
+diff --git a/tests/docker/dockerfiles/fedora25.docker b/tests/docker/dockerfiles/fedora25.docker
 new file mode 100644
-index 0000000000..7cba4dcc2c
+index 0000000000..b53fe63b5c
 --- /dev/null
-+++ b/tests/docker/dockerfiles/fedora27.docker
++++ b/tests/docker/dockerfiles/fedora25.docker
 @@ -0,0 +1,18 @@
-+FROM fedora:27
++FROM fedora:25
 +ENV PACKAGES \
 +    ccache gettext git tar PyYAML sparse flex bison python2 bzip2 hostname \
 +    glib2-devel pixman-devel zlib-devel SDL-devel libfdt-devel \
