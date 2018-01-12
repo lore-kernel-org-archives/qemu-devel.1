@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48952)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50832)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1eZwYk-0001lA-WA
-	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 05:27:40 -0500
+	(envelope-from <frederic.konrad@adacore.com>) id 1eZwfa-0003h3-6M
+	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 05:34:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1eZwYg-0000Dv-KJ
-	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 05:27:38 -0500
-Received: from mail-wr0-x244.google.com ([2a00:1450:400c:c0c::244]:39261)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1eZwYg-0000Cl-AR
-	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 05:27:34 -0500
-Received: by mail-wr0-x244.google.com with SMTP id z48so4864660wrz.6
-	for <qemu-devel@nongnu.org>; Fri, 12 Jan 2018 02:27:34 -0800 (PST)
+	(envelope-from <frederic.konrad@adacore.com>) id 1eZwfW-0004tM-W6
+	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 05:34:42 -0500
+Received: from mel.act-europe.fr ([2a02:2ab8:224:1::a0a:d2]:53817
+	helo=smtp.eu.adacore.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <frederic.konrad@adacore.com>)
+	id 1eZwfW-0004sw-LD
+	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 05:34:38 -0500
+References: <cover.1515260163.git.pisa@cmp.felk.cvut.cz>
+	<9d07dec0056ce48504c0f41da37a34a70a8acf6c.1515260163.git.pisa@cmp.felk.cvut.cz>
+From: KONRAD Frederic <frederic.konrad@adacore.com>
+Message-ID: <5e2612a9-764d-c2c9-fcc3-8c7dc9b9cf61@adacore.com>
+Date: Fri, 12 Jan 2018 11:34:35 +0100
 MIME-Version: 1.0
-In-Reply-To: <20180111213250.16511-13-marcandre.lureau@redhat.com>
-References: <20180111213250.16511-1-marcandre.lureau@redhat.com>
-	<20180111213250.16511-13-marcandre.lureau@redhat.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Fri, 12 Jan 2018 11:27:32 +0100
-Message-ID: <CAJ+F1CKa+hpr9wr5LNXfW9xAwXp2LuwBpd1gc3=rO6a4AmxwpQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v4 12/51] qapi-introspect: add preprocessor
- conditions to generated QLit
+In-Reply-To: <9d07dec0056ce48504c0f41da37a34a70a8acf6c.1515260163.git.pisa@cmp.felk.cvut.cz>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 5/7] CAN bus PCM-3680I PCI (dual SJA1000
+ channel) emulation added.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,157 +31,378 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: QEMU <qemu-devel@nongnu.org>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, Markus Armbruster <armbru@redhat.com>, Cleber Rosa <crosa@redhat.com>, =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
+To: pisa@cmp.felk.cvut.cz, qemu-devel@nongnu.org
+Cc: Marek Vasut <marex@denx.de>, Oliver Hartkopp <socketcan@hartkopp.net>, Stefan Hajnoczi <stefanha@gmail.com>, Deniz Eren <deniz.eren@icloud.com>, Oleksij Rempel <o.rempel@pengutronix.de>, Jan Kiszka <jan.kiszka@siemens.com>
 
-Hi
 
-On Thu, Jan 11, 2018 at 10:32 PM, Marc-Andr=C3=A9 Lureau
-<marcandre.lureau@redhat.com> wrote:
-> The generator will take (obj, condition) tuples to wrap generated QLit
-> objects for 'obj' with #if/#endif conditions.
->
-> This commit adds 'ifcond' condition to top-level QLit objects.
->
-> See generated tests/test-qmp-introspect.c. Example diff after this patch:
->
-> --- before      2018-01-08 11:55:24.757083654 +0100
-> +++ tests/test-qmp-introspect.c 2018-01-08 13:08:44.477641629 +0100
-> @@ -51,6 +51,8 @@
->          { "name", QLIT_QSTR("EVENT_F"), },
->          {}
->      })),
-> +#if defined(TEST_IF_CMD)
-> +#if defined(TEST_IF_STRUCT)
->      QLIT_QDICT(((QLitDictEntry[]) {
->          { "arg-type", QLIT_QSTR("5"), },
->          { "meta-type", QLIT_QSTR("command"), },
-> @@ -58,12 +60,16 @@
->          { "ret-type", QLIT_QSTR("0"), },
->          {}
->      })),
-> +#endif /* defined(TEST_IF_STRUCT) */
-> +#endif /* defined(TEST_IF_CMD) */
->
 
-My bad, this comment causes git am (and patchew) to fail to apply. FIxed.
+On 01/06/2018 09:47 PM, pisa@cmp.felk.cvut.cz wrote:
+> From: Deniz Eren <deniz.eren@icloud.com>
 
-The series is also available on https://github.com/elmarco/qemu/commits/qap=
-i-if
+I guess Deniz is the author of this patch?
+If so I think this will requires Deniz and your Signed-off-by
+line.
+The same apply for the other devices.
 
-> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Fred
+
+> 
+> Signed-off-by: Pavel Pisa <pisa@cmp.felk.cvut.cz>
 > ---
->  scripts/qapi-introspect.py | 31 +++++++++++++++++++++----------
->  1 file changed, 21 insertions(+), 10 deletions(-)
->
-> diff --git a/scripts/qapi-introspect.py b/scripts/qapi-introspect.py
-> index b1d08ec97b..7d3a5c37fd 100644
-> --- a/scripts/qapi-introspect.py
-> +++ b/scripts/qapi-introspect.py
-> @@ -17,6 +17,15 @@ def to_qlit(obj, level=3D0, suppress_first_indent=3DFa=
-lse):
->      def indent(level):
->          return level * 4 * ' '
->
-> +    if isinstance(obj, tuple):
-> +        ifobj, ifcond =3D obj
-> +        ret =3D gen_if(ifcond)
-> +        ret +=3D to_qlit(ifobj, level)
-> +        endif =3D gen_endif(ifcond)
-> +        if endif:
-> +            ret +=3D '\n' + endif
-> +        return ret
+>   hw/can/Makefile.objs     |   1 +
+>   hw/can/can_pcm3680_pci.c | 335 +++++++++++++++++++++++++++++++++++++++++++++++
+>   2 files changed, 336 insertions(+)
+>   create mode 100644 hw/can/can_pcm3680_pci.c
+> 
+> diff --git a/hw/can/Makefile.objs b/hw/can/Makefile.objs
+> index c9d07b9b16..6a328f0c3a 100644
+> --- a/hw/can/Makefile.objs
+> +++ b/hw/can/Makefile.objs
+> @@ -9,4 +9,5 @@ common-obj-y += can_host_stub.o
+>   endif
+>   common-obj-$(CONFIG_CAN_SJA1000) += can_sja1000.o
+>   common-obj-$(CONFIG_CAN_PCI) += can_kvaser_pci.o
+> +common-obj-$(CONFIG_CAN_PCI) += can_pcm3680_pci.o
+>   endif
+> diff --git a/hw/can/can_pcm3680_pci.c b/hw/can/can_pcm3680_pci.c
+> new file mode 100644
+> index 0000000000..692aab6ab8
+> --- /dev/null
+> +++ b/hw/can/can_pcm3680_pci.c
+> @@ -0,0 +1,335 @@
+> +/*
+> + * PCM-3680i PCI CAN device (SJA1000 based) emulation
+> + *
+> + * Copyright (c) 2016 Deniz Eren (deniz.eren@icloud.com)
+> + *
+> + * Based on Kvaser PCI CAN device (SJA1000 based) emulation implemented by
+> + * Jin Yang and Pavel Pisa
+> + *
+> + * Permission is hereby granted, free of charge, to any person obtaining a copy
+> + * of this software and associated documentation files (the "Software"), to deal
+> + * in the Software without restriction, including without limitation the rights
+> + * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+> + * copies of the Software, and to permit persons to whom the Software is
+> + * furnished to do so, subject to the following conditions:
+> + *
+> + * The above copyright notice and this permission notice shall be included in
+> + * all copies or substantial portions of the Software.
+> + *
+> + * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+> + * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+> + * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+> + * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+> + * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+> + * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+> + * THE SOFTWARE.
+> + */
 > +
->      ret =3D ''
->      if not suppress_first_indent:
->          ret +=3D indent(level)
-> @@ -25,7 +34,7 @@ def to_qlit(obj, level=3D0, suppress_first_indent=3DFal=
-se):
->      elif isinstance(obj, str):
->          ret +=3D 'QLIT_QSTR(' + to_c_string(obj) + ')'
->      elif isinstance(obj, list):
-> -        elts =3D [to_qlit(elt, level + 1)
-> +        elts =3D [to_qlit(elt, level + 1).strip('\n')
->                  for elt in obj]
->          elts.append(indent(level + 1) + "{}")
->          ret +=3D 'QLIT_QLIST(((QLitObject[]) {\n'
-> @@ -121,12 +130,12 @@ const QLitObject %(c_name)s =3D %(c_string)s;
->              return '[' + self._use_type(typ.element_type) + ']'
->          return self._name(typ.name)
->
-> -    def _gen_qlit(self, name, mtype, obj):
-> +    def _gen_qlit(self, name, mtype, obj, ifcond):
->          if mtype not in ('command', 'event', 'builtin', 'array'):
->              name =3D self._name(name)
->          obj['name'] =3D name
->          obj['meta-type'] =3D mtype
-> -        self._qlits.append(obj)
-> +        self._qlits.append((obj, ifcond))
->
->      def _gen_member(self, member):
->          ret =3D {'name': member.name, 'type': self._use_type(member.type=
-)}
-> @@ -142,26 +151,27 @@ const QLitObject %(c_name)s =3D %(c_string)s;
->          return {'case': variant.name, 'type': self._use_type(variant.typ=
-e)}
->
->      def visit_builtin_type(self, name, info, json_type):
-> -        self._gen_qlit(name, 'builtin', {'json-type': json_type})
-> +        self._gen_qlit(name, 'builtin', {'json-type': json_type}, [])
->
->      def visit_enum_type(self, name, info, ifcond, values, prefix):
-> -        self._gen_qlit(name, 'enum', {'values': values})
-> +        self._gen_qlit(name, 'enum', {'values': values}, ifcond)
->
->      def visit_array_type(self, name, info, ifcond, element_type):
->          element =3D self._use_type(element_type)
-> -        self._gen_qlit('[' + element + ']', 'array', {'element-type': el=
-ement})
-> +        self._gen_qlit('[' + element + ']', 'array', {'element-type': el=
-ement},
-> +                       ifcond)
->
->      def visit_object_type_flat(self, name, info, ifcond, members, varian=
-ts):
->          obj =3D {'members': [self._gen_member(m) for m in members]}
->          if variants:
->              obj.update(self._gen_variants(variants.tag_member.name,
->                                            variants.variants))
-> -        self._gen_qlit(name, 'object', obj)
-> +        self._gen_qlit(name, 'object', obj, ifcond)
->
->      def visit_alternate_type(self, name, info, ifcond, variants):
->          self._gen_qlit(name, 'alternate',
->                         {'members': [{'type': self._use_type(m.type)}
-> -                                    for m in variants.variants]})
-> +                                    for m in variants.variants]}, ifcond=
-)
->
->      def visit_command(self, name, info, ifcond, arg_type, ret_type,
->                        gen, success_response, boxed):
-> @@ -169,11 +179,12 @@ const QLitObject %(c_name)s =3D %(c_string)s;
->          ret_type =3D ret_type or self._schema.the_empty_object_type
->          self._gen_qlit(name, 'command',
->                         {'arg-type': self._use_type(arg_type),
-> -                        'ret-type': self._use_type(ret_type)})
-> +                        'ret-type': self._use_type(ret_type)}, ifcond)
->
->      def visit_event(self, name, info, ifcond, arg_type, boxed):
->          arg_type =3D arg_type or self._schema.the_empty_object_type
-> -        self._gen_qlit(name, 'event', {'arg-type': self._use_type(arg_ty=
-pe)})
-> +        self._gen_qlit(name, 'event', {'arg-type': self._use_type(arg_ty=
-pe)},
-> +                       ifcond)
->
->  # Debugging aid: unmask QAPI schema's type names
->  # We normally mask them, because they're not QMP wire ABI
-> --
-> 2.16.0.rc1.1.gef27df75a1
->
->
-
-
-
---=20
-Marc-Andr=C3=A9 Lureau
+> +#include "qemu/osdep.h"
+> +#include "qemu/event_notifier.h"
+> +#include "qemu/thread.h"
+> +#include "qemu/sockets.h"
+> +#include "qemu/error-report.h"
+> +#include "chardev/char.h"
+> +#include "hw/hw.h"
+> +#include "hw/pci/pci.h"
+> +#include "can/can_emu.h"
+> +
+> +#include "can_sja1000.h"
+> +
+> +#define TYPE_CAN_PCI_DEV "pcm3680_pci"
+> +
+> +#define PCM3680i_PCI_DEV(obj) \
+> +    OBJECT_CHECK(Pcm3680iPCIState, (obj), TYPE_CAN_PCI_DEV)
+> +
+> +#ifndef PCM3680i_PCI_VENDOR_ID1
+> +#define PCM3680i_PCI_VENDOR_ID1     0x13fe    /* the PCI device and vendor IDs */
+> +#endif
+> +
+> +#ifndef PCM3680i_PCI_DEVICE_ID1
+> +#define PCM3680i_PCI_DEVICE_ID1     0xc002
+> +#endif
+> +
+> +#define PCM3680i_PCI_SJA_RANGE     0x200
+> +
+> +#define PCM3680i_PCI_BYTES_PER_SJA 0x20
+> +
+> +typedef struct Pcm3680iPCIState {
+> +    /*< private >*/
+> +    PCIDevice       dev;
+> +    /*< public >*/
+> +    MemoryRegion    sja_io[2];
+> +
+> +    CanSJA1000State sja_state[2];
+> +    qemu_irq        irq;
+> +
+> +    char            *model; /* The model that support, only SJA1000 now. */
+> +    char            *canbus[2];
+> +    char            *host[2];
+> +} Pcm3680iPCIState;
+> +
+> +static void pcm3680i_pci_irq_raise(void *opaque)
+> +{
+> +    Pcm3680iPCIState *d = (Pcm3680iPCIState *)opaque;
+> +
+> +    qemu_irq_raise(d->irq);
+> +}
+> +
+> +static void pcm3680i_pci_irq_lower(void *opaque)
+> +{
+> +    Pcm3680iPCIState *d = (Pcm3680iPCIState *)opaque;
+> +
+> +    qemu_irq_lower(d->irq);
+> +}
+> +
+> +static void
+> +pcm3680i_pci_reset(void *opaque)
+> +{
+> +    Pcm3680iPCIState *d = (Pcm3680iPCIState *)opaque;
+> +    CanSJA1000State *s1 = &d->sja_state[0];
+> +    CanSJA1000State *s2 = &d->sja_state[1];
+> +
+> +    can_sja_hardware_reset(s1);
+> +    can_sja_hardware_reset(s2);
+> +}
+> +
+> +static uint64_t pcm3680i_pci_sja1_io_read(void *opaque, hwaddr addr,
+> +                                          unsigned size)
+> +{
+> +    Pcm3680iPCIState *d = opaque;
+> +    CanSJA1000State *s = &d->sja_state[0];
+> +
+> +    if (addr >= PCM3680i_PCI_BYTES_PER_SJA) {
+> +        return 0;
+> +    }
+> +
+> +    return can_sja_mem_read(s, addr, size);
+> +}
+> +
+> +static void pcm3680i_pci_sja1_io_write(void *opaque, hwaddr addr,
+> +                                       uint64_t data, unsigned size)
+> +{
+> +    Pcm3680iPCIState *d = opaque;
+> +    CanSJA1000State *s = &d->sja_state[0];
+> +
+> +    if (addr >= PCM3680i_PCI_BYTES_PER_SJA) {
+> +        return;
+> +    }
+> +
+> +    can_sja_mem_write(s, addr, data, size);
+> +}
+> +
+> +static uint64_t pcm3680i_pci_sja2_io_read(void *opaque, hwaddr addr,
+> +                                          unsigned size)
+> +{
+> +    Pcm3680iPCIState *d = opaque;
+> +    CanSJA1000State *s = &d->sja_state[1];
+> +
+> +    if (addr >= PCM3680i_PCI_BYTES_PER_SJA) {
+> +        return 0;
+> +    }
+> +
+> +    return can_sja_mem_read(s, addr, size);
+> +}
+> +
+> +static void pcm3680i_pci_sja2_io_write(void *opaque, hwaddr addr, uint64_t data,
+> +                             unsigned size)
+> +{
+> +    Pcm3680iPCIState *d = opaque;
+> +    CanSJA1000State *s = &d->sja_state[1];
+> +
+> +    if (addr >= PCM3680i_PCI_BYTES_PER_SJA) {
+> +        return;
+> +    }
+> +
+> +    can_sja_mem_write(s, addr, data, size);
+> +}
+> +
+> +static const MemoryRegionOps pcm3680i_pci_sja1_io_ops = {
+> +    .read = pcm3680i_pci_sja1_io_read,
+> +    .write = pcm3680i_pci_sja1_io_write,
+> +    .endianness = DEVICE_LITTLE_ENDIAN,
+> +    .impl = {
+> +        .min_access_size = 1,
+> +        .max_access_size = 1,
+> +    },
+> +};
+> +
+> +static const MemoryRegionOps pcm3680i_pci_sja2_io_ops = {
+> +    .read = pcm3680i_pci_sja2_io_read,
+> +    .write = pcm3680i_pci_sja2_io_write,
+> +    .endianness = DEVICE_LITTLE_ENDIAN,
+> +    .impl = {
+> +        .min_access_size = 1,
+> +        .max_access_size = 1,
+> +    },
+> +};
+> +
+> +static int pcm3680i_pci_init(PCIDevice *pci_dev)
+> +{
+> +    Pcm3680iPCIState *d = PCM3680i_PCI_DEV(pci_dev);
+> +    CanSJA1000State *s1 = &d->sja_state[0];
+> +    CanSJA1000State *s2 = &d->sja_state[1];
+> +    uint8_t *pci_conf;
+> +    CanBusState *can_bus1;
+> +    CanBusState *can_bus2;
+> +
+> +    if (d->model) {
+> +        if (strncmp(d->model, "pcican-s", 256)) { /* for security reason */
+> +            error_report("Can't create CAN device, "
+> +                         "the model %s is not supported now.", d->model);
+> +            exit(1);
+> +        }
+> +    }
+> +
+> +    can_bus1 = can_bus_find_by_name(d->canbus[0], true);
+> +    if (can_bus1 == NULL) {
+> +        error_report("Cannot create can find/allocate CAN bus #1");
+> +        exit(1);
+> +    }
+> +
+> +    can_bus2 = can_bus_find_by_name(d->canbus[1], true);
+> +    if (can_bus2 == NULL) {
+> +        error_report("Cannot create can find/allocate CAN bus #2");
+> +        exit(1);
+> +    }
+> +
+> +    if (d->host[0] != NULL) {
+> +        if (can_bus_connect_to_host_device(can_bus1, d->host[0]) < 0) {
+> +            error_report("Cannot connect CAN bus to host #1 device \"%s\"",
+> +                         d->host[0]);
+> +            exit(1);
+> +        }
+> +    }
+> +
+> +    if (d->host[1] != NULL) {
+> +        if (can_bus_connect_to_host_device(can_bus2, d->host[1]) < 0) {
+> +            error_report("Cannot connect CAN bus to host #2 device \"%s\"",
+> +                         d->host[1]);
+> +            exit(1);
+> +        }
+> +    }
+> +
+> +    pci_conf = pci_dev->config;
+> +    pci_conf[PCI_INTERRUPT_PIN] = 0x01; /* interrupt pin A */
+> +
+> +    d->irq = pci_allocate_irq(&d->dev);
+> +
+> +    can_sja_init(s1, pcm3680i_pci_irq_raise, pcm3680i_pci_irq_lower, d);
+> +    can_sja_init(s2, pcm3680i_pci_irq_raise, pcm3680i_pci_irq_lower, d);
+> +
+> +    qemu_register_reset(pcm3680i_pci_reset, d);
+> +
+> +    if (can_sja_connect_to_bus(s1, can_bus1) < 0) {
+> +        error_report("can_sja_connect_to_bus failed");
+> +        exit(1);
+> +    }
+> +
+> +    if (can_sja_connect_to_bus(s2, can_bus2) < 0) {
+> +        error_report("can_sja_connect_to_bus failed");
+> +        exit(1);
+> +    }
+> +
+> +    memory_region_init_io(&d->sja_io[0], OBJECT(d), &pcm3680i_pci_sja1_io_ops,
+> +                          d, "pcm3680i_pci-sja1", PCM3680i_PCI_SJA_RANGE / 2);
+> +    memory_region_init_io(&d->sja_io[1], OBJECT(d), &pcm3680i_pci_sja2_io_ops,
+> +                          d, "pcm3680i_pci-sja2", PCM3680i_PCI_SJA_RANGE / 2);
+> +
+> +    pci_register_bar(&d->dev, /*BAR*/ 0, PCI_BASE_ADDRESS_SPACE_IO,
+> +                                             &d->sja_io[0]);
+> +    pci_register_bar(&d->dev, /*BAR*/ 1, PCI_BASE_ADDRESS_SPACE_IO,
+> +                                             &d->sja_io[1]);
+> +
+> +    return 0;
+> +}
+> +
+> +static void pcm3680i_pci_exit(PCIDevice *pci_dev)
+> +{
+> +    Pcm3680iPCIState *d = PCM3680i_PCI_DEV(pci_dev);
+> +    CanSJA1000State *s1 = &d->sja_state[0];
+> +    CanSJA1000State *s2 = &d->sja_state[1];
+> +
+> +    can_sja_disconnect(s1);
+> +    can_sja_disconnect(s2);
+> +
+> +    qemu_unregister_reset(pcm3680i_pci_reset, d);
+> +
+> +    /*
+> +     * region d->sja_io is destroyed by QOM now
+> +     */
+> +    /* memory_region_destroy(&d->sja_io[0]); */
+> +    /* memory_region_destroy(&d->sja_io[1]); */
+> +
+> +    can_sja_exit(s1);
+> +    can_sja_exit(s2);
+> +
+> +    qemu_free_irq(d->irq);
+> +}
+> +
+> +static const VMStateDescription vmstate_pcm3680i_pci = {
+> +    .name = "pcm3680i_pci",
+> +    .version_id = 1,
+> +    .minimum_version_id = 1,
+> +    .minimum_version_id_old = 1,
+> +    .fields = (VMStateField[]) {
+> +        VMSTATE_PCI_DEVICE(dev, Pcm3680iPCIState),
+> +        VMSTATE_STRUCT(sja_state[0], Pcm3680iPCIState, 0,
+> +                       vmstate_can_sja, CanSJA1000State),
+> +        VMSTATE_STRUCT(sja_state[1], Pcm3680iPCIState, 0,
+> +                       vmstate_can_sja, CanSJA1000State),
+> +        VMSTATE_END_OF_LIST()
+> +    }
+> +};
+> +
+> +static void qdev_pcm3680i_pci_reset(DeviceState *dev)
+> +{
+> +    Pcm3680iPCIState *d = PCM3680i_PCI_DEV(dev);
+> +    pcm3680i_pci_reset(d);
+> +}
+> +
+> +static Property pcm3680i_pci_properties[] = {
+> +    DEFINE_PROP_STRING("canbus1",   Pcm3680iPCIState, canbus[0]),
+> +    DEFINE_PROP_STRING("canbus2",   Pcm3680iPCIState, canbus[1]),
+> +    DEFINE_PROP_STRING("host1",  Pcm3680iPCIState, host[0]),
+> +    DEFINE_PROP_STRING("host2",  Pcm3680iPCIState, host[1]),
+> +    DEFINE_PROP_STRING("model", Pcm3680iPCIState, model),
+> +    DEFINE_PROP_END_OF_LIST(),
+> +};
+> +
+> +static void pcm3680i_pci_class_init(ObjectClass *klass, void *data)
+> +{
+> +    DeviceClass *dc = DEVICE_CLASS(klass);
+> +    PCIDeviceClass *k = PCI_DEVICE_CLASS(klass);
+> +
+> +    k->init = pcm3680i_pci_init;
+> +    k->exit = pcm3680i_pci_exit;
+> +    k->vendor_id = PCM3680i_PCI_VENDOR_ID1;
+> +    k->device_id = PCM3680i_PCI_DEVICE_ID1;
+> +    k->revision = 0x00;
+> +    k->class_id = 0x000c09;
+> +    k->subsystem_vendor_id = PCM3680i_PCI_VENDOR_ID1;
+> +    k->subsystem_id = PCM3680i_PCI_DEVICE_ID1;
+> +    dc->desc = "Pcm3680i PCICANx";
+> +    dc->props = pcm3680i_pci_properties;
+> +    dc->vmsd = &vmstate_pcm3680i_pci;
+> +    set_bit(DEVICE_CATEGORY_MISC, dc->categories);
+> +    dc->reset = qdev_pcm3680i_pci_reset;
+> +}
+> +
+> +static const TypeInfo pcm3680i_pci_info = {
+> +    .name          = TYPE_CAN_PCI_DEV,
+> +    .parent        = TYPE_PCI_DEVICE,
+> +    .instance_size = sizeof(Pcm3680iPCIState),
+> +    .class_init    = pcm3680i_pci_class_init,
+> +    .interfaces = (InterfaceInfo[]) {
+> +        { INTERFACE_CONVENTIONAL_PCI_DEVICE },
+> +        { },
+> +    },
+> +};
+> +
+> +static void pcm3680i_pci_register_types(void)
+> +{
+> +    type_register_static(&pcm3680i_pci_info);
+> +}
+> +
+> +type_init(pcm3680i_pci_register_types)
+> 
