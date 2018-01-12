@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47207)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47313)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1eZskP-0003Z0-Kn
-	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 01:23:26 -0500
+	(envelope-from <peterx@redhat.com>) id 1eZsl6-0003zT-Vp
+	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 01:24:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1eZskL-0007St-St
-	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 01:23:25 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:42094)
+	(envelope-from <peterx@redhat.com>) id 1eZsl3-0000C0-0j
+	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 01:24:09 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:53360)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1eZskL-0007Rh-MU
-	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 01:23:21 -0500
-References: <151570326218.441.13378298987831799927@5adcb62bf0d6>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <ba4c016b-703f-906d-ad16-22ae1aa05b25@redhat.com>
-Date: Fri, 12 Jan 2018 07:23:13 +0100
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1eZsl2-0000AK-No
+	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 01:24:04 -0500
+Date: Fri, 12 Jan 2018 14:23:51 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20180112062351.GM2551@xz-mi>
+References: <20171219084557.9801-1-peterx@redhat.com>
+	<20171219084557.9801-22-peterx@redhat.com>
+	<20180109140810.GF31400@stefanha-x1.localdomain>
 MIME-Version: 1.0
-In-Reply-To: <151570326218.441.13378298987831799927@5adcb62bf0d6>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] net: Allow netdevs to be used with
- 'hostfwd_add' and 'hostfwd_remove'
+Content-Disposition: inline
+In-Reply-To: <20180109140810.GF31400@stefanha-x1.localdomain>
+Subject: Re: [Qemu-devel] [RFC v6 21/27] qmp: support out-of-band (oob)
+ execution
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,35 +29,134 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, famz@redhat.com
-Cc: jasowang@redhat.com, samuel.thibault@ens-lyon.org, dgilbert@redhat.com
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Cc: qemu-devel@nongnu.org, Stefan Hajnoczi <shajnocz@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <famz@redhat.com>, Juan Quintela <quintela@redhat.com>, mdroth@linux.vnet.ibm.com, Eric Blake <eblake@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Markus Armbruster <armbru@redhat.com>, marcandre.lureau@redhat.com, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 
-On 11.01.2018 21:41, no-reply@patchew.org wrote:
-> Hi,
+On Tue, Jan 09, 2018 at 02:08:10PM +0000, Stefan Hajnoczi wrote:
+> On Tue, Dec 19, 2017 at 04:45:51PM +0800, Peter Xu wrote:
+> > diff --git a/monitor.c b/monitor.c
+> > index b571866659..505db439d8 100644
+> > --- a/monitor.c
+> > +++ b/monitor.c
+> > @@ -1090,6 +1090,44 @@ static void qmp_caps_apply(Monitor *mon, QMPCapabilityList *list)
+> >      }
+> >  }
+> >  
+> > +/*
+> > + * Return true if check successful, or false otherwise.  When false is
+> > + * returned, detailed error will be in errp if provided.
+> > + */
+> > +static bool qmp_cmd_oob_check(Monitor *mon, QDict *req, Error **errp)
+> > +{
+> > +    const char *command;
+> > +    QmpCommand *cmd;
+> > +
+> > +    command = qdict_get_try_str(req, "execute");
+> > +    if (!command) {
+> > +        error_setg(errp, "Command field 'execute' missing");
+> > +        return false;
+> > +    }
+> > +
+> > +    cmd = qmp_find_command(mon->qmp.commands, command);
+> > +    if (!cmd) {
+> > +        error_set(errp, ERROR_CLASS_COMMAND_NOT_FOUND,
+> > +                  "The command %s has not been found", command);
+> > +        return false;
+> > +    }
+> > +
+> > +    if (qmp_is_oob(req)) {
+> > +        if (!qmp_oob_enabled(mon)) {
+> > +            error_setg(errp, "Please enable Out-Of-Band first "
+> > +                       "for the session during handshake");
 > 
-> This series failed build test on ppc host. Please find the details below.
-[...]
-> Updating 3c8cf5a9c21ff8782164d1def7f44bd888713384
-> Submodule 'dtc' (git://git.qemu-project.org/dtc.git) registered for path 'dtc'
-> Submodule 'pixman' (git://anongit.freedesktop.org/pixman) registered for path 'pixman'
-> Submodule 'roms/SLOF' (git://git.qemu-project.org/SLOF.git) registered for path 'roms/SLOF'
-> Submodule 'roms/ipxe' (git://git.qemu-project.org/ipxe.git) registered for path 'roms/ipxe'
-> Submodule 'roms/openbios' (git://git.qemu-project.org/openbios.git) registered for path 'roms/openbios'
-> Submodule 'roms/openhackware' (git://git.qemu-project.org/openhackware.git) registered for path 'roms/openhackware'
-> Submodule 'roms/qemu-palcode' (git://github.com/rth7680/qemu-palcode.git) registered for path 'roms/qemu-palcode'
-> Submodule 'roms/seabios' (git://git.qemu-project.org/seabios.git/) registered for path 'roms/seabios'
-> Submodule 'roms/sgabios' (git://git.qemu-project.org/sgabios.git) registered for path 'roms/sgabios'
-> Submodule 'roms/u-boot' (git://git.qemu-project.org/u-boot.git) registered for path 'roms/u-boot'
-> Submodule 'roms/vgabios' (git://git.qemu-project.org/vgabios.git/) registered for path 'roms/vgabios'
-> Cloning into 'dtc'...
-> Submodule path 'dtc': checked out '65cc4d2748a2c2e6f27f1cf39e07a5dbabd80ebf'
-> fatal: remote error: access denied or repository not exported: /pixman
-> Cloning into 'pixman'...
-> Clone of 'git://anongit.freedesktop.org/pixman' into submodule path 'pixman' failed
+> The qmp-spec.txt document calls it "capabilities negotiation".  I don't
+> see "handshake" mentioned.  Please use the terminology from the QMP spec
+> so it's clear what this error message means.
+> 
+> > +            return false;
+> > +        }
+> > +        if (!(cmd->options & QCO_ALLOW_OOB)) {
+> > +            error_setg(errp, "The command %s does not support OOB",
+> > +                       command);
+> > +            return false;
+> > +        }
+> > +    }
+> > +
+> > +    return true;
+> > +}
+> > +
+> >  void qmp_qmp_capabilities(bool has_enable, QMPCapabilityList *enable,
+> >                            Error **errp)
+> >  {
+> > @@ -4032,6 +4070,7 @@ static void monitor_qmp_bh_dispatcher(void *data)
+> >      QMPRequest *req_obj = monitor_qmp_requests_pop_one();
+> >  
+> >      if (req_obj) {
+> > +        trace_monitor_qmp_cmd_in_band(qobject_get_try_str(req_obj->id));
+> 
+> Not all tracers on all platforms support NULL string pointers.  Please
+> use qobject_get_try_str(req_obj->id) ?: "".
+> 
+> >          monitor_qmp_dispatch_one(req_obj);
+> >          /* Reschedule instead of looping so the main loop stays responsive */
+> >          qemu_bh_schedule(mon_global.qmp_dispatcher_bh);
+> > @@ -4055,17 +4094,31 @@ static void handle_qmp_command(JSONMessageParser *parser, GQueue *tokens)
+> >          error_setg(&err, QERR_JSON_PARSING);
+> >      }
+> >      if (err) {
+> > -        monitor_qmp_respond(mon, NULL, err, NULL);
+> > -        qobject_decref(req);
+> > -        return;
+> > +        goto err;
+> > +    }
+> > +
+> > +    /* Check against the request in general layout */
+> > +    qdict = qmp_dispatch_check_obj(req, &err);
+> > +    if (!qdict) {
+> > +        goto err;
+> >      }
+> >  
+> > -    qdict = qobject_to_qdict(req);
+> > -    if (qdict) {
+> > -        id = qdict_get(qdict, "id");
+> > -        qobject_incref(id);
+> > -        qdict_del(qdict, "id");
+> > -    } /* else will fail qmp_dispatch() */
+> > +    /* Check against OOB specific */
+> > +    if (!qmp_cmd_oob_check(mon, qdict, &err)) {
+> > +        goto err;
+> > +    }
+> > +
+> > +    id = qdict_get(qdict, "id");
+> > +
+> > +    /* When OOB is enabled, the "id" field is mandatory. */
+> > +    if (qmp_oob_enabled(mon) && !id) {
+> > +        error_setg(&err, "Out-Of-Band capability requires that "
+> > +                   "every command contains an 'id' field.");
+> 
+> error_setg() messages shouldn't end with a period ('.').
+> 
+> > +        goto err;
+> > +    }
+> > +
+> > +    qobject_incref(id);
+> > +    qdict_del(qdict, "id");
+> >  
+> >      req_obj = g_new0(QMPRequest, 1);
+> >      req_obj->mon = mon;
+> > @@ -4073,6 +4126,13 @@ static void handle_qmp_command(JSONMessageParser *parser, GQueue *tokens)
+> >      req_obj->req = req;
+> >      req_obj->need_resume = false;
+> >  
+> > +    if (qmp_is_oob(qdict)) {
+> > +        /* Out-Of-Band (OOB) requests are executed directly in parser. */
+> > +        trace_monitor_qmp_cmd_out_of_band(qobject_get_try_str(req_obj->id));
+> 
+> Same NULL "%s" issue here.
 
- Hi Fam,
+Fixing them all.
 
-why is patchew still trying to clone pixman? I thought we only use the
-system pixman library nowadays?
+Good to know the "?:" syntax...  Thanks,
 
- Thomas
+-- 
+Peter Xu
