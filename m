@@ -1,31 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35133)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36704)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <douly.fnst@cn.fujitsu.com>) id 1eZtjO-0005fx-Lf
-	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 02:26:27 -0500
+	(envelope-from <jianjay.zhou@huawei.com>) id 1eZto5-0007KW-HW
+	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 02:31:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <douly.fnst@cn.fujitsu.com>) id 1eZtjL-00081E-Hq
-	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 02:26:26 -0500
-Received: from mail.cn.fujitsu.com ([183.91.158.132]:25550
-	helo=heian.cn.fujitsu.com) by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <douly.fnst@cn.fujitsu.com>) id 1eZtjL-00080e-6q
-	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 02:26:23 -0500
-References: <20171214040855.22231-1-douly.fnst@cn.fujitsu.com>
-	<20171218220901.GE5209@localhost.localdomain>
-	<f5057cbf-c699-847a-d219-78a0ba6bff63@cn.fujitsu.com>
-	<20171220213820.GF24025@localhost.localdomain>
-	<20171222202434.2e749e99@igors-macbook-pro.local>
-	<20171222213027-mutt-send-email-mst@kernel.org>
-	<3d7e0c5a-9079-9975-6e5e-ec30accff191@cn.fujitsu.com>
-From: Dou Liyang <douly.fnst@cn.fujitsu.com>
-Message-ID: <b9f0f7e1-d526-ff33-ed48-8564a4650408@cn.fujitsu.com>
-Date: Fri, 12 Jan 2018 15:26:12 +0800
+	(envelope-from <jianjay.zhou@huawei.com>) id 1eZto2-00022v-EJ
+	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 02:31:17 -0500
+Received: from szxga04-in.huawei.com ([45.249.212.190]:2149 helo=huawei.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jianjay.zhou@huawei.com>)
+	id 1eZto2-00021E-2K
+	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 02:31:14 -0500
+From: Jay Zhou <jianjay.zhou@huawei.com>
+Date: Fri, 12 Jan 2018 15:30:32 +0800
+Message-ID: <1515742232-49096-1-git-send-email-jianjay.zhou@huawei.com>
 MIME-Version: 1.0
-In-Reply-To: <3d7e0c5a-9079-9975-6e5e-ec30accff191@cn.fujitsu.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RESEND PATCH for-2.12 0/2] ACPI/unit-test: Add a
- testcase
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH] tap: close fd conditionally when error occured
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,37 +24,101 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, peter.maydell@linaro.org, qemu-devel@nongnu.org, indou.takao@jp.fujitsu.com
+To: qemu-devel@nongnu.org
+Cc: jasowang@redhat.com, mst@redhat.com, imammedo@redhat.com, weidong.huang@huawei.com, wangxinxin.wang@huawei.com, arei.gonglei@huawei.com, jianjay.zhou@huawei.com
 
+If netdev_add tap,id=net0,vhost=on failed in net_init_tap_one(),
+the followed up device_add virtio-net-pci,netdev=net0 will fail
+too, prints:
 
+  TUNSETOFFLOAD ioctl() failed: Bad file descriptor TUNSETOFFLOAD
+  ioctl() failed: Bad file descriptor
 
-At 01/12/2018 03:23 PM, Dou Liyang wrote:
-> [...]
->>>>>
->>>>> BTW, I used "make TEST_ACPI_REBUILD_AML=1 check" to create the DSDT
->>>>> file. Is it correct?
->>>>
->>>> This sounds correct to me.  Igor, can you confirm?
->>> It's will rebuild/update reference tables.
->>>
->>> I'm for merging it early and tracking/fixing issue Peter saw during 
->>> this dev cycle.
->>>
->>>
->>
->> Send an ack then?
->>
-> Hi Michael,
-> 
-> I saw Igor gave the Reviewed-by at 21 Dec 2017
-                                      ^^ Oops! Sorry, it's 27 Dec.
-> 
-> What is the state of this patchset?
-> 
-> I rebase and retest it again, Do I need to send it again?
-> 
-> Thanks,
->      dou
->>
->>
+The reason is that the fd of tap is closed when error occured after
+calling net_init_tap_one().
+
+I think the fd should be closed in these two case:
+  1.tap_set_sndbuf() failed
+  2.tap_set_sndbuf() succeeded but vhost failed to initialize with
+    vhostforce flag on
+Meanwhile, the fd should not be closed just because vhost failed to
+initialize but without vhostforce flag. So the followed up device_add
+can fall back to userspace virtio successfully.
+
+Suggested-by: Michael S. Tsirkin <mst@redhat.com>
+Suggested-by: Igor Mammedov <imammedo@redhat.com>
+Suggested-by: Jason Wang <jasowang@redhat.com>
+Signed-off-by: Jay Zhou <jianjay.zhou@huawei.com>
+---
+ net/tap.c | 18 +++++++++++++-----
+ 1 file changed, 13 insertions(+), 5 deletions(-)
+
+diff --git a/net/tap.c b/net/tap.c
+index 979e622..3ed72eb 100644
+--- a/net/tap.c
++++ b/net/tap.c
+@@ -651,6 +651,9 @@ static void net_init_tap_one(const NetdevTapOptions *tap, NetClientState *peer,
+     tap_set_sndbuf(s->fd, tap, &err);
+     if (err) {
+         error_propagate(errp, err);
++        if (!tap->has_fd && !tap->has_fds) {
++            close(fd);
++        }
+         return;
+     }
+ 
+@@ -687,14 +690,14 @@ static void net_init_tap_one(const NetdevTapOptions *tap, NetClientState *peer,
+             vhostfd = monitor_fd_param(cur_mon, vhostfdname, &err);
+             if (vhostfd == -1) {
+                 error_propagate(errp, err);
+-                return;
++                goto cleanup;
+             }
+         } else {
+             vhostfd = open("/dev/vhost-net", O_RDWR);
+             if (vhostfd < 0) {
+                 error_setg_errno(errp, errno,
+                                  "tap: open vhost char device failed");
+-                return;
++                goto cleanup;
+             }
+             fcntl(vhostfd, F_SETFL, O_NONBLOCK);
+         }
+@@ -704,11 +707,18 @@ static void net_init_tap_one(const NetdevTapOptions *tap, NetClientState *peer,
+         if (!s->vhost_net) {
+             error_setg(errp,
+                        "vhost-net requested but could not be initialized");
+-            return;
++            goto cleanup;
+         }
+     } else if (vhostfdname) {
+         error_setg(errp, "vhostfd(s)= is not valid without vhost");
+     }
++
++cleanup:
++    if (!tap->has_fd && !tap->has_fds && tap->has_vhostforce &&
++        tap->vhostforce) {
++        close(fd);
++    }
++    return;
+ }
+ 
+ static int get_fds(char *str, char *fds[], int max)
+@@ -877,7 +887,6 @@ free_fail:
+                          vnet_hdr, fd, &err);
+         if (err) {
+             error_propagate(errp, err);
+-            close(fd);
+             return -1;
+         }
+     } else {
+@@ -916,7 +925,6 @@ free_fail:
+                              vhostfdname, vnet_hdr, fd, &err);
+             if (err) {
+                 error_propagate(errp, err);
+-                close(fd);
+                 return -1;
+             }
+         }
+-- 
+1.8.3.1
