@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53717)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47031)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1ea2XS-0005Fu-OJ
-	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 11:50:43 -0500
+	(envelope-from <veaceslav.falico@huawei.com>) id 1ea0tq-0007tF-RK
+	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 10:05:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1ea2XR-0002nh-1i
-	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 11:50:42 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:51442)
+	(envelope-from <veaceslav.falico@huawei.com>) id 1ea0tm-0003Bo-U3
+	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 10:05:42 -0500
+Received: from lhrrgout.huawei.com ([194.213.3.17]:38573 helo=huawei.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1ea2XQ-0002mo-RE
-	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 11:50:40 -0500
-Date: Fri, 12 Jan 2018 16:50:29 +0000
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20180112165029.GP17392@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <20180112125854.18261-1-kraxel@redhat.com>
-	<20180112125854.18261-13-kraxel@redhat.com>
-	<CAFEAcA94QnxHqnhwEzY=U4eiSs5agnEbi8TSViQ8kk=ywEW5Dg@mail.gmail.com>
+	(Exim 4.71) (envelope-from <veaceslav.falico@huawei.com>)
+	id 1ea0tm-000322-LH
+	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 10:05:38 -0500
+From: Veaceslav Falico <veaceslav.falico@huawei.com>
+Date: Fri, 12 Jan 2018 15:05:24 +0000
+Message-ID: <C161AD53546ABF4DBF9240B4479814F577E17A1B@lhreml502-mbb>
+References: <081955e1-84ec-4877-72d4-f4e8b46be350@huawei.com>
+	<20180112142722.GG17392@redhat.com>
+In-Reply-To: <20180112142722.GG17392@redhat.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <CAFEAcA94QnxHqnhwEzY=U4eiSs5agnEbi8TSViQ8kk=ywEW5Dg@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PULL 12/14] ui: place a hard cap on VNC server
- output buffer size
+Subject: Re: [Qemu-devel] [RFC] qid path collision issues in 9pfs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,34 +29,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Gerd Hoffmann <kraxel@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
+To: "Daniel P. Berrange" <berrange@redhat.com>, "Antonios Motakis (Tony)" <Antonios.Motakis@huawei.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Greg Kurz <groug@kaod.org>, "zhangwei (CR)" <zhangwei555@huawei.com>, Eduard Shishkin <Eduard.Shishkin@huawei.com>, "Wangguoli (Andy)" <andy.wangguoli@huawei.com>, Jiangyiwen <jiangyiwen@huawei.com>, "vfalico@gmail.com" <vfalico@gmail.com>, Jani Kokkonen <Jani.Kokkonen@huawei.com>, "v9fs-developer@lists.sourceforge.net" <v9fs-developer@lists.sourceforge.net>
 
-On Fri, Jan 12, 2018 at 04:40:32PM +0000, Peter Maydell wrote:
-> On 12 January 2018 at 12:58, Gerd Hoffmann <kraxel@redhat.com> wrote:
-> > From: "Daniel P. Berrange" <berrange@redhat.com>
-> 
-> Hi Dan: just FYI:
-> 
-> > The previous patches fix problems with throttling of forced framebuffer updates
-> > and audio data capture that would cause the QEMU output buffer size to grow
-> > without bound. Those fixes are graceful in that once the client catches up with
-> > reading data from the server, everything continues operating normally.
-> 
-> 12345678901234567890123456789012345678901234567890123456789012345678901234567890
->          1         2         3         4         5         6         7         8
-> 
-> Your wrap settings on your editor for git commit messages seem to be a
-> bit mis-set -- wrapping around 72 cols or so is recommended.
-> 
-> I've applied the pullreq but noticed in passing that git log wraps
-> a bit awkwardly on an 80-column xterm.
-
-Thanks, I'll see about fixing that
-
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+KHNvcnJ5IGZvciB0b3AgcG9zdGluZyBhbmQgb3V0bG9vaywgc2lnaC4uLikNCihhZGRpbmcgdjlm
+cy1kZXZlbG9wZXIgbGlzdCB0byB0aGUgbG9vcCkNCg0KVGhlIGNydWNpYWwgcGFydCBoZXJlIGlz
+IGZzY2FjaGUsIHdoaWNoIHN0b3JlcyBpbm9kZXMgZ3Vlc3Qtc2lkZSBieSBrZXkvYXV4DQpmcm9t
+IHFpZCAoa2V5ID0gcGF0aCwgYXV4ID0gdmVyc2lvbikuDQoNCldpdGhvdXQgZnNjYWNoZSwgdGhl
+cmUgd291bGQgYWx3YXlzIGJlIGEgZGlyZWN0b3J5IHRyYXZlcnNhbCBhbmQgd2UncmUgc2FmZQ0K
+ZnJvbSAqdGhpcyBraW5kKiBvZiBzaXR1YXRpb24uDQoNCldpdGggZnNjYWNoZSwgZmlyc3QgaW5v
+ZGUgdG8gZ2V0IGluIGNhY2hlIHdpbGwgYWx3YXlzIHJlc3BvbmQgdG8gaW5vZGUgbnVtYmVyDQph
+bmQgdmVyc2lvbiBwYWlyLCBldmVuIHdpdGggZGlmZmVyZW50IGRldmljZSBpZHMuDQoNCklmIHdl
+IHdvdWxkIGJlIGFibGUgdG8gc29tZWhvdyBnZXQvcHJvdmlkZSBkZXZpY2UgaWQgZnJvbSBob3N0
+IHRvIGd1ZXN0LA0KYSBzaW1wbGUgbW9kaWZpY2F0aW9uIG9mIGZzY2FjaGUgYXV4IHZlcmlmaWNh
+dGlvbiBoYW5kbGluZyB3b3VsZCBzdWZmaWNlLg0KDQpIb3dldmVyLCBJIGNhbid0IGN1cnJlbnRs
+eSBjb21lIHVwIHdpdGggYW4gaWRlYSBvbiBob3cgZXhhY3RseSBjb3VsZCB3ZSBnZXQNCnRoYXQg
+aW5mb3JtYXRpb24gZ3Vlc3Qtc2lkZS4gTWF5YmUgdXNlIGRlbnRyeSdzIHFpZC0+dmVyc2lvbiAo
+bm90IHVzZWQNCmN1cnJlbnRseSkgdG8gdHJhbnNtaXQgdGhpcywgYW5kIHBvcHVsYXRlIHY5ZnMg
+aW5vZGVzJyBjYWNoZXMgZHVyaW5nIA0Kd2Fsay9yZWFkZGlyL2V0Yy4/DQoNCi0tLS0tT3JpZ2lu
+YWwgTWVzc2FnZS0tLS0tDQpGcm9tOiBEYW5pZWwgUC4gQmVycmFuZ2UgW21haWx0bzpiZXJyYW5n
+ZUByZWRoYXQuY29tXSANClNlbnQ6IEZyaWRheSwgSmFudWFyeSAxMiwgMjAxOCAzOjI3IFBNDQpU
+bzogQW50b25pb3MgTW90YWtpcyAoVG9ueSkNCkNjOiBxZW11LWRldmVsQG5vbmdudS5vcmc7IEdy
+ZWcgS3Vyejsgemhhbmd3ZWkgKENSKTsgVmVhY2VzbGF2IEZhbGljbzsgRWR1YXJkIFNoaXNoa2lu
+OyBXYW5nZ3VvbGkgKEFuZHkpOyBKaWFuZ3lpd2VuOyB2ZmFsaWNvQGdtYWlsLmNvbTsgSmFuaSBL
+b2trb25lbg0KU3ViamVjdDogUmU6IFtRZW11LWRldmVsXSBbUkZDXSBxaWQgcGF0aCBjb2xsaXNp
+b24gaXNzdWVzIGluIDlwZnMNCg0KT24gRnJpLCBKYW4gMTIsIDIwMTggYXQgMDc6MzI6MTBQTSAr
+MDgwMCwgQW50b25pb3MgTW90YWtpcyB3cm90ZToNCj4gSGVsbG8gYWxsLA0KPiANCj4gV2UgaGF2
+ZSBmb3VuZCBhbiBpc3N1ZSBpbiB0aGUgOXAgaW1wbGVtZW50YXRpb24gb2YgUUVNVSwgd2l0aCBo
+b3cgcWlkIHBhdGhzDQo+IGFyZSBnZW5lcmF0ZWQsIHdoaWNoIGNhbiBjYXVzZSBxaWQgcGF0aCBj
+b2xsaXNpb25zIGFuZCBzZXZlcmFsIGlzc3VlcyBjYXVzZWQNCj4gYnkgdGhlbS4gSW4gb3VyIHVz
+ZSBjYXNlIChydW5uaW5nIGNvbnRhaW5lcnMgdW5kZXIgVk1zKSB0aGVzZSBoYXZlIHByb3ZlbiB0
+bw0KPiBiZSBjcml0aWNhbC4NCj4gDQo+IEluIHBhcnRpY3VsYXIsIHN0YXRfdG9fcWlkIGluIGh3
+LzlwZnMvOXAuYyBnZW5lcmF0ZXMgYSBxaWQgcGF0aCB1c2luZyB0aGUNCj4gaW5vZGUgbnVtYmVy
+IG9mIHRoZSBmaWxlIGFzIGlucHV0LiBBY2NvcmRpbmcgdG8gdGhlIDlwIHNwZWMgdGhlIHBhdGgg
+c2hvdWxkDQo+IGJlIGFibGUgdG8gdW5pcXVlbHkgaWRlbnRpZnkgYSBmaWxlLCBkaXN0aW5jdCBm
+aWxlcyBzaG91bGQgbm90IHNoYXJlIGEgcGF0aA0KPiB2YWx1ZS4NCj4gDQo+IFRoZSBjdXJyZW50
+IGltcGxlbWVudGF0aW9uIHRoYXQgZGVmaW5lcyBxaWQucGF0aCA9IGlub2RlIG5yIHdvcmtzIGZp
+bmUgYXMgbG9uZyBhcyB0aGVyZSBhcmUgbm90IGZpbGVzIGZyb20gbXVsdGlwbGUgcGFydGl0aW9u
+cyB2aXNpYmxlIHVuZGVyIHRoZSA5cCBzaGFyZS4gSW4gdGhhdCBjYXNlLCBkaXN0aW5jdCBmaWxl
+cyBmcm9tIGRpZmZlcmVudCBkZXZpY2VzIGFyZSBhbGxvd2VkIHRvIGhhdmUgdGhlIHNhbWUgaW5v
+ZGUgbnVtYmVyLiBTbyB3aXRoIG11bHRpcGxlIHBhcnRpdGlvbnMsIHdlIGhhdmUgYSB2ZXJ5IGhp
+Z2ggcHJvYmFiaWxpdHkgb2YgcWlkIHBhdGggY29sbGlzaW9ucy4NCj4gDQo+IEhvdyB0byBkZW1v
+bnN0cmF0ZSB0aGUgaXNzdWU6DQo+IDEpIFByZXBhcmUgYSBwcm9ibGVtYXRpYyBzaGFyZToNCj4g
+IC0gbW91bnQgb25lIHBhcnRpdGlvbiB1bmRlciBzaGFyZS9wMS8gd2l0aCBzb21lIGZpbGVzIGlu
+c2lkZQ0KPiAgLSBtb3VudCBhbm90aGVyIG9uZSAqd2l0aCBpZGVudGljYWwgY29udGVudHMqIHVu
+ZGVyIHNoYXJlL3AyLw0KPiAgLSBjb25maXJtIHRoYXQgYm90aCBwYXJ0aXRpb25zIGhhdmUgZmls
+ZXMgd2l0aCBzYW1lIGlub2RlIG5yLCBzaXplLCBldGMNCj4gMikgRGVtb25zdHJhdGUgYnJlYWth
+Z2U6DQo+ICAtIHN0YXJ0IGEgVk0gd2l0aCBhIHZpcnRpby05cCBwb2ludGluZyB0byB0aGUgc2hh
+cmUNCj4gIC0gbW91bnQgOXAgc2hhcmUgd2l0aCBGU0NBQ0hFIG9uDQo+ICAtIGtlZXAgb3BlbiBz
+aGFyZS9wMS9maWxlDQo+ICAtIG9wZW4gYW5kIHdyaXRlIHRvIHNoYXJlL3AyL2ZpbGUNCj4gDQo+
+IFdoYXQgc2hvdWxkIGhhcHBlbiBpcywgdGhlIGd1ZXN0IHdpbGwgY29uc2lkZXIgc2hhcmUvcDEv
+ZmlsZSBhbmQNCj4gc2hhcmUvcDIvZmlsZSB0byBiZSB0aGUgc2FtZSBmaWxlLCBhbmQgc2luY2Ug
+d2UgYXJlIHVzaW5nIHRoZSBjYWNoZSBpdCB3aWxsDQo+IG5vdCByZW9wZW4gaXQuIFdlIGludGVu
+ZGVkIHRvIHdyaXRlIHRvIHBhcnRpdGlvbiAyLCBidXQgd2UganVzdCB3cm90ZSB0bw0KPiBwYXJ0
+aXRpb24gMS4gVGhpcyBpcyBqdXN0IG9uZSBleGFtcGxlIG9uIGhvdyB0aGUgZ3Vlc3QgbWF5IHJl
+bHkgb24gcWlkIHBhdGhzDQo+IGJlaW5nIHVuaXF1ZS4NCg0KT3VjaCwgdGhpcyBpcyBhIHNlcmlv
+dXMgc2VjdXJpdHkgYnVnLiBUaGUgZ3Vlc3QgdXNlciB3aG8gaGFzIHAxL2ZpbGUgb3BlbiBtYXkN
+CmhhdmUgZGlmZmVyZW50IHByaXZpbGVnZSBsZXZlbCB0byB0aGUgZ3Vlc3QgdXNlciB3aG8gdHJp
+ZWQgdG8gYWNjZXNzIHAyL2ZpbGUuDQpTbyB0aGlzIGZsYXcgY2FuIGJlIHVzZWQgZm9yIHByaXZp
+bGVnZSBlc2NhbGF0aW9uIGFuZC9vciBjb25maW5lbWVudCBlc2NhcGUNCmJ5IGEgbWFsaWNpb3Vz
+IGd1ZXN0IHVzZXIuDQoNCj4gV2UgaGF2ZSB0aG91Z2h0IG9mIGEgZmV3IGFwcHJvYWNoZXMsIGJ1
+dCB3ZSB3b3VsZCBkZWZpbml0ZWx5IGxpa2UgdG8gaGVhcg0KPiB3aGF0IHRoZSB1cHN0cmVhbSBt
+YWludGFpbmVycyBhbmQgY29tbXVuaXR5IHRoaW5rOg0KPiANCj4gKiBGdWxsIGZpeDogQ2hhbmdl
+IHRoZSA5cCBwcm90b2NvbA0KPiANCj4gV2Ugd291bGQgbmVlZCB0byBzdXBwb3J0IGEgbG9uZ2Vy
+IHFpZCBwYXRoLCBiYXNlZCBvbiBhIHZpcnRpbyBmZWF0dXJlIGZsYWcuDQo+IFRoaXMgd291bGQg
+dGFrZSByZXdvcmtpbmcgb2YgaG9zdCBhbmQgZ3Vlc3QgcGFydHMgb2YgdmlydGlvLTlwLCBzbyBi
+b3RoIFFFTVUNCj4gYW5kIExpbnV4IGZvciBtb3N0IHVzZXJzLg0KDQpSZXF1aXJpbmcgdXBkYXRl
+ZCBndWVzdCBmZWVscyB1bnBsZWFzYW50IGJlY2F1c2Ugb2YgdGhlIGNvLW9yZGluYXRpb24gcmVx
+dWlyZWQNCnRvIGdldCB0aGUgc2VjdXJpdHkgZml4IGFwcGxpZWQuIFNvIGV2ZW4gaWYgd2UgZG8g
+dGhhdCwgSU1ITywgd2UgbXVzdCBhbHNvDQpoYXZlIGEgZml4IGluIFFFTVUgdGhhdCBkb2VzIG5v
+dCByZXF1aXJlIGd1ZXN0IHVwZGF0ZS4NCg0KPiANCj4gKiBGYWxsYmFjayBhbmQvb3IgaW50ZXJp
+bSBzb2x1dGlvbnMNCj4gDQo+IEEgdmlydGlvIGZlYXR1cmUgZmxhZyBtYXkgYmUgcmVmdXNlZCBi
+eSB0aGUgZ3Vlc3QsIHNvIHdlIHRoaW5rIHdlIHN0aWxsIG5lZWQNCj4gdG8gbWFrZSBjb2xsaXNp
+b25zIGxlc3MgbGlrZWx5IGV2ZW4gd2l0aCA2NCBiaXQgcGF0aHMuIEUuZy4NCj4gMS4gWE9SIHRo
+ZSBkZXZpY2UgaWQgd2l0aCBpbm9kZSBuciB0byBwcm9kdWNlIHRoZSBxaWQgcGF0aCAod2UgYXR0
+YWNoIGEgcHJvb2YNCj4gb2YgY29uY2VwdCBwYXRjaCkNCg0KVGhhdCBqdXN0IG1ha2VzIGNvbGxp
+c2lvbiBsZXNzIGxpa2VseSwgYnV0IGRvZXNudCBndWFyYW50ZWUgaXRzIGVsaW1pbmF0ZWQNCmFu
+ZCBpdHMgcHJvYmFibHkgcHJhY3RpY2FsIGZvciBndWVzdHMgdG8gYnJ1dGVmb3JjZSBjb2xsaXNp
+b25zIGRlcGVuZGluZyBvbg0KaG93IG1hbnkgZGlmZmVyZW50IEZTIGFyZSBwYXNzZWQgdGhyb3Vn
+aCAmIG51bWJlciBvZiBmaWxlcyB0aGF0IGNhbiBiZQ0Kb3BlbmVkIGNvbmN1cnJlbnRseQ0KDQo+
+IDIuIDY0IGJpdCBoYXNoIG9mIGRldmljZSBpZCBhbmQgaW5vZGUgbnINCg0KVGhpcyBpcyBwcm9i
+YWJseSBiZXR0ZXIgdGhhbiAoMSksIGJ1dCBhIDY0LWJpdCBoYXNoIGFsZ29yaXRobSBpcyBmYWly
+bHkgd2Vhaw0Kd3J0IGNvbGxpc2lvbiByZXNpc3RhbmNlIHdoZW4geW91IGhhdmUgYSBsYXJnZSBu
+dW1iZXIgb2YgZmlsZXMuDQoNCj4gMy4gb3RoZXIgaWRlYXMsIHN1Y2ggYXMgYWxsb2NhdGluZyBu
+ZXcgcWlkIHBhdGhzIGFuZCBrZWVwIGEgbG9vayB1cCB0YWJsZSBvZg0KPiBzb21lIHNvcnRzIChw
+b3NzaWJseSB0b28gZXhwZW5zaXZlKQ0KDQpJIHRoaW5rIFFFTVUgd2lsbCBoYXZlIHRvIG1haW50
+YWluIGEgbG9va3VwIHRhYmxlIG9mIGZpbGVzIHRoYXQgYXJlIGN1cnJlbnRseQ0Kb3BlbiwgYW5k
+IHRoZWlyIGFzc29jaWF0ZWQgcWlkcywgaW4gb3JkZXIgdG8gcHJvdmlkZSBhIHJlYWwgZ3VhcmFu
+dGVlIHRoYXQNCnRoZSBzZWN1cml0eSBmbGF3IGlzIGFkZHJlc3NlZC4NCg0KUmVnYXJkcywNCkRh
+bmllbA0KLS0gDQp8OiBodHRwczovL2JlcnJhbmdlLmNvbSAgICAgIC1vLSAgICBodHRwczovL3d3
+dy5mbGlja3IuY29tL3Bob3Rvcy9kYmVycmFuZ2UgOnwNCnw6IGh0dHBzOi8vbGlidmlydC5vcmcg
+ICAgICAgICAtby0gICAgICAgICAgICBodHRwczovL2ZzdG9wMTM4LmJlcnJhbmdlLmNvbSA6fA0K
+fDogaHR0cHM6Ly9lbnRhbmdsZS1waG90by5vcmcgICAgLW8tICAgIGh0dHBzOi8vd3d3Lmluc3Rh
+Z3JhbS5jb20vZGJlcnJhbmdlIDp8DQo=
