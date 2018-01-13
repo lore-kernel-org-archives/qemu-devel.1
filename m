@@ -1,18 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34244)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34324)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1ea9vH-0003pJ-9F
-	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 19:43:48 -0500
+	(envelope-from <laurent@vivier.eu>) id 1ea9vN-0003u9-DF
+	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 19:43:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1ea9vE-0006Nd-5J
-	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 19:43:47 -0500
-Received: from mout.kundenserver.de ([212.227.17.10]:55494)
+	(envelope-from <laurent@vivier.eu>) id 1ea9vM-0006aM-2V
+	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 19:43:53 -0500
+Received: from mout.kundenserver.de ([212.227.17.10]:60973)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1ea9vD-0006Kv-Rr
-	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 19:43:44 -0500
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1ea9vL-0006Yg-NE
+	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 19:43:51 -0500
 From: Laurent Vivier <laurent@vivier.eu>
-Date: Sat, 13 Jan 2018 01:43:31 +0100
-Message-Id: <20180113004338.16867-1-laurent@vivier.eu>
-Subject: [Qemu-devel] [PATCH v2 0/7] target/m68k: supervisor mode (part 2)
+Date: Sat, 13 Jan 2018 01:43:36 +0100
+Message-Id: <20180113004338.16867-6-laurent@vivier.eu>
+In-Reply-To: <20180113004338.16867-1-laurent@vivier.eu>
+References: <20180113004338.16867-1-laurent@vivier.eu>
+Subject: [Qemu-devel] [PATCH v2 5/7] target/m68k: add moves
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,124 +26,264 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Thomas Huth <huth@tuxfamily.org>, Laurent Vivier <laurent@vivier.eu>
 
-This series introduces the MC68040 MMU.
+and introduce SFC and DFC control registers.
 
-But first of all, we need to modify the prototype
-of tlb_fill() and handle_mmu_fault handler to pass
-the size of the access. MC68040 stores this value
-in the exception stack frame.
+Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+---
+v2: copy bit 2 of SFC and DFC to tb->flags to
+    inline memory access in moves decoder.
 
-Following patches add:
-- MMU page table and fault handlers,
-- Transparent Translation Registers
-- instruction "moves" to move data
-  between user and kernel space
-- instructions pflush/ptest, to flush TLB and
-  convert virtual address to physical address
-- "info tlb" HMP command
+ target/m68k/cpu.h       | 10 ++++--
+ target/m68k/helper.c    | 10 ++++++
+ target/m68k/monitor.c   |  2 ++
+ target/m68k/op_helper.c |  4 +--
+ target/m68k/qregs.def   |  2 ++
+ target/m68k/translate.c | 88 +++++++++++++++++++++++++++++++++++++++++++++++--
+ 6 files changed, 109 insertions(+), 7 deletions(-)
 
-I have tested it doesn't break QEMU linux-user mode
-emulation and coldfire softmmu machine.
-
-With the help of these patches I'm able to start
-a debian etch-m68k, but the following patches
-are still missing in master:
-- m68k softfloat series
-- Quadra 800 machine emulation series
-  (VIA emulation, Nubus emulation,
-   ESCC control/data address bit selector,
-   video card emulation, ESP Pseudo-DMA,
-   SWIM floppy controller, Apple Sound Chip
-   emulation, and some big-endian fixes for
-   dp8393x)
-
-v2: use "0" for the access size when we don't know
-    the size of the access
-    move mmu_fault to CPUM68KState
-    set TARGET_PAGE_BITS to 12 to avoid tlb_add_large_page() path
-    use -page_size to mask address instead of TARGET_PAGE_MASK
-    add ACCESS_DEBUG to not update page table USED/MODIFIED bits
-    on gdb access
-    rename ACCESS_INT to ACCESS_DATA
-    add index parameter to gen_load()/gen_store()
-    copy bit 2 of SFC and DFC to tb->flags to
-    inline memory access in moves decoder
-    change ACCESS_PTEST value because of new ACCESS_DEBUG
-
-Laurent Vivier (7):
-  accel/tcg: add size paremeter in tlb_fill()
-  target/m68k: add MC68040 MMU
-  target/m68k: add Transparent Translation
-  target/m68k: add index parameter to gen_load()/gen_store() and Co.
-  target/m68k: add moves
-  target/m68k: add pflush/ptest
-  target/m68k: add HMP command "info tlb"
-
- accel/tcg/cputlb.c            |  13 +-
- accel/tcg/softmmu_template.h  |  14 +-
- accel/tcg/user-exec.c         |   2 +-
- hmp-commands-info.hx          |   2 +-
- include/exec/exec-all.h       |   6 +-
- include/qom/cpu.h             |   2 +-
- target/alpha/cpu.h            |   2 +-
- target/alpha/helper.c         |   4 +-
- target/alpha/mem_helper.c     |   6 +-
- target/arm/cpu.c              |   4 +-
- target/arm/op_helper.c        |   4 +-
- target/cris/cpu.h             |   2 +-
- target/cris/helper.c          |   4 +-
- target/cris/op_helper.c       |   6 +-
- target/hppa/cpu.h             |   3 +-
- target/hppa/helper.c          |   2 +-
- target/hppa/op_helper.c       |   2 +-
- target/i386/cpu.h             |   2 +-
- target/i386/excp_helper.c     |   4 +-
- target/i386/mem_helper.c      |   6 +-
- target/lm32/cpu.h             |   2 +-
- target/lm32/helper.c          |   2 +-
- target/lm32/op_helper.c       |   6 +-
- target/m68k/cpu.c             |   4 +-
- target/m68k/cpu.h             | 145 +++++++++-
- target/m68k/helper.c          | 604 +++++++++++++++++++++++++++++++++++++++++-
- target/m68k/helper.h          |   2 +
- target/m68k/monitor.c         |  22 ++
- target/m68k/op_helper.c       | 101 ++++++-
- target/m68k/qregs.def         |   2 +
- target/m68k/translate.c       | 247 ++++++++++++-----
- target/microblaze/cpu.h       |   2 +-
- target/microblaze/helper.c    |   4 +-
- target/microblaze/op_helper.c |   6 +-
- target/mips/helper.c          |   2 +-
- target/mips/internal.h        |   2 +-
- target/mips/op_helper.c       |  10 +-
- target/moxie/cpu.h            |   2 +-
- target/moxie/helper.c         |  10 +-
- target/nios2/cpu.h            |   2 +-
- target/nios2/helper.c         |   6 +-
- target/nios2/mmu.c            |   6 +-
- target/openrisc/cpu.h         |   2 +-
- target/openrisc/mmu.c         |   8 +-
- target/openrisc/mmu_helper.c  |   6 +-
- target/ppc/cpu.h              |   2 +-
- target/ppc/mmu_helper.c       |   4 +-
- target/ppc/user_only_helper.c |   2 +-
- target/s390x/excp_helper.c    |   4 +-
- target/s390x/internal.h       |   2 +-
- target/s390x/mem_helper.c     |   8 +-
- target/sh4/cpu.h              |   2 +-
- target/sh4/helper.c           |   4 +-
- target/sh4/op_helper.c        |   6 +-
- target/sparc/cpu.h            |   2 +-
- target/sparc/ldst_helper.c    |   6 +-
- target/sparc/mmu_helper.c     |   6 +-
- target/tilegx/cpu.c           |   4 +-
- target/tricore/op_helper.c    |   4 +-
- target/unicore32/cpu.h        |   2 +-
- target/unicore32/helper.c     |   2 +-
- target/unicore32/op_helper.c  |   6 +-
- target/unicore32/softmmu.c    |   2 +-
- target/xtensa/op_helper.c     |   4 +-
- 64 files changed, 1166 insertions(+), 201 deletions(-)
-
+diff --git a/target/m68k/cpu.h b/target/m68k/cpu.h
+index 4cb75f558e..4f09888de4 100644
+--- a/target/m68k/cpu.h
++++ b/target/m68k/cpu.h
+@@ -138,6 +138,8 @@ typedef struct CPUM68KState {
+     uint32_t mbar;
+     uint32_t rambar0;
+     uint32_t cacr;
++    uint32_t sfc;
++    uint32_t dfc;
+ 
+     int pending_vector;
+     int pending_level;
+@@ -547,8 +549,12 @@ static inline void cpu_get_tb_cpu_state(CPUM68KState *env, target_ulong *pc,
+ {
+     *pc = env->pc;
+     *cs_base = 0;
+-    *flags = (env->sr & SR_S)                   /* Bit  13 */
+-            | ((env->macsr >> 4) & 0xf);        /* Bits 0-3 */
++    *flags = (env->macsr >> 4) & 0xf;           /* Bits 0-3 */
++    if (env->sr & SR_S) {
++        *flags |= SR_S;                         /* Bit  13 */
++        *flags |= (env->sfc & 4) << 12;         /* Bit  14 */
++        *flags |= (env->dfc & 4) << 13;         /* Bit  15 */
++    }
+ }
+ 
+ #endif
+diff --git a/target/m68k/helper.c b/target/m68k/helper.c
+index f1d50e54b1..c1bd0e9681 100644
+--- a/target/m68k/helper.c
++++ b/target/m68k/helper.c
+@@ -203,6 +203,12 @@ void HELPER(m68k_movec_to)(CPUM68KState *env, uint32_t reg, uint32_t val)
+ 
+     switch (reg) {
+     /* MC680[1234]0 */
++    case M68K_CR_SFC:
++        env->sfc = val & 7;
++        return;
++    case M68K_CR_DFC:
++        env->dfc = val & 7;
++        return;
+     case M68K_CR_VBR:
+         env->vbr = val;
+         return;
+@@ -254,6 +260,10 @@ uint32_t HELPER(m68k_movec_from)(CPUM68KState *env, uint32_t reg)
+ 
+     switch (reg) {
+     /* MC680[1234]0 */
++    case M68K_CR_SFC:
++        return env->sfc;
++    case M68K_CR_DFC:
++        return env->dfc;
+     case M68K_CR_VBR:
+         return env->vbr;
+     /* MC680[234]0 */
+diff --git a/target/m68k/monitor.c b/target/m68k/monitor.c
+index a20af6b09c..c31feb4b02 100644
+--- a/target/m68k/monitor.c
++++ b/target/m68k/monitor.c
+@@ -31,6 +31,8 @@ static const MonitorDef monitor_defs[] = {
+     { "ssp", offsetof(CPUM68KState, sp[0]) },
+     { "usp", offsetof(CPUM68KState, sp[1]) },
+     { "isp", offsetof(CPUM68KState, sp[2]) },
++    { "sfc", offsetof(CPUM68KState, sfc) },
++    { "dfc", offsetof(CPUM68KState, dfc) },
+     { "urp", offsetof(CPUM68KState, mmu.urp) },
+     { "srp", offsetof(CPUM68KState, mmu.srp) },
+     { "dttr0", offsetof(CPUM68KState, mmu.ttr[M68K_DTTR0]) },
+diff --git a/target/m68k/op_helper.c b/target/m68k/op_helper.c
+index f023901061..4609caa546 100644
+--- a/target/m68k/op_helper.c
++++ b/target/m68k/op_helper.c
+@@ -399,8 +399,8 @@ static void m68k_interrupt_all(CPUM68KState *env, int is_hw)
+         env->mmu.fault = false;
+         if (qemu_loglevel_mask(CPU_LOG_INT)) {
+             qemu_log("            "
+-                     "ssw:  %08x ea:   %08x\n",
+-                     env->mmu.ssw, env->mmu.ar);
++                     "ssw:  %08x ea:   %08x sfc:  %d    dfc: %d\n",
++                     env->mmu.ssw, env->mmu.ar, env->sfc, env->dfc);
+         }
+     } else if (cs->exception_index == EXCP_ADDRESS) {
+         do_stack_frame(env, &sp, 2, oldsr, 0, retaddr);
+diff --git a/target/m68k/qregs.def b/target/m68k/qregs.def
+index 1aadc622db..efe2bf90ee 100644
+--- a/target/m68k/qregs.def
++++ b/target/m68k/qregs.def
+@@ -1,5 +1,7 @@
+ DEFO32(PC, pc)
+ DEFO32(SR, sr)
++DEFO32(DFC, dfc)
++DEFO32(SFC, sfc)
+ DEFO32(CC_OP, cc_op)
+ DEFO32(CC_X, cc_x)
+ DEFO32(CC_C, cc_c)
+diff --git a/target/m68k/translate.c b/target/m68k/translate.c
+index d6625324c8..6972913984 100644
+--- a/target/m68k/translate.c
++++ b/target/m68k/translate.c
+@@ -48,6 +48,8 @@ static char cpu_reg_names[2 * 8 * 3 + 5 * 4];
+ static TCGv cpu_dregs[8];
+ static TCGv cpu_aregs[8];
+ static TCGv_i64 cpu_macc[4];
++static TCGv QEMU_DFC;
++static TCGv QEMU_SFC;
+ 
+ #define REG(insn, pos)  (((insn) >> (pos)) & 7)
+ #define DREG(insn, pos) cpu_dregs[REG(insn, pos)]
+@@ -103,6 +105,10 @@ void m68k_tcg_init(void)
+         p += 5;
+     }
+ 
++    QEMU_DFC = tcg_global_mem_new(cpu_env, offsetof(CPUM68KState, dfc),
++                                  "DFC");
++    QEMU_SFC = tcg_global_mem_new(cpu_env, offsetof(CPUM68KState, sfc),
++                                  "SFC");
+     NULL_QREG = tcg_global_mem_new(cpu_env, -4, "NULL");
+     store_dummy = tcg_global_mem_new(cpu_env, -8, "NULL");
+ }
+@@ -115,7 +121,9 @@ typedef struct DisasContext {
+     int is_jmp;
+     CCOp cc_op; /* Current CC operation */
+     int cc_op_synced;
+-    int user;
++#if defined(CONFIG_SOFTMMU)
++    uint32_t user;
++#endif
+     struct TranslationBlock *tb;
+     int singlestep_enabled;
+     TCGv_i64 mactmp;
+@@ -178,7 +186,15 @@ static void do_writebacks(DisasContext *s)
+ #if defined(CONFIG_USER_ONLY)
+ #define IS_USER(s) 1
+ #else
+-#define IS_USER(s) s->user
++#define M68K_USER_FROM_MSR 0x01
++#define M68K_USER_FROM_SFC 0x02
++#define M68K_USER_FROM_DFC 0x04
++
++#define IS_USER(s)   (!!(s->user & M68K_USER_FROM_MSR))
++#define SFC_INDEX(s) ((s->user & M68K_USER_FROM_SFC) ? \
++                      MMU_USER_IDX : MMU_KERNEL_IDX)
++#define DFC_INDEX(s) ((s->user & M68K_USER_FROM_DFC) ? \
++                      MMU_USER_IDX : MMU_KERNEL_IDX)
+ #endif
+ 
+ typedef void (*disas_proc)(CPUM68KState *env, DisasContext *s, uint16_t insn);
+@@ -4452,6 +4468,64 @@ DISAS_INSN(move_from_sr)
+ }
+ 
+ #if defined(CONFIG_SOFTMMU)
++DISAS_INSN(moves)
++{
++    int opsize;
++    uint16_t ext;
++    TCGv reg;
++    TCGv addr;
++    int extend;
++
++    if (IS_USER(s)) {
++        gen_exception(s, s->insn_pc, EXCP_PRIVILEGE);
++        return;
++    }
++
++    ext = read_im16(env, s);
++
++    opsize = insn_opsize(insn);
++
++    if (ext & 0x8000) {
++        /* address register */
++        reg = AREG(ext, 12);
++        extend = 1;
++    } else {
++        /* data register */
++        reg = DREG(ext, 12);
++        extend = 0;
++    }
++
++    addr = gen_lea(env, s, insn, opsize);
++    if (IS_NULL_QREG(addr)) {
++        gen_addr_fault(s);
++        return;
++    }
++
++    if (ext & 0x0800) {
++        /* from reg to ea */
++        gen_store(s, opsize, addr, reg, DFC_INDEX(s));
++    } else {
++        /* from ea to reg */
++        TCGv tmp = gen_load(s, opsize, addr, 0, SFC_INDEX(s));
++        if (extend) {
++            gen_ext(reg, tmp, opsize, 1);
++        } else {
++            gen_partset_reg(opsize, reg, tmp);
++        }
++    }
++    switch (extract32(insn, 3, 3)) {
++    case 3: /* Indirect postincrement.  */
++        tcg_gen_addi_i32(AREG(insn, 0), addr,
++                         REG(insn, 0) == 7 && opsize == OS_BYTE
++                         ? 2
++                         : opsize_bytes(opsize));
++        break;
++    case 4: /* Indirect predecrememnt.  */
++        tcg_gen_mov_i32(AREG(insn, 0), addr);
++        break;
++    }
++}
++
+ DISAS_INSN(move_to_sr)
+ {
+     if (IS_USER(s)) {
+@@ -5604,6 +5678,9 @@ void register_m68k_insns (CPUM68KState *env)
+     BASE(bitop_im,  08c0, ffc0);
+     INSN(arith_im,  0a80, fff8, CF_ISA_A);
+     INSN(arith_im,  0a00, ff00, M68000);
++#if defined(CONFIG_SOFTMMU)
++    INSN(moves,     0e00, ff00, M68000);
++#endif
+     INSN(cas,       0ac0, ffc0, CAS);
+     INSN(cas,       0cc0, ffc0, CAS);
+     INSN(cas,       0ec0, ffc0, CAS);
+@@ -5825,7 +5902,11 @@ void gen_intermediate_code(CPUState *cs, TranslationBlock *tb)
+     dc->cc_op = CC_OP_DYNAMIC;
+     dc->cc_op_synced = 1;
+     dc->singlestep_enabled = cs->singlestep_enabled;
+-    dc->user = (env->sr & SR_S) == 0;
++#if defined(CONFIG_SOFTMMU)
++    dc->user = (env->sr & SR_S) == 0 ? M68K_USER_FROM_MSR : 0;
++    dc->user |= (env->sfc & 4) == 0 ? M68K_USER_FROM_SFC : 0;
++    dc->user |= (env->dfc & 4) == 0 ? M68K_USER_FROM_DFC : 0;
++#endif
+     dc->done_mac = 0;
+     dc->writeback_mask = 0;
+     num_insns = 0;
+@@ -5984,6 +6065,7 @@ void m68k_cpu_dump_state(CPUState *cs, FILE *f, fprintf_function cpu_fprintf,
+                env->current_sp == M68K_USP ? "->" : "  ", env->sp[M68K_USP],
+                env->current_sp == M68K_ISP ? "->" : "  ", env->sp[M68K_ISP]);
+     cpu_fprintf(f, "VBR = 0x%08x\n", env->vbr);
++    cpu_fprintf(f, "SFC = %x DFC %x\n", env->sfc, env->dfc);
+     cpu_fprintf(f, "SSW %08x TCR %08x URP %08x SRP %08x\n",
+                 env->mmu.ssw, env->mmu.tcr, env->mmu.urp, env->mmu.srp);
+     cpu_fprintf(f, "DTTR0/1: %08x/%08x ITTR0/1: %08x/%08x\n",
 -- 
 2.14.3
