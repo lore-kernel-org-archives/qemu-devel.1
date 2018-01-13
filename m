@@ -1,29 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52459)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45323)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eaL6H-0001m7-8z
-	for qemu-devel@nongnu.org; Sat, 13 Jan 2018 07:39:54 -0500
+	(envelope-from <tcminyard@gmail.com>) id 1eaMxh-0005xk-KQ
+	for qemu-devel@nongnu.org; Sat, 13 Jan 2018 09:39:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eaL6G-0003tt-IP
-	for qemu-devel@nongnu.org; Sat, 13 Jan 2018 07:39:53 -0500
-Received: from mail-oi0-x242.google.com ([2607:f8b0:4003:c06::242]:36606)
+	(envelope-from <tcminyard@gmail.com>) id 1eaMxc-0007aw-Mu
+	for qemu-devel@nongnu.org; Sat, 13 Jan 2018 09:39:09 -0500
+Received: from mail-ot0-x236.google.com ([2607:f8b0:4003:c0f::236]:35178)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1eaL6G-0003tL-CG
-	for qemu-devel@nongnu.org; Sat, 13 Jan 2018 07:39:52 -0500
-Received: by mail-oi0-x242.google.com with SMTP id w135so5632515oie.3
-	for <qemu-devel@nongnu.org>; Sat, 13 Jan 2018 04:39:52 -0800 (PST)
+	(Exim 4.71) (envelope-from <tcminyard@gmail.com>) id 1eaMxc-0007ak-IK
+	for qemu-devel@nongnu.org; Sat, 13 Jan 2018 09:39:04 -0500
+Received: by mail-ot0-x236.google.com with SMTP id 53so7377344otj.2
+	for <qemu-devel@nongnu.org>; Sat, 13 Jan 2018 06:39:04 -0800 (PST)
+Sender: Corey Minyard <tcminyard@gmail.com>
+Reply-To: minyard@acm.org
+References: <1512682213-4354-1-git-send-email-minyard@acm.org>
+	<1512682213-4354-7-git-send-email-minyard@acm.org>
+	<CAJ+F1CKUK_uRa9imNcOLzvNZyNaC7ciNqLppzGWVZjKGJ8ggRQ@mail.gmail.com>
+From: Corey Minyard <minyard@acm.org>
+Message-ID: <7d0d484e-2ff2-11cc-8119-8d8586ac04e7@acm.org>
+Date: Sat, 13 Jan 2018 08:38:59 -0600
 MIME-Version: 1.0
-In-Reply-To: <CAAYMZQvY=yp2xaGWPPW3gXrj_no3jWgtemJY3eDgo34WU2OVCQ@mail.gmail.com>
-References: <20171126231634.9531-1-frasse.iglesias@gmail.com>
-	<20171126231634.9531-8-frasse.iglesias@gmail.com>
-	<CAFEAcA-Z2-M88JS7n+zW1AgA99gmeT-cj90BjbEzYEN95c6Zuw@mail.gmail.com>
-	<CAAYMZQvY=yp2xaGWPPW3gXrj_no3jWgtemJY3eDgo34WU2OVCQ@mail.gmail.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Sat, 13 Jan 2018 12:39:31 +0000
-Message-ID: <CAFEAcA8F7VJ2Gp3AJuhbu8iSuBPjyeK==dPEZB_fHSf_uAvang@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v9 07/13] xilinx_spips: Add support for RX
- discard and RX drain
+In-Reply-To: <CAJ+F1CKUK_uRa9imNcOLzvNZyNaC7ciNqLppzGWVZjKGJ8ggRQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-GB
+Subject: Re: [Qemu-devel] [PATCH 6/8] vl.c: disallow command line fw cfg
+ without opt/
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,37 +34,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: francisco iglesias <frasse.iglesias@gmail.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Edgar Iglesias <edgari@xilinx.com>, Alistair Francis <alistai@xilinx.com>, Francisco Iglesias <francisco.iglesias@feimtech.se>, =?UTF-8?Q?Marcin_Krzemi=C5=84ski?= <mar.krzeminski@gmail.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@gmail.com>
+Cc: QEMU <qemu-devel@nongnu.org>, Corey Minyard <cminyard@mvista.com>, "Michael S. Tsirkin" <mst@redhat.com>
 
-On 13 January 2018 at 01:04, francisco iglesias
-<frasse.iglesias@gmail.com> wrote:
-> CID 1383841 (#2 of 4): Uninitialized scalar variable (UNINIT)29.
-> uninit_use_in_call: Using uninitialized value (uint32_t)tx_rx[0] when
-> calling
-> ssi_transfer.
+On 01/12/2018 11:06 AM, Marc-André Lureau wrote:
+> Hi
 >
-> This is correct, tx_rx is used uninitialized but since we are transmitting
-> dummy cycles the transmitted value (tx_rx[0] in this case) is not used (by
-> the flashes), this the reason the code looks like that. Would you like me to
-> create a patch for quieting coverity here anyway?
+> On Thu, Dec 7, 2017 at 10:30 PM,  <minyard@acm.org> wrote:
+>> From: "Michael S. Tsirkin" <mst@redhat.com>
+>>
+>> Allowing arbitary file names on command line is setting us up for
+>> failure: future guests will look for a specific QEMU-specified name and
+>> will get confused finding a user file there.
+>>
+> Why is this part of a IPMI series?
 
-  tx_rx[0] = ssi_transfer(s->spi[bus], (uint32_t)tx_rx[0]);
+It's been so long I don't remember any more.  I think I suggested a 
+simpler fix when
+Michael posted his, and it ended up in my queue, because at one point 
+the IPMI code
+was messing around in fw_cfg.  But you are right, it doesn't belong here.
 
-is effectively using the value (since you don't know what the
-thing on the other end of that function is going to do with the
-value you pass it. You really don't want to make this code's
-correctness depend on the called function never looking at
-its argument. If you want to pass a dummy value why not
-just use constant 0 or something rather than an uninitialized
-variable ?
+> There was a lengthy discussion on this patch earlier, could you
+> summarize the conclusion?
 
-I think quieting coverity is probably a good idea anyway for
-the other false positives (it sounds like it hasn't been able
-to determine that paths in the rest of the loop can only occur
-if the top of the loop went through a path initializing the
-variable. Code like that is also hard for humans to comprehend,
-though...)
+I think there was no conclusion.  This patch should just be dropped.
 
-thanks
--- PMM
+Thanks for this and your other comments.
+
+-corey
+
+>
+> thanks
+>
+>> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+>> [Change "warning" to "error" in the error report.]
+>> Signed-off-by: Corey Minyard <cminyard@mvista.com>
+>> ---
+>>   vl.c | 5 +++--
+>>   1 file changed, 3 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/vl.c b/vl.c
+>> index 1ad1c04..fae9300 100644
+>> --- a/vl.c
+>> +++ b/vl.c
+>> @@ -2400,8 +2400,9 @@ static int parse_fw_cfg(void *opaque, QemuOpts *opts, Error **errp)
+>>           return -1;
+>>       }
+>>       if (strncmp(name, "opt/", 4) != 0) {
+>> -        warn_report("externally provided fw_cfg item names "
+>> -                    "should be prefixed with \"opt/\"");
+>> +        error_report("error: externally provided fw_cfg item names "
+>> +                     "should be prefixed with \"opt/\"");
+>> +        return -1;
+>>       }
+>>       if (nonempty_str(str)) {
+>>           size = strlen(str); /* NUL terminator NOT included in fw_cfg blob */
+>> --
+>> 2.7.4
+>>
+>>
+>
+>
