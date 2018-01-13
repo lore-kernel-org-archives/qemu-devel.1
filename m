@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46823)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46856)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eaB3v-0000vn-0o
-	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 20:56:48 -0500
+	(envelope-from <no-reply@patchew.org>) id 1eaB4I-00018y-Jh
+	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 20:57:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eaB3t-0007ng-9k
-	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 20:56:47 -0500
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20180111205626.23291-1-f4bug@amsat.org>
-	<20180111205626.23291-3-f4bug@amsat.org>
-	<CAKmqyKM7Jk6tVhYET8Uv_BowOV+FB7oDKJcpHwhMjVfH4p6Muw@mail.gmail.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <94259059-9037-2141-b96f-a2098c9ce9c6@amsat.org>
-Date: Fri, 12 Jan 2018 22:56:31 -0300
+	(envelope-from <no-reply@patchew.org>) id 1eaB4E-00086v-1H
+	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 20:57:10 -0500
+Resent-Message-Id: <E1eaB4E-00086v-1H@eggs.gnu.org>
+Received: from sender-of-o51.zoho.com ([135.84.80.216]:21079)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1eaB4D-00085N-Q9
+	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 20:57:05 -0500
+In-Reply-To: <20180113004338.16867-1-laurent@vivier.eu>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <151580587893.536.12392040290017217675@5adcb62bf0d6>
 MIME-Version: 1.0
-In-Reply-To: <CAKmqyKM7Jk6tVhYET8Uv_BowOV+FB7oDKJcpHwhMjVfH4p6Muw@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v6 02/21] sdhci: add basic Spec v1
- capabilities
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Fri, 12 Jan 2018 17:11:19 -0800 (PST)
+Subject: Re: [Qemu-devel] [PATCH v2 0/7] target/m68k: supervisor mode (part
+ 2)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,253 +29,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alistair Francis <alistair.francis@xilinx.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Andrey Smirnov <andrew.smirnov@gmail.com>, Igor Mitsyanko <i.mitsyanko@gmail.com>, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, Prasad J Pandit <pjp@fedoraproject.org>, =?UTF-8?Q?Gr=c3=a9gory_Estrade?= <gregory.estrade@gmail.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Krzysztof Kozlowski <krzk@kernel.org>, Jean-Christophe Dubois <jcd@tribudubois.net>, Sai Pavan Boddu <saipava@xilinx.com>, qemu-arm <qemu-arm@nongnu.org>, Clement Deschamps <clement.deschamps@antfield.fr>, Andrew Baumann <Andrew.Baumann@microsoft.com>
+To: laurent@vivier.eu
+Cc: famz@redhat.com, qemu-devel@nongnu.org, huth@tuxfamily.org
 
-Hi Alistair,
-
-On 01/12/2018 09:00 PM, Alistair Francis wrote:
-> On Thu, Jan 11, 2018 at 12:56 PM, Philippe Mathieu-Daudé
-> <f4bug@amsat.org> wrote:
->> (Note than Spec v2 is supported by default)
->>
->> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
->> ---
->>  hw/sd/sdhci-internal.h | 24 +++++++++++++++++++-
->>  include/hw/sd/sdhci.h  |  6 +++++
->>  hw/sd/sdhci.c          | 61 +++++++++++++++++++++++++++++++++++++-------------
->>  3 files changed, 74 insertions(+), 17 deletions(-)
->>
->> diff --git a/hw/sd/sdhci-internal.h b/hw/sd/sdhci-internal.h
->> index b7751c815f..9acafe7b01 100644
->> --- a/hw/sd/sdhci-internal.h
->> +++ b/hw/sd/sdhci-internal.h
->> @@ -24,6 +24,8 @@
->>  #ifndef SDHCI_INTERNAL_H
->>  #define SDHCI_INTERNAL_H
->>
->> +#include "hw/registerfields.h"
->> +
->>  /* R/W SDMA System Address register 0x0 */
->>  #define SDHC_SYSAD                     0x00
->>
->> @@ -84,6 +86,9 @@
->>
->>  /* R/W Host control Register 0x0 */
->>  #define SDHC_HOSTCTL                   0x28
->> +FIELD(SDHC_HOSTCTL, LED_CTRL,          0, 1);
->> +FIELD(SDHC_HOSTCTL, DATATRANSFERWIDTH, 1, 1); /* SD mode only */
->> +FIELD(SDHC_HOSTCTL, HIGH_SPEED,        2, 1);
->>  #define SDHC_CTRL_DMA_CHECK_MASK       0x18
->>  #define SDHC_CTRL_SDMA                 0x00
->>  #define SDHC_CTRL_ADMA1_32             0x08
->> @@ -94,6 +99,7 @@
->>  /* R/W Power Control Register 0x0 */
->>  #define SDHC_PWRCON                    0x29
->>  #define SDHC_POWER_ON                  (1 << 0)
->> +FIELD(SDHC_PWRCON, BUS_VOLTAGE,        1, 3);
->>
->>  /* R/W Block Gap Control Register 0x0 */
->>  #define SDHC_BLKGAP                    0x2A
->> @@ -116,6 +122,7 @@
->>
->>  /* R/W Timeout Control Register 0x0 */
->>  #define SDHC_TIMEOUTCON                0x2E
->> +FIELD(SDHC_TIMEOUTCON, COUNTER,        0, 4);
->>
->>  /* R/W Software Reset Register 0x0 */
->>  #define SDHC_SWRST                     0x2F
->> @@ -172,17 +179,32 @@
->>
->>  /* ROC Auto CMD12 error status register 0x0 */
->>  #define SDHC_ACMD12ERRSTS              0x3C
->> +FIELD(SDHC_ACMD12ERRSTS, TIMEOUT_ERR,  1, 1);
->> +FIELD(SDHC_ACMD12ERRSTS, CRC_ERR,      2, 1);
->> +FIELD(SDHC_ACMD12ERRSTS, INDEX_ERR,    4, 1);
->>
->>  /* HWInit Capabilities Register 0x05E80080 */
->>  #define SDHC_CAPAB                     0x40
->> -#define SDHC_CAN_DO_DMA                0x00400000
->>  #define SDHC_CAN_DO_ADMA2              0x00080000
->>  #define SDHC_CAN_DO_ADMA1              0x00100000
->>  #define SDHC_64_BIT_BUS_SUPPORT        (1 << 28)
->>  #define SDHC_CAPAB_BLOCKSIZE(x)        (((x) >> 16) & 0x3)
->> +FIELD(SDHC_CAPAB, TOCLKFREQ,           0, 6);
->> +FIELD(SDHC_CAPAB, TOUNIT,              7, 1);
->> +FIELD(SDHC_CAPAB, BASECLKFREQ,         8, 8);
->> +FIELD(SDHC_CAPAB, MAXBLOCKLENGTH,     16, 2);
->> +FIELD(SDHC_CAPAB, HIGHSPEED,          21, 1);
->> +FIELD(SDHC_CAPAB, SDMA,               22, 1);
->> +FIELD(SDHC_CAPAB, SUSPRESUME,         23, 1);
->> +FIELD(SDHC_CAPAB, V33,                24, 1);
->> +FIELD(SDHC_CAPAB, V30,                25, 1);
->> +FIELD(SDHC_CAPAB, V18,                26, 1);
->>
->>  /* HWInit Maximum Current Capabilities Register 0x0 */
->>  #define SDHC_MAXCURR                   0x48
->> +FIELD(SDHC_MAXCURR, V33_VDD1,          0, 8);
->> +FIELD(SDHC_MAXCURR, V30_VDD1,          8, 8);
->> +FIELD(SDHC_MAXCURR, V18_VDD1,         16, 8);
->>
->>  /* W Force Event Auto CMD12 Error Interrupt Register 0x0000 */
->>  #define SDHC_FEAER                     0x50
->> diff --git a/include/hw/sd/sdhci.h b/include/hw/sd/sdhci.h
->> index 8786676ac8..09b756eb7a 100644
->> --- a/include/hw/sd/sdhci.h
->> +++ b/include/hw/sd/sdhci.h
->> @@ -92,6 +92,12 @@ typedef struct SDHCIState {
->>      /* Configurable properties */
->>      bool pending_insert_quirk; /* Quirk for Raspberry Pi card insert int */
->>      uint8_t spec_version;
->> +    struct {
->> +        bool suspend;
->> +        bool high_speed;
->> +        bool sdma;
->> +        bool v33, v30, v18;
->> +    } cap;
->>  } SDHCIState;
->>
->>  #define TYPE_PCI_SDHCI "sdhci-pci"
->> diff --git a/hw/sd/sdhci.c b/hw/sd/sdhci.c
->> index c8f750451e..d26ea821d0 100644
->> --- a/hw/sd/sdhci.c
->> +++ b/hw/sd/sdhci.c
->> @@ -44,12 +44,6 @@
->>   * 0 - not supported, 1 - supported, other - prohibited.
->>   */
->>  #define SDHC_CAPAB_64BITBUS       0ul        /* 64-bit System Bus Support */
->> -#define SDHC_CAPAB_18V            1ul        /* Voltage support 1.8v */
->> -#define SDHC_CAPAB_30V            0ul        /* Voltage support 3.0v */
->> -#define SDHC_CAPAB_33V            1ul        /* Voltage support 3.3v */
->> -#define SDHC_CAPAB_SUSPRESUME     0ul        /* Suspend/resume support */
->> -#define SDHC_CAPAB_SDMA           1ul        /* SDMA support */
->> -#define SDHC_CAPAB_HIGHSPEED      1ul        /* High speed support */
->>  #define SDHC_CAPAB_ADMA1          1ul        /* ADMA1 support */
->>  #define SDHC_CAPAB_ADMA2          1ul        /* ADMA2 support */
->>  /* Maximum host controller R/W buffers size
->> @@ -63,9 +57,7 @@
->>  #define SDHC_CAPAB_TOCLKFREQ      52ul
->>
->>  /* Now check all parameters and calculate CAPABILITIES REGISTER value */
->> -#if SDHC_CAPAB_64BITBUS > 1 || SDHC_CAPAB_18V > 1 || SDHC_CAPAB_30V > 1 ||     \
->> -    SDHC_CAPAB_33V > 1 || SDHC_CAPAB_SUSPRESUME > 1 || SDHC_CAPAB_SDMA > 1 ||  \
->> -    SDHC_CAPAB_HIGHSPEED > 1 || SDHC_CAPAB_ADMA2 > 1 || SDHC_CAPAB_ADMA1 > 1 ||\
->> +#if SDHC_CAPAB_64BITBUS > 1 || SDHC_CAPAB_ADMA2 > 1 || SDHC_CAPAB_ADMA1 > 1 || \
->>      SDHC_CAPAB_TOUNIT > 1
->>  #error Capabilities features can have value 0 or 1 only!
->>  #endif
->> @@ -90,16 +82,36 @@
->>  #endif
->>
->>  #define SDHC_CAPAB_REG_DEFAULT                                 \
->> -   ((SDHC_CAPAB_64BITBUS << 28) | (SDHC_CAPAB_18V << 26) |     \
->> -    (SDHC_CAPAB_30V << 25) | (SDHC_CAPAB_33V << 24) |          \
->> -    (SDHC_CAPAB_SUSPRESUME << 23) | (SDHC_CAPAB_SDMA << 22) |  \
->> -    (SDHC_CAPAB_HIGHSPEED << 21) | (SDHC_CAPAB_ADMA1 << 20) |  \
->> +   ((SDHC_CAPAB_64BITBUS << 28) | (SDHC_CAPAB_ADMA1 << 20) |   \
->>      (SDHC_CAPAB_ADMA2 << 19) | (MAX_BLOCK_LENGTH << 16) |      \
->>      (SDHC_CAPAB_BASECLKFREQ << 8) | (SDHC_CAPAB_TOUNIT << 7) | \
->>      (SDHC_CAPAB_TOCLKFREQ))
->>
->>  #define MASKED_WRITE(reg, mask, val)  (reg = (reg & (mask)) | (val))
->>
->> +static void sdhci_init_capareg(SDHCIState *s, Error **errp)
->> +{
->> +    uint64_t capareg = 0;
->> +
->> +    switch (s->spec_version) {
->> +    case 2: /* default version */
->> +
->> +    /* fallback */
->> +    case 1:
->> +        capareg = FIELD_DP64(capareg, SDHC_CAPAB, HIGHSPEED, s->cap.high_speed);
->> +        capareg = FIELD_DP64(capareg, SDHC_CAPAB, SDMA, s->cap.sdma);
->> +        capareg = FIELD_DP64(capareg, SDHC_CAPAB, SUSPRESUME, s->cap.suspend);
->> +        capareg = FIELD_DP64(capareg, SDHC_CAPAB, V33, s->cap.v33);
->> +        capareg = FIELD_DP64(capareg, SDHC_CAPAB, V30, s->cap.v30);
->> +        capareg = FIELD_DP64(capareg, SDHC_CAPAB, V18, s->cap.v18);
->> +        break;
->> +
->> +    default:
->> +        error_setg(errp, "Unsupported spec version: %u", s->spec_version);
-> 
-> Probably best to have a return here, encase some logic added below
-> later relies on this being successful.
-
-Indeed, better safe than sorry.
->> +    }
->> +    s->capareg = capareg;
->> +}
->> +
->>  static uint8_t sdhci_slotint(SDHCIState *s)
->>  {
->>      return (s->norintsts & s->norintsigen) || (s->errintsts & s->errintsigen) ||
->> @@ -1026,7 +1038,7 @@ sdhci_write(void *opaque, hwaddr offset, uint64_t val, unsigned size)
->>      case SDHC_TRNMOD:
->>          /* DMA can be enabled only if it is supported as indicated by
->>           * capabilities register */
->> -        if (!(s->capareg & SDHC_CAN_DO_DMA)) {
->> +        if (!(s->capareg & R_SDHC_CAPAB_SDMA_MASK)) {
->>              value &= ~SDHC_TRNS_DMA;
->>          }
->>          MASKED_WRITE(s->trnmod, mask, value & SDHC_TRNMOD_MASK);
->> @@ -1181,6 +1193,10 @@ static void sdhci_init_readonly_registers(SDHCIState *s, Error **errp)
->>          return;
->>      }
->>      s->version = (SDHC_HCVER_VENDOR << 8) | (s->spec_version - 1);
->> +
->> +    if (s->capareg == UINT64_MAX) {
->> +        sdhci_init_capareg(s, errp);
->> +    }
->>  }
->>
->>  static void sdhci_initfn(SDHCIState *s)
->> @@ -1297,8 +1313,21 @@ const VMStateDescription sdhci_vmstate = {
->>   * specific host controller implementation */
->>  static Property sdhci_properties[] = {
->>      DEFINE_PROP_UINT8("sd-spec-version", SDHCIState, spec_version, 2),
->> -    DEFINE_PROP_UINT64("capareg", SDHCIState, capareg,
->> -            SDHC_CAPAB_REG_DEFAULT),
->> +
->> +    /* DMA */
->> +    DEFINE_PROP_BOOL("sdma", SDHCIState, cap.sdma, true),
->> +    /* Suspend/resume support */
->> +    DEFINE_PROP_BOOL("suspend", SDHCIState, cap.suspend, false),
->> +    /* High speed support */
->> +    DEFINE_PROP_BOOL("high-speed", SDHCIState, cap.high_speed, true),
->> +    /* Voltage support 3.3/3.0/1.8V */
->> +    DEFINE_PROP_BOOL("3v3", SDHCIState, cap.v33, true),
->> +    DEFINE_PROP_BOOL("3v0", SDHCIState, cap.v30, false),
->> +    DEFINE_PROP_BOOL("1v8", SDHCIState, cap.v18, false),
-> 
-> This is a change of the default value.
-> 
-> I think you really need to specify specific changes in the commit
-> message. That way is the defaults cause breakages we will be able to
-> bisect it in the future.
-
-You are right I need to be more descriptive in my messages.
-
-I wonder how to consider the "default" SDHC_CAPAB_REG_DEFAULT, it seems
-to only correctly matches the Zynq-7000 SDHCI.
-
-Note that I only deprecate the 'capareg' property, it isn't modified
-until all HCI are correctly passed to the new properties (verified using
-the qtests), then I remove it.
-This way this series is bisectable and due to the qtests, no breakage
-should be introduced.
-
-I tried to use the Spec default value for each property introduced.
-I will sort the properties per Spec introduction, with a comment around.
-
->> +
->> +    /* capareg: deprecated */
->> +    DEFINE_PROP_UINT64("capareg", SDHCIState, capareg, UINT64_MAX),
->> +
->>      DEFINE_PROP_UINT64("maxcurr", SDHCIState, maxcurr, 0),
->>      DEFINE_PROP_BOOL("pending-insert-quirk", SDHCIState, pending_insert_quirk,
->>                       false),
->> --
->> 2.15.1
->>
->>
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IDIwMTgwMTEzMDA0MzM4LjE2ODY3LTEtbGF1cmVudEB2aXZpZXIuZXUKU3ViamVj
+dDogW1FlbXUtZGV2ZWxdIFtQQVRDSCB2MiAwLzddIHRhcmdldC9tNjhrOiBzdXBlcnZpc29yIG1v
+ZGUgKHBhcnQgMikKCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKCkJBU0U9
+YmFzZQpuPTEKdG90YWw9JChnaXQgbG9nIC0tb25lbGluZSAkQkFTRS4uIHwgd2MgLWwpCmZhaWxl
+ZD0wCgpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1s
+b2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQoKY29tbWl0cz0iJChnaXQgbG9nIC0tZm9ybWF0PSVIIC0t
+cmV2ZXJzZSAkQkFTRS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7IGRvCiAgICBlY2hvICJDaGVja2lu
+ZyBQQVRDSCAkbi8kdG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVzICRjKS4uLiIKICAg
+IGlmICEgZ2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMvY2hlY2twYXRjaC5w
+bCAtLW1haWxiYWNrIC07IHRoZW4KICAgICAgICBmYWlsZWQ9MQogICAgICAgIGVjaG8KICAgIGZp
+CiAgICBuPSQoKG4rMSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBTQ1JJUFQgRU5EID09
+PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApTd2l0
+Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCjkyMjBiYjg3ZjUgdGFyZ2V0L202OGs6IGFkZCBI
+TVAgY29tbWFuZCAiaW5mbyB0bGIiCmI0NGUwOGRhYjAgdGFyZ2V0L202OGs6IGFkZCBwZmx1c2gv
+cHRlc3QKNTdjZDdkY2E3NCB0YXJnZXQvbTY4azogYWRkIG1vdmVzCmEwNTA1MTNkOGIgdGFyZ2V0
+L202OGs6IGFkZCBpbmRleCBwYXJhbWV0ZXIgdG8gZ2VuX2xvYWQoKS9nZW5fc3RvcmUoKSBhbmQg
+Q28uCjVkZGU0YWU4MzcgdGFyZ2V0L202OGs6IGFkZCBUcmFuc3BhcmVudCBUcmFuc2xhdGlvbgph
+Zjg3MzYwNTE0IHRhcmdldC9tNjhrOiBhZGQgTUM2ODA0MCBNTVUKZjMxNjM2MzUyMyBhY2NlbC90
+Y2c6IGFkZCBzaXplIHBhcmVtZXRlciBpbiB0bGJfZmlsbCgpCgo9PT0gT1VUUFVUIEJFR0lOID09
+PQpDaGVja2luZyBQQVRDSCAxLzc6IGFjY2VsL3RjZzogYWRkIHNpemUgcGFyZW1ldGVyIGluIHRs
+Yl9maWxsKCkuLi4KQ2hlY2tpbmcgUEFUQ0ggMi83OiB0YXJnZXQvbTY4azogYWRkIE1DNjgwNDAg
+TU1VLi4uCkNoZWNraW5nIFBBVENIIDMvNzogdGFyZ2V0L202OGs6IGFkZCBUcmFuc3BhcmVudCBU
+cmFuc2xhdGlvbi4uLgpDaGVja2luZyBQQVRDSCA0Lzc6IHRhcmdldC9tNjhrOiBhZGQgaW5kZXgg
+cGFyYW1ldGVyIHRvIGdlbl9sb2FkKCkvZ2VuX3N0b3JlKCkgYW5kIENvLi4uLgpFUlJPUjogImZv
+byAqIGJhciIgc2hvdWxkIGJlICJmb28gKmJhciIKIzI2OiBGSUxFOiB0YXJnZXQvbTY4ay90cmFu
+c2xhdGUuYzoyODQ6CitzdGF0aWMgaW5saW5lIFRDR3YgZ2VuX2xvYWQoRGlzYXNDb250ZXh0ICog
+cywgaW50IG9wc2l6ZSwgVENHdiBhZGRyLAoKV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3Rl
+cnMKIzEzMjogRklMRTogdGFyZ2V0L202OGsvdHJhbnNsYXRlLmM6OTQ1Ogorc3RhdGljIHZvaWQg
+Z2VuX2xvYWRfZnAoRGlzYXNDb250ZXh0ICpzLCBpbnQgb3BzaXplLCBUQ0d2IGFkZHIsIFRDR3Zf
+cHRyIGZwLCBpbnQgaW5kZXgpCgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojMTQ1
+OiBGSUxFOiB0YXJnZXQvbTY4ay90cmFuc2xhdGUuYzo5OTk6CitzdGF0aWMgdm9pZCBnZW5fc3Rv
+cmVfZnAoRGlzYXNDb250ZXh0ICpzLCBpbnQgb3BzaXplLCBUQ0d2IGFkZHIsIFRDR3ZfcHRyIGZw
+LCBpbnQgaW5kZXgpCgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojNDIxOiBGSUxF
+OiB0YXJnZXQvbTY4ay90cmFuc2xhdGUuYzo0ODUwOgorICAgICAgICBpZiAoZ2VuX2VhX2ZwKGVu
+diwgcywgaW5zbiwgb3BzaXplLCBjcHVfc3JjLCBFQV9TVE9SRSwgSVNfVVNFUihzKSkgPT0gLTEp
+IHsKCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiM0MzA6IEZJTEU6IHRhcmdldC9t
+NjhrL3RyYW5zbGF0ZS5jOjQ4NzI6CisgICAgICAgIGlmIChnZW5fZWFfZnAoZW52LCBzLCBpbnNu
+LCBvcHNpemUsIGNwdV9zcmMsIEVBX0xPQURTLCBJU19VU0VSKHMpKSA9PSAtMSkgewoKdG90YWw6
+IDEgZXJyb3JzLCA0IHdhcm5pbmdzLCAzODcgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMg
+c3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFy
+ZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVD
+S1BBVENIIGluIE1BSU5UQUlORVJTLgoKQ2hlY2tpbmcgUEFUQ0ggNS83OiB0YXJnZXQvbTY4azog
+YWRkIG1vdmVzLi4uCkNoZWNraW5nIFBBVENIIDYvNzogdGFyZ2V0L202OGs6IGFkZCBwZmx1c2gv
+cHRlc3QuLi4KQ2hlY2tpbmcgUEFUQ0ggNy83OiB0YXJnZXQvbTY4azogYWRkIEhNUCBjb21tYW5k
+ICJpbmZvIHRsYiIuLi4KPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdp
+dGggY29kZTogMQoKCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3
+IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRj
+aGV3LWRldmVsQGZyZWVsaXN0cy5vcmc=
