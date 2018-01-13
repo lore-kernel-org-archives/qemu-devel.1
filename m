@@ -1,21 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55705)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58960)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1ea9OP-0001et-6s
-	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 19:09:50 -0500
+	(envelope-from <bounces@canonical.com>) id 1ea9cr-0006Hp-MP
+	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 19:24:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1ea9ON-0000yl-SZ
-	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 19:09:49 -0500
+	(envelope-from <bounces@canonical.com>) id 1ea9co-0007C9-JT
+	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 19:24:45 -0500
+Received: from indium.canonical.com ([91.189.90.7]:48242)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1ea9co-0007AV-D1
+	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 19:24:42 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1ea9cm-0007Mz-56
+	for <qemu-devel@nongnu.org>; Sat, 13 Jan 2018 00:24:40 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 082272E8550
+	for <qemu-devel@nongnu.org>; Sat, 13 Jan 2018 00:24:40 +0000 (UTC)
 MIME-Version: 1.0
-Sender: alistair23@gmail.com
-In-Reply-To: <20180111205626.23291-20-f4bug@amsat.org>
-References: <20180111205626.23291-1-f4bug@amsat.org>
-	<20180111205626.23291-20-f4bug@amsat.org>
-From: Alistair Francis <alistair.francis@xilinx.com>
-Date: Fri, 12 Jan 2018 16:09:16 -0800
-Message-ID: <CAKmqyKPhSYpMcyDJ6T-dM9LM8LOwq8vZBM7NAM+dzJaM3ULOUQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v6 19/21] sdbus: add trace events
+Date: Sat, 13 Jan 2018 00:11:42 -0000
+From: Till Kamppeter <1157368@bugs.launchpad.net>
+Reply-To: Bug 1157368 <1157368@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20130319191503.10848.67844.malonedeb@wampee.canonical.com>
+Message-Id: <151580230236.10413.15736998991995621412.malone@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1157368] Re: Desktop background messed up when
+ running Raring in a QEMU-based virtual machine
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,93 +37,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Cc: Alistair Francis <alistair.francis@xilinx.com>, Peter Maydell <peter.maydell@linaro.org>, Andrey Smirnov <andrew.smirnov@gmail.com>, Igor Mitsyanko <i.mitsyanko@gmail.com>, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, Prasad J Pandit <pjp@fedoraproject.org>, =?UTF-8?Q?Gr=C3=A9gory_Estrade?= <gregory.estrade@gmail.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Krzysztof Kozlowski <krzk@kernel.org>, Jean-Christophe Dubois <jcd@tribudubois.net>, Sai Pavan Boddu <saipava@xilinx.com>, qemu-arm <qemu-arm@nongnu.org>, Clement Deschamps <clement.deschamps@antfield.fr>, Andrew Baumann <Andrew.Baumann@microsoft.com>
+To: qemu-devel@nongnu.org
 
-On Thu, Jan 11, 2018 at 12:56 PM, Philippe Mathieu-Daud=C3=A9
-<f4bug@amsat.org> wrote:
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+This did never occur again for me. So this can get closed.
 
-Reviewed-by: Alistair Francis <alistair.francis@xilinx.com>
+** Changed in: qemu (Ubuntu)
+       Status: Triaged =3D> Invalid
 
-Alistair
+** Changed in: qemu
+       Status: Incomplete =3D> Invalid
 
-> ---
->  hw/sd/core.c       | 14 ++++++++++++--
->  hw/sd/trace-events |  5 +++++
->  2 files changed, 17 insertions(+), 2 deletions(-)
->
-> diff --git a/hw/sd/core.c b/hw/sd/core.c
-> index 295dc44ab7..498284f109 100644
-> --- a/hw/sd/core.c
-> +++ b/hw/sd/core.c
-> @@ -23,6 +23,12 @@
->  #include "hw/qdev-core.h"
->  #include "sysemu/block-backend.h"
->  #include "hw/sd/sd.h"
-> +#include "trace.h"
-> +
-> +static inline const char *sdbus_name(SDBus *sdbus)
-> +{
-> +    return sdbus->qbus.name;
-> +}
->
->  static SDState *get_card(SDBus *sdbus)
->  {
-> @@ -39,6 +45,7 @@ int sdbus_do_command(SDBus *sdbus, SDRequest *req, uint=
-8_t *response)
->  {
->      SDState *card =3D get_card(sdbus);
->
-> +    trace_sdbus_command(sdbus_name(sdbus), req->cmd, req->arg, req->crc)=
-;
->      if (card) {
->          SDCardClass *sc =3D SD_CARD_GET_CLASS(card);
->
-> @@ -52,6 +59,7 @@ void sdbus_write_data(SDBus *sdbus, uint8_t value)
->  {
->      SDState *card =3D get_card(sdbus);
->
-> +    trace_sdbus_write(sdbus_name(sdbus), value);
->      if (card) {
->          SDCardClass *sc =3D SD_CARD_GET_CLASS(card);
->
-> @@ -62,14 +70,16 @@ void sdbus_write_data(SDBus *sdbus, uint8_t value)
->  uint8_t sdbus_read_data(SDBus *sdbus)
->  {
->      SDState *card =3D get_card(sdbus);
-> +    uint8_t value =3D 0;
->
->      if (card) {
->          SDCardClass *sc =3D SD_CARD_GET_CLASS(card);
->
-> -        return sc->read_data(card);
-> +        value =3D sc->read_data(card);
->      }
-> +    trace_sdbus_read(sdbus_name(sdbus), value);
->
-> -    return 0;
-> +    return value;
->  }
->
->  bool sdbus_data_ready(SDBus *sdbus)
-> diff --git a/hw/sd/trace-events b/hw/sd/trace-events
-> index 0a121156a3..c0f51f11d4 100644
-> --- a/hw/sd/trace-events
-> +++ b/hw/sd/trace-events
-> @@ -1,5 +1,10 @@
->  # See docs/devel/tracing.txt for syntax documentation.
->
-> +# hw/sd/core.c
-> +sdbus_command(const char *bus_name, uint8_t cmd, uint32_t arg, uint8_t c=
-rc) "@%s CMD%02d arg 0x%08x crc 0x%02x"
-> +sdbus_read(const char *bus_name, uint8_t value) "@%s value 0x%02x"
-> +sdbus_write(const char *bus_name, uint8_t value) "@%s value 0x%02x"
-> +
->  # hw/sd/sdhci.c
->  sdhci_set_inserted(const char *level) "card state changed: %s"
->  sdhci_send_command(uint8_t cmd, uint32_t arg) "CMD%02u ARG[0x%08x]"
-> --
-> 2.15.1
->
->
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1157368
+
+Title:
+  Desktop background messed up when running Raring in a QEMU-based
+  virtual machine
+
+Status in QEMU:
+  Invalid
+Status in qemu package in Ubuntu:
+  Invalid
+
+Bug description:
+  Screenshot attached.
+
+  Problem occurs only when choosing the default cirrus graphics card.
+  The other graphics cards do not show this problem but are very
+  unstable.
+
+  The screenshot is of the whole desktop with a Virtual Machine Manager
+  window containing the desktop of the VM. You see that its actual
+  background is messed up and also the background images which you can
+  choose when right-clicking the background and choosing "Change Desktop
+  Background".
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1157368/+subscriptions
