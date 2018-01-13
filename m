@@ -1,34 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41248)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41247)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eaDSF-0007jv-7W
+	(envelope-from <bounces@canonical.com>) id 1eaDSF-0007ju-7D
 	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 23:30:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eaDSC-00005E-53
+	(envelope-from <bounces@canonical.com>) id 1eaDSC-000056-2c
 	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 23:30:03 -0500
-Received: from indium.canonical.com ([91.189.90.7]:37488)
+Received: from indium.canonical.com ([91.189.90.7]:37470)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1eaDSB-0008WU-Vc
-	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 23:30:00 -0500
+	id 1eaDSB-0008WO-S6
+	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 23:29:59 -0500
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1eaDSA-0006AY-6U
-	for <qemu-devel@nongnu.org>; Sat, 13 Jan 2018 04:29:58 +0000
+	id 1eaDS9-0006AZ-DB
+	for <qemu-devel@nongnu.org>; Sat, 13 Jan 2018 04:29:57 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 4BC142E8689
-	for <qemu-devel@nongnu.org>; Sat, 13 Jan 2018 04:29:47 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id C8AB12E867C
+	for <qemu-devel@nongnu.org>; Sat, 13 Jan 2018 04:29:46 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Sat, 13 Jan 2018 04:17:24 -0000
-From: Launchpad Bug Tracker <530077@bugs.launchpad.net>
-Reply-To: Bug 530077 <530077@bugs.launchpad.net>
+Date: Sat, 13 Jan 2018 04:17:16 -0000
+From: Launchpad Bug Tracker <1449687@bugs.launchpad.net>
+Reply-To: Bug 1449687 <1449687@bugs.launchpad.net>
 Sender: bounces@canonical.com
-References: <20100301145813.10998.7671.malonedeb@gandwana.canonical.com>
-Message-Id: <151581704488.16027.6460589485624000311.malone@loganberry.canonical.com>
+References: <20150428180718.24323.78355.malonedeb@wampee.canonical.com>
+Message-Id: <151581703810.16027.126153189721903655.malone@loganberry.canonical.com>
 Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 530077] Re: kvm: 16-bit code execution failure
- should be more friendly
+Subject: [Qemu-devel] [Bug 1449687] Re: block migration of qcow2 VMs copies
+ all empty space
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -48,34 +48,22 @@ To: qemu-devel@nongnu.org
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/530077
+https://bugs.launchpad.net/bugs/1449687
 
 Title:
-  kvm: 16-bit code execution failure should be more friendly
+  block migration of qcow2 VMs copies all empty space
 
 Status in QEMU:
   Expired
 
 Bug description:
-  Today, when kvm fails at 16-bit code execution, we report:
+  I'm running openstack 2012.1 'icehouse' which, ultimately, calls down
+  into qemu-system-x86 2.0.0+dfsg-2ubuntu1.10.
 
-       spirit:~/qemu> qemu-kvm ./hda-fedora.img =
-
-       kvm: unhandled exit 80000021
-       kvm_run returned -22
-
-  There are three reasons exit reason 21 happens.  The first is that a
-  user is executing an image containing a workload that uses GFXBOOT or
-  some other bootloader that exercises big real mode.  On pre-Westmere
-  Intel processors, VT could not handle big real mode.  The second
-  reason is that the guest's image is corrupted and we're executing
-  random code.  We accidentally fall into one of the unsupported modes
-  for VT.  Again, this is addressed on WSM.  The third case is where
-  there's an actual bug in KVM.  This should be exceedingly rare at this
-  stage.
-
-  We should present a friendly error message explaining the possible
-  causes and recommending corrective action.
+  I primed the process by copying all necessary base images onto the
+  destination host.  Nonetheless, post-migration instances are much
+  larger than the original image; the copy duplicated all the empty
+  space that ought to have remained copy-on-write.
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/530077/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1449687/+subscriptions
