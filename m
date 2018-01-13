@@ -1,34 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40297)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41248)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eaDOJ-0006Te-Ac
-	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 23:26:00 -0500
+	(envelope-from <bounces@canonical.com>) id 1eaDSF-0007jv-7W
+	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 23:30:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eaDOG-0005wA-4W
-	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 23:25:59 -0500
-Received: from indium.canonical.com ([91.189.90.7]:35588)
+	(envelope-from <bounces@canonical.com>) id 1eaDSC-00005E-53
+	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 23:30:03 -0500
+Received: from indium.canonical.com ([91.189.90.7]:37488)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1eaDOF-0005vG-UY
-	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 23:25:56 -0500
+	id 1eaDSB-0008WU-Vc
+	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 23:30:00 -0500
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1eaDOD-0005ak-5v
-	for <qemu-devel@nongnu.org>; Sat, 13 Jan 2018 04:25:53 +0000
+	id 1eaDSA-0006AY-6U
+	for <qemu-devel@nongnu.org>; Sat, 13 Jan 2018 04:29:58 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 39E9B2E8581
-	for <qemu-devel@nongnu.org>; Sat, 13 Jan 2018 04:25:49 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 4BC142E8689
+	for <qemu-devel@nongnu.org>; Sat, 13 Jan 2018 04:29:47 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Sat, 13 Jan 2018 04:17:33 -0000
-From: Launchpad Bug Tracker <1727737@bugs.launchpad.net>
-Reply-To: Bug 1727737 <1727737@bugs.launchpad.net>
+Date: Sat, 13 Jan 2018 04:17:24 -0000
+From: Launchpad Bug Tracker <530077@bugs.launchpad.net>
+Reply-To: Bug 530077 <530077@bugs.launchpad.net>
 Sender: bounces@canonical.com
-References: <150902607840.5143.15937446061017284272.malonedeb@chaenomeles.canonical.com>
-Message-Id: <151581705352.16027.1294670378630487745.malone@loganberry.canonical.com>
+References: <20100301145813.10998.7671.malonedeb@gandwana.canonical.com>
+Message-Id: <151581704488.16027.6460589485624000311.malone@loganberry.canonical.com>
 Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1727737] Re: qemu-arm stalls on a GCC sanitizer
- test since qemu-2.7
+Subject: [Qemu-devel] [Bug 530077] Re: kvm: 16-bit code execution failure
+ should be more friendly
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -48,42 +48,34 @@ To: qemu-devel@nongnu.org
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1727737
+https://bugs.launchpad.net/bugs/530077
 
 Title:
-  qemu-arm stalls on a GCC sanitizer test since qemu-2.7
+  kvm: 16-bit code execution failure should be more friendly
 
 Status in QEMU:
   Expired
 
 Bug description:
-  Hi,
+  Today, when kvm fails at 16-bit code execution, we report:
 
-  I have noticed that several GCC/sanitizer tests fail with timeout when
-  executed under QEMU.
+       spirit:~/qemu> qemu-kvm ./hda-fedora.img =
 
-  After a bit of investigation, I have noticed that this worked with
-  qemu-2.7, and started failing with qemu-2.8, and still fails with
-  qemu-2.10.1
+       kvm: unhandled exit 80000021
+       kvm_run returned -22
 
-  I'm attaching a tarball containing:
-  alloca_instruments_all_paddings.exe : the testcase, and the needed libs:
-  lib/librt.so.1
-  lib/libdl.so.2
-  lib/ld-linux-armhf.so.3
-  lib/libasan.so.5
-  lib/libc.so.6
-  lib/libgcc_s.so.1
-  lib/libpthread.so.0
-  lib/libm.so.6
+  There are three reasons exit reason 21 happens.  The first is that a
+  user is executing an image containing a workload that uses GFXBOOT or
+  some other bootloader that exercises big real mode.  On pre-Westmere
+  Intel processors, VT could not handle big real mode.  The second
+  reason is that the guest's image is corrupted and we're executing
+  random code.  We accidentally fall into one of the unsupported modes
+  for VT.  Again, this is addressed on WSM.  The third case is where
+  there's an actual bug in KVM.  This should be exceedingly rare at this
+  stage.
 
-  To reproduce the problem:
-  $ qemu-arm -cpu any -R 0 -L $PWD $PWD/alloca_instruments_all_paddings.exe
-  returns in less than a second with qemu-2.7, and never with qemu-2.8
-
-  Using -d in_asm suggests that the program "almost" completes and qemu see=
-ms to stall on:
-  0x40b6eb44: e08f4004 add r4, pc, r4
+  We should present a friendly error message explaining the possible
+  causes and recommending corrective action.
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1727737/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/530077/+subscriptions
