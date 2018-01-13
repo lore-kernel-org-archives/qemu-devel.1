@@ -1,14 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37453)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52459)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcd@tribudubois.net>) id 1eaK5p-0001ul-1L
-	for qemu-devel@nongnu.org; Sat, 13 Jan 2018 06:35:21 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1eaL6H-0001m7-8z
+	for qemu-devel@nongnu.org; Sat, 13 Jan 2018 07:39:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcd@tribudubois.net>) id 1eaK5o-0006ve-4U
-	for qemu-devel@nongnu.org; Sat, 13 Jan 2018 06:35:21 -0500
-From: Jean-Christophe Dubois <jcd@tribudubois.net>
-Date: Sat, 13 Jan 2018 12:34:45 +0100
-Message-Id: <20180113113445.2705-1-jcd@tribudubois.net>
-Subject: [Qemu-devel] [PATCH v2] i.MX: Fix FEC/ENET receive funtions
+	(envelope-from <peter.maydell@linaro.org>) id 1eaL6G-0003tt-IP
+	for qemu-devel@nongnu.org; Sat, 13 Jan 2018 07:39:53 -0500
+Received: from mail-oi0-x242.google.com ([2607:f8b0:4003:c06::242]:36606)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1eaL6G-0003tL-CG
+	for qemu-devel@nongnu.org; Sat, 13 Jan 2018 07:39:52 -0500
+Received: by mail-oi0-x242.google.com with SMTP id w135so5632515oie.3
+	for <qemu-devel@nongnu.org>; Sat, 13 Jan 2018 04:39:52 -0800 (PST)
+MIME-Version: 1.0
+In-Reply-To: <CAAYMZQvY=yp2xaGWPPW3gXrj_no3jWgtemJY3eDgo34WU2OVCQ@mail.gmail.com>
+References: <20171126231634.9531-1-frasse.iglesias@gmail.com>
+	<20171126231634.9531-8-frasse.iglesias@gmail.com>
+	<CAFEAcA-Z2-M88JS7n+zW1AgA99gmeT-cj90BjbEzYEN95c6Zuw@mail.gmail.com>
+	<CAAYMZQvY=yp2xaGWPPW3gXrj_no3jWgtemJY3eDgo34WU2OVCQ@mail.gmail.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Sat, 13 Jan 2018 12:39:31 +0000
+Message-ID: <CAFEAcA8F7VJ2Gp3AJuhbu8iSuBPjyeK==dPEZB_fHSf_uAvang@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v9 07/13] xilinx_spips: Add support for RX
+ discard and RX drain
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -17,67 +32,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: jasowang@redhat.com
-Cc: Jean-Christophe Dubois <jcd@tribudubois.net>, qemu-devel@nongnu.org, fyleo45@gmail.com, qemu-arm@nongnu.org, peter.maydell@linaro.org, peter.chubb@nicta.com.au
+To: francisco iglesias <frasse.iglesias@gmail.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Edgar Iglesias <edgari@xilinx.com>, Alistair Francis <alistai@xilinx.com>, Francisco Iglesias <francisco.iglesias@feimtech.se>, =?UTF-8?Q?Marcin_Krzemi=C5=84ski?= <mar.krzeminski@gmail.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
 
-The actual imx_eth_enable_rx() function is buggy.
+On 13 January 2018 at 01:04, francisco iglesias
+<frasse.iglesias@gmail.com> wrote:
+> CID 1383841 (#2 of 4): Uninitialized scalar variable (UNINIT)29.
+> uninit_use_in_call: Using uninitialized value (uint32_t)tx_rx[0] when
+> calling
+> ssi_transfer.
+>
+> This is correct, tx_rx is used uninitialized but since we are transmitting
+> dummy cycles the transmitted value (tx_rx[0] in this case) is not used (by
+> the flashes), this the reason the code looks like that. Would you like me to
+> create a patch for quieting coverity here anyway?
 
-It updates s->regs[ENET_RDAR] after calling qemu_flush_queued_packets().
+  tx_rx[0] = ssi_transfer(s->spi[bus], (uint32_t)tx_rx[0]);
 
-qemu_flush_queued_packets() is going to call imx_XXX_receive() which itself
-is going to call imx_eth_enable_rx().
+is effectively using the value (since you don't know what the
+thing on the other end of that function is going to do with the
+value you pass it. You really don't want to make this code's
+correctness depend on the called function never looking at
+its argument. If you want to pass a dummy value why not
+just use constant 0 or something rather than an uninitialized
+variable ?
 
-By updating s->regs[ENET_RDAR] after calling qemu_flush_queued_packets()
-we end up updating the register with an outdated value which might
-lead to disabling the receive function in the i.MX FEC/ENET device.
+I think quieting coverity is probably a good idea anyway for
+the other false positives (it sounds like it hasn't been able
+to determine that paths in the rest of the loop can only occur
+if the top of the loop went through a path initializing the
+variable. Code like that is also hard for humans to comprehend,
+though...)
 
-This patch change the place where the register update is done so that the
-register value stays up to date and the receive function can keep
-running.
-
-Reported-by: Fyleo <fyleo45@gmail.com>
-Tested-by: Fyleo  <fyleo45@gmail.com>
-Signed-off-by: Jean-Christophe Dubois <jcd@tribudubois.net>
----
-Change since v1:
-1. Rebase the patch on the updated master branch
-
- hw/net/imx_fec.c | 8 ++------
- 1 file changed, 2 insertions(+), 6 deletions(-)
-
-diff --git a/hw/net/imx_fec.c b/hw/net/imx_fec.c
-index 4fb48f62ba..9506f9b69f 100644
---- a/hw/net/imx_fec.c
-+++ b/hw/net/imx_fec.c
-@@ -595,19 +595,16 @@ static void imx_eth_do_tx(IMXFECState *s, uint32_t index)
- static void imx_eth_enable_rx(IMXFECState *s, bool flush)
- {
-     IMXFECBufDesc bd;
--    bool rx_ring_full;
- 
-     imx_fec_read_bd(&bd, s->rx_descriptor);
- 
--    rx_ring_full = !(bd.flags & ENET_BD_E);
-+    s->regs[ENET_RDAR] = (bd.flags & ENET_BD_E) ? ENET_RDAR_RDAR : 0;
- 
--    if (rx_ring_full) {
-+    if (!s->regs[ENET_RDAR]) {
-         FEC_PRINTF("RX buffer full\n");
-     } else if (flush) {
-         qemu_flush_queued_packets(qemu_get_queue(s->nic));
-     }
--
--    s->regs[ENET_RDAR] = rx_ring_full ? 0 : ENET_RDAR_RDAR;
- }
- 
- static void imx_eth_reset(DeviceState *d)
-@@ -866,7 +863,6 @@ static void imx_eth_write(void *opaque, hwaddr offset, uint64_t value,
-     case ENET_RDAR:
-         if (s->regs[ENET_ECR] & ENET_ECR_ETHEREN) {
-             if (!s->regs[index]) {
--                s->regs[index] = ENET_RDAR_RDAR;
-                 imx_eth_enable_rx(s, true);
-             }
-         } else {
--- 
-2.14.1
+thanks
+-- PMM
