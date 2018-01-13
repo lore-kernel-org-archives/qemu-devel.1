@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53677)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55705)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1ea9Fn-00089k-MN
-	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 19:00:57 -0500
+	(envelope-from <alistair23@gmail.com>) id 1ea9OP-0001et-6s
+	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 19:09:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1ea9Fm-0001GT-4P
-	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 19:00:55 -0500
+	(envelope-from <alistair23@gmail.com>) id 1ea9ON-0000yl-SZ
+	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 19:09:49 -0500
 MIME-Version: 1.0
 Sender: alistair23@gmail.com
-In-Reply-To: <20180111205626.23291-3-f4bug@amsat.org>
+In-Reply-To: <20180111205626.23291-20-f4bug@amsat.org>
 References: <20180111205626.23291-1-f4bug@amsat.org>
-	<20180111205626.23291-3-f4bug@amsat.org>
+	<20180111205626.23291-20-f4bug@amsat.org>
 From: Alistair Francis <alistair.francis@xilinx.com>
-Date: Fri, 12 Jan 2018 16:00:21 -0800
-Message-ID: <CAKmqyKM7Jk6tVhYET8Uv_BowOV+FB7oDKJcpHwhMjVfH4p6Muw@mail.gmail.com>
+Date: Fri, 12 Jan 2018 16:09:16 -0800
+Message-ID: <CAKmqyKPhSYpMcyDJ6T-dM9LM8LOwq8vZBM7NAM+dzJaM3ULOUQ@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v6 02/21] sdhci: add basic Spec v1
- capabilities
+Subject: Re: [Qemu-devel] [PATCH v6 19/21] sdbus: add trace events
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,247 +29,87 @@ Cc: Alistair Francis <alistair.francis@xilinx.com>, Peter Maydell <peter.maydell
 
 On Thu, Jan 11, 2018 at 12:56 PM, Philippe Mathieu-Daud=C3=A9
 <f4bug@amsat.org> wrote:
-> (Note than Spec v2 is supported by default)
->
 > Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-> ---
->  hw/sd/sdhci-internal.h | 24 +++++++++++++++++++-
->  include/hw/sd/sdhci.h  |  6 +++++
->  hw/sd/sdhci.c          | 61 +++++++++++++++++++++++++++++++++++++-------=
-------
->  3 files changed, 74 insertions(+), 17 deletions(-)
->
-> diff --git a/hw/sd/sdhci-internal.h b/hw/sd/sdhci-internal.h
-> index b7751c815f..9acafe7b01 100644
-> --- a/hw/sd/sdhci-internal.h
-> +++ b/hw/sd/sdhci-internal.h
-> @@ -24,6 +24,8 @@
->  #ifndef SDHCI_INTERNAL_H
->  #define SDHCI_INTERNAL_H
->
-> +#include "hw/registerfields.h"
-> +
->  /* R/W SDMA System Address register 0x0 */
->  #define SDHC_SYSAD                     0x00
->
-> @@ -84,6 +86,9 @@
->
->  /* R/W Host control Register 0x0 */
->  #define SDHC_HOSTCTL                   0x28
-> +FIELD(SDHC_HOSTCTL, LED_CTRL,          0, 1);
-> +FIELD(SDHC_HOSTCTL, DATATRANSFERWIDTH, 1, 1); /* SD mode only */
-> +FIELD(SDHC_HOSTCTL, HIGH_SPEED,        2, 1);
->  #define SDHC_CTRL_DMA_CHECK_MASK       0x18
->  #define SDHC_CTRL_SDMA                 0x00
->  #define SDHC_CTRL_ADMA1_32             0x08
-> @@ -94,6 +99,7 @@
->  /* R/W Power Control Register 0x0 */
->  #define SDHC_PWRCON                    0x29
->  #define SDHC_POWER_ON                  (1 << 0)
-> +FIELD(SDHC_PWRCON, BUS_VOLTAGE,        1, 3);
->
->  /* R/W Block Gap Control Register 0x0 */
->  #define SDHC_BLKGAP                    0x2A
-> @@ -116,6 +122,7 @@
->
->  /* R/W Timeout Control Register 0x0 */
->  #define SDHC_TIMEOUTCON                0x2E
-> +FIELD(SDHC_TIMEOUTCON, COUNTER,        0, 4);
->
->  /* R/W Software Reset Register 0x0 */
->  #define SDHC_SWRST                     0x2F
-> @@ -172,17 +179,32 @@
->
->  /* ROC Auto CMD12 error status register 0x0 */
->  #define SDHC_ACMD12ERRSTS              0x3C
-> +FIELD(SDHC_ACMD12ERRSTS, TIMEOUT_ERR,  1, 1);
-> +FIELD(SDHC_ACMD12ERRSTS, CRC_ERR,      2, 1);
-> +FIELD(SDHC_ACMD12ERRSTS, INDEX_ERR,    4, 1);
->
->  /* HWInit Capabilities Register 0x05E80080 */
->  #define SDHC_CAPAB                     0x40
-> -#define SDHC_CAN_DO_DMA                0x00400000
->  #define SDHC_CAN_DO_ADMA2              0x00080000
->  #define SDHC_CAN_DO_ADMA1              0x00100000
->  #define SDHC_64_BIT_BUS_SUPPORT        (1 << 28)
->  #define SDHC_CAPAB_BLOCKSIZE(x)        (((x) >> 16) & 0x3)
-> +FIELD(SDHC_CAPAB, TOCLKFREQ,           0, 6);
-> +FIELD(SDHC_CAPAB, TOUNIT,              7, 1);
-> +FIELD(SDHC_CAPAB, BASECLKFREQ,         8, 8);
-> +FIELD(SDHC_CAPAB, MAXBLOCKLENGTH,     16, 2);
-> +FIELD(SDHC_CAPAB, HIGHSPEED,          21, 1);
-> +FIELD(SDHC_CAPAB, SDMA,               22, 1);
-> +FIELD(SDHC_CAPAB, SUSPRESUME,         23, 1);
-> +FIELD(SDHC_CAPAB, V33,                24, 1);
-> +FIELD(SDHC_CAPAB, V30,                25, 1);
-> +FIELD(SDHC_CAPAB, V18,                26, 1);
->
->  /* HWInit Maximum Current Capabilities Register 0x0 */
->  #define SDHC_MAXCURR                   0x48
-> +FIELD(SDHC_MAXCURR, V33_VDD1,          0, 8);
-> +FIELD(SDHC_MAXCURR, V30_VDD1,          8, 8);
-> +FIELD(SDHC_MAXCURR, V18_VDD1,         16, 8);
->
->  /* W Force Event Auto CMD12 Error Interrupt Register 0x0000 */
->  #define SDHC_FEAER                     0x50
-> diff --git a/include/hw/sd/sdhci.h b/include/hw/sd/sdhci.h
-> index 8786676ac8..09b756eb7a 100644
-> --- a/include/hw/sd/sdhci.h
-> +++ b/include/hw/sd/sdhci.h
-> @@ -92,6 +92,12 @@ typedef struct SDHCIState {
->      /* Configurable properties */
->      bool pending_insert_quirk; /* Quirk for Raspberry Pi card insert int=
- */
->      uint8_t spec_version;
-> +    struct {
-> +        bool suspend;
-> +        bool high_speed;
-> +        bool sdma;
-> +        bool v33, v30, v18;
-> +    } cap;
->  } SDHCIState;
->
->  #define TYPE_PCI_SDHCI "sdhci-pci"
-> diff --git a/hw/sd/sdhci.c b/hw/sd/sdhci.c
-> index c8f750451e..d26ea821d0 100644
-> --- a/hw/sd/sdhci.c
-> +++ b/hw/sd/sdhci.c
-> @@ -44,12 +44,6 @@
->   * 0 - not supported, 1 - supported, other - prohibited.
->   */
->  #define SDHC_CAPAB_64BITBUS       0ul        /* 64-bit System Bus Suppor=
-t */
-> -#define SDHC_CAPAB_18V            1ul        /* Voltage support 1.8v */
-> -#define SDHC_CAPAB_30V            0ul        /* Voltage support 3.0v */
-> -#define SDHC_CAPAB_33V            1ul        /* Voltage support 3.3v */
-> -#define SDHC_CAPAB_SUSPRESUME     0ul        /* Suspend/resume support *=
-/
-> -#define SDHC_CAPAB_SDMA           1ul        /* SDMA support */
-> -#define SDHC_CAPAB_HIGHSPEED      1ul        /* High speed support */
->  #define SDHC_CAPAB_ADMA1          1ul        /* ADMA1 support */
->  #define SDHC_CAPAB_ADMA2          1ul        /* ADMA2 support */
->  /* Maximum host controller R/W buffers size
-> @@ -63,9 +57,7 @@
->  #define SDHC_CAPAB_TOCLKFREQ      52ul
->
->  /* Now check all parameters and calculate CAPABILITIES REGISTER value */
-> -#if SDHC_CAPAB_64BITBUS > 1 || SDHC_CAPAB_18V > 1 || SDHC_CAPAB_30V > 1 =
-||     \
-> -    SDHC_CAPAB_33V > 1 || SDHC_CAPAB_SUSPRESUME > 1 || SDHC_CAPAB_SDMA >=
- 1 ||  \
-> -    SDHC_CAPAB_HIGHSPEED > 1 || SDHC_CAPAB_ADMA2 > 1 || SDHC_CAPAB_ADMA1=
- > 1 ||\
-> +#if SDHC_CAPAB_64BITBUS > 1 || SDHC_CAPAB_ADMA2 > 1 || SDHC_CAPAB_ADMA1 =
-> 1 || \
->      SDHC_CAPAB_TOUNIT > 1
->  #error Capabilities features can have value 0 or 1 only!
->  #endif
-> @@ -90,16 +82,36 @@
->  #endif
->
->  #define SDHC_CAPAB_REG_DEFAULT                                 \
-> -   ((SDHC_CAPAB_64BITBUS << 28) | (SDHC_CAPAB_18V << 26) |     \
-> -    (SDHC_CAPAB_30V << 25) | (SDHC_CAPAB_33V << 24) |          \
-> -    (SDHC_CAPAB_SUSPRESUME << 23) | (SDHC_CAPAB_SDMA << 22) |  \
-> -    (SDHC_CAPAB_HIGHSPEED << 21) | (SDHC_CAPAB_ADMA1 << 20) |  \
-> +   ((SDHC_CAPAB_64BITBUS << 28) | (SDHC_CAPAB_ADMA1 << 20) |   \
->      (SDHC_CAPAB_ADMA2 << 19) | (MAX_BLOCK_LENGTH << 16) |      \
->      (SDHC_CAPAB_BASECLKFREQ << 8) | (SDHC_CAPAB_TOUNIT << 7) | \
->      (SDHC_CAPAB_TOCLKFREQ))
->
->  #define MASKED_WRITE(reg, mask, val)  (reg =3D (reg & (mask)) | (val))
->
-> +static void sdhci_init_capareg(SDHCIState *s, Error **errp)
-> +{
-> +    uint64_t capareg =3D 0;
-> +
-> +    switch (s->spec_version) {
-> +    case 2: /* default version */
-> +
-> +    /* fallback */
-> +    case 1:
-> +        capareg =3D FIELD_DP64(capareg, SDHC_CAPAB, HIGHSPEED, s->cap.hi=
-gh_speed);
-> +        capareg =3D FIELD_DP64(capareg, SDHC_CAPAB, SDMA, s->cap.sdma);
-> +        capareg =3D FIELD_DP64(capareg, SDHC_CAPAB, SUSPRESUME, s->cap.s=
-uspend);
-> +        capareg =3D FIELD_DP64(capareg, SDHC_CAPAB, V33, s->cap.v33);
-> +        capareg =3D FIELD_DP64(capareg, SDHC_CAPAB, V30, s->cap.v30);
-> +        capareg =3D FIELD_DP64(capareg, SDHC_CAPAB, V18, s->cap.v18);
-> +        break;
-> +
-> +    default:
-> +        error_setg(errp, "Unsupported spec version: %u", s->spec_version=
-);
 
-Probably best to have a return here, encase some logic added below
-later relies on this being successful.
-
-
-> +    }
-> +    s->capareg =3D capareg;
-> +}
-> +
->  static uint8_t sdhci_slotint(SDHCIState *s)
->  {
->      return (s->norintsts & s->norintsigen) || (s->errintsts & s->errints=
-igen) ||
-> @@ -1026,7 +1038,7 @@ sdhci_write(void *opaque, hwaddr offset, uint64_t v=
-al, unsigned size)
->      case SDHC_TRNMOD:
->          /* DMA can be enabled only if it is supported as indicated by
->           * capabilities register */
-> -        if (!(s->capareg & SDHC_CAN_DO_DMA)) {
-> +        if (!(s->capareg & R_SDHC_CAPAB_SDMA_MASK)) {
->              value &=3D ~SDHC_TRNS_DMA;
->          }
->          MASKED_WRITE(s->trnmod, mask, value & SDHC_TRNMOD_MASK);
-> @@ -1181,6 +1193,10 @@ static void sdhci_init_readonly_registers(SDHCISta=
-te *s, Error **errp)
->          return;
->      }
->      s->version =3D (SDHC_HCVER_VENDOR << 8) | (s->spec_version - 1);
-> +
-> +    if (s->capareg =3D=3D UINT64_MAX) {
-> +        sdhci_init_capareg(s, errp);
-> +    }
->  }
->
->  static void sdhci_initfn(SDHCIState *s)
-> @@ -1297,8 +1313,21 @@ const VMStateDescription sdhci_vmstate =3D {
->   * specific host controller implementation */
->  static Property sdhci_properties[] =3D {
->      DEFINE_PROP_UINT8("sd-spec-version", SDHCIState, spec_version, 2),
-> -    DEFINE_PROP_UINT64("capareg", SDHCIState, capareg,
-> -            SDHC_CAPAB_REG_DEFAULT),
-> +
-> +    /* DMA */
-> +    DEFINE_PROP_BOOL("sdma", SDHCIState, cap.sdma, true),
-> +    /* Suspend/resume support */
-> +    DEFINE_PROP_BOOL("suspend", SDHCIState, cap.suspend, false),
-> +    /* High speed support */
-> +    DEFINE_PROP_BOOL("high-speed", SDHCIState, cap.high_speed, true),
-> +    /* Voltage support 3.3/3.0/1.8V */
-> +    DEFINE_PROP_BOOL("3v3", SDHCIState, cap.v33, true),
-> +    DEFINE_PROP_BOOL("3v0", SDHCIState, cap.v30, false),
-> +    DEFINE_PROP_BOOL("1v8", SDHCIState, cap.v18, false),
-
-This is a change of the default value.
-
-I think you really need to specify specific changes in the commit
-message. That way is the defaults cause breakages we will be able to
-bisect it in the future.
+Reviewed-by: Alistair Francis <alistair.francis@xilinx.com>
 
 Alistair
 
+> ---
+>  hw/sd/core.c       | 14 ++++++++++++--
+>  hw/sd/trace-events |  5 +++++
+>  2 files changed, 17 insertions(+), 2 deletions(-)
+>
+> diff --git a/hw/sd/core.c b/hw/sd/core.c
+> index 295dc44ab7..498284f109 100644
+> --- a/hw/sd/core.c
+> +++ b/hw/sd/core.c
+> @@ -23,6 +23,12 @@
+>  #include "hw/qdev-core.h"
+>  #include "sysemu/block-backend.h"
+>  #include "hw/sd/sd.h"
+> +#include "trace.h"
 > +
-> +    /* capareg: deprecated */
-> +    DEFINE_PROP_UINT64("capareg", SDHCIState, capareg, UINT64_MAX),
+> +static inline const char *sdbus_name(SDBus *sdbus)
+> +{
+> +    return sdbus->qbus.name;
+> +}
+>
+>  static SDState *get_card(SDBus *sdbus)
+>  {
+> @@ -39,6 +45,7 @@ int sdbus_do_command(SDBus *sdbus, SDRequest *req, uint=
+8_t *response)
+>  {
+>      SDState *card =3D get_card(sdbus);
+>
+> +    trace_sdbus_command(sdbus_name(sdbus), req->cmd, req->arg, req->crc)=
+;
+>      if (card) {
+>          SDCardClass *sc =3D SD_CARD_GET_CLASS(card);
+>
+> @@ -52,6 +59,7 @@ void sdbus_write_data(SDBus *sdbus, uint8_t value)
+>  {
+>      SDState *card =3D get_card(sdbus);
+>
+> +    trace_sdbus_write(sdbus_name(sdbus), value);
+>      if (card) {
+>          SDCardClass *sc =3D SD_CARD_GET_CLASS(card);
+>
+> @@ -62,14 +70,16 @@ void sdbus_write_data(SDBus *sdbus, uint8_t value)
+>  uint8_t sdbus_read_data(SDBus *sdbus)
+>  {
+>      SDState *card =3D get_card(sdbus);
+> +    uint8_t value =3D 0;
+>
+>      if (card) {
+>          SDCardClass *sc =3D SD_CARD_GET_CLASS(card);
+>
+> -        return sc->read_data(card);
+> +        value =3D sc->read_data(card);
+>      }
+> +    trace_sdbus_read(sdbus_name(sdbus), value);
+>
+> -    return 0;
+> +    return value;
+>  }
+>
+>  bool sdbus_data_ready(SDBus *sdbus)
+> diff --git a/hw/sd/trace-events b/hw/sd/trace-events
+> index 0a121156a3..c0f51f11d4 100644
+> --- a/hw/sd/trace-events
+> +++ b/hw/sd/trace-events
+> @@ -1,5 +1,10 @@
+>  # See docs/devel/tracing.txt for syntax documentation.
+>
+> +# hw/sd/core.c
+> +sdbus_command(const char *bus_name, uint8_t cmd, uint32_t arg, uint8_t c=
+rc) "@%s CMD%02d arg 0x%08x crc 0x%02x"
+> +sdbus_read(const char *bus_name, uint8_t value) "@%s value 0x%02x"
+> +sdbus_write(const char *bus_name, uint8_t value) "@%s value 0x%02x"
 > +
->      DEFINE_PROP_UINT64("maxcurr", SDHCIState, maxcurr, 0),
->      DEFINE_PROP_BOOL("pending-insert-quirk", SDHCIState, pending_insert_=
-quirk,
->                       false),
+>  # hw/sd/sdhci.c
+>  sdhci_set_inserted(const char *level) "card state changed: %s"
+>  sdhci_send_command(uint8_t cmd, uint32_t arg) "CMD%02u ARG[0x%08x]"
 > --
 > 2.15.1
 >
