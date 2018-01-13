@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34365)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34398)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1ea9vP-0003vm-Vf
-	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 19:43:57 -0500
+	(envelope-from <laurent@vivier.eu>) id 1ea9vU-00040F-Gd
+	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 19:44:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1ea9vM-0006am-S6
-	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 19:43:56 -0500
-Received: from mout.kundenserver.de ([217.72.192.75]:56211)
+	(envelope-from <laurent@vivier.eu>) id 1ea9vR-0006dq-Ae
+	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 19:44:00 -0500
+Received: from mout.kundenserver.de ([212.227.17.13]:61108)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1ea9vM-0006Zv-HZ
-	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 19:43:52 -0500
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1ea9vQ-0006d5-Un
+	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 19:43:57 -0500
 From: Laurent Vivier <laurent@vivier.eu>
-Date: Sat, 13 Jan 2018 01:43:37 +0100
-Message-Id: <20180113004338.16867-7-laurent@vivier.eu>
+Date: Sat, 13 Jan 2018 01:43:38 +0100
+Message-Id: <20180113004338.16867-8-laurent@vivier.eu>
 In-Reply-To: <20180113004338.16867-1-laurent@vivier.eu>
 References: <20180113004338.16867-1-laurent@vivier.eu>
-Subject: [Qemu-devel] [PATCH v2 6/7] target/m68k: add pflush/ptest
+Subject: [Qemu-devel] [PATCH v2 7/7] target/m68k: add HMP command "info tlb"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,261 +24,294 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Thomas Huth <huth@tuxfamily.org>, Laurent Vivier <laurent@vivier.eu>
+Cc: Thomas Huth <huth@tuxfamily.org>, Laurent Vivier <laurent@vivier.eu>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+
+Dump MMU state and address mappings.
 
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 ---
-v2: change ACCESS_PTEST value because of new ACCESS_DEBUG
-    use -page_size to mask address instead of TARGET_PAGE_MASK
+CC: Dr. David Alan Gilbert <dgilbert@redhat.com>
 
- target/m68k/cpu.h       |  3 +++
- target/m68k/helper.c    | 72 +++++++++++++++++++++++++++++++++++++++++++++++++
- target/m68k/helper.h    |  2 ++
- target/m68k/monitor.c   |  1 +
- target/m68k/op_helper.c |  1 +
- target/m68k/translate.c | 33 +++++++++++++++++++++++
- 6 files changed, 112 insertions(+)
+ hmp-commands-info.hx  |   2 +-
+ target/m68k/cpu.h     |   1 +
+ target/m68k/helper.c  | 216 ++++++++++++++++++++++++++++++++++++++++++++++++++
+ target/m68k/monitor.c |  13 +++
+ 4 files changed, 231 insertions(+), 1 deletion(-)
 
+diff --git a/hmp-commands-info.hx b/hmp-commands-info.hx
+index 54c3e5eac6..ad590a4ffb 100644
+--- a/hmp-commands-info.hx
++++ b/hmp-commands-info.hx
+@@ -216,7 +216,7 @@ Show PCI information.
+ ETEXI
+ 
+ #if defined(TARGET_I386) || defined(TARGET_SH4) || defined(TARGET_SPARC) || \
+-    defined(TARGET_PPC) || defined(TARGET_XTENSA)
++    defined(TARGET_PPC) || defined(TARGET_XTENSA) || defined(TARGET_M68K)
+     {
+         .name       = "tlb",
+         .args_type  = "",
 diff --git a/target/m68k/cpu.h b/target/m68k/cpu.h
-index 4f09888de4..bb890f0561 100644
+index bb890f0561..f1721f0649 100644
 --- a/target/m68k/cpu.h
 +++ b/target/m68k/cpu.h
-@@ -131,6 +131,7 @@ typedef struct CPUM68KState {
-         uint32_t srp;
-         bool fault;
-         uint32_t ttr[4];
-+        uint32_t mmusr;
-     } mmu;
+@@ -560,4 +560,5 @@ static inline void cpu_get_tb_cpu_state(CPUM68KState *env, target_ulong *pc,
+     }
+ }
  
-     /* Control registers.  */
-@@ -510,6 +511,8 @@ enum {
-     ACCESS_STORE = 0x02,
-     /* 1 bit to indicate debug access */
-     ACCESS_DEBUG = 0x04,
-+    /* PTEST instruction */
-+    ACCESS_PTEST = 0x08,
-     /* Type of instruction that generated the access */
-     ACCESS_CODE  = 0x10, /* Code fetch access                */
-     ACCESS_DATA  = 0x20, /* Data load/store access        */
++void dump_mmu(FILE *f, fprintf_function cpu_fprintf, CPUM68KState *env);
+ #endif
 diff --git a/target/m68k/helper.c b/target/m68k/helper.c
-index c1bd0e9681..6950c03ada 100644
+index 6950c03ada..6e79cd8621 100644
 --- a/target/m68k/helper.c
 +++ b/target/m68k/helper.c
-@@ -221,6 +221,9 @@ void HELPER(m68k_movec_to)(CPUM68KState *env, uint32_t reg, uint32_t val)
-     case M68K_CR_TC:
-         env->mmu.tcr = val;
-         return;
-+    case M68K_CR_MMUSR:
-+        env->mmu.mmusr = val;
-+        return;
-     case M68K_CR_SRP:
-         env->mmu.srp = val;
-         return;
-@@ -272,6 +275,8 @@ uint32_t HELPER(m68k_movec_from)(CPUM68KState *env, uint32_t reg)
-     /* MC680[34]0 */
-     case M68K_CR_TC:
-         return env->mmu.tcr;
-+    case M68K_CR_MMUSR:
-+        return env->mmu.mmusr;
-     case M68K_CR_SRP:
-         return env->mmu.srp;
-     case M68K_CR_USP:
-@@ -434,6 +439,10 @@ static int get_physical_address(CPUM68KState *env, hwaddr *physical,
-     for (i = 0; i < M68K_MAX_TTR; i++) {
-         if (check_TTR(env->mmu.TTR(access_type, i),
-                       prot, address, access_type)) {
-+            if (access_type & ACCESS_PTEST) {
-+                /* Transparent Translation Register bit */
-+                env->mmu.mmusr = M68K_MMU_T_040 | M68K_MMU_R_040;
-+            }
-             *physical = address;
-             *page_size = TARGET_PAGE_SIZE;
-             return 0;
-@@ -462,6 +471,9 @@ static int get_physical_address(CPUM68KState *env, hwaddr *physical,
-         stl_phys(cs->as, entry, next | M68K_DESC_USED);
-     }
-     if (next & M68K_DESC_WRITEPROT) {
-+        if (access_type & ACCESS_PTEST) {
-+            env->mmu.mmusr |= M68K_MMU_WP_040;
-+        }
-         *prot &= ~PAGE_WRITE;
-         if (access_type & ACCESS_STORE) {
-             return -1;
-@@ -479,6 +491,9 @@ static int get_physical_address(CPUM68KState *env, hwaddr *physical,
-         stl_phys(cs->as, entry, next | M68K_DESC_USED);
-     }
-     if (next & M68K_DESC_WRITEPROT) {
-+        if (access_type & ACCESS_PTEST) {
-+            env->mmu.mmusr |= M68K_MMU_WP_040;
-+        }
-         *prot &= ~PAGE_WRITE;
-         if (access_type & ACCESS_STORE) {
-             return -1;
-@@ -526,6 +541,12 @@ static int get_physical_address(CPUM68KState *env, hwaddr *physical,
-     page_offset = address & ~page_mask;
-     *physical = (next & page_mask) + page_offset;
+@@ -374,6 +374,222 @@ int m68k_cpu_handle_mmu_fault(CPUState *cs, vaddr address, int size, int rw,
  
-+    if (access_type & ACCESS_PTEST) {
-+        env->mmu.mmusr |= next & M68K_MMU_SR_MASK_040;
-+        env->mmu.mmusr |= *physical & 0xfffff000;
-+        env->mmu.mmusr |= M68K_MMU_R_040;
-+    }
-+
-     if (next & M68K_DESC_WRITEPROT) {
-         *prot &= ~PAGE_WRITE;
-         if (access_type & ACCESS_STORE) {
-@@ -1079,6 +1100,57 @@ void HELPER(set_mac_extu)(CPUM68KState *env, uint32_t val, uint32_t acc)
- }
+ /* MMU: 68040 only */
  
- #if defined(CONFIG_SOFTMMU)
-+void HELPER(ptest)(CPUM68KState *env, uint32_t addr, uint32_t is_read)
++static void print_address_zone(FILE *f, fprintf_function cpu_fprintf,
++                               uint32_t logical, uint32_t physical,
++                               uint32_t size, int attr)
 +{
++    cpu_fprintf(f, "%08x - %08x -> %08x - %08x %c ",
++                logical, logical + size - 1,
++                physical, physical + size - 1,
++                attr & 4 ? 'W' : '-');
++    size >>= 10;
++    if (size < 1024) {
++        cpu_fprintf(f, "(%d KiB)\n", size);
++    } else {
++        size >>= 10;
++        if (size < 1024) {
++            cpu_fprintf(f, "(%d MiB)\n", size);
++        } else {
++            size >>= 10;
++            cpu_fprintf(f, "(%d GiB)\n", size);
++        }
++    }
++}
++
++static void dump_address_map(FILE *f, fprintf_function cpu_fprintf,
++                             CPUM68KState *env, uint32_t root_pointer)
++{
++    int i, j, k;
++    int tic_size, tic_shift;
++    uint32_t tib_mask;
++    uint32_t tia, tib, tic;
++    uint32_t logical = 0xffffffff, physical = 0xffffffff;
++    uint32_t first_logical = 0xffffffff, first_physical = 0xffffffff;
++    uint32_t last_logical, last_physical;
++    int32_t size;
++    int last_attr = -1, attr = -1;
 +    M68kCPU *cpu = m68k_env_get_cpu(env);
 +    CPUState *cs = CPU(cpu);
-+    hwaddr physical;
-+    int access_type;
-+    int prot;
-+    int ret;
-+    target_ulong page_size;
 +
-+    access_type = ACCESS_PTEST;
-+    if (env->dfc & 4) {
-+        access_type |= ACCESS_SUPER;
++    if (env->mmu.tcr & M68K_TCR_PAGE_8K) {
++        /* 8k page */
++        tic_size = 32;
++        tic_shift = 13;
++        tib_mask = 0xffffff80;
++    } else {
++        /* 4k page */
++        tic_size = 64;
++        tic_shift = 12;
++        tib_mask = 0xffffff00;
 +    }
-+    if ((env->dfc & 3) == 2) {
-+        access_type |= ACCESS_CODE;
-+    }
-+    if (!is_read) {
-+        access_type |= ACCESS_STORE;
-+    }
++    for (i = 0; i < 128; i++) {
++        tia = ldl_phys(cs->as, M68K_POINTER_BASE(root_pointer) + i * 4);
++        if (!M68K_UDT_VALID(tia)) {
++            continue;
++        }
++        for (j = 0; j < 128; j++) {
++            tib = ldl_phys(cs->as, M68K_POINTER_BASE(tia) + j * 4);
++            if (!M68K_UDT_VALID(tia)) {
++                continue;
++            }
++            for (k = 0; k < tic_size; k++) {
++                tic = ldl_phys(cs->as, (tib & tib_mask) + k * 4);
++                if (!M68K_PDT_VALID(tia)) {
++                    continue;
++                }
++                if (M68K_PDT_INDIRECT(tic)) {
++                    tic = ldl_phys(cs->as, M68K_INDIRECT_POINTER(tic));
++                }
 +
-+    env->mmu.mmusr = 0;
-+    env->mmu.ssw = 0;
-+    ret = get_physical_address(env, &physical, &prot, addr,
-+                               access_type, &page_size);
-+    if (ret == 0) {
-+        tlb_set_page(cs, addr & -page_size,
-+                     physical & -page_size,
-+                     prot, access_type & ACCESS_SUPER ?
-+                     MMU_KERNEL_IDX : MMU_USER_IDX, page_size);
++                last_logical = logical;
++                logical = (i << 25) | (j << 18) | (k << tic_shift);
++
++                last_physical = physical;
++                physical = tic & ~((1 << tic_shift) - 1);
++
++                last_attr = attr;
++                attr = tic & ((1 << tic_shift) - 1);
++
++                if ((logical != (last_logical + (1 << tic_shift))) ||
++                    (physical != (last_physical + (1 << tic_shift))) ||
++                    (attr & 4) != (last_attr & 4)) {
++
++                    if (first_logical != 0xffffffff) {
++                        size = last_logical + (1 << tic_shift) -
++                               first_logical;
++                        print_address_zone(f, cpu_fprintf, first_logical,
++                                           first_physical, size, last_attr);
++                    }
++                    first_logical = logical;
++                    first_physical = physical;
++                }
++            }
++        }
++    }
++    if (first_logical != logical || (attr & 4) != (last_attr & 4)) {
++        size = logical + (1 << tic_shift) - first_logical;
++        print_address_zone(f, cpu_fprintf, first_logical, first_physical, size,
++                           last_attr);
 +    }
 +}
 +
-+void HELPER(pflush)(CPUM68KState *env, uint32_t addr, uint32_t opmode)
++#define DUMP_CACHEFLAGS(a) \
++    switch (a & M68K_DESC_CACHEMODE) { \
++    case M68K_DESC_CM_WRTHRU: /* cachable, write-through */ \
++        cpu_fprintf(f, "T"); \
++        break; \
++    case M68K_DESC_CM_COPYBK: /* cachable, copyback */ \
++        cpu_fprintf(f, "C"); \
++        break; \
++    case M68K_DESC_CM_SERIAL: /* noncachable, serialized */ \
++        cpu_fprintf(f, "S"); \
++        break; \
++    case M68K_DESC_CM_NCACHE: /* noncachable */ \
++        cpu_fprintf(f, "N"); \
++        break; \
++    }
++
++static void dump_ttr(FILE *f, fprintf_function cpu_fprintf, uint32_t ttr)
 +{
-+    M68kCPU *cpu = m68k_env_get_cpu(env);
-+
-+    switch (opmode) {
-+    case 0: /* Flush page entry if not global */
-+    case 1: /* Flush page entry */
-+        tlb_flush_page(CPU(cpu), addr);
++    if ((ttr & M68K_TTR_ENABLED) == 0) {
++        cpu_fprintf(f, "disabled\n");
++        return;
++    }
++    cpu_fprintf(f, "Base: 0x%08x Mask: 0x%08x Control: ",
++                ttr & M68K_TTR_ADDR_BASE,
++                (ttr & M68K_TTR_ADDR_MASK) << M68K_TTR_ADDR_MASK_SHIFT);
++    switch (ttr & M68K_TTR_SFIELD) {
++    case M68K_TTR_SFIELD_USER:
++        cpu_fprintf(f, "U");
 +        break;
-+    case 2: /* Flush all except global entries */
-+        tlb_flush(CPU(cpu));
++    case M68K_TTR_SFIELD_SUPER:
++        cpu_fprintf(f, "S");
 +        break;
-+    case 3: /* Flush all entries */
-+        tlb_flush(CPU(cpu));
++    default:
++        cpu_fprintf(f, "*");
 +        break;
 +    }
++    DUMP_CACHEFLAGS(ttr);
++    if (ttr & M68K_DESC_WRITEPROT) {
++        cpu_fprintf(f, "R");
++    } else {
++        cpu_fprintf(f, "W");
++    }
++    cpu_fprintf(f, " U: %d\n", (ttr & M68K_DESC_USERATTR) >>
++                               M68K_DESC_USERATTR_SHIFT);
 +}
 +
- void HELPER(reset)(CPUM68KState *env)
++void dump_mmu(FILE *f, fprintf_function cpu_fprintf, CPUM68KState *env)
++{
++    if ((env->mmu.tcr & M68K_TCR_ENABLED) == 0) {
++        cpu_fprintf(f, "Translation disabled\n");
++        return;
++    }
++    cpu_fprintf(f, "Page Size: ");
++    if (env->mmu.tcr & M68K_TCR_PAGE_8K) {
++        cpu_fprintf(f, "8kB\n");
++    } else {
++        cpu_fprintf(f, "4kB\n");
++    }
++
++    cpu_fprintf(f, "MMUSR: ");
++    if (env->mmu.mmusr & M68K_MMU_B_040) {
++        cpu_fprintf(f, "BUS ERROR\n");
++    } else {
++        cpu_fprintf(f, "Phy=%08x Flags: ", env->mmu.mmusr & 0xfffff000);
++        /* flags found on the page descriptor */
++        if (env->mmu.mmusr & M68K_MMU_G_040) {
++            cpu_fprintf(f, "G"); /* Global */
++        } else {
++            cpu_fprintf(f, ".");
++        }
++        if (env->mmu.mmusr & M68K_MMU_S_040) {
++            cpu_fprintf(f, "S"); /* Supervisor */
++        } else {
++            cpu_fprintf(f, ".");
++        }
++        if (env->mmu.mmusr & M68K_MMU_M_040) {
++            cpu_fprintf(f, "M"); /* Modified */
++        } else {
++            cpu_fprintf(f, ".");
++        }
++        if (env->mmu.mmusr & M68K_MMU_WP_040) {
++            cpu_fprintf(f, "W"); /* Write protect */
++        } else {
++            cpu_fprintf(f, ".");
++        }
++        if (env->mmu.mmusr & M68K_MMU_T_040) {
++            cpu_fprintf(f, "T"); /* Transparent */
++        } else {
++            cpu_fprintf(f, ".");
++        }
++        if (env->mmu.mmusr & M68K_MMU_R_040) {
++            cpu_fprintf(f, "R"); /* Resident */
++        } else {
++            cpu_fprintf(f, ".");
++        }
++        cpu_fprintf(f, " Cache: ");
++        DUMP_CACHEFLAGS(env->mmu.mmusr);
++        cpu_fprintf(f, " U: %d\n", (env->mmu.mmusr >> 8) & 3);
++        cpu_fprintf(f, "\n");
++    }
++
++    cpu_fprintf(f, "ITTR0: ");
++    dump_ttr(f, cpu_fprintf, env->mmu.ttr[M68K_ITTR0]);
++    cpu_fprintf(f, "ITTR1: ");
++    dump_ttr(f, cpu_fprintf, env->mmu.ttr[M68K_ITTR1]);
++    cpu_fprintf(f, "DTTR0: ");
++    dump_ttr(f, cpu_fprintf, env->mmu.ttr[M68K_DTTR0]);
++    cpu_fprintf(f, "DTTR1: ");
++    dump_ttr(f, cpu_fprintf, env->mmu.ttr[M68K_DTTR1]);
++
++    cpu_fprintf(f, "SRP: 0x%08x\n", env->mmu.srp);
++    dump_address_map(f, cpu_fprintf, env, env->mmu.srp);
++
++    cpu_fprintf(f, "URP: 0x%08x\n", env->mmu.urp);
++    dump_address_map(f, cpu_fprintf, env, env->mmu.urp);
++}
++
+ static int check_TTR(uint32_t ttr, int *prot, target_ulong addr,
+                      int access_type)
  {
-     /* FIXME: reset all except CPU */
-diff --git a/target/m68k/helper.h b/target/m68k/helper.h
-index 57f210aa14..7f400f0def 100644
---- a/target/m68k/helper.h
-+++ b/target/m68k/helper.h
-@@ -101,5 +101,7 @@ DEF_HELPER_3(chk, void, env, s32, s32)
- DEF_HELPER_4(chk2, void, env, s32, s32, s32)
- 
- #if defined(CONFIG_SOFTMMU)
-+DEF_HELPER_3(ptest, void, env, i32, i32)
-+DEF_HELPER_3(pflush, void, env, i32, i32)
- DEF_HELPER_FLAGS_1(reset, TCG_CALL_NO_RWG, void, env)
- #endif
 diff --git a/target/m68k/monitor.c b/target/m68k/monitor.c
-index c31feb4b02..486213cd8b 100644
+index 486213cd8b..db582a34ac 100644
 --- a/target/m68k/monitor.c
 +++ b/target/m68k/monitor.c
-@@ -39,6 +39,7 @@ static const MonitorDef monitor_defs[] = {
-     { "dttr1", offsetof(CPUM68KState, mmu.ttr[M68K_DTTR1]) },
-     { "ittr0", offsetof(CPUM68KState, mmu.ttr[M68K_ITTR0]) },
-     { "ittr1", offsetof(CPUM68KState, mmu.ttr[M68K_ITTR1]) },
-+    { "mmusr", offsetof(CPUM68KState, mmu.mmusr) },
-     { NULL },
- };
- 
-diff --git a/target/m68k/op_helper.c b/target/m68k/op_helper.c
-index 4609caa546..ffea9693fc 100644
---- a/target/m68k/op_helper.c
-+++ b/target/m68k/op_helper.c
-@@ -466,6 +466,7 @@ void m68k_cpu_unassigned_access(CPUState *cs, hwaddr addr, bool is_write,
-     }
- 
-     if (m68k_feature(env, M68K_FEATURE_M68040)) {
-+        env->mmu.mmusr = 0;
-         env->mmu.ssw |= M68K_ATC_040;
-         /* FIXME: manage MMU table access error */
-         env->mmu.ssw &= ~M68K_TM_040;
-diff --git a/target/m68k/translate.c b/target/m68k/translate.c
-index 6972913984..0ebd786ba4 100644
---- a/target/m68k/translate.c
-+++ b/target/m68k/translate.c
-@@ -4673,6 +4673,35 @@ DISAS_INSN(cinv)
-     /* Invalidate cache line.  Implement as no-op.  */
- }
- 
-+#if defined(CONFIG_SOFTMMU)
-+DISAS_INSN(pflush)
-+{
-+    TCGv opmode;
+@@ -8,6 +8,19 @@
+ #include "qemu/osdep.h"
+ #include "cpu.h"
+ #include "monitor/hmp-target.h"
++#include "monitor/monitor.h"
 +
-+    if (IS_USER(s)) {
-+        gen_exception(s, s->insn_pc, EXCP_PRIVILEGE);
++void hmp_info_tlb(Monitor *mon, const QDict *qdict)
++{
++    CPUArchState *env1 = mon_get_cpu_env();
++
++    if (!env1) {
++        monitor_printf(mon, "No CPU available\n");
 +        return;
 +    }
 +
-+    opmode = tcg_const_i32((insn >> 3) & 3);
-+    gen_helper_pflush(cpu_env, AREG(insn, 0), opmode);
-+    tcg_temp_free(opmode);
++    dump_mmu((FILE *)mon, (fprintf_function)monitor_printf, env1);
 +}
-+
-+DISAS_INSN(ptest)
-+{
-+    TCGv is_read;
-+
-+    if (IS_USER(s)) {
-+        gen_exception(s, s->insn_pc, EXCP_PRIVILEGE);
-+        return;
-+    }
-+    is_read = tcg_const_i32((insn >> 5) & 1);
-+    gen_helper_ptest(cpu_env, AREG(insn, 0), is_read);
-+    tcg_temp_free(is_read);
-+}
-+#endif
-+
- DISAS_INSN(wddata)
- {
-     gen_exception(s, s->insn_pc, EXCP_PRIVILEGE);
-@@ -5864,6 +5893,8 @@ void register_m68k_insns (CPUM68KState *env)
-     INSN(cpushl,    f428, ff38, CF_ISA_A);
-     INSN(cpush,     f420, ff20, M68040);
-     INSN(cinv,      f400, ff20, M68040);
-+    INSN(pflush,    f500, ffe0, M68040);
-+    INSN(ptest,     f548, ffd8, M68040);
-     INSN(wddata,    fb00, ff00, CF_ISA_A);
-     INSN(wdebug,    fbc0, ffc0, CF_ISA_A);
- #endif
-@@ -6071,6 +6102,8 @@ void m68k_cpu_dump_state(CPUState *cs, FILE *f, fprintf_function cpu_fprintf,
-     cpu_fprintf(f, "DTTR0/1: %08x/%08x ITTR0/1: %08x/%08x\n",
-                 env->mmu.ttr[M68K_DTTR0], env->mmu.ttr[M68K_DTTR1],
-                 env->mmu.ttr[M68K_ITTR0], env->mmu.ttr[M68K_ITTR1]);
-+    cpu_fprintf(f, "MMUSR %08x, fault at %08x\n",
-+                env->mmu.mmusr, env->mmu.ar);
- #endif
- }
  
+ static const MonitorDef monitor_defs[] = {
+     { "d0", offsetof(CPUM68KState, dregs[0]) },
 -- 
 2.14.3
