@@ -1,34 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58960)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60251)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1ea9cr-0006Hp-MP
-	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 19:24:46 -0500
+	(envelope-from <matt.s@aptalaska.net>) id 1ea9jC-0008Mo-QF
+	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 19:31:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1ea9co-0007C9-JT
-	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 19:24:45 -0500
-Received: from indium.canonical.com ([91.189.90.7]:48242)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1ea9co-0007AV-D1
-	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 19:24:42 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1ea9cm-0007Mz-56
-	for <qemu-devel@nongnu.org>; Sat, 13 Jan 2018 00:24:40 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 082272E8550
-	for <qemu-devel@nongnu.org>; Sat, 13 Jan 2018 00:24:40 +0000 (UTC)
+	(envelope-from <matt.s@aptalaska.net>) id 1ea9j9-0004iH-Mj
+	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 19:31:18 -0500
+Received: from mail.aptalaska.net ([64.186.96.3]:43466)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <matt.s@aptalaska.net>) id 1ea9j9-0004fG-Fy
+	for qemu-devel@nongnu.org; Fri, 12 Jan 2018 19:31:15 -0500
+Received: from [192.168.7.99] (66-232-4-64.mtaonline.net [64.4.232.66])
+	(authenticated bits=0)
+	by mail.aptalaska.net (8.15.2/8.15.2) with ESMTPSA id w0D0VBXS009287
+	(version=TLSv1.2 cipher=DHE-RSA-AES256-SHA bits=256 verify=NO)
+	for <qemu-devel@nongnu.org>; Fri, 12 Jan 2018 15:31:12 -0900
+From: Matthew Schumacher <matt.s@aptalaska.net>
+Message-ID: <9406328b-b058-2c34-dc32-45b440ea7b80@aptalaska.net>
+Date: Fri, 12 Jan 2018 15:31:06 -0900
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Sat, 13 Jan 2018 00:11:42 -0000
-From: Till Kamppeter <1157368@bugs.launchpad.net>
-Reply-To: Bug 1157368 <1157368@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20130319191503.10848.67844.malonedeb@wampee.canonical.com>
-Message-Id: <151580230236.10413.15736998991995621412.malone@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1157368] Re: Desktop background messed up when
- running Raring in a QEMU-based virtual machine
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] question: I found a qemu crash about migration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,41 +32,91 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-This did never occur again for me. So this can get closed.
+Am 28.09.2017 um 19:01 hat Dr. David Alan Gilbert geschrieben:
+> Hi,
+>   This is a 'fun' bug;  I had a good chat to kwolf about it earlier.
+> A proper fix really needs to be done together with libvirt so that we
+> can sequence:
+>    a) The stopping of the CPU on the source
+>    b) The termination of the mirroring block job
+>    c) The inactivation of the block devices on the source
+>        (bdrv_inactivate_all)
+>    d) The activation of the block devices on the destination
+>        (bdrv_invalidate_cache_all)
+>    e) The start of the CPU on the destinationOn 01/12/2018 03:21 PM,
+qemu-devel-confirm+7e23769bf079599cf1f3db6b00d347e8675d87f
+3@nongnu.org wrote:
+>
+>
+> It looks like you're hitting a race between b/c;  we've had races
+> between c/d in the past and moved the bdrv_inactivate_all.
+>
+> During the discussion we ended up with two proposed solutions;
+> both of them require one extra command and one extra migration
+> capability.
+>
+> The block way
+> -------------
+>    1) Add a new migration capability pause-at-complete
+>    2) Add a new migration state almost-complete
+>    3) After saving devices, if pause-at-complete is set,
+>       transition to almost-complete
+>    4) Add a new command (migration-continue) that
+>       causes the migration to inactivate the devices (c)
+>       and send the final EOF to the destination.
+>
+> You set pause-at-complete, wait until migrate hits almost-complete;
+> cleanup the mirror job, and then do migration-continue.  When it
+> completes do 'cont' on the destination.
+>
+> The migration way
+> -----------------
+>    1) Stop doing (d) when the destination is started with -S
+>       since it happens anyway when 'cont' is issued
+>    2) Add a new migration capability ext-manage-storage
+>    3) When 'ext-manage-storage' is set, we don't bother doing (c)
+>    4) Add a new command 'block-inactivate' on the source
+>
+> You set ext-manage-storage, do the migrate and when it's finished
+> clean up the block job, block-inactivate on the source, and
+> then cont on the destination.
+>
+>
+> My worry about the 'block way' is that the point at which we
+> do the pause seems pretty interesting;  it probably is best
+> done after the final device save but before the inactivate,
+> but could be done before it.  But it probably becomes API
+> and something might become dependent on where we did it.
+>
+> I think Kevin's worry about the 'migration way' is that
+> it's a bit of a block-specific fudge; which is probably right.
+>
+>
+> I've not really thought what happens when you have a mix of shared and
+> non-shared storage.
+>
+> Could we do any hack that isn't libvirt-visible for existing versions?
+> I guess maybe hack drive-mirror so it interlocks with the migration
+> code somehow to hold off on that inactivate?
+>
+> This code is visible probalby from 2.9.ish with the new locking code;
+> but really that b/c race has been there for ever - there's maybe
+> always the chance that the last few blocks of mirroring might have
+> happened too late ?
+>
+> Thoughts?
+> What are the libvirt view on the preferred solution.
+>
+> Dave
 
-** Changed in: qemu (Ubuntu)
-       Status: Triaged =3D> Invalid
+Devs,
 
-** Changed in: qemu
-       Status: Incomplete =3D> Invalid
+Did this issue ever get addressed?  I'm looking at the history for
+mirror.c at https://github.com/qemu/qemu/commits/master/block/mirror.c
+and I don't see anything that leads me to believe this was fixed.
 
--- =
+I'm still unable to live migrate storage without risking corruption on
+even a moderately loaded vm.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1157368
-
-Title:
-  Desktop background messed up when running Raring in a QEMU-based
-  virtual machine
-
-Status in QEMU:
-  Invalid
-Status in qemu package in Ubuntu:
-  Invalid
-
-Bug description:
-  Screenshot attached.
-
-  Problem occurs only when choosing the default cirrus graphics card.
-  The other graphics cards do not show this problem but are very
-  unstable.
-
-  The screenshot is of the whole desktop with a Virtual Machine Manager
-  window containing the desktop of the VM. You see that its actual
-  background is messed up and also the background images which you can
-  choose when right-clicking the background and choosing "Change Desktop
-  Background".
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1157368/+subscriptions
+Thanks,
+schu
