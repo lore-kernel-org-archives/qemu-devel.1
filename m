@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42012)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42094)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pisa@cmp.felk.cvut.cz>) id 1eaog6-0006s5-EF
-	for qemu-devel@nongnu.org; Sun, 14 Jan 2018 15:14:52 -0500
+	(envelope-from <pisa@cmp.felk.cvut.cz>) id 1eaogX-0007GM-FE
+	for qemu-devel@nongnu.org; Sun, 14 Jan 2018 15:15:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pisa@cmp.felk.cvut.cz>) id 1eaog3-0005Hc-6E
-	for qemu-devel@nongnu.org; Sun, 14 Jan 2018 15:14:50 -0500
-Received: from smtp8.web4u.cz ([81.91.87.88]:45453 helo=mx-8.mail.web4u.cz)
+	(envelope-from <pisa@cmp.felk.cvut.cz>) id 1eaogU-0005Z0-85
+	for qemu-devel@nongnu.org; Sun, 14 Jan 2018 15:15:17 -0500
+Received: from smtp8.web4u.cz ([81.91.87.88]:45501 helo=mx-8.mail.web4u.cz)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <pisa@cmp.felk.cvut.cz>)
-	id 1eaog2-0005HI-Rr
-	for qemu-devel@nongnu.org; Sun, 14 Jan 2018 15:14:47 -0500
+	id 1eaogT-0005XM-TX
+	for qemu-devel@nongnu.org; Sun, 14 Jan 2018 15:15:14 -0500
 From: pisa@cmp.felk.cvut.cz
-Date: Sun, 14 Jan 2018 21:14:07 +0100
-Message-Id: <ba1a251965e9b9ee62d32e8580c7a041fb423c36.1515960078.git.pisa@cmp.felk.cvut.cz>
+Date: Sun, 14 Jan 2018 21:14:08 +0100
+Message-Id: <425e38f28bba536cfb1ae389ffa963984990f306.1515960078.git.pisa@cmp.felk.cvut.cz>
 In-Reply-To: <cover.1515960078.git.pisa@cmp.felk.cvut.cz>
 References: <cover.1515960078.git.pisa@cmp.felk.cvut.cz>
 In-Reply-To: <cover.1515960078.git.pisa@cmp.felk.cvut.cz>
 References: <cover.1515960078.git.pisa@cmp.felk.cvut.cz>
-Subject: [Qemu-devel] [PATCH V4 1/7] CAN bus simple messages transport
- implementation for QEMU
+Subject: [Qemu-devel] [PATCH V4 2/7] CAN bus support to connect bust to
+ Linux host SocketCAN interface.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,88 +32,40 @@ Cc: Stefan Hajnoczi <stefanha@gmail.com>, Konrad Frederic <frederic.konrad@adaco
 
 From: Pavel Pisa <pisa@cmp.felk.cvut.cz>
 
-The CanBusState state structure is created for each
-emulated CAN channel. Individual clients/emulated
-CAN interfaces or host interface connection registers
-to the bus by CanBusClientState structure.
-
-The CAN core is prepared to support connection to the
-real host CAN bus network. The commit with such support
-for Linux SocketCAN follows.
-
-Implementation is as simple as possible, no migration,
-messages prioritization and queuing considered for now.
-But it is intended to be extended when need arises.
-
-Development repository and more documentation at
-
-https://gitlab.fel.cvut.cz/canbus/qemu-canbus
-
-The work is based on Jin Yang GSoC 2013 work funded
-by Google and mentored in frame of RTEMS project GSoC
-slot donated to QEMU.
-
-Rewritten for QEMU-2.0+ versions and architecture cleanup
-by Pavel Pisa (Czech Technical University in Prague).
+Connection to the real host CAN bus network through
+SocketCAN network interface is available only for Linux
+host system. Mechanism is generic, support for another
+CAN API and operating systems can be implemented in future.
 
 Signed-off-by: Pavel Pisa <pisa@cmp.felk.cvut.cz>
 ---
- default-configs/pci.mak |   1 +
- hw/Makefile.objs        |   1 +
- hw/can/Makefile.objs    |   6 +++
- hw/can/can_core.c       | 136 ++++++++++++++++++++++++++++++++++++++++++++++++
- hw/can/can_host_stub.c  |  36 +++++++++++++
- include/can/can_emu.h   | 131 ++++++++++++++++++++++++++++++++++++++++++++++
- 6 files changed, 311 insertions(+)
- create mode 100644 hw/can/Makefile.objs
- create mode 100644 hw/can/can_core.c
- create mode 100644 hw/can/can_host_stub.c
- create mode 100644 include/can/can_emu.h
+ hw/can/Makefile.objs   |   4 +
+ hw/can/can_socketcan.c | 314 +++++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 318 insertions(+)
+ create mode 100644 hw/can/can_socketcan.c
 
-diff --git a/default-configs/pci.mak b/default-configs/pci.mak
-index e514bdef42..bbe11887a1 100644
---- a/default-configs/pci.mak
-+++ b/default-configs/pci.mak
-@@ -31,6 +31,7 @@ CONFIG_ESP_PCI=y
- CONFIG_SERIAL=y
- CONFIG_SERIAL_ISA=y
- CONFIG_SERIAL_PCI=y
-+CONFIG_CAN_CORE=y
- CONFIG_IPACK=y
- CONFIG_WDT_IB6300ESB=y
- CONFIG_PCI_TESTDEV=y
-diff --git a/hw/Makefile.objs b/hw/Makefile.objs
-index cf4cb2010b..9d84b8faaa 100644
---- a/hw/Makefile.objs
-+++ b/hw/Makefile.objs
-@@ -6,6 +6,7 @@ devices-dirs-$(CONFIG_SOFTMMU) += block/
- devices-dirs-$(CONFIG_SOFTMMU) += bt/
- devices-dirs-$(CONFIG_SOFTMMU) += char/
- devices-dirs-$(CONFIG_SOFTMMU) += cpu/
-+devices-dirs-$(CONFIG_SOFTMMU) += can/
- devices-dirs-$(CONFIG_SOFTMMU) += display/
- devices-dirs-$(CONFIG_SOFTMMU) += dma/
- devices-dirs-$(CONFIG_SOFTMMU) += gpio/
 diff --git a/hw/can/Makefile.objs b/hw/can/Makefile.objs
-new file mode 100644
-index 0000000000..1028d7c455
---- /dev/null
+index 1028d7c455..f999085f7a 100644
+--- a/hw/can/Makefile.objs
 +++ b/hw/can/Makefile.objs
-@@ -0,0 +1,6 @@
-+# CAN bus interfaces emulation and infrastructure
-+
-+ifeq ($(CONFIG_CAN_CORE),y)
-+common-obj-y += can_core.o
-+common-obj-y += can_host_stub.o
+@@ -2,5 +2,9 @@
+ 
+ ifeq ($(CONFIG_CAN_CORE),y)
+ common-obj-y += can_core.o
++ifeq ($(CONFIG_LINUX),y)
++common-obj-y += can_socketcan.o
++else
+ common-obj-y += can_host_stub.o
+ endif
 +endif
-diff --git a/hw/can/can_core.c b/hw/can/can_core.c
+diff --git a/hw/can/can_socketcan.c b/hw/can/can_socketcan.c
 new file mode 100644
-index 0000000000..41c458c792
+index 0000000000..f6df747c5a
 --- /dev/null
-+++ b/hw/can/can_core.c
-@@ -0,0 +1,136 @@
++++ b/hw/can/can_socketcan.c
+@@ -0,0 +1,314 @@
 +/*
-+ * CAN common CAN bus emulation support
++ * CAN socketcan support to connect to the Linux host SocketCAN interfaces
 + *
 + * Copyright (c) 2013-2014 Jin Yang
 + * Copyright (c) 2014-2018 Pavel Pisa
@@ -139,293 +91,292 @@ index 0000000000..41c458c792
 + * THE SOFTWARE.
 + */
 +#include "qemu/osdep.h"
++#include "qemu/log.h"
++#include "qemu/error-report.h"
 +#include "chardev/char.h"
 +#include "qemu/sockets.h"
 +#include "qemu/error-report.h"
 +#include "hw/hw.h"
 +#include "can/can_emu.h"
 +
-+static QTAILQ_HEAD(, CanBusState) can_buses =
-+    QTAILQ_HEAD_INITIALIZER(can_buses);
++#include <sys/ioctl.h>
++#include <net/if.h>
++#include <linux/can.h>
++#include <linux/can/raw.h>
 +
-+CanBusState *can_bus_find_by_name(const char *name, bool create_missing)
++#ifndef DEBUG_CAN
++#define DEBUG_CAN 0
++#endif /*DEBUG_CAN*/
++
++#define CAN_READ_BUF_LEN  5
++typedef struct {
++    CanBusClientState  bus_client;
++    qemu_can_filter    *rfilter;
++    int                rfilter_num;
++    can_err_mask_t     err_mask;
++
++    qemu_can_frame     buf[CAN_READ_BUF_LEN];
++    int                bufcnt;
++    int                bufptr;
++
++    int                fd;
++} CanBusSocketcanConnectState;
++
++static void can_bus_socketcan_display_msg(struct qemu_can_frame *msg)
 +{
-+    CanBusState *bus;
++    int i;
 +
-+    if (name == NULL) {
-+        name = "canbus0";
++    /* Check that QEMU and Linux kernel flags encoding matches */
++    assert(QEMU_CAN_EFF_FLAG == CAN_EFF_FLAG);
++    assert(QEMU_CAN_RTR_FLAG == CAN_RTR_FLAG);
++    assert(QEMU_CAN_ERR_FLAG == CAN_ERR_FLAG);
++
++    assert(QEMU_CAN_INV_FILTER == CAN_INV_FILTER);
++
++    assert(offsetof(qemu_can_frame, data) == offsetof(struct can_frame, data));
++
++    qemu_log_lock();
++    qemu_log("[cansocketcan]: %03X [%01d] %s %s",
++             msg->can_id & QEMU_CAN_EFF_MASK,
++             msg->can_dlc,
++             msg->can_id & QEMU_CAN_EFF_FLAG ? "EFF" : "SFF",
++             msg->can_id & QEMU_CAN_RTR_FLAG ? "RTR" : "DAT");
++
++    for (i = 0; i < msg->can_dlc; i++) {
++        qemu_log(" %02X", msg->data[i]);
 +    }
-+
-+    QTAILQ_FOREACH(bus, &can_buses, next) {
-+        if (!strcmp(bus->name, name)) {
-+            return bus;
-+        }
-+    }
-+
-+    if (!create_missing) {
-+        return 0;
-+    }
-+
-+    bus = g_malloc0(sizeof(*bus));
-+    if (bus == NULL) {
-+        return NULL;
-+    }
-+
-+    QTAILQ_INIT(&bus->clients);
-+
-+    bus->name = g_strdup(name);
-+
-+    QTAILQ_INSERT_TAIL(&can_buses, bus, next);
-+    return bus;
++    qemu_log("\n");
++    qemu_log_flush();
++    qemu_log_unlock();
 +}
 +
-+int can_bus_insert_client(CanBusState *bus, CanBusClientState *client)
++static void can_bus_socketcan_read(void *opaque)
 +{
-+    client->bus = bus;
-+    QTAILQ_INSERT_TAIL(&bus->clients, client, next);
-+    return 0;
-+}
++    CanBusSocketcanConnectState *c;
++    c = (CanBusSocketcanConnectState *)opaque;
 +
-+int can_bus_remove_client(CanBusClientState *client)
-+{
-+    CanBusState *bus = client->bus;
-+    if (bus == NULL) {
-+        return 0;
++
++
++    /* CAN_READ_BUF_LEN for multiple messages syscall is possible for future */
++    c->bufcnt = read(c->fd, c->buf, sizeof(qemu_can_frame));
++    if (c->bufcnt < 0) {
++        warn_report("CAN bus host read failed (%s)", strerror(errno));
++        return;
 +    }
 +
-+    QTAILQ_REMOVE(&bus->clients, client, next);
-+    client->bus = NULL;
-+    return 1;
++    can_bus_client_send(&c->bus_client, c->buf, 1);
++
++    if (DEBUG_CAN) {
++        can_bus_socketcan_display_msg(c->buf);
++    }
 +}
 +
-+ssize_t can_bus_client_send(CanBusClientState *client,
-+             const struct qemu_can_frame *frames, size_t frames_cnt)
++static int can_bus_socketcan_can_receive(CanBusClientState *client)
 +{
-+    int ret = 0;
-+    CanBusState *bus = client->bus;
-+    CanBusClientState *peer;
-+    if (bus == NULL) {
++    CanBusSocketcanConnectState *c;
++    c = container_of(client, CanBusSocketcanConnectState, bus_client);
++
++    if (c->fd < 0) {
 +        return -1;
 +    }
 +
-+    QTAILQ_FOREACH(peer, &bus->clients, next) {
-+        if (peer->info->can_receive(peer)) {
-+            if (peer == client) {
-+                /* No loopback support for now */
-+                continue;
-+            }
-+            if (peer->info->receive(peer, frames, frames_cnt) > 0) {
-+                ret = 1;
-+            }
++    return 1;
++}
++
++static ssize_t can_bus_socketcan_receive(CanBusClientState *client,
++                            const qemu_can_frame *frames, size_t frames_cnt)
++{
++    CanBusSocketcanConnectState *c;
++    c = container_of(client, CanBusSocketcanConnectState, bus_client);
++    size_t len = sizeof(qemu_can_frame);
++    int res;
++
++    if (c->fd < 0) {
++        return -1;
++    }
++
++    res = write(c->fd, frames, len);
++
++    if (!res) {
++        warn_report("[cansocketcan]: write message to host returns zero");
++        return -1;
++    }
++
++    if (res != len) {
++        if (res < 0) {
++            warn_report("[cansocketcan]: write to host failed (%s)",
++                        strerror(errno));
++        } else {
++            warn_report("[cansocketcan]: write to host truncated");
 +        }
++        return -1;
 +    }
 +
-+    return ret;
++    return 1;
 +}
 +
-+int can_bus_filter_match(struct qemu_can_filter *filter, qemu_canid_t can_id)
++static void can_bus_socketcan_cleanup(CanBusClientState *client)
 +{
-+    int m;
-+    if (((can_id | filter->can_mask) & QEMU_CAN_ERR_FLAG)) {
-+        return (filter->can_mask & QEMU_CAN_ERR_FLAG) != 0;
++    CanBusSocketcanConnectState *c;
++    c = container_of(client, CanBusSocketcanConnectState, bus_client);
++
++    if (c->fd >= 0) {
++        qemu_set_fd_handler(c->fd, NULL, NULL, c);
++        close(c->fd);
++        c->fd = -1;
 +    }
-+    m = (can_id & filter->can_mask) == (filter->can_id & filter->can_mask);
-+    return filter->can_id & QEMU_CAN_INV_FILTER ? !m : m;
++
++    c->rfilter_num = 0;
++    if (c->rfilter != NULL) {
++        g_free(c->rfilter);
++    }
 +}
 +
-+int can_bus_client_set_filters(CanBusClientState *client,
-+             const struct qemu_can_filter *filters, size_t filters_cnt)
++static int can_bus_socketcan_set_filters(CanBusClientState *client,
++                   const struct qemu_can_filter *filters, size_t filters_cnt)
 +{
++    CanBusSocketcanConnectState *c;
++    c = container_of(client, CanBusSocketcanConnectState, bus_client);
++
++    int i;
++
++    if (DEBUG_CAN) {
++        qemu_log_lock();
++        qemu_log("[cansocketcan]: filters set for channel\n");
++        for (i = 0; i < filters_cnt; i++) {
++            fprintf(stderr, "[%i]  id=0x%08x maks=0x%08x\n",
++                   i, filters[i].can_id, filters[i].can_mask);
++        }
++        qemu_log("\n");
++        qemu_log_flush();
++        qemu_log_unlock();
++    }
++
++    setsockopt(c->fd, SOL_CAN_RAW, CAN_RAW_FILTER,
++               filters, filters_cnt * sizeof(qemu_can_filter));
++
 +    return 0;
 +}
 +
-+int can_bus_connect_to_host_device(CanBusState *bus, const char *name)
++static
++void can_bus_socketcan_update_read_handler(CanBusSocketcanConnectState *c)
 +{
-+    if (can_bus_connect_to_host_variant == NULL) {
-+        error_report("CAN bus connect to host device is not "
-+                     "supported on this system");
++    if (c->fd >= 0) {
++        qemu_set_fd_handler(c->fd, can_bus_socketcan_read, NULL, c);
++    }
++}
++
++static CanBusClientInfo can_bus_socketcan_bus_client_info = {
++    .can_receive = can_bus_socketcan_can_receive,
++    .receive = can_bus_socketcan_receive,
++    .cleanup = can_bus_socketcan_cleanup,
++    .poll = NULL
++};
++
++static CanBusSocketcanConnectState *
++    can_bus_socketcan_connect_new(const char *host_dev_name)
++{
++    int s; /* can raw socket */
++    CanBusSocketcanConnectState    *c;
++    struct sockaddr_can addr;
++    struct ifreq ifr;
++
++    c = g_malloc0(sizeof(CanBusSocketcanConnectState));
++    if (c == NULL) {
++        goto fail1;
++    }
++
++    c->fd = -1;
++
++    /* open socket */
++    s = socket(PF_CAN, SOCK_RAW, CAN_RAW);
++    if (s < 0) {
++        error_report("[cansocketcan]: CAN_RAW socket create failed  (%s)",
++                        strerror(errno));
++        goto fail;
++    }
++
++    addr.can_family = AF_CAN;
++    memset(&ifr.ifr_name, 0, sizeof(ifr.ifr_name));
++    strcpy(ifr.ifr_name, host_dev_name);
++    if (ioctl(s, SIOCGIFINDEX, &ifr) < 0) {
++        error_report("[cansocketcan]: host interface %s not available (%s)",
++                     host_dev_name, strerror(errno));
++        goto fail;
++    }
++    addr.can_ifindex = ifr.ifr_ifindex;
++
++    c->err_mask = 0xffffffff; /* Receive error frame. */
++    setsockopt(s, SOL_CAN_RAW, CAN_RAW_ERR_FILTER,
++                   &c->err_mask, sizeof(c->err_mask));
++
++    c->rfilter_num = 1;
++    c->rfilter = g_malloc0(c->rfilter_num * sizeof(struct qemu_can_filter));
++    if (c->rfilter == NULL) {
++        goto fail;
++    }
++
++    /* Receive all data frame. If |= CAN_INV_FILTER no data. */
++    c->rfilter[0].can_id = 0;
++    c->rfilter[0].can_mask = 0;
++    c->rfilter[0].can_mask &= ~CAN_ERR_FLAG;
++
++    setsockopt(s, SOL_CAN_RAW, CAN_RAW_FILTER, c->rfilter,
++               c->rfilter_num * sizeof(struct qemu_can_filter));
++
++    if (bind(s, (struct sockaddr *)&addr, sizeof(addr)) < 0) {
++        error_report("[cansocketcan]: bind to host interface %s failed (%s)",
++                     host_dev_name, strerror(errno));
++        goto fail;
++    }
++
++    c->fd = s;
++
++    c->bus_client.info = &can_bus_socketcan_bus_client_info;
++
++    can_bus_socketcan_update_read_handler(c);
++
++    return c;
++
++fail:
++    can_bus_socketcan_cleanup(&c->bus_client);
++    g_free(c);
++fail1:
++
++    return NULL;
++}
++
++static int can_bus_connect_to_host_socketcan(CanBusState *bus,
++                                             const char *host_dev_name)
++{
++    CanBusSocketcanConnectState *c;
++
++    c = can_bus_socketcan_connect_new(host_dev_name);
++    if (c == NULL) {
++        error_report("CAN bus setup of host connect to \"%s\" failed",
++                      host_dev_name);
 +        exit(1);
 +    }
-+    return can_bus_connect_to_host_variant(bus, name);
-+}
-diff --git a/hw/can/can_host_stub.c b/hw/can/can_host_stub.c
-new file mode 100644
-index 0000000000..748d25f995
---- /dev/null
-+++ b/hw/can/can_host_stub.c
-@@ -0,0 +1,36 @@
-+/*
-+ * CAN stub to connect to host system CAN interface
-+ *
-+ * Copyright (c) 2013-2014 Jin Yang
-+ * Copyright (c) 2014-2018 Pavel Pisa
-+ *
-+ * Initial development supported by Google GSoC 2013 from RTEMS project slot
-+ *
-+ * Permission is hereby granted, free of charge, to any person obtaining a copy
-+ * of this software and associated documentation files (the "Software"), to deal
-+ * in the Software without restriction, including without limitation the rights
-+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-+ * copies of the Software, and to permit persons to whom the Software is
-+ * furnished to do so, subject to the following conditions:
-+ *
-+ * The above copyright notice and this permission notice shall be included in
-+ * all copies or substantial portions of the Software.
-+ *
-+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-+ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-+ * THE SOFTWARE.
-+ */
-+#include "qemu/osdep.h"
-+#include "chardev/char.h"
-+#include "qemu/sockets.h"
-+#include "qemu/error-report.h"
-+#include "hw/hw.h"
-+#include "can/can_emu.h"
 +
++    if (can_bus_insert_client(bus, &c->bus_client) < 0) {
++        error_report("CAN host device \"%s\" connect to bus \"%s\" failed",
++                      host_dev_name, bus->name);
++        exit(1);
++    }
++
++    if (0) {
++        /*
++         * Not used there or as a CanBusSocketcanConnectState method
++         * for now but included there for documentation purposes
++         * and to suppress warning.
++         */
++        can_bus_socketcan_set_filters(&c->bus_client, NULL, 0);
++    }
++
++    return 0;
++}
 +
 +int (*can_bus_connect_to_host_variant)(CanBusState *bus, const char *name) =
-+        NULL;
-diff --git a/include/can/can_emu.h b/include/can/can_emu.h
-new file mode 100644
-index 0000000000..85237ee3c9
---- /dev/null
-+++ b/include/can/can_emu.h
-@@ -0,0 +1,131 @@
-+/*
-+ * CAN common CAN bus emulation support
-+ *
-+ * Copyright (c) 2013-2014 Jin Yang
-+ * Copyright (c) 2014-2018 Pavel Pisa
-+ *
-+ * Initial development supported by Google GSoC 2013 from RTEMS project slot
-+ *
-+ * Permission is hereby granted, free of charge, to any person obtaining a copy
-+ * of this software and associated documentation files (the "Software"), to deal
-+ * in the Software without restriction, including without limitation the rights
-+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-+ * copies of the Software, and to permit persons to whom the Software is
-+ * furnished to do so, subject to the following conditions:
-+ *
-+ * The above copyright notice and this permission notice shall be included in
-+ * all copies or substantial portions of the Software.
-+ *
-+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-+ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-+ * THE SOFTWARE.
-+ */
-+
-+#ifndef NET_CAN_EMU_H
-+#define NET_CAN_EMU_H
-+
-+#include "qemu/queue.h"
-+
-+/* NOTE: the following two structures is copied from <linux/can.h>. */
-+
-+/*
-+ * Controller Area Network Identifier structure
-+ *
-+ * bit 0-28    : CAN identifier (11/29 bit)
-+ * bit 29      : error frame flag (0 = data frame, 1 = error frame)
-+ * bit 30      : remote transmission request flag (1 = rtr frame)
-+ * bit 31      : frame format flag (0 = standard 11 bit, 1 = extended 29 bit)
-+ */
-+typedef uint32_t qemu_canid_t;
-+
-+typedef struct qemu_can_frame {
-+    qemu_canid_t    can_id;  /* 32 bit CAN_ID + EFF/RTR/ERR flags */
-+    uint8_t         can_dlc; /* data length code: 0 .. 8 */
-+    uint8_t         data[8] QEMU_ALIGNED(8);
-+} qemu_can_frame;
-+
-+/* Keep defines for QEMU separate from Linux ones for now */
-+
-+#define QEMU_CAN_EFF_FLAG 0x80000000U /* EFF/SFF is set in the MSB */
-+#define QEMU_CAN_RTR_FLAG 0x40000000U /* remote transmission request */
-+#define QEMU_CAN_ERR_FLAG 0x20000000U /* error message frame */
-+
-+#define QEMU_CAN_SFF_MASK 0x000007FFU /* standard frame format (SFF) */
-+#define QEMU_CAN_EFF_MASK 0x1FFFFFFFU /* extended frame format (EFF) */
-+
-+/**
-+ * struct qemu_can_filter - CAN ID based filter in can_register().
-+ * @can_id:   relevant bits of CAN ID which are not masked out.
-+ * @can_mask: CAN mask (see description)
-+ *
-+ * Description:
-+ * A filter matches, when
-+ *
-+ *          <received_can_id> & mask == can_id & mask
-+ *
-+ * The filter can be inverted (QEMU_CAN_INV_FILTER bit set in can_id) or it can
-+ * filter for error message frames (QEMU_CAN_ERR_FLAG bit set in mask).
-+ */
-+typedef struct qemu_can_filter {
-+    qemu_canid_t    can_id;
-+    qemu_canid_t    can_mask;
-+} qemu_can_filter;
-+
-+/* QEMU_CAN_INV_FILTER can be set in qemu_can_filter.can_id */
-+#define QEMU_CAN_INV_FILTER 0x20000000U
-+
-+typedef struct CanBusClientState CanBusClientState;
-+typedef struct CanBusState CanBusState;
-+
-+typedef struct CanBusClientInfo {
-+    size_t size;
-+    int (*can_receive)(CanBusClientState *);
-+    ssize_t (*receive)(CanBusClientState *,
-+        const struct qemu_can_frame *frames, size_t frames_cnt);
-+    void (*cleanup) (CanBusClientState *);
-+    void (*poll)(CanBusClientState *, bool enable);
-+} CanBusClientInfo;
-+
-+struct CanBusClientState {
-+    CanBusClientInfo *info;
-+    CanBusState *bus;
-+    int link_down;
-+    QTAILQ_ENTRY(CanBusClientState) next;
-+    CanBusClientState *peer;
-+    char *model;
-+    char *name;
-+    void (*destructor)(CanBusClientState *);
-+};
-+
-+struct CanBusState {
-+    char *name;
-+    QTAILQ_HEAD(, CanBusClientState) clients;
-+    QTAILQ_ENTRY(CanBusState) next;
-+};
-+
-+extern int (*can_bus_connect_to_host_variant)(CanBusState *bus,
-+                                              const char *name);
-+
-+int can_bus_filter_match(struct qemu_can_filter *filter, qemu_canid_t can_id);
-+
-+CanBusState *can_bus_find_by_name(const char *name, bool create_missing);
-+
-+int can_bus_insert_client(CanBusState *bus, CanBusClientState *client);
-+
-+int can_bus_remove_client(CanBusClientState *client);
-+
-+ssize_t can_bus_client_send(CanBusClientState *,
-+                            const struct qemu_can_frame *frames,
-+                            size_t frames_cnt);
-+
-+int can_bus_client_set_filters(CanBusClientState *,
-+                               const struct qemu_can_filter *filters,
-+                               size_t filters_cnt);
-+
-+int can_bus_connect_to_host_device(CanBusState *bus, const char *host_dev_name);
-+
-+#endif
++        can_bus_connect_to_host_socketcan;
 -- 
 2.11.0
