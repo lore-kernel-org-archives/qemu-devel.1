@@ -1,22 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41252)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41224)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1eafqc-0007xq-SI
-	for qemu-devel@nongnu.org; Sun, 14 Jan 2018 05:49:08 -0500
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1eafqb-0007x3-9s
+	for qemu-devel@nongnu.org; Sun, 14 Jan 2018 05:49:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1eafqb-00010O-Q4
-	for qemu-devel@nongnu.org; Sun, 14 Jan 2018 05:49:06 -0500
-Received: from chuckie.co.uk ([82.165.15.123]:41913
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1eafqa-0000uU-3B
+	for qemu-devel@nongnu.org; Sun, 14 Jan 2018 05:49:05 -0500
+Received: from chuckie.co.uk ([82.165.15.123]:41899
 	helo=s16892447.onlinehome-server.info)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
-	id 1eafqb-0000xa-JM
-	for qemu-devel@nongnu.org; Sun, 14 Jan 2018 05:49:05 -0500
+	id 1eafqZ-0000iz-SO
+	for qemu-devel@nongnu.org; Sun, 14 Jan 2018 05:49:04 -0500
 From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Date: Sun, 14 Jan 2018 10:47:47 +0000
-Message-Id: <20180114104751.21965-8-mark.cave-ayland@ilande.co.uk>
+Date: Sun, 14 Jan 2018 10:47:42 +0000
+Message-Id: <20180114104751.21965-3-mark.cave-ayland@ilande.co.uk>
 In-Reply-To: <20180114104751.21965-1-mark.cave-ayland@ilande.co.uk>
 References: <20180114104751.21965-1-mark.cave-ayland@ilande.co.uk>
-Subject: [Qemu-devel] [PATCH 07/11] sun4u: rename apb variables and constants
+Subject: [Qemu-devel] [PATCH 02/11] simba: rename PBMPCIBridge and QOM types
+ to reflect simba naming
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,98 +29,147 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, atar4qemu@gmail.com
 Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 
-In order to reflect the previous change of TYPE_APB to TYPE_SABRE, update
-the corresponding variable names to keep the terminology consistent.
+Here we rename PBMPCIBridge to SimbaPCIBridge and the QOM type from
+TYPE_PBM_PCI_BRIDGE to TYPE_SIMBA_PCI_BRIDGE in improve the clarity
+of the device name.
+
+Also touch up the relevant spots in apb.c and various other function
+names as appropriate.
 
 Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 ---
- hw/sparc64/sun4u.c | 41 +++++++++++++++++++++--------------------
- 1 file changed, 21 insertions(+), 20 deletions(-)
+ hw/pci-bridge/simba.c         | 22 +++++++++++-----------
+ hw/pci-host/apb.c             | 12 ++++++------
+ include/hw/pci-bridge/simba.h | 10 +++++-----
+ 3 files changed, 22 insertions(+), 22 deletions(-)
 
-diff --git a/hw/sparc64/sun4u.c b/hw/sparc64/sun4u.c
-index b8f685847a..fb18afaaa6 100644
---- a/hw/sparc64/sun4u.c
-+++ b/hw/sparc64/sun4u.c
-@@ -55,9 +55,9 @@
- #define CMDLINE_ADDR         0x003ff000
- #define PROM_SIZE_MAX        (4 * 1024 * 1024)
- #define PROM_VADDR           0x000ffd00000ULL
--#define APB_SPECIAL_BASE     0x1fe00000000ULL
--#define APB_MEM_BASE         0x1ff00000000ULL
--#define APB_PCI_IO_BASE      (APB_SPECIAL_BASE + 0x02000000ULL)
-+#define PBM_SPECIAL_BASE     0x1fe00000000ULL
-+#define PBM_MEM_BASE         0x1ff00000000ULL
-+#define PBM_PCI_IO_BASE      (PBM_SPECIAL_BASE + 0x02000000ULL)
- #define PROM_FILENAME        "openbios-sparc64"
- #define NVRAM_SIZE           0x2000
- #define MAX_IDE_BUS          2
-@@ -465,7 +465,7 @@ static void sun4uv_init(MemoryRegion *address_space_mem,
-     Nvram *nvram;
-     unsigned int i;
-     uint64_t initrd_addr, initrd_size, kernel_addr, kernel_size, kernel_entry;
--    SabreState *apb;
-+    SabreState *sabre;
-     PCIBus *pci_bus, *pci_busA, *pci_busB;
-     PCIDevice *ebus, *pci_dev;
-     SysBusDevice *s;
-@@ -489,23 +489,24 @@ static void sun4uv_init(MemoryRegion *address_space_mem,
-     prom_init(hwdef->prom_addr, bios_name);
+diff --git a/hw/pci-bridge/simba.c b/hw/pci-bridge/simba.c
+index 05ba6f0f34..dea4c8c5e7 100644
+--- a/hw/pci-bridge/simba.c
++++ b/hw/pci-bridge/simba.c
+@@ -36,7 +36,7 @@
+  * http://www.sun.com/processors/manuals/805-1251.pdf
+  */
  
-     /* Init sabre (PCI host bridge) */
--    apb = SABRE_DEVICE(qdev_create(NULL, TYPE_SABRE));
--    qdev_prop_set_uint64(DEVICE(apb), "special-base", APB_SPECIAL_BASE);
--    qdev_prop_set_uint64(DEVICE(apb), "mem-base", APB_MEM_BASE);
--    object_property_set_link(OBJECT(apb), OBJECT(iommu), "iommu", &error_abort);
--    qdev_init_nofail(DEVICE(apb));
-+    sabre = SABRE_DEVICE(qdev_create(NULL, TYPE_SABRE));
-+    qdev_prop_set_uint64(DEVICE(sabre), "special-base", PBM_SPECIAL_BASE);
-+    qdev_prop_set_uint64(DEVICE(sabre), "mem-base", PBM_MEM_BASE);
-+    object_property_set_link(OBJECT(sabre), OBJECT(iommu), "iommu",
-+                             &error_abort);
-+    qdev_init_nofail(DEVICE(sabre));
+-static void apb_pci_bridge_realize(PCIDevice *dev, Error **errp)
++static void simba_pci_bridge_realize(PCIDevice *dev, Error **errp)
+ {
+     /*
+      * command register:
+@@ -47,7 +47,7 @@ static void apb_pci_bridge_realize(PCIDevice *dev, Error **errp)
+      *   the reset value should be zero unless the boot pin is tied high
+      *   (which is true) and thus it should be PCI_COMMAND_MEMORY.
+      */
+-    PBMPCIBridge *br = PBM_PCI_BRIDGE(dev);
++    SimbaPCIBridge *br = SIMBA_PCI_BRIDGE(dev);
  
-     /* Wire up PCI interrupts to CPU */
-     for (i = 0; i < IVEC_MAX; i++) {
--        qdev_connect_gpio_out_named(DEVICE(apb), "ivec-irq", i,
-+        qdev_connect_gpio_out_named(DEVICE(sabre), "ivec-irq", i,
-             qdev_get_gpio_in_named(DEVICE(cpu), "ivec-irq", i));
-     }
+     pci_bridge_initfn(dev, TYPE_PCI_BUS);
  
--    pci_bus = PCI_HOST_BRIDGE(apb)->bus;
--    pci_busA = pci_bridge_get_sec_bus(apb->bridgeA);
--    pci_busB = pci_bridge_get_sec_bus(apb->bridgeB);
-+    pci_bus = PCI_HOST_BRIDGE(sabre)->bus;
-+    pci_busA = pci_bridge_get_sec_bus(sabre->bridgeA);
-+    pci_busB = pci_bridge_get_sec_bus(sabre->bridgeB);
+@@ -65,12 +65,12 @@ static void apb_pci_bridge_realize(PCIDevice *dev, Error **errp)
+     pci_bridge_update_mappings(PCI_BRIDGE(br));
+ }
  
--    /* Only in-built Simba PBMs can exist on the root bus, slot 0 on busA is
-+    /* Only in-built Simba APBs can exist on the root bus, slot 0 on busA is
-        reserved (leaving no slots free after on-board devices) however slots
-        0-3 are free on busB */
-     pci_bus->slot_reserved_mask = 0xfffffffc;
-@@ -517,17 +518,17 @@ static void sun4uv_init(MemoryRegion *address_space_mem,
-                          hwdef->console_serial_base);
-     qdev_init_nofail(DEVICE(ebus));
+-static void pbm_pci_bridge_class_init(ObjectClass *klass, void *data)
++static void simba_pci_bridge_class_init(ObjectClass *klass, void *data)
+ {
+     DeviceClass *dc = DEVICE_CLASS(klass);
+     PCIDeviceClass *k = PCI_DEVICE_CLASS(klass);
  
--    /* Wire up "well-known" ISA IRQs to APB legacy obio IRQs */
-+    /* Wire up "well-known" ISA IRQs to PBM legacy obio IRQs */
-     qdev_connect_gpio_out_named(DEVICE(ebus), "isa-irq", 7,
--        qdev_get_gpio_in_named(DEVICE(apb), "pbm-irq", OBIO_LPT_IRQ));
-+        qdev_get_gpio_in_named(DEVICE(sabre), "pbm-irq", OBIO_LPT_IRQ));
-     qdev_connect_gpio_out_named(DEVICE(ebus), "isa-irq", 6,
--        qdev_get_gpio_in_named(DEVICE(apb), "pbm-irq", OBIO_FDD_IRQ));
-+        qdev_get_gpio_in_named(DEVICE(sabre), "pbm-irq", OBIO_FDD_IRQ));
-     qdev_connect_gpio_out_named(DEVICE(ebus), "isa-irq", 1,
--        qdev_get_gpio_in_named(DEVICE(apb), "pbm-irq", OBIO_KBD_IRQ));
-+        qdev_get_gpio_in_named(DEVICE(sabre), "pbm-irq", OBIO_KBD_IRQ));
-     qdev_connect_gpio_out_named(DEVICE(ebus), "isa-irq", 12,
--        qdev_get_gpio_in_named(DEVICE(apb), "pbm-irq", OBIO_MSE_IRQ));
-+        qdev_get_gpio_in_named(DEVICE(sabre), "pbm-irq", OBIO_MSE_IRQ));
-     qdev_connect_gpio_out_named(DEVICE(ebus), "isa-irq", 4,
--        qdev_get_gpio_in_named(DEVICE(apb), "pbm-irq", OBIO_SER_IRQ));
-+        qdev_get_gpio_in_named(DEVICE(sabre), "pbm-irq", OBIO_SER_IRQ));
+-    k->realize = apb_pci_bridge_realize;
++    k->realize = simba_pci_bridge_realize;
+     k->exit = pci_bridge_exitfn;
+     k->vendor_id = PCI_VENDOR_ID_SUN;
+     k->device_id = PCI_DEVICE_ID_SUN_SIMBA;
+@@ -82,20 +82,20 @@ static void pbm_pci_bridge_class_init(ObjectClass *klass, void *data)
+     dc->vmsd = &vmstate_pci_device;
+ }
  
-     pci_dev = pci_create_simple(pci_busA, PCI_DEVFN(2, 0), "VGA");
+-static const TypeInfo pbm_pci_bridge_info = {
+-    .name          = TYPE_PBM_PCI_BRIDGE,
++static const TypeInfo simba_pci_bridge_info = {
++    .name          = TYPE_SIMBA_PCI_BRIDGE,
+     .parent        = TYPE_PCI_BRIDGE,
+-    .class_init    = pbm_pci_bridge_class_init,
+-    .instance_size = sizeof(PBMPCIBridge),
++    .class_init    = simba_pci_bridge_class_init,
++    .instance_size = sizeof(SimbaPCIBridge),
+     .interfaces = (InterfaceInfo[]) {
+         { INTERFACE_CONVENTIONAL_PCI_DEVICE },
+         { },
+     },
+ };
  
+-static void pbm_register_types(void)
++static void simba_register_types(void)
+ {
+-    type_register_static(&pbm_pci_bridge_info);
++    type_register_static(&simba_pci_bridge_info);
+ }
+ 
+-type_init(pbm_register_types)
++type_init(simba_register_types)
+diff --git a/hw/pci-host/apb.c b/hw/pci-host/apb.c
+index 3a5c046794..43ee42d170 100644
+--- a/hw/pci-host/apb.c
++++ b/hw/pci-host/apb.c
+@@ -293,7 +293,7 @@ static int pci_apb_map_irq(PCIDevice *pci_dev, int irq_num)
+     return irq_num;
+ }
+ 
+-static int pci_pbmA_map_irq(PCIDevice *pci_dev, int irq_num)
++static int pci_simbaA_map_irq(PCIDevice *pci_dev, int irq_num)
+ {
+     /* The on-board devices have fixed (legacy) OBIO intnos */
+     switch (PCI_SLOT(pci_dev->devfn)) {
+@@ -311,7 +311,7 @@ static int pci_pbmA_map_irq(PCIDevice *pci_dev, int irq_num)
+     return ((PCI_SLOT(pci_dev->devfn) << 2) + irq_num) & 0x1f;
+ }
+ 
+-static int pci_pbmB_map_irq(PCIDevice *pci_dev, int irq_num)
++static int pci_simbaB_map_irq(PCIDevice *pci_dev, int irq_num)
+ {
+     return (0x10 + (PCI_SLOT(pci_dev->devfn) << 2) + irq_num) & 0x1f;
+ }
+@@ -417,15 +417,15 @@ static void pci_pbm_realize(DeviceState *dev, Error **errp)
+ 
+     /* APB secondary busses */
+     pci_dev = pci_create_multifunction(phb->bus, PCI_DEVFN(1, 0), true,
+-                                   TYPE_PBM_PCI_BRIDGE);
++                                       TYPE_SIMBA_PCI_BRIDGE);
+     s->bridgeB = PCI_BRIDGE(pci_dev);
+-    pci_bridge_map_irq(s->bridgeB, "pciB", pci_pbmB_map_irq);
++    pci_bridge_map_irq(s->bridgeB, "pciB", pci_simbaB_map_irq);
+     qdev_init_nofail(&pci_dev->qdev);
+ 
+     pci_dev = pci_create_multifunction(phb->bus, PCI_DEVFN(1, 1), true,
+-                                   TYPE_PBM_PCI_BRIDGE);
++                                       TYPE_SIMBA_PCI_BRIDGE);
+     s->bridgeA = PCI_BRIDGE(pci_dev);
+-    pci_bridge_map_irq(s->bridgeA, "pciA", pci_pbmA_map_irq);
++    pci_bridge_map_irq(s->bridgeA, "pciA", pci_simbaA_map_irq);
+     qdev_init_nofail(&pci_dev->qdev);
+ }
+ 
+diff --git a/include/hw/pci-bridge/simba.h b/include/hw/pci-bridge/simba.h
+index 5ab1330236..fac56ab1cf 100644
+--- a/include/hw/pci-bridge/simba.h
++++ b/include/hw/pci-bridge/simba.h
+@@ -28,11 +28,11 @@
+ #include "hw/pci/pci_bridge.h"
+ 
+ 
+-typedef struct PBMPCIBridge {
++typedef struct SimbaPCIBridge {
+     /*< private >*/
+     PCIBridge parent_obj;
+-} PBMPCIBridge;
++} SimbaPCIBridge;
+ 
+-#define TYPE_PBM_PCI_BRIDGE "pbm-bridge"
+-#define PBM_PCI_BRIDGE(obj) \
+-    OBJECT_CHECK(PBMPCIBridge, (obj), TYPE_PBM_PCI_BRIDGE)
++#define TYPE_SIMBA_PCI_BRIDGE "pbm-bridge"
++#define SIMBA_PCI_BRIDGE(obj) \
++    OBJECT_CHECK(SimbaPCIBridge, (obj), TYPE_SIMBA_PCI_BRIDGE)
 -- 
 2.11.0
