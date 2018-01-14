@@ -1,33 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46844)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50103)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eadlL-0006iL-Qk
-	for qemu-devel@nongnu.org; Sun, 14 Jan 2018 03:35:33 -0500
+	(envelope-from <marcel@redhat.com>) id 1eaeB4-0004nA-LN
+	for qemu-devel@nongnu.org; Sun, 14 Jan 2018 04:02:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eadlG-0004x1-Mr
-	for qemu-devel@nongnu.org; Sun, 14 Jan 2018 03:35:31 -0500
-Received: from indium.canonical.com ([91.189.90.7]:51956)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1eadlG-0004u0-D6
-	for qemu-devel@nongnu.org; Sun, 14 Jan 2018 03:35:26 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1eadlD-0003ak-Pt
-	for <qemu-devel@nongnu.org>; Sun, 14 Jan 2018 08:35:23 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id BB56C2E804B
-	for <qemu-devel@nongnu.org>; Sun, 14 Jan 2018 08:35:23 +0000 (UTC)
+	(envelope-from <marcel@redhat.com>) id 1eaeB1-0001tS-LF
+	for qemu-devel@nongnu.org; Sun, 14 Jan 2018 04:02:06 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:48300)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <marcel@redhat.com>) id 1eaeB1-0001tL-GK
+	for qemu-devel@nongnu.org; Sun, 14 Jan 2018 04:02:03 -0500
+From: Marcel Apfelbaum <marcel@redhat.com>
+Date: Sun, 14 Jan 2018 11:01:43 +0200
+Message-Id: <20180114090147.39255-2-marcel@redhat.com>
+In-Reply-To: <20180114090147.39255-1-marcel@redhat.com>
+References: <20180114090147.39255-1-marcel@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Date: Sun, 14 Jan 2018 08:29:01 -0000
-From: Andreas Gustafsson <gson@gson.org>
-Reply-To: Bug 1743191 <1743191@bugs.launchpad.net>
-Sender: bounces@canonical.com
-Message-Id: <151591854188.4596.10964938100242408667.malonedeb@wampee.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1743191] [NEW] Interacting with NetBSD serial
- console boot blocks no longer works
+Subject: [Qemu-devel] [PATCH V7 1/5] pci/shpc: Move function to generic
+ header file
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,110 +28,81 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: ehabkost@redhat.com, imammedo@redhat.com, yuval.shaia@oracle.com, marcel@redhat.com, pbonzini@redhat.com, mst@redhat.com, borntraeger@de.ibm.com, cohuck@redhat.com, f4bug@amsat.org
 
-Public bug reported:
+From: Yuval Shaia <yuval.shaia@oracle.com>
 
-The NetBSD boot blocks display a menu allowing the user to make a
-selection using the keyboard.  For example, when booting a NetBSD
-installation CD-ROM, the menu looks like this:
+This function should be declared in generic header file so we can
+utilize it.
 
-         1. Install NetBSD
-         2. Install NetBSD (no ACPI)
-         3. Install NetBSD (no ACPI, no SMP)
-         4. Drop to boot prompt
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+Signed-off-by: Yuval Shaia <yuval.shaia@oracle.com>
+Signed-off-by: Marcel Apfelbaum <marcel@redhat.com>
+---
+ hw/pci/shpc.c             | 13 ++-----------
+ include/qemu/host-utils.h | 10 ++++++++++
+ 2 files changed, 12 insertions(+), 11 deletions(-)
 
-    Choose an option; RETURN for default; SPACE to stop countdown.
-    Option 1 will be chosen in 30 seconds.
-
-When booting NetBSD in a recent qemu using an emulated serial console,
-making this menu selection no longer works: when you type the selected
-number, the keyboard input is ignored, and the 30-second countdown
-continues.  In older versions of qemu, it works.
-
-To reproduce the problem, run:
-
-   wget http://ftp.netbsd.org/pub/NetBSD/NetBSD-7.1.1/amd64/installation/cd=
-rom/boot-com.iso
-   qemu-system-x86_64 -nographic -cdrom boot-com.iso
-
-During the 30-second countdown, press 4
-
-Expected behavior: The countdown stops and you get a ">" prompt
-
-Incorrect behavior: The countdown continues
-
-There may also be some corruption of the terminal output; for example,
-"Option 1 will be chosen in 30 seconds" may be displayed as "Option 1
-will be chosen in p0 seconds".
-
-Using bisection, I have determined that the problem appeared with qemu
-commit 083fab0290f2c40d3d04f7f22eed9c8f2d5b6787, in which seabios was
-updated to 1.11 prerelease, and the problem is still there as of
-commit 7398166ddf7c6dbbc9cae6ac69bb2feda14b40ac.  The host operating
-system used for the tests was Debian 9 x86_64.
-
-Credit for discovering this bug goes to Paul Goyette.
-
-** Affects: qemu
-     Importance: Undecided
-         Status: New
-
-
-** Tags: regression
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1743191
-
-Title:
-  Interacting with NetBSD serial console boot blocks no longer works
-
-Status in QEMU:
-  New
-
-Bug description:
-  The NetBSD boot blocks display a menu allowing the user to make a
-  selection using the keyboard.  For example, when booting a NetBSD
-  installation CD-ROM, the menu looks like this:
-
-           1. Install NetBSD
-           2. Install NetBSD (no ACPI)
-           3. Install NetBSD (no ACPI, no SMP)
-           4. Drop to boot prompt
-
-      Choose an option; RETURN for default; SPACE to stop countdown.
-      Option 1 will be chosen in 30 seconds.
-
-  When booting NetBSD in a recent qemu using an emulated serial console,
-  making this menu selection no longer works: when you type the selected
-  number, the keyboard input is ignored, and the 30-second countdown
-  continues.  In older versions of qemu, it works.
-
-  To reproduce the problem, run:
-
-     wget http://ftp.netbsd.org/pub/NetBSD/NetBSD-7.1.1/amd64/installation/=
-cdrom/boot-com.iso
-     qemu-system-x86_64 -nographic -cdrom boot-com.iso
-
-  During the 30-second countdown, press 4
-
-  Expected behavior: The countdown stops and you get a ">" prompt
-
-  Incorrect behavior: The countdown continues
-
-  There may also be some corruption of the terminal output; for example,
-  "Option 1 will be chosen in 30 seconds" may be displayed as "Option 1
-  will be chosen in p0 seconds".
-
-  Using bisection, I have determined that the problem appeared with qemu
-  commit 083fab0290f2c40d3d04f7f22eed9c8f2d5b6787, in which seabios was
-  updated to 1.11 prerelease, and the problem is still there as of
-  commit 7398166ddf7c6dbbc9cae6ac69bb2feda14b40ac.  The host operating
-  system used for the tests was Debian 9 x86_64.
-
-  Credit for discovering this bug goes to Paul Goyette.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1743191/+subscriptions
+diff --git a/hw/pci/shpc.c b/hw/pci/shpc.c
+index 69fc14b218..a8462d48bb 100644
+--- a/hw/pci/shpc.c
++++ b/hw/pci/shpc.c
+@@ -1,6 +1,7 @@
+ #include "qemu/osdep.h"
+ #include "qapi/error.h"
+ #include "qemu-common.h"
++#include "qemu/host-utils.h"
+ #include "qemu/range.h"
+ #include "qemu/error-report.h"
+ #include "hw/pci/shpc.h"
+@@ -122,16 +123,6 @@
+ #define SHPC_PCI_TO_IDX(pci_slot) ((pci_slot) - 1)
+ #define SHPC_IDX_TO_PHYSICAL(slot) ((slot) + 1)
+=20
+-static int roundup_pow_of_two(int x)
+-{
+-    x |=3D (x >> 1);
+-    x |=3D (x >> 2);
+-    x |=3D (x >> 4);
+-    x |=3D (x >> 8);
+-    x |=3D (x >> 16);
+-    return x + 1;
+-}
+-
+ static uint16_t shpc_get_status(SHPCDevice *shpc, int slot, uint16_t msk=
+)
+ {
+     uint8_t *status =3D shpc->config + SHPC_SLOT_STATUS(slot);
+@@ -656,7 +647,7 @@ int shpc_init(PCIDevice *d, PCIBus *sec_bus, MemoryRe=
+gion *bar,
+=20
+ int shpc_bar_size(PCIDevice *d)
+ {
+-    return roundup_pow_of_two(SHPC_SLOT_REG(SHPC_MAX_SLOTS));
++    return pow2roundup32(SHPC_SLOT_REG(SHPC_MAX_SLOTS));
+ }
+=20
+ void shpc_cleanup(PCIDevice *d, MemoryRegion *bar)
+diff --git a/include/qemu/host-utils.h b/include/qemu/host-utils.h
+index 5ac621cf1f..38da849be9 100644
+--- a/include/qemu/host-utils.h
++++ b/include/qemu/host-utils.h
+@@ -400,6 +400,16 @@ static inline uint64_t pow2ceil(uint64_t value)
+     return 0x8000000000000000ull >> (n - 1);
+ }
+=20
++static inline uint32_t pow2roundup32(uint32_t x)
++{
++    x |=3D (x >> 1);
++    x |=3D (x >> 2);
++    x |=3D (x >> 4);
++    x |=3D (x >> 8);
++    x |=3D (x >> 16);
++    return x + 1;
++}
++
+ /**
+  * urshift - 128-bit Unsigned Right Shift.
+  * @plow: in/out - lower 64-bit integer.
+--=20
+2.13.5
