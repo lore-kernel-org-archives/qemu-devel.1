@@ -1,33 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37362)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38050)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eaiD1-0006Cv-Vu
-	for qemu-devel@nongnu.org; Sun, 14 Jan 2018 08:20:25 -0500
+	(envelope-from <balaton@eik.bme.hu>) id 1eaiHj-0007l1-5h
+	for qemu-devel@nongnu.org; Sun, 14 Jan 2018 08:25:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eaiCx-00054n-Ry
-	for qemu-devel@nongnu.org; Sun, 14 Jan 2018 08:20:23 -0500
-Received: from mail-qk0-x242.google.com ([2607:f8b0:400d:c09::242]:43768)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eaiCx-00053t-FZ
-	for qemu-devel@nongnu.org; Sun, 14 Jan 2018 08:20:19 -0500
-Received: by mail-qk0-x242.google.com with SMTP id a5so11154245qkg.10
-	for <qemu-devel@nongnu.org>; Sun, 14 Jan 2018 05:20:19 -0800 (PST)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20180114104751.21965-1-mark.cave-ayland@ilande.co.uk>
-	<20180114104751.21965-8-mark.cave-ayland@ilande.co.uk>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <ee46e8fc-0ff2-3624-1b51-7377f05143d3@amsat.org>
-Date: Sun, 14 Jan 2018 10:20:09 -0300
+	(envelope-from <balaton@eik.bme.hu>) id 1eaiHf-0000q7-M7
+	for qemu-devel@nongnu.org; Sun, 14 Jan 2018 08:25:14 -0500
+Received: from zero.eik.bme.hu ([2001:738:2001:2001::2001]:28322)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <balaton@eik.bme.hu>) id 1eaiHf-0000f8-Ev
+	for qemu-devel@nongnu.org; Sun, 14 Jan 2018 08:25:11 -0500
+Date: Sun, 14 Jan 2018 14:24:57 +0100 (CET)
+From: BALATON Zoltan <balaton@eik.bme.hu>
+In-Reply-To: <151593225024.11261.9880390596143098449.malonedeb@soybean.canonical.com>
+Message-ID: <alpine.BSF.2.21.1801141421010.19489@zero.eik.bme.hu>
+References: <151593225024.11261.9880390596143098449.malonedeb@soybean.canonical.com>
 MIME-Version: 1.0
-In-Reply-To: <20180114104751.21965-8-mark.cave-ayland@ilande.co.uk>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 07/11] sun4u: rename apb variables and
- constants
+Content-Type: text/plain; format=flowed; charset=US-ASCII
+Subject: Re: [Qemu-devel] [Bug 1743214] [NEW] OS/2 Warp 3 support broken in
+ 2.11
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,109 +26,20 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, atar4qemu@gmail.com
+To: MVoloshin <1743214@bugs.launchpad.net>
 Cc: qemu-devel@nongnu.org
 
-Hi Mark,
+On Sun, 14 Jan 2018, MVoloshin wrote:
+> Hello, I used to run OS/2 Warp 3 on QEMU with the following command 
+> line: qemu-system-i386 -vga cirrus -soundhw sb16 -hda os2warp3v2.img 
+> -boot c. It runs OK on QEMU 2.10, but immediately gives TRAP 0006 
+> (invalid opcode?) on QEMU 2.11 (see screenshot).
+>
+> If it is important I have Fixpack 40 and GRADD installed in OS/2.
+> Here is the image:
+> https://drive.google.com/open?id=15umPecy7JlPLKUP6520MB_87CfrCDWO5
 
-On 01/14/2018 07:47 AM, Mark Cave-Ayland wrote:
-> In order to reflect the previous change of TYPE_APB to TYPE_SABRE, update
-> the corresponding variable names to keep the terminology consistent.
-> 
-> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-> ---
->  hw/sparc64/sun4u.c | 41 +++++++++++++++++++++--------------------
->  1 file changed, 21 insertions(+), 20 deletions(-)
-> 
-> diff --git a/hw/sparc64/sun4u.c b/hw/sparc64/sun4u.c
-> index b8f685847a..fb18afaaa6 100644
-> --- a/hw/sparc64/sun4u.c
-> +++ b/hw/sparc64/sun4u.c
-> @@ -55,9 +55,9 @@
->  #define CMDLINE_ADDR         0x003ff000
->  #define PROM_SIZE_MAX        (4 * 1024 * 1024)
->  #define PROM_VADDR           0x000ffd00000ULL
-> -#define APB_SPECIAL_BASE     0x1fe00000000ULL
-> -#define APB_MEM_BASE         0x1ff00000000ULL
-> -#define APB_PCI_IO_BASE      (APB_SPECIAL_BASE + 0x02000000ULL)
-> +#define PBM_SPECIAL_BASE     0x1fe00000000ULL
-> +#define PBM_MEM_BASE         0x1ff00000000ULL
-> +#define PBM_PCI_IO_BASE      (PBM_SPECIAL_BASE + 0x02000000ULL)
->  #define PROM_FILENAME        "openbios-sparc64"
->  #define NVRAM_SIZE           0x2000
->  #define MAX_IDE_BUS          2
-> @@ -465,7 +465,7 @@ static void sun4uv_init(MemoryRegion *address_space_mem,
->      Nvram *nvram;
->      unsigned int i;
->      uint64_t initrd_addr, initrd_size, kernel_addr, kernel_size, kernel_entry;
-> -    SabreState *apb;
-> +    SabreState *sabre;
->      PCIBus *pci_bus, *pci_busA, *pci_busB;
->      PCIDevice *ebus, *pci_dev;
->      SysBusDevice *s;
-> @@ -489,23 +489,24 @@ static void sun4uv_init(MemoryRegion *address_space_mem,
->      prom_init(hwdef->prom_addr, bios_name);
->  
->      /* Init sabre (PCI host bridge) */
-> -    apb = SABRE_DEVICE(qdev_create(NULL, TYPE_SABRE));
-> -    qdev_prop_set_uint64(DEVICE(apb), "special-base", APB_SPECIAL_BASE);
-> -    qdev_prop_set_uint64(DEVICE(apb), "mem-base", APB_MEM_BASE);
-> -    object_property_set_link(OBJECT(apb), OBJECT(iommu), "iommu", &error_abort);
-> -    qdev_init_nofail(DEVICE(apb));
-> +    sabre = SABRE_DEVICE(qdev_create(NULL, TYPE_SABRE));
-> +    qdev_prop_set_uint64(DEVICE(sabre), "special-base", PBM_SPECIAL_BASE);
-> +    qdev_prop_set_uint64(DEVICE(sabre), "mem-base", PBM_MEM_BASE);
-> +    object_property_set_link(OBJECT(sabre), OBJECT(iommu), "iommu",
-> +                             &error_abort);
-> +    qdev_init_nofail(DEVICE(sabre));
->  
->      /* Wire up PCI interrupts to CPU */
->      for (i = 0; i < IVEC_MAX; i++) {
-> -        qdev_connect_gpio_out_named(DEVICE(apb), "ivec-irq", i,
-> +        qdev_connect_gpio_out_named(DEVICE(sabre), "ivec-irq", i,
->              qdev_get_gpio_in_named(DEVICE(cpu), "ivec-irq", i));
->      }
->  
-> -    pci_bus = PCI_HOST_BRIDGE(apb)->bus;
-> -    pci_busA = pci_bridge_get_sec_bus(apb->bridgeA);
-> -    pci_busB = pci_bridge_get_sec_bus(apb->bridgeB);
-> +    pci_bus = PCI_HOST_BRIDGE(sabre)->bus;
-> +    pci_busA = pci_bridge_get_sec_bus(sabre->bridgeA);
-> +    pci_busB = pci_bridge_get_sec_bus(sabre->bridgeB);
->  
-> -    /* Only in-built Simba PBMs can exist on the root bus, slot 0 on busA is
-> +    /* Only in-built Simba APBs can exist on the root bus, slot 0 on busA is
-
-This single change might go in patch #2 instead.
-
-Anyway:
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-
->         reserved (leaving no slots free after on-board devices) however slots
->         0-3 are free on busB */
->      pci_bus->slot_reserved_mask = 0xfffffffc;
-> @@ -517,17 +518,17 @@ static void sun4uv_init(MemoryRegion *address_space_mem,
->                           hwdef->console_serial_base);
->      qdev_init_nofail(DEVICE(ebus));
->  
-> -    /* Wire up "well-known" ISA IRQs to APB legacy obio IRQs */
-> +    /* Wire up "well-known" ISA IRQs to PBM legacy obio IRQs */
->      qdev_connect_gpio_out_named(DEVICE(ebus), "isa-irq", 7,
-> -        qdev_get_gpio_in_named(DEVICE(apb), "pbm-irq", OBIO_LPT_IRQ));
-> +        qdev_get_gpio_in_named(DEVICE(sabre), "pbm-irq", OBIO_LPT_IRQ));
->      qdev_connect_gpio_out_named(DEVICE(ebus), "isa-irq", 6,
-> -        qdev_get_gpio_in_named(DEVICE(apb), "pbm-irq", OBIO_FDD_IRQ));
-> +        qdev_get_gpio_in_named(DEVICE(sabre), "pbm-irq", OBIO_FDD_IRQ));
->      qdev_connect_gpio_out_named(DEVICE(ebus), "isa-irq", 1,
-> -        qdev_get_gpio_in_named(DEVICE(apb), "pbm-irq", OBIO_KBD_IRQ));
-> +        qdev_get_gpio_in_named(DEVICE(sabre), "pbm-irq", OBIO_KBD_IRQ));
->      qdev_connect_gpio_out_named(DEVICE(ebus), "isa-irq", 12,
-> -        qdev_get_gpio_in_named(DEVICE(apb), "pbm-irq", OBIO_MSE_IRQ));
-> +        qdev_get_gpio_in_named(DEVICE(sabre), "pbm-irq", OBIO_MSE_IRQ));
->      qdev_connect_gpio_out_named(DEVICE(ebus), "isa-irq", 4,
-> -        qdev_get_gpio_in_named(DEVICE(apb), "pbm-irq", OBIO_SER_IRQ));
-> +        qdev_get_gpio_in_named(DEVICE(sabre), "pbm-irq", OBIO_SER_IRQ));
->  
->      pci_dev = pci_create_simple(pci_busA, PCI_DEVFN(2, 0), "VGA");
->  
-> 
+This image boots for me without problem with latest version from git so 
+either it's already fixed or the problem is elsewhere. Can you try latest 
+git version? If it still does not work with that maybe you need to provide 
+more details, like configure options or what host arch/OS are you on.
