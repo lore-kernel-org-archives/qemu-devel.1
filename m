@@ -1,33 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39041)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39974)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eaiOT-0002Cw-1k
-	for qemu-devel@nongnu.org; Sun, 14 Jan 2018 08:32:13 -0500
+	id 1eaiSU-0004M7-Qb
+	for qemu-devel@nongnu.org; Sun, 14 Jan 2018 08:36:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eaiOP-0006v1-RW
-	for qemu-devel@nongnu.org; Sun, 14 Jan 2018 08:32:13 -0500
-Received: from mail-qk0-x241.google.com ([2607:f8b0:400d:c09::241]:36925)
+	id 1eaiSR-0002TC-LC
+	for qemu-devel@nongnu.org; Sun, 14 Jan 2018 08:36:22 -0500
+Received: from mail-qk0-x243.google.com ([2607:f8b0:400d:c09::243]:43831)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eaiOP-0006uh-N1
-	for qemu-devel@nongnu.org; Sun, 14 Jan 2018 08:32:09 -0500
-Received: by mail-qk0-x241.google.com with SMTP id y80so7409807qkb.4
-	for <qemu-devel@nongnu.org>; Sun, 14 Jan 2018 05:32:09 -0800 (PST)
+	id 1eaiSR-0002T1-G0
+	for qemu-devel@nongnu.org; Sun, 14 Jan 2018 08:36:19 -0500
+Received: by mail-qk0-x243.google.com with SMTP id a5so11177570qkg.10
+	for <qemu-devel@nongnu.org>; Sun, 14 Jan 2018 05:36:19 -0800 (PST)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 References: <20180114104751.21965-1-mark.cave-ayland@ilande.co.uk>
-	<20180114104751.21965-10-mark.cave-ayland@ilande.co.uk>
+	<20180114104751.21965-11-mark.cave-ayland@ilande.co.uk>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <e4cb0bba-c6e0-0a38-7224-71738c3a7d5a@amsat.org>
-Date: Sun, 14 Jan 2018 10:32:05 -0300
+Message-ID: <6316c7eb-e049-297b-60a9-df5a3d9456d3@amsat.org>
+Date: Sun, 14 Jan 2018 10:36:15 -0300
 MIME-Version: 1.0
-In-Reply-To: <20180114104751.21965-10-mark.cave-ayland@ilande.co.uk>
+In-Reply-To: <20180114104751.21965-11-mark.cave-ayland@ilande.co.uk>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 09/11] pci: add trace-events support for
- hw/pci-host
+Subject: Re: [Qemu-devel] [PATCH 10/11] sabre: convert from SABRE_DPRINTF
+ macro to trace-events
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,40 +37,140 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, atar4qemu@gmail.com
-Cc: qemu-devel@nongnu.org, Marcel Apfelbaum <marcel@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>
+Cc: qemu-devel@nongnu.org
 
 On 01/14/2018 07:47 AM, Mark Cave-Ayland wrote:
 > Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-
-Not sure this is worth a separate commit (I'd squash it in the next
-patch), still:
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-
-> CC: Michael S. Tsirkin <mst@redhat.com>
-> CC: Marcel Apfelbaum <marcel@redhat.com>
 > ---
->  Makefile.objs            | 1 +
->  hw/pci-host/trace-events | 1 +
->  2 files changed, 2 insertions(+)
->  create mode 100644 hw/pci-host/trace-events
+>  hw/pci-host/sabre.c      | 32 ++++++++++----------------------
+>  hw/pci-host/trace-events | 10 ++++++++++
+>  2 files changed, 20 insertions(+), 22 deletions(-)
 > 
-> diff --git a/Makefile.objs b/Makefile.objs
-> index c8b1bba593..6aa793ce4f 100644
-> --- a/Makefile.objs
-> +++ b/Makefile.objs
-> @@ -149,6 +149,7 @@ trace-events-subdirs += hw/i386/xen
->  trace-events-subdirs += hw/9pfs
->  trace-events-subdirs += hw/ppc
->  trace-events-subdirs += hw/pci
-> +trace-events-subdirs += hw/pci-host
->  trace-events-subdirs += hw/s390x
->  trace-events-subdirs += hw/vfio
->  trace-events-subdirs += hw/acpi
+> diff --git a/hw/pci-host/sabre.c b/hw/pci-host/sabre.c
+> index 4054c17598..2268a41dd9 100644
+> --- a/hw/pci-host/sabre.c
+> +++ b/hw/pci-host/sabre.c
+> @@ -36,16 +36,7 @@
+>  #include "exec/address-spaces.h"
+>  #include "qapi/error.h"
+>  #include "qemu/log.h"
+> -
+> -/* debug sabre */
+> -//#define DEBUG_SABRE
+> -
+> -#ifdef DEBUG_SABRE
+> -#define SABRE_DPRINTF(fmt, ...) \
+> -do { printf("sabre: " fmt , ## __VA_ARGS__); } while (0)
+> -#else
+> -#define SABRE_DPRINTF(fmt, ...)
+> -#endif
+> +#include "trace.h"
+>  
+>  /*
+>   * Chipset docs:
+> @@ -69,8 +60,7 @@ do { printf("sabre: " fmt , ## __VA_ARGS__); } while (0)
+>  
+>  static inline void sabre_set_request(SabreState *s, unsigned int irq_num)
+>  {
+> -    SABRE_DPRINTF("%s: request irq %d\n", __func__, irq_num);
+> -
+> +    trace_sabre_set_request(irq_num);
+>      s->irq_request = irq_num;
+>      qemu_set_irq(s->ivec_irqs[irq_num], 1);
+>  }
+> @@ -108,7 +98,7 @@ static inline void sabre_check_irqs(SabreState *s)
+>  
+>  static inline void sabre_clear_request(SabreState *s, unsigned int irq_num)
+>  {
+> -    SABRE_DPRINTF("%s: clear request irq %d\n", __func__, irq_num);
+> +    trace_sabre_clear_request(irq_num);
+>      qemu_set_irq(s->ivec_irqs[irq_num], 0);
+>      s->irq_request = NO_IRQ_REQUEST;
+>  }
+> @@ -125,8 +115,7 @@ static void sabre_config_write(void *opaque, hwaddr addr,
+>  {
+>      SabreState *s = opaque;
+>  
+> -    SABRE_DPRINTF("%s: addr " TARGET_FMT_plx " val %" PRIx64 "\n", __func__,
+> -                  addr, val);
+> +    trace_sabre_config_write(addr, val);
+>  
+>      switch (addr & 0xffff) {
+>      case 0x30 ... 0x4f: /* DMA error registers */
+> @@ -250,7 +239,7 @@ static uint64_t sabre_config_read(void *opaque,
+>          val = 0;
+>          break;
+>      }
+> -    SABRE_DPRINTF("%s: addr " TARGET_FMT_plx " -> %x\n", __func__, addr, val);
+> +    trace_sabre_config_read(addr, val);
+>  
+>      return val;
+>  }
+> @@ -267,8 +256,7 @@ static void sabre_pci_config_write(void *opaque, hwaddr addr,
+>      SabreState *s = opaque;
+>      PCIHostState *phb = PCI_HOST_BRIDGE(s);
+>  
+> -    SABRE_DPRINTF("%s: addr " TARGET_FMT_plx " val %" PRIx64 "\n", __func__,
+> -                  addr, val);
+> +    trace_sabre_pci_config_write(addr, val);
+>      pci_data_write(phb->bus, addr, val, size);
+>  }
+>  
+> @@ -280,7 +268,7 @@ static uint64_t sabre_pci_config_read(void *opaque, hwaddr addr,
+>      PCIHostState *phb = PCI_HOST_BRIDGE(s);
+>  
+>      ret = pci_data_read(phb->bus, addr, size);
+> -    SABRE_DPRINTF("%s: addr " TARGET_FMT_plx " -> %x\n", __func__, addr, ret);
+> +    trace_sabre_pci_config_read(addr, ret);
+>      return ret;
+>  }
+>  
+> @@ -318,7 +306,8 @@ static void pci_sabre_set_irq(void *opaque, int irq_num, int level)
+>  {
+>      SabreState *s = opaque;
+>  
+> -    SABRE_DPRINTF("%s: set irq_in %d level %d\n", __func__, irq_num, level);
+> +    trace_sabre_pci_set_irq(irq_num, level);
+> +
+>      /* PCI IRQ map onto the first 32 INO.  */
+>      if (irq_num < 32) {
+>          if (level) {
+> @@ -332,8 +321,7 @@ static void pci_sabre_set_irq(void *opaque, int irq_num, int level)
+>      } else {
+>          /* OBIO IRQ map onto the next 32 INO.  */
+>          if (level) {
+> -            SABRE_DPRINTF("%s: set irq %d level %d\n", __func__, irq_num,
+> -                          level);
+> +            trace_sabre_pci_set_obio_irq(irq_num, level);
+>              s->pci_irq_in |= 1ULL << irq_num;
+>              if ((s->irq_request == NO_IRQ_REQUEST)
+>                  && (s->obio_irq_map[irq_num - 32] & PBM_PCI_IMR_ENABLED)) {
 > diff --git a/hw/pci-host/trace-events b/hw/pci-host/trace-events
-> new file mode 100644
-> index 0000000000..9284b1fbad
-> --- /dev/null
+> index 9284b1fbad..32dfc84692 100644
+> --- a/hw/pci-host/trace-events
 > +++ b/hw/pci-host/trace-events
-> @@ -0,0 +1 @@
-> +# See docs/devel/tracing.txt for syntax documentation.
-> 
+> @@ -1 +1,11 @@
+>  # See docs/devel/tracing.txt for syntax documentation.
+> +
+> +# hw/pci-host/sabre.c
+> +sabre_set_request(int irq_num) "request irq %d"
+
+unsigned int irq_num, %u?
+
+or maybe simpler to change sabre_clear_request() to take an int.
+
+> +sabre_clear_request(int irq_num) "clear request irq %d"
+
+ditto.
+
+> +sabre_config_write(uint64_t addr, uint64_t val) "addr 0x%"PRIx64" val 0x%"PRIx64
+> +sabre_config_read(uint64_t addr, uint64_t val) "addr 0x%"PRIx64" val 0x%"PRIx64
+> +sabre_pci_config_write(uint64_t addr, uint64_t val) "addr 0x%"PRIx64" val 0x%"PRIx64
+> +sabre_pci_config_read(uint64_t addr, uint64_t val) "addr 0x%"PRIx64" val 0x%"PRIx64
+
+Cool, you cared about replacing TARGET_FMT_plx by PRIx64 :)
+
+> +sabre_pci_set_irq(int irq_num, int level) "set irq_in %d level %d"
+> +sabre_pci_set_obio_irq(int irq_num, int level) "set irq %d level %d"
+
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
