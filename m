@@ -1,26 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55313)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33975)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eakIt-0002pN-LR
-	for qemu-devel@nongnu.org; Sun, 14 Jan 2018 10:34:36 -0500
+	(envelope-from <marcel.apfelbaum@zoho.com>) id 1eal8B-0000Ao-3C
+	for qemu-devel@nongnu.org; Sun, 14 Jan 2018 11:27:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eakIs-0001MW-RP
-	for qemu-devel@nongnu.org; Sun, 14 Jan 2018 10:34:35 -0500
-Received: from mail-oi0-x242.google.com ([2607:f8b0:4003:c06::242]:39736)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1eakIs-0001MF-Mc
-	for qemu-devel@nongnu.org; Sun, 14 Jan 2018 10:34:34 -0500
-Received: by mail-oi0-x242.google.com with SMTP id t8so6815487oie.6
-	for <qemu-devel@nongnu.org>; Sun, 14 Jan 2018 07:34:34 -0800 (PST)
+	(envelope-from <marcel.apfelbaum@zoho.com>) id 1eal87-0001Wy-W1
+	for qemu-devel@nongnu.org; Sun, 14 Jan 2018 11:27:35 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:44666)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <marcel.apfelbaum@zoho.com>)
+	id 1eal87-0001VB-Q8
+	for qemu-devel@nongnu.org; Sun, 14 Jan 2018 11:27:31 -0500
+Reply-To: marcel@redhat.com
+References: <20180114104751.21965-1-mark.cave-ayland@ilande.co.uk>
+	<20180114104751.21965-10-mark.cave-ayland@ilande.co.uk>
+	<e4cb0bba-c6e0-0a38-7224-71738c3a7d5a@amsat.org>
+From: Marcel Apfelbaum <marcel.apfelbaum@zoho.com>
+Message-ID: <b0a9500a-6aae-2d2d-6a5e-0307e32fa23f@zoho.com>
+Date: Sun, 14 Jan 2018 18:27:12 +0200
 MIME-Version: 1.0
-In-Reply-To: <20180114024524.28821-1-f4bug@amsat.org>
-References: <20180114024524.28821-1-f4bug@amsat.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Sun, 14 Jan 2018 15:34:13 +0000
-Message-ID: <CAFEAcA8ezx6JZa4+XPeaWrJOrr_aND+gFtZPV8UxJzaY3GbGgA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <e4cb0bba-c6e0-0a38-7224-71738c3a7d5a@amsat.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] hw/i2c: QOM'ify i2c slave
+Subject: Re: [Qemu-devel] [PATCH 09/11] pci: add trace-events support for
+ hw/pci-host
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,67 +32,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Cc: =?UTF-8?Q?Andreas_F=C3=A4rber?= <afaerber@suse.de>, KONRAD Frederic <frederic.konrad@adacore.com>, QEMU Developers <qemu-devel@nongnu.org>, Corey Minyard <cminyard@mvista.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Alistair Francis <alistair.francis@xilinx.com>
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, atar4qemu@gmail.com
+Cc: Marcel Apfelbaum <marcel@redhat.com>, qemu-devel@nongnu.org, "Michael S . Tsirkin" <mst@redhat.com>
 
-On 14 January 2018 at 02:45, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> =
-wrote:
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-> ---
->  hw/i2c/core.c | 12 ++++++------
->  1 file changed, 6 insertions(+), 6 deletions(-)
->
-> diff --git a/hw/i2c/core.c b/hw/i2c/core.c
-> index 59068f157e..c84dbfb884 100644
-> --- a/hw/i2c/core.c
-> +++ b/hw/i2c/core.c
-> @@ -8,6 +8,7 @@
->   */
->
->  #include "qemu/osdep.h"
-> +#include "qapi/error.h"
->  #include "hw/i2c/i2c.h"
->
->  typedef struct I2CNode I2CNode;
-> @@ -276,16 +277,15 @@ const VMStateDescription vmstate_i2c_slave =3D {
->      }
->  };
->
-> -static int i2c_slave_qdev_init(DeviceState *dev)
-> +static void i2c_slave_realize(DeviceState *dev, Error **errp)
->  {
->      I2CSlave *s =3D I2C_SLAVE(dev);
->      I2CSlaveClass *sc =3D I2C_SLAVE_GET_CLASS(s);
->
-> -    if (sc->init) {
-> -        return sc->init(s);
-> +    if (sc->init && sc->init(s)) {
-> +        error_setg(errp, "i2c slave initialization failed");
-> +        return;
->      }
-> -
-> -    return 0;
->  }
->
->  DeviceState *i2c_create_slave(I2CBus *bus, const char *name, uint8_t add=
-r)
-> @@ -301,7 +301,7 @@ DeviceState *i2c_create_slave(I2CBus *bus, const char=
- *name, uint8_t addr)
->  static void i2c_slave_class_init(ObjectClass *klass, void *data)
->  {
->      DeviceClass *k =3D DEVICE_CLASS(klass);
-> -    k->init =3D i2c_slave_qdev_init;
-> +    k->realize =3D i2c_slave_realize;
->      set_bit(DEVICE_CATEGORY_MISC, k->categories);
->      k->bus_type =3D TYPE_I2C_BUS;
->      k->props =3D i2c_props;
+On 14/01/2018 15:32, Philippe Mathieu-Daud=C3=A9 wrote:
+> On 01/14/2018 07:47 AM, Mark Cave-Ayland wrote:
+>> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+> Not sure this is worth a separate commit (I'd squash it in the next
+> patch), still:
 
-This is changing the semantics of the I2CSlaveClass::init
-method. Is that really OK? (If nothing else, it means
-that we end up with a method named init which is called
-at realize time, which is confusing, and which doesn't
-have an API like realize which allows it to fill in
-an Error**.)
+I agree, no need to add a new directory to the trace list
+while we don't have a trace events file.
 
-thanks
--- PMM
+Thanks,
+Marcel
+
+> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+>> CC: Michael S. Tsirkin <mst@redhat.com>
+>> CC: Marcel Apfelbaum <marcel@redhat.com>
+>> ---
+>>   Makefile.objs            | 1 +
+>>   hw/pci-host/trace-events | 1 +
+>>   2 files changed, 2 insertions(+)
+>>   create mode 100644 hw/pci-host/trace-events
+>>
+>> diff --git a/Makefile.objs b/Makefile.objs
+>> index c8b1bba593..6aa793ce4f 100644
+>> --- a/Makefile.objs
+>> +++ b/Makefile.objs
+>> @@ -149,6 +149,7 @@ trace-events-subdirs +=3D hw/i386/xen
+>>   trace-events-subdirs +=3D hw/9pfs
+>>   trace-events-subdirs +=3D hw/ppc
+>>   trace-events-subdirs +=3D hw/pci
+>> +trace-events-subdirs +=3D hw/pci-host
+>>   trace-events-subdirs +=3D hw/s390x
+>>   trace-events-subdirs +=3D hw/vfio
+>>   trace-events-subdirs +=3D hw/acpi
+>> diff --git a/hw/pci-host/trace-events b/hw/pci-host/trace-events
+>> new file mode 100644
+>> index 0000000000..9284b1fbad
+>> --- /dev/null
+>> +++ b/hw/pci-host/trace-events
+>> @@ -0,0 +1 @@
+>> +# See docs/devel/tracing.txt for syntax documentation.
+>>
