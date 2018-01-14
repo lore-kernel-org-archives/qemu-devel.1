@@ -1,26 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58400)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33655)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1eanY8-0003BG-9J
-	for qemu-devel@nongnu.org; Sun, 14 Jan 2018 14:02:33 -0500
+	(envelope-from <joserz@linux.vnet.ibm.com>) id 1eant5-0000mC-E6
+	for qemu-devel@nongnu.org; Sun, 14 Jan 2018 14:24:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1eanY5-0003tm-6I
-	for qemu-devel@nongnu.org; Sun, 14 Jan 2018 14:02:32 -0500
-Resent-Message-Id: <E1eanY5-0003tm-6I@eggs.gnu.org>
-Received: from sender-of-o51.zoho.com ([135.84.80.216]:21047)
+	(envelope-from <joserz@linux.vnet.ibm.com>) id 1eant2-0005R7-Kj
+	for qemu-devel@nongnu.org; Sun, 14 Jan 2018 14:24:11 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:57366)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1eanY5-0003pk-03
-	for qemu-devel@nongnu.org; Sun, 14 Jan 2018 14:02:29 -0500
-In-Reply-To: <20180114104751.21965-1-mark.cave-ayland@ilande.co.uk>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <151592855528.545.6795538165308775542@5adcb62bf0d6>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Sun, 14 Jan 2018 03:15:56 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH 00/11] sun4u: APB tidy-up/rename and
- tracepoint conversions
+	(Exim 4.71) (envelope-from <joserz@linux.vnet.ibm.com>)
+	id 1eant2-0005QZ-CQ
+	for qemu-devel@nongnu.org; Sun, 14 Jan 2018 14:24:08 -0500
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w0EJNsbi067441
+	for <qemu-devel@nongnu.org>; Sun, 14 Jan 2018 14:24:07 -0500
+Received: from e11.ny.us.ibm.com (e11.ny.us.ibm.com [129.33.205.201])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2fgbbdkg4q-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Sun, 14 Jan 2018 14:24:06 -0500
+Received: from localhost
+	by e11.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <joserz@linux.vnet.ibm.com>;
+	Sun, 14 Jan 2018 14:24:05 -0500
+From: Jose Ricardo Ziviani <joserz@linux.vnet.ibm.com>
+Date: Sun, 14 Jan 2018 17:23:48 -0200
+In-Reply-To: <20180114192349.22212-1-joserz@linux.vnet.ibm.com>
+References: <20180114192349.22212-1-joserz@linux.vnet.ibm.com>
+Message-Id: <20180114192349.22212-2-joserz@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH v2 1/2] ppc: Change Power9 compat table to
+ support at most 8 threads/core
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,57 +38,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: mark.cave-ayland@ilande.co.uk
-Cc: famz@redhat.com, qemu-devel@nongnu.org, atar4qemu@gmail.com
+To: qemu-ppc@nongnu.org
+Cc: qemu-devel@nongnu.org, david@gibson.dropbear.id.au, groug@kaod.org, lvivier@redhat.com
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
-c3NhZ2UtaWQ6IDIwMTgwMTE0MTA0NzUxLjIxOTY1LTEtbWFyay5jYXZlLWF5bGFuZEBpbGFuZGUu
-Y28udWsKU3ViamVjdDogW1FlbXUtZGV2ZWxdIFtQQVRDSCAwMC8xMV0gc3VuNHU6IEFQQiB0aWR5
-LXVwL3JlbmFtZSBhbmQgdHJhY2Vwb2ludCBjb252ZXJzaW9ucwoKPT09IFRFU1QgU0NSSVBUIEJF
-R0lOID09PQojIS9iaW4vYmFzaAoKQkFTRT1iYXNlCm49MQp0b3RhbD0kKGdpdCBsb2cgLS1vbmVs
-aW5lICRCQVNFLi4gfCB3YyAtbCkKZmFpbGVkPTAKCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJl
-bmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCgpjb21taXRz
-PSIkKGdpdCBsb2cgLS1mb3JtYXQ9JUggLS1yZXZlcnNlICRCQVNFLi4pIgpmb3IgYyBpbiAkY29t
-bWl0czsgZG8KICAgIGVjaG8gIkNoZWNraW5nIFBBVENIICRuLyR0b3RhbDogJChnaXQgbG9nIC1u
-IDEgLS1mb3JtYXQ9JXMgJGMpLi4uIgogICAgaWYgISBnaXQgc2hvdyAkYyAtLWZvcm1hdD1lbWFp
-bCB8IC4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgLTsgdGhlbgogICAgICAgIGZh
-aWxlZD0xCiAgICAgICAgZWNobwogICAgZmkKICAgIG49JCgobisxKSkKZG9uZQoKZXhpdCAkZmFp
-bGVkCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2
-NGQxZGVmN2Y0NGJkODg4NzEzMzg0ClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKNjhl
-MzNmNTIzZiBzcGFyYzY0OiBjb252ZXJ0IGh3L3NwYXJjNjQvc3BhcmM2NC5jIGZyb20gRFBSSU5U
-RiBtYWNyb3MgdG8gdHJhY2UgZXZlbnRzCjNhYzg5NTM0OGQgc2FicmU6IGNvbnZlcnQgZnJvbSBT
-QUJSRV9EUFJJTlRGIG1hY3JvIHRvIHRyYWNlLWV2ZW50cwo1YjQ0ZjAwMTllIHBjaTogYWRkIHRy
-YWNlLWV2ZW50cyBzdXBwb3J0IGZvciBody9wY2ktaG9zdAphNjI1NzY1MTA1IGFwYjogcmVuYW1l
-IGFwYi5jIHRvIHNhYnJlLmMKOGVmMzA4M2E1NSBzdW40dTogcmVuYW1lIGFwYiB2YXJpYWJsZXMg
-YW5kIGNvbnN0YW50cwozNDlmYzg5ZmU4IGFwYjogcmVuYW1lIFFPTSB0eXBlIGZyb20gVFlQRV9B
-UEIgdG8gVFlQRV9TQUJSRQo3NGNiYWM0OGNkIGFwYjogUU9NaWZ5IHNhYnJlIFBDSSBob3N0IGJy
-aWRnZQo3ODdmNzZmYzAzIGFwYjogY2hhbmdlIHBibV9wY2lfaG9zdCBwcmVmaXggZnVuY3Rpb25z
-IHRvIHVzZSBzYWJyZV9wY2kgcHJlZml4CjY1YjY3ZjQ4OTIgYXBiOiByZW5hbWUgQVBCIGZ1bmN0
-aW9ucyB0byB1c2Ugc2FicmUgcHJlZml4CjNiZGYxMDMwZTcgc2ltYmE6IHJlbmFtZSBQQk1QQ0lC
-cmlkZ2UgYW5kIFFPTSB0eXBlcyB0byByZWZsZWN0IHNpbWJhIG5hbWluZwpiNjQ1YWJjZmI2IGFw
-Yjogc3BsaXQgc2ltYmEgUENJIGJyaWRnZSBpbnRvIGh3L3BjaS1icmlkZ2Uvc2ltYmEuYwoKPT09
-IE9VVFBVVCBCRUdJTiA9PT0KQ2hlY2tpbmcgUEFUQ0ggMS8xMTogYXBiOiBzcGxpdCBzaW1iYSBQ
-Q0kgYnJpZGdlIGludG8gaHcvcGNpLWJyaWRnZS9zaW1iYS5jLi4uCkNoZWNraW5nIFBBVENIIDIv
-MTE6IHNpbWJhOiByZW5hbWUgUEJNUENJQnJpZGdlIGFuZCBRT00gdHlwZXMgdG8gcmVmbGVjdCBz
-aW1iYSBuYW1pbmcuLi4KQ2hlY2tpbmcgUEFUQ0ggMy8xMTogYXBiOiByZW5hbWUgQVBCIGZ1bmN0
-aW9ucyB0byB1c2Ugc2FicmUgcHJlZml4Li4uCkNoZWNraW5nIFBBVENIIDQvMTE6IGFwYjogY2hh
-bmdlIHBibV9wY2lfaG9zdCBwcmVmaXggZnVuY3Rpb25zIHRvIHVzZSBzYWJyZV9wY2kgcHJlZml4
-Li4uCkNoZWNraW5nIFBBVENIIDUvMTE6IGFwYjogUU9NaWZ5IHNhYnJlIFBDSSBob3N0IGJyaWRn
-ZS4uLgpDaGVja2luZyBQQVRDSCA2LzExOiBhcGI6IHJlbmFtZSBRT00gdHlwZSBmcm9tIFRZUEVf
-QVBCIHRvIFRZUEVfU0FCUkUuLi4KQ2hlY2tpbmcgUEFUQ0ggNy8xMTogc3VuNHU6IHJlbmFtZSBh
-cGIgdmFyaWFibGVzIGFuZCBjb25zdGFudHMuLi4KQ2hlY2tpbmcgUEFUQ0ggOC8xMTogYXBiOiBy
-ZW5hbWUgYXBiLmMgdG8gc2FicmUuYy4uLgpFUlJPUjogZG8gbm90IHVzZSBDOTkgLy8gY29tbWVu
-dHMKIzg2OiBGSUxFOiBody9wY2ktaG9zdC9zYWJyZS5jOjQxOgorLy8jZGVmaW5lIERFQlVHX1NB
-QlJFCgp0b3RhbDogMSBlcnJvcnMsIDAgd2FybmluZ3MsIDE4OCBsaW5lcyBjaGVja2VkCgpZb3Vy
-IHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVz
-ZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5l
-ciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgpDaGVja2luZyBQQVRDSCA5LzExOiBw
-Y2k6IGFkZCB0cmFjZS1ldmVudHMgc3VwcG9ydCBmb3IgaHcvcGNpLWhvc3QuLi4KQ2hlY2tpbmcg
-UEFUQ0ggMTAvMTE6IHNhYnJlOiBjb252ZXJ0IGZyb20gU0FCUkVfRFBSSU5URiBtYWNybyB0byB0
-cmFjZS1ldmVudHMuLi4KQ2hlY2tpbmcgUEFUQ0ggMTEvMTE6IHNwYXJjNjQ6IGNvbnZlcnQgaHcv
-c3BhcmM2NC9zcGFyYzY0LmMgZnJvbSBEUFJJTlRGIG1hY3JvcyB0byB0cmFjZSBldmVudHMuLi4K
-PT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKCi0t
-LQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hl
-dy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQGZyZWVs
-aXN0cy5vcmc=
+Increases the max smt mode to 8 for Power9. That's because KVM supports
+smt emulation in this platform so QEMU should allow users to use it as
+well.
+
+Today if we try to pass -smp ...,threads=8, QEMU will silently truncate
+it to smt4 mode and may cause a crash if we try to perform a cpu
+hotplug.
+
+Signed-off-by: Jose Ricardo Ziviani <joserz@linux.vnet.ibm.com>
+---
+ target/ppc/compat.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/target/ppc/compat.c b/target/ppc/compat.c
+index ad8f93c064..d1770cdc6f 100644
+--- a/target/ppc/compat.c
++++ b/target/ppc/compat.c
+@@ -73,7 +73,7 @@ static const CompatInfo compat_table[] = {
+         .pvr = CPU_POWERPC_LOGICAL_3_00,
+         .pcr = PCR_COMPAT_3_00,
+         .pcr_level = PCR_COMPAT_3_00,
+-        .max_threads = 4,
++        .max_threads = 8,
+     },
+ };
+ 
+-- 
+2.14.3
