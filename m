@@ -1,23 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41250)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41252)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1eafqc-0007xl-RP
-	for qemu-devel@nongnu.org; Sun, 14 Jan 2018 05:49:07 -0500
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1eafqc-0007xq-SI
+	for qemu-devel@nongnu.org; Sun, 14 Jan 2018 05:49:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1eafqc-00011H-2d
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1eafqb-00010O-Q4
 	for qemu-devel@nongnu.org; Sun, 14 Jan 2018 05:49:06 -0500
-Received: from chuckie.co.uk ([82.165.15.123]:41905
+Received: from chuckie.co.uk ([82.165.15.123]:41913
 	helo=s16892447.onlinehome-server.info)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
-	id 1eafqb-0000oQ-TE
-	for qemu-devel@nongnu.org; Sun, 14 Jan 2018 05:49:06 -0500
+	id 1eafqb-0000xa-JM
+	for qemu-devel@nongnu.org; Sun, 14 Jan 2018 05:49:05 -0500
 From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Date: Sun, 14 Jan 2018 10:47:44 +0000
-Message-Id: <20180114104751.21965-5-mark.cave-ayland@ilande.co.uk>
+Date: Sun, 14 Jan 2018 10:47:47 +0000
+Message-Id: <20180114104751.21965-8-mark.cave-ayland@ilande.co.uk>
 In-Reply-To: <20180114104751.21965-1-mark.cave-ayland@ilande.co.uk>
 References: <20180114104751.21965-1-mark.cave-ayland@ilande.co.uk>
-Subject: [Qemu-devel] [PATCH 04/11] apb: change pbm_pci_host prefix
- functions to use sabre_pci prefix
+Subject: [Qemu-devel] [PATCH 07/11] sun4u: rename apb variables and constants
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,64 +28,98 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, atar4qemu@gmail.com
 Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 
-This is the proper name for the PBM host bridge as referenced in the Sun
-documentation.
+In order to reflect the previous change of TYPE_APB to TYPE_SABRE, update
+the corresponding variable names to keep the terminology consistent.
 
 Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 ---
- hw/pci-host/apb.c | 12 ++++++------
- 1 file changed, 6 insertions(+), 6 deletions(-)
+ hw/sparc64/sun4u.c | 41 +++++++++++++++++++++--------------------
+ 1 file changed, 21 insertions(+), 20 deletions(-)
 
-diff --git a/hw/pci-host/apb.c b/hw/pci-host/apb.c
-index d5c459a2df..98c5f344f7 100644
---- a/hw/pci-host/apb.c
-+++ b/hw/pci-host/apb.c
-@@ -472,7 +472,7 @@ static void sabre_init(Object *obj)
-     sysbus_init_mmio(sbd, &s->pci_ioport);
- }
+diff --git a/hw/sparc64/sun4u.c b/hw/sparc64/sun4u.c
+index b8f685847a..fb18afaaa6 100644
+--- a/hw/sparc64/sun4u.c
++++ b/hw/sparc64/sun4u.c
+@@ -55,9 +55,9 @@
+ #define CMDLINE_ADDR         0x003ff000
+ #define PROM_SIZE_MAX        (4 * 1024 * 1024)
+ #define PROM_VADDR           0x000ffd00000ULL
+-#define APB_SPECIAL_BASE     0x1fe00000000ULL
+-#define APB_MEM_BASE         0x1ff00000000ULL
+-#define APB_PCI_IO_BASE      (APB_SPECIAL_BASE + 0x02000000ULL)
++#define PBM_SPECIAL_BASE     0x1fe00000000ULL
++#define PBM_MEM_BASE         0x1ff00000000ULL
++#define PBM_PCI_IO_BASE      (PBM_SPECIAL_BASE + 0x02000000ULL)
+ #define PROM_FILENAME        "openbios-sparc64"
+ #define NVRAM_SIZE           0x2000
+ #define MAX_IDE_BUS          2
+@@ -465,7 +465,7 @@ static void sun4uv_init(MemoryRegion *address_space_mem,
+     Nvram *nvram;
+     unsigned int i;
+     uint64_t initrd_addr, initrd_size, kernel_addr, kernel_size, kernel_entry;
+-    SabreState *apb;
++    SabreState *sabre;
+     PCIBus *pci_bus, *pci_busA, *pci_busB;
+     PCIDevice *ebus, *pci_dev;
+     SysBusDevice *s;
+@@ -489,23 +489,24 @@ static void sun4uv_init(MemoryRegion *address_space_mem,
+     prom_init(hwdef->prom_addr, bios_name);
  
--static void sabre_pci_host_realize(PCIDevice *d, Error **errp)
-+static void sabre_pci_realize(PCIDevice *d, Error **errp)
- {
-     pci_set_word(d->config + PCI_COMMAND,
-                  PCI_COMMAND_MEMORY | PCI_COMMAND_MASTER);
-@@ -481,12 +481,12 @@ static void sabre_pci_host_realize(PCIDevice *d, Error **errp)
-                  PCI_STATUS_DEVSEL_MEDIUM);
- }
+     /* Init sabre (PCI host bridge) */
+-    apb = SABRE_DEVICE(qdev_create(NULL, TYPE_SABRE));
+-    qdev_prop_set_uint64(DEVICE(apb), "special-base", APB_SPECIAL_BASE);
+-    qdev_prop_set_uint64(DEVICE(apb), "mem-base", APB_MEM_BASE);
+-    object_property_set_link(OBJECT(apb), OBJECT(iommu), "iommu", &error_abort);
+-    qdev_init_nofail(DEVICE(apb));
++    sabre = SABRE_DEVICE(qdev_create(NULL, TYPE_SABRE));
++    qdev_prop_set_uint64(DEVICE(sabre), "special-base", PBM_SPECIAL_BASE);
++    qdev_prop_set_uint64(DEVICE(sabre), "mem-base", PBM_MEM_BASE);
++    object_property_set_link(OBJECT(sabre), OBJECT(iommu), "iommu",
++                             &error_abort);
++    qdev_init_nofail(DEVICE(sabre));
  
--static void sabre_pci_host_class_init(ObjectClass *klass, void *data)
-+static void sabre_pci_class_init(ObjectClass *klass, void *data)
- {
-     PCIDeviceClass *k = PCI_DEVICE_CLASS(klass);
-     DeviceClass *dc = DEVICE_CLASS(klass);
+     /* Wire up PCI interrupts to CPU */
+     for (i = 0; i < IVEC_MAX; i++) {
+-        qdev_connect_gpio_out_named(DEVICE(apb), "ivec-irq", i,
++        qdev_connect_gpio_out_named(DEVICE(sabre), "ivec-irq", i,
+             qdev_get_gpio_in_named(DEVICE(cpu), "ivec-irq", i));
+     }
  
--    k->realize = sabre_pci_host_realize;
-+    k->realize = sabre_pci_realize;
-     k->vendor_id = PCI_VENDOR_ID_SUN;
-     k->device_id = PCI_DEVICE_ID_SUN_SABRE;
-     k->class_id = PCI_CLASS_BRIDGE_HOST;
-@@ -497,11 +497,11 @@ static void sabre_pci_host_class_init(ObjectClass *klass, void *data)
-     dc->user_creatable = false;
- }
+-    pci_bus = PCI_HOST_BRIDGE(apb)->bus;
+-    pci_busA = pci_bridge_get_sec_bus(apb->bridgeA);
+-    pci_busB = pci_bridge_get_sec_bus(apb->bridgeB);
++    pci_bus = PCI_HOST_BRIDGE(sabre)->bus;
++    pci_busA = pci_bridge_get_sec_bus(sabre->bridgeA);
++    pci_busB = pci_bridge_get_sec_bus(sabre->bridgeB);
  
--static const TypeInfo pbm_pci_host_info = {
-+static const TypeInfo sabre_pci_info = {
-     .name          = "pbm-pci",
-     .parent        = TYPE_PCI_DEVICE,
-     .instance_size = sizeof(PCIDevice),
--    .class_init    = sabre_pci_host_class_init,
-+    .class_init    = sabre_pci_class_init,
-     .interfaces = (InterfaceInfo[]) {
-         { INTERFACE_CONVENTIONAL_PCI_DEVICE },
-         { },
-@@ -535,7 +535,7 @@ static const TypeInfo sabre_info = {
- static void sabre_register_types(void)
- {
-     type_register_static(&sabre_info);
--    type_register_static(&pbm_pci_host_info);
-+    type_register_static(&sabre_pci_info);
- }
+-    /* Only in-built Simba PBMs can exist on the root bus, slot 0 on busA is
++    /* Only in-built Simba APBs can exist on the root bus, slot 0 on busA is
+        reserved (leaving no slots free after on-board devices) however slots
+        0-3 are free on busB */
+     pci_bus->slot_reserved_mask = 0xfffffffc;
+@@ -517,17 +518,17 @@ static void sun4uv_init(MemoryRegion *address_space_mem,
+                          hwdef->console_serial_base);
+     qdev_init_nofail(DEVICE(ebus));
  
- type_init(sabre_register_types)
+-    /* Wire up "well-known" ISA IRQs to APB legacy obio IRQs */
++    /* Wire up "well-known" ISA IRQs to PBM legacy obio IRQs */
+     qdev_connect_gpio_out_named(DEVICE(ebus), "isa-irq", 7,
+-        qdev_get_gpio_in_named(DEVICE(apb), "pbm-irq", OBIO_LPT_IRQ));
++        qdev_get_gpio_in_named(DEVICE(sabre), "pbm-irq", OBIO_LPT_IRQ));
+     qdev_connect_gpio_out_named(DEVICE(ebus), "isa-irq", 6,
+-        qdev_get_gpio_in_named(DEVICE(apb), "pbm-irq", OBIO_FDD_IRQ));
++        qdev_get_gpio_in_named(DEVICE(sabre), "pbm-irq", OBIO_FDD_IRQ));
+     qdev_connect_gpio_out_named(DEVICE(ebus), "isa-irq", 1,
+-        qdev_get_gpio_in_named(DEVICE(apb), "pbm-irq", OBIO_KBD_IRQ));
++        qdev_get_gpio_in_named(DEVICE(sabre), "pbm-irq", OBIO_KBD_IRQ));
+     qdev_connect_gpio_out_named(DEVICE(ebus), "isa-irq", 12,
+-        qdev_get_gpio_in_named(DEVICE(apb), "pbm-irq", OBIO_MSE_IRQ));
++        qdev_get_gpio_in_named(DEVICE(sabre), "pbm-irq", OBIO_MSE_IRQ));
+     qdev_connect_gpio_out_named(DEVICE(ebus), "isa-irq", 4,
+-        qdev_get_gpio_in_named(DEVICE(apb), "pbm-irq", OBIO_SER_IRQ));
++        qdev_get_gpio_in_named(DEVICE(sabre), "pbm-irq", OBIO_SER_IRQ));
+ 
+     pci_dev = pci_create_simple(pci_busA, PCI_DEVFN(2, 0), "VGA");
+ 
 -- 
 2.11.0
