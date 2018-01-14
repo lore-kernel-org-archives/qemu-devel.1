@@ -1,35 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33694)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41992)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <joserz@linux.vnet.ibm.com>) id 1eant9-0000pn-WF
-	for qemu-devel@nongnu.org; Sun, 14 Jan 2018 14:24:16 -0500
+	(envelope-from <pisa@cmp.felk.cvut.cz>) id 1eaofu-0006nP-Hh
+	for qemu-devel@nongnu.org; Sun, 14 Jan 2018 15:14:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <joserz@linux.vnet.ibm.com>) id 1eant6-0005TN-Rd
-	for qemu-devel@nongnu.org; Sun, 14 Jan 2018 14:24:15 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:54566)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <joserz@linux.vnet.ibm.com>)
-	id 1eant6-0005St-Jy
-	for qemu-devel@nongnu.org; Sun, 14 Jan 2018 14:24:12 -0500
-Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w0EJO3wY074230
-	for <qemu-devel@nongnu.org>; Sun, 14 Jan 2018 14:24:10 -0500
-Received: from e17.ny.us.ibm.com (e17.ny.us.ibm.com [129.33.205.207])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2ffpquws5q-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Sun, 14 Jan 2018 14:24:09 -0500
-Received: from localhost
-	by e17.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <joserz@linux.vnet.ibm.com>;
-	Sun, 14 Jan 2018 14:24:08 -0500
-From: Jose Ricardo Ziviani <joserz@linux.vnet.ibm.com>
-Date: Sun, 14 Jan 2018 17:23:49 -0200
-In-Reply-To: <20180114192349.22212-1-joserz@linux.vnet.ibm.com>
-References: <20180114192349.22212-1-joserz@linux.vnet.ibm.com>
-Message-Id: <20180114192349.22212-3-joserz@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH v2 2/2] ppc: spapr: Check if thread argument is
- supported by host KVM
+	(envelope-from <pisa@cmp.felk.cvut.cz>) id 1eaofr-0005EX-CQ
+	for qemu-devel@nongnu.org; Sun, 14 Jan 2018 15:14:38 -0500
+Received: from smtp8.web4u.cz ([81.91.87.88]:45437 helo=mx-8.mail.web4u.cz)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pisa@cmp.felk.cvut.cz>)
+	id 1eaofr-0005DL-2j
+	for qemu-devel@nongnu.org; Sun, 14 Jan 2018 15:14:35 -0500
+From: pisa@cmp.felk.cvut.cz
+Date: Sun, 14 Jan 2018 21:14:06 +0100
+Message-Id: <cover.1515960078.git.pisa@cmp.felk.cvut.cz>
+Subject: [Qemu-devel] [PATCH V4 0/7] CAN bus support for QEMU (SJA1000 PCI
+ so far)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,88 +23,129 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-ppc@nongnu.org
-Cc: qemu-devel@nongnu.org, david@gibson.dropbear.id.au, groug@kaod.org, lvivier@redhat.com
+To: qemu-devel@nongnu.org
+Cc: Stefan Hajnoczi <stefanha@gmail.com>, Konrad Frederic <frederic.konrad@adacore.com>, Deniz Eren <deniz.eren@icloud.com>, Oliver Hartkopp <socketcan@hartkopp.net>, Marek Vasut <marex@denx.de>, Jan Kiszka <jan.kiszka@siemens.com>, Oleksij Rempel <o.rempel@pengutronix.de>, Pavel Pisa <pisa@cmp.felk.cvut.cz>
 
-QEMU currently checks whether SMT passed is valid or not. However, it
-doesn't check if KVM supports such mode when kvm is enabled.
+From: Pavel Pisa <pisa@cmp.felk.cvut.cz>
 
-This patch relies on KVM_CAP_PPC_SMT_POSSIBLE to make it sure that QEMU
-will either set a valid SMT mode or warn an error message and quit.
+Basic emulation of CAN bus controller and interconnection for QEMU.
 
-Signed-off-by: Jose Ricardo Ziviani <joserz@linux.vnet.ibm.com>
----
- hw/ppc/spapr.c       | 10 ++++++++++
- target/ppc/kvm.c     |  5 +++++
- target/ppc/kvm_ppc.h |  6 ++++++
- 3 files changed, 21 insertions(+)
+Patches version 4:
+Resolve comments longer than 80 characters to suppress
+all warnings reported by scripts/checkpatch.pl.
+Follow all suggestions from Frederic Konrad review.
+Replace all printf and perror calls by QEMU equivalents.
+Include Deniz Eren signed-off confimation.
 
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index d1acfe8858..aed4d25fc4 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -2261,12 +2261,22 @@ static void spapr_set_vsmt_mode(sPAPRMachineState *spapr, Error **errp)
-                      "on a pseries machine");
-         goto out;
-     }
-+
-     if (!is_power_of_2(smp_threads)) {
-         error_setg(&local_err, "Cannot support %d threads/core on a pseries "
-                      "machine because it must be a power of 2", smp_threads);
-         goto out;
-     }
- 
-+    if (kvm_enabled() && kvmppc_cap_smt_possible() > 0) {
-+        if ((kvmppc_cap_smt_possible() & smp_threads) != smp_threads) {
-+            error_setg(&local_err, "KVM does not support %d threads/core.",
-+                    smp_threads);
-+            kvmppc_hint_smt_possible(&local_err);
-+            goto out;
-+        }
-+    }
-+
-     /* Detemine the VSMT mode to use: */
-     if (vsmt_user) {
-         if (spapr->vsmt < smp_threads) {
-diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
-index 914be687e7..4a8ff4d63c 100644
---- a/target/ppc/kvm.c
-+++ b/target/ppc/kvm.c
-@@ -2456,6 +2456,11 @@ bool kvmppc_has_cap_mmu_hash_v3(void)
-     return cap_mmu_hash_v3;
- }
- 
-+int kvmppc_cap_smt_possible(void)
-+{
-+    return cap_ppc_smt_possible;
-+}
-+
- PowerPCCPUClass *kvm_ppc_get_host_cpu_class(void)
- {
-     uint32_t host_pvr = mfpvr();
-diff --git a/target/ppc/kvm_ppc.h b/target/ppc/kvm_ppc.h
-index ecb55493cc..2221850723 100644
---- a/target/ppc/kvm_ppc.h
-+++ b/target/ppc/kvm_ppc.h
-@@ -59,6 +59,7 @@ bool kvmppc_has_cap_fixup_hcalls(void);
- bool kvmppc_has_cap_htm(void);
- bool kvmppc_has_cap_mmu_radix(void);
- bool kvmppc_has_cap_mmu_hash_v3(void);
-+int kvmppc_cap_smt_possible(void);
- int kvmppc_enable_hwrng(void);
- int kvmppc_put_books_sregs(PowerPCCPU *cpu);
- PowerPCCPUClass *kvm_ppc_get_host_cpu_class(void);
-@@ -290,6 +291,11 @@ static inline bool kvmppc_has_cap_mmu_hash_v3(void)
-     return false;
- }
- 
-+static inline int kvmppc_cap_smt_possible(void)
-+{
-+    return 0;
-+}
-+
- static inline int kvmppc_enable_hwrng(void)
- {
-     return -1;
+Patches version 3:
+Support to connect to host SocketCAN interface has been
+separated from the core bus implementation. Only simple
+statically initialize pointer to the connection function
+is used, no QOM concept for now.
+SJA1000 message filters redone and code unified where
+possible.
+Basic documentation added.
+QEMU_ALIGNED used in definition of CAN frame structure,
+structure and defines are separated from Linux/SocketCAN
+API defined ones to allow to keep QEMU message format
+independed from host system one. Check for correspondence
+to socketcan defines added.
+
+Patches version 2:
+The bus emulation and the SJA1000 chip emulation introduced
+by individual patches as suggested by Frederic Konrad.
+Simple example board to test SJA1000 as single memory-mapped BAR
+has been omitted in a new series because emulation of real
+existing boards can provide same functions now.
+Conditionalized debug printfs changed to be exposed to compiler
+syntax check as suggested in review.
+
+The work has been started by Jin Yang in the frame of GSoC 2013 slot
+contributed by RTEMS project which has been looking for environment
+to allow develop and test CAN drivers for multiple CPU architectures.
+
+I have menthored the project and then done substantial code cleanup
+and update to QOM. Deniz Eren then used emulation for SJA1000 base card
+driver development for other operating system and contributed
+PCM-3680I and MIOe-3680 support.
+
+Some page about the project
+
+  https://gitlab.fel.cvut.cz/canbus/qemu-canbus/wikis/home
+
+FEE CTU GitLab repository with can-pci branch for 2.3, 2.4, 2.7, 2.8, 2.10
+and 2.11 QEMU version is available in the repository
+
+  https://gitlab.fel.cvut.cz/canbus/qemu-canbus/tree/can-pci
+
+mirror at GitHub
+
+  https://github.com/CTU-IIG/qemu
+
+There are many areas for improvement and extension of the code still
+(for example freeze and migration is not implemented. CAN controllers
+use proper QOM model but bus/interconnection emulation uses simple broadcast
+connection which is required for CAN, but it is not based on QEMU bus model).
+I have tried to look into QEMU VLANs implementation but it
+does not map straightforward to CAN and I would need some help/opinion
+from more advanced developers to decide what is their right
+mapping to CAN.
+
+CAN-FD support would be interesting requires other developers/
+companies contributions or setup of some project to allow invite
+some students and colleagues from my university into project.
+
+But I believe that (even in its actual state) provided solution
+is great help for embedded systems developers when they can connect
+SocketCAN from one or more embedded systems running in virtual
+environment together or with Linux host SocketCAN virtual
+or real bus interfaces.
+
+We have even tested our generic CANopen device configured
+for CANopen 401 profile for generic I/O running in the virtual
+system which can control GPIO inputs/outputs through virtual
+industrial I/O card.
+
+Generally QEMU can be interesting setup which allows
+to test complete industrial and automotive applications
+in virtual environment even before real hardware is availabe.
+
+Deniz Eren (2):
+  CAN bus PCM-3680I PCI (dual SJA1000 channel) emulation added.
+  CAN bus MIOe-3680 PCI (dual SJA1000 channel) emulation added.
+
+Pavel Pisa (5):
+  CAN bus simple messages transport implementation for QEMU
+  CAN bus support to connect bust to Linux host SocketCAN interface.
+  CAN bus SJA1000 chip register level emulation for QEMU
+  CAN bus Kvaser PCI CAN-S (single SJA1000 channel) emulation added.
+  QEMU CAN bus emulation documentation
+
+ default-configs/pci.mak   |    3 +
+ docs/can.txt              |   78 ++++
+ hw/Makefile.objs          |    1 +
+ hw/can/Makefile.objs      |   14 +
+ hw/can/can_core.c         |  136 ++++++
+ hw/can/can_host_stub.c    |   36 ++
+ hw/can/can_kvaser_pci.c   |  375 +++++++++++++++++
+ hw/can/can_mioe3680_pci.c |  336 +++++++++++++++
+ hw/can/can_pcm3680_pci.c  |  336 +++++++++++++++
+ hw/can/can_sja1000.c      | 1013 +++++++++++++++++++++++++++++++++++++++++++++
+ hw/can/can_sja1000.h      |  167 ++++++++
+ hw/can/can_socketcan.c    |  314 ++++++++++++++
+ include/can/can_emu.h     |  131 ++++++
+ 13 files changed, 2940 insertions(+)
+ create mode 100644 docs/can.txt
+ create mode 100644 hw/can/Makefile.objs
+ create mode 100644 hw/can/can_core.c
+ create mode 100644 hw/can/can_host_stub.c
+ create mode 100644 hw/can/can_kvaser_pci.c
+ create mode 100644 hw/can/can_mioe3680_pci.c
+ create mode 100644 hw/can/can_pcm3680_pci.c
+ create mode 100644 hw/can/can_sja1000.c
+ create mode 100644 hw/can/can_sja1000.h
+ create mode 100644 hw/can/can_socketcan.c
+ create mode 100644 include/can/can_emu.h
+
 -- 
-2.14.3
+2.11.0
