@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41206)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41226)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1eafqa-0007wx-M5
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1eafqb-0007x7-G2
 	for qemu-devel@nongnu.org; Sun, 14 Jan 2018 05:49:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1eafqY-0000s4-Rl
-	for qemu-devel@nongnu.org; Sun, 14 Jan 2018 05:49:04 -0500
-Received: from chuckie.co.uk ([82.165.15.123]:41895
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1eafqa-0000vU-B6
+	for qemu-devel@nongnu.org; Sun, 14 Jan 2018 05:49:05 -0500
+Received: from chuckie.co.uk ([82.165.15.123]:41910
 	helo=s16892447.onlinehome-server.info)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
-	id 1eafqY-0000gJ-Hd
-	for qemu-devel@nongnu.org; Sun, 14 Jan 2018 05:49:02 -0500
+	id 1eafqa-0000tV-44
+	for qemu-devel@nongnu.org; Sun, 14 Jan 2018 05:49:04 -0500
 From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Date: Sun, 14 Jan 2018 10:47:41 +0000
-Message-Id: <20180114104751.21965-2-mark.cave-ayland@ilande.co.uk>
+Date: Sun, 14 Jan 2018 10:47:46 +0000
+Message-Id: <20180114104751.21965-7-mark.cave-ayland@ilande.co.uk>
 In-Reply-To: <20180114104751.21965-1-mark.cave-ayland@ilande.co.uk>
 References: <20180114104751.21965-1-mark.cave-ayland@ilande.co.uk>
-Subject: [Qemu-devel] [PATCH 01/11] apb: split simba PCI bridge into
- hw/pci-bridge/simba.c
+Subject: [Qemu-devel] [PATCH 06/11] apb: rename QOM type from TYPE_APB to
+ TYPE_SABRE
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,314 +27,194 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org, atar4qemu@gmail.com
-Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, "Michael S . Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>
+Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 
-Move the QOM type and macros into a new include/hw/pci-bridge/simba.h
-file, and add a new CONFIG_SIMBA Makefile.objs variable which is enabled
-for sparc64-softmmu builds only.
+Similarly rename the corresponding APBState typedef to SabreState.
 
 Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-CC: Michael S. Tsirkin <mst@redhat.com>
-CC: Marcel Apfelbaum <marcel@redhat.com>
 ---
- default-configs/sparc64-softmmu.mak |   1 +
- hw/pci-bridge/Makefile.objs         |   2 +
- hw/pci-bridge/simba.c               | 101 ++++++++++++++++++++++++++++++++++++
- hw/pci-host/apb.c                   |  62 +---------------------
- include/hw/pci-bridge/simba.h       |  38 ++++++++++++++
- include/hw/pci-host/apb.h           |   9 ----
- 6 files changed, 143 insertions(+), 70 deletions(-)
- create mode 100644 hw/pci-bridge/simba.c
- create mode 100644 include/hw/pci-bridge/simba.h
+ hw/pci-host/apb.c         | 30 +++++++++++++++---------------
+ hw/sparc64/sun4u.c        |  6 +++---
+ include/hw/pci-host/apb.h | 10 +++++-----
+ 3 files changed, 23 insertions(+), 23 deletions(-)
 
-diff --git a/default-configs/sparc64-softmmu.mak b/default-configs/sparc64-softmmu.mak
-index 3e177bbd7b..9b742a7b41 100644
---- a/default-configs/sparc64-softmmu.mak
-+++ b/default-configs/sparc64-softmmu.mak
-@@ -12,6 +12,7 @@ CONFIG_FDC=y
- CONFIG_IDE_ISA=y
- CONFIG_IDE_CMD646=y
- CONFIG_PCI_APB=y
-+CONFIG_SIMBA=y
- CONFIG_SUNHME=y
- CONFIG_MC146818RTC=y
- CONFIG_ISA_TESTDEV=y
-diff --git a/hw/pci-bridge/Makefile.objs b/hw/pci-bridge/Makefile.objs
-index 1b05023662..47065f87d9 100644
---- a/hw/pci-bridge/Makefile.objs
-+++ b/hw/pci-bridge/Makefile.objs
-@@ -6,3 +6,5 @@ common-obj-$(CONFIG_IOH3420) += ioh3420.o
- common-obj-$(CONFIG_I82801B11) += i82801b11.o
- # NewWorld PowerMac
- common-obj-$(CONFIG_DEC_PCI) += dec.o
-+# Sun4u
-+common-obj-$(CONFIG_SIMBA) += simba.o
-diff --git a/hw/pci-bridge/simba.c b/hw/pci-bridge/simba.c
-new file mode 100644
-index 0000000000..05ba6f0f34
---- /dev/null
-+++ b/hw/pci-bridge/simba.c
-@@ -0,0 +1,101 @@
-+/*
-+ * QEMU Simba PCI bridge
-+ *
-+ * Copyright (c) 2006 Fabrice Bellard
-+ * Copyright (c) 2012,2013 Artyom Tarasenko
-+ * Copyright (c) 2018 Mark Cave-Ayland
-+ *
-+ * Permission is hereby granted, free of charge, to any person obtaining a copy
-+ * of this software and associated documentation files (the "Software"), to deal
-+ * in the Software without restriction, including without limitation the rights
-+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-+ * copies of the Software, and to permit persons to whom the Software is
-+ * furnished to do so, subject to the following conditions:
-+ *
-+ * The above copyright notice and this permission notice shall be included in
-+ * all copies or substantial portions of the Software.
-+ *
-+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-+ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-+ * THE SOFTWARE.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "hw/pci/pci.h"
-+#include "hw/pci/pci_bridge.h"
-+#include "hw/pci/pci_bus.h"
-+#include "hw/pci-bridge/simba.h"
-+
-+/*
-+ * Chipset docs:
-+ * APB: "Advanced PCI Bridge (APB) User's Manual",
-+ * http://www.sun.com/processors/manuals/805-1251.pdf
-+ */
-+
-+static void apb_pci_bridge_realize(PCIDevice *dev, Error **errp)
-+{
-+    /*
-+     * command register:
-+     * According to PCI bridge spec, after reset
-+     *   bus master bit is off
-+     *   memory space enable bit is off
-+     * According to manual (805-1251.pdf).
-+     *   the reset value should be zero unless the boot pin is tied high
-+     *   (which is true) and thus it should be PCI_COMMAND_MEMORY.
-+     */
-+    PBMPCIBridge *br = PBM_PCI_BRIDGE(dev);
-+
-+    pci_bridge_initfn(dev, TYPE_PCI_BUS);
-+
-+    pci_set_word(dev->config + PCI_COMMAND, PCI_COMMAND_MEMORY);
-+    pci_set_word(dev->config + PCI_STATUS,
-+                 PCI_STATUS_FAST_BACK | PCI_STATUS_66MHZ |
-+                 PCI_STATUS_DEVSEL_MEDIUM);
-+
-+    /* Allow 32-bit IO addresses */
-+    pci_set_word(dev->config + PCI_IO_BASE, PCI_IO_RANGE_TYPE_32);
-+    pci_set_word(dev->config + PCI_IO_LIMIT, PCI_IO_RANGE_TYPE_32);
-+    pci_set_word(dev->wmask + PCI_IO_BASE_UPPER16, 0xffff);
-+    pci_set_word(dev->wmask + PCI_IO_LIMIT_UPPER16, 0xffff);
-+
-+    pci_bridge_update_mappings(PCI_BRIDGE(br));
-+}
-+
-+static void pbm_pci_bridge_class_init(ObjectClass *klass, void *data)
-+{
-+    DeviceClass *dc = DEVICE_CLASS(klass);
-+    PCIDeviceClass *k = PCI_DEVICE_CLASS(klass);
-+
-+    k->realize = apb_pci_bridge_realize;
-+    k->exit = pci_bridge_exitfn;
-+    k->vendor_id = PCI_VENDOR_ID_SUN;
-+    k->device_id = PCI_DEVICE_ID_SUN_SIMBA;
-+    k->revision = 0x11;
-+    k->config_write = pci_bridge_write_config;
-+    k->is_bridge = 1;
-+    set_bit(DEVICE_CATEGORY_BRIDGE, dc->categories);
-+    dc->reset = pci_bridge_reset;
-+    dc->vmsd = &vmstate_pci_device;
-+}
-+
-+static const TypeInfo pbm_pci_bridge_info = {
-+    .name          = TYPE_PBM_PCI_BRIDGE,
-+    .parent        = TYPE_PCI_BRIDGE,
-+    .class_init    = pbm_pci_bridge_class_init,
-+    .instance_size = sizeof(PBMPCIBridge),
-+    .interfaces = (InterfaceInfo[]) {
-+        { INTERFACE_CONVENTIONAL_PCI_DEVICE },
-+        { },
-+    },
-+};
-+
-+static void pbm_register_types(void)
-+{
-+    type_register_static(&pbm_pci_bridge_info);
-+}
-+
-+type_init(pbm_register_types)
 diff --git a/hw/pci-host/apb.c b/hw/pci-host/apb.c
-index ec676f94b6..3a5c046794 100644
+index 36c6251816..f6c5dbd469 100644
 --- a/hw/pci-host/apb.c
 +++ b/hw/pci-host/apb.c
-@@ -33,6 +33,7 @@
- #include "hw/pci/pci_host.h"
- #include "hw/pci/pci_bridge.h"
- #include "hw/pci/pci_bus.h"
-+#include "hw/pci-bridge/simba.h"
- #include "hw/pci-host/apb.h"
- #include "sysemu/sysemu.h"
- #include "exec/address-spaces.h"
-@@ -53,9 +54,6 @@ do { printf("APB: " fmt , ## __VA_ARGS__); } while (0)
-  * Chipset docs:
-  * PBM: "UltraSPARC IIi User's Manual",
-  * http://www.sun.com/processors/manuals/805-0087.pdf
-- *
-- * APB: "Advanced PCI Bridge (APB) User's Manual",
-- * http://www.sun.com/processors/manuals/805-1251.pdf
-  */
+@@ -70,7 +70,7 @@ do { printf("APB: " fmt , ## __VA_ARGS__); } while (0)
  
- #define PBM_PCI_IMR_MASK    0x7fffffff
-@@ -348,35 +346,6 @@ static void pci_apb_set_irq(void *opaque, int irq_num, int level)
+ #define NO_IRQ_REQUEST (MAX_IVEC + 1)
+ 
+-static inline void sabre_set_request(APBState *s, unsigned int irq_num)
++static inline void sabre_set_request(SabreState *s, unsigned int irq_num)
+ {
+     APB_DPRINTF("%s: request irq %d\n", __func__, irq_num);
+ 
+@@ -78,7 +78,7 @@ static inline void sabre_set_request(APBState *s, unsigned int irq_num)
+     qemu_set_irq(s->ivec_irqs[irq_num], 1);
+ }
+ 
+-static inline void sabre_check_irqs(APBState *s)
++static inline void sabre_check_irqs(SabreState *s)
+ {
+     unsigned int i;
+ 
+@@ -109,7 +109,7 @@ static inline void sabre_check_irqs(APBState *s)
      }
  }
  
--static void apb_pci_bridge_realize(PCIDevice *dev, Error **errp)
--{
--    /*
--     * command register:
--     * According to PCI bridge spec, after reset
--     *   bus master bit is off
--     *   memory space enable bit is off
--     * According to manual (805-1251.pdf).
--     *   the reset value should be zero unless the boot pin is tied high
--     *   (which is true) and thus it should be PCI_COMMAND_MEMORY.
--     */
--    PBMPCIBridge *br = PBM_PCI_BRIDGE(dev);
--
--    pci_bridge_initfn(dev, TYPE_PCI_BUS);
--
--    pci_set_word(dev->config + PCI_COMMAND, PCI_COMMAND_MEMORY);
--    pci_set_word(dev->config + PCI_STATUS,
--                 PCI_STATUS_FAST_BACK | PCI_STATUS_66MHZ |
--                 PCI_STATUS_DEVSEL_MEDIUM);
--
--    /* Allow 32-bit IO addresses */
--    pci_set_word(dev->config + PCI_IO_BASE, PCI_IO_RANGE_TYPE_32);
--    pci_set_word(dev->config + PCI_IO_LIMIT, PCI_IO_RANGE_TYPE_32);
--    pci_set_word(dev->wmask + PCI_IO_BASE_UPPER16, 0xffff);
--    pci_set_word(dev->wmask + PCI_IO_LIMIT_UPPER16, 0xffff);
--
--    pci_bridge_update_mappings(PCI_BRIDGE(br));
--}
--
- static void pci_pbm_reset(DeviceState *d)
+-static inline void sabre_clear_request(APBState *s, unsigned int irq_num)
++static inline void sabre_clear_request(SabreState *s, unsigned int irq_num)
  {
-     APBState *s = APB_DEVICE(d);
-@@ -564,39 +533,10 @@ static const TypeInfo pbm_host_info = {
-     .class_init    = pbm_host_class_init,
+     APB_DPRINTF("%s: clear request irq %d\n", __func__, irq_num);
+     qemu_set_irq(s->ivec_irqs[irq_num], 0);
+@@ -126,7 +126,7 @@ static AddressSpace *sabre_pci_dma_iommu(PCIBus *bus, void *opaque, int devfn)
+ static void sabre_config_write(void *opaque, hwaddr addr,
+                                uint64_t val, unsigned size)
+ {
+-    APBState *s = opaque;
++    SabreState *s = opaque;
+ 
+     APB_DPRINTF("%s: addr " TARGET_FMT_plx " val %" PRIx64 "\n", __func__, addr, val);
+ 
+@@ -204,7 +204,7 @@ static void sabre_config_write(void *opaque, hwaddr addr,
+ static uint64_t sabre_config_read(void *opaque,
+                                   hwaddr addr, unsigned size)
+ {
+-    APBState *s = opaque;
++    SabreState *s = opaque;
+     uint32_t val;
+ 
+     switch (addr & 0xffff) {
+@@ -266,7 +266,7 @@ static const MemoryRegionOps sabre_config_ops = {
+ static void sabre_pci_config_write(void *opaque, hwaddr addr,
+                                    uint64_t val, unsigned size)
+ {
+-    APBState *s = opaque;
++    SabreState *s = opaque;
+     PCIHostState *phb = PCI_HOST_BRIDGE(s);
+ 
+     APB_DPRINTF("%s: addr " TARGET_FMT_plx " val %" PRIx64 "\n", __func__, addr, val);
+@@ -277,7 +277,7 @@ static uint64_t sabre_pci_config_read(void *opaque, hwaddr addr,
+                                       unsigned size)
+ {
+     uint32_t ret;
+-    APBState *s = opaque;
++    SabreState *s = opaque;
+     PCIHostState *phb = PCI_HOST_BRIDGE(s);
+ 
+     ret = pci_data_read(phb->bus, addr, size);
+@@ -317,7 +317,7 @@ static int pci_simbaB_map_irq(PCIDevice *pci_dev, int irq_num)
+ 
+ static void pci_sabre_set_irq(void *opaque, int irq_num, int level)
+ {
+-    APBState *s = opaque;
++    SabreState *s = opaque;
+ 
+     APB_DPRINTF("%s: set irq_in %d level %d\n", __func__, irq_num, level);
+     /* PCI IRQ map onto the first 32 INO.  */
+@@ -347,7 +347,7 @@ static void pci_sabre_set_irq(void *opaque, int irq_num, int level)
+ 
+ static void sabre_reset(DeviceState *d)
+ {
+-    APBState *s = APB_DEVICE(d);
++    SabreState *s = SABRE_DEVICE(d);
+     PCIDevice *pci_dev;
+     unsigned int i;
+     uint16_t cmd;
+@@ -385,7 +385,7 @@ static const MemoryRegionOps pci_config_ops = {
+ 
+ static void sabre_realize(DeviceState *dev, Error **errp)
+ {
+-    APBState *s = APB_DEVICE(dev);
++    SabreState *s = SABRE_DEVICE(dev);
+     PCIHostState *phb = PCI_HOST_BRIDGE(dev);
+     SysBusDevice *sbd = SYS_BUS_DEVICE(s);
+     PCIDevice *pci_dev;
+@@ -430,7 +430,7 @@ static void sabre_realize(DeviceState *dev, Error **errp)
+ 
+ static void sabre_init(Object *obj)
+ {
+-    APBState *s = APB_DEVICE(obj);
++    SabreState *s = SABRE_DEVICE(obj);
+     SysBusDevice *sbd = SYS_BUS_DEVICE(obj);
+     unsigned int i;
+ 
+@@ -509,8 +509,8 @@ static const TypeInfo sabre_pci_info = {
  };
  
--static void pbm_pci_bridge_class_init(ObjectClass *klass, void *data)
--{
--    DeviceClass *dc = DEVICE_CLASS(klass);
--    PCIDeviceClass *k = PCI_DEVICE_CLASS(klass);
--
--    k->realize = apb_pci_bridge_realize;
--    k->exit = pci_bridge_exitfn;
--    k->vendor_id = PCI_VENDOR_ID_SUN;
--    k->device_id = PCI_DEVICE_ID_SUN_SIMBA;
--    k->revision = 0x11;
--    k->config_write = pci_bridge_write_config;
--    k->is_bridge = 1;
--    set_bit(DEVICE_CATEGORY_BRIDGE, dc->categories);
--    dc->reset = pci_bridge_reset;
--    dc->vmsd = &vmstate_pci_device;
--}
--
--static const TypeInfo pbm_pci_bridge_info = {
--    .name          = TYPE_PBM_PCI_BRIDGE,
--    .parent        = TYPE_PCI_BRIDGE,
--    .class_init    = pbm_pci_bridge_class_init,
--    .instance_size = sizeof(PBMPCIBridge),
--    .interfaces = (InterfaceInfo[]) {
--        { INTERFACE_CONVENTIONAL_PCI_DEVICE },
--        { },
--    },
--};
--
- static void pbm_register_types(void)
- {
-     type_register_static(&pbm_host_info);
-     type_register_static(&pbm_pci_host_info);
--    type_register_static(&pbm_pci_bridge_info);
+ static Property sabre_properties[] = {
+-    DEFINE_PROP_UINT64("special-base", APBState, special_base, 0),
+-    DEFINE_PROP_UINT64("mem-base", APBState, mem_base, 0),
++    DEFINE_PROP_UINT64("special-base", SabreState, special_base, 0),
++    DEFINE_PROP_UINT64("mem-base", SabreState, mem_base, 0),
+     DEFINE_PROP_END_OF_LIST(),
+ };
+ 
+@@ -525,9 +525,9 @@ static void sabre_class_init(ObjectClass *klass, void *data)
  }
  
- type_init(pbm_register_types)
-diff --git a/include/hw/pci-bridge/simba.h b/include/hw/pci-bridge/simba.h
-new file mode 100644
-index 0000000000..5ab1330236
---- /dev/null
-+++ b/include/hw/pci-bridge/simba.h
-@@ -0,0 +1,38 @@
-+/*
-+ * QEMU Simba PCI bridge
-+ *
-+ * Copyright (c) 2006 Fabrice Bellard
-+ * Copyright (c) 2012,2013 Artyom Tarasenko
-+ * Copyright (c) 2017 Mark Cave-Ayland
-+ *
-+ * Permission is hereby granted, free of charge, to any person obtaining a copy
-+ * of this software and associated documentation files (the "Software"), to deal
-+ * in the Software without restriction, including without limitation the rights
-+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-+ * copies of the Software, and to permit persons to whom the Software is
-+ * furnished to do so, subject to the following conditions:
-+ *
-+ * The above copyright notice and this permission notice shall be included in
-+ * all copies or substantial portions of the Software.
-+ *
-+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-+ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-+ * THE SOFTWARE.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "hw/pci/pci_bridge.h"
-+
-+
-+typedef struct PBMPCIBridge {
-+    /*< private >*/
-+    PCIBridge parent_obj;
-+} PBMPCIBridge;
-+
-+#define TYPE_PBM_PCI_BRIDGE "pbm-bridge"
-+#define PBM_PCI_BRIDGE(obj) \
-+    OBJECT_CHECK(PBMPCIBridge, (obj), TYPE_PBM_PCI_BRIDGE)
+ static const TypeInfo sabre_info = {
+-    .name          = TYPE_APB,
++    .name          = TYPE_SABRE,
+     .parent        = TYPE_PCI_HOST_BRIDGE,
+-    .instance_size = sizeof(APBState),
++    .instance_size = sizeof(SabreState),
+     .instance_init = sabre_init,
+     .class_init    = sabre_class_init,
+ };
+diff --git a/hw/sparc64/sun4u.c b/hw/sparc64/sun4u.c
+index ec45ec2801..b8f685847a 100644
+--- a/hw/sparc64/sun4u.c
++++ b/hw/sparc64/sun4u.c
+@@ -465,7 +465,7 @@ static void sun4uv_init(MemoryRegion *address_space_mem,
+     Nvram *nvram;
+     unsigned int i;
+     uint64_t initrd_addr, initrd_size, kernel_addr, kernel_size, kernel_entry;
+-    APBState *apb;
++    SabreState *apb;
+     PCIBus *pci_bus, *pci_busA, *pci_busB;
+     PCIDevice *ebus, *pci_dev;
+     SysBusDevice *s;
+@@ -488,8 +488,8 @@ static void sun4uv_init(MemoryRegion *address_space_mem,
+ 
+     prom_init(hwdef->prom_addr, bios_name);
+ 
+-    /* Init APB (PCI host bridge) */
+-    apb = APB_DEVICE(qdev_create(NULL, TYPE_APB));
++    /* Init sabre (PCI host bridge) */
++    apb = SABRE_DEVICE(qdev_create(NULL, TYPE_SABRE));
+     qdev_prop_set_uint64(DEVICE(apb), "special-base", APB_SPECIAL_BASE);
+     qdev_prop_set_uint64(DEVICE(apb), "mem-base", APB_MEM_BASE);
+     object_property_set_link(OBJECT(apb), OBJECT(iommu), "iommu", &error_abort);
 diff --git a/include/hw/pci-host/apb.h b/include/hw/pci-host/apb.h
-index 604d899b1e..5e28f3e1f3 100644
+index 470863639a..2552f3c984 100644
 --- a/include/hw/pci-host/apb.h
 +++ b/include/hw/pci-host/apb.h
-@@ -42,13 +42,4 @@ typedef struct APBState {
-     unsigned int nr_resets;
- } APBState;
+@@ -22,7 +22,7 @@ typedef struct SabrePCIState {
+ #define SABRE_PCI_DEVICE(obj) \
+     OBJECT_CHECK(SabrePCIState, (obj), TYPE_SABRE_PCI_DEVICE)
  
--typedef struct PBMPCIBridge {
--    /*< private >*/
--    PCIBridge parent_obj;
--} PBMPCIBridge;
--
--#define TYPE_PBM_PCI_BRIDGE "pbm-bridge"
--#define PBM_PCI_BRIDGE(obj) \
--    OBJECT_CHECK(PBMPCIBridge, (obj), TYPE_PBM_PCI_BRIDGE)
--
+-typedef struct APBState {
++typedef struct SabreState {
+     PCIHostState parent_obj;
+ 
+     hwaddr special_base;
+@@ -43,10 +43,10 @@ typedef struct APBState {
+     unsigned int irq_request;
+     uint32_t reset_control;
+     unsigned int nr_resets;
+-} APBState;
++} SabreState;
+ 
+-#define TYPE_APB "apb"
+-#define APB_DEVICE(obj) \
+-    OBJECT_CHECK(APBState, (obj), TYPE_APB)
++#define TYPE_SABRE "sabre"
++#define SABRE_DEVICE(obj) \
++    OBJECT_CHECK(SabreState, (obj), TYPE_SABRE)
+ 
  #endif
 -- 
 2.11.0
