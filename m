@@ -1,33 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52230)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58400)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eamvh-0001gS-UZ
-	for qemu-devel@nongnu.org; Sun, 14 Jan 2018 13:22:51 -0500
+	(envelope-from <no-reply@patchew.org>) id 1eanY8-0003BG-9J
+	for qemu-devel@nongnu.org; Sun, 14 Jan 2018 14:02:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eamvd-00052P-11
-	for qemu-devel@nongnu.org; Sun, 14 Jan 2018 13:22:49 -0500
-Received: from mail-qk0-x22e.google.com ([2607:f8b0:400d:c09::22e]:39213)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eamvc-00052E-SH
-	for qemu-devel@nongnu.org; Sun, 14 Jan 2018 13:22:44 -0500
-Received: by mail-qk0-x22e.google.com with SMTP id c69so5301316qkg.6
-	for <qemu-devel@nongnu.org>; Sun, 14 Jan 2018 10:22:44 -0800 (PST)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20180108024558.17983-1-f4bug@amsat.org>
-	<20180108024558.17983-7-f4bug@amsat.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <40ab8186-dddc-39cc-2514-077c941d72a6@amsat.org>
-Date: Sun, 14 Jan 2018 15:22:40 -0300
+	(envelope-from <no-reply@patchew.org>) id 1eanY5-0003tm-6I
+	for qemu-devel@nongnu.org; Sun, 14 Jan 2018 14:02:32 -0500
+Resent-Message-Id: <E1eanY5-0003tm-6I@eggs.gnu.org>
+Received: from sender-of-o51.zoho.com ([135.84.80.216]:21047)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1eanY5-0003pk-03
+	for qemu-devel@nongnu.org; Sun, 14 Jan 2018 14:02:29 -0500
+In-Reply-To: <20180114104751.21965-1-mark.cave-ayland@ilande.co.uk>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <151592855528.545.6795538165308775542@5adcb62bf0d6>
 MIME-Version: 1.0
-In-Reply-To: <20180108024558.17983-7-f4bug@amsat.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 06/29] hw/isa: add a generic
- isa_superio_init()
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Sun, 14 Jan 2018 03:15:56 -0800 (PST)
+Subject: Re: [Qemu-devel] [PATCH 00/11] sun4u: APB tidy-up/rename and
+ tracepoint conversions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,126 +29,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>, Aurelien Jarno <aurelien@aurel32.net>, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>
-Cc: qemu-devel@nongnu.org, Igor Mammedov <imammedo@redhat.com>
+To: mark.cave-ayland@ilande.co.uk
+Cc: famz@redhat.com, qemu-devel@nongnu.org, atar4qemu@gmail.com
 
-On 01/07/2018 11:45 PM, Philippe Mathieu-Daudé wrote:
-> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-> ---
->  include/hw/isa/superio.h | 17 +++++++++++++++++
->  hw/isa/isa-superio.c     | 45 +++++++++++++++++++++++++++++++++++++++++++++
->  MAINTAINERS              |  2 ++
->  hw/isa/Makefile.objs     |  1 +
->  4 files changed, 65 insertions(+)
->  create mode 100644 include/hw/isa/superio.h
->  create mode 100644 hw/isa/isa-superio.c
-> 
-> diff --git a/include/hw/isa/superio.h b/include/hw/isa/superio.h
-> new file mode 100644
-> index 0000000000..e685b96653
-> --- /dev/null
-> +++ b/include/hw/isa/superio.h
-> @@ -0,0 +1,17 @@
-> +/*
-> + * Generic ISA Super I/O
-> + *
-> + * Copyright (c) 2018 Philippe Mathieu-Daudé
-> + *
-> + * This work is licensed under the terms of the GNU GPL, version 2 or later.
-> + * See the COPYING file in the top-level directory.
-> + */
-> +#ifndef HW_ISA_SUPERIO_H
-> +#define HW_ISA_SUPERIO_H
-> +
-> +#include "hw/isa/isa.h"
-> +
-> +ISADevice *isa_superio_init(ISABus *isa_bus, int serial_count,
-> +                            int parallel_count, int drive_count);
-
-This approach is simple enough, but how Hervé wrote hw/isa/pc87312.c is
-way cleaner, so I'll respin using it.
-
-> +
-> +#endif
-> diff --git a/hw/isa/isa-superio.c b/hw/isa/isa-superio.c
-> new file mode 100644
-> index 0000000000..93d8457c6b
-> --- /dev/null
-> +++ b/hw/isa/isa-superio.c
-> @@ -0,0 +1,45 @@
-> +/*
-> + * Generic ISA Super I/O
-> + *
-> + * Copyright (c) 2018 Philippe Mathieu-Daudé
-> + *
-> + * This work is licensed under the terms of the GNU GPL, version 2 or later.
-> + * See the COPYING file in the top-level directory.
-> + */
-> +#include "qemu/osdep.h"
-> +#include "qemu/error-report.h"
-> +#include "sysemu/blockdev.h"
-> +#include "hw/isa/superio.h"
-> +#include "hw/char/serial.h"
-> +#include "hw/char/parallel.h"
-> +#include "hw/block/fdc.h"
-> +#include "hw/input/i8042.h"
-> +
-> +ISADevice *isa_superio_init(ISABus *isa_bus, int serial_count,
-> +                            int parallel_count, int drive_count)
-> +{
-> +    serial_hds_isa_init(isa_bus, 0, serial_count);
-> +
-> +    parallel_hds_isa_init(isa_bus, parallel_count);
-> +
-> +    if (drive_count) {
-> +        DriveInfo **fd;
-> +        int i;
-> +
-> +        if (drive_count > MAX_FD) {
-> +            warn_report("superio: ignoring %d floppy controllers",
-> +                        drive_count - MAX_FD);
-> +            drive_count = MAX_FD;
-> +        }
-> +        fd = g_new(DriveInfo *, drive_count);
-> +
-> +        for (i = 0; i < drive_count; i++) {
-> +            fd[i] = drive_get(IF_FLOPPY, 0, i);
-> +        }
-> +        fdctrl_init_isa(isa_bus, fd);
-> +
-> +        g_free(fd); /* FIXME */
-> +    }
-> +
-> +    return isa_create_simple(isa_bus, TYPE_I8042);
-> +}
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index 7f9e98a046..6f867da743 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -875,6 +875,7 @@ F: hw/input/pckbd.c
->  F: hw/intc/apic*
->  F: hw/intc/ioapic*
->  F: hw/intc/i8259*
-> +F: hw/isa/isa-superio.c
->  F: hw/misc/debugexit.c
->  F: hw/misc/pc-testdev.c
->  F: hw/timer/hpet*
-> @@ -885,6 +886,7 @@ F: include/hw/display/vga.h
->  F: include/hw/char/parallel.h
->  F: include/hw/dma/i8257.h
->  F: include/hw/i2c/pm_smbus.h
-> +F: include/hw/isa/superio.h
->  F: include/hw/input/i8042.h
->  F: include/hw/timer/hpet.h
->  F: include/hw/timer/i8254*
-> diff --git a/hw/isa/Makefile.objs b/hw/isa/Makefile.objs
-> index fb37c55cf2..cac655ba58 100644
-> --- a/hw/isa/Makefile.objs
-> +++ b/hw/isa/Makefile.objs
-> @@ -1,4 +1,5 @@
->  common-obj-$(CONFIG_ISA_BUS) += isa-bus.o
-> +common-obj-$(CONFIG_ISA_BUS) += isa-superio.o
->  common-obj-$(CONFIG_APM) += apm.o
->  common-obj-$(CONFIG_I82378) += i82378.o
->  common-obj-$(CONFIG_PC87312) += pc87312.o
-> 
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IDIwMTgwMTE0MTA0NzUxLjIxOTY1LTEtbWFyay5jYXZlLWF5bGFuZEBpbGFuZGUu
+Y28udWsKU3ViamVjdDogW1FlbXUtZGV2ZWxdIFtQQVRDSCAwMC8xMV0gc3VuNHU6IEFQQiB0aWR5
+LXVwL3JlbmFtZSBhbmQgdHJhY2Vwb2ludCBjb252ZXJzaW9ucwoKPT09IFRFU1QgU0NSSVBUIEJF
+R0lOID09PQojIS9iaW4vYmFzaAoKQkFTRT1iYXNlCm49MQp0b3RhbD0kKGdpdCBsb2cgLS1vbmVs
+aW5lICRCQVNFLi4gfCB3YyAtbCkKZmFpbGVkPTAKCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJl
+bmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCgpjb21taXRz
+PSIkKGdpdCBsb2cgLS1mb3JtYXQ9JUggLS1yZXZlcnNlICRCQVNFLi4pIgpmb3IgYyBpbiAkY29t
+bWl0czsgZG8KICAgIGVjaG8gIkNoZWNraW5nIFBBVENIICRuLyR0b3RhbDogJChnaXQgbG9nIC1u
+IDEgLS1mb3JtYXQ9JXMgJGMpLi4uIgogICAgaWYgISBnaXQgc2hvdyAkYyAtLWZvcm1hdD1lbWFp
+bCB8IC4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgLTsgdGhlbgogICAgICAgIGZh
+aWxlZD0xCiAgICAgICAgZWNobwogICAgZmkKICAgIG49JCgobisxKSkKZG9uZQoKZXhpdCAkZmFp
+bGVkCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2
+NGQxZGVmN2Y0NGJkODg4NzEzMzg0ClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKNjhl
+MzNmNTIzZiBzcGFyYzY0OiBjb252ZXJ0IGh3L3NwYXJjNjQvc3BhcmM2NC5jIGZyb20gRFBSSU5U
+RiBtYWNyb3MgdG8gdHJhY2UgZXZlbnRzCjNhYzg5NTM0OGQgc2FicmU6IGNvbnZlcnQgZnJvbSBT
+QUJSRV9EUFJJTlRGIG1hY3JvIHRvIHRyYWNlLWV2ZW50cwo1YjQ0ZjAwMTllIHBjaTogYWRkIHRy
+YWNlLWV2ZW50cyBzdXBwb3J0IGZvciBody9wY2ktaG9zdAphNjI1NzY1MTA1IGFwYjogcmVuYW1l
+IGFwYi5jIHRvIHNhYnJlLmMKOGVmMzA4M2E1NSBzdW40dTogcmVuYW1lIGFwYiB2YXJpYWJsZXMg
+YW5kIGNvbnN0YW50cwozNDlmYzg5ZmU4IGFwYjogcmVuYW1lIFFPTSB0eXBlIGZyb20gVFlQRV9B
+UEIgdG8gVFlQRV9TQUJSRQo3NGNiYWM0OGNkIGFwYjogUU9NaWZ5IHNhYnJlIFBDSSBob3N0IGJy
+aWRnZQo3ODdmNzZmYzAzIGFwYjogY2hhbmdlIHBibV9wY2lfaG9zdCBwcmVmaXggZnVuY3Rpb25z
+IHRvIHVzZSBzYWJyZV9wY2kgcHJlZml4CjY1YjY3ZjQ4OTIgYXBiOiByZW5hbWUgQVBCIGZ1bmN0
+aW9ucyB0byB1c2Ugc2FicmUgcHJlZml4CjNiZGYxMDMwZTcgc2ltYmE6IHJlbmFtZSBQQk1QQ0lC
+cmlkZ2UgYW5kIFFPTSB0eXBlcyB0byByZWZsZWN0IHNpbWJhIG5hbWluZwpiNjQ1YWJjZmI2IGFw
+Yjogc3BsaXQgc2ltYmEgUENJIGJyaWRnZSBpbnRvIGh3L3BjaS1icmlkZ2Uvc2ltYmEuYwoKPT09
+IE9VVFBVVCBCRUdJTiA9PT0KQ2hlY2tpbmcgUEFUQ0ggMS8xMTogYXBiOiBzcGxpdCBzaW1iYSBQ
+Q0kgYnJpZGdlIGludG8gaHcvcGNpLWJyaWRnZS9zaW1iYS5jLi4uCkNoZWNraW5nIFBBVENIIDIv
+MTE6IHNpbWJhOiByZW5hbWUgUEJNUENJQnJpZGdlIGFuZCBRT00gdHlwZXMgdG8gcmVmbGVjdCBz
+aW1iYSBuYW1pbmcuLi4KQ2hlY2tpbmcgUEFUQ0ggMy8xMTogYXBiOiByZW5hbWUgQVBCIGZ1bmN0
+aW9ucyB0byB1c2Ugc2FicmUgcHJlZml4Li4uCkNoZWNraW5nIFBBVENIIDQvMTE6IGFwYjogY2hh
+bmdlIHBibV9wY2lfaG9zdCBwcmVmaXggZnVuY3Rpb25zIHRvIHVzZSBzYWJyZV9wY2kgcHJlZml4
+Li4uCkNoZWNraW5nIFBBVENIIDUvMTE6IGFwYjogUU9NaWZ5IHNhYnJlIFBDSSBob3N0IGJyaWRn
+ZS4uLgpDaGVja2luZyBQQVRDSCA2LzExOiBhcGI6IHJlbmFtZSBRT00gdHlwZSBmcm9tIFRZUEVf
+QVBCIHRvIFRZUEVfU0FCUkUuLi4KQ2hlY2tpbmcgUEFUQ0ggNy8xMTogc3VuNHU6IHJlbmFtZSBh
+cGIgdmFyaWFibGVzIGFuZCBjb25zdGFudHMuLi4KQ2hlY2tpbmcgUEFUQ0ggOC8xMTogYXBiOiBy
+ZW5hbWUgYXBiLmMgdG8gc2FicmUuYy4uLgpFUlJPUjogZG8gbm90IHVzZSBDOTkgLy8gY29tbWVu
+dHMKIzg2OiBGSUxFOiBody9wY2ktaG9zdC9zYWJyZS5jOjQxOgorLy8jZGVmaW5lIERFQlVHX1NB
+QlJFCgp0b3RhbDogMSBlcnJvcnMsIDAgd2FybmluZ3MsIDE4OCBsaW5lcyBjaGVja2VkCgpZb3Vy
+IHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVz
+ZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5l
+ciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgpDaGVja2luZyBQQVRDSCA5LzExOiBw
+Y2k6IGFkZCB0cmFjZS1ldmVudHMgc3VwcG9ydCBmb3IgaHcvcGNpLWhvc3QuLi4KQ2hlY2tpbmcg
+UEFUQ0ggMTAvMTE6IHNhYnJlOiBjb252ZXJ0IGZyb20gU0FCUkVfRFBSSU5URiBtYWNybyB0byB0
+cmFjZS1ldmVudHMuLi4KQ2hlY2tpbmcgUEFUQ0ggMTEvMTE6IHNwYXJjNjQ6IGNvbnZlcnQgaHcv
+c3BhcmM2NC9zcGFyYzY0LmMgZnJvbSBEUFJJTlRGIG1hY3JvcyB0byB0cmFjZSBldmVudHMuLi4K
+PT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKCi0t
+LQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hl
+dy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQGZyZWVs
+aXN0cy5vcmc=
