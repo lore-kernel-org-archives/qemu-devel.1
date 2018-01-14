@@ -1,27 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34278)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41198)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ghammer@redhat.com>) id 1eafCC-0000Z3-VJ
-	for qemu-devel@nongnu.org; Sun, 14 Jan 2018 05:07:24 -0500
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1eafqa-0007wt-6a
+	for qemu-devel@nongnu.org; Sun, 14 Jan 2018 05:49:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ghammer@redhat.com>) id 1eafCA-0002YB-Pz
-	for qemu-devel@nongnu.org; Sun, 14 Jan 2018 05:07:20 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:40126)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ghammer@redhat.com>) id 1eafCA-0002XD-KH
-	for qemu-devel@nongnu.org; Sun, 14 Jan 2018 05:07:18 -0500
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id B86B11F561
-	for <qemu-devel@nongnu.org>; Sun, 14 Jan 2018 10:07:17 +0000 (UTC)
-From: Gal Hammer <ghammer@redhat.com>
-Date: Sun, 14 Jan 2018 12:06:55 +0200
-Message-Id: <1515924416-9266-3-git-send-email-ghammer@redhat.com>
-In-Reply-To: <1515924416-9266-1-git-send-email-ghammer@redhat.com>
-References: <1515924416-9266-1-git-send-email-ghammer@redhat.com>
-Subject: [Qemu-devel] [PATCH 2/3] virtio: postpone the execution of
- event_notifier_cleanup function
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1eafqX-0000rG-Vf
+	for qemu-devel@nongnu.org; Sun, 14 Jan 2018 05:49:04 -0500
+Received: from chuckie.co.uk ([82.165.15.123]:41908
+	helo=s16892447.onlinehome-server.info)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
+	id 1eafqX-0000q9-OZ
+	for qemu-devel@nongnu.org; Sun, 14 Jan 2018 05:49:01 -0500
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Date: Sun, 14 Jan 2018 10:47:45 +0000
+Message-Id: <20180114104751.21965-6-mark.cave-ayland@ilande.co.uk>
+In-Reply-To: <20180114104751.21965-1-mark.cave-ayland@ilande.co.uk>
+References: <20180114104751.21965-1-mark.cave-ayland@ilande.co.uk>
+Subject: [Qemu-devel] [PATCH 05/11] apb: QOMify sabre PCI host bridge
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,78 +25,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: mst@redhat.com, Gal Hammer <ghammer@redhat.com>
+To: qemu-devel@nongnu.org, atar4qemu@gmail.com
+Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 
-Use the EventNotifier's cleanup callback function to execute the
-event_notifier_cleanup function after kvm unregistered the eventfd.
-
-This change supports running the virtio_bus_set_host_notifier
-function inside a memory region transaction. Otherwise, a closed
-fd is sent to kvm, which results in a failure.
-
-Signed-off-by: Gal Hammer <ghammer@redhat.com>
+Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 ---
- accel/kvm/kvm-all.c    |  4 ++++
- hw/virtio/virtio-bus.c | 19 +++++++++++--------
- 2 files changed, 15 insertions(+), 8 deletions(-)
+ hw/pci-host/apb.c         |  6 +++---
+ include/hw/pci-host/apb.h | 14 +++++++++++---
+ 2 files changed, 14 insertions(+), 6 deletions(-)
 
-diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
-index f290f48..071f4f5 100644
---- a/accel/kvm/kvm-all.c
-+++ b/accel/kvm/kvm-all.c
-@@ -812,6 +812,10 @@ static void kvm_mem_ioeventfd_del(MemoryListener *listener,
-     if (r < 0) {
-         abort();
-     }
+diff --git a/hw/pci-host/apb.c b/hw/pci-host/apb.c
+index 98c5f344f7..36c6251816 100644
+--- a/hw/pci-host/apb.c
++++ b/hw/pci-host/apb.c
+@@ -407,7 +407,7 @@ static void sabre_realize(DeviceState *dev, Error **errp)
+                                      &s->pci_ioport,
+                                      0, 32, TYPE_PCI_BUS);
+ 
+-    pci_create_simple(phb->bus, 0, "pbm-pci");
++    pci_create_simple(phb->bus, 0, TYPE_SABRE_PCI_DEVICE);
+ 
+     /* IOMMU */
+     memory_region_add_subregion_overlap(&s->apb_config, 0x200,
+@@ -498,9 +498,9 @@ static void sabre_pci_class_init(ObjectClass *klass, void *data)
+ }
+ 
+ static const TypeInfo sabre_pci_info = {
+-    .name          = "pbm-pci",
++    .name          = TYPE_SABRE_PCI_DEVICE,
+     .parent        = TYPE_PCI_DEVICE,
+-    .instance_size = sizeof(PCIDevice),
++    .instance_size = sizeof(SabrePCIState),
+     .class_init    = sabre_pci_class_init,
+     .interfaces = (InterfaceInfo[]) {
+         { INTERFACE_CONVENTIONAL_PCI_DEVICE },
+diff --git a/include/hw/pci-host/apb.h b/include/hw/pci-host/apb.h
+index 41de012396..470863639a 100644
+--- a/include/hw/pci-host/apb.h
++++ b/include/hw/pci-host/apb.h
+@@ -14,9 +14,13 @@
+ #define OBIO_MSE_IRQ         0x2a
+ #define OBIO_SER_IRQ         0x2b
+ 
+-#define TYPE_APB "pbm"
+-#define APB_DEVICE(obj) \
+-    OBJECT_CHECK(APBState, (obj), TYPE_APB)
++typedef struct SabrePCIState {
++    PCIDevice parent_obj;
++} SabrePCIState;
 +
-+    if (e->cleanup) {
-+        e->cleanup(e);
-+    }
- }
++#define TYPE_SABRE_PCI_DEVICE "sabre-pci"
++#define SABRE_PCI_DEVICE(obj) \
++    OBJECT_CHECK(SabrePCIState, (obj), TYPE_SABRE_PCI_DEVICE)
  
- static void kvm_io_ioeventfd_add(MemoryListener *listener,
-diff --git a/hw/virtio/virtio-bus.c b/hw/virtio/virtio-bus.c
-index 3042232..8106346 100644
---- a/hw/virtio/virtio-bus.c
-+++ b/hw/virtio/virtio-bus.c
-@@ -256,6 +256,15 @@ bool virtio_bus_ioeventfd_enabled(VirtioBusState *bus)
-     return k->ioeventfd_assign && k->ioeventfd_enabled(proxy);
- }
+ typedef struct APBState {
+     PCIHostState parent_obj;
+@@ -41,4 +45,8 @@ typedef struct APBState {
+     unsigned int nr_resets;
+ } APBState;
  
-+static void virtio_bus_cleanup_event_notifier(EventNotifier *notifier)
-+{
-+    /* Test and clear notifier after disabling event,
-+     * in case poll callback didn't have time to run.
-+     */
-+    virtio_queue_host_notifier_read(notifier);
-+    event_notifier_cleanup(notifier);
-+}
++#define TYPE_APB "apb"
++#define APB_DEVICE(obj) \
++    OBJECT_CHECK(APBState, (obj), TYPE_APB)
 +
- /*
-  * This function switches ioeventfd on/off in the device.
-  * The caller must set or clear the handlers for the EventNotifier.
-@@ -283,19 +292,13 @@ int virtio_bus_set_host_notifier(VirtioBusState *bus, int n, bool assign)
-         r = k->ioeventfd_assign(proxy, notifier, n, true);
-         if (r < 0) {
-             error_report("%s: unable to assign ioeventfd: %d", __func__, r);
--            goto cleanup_event_notifier;
-+            virtio_bus_cleanup_event_notifier(notifier);
-         }
--        return 0;
-     } else {
-+        notifier->cleanup = virtio_bus_cleanup_event_notifier;
-         k->ioeventfd_assign(proxy, notifier, n, false);
-     }
- 
--cleanup_event_notifier:
--    /* Test and clear notifier after disabling event,
--     * in case poll callback didn't have time to run.
--     */
--    virtio_queue_host_notifier_read(notifier);
--    event_notifier_cleanup(notifier);
-     return r;
- }
- 
+ #endif
 -- 
-2.7.5
+2.11.0
