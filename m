@@ -1,32 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50837)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52230)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eamo6-0007kK-LU
-	for qemu-devel@nongnu.org; Sun, 14 Jan 2018 13:15:04 -0500
+	id 1eamvh-0001gS-UZ
+	for qemu-devel@nongnu.org; Sun, 14 Jan 2018 13:22:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eamo1-0008TA-N5
-	for qemu-devel@nongnu.org; Sun, 14 Jan 2018 13:14:58 -0500
-Received: from mail-qt0-x244.google.com ([2607:f8b0:400d:c0d::244]:43165)
+	id 1eamvd-00052P-11
+	for qemu-devel@nongnu.org; Sun, 14 Jan 2018 13:22:49 -0500
+Received: from mail-qk0-x22e.google.com ([2607:f8b0:400d:c09::22e]:39213)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eamo1-0008T3-Id
-	for qemu-devel@nongnu.org; Sun, 14 Jan 2018 13:14:53 -0500
-Received: by mail-qt0-x244.google.com with SMTP id s3so11745918qtb.10
-	for <qemu-devel@nongnu.org>; Sun, 14 Jan 2018 10:14:53 -0800 (PST)
+	id 1eamvc-00052E-SH
+	for qemu-devel@nongnu.org; Sun, 14 Jan 2018 13:22:44 -0500
+Received: by mail-qk0-x22e.google.com with SMTP id c69so5301316qkg.6
+	for <qemu-devel@nongnu.org>; Sun, 14 Jan 2018 10:22:44 -0800 (PST)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
-References: <20180114024524.28821-1-f4bug@amsat.org>
-	<CAFEAcA8ezx6JZa4+XPeaWrJOrr_aND+gFtZPV8UxJzaY3GbGgA@mail.gmail.com>
+References: <20180108024558.17983-1-f4bug@amsat.org>
+	<20180108024558.17983-7-f4bug@amsat.org>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <39ba375a-35cb-84c2-8246-c32864a0819d@amsat.org>
-Date: Sun, 14 Jan 2018 15:14:48 -0300
+Message-ID: <40ab8186-dddc-39cc-2514-077c941d72a6@amsat.org>
+Date: Sun, 14 Jan 2018 15:22:40 -0300
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA8ezx6JZa4+XPeaWrJOrr_aND+gFtZPV8UxJzaY3GbGgA@mail.gmail.com>
+In-Reply-To: <20180108024558.17983-7-f4bug@amsat.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] hw/i2c: QOM'ify i2c slave
+Subject: Re: [Qemu-devel] [PATCH 06/29] hw/isa: add a generic
+ isa_superio_init()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,71 +36,126 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: =?UTF-8?Q?Andreas_F=c3=a4rber?= <afaerber@suse.de>, KONRAD Frederic <frederic.konrad@adacore.com>, QEMU Developers <qemu-devel@nongnu.org>, Corey Minyard <cminyard@mvista.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Alistair Francis <alistair.francis@xilinx.com>
+To: Paolo Bonzini <pbonzini@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>, Aurelien Jarno <aurelien@aurel32.net>, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>
+Cc: qemu-devel@nongnu.org, Igor Mammedov <imammedo@redhat.com>
 
-On 01/14/2018 12:34 PM, Peter Maydell wrote:
-> On 14 January 2018 at 02:45, Philippe Mathieu-Daudé <f4bug@amsat.org> wrote:
->> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
->> ---
->>  hw/i2c/core.c | 12 ++++++------
->>  1 file changed, 6 insertions(+), 6 deletions(-)
->>
->> diff --git a/hw/i2c/core.c b/hw/i2c/core.c
->> index 59068f157e..c84dbfb884 100644
->> --- a/hw/i2c/core.c
->> +++ b/hw/i2c/core.c
->> @@ -8,6 +8,7 @@
->>   */
->>
->>  #include "qemu/osdep.h"
->> +#include "qapi/error.h"
->>  #include "hw/i2c/i2c.h"
->>
->>  typedef struct I2CNode I2CNode;
->> @@ -276,16 +277,15 @@ const VMStateDescription vmstate_i2c_slave = {
->>      }
->>  };
->>
->> -static int i2c_slave_qdev_init(DeviceState *dev)
->> +static void i2c_slave_realize(DeviceState *dev, Error **errp)
->>  {
->>      I2CSlave *s = I2C_SLAVE(dev);
->>      I2CSlaveClass *sc = I2C_SLAVE_GET_CLASS(s);
->>
->> -    if (sc->init) {
->> -        return sc->init(s);
->> +    if (sc->init && sc->init(s)) {
->> +        error_setg(errp, "i2c slave initialization failed");
->> +        return;
->>      }
->> -
->> -    return 0;
->>  }
->>
->>  DeviceState *i2c_create_slave(I2CBus *bus, const char *name, uint8_t addr)
->> @@ -301,7 +301,7 @@ DeviceState *i2c_create_slave(I2CBus *bus, const char *name, uint8_t addr)
->>  static void i2c_slave_class_init(ObjectClass *klass, void *data)
->>  {
->>      DeviceClass *k = DEVICE_CLASS(klass);
->> -    k->init = i2c_slave_qdev_init;
->> +    k->realize = i2c_slave_realize;
->>      set_bit(DEVICE_CATEGORY_MISC, k->categories);
->>      k->bus_type = TYPE_I2C_BUS;
->>      k->props = i2c_props;
+On 01/07/2018 11:45 PM, Philippe Mathieu-Daudé wrote:
+> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+> ---
+>  include/hw/isa/superio.h | 17 +++++++++++++++++
+>  hw/isa/isa-superio.c     | 45 +++++++++++++++++++++++++++++++++++++++++++++
+>  MAINTAINERS              |  2 ++
+>  hw/isa/Makefile.objs     |  1 +
+>  4 files changed, 65 insertions(+)
+>  create mode 100644 include/hw/isa/superio.h
+>  create mode 100644 hw/isa/isa-superio.c
 > 
-> This is changing the semantics of the I2CSlaveClass::init
-> method. Is that really OK? (If nothing else, it means
-> that we end up with a method named init which is called
-> at realize time, which is confusing, and which doesn't
-> have an API like realize which allows it to fill in
-> an Error**.)
+> diff --git a/include/hw/isa/superio.h b/include/hw/isa/superio.h
+> new file mode 100644
+> index 0000000000..e685b96653
+> --- /dev/null
+> +++ b/include/hw/isa/superio.h
+> @@ -0,0 +1,17 @@
+> +/*
+> + * Generic ISA Super I/O
+> + *
+> + * Copyright (c) 2018 Philippe Mathieu-Daudé
+> + *
+> + * This work is licensed under the terms of the GNU GPL, version 2 or later.
+> + * See the COPYING file in the top-level directory.
+> + */
+> +#ifndef HW_ISA_SUPERIO_H
+> +#define HW_ISA_SUPERIO_H
+> +
+> +#include "hw/isa/isa.h"
+> +
+> +ISADevice *isa_superio_init(ISABus *isa_bus, int serial_count,
+> +                            int parallel_count, int drive_count);
 
-I see your point and missed it.
+This approach is simple enough, but how Hervé wrote hw/isa/pc87312.c is
+way cleaner, so I'll respin using it.
 
-I'll respin this patch once I2CSlaveClass is correctly converted to
-realize().
-
-Thanks,
-
-Phil.
+> +
+> +#endif
+> diff --git a/hw/isa/isa-superio.c b/hw/isa/isa-superio.c
+> new file mode 100644
+> index 0000000000..93d8457c6b
+> --- /dev/null
+> +++ b/hw/isa/isa-superio.c
+> @@ -0,0 +1,45 @@
+> +/*
+> + * Generic ISA Super I/O
+> + *
+> + * Copyright (c) 2018 Philippe Mathieu-Daudé
+> + *
+> + * This work is licensed under the terms of the GNU GPL, version 2 or later.
+> + * See the COPYING file in the top-level directory.
+> + */
+> +#include "qemu/osdep.h"
+> +#include "qemu/error-report.h"
+> +#include "sysemu/blockdev.h"
+> +#include "hw/isa/superio.h"
+> +#include "hw/char/serial.h"
+> +#include "hw/char/parallel.h"
+> +#include "hw/block/fdc.h"
+> +#include "hw/input/i8042.h"
+> +
+> +ISADevice *isa_superio_init(ISABus *isa_bus, int serial_count,
+> +                            int parallel_count, int drive_count)
+> +{
+> +    serial_hds_isa_init(isa_bus, 0, serial_count);
+> +
+> +    parallel_hds_isa_init(isa_bus, parallel_count);
+> +
+> +    if (drive_count) {
+> +        DriveInfo **fd;
+> +        int i;
+> +
+> +        if (drive_count > MAX_FD) {
+> +            warn_report("superio: ignoring %d floppy controllers",
+> +                        drive_count - MAX_FD);
+> +            drive_count = MAX_FD;
+> +        }
+> +        fd = g_new(DriveInfo *, drive_count);
+> +
+> +        for (i = 0; i < drive_count; i++) {
+> +            fd[i] = drive_get(IF_FLOPPY, 0, i);
+> +        }
+> +        fdctrl_init_isa(isa_bus, fd);
+> +
+> +        g_free(fd); /* FIXME */
+> +    }
+> +
+> +    return isa_create_simple(isa_bus, TYPE_I8042);
+> +}
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index 7f9e98a046..6f867da743 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -875,6 +875,7 @@ F: hw/input/pckbd.c
+>  F: hw/intc/apic*
+>  F: hw/intc/ioapic*
+>  F: hw/intc/i8259*
+> +F: hw/isa/isa-superio.c
+>  F: hw/misc/debugexit.c
+>  F: hw/misc/pc-testdev.c
+>  F: hw/timer/hpet*
+> @@ -885,6 +886,7 @@ F: include/hw/display/vga.h
+>  F: include/hw/char/parallel.h
+>  F: include/hw/dma/i8257.h
+>  F: include/hw/i2c/pm_smbus.h
+> +F: include/hw/isa/superio.h
+>  F: include/hw/input/i8042.h
+>  F: include/hw/timer/hpet.h
+>  F: include/hw/timer/i8254*
+> diff --git a/hw/isa/Makefile.objs b/hw/isa/Makefile.objs
+> index fb37c55cf2..cac655ba58 100644
+> --- a/hw/isa/Makefile.objs
+> +++ b/hw/isa/Makefile.objs
+> @@ -1,4 +1,5 @@
+>  common-obj-$(CONFIG_ISA_BUS) += isa-bus.o
+> +common-obj-$(CONFIG_ISA_BUS) += isa-superio.o
+>  common-obj-$(CONFIG_APM) += apm.o
+>  common-obj-$(CONFIG_I82378) += i82378.o
+>  common-obj-$(CONFIG_PC87312) += pc87312.o
+> 
