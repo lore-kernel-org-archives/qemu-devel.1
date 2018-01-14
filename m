@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34280)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34278)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ghammer@redhat.com>) id 1eafCD-0000Z7-0f
+	(envelope-from <ghammer@redhat.com>) id 1eafCC-0000Z3-VJ
 	for qemu-devel@nongnu.org; Sun, 14 Jan 2018 05:07:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ghammer@redhat.com>) id 1eafCC-0002Zl-7l
+	(envelope-from <ghammer@redhat.com>) id 1eafCA-0002YB-Pz
 	for qemu-devel@nongnu.org; Sun, 14 Jan 2018 05:07:20 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:56910)
+Received: from mx1.redhat.com ([209.132.183.28]:40126)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ghammer@redhat.com>) id 1eafCC-0002ZX-2K
-	for qemu-devel@nongnu.org; Sun, 14 Jan 2018 05:07:20 -0500
+	(Exim 4.71) (envelope-from <ghammer@redhat.com>) id 1eafCA-0002XD-KH
+	for qemu-devel@nongnu.org; Sun, 14 Jan 2018 05:07:18 -0500
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
 	[10.5.11.12])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 4663D81DFF
-	for <qemu-devel@nongnu.org>; Sun, 14 Jan 2018 10:07:19 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id B86B11F561
+	for <qemu-devel@nongnu.org>; Sun, 14 Jan 2018 10:07:17 +0000 (UTC)
 From: Gal Hammer <ghammer@redhat.com>
-Date: Sun, 14 Jan 2018 12:06:56 +0200
-Message-Id: <1515924416-9266-4-git-send-email-ghammer@redhat.com>
+Date: Sun, 14 Jan 2018 12:06:55 +0200
+Message-Id: <1515924416-9266-3-git-send-email-ghammer@redhat.com>
 In-Reply-To: <1515924416-9266-1-git-send-email-ghammer@redhat.com>
 References: <1515924416-9266-1-git-send-email-ghammer@redhat.com>
-Subject: [Qemu-devel] [PATCH 3/3] virtio: improve virtio devices
- initialization time
+Subject: [Qemu-devel] [PATCH 2/3] virtio: postpone the execution of
+ event_notifier_cleanup function
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,65 +33,75 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: mst@redhat.com, Gal Hammer <ghammer@redhat.com>
 
-The loading time of a VM is quite significant when its virtio
-devices use a large amount of virt-queues (e.g. a virtio-serial
-device with max_ports=511). Most of the time is spend in the
-creation of all the required event notifiers (ioeventfd and memory
-regions).
+Use the EventNotifier's cleanup callback function to execute the
+event_notifier_cleanup function after kvm unregistered the eventfd.
 
-This patch pack all the changes to the memory regions in a
-single memory transaction.
+This change supports running the virtio_bus_set_host_notifier
+function inside a memory region transaction. Otherwise, a closed
+fd is sent to kvm, which results in a failure.
 
-Reported-by: Sitong Liu <siliu@redhat.com>
-Reported-by: Xiaoling Gao <xiagao@redhat.com>
 Signed-off-by: Gal Hammer <ghammer@redhat.com>
 ---
- hw/virtio/virtio.c | 5 +++++
- 1 file changed, 5 insertions(+)
+ accel/kvm/kvm-all.c    |  4 ++++
+ hw/virtio/virtio-bus.c | 19 +++++++++++--------
+ 2 files changed, 15 insertions(+), 8 deletions(-)
 
-diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
-index d6002ee..3ac3491 100644
---- a/hw/virtio/virtio.c
-+++ b/hw/virtio/virtio.c
-@@ -2574,6 +2574,7 @@ static int virtio_device_start_ioeventfd_impl(VirtIODevice *vdev)
-     VirtioBusState *qbus = VIRTIO_BUS(qdev_get_parent_bus(DEVICE(vdev)));
-     int n, r, err;
+diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
+index f290f48..071f4f5 100644
+--- a/accel/kvm/kvm-all.c
++++ b/accel/kvm/kvm-all.c
+@@ -812,6 +812,10 @@ static void kvm_mem_ioeventfd_del(MemoryListener *listener,
+     if (r < 0) {
+         abort();
+     }
++
++    if (e->cleanup) {
++        e->cleanup(e);
++    }
+ }
  
-+    memory_region_transaction_begin();
-     for (n = 0; n < VIRTIO_QUEUE_MAX; n++) {
-         VirtQueue *vq = &vdev->vq[n];
-         if (!virtio_queue_get_num(vdev, n)) {
-@@ -2596,6 +2597,7 @@ static int virtio_device_start_ioeventfd_impl(VirtIODevice *vdev)
+ static void kvm_io_ioeventfd_add(MemoryListener *listener,
+diff --git a/hw/virtio/virtio-bus.c b/hw/virtio/virtio-bus.c
+index 3042232..8106346 100644
+--- a/hw/virtio/virtio-bus.c
++++ b/hw/virtio/virtio-bus.c
+@@ -256,6 +256,15 @@ bool virtio_bus_ioeventfd_enabled(VirtioBusState *bus)
+     return k->ioeventfd_assign && k->ioeventfd_enabled(proxy);
+ }
+ 
++static void virtio_bus_cleanup_event_notifier(EventNotifier *notifier)
++{
++    /* Test and clear notifier after disabling event,
++     * in case poll callback didn't have time to run.
++     */
++    virtio_queue_host_notifier_read(notifier);
++    event_notifier_cleanup(notifier);
++}
++
+ /*
+  * This function switches ioeventfd on/off in the device.
+  * The caller must set or clear the handlers for the EventNotifier.
+@@ -283,19 +292,13 @@ int virtio_bus_set_host_notifier(VirtioBusState *bus, int n, bool assign)
+         r = k->ioeventfd_assign(proxy, notifier, n, true);
+         if (r < 0) {
+             error_report("%s: unable to assign ioeventfd: %d", __func__, r);
+-            goto cleanup_event_notifier;
++            virtio_bus_cleanup_event_notifier(notifier);
          }
-         event_notifier_set(&vq->host_notifier);
+-        return 0;
+     } else {
++        notifier->cleanup = virtio_bus_cleanup_event_notifier;
+         k->ioeventfd_assign(proxy, notifier, n, false);
      }
-+    memory_region_transaction_commit();
-     return 0;
  
- assign_error:
-@@ -2609,6 +2611,7 @@ assign_error:
-         r = virtio_bus_set_host_notifier(qbus, n, false);
-         assert(r >= 0);
-     }
-+    memory_region_transaction_commit();
-     return err;
+-cleanup_event_notifier:
+-    /* Test and clear notifier after disabling event,
+-     * in case poll callback didn't have time to run.
+-     */
+-    virtio_queue_host_notifier_read(notifier);
+-    event_notifier_cleanup(notifier);
+     return r;
  }
  
-@@ -2625,6 +2628,7 @@ static void virtio_device_stop_ioeventfd_impl(VirtIODevice *vdev)
-     VirtioBusState *qbus = VIRTIO_BUS(qdev_get_parent_bus(DEVICE(vdev)));
-     int n, r;
- 
-+    memory_region_transaction_begin();
-     for (n = 0; n < VIRTIO_QUEUE_MAX; n++) {
-         VirtQueue *vq = &vdev->vq[n];
- 
-@@ -2635,6 +2639,7 @@ static void virtio_device_stop_ioeventfd_impl(VirtIODevice *vdev)
-         r = virtio_bus_set_host_notifier(qbus, n, false);
-         assert(r >= 0);
-     }
-+    memory_region_transaction_commit();
- }
- 
- void virtio_device_stop_ioeventfd(VirtIODevice *vdev)
 -- 
 2.7.5
