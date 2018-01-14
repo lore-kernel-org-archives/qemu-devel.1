@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41198)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41199)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1eafqa-0007wt-6a
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1eafqa-0007wu-6c
 	for qemu-devel@nongnu.org; Sun, 14 Jan 2018 05:49:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1eafqX-0000rG-Vf
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1eafqW-0000pw-Uw
 	for qemu-devel@nongnu.org; Sun, 14 Jan 2018 05:49:04 -0500
-Received: from chuckie.co.uk ([82.165.15.123]:41908
+Received: from chuckie.co.uk ([82.165.15.123]:41891
 	helo=s16892447.onlinehome-server.info)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
-	id 1eafqX-0000q9-OZ
-	for qemu-devel@nongnu.org; Sun, 14 Jan 2018 05:49:01 -0500
+	id 1eafqW-0000cu-O5
+	for qemu-devel@nongnu.org; Sun, 14 Jan 2018 05:49:00 -0500
 From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Date: Sun, 14 Jan 2018 10:47:45 +0000
-Message-Id: <20180114104751.21965-6-mark.cave-ayland@ilande.co.uk>
-In-Reply-To: <20180114104751.21965-1-mark.cave-ayland@ilande.co.uk>
-References: <20180114104751.21965-1-mark.cave-ayland@ilande.co.uk>
-Subject: [Qemu-devel] [PATCH 05/11] apb: QOMify sabre PCI host bridge
+Date: Sun, 14 Jan 2018 10:47:40 +0000
+Message-Id: <20180114104751.21965-1-mark.cave-ayland@ilande.co.uk>
+Subject: [Qemu-devel] [PATCH 00/11] sun4u: APB tidy-up/rename and tracepoint
+ conversions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,66 +27,54 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, atar4qemu@gmail.com
 Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 
-Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
----
- hw/pci-host/apb.c         |  6 +++---
- include/hw/pci-host/apb.h | 14 +++++++++++---
- 2 files changed, 14 insertions(+), 6 deletions(-)
+This patchset is the next round of sun4u tidy-ups mostly centered around the
+APB (PCI host bridge). In its current form apb.c contains both the PCI host
+bridge and the secondary PCI bridge, so we split the PCI bridge into a new
+file and move it under hw/pci-bridge.
 
-diff --git a/hw/pci-host/apb.c b/hw/pci-host/apb.c
-index 98c5f344f7..36c6251816 100644
---- a/hw/pci-host/apb.c
-+++ b/hw/pci-host/apb.c
-@@ -407,7 +407,7 @@ static void sabre_realize(DeviceState *dev, Error **errp)
-                                      &s->pci_ioport,
-                                      0, 32, TYPE_PCI_BUS);
- 
--    pci_create_simple(phb->bus, 0, "pbm-pci");
-+    pci_create_simple(phb->bus, 0, TYPE_SABRE_PCI_DEVICE);
- 
-     /* IOMMU */
-     memory_region_add_subregion_overlap(&s->apb_config, 0x200,
-@@ -498,9 +498,9 @@ static void sabre_pci_class_init(ObjectClass *klass, void *data)
- }
- 
- static const TypeInfo sabre_pci_info = {
--    .name          = "pbm-pci",
-+    .name          = TYPE_SABRE_PCI_DEVICE,
-     .parent        = TYPE_PCI_DEVICE,
--    .instance_size = sizeof(PCIDevice),
-+    .instance_size = sizeof(SabrePCIState),
-     .class_init    = sabre_pci_class_init,
-     .interfaces = (InterfaceInfo[]) {
-         { INTERFACE_CONVENTIONAL_PCI_DEVICE },
-diff --git a/include/hw/pci-host/apb.h b/include/hw/pci-host/apb.h
-index 41de012396..470863639a 100644
---- a/include/hw/pci-host/apb.h
-+++ b/include/hw/pci-host/apb.h
-@@ -14,9 +14,13 @@
- #define OBIO_MSE_IRQ         0x2a
- #define OBIO_SER_IRQ         0x2b
- 
--#define TYPE_APB "pbm"
--#define APB_DEVICE(obj) \
--    OBJECT_CHECK(APBState, (obj), TYPE_APB)
-+typedef struct SabrePCIState {
-+    PCIDevice parent_obj;
-+} SabrePCIState;
-+
-+#define TYPE_SABRE_PCI_DEVICE "sabre-pci"
-+#define SABRE_PCI_DEVICE(obj) \
-+    OBJECT_CHECK(SabrePCIState, (obj), TYPE_SABRE_PCI_DEVICE)
- 
- typedef struct APBState {
-     PCIHostState parent_obj;
-@@ -41,4 +45,8 @@ typedef struct APBState {
-     unsigned int nr_resets;
- } APBState;
- 
-+#define TYPE_APB "apb"
-+#define APB_DEVICE(obj) \
-+    OBJECT_CHECK(APBState, (obj), TYPE_APB)
-+
- #endif
+To order to avoid further confusion between PBM/APB naming I've gone for using
+the Sun internal code names, sabre and simba for the two PCI bridges to keep
+things consistent.
+
+Finally there are a couple of conversions to trace-events for sabre and the
+sparc CPU as used when debugging this patchset. Note that as hw/pci-host is
+listed as having no maintainers, I've CCd the PCI bridge maintainers on the
+hw/pci-host tracepoint conversion which I hope is reasonable.
+
+Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+
+Mark Cave-Ayland (11):
+  apb: split simba PCI bridge into hw/pci-bridge/simba.c
+  simba: rename PBMPCIBridge and QOM types to reflect simba naming
+  apb: rename APB functions to use sabre prefix
+  apb: change pbm_pci_host prefix functions to use sabre_pci prefix
+  apb: QOMify sabre PCI host bridge
+  apb: rename QOM type from TYPE_APB to TYPE_SABRE
+  sun4u: rename apb variables and constants
+  apb: rename apb.c to sabre.c
+  pci: add trace-events support for hw/pci-host
+  sabre: convert from SABRE_DPRINTF macro to trace-events
+  sparc64: convert hw/sparc64/sparc64.c from DPRINTF macros to trace
+    events
+
+ Makefile.objs                          |   1 +
+ default-configs/sparc64-softmmu.mak    |   3 +-
+ hw/pci-bridge/Makefile.objs            |   2 +
+ hw/pci-bridge/simba.c                  | 101 ++++++++++++
+ hw/pci-host/Makefile.objs              |   2 +-
+ hw/pci-host/{apb.c => sabre.c}         | 270 ++++++++++++---------------------
+ hw/pci-host/trace-events               |  11 ++
+ hw/sparc64/sparc64.c                   |  85 +++++------
+ hw/sparc64/sun4u.c                     |  45 +++---
+ hw/sparc64/trace-events                |  18 +++
+ include/hw/pci-bridge/simba.h          |  38 +++++
+ include/hw/pci-host/{apb.h => sabre.h} |  26 ++--
+ 12 files changed, 342 insertions(+), 260 deletions(-)
+ create mode 100644 hw/pci-bridge/simba.c
+ rename hw/pci-host/{apb.c => sabre.c} (62%)
+ create mode 100644 hw/pci-host/trace-events
+ create mode 100644 include/hw/pci-bridge/simba.h
+ rename include/hw/pci-host/{apb.h => sabre.h} (69%)
+
 -- 
 2.11.0
