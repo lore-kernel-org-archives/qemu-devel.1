@@ -1,26 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39936)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41074)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eb8P5-00042t-Rn
-	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 12:18:39 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1eb8SD-0006LU-0k
+	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 12:21:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eb8P3-0007wO-7R
-	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 12:18:35 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:14654)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1eb8P2-0007vr-UI
-	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 12:18:33 -0500
-References: <20180115170243.24578-1-berrange@redhat.com>
-	<20180115170243.24578-5-berrange@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <2a662f65-159c-bef0-8d38-71c033fb02c1@redhat.com>
-Date: Mon, 15 Jan 2018 11:18:24 -0600
+	(envelope-from <peter.maydell@linaro.org>) id 1eb8S8-0002Wp-S8
+	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 12:21:49 -0500
+Received: from mail-ot0-x242.google.com ([2607:f8b0:4003:c0f::242]:42918)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1eb8S8-0002WP-OF
+	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 12:21:44 -0500
+Received: by mail-ot0-x242.google.com with SMTP id s3so11236313otc.9
+	for <qemu-devel@nongnu.org>; Mon, 15 Jan 2018 09:21:44 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20180115170243.24578-5-berrange@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="rWiKveZiJKED6zrcG7wXpibLtjdTWtvJk"
-Subject: Re: [Qemu-devel] [PATCH v4 04/13] qapi: Adapt to moved location of
- 'maketrans' function in py3
+In-Reply-To: <20171218172425.18200-2-richard.henderson@linaro.org>
+References: <20171218172425.18200-1-richard.henderson@linaro.org>
+	<20171218172425.18200-2-richard.henderson@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 15 Jan 2018 17:21:23 +0000
+Message-ID: <CAFEAcA_MEhgNCQf9MvfPxLdhpNUMYFB9-rKKy=X7_p-tXkCD1Q@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 01/11] target/arm: Add
+ ARM_FEATURE_V8_1_SIMD
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,78 +31,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
-Cc: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Fam Zheng <famz@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Markus Armbruster <armbru@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---rWiKveZiJKED6zrcG7wXpibLtjdTWtvJk
-From: Eric Blake <eblake@redhat.com>
-To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
-Cc: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
- Fam Zheng <famz@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?=
- <f4bug@amsat.org>, Markus Armbruster <armbru@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <2a662f65-159c-bef0-8d38-71c033fb02c1@redhat.com>
-Subject: Re: [PATCH v4 04/13] qapi: Adapt to moved location of 'maketrans'
- function in py3
-References: <20180115170243.24578-1-berrange@redhat.com>
- <20180115170243.24578-5-berrange@redhat.com>
-In-Reply-To: <20180115170243.24578-5-berrange@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 01/15/2018 11:02 AM, Daniel P. Berrange wrote:
-> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+On 18 December 2017 at 17:24, Richard Henderson
+<richard.henderson@linaro.org> wrote:
+> Enable it for the "any" CPU used by *-linux-user.
+>
+> Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 > ---
->  scripts/qapi.py | 5 ++++-
->  1 file changed, 4 insertions(+), 1 deletion(-)
+>  target/arm/cpu.h     | 1 +
+>  linux-user/elfload.c | 9 +++++++++
+>  target/arm/cpu.c     | 1 +
+>  target/arm/cpu64.c   | 1 +
+>  4 files changed, 12 insertions(+)
+>
+> diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+> index 715ec6a476..e047756b80 100644
+> --- a/target/arm/cpu.h
+> +++ b/target/arm/cpu.h
+> @@ -1351,6 +1351,7 @@ enum arm_features {
+>      ARM_FEATURE_VBAR, /* has cp15 VBAR */
+>      ARM_FEATURE_M_SECURITY, /* M profile Security Extension */
+>      ARM_FEATURE_JAZELLE, /* has (trivial) Jazelle implementation */
+> +    ARM_FEATURE_V8_1_SIMD, /* has ARMv8.1-SIMD */
+>      ARM_FEATURE_V8_FP16, /* implements v8.2 half-precision float */
+>  };
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
+I kind of prefer the kernel's choice of ASIMDRDM rather than
+V8_1_SIMD, but the latter is the official architectural feature
+name, so oh well.
 
->=20
-> diff --git a/scripts/qapi.py b/scripts/qapi.py
-> index 514cca44bf..1fdd189c0d 100644
-> --- a/scripts/qapi.py
-> +++ b/scripts/qapi.py
-> @@ -1734,7 +1734,10 @@ def c_enum_const(type_name, const_name, prefix=3D=
-None):
->          type_name =3D prefix
->      return camel_to_upper(type_name) + '_' + c_name(const_name, False)=
-=2Eupper()
-> =20
-> -c_name_trans =3D string.maketrans('.-', '__')
-> +if hasattr(str, 'maketrans'):
-> +    c_name_trans =3D str.maketrans('.-', '__')
-> +else:
-> +    c_name_trans =3D string.maketrans('.-', '__')
-> =20
-> =20
->  # Map @name to a valid C identifier.
->=20
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---rWiKveZiJKED6zrcG7wXpibLtjdTWtvJk
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlpc4mAACgkQp6FrSiUn
-Q2rWPAf/U3v/j0k+ucA4vy9ksNox5npl9Lu6K/Om4aJE7Sgty/as1qq3Ap1510vt
-I7qDiykCORMKZcMUa7nwGg+5b+H4hjQzL8vaYrG+fKlytzy43t3gUPfW7GitkoF9
-+YBKw/nk3+xoMsAynXZFuCsXYtquEq+NXOH7lH16J0eYBgjlah1vZEkrNKe0HyuP
-KeC1lPCa4jaIdkA0Fx4sG3I0URA/PXjwVBRzIBISgyZ/KP24RdkcrY3oYzu7lvBW
-GhEmAiYB02D2DHzSnQzLF0Ol1DPlJCDYOLCkEzbO2180Kh1y28mIkIg0fTteHEel
-AbolUQiSG7L4coCpy7CdENw+ig4tcw==
-=yXMC
------END PGP SIGNATURE-----
-
---rWiKveZiJKED6zrcG7wXpibLtjdTWtvJk--
+thanks
+-- PMM
