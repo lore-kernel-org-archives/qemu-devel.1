@@ -1,24 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59429)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34859)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1eb6XO-00057d-W5
-	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 10:19:03 -0500
+	(envelope-from <berto@igalia.com>) id 1eb6jl-0000kZ-Oz
+	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 10:31:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1eb6XJ-0003CJ-VY
-	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 10:19:02 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:35288)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1eb6XJ-0003CD-Pa
-	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 10:18:57 -0500
-Date: Mon, 15 Jan 2018 16:18:53 +0100
-From: Gerd Hoffmann <kraxel@redhat.com>
-Message-ID: <20180115151853.iduknw4f4y26b4lt@sirius.home.kraxel.org>
-References: <20171222152531.1849-1-miika9764@gmail.com>
+	(envelope-from <berto@igalia.com>) id 1eb6jf-0000mU-VX
+	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 10:31:49 -0500
+From: Alberto Garcia <berto@igalia.com>
+In-Reply-To: <1509551048-129830-9-git-send-email-anton.nefedov@virtuozzo.com>
+References: <1509551048-129830-1-git-send-email-anton.nefedov@virtuozzo.com>
+	<1509551048-129830-9-git-send-email-anton.nefedov@virtuozzo.com>
+Date: Mon, 15 Jan 2018 16:31:41 +0100
+Message-ID: <w511sirt9ya.fsf@maestria.local.igalia.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20171222152531.1849-1-miika9764@gmail.com>
-Subject: Re: [Qemu-devel] [PATCH 0/3] input: add keys and mouse buttons to
- virtio input
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v5 08/15] qcow2: skip writing zero buffers
+ to empty COW areas
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,17 +23,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Miika S <miika9764@gmail.com>
-Cc: qemu-devel@nongnu.org, berrange@redhat.com
+To: Anton Nefedov <anton.nefedov@virtuozzo.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, kwolf@redhat.com, mreitz@redhat.com, eblake@redhat.com, den@virtuozzo.com
 
-  Hi,
+On Wed 01 Nov 2017 04:44:01 PM CET, Anton Nefedov wrote:
+> If COW areas of the newly allocated clusters are zeroes on the backing image,
+> efficient bdrv_write_zeroes(flags=BDRV_REQ_ALLOCATE) can be used on the whole
+> cluster instead of writing explicit zero buffers later in perform_cow().
+>
+> iotest 060:
+> write to the discarded cluster does not trigger COW anymore.
+> so, break on write_aio event instead, will work for the test
+> (but write won't fail anymore, so update reference output)
+>
+> iotest 066:
+> cluster-alignment areas that were not really COWed are now detected
+> as zeroes, hence the initial write has to be exactly the same size for
+> the maps to match
+>
+> Signed-off-by: Anton Nefedov <anton.nefedov@virtuozzo.com>
+> ---
+>  block/qcow2.h              |  6 +++++
+>  block/qcow2-cluster.c      |  3 ++-
+>  block/qcow2.c              | 67 ++++++++++++++++++++++++++++++++++++++++++++--
+>  block/trace-events         |  1 +
+>  tests/qemu-iotests/060     |  2 +-
+>  tests/qemu-iotests/060.out |  3 ++-
+>  tests/qemu-iotests/066     |  2 +-
+>  tests/qemu-iotests/066.out |  4 +--
+>  8 files changed, 80 insertions(+), 8 deletions(-)
+>
+> diff --git a/block/qcow2.h b/block/qcow2.h
+> index 782a206..e312e48 100644
+> --- a/block/qcow2.h
+> +++ b/block/qcow2.h
+> @@ -377,6 +377,12 @@ typedef struct QCowL2Meta
+>      Qcow2COWRegion cow_end;
+>  
+>      /**
+> +     * Indicates that both COW areas are empty (nb_bytes == 0)
+> +     * or filled with zeroes and do not require any more copying
+> +     */
+> +    bool zero_cow;
 
-> Miika S (3):
->   input: add mouse side buttons to virtio input
->   input: virtio: don't send mouse wheel event twice
+I think the terminology elsewhere is "COW regions".
 
-Cherry-picked these two ad the kbd update depends on the not-yet merged
-keycodemapdb update for virtio-keyboard.
+Also, in this patch that field doesn't really seem to track the case
+where both regions have nb_bytes == 0, or does it? It seems to be
+checked separately in all cases.
 
-thanks,
-  Gerd
+Example:
+
+> -    if (start->nb_bytes == 0 && end->nb_bytes == 0) {
+> +    if ((start->nb_bytes == 0 && end->nb_bytes == 0) || m->zero_cow) {
+>          return 0;
+>      }
+
+Here, 'if (m->zero_cow)' would suffice.
+
+> +        /* If both COW regions are zeroes already, skip this too */
+> +        if (m->zero_cow) {
+> +            continue;
+> +        }
+
+Same as above
+
+> +static bool is_zero_cow(BlockDriverState *bs, QCowL2Meta *m)
+> +{
+> +    if (bs->encrypted) {
+> +        return false;
+> +    }
+> +
+> +    if (m->cow_start.nb_bytes != 0 &&
+> +        !is_zero(bs, m->offset + m->cow_start.offset, m->cow_start.nb_bytes))
+> +    {
+> +        return false;
+> +    }
+> +
+> +    if (m->cow_end.nb_bytes != 0 &&
+> +        !is_zero(bs, m->offset + m->cow_end.offset, m->cow_end.nb_bytes))
+> +    {
+> +        return false;
+> +    }
+
+Why do you need to check that nb_bytes != 0? Doesn't is_zero() do that
+already?
+
+Berto
