@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36968)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37646)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1eb19H-0001Ha-11
-	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 04:33:52 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1eb1Bn-00031O-R3
+	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 04:36:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1eb19C-0005a4-Uw
-	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 04:33:47 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:2800)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1eb19C-0005Zr-Ng
-	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 04:33:42 -0500
-References: <1515443797-10837-1-git-send-email-luwei.kang@intel.com>
-	<20180112142252.GG6646@localhost.localdomain>
-	<82D7661F83C1A047AF7DC287873BF1E167E7630B@SHSMSX101.ccr.corp.intel.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <97bf8d29-4009-6f61-f4bb-d128da5a4c9f@redhat.com>
-Date: Mon, 15 Jan 2018 10:33:35 +0100
+	(envelope-from <peter.maydell@linaro.org>) id 1eb1Bm-0007Uc-R0
+	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 04:36:23 -0500
+Received: from mail-oi0-x235.google.com ([2607:f8b0:4003:c06::235]:33162)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1eb1Bm-0007T0-MG
+	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 04:36:22 -0500
+Received: by mail-oi0-x235.google.com with SMTP id y141so7877446oia.0
+	for <qemu-devel@nongnu.org>; Mon, 15 Jan 2018 01:36:22 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <82D7661F83C1A047AF7DC287873BF1E167E7630B@SHSMSX101.ccr.corp.intel.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH RESEND v1 1/2] i386: Add Intel Processor
- Trace feature support
+In-Reply-To: <20180112145258.10578-1-kraxel@redhat.com>
+References: <20180112145258.10578-1-kraxel@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 15 Jan 2018 09:36:01 +0000
+Message-ID: <CAFEAcA_nNmT+fXvaTa7sD5kXoybNQuWyJ10EG94ffd7W=-WfOQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL 0/9] Ui 20180112 patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,26 +28,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Kang, Luwei" <luwei.kang@intel.com>, Eduardo Habkost <ehabkost@redhat.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "rth@twiddle.net" <rth@twiddle.net>, "mtosatti@redhat.com" <mtosatti@redhat.com>, Chao Peng <chao.p.peng@linux.intel.com>
+To: Gerd Hoffmann <kraxel@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-On 15/01/2018 08:19, Kang, Luwei wrote:
->> If you are forwarding host info directly to the guest, the feature
->> is not migration-safe.  The new feature needs to be added to 
->> feature_word_info[FEAT_7_0_EBX].unmigratable_flags.
->> 
-> Hi, Thanks for you review. I want to support Intel PT live migration
-> and patch [2/2] to do this. I don't understand  why need to add this
-> feature in feature_word_info[FEAT_7_0_EBX].unmigratable_flags first
-> to disable live migration.
+On 12 January 2018 at 14:52, Gerd Hoffmann <kraxel@redhat.com> wrote:
+> The following changes since commit 997eba28a3ed5400a80f754bf3a1c8044b75b9ff:
+>
+>   Merge remote-tracking branch 'remotes/pmaydell/tags/pull-target-arm-20180111' into staging (2018-01-11 14:34:41 +0000)
+>
+> are available in the git repository at:
+>
+>   git://git.kraxel.org/qemu tags/ui-20180112-pull-request
+>
+> for you to fetch changes up to 849bbe60356caf3d320202d45f1ddffeefae06c7:
+>
+>   sdl2: Ignore UI hotkeys after a focus change when GUI modifier is held (2018-01-12 15:51:18 +0100)
+>
+> ----------------------------------------------------------------
+> sdl2: bugfixes.
+> spice: cleanups.
+> input: mem leak fix.
+> gtk: deprecate 2.x support.
+>
 
-Hi Luwei,
+Applied, thanks.
 
-the issue is that different hosts can have different CPUID flags.  You
-don't have a way to set the CPUID flags from the "-cpu" command line,
-and it's not clear what values will be there in the various Ice Lake SKUs.
+Please can you add some text to the "Build Dependencies" section
+of the changelog for the GTK2 deprecation?
+ https://wiki.qemu.org/index.php?title=ChangeLog/2.12
 
-I am not sure if there is a mechanism to allow live migration only for
-"-cpu host", but it cannot be supported for any other "-cpu" model.
-
-Paolo
+-- PMM
