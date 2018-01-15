@@ -1,33 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53919)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54224)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1eb99d-0004Ak-Dz
-	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 13:06:42 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1eb9AH-0004hh-OS
+	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 13:07:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1eb99a-0000RF-9z
-	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 13:06:41 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:45010)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1eb99a-0000Qj-3t
-	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 13:06:38 -0500
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 18EAD883CA
-	for <qemu-devel@nongnu.org>; Mon, 15 Jan 2018 18:06:37 +0000 (UTC)
-From: Thomas Huth <thuth@redhat.com>
-References: <1515594755-12138-1-git-send-email-thuth@redhat.com>
-	<73e534aa-ba61-e3ca-6730-3382f1c1ce1a@redhat.com>
-	<848373da-2010-d38b-fd88-91cd61dec91e@redhat.com>
-Message-ID: <28cccfd1-dca4-c074-0f74-1cf29c143a9c@redhat.com>
-Date: Mon, 15 Jan 2018 19:06:27 +0100
+	(envelope-from <richard.henderson@linaro.org>) id 1eb9AE-000152-Jz
+	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 13:07:21 -0500
+Received: from mail-pl0-x243.google.com ([2607:f8b0:400e:c01::243]:44153)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1eb9AE-000142-Ek
+	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 13:07:18 -0500
+Received: by mail-pl0-x243.google.com with SMTP id f8so2222961plk.11
+	for <qemu-devel@nongnu.org>; Mon, 15 Jan 2018 10:07:18 -0800 (PST)
+References: <20180113004338.16867-1-laurent@vivier.eu>
+	<20180113004338.16867-2-laurent@vivier.eu>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <9a3f4e0b-dd3c-272a-b836-8f25647ceda5@linaro.org>
+Date: Mon, 15 Jan 2018 10:07:12 -0800
 MIME-Version: 1.0
-In-Reply-To: <848373da-2010-d38b-fd88-91cd61dec91e@redhat.com>
+In-Reply-To: <20180113004338.16867-2-laurent@vivier.eu>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] net: Allow hubports to connect to other
- netdevs
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 1/7] accel/tcg: add size paremeter in
+ tlb_fill()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,29 +32,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jason Wang <jasowang@redhat.com>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
-Cc: Markus Armbruster <armbru@redhat.com>
+To: Laurent Vivier <laurent@vivier.eu>, qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, Eduardo Habkost <ehabkost@redhat.com>, qemu-s390x@nongnu.org, Thomas Huth <huth@tuxfamily.org>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Anthony Green <green@moxielogic.com>, Chris Wulff <crwulff@gmail.com>, Alexander Graf <agraf@suse.de>, Max Filippov <jcmvbkbc@gmail.com>, Michael Walle <michael@walle.cc>, qemu-arm@nongnu.org, qemu-ppc@nongnu.org, Artyom Tarasenko <atar4qemu@gmail.com>, "Edgar E . Iglesias" <edgar.iglesias@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Stafford Horne <shorne@gmail.com>, Guan Xuetao <gxt@mprc.pku.edu.cn>, Aurelien Jarno <aurelien@aurel32.net>
 
-On 15.01.2018 18:36, Thomas Huth wrote:
-> On 15.01.2018 08:40, Jason Wang wrote:
-[...]
->> And since it was a hub, do we need to send to its netdev too inside
->> net_hub_receive()?
->=20
-> I currently don't think so, but I'll check again...
+On 01/12/2018 04:43 PM, Laurent Vivier wrote:
+> The MC68040 MMU provides the size of the access that
+> triggers the page fault.
+> 
+> This size is set in the Special Status Word which
+> is written in the stack frame of the access fault
+> exception.
+> 
+> So we need the size in m68k_cpu_unassigned_access() and
+> m68k_cpu_handle_mmu_fault().
+> 
+> To be able to do that, this patch modifies the prototype of
+> handle_mmu_fault handler, tlb_fill() and probe_write().
+> do_unassigned_access() already includes a size parameter.
+> 
+> This patch also updates handle_mmu_fault handlers and
+> tlb_fill() of all targets (only parameter, no code change).
+> 
+> Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+> ---
+> v2: use "0" for the access size when we don't know
+>     the size of the access
+>     
 
-OK, I now think we're definitely fine here. The check is really just
-there to make sure that we do not send the packet back to the same
-sender. And I've checked with a command line like this that network
-traffic (TFTP booting in this case) works as expected:
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
-qemu-system-ppc64 -vga none -nographic \
- -netdev user,id=3Ds1,tftp=3D/path/to/tftpdir,bootfile=3Dppc64.img \
- -netdev hubport,hubid=3D1,id=3Dh1,netdev=3Ds1  \
- -netdev hubport,hubid=3D1,id=3Dh3 -device virtio-net-pci,netdev=3Dh3 \
- -boot n -object filter-dump,id=3Df1,netdev=3Ds1,file=3D/tmp/dump.dat
 
-Both, the behaviour of the TFTP boot in the guest and the wireshark dump
-looked fine, there were no missing packets here.
-
- Thomas
+r~
