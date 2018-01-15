@@ -1,17 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37881)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37897)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1eazAy-0000ia-0c
-	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 02:27:25 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1eazB0-0000ix-RD
+	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 02:27:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1eazAw-0000cF-So
-	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 02:27:24 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1eazAw-0000cK-U1
+	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 02:27:26 -0500
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Mon, 15 Jan 2018 18:27:14 +1100
-Message-Id: <20180115072715.25921-2-david@gibson.dropbear.id.au>
-In-Reply-To: <20180115072715.25921-1-david@gibson.dropbear.id.au>
-References: <20180115072715.25921-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PATCH 1/2] target/ppc: Clarify compat mode
- max_threads value
+Date: Mon, 15 Jan 2018 18:27:13 +1100
+Message-Id: <20180115072715.25921-1-david@gibson.dropbear.id.au>
+Subject: [Qemu-devel] [PATCH 0/2] Further VSMT fixes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,136 +20,20 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: groug@kaod.org, joserz@linux.vnet.ibm.com, surajjs@au1.ibm.com, sam.bobroff@au1.ibm.com
 Cc: lvivier@redhat.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
 
-We recently had some discussions that were sidetracked for a while, because
-nearly everyone misapprehended the purpose of the 'max_threads' field in
-the compatiblity modes table.  It's all about guest expectations, not host
-expectations or support (that's handled elsewhere).
+Here are some follow on fixes to Ziviani's proposed changes to VSMT
+handling.  This should fix migration of POWER8 compat mode guests
+between POWER8 and POWER9 hosts.
 
-In an attempt to avoid a repeat of that confusion, rename the field to
-'max_vthreads' and add an explanatory comment.
+The changes are simple, the rationale's rather more complex.
 
-Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
----
- hw/ppc/spapr.c      |  4 ++--
+David Gibson (2):
+  target/ppc: Clarify compat mode max_threads value
+  spapr: Adjust default VSMT value for better migration compatibility
+
+ hw/ppc/spapr.c      | 15 ++++++++++-----
  target/ppc/compat.c | 25 +++++++++++++++++--------
  target/ppc/cpu.h    |  2 +-
- 3 files changed, 20 insertions(+), 11 deletions(-)
+ 3 files changed, 28 insertions(+), 14 deletions(-)
 
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index 3e528fe91e..e35214bfc3 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -345,7 +345,7 @@ static int spapr_fixup_cpu_dt(void *fdt, sPAPRMachineState *spapr)
-         PowerPCCPU *cpu = POWERPC_CPU(cs);
-         DeviceClass *dc = DEVICE_GET_CLASS(cs);
-         int index = spapr_vcpu_id(cpu);
--        int compat_smt = MIN(smp_threads, ppc_compat_max_threads(cpu));
-+        int compat_smt = MIN(smp_threads, ppc_compat_max_vthreads(cpu));
- 
-         if ((index % smt) != 0) {
-             continue;
-@@ -503,7 +503,7 @@ static void spapr_populate_cpu_dt(CPUState *cs, void *fdt, int offset,
-     size_t page_sizes_prop_size;
-     uint32_t vcpus_per_socket = smp_threads * smp_cores;
-     uint32_t pft_size_prop[] = {0, cpu_to_be32(spapr->htab_shift)};
--    int compat_smt = MIN(smp_threads, ppc_compat_max_threads(cpu));
-+    int compat_smt = MIN(smp_threads, ppc_compat_max_vthreads(cpu));
-     sPAPRDRConnector *drc;
-     int drc_index;
-     uint32_t radix_AP_encodings[PPC_PAGE_SIZES_MAX_SZ];
-diff --git a/target/ppc/compat.c b/target/ppc/compat.c
-index 276b5b52c2..807c906f68 100644
---- a/target/ppc/compat.c
-+++ b/target/ppc/compat.c
-@@ -32,7 +32,16 @@ typedef struct {
-     uint32_t pvr;
-     uint64_t pcr;
-     uint64_t pcr_level;
--    int max_threads;
-+
-+    /*
-+     * Maximum allowed virtual threads per virtual core
-+     *
-+     * This is to stop older guests getting confused by seeing more
-+     * threads than they think the cpu can support.  Usually it's
-+     * equal to the number of threads supported on bare metal
-+     * hardware, but not always (see POWER9).
-+     */
-+    int max_vthreads;
- } CompatInfo;
- 
- static const CompatInfo compat_table[] = {
-@@ -45,28 +54,28 @@ static const CompatInfo compat_table[] = {
-         .pcr = PCR_COMPAT_3_00 | PCR_COMPAT_2_07 | PCR_COMPAT_2_06 |
-                PCR_COMPAT_2_05 | PCR_TM_DIS | PCR_VSX_DIS,
-         .pcr_level = PCR_COMPAT_2_05,
--        .max_threads = 2,
-+        .max_vthreads = 2,
-     },
-     { /* POWER7, ISA2.06 */
-         .name = "power7",
-         .pvr = CPU_POWERPC_LOGICAL_2_06,
-         .pcr = PCR_COMPAT_3_00 | PCR_COMPAT_2_07 | PCR_COMPAT_2_06 | PCR_TM_DIS,
-         .pcr_level = PCR_COMPAT_2_06,
--        .max_threads = 4,
-+        .max_vthreads = 4,
-     },
-     {
-         .name = "power7+",
-         .pvr = CPU_POWERPC_LOGICAL_2_06_PLUS,
-         .pcr = PCR_COMPAT_3_00 | PCR_COMPAT_2_07 | PCR_COMPAT_2_06 | PCR_TM_DIS,
-         .pcr_level = PCR_COMPAT_2_06,
--        .max_threads = 4,
-+        .max_vthreads = 4,
-     },
-     { /* POWER8, ISA2.07 */
-         .name = "power8",
-         .pvr = CPU_POWERPC_LOGICAL_2_07,
-         .pcr = PCR_COMPAT_3_00 | PCR_COMPAT_2_07,
-         .pcr_level = PCR_COMPAT_2_07,
--        .max_threads = 8,
-+        .max_vthreads = 8,
-     },
-     { /* POWER9, ISA3.00 */
-         .name = "power9",
-@@ -80,7 +89,7 @@ static const CompatInfo compat_table[] = {
-          * confusing if half of the threads disappear from the guest
-          * if it announces it's POWER9 aware at CAS time.
-          */
--        .max_threads = 8,
-+        .max_vthreads = 8,
-     },
- };
- 
-@@ -192,14 +201,14 @@ void ppc_set_compat_all(uint32_t compat_pvr, Error **errp)
-     }
- }
- 
--int ppc_compat_max_threads(PowerPCCPU *cpu)
-+int ppc_compat_max_vthreads(PowerPCCPU *cpu)
- {
-     const CompatInfo *compat = compat_by_pvr(cpu->compat_pvr);
-     int n_threads = CPU(cpu)->nr_threads;
- 
-     if (cpu->compat_pvr) {
-         g_assert(compat);
--        n_threads = MIN(n_threads, compat->max_threads);
-+        n_threads = MIN(n_threads, compat->max_vthreads);
-     }
- 
-     return n_threads;
-diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
-index a5e49f23e9..dc6820c5eb 100644
---- a/target/ppc/cpu.h
-+++ b/target/ppc/cpu.h
-@@ -1395,7 +1395,7 @@ void ppc_set_compat(PowerPCCPU *cpu, uint32_t compat_pvr, Error **errp);
- #if !defined(CONFIG_USER_ONLY)
- void ppc_set_compat_all(uint32_t compat_pvr, Error **errp);
- #endif
--int ppc_compat_max_threads(PowerPCCPU *cpu);
-+int ppc_compat_max_vthreads(PowerPCCPU *cpu);
- void ppc_compat_add_property(Object *obj, const char *name,
-                              uint32_t *compat_pvr, const char *basedesc,
-                              Error **errp);
 -- 
 2.14.3
