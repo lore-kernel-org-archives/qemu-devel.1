@@ -1,29 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60762)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32885)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1eb9TC-0001TT-0V
-	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 13:26:55 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1eb9Up-0002wx-Kc
+	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 13:28:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1eb9T8-00045l-QQ
-	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 13:26:53 -0500
-Received: from chuckie.co.uk ([82.165.15.123]:45331
-	helo=s16892447.onlinehome-server.info)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
-	id 1eb9T8-00043P-Ie
-	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 13:26:50 -0500
-References: <20180114104751.21965-1-mark.cave-ayland@ilande.co.uk>
-	<20180114104751.21965-8-mark.cave-ayland@ilande.co.uk>
-	<ee46e8fc-0ff2-3624-1b51-7377f05143d3@amsat.org>
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Message-ID: <af188181-8d00-27b4-f268-75401c893b32@ilande.co.uk>
-Date: Mon, 15 Jan 2018 18:26:41 +0000
+	(envelope-from <vsementsov@virtuozzo.com>) id 1eb9Uo-0004ob-9K
+	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 13:28:35 -0500
+References: <20171207155102.66622-1-vsementsov@virtuozzo.com>
+	<20171207155102.66622-7-vsementsov@virtuozzo.com>
+	<a0096cf0-8bec-dedb-e637-f29c71e46fbb@redhat.com>
+	<624f9181-d57c-4029-e3e8-7f6f4fea3963@virtuozzo.com>
+	<fedadb51-af71-82b1-ee73-135a7ce689eb@redhat.com>
+	<39f16940-1b62-5054-d872-80e9ce0fc560@virtuozzo.com>
+	<c228c4f2-3f4b-1898-4ae6-92b2087e73ae@redhat.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <732f4de5-2e9b-538b-5fcc-9915a72fd3d9@virtuozzo.com>
+Date: Mon, 15 Jan 2018 21:28:21 +0300
 MIME-Version: 1.0
-In-Reply-To: <ee46e8fc-0ff2-3624-1b51-7377f05143d3@amsat.org>
+In-Reply-To: <c228c4f2-3f4b-1898-4ae6-92b2087e73ae@redhat.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-GB
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 07/11] sun4u: rename apb variables and
- constants
+Content-Transfer-Encoding: quoted-printable
+Content-Language: en-US
+Subject: Re: [Qemu-devel] [PATCH v2 6/6] iotest 201: new test for qmp
+ nbd-server-remove
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,92 +30,141 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, atar4qemu@gmail.com
-Cc: qemu-devel@nongnu.org
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: armbru@redhat.com, dgilbert@redhat.com, pbonzini@redhat.com, mreitz@redhat.com, kwolf@redhat.com, den@openvz.org
 
-On 14/01/18 13:20, Philippe Mathieu-Daudé wrote:
-> Hi Mark,
-> 
-> On 01/14/2018 07:47 AM, Mark Cave-Ayland wrote:
->> In order to reflect the previous change of TYPE_APB to TYPE_SABRE, update
->> the corresponding variable names to keep the terminology consistent.
+15.01.2018 18:05, Eric Blake wrote:
+> On 01/15/2018 08:40 AM, Vladimir Sementsov-Ogievskiy wrote:
+>
+>>> And the list archives show several threads of people complaining that
+>>> ./check failing with a diff that merely shows:
+>>>
+>>> -.....
+>>> +..E..
+>> didn't see that. usually, for failed iotests I see
 >>
->> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
->> ---
->>   hw/sparc64/sun4u.c | 41 +++++++++++++++++++++--------------------
->>   1 file changed, 21 insertions(+), 20 deletions(-)
+>> -.....
+>> +..E..
 >>
->> diff --git a/hw/sparc64/sun4u.c b/hw/sparc64/sun4u.c
->> index b8f685847a..fb18afaaa6 100644
->> --- a/hw/sparc64/sun4u.c
->> +++ b/hw/sparc64/sun4u.c
->> @@ -55,9 +55,9 @@
->>   #define CMDLINE_ADDR         0x003ff000
->>   #define PROM_SIZE_MAX        (4 * 1024 * 1024)
->>   #define PROM_VADDR           0x000ffd00000ULL
->> -#define APB_SPECIAL_BASE     0x1fe00000000ULL
->> -#define APB_MEM_BASE         0x1ff00000000ULL
->> -#define APB_PCI_IO_BASE      (APB_SPECIAL_BASE + 0x02000000ULL)
->> +#define PBM_SPECIAL_BASE     0x1fe00000000ULL
->> +#define PBM_MEM_BASE         0x1ff00000000ULL
->> +#define PBM_PCI_IO_BASE      (PBM_SPECIAL_BASE + 0x02000000ULL)
->>   #define PROM_FILENAME        "openbios-sparc64"
->>   #define NVRAM_SIZE           0x2000
->>   #define MAX_IDE_BUS          2
->> @@ -465,7 +465,7 @@ static void sun4uv_init(MemoryRegion *address_space_mem,
->>       Nvram *nvram;
->>       unsigned int i;
->>       uint64_t initrd_addr, initrd_size, kernel_addr, kernel_size, kernel_entry;
->> -    SabreState *apb;
->> +    SabreState *sabre;
->>       PCIBus *pci_bus, *pci_busA, *pci_busB;
->>       PCIDevice *ebus, *pci_dev;
->>       SysBusDevice *s;
->> @@ -489,23 +489,24 @@ static void sun4uv_init(MemoryRegion *address_space_mem,
->>       prom_init(hwdef->prom_addr, bios_name);
->>   
->>       /* Init sabre (PCI host bridge) */
->> -    apb = SABRE_DEVICE(qdev_create(NULL, TYPE_SABRE));
->> -    qdev_prop_set_uint64(DEVICE(apb), "special-base", APB_SPECIAL_BASE);
->> -    qdev_prop_set_uint64(DEVICE(apb), "mem-base", APB_MEM_BASE);
->> -    object_property_set_link(OBJECT(apb), OBJECT(iommu), "iommu", &error_abort);
->> -    qdev_init_nofail(DEVICE(apb));
->> +    sabre = SABRE_DEVICE(qdev_create(NULL, TYPE_SABRE));
->> +    qdev_prop_set_uint64(DEVICE(sabre), "special-base", PBM_SPECIAL_BASE);
->> +    qdev_prop_set_uint64(DEVICE(sabre), "mem-base", PBM_MEM_BASE);
->> +    object_property_set_link(OBJECT(sabre), OBJECT(iommu), "iommu",
->> +                             &error_abort);
->> +    qdev_init_nofail(DEVICE(sabre));
->>   
->>       /* Wire up PCI interrupts to CPU */
->>       for (i = 0; i < IVEC_MAX; i++) {
->> -        qdev_connect_gpio_out_named(DEVICE(apb), "ivec-irq", i,
->> +        qdev_connect_gpio_out_named(DEVICE(sabre), "ivec-irq", i,
->>               qdev_get_gpio_in_named(DEVICE(cpu), "ivec-irq", i));
->>       }
->>   
->> -    pci_bus = PCI_HOST_BRIDGE(apb)->bus;
->> -    pci_busA = pci_bridge_get_sec_bus(apb->bridgeA);
->> -    pci_busB = pci_bridge_get_sec_bus(apb->bridgeB);
->> +    pci_bus = PCI_HOST_BRIDGE(sabre)->bus;
->> +    pci_busA = pci_bridge_get_sec_bus(sabre->bridgeA);
->> +    pci_busB = pci_bridge_get_sec_bus(sabre->bridgeB);
->>   
->> -    /* Only in-built Simba PBMs can exist on the root bus, slot 0 on busA is
->> +    /* Only in-built Simba APBs can exist on the root bus, slot 0 on busA is
-> 
-> This single change might go in patch #2 instead.
-> 
-> Anyway:
-> Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+>> + some kind of assert-fail in one of testcases
+> Although deciphering the assert-fail is not always trivial, and it is
+> still sorely underdocumented on how to manually reproduce the situation
+> that got to the stackdump.
 
-Hi Philippe,
+hmm, restart test? is it documented for 194?
 
-I did think about that, but it feels a bit cleaner to keep all the sun4u 
-changes in one place (see the change to the constants and the other 
-comments within the file).
+I don't see an option to run only one testcase, but unittest supports it,
+so we just need to add this option to ./check
 
 
-ATB,
+Is it really not trivial with my test?
 
-Mark.
+example, inject bug:
+--- a/tests/qemu-iotests/201
++++ b/tests/qemu-iotests/201
+@@ -76,7 +76,7 @@ class TestNbdServerRemove(iotests.QMPTestCase):
+ =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 self.assertEqual(filter_q=
+emu_io(qemu_io_output).strip(),
+ =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0 "can't open device=20
+nbd+tcp://localhost:10900/exp: " +
+ =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0 "Requested export not available\nserver=20
+reported: " +
+-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 "e=
+xport 'exp' not present")
++=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 "1=
+export 'exp' not present")
+
+ =C2=A0=C2=A0=C2=A0=C2=A0 def do_test_connect_after_remove(self, force=3DNo=
+ne):
+ =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 args =3D ('-r', '-f', 'ra=
+w', '-c', 'read 0 512', nbd_uri)
+
+
+
+output:
+
+-.......
++FFF....
++=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
++FAIL: test_connect_after_remove_default (__main__.TestNbdServerRemove)
++----------------------------------------------------------------------
++Traceback (most recent call last):
++=C2=A0 File "201", line 89, in test_connect_after_remove_default
++=C2=A0=C2=A0=C2=A0 self.do_test_connect_after_remove()
++=C2=A0 File "201", line 86, in do_test_connect_after_remove
++=C2=A0=C2=A0=C2=A0 self.assertConnectFailed(qemu_io(*args))
++=C2=A0 File "201", line 79, in assertConnectFailed
++=C2=A0=C2=A0=C2=A0 "1export 'exp' not present")
++AssertionError: "can't open device nbd+tcp://localhost:10900/exp:=20
+Requested export not available\nserver reported: export 'exp' not=20
+present" !=3D "can't open device nbd+tcp://localhost:10900/exp: Requested=20
+export not available\nserver reported: 1export 'exp' not present"
++
+[...]
+
+
+- all obvious. We see what happened and where. And the name of the=20
+broken testcase.
+
+
+----
+I remember the following problems with iotests, but I do not think that=20
+this is a reason to deprecate unittest and go
+in some custom way. Better is to fix them. It's all are problems of our=20
+unittest wrapping, not of python unittest.
+
+- asserts and prints are not naturally mixed in final output (isn't it a=20
+reason for never using print in these tests?)
+- no progress, to see the output we should wait until test finished
+- if qemu crashed, it is hard to understand, in which testcase
+
+so, my point is: use unittest. It is a standard library and common way=20
+of doing this. And it is already in Qemu iotests.
+It gives good organization of test code.
+
+Maybe, a "plain executable python test" is good for complicated tests,=20
+which are actually cant be called "unit test", but
+which are more like "system wide test", when we actually need only one=20
+testcase, but it needs several pages of code.
+
+>
+>> so we know in which testcase and in which line it was failed.
+>>
+>>> makes it rather hard to see WHAT test 2 was doing that caused an error
+>>> instead of a pass, let alone set up a reproduction scenario on JUST the
+>>> failing test.=C2=A0 Yes, a lot of existing iotests use this unittest la=
+yout,
+>>> and on that grounds, I'm not opposed to adding another one; but test 19=
+4
+>>> really IS easier to debug when something goes wrong.
+>>>
+>>>> And there 3 test cases, sharing same setUp. Do not you say that unitte=
+st
+>>>> becomes
+>>>> deprecated in qemu? I think, if we have only one testcase, we may use
+>>>> 194-like approach,
+>>>> but if we have more, it's better to use unittest.
+>>> Yes, I think a nice goal for improved testing is to write more
+>>> python-based iotests in the style that uses actual output, and not just
+>>> the unittest framework, in the test log.=C2=A0 It's not a hard requirem=
+ent as
+>>> long as no one has converted existing tests, but is food for thought.
+>>>
+>> I think, it doesn't mean that we should not use unittest at all, we just
+>> need more output with
+>> it.
+> Yes, that's also a potentially viable option.
+>
+
+
+--=20
+Best regards,
+Vladimir
