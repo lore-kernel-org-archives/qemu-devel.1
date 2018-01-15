@@ -1,25 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51843)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51923)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1eb67q-00088t-FV
-	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 09:52:39 -0500
+	(envelope-from <kwolf@redhat.com>) id 1eb67y-0008Ef-G6
+	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 09:52:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1eb67m-00058L-IY
-	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 09:52:38 -0500
-Resent-Message-Id: <E1eb67m-00058L-IY@eggs.gnu.org>
-Received: from sender-of-o51.zoho.com ([135.84.80.216]:21037)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1eb67m-00055z-9l
-	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 09:52:34 -0500
-In-Reply-To: <20180115141759.11857-1-kraxel@redhat.com>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <151602791373.557.1712710882769350620@5adcb62bf0d6>
+	(envelope-from <kwolf@redhat.com>) id 1eb67u-0005O9-Kg
+	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 09:52:46 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:47720)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1eb67u-0005NC-EJ
+	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 09:52:42 -0500
+Date: Mon, 15 Jan 2018 15:52:12 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20180115145212.GH32271@localhost.localdomain>
+References: <20171012235439.19457-1-anatol.pomozov@gmail.com>
+	<20171012235439.19457-3-anatol.pomozov@gmail.com>
+	<20171013192550.GC3246@localhost.localdomain>
+	<CAOMFOmW+r86WHWPUMtG54BrAQXqSWZ67oF-6G697ox-7AKL4GA@mail.gmail.com>
+	<20171013232114.GD3246@localhost.localdomain>
+	<CAFEAcA-zYJUOqH=WU_XnyxEfiZM7a2yqmzndTrf=pKkp=1wUGA@mail.gmail.com>
+	<20171016082755.GA5145@localhost.localdomain>
+	<CAOMFOmUM7Ct6kUdrB=y2vk6Fm+dFybQb=8hbcUmKNb2RrL2Lew@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Mon, 15 Jan 2018 06:51:54 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH v2 0/2] sdl: hotkey updates and cleanups
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAOMFOmUM7Ct6kUdrB=y2vk6Fm+dFybQb=8hbcUmKNb2RrL2Lew@mail.gmail.com>
+Subject: Re: [Qemu-devel] [PATCH 2/4] multiboot: load any machine type of ELF
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,38 +33,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: kraxel@redhat.com
-Cc: famz@redhat.com, qemu-devel@nongnu.org
+To: Anatol Pomozov <anatol.pomozov@gmail.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Alexander Graf <agraf@suse.de>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
-c3NhZ2UtaWQ6IDIwMTgwMTE1MTQxNzU5LjExODU3LTEta3JheGVsQHJlZGhhdC5jb20KU3ViamVj
-dDogW1FlbXUtZGV2ZWxdIFtQQVRDSCB2MiAwLzJdIHNkbDogaG90a2V5IHVwZGF0ZXMgYW5kIGNs
-ZWFudXBzCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCgpCQVNFPWJhc2UK
-bj0xCnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJBU0UuLiB8IHdjIC1sKQpmYWlsZWQ9MAoK
-Z2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwg
-ZGlmZi5yZW5hbWVzIFRydWUKCmNvbW1pdHM9IiQoZ2l0IGxvZyAtLWZvcm1hdD0lSCAtLXJldmVy
-c2UgJEJBU0UuLikiCmZvciBjIGluICRjb21taXRzOyBkbwogICAgZWNobyAiQ2hlY2tpbmcgUEFU
-Q0ggJG4vJHRvdGFsOiAkKGdpdCBsb2cgLW4gMSAtLWZvcm1hdD0lcyAkYykuLi4iCiAgICBpZiAh
-IGdpdCBzaG93ICRjIC0tZm9ybWF0PWVtYWlsIHwgLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1t
-YWlsYmFjayAtOyB0aGVuCiAgICAgICAgZmFpbGVkPTEKICAgICAgICBlY2hvCiAgICBmaQogICAg
-bj0kKChuKzEpKQpkb25lCgpleGl0ICRmYWlsZWQKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVw
-ZGF0aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKRnJvbSBodHRw
-czovL2dpdGh1Yi5jb20vcGF0Y2hldy1wcm9qZWN0L3FlbXUKICogW25ldyB0YWddICAgICAgICAg
-ICAgICAgcGF0Y2hldy8yMDE4MDExNTE0MzUwMC4yMjYzMS0xLWY0YnVnQGFtc2F0Lm9yZyAtPiBw
-YXRjaGV3LzIwMTgwMTE1MTQzNTAwLjIyNjMxLTEtZjRidWdAYW1zYXQub3JnClN3aXRjaGVkIHRv
-IGEgbmV3IGJyYW5jaCAndGVzdCcKMDY5YjkxMmQ2NyBzZGw6IHJlb3JnYW5pemUgLW5vLWZyYW1l
-IHN1cHBvcnQKZTI1MzgwZmI1YyBzZGw6IHVzZSBjdHJsLWFsdC1nIGFzIGdyYWIgaG90a2V5Cgo9
-PT0gT1VUUFVUIEJFR0lOID09PQpDaGVja2luZyBQQVRDSCAxLzI6IHNkbDogdXNlIGN0cmwtYWx0
-LWcgYXMgZ3JhYiBob3RrZXkuLi4KQ2hlY2tpbmcgUEFUQ0ggMi8yOiBzZGw6IHJlb3JnYW5pemUg
-LW5vLWZyYW1lIHN1cHBvcnQuLi4KRVJST1I6IGJyYWNlcyB7fSBhcmUgbmVjZXNzYXJ5IGZvciBh
-bGwgYXJtcyBvZiB0aGlzIHN0YXRlbWVudAojNjg6IEZJTEU6IHVpL3NkbC5jOjExNjoKKyAgICBp
-ZiAobm9fZnJhbWUpClsuLi5dCgpFUlJPUjogZG8gbm90IGluaXRpYWxpc2UgZ2xvYmFscyB0byAw
-IG9yIE5VTEwKIzEzMjogRklMRTogdmwuYzoxNTM6CitpbnQgbm9fZnJhbWUgPSAwOwoKdG90YWw6
-IDIgZXJyb3JzLCAwIHdhcm5pbmdzLCA5NyBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBz
-dHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJl
-IGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNL
-UEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBl
-eGl0ZWQgd2l0aCBjb2RlOiAxCgoKLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5
-IFBhdGNoZXcgW2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNr
-IHRvIHBhdGNoZXctZGV2ZWxAZnJlZWxpc3RzLm9yZw==
+Am 16.10.2017 um 20:38 hat Anatol Pomozov geschrieben:
+> Hi
+> 
+> On Mon, Oct 16, 2017 at 1:27 AM, Kevin Wolf <kwolf@redhat.com> wrote:
+> > Am 14.10.2017 um 15:41 hat Peter Maydell geschrieben:
+> >> On 14 October 2017 at 00:21, Eduardo Habkost <ehabkost@redhat.com> wrote:
+> >> > I don't believe the spec restricts that, but I don't see why it
+> >> > would be useful to load an ELF file that doesn't match the target
+> >> > architecture (e.g. loading non-x86 ELF files on a x86 machine
+> >> > like PC).
+> 
+> I see what do you mean Eduardo. Yes it makes sense to restrict ELF to
+> the currently emulated platform.
+> 
+> On a second thought adding multiboot support for non x86 needs to go
+> with other changes, e.g. multiboot.c should be moved out of hw/i386 to
+> some platform-independent location. It probably worth to postpone this
+> change until after Qemu gets multiboot2 support that explicitly states
+> MIPS support, thus it will be easier to test this codepath on multiple
+> platforms.
+> 
+> So if you don't mind I'll remove this patch from the current patch
+> series and put it into later one.
+
+I can't find a new version of this patch series with this patch dropped.
+Are you still planning to send one?
+
+Kevin
