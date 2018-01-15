@@ -1,31 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44658)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44680)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eb5r4-0003jT-4G
-	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 09:35:19 -0500
+	id 1eb5r6-0003lA-MY
+	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 09:35:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eb5r3-00011c-9W
-	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 09:35:18 -0500
-Received: from mail-qk0-x242.google.com ([2607:f8b0:400d:c09::242]:41342)
+	id 1eb5r5-000138-QU
+	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 09:35:20 -0500
+Received: from mail-qk0-x243.google.com ([2607:f8b0:400d:c09::243]:39369)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eb5r3-00011T-5O
-	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 09:35:17 -0500
-Received: by mail-qk0-x242.google.com with SMTP id l29so7427878qkj.8
-	for <qemu-devel@nongnu.org>; Mon, 15 Jan 2018 06:35:17 -0800 (PST)
+	id 1eb5r5-00012v-Lr
+	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 09:35:19 -0500
+Received: by mail-qk0-x243.google.com with SMTP id c69so7853387qkg.6
+	for <qemu-devel@nongnu.org>; Mon, 15 Jan 2018 06:35:19 -0800 (PST)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Mon, 15 Jan 2018 11:34:53 -0300
-Message-Id: <20180115143500.22631-3-f4bug@amsat.org>
+Date: Mon, 15 Jan 2018 11:34:54 -0300
+Message-Id: <20180115143500.22631-4-f4bug@amsat.org>
 In-Reply-To: <20180115143500.22631-1-f4bug@amsat.org>
 References: <20180115143500.22631-1-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v2 2/8] docker: do not display deprecated
- images in 'make docker' help
+Subject: [Qemu-devel] [PATCH v2 3/8] docker: add the Ubuntu Trusty base image
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,35 +36,36 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Fam Zheng <famz@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org
 
-the 'debian' base image is deprecated since 3e11974988d8
+based on QEMU v2.10 ubuntu.docker (ca853f0c76e3 and 2346b12fc52d)
 
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- tests/docker/Makefile.include | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+ tests/docker/dockerfiles/ubuntu14.04.docker | 17 +++++++++++++++++
+ 1 file changed, 17 insertions(+)
+ create mode 100644 tests/docker/dockerfiles/ubuntu14.04.docker
 
-diff --git a/tests/docker/Makefile.include b/tests/docker/Makefile.include
-index ef95703cef..d5cf896966 100644
---- a/tests/docker/Makefile.include
-+++ b/tests/docker/Makefile.include
-@@ -4,7 +4,8 @@
- 
- DOCKER_SUFFIX := .docker
- DOCKER_FILES_DIR := $(SRC_PATH)/tests/docker/dockerfiles
--DOCKER_IMAGES := $(sort $(notdir $(basename $(wildcard $(DOCKER_FILES_DIR)/*.docker))))
-+DOCKER_DEPRECATED_IMAGES := debian
-+DOCKER_IMAGES := $(filter-out $(DOCKER_DEPRECATED_IMAGES),$(sort $(notdir $(basename $(wildcard $(DOCKER_FILES_DIR)/*.docker)))))
- DOCKER_TARGETS := $(patsubst %,docker-image-%,$(DOCKER_IMAGES))
- # Use a global constant ccache directory to speed up repetitive builds
- DOCKER_CCACHE_DIR := $$HOME/.cache/qemu-docker-ccache
-@@ -63,7 +64,7 @@ docker-image-debian-win64-cross: docker-image-debian8-mxe
- docker-image-travis: NOUSER=1
- 
- # Expand all the pre-requistes for each docker image and test combination
--$(foreach i,$(DOCKER_IMAGES), \
-+$(foreach i,$(DOCKER_IMAGES) $(DOCKER_DEPRECATED_IMAGES), \
- 	$(foreach t,$(DOCKER_TESTS) $(DOCKER_TOOLS), \
- 		$(eval .PHONY: docker-$t@$i) \
- 		$(eval docker-$t@$i: docker-image-$i docker-run-$t@$i) \
+diff --git a/tests/docker/dockerfiles/ubuntu14.04.docker b/tests/docker/dockerfiles/ubuntu14.04.docker
+new file mode 100644
+index 0000000000..cd24e759a7
+--- /dev/null
++++ b/tests/docker/dockerfiles/ubuntu14.04.docker
+@@ -0,0 +1,17 @@
++FROM ubuntu:14.04
++RUN apt-get update
++ENV PACKAGES flex bison \
++    libusb-1.0-0-dev libiscsi-dev librados-dev libncurses5-dev libncursesw5-dev \
++    libseccomp-dev libgnutls-dev libssh2-1-dev  libspice-server-dev \
++    libspice-protocol-dev libnss3-dev libfdt-dev \
++    libgtk-3-dev libvte-2.90-dev libsdl1.2-dev libpng12-dev libpixman-1-dev \
++    libvdeplug-dev liblzo2-dev libsnappy-dev libbz2-dev libxen-dev librdmacm-dev libibverbs-dev \
++    libsasl2-dev libjpeg-turbo8-dev xfslibs-dev libcap-ng-dev libbrlapi-dev libcurl4-gnutls-dev \
++    libbluetooth-dev librbd-dev libaio-dev glusterfs-common libnuma-dev libepoxy-dev libdrm-dev libgbm-dev \
++    libjemalloc-dev libusbredirhost-dev libnfs-dev libcap-dev libattr1-dev \
++    texinfo dpkg-dev \
++    gettext git make ccache python-yaml gcc clang sparse
++RUN DEBIAN_FRONTEND=noninteractive apt-get -y --no-install-recommends install $PACKAGES
++RUN dpkg -l $PACKAGES | sort > /packages.txt
++ENV FEATURES clang pyyaml
++ENV QEMU_CONFIGURE_OPTS --disable-opengl
 -- 
 2.15.1
