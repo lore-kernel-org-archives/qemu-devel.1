@@ -1,22 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45836)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46864)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1ebCHf-0000Mn-NM
-	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 16:27:13 -0500
+	(envelope-from <pisa@cmp.felk.cvut.cz>) id 1ebCL1-0002nA-JE
+	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 16:30:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1ebCHe-0005bv-Ky
-	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 16:27:11 -0500
-References: <76a29a1e-7fdb-37a8-9f79-df618d385b05@virtuozzo.com>
-	<9e11cf33-cbe1-9fd5-f265-180e4e14dfa7@redhat.com>
-	<6a2d73cc-5042-54c8-364d-18d273547f27@virtuozzo.com>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <e5e834f9-5482-addc-0e45-00b39186e92f@redhat.com>
-Date: Mon, 15 Jan 2018 16:26:55 -0500
+	(envelope-from <pisa@cmp.felk.cvut.cz>) id 1ebCKy-0007cM-Ft
+	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 16:30:39 -0500
+Received: from relay.felk.cvut.cz ([2001:718:2:1611:0:1:0:70]:35679)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <pisa@cmp.felk.cvut.cz>) id 1ebCKy-0007bH-5g
+	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 16:30:36 -0500
+From: Pavel Pisa <pisa@cmp.felk.cvut.cz>
+Date: Mon, 15 Jan 2018 22:29:53 +0100
+References: <cover.1515960078.git.pisa@cmp.felk.cvut.cz>
+	<425e38f28bba536cfb1ae389ffa963984990f306.1515960078.git.pisa@cmp.felk.cvut.cz>
+	<65ff7759-2e09-fba6-e60e-41e8d89d0e7c@amsat.org>
+In-Reply-To: <65ff7759-2e09-fba6-e60e-41e8d89d0e7c@amsat.org>
 MIME-Version: 1.0
-In-Reply-To: <6a2d73cc-5042-54c8-364d-18d273547f27@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: Text/Plain;
+  charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] qcow2 autoloading bitmaps
+Content-Disposition: inline
+Message-Id: <201801152229.53520.pisa@cmp.felk.cvut.cz>
+Subject: Re: [Qemu-devel] [PATCH V4 2/7] CAN bus support to connect bust to
+ Linux host SocketCAN interface.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,150 +31,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, Eric Blake <eblake@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, qemu block <qemu-block@nongnu.org>
-Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <famz@redhat.com>, Max Reitz <mreitz@redhat.com>, Nikolay Shirokovskiy <nshirokovskiy@virtuozzo.com>, Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, "Denis V. Lunev" <den@openvz.org>
+To: Philippe =?utf-8?q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Cc: "Daniel P. Berrange" <berrange@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org, Marek Vasut <marex@denx.de>, Oliver Hartkopp <socketcan@hartkopp.net>, Stefan Hajnoczi <stefanha@gmail.com>, Deniz Eren <deniz.eren@icloud.com>, Oleksij Rempel <o.rempel@pengutronix.de>, Konrad Frederic <frederic.konrad@adacore.com>, Jan Kiszka <jan.kiszka@siemens.com>
 
+Hello Philippe,
 
+thanks for review.
 
-On 01/11/2018 10:15 AM, Vladimir Sementsov-Ogievskiy wrote:
-> 11.01.2018 17:43, Eric Blake wrote:
->> On 01/11/2018 08:26 AM, Vladimir Sementsov-Ogievskiy wrote:
->>
->>> # @autoload: the bitmap will be automatically loaded when the image i=
-t
->>> is stored
->>> #=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 i=
-n is opened. This flag may only be specified for persistent
->>> #=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 b=
-itmaps. Default is false for block-dirty-bitmap-add.
->>> (Since: 2.10)
->>>
->>> so, if we consider only enabled bitmaps it is ok to direct map autolo=
-ad
->>> <=3D> auto.
->>>
->>> But now we've faced into necessity of load/store disabled bitmaps.
->>>
->>> Current behavior is definitely wrong: user sets autoload flag for
->>> disabled bitmap, but on next
->>> Qemu start the bitmap will be autoloaded and enabled.
->> Can we make it an error to set autoload to true when requesting a
->> disabled bitmap? Or can we not even request a disabled bitmap?
->=20
-> currently, autoload is set on bitmap creation, so it is always enabled
-> at this time.
->=20
->>
->>>
->>> Proposed solution:
->>> =C2=A0- deprecate @autoload flag for bitmap creation, ignore it
->> Is there ever a case where you'd create an enabled persistent
->> dirty-tracking bitmap, but not want it to be re-enabled the next time
->> the image is created?
->=20
-> looks like we do not. For now we use only persistent+autoload.
->=20
->> Your argument for ignoring/deleting the parameter
->> is that you can decide whether to set the "auto" flag solely based on
->> whether the bitmap is both persistent and enabled, without needing any
->> additional user input?
->=20
-> The main point is that, when we want to load/store disabled bitmaps thi=
-s
-> parameter is confusing: In user's point of view it's ok to have autoloa=
-ding
-> disabled bitmap, which he wants to be autoloaded and disabled on next Q=
-emu
-> start. So, to maintain this flag (autoload) for disabled bitmaps, we
-> will need
-> to add some additional flag "disabled" to Qcow2 spec, to make it possib=
-le to
-> have "auto" but "disabled" bitmaps. And we will have to change qcow2 "a=
-uto"
-> specification, to consider "disabled" bit set in parallel. But all this
-> looks
-> superfluous for now. We already have type "dirty tracking bitmaps" in q=
-cow2
-> spec for dirty bitmaps. So, for now, "auto" flag set on "dirty tracking
-> bitmaps" means that it is enabled. It is logical to assume that all oth=
-er
-> "dirty tracking bitmaps" are disabled.
->=20
+I have updated patch series in can-pci branch in
 
-Oh, so you want to be able to "autoload" a disabled bitmap, is that right=
-?
+  https://gitlab.fel.cvut.cz/canbus/qemu-canbus
 
-Is it important to distinguish these two cases?
+I would wait some day if there is some remark
+from other developers and socket ones especially.
 
-(1) A bitmap is saved to the qcow2, but autoload is set to false
-(2) A bitmap is saved to the qcow2, autoload is true, but a (new)
-disabled bit is set.
+On Monday 15 of January 2018 03:55:00 Philippe Mathieu-Daud=C3=A9 wrote:
+> Hi Pavel,
+>
+> I'm CC'ing the QEMU Sockets maintainer to ask them a quick review of the
+> socket part.
+>
+> On 01/14/2018 05:14 PM, pisa@cmp.felk.cvut.cz wrote:
+> > From: Pavel Pisa <pisa@cmp.felk.cvut.cz>
 
-Is it okay, basically, to always autoload bitmaps in a disabled state?
-Is it imperative we add the new bit?
+> Please move those checks out of the function, to call them once at build
+> time and not at runtime.
+>
+> /* Check that QEMU and Linux kernel flags encoding matches */
+> QEMU_BUILD_BUG_ON(QEMU_CAN_EFF_FLAG =3D=3D CAN_EFF_FLAG);
+> QEMU_BUILD_BUG_ON(QEMU_CAN_RTR_FLAG =3D=3D CAN_RTR_FLAG);
+> QEMU_BUILD_BUG_ON(QEMU_CAN_ERR_FLAG =3D=3D CAN_ERR_FLAG);
+> QEMU_BUILD_BUG_ON(QEMU_CAN_INV_FILTER =3D=3D CAN_INV_FILTER);
+> QEMU_BUILD_BUG_ON(offsetof(qemu_can_frame, data)
+>                   =3D=3D offsetof(struct can_frame, data));
 
-(Genuinely asking. I'm not sure.)
+moved
 
-> On the other hand, "autoloading" is a bad property for disabled bitmap
-> at all.
-> Disabled bitmap is simpler than enabled (or "auto") bitmap, it doesn't
-> require
-> any care like "auto" bitmap. So, it is more natural to let Qemu decide
-> to load
-> or not any disabled bitmaps.
->=20
+> > +
+> > +    qemu_log_lock();
+> > +    qemu_log("[cansocketcan]: %03X [%01d] %s %s",
+> > +             msg->can_id & QEMU_CAN_EFF_MASK,
+> > +             msg->can_dlc,
+> > +             msg->can_id & QEMU_CAN_EFF_FLAG ? "EFF" : "SFF",
+> > +             msg->can_id & QEMU_CAN_RTR_FLAG ? "RTR" : "DAT");
+> > +
+> > +    for (i =3D 0; i < msg->can_dlc; i++) {
+> > +        qemu_log(" %02X", msg->data[i]);
+> > +    }
+> > +    qemu_log("\n");
+>
+> I'd rather use tracepoints, but since this is restricted by DEBUG_CAN
+> this doesn't bother the user console, so ok.
+>
+> > +    qemu_log_flush();
+> > +    qemu_log_unlock();
+> > +}
 
-If we don't autoload the disabled ones, I imagine you'll eventually want
-some way to manually load them into memory to manipulate them for
-various reasons.
+Trace events seems as nice feature. But simple text printf
+like output has been enough till now for CAN testing.
+There is no debugging output in production build.
+So I would add tracing infrastructure later if needed.
 
->=20
->=20
->>
->>> =C2=A0- save persistent enabled bitmaps with "auto" flag
->>> =C2=A0- save persistent disabled bitmaps without "auto" flag
->>> =C2=A0- on Qemu start load all bitmaps, mapping "auto" flag state to
->>> "enabled" state.
->> So if I follow the argument, the state of the 'auto' flag stored into
->> the file on BDS close (often at qemu exit) is based on whether the
->> bitmap was currently enabled, and the user can then control whether to
->> enable/disable the bitmap on the fly to control whether the 'auto' fla=
-g
->> is stored; thus, having the flag at creation time is redundant.
->=20
-> Yes.
->=20
->>
->>>
->>> Note: we may store a lot of disabled bitmaps in qcow2 image, but load=
-ing
->>> them all into RAM may be
->>> inefficient. Actually such bitmap will be needed only on demand (for
->>> export through nbd or
->>> making some kind of backup). So in future it may be optimized by "laz=
-y
->>> load" of disabled bitmaps,
->>> postponing their actual load up to first read or enabling. This
->>> optimization doesn't need changing
->>> of qapi or qcow2 format (at first sight).
->>>
->>>
->>> Note2: now there is no way to disable/enable bitmaps, but there is a
->>> =C2=A0 [PATCH for-2.12 0/4] qmp dirty bitmap API
->>> with big conversation, but I hope, I'll post a new version with a sma=
-ll
->>> fix soon and it will be merged.
->> In other words, you can incorporate your QAPI tweaks proposed here int=
-o
->> your respin of that series.
->>
->=20
-> right idea, I'll do so, just wait a bit for others to comment here.
->=20
+> > +    /* open socket */
+> > +    s =3D socket(PF_CAN, SOCK_RAW, CAN_RAW);
+>
+> I never used it, but I think QEMU uses his socket API: "qemu/sockets.h"
 
-Stay tuned...
+The SocketCAN host connection code is Linux specific,
+but I can switch to qemu_socket() if it is preferred.
+But address family has to be from Linux header file anyway.
 
-> --=20
-> Best regards,
-> Vladimir
->=20
+Best wishes,
+
+Pavel
