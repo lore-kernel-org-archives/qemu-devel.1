@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50044)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50067)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1eb3LH-0007vA-Of
+	(envelope-from <quintela@redhat.com>) id 1eb3LK-0007vH-Eu
 	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 06:54:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1eb3LF-0003mn-1O
-	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 06:54:19 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:41414)
+	(envelope-from <quintela@redhat.com>) id 1eb3LJ-0003pJ-1g
+	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 06:54:22 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:41460)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1eb3LE-0003mJ-SE
-	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 06:54:16 -0500
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1eb3LI-0003os-PW
+	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 06:54:20 -0500
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
 	[10.5.11.13])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id F28D44E33B
-	for <qemu-devel@nongnu.org>; Mon, 15 Jan 2018 11:54:15 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id E2A2E4E05D
+	for <qemu-devel@nongnu.org>; Mon, 15 Jan 2018 11:54:19 +0000 (UTC)
 From: Juan Quintela <quintela@redhat.com>
-Date: Mon, 15 Jan 2018 12:53:04 +0100
-Message-Id: <20180115115309.23982-23-quintela@redhat.com>
+Date: Mon, 15 Jan 2018 12:53:06 +0100
+Message-Id: <20180115115309.23982-25-quintela@redhat.com>
 In-Reply-To: <20180115115309.23982-1-quintela@redhat.com>
 References: <20180115115309.23982-1-quintela@redhat.com>
-Subject: [Qemu-devel] [PULL 22/27] migration: use switch at the end of
- migration
+Subject: [Qemu-devel] [PULL 24/27] migration: major cleanup for migrate
+ iterations
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,81 +35,148 @@ Cc: dgilbert@redhat.com, lvivier@redhat.com, peterx@redhat.com
 
 From: Peter Xu <peterx@redhat.com>
 
-It converts the old if clauses into switch, explicitly mentions the
-possible migration states.  The old nested "if"s are not clear on what
-we do on different states.
+The major work for migration iterations are to move RAM/block/... data
+via qemu_savevm_state_iterate().  Generalize those part into a single
+function.
 
-Signed-off-by: Peter Xu <peterx@redhat.com>
 Reviewed-by: Juan Quintela <quintela@redhat.com>
+Signed-off-by: Peter Xu <peterx@redhat.com>
 Signed-off-by: Juan Quintela <quintela@redhat.com>
 ---
- migration/migration.c | 44 +++++++++++++++++++++++++++-----------------
- 1 file changed, 27 insertions(+), 17 deletions(-)
+ migration/migration.c | 90 +++++++++++++++++++++++++++++++--------------------
+ 1 file changed, 55 insertions(+), 35 deletions(-)
 
 diff --git a/migration/migration.c b/migration/migration.c
-index c1de46a101..6023218ffa 100644
+index d7f85aa460..a95f5e469c 100644
 --- a/migration/migration.c
 +++ b/migration/migration.c
-@@ -2341,26 +2341,30 @@ static void *migration_thread(void *opaque)
-     cpu_throttle_stop();
+@@ -2095,11 +2095,11 @@ static int migration_maybe_pause(MigrationState *s,
+  *   The caller 'breaks' the loop when this returns.
+  *
+  * @s: Current migration state
+- * @current_active_state: The migration state we expect to be in
+  */
+-static void migration_completion(MigrationState *s, int current_active_state)
++static void migration_completion(MigrationState *s)
+ {
+     int ret;
++    int current_active_state = s->state;
  
-     qemu_mutex_lock_iothread();
--    if (s->state == MIGRATION_STATUS_COMPLETED) {
-+    switch (s->state) {
-+    case MIGRATION_STATUS_COMPLETED:
-         migration_calculate_complete(s);
-         runstate_set(RUN_STATE_POSTMIGRATE);
--    } else {
--        if (s->state == MIGRATION_STATUS_ACTIVE) {
--            /*
--             * We should really assert here, but since it's during
--             * migration, let's try to reduce the usage of assertions.
--             */
--            if (!migrate_colo_enabled()) {
--                error_report("%s: critical error: calling COLO code without "
--                             "COLO enabled", __func__);
--            }
--            migrate_start_colo_process(s);
--            /*
--            * Fixme: we will run VM in COLO no matter its old running state.
--            * After exited COLO, we will keep running.
--            */
--            s->vm_was_running = true;
-+        break;
+     if (s->state == MIGRATION_STATUS_ACTIVE) {
+         qemu_mutex_lock_iothread();
+@@ -2248,6 +2248,51 @@ static void migration_update_counters(MigrationState *s,
+                               bandwidth, threshold_size);
+ }
+ 
++/* Migration thread iteration status */
++typedef enum {
++    MIG_ITERATE_RESUME,         /* Resume current iteration */
++    MIG_ITERATE_SKIP,           /* Skip current iteration */
++    MIG_ITERATE_BREAK,          /* Break the loop */
++} MigIterateState;
 +
-+    case MIGRATION_STATUS_ACTIVE:
-+        /*
-+         * We should really assert here, but since it's during
-+         * migration, let's try to reduce the usage of assertions.
-+         */
-+        if (!migrate_colo_enabled()) {
-+            error_report("%s: critical error: calling COLO code without "
-+                         "COLO enabled", __func__);
-         }
-+        migrate_start_colo_process(s);
-+        /*
-+         * Fixme: we will run VM in COLO no matter its old running state.
-+         * After exited COLO, we will keep running.
-+         */
-+        s->vm_was_running = true;
-+        /* Fallthrough */
-+    case MIGRATION_STATUS_FAILED:
-+    case MIGRATION_STATUS_CANCELLED:
-         if (s->vm_was_running) {
-             vm_start();
-         } else {
-@@ -2368,6 +2372,12 @@ static void *migration_thread(void *opaque)
-                 runstate_set(RUN_STATE_POSTMIGRATE);
++/*
++ * Return true if continue to the next iteration directly, false
++ * otherwise.
++ */
++static MigIterateState migration_iteration_run(MigrationState *s)
++{
++    uint64_t pending_size, pend_post, pend_nonpost;
++    bool in_postcopy = s->state == MIGRATION_STATUS_POSTCOPY_ACTIVE;
++
++    qemu_savevm_state_pending(s->to_dst_file, s->threshold_size,
++                              &pend_nonpost, &pend_post);
++    pending_size = pend_nonpost + pend_post;
++
++    trace_migrate_pending(pending_size, s->threshold_size,
++                          pend_post, pend_nonpost);
++
++    if (pending_size && pending_size >= s->threshold_size) {
++        /* Still a significant amount to transfer */
++        if (migrate_postcopy() && !in_postcopy &&
++            pend_nonpost <= s->threshold_size &&
++            atomic_read(&s->start_postcopy)) {
++            if (postcopy_start(s)) {
++                error_report("%s: postcopy failed to start", __func__);
++            }
++            return MIG_ITERATE_SKIP;
++        }
++        /* Just another iteration step */
++        qemu_savevm_state_iterate(s->to_dst_file,
++            s->state == MIGRATION_STATUS_POSTCOPY_ACTIVE);
++    } else {
++        trace_migration_thread_low_pending(pending_size);
++        migration_completion(s);
++        return MIG_ITERATE_BREAK;
++    }
++
++    return MIG_ITERATE_RESUME;
++}
++
+ /*
+  * Master migration thread on the source VM.
+  * It drives the migration and pumps the data down the outgoing channel.
+@@ -2256,9 +2301,6 @@ static void *migration_thread(void *opaque)
+ {
+     MigrationState *s = opaque;
+     int64_t setup_start = qemu_clock_get_ms(QEMU_CLOCK_HOST);
+-    bool entered_postcopy = false;
+-    /* The active state we expect to be in; ACTIVE or POSTCOPY_ACTIVE */
+-    enum MigrationStatus current_active_state = MIGRATION_STATUS_ACTIVE;
+ 
+     rcu_register_thread();
+ 
+@@ -2298,43 +2340,21 @@ static void *migration_thread(void *opaque)
+     while (s->state == MIGRATION_STATUS_ACTIVE ||
+            s->state == MIGRATION_STATUS_POSTCOPY_ACTIVE) {
+         int64_t current_time;
+-        uint64_t pending_size;
+ 
+         if (!qemu_file_rate_limit(s->to_dst_file)) {
+-            uint64_t pend_post, pend_nonpost;
+-
+-            qemu_savevm_state_pending(s->to_dst_file, s->threshold_size,
+-                                      &pend_nonpost, &pend_post);
+-            pending_size = pend_nonpost + pend_post;
+-            trace_migrate_pending(pending_size, s->threshold_size,
+-                                  pend_post, pend_nonpost);
+-            if (pending_size && pending_size >= s->threshold_size) {
+-                /* Still a significant amount to transfer */
+-
+-                if (migrate_postcopy() &&
+-                    s->state != MIGRATION_STATUS_POSTCOPY_ACTIVE &&
+-                    pend_nonpost <= s->threshold_size &&
+-                    atomic_read(&s->start_postcopy)) {
+-
+-                    if (!postcopy_start(s)) {
+-                        current_active_state = MIGRATION_STATUS_POSTCOPY_ACTIVE;
+-                        entered_postcopy = true;
+-                    }
+-
+-                    continue;
+-                }
+-                /* Just another iteration step */
+-                qemu_savevm_state_iterate(s->to_dst_file, entered_postcopy);
+-            } else {
+-                trace_migration_thread_low_pending(pending_size);
+-                migration_completion(s, current_active_state);
++            MigIterateState iter_state = migration_iteration_run(s);
++            if (iter_state == MIG_ITERATE_SKIP) {
++                continue;
++            } else if (iter_state == MIG_ITERATE_BREAK) {
+                 break;
              }
          }
-+        break;
-+
-+    default:
-+        /* Should not reach here, but if so, forgive the VM. */
-+        error_report("%s: Unknown ending state %d", __func__, s->state);
-+        break;
-     }
-     qemu_bh_schedule(s->cleanup_bh);
-     qemu_mutex_unlock_iothread();
+ 
+         if (qemu_file_get_error(s->to_dst_file)) {
+-            migrate_set_state(&s->state, current_active_state,
+-                              MIGRATION_STATUS_FAILED);
++            if (migration_is_setup_or_active(s->state)) {
++                migrate_set_state(&s->state, s->state,
++                                  MIGRATION_STATUS_FAILED);
++            }
+             trace_migration_thread_file_err();
+             break;
+         }
 -- 
 2.14.3
