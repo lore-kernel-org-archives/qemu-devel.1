@@ -1,20 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39972)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45836)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1ebBqS-00016r-34
-	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 15:59:05 -0500
+	(envelope-from <jsnow@redhat.com>) id 1ebCHf-0000Mn-NM
+	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 16:27:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1ebBqO-0000tA-Rh
-	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 15:59:04 -0500
-Received: from chuckie.co.uk ([82.165.15.123]:45853
-	helo=s16892447.onlinehome-server.info)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
-	id 1ebBqO-0000sq-L3
-	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 15:59:00 -0500
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Date: Mon, 15 Jan 2018 20:58:48 +0000
-Message-Id: <20180115205848.26027-1-mark.cave-ayland@ilande.co.uk>
-Subject: [Qemu-devel] [PATCH] sun4u: implement power device
+	(envelope-from <jsnow@redhat.com>) id 1ebCHe-0005bv-Ky
+	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 16:27:11 -0500
+References: <76a29a1e-7fdb-37a8-9f79-df618d385b05@virtuozzo.com>
+	<9e11cf33-cbe1-9fd5-f265-180e4e14dfa7@redhat.com>
+	<6a2d73cc-5042-54c8-364d-18d273547f27@virtuozzo.com>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <e5e834f9-5482-addc-0e45-00b39186e92f@redhat.com>
+Date: Mon, 15 Jan 2018 16:26:55 -0500
+MIME-Version: 1.0
+In-Reply-To: <6a2d73cc-5042-54c8-364d-18d273547f27@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] qcow2 autoloading bitmaps
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,125 +25,150 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, atar4qemu@gmail.com
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, Eric Blake <eblake@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, qemu block <qemu-block@nongnu.org>
+Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <famz@redhat.com>, Max Reitz <mreitz@redhat.com>, Nikolay Shirokovskiy <nshirokovskiy@virtuozzo.com>, Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, "Denis V. Lunev" <den@openvz.org>
 
-This inbuilt device contains a single 4-byte register, of which bit 24 is used
-to power down the machine on a real Ultra 5.
 
-The power device exists at offset 0x724000 on a real machine, but due to the
-current configuration of the BARs in QEMU it must be located lower in PCI IO
-space.
 
-For the moment we place the power device at offset 0x7240 as a reminder of its
-original location and raise the base PCI IO address from 0x4000 to 0x8000.
+On 01/11/2018 10:15 AM, Vladimir Sementsov-Ogievskiy wrote:
+> 11.01.2018 17:43, Eric Blake wrote:
+>> On 01/11/2018 08:26 AM, Vladimir Sementsov-Ogievskiy wrote:
+>>
+>>> # @autoload: the bitmap will be automatically loaded when the image i=
+t
+>>> is stored
+>>> #=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 i=
+n is opened. This flag may only be specified for persistent
+>>> #=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 b=
+itmaps. Default is false for block-dirty-bitmap-add.
+>>> (Since: 2.10)
+>>>
+>>> so, if we consider only enabled bitmaps it is ok to direct map autolo=
+ad
+>>> <=3D> auto.
+>>>
+>>> But now we've faced into necessity of load/store disabled bitmaps.
+>>>
+>>> Current behavior is definitely wrong: user sets autoload flag for
+>>> disabled bitmap, but on next
+>>> Qemu start the bitmap will be autoloaded and enabled.
+>> Can we make it an error to set autoload to true when requesting a
+>> disabled bitmap? Or can we not even request a disabled bitmap?
+>=20
+> currently, autoload is set on bitmap creation, so it is always enabled
+> at this time.
+>=20
+>>
+>>>
+>>> Proposed solution:
+>>> =C2=A0- deprecate @autoload flag for bitmap creation, ignore it
+>> Is there ever a case where you'd create an enabled persistent
+>> dirty-tracking bitmap, but not want it to be re-enabled the next time
+>> the image is created?
+>=20
+> looks like we do not. For now we use only persistent+autoload.
+>=20
+>> Your argument for ignoring/deleting the parameter
+>> is that you can decide whether to set the "auto" flag solely based on
+>> whether the bitmap is both persistent and enabled, without needing any
+>> additional user input?
+>=20
+> The main point is that, when we want to load/store disabled bitmaps thi=
+s
+> parameter is confusing: In user's point of view it's ok to have autoloa=
+ding
+> disabled bitmap, which he wants to be autoloaded and disabled on next Q=
+emu
+> start. So, to maintain this flag (autoload) for disabled bitmaps, we
+> will need
+> to add some additional flag "disabled" to Qcow2 spec, to make it possib=
+le to
+> have "auto" but "disabled" bitmaps. And we will have to change qcow2 "a=
+uto"
+> specification, to consider "disabled" bit set in parallel. But all this
+> looks
+> superfluous for now. We already have type "dirty tracking bitmaps" in q=
+cow2
+> spec for dirty bitmaps. So, for now, "auto" flag set on "dirty tracking
+> bitmaps" means that it is enabled. It is logical to assume that all oth=
+er
+> "dirty tracking bitmaps" are disabled.
+>=20
 
-Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
----
- hw/sparc64/sun4u.c | 64 +++++++++++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 63 insertions(+), 1 deletion(-)
+Oh, so you want to be able to "autoload" a disabled bitmap, is that right=
+?
 
-diff --git a/hw/sparc64/sun4u.c b/hw/sparc64/sun4u.c
-index ec45ec2801..26ab6e9a9c 100644
---- a/hw/sparc64/sun4u.c
-+++ b/hw/sparc64/sun4u.c
-@@ -205,6 +205,59 @@ typedef struct ResetData {
-     uint64_t prom_addr;
- } ResetData;
- 
-+#define TYPE_SUN4U_POWER "power"
-+#define SUN4U_POWER(obj) OBJECT_CHECK(PowerDevice, (obj), TYPE_SUN4U_POWER)
-+
-+typedef struct PowerDevice {
-+    SysBusDevice parent_obj;
-+
-+    MemoryRegion power_mmio;
-+} PowerDevice;
-+
-+/* Power */
-+static void power_mem_write(void *opaque, hwaddr addr,
-+                            uint64_t val, unsigned size)
-+{
-+    /* According to a real Ultra 5, bit 24 controls the power */
-+    if (val & 0x1000000) {
-+        qemu_system_shutdown_request(SHUTDOWN_CAUSE_GUEST_SHUTDOWN);
-+    }
-+}
-+
-+static const MemoryRegionOps power_mem_ops = {
-+    .write = power_mem_write,
-+    .endianness = DEVICE_NATIVE_ENDIAN,
-+    .valid = {
-+        .min_access_size = 4,
-+        .max_access_size = 4,
-+    },
-+};
-+
-+static void power_realize(DeviceState *dev, Error **errp)
-+{
-+    PowerDevice *d = SUN4U_POWER(dev);
-+    SysBusDevice *sbd = SYS_BUS_DEVICE(dev);
-+
-+    memory_region_init_io(&d->power_mmio, OBJECT(dev), &power_mem_ops, d,
-+                          "power", sizeof(uint32_t));
-+
-+    sysbus_init_mmio(sbd, &d->power_mmio);
-+}
-+
-+static void power_class_init(ObjectClass *klass, void *data)
-+{
-+    DeviceClass *dc = DEVICE_CLASS(klass);
-+
-+    dc->realize = power_realize;
-+}
-+
-+static const TypeInfo power_info = {
-+    .name          = TYPE_SUN4U_POWER,
-+    .parent        = TYPE_SYS_BUS_DEVICE,
-+    .instance_size = sizeof(PowerDevice),
-+    .class_init    = power_class_init,
-+};
-+
- static void ebus_isa_irq_handler(void *opaque, int n, int level)
- {
-     EbusState *s = EBUS(opaque);
-@@ -221,6 +274,7 @@ static void ebus_isa_irq_handler(void *opaque, int n, int level)
- static void ebus_realize(PCIDevice *pci_dev, Error **errp)
- {
-     EbusState *s = EBUS(pci_dev);
-+    SysBusDevice *sbd;
-     DeviceState *dev;
-     qemu_irq *isa_irq;
-     DriveInfo *fd[MAX_FD];
-@@ -270,6 +324,13 @@ static void ebus_realize(PCIDevice *pci_dev, Error **errp)
-     qdev_prop_set_uint32(dev, "dma", -1);
-     qdev_init_nofail(dev);
- 
-+    /* Power */
-+    dev = qdev_create(NULL, TYPE_SUN4U_POWER);
-+    qdev_init_nofail(dev);
-+    sbd = SYS_BUS_DEVICE(dev);
-+    memory_region_add_subregion(pci_address_space_io(pci_dev), 0x7240,
-+                                sysbus_mmio_get_region(sbd, 0));
-+
-     /* PCI */
-     pci_dev->config[0x04] = 0x06; // command = bus master, pci mem
-     pci_dev->config[0x05] = 0x00;
-@@ -282,7 +343,7 @@ static void ebus_realize(PCIDevice *pci_dev, Error **errp)
-                              0, 0x1000000);
-     pci_register_bar(pci_dev, 0, PCI_BASE_ADDRESS_SPACE_MEMORY, &s->bar0);
-     memory_region_init_alias(&s->bar1, OBJECT(s), "bar1", get_system_io(),
--                             0, 0x4000);
-+                             0, 0x8000);
-     pci_register_bar(pci_dev, 1, PCI_BASE_ADDRESS_SPACE_IO, &s->bar1);
- }
- 
-@@ -693,6 +754,7 @@ static const TypeInfo sun4v_type = {
- 
- static void sun4u_register_types(void)
- {
-+    type_register_static(&power_info);
-     type_register_static(&ebus_info);
-     type_register_static(&prom_info);
-     type_register_static(&ram_info);
--- 
-2.11.0
+Is it important to distinguish these two cases?
+
+(1) A bitmap is saved to the qcow2, but autoload is set to false
+(2) A bitmap is saved to the qcow2, autoload is true, but a (new)
+disabled bit is set.
+
+Is it okay, basically, to always autoload bitmaps in a disabled state?
+Is it imperative we add the new bit?
+
+(Genuinely asking. I'm not sure.)
+
+> On the other hand, "autoloading" is a bad property for disabled bitmap
+> at all.
+> Disabled bitmap is simpler than enabled (or "auto") bitmap, it doesn't
+> require
+> any care like "auto" bitmap. So, it is more natural to let Qemu decide
+> to load
+> or not any disabled bitmaps.
+>=20
+
+If we don't autoload the disabled ones, I imagine you'll eventually want
+some way to manually load them into memory to manipulate them for
+various reasons.
+
+>=20
+>=20
+>>
+>>> =C2=A0- save persistent enabled bitmaps with "auto" flag
+>>> =C2=A0- save persistent disabled bitmaps without "auto" flag
+>>> =C2=A0- on Qemu start load all bitmaps, mapping "auto" flag state to
+>>> "enabled" state.
+>> So if I follow the argument, the state of the 'auto' flag stored into
+>> the file on BDS close (often at qemu exit) is based on whether the
+>> bitmap was currently enabled, and the user can then control whether to
+>> enable/disable the bitmap on the fly to control whether the 'auto' fla=
+g
+>> is stored; thus, having the flag at creation time is redundant.
+>=20
+> Yes.
+>=20
+>>
+>>>
+>>> Note: we may store a lot of disabled bitmaps in qcow2 image, but load=
+ing
+>>> them all into RAM may be
+>>> inefficient. Actually such bitmap will be needed only on demand (for
+>>> export through nbd or
+>>> making some kind of backup). So in future it may be optimized by "laz=
+y
+>>> load" of disabled bitmaps,
+>>> postponing their actual load up to first read or enabling. This
+>>> optimization doesn't need changing
+>>> of qapi or qcow2 format (at first sight).
+>>>
+>>>
+>>> Note2: now there is no way to disable/enable bitmaps, but there is a
+>>> =C2=A0 [PATCH for-2.12 0/4] qmp dirty bitmap API
+>>> with big conversation, but I hope, I'll post a new version with a sma=
+ll
+>>> fix soon and it will be merged.
+>> In other words, you can incorporate your QAPI tweaks proposed here int=
+o
+>> your respin of that series.
+>>
+>=20
+> right idea, I'll do so, just wait a bit for others to comment here.
+>=20
+
+Stay tuned...
+
+> --=20
+> Best regards,
+> Vladimir
+>=20
