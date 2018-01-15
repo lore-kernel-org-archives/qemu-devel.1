@@ -1,23 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55987)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56251)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eb6OB-0007Xm-4L
-	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 10:09:35 -0500
+	(envelope-from <kraxel@redhat.com>) id 1eb6Ov-00082X-Vy
+	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 10:10:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1eb6OA-00060r-41
-	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 10:09:31 -0500
-References: <20171207155102.66622-1-vsementsov@virtuozzo.com>
-	<20171207155102.66622-4-vsementsov@virtuozzo.com>
-	<74fa9031-25d8-df0f-0690-c03ff377c0d9@redhat.com>
-	<7f7c46fe-c6e1-a597-c6d1-5212abc12212@virtuozzo.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <d338d282-f264-3d39-2240-0cd5dbf0294e@redhat.com>
-Date: Mon, 15 Jan 2018 09:09:12 -0600
+	(envelope-from <kraxel@redhat.com>) id 1eb6Or-0006Ke-HV
+	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 10:10:17 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:45954)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1eb6Or-0006K5-CQ
+	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 10:10:13 -0500
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 8E466A3280
+	for <qemu-devel@nongnu.org>; Mon, 15 Jan 2018 15:10:12 +0000 (UTC)
+Date: Mon, 15 Jan 2018 16:10:09 +0100
+From: Gerd Hoffmann <kraxel@redhat.com>
+Message-ID: <20180115151009.3cqfppwtsr4zx4mo@sirius.home.kraxel.org>
+References: <20171212140459.2234-1-berrange@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <7f7c46fe-c6e1-a597-c6d1-5212abc12212@virtuozzo.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="BsEWmd6qYDd8vZFyj1M3BrjXvL42NJuOy"
-Subject: Re: [Qemu-devel] [PATCH v2 3/6] qapi: add nbd-server-remove
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20171212140459.2234-1-berrange@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v6 0/4] Convert frontends to use
+ keycodemapdb
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,110 +33,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: armbru@redhat.com, dgilbert@redhat.com, pbonzini@redhat.com, mreitz@redhat.com, kwolf@redhat.com, den@openvz.org, Nikolay Shirokovskiy <nshirokovskiy@virtuozzo.com>
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---BsEWmd6qYDd8vZFyj1M3BrjXvL42NJuOy
-From: Eric Blake <eblake@redhat.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: armbru@redhat.com, dgilbert@redhat.com, pbonzini@redhat.com,
- mreitz@redhat.com, kwolf@redhat.com, den@openvz.org,
- Nikolay Shirokovskiy <nshirokovskiy@virtuozzo.com>
-Message-ID: <d338d282-f264-3d39-2240-0cd5dbf0294e@redhat.com>
-Subject: Re: [PATCH v2 3/6] qapi: add nbd-server-remove
-References: <20171207155102.66622-1-vsementsov@virtuozzo.com>
- <20171207155102.66622-4-vsementsov@virtuozzo.com>
- <74fa9031-25d8-df0f-0690-c03ff377c0d9@redhat.com>
- <7f7c46fe-c6e1-a597-c6d1-5212abc12212@virtuozzo.com>
-In-Reply-To: <7f7c46fe-c6e1-a597-c6d1-5212abc12212@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Tue, Dec 12, 2017 at 02:04:55PM +0000, Daniel P. Berrange wrote:
+> This is a followup to
+> 
+>   v1: https://lists.nongnu.org/archive/html/qemu-devel/2017-08/msg02047.html
+>   v2: https://lists.nongnu.org/archive/html/qemu-devel/2017-08/msg02471.html
+>   v3: https://lists.nongnu.org/archive/html/qemu-devel/2017-08/msg02517.html
+>   v4: https://lists.nongnu.org/archive/html/qemu-devel/2017-08/msg02708.html
+>   v5: https://lists.nongnu.org/archive/html/qemu-devel/2017-09/msg02950.html
+> 
+> This new series contains just the patches for converting the ui frontends
+> for SDL1, SDL2, and GTK to use keycodemapdb.
+> 
+> The particularly notable benefit is that this includes fixes such that SDL1
+> and GTK2/3 can actually work when using a non-Linux host Xorg/X11 server.
+> Previously it would display but key handling was complete garbage, making it
+> unusable in practice.
+> 
+> Daniel P. Berrange (4):
+>   ui: convert the SDL2 frontend to keycodemapdb
+>   ui: convert GTK and SDL1 frontends to keycodemapdb
+>   ui: add fix for GTK Pause key handling on Win32
+>   ui: ignore hardware keycode 255 on win32
 
-On 01/12/2018 03:47 AM, Vladimir Sementsov-Ogievskiy wrote:
-> 09.01.2018 22:52, Eric Blake wrote:
->> On 12/07/2017 09:50 AM, Vladimir Sementsov-Ogievskiy wrote:
->>> Add command for export removing. It is needed for cases when we
->>> don't want to keep export after the operation on it was completed.
->>> The other example is temporary node, created with blockdev-add.
->>> If we want to delete it we should firstly remove corresponding
->>> NBD export.
->>>
->>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com=
->
->>> ---
+Doesn't apply cleanly any more, could you rebase please?
 
->> Do we want a third mode in the middle, where the server starts replyin=
-g
->> to all existing clients with ESHUTDOWN errors for all new requests
->> rather than abruptly disconnecting (no new I/O, but no forced disconne=
-ct
->> and pending in-flight transactions can still complete gracefully)?
->=20
-> looks interesting. what about the following naming?
->=20
-> @mode: possible values:
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0 hide - just hide server from new clients, maintain
-> existing connections,
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0 remove after all clients disconnected
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0 soft - like hide, but answer with ESHUTDOWN for all
-> further requests from
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 =C2=A0 =C2=A0 exis=
-ting connections
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0 hard - hard disconnect all clients and remove server
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0 (default: soft)
-
-Or even a fourth mode that causes an immediate error return without
-state change if there are any connected clients, but otherwise removes
-the server.
-
->=20
-> new corresponding states of nbd export:
-> hidden, shutting_down
->=20
-> and we allow transitions:
->=20
-> normal_execution -> hidden
-> normal_execution -> shutting_down
-> normal_execution -> exit
-> hidden -> shutting_down
-> hidden -> exit
-> shutting_down -> exit
-
-Seems reasonable.  Are you planning on tackling a respin of this series
-incorporating that idea?
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---BsEWmd6qYDd8vZFyj1M3BrjXvL42NJuOy
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlpcxBgACgkQp6FrSiUn
-Q2ommggAhlsMqpWbzG12DabVo52V6dOIg0365myezhV04/wKN504+G7aTUnCZPrm
-I2xmsthjUoRV4R6zketXRRMbu9pIcnct3TF/Ag3gEPYOfBBMhXTrhy0exJbaDb1o
-WaWRbQJWonzoltCymlRWCmeY1a3piFg0OkOTHCqtCgZTDf8pjInqGeadjUrcQAcj
-x9mp+o2L3cC4gV5gaxMjNWlrudvlJ8aw6/CcenJeiwJWxD/z4dF8XMSbMKnH2NVr
-tnJNDOFeoHs9jtx8FckgKamvr9kXArMgyMm4y7GUrVPLXl9HeCAq1nnho9uzvVIN
-S23X9fCVuc/AMjUEnjBCXbUI4CUwlQ==
-=f9YH
------END PGP SIGNATURE-----
-
---BsEWmd6qYDd8vZFyj1M3BrjXvL42NJuOy--
+thanks,
+  Gerd
