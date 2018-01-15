@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36019)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36119)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <luc.michel@git.antfield.fr>) id 1eb16R-0007WK-Ud
-	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 04:30:58 -0500
+	(envelope-from <thuth@redhat.com>) id 1eb16e-0007h7-QI
+	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 04:31:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <luc.michel@git.antfield.fr>) id 1eb16N-0003L9-3S
-	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 04:30:51 -0500
-From: Luc MICHEL <luc.michel@git.antfield.fr>
-Date: Mon, 15 Jan 2018 10:32:20 +0100
-Message-Id: <20180115093220.9154-2-luc.michel@git.antfield.fr>
-In-Reply-To: <20180115093220.9154-1-luc.michel@git.antfield.fr>
-References: <20180115093220.9154-1-luc.michel@git.antfield.fr>
-Subject: [Qemu-devel] [PATCH v2 1/1] target-ppc: Fix booke206 tlbwe TLB
- instruction
+	(envelope-from <thuth@redhat.com>) id 1eb16d-0003XN-UN
+	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 04:31:04 -0500
+From: Thomas Huth <thuth@redhat.com>
+Date: Mon, 15 Jan 2018 10:30:54 +0100
+Message-Id: <1516008655-31732-2-git-send-email-thuth@redhat.com>
+In-Reply-To: <1516008655-31732-1-git-send-email-thuth@redhat.com>
+References: <1516008655-31732-1-git-send-email-thuth@redhat.com>
+Subject: [Qemu-devel] [PATCH 1/2] default-configs/ppc64-softmmu: Include
+ 32-bit configs instead of copying them
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,74 +20,97 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Luc MICHEL <luc.michel@git.antfield.fr>, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Alexander Graf <agraf@suse.de>
+To: David Gibson <david@gibson.dropbear.id.au>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 
-When overwritting a valid TLB entry with a new one, the previous page
-were not flushed in QEMU TLB, leading to incoherent mapping. This commit
-fixes this.
+qemu-softmmu-ppc64 is supposed to be a superset of qemu-softmmu-ppc.
+However, instead of simply including the 32-bit config file, we've
+duplicated all CONFIG_xxx settings there instead. This way, we've missed
+some CONFIG switches in ppc64-softmmu.mak which were only added to the
+32-bit config file (e.g. CONFIG_SUNGEM). Let's fix this problem by
+including the 32-bit config file into the 64-bit config file instead
+of duplicating all the CONFIG switches there.
 
-Signed-off-by: Luc MICHEL <luc.michel@git.antfield.fr>
+Signed-off-by: Thomas Huth <thuth@redhat.com>
 ---
- target/ppc/mmu_helper.c | 32 +++++++++++++++++++++++++++-----
- 1 file changed, 27 insertions(+), 5 deletions(-)
+ default-configs/ppc64-softmmu.mak | 61 +++++----------------------------------
+ 1 file changed, 8 insertions(+), 53 deletions(-)
 
-diff --git a/target/ppc/mmu_helper.c b/target/ppc/mmu_helper.c
-index 2a1f9902c9..298c15e961 100644
---- a/target/ppc/mmu_helper.c
-+++ b/target/ppc/mmu_helper.c
-@@ -2570,6 +2570,17 @@ void helper_booke_setpid(CPUPPCState *env, uint32_t pidn, target_ulong pid)
-     tlb_flush(CPU(cpu));
- }
+diff --git a/default-configs/ppc64-softmmu.mak b/default-configs/ppc64-softmmu.mak
+index d1b3a6d..b94af6c 100644
+--- a/default-configs/ppc64-softmmu.mak
++++ b/default-configs/ppc64-softmmu.mak
+@@ -1,64 +1,19 @@
+ # Default configuration for ppc64-softmmu
  
-+static inline void flush_page(CPUPPCState *env, ppcmas_tlb_t *tlb)
-+{
-+    PowerPCCPU *cpu = ppc_env_get_cpu(env);
+-include pci.mak
+-include sound.mak
+-include usb.mak
+-CONFIG_PPC4XX=y
+-CONFIG_VIRTIO_VGA=y
+-CONFIG_ESCC=y
+-CONFIG_M48T59=y
++# Include all 32-bit boards
++include ppc-softmmu.mak
 +
-+    if (booke206_tlb_to_page_size(env, tlb) == TARGET_PAGE_SIZE) {
-+        tlb_flush_page(CPU(cpu), tlb->mas2 & MAS2_EPN_MASK);
-+    } else {
-+        tlb_flush(CPU(cpu));
-+    }
-+}
++# For PowerNV
++CONFIG_POWERNV=y
+ CONFIG_IPMI=y
+ CONFIG_IPMI_LOCAL=y
+ CONFIG_IPMI_EXTERN=y
+ CONFIG_ISA_IPMI_BT=y
+-CONFIG_SERIAL=y
+-CONFIG_PARALLEL=y
+-CONFIG_I8254=y
+-CONFIG_PCKBD=y
+-CONFIG_FDC=y
+-CONFIG_I8257=y
+-CONFIG_I82374=y
+-CONFIG_OPENPIC=y
+-CONFIG_PREP_PCI=y
+-CONFIG_I82378=y
+-CONFIG_PC87312=y
+-CONFIG_MACIO=y
+-CONFIG_PCSPK=y
+-CONFIG_CUDA=y
+-CONFIG_ADB=y
+-CONFIG_MAC_NVRAM=y
+-CONFIG_MAC_DBDMA=y
+-CONFIG_HEATHROW_PIC=y
+-CONFIG_GRACKLE_PCI=y
+-CONFIG_UNIN_PCI=y
+-CONFIG_DEC_PCI=y
+-CONFIG_PPCE500_PCI=y
+-CONFIG_IDE_ISA=y
+-CONFIG_IDE_CMD646=y
+-CONFIG_IDE_MACIO=y
+-CONFIG_NE2000_ISA=y
+-CONFIG_PFLASH_CFI01=y
+-CONFIG_PFLASH_CFI02=y
+-CONFIG_PTIMER=y
+-CONFIG_I8259=y
+-CONFIG_XILINX=y
+-CONFIG_XILINX_ETHLITE=y
+-CONFIG_PSERIES=y
+-CONFIG_POWERNV=y
+-CONFIG_PREP=y
+-CONFIG_MAC=y
+-CONFIG_E500=y
+-CONFIG_OPENPIC_KVM=$(call land,$(CONFIG_E500),$(CONFIG_KVM))
+-CONFIG_PLATFORM_BUS=y
+-CONFIG_ETSEC=y
+-CONFIG_SM501=y
 +
- void helper_booke206_tlbwe(CPUPPCState *env)
- {
-     PowerPCCPU *cpu = ppc_env_get_cpu(env);
-@@ -2628,6 +2639,21 @@ void helper_booke206_tlbwe(CPUPPCState *env)
-     if (msr_gs) {
-         cpu_abort(CPU(cpu), "missing HV implementation\n");
-     }
-+
-+    if (tlb->mas1 & MAS1_VALID) {
-+        /* Invalidate the page in QEMU TLB if it was a valid entry.
-+         *
-+         * In "PowerPC e500 Core Family Reference Manual, Rev. 1",
-+         * Section "12.4.2 TLB Write Entry (tlbwe) Instruction":
-+         * (https://www.nxp.com/docs/en/reference-manual/E500CORERM.pdf)
-+         *
-+         * "Note that when an L2 TLB entry is written, it may be displacing an
-+         * already valid entry in the same L2 TLB location (a victim). If a
-+         * valid L1 TLB entry corresponds to the L2 MMU victim entry, that L1
-+         * TLB entry is automatically invalidated." */
-+        flush_page(env, tlb);
-+    }
-+
-     tlb->mas7_3 = ((uint64_t)env->spr[SPR_BOOKE_MAS7] << 32) |
-         env->spr[SPR_BOOKE_MAS3];
-     tlb->mas1 = env->spr[SPR_BOOKE_MAS1];
-@@ -2663,11 +2689,7 @@ void helper_booke206_tlbwe(CPUPPCState *env)
-         tlb->mas1 &= ~MAS1_IPROT;
-     }
- 
--    if (booke206_tlb_to_page_size(env, tlb) == TARGET_PAGE_SIZE) {
--        tlb_flush_page(CPU(cpu), tlb->mas2 & MAS2_EPN_MASK);
--    } else {
--        tlb_flush(CPU(cpu));
--    }
-+    flush_page(env, tlb);
- }
- 
- static inline void booke206_tlb_to_mas(CPUPPCState *env, ppcmas_tlb_t *tlb)
+ # For pSeries
++CONFIG_PSERIES=y
++CONFIG_VIRTIO_VGA=y
+ CONFIG_XICS=$(CONFIG_PSERIES)
+ CONFIG_XICS_SPAPR=$(CONFIG_PSERIES)
+ CONFIG_XICS_KVM=$(call land,$(CONFIG_PSERIES),$(CONFIG_KVM))
+-# For PReP
+-CONFIG_SERIAL_ISA=y
+-CONFIG_MC146818RTC=y
+-CONFIG_ISA_TESTDEV=y
+ CONFIG_MEM_HOTPLUG=y
+-CONFIG_RS6000_MC=y
 -- 
-2.15.1
+1.8.3.1
