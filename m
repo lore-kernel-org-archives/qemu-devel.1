@@ -1,26 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43459)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43520)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1eb5nl-0001kU-Mx
-	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 09:31:54 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1eb5o3-0001ta-1h
+	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 09:32:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1eb5ng-0008Ig-QN
-	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 09:31:53 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:51994)
+	(envelope-from <ehabkost@redhat.com>) id 1eb5ny-0008Q3-5h
+	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 09:32:11 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:58982)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1eb5ng-0008GI-LE
-	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 09:31:48 -0500
-Date: Mon, 15 Jan 2018 15:31:37 +0100
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20180115153137.32432502@redhat.com>
-In-Reply-To: <93fd6ae0-ab03-3e4a-cb85-26ab492e0f79@linux.vnet.ibm.com>
-References: <1515609318-1897-1-git-send-email-stefanb@linux.vnet.ibm.com>
-	<1515609318-1897-3-git-send-email-stefanb@linux.vnet.ibm.com>
-	<CAJ+F1CJwt+txMjY1AtCRF0_FzkgAm_qv8_itHUwnWD9s_Oucqg@mail.gmail.com>
-	<93fd6ae0-ab03-3e4a-cb85-26ab492e0f79@linux.vnet.ibm.com>
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1eb5nx-0008PZ-VG
+	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 09:32:06 -0500
+Date: Mon, 15 Jan 2018 12:31:56 -0200
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20180115143156.GO6646@localhost.localdomain>
+References: <1515443797-10837-1-git-send-email-luwei.kang@intel.com>
+	<20180112142252.GG6646@localhost.localdomain>
+	<82D7661F83C1A047AF7DC287873BF1E167E7630B@SHSMSX101.ccr.corp.intel.com>
+	<97bf8d29-4009-6f61-f4bb-d128da5a4c9f@redhat.com>
+	<20180115140455.GN6646@localhost.localdomain>
+	<20180115142518.GN1602429@orkuz.home>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC PATCH 2/3] acpi: implement aml_lless_equal
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180115142518.GN1602429@orkuz.home>
+Subject: Re: [Qemu-devel] [PATCH RESEND v1 1/2] i386: Add Intel Processor
+ Trace feature support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,71 +32,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Berger <stefanb@linux.vnet.ibm.com>
-Cc: =?UTF-8?B?TWFyYy1BbmRyw6k=?= Lureau <marcandre.lureau@gmail.com>, kevin@koconnor.net, QEMU <qemu-devel@nongnu.org>, "Michael S. Tsirkin" <mst@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>, "Kang, Luwei" <luwei.kang@intel.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "rth@twiddle.net" <rth@twiddle.net>, "mtosatti@redhat.com" <mtosatti@redhat.com>, Chao Peng <chao.p.peng@linux.intel.com>, libvir-list@redhat.com
 
-On Fri, 12 Jan 2018 14:42:14 -0500
-Stefan Berger <stefanb@linux.vnet.ibm.com> wrote:
+On Mon, Jan 15, 2018 at 03:25:18PM +0100, Jiri Denemark wrote:
+> On Mon, Jan 15, 2018 at 12:04:55 -0200, Eduardo Habkost wrote:
+> > CCing libvirt developers.
+> ...
+> > This case is slightly more problematic, however: the new feature
+> > is actually migratable (under very controlled circumstances)
+> > because of patch 2/2, but it is not migration-safe[1].  This
+> > means libvirt shouldn't include it in "host-model" expansion
+> > (which uses the query-cpu-model-expansion QMP command) until we
+> > make the feature migration-safe.
+> > 
+> > For QEMU, this means the feature shouldn't be returned by
+> > "query-cpu-model-expansion type=static model=max" (but it can be
+> > returned by "query-cpu-model-expansion type=full model=max").
+> > 
+> > Jiri, it looks like libvirt uses type=full on
+> > query-cpu-model-expansion on x86.  It needs to use
+> > type=static[2], or it will have no way to find out if a feature
+> > is migration-safe or not.
+> ...
+> > [2] It looks like libvirt uses type=full because it wants to get
+> >     all QOM property aliases returned.  In this case, one
+> >     solution for libvirt is to use:
+> > 
+> >     static_expansion = query_cpu_model_expansion(type=static, model)
+> >     all_props = query_cpu_model_expansion(type=full, static_expansion)
+> 
+> This is exactly what libvirt is doing (with model = "host") ever since
+> query-cpu-model-expansion support was implemented for x86.
 
-> On 01/12/2018 10:17 AM, Marc-Andr=C3=A9 Lureau wrote:
-> > 2018-01-10 19:35 GMT+01:00 Stefan Berger <stefanb@linux.vnet.ibm.com>: =
-=20
-> >> LLessEqualOp =3D LNotOp LGreaterOp
-> >>
-> >> Signed-off-by: Stefan Berger <stefanb@linux.vnet.ibm.com> =20
-> > Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> =20
->=20
-> Thanks. I added a comment line above the function now:
->=20
-> /* ACPI 1.0b: 16.2.5.4 Type 2 Opcodes Encoding: DefLLessEqual */
+Oh, now I see that the x86 code uses
+QEMU_MONITOR_CPU_MODEL_EXPANSION_STATIC_FULL and not just
+QEMU_MONITOR_CPU_MODEL_EXPANSION_FULL.  Nice!
 
-Reviewed-by: Igor Mammedov <imammedo@redhat.com>
-
-> >
-> > =20
-> >> ---
-> >>   hw/acpi/aml-build.c         | 10 ++++++++++
-> >>   include/hw/acpi/aml-build.h |  1 +
-> >>   2 files changed, 11 insertions(+)
-> >>
-> >> diff --git a/hw/acpi/aml-build.c b/hw/acpi/aml-build.c
-> >> index 36a6cc4..597a58d 100644
-> >> --- a/hw/acpi/aml-build.c
-> >> +++ b/hw/acpi/aml-build.c
-> >> @@ -568,6 +568,16 @@ Aml *aml_lless(Aml *arg1, Aml *arg2)
-> >>       return var;
-> >>   }
-> >>
-> >> +Aml *aml_lless_equal(Aml *arg1, Aml *arg2)
-> >> +{
-> >> +    /* LLessEqualOp :=3D LNotOp LGreaterOp */
-> >> +    Aml *var =3D aml_opcode(0x92 /* LNotOp */);
-> >> +    build_append_byte(var->buf, 0x94 /* LGreaterOp */);
-> >> +    aml_append(var, arg1);
-> >> +    aml_append(var, arg2);
-> >> +    return var;
-> >> +}
-> >> +
-> >>   /* ACPI 1.0b: 16.2.5.4 Type 2 Opcodes Encoding: DefAdd */
-> >>   Aml *aml_add(Aml *arg1, Aml *arg2, Aml *dst)
-> >>   {
-> >> diff --git a/include/hw/acpi/aml-build.h b/include/hw/acpi/aml-build.h
-> >> index 88d0738..c4398cc 100644
-> >> --- a/include/hw/acpi/aml-build.h
-> >> +++ b/include/hw/acpi/aml-build.h
-> >> @@ -267,6 +267,7 @@ Aml *aml_lor(Aml *arg1, Aml *arg2);
-> >>   Aml *aml_shiftleft(Aml *arg1, Aml *count);
-> >>   Aml *aml_shiftright(Aml *arg1, Aml *count, Aml *dst);
-> >>   Aml *aml_lless(Aml *arg1, Aml *arg2);
-> >> +Aml *aml_lless_equal(Aml *arg1, Aml *arg2);
-> >>   Aml *aml_add(Aml *arg1, Aml *arg2, Aml *dst);
-> >>   Aml *aml_subtract(Aml *arg1, Aml *arg2, Aml *dst);
-> >>   Aml *aml_increment(Aml *arg);
-> >> --
-> >> 2.5.5
-> >>
-> >> =20
-> >
-> > =20
->=20
->=20
+-- 
+Eduardo
