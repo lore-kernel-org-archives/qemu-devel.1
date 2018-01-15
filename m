@@ -1,17 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34020)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36878)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sjitindarsingh@gmail.com>) id 1eayjY-0000Al-0r
-	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 01:59:05 -0500
+	(envelope-from <luwei.kang@intel.com>) id 1eaz3J-0006NV-6N
+	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 02:19:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sjitindarsingh@gmail.com>) id 1eayjW-0008Bg-Jy
-	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 01:59:04 -0500
-From: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
-Date: Mon, 15 Jan 2018 17:58:37 +1100
-Message-Id: <20180115065837.12431-1-sjitindarsingh@gmail.com>
-In-Reply-To: <20180115063235.7518-2-sjitindarsingh@gmail.com>
-References: <20180115063235.7518-2-sjitindarsingh@gmail.com>
-Subject: [Qemu-devel] [QEMU-PPC] [PATCH V4 1/6] target/ppc/kvm: Add
- cap_ppc_safe_[cache/bounds_check/indirect_branch]
+	(envelope-from <luwei.kang@intel.com>) id 1eaz3E-0004lB-B5
+	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 02:19:29 -0500
+Received: from mga14.intel.com ([192.55.52.115]:6493)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <luwei.kang@intel.com>)
+	id 1eaz3D-0004ja-Uk
+	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 02:19:24 -0500
+From: "Kang, Luwei" <luwei.kang@intel.com>
+Date: Mon, 15 Jan 2018 07:19:16 +0000
+Message-ID: <82D7661F83C1A047AF7DC287873BF1E167E7630B@SHSMSX101.ccr.corp.intel.com>
+References: <1515443797-10837-1-git-send-email-luwei.kang@intel.com>
+	<20180112142252.GG6646@localhost.localdomain>
+In-Reply-To: <20180112142252.GG6646@localhost.localdomain>
+Content-Language: en-US
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH RESEND v1 1/2] i386: Add Intel Processor
+ Trace feature support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,222 +30,132 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-ppc@nongnu.org
-Cc: qemu-devel@nongnu.org, david@gibson.dropbear.id.au, paulus@ozlabs.org, sjitindarsingh@gmail.com
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "rth@twiddle.net" <rth@twiddle.net>, "mtosatti@redhat.com" <mtosatti@redhat.com>, Chao Peng <chao.p.peng@linux.intel.com>
 
-Add three new kvm capabilities used to represent the level of host support
-for three corresponding workarounds.
+> > From: Chao Peng <chao.p.peng@linux.intel.com>
+> >
+> > Expose Intel Processor Trace feature to guest.
+> >
+> > Signed-off-by: Chao Peng <chao.p.peng@linux.intel.com>
+> > Signed-off-by: Luwei Kang <luwei.kang@intel.com>
+> > ---
+> >  target/i386/cpu.c | 19 ++++++++++++++++++-  target/i386/cpu.h |  1 +
+> > target/i386/kvm.c | 23 +++++++++++++++++++++++
+> >  3 files changed, 42 insertions(+), 1 deletion(-)
+> >
+> > diff --git a/target/i386/cpu.c b/target/i386/cpu.c index
+> > 3818d72..57f8370 100644
+> > --- a/target/i386/cpu.c
+> > +++ b/target/i386/cpu.c
+> > @@ -427,7 +427,7 @@ static FeatureWordInfo feature_word_info[FEATURE_WO=
+RDS] =3D {
+> >              NULL, NULL, "mpx", NULL,
+> >              "avx512f", "avx512dq", "rdseed", "adx",
+> >              "smap", "avx512ifma", "pcommit", "clflushopt",
+> > -            "clwb", NULL, "avx512pf", "avx512er",
+> > +            "clwb", "intel-pt", "avx512pf", "avx512er",
+> >              "avx512cd", "sha-ni", "avx512bw", "avx512vl",
+> >          },
+> >          .cpuid_eax =3D 7,
+> > @@ -3006,6 +3006,23 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t in=
+dex, uint32_t count,
+> >          }
+> >          break;
+> >      }
+> > +    case 0x14: {
+> > +        if ((env->features[FEAT_7_0_EBX] & CPUID_7_0_EBX_INTEL_PT) &&
+> > +             kvm_enabled()) {
+> > +            KVMState *s =3D cs->kvm_state;
+> > +
+> > +            *eax =3D kvm_arch_get_supported_cpuid(s, 0x14, count, R_EA=
+X);
+> > +            *ebx =3D kvm_arch_get_supported_cpuid(s, 0x14, count, R_EB=
+X);
+> > +            *ecx =3D kvm_arch_get_supported_cpuid(s, 0x14, count, R_EC=
+X);
+> > +            *edx =3D kvm_arch_get_supported_cpuid(s, 0x14, count,
+> > + R_EDX);
+>=20
+> If you are forwarding host info directly to the guest, the feature is not=
+ migration-safe.  The new feature needs to be added to
+> feature_word_info[FEAT_7_0_EBX].unmigratable_flags.
+>=20
 
-Host support for each of the capabilities is queried through the
-new ioctl KVM_PPC_GET_CPU_CHAR which returns four uint64 quantities. The
-first two, character and behaviour, represent the available
-characteristics of the cpu and the behaviour of the cpu respectively.
-The second two, c_mask and b_mask, represent the mask of known bits for
-the character and beheviour dwords respectively.
+Hi,
+     Thanks for you review. I want to support Intel PT live migration and p=
+atch [2/2] to do this. I don't understand  why need to add this feature in =
+feature_word_info[FEAT_7_0_EBX].unmigratable_flags first to disable live mi=
+gration.
 
-Signed-off-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
----
+Thanks,
+Luwei Kang
 
-V3 -> V4:
-- Move kvmppc_get_cpu_characteristics() function implementation to fix
-  compilation on some targets.
-
----
- include/hw/ppc/spapr.h          | 12 +++++++++
- linux-headers/asm-powerpc/kvm.h |  8 ++++++
- linux-headers/linux/kvm.h       |  3 +++
- target/ppc/kvm.c                | 58 +++++++++++++++++++++++++++++++++++++++++
- target/ppc/kvm_ppc.h            | 18 +++++++++++++
- 5 files changed, 99 insertions(+)
-
-diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-index 0f5628f22e..eded0ea57d 100644
---- a/include/hw/ppc/spapr.h
-+++ b/include/hw/ppc/spapr.h
-@@ -295,6 +295,18 @@ struct sPAPRMachineState {
- #define H_DABRX_KERNEL     (1ULL<<(63-62))
- #define H_DABRX_USER       (1ULL<<(63-63))
- 
-+/* Values for KVM_PPC_GET_CPU_CHAR & H_GET_CPU_CHARACTERISTICS */
-+#define H_CPU_CHAR_SPEC_BAR_ORI31               PPC_BIT(0)
-+#define H_CPU_CHAR_BCCTRL_SERIALISED            PPC_BIT(1)
-+#define H_CPU_CHAR_L1D_FLUSH_ORI30              PPC_BIT(2)
-+#define H_CPU_CHAR_L1D_FLUSH_TRIG2              PPC_BIT(3)
-+#define H_CPU_CHAR_L1D_THREAD_PRIV              PPC_BIT(4)
-+#define H_CPU_CHAR_HON_BRANCH_HINTS             PPC_BIT(5)
-+#define H_CPU_CHAR_THR_RECONF_TRIG              PPC_BIT(6)
-+#define H_CPU_BEHAV_FAVOUR_SECURITY             PPC_BIT(0)
-+#define H_CPU_BEHAV_L1D_FLUSH_PR                PPC_BIT(1)
-+#define H_CPU_BEHAV_BNDS_CHK_SPEC_BAR           PPC_BIT(2)
-+
- /* Each control block has to be on a 4K boundary */
- #define H_CB_ALIGNMENT     4096
- 
-diff --git a/linux-headers/asm-powerpc/kvm.h b/linux-headers/asm-powerpc/kvm.h
-index 61d6049f4c..5d2cb26848 100644
---- a/linux-headers/asm-powerpc/kvm.h
-+++ b/linux-headers/asm-powerpc/kvm.h
-@@ -443,6 +443,14 @@ struct kvm_ppc_rmmu_info {
- 	__u32	ap_encodings[8];
- };
- 
-+/* For KVM_PPC_GET_CPU_CHAR */
-+struct kvm_ppc_cpu_char {
-+        __u64   character;      /* characteristics of the CPU */
-+        __u64   behaviour;      /* recommended software behaviour */
-+        __u64   c_mask;         /* valid bits in character */
-+        __u64   b_mask;         /* valid bits in behaviour */
-+};
-+
- /* Per-vcpu XICS interrupt controller state */
- #define KVM_REG_PPC_ICP_STATE	(KVM_REG_PPC | KVM_REG_SIZE_U64 | 0x8c)
- 
-diff --git a/linux-headers/linux/kvm.h b/linux-headers/linux/kvm.h
-index ce6c2f11f4..c35f1bd363 100644
---- a/linux-headers/linux/kvm.h
-+++ b/linux-headers/linux/kvm.h
-@@ -932,6 +932,7 @@ struct kvm_ppc_resize_hpt {
- #define KVM_CAP_HYPERV_SYNIC2 148
- #define KVM_CAP_HYPERV_VP_INDEX 149
- #define KVM_CAP_S390_AIS_MIGRATION 150
-+#define KVM_CAP_PPC_GET_CPU_CHAR 151
- 
- #ifdef KVM_CAP_IRQ_ROUTING
- 
-@@ -1261,6 +1262,8 @@ struct kvm_s390_ucas_mapping {
- #define KVM_PPC_CONFIGURE_V3_MMU  _IOW(KVMIO,  0xaf, struct kvm_ppc_mmuv3_cfg)
- /* Available with KVM_CAP_PPC_RADIX_MMU */
- #define KVM_PPC_GET_RMMU_INFO	  _IOW(KVMIO,  0xb0, struct kvm_ppc_rmmu_info)
-+/* Available with KVM_CAP_PPC_GET_CPU_CHAR */
-+#define KVM_PPC_GET_CPU_CHAR      _IOR(KVMIO,  0xb1, struct kvm_ppc_cpu_char)
- 
- /* ioctl for vm fd */
- #define KVM_CREATE_DEVICE	  _IOWR(KVMIO,  0xe0, struct kvm_create_device)
-diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
-index 914be687e7..b16f731522 100644
---- a/target/ppc/kvm.c
-+++ b/target/ppc/kvm.c
-@@ -89,6 +89,9 @@ static int cap_mmu_radix;
- static int cap_mmu_hash_v3;
- static int cap_resize_hpt;
- static int cap_ppc_pvr_compat;
-+static int cap_ppc_safe_cache;
-+static int cap_ppc_safe_bounds_check;
-+static int cap_ppc_safe_indirect_branch;
- 
- static uint32_t debug_inst_opcode;
- 
-@@ -121,6 +124,7 @@ static bool kvmppc_is_pr(KVMState *ks)
- }
- 
- static int kvm_ppc_register_host_cpu_type(MachineState *ms);
-+static void kvmppc_get_cpu_characteristics(KVMState *s);
- 
- int kvm_arch_init(MachineState *ms, KVMState *s)
- {
-@@ -147,6 +151,7 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
-     cap_mmu_radix = kvm_vm_check_extension(s, KVM_CAP_PPC_MMU_RADIX);
-     cap_mmu_hash_v3 = kvm_vm_check_extension(s, KVM_CAP_PPC_MMU_HASH_V3);
-     cap_resize_hpt = kvm_vm_check_extension(s, KVM_CAP_SPAPR_RESIZE_HPT);
-+    kvmppc_get_cpu_characteristics(s);
-     /*
-      * Note: setting it to false because there is not such capability
-      * in KVM at this moment.
-@@ -2456,6 +2461,59 @@ bool kvmppc_has_cap_mmu_hash_v3(void)
-     return cap_mmu_hash_v3;
- }
- 
-+static void kvmppc_get_cpu_characteristics(KVMState *s)
-+{
-+    struct kvm_ppc_cpu_char c;
-+    int ret;
-+
-+    /* Assume broken */
-+    cap_ppc_safe_cache = 0;
-+    cap_ppc_safe_bounds_check = 0;
-+    cap_ppc_safe_indirect_branch = 0;
-+
-+    ret = kvm_vm_check_extension(s, KVM_CAP_PPC_GET_CPU_CHAR);
-+    if (!ret) {
-+        return;
-+    }
-+    ret = kvm_vm_ioctl(s, KVM_PPC_GET_CPU_CHAR, &c);
-+    if (ret < 0) {
-+        return;
-+    }
-+    /* Parse and set cap_ppc_safe_cache */
-+    if (~c.behaviour & c.b_mask & H_CPU_BEHAV_L1D_FLUSH_PR) {
-+        cap_ppc_safe_cache = 2;
-+    } else if ((c.character & c.c_mask & H_CPU_CHAR_L1D_THREAD_PRIV) &&
-+               (c.character & c.c_mask & (H_CPU_CHAR_L1D_FLUSH_ORI30 |
-+                                          H_CPU_CHAR_L1D_FLUSH_TRIG2))) {
-+        cap_ppc_safe_cache = 1;
-+    }
-+    /* Parse and set cap_ppc_safe_bounds_check */
-+    if (~c.behaviour & c.b_mask & H_CPU_BEHAV_BNDS_CHK_SPEC_BAR) {
-+        cap_ppc_safe_bounds_check = 2;
-+    } else if (c.character & c.c_mask & H_CPU_CHAR_SPEC_BAR_ORI31) {
-+        cap_ppc_safe_bounds_check = 1;
-+    }
-+    /* Parse and set cap_ppc_safe_indirect_branch */
-+    if (c.character & H_CPU_CHAR_BCCTRL_SERIALISED) {
-+        cap_ppc_safe_indirect_branch = 2;
-+    }
-+}
-+
-+int kvmppc_get_cap_safe_cache(void)
-+{
-+    return cap_ppc_safe_cache;
-+}
-+
-+int kvmppc_get_cap_safe_bounds_check(void)
-+{
-+    return cap_ppc_safe_bounds_check;
-+}
-+
-+int kvmppc_get_cap_safe_indirect_branch(void)
-+{
-+    return cap_ppc_safe_indirect_branch;
-+}
-+
- PowerPCCPUClass *kvm_ppc_get_host_cpu_class(void)
- {
-     uint32_t host_pvr = mfpvr();
-diff --git a/target/ppc/kvm_ppc.h b/target/ppc/kvm_ppc.h
-index ecb55493cc..39830baa77 100644
---- a/target/ppc/kvm_ppc.h
-+++ b/target/ppc/kvm_ppc.h
-@@ -59,6 +59,9 @@ bool kvmppc_has_cap_fixup_hcalls(void);
- bool kvmppc_has_cap_htm(void);
- bool kvmppc_has_cap_mmu_radix(void);
- bool kvmppc_has_cap_mmu_hash_v3(void);
-+int kvmppc_get_cap_safe_cache(void);
-+int kvmppc_get_cap_safe_bounds_check(void);
-+int kvmppc_get_cap_safe_indirect_branch(void);
- int kvmppc_enable_hwrng(void);
- int kvmppc_put_books_sregs(PowerPCCPU *cpu);
- PowerPCCPUClass *kvm_ppc_get_host_cpu_class(void);
-@@ -290,6 +293,21 @@ static inline bool kvmppc_has_cap_mmu_hash_v3(void)
-     return false;
- }
- 
-+static inline int kvmppc_get_cap_safe_cache(void)
-+{
-+    return 0;
-+}
-+
-+static inline int kvmppc_get_cap_safe_bounds_check(void)
-+{
-+    return 0;
-+}
-+
-+static inline int kvmppc_get_cap_safe_indirect_branch(void)
-+{
-+    return 0;
-+}
-+
- static inline int kvmppc_enable_hwrng(void)
- {
-     return -1;
--- 
-2.13.6
+>=20
+> > +        } else {
+> > +            *eax =3D 0;
+> > +            *ebx =3D 0;
+> > +            *ecx =3D 0;
+> > +            *edx =3D 0;
+> > +        }
+> > +        break;
+> > +    }
+> >      case 0x40000000:
+> >          /*
+> >           * CPUID code in kvm_arch_init_vcpu() ignores stuff diff
+> > --git a/target/i386/cpu.h b/target/i386/cpu.h index 62c4742..58a4b6c
+> > 100644
+> > --- a/target/i386/cpu.h
+> > +++ b/target/i386/cpu.h
+> > @@ -642,6 +642,7 @@ typedef uint32_t FeatureWordArray[FEATURE_WORDS];
+> > #define CPUID_7_0_EBX_PCOMMIT  (1U << 22) /* Persistent Commit */
+> > #define CPUID_7_0_EBX_CLFLUSHOPT (1U << 23) /* Flush a Cache Line Optim=
+ized */
+> >  #define CPUID_7_0_EBX_CLWB     (1U << 24) /* Cache Line Write Back */
+> > +#define CPUID_7_0_EBX_INTEL_PT (1U << 25) /* Intel Processor Trace */
+> >  #define CPUID_7_0_EBX_AVX512PF (1U << 26) /* AVX-512 Prefetch */
+> > #define CPUID_7_0_EBX_AVX512ER (1U << 27) /* AVX-512 Exponential and
+> > Reciprocal */  #define CPUID_7_0_EBX_AVX512CD (1U << 28) /* AVX-512
+> > Conflict Detection */ diff --git a/target/i386/kvm.c
+> > b/target/i386/kvm.c index 6f69e2f..e13ab58 100644
+> > --- a/target/i386/kvm.c
+> > +++ b/target/i386/kvm.c
+> > @@ -863,6 +863,29 @@ int kvm_arch_init_vcpu(CPUState *cs)
+> >                  c =3D &cpuid_data.entries[cpuid_i++];
+> >              }
+> >              break;
+> > +        case 0x14: {
+> > +            uint32_t times;
+> > +
+> > +            c->function =3D i;
+> > +            c->index =3D 0;
+> > +            c->flags =3D KVM_CPUID_FLAG_SIGNIFCANT_INDEX;
+> > +            cpu_x86_cpuid(env, i, 0, &c->eax, &c->ebx, &c->ecx, &c->ed=
+x);
+> > +            times =3D c->eax;
+> > +
+> > +            for (j =3D 1; j <=3D times; ++j) {
+> > +                if (cpuid_i =3D=3D KVM_MAX_CPUID_ENTRIES) {
+> > +                    fprintf(stderr, "cpuid_data is full, no space for =
+"
+> > +                                "cpuid(eax:0x14,ecx:0x%x)\n", j);
+> > +                    abort();
+> > +                }
+> > +                c =3D &cpuid_data.entries[cpuid_i++];
+> > +                c->function =3D i;
+> > +                c->index =3D j;
+> > +                c->flags =3D KVM_CPUID_FLAG_SIGNIFCANT_INDEX;
+> > +                cpu_x86_cpuid(env, i, j, &c->eax, &c->ebx, &c->ecx, &c=
+->edx);
+> > +            }
+> > +            break;
+> > +        }
+> >          default:
+> >              c->function =3D i;
+> >              c->flags =3D 0;
+> > --
+> > 1.8.3.1
+> >
+>=20
+> --
+> Eduardo
