@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33480)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35493)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mar.krzeminski@gmail.com>) id 1eb9X1-00055q-5w
-	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 13:30:52 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1eb9du-0002yR-Sm
+	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 13:37:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mar.krzeminski@gmail.com>) id 1eb9Ww-0005pn-5I
-	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 13:30:51 -0500
-Received: from mail-lf0-x244.google.com ([2a00:1450:4010:c07::244]:37531)
+	(envelope-from <richard.henderson@linaro.org>) id 1eb9dq-00028i-04
+	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 13:37:58 -0500
+Received: from mail-pg0-x232.google.com ([2607:f8b0:400e:c05::232]:46009)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mar.krzeminski@gmail.com>)
-	id 1eb9Wv-0005pW-TJ
-	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 13:30:46 -0500
-Received: by mail-lf0-x244.google.com with SMTP id f3so14441635lfe.4
-	for <qemu-devel@nongnu.org>; Mon, 15 Jan 2018 10:30:45 -0800 (PST)
-References: <4692971516029191@web59g.yandex.ru>
-From: "mar.krzeminski" <mar.krzeminski@gmail.com>
-Message-ID: <f9e196c1-72ba-a332-ef05-b764f57d79f5@gmail.com>
-Date: Mon, 15 Jan 2018 19:30:42 +0100
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1eb9dp-00028L-QE
+	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 13:37:53 -0500
+Received: by mail-pg0-x232.google.com with SMTP id c194so8312970pga.12
+	for <qemu-devel@nongnu.org>; Mon, 15 Jan 2018 10:37:53 -0800 (PST)
+References: <20180113004338.16867-1-laurent@vivier.eu>
+	<20180113004338.16867-6-laurent@vivier.eu>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <ca9dca07-3551-3e7b-cd1c-f1b41e1e3fc4@linaro.org>
+Date: Mon, 15 Jan 2018 10:37:49 -0800
 MIME-Version: 1.0
-In-Reply-To: <4692971516029191@web59g.yandex.ru>
-Content-Language: pl
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] m25p80: prevent buffer overflow during
- erasing
+In-Reply-To: <20180113004338.16867-6-laurent@vivier.eu>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 5/7] target/m68k: add moves
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,45 +31,94 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Aleksey Kuleshov <rndfax@yandex.ru>, qemu-devel <qemu-devel@nongnu.org>
+To: Laurent Vivier <laurent@vivier.eu>, qemu-devel@nongnu.org
+Cc: Thomas Huth <huth@tuxfamily.org>
 
-W dniu 15.01.2018 o 16:13, Aleksey Kuleshov pisze:
-> memset is not checked, so it's possible to go beyond the storage.
-> Add checks and truncate requested length.
->
-> Signed-off-by: Aleksey Kuleshov <rndfax@yandex.ru>
+On 01/12/2018 04:43 PM, Laurent Vivier wrote:
+> index 1aadc622db..efe2bf90ee 100644
+> --- a/target/m68k/qregs.def
+> +++ b/target/m68k/qregs.def
+> @@ -1,5 +1,7 @@
+>  DEFO32(PC, pc)
+>  DEFO32(SR, sr)
+> +DEFO32(DFC, dfc)
+> +DEFO32(SFC, sfc)
 
-Acked-by: Marcin Krzemiński<mar.krzeminski@gmail.com>
+These are unused.  No need to define or initialize.
 
-> ---
->   hw/block/m25p80.c | 10 ++++++++++
->   1 file changed, 10 insertions(+)
->
-> diff --git a/hw/block/m25p80.c b/hw/block/m25p80.c
-> index ea142160b3..18ec501912 100644
-> --- a/hw/block/m25p80.c
-> +++ b/hw/block/m25p80.c
-> @@ -539,6 +539,8 @@ static void flash_erase(Flash *s, int offset, FlashCMD cmd)
->       uint32_t len;
->       uint8_t capa_to_assert = 0;
->   
-> +    assert(0 <= offset && offset < s->size);
+>  #if defined(CONFIG_SOFTMMU)
+> +DISAS_INSN(moves)
+> +{
+> +    int opsize;
+> +    uint16_t ext;
+> +    TCGv reg;
+> +    TCGv addr;
+> +    int extend;
 > +
->       switch (cmd) {
->       case ERASE_4K:
->       case ERASE4_4K:
-> @@ -581,6 +583,14 @@ static void flash_erase(Flash *s, int offset, FlashCMD cmd)
->           qemu_log_mask(LOG_GUEST_ERROR, "M25P80: erase with write protect!\n");
->           return;
->       }
-> +
-> +    if (offset + len > s->size) {
-> +        qemu_log_mask(LOG_GUEST_ERROR,
-> +                            "M25P80: trying to erase beyond the flash size! "
-> +                            "Truncating the length...\n");
-> +        len = s->size - offset;
+> +    if (IS_USER(s)) {
+> +        gen_exception(s, s->insn_pc, EXCP_PRIVILEGE);
+> +        return;
 > +    }
 > +
->       memset(s->storage + offset, 0xff, len);
->       flash_sync_area(s, offset, len);
->   }
+> +    ext = read_im16(env, s);
+> +
+> +    opsize = insn_opsize(insn);
+> +
+> +    if (ext & 0x8000) {
+> +        /* address register */
+> +        reg = AREG(ext, 12);
+> +        extend = 1;
+> +    } else {
+> +        /* data register */
+> +        reg = DREG(ext, 12);
+> +        extend = 0;
+> +    }
+> +
+> +    addr = gen_lea(env, s, insn, opsize);
+> +    if (IS_NULL_QREG(addr)) {
+> +        gen_addr_fault(s);
+> +        return;
+> +    }
+> +
+> +    if (ext & 0x0800) {
+> +        /* from reg to ea */
+> +        gen_store(s, opsize, addr, reg, DFC_INDEX(s));
+> +    } else {
+> +        /* from ea to reg */
+> +        TCGv tmp = gen_load(s, opsize, addr, 0, SFC_INDEX(s));
+> +        if (extend) {
+> +            gen_ext(reg, tmp, opsize, 1);
+> +        } else {
+> +            gen_partset_reg(opsize, reg, tmp);
+> +        }
+> +    }
+> +    switch (extract32(insn, 3, 3)) {
+> +    case 3: /* Indirect postincrement.  */
+> +        tcg_gen_addi_i32(AREG(insn, 0), addr,
+> +                         REG(insn, 0) == 7 && opsize == OS_BYTE
+> +                         ? 2
+> +                         : opsize_bytes(opsize));
+> +        break;
+> +    case 4: /* Indirect predecrememnt.  */
+> +        tcg_gen_mov_i32(AREG(insn, 0), addr);
+> +        break;
+> +    }
+> +}
+
+Looks ok.
+
+> -    dc->user = (env->sr & SR_S) == 0;
+> +#if defined(CONFIG_SOFTMMU)
+> +    dc->user = (env->sr & SR_S) == 0 ? M68K_USER_FROM_MSR : 0;
+> +    dc->user |= (env->sfc & 4) == 0 ? M68K_USER_FROM_SFC : 0;
+> +    dc->user |= (env->dfc & 4) == 0 ? M68K_USER_FROM_DFC : 0;
+> +#endif
+
+Really you should be extracting these from tb->flags.
+
+You also need to end the TB when assigning to SFC and DFC.  Otherwise the
+generated code is not in sync with the register contents.
+
+
+
+r~
