@@ -1,30 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33333)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33480)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1eb9WK-0004Nd-SS
-	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 13:30:09 -0500
+	(envelope-from <mar.krzeminski@gmail.com>) id 1eb9X1-00055q-5w
+	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 13:30:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1eb9WF-0005UT-V6
-	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 13:30:08 -0500
-Received: from chuckie.co.uk ([82.165.15.123]:45346
-	helo=s16892447.onlinehome-server.info)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
-	id 1eb9WF-0005TA-Ol
-	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 13:30:03 -0500
-References: <20180114104751.21965-1-mark.cave-ayland@ilande.co.uk>
-	<20180114104751.21965-10-mark.cave-ayland@ilande.co.uk>
-	<e4cb0bba-c6e0-0a38-7224-71738c3a7d5a@amsat.org>
-	<b0a9500a-6aae-2d2d-6a5e-0307e32fa23f@zoho.com>
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Message-ID: <fbf0ce41-2346-d391-5e16-d560279a9b15@ilande.co.uk>
-Date: Mon, 15 Jan 2018 18:29:55 +0000
+	(envelope-from <mar.krzeminski@gmail.com>) id 1eb9Ww-0005pn-5I
+	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 13:30:51 -0500
+Received: from mail-lf0-x244.google.com ([2a00:1450:4010:c07::244]:37531)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <mar.krzeminski@gmail.com>)
+	id 1eb9Wv-0005pW-TJ
+	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 13:30:46 -0500
+Received: by mail-lf0-x244.google.com with SMTP id f3so14441635lfe.4
+	for <qemu-devel@nongnu.org>; Mon, 15 Jan 2018 10:30:45 -0800 (PST)
+References: <4692971516029191@web59g.yandex.ru>
+From: "mar.krzeminski" <mar.krzeminski@gmail.com>
+Message-ID: <f9e196c1-72ba-a332-ef05-b764f57d79f5@gmail.com>
+Date: Mon, 15 Jan 2018 19:30:42 +0100
 MIME-Version: 1.0
-In-Reply-To: <b0a9500a-6aae-2d2d-6a5e-0307e32fa23f@zoho.com>
+In-Reply-To: <4692971516029191@web59g.yandex.ru>
+Content-Language: pl
 Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-GB
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 09/11] pci: add trace-events support for
- hw/pci-host
+Subject: Re: [Qemu-devel] [PATCH] m25p80: prevent buffer overflow during
+ erasing
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,28 +31,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: marcel@redhat.com, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, atar4qemu@gmail.com
-Cc: qemu-devel@nongnu.org, "Michael S . Tsirkin" <mst@redhat.com>
+To: Aleksey Kuleshov <rndfax@yandex.ru>, qemu-devel <qemu-devel@nongnu.org>
 
-On 14/01/18 16:27, Marcel Apfelbaum wrote:
+W dniu 15.01.2018 o 16:13, Aleksey Kuleshov pisze:
+> memset is not checked, so it's possible to go beyond the storage.
+> Add checks and truncate requested length.
+>
+> Signed-off-by: Aleksey Kuleshov <rndfax@yandex.ru>
 
-> On 14/01/2018 15:32, Philippe Mathieu-Daudé wrote:
->> On 01/14/2018 07:47 AM, Mark Cave-Ayland wrote:
->>> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
->> Not sure this is worth a separate commit (I'd squash it in the next
->> patch), still:
-> 
-> I agree, no need to add a new directory to the trace list
-> while we don't have a trace events file.
+Acked-by: Marcin Krzemiński<mar.krzeminski@gmail.com>
 
-Hi Marcel,
-
-The basic skeleton of the file is there with the just the default 
-comments, but other than that it's empty. The only reason I placed it 
-into a separate patch was so it could get an Ack from someone on the PCI 
-side, but I'm happy to squash it based upon your comment above.
-
-
-ATB,
-
-Mark.
+> ---
+>   hw/block/m25p80.c | 10 ++++++++++
+>   1 file changed, 10 insertions(+)
+>
+> diff --git a/hw/block/m25p80.c b/hw/block/m25p80.c
+> index ea142160b3..18ec501912 100644
+> --- a/hw/block/m25p80.c
+> +++ b/hw/block/m25p80.c
+> @@ -539,6 +539,8 @@ static void flash_erase(Flash *s, int offset, FlashCMD cmd)
+>       uint32_t len;
+>       uint8_t capa_to_assert = 0;
+>   
+> +    assert(0 <= offset && offset < s->size);
+> +
+>       switch (cmd) {
+>       case ERASE_4K:
+>       case ERASE4_4K:
+> @@ -581,6 +583,14 @@ static void flash_erase(Flash *s, int offset, FlashCMD cmd)
+>           qemu_log_mask(LOG_GUEST_ERROR, "M25P80: erase with write protect!\n");
+>           return;
+>       }
+> +
+> +    if (offset + len > s->size) {
+> +        qemu_log_mask(LOG_GUEST_ERROR,
+> +                            "M25P80: trying to erase beyond the flash size! "
+> +                            "Truncating the length...\n");
+> +        len = s->size - offset;
+> +    }
+> +
+>       memset(s->storage + offset, 0xff, len);
+>       flash_sync_area(s, offset, len);
+>   }
