@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54258)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54302)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1eb3Y0-0002Im-5E
-	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 07:07:32 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1eb3Y8-0002P0-DU
+	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 07:07:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1eb3Xv-00043T-7Y
-	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 07:07:28 -0500
-Received: from mail-wm0-f66.google.com ([74.125.82.66]:37385)
+	(envelope-from <peter.maydell@linaro.org>) id 1eb3Y2-00046C-MI
+	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 07:07:36 -0500
+Received: from mail-ot0-x231.google.com ([2607:f8b0:4003:c0f::231]:41376)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1eb3Xv-00042t-1W
-	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 07:07:23 -0500
-Received: by mail-wm0-f66.google.com with SMTP id v71so1486769wmv.2
-	for <qemu-devel@nongnu.org>; Mon, 15 Jan 2018 04:07:23 -0800 (PST)
-References: <20171215052326.21386-1-aik@ozlabs.ru>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <a5383f04-554d-3db9-85a1-e9661aba23a5@redhat.com>
-Date: Mon, 15 Jan 2018 13:07:17 +0100
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1eb3Y2-00045w-HR
+	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 07:07:30 -0500
+Received: by mail-ot0-x231.google.com with SMTP id 44so9552331otk.8
+	for <qemu-devel@nongnu.org>; Mon, 15 Jan 2018 04:07:30 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20171215052326.21386-1-aik@ozlabs.ru>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH qemu v2] kvm: Add kvm_set_user_memory
- tracepoint
+In-Reply-To: <d7f23db3-6669-76fe-661e-a5b506cfbeaf@amsat.org>
+References: <1515506513-31961-1-git-send-email-peter.maydell@linaro.org>
+	<d7f23db3-6669-76fe-661e-a5b506cfbeaf@amsat.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 15 Jan 2018 12:07:09 +0000
+Message-ID: <CAFEAcA-bwHPH0W2WDOzoKrvTLff7WS-KN0NpRkP7tR=geL-HSw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH 0/4] Reset SD cards attached to
+ legacy-API controllers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,59 +31,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alexey Kardashevskiy <aik@ozlabs.ru>, qemu-devel@nongnu.org
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, qemu-stable <qemu-stable@nongnu.org>, "patches@linaro.org" <patches@linaro.org>
 
-On 15/12/2017 06:23, Alexey Kardashevskiy wrote:
-> This adds a tracepoint to trace the KVM_SET_USER_MEMORY_REGION ioctl
-> parameters which is quite useful for debugging VFIO memory regions
-> being actually registered with KVM.
-> 
-> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
-> ---
-> Changes:
-> v2:
-> * added forgotten change to trace-events
-> ---
->  accel/kvm/kvm-all.c    | 6 +++++-
->  accel/kvm/trace-events | 1 +
->  2 files changed, 6 insertions(+), 1 deletion(-)
-> 
-> diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
-> index f290f48..b91fcb7 100644
-> --- a/accel/kvm/kvm-all.c
-> +++ b/accel/kvm/kvm-all.c
-> @@ -235,6 +235,7 @@ static int kvm_set_user_memory_region(KVMMemoryListener *kml, KVMSlot *slot)
->  {
->      KVMState *s = kvm_state;
->      struct kvm_userspace_memory_region mem;
-> +    int ret;
->  
->      mem.slot = slot->slot | (kml->as_id << 16);
->      mem.guest_phys_addr = slot->start_addr;
-> @@ -248,7 +249,10 @@ static int kvm_set_user_memory_region(KVMMemoryListener *kml, KVMSlot *slot)
->          kvm_vm_ioctl(s, KVM_SET_USER_MEMORY_REGION, &mem);
->      }
->      mem.memory_size = slot->memory_size;
-> -    return kvm_vm_ioctl(s, KVM_SET_USER_MEMORY_REGION, &mem);
-> +    ret = kvm_vm_ioctl(s, KVM_SET_USER_MEMORY_REGION, &mem);
-> +    trace_kvm_set_user_memory(mem.slot, mem.flags, mem.guest_phys_addr,
-> +                              mem.memory_size, mem.userspace_addr, ret);
-> +    return ret;
->  }
->  
->  int kvm_destroy_vcpu(CPUState *cpu)
-> diff --git a/accel/kvm/trace-events b/accel/kvm/trace-events
-> index f89ba55..58e98ef 100644
-> --- a/accel/kvm/trace-events
-> +++ b/accel/kvm/trace-events
-> @@ -12,4 +12,5 @@ kvm_irqchip_commit_routes(void) ""
->  kvm_irqchip_add_msi_route(char *name, int vector, int virq) "dev %s vector %d virq %d"
->  kvm_irqchip_update_msi_route(int virq) "Updating MSI route virq=%d"
->  kvm_irqchip_release_virq(int virq) "virq %d"
-> +kvm_set_user_memory(uint32_t slot, uint32_t flags, uint64_t guest_phys_addr, uint64_t memory_size, uint64_t userspace_addr, int ret) "Slot#%d flags=0x%x gpa=0x%"PRIx64 " size=0x%"PRIx64 " ua=0x%"PRIx64 " ret=%d"
->  
-> 
+On 9 January 2018 at 16:13, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> w=
+rote:
+> Hi Peter,
+>
+> On 01/09/2018 11:01 AM, Peter Maydell wrote:
+>> It turns out that we don't reset the SD card model if it's
+>> attached to a legacy-API controller. For new-style controllers
+>> where the SD card object is attached to an SD_BUS, the generic
+>> qbus infrastructure takes care of ensuring that the card's
+>> DeviceState::reset method gets called. But for the legacy
+>> API where the card is created by calling sd_init(), the card
+>> object has no SD_BUS to plug into, and so the reset function
+>> must be called manually.
+>>
+>> This mostly had no ill effects because a guest OS will typically
+>> perform an SD reset command as part of its device driver init
+>> sequence. However it does mean that migration won't work, because
+>> it's in sd_reset() that we set up the wpgrps_size field, and
+>> without that the migration struct on reload won't match.
+>>
+>> This patchset fixes up the four legacy controllers to call
+>> reset on the SD card device in their controller reset functions.
+>> The first 3 are cc:stable as migration bugfixes.
+>>
+>> This fixes https://bugs.launchpad.net/qemu/+bug/1739378
+>>
+>> Philippe: this probably clashes slightly with your sdcard
+>> patchsets (and where you've updated devices to the new APIs
+>> it becomes irrelevant), but I think we should apply these
+>> first so we can have a simple patch to backport to the stable
+>> tree.
+>
+> Sure, it makes sens.
+>
+> I didn't test migrating a card (but have a "sdcard migration qtest"
+> entry in my TODO).
+>
+> this series:
+> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+> Tested-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 
-Queued, thanks.
+Thanks for the review. I've applied this series to target-arm.next
+(with the fix to the milkymist commit message and the removal
+of s->mod =3D SSI_SD_CMD from the ssi-sd realize function that you
+suggested).
 
-Paolo
+-- PMM
