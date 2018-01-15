@@ -1,28 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57204)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57675)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1eav9t-0006gG-Md
-	for qemu-devel@nongnu.org; Sun, 14 Jan 2018 22:10:03 -0500
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1eavCH-00081e-8M
+	for qemu-devel@nongnu.org; Sun, 14 Jan 2018 22:12:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1eav9o-0002u2-MS
-	for qemu-devel@nongnu.org; Sun, 14 Jan 2018 22:10:01 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:46492)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1eav9o-0002t3-E3
-	for qemu-devel@nongnu.org; Sun, 14 Jan 2018 22:09:56 -0500
-References: <20180110161438.GA28096@stefanha-x1.localdomain>
-	<dcb849d4-82fb-de8a-5e81-23d47026c9eb@redhat.com>
-	<20180111152345.GA7353@stefanha-x1.localdomain>
-	<86106573-422b-fe4c-ec15-dad0edf05880@redhat.com>
-	<E182254E98A5DA4EB1E657AC7CB9BD2A8B023E3B@BGSMSX101.gar.corp.intel.com>
-From: Jason Wang <jasowang@redhat.com>
-Message-ID: <a92a5335-005e-0d54-869d-0f01106c37df@redhat.com>
-Date: Mon, 15 Jan 2018 11:09:46 +0800
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1eavCD-0004qw-Tz
+	for qemu-devel@nongnu.org; Sun, 14 Jan 2018 22:12:29 -0500
+Received: from mail-qt0-x244.google.com ([2607:f8b0:400d:c0d::244]:33701)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1eavCD-0004qP-Nx
+	for qemu-devel@nongnu.org; Sun, 14 Jan 2018 22:12:25 -0500
+Received: by mail-qt0-x244.google.com with SMTP id e2so12620129qti.0
+	for <qemu-devel@nongnu.org>; Sun, 14 Jan 2018 19:12:25 -0800 (PST)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <cover.1515960078.git.pisa@cmp.felk.cvut.cz>
+	<07099f0ebd7a206ee94eb555be35995e69ab31f5.1515960078.git.pisa@cmp.felk.cvut.cz>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <87af3cfd-ee4e-7abd-ac2c-a6ee08c86aeb@amsat.org>
+Date: Mon, 15 Jan 2018 00:12:20 -0300
 MIME-Version: 1.0
-In-Reply-To: <E182254E98A5DA4EB1E657AC7CB9BD2A8B023E3B@BGSMSX101.gar.corp.intel.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <07099f0ebd7a206ee94eb555be35995e69ab31f5.1515960078.git.pisa@cmp.felk.cvut.cz>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] vhost-pci and virtio-vhost-user
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH V4 6/7] CAN bus PCM-3680I PCI (dual SJA1000
+ channel) emulation added.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,88 +36,382 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Yang, Zhiyong" <zhiyong.yang@intel.com>, Stefan Hajnoczi <stefanha@redhat.com>
-Cc: "Wang, Wei W" <wei.w.wang@intel.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: pisa@cmp.felk.cvut.cz, qemu-devel@nongnu.org
+Cc: Marek Vasut <marex@denx.de>, Oliver Hartkopp <socketcan@hartkopp.net>, Stefan Hajnoczi <stefanha@gmail.com>, Deniz Eren <deniz.eren@icloud.com>, Oleksij Rempel <o.rempel@pengutronix.de>, Konrad Frederic <frederic.konrad@adacore.com>, Jan Kiszka <jan.kiszka@siemens.com>
 
+On 01/14/2018 05:14 PM, pisa@cmp.felk.cvut.cz wrote:
+> From: Deniz Eren <deniz.eren@icloud.com>
+> 
+> Signed-off-by: Deniz Eren <deniz.eren@icloud.com>
+> Signed-off-by: Pavel Pisa <pisa@cmp.felk.cvut.cz>
+> ---
+>  hw/can/Makefile.objs     |   1 +
+>  hw/can/can_pcm3680_pci.c | 336 +++++++++++++++++++++++++++++++++++++++++++++++
+>  2 files changed, 337 insertions(+)
+>  create mode 100644 hw/can/can_pcm3680_pci.c
+> 
+> diff --git a/hw/can/Makefile.objs b/hw/can/Makefile.objs
+> index c9d07b9b16..6a328f0c3a 100644
+> --- a/hw/can/Makefile.objs
+> +++ b/hw/can/Makefile.objs
+> @@ -9,4 +9,5 @@ common-obj-y += can_host_stub.o
+>  endif
+>  common-obj-$(CONFIG_CAN_SJA1000) += can_sja1000.o
+>  common-obj-$(CONFIG_CAN_PCI) += can_kvaser_pci.o
+> +common-obj-$(CONFIG_CAN_PCI) += can_pcm3680_pci.o
+>  endif
+> diff --git a/hw/can/can_pcm3680_pci.c b/hw/can/can_pcm3680_pci.c
+> new file mode 100644
+> index 0000000000..e85b61849a
+> --- /dev/null
+> +++ b/hw/can/can_pcm3680_pci.c
+> @@ -0,0 +1,336 @@
+> +/*
+> + * PCM-3680i PCI CAN device (SJA1000 based) emulation
+> + *
+> + * Copyright (c) 2016 Deniz Eren (deniz.eren@icloud.com)
+> + *
+> + * Based on Kvaser PCI CAN device (SJA1000 based) emulation implemented by
+> + * Jin Yang and Pavel Pisa
+> + *
+> + * Permission is hereby granted, free of charge, to any person obtaining a copy
+> + * of this software and associated documentation files (the "Software"), to deal
+> + * in the Software without restriction, including without limitation the rights
+> + * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+> + * copies of the Software, and to permit persons to whom the Software is
+> + * furnished to do so, subject to the following conditions:
+> + *
+> + * The above copyright notice and this permission notice shall be included in
+> + * all copies or substantial portions of the Software.
+> + *
+> + * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+> + * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+> + * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+> + * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+> + * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+> + * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+> + * THE SOFTWARE.
+> + */
+> +
+> +#include "qemu/osdep.h"
+> +#include "qemu/event_notifier.h"
+> +#include "qemu/thread.h"
+> +#include "qemu/sockets.h"
+> +#include "qemu/error-report.h"
+> +#include "chardev/char.h"
+> +#include "hw/hw.h"
+> +#include "hw/pci/pci.h"
+> +#include "can/can_emu.h"
+> +
+> +#include "can_sja1000.h"
+> +
+> +#define TYPE_CAN_PCI_DEV "pcm3680_pci"
+> +
+> +#define PCM3680i_PCI_DEV(obj) \
+> +    OBJECT_CHECK(Pcm3680iPCIState, (obj), TYPE_CAN_PCI_DEV)
+> +
+> +/* the PCI device and vendor IDs */
+> +#ifndef PCM3680i_PCI_VENDOR_ID1
+> +#define PCM3680i_PCI_VENDOR_ID1     0x13fe
+> +#endif
+> +
+> +#ifndef PCM3680i_PCI_DEVICE_ID1
+> +#define PCM3680i_PCI_DEVICE_ID1     0xc002
+> +#endif
+> +
+> +#define PCM3680i_PCI_SJA_RANGE     0x200
+> +
+> +#define PCM3680i_PCI_BYTES_PER_SJA 0x20
+> +
+> +typedef struct Pcm3680iPCIState {
+> +    /*< private >*/
+> +    PCIDevice       dev;
+> +    /*< public >*/
+> +    MemoryRegion    sja_io[2];
+> +
+> +    CanSJA1000State sja_state[2];
+> +    qemu_irq        irq;
+> +
+> +    char            *model; /* The model that support, only SJA1000 now. */
+> +    char            *canbus[2];
+> +    char            *host[2];
+> +} Pcm3680iPCIState;
+> +
+> +static void pcm3680i_pci_irq_raise(void *opaque)
+> +{
+> +    Pcm3680iPCIState *d = (Pcm3680iPCIState *)opaque;
+> +
+> +    qemu_irq_raise(d->irq);
+> +}
+> +
+> +static void pcm3680i_pci_irq_lower(void *opaque)
+> +{
+> +    Pcm3680iPCIState *d = (Pcm3680iPCIState *)opaque;
+> +
+> +    qemu_irq_lower(d->irq);
+> +}
+> +
+> +static void
+> +pcm3680i_pci_reset(void *opaque)
 
+static void pcm3680i_pci_reset(void *opaque)
 
-On 2018=E5=B9=B401=E6=9C=8812=E6=97=A5 13:20, Yang, Zhiyong wrote:
->>>    Both vhost-pci and virtio-vhost-user work using shared memory acce=
-ss
->>> to the guest RAM of the other VM.  Therefore they can poll virtqueues
->>> and avoid vmexit.  They do also support cross-VM interrupts, thanks t=
-o
->>> QEMU setting up irqfd/ioeventfd appropriately on the host.
->>>
->>> Stefan
->> So in conclusion, consider the complexity, I would suggest to figure o=
-ut
->> whether or not this (either vhost-pci or virito-vhost-user) is really =
-required
->> before moving ahead. E.g, for VM2VM direct network path, this looks si=
-mply
->> an issue of network topology instead of the problem of device, so ther=
-e's a
->> lot of trick, for vhost-user one can easily image to write an applicat=
-ion (or use
->> testpmd) to build a zerocopied VM2VM datapath, isn't this not sufficie=
-nt for
->> the case?
-> As far as I know,  dequeue zero copied feature of vhost user PMD can't =
-help improve throughput for small packest ,such as 64 bytes.
-> On the contrary, it causes perf drop.  The feature mainly helps large p=
-ackets throughput.
+> +{
+> +    Pcm3680iPCIState *d = (Pcm3680iPCIState *)opaque;
+> +    CanSJA1000State *s1 = &d->sja_state[0];
+> +    CanSJA1000State *s2 = &d->sja_state[1];
+> +
+> +    can_sja_hardware_reset(s1);
+> +    can_sja_hardware_reset(s2);
+> +}
+> +
+> +static uint64_t pcm3680i_pci_sja1_io_read(void *opaque, hwaddr addr,
+> +                                          unsigned size)
+> +{
+> +    Pcm3680iPCIState *d = opaque;
+> +    CanSJA1000State *s = &d->sja_state[0];
+> +
+> +    if (addr >= PCM3680i_PCI_BYTES_PER_SJA) {
+> +        return 0;
+> +    }
+> +
+> +    return can_sja_mem_read(s, addr, size);
+> +}
+> +
+> +static void pcm3680i_pci_sja1_io_write(void *opaque, hwaddr addr,
+> +                                       uint64_t data, unsigned size)
+> +{
+> +    Pcm3680iPCIState *d = opaque;
+> +    CanSJA1000State *s = &d->sja_state[0];
+> +
+> +    if (addr >= PCM3680i_PCI_BYTES_PER_SJA) {
+> +        return;
+> +    }
+> +
+> +    can_sja_mem_write(s, addr, data, size);
+> +}
+> +
+> +static uint64_t pcm3680i_pci_sja2_io_read(void *opaque, hwaddr addr,
+> +                                          unsigned size)
+> +{
+> +    Pcm3680iPCIState *d = opaque;
+> +    CanSJA1000State *s = &d->sja_state[1];
+> +
+> +    if (addr >= PCM3680i_PCI_BYTES_PER_SJA) {
+> +        return 0;
+> +    }
+> +
+> +    return can_sja_mem_read(s, addr, size);
+> +}
+> +
+> +static void pcm3680i_pci_sja2_io_write(void *opaque, hwaddr addr, uint64_t data,
+> +                             unsigned size)
+> +{
+> +    Pcm3680iPCIState *d = opaque;
+> +    CanSJA1000State *s = &d->sja_state[1];
+> +
+> +    if (addr >= PCM3680i_PCI_BYTES_PER_SJA) {
+> +        return;
+> +    }
+> +
+> +    can_sja_mem_write(s, addr, data, size);
+> +}
+> +
+> +static const MemoryRegionOps pcm3680i_pci_sja1_io_ops = {
+> +    .read = pcm3680i_pci_sja1_io_read,
+> +    .write = pcm3680i_pci_sja1_io_write,
+> +    .endianness = DEVICE_LITTLE_ENDIAN,
+> +    .impl = {
+> +        .min_access_size = 1,
 
-Can you explain why? And what's the number of:
+superfluous ^
 
-1) 64B/1500B zerocopy
-2) 64B/1500B datacopy
-3) 64B/1500B vhost-pci
+> +        .max_access_size = 1,
+> +    },
+> +};
+> +
+> +static const MemoryRegionOps pcm3680i_pci_sja2_io_ops = {
+> +    .read = pcm3680i_pci_sja2_io_read,
+> +    .write = pcm3680i_pci_sja2_io_write,
+> +    .endianness = DEVICE_LITTLE_ENDIAN,
+> +    .impl = {
+> +        .min_access_size = 1,
 
-It makes make feel that vhost-pci is dedicated for small bytes? We=20
-probably don't want a solution for just a specific size of packets.
+ditto
 
->    =20
-> Vhostpci can bring the following advantages compared to traditional sol=
-ution(vhost/virtio PMD pairs)
-> 1.  higher throughput for two VMs. ( Let us see the following  case,  i=
-f we use NIC passthrough way to two 2 VMs,  vhostpci RX or TX is handled =
- running 1 single core in VM1,  virtio PMD  is similar on VM2,
-> Only RX or TX is handled running on one single core.
-> for traditional solution,  except each virtio PMD is running inside eac=
-h VM,  at least one extra core is needed for vhost user RX and TX as an m=
-ediator.
-> In this case, the bottleneck lies in the two vhost user ports running o=
-n one single core, which has double workload.
+> +        .max_access_size = 1,
+> +    },
+> +};
+> +
+> +static int pcm3680i_pci_init(PCIDevice *pci_dev)
+> +{
+> +    Pcm3680iPCIState *d = PCM3680i_PCI_DEV(pci_dev);
+> +    CanSJA1000State *s1 = &d->sja_state[0];
+> +    CanSJA1000State *s2 = &d->sja_state[1];
+> +    uint8_t *pci_conf;
+> +    CanBusState *can_bus1;
+> +    CanBusState *can_bus2;
 
-Does this still make sense for packet size other than 64 byte (e.g 1500B)=
-?
+why not use CanBusState *can_bus[2]?
 
->  =20
->
-> 2. Low latencies (have shorter data path than tradition soluton, doesn'=
-t need to pass host OS any more by vhost user)
-
-Is this still true if you do busy polling on both sides?
-
->
-> 3. reduce nearly 50% cores  because  OVS is not involved again if we ap=
-ply vhostpci/virtio to VMs-chain case.
-
-Well the differences to me is, copy in guest vs copy in host.
-
-- vhost-pci move the copy from host process to pmd in guest, it probably=20
-save cores but sacrifice the performance of pmd which needs do copy now
-- exist OVS may occupy more cores in host, but if saves the ability of=20
-guest pmd
-
- From the view of performance, it looks to me that copy in host is=20
-faster since it has less overhead e.g vmexits. Vhost-pci probably needs=20
-more vcpus to compete with current solution.
-
-Thanks
-
->
-> Thanks
-> Zhiyong
->
+> +
+> +    if (d->model) {
+> +        if (strncmp(d->model, "pcican-s", 256)) { /* for security reason */
+> +            error_report("Can't create CAN device, "
+> +                         "the model %s is not supported now.", d->model);
+> +            exit(1);
+> +        }
+> +    }
+> +
+> +    can_bus1 = can_bus_find_by_name(d->canbus[0], true);
+> +    if (can_bus1 == NULL) {
+> +        error_report("Cannot create can find/allocate CAN bus #1");
+> +        exit(1);
+> +    }
+> +
+> +    can_bus2 = can_bus_find_by_name(d->canbus[1], true);
+> +    if (can_bus2 == NULL) {
+> +        error_report("Cannot create can find/allocate CAN bus #2");
+> +        exit(1);
+> +    }
+> +
+> +    if (d->host[0] != NULL) {
+> +        if (can_bus_connect_to_host_device(can_bus1, d->host[0]) < 0) {
+> +            error_report("Cannot connect CAN bus to host #1 device \"%s\"",
+> +                         d->host[0]);
+> +            exit(1);
+> +        }
+> +    }
+> +
+> +    if (d->host[1] != NULL) {
+> +        if (can_bus_connect_to_host_device(can_bus2, d->host[1]) < 0) {
+> +            error_report("Cannot connect CAN bus to host #2 device \"%s\"",
+> +                         d->host[1]);
+> +            exit(1);
+> +        }
+> +    }
+> +
+> +    pci_conf = pci_dev->config;
+> +    pci_conf[PCI_INTERRUPT_PIN] = 0x01; /* interrupt pin A */
+> +
+> +    d->irq = pci_allocate_irq(&d->dev);
+> +
+> +    can_sja_init(s1, pcm3680i_pci_irq_raise, pcm3680i_pci_irq_lower, d);
+> +    can_sja_init(s2, pcm3680i_pci_irq_raise, pcm3680i_pci_irq_lower, d);
+> +
+> +    qemu_register_reset(pcm3680i_pci_reset, d);
+> +
+> +    if (can_sja_connect_to_bus(s1, can_bus1) < 0) {
+> +        error_report("can_sja_connect_to_bus failed");
+> +        exit(1);
+> +    }
+> +
+> +    if (can_sja_connect_to_bus(s2, can_bus2) < 0) {
+> +        error_report("can_sja_connect_to_bus failed");
+> +        exit(1);
+> +    }
+> +
+> +    memory_region_init_io(&d->sja_io[0], OBJECT(d), &pcm3680i_pci_sja1_io_ops,
+> +                          d, "pcm3680i_pci-sja1", PCM3680i_PCI_SJA_RANGE / 2);
+> +    memory_region_init_io(&d->sja_io[1], OBJECT(d), &pcm3680i_pci_sja2_io_ops,
+> +                          d, "pcm3680i_pci-sja2", PCM3680i_PCI_SJA_RANGE / 2);
+> +
+> +    pci_register_bar(&d->dev, /*BAR*/ 0, PCI_BASE_ADDRESS_SPACE_IO,
+> +                                             &d->sja_io[0]);
+> +    pci_register_bar(&d->dev, /*BAR*/ 1, PCI_BASE_ADDRESS_SPACE_IO,
+> +                                             &d->sja_io[1]);
+> +
+> +    return 0;
+> +}
+> +
+> +static void pcm3680i_pci_exit(PCIDevice *pci_dev)
+> +{
+> +    Pcm3680iPCIState *d = PCM3680i_PCI_DEV(pci_dev);
+> +    CanSJA1000State *s1 = &d->sja_state[0];
+> +    CanSJA1000State *s2 = &d->sja_state[1];
+> +
+> +    can_sja_disconnect(s1);
+> +    can_sja_disconnect(s2);
+> +
+> +    qemu_unregister_reset(pcm3680i_pci_reset, d);
+> +
+> +    /*
+> +     * region d->sja_io is destroyed by QOM now
+> +     */
+> +    /* memory_region_destroy(&d->sja_io[0]); */
+> +    /* memory_region_destroy(&d->sja_io[1]); */
+> +
+> +    can_sja_exit(s1);
+> +    can_sja_exit(s2);
+> +
+> +    qemu_free_irq(d->irq);
+> +}
+> +
+> +static const VMStateDescription vmstate_pcm3680i_pci = {
+> +    .name = "pcm3680i_pci",
+> +    .version_id = 1,
+> +    .minimum_version_id = 1,
+> +    .minimum_version_id_old = 1,
+> +    .fields = (VMStateField[]) {
+> +        VMSTATE_PCI_DEVICE(dev, Pcm3680iPCIState),
+> +        VMSTATE_STRUCT(sja_state[0], Pcm3680iPCIState, 0,
+> +                       vmstate_can_sja, CanSJA1000State),
+> +        VMSTATE_STRUCT(sja_state[1], Pcm3680iPCIState, 0,
+> +                       vmstate_can_sja, CanSJA1000State),
+> +        VMSTATE_END_OF_LIST()
+> +    }
+> +};
+> +
+> +static void qdev_pcm3680i_pci_reset(DeviceState *dev)
+> +{
+> +    Pcm3680iPCIState *d = PCM3680i_PCI_DEV(dev);
+> +    pcm3680i_pci_reset(d);
+> +}
+> +
+> +static Property pcm3680i_pci_properties[] = {
+> +    DEFINE_PROP_STRING("canbus1",   Pcm3680iPCIState, canbus[0]),
+> +    DEFINE_PROP_STRING("canbus2",   Pcm3680iPCIState, canbus[1]),
+> +    DEFINE_PROP_STRING("host1",  Pcm3680iPCIState, host[0]),
+> +    DEFINE_PROP_STRING("host2",  Pcm3680iPCIState, host[1]),
+> +    DEFINE_PROP_STRING("model", Pcm3680iPCIState, model),
+> +    DEFINE_PROP_END_OF_LIST(),
+> +};
+> +
+> +static void pcm3680i_pci_class_init(ObjectClass *klass, void *data)
+> +{
+> +    DeviceClass *dc = DEVICE_CLASS(klass);
+> +    PCIDeviceClass *k = PCI_DEVICE_CLASS(klass);
+> +
+> +    k->init = pcm3680i_pci_init;
+> +    k->exit = pcm3680i_pci_exit;
+> +    k->vendor_id = PCM3680i_PCI_VENDOR_ID1;
+> +    k->device_id = PCM3680i_PCI_DEVICE_ID1;
+> +    k->revision = 0x00;
+> +    k->class_id = 0x000c09;
+> +    k->subsystem_vendor_id = PCM3680i_PCI_VENDOR_ID1;
+> +    k->subsystem_id = PCM3680i_PCI_DEVICE_ID1;
+> +    dc->desc = "Pcm3680i PCICANx";
+> +    dc->props = pcm3680i_pci_properties;
+> +    dc->vmsd = &vmstate_pcm3680i_pci;
+> +    set_bit(DEVICE_CATEGORY_MISC, dc->categories);
+> +    dc->reset = qdev_pcm3680i_pci_reset;
+> +}
+> +
+> +static const TypeInfo pcm3680i_pci_info = {
+> +    .name          = TYPE_CAN_PCI_DEV,
+> +    .parent        = TYPE_PCI_DEVICE,
+> +    .instance_size = sizeof(Pcm3680iPCIState),
+> +    .class_init    = pcm3680i_pci_class_init,
+> +    .interfaces = (InterfaceInfo[]) {
+> +        { INTERFACE_CONVENTIONAL_PCI_DEVICE },
+> +        { },
+> +    },
+> +};
+> +
+> +static void pcm3680i_pci_register_types(void)
+> +{
+> +    type_register_static(&pcm3680i_pci_info);
+> +}
+> +
+> +type_init(pcm3680i_pci_register_types)
+> 
