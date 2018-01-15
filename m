@@ -1,27 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38665)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38747)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jianjay.zhou@huawei.com>) id 1eb4IS-0003cy-Cn
-	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 07:55:29 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1eb4Is-0003qy-S6
+	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 07:55:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jianjay.zhou@huawei.com>) id 1eb4IO-0006xl-3M
-	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 07:55:28 -0500
-Received: from [45.249.212.255] (port=52285 helo=huawei.com)
+	(envelope-from <dgilbert@redhat.com>) id 1eb4Io-0007B9-Uc
+	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 07:55:54 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:38762)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jianjay.zhou@huawei.com>)
-	id 1eb4IM-0006pW-I6
-	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 07:55:24 -0500
-From: "Zhoujian (jay)" <jianjay.zhou@huawei.com>
-Date: Mon, 15 Jan 2018 12:55:03 +0000
-Message-ID: <B2D15215269B544CADD246097EACE7473AB41544@DGGEMM505-MBS.china.huawei.com>
-References: <1515742232-49096-1-git-send-email-jianjay.zhou@huawei.com>
-	<2ec90e7e-0625-62c7-a5a8-3a8aee68114f@redhat.com>
-In-Reply-To: <2ec90e7e-0625-62c7-a5a8-3a8aee68114f@redhat.com>
-Content-Language: zh-CN
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1eb4Io-00079s-Ky
+	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 07:55:50 -0500
+Date: Mon, 15 Jan 2018 12:55:44 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20180115125543.GB2584@work-vm>
+References: <9406328b-b058-2c34-dc32-45b440ea7b80@aptalaska.net>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH] tap: close fd conditionally when error
- occured
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <9406328b-b058-2c34-dc32-45b440ea7b80@aptalaska.net>
+Subject: Re: [Qemu-devel] question: I found a qemu crash about migration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,88 +26,105 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jason Wang <jasowang@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "mst@redhat.com" <mst@redhat.com>, "imammedo@redhat.com" <imammedo@redhat.com>, "Huangweidong (C)" <weidong.huang@huawei.com>, "wangxin (U)" <wangxinxin.wang@huawei.com>, "Gonglei (Arei)" <arei.gonglei@huawei.com>
+To: Matthew Schumacher <matt.s@aptalaska.net>
+Cc: qemu-devel@nongnu.org, kwolf@redhat.com
 
-PiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBKYXNvbiBXYW5nIFttYWlsdG86
-amFzb3dhbmdAcmVkaGF0LmNvbV0NCj4gU2VudDogTW9uZGF5LCBKYW51YXJ5IDE1LCAyMDE4IDM6
-MjEgUE0NCj4gVG86IFpob3VqaWFuIChqYXkpIDxqaWFuamF5Lnpob3VAaHVhd2VpLmNvbT47IHFl
-bXUtZGV2ZWxAbm9uZ251Lm9yZw0KPiBDYzogbXN0QHJlZGhhdC5jb207IGltYW1tZWRvQHJlZGhh
-dC5jb207IEh1YW5nd2VpZG9uZyAoQykNCj4gPHdlaWRvbmcuaHVhbmdAaHVhd2VpLmNvbT47IHdh
-bmd4aW4gKFUpIDx3YW5neGlueGluLndhbmdAaHVhd2VpLmNvbT47IEdvbmdsZWkNCj4gKEFyZWkp
-IDxhcmVpLmdvbmdsZWlAaHVhd2VpLmNvbT4NCj4gU3ViamVjdDogUmU6IFtQQVRDSF0gdGFwOiBj
-bG9zZSBmZCBjb25kaXRpb25hbGx5IHdoZW4gZXJyb3Igb2NjdXJlZA0KPiANCj4gDQo+IA0KPiBP
-biAyMDE45bm0MDHmnIgxMuaXpSAxNTozMCwgSmF5IFpob3Ugd3JvdGU6DQo+ID4gSWYgbmV0ZGV2
-X2FkZCB0YXAsaWQ9bmV0MCx2aG9zdD1vbiBmYWlsZWQgaW4gbmV0X2luaXRfdGFwX29uZSgpLCB0
-aGUNCj4gPiBmb2xsb3dlZCB1cCBkZXZpY2VfYWRkIHZpcnRpby1uZXQtcGNpLG5ldGRldj1uZXQw
-IHdpbGwgZmFpbCB0b28sDQo+ID4gcHJpbnRzOg0KPiA+DQo+ID4gICAgVFVOU0VUT0ZGTE9BRCBp
-b2N0bCgpIGZhaWxlZDogQmFkIGZpbGUgZGVzY3JpcHRvciBUVU5TRVRPRkZMT0FEDQo+ID4gICAg
-aW9jdGwoKSBmYWlsZWQ6IEJhZCBmaWxlIGRlc2NyaXB0b3INCj4gPg0KPiA+IFRoZSByZWFzb24g
-aXMgdGhhdCB0aGUgZmQgb2YgdGFwIGlzIGNsb3NlZCB3aGVuIGVycm9yIG9jY3VyZWQgYWZ0ZXIN
-Cj4gPiBjYWxsaW5nIG5ldF9pbml0X3RhcF9vbmUoKS4NCj4gPg0KPiA+IEkgdGhpbmsgdGhlIGZk
-IHNob3VsZCBiZSBjbG9zZWQgaW4gdGhlc2UgdHdvIGNhc2U6DQo+ID4gICAgMS50YXBfc2V0X3Nu
-ZGJ1ZigpIGZhaWxlZA0KPiA+ICAgIDIudGFwX3NldF9zbmRidWYoKSBzdWNjZWVkZWQgYnV0IHZo
-b3N0IGZhaWxlZCB0byBpbml0aWFsaXplIHdpdGgNCj4gPiAgICAgIHZob3N0Zm9yY2UgZmxhZyBv
-bg0KPiA+IE1lYW53aGlsZSwgdGhlIGZkIHNob3VsZCBub3QgYmUgY2xvc2VkIGp1c3QgYmVjYXVz
-ZSB2aG9zdCBmYWlsZWQgdG8NCj4gPiBpbml0aWFsaXplIGJ1dCB3aXRob3V0IHZob3N0Zm9yY2Ug
-ZmxhZy4gU28gdGhlIGZvbGxvd2VkIHVwIGRldmljZV9hZGQNCj4gPiBjYW4gZmFsbCBiYWNrIHRv
-IHVzZXJzcGFjZSB2aXJ0aW8gc3VjY2Vzc2Z1bGx5Lg0KPiA+DQo+ID4gU3VnZ2VzdGVkLWJ5OiBN
-aWNoYWVsIFMuIFRzaXJraW4gPG1zdEByZWRoYXQuY29tPg0KPiA+IFN1Z2dlc3RlZC1ieTogSWdv
-ciBNYW1tZWRvdiA8aW1hbW1lZG9AcmVkaGF0LmNvbT4NCj4gPiBTdWdnZXN0ZWQtYnk6IEphc29u
-IFdhbmcgPGphc293YW5nQHJlZGhhdC5jb20+DQo+ID4gU2lnbmVkLW9mZi1ieTogSmF5IFpob3Ug
-PGppYW5qYXkuemhvdUBodWF3ZWkuY29tPg0KPiA+IC0tLQ0KPiA+ICAgbmV0L3RhcC5jIHwgMTgg
-KysrKysrKysrKysrKy0tLS0tDQo+ID4gICAxIGZpbGUgY2hhbmdlZCwgMTMgaW5zZXJ0aW9ucygr
-KSwgNSBkZWxldGlvbnMoLSkNCj4gPg0KPiA+IGRpZmYgLS1naXQgYS9uZXQvdGFwLmMgYi9uZXQv
-dGFwLmMNCj4gPiBpbmRleCA5NzllNjIyLi4zZWQ3MmViIDEwMDY0NA0KPiA+IC0tLSBhL25ldC90
-YXAuYw0KPiA+ICsrKyBiL25ldC90YXAuYw0KPiA+IEBAIC02NTEsNiArNjUxLDkgQEAgc3RhdGlj
-IHZvaWQgbmV0X2luaXRfdGFwX29uZShjb25zdCBOZXRkZXZUYXBPcHRpb25zDQo+ICp0YXAsIE5l
-dENsaWVudFN0YXRlICpwZWVyLA0KPiA+ICAgICAgIHRhcF9zZXRfc25kYnVmKHMtPmZkLCB0YXAs
-ICZlcnIpOw0KPiA+ICAgICAgIGlmIChlcnIpIHsNCj4gPiAgICAgICAgICAgZXJyb3JfcHJvcGFn
-YXRlKGVycnAsIGVycik7DQo+ID4gKyAgICAgICAgaWYgKCF0YXAtPmhhc19mZCAmJiAhdGFwLT5o
-YXNfZmRzKSB7DQo+ID4gKyAgICAgICAgICAgIGNsb3NlKGZkKTsNCj4gPiArICAgICAgICB9DQo+
-ID4gICAgICAgICAgIHJldHVybjsNCj4gPiAgICAgICB9DQo+ID4NCj4gPiBAQCAtNjg3LDE0ICs2
-OTAsMTQgQEAgc3RhdGljIHZvaWQgbmV0X2luaXRfdGFwX29uZShjb25zdCBOZXRkZXZUYXBPcHRp
-b25zDQo+ICp0YXAsIE5ldENsaWVudFN0YXRlICpwZWVyLA0KPiA+ICAgICAgICAgICAgICAgdmhv
-c3RmZCA9IG1vbml0b3JfZmRfcGFyYW0oY3VyX21vbiwgdmhvc3RmZG5hbWUsICZlcnIpOw0KPiA+
-ICAgICAgICAgICAgICAgaWYgKHZob3N0ZmQgPT0gLTEpIHsNCj4gPiAgICAgICAgICAgICAgICAg
-ICBlcnJvcl9wcm9wYWdhdGUoZXJycCwgZXJyKTsNCj4gPiAtICAgICAgICAgICAgICAgIHJldHVy
-bjsNCj4gPiArICAgICAgICAgICAgICAgIGdvdG8gY2xlYW51cDsNCj4gPiAgICAgICAgICAgICAg
-IH0NCj4gPiAgICAgICAgICAgfSBlbHNlIHsNCj4gPiAgICAgICAgICAgICAgIHZob3N0ZmQgPSBv
-cGVuKCIvZGV2L3Zob3N0LW5ldCIsIE9fUkRXUik7DQo+ID4gICAgICAgICAgICAgICBpZiAodmhv
-c3RmZCA8IDApIHsNCj4gPiAgICAgICAgICAgICAgICAgICBlcnJvcl9zZXRnX2Vycm5vKGVycnAs
-IGVycm5vLA0KPiA+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgInRhcDogb3Bl
-biB2aG9zdCBjaGFyIGRldmljZSBmYWlsZWQiKTsNCj4gPiAtICAgICAgICAgICAgICAgIHJldHVy
-bjsNCj4gPiArICAgICAgICAgICAgICAgIGdvdG8gY2xlYW51cDsNCj4gPiAgICAgICAgICAgICAg
-IH0NCj4gPiAgICAgICAgICAgICAgIGZjbnRsKHZob3N0ZmQsIEZfU0VURkwsIE9fTk9OQkxPQ0sp
-Ow0KPiA+ICAgICAgICAgICB9DQo+ID4gQEAgLTcwNCwxMSArNzA3LDE4IEBAIHN0YXRpYyB2b2lk
-IG5ldF9pbml0X3RhcF9vbmUoY29uc3QgTmV0ZGV2VGFwT3B0aW9ucw0KPiAqdGFwLCBOZXRDbGll
-bnRTdGF0ZSAqcGVlciwNCj4gPiAgICAgICAgICAgaWYgKCFzLT52aG9zdF9uZXQpIHsNCj4gPiAg
-ICAgICAgICAgICAgIGVycm9yX3NldGcoZXJycCwNCj4gPiAgICAgICAgICAgICAgICAgICAgICAg
-ICAgInZob3N0LW5ldCByZXF1ZXN0ZWQgYnV0IGNvdWxkIG5vdCBiZQ0KPiA+IGluaXRpYWxpemVk
-Iik7DQo+IA0KPiBTbyBlcnJvcl9zZXRnKCkgaXMgbm90IGFwcHJvcHJpYXRlIGhlcmUgY29uc2lk
-ZXIgaXQgd2FzIG5vdCB0cmF0ZWQgYXMgYW4NCj4gZXJyb3IuIFdlIHByb2JhYmx5IGp1c3QgbmVl
-ZCBzb21lIHdhcm5pbmcuDQoNClNob3VsZCBpdCBiZSB3YXJuaW5nIHRvbyBpZiB2aG9zdGZvcmNl
-IGZsYWcgb24/DQoNCj4gDQo+ID4gLSAgICAgICAgICAgIHJldHVybjsNCj4gPiArICAgICAgICAg
-ICAgZ290byBjbGVhbnVwOw0KPiA+ICAgICAgICAgICB9DQo+ID4gICAgICAgfSBlbHNlIGlmICh2
-aG9zdGZkbmFtZSkgew0KPiA+ICAgICAgICAgICBlcnJvcl9zZXRnKGVycnAsICJ2aG9zdGZkKHMp
-PSBpcyBub3QgdmFsaWQgd2l0aG91dCB2aG9zdCIpOw0KPiA+ICAgICAgIH0NCj4gPiArDQo+ID4g
-K2NsZWFudXA6DQo+ID4gKyAgICBpZiAoIXRhcC0+aGFzX2ZkICYmICF0YXAtPmhhc19mZHMgJiYg
-dGFwLT5oYXNfdmhvc3Rmb3JjZSAmJg0KPiA+ICsgICAgICAgIHRhcC0+dmhvc3Rmb3JjZSkgew0K
-PiA+ICsgICAgICAgIGNsb3NlKGZkKTsNCj4gDQo+IEkgd291bGQgc3RpbGwgbGV0IGNhbGxlciB0
-byBkZWNpZGUgd2hldGhlciBvciBub3QgdG8gY2xvc2UgdGhlIGZkLg0KDQpIb3cgYWJvdXQgbW92
-aW5nIHRhcF9zZXRfc25kYnVmKCkgb3V0IG9mIG5ldF9pbml0X3RhcF9vbmUoKT8gU28gdGhlIGNh
-bGxlcg0KY291bGQgZGVjaWRlIHdoZXRoZXIgb3Igbm90IGNsb3NlIHRoZSBmZCBlYXNpbHkoVGhl
-IHJlYXNvbiBpcyBleHBsYWluZWQgaW4NCnRoZSBjb21taXQgbWVzc2FnZSkuIEFueSBiZXR0ZXIg
-c3VnZ2VzdGlvbj8NCg0KUmVnYXJkcywNCkpheQ0KDQo+IA0KPiBUaGFua3MNCj4gDQo+ID4gKyAg
-ICB9DQo+ID4gKyAgICByZXR1cm47DQo+ID4gICB9DQo+ID4NCj4gPiAgIHN0YXRpYyBpbnQgZ2V0
-X2ZkcyhjaGFyICpzdHIsIGNoYXIgKmZkc1tdLCBpbnQgbWF4KSBAQCAtODc3LDcgKzg4Nyw2DQo+
-ID4gQEAgZnJlZV9mYWlsOg0KPiA+ICAgICAgICAgICAgICAgICAgICAgICAgICAgIHZuZXRfaGRy
-LCBmZCwgJmVycik7DQo+ID4gICAgICAgICAgIGlmIChlcnIpIHsNCj4gPiAgICAgICAgICAgICAg
-IGVycm9yX3Byb3BhZ2F0ZShlcnJwLCBlcnIpOw0KPiA+IC0gICAgICAgICAgICBjbG9zZShmZCk7
-DQo+ID4gICAgICAgICAgICAgICByZXR1cm4gLTE7DQo+ID4gICAgICAgICAgIH0NCj4gPiAgICAg
-ICB9IGVsc2Ugew0KPiA+IEBAIC05MTYsNyArOTI1LDYgQEAgZnJlZV9mYWlsOg0KPiA+ICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICB2aG9zdGZkbmFtZSwgdm5ldF9oZHIsIGZkLCAmZXJy
-KTsNCj4gPiAgICAgICAgICAgICAgIGlmIChlcnIpIHsNCj4gPiAgICAgICAgICAgICAgICAgICBl
-cnJvcl9wcm9wYWdhdGUoZXJycCwgZXJyKTsNCj4gPiAtICAgICAgICAgICAgICAgIGNsb3NlKGZk
-KTsNCj4gPiAgICAgICAgICAgICAgICAgICByZXR1cm4gLTE7DQo+ID4gICAgICAgICAgICAgICB9
-DQo+ID4gICAgICAgICAgIH0NCg0K
+* Matthew Schumacher (matt.s@aptalaska.net) wrote:
+> Am 28.09.2017 um 19:01 hat Dr. David Alan Gilbert geschrieben:
+> > Hi,
+> >   This is a 'fun' bug;  I had a good chat to kwolf about it earlier.
+> > A proper fix really needs to be done together with libvirt so that we
+> > can sequence:
+> >    a) The stopping of the CPU on the source
+> >    b) The termination of the mirroring block job
+> >    c) The inactivation of the block devices on the source
+> >        (bdrv_inactivate_all)
+> >    d) The activation of the block devices on the destination
+> >        (bdrv_invalidate_cache_all)
+> >    e) The start of the CPU on the destinationOn 01/12/2018 03:21 PM,
+> qemu-devel-confirm+7e23769bf079599cf1f3db6b00d347e8675d87f
+> 3@nongnu.org wrote:
+> >
+> >
+> > It looks like you're hitting a race between b/c;  we've had races
+> > between c/d in the past and moved the bdrv_inactivate_all.
+> >
+> > During the discussion we ended up with two proposed solutions;
+> > both of them require one extra command and one extra migration
+> > capability.
+> >
+> > The block way
+> > -------------
+> >    1) Add a new migration capability pause-at-complete
+> >    2) Add a new migration state almost-complete
+> >    3) After saving devices, if pause-at-complete is set,
+> >       transition to almost-complete
+> >    4) Add a new command (migration-continue) that
+> >       causes the migration to inactivate the devices (c)
+> >       and send the final EOF to the destination.
+> >
+> > You set pause-at-complete, wait until migrate hits almost-complete;
+> > cleanup the mirror job, and then do migration-continue.  When it
+> > completes do 'cont' on the destination.
+> >
+> > The migration way
+> > -----------------
+> >    1) Stop doing (d) when the destination is started with -S
+> >       since it happens anyway when 'cont' is issued
+> >    2) Add a new migration capability ext-manage-storage
+> >    3) When 'ext-manage-storage' is set, we don't bother doing (c)
+> >    4) Add a new command 'block-inactivate' on the source
+> >
+> > You set ext-manage-storage, do the migrate and when it's finished
+> > clean up the block job, block-inactivate on the source, and
+> > then cont on the destination.
+> >
+> >
+> > My worry about the 'block way' is that the point at which we
+> > do the pause seems pretty interesting;  it probably is best
+> > done after the final device save but before the inactivate,
+> > but could be done before it.  But it probably becomes API
+> > and something might become dependent on where we did it.
+> >
+> > I think Kevin's worry about the 'migration way' is that
+> > it's a bit of a block-specific fudge; which is probably right.
+> >
+> >
+> > I've not really thought what happens when you have a mix of shared and
+> > non-shared storage.
+> >
+> > Could we do any hack that isn't libvirt-visible for existing versions?
+> > I guess maybe hack drive-mirror so it interlocks with the migration
+> > code somehow to hold off on that inactivate?
+> >
+> > This code is visible probalby from 2.9.ish with the new locking code;
+> > but really that b/c race has been there for ever - there's maybe
+> > always the chance that the last few blocks of mirroring might have
+> > happened too late ?
+> >
+> > Thoughts?
+> > What are the libvirt view on the preferred solution.
+> >
+> > Dave
+> 
+> Devs,
+> 
+> Did this issue ever get addressed?  I'm looking at the history for
+> mirror.c at https://github.com/qemu/qemu/commits/master/block/mirror.c
+> and I don't see anything that leads me to believe this was fixed.
+> 
+> I'm still unable to live migrate storage without risking corruption on
+> even a moderately loaded vm.
+
+Yes, there's now a 'pause-before-switchover' which gives libvirt
+a chance to quiesce the block devices.
+That went in my 93fbd0314^..0331c8cabf6168 back in October.
+I believe libvirt uses that; see libvirt commit 6addde2.
+
+Dave
+
+> Thanks,
+> schu
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
