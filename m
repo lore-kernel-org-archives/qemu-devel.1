@@ -1,34 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57304)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57352)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <walling@linux.vnet.ibm.com>) id 1eb7sm-0004v7-Cb
-	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 11:45:18 -0500
+	(envelope-from <walling@linux.vnet.ibm.com>) id 1eb7sq-0004xU-5M
+	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 11:45:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <walling@linux.vnet.ibm.com>) id 1eb7si-00020q-AX
-	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 11:45:12 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:39298)
+	(envelope-from <walling@linux.vnet.ibm.com>) id 1eb7sp-00027v-1Q
+	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 11:45:16 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:42640)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <walling@linux.vnet.ibm.com>)
-	id 1eb7si-0001zd-1Z
-	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 11:45:08 -0500
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
+	id 1eb7so-00026q-Pb
+	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 11:45:14 -0500
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
 	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w0FGdjEx137115
-	for <qemu-devel@nongnu.org>; Mon, 15 Jan 2018 11:45:06 -0500
-Received: from e32.co.us.ibm.com (e32.co.us.ibm.com [32.97.110.150])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2fgucuw76j-1
+	w0FGiuoR008257
+	for <qemu-devel@nongnu.org>; Mon, 15 Jan 2018 11:45:11 -0500
+Received: from e31.co.us.ibm.com (e31.co.us.ibm.com [32.97.110.149])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2fh00agacv-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 15 Jan 2018 11:45:06 -0500
+	for <qemu-devel@nongnu.org>; Mon, 15 Jan 2018 11:45:10 -0500
 Received: from localhost
-	by e32.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	by e31.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
 	Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <walling@linux.vnet.ibm.com>;
-	Mon, 15 Jan 2018 09:45:05 -0700
+	Mon, 15 Jan 2018 09:45:09 -0700
 From: "Collin L. Walling" <walling@linux.vnet.ibm.com>
-Date: Mon, 15 Jan 2018 11:44:18 -0500
+Date: Mon, 15 Jan 2018 11:44:20 -0500
 In-Reply-To: <1516034665-27606-1-git-send-email-walling@linux.vnet.ibm.com>
 References: <1516034665-27606-1-git-send-email-walling@linux.vnet.ibm.com>
-Message-Id: <1516034665-27606-2-git-send-email-walling@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH v3 1/8] s390-ccw: update libc
+Message-Id: <1516034665-27606-4-git-send-email-walling@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH v3 3/8] s390-ccw: parse and set boot menu
+ options
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -40,284 +41,167 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-s390x@nongnu.org, qemu-devel@nongnu.org
 Cc: borntraeger@de.ibm.com, frankja@linux.vnet.ibm.com, cohuck@redhat.com, thuth@redhat.com, david@redhat.com, alifm@linux.vnet.ibm.com
 
-Moved:
-  memcmp from bootmap.h to libc.h (renamed from _memcmp)
-  strlen from sclp.c to libc.h (renamed from _strlen)
+Set boot menu options for an s390 guest and store them in
+the iplb. These options are set via the QEMU command line
+option:
 
-Added C standard functions:
-  isdigit
-  atoi
+    -boot menu=on|off[,splash-time=X]
 
-Added non-C standard function:
-  itostr
+or via the libvirt domain xml:
+
+    <os>
+      <bootmenu enable='yes|no' timeout='X'/>
+    </os>
+
+Where X represents some positive integer representing
+milliseconds.
+
+A loadparm other than 'prompt' will disable the menu and
+just boot the specified entry.
 
 Signed-off-by: Collin L. Walling <walling@linux.vnet.ibm.com>
-Acked-by: Christian Borntraeger <borntraeger@de.ibm.com>
 Reviewed-by: Janosch Frank <frankja@linux.vnet.ibm.com>
 ---
- pc-bios/s390-ccw/Makefile  |  2 +-
- pc-bios/s390-ccw/bootmap.c |  4 +--
- pc-bios/s390-ccw/bootmap.h | 16 +--------
- pc-bios/s390-ccw/libc.c    | 83 ++++++++++++++++++++++++++++++++++++++++++++++
- pc-bios/s390-ccw/libc.h    | 31 +++++++++++++++++
- pc-bios/s390-ccw/main.c    | 17 +---------
- pc-bios/s390-ccw/sclp.c    | 10 +-----
- 7 files changed, 120 insertions(+), 43 deletions(-)
- create mode 100644 pc-bios/s390-ccw/libc.c
+ hw/s390x/ipl.c          | 54 +++++++++++++++++++++++++++++++++++++++++++++++++
+ hw/s390x/ipl.h          | 11 ++++++++--
+ pc-bios/s390-ccw/iplb.h |  8 ++++++--
+ 3 files changed, 69 insertions(+), 4 deletions(-)
 
-diff --git a/pc-bios/s390-ccw/Makefile b/pc-bios/s390-ccw/Makefile
-index 6d0c2ee..9f7904f 100644
---- a/pc-bios/s390-ccw/Makefile
-+++ b/pc-bios/s390-ccw/Makefile
-@@ -9,7 +9,7 @@ $(call set-vpath, $(SRC_PATH)/pc-bios/s390-ccw)
+diff --git a/hw/s390x/ipl.c b/hw/s390x/ipl.c
+index 0d06fc1..81ba9ed 100644
+--- a/hw/s390x/ipl.c
++++ b/hw/s390x/ipl.c
+@@ -23,6 +23,8 @@
+ #include "hw/s390x/ebcdic.h"
+ #include "ipl.h"
+ #include "qemu/error-report.h"
++#include "qemu/config-file.h"
++#include "qemu/cutils.h"
  
- .PHONY : all clean build-all
+ #define KERN_IMAGE_START                0x010000UL
+ #define KERN_PARM_AREA                  0x010480UL
+@@ -219,6 +221,55 @@ static Property s390_ipl_properties[] = {
+     DEFINE_PROP_END_OF_LIST(),
+ };
  
--OBJECTS = start.o main.o bootmap.o sclp.o virtio.o virtio-scsi.o virtio-blkdev.o
-+OBJECTS = start.o main.o bootmap.o sclp.o virtio.o virtio-scsi.o virtio-blkdev.o libc.o
- QEMU_CFLAGS := $(filter -W%, $(QEMU_CFLAGS))
- QEMU_CFLAGS += -ffreestanding -fno-delete-null-pointer-checks -msoft-float
- QEMU_CFLAGS += -march=z900 -fPIE -fno-strict-aliasing
-diff --git a/pc-bios/s390-ccw/bootmap.c b/pc-bios/s390-ccw/bootmap.c
-index 67a6123..6f8e30f 100644
---- a/pc-bios/s390-ccw/bootmap.c
-+++ b/pc-bios/s390-ccw/bootmap.c
-@@ -512,7 +512,7 @@ static bool is_iso_bc_entry_compatible(IsoBcSection *s)
-                     "Failed to read image sector 0");
- 
-     /* Checking bytes 8 - 32 for S390 Linux magic */
--    return !_memcmp(magic_sec + 8, linux_s390_magic, 24);
-+    return !memcmp(magic_sec + 8, linux_s390_magic, 24);
- }
- 
- /* Location of the current sector of the directory */
-@@ -641,7 +641,7 @@ static uint32_t find_iso_bc(void)
-         if (vd->type == VOL_DESC_TYPE_BOOT) {
-             IsoVdElTorito *et = &vd->vd.boot;
- 
--            if (!_memcmp(&et->el_torito[0], el_torito_magic, 32)) {
-+            if (!memcmp(&et->el_torito[0], el_torito_magic, 32)) {
-                 return bswap32(et->bc_offset);
-             }
++static void s390_ipl_set_boot_menu(IplParameterBlock *iplb)
++{
++    QemuOptsList *plist = qemu_find_opts("boot-opts");
++    QemuOpts *opts = QTAILQ_FIRST(&plist->head);
++    uint8_t *flags;
++    uint16_t *timeout;
++    const char *tmp;
++    unsigned long result = 0;
++
++    switch (iplb->pbt) {
++    case S390_IPL_TYPE_CCW:
++        flags = &iplb->ccw.boot_menu_flags;
++        timeout = &iplb->ccw.boot_menu_timeout;
++        break;
++    case S390_IPL_TYPE_QEMU_SCSI:
++        flags = &iplb->scsi.boot_menu_flags;
++        timeout = &iplb->scsi.boot_menu_timeout;
++        break;
++    default:
++        error_report("boot menu is not supported for this device type.");
++        return;
++    }
++
++    /* In the absence of -boot menu, use zipl parameters */
++    if (!qemu_opt_get(opts, "menu")) {
++        *flags = BOOT_MENU_FLAG_ZIPL_OPTS;
++    } else if (boot_menu) {
++        *flags = BOOT_MENU_FLAG_BOOT_OPTS;
++
++        tmp = qemu_opt_get(opts, "splash-time");
++
++        if (tmp && qemu_strtoul(tmp, NULL, 10, &result)) {
++            error_report("splash-time value is invalid, forcing it to 0.");
++            return;
++        }
++
++        result /= 1000; /* Store timeout value as seconds */
++
++        if (result > 0xffff) {
++            error_report("splash-time value is greater than 65535000,"
++                         " forcing it to 65535000.");
++            *timeout = 0xffff;
++            return;
++        }
++
++        *timeout = cpu_to_be16(result);
++    }
++}
++
+ static bool s390_gen_initial_iplb(S390IPLState *ipl)
+ {
+     DeviceState *dev_st;
+@@ -273,6 +324,9 @@ static bool s390_gen_initial_iplb(S390IPLState *ipl)
+         if (!s390_ipl_set_loadparm(ipl->iplb.loadparm)) {
+             ipl->iplb.flags |= DIAG308_FLAGS_LP_VALID;
          }
-diff --git a/pc-bios/s390-ccw/bootmap.h b/pc-bios/s390-ccw/bootmap.h
-index cf99a4c..4980838 100644
---- a/pc-bios/s390-ccw/bootmap.h
-+++ b/pc-bios/s390-ccw/bootmap.h
-@@ -310,20 +310,6 @@ static inline bool magic_match(const void *data, const void *magic)
-     return *((uint32_t *)data) == *((uint32_t *)magic);
- }
++
++        s390_ipl_set_boot_menu(&ipl->iplb);
++
+         return true;
+     }
  
--static inline int _memcmp(const void *s1, const void *s2, size_t n)
--{
--    int i;
--    const uint8_t *p1 = s1, *p2 = s2;
--
--    for (i = 0; i < n; i++) {
--        if (p1[i] != p2[i]) {
--            return p1[i] > p2[i] ? 1 : -1;
--        }
--    }
--
--    return 0;
--}
--
- static inline uint32_t iso_733_to_u32(uint64_t x)
- {
-     return (uint32_t)x;
-@@ -416,7 +402,7 @@ const uint8_t vol_desc_magic[] = "CD001";
+diff --git a/hw/s390x/ipl.h b/hw/s390x/ipl.h
+index 8a705e0..48e82cf 100644
+--- a/hw/s390x/ipl.h
++++ b/hw/s390x/ipl.h
+@@ -15,9 +15,14 @@
+ #include "hw/qdev.h"
+ #include "cpu.h"
  
- static inline bool is_iso_vd_valid(IsoVolDesc *vd)
- {
--    return !_memcmp(&vd->ident[0], vol_desc_magic, 5) &&
-+    return !memcmp(&vd->ident[0], vol_desc_magic, 5) &&
-            vd->version == 0x1 &&
-            vd->type <= VOL_DESC_TYPE_PARTITION;
- }
-diff --git a/pc-bios/s390-ccw/libc.c b/pc-bios/s390-ccw/libc.c
-new file mode 100644
-index 0000000..3ce0fb7
---- /dev/null
-+++ b/pc-bios/s390-ccw/libc.c
-@@ -0,0 +1,83 @@
-+/*
-+ * libc-style definitions and functions
-+ *
-+ * This code is free software; you can redistribute it and/or modify it
-+ * under the terms of the GNU General Public License as published by the
-+ * Free Software Foundation; either version 2 of the License, or (at your
-+ * option) any later version.
-+ */
++#define BOOT_MENU_FLAG_BOOT_OPTS 0x80
++#define BOOT_MENU_FLAG_ZIPL_OPTS 0x40
 +
-+#include "libc.h"
-+#include "s390-ccw.h"
-+
-+/**
-+ * atoi:
-+ * @str: the string to be converted.
-+ *
-+ * Given a string @str, convert it to an integer. Any non-numerical value
-+ * will terminate the conversion.
-+ *
-+ * Returns: an integer converted from the string @str.
-+ */
-+int atoi(const char *str)
-+{
-+    int i;
-+    int val = 0;
-+
-+    for (i = 0; str[i]; i++) {
-+        char c = str[i];
-+        if (!isdigit(c)) {
-+            break;
-+        }
-+        val *= 10;
-+        val += c - '0';
-+    }
-+
-+    return val;
-+}
-+
-+/**
-+ * itostr:
-+ * @num: the integer to be converted.
-+ * @str: a pointer to a string to store the conversion.
-+ * @len: the length of the passed string.
-+ *
-+ * Given an integer @num, convert it to a string. The string @str must be
-+ * allocated beforehand. The resulting string will be null terminated and
-+ * returned.
-+ *
-+ * Returns: the string @str of the converted integer @num.
-+ */
-+static char *_itostr(int num, char *str, size_t len)
-+{
-+    long num_len = 1;
-+    int tmp = num;
-+    int i;
-+
-+    /* Count length of num */
-+    while ((tmp /= 10) > 0) {
-+        num_len++;
-+    }
-+
-+    /* Check if we have enough space for num and null */
-+    if (len <= num_len) {
-+        return 0;
-+    }
-+
-+    /* Convert int to string */
-+    for (i = num_len - 1; i >= 0; i--) {
-+        str[i] = num % 10 + '0';
-+        num /= 10;
-+    }
-+
-+    str[num_len] = '\0';
-+
-+    return str;
-+}
-+
-+char *itostr(int num, char *str, size_t len)
-+{
-+    char *tmp = _itostr(num, str, len);
-+    IPL_assert(tmp != 0, "array too small for itostr conversion");
-+    return tmp;
-+}
-diff --git a/pc-bios/s390-ccw/libc.h b/pc-bios/s390-ccw/libc.h
-index 0142ea8..00268e3 100644
---- a/pc-bios/s390-ccw/libc.h
-+++ b/pc-bios/s390-ccw/libc.h
-@@ -42,4 +42,35 @@ static inline void *memcpy(void *s1, const void *s2, size_t n)
-     return s1;
- }
+ struct IplBlockCcw {
+     uint64_t netboot_start_addr;
+-    uint8_t  reserved0[77];
++    uint8_t  reserved0[74];
++    uint16_t boot_menu_timeout;
++    uint8_t  boot_menu_flags;
+     uint8_t  ssid;
+     uint16_t devno;
+     uint8_t  vm_flags;
+@@ -51,7 +56,9 @@ struct IplBlockQemuScsi {
+     uint32_t lun;
+     uint16_t target;
+     uint16_t channel;
+-    uint8_t  reserved0[77];
++    uint8_t  reserved0[74];
++    uint16_t boot_menu_timeout;
++    uint8_t  boot_menu_flags;
+     uint8_t  ssid;
+     uint16_t devno;
+ } QEMU_PACKED;
+diff --git a/pc-bios/s390-ccw/iplb.h b/pc-bios/s390-ccw/iplb.h
+index 890aed9..fe909d2 100644
+--- a/pc-bios/s390-ccw/iplb.h
++++ b/pc-bios/s390-ccw/iplb.h
+@@ -14,7 +14,9 @@
  
-+static inline int memcmp(const void *s1, const void *s2, size_t n)
-+{
-+    int i;
-+    const uint8_t *p1 = s1, *p2 = s2;
-+
-+    for (i = 0; i < n; i++) {
-+        if (p1[i] != p2[i]) {
-+            return p1[i] > p2[i] ? 1 : -1;
-+        }
-+    }
-+
-+    return 0;
-+}
-+
-+static inline size_t strlen(const char *str)
-+{
-+    size_t i;
-+    for (i = 0; *str; i++) {
-+        str++;
-+    }
-+    return i;
-+}
-+
-+static inline int isdigit(int c)
-+{
-+    return (c >= '0') && (c <= '9');
-+}
-+
-+int atoi(const char *str);
-+char *itostr(int num, char *str, size_t len);
-+
- #endif
-diff --git a/pc-bios/s390-ccw/main.c b/pc-bios/s390-ccw/main.c
-index 401e9db..a8ef120 100644
---- a/pc-bios/s390-ccw/main.c
-+++ b/pc-bios/s390-ccw/main.c
-@@ -40,22 +40,7 @@ void panic(const char *string)
- 
- unsigned int get_loadparm_index(void)
- {
--    const char *lp = loadparm;
--    int i;
--    unsigned int idx = 0;
--
--    for (i = 0; i < 8; i++) {
--        char c = lp[i];
--
--        if (c < '0' || c > '9') {
--            break;
--        }
--
--        idx *= 10;
--        idx += c - '0';
--    }
--
--    return idx;
-+    return atoi(loadparm);
- }
- 
- static bool find_dev(Schib *schib, int dev_no)
-diff --git a/pc-bios/s390-ccw/sclp.c b/pc-bios/s390-ccw/sclp.c
-index b1fc8ff..486fce1 100644
---- a/pc-bios/s390-ccw/sclp.c
-+++ b/pc-bios/s390-ccw/sclp.c
-@@ -65,14 +65,6 @@ void sclp_setup(void)
-     sclp_set_write_mask();
- }
- 
--static int _strlen(const char *str)
--{
--    int i;
--    for (i = 0; *str; i++)
--        str++;
--    return i;
--}
--
- long write(int fd, const void *str, size_t len)
- {
-     WriteEventData *sccb = (void *)_sccb;
-@@ -95,7 +87,7 @@ long write(int fd, const void *str, size_t len)
- 
- void sclp_print(const char *str)
- {
--    write(1, str, _strlen(str));
-+    write(1, str, strlen(str));
- }
- 
- void sclp_get_loadparm_ascii(char *loadparm)
+ struct IplBlockCcw {
+     uint64_t netboot_start_addr;
+-    uint8_t  reserved0[77];
++    uint8_t  reserved0[74];
++    uint16_t boot_menu_timeout;
++    uint8_t  boot_menu_flags;
+     uint8_t  ssid;
+     uint16_t devno;
+     uint8_t  vm_flags;
+@@ -48,7 +50,9 @@ struct IplBlockQemuScsi {
+     uint32_t lun;
+     uint16_t target;
+     uint16_t channel;
+-    uint8_t  reserved0[77];
++    uint8_t  reserved0[74];
++    uint16_t boot_menu_timeout;
++    uint8_t  boot_menu_flags;
+     uint8_t  ssid;
+     uint16_t devno;
+ } __attribute__ ((packed));
 -- 
 2.7.4
