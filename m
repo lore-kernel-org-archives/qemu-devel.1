@@ -1,27 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55077)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55061)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eb29g-0002hW-HN
-	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 05:38:17 -0500
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1eb29f-0002gB-3x
+	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 05:38:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eb29f-0005Pe-OQ
-	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 05:38:16 -0500
-Received: from mail-oi0-x230.google.com ([2607:f8b0:4003:c06::230]:37228)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1eb29f-0005OV-Hp
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1eb29b-0005ME-2W
 	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 05:38:15 -0500
-Received: by mail-oi0-x230.google.com with SMTP id e144so7973745oib.4
-	for <qemu-devel@nongnu.org>; Mon, 15 Jan 2018 02:38:15 -0800 (PST)
+Received: from mail-qk0-x22b.google.com ([2607:f8b0:400d:c09::22b]:45102)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1eb29a-0005M0-TS
+	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 05:38:10 -0500
+Received: by mail-qk0-x22b.google.com with SMTP id z12so16163715qkf.12
+	for <qemu-devel@nongnu.org>; Mon, 15 Jan 2018 02:38:10 -0800 (PST)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20180115102621.9183-1-berrange@redhat.com>
+	<20180115102621.9183-3-berrange@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <217d47b6-679e-bd53-a60d-37fba1065c77@amsat.org>
+Date: Mon, 15 Jan 2018 07:38:06 -0300
 MIME-Version: 1.0
-In-Reply-To: <eb24b3ef-40ff-6565-ddd7-15103a06d1aa@redhat.com>
-References: <1515759853-20360-1-git-send-email-pbonzini@redhat.com>
-	<CAFEAcA_0uFXKY8Xg-FN+AgqVGoL+SJa-FPC8vyw-wLHazu6JEA@mail.gmail.com>
-	<eb24b3ef-40ff-6565-ddd7-15103a06d1aa@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 15 Jan 2018 10:37:54 +0000
-Message-ID: <CAFEAcA8FXcQP8m7_DtN0_Ax7TFHTZcLQR_eRuEj7Tf7OEb_Ywg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL v2 00/52] Misc patches for 2017-01-12
+In-Reply-To: <20180115102621.9183-3-berrange@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v3 02/13] qapi: use items()/values() intead
+ of iteritems()/itervalues()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,15 +36,104 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: qemu-devel@nongnu.org, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Fam Zheng <famz@redhat.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-On 12 January 2018 at 13:42, Paolo Bonzini <pbonzini@redhat.com> wrote:
-> I'll drop that patch.
+On 01/15/2018 07:26 AM, Daniel P. Berrange wrote:
+> The iteritems()/itervalues() methods are gone in py3, but the
+> items()/values() methods are still around. The latter are less
+> efficient than the former in py2, but this has unmeasurably
+> small impact on QEMU build time, so taking portability over
+> efficiency is a net win
+> 
+> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
 
-I'm assuming you'll send a new pull req cover letter email
-when you've done that (so this one is leaving my queue of
-things to do).
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-thanks
--- PMM
+> ---
+>  scripts/qapi.py                | 12 ++++++------
+>  scripts/qapi2texi.py           |  2 +-
+>  tests/qapi-schema/test-qapi.py |  2 +-
+>  3 files changed, 8 insertions(+), 8 deletions(-)
+> 
+> diff --git a/scripts/qapi.py b/scripts/qapi.py
+> index 924c762381..5ef50317ca 100644
+> --- a/scripts/qapi.py
+> +++ b/scripts/qapi.py
+> @@ -245,7 +245,7 @@ class QAPIDoc(object):
+>                                 "'Returns:' is only valid for commands")
+>  
+>      def check(self):
+> -        bogus = [name for name, section in self.args.iteritems()
+> +        bogus = [name for name, section in self.args.items()
+>                   if not section.member]
+>          if bogus:
+>              raise QAPISemError(
+> @@ -300,7 +300,7 @@ class QAPISchemaParser(object):
+>                  if not isinstance(pragma, dict):
+>                      raise QAPISemError(
+>                          info, "Value of 'pragma' must be a dictionary")
+> -                for name, value in pragma.iteritems():
+> +                for name, value in pragma.items():
+>                      self._pragma(name, value, info)
+>              else:
+>                  expr_elem = {'expr': expr,
+> @@ -1566,7 +1566,7 @@ class QAPISchema(object):
+>  
+>      def _make_members(self, data, info):
+>          return [self._make_member(key, value, info)
+> -                for (key, value) in data.iteritems()]
+> +                for (key, value) in data.items()]
+>  
+>      def _def_struct_type(self, expr, info, doc):
+>          name = expr['struct']
+> @@ -1598,11 +1598,11 @@ class QAPISchema(object):
+>                  name, info, doc, 'base', self._make_members(base, info)))
+>          if tag_name:
+>              variants = [self._make_variant(key, value)
+> -                        for (key, value) in data.iteritems()]
+> +                        for (key, value) in data.items()]
+>              members = []
+>          else:
+>              variants = [self._make_simple_variant(key, value, info)
+> -                        for (key, value) in data.iteritems()]
+> +                        for (key, value) in data.items()]
+>              typ = self._make_implicit_enum_type(name, info,
+>                                                  [v.name for v in variants])
+>              tag_member = QAPISchemaObjectTypeMember('type', typ, False)
+> @@ -1617,7 +1617,7 @@ class QAPISchema(object):
+>          name = expr['alternate']
+>          data = expr['data']
+>          variants = [self._make_variant(key, value)
+> -                    for (key, value) in data.iteritems()]
+> +                    for (key, value) in data.items()]
+>          tag_member = QAPISchemaObjectTypeMember('type', 'QType', False)
+>          self._def_entity(
+>              QAPISchemaAlternateType(name, info, doc,
+> diff --git a/scripts/qapi2texi.py b/scripts/qapi2texi.py
+> index 6630138192..d155cf099e 100755
+> --- a/scripts/qapi2texi.py
+> +++ b/scripts/qapi2texi.py
+> @@ -146,7 +146,7 @@ def texi_member(member, suffix=''):
+>  def texi_members(doc, what, base, variants, member_func):
+>      """Format the table of members"""
+>      items = ''
+> -    for section in doc.args.itervalues():
+> +    for section in doc.args.values():
+>          # TODO Drop fallbacks when undocumented members are outlawed
+>          if section.text:
+>              desc = texi_format(section.text)
+> diff --git a/tests/qapi-schema/test-qapi.py b/tests/qapi-schema/test-qapi.py
+> index aad407e0df..f535bc1c0c 100644
+> --- a/tests/qapi-schema/test-qapi.py
+> +++ b/tests/qapi-schema/test-qapi.py
+> @@ -63,7 +63,7 @@ for doc in schema.docs:
+>      else:
+>          print ('doc freeform')
+>      print ('    body=\n%s' % doc.body.text)
+> -    for arg, section in doc.args.iteritems():
+> +    for arg, section in doc.args.items():
+>          print ('    arg=%s\n%s' % (arg, section.text))
+>      for section in doc.sections:
+>          print ('    section=%s\n%s' % (section.name, section.text))
+> 
