@@ -1,28 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52329)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55731)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1eb0Oe-0000Hd-PW
-	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 03:45:38 -0500
+	(envelope-from <peterx@redhat.com>) id 1eb0YS-0003jt-UY
+	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 03:55:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1eb0Ob-0000kz-MF
-	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 03:45:36 -0500
-Received: from 7.mo177.mail-out.ovh.net ([46.105.61.149]:52090)
+	(envelope-from <peterx@redhat.com>) id 1eb0YP-0007my-Qt
+	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 03:55:45 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:51230)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1eb0Ob-0000bS-Cg
-	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 03:45:33 -0500
-Received: from player714.ha.ovh.net (b6.ovh.net [213.186.33.56])
-	by mo177.mail-out.ovh.net (Postfix) with ESMTP id 1FCDF95B68
-	for <qemu-devel@nongnu.org>; Mon, 15 Jan 2018 09:45:22 +0100 (CET)
-Date: Mon, 15 Jan 2018 09:45:11 +0100
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20180115094511.3a3fdb94@bahia.lan>
-In-Reply-To: <20180115072715.25921-2-david@gibson.dropbear.id.au>
-References: <20180115072715.25921-1-david@gibson.dropbear.id.au>
-	<20180115072715.25921-2-david@gibson.dropbear.id.au>
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1eb0YP-0007lw-HT
+	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 03:55:41 -0500
+From: Peter Xu <peterx@redhat.com>
+Date: Mon, 15 Jan 2018 16:55:28 +0800
+Message-Id: <20180115085528.32663-1-peterx@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 1/2] target/ppc: Clarify compat mode
- max_threads value
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH] fw_cfg: don't use DMA mapping for fw_cfg device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,143 +24,155 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: joserz@linux.vnet.ibm.com, surajjs@au1.ibm.com, sam.bobroff@au1.ibm.com, lvivier@redhat.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+Cc: "Michael S . Tsirkin" <mst@redhat.com>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, Baoquan He <bhe@redhat.com>, peterx@redhat.com
 
-On Mon, 15 Jan 2018 18:27:14 +1100
-David Gibson <david@gibson.dropbear.id.au> wrote:
+fw_cfg device does not need IOMMU protection, so use physical addresses
+always.  That's how QEMU implements fw_cfg.  Otherwise we'll see call
+traces during boot when vIOMMU is enabled in guest:
 
-> We recently had some discussions that were sidetracked for a while, because
-> nearly everyone misapprehended the purpose of the 'max_threads' field in
-> the compatiblity modes table.  It's all about guest expectations, not host
-> expectations or support (that's handled elsewhere).
-> 
-> In an attempt to avoid a repeat of that confusion, rename the field to
-> 'max_vthreads' and add an explanatory comment.
-> 
-> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-> ---
+[    1.018306] ------------[ cut here ]------------
+[    1.018314] WARNING: CPU: 1 PID: 1 at drivers/firmware/qemu_fw_cfg.c:1=
+52 fw_cfg_dma_transfer+0x399/0x500
+[    1.018315] fw_cfg_dma_transfer: failed to map fw_cfg_dma
+[    1.018316] Modules linked in:
+[    1.018320] CPU: 1 PID: 1 Comm: swapper/0 Not tainted 3.10.0-827.el7.x=
+86_64 #1
+[    1.018321] Hardware name: Red Hat KVM, BIOS 1.11.0-1.el7 04/01/2014
+[    1.018322] Call Trace:
+[    1.018330]  [<ffffffffafcf6b3a>] dump_stack+0x19/0x1b
+[    1.018334]  [<ffffffffaf68fff8>] __warn+0xd8/0x100
+[    1.018336]  [<ffffffffaf69007f>] warn_slowpath_fmt+0x5f/0x80
+[    1.018338]  [<ffffffffafb67329>] fw_cfg_dma_transfer+0x399/0x500
+[    1.018340]  [<ffffffffafb6753c>] fw_cfg_read_blob+0xac/0x1c0
+[    1.018342]  [<ffffffffafb67720>] fw_cfg_register_dir_entries+0x80/0x4=
+50
+[    1.018344]  [<ffffffffafb67d02>] fw_cfg_sysfs_probe+0x212/0x3f0
+[    1.018347]  [<ffffffffafa70352>] platform_drv_probe+0x42/0x110
+[    1.018350]  [<ffffffffafa6e002>] driver_probe_device+0xc2/0x3e0
+[    1.018352]  [<ffffffffafa6e3f3>] __driver_attach+0x93/0xa0
+[    1.018354]  [<ffffffffafa6e360>] ? __device_attach+0x40/0x40
+[    1.018359]  [<ffffffffafa6bbd3>] bus_for_each_dev+0x73/0xc0
+[    1.018362]  [<ffffffffafa6d97e>] driver_attach+0x1e/0x20
+[    1.018364]  [<ffffffffafa6d420>] bus_add_driver+0x200/0x2d0
+[    1.018366]  [<ffffffffb03c2041>] ? firmware_map_add_early+0x58/0x58
+[    1.018368]  [<ffffffffafa6ea84>] driver_register+0x64/0xf0
+[    1.018370]  [<ffffffffafa7013a>] __platform_driver_register+0x4a/0x50
+[    1.018372]  [<ffffffffb03c2075>] fw_cfg_sysfs_init+0x34/0x61
+[    1.018376]  [<ffffffffaf602108>] do_one_initcall+0xb8/0x230
+[    1.018379]  [<ffffffffb036b34a>] kernel_init_freeable+0x17a/0x219
+[    1.018381]  [<ffffffffb036ab19>] ? initcall_blacklist+0xb0/0xb0
+[    1.018383]  [<ffffffffafce5b30>] ? rest_init+0x80/0x80
+[    1.018385]  [<ffffffffafce5b3e>] kernel_init+0xe/0xf0
+[    1.018388]  [<ffffffffafd08898>] ret_from_fork+0x58/0x90
+[    1.018390]  [<ffffffffafce5b30>] ? rest_init+0x80/0x80
+[    1.018392] ---[ end trace d00a5b71608a8f59 ]---
 
-Reviewed-by: Greg Kurz <groug@kaod.org>
+Bug: https://bugzilla.redhat.com/show_bug.cgi?id=3D1533367
+Fixes: e90cb816599b ("fw_cfg: do DMA read operation", 2017-11-28)
+CC: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+CC: Michael S. Tsirkin <mst@redhat.com>
+Signed-off-by: Peter Xu <peterx@redhat.com>
+--
 
->  hw/ppc/spapr.c      |  4 ++--
->  target/ppc/compat.c | 25 +++++++++++++++++--------
->  target/ppc/cpu.h    |  2 +-
->  3 files changed, 20 insertions(+), 11 deletions(-)
-> 
-> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> index 3e528fe91e..e35214bfc3 100644
-> --- a/hw/ppc/spapr.c
-> +++ b/hw/ppc/spapr.c
-> @@ -345,7 +345,7 @@ static int spapr_fixup_cpu_dt(void *fdt, sPAPRMachineState *spapr)
->          PowerPCCPU *cpu = POWERPC_CPU(cs);
->          DeviceClass *dc = DEVICE_GET_CLASS(cs);
->          int index = spapr_vcpu_id(cpu);
-> -        int compat_smt = MIN(smp_threads, ppc_compat_max_threads(cpu));
-> +        int compat_smt = MIN(smp_threads, ppc_compat_max_vthreads(cpu));
->  
->          if ((index % smt) != 0) {
->              continue;
-> @@ -503,7 +503,7 @@ static void spapr_populate_cpu_dt(CPUState *cs, void *fdt, int offset,
->      size_t page_sizes_prop_size;
->      uint32_t vcpus_per_socket = smp_threads * smp_cores;
->      uint32_t pft_size_prop[] = {0, cpu_to_be32(spapr->htab_shift)};
-> -    int compat_smt = MIN(smp_threads, ppc_compat_max_threads(cpu));
-> +    int compat_smt = MIN(smp_threads, ppc_compat_max_vthreads(cpu));
->      sPAPRDRConnector *drc;
->      int drc_index;
->      uint32_t radix_AP_encodings[PPC_PAGE_SIZES_MAX_SZ];
-> diff --git a/target/ppc/compat.c b/target/ppc/compat.c
-> index 276b5b52c2..807c906f68 100644
-> --- a/target/ppc/compat.c
-> +++ b/target/ppc/compat.c
-> @@ -32,7 +32,16 @@ typedef struct {
->      uint32_t pvr;
->      uint64_t pcr;
->      uint64_t pcr_level;
-> -    int max_threads;
-> +
-> +    /*
-> +     * Maximum allowed virtual threads per virtual core
-> +     *
-> +     * This is to stop older guests getting confused by seeing more
-> +     * threads than they think the cpu can support.  Usually it's
-> +     * equal to the number of threads supported on bare metal
-> +     * hardware, but not always (see POWER9).
-> +     */
-> +    int max_vthreads;
->  } CompatInfo;
->  
->  static const CompatInfo compat_table[] = {
-> @@ -45,28 +54,28 @@ static const CompatInfo compat_table[] = {
->          .pcr = PCR_COMPAT_3_00 | PCR_COMPAT_2_07 | PCR_COMPAT_2_06 |
->                 PCR_COMPAT_2_05 | PCR_TM_DIS | PCR_VSX_DIS,
->          .pcr_level = PCR_COMPAT_2_05,
-> -        .max_threads = 2,
-> +        .max_vthreads = 2,
->      },
->      { /* POWER7, ISA2.06 */
->          .name = "power7",
->          .pvr = CPU_POWERPC_LOGICAL_2_06,
->          .pcr = PCR_COMPAT_3_00 | PCR_COMPAT_2_07 | PCR_COMPAT_2_06 | PCR_TM_DIS,
->          .pcr_level = PCR_COMPAT_2_06,
-> -        .max_threads = 4,
-> +        .max_vthreads = 4,
->      },
->      {
->          .name = "power7+",
->          .pvr = CPU_POWERPC_LOGICAL_2_06_PLUS,
->          .pcr = PCR_COMPAT_3_00 | PCR_COMPAT_2_07 | PCR_COMPAT_2_06 | PCR_TM_DIS,
->          .pcr_level = PCR_COMPAT_2_06,
-> -        .max_threads = 4,
-> +        .max_vthreads = 4,
->      },
->      { /* POWER8, ISA2.07 */
->          .name = "power8",
->          .pvr = CPU_POWERPC_LOGICAL_2_07,
->          .pcr = PCR_COMPAT_3_00 | PCR_COMPAT_2_07,
->          .pcr_level = PCR_COMPAT_2_07,
-> -        .max_threads = 8,
-> +        .max_vthreads = 8,
->      },
->      { /* POWER9, ISA3.00 */
->          .name = "power9",
-> @@ -80,7 +89,7 @@ static const CompatInfo compat_table[] = {
->           * confusing if half of the threads disappear from the guest
->           * if it announces it's POWER9 aware at CAS time.
->           */
-> -        .max_threads = 8,
-> +        .max_vthreads = 8,
->      },
->  };
->  
-> @@ -192,14 +201,14 @@ void ppc_set_compat_all(uint32_t compat_pvr, Error **errp)
->      }
->  }
->  
-> -int ppc_compat_max_threads(PowerPCCPU *cpu)
-> +int ppc_compat_max_vthreads(PowerPCCPU *cpu)
->  {
->      const CompatInfo *compat = compat_by_pvr(cpu->compat_pvr);
->      int n_threads = CPU(cpu)->nr_threads;
->  
->      if (cpu->compat_pvr) {
->          g_assert(compat);
-> -        n_threads = MIN(n_threads, compat->max_threads);
-> +        n_threads = MIN(n_threads, compat->max_vthreads);
->      }
->  
->      return n_threads;
-> diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
-> index a5e49f23e9..dc6820c5eb 100644
-> --- a/target/ppc/cpu.h
-> +++ b/target/ppc/cpu.h
-> @@ -1395,7 +1395,7 @@ void ppc_set_compat(PowerPCCPU *cpu, uint32_t compat_pvr, Error **errp);
->  #if !defined(CONFIG_USER_ONLY)
->  void ppc_set_compat_all(uint32_t compat_pvr, Error **errp);
->  #endif
-> -int ppc_compat_max_threads(PowerPCCPU *cpu);
-> +int ppc_compat_max_vthreads(PowerPCCPU *cpu);
->  void ppc_compat_add_property(Object *obj, const char *name,
->                               uint32_t *compat_pvr, const char *basedesc,
->                               Error **errp);
+This is based on tree:
+  https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git/log/?h=3D=
+vhost
+
+Please review, thanks.
+
+Signed-off-by: Peter Xu <peterx@redhat.com>
+---
+ drivers/firmware/qemu_fw_cfg.c | 37 ++++++++----------------------------=
+-
+ 1 file changed, 8 insertions(+), 29 deletions(-)
+
+diff --git a/drivers/firmware/qemu_fw_cfg.c b/drivers/firmware/qemu_fw_cf=
+g.c
+index 6eb5d8f43c3e..62a44bc81a88 100644
+--- a/drivers/firmware/qemu_fw_cfg.c
++++ b/drivers/firmware/qemu_fw_cfg.c
+@@ -106,11 +106,12 @@ static inline bool fw_cfg_dma_enabled(void)
+ }
+=20
+ /* qemu fw_cfg device is sync today, but spec says it may become async *=
+/
+-static void fw_cfg_wait_for_control(struct fw_cfg_dma *d, dma_addr_t dma=
+)
++static void fw_cfg_wait_for_control(struct fw_cfg_dma *d)
+ {
+ 	do {
+-		dma_sync_single_for_cpu(dev, dma, sizeof(*d), DMA_FROM_DEVICE);
+-		if ((be32_to_cpu(d->control) & ~FW_CFG_DMA_CTL_ERROR) =3D=3D 0)
++		u32 ctrl =3D be32_to_cpu(READ_ONCE(d->control));
++
++		if ((ctrl & ~FW_CFG_DMA_CTL_ERROR) =3D=3D 0)
+ 			return;
+=20
+ 		usleep_range(50, 100);
+@@ -119,21 +120,9 @@ static void fw_cfg_wait_for_control(struct fw_cfg_dm=
+a *d, dma_addr_t dma)
+=20
+ static ssize_t fw_cfg_dma_transfer(void *address, u32 length, u32 contro=
+l)
+ {
+-	dma_addr_t dma_addr =3D 0;
+ 	struct fw_cfg_dma *d =3D NULL;
+-	dma_addr_t dma;
+ 	ssize_t ret =3D length;
+-	enum dma_data_direction dir =3D
+-		(control & FW_CFG_DMA_CTL_READ ? DMA_FROM_DEVICE : 0) |
+-		(control & FW_CFG_DMA_CTL_WRITE ? DMA_TO_DEVICE : 0);
+-
+-	if (address && length) {
+-		dma_addr =3D dma_map_single(dev, address, length, dir);
+-		if (dma_mapping_error(NULL, dma_addr)) {
+-			WARN(1, "%s: failed to map address\n", __func__);
+-			return -EFAULT;
+-		}
+-	}
++	phys_addr_t dma;
+=20
+ 	d =3D kmalloc(sizeof(*d), GFP_KERNEL);
+ 	if (!d) {
+@@ -142,34 +131,24 @@ static ssize_t fw_cfg_dma_transfer(void *address, u=
+32 length, u32 control)
+ 	}
+=20
+ 	*d =3D (struct fw_cfg_dma) {
+-		.address =3D cpu_to_be64(dma_addr),
++		.address =3D cpu_to_be64(virt_to_phys(address)),
+ 		.length =3D cpu_to_be32(length),
+ 		.control =3D cpu_to_be32(control)
+ 	};
+=20
+-	dma =3D dma_map_single(dev, d, sizeof(*d), DMA_BIDIRECTIONAL);
+-	if (dma_mapping_error(NULL, dma)) {
+-		WARN(1, "%s: failed to map fw_cfg_dma\n", __func__);
+-		ret =3D -EFAULT;
+-		goto end;
+-	}
++	dma =3D virt_to_phys(d);
+=20
+ 	iowrite32be((u64)dma >> 32, fw_cfg_reg_dma);
+ 	iowrite32be(dma, fw_cfg_reg_dma + 4);
+=20
+-	fw_cfg_wait_for_control(d, dma);
++	fw_cfg_wait_for_control(d);
+=20
+ 	if (be32_to_cpu(d->control) & FW_CFG_DMA_CTL_ERROR) {
+ 		ret =3D -EIO;
+ 	}
+=20
+-	dma_unmap_single(dev, dma, sizeof(*d), DMA_BIDIRECTIONAL);
+-
+ end:
+ 	kfree(d);
+-	if (dma_addr)
+-		dma_unmap_single(dev, dma_addr, length, dir);
+-
+ 	return ret;
+ }
+=20
+--=20
+2.14.3
