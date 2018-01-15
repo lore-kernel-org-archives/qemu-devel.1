@@ -1,31 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44764)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45912)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eb5rH-00041X-Nw
-	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 09:35:32 -0500
+	(envelope-from <thuth@redhat.com>) id 1eb5tz-0006Kf-Pr
+	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 09:38:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eb5rG-00016f-HW
-	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 09:35:31 -0500
-Received: from mail-qt0-x244.google.com ([2607:f8b0:400d:c0d::244]:40517)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eb5rG-00016U-2w
-	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 09:35:30 -0500
-Received: by mail-qt0-x244.google.com with SMTP id u42so14364840qte.7
-	for <qemu-devel@nongnu.org>; Mon, 15 Jan 2018 06:35:29 -0800 (PST)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Mon, 15 Jan 2018 11:34:58 -0300
-Message-Id: <20180115143500.22631-8-f4bug@amsat.org>
-In-Reply-To: <20180115143500.22631-1-f4bug@amsat.org>
-References: <20180115143500.22631-1-f4bug@amsat.org>
+	(envelope-from <thuth@redhat.com>) id 1eb5tu-0002ct-TY
+	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 09:38:19 -0500
+References: <1516008655-31732-1-git-send-email-thuth@redhat.com>
+	<alpine.BSF.2.21.1801151238370.57536@zero.eik.bme.hu>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <57803cc5-9f54-07bc-e18c-0606cb63d6c6@redhat.com>
+Date: Mon, 15 Jan 2018 15:38:01 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v2 7/8] docker: warn users to use newer
- fedora25/fedora27 base image
+In-Reply-To: <alpine.BSF.2.21.1801151238370.57536@zero.eik.bme.hu>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH 0/2] Clean up the ppc default
+ configs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,98 +25,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Fam Zheng <famz@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org
+To: BALATON Zoltan <balaton@eik.bme.hu>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
 
-deprecate the generic 'fedora' image, but stay backward incompatible
+On 15.01.2018 13:00, BALATON Zoltan wrote:
+> On Mon, 15 Jan 2018, Thomas Huth wrote:
+>> ppc64-softmmu is a superset of ppc-softmmu which in turn is a superset
+>> of ppcemb-softmmu. But since the config files are currently independen=
+t
+>> from each other, we missed to define some CONFIG switches in the super=
+-
+>> sets: CONFIG_SUNGEM is missing from the ppc64-softmmu config, and the
+>> CONFIG_IDE_SII3112 switch is only defined in ppcemb-softmmu.
+>=20
+> I'm not sure about this. The Sun GEM network interface is a device
+> typically found on Apple PowerMacs but also seems to be found on G5
+> based Macs so it's probably OK to add. The SiI3112 is now only used on
+> the (not yet fully merged) Sam460EX emulation which is to be added to
+> ppcemb, that's why I've only added it to that target.
 
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
----
- tests/docker/Makefile.include            |  3 ++-
- tests/docker/dockerfiles/fedora.docker   | 29 ++++++++++++-----------------
- tests/docker/dockerfiles/fedora25.docker | 18 ++++++++++++++++++
- 3 files changed, 32 insertions(+), 18 deletions(-)
- create mode 100644 tests/docker/dockerfiles/fedora25.docker
+But as I wrote: ppc-softmmu is currently a superset of ppcemb-softmmu. I
+think people expect to be able to run the same amount of machines with
+ppc-softmmu than with ppcemb-softmmu, don't they?
 
-diff --git a/tests/docker/Makefile.include b/tests/docker/Makefile.include
-index 1adea40499..950ef51d35 100644
---- a/tests/docker/Makefile.include
-+++ b/tests/docker/Makefile.include
-@@ -4,7 +4,7 @@
- 
- DOCKER_SUFFIX := .docker
- DOCKER_FILES_DIR := $(SRC_PATH)/tests/docker/dockerfiles
--DOCKER_DEPRECATED_IMAGES := debian ubuntu
-+DOCKER_DEPRECATED_IMAGES := debian fedora ubuntu
- DOCKER_IMAGES := $(filter-out $(DOCKER_DEPRECATED_IMAGES),$(sort $(notdir $(basename $(wildcard $(DOCKER_FILES_DIR)/*.docker)))))
- DOCKER_TARGETS := $(patsubst %,docker-image-%,$(DOCKER_IMAGES))
- # Use a global constant ccache directory to speed up repetitive builds
-@@ -61,6 +61,7 @@ docker-image-debian-ppc64el-cross: docker-image-debian9
- docker-image-debian-s390x-cross: docker-image-debian9
- docker-image-debian-win32-cross: docker-image-debian8-mxe
- docker-image-debian-win64-cross: docker-image-debian8-mxe
-+docker-image-fedora: docker-image-fedora25
- docker-image-ubuntu: docker-image-ubuntu16.04
- docker-image-travis: NOUSER=1
- 
-diff --git a/tests/docker/dockerfiles/fedora.docker b/tests/docker/dockerfiles/fedora.docker
-index 4b26c3aded..961534275f 100644
---- a/tests/docker/dockerfiles/fedora.docker
-+++ b/tests/docker/dockerfiles/fedora.docker
-@@ -1,18 +1,13 @@
--FROM fedora:latest
--ENV PACKAGES \
--    ccache gettext git tar PyYAML sparse flex bison python2 bzip2 hostname \
--    glib2-devel pixman-devel zlib-devel SDL-devel libfdt-devel \
--    gcc gcc-c++ clang make perl which bc findutils libaio-devel \
--    nettle-devel \
--    mingw32-pixman mingw32-glib2 mingw32-gmp mingw32-SDL mingw32-pkg-config \
--    mingw32-gtk2 mingw32-gtk3 mingw32-gnutls mingw32-nettle mingw32-libtasn1 \
--    mingw32-libjpeg-turbo mingw32-libpng mingw32-curl mingw32-libssh2 \
--    mingw32-bzip2 \
--    mingw64-pixman mingw64-glib2 mingw64-gmp mingw64-SDL mingw64-pkg-config \
--    mingw64-gtk2 mingw64-gtk3 mingw64-gnutls mingw64-nettle mingw64-libtasn1 \
--    mingw64-libjpeg-turbo mingw64-libpng mingw64-curl mingw64-libssh2 \
--    mingw64-bzip2
-+# SPDX-License-Identifier: GPL-2.0-or-later
-+#
-+# This template is deprecated, it was previously based on Fedora 25 on QEMU 2.9.
-+# Now than more recent releases are out, please use qemu:fedora25 as base for
-+# Fedora 25.
-+#
-+FROM qemu:fedora25
- 
--RUN dnf install -y $PACKAGES
--RUN rpm -q $PACKAGES | sort > /packages.txt
--ENV FEATURES mingw clang pyyaml
-+RUN for n in $(seq 8); do echo; done && \
-+    echo "\n\t\tThis image is deprecated." && echo && \
-+    echo "\tUse 'FROM qemu:fedora27' to use the Fedora 27 image" && \
-+    echo "\tor 'FROM qemu:fedora25' to use the old Fedora 25." && \
-+    for n in $(seq 8); do echo; done
-diff --git a/tests/docker/dockerfiles/fedora25.docker b/tests/docker/dockerfiles/fedora25.docker
-new file mode 100644
-index 0000000000..b53fe63b5c
---- /dev/null
-+++ b/tests/docker/dockerfiles/fedora25.docker
-@@ -0,0 +1,18 @@
-+FROM fedora:25
-+ENV PACKAGES \
-+    ccache gettext git tar PyYAML sparse flex bison python2 bzip2 hostname \
-+    glib2-devel pixman-devel zlib-devel SDL-devel libfdt-devel \
-+    gcc gcc-c++ clang make perl which bc findutils libaio-devel \
-+    nettle-devel \
-+    mingw32-pixman mingw32-glib2 mingw32-gmp mingw32-SDL mingw32-pkg-config \
-+    mingw32-gtk2 mingw32-gtk3 mingw32-gnutls mingw32-nettle mingw32-libtasn1 \
-+    mingw32-libjpeg-turbo mingw32-libpng mingw32-curl mingw32-libssh2 \
-+    mingw32-bzip2 \
-+    mingw64-pixman mingw64-glib2 mingw64-gmp mingw64-SDL mingw64-pkg-config \
-+    mingw64-gtk2 mingw64-gtk3 mingw64-gnutls mingw64-nettle mingw64-libtasn1 \
-+    mingw64-libjpeg-turbo mingw64-libpng mingw64-curl mingw64-libssh2 \
-+    mingw64-bzip2
-+
-+RUN dnf install -y $PACKAGES
-+RUN rpm -q $PACKAGES | sort > /packages.txt
-+ENV FEATURES mingw clang pyyaml
--- 
-2.15.1
+>> (off-topic question: Do we still need a separate ppcemb-softmmu nowada=
+ys?
+>> It seemed to be useful 10 years ago when everybody was doing KVM on
+>> embedded PPC, but these days seem to be pretty much over now, so IMHO
+>> just using ppc-softmmu for embedded should be enough nowadays? We coul=
+d
+>> save quite some compilation- and "make check"-time if we could finally
+>> get rid of ppcemb-softmmu again...)
+>=20
+> I've also noticed that most of the boards were available both in ppcemb
+> and ppc targets so maybe these could be merged now to avoid confusion
+> but I don't know the reason why ppcemb existed in the first place so I
+> don't know what other implications dropping ppcemb may have.
+
+An alternative would be to remove the embedded configs from the
+ppc-softmmu.mak and only include them in ppcemb-softmmu.mak, so that
+there is a stricter distinction. I think the current situation is rather
+confusing, where it is possible that the user could try to run a pseries
+machine with an embedded PPC CPU for example ... so strictly separating
+the embedded stuff into ppcemb-softmmu would maybe really make sense.
+
+ Thomas
