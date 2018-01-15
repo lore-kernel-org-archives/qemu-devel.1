@@ -1,30 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50865)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52329)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1eb0EH-00062p-Le
-	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 03:34:55 -0500
+	(envelope-from <groug@kaod.org>) id 1eb0Oe-0000Hd-PW
+	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 03:45:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1eb0ED-00013Z-OA
-	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 03:34:53 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:36064)
+	(envelope-from <groug@kaod.org>) id 1eb0Ob-0000kz-MF
+	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 03:45:36 -0500
+Received: from 7.mo177.mail-out.ovh.net ([46.105.61.149]:52090)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1eb0ED-00012b-Hb
-	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 03:34:49 -0500
-References: <20180110161438.GA28096@stefanha-x1.localdomain>
-	<dcb849d4-82fb-de8a-5e81-23d47026c9eb@redhat.com>
-	<20180111152345.GA7353@stefanha-x1.localdomain>
-	<86106573-422b-fe4c-ec15-dad0edf05880@redhat.com>
-	<20180112101807.GE7356@stefanha-x1.localdomain>
-	<a45c1da8-03e8-140f-725c-af0f31e3da62@redhat.com>
-	<5A5C5F7D.8070403@intel.com>
-From: Jason Wang <jasowang@redhat.com>
-Message-ID: <6b618d06-0891-fb3b-b845-8beae5649b22@redhat.com>
-Date: Mon, 15 Jan 2018 16:34:42 +0800
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1eb0Ob-0000bS-Cg
+	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 03:45:33 -0500
+Received: from player714.ha.ovh.net (b6.ovh.net [213.186.33.56])
+	by mo177.mail-out.ovh.net (Postfix) with ESMTP id 1FCDF95B68
+	for <qemu-devel@nongnu.org>; Mon, 15 Jan 2018 09:45:22 +0100 (CET)
+Date: Mon, 15 Jan 2018 09:45:11 +0100
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20180115094511.3a3fdb94@bahia.lan>
+In-Reply-To: <20180115072715.25921-2-david@gibson.dropbear.id.au>
+References: <20180115072715.25921-1-david@gibson.dropbear.id.au>
+	<20180115072715.25921-2-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
-In-Reply-To: <5A5C5F7D.8070403@intel.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] vhost-pci and virtio-vhost-user
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 1/2] target/ppc: Clarify compat mode
+ max_threads value
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,47 +31,143 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Wei Wang <wei.w.wang@intel.com>, Stefan Hajnoczi <stefanha@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: joserz@linux.vnet.ibm.com, surajjs@au1.ibm.com, sam.bobroff@au1.ibm.com, lvivier@redhat.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 
+On Mon, 15 Jan 2018 18:27:14 +1100
+David Gibson <david@gibson.dropbear.id.au> wrote:
 
+> We recently had some discussions that were sidetracked for a while, because
+> nearly everyone misapprehended the purpose of the 'max_threads' field in
+> the compatiblity modes table.  It's all about guest expectations, not host
+> expectations or support (that's handled elsewhere).
+> 
+> In an attempt to avoid a repeat of that confusion, rename the field to
+> 'max_vthreads' and add an explanatory comment.
+> 
+> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+> ---
 
-On 2018=E5=B9=B401=E6=9C=8815=E6=97=A5 15:59, Wei Wang wrote:
-> On 01/15/2018 02:56 PM, Jason Wang wrote:
->>
->>
->> On 2018=E5=B9=B401=E6=9C=8812=E6=97=A5 18:18, Stefan Hajnoczi wrote:
->>>
->>
->> I just fail understand why we can't do software defined network or=20
->> storage with exist virtio device/drivers (or are there any=20
->> shortcomings that force us to invent new infrastructure).
->>
->
-> Existing virtio-net works with a host central vSwitch, and it has the=20
-> following disadvantages:
-> 1) long code/data path;
-> 2) poor scalability; and
-> 3) host CPU sacrifice
+Reviewed-by: Greg Kurz <groug@kaod.org>
 
-Please show me the numbers.
-
->
-> Vhost-pci solves the above issues by providing a point-to-point=20
-> communication between VMs. No matter how the control path would look=20
-> like finally, the key point is that the data path is P2P between VMs.
->
-> Best,
-> Wei
->
->
-
-Well, I think I've pointed out several times in the replies of previous=20
-versions. Both vhost-pci-net and virtio-net is an ethernet device, which=20
-is not tied to a central vswitch for sure. There're just too many=20
-methods or tricks which can be used to build a point to point data path.
-
-The problem is not whether or not you can build direct path between VMs=20
-through vhost-pci, the problem is why you must do it through vhost-pci.
-
-Thanks
+>  hw/ppc/spapr.c      |  4 ++--
+>  target/ppc/compat.c | 25 +++++++++++++++++--------
+>  target/ppc/cpu.h    |  2 +-
+>  3 files changed, 20 insertions(+), 11 deletions(-)
+> 
+> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> index 3e528fe91e..e35214bfc3 100644
+> --- a/hw/ppc/spapr.c
+> +++ b/hw/ppc/spapr.c
+> @@ -345,7 +345,7 @@ static int spapr_fixup_cpu_dt(void *fdt, sPAPRMachineState *spapr)
+>          PowerPCCPU *cpu = POWERPC_CPU(cs);
+>          DeviceClass *dc = DEVICE_GET_CLASS(cs);
+>          int index = spapr_vcpu_id(cpu);
+> -        int compat_smt = MIN(smp_threads, ppc_compat_max_threads(cpu));
+> +        int compat_smt = MIN(smp_threads, ppc_compat_max_vthreads(cpu));
+>  
+>          if ((index % smt) != 0) {
+>              continue;
+> @@ -503,7 +503,7 @@ static void spapr_populate_cpu_dt(CPUState *cs, void *fdt, int offset,
+>      size_t page_sizes_prop_size;
+>      uint32_t vcpus_per_socket = smp_threads * smp_cores;
+>      uint32_t pft_size_prop[] = {0, cpu_to_be32(spapr->htab_shift)};
+> -    int compat_smt = MIN(smp_threads, ppc_compat_max_threads(cpu));
+> +    int compat_smt = MIN(smp_threads, ppc_compat_max_vthreads(cpu));
+>      sPAPRDRConnector *drc;
+>      int drc_index;
+>      uint32_t radix_AP_encodings[PPC_PAGE_SIZES_MAX_SZ];
+> diff --git a/target/ppc/compat.c b/target/ppc/compat.c
+> index 276b5b52c2..807c906f68 100644
+> --- a/target/ppc/compat.c
+> +++ b/target/ppc/compat.c
+> @@ -32,7 +32,16 @@ typedef struct {
+>      uint32_t pvr;
+>      uint64_t pcr;
+>      uint64_t pcr_level;
+> -    int max_threads;
+> +
+> +    /*
+> +     * Maximum allowed virtual threads per virtual core
+> +     *
+> +     * This is to stop older guests getting confused by seeing more
+> +     * threads than they think the cpu can support.  Usually it's
+> +     * equal to the number of threads supported on bare metal
+> +     * hardware, but not always (see POWER9).
+> +     */
+> +    int max_vthreads;
+>  } CompatInfo;
+>  
+>  static const CompatInfo compat_table[] = {
+> @@ -45,28 +54,28 @@ static const CompatInfo compat_table[] = {
+>          .pcr = PCR_COMPAT_3_00 | PCR_COMPAT_2_07 | PCR_COMPAT_2_06 |
+>                 PCR_COMPAT_2_05 | PCR_TM_DIS | PCR_VSX_DIS,
+>          .pcr_level = PCR_COMPAT_2_05,
+> -        .max_threads = 2,
+> +        .max_vthreads = 2,
+>      },
+>      { /* POWER7, ISA2.06 */
+>          .name = "power7",
+>          .pvr = CPU_POWERPC_LOGICAL_2_06,
+>          .pcr = PCR_COMPAT_3_00 | PCR_COMPAT_2_07 | PCR_COMPAT_2_06 | PCR_TM_DIS,
+>          .pcr_level = PCR_COMPAT_2_06,
+> -        .max_threads = 4,
+> +        .max_vthreads = 4,
+>      },
+>      {
+>          .name = "power7+",
+>          .pvr = CPU_POWERPC_LOGICAL_2_06_PLUS,
+>          .pcr = PCR_COMPAT_3_00 | PCR_COMPAT_2_07 | PCR_COMPAT_2_06 | PCR_TM_DIS,
+>          .pcr_level = PCR_COMPAT_2_06,
+> -        .max_threads = 4,
+> +        .max_vthreads = 4,
+>      },
+>      { /* POWER8, ISA2.07 */
+>          .name = "power8",
+>          .pvr = CPU_POWERPC_LOGICAL_2_07,
+>          .pcr = PCR_COMPAT_3_00 | PCR_COMPAT_2_07,
+>          .pcr_level = PCR_COMPAT_2_07,
+> -        .max_threads = 8,
+> +        .max_vthreads = 8,
+>      },
+>      { /* POWER9, ISA3.00 */
+>          .name = "power9",
+> @@ -80,7 +89,7 @@ static const CompatInfo compat_table[] = {
+>           * confusing if half of the threads disappear from the guest
+>           * if it announces it's POWER9 aware at CAS time.
+>           */
+> -        .max_threads = 8,
+> +        .max_vthreads = 8,
+>      },
+>  };
+>  
+> @@ -192,14 +201,14 @@ void ppc_set_compat_all(uint32_t compat_pvr, Error **errp)
+>      }
+>  }
+>  
+> -int ppc_compat_max_threads(PowerPCCPU *cpu)
+> +int ppc_compat_max_vthreads(PowerPCCPU *cpu)
+>  {
+>      const CompatInfo *compat = compat_by_pvr(cpu->compat_pvr);
+>      int n_threads = CPU(cpu)->nr_threads;
+>  
+>      if (cpu->compat_pvr) {
+>          g_assert(compat);
+> -        n_threads = MIN(n_threads, compat->max_threads);
+> +        n_threads = MIN(n_threads, compat->max_vthreads);
+>      }
+>  
+>      return n_threads;
+> diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
+> index a5e49f23e9..dc6820c5eb 100644
+> --- a/target/ppc/cpu.h
+> +++ b/target/ppc/cpu.h
+> @@ -1395,7 +1395,7 @@ void ppc_set_compat(PowerPCCPU *cpu, uint32_t compat_pvr, Error **errp);
+>  #if !defined(CONFIG_USER_ONLY)
+>  void ppc_set_compat_all(uint32_t compat_pvr, Error **errp);
+>  #endif
+> -int ppc_compat_max_threads(PowerPCCPU *cpu);
+> +int ppc_compat_max_vthreads(PowerPCCPU *cpu);
+>  void ppc_compat_add_property(Object *obj, const char *name,
+>                               uint32_t *compat_pvr, const char *basedesc,
+>                               Error **errp);
