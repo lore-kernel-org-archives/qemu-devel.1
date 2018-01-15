@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51769)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52507)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1eb7TT-0002O9-Rm
-	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 11:19:04 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1eb7Ws-0003my-Ll
+	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 11:22:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1eb7TQ-0002hp-Km
-	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 11:19:03 -0500
-Received: from mail-pg0-x244.google.com ([2607:f8b0:400e:c05::244]:38139)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1eb7TQ-0002hK-Dn
-	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 11:19:00 -0500
-Received: by mail-pg0-x244.google.com with SMTP id y27so2181628pgc.5
-	for <qemu-devel@nongnu.org>; Mon, 15 Jan 2018 08:19:00 -0800 (PST)
-Sender: Richard Henderson <rth7680@gmail.com>
-References: <1515562748-32287-1-git-send-email-rth@twiddle.net>
-	<CAFEAcA8TxNTjvsqeHss=7BEm6SzwLHZ54UqDmOPMWA5z0oTsUA@mail.gmail.com>
-From: Richard Henderson <rth@twiddle.net>
-Message-ID: <6cded669-a2af-cec0-f4c5-028758c48bfa@twiddle.net>
-Date: Mon, 15 Jan 2018 08:18:55 -0800
+	(envelope-from <pbonzini@redhat.com>) id 1eb7Wp-0004zq-FD
+	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 11:22:34 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:44090)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1eb7Wp-0004zS-99
+	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 11:22:31 -0500
+References: <20180113050717.22969-1-f4bug@amsat.org>
+	<CAFEAcA9YNOfZW6tY_OWZ+cyF1Gvc9-9Sq81WgdL_JRDUxcfAqw@mail.gmail.com>
+	<70091140-1b3e-6000-0add-b4e980db295e@amsat.org>
+	<CAFEAcA9zdxMBosPJOg25vUzg6sdsBORkMRwaVqyAGq6wHxE_Dg@mail.gmail.com>
+	<CAAdtpL5xbZ3BQjb6Sm9HkeSiqpV-KfT-HDaohD5Xh2MF=Nw2ZQ@mail.gmail.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <42c141c9-c475-38bc-e29b-e492b01cf8c3@redhat.com>
+Date: Mon, 15 Jan 2018 17:22:15 +0100
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA8TxNTjvsqeHss=7BEm6SzwLHZ54UqDmOPMWA5z0oTsUA@mail.gmail.com>
+In-Reply-To: <CAAdtpL5xbZ3BQjb6Sm9HkeSiqpV-KfT-HDaohD5Xh2MF=Nw2ZQ@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] tcg/arm: Fix double-word comparisons
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v7 00/14] SDHCI: housekeeping (part 1)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,72 +31,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, David Gibson <david@gibson.dropbear.id.au>, Paolo Bonzini <pbonzini@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Peter Maydell <peter.maydell@linaro.org>
+Cc: Alistair Francis <alistair.francis@xilinx.com>, Kevin O'Connor <kevin@koconnor.net>, QEMU Developers <qemu-devel@nongnu.org>, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, Andrey Smirnov <andrew.smirnov@gmail.com>, Marcel Apfelbaum <marcel@redhat.com>
 
-On 01/15/2018 06:27 AM, Peter Maydell wrote:
-> On 10 January 2018 at 05:39, Richard Henderson <rth@twiddle.net> wrote:
->> The code sequence we were generating was only good for unsigned
->> comparisons.  For signed comparisions, use the sequence from gcc.
->>
->> Fixes booting of ppc64 firmware, with a patch changing the code
->> sequence for ppc comparisons.
->>
->> Signed-off-by: Richard Henderson <rth@twiddle.net>
->> ---
->>  tcg/arm/tcg-target.inc.c | 112 +++++++++++++++++++++++++++++++++--------------
->>  1 file changed, 80 insertions(+), 32 deletions(-)
->>
->> diff --git a/tcg/arm/tcg-target.inc.c b/tcg/arm/tcg-target.inc.c
->> index 98a1253..b9890c8 100644
->> --- a/tcg/arm/tcg-target.inc.c
->> +++ b/tcg/arm/tcg-target.inc.c
->> @@ -239,10 +239,11 @@ static void patch_reloc(tcg_insn_unit *code_ptr, int type,
->>      }
->>  }
->>
->> -#define TCG_CT_CONST_ARM  0x100
->> -#define TCG_CT_CONST_INV  0x200
->> -#define TCG_CT_CONST_NEG  0x400
->> -#define TCG_CT_CONST_ZERO 0x800
->> +#define TCG_CT_CONST_ARM     0x0100
->> +#define TCG_CT_CONST_INV     0x0200
->> +#define TCG_CT_CONST_NEG     0x0400
->> +#define TCG_CT_CONST_INVNEG  0x0800
->> +#define TCG_CT_CONST_ZERO    0x1000
->>
->>  /* parse target specific constraints */
->>  static const char *target_parse_constraint(TCGArgConstraint *ct,
->> @@ -258,6 +259,9 @@ static const char *target_parse_constraint(TCGArgConstraint *ct,
->>      case 'N': /* The gcc constraint letter is L, already used here.  */
->>          ct->ct |= TCG_CT_CONST_NEG;
->>          break;
->> +    case 'M':
->> +        ct->ct |= TCG_CT_CONST_INVNEG;
->> +        break;
-> 
-> In GCC constraint "M" is "integer in the range 0 to 32", which this clearly
-> isn't. Can we have a comment saying what it is? (may be worth mentioning
-> in particular how "rIM" differs from "rINK" -- I think the answer is that
-> we want to say "valid-immediate OR (valid-if-inverted AND valid-if-negated)",
-> whereas 'rINK' is "valid-immediate OR valid-if-inverted OR valid-if-negated".)
+On 15/01/2018 16:17, Philippe Mathieu-Daud=C3=A9 wrote:
+>=20
+> The only 2 properties specific to sysbus are:
+>=20
+> static Property sdhci_sysbus_properties[] =3D {
+>     DEFINE_PROP_BOOL("pending-insert-quirk", SDHCIState, pending_insert=
+_quirk,
+>                      false),
+>     DEFINE_PROP_LINK("dma", SDHCIState, dma_mr,
+>                      TYPE_MEMORY_REGION, MemoryRegion *),
+> }
+>=20
+> I guess I assumed the Property to be const (being compilation-time
+> allocated, ended with DEFINE_PROP_END_OF_LIST),
+> so I couldn't add more properties to it, but it seems each device has
+> his properties allocated at runtime, so I can use the same
+> sdhci_common_properties[] array and only use
+> qdev_property_add_static() for the 2 sysbus specific properties.
 
-Exactly.
+You can define a macro DEFINE_SDHCI_PROPERTIES for the "common" propertie=
+s.
 
-> The code looks OK to me. I'm guessing the sparc guest failure is
-> just because we now generate more code for some of the comparison
-> cases and that doesn't fit in the buffer...
-
-I don't recall having seen a sparc failure...
-
-> We could avoid the annoying "load LE/GE immediates to tempreg"
-> extra code by having tcg_out_cmp2() return a flag to tell
-> the caller which way round to put the conditions for its two
-> conditional ARITH_MOV insns (for setcond2) or which condition
-> to use for the branch (brcond2), right?
-
-Um... we do return a condition.  I must have missed a trick or made a mistake
-somewhere.
-
-
-r~
+Paolo
