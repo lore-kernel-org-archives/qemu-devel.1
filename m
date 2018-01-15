@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50087)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50123)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1eb3LN-0007xk-6Z
-	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 06:54:28 -0500
+	(envelope-from <quintela@redhat.com>) id 1eb3LQ-00081r-Ry
+	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 06:54:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1eb3LM-0003r1-FM
-	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 06:54:25 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:53024)
+	(envelope-from <quintela@redhat.com>) id 1eb3LP-0003tG-Rq
+	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 06:54:28 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:55576)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1eb3LM-0003qd-99
-	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 06:54:24 -0500
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1eb3LP-0003sc-JT
+	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 06:54:27 -0500
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
 	[10.5.11.13])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 676A1C04B925
-	for <qemu-devel@nongnu.org>; Mon, 15 Jan 2018 11:54:23 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id A1E65486C4
+	for <qemu-devel@nongnu.org>; Mon, 15 Jan 2018 11:54:21 +0000 (UTC)
 From: Juan Quintela <quintela@redhat.com>
-Date: Mon, 15 Jan 2018 12:53:08 +0100
-Message-Id: <20180115115309.23982-27-quintela@redhat.com>
+Date: Mon, 15 Jan 2018 12:53:07 +0100
+Message-Id: <20180115115309.23982-26-quintela@redhat.com>
 In-Reply-To: <20180115115309.23982-1-quintela@redhat.com>
 References: <20180115115309.23982-1-quintela@redhat.com>
-Subject: [Qemu-devel] [PULL 26/27] migration: remove some
- block_cleanup_parameters()
+Subject: [Qemu-devel] [PULL 25/27] migration: put the finish part into a new
+ function
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,35 +35,129 @@ Cc: dgilbert@redhat.com, lvivier@redhat.com, peterx@redhat.com
 
 From: Peter Xu <peterx@redhat.com>
 
-Keep the one in migrate_fd_cleanup() would be enough.  Removing the other
-two.
+This patch only moved the last part of migration_thread() into a new
+function migration_iteration_finish() to make it much shorter.  With
+previous works to remove some local variables, now it's fairly easy to
+do that.
 
-Signed-off-by: Peter Xu <peterx@redhat.com>
 Reviewed-by: Juan Quintela <quintela@redhat.com>
+Signed-off-by: Peter Xu <peterx@redhat.com>
 Signed-off-by: Juan Quintela <quintela@redhat.com>
 ---
- migration/migration.c | 2 --
- 1 file changed, 2 deletions(-)
+ migration/migration.c | 94 +++++++++++++++++++++++++++------------------------
+ 1 file changed, 49 insertions(+), 45 deletions(-)
 
 diff --git a/migration/migration.c b/migration/migration.c
-index 793fd163f7..47367cffae 100644
+index a95f5e469c..793fd163f7 100644
 --- a/migration/migration.c
 +++ b/migration/migration.c
-@@ -1160,7 +1160,6 @@ void migrate_fd_error(MigrationState *s, const Error *error)
-                       MIGRATION_STATUS_FAILED);
-     migrate_set_error(s, error);
-     notifier_list_notify(&migration_state_notifiers, s);
--    block_cleanup_parameters(s);
+@@ -2293,6 +2293,54 @@ static MigIterateState migration_iteration_run(MigrationState *s)
+     return MIG_ITERATE_RESUME;
  }
  
- static void migrate_fd_cancel(MigrationState *s)
-@@ -1206,7 +1205,6 @@ static void migrate_fd_cancel(MigrationState *s)
-             s->block_inactive = false;
-         }
++static void migration_iteration_finish(MigrationState *s)
++{
++    /* If we enabled cpu throttling for auto-converge, turn it off. */
++    cpu_throttle_stop();
++
++    qemu_mutex_lock_iothread();
++    switch (s->state) {
++    case MIGRATION_STATUS_COMPLETED:
++        migration_calculate_complete(s);
++        runstate_set(RUN_STATE_POSTMIGRATE);
++        break;
++
++    case MIGRATION_STATUS_ACTIVE:
++        /*
++         * We should really assert here, but since it's during
++         * migration, let's try to reduce the usage of assertions.
++         */
++        if (!migrate_colo_enabled()) {
++            error_report("%s: critical error: calling COLO code without "
++                         "COLO enabled", __func__);
++        }
++        migrate_start_colo_process(s);
++        /*
++         * Fixme: we will run VM in COLO no matter its old running state.
++         * After exited COLO, we will keep running.
++         */
++        s->vm_was_running = true;
++        /* Fallthrough */
++    case MIGRATION_STATUS_FAILED:
++    case MIGRATION_STATUS_CANCELLED:
++        if (s->vm_was_running) {
++            vm_start();
++        } else {
++            if (runstate_check(RUN_STATE_FINISH_MIGRATE)) {
++                runstate_set(RUN_STATE_POSTMIGRATE);
++            }
++        }
++        break;
++
++    default:
++        /* Should not reach here, but if so, forgive the VM. */
++        error_report("%s: Unknown ending state %d", __func__, s->state);
++        break;
++    }
++    qemu_bh_schedule(s->cleanup_bh);
++    qemu_mutex_unlock_iothread();
++}
++
+ /*
+  * Master migration thread on the source VM.
+  * It drives the migration and pumps the data down the outgoing channel.
+@@ -2371,51 +2419,7 @@ static void *migration_thread(void *opaque)
      }
--    block_cleanup_parameters(s);
- }
  
- void add_migration_state_change_notifier(Notifier *notify)
+     trace_migration_thread_after_loop();
+-    /* If we enabled cpu throttling for auto-converge, turn it off. */
+-    cpu_throttle_stop();
+-
+-    qemu_mutex_lock_iothread();
+-    switch (s->state) {
+-    case MIGRATION_STATUS_COMPLETED:
+-        migration_calculate_complete(s);
+-        runstate_set(RUN_STATE_POSTMIGRATE);
+-        break;
+-
+-    case MIGRATION_STATUS_ACTIVE:
+-        /*
+-         * We should really assert here, but since it's during
+-         * migration, let's try to reduce the usage of assertions.
+-         */
+-        if (!migrate_colo_enabled()) {
+-            error_report("%s: critical error: calling COLO code without "
+-                         "COLO enabled", __func__);
+-        }
+-        migrate_start_colo_process(s);
+-        /*
+-         * Fixme: we will run VM in COLO no matter its old running state.
+-         * After exited COLO, we will keep running.
+-         */
+-        s->vm_was_running = true;
+-        /* Fallthrough */
+-    case MIGRATION_STATUS_FAILED:
+-    case MIGRATION_STATUS_CANCELLED:
+-        if (s->vm_was_running) {
+-            vm_start();
+-        } else {
+-            if (runstate_check(RUN_STATE_FINISH_MIGRATE)) {
+-                runstate_set(RUN_STATE_POSTMIGRATE);
+-            }
+-        }
+-        break;
+-
+-    default:
+-        /* Should not reach here, but if so, forgive the VM. */
+-        error_report("%s: Unknown ending state %d", __func__, s->state);
+-        break;
+-    }
+-    qemu_bh_schedule(s->cleanup_bh);
+-    qemu_mutex_unlock_iothread();
+-
++    migration_iteration_finish(s);
+     rcu_unregister_thread();
+     return NULL;
+ }
 -- 
 2.14.3
