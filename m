@@ -1,33 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57137)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57204)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eav9T-0006Ry-8a
-	for qemu-devel@nongnu.org; Sun, 14 Jan 2018 22:09:37 -0500
+	(envelope-from <jasowang@redhat.com>) id 1eav9t-0006gG-Md
+	for qemu-devel@nongnu.org; Sun, 14 Jan 2018 22:10:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eav9O-0002b6-2v
-	for qemu-devel@nongnu.org; Sun, 14 Jan 2018 22:09:35 -0500
-Received: from mail-qt0-x241.google.com ([2607:f8b0:400d:c0d::241]:42889)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eav9N-0002aS-TW
-	for qemu-devel@nongnu.org; Sun, 14 Jan 2018 22:09:30 -0500
-Received: by mail-qt0-x241.google.com with SMTP id c2so12604132qtn.9
-	for <qemu-devel@nongnu.org>; Sun, 14 Jan 2018 19:09:29 -0800 (PST)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <cover.1515960078.git.pisa@cmp.felk.cvut.cz>
-	<48c4af3c240286a89fc5fdbcaa254ea386c979b9.1515960078.git.pisa@cmp.felk.cvut.cz>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <e3bd8271-d4c3-a3b0-c7cc-b5d0a405f3af@amsat.org>
-Date: Mon, 15 Jan 2018 00:09:25 -0300
+	(envelope-from <jasowang@redhat.com>) id 1eav9o-0002u2-MS
+	for qemu-devel@nongnu.org; Sun, 14 Jan 2018 22:10:01 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:46492)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1eav9o-0002t3-E3
+	for qemu-devel@nongnu.org; Sun, 14 Jan 2018 22:09:56 -0500
+References: <20180110161438.GA28096@stefanha-x1.localdomain>
+	<dcb849d4-82fb-de8a-5e81-23d47026c9eb@redhat.com>
+	<20180111152345.GA7353@stefanha-x1.localdomain>
+	<86106573-422b-fe4c-ec15-dad0edf05880@redhat.com>
+	<E182254E98A5DA4EB1E657AC7CB9BD2A8B023E3B@BGSMSX101.gar.corp.intel.com>
+From: Jason Wang <jasowang@redhat.com>
+Message-ID: <a92a5335-005e-0d54-869d-0f01106c37df@redhat.com>
+Date: Mon, 15 Jan 2018 11:09:46 +0800
 MIME-Version: 1.0
-In-Reply-To: <48c4af3c240286a89fc5fdbcaa254ea386c979b9.1515960078.git.pisa@cmp.felk.cvut.cz>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <E182254E98A5DA4EB1E657AC7CB9BD2A8B023E3B@BGSMSX101.gar.corp.intel.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH V4 4/7] CAN bus Kvaser PCI CAN-S (single
- SJA1000 channel) emulation added.
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] vhost-pci and virtio-vhost-user
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,444 +31,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: pisa@cmp.felk.cvut.cz, qemu-devel@nongnu.org
-Cc: Marek Vasut <marex@denx.de>, Oliver Hartkopp <socketcan@hartkopp.net>, Stefan Hajnoczi <stefanha@gmail.com>, Deniz Eren <deniz.eren@icloud.com>, Oleksij Rempel <o.rempel@pengutronix.de>, Konrad Frederic <frederic.konrad@adacore.com>, Jan Kiszka <jan.kiszka@siemens.com>
+To: "Yang, Zhiyong" <zhiyong.yang@intel.com>, Stefan Hajnoczi <stefanha@redhat.com>
+Cc: "Wang, Wei W" <wei.w.wang@intel.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
-On 01/14/2018 05:14 PM, pisa@cmp.felk.cvut.cz wrote:
-> From: Pavel Pisa <pisa@cmp.felk.cvut.cz>
-> 
-> Signed-off-by: Pavel Pisa <pisa@cmp.felk.cvut.cz>
-> ---
->  default-configs/pci.mak |   1 +
->  hw/can/Makefile.objs    |   1 +
->  hw/can/can_kvaser_pci.c | 375 ++++++++++++++++++++++++++++++++++++++++++++++++
->  3 files changed, 377 insertions(+)
->  create mode 100644 hw/can/can_kvaser_pci.c
-> 
-> diff --git a/default-configs/pci.mak b/default-configs/pci.mak
-> index 979b649fe5..72c0802ced 100644
-> --- a/default-configs/pci.mak
-> +++ b/default-configs/pci.mak
-> @@ -33,6 +33,7 @@ CONFIG_SERIAL_ISA=y
->  CONFIG_SERIAL_PCI=y
->  CONFIG_CAN_CORE=y
->  CONFIG_CAN_SJA1000=y
-> +CONFIG_CAN_PCI=y
->  CONFIG_IPACK=y
->  CONFIG_WDT_IB6300ESB=y
->  CONFIG_PCI_TESTDEV=y
-> diff --git a/hw/can/Makefile.objs b/hw/can/Makefile.objs
-> index 3c4bf3bfc1..c9d07b9b16 100644
-> --- a/hw/can/Makefile.objs
-> +++ b/hw/can/Makefile.objs
-> @@ -8,4 +8,5 @@ else
->  common-obj-y += can_host_stub.o
->  endif
->  common-obj-$(CONFIG_CAN_SJA1000) += can_sja1000.o
-> +common-obj-$(CONFIG_CAN_PCI) += can_kvaser_pci.o
->  endif
-> diff --git a/hw/can/can_kvaser_pci.c b/hw/can/can_kvaser_pci.c
-> new file mode 100644
-> index 0000000000..7e3f28d83c
-> --- /dev/null
-> +++ b/hw/can/can_kvaser_pci.c
-> @@ -0,0 +1,375 @@
-> +/*
-> + * Kvaser PCI CAN device (SJA1000 based) emulation
-> + *
-> + * Copyright (c) 2013-2014 Jin Yang
-> + * Copyright (c) 2014-2018 Pavel Pisa
-> + *
-> + * Partially based on educational PCIexpress APOHW hardware
-> + * emulator used fro class A0B36APO at CTU FEE course by
-> + *    Rostislav Lisovy and Pavel Pisa
-> + *
-> + * Initial development supported by Google GSoC 2013 from RTEMS project slot
-> + *
-> + * Permission is hereby granted, free of charge, to any person obtaining a copy
-> + * of this software and associated documentation files (the "Software"), to deal
-> + * in the Software without restriction, including without limitation the rights
-> + * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-> + * copies of the Software, and to permit persons to whom the Software is
-> + * furnished to do so, subject to the following conditions:
-> + *
-> + * The above copyright notice and this permission notice shall be included in
-> + * all copies or substantial portions of the Software.
-> + *
-> + * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-> + * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-> + * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-> + * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-> + * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-> + * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-> + * THE SOFTWARE.
-> + */
-> +
-> +#include "qemu/osdep.h"
-> +#include "qemu/event_notifier.h"
-> +#include "qemu/thread.h"
-> +#include "qemu/sockets.h"
-> +#include "qemu/error-report.h"
-> +#include "chardev/char.h"
-> +#include "hw/hw.h"
-> +#include "hw/pci/pci.h"
-> +#include "can/can_emu.h"
-> +
-> +#include "can_sja1000.h"
-> +
-> +#define TYPE_CAN_PCI_DEV "kvaser_pci"
-> +
-> +#define KVASER_PCI_DEV(obj) \
-> +    OBJECT_CHECK(KvaserPCIState, (obj), TYPE_CAN_PCI_DEV)
-> +
-> +#ifndef KVASER_PCI_VENDOR_ID1
-> +#define KVASER_PCI_VENDOR_ID1     0x10e8    /* the PCI device and vendor IDs */
-> +#endif
-> +
-> +#ifndef KVASER_PCI_DEVICE_ID1
-> +#define KVASER_PCI_DEVICE_ID1     0x8406
-> +#endif
-> +
-> +#define KVASER_PCI_S5920_RANGE    0x80
-> +#define KVASER_PCI_SJA_RANGE      0x80
-> +#define KVASER_PCI_XILINX_RANGE   0x8
-> +
-> +#define KVASER_PCI_BYTES_PER_SJA  0x20
-> +
-> +#define S5920_OMB                 0x0C
-> +#define S5920_IMB                 0x1C
-> +#define S5920_MBEF                0x34
-> +#define S5920_INTCSR              0x38
-> +#define S5920_RCR                 0x3C
-> +#define S5920_PTCR                0x60
-> +
-> +#define S5920_INTCSR_ADDON_INTENABLE_M        0x2000
-> +#define S5920_INTCSR_INTERRUPT_ASSERTED_M     0x800000
-> +
-> +#define KVASER_PCI_XILINX_VERINT  7   /* Lower nibble simulate interrupts,
-> +                                         high nibble version number. */
-> +
-> +#define KVASER_PCI_XILINX_VERSION_NUMBER 13
-> +
-> +typedef struct KvaserPCIState {
-> +    /*< private >*/
-> +    PCIDevice       dev;
-> +    /*< public >*/
-> +    MemoryRegion    s5920_io;
-> +    MemoryRegion    sja_io;
-> +    MemoryRegion    xilinx_io;
-> +
-> +    CanSJA1000State sja_state;
-> +    qemu_irq        irq;
-> +
-> +    uint32_t        s5920_intcsr;
-> +    uint32_t        s5920_irqstate;
-> +
-> +    char            *model; /* The model that support, only SJA1000 now. */
-> +    char            *canbus;
-> +    char            *host;
-> +} KvaserPCIState;
-> +
-> +static void kvaser_pci_irq_raise(void *opaque)
-> +{
-> +    KvaserPCIState *d = (KvaserPCIState *)opaque;
-> +    d->s5920_irqstate = 1;
-> +
-> +    if (d->s5920_intcsr & S5920_INTCSR_ADDON_INTENABLE_M) {
-> +        qemu_irq_raise(d->irq);
-> +    }
-> +}
-> +
-> +static void kvaser_pci_irq_lower(void *opaque)
-> +{
-> +    KvaserPCIState *d = (KvaserPCIState *)opaque;
-> +    d->s5920_irqstate = 0;
-> +    qemu_irq_lower(d->irq);
-> +}
-> +
-> +static void
-> +kvaser_pci_reset(void *opaque)
 
-static void kvaser_pci_reset(void *opaque)
 
-> +{
-> +    KvaserPCIState *d = (KvaserPCIState *)opaque;
-> +    CanSJA1000State *s = &d->sja_state;
-> +
-> +    can_sja_hardware_reset(s);
-> +}
-> +
-> +static uint64_t kvaser_pci_s5920_io_read(void *opaque, hwaddr addr,
-> +                             unsigned size)
+On 2018=E5=B9=B401=E6=9C=8812=E6=97=A5 13:20, Yang, Zhiyong wrote:
+>>>    Both vhost-pci and virtio-vhost-user work using shared memory acce=
+ss
+>>> to the guest RAM of the other VM.  Therefore they can poll virtqueues
+>>> and avoid vmexit.  They do also support cross-VM interrupts, thanks t=
+o
+>>> QEMU setting up irqfd/ioeventfd appropriately on the host.
+>>>
+>>> Stefan
+>> So in conclusion, consider the complexity, I would suggest to figure o=
+ut
+>> whether or not this (either vhost-pci or virito-vhost-user) is really =
+required
+>> before moving ahead. E.g, for VM2VM direct network path, this looks si=
+mply
+>> an issue of network topology instead of the problem of device, so ther=
+e's a
+>> lot of trick, for vhost-user one can easily image to write an applicat=
+ion (or use
+>> testpmd) to build a zerocopied VM2VM datapath, isn't this not sufficie=
+nt for
+>> the case?
+> As far as I know,  dequeue zero copied feature of vhost user PMD can't =
+help improve throughput for small packest ,such as 64 bytes.
+> On the contrary, it causes perf drop.  The feature mainly helps large p=
+ackets throughput.
 
-weird align
+Can you explain why? And what's the number of:
 
-> +{
-> +    KvaserPCIState *d = opaque;
-> +    uint64_t val;
-> +
-> +    switch (addr) {
-> +    case S5920_INTCSR:
-> +        val = d->s5920_intcsr;
-> +        val &= ~S5920_INTCSR_INTERRUPT_ASSERTED_M;
-> +        if (d->s5920_irqstate) {
-> +            val |= S5920_INTCSR_INTERRUPT_ASSERTED_M;
-> +        }
-> +        return val;
-> +    }
-> +    return 0;
-> +}
-> +
-> +static void kvaser_pci_s5920_io_write(void *opaque, hwaddr addr, uint64_t data,
-> +                                      unsigned size)
-> +{
-> +    KvaserPCIState *d = opaque;
-> +
-> +    switch (addr) {
-> +    case S5920_INTCSR:
-> +        if (~d->s5920_intcsr & data & S5920_INTCSR_ADDON_INTENABLE_M) {
-> +            if (d->s5920_irqstate) {
-> +                qemu_irq_raise(d->irq);
-> +            }
-> +        }
-> +        d->s5920_intcsr = data;
-> +        break;
-> +    }
-> +}
-> +
-> +static uint64_t kvaser_pci_sja_io_read(void *opaque, hwaddr addr, unsigned size)
-> +{
-> +    KvaserPCIState *d = opaque;
-> +    CanSJA1000State *s = &d->sja_state;
-> +
-> +    if (addr >= KVASER_PCI_BYTES_PER_SJA) {
-> +        return 0;
-> +    }
-> +
-> +    return can_sja_mem_read(s, addr, size);
-> +}
-> +
-> +static void kvaser_pci_sja_io_write(void *opaque, hwaddr addr, uint64_t data,
-> +                                    unsigned size)
-> +{
-> +    KvaserPCIState *d = opaque;
-> +    CanSJA1000State *s = &d->sja_state;
-> +
-> +    if (addr >= KVASER_PCI_BYTES_PER_SJA) {
-> +        return;
-> +    }
-> +
-> +    can_sja_mem_write(s, addr, data, size);
-> +}
-> +
-> +static uint64_t kvaser_pci_xilinx_io_read(void *opaque, hwaddr addr,
-> +                                          unsigned size)
-> +{
-> +    /*KvaserPCIState *d = opaque;*/
+1) 64B/1500B zerocopy
+2) 64B/1500B datacopy
+3) 64B/1500B vhost-pci
 
-remove?
+It makes make feel that vhost-pci is dedicated for small bytes? We=20
+probably don't want a solution for just a specific size of packets.
 
-it would be nice to have trace events here (later).
+>    =20
+> Vhostpci can bring the following advantages compared to traditional sol=
+ution(vhost/virtio PMD pairs)
+> 1.  higher throughput for two VMs. ( Let us see the following  case,  i=
+f we use NIC passthrough way to two 2 VMs,  vhostpci RX or TX is handled =
+ running 1 single core in VM1,  virtio PMD  is similar on VM2,
+> Only RX or TX is handled running on one single core.
+> for traditional solution,  except each virtio PMD is running inside eac=
+h VM,  at least one extra core is needed for vhost user RX and TX as an m=
+ediator.
+> In this case, the bottleneck lies in the two vhost user ports running o=
+n one single core, which has double workload.
 
-> +
-> +    switch (addr) {
-> +    case KVASER_PCI_XILINX_VERINT:
-> +        return (KVASER_PCI_XILINX_VERSION_NUMBER << 4) | 0;
-> +    }
-> +
-> +    return 0;
-> +}
-> +
-> +static void kvaser_pci_xilinx_io_write(void *opaque, hwaddr addr, uint64_t data,
-> +                             unsigned size)
-> +{
-> +    /*KvaserPCIState *d = opaque;*/
+Does this still make sense for packet size other than 64 byte (e.g 1500B)=
+?
 
-also trace events.
+>  =20
+>
+> 2. Low latencies (have shorter data path than tradition soluton, doesn'=
+t need to pass host OS any more by vhost user)
 
-> +}
-> +
-> +static const MemoryRegionOps kvaser_pci_s5920_io_ops = {
-> +    .read = kvaser_pci_s5920_io_read,
-> +    .write = kvaser_pci_s5920_io_write,
-> +    .endianness = DEVICE_LITTLE_ENDIAN,
-> +    .impl = {
-> +        .min_access_size = 4,
-> +        .max_access_size = 4,
-> +    },
-> +};
-> +
-> +static const MemoryRegionOps kvaser_pci_sja_io_ops = {
-> +    .read = kvaser_pci_sja_io_read,
-> +    .write = kvaser_pci_sja_io_write,
-> +    .endianness = DEVICE_LITTLE_ENDIAN,
-> +    .impl = {
-> +        .min_access_size = 1,
+Is this still true if you do busy polling on both sides?
 
-superfluous ^
+>
+> 3. reduce nearly 50% cores  because  OVS is not involved again if we ap=
+ply vhostpci/virtio to VMs-chain case.
 
-> +        .max_access_size = 1,
-> +    },
-> +};
-> +
-> +static const MemoryRegionOps kvaser_pci_xilinx_io_ops = {
-> +    .read = kvaser_pci_xilinx_io_read,
-> +    .write = kvaser_pci_xilinx_io_write,
-> +    .endianness = DEVICE_LITTLE_ENDIAN,
-> +    .impl = {
-> +        .min_access_size = 1,
+Well the differences to me is, copy in guest vs copy in host.
 
-ditto
+- vhost-pci move the copy from host process to pmd in guest, it probably=20
+save cores but sacrifice the performance of pmd which needs do copy now
+- exist OVS may occupy more cores in host, but if saves the ability of=20
+guest pmd
 
-> +        .max_access_size = 1,
-> +    },
-> +};
-> +
-> +static int kvaser_pci_init(PCIDevice *pci_dev)
-> +{
-> +    KvaserPCIState *d = KVASER_PCI_DEV(pci_dev);
-> +    CanSJA1000State *s = &d->sja_state;
-> +    uint8_t *pci_conf;
-> +    CanBusState *can_bus;
-> +
-> +    if (d->model) {
-> +        if (strncmp(d->model, "pcican-s", 256)) { /* for security reason */
+ From the view of performance, it looks to me that copy in host is=20
+faster since it has less overhead e.g vmexits. Vhost-pci probably needs=20
+more vcpus to compete with current solution.
 
-Why 256?
+Thanks
 
-> +            error_report("Can't create CAN device, "
-> +                         "the model %s is not supported now.", d->model);
-> +            exit(1);
-> +        }
-> +    }
-> +
-> +    can_bus = can_bus_find_by_name(d->canbus, true);
-> +    if (can_bus == NULL) {
-> +        error_report("Cannot create can find/allocate CAN bus");
-> +        exit(1);
-> +
-> +    }
-> +
-> +    if (d->host != NULL) {
-> +        if (can_bus_connect_to_host_device(can_bus, d->host) < 0) {
-> +            error_report("Cannot connect CAN bus to host device \"%s\"",
-> +                         d->host);
-> +            exit(1);
-> +        }
-> +    }
-> +
-> +    pci_conf = pci_dev->config;
-> +    pci_conf[PCI_INTERRUPT_PIN] = 0x01; /* interrupt pin A */
-> +
-> +    d->irq = pci_allocate_irq(&d->dev);
-> +
-> +    can_sja_init(s, kvaser_pci_irq_raise, kvaser_pci_irq_lower, d);
-> +
-> +    qemu_register_reset(kvaser_pci_reset, d);
-> +
-> +    if (can_sja_connect_to_bus(s, can_bus) < 0) {
-> +        error_report("can_sja_connect_to_bus failed");
-> +        exit(1);
-> +    }
-> +
-> +    memory_region_init_io(&d->s5920_io, OBJECT(d), &kvaser_pci_s5920_io_ops,
-> +                          d, "kvaser_pci-s5920", KVASER_PCI_S5920_RANGE);
-> +    memory_region_init_io(&d->sja_io, OBJECT(d), &kvaser_pci_sja_io_ops,
-> +                          d, "kvaser_pci-sja", KVASER_PCI_SJA_RANGE);
-> +    memory_region_init_io(&d->xilinx_io, OBJECT(d), &kvaser_pci_xilinx_io_ops,
-> +                          d, "kvaser_pci-xilinx", KVASER_PCI_XILINX_RANGE);
-> +
-> +    pci_register_bar(&d->dev, /*BAR*/ 0, PCI_BASE_ADDRESS_SPACE_IO,
-> +                                            &d->s5920_io);
-> +    pci_register_bar(&d->dev, /*BAR*/ 1, PCI_BASE_ADDRESS_SPACE_IO,
-> +                                            &d->sja_io);
-> +    pci_register_bar(&d->dev, /*BAR*/ 2, PCI_BASE_ADDRESS_SPACE_IO,
-> +                                            &d->xilinx_io);
-> +
-> +    return 0;
-> +}
-> +
-> +static void kvaser_pci_exit(PCIDevice *pci_dev)
-> +{
-> +    KvaserPCIState *d = KVASER_PCI_DEV(pci_dev);
-> +    CanSJA1000State *s = &d->sja_state;
-> +
-> +    can_sja_disconnect(s);
-> +
-> +    qemu_unregister_reset(kvaser_pci_reset, d);
-> +
-> +    /*
-> +     * regions d->s5920_io, d->sja_io and d->xilinx_io
-> +     * are destroyed by QOM now
-> +     */
-> +
-> +    can_sja_exit(s);
-> +
-> +    qemu_free_irq(d->irq);
-> +}
-> +
-> +static const VMStateDescription vmstate_kvaser_pci = {
-> +    .name = "kvaser_pci",
-> +    .version_id = 1,
-> +    .minimum_version_id = 1,
-> +    .minimum_version_id_old = 1,
-> +    .fields = (VMStateField[]) {
-> +        VMSTATE_PCI_DEVICE(dev, KvaserPCIState),
-> +        VMSTATE_STRUCT(sja_state, KvaserPCIState, 0, vmstate_can_sja,
-> +                       CanSJA1000State),
-> +        /*char *model,*/
-> +        VMSTATE_UINT32(s5920_intcsr, KvaserPCIState),
-> +        VMSTATE_UINT32(s5920_irqstate, KvaserPCIState),
-> +        VMSTATE_END_OF_LIST()
-> +    }
-> +};
-> +
-> +static void qdev_kvaser_pci_reset(DeviceState *dev)
-> +{
-> +    KvaserPCIState *d = KVASER_PCI_DEV(dev);
-> +    kvaser_pci_reset(d);
-> +}
-> +
-> +static Property kvaser_pci_properties[] = {
-> +    DEFINE_PROP_STRING("canbus",   KvaserPCIState, canbus),
-> +    DEFINE_PROP_STRING("host",  KvaserPCIState, host),
-> +    DEFINE_PROP_STRING("model", KvaserPCIState, model),
-> +    DEFINE_PROP_END_OF_LIST(),
-> +};
-> +
-> +static void kvaser_pci_class_init(ObjectClass *klass, void *data)
-> +{
-> +    DeviceClass *dc = DEVICE_CLASS(klass);
-> +    PCIDeviceClass *k = PCI_DEVICE_CLASS(klass);
-> +
-> +    k->init = kvaser_pci_init;
-> +    k->exit = kvaser_pci_exit;
-> +    k->vendor_id = KVASER_PCI_VENDOR_ID1;
-> +    k->device_id = KVASER_PCI_DEVICE_ID1;
-> +    k->revision = 0x00;
-> +    k->class_id = 0x00ff00;
-> +    dc->desc = "Kvaser PCICANx";
-> +    dc->props = kvaser_pci_properties;
-> +    dc->vmsd = &vmstate_kvaser_pci;
-> +    set_bit(DEVICE_CATEGORY_MISC, dc->categories);
-> +    dc->reset = qdev_kvaser_pci_reset;
-> +}
-> +
-> +static const TypeInfo kvaser_pci_info = {
-> +    .name          = TYPE_CAN_PCI_DEV,
-> +    .parent        = TYPE_PCI_DEVICE,
-> +    .instance_size = sizeof(KvaserPCIState),
-> +    .class_init    = kvaser_pci_class_init,
-> +    .interfaces = (InterfaceInfo[]) {
-> +        { INTERFACE_CONVENTIONAL_PCI_DEVICE },
-> +        { },
-> +    },
-> +};
-> +
-> +static void kvaser_pci_register_types(void)
-> +{
-> +    type_register_static(&kvaser_pci_info);
-> +}
-> +
-> +type_init(kvaser_pci_register_types)
-> 
+>
+> Thanks
+> Zhiyong
+>
