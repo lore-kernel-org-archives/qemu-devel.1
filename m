@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51564)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51580)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1eb1yj-0001Ge-AI
-	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 05:27:01 -0500
+	(envelope-from <berrange@redhat.com>) id 1eb1yn-0001K2-Bk
+	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 05:27:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1eb1yi-0007Ng-KY
-	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 05:26:57 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:42336)
+	(envelope-from <berrange@redhat.com>) id 1eb1ym-0007PW-4y
+	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 05:27:01 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:60692)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1eb1yi-0007NP-Ep
-	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 05:26:56 -0500
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1eb1yl-0007PD-VG
+	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 05:27:00 -0500
 From: "Daniel P. Berrange" <berrange@redhat.com>
-Date: Mon, 15 Jan 2018 10:26:12 +0000
-Message-Id: <20180115102621.9183-5-berrange@redhat.com>
+Date: Mon, 15 Jan 2018 10:26:13 +0000
+Message-Id: <20180115102621.9183-6-berrange@redhat.com>
 In-Reply-To: <20180115102621.9183-1-berrange@redhat.com>
 References: <20180115102621.9183-1-berrange@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 04/13] qapi: adapt to moved location of
- StringIO module in py3
+Subject: [Qemu-devel] [PATCH v3 05/13] qapi: Adapt to moved location of
+ 'maketrans' function in py3
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,33 +29,24 @@ Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Fam Zheng <famz@red
 
 Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
 ---
- scripts/qapi.py | 7 +++++--
- 1 file changed, 5 insertions(+), 2 deletions(-)
+ scripts/qapi.py | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
 diff --git a/scripts/qapi.py b/scripts/qapi.py
-index 7ec2e00b2c..eaa63a58be 100644
+index eaa63a58be..b6a7b5139f 100644
 --- a/scripts/qapi.py
 +++ b/scripts/qapi.py
-@@ -22,6 +22,10 @@ try:
-     from collections import OrderedDict
- except:
-     from ordereddict import OrderedDict
-+try:
-+    from StringIO import StringIO
-+except ImportError:
-+    from io import StringIO
+@@ -1734,7 +1734,10 @@ def c_enum_const(type_name, const_name, prefix=None):
+         type_name = prefix
+     return camel_to_upper(type_name) + '_' + c_name(const_name, False).upper()
  
- builtin_types = {
-     'null':     'QTYPE_QNULL',
-@@ -1995,8 +1999,7 @@ def open_output(output_dir, do_c, do_h, prefix, c_file, h_file,
-         if really:
-             return open(name, opt)
-         else:
--            import StringIO
--            return StringIO.StringIO()
-+            return StringIO()
+-c_name_trans = string.maketrans('.-', '__')
++if hasattr(str, 'maketrans'):
++    c_name_trans = str.maketrans('.-', '__')
++else:
++    c_name_trans = string.maketrans('.-', '__')
  
-     fdef = maybe_open(do_c, c_file, 'w')
-     fdecl = maybe_open(do_h, h_file, 'w')
+ 
+ # Map @name to a valid C identifier.
 -- 
 2.14.3
