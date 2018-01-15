@@ -1,22 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43340)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43347)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1eazaf-0002rL-D1
-	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 02:53:58 -0500
+	(envelope-from <wei.w.wang@intel.com>) id 1eazag-0002sL-RY
+	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 02:53:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1eazac-00005B-8I
-	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 02:53:57 -0500
-References: <20180115072715.25921-1-david@gibson.dropbear.id.au>
-	<20180115072715.25921-3-david@gibson.dropbear.id.au>
-From: Laurent Vivier <lvivier@redhat.com>
-Message-ID: <b1e1fc20-299c-860f-d089-74468571489f@redhat.com>
-Date: Mon, 15 Jan 2018 08:53:48 +0100
+	(envelope-from <wei.w.wang@intel.com>) id 1eazad-00006r-NH
+	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 02:53:58 -0500
+Received: from mga04.intel.com ([192.55.52.120]:20445)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
+	id 1eazad-0008Uy-D2
+	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 02:53:55 -0500
+Message-ID: <5A5C5EA2.7060605@intel.com>
+Date: Mon, 15 Jan 2018 15:56:18 +0800
+From: Wei Wang <wei.w.wang@intel.com>
 MIME-Version: 1.0
-In-Reply-To: <20180115072715.25921-3-david@gibson.dropbear.id.au>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 2/2] spapr: Adjust default VSMT value for
- better migration compatibility
+References: <20180110161438.GA28096@stefanha-x1.localdomain>
+	<dcb849d4-82fb-de8a-5e81-23d47026c9eb@redhat.com>
+	<20180111152345.GA7353@stefanha-x1.localdomain>
+	<86106573-422b-fe4c-ec15-dad0edf05880@redhat.com>
+	<20180112101807.GE7356@stefanha-x1.localdomain>
+In-Reply-To: <20180112101807.GE7356@stefanha-x1.localdomain>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] vhost-pci and virtio-vhost-user
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,75 +31,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>, groug@kaod.org, joserz@linux.vnet.ibm.com, surajjs@au1.ibm.com, sam.bobroff@au1.ibm.com
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+To: Stefan Hajnoczi <stefanha@redhat.com>, Jason Wang <jasowang@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-On 15/01/2018 08:27, David Gibson wrote:
-> fa98fbfc "PC: KVM: Support machine option to set VSMT mode" introduced the
-> "vsmt" parameter for the pseries machine type, which controls the spacing
-> of the vcpu ids of thread 0 for each virtual core.  This was done to bring
-> some consistency and stability to how that was done, while still allowing
-> backwards compatibility for migration and otherwise.
-> 
-> The default value we used for vsmt was set to the max of the host's
-> advertised default number of threads and the number of vthreads per vcore
-> in the guest.  This was done to continue running without extra parameters
-> on older KVM versions which don't allow the VSMT value to be changed.
-> 
-> Unfortunately, even that smaller than before leakage of host configuration
-> into guest visible configuration still breaks things.  Specifically a guest
-> with 4 (or less) vthread/vcore will get a different vsmt value when
-> running on a POWER8 (vsmt==8) and POWER9 (vsmt==4) host.  That means the
-> vcpu ids don't line up so you can't migrate between them, though you should
-> be able to.
-> 
-> Long term we really want to make vsmt == smp_threads for sufficiently
-> new machine types.  However, that means that qemu will then require a
-> sufficiently recent KVM (one which supports changing VSMT) - that's still
-> not widely enough deployed to be really comfortable to do.
-> 
-> In the meantime we some default that will work as often as possible.
-> This patch changes that default to 8 in all circumstances.  This does
-> change guest visible behaviour (including for existing machine versions)
-> for many cases - just not the most common/important case.
-> 
-> Following is case by case justification for why this is still the least
-> worst option.  Note that any of the old behaviours can still be duplicated
-> after this patch, it's just that it requires manual intervention by
-> setting the vsmt property on the command line.
-> 
-> KVM HV on POWER8 host:
->    This is the overwhelmingly common case in production setups, and is
->    unchanged by design.  POWER8 hosts will advertise a default VSMT mode
->    of 8, and > 8 vthreads/vcore isn't permitted
-> 
-> KVM HV on POWER7 host:
->    Will break, but POWER7s allowing KVM were never released to the public.
-> 
-> KVM HV on POWER9 host:
->    Not yet released to the public, breaking this now will reduce other
->    breakage later.
-> 
-> KVM HV on PowerPC 970:
->    Will theoretically break it, but it was barely supported to begin with
->    and already required various user visible hacks to work.  Also so old
->    that I just don't care.
-> 
-> TCG:
->    This is the nastiest one; it means migration of TCG guests (without
->    manual vsmt setting) will break.  Since TCG is rarely used in production
->    I think this is worth it for the other benefits.  It does also remove
->    one more barrier to TCG<->KVM migration which could be interesting for
->    debugging applications.
-> 
-> KVM PR:
->    As with TCG, this will break migration of existing configurations,
->    without adding extra manual vsmt options.  As with TCG, it is rare in
->    production so I think the benefits outweigh breakages.
-> 
-> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-> ---
->  hw/ppc/spapr.c | 11 ++++++++---
->  1 file changed, 8 insertions(+), 3 deletions(-)
+On 01/12/2018 06:18 PM, Stefan Hajnoczi wrote:
+> On Fri, Jan 12, 2018 at 11:32:56AM +0800, Jason Wang wrote:
+>>
+>> On 2018年01月11日 23:23, Stefan Hajnoczi wrote:
+>>> On Thu, Jan 11, 2018 at 06:57:03PM +0800, Jason Wang wrote:
+>>>> On 2018年01月11日 00:14, Stefan Hajnoczi wrote:
+>>>
+>> Looks not, if I read the code correctly, vhost-pci has a device
+>> implementation in qemu, and in slave VM it only have a vhost-pci-net driver.
+> You are right that the current "[PATCH v3 0/7] Vhost-pci for inter-VM
+> communication" does not reach this goal yet.  The patch series focusses
+> on a subset of vhost-user-net for poll mode drivers.
+>
+> But the goal is to eventually let VMs implement any vhost device type.
+> Even if Wei, you, or I don't implement scsi, for example, someone else
+> should be able to do it based on vhost-pci or virtio-vhost-user.
+>
+> Wei: Do you agree?
 
-Reviewed-by: Laurent Vivier <lvivier@redhat.com>
+Yes. I agree it would be good to have only one device, which performs 
+the fundamental emulation (e.g. expose master VM memory via a bar) that 
+is common to all the types (net, scsi..). The device should be able to 
+tell the driver which type the master side is. So, at the QEMU device 
+layer, we don't need to distinguish between device types, while 
+regarding the driver, each device type has its own specific driver 
+implementation, which is based on a common vhost-pci driver layer.
+
+
+Best,
+Wei
