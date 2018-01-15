@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51698)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51659)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1eb1z5-0001Zz-0j
-	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 05:27:20 -0500
+	(envelope-from <berrange@redhat.com>) id 1eb1z2-0001XW-Ot
+	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 05:27:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1eb1z4-0007Zl-0A
-	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 05:27:19 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:41212)
+	(envelope-from <berrange@redhat.com>) id 1eb1z1-0007YB-Vw
+	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 05:27:16 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:42630)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1eb1z3-0007Z9-Qk
-	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 05:27:17 -0500
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1eb1z1-0007Xl-QO
+	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 05:27:15 -0500
 From: "Daniel P. Berrange" <berrange@redhat.com>
-Date: Mon, 15 Jan 2018 10:26:18 +0000
-Message-Id: <20180115102621.9183-11-berrange@redhat.com>
+Date: Mon, 15 Jan 2018 10:26:17 +0000
+Message-Id: <20180115102621.9183-10-berrange@redhat.com>
 In-Reply-To: <20180115102621.9183-1-berrange@redhat.com>
 References: <20180115102621.9183-1-berrange@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 10/13] input: add missing JIS keys to virtio
- input
+Subject: [Qemu-devel] [PATCH v3 09/13] configure: allow use of python 3
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,66 +24,28 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Fam Zheng <famz@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Miika S <miika9764@gmail.com>
+Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Fam Zheng <famz@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>
 
-From: Miika S <miika9764@gmail.com>
-
-keycodemapdb updated to add the QKeyCodes muhenkan and katakanahiragana
-
-Signed-off-by: Miika S <miika9764@gmail.com>
+Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
 ---
- hw/input/virtio-input-hid.c | 7 +++++++
- qapi/ui.json                | 5 ++++-
- ui/keycodemapdb             | 2 +-
- 3 files changed, 12 insertions(+), 2 deletions(-)
+ configure | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
 
-diff --git a/hw/input/virtio-input-hid.c b/hw/input/virtio-input-hid.c
-index e78faec0b1..9628d289f9 100644
---- a/hw/input/virtio-input-hid.c
-+++ b/hw/input/virtio-input-hid.c
-@@ -139,6 +139,13 @@ static const unsigned int keymap_qcode[Q_KEY_CODE__MAX] = {
-     [Q_KEY_CODE_META_L]              = KEY_LEFTMETA,
-     [Q_KEY_CODE_META_R]              = KEY_RIGHTMETA,
-     [Q_KEY_CODE_MENU]                = KEY_MENU,
-+
-+    [Q_KEY_CODE_MUHENKAN]            = KEY_MUHENKAN,
-+    [Q_KEY_CODE_HENKAN]              = KEY_HENKAN,
-+    [Q_KEY_CODE_KATAKANAHIRAGANA]    = KEY_KATAKANAHIRAGANA,
-+    [Q_KEY_CODE_COMPOSE]             = KEY_COMPOSE,
-+    [Q_KEY_CODE_RO]                  = KEY_RO,
-+    [Q_KEY_CODE_YEN]                 = KEY_YEN,
- };
+diff --git a/configure b/configure
+index b272a0336b..60b99f45f6 100755
+--- a/configure
++++ b/configure
+@@ -1598,9 +1598,8 @@ fi
  
- static const unsigned int keymap_button[INPUT_BUTTON__MAX] = {
-diff --git a/qapi/ui.json b/qapi/ui.json
-index 07b468f625..d6679aa8f5 100644
---- a/qapi/ui.json
-+++ b/qapi/ui.json
-@@ -748,6 +748,9 @@
- # @ac_bookmarks: since 2.10
- # altgr, altgr_r: dropped in 2.10
- #
-+# @muhenkan: since 2.12
-+# @katakanahiragana: since 2.12
-+#
- # 'sysrq' was mistakenly added to hack around the fact that
- # the ps2 driver was not generating correct scancodes sequences
- # when 'alt+print' was pressed. This flaw is now fixed and the
-@@ -775,7 +778,7 @@
-             'left', 'up', 'down', 'right', 'insert', 'delete', 'stop', 'again',
-             'props', 'undo', 'front', 'copy', 'open', 'paste', 'find', 'cut',
-             'lf', 'help', 'meta_l', 'meta_r', 'compose', 'pause',
--            'ro', 'hiragana', 'henkan', 'yen',
-+            'ro', 'hiragana', 'henkan', 'yen', 'muhenkan', 'katakanahiragana',
-             'kp_comma', 'kp_equals', 'power', 'sleep', 'wake',
-             'audionext', 'audioprev', 'audiostop', 'audioplay', 'audiomute',
-             'volumeup', 'volumedown', 'mediaselect',
-diff --git a/ui/keycodemapdb b/ui/keycodemapdb
-index 10739aa260..05dad417e9 160000
---- a/ui/keycodemapdb
-+++ b/ui/keycodemapdb
-@@ -1 +1 @@
--Subproject commit 10739aa26051a5d49d88132604539d3ed085e72e
-+Subproject commit 05dad417e9d0b37ee1fba33056d91a6b734b3357
+ # Note that if the Python conditional here evaluates True we will exit
+ # with status 1 which is a shell 'false' value.
+-if ! $python -c 'import sys; sys.exit(sys.version_info < (2,6) or sys.version_info >= (3,))'; then
+-  error_exit "Cannot use '$python', Python 2.6 or later is required." \
+-      "Note that Python 3 or later is not yet supported." \
++if ! $python -c 'import sys; sys.exit(sys.version_info < (2,6))'; then
++  error_exit "Cannot use '$python', Python 2 >= 2.6 or Python 3 is required." \
+       "Use --python=/path/to/python to specify a supported Python."
+ fi
+ 
 -- 
 2.14.3
