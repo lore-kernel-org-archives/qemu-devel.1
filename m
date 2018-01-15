@@ -1,24 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35704)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36021)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1eb15J-0006aB-Nn
-	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 04:29:42 -0500
+	(envelope-from <luc.michel@git.antfield.fr>) id 1eb16S-0007Wz-OO
+	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 04:30:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1eb15F-0002dI-Qu
-	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 04:29:41 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:34086)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1eb15F-0002cy-Js
-	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 04:29:37 -0500
-References: <20180115041648.33740-1-linzhecheng@huawei.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <2a6ca84f-4df2-523c-d3aa-75cd73b1d739@redhat.com>
-Date: Mon, 15 Jan 2018 10:29:32 +0100
-MIME-Version: 1.0
-In-Reply-To: <20180115041648.33740-1-linzhecheng@huawei.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] scsi: handle the special parameters
+	(envelope-from <luc.michel@git.antfield.fr>) id 1eb16N-0003L2-2c
+	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 04:30:52 -0500
+From: Luc MICHEL <luc.michel@git.antfield.fr>
+Date: Mon, 15 Jan 2018 10:32:19 +0100
+Message-Id: <20180115093220.9154-1-luc.michel@git.antfield.fr>
+Subject: [Qemu-devel] [PATCH v2 0/1] target-ppc: Fix booke206 tlbwe TLB
+ instruction
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,39 +18,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: linzhecheng <linzhecheng@huawei.com>, qemu-devel@nongnu.org
-Cc: famz@redhat.com, wangxinxin.wang@huawei.com
+To: qemu-devel@nongnu.org
+Cc: Luc MICHEL <luc.michel@git.antfield.fr>, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Alexander Graf <agraf@suse.de>
 
-On 15/01/2018 05:16, linzhecheng wrote:
-> scsi_disk_emulate_command calls
-> scsi_build_sense(NULL, 0, outbuf, r->buflen,
->                                   (req->cmd.buf[1] & 1) == 0);
-> But scsi_convert_sense doesn't handle the case when in_buf is NULL
-> or in_len is 0, which will lead to segfault.
-> 
+v1 is here: https://lists.gnu.org/archive/html/qemu-devel/2017-11/msg00140.html
 
-This is already fixed in my last pull request.
+v2:
+    - Add a comment with a cite from the "PowerPC e500 Core Family Reference Manual,
+      Rev. 1", as advised by David.
 
-Paolo
+Thanks.
 
-> Signed-off-by: linzhecheng <linzhecheng@huawei.com>
-> ---
->  scsi/utils.c | 4 ++++
->  1 file changed, 4 insertions(+)
-> 
-> diff --git a/scsi/utils.c b/scsi/utils.c
-> index ddae650a99..b769e80c12 100644
-> --- a/scsi/utils.c
-> +++ b/scsi/utils.c
-> @@ -322,6 +322,10 @@ int scsi_convert_sense(uint8_t *in_buf, int in_len,
->      SCSISense sense;
->      bool fixed_in;
->  
-> +    if (!in_buf || !in_len) {
-> +        return 0;
-> +    }
-> +
->      fixed_in = (in_buf[0] & 2) == 0;
->      if (in_len && fixed == fixed_in) {
->          memcpy(buf, in_buf, MIN(len, in_len));
-> 
+Luc MICHEL (1):
+  target-ppc: Fix booke206 tlbwe TLB instruction
+
+ target/ppc/mmu_helper.c | 32 +++++++++++++++++++++++++++-----
+ 1 file changed, 27 insertions(+), 5 deletions(-)
+
+-- 
+2.15.1
