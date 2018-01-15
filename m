@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40939)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41376)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1eb1Ke-0001Rd-Bj
-	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 04:45:39 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1eb1Ls-00022p-Ir
+	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 04:46:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1eb1Kb-0004ZH-AK
-	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 04:45:32 -0500
-Received: from mout.kundenserver.de ([212.227.126.131]:55486)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1eb1Ka-0004Yq-W5
-	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 04:45:29 -0500
-References: <20180114020412.26160-1-f4bug@amsat.org>
-	<20180114020412.26160-2-f4bug@amsat.org>
-From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <1f39fe23-a693-c164-3417-061648e2b2b4@vivier.eu>
-Date: Mon, 15 Jan 2018 10:45:00 +0100
+	(envelope-from <pbonzini@redhat.com>) id 1eb1Lp-0005Rt-Hy
+	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 04:46:48 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:42320)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1eb1Lp-0005RE-B9
+	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 04:46:45 -0500
+References: <1515934519-16158-1-git-send-email-linzc@zju.edu.cn>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <9fad2f5d-a8e1-cde5-711a-ecbfcda60b59@redhat.com>
+Date: Mon, 15 Jan 2018 10:46:41 +0100
 MIME-Version: 1.0
-In-Reply-To: <20180114020412.26160-2-f4bug@amsat.org>
+In-Reply-To: <1515934519-16158-1-git-send-email-linzc@zju.edu.cn>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [RFC PATCH 1/3] qdev: rename typedef
- qdev_resetfn() -> DeviceReset()
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] memory: set ioeventfd_update_pending after
+ address_space_update_ioeventfds
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,41 +28,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>
-Cc: qemu-devel@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>, Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: linzhecheng <linzc@zju.edu.cn>, qemu-devel@nongnu.org
 
-Le 14/01/2018 à 03:04, Philippe Mathieu-Daudé a écrit :
-> following the DeviceRealize and DeviceUnrealize typedefs,
-> this unify a bit the new QOM API.
+On 14/01/2018 13:55, linzhecheng wrote:
+> We should set ioeventfd_update_pending same as memory_region_update_pending.
 > 
-> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+> Signed-off-by: linzhecheng <linzc@zju.edu.cn>
+
+Thanks.  This indeed fixes a bug introduced by commit
+ade9c1aac5292ff698fa550adebe794c37d86cc9.
+
+Paolo
+
 > ---
->  include/hw/qdev-core.h | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
+>  memory.c | 1 +
+>  1 file changed, 1 insertion(+)
 > 
-> diff --git a/include/hw/qdev-core.h b/include/hw/qdev-core.h
-> index 0a71bf83f0..83db53b3f5 100644
-> --- a/include/hw/qdev-core.h
-> +++ b/include/hw/qdev-core.h
-> @@ -32,9 +32,9 @@ typedef enum DeviceCategory {
->  
->  typedef int (*qdev_initfn)(DeviceState *dev);
->  typedef int (*qdev_event)(DeviceState *dev);
-> -typedef void (*qdev_resetfn)(DeviceState *dev);
->  typedef void (*DeviceRealize)(DeviceState *dev, Error **errp);
->  typedef void (*DeviceUnrealize)(DeviceState *dev, Error **errp);
-> +typedef void (*DeviceReset)(DeviceState *dev);
->  typedef void (*BusRealize)(BusState *bus, Error **errp);
->  typedef void (*BusUnrealize)(BusState *bus, Error **errp);
->  
-> @@ -117,7 +117,7 @@ typedef struct DeviceClass {
->      bool hotpluggable;
->  
->      /* callbacks */
-> -    void (*reset)(DeviceState *dev);
-> +    DeviceReset reset;
->      DeviceRealize realize;
->      DeviceUnrealize unrealize;
->  
+> diff --git a/memory.c b/memory.c
+> index 4b41fb8..0cf39d0 100644
+> --- a/memory.c
+> +++ b/memory.c
+> @@ -1091,6 +1091,7 @@ void memory_region_transaction_commit(void)
+>                  address_space_update_ioeventfds(as);
+>              }
+>              memory_region_update_pending = false;
+> +            ioeventfd_update_pending = false;
+>              MEMORY_LISTENER_CALL_GLOBAL(commit, Forward);
+>          } else if (ioeventfd_update_pending) {
+>              QTAILQ_FOREACH(as, &address_spaces, address_spaces_link) {
 > 
-Reviewed-by: Laurent Vivier <laurent@vivier.eu>
