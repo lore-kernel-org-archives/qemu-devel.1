@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43748)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44252)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1eb8aP-0004pe-7U
-	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 12:30:18 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1eb8bw-0006Gv-PK
+	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 12:31:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1eb8aL-0006wF-8g
-	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 12:30:17 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:35876)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1eb8aK-0006vP-R1
-	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 12:30:13 -0500
-Date: Mon, 15 Jan 2018 17:30:01 +0000
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20180115173001.GW8218@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <20180115170243.24578-1-berrange@redhat.com>
-	<20180115170243.24578-11-berrange@redhat.com>
-	<88039710-1259-3868-0d67-febff24d36db@redhat.com>
+	(envelope-from <richard.henderson@linaro.org>) id 1eb8bs-00005q-NE
+	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 12:31:52 -0500
+Received: from mail-pl0-x232.google.com ([2607:f8b0:400e:c01::232]:42784)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1eb8bs-0008W5-GX
+	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 12:31:48 -0500
+Received: by mail-pl0-x232.google.com with SMTP id bd8so4183775plb.9
+	for <qemu-devel@nongnu.org>; Mon, 15 Jan 2018 09:31:48 -0800 (PST)
+References: <1515562748-32287-1-git-send-email-rth@twiddle.net>
+	<CAFEAcA8TxNTjvsqeHss=7BEm6SzwLHZ54UqDmOPMWA5z0oTsUA@mail.gmail.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <2706dc83-cf36-31e9-71d7-ec7ca0cecff0@linaro.org>
+Date: Mon, 15 Jan 2018 09:31:43 -0800
 MIME-Version: 1.0
+In-Reply-To: <CAFEAcA8TxNTjvsqeHss=7BEm6SzwLHZ54UqDmOPMWA5z0oTsUA@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <88039710-1259-3868-0d67-febff24d36db@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v4 10/13] input: add missing JIS keys to
- virtio input
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] tcg/arm: Fix double-word comparisons
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,37 +31,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org, Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>, Fam Zheng <famz@redhat.com>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Markus Armbruster <armbru@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Miika S <miika9764@gmail.com>
+To: Peter Maydell <peter.maydell@linaro.org>, Richard Henderson <rth@twiddle.net>
+Cc: Michael Roth <mdroth@linux.vnet.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, David Gibson <david@gibson.dropbear.id.au>
 
-On Mon, Jan 15, 2018 at 11:17:15AM -0600, Eric Blake wrote:
-> On 01/15/2018 11:02 AM, Daniel P. Berrange wrote:
-> > From: Miika S <miika9764@gmail.com>
-> > 
-> > keycodemapdb updated to add the QKeyCodes muhenkan and katakanahiragana
-> > 
-> > Signed-off-by: Miika S <miika9764@gmail.com>
-> > ---
-> >  hw/input/virtio-input-hid.c | 7 +++++++
-> >  qapi/ui.json                | 5 ++++-
-> >  ui/keycodemapdb             | 2 +-
-> >  3 files changed, 12 insertions(+), 2 deletions(-)
-> 
-> Why are you bumping the submodule here and again in 11/13? Can those two
-> patches be squashed together?
+On 01/15/2018 06:27 AM, Peter Maydell wrote:
+> We could avoid the annoying "load LE/GE immediates to tempreg"
+> extra code by having tcg_out_cmp2() return a flag to tell
+> the caller which way round to put the conditions for its two
+> conditional ARITH_MOV insns (for setcond2) or which condition
+> to use for the branch (brcond2), right?
 
-This patch is just temporarily pulled from another patch series, which
-I expect to get merged before this one does.
+No.
 
-> > +++ b/ui/keycodemapdb
-> > @@ -1 +1 @@
-> > -Subproject commit 10739aa26051a5d49d88132604539d3ed085e72e
-> > +Subproject commit 05dad417e9d0b37ee1fba33056d91a6b734b3357
+We do return a condition to use for the user.  When we do the LE/GT load
+immediates to temp path, we do apply tcg_cond_swap(cond), which converts the
+condition as for swapped arguments, i.e. to GE/LT.
+
+But we can't *not* swap the arguments to the generated comparison.  Otherwise
+we're computing the wrong thing.
 
 
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+r~
