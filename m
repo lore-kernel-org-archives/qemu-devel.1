@@ -1,27 +1,39 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39215)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40003)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eb9rE-0004YQ-4c
-	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 13:51:45 -0500
+	(envelope-from <borntraeger@de.ibm.com>) id 1eb9tZ-0006Ci-3U
+	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 13:54:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eb9rD-0000OS-B0
-	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 13:51:44 -0500
-Received: from mail-oi0-x243.google.com ([2607:f8b0:4003:c06::243]:41025)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1eb9rD-0000Nr-6Y
-	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 13:51:43 -0500
-Received: by mail-oi0-x243.google.com with SMTP id n81so8938054oig.8
-	for <qemu-devel@nongnu.org>; Mon, 15 Jan 2018 10:51:43 -0800 (PST)
+	(envelope-from <borntraeger@de.ibm.com>) id 1eb9tU-0001wi-To
+	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 13:54:09 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:52166)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
+	id 1eb9tU-0001uZ-Lh
+	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 13:54:04 -0500
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w0FIqvZp106370
+	for <qemu-devel@nongnu.org>; Mon, 15 Jan 2018 13:54:01 -0500
+Received: from e06smtp13.uk.ibm.com (e06smtp13.uk.ibm.com [195.75.94.109])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2fh0a5mjm9-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Mon, 15 Jan 2018 13:54:01 -0500
+Received: from localhost
+	by e06smtp13.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
+	Mon, 15 Jan 2018 18:53:58 -0000
+References: <1516035122-7617-1-git-send-email-imbrenda@linux.vnet.ibm.com>
+From: Christian Borntraeger <borntraeger@de.ibm.com>
+Date: Mon, 15 Jan 2018 19:53:55 +0100
 MIME-Version: 1.0
-In-Reply-To: <20171218172425.18200-12-richard.henderson@linaro.org>
-References: <20171218172425.18200-1-richard.henderson@linaro.org>
-	<20171218172425.18200-12-richard.henderson@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 15 Jan 2018 18:51:22 +0000
-Message-ID: <CAFEAcA9ZZYrsjS4q393N4f91-bSia8G-dvB3Di8aSTzDz6Ckdw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v2 11/11] target/arm: Decode aa32 armv8.3
- 2-reg-index
+In-Reply-To: <1516035122-7617-1-git-send-email-imbrenda@linux.vnet.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Message-Id: <58a90a3a-2d90-15b0-dc7a-2523fab5c3d3@de.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH v1 1/1] s390x: fix storage attributes
+ migration for non-small guests
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,91 +42,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>
+To: Claudio Imbrenda <imbrenda@linux.vnet.ibm.com>, qemu-devel@nongnu.org
+Cc: cohuck@redhat.com, qemu-s390x <qemu-s390x@nongnu.org>
 
-On 18 December 2017 at 17:24, Richard Henderson
-<richard.henderson@linaro.org> wrote:
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+CCing qemu-s390x.
+
+On 01/15/2018 05:52 PM, Claudio Imbrenda wrote:
+> Fix storage attribute migration so that it does not fail for guests
+> with more than a few GB of RAM. Migration itself was successful, but
+> storage attributes were not migrated completely.
+> 
+> This patch fixes the migration of all storage attributes, even when the
+> guest have large amounts of memory.
+> 
+> Signed-off-by: Claudio Imbrenda <imbrenda@linux.vnet.ibm.com>
+> Fixes: 903fd80b03243476 ("s390x/migration: Storage attributes device")
 > ---
->  target/arm/translate.c | 51 ++++++++++++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 51 insertions(+)
->
-> diff --git a/target/arm/translate.c b/target/arm/translate.c
-> index e57844c019..490e120b0b 100644
-> --- a/target/arm/translate.c
-> +++ b/target/arm/translate.c
-> @@ -7721,6 +7721,51 @@ static int disas_neon_insn_cp8_3same(DisasContext *s, uint32_t insn)
->      return 0;
->  }
->
-> +/* ARMv8.3 reclaims a portion of the CDP2 coprocessor 8 space.  */
-> +
-> +static int disas_neon_insn_cp8_index(DisasContext *s, uint32_t insn)
-> +{
-> +    int rd, rn, rm, rot, size, opr_sz;
-> +    TCGv_ptr fpst;
-> +    bool q;
-> +
-> +    /* FIXME: this access check should not take precedence over UNDEF
-> +     * for invalid encodings; we will generate incorrect syndrome information
-> +     * for attempts to execute invalid vfp/neon encodings with FP disabled.
-> +     */
-
-Again, we can push this test down to where it belongs in this new code.
-
-> +    if (s->fp_excp_el) {
-> +        gen_exception_insn(s, 4, EXCP_UDEF,
-> +                           syn_fp_access_trap(1, 0xe, false), s->fp_excp_el);
-> +        return 0;
-> +    }
-> +    if (!s->vfp_enabled || !arm_dc_feature(s, ARM_FEATURE_V8_FCMA)) {
-> +        return 1;
-> +    }
-> +
-> +    q = extract32(insn, 6, 1);
-> +    size = extract32(insn, 23, 1);
-> +
-> +    VFP_DREG_D(rd, insn);
-> +    VFP_DREG_N(rn, insn);
-> +    VFP_DREG_M(rm, insn);
-> +    if ((rd | rn) & q) {
-> +        return 1;
-> +    }
-> +
-> +    /* This entire space is VCMLA (indexed).  */
-> +    rot = extract32(insn, 20, 2);
-> +    opr_sz = (1 + q) * 8;
-> +    fpst = get_fpstatus_ptr(1);
-> +    tcg_gen_gvec_3_ptr(vfp_reg_offset(1, rd),
-> +                       vfp_reg_offset(1, rn),
-> +                       vfp_reg_offset(1, rm), fpst,
-> +                       opr_sz, opr_sz, rot,
-> +                       size ? gen_helper_gvec_fcmlas_idx
-> +                       : gen_helper_gvec_fcmlah_idx);
-> +    tcg_temp_free_ptr(fpst);
-> +    return 0;
-> +}
-> +
->  static int disas_coproc_insn(DisasContext *s, uint32_t insn)
->  {
->      int cpnum, is64, crn, crm, opc1, opc2, isread, rt, rt2;
-> @@ -8471,6 +8516,12 @@ static void disas_arm_insn(DisasContext *s, unsigned int insn)
->                  goto illegal_op;
->              }
->              return;
-> +        } else if ((insn & 0x0f000f10) == 0x0e000800) {
-> +            /* ARMv8.3 neon cdp2 coprocessor 8 extension.  */
-> +            if (disas_neon_insn_cp8_index(s, insn)) {
-> +                goto illegal_op;
-> +            }
-> +            return;
->          } else if ((insn & 0x0fe00000) == 0x0c400000) {
->              /* Coprocessor double register transfer.  */
->              ARCH(5TE);
-
-Similar remarks as for patch 10 about decode, and how we're going
-to deal with thumb.
-
-thanks
--- PMM
+>  hw/s390x/s390-stattrib-kvm.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/hw/s390x/s390-stattrib-kvm.c b/hw/s390x/s390-stattrib-kvm.c
+> index 41770a7..480551c 100644
+> --- a/hw/s390x/s390-stattrib-kvm.c
+> +++ b/hw/s390x/s390-stattrib-kvm.c
+> @@ -116,7 +116,7 @@ static void kvm_s390_stattrib_synchronize(S390StAttribState *sa)
+>          for (cx = 0; cx + len <= max; cx += len) {
+>              clog.start_gfn = cx;
+>              clog.count = len;
+> -            clog.values = (uint64_t)(sas->incoming_buffer + cx * len);
+> +            clog.values = (uint64_t)(sas->incoming_buffer + cx);
+>              r = kvm_vm_ioctl(kvm_state, KVM_S390_SET_CMMA_BITS, &clog);
+>              if (r) {
+>                  error_report("KVM_S390_SET_CMMA_BITS failed: %s", strerror(-r));
+> @@ -126,7 +126,7 @@ static void kvm_s390_stattrib_synchronize(S390StAttribState *sa)
+>          if (cx < max) {
+>              clog.start_gfn = cx;
+>              clog.count = max - cx;
+> -            clog.values = (uint64_t)(sas->incoming_buffer + cx * len);
+> +            clog.values = (uint64_t)(sas->incoming_buffer + cx);
+>              r = kvm_vm_ioctl(kvm_state, KVM_S390_SET_CMMA_BITS, &clog);
+>              if (r) {
+>                  error_report("KVM_S390_SET_CMMA_BITS failed: %s", strerror(-r));
+> 
