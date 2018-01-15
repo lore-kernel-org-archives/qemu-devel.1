@@ -1,27 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53782)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54502)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eb7c5-0006kP-G0
-	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 11:27:58 -0500
+	(envelope-from <marcel@redhat.com>) id 1eb7fW-000057-09
+	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 11:31:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eb7c4-0007ue-Lz
-	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 11:27:57 -0500
-Received: from mail-ot0-x229.google.com ([2607:f8b0:4003:c0f::229]:37134)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1eb7c4-0007uT-FP
-	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 11:27:56 -0500
-Received: by mail-ot0-x229.google.com with SMTP id a24so11096157otd.4
-	for <qemu-devel@nongnu.org>; Mon, 15 Jan 2018 08:27:56 -0800 (PST)
+	(envelope-from <marcel@redhat.com>) id 1eb7fQ-0001Mj-V8
+	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 11:31:29 -0500
+References: <20180110190909.20652-1-marcel@redhat.com>
+	<5ea6ecb8-8866-b396-2c45-bac340a400e7@redhat.com>
+From: Marcel Apfelbaum <marcel@redhat.com>
+Message-ID: <3a752931-71f0-4708-c57b-6bab609e3a60@redhat.com>
+Date: Mon, 15 Jan 2018 18:31:09 +0200
 MIME-Version: 1.0
-In-Reply-To: <6cded669-a2af-cec0-f4c5-028758c48bfa@twiddle.net>
-References: <1515562748-32287-1-git-send-email-rth@twiddle.net>
-	<CAFEAcA8TxNTjvsqeHss=7BEm6SzwLHZ54UqDmOPMWA5z0oTsUA@mail.gmail.com>
-	<6cded669-a2af-cec0-f4c5-028758c48bfa@twiddle.net>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 15 Jan 2018 16:27:35 +0000
-Message-ID: <CAFEAcA-JVbW6uUduFpJ5Yrfq9LcpJ+wiuJfrnK6btwD9+MfbnQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH] tcg/arm: Fix double-word comparisons
+In-Reply-To: <5ea6ecb8-8866-b396-2c45-bac340a400e7@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] hw/pci-bridge: fix QEMU crash because of
+ pcie-root-port
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,31 +25,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <rth@twiddle.net>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, David Gibson <david@gibson.dropbear.id.au>, Paolo Bonzini <pbonzini@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>
+To: Laszlo Ersek <lersek@redhat.com>, qemu-devel@nongnu.org, mst@redhat.com
+Cc: qemu-stable@nongnu.org, zuban32s@gmail.com
 
-On 15 January 2018 at 16:18, Richard Henderson <rth@twiddle.net> wrote:
-> On 01/15/2018 06:27 AM, Peter Maydell wrote:
->> The code looks OK to me. I'm guessing the sparc guest failure is
->> just because we now generate more code for some of the comparison
->> cases and that doesn't fit in the buffer...
->
-> I don't recall having seen a sparc failure...
+On 15/01/2018 17:54, Laszlo Ersek wrote:
+> On 01/10/18 20:09, Marcel Apfelbaum wrote:
+>> If we try to use more pcie_root_ports then available slots
+>> and an IO hint is passed to the port, QEMU crashes because
+>> we try to init the "IO hint" capability even if the device
+>> is not created.
+>> Fix it by checking for error before adding the capability,
+>> so QEMU can fail gracefully.
+>>
+>> Signed-off-by: Marcel Apfelbaum <marcel@redhat.com>
+>> ---
+>>   hw/pci-bridge/gen_pcie_root_port.c | 7 ++++++-
+>>   1 file changed, 6 insertions(+), 1 deletion(-)
+> 
+> In your opinion, can we add:
+> 
+> Cc: qemu-stable@nongnu.org
+> Fixes: 226263fb5cdaa4a4a95f1680fabbc9dd2123fd67
+> 
+> ?
+> 
+> (Not sure if a stable branch is already open for 2.11. Commit
+> 226263fb5cdaa appeared in 2.11.)
+> 
+> Ah, I'm silly. You CC'd stable up-front. :)
+> 
+> So, what about the Fixes tag?
+> 
 
-See the backtrace in my reply to your tcg pullrequest email :-)
+For sure, I wasn't aware of the "Fixes" tag. I'll be sure to use it
+in the future.
 
->> We could avoid the annoying "load LE/GE immediates to tempreg"
->> extra code by having tcg_out_cmp2() return a flag to tell
->> the caller which way round to put the conditions for its two
->> conditional ARITH_MOV insns (for setcond2) or which condition
->> to use for the branch (brcond2), right?
->
-> Um... we do return a condition.  I must have missed a trick or
-> made a mistake somewhere.
+Do I need to resend, or Michael can pick the tag?
 
-Oh, yes, rather than returning "condition and flag to tell caller
-to invert it" we could just flip which condition we return,
-couldn't we.
+>>
+>> diff --git a/hw/pci-bridge/gen_pcie_root_port.c b/hw/pci-bridge/gen_pcie_root_port.c
+>> index ad4e6aa7ff..0e2f2e8bf1 100644
+>> --- a/hw/pci-bridge/gen_pcie_root_port.c
+>> +++ b/hw/pci-bridge/gen_pcie_root_port.c
+>> @@ -74,8 +74,13 @@ static void gen_rp_realize(DeviceState *dev, Error **errp)
+>>       PCIDevice *d = PCI_DEVICE(dev);
+>>       GenPCIERootPort *grp = GEN_PCIE_ROOT_PORT(d);
+>>       PCIERootPortClass *rpc = PCIE_ROOT_PORT_GET_CLASS(d);
+>> +    Error *local_err = NULL;
+>>   
+>> -    rpc->parent_realize(dev, errp);
+>> +    rpc->parent_realize(dev, &local_err);
+>> +    if (local_err) {
+>> +        error_propagate(errp, local_err);
+>> +        return;
+>> +    }
+>>   
+>>       int rc = pci_bridge_qemu_reserve_cap_init(d, 0, grp->bus_reserve,
+>>               grp->io_reserve, grp->mem_reserve, grp->pref32_reserve,
+>>
+> 
+> Reviewed-by: Laszlo Ersek <lersek@redhat.com>
+> 
 
-thanks
--- PMM
+Appreciated!
+
+Thanks,
+Marcel
+
+> Thanks
+> Laszlo
+> 
