@@ -1,34 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32968)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34783)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eb2LQ-0003xS-NQ
-	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 05:50:25 -0500
+	(envelope-from <berrange@redhat.com>) id 1eb2PD-0005IE-1d
+	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 05:54:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eb2LL-0006vF-ME
-	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 05:50:24 -0500
-Received: from mail-qt0-x236.google.com ([2607:f8b0:400d:c0d::236]:38060)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eb2LL-0006v5-H5
-	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 05:50:19 -0500
-Received: by mail-qt0-x236.google.com with SMTP id d4so13612596qtj.5
-	for <qemu-devel@nongnu.org>; Mon, 15 Jan 2018 02:50:19 -0800 (PST)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <1515759853-20360-1-git-send-email-pbonzini@redhat.com>
-	<CAFEAcA_0uFXKY8Xg-FN+AgqVGoL+SJa-FPC8vyw-wLHazu6JEA@mail.gmail.com>
-	<eb24b3ef-40ff-6565-ddd7-15103a06d1aa@redhat.com>
-	<CAFEAcA8FXcQP8m7_DtN0_Ax7TFHTZcLQR_eRuEj7Tf7OEb_Ywg@mail.gmail.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <a2816c59-4e29-d0ce-93d2-85fa4fa41668@amsat.org>
-Date: Mon, 15 Jan 2018 07:50:15 -0300
+	(envelope-from <berrange@redhat.com>) id 1eb2P9-0000rg-8p
+	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 05:54:19 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:49900)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1eb2P9-0000qs-0H
+	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 05:54:15 -0500
+Date: Mon, 15 Jan 2018 10:53:57 +0000
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20180115105357.GF8218@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <20180115102621.9183-1-berrange@redhat.com>
+	<20180115102621.9183-14-berrange@redhat.com>
+	<3ea0dbad-1ec3-3a0f-957d-36fa3e262cbe@amsat.org>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA8FXcQP8m7_DtN0_Ax7TFHTZcLQR_eRuEj7Tf7OEb_Ywg@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PULL v2 00/52] Misc patches for 2017-01-12
+Content-Disposition: inline
+In-Reply-To: <3ea0dbad-1ec3-3a0f-957d-36fa3e262cbe@amsat.org>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v3 13/13] docker: change Fedora images to
+ run with python3
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,26 +31,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>
-Cc: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
+To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>, Fam Zheng <famz@redhat.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
 
-Hi Paolo,
+On Mon, Jan 15, 2018 at 07:47:29AM -0300, Philippe Mathieu-Daud=C3=A9 wro=
+te:
+> Hi Daniel,
+>=20
+> On 01/15/2018 07:26 AM, Daniel P. Berrange wrote:
+> > Fedora has switched to Python 3 by default, so it makes sense to use =
+that
+> > for testing QEMU builds, so we get testing of Python 3 compatibility.
+>=20
+> I'd rather keep Fedora 25 with Python 2, and use Python 3 in Fedora 27.
 
-On 01/15/2018 07:37 AM, Peter Maydell wrote:
-> On 12 January 2018 at 13:42, Paolo Bonzini <pbonzini@redhat.com> wrote:
->> I'll drop that patch.
-> 
-> I'm assuming you'll send a new pull req cover letter email
-> when you've done that (so this one is leaving my queue of
-> things to do).
+FYI, Fedora 25 went end of life 2 weeks ago, so I'm not sure it is worth
+keeping that around in QEMU CI all that much much longer.
 
-If you send an new PR can you include Dmitry patch to update his email
-address? He is no more receiving mails for his maintained sections, and
-emails keep bouncing.
+To your general point though - I just picked Fedora since all non-EOL
+versions of Fedora now ship with Python3 only by default. I'm happy to
+see any arbitrary combo of Docker images changed, as long as we get a
+nice mixture of python 2/3 versions covered across the set. So feel free
+to suggest anything that gets us good coverage of 2+3.
 
-This is the patch:
-http://lists.nongnu.org/archive/html/qemu-trivial/2017-12/msg00189.html
+> If you agree, I can apply this patch once your series is merged, on top
+> of http://lists.nongnu.org/archive/html/qemu-devel/2018-01/msg02569.htm=
+l
+>=20
+> relevant patches:
+> http://lists.nongnu.org/archive/html/qemu-devel/2018-01/msg02574.html
+> http://lists.nongnu.org/archive/html/qemu-devel/2018-01/msg02575.html
+>=20
+> >=20
+> > Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+> > ---
+> >  tests/docker/dockerfiles/fedora.docker | 3 ++-
+> >  1 file changed, 2 insertions(+), 1 deletion(-)
+> >=20
+> > diff --git a/tests/docker/dockerfiles/fedora.docker b/tests/docker/do=
+ckerfiles/fedora.docker
+> > index 4b26c3aded..a22fe16157 100644
+> > --- a/tests/docker/dockerfiles/fedora.docker
+> > +++ b/tests/docker/dockerfiles/fedora.docker
+> > @@ -1,6 +1,6 @@
+> >  FROM fedora:latest
+> >  ENV PACKAGES \
+> > -    ccache gettext git tar PyYAML sparse flex bison python2 bzip2 ho=
+stname \
+> > +    ccache gettext git tar PyYAML sparse flex bison python3 bzip2 ho=
+stname \
+> >      glib2-devel pixman-devel zlib-devel SDL-devel libfdt-devel \
+> >      gcc gcc-c++ clang make perl which bc findutils libaio-devel \
+> >      nettle-devel \
+> > @@ -12,6 +12,7 @@ ENV PACKAGES \
+> >      mingw64-gtk2 mingw64-gtk3 mingw64-gnutls mingw64-nettle mingw64-=
+libtasn1 \
+> >      mingw64-libjpeg-turbo mingw64-libpng mingw64-curl mingw64-libssh=
+2 \
+> >      mingw64-bzip2
+> > +ENV QEMU_CONFIGURE_OPTS --python=3D/usr/bin/python3
+> > =20
+> >  RUN dnf install -y $PACKAGES
+> >  RUN rpm -q $PACKAGES | sort > /packages.txt
+> >=20
 
-Thanks!
-
-Phil.
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
