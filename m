@@ -1,27 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58467)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59136)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eb9Lg-00057j-3Z
-	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 13:19:09 -0500
+	(envelope-from <anton.nefedov@virtuozzo.com>) id 1eb9Ni-0006cv-KC
+	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 13:21:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eb9Le-00009n-HS
-	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 13:19:08 -0500
-Received: from mail-ot0-x241.google.com ([2607:f8b0:4003:c0f::241]:42325)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1eb9Le-00009M-Bi
-	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 13:19:06 -0500
-Received: by mail-ot0-x241.google.com with SMTP id s3so11382581otc.9
-	for <qemu-devel@nongnu.org>; Mon, 15 Jan 2018 10:19:06 -0800 (PST)
+	(envelope-from <anton.nefedov@virtuozzo.com>) id 1eb9Nh-000184-Ce
+	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 13:21:14 -0500
+From: Anton Nefedov <anton.nefedov@virtuozzo.com>
+References: <1509551048-129830-1-git-send-email-anton.nefedov@virtuozzo.com>
+	<1509551048-129830-9-git-send-email-anton.nefedov@virtuozzo.com>
+	<w511sirt9ya.fsf@maestria.local.igalia.com>
+Message-ID: <c4c78a3f-39c4-fe06-c151-db1e4f9009aa@virtuozzo.com>
+Date: Mon, 15 Jan 2018 21:21:01 +0300
 MIME-Version: 1.0
-In-Reply-To: <20171218172425.18200-10-richard.henderson@linaro.org>
-References: <20171218172425.18200-1-richard.henderson@linaro.org>
-	<20171218172425.18200-10-richard.henderson@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 15 Jan 2018 18:18:45 +0000
-Message-ID: <CAFEAcA9Dmdh+u7AZHhjEkS3zc6i4yf+Eo1-NuksgVdo1cqmKFQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v2 09/11] target/arm: Decode aa64 armv8.3
- fcmla
+In-Reply-To: <w511sirt9ya.fsf@maestria.local.igalia.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v5 08/15] qcow2: skip writing zero buffers
+ to empty COW areas
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,276 +26,117 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>
-
-On 18 December 2017 at 17:24, Richard Henderson
-<richard.henderson@linaro.org> wrote:
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-> ---
->  target/arm/helper.h         |  11 ++++
->  target/arm/advsimd_helper.c | 144 ++++++++++++++++++++++++++++++++++++++++++
->  target/arm/translate-a64.c  | 149 ++++++++++++++++++++++++++++++++------------
->  3 files changed, 265 insertions(+), 39 deletions(-)
->
-> diff --git a/target/arm/helper.h b/target/arm/helper.h
-> index 0f0fc942b0..5b6333347d 100644
-> --- a/target/arm/helper.h
-> +++ b/target/arm/helper.h
-> @@ -574,6 +574,17 @@ DEF_HELPER_FLAGS_5(gvec_fcadds, TCG_CALL_NO_RWG,
->  DEF_HELPER_FLAGS_5(gvec_fcaddd, TCG_CALL_NO_RWG,
->                     void, ptr, ptr, ptr, ptr, i32)
->
-> +DEF_HELPER_FLAGS_5(gvec_fcmlah, TCG_CALL_NO_RWG,
-> +                   void, ptr, ptr, ptr, ptr, i32)
-> +DEF_HELPER_FLAGS_5(gvec_fcmlah_idx, TCG_CALL_NO_RWG,
-> +                   void, ptr, ptr, ptr, ptr, i32)
-> +DEF_HELPER_FLAGS_5(gvec_fcmlas, TCG_CALL_NO_RWG,
-> +                   void, ptr, ptr, ptr, ptr, i32)
-> +DEF_HELPER_FLAGS_5(gvec_fcmlas_idx, TCG_CALL_NO_RWG,
-> +                   void, ptr, ptr, ptr, ptr, i32)
-> +DEF_HELPER_FLAGS_5(gvec_fcmlad, TCG_CALL_NO_RWG,
-> +                   void, ptr, ptr, ptr, ptr, i32)
-> +
->  #ifdef TARGET_AARCH64
->  #include "helper-a64.h"
->  #endif
-> diff --git a/target/arm/advsimd_helper.c b/target/arm/advsimd_helper.c
-> index afc2bb1142..6a2a53e111 100644
-> --- a/target/arm/advsimd_helper.c
-> +++ b/target/arm/advsimd_helper.c
-> @@ -274,3 +274,147 @@ void HELPER(gvec_fcaddd)(void *vd, void *vn, void *vm,
->      }
->      clear_tail(d, opr_sz, simd_maxsz(desc));
->  }
-> +
-> +void HELPER(gvec_fcmlah)(void *vd, void *vn, void *vm,
-> +                         void *vfpst, uint32_t desc)
-> +{
-> +    uintptr_t opr_sz = simd_oprsz(desc);
-> +    float16 *d = vd;
-> +    float16 *n = vn;
-> +    float16 *m = vm;
-> +    float_status *fpst = vfpst;
-> +    intptr_t flip = extract32(desc, SIMD_DATA_SHIFT, 1);
-> +    uint32_t neg_imag = extract32(desc, SIMD_DATA_SHIFT + 1, 1);
-> +    uint32_t neg_real = flip ^ neg_imag;
-> +    uintptr_t i;
-> +
-> +    neg_real <<= 15;
-> +    neg_imag <<= 15;
-> +
-> +    for (i = 0; i < opr_sz / 2; i += 2) {
-> +        float16 e0 = n[H2(i + flip)];
-> +        float16 e1 = m[H2(i + flip)] ^ neg_real;
-> +        float16 e2 = e0;
-> +        float16 e3 = m[H2(i + 1 - flip)] ^ neg_imag;
-
-This is again rather confusing to compare against the pseudocode.
-What order are your e0/e1/e2/e3 compared to the pseudocode's
-element1/element2/element3/element4 ?
-
-> +
-> +        d[H2(i)] = float16_muladd(e0, e1, d[H2(i)], 0, fpst);
-> +        d[H2(i + 1)] = float16_muladd(e2, e3, d[H2(i + 1)], 0, fpst);
-> +    }
-> +    clear_tail(d, opr_sz, simd_maxsz(desc));
-> +}
-> +
-> +void HELPER(gvec_fcmlah_idx)(void *vd, void *vn, void *vm,
-> +                             void *vfpst, uint32_t desc)
-> +{
-> +    uintptr_t opr_sz = simd_oprsz(desc);
-> +    float16 *d = vd;
-> +    float16 *n = vn;
-> +    float16 *m = vm;
-> +    float_status *fpst = vfpst;
-> +    intptr_t flip = extract32(desc, SIMD_DATA_SHIFT, 1);
-> +    uint32_t neg_imag = extract32(desc, SIMD_DATA_SHIFT + 1, 1);
-> +    uint32_t neg_real = flip ^ neg_imag;
-> +    uintptr_t i;
-> +    float16 e1 = m[H2(flip)];
-> +    float16 e3 = m[H2(1 - flip)];
-> +
-> +    neg_real <<= 15;
-> +    neg_imag <<= 15;
-> +    e1 ^= neg_real;
-> +    e3 ^= neg_imag;
-> +
-> +    for (i = 0; i < opr_sz / 2; i += 2) {
-> +        float16 e0 = n[H2(i + flip)];
-> +        float16 e2 = e0;
-> +
-> +        d[H2(i)] = float16_muladd(e0, e1, d[H2(i)], 0, fpst);
-> +        d[H2(i + 1)] = float16_muladd(e2, e3, d[H2(i + 1)], 0, fpst);
-> +    }
-> +    clear_tail(d, opr_sz, simd_maxsz(desc));
-> +}
-> +
-> +void HELPER(gvec_fcmlas)(void *vd, void *vn, void *vm,
-> +                         void *vfpst, uint32_t desc)
-> +{
-> +    uintptr_t opr_sz = simd_oprsz(desc);
-> +    float32 *d = vd;
-> +    float32 *n = vn;
-> +    float32 *m = vm;
-> +    float_status *fpst = vfpst;
-> +    intptr_t flip = extract32(desc, SIMD_DATA_SHIFT, 1);
-> +    uint32_t neg_imag = extract32(desc, SIMD_DATA_SHIFT + 1, 1);
-> +    uint32_t neg_real = flip ^ neg_imag;
-> +    uintptr_t i;
-> +
-> +    neg_real <<= 31;
-> +    neg_imag <<= 31;
-> +
-> +    for (i = 0; i < opr_sz / 4; i += 2) {
-> +        float32 e0 = n[H4(i + flip)];
-> +        float32 e1 = m[H4(i + flip)] ^ neg_real;
-> +        float32 e2 = e0;
-> +        float32 e3 = m[H4(i + 1 - flip)] ^ neg_imag;
-> +
-> +        d[H4(i)] = float32_muladd(e0, e1, d[H4(i)], 0, fpst);
-> +        d[H4(i + 1)] = float32_muladd(e2, e3, d[H4(i + 1)], 0, fpst);
-> +    }
-> +    clear_tail(d, opr_sz, simd_maxsz(desc));
-> +}
-> +
-> +void HELPER(gvec_fcmlas_idx)(void *vd, void *vn, void *vm,
-> +                             void *vfpst, uint32_t desc)
-> +{
-> +    uintptr_t opr_sz = simd_oprsz(desc);
-> +    float32 *d = vd;
-> +    float32 *n = vn;
-> +    float32 *m = vm;
-> +    float_status *fpst = vfpst;
-> +    intptr_t flip = extract32(desc, SIMD_DATA_SHIFT, 1);
-> +    uint32_t neg_imag = extract32(desc, SIMD_DATA_SHIFT + 1, 1);
-> +    uint32_t neg_real = flip ^ neg_imag;
-> +    uintptr_t i;
-> +    float32 e1 = m[H4(flip)];
-> +    float32 e3 = m[H4(1 - flip)];
-> +
-> +    neg_real <<= 31;
-> +    neg_imag <<= 31;
-> +    e1 ^= neg_real;
-> +    e3 ^= neg_imag;
-> +
-> +    for (i = 0; i < opr_sz / 4; i += 2) {
-> +        float32 e0 = n[H4(i + flip)];
-> +        float32 e2 = e0;
-> +
-> +        d[H4(i)] = float32_muladd(e0, e1, d[H4(i)], 0, fpst);
-> +        d[H4(i + 1)] = float32_muladd(e2, e3, d[H4(i + 1)], 0, fpst);
-> +    }
-> +    clear_tail(d, opr_sz, simd_maxsz(desc));
-> +}
-> +
-> +void HELPER(gvec_fcmlad)(void *vd, void *vn, void *vm,
-> +                         void *vfpst, uint32_t desc)
-> +{
-> +    uintptr_t opr_sz = simd_oprsz(desc);
-> +    float64 *d = vd;
-> +    float64 *n = vn;
-> +    float64 *m = vm;
-> +    float_status *fpst = vfpst;
-> +    intptr_t flip = extract32(desc, SIMD_DATA_SHIFT, 1);
-> +    uint64_t neg_imag = extract32(desc, SIMD_DATA_SHIFT + 1, 1);
-> +    uint64_t neg_real = flip ^ neg_imag;
-> +    uintptr_t i;
-> +
-> +    neg_real <<= 63;
-> +    neg_imag <<= 63;
-> +
-> +    for (i = 0; i < opr_sz / 8; i += 2) {
-> +        float64 e0 = n[i + flip];
-> +        float64 e1 = m[i + flip] ^ neg_real;
-> +        float64 e2 = e0;
-> +        float64 e3 = m[i + 1 - flip] ^ neg_imag;
-> +
-> +        d[i] = float64_muladd(e0, e1, d[i], 0, fpst);
-> +        d[i + 1] = float64_muladd(e2, e3, d[i + 1], 0, fpst);
-> +    }
-> +    clear_tail(d, opr_sz, simd_maxsz(desc));
-> +}
-> diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
-> index 89a0616894..79fede35c1 100644
-> --- a/target/arm/translate-a64.c
-> +++ b/target/arm/translate-a64.c
-> @@ -10713,6 +10713,10 @@ static void disas_simd_three_reg_same_extra(DisasContext *s, uint32_t insn)
->          }
->          feature = ARM_FEATURE_V8_1_SIMD;
->          break;
-> +    case 0x8: /* FCMLA, #0 */
-> +    case 0x9: /* FCMLA, #90 */
-> +    case 0xa: /* FCMLA, #180 */
-> +    case 0xb: /* FCMLA, #270 */
->      case 0xc: /* FCADD, #90 */
->      case 0xe: /* FCADD, #270 */
->          if (size == 0 || (size == 3 && !is_q)) {
-> @@ -10767,6 +10771,26 @@ static void disas_simd_three_reg_same_extra(DisasContext *s, uint32_t insn)
->                             0, fn_gvec_ptr);
->          break;
->
-> +    case 0x8: /* FCMLA, #0 */
-> +    case 0x9: /* FCMLA, #90 */
-> +    case 0xa: /* FCMLA, #180 */
-> +    case 0xb: /* FCMLA, #270 */
-> +        switch (size) {
-> +        case 1:
-> +            fn_gvec_ptr = gen_helper_gvec_fcmlah;
-> +            break;
-> +        case 2:
-> +            fn_gvec_ptr = gen_helper_gvec_fcmlas;
-> +            break;
-> +        case 3:
-> +            fn_gvec_ptr = gen_helper_gvec_fcmlad;
-> +            break;
-> +        default:
-> +            g_assert_not_reached();
-> +        }
-> +        data = extract32(opcode, 0, 2);
-> +        goto do_fpst;
-
-These need the "size 0b01 is UNDEF unless FP16 extn present" check too.
-
-> +
->      case 0xc: /* FCADD, #90 */
->      case 0xe: /* FCADD, #270 */
->          switch (size) {
-> @@ -10783,6 +10807,7 @@ static void disas_simd_three_reg_same_extra(DisasContext *s, uint32_t insn)
->              g_assert_not_reached();
->          }
->          data = extract32(opcode, 1, 1);
-> +    do_fpst:
->          fpst = get_fpstatus_ptr(size == 1);
->          tcg_gen_gvec_3_ptr(vec_full_reg_offset(s, rd),
->                             vec_full_reg_offset(s, rn),
-> @@ -11864,80 +11889,80 @@ static void disas_simd_indexed(DisasContext *s, uint32_t insn)
->      int rn = extract32(insn, 5, 5);
->      int rd = extract32(insn, 0, 5);
->      bool is_long = false;
-> -    bool is_fp = false;
-> +    int is_fp = 0;
-> +    bool is_fp16 = false;
->      int index;
->      TCGv_ptr fpst;
->
-> -    switch (opcode) {
-> -    case 0x0: /* MLA */
-> -    case 0x4: /* MLS */
-> -        if (!u || is_scalar) {
-> +    switch (16 * u + opcode) {
-> +    case 0x00: /* MLA */
-> +    case 0x04: /* MLS */
-> +    case 0x08: /* MUL */
-> +        if (is_scalar) {
->              unallocated_encoding(s);
->              return;
->          }
-
-This would all be easier to read if "refactor to switch on u:opcode"
-was a separate patch from adding the new insns.
+To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, kwolf@redhat.com, mreitz@redhat.com, eblake@redhat.com, den@virtuozzo.com, anton.nefedov@virtuozzo.com
 
 
-thanks
--- PMM
+
+On 15/1/2018 6:31 PM, Alberto Garcia wrote:
+> On Wed 01 Nov 2017 04:44:01 PM CET, Anton Nefedov wrote:
+>> If COW areas of the newly allocated clusters are zeroes on the backing image,
+>> efficient bdrv_write_zeroes(flags=BDRV_REQ_ALLOCATE) can be used on the whole
+>> cluster instead of writing explicit zero buffers later in perform_cow().
+>>
+>> iotest 060:
+>> write to the discarded cluster does not trigger COW anymore.
+>> so, break on write_aio event instead, will work for the test
+>> (but write won't fail anymore, so update reference output)
+>>
+>> iotest 066:
+>> cluster-alignment areas that were not really COWed are now detected
+>> as zeroes, hence the initial write has to be exactly the same size for
+>> the maps to match
+>>
+>> Signed-off-by: Anton Nefedov <anton.nefedov@virtuozzo.com>
+>> ---
+>>   block/qcow2.h              |  6 +++++
+>>   block/qcow2-cluster.c      |  3 ++-
+>>   block/qcow2.c              | 67 ++++++++++++++++++++++++++++++++++++++++++++--
+>>   block/trace-events         |  1 +
+>>   tests/qemu-iotests/060     |  2 +-
+>>   tests/qemu-iotests/060.out |  3 ++-
+>>   tests/qemu-iotests/066     |  2 +-
+>>   tests/qemu-iotests/066.out |  4 +--
+>>   8 files changed, 80 insertions(+), 8 deletions(-)
+>>
+>> diff --git a/block/qcow2.h b/block/qcow2.h
+>> index 782a206..e312e48 100644
+>> --- a/block/qcow2.h
+>> +++ b/block/qcow2.h
+>> @@ -377,6 +377,12 @@ typedef struct QCowL2Meta
+>>       Qcow2COWRegion cow_end;
+>>   
+>>       /**
+>> +     * Indicates that both COW areas are empty (nb_bytes == 0)
+>> +     * or filled with zeroes and do not require any more copying
+>> +     */
+>> +    bool zero_cow;
+> 
+> I think the terminology elsewhere is "COW regions".
+> 
+
+Hi Berto! thanks much for checking this series
+
+Will fix 'areas' to 'regions'
+
+> Also, in this patch that field doesn't really seem to track the case
+> where both regions have nb_bytes == 0, or does it? It seems to be
+> checked separately in all cases.
+> 
+> Example:
+> 
+>> -    if (start->nb_bytes == 0 && end->nb_bytes == 0) {
+>> +    if ((start->nb_bytes == 0 && end->nb_bytes == 0) || m->zero_cow) {
+>>           return 0;
+>>       }
+> 
+> Here, 'if (m->zero_cow)' would suffice.
+> 
+
+The thing is, zero_cow is not assigned on some code paths,
+e.g. !(bs->file->bs->supported_zero_flags & BDRV_REQ_ALLOCATE)
+or when bs->encrypted.
+
+but now thinking about this again; probably it should be - that will be
+least confusing. I'll fix
+
+
+>> +        /* If both COW regions are zeroes already, skip this too */
+>> +        if (m->zero_cow) {
+>> +            continue;
+>> +        }
+> 
+> Same as above
+> 
+
+Yep.
+
+>> +static bool is_zero_cow(BlockDriverState *bs, QCowL2Meta *m)
+>> +{
+>> +    if (bs->encrypted) {
+>> +        return false;
+>> +    }
+>> +
+>> +    if (m->cow_start.nb_bytes != 0 &&
+>> +        !is_zero(bs, m->offset + m->cow_start.offset, m->cow_start.nb_bytes))
+>> +    {
+>> +        return false;
+>> +    }
+>> +
+>> +    if (m->cow_end.nb_bytes != 0 &&
+>> +        !is_zero(bs, m->offset + m->cow_end.offset, m->cow_end.nb_bytes))
+>> +    {
+>> +        return false;
+>> +    }
+> 
+> Why do you need to check that nb_bytes != 0? Doesn't is_zero() do that
+> already?
+> 
+
+I really don't; I think previously is_zero() didn't have that check
+and I didn't notice it introduced during a rebase.
+
+Will fix
+
+> Berto
+> 
