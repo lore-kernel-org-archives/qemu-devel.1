@@ -1,26 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49852)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50840)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eb4wg-0003oB-4J
-	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 08:37:03 -0500
+	(envelope-from <kwolf@redhat.com>) id 1eb4yi-0005Sv-TO
+	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 08:39:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eb4wf-0007LO-1m
-	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 08:37:02 -0500
-Received: from mail-oi0-x241.google.com ([2607:f8b0:4003:c06::241]:44161)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1eb4we-0007L0-TN
-	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 08:37:00 -0500
-Received: by mail-oi0-x241.google.com with SMTP id g128so8259767oib.11
-	for <qemu-devel@nongnu.org>; Mon, 15 Jan 2018 05:37:00 -0800 (PST)
+	(envelope-from <kwolf@redhat.com>) id 1eb4yh-00006n-Ut
+	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 08:39:08 -0500
+Date: Mon, 15 Jan 2018 14:38:48 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20180115133848.GD32271@localhost.localdomain>
+References: <20180111195225.4226-1-kwolf@redhat.com>
+	<20180111195225.4226-3-kwolf@redhat.com>
+	<20180112105320.GB17392@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <b435525e701bbda428d9cbf1e8e0a1b20dba499b.1515796549.git.alistair.francis@xilinx.com>
-References: <cover.1515796549.git.alistair.francis@xilinx.com>
-	<b435525e701bbda428d9cbf1e8e0a1b20dba499b.1515796549.git.alistair.francis@xilinx.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 15 Jan 2018 13:36:39 +0000
-Message-ID: <CAFEAcA_Z-iLaxmA55aF=D7FfqXKvc2_Ug51d+oAUR2q=jCsBog@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v2 3/3] xlnx-zynqmp: Connect the RTC device
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180112105320.GB17392@redhat.com>
+Subject: Re: [Qemu-devel] [RFC PATCH 02/10] block/qapi: Add qcow2 create
+ options to schema
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,81 +25,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alistair Francis <alistair.francis@xilinx.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Alistair Francis <alistair23@gmail.com>, Edgar Iglesias <edgar.iglesias@xilinx.com>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: qemu-block@nongnu.org, pkrempa@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com
 
-On 12 January 2018 at 22:37, Alistair Francis
-<alistair.francis@xilinx.com> wrote:
-> Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
-> ---
->
->  hw/arm/xlnx-zynqmp.c         | 14 ++++++++++++++
->  include/hw/arm/xlnx-zynqmp.h |  2 ++
->  2 files changed, 16 insertions(+)
->
-> diff --git a/hw/arm/xlnx-zynqmp.c b/hw/arm/xlnx-zynqmp.c
-> index 325642058b..deef583c2a 100644
-> --- a/hw/arm/xlnx-zynqmp.c
-> +++ b/hw/arm/xlnx-zynqmp.c
-> @@ -50,6 +50,9 @@
->  #define DPDMA_ADDR          0xfd4c0000
->  #define DPDMA_IRQ           116
->
-> +#define RTC_ADDR            0xffa60000
-> +#define RTC_IRQ             26
-> +
->  static const uint64_t gem_addr[XLNX_ZYNQMP_NUM_GEMS] = {
->      0xFF0B0000, 0xFF0C0000, 0xFF0D0000, 0xFF0E0000,
->  };
-> @@ -183,6 +186,9 @@ static void xlnx_zynqmp_init(Object *obj)
->
->      object_initialize(&s->dpdma, sizeof(s->dpdma), TYPE_XLNX_DPDMA);
->      qdev_set_parent_bus(DEVICE(&s->dpdma), sysbus_get_default());
-> +
-> +    object_initialize(&s->rtc, sizeof(s->rtc), TYPE_XLNX_ZYNQMP_RTC);
-> +    qdev_set_parent_bus(DEVICE(&s->rtc), sysbus_get_default());
->  }
->
->  static void xlnx_zynqmp_realize(DeviceState *dev, Error **errp)
-> @@ -454,6 +460,14 @@ static void xlnx_zynqmp_realize(DeviceState *dev, Error **errp)
->                               &error_abort);
->      sysbus_mmio_map(SYS_BUS_DEVICE(&s->dpdma), 0, DPDMA_ADDR);
->      sysbus_connect_irq(SYS_BUS_DEVICE(&s->dpdma), 0, gic_spi[DPDMA_IRQ]);
-> +
-> +    object_property_set_bool(OBJECT(&s->rtc), true, "realized", &err);
-> +    if (err) {
-> +        error_propagate(errp, err);
-> +        return;
-> +    }
-> +    sysbus_mmio_map(SYS_BUS_DEVICE(&s->rtc), 0, RTC_ADDR);
-> +    sysbus_connect_irq(SYS_BUS_DEVICE(&s->rtc), 0, gic_spi[RTC_IRQ]);
->  }
->
->  static Property xlnx_zynqmp_props[] = {
-> diff --git a/include/hw/arm/xlnx-zynqmp.h b/include/hw/arm/xlnx-zynqmp.h
-> index 3e6fb9b7bd..9e8c9e18dd 100644
-> --- a/include/hw/arm/xlnx-zynqmp.h
-> +++ b/include/hw/arm/xlnx-zynqmp.h
-> @@ -28,6 +28,7 @@
->  #include "hw/ssi/xilinx_spips.h"
->  #include "hw/dma/xlnx_dpdma.h"
->  #include "hw/display/xlnx_dp.h"
-> +#include "hw/timer/xlnx-zynqmp-rtc.h"
->
->  #define TYPE_XLNX_ZYNQMP "xlnx,zynqmp"
->  #define XLNX_ZYNQMP(obj) OBJECT_CHECK(XlnxZynqMPState, (obj), \
-> @@ -90,6 +91,7 @@ typedef struct XlnxZynqMPState {
->      XlnxZynqMPQSPIPS qspi;
->      XlnxDPState dp;
->      XlnxDPDMAState dpdma;
-> +    XlnxZynqMPRTC rtc;
->
->      char *boot_cpu;
->      ARMCPU *boot_cpu_ptr;
-> --
-> 2.14.1
+Am 12.01.2018 um 11:53 hat Daniel P. Berrange geschrieben:
+> On Thu, Jan 11, 2018 at 08:52:17PM +0100, Kevin Wolf wrote:
+> > Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> > ---
+> >  qapi/block-core.json | 33 ++++++++++++++++++++++++++++++++-
+> >  1 file changed, 32 insertions(+), 1 deletion(-)
+> > 
+> > diff --git a/qapi/block-core.json b/qapi/block-core.json
+> > index 1749376c61..9341f6708d 100644
+> > --- a/qapi/block-core.json
+> > +++ b/qapi/block-core.json
+> > @@ -3320,6 +3320,37 @@
+> >  { 'command': 'blockdev-del', 'data': { 'node-name': 'str' } }
+> >  
+> >  ##
+> > +# @BlockdevQcow2CompatLevel:
+> > +# @0_10:    The original QCOW2 format as introduced in qemu 0.10 (version 2)
+> > +# @1_1:     The extended QCOW2 format as introduced in qemu 1.1 (version 3)
+> > +#
+> > +# Since: 2.10
+> > +##
+> > +{ 'enum': 'BlockdevQcow2CompatLevel',
+> > +  'data': [ '0_10', '1_1' ] }
+> > +
+> > +
+> > +##
+> > +# @BlockdevCreateOptionsQcow2:
+> > +#
+> > +# Driver specific image creation options for qcow2.
+> > +#
+> > +# TODO Describe fields
+> > +#
+> > +# Since: 2.12
+> > +##
+> > +{ 'struct': 'BlockdevCreateOptionsQcow2',
+> > +  'data': { 'size':             'size',
+> > +            '*compat':          'BlockdevQcow2CompatLevel',
+> > +            '*backing-file':    'str',
+> > +            '*backing-fmt':     'BlockdevDriver',
+> 
+> For anything non-trivial, the caller is going to have to stuff a
+> JSON string into 'backing-file' value. It feels like we should
+> be referencing 'BlockdevOptions' here in some manner.
 
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Hm, that's an interesting question. For the image creation, this is
+really treated as a string that is directly written into the image file,
+without being parsed, so 'str' is the more correct type in this context.
+However, when the backing file gets loaded, that string is in fact
+parsed and we expect it to describe the same thing as BlockdevOptions.
 
-thanks
--- PMM
+If we get BlockdevOptions here, qemu would have to convert them into a
+json:{...} string before writing the header of the new image.
+Compatibility code would become a bit more complex because we'd have to
+convert the existing string into BlockdevOptions, only to convert it
+back to a string before we write it to the image file. And finally, the
+1023 character limit of qcow2 becomes kind of unpredicatble when you
+don't pass the string yourself.
+
+So considering all of that, I still think that 'str' is the better
+option here.
+
+Kevin
