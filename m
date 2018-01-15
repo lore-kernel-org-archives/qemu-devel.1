@@ -1,26 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33354)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39972)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1ebBE1-0007pi-1a
-	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 15:19:23 -0500
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1ebBqS-00016r-34
+	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 15:59:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1ebBDw-0006Fk-99
-	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 15:19:21 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:56970)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1ebBDv-0006Et-VN
-	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 15:19:16 -0500
-References: <20180115115309.23982-1-quintela@redhat.com>
-	<20180115115309.23982-10-quintela@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <215cfa8f-1f2d-1155-bd0b-17ecd10c4c61@redhat.com>
-Date: Mon, 15 Jan 2018 21:19:10 +0100
-MIME-Version: 1.0
-In-Reply-To: <20180115115309.23982-10-quintela@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="OzDCvEBQZJ0zY1m5DfPerm33csZKtqVbs"
-Subject: Re: [Qemu-devel] [PULL 09/27] migration: calculate vCPU blocktime
- on dst side
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1ebBqO-0000tA-Rh
+	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 15:59:04 -0500
+Received: from chuckie.co.uk ([82.165.15.123]:45853
+	helo=s16892447.onlinehome-server.info)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
+	id 1ebBqO-0000sq-L3
+	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 15:59:00 -0500
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Date: Mon, 15 Jan 2018 20:58:48 +0000
+Message-Id: <20180115205848.26027-1-mark.cave-ayland@ilande.co.uk>
+Subject: [Qemu-devel] [PATCH] sun4u: implement power device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,90 +23,125 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org
-Cc: lvivier@redhat.com, dgilbert@redhat.com, peterx@redhat.com, Alexey Perevalov <a.perevalov@samsung.com>
+To: qemu-devel@nongnu.org, atar4qemu@gmail.com
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---OzDCvEBQZJ0zY1m5DfPerm33csZKtqVbs
-From: Max Reitz <mreitz@redhat.com>
-To: Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org
-Cc: lvivier@redhat.com, dgilbert@redhat.com, peterx@redhat.com,
- Alexey Perevalov <a.perevalov@samsung.com>
-Message-ID: <215cfa8f-1f2d-1155-bd0b-17ecd10c4c61@redhat.com>
-Subject: Re: [Qemu-devel] [PULL 09/27] migration: calculate vCPU blocktime on
- dst side
-References: <20180115115309.23982-1-quintela@redhat.com>
- <20180115115309.23982-10-quintela@redhat.com>
-In-Reply-To: <20180115115309.23982-10-quintela@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+This inbuilt device contains a single 4-byte register, of which bit 24 is used
+to power down the machine on a real Ultra 5.
 
-On 2018-01-15 12:52, Juan Quintela wrote:
-> From: Alexey Perevalov <a.perevalov@samsung.com>
->=20
-> This patch provides blocktime calculation per vCPU,
-> as a summary and as a overlapped value for all vCPUs.
->=20
-> This approach was suggested by Peter Xu, as an improvements of
-> previous approch where QEMU kept tree with faulted page address and cpu=
-s bitmask
-> in it. Now QEMU is keeping array with faulted page address as value and=
- vCPU
-> as index. It helps to find proper vCPU at UFFD_COPY time. Also it keeps=
+The power device exists at offset 0x724000 on a real machine, but due to the
+current configuration of the BARs in QEMU it must be located lower in PCI IO
+space.
 
-> list for blocktime per vCPU (could be traced with page_fault_addr)
->=20
-> Blocktime will not calculated if postcopy_blocktime field of
-> MigrationIncomingState wasn't initialized.
->=20
-> Signed-off-by: Alexey Perevalov <a.perevalov@samsung.com>
-> Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> Reviewed-by: Juan Quintela <quintela@redhat.com>
-> Signed-off-by: Juan Quintela <quintela@redhat.com>
-> ---
->  migration/postcopy-ram.c | 143 +++++++++++++++++++++++++++++++++++++++=
-+++++++-
->  migration/trace-events   |   5 +-
->  2 files changed, 146 insertions(+), 2 deletions(-)
+For the moment we place the power device at offset 0x7240 as a reminder of its
+original location and raise the base PCI IO address from 0x4000 to 0x8000.
 
-For me, this breaks compilation with clang -m32:
+Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+---
+ hw/sparc64/sun4u.c | 64 +++++++++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 63 insertions(+), 1 deletion(-)
 
-  LINK    x86_64-softmmu/qemu-system-x86_64
-=2E./migration/postcopy-ram.o: In function `mark_postcopy_blocktime_begin=
-':
-/home/maxx/projects/qemu/migration/postcopy-ram.c:599: undefined
-reference to `__atomic_exchange_8'
-/home/maxx/projects/qemu/migration/postcopy-ram.c:600: undefined
-reference to `__atomic_exchange_8'
-/home/maxx/projects/qemu/migration/postcopy-ram.c:609: undefined
-reference to `__atomic_exchange_8'
-=2E./migration/postcopy-ram.o: In function `mark_postcopy_blocktime_end':=
-
-/home/maxx/projects/qemu/migration/postcopy-ram.c:665: undefined
-reference to `__atomic_fetch_add_8'
-/home/maxx/projects/qemu/migration/postcopy-ram.c:686: undefined
-reference to `__atomic_fetch_add_8'
-
-Am I doing something wrong?
-
-Max
-
-
---OzDCvEBQZJ0zY1m5DfPerm33csZKtqVbs
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlpdDL4SHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9AjcIH+gKgs7JMyTyBJeNgIWonXdUMLVcJbnkF
-RACIICQb0Fx3b3iI1iwb90SeQcpCCJajwn9GEfhseVmZz1rlE5XC26l+he3Y8tq7
-yE0nt+269arwjzxqa+haajMKwYNbV0PEXQLC66XqDJT/9kC1/HB6dnJYnSk76pRN
-WRShPbWoAgBnWraPX8eYwZpUBBCEbIshdpKuwvEcv1SlslWR6QaRKo7akGYxIpN/
-NHzRj5TYk0XWZDCaWMN1CiI8kZCvBhv4hLKzbll2TsOGGsVRBwuQzd5BfhoFJEqU
-JmS0Y/LkGmrXP8+NqhzSrnSixGhErx7P2sa+fUxa+Lnd33bfjQDJiAI=
-=5kcH
------END PGP SIGNATURE-----
-
---OzDCvEBQZJ0zY1m5DfPerm33csZKtqVbs--
+diff --git a/hw/sparc64/sun4u.c b/hw/sparc64/sun4u.c
+index ec45ec2801..26ab6e9a9c 100644
+--- a/hw/sparc64/sun4u.c
++++ b/hw/sparc64/sun4u.c
+@@ -205,6 +205,59 @@ typedef struct ResetData {
+     uint64_t prom_addr;
+ } ResetData;
+ 
++#define TYPE_SUN4U_POWER "power"
++#define SUN4U_POWER(obj) OBJECT_CHECK(PowerDevice, (obj), TYPE_SUN4U_POWER)
++
++typedef struct PowerDevice {
++    SysBusDevice parent_obj;
++
++    MemoryRegion power_mmio;
++} PowerDevice;
++
++/* Power */
++static void power_mem_write(void *opaque, hwaddr addr,
++                            uint64_t val, unsigned size)
++{
++    /* According to a real Ultra 5, bit 24 controls the power */
++    if (val & 0x1000000) {
++        qemu_system_shutdown_request(SHUTDOWN_CAUSE_GUEST_SHUTDOWN);
++    }
++}
++
++static const MemoryRegionOps power_mem_ops = {
++    .write = power_mem_write,
++    .endianness = DEVICE_NATIVE_ENDIAN,
++    .valid = {
++        .min_access_size = 4,
++        .max_access_size = 4,
++    },
++};
++
++static void power_realize(DeviceState *dev, Error **errp)
++{
++    PowerDevice *d = SUN4U_POWER(dev);
++    SysBusDevice *sbd = SYS_BUS_DEVICE(dev);
++
++    memory_region_init_io(&d->power_mmio, OBJECT(dev), &power_mem_ops, d,
++                          "power", sizeof(uint32_t));
++
++    sysbus_init_mmio(sbd, &d->power_mmio);
++}
++
++static void power_class_init(ObjectClass *klass, void *data)
++{
++    DeviceClass *dc = DEVICE_CLASS(klass);
++
++    dc->realize = power_realize;
++}
++
++static const TypeInfo power_info = {
++    .name          = TYPE_SUN4U_POWER,
++    .parent        = TYPE_SYS_BUS_DEVICE,
++    .instance_size = sizeof(PowerDevice),
++    .class_init    = power_class_init,
++};
++
+ static void ebus_isa_irq_handler(void *opaque, int n, int level)
+ {
+     EbusState *s = EBUS(opaque);
+@@ -221,6 +274,7 @@ static void ebus_isa_irq_handler(void *opaque, int n, int level)
+ static void ebus_realize(PCIDevice *pci_dev, Error **errp)
+ {
+     EbusState *s = EBUS(pci_dev);
++    SysBusDevice *sbd;
+     DeviceState *dev;
+     qemu_irq *isa_irq;
+     DriveInfo *fd[MAX_FD];
+@@ -270,6 +324,13 @@ static void ebus_realize(PCIDevice *pci_dev, Error **errp)
+     qdev_prop_set_uint32(dev, "dma", -1);
+     qdev_init_nofail(dev);
+ 
++    /* Power */
++    dev = qdev_create(NULL, TYPE_SUN4U_POWER);
++    qdev_init_nofail(dev);
++    sbd = SYS_BUS_DEVICE(dev);
++    memory_region_add_subregion(pci_address_space_io(pci_dev), 0x7240,
++                                sysbus_mmio_get_region(sbd, 0));
++
+     /* PCI */
+     pci_dev->config[0x04] = 0x06; // command = bus master, pci mem
+     pci_dev->config[0x05] = 0x00;
+@@ -282,7 +343,7 @@ static void ebus_realize(PCIDevice *pci_dev, Error **errp)
+                              0, 0x1000000);
+     pci_register_bar(pci_dev, 0, PCI_BASE_ADDRESS_SPACE_MEMORY, &s->bar0);
+     memory_region_init_alias(&s->bar1, OBJECT(s), "bar1", get_system_io(),
+-                             0, 0x4000);
++                             0, 0x8000);
+     pci_register_bar(pci_dev, 1, PCI_BASE_ADDRESS_SPACE_IO, &s->bar1);
+ }
+ 
+@@ -693,6 +754,7 @@ static const TypeInfo sun4v_type = {
+ 
+ static void sun4u_register_types(void)
+ {
++    type_register_static(&power_info);
+     type_register_static(&ebus_info);
+     type_register_static(&prom_info);
+     type_register_static(&ram_info);
+-- 
+2.11.0
