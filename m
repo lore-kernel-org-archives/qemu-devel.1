@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35277)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35323)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1eb8BA-0001FK-Pv
-	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 12:04:13 -0500
+	(envelope-from <berrange@redhat.com>) id 1eb8BH-0001K7-79
+	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 12:04:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1eb8B9-0007Ef-IE
-	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 12:04:12 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:41464)
+	(envelope-from <berrange@redhat.com>) id 1eb8BB-0007H6-CI
+	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 12:04:19 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:51494)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1eb8B9-0007Dx-Br
-	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 12:04:11 -0500
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1eb8BB-0007GG-6O
+	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 12:04:13 -0500
 From: "Daniel P. Berrange" <berrange@redhat.com>
-Date: Mon, 15 Jan 2018 17:02:43 +0000
-Message-Id: <20180115170243.24578-14-berrange@redhat.com>
+Date: Mon, 15 Jan 2018 17:02:42 +0000
+Message-Id: <20180115170243.24578-13-berrange@redhat.com>
 In-Reply-To: <20180115170243.24578-1-berrange@redhat.com>
 References: <20180115170243.24578-1-berrange@redhat.com>
-Subject: [Qemu-devel] [PATCH v4 13/13] docker: change Fedora images to run
- with python3
+Subject: [Qemu-devel] [PATCH v4 12/13] travis: improve python version test
+ coverage
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,33 +27,72 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Fam Zheng <famz@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>
 
-Fedora has switched to Python 3 by default, so it makes sense to use that
-for testing QEMU builds, so we get testing of Python 3 compatibility.
+Currently travis declares ancient python 2.4 is desired. Update that to
+2.6 which is the oldest version any targetted distros still needs. If we
+just list a python 3 version at the top level this will double the
+number of travis jobs we run which is unreasonable.
+
+So arbitrarily pick the clang test matrix entries to build with python
+3.0 and 3.6, to extend coverage of python versions, without increasing
+job count or build time.
 
 Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
 ---
- tests/docker/dockerfiles/fedora.docker | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ .travis.yml | 14 +++++++++-----
+ 1 file changed, 9 insertions(+), 5 deletions(-)
 
-diff --git a/tests/docker/dockerfiles/fedora.docker b/tests/docker/dockerfiles/fedora.docker
-index 4b26c3aded..a22fe16157 100644
---- a/tests/docker/dockerfiles/fedora.docker
-+++ b/tests/docker/dockerfiles/fedora.docker
-@@ -1,6 +1,6 @@
- FROM fedora:latest
- ENV PACKAGES \
--    ccache gettext git tar PyYAML sparse flex bison python2 bzip2 hostname \
-+    ccache gettext git tar PyYAML sparse flex bison python3 bzip2 hostname \
-     glib2-devel pixman-devel zlib-devel SDL-devel libfdt-devel \
-     gcc gcc-c++ clang make perl which bc findutils libaio-devel \
-     nettle-devel \
-@@ -12,6 +12,7 @@ ENV PACKAGES \
-     mingw64-gtk2 mingw64-gtk3 mingw64-gnutls mingw64-nettle mingw64-libtasn1 \
-     mingw64-libjpeg-turbo mingw64-libpng mingw64-curl mingw64-libssh2 \
-     mingw64-bzip2
-+ENV QEMU_CONFIGURE_OPTS --python=/usr/bin/python3
- 
- RUN dnf install -y $PACKAGES
- RUN rpm -q $PACKAGES | sort > /packages.txt
+diff --git a/.travis.yml b/.travis.yml
+index f583839755..708c886017 100644
+--- a/.travis.yml
++++ b/.travis.yml
+@@ -1,7 +1,7 @@
+ sudo: false
+ language: c
+ python:
+-  - "2.4"
++  - "2.6"
+ compiler:
+   - gcc
+ cache: ccache
+@@ -115,15 +115,17 @@ matrix:
+         - sudo apt-get build-dep -qq qemu
+         - wget -O - http://people.linaro.org/~alex.bennee/qemu-submodule-git-seed.tar.xz | tar -xvJ
+         - git submodule update --init --recursive
+-    # Trusty System build with latest stable clang
++    # Trusty System build with latest stable clang & python 3.0
+     - sudo: required
+       addons:
+       dist: trusty
+       language: generic
+       compiler: none
++      python:
++        - "3.0"
+       env:
+         - COMPILER_NAME=clang CXX=clang++-3.9 CC=clang-3.9
+-        - CONFIG="--disable-linux-user --cc=clang-3.9 --cxx=clang++-3.9"
++        - CONFIG="--disable-linux-user --cc=clang-3.9 --cxx=clang++-3.9 --python=/usr/bin/python3"
+       before_install:
+         - wget -nv -O - http://llvm.org/apt/llvm-snapshot.gpg.key | sudo apt-key add -
+         - sudo apt-add-repository -y 'deb http://llvm.org/apt/trusty llvm-toolchain-trusty-3.9 main'
+@@ -134,15 +136,17 @@ matrix:
+         - git submodule update --init --recursive
+       before_script:
+         - ./configure ${CONFIG} || cat config.log
+-    # Trusty Linux User build with latest stable clang
++    # Trusty Linux User build with latest stable clang & python 3.6
+     - sudo: required
+       addons:
+       dist: trusty
+       language: generic
+       compiler: none
++      python:
++        - "3.6"
+       env:
+         - COMPILER_NAME=clang CXX=clang++-3.9 CC=clang-3.9
+-        - CONFIG="--disable-system --cc=clang-3.9 --cxx=clang++-3.9"
++        - CONFIG="--disable-system --cc=clang-3.9 --cxx=clang++-3.9 --python=/usr/bin/python3"
+       before_install:
+         - wget -nv -O - http://llvm.org/apt/llvm-snapshot.gpg.key | sudo apt-key add -
+         - sudo apt-add-repository -y 'deb http://llvm.org/apt/trusty llvm-toolchain-trusty-3.9 main'
 -- 
 2.14.3
