@@ -1,33 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34125)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35136)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eb0wz-0003Oo-ED
-	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 04:21:06 -0500
+	(envelope-from <david@redhat.com>) id 1eb12p-0005Hx-71
+	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 04:27:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1eb0wu-0005xL-Gw
-	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 04:21:05 -0500
-Received: from indium.canonical.com ([91.189.90.7]:50400)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1eb0wu-0005wu-As
-	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 04:21:00 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1eb0ws-0000Lp-Gx
-	for <qemu-devel@nongnu.org>; Mon, 15 Jan 2018 09:20:58 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 675782E8550
-	for <qemu-devel@nongnu.org>; Mon, 15 Jan 2018 09:20:58 +0000 (UTC)
+	(envelope-from <david@redhat.com>) id 1eb12l-0001DK-4b
+	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 04:27:07 -0500
+References: <20180113111428.7066-1-laurent@vivier.eu>
+	<20180113111428.7066-2-laurent@vivier.eu>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <933500bf-2833-9585-561b-40c43c3ab9e8@redhat.com>
+Date: Mon, 15 Jan 2018 10:26:48 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 15 Jan 2018 09:14:26 -0000
-From: Paul Goyette <1654137@bugs.launchpad.net>
-Reply-To: Bug 1654137 <1654137@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20170105043743.14700.719.malonedeb@wampee.canonical.com>
-Message-Id: <151600766824.11084.16403491659510613591.launchpad@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1654137] Re: Ctrl-A b not working in 2.8.0
+In-Reply-To: <20180113111428.7066-2-laurent@vivier.eu>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v3 1/7] accel/tcg: add size
+ paremeter in tlb_fill()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,32 +25,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Laurent Vivier <laurent@vivier.eu>, qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, Eduardo Habkost <ehabkost@redhat.com>, qemu-s390x@nongnu.org, Thomas Huth <huth@tuxfamily.org>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Anthony Green <green@moxielogic.com>, Chris Wulff <crwulff@gmail.com>, Alexander Graf <agraf@suse.de>, Max Filippov <jcmvbkbc@gmail.com>, Michael Walle <michael@walle.cc>, qemu-arm@nongnu.org, qemu-ppc@nongnu.org, Artyom Tarasenko <atar4qemu@gmail.com>, "Edgar E . Iglesias" <edgar.iglesias@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Stafford Horne <shorne@gmail.com>, Guan Xuetao <gxt@mprc.pku.edu.cn>, Aurelien Jarno <aurelien@aurel32.net>
 
-** Changed in: qemu
-       Status: In Progress =3D> Confirmed
+On 13.01.2018 12:14, Laurent Vivier wrote:
+> The MC68040 MMU provides the size of the access that
+> triggers the page fault.
+> 
+> This size is set in the Special Status Word which
+> is written in the stack frame of the access fault
+> exception.
+> 
+> So we need the size in m68k_cpu_unassigned_access() and
+> m68k_cpu_handle_mmu_fault().
+> 
+> To be able to do that, this patch modifies the prototype of
+> handle_mmu_fault handler, tlb_fill() and probe_write().
+> do_unassigned_access() already includes a size parameter.
+> 
+> This patch also updates handle_mmu_fault handlers and
+> tlb_fill() of all targets (only parameter, no code change).
+> 
+> Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 
--- =
+Reviewed-by: David Hildenbrand <david@redhat.com>
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1654137
 
-Title:
-  Ctrl-A b not working in 2.8.0
+-- 
 
-Status in QEMU:
-  Confirmed
+Thanks,
 
-Bug description:
-  With a recent update from 2.7.0 to 2.8.0 I have discovered that I can
-  no longer send a "break" to the VM.  Ctrl-A b is simply ignored.
-  Other Ctrl-A sequences seem to work correctly.
-
-  This is on a NetBSD amd64 system, version 7.99.53, and qemu was
-  installed on this system from source.
-
-  Reverting to the previous install restores "break" capability.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1654137/+subscriptions
+David / dhildenb
