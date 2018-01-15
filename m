@@ -1,21 +1,40 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55731)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56201)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1eb0YS-0003jt-UY
-	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 03:55:46 -0500
+	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1eb0aZ-0004dZ-Ra
+	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 03:57:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1eb0YP-0007my-Qt
-	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 03:55:45 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:51230)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1eb0YP-0007lw-HT
-	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 03:55:41 -0500
-From: Peter Xu <peterx@redhat.com>
-Date: Mon, 15 Jan 2018 16:55:28 +0800
-Message-Id: <20180115085528.32663-1-peterx@redhat.com>
+	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1eb0aT-0000q5-Bw
+	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 03:57:55 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:45538
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bjsdjshi@linux.vnet.ibm.com>)
+	id 1eb0aT-0000p7-4l
+	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 03:57:49 -0500
+Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w0F8sDtK139795
+	for <qemu-devel@nongnu.org>; Mon, 15 Jan 2018 03:57:48 -0500
+Received: from e31.co.us.ibm.com (e31.co.us.ibm.com [32.97.110.149])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2fgr192vr1-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Mon, 15 Jan 2018 03:57:47 -0500
+Received: from localhost
+	by e31.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <bjsdjshi@linux.vnet.ibm.com>;
+	Mon, 15 Jan 2018 01:57:47 -0700
+Date: Mon, 15 Jan 2018 16:57:41 +0800
+From: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
+References: <20180111030421.31418-1-bjsdjshi@linux.vnet.ibm.com>
+	<20180111115422.201987ee.cohuck@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH] fw_cfg: don't use DMA mapping for fw_cfg device
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180111115422.201987ee.cohuck@redhat.com>
+Message-Id: <20180115085741.GB12499@bjsdjshi@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [RFC PATCH 0/3] vfio: ccw: basic channel path
+ event handling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,155 +43,193 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
-Cc: "Michael S . Tsirkin" <mst@redhat.com>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, Baoquan He <bhe@redhat.com>, peterx@redhat.com
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org, kvm@vger.kernel.org, qemu-devel@nongnu.org, qemu-s390x@nongnu.org, borntraeger@de.ibm.com, pasic@linux.vnet.ibm.com, pmorel@linux.vnet.ibm.com
 
-fw_cfg device does not need IOMMU protection, so use physical addresses
-always.  That's how QEMU implements fw_cfg.  Otherwise we'll see call
-traces during boot when vIOMMU is enabled in guest:
+* Cornelia Huck <cohuck@redhat.com> [2018-01-11 11:54:22 +0100]:
 
-[    1.018306] ------------[ cut here ]------------
-[    1.018314] WARNING: CPU: 1 PID: 1 at drivers/firmware/qemu_fw_cfg.c:1=
-52 fw_cfg_dma_transfer+0x399/0x500
-[    1.018315] fw_cfg_dma_transfer: failed to map fw_cfg_dma
-[    1.018316] Modules linked in:
-[    1.018320] CPU: 1 PID: 1 Comm: swapper/0 Not tainted 3.10.0-827.el7.x=
-86_64 #1
-[    1.018321] Hardware name: Red Hat KVM, BIOS 1.11.0-1.el7 04/01/2014
-[    1.018322] Call Trace:
-[    1.018330]  [<ffffffffafcf6b3a>] dump_stack+0x19/0x1b
-[    1.018334]  [<ffffffffaf68fff8>] __warn+0xd8/0x100
-[    1.018336]  [<ffffffffaf69007f>] warn_slowpath_fmt+0x5f/0x80
-[    1.018338]  [<ffffffffafb67329>] fw_cfg_dma_transfer+0x399/0x500
-[    1.018340]  [<ffffffffafb6753c>] fw_cfg_read_blob+0xac/0x1c0
-[    1.018342]  [<ffffffffafb67720>] fw_cfg_register_dir_entries+0x80/0x4=
-50
-[    1.018344]  [<ffffffffafb67d02>] fw_cfg_sysfs_probe+0x212/0x3f0
-[    1.018347]  [<ffffffffafa70352>] platform_drv_probe+0x42/0x110
-[    1.018350]  [<ffffffffafa6e002>] driver_probe_device+0xc2/0x3e0
-[    1.018352]  [<ffffffffafa6e3f3>] __driver_attach+0x93/0xa0
-[    1.018354]  [<ffffffffafa6e360>] ? __device_attach+0x40/0x40
-[    1.018359]  [<ffffffffafa6bbd3>] bus_for_each_dev+0x73/0xc0
-[    1.018362]  [<ffffffffafa6d97e>] driver_attach+0x1e/0x20
-[    1.018364]  [<ffffffffafa6d420>] bus_add_driver+0x200/0x2d0
-[    1.018366]  [<ffffffffb03c2041>] ? firmware_map_add_early+0x58/0x58
-[    1.018368]  [<ffffffffafa6ea84>] driver_register+0x64/0xf0
-[    1.018370]  [<ffffffffafa7013a>] __platform_driver_register+0x4a/0x50
-[    1.018372]  [<ffffffffb03c2075>] fw_cfg_sysfs_init+0x34/0x61
-[    1.018376]  [<ffffffffaf602108>] do_one_initcall+0xb8/0x230
-[    1.018379]  [<ffffffffb036b34a>] kernel_init_freeable+0x17a/0x219
-[    1.018381]  [<ffffffffb036ab19>] ? initcall_blacklist+0xb0/0xb0
-[    1.018383]  [<ffffffffafce5b30>] ? rest_init+0x80/0x80
-[    1.018385]  [<ffffffffafce5b3e>] kernel_init+0xe/0xf0
-[    1.018388]  [<ffffffffafd08898>] ret_from_fork+0x58/0x90
-[    1.018390]  [<ffffffffafce5b30>] ? rest_init+0x80/0x80
-[    1.018392] ---[ end trace d00a5b71608a8f59 ]---
+> On Thu, 11 Jan 2018 04:04:18 +0100
+> Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com> wrote:
+> 
+> > Hi Folks,
+> > 
+> > Background
+> > ==========
+> > 
+> > Some days ago, we had a discussion on the topic of channel path virtualization.
+> > Ref:
+> > Subject: [PATCH 0/3] Channel Path realted CRW generation
+> > Message-Id: <20170727015418.85407-1-bjsdjshi@linux.vnet.ibm.com>
+> > URL: https://lists.nongnu.org/archive/html/qemu-devel/2017-07/msg08414.html
+> > 
+> > Indeed that thread is not short and discussed many aspects in a
+> > non-concentrated manner. The parts those are most valuable to me are:
+> > 1. a re-modelling for channel path is surely the best offer, but is not
+> >    possible to have in the near future.
+> > 2. to enhance the path related functionalities, using PNO and PNOM might
+> >    be something we can do for now. This may be something that I could improve
+> >    without model related arguments.
+> > 
+> > So here I have this series targeting to add basic channel path event handling
+> > for vfio-ccw -- no touch of the channel path modelling in both the kernel and
+> > the QEMU side, but find a way to sync path status change to guest lazily using
+> > SCSW_FLAGS_MASK_PNO and pmcw->pnom.  In short, I want to enhance path related
+> > stuff (to be more specific: sync up path status to the guest) on a best effort
+> > basis, which means in a way that won't get us invloed to do channel path
+> > re-modelling.
+> 
+> The guest should also get the updated PIM/PAM/POM, shouldn't it?
+> 
+Yes. The following values will be updated for the guest:
+PMCW:
+  - PIM/PAM/POM
+  - PNOM
+  - CHPIDs
+SCSW
+  - PNOM bit
 
-Bug: https://bugzilla.redhat.com/show_bug.cgi?id=3D1533367
-Fixes: e90cb816599b ("fw_cfg: do DMA read operation", 2017-11-28)
-CC: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-CC: Michael S. Tsirkin <mst@redhat.com>
-Signed-off-by: Peter Xu <peterx@redhat.com>
---
+See vfio_ccw_update_schib in patch #4 of the QEMU series.
 
-This is based on tree:
-  https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git/log/?h=3D=
-vhost
+> > 
+> > What benifit can we get from this? The administrator of a virtual machine can
+> > get uptodate (in some extent) status of the current using channel paths, so
+> > he/she can monitor paths status and get path problem noticed timely (see the
+> > example below).
+> > 
+> > I think we can start a new round discussion based on this series. So reviewers
+> > can give their comments based on some code, and then we can decide if this is
+> > we want or not.
+> > 
+> > As flagged with RFC, the intention of this series is to show what I have for
+> > now, and what could the code look like in general. Thus I can get some early
+> > feedbacks. I would expect to see opinions on:
+> > - is the target (mentioned above) of this series welcomed or not.
+> 
+> It certainly makes sense to have a way to get an updated schib.
+> 
+:)
 
-Please review, thanks.
+> > - is the approach of this series good or bad.
+> 
+> Still need to read :)
+> 
+> > So I can either move on with this (or with other suggested approach) or leave
+> > it alone.
+> > 
+> > Basic Introduction of The Patches
+> > =================================
+> > 
+> > This is the kernel counterpart, which mainly does:
+> > 1. add a schib vfio region for userland to _store_ subchannel information.
+> > 2. add a channel path vfio irq to notify userland with chp status change event.
+> > 3. add .chp_event handler for vfio-ccw driver, so the driver handles chp event,
+> >    and signals userland about the event.
+> 
+> Do you plan to trigger schib updates for things other than path events?
+> 
+This is surely a good question... and my answer is no. If the other
+fields are handled by QEMU well, then we don't need to trigger update
+events for them. Currently I don't find things that need extra trigger.
 
-Signed-off-by: Peter Xu <peterx@redhat.com>
----
- drivers/firmware/qemu_fw_cfg.c | 37 ++++++++----------------------------=
--
- 1 file changed, 8 insertions(+), 29 deletions(-)
+> > 
+> > With the above work, userland can be signaled with chp related event, and then
+> > it can read out uptodate SCHIB from the new region, and sync up path related
+> > information to the corresponding virtual subchannel. So a guest can sense the
+> > path update in some extent.
+> 
+> That's basically what Linux could do before implementing chpid related
+> machine checks, so it should be at least helpful.
+> 
+> > 
+> > For the QEMU counterpart, please ref:
+> > [RFC PATCH 0/5] vfio/ccw: basic channel path event handling
+> > 
+> > The QEMU counterpart mainly does:
+> > 1. add handling of the schib region, so that it can read out the newest schib
+> >    information.
+> > 2. add handling of the chp irq, so that it can get notification of channel path
+> >    status change.
+> > 3. once there is a chp status event, synchronize related information from the
+> >    newest schib information to guest lazily.
+> > 
+> > What are still missing, thus need to be offered in the next version are:
+> > - I/O termination and FSM state handling if currently we have I/O on the status
+> >   switched path.
+> 
+> I'm wondering up to which extent we should involve ourselves here. The
+> normal I/O subchannel driver handles all the path related things; but
+> for vfio, we basically want to hand the subchannel to the guest and not
+> involve ourselves in management.
+Nod.
 
-diff --git a/drivers/firmware/qemu_fw_cfg.c b/drivers/firmware/qemu_fw_cf=
-g.c
-index 6eb5d8f43c3e..62a44bc81a88 100644
---- a/drivers/firmware/qemu_fw_cfg.c
-+++ b/drivers/firmware/qemu_fw_cfg.c
-@@ -106,11 +106,12 @@ static inline bool fw_cfg_dma_enabled(void)
- }
-=20
- /* qemu fw_cfg device is sync today, but spec says it may become async *=
-/
--static void fw_cfg_wait_for_control(struct fw_cfg_dma *d, dma_addr_t dma=
-)
-+static void fw_cfg_wait_for_control(struct fw_cfg_dma *d)
- {
- 	do {
--		dma_sync_single_for_cpu(dev, dma, sizeof(*d), DMA_FROM_DEVICE);
--		if ((be32_to_cpu(d->control) & ~FW_CFG_DMA_CTL_ERROR) =3D=3D 0)
-+		u32 ctrl =3D be32_to_cpu(READ_ONCE(d->control));
-+
-+		if ((ctrl & ~FW_CFG_DMA_CTL_ERROR) =3D=3D 0)
- 			return;
-=20
- 		usleep_range(50, 100);
-@@ -119,21 +120,9 @@ static void fw_cfg_wait_for_control(struct fw_cfg_dm=
-a *d, dma_addr_t dma)
-=20
- static ssize_t fw_cfg_dma_transfer(void *address, u32 length, u32 contro=
-l)
- {
--	dma_addr_t dma_addr =3D 0;
- 	struct fw_cfg_dma *d =3D NULL;
--	dma_addr_t dma;
- 	ssize_t ret =3D length;
--	enum dma_data_direction dir =3D
--		(control & FW_CFG_DMA_CTL_READ ? DMA_FROM_DEVICE : 0) |
--		(control & FW_CFG_DMA_CTL_WRITE ? DMA_TO_DEVICE : 0);
--
--	if (address && length) {
--		dma_addr =3D dma_map_single(dev, address, length, dir);
--		if (dma_mapping_error(NULL, dma_addr)) {
--			WARN(1, "%s: failed to map address\n", __func__);
--			return -EFAULT;
--		}
--	}
-+	phys_addr_t dma;
-=20
- 	d =3D kmalloc(sizeof(*d), GFP_KERNEL);
- 	if (!d) {
-@@ -142,34 +131,24 @@ static ssize_t fw_cfg_dma_transfer(void *address, u=
-32 length, u32 control)
- 	}
-=20
- 	*d =3D (struct fw_cfg_dma) {
--		.address =3D cpu_to_be64(dma_addr),
-+		.address =3D cpu_to_be64(virt_to_phys(address)),
- 		.length =3D cpu_to_be32(length),
- 		.control =3D cpu_to_be32(control)
- 	};
-=20
--	dma =3D dma_map_single(dev, d, sizeof(*d), DMA_BIDIRECTIONAL);
--	if (dma_mapping_error(NULL, dma)) {
--		WARN(1, "%s: failed to map fw_cfg_dma\n", __func__);
--		ret =3D -EFAULT;
--		goto end;
--	}
-+	dma =3D virt_to_phys(d);
-=20
- 	iowrite32be((u64)dma >> 32, fw_cfg_reg_dma);
- 	iowrite32be(dma, fw_cfg_reg_dma + 4);
-=20
--	fw_cfg_wait_for_control(d, dma);
-+	fw_cfg_wait_for_control(d);
-=20
- 	if (be32_to_cpu(d->control) & FW_CFG_DMA_CTL_ERROR) {
- 		ret =3D -EIO;
- 	}
-=20
--	dma_unmap_single(dev, dma, sizeof(*d), DMA_BIDIRECTIONAL);
--
- end:
- 	kfree(d);
--	if (dma_addr)
--		dma_unmap_single(dev, dma_addr, length, dir);
--
- 	return ret;
- }
-=20
---=20
-2.14.3
+> A configure off does an SCLP command; does that already have an impact
+> on running commands? (I can't check myself due to lack of public
+> documentation, sadly.)
+> 
+Yes, for I/O operations that do not end before the command is performed,
+the requirements are those of channel-path reset. See:
+- PoP 17-12 Channel-Path Reset
+- PoP 14-9 RESET CHANNEL PATH
+
+So this means that there is really no need on the host to terminate
+ongoing I/O on the chp that is configured off I think now.
+
+> > - Vary on/off event is not sensible to a guest.
+> 
+> As vary on/off basically means manipulating some internal masks and
+> updating path groups if applicable, I'm not sure how much we
+> could/should do here anyway.
+> 
+This is really a good point. Now I think it's ok to even ignore this
+event in the vfio-ccw driver.
+
+> > 
+> > Example
+> > =======
+> > 
+> > With both the kernel and Qemu parts applied, we can notice some new behaviors
+> > of a channel path when we have a guest with a passed through vfio-ccw device
+> > using it. The guest can reflect the chp status change of the host side lazily,
+> > and synchronize the updated information.
+> > 
+> > For example:
+> > 0. Prepare a vfio subchannel on the host:
+> > [root@host ~]# lscss --vfio 013f
+> 
+> Oh, is this a new option? In which version had it been added? (My
+> Fedora 26 LPAR does not yet have it.)
+>
+Yes. ;)
+
+I use a lscss version that was re-written in C language. I added it in
+the version after the following one:
+    lscss version 1.37.1-build-20170609
+
+[...]
+
+> > 6. On the guest, check the status again:
+> > [root@guest ~]# lscss 0002
+> > Device   Subchan.  DevType CU Type Use  PIM PAM POM  CHPIDs
+> > ----------------------------------------------------------------------
+> > 0.0.3f3f 0.0.0002  3390/0c 3990/e9      f0  70  ff   42434445 00000000 
+> > #Notice: No change!
+> > 
+> > [root@localhost ~]# chccwdev -d 3f3f
+> > Setting device 0.0.3f3f offline
+> > Done
+> > 
+> > [root@guest ~]# lscss 0002
+> > Device   Subchan.  DevType CU Type Use  PIM PAM POM  CHPIDs
+> > ----------------------------------------------------------------------
+> > 0.0.3f3f 0.0.0002  3390/0c 3990/e9      f0  f0  ff   42434445 00000000 
+> > #Notice: PAM changed again.
+> 
+> Yes, that looks reasonable. The guest being aware of changed masks only
+> if it actually did something that triggered path verification is
+> probably the best we can do without implementing channel path machine
+> checks.
+> 
+Good to know this is reasonable. So I can keep working on this.
+
+-- 
+Dong Jia Shi
