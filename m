@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50819)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51769)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eb7Pr-0000lR-9X
-	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 11:15:20 -0500
+	(envelope-from <rth7680@gmail.com>) id 1eb7TT-0002O9-Rm
+	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 11:19:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eb7Pq-0000gt-Et
-	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 11:15:19 -0500
-Received: from mail-ot0-x22d.google.com ([2607:f8b0:4003:c0f::22d]:33270)
+	(envelope-from <rth7680@gmail.com>) id 1eb7TQ-0002hp-Km
+	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 11:19:03 -0500
+Received: from mail-pg0-x244.google.com ([2607:f8b0:400e:c05::244]:38139)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1eb7Pq-0000gc-9p
-	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 11:15:18 -0500
-Received: by mail-ot0-x22d.google.com with SMTP id x15so11075475ote.0
-	for <qemu-devel@nongnu.org>; Mon, 15 Jan 2018 08:15:18 -0800 (PST)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1eb7TQ-0002hK-Dn
+	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 11:19:00 -0500
+Received: by mail-pg0-x244.google.com with SMTP id y27so2181628pgc.5
+	for <qemu-devel@nongnu.org>; Mon, 15 Jan 2018 08:19:00 -0800 (PST)
+Sender: Richard Henderson <rth7680@gmail.com>
+References: <1515562748-32287-1-git-send-email-rth@twiddle.net>
+	<CAFEAcA8TxNTjvsqeHss=7BEm6SzwLHZ54UqDmOPMWA5z0oTsUA@mail.gmail.com>
+From: Richard Henderson <rth@twiddle.net>
+Message-ID: <6cded669-a2af-cec0-f4c5-028758c48bfa@twiddle.net>
+Date: Mon, 15 Jan 2018 08:18:55 -0800
 MIME-Version: 1.0
-In-Reply-To: <20180115115309.23982-1-quintela@redhat.com>
-References: <20180115115309.23982-1-quintela@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 15 Jan 2018 16:14:57 +0000
-Message-ID: <CAFEAcA-SxiJyKa84UwG8CESpkTXEM9AG5HqEgpPrzSFwrTPzYg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 00/27] Migration pull
+In-Reply-To: <CAFEAcA8TxNTjvsqeHss=7BEm6SzwLHZ54UqDmOPMWA5z0oTsUA@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] tcg/arm: Fix double-word comparisons
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,32 +31,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Juan Quintela <quintela@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Laurent Vivier <lvivier@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Peter Xu <peterx@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, David Gibson <david@gibson.dropbear.id.au>, Paolo Bonzini <pbonzini@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>
 
-On 15 January 2018 at 11:52, Juan Quintela <quintela@redhat.com> wrote:
-> Hi
-> - rebase on top of lastest
-> - fix compilation on 32bit machines
-> - add Peter Xu cleanups
->
-> Please, apply.
->
-> The following changes since commit fd06527b80c88c8dde1b35fdc692685b68d2fd93:
->
->   Merge remote-tracking branch 'remotes/thibault/tags/samuel-thibault' into staging (2018-01-15 10:39:29 +0000)
->
-> are available in the Git repository at:
->
->   git://github.com/juanquintela/qemu.git tags/migration/20180115
->
-> for you to fetch changes up to 816306826a45f4d15352e32d157172af3a35899f:
->
->   migration: remove notify in fd_error (2018-01-15 12:48:13 +0100)
->
-> ----------------------------------------------------------------
-> migration/next for 20180115
+On 01/15/2018 06:27 AM, Peter Maydell wrote:
+> On 10 January 2018 at 05:39, Richard Henderson <rth@twiddle.net> wrote:
+>> The code sequence we were generating was only good for unsigned
+>> comparisons.  For signed comparisions, use the sequence from gcc.
+>>
+>> Fixes booting of ppc64 firmware, with a patch changing the code
+>> sequence for ppc comparisons.
+>>
+>> Signed-off-by: Richard Henderson <rth@twiddle.net>
+>> ---
+>>  tcg/arm/tcg-target.inc.c | 112 +++++++++++++++++++++++++++++++++--------------
+>>  1 file changed, 80 insertions(+), 32 deletions(-)
+>>
+>> diff --git a/tcg/arm/tcg-target.inc.c b/tcg/arm/tcg-target.inc.c
+>> index 98a1253..b9890c8 100644
+>> --- a/tcg/arm/tcg-target.inc.c
+>> +++ b/tcg/arm/tcg-target.inc.c
+>> @@ -239,10 +239,11 @@ static void patch_reloc(tcg_insn_unit *code_ptr, int type,
+>>      }
+>>  }
+>>
+>> -#define TCG_CT_CONST_ARM  0x100
+>> -#define TCG_CT_CONST_INV  0x200
+>> -#define TCG_CT_CONST_NEG  0x400
+>> -#define TCG_CT_CONST_ZERO 0x800
+>> +#define TCG_CT_CONST_ARM     0x0100
+>> +#define TCG_CT_CONST_INV     0x0200
+>> +#define TCG_CT_CONST_NEG     0x0400
+>> +#define TCG_CT_CONST_INVNEG  0x0800
+>> +#define TCG_CT_CONST_ZERO    0x1000
+>>
+>>  /* parse target specific constraints */
+>>  static const char *target_parse_constraint(TCGArgConstraint *ct,
+>> @@ -258,6 +259,9 @@ static const char *target_parse_constraint(TCGArgConstraint *ct,
+>>      case 'N': /* The gcc constraint letter is L, already used here.  */
+>>          ct->ct |= TCG_CT_CONST_NEG;
+>>          break;
+>> +    case 'M':
+>> +        ct->ct |= TCG_CT_CONST_INVNEG;
+>> +        break;
+> 
+> In GCC constraint "M" is "integer in the range 0 to 32", which this clearly
+> isn't. Can we have a comment saying what it is? (may be worth mentioning
+> in particular how "rIM" differs from "rINK" -- I think the answer is that
+> we want to say "valid-immediate OR (valid-if-inverted AND valid-if-negated)",
+> whereas 'rINK' is "valid-immediate OR valid-if-inverted OR valid-if-negated".)
 
-Applied, thanks.
+Exactly.
 
--- PMM
+> The code looks OK to me. I'm guessing the sparc guest failure is
+> just because we now generate more code for some of the comparison
+> cases and that doesn't fit in the buffer...
+
+I don't recall having seen a sparc failure...
+
+> We could avoid the annoying "load LE/GE immediates to tempreg"
+> extra code by having tcg_out_cmp2() return a flag to tell
+> the caller which way round to put the conditions for its two
+> conditional ARITH_MOV insns (for setcond2) or which condition
+> to use for the branch (brcond2), right?
+
+Um... we do return a condition.  I must have missed a trick or made a mistake
+somewhere.
+
+
+r~
