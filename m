@@ -1,22 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60844)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33304)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1eaycs-0004FZ-OE
-	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 01:52:12 -0500
+	(envelope-from <jasowang@redhat.com>) id 1eayhJ-0006p1-4E
+	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 01:56:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1eaycp-0003yx-Kq
-	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 01:52:10 -0500
-Date: Mon, 15 Jan 2018 16:49:19 +1100
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20180115054919.GF2027@umbus.fritz.box>
-References: <20180114192349.22212-1-joserz@linux.vnet.ibm.com>
-	<20180114192349.22212-3-joserz@linux.vnet.ibm.com>
+	(envelope-from <jasowang@redhat.com>) id 1eayhD-0006JX-4T
+	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 01:56:45 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:53112)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1eayhC-0006Iq-Rm
+	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 01:56:39 -0500
+References: <20180110161438.GA28096@stefanha-x1.localdomain>
+	<dcb849d4-82fb-de8a-5e81-23d47026c9eb@redhat.com>
+	<20180111152345.GA7353@stefanha-x1.localdomain>
+	<86106573-422b-fe4c-ec15-dad0edf05880@redhat.com>
+	<20180112101807.GE7356@stefanha-x1.localdomain>
+From: Jason Wang <jasowang@redhat.com>
+Message-ID: <a45c1da8-03e8-140f-725c-af0f31e3da62@redhat.com>
+Date: Mon, 15 Jan 2018 14:56:31 +0800
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="iBwuxWUsK/REspAd"
-Content-Disposition: inline
-In-Reply-To: <20180114192349.22212-3-joserz@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH v2 2/2] ppc: spapr: Check if thread
- argument is supported by host KVM
+In-Reply-To: <20180112101807.GE7356@stefanha-x1.localdomain>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] vhost-pci and virtio-vhost-user
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,139 +31,142 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jose Ricardo Ziviani <joserz@linux.vnet.ibm.com>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, groug@kaod.org, lvivier@redhat.com
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Cc: wei.w.wang@intel.com, qemu-devel@nongnu.org
 
 
---iBwuxWUsK/REspAd
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
 
-On Sun, Jan 14, 2018 at 05:23:49PM -0200, Jose Ricardo Ziviani wrote:
-> QEMU currently checks whether SMT passed is valid or not. However, it
-> doesn't check if KVM supports such mode when kvm is enabled.
+On 2018=E5=B9=B401=E6=9C=8812=E6=97=A5 18:18, Stefan Hajnoczi wrote:
+>>>> Form what I'm understanding, vhost-pci tries to build a scalable V2V=
+ private
+>>>> datapath. But according to what you describe here, virito-vhost-user=
+ tries
+>>>> to make it possible to implement the device inside another VM. I und=
+erstand
+>>>> the goal of vhost-pci could be done on top, but it looks to me it wo=
+uld then
+>>>> rather similar to the design of Xen driver domain. So I can not figu=
+re out
+>>>> how it can be done in a high performance way.
+>>> vhost-pci and virtio-vhost-user both have the same goal.  They allow
+>>> a VM to implement a vhost device (net, scsi, blk, etc).
+>> Looks not, if I read the code correctly, vhost-pci has a device
+>> implementation in qemu, and in slave VM it only have a vhost-pci-net d=
+river.
+> You are right that the current "[PATCH v3 0/7] Vhost-pci for inter-VM
+> communication" does not reach this goal yet.  The patch series focusses
+> on a subset of vhost-user-net for poll mode drivers.
+>
+> But the goal is to eventually let VMs implement any vhost device type.
+> Even if Wei, you, or I don't implement scsi, for example, someone else
+> should be able to do it based on vhost-pci or virtio-vhost-user.
+>
+> Wei: Do you agree?
+>
+>>> This allows
+>>> software defined network or storage appliances running inside a VM to
+>>> provide I/O services to other VMs.
+>> Well, I think we can do it even with the existed virtio or whatever ot=
+her
+>> emulated device which should not be bounded to any specific kind of de=
+vice.
+> Please explain the approach you have in mind.
 
-That's not really true - the attempt to actually set the vsmt mode in
-KVM later on in spapr_set_vsmt_mode() will fail if KVM can't support
-the number of threads.
+I just fail understand why we can't do software defined network or=20
+storage with exist virtio device/drivers (or are there any shortcomings=20
+that force us to invent new infrastructure).
 
-The error added here might be a bit easier to understand, since it
-doesn't refer to vsmt modes, which might just confuse the issue.
+>
+>> And what's more important, according to the kvm 2016 slides of vhost-p=
+ci,
+>> the motivation of vhost-pci is not building SDN but a chain of VNFs. S=
+o
+>> bypassing the central vswitch through a private VM2VM path does make s=
+ense.
+>> (Though whether or not vhost-pci is the best choice is still questiona=
+ble).
+> This is probably my fault.  Maybe my networking terminology is wrong.  =
+I
+> consider "virtual network functions" to be part of "software-defined
+> networking" use cases.  I'm not implying there must be a central virtua=
+l
+> switch.
+>
+> To rephrase: vhost-pci enables exitless VM2VM communication.
 
-The change isn't urgent, though.
+The problem is, exitless is not what vhost-pci invents, it could be=20
+achieved now when both sides are doing busypolling.
 
-> This patch relies on KVM_CAP_PPC_SMT_POSSIBLE to make it sure that QEMU
-> will either set a valid SMT mode or warn an error message and quit.
->=20
-> Signed-off-by: Jose Ricardo Ziviani <joserz@linux.vnet.ibm.com>
-> ---
->  hw/ppc/spapr.c       | 10 ++++++++++
->  target/ppc/kvm.c     |  5 +++++
->  target/ppc/kvm_ppc.h |  6 ++++++
->  3 files changed, 21 insertions(+)
->=20
-> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> index d1acfe8858..aed4d25fc4 100644
-> --- a/hw/ppc/spapr.c
-> +++ b/hw/ppc/spapr.c
-> @@ -2261,12 +2261,22 @@ static void spapr_set_vsmt_mode(sPAPRMachineState=
- *spapr, Error **errp)
->                       "on a pseries machine");
->          goto out;
->      }
-> +
->      if (!is_power_of_2(smp_threads)) {
->          error_setg(&local_err, "Cannot support %d threads/core on a pser=
-ies "
->                       "machine because it must be a power of 2", smp_thre=
-ads);
->          goto out;
->      }
-> =20
-> +    if (kvm_enabled() && kvmppc_cap_smt_possible() > 0) {
-> +        if ((kvmppc_cap_smt_possible() & smp_threads) !=3D smp_threads) {
-> +            error_setg(&local_err, "KVM does not support %d threads/core=
-=2E",
-> +                    smp_threads);
-> +            kvmppc_hint_smt_possible(&local_err);
-> +            goto out;
-> +        }
-> +    }
+>
+>>>    To the other VMs the devices look
+>>> like regular virtio devices.
+>>>
+>>> I'm not sure I understand your reference to the Xen driver domain or
+>>> performance.
+>> So what proposed here is basically memory sharing and event notificati=
+on
+>> through eventfd, this model have been used by Xen for many years throu=
+gh
+>> grant table and event channel. Xen use this to move the backend
+>> implementation from dom0 to a driver domain which has direct access to=
+ some
+>> hardwares. Consider the case of network, it can then implement xen net=
+back
+>> inside driver domain which can access hardware NIC directly.
+>>
+>> This makes sense for Xen and for performance since driver domain (back=
+end)
+>> can access hardware directly and event was triggered through lower ove=
+rhead
+>> hypercall (or it can do busypolling). But for virtio-vhost-user, unles=
+s you
+>> want SRIOV based solutions inside the slave VM, I believe we won't wan=
+t to
+>> go back to Xen since the hardware virtualization can bring extra overh=
+eads.
+> Okay, this point is about the NFV use case.  I can't answer that becaus=
+e
+> I'm not familiar with it.
+>
+> Even if the NFV use case is not ideal for VMs, there are many other use
+> cases for VMs implementing vhost devices.  In the cloud the VM is the
+> first-class object that users can manage.  They do not have the ability
+> to run vhost-user processes on the host.  Therefore I/O appliances need
+> to be able to run as VMs and vhost-pci (or virtio-vhost-user) solve tha=
+t
+> problem.
 
-I'd like to see a fallback for kernels that don't support the
-smt_possible cap and vsmt mode setting (for those, we must have
-smp_threads <=3D kvm_smt).
+The question is why must use vhost-user? E.g in the case of SDN, you can=20
+easily deploy an OVS instance with openflow inside a VM and it works=20
+like a charm.
 
-> +
->      /* Detemine the VSMT mode to use: */
->      if (vsmt_user) {
->          if (spapr->vsmt < smp_threads) {
-> diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
-> index 914be687e7..4a8ff4d63c 100644
-> --- a/target/ppc/kvm.c
-> +++ b/target/ppc/kvm.c
-> @@ -2456,6 +2456,11 @@ bool kvmppc_has_cap_mmu_hash_v3(void)
->      return cap_mmu_hash_v3;
->  }
-> =20
-> +int kvmppc_cap_smt_possible(void)
-> +{
-> +    return cap_ppc_smt_possible;
-> +}
-> +
->  PowerPCCPUClass *kvm_ppc_get_host_cpu_class(void)
->  {
->      uint32_t host_pvr =3D mfpvr();
-> diff --git a/target/ppc/kvm_ppc.h b/target/ppc/kvm_ppc.h
-> index ecb55493cc..2221850723 100644
-> --- a/target/ppc/kvm_ppc.h
-> +++ b/target/ppc/kvm_ppc.h
-> @@ -59,6 +59,7 @@ bool kvmppc_has_cap_fixup_hcalls(void);
->  bool kvmppc_has_cap_htm(void);
->  bool kvmppc_has_cap_mmu_radix(void);
->  bool kvmppc_has_cap_mmu_hash_v3(void);
-> +int kvmppc_cap_smt_possible(void);
->  int kvmppc_enable_hwrng(void);
->  int kvmppc_put_books_sregs(PowerPCCPU *cpu);
->  PowerPCCPUClass *kvm_ppc_get_host_cpu_class(void);
-> @@ -290,6 +291,11 @@ static inline bool kvmppc_has_cap_mmu_hash_v3(void)
->      return false;
->  }
-> =20
-> +static inline int kvmppc_cap_smt_possible(void)
-> +{
-> +    return 0;
-> +}
-> +
->  static inline int kvmppc_enable_hwrng(void)
->  {
->      return -1;
+>
+>>>    Both vhost-pci and virtio-vhost-user work using shared
+>>> memory access to the guest RAM of the other VM.  Therefore they can p=
+oll
+>>> virtqueues and avoid vmexit.  They do also support cross-VM interrupt=
+s,
+>>> thanks to QEMU setting up irqfd/ioeventfd appropriately on the host.
+>>>
+>>> Stefan
+>> So in conclusion, consider the complexity, I would suggest to figure o=
+ut
+>> whether or not this (either vhost-pci or virito-vhost-user) is really
+>> required before moving ahead. E.g, for VM2VM direct network path, this=
+ looks
+>> simply an issue of network topology instead of the problem of device, =
+so
+>> there's a lot of trick, for vhost-user one can easily image to write a=
+n
+>> application (or use testpmd) to build a zerocopied VM2VM datapath, isn=
+'t
+>> this not sufficient for the case?
+> See above, I described the general cloud I/O appliance use case.
+>
+> Stefan
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
+So I understand vhost-user could be used to build I/O appliance. What I=20
+don't understand is, the advantages of using vhost-user or why we must=20
+use it inside a guest.
 
---iBwuxWUsK/REspAd
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlpcQN0ACgkQbDjKyiDZ
-s5KzrBAAk5k1Nf1NsOmVAfzER5eVN1SNrVr6P1t5TN5SxoarlpjQD9ebFNp7Wf0b
-cLrKB4yLF8Jtxtn/xsrfSjYewNGrvcqFZZDhxN/W+UWbSzAGC193HHNFNHxHkXmI
-OJ9ic9INeDaGawqn0JNiMhGlAS9WTuSIHDM4Sd083Mlud8oA1Z3q+j5FzjZ8yqqg
-S92din3hIq/0DSHVoL030ARmiw74PDJvkGwx3m+sSI/7TzkRcf/ZDKk59SgDVIxL
-wM6hTXukgJAVR5SfFMd938wMTsSSbcom58Efsn1JjVJh/HIVIbrWi//pSEApy289
-kYk4Ni7XlBQk/w8x4XlnHqFbQlVi2bqPD0UWrkYO74B3+x6FAWoOYeyIyvTCbByk
-hYA6qgBp2h99JJ47NQ8bnGxsK0kRlPG3opxzDKaAp2bEpwZvoSWVT4CD1owhlWV+
-+ti6usi7fWyfY6pQcnSVA3pJu55mi53XBpPyWAeshIr5+qAFiA7MNPK1Fas4Z65V
-YmWBdtwg3+pWRUd3tTMIrD6ZM1TTdHWZ+o/zn62GOAb8v5XA73ZReSwmhCqyJU48
-L3RgNC4HBasDgp/S1Cq3shnuhMUkOXs5T1wJzXPpW9Zqxa92QyPrN6CPnEnaviHJ
-yusq5RAitwD80gnO3HE7tmQbirRwHu5qROJ53vlpJLJpynIqsRU=
-=Jb4e
------END PGP SIGNATURE-----
-
---iBwuxWUsK/REspAd--
+Thanks
