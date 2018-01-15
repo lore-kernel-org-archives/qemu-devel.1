@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43656)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45012)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eb4Zr-0002e1-8C
-	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 08:13:31 -0500
+	(envelope-from <imammedo@redhat.com>) id 1eb4fn-0004Yr-2N
+	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 08:19:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eb4Zq-0008Qj-Eo
-	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 08:13:27 -0500
-Received: from mail-oi0-x244.google.com ([2607:f8b0:4003:c06::244]:38289)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1eb4Zq-0008QI-91
-	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 08:13:26 -0500
-Received: by mail-oi0-x244.google.com with SMTP id m65so8232715oig.5
-	for <qemu-devel@nongnu.org>; Mon, 15 Jan 2018 05:13:26 -0800 (PST)
+	(envelope-from <imammedo@redhat.com>) id 1eb4fj-0004cE-Q9
+	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 08:19:35 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:53396)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1eb4fj-0004bD-H0
+	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 08:19:31 -0500
+Date: Mon, 15 Jan 2018 14:19:26 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20180115141926.6c2d06e4@redhat.com>
+In-Reply-To: <1515628000-93285-13-git-send-email-mjc@sifive.com>
+References: <1515628000-93285-1-git-send-email-mjc@sifive.com>
+	<1515628000-93285-13-git-send-email-mjc@sifive.com>
 MIME-Version: 1.0
-In-Reply-To: <94742c6e-9b7c-2d83-fc97-b8813a96b1e8@linaro.org>
-References: <20180110063337.21538-1-richard.henderson@linaro.org>
-	<CAFEAcA_yQPCNWcv0Mz9mKUObuQH74DcbzyBvo9=UWF6pJ0qPWg@mail.gmail.com>
-	<94742c6e-9b7c-2d83-fc97-b8813a96b1e8@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 15 Jan 2018 13:13:05 +0000
-Message-ID: <CAFEAcA-TWemchenRbxskT+xgmnWu3SGyvBYSmp6F+=ByyM5nTw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH 0/2] target/arm: split out vfp_expand_imm
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 12/21] RISC-V HART Array
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,26 +27,175 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+To: Michael Clark <mjc@sifive.com>
+Cc: qemu-devel@nongnu.org, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, RISC-V Patches <patches+subscribe@groups.riscv.org>, Palmer Dabbelt <palmer@sifive.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>
 
-On 12 January 2018 at 19:07, Richard Henderson
-<richard.henderson@linaro.org> wrote:
-> On 01/12/2018 09:22 AM, Peter Maydell wrote:
->>> Richard Henderson (2):
->>>   target/arm: Split out vfp_expand_imm
->>>   target/arm: Add fp16 support to vfp_expand_imm
->>>
->>>  target/arm/translate-a64.c | 49 +++++++++++++++++++++++++++++++---------------
->>>  1 file changed, 33 insertions(+), 16 deletions(-)
->>
->> Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
->>
->> I could put these in target-arm.next now if you like ?
->
-> Yes, please.
+On Wed, 10 Jan 2018 15:46:31 -0800
+Michael Clark <mjc@sifive.com> wrote:
 
-OK, done.
+> Holds the state of a heterogenous array of RISC-V hardware threads.
+> 
+> Signed-off-by: Michael Clark <mjc@sifive.com>
+> ---
+>  hw/riscv/riscv_hart.c         | 95 +++++++++++++++++++++++++++++++++++++++++++
+>  include/hw/riscv/riscv_hart.h | 45 ++++++++++++++++++++
+>  2 files changed, 140 insertions(+)
+>  create mode 100644 hw/riscv/riscv_hart.c
+>  create mode 100644 include/hw/riscv/riscv_hart.h
+> 
+> diff --git a/hw/riscv/riscv_hart.c b/hw/riscv/riscv_hart.c
+> new file mode 100644
+> index 0000000..a7e079e
+> --- /dev/null
+> +++ b/hw/riscv/riscv_hart.c
+> @@ -0,0 +1,95 @@
+> +/*
+> + * QEMU RISCV Hart Array
+> + *
+> + * Copyright (c) 2017 SiFive, Inc.
+> + *
+> + * Holds the state of a heterogenous array of RISC-V harts
+> + *
+> + * Permission is hereby granted, free of charge, to any person obtaining a copy
+> + * of this software and associated documentation files (the "Software"), to deal
+> + * in the Software without restriction, including without limitation the rights
+> + * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+> + * copies of the Software, and to permit persons to whom the Software is
+> + * furnished to do so, subject to the following conditions:
+> + *
+> + * The above copyright notice and this permission notice shall be included in
+> + * all copies or substantial portions of the Software.
+> + *
+> + * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+> + * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+> + * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+> + * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+> + * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+> + * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+> + * THE SOFTWARE.
+> + */
+> +
+> +#include "qemu/osdep.h"
+> +#include "qapi/error.h"
+> +#include "hw/sysbus.h"
+> +#include "target/riscv/cpu.h"
+> +#include "hw/riscv/riscv_hart.h"
+> +
+> +static Property riscv_harts_props[] = {
+> +    DEFINE_PROP_UINT32("num-harts", RISCVHartArrayState, num_harts, 1),
+> +    DEFINE_PROP_STRING("cpu-model", RISCVHartArrayState, cpu_model),
+suggest to rename it to cpu-type/cpu_type since it's used as such,
+new code shouldn't use cpu_model anywhere except of foo_cpu_class_by_name()
+callback.
 
-thanks
--- PMM
+> +    DEFINE_PROP_END_OF_LIST(),
+> +};
+> +
+> +static void riscv_harts_cpu_reset(void *opaque)
+> +{
+> +    RISCVCPU *cpu = opaque;
+> +    cpu_reset(CPU(cpu));
+> +}
+> +
+> +static void riscv_harts_realize(DeviceState *dev, Error **errp)
+> +{
+> +    RISCVHartArrayState *s = RISCV_HART_ARRAY(dev);
+> +    Error *err = NULL;
+> +    int n;
+> +
+> +    s->harts = g_new0(RISCVCPU, s->num_harts);
+> +
+> +    for (n = 0; n < s->num_harts; n++) {
+> +
+> +        object_initialize(&s->harts[n], sizeof(RISCVCPU), s->cpu_model);
+> +        s->harts[n].env.mhartid = n;
+> +        object_property_add_child(OBJECT(s), "harts[*]", OBJECT(&s->harts[n]),
+> +                                  &error_abort);
+> +        qemu_register_reset(riscv_harts_cpu_reset, &s->harts[n]);
+> +        object_property_set_bool(OBJECT(&s->harts[n]), true,
+> +                                 "realized", &err);
+> +        if (err) {
+> +            error_propagate(errp, err);
+> +            return;
+> +        }
+> +    }
+> +}
+> +
+> +static void riscv_harts_class_init(ObjectClass *klass, void *data)
+> +{
+> +    DeviceClass *dc = DEVICE_CLASS(klass);
+> +
+> +    dc->props = riscv_harts_props;
+> +    dc->realize = riscv_harts_realize;
+> +}
+> +
+> +static void riscv_harts_init(Object *obj)
+> +{
+> +    /* RISCVHartArrayState *s = SIFIVE_COREPLEX(obj); */
+> +}
+> +
+> +static const TypeInfo riscv_harts_info = {
+> +    .name          = TYPE_RISCV_HART_ARRAY,
+> +    .parent        = TYPE_SYS_BUS_DEVICE,
+> +    .instance_size = sizeof(RISCVHartArrayState),
+> +    .instance_init = riscv_harts_init,
+> +    .class_init    = riscv_harts_class_init,
+> +};
+> +
+> +static void riscv_harts_register_types(void)
+> +{
+> +    type_register_static(&riscv_harts_info);
+> +}
+> +
+> +type_init(riscv_harts_register_types)
+> diff --git a/include/hw/riscv/riscv_hart.h b/include/hw/riscv/riscv_hart.h
+> new file mode 100644
+> index 0000000..c45e987
+> --- /dev/null
+> +++ b/include/hw/riscv/riscv_hart.h
+> @@ -0,0 +1,45 @@
+> +/*
+> + * QEMU RISC-V Hart Array interface
+> + *
+> + * Copyright (c) 2017 SiFive, Inc.
+> + *
+> + * Holds the state of a heterogenous array of RISC-V harts
+> + *
+> + * Permission is hereby granted, free of charge, to any person obtaining a copy
+> + * of this software and associated documentation files (the "Software"), to deal
+> + * in the Software without restriction, including without limitation the rights
+> + * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+> + * copies of the Software, and to permit persons to whom the Software is
+> + * furnished to do so, subject to the following conditions:
+> + *
+> + * The above copyright notice and this permission notice shall be included in
+> + * all copies or substantial portions of the Software.
+> + *
+> + * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+> + * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+> + * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+> + * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+> + * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+> + * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+> + * THE SOFTWARE.
+> + */
+> +
+> +#ifndef HW_RISCV_HART_H
+> +#define HW_RISCV_HART_H
+> +
+> +#define TYPE_RISCV_HART_ARRAY "riscv.hart_array"
+> +
+> +#define RISCV_HART_ARRAY(obj) \
+> +    OBJECT_CHECK(RISCVHartArrayState, (obj), TYPE_RISCV_HART_ARRAY)
+> +
+> +typedef struct RISCVHartArrayState {
+> +    /*< private >*/
+> +    SysBusDevice parent_obj;
+> +
+> +    /*< public >*/
+> +    uint32_t num_harts;
+> +    char *cpu_model;
+> +    RISCVCPU *harts;
+> +} RISCVHartArrayState;
+> +
+> +#endif
