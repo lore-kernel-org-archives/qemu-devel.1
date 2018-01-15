@@ -1,28 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33304)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34020)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1eayhJ-0006p1-4E
-	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 01:56:46 -0500
+	(envelope-from <sjitindarsingh@gmail.com>) id 1eayjY-0000Al-0r
+	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 01:59:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1eayhD-0006JX-4T
-	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 01:56:45 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:53112)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1eayhC-0006Iq-Rm
-	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 01:56:39 -0500
-References: <20180110161438.GA28096@stefanha-x1.localdomain>
-	<dcb849d4-82fb-de8a-5e81-23d47026c9eb@redhat.com>
-	<20180111152345.GA7353@stefanha-x1.localdomain>
-	<86106573-422b-fe4c-ec15-dad0edf05880@redhat.com>
-	<20180112101807.GE7356@stefanha-x1.localdomain>
-From: Jason Wang <jasowang@redhat.com>
-Message-ID: <a45c1da8-03e8-140f-725c-af0f31e3da62@redhat.com>
-Date: Mon, 15 Jan 2018 14:56:31 +0800
-MIME-Version: 1.0
-In-Reply-To: <20180112101807.GE7356@stefanha-x1.localdomain>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] vhost-pci and virtio-vhost-user
+	(envelope-from <sjitindarsingh@gmail.com>) id 1eayjW-0008Bg-Jy
+	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 01:59:04 -0500
+From: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+Date: Mon, 15 Jan 2018 17:58:37 +1100
+Message-Id: <20180115065837.12431-1-sjitindarsingh@gmail.com>
+In-Reply-To: <20180115063235.7518-2-sjitindarsingh@gmail.com>
+References: <20180115063235.7518-2-sjitindarsingh@gmail.com>
+Subject: [Qemu-devel] [QEMU-PPC] [PATCH V4 1/6] target/ppc/kvm: Add
+ cap_ppc_safe_[cache/bounds_check/indirect_branch]
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,142 +20,222 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: wei.w.wang@intel.com, qemu-devel@nongnu.org
+To: qemu-ppc@nongnu.org
+Cc: qemu-devel@nongnu.org, david@gibson.dropbear.id.au, paulus@ozlabs.org, sjitindarsingh@gmail.com
 
+Add three new kvm capabilities used to represent the level of host support
+for three corresponding workarounds.
 
+Host support for each of the capabilities is queried through the
+new ioctl KVM_PPC_GET_CPU_CHAR which returns four uint64 quantities. The
+first two, character and behaviour, represent the available
+characteristics of the cpu and the behaviour of the cpu respectively.
+The second two, c_mask and b_mask, represent the mask of known bits for
+the character and beheviour dwords respectively.
 
-On 2018=E5=B9=B401=E6=9C=8812=E6=97=A5 18:18, Stefan Hajnoczi wrote:
->>>> Form what I'm understanding, vhost-pci tries to build a scalable V2V=
- private
->>>> datapath. But according to what you describe here, virito-vhost-user=
- tries
->>>> to make it possible to implement the device inside another VM. I und=
-erstand
->>>> the goal of vhost-pci could be done on top, but it looks to me it wo=
-uld then
->>>> rather similar to the design of Xen driver domain. So I can not figu=
-re out
->>>> how it can be done in a high performance way.
->>> vhost-pci and virtio-vhost-user both have the same goal.  They allow
->>> a VM to implement a vhost device (net, scsi, blk, etc).
->> Looks not, if I read the code correctly, vhost-pci has a device
->> implementation in qemu, and in slave VM it only have a vhost-pci-net d=
-river.
-> You are right that the current "[PATCH v3 0/7] Vhost-pci for inter-VM
-> communication" does not reach this goal yet.  The patch series focusses
-> on a subset of vhost-user-net for poll mode drivers.
->
-> But the goal is to eventually let VMs implement any vhost device type.
-> Even if Wei, you, or I don't implement scsi, for example, someone else
-> should be able to do it based on vhost-pci or virtio-vhost-user.
->
-> Wei: Do you agree?
->
->>> This allows
->>> software defined network or storage appliances running inside a VM to
->>> provide I/O services to other VMs.
->> Well, I think we can do it even with the existed virtio or whatever ot=
-her
->> emulated device which should not be bounded to any specific kind of de=
-vice.
-> Please explain the approach you have in mind.
+Signed-off-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+---
 
-I just fail understand why we can't do software defined network or=20
-storage with exist virtio device/drivers (or are there any shortcomings=20
-that force us to invent new infrastructure).
+V3 -> V4:
+- Move kvmppc_get_cpu_characteristics() function implementation to fix
+  compilation on some targets.
 
->
->> And what's more important, according to the kvm 2016 slides of vhost-p=
-ci,
->> the motivation of vhost-pci is not building SDN but a chain of VNFs. S=
-o
->> bypassing the central vswitch through a private VM2VM path does make s=
-ense.
->> (Though whether or not vhost-pci is the best choice is still questiona=
-ble).
-> This is probably my fault.  Maybe my networking terminology is wrong.  =
-I
-> consider "virtual network functions" to be part of "software-defined
-> networking" use cases.  I'm not implying there must be a central virtua=
-l
-> switch.
->
-> To rephrase: vhost-pci enables exitless VM2VM communication.
+---
+ include/hw/ppc/spapr.h          | 12 +++++++++
+ linux-headers/asm-powerpc/kvm.h |  8 ++++++
+ linux-headers/linux/kvm.h       |  3 +++
+ target/ppc/kvm.c                | 58 +++++++++++++++++++++++++++++++++++++++++
+ target/ppc/kvm_ppc.h            | 18 +++++++++++++
+ 5 files changed, 99 insertions(+)
 
-The problem is, exitless is not what vhost-pci invents, it could be=20
-achieved now when both sides are doing busypolling.
-
->
->>>    To the other VMs the devices look
->>> like regular virtio devices.
->>>
->>> I'm not sure I understand your reference to the Xen driver domain or
->>> performance.
->> So what proposed here is basically memory sharing and event notificati=
-on
->> through eventfd, this model have been used by Xen for many years throu=
-gh
->> grant table and event channel. Xen use this to move the backend
->> implementation from dom0 to a driver domain which has direct access to=
- some
->> hardwares. Consider the case of network, it can then implement xen net=
-back
->> inside driver domain which can access hardware NIC directly.
->>
->> This makes sense for Xen and for performance since driver domain (back=
-end)
->> can access hardware directly and event was triggered through lower ove=
-rhead
->> hypercall (or it can do busypolling). But for virtio-vhost-user, unles=
-s you
->> want SRIOV based solutions inside the slave VM, I believe we won't wan=
-t to
->> go back to Xen since the hardware virtualization can bring extra overh=
-eads.
-> Okay, this point is about the NFV use case.  I can't answer that becaus=
-e
-> I'm not familiar with it.
->
-> Even if the NFV use case is not ideal for VMs, there are many other use
-> cases for VMs implementing vhost devices.  In the cloud the VM is the
-> first-class object that users can manage.  They do not have the ability
-> to run vhost-user processes on the host.  Therefore I/O appliances need
-> to be able to run as VMs and vhost-pci (or virtio-vhost-user) solve tha=
-t
-> problem.
-
-The question is why must use vhost-user? E.g in the case of SDN, you can=20
-easily deploy an OVS instance with openflow inside a VM and it works=20
-like a charm.
-
->
->>>    Both vhost-pci and virtio-vhost-user work using shared
->>> memory access to the guest RAM of the other VM.  Therefore they can p=
-oll
->>> virtqueues and avoid vmexit.  They do also support cross-VM interrupt=
-s,
->>> thanks to QEMU setting up irqfd/ioeventfd appropriately on the host.
->>>
->>> Stefan
->> So in conclusion, consider the complexity, I would suggest to figure o=
-ut
->> whether or not this (either vhost-pci or virito-vhost-user) is really
->> required before moving ahead. E.g, for VM2VM direct network path, this=
- looks
->> simply an issue of network topology instead of the problem of device, =
-so
->> there's a lot of trick, for vhost-user one can easily image to write a=
-n
->> application (or use testpmd) to build a zerocopied VM2VM datapath, isn=
-'t
->> this not sufficient for the case?
-> See above, I described the general cloud I/O appliance use case.
->
-> Stefan
-
-So I understand vhost-user could be used to build I/O appliance. What I=20
-don't understand is, the advantages of using vhost-user or why we must=20
-use it inside a guest.
-
-Thanks
+diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
+index 0f5628f22e..eded0ea57d 100644
+--- a/include/hw/ppc/spapr.h
++++ b/include/hw/ppc/spapr.h
+@@ -295,6 +295,18 @@ struct sPAPRMachineState {
+ #define H_DABRX_KERNEL     (1ULL<<(63-62))
+ #define H_DABRX_USER       (1ULL<<(63-63))
+ 
++/* Values for KVM_PPC_GET_CPU_CHAR & H_GET_CPU_CHARACTERISTICS */
++#define H_CPU_CHAR_SPEC_BAR_ORI31               PPC_BIT(0)
++#define H_CPU_CHAR_BCCTRL_SERIALISED            PPC_BIT(1)
++#define H_CPU_CHAR_L1D_FLUSH_ORI30              PPC_BIT(2)
++#define H_CPU_CHAR_L1D_FLUSH_TRIG2              PPC_BIT(3)
++#define H_CPU_CHAR_L1D_THREAD_PRIV              PPC_BIT(4)
++#define H_CPU_CHAR_HON_BRANCH_HINTS             PPC_BIT(5)
++#define H_CPU_CHAR_THR_RECONF_TRIG              PPC_BIT(6)
++#define H_CPU_BEHAV_FAVOUR_SECURITY             PPC_BIT(0)
++#define H_CPU_BEHAV_L1D_FLUSH_PR                PPC_BIT(1)
++#define H_CPU_BEHAV_BNDS_CHK_SPEC_BAR           PPC_BIT(2)
++
+ /* Each control block has to be on a 4K boundary */
+ #define H_CB_ALIGNMENT     4096
+ 
+diff --git a/linux-headers/asm-powerpc/kvm.h b/linux-headers/asm-powerpc/kvm.h
+index 61d6049f4c..5d2cb26848 100644
+--- a/linux-headers/asm-powerpc/kvm.h
++++ b/linux-headers/asm-powerpc/kvm.h
+@@ -443,6 +443,14 @@ struct kvm_ppc_rmmu_info {
+ 	__u32	ap_encodings[8];
+ };
+ 
++/* For KVM_PPC_GET_CPU_CHAR */
++struct kvm_ppc_cpu_char {
++        __u64   character;      /* characteristics of the CPU */
++        __u64   behaviour;      /* recommended software behaviour */
++        __u64   c_mask;         /* valid bits in character */
++        __u64   b_mask;         /* valid bits in behaviour */
++};
++
+ /* Per-vcpu XICS interrupt controller state */
+ #define KVM_REG_PPC_ICP_STATE	(KVM_REG_PPC | KVM_REG_SIZE_U64 | 0x8c)
+ 
+diff --git a/linux-headers/linux/kvm.h b/linux-headers/linux/kvm.h
+index ce6c2f11f4..c35f1bd363 100644
+--- a/linux-headers/linux/kvm.h
++++ b/linux-headers/linux/kvm.h
+@@ -932,6 +932,7 @@ struct kvm_ppc_resize_hpt {
+ #define KVM_CAP_HYPERV_SYNIC2 148
+ #define KVM_CAP_HYPERV_VP_INDEX 149
+ #define KVM_CAP_S390_AIS_MIGRATION 150
++#define KVM_CAP_PPC_GET_CPU_CHAR 151
+ 
+ #ifdef KVM_CAP_IRQ_ROUTING
+ 
+@@ -1261,6 +1262,8 @@ struct kvm_s390_ucas_mapping {
+ #define KVM_PPC_CONFIGURE_V3_MMU  _IOW(KVMIO,  0xaf, struct kvm_ppc_mmuv3_cfg)
+ /* Available with KVM_CAP_PPC_RADIX_MMU */
+ #define KVM_PPC_GET_RMMU_INFO	  _IOW(KVMIO,  0xb0, struct kvm_ppc_rmmu_info)
++/* Available with KVM_CAP_PPC_GET_CPU_CHAR */
++#define KVM_PPC_GET_CPU_CHAR      _IOR(KVMIO,  0xb1, struct kvm_ppc_cpu_char)
+ 
+ /* ioctl for vm fd */
+ #define KVM_CREATE_DEVICE	  _IOWR(KVMIO,  0xe0, struct kvm_create_device)
+diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
+index 914be687e7..b16f731522 100644
+--- a/target/ppc/kvm.c
++++ b/target/ppc/kvm.c
+@@ -89,6 +89,9 @@ static int cap_mmu_radix;
+ static int cap_mmu_hash_v3;
+ static int cap_resize_hpt;
+ static int cap_ppc_pvr_compat;
++static int cap_ppc_safe_cache;
++static int cap_ppc_safe_bounds_check;
++static int cap_ppc_safe_indirect_branch;
+ 
+ static uint32_t debug_inst_opcode;
+ 
+@@ -121,6 +124,7 @@ static bool kvmppc_is_pr(KVMState *ks)
+ }
+ 
+ static int kvm_ppc_register_host_cpu_type(MachineState *ms);
++static void kvmppc_get_cpu_characteristics(KVMState *s);
+ 
+ int kvm_arch_init(MachineState *ms, KVMState *s)
+ {
+@@ -147,6 +151,7 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
+     cap_mmu_radix = kvm_vm_check_extension(s, KVM_CAP_PPC_MMU_RADIX);
+     cap_mmu_hash_v3 = kvm_vm_check_extension(s, KVM_CAP_PPC_MMU_HASH_V3);
+     cap_resize_hpt = kvm_vm_check_extension(s, KVM_CAP_SPAPR_RESIZE_HPT);
++    kvmppc_get_cpu_characteristics(s);
+     /*
+      * Note: setting it to false because there is not such capability
+      * in KVM at this moment.
+@@ -2456,6 +2461,59 @@ bool kvmppc_has_cap_mmu_hash_v3(void)
+     return cap_mmu_hash_v3;
+ }
+ 
++static void kvmppc_get_cpu_characteristics(KVMState *s)
++{
++    struct kvm_ppc_cpu_char c;
++    int ret;
++
++    /* Assume broken */
++    cap_ppc_safe_cache = 0;
++    cap_ppc_safe_bounds_check = 0;
++    cap_ppc_safe_indirect_branch = 0;
++
++    ret = kvm_vm_check_extension(s, KVM_CAP_PPC_GET_CPU_CHAR);
++    if (!ret) {
++        return;
++    }
++    ret = kvm_vm_ioctl(s, KVM_PPC_GET_CPU_CHAR, &c);
++    if (ret < 0) {
++        return;
++    }
++    /* Parse and set cap_ppc_safe_cache */
++    if (~c.behaviour & c.b_mask & H_CPU_BEHAV_L1D_FLUSH_PR) {
++        cap_ppc_safe_cache = 2;
++    } else if ((c.character & c.c_mask & H_CPU_CHAR_L1D_THREAD_PRIV) &&
++               (c.character & c.c_mask & (H_CPU_CHAR_L1D_FLUSH_ORI30 |
++                                          H_CPU_CHAR_L1D_FLUSH_TRIG2))) {
++        cap_ppc_safe_cache = 1;
++    }
++    /* Parse and set cap_ppc_safe_bounds_check */
++    if (~c.behaviour & c.b_mask & H_CPU_BEHAV_BNDS_CHK_SPEC_BAR) {
++        cap_ppc_safe_bounds_check = 2;
++    } else if (c.character & c.c_mask & H_CPU_CHAR_SPEC_BAR_ORI31) {
++        cap_ppc_safe_bounds_check = 1;
++    }
++    /* Parse and set cap_ppc_safe_indirect_branch */
++    if (c.character & H_CPU_CHAR_BCCTRL_SERIALISED) {
++        cap_ppc_safe_indirect_branch = 2;
++    }
++}
++
++int kvmppc_get_cap_safe_cache(void)
++{
++    return cap_ppc_safe_cache;
++}
++
++int kvmppc_get_cap_safe_bounds_check(void)
++{
++    return cap_ppc_safe_bounds_check;
++}
++
++int kvmppc_get_cap_safe_indirect_branch(void)
++{
++    return cap_ppc_safe_indirect_branch;
++}
++
+ PowerPCCPUClass *kvm_ppc_get_host_cpu_class(void)
+ {
+     uint32_t host_pvr = mfpvr();
+diff --git a/target/ppc/kvm_ppc.h b/target/ppc/kvm_ppc.h
+index ecb55493cc..39830baa77 100644
+--- a/target/ppc/kvm_ppc.h
++++ b/target/ppc/kvm_ppc.h
+@@ -59,6 +59,9 @@ bool kvmppc_has_cap_fixup_hcalls(void);
+ bool kvmppc_has_cap_htm(void);
+ bool kvmppc_has_cap_mmu_radix(void);
+ bool kvmppc_has_cap_mmu_hash_v3(void);
++int kvmppc_get_cap_safe_cache(void);
++int kvmppc_get_cap_safe_bounds_check(void);
++int kvmppc_get_cap_safe_indirect_branch(void);
+ int kvmppc_enable_hwrng(void);
+ int kvmppc_put_books_sregs(PowerPCCPU *cpu);
+ PowerPCCPUClass *kvm_ppc_get_host_cpu_class(void);
+@@ -290,6 +293,21 @@ static inline bool kvmppc_has_cap_mmu_hash_v3(void)
+     return false;
+ }
+ 
++static inline int kvmppc_get_cap_safe_cache(void)
++{
++    return 0;
++}
++
++static inline int kvmppc_get_cap_safe_bounds_check(void)
++{
++    return 0;
++}
++
++static inline int kvmppc_get_cap_safe_indirect_branch(void)
++{
++    return 0;
++}
++
+ static inline int kvmppc_enable_hwrng(void)
+ {
+     return -1;
+-- 
+2.13.6
