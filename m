@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51659)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51732)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1eb1z2-0001XW-Ot
-	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 05:27:21 -0500
+	(envelope-from <berrange@redhat.com>) id 1eb1z9-0001eT-HA
+	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 05:27:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1eb1z1-0007YB-Vw
-	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 05:27:16 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:42630)
+	(envelope-from <berrange@redhat.com>) id 1eb1z6-0007bP-AL
+	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 05:27:23 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:50992)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1eb1z1-0007Xl-QO
-	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 05:27:15 -0500
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1eb1z6-0007at-4F
+	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 05:27:20 -0500
 From: "Daniel P. Berrange" <berrange@redhat.com>
-Date: Mon, 15 Jan 2018 10:26:17 +0000
-Message-Id: <20180115102621.9183-10-berrange@redhat.com>
+Date: Mon, 15 Jan 2018 10:26:19 +0000
+Message-Id: <20180115102621.9183-12-berrange@redhat.com>
 In-Reply-To: <20180115102621.9183-1-berrange@redhat.com>
 References: <20180115102621.9183-1-berrange@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 09/13] configure: allow use of python 3
+Subject: [Qemu-devel] [PATCH v3 11/13] ui: update keycodemapdb to get py3
+ fixes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,24 +29,15 @@ Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Fam Zheng <famz@red
 
 Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
 ---
- configure | 5 ++---
- 1 file changed, 2 insertions(+), 3 deletions(-)
+ ui/keycodemapdb | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/configure b/configure
-index b272a0336b..60b99f45f6 100755
---- a/configure
-+++ b/configure
-@@ -1598,9 +1598,8 @@ fi
- 
- # Note that if the Python conditional here evaluates True we will exit
- # with status 1 which is a shell 'false' value.
--if ! $python -c 'import sys; sys.exit(sys.version_info < (2,6) or sys.version_info >= (3,))'; then
--  error_exit "Cannot use '$python', Python 2.6 or later is required." \
--      "Note that Python 3 or later is not yet supported." \
-+if ! $python -c 'import sys; sys.exit(sys.version_info < (2,6))'; then
-+  error_exit "Cannot use '$python', Python 2 >= 2.6 or Python 3 is required." \
-       "Use --python=/path/to/python to specify a supported Python."
- fi
- 
+diff --git a/ui/keycodemapdb b/ui/keycodemapdb
+index 05dad417e9..6b3d716e2b 160000
+--- a/ui/keycodemapdb
++++ b/ui/keycodemapdb
+@@ -1 +1 @@
+-Subproject commit 05dad417e9d0b37ee1fba33056d91a6b734b3357
++Subproject commit 6b3d716e2b6472eb7189d3220552280ef3d832ce
 -- 
 2.14.3
