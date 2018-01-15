@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51230)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51843)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1eb65e-0006yU-3k
-	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 09:50:22 -0500
+	(envelope-from <no-reply@patchew.org>) id 1eb67q-00088t-FV
+	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 09:52:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1eb65a-0002uK-7G
-	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 09:50:22 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:44700)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1eb65a-0002tH-1W
-	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 09:50:18 -0500
-Date: Mon, 15 Jan 2018 15:49:44 +0100
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20180115144944.GG32271@localhost.localdomain>
-References: <20171012235439.19457-1-anatol.pomozov@gmail.com>
-	<20171012235439.19457-2-anatol.pomozov@gmail.com>
+	(envelope-from <no-reply@patchew.org>) id 1eb67m-00058L-IY
+	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 09:52:38 -0500
+Resent-Message-Id: <E1eb67m-00058L-IY@eggs.gnu.org>
+Received: from sender-of-o51.zoho.com ([135.84.80.216]:21037)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1eb67m-00055z-9l
+	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 09:52:34 -0500
+In-Reply-To: <20180115141759.11857-1-kraxel@redhat.com>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <151602791373.557.1712710882769350620@5adcb62bf0d6>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20171012235439.19457-2-anatol.pomozov@gmail.com>
-Subject: Re: [Qemu-devel] [PATCH 1/4] multiboot: Change multiboot_info from
- array of bytes to a C struct
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Mon, 15 Jan 2018 06:51:54 -0800 (PST)
+Subject: Re: [Qemu-devel] [PATCH v2 0/2] sdl: hotkey updates and cleanups
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,32 +28,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Anatol Pomozov <anatol.pomozov@gmail.com>
-Cc: qemu-devel@nongnu.org, ehabkost@redhat.com, agraf@suse.de, pbonzini@redhat.com, rth@twiddle.net
+To: kraxel@redhat.com
+Cc: famz@redhat.com, qemu-devel@nongnu.org
 
-Am 13.10.2017 um 01:54 hat Anatol Pomozov geschrieben:
-> Using C structs makes the code more readable and prevents type conversion
-> errors.
-> 
-> Borrow multiboot1 header from GRUB project.
-> 
-> Signed-off-by: Anatol Pomozov <anatol.pomozov@gmail.com>
-> ---
->  hw/i386/multiboot.c         | 124 +++++++++------------
->  hw/i386/multiboot_header.h  | 254 ++++++++++++++++++++++++++++++++++++++++++++
->  tests/multiboot/mmap.c      |  14 +--
->  tests/multiboot/mmap.out    |  10 ++
->  tests/multiboot/modules.c   |  12 ++-
->  tests/multiboot/modules.out |  10 ++
->  tests/multiboot/multiboot.h |  66 ------------
->  7 files changed, 339 insertions(+), 151 deletions(-)
->  create mode 100644 hw/i386/multiboot_header.h
->  delete mode 100644 tests/multiboot/multiboot.h
-
-This is a good change in general. However, I'm not sure if we should
-really replace the header used in the tests. After all, the tests also
-test whether things are at the right place, and if there is an error in
-the header file, we can only catch it if the tests keep using their own
-definitions.
-
-Kevin
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IDIwMTgwMTE1MTQxNzU5LjExODU3LTEta3JheGVsQHJlZGhhdC5jb20KU3ViamVj
+dDogW1FlbXUtZGV2ZWxdIFtQQVRDSCB2MiAwLzJdIHNkbDogaG90a2V5IHVwZGF0ZXMgYW5kIGNs
+ZWFudXBzCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCgpCQVNFPWJhc2UK
+bj0xCnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJBU0UuLiB8IHdjIC1sKQpmYWlsZWQ9MAoK
+Z2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwg
+ZGlmZi5yZW5hbWVzIFRydWUKCmNvbW1pdHM9IiQoZ2l0IGxvZyAtLWZvcm1hdD0lSCAtLXJldmVy
+c2UgJEJBU0UuLikiCmZvciBjIGluICRjb21taXRzOyBkbwogICAgZWNobyAiQ2hlY2tpbmcgUEFU
+Q0ggJG4vJHRvdGFsOiAkKGdpdCBsb2cgLW4gMSAtLWZvcm1hdD0lcyAkYykuLi4iCiAgICBpZiAh
+IGdpdCBzaG93ICRjIC0tZm9ybWF0PWVtYWlsIHwgLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1t
+YWlsYmFjayAtOyB0aGVuCiAgICAgICAgZmFpbGVkPTEKICAgICAgICBlY2hvCiAgICBmaQogICAg
+bj0kKChuKzEpKQpkb25lCgpleGl0ICRmYWlsZWQKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVw
+ZGF0aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKRnJvbSBodHRw
+czovL2dpdGh1Yi5jb20vcGF0Y2hldy1wcm9qZWN0L3FlbXUKICogW25ldyB0YWddICAgICAgICAg
+ICAgICAgcGF0Y2hldy8yMDE4MDExNTE0MzUwMC4yMjYzMS0xLWY0YnVnQGFtc2F0Lm9yZyAtPiBw
+YXRjaGV3LzIwMTgwMTE1MTQzNTAwLjIyNjMxLTEtZjRidWdAYW1zYXQub3JnClN3aXRjaGVkIHRv
+IGEgbmV3IGJyYW5jaCAndGVzdCcKMDY5YjkxMmQ2NyBzZGw6IHJlb3JnYW5pemUgLW5vLWZyYW1l
+IHN1cHBvcnQKZTI1MzgwZmI1YyBzZGw6IHVzZSBjdHJsLWFsdC1nIGFzIGdyYWIgaG90a2V5Cgo9
+PT0gT1VUUFVUIEJFR0lOID09PQpDaGVja2luZyBQQVRDSCAxLzI6IHNkbDogdXNlIGN0cmwtYWx0
+LWcgYXMgZ3JhYiBob3RrZXkuLi4KQ2hlY2tpbmcgUEFUQ0ggMi8yOiBzZGw6IHJlb3JnYW5pemUg
+LW5vLWZyYW1lIHN1cHBvcnQuLi4KRVJST1I6IGJyYWNlcyB7fSBhcmUgbmVjZXNzYXJ5IGZvciBh
+bGwgYXJtcyBvZiB0aGlzIHN0YXRlbWVudAojNjg6IEZJTEU6IHVpL3NkbC5jOjExNjoKKyAgICBp
+ZiAobm9fZnJhbWUpClsuLi5dCgpFUlJPUjogZG8gbm90IGluaXRpYWxpc2UgZ2xvYmFscyB0byAw
+IG9yIE5VTEwKIzEzMjogRklMRTogdmwuYzoxNTM6CitpbnQgbm9fZnJhbWUgPSAwOwoKdG90YWw6
+IDIgZXJyb3JzLCAwIHdhcm5pbmdzLCA5NyBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBz
+dHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJl
+IGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNL
+UEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBl
+eGl0ZWQgd2l0aCBjb2RlOiAxCgoKLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5
+IFBhdGNoZXcgW2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNr
+IHRvIHBhdGNoZXctZGV2ZWxAZnJlZWxpc3RzLm9yZw==
