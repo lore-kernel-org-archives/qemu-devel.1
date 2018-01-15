@@ -1,22 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45912)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47260)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1eb5tz-0006Kf-Pr
-	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 09:38:20 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1eb5w7-0008P1-FB
+	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 09:40:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1eb5tu-0002ct-TY
-	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 09:38:19 -0500
-References: <1516008655-31732-1-git-send-email-thuth@redhat.com>
-	<alpine.BSF.2.21.1801151238370.57536@zero.eik.bme.hu>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <57803cc5-9f54-07bc-e18c-0606cb63d6c6@redhat.com>
-Date: Mon, 15 Jan 2018 15:38:01 +0100
+	(envelope-from <vsementsov@virtuozzo.com>) id 1eb5w6-00043t-CT
+	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 09:40:31 -0500
+References: <20171207155102.66622-1-vsementsov@virtuozzo.com>
+	<20171207155102.66622-7-vsementsov@virtuozzo.com>
+	<a0096cf0-8bec-dedb-e637-f29c71e46fbb@redhat.com>
+	<624f9181-d57c-4029-e3e8-7f6f4fea3963@virtuozzo.com>
+	<fedadb51-af71-82b1-ee73-135a7ce689eb@redhat.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <39f16940-1b62-5054-d872-80e9ce0fc560@virtuozzo.com>
+Date: Mon, 15 Jan 2018 17:40:16 +0300
 MIME-Version: 1.0
-In-Reply-To: <alpine.BSF.2.21.1801151238370.57536@zero.eik.bme.hu>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+In-Reply-To: <fedadb51-af71-82b1-ee73-135a7ce689eb@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH 0/2] Clean up the ppc default
- configs
+Content-Language: en-US
+Subject: Re: [Qemu-devel] [PATCH v2 6/6] iotest 201: new test for qmp
+ nbd-server-remove
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,48 +28,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: BALATON Zoltan <balaton@eik.bme.hu>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: armbru@redhat.com, dgilbert@redhat.com, pbonzini@redhat.com, mreitz@redhat.com, kwolf@redhat.com, den@openvz.org
 
-On 15.01.2018 13:00, BALATON Zoltan wrote:
-> On Mon, 15 Jan 2018, Thomas Huth wrote:
->> ppc64-softmmu is a superset of ppc-softmmu which in turn is a superset
->> of ppcemb-softmmu. But since the config files are currently independen=
-t
->> from each other, we missed to define some CONFIG switches in the super=
+12.01.2018 19:54, Eric Blake wrote:
+> On 01/12/2018 05:43 AM, Vladimir Sementsov-Ogievskiy wrote:
+>
+>>>> +++ b/tests/qemu-iotests/201.out
+>>>> @@ -0,0 +1,5 @@
+>>>> +.......
+>>>> +---------------------------------------------------------------------=
 -
->> sets: CONFIG_SUNGEM is missing from the ppc64-softmmu config, and the
->> CONFIG_IDE_SII3112 switch is only defined in ppcemb-softmmu.
->=20
-> I'm not sure about this. The Sun GEM network interface is a device
-> typically found on Apple PowerMacs but also seems to be found on G5
-> based Macs so it's probably OK to add. The SiI3112 is now only used on
-> the (not yet fully merged) Sam460EX emulation which is to be added to
-> ppcemb, that's why I've only added it to that target.
+>>>> +Ran 7 tests
+>>> I'm not a fan of python tests that are difficult to debug.=C2=A0 Your
+>>> additions to 147 in patch 4/6 are okay (hard to debug, but an
+>>> incremental addition); but is it possible to rewrite this test in a bit
+>>> more verbose manner?=C2=A0 See test 194 and this message for more detai=
+ls:
+>>> https://lists.gnu.org/archive/html/qemu-devel/2017-12/msg00234.html
+>> hmm, what do you mean by "difficult to debug"? This is a usual python
+>> unittest based test.
+> And the list archives show several threads of people complaining that
+> ./check failing with a diff that merely shows:
+>
+> -.....
+> +..E..
 
-But as I wrote: ppc-softmmu is currently a superset of ppcemb-softmmu. I
-think people expect to be able to run the same amount of machines with
-ppc-softmmu than with ppcemb-softmmu, don't they?
+didn't see that. usually, for failed iotests I see
 
->> (off-topic question: Do we still need a separate ppcemb-softmmu nowada=
-ys?
->> It seemed to be useful 10 years ago when everybody was doing KVM on
->> embedded PPC, but these days seem to be pretty much over now, so IMHO
->> just using ppc-softmmu for embedded should be enough nowadays? We coul=
-d
->> save quite some compilation- and "make check"-time if we could finally
->> get rid of ppcemb-softmmu again...)
->=20
-> I've also noticed that most of the boards were available both in ppcemb
-> and ppc targets so maybe these could be merged now to avoid confusion
-> but I don't know the reason why ppcemb existed in the first place so I
-> don't know what other implications dropping ppcemb may have.
+-.....
++..E..
 
-An alternative would be to remove the embedded configs from the
-ppc-softmmu.mak and only include them in ppcemb-softmmu.mak, so that
-there is a stricter distinction. I think the current situation is rather
-confusing, where it is possible that the user could try to run a pseries
-machine with an embedded PPC CPU for example ... so strictly separating
-the embedded stuff into ppcemb-softmmu would maybe really make sense.
++ some kind of assert-fail in one of testcases
 
- Thomas
+so we know in which testcase and in which line it was failed.
+
+>
+> makes it rather hard to see WHAT test 2 was doing that caused an error
+> instead of a pass, let alone set up a reproduction scenario on JUST the
+> failing test.  Yes, a lot of existing iotests use this unittest layout,
+> and on that grounds, I'm not opposed to adding another one; but test 194
+> really IS easier to debug when something goes wrong.
+>
+>> And there 3 test cases, sharing same setUp. Do not you say that unittest
+>> becomes
+>> deprecated in qemu? I think, if we have only one testcase, we may use
+>> 194-like approach,
+>> but if we have more, it's better to use unittest.
+> Yes, I think a nice goal for improved testing is to write more
+> python-based iotests in the style that uses actual output, and not just
+> the unittest framework, in the test log.  It's not a hard requirement as
+> long as no one has converted existing tests, but is food for thought.
+>
+
+I think, it doesn't mean that we should not use unittest at all, we just=20
+need more output with
+it.
+
+--=20
+Best regards,
+Vladimir
