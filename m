@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36878)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37077)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <luwei.kang@intel.com>) id 1eaz3J-0006NV-6N
-	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 02:19:30 -0500
+	(envelope-from <jasowang@redhat.com>) id 1eaz57-0007H9-Lc
+	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 02:21:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <luwei.kang@intel.com>) id 1eaz3E-0004lB-B5
-	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 02:19:29 -0500
-Received: from mga14.intel.com ([192.55.52.115]:6493)
+	(envelope-from <jasowang@redhat.com>) id 1eaz52-0005dB-9h
+	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 02:21:20 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:47874)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <luwei.kang@intel.com>)
-	id 1eaz3D-0004ja-Uk
-	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 02:19:24 -0500
-From: "Kang, Luwei" <luwei.kang@intel.com>
-Date: Mon, 15 Jan 2018 07:19:16 +0000
-Message-ID: <82D7661F83C1A047AF7DC287873BF1E167E7630B@SHSMSX101.ccr.corp.intel.com>
-References: <1515443797-10837-1-git-send-email-luwei.kang@intel.com>
-	<20180112142252.GG6646@localhost.localdomain>
-In-Reply-To: <20180112142252.GG6646@localhost.localdomain>
-Content-Language: en-US
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1eaz52-0005cS-0H
+	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 02:21:16 -0500
+References: <1515742232-49096-1-git-send-email-jianjay.zhou@huawei.com>
+From: Jason Wang <jasowang@redhat.com>
+Message-ID: <2ec90e7e-0625-62c7-a5a8-3a8aee68114f@redhat.com>
+Date: Mon, 15 Jan 2018 15:21:06 +0800
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH RESEND v1 1/2] i386: Add Intel Processor
- Trace feature support
+In-Reply-To: <1515742232-49096-1-git-send-email-jianjay.zhou@huawei.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] tap: close fd conditionally when error
+ occured
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,132 +28,116 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "rth@twiddle.net" <rth@twiddle.net>, "mtosatti@redhat.com" <mtosatti@redhat.com>, Chao Peng <chao.p.peng@linux.intel.com>
+To: Jay Zhou <jianjay.zhou@huawei.com>, qemu-devel@nongnu.org
+Cc: mst@redhat.com, imammedo@redhat.com, weidong.huang@huawei.com, wangxinxin.wang@huawei.com, arei.gonglei@huawei.com
 
-> > From: Chao Peng <chao.p.peng@linux.intel.com>
-> >
-> > Expose Intel Processor Trace feature to guest.
-> >
-> > Signed-off-by: Chao Peng <chao.p.peng@linux.intel.com>
-> > Signed-off-by: Luwei Kang <luwei.kang@intel.com>
-> > ---
-> >  target/i386/cpu.c | 19 ++++++++++++++++++-  target/i386/cpu.h |  1 +
-> > target/i386/kvm.c | 23 +++++++++++++++++++++++
-> >  3 files changed, 42 insertions(+), 1 deletion(-)
-> >
-> > diff --git a/target/i386/cpu.c b/target/i386/cpu.c index
-> > 3818d72..57f8370 100644
-> > --- a/target/i386/cpu.c
-> > +++ b/target/i386/cpu.c
-> > @@ -427,7 +427,7 @@ static FeatureWordInfo feature_word_info[FEATURE_WO=
-RDS] =3D {
-> >              NULL, NULL, "mpx", NULL,
-> >              "avx512f", "avx512dq", "rdseed", "adx",
-> >              "smap", "avx512ifma", "pcommit", "clflushopt",
-> > -            "clwb", NULL, "avx512pf", "avx512er",
-> > +            "clwb", "intel-pt", "avx512pf", "avx512er",
-> >              "avx512cd", "sha-ni", "avx512bw", "avx512vl",
-> >          },
-> >          .cpuid_eax =3D 7,
-> > @@ -3006,6 +3006,23 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t in=
-dex, uint32_t count,
-> >          }
-> >          break;
-> >      }
-> > +    case 0x14: {
-> > +        if ((env->features[FEAT_7_0_EBX] & CPUID_7_0_EBX_INTEL_PT) &&
-> > +             kvm_enabled()) {
-> > +            KVMState *s =3D cs->kvm_state;
-> > +
-> > +            *eax =3D kvm_arch_get_supported_cpuid(s, 0x14, count, R_EA=
-X);
-> > +            *ebx =3D kvm_arch_get_supported_cpuid(s, 0x14, count, R_EB=
-X);
-> > +            *ecx =3D kvm_arch_get_supported_cpuid(s, 0x14, count, R_EC=
-X);
-> > +            *edx =3D kvm_arch_get_supported_cpuid(s, 0x14, count,
-> > + R_EDX);
->=20
-> If you are forwarding host info directly to the guest, the feature is not=
- migration-safe.  The new feature needs to be added to
-> feature_word_info[FEAT_7_0_EBX].unmigratable_flags.
->=20
 
-Hi,
-     Thanks for you review. I want to support Intel PT live migration and p=
-atch [2/2] to do this. I don't understand  why need to add this feature in =
-feature_word_info[FEAT_7_0_EBX].unmigratable_flags first to disable live mi=
-gration.
 
-Thanks,
-Luwei Kang
+On 2018=E5=B9=B401=E6=9C=8812=E6=97=A5 15:30, Jay Zhou wrote:
+> If netdev_add tap,id=3Dnet0,vhost=3Don failed in net_init_tap_one(),
+> the followed up device_add virtio-net-pci,netdev=3Dnet0 will fail
+> too, prints:
+>
+>    TUNSETOFFLOAD ioctl() failed: Bad file descriptor TUNSETOFFLOAD
+>    ioctl() failed: Bad file descriptor
+>
+> The reason is that the fd of tap is closed when error occured after
+> calling net_init_tap_one().
+>
+> I think the fd should be closed in these two case:
+>    1.tap_set_sndbuf() failed
+>    2.tap_set_sndbuf() succeeded but vhost failed to initialize with
+>      vhostforce flag on
+> Meanwhile, the fd should not be closed just because vhost failed to
+> initialize but without vhostforce flag. So the followed up device_add
+> can fall back to userspace virtio successfully.
+>
+> Suggested-by: Michael S. Tsirkin <mst@redhat.com>
+> Suggested-by: Igor Mammedov <imammedo@redhat.com>
+> Suggested-by: Jason Wang <jasowang@redhat.com>
+> Signed-off-by: Jay Zhou <jianjay.zhou@huawei.com>
+> ---
+>   net/tap.c | 18 +++++++++++++-----
+>   1 file changed, 13 insertions(+), 5 deletions(-)
+>
+> diff --git a/net/tap.c b/net/tap.c
+> index 979e622..3ed72eb 100644
+> --- a/net/tap.c
+> +++ b/net/tap.c
+> @@ -651,6 +651,9 @@ static void net_init_tap_one(const NetdevTapOptions=
+ *tap, NetClientState *peer,
+>       tap_set_sndbuf(s->fd, tap, &err);
+>       if (err) {
+>           error_propagate(errp, err);
+> +        if (!tap->has_fd && !tap->has_fds) {
+> +            close(fd);
+> +        }
+>           return;
+>       }
+>  =20
+> @@ -687,14 +690,14 @@ static void net_init_tap_one(const NetdevTapOptio=
+ns *tap, NetClientState *peer,
+>               vhostfd =3D monitor_fd_param(cur_mon, vhostfdname, &err);
+>               if (vhostfd =3D=3D -1) {
+>                   error_propagate(errp, err);
+> -                return;
+> +                goto cleanup;
+>               }
+>           } else {
+>               vhostfd =3D open("/dev/vhost-net", O_RDWR);
+>               if (vhostfd < 0) {
+>                   error_setg_errno(errp, errno,
+>                                    "tap: open vhost char device failed"=
+);
+> -                return;
+> +                goto cleanup;
+>               }
+>               fcntl(vhostfd, F_SETFL, O_NONBLOCK);
+>           }
+> @@ -704,11 +707,18 @@ static void net_init_tap_one(const NetdevTapOptio=
+ns *tap, NetClientState *peer,
+>           if (!s->vhost_net) {
+>               error_setg(errp,
+>                          "vhost-net requested but could not be initiali=
+zed");
 
->=20
-> > +        } else {
-> > +            *eax =3D 0;
-> > +            *ebx =3D 0;
-> > +            *ecx =3D 0;
-> > +            *edx =3D 0;
-> > +        }
-> > +        break;
-> > +    }
-> >      case 0x40000000:
-> >          /*
-> >           * CPUID code in kvm_arch_init_vcpu() ignores stuff diff
-> > --git a/target/i386/cpu.h b/target/i386/cpu.h index 62c4742..58a4b6c
-> > 100644
-> > --- a/target/i386/cpu.h
-> > +++ b/target/i386/cpu.h
-> > @@ -642,6 +642,7 @@ typedef uint32_t FeatureWordArray[FEATURE_WORDS];
-> > #define CPUID_7_0_EBX_PCOMMIT  (1U << 22) /* Persistent Commit */
-> > #define CPUID_7_0_EBX_CLFLUSHOPT (1U << 23) /* Flush a Cache Line Optim=
-ized */
-> >  #define CPUID_7_0_EBX_CLWB     (1U << 24) /* Cache Line Write Back */
-> > +#define CPUID_7_0_EBX_INTEL_PT (1U << 25) /* Intel Processor Trace */
-> >  #define CPUID_7_0_EBX_AVX512PF (1U << 26) /* AVX-512 Prefetch */
-> > #define CPUID_7_0_EBX_AVX512ER (1U << 27) /* AVX-512 Exponential and
-> > Reciprocal */  #define CPUID_7_0_EBX_AVX512CD (1U << 28) /* AVX-512
-> > Conflict Detection */ diff --git a/target/i386/kvm.c
-> > b/target/i386/kvm.c index 6f69e2f..e13ab58 100644
-> > --- a/target/i386/kvm.c
-> > +++ b/target/i386/kvm.c
-> > @@ -863,6 +863,29 @@ int kvm_arch_init_vcpu(CPUState *cs)
-> >                  c =3D &cpuid_data.entries[cpuid_i++];
-> >              }
-> >              break;
-> > +        case 0x14: {
-> > +            uint32_t times;
-> > +
-> > +            c->function =3D i;
-> > +            c->index =3D 0;
-> > +            c->flags =3D KVM_CPUID_FLAG_SIGNIFCANT_INDEX;
-> > +            cpu_x86_cpuid(env, i, 0, &c->eax, &c->ebx, &c->ecx, &c->ed=
-x);
-> > +            times =3D c->eax;
-> > +
-> > +            for (j =3D 1; j <=3D times; ++j) {
-> > +                if (cpuid_i =3D=3D KVM_MAX_CPUID_ENTRIES) {
-> > +                    fprintf(stderr, "cpuid_data is full, no space for =
-"
-> > +                                "cpuid(eax:0x14,ecx:0x%x)\n", j);
-> > +                    abort();
-> > +                }
-> > +                c =3D &cpuid_data.entries[cpuid_i++];
-> > +                c->function =3D i;
-> > +                c->index =3D j;
-> > +                c->flags =3D KVM_CPUID_FLAG_SIGNIFCANT_INDEX;
-> > +                cpu_x86_cpuid(env, i, j, &c->eax, &c->ebx, &c->ecx, &c=
-->edx);
-> > +            }
-> > +            break;
-> > +        }
-> >          default:
-> >              c->function =3D i;
-> >              c->flags =3D 0;
-> > --
-> > 1.8.3.1
-> >
->=20
-> --
-> Eduardo
+So error_setg() is not appropriate here consider it was not trated as an=20
+error. We probably just need some warning.
+
+> -            return;
+> +            goto cleanup;
+>           }
+>       } else if (vhostfdname) {
+>           error_setg(errp, "vhostfd(s)=3D is not valid without vhost");
+>       }
+> +
+> +cleanup:
+> +    if (!tap->has_fd && !tap->has_fds && tap->has_vhostforce &&
+> +        tap->vhostforce) {
+> +        close(fd);
+
+I would still let caller to decide whether or not to close the fd.
+
+Thanks
+
+> +    }
+> +    return;
+>   }
+>  =20
+>   static int get_fds(char *str, char *fds[], int max)
+> @@ -877,7 +887,6 @@ free_fail:
+>                            vnet_hdr, fd, &err);
+>           if (err) {
+>               error_propagate(errp, err);
+> -            close(fd);
+>               return -1;
+>           }
+>       } else {
+> @@ -916,7 +925,6 @@ free_fail:
+>                                vhostfdname, vnet_hdr, fd, &err);
+>               if (err) {
+>                   error_propagate(errp, err);
+> -                close(fd);
+>                   return -1;
+>               }
+>           }
