@@ -1,17 +1,39 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57460)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59634)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sjitindarsingh@gmail.com>) id 1eayKd-0007xn-N7
-	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 01:33:20 -0500
+	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1eayUN-0007Ig-HN
+	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 01:43:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sjitindarsingh@gmail.com>) id 1eayKa-0006yC-Km
-	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 01:33:19 -0500
-From: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
-Date: Mon, 15 Jan 2018 17:32:35 +1100
-Message-Id: <20180115063235.7518-7-sjitindarsingh@gmail.com>
-In-Reply-To: <20180115063235.7518-1-sjitindarsingh@gmail.com>
-References: <20180115063235.7518-1-sjitindarsingh@gmail.com>
-Subject: [Qemu-devel] [QEMU-PPC] [PATCH V3 6/6] target/ppc/spapr: Add H-Call
- H_GET_CPU_CHARACTERISTICS
+	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1eayUK-0007dq-FF
+	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 01:43:23 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:37152)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bjsdjshi@linux.vnet.ibm.com>)
+	id 1eayUK-0007cN-6K
+	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 01:43:20 -0500
+Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w0F6g1HN128003
+	for <qemu-devel@nongnu.org>; Mon, 15 Jan 2018 01:43:17 -0500
+Received: from e37.co.us.ibm.com (e37.co.us.ibm.com [32.97.110.158])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2fghu9at3n-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Mon, 15 Jan 2018 01:43:16 -0500
+Received: from localhost
+	by e37.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <bjsdjshi@linux.vnet.ibm.com>;
+	Sun, 14 Jan 2018 23:43:15 -0700
+Date: Mon, 15 Jan 2018 14:43:09 +0800
+From: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
+References: <20180111030421.31418-1-bjsdjshi@linux.vnet.ibm.com>
+	<20180111030421.31418-2-bjsdjshi@linux.vnet.ibm.com>
+	<20180111151659.2d997abf.cohuck@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180111151659.2d997abf.cohuck@redhat.com>
+Message-Id: <20180115064309.GA12499@bjsdjshi@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [RFC PATCH 1/3] vfio: ccw: introduce schib region
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,116 +42,116 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-ppc@nongnu.org
-Cc: qemu-devel@nongnu.org, david@gibson.dropbear.id.au, paulus@ozlabs.org, sjitindarsingh@gmail.com
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org, kvm@vger.kernel.org, qemu-devel@nongnu.org, qemu-s390x@nongnu.org, borntraeger@de.ibm.com, pasic@linux.vnet.ibm.com, pmorel@linux.vnet.ibm.com
 
-The new H-Call H_GET_CPU_CHARACTERISTICS is used by the guest to query
-behaviours and available characteristics of the cpu.
+* Cornelia Huck <cohuck@redhat.com> [2018-01-11 15:16:59 +0100]:
 
-Implement the handler for this new H-Call which formulates its response
-based on the setting of the spapr_caps cap-cfpc, cap-sbbc and cap-ibs.
+Hi Conny,
 
-Signed-off-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
----
- hw/ppc/spapr_hcall.c   | 66 ++++++++++++++++++++++++++++++++++++++++++++++++++
- include/hw/ppc/spapr.h |  1 +
- 2 files changed, 67 insertions(+)
+> On Thu, 11 Jan 2018 04:04:19 +0100
+> Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com> wrote:
+> 
+> > This introduces a new region for vfio-ccw to provide subchannel
+> > information for user space.
+> > 
+> > Signed-off-by: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
+> > ---
+> >  drivers/s390/cio/vfio_ccw_fsm.c     | 21 ++++++++++
+> >  drivers/s390/cio/vfio_ccw_ops.c     | 79 +++++++++++++++++++++++++++----------
+> >  drivers/s390/cio/vfio_ccw_private.h |  3 ++
+> >  include/uapi/linux/vfio.h           |  1 +
+> >  include/uapi/linux/vfio_ccw.h       |  6 +++
+> >  5 files changed, 90 insertions(+), 20 deletions(-)
+> > 
+> > diff --git a/drivers/s390/cio/vfio_ccw_fsm.c b/drivers/s390/cio/vfio_ccw_fsm.c
+> > index c30420c517b1..be081ccabea3 100644
+> > --- a/drivers/s390/cio/vfio_ccw_fsm.c
+> > +++ b/drivers/s390/cio/vfio_ccw_fsm.c
+> > @@ -172,6 +172,22 @@ static void fsm_irq(struct vfio_ccw_private *private,
+> >  		complete(private->completion);
+> >  }
+> >  
+> > +static void fsm_update_subch(struct vfio_ccw_private *private,
+> > +			     enum vfio_ccw_event event)
+> > +{
+> > +	struct subchannel *sch;
+> > +
+> > +	sch = private->sch;
+> > +	if (cio_update_schib(sch)) {
+> 
+> This implies device gone. Do we also want to trigger some event, or
+> just wait until a machine check comes around and we're notified in the
+> normal way? (Probably the latter.)
+> 
+We'd need to handle machine checks better anyway, and we can trigger
+event there. I think we can choose the latter one.
 
-diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
-index 51eba52e86..a693d3b852 100644
---- a/hw/ppc/spapr_hcall.c
-+++ b/hw/ppc/spapr_hcall.c
-@@ -1654,6 +1654,69 @@ static target_ulong h_client_architecture_support(PowerPCCPU *cpu,
-     return H_SUCCESS;
- }
- 
-+static target_ulong h_get_cpu_characteristics(PowerPCCPU *cpu,
-+                                              sPAPRMachineState *spapr,
-+                                              target_ulong opcode,
-+                                              target_ulong *args)
-+{
-+    uint64_t characteristics = H_CPU_CHAR_HON_BRANCH_HINTS &
-+			       ~H_CPU_CHAR_THR_RECONF_TRIG;
-+    uint64_t behaviour = H_CPU_BEHAV_FAVOUR_SECURITY;
-+    uint8_t safe_cache = spapr_get_cap(spapr, SPAPR_CAP_CFPC);
-+    uint8_t safe_bounds_check = spapr_get_cap(spapr, SPAPR_CAP_SBBC);
-+    uint8_t safe_indirect_branch = spapr_get_cap(spapr, SPAPR_CAP_IBS);
-+
-+    switch (safe_cache) {
-+    case SPAPR_CAP_WORKAROUND:
-+        characteristics |= H_CPU_CHAR_L1D_FLUSH_ORI30;
-+        characteristics |= H_CPU_CHAR_L1D_FLUSH_TRIG2;
-+        characteristics |= H_CPU_CHAR_L1D_THREAD_PRIV;
-+        behaviour |= H_CPU_BEHAV_L1D_FLUSH_PR;
-+        break;
-+    case SPAPR_CAP_FIXED:
-+        break;
-+    default: /* broken */
-+        if (safe_cache != SPAPR_CAP_BROKEN) {
-+            error_report("Invalid value for cap-cfpc (%d), assuming broken",
-+                         safe_cache);
-+        }
-+        behaviour |= H_CPU_BEHAV_L1D_FLUSH_PR;
-+        break;
-+    }
-+
-+    switch (safe_bounds_check) {
-+    case SPAPR_CAP_WORKAROUND:
-+        characteristics |= H_CPU_CHAR_SPEC_BAR_ORI31;
-+        behaviour |= H_CPU_BEHAV_BNDS_CHK_SPEC_BAR;
-+        break;
-+    case SPAPR_CAP_FIXED:
-+        break;
-+    default: /* broken */
-+        if (safe_bounds_check != SPAPR_CAP_BROKEN) {
-+            error_report("Invalid value for cap-sbbc (%d), assuming broken",
-+                         safe_bounds_check);
-+        }
-+        behaviour |= H_CPU_BEHAV_BNDS_CHK_SPEC_BAR;
-+        break;
-+    }
-+
-+    switch (safe_indirect_branch) {
-+    case SPAPR_CAP_FIXED:
-+        characteristics |= H_CPU_CHAR_BCCTRL_SERIALISED;
-+    default: /* broken */
-+        if (safe_indirect_branch != SPAPR_CAP_BROKEN) {
-+            error_report("Invalid value for cap-ibs (%d), assuming broken",
-+                         safe_indirect_branch);
-+        }
-+        break;
-+    }
-+
-+    args[0] = characteristics;
-+    args[1] = behaviour;
-+
-+    return H_SUCCESS;
-+}
-+
- static spapr_hcall_fn papr_hypercall_table[(MAX_HCALL_OPCODE / 4) + 1];
- static spapr_hcall_fn kvmppc_hypercall_table[KVMPPC_HCALL_MAX - KVMPPC_HCALL_BASE + 1];
- 
-@@ -1733,6 +1796,9 @@ static void hypercall_register_types(void)
-     spapr_register_hypercall(H_INVALIDATE_PID, h_invalidate_pid);
-     spapr_register_hypercall(H_REGISTER_PROC_TBL, h_register_process_table);
- 
-+    /* hcall-get-cpu-characteristics */
-+    spapr_register_hypercall(H_GET_CPU_CHARACTERISTICS, h_get_cpu_characteristics);
-+
-     /* "debugger" hcalls (also used by SLOF). Note: We do -not- differenciate
-      * here between the "CI" and the "CACHE" variants, they will use whatever
-      * mapping attributes qemu is using. When using KVM, the kernel will
-diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-index 549d7a4134..62c077ac20 100644
---- a/include/hw/ppc/spapr.h
-+++ b/include/hw/ppc/spapr.h
-@@ -404,6 +404,7 @@ struct sPAPRMachineState {
- #define H_GET_HCA_INFO          0x1B8
- #define H_GET_PERF_COUNT        0x1BC
- #define H_MANAGE_TRACE          0x1C0
-+#define H_GET_CPU_CHARACTERISTICS 0x1C8
- #define H_FREE_LOGICAL_LAN_BUFFER 0x1D4
- #define H_QUERY_INT_STATE       0x1E4
- #define H_POLL_PENDING          0x1D8
+> > +		private->schib_region.cc = 3;
+> > +		return;
+> > +	}
+> > +
+> > +	private->schib_region.cc = 0;
+> > +	memcpy(private->schib_region.schib_area, &sch->schib,
+> > +	       sizeof(sch->schib));
+> 
+> We might want to add documentation that schib_area contains the schib
+> from the last successful invocation of stsch (if any). That makes sense
+> as the schib remains unchanged for cc=3 after stsch anyway, but it
+> can't hurt to spell it out.
+> 
+PoP doesn't say anything about the content of SCHIB when cc=3. So it's
+fine to remain the last content I guess. I can add comments here and
+document in vfio-ccw.txt. Ok?
+
+> > +}
+> > +
+> >  /*
+> >   * Device statemachine
+> >   */
+> > @@ -180,25 +196,30 @@ fsm_func_t *vfio_ccw_jumptable[NR_VFIO_CCW_STATES][NR_VFIO_CCW_EVENTS] = {
+> >  		[VFIO_CCW_EVENT_NOT_OPER]	= fsm_nop,
+> >  		[VFIO_CCW_EVENT_IO_REQ]		= fsm_io_error,
+> >  		[VFIO_CCW_EVENT_INTERRUPT]	= fsm_disabled_irq,
+> > +		[VFIO_CCW_EVENT_UPDATE_SUBCH]	= fsm_update_subch,
+> >  	},
+> >  	[VFIO_CCW_STATE_STANDBY] = {
+> >  		[VFIO_CCW_EVENT_NOT_OPER]	= fsm_notoper,
+> >  		[VFIO_CCW_EVENT_IO_REQ]		= fsm_io_error,
+> >  		[VFIO_CCW_EVENT_INTERRUPT]	= fsm_irq,
+> > +		[VFIO_CCW_EVENT_UPDATE_SUBCH]	= fsm_update_subch,
+> >  	},
+> >  	[VFIO_CCW_STATE_IDLE] = {
+> >  		[VFIO_CCW_EVENT_NOT_OPER]	= fsm_notoper,
+> >  		[VFIO_CCW_EVENT_IO_REQ]		= fsm_io_request,
+> >  		[VFIO_CCW_EVENT_INTERRUPT]	= fsm_irq,
+> > +		[VFIO_CCW_EVENT_UPDATE_SUBCH]	= fsm_update_subch,
+> >  	},
+> >  	[VFIO_CCW_STATE_BOXED] = {
+> >  		[VFIO_CCW_EVENT_NOT_OPER]	= fsm_notoper,
+> >  		[VFIO_CCW_EVENT_IO_REQ]		= fsm_io_busy,
+> >  		[VFIO_CCW_EVENT_INTERRUPT]	= fsm_irq,
+> > +		[VFIO_CCW_EVENT_UPDATE_SUBCH]	= fsm_update_subch,
+> >  	},
+> >  	[VFIO_CCW_STATE_BUSY] = {
+> >  		[VFIO_CCW_EVENT_NOT_OPER]	= fsm_notoper,
+> >  		[VFIO_CCW_EVENT_IO_REQ]		= fsm_io_busy,
+> >  		[VFIO_CCW_EVENT_INTERRUPT]	= fsm_irq,
+> > +		[VFIO_CCW_EVENT_UPDATE_SUBCH]	= fsm_update_subch,
+> 
+> Does it makes to trigger this through the state machine if we always do
+> the same action and never change state?
+Yes. Ah, are you implying that we can call update_subch directly without
+state machine involved? If so, I agree. There seems no benifit to add
+a new VFIO_CCW_EVENT_UPDATE_SUBCH event to the FSM.
+
+> 
+> >  	},
+> >  };
+> 
+> Else, looks good.
+> 
+Thanks for the comments. :)
+
 -- 
-2.13.6
+Dong Jia Shi
