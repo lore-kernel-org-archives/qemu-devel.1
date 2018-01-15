@@ -1,41 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51058)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51230)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1eb64z-0006Vp-87
-	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 09:49:42 -0500
+	(envelope-from <kwolf@redhat.com>) id 1eb65e-0006yU-3k
+	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 09:50:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1eb64v-0002KJ-B6
-	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 09:49:41 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:53400
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanb@linux.vnet.ibm.com>)
-	id 1eb64v-0002JN-5f
-	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 09:49:37 -0500
-Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w0FEibHH124592
-	for <qemu-devel@nongnu.org>; Mon, 15 Jan 2018 09:49:35 -0500
-Received: from e18.ny.us.ibm.com (e18.ny.us.ibm.com [129.33.205.208])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2fgupdqy80-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 15 Jan 2018 09:49:35 -0500
-Received: from localhost
-	by e18.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <stefanb@linux.vnet.ibm.com>;
-	Mon, 15 Jan 2018 09:49:34 -0500
-References: <1515609318-1897-1-git-send-email-stefanb@linux.vnet.ibm.com>
-	<1515609318-1897-2-git-send-email-stefanb@linux.vnet.ibm.com>
-	<CAJ+F1C+wFaPWov+sM_UveO92s3tEUDxo1OzSKyMGyS1tRqm+2Q@mail.gmail.com>
-From: Stefan Berger <stefanb@linux.vnet.ibm.com>
-Date: Mon, 15 Jan 2018 09:49:30 -0500
+	(envelope-from <kwolf@redhat.com>) id 1eb65a-0002uK-7G
+	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 09:50:22 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:44700)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1eb65a-0002tH-1W
+	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 09:50:18 -0500
+Date: Mon, 15 Jan 2018 15:49:44 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20180115144944.GG32271@localhost.localdomain>
+References: <20171012235439.19457-1-anatol.pomozov@gmail.com>
+	<20171012235439.19457-2-anatol.pomozov@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <CAJ+F1C+wFaPWov+sM_UveO92s3tEUDxo1OzSKyMGyS1tRqm+2Q@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Message-Id: <b38364c9-6ffd-e065-8867-43566f48545a@linux.vnet.ibm.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC PATCH 1/3] tpm: Implement virtual memory
- device for TPM PPI
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20171012235439.19457-2-anatol.pomozov@gmail.com>
+Subject: Re: [Qemu-devel] [PATCH 1/4] multiboot: Change multiboot_info from
+ array of bytes to a C struct
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -44,43 +28,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@gmail.com>
-Cc: QEMU <qemu-devel@nongnu.org>, kevin@koconnor.net, "Michael S. Tsirkin" <mst@redhat.com>
+To: Anatol Pomozov <anatol.pomozov@gmail.com>
+Cc: qemu-devel@nongnu.org, ehabkost@redhat.com, agraf@suse.de, pbonzini@redhat.com, rth@twiddle.net
 
-On 01/12/2018 09:55 AM, Marc-Andr=C3=A9 Lureau wrote:
-> Hi
->
-> On Wed, Jan 10, 2018 at 7:35 PM, Stefan Berger
-> <stefanb@linux.vnet.ibm.com> wrote:
->
->>   }
->>
->>   static void tpm_tis_class_init(ObjectClass *klass, void *data)
->> diff --git a/include/hw/acpi/tpm.h b/include/hw/acpi/tpm.h
->> index 6d516c6..d9b7452 100644
->> --- a/include/hw/acpi/tpm.h
->> +++ b/include/hw/acpi/tpm.h
->> @@ -31,4 +31,10 @@
->>
->>   #define TPM2_START_METHOD_MMIO      6
->>
->> +/*
->> + * Physical Presence Interface
->> + */
->> +#define TPM_PPI_ADDR_SIZE           0x100
->> +#define TPM_PPI_ADDR_BASE           0xffff0000
+Am 13.10.2017 um 01:54 hat Anatol Pomozov geschrieben:
+> Using C structs makes the code more readable and prevents type conversion
+> errors.
+> 
+> Borrow multiboot1 header from GRUB project.
+> 
+> Signed-off-by: Anatol Pomozov <anatol.pomozov@gmail.com>
+> ---
+>  hw/i386/multiboot.c         | 124 +++++++++------------
+>  hw/i386/multiboot_header.h  | 254 ++++++++++++++++++++++++++++++++++++++++++++
+>  tests/multiboot/mmap.c      |  14 +--
+>  tests/multiboot/mmap.out    |  10 ++
+>  tests/multiboot/modules.c   |  12 ++-
+>  tests/multiboot/modules.out |  10 ++
+>  tests/multiboot/multiboot.h |  66 ------------
+>  7 files changed, 339 insertions(+), 151 deletions(-)
+>  create mode 100644 hw/i386/multiboot_header.h
+>  delete mode 100644 tests/multiboot/multiboot.h
 
-I tried to extend the memory size to be able to store per opcode flags=20
-into this area to de-couple the ACPI code from the firmware code as far=20
-as possible. I ended up seeing crashes. The following comment is in SeaBI=
-OS:
+This is a good change in general. However, I'm not sure if we should
+really replace the header used in the tests. After all, the tests also
+test whether things are at the right place, and if there is an error in
+the header file, we can only catch it if the tests keep using their own
+definitions.
 
-./src/fw/shadow.c:// On the emulators, the bios at 0xf0000 is also at=20
-0xffff0000
-
-Following this, I am moving this base address to 0xfffe_f000 and=20
-extending it to 0x400 bytes. Besides that there will be a QEMU ACPI=20
-table with OEM 'QEMU' and oem_table_id 'CONF' for which the firmware has=20
-to look for. It holds the base address and the TPM version.
-
-    Stefan
+Kevin
