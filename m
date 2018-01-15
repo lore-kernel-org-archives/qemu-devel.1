@@ -1,32 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44859)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47483)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1ebAEN-0005qT-3O
-	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 14:15:40 -0500
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1ebAMP-00011H-L9
+	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 14:23:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1ebAEJ-0007Ig-Ol
-	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 14:15:39 -0500
-Received: from indium.canonical.com ([91.189.90.7]:41748)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1ebAEJ-0007Ht-Db
-	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 14:15:35 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1ebAEI-0000fL-9k
-	for <qemu-devel@nongnu.org>; Mon, 15 Jan 2018 19:15:34 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 442F12E854B
-	for <qemu-devel@nongnu.org>; Mon, 15 Jan 2018 19:15:34 +0000 (UTC)
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1ebAMO-0004Cv-7c
+	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 14:23:57 -0500
+References: <20180102183317.2571-1-laurent@vivier.eu>
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Message-ID: <fb3749ae-bc61-ca55-aff5-fd35c608b6e9@ilande.co.uk>
+Date: Mon, 15 Jan 2018 19:23:39 +0000
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 15 Jan 2018 19:07:12 -0000
-From: MVoloshin <1743441@bugs.launchpad.net>
-Reply-To: Bug 1743441 <1743441@bugs.launchpad.net>
-Sender: bounces@canonical.com
-Message-Id: <151604323239.5020.7297818634644485125.malonedeb@wampee.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1743441] [NEW] OS/2 Warp 4.52 OS2LVM failure
+In-Reply-To: <20180102183317.2571-1-laurent@vivier.eu>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-GB
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] escc: introduce a selector for the
+ register bit
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,66 +24,186 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Laurent Vivier <laurent@vivier.eu>, qemu-devel@nongnu.org
+Cc: Alexander Graf <agraf@suse.de>, qemu-ppc@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Artyom Tarasenko <atar4qemu@gmail.com>
 
-Public bug reported:
+On 02/01/18 18:33, Laurent Vivier wrote:
+> From: Laurent Vivier <Laurent@Vivier.EU>
+> 
+> On Sparc and PowerMac, the bit 0 of the address
+> selects the register type (control or data) and
+> bit 1 selects the channel (B or A).
+> 
+> On m68k Macintosh, the bit 0 selects the channel and
+> bit 1 the register type.
+> 
+> This patch introduces a new parameter (reg_bit) to
+> the device interface to indicate which bit is used
+> to select the register type.
+> 
+> For the moment all the machines use the bit 0,
+> but this change will be needed to emulate Quadra 800.
+> 
+> Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+> ---
+>   hw/char/escc.c         | 24 +++++++++++++++++-------
+>   hw/ppc/mac_newworld.c  |  2 +-
+>   hw/ppc/mac_oldworld.c  |  2 +-
+>   hw/sparc/sun4m.c       |  2 +-
+>   include/hw/char/escc.h |  2 +-
+>   5 files changed, 21 insertions(+), 11 deletions(-)
+> 
+> diff --git a/hw/char/escc.c b/hw/char/escc.c
+> index 3ab831a6a7..b2bea3982e 100644
+> --- a/hw/char/escc.c
+> +++ b/hw/char/escc.c
+> @@ -45,14 +45,21 @@
+>    * mouse and keyboard ports don't implement all functions and they are
+>    * only asynchronous. There is no DMA.
+>    *
+> - * Z85C30 is also used on PowerMacs. There are some small differences
+> - * between Sparc version (sunzilog) and PowerMac (pmac):
+> + * Z85C30 is also used on PowerMacs and m68k Macs.
+> + *
+> + * There are some small differences between Sparc version (sunzilog)
+> + * and PowerMac (pmac):
+>    *  Offset between control and data registers
+>    *  There is some kind of lockup bug, but we can ignore it
+>    *  CTS is inverted
+>    *  DMA on pmac using DBDMA chip
+>    *  pmac can do IRDA and faster rates, sunzilog can only do 38400
+>    *  pmac baud rate generator clock is 3.6864 MHz, sunzilog 4.9152 MHz
+> + *
+> + * Linux driver for m68k Macs is the same as for PowerMac (pmac_zilog),
+> + * but registers are grouped by type and not by channel:
+> + * channel is selected by bit 0 of the address (instead of bit 1)
+> + * and register is selected by bit 1 of the address (instead of bit 0).
+>    */
+>   
+>   /*
+> @@ -107,6 +114,7 @@ typedef struct ESCCState {
+>   
+>       struct ChannelState chn[2];
+>       uint32_t it_shift;
+> +    uint32_t reg_bit;
+>       MemoryRegion mmio;
+>       uint32_t disabled;
+>       uint32_t frequency;
+> @@ -479,8 +487,8 @@ static void escc_mem_write(void *opaque, hwaddr addr,
+>       int newreg, channel;
+>   
+>       val &= 0xff;
+> -    saddr = (addr >> serial->it_shift) & 1;
+> -    channel = (addr >> (serial->it_shift + 1)) & 1;
+> +    saddr = (addr >> (serial->it_shift + serial->reg_bit)) & 1;
+> +    channel = (addr >> (serial->it_shift + (1 - serial->reg_bit))) & 1;
 
-When I try to boot OS/2 Warp 4.51 (Merlin), 4.52 (Aurora) or eCS 1.2.5, etc=
-. I always get an exception in OS2LVM (TRAP 000E). You can reproduce the bu=
-g using this disk image: https://drive.google.com/open?id=3D1zzjs9hTS0TK-Xb=
-5hnon8SQ-2C1EmlYfy
-P.S. OS/2 Warp 4.0 boots OK (if installed on FAT, not HPFS)
+Presumably this is only valid for reg_bit values of 0 and 1 - are there 
+any other ESCC variants in the wild? If not, I wonder if a bool 
+indicating the swap would be better since it couldn't be set to an 
+erroneous value accidentally? It also might be easier to read if the 
+saddr and channel assignments are done using macros.
 
-** Affects: qemu
-     Importance: Undecided
-         Status: New
+>       s = &serial->chn[channel];
+>       switch (saddr) {
+>       case SERIAL_CTRL:
+> @@ -583,8 +591,8 @@ static uint64_t escc_mem_read(void *opaque, hwaddr addr,
+>       uint32_t ret;
+>       int channel;
+>   
+> -    saddr = (addr >> serial->it_shift) & 1;
+> -    channel = (addr >> (serial->it_shift + 1)) & 1;
+> +    saddr = (addr >> (serial->it_shift + serial->reg_bit)) & 1;
+> +    channel = (addr >> (serial->it_shift + (1 - serial->reg_bit))) & 1;
+>       s = &serial->chn[channel];
+>       switch (saddr) {
+>       case SERIAL_CTRL:
+> @@ -691,7 +699,7 @@ static const VMStateDescription vmstate_escc = {
+>   
+>   MemoryRegion *escc_init(hwaddr base, qemu_irq irqA, qemu_irq irqB,
+>                 Chardev *chrA, Chardev *chrB,
+> -              int clock, int it_shift)
+> +              int clock, int it_shift, int reg_bit)
+>   {
+
+Given that the *_init() functions are deprecated, it might be worth 
+following this up with a patchset to move the creation of the ESCC 
+devices to within each of the Old World/New World/SPARC machines and 
+remove the unused escc_init() function.
+
+>       DeviceState *dev;
+>       SysBusDevice *s;
+> @@ -701,6 +709,7 @@ MemoryRegion *escc_init(hwaddr base, qemu_irq irqA, qemu_irq irqB,
+>       qdev_prop_set_uint32(dev, "disabled", 0);
+>       qdev_prop_set_uint32(dev, "frequency", clock);
+>       qdev_prop_set_uint32(dev, "it_shift", it_shift);
+> +    qdev_prop_set_uint32(dev, "reg_bit", reg_bit);
+>       qdev_prop_set_chr(dev, "chrB", chrB);
+>       qdev_prop_set_chr(dev, "chrA", chrA);
+>       qdev_prop_set_uint32(dev, "chnBtype", ser);
+> @@ -1033,6 +1042,7 @@ static void escc_realize(DeviceState *dev, Error **errp)
+>   static Property escc_properties[] = {
+>       DEFINE_PROP_UINT32("frequency", ESCCState, frequency,   0),
+>       DEFINE_PROP_UINT32("it_shift",  ESCCState, it_shift,    0),
+> +    DEFINE_PROP_UINT32("reg_bit",   ESCCState, reg_bit,     0),
+>       DEFINE_PROP_UINT32("disabled",  ESCCState, disabled,    0),
+>       DEFINE_PROP_UINT32("chnBtype",  ESCCState, chn[0].type, 0),
+>       DEFINE_PROP_UINT32("chnAtype",  ESCCState, chn[1].type, 0),
+> diff --git a/hw/ppc/mac_newworld.c b/hw/ppc/mac_newworld.c
+> index 3fa7c429d5..f9a5be19a8 100644
+> --- a/hw/ppc/mac_newworld.c
+> +++ b/hw/ppc/mac_newworld.c
+> @@ -370,7 +370,7 @@ static void ppc_core99_init(MachineState *machine)
+>   
+>       /* init basic PC hardware */
+>       escc_mem = escc_init(0, pic[0x25], pic[0x24],
+> -                         serial_hds[0], serial_hds[1], ESCC_CLOCK, 4);
+> +                         serial_hds[0], serial_hds[1], ESCC_CLOCK, 4, 0);
+>       memory_region_init_alias(escc_bar, NULL, "escc-bar",
+>                                escc_mem, 0, memory_region_size(escc_mem));
+>   
+> diff --git a/hw/ppc/mac_oldworld.c b/hw/ppc/mac_oldworld.c
+> index 010ea36bf2..f44361f42d 100644
+> --- a/hw/ppc/mac_oldworld.c
+> +++ b/hw/ppc/mac_oldworld.c
+> @@ -265,7 +265,7 @@ static void ppc_heathrow_init(MachineState *machine)
+>       pci_vga_init(pci_bus);
+>   
+>       escc_mem = escc_init(0, pic[0x0f], pic[0x10], serial_hds[0],
+> -                               serial_hds[1], ESCC_CLOCK, 4);
+> +                               serial_hds[1], ESCC_CLOCK, 4, 0);
+>       memory_region_init_alias(escc_bar, NULL, "escc-bar",
+>                                escc_mem, 0, memory_region_size(escc_mem));
+>   
+> diff --git a/hw/sparc/sun4m.c b/hw/sparc/sun4m.c
+> index e71648404c..d492c75abc 100644
+> --- a/hw/sparc/sun4m.c
+> +++ b/hw/sparc/sun4m.c
+> @@ -932,7 +932,7 @@ static void sun4m_hw_init(const struct sun4m_hwdef *hwdef,
+>       /* Slavio TTYA (base+4, Linux ttyS0) is the first QEMU serial device
+>          Slavio TTYB (base+0, Linux ttyS1) is the second QEMU serial device */
+>       escc_init(hwdef->serial_base, slavio_irq[15], slavio_irq[15],
+> -              serial_hds[0], serial_hds[1], ESCC_CLOCK, 1);
+> +              serial_hds[0], serial_hds[1], ESCC_CLOCK, 1, 0);
+>   
+>       if (hwdef->apc_base) {
+>           apc_init(hwdef->apc_base, qemu_allocate_irq(cpu_halt_signal, NULL, 0));
+> diff --git a/include/hw/char/escc.h b/include/hw/char/escc.h
+> index 08ae122386..3caa58e25d 100644
+> --- a/include/hw/char/escc.h
+> +++ b/include/hw/char/escc.h
+> @@ -6,7 +6,7 @@
+>   #define ESCC_SIZE 4
+>   MemoryRegion *escc_init(hwaddr base, qemu_irq irqA, qemu_irq irqB,
+>                 Chardev *chrA, Chardev *chrB,
+> -              int clock, int it_shift);
+> +              int clock, int it_shift, int reg_bit);
+>   
+>   void slavio_serial_ms_kbd_init(hwaddr base, qemu_irq irq,
+>                                  int disabled, int clock, int it_shift);
+> 
 
 
-** Tags: aurora ecs i386 merlin os2 os2lvm trap warp4
+ATB,
 
-** Attachment added: "os2lvm.PNG"
-   https://bugs.launchpad.net/bugs/1743441/+attachment/5037501/+files/os2lv=
-m.PNG
-
-** Description changed:
-
-- When I try to boot OS/2 Warp 4.51 (Merlin), 4.52 (Aurora) or eCS 1.2.5,
-- etc. I always get an exception in OS2LVM (TRAP 000E). You can reproduce
-- the bug using this disk image: https://drive.google.com/open?id
-- =3D1zzjs9hTS0TK-Xb5hnon8SQ-2C1EmlYfy
-+ When I try to boot OS/2 Warp 4.51 (Merlin), 4.52 (Aurora) or eCS 1.2.5, e=
-tc. I always get an exception in OS2LVM (TRAP 000E). You can reproduce the =
-bug using this disk image: https://drive.google.com/open?id=3D1zzjs9hTS0TK-=
-Xb5hnon8SQ-2C1EmlYfy
-+ P.S. OS/2 Warp 4.0 boot OK (if installed on FAT, not HPFS)
-
-** Description changed:
-
-  When I try to boot OS/2 Warp 4.51 (Merlin), 4.52 (Aurora) or eCS 1.2.5, e=
-tc. I always get an exception in OS2LVM (TRAP 000E). You can reproduce the =
-bug using this disk image: https://drive.google.com/open?id=3D1zzjs9hTS0TK-=
-Xb5hnon8SQ-2C1EmlYfy
-- P.S. OS/2 Warp 4.0 boot OK (if installed on FAT, not HPFS)
-+ P.S. OS/2 Warp 4.0 boots OK (if installed on FAT, not HPFS)
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1743441
-
-Title:
-  OS/2 Warp 4.52 OS2LVM failure
-
-Status in QEMU:
-  New
-
-Bug description:
-  When I try to boot OS/2 Warp 4.51 (Merlin), 4.52 (Aurora) or eCS 1.2.5, e=
-tc. I always get an exception in OS2LVM (TRAP 000E). You can reproduce the =
-bug using this disk image: https://drive.google.com/open?id=3D1zzjs9hTS0TK-=
-Xb5hnon8SQ-2C1EmlYfy
-  P.S. OS/2 Warp 4.0 boots OK (if installed on FAT, not HPFS)
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1743441/+subscriptions
+Mark.
