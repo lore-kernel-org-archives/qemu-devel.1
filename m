@@ -1,22 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54502)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56235)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcel@redhat.com>) id 1eb7fW-000057-09
-	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 11:31:30 -0500
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1eb7mp-0002hv-7Z
+	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 11:39:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcel@redhat.com>) id 1eb7fQ-0001Mj-V8
-	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 11:31:29 -0500
-References: <20180110190909.20652-1-marcel@redhat.com>
-	<5ea6ecb8-8866-b396-2c45-bac340a400e7@redhat.com>
-From: Marcel Apfelbaum <marcel@redhat.com>
-Message-ID: <3a752931-71f0-4708-c57b-6bab609e3a60@redhat.com>
-Date: Mon, 15 Jan 2018 18:31:09 +0200
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1eb7mk-0005bC-7p
+	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 11:39:03 -0500
+Received: from mail-qk0-x243.google.com ([2607:f8b0:400d:c09::243]:42977)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1eb7mk-0005ao-2B
+	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 11:38:58 -0500
+Received: by mail-qk0-x243.google.com with SMTP id k201so2494541qke.9
+	for <qemu-devel@nongnu.org>; Mon, 15 Jan 2018 08:38:57 -0800 (PST)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20180115143500.22631-1-f4bug@amsat.org>
+	<20180115143500.22631-7-f4bug@amsat.org>
+	<20180115162728.GS8218@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <25b03edb-0db9-4ad4-538c-72255cf310cf@amsat.org>
+Date: Mon, 15 Jan 2018 13:38:53 -0300
 MIME-Version: 1.0
-In-Reply-To: <5ea6ecb8-8866-b396-2c45-bac340a400e7@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <20180115162728.GS8218@redhat.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] hw/pci-bridge: fix QEMU crash because of
- pcie-root-port
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v2 6/8] docker: add the Fedora 27 base image
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,73 +36,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laszlo Ersek <lersek@redhat.com>, qemu-devel@nongnu.org, mst@redhat.com
-Cc: qemu-stable@nongnu.org, zuban32s@gmail.com
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Fam Zheng <famz@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
 
-On 15/01/2018 17:54, Laszlo Ersek wrote:
-> On 01/10/18 20:09, Marcel Apfelbaum wrote:
->> If we try to use more pcie_root_ports then available slots
->> and an IO hint is passed to the port, QEMU crashes because
->> we try to init the "IO hint" capability even if the device
->> is not created.
->> Fix it by checking for error before adding the capability,
->> so QEMU can fail gracefully.
+On 01/15/2018 01:27 PM, Daniel P. Berrange wrote:
+> On Mon, Jan 15, 2018 at 11:34:57AM -0300, Philippe Mathieu-Daudé wrote:
+>> straight copy on Fedora 25 base.
 >>
->> Signed-off-by: Marcel Apfelbaum <marcel@redhat.com>
+>> Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
+>> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 >> ---
->>   hw/pci-bridge/gen_pcie_root_port.c | 7 ++++++-
->>   1 file changed, 6 insertions(+), 1 deletion(-)
-> 
-> In your opinion, can we add:
-> 
-> Cc: qemu-stable@nongnu.org
-> Fixes: 226263fb5cdaa4a4a95f1680fabbc9dd2123fd67
-> 
-> ?
-> 
-> (Not sure if a stable branch is already open for 2.11. Commit
-> 226263fb5cdaa appeared in 2.11.)
-> 
-> Ah, I'm silly. You CC'd stable up-front. :)
-> 
-> So, what about the Fixes tag?
-> 
-
-For sure, I wasn't aware of the "Fixes" tag. I'll be sure to use it
-in the future.
-
-Do I need to resend, or Michael can pick the tag?
-
+>>  tests/docker/dockerfiles/fedora27.docker | 18 ++++++++++++++++++
+>>  1 file changed, 18 insertions(+)
+>>  create mode 100644 tests/docker/dockerfiles/fedora27.docker
 >>
->> diff --git a/hw/pci-bridge/gen_pcie_root_port.c b/hw/pci-bridge/gen_pcie_root_port.c
->> index ad4e6aa7ff..0e2f2e8bf1 100644
->> --- a/hw/pci-bridge/gen_pcie_root_port.c
->> +++ b/hw/pci-bridge/gen_pcie_root_port.c
->> @@ -74,8 +74,13 @@ static void gen_rp_realize(DeviceState *dev, Error **errp)
->>       PCIDevice *d = PCI_DEVICE(dev);
->>       GenPCIERootPort *grp = GEN_PCIE_ROOT_PORT(d);
->>       PCIERootPortClass *rpc = PCIE_ROOT_PORT_GET_CLASS(d);
->> +    Error *local_err = NULL;
->>   
->> -    rpc->parent_realize(dev, errp);
->> +    rpc->parent_realize(dev, &local_err);
->> +    if (local_err) {
->> +        error_propagate(errp, local_err);
->> +        return;
->> +    }
->>   
->>       int rc = pci_bridge_qemu_reserve_cap_init(d, 0, grp->bus_reserve,
->>               grp->io_reserve, grp->mem_reserve, grp->pref32_reserve,
->>
+>> diff --git a/tests/docker/dockerfiles/fedora27.docker b/tests/docker/dockerfiles/fedora27.docker
+>> new file mode 100644
+>> index 0000000000..7cba4dcc2c
+>> --- /dev/null
+>> +++ b/tests/docker/dockerfiles/fedora27.docker
+>> @@ -0,0 +1,18 @@
+>> +FROM fedora:27
+>> +ENV PACKAGES \
+>> +    ccache gettext git tar PyYAML sparse flex bison python2 bzip2 hostname \
+>> +    glib2-devel pixman-devel zlib-devel SDL-devel libfdt-devel \
 > 
-> Reviewed-by: Laszlo Ersek <lersek@redhat.com>
+> Perhaps SDL2 here too
 > 
+>> +    gcc gcc-c++ clang make perl which bc findutils libaio-devel \
+>> +    nettle-devel \
+>> +    mingw32-pixman mingw32-glib2 mingw32-gmp mingw32-SDL mingw32-pkg-config \
+>> +    mingw32-gtk2 mingw32-gtk3 mingw32-gnutls mingw32-nettle mingw32-libtasn1 \
+> 
+> Is there a reason we have both GTK2 and GTK3 installed ? We've deprecated GTK2
+> and configure will pick GTK3 by default. IIUC there's no way to override
+> that in the docker builds to force GTK2, so it can possibly be dropped.
 
-Appreciated!
+No clue, Fam?
 
-Thanks,
-Marcel
-
-> Thanks
-> Laszlo
+>> +    mingw32-libjpeg-turbo mingw32-libpng mingw32-curl mingw32-libssh2 \
+>> +    mingw32-bzip2 \
+>> +    mingw64-pixman mingw64-glib2 mingw64-gmp mingw64-SDL mingw64-pkg-config \
+>> +    mingw64-gtk2 mingw64-gtk3 mingw64-gnutls mingw64-nettle mingw64-libtasn1 \
+> 
+> Repeated here.
+> 
+>> +    mingw64-libjpeg-turbo mingw64-libpng mingw64-curl mingw64-libssh2 \
+>> +    mingw64-bzip2
+>> +
+>> +RUN dnf install -y $PACKAGES
+>> +RUN rpm -q $PACKAGES | sort > /packages.txt
+>> +ENV FEATURES mingw clang pyyaml
+> 
+> Regards,
+> Daniel
 > 
