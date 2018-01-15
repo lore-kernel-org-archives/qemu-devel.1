@@ -1,31 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60332)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60762)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eb9Rz-0000Oo-SO
-	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 13:25:40 -0500
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1eb9TC-0001TT-0V
+	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 13:26:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eb9Rw-0003LS-Mx
-	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 13:25:39 -0500
-Received: from mail-qk0-x241.google.com ([2607:f8b0:400d:c09::241]:33551)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1eb9Rw-0003L3-6w
-	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 13:25:36 -0500
-Received: by mail-qk0-x241.google.com with SMTP id i141so17926003qke.0
-	for <qemu-devel@nongnu.org>; Mon, 15 Jan 2018 10:25:36 -0800 (PST)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Mon, 15 Jan 2018 15:24:36 -0300
-Message-Id: <20180115182436.2066-15-f4bug@amsat.org>
-In-Reply-To: <20180115182436.2066-1-f4bug@amsat.org>
-References: <20180115182436.2066-1-f4bug@amsat.org>
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1eb9T8-00045l-QQ
+	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 13:26:53 -0500
+Received: from chuckie.co.uk ([82.165.15.123]:45331
+	helo=s16892447.onlinehome-server.info)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
+	id 1eb9T8-00043P-Ie
+	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 13:26:50 -0500
+References: <20180114104751.21965-1-mark.cave-ayland@ilande.co.uk>
+	<20180114104751.21965-8-mark.cave-ayland@ilande.co.uk>
+	<ee46e8fc-0ff2-3624-1b51-7377f05143d3@amsat.org>
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Message-ID: <af188181-8d00-27b4-f268-75401c893b32@ilande.co.uk>
+Date: Mon, 15 Jan 2018 18:26:41 +0000
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <ee46e8fc-0ff2-3624-1b51-7377f05143d3@amsat.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-GB
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v8 14/14] sdhci: add a 'dma' property to the
- sysbus devices
+Subject: Re: [Qemu-devel] [PATCH 07/11] sun4u: rename apb variables and
+ constants
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,81 +32,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, Alistair Francis <alistair.francis@xilinx.com>, Peter Maydell <peter.maydell@linaro.org>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, Kevin O'Connor <kevin@koconnor.net>, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, Andrey Smirnov <andrew.smirnov@gmail.com>, Marcel Apfelbaum <marcel@redhat.com>
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, atar4qemu@gmail.com
+Cc: qemu-devel@nongnu.org
 
-Add a 'dma' property allowing machine creation to provide the address-space
-SDHCI DMA operates on.
+On 14/01/18 13:20, Philippe Mathieu-Daudé wrote:
+> Hi Mark,
+> 
+> On 01/14/2018 07:47 AM, Mark Cave-Ayland wrote:
+>> In order to reflect the previous change of TYPE_APB to TYPE_SABRE, update
+>> the corresponding variable names to keep the terminology consistent.
+>>
+>> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+>> ---
+>>   hw/sparc64/sun4u.c | 41 +++++++++++++++++++++--------------------
+>>   1 file changed, 21 insertions(+), 20 deletions(-)
+>>
+>> diff --git a/hw/sparc64/sun4u.c b/hw/sparc64/sun4u.c
+>> index b8f685847a..fb18afaaa6 100644
+>> --- a/hw/sparc64/sun4u.c
+>> +++ b/hw/sparc64/sun4u.c
+>> @@ -55,9 +55,9 @@
+>>   #define CMDLINE_ADDR         0x003ff000
+>>   #define PROM_SIZE_MAX        (4 * 1024 * 1024)
+>>   #define PROM_VADDR           0x000ffd00000ULL
+>> -#define APB_SPECIAL_BASE     0x1fe00000000ULL
+>> -#define APB_MEM_BASE         0x1ff00000000ULL
+>> -#define APB_PCI_IO_BASE      (APB_SPECIAL_BASE + 0x02000000ULL)
+>> +#define PBM_SPECIAL_BASE     0x1fe00000000ULL
+>> +#define PBM_MEM_BASE         0x1ff00000000ULL
+>> +#define PBM_PCI_IO_BASE      (PBM_SPECIAL_BASE + 0x02000000ULL)
+>>   #define PROM_FILENAME        "openbios-sparc64"
+>>   #define NVRAM_SIZE           0x2000
+>>   #define MAX_IDE_BUS          2
+>> @@ -465,7 +465,7 @@ static void sun4uv_init(MemoryRegion *address_space_mem,
+>>       Nvram *nvram;
+>>       unsigned int i;
+>>       uint64_t initrd_addr, initrd_size, kernel_addr, kernel_size, kernel_entry;
+>> -    SabreState *apb;
+>> +    SabreState *sabre;
+>>       PCIBus *pci_bus, *pci_busA, *pci_busB;
+>>       PCIDevice *ebus, *pci_dev;
+>>       SysBusDevice *s;
+>> @@ -489,23 +489,24 @@ static void sun4uv_init(MemoryRegion *address_space_mem,
+>>       prom_init(hwdef->prom_addr, bios_name);
+>>   
+>>       /* Init sabre (PCI host bridge) */
+>> -    apb = SABRE_DEVICE(qdev_create(NULL, TYPE_SABRE));
+>> -    qdev_prop_set_uint64(DEVICE(apb), "special-base", APB_SPECIAL_BASE);
+>> -    qdev_prop_set_uint64(DEVICE(apb), "mem-base", APB_MEM_BASE);
+>> -    object_property_set_link(OBJECT(apb), OBJECT(iommu), "iommu", &error_abort);
+>> -    qdev_init_nofail(DEVICE(apb));
+>> +    sabre = SABRE_DEVICE(qdev_create(NULL, TYPE_SABRE));
+>> +    qdev_prop_set_uint64(DEVICE(sabre), "special-base", PBM_SPECIAL_BASE);
+>> +    qdev_prop_set_uint64(DEVICE(sabre), "mem-base", PBM_MEM_BASE);
+>> +    object_property_set_link(OBJECT(sabre), OBJECT(iommu), "iommu",
+>> +                             &error_abort);
+>> +    qdev_init_nofail(DEVICE(sabre));
+>>   
+>>       /* Wire up PCI interrupts to CPU */
+>>       for (i = 0; i < IVEC_MAX; i++) {
+>> -        qdev_connect_gpio_out_named(DEVICE(apb), "ivec-irq", i,
+>> +        qdev_connect_gpio_out_named(DEVICE(sabre), "ivec-irq", i,
+>>               qdev_get_gpio_in_named(DEVICE(cpu), "ivec-irq", i));
+>>       }
+>>   
+>> -    pci_bus = PCI_HOST_BRIDGE(apb)->bus;
+>> -    pci_busA = pci_bridge_get_sec_bus(apb->bridgeA);
+>> -    pci_busB = pci_bridge_get_sec_bus(apb->bridgeB);
+>> +    pci_bus = PCI_HOST_BRIDGE(sabre)->bus;
+>> +    pci_busA = pci_bridge_get_sec_bus(sabre->bridgeA);
+>> +    pci_busB = pci_bridge_get_sec_bus(sabre->bridgeB);
+>>   
+>> -    /* Only in-built Simba PBMs can exist on the root bus, slot 0 on busA is
+>> +    /* Only in-built Simba APBs can exist on the root bus, slot 0 on busA is
+> 
+> This single change might go in patch #2 instead.
+> 
+> Anyway:
+> Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-[based on a patch from Alistair Francis <alistair.francis@xilinx.com>
- from qemu/xilinx tag xilinx-v2016.1]
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
----
- include/hw/sd/sdhci.h |  1 +
- hw/sd/sdhci.c         | 18 +++++++++++++++++-
- 2 files changed, 18 insertions(+), 1 deletion(-)
+Hi Philippe,
 
-diff --git a/include/hw/sd/sdhci.h b/include/hw/sd/sdhci.h
-index 4a102b86ce..cb37182536 100644
---- a/include/hw/sd/sdhci.h
-+++ b/include/hw/sd/sdhci.h
-@@ -42,6 +42,7 @@ typedef struct SDHCIState {
-     SDBus sdbus;
-     MemoryRegion iomem;
-     AddressSpace *dma_as;
-+    MemoryRegion *dma_mr;
- 
-     QEMUTimer *insert_timer;       /* timer for 'changing' sd card. */
-     QEMUTimer *transfer_timer;
-diff --git a/hw/sd/sdhci.c b/hw/sd/sdhci.c
-index dd400695e4..f9264d3be5 100644
---- a/hw/sd/sdhci.c
-+++ b/hw/sd/sdhci.c
-@@ -1354,6 +1354,8 @@ static Property sdhci_sysbus_properties[] = {
-     DEFINE_SDHCI_COMMON_PROPERTIES(SDHCIState),
-     DEFINE_PROP_BOOL("pending-insert-quirk", SDHCIState, pending_insert_quirk,
-                      false),
-+    DEFINE_PROP_LINK("dma", SDHCIState,
-+                     dma_mr, TYPE_MEMORY_REGION, MemoryRegion *),
-     DEFINE_PROP_END_OF_LIST(),
- };
- 
-@@ -1367,6 +1369,11 @@ static void sdhci_sysbus_init(Object *obj)
- static void sdhci_sysbus_finalize(Object *obj)
- {
-     SDHCIState *s = SYSBUS_SDHCI(obj);
-+
-+    if (s->dma_mr) {
-+        object_unparent(OBJECT(s->dma_mr));
-+    }
-+
-     sdhci_uninitfn(s);
- }
- 
-@@ -1380,7 +1387,12 @@ static void sdhci_sysbus_realize(DeviceState *dev, Error ** errp)
-         return;
-     }
- 
--    s->dma_as = &address_space_memory;
-+    if (s->dma_mr) {
-+        address_space_init(s->dma_as, s->dma_mr, "sdhci-dma");
-+    } else {
-+        /* use system_memory() if property "dma" not set */
-+        s->dma_as = &address_space_memory;
-+    }
- 
-     sysbus_init_irq(sbd, &s->irq);
-     sysbus_init_mmio(sbd, &s->iomem);
-@@ -1391,6 +1403,10 @@ static void sdhci_sysbus_unrealize(DeviceState *dev, Error **errp)
-     SDHCIState *s = SYSBUS_SDHCI(dev);
- 
-     sdhci_common_unrealize(s, &error_abort);
-+
-+     if (s->dma_mr) {
-+        address_space_destroy(s->dma_as);
-+    }
- }
- 
- static void sdhci_sysbus_class_init(ObjectClass *klass, void *data)
--- 
-2.15.1
+I did think about that, but it feels a bit cleaner to keep all the sun4u 
+changes in one place (see the change to the constants and the other 
+comments within the file).
+
+
+ATB,
+
+Mark.
