@@ -1,24 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57252)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59393)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1eb5BH-0003qf-6C
-	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 08:52:13 -0500
+	(envelope-from <stefanha@redhat.com>) id 1eb5FU-0006wt-5B
+	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 08:56:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1eb5BF-0005S5-Rj
-	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 08:52:07 -0500
-Date: Mon, 15 Jan 2018 13:51:46 +0000
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20180115135146.GJ8218@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <20180111195225.4226-1-kwolf@redhat.com>
-	<20180111195225.4226-3-kwolf@redhat.com>
-	<20180112105320.GB17392@redhat.com>
-	<20180115133848.GD32271@localhost.localdomain>
+	(envelope-from <stefanha@redhat.com>) id 1eb5FQ-0008KN-7N
+	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 08:56:28 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:51310)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1eb5FQ-0008If-0u
+	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 08:56:24 -0500
+Date: Mon, 15 Jan 2018 13:56:20 +0000
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20180115135620.GG13238@stefanha-x1.localdomain>
+References: <20180110161438.GA28096@stefanha-x1.localdomain>
+	<dcb849d4-82fb-de8a-5e81-23d47026c9eb@redhat.com>
+	<20180111152345.GA7353@stefanha-x1.localdomain>
+	<86106573-422b-fe4c-ec15-dad0edf05880@redhat.com>
+	<20180112101807.GE7356@stefanha-x1.localdomain>
+	<a45c1da8-03e8-140f-725c-af0f31e3da62@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="xjyYRNSh/RebjC6o"
 Content-Disposition: inline
-In-Reply-To: <20180115133848.GD32271@localhost.localdomain>
-Subject: Re: [Qemu-devel] [RFC PATCH 02/10] block/qapi: Add qcow2 create
- options to schema
+In-Reply-To: <a45c1da8-03e8-140f-725c-af0f31e3da62@redhat.com>
+Subject: Re: [Qemu-devel] vhost-pci and virtio-vhost-user
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,86 +32,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: qemu-block@nongnu.org, pkrempa@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com
+To: Jason Wang <jasowang@redhat.com>
+Cc: wei.w.wang@intel.com, qemu-devel@nongnu.org
 
-On Mon, Jan 15, 2018 at 02:38:48PM +0100, Kevin Wolf wrote:
-> Am 12.01.2018 um 11:53 hat Daniel P. Berrange geschrieben:
-> > On Thu, Jan 11, 2018 at 08:52:17PM +0100, Kevin Wolf wrote:
-> > > Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-> > > ---
-> > >  qapi/block-core.json | 33 ++++++++++++++++++++++++++++++++-
-> > >  1 file changed, 32 insertions(+), 1 deletion(-)
-> > > 
-> > > diff --git a/qapi/block-core.json b/qapi/block-core.json
-> > > index 1749376c61..9341f6708d 100644
-> > > --- a/qapi/block-core.json
-> > > +++ b/qapi/block-core.json
-> > > @@ -3320,6 +3320,37 @@
-> > >  { 'command': 'blockdev-del', 'data': { 'node-name': 'str' } }
-> > >  
-> > >  ##
-> > > +# @BlockdevQcow2CompatLevel:
-> > > +# @0_10:    The original QCOW2 format as introduced in qemu 0.10 (version 2)
-> > > +# @1_1:     The extended QCOW2 format as introduced in qemu 1.1 (version 3)
-> > > +#
-> > > +# Since: 2.10
-> > > +##
-> > > +{ 'enum': 'BlockdevQcow2CompatLevel',
-> > > +  'data': [ '0_10', '1_1' ] }
-> > > +
-> > > +
-> > > +##
-> > > +# @BlockdevCreateOptionsQcow2:
-> > > +#
-> > > +# Driver specific image creation options for qcow2.
-> > > +#
-> > > +# TODO Describe fields
-> > > +#
-> > > +# Since: 2.12
-> > > +##
-> > > +{ 'struct': 'BlockdevCreateOptionsQcow2',
-> > > +  'data': { 'size':             'size',
-> > > +            '*compat':          'BlockdevQcow2CompatLevel',
-> > > +            '*backing-file':    'str',
-> > > +            '*backing-fmt':     'BlockdevDriver',
-> > 
-> > For anything non-trivial, the caller is going to have to stuff a
-> > JSON string into 'backing-file' value. It feels like we should
-> > be referencing 'BlockdevOptions' here in some manner.
-> 
-> Hm, that's an interesting question. For the image creation, this is
-> really treated as a string that is directly written into the image file,
-> without being parsed, so 'str' is the more correct type in this context.
-> However, when the backing file gets loaded, that string is in fact
-> parsed and we expect it to describe the same thing as BlockdevOptions.
-> 
-> If we get BlockdevOptions here, qemu would have to convert them into a
-> json:{...} string before writing the header of the new image.
-> Compatibility code would become a bit more complex because we'd have to
-> convert the existing string into BlockdevOptions, only to convert it
-> back to a string before we write it to the image file. And finally, the
-> 1023 character limit of qcow2 becomes kind of unpredicatble when you
-> don't pass the string yourself.
-> 
-> So considering all of that, I still think that 'str' is the better
-> option here.
 
-Hmm, when we write the backing chain into the qcow2 header, we only want to
-write the 1st level of the backing chain.
+--xjyYRNSh/RebjC6o
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-When we are creating the new qcow2 image, we could be pointing to a backing
-chain that goes many levels deep. So the actual creation process potentially
-needs to be given the full arbitrarily deep backing file eg in order that
-we can set 'encrypt.secret' for any encrypted images at at arbitrary level.
+On Mon, Jan 15, 2018 at 02:56:31PM +0800, Jason Wang wrote:
+> On 2018=E5=B9=B401=E6=9C=8812=E6=97=A5 18:18, Stefan Hajnoczi wrote:
+> > > And what's more important, according to the kvm 2016 slides of vhost-=
+pci,
+> > > the motivation of vhost-pci is not building SDN but a chain of VNFs. =
+So
+> > > bypassing the central vswitch through a private VM2VM path does make =
+sense.
+> > > (Though whether or not vhost-pci is the best choice is still question=
+able).
+> > This is probably my fault.  Maybe my networking terminology is wrong.  I
+> > consider "virtual network functions" to be part of "software-defined
+> > networking" use cases.  I'm not implying there must be a central virtual
+> > switch.
+> >=20
+> > To rephrase: vhost-pci enables exitless VM2VM communication.
+>=20
+> The problem is, exitless is not what vhost-pci invents, it could be achie=
+ved
+> now when both sides are doing busypolling.
 
-IOW, I think we need to be able to pass BlockdevOptions here to specify the
-full deep chain, but then only the 1st level of these BlockdevOptions should
-get written into the qcow2 file header.
+The only way I'm aware of is ivshmem.  But ivshmem lacks a family of
+standard device types that allows different implementations to
+interoperate.  We already have the virtio family of device types, so it
+makes sense to work on a virtio-based solution.
 
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+Perhaps I've missed a different approach for exitless VM2VM
+communication.  Please explain how VM1 and VM2 can do exitless network
+communication today?
+
+Also, how can VM1 provide SCSI I/O services to VM2 today?
+
+Stefan
+
+--xjyYRNSh/RebjC6o
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJaXLMEAAoJEJykq7OBq3PI9ooIALplKMZ1Lfking1jcIf30mX/
+VZA2VVeuLk4BA48WFl0ATVKTK15rXffhdh7ozDEHXLBnm/o0gZrfTfWfwlknaZfP
+sXZrF0QU06Zgru+kFGUbUXuhdOI6Sn3Xq3kfgLHdVYBdF0tD0OsQ60ZdeEgI3S9+
+k0AZ9zc6Nq7fd1OMo3ws2WL/zP1cZ9CvfzhDMFWc2rXDRFtn/Vsr2im9Al2FPGg/
+aVLrSIh6iwp7BYTuDnsqeOaxRFdUNaq+zIiG+stm1HG/HDCw4jGo8rywMqsy17tb
+kKZ3pBRfKuSFIYnq5IXOpW7U928O6YLNLz3iRWviJ2V4tTGbPQGWFbokgKtnkNM=
+=bT53
+-----END PGP SIGNATURE-----
+
+--xjyYRNSh/RebjC6o--
