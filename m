@@ -1,17 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56483)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37497)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1ebCvh-0007PN-2c
-	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 17:08:34 -0500
+	(envelope-from <jsnow@redhat.com>) id 1ebDao-0005Ew-SP
+	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 17:51:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1ebCvg-0006DX-34
-	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 17:08:32 -0500
-Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Mon, 15 Jan 2018 23:08:22 +0100
-Message-Id: <20180115220822.10156-5-pbonzini@redhat.com>
-In-Reply-To: <20180115220822.10156-1-pbonzini@redhat.com>
-References: <20180115220822.10156-1-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PATCH 4/4] curl: convert to CoQueue
+	(envelope-from <jsnow@redhat.com>) id 1ebDan-0004Se-IH
+	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 17:51:02 -0500
+From: John Snow <jsnow@redhat.com>
+Date: Mon, 15 Jan 2018 17:50:47 -0500
+Message-Id: <20180115225047.28607-1-jsnow@redhat.com>
+Subject: [Qemu-devel] [PATCH v2] file-posix: specify expected filetypes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,83 +17,119 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: famz@redhat.com, stefanha@redhat.com, qemu-block@nongnu.org
+To: qemu-block@nongnu.org
+Cc: kwolf@redhat.com, qemu-devel@nongnu.org, John Snow <jsnow@redhat.com>
 
-Now that CoQueues can use a QemuMutex for thread-safety, there is no
-need for curl to roll its own coroutine queue.  Coroutines can be
-placed directly on the queue instead of using a list of CURLAIOCBs.
+I don't think there's a legitimate reason to open directories as if
+they were files. This prevents QEMU from opening and attempting to probe
+a directory inode, which can break in exciting ways. One of those ways
+is lseek on ext4/xfs, which will return 0x7fffffffffffffff as the file
+size instead of EISDIR. This can coax QEMU into responding with a
+confusing "file too big" instead of "Hey, that's not a file".
 
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+See: https://bugs.launchpad.net/qemu/+bug/1739304/
+Signed-off-by: John Snow <jsnow@redhat.com>
 ---
- block/curl.c | 20 ++++----------------
- 1 file changed, 4 insertions(+), 16 deletions(-)
 
-diff --git a/block/curl.c b/block/curl.c
-index 35cf417f59..cd578d3d14 100644
---- a/block/curl.c
-+++ b/block/curl.c
-@@ -101,8 +101,6 @@ typedef struct CURLAIOCB {
+v2: Is something like this what you had in mind, Kevin?
+    I couldn't make the hdev/cdrom checks more specific
+    as I'm not sure which environments expect which, but
+    if you know I can tighten it.
+
+ block/file-posix.c | 38 +++++++++++++++++++++++++++++---------
+ 1 file changed, 29 insertions(+), 9 deletions(-)
+
+diff --git a/block/file-posix.c b/block/file-posix.c
+index 36ee89e940..fe06cdb8f8 100644
+--- a/block/file-posix.c
++++ b/block/file-posix.c
+@@ -417,7 +417,8 @@ static QemuOptsList raw_runtime_opts = {
+ };
  
-     size_t start;
-     size_t end;
--
--    QSIMPLEQ_ENTRY(CURLAIOCB) next;
- } CURLAIOCB;
- 
- typedef struct CURLSocket {
-@@ -138,7 +136,7 @@ typedef struct BDRVCURLState {
-     bool accept_range;
-     AioContext *aio_context;
-     QemuMutex mutex;
--    QSIMPLEQ_HEAD(, CURLAIOCB) free_state_waitq;
-+    CoQueue free_state_waitq;
-     char *username;
-     char *password;
-     char *proxyusername;
-@@ -538,7 +536,6 @@ static int curl_init_state(BDRVCURLState *s, CURLState *state)
- /* Called with s->mutex held.  */
- static void curl_clean_state(CURLState *s)
+ static int raw_open_common(BlockDriverState *bs, QDict *options,
+-                           int bdrv_flags, int open_flags, Error **errp)
++                           int bdrv_flags, int open_flags,
++                           bool device, Error **errp)
  {
--    CURLAIOCB *next;
-     int j;
-     for (j = 0; j < CURL_NUM_ACB; j++) {
-         assert(!s->acb[j]);
-@@ -556,13 +553,7 @@ static void curl_clean_state(CURLState *s)
+     BDRVRawState *s = bs->opaque;
+     QemuOpts *opts;
+@@ -556,10 +557,30 @@ static int raw_open_common(BlockDriverState *bs, QDict *options,
+         error_setg_errno(errp, errno, "Could not stat file");
+         goto fail;
+     }
+-    if (S_ISREG(st.st_mode)) {
+-        s->discard_zeroes = true;
+-        s->has_fallocate = true;
++
++    if (!device) {
++        if (S_ISBLK(st.st_mode)) {
++            warn_report("Opening a block device as file using 'file'"
++                        "driver is deprecated");
++        } else if (S_ISCHR(st.st_mode)) {
++            warn_report("Opening a character device as file using the 'file'"
++                        "driver is deprecated");
++        } else if (!S_ISREG(st.st_mode)) {
++            error_setg(errp, "A regular file was expected by the 'file' driver,"
++                       "but something else was given");
++            goto fail;
++        } else {
++            s->discard_zeroes = true;
++            s->has_fallocate = true;
++        }
++    } else {
++        if (!(S_ISCHR(st.st_mode) || S_ISBLK(st.st_mode))) {
++            error_setg(errp, "host_device/host_cdrom driver expects either"
++                       "a character or block device");
++            goto fail;
++        }
+     }
++
+     if (S_ISBLK(st.st_mode)) {
+ #ifdef BLKDISCARDZEROES
+         unsigned int arg;
+@@ -589,7 +610,6 @@ static int raw_open_common(BlockDriverState *bs, QDict *options,
+         s->needs_alignment = true;
+     }
+ #endif
+-
+ #ifdef CONFIG_XFS
+     if (platform_test_xfs_fd(s->fd)) {
+         s->is_xfs = true;
+@@ -611,7 +631,7 @@ static int raw_open(BlockDriverState *bs, QDict *options, int flags,
+     BDRVRawState *s = bs->opaque;
  
-     s->in_use = 0;
- 
--    next = QSIMPLEQ_FIRST(&s->s->free_state_waitq);
--    if (next) {
--        QSIMPLEQ_REMOVE_HEAD(&s->s->free_state_waitq, next);
--        qemu_mutex_unlock(&s->s->mutex);
--        aio_co_wake(next->co);
--        qemu_mutex_lock(&s->s->mutex);
--    }
-+    qemu_co_enter_next(&s->s->free_state_waitq, &s->s->mutex);
+     s->type = FTYPE_FILE;
+-    return raw_open_common(bs, options, flags, 0, errp);
++    return raw_open_common(bs, options, flags, 0, false, errp);
  }
  
- static void curl_parse_filename(const char *filename, QDict *options,
-@@ -784,7 +775,7 @@ static int curl_open(BlockDriverState *bs, QDict *options, int flags,
-     }
+ typedef enum {
+@@ -2575,7 +2595,7 @@ hdev_open_Mac_error:
  
-     DPRINTF("CURL: Opening %s\n", file);
--    QSIMPLEQ_INIT(&s->free_state_waitq);
-+    qemu_co_queue_init(&s->free_state_waitq);
-     s->aio_context = bdrv_get_aio_context(bs);
-     s->url = g_strdup(file);
-     qemu_mutex_lock(&s->mutex);
-@@ -888,10 +879,7 @@ static void curl_setup_preadv(BlockDriverState *bs, CURLAIOCB *acb)
-         if (state) {
-             break;
-         }
--        QSIMPLEQ_INSERT_TAIL(&s->free_state_waitq, acb, next);
--        qemu_mutex_unlock(&s->mutex);
--        qemu_coroutine_yield();
--        qemu_mutex_lock(&s->mutex);
-+        qemu_co_queue_wait(&s->free_state_waitq, &s->mutex);
-     }
+     s->type = FTYPE_FILE;
  
-     if (curl_init_state(s, state) < 0) {
+-    ret = raw_open_common(bs, options, flags, 0, &local_err);
++    ret = raw_open_common(bs, options, flags, 0, true, &local_err);
+     if (ret < 0) {
+         error_propagate(errp, local_err);
+ #if defined(__APPLE__) && defined(__MACH__)
+@@ -2802,7 +2822,7 @@ static int cdrom_open(BlockDriverState *bs, QDict *options, int flags,
+     s->type = FTYPE_CD;
+ 
+     /* open will not fail even if no CD is inserted, so add O_NONBLOCK */
+-    return raw_open_common(bs, options, flags, O_NONBLOCK, errp);
++    return raw_open_common(bs, options, flags, O_NONBLOCK, true, errp);
+ }
+ 
+ static int cdrom_probe_device(const char *filename)
+@@ -2915,7 +2935,7 @@ static int cdrom_open(BlockDriverState *bs, QDict *options, int flags,
+ 
+     s->type = FTYPE_CD;
+ 
+-    ret = raw_open_common(bs, options, flags, 0, &local_err);
++    ret = raw_open_common(bs, options, flags, 0, true, &local_err);
+     if (ret) {
+         error_propagate(errp, local_err);
+         return ret;
 -- 
 2.14.3
