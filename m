@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46440)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47227)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eb4m3-0007Ev-TM
-	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 08:26:05 -0500
+	(envelope-from <imammedo@redhat.com>) id 1eb4ne-0008Jo-OV
+	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 08:27:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1eb4lz-0000UH-Lc
-	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 08:26:03 -0500
-Received: from mail-ot0-x244.google.com ([2607:f8b0:4003:c0f::244]:41555)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1eb4lz-0000Ti-FN
-	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 08:25:59 -0500
-Received: by mail-ot0-x244.google.com with SMTP id 44so9728244otk.8
-	for <qemu-devel@nongnu.org>; Mon, 15 Jan 2018 05:25:59 -0800 (PST)
+	(envelope-from <imammedo@redhat.com>) id 1eb4na-0001zo-AH
+	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 08:27:42 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:1961)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1eb4na-0001zP-0q
+	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 08:27:38 -0500
+Date: Mon, 15 Jan 2018 14:27:32 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20180115142732.3028e94a@redhat.com>
+In-Reply-To: <1515628000-93285-16-git-send-email-mjc@sifive.com>
+References: <1515628000-93285-1-git-send-email-mjc@sifive.com>
+	<1515628000-93285-16-git-send-email-mjc@sifive.com>
 MIME-Version: 1.0
-In-Reply-To: <5d3528b2428e0eb4ea7a058fbb12b6b1229a496f.1515796549.git.alistair.francis@xilinx.com>
-References: <cover.1515796549.git.alistair.francis@xilinx.com>
-	<5d3528b2428e0eb4ea7a058fbb12b6b1229a496f.1515796549.git.alistair.francis@xilinx.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 15 Jan 2018 13:25:38 +0000
-Message-ID: <CAFEAcA-ht8NXMhdXdtnJRQFJSiNH4JRAUdygjdCg+Y=U_8_TuA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 1/3] xlnx-zynqmp-rtc: Initial commit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 15/21] RISC-V Spike Machines
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,158 +27,590 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alistair Francis <alistair.francis@xilinx.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Alistair Francis <alistair23@gmail.com>, Edgar Iglesias <edgar.iglesias@xilinx.com>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+To: Michael Clark <mjc@sifive.com>
+Cc: qemu-devel@nongnu.org, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, RISC-V Patches <patches+subscribe@groups.riscv.org>, Palmer Dabbelt <palmer@sifive.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>
 
-On 12 January 2018 at 22:36, Alistair Francis
-<alistair.francis@xilinx.com> wrote:
-> Initial commit of the ZynqMP RTC device.
->
-> Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
+On Wed, 10 Jan 2018 15:46:34 -0800
+Michael Clark <mjc@sifive.com> wrote:
+
+> RISC-V machines compatble with Spike aka riscv-isa-sim, the RISC-V
+> Instruction Set Simulator. The following machines are implemented:
+> 
+> - 'spike_v1.9'; HTIF console, config-string, Privileged ISA Version 1.9.1
+> - 'spike_v1.10'; HTIF console, device-tree, Privileged ISA Version 1.10
+> 
+> Signed-off-by: Michael Clark <mjc@sifive.com>
 > ---
-> V2:
->  - Delete unused realise function
->  - Remove DB_PRINT()
->
->  hw/timer/Makefile.objs             |   1 +
->  hw/timer/xlnx-zynqmp-rtc.c         | 218 +++++++++++++++++++++++++++++++=
-++++++
->  include/hw/timer/xlnx-zynqmp-rtc.h |  84 ++++++++++++++
->  3 files changed, 303 insertions(+)
->  create mode 100644 hw/timer/xlnx-zynqmp-rtc.c
->  create mode 100644 include/hw/timer/xlnx-zynqmp-rtc.h
->
-> diff --git a/hw/timer/Makefile.objs b/hw/timer/Makefile.objs
-> index 8c19eac3b6..8b27a4b7ef 100644
-> --- a/hw/timer/Makefile.objs
-> +++ b/hw/timer/Makefile.objs
-> @@ -21,6 +21,7 @@ common-obj-$(CONFIG_IMX) +=3D imx_epit.o
->  common-obj-$(CONFIG_IMX) +=3D imx_gpt.o
->  common-obj-$(CONFIG_LM32) +=3D lm32_timer.o
->  common-obj-$(CONFIG_MILKYMIST) +=3D milkymist-sysctl.o
-> +common-obj-$(CONFIG_XLNX_ZYNQMP) +=3D xlnx-zynqmp-rtc.o
->
->  obj-$(CONFIG_ALTERA_TIMER) +=3D altera_timer.o
->  obj-$(CONFIG_EXYNOS4) +=3D exynos4210_mct.o
-> diff --git a/hw/timer/xlnx-zynqmp-rtc.c b/hw/timer/xlnx-zynqmp-rtc.c
+>  hw/riscv/spike_v1_09.c   | 207 ++++++++++++++++++++++++++++++++++
+>  hw/riscv/spike_v1_10.c   | 281 +++++++++++++++++++++++++++++++++++++++++++++++
+>  include/hw/riscv/spike.h |  51 +++++++++
+>  3 files changed, 539 insertions(+)
+>  create mode 100644 hw/riscv/spike_v1_09.c
+>  create mode 100644 hw/riscv/spike_v1_10.c
+>  create mode 100644 include/hw/riscv/spike.h
+> 
+> diff --git a/hw/riscv/spike_v1_09.c b/hw/riscv/spike_v1_09.c
 > new file mode 100644
-> index 0000000000..ead40fc42d
+> index 0000000..9b32c6a
 > --- /dev/null
-> +++ b/hw/timer/xlnx-zynqmp-rtc.c
-> @@ -0,0 +1,218 @@
+> +++ b/hw/riscv/spike_v1_09.c
+> @@ -0,0 +1,207 @@
 > +/*
-> + * QEMU model of the Xilinx ZynqMP Real Time Clock (RTC).
+> + * QEMU RISC-V Spike Board
 > + *
-> + * Copyright (c) 2017 Xilinx Inc.
+> + * Author: Sagar Karandikar, sagark@eecs.berkeley.edu
 > + *
-> + * Written-by: Alistair Francis <alistair.francis@xilinx.com>
+> + * This provides a RISC-V Board with the following devices:
 > + *
-> + * Permission is hereby granted, free of charge, to any person obtaining=
- a copy
-> + * of this software and associated documentation files (the "Software"),=
- to deal
-> + * in the Software without restriction, including without limitation the=
- rights
-> + * to use, copy, modify, merge, publish, distribute, sublicense, and/or =
-sell
+> + * 0) HTIF Test Pass/Fail Reporting (no syscall proxy)
+> + * 1) HTIF Console
+> + *
+> + * These are created by htif_mm_init below.
+> + *
+> + * This board currently uses a hardcoded devicetree that indicates one hart.
+> + *
+> + * Permission is hereby granted, free of charge, to any person obtaining a copy
+> + * of this software and associated documentation files (the "Software"), to deal
+> + * in the Software without restriction, including without limitation the rights
+> + * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 > + * copies of the Software, and to permit persons to whom the Software is
 > + * furnished to do so, subject to the following conditions:
 > + *
-> + * The above copyright notice and this permission notice shall be includ=
-ed in
+> + * The above copyright notice and this permission notice shall be included in
 > + * all copies or substantial portions of the Software.
 > + *
-> + * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRE=
-SS OR
-> + * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILI=
-TY,
-> + * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHA=
-LL
-> + * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR =
-OTHER
-> + * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISI=
-NG FROM,
-> + * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALING=
-S IN
+> + * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+> + * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+> + * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+> + * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+> + * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+> + * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 > + * THE SOFTWARE.
 > + */
 > +
 > +#include "qemu/osdep.h"
-> +#include "hw/sysbus.h"
-> +#include "hw/register.h"
-> +#include "qemu/bitops.h"
 > +#include "qemu/log.h"
-> +#include "hw/timer/xlnx-zynqmp-rtc.h"
+> +#include "qemu/error-report.h"
+> +#include "hw/hw.h"
+> +#include "hw/boards.h"
+> +#include "hw/loader.h"
+> +#include "hw/sysbus.h"
+> +#include "target/riscv/cpu.h"
+> +#include "hw/riscv/riscv_htif.h"
+> +#include "hw/riscv/riscv_hart.h"
+> +#include "hw/riscv/sifive_clint.h"
+> +#include "hw/riscv/spike.h"
+> +#include "chardev/char.h"
+> +#include "sysemu/arch_init.h"
+> +#include "exec/address-spaces.h"
+> +#include "elf.h"
 > +
-> +#ifndef XLNX_ZYNQMP_RTC_ERR_DEBUG
-> +#define XLNX_ZYNQMP_RTC_ERR_DEBUG 0
-> +#endif
-
-This #define doesn't seem to be used, or have I missed it?
-
+> +static const struct MemmapEntry {
+> +    hwaddr base;
+> +    hwaddr size;
+> +} spike_memmap[] = {
+> +    [SPIKE_MROM] =     {     0x1000,     0x2000 },
+> +    [SPIKE_CLINT] =    {  0x2000000,    0x10000 },
+> +    [SPIKE_DRAM] =     { 0x80000000,        0x0 },
+> +};
 > +
-> +static void rtc_int_update_irq(XlnxZynqMPRTC *s)
+> +static uint64_t identity_translate(void *opaque, uint64_t addr)
 > +{
-> +    bool pending =3D s->regs[R_RTC_INT_STATUS] & ~s->regs[R_RTC_INT_MASK=
-];
-> +    qemu_set_irq(s->irq_rtc_int, pending);
+> +    return addr;
 > +}
 > +
-> +static void addr_error_int_update_irq(XlnxZynqMPRTC *s)
+> +static uint64_t load_kernel(const char *kernel_filename)
 > +{
-> +    bool pending =3D s->regs[R_ADDR_ERROR] & ~s->regs[R_ADDR_ERROR_INT_M=
-ASK];
-> +    qemu_set_irq(s->irq_addr_error_int, pending);
+> +    uint64_t kernel_entry, kernel_high;
+> +
+> +    if (load_elf(kernel_filename, identity_translate, NULL,
+> +                 &kernel_entry, NULL, &kernel_high,
+> +                 /* little_endian = */ 0, ELF_MACHINE, 1, 0) < 0) {
+> +        error_report("qemu: could not load kernel '%s'", kernel_filename);
+> +        exit(1);
+> +    }
+> +    return kernel_entry;
 > +}
 > +
-> +static void rtc_int_status_postw(RegisterInfo *reg, uint64_t val64)
+> +static void riscv_spike_board_init(MachineState *machine)
 > +{
-> +    XlnxZynqMPRTC *s =3D XLNX_ZYNQMP_RTC(reg->opaque);
-> +    rtc_int_update_irq(s);
-> +}
+> +    const struct MemmapEntry *memmap = spike_memmap;
 > +
-> +static uint64_t rtc_int_en_prew(RegisterInfo *reg, uint64_t val64)
-> +{
-> +    XlnxZynqMPRTC *s =3D XLNX_ZYNQMP_RTC(reg->opaque);
-> +    uint32_t val =3D val64;
+> +    SpikeState *s = g_new0(SpikeState, 1);
+> +    /* const char *cpu_model = machine->cpu_model; *
+> +    /* const char *kernel_cmdline = machine->kernel_cmdline; */
+> +    /* const char *initrd_filename = machine->initrd_filename; */
+drop commented out code, and if board will allow user to pick
+cpu type from CLI, vl.c will do cpu_model parsing for you
+so board shouldn't deal with cpu_model at all.
+See
+ 1498e9706 openrisc: use generic cpu_model parsing
+ 
+
+
+> +    MemoryRegion *system_memory = get_system_memory();
+> +    MemoryRegion *main_mem = g_new(MemoryRegion, 1);
+> +    MemoryRegion *boot_rom = g_new(MemoryRegion, 1);
 > +
-> +    s->regs[R_RTC_INT_MASK] &=3D ~val;
-> +    rtc_int_update_irq(s);
-> +    return 0;
-> +}
-
-I have to say I find all this pre-write/post-write stuff confusing
-compared to just having a straightforward pair of read and write functions
-for the device. Why do we update the interrupt state in a post-write
-for the status register but a pre-write for the int_en register ?
-
-
-
-> +static void rtc_reset(DeviceState *dev)
-> +{
-> +    XlnxZynqMPRTC *s =3D XLNX_ZYNQMP_RTC(dev);
-> +    unsigned int i;
+> +    /* Initialize SOC */
+> +    object_initialize(&s->soc, sizeof(s->soc), TYPE_RISCV_HART_ARRAY);
+> +    object_property_add_child(OBJECT(machine), "soc", OBJECT(&s->soc),
+> +                              &error_abort);
+> +    object_property_set_str(OBJECT(&s->soc), TYPE_RISCV_CPU_IMAFDCSU_PRIV_1_09,
+> +                            "cpu-model", &error_abort);
+> +    object_property_set_int(OBJECT(&s->soc), smp_cpus, "num-harts",
+> +                            &error_abort);
+> +    object_property_set_bool(OBJECT(&s->soc), true, "realized",
+> +                            &error_abort);
 > +
-> +    for (i =3D 0; i < ARRAY_SIZE(s->regs_info); ++i) {
-> +        register_reset(&s->regs_info[i]);
+> +    /* register system main memory (actual RAM) */
+> +    memory_region_init_ram(main_mem, NULL, "riscv.spike.ram",
+> +                           machine->ram_size, &error_fatal);
+> +    memory_region_add_subregion(system_memory, DRAM_BASE, main_mem);
+> +
+> +    /* boot rom */
+> +    memory_region_init_ram(boot_rom, NULL, "riscv.spike.bootrom",
+> +                           0x40000, &error_fatal);
+> +    memory_region_add_subregion(system_memory, 0x0, boot_rom);
+> +
+> +    if (machine->kernel_filename) {
+> +        load_kernel(machine->kernel_filename);
 > +    }
 > +
-> +    rtc_int_update_irq(s);
-> +    addr_error_int_update_irq(s);
+> +    uint32_t reset_vec[8] = {
+> +        0x297 + memmap[SPIKE_DRAM].base - memmap[SPIKE_MROM].base, /* lui */
+> +        0x00028067,                   /* jump to DRAM_BASE */
+> +        0x00000000,                   /* reserved */
+> +        memmap[SPIKE_MROM].base + sizeof(reset_vec), /* config string pointer */
+> +        0, 0, 0, 0                    /* trap vector */
+> +    };
+> +
+> +    /* part one of config string - before memory size specified */
+> +    const char *config_string_tmpl =
+> +        "platform {\n"
+> +        "  vendor ucb;\n"
+> +        "  arch spike;\n"
+> +        "};\n"
+> +        "rtc {\n"
+> +        "  addr 0x" "40000000" ";\n"
+> +        "};\n"
+> +        "ram {\n"
+> +        "  0 {\n"
+> +        "    addr 0x" "80000000" ";\n"
+> +        "    size 0x" "%016" PRIx64 ";\n"
+> +        "  };\n"
+> +        "};\n"
+> +        "core {\n"
+> +        "  0" " {\n"
+> +        "    " "0 {\n"
+> +        "      isa " "rv64imafd" ";\n"
+> +        "      timecmp 0x" "40000008" ";\n"
+> +        "      ipi 0x" "40001000" ";\n" /* match dummy ipi region above */
+> +        "    };\n"
+> +        "  };\n"
+> +        "};\n";
+> +
+> +    /* build config string with supplied memory size */
+> +    size_t config_string_size = strlen(config_string_tmpl) + 16;
+> +    char *config_string = malloc(config_string_size);
+> +    snprintf(config_string, config_string_size,
+> +        config_string_tmpl, (uint64_t)ram_size);
+> +    size_t config_string_len = strlen(config_string);
+> +
+> +    /* copy in the reset vector */
+> +    cpu_physical_memory_write(memmap[SPIKE_MROM].base, reset_vec,
+> +        sizeof(reset_vec));
+> +
+> +    /* copy in the config string */
+> +    cpu_physical_memory_write(memmap[SPIKE_MROM].base + sizeof(reset_vec),
+> +        config_string, config_string_len);
+> +
+> +    /* add memory mapped htif registers at location specified in the symbol
+> +       table of the elf being loaded (thus kernel_filename is passed to the
+> +       init rather than an address) */
+> +    htif_mm_init(system_memory, machine->kernel_filename,
+> +        s->soc.harts[0].env.irq[4], boot_rom,
+> +        &s->soc.harts[0].env, serial_hds[0]);
+> +
+> +    /* Core Local Interruptor (timer and IPI) */
+> +    sifive_clint_create(0x40000000, 0x2000, smp_cpus, 0x1000, 0x8, 0x0);
 > +}
-
-Updating irq lines in reset functions is a bit dubious.
-(We really should figure out how to do that properly some day.)
-
-> This email and any attachments are intended for the sole use of the named=
- recipient(s) and contain(s) confidential information that may be proprieta=
-ry, privileged or copyrighted under applicable law. If you are not the inte=
-nded recipient, do not read, copy, or forward this email message or any att=
-achments. Delete this email message and any attachments immediately.
-
-
-You probably don't really mean this :-)  Can you fix your email
-config for sending patch mails, please?
-
-thanks
--- PMM
+> +
+> +static int riscv_spike_board_sysbus_device_init(SysBusDevice *sysbusdev)
+> +{
+> +    return 0;
+> +}
+> +
+> +static void riscv_spike_board_class_init(ObjectClass *klass, void *data)
+> +{
+> +    SysBusDeviceClass *k = SYS_BUS_DEVICE_CLASS(klass);
+> +    k->init = riscv_spike_board_sysbus_device_init;
+> +}
+> +
+> +static const TypeInfo riscv_spike_board_device = {
+> +    .name          = TYPE_RISCV_SPIKE_V1_09_1_BOARD,
+> +    .parent        = TYPE_SYS_BUS_DEVICE,
+> +    .instance_size = sizeof(SpikeState),
+> +    .class_init    = riscv_spike_board_class_init,
+> +};
+> +
+> +static void riscv_spike_board_machine_init(MachineClass *mc)
+> +{
+> +    mc->desc = "RISC-V Spike Board (Privileged ISA v1.9.1)";
+> +    mc->init = riscv_spike_board_init;
+> +    mc->max_cpus = 1;
+> +    mc->is_default = 1;
+> +}
+> +
+> +DEFINE_MACHINE("spike_v1.9", riscv_spike_board_machine_init)
+> +
+> +static void riscv_spike_board_register_types(void)
+> +{
+> +    type_register_static(&riscv_spike_board_device);
+> +}
+> +
+> +type_init(riscv_spike_board_register_types);
+> diff --git a/hw/riscv/spike_v1_10.c b/hw/riscv/spike_v1_10.c
+> new file mode 100644
+> index 0000000..4edff49
+> --- /dev/null
+> +++ b/hw/riscv/spike_v1_10.c
+> @@ -0,0 +1,281 @@
+> +/*
+> + * QEMU RISC-V Spike Board
+> + *
+> + * Author: Sagar Karandikar, sagark@eecs.berkeley.edu
+> + * Author: Michael Clark, mjc@sifive.com
+> + *
+> + * This provides a RISC-V Board with the following devices:
+> + *
+> + * 0) HTIF Test Pass/Fail Reporting (no syscall proxy)
+> + * 1) HTIF Console
+> + *
+> + * These are created by htif_mm_init below.
+> + *
+> + * Permission is hereby granted, free of charge, to any person obtaining a copy
+> + * of this software and associated documentation files (the "Software"), to deal
+> + * in the Software without restriction, including without limitation the rights
+> + * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+> + * copies of the Software, and to permit persons to whom the Software is
+> + * furnished to do so, subject to the following conditions:
+> + *
+> + * The above copyright notice and this permission notice shall be included in
+> + * all copies or substantial portions of the Software.
+> + *
+> + * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+> + * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+> + * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+> + * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+> + * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+> + * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+> + * THE SOFTWARE.
+> + */
+> +
+> +#include "qemu/osdep.h"
+> +#include "qemu/log.h"
+> +#include "qemu/error-report.h"
+> +#include "hw/hw.h"
+> +#include "hw/boards.h"
+> +#include "hw/loader.h"
+> +#include "hw/sysbus.h"
+> +#include "target/riscv/cpu.h"
+> +#include "hw/riscv/riscv_htif.h"
+> +#include "hw/riscv/riscv_hart.h"
+> +#include "hw/riscv/sifive_clint.h"
+> +#include "hw/riscv/spike.h"
+> +#include "chardev/char.h"
+> +#include "sysemu/arch_init.h"
+> +#include "sysemu/device_tree.h"
+> +#include "exec/address-spaces.h"
+> +#include "elf.h"
+> +
+> +static const struct MemmapEntry {
+> +    hwaddr base;
+> +    hwaddr size;
+> +} spike_memmap[] = {
+> +    [SPIKE_MROM] =     {     0x1000,     0x2000 },
+> +    [SPIKE_CLINT] =    {  0x2000000,    0x10000 },
+> +    [SPIKE_DRAM] =     { 0x80000000,        0x0 },
+> +};
+> +
+> +static uint64_t identity_translate(void *opaque, uint64_t addr)
+> +{
+> +    return addr;
+> +}
+> +
+> +static uint64_t load_kernel(const char *kernel_filename)
+> +{
+> +    uint64_t kernel_entry, kernel_high;
+> +
+> +    if (load_elf(kernel_filename, identity_translate, NULL,
+> +                 &kernel_entry, NULL, &kernel_high,
+> +                 /* little_endian = */ 0, ELF_MACHINE, 1, 0) < 0) {
+> +        error_report("qemu: could not load kernel '%s'", kernel_filename);
+> +        exit(1);
+> +    }
+> +    return kernel_entry;
+> +}
+> +
+> +static void create_fdt(SpikeState *s, const struct MemmapEntry *memmap,
+> +    uint64_t mem_size, const char *cmdline)
+> +{
+> +    void *fdt;
+> +    int cpu;
+> +    uint32_t *cells;
+> +    char *nodename;
+> +
+> +    fdt = s->fdt = create_device_tree(&s->fdt_size);
+> +    if (!fdt) {
+> +        error_report("create_device_tree() failed");
+> +        exit(1);
+> +    }
+> +
+> +    qemu_fdt_setprop_string(fdt, "/", "model", "ucbbar,spike-bare,qemu");
+> +    qemu_fdt_setprop_string(fdt, "/", "compatible", "ucbbar,spike-bare-dev");
+> +    qemu_fdt_setprop_cell(fdt, "/", "#size-cells", 0x2);
+> +    qemu_fdt_setprop_cell(fdt, "/", "#address-cells", 0x2);
+> +
+> +    qemu_fdt_add_subnode(fdt, "/htif");
+> +    qemu_fdt_setprop_string(fdt, "/htif", "compatible", "ucb,htif0");
+> +
+> +    qemu_fdt_add_subnode(fdt, "/soc");
+> +    qemu_fdt_setprop(fdt, "/soc", "ranges", NULL, 0);
+> +    qemu_fdt_setprop_string(fdt, "/soc", "compatible", "ucbbar,spike-bare-soc");
+> +    qemu_fdt_setprop_cell(fdt, "/soc", "#size-cells", 0x2);
+> +    qemu_fdt_setprop_cell(fdt, "/soc", "#address-cells", 0x2);
+> +
+> +    nodename = g_strdup_printf("/memory@%lx",
+> +        (long)memmap[SPIKE_DRAM].base);
+> +    qemu_fdt_add_subnode(fdt, nodename);
+> +    qemu_fdt_setprop_cells(fdt, nodename, "reg",
+> +        memmap[SPIKE_DRAM].base >> 32, memmap[SPIKE_DRAM].base,
+> +        mem_size >> 32, mem_size);
+> +    qemu_fdt_setprop_string(fdt, nodename, "device_type", "memory");
+> +    g_free(nodename);
+> +
+> +    qemu_fdt_add_subnode(fdt, "/cpus");
+> +    qemu_fdt_setprop_cell(fdt, "/cpus", "timebase-frequency", 10000000);
+> +    qemu_fdt_setprop_cell(fdt, "/cpus", "#size-cells", 0x0);
+> +    qemu_fdt_setprop_cell(fdt, "/cpus", "#address-cells", 0x1);
+> +
+> +    for (cpu = s->soc.num_harts - 1; cpu >= 0; cpu--) {
+> +        nodename = g_strdup_printf("/cpus/cpu@%d", cpu);
+> +        char *intc = g_strdup_printf("/cpus/cpu@%d/interrupt-controller", cpu);
+> +        char *isa = riscv_isa_string(&s->soc.harts[cpu]);
+> +        qemu_fdt_add_subnode(fdt, nodename);
+> +        qemu_fdt_setprop_cell(fdt, nodename, "clock-frequency", 1000000000);
+> +        qemu_fdt_setprop_string(fdt, nodename, "mmu-type", "riscv,sv48");
+> +        qemu_fdt_setprop_string(fdt, nodename, "riscv,isa", isa);
+> +        qemu_fdt_setprop_string(fdt, nodename, "compatible", "riscv");
+> +        qemu_fdt_setprop_string(fdt, nodename, "status", "okay");
+> +        qemu_fdt_setprop_cell(fdt, nodename, "reg", cpu);
+> +        qemu_fdt_setprop_string(fdt, nodename, "device_type", "cpu");
+> +        qemu_fdt_add_subnode(fdt, intc);
+> +        qemu_fdt_setprop_cell(fdt, intc, "phandle", 1);
+> +        qemu_fdt_setprop_cell(fdt, intc, "linux,phandle", 1);
+> +        qemu_fdt_setprop_string(fdt, intc, "compatible", "riscv,cpu-intc");
+> +        qemu_fdt_setprop(fdt, intc, "interrupt-controller", NULL, 0);
+> +        qemu_fdt_setprop_cell(fdt, intc, "#interrupt-cells", 1);
+> +        g_free(isa);
+> +        g_free(intc);
+> +        g_free(nodename);
+> +    }
+> +
+> +    cells =  g_new0(uint32_t, s->soc.num_harts * 4);
+> +    for (cpu = 0; cpu < s->soc.num_harts; cpu++) {
+> +        nodename =
+> +            g_strdup_printf("/cpus/cpu@%d/interrupt-controller", cpu);
+> +        uint32_t intc_phandle = qemu_fdt_get_phandle(fdt, nodename);
+> +        cells[cpu * 4 + 0] = cpu_to_be32(intc_phandle);
+> +        cells[cpu * 4 + 1] = cpu_to_be32(IRQ_M_SOFT);
+> +        cells[cpu * 4 + 2] = cpu_to_be32(intc_phandle);
+> +        cells[cpu * 4 + 3] = cpu_to_be32(IRQ_M_TIMER);
+> +        g_free(nodename);
+> +    }
+> +    nodename = g_strdup_printf("/soc/clint@%lx",
+> +        (long)memmap[SPIKE_CLINT].base);
+> +    qemu_fdt_add_subnode(fdt, nodename);
+> +    qemu_fdt_setprop_string(fdt, nodename, "compatible", "riscv,clint0");
+> +    qemu_fdt_setprop_cells(fdt, nodename, "reg",
+> +        0x0, memmap[SPIKE_CLINT].base,
+> +        0x0, memmap[SPIKE_CLINT].size);
+> +    qemu_fdt_setprop(fdt, nodename, "interrupts-extended",
+> +        cells, s->soc.num_harts * sizeof(uint32_t) * 4);
+> +    g_free(cells);
+> +    g_free(nodename);
+> +
+> +    qemu_fdt_add_subnode(fdt, "/chosen");
+> +    qemu_fdt_setprop_string(fdt, "/chosen", "bootargs", cmdline);
+> + }
+> +
+> +static void riscv_spike_board_init(MachineState *machine)
+> +{
+> +    const struct MemmapEntry *memmap = spike_memmap;
+> +
+> +    SpikeState *s = g_new0(SpikeState, 1);
+> +    /* const char *cpu_model = machine->cpu_model; */
+> +    /* const char *kernel_cmdline = machine->kernel_cmdline; */
+> +    /* const char *initrd_filename = machine->initrd_filename; */
+> +    MemoryRegion *system_memory = get_system_memory();
+> +    MemoryRegion *main_mem = g_new(MemoryRegion, 1);
+> +    MemoryRegion *boot_rom = g_new(MemoryRegion, 1);
+> +
+> +    /* Initialize SOC */
+> +    object_initialize(&s->soc, sizeof(s->soc), TYPE_RISCV_HART_ARRAY);
+> +    object_property_add_child(OBJECT(machine), "soc", OBJECT(&s->soc),
+> +                              &error_abort);
+> +    object_property_set_str(OBJECT(&s->soc), TYPE_RISCV_CPU_IMAFDCSU_PRIV_1_10,
+> +                            "cpu-model", &error_abort);
+> +    object_property_set_int(OBJECT(&s->soc), smp_cpus, "num-harts",
+> +                            &error_abort);
+> +    object_property_set_bool(OBJECT(&s->soc), true, "realized",
+> +                            &error_abort);
+> +
+> +    /* register system main memory (actual RAM) */
+> +    memory_region_init_ram(main_mem, NULL, "riscv.spike.ram",
+> +                           machine->ram_size, &error_fatal);
+> +    memory_region_add_subregion(system_memory, memmap[SPIKE_DRAM].base,
+> +        main_mem);
+> +
+> +    /* create device tree */
+> +    create_fdt(s, memmap, machine->ram_size, machine->kernel_cmdline);
+> +
+> +    /* boot rom */
+> +    memory_region_init_ram(boot_rom, NULL, "riscv.spike.bootrom",
+> +                           s->fdt_size + 0x2000, &error_fatal);
+> +    memory_region_add_subregion(system_memory, 0x0, boot_rom);
+> +
+> +    if (machine->kernel_filename) {
+> +        load_kernel(machine->kernel_filename);
+> +    }
+> +
+> +    /* reset vector */
+> +    uint32_t reset_vec[8] = {
+> +        0x00000297,                  /* 1:  auipc  t0, %pcrel_hi(dtb) */
+> +        0x02028593,                  /*     addi   a1, t0, %pcrel_lo(1b) */
+> +        0xf1402573,                  /*     csrr   a0, mhartid  */
+> +#if defined(TARGET_RISCV32)
+> +        0x0182a283,                  /*     lw     t0, 24(t0) */
+> +#elif defined(TARGET_RISCV64)
+> +        0x0182b283,                  /*     ld     t0, 24(t0) */
+> +#endif
+> +        0x00028067,                  /*     jr     t0 */
+> +        0x00000000,
+> +        memmap[SPIKE_DRAM].base,     /* start: .dword DRAM_BASE */
+> +        0x00000000,
+> +                                     /* dtb: */
+> +    };
+> +
+> +    /* copy in the reset vector */
+> +    cpu_physical_memory_write(memmap[SPIKE_MROM].base,
+> +        reset_vec, sizeof(reset_vec));
+> +
+> +    /* copy in the device tree */
+> +    qemu_fdt_dumpdtb(s->fdt, s->fdt_size);
+> +    cpu_physical_memory_write(memmap[SPIKE_MROM].base + sizeof(reset_vec),
+> +        s->fdt, s->fdt_size);
+> +
+> +    /* add memory mapped htif registers at location specified in the symbol
+> +       table of the elf being loaded (thus kernel_filename is passed to the
+> +       init rather than an address) */
+> +    htif_mm_init(system_memory, machine->kernel_filename,
+> +        s->soc.harts[0].env.irq[4], boot_rom,
+> +        &s->soc.harts[0].env, serial_hds[0]);
+> +
+> +    /* Core Local Interruptor (timer and IPI) */
+> +    sifive_clint_create(0x2000000, 0x10000, smp_cpus,
+> +        SIFIVE_SIP_BASE, SIFIVE_TIMECMP_BASE, SIFIVE_TIME_BASE);
+> +}
+> +
+> +static int riscv_spike_board_sysbus_device_init(SysBusDevice *sysbusdev)
+> +{
+> +    return 0;
+> +}
+> +
+> +static void riscv_spike_board_class_init(ObjectClass *klass, void *data)
+> +{
+> +    SysBusDeviceClass *k = SYS_BUS_DEVICE_CLASS(klass);
+> +    k->init = riscv_spike_board_sysbus_device_init;
+> +}
+> +
+> +static const TypeInfo riscv_spike_board_device = {
+> +    .name          = TYPE_RISCV_SPIKE_V1_10_0_BOARD,
+> +    .parent        = TYPE_SYS_BUS_DEVICE,
+> +    .instance_size = sizeof(SpikeState),
+> +    .class_init    = riscv_spike_board_class_init,
+> +};
+> +
+> +static void riscv_spike_board_machine_init(MachineClass *mc)
+> +{
+> +    mc->desc = "RISC-V Spike Board (Privileged ISA v1.10)";
+> +    mc->init = riscv_spike_board_init;
+> +    mc->max_cpus = 1;
+> +}
+> +
+> +DEFINE_MACHINE("spike_v1.10", riscv_spike_board_machine_init)
+> +
+> +static void riscv_spike_board_register_types(void)
+> +{
+> +    type_register_static(&riscv_spike_board_device);
+> +}
+> +
+> +type_init(riscv_spike_board_register_types);
+> diff --git a/include/hw/riscv/spike.h b/include/hw/riscv/spike.h
+> new file mode 100644
+> index 0000000..cb4d6ac
+> --- /dev/null
+> +++ b/include/hw/riscv/spike.h
+> @@ -0,0 +1,51 @@
+> +/*
+> + * SiFive U500 series machine interface
+> + *
+> + * Copyright (c) 2017 SiFive, Inc.
+> + *
+> + * Permission is hereby granted, free of charge, to any person obtaining a copy
+> + * of this software and associated documentation files (the "Software"), to deal
+> + * in the Software without restriction, including without limitation the rights
+> + * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+> + * copies of the Software, and to permit persons to whom the Software is
+> + * furnished to do so, subject to the following conditions:
+> + *
+> + * The above copyright notice and this permission notice shall be included in
+> + * all copies or substantial portions of the Software.
+> + *
+> + * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+> + * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+> + * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+> + * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+> + * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+> + * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+> + * THE SOFTWARE.
+> + */
+> +
+> +#ifndef HW_SPIKE_H
+> +#define HW_SPIKE_H
+> +
+> +#define TYPE_RISCV_SPIKE_V1_09_1_BOARD "riscv.spike_v1_9"
+> +#define TYPE_RISCV_SPIKE_V1_10_0_BOARD "riscv.spike_v1_10"
+> +
+> +#define SPIKE(obj) \
+> +    OBJECT_CHECK(SpikeState, (obj), TYPE_RISCV_SPIKE_BOARD)
+> +
+> +typedef struct {
+> +    /*< private >*/
+> +    SysBusDevice parent_obj;
+> +
+> +    /*< public >*/
+> +    RISCVHartArrayState soc;
+> +    void *fdt;
+> +    int fdt_size;
+> +} SpikeState;
+> +
+> +
+> +enum {
+> +    SPIKE_MROM,
+> +    SPIKE_CLINT,
+> +    SPIKE_DRAM
+> +};
+> +
+> +#endif
