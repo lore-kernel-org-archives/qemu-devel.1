@@ -1,30 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60138)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37346)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1eb3rL-0000jA-As
-	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 07:27:28 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1eb4CH-0008MO-SR
+	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 07:49:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1eb3rI-00083h-7n
-	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 07:27:27 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:44792)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1eb3rI-00083R-0q
-	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 07:27:24 -0500
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 425092DB731
-	for <qemu-devel@nongnu.org>; Mon, 15 Jan 2018 12:27:18 +0000 (UTC)
-Date: Mon, 15 Jan 2018 10:27:13 -0200
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20180115122713.GL6646@localhost.localdomain>
-References: <20180109154519.25634-1-ehabkost@redhat.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1eb4CH-00040f-3O
+	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 07:49:05 -0500
+Received: from mail-oi0-x22c.google.com ([2607:f8b0:4003:c06::22c]:32791)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1eb4CG-00040Q-Ud
+	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 07:49:05 -0500
+Received: by mail-oi0-x22c.google.com with SMTP id y141so8203361oia.0
+	for <qemu-devel@nongnu.org>; Mon, 15 Jan 2018 04:49:04 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180109154519.25634-1-ehabkost@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 0/7] CPU model updates for CVE-2017-5715
- (Spectre variant #2)
+In-Reply-To: <1511879725-9576-1-git-send-email-peter.maydell@linaro.org>
+References: <1511879725-9576-1-git-send-email-peter.maydell@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 15 Jan 2018 12:48:43 +0000
+Message-ID: <CAFEAcA90dgSX9kYC5TbPBV2UHgQjz3HWT3eyE4RUC6x9P=7_QQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH 0/2] linux-user: Fix race between threads
+ in page_unprotect()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,43 +29,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>
+To: QEMU Developers <qemu-devel@nongnu.org>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Riku Voipio <riku.voipio@iki.fi>, Richard Henderson <rth@twiddle.net>, Laurent Vivier <laurent@vivier.eu>, "patches@linaro.org" <patches@linaro.org>
 
-On Tue, Jan 09, 2018 at 01:45:12PM -0200, Eduardo Habkost wrote:
-> This series adds support for the new IA32_SPEC_CTRL MSR on Intel
-> CPU models.  The new MSR and the spec-ctrl CPUID bit
-> (CPUID[EAX=7,ECX=0].EDX[bit 26]) were introduced by a recent
-> Intel microcode updated and can be used by OSes to mitigate
-> CVE-2017-5715.
-> 
-> It also adds a new EPYC-IBPB CPU model that includes
-> CPUID[0x80000008].EBX[bit 12] (IBPB).  That patch is a RFC
-> because I couldn't find any detailed info on the new CPUID bit
-> and the IA32_PRED_CMD MSR.
-> 
-> Additionally, the last patch on this series changes the new
-> Westmere-IBRS, SandyBridge-IBRS and IvyBridge-IBRS to include the
-> PCID feature, because PCID helps to reduce the performance impact
-> of KPTI on the guest.  The patch is also a RFC because we need to
-> confirm if all Westmere (and newer) CPUs out there have PCID
-> available.
-> 
-> References:
-> * https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2017-5715
-> * Google Security Blog on Meltdown/Spectre mitigations:
->   https://security.googleblog.com/2018/01/more-details-about-mitigations-for-cpu_4.html
-> * Kernel patches to make use of the new MSRs:
->   https://www.mail-archive.com/linux-kernel@vger.kernel.org/msg1578798.html
-> * KVM kernel patches for the new CPUID bits and MSRs:
->   https://www.mail-archive.com/linux-kernel@vger.kernel.org/msg1580363.html
-> * Patches adding PCID to the existing CPU models:
->   https://patchew.org/QEMU/20180108205052.24385-1-vincent@bernat.im
->   https://patchew.org/QEMU/20180109070112.30806-1-vincent@bernat.im
+On 28 November 2017 at 14:35, Peter Maydell <peter.maydell@linaro.org> wrote:
+> If multiple guest threads in user-mode emulation write to a
+> page which QEMU has marked read-only because of cached TCG
+> translations, the threads can race in page_unprotect:
 
-Intel docs for the new CPUID flags and MSRs were finally
-published:
-https://software.intel.com/sites/default/files/managed/c5/63/336996-Speculative-Execution-Side-Channel-Mitigations.pdf
+> Peter Maydell (2):
+>   linux-user: Propagate siginfo_t through to handle_cpu_signal()
+>   page_unprotect(): handle calls to pages that are PAGE_WRITE
 
--- 
-Eduardo
+Ping! Linux-user maintainers, any chance this could get into
+a pull-request sometime soon? (I have another cleanup I'm
+thinking of that will touch the same code so I'd rather this
+went into master before I look at that.)
+
+(I have a bunch of other pending linux-user patchsets which
+I shan't bother to ping individually unless you want me to.)
+
+thanks
+-- PMM
