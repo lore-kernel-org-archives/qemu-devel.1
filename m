@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50958)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50937)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1ebS4f-0003e8-IG
-	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 09:18:50 -0500
+	(envelope-from <paolo.bonzini@gmail.com>) id 1ebS4d-0003bl-QK
+	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 09:18:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1ebS4a-0005Rk-Qp
-	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 09:18:49 -0500
-Received: from mail-wm0-x241.google.com ([2a00:1450:400c:c09::241]:38888)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1ebS4Y-0005Pd-5o
+	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 09:18:47 -0500
+Received: from mail-wr0-x241.google.com ([2a00:1450:400c:c0c::241]:46887)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1ebS4a-0005RK-KD
-	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 09:18:44 -0500
-Received: by mail-wm0-x241.google.com with SMTP id 141so8907992wme.3
-	for <qemu-devel@nongnu.org>; Tue, 16 Jan 2018 06:18:44 -0800 (PST)
+	id 1ebS4X-0005P7-W1
+	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 09:18:42 -0500
+Received: by mail-wr0-x241.google.com with SMTP id g21so15303908wrb.13
+	for <qemu-devel@nongnu.org>; Tue, 16 Jan 2018 06:18:41 -0800 (PST)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Tue, 16 Jan 2018 15:17:27 +0100
-Message-Id: <1516112253-14480-46-git-send-email-pbonzini@redhat.com>
+Date: Tue, 16 Jan 2018 15:17:26 +0100
+Message-Id: <1516112253-14480-45-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1516112253-14480-1-git-send-email-pbonzini@redhat.com>
 References: <1516112253-14480-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 45/51] cpu_physical_memory_sync_dirty_bitmap:
- Another alignment fix
+Subject: [Qemu-devel] [PULL 44/51] checkpatch: Enforce proper do/while (0)
+ style
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,53 +29,48 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+From: Eric Blake <eblake@redhat.com>
 
-This code has an optimised, word aligned version, and a boring
-unaligned version. My commit f70d345 fixed one alignment issue, but
-there's another.
+Use of a loop construct for code that is not intended to repeat
+does not make much idiomatic sense, except in one place: it is a
+common usage in macros in order to wrap arbitrary code with
+single-statement semantics.  But when used in a macro, it is more
+typical for the caller to supply the trailing ';' when calling
+the macro.
 
-The optimised version operates on 'longs' dealing with (typically) 64
-pages at a time, replacing the whole long by a 0 and counting the bits.
-If the Ramblock is less than 64bits in length that long can contain bits
-representing two different RAMBlocks, but the code will update the
-bmap belinging to the 1st RAMBlock only while having updated the total
-dirty page count for both.
+Although qemu coding style frowns on bare:
+  if (cond)
+    statement1;
+  else
+    statement2;
+where extra semicolons actually cause syntax errors, we still
+want our macro styles to be easily copied to other projects.
+Thus, declare it an error if we encounter any form of 'while (0)'
+with a semicolon in the same line.
 
-This probably didn't matter prior to 6b6712ef which split the dirty
-bitmap by RAMBlock, but now they're separate RAMBlocks we end up
-with a count that doesn't match the state in the bitmaps.
-
-Symptom:
-  Migration showing a few dirty pages left to be sent constantly
-  Seen on aarch64 and x86 with x86+ovmf
-
-Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-Reported-by: Wei Huang <wei@redhat.com>
-Fixes: 6b6712efccd383b48a909bee0b29e079a57601ec
+Signed-off-by: Eric Blake <eblake@redhat.com>
+Message-Id: <20171201232433.25193-8-eblake@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- include/exec/ram_addr.h | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+ scripts/checkpatch.pl | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-diff --git a/include/exec/ram_addr.h b/include/exec/ram_addr.h
-index 6cbc02a..7633ef6 100644
---- a/include/exec/ram_addr.h
-+++ b/include/exec/ram_addr.h
-@@ -391,9 +391,10 @@ uint64_t cpu_physical_memory_sync_dirty_bitmap(RAMBlock *rb,
-     uint64_t num_dirty = 0;
-     unsigned long *dest = rb->bmap;
+diff --git a/scripts/checkpatch.pl b/scripts/checkpatch.pl
+index 3dc27d9..accba24 100755
+--- a/scripts/checkpatch.pl
++++ b/scripts/checkpatch.pl
+@@ -1622,6 +1622,11 @@ sub process {
+ 			}
+ 		}
  
--    /* start address is aligned at the start of a word? */
-+    /* start address and length is aligned at the start of a word? */
-     if (((word * BITS_PER_LONG) << TARGET_PAGE_BITS) ==
--         (start + rb->offset)) {
-+         (start + rb->offset) &&
-+        !(length & ((BITS_PER_LONG << TARGET_PAGE_BITS) - 1))) {
-         int k;
-         int nr = BITS_TO_LONGS(length >> TARGET_PAGE_BITS);
-         unsigned long * const *src;
++# 'do ... while (0/false)' only makes sense in macros, without trailing ';'
++		if ($line =~ /while\s*\((0|false)\);/) {
++			ERROR("suspicious ; after while (0)\n" . $herecurr);
++		}
++
+ # Check relative indent for conditionals and blocks.
+ 		if ($line =~ /\b(?:(?:if|while|for)\s*\(|do\b)/ && $line !~ /^.\s*#/ && $line !~ /\}\s*while\s*/) {
+ 			my ($s, $c) = ($stat, $cond);
 -- 
 1.8.3.1
