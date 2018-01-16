@@ -1,22 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58420)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59757)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ebXO1-0003by-6f
-	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 14:59:11 -0500
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1ebXSA-0006QD-0g
+	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 15:03:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ebXO0-0004CU-0e
-	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 14:59:09 -0500
-References: <20180111195225.4226-1-kwolf@redhat.com>
-	<20180111195225.4226-10-kwolf@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <64cf790b-485c-06dd-ad0e-7686914e3fa8@redhat.com>
-Date: Tue, 16 Jan 2018 13:59:00 -0600
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1ebXS4-0006Gj-DR
+	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 15:03:26 -0500
+Received: from chuckie.co.uk ([82.165.15.123]:51138
+	helo=s16892447.onlinehome-server.info)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
+	id 1ebXS4-0006G1-7C
+	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 15:03:20 -0500
+References: <20180115205848.26027-1-mark.cave-ayland@ilande.co.uk>
+	<b706db4f-b103-9433-9973-762c7c594005@amsat.org>
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Message-ID: <e60bf4f3-37cf-6924-4375-83524ad1e191@ilande.co.uk>
+Date: Tue, 16 Jan 2018 20:03:10 +0000
 MIME-Version: 1.0
-In-Reply-To: <20180111195225.4226-10-kwolf@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="vdKPCGydvojZ4WlApHZlkhSaE999VssoG"
-Subject: Re: [Qemu-devel] [RFC PATCH 09/10] qcow2: Use visitor for options
- in qcow2_create()
+In-Reply-To: <b706db4f-b103-9433-9973-762c7c594005@amsat.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-GB
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH] sun4u: implement power device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,122 +30,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-Cc: mreitz@redhat.com, pkrempa@redhat.com, qemu-devel@nongnu.org
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, atar4qemu@gmail.com, "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---vdKPCGydvojZ4WlApHZlkhSaE999VssoG
-From: Eric Blake <eblake@redhat.com>
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-Cc: mreitz@redhat.com, pkrempa@redhat.com, qemu-devel@nongnu.org
-Message-ID: <64cf790b-485c-06dd-ad0e-7686914e3fa8@redhat.com>
-Subject: Re: [RFC PATCH 09/10] qcow2: Use visitor for options in
- qcow2_create()
-References: <20180111195225.4226-1-kwolf@redhat.com>
- <20180111195225.4226-10-kwolf@redhat.com>
-In-Reply-To: <20180111195225.4226-10-kwolf@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On 16/01/18 00:54, Philippe Mathieu-Daudé wrote:
 
-On 01/11/2018 01:52 PM, Kevin Wolf wrote:
-> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-> ---
->  block/qcow2.c              | 227 ++++++++++++++++++-------------------=
---------
->  tests/qemu-iotests/049.out |  10 +-
->  2 files changed, 93 insertions(+), 144 deletions(-)
->=20
+> CC'ing PCI maintainers.
+> 
+> Hi Mark,
+> 
+> On 01/15/2018 05:58 PM, Mark Cave-Ayland wrote:
+>> This inbuilt device contains a single 4-byte register, of which bit 24 is used
+>> to power down the machine on a real Ultra 5.
+>>
+>> The power device exists at offset 0x724000 on a real machine, but due to the
+>> current configuration of the BARs in QEMU it must be located lower in PCI IO
+>> space.
+> Is is some issue in pci_bar_address()?
 
+Hi Philippe,
 
-> +    /* Only the keyval visitor supports the dotted syntax needed for
-> +     * encryption, so go through a QDict before getting a QAPI type. I=
-gnore
-> +     * options meant for the protocol layer so that the visitor doesn'=
-t
-> +     * complain. */
-> +    qdict =3D qemu_opts_to_qdict_filtered(opts, NULL, bdrv_qcow2.creat=
-e_opts,
-> +                                        true);
+It's not an issue with QEMU at all, more the way in which the on-board 
+devices are mapped. From memory there are 3 different issues with the 
+current setup:
 
-Whether we like it or not, the keyval visitor is getting more and more
-important!
+- OpenBIOS uses PCI IO space accesses for all its drivers
 
-> +
-> +    /* TODO QAPI doesn't allow dots in enum values. Either change QAPI=
- or
-> +     * decide on the proper new representation for blockdev-create */
-> +    val =3D qdict_get_try_str(qdict, BLOCK_OPT_COMPAT_LEVEL);
-> +    if (val && !strcmp(val, "0.10")) {
-> +        qdict_put_str(qdict, BLOCK_OPT_COMPAT_LEVEL, "0_10");
-> +    } else if (val && !strcmp(val, "1.1")) {
-> +        qdict_put_str(qdict, BLOCK_OPT_COMPAT_LEVEL, "1_1");
+In a real Ultra 5 the on-board devices are behind a memory BAR but 
+everything in OpenBIOS is hard-coded to use IO accesses. Changing that 
+will be fairly hard.
 
-Yeah, I flagged that in the earlier QAPI patch. The fact that it starts
-with a number at all is also a bit worrying (we have to support leading
-digits for legacy reasons in QKeyCode, but maybe naming things just 'v2'
-and 'v3' might be cleaner than '0_10' and '1_1'?)
+- Some OSs use the ebus BAR to access the onboard devices, others use 
+the direct physical accesses
 
+This means that the ebus BAR has to be located at address zero (even 
+though its in slot 1) for both accesses to work. The first part of PCI 
+IO space containing the ebus is then aliased back onto its physical 
+address to make everything consistent.
 
-> +    /* Now get the QAPI type BlockdevCreateOptions */
-> +    qobj =3D qdict_crumple(qdict, errp);
-> +    QDECREF(qdict);
-> +    qdict =3D qobject_to_qdict(qobj);
-> +    if (qdict =3D=3D NULL) {
->          ret =3D -EINVAL;
->          goto finish;
->      }
-> =20
-> -    if (qemu_opt_get_bool_del(opts, BLOCK_OPT_LAZY_REFCOUNTS, false)) =
-{
-> -        flags |=3D BLOCK_FLAG_LAZY_REFCOUNTS;
-> -    }
-> +    v =3D qobject_input_visitor_new_keyval(QOBJECT(qdict));
-> +    visit_type_BlockdevCreateOptions(v, NULL, &create_options, &local_=
-err);
-> +    visit_free(v);
+- Linux sabre fix-up bug
 
-Feels like a lot of round-tripping between formats to get things this
-compact - but it's as good as anything else I can come up with.
+Potentially this could be fixed by increasing the base physical address 
+of the simba IO space, however Linux has a fixup routine for this 
+particular PCI host bridge and this has a bug which means that it 
+presumes the lower word of the address is 0 (like a real Ultra 5) rather 
+than reading it from the DT.
+
+Therefore whilst moving the base of PCI IO space within the physical 
+address space should work, due to this bug the PCI addresses are 
+converted incorrectly from physical addresses causing a panic.
+
+>> For the moment we place the power device at offset 0x7240 as a reminder of its
+>> original location and raise the base PCI IO address from 0x4000 to 0x8000.
+> 
+> If we can't fix it, I rather prefer a #define with a comment in the
+> code, IMHO this is safer and easier to remember than looking in git history.
+
+Well TBH just about all of the current devices for sun4u are either 
+incorrect or located at the wrong address, and could possibly change 
+later if required for Solaris compatibility. So while things are still 
+quite fluid, I'm more inclined to leave them as hard-coded offsets 
+(similarly in OpenBIOS) until things become more clear.
 
 
-> +++ b/tests/qemu-iotests/049.out
-> @@ -106,7 +106,7 @@ qemu-img: Value '-1k' is out of range for parameter=
- 'size'
->  qemu-img: TEST_DIR/t.qcow2: Invalid options for file format 'qcow2'
-> =20
->  qemu-img create -f qcow2 TEST_DIR/t.qcow2 -- 1kilobyte
-> -qemu-img: Invalid image size specified! You may use k, M, G, T, P or E=
- suffixes for
-> +qemu-img: Invalid image size specified! You may use k, M, G, T, P or E=
- suffixes for=20
+ATB,
 
-Why are you re-adding trailing whitespace?
-
-Overall seems sane.
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---vdKPCGydvojZ4WlApHZlkhSaE999VssoG
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlpeWYQACgkQp6FrSiUn
-Q2rt1ggArjeaYmxDhZvYguuZ0PBM7PEpfiXDEbXjX3rNMT3+LpuJ4C0pj4oO2szA
-CFms7R6jUdFWWpn6BLgFg324Gd/LbIM7i8aOPxhaWRSsv3wcOwPE9xThue9EWPnJ
-YwITvGs2o1IyatRF7eJWFEWReyHAha4D+xdaxLNlP7T4jgCq2eA2u0UA01ozY+rr
-a6liT1G6gMWZowyohkeT9ofKebj7Z/RaeUrO0i1MdNAZJC6R9mJm6pnWTgig5Y60
-N374T9/BF7MOgNs4DEoCBCjEB6ttj2NG+sUBBVyh7eMj8C99ahZJMm0uOS9/Ze0s
-wazmfeTuHLKvpiJqDyresUwS7kNYAg==
-=y+8V
------END PGP SIGNATURE-----
-
---vdKPCGydvojZ4WlApHZlkhSaE999VssoG--
+Mark.
