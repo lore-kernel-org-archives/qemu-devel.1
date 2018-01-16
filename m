@@ -1,22 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51813)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51866)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ebX1M-00038S-3s
-	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 14:35:44 -0500
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1ebX1l-0003NS-My
+	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 14:36:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ebX1L-0001yQ-2b
-	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 14:35:44 -0500
-References: <20180111195225.4226-1-kwolf@redhat.com>
-	<20180111195225.4226-6-kwolf@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <63d5617c-67c7-6ffd-e312-01ba3f63af6a@redhat.com>
-Date: Tue, 16 Jan 2018 13:35:31 -0600
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1ebX1h-00029a-Kj
+	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 14:36:09 -0500
+Received: from chuckie.co.uk ([82.165.15.123]:51025
+	helo=s16892447.onlinehome-server.info)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
+	id 1ebX1h-00025Q-DW
+	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 14:36:05 -0500
+References: <20180110204327.22510-1-jcd@tribudubois.net>
+	<a2aa7ea7-ac15-d69e-82cd-dad6c89c61c7@adacore.com>
+	<c8bc330c-d03e-4b2e-87dd-5c5b4d66499f@ilande.co.uk>
+	<c710275e-a7c6-8356-0de1-9869d1b1a245@adacore.com>
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Message-ID: <70f971e3-0120-c58d-9ddc-f718d117574a@ilande.co.uk>
+Date: Tue, 16 Jan 2018 19:35:47 +0000
 MIME-Version: 1.0
-In-Reply-To: <20180111195225.4226-6-kwolf@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="osYxAagBDmQt0mcEjIjKwBwnoEvGi0UP6"
-Subject: Re: [Qemu-devel] [RFC PATCH 05/10] qcow2: Use BlockdevRef in
- qcow2_create2()
+In-Reply-To: <c710275e-a7c6-8356-0de1-9869d1b1a245@adacore.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-GB
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH] LEON3 IRQMP: Fix IRQ software ack
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,59 +32,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-Cc: mreitz@redhat.com, pkrempa@redhat.com, qemu-devel@nongnu.org
+To: Fabien Chouteau <chouteau@adacore.com>, Jean-Christophe Dubois <jcd@tribudubois.net>
+Cc: qemu-devel@nongnu.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---osYxAagBDmQt0mcEjIjKwBwnoEvGi0UP6
-From: Eric Blake <eblake@redhat.com>
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-Cc: mreitz@redhat.com, pkrempa@redhat.com, qemu-devel@nongnu.org
-Message-ID: <63d5617c-67c7-6ffd-e312-01ba3f63af6a@redhat.com>
-Subject: Re: [RFC PATCH 05/10] qcow2: Use BlockdevRef in qcow2_create2()
-References: <20180111195225.4226-1-kwolf@redhat.com>
- <20180111195225.4226-6-kwolf@redhat.com>
-In-Reply-To: <20180111195225.4226-6-kwolf@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On 16/01/18 10:21, Fabien Chouteau wrote:
 
-On 01/11/2018 01:52 PM, Kevin Wolf wrote:
-> Instead of passing a separate BlockDriverState* into qcow2_create2(),
-> make use of the BlockdevRef that is included in BlockdevCreateOptions.
->=20
-> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-> ---
->  include/block/block.h |  1 +
->  block.c               | 39 +++++++++++++++++++++++++++++++++++++++
->  block/qcow2.c         | 33 +++++++++++++++++++++------------
->  3 files changed, 61 insertions(+), 12 deletions(-)
->=20
+> On 15/01/2018 19:16, Mark Cave-Ayland wrote:
+>> On 11/01/18 11:48, Fabien Chouteau wrote:
+>>
+>>> On 10/01/2018 21:43, Jean-Christophe Dubois wrote:
+>>>> With the LEON3 IRQ controller IRQs can be acknoledged 2 ways:
+>>>> * Explicitely by software writing to the CLEAR_OFFSET register
+>>>> * Implicitely when the procesor is done running the trap handler attached
+>>>>     to the IRQ.
+>>>>
+>>>
+>>> Thanks Jean-Christophe,
+>>>
+>>> I tested the patch with our software and it works.
+>>>
+>>> Reviewed-by: Fabien Chouteau <chouteau@adacore.com>
+>>
+>> Thanks Fabien. Does that mean you would like me to take this patch for my qemu-sparc branch?
+>>
+> 
+> Yes please :)
+> 
+> Should I use Acked-by?
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+I already have your Reviewed-by from a previous email so that's fine 
+with me.
 
 
---osYxAagBDmQt0mcEjIjKwBwnoEvGi0UP6
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+ATB,
 
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlpeVAMACgkQp6FrSiUn
-Q2py9QgApLP9QJRXzGzl2zJJ5YLr1McbQENZ1O3jtDGUyDzHLJAXF93R20qC27t2
-QLsQho8bXI5ClQTygA3VbZV10qMhCccR9bK94H4QBSHU+uFbEkLK9FOY1wlSqcXH
-j1SQaGbQtsUw0hCW1y0yuDfn2BPLmzPCW6Kqq5xpSyLX6FupGosFs0jsw39Tu5xM
-2jq7ZEU8qKl/BG3P996VDdSN0meeJ5rPyCpP5FhScVwGOtMpXNHhiEUPRHJXCmuX
-CMn3uksQGzHJoiZFPTOuICStYEF751YXNNQOnJqwpsw4oxglpS116+yQ2UP7ALY5
-N4gavZIKBwKhS43I09utpx+zMoQibg==
-=tIuf
------END PGP SIGNATURE-----
-
---osYxAagBDmQt0mcEjIjKwBwnoEvGi0UP6--
+Mark.
