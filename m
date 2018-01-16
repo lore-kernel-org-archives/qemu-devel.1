@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48300)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48326)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1ebJAN-00008N-DF
-	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 23:48:10 -0500
+	(envelope-from <mst@redhat.com>) id 1ebJAQ-0000BT-Hg
+	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 23:48:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1ebJAM-000503-IQ
-	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 23:48:07 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:34604)
+	(envelope-from <mst@redhat.com>) id 1ebJAN-00050T-Ft
+	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 23:48:10 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:57178)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1ebJAM-0004zp-8l
-	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 23:48:06 -0500
-Date: Tue, 16 Jan 2018 06:47:57 +0200
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1ebJAN-000508-6F
+	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 23:48:07 -0500
+Date: Tue, 16 Jan 2018 06:48:05 +0200
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <1516077852-7974-21-git-send-email-mst@redhat.com>
+Message-ID: <1516077852-7974-22-git-send-email-mst@redhat.com>
 References: <1516077852-7974-1-git-send-email-mst@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 In-Reply-To: <1516077852-7974-1-git-send-email-mst@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 20/33] vhost-user-test: use init_virtio_dev in
- multiqueue test
+Subject: [Qemu-devel] [PULL 21/33] vhost: Build temporary section list and
+ deref after commit
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,116 +28,179 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Maxime Coquelin <maxime.coquelin@redhat.com>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Eric Blake <eblake@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Igor Mammedov <imammedo@redhat.com>
 
-From: Maxime Coquelin <maxime.coquelin@redhat.com>
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-Now that init_virtio_dev() has been generalized to all cases,
-use it in test_multiqueue() to avoid code duplication.
+Igor spotted that there's a race, where a region that's unref'd
+in a _del callback might be free'd before the set_mem_table call in
+the _commit callback, and thus the vhost might end up using free memory.
 
-Signed-off-by: Maxime Coquelin <maxime.coquelin@redhat.com>
+Fix this by building a complete temporary sections list, ref'ing every
+section (during add and nop) and then unref'ing the whole list right
+at the end of commit.
+
+Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Reviewed-by: Igor Mammedov <imammedo@redhat.com>
 ---
- tests/vhost-user-test.c | 65 ++++++-------------------------------------=
-------
- 1 file changed, 8 insertions(+), 57 deletions(-)
+ include/hw/virtio/vhost.h |  2 ++
+ hw/virtio/vhost.c         | 73 ++++++++++++++++++++++++++++++-----------------
+ 2 files changed, 49 insertions(+), 26 deletions(-)
 
-diff --git a/tests/vhost-user-test.c b/tests/vhost-user-test.c
-index 6a144e8..ec6ac9d 100644
---- a/tests/vhost-user-test.c
-+++ b/tests/vhost-user-test.c
-@@ -892,79 +892,30 @@ static void test_flags_mismatch(void)
-=20
- #endif
-=20
--static QVirtioPCIDevice *virtio_net_pci_init(QPCIBus *bus, int slot)
--{
--    QVirtioPCIDevice *dev;
--
--    dev =3D qvirtio_pci_device_find(bus, VIRTIO_ID_NET);
--    g_assert(dev !=3D NULL);
--    g_assert_cmphex(dev->vdev.device_type, =3D=3D, VIRTIO_ID_NET);
--
--    qvirtio_pci_device_enable(dev);
--    qvirtio_reset(&dev->vdev);
--    qvirtio_set_acknowledge(&dev->vdev);
--    qvirtio_set_driver(&dev->vdev);
--
--    return dev;
--}
--
--static void driver_init(QVirtioDevice *dev)
--{
--    uint32_t features;
--
--    features =3D qvirtio_get_features(dev);
--    features =3D features & ~(QVIRTIO_F_BAD_FEATURE |
--                            (1u << VIRTIO_RING_F_INDIRECT_DESC) |
--                            (1u << VIRTIO_RING_F_EVENT_IDX));
--    qvirtio_set_features(dev, features);
--
--    qvirtio_set_driver_ok(dev);
--}
--
--#define PCI_SLOT                0x04
--
- static void test_multiqueue(void)
+diff --git a/include/hw/virtio/vhost.h b/include/hw/virtio/vhost.h
+index 1dc2d73..09854b6 100644
+--- a/include/hw/virtio/vhost.h
++++ b/include/hw/virtio/vhost.h
+@@ -60,6 +60,8 @@ struct vhost_dev {
+     struct vhost_memory *mem;
+     int n_mem_sections;
+     MemoryRegionSection *mem_sections;
++    int n_tmp_sections;
++    MemoryRegionSection *tmp_sections;
+     struct vhost_virtqueue *vqs;
+     int nvqs;
+     /* the first virtqueue which would be used by this vhost dev */
+diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
+index 386aef8..8a85dde 100644
+--- a/hw/virtio/vhost.c
++++ b/hw/virtio/vhost.c
+@@ -621,6 +621,8 @@ static void vhost_begin(MemoryListener *listener)
+                                          memory_listener);
+     dev->mem_changed_end_addr = 0;
+     dev->mem_changed_start_addr = -1;
++    dev->tmp_sections = NULL;
++    dev->n_tmp_sections = 0;
+ }
+ 
+ static void vhost_commit(MemoryListener *listener)
+@@ -629,17 +631,25 @@ static void vhost_commit(MemoryListener *listener)
+                                          memory_listener);
+     hwaddr start_addr = 0;
+     ram_addr_t size = 0;
++    MemoryRegionSection *old_sections;
++    int n_old_sections;
++
+     uint64_t log_size;
+     int r;
+ 
++    old_sections = dev->mem_sections;
++    n_old_sections = dev->n_mem_sections;
++    dev->mem_sections = dev->tmp_sections;
++    dev->n_mem_sections = dev->n_tmp_sections;
++
+     if (!dev->memory_changed) {
+-        return;
++        goto out;
+     }
+     if (!dev->started) {
+-        return;
++        goto out;
+     }
+     if (dev->mem_changed_start_addr > dev->mem_changed_end_addr) {
+-        return;
++        goto out;
+     }
+ 
+     if (dev->started) {
+@@ -656,7 +666,7 @@ static void vhost_commit(MemoryListener *listener)
+             VHOST_OPS_DEBUG("vhost_set_mem_table failed");
+         }
+         dev->memory_changed = false;
+-        return;
++        goto out;
+     }
+     log_size = vhost_get_log_size(dev);
+     /* We allocate an extra 4K bytes to log,
+@@ -675,6 +685,27 @@ static void vhost_commit(MemoryListener *listener)
+         vhost_dev_log_resize(dev, log_size);
+     }
+     dev->memory_changed = false;
++
++out:
++    /* Deref the old list of sections, this must happen _after_ the
++     * vhost_set_mem_table to ensure the client isn't still using the
++     * section we're about to unref.
++     */
++    while (n_old_sections--) {
++        memory_region_unref(old_sections[n_old_sections].mr);
++    }
++    g_free(old_sections);
++    return;
++}
++
++static void vhost_add_section(struct vhost_dev *dev,
++                              MemoryRegionSection *section)
++{
++    ++dev->n_tmp_sections;
++    dev->tmp_sections = g_renew(MemoryRegionSection, dev->tmp_sections,
++                                dev->n_tmp_sections);
++    dev->tmp_sections[dev->n_tmp_sections - 1] = *section;
++    memory_region_ref(section->mr);
+ }
+ 
+ static void vhost_region_add(MemoryListener *listener,
+@@ -687,36 +718,31 @@ static void vhost_region_add(MemoryListener *listener,
+         return;
+     }
+ 
+-    ++dev->n_mem_sections;
+-    dev->mem_sections = g_renew(MemoryRegionSection, dev->mem_sections,
+-                                dev->n_mem_sections);
+-    dev->mem_sections[dev->n_mem_sections - 1] = *section;
+-    memory_region_ref(section->mr);
++    vhost_add_section(dev, section);
+     vhost_set_memory(listener, section, true);
+ }
+ 
+-static void vhost_region_del(MemoryListener *listener,
++static void vhost_region_nop(MemoryListener *listener,
+                              MemoryRegionSection *section)
  {
--    const int queues =3D 2;
-     TestServer *s =3D test_server_new("mq");
--    QVirtioPCIDevice *dev;
--    QPCIBus *bus;
--    QVirtQueuePCI *vq[queues * 2];
--    QGuestAllocator *alloc;
-     char *cmd;
+     struct vhost_dev *dev = container_of(listener, struct vhost_dev,
+                                          memory_listener);
 -    int i;
+ 
+     if (!vhost_section(section)) {
+         return;
+     }
+ 
+-    vhost_set_memory(listener, section, false);
+-    memory_region_unref(section->mr);
+-    for (i = 0; i < dev->n_mem_sections; ++i) {
+-        if (dev->mem_sections[i].offset_within_address_space
+-            == section->offset_within_address_space) {
+-            --dev->n_mem_sections;
+-            memmove(&dev->mem_sections[i], &dev->mem_sections[i+1],
+-                    (dev->n_mem_sections - i) * sizeof(*dev->mem_sections));
+-            break;
+-        }
++    vhost_add_section(dev, section);
++}
++
++static void vhost_region_del(MemoryListener *listener,
++                             MemoryRegionSection *section)
++{
++    if (!vhost_section(section)) {
++        return;
+     }
++
++    vhost_set_memory(listener, section, false);
+ }
+ 
+ static void vhost_iommu_unmap_notify(IOMMUNotifier *n, IOMMUTLBEntry *iotlb)
+@@ -783,11 +809,6 @@ static void vhost_iommu_region_del(MemoryListener *listener,
+     }
+ }
+ 
+-static void vhost_region_nop(MemoryListener *listener,
+-                             MemoryRegionSection *section)
+-{
+-}
 -
--    s->queues =3D queues;
-+    uint32_t features_mask =3D ~(QVIRTIO_F_BAD_FEATURE |
-+                            (1u << VIRTIO_RING_F_INDIRECT_DESC) |
-+                            (1u << VIRTIO_RING_F_EVENT_IDX));
-+    s->queues =3D 2;
-     test_server_listen(s);
-=20
-     cmd =3D g_strdup_printf(QEMU_CMD_MEM QEMU_CMD_CHR QEMU_CMD_NETDEV ",=
-queues=3D%d "
-                           "-device virtio-net-pci,netdev=3Dnet0,mq=3Don,=
-vectors=3D%d",
-                           512, 512, root, s->chr_name,
-                           s->socket_path, "", s->chr_name,
--                          queues, queues * 2 + 2);
-+                          s->queues, s->queues * 2 + 2);
-     qtest_start(cmd);
-     g_free(cmd);
-=20
--    bus =3D qpci_init_pc(NULL);
--    dev =3D virtio_net_pci_init(bus, PCI_SLOT);
-+    init_virtio_dev(s, features_mask);
-=20
--    alloc =3D pc_alloc_init();
--    for (i =3D 0; i < queues * 2; i++) {
--        vq[i] =3D (QVirtQueuePCI *)qvirtqueue_setup(&dev->vdev, alloc, i=
-);
--    }
-+    wait_for_rings_started(s, s->queues * 2);
-=20
--    driver_init(&dev->vdev);
--    wait_for_rings_started(s, queues * 2);
-+    uninit_virtio_dev(s);
-=20
--    /* End test */
--    for (i =3D 0; i < queues * 2; i++) {
--        qvirtqueue_cleanup(dev->vdev.bus, &vq[i]->vq, alloc);
--    }
--    pc_alloc_uninit(alloc);
--    qvirtio_pci_device_disable(dev);
--    g_free(dev->pdev);
--    g_free(dev);
--    qpci_free_pc(bus);
-     qtest_end();
-=20
-     test_server_free(s);
---=20
+ static int vhost_virtqueue_set_addr(struct vhost_dev *dev,
+                                     struct vhost_virtqueue *vq,
+                                     unsigned idx, bool enable_log)
+-- 
 MST
