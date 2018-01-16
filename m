@@ -1,42 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56571)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57324)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1ebHjr-0007vW-Kz
-	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 22:16:40 -0500
+	(envelope-from <mst@redhat.com>) id 1ebHni-00013t-Kw
+	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 22:20:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1ebHjm-0004NA-JY
-	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 22:16:39 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:36788
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bjsdjshi@linux.vnet.ibm.com>)
-	id 1ebHjm-0004N3-Ch
-	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 22:16:34 -0500
-Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w0G3EnAh070635
-	for <qemu-devel@nongnu.org>; Mon, 15 Jan 2018 22:16:33 -0500
-Received: from e12.ny.us.ibm.com (e12.ny.us.ibm.com [129.33.205.202])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2fh84ejjux-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 15 Jan 2018 22:16:33 -0500
-Received: from localhost
-	by e12.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <bjsdjshi@linux.vnet.ibm.com>;
-	Mon, 15 Jan 2018 22:16:32 -0500
-Date: Tue, 16 Jan 2018 11:16:27 +0800
-From: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
-References: <20180111030421.31418-1-bjsdjshi@linux.vnet.ibm.com>
-	<20180111115422.201987ee.cohuck@redhat.com>
-	<20180115085741.GB12499@bjsdjshi@linux.vnet.ibm.com>
-	<bd035cc2-1859-91da-9051-660caec6ac0f@linux.vnet.ibm.com>
+	(envelope-from <mst@redhat.com>) id 1ebHnd-0005mo-M6
+	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 22:20:38 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:49056)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1ebHnd-0005mY-CO
+	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 22:20:33 -0500
+Date: Tue, 16 Jan 2018 05:20:28 +0200
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20180116051952-mutt-send-email-mst@kernel.org>
+References: <20171218201340.27583-1-dgilbert@redhat.com>
+	<20171218201340.27583-5-dgilbert@redhat.com>
+	<20171227133403.42d43cf1@igors-macbook-pro.local>
+	<20180108180729.GI2462@work-vm>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <bd035cc2-1859-91da-9051-660caec6ac0f@linux.vnet.ibm.com>
-Message-Id: <20180116031627.GE12499@bjsdjshi@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [RFC PATCH 0/3] vfio: ccw: basic channel path
- event handling
+In-Reply-To: <20180108180729.GI2462@work-vm>
+Subject: Re: [Qemu-devel] [PATCH v5 4/7] vhost: Merge sections added to
+ temporary list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -45,86 +30,152 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pierre Morel <pmorel@linux.vnet.ibm.com>
-Cc: Cornelia Huck <cohuck@redhat.com>, Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org, kvm@vger.kernel.org, qemu-devel@nongnu.org, qemu-s390x@nongnu.org, borntraeger@de.ibm.com, pasic@linux.vnet.ibm.com
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org, pbonzini@redhat.com, maxime.coquelin@redhat.com, groug@kaod.org
 
-* Pierre Morel <pmorel@linux.vnet.ibm.com> [2018-01-15 11:21:47 +0100]:
-
-> On 15/01/2018 09:57, Dong Jia Shi wrote:
-> >* Cornelia Huck <cohuck@redhat.com> [2018-01-11 11:54:22 +0100]:
-> >
-> >>On Thu, 11 Jan 2018 04:04:18 +0100
-> >>Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com> wrote:
-> >>
-> >>>Hi Folks,
-> >>>
-> >>>Background
-> >>>==========
-> >>>
-> >>>Some days ago, we had a discussion on the topic of channel path virtualization.
-> >>>Ref:
-> >>>Subject: [PATCH 0/3] Channel Path realted CRW generation
-> >>>Message-Id: <20170727015418.85407-1-bjsdjshi@linux.vnet.ibm.com>
-> >>>URL: https://lists.nongnu.org/archive/html/qemu-devel/2017-07/msg08414.html
-> >>>
-> >>>Indeed that thread is not short and discussed many aspects in a
-> >>>non-concentrated manner. The parts those are most valuable to me are:
-> >>>1. a re-modelling for channel path is surely the best offer, but is not
-> >>>    possible to have in the near future.
-> >>>2. to enhance the path related functionalities, using PNO and PNOM might
-> >>>    be something we can do for now. This may be something that I could improve
-> >>>    without model related arguments.
-> >>>
-> >>>So here I have this series targeting to add basic channel path event handling
-> >>>for vfio-ccw -- no touch of the channel path modelling in both the kernel and
-> >>>the QEMU side, but find a way to sync path status change to guest lazily using
-> >>>SCSW_FLAGS_MASK_PNO and pmcw->pnom.  In short, I want to enhance path related
-> >>>stuff (to be more specific: sync up path status to the guest) on a best effort
-> >>>basis, which means in a way that won't get us invloed to do channel path
-> >>>re-modelling.
-> >>The guest should also get the updated PIM/PAM/POM, shouldn't it?
-> >>
-> >Yes. The following values will be updated for the guest:
-> >PMCW:
-> >   - PIM/PAM/POM
-> >   - PNOM
-> >   - CHPIDs
-> >SCSW
-> >   - PNOM bit
-> >
-> >See vfio_ccw_update_schib in patch #4 of the QEMU series.
-> >
-> >>>What benifit can we get from this? The administrator of a virtual machine can
-> >>>get uptodate (in some extent) status of the current using channel paths, so
-> >>>he/she can monitor paths status and get path problem noticed timely (see the
-> >>>example below).
-> >>>
-> >>>I think we can start a new round discussion based on this series. So reviewers
-> >>>can give their comments based on some code, and then we can decide if this is
-> >>>we want or not.
-> >>>
-> >>>As flagged with RFC, the intention of this series is to show what I have for
-> >>>now, and what could the code look like in general. Thus I can get some early
-> >>>feedbacks. I would expect to see opinions on:
-> >>>- is the target (mentioned above) of this series welcomed or not.
-> >>It certainly makes sense to have a way to get an updated schib.
-> >>
-> >:)
+On Mon, Jan 08, 2018 at 06:07:30PM +0000, Dr. David Alan Gilbert wrote:
+> * Igor Mammedov (imammedo@redhat.com) wrote:
+> > On Mon, 18 Dec 2017 20:13:37 +0000
+> > "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com> wrote:
+> > 
+> > > From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+> > > 
+> > > As sections are reported by the listener to the _nop and _add
+> > > methods, add them to the temporary section list but now merge them
+> > > with the previous section if the new one abuts and the backend allows.
+> > > 
+> > > Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> > beside small nit patch looks good to me, so with it fixed
+> > 
+> > Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+> > 
+> > > ---
+> > >  hw/virtio/trace-events |  2 ++
+> > >  hw/virtio/vhost.c      | 70 +++++++++++++++++++++++++++++++++++++++++++-------
+> > >  2 files changed, 63 insertions(+), 9 deletions(-)
+> > > 
+> > > diff --git a/hw/virtio/trace-events b/hw/virtio/trace-events
+> > > index 4a493bcd46..0e63c8739d 100644
+> > > --- a/hw/virtio/trace-events
+> > > +++ b/hw/virtio/trace-events
+> > > @@ -1,6 +1,8 @@
+> > >  # See docs/devel/tracing.txt for syntax documentation.
+> > >  
+> > >  # hw/virtio/vhost.c
+> > > +vhost_region_add_section(const char *name, uint64_t gpa, uint64_t size, uint64_t host) "%s: 0x%"PRIx64"+0x%"PRIx64" @ 0x%"PRIx64
+> > > +vhost_region_add_section_abut(const char *name, uint64_t new_size) "%s: 0x%"PRIx64
+> > >  vhost_section(const char *name, int r) "%s:%d"
+> > >  
+> > >  # hw/virtio/virtio.c
+> > > diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
+> > > index 18611f0d40..57d15acd2b 100644
+> > > --- a/hw/virtio/vhost.c
+> > > +++ b/hw/virtio/vhost.c
+> > > @@ -709,14 +709,65 @@ out:
+> > >      return;
+> > >  }
+> > >  
+> > > -static void vhost_add_section(struct vhost_dev *dev,
+> > > -                              MemoryRegionSection *section)
+> > > +/* Adds the section data to the tmp_section structure.
+> > > + * It relies on the listener calling us in memory address order
+> > > + * and for each region (via the _add and _nop methods) to
+> > > + * join neighbours.
+> > > + */
+> > > +static void vhost_region_add_section(struct vhost_dev *dev,
+> > > +                                 MemoryRegionSection *section)
+> > wrong alignment, should be on '('
 > 
-> I think so too, if the guest's administrator wants to be able to do
-> something.
+> Fixed, thanks.
 > 
-> But I would like to see something about path virtualization.
-Me too... As pointed in the discussion thread (URL listed above), this
-is something that really hard to have in the near future. The question
-is do we want some enhancements like this without channel path
-re-modelling, or we want nothing until we have the re-modelling firstly?
+> Dave
 
-> Having more accurate information on hardware without virtualization is a
-> big handicap for migration and hotplug.
-> 
-vfio-ccw does not support migration. What could be the handicap for
-that? :^)
+This is too big by now. I'm applying as is and you can fix with
+a patch on top.
 
--- 
-Dong Jia Shi
+> > >  {
+> > > -    ++dev->n_tmp_sections;
+> > > -    dev->tmp_sections = g_renew(MemoryRegionSection, dev->tmp_sections,
+> > > -                                dev->n_tmp_sections);
+> > > -    dev->tmp_sections[dev->n_tmp_sections - 1] = *section;
+> > > -    memory_region_ref(section->mr);
+> > > +    bool need_add = true;
+> > > +    uint64_t mrs_size = int128_get64(section->size);
+> > > +    uint64_t mrs_gpa = section->offset_within_address_space;
+> > > +    uintptr_t mrs_host = (uintptr_t)memory_region_get_ram_ptr(section->mr) +
+> > > +                         section->offset_within_region;
+> > > +
+> > > +    trace_vhost_region_add_section(section->mr->name, mrs_gpa, mrs_size,
+> > > +                                   mrs_host);
+> > > +
+> > > +    if (dev->n_tmp_sections) {
+> > > +        /* Since we already have at least one section, lets see if
+> > > +         * this extends it; since we're scanning in order, we only
+> > > +         * have to look at the last one, and the FlatView that calls
+> > > +         * us shouldn't have overlaps.
+> > > +         */
+> > > +        MemoryRegionSection *prev_sec = dev->tmp_sections +
+> > > +                                               (dev->n_tmp_sections - 1);
+> > > +        uint64_t prev_gpa_start = prev_sec->offset_within_address_space;
+> > > +        uint64_t prev_size = int128_get64(prev_sec->size);
+> > > +        uint64_t prev_gpa_end   = range_get_last(prev_gpa_start, prev_size);
+> > > +        uint64_t prev_host_start =
+> > > +                        (uintptr_t)memory_region_get_ram_ptr(prev_sec->mr) +
+> > > +                        prev_sec->offset_within_region;
+> > > +        uint64_t prev_host_end   = range_get_last(prev_host_start, prev_size);
+> > > +
+> > > +        if (prev_gpa_end + 1 == mrs_gpa &&
+> > > +            prev_host_end + 1 == mrs_host &&
+> > > +            section->mr == prev_sec->mr &&
+> > > +            (!dev->vhost_ops->vhost_backend_can_merge ||
+> > > +                dev->vhost_ops->vhost_backend_can_merge(dev,
+> > > +                    mrs_host, mrs_size,
+> > > +                    prev_host_start, prev_size))) {
+> > > +            /* The two sections abut */
+> > > +            need_add = false;
+> > > +            prev_sec->size = int128_add(prev_sec->size, section->size);
+> > > +            trace_vhost_region_add_section_abut(section->mr->name,
+> > > +                                                mrs_size + prev_size);
+> > > +        }
+> > > +    }
+> > > +
+> > > +    if (need_add) {
+> > > +        ++dev->n_tmp_sections;
+> > > +        dev->tmp_sections = g_renew(MemoryRegionSection, dev->tmp_sections,
+> > > +                                    dev->n_tmp_sections);
+> > > +        dev->tmp_sections[dev->n_tmp_sections - 1] = *section;
+> > > +        /* The flatview isn't stable and we don't use it, making it NULL
+> > > +         * means we can memcmp the list.
+> > > +         */
+> > > +        dev->tmp_sections[dev->n_tmp_sections - 1].fv = NULL;
+> > > +        memory_region_ref(section->mr);
+> > > +    }
+> > >  }
+> > >  
+> > >  static void vhost_region_add(MemoryListener *listener,
+> > > @@ -728,11 +779,12 @@ static void vhost_region_add(MemoryListener *listener,
+> > >      if (!vhost_section(section)) {
+> > >          return;
+> > >      }
+> > > +    vhost_region_add_section(dev, section);
+> > >  
+> > > -    vhost_add_section(dev, section);
+> > >      vhost_set_memory(listener, section, true);
+> > >  }
+> > >  
+> > > +/* Called on regions that have not changed */
+> > >  static void vhost_region_nop(MemoryListener *listener,
+> > >                               MemoryRegionSection *section)
+> > >  {
+> > > @@ -743,7 +795,7 @@ static void vhost_region_nop(MemoryListener *listener,
+> > >          return;
+> > >      }
+> > >  
+> > > -    vhost_add_section(dev, section);
+> > > +    vhost_region_add_section(dev, section);
+> > >  }
+> > >  
+> > >  static void vhost_region_del(MemoryListener *listener,
+> > 
+> --
+> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
