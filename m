@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33118)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34002)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1ebTsN-0006ni-Ja
-	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 11:14:21 -0500
+	(envelope-from <mdr@ashroe.eu>) id 1ebTuz-0000aP-Rn
+	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 11:16:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1ebTsH-0007x7-Lg
-	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 11:14:15 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:49168)
+	(envelope-from <mdr@ashroe.eu>) id 1ebTuw-0001cE-JJ
+	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 11:16:57 -0500
+Received: from mail.ashroe.eu ([94.176.239.133]:59722)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1ebTsH-0007w9-FJ
-	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 11:14:09 -0500
-Date: Tue, 16 Jan 2018 18:13:48 +0200
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20180116181343-mutt-send-email-mst@kernel.org>
-References: <1516117900-11382-1-git-send-email-stefanb@linux.vnet.ibm.com>
-	<1516117900-11382-4-git-send-email-stefanb@linux.vnet.ibm.com>
+	(Exim 4.71) (envelope-from <mdr@ashroe.eu>) id 1ebTuw-0001bM-Cb
+	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 11:16:54 -0500
+References: <1515924416-9266-1-git-send-email-ghammer@redhat.com>
+From: "Kinsella, Ray" <mdr@ashroe.eu>
+Message-ID: <4a649398-c643-33d2-f4ec-cd031b963e2f@ashroe.eu>
+Date: Tue, 16 Jan 2018 15:40:21 +0000
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <1516117900-11382-4-git-send-email-stefanb@linux.vnet.ibm.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 3/4] acpi: implement aml_lless_equal
+In-Reply-To: <1515924416-9266-1-git-send-email-ghammer@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+Subject: Re: [Qemu-devel] [PATCH 0/3 v2] virtio: improve virtio devices
+ initialization time
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,56 +28,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Berger <stefanb@linux.vnet.ibm.com>
-Cc: qemu-devel@nongnu.org, kevin@koconnor.net, marcandre.lureau@redhat.com, lersek@redhat.com
+To: Gal Hammer <ghammer@redhat.com>, qemu-devel@nongnu.org
+Cc: mst@redhat.com
 
-On Tue, Jan 16, 2018 at 10:51:39AM -0500, Stefan Berger wrote:
-> LLessEqualOp =3D LNotOp LGreaterOp
->=20
-> Signed-off-by: Stefan Berger <stefanb@linux.vnet.ibm.com>
-> Reviewed-by: Marc-Andr=E9 Lureau <marcandre.lureau@redhat.com>
-> Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+Hi Gal,
 
-Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+Brilliant - will test this in the next day or two.
+Hopefully this will help resolve the issues I reported last summer.
 
-> ---
->  hw/acpi/aml-build.c         | 11 +++++++++++
->  include/hw/acpi/aml-build.h |  1 +
->  2 files changed, 12 insertions(+)
->=20
-> diff --git a/hw/acpi/aml-build.c b/hw/acpi/aml-build.c
-> index 36a6cc4..c475f56 100644
-> --- a/hw/acpi/aml-build.c
-> +++ b/hw/acpi/aml-build.c
-> @@ -568,6 +568,17 @@ Aml *aml_lless(Aml *arg1, Aml *arg2)
->      return var;
->  }
-> =20
-> +/* ACPI 1.0b: 16.2.5.4 Type 2 Opcodes Encoding: DefLLessEqual */
-> +Aml *aml_lless_equal(Aml *arg1, Aml *arg2)
-> +{
-> +    /* LLessEqualOp :=3D LNotOp LGreaterOp */
-> +    Aml *var =3D aml_opcode(0x92 /* LNotOp */);
-> +    build_append_byte(var->buf, 0x94 /* LGreaterOp */);
-> +    aml_append(var, arg1);
-> +    aml_append(var, arg2);
-> +    return var;
-> +}
-> +
->  /* ACPI 1.0b: 16.2.5.4 Type 2 Opcodes Encoding: DefAdd */
->  Aml *aml_add(Aml *arg1, Aml *arg2, Aml *dst)
->  {
-> diff --git a/include/hw/acpi/aml-build.h b/include/hw/acpi/aml-build.h
-> index 88d0738..c4398cc 100644
-> --- a/include/hw/acpi/aml-build.h
-> +++ b/include/hw/acpi/aml-build.h
-> @@ -267,6 +267,7 @@ Aml *aml_lor(Aml *arg1, Aml *arg2);
->  Aml *aml_shiftleft(Aml *arg1, Aml *count);
->  Aml *aml_shiftright(Aml *arg1, Aml *count, Aml *dst);
->  Aml *aml_lless(Aml *arg1, Aml *arg2);
-> +Aml *aml_lless_equal(Aml *arg1, Aml *arg2);
->  Aml *aml_add(Aml *arg1, Aml *arg2, Aml *dst);
->  Aml *aml_subtract(Aml *arg1, Aml *arg2, Aml *dst);
->  Aml *aml_increment(Aml *arg);
-> --=20
-> 2.5.5
+http://lists.nongnu.org/archive/html/qemu-devel/2017-07/msg05268.html
+
+Ray K
+
+On 14/01/2018 10:06, Gal Hammer wrote:
+> A bug was reported about a very slow boot time and a 100% CPU usage of
+> both Windows and Linux guests when running a VM with multiple
+> virtio-serial devices (https://bugzilla.redhat.com/1528588).
+>
+> For example, running a VM with 25 virtio-serial devices, each one with
+> max_ports=511, could have a boot time of around 30 minutes. With this
+> patch (and another patch to kvm) the boot time is reduced to
+> approximately 3 minutes.
+>
+> The patch wraps all the changes made to the Memory Regions during the
+> eventfd registrations in a memory regions transaction. I had to add a
+> cleanup callback function to the EventNotifier struct, so it will be
+> possible to use a transaction in the shutdown code path as well.
+>
+> Gal Hammer (3):
+>    qemu: add a cleanup callback function to EventNotifier
+>    virtio: postpone the execution of event_notifier_cleanup function
+>    virtio: improve virtio devices initialization time
+>
+>   accel/kvm/kvm-all.c           |  4 ++++
+>   hw/virtio/virtio-bus.c        | 19 +++++++++++--------
+>   hw/virtio/virtio.c            |  5 +++++
+>   include/qemu/event_notifier.h |  1 +
+>   util/event_notifier-posix.c   |  5 ++++-
+>   util/event_notifier-win32.c   |  2 ++
+>   6 files changed, 27 insertions(+), 9 deletions(-)
+>
