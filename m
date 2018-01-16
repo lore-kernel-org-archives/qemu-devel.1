@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48334)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48461)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1ebJAR-0000By-0P
-	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 23:48:12 -0500
+	(envelope-from <mst@redhat.com>) id 1ebJAe-0000QG-5F
+	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 23:48:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1ebJAP-000519-Ts
-	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 23:48:11 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:48170)
+	(envelope-from <mst@redhat.com>) id 1ebJAd-00055I-AU
+	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 23:48:24 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:54312)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1ebJAP-000510-Jg
-	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 23:48:09 -0500
-Date: Tue, 16 Jan 2018 06:48:07 +0200
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1ebJAd-000550-4E
+	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 23:48:23 -0500
+Date: Tue, 16 Jan 2018 06:48:19 +0200
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <1516077852-7974-24-git-send-email-mst@redhat.com>
+Message-ID: <1516077852-7974-27-git-send-email-mst@redhat.com>
 References: <1516077852-7974-1-git-send-email-mst@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 In-Reply-To: <1516077852-7974-1-git-send-email-mst@redhat.com>
-Subject: [Qemu-devel] [PULL 23/33] vhost: Simplify ring verification checks
+Subject: [Qemu-devel] [PULL 26/33] x86_iommu: check if machine has PCI bus
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,170 +27,38 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Igor Mammedov <imammedo@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Mohammed Gamal <mgamal@redhat.com>, Peter Xu <peterx@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Thomas Huth <thuth@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+From: Mohammed Gamal <mgamal@redhat.com>
 
-vhost_verify_ring_mappings() were used to verify that
-rings are still accessible and related memory hasn't
-been moved after flatview is updated.
+Starting qemu with
+qemu-system-x86_64 -S -M isapc -device {amd|intel}-iommu
+leads to a segfault. The code assume PCI bus is present and
+tries to access the bus structure without checking.
 
-It was doing checks by mapping ring's GPA+len and
-checking that HVA hadn't changed with new memory map.
-To avoid maybe expensive mapping call, we were
-identifying address range that changed and were doing
-mapping only if ring was in changed range.
+Since Intel VT-d and AMDVI should only work with PCI, add a
+check for PCI bus and return error if not present.
 
-However it's not neccessary to perform ring's GPA
-mapping as we already have its current HVA and all
-we need is to verify that ring's GPA translates to
-the same HVA in updated flatview.
-
-This will allow the following patches to simplify the range
-comparison that was previously needed to avoid expensive
-verify_ring_mapping calls.
-
-Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-with modifications by:
-Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
-Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+Reviewed-by: Peter Xu <peterx@redhat.com>
+Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
+Signed-off-by: Mohammed Gamal <mgamal@redhat.com>
+Reviewed-by: Thomas Huth <thuth@redhat.com>
 ---
- hw/virtio/vhost.c | 79 +++++++++++++++++++++++++++++--------------------------
- 1 file changed, 42 insertions(+), 37 deletions(-)
+ hw/i386/x86-iommu.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
-index 83df043..0bdd833 100644
---- a/hw/virtio/vhost.c
-+++ b/hw/virtio/vhost.c
-@@ -450,35 +450,37 @@ static void vhost_memory_unmap(struct vhost_dev *dev, void *buffer,
-     }
- }
+diff --git a/hw/i386/x86-iommu.c b/hw/i386/x86-iommu.c
+index 51de519..8a01a2d 100644
+--- a/hw/i386/x86-iommu.c
++++ b/hw/i386/x86-iommu.c
+@@ -88,7 +88,7 @@ static void x86_iommu_realize(DeviceState *dev, Error **errp)
+         PC_MACHINE(object_dynamic_cast(OBJECT(ms), TYPE_PC_MACHINE));
+     QLIST_INIT(&x86_iommu->iec_notifiers);
  
--static int vhost_verify_ring_part_mapping(struct vhost_dev *dev,
--                                          void *part,
--                                          uint64_t part_addr,
--                                          uint64_t part_size,
--                                          uint64_t start_addr,
--                                          uint64_t size)
--{
--    hwaddr l;
--    void *p;
--    int r = 0;
--
--    if (!ranges_overlap(start_addr, size, part_addr, part_size)) {
-+static int vhost_verify_ring_part_mapping(void *ring_hva,
-+                                          uint64_t ring_gpa,
-+                                          uint64_t ring_size,
-+                                          void *reg_hva,
-+                                          uint64_t reg_gpa,
-+                                          uint64_t reg_size)
-+{
-+    uint64_t hva_ring_offset;
-+    uint64_t ring_last = range_get_last(ring_gpa, ring_size);
-+    uint64_t reg_last = range_get_last(reg_gpa, reg_size);
-+
-+    if (ring_last < reg_gpa || ring_gpa > reg_last) {
-         return 0;
-     }
--    l = part_size;
--    p = vhost_memory_map(dev, part_addr, &l, 1);
--    if (!p || l != part_size) {
--        r = -ENOMEM;
-+    /* check that whole ring's is mapped */
-+    if (ring_last > reg_last) {
-+        return -ENOMEM;
-     }
--    if (p != part) {
--        r = -EBUSY;
-+    /* check that ring's MemoryRegion wasn't replaced */
-+    hva_ring_offset = ring_gpa - reg_gpa;
-+    if (ring_hva != reg_hva + hva_ring_offset) {
-+        return -EBUSY;
-     }
--    vhost_memory_unmap(dev, p, l, 0, 0);
--    return r;
-+
-+    return 0;
- }
- 
- static int vhost_verify_ring_mappings(struct vhost_dev *dev,
--                                      uint64_t start_addr,
--                                      uint64_t size)
-+                                      void *reg_hva,
-+                                      uint64_t reg_gpa,
-+                                      uint64_t reg_size)
- {
-     int i, j;
-     int r = 0;
-@@ -492,22 +494,25 @@ static int vhost_verify_ring_mappings(struct vhost_dev *dev,
-         struct vhost_virtqueue *vq = dev->vqs + i;
- 
-         j = 0;
--        r = vhost_verify_ring_part_mapping(dev, vq->desc, vq->desc_phys,
--                                           vq->desc_size, start_addr, size);
-+        r = vhost_verify_ring_part_mapping(
-+                vq->desc, vq->desc_phys, vq->desc_size,
-+                reg_hva, reg_gpa, reg_size);
-         if (r) {
-             break;
-         }
- 
-         j++;
--        r = vhost_verify_ring_part_mapping(dev, vq->avail, vq->avail_phys,
--                                           vq->avail_size, start_addr, size);
-+        r = vhost_verify_ring_part_mapping(
-+                vq->desc, vq->desc_phys, vq->desc_size,
-+                reg_hva, reg_gpa, reg_size);
-         if (r) {
-             break;
-         }
- 
-         j++;
--        r = vhost_verify_ring_part_mapping(dev, vq->used, vq->used_phys,
--                                           vq->used_size, start_addr, size);
-+        r = vhost_verify_ring_part_mapping(
-+                vq->desc, vq->desc_phys, vq->desc_size,
-+                reg_hva, reg_gpa, reg_size);
-         if (r) {
-             break;
-         }
-@@ -635,13 +640,11 @@ static void vhost_commit(MemoryListener *listener)
- {
-     struct vhost_dev *dev = container_of(listener, struct vhost_dev,
-                                          memory_listener);
--    hwaddr start_addr = 0;
--    ram_addr_t size = 0;
-     MemoryRegionSection *old_sections;
-     int n_old_sections;
--
-     uint64_t log_size;
-     int r;
-+    int i;
- 
-     old_sections = dev->mem_sections;
-     n_old_sections = dev->n_mem_sections;
-@@ -658,12 +661,14 @@ static void vhost_commit(MemoryListener *listener)
-         goto out;
-     }
- 
--    if (dev->started) {
--        start_addr = dev->mem_changed_start_addr;
--        size = dev->mem_changed_end_addr - dev->mem_changed_start_addr + 1;
--
--        r = vhost_verify_ring_mappings(dev, start_addr, size);
--        assert(r >= 0);
-+    for (i = 0; i < dev->mem->nregions; i++) {
-+        if (vhost_verify_ring_mappings(dev,
-+                           (void *)dev->mem->regions[i].userspace_addr,
-+                           dev->mem->regions[i].guest_phys_addr,
-+                           dev->mem->regions[i].memory_size)) {
-+            error_report("Verify ring failure on region %d", i);
-+            abort();
-+        }
-     }
- 
-     if (!dev->log_enabled) {
+-    if (!pcms) {
++    if (!pcms || !pcms->bus) {
+         error_setg(errp, "Machine-type '%s' not supported by IOMMU",
+                    mc->name);
+         return;
 -- 
 MST
