@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40182)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40201)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1ebRX9-00088K-39
-	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 08:44:12 -0500
+	(envelope-from <berrange@redhat.com>) id 1ebRXB-0008Ax-Kc
+	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 08:44:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1ebRX6-0001CZ-2s
-	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 08:44:11 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:35748)
+	(envelope-from <berrange@redhat.com>) id 1ebRX6-0001Ca-2v
+	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 08:44:13 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:60190)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1ebRX5-0001C8-TT
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1ebRX5-0001C9-TR
 	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 08:44:08 -0500
 From: "Daniel P. Berrange" <berrange@redhat.com>
-Date: Tue, 16 Jan 2018 13:42:08 +0000
-Message-Id: <20180116134217.8725-6-berrange@redhat.com>
+Date: Tue, 16 Jan 2018 13:42:09 +0000
+Message-Id: <20180116134217.8725-7-berrange@redhat.com>
 In-Reply-To: <20180116134217.8725-1-berrange@redhat.com>
 References: <20180116134217.8725-1-berrange@redhat.com>
-Subject: [Qemu-devel] [PATCH v5 05/14] qapi: Adapt to moved location of
- 'maketrans' function in py3
+Subject: [Qemu-devel] [PATCH v5 06/14] qapi: remove '-q' arg to diff when
+ comparing QAPI output
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,27 +27,35 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Fam Zheng <famz@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Eric Blake <eblake@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>
 
+When the qapi schema tests fail they merely print that the expected
+output didn't match the actual output. This is largely useless when
+trying diagnose what went wrong. Removing the '-q' arg to diff
+means that it is still silent on successful tests, but when it
+fails we'll see details of the incorrect output.
+
 Reviewed-by: Eric Blake <eblake@redhat.com>
 Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
 ---
- scripts/qapi.py | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+ tests/Makefile.include | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/scripts/qapi.py b/scripts/qapi.py
-index 514cca44bf..1fdd189c0d 100644
---- a/scripts/qapi.py
-+++ b/scripts/qapi.py
-@@ -1734,7 +1734,10 @@ def c_enum_const(type_name, const_name, prefix=None):
-         type_name = prefix
-     return camel_to_upper(type_name) + '_' + c_name(const_name, False).upper()
+diff --git a/tests/Makefile.include b/tests/Makefile.include
+index 39a4b5359d..d65fb4e1b3 100644
+--- a/tests/Makefile.include
++++ b/tests/Makefile.include
+@@ -908,10 +908,10 @@ $(patsubst %, check-%, $(check-qapi-schema-y)): check-%.json: $(SRC_PATH)/%.json
+ 		$^ >$*.test.out 2>$*.test.err; \
+ 		echo $$? >$*.test.exit, \
+ 		"TEST","$*.out")
+-	@diff -q $(SRC_PATH)/$*.out $*.test.out
++	@diff $(SRC_PATH)/$*.out $*.test.out
+ 	@# Sanitize error messages (make them independent of build directory)
+-	@perl -p -e 's|\Q$(SRC_PATH)\E/||g' $*.test.err | diff -q $(SRC_PATH)/$*.err -
+-	@diff -q $(SRC_PATH)/$*.exit $*.test.exit
++	@perl -p -e 's|\Q$(SRC_PATH)\E/||g' $*.test.err | diff $(SRC_PATH)/$*.err -
++	@diff $(SRC_PATH)/$*.exit $*.test.exit
  
--c_name_trans = string.maketrans('.-', '__')
-+if hasattr(str, 'maketrans'):
-+    c_name_trans = str.maketrans('.-', '__')
-+else:
-+    c_name_trans = string.maketrans('.-', '__')
- 
- 
- # Map @name to a valid C identifier.
+ .PHONY: check-tests/qapi-schema/doc-good.texi
+ check-tests/qapi-schema/doc-good.texi: tests/qapi-schema/doc-good.test.texi
 -- 
 2.14.3
