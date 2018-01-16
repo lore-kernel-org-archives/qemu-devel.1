@@ -1,29 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46788)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50919)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kchamart@redhat.com>) id 1ebTEm-0001Tn-88
-	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 10:33:24 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1ebTPj-00051U-V8
+	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 10:44:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kchamart@redhat.com>) id 1ebTEg-0007Ep-Mq
-	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 10:33:20 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:44384)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kchamart@redhat.com>) id 1ebTEg-00078d-Gb
-	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 10:33:14 -0500
-Date: Tue, 16 Jan 2018 16:33:00 +0100
-From: Kashyap Chamarthy <kchamart@redhat.com>
-Message-ID: <20180116153300.ahsce4wkxq3mzh7o@eukaryote>
-References: <20180109070112.30806-1-vincent@bernat.im>
-	<20180112184727.GJ6646@localhost.localdomain>
-	<87zi5ite88.fsf@luffy.cx>
-	<20180116124111.GC627@localhost.localdomain>
-	<87efmqx8sl.fsf@luffy.cx>
+	(envelope-from <peter.maydell@linaro.org>) id 1ebTPi-00077f-Th
+	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 10:44:40 -0500
+Received: from mail-ot0-x241.google.com ([2607:f8b0:4003:c0f::241]:40479)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1ebTPi-000775-Ob
+	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 10:44:38 -0500
+Received: by mail-ot0-x241.google.com with SMTP id d10so13966878oti.7
+	for <qemu-devel@nongnu.org>; Tue, 16 Jan 2018 07:44:38 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <87efmqx8sl.fsf@luffy.cx>
+In-Reply-To: <20180116151152.4040-2-marcandre.lureau@redhat.com>
+References: <20180116151152.4040-1-marcandre.lureau@redhat.com>
+	<20180116151152.4040-2-marcandre.lureau@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 16 Jan 2018 15:44:17 +0000
+Message-ID: <CAFEAcA-3xF6z-D7XrKzAhNA_p0Y0U-UuDL7R1dK9+HaF4DPH1Q@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH x86-next v2] target-i386: add PCID flag to
- Westmere, Sandy Bridge and Ivy Bridge
+Subject: Re: [Qemu-devel] [PATCH 1/3] exynos4210: workaround UBSAN
+ compilation error
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,50 +31,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vincent Bernat <vincent@bernat.im>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, qemu-devel@nongnu.org, Jiri Denemark <jdenemar@redhat.com>
+To: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Igor Mitsyanko <i.mitsyanko@gmail.com>, "open list:Exynos" <qemu-arm@nongnu.org>
 
-On Tue, Jan 16, 2018 at 01:55:22PM +0100, Vincent Bernat wrote:
->  =E2=9D=A6 16 janvier 2018 10:41 -0200, Eduardo Habkost <ehabkost@redha=
-t.com>=C2=A0:
->=20
-> >> > Adding Westmere-PCID would require adding a Westmere-PCID-IBRS
-> >> > CPU model too, so this is starting to look a bit ridiculous.
-> >> > Sane VM management systems would know how to use
-> >> > "-cpu Westmere,+pcid" without requiring new CPU model entries in
-> >> > QEMU.  What's missing in existing management stacks to allow that
-> >> > to happen?
-> >>=20
-> >> That's what I actually do. So, I am fine with the solution of doing
-> >> nothing. However, it would be nice for unaware people to get the spe=
-edup
-> >> of pcid without knowing about it. Maybe we can just forget about
-> >> Westmere and still apply it to Sandy Bridge and Ivy Bridge.
-> >
-> > If management stacks today don't let the user choose
-> > "Westmere,+pcid", we probably have no other choice than adding a
-> > Westmere-PCID CPU model.  But our management stacks need to be
-> > fixed so we won't need similar hacks in the future.
+On 16 January 2018 at 15:11, Marc-Andr=C3=A9 Lureau
+<marcandre.lureau@redhat.com> wrote:
+> gcc 5.4.0-6ubuntu1~16.04.5 build with UBSAN enabled error:
+>
+>   CC      hw/display/exynos4210_fimd.o
+> /home/petmay01/linaro/qemu-for-merges/hw/display/exynos4210_fimd.c: In
+> function =E2=80=98fimd_get_buffer_id=E2=80=99:
+> /home/petmay01/linaro/qemu-for-merges/hw/display/exynos4210_fimd.c:1105:5=
+:
+> error: case label does not reduce to an integer constant
+>      case FIMD_WINCON_BUF2_STAT:
+>
+> Because FIMD_WINCON_BUF2_STAT case contains an integer
+> overflow, use U suffix to get the unsigned type.
 
-True;  I'm aware of the limitation here in Nova.
+We should note that this is a gcc bug here (we compile with
+-fwrapv so integer overflows like this are well-defined)
+which we are working around.
 
-> With libvirt:
->=20
->   <cpu mode=3D'custom' match=3D'exact'>
->     <model>Westmere</model>
->     <feature policy=3D'require' name=3D'pcid'/>
->   </cpu>
+> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> ---
+>  hw/display/exynos4210_fimd.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/hw/display/exynos4210_fimd.c b/hw/display/exynos4210_fimd.c
+> index fd0b2bec65..86e37e93e9 100644
+> --- a/hw/display/exynos4210_fimd.c
+> +++ b/hw/display/exynos4210_fimd.c
+> @@ -98,7 +98,7 @@
+>  #define FIMD_WINCON_BUFSTATUS       ((1 << 21) | (1 << 31))
+>  #define FIMD_WINCON_BUF0_STAT       ((0 << 21) | (0 << 31))
+>  #define FIMD_WINCON_BUF1_STAT       ((1 << 21) | (0 << 31))
+> -#define FIMD_WINCON_BUF2_STAT       ((0 << 21) | (1 << 31))
+> +#define FIMD_WINCON_BUF2_STAT       ((0 << 21) | (1U << 31))
+>  #define FIMD_WINCON_BUFSELECT       ((1 << 20) | (1 << 30))
+>  #define FIMD_WINCON_BUF0_SEL        ((0 << 20) | (0 << 30))
+>  #define FIMD_WINCON_BUF1_SEL        ((1 << 20) | (0 << 30))
+> --
+> 2.16.0.rc1.1.gef27df75a1
+>
 
-Yep, libvirt upstream allows it.
-
-> We are using CloudStack on top of that and it's also an available
-> option. However, looking at OpenStack, it doesn't seem possible:
->  https://github.com/openstack/nova/blob/6b248518da794a4c82665c22abf7bee=
-5aa527a47/nova/conf/libvirt.py#L506
-
-That's correct, upstream OpenStack Nova doesn't yet have facility to
-specify granular CPU feature names.  Nova just ought to wire up the
-facility libvirt already provides.
-
---=20
-/kashyap
+thanks
+-- PMM
