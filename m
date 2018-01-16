@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45304)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45465)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1ebVNh-0007hg-4t
-	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 12:50:41 -0500
+	(envelope-from <mst@redhat.com>) id 1ebVO9-0008Dl-Ib
+	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 12:51:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1ebVNe-0002JC-Pg
-	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 12:50:41 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:39700)
+	(envelope-from <mst@redhat.com>) id 1ebVO5-0002YA-Ng
+	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 12:51:09 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:56212)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1ebVNe-0002Ia-9z
-	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 12:50:38 -0500
-Date: Tue, 16 Jan 2018 19:50:08 +0200
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1ebVO5-0002Xp-Ev
+	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 12:51:05 -0500
+Date: Tue, 16 Jan 2018 19:50:27 +0200
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <1516121887-32738-17-git-send-email-mst@redhat.com>
+Message-ID: <1516121887-32738-18-git-send-email-mst@redhat.com>
 References: <1516121887-32738-1-git-send-email-mst@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 In-Reply-To: <1516121887-32738-1-git-send-email-mst@redhat.com>
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL v2 16/34] vhost-user-test: fix features mask
+Subject: [Qemu-devel] [PULL v2 17/34] vhost-user-test: extract
+ read-guest-mem test from main loop
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,28 +33,96 @@ Cc: Peter Maydell <peter.maydell@linaro.org>, Maxime Coquelin <maxime.coquelin@r
 
 From: Maxime Coquelin <maxime.coquelin@redhat.com>
 
-VIRTIO_NET_F_MAC is a bit position, not a bit mask.
+This patch makes read-guest-test consistent with other tests,
+i.e. create the test server in the test function.
 
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 Signed-off-by: Maxime Coquelin <maxime.coquelin@redhat.com>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 ---
- tests/vhost-user-test.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ tests/vhost-user-test.c | 41 +++++++++++++++++++++++------------------
+ 1 file changed, 23 insertions(+), 18 deletions(-)
 
 diff --git a/tests/vhost-user-test.c b/tests/vhost-user-test.c
-index e2c89ed..43c6528 100644
+index 43c6528..df56724 100644
 --- a/tests/vhost-user-test.c
 +++ b/tests/vhost-user-test.c
-@@ -177,7 +177,7 @@ static void init_virtio_dev(TestServer *s)
-     qvirtio_set_driver(&dev->vdev);
+@@ -617,6 +617,28 @@ GSourceFuncs test_migrate_source_funcs =3D {
+     .check =3D test_migrate_source_check,
+ };
 =20
-     features =3D qvirtio_get_features(&dev->vdev);
--    features =3D features & VIRTIO_NET_F_MAC;
-+    features =3D features & (1u << VIRTIO_NET_F_MAC);
-     qvirtio_set_features(&dev->vdev, features);
++static void test_read_guest_mem(void)
++{
++    TestServer *server =3D NULL;
++    char *qemu_cmd =3D NULL;
++    QTestState *s =3D NULL;
++
++    server =3D test_server_new("test");
++    test_server_listen(server);
++
++    qemu_cmd =3D GET_QEMU_CMD(server);
++
++    s =3D qtest_start(qemu_cmd);
++    g_free(qemu_cmd);
++
++    init_virtio_dev(server);
++
++    read_guest_mem(server);
++
++    qtest_quit(s);
++    test_server_free(server);
++}
++
+ static void test_migrate(void)
+ {
+     TestServer *s =3D test_server_new("src");
+@@ -919,10 +941,7 @@ static void test_multiqueue(void)
 =20
-     qvirtio_set_driver_ok(&dev->vdev);
+ int main(int argc, char **argv)
+ {
+-    QTestState *s =3D NULL;
+-    TestServer *server =3D NULL;
+     const char *hugefs;
+-    char *qemu_cmd =3D NULL;
+     int ret;
+     char template[] =3D "/tmp/vhost-test-XXXXXX";
+     GMainLoop *loop;
+@@ -947,20 +966,11 @@ int main(int argc, char **argv)
+         root =3D tmpfs;
+     }
+=20
+-    server =3D test_server_new("test");
+-    test_server_listen(server);
+-
+     loop =3D g_main_loop_new(NULL, FALSE);
+     /* run the main loop thread so the chardev may operate */
+     thread =3D g_thread_new(NULL, thread_function, loop);
+=20
+-    qemu_cmd =3D GET_QEMU_CMD(server);
+-
+-    s =3D qtest_start(qemu_cmd);
+-    g_free(qemu_cmd);
+-    init_virtio_dev(server);
+-
+-    qtest_add_data_func("/vhost-user/read-guest-mem", server, read_guest=
+_mem);
++    qtest_add_func("/vhost-user/read-guest-mem", test_read_guest_mem);
+     qtest_add_func("/vhost-user/migrate", test_migrate);
+     qtest_add_func("/vhost-user/multiqueue", test_multiqueue);
+=20
+@@ -978,12 +988,7 @@ int main(int argc, char **argv)
+=20
+     ret =3D g_test_run();
+=20
+-    if (s) {
+-        qtest_quit(s);
+-    }
+-
+     /* cleanup */
+-    test_server_free(server);
+=20
+     /* finish the helper thread and dispatch pending sources */
+     g_main_loop_quit(loop);
 --=20
 MST
