@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35064)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37282)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1ebRHa-0004jf-M8
-	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 08:28:12 -0500
+	(envelope-from <pm215@archaic.org.uk>) id 1ebRNr-0008AB-Cx
+	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 08:34:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1ebRHU-0006s4-Og
-	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 08:28:06 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:43630)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1ebRHU-0006gL-FN
-	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 08:28:00 -0500
-Date: Tue, 16 Jan 2018 14:27:37 +0100
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20180116142737.30a4e4cd@redhat.com>
-In-Reply-To: <1516077852-7974-23-git-send-email-mst@redhat.com>
-References: <1516077852-7974-1-git-send-email-mst@redhat.com>
-	<1516077852-7974-23-git-send-email-mst@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PULL 22/33] vhost: Move log_dirty check
+	(envelope-from <pm215@archaic.org.uk>) id 1ebRNq-0002mP-Ku
+	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 08:34:35 -0500
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:45888)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
+	id 1ebRNq-0002ll-Dz
+	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 08:34:34 -0500
+Received: from pm215 by orth.archaic.org.uk with local (Exim 4.89)
+	(envelope-from <pm215@archaic.org.uk>) id 1ebRNp-0002tN-Db
+	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 13:34:33 +0000
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 16 Jan 2018 13:34:05 +0000
+Message-Id: <1516109659-1557-11-git-send-email-peter.maydell@linaro.org>
+In-Reply-To: <1516109659-1557-1-git-send-email-peter.maydell@linaro.org>
+References: <1516109659-1557-1-git-send-email-peter.maydell@linaro.org>
+Subject: [Qemu-devel] [PULL 10/24] target/arm: Add fp16 support to
+ vfp_expand_imm
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,94 +28,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, "Dr.
-	David Alan Gilbert" <dgilbert@redhat.com>
+To: qemu-devel@nongnu.org
 
-On Tue, 16 Jan 2018 06:48:06 +0200
-"Michael S. Tsirkin" <mst@redhat.com> wrote:
+From: Richard Henderson <richard.henderson@linaro.org>
 
-> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-> 
-> Move the log_dirty check into vhost_section.
-> 
-> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
-> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-As it change looks unsafe to me with current vhost_set_memory(),
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Message-id: 20180110063337.21538-3-richard.henderson@linaro.org
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+---
+ target/arm/translate-a64.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-I'd leave it out and merge only after switching new
-table generation algorithm.
-
-David agreed to take care of it on respin.
-
-> ---
->  hw/virtio/vhost.c      | 20 +++++++++++++-------
->  hw/virtio/trace-events |  3 +++
->  2 files changed, 16 insertions(+), 7 deletions(-)
-> 
-> diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
-> index 8a85dde..83df043 100644
-> --- a/hw/virtio/vhost.c
-> +++ b/hw/virtio/vhost.c
-> @@ -27,6 +27,7 @@
->  #include "hw/virtio/virtio-access.h"
->  #include "migration/blocker.h"
->  #include "sysemu/dma.h"
-> +#include "trace.h"
->  
->  /* enabled until disconnected backend stabilizes */
->  #define _VHOST_DEBUG 1
-> @@ -567,18 +568,12 @@ static void vhost_set_memory(MemoryListener *listener,
->                                           memory_listener);
->      hwaddr start_addr = section->offset_within_address_space;
->      ram_addr_t size = int128_get64(section->size);
-> -    bool log_dirty =
-> -        memory_region_get_dirty_log_mask(section->mr) & ~(1 << DIRTY_MEMORY_MIGRATION);
->      int s = offsetof(struct vhost_memory, regions) +
->          (dev->mem->nregions + 1) * sizeof dev->mem->regions[0];
->      void *ram;
->  
->      dev->mem = g_realloc(dev->mem, s);
->  
-> -    if (log_dirty) {
-> -        add = false;
-> -    }
-> -
->      assert(size);
->  
->      /* Optimize no-change case. At least cirrus_vga does this a lot at this time. */
-> @@ -611,8 +606,19 @@ static void vhost_set_memory(MemoryListener *listener,
->  
->  static bool vhost_section(MemoryRegionSection *section)
->  {
-> -    return memory_region_is_ram(section->mr) &&
-> +    bool result;
-> +    bool log_dirty = memory_region_get_dirty_log_mask(section->mr) &
-> +                     ~(1 << DIRTY_MEMORY_MIGRATION);
-> +    result = memory_region_is_ram(section->mr) &&
->          !memory_region_is_rom(section->mr);
-> +
-> +    /* Vhost doesn't handle any block which is doing dirty-tracking other
-> +     * than migration; this typically fires on VGA areas.
-> +     */
-> +    result &= !log_dirty;
-> +
-> +    trace_vhost_section(section->mr->name, result);
-> +    return result;
->  }
->  
->  static void vhost_begin(MemoryListener *listener)
-> diff --git a/hw/virtio/trace-events b/hw/virtio/trace-events
-> index 775461a..4a493bc 100644
-> --- a/hw/virtio/trace-events
-> +++ b/hw/virtio/trace-events
-> @@ -1,5 +1,8 @@
->  # See docs/devel/tracing.txt for syntax documentation.
->  
-> +# hw/virtio/vhost.c
-> +vhost_section(const char *name, int r) "%s:%d"
-> +
->  # hw/virtio/virtio.c
->  virtqueue_alloc_element(void *elem, size_t sz, unsigned in_num, unsigned out_num) "elem %p size %zd in_num %u out_num %u"
->  virtqueue_fill(void *vq, const void *elem, unsigned int len, unsigned int idx) "vq %p elem %p len %u idx %u"
+diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
+index 80ae019..cf537e9 100644
+--- a/target/arm/translate-a64.c
++++ b/target/arm/translate-a64.c
+@@ -5006,6 +5006,11 @@ static uint64_t vfp_expand_imm(int size, uint8_t imm8)
+             (extract32(imm8, 0, 6) << 3);
+         imm <<= 16;
+         break;
++    case MO_16:
++        imm = (extract32(imm8, 7, 1) ? 0x8000 : 0) |
++            (extract32(imm8, 6, 1) ? 0x3000 : 0x4000) |
++            (extract32(imm8, 0, 6) << 6);
++        break;
+     default:
+         g_assert_not_reached();
+     }
+-- 
+2.7.4
