@@ -1,23 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58288)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58420)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1ebXNZ-0003K3-2e
-	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 14:58:42 -0500
+	(envelope-from <eblake@redhat.com>) id 1ebXO1-0003by-6f
+	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 14:59:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1ebXNY-000403-6J
-	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 14:58:41 -0500
-Date: Tue, 16 Jan 2018 20:58:30 +0100
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20180116195830.GB5719@localhost.localdomain>
+	(envelope-from <eblake@redhat.com>) id 1ebXO0-0004CU-0e
+	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 14:59:09 -0500
 References: <20180111195225.4226-1-kwolf@redhat.com>
-	<20180111195225.4226-2-kwolf@redhat.com>
-	<f55f84bb-2f05-1ef8-8198-42208a927764@redhat.com>
+	<20180111195225.4226-10-kwolf@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <64cf790b-485c-06dd-ad0e-7686914e3fa8@redhat.com>
+Date: Tue, 16 Jan 2018 13:59:00 -0600
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="yrj/dFKFPuw6o+aM"
-Content-Disposition: inline
-In-Reply-To: <f55f84bb-2f05-1ef8-8198-42208a927764@redhat.com>
-Subject: Re: [Qemu-devel] [RFC PATCH 01/10] block/qapi: Introduce
- BlockdevCreateOptions
+In-Reply-To: <20180111195225.4226-10-kwolf@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="vdKPCGydvojZ4WlApHZlkhSaE999VssoG"
+Subject: Re: [Qemu-devel] [RFC PATCH 09/10] qcow2: Use visitor for options
+ in qcow2_create()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,117 +25,122 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-block@nongnu.org, mreitz@redhat.com, pkrempa@redhat.com, qemu-devel@nongnu.org
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: mreitz@redhat.com, pkrempa@redhat.com, qemu-devel@nongnu.org
 
-
---yrj/dFKFPuw6o+aM
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--vdKPCGydvojZ4WlApHZlkhSaE999VssoG
+From: Eric Blake <eblake@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: mreitz@redhat.com, pkrempa@redhat.com, qemu-devel@nongnu.org
+Message-ID: <64cf790b-485c-06dd-ad0e-7686914e3fa8@redhat.com>
+Subject: Re: [RFC PATCH 09/10] qcow2: Use visitor for options in
+ qcow2_create()
+References: <20180111195225.4226-1-kwolf@redhat.com>
+ <20180111195225.4226-10-kwolf@redhat.com>
+In-Reply-To: <20180111195225.4226-10-kwolf@redhat.com>
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-Am 16.01.2018 um 19:54 hat Eric Blake geschrieben:
-> On 01/11/2018 01:52 PM, Kevin Wolf wrote:
-> > This creates a BlockdevCreateOptions union type that will contain all of
-> > the options for image creation. We'll start out with an empty struct
-> > type BlockdevCreateDummy for all drivers.
-> >=20
-> > Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-> > ---
-> >  qapi/block-core.json | 64 ++++++++++++++++++++++++++++++++++++++++++++=
-++++++++
-> >  1 file changed, 64 insertions(+)
-> >=20
-> > diff --git a/qapi/block-core.json b/qapi/block-core.json
-> > index e94a6881b2..1749376c61 100644
-> > --- a/qapi/block-core.json
-> > +++ b/qapi/block-core.json
-> > @@ -3320,6 +3320,70 @@
-> >  { 'command': 'blockdev-del', 'data': { 'node-name': 'str' } }
-> > =20
-> >  ##
-> > +# @BlockdevCreateDummy:
-> > +#
-> > +# FIXME To be removed. Only there to make the QAPI generator happy whi=
-le we're
-> > +# adding driver by driver. Leaving out union branches is not allowed.
-> > +#
-> > +# Since: 2.12
-> > +##
-> > +{ 'struct': 'BlockdevCreateDummy', 'data': {}}
+On 01/11/2018 01:52 PM, Kevin Wolf wrote:
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> ---
+>  block/qcow2.c              | 227 ++++++++++++++++++-------------------=
+--------
+>  tests/qemu-iotests/049.out |  10 +-
+>  2 files changed, 93 insertions(+), 144 deletions(-)
 >=20
-> At one point, I had a patch that let you do:
->=20
-> 'data': { 'branch': {},
->           ... }
->=20
-> for the branches that didn't need to add any additional types to the
-> flat union.  Hmm, looks like it is still sitting in my tree, unapplied;
-> would it help if I revived that one?
 
-I actually realised that this type won't go away because we have drivers
-that don't support image creation. I'm not sure if I should prefer the
-conciseness of this syntax or the documentation that comes with a full
-type in this specific case. Though generally, I think allowing inline
-definitions would be nice.
 
-The infrastructure that I was actually looking for here was a union type
-that doesn't accept all enum values, but only some. Maybe some kind of
-sub-enum for the discriminator, so that I still get the usual
-BLOCKDEV_DRIVER_* constants, but allow only some of them in the context
-of the union.
+> +    /* Only the keyval visitor supports the dotted syntax needed for
+> +     * encryption, so go through a QDict before getting a QAPI type. I=
+gnore
+> +     * options meant for the protocol layer so that the visitor doesn'=
+t
+> +     * complain. */
+> +    qdict =3D qemu_opts_to_qdict_filtered(opts, NULL, bdrv_qcow2.creat=
+e_opts,
+> +                                        true);
 
-> > +
-> > +##
-> > +# @BlockdevCreateOptions:
-> > +#
-> > +# Options for creating an image format on a given node.
-> > +#
-> > +# @driver           block driver to create the image format
-> > +# @node             node to create the image format on
->=20
-> Any restrictions we want to document about the node (for example, it
-> must not be in use by any backend device at the moment, particularly
-> since creation may change the node's format)?
+Whether we like it or not, the keyval visitor is getting more and more
+important!
 
-Hm... As long as we can get BLK_PERM_WRITE, we should be good, right?
+> +
+> +    /* TODO QAPI doesn't allow dots in enum values. Either change QAPI=
+ or
+> +     * decide on the proper new representation for blockdev-create */
+> +    val =3D qdict_get_try_str(qdict, BLOCK_OPT_COMPAT_LEVEL);
+> +    if (val && !strcmp(val, "0.10")) {
+> +        qdict_put_str(qdict, BLOCK_OPT_COMPAT_LEVEL, "0_10");
+> +    } else if (val && !strcmp(val, "1.1")) {
+> +        qdict_put_str(qdict, BLOCK_OPT_COMPAT_LEVEL, "1_1");
 
-By the way, I've moved this to the driver-specific options since because
-protocol drivers don't need it.
+Yeah, I flagged that in the earlier QAPI patch. The fact that it starts
+with a number at all is also a bit worrying (we have to support leading
+digits for legacy reasons in QKeyCode, but maybe naming things just 'v2'
+and 'v3' might be cleaner than '0_10' and '1_1'?)
 
-> > +#
-> > +# Since: 2.12
-> > +##
-> > +{ 'union': 'BlockdevCreateOptions',
-> > +  'base': {
-> > +      'driver':         'BlockdevDriver',
-> > +      'node':           'BlockdevRef' },
-> > +  'discriminator': 'driver',
-> > +  'data': {
-> > +      'blkdebug':       'BlockdevCreateDummy',
->=20
-> The QAPI itself looks sane for the future patches.
 
-Kevin
+> +    /* Now get the QAPI type BlockdevCreateOptions */
+> +    qobj =3D qdict_crumple(qdict, errp);
+> +    QDECREF(qdict);
+> +    qdict =3D qobject_to_qdict(qobj);
+> +    if (qdict =3D=3D NULL) {
+>          ret =3D -EINVAL;
+>          goto finish;
+>      }
+> =20
+> -    if (qemu_opt_get_bool_del(opts, BLOCK_OPT_LAZY_REFCOUNTS, false)) =
+{
+> -        flags |=3D BLOCK_FLAG_LAZY_REFCOUNTS;
+> -    }
+> +    v =3D qobject_input_visitor_new_keyval(QOBJECT(qdict));
+> +    visit_type_BlockdevCreateOptions(v, NULL, &create_options, &local_=
+err);
+> +    visit_free(v);
 
---yrj/dFKFPuw6o+aM
+Feels like a lot of round-tripping between formats to get things this
+compact - but it's as good as anything else I can come up with.
+
+
+> +++ b/tests/qemu-iotests/049.out
+> @@ -106,7 +106,7 @@ qemu-img: Value '-1k' is out of range for parameter=
+ 'size'
+>  qemu-img: TEST_DIR/t.qcow2: Invalid options for file format 'qcow2'
+> =20
+>  qemu-img create -f qcow2 TEST_DIR/t.qcow2 -- 1kilobyte
+> -qemu-img: Invalid image size specified! You may use k, M, G, T, P or E=
+ suffixes for
+> +qemu-img: Invalid image size specified! You may use k, M, G, T, P or E=
+ suffixes for=20
+
+Why are you re-adding trailing whitespace?
+
+Overall seems sane.
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--vdKPCGydvojZ4WlApHZlkhSaE999VssoG
 Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQIcBAEBAgAGBQJaXllmAAoJEH8JsnLIjy/WtnoP/0p7nfJP96U9+FI13vgeKLQO
-VhSFmVC61UukpSdoKR1IvGSvr66S1govmO1E3I1fQkfNPspOWOWgqdg7sJT//U4i
-VT5XxWNXwEW/VEj5vNd9JE11DgdJfUfX0QtMIacsrF66a18dPMMxte/e9Us3RhrH
-44dd4CefX1W3RFopNzWYOmHxwgXv8pJW1i6lwZnRzmy59NzIjYQzD+daFuXC4lbD
-/LqS/zFD1wXqxUaVRrCO9CUQsTbIWQBz9On+Q+IL69ctsI21MIhF/jPWFyBt6kbf
-SrQ/TK/0mgvKb6GyS2qdt+ij9sSm4XBh/TrmDlzjfJMuRTEw3+qhf9jod7LJSN3F
-vtdAnlGQNYPFaII73b9C36Q4+oh5a31I1t7hi4HGM9DMPu+99Xbee6cMYKnxnzWQ
-UhnNqOSoZTy67i2Si7s/LOOKSZHhij+7B/WiL83YJ2MHT9naHKVvIvxBmfwZpVVZ
-HDLeGFzbcPJaedTgt+a9dw+4rh67bnF1gfV0Yueqw2mLlWPA+LQ71mcMxJLrZgk6
-Q54P2ZaoLgzqxcLC25F8DnhfhVCF8Np+9bZGoaa1K8YQkC8j3qCDhYqr3qqoopHn
-tNH+2xrLgNWR3m9rA01vKfb3ftHtZWfqeAOMeoF6bTcKZ/vppnZ9UUpF/ZQEeY53
-M5YtuFOVF7XUVtHLyXeQ
-=12ny
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlpeWYQACgkQp6FrSiUn
+Q2rt1ggArjeaYmxDhZvYguuZ0PBM7PEpfiXDEbXjX3rNMT3+LpuJ4C0pj4oO2szA
+CFms7R6jUdFWWpn6BLgFg324Gd/LbIM7i8aOPxhaWRSsv3wcOwPE9xThue9EWPnJ
+YwITvGs2o1IyatRF7eJWFEWReyHAha4D+xdaxLNlP7T4jgCq2eA2u0UA01ozY+rr
+a6liT1G6gMWZowyohkeT9ofKebj7Z/RaeUrO0i1MdNAZJC6R9mJm6pnWTgig5Y60
+N374T9/BF7MOgNs4DEoCBCjEB6ttj2NG+sUBBVyh7eMj8C99ahZJMm0uOS9/Ze0s
+wazmfeTuHLKvpiJqDyresUwS7kNYAg==
+=y+8V
 -----END PGP SIGNATURE-----
 
---yrj/dFKFPuw6o+aM--
+--vdKPCGydvojZ4WlApHZlkhSaE999VssoG--
