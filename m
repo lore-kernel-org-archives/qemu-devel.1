@@ -1,26 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47340)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47501)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ebJ7z-0006kk-Ex
-	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 23:45:40 -0500
+	(envelope-from <mst@redhat.com>) id 1ebJ8f-0007A8-68
+	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 23:46:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ebJ7w-0003rF-AY
-	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 23:45:39 -0500
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20180116013709.13830-1-andrew.smirnov@gmail.com>
-	<20180116013709.13830-9-andrew.smirnov@gmail.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <ebab631b-7d14-dd9a-8e81-e76830bfda02@amsat.org>
-Date: Tue, 16 Jan 2018 01:45:32 -0300
+	(envelope-from <mst@redhat.com>) id 1ebJ8b-000458-VQ
+	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 23:46:21 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:56728)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1ebJ8b-00043e-L5
+	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 23:46:17 -0500
+Date: Tue, 16 Jan 2018 06:46:15 +0200
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <1516077852-7974-1-git-send-email-mst@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20180116013709.13830-9-andrew.smirnov@gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v4 08/14] i.MX: Add implementation of i.MX7
- GPR IP block
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Subject: [Qemu-devel] [PULL 00/33] pc, pci, virtio: features, fixes, cleanups
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,208 +24,136 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Andrey Smirnov <andrew.smirnov@gmail.com>, qemu-arm@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Jason Wang <jasowang@redhat.com>, qemu-devel@nongnu.org, yurovsky@gmail.com
+To: qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>
 
-On 01/15/2018 10:37 PM, Andrey Smirnov wrote:
-> Add minimal code needed to allow upstream Linux guest to boot.
-> 
-> Cc: Peter Maydell <peter.maydell@linaro.org>
-> Cc: Jason Wang <jasowang@redhat.com>
-> Cc: Philippe Mathieu-Daudé <f4bug@amsat.org>
-> Cc: qemu-devel@nongnu.org
-> Cc: qemu-arm@nongnu.org
-> Cc: yurovsky@gmail.com
-> Signed-off-by: Andrey Smirnov <andrew.smirnov@gmail.com>
-> ---
->  hw/misc/Makefile.objs      |   1 +
->  hw/misc/imx7_gpr.c         | 119 +++++++++++++++++++++++++++++++++++++++++++++
->  include/hw/misc/imx7_gpr.h |  28 +++++++++++
->  3 files changed, 148 insertions(+)
->  create mode 100644 hw/misc/imx7_gpr.c
->  create mode 100644 include/hw/misc/imx7_gpr.h
-> 
-> diff --git a/hw/misc/Makefile.objs b/hw/misc/Makefile.objs
-> index 019886912c..fce426eb75 100644
-> --- a/hw/misc/Makefile.objs
-> +++ b/hw/misc/Makefile.objs
-> @@ -36,6 +36,7 @@ obj-$(CONFIG_IMX) += imx6_src.o
->  obj-$(CONFIG_IMX) += imx7_ccm.o
->  obj-$(CONFIG_IMX) += imx2_wdt.o
->  obj-$(CONFIG_IMX) += imx7_snvs.o
-> +obj-$(CONFIG_IMX) += imx7_gpr.o
->  obj-$(CONFIG_MILKYMIST) += milkymist-hpdmc.o
->  obj-$(CONFIG_MILKYMIST) += milkymist-pfpu.o
->  obj-$(CONFIG_MAINSTONE) += mst_fpga.o
-> diff --git a/hw/misc/imx7_gpr.c b/hw/misc/imx7_gpr.c
-> new file mode 100644
-> index 0000000000..9e8ccea9e8
-> --- /dev/null
-> +++ b/hw/misc/imx7_gpr.c
-> @@ -0,0 +1,119 @@
-> +/*
-> + * Copyright (c) 2017, Impinj, Inc.
-> + *
-> + * i.MX7 GPR IP block emulation code
-> + *
-> + * Author: Andrey Smirnov <andrew.smirnov@gmail.com>
-> + *
-> + * This work is licensed under the terms of the GNU GPL, version 2 or later.
-> + * See the COPYING file in the top-level directory.
-> + *
-> + * Bare minimum emulation code needed to support being able to shut
-> + * down linux guest gracefully.
-> + */
-> +
-> +#include "qemu/osdep.h"
-> +#include "hw/misc/imx7_gpr.h"
-> +#include "qemu/log.h"
-> +#include "sysemu/sysemu.h"
-> +
-> +enum IMX7GPRRegisters {
-> +    IOMUXC_GPR0  = 0x00,
-> +    IOMUXC_GPR1  = 0x04,
-> +    IOMUXC_GPR2  = 0x08,
-> +    IOMUXC_GPR3  = 0x0c,
-> +    IOMUXC_GPR4  = 0x10,
-> +    IOMUXC_GPR5  = 0x14,
-> +    IOMUXC_GPR6  = 0x18,
-> +    IOMUXC_GPR7  = 0x1c,
-> +    IOMUXC_GPR8  = 0x20,
-> +    IOMUXC_GPR9  = 0x24,
-> +    IOMUXC_GPR10 = 0x28,
-> +    IOMUXC_GPR11 = 0x2c,
-> +    IOMUXC_GPR12 = 0x30,
-> +    IOMUXC_GPR13 = 0x34,
-> +    IOMUXC_GPR14 = 0x38,
-> +    IOMUXC_GPR15 = 0x3c,
-> +    IOMUXC_GPR16 = 0x40,
-> +    IOMUXC_GPR17 = 0x44,
-> +    IOMUXC_GPR18 = 0x48,
-> +    IOMUXC_GPR19 = 0x4c,
-> +    IOMUXC_GPR20 = 0x50,
-> +    IOMUXC_GPR21 = 0x54,
-> +    IOMUXC_GPR22 = 0x58,
-> +};
-> +
-> +#define IMX7D_GPR1_IRQ_MASK                 BIT(12)
-> +#define IMX7D_GPR1_ENET1_TX_CLK_SEL_MASK    BIT(13)
-> +#define IMX7D_GPR1_ENET2_TX_CLK_SEL_MASK    BIT(14)
-> +#define IMX7D_GPR1_ENET_TX_CLK_SEL_MASK     (0x3 << 13)
-> +#define IMX7D_GPR1_ENET1_CLK_DIR_MASK       BIT(17)
-> +#define IMX7D_GPR1_ENET2_CLK_DIR_MASK       BIT(18)
-> +#define IMX7D_GPR1_ENET_CLK_DIR_MASK        (0x3 << 17)
-> +
-> +#define IMX7D_GPR5_CSI_MUX_CONTROL_MIPI     BIT(4)
-> +#define IMX7D_GPR12_PCIE_PHY_REFCLK_SEL     BIT(5)
-> +#define IMX7D_GPR22_PCIE_PHY_PLL_LOCKED     BIT(31)
-> +
-> +
-> +static uint64_t imx7_gpr_read(void *opaque, hwaddr offset, unsigned size)
-> +{
-> +    if (offset == IOMUXC_GPR22) {
-> +        return IMX7D_GPR22_PCIE_PHY_PLL_LOCKED;
-> +    }
-> +
-> +    return 0;
-> +}
-> +
-> +static void imx7_gpr_write(void *opaque, hwaddr offset,
-> +                           uint64_t v, unsigned size)
-> +{
+A large pull due to patch buildup over the holiday period.
+Most notable here is probably the addition of vhost-user-blk.
 
-If you ever respin, please add a trace point here (just copy/paste from
-another file from the same directory), and in the read() function.
+The following changes since commit f521eeee3bd060b460c99e605472b7e03967db43:
 
-Linux will evolve and use more registers from this device (and the other
-devices you are modelling), and a Linux driver busy loop is likely to
-hang QEMU. A trace event will ease your board next user soon :)
+  Merge remote-tracking branch 'remotes/juanquintela/tags/migration/20180115' into staging (2018-01-15 13:17:47 +0000)
 
-That said,
+are available in the git repository at:
 
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+  git://git.kernel.org/pub/scm/virt/kvm/mst/qemu.git tags/for_upstream
 
-> +}
-> +
-> +static const struct MemoryRegionOps imx7_gpr_ops = {
-> +    .read = imx7_gpr_read,
-> +    .write = imx7_gpr_write,
-> +    .endianness = DEVICE_NATIVE_ENDIAN,
-> +    .impl = {
-> +        /*
-> +         * Our device would not work correctly if the guest was doing
-> +         * unaligned access. This might not be a limitation on the
-> +         * real device but in practice there is no reason for a guest
-> +         * to access this device unaligned.
-> +         */
-> +        .min_access_size = 4,
-> +        .max_access_size = 4,
-> +        .unaligned = false,
-> +    },
-> +};
-> +
-> +static void imx7_gpr_init(Object *obj)
-> +{
-> +    SysBusDevice *sd = SYS_BUS_DEVICE(obj);
-> +    IMX7GPRState *s = IMX7_GPR(obj);
-> +
-> +    memory_region_init_io(&s->mmio, obj, &imx7_gpr_ops, s,
-> +                          TYPE_IMX7_GPR, 64 * 1024);
-> +    sysbus_init_mmio(sd, &s->mmio);
-> +}
-> +
-> +static void imx7_gpr_class_init(ObjectClass *klass, void *data)
-> +{
-> +    DeviceClass *dc = DEVICE_CLASS(klass);
-> +
-> +    dc->desc  = "i.MX7 General Purpose Registers Module";
-> +}
-> +
-> +static const TypeInfo imx7_gpr_info = {
-> +    .name          = TYPE_IMX7_GPR,
-> +    .parent        = TYPE_SYS_BUS_DEVICE,
-> +    .instance_size = sizeof(IMX7GPRState),
-> +    .instance_init = imx7_gpr_init,
-> +    .class_init    = imx7_gpr_class_init,
-> +};
-> +
-> +static void imx7_gpr_register_type(void)
-> +{
-> +    type_register_static(&imx7_gpr_info);
-> +}
-> +type_init(imx7_gpr_register_type)
-> diff --git a/include/hw/misc/imx7_gpr.h b/include/hw/misc/imx7_gpr.h
-> new file mode 100644
-> index 0000000000..e19373d274
-> --- /dev/null
-> +++ b/include/hw/misc/imx7_gpr.h
-> @@ -0,0 +1,28 @@
-> +/*
-> + * Copyright (c) 2017, Impinj, Inc.
-> + *
-> + * i.MX7 GPR IP block emulation code
-> + *
-> + * Author: Andrey Smirnov <andrew.smirnov@gmail.com>
-> + *
-> + * This work is licensed under the terms of the GNU GPL, version 2 or later.
-> + * See the COPYING file in the top-level directory.
-> + */
-> +
-> +#ifndef IMX7_GPR_H
-> +#define IMX7_GPR_H
-> +
-> +#include "qemu/bitops.h"
-> +#include "hw/sysbus.h"
-> +
-> +#define TYPE_IMX7_GPR "imx7.gpr"
-> +#define IMX7_GPR(obj) OBJECT_CHECK(IMX7GPRState, (obj), TYPE_IMX7_GPR)
-> +
-> +typedef struct IMX7GPRState {
-> +    /* <private> */
-> +    SysBusDevice parent_obj;
-> +
-> +    MemoryRegion mmio;
-> +} IMX7GPRState;
-> +
-> +#endif /* IMX7_GPR_H */
-> 
+for you to fetch changes up to 631ae6adb1fcea786e0db8c6f1b19570bad0f90c:
+
+  vhost: remove assertion to prevent crash (2018-01-16 06:36:19 +0200)
+
+----------------------------------------------------------------
+pc, pci, virtio: features, fixes, cleanups
+
+A bunch of fixes, cleanus and new features all over the place.
+
+Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+
+----------------------------------------------------------------
+Changpeng Liu (4):
+      vhost-user: add new vhost user messages to support virtio config space
+      vhost-user-blk: introduce a new vhost-user-blk host device
+      contrib/libvhost-user: enable virtio config space messages
+      contrib/vhost-user-blk: introduce a vhost-user-blk sample application
+
+Dou Liyang (2):
+      ACPI/unit-test: Add a testcase for RAM allocation in numa node
+      hw/acpi-build: Make next_base easy to follow
+
+Dr. David Alan Gilbert (4):
+      vhost: Build temporary section list and deref after commit
+      vhost: Move log_dirty check
+      vhost: Simplify ring verification checks
+      vhost: Merge sections added to temporary list
+
+Gal Hammer (3):
+      qemu: add a cleanup callback function to EventNotifier
+      virtio: postpone the execution of event_notifier_cleanup function
+      virtio: improve virtio devices initialization time
+
+Igor Mammedov (4):
+      tests: acpi: move tested tables array allocation outside of test_acpi_dsdt_table()
+      tests: acpi: init table descriptor in test_dst_table()
+      tests: acpi: rename test_acpi_tables()/test_dst_table() to reflect its usage
+      tests: acpi: add comments to fetch_rsdt_referenced_tables/data->tables usage
+
+Jay Zhou (1):
+      vhost: remove assertion to prevent crash
+
+Marcel Apfelbaum (2):
+      MAINTAINERS: Add myself as maintainer to X86 machines
+      hw/pci-bridge: fix QEMU crash because of pcie-root-port
+
+Maxime Coquelin (6):
+      vhost-user: fix multiple queue specification
+      vhost-user-test: fix features mask
+      vhost-user-test: extract read-guest-mem test from main loop
+      vhost-user-test: setup virtqueues in all tests
+      vhost-user-test: make features mask an init_virtio_dev() argument
+      vhost-user-test: use init_virtio_dev in multiqueue test
+
+Michael S. Tsirkin (2):
+      vhost-user: factor out msg head and payload
+      vhost-user: fix misaligned access to payload
+
+Mohammed Gamal (2):
+      x86_iommu: Move machine check to x86_iommu_realize()
+      x86_iommu: check if machine has PCI bus
+
+Prasad Singamsetty (2):
+      intel-iommu: Redefine macros to enable supporting 48 bit address width
+      intel-iommu: Extend address width to 48 bits
+
+Yuval Shaia (1):
+      pci/shpc: Move function to generic header file
+
+ docs/interop/vhost-user.txt             |  61 +++-
+ Makefile                                |   3 +
+ default-configs/pci.mak                 |   1 +
+ contrib/libvhost-user/libvhost-user.h   |  33 ++
+ hw/i386/intel_iommu_internal.h          |  43 ++-
+ hw/virtio/virtio-pci.h                  |  18 ++
+ include/hw/i386/intel_iommu.h           |   7 +-
+ include/hw/virtio/vhost-backend.h       |  12 +
+ include/hw/virtio/vhost-user-blk.h      |  41 +++
+ include/hw/virtio/vhost.h               |  17 +
+ include/qemu/event_notifier.h           |   1 +
+ include/qemu/host-utils.h               |  10 +
+ accel/kvm/kvm-all.c                     |   4 +
+ contrib/libvhost-user/libvhost-user.c   |  42 +++
+ contrib/vhost-user-blk/vhost-user-blk.c | 545 ++++++++++++++++++++++++++++++++
+ hw/block/vhost-user-blk.c               | 359 +++++++++++++++++++++
+ hw/i386/acpi-build.c                    |   5 +-
+ hw/i386/amd_iommu.c                     |  13 +-
+ hw/i386/intel_iommu.c                   | 136 ++++----
+ hw/i386/x86-iommu.c                     |  13 +
+ hw/pci-bridge/gen_pcie_root_port.c      |   7 +-
+ hw/pci/shpc.c                           |  13 +-
+ hw/virtio/vhost-user.c                  | 318 +++++++++++++------
+ hw/virtio/vhost.c                       | 250 +++++++++++----
+ hw/virtio/virtio-bus.c                  |  19 +-
+ hw/virtio/virtio-pci.c                  |  55 ++++
+ hw/virtio/virtio.c                      |   5 +
+ tests/bios-tables-test.c                |  50 ++-
+ tests/vhost-user-test.c                 | 171 +++++-----
+ util/event_notifier-posix.c             |   5 +-
+ util/event_notifier-win32.c             |   2 +
+ .gitignore                              |   1 +
+ MAINTAINERS                             |   1 +
+ Makefile.objs                           |   1 +
+ contrib/vhost-user-blk/Makefile.objs    |   1 +
+ hw/block/Makefile.objs                  |   3 +
+ hw/virtio/trace-events                  |   5 +
+ tests/acpi-test-data/pc/DSDT.numamem    | Bin 0 -> 5150 bytes
+ tests/acpi-test-data/pc/SRAT.numamem    | Bin 0 -> 224 bytes
+ tests/acpi-test-data/q35/DSDT.numamem   | Bin 0 -> 7834 bytes
+ tests/acpi-test-data/q35/SRAT.numamem   | Bin 0 -> 224 bytes
+ 41 files changed, 1897 insertions(+), 374 deletions(-)
+ create mode 100644 include/hw/virtio/vhost-user-blk.h
+ create mode 100644 contrib/vhost-user-blk/vhost-user-blk.c
+ create mode 100644 hw/block/vhost-user-blk.c
+ create mode 100644 contrib/vhost-user-blk/Makefile.objs
+ create mode 100644 tests/acpi-test-data/pc/DSDT.numamem
+ create mode 100644 tests/acpi-test-data/pc/SRAT.numamem
+ create mode 100644 tests/acpi-test-data/q35/DSDT.numamem
+ create mode 100644 tests/acpi-test-data/q35/SRAT.numamem
