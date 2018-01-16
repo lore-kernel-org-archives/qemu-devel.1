@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50253)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50240)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1ebS3w-0002vS-61
-	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 09:18:05 -0500
+	(envelope-from <paolo.bonzini@gmail.com>) id 1ebS3v-0002uC-8z
+	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 09:18:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1ebS3v-0004b5-24
-	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 09:18:04 -0500
-Received: from mail-wr0-x234.google.com ([2a00:1450:400c:c0c::234]:45128)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1ebS3p-0004YO-B1
+	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 09:18:03 -0500
+Received: from mail-wm0-x243.google.com ([2a00:1450:400c:c09::243]:41873)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1ebS3u-0004ai-SG
-	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 09:18:03 -0500
-Received: by mail-wr0-x234.google.com with SMTP id 16so15331755wry.12
-	for <qemu-devel@nongnu.org>; Tue, 16 Jan 2018 06:18:02 -0800 (PST)
+	id 1ebS3p-0004Y1-58
+	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 09:17:57 -0500
+Received: by mail-wm0-x243.google.com with SMTP id f71so8700778wmf.0
+	for <qemu-devel@nongnu.org>; Tue, 16 Jan 2018 06:17:57 -0800 (PST)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Tue, 16 Jan 2018 15:16:59 +0100
-Message-Id: <1516112253-14480-18-git-send-email-pbonzini@redhat.com>
+Date: Tue, 16 Jan 2018 15:16:55 +0100
+Message-Id: <1516112253-14480-14-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1516112253-14480-1-git-send-email-pbonzini@redhat.com>
 References: <1516112253-14480-1-git-send-email-pbonzini@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 17/51] readline: add a free function
+Subject: [Qemu-devel] [PULL 13/51] tests/docker: add some sanitizers to
+ fedora dockerfile
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,99 +36,35 @@ Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
 From: Marc-André Lureau <marcandre.lureau@redhat.com>
 
-Fixes leaks such as:
-
-Direct leak of 2 byte(s) in 1 object(s) allocated from:
-    #0 0x7eff58beb850 in malloc (/lib64/libasan.so.4+0xde850)
-    #1 0x7eff57942f0c in g_malloc ../glib/gmem.c:94
-    #2 0x7eff579431cf in g_malloc_n ../glib/gmem.c:331
-    #3 0x7eff5795f6eb in g_strdup ../glib/gstrfuncs.c:363
-    #4 0x55db720f1d46 in readline_hist_add /home/elmarco/src/qq/util/readline.c:258
-    #5 0x55db720f2d34 in readline_handle_byte /home/elmarco/src/qq/util/readline.c:387
-    #6 0x55db71539d00 in monitor_read /home/elmarco/src/qq/monitor.c:3896
-    #7 0x55db71f9be35 in qemu_chr_be_write_impl /home/elmarco/src/qq/chardev/char.c:167
-    #8 0x55db71f9bed3 in qemu_chr_be_write /home/elmarco/src/qq/chardev/char.c:179
-    #9 0x55db71fa013c in fd_chr_read /home/elmarco/src/qq/chardev/char-fd.c:66
-    #10 0x55db71fe18a8 in qio_channel_fd_source_dispatch /home/elmarco/src/qq/io/channel-watch.c:84
-    #11 0x7eff5793a90b in g_main_dispatch ../glib/gmain.c:3182
-    #12 0x7eff5793b7ac in g_main_context_dispatch ../glib/gmain.c:3847
-    #13 0x55db720af3bd in glib_pollfds_poll /home/elmarco/src/qq/util/main-loop.c:214
-    #14 0x55db720af505 in os_host_main_loop_wait /home/elmarco/src/qq/util/main-loop.c:261
-    #15 0x55db720af6d6 in main_loop_wait /home/elmarco/src/qq/util/main-loop.c:515
-    #16 0x55db7184e0de in main_loop /home/elmarco/src/qq/vl.c:1995
-    #17 0x55db7185e956 in main /home/elmarco/src/qq/vl.c:4914
-    #18 0x7eff4ea17039 in __libc_start_main (/lib64/libc.so.6+0x21039)
-
-(while at it, use g_new0(ReadLineState), it's a bit easier to read)
+Build fedora image with ASAN/UBSan support.
 
 Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Message-Id: <20180104160523.22995-6-marcandre.lureau@redhat.com>
+Tested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Message-Id: <20180104160523.22995-11-marcandre.lureau@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- include/qemu/readline.h |  1 +
- monitor.c               |  2 +-
- util/readline.c         | 18 +++++++++++++++++-
- 3 files changed, 19 insertions(+), 2 deletions(-)
+ tests/docker/dockerfiles/fedora.docker | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/include/qemu/readline.h b/include/qemu/readline.h
-index c08cf74..e812583 100644
---- a/include/qemu/readline.h
-+++ b/include/qemu/readline.h
-@@ -59,5 +59,6 @@ ReadLineState *readline_init(ReadLinePrintfFunc *printf_func,
-                              ReadLineFlushFunc *flush_func,
-                              void *opaque,
-                              ReadLineCompletionFunc *completion_finder);
-+void readline_free(ReadLineState *rs);
+diff --git a/tests/docker/dockerfiles/fedora.docker b/tests/docker/dockerfiles/fedora.docker
+index 4b26c3a..32de731 100644
+--- a/tests/docker/dockerfiles/fedora.docker
++++ b/tests/docker/dockerfiles/fedora.docker
+@@ -3,7 +3,7 @@ ENV PACKAGES \
+     ccache gettext git tar PyYAML sparse flex bison python2 bzip2 hostname \
+     glib2-devel pixman-devel zlib-devel SDL-devel libfdt-devel \
+     gcc gcc-c++ clang make perl which bc findutils libaio-devel \
+-    nettle-devel \
++    nettle-devel libasan libubsan \
+     mingw32-pixman mingw32-glib2 mingw32-gmp mingw32-SDL mingw32-pkg-config \
+     mingw32-gtk2 mingw32-gtk3 mingw32-gnutls mingw32-nettle mingw32-libtasn1 \
+     mingw32-libjpeg-turbo mingw32-libpng mingw32-curl mingw32-libssh2 \
+@@ -15,4 +15,4 @@ ENV PACKAGES \
  
- #endif /* READLINE_H */
-diff --git a/monitor.c b/monitor.c
-index d682eee..b9da5e2 100644
---- a/monitor.c
-+++ b/monitor.c
-@@ -583,7 +583,7 @@ static void monitor_data_destroy(Monitor *mon)
-     if (monitor_is_qmp(mon)) {
-         json_message_parser_destroy(&mon->qmp.parser);
-     }
--    g_free(mon->rs);
-+    readline_free(mon->rs);
-     QDECREF(mon->outbuf);
-     qemu_mutex_destroy(&mon->out_lock);
- }
-diff --git a/util/readline.c b/util/readline.c
-index bbdee79..24ec839 100644
---- a/util/readline.c
-+++ b/util/readline.c
-@@ -500,12 +500,28 @@ const char *readline_get_history(ReadLineState *rs, unsigned int index)
-     return rs->history[index];
- }
- 
-+void readline_free(ReadLineState *rs)
-+{
-+    int i;
-+
-+    if (!rs) {
-+        return;
-+    }
-+    for (i = 0; i < READLINE_MAX_CMDS; i++) {
-+        g_free(rs->history[i]);
-+    }
-+    for (i = 0; i < READLINE_MAX_COMPLETIONS; i++) {
-+        g_free(rs->completions[i]);
-+    }
-+    g_free(rs);
-+}
-+
- ReadLineState *readline_init(ReadLinePrintfFunc *printf_func,
-                              ReadLineFlushFunc *flush_func,
-                              void *opaque,
-                              ReadLineCompletionFunc *completion_finder)
- {
--    ReadLineState *rs = g_malloc0(sizeof(*rs));
-+    ReadLineState *rs = g_new0(ReadLineState, 1);
- 
-     rs->hist_entry = -1;
-     rs->opaque = opaque;
+ RUN dnf install -y $PACKAGES
+ RUN rpm -q $PACKAGES | sort > /packages.txt
+-ENV FEATURES mingw clang pyyaml
++ENV FEATURES mingw clang pyyaml asan
 -- 
 1.8.3.1
