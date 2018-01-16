@@ -1,25 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47677)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53129)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <fzheng@redhat.com>) id 1ebGoF-0000S9-IT
-	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 21:17:08 -0500
+	(envelope-from <sagart@cse.iitb.ac.in>) id 1ebNNg-000553-W1
+	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 04:18:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <fzheng@redhat.com>) id 1ebGoB-0000FR-0A
-	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 21:17:07 -0500
-Received: from mail-wm0-f41.google.com ([74.125.82.41]:41134)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <fzheng@redhat.com>) id 1ebGoA-0000AU-PX
-	for qemu-devel@nongnu.org; Mon, 15 Jan 2018 21:17:02 -0500
-Received: by mail-wm0-f41.google.com with SMTP id f71so5281039wmf.0
-	for <qemu-devel@nongnu.org>; Mon, 15 Jan 2018 18:17:00 -0800 (PST)
+	(envelope-from <sagart@cse.iitb.ac.in>) id 1ebNNb-0001Xc-Ef
+	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 04:18:08 -0500
+Received: from smtp1.iitb.ac.in ([103.21.127.13]:56546)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <sagart@cse.iitb.ac.in>)
+	id 1ebNNb-0001E0-2S
+	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 04:18:03 -0500
+Received: from ldns1.iitb.ac.in (ldns1.iitb.ac.in [10.200.12.1])
+	by smtp1.iitb.ac.in (Postfix) with SMTP id 63B07B7
+	for <qemu-devel@nongnu.org>; Tue, 16 Jan 2018 14:47:43 +0530 (IST)
+Received: from jeeves.cse.iitb.ac.in (miller.cse.iitb.ac.in [10.129.3.1])
+	by ldns1.iitb.ac.in (Postfix) with ESMTP id 8D268360045
+	for <qemu-devel@nongnu.org>; Tue, 16 Jan 2018 14:47:42 +0530 (IST)
+Received: from www.cse.iitb.ac.in (localhost [127.0.0.1])
+	(using TLSv1 with cipher DHE-RSA-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by jeeves.cse.iitb.ac.in (Postfix) with ESMTPSA id E16A58C270C
+	for <qemu-devel@nongnu.org>; Tue, 16 Jan 2018 14:47:41 +0530 (IST)
 MIME-Version: 1.0
-In-Reply-To: <20180115132636.33905fde.cohuck@redhat.com>
-References: <20180115114841.GH8218@redhat.com>
-	<20180115132636.33905fde.cohuck@redhat.com>
-From: Fam Zheng <fzheng@redhat.com>
-Date: Tue, 16 Jan 2018 10:16:28 +0800
-Message-ID: <CAK1Eb9=c08yNKiNysQp6nprcMKDhRF2FH-pCe278gJEQSzP-KQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] RFE for patchew docker result reporting
+Content-Type: text/plain; charset=UTF-8;
+ format=flowed
+Content-Transfer-Encoding: 7bit
+Date: Tue, 16 Jan 2018 14:47:41 +0530
+From: sagart <sagart@cse.iitb.ac.in>
+Message-ID: <3f97e5fca675d8561f2291e6fbd673b6@cse.iitb.ac.in>
+Subject: [Qemu-devel] Help regarding configuring qemu with
+ '--enable-ptnetmap' option
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,26 +38,12 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org, famz@redhat.com
+To: qemu-devel@nongnu.org
 
-On Mon, Jan 15, 2018 at 8:26 PM, Cornelia Huck <cohuck@redhat.com> wrote:
-> On Mon, 15 Jan 2018 11:48:41 +0000
-> "Daniel P. Berrange" <berrange@redhat.com> wrote:
->
->> Currently if I look at the patchew website for build logs, the 'docker'
->> job results are listed as a single expandable item.
->>
->> Patchew runs 3 separate docker builds, however, and there's a tonne of
->> output to scroll through to find which one actually failed.
->>
->> Thus, my RFE is to split the build log up so that instead of a single
->> "docker" result, it shows  "docker quick", "docker biuld" and
->> "docker mingw" as separate build logs / results. This would make it
->> easier to see at a glance which scenario failed.
->
-> +1. Splitting the output into smaller units makes sense to me.
+Hello,
+  I am trying to configure qemu with ptnet. But it seems like, now there 
+is no 'ptnet' branch to checkout,
+so I am unable to configure using '--enable-ptnetmap' option.
+please help in this regard.
 
-Made the proposed change on patchew.org. Thanks.
-
-Fam
+Thank you.
