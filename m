@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43745)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44039)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1ebY7i-00052R-9y
-	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 15:46:23 -0500
+	(envelope-from <eblake@redhat.com>) id 1ebY8T-0005YA-OG
+	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 15:47:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1ebY7e-0003xz-Cz
-	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 15:46:22 -0500
-Date: Tue, 16 Jan 2018 13:46:14 -0700
-From: Alex Williamson <alex.williamson@redhat.com>
-Message-ID: <20180116134614.1aae30b9@w520.home>
-In-Reply-To: <ad143758-227b-55fe-44a6-c62a48f74162@ozlabs.ru>
-References: <20180102052805.20498-1-aik@ozlabs.ru>
-	<f14c0782-0f25-8bd0-8536-323bfc5fcbe4@redhat.com>
-	<ad143758-227b-55fe-44a6-c62a48f74162@ozlabs.ru>
+	(envelope-from <eblake@redhat.com>) id 1ebY8S-0004N6-T6
+	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 15:47:09 -0500
+References: <cover.1513342045.git.berto@igalia.com>
+	<cc1ca55a4f93a0eaf582286ce1f1f93b2a94d727.1513342045.git.berto@igalia.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <6eb7f158-3acb-b3ee-d41f-e6b6b15bb8a3@redhat.com>
+Date: Tue, 16 Jan 2018 14:47:00 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH qemu 0/3] spapr/iommu: Enable in-kernel TCE
- acceleration via VFIO KVM device
+In-Reply-To: <cc1ca55a4f93a0eaf582286ce1f1f93b2a94d727.1513342045.git.berto@igalia.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="fYm3TTe8z6UpLkjfKQc86onhoGt6MVtQn"
+Subject: Re: [Qemu-devel] [PATCH v2 01/32] qcow2: Fix documentation of
+ get_cluster_table()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,55 +25,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alexey Kardashevskiy <aik@ozlabs.ru>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
+To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, "Denis V . Lunev" <den@openvz.org>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 
-On Mon, 15 Jan 2018 15:12:07 +1100
-Alexey Kardashevskiy <aik@ozlabs.ru> wrote:
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--fYm3TTe8z6UpLkjfKQc86onhoGt6MVtQn
+From: Eric Blake <eblake@redhat.com>
+To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, "Denis V . Lunev" <den@openvz.org>,
+ qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+Message-ID: <6eb7f158-3acb-b3ee-d41f-e6b6b15bb8a3@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 01/32] qcow2: Fix documentation of
+ get_cluster_table()
+References: <cover.1513342045.git.berto@igalia.com>
+ <cc1ca55a4f93a0eaf582286ce1f1f93b2a94d727.1513342045.git.berto@igalia.com>
+In-Reply-To: <cc1ca55a4f93a0eaf582286ce1f1f93b2a94d727.1513342045.git.berto@igalia.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-> On 03/01/18 04:51, Paolo Bonzini wrote:
-> > On 02/01/2018 06:28, Alexey Kardashevskiy wrote: =20
-> >> This is my current queue of the in-kernel TCE acceleration
-> >> enablement.
-> >>
-> >> Changes since https://lists.gnu.org/archive/html/qemu-devel/2017-12/ms=
-g01918.html :
-> >> * 3 patches instead of one, one per maintainership area;
-> >> * added memory_region_iommu_get_attr();
-> >> * removed set_attr() as there is no use for it now;
-> >> * folded the chunk in vfio_listener_region_add() under
-> >> VFIO_SPAPR_TCE_v2_IOMMU branch as the acceleration is only
-> >> enabled when DMA memory is preregistered and this is only supported
-> >> by the v2 IOMMU.
-> >>
-> >> This is based on sha1
-> >> ad59cde C=C3=A9dric Le Goater "target/ppc: more use of the PPC_*() mac=
-ros".
-> >>
-> >> Please comment. Thanks.
-> >>
-> >>
-> >>
-> >> Alexey Kardashevskiy (3):
-> >>   memory/iommu: Add get_attr()
-> >>   vfio/spapr: Use iommu memory region's get_attr()
-> >>   spapr/iommu: Enable in-kernel TCE acceleration via VFIO KVM device
-> >>
-> >>  include/exec/memory.h | 22 ++++++++++++++++++++++
-> >>  target/ppc/kvm_ppc.h  |  6 ++++++
-> >>  hw/ppc/spapr_iommu.c  | 19 +++++++++++++++++++
-> >>  hw/vfio/common.c      | 26 ++++++++++++++++++++++++++
-> >>  memory.c              | 13 +++++++++++++
-> >>  target/ppc/kvm.c      |  7 ++++++-
-> >>  hw/vfio/trace-events  |  1 +
-> >>  7 files changed, 93 insertions(+), 1 deletion(-)
-> >> =20
-> >=20
-> > Alex, if this is okay for you, please pick it up yourself. =20
+On 12/15/2017 06:53 AM, Alberto Garcia wrote:
+> This function has not been returning the offset of the L2 table since
+> commit 3948d1d4876065160583e79533bf604481063833
 >=20
-> Alex, ping?
+> Signed-off-by: Alberto Garcia <berto@igalia.com>
+> ---
+>  block/qcow2-cluster.c | 3 +--
+>  1 file changed, 1 insertion(+), 2 deletions(-)
+>=20
 
-Yeah, I'll pick these up.  Paolo, do you want to throw an explicit Ack
-for the first patch?  David, R-b/A-b?  Thanks,
+Reviewed-by: Eric Blake <eblake@redhat.com>
 
-Alex
+> diff --git a/block/qcow2-cluster.c b/block/qcow2-cluster.c
+> index a3fec27bf9..8163983d28 100644
+> --- a/block/qcow2-cluster.c
+> +++ b/block/qcow2-cluster.c
+> @@ -648,8 +648,7 @@ fail:
+>   * for a given disk offset, load (and allocate if needed)
+>   * the l2 table.
+>   *
+> - * the l2 table offset in the qcow2 file and the cluster index
+> - * in the l2 table are given to the caller.
+> + * the cluster index in the l2 table is given to the caller.
+>   *
+>   * Returns 0 on success, -errno in failure case
+>   */
+>=20
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--fYm3TTe8z6UpLkjfKQc86onhoGt6MVtQn
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlpeZMQACgkQp6FrSiUn
+Q2oPGAf9GvL972W7RoxTlXroxP6/SCNyZg66vAj+xZChTe/DAwFQVl1aV7UdIPWp
+c6PrkQT9GGgNzonBpn9lZzup2N1as5dGkVre/lMb19wz0mEtIN4AScW7mb3/IUMY
+izIOr49sdMKP7oDR3iJ/DGZhDPEbJBZIw/4nE44fxG3mD4D0zuAAaO0nIA4gFm3X
+x6fRR/gv10BKGfyJ9msSjI7ciXfnpx8c7Zpe49203D3bN3CH3EGgTLm0Iy//Sm3X
+G8Cd66IrS5hEMyJXk4+64kHiiRQ0hf3BjUFRvQmwD56+CVkSbPHSZmQT0EUq744X
+wHz/dnMGhFTEVxJdmkwE0dU4Ugk+5g==
+=XFE+
+-----END PGP SIGNATURE-----
+
+--fYm3TTe8z6UpLkjfKQc86onhoGt6MVtQn--
