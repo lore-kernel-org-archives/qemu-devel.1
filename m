@@ -1,25 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51914)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52143)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jianjay.zhou@huawei.com>) id 1ebS7Y-0006Mc-0O
-	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 09:21:49 -0500
+	(envelope-from <marcandre.lureau@gmail.com>) id 1ebS8O-00078j-Ip
+	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 09:22:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jianjay.zhou@huawei.com>) id 1ebS7U-0006vV-NH
-	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 09:21:47 -0500
-Received: from [45.249.212.255] (port=55157 helo=huawei.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jianjay.zhou@huawei.com>)
-	id 1ebS7U-0006uU-0e
-	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 09:21:44 -0500
-From: "Zhoujian (jay)" <jianjay.zhou@huawei.com>
-Date: Tue, 16 Jan 2018 14:21:32 +0000
-Message-ID: <B2D15215269B544CADD246097EACE7473AB46F25@DGGEMM505-MBS.china.huawei.com>
-References: <1516111613-18988-1-git-send-email-jianjay.zhou@huawei.com>
-In-Reply-To: <1516111613-18988-1-git-send-email-jianjay.zhou@huawei.com>
-Content-Language: zh-CN
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	(envelope-from <marcandre.lureau@gmail.com>) id 1ebS8N-0007Jv-7d
+	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 09:22:40 -0500
+Received: from mail-wm0-x230.google.com ([2a00:1450:400c:c09::230]:41354)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+	id 1ebS8N-0007Jg-1a
+	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 09:22:39 -0500
+Received: by mail-wm0-x230.google.com with SMTP id f71so8733348wmf.0
+	for <qemu-devel@nongnu.org>; Tue, 16 Jan 2018 06:22:38 -0800 (PST)
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v3 0/4] cryptodev: add vhost support
+In-Reply-To: <5edb00c6-382e-5a36-a61b-47d3fc5b8408@redhat.com>
+References: <1516059302-7169-1-git-send-email-pbonzini@redhat.com>
+	<CAFEAcA-wnvhRfOAQySLXWqvwtPXwj+r+wn_sRGM5ti6wWe_c-Q@mail.gmail.com>
+	<CAJ+F1CLzuv4CevvT+gM_ZOnC67_=-3EpRiQBoQXqNYDiFLBw+A@mail.gmail.com>
+	<CAFEAcA9dsWKLitCfxy+HV66rBMruxX67Aq-n4Bpmx5b2QzC2YA@mail.gmail.com>
+	<26d847ad-b3ba-bdab-a79b-79ad486ae80a@redhat.com>
+	<CAFEAcA87VxcTz710LKTLCkre+DoBhqgRtShObU-CYp1XU9TgWg@mail.gmail.com>
+	<5edb00c6-382e-5a36-a61b-47d3fc5b8408@redhat.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Tue, 16 Jan 2018 15:22:36 +0100
+Message-ID: <CAJ+F1CKKdHYBgWWf6zucKB25gD0zG9Lrvbh51FCir2MvTRkJbQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PULL v3 00/53] Misc changes for 2017-01-12
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,176 +35,103 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "mst@redhat.com" <mst@redhat.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "Huangweidong (C)" <weidong.huang@huawei.com>, "stefanha@redhat.com" <stefanha@redhat.com>, "pasic@linux.vnet.ibm.com" <pasic@linux.vnet.ibm.com>, longpeng <longpeng2@huawei.com>, "xin.zeng@intel.com" <xin.zeng@intel.com>, "roy.fan.zhang@intel.com" <roy.fan.zhang@intel.com>, "Gonglei (Arei)" <arei.gonglei@huawei.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-VHOST_USER_CREATE_CRYPTO_SESSION and VHOST_USER_CLOSE_CRYPTO_SESSION are ne=
-w
-added messages, they should be sent only when
-VHOST_USER_PROTOCOL_F_CRYPTO_SESSION feature has been successfully negotiat=
-ed.
+Hi
 
-The differs between v2 and v3 are listed below, pls review, thanks!
+On Tue, Jan 16, 2018 at 2:54 PM, Paolo Bonzini <pbonzini@redhat.com> wrote:
+> On 16/01/2018 14:47, Peter Maydell wrote:
+>> On 16 January 2018 at 13:41, Paolo Bonzini <pbonzini@redhat.com> wrote:
+>>> On 16/01/2018 13:06, Peter Maydell wrote:
+>>>>> ASAN is enabled by default if available when --enable-debug. We could
+>>>>> add more flags if that helps.
+>>>> Configure switches should work like this:
+>>>>  * default: use feature if present, but don't complain if not present
+>>>>    or not usable
+>>>>  * --enable-foo: use feature. if feature not present, complain and
+>>>>    fail configure
+>>>>  * --disable-foo: don't test for or use feature
+>>>>
+>>>
+>>> However, --enable-debug has never worked like this (the "default" part)=
+...
+>>
+>> True, but -g, no optimization isn't really something we want to
+>> default to :-)
+>
+> Same for ASAN. :-)
+>
+>> I think the general principle that unless the user
+>> specifically said they cared about the address sanitizer we shouldn't
+>> complain if it happens not to work on this host is still a good one.
+>
+> Yes, I agree.
+>
+> So we need two options:
+>
+> * --enable-asan defaults to not used, but also fails configure if ASAN
+> is not available/usable.
 
----
-diff --git a/docs/interop/vhost-user.txt b/docs/interop/vhost-user.txt
-index f43c63d..3aec685 100644
---- a/docs/interop/vhost-user.txt
-+++ b/docs/interop/vhost-user.txt
-@@ -327,6 +327,7 @@ Protocol features
- #define VHOST_USER_PROTOCOL_F_MTU            4
- #define VHOST_USER_PROTOCOL_F_SLAVE_REQ      5
- #define VHOST_USER_PROTOCOL_F_CROSS_ENDIAN   6
-+#define VHOST_USER_PROTOCOL_F_CRYPTO_SESSION 7
-=20
- Master message types
- --------------------
-@@ -605,6 +606,9 @@ Master message types
-=20
-       Create a session for crypto operation. The server side must return t=
-he
-       session id, 0 or positive for success, negative for failure.
-+      This request should be sent only when VHOST_USER_PROTOCOL_F_CRYPTO_S=
-ESSION
-+      feature has been successfully negotiated.
-+      It's a required feature for crypto devices.
-=20
-  * VHOST_USER_CLOSE_CRYPTO_SESSION
-=20
-@@ -614,6 +618,9 @@ Master message types
-=20
-       Close a session for crypto operation which was previously
-       created by VHOST_USER_CREATE_CRYPTO_SESSION.
-+      This request should be sent only when VHOST_USER_PROTOCOL_F_CRYPTO_S=
-ESSION
-+      feature has been successfully negotiated.
-+      It's a required feature for crypto devices.
-=20
- Slave message types
- -------------------
-diff --git a/hw/virtio/vhost-user.c b/hw/virtio/vhost-user.c
-index 7865c6d..f779512 100644
---- a/hw/virtio/vhost-user.c
-+++ b/hw/virtio/vhost-user.c
-@@ -35,6 +35,7 @@ enum VhostUserProtocolFeature {
-     VHOST_USER_PROTOCOL_F_NET_MTU =3D 4,
-     VHOST_USER_PROTOCOL_F_SLAVE_REQ =3D 5,
-     VHOST_USER_PROTOCOL_F_CROSS_ENDIAN =3D 6,
-+    VHOST_USER_PROTOCOL_F_CRYPTO_SESSION =3D 7,
-=20
-     VHOST_USER_PROTOCOL_F_MAX
- };
-@@ -941,6 +942,8 @@ static int vhost_user_crypto_create_session(struct vhos=
-t_dev *dev,
-                               void *session_info,
-                               uint64_t *session_id)
- {
-+    bool crypto_session =3D virtio_has_feature(dev->protocol_features,
-+                                       VHOST_USER_PROTOCOL_F_CRYPTO_SESSIO=
-N);
-     CryptoDevBackendSymSessionInfo *sess_info =3D session_info;
-     VhostUserMsg msg =3D {
-         .request =3D VHOST_USER_CREATE_CRYPTO_SESSION,
-@@ -950,6 +953,11 @@ static int vhost_user_crypto_create_session(struct vho=
-st_dev *dev,
-=20
-     assert(dev->vhost_ops->backend_type =3D=3D VHOST_BACKEND_TYPE_USER);
-=20
-+    if (!crypto_session) {
-+        error_report("vhost-user trying to send unhandled ioctl");
-+        return -1;
-+    }
-+
-     memcpy(&msg.payload.session.session_setup_data, sess_info,
-               sizeof(CryptoDevBackendSymSessionInfo));
-     if (sess_info->key_len) {
-@@ -994,6 +1002,8 @@ static int vhost_user_crypto_create_session(struct vho=
-st_dev *dev,
- static int
- vhost_user_crypto_close_session(struct vhost_dev *dev, uint64_t session_id=
-)
- {
-+    bool crypto_session =3D virtio_has_feature(dev->protocol_features,
-+                                       VHOST_USER_PROTOCOL_F_CRYPTO_SESSIO=
-N);
-     VhostUserMsg msg =3D {
-         .request =3D VHOST_USER_CLOSE_CRYPTO_SESSION,
-         .flags =3D VHOST_USER_VERSION,
-@@ -1001,6 +1011,11 @@ vhost_user_crypto_close_session(struct vhost_dev *de=
-v, uint64_t session_id)
-     };
-     msg.payload.u64 =3D session_id;
-=20
-+    if (!crypto_session) {
-+        error_report("vhost-user trying to send unhandled ioctl");
-+        return -1;
-+    }
-+
-     if (vhost_user_write(dev, &msg, NULL, 0) < 0) {
-         error_report("vhost_user_write() return -1, close session failed")=
-;
-         return -1;
+and --enable-ubsan etc ...
+
+I wish we would avoid the multiplication of configure options, and use
+good default values instead for --enable-debug. But if it's not
+possible, let's add more options. However, it would be great if ASAN
+can be enabled by default, it seems too few developers care, even
+though it should be strongly recommended.
+
+>
+> * if we want to have --enable-debug enable ASAN, it should however _not_
+> fail configure if ASAN is not available/usable.  (I am not sure anymore
+> it's a good idea).
+>
+> The questions are:
+>
+> * should fiber support be required for --enable-asan?  What is the
+> difference in the quality of the reports?
+
+It's not required, but helps to detect more leaks. It also removes
+some warnings in some cases:
+
+Before:
+
+elmarco@boraha:~/src/qemu/build (asan *%)$ tests/test-coroutine -p
+/basic/lifecycle
+/basic/lifecycle: =3D=3D20781=3D=3DWARNING: ASan doesn't fully support
+makecontext/swapcontext functions and may produce false positives in
+some cases!
+=3D=3D20781=3D=3DWARNING: ASan is ignoring requested __asan_handle_no_retur=
+n:
+stack top: 0x7ffcb184d000; bottom 0x7ff6c4cfd000; size: 0x0005ecb50000
+(25446121472)
+False positive error reports may follow
+For details see https://github.com/google/sanitizers/issues/189
+OK
+
+After:
+
+ tests/test-coroutine -p /basic/lifecycle
+/basic/lifecycle: =3D=3D21110=3D=3DWARNING: ASan doesn't fully support
+makecontext/swapcontext functions and may produce false positives in
+some cases!
+OK
 
 
-> -----Original Message-----
-> From: Zhoujian (jay)
-> Sent: Tuesday, January 16, 2018 10:07 PM
-> To: qemu-devel@nongnu.org
-> Cc: mst@redhat.com; pbonzini@redhat.com; Huangweidong (C)
-> <weidong.huang@huawei.com>; stefanha@redhat.com; Zhoujian (jay)
-> <jianjay.zhou@huawei.com>; pasic@linux.vnet.ibm.com; longpeng
-> <longpeng2@huawei.com>; xin.zeng@intel.com; roy.fan.zhang@intel.com; Gong=
-lei
-> (Arei) <arei.gonglei@huawei.com>
-> Subject: [PATCH v3 0/4] cryptodev: add vhost support
->=20
-> From: Gonglei <arei.gonglei@huawei.com>
->=20
-> I posted the RFC verion a few months ago for DPDK vhost-crypto implmentio=
-n,
-> and now it's time to send the formal version. Because we need an user spa=
-ce
-> scheme for better performance.
->=20
-> The vhost user crypto server side patches had been sent to DPDK community=
-,
-> pls see
->=20
-> [RFC PATCH 0/6] lib/librte_vhost: introduce new vhost_user crypto backend
-> support http://dpdk.org/ml/archives/dev/2017-November/081048.html
->=20
-> You also can get virtio-crypto polling mode driver from:
->=20
-> [PATCH] virtio: add new driver for crypto devices
-> http://dpdk.org/ml/archives/dev/2017-November/081985.html
->=20
-> Gonglei (4):
->   cryptodev: add vhost-user as a new cryptodev backend
->   cryptodev: add vhost support
->   cryptodev-vhost-user: add crypto session handler
->   cryptodev-vhost-user: set the key length
->=20
->  backends/Makefile.objs                |   4 +
->  backends/cryptodev-builtin.c          |   1 +
->  backends/cryptodev-vhost-user.c       | 381
-> ++++++++++++++++++++++++++++++++++
->  backends/cryptodev-vhost.c            | 297 ++++++++++++++++++++++++++
->  docs/interop/vhost-user.txt           |  26 +++
->  hw/virtio/Makefile.objs               |   2 +-
->  hw/virtio/vhost-user.c                | 104 ++++++++++
->  hw/virtio/virtio-crypto.c             |  70 +++++++
->  include/hw/virtio/vhost-backend.h     |   8 +
->  include/hw/virtio/virtio-crypto.h     |   1 +
->  include/sysemu/cryptodev-vhost-user.h |  47 +++++
->  include/sysemu/cryptodev-vhost.h      | 154 ++++++++++++++
->  include/sysemu/cryptodev.h            |   8 +
->  qemu-options.hx                       |  21 ++
->  vl.c                                  |   4 +
->  15 files changed, 1127 insertions(+), 1 deletion(-)  create mode 100644
-> backends/cryptodev-vhost-user.c  create mode 100644 backends/cryptodev-
-> vhost.c  create mode 100644 include/sysemu/cryptodev-vhost-user.h
->  create mode 100644 include/sysemu/cryptodev-vhost.h
->=20
-> --
-> 1.8.3.1
->=20
+> * if not, and assuming --enable-debug tries to enable ASAN, should
+> --enable-debug complain if fiber support is not required?  Should
+> --enable-debug enable ASAN if fiber support is not available?
+
+I propose to simply print a warning during configure
+
+>
+> * if --enable-debug does *not* try to enable ASAN, should test-debug add
+> --enable-asn?  (I think so).
+
+The other way around?
+
+(tbh, I am not fond of all the configure options - if you need
+fine-grained configuration, you can overwrite the various *FLAGS..)
+
+--=20
+Marc-Andr=C3=A9 Lureau
