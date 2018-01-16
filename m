@@ -1,34 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43864)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51389)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1ebKoq-0003xS-HW
-	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 01:34:01 -0500
+	(envelope-from <junyan.he@intel.com>) id 1ebLS6-0004gw-8a
+	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 02:14:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1ebKon-0003TV-Al
-	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 01:34:00 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:36024)
+	(envelope-from <junyan.he@intel.com>) id 1ebLS2-0006vE-5T
+	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 02:14:34 -0500
+Received: from mga09.intel.com ([134.134.136.24]:10636)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1ebKon-0003TF-16
-	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 01:33:57 -0500
-From: Jason Wang <jasowang@redhat.com>
-References: <1513866427-27125-1-git-send-email-mst@redhat.com>
-	<CAFEAcA_pt7XhXOhL2jSxwH9ooL7xjShmp6eBAYpRLc=dY-=TXQ@mail.gmail.com>
-	<20171221223704-mutt-send-email-mst@kernel.org>
-	<CAAdtpL74ZyVsLwgBjpbsdSHbWdY_Uq6ouRAvgo00UdVevTKq8A@mail.gmail.com>
-	<20171222014258-mutt-send-email-mst@kernel.org>
-	<CAFEAcA8eKTEh3zSOPNm1WgUujNOU+zcNSgBAE5G68QcObQd8sA@mail.gmail.com>
-	<20180108200725-mutt-send-email-mst@kernel.org>
-	<20180109011010.GI2131@umbus.fritz.box>
-	<20180116044747-mutt-send-email-mst@kernel.org>
-	<84d463e9-1cd6-f3aa-7554-f1ef95bdebc9@redhat.com>
-Message-ID: <81ae7df4-666c-c10a-25fa-d8040905f70d@redhat.com>
-Date: Tue, 16 Jan 2018 14:33:48 +0800
-MIME-Version: 1.0
-In-Reply-To: <84d463e9-1cd6-f3aa-7554-f1ef95bdebc9@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PULL 00/25] pc, pci, virtio: features, fixes,
- cleanups
+	(Exim 4.71) (envelope-from <junyan.he@intel.com>) id 1ebLS1-0006tT-SW
+	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 02:14:30 -0500
+Message-ID: <1516086863.28212.27.camel@intel.com>
+From: He Junyan <junyan.he@intel.com>
+Date: Tue, 16 Jan 2018 15:14:23 +0800
+In-Reply-To: <CAJSP0QU8YGzLo0mVL-VCWzebk1iE-ZV1XQPkOJ7pq69Ch6GtnA@mail.gmail.com>
+References: <EC8A4E314CF1574AB62C80421BD9833933FEE069@SHSMSX104.ccr.corp.intel.com>
+	<20180109153538.GC1197@stefanha-x1.localdomain>
+	<20180109195517.GD2708@work-vm>
+	<CAJSP0QVm+AoRoFNYx-r1k0WTPPopm60dmD7OhGZozm9ARfMwRQ@mail.gmail.com>
+	<20180110201519.GF2451@work-vm>
+	<CAJSP0QU8YGzLo0mVL-VCWzebk1iE-ZV1XQPkOJ7pq69Ch6GtnA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] Some question about savem/qcow2 incremental
+ snapshot
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,140 +32,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
-Cc: Dmitry Fleytman <dmitry.fleytman@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philippe@mathieu-daude.net>, QEMU Developers <qemu-devel@nongnu.org>
+To: Stefan Hajnoczi <stefanha@gmail.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: John Snow <jsnow@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Juan Quintela <quintela@redhat.com>
 
+On 三, 2018-01-10 at 20:17 +0000, Stefan Hajnoczi wrote:
+> On Wed, Jan 10, 2018 at 8:15 PM, Dr. David Alan Gilbert
+> <dgilbert@redhat.com> wrote:
+> > 
+> > * Stefan Hajnoczi (stefanha@gmail.com) wrote:
+> > > 
+> > > On Tue, Jan 9, 2018 at 7:55 PM, Dr. David Alan Gilbert
+> > > <dgilbert@redhat.com> wrote:
+> > > > 
+> > > > > 
+> > > > > Certain guest operations like rebooting or zeroing memory
+> > > > > will defeat
+> > > > > the incremental guest RAM snapshot feature.  It's worth
+> > > > > thinking about
+> > > > > these cases to make sure this feature would be worth it in
+> > > > > real use
+> > > > > cases.
+> > > > But those probably wouldn't upset an NVDimm?
+> > > If the guest dirties all RAM then the incremental snapshot
+> > > feature
+> > > degrades to a full snapshot.  I'm asking if there are common
+> > > operations where that happens.
+> > > 
+> > > I seem to remember Windows guests zero all pages on cold
+> > > boot.  Maybe
+> > > that's not the case anymore.
+> > > 
+> > > Worth checking before embarking on this feature because it could
+> > > be a
+> > > waste of effort if it turns out real-world guests dirty all
+> > > memory in
+> > > common cases.
+> > Right, but I'm hoping that there's some magic somewhere where an
+> > NVDimm doesn't
+> > get zero'd because of a cold boot since that would seem to make it
+> > volatile.
+> This feature isn't specific to NVDIMM though.  It would be equally
+> useful for regular RAM.
+> 
+> Stefan
+> 
 
+Thanks for all your advices.
+I already did a lot of investigation and write some code. My
+consideration is as following:
+1. As the first step, I will use is_active() function to make it just
+work for nvdimm kind memory region and just for snapshot saving, not
+for live migration. I understand that this can work for all kinds of
+memory, but it may low guest's performance if we always enable dirty
+log tracking for memory. For the live migration, all the data need to
+be copied and it seems can not get benefit by this manner.
+2. Saving and Loading is relatively easy to do, while deleting some
+snapshot point needs a lot of work to do. The current framework just
+deletes all the data of one snapshot point by one shot. I want to add
+some reference to L1/L2 table of QCOW2 when the cluster's data is
+depended by other snapshot point, so we can keep the data when
+deleting.
 
-On 2018=E5=B9=B401=E6=9C=8816=E6=97=A5 14:28, Jason Wang wrote:
->
->
-> On 2018=E5=B9=B401=E6=9C=8816=E6=97=A5 10:48, Michael S. Tsirkin wrote:
->> On Tue, Jan 09, 2018 at 12:10:10PM +1100, David Gibson wrote:
->>> On Mon, Jan 08, 2018 at 08:10:23PM +0200, Michael S. Tsirkin wrote:
->>>> On Mon, Jan 08, 2018 at 09:14:41AM +0000, Peter Maydell wrote:
->>>>> On 21 December 2017 at 23:43, Michael S. Tsirkin <mst@redhat.com>=20
->>>>> wrote:
->>>>>>> you also need to drop "hw/pci: remove obsolete PCIDevice->init()"
->>>>>>> (applied in your tree as 18951fce55d5aa58cd1629b4cb704ee51bab4420=
-)
->>>>>>> else the not-yet-QOM'ified NVME won't work anymore.
->>>>>> Done that too, thanks a lot
->>>>> Hi. I'm afraid this pullreq (merge of 880b1ff) has new runtime
->>>>> errors from the clang sanitizer:
->>>>>
->>>>> /home/petmay01/linaro/qemu-for-merges/hw/net/net_tx_pkt.c:201:27:
->>>>> runtime error: member access within misaligned address 0x55b4ffee82=
-46
->>>>> for type 'struct ip_header', which requires 4 byte alignment
->>>>> 0x55b4ffee8246: note: pointer points here
->>>>> =C2=A0 01 00 00 00 45 00=C2=A0 01 a9 01 00 00 00 40 11=C2=A0 78 45 =
-00 00 00 00 ff ff
->>>>> ff ff 00 00 00 00 00 00=C2=A0 00 00
->>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0 ^
->>>>> /home/petmay01/linaro/qemu-for-merges/hw/net/net_tx_pkt.c:201:27:
->>>>> runtime error: load of misaligned address 0x55b4ffee8246 for type
->>>>> 'uint8_t' (aka 'unsigned char'), which requires 4 byte alignment
->>>>> 0x55b4ffee8246: note: pointer points here
->>>>> =C2=A0 01 00 00 00 45 00=C2=A0 01 a9 01 00 00 00 40 11=C2=A0 78 45 =
-00 00 00 00 ff ff
->>>>> ff ff 00 00 00 00 00 00=C2=A0 00 00
->>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0 ^
->>>>> /home/petmay01/linaro/qemu-for-merges/hw/net/net_tx_pkt.c:208:65:
->>>>> runtime error: member access within misaligned address 0x55b4ffee82=
-46
->>>>> for type 'struct ip_header', which requires 4 byte alignment
->>>>> 0x55b4ffee8246: note: pointer points here
->>>>> =C2=A0 01 00 00 00 45 00=C2=A0 01 a9 01 00 00 00 40 11=C2=A0 78 45 =
-00 00 00 00 ff ff
->>>>> ff ff 00 00 00 00 00 00=C2=A0 00 00
->>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0 ^
->>>>> /home/petmay01/linaro/qemu-for-merges/hw/net/net_tx_pkt.c:210:13:
->>>>> runtime error: member access within misaligned address 0x55b4ffee82=
-46
->>>>> for type 'struct ip_header', which requires 4 byte alignment
->>>>> 0x55b4ffee8246: note: pointer points here
->>>>> =C2=A0 01 00 00 00 45 00=C2=A0 01 a9 01 00 00 00 40 11=C2=A0 78 45 =
-00 00 00 00 ff ff
->>>>> ff ff 00 00 00 00 00 00=C2=A0 00 00
->>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0 ^
->>>>> /home/petmay01/linaro/qemu-for-merges/hw/net/net_tx_pkt.c:210:13:
->>>>> runtime error: load of misaligned address 0x55b4ffee8246 for type
->>>>> 'uint8_t' (aka 'unsigned char'), which requires 4 byte alignment
->>>>> 0x55b4ffee8246: note: pointer points here
->>>>> =C2=A0 01 00 00 00 45 00=C2=A0 01 a9 01 00 00 00 40 11=C2=A0 78 45 =
-00 00 00 00 ff ff
->>>>> ff ff 00 00 00 00 00 00=C2=A0 00 00
->>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0 ^
->>>>>
->>>>> Sorry for the late report, I didn't quite have time
->>>>> to process the pull before Christmas holidays.
->>>>>
->>>>> thanks
->>>>> -- PMM
->>>> So I bisected and the reason is this commit:
->>>>
->>>> commit 18b20bb43a2f37f0c8ae23a3e9b3d9a4a05b6bd4
->>>> Author: David Gibson <david@gibson.dropbear.id.au>
->>>> Date:=C2=A0=C2=A0 Tue Dec 19 15:45:22 2017 +1100
->>>>
->>>> =C2=A0=C2=A0=C2=A0=C2=A0 tests/pxe-test: Add some extra tests
->>>> =C2=A0=C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0=C2=A0 Previously virtio-=
-net was only tested for ppc64 in "slow"=20
->>>> mode.=C2=A0 That
->>>> =C2=A0=C2=A0=C2=A0=C2=A0 doesn't make much sense since virtio-net is=
- used much more=20
->>>> often in
->>>> =C2=A0=C2=A0=C2=A0=C2=A0 practice than the spapr-vlan device which w=
-as tested always.=C2=A0=20
->>>> So, move
->>>> =C2=A0=C2=A0=C2=A0=C2=A0 virtio-net to always be tested on ppc64.
->>>> =C2=A0=C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0=C2=A0 We had no tests at=
- all for the q35 machine, which doesn't=20
->>>> seem wise
->>>> =C2=A0=C2=A0=C2=A0=C2=A0 given its increasing prominence.=C2=A0 Add =
-a couple of tests for it,
->>>> =C2=A0=C2=A0=C2=A0=C2=A0 including testing the newer e1000e adapter.
->>>> =C2=A0=C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0=C2=A0 Signed-off-by: Dav=
-id Gibson <david@gibson.dropbear.id.au>
->>>> =C2=A0=C2=A0=C2=A0=C2=A0 Reviewed-by: Thomas Huth <thuth@redhat.com>
->>>> =C2=A0=C2=A0=C2=A0=C2=A0 Reviewed-by: Michael S. Tsirkin <mst@redhat=
-.com>
->>>> =C2=A0=C2=A0=C2=A0=C2=A0 Signed-off-by: Michael S. Tsirkin <mst@redh=
-at.com>
->>>>
->>>> :040000 040000 5a982bfea24b9ac3c651b84425a39b3c85f4871e=20
->>>> 771af3fdfb2778c6d6ed6b1098d1e79c181d6fb0 M=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0 tests
->>>>
->>>> Pls either fix or drop e1000e test
->>> Feel free to drop this patch for now.=C2=A0 I'll debug and repost it =
-when I
->>> have a chance.
->>>
->>> --=20
->>> David Gibson=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0 | I'll have my music baroque, and my code
->>> david AT gibson.dropbear.id.au=C2=A0=C2=A0=C2=A0 | minimalist, thank =
-you. NOT _the_=20
->>> _other_
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0 | _way_ _around_!
->>> http://www.ozlabs.org/~dgibson
->> BTw, Jason, you might want to take a look.
->> I suspect it's a bug somewhere in the e1000e emulation.
->>
->
-> Will have a look.
->
-> cc Dmitry for more thoughts.
->
-> Thanks
->
-
-Cc again with the correct address.
+I will also check whether the cold boot will zero all pages later.
+ 
+Thanks,
+Junyan
