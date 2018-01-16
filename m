@@ -1,24 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50674)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50703)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1ebS4O-0003P6-6y
+	(envelope-from <paolo.bonzini@gmail.com>) id 1ebS4P-0003Pl-BG
 	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 09:18:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1ebS4N-0005D4-58
-	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 09:18:32 -0500
-Received: from mail-wr0-x241.google.com ([2a00:1450:400c:c0c::241]:45407)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1ebS4O-0005EL-C2
+	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 09:18:33 -0500
+Received: from mail-wr0-x242.google.com ([2a00:1450:400c:c0c::242]:43651)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1ebS4M-0005Bk-Th
-	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 09:18:31 -0500
-Received: by mail-wr0-x241.google.com with SMTP id 16so15333431wry.12
-	for <qemu-devel@nongnu.org>; Tue, 16 Jan 2018 06:18:30 -0800 (PST)
+	id 1ebS4O-0005DM-2Z
+	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 09:18:32 -0500
+Received: by mail-wr0-x242.google.com with SMTP id t16so1687201wrc.10
+	for <qemu-devel@nongnu.org>; Tue, 16 Jan 2018 06:18:32 -0800 (PST)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Tue, 16 Jan 2018 15:17:20 +0100
-Message-Id: <1516112253-14480-39-git-send-email-pbonzini@redhat.com>
+Date: Tue, 16 Jan 2018 15:17:21 +0100
+Message-Id: <1516112253-14480-40-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1516112253-14480-1-git-send-email-pbonzini@redhat.com>
 References: <1516112253-14480-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 38/51] net: Drop unusual use of do { } while (0); 
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PULL 39/51] mips: Tweak location of ';' in macros
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,89 +34,138 @@ To: qemu-devel@nongnu.org
 
 From: Eric Blake <eblake@redhat.com>
 
-For a couple of macros in pcnet.c, we have to provide a new scope
-to avoid compiler warnings about declarations in the middle of a
-switch statement that aren't in a sub-scope.  But use of
-'do { ... } while (0);' merely to provide that new scope is arcane
-overkill, compared to just using '{ ... }'.
+It is more typical to provide the ';' by the caller of a macro
+than to embed it in the macro itself; this is because syntax
+highlight engines can get confused if a macro is called without
+a semicolon before the closing '}'.
 
 Signed-off-by: Eric Blake <eblake@redhat.com>
-Reviewed-by: Thomas Huth <thuth@redhat.com>
-Message-Id: <20171201232433.25193-2-eblake@redhat.com>
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Message-Id: <20171201232433.25193-3-eblake@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- hw/net/pcnet.c | 20 ++++++++++----------
- 1 file changed, 10 insertions(+), 10 deletions(-)
+ target/mips/msa_helper.c | 34 ++++++++++++++++++----------------
+ 1 file changed, 18 insertions(+), 16 deletions(-)
 
-diff --git a/hw/net/pcnet.c b/hw/net/pcnet.c
-index 39d5d93..606b05c 100644
---- a/hw/net/pcnet.c
-+++ b/hw/net/pcnet.c
-@@ -456,32 +456,32 @@ static inline void pcnet_rmd_store(PCNetState *s, struct pcnet_RMD *rmd,
- #define CHECK_RMD(ADDR,RES) do {                \
-     switch (BCR_SWSTYLE(s)) {                   \
-     case 0x00:                                  \
--        do {                                    \
-+        {                                       \
-             uint16_t rda[4];                    \
-             s->phys_mem_read(s->dma_opaque, (ADDR), \
-                 (void *)&rda[0], sizeof(rda), 0); \
-             (RES) |= (rda[2] & 0xf000)!=0xf000; \
-             (RES) |= (rda[3] & 0xf000)!=0x0000; \
--        } while (0);                            \
-+        }                                       \
-         break;                                  \
-     case 0x01:                                  \
-     case 0x02:                                  \
--        do {                                    \
-+        {                                       \
-             uint32_t rda[4];                    \
-             s->phys_mem_read(s->dma_opaque, (ADDR), \
-                 (void *)&rda[0], sizeof(rda), 0); \
-             (RES) |= (rda[1] & 0x0000f000L)!=0x0000f000L; \
-             (RES) |= (rda[2] & 0x0000f000L)!=0x00000000L; \
--        } while (0);                            \
-+        }                                       \
-         break;                                  \
-     case 0x03:                                  \
--        do {                                    \
-+        {                                       \
-             uint32_t rda[4];                    \
-             s->phys_mem_read(s->dma_opaque, (ADDR), \
-                 (void *)&rda[0], sizeof(rda), 0); \
-             (RES) |= (rda[0] & 0x0000f000L)!=0x00000000L; \
-             (RES) |= (rda[1] & 0x0000f000L)!=0x0000f000L; \
--        } while (0);                            \
-+        }                                       \
-         break;                                  \
-     }                                           \
- } while (0)
-@@ -489,22 +489,22 @@ static inline void pcnet_rmd_store(PCNetState *s, struct pcnet_RMD *rmd,
- #define CHECK_TMD(ADDR,RES) do {                \
-     switch (BCR_SWSTYLE(s)) {                   \
-     case 0x00:                                  \
--        do {                                    \
-+        {                                       \
-             uint16_t xda[4];                    \
-             s->phys_mem_read(s->dma_opaque, (ADDR), \
-                 (void *)&xda[0], sizeof(xda), 0); \
-             (RES) |= (xda[2] & 0xf000)!=0xf000; \
--        } while (0);                            \
-+        }                                       \
-         break;                                  \
-     case 0x01:                                  \
-     case 0x02:                                  \
-     case 0x03:                                  \
--        do {                                    \
-+        {                                       \
-             uint32_t xda[4];                    \
-             s->phys_mem_read(s->dma_opaque, (ADDR), \
-                 (void *)&xda[0], sizeof(xda), 0); \
-             (RES) |= (xda[1] & 0x0000f000L)!=0x0000f000L; \
--        } while (0);                            \
-+        }                                       \
-         break;                                  \
-     }                                           \
- } while (0)
+diff --git a/target/mips/msa_helper.c b/target/mips/msa_helper.c
+index f167a42..8fb7a36 100644
+--- a/target/mips/msa_helper.c
++++ b/target/mips/msa_helper.c
+@@ -682,13 +682,13 @@ static inline int64_t msa_mod_u_df(uint32_t df, int64_t arg1, int64_t arg2)
+     do {                                \
+         e = SIGNED_EVEN(a, df);         \
+         o = SIGNED_ODD(a, df);          \
+-    } while (0);
++    } while (0)
+ 
+ #define UNSIGNED_EXTRACT(e, o, a, df)   \
+     do {                                \
+         e = UNSIGNED_EVEN(a, df);       \
+         o = UNSIGNED_ODD(a, df);        \
+-    } while (0);
++    } while (0)
+ 
+ static inline int64_t msa_dotp_s_df(uint32_t df, int64_t arg1, int64_t arg2)
+ {
+@@ -1120,9 +1120,11 @@ void helper_msa_splat_df(CPUMIPSState *env, uint32_t df, uint32_t wd,
+ #define MSA_LOOP_COND_D MSA_LOOP_COND(DF_DOUBLE)
+ 
+ #define MSA_LOOP(DF) \
++    do { \
+         for (i = 0; i < (MSA_LOOP_COND_ ## DF) ; i++) { \
+-            MSA_DO_ ## DF \
+-        }
++            MSA_DO_ ## DF; \
++        } \
++    } while (0)
+ 
+ #define MSA_FN_DF(FUNC)                                             \
+ void helper_msa_##FUNC(CPUMIPSState *env, uint32_t df, uint32_t wd, \
+@@ -1135,17 +1137,17 @@ void helper_msa_##FUNC(CPUMIPSState *env, uint32_t df, uint32_t wd, \
+     uint32_t i;                                                     \
+     switch (df) {                                                   \
+     case DF_BYTE:                                                   \
+-        MSA_LOOP_B                                                  \
++        MSA_LOOP_B;                                                 \
+         break;                                                      \
+     case DF_HALF:                                                   \
+-        MSA_LOOP_H                                                  \
++        MSA_LOOP_H;                                                 \
+         break;                                                      \
+     case DF_WORD:                                                   \
+-        MSA_LOOP_W                                                  \
++        MSA_LOOP_W;                                                 \
+         break;                                                      \
+     case DF_DOUBLE:                                                 \
+-        MSA_LOOP_D                                                  \
+-       break;                                                       \
++        MSA_LOOP_D;                                                 \
++        break;                                                      \
+     default:                                                        \
+         assert(0);                                                  \
+     }                                                               \
+@@ -1168,7 +1170,7 @@ void helper_msa_##FUNC(CPUMIPSState *env, uint32_t df, uint32_t wd, \
+     do {                                \
+         R##DF(pwx, i) = pwt->DF[2*i];   \
+         L##DF(pwx, i) = pws->DF[2*i];   \
+-    } while (0);
++    } while (0)
+ MSA_FN_DF(pckev_df)
+ #undef MSA_DO
+ 
+@@ -1176,7 +1178,7 @@ MSA_FN_DF(pckev_df)
+     do {                                \
+         R##DF(pwx, i) = pwt->DF[2*i+1]; \
+         L##DF(pwx, i) = pws->DF[2*i+1]; \
+-    } while (0);
++    } while (0)
+ MSA_FN_DF(pckod_df)
+ #undef MSA_DO
+ 
+@@ -1184,7 +1186,7 @@ MSA_FN_DF(pckod_df)
+     do {                                \
+         pwx->DF[2*i]   = L##DF(pwt, i); \
+         pwx->DF[2*i+1] = L##DF(pws, i); \
+-    } while (0);
++    } while (0)
+ MSA_FN_DF(ilvl_df)
+ #undef MSA_DO
+ 
+@@ -1192,7 +1194,7 @@ MSA_FN_DF(ilvl_df)
+     do {                                \
+         pwx->DF[2*i]   = R##DF(pwt, i); \
+         pwx->DF[2*i+1] = R##DF(pws, i); \
+-    } while (0);
++    } while (0)
+ MSA_FN_DF(ilvr_df)
+ #undef MSA_DO
+ 
+@@ -1200,7 +1202,7 @@ MSA_FN_DF(ilvr_df)
+     do {                                \
+         pwx->DF[2*i]   = pwt->DF[2*i];  \
+         pwx->DF[2*i+1] = pws->DF[2*i];  \
+-    } while (0);
++    } while (0)
+ MSA_FN_DF(ilvev_df)
+ #undef MSA_DO
+ 
+@@ -1208,7 +1210,7 @@ MSA_FN_DF(ilvev_df)
+     do {                                    \
+         pwx->DF[2*i]   = pwt->DF[2*i+1];    \
+         pwx->DF[2*i+1] = pws->DF[2*i+1];    \
+-    } while (0);
++    } while (0)
+ MSA_FN_DF(ilvod_df)
+ #undef MSA_DO
+ #undef MSA_LOOP_COND
+@@ -1222,7 +1224,7 @@ MSA_FN_DF(ilvod_df)
+         uint32_t k = (pwd->DF[i] & 0x3f) % (2 * n);                         \
+         pwx->DF[i] =                                                        \
+             (pwd->DF[i] & 0xc0) ? 0 : k < n ? pwt->DF[k] : pws->DF[k - n];  \
+-    } while (0);
++    } while (0)
+ MSA_FN_DF(vshf_df)
+ #undef MSA_DO
+ #undef MSA_LOOP_COND
 -- 
 1.8.3.1
