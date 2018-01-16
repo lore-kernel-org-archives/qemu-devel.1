@@ -1,28 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50779)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50674)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1ebS4T-0003TH-DG
+	(envelope-from <paolo.bonzini@gmail.com>) id 1ebS4O-0003P6-6y
 	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 09:18:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1ebS4S-0005KO-Eh
-	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 09:18:37 -0500
-Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:34665)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1ebS4N-0005D4-58
+	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 09:18:32 -0500
+Received: from mail-wr0-x241.google.com ([2a00:1450:400c:c0c::241]:45407)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1ebS4S-0005JU-8J
-	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 09:18:36 -0500
-Received: by mail-wm0-x242.google.com with SMTP id 81so17394028wmb.1
-	for <qemu-devel@nongnu.org>; Tue, 16 Jan 2018 06:18:36 -0800 (PST)
+	id 1ebS4M-0005Bk-Th
+	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 09:18:31 -0500
+Received: by mail-wr0-x241.google.com with SMTP id 16so15333431wry.12
+	for <qemu-devel@nongnu.org>; Tue, 16 Jan 2018 06:18:30 -0800 (PST)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Tue, 16 Jan 2018 15:17:23 +0100
-Message-Id: <1516112253-14480-42-git-send-email-pbonzini@redhat.com>
+Date: Tue, 16 Jan 2018 15:17:20 +0100
+Message-Id: <1516112253-14480-39-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1516112253-14480-1-git-send-email-pbonzini@redhat.com>
 References: <1516112253-14480-1-git-send-email-pbonzini@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 41/51] chardev: Clean up previous patch
- indentation
+Subject: [Qemu-devel] [PULL 38/51] net: Drop unusual use of do { } while (0); 
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,119 +31,89 @@ To: qemu-devel@nongnu.org
 
 From: Eric Blake <eblake@redhat.com>
 
-The previous patch left in an extra scope layer for ease of
-review; time to remove it.  No semantic change.
+For a couple of macros in pcnet.c, we have to provide a new scope
+to avoid compiler warnings about declarations in the middle of a
+switch statement that aren't in a sub-scope.  But use of
+'do { ... } while (0);' merely to provide that new scope is arcane
+overkill, compared to just using '{ ... }'.
 
 Signed-off-by: Eric Blake <eblake@redhat.com>
-Message-Id: <20171201232433.25193-5-eblake@redhat.com>
-Reviewed-by: Marc-André Lureau <marcandre.lureau@redhat.com>
+Reviewed-by: Thomas Huth <thuth@redhat.com>
+Message-Id: <20171201232433.25193-2-eblake@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- chardev/char-serial.c | 66 +++++++++++++++++++++++++--------------------------
- 1 file changed, 32 insertions(+), 34 deletions(-)
+ hw/net/pcnet.c | 20 ++++++++++----------
+ 1 file changed, 10 insertions(+), 10 deletions(-)
 
-diff --git a/chardev/char-serial.c b/chardev/char-serial.c
-index 10162f9..93392c5 100644
---- a/chardev/char-serial.c
-+++ b/chardev/char-serial.c
-@@ -71,66 +71,64 @@ static void tty_serial_init(int fd, int speed,
-     }
- 
-     speed = speed * 10 / 11;
--    {
--        check_speed(50);
--        check_speed(75);
--        check_speed(110);
--        check_speed(134);
--        check_speed(150);
--        check_speed(200);
--        check_speed(300);
--        check_speed(600);
--        check_speed(1200);
--        check_speed(1800);
--        check_speed(2400);
--        check_speed(4800);
--        check_speed(9600);
--        check_speed(19200);
--        check_speed(38400);
--        /* Non-Posix values follow. They may be unsupported on some systems. */
--        check_speed(57600);
--        check_speed(115200);
-+    check_speed(50);
-+    check_speed(75);
-+    check_speed(110);
-+    check_speed(134);
-+    check_speed(150);
-+    check_speed(200);
-+    check_speed(300);
-+    check_speed(600);
-+    check_speed(1200);
-+    check_speed(1800);
-+    check_speed(2400);
-+    check_speed(4800);
-+    check_speed(9600);
-+    check_speed(19200);
-+    check_speed(38400);
-+    /* Non-Posix values follow. They may be unsupported on some systems. */
-+    check_speed(57600);
-+    check_speed(115200);
- #ifdef B230400
--        check_speed(230400);
-+    check_speed(230400);
- #endif
- #ifdef B460800
--        check_speed(460800);
-+    check_speed(460800);
- #endif
- #ifdef B500000
--        check_speed(500000);
-+    check_speed(500000);
- #endif
- #ifdef B576000
--        check_speed(576000);
-+    check_speed(576000);
- #endif
- #ifdef B921600
--        check_speed(921600);
-+    check_speed(921600);
- #endif
- #ifdef B1000000
--        check_speed(1000000);
-+    check_speed(1000000);
- #endif
- #ifdef B1152000
--        check_speed(1152000);
-+    check_speed(1152000);
- #endif
- #ifdef B1500000
--        check_speed(1500000);
-+    check_speed(1500000);
- #endif
- #ifdef B2000000
--        check_speed(2000000);
-+    check_speed(2000000);
- #endif
- #ifdef B2500000
--        check_speed(2500000);
-+    check_speed(2500000);
- #endif
- #ifdef B3000000
--        check_speed(3000000);
-+    check_speed(3000000);
- #endif
- #ifdef B3500000
--        check_speed(3500000);
-+    check_speed(3500000);
- #endif
- #ifdef B4000000
--        check_speed(4000000);
-+    check_speed(4000000);
- #endif
--        spd = B115200;
--    }
-+    spd = B115200;
- 
- #undef check_speed
-  done:
+diff --git a/hw/net/pcnet.c b/hw/net/pcnet.c
+index 39d5d93..606b05c 100644
+--- a/hw/net/pcnet.c
++++ b/hw/net/pcnet.c
+@@ -456,32 +456,32 @@ static inline void pcnet_rmd_store(PCNetState *s, struct pcnet_RMD *rmd,
+ #define CHECK_RMD(ADDR,RES) do {                \
+     switch (BCR_SWSTYLE(s)) {                   \
+     case 0x00:                                  \
+-        do {                                    \
++        {                                       \
+             uint16_t rda[4];                    \
+             s->phys_mem_read(s->dma_opaque, (ADDR), \
+                 (void *)&rda[0], sizeof(rda), 0); \
+             (RES) |= (rda[2] & 0xf000)!=0xf000; \
+             (RES) |= (rda[3] & 0xf000)!=0x0000; \
+-        } while (0);                            \
++        }                                       \
+         break;                                  \
+     case 0x01:                                  \
+     case 0x02:                                  \
+-        do {                                    \
++        {                                       \
+             uint32_t rda[4];                    \
+             s->phys_mem_read(s->dma_opaque, (ADDR), \
+                 (void *)&rda[0], sizeof(rda), 0); \
+             (RES) |= (rda[1] & 0x0000f000L)!=0x0000f000L; \
+             (RES) |= (rda[2] & 0x0000f000L)!=0x00000000L; \
+-        } while (0);                            \
++        }                                       \
+         break;                                  \
+     case 0x03:                                  \
+-        do {                                    \
++        {                                       \
+             uint32_t rda[4];                    \
+             s->phys_mem_read(s->dma_opaque, (ADDR), \
+                 (void *)&rda[0], sizeof(rda), 0); \
+             (RES) |= (rda[0] & 0x0000f000L)!=0x00000000L; \
+             (RES) |= (rda[1] & 0x0000f000L)!=0x0000f000L; \
+-        } while (0);                            \
++        }                                       \
+         break;                                  \
+     }                                           \
+ } while (0)
+@@ -489,22 +489,22 @@ static inline void pcnet_rmd_store(PCNetState *s, struct pcnet_RMD *rmd,
+ #define CHECK_TMD(ADDR,RES) do {                \
+     switch (BCR_SWSTYLE(s)) {                   \
+     case 0x00:                                  \
+-        do {                                    \
++        {                                       \
+             uint16_t xda[4];                    \
+             s->phys_mem_read(s->dma_opaque, (ADDR), \
+                 (void *)&xda[0], sizeof(xda), 0); \
+             (RES) |= (xda[2] & 0xf000)!=0xf000; \
+-        } while (0);                            \
++        }                                       \
+         break;                                  \
+     case 0x01:                                  \
+     case 0x02:                                  \
+     case 0x03:                                  \
+-        do {                                    \
++        {                                       \
+             uint32_t xda[4];                    \
+             s->phys_mem_read(s->dma_opaque, (ADDR), \
+                 (void *)&xda[0], sizeof(xda), 0); \
+             (RES) |= (xda[1] & 0x0000f000L)!=0x0000f000L; \
+-        } while (0);                            \
++        }                                       \
+         break;                                  \
+     }                                           \
+ } while (0)
 -- 
 1.8.3.1
