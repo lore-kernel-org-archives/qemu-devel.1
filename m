@@ -1,17 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60740)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60815)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistai@xilinx.com>) id 1ebad3-00049V-2v
-	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 18:26:54 -0500
+	(envelope-from <alistai@xilinx.com>) id 1ebadC-0004H3-ME
+	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 18:27:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistai@xilinx.com>) id 1ebad2-0001yB-57
-	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 18:26:53 -0500
+	(envelope-from <alistai@xilinx.com>) id 1ebadB-00025N-Kz
+	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 18:27:02 -0500
 From: Alistair Francis <alistair.francis@xilinx.com>
-Date: Tue, 16 Jan 2018 15:22:18 -0800
-Message-ID: <cover.1516144891.git.alistair.francis@xilinx.com>
+Date: Tue, 16 Jan 2018 15:22:22 -0800
+Message-ID: <3ce133738e77a4d370e117467754369c738a926d.1516144891.git.alistair.francis@xilinx.com>
+In-Reply-To: <cover.1516144891.git.alistair.francis@xilinx.com>
+References: <cover.1516144891.git.alistair.francis@xilinx.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v5 0/9]  Add the ZynqMP PMU and IPI
+Subject: [Qemu-devel] [PATCH v5 2/9] xlnx-zynqmp-pmu: Initial commit of the
+ ZynqMP PMU
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,71 +26,135 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, edgar.iglesias@xilinx.com, edgar.iglesias@gmail.com
 Cc: alistair.francis@xilinx.com, alistair23@gmail.com, qemu-arm@nongnu.org
 
+The Xilinx ZynqMP SoC has two main processing systems in it. The ARM
+processing system (which is already modeled in QEMU) and the MicroBlaze
+Power Management Unit (PMU). This is the inital work for adding support
+for the PMU.
 
-This series adds the ZynqMP Power Management Unit (PMU) machine with basic
-functionality.
+The PMU susbsystem runs along side the ARM system on hardware, but due
+to architecture limitations in QEMU the two instances are seperate for
+the time being.
 
-The machine only has the
- - CPU
- - Memory
- - Interrupt controller
- - IPI device
+Let's follow the same setup we do with the ARM system, where there is an
+SoC device and a ZCU102 board. Although the PMU is less board specific
+we are still going to follow the same split as maybe in future we can
+connect the PMU device to the ARM ZCU102 board. As the machine will be
+fairly small let's keep them both together in one file.
 
-connected, but that is enough to run some of the ROM and firmware
-code on the machine
+Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
+Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
+---
 
-The series also adds the IPI device and connects it to the ZynqMP ARM
-side and the ZynqMP PMU. These IPI devices don't connect between the ARM
-and MicroBlaze instances though.
-
-V5:
- - Fix clang makecheck error
- - Rebase on master
 V4:
- - Rename the ZCU102 machine to just ZynqMP
- - Rename the PMC SoC to "xlnx,zynqmp-pmu-soc"
- - Move the IPI device to the machine instead of the SoC
-V3:
- - Add the interrupt controller
- - Replace some of the error_fatals with errp
- - Fix the PMU CPU name
+ - Rename to remove ZCU102 name
 
-
-
-Alistair Francis (9):
-  microblaze: boot.c: Don't try to find NULL pointer
-  xlnx-zynqmp-pmu: Initial commit of the ZynqMP PMU
-  xlnx-zynqmp-pmu: Add the CPU and memory
-  aarch64-softmmu.mak: Use an ARM specific config
-  xlnx-pmu-iomod-intc: Add the PMU Interrupt controller
-  xlnx-zynqmp-pmu: Connect the PMU interrupt controller
-  xlnx-zynqmp-ipi: Initial version of the Xilinx IPI device
-  xlnx-zynqmp-pmu: Connect the IPI device to the PMU
-  xlnx-zynqmp: Connect the IPI device to the ZynqMP SoC
-
- default-configs/aarch64-softmmu.mak    |   1 +
- default-configs/microblaze-softmmu.mak |   1 +
- hw/arm/Makefile.objs                   |   2 +-
- hw/arm/xlnx-zynqmp.c                   |  14 +
- hw/display/Makefile.objs               |   2 +-
- hw/dma/Makefile.objs                   |   1 +
- hw/intc/Makefile.objs                  |   2 +
- hw/intc/xlnx-pmu-iomod-intc.c          | 554 +++++++++++++++++++++++++++++=
+ hw/microblaze/Makefile.objs     |  1 +
+ hw/microblaze/xlnx-zynqmp-pmu.c | 83 +++++++++++++++++++++++++++++++++++++=
 ++++
- hw/intc/xlnx-zynqmp-ipi.c              | 377 ++++++++++++++++++++++
- hw/microblaze/Makefile.objs            |   1 +
- hw/microblaze/boot.c                   |   2 +-
- hw/microblaze/xlnx-zynqmp-pmu.c        | 204 ++++++++++++
- include/hw/arm/xlnx-zynqmp.h           |   2 +
- include/hw/intc/xlnx-pmu-iomod-intc.h  |  58 ++++
- include/hw/intc/xlnx-zynqmp-ipi.h      |  57 ++++
- 15 files changed, 1275 insertions(+), 3 deletions(-)
- create mode 100644 hw/intc/xlnx-pmu-iomod-intc.c
- create mode 100644 hw/intc/xlnx-zynqmp-ipi.c
+ 2 files changed, 84 insertions(+)
  create mode 100644 hw/microblaze/xlnx-zynqmp-pmu.c
- create mode 100644 include/hw/intc/xlnx-pmu-iomod-intc.h
- create mode 100644 include/hw/intc/xlnx-zynqmp-ipi.h
 
+diff --git a/hw/microblaze/Makefile.objs b/hw/microblaze/Makefile.objs
+index b2517d87fe..ae9fd40de7 100644
+--- a/hw/microblaze/Makefile.objs
++++ b/hw/microblaze/Makefile.objs
+@@ -1,3 +1,4 @@
+ obj-y +=3D petalogix_s3adsp1800_mmu.o
+ obj-y +=3D petalogix_ml605_mmu.o
++obj-y +=3D xlnx-zynqmp-pmu.o
+ obj-y +=3D boot.o
+diff --git a/hw/microblaze/xlnx-zynqmp-pmu.c b/hw/microblaze/xlnx-zynqmp-pm=
+u.c
+new file mode 100644
+index 0000000000..ac0f78928a
+--- /dev/null
++++ b/hw/microblaze/xlnx-zynqmp-pmu.c
+@@ -0,0 +1,83 @@
++/*
++ * Xilinx Zynq MPSoC PMU (Power Management Unit) emulation
++ *
++ * Copyright (C) 2017 Xilinx Inc
++ * Written by Alistair Francis <alistair.francis@xilinx.com>
++ *
++ * This program is free software; you can redistribute it and/or modify it
++ * under the terms of the GNU General Public License as published by the
++ * Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++ *
++ * This program is distributed in the hope that it will be useful, but WIT=
+HOUT
++ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
++ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
++ * for more details.
++ */
++
++#include "qemu/osdep.h"
++#include "qapi/error.h"
++#include "qemu-common.h"
++#include "hw/boards.h"
++#include "cpu.h"
++
++/* Define the PMU device */
++
++#define TYPE_XLNX_ZYNQMP_PMU_SOC "xlnx,zynqmp-pmu-soc"
++#define XLNX_ZYNQMP_PMU_SOC(obj) OBJECT_CHECK(XlnxZynqMPPMUSoCState, (obj)=
+, \
++                                              TYPE_XLNX_ZYNQMP_PMU_SOC)
++
++typedef struct XlnxZynqMPPMUSoCState {
++    /*< private >*/
++    DeviceState parent_obj;
++
++    /*< public >*/
++}  XlnxZynqMPPMUSoCState;
++
++static void xlnx_zynqmp_pmu_soc_init(Object *obj)
++{
++
++}
++
++static void xlnx_zynqmp_pmu_soc_realize(DeviceState *dev, Error **errp)
++{
++
++}
++
++static void xlnx_zynqmp_pmu_soc_class_init(ObjectClass *oc, void *data)
++{
++    DeviceClass *dc =3D DEVICE_CLASS(oc);
++
++    dc->realize =3D xlnx_zynqmp_pmu_soc_realize;
++}
++
++static const TypeInfo xlnx_zynqmp_pmu_soc_type_info =3D {
++    .name =3D TYPE_XLNX_ZYNQMP_PMU_SOC,
++    .parent =3D TYPE_DEVICE,
++    .instance_size =3D sizeof(XlnxZynqMPPMUSoCState),
++    .instance_init =3D xlnx_zynqmp_pmu_soc_init,
++    .class_init =3D xlnx_zynqmp_pmu_soc_class_init,
++};
++
++static void xlnx_zynqmp_pmu_soc_register_types(void)
++{
++    type_register_static(&xlnx_zynqmp_pmu_soc_type_info);
++}
++
++type_init(xlnx_zynqmp_pmu_soc_register_types)
++
++/* Define the PMU Machine */
++
++static void xlnx_zynqmp_pmu_init(MachineState *machine)
++{
++
++}
++
++static void xlnx_zynqmp_pmu_machine_init(MachineClass *mc)
++{
++    mc->desc =3D "Xilinx ZynqMP PMU machine";
++    mc->init =3D xlnx_zynqmp_pmu_init;
++}
++
++DEFINE_MACHINE("xlnx-zynqmp-pmu", xlnx_zynqmp_pmu_machine_init)
++
 --
 2.14.1
 
