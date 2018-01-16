@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39273)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39320)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1ebKSA-00088g-EF
-	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 01:10:35 -0500
+	(envelope-from <famz@redhat.com>) id 1ebKSD-0008BY-9k
+	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 01:10:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1ebKS9-0001cb-Fs
-	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 01:10:34 -0500
+	(envelope-from <famz@redhat.com>) id 1ebKSB-0001e9-Qm
+	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 01:10:36 -0500
 From: Fam Zheng <famz@redhat.com>
-Date: Tue, 16 Jan 2018 14:09:00 +0800
-Message-Id: <20180116060901.17413-9-famz@redhat.com>
+Date: Tue, 16 Jan 2018 14:09:01 +0800
+Message-Id: <20180116060901.17413-10-famz@redhat.com>
 In-Reply-To: <20180116060901.17413-1-famz@redhat.com>
 References: <20180116060901.17413-1-famz@redhat.com>
-Subject: [Qemu-devel] [PATCH v6 8/9] docs: Add section for NVMe VFIO driver
+Subject: [Qemu-devel] [PATCH v6 9/9] qapi: Add NVMe driver options to the
+ schema
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,59 +24,60 @@ To: qemu-devel@nongnu.org
 Cc: Paolo Bonzini <pbonzini@redhat.com>, Keith Busch <keith.busch@intel.com>, qemu-block@nongnu.org, Fam Zheng <famz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Eric Blake <eblake@redhat.com>, alex.williamson@redhat.com, Markus Armbruster <armbru@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Karl Rister <krister@redhat.com>
 
 Signed-off-by: Fam Zheng <famz@redhat.com>
-Message-Id: <20180110091846.10699-9-famz@redhat.com>
+Message-Id: <20180110091846.10699-10-famz@redhat.com>
 Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 ---
- docs/qemu-block-drivers.texi | 37 +++++++++++++++++++++++++++++++++++++
- 1 file changed, 37 insertions(+)
+ qapi/block-core.json | 17 ++++++++++++++++-
+ 1 file changed, 16 insertions(+), 1 deletion(-)
 
-diff --git a/docs/qemu-block-drivers.texi b/docs/qemu-block-drivers.texi
-index 503c1847aa..cd74767ed3 100644
---- a/docs/qemu-block-drivers.texi
-+++ b/docs/qemu-block-drivers.texi
-@@ -785,6 +785,43 @@ warning: ssh server @code{ssh.example.com:22} does not support fsync
- With sufficiently new versions of libssh2 and OpenSSH, @code{fsync} is
- supported.
+diff --git a/qapi/block-core.json b/qapi/block-core.json
+index e94a6881b2..bd16440dc7 100644
+--- a/qapi/block-core.json
++++ b/qapi/block-core.json
+@@ -2230,6 +2230,7 @@
+ #
+ # @vxhs: Since 2.10
+ # @throttle: Since 2.11
++# @nvme: Since 2.12
+ #
+ # Since: 2.9
+ ##
+@@ -2237,7 +2238,7 @@
+   'data': [ 'blkdebug', 'blkverify', 'bochs', 'cloop',
+             'dmg', 'file', 'ftp', 'ftps', 'gluster', 'host_cdrom',
+             'host_device', 'http', 'https', 'iscsi', 'luks', 'nbd', 'nfs',
+-            'null-aio', 'null-co', 'parallels', 'qcow', 'qcow2', 'qed',
++            'null-aio', 'null-co', 'nvme', 'parallels', 'qcow', 'qcow2', 'qed',
+             'quorum', 'raw', 'rbd', 'replication', 'sheepdog', 'ssh',
+             'throttle', 'vdi', 'vhdx', 'vmdk', 'vpc', 'vvfat', 'vxhs' ] }
  
-+@node disk_images_nvme
-+@subsection NVMe disk images
-+
-+NVM Express (NVMe) storage controllers can be accessed directly by a userspace
-+driver in QEMU.  This bypasses the host kernel file system and block layers
-+while retaining QEMU block layer functionalities, such as block jobs, I/O
-+throttling, image formats, etc.  Disk I/O performance is typically higher than
-+with @code{-drive file=/dev/sda} using either thread pool or linux-aio.
-+
-+The controller will be exclusively used by the QEMU process once started. To be
-+able to share storage between multiple VMs and other applications on the host,
-+please use the file based protocols.
-+
-+Before starting QEMU, bind the host NVMe controller to the host vfio-pci
-+driver.  For example:
-+
-+@example
-+# modprobe vfio-pci
-+# lspci -n -s 0000:06:0d.0
-+06:0d.0 0401: 1102:0002 (rev 08)
-+# echo 0000:06:0d.0 > /sys/bus/pci/devices/0000:06:0d.0/driver/unbind
-+# echo 1102 0002 > /sys/bus/pci/drivers/vfio-pci/new_id
-+
-+# qemu-system-x86_64 -drive file=nvme://@var{host}:@var{bus}:@var{slot}.@var{func}/@var{namespace}
-+@end example
-+
-+Alternative syntax using properties:
-+
-+@example
-+qemu-system-x86_64 -drive file.driver=nvme,file.device=@var{host}:@var{bus}:@var{slot}.@var{func},file.namespace=@var{namespace}
-+@end example
-+
-+@var{host}:@var{bus}:@var{slot}.@var{func} is the NVMe controller's PCI device
-+address on the host.
-+
-+@var{namespace} is the NVMe namespace number, starting from 1.
-+
- @node disk_image_locking
- @subsection Disk image file locking
+@@ -2278,6 +2279,19 @@
+ { 'struct': 'BlockdevOptionsNull',
+   'data': { '*size': 'int', '*latency-ns': 'uint64' } }
  
++##
++# @BlockdevOptionsNVMe:
++#
++# Driver specific block device options for the NVMe backend.
++#
++# @device:    controller address of the NVMe device.
++# @namespace: namespace number of the device, starting from 1.
++#
++# Since: 2.12
++##
++{ 'struct': 'BlockdevOptionsNVMe',
++  'data': { 'device': 'str', 'namespace': 'int' } }
++
+ ##
+ # @BlockdevOptionsVVFAT:
+ #
+@@ -3183,6 +3197,7 @@
+       'nfs':        'BlockdevOptionsNfs',
+       'null-aio':   'BlockdevOptionsNull',
+       'null-co':    'BlockdevOptionsNull',
++      'nvme':       'BlockdevOptionsNVMe',
+       'parallels':  'BlockdevOptionsGenericFormat',
+       'qcow2':      'BlockdevOptionsQcow2',
+       'qcow':       'BlockdevOptionsQcow',
 -- 
 2.14.3
