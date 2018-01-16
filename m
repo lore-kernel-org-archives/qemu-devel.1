@@ -1,22 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33580)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36171)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ebZ7t-0007Qt-6N
-	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 16:50:38 -0500
+	(envelope-from <laurent@vivier.eu>) id 1ebZFw-0002Oq-Iv
+	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 16:58:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ebZ7s-00038e-FY
-	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 16:50:37 -0500
-References: <cover.1513342045.git.berto@igalia.com>
-	<4007dce42901324c3d129917d555d3fec4fb82a2.1513342045.git.berto@igalia.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <62b53b4b-ca45-a1b6-5c7e-66c18f99f58c@redhat.com>
-Date: Tue, 16 Jan 2018 15:50:28 -0600
+	(envelope-from <laurent@vivier.eu>) id 1ebZFt-0005jM-If
+	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 16:58:56 -0500
+Received: from mout.kundenserver.de ([212.227.126.135]:55151)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1ebZFt-0005iI-9R
+	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 16:58:53 -0500
+References: <20180116172510.28878-1-laurent@vivier.eu>
+	<20180116172510.28878-5-laurent@vivier.eu>
+	<2abfb579-ddec-0099-4b0f-fc6ba8dc9820@amsat.org>
+From: Laurent Vivier <laurent@vivier.eu>
+Message-ID: <6b7ead9c-089d-3b26-a5f0-6f5c7dc244b8@vivier.eu>
+Date: Tue, 16 Jan 2018 22:58:31 +0100
 MIME-Version: 1.0
-In-Reply-To: <4007dce42901324c3d129917d555d3fec4fb82a2.1513342045.git.berto@igalia.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="8d1G7UxwsGCO0o3iwxuziztqOQFGts5wl"
-Subject: Re: [Qemu-devel] [PATCH v2 11/32] qcow2: Remove BDS parameter from
- qcow2_cache_is_table_offset()
+In-Reply-To: <2abfb579-ddec-0099-4b0f-fc6ba8dc9820@amsat.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v2 4/4] linux-user: MIPS set cpu to r6 CPU
+ if binary is R6
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,62 +30,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, "Denis V . Lunev" <den@openvz.org>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, YunQiang Su <syq@debian.org>, Riku Voipio <riku.voipio@iki.fi>, Richard Henderson <richard.henderson@linaro.org>, Aaron Sierra <asierra@xes-inc.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---8d1G7UxwsGCO0o3iwxuziztqOQFGts5wl
-From: Eric Blake <eblake@redhat.com>
-To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, "Denis V . Lunev" <den@openvz.org>,
- qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
-Message-ID: <62b53b4b-ca45-a1b6-5c7e-66c18f99f58c@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 11/32] qcow2: Remove BDS parameter from
- qcow2_cache_is_table_offset()
-References: <cover.1513342045.git.berto@igalia.com>
- <4007dce42901324c3d129917d555d3fec4fb82a2.1513342045.git.berto@igalia.com>
-In-Reply-To: <4007dce42901324c3d129917d555d3fec4fb82a2.1513342045.git.berto@igalia.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Le 16/01/2018 à 21:29, Philippe Mathieu-Daudé a écrit :
+> On 01/16/2018 02:25 PM, Laurent Vivier wrote:
+>> From: YunQiang Su <syq@debian.org>
+>>
+>> So here we need to detect the version of binaries and set
+>> cpu_model for it.
+>>
+>> [lv: original patch modified to move code into cpu_get_model()]
+>> Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+>> ---
+>>
+>> Notes:
+>>     YunQiang Su, please add your Signed-off-by that was
+>>     missing in your original patch.
+>>     
+>>     v2: call cpu_get_model() with the result of get_elf_eflags()
+>>
+>>  include/elf.h                  | 4 ++++
+>>  linux-user/mips/target_elf.h   | 3 +++
+>>  linux-user/mips64/target_elf.h | 3 +++
+>>  3 files changed, 10 insertions(+)
+>>
+>> diff --git a/include/elf.h b/include/elf.h
+>> index e8a515ce3d..f2104809b1 100644
+>> --- a/include/elf.h
+>> +++ b/include/elf.h
+>> @@ -40,6 +40,10 @@ typedef int64_t  Elf64_Sxword;
+>>  #define EF_MIPS_ARCH_5		0x40000000	/* -mips5 code.  */
+>>  #define EF_MIPS_ARCH_32		0x50000000	/* MIPS32 code.  */
+>>  #define EF_MIPS_ARCH_64		0x60000000	/* MIPS64 code.  */
+>> +#define EF_MIPS_ARCH_32R2       0x70000000      /* MIPS32r2 code.  */
+>> +#define EF_MIPS_ARCH_64R2       0x80000000      /* MIPS64r2 code.  */
+>> +#define EF_MIPS_ARCH_32R6       0x90000000      /* MIPS32r6 code.  */
+>> +#define EF_MIPS_ARCH_64R6       0xa0000000      /* MIPS64r6 code.  */
+>>  
+>>  /* The ABI of a file. */
+>>  #define EF_MIPS_ABI_O32		0x00001000	/* O32 ABI.  */
+>> diff --git a/linux-user/mips/target_elf.h b/linux-user/mips/target_elf.h
+>> index bed0b43259..ac14f99ac5 100644
+>> --- a/linux-user/mips/target_elf.h
+>> +++ b/linux-user/mips/target_elf.h
+>> @@ -9,6 +9,9 @@
+>>  #define MIPS_TARGET_ELF_H
+>>  static inline const char *cpu_get_model(uint32_t eflags)
+>>  {
+>> +     if ((eflags & EF_MIPS_ARCH_32R6) != 0) {
+> 
+>         if (eflags & EF_MIPS_ARCH_32R6) {
+> 
+>> +         return "mips32r6-generic";
+> 
+> What is the gain of the "-generic" suffix?
 
-On 12/15/2017 06:53 AM, Alberto Garcia wrote:
-> This function was only using the BlockDriverState parameter to pass it
-> to qcow2_cache_get_table_addr(). This is no longer necessary so this
-> parameter can be removed.
->=20
-> Signed-off-by: Alberto Garcia <berto@igalia.com>
-> ---
->  block/qcow2-cache.c    | 3 +--
->  block/qcow2-refcount.c | 6 +++---
->  block/qcow2.h          | 3 +--
->  3 files changed, 5 insertions(+), 7 deletions(-)
->=20
+Don't know, but this the name in list given by:
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
+qemu-system-mips -cpu help
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+> 
+> Using "mips32r6":
+> Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
+qemu-system-mips -cpu mips32r6
+qemu-system-mips: unable to find CPU model 'mips32r6'
 
---8d1G7UxwsGCO0o3iwxuziztqOQFGts5wl
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+mips-softmmu/qemu-system-mips -cpu mips32r6-generic
+qemu-system-mips: Could not load MIPS bios 'mips_bios.bin', and no
+-kernel argument was specified
 
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlpec6QACgkQp6FrSiUn
-Q2pDgwf/divVEW5p2cTu4Q+DrJeg1BaI67yd4d1xdGXpGW6pWzfCOV1ttTMCOrLI
-xuxyTwjIX3KW7FrDFoGrOz2mR/ETC+RdOrI8ROm1n6KD7FePxiHITNxDlwX7Omxn
-16AGE/6Pr2puq3fve5DMgMPK4Gy3udn7Wsltt5SGBMe5onfo5QMFn4RQGv7rkC5f
-aSbLdedQ6PekXgyIEVlkd0ISh9+aMQPX0KDX6VrkxYgfxPZG+zeZ15yGIE22yznM
-U+QB5so294q1pxqS0RtGrx/77sd/XY27L/g+ZXrwjLK/zkUL9n2Ht8Hs18WU37cA
-SZPBTedfpdXAGnE6sncG7hy7/0so9A==
-=JZLO
------END PGP SIGNATURE-----
-
---8d1G7UxwsGCO0o3iwxuziztqOQFGts5wl--
+Thanks,
+Laurent
