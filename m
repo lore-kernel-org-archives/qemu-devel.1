@@ -1,28 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32907)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33264)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <arei.gonglei@huawei.com>) id 1ebSZY-0004lW-8r
-	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 09:50:47 -0500
+	(envelope-from <eblake@redhat.com>) id 1ebSaq-0005rl-HA
+	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 09:52:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <arei.gonglei@huawei.com>) id 1ebSZV-0005Ay-4n
-	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 09:50:44 -0500
-Received: from szxga03-in.huawei.com ([45.249.212.189]:2248 helo=huawei.com)
+	(envelope-from <eblake@redhat.com>) id 1ebSan-0005yX-Ei
+	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 09:52:04 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:61305)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <arei.gonglei@huawei.com>)
-	id 1ebSZT-00057u-SE
-	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 09:50:41 -0500
-From: "Gonglei (Arei)" <arei.gonglei@huawei.com>
-Date: Tue, 16 Jan 2018 14:50:29 +0000
-Message-ID: <33183CC9F5247A488A2544077AF19020DA516CF3@DGGEMA505-MBX.china.huawei.com>
-References: <20180109154519.25634-1-ehabkost@redhat.com>
-	<20180109154519.25634-4-ehabkost@redhat.com>
-	<33183CC9F5247A488A2544077AF19020DA5109CD@DGGEMA505-MBX.china.huawei.com>
-	<20180115122302.GK6646@localhost.localdomain>
-In-Reply-To: <20180115122302.GK6646@localhost.localdomain>
-Content-Language: zh-CN
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1ebSan-0005y2-6H
+	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 09:52:01 -0500
+References: <20180116134217.8725-1-berrange@redhat.com>
+	<20180116134217.8725-11-berrange@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <09245bb8-bc24-17b8-945e-5cee3da9fd37@redhat.com>
+Date: Tue, 16 Jan 2018 08:51:30 -0600
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH 3/7] i386: Add spec-ctrl CPUID bit
+In-Reply-To: <20180116134217.8725-11-berrange@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="EBH0RpwAKxIEX4UthFM4cCre1knMA3fWg"
+Subject: Re: [Qemu-devel] [PATCH v5 10/14] configure: allow use of python 3
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,81 +28,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>
+To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
+Cc: Fam Zheng <famz@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--EBH0RpwAKxIEX4UthFM4cCre1knMA3fWg
+From: Eric Blake <eblake@redhat.com>
+To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
+Cc: Fam Zheng <famz@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <09245bb8-bc24-17b8-945e-5cee3da9fd37@redhat.com>
+Subject: Re: [PATCH v5 10/14] configure: allow use of python 3
+References: <20180116134217.8725-1-berrange@redhat.com>
+ <20180116134217.8725-11-berrange@redhat.com>
+In-Reply-To: <20180116134217.8725-11-berrange@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 01/16/2018 07:42 AM, Daniel P. Berrange wrote:
+> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+> ---
+>  configure | 5 ++---
+>  1 file changed, 2 insertions(+), 3 deletions(-)
+>=20
+
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
+Presumably, you tested with this patch first in the series to come up
+with patches 1-9 ;)
+
+> diff --git a/configure b/configure
+> index b272a0336b..60b99f45f6 100755
+> --- a/configure
+> +++ b/configure
+> @@ -1598,9 +1598,8 @@ fi
+> =20
+>  # Note that if the Python conditional here evaluates True we will exit=
+
+>  # with status 1 which is a shell 'false' value.
+> -if ! $python -c 'import sys; sys.exit(sys.version_info < (2,6) or sys.=
+version_info >=3D (3,))'; then
+> -  error_exit "Cannot use '$python', Python 2.6 or later is required." =
+\
+> -      "Note that Python 3 or later is not yet supported." \
+> +if ! $python -c 'import sys; sys.exit(sys.version_info < (2,6))'; then=
+
+> +  error_exit "Cannot use '$python', Python 2 >=3D 2.6 or Python 3 is r=
+equired." \
+>        "Use --python=3D/path/to/python to specify a supported Python."
+>  fi
+> =20
+>=20
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
 
 
-> -----Original Message-----
-> From: Eduardo Habkost [mailto:ehabkost@redhat.com]
-> Sent: Monday, January 15, 2018 8:23 PM
-> To: Gonglei (Arei)
-> Cc: qemu-devel@nongnu.org; Paolo Bonzini
-> Subject: Re: [Qemu-devel] [PATCH 3/7] i386: Add spec-ctrl CPUID bit
->=20
-> On Sat, Jan 13, 2018 at 03:04:44AM +0000, Gonglei (Arei) wrote:
-> >
-> > > -----Original Message-----
-> > > From: Qemu-devel
-> > > [mailto:qemu-devel-bounces+arei.gonglei=3Dhuawei.com@nongnu.org] On
-> > > Behalf Of Eduardo Habkost
-> > > Sent: Tuesday, January 09, 2018 11:45 PM
-> > > To: qemu-devel@nongnu.org
-> > > Cc: Paolo Bonzini
-> > > Subject: [Qemu-devel] [PATCH 3/7] i386: Add spec-ctrl CPUID bit
-> > >
-> > > Add the feature name and a CPUID_7_0_EDX_SPEC_CTRL macro.
-> > >
-> > > Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-> > > ---
-> > >  target/i386/cpu.h | 1 +
-> > >  target/i386/cpu.c | 2 +-
-> > >  2 files changed, 2 insertions(+), 1 deletion(-)
-> > >
-> > > diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-> > > index 07f47997d6..de387c1311 100644
-> > > --- a/target/i386/cpu.h
-> > > +++ b/target/i386/cpu.h
-> > > @@ -667,6 +667,7 @@ typedef uint32_t
-> > > FeatureWordArray[FEATURE_WORDS];
-> > >
-> > >  #define CPUID_7_0_EDX_AVX512_4VNNIW (1U << 2) /* AVX512 Neural
-> > > Network Instructions */
-> > >  #define CPUID_7_0_EDX_AVX512_4FMAPS (1U << 3) /* AVX512 Multiply
-> > > Accumulation Single Precision */
-> > > +#define CPUID_7_0_EDX_SPEC_CTRL     (1U << 26) /* Speculation
-> Control
-> > > */
-> > >
-> > >  #define CPUID_XSAVE_XSAVEOPT   (1U << 0)
-> > >  #define CPUID_XSAVE_XSAVEC     (1U << 1)
-> > > diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-> > > index 9f4f949899..1be1642eb2 100644
-> > > --- a/target/i386/cpu.c
-> > > +++ b/target/i386/cpu.c
-> > > @@ -459,7 +459,7 @@ static FeatureWordInfo
-> > > feature_word_info[FEATURE_WORDS] =3D {
-> > >              NULL, NULL, NULL, NULL,
-> > >              NULL, NULL, NULL, NULL,
-> > >              NULL, NULL, NULL, NULL,
-> > > -            NULL, NULL, NULL, NULL,
-> > > +            NULL, NULL, "spec-ctrl", NULL,
-> > >              NULL, NULL, NULL, NULL,
-> > >          },
-> > >          .cpuid_eax =3D 7,
-> > > --
-> > > 2.14.3
-> > >
-> > Don't we need to pass-through cupid_7_edx to guest when configuring '-c=
-pu
-> host'?
-> > Otherwise how guests use IBPB/IBRS/STIPB capabilities?
->=20
-> We already do.  See the check for cpu->max_features at
-> x86_cpu_expand_features().
->=20
-> Do you see something else missing?
->=20
-No, thank you. My bad. :(
+--EBH0RpwAKxIEX4UthFM4cCre1knMA3fWg
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-Thanks,
--Gonglei
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlpeEXMACgkQp6FrSiUn
+Q2rU6AgAkENLz93iigAdFb1Ng2qbyEcvVbmspUTGADYmT9+HiZ1OswD3VRVWKRP9
+nNtXU1d6NM3nCb4ShBzmesA2XzcqZ8yfDQXrL6zJzDWlS7zfezjHPodtDS9KnY8B
+k4Wh1nzr323HthEhycSVH9FcvOCHpmCX5PqL0e+Fgok5cMl+u5WHdhmeGFf8DaNv
+BaGaj+r0t/GYpu1cY/k/OYS1KgKiL61vyjTDOGna37iokZUkOqMRXEffkav5Ul9Y
+o/jexbGyMa3rzr/KPQqhDT3Y86vfyM7gXjKFYBvIpwyXKnkntAbTDxkiMUs3yZyq
+RAgrC9Dx7dMqPijVeetECPcWaNp2Rg==
+=P55Q
+-----END PGP SIGNATURE-----
+
+--EBH0RpwAKxIEX4UthFM4cCre1knMA3fWg--
