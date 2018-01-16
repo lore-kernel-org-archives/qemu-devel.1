@@ -1,24 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50058)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50088)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1ebS3e-0002Z9-QR
+	(envelope-from <paolo.bonzini@gmail.com>) id 1ebS3i-0002cU-JW
 	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 09:17:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1ebS3Z-0004Ph-5h
-	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 09:17:46 -0500
-Received: from mail-wm0-x243.google.com ([2a00:1450:400c:c09::243]:39446)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1ebS3a-0004QA-Oz
+	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 09:17:50 -0500
+Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:43472)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1ebS3Y-0004PR-VA
-	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 09:17:41 -0500
-Received: by mail-wm0-x243.google.com with SMTP id i11so8890441wmf.4
-	for <qemu-devel@nongnu.org>; Tue, 16 Jan 2018 06:17:40 -0800 (PST)
+	id 1ebS3a-0004Ps-Ht
+	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 09:17:42 -0500
+Received: by mail-wm0-x242.google.com with SMTP id g1so8671317wmg.2
+	for <qemu-devel@nongnu.org>; Tue, 16 Jan 2018 06:17:42 -0800 (PST)
+Received: from 640k.lan (dynamic-adsl-78-12-229-84.clienti.tiscali.it.
+	[78.12.229.84])
+	by smtp.gmail.com with ESMTPSA id u10sm1537758wrg.6.2018.01.16.06.17.39
+	for <qemu-devel@nongnu.org>
+	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+	Tue, 16 Jan 2018 06:17:39 -0800 (PST)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Tue, 16 Jan 2018 15:16:43 +0100
-Message-Id: <1516112253-14480-2-git-send-email-pbonzini@redhat.com>
+Date: Tue, 16 Jan 2018 15:16:44 +0100
+Message-Id: <1516112253-14480-3-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1516112253-14480-1-git-send-email-pbonzini@redhat.com>
 References: <1516112253-14480-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 01/51] scsi-generic: Add share-rw option
+Subject: [Qemu-devel] [PULL 02/51] scsi: fix scsi_convert_sense crash when
+ in_buf == NULL && in_len == 0
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,59 +35,46 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Fam Zheng <famz@redhat.com>
 
-From: Fam Zheng <famz@redhat.com>
+scsi_disk_emulate_command passes in_buf == NULL when sent a REQUEST
+SENSE command.  Check for in_len == 0 before dereferencing in_buf.
 
-Add the property to the device model, then parse it by calling
-blkconf_apply_backend_options().
-
-In addition to blk_set_perm(), the called function also handles error
-options and wce. For error options we've already checked that the
-default values are used, for wce we don't have the option either so it
-is always the default (true). In other words there is no change of
-behavior in these regards.
-
-Signed-off-by: Fam Zheng <famz@redhat.com>
-Message-Id: <20171205151553.7834-1-famz@redhat.com>
+Fixes: f68d98b21fa74155dc7c1fd212474379ac3c7531
+Reported-by: Roman Kagan <rkagan@virtuozzo.com>
+Tested-by: Roman Kagan <rkagan@virtuozzo.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- hw/scsi/scsi-generic.c | 9 +++++++++
- 1 file changed, 9 insertions(+)
+ scsi/utils.c | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
 
-diff --git a/hw/scsi/scsi-generic.c b/hw/scsi/scsi-generic.c
-index bd0d9ff..ba70c0d 100644
---- a/hw/scsi/scsi-generic.c
-+++ b/hw/scsi/scsi-generic.c
-@@ -482,6 +482,7 @@ static void scsi_generic_realize(SCSIDevice *s, Error **errp)
-     int rc;
-     int sg_version;
-     struct sg_scsi_id scsiid;
-+    Error *local_err = NULL;
+diff --git a/scsi/utils.c b/scsi/utils.c
+index ddae650..8738522 100644
+--- a/scsi/utils.c
++++ b/scsi/utils.c
+@@ -322,18 +322,18 @@ int scsi_convert_sense(uint8_t *in_buf, int in_len,
+     SCSISense sense;
+     bool fixed_in;
  
-     if (!s->conf.blk) {
-         error_setg(errp, "drive property not set");
-@@ -515,6 +516,13 @@ static void scsi_generic_realize(SCSIDevice *s, Error **errp)
-         error_setg(errp, "SG_GET_SCSI_ID ioctl failed");
-         return;
-     }
-+    blkconf_apply_backend_options(&s->conf,
-+                                  blk_is_read_only(s->conf.blk),
-+                                  true, &local_err);
-+    if (local_err) {
-+        error_propagate(errp, local_err);
-+        return;
++    if (in_len == 0) {
++        return scsi_build_sense_buf(buf, len, SENSE_CODE(NO_SENSE), fixed);
 +    }
++
+     fixed_in = (in_buf[0] & 2) == 0;
+-    if (in_len && fixed == fixed_in) {
++    if (fixed == fixed_in) {
+         memcpy(buf, in_buf, MIN(len, in_len));
+         return MIN(len, in_len);
+-    }
+-
+-    if (in_len == 0) {
+-        sense = SENSE_CODE(NO_SENSE);
+     } else {
+         sense = scsi_parse_sense_buf(in_buf, in_len);
++        return scsi_build_sense_buf(buf, len, sense, fixed);
+     }
+-    return scsi_build_sense_buf(buf, len, sense, fixed);
+ }
  
-     /* define device state */
-     s->type = scsiid.scsi_type;
-@@ -565,6 +573,7 @@ static SCSIRequest *scsi_new_request(SCSIDevice *d, uint32_t tag, uint32_t lun,
- 
- static Property scsi_generic_properties[] = {
-     DEFINE_PROP_DRIVE("drive", SCSIDevice, conf.blk),
-+    DEFINE_PROP_BOOL("share-rw", SCSIDevice, conf.share_rw, false),
-     DEFINE_PROP_END_OF_LIST(),
- };
- 
+ int scsi_sense_to_errno(int key, int asc, int ascq)
 -- 
 1.8.3.1
