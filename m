@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40514)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41373)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1ebRXg-0000D0-A0
-	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 08:44:49 -0500
+	(envelope-from <abologna@redhat.com>) id 1ebRaP-0002Ux-W1
+	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 08:47:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1ebRXd-0001UN-6b
-	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 08:44:44 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:52588)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1ebRXd-0001Tx-0E
-	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 08:44:41 -0500
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Date: Tue, 16 Jan 2018 13:42:17 +0000
-Message-Id: <20180116134217.8725-15-berrange@redhat.com>
-In-Reply-To: <20180116134217.8725-1-berrange@redhat.com>
-References: <20180116134217.8725-1-berrange@redhat.com>
-Subject: [Qemu-devel] [PATCH v5 14/14] docker: change Fedora images to run
- with python3
+	(envelope-from <abologna@redhat.com>) id 1ebRaK-00033C-EX
+	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 08:47:34 -0500
+Message-ID: <1516110433.10494.5.camel@redhat.com>
+From: Andrea Bolognani <abologna@redhat.com>
+Date: Tue, 16 Jan 2018 14:47:13 +0100
+In-Reply-To: <20180115063235.7518-1-sjitindarsingh@gmail.com>
+References: <20180115063235.7518-1-sjitindarsingh@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [Qemu-ppc] [QEMU-PPC] [PATCH V3 0/6] target/ppc:
+ Rework spapr_caps
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,36 +23,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Fam Zheng <famz@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Eric Blake <eblake@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>
+To: Suraj Jitindar Singh <sjitindarsingh@gmail.com>, qemu-ppc@nongnu.org
+Cc: paulus@ozlabs.org, qemu-devel@nongnu.org, david@gibson.dropbear.id.au
 
-Fedora has switched to Python 3 by default, so it makes sense to use that
-for testing QEMU builds, so we get testing of Python 3 compatibility.
+On Mon, 2018-01-15 at 17:32 +1100, Suraj Jitindar Singh wrote:
+> The following patch series adds 3 new tristate capabilities and their
+> associated handling.
+> 
+> A new H-Call is implemented which a guest will use to query the
+> requirement for and availability of workarounds for certain cpu
+> behaviours.
+> 
+> Applies on top of David's tree: ppc-for-2.12
+> 
+> The first patch from the previous revision has already been merged:
+> hw/ppc/spapr_caps: Rework spapr_caps to use uint8 internal representation
+> 
+> The main changes to V3 are:
+> - Split up the addition of the tristate caps into 5 patches
+>   - 1/6 query the caps from the hypervisor and parse the new return format
+>   - 2/6 add support for the new caps
+>   - 3-5/6 add each of the three new caps
+> - Patch 6/6 Unchanged
 
-Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
----
- tests/docker/dockerfiles/fedora.docker | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+Correct me if I'm wrong, but it seems to me like there's no way
+to figure out through QMP whether these new machine options can be
+used for a given QEMU binary.
 
-diff --git a/tests/docker/dockerfiles/fedora.docker b/tests/docker/dockerfiles/fedora.docker
-index 4b26c3aded..a22fe16157 100644
---- a/tests/docker/dockerfiles/fedora.docker
-+++ b/tests/docker/dockerfiles/fedora.docker
-@@ -1,6 +1,6 @@
- FROM fedora:latest
- ENV PACKAGES \
--    ccache gettext git tar PyYAML sparse flex bison python2 bzip2 hostname \
-+    ccache gettext git tar PyYAML sparse flex bison python3 bzip2 hostname \
-     glib2-devel pixman-devel zlib-devel SDL-devel libfdt-devel \
-     gcc gcc-c++ clang make perl which bc findutils libaio-devel \
-     nettle-devel \
-@@ -12,6 +12,7 @@ ENV PACKAGES \
-     mingw64-gtk2 mingw64-gtk3 mingw64-gnutls mingw64-nettle mingw64-libtasn1 \
-     mingw64-libjpeg-turbo mingw64-libpng mingw64-curl mingw64-libssh2 \
-     mingw64-bzip2
-+ENV QEMU_CONFIGURE_OPTS --python=/usr/bin/python3
- 
- RUN dnf install -y $PACKAGES
- RUN rpm -q $PACKAGES | sort > /packages.txt
+If so, that's very unfortunate because it means that libvirt has
+only two options: 1) just use them if the user requests the
+corresponding feature, which will lead to older QEMU binaries
+simply refusing to start; or 2) perform a version number check,
+which will not be accurate if downstream backports are involved.
+
+Would this information be added to the MachineInfo struct, so that
+query-machines reports it? Or would a new QMP command be more
+appropriate for the task?
+
+Alternatively, if there's any witness we can use instead of an
+explicit capability, let me know. But I still think we should
+think about a better long-term solution, especially because this
+seems to be happening quite frequently lately: see the hpt-resizing
+and max-cpu-compat machine properties, which are just as opaque
+from an introspection point of view.
+
+Sorry for not bringing this up earlier.
+
 -- 
-2.14.3
+Andrea Bolognani / Red Hat / Virtualization
