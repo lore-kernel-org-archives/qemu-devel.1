@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43601)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43745)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ebY79-0004eR-Ah
-	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 15:45:48 -0500
+	(envelope-from <alex.williamson@redhat.com>) id 1ebY7i-00052R-9y
+	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 15:46:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ebY78-0003i1-GQ
-	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 15:45:47 -0500
-References: <1516107870-8110-1-git-send-email-anton.nefedov@virtuozzo.com>
-	<1516107870-8110-10-git-send-email-anton.nefedov@virtuozzo.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <55baeb92-f476-20de-0bec-cb8bf42e2155@redhat.com>
-Date: Tue, 16 Jan 2018 14:45:32 -0600
+	(envelope-from <alex.williamson@redhat.com>) id 1ebY7e-0003xz-Cz
+	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 15:46:22 -0500
+Date: Tue, 16 Jan 2018 13:46:14 -0700
+From: Alex Williamson <alex.williamson@redhat.com>
+Message-ID: <20180116134614.1aae30b9@w520.home>
+In-Reply-To: <ad143758-227b-55fe-44a6-c62a48f74162@ozlabs.ru>
+References: <20180102052805.20498-1-aik@ozlabs.ru>
+	<f14c0782-0f25-8bd0-8536-323bfc5fcbe4@redhat.com>
+	<ad143758-227b-55fe-44a6-c62a48f74162@ozlabs.ru>
 MIME-Version: 1.0
-In-Reply-To: <1516107870-8110-10-git-send-email-anton.nefedov@virtuozzo.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="ZgVxw9CWT61xgebtQN50obdGGs2AfDRAR"
-Subject: Re: [Qemu-devel] [PATCH v6 9/9] iotest 134: test cluster-misaligned
- encrypted write
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH qemu 0/3] spapr/iommu: Enable in-kernel TCE
+ acceleration via VFIO KVM device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,58 +25,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Anton Nefedov <anton.nefedov@virtuozzo.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, kwolf@redhat.com, mreitz@redhat.com, den@virtuozzo.com, berto@igalia.com
+To: Alexey Kardashevskiy <aik@ozlabs.ru>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---ZgVxw9CWT61xgebtQN50obdGGs2AfDRAR
-From: Eric Blake <eblake@redhat.com>
-To: Anton Nefedov <anton.nefedov@virtuozzo.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, kwolf@redhat.com, mreitz@redhat.com,
- den@virtuozzo.com, berto@igalia.com
-Message-ID: <55baeb92-f476-20de-0bec-cb8bf42e2155@redhat.com>
-Subject: Re: [PATCH v6 9/9] iotest 134: test cluster-misaligned encrypted
- write
-References: <1516107870-8110-1-git-send-email-anton.nefedov@virtuozzo.com>
- <1516107870-8110-10-git-send-email-anton.nefedov@virtuozzo.com>
-In-Reply-To: <1516107870-8110-10-git-send-email-anton.nefedov@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Mon, 15 Jan 2018 15:12:07 +1100
+Alexey Kardashevskiy <aik@ozlabs.ru> wrote:
 
-On 01/16/2018 07:04 AM, Anton Nefedov wrote:
-> COW (even empty/zero) areas require encryption too
+> On 03/01/18 04:51, Paolo Bonzini wrote:
+> > On 02/01/2018 06:28, Alexey Kardashevskiy wrote: =20
+> >> This is my current queue of the in-kernel TCE acceleration
+> >> enablement.
+> >>
+> >> Changes since https://lists.gnu.org/archive/html/qemu-devel/2017-12/ms=
+g01918.html :
+> >> * 3 patches instead of one, one per maintainership area;
+> >> * added memory_region_iommu_get_attr();
+> >> * removed set_attr() as there is no use for it now;
+> >> * folded the chunk in vfio_listener_region_add() under
+> >> VFIO_SPAPR_TCE_v2_IOMMU branch as the acceleration is only
+> >> enabled when DMA memory is preregistered and this is only supported
+> >> by the v2 IOMMU.
+> >>
+> >> This is based on sha1
+> >> ad59cde C=C3=A9dric Le Goater "target/ppc: more use of the PPC_*() mac=
+ros".
+> >>
+> >> Please comment. Thanks.
+> >>
+> >>
+> >>
+> >> Alexey Kardashevskiy (3):
+> >>   memory/iommu: Add get_attr()
+> >>   vfio/spapr: Use iommu memory region's get_attr()
+> >>   spapr/iommu: Enable in-kernel TCE acceleration via VFIO KVM device
+> >>
+> >>  include/exec/memory.h | 22 ++++++++++++++++++++++
+> >>  target/ppc/kvm_ppc.h  |  6 ++++++
+> >>  hw/ppc/spapr_iommu.c  | 19 +++++++++++++++++++
+> >>  hw/vfio/common.c      | 26 ++++++++++++++++++++++++++
+> >>  memory.c              | 13 +++++++++++++
+> >>  target/ppc/kvm.c      |  7 ++++++-
+> >>  hw/vfio/trace-events  |  1 +
+> >>  7 files changed, 93 insertions(+), 1 deletion(-)
+> >> =20
+> >=20
+> > Alex, if this is okay for you, please pick it up yourself. =20
 >=20
-> Signed-off-by: Anton Nefedov <anton.nefedov@virtuozzo.com>
-> ---
->  tests/qemu-iotests/134     |  9 +++++++++
->  tests/qemu-iotests/134.out | 10 ++++++++++
->  2 files changed, 19 insertions(+)
+> Alex, ping?
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
+Yeah, I'll pick these up.  Paolo, do you want to throw an explicit Ack
+for the first patch?  David, R-b/A-b?  Thanks,
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---ZgVxw9CWT61xgebtQN50obdGGs2AfDRAR
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlpeZGwACgkQp6FrSiUn
-Q2rz+gf/dDeF+FmWb3G/xssIzwEBdB8YpMCo5mm4ssGDJ6kYEXJcqVNuI0FgHUoQ
-UV1EVhzU4H6gCBGjkbXzKTz1bE5ZfSdWqBBEBVf769phIeXdRBw/eBxmq0tc/Yyz
-datHar+GLWUH2pZIxm07EMjg9VBl1M6z7UHbV5h/74ssDWQ/ESLZy+hjrTh6CisK
-bKXWMHAPY86tmR5tqqCSXn2QxmpU+cMqzVTjlMgPhl+/ZLtBWo8Hsb5Y5vz439jn
-Xc1kWa/h+6uY4ByfN30RlmJeCwYzcV3Niljz3MAYIpo+CZ6Ea/Fzs7DOlISIjG8T
-P1eYV07a6eRo7Fj+BuX1eDSS/8zxlg==
-=tQfX
------END PGP SIGNATURE-----
-
---ZgVxw9CWT61xgebtQN50obdGGs2AfDRAR--
+Alex
