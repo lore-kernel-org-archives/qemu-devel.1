@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44655)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44731)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1ebVMN-0006S7-MT
-	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 12:49:20 -0500
+	(envelope-from <mst@redhat.com>) id 1ebVMX-0006Z2-BS
+	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 12:49:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1ebVMM-0001M8-Eb
-	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 12:49:19 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:53696)
+	(envelope-from <mst@redhat.com>) id 1ebVMV-0001Sz-KL
+	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 12:49:29 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:53906)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1ebVMM-0001Lg-8S
-	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 12:49:18 -0500
-Date: Tue, 16 Jan 2018 19:49:13 +0200
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1ebVMV-0001SK-Do
+	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 12:49:27 -0500
+Date: Tue, 16 Jan 2018 19:49:17 +0200
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <1516121887-32738-7-git-send-email-mst@redhat.com>
+Message-ID: <1516121887-32738-8-git-send-email-mst@redhat.com>
 References: <1516121887-32738-1-git-send-email-mst@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 In-Reply-To: <1516121887-32738-1-git-send-email-mst@redhat.com>
-Subject: [Qemu-devel] [PULL v2 06/34] qemu: add a cleanup callback function
- to EventNotifier
+Subject: [Qemu-devel] [PULL v2 07/34] virtio: postpone the execution of
+ event_notifier_cleanup function
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,87 +28,81 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Gal Hammer <ghammer@redhat.com>, Stefan Weil <sw@weilnetz.de>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Gal Hammer <ghammer@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
 
 From: Gal Hammer <ghammer@redhat.com>
 
-Adding a cleanup callback function to the EventNotifier struct
-which allows users to execute event_notifier_cleanup in a
-different context.
+Use the EventNotifier's cleanup callback function to execute the
+event_notifier_cleanup function after kvm unregistered the eventfd.
+
+This change supports running the virtio_bus_set_host_notifier
+function inside a memory region transaction. Otherwise, a closed
+fd is sent to kvm, which results in a failure.
 
 Signed-off-by: Gal Hammer <ghammer@redhat.com>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 ---
- include/qemu/event_notifier.h | 1 +
- util/event_notifier-posix.c   | 5 ++++-
- util/event_notifier-win32.c   | 2 ++
- 3 files changed, 7 insertions(+), 1 deletion(-)
+ accel/kvm/kvm-all.c    |  4 ++++
+ hw/virtio/virtio-bus.c | 19 +++++++++++--------
+ 2 files changed, 15 insertions(+), 8 deletions(-)
 
-diff --git a/include/qemu/event_notifier.h b/include/qemu/event_notifier.h
-index 599c99f..b30a454 100644
---- a/include/qemu/event_notifier.h
-+++ b/include/qemu/event_notifier.h
-@@ -26,6 +26,7 @@ struct EventNotifier {
-     int rfd;
-     int wfd;
- #endif
-+    void (*cleanup)(EventNotifier *);
- };
- 
- typedef void EventNotifierHandler(EventNotifier *);
-diff --git a/util/event_notifier-posix.c b/util/event_notifier-posix.c
-index 73c4046..6525666 100644
---- a/util/event_notifier-posix.c
-+++ b/util/event_notifier-posix.c
-@@ -29,6 +29,7 @@ void event_notifier_init_fd(EventNotifier *e, int fd)
- {
-     e->rfd = fd;
-     e->wfd = fd;
-+    e->cleanup = NULL;
- }
- #endif
- 
-@@ -65,6 +66,7 @@ int event_notifier_init(EventNotifier *e, int active)
-         e->rfd = fds[0];
-         e->wfd = fds[1];
+diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
+index f290f48..071f4f5 100644
+--- a/accel/kvm/kvm-all.c
++++ b/accel/kvm/kvm-all.c
+@@ -812,6 +812,10 @@ static void kvm_mem_ioeventfd_del(MemoryListener *listener,
+     if (r < 0) {
+         abort();
      }
-+    e->cleanup = NULL;
-     if (active) {
-         event_notifier_set(e);
++
++    if (e->cleanup) {
++        e->cleanup(e);
++    }
+ }
+ 
+ static void kvm_io_ioeventfd_add(MemoryListener *listener,
+diff --git a/hw/virtio/virtio-bus.c b/hw/virtio/virtio-bus.c
+index 3042232..8106346 100644
+--- a/hw/virtio/virtio-bus.c
++++ b/hw/virtio/virtio-bus.c
+@@ -256,6 +256,15 @@ bool virtio_bus_ioeventfd_enabled(VirtioBusState *bus)
+     return k->ioeventfd_assign && k->ioeventfd_enabled(proxy);
+ }
+ 
++static void virtio_bus_cleanup_event_notifier(EventNotifier *notifier)
++{
++    /* Test and clear notifier after disabling event,
++     * in case poll callback didn't have time to run.
++     */
++    virtio_queue_host_notifier_read(notifier);
++    event_notifier_cleanup(notifier);
++}
++
+ /*
+  * This function switches ioeventfd on/off in the device.
+  * The caller must set or clear the handlers for the EventNotifier.
+@@ -283,19 +292,13 @@ int virtio_bus_set_host_notifier(VirtioBusState *bus, int n, bool assign)
+         r = k->ioeventfd_assign(proxy, notifier, n, true);
+         if (r < 0) {
+             error_report("%s: unable to assign ioeventfd: %d", __func__, r);
+-            goto cleanup_event_notifier;
++            virtio_bus_cleanup_event_notifier(notifier);
+         }
+-        return 0;
+     } else {
++        notifier->cleanup = virtio_bus_cleanup_event_notifier;
+         k->ioeventfd_assign(proxy, notifier, n, false);
      }
-@@ -80,10 +82,11 @@ void event_notifier_cleanup(EventNotifier *e)
- {
-     if (e->rfd != e->wfd) {
-         close(e->rfd);
--        e->rfd = -1;
-     }
-     close(e->wfd);
-+    e->rfd = -1;
-     e->wfd = -1;
-+    e->cleanup = NULL;
+ 
+-cleanup_event_notifier:
+-    /* Test and clear notifier after disabling event,
+-     * in case poll callback didn't have time to run.
+-     */
+-    virtio_queue_host_notifier_read(notifier);
+-    event_notifier_cleanup(notifier);
+     return r;
  }
  
- int event_notifier_get_fd(const EventNotifier *e)
-diff --git a/util/event_notifier-win32.c b/util/event_notifier-win32.c
-index 62c53b0..eff8670 100644
---- a/util/event_notifier-win32.c
-+++ b/util/event_notifier-win32.c
-@@ -19,6 +19,7 @@ int event_notifier_init(EventNotifier *e, int active)
- {
-     e->event = CreateEvent(NULL, TRUE, FALSE, NULL);
-     assert(e->event);
-+    e->cleanup = NULL;
-     return 0;
- }
- 
-@@ -26,6 +27,7 @@ void event_notifier_cleanup(EventNotifier *e)
- {
-     CloseHandle(e->event);
-     e->event = NULL;
-+    e->cleanup = NULL;
- }
- 
- HANDLE event_notifier_get_handle(EventNotifier *e)
 -- 
 MST
