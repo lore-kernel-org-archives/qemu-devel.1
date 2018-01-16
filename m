@@ -1,16 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43671)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44542)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1ebQA9-0003lJ-1T
-	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 07:16:25 -0500
+	(envelope-from <peterx@redhat.com>) id 1ebQDP-0006Cn-PO
+	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 07:19:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1ebQA8-00031M-1F
-	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 07:16:21 -0500
-From: Thomas Huth <thuth@redhat.com>
-Date: Tue, 16 Jan 2018 13:15:58 +0100
-Message-Id: <1516104958-3881-5-git-send-email-thuth@redhat.com>
-In-Reply-To: <1516104958-3881-1-git-send-email-thuth@redhat.com>
-References: <1516104958-3881-1-git-send-email-thuth@redhat.com>
-Subject: [Qemu-devel] [PATCH 4/4] ppc: Deprecate qemu-system-ppcemb
+	(envelope-from <peterx@redhat.com>) id 1ebQDL-0005wX-0a
+	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 07:19:43 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:45108)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1ebQDK-0005pq-RJ
+	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 07:19:38 -0500
+Date: Tue, 16 Jan 2018 20:19:31 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20180116121931.GC7031@xz-mi>
+References: <1516099892-34247-1-git-send-email-wei.w.wang@intel.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <1516099892-34247-1-git-send-email-wei.w.wang@intel.com>
+Subject: Re: [Qemu-devel] [PATCH v1] migration: use s->threshold_size inside
+ migration_update_counters
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -19,64 +27,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
-Cc: Alexander Graf <agraf@suse.de>, BALATON Zoltan <balaton@eik.bme.hu>
+To: Wei Wang <wei.w.wang@intel.com>
+Cc: qemu-devel@nongnu.org, quintela@redhat.com, dgilbert@redhat.com
 
-qemu-system-ppcemb has been once split of qemu-system-ppc to support
-CPU page sizes < 4096 for some of the embedded 4xx PowerPC CPUs.
-However, there was hardly any OS available in the wild that really
-used such small page sizes (Linux uses 4096 on PPC), so there is
-no known recent use case for this separate build anymore. It's
-rather cumbersome to maintain a separate set of config switches for
-this, and it's wasting compile and test time of all the developers
-who have to build all QEMU targets to verify that their changes did
-not break anything.
+On Tue, Jan 16, 2018 at 06:51:32PM +0800, Wei Wang wrote:
+> The threshold size is changed to be recorded in s->threshold_size by
+> commit b15df1ae5063c7c181f8f068f9eba7661b3b5e1.
+> 
+> Signed-off-by: Wei Wang <wei.w.wang@intel.com>
 
-Except for the small CPU page sizes, qemu-system-ppc can be used as
-a full replacement for qemu-system-ppcemb since it contains all the
-embedded 4xx PPC boards and CPUs, too. Thus let's start the deprecation
-process for qemu-system-ppcemb to see whether somebody still needs
-the small page sizes or whether we could finally remove this unloved
-separate build.
+Could you help confirm the commit ID?  Since what I see is
+b15df1ae50.  Otherwise:
 
-Signed-off-by: Thomas Huth <thuth@redhat.com>
----
- qemu-doc.texi               | 6 ++++++
- target/ppc/translate_init.c | 5 +++++
- 2 files changed, 11 insertions(+)
+Reviewed-by: Peter Xu <peterx@redhat.com>
 
-diff --git a/qemu-doc.texi b/qemu-doc.texi
-index a3d2054..ae38f0a 100644
---- a/qemu-doc.texi
-+++ b/qemu-doc.texi
-@@ -2757,6 +2757,12 @@ The ``host_net_remove'' command is replaced by the ``netdev_del'' command.
- The ``ivshmem'' device type is replaced by either the ``ivshmem-plain''
- or ``ivshmem-doorbell`` device types.
- 
-+@subsection Page size support < 4k for embedded PowerPC CPUs (since 2.12.0)
-+
-+qemu-system-ppcemb will be removed. qemu-system-ppc (or qemu-system-ppc64)
-+should be used instead. That means that embedded 4xx PowerPC CPUs will not
-+support page sizes < 4096 any longer.
-+
- @section System emulator machines
- 
- @subsection Xilinx EP108 (since 2.11.0)
-diff --git a/target/ppc/translate_init.c b/target/ppc/translate_init.c
-index 70ff15a..ab70b3a 100644
---- a/target/ppc/translate_init.c
-+++ b/target/ppc/translate_init.c
-@@ -10634,6 +10634,11 @@ static void ppc_cpu_register_types(void)
- {
-     type_register_static(&ppc_cpu_type_info);
-     type_register_static(&ppc_vhyp_type_info);
-+
-+#ifdef TARGET_PPCEMB
-+    warn_report("qemu-system-ppcemb is deprecated, "
-+                "please use qemu-system-ppc instead.");
-+#endif
- }
- 
- type_init(ppc_cpu_register_types)
+And I'd prefer add:
+
+Fixes: b15df1ae50 ("migration: cleanup stats update into function")
+
+Thanks for the patch!
+
 -- 
-1.8.3.1
+Peter Xu
