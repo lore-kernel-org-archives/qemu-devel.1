@@ -1,17 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43628)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43604)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1ebQA2-0003gD-6i
-	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 07:16:17 -0500
+	(envelope-from <thuth@redhat.com>) id 1ebQ9y-0003fk-PM
+	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 07:16:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1ebQA0-0002qv-W3
-	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 07:16:14 -0500
+	(envelope-from <thuth@redhat.com>) id 1ebQ9s-0002ms-WB
+	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 07:16:10 -0500
 From: Thomas Huth <thuth@redhat.com>
-Date: Tue, 16 Jan 2018 13:15:56 +0100
-Message-Id: <1516104958-3881-3-git-send-email-thuth@redhat.com>
-In-Reply-To: <1516104958-3881-1-git-send-email-thuth@redhat.com>
-References: <1516104958-3881-1-git-send-email-thuth@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 2/4] default-configs/ppc-softmmu:
- Restructure the switches according to the machines
+Date: Tue, 16 Jan 2018 13:15:54 +0100
+Message-Id: <1516104958-3881-1-git-send-email-thuth@redhat.com>
+Subject: [Qemu-devel] [PATCH v2 0/4] Clean up the ppc configs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,110 +20,37 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: David Gibson <david@gibson.dropbear.id.au>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 Cc: Alexander Graf <agraf@suse.de>, BALATON Zoltan <balaton@eik.bme.hu>
 
-Order the CONFIG switches in ppc-softmmu.mak according to the machine
-classes where they are used (embedded, Mac or PReP), so that it is
-easier for the users to disable a set of switches completely if they
-are not needed.
+ppc64-softmmu is a superset of ppc-softmmu which in turn is a superset
+of ppcemb-softmmu. But since the config files are currently independent
+from each other, we missed to define some CONFIG switches in the super-
+sets: CONFIG_SUNGEM is missing from the ppc64-softmmu config, and the
+CONFIG_IDE_SII3112 switch is only defined in ppcemb-softmmu.
 
-Also add the missing CONFIG_IDE_SII3112 switch to the embedded section
-which was previously only added to ppcemb-softmmu.mak.
+This patch series fixes these problems, together with cleaning up
+the config- and make-files for better usability. qemu-system-ppcemb
+is finally marked as deprecated since there is hardly any use case
+for this separate build nowadays anymore (and if somebody really
+still needs page sizes < 4k, we should likely rather use the dynamic
+approach that is already done on the ARM boards instead).
 
-And while we're at it, also remove the CONFIG_IDE_CMD646 switch since
-this controller does not seem to be used by any ppc machine in QEMU.
+v2:
+ - Added patch to disable the PPC4xx boards in the hw/ppc/Makefile
+ - Added patch to deprecate qemu-system-ppcemb
 
-Signed-off-by: Thomas Huth <thuth@redhat.com>
----
- default-configs/ppc-softmmu.mak | 59 ++++++++++++++++++++++-------------------
- 1 file changed, 32 insertions(+), 27 deletions(-)
+Thomas Huth (4):
+  default-configs/ppc64-softmmu: Include 32-bit configs instead of
+    copying them
+  default-configs/ppc-softmmu: Restructure the switches according to the
+    machines
+  hw/ppc/Makefile: Add a way to disable the PPC4xx boards
+  ppc: Deprecate qemu-system-ppcemb
 
-diff --git a/default-configs/ppc-softmmu.mak b/default-configs/ppc-softmmu.mak
-index bb225c6..3baed6a 100644
---- a/default-configs/ppc-softmmu.mak
-+++ b/default-configs/ppc-softmmu.mak
-@@ -3,52 +3,57 @@
- include pci.mak
- include sound.mak
- include usb.mak
-+
-+# For embedded PPCs:
- CONFIG_PPC4XX=y
--CONFIG_ESCC=y
- CONFIG_M48T59=y
- CONFIG_SERIAL=y
--CONFIG_PARALLEL=y
--CONFIG_I8254=y
--CONFIG_PCKBD=y
--CONFIG_FDC=y
- CONFIG_I8257=y
--CONFIG_I82374=y
- CONFIG_OPENPIC=y
--CONFIG_PREP_PCI=y
--CONFIG_I82378=y
--CONFIG_PC87312=y
--CONFIG_MACIO=y
--CONFIG_SUNGEM=y
--CONFIG_PCSPK=y
--CONFIG_CS4231A=y
--CONFIG_CUDA=y
--CONFIG_ADB=y
--CONFIG_MAC_NVRAM=y
--CONFIG_MAC_DBDMA=y
--CONFIG_HEATHROW_PIC=y
--CONFIG_GRACKLE_PCI=y
--CONFIG_UNIN_PCI=y
--CONFIG_DEC_PCI=y
- CONFIG_PPCE500_PCI=y
--CONFIG_IDE_ISA=y
--CONFIG_IDE_CMD646=y
--CONFIG_IDE_MACIO=y
--CONFIG_NE2000_ISA=y
- CONFIG_PFLASH_CFI01=y
- CONFIG_PFLASH_CFI02=y
- CONFIG_PTIMER=y
- CONFIG_I8259=y
- CONFIG_XILINX=y
- CONFIG_XILINX_ETHLITE=y
--CONFIG_PREP=y
--CONFIG_MAC=y
- CONFIG_E500=y
- CONFIG_OPENPIC_KVM=$(call land,$(CONFIG_E500),$(CONFIG_KVM))
- CONFIG_PLATFORM_BUS=y
- CONFIG_ETSEC=y
- CONFIG_SM501=y
-+CONFIG_IDE_SII3112=y
-+
-+# For Macs
-+CONFIG_MAC=y
-+CONFIG_ESCC=y
-+CONFIG_MACIO=y
-+CONFIG_SUNGEM=y
-+CONFIG_CUDA=y
-+CONFIG_ADB=y
-+CONFIG_MAC_NVRAM=y
-+CONFIG_MAC_DBDMA=y
-+CONFIG_HEATHROW_PIC=y
-+CONFIG_GRACKLE_PCI=y
-+CONFIG_UNIN_PCI=y
-+CONFIG_DEC_PCI=y
-+CONFIG_IDE_MACIO=y
-+
- # For PReP
-+CONFIG_PREP=y
-+CONFIG_PREP_PCI=y
- CONFIG_SERIAL_ISA=y
- CONFIG_MC146818RTC=y
- CONFIG_ISA_TESTDEV=y
- CONFIG_RS6000_MC=y
-+CONFIG_PARALLEL=y
-+CONFIG_I82374=y
-+CONFIG_I82378=y
-+CONFIG_I8254=y
-+CONFIG_PCKBD=y
-+CONFIG_FDC=y
-+CONFIG_NE2000_ISA=y
-+CONFIG_PC87312=y
-+CONFIG_PCSPK=y
-+CONFIG_IDE_ISA=y
-+CONFIG_CS4231A=y
+ default-configs/ppc-softmmu.mak   | 59 ++++++++++++++++++++-----------------
+ default-configs/ppc64-softmmu.mak | 61 +++++----------------------------------
+ hw/ppc/Makefile.objs              |  4 +--
+ qemu-doc.texi                     |  6 ++++
+ target/ppc/translate_init.c       |  5 ++++
+ 5 files changed, 53 insertions(+), 82 deletions(-)
+
 -- 
 1.8.3.1
