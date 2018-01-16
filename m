@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35340)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35386)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <edgar.iglesias@gmail.com>) id 1ebPlw-0005fJ-TV
-	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 06:51:26 -0500
+	(envelope-from <edgar.iglesias@gmail.com>) id 1ebPm0-0005gE-Ud
+	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 06:51:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <edgar.iglesias@gmail.com>) id 1ebPlq-0000AR-Sv
-	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 06:51:20 -0500
-Received: from mail-lf0-x241.google.com ([2a00:1450:4010:c07::241]:42758)
+	(envelope-from <edgar.iglesias@gmail.com>) id 1ebPlx-0000HX-FA
+	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 06:51:25 -0500
+Received: from mail-lf0-x243.google.com ([2a00:1450:4010:c07::243]:42761)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <edgar.iglesias@gmail.com>)
-	id 1ebPlq-00009h-H2
-	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 06:51:14 -0500
-Received: by mail-lf0-x241.google.com with SMTP id q17so6874642lfa.9
-	for <qemu-devel@nongnu.org>; Tue, 16 Jan 2018 03:51:14 -0800 (PST)
+	id 1ebPlx-0000GC-4O
+	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 06:51:21 -0500
+Received: by mail-lf0-x243.google.com with SMTP id q17so6875072lfa.9
+	for <qemu-devel@nongnu.org>; Tue, 16 Jan 2018 03:51:20 -0800 (PST)
 From: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
-Date: Tue, 16 Jan 2018 12:51:01 +0100
-Message-Id: <1516103467-7983-3-git-send-email-edgar.iglesias@gmail.com>
+Date: Tue, 16 Jan 2018 12:51:05 +0100
+Message-Id: <1516103467-7983-7-git-send-email-edgar.iglesias@gmail.com>
 In-Reply-To: <1516103467-7983-1-git-send-email-edgar.iglesias@gmail.com>
 References: <1516103467-7983-1-git-send-email-edgar.iglesias@gmail.com>
-Subject: [Qemu-devel] [PULL v1 2/8] xlnx-zynqmp-pmu: Add the CPU and memory
+Subject: [Qemu-devel] [PULL v1 6/8] xlnx-zynqmp-ipi: Initial version of the
+ Xilinx IPI device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,125 +32,476 @@ Cc: alistai@xilinx.com, sai.pavan.boddu@xilinx.com, edgar.iglesias@xilinx.com
 
 From: Alistair Francis <alistair.francis@xilinx.com>
 
-Connect the MicroBlaze CPU and the ROM and RAM memory regions.
+This is the initial version of the Inter Processor Interrupt device.
 
 Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
 Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
 Signed-off-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
 ---
- hw/microblaze/xlnx-zynqmp-pmu.c | 70 +++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 68 insertions(+), 2 deletions(-)
+ hw/intc/Makefile.objs             |   1 +
+ hw/intc/xlnx-zynqmp-ipi.c         | 377 ++++++++++++++++++++++++++++++++++++++
+ include/hw/intc/xlnx-zynqmp-ipi.h |  57 ++++++
+ 3 files changed, 435 insertions(+)
+ create mode 100644 hw/intc/xlnx-zynqmp-ipi.c
+ create mode 100644 include/hw/intc/xlnx-zynqmp-ipi.h
 
-diff --git a/hw/microblaze/xlnx-zynqmp-pmu.c b/hw/microblaze/xlnx-zynqmp-pmu.c
-index ac0f789..c6a0b3b 100644
---- a/hw/microblaze/xlnx-zynqmp-pmu.c
-+++ b/hw/microblaze/xlnx-zynqmp-pmu.c
-@@ -18,8 +18,11 @@
- #include "qemu/osdep.h"
- #include "qapi/error.h"
- #include "qemu-common.h"
-+#include "exec/address-spaces.h"
- #include "hw/boards.h"
-+#include "hw/qdev-properties.h"
- #include "cpu.h"
-+#include "boot.h"
- 
- /* Define the PMU device */
- 
-@@ -27,21 +30,56 @@
- #define XLNX_ZYNQMP_PMU_SOC(obj) OBJECT_CHECK(XlnxZynqMPPMUSoCState, (obj), \
-                                               TYPE_XLNX_ZYNQMP_PMU_SOC)
- 
-+#define XLNX_ZYNQMP_PMU_ROM_SIZE    0x8000
-+#define XLNX_ZYNQMP_PMU_ROM_ADDR    0xFFD00000
-+#define XLNX_ZYNQMP_PMU_RAM_ADDR    0xFFDC0000
+diff --git a/hw/intc/Makefile.objs b/hw/intc/Makefile.objs
+index 2116550..571e094 100644
+--- a/hw/intc/Makefile.objs
++++ b/hw/intc/Makefile.objs
+@@ -4,6 +4,7 @@ common-obj-$(CONFIG_PL190) += pl190.o
+ common-obj-$(CONFIG_PUV3) += puv3_intc.o
+ common-obj-$(CONFIG_XILINX) += xilinx_intc.o
+ common-obj-$(CONFIG_XLNX_ZYNQMP) += xlnx-pmu-iomod-intc.o
++common-obj-$(CONFIG_XLNX_ZYNQMP) += xlnx-zynqmp-ipi.o
+ common-obj-$(CONFIG_ETRAXFS) += etraxfs_pic.o
+ common-obj-$(CONFIG_IMX) += imx_avic.o
+ common-obj-$(CONFIG_LM32) += lm32_pic.o
+diff --git a/hw/intc/xlnx-zynqmp-ipi.c b/hw/intc/xlnx-zynqmp-ipi.c
+new file mode 100644
+index 0000000..6203b27
+--- /dev/null
++++ b/hw/intc/xlnx-zynqmp-ipi.c
+@@ -0,0 +1,377 @@
++/*
++ * QEMU model of the IPI Inter Processor Interrupt block
++ *
++ * Copyright (c) 2014 Xilinx Inc.
++ *
++ * Written by Edgar E. Iglesias <edgar.iglesias@xilinx.com>
++ * Written by Alistair Francis <alistair.francis@xilinx.com>
++ *
++ * Permission is hereby granted, free of charge, to any person obtaining a copy
++ * of this software and associated documentation files (the "Software"), to deal
++ * in the Software without restriction, including without limitation the rights
++ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
++ * copies of the Software, and to permit persons to whom the Software is
++ * furnished to do so, subject to the following conditions:
++ *
++ * The above copyright notice and this permission notice shall be included in
++ * all copies or substantial portions of the Software.
++ *
++ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
++ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
++ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
++ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
++ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
++ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
++ * THE SOFTWARE.
++ */
 +
- typedef struct XlnxZynqMPPMUSoCState {
-     /*< private >*/
-     DeviceState parent_obj;
- 
-     /*< public >*/
-+    MicroBlazeCPU cpu;
- }  XlnxZynqMPPMUSoCState;
- 
- static void xlnx_zynqmp_pmu_soc_init(Object *obj)
- {
-+    XlnxZynqMPPMUSoCState *s = XLNX_ZYNQMP_PMU_SOC(obj);
- 
-+    object_initialize(&s->cpu, sizeof(s->cpu),
-+                      TYPE_MICROBLAZE_CPU);
-+    object_property_add_child(obj, "pmu-cpu", OBJECT(&s->cpu),
-+                              &error_abort);
- }
- 
- static void xlnx_zynqmp_pmu_soc_realize(DeviceState *dev, Error **errp)
- {
--
-+    XlnxZynqMPPMUSoCState *s = XLNX_ZYNQMP_PMU_SOC(dev);
-+    Error *err = NULL;
++#include "qemu/osdep.h"
++#include "hw/sysbus.h"
++#include "hw/register.h"
++#include "qemu/bitops.h"
++#include "qemu/log.h"
++#include "hw/intc/xlnx-zynqmp-ipi.h"
 +
-+    object_property_set_uint(OBJECT(&s->cpu), XLNX_ZYNQMP_PMU_ROM_ADDR,
-+                             "base-vectors", &error_abort);
-+    object_property_set_bool(OBJECT(&s->cpu), true, "use-stack-protection",
-+                             &error_abort);
-+    object_property_set_uint(OBJECT(&s->cpu), 0, "use-fpu", &error_abort);
-+    object_property_set_uint(OBJECT(&s->cpu), 0, "use-hw-mul", &error_abort);
-+    object_property_set_bool(OBJECT(&s->cpu), true, "use-barrel",
-+                             &error_abort);
-+    object_property_set_bool(OBJECT(&s->cpu), true, "use-msr-instr",
-+                             &error_abort);
-+    object_property_set_bool(OBJECT(&s->cpu), true, "use-pcmp-instr",
-+                             &error_abort);
-+    object_property_set_bool(OBJECT(&s->cpu), false, "use-mmu", &error_abort);
-+    object_property_set_bool(OBJECT(&s->cpu), true, "endianness",
-+                             &error_abort);
-+    object_property_set_str(OBJECT(&s->cpu), "8.40.b", "version",
-+                            &error_abort);
-+    object_property_set_uint(OBJECT(&s->cpu), 0, "pvr", &error_abort);
-+    object_property_set_bool(OBJECT(&s->cpu), true, "realized", &err);
-+    if (err) {
-+        error_propagate(errp, err);
-+        return;
++#ifndef XLNX_ZYNQMP_IPI_ERR_DEBUG
++#define XLNX_ZYNQMP_IPI_ERR_DEBUG 0
++#endif
++
++#define DB_PRINT_L(lvl, fmt, args...) do {\
++    if (XLNX_ZYNQMP_IPI_ERR_DEBUG >= lvl) {\
++        qemu_log(TYPE_XLNX_ZYNQMP_IPI ": %s:" fmt, __func__, ## args);\
++    } \
++} while (0);
++
++#define DB_PRINT(fmt, args...) DB_PRINT_L(1, fmt, ## args)
++
++REG32(IPI_TRIG, 0x0)
++    FIELD(IPI_TRIG, PL_3, 27, 1)
++    FIELD(IPI_TRIG, PL_2, 26, 1)
++    FIELD(IPI_TRIG, PL_1, 25, 1)
++    FIELD(IPI_TRIG, PL_0, 24, 1)
++    FIELD(IPI_TRIG, PMU_3, 19, 1)
++    FIELD(IPI_TRIG, PMU_2, 18, 1)
++    FIELD(IPI_TRIG, PMU_1, 17, 1)
++    FIELD(IPI_TRIG, PMU_0, 16, 1)
++    FIELD(IPI_TRIG, RPU_1, 9, 1)
++    FIELD(IPI_TRIG, RPU_0, 8, 1)
++    FIELD(IPI_TRIG, APU, 0, 1)
++REG32(IPI_OBS, 0x4)
++    FIELD(IPI_OBS, PL_3, 27, 1)
++    FIELD(IPI_OBS, PL_2, 26, 1)
++    FIELD(IPI_OBS, PL_1, 25, 1)
++    FIELD(IPI_OBS, PL_0, 24, 1)
++    FIELD(IPI_OBS, PMU_3, 19, 1)
++    FIELD(IPI_OBS, PMU_2, 18, 1)
++    FIELD(IPI_OBS, PMU_1, 17, 1)
++    FIELD(IPI_OBS, PMU_0, 16, 1)
++    FIELD(IPI_OBS, RPU_1, 9, 1)
++    FIELD(IPI_OBS, RPU_0, 8, 1)
++    FIELD(IPI_OBS, APU, 0, 1)
++REG32(IPI_ISR, 0x10)
++    FIELD(IPI_ISR, PL_3, 27, 1)
++    FIELD(IPI_ISR, PL_2, 26, 1)
++    FIELD(IPI_ISR, PL_1, 25, 1)
++    FIELD(IPI_ISR, PL_0, 24, 1)
++    FIELD(IPI_ISR, PMU_3, 19, 1)
++    FIELD(IPI_ISR, PMU_2, 18, 1)
++    FIELD(IPI_ISR, PMU_1, 17, 1)
++    FIELD(IPI_ISR, PMU_0, 16, 1)
++    FIELD(IPI_ISR, RPU_1, 9, 1)
++    FIELD(IPI_ISR, RPU_0, 8, 1)
++    FIELD(IPI_ISR, APU, 0, 1)
++REG32(IPI_IMR, 0x14)
++    FIELD(IPI_IMR, PL_3, 27, 1)
++    FIELD(IPI_IMR, PL_2, 26, 1)
++    FIELD(IPI_IMR, PL_1, 25, 1)
++    FIELD(IPI_IMR, PL_0, 24, 1)
++    FIELD(IPI_IMR, PMU_3, 19, 1)
++    FIELD(IPI_IMR, PMU_2, 18, 1)
++    FIELD(IPI_IMR, PMU_1, 17, 1)
++    FIELD(IPI_IMR, PMU_0, 16, 1)
++    FIELD(IPI_IMR, RPU_1, 9, 1)
++    FIELD(IPI_IMR, RPU_0, 8, 1)
++    FIELD(IPI_IMR, APU, 0, 1)
++REG32(IPI_IER, 0x18)
++    FIELD(IPI_IER, PL_3, 27, 1)
++    FIELD(IPI_IER, PL_2, 26, 1)
++    FIELD(IPI_IER, PL_1, 25, 1)
++    FIELD(IPI_IER, PL_0, 24, 1)
++    FIELD(IPI_IER, PMU_3, 19, 1)
++    FIELD(IPI_IER, PMU_2, 18, 1)
++    FIELD(IPI_IER, PMU_1, 17, 1)
++    FIELD(IPI_IER, PMU_0, 16, 1)
++    FIELD(IPI_IER, RPU_1, 9, 1)
++    FIELD(IPI_IER, RPU_0, 8, 1)
++    FIELD(IPI_IER, APU, 0, 1)
++REG32(IPI_IDR, 0x1c)
++    FIELD(IPI_IDR, PL_3, 27, 1)
++    FIELD(IPI_IDR, PL_2, 26, 1)
++    FIELD(IPI_IDR, PL_1, 25, 1)
++    FIELD(IPI_IDR, PL_0, 24, 1)
++    FIELD(IPI_IDR, PMU_3, 19, 1)
++    FIELD(IPI_IDR, PMU_2, 18, 1)
++    FIELD(IPI_IDR, PMU_1, 17, 1)
++    FIELD(IPI_IDR, PMU_0, 16, 1)
++    FIELD(IPI_IDR, RPU_1, 9, 1)
++    FIELD(IPI_IDR, RPU_0, 8, 1)
++    FIELD(IPI_IDR, APU, 0, 1)
++
++/* APU
++ * RPU_0
++ * RPU_1
++ * PMU_0
++ * PMU_1
++ * PMU_2
++ * PMU_3
++ * PL_0
++ * PL_1
++ * PL_2
++ * PL_3
++ */
++int index_array[NUM_IPIS] = {0, 8, 9, 16, 17, 18, 19, 24, 25, 26, 27};
++static const char *index_array_names[NUM_IPIS] = {"APU", "RPU_0", "RPU_1",
++                                                  "PMU_0", "PMU_1", "PMU_2",
++                                                  "PMU_3", "PL_0", "PL_1",
++                                                  "PL_2", "PL_3"};
++
++static void xlnx_zynqmp_ipi_set_trig(XlnxZynqMPIPI *s, uint32_t val)
++{
++    int i, ipi_index, ipi_mask;
++
++    for (i = 0; i < NUM_IPIS; i++) {
++        ipi_index = index_array[i];
++        ipi_mask = (1 << ipi_index);
++        DB_PRINT("Setting %s=%d\n", index_array_names[i],
++                 !!(val & ipi_mask));
++        qemu_set_irq(s->irq_trig_out[i], !!(val & ipi_mask));
 +    }
- }
- 
- static void xlnx_zynqmp_pmu_soc_class_init(ObjectClass *oc, void *data)
-@@ -70,7 +108,35 @@ type_init(xlnx_zynqmp_pmu_soc_register_types)
- 
- static void xlnx_zynqmp_pmu_init(MachineState *machine)
- {
--
-+    XlnxZynqMPPMUSoCState *pmu = g_new0(XlnxZynqMPPMUSoCState, 1);
-+    MemoryRegion *address_space_mem = get_system_memory();
-+    MemoryRegion *pmu_rom = g_new(MemoryRegion, 1);
-+    MemoryRegion *pmu_ram = g_new(MemoryRegion, 1);
++}
 +
-+    /* Create the ROM */
-+    memory_region_init_rom(pmu_rom, NULL, "xlnx-zynqmp-pmu.rom",
-+                           XLNX_ZYNQMP_PMU_ROM_SIZE, &error_fatal);
-+    memory_region_add_subregion(address_space_mem, XLNX_ZYNQMP_PMU_ROM_ADDR,
-+                                pmu_rom);
++static void xlnx_zynqmp_ipi_set_obs(XlnxZynqMPIPI *s, uint32_t val)
++{
++    int i, ipi_index, ipi_mask;
 +
-+    /* Create the RAM */
-+    memory_region_init_ram(pmu_ram, NULL, "xlnx-zynqmp-pmu.ram",
-+                           machine->ram_size, &error_fatal);
-+    memory_region_add_subregion(address_space_mem, XLNX_ZYNQMP_PMU_RAM_ADDR,
-+                                pmu_ram);
++    for (i = 0; i < NUM_IPIS; i++) {
++        ipi_index = index_array[i];
++        ipi_mask = (1 << ipi_index);
++        DB_PRINT("Setting %s=%d\n", index_array_names[i],
++                 !!(val & ipi_mask));
++        qemu_set_irq(s->irq_obs_out[i], !!(val & ipi_mask));
++    }
++}
 +
-+    /* Create the PMU device */
-+    object_initialize(pmu, sizeof(XlnxZynqMPPMUSoCState), TYPE_XLNX_ZYNQMP_PMU_SOC);
-+    object_property_add_child(OBJECT(machine), "pmu", OBJECT(pmu),
-+                              &error_abort);
-+    object_property_set_bool(OBJECT(pmu), true, "realized", &error_fatal);
++static void xlnx_zynqmp_ipi_update_irq(XlnxZynqMPIPI *s)
++{
++    bool pending = s->regs[R_IPI_ISR] & ~s->regs[R_IPI_IMR];
 +
-+    /* Load the kernel */
-+    microblaze_load_kernel(&pmu->cpu, XLNX_ZYNQMP_PMU_RAM_ADDR,
-+                           machine->ram_size,
-+                           machine->kernel_filename,
-+                           machine->dtb,
-+                           NULL);
- }
- 
- static void xlnx_zynqmp_pmu_machine_init(MachineClass *mc)
++    DB_PRINT("irq=%d isr=%x mask=%x\n",
++             pending, s->regs[R_IPI_ISR], s->regs[R_IPI_IMR]);
++    qemu_set_irq(s->irq, pending);
++}
++
++static uint64_t xlnx_zynqmp_ipi_trig_prew(RegisterInfo *reg, uint64_t val64)
++{
++    XlnxZynqMPIPI *s = XLNX_ZYNQMP_IPI(reg->opaque);
++
++    xlnx_zynqmp_ipi_set_trig(s, val64);
++
++    return val64;
++}
++
++static void xlnx_zynqmp_ipi_trig_postw(RegisterInfo *reg, uint64_t val64)
++{
++    XlnxZynqMPIPI *s = XLNX_ZYNQMP_IPI(reg->opaque);
++
++    /* TRIG generates a pulse on the outbound signals. We use the
++     * post-write callback to bring the signal back-down.
++     */
++    s->regs[R_IPI_TRIG] = 0;
++
++    xlnx_zynqmp_ipi_set_trig(s, 0);
++}
++
++static uint64_t xlnx_zynqmp_ipi_isr_prew(RegisterInfo *reg, uint64_t val64)
++{
++    XlnxZynqMPIPI *s = XLNX_ZYNQMP_IPI(reg->opaque);
++
++    xlnx_zynqmp_ipi_set_obs(s, val64);
++
++    return val64;
++}
++
++static void xlnx_zynqmp_ipi_isr_postw(RegisterInfo *reg, uint64_t val64)
++{
++    XlnxZynqMPIPI *s = XLNX_ZYNQMP_IPI(reg->opaque);
++
++    xlnx_zynqmp_ipi_update_irq(s);
++}
++
++static uint64_t xlnx_zynqmp_ipi_ier_prew(RegisterInfo *reg, uint64_t val64)
++{
++    XlnxZynqMPIPI *s = XLNX_ZYNQMP_IPI(reg->opaque);
++    uint32_t val = val64;
++
++    s->regs[R_IPI_IMR] &= ~val;
++    xlnx_zynqmp_ipi_update_irq(s);
++    return 0;
++}
++
++static uint64_t xlnx_zynqmp_ipi_idr_prew(RegisterInfo *reg, uint64_t val64)
++{
++    XlnxZynqMPIPI *s = XLNX_ZYNQMP_IPI(reg->opaque);
++    uint32_t val = val64;
++
++    s->regs[R_IPI_IMR] |= val;
++    xlnx_zynqmp_ipi_update_irq(s);
++    return 0;
++}
++
++static const RegisterAccessInfo xlnx_zynqmp_ipi_regs_info[] = {
++    {   .name = "IPI_TRIG",  .addr = A_IPI_TRIG,
++        .rsvd = 0xf0f0fcfe,
++        .ro = 0xf0f0fcfe,
++        .pre_write = xlnx_zynqmp_ipi_trig_prew,
++        .post_write = xlnx_zynqmp_ipi_trig_postw,
++    },{ .name = "IPI_OBS",  .addr = A_IPI_OBS,
++        .rsvd = 0xf0f0fcfe,
++        .ro = 0xffffffff,
++    },{ .name = "IPI_ISR",  .addr = A_IPI_ISR,
++        .rsvd = 0xf0f0fcfe,
++        .ro = 0xf0f0fcfe,
++        .w1c = 0xf0f0301,
++        .pre_write = xlnx_zynqmp_ipi_isr_prew,
++        .post_write = xlnx_zynqmp_ipi_isr_postw,
++    },{ .name = "IPI_IMR",  .addr = A_IPI_IMR,
++        .reset = 0xf0f0301,
++        .rsvd = 0xf0f0fcfe,
++        .ro = 0xffffffff,
++    },{ .name = "IPI_IER",  .addr = A_IPI_IER,
++        .rsvd = 0xf0f0fcfe,
++        .ro = 0xf0f0fcfe,
++        .pre_write = xlnx_zynqmp_ipi_ier_prew,
++    },{ .name = "IPI_IDR",  .addr = A_IPI_IDR,
++        .rsvd = 0xf0f0fcfe,
++        .ro = 0xf0f0fcfe,
++        .pre_write = xlnx_zynqmp_ipi_idr_prew,
++    }
++};
++
++static void xlnx_zynqmp_ipi_reset(DeviceState *dev)
++{
++    XlnxZynqMPIPI *s = XLNX_ZYNQMP_IPI(dev);
++    int i;
++
++    for (i = 0; i < ARRAY_SIZE(s->regs_info); ++i) {
++        register_reset(&s->regs_info[i]);
++    }
++
++    xlnx_zynqmp_ipi_update_irq(s);
++}
++
++static void xlnx_zynqmp_ipi_handler(void *opaque, int n, int level)
++{
++    XlnxZynqMPIPI *s = XLNX_ZYNQMP_IPI(opaque);
++    uint32_t val = (!!level) << n;
++
++    DB_PRINT("IPI input irq[%d]=%d\n", n, level);
++
++    s->regs[R_IPI_ISR] |= val;
++    xlnx_zynqmp_ipi_set_obs(s, s->regs[R_IPI_ISR]);
++    xlnx_zynqmp_ipi_update_irq(s);
++}
++
++static void xlnx_zynqmp_obs_handler(void *opaque, int n, int level)
++{
++    XlnxZynqMPIPI *s = XLNX_ZYNQMP_IPI(opaque);
++
++    DB_PRINT("OBS input irq[%d]=%d\n", n, level);
++
++    s->regs[R_IPI_OBS] &= ~(1ULL << n);
++    s->regs[R_IPI_OBS] |= (level << n);
++}
++
++static const MemoryRegionOps xlnx_zynqmp_ipi_ops = {
++    .read = register_read_memory,
++    .write = register_write_memory,
++    .endianness = DEVICE_LITTLE_ENDIAN,
++    .valid = {
++        .min_access_size = 4,
++        .max_access_size = 4,
++    },
++};
++
++static void xlnx_zynqmp_ipi_realize(DeviceState *dev, Error **errp)
++{
++    qdev_init_gpio_in_named(dev, xlnx_zynqmp_ipi_handler, "IPI_INPUTS", 32);
++    qdev_init_gpio_in_named(dev, xlnx_zynqmp_obs_handler, "OBS_INPUTS", 32);
++}
++
++static void xlnx_zynqmp_ipi_init(Object *obj)
++{
++    XlnxZynqMPIPI *s = XLNX_ZYNQMP_IPI(obj);
++    DeviceState *dev = DEVICE(obj);
++    SysBusDevice *sbd = SYS_BUS_DEVICE(obj);
++    RegisterInfoArray *reg_array;
++    char *irq_name;
++    int i;
++
++    memory_region_init(&s->iomem, obj, TYPE_XLNX_ZYNQMP_IPI,
++                       R_XLNX_ZYNQMP_IPI_MAX * 4);
++    reg_array =
++        register_init_block32(DEVICE(obj), xlnx_zynqmp_ipi_regs_info,
++                              ARRAY_SIZE(xlnx_zynqmp_ipi_regs_info),
++                              s->regs_info, s->regs,
++                              &xlnx_zynqmp_ipi_ops,
++                              XLNX_ZYNQMP_IPI_ERR_DEBUG,
++                              R_XLNX_ZYNQMP_IPI_MAX * 4);
++    memory_region_add_subregion(&s->iomem,
++                                0x0,
++                                &reg_array->mem);
++    sysbus_init_mmio(sbd, &s->iomem);
++    sysbus_init_irq(sbd, &s->irq);
++
++    for (i = 0; i < NUM_IPIS; i++) {
++        qdev_init_gpio_out_named(dev, &s->irq_trig_out[i],
++                                 index_array_names[i], 1);
++
++        irq_name = g_strdup_printf("OBS_%s", index_array_names[i]);
++        qdev_init_gpio_out_named(dev, &s->irq_obs_out[i],
++                                 irq_name, 1);
++        g_free(irq_name);
++    }
++}
++
++static const VMStateDescription vmstate_zynqmp_pmu_ipi = {
++    .name = TYPE_XLNX_ZYNQMP_IPI,
++    .version_id = 1,
++    .minimum_version_id = 1,
++    .fields = (VMStateField[]) {
++        VMSTATE_UINT32_ARRAY(regs, XlnxZynqMPIPI, R_XLNX_ZYNQMP_IPI_MAX),
++        VMSTATE_END_OF_LIST(),
++    }
++};
++
++static void xlnx_zynqmp_ipi_class_init(ObjectClass *klass, void *data)
++{
++    DeviceClass *dc = DEVICE_CLASS(klass);
++
++    dc->reset = xlnx_zynqmp_ipi_reset;
++    dc->realize = xlnx_zynqmp_ipi_realize;
++    dc->vmsd = &vmstate_zynqmp_pmu_ipi;
++}
++
++static const TypeInfo xlnx_zynqmp_ipi_info = {
++    .name          = TYPE_XLNX_ZYNQMP_IPI,
++    .parent        = TYPE_SYS_BUS_DEVICE,
++    .instance_size = sizeof(XlnxZynqMPIPI),
++    .class_init    = xlnx_zynqmp_ipi_class_init,
++    .instance_init = xlnx_zynqmp_ipi_init,
++};
++
++static void xlnx_zynqmp_ipi_register_types(void)
++{
++    type_register_static(&xlnx_zynqmp_ipi_info);
++}
++
++type_init(xlnx_zynqmp_ipi_register_types)
+diff --git a/include/hw/intc/xlnx-zynqmp-ipi.h b/include/hw/intc/xlnx-zynqmp-ipi.h
+new file mode 100644
+index 0000000..4afa4ff
+--- /dev/null
++++ b/include/hw/intc/xlnx-zynqmp-ipi.h
+@@ -0,0 +1,57 @@
++/*
++ * QEMU model of the IPI Inter Processor Interrupt block
++ *
++ * Copyright (c) 2014 Xilinx Inc.
++ *
++ * Permission is hereby granted, free of charge, to any person obtaining a copy
++ * of this software and associated documentation files (the "Software"), to deal
++ * in the Software without restriction, including without limitation the rights
++ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
++ * copies of the Software, and to permit persons to whom the Software is
++ * furnished to do so, subject to the following conditions:
++ *
++ * The above copyright notice and this permission notice shall be included in
++ * all copies or substantial portions of the Software.
++ *
++ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
++ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
++ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
++ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
++ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
++ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
++ * THE SOFTWARE.
++ */
++
++#ifndef XLNX_ZYNQMP_IPI_H
++#define XLNX_ZYNQMP_IPI_H
++
++#include "qemu/osdep.h"
++#include "hw/sysbus.h"
++#include "hw/register.h"
++
++#define TYPE_XLNX_ZYNQMP_IPI "xlnx.zynqmp_ipi"
++
++#define XLNX_ZYNQMP_IPI(obj) \
++     OBJECT_CHECK(XlnxZynqMPIPI, (obj), TYPE_XLNX_ZYNQMP_IPI)
++
++/* This is R_IPI_IDR + 1 */
++#define R_XLNX_ZYNQMP_IPI_MAX ((0x1c / 4) + 1)
++
++#define NUM_IPIS 11
++
++typedef struct XlnxZynqMPIPI {
++    /* Private */
++    SysBusDevice parent_obj;
++
++    /* Public */
++    MemoryRegion iomem;
++    qemu_irq irq;
++
++    qemu_irq irq_trig_out[NUM_IPIS];
++    qemu_irq irq_obs_out[NUM_IPIS];
++
++    uint32_t regs[R_XLNX_ZYNQMP_IPI_MAX];
++    RegisterInfo regs_info[R_XLNX_ZYNQMP_IPI_MAX];
++} XlnxZynqMPIPI;
++
++#endif /* XLNX_ZYNQMP_IPI_H */
 -- 
 2.7.4
