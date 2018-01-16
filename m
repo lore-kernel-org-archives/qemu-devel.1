@@ -1,20 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39509)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41672)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ebXxZ-0007xV-Kz
-	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 15:35:54 -0500
+	(envelope-from <lersek@redhat.com>) id 1ebY4G-0001rv-EF
+	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 15:42:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ebXxY-0004gX-9l
-	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 15:35:53 -0500
-References: <20180115225047.28607-1-jsnow@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <cf2e7128-9062-c270-5def-5f05a1001d47@redhat.com>
-Date: Tue, 16 Jan 2018 14:35:36 -0600
+	(envelope-from <lersek@redhat.com>) id 1ebY4C-0001fw-GO
+	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 15:42:48 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:42098)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1ebY4C-0001fL-7O
+	for qemu-devel@nongnu.org; Tue, 16 Jan 2018 15:42:44 -0500
+References: <1516117900-11382-1-git-send-email-stefanb@linux.vnet.ibm.com>
+	<1516117900-11382-3-git-send-email-stefanb@linux.vnet.ibm.com>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <8fa53398-2a94-a0ce-d093-390869f2b974@redhat.com>
+Date: Tue, 16 Jan 2018 21:42:35 +0100
 MIME-Version: 1.0
-In-Reply-To: <20180115225047.28607-1-jsnow@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="palW329kmR1ne7dmWjT7sEomA2joaAJPG"
-Subject: Re: [Qemu-devel] [PATCH v2] file-posix: specify expected filetypes
+In-Reply-To: <1516117900-11382-3-git-send-email-stefanb@linux.vnet.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 2/4] acpi: build QEMU table for PPI
+ virtual memory device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,99 +29,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org
-Cc: kwolf@redhat.com, qemu-devel@nongnu.org
+To: Stefan Berger <stefanb@linux.vnet.ibm.com>, qemu-devel@nongnu.org
+Cc: mst@redhat.com, kevin@koconnor.net, marcandre.lureau@redhat.com
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---palW329kmR1ne7dmWjT7sEomA2joaAJPG
-From: Eric Blake <eblake@redhat.com>
-To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org
-Cc: kwolf@redhat.com, qemu-devel@nongnu.org
-Message-ID: <cf2e7128-9062-c270-5def-5f05a1001d47@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2] file-posix: specify expected filetypes
-References: <20180115225047.28607-1-jsnow@redhat.com>
-In-Reply-To: <20180115225047.28607-1-jsnow@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 01/15/2018 04:50 PM, John Snow wrote:
-> I don't think there's a legitimate reason to open directories as if
-> they were files. This prevents QEMU from opening and attempting to prob=
-e
-> a directory inode, which can break in exciting ways. One of those ways
-> is lseek on ext4/xfs, which will return 0x7fffffffffffffff as the file
-> size instead of EISDIR. This can coax QEMU into responding with a
-> confusing "file too big" instead of "Hey, that's not a file".
->=20
-> See: https://bugs.launchpad.net/qemu/+bug/1739304/
-> Signed-off-by: John Snow <jsnow@redhat.com>
+On 01/16/18 16:51, Stefan Berger wrote:
+> To avoid having to hard code the base address of the PPI virtual memory
+> device we introduce a QEMU ACPI table that holds the base address, if a
+> TPM 1.2 or 2 is used. This table gives us flexibility to move the base
+> address later on.
+> 
+> Signed-off-by: Stefan Berger <stefanb@linux.vnet.ibm.com>
 > ---
->=20
+>  hw/i386/acpi-build.c        | 19 +++++++++++++++++++
+>  include/hw/acpi/acpi-defs.h |  8 ++++++++
+>  2 files changed, 27 insertions(+)
 
-> @@ -556,10 +557,30 @@ static int raw_open_common(BlockDriverState *bs, =
-QDict *options,
->          error_setg_errno(errp, errno, "Could not stat file");
->          goto fail;
->      }
-> -    if (S_ISREG(st.st_mode)) {
-> -        s->discard_zeroes =3D true;
-> -        s->has_fallocate =3D true;
+I don't understand how the guest OS is supposed to consume the QEMU
+table. The AML code in patch #4 does not seem to consume the QEMU table,
+for locating the operation region. I'm not saying that it *should*
+consume the QEMU table, only that I'm currently not seeing a use for the
+QEMU table.
+
+How is the QEMU table useful? What breaks if we drop it?
+
+(Sorry if we've been through this; then I must have lost context.)
+
+Thanks,
+Laszlo
+
+> 
+> diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+> index 18b939e..522d6d2 100644
+> --- a/hw/i386/acpi-build.c
+> +++ b/hw/i386/acpi-build.c
+> @@ -2628,6 +2628,20 @@ static bool acpi_get_mcfg(AcpiMcfgInfo *mcfg)
+>      return true;
+>  }
+>  
+> +static void build_qemu(GArray *table_data, BIOSLinker *linker,
+> +                       TPMVersion tpm_version)
+> +{
+> +    AcpiTableQemu *qemu = acpi_data_push(table_data, sizeof(*qemu));
 > +
-> +    if (!device) {
-> +        if (S_ISBLK(st.st_mode)) {
-> +            warn_report("Opening a block device as file using 'file'"
-> +                        "driver is deprecated");
-
-Do we have a proper deprecation documentation in place, and a time frame
-for when we'd start rejecting this rather than permitting it with the
-warning?
-
-> +        } else if (S_ISCHR(st.st_mode)) {
-> +            warn_report("Opening a character device as file using the =
-'file'"
-> +                        "driver is deprecated");
-> +        } else if (!S_ISREG(st.st_mode)) {
-> +            error_setg(errp, "A regular file was expected by the 'file=
-' driver,"
-> +                       "but something else was given");
-
-This makes sense.
-
-
-> @@ -589,7 +610,6 @@ static int raw_open_common(BlockDriverState *bs, QD=
-ict *options,
->          s->needs_alignment =3D true;
+> +    if (tpm_version != TPM_VERSION_UNSPEC) {
+> +        qemu->tpmppi_addr = TPM_PPI_ADDR_BASE;
+> +        qemu->tpm_version = tpm_version;
+> +    }
+> +
+> +    build_header(linker, table_data,
+> +                 (void *)qemu, "QEMU", sizeof(*qemu), 1, "QEMU", "CONF");
+> +}
+> +
+>  static
+>  void acpi_build(AcpiBuildTables *tables, MachineState *machine)
+>  {
+> @@ -2734,6 +2748,11 @@ void acpi_build(AcpiBuildTables *tables, MachineState *machine)
+>                            &pcms->acpi_nvdimm_state, machine->ram_slots);
 >      }
->  #endif
-> -
->  #ifdef CONFIG_XFS
->      if (platform_test_xfs_fd(s->fd)) {
-
-Spurious whitespace change.
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---palW329kmR1ne7dmWjT7sEomA2joaAJPG
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlpeYhgACgkQp6FrSiUn
-Q2o7Lgf/eSZAQL25mH7+y46cl9znwripuTmKjj+rpp14jtiszq2CqMniZ5XC0jmQ
-rmvhg4RW8kjXJmWF91wI8/qlxBFp6SDKR6TvbIKsGNAEK9ck4O4gg7BZf+CrwP3y
-lL00rl4Hs3x0NvzQ/Na29reIRwTVV+KU4L1EEYjLOaFzp6PVHqBm6jHV6ZaZ7n9S
-467jmNOM1e6+ZHrhhMpfvAgFrBJhH+xgOihPXgMxsN8m2DfLUS8+ALNpLicAuj6V
-0jVSpfCEZv6sCUi651EskeXAnca+q+nlw7a5FoBK0RERjV/C3wP2Jrr2J+OjM0mX
-sT1IgEWvqqthlR31exMhlILL8MxwLA==
-=ZijX
------END PGP SIGNATURE-----
-
---palW329kmR1ne7dmWjT7sEomA2joaAJPG--
+>  
+> +    if (misc.tpm_version != TPM_VERSION_UNSPEC) {
+> +        acpi_add_table(table_offsets, tables_blob);
+> +        build_qemu(tables_blob, tables->linker, misc.tpm_version);
+> +    }
+> +
+>      /* Add tables supplied by user (if any) */
+>      for (u = acpi_table_first(); u; u = acpi_table_next(u)) {
+>          unsigned len = acpi_table_len(u);
+> diff --git a/include/hw/acpi/acpi-defs.h b/include/hw/acpi/acpi-defs.h
+> index 80c8099..98764c1 100644
+> --- a/include/hw/acpi/acpi-defs.h
+> +++ b/include/hw/acpi/acpi-defs.h
+> @@ -573,6 +573,14 @@ struct Acpi20TPM2 {
+>  } QEMU_PACKED;
+>  typedef struct Acpi20TPM2 Acpi20TPM2;
+>  
+> +/* QEMU - Custom QEMU table */
+> +struct AcpiTableQemu {
+> +    ACPI_TABLE_HEADER_DEF
+> +    uint32_t tpmppi_addr;
+> +    uint8_t tpm_version; /* 1 = 1.2, 2 = 2 */
+> +};
+> +typedef struct AcpiTableQemu AcpiTableQemu;
+> +
+>  /* DMAR - DMA Remapping table r2.2 */
+>  struct AcpiTableDmar {
+>      ACPI_TABLE_HEADER_DEF
+> 
